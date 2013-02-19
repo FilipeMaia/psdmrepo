@@ -91,6 +91,7 @@ class GUIHelp ( QtGui.QWidget ) :
 
 
     def setStyle(self):
+        self.setMinimumHeight(300)
         self.           setStyleSheet (cp.styleBkgd)
         self.tit_status.setStyleSheet (cp.styleTitle)
         self.but_close .setStyleSheet (cp.styleButton)

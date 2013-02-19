@@ -64,7 +64,7 @@ class MaskEditor (QtGui.QWidget) :
     """Mask editor for 2d array"""
 
 
-    def __init__(self, parent=None, arr=None, xyc=None, ifname=None, ofname='./fig.png', mfname='./roi-mask', title='Mask editor', lw=2, col='b', picker=8):
+    def __init__(self, parent=None, arr=None, xyc=None, ifname=None, ofname='./fig.png', mfname='./roi-mask', title='Mask editor', lw=1, col='b', picker=8):
         """List of input parameters:
         @param parent  parent window is used to open other window moved w.r.t. parent.
         @param arr     2D array for image. If None then image will be taken from file or generated as random.
@@ -158,27 +158,48 @@ class MaskEditor (QtGui.QWidget) :
         #print 'Close application'
 
     def help_message(self):
-        msg  = 'Mouse control buttons for Mask Editor:' + \
-               '\n' + '='*38 +\
+        msg  = 'Mouse control buttons for Mask Editor' + \
+               '\n' + '='*37 + \
                '\n' + \
-               '\n"Zoom" mode - serves to zoom-in image and to set limits for spectrum.' + \
+               '\nForms' + \
+               '\n' + '='*5 + \
+               '\n"Rectangle", "Wedge", "Circle", "Line", and "Polygon" forms are used to compose ROI or inversed mask on image.' + \
+               'Selected forms will inverse choosen regions in composition of the mask.' + \
+               'Forms can be added, moved/edited, selected, or removed using appropriate mode, as explained below.' + \
+               '\n' + \
+               '\n' + \
+               '\nModes' + \
+               '\n' + '='*5 + \
+               '\n"Zoom" - zoom-in image and set limits for spectrum:' + \
                '\nZoom-in image: left mouse button click-drug-release for desired region of image.' + \
-               '\nSet limits for spectrum: left/right mouse button click on desired min/max limit.' + \
-               '\nReset to full size: middle mouse button click or "Reset" button' + \
+               '\nSet limits for spectrum: left/right mouse button click on desired min/max limit on spectrum.' + \
+               '\nReset to full size: middle mouse button click or "Reset" button.' + \
                '\n' + \
-               '\n"Add" mode - adds new form to shape mask on image: ' + \
-               '\nIn the "Add" mode for Rectangle, Wedge, Circle and Line use left mouse button click-drug-release,' + \
-               '\nfor Polygon use left mouse button click to add each next vertex and right mouse button click for last vertex' + \
+               '\n"Add" - add new form to compose the mask on image: ' + \
+               '\nIn the "Add" mode for Rectangle, Wedge, Circle, and Line use left mouse button click-drug-release. ' + \
+               'For Polygon use left mouse button click to add each next vertex and right mouse button click for the last vertex. '+  \
+               'Polygon form will be closed automatically after the last right mouse button click.' + \
                '\n' + \
-               '\n"Select" mode - select forms are for inverse regions in mask.' + \
+               '\n"Move" - move/edit form: ' + \
+               '\nIn the Move mode choose the form, then use mouse button click-drug-release on form boarder.' + \
+               'to move a single vertex or entire form for left or right button, respectively.' + \
                '\n' + \
+               '\n"Select" - select/deselect form(s) for inverse mask region(s): \nIn the Select mode choose the form, ' + \
+               'then use left mouse button click on form boarder. Form color is changed at selection/deselection.' + \
                '\n' + \
+               '\n"Remove" - removes form from image:' + \
+               '\nIn the Remove mode choose the form, then use any mouse button click on form boarder.' + \
+               '\nAs an alternative option, currently active form can be removed by the middle mouse button click on its boarder.' + \
                '\n' + \
-               '\n' + \
-               '\n' + \
-               '\n' + \
-               '\n' + \
-               '\n' + \
+               '\nI/O' + \
+               '\n' + '='*5 + \
+               '\n"Load Image"  - loads image for display from file.' + \
+               '\n"Load Forms"  - loads forms of masked regions from file.' + \
+               '\n"Save Forms"  - saves forms of masked regions in text file.' + \
+               '\n"Save Mask"   - saves mask as a 2D array of ones and zeros in text file.' + \
+               '\n"Save Inv-M"  - saves inversed-mask as a 2D array of ones and zeros in text file.' + \
+               '\n"Print Forms" - prints parameters of currently available forms.' + \
+               '\n"Clear Forms" - removes all forms from image.' + \
                '\n'
 
         return msg

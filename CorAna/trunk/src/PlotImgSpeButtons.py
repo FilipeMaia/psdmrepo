@@ -258,7 +258,7 @@ class PlotImgSpeButtons (QtGui.QWidget) :
             del self.guihelp
         except :
             self.guihelp = GUIHelp(None, self.help_msg)
-            self.guihelp.setFixedSize(620, 160) 
+            self.guihelp.setMinimumSize(620, 200) 
             self.guihelp.move(self.parentWidget().pos().__add__(QtCore.QPoint(250,60))) 
             self.guihelp.show()
 

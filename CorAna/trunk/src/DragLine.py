@@ -15,7 +15,7 @@ class DragLine( Drag, lines.Line2D ) :
 
         Drag.__init__(self, linewidth, color, linestyle, my_type='Line')
 
-        if str_of_pars != None :
+        if str_of_pars != None :      # Initialization from input file
             x1,x2,y1,y2,lw,col,s,t,r = self.parse_str_of_pars(str_of_pars)
             self.isSelected    = s
             self.myType        = t
@@ -23,10 +23,10 @@ class DragLine( Drag, lines.Line2D ) :
             self.isInitialized = True
             lines.Line2D.__init__(self, (x1,x2), (y1,y2), linewidth=lw, color=col, picker=picker)
 
-        elif x == None or y == None : # Default line initialization
+        elif x == None or y == None : # Default initialization using mouse 
             lines.Line2D.__init__(self, (0,1), (0,1), linewidth=linewidth, color=color, picker=picker)
             self.isInitialized = False
-        else :
+        else :                        # Initialization from program call
             lines.Line2D.__init__(self,  x,  y, linewidth=linewidth, color=color, picker=picker)
             self.isInitialized = True
 
@@ -35,12 +35,6 @@ class DragLine( Drag, lines.Line2D ) :
         self.myPicker = picker
         self.vtx      = 0
 
-
-
-    #def set_dragged_obj_properties(self):
-    #    self.set_color    ('k')
-    #    self.set_linewidth(1)
-    #    self.set_linestyle('--') #'--', ':'
 
     def get_list_of_pars(self) :
         xarr, yarr = self.get_data()
@@ -51,6 +45,7 @@ class DragLine( Drag, lines.Line2D ) :
         t   = self.myType
         r   = self.isRemoved
         return (xarr[0],xarr[1],yarr[0],yarr[1],lw,col,s,t,r)
+
 
     def parse_str_of_pars(self, str_of_pars) :
         pars = str_of_pars.split()
@@ -110,6 +105,9 @@ class DragLine( Drag, lines.Line2D ) :
 
         else : # if the line position is not defined yet:
 
+            if event.button is 2 : # Ignore middle button at initialization
+                return
+
             if self.vtx == 0 :
                 self.xarr = [clickxy[0]]
                 self.yarr = [clickxy[1]]
@@ -167,10 +165,15 @@ class DragLine( Drag, lines.Line2D ) :
 
     def on_release(self, event):
         'on release we reset the press data'
+
+        if not self.isInitialized and event.button is 2 : # Ignore middle button at initialization
+            return
+
         self.on_release_graphic_manipulations()
         #if self.press != None : self.print_pars()
         if self.press != None : self.maskIsAvailable = False        
         self.press = None
+
 
     #def get_poly_verts(self):
     #    """Creates a set of (closed) poly vertices for mask"""

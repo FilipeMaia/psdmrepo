@@ -6,7 +6,7 @@ from PyQt4 import QtGui, QtCore # For ability to override cursor...
 
 class DragObjectSet : 
 
-    def __init__(self, fig, axes=None, ObjectType=None, useKeyboard=False, is_single_obj=False, use_xyc=False, lw=2, col='b', picker=8) :
+    def __init__(self, fig, axes=None, ObjectType=None, useKeyboard=False, is_single_obj=False, use_xyc=False, lw=1, col='b', picker=8) :
 
         self.ObjectType    = ObjectType
         self.axes          = axes
@@ -190,6 +190,15 @@ class DragObjectSet :
                 #====================== REMOVE OBJECT BY PROGRAM CALL =================================
                 self.send_signal_and_remove_object_from_list(obj, self.list_of_objs, 'Call')
                 #======================================================================================
+
+    def remove_all_objs_from_img_by_call(self) :
+        """Loop over list of objects and remove them from the image USING CALL from code.
+        """
+        initial_list_of_objs = list(self.list_of_objs)
+        for obj in initial_list_of_objs :
+            #====================== REMOVE OBJECT BY PROGRAM CALL =================================
+            self.send_signal_and_remove_object_from_list(obj, self.list_of_objs, 'Call')
+            #======================================================================================
 
 
     def print_list_of_objs(self) :

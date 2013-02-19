@@ -95,14 +95,16 @@ class MaskEditorButtons (QtGui.QWidget) :
             
         self.list_of_modes   = ['Zoom', 'Add', 'Move', 'Select', 'Remove']
         self.list_of_forms   = ['Rectangle', 'Wedge', 'Circle', 'Line', 'Polygon'] #, 'Center'] 
-        self.list_of_io_tits = ['Load Image', 'Load Forms', 'Save Forms', 'Save Mask', 'Save Inv-M']
+        self.list_of_io_tits = ['Load Image', 'Load Forms', 'Save Forms', 'Save Mask', 'Save Inv-M', 'Print Forms', 'Clear Forms']
         self.list_of_io_tips = ['Load image for \ndisplay from file',
                                 'Load forms of masked \nregions from file',
                                 'Save forms of masked \nregions in text file',
                                 'Save mask as a 2D array \nof ones and zeros in text file',
-                                'Save inversed-mask as a 2D array\n of ones and zeros in text file']
+                                'Save inversed-mask as a 2D array\n of ones and zeros in text file',
+                                'Prints parameters of \ncurrently entered forms',
+                                'Clear all forms from the image']
 
-        self.list_of_fnames  = [self.mfname_img, self.mfname_objs, self.mfname_objs, self.mfname_mask, self.mfname_mask]
+        self.list_of_fnames  = [self.mfname_img, self.mfname_objs, self.mfname_objs, self.mfname_mask, self.mfname_mask, None, None]
 
         zoom_tip_msg = 'Zoom mode for image and spactrom.' + \
                        '\nZoom-in image: left mouse button click-drug-release.' + \
@@ -277,12 +279,43 @@ class MaskEditorButtons (QtGui.QWidget) :
         else                         : pass
 
 
+    #def on_but_old(self):
     def on_but(self):
         but = self.get_pushed_but()
         msg = 'on_but ' + str(but.text())
         logger.debug(msg, __name__ )
         #print msg
+        but_text = str(but.text())
 
+        #Set MODE
+        if but_text in self.list_of_modes :
+            self.fig.my_mode  = but_text # Sets mode for Drag objects
+
+            if self.fig.my_mode == 'Zoom' :
+                self.widgimage.connectZoomMode()
+                self.disconnect_all()
+                self.current_form = None
+            else :
+                self.widgimage.disconnectZoomMode()
+
+        #Set FORM
+        if but_text in self.list_of_forms :
+            self.disconnect_all()
+            self.current_form = but_text
+            self.connect_form(self.current_form)    # Connect objects for NEW form
+
+        self.setButtonStyle()
+
+
+
+    def on_but_new(self):
+    #def on_but(self):
+        but = self.get_pushed_but()
+        msg = 'on_but ' + str(but.text())
+        logger.debug(msg, __name__ )
+        #print msg
+
+        #Set MODE
         but_text = str(but.text())
         if but_text in self.list_of_modes :
             self.fig.my_mode  = but_text # Sets mode for Drag objects
@@ -292,20 +325,20 @@ class MaskEditorButtons (QtGui.QWidget) :
                 self.disconnect_all()
                 self.current_form = None
 
-            #elif self.fig.my_mode == 'Add' :
-            #    self.widgimage.disconnectZoomMode()
-            #    self.disconnect_all()
+            elif self.fig.my_mode == 'Add' :
+                self.widgimage.disconnectZoomMode()
+                self.disconnect_all()
                 #self.current_form = None
 
             else :
                 self.widgimage.disconnectZoomMode()
-                #self.connect_all()
-                #self.current_form = None
+                self.connect_all()
+                self.current_form = None
 
-
+        #Set FORM
         if but_text in self.list_of_forms :
-            self.disconnect_all()
-            #self.disconnect_form(self.current_form) # Disconnect objects for OLD form
+            if self.current_form == None : self.disconnect_all()
+            else : self.disconnect_form(self.current_form) # Disconnect objects for OLD form
             self.current_form = but_text
             self.connect_form(self.current_form)    # Connect objects for NEW form
 
@@ -328,13 +361,6 @@ class MaskEditorButtons (QtGui.QWidget) :
         else             : path0 = fname
 
 
-        #path = str( QtGui.QFileDialog.getOpenFileName(self,'Select file',fname) )
-        #dname, fname = os.path.split(path)
-        #if dname == '' or fname == '' :
-        #    logger.info('Input directiry name or file name is empty... keep file path unchanged...')
-        #    return
-
- 
         if but_text == self.list_of_io_tits[0] : # 'Load Img'
             path = gu.get_open_fname_through_dialog_box(self, path0, but_text, filter='*.txt')
             if path == None : return
@@ -369,7 +395,7 @@ class MaskEditorButtons (QtGui.QWidget) :
                 f.write(str_of_pars + '\n')
             f.close() 
 
- 
+
         if but_text == self.list_of_io_tits[3] : # 'Save Mask'
             if self.list_of_objs_for_mask_is_empty() : return
             mask_total = self.get_mask_total()
@@ -387,6 +413,27 @@ class MaskEditorButtons (QtGui.QWidget) :
             path = gu.get_save_fname_through_dialog_box(self, path0, but_text, filter='*.txt')
             if path == None : return
             np.savetxt(path, mask_total, fmt='%1i', delimiter=' ')
+
+
+        if but_text == self.list_of_io_tits[5] : # 'Print Forms'
+            #self.parent.set_image_array_new( get_array2d_for_test(), title='New array' )
+
+            msg = '\nForm parameters for composition of the mask'
+            print msg
+            logger.info(msg, __name__ )
+
+            for obj in self.get_list_of_objs_for_mask() :
+                str_of_pars = obj.get_str_of_pars()
+                print str_of_pars
+                logger.info(str_of_pars)
+
+
+        if but_text == self.list_of_io_tits[6] : # 'Clear Forms'
+            self.set_lines     .remove_all_objs_from_img_by_call()    
+            self.set_rectangles.remove_all_objs_from_img_by_call()        
+            self.set_circles   .remove_all_objs_from_img_by_call()        
+            self.set_wedges    .remove_all_objs_from_img_by_call()        
+            self.set_polygons  .remove_all_objs_from_img_by_call()    
 
 
     def get_mask_total(self):       
@@ -426,57 +473,6 @@ class MaskEditorButtons (QtGui.QWidget) :
               +self.set_lines     .get_list_of_objs() \
               +self.set_polygons  .get_list_of_objs()
             #+self.set_centers
-
-
-
-    def on_but_reset(self):
-        logger.debug('on_but_reset', __name__ )
-        self.widgimage.initParameters()
-        self.set_buttons()
-        self.widgimage.on_draw()
-
-
-    def on_but_save(self):
-        logger.debug('on_but_save', __name__ )
-        path = self.ofname
-        #dir, fname = os.path.split(path)
-        path = gu.get_save_fname_through_dialog_box(self, path, \
-                                                    'Select file to save the plot', \
-                                                    filter='*.png, *.eps, *pdf, *.ps')
-        #path  = str( QtGui.QFileDialog.getSaveFileName(self,
-        #                                               caption='Select file to save the plot',
-        #                                               directory = path,
-        #                                               filter = '*.png, *.eps, *pdf, *.ps'
-        #                                               ) )
-        #if path == '' :
-        #    logger.debug('Saving is cancelled.', __name__ )
-        #    return 
-        #logger.info('Save file: ' + path, __name__ )
-
-        if path != None : self.widgimage.saveFigure(path)
-
-
-    def on_but_elog(self):
-        logger.info('Send message to ELog:', __name__ )
-        path = self.ofname
-        logger.info('1. Save plot in file: ' + path, __name__ )
-        self.widgimage.saveFigure(path)
-        logger.info('2. Submit message with plot to ELog', __name__ )
-        wdialog = GUIELogPostingDialog (self, fname=path)
-        resp=wdialog.exec_()
-         
-
-
-    #def on_but_help(self):
-    #    logger.debug('on_but_help - is not implemented yet...', __name__ )
-    #    try :
-    #        self.guihelp.close()
-    #        del self.guihelp
-    #    except :
-    #        self.guihelp = GUIHelp(None,self.help_message())
-    #        self.guihelp.setFixedSize(620,160) 
-    #        self.guihelp.move(self.parentWidget().pos().__add__(QtCore.QPoint(250,60))) 
-    #        self.guihelp.show()
 
 
     def help_message(self):

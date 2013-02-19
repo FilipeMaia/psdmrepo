@@ -115,6 +115,9 @@ class DragPolygon( Drag, lines.Line2D ) :
 
         else : # if the line position is not defined yet, when it is added:
 
+            if event.button is 2 : # Ignore middle button at initialization
+                return
+
             if self.vtx == 0 :
                 self.xarr = [clickxy[0]]
                 self.yarr = [clickxy[1]]
@@ -153,6 +156,15 @@ class DragPolygon( Drag, lines.Line2D ) :
                 self.xarr[self.vtx] = xv + dx
                 self.yarr[self.vtx] = yv + dy
 
+                # Keep polygon closed in motion of 0 and last vertex
+                if self.vtx == 0 :
+                    self.xarr[-1] = self.xarr[0]
+                    self.yarr[-1] = self.yarr[0]
+                    
+                if self.vtx == len(self.xarr)-1 :
+                    self.xarr[0] = self.xarr[-1]
+                    self.yarr[0] = self.yarr[-1]
+
             # Move entire polylane
             if event.button is 3 : # for right mouse button
                 for vi in range(len(self.xarr)) :
@@ -182,8 +194,11 @@ class DragPolygon( Drag, lines.Line2D ) :
             if self.press != None : self.maskIsAvailable = False        
             self.press = None
 
-        else :
-            if event.button is 3 : # and not self.isInitialized  :
+        else : # if not self.isInitialized
+            if event.button is 2 : # Ignore middle button at initialization
+                return
+
+            if event.button is 3 :
                 """on release we reset the press data"""
 
                 self.xarr[self.vtx] = self.xarr[0]
