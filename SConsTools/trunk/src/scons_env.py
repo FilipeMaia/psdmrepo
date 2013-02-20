@@ -70,9 +70,6 @@ def buildEnv () :
     # all repos including local
     all_sit_repos = [ '#' ] + sit_repos
 
-    # SIT_EXTERNAL_SW
-    sit_external_sw = pjoin(sit_root, "sw", "external")
-
     # arch parts
     sit_arch = env['SIT_ARCH']
     sit_arch_parts = sit_arch.split('-')

@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-06
+2013-02-20 Andy Salnikov
+- fixing python path in tools/psdm_python.py
+
 Tag: V00-08-05
 2013-02-11 Andy Salnikov
 - adding support for collecting links to PHP stuff in ARCHDIR/php directory
