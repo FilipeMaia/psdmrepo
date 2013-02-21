@@ -89,11 +89,10 @@ class RegDBAuth {
             'LDAP',
             'manage_groups' )) return true;
 
-        /* Go through all experiments. Skip 'facilities'.
+        /* Go through all experiments.
     	 */
     	RegDB::instance()->begin();
     	foreach( RegDB::instance()->experiments() as $experiment ) {    	
-    		if( $experiment->is_facility()) continue;
     		if( $experiment->POSIX_gid() == $name ) {
                 if( AuthDb::instance()->hasPrivilege(
                     RegDBAuth::instance()->authName(),

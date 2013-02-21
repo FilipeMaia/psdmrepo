@@ -76,7 +76,16 @@ try {
     $default_medium_retention      = intval(Config::instance()->get_policy_param('MEDIUM-TERM', 'RETENTION'));
     $default_medium_quota          = intval(Config::instance()->get_policy_param('MEDIUM-TERM', 'QUOTA'));
 
-    $deadline_time = LusiTime::parse('2012-12-02');
+    $now = LusiTime::now();
+    $year = $now->year();
+    $month = $now->month();
+
+//    $month = $now->month() + 1;
+//    if ($month > 12) {
+//        $year++;
+//        $month = $month - 12;
+//    }
+    $deadline_time = LusiTime::parse(sprintf("%04d-%02d-02", $year, $month));
 
     if (is_null($exper_name)) {
 
@@ -93,13 +102,13 @@ try {
         $expiration_deadlines = array();
         foreach (
             array(
-                '2012-10-02',
-                '2012-11-02',
-                '2012-12-02',
                 '2013-01-02',
                 '2013-02-02',
                 '2013-03-02',
-                '2013-04-02') as $day) {
+                '2013-04-02',
+                '2013-05-02',
+                '2013-06-02',
+                '2013-07-02') as $day) {
             array_push(
                 $expiration_deadlines,
                 array(

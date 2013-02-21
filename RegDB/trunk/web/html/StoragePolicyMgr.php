@@ -8,6 +8,7 @@ require_once( 'regdb/regdb.inc.php' );
 
 use AuthDB\AuthDB;
 use DataPortal\Config;
+use DataPortal\DataPortal;
 use LogBook\LogBook;
 use LusiTime\LusiTime;
 use RegDB\RegDB;
@@ -134,7 +135,17 @@ var experiments = [];
     foreach ($instruments as $instrument_name) {
         echo "instruments.push('{$instrument_name}');\n";
         foreach ($experiments_by_instrument[$instrument_name] as $experiment) {
-            echo "experiments.push({instr_name: '{$instrument_name}', exper_name: '{$experiment->name()}', exper_id: {$experiment->id()}});\n";
+            $contacts = array();
+            foreach (DataPortal::experiment_contacts( $experiment ) as $contact) {
+                array_push($contacts, $contact);
+            }
+            $experiment_entry = json_encode(array(
+                'instr_name' => $instrument_name,
+                'exper_name' => $experiment->name(),
+                'exper_id'   => $experiment->id(),
+                'contacts'   => $contacts
+            ));
+            echo "experiments.push({$experiment_entry});\n";
         }
     }
 ?>
@@ -154,6 +165,55 @@ function load_stats_for_experiment (descr) {
             $('#short_term_expiration_' +descr.exper_id).html(data.short_term_expiration);
             $('#medium_term_expiration_'+descr.exper_id).html(data.medium_term_expiration);
             $('#medium_usage_gb_'       +descr.exper_id).html(data.medium_usage_gb    ? data.medium_usage_gb    : '');
+            $.ajax({
+                type: 'GET',
+                url: '../portal/ws/SearchFiles.php',
+                data: {
+                    exper_id: descr.exper_id
+                },
+                success: function(data) {
+                    if( data.Status != 'success' ) { alert(data.Message); return; }
+                    var total_size_gb = 0;
+                    if( data.overstay['SHORT-TERM'] != undefined) total_size_gb = Math.floor(data.overstay['SHORT-TERM'].total_size_gb);
+                    $('#short_term_expired_size_gb_'+descr.exper_id).html(total_size_gb ? total_size_gb : '').css('color','red');
+                    if( total_size_gb ) {
+                        var email_to      = descr.contacts[0];  // the first contact in the list only
+                        var email_cc      = 'perazzo@slac.stanford.edu;gapon@slac.stanford.edu';
+                        var email_subject = encodeURIComponent('Cleaning expired data files of LCLS experiment '+descr.exper_name);
+                        var email_body    = encodeURIComponent(
+'Dear LCLS user,\n'+
+'\n'+
+'You\'re receiving this communication because you\'re registered as the PI of experiment '+descr.exper_name+'. '+
+'We would like to let you know that some of the data files you have at our disk storage system have either expired '+
+'or about to expire in accordance with the LCLC Data Retention Policy. The expired files will be removed from '+
+'the disks 1 week from the date of this message.\n'+
+'\n'+
+'The total amount if expired data: '+total_size_gb+' GB\n'+
+'\n'+
+'Please, note that you can always restore these files from tape using the \'File Manager\' page of the Web Portal '+
+'of your experiment. Another possibility which you may consider is to move selected files to the MEDIUM-STORAGE class '+
+'using the Web Portal.  This will prolong the disk stay of those files for up to 2 years from the day when the files '+
+'were recorded. Be advised that the amount of data which you can keep in the MEDIUM-STORAGE is limited by a quota whose '+
+'default value is 10 TB.\n'+
+'You can learn about the Data Retention Policy and instructions for moving files between different storage levels at:\n'+
+'\n'+
+'https://confluence.slac.stanford.edu/display/PCDS/Data+Retention+Policy\n'+
+'\n'+
+'Please, do not hesitate to contact us directly or via pcds-help@slac.stanford.edu should you have any further '+
+'questions regarding the Policy or the status of your files. And we would also appreciate if you spread this news '+
+'to the other members of your experiment.\n\n'
+                        );
+                        var notify_pi = $('a.notify_pi[name="notify_pi_of_exper_id_'+descr.exper_id+'"]');
+                        var notify_pi_href = 'mailto:'+email_to+'?cc='+email_cc+'&subject='+email_subject+'&body='+email_body;
+                        notify_pi.attr('href',notify_pi_href).button('enable');
+                        $('button.delete_expired[name="'+descr.exper_id+'"]').button('enable');
+                    }
+                },
+                error: function() {
+                    alert('The request can not go through due a failure to contact the server.');
+                },
+                dataType: 'json'
+            });
         },
         error: function() {
             alert('The request can not go through due a failure to contact the server.');
@@ -165,13 +225,13 @@ function load_stats_for_experiment (descr) {
 var total_short_usage_files = 0;
 var total_short_usage_tb = 0;
 var total_short_expired_tb = {
-    '2012-10-02': 0,
-    '2012-11-02': 0,
-    '2012-12-02': 0,
     '2013-01-02': 0,
     '2013-02-02': 0,
     '2013-03-02': 0,
-    '2013-04-02': 0
+    '2013-04-02': 0,
+    '2013-05-02': 0,
+    '2013-06-02': 0,
+    '2013-07-02': 0,
 };
 var total_medium_usage_files = 0;
 var total_medium_usage_tb = 0;
@@ -284,7 +344,7 @@ $(function() {
             $('#comment_'+exper_id).text('failed');
         });
     });
-    $('button.delete_expired').button().click(function() {
+    $('button.delete_expired').button().button('disable').click(function() {
 
         var exper_id = this.name;
         var button = $(this);
@@ -312,6 +372,9 @@ $(function() {
             button.button('enable');
             $('#comment_'+exper_id).text('failed');
         });
+    });
+    $('a.notify_pi').button().button('disable').click(function() {
+        $(this).button('disable');
     });
     $('input.experiment').keyup(function() {
         var exper_id = parseInt(this.name.substr(this.name.lastIndexOf('_')+1));
@@ -518,7 +581,7 @@ HERE;
               <td class="table_hdr" rowspan=2 >Experiment</td>
               <td class="table_hdr" rowspan=2 >Id</td>
               <td class="table_hdr" rowspan=2 >#runs</td>
-              <td class="table_hdr" colspan=4 align="center" >SHORT-TERM</td>
+              <td class="table_hdr" colspan=5 align="center" >SHORT-TERM</td>
               <td class="table_hdr" colspan=6 align="center" >MEDIUM-TERM</td>
 
 HERE;
@@ -531,11 +594,12 @@ HERE;
         print <<<HERE
             </tr>
             <tr>
-              <td class="table_hdr" align="right" >data [GB]</td>
+              <td class="table_hdr" align="right" >total [GB]</td>
+              <td class="table_hdr" align="right" >expired [GB]</td>
               <td class="table_hdr" >CTIME override</td>
               <td class="table_hdr" align="right" >retention</td>
               <td class="table_hdr" >expiration</td>
-              <td class="table_hdr" align="right" >data [GB]</td>
+              <td class="table_hdr" align="right" >total [GB]</td>
               <td class="table_hdr" align="right" >quota [GB]</td>
               <td class="table_hdr" >used [%]</td>
               <td class="table_hdr" >CTIME override</td>
@@ -585,6 +649,7 @@ HERE;
               <td class="table_cell"                      align="right"    >{$experiment->id()}</td>
               <td class="table_cell table_cell_highlight" align="right" id="num_runs_{$experiment->id()}"           >Loading...</td>
               <td class="table_cell table_cell_highlight" align="right" id="short_term_size_gb_{$experiment->id()}" >Loading...</td>
+              <td class="table_cell table_cell_highlight" align="right" id="short_term_expired_size_gb_{$experiment->id()}" >Loading...</td>
 
 HERE;
             if ($can_edit) {
@@ -598,7 +663,7 @@ HERE;
               <td class="table_cell "                                      ><input type="text" class="experiment" name="medium_ctime_{$experiment->id()}"     value="{$medium_quota_ctime_time_str}" size="11" /></td>
               <td class="table_cell "                                      ><input type="text" class="experiment" name="medium_retention_{$experiment->id()}" value="{$medium_retention_str}"        size="2" style="text-align:right" /></td>
               <td class="table_cell"                                    id="medium_term_expiration_{$experiment->id()}" >Loading...</td>
-              <td class="table_cell " style="white-space: nowrap;"         ><button class="experiment" name="{$experiment->id()}" >Save</button><button class="delete_expired" name="{$experiment->id()}" >Delete Expired Files</button></td>
+              <td class="table_cell " style="white-space: nowrap;"         ><button class="experiment" name="{$experiment->id()}" >Save</button><button class="delete_expired" name="{$experiment->id()}" >Delete Expired Files</button><a class="notify_pi" name="notify_pi_of_exper_id_{$experiment->id()}" >Notify PI</a></td>
               <td class="table_cell table_cell_right"                      ><span id="comment_{$experiment->id()}"}></span></td>
 
 HERE;
@@ -651,13 +716,13 @@ HERE;
             <tr>
               <td class="table_hdr"             align="right"  >files</td>
               <td class="table_hdr"             align="right"  >TB</td>
-              <td class="table_hdr"             align="right"  >2012-10-01</td>
-              <td class="table_hdr"             align="right"  >2012-11-01</td>
-              <td class="table_hdr"             align="right"  >2012-12-01</td>
               <td class="table_hdr"             align="right"  >2013-01-01</td>
               <td class="table_hdr"             align="right"  >2013-02-01</td>
               <td class="table_hdr"             align="right"  >2013-03-01</td>
               <td class="table_hdr"             align="right"  >2013-04-01</td>
+              <td class="table_hdr"             align="right"  >2013-05-01</td>
+              <td class="table_hdr"             align="right"  >2013-06-01</td>
+              <td class="table_hdr"             align="right"  >2013-07-01</td>
               <td class="table_hdr"             align="right"  >files</td>
               <td class="table_hdr"             align="right"  >TB</td>
             </tr>
@@ -697,13 +762,13 @@ HERE;
               <td class="table_cell table_cell_left"  align="left"  >{$instrument_name}</td>
               <td class="table_cell "                 align="right" id="short_usage_files_{$instrument_name}"           >Loading</td>
               <td class="table_cell highlighted "     align="right" id="short_usage_tb_{$instrument_name}"              >Loading...</td>
-              <td class="table_cell highlighted "     align="right" id="short_expired_tb_2012-10-02_{$instrument_name}" >Loading...</td>
-              <td class="table_cell "                 align="right" id="short_expired_tb_2012-11-02_{$instrument_name}" >Loading...</td>
-              <td class="table_cell "                 align="right" id="short_expired_tb_2012-12-02_{$instrument_name}" >Loading...</td>
               <td class="table_cell "                 align="right" id="short_expired_tb_2013-01-02_{$instrument_name}" >Loading...</td>
               <td class="table_cell "                 align="right" id="short_expired_tb_2013-02-02_{$instrument_name}" >Loading...</td>
               <td class="table_cell "                 align="right" id="short_expired_tb_2013-03-02_{$instrument_name}" >Loading...</td>
               <td class="table_cell "                 align="right" id="short_expired_tb_2013-04-02_{$instrument_name}" >Loading...</td>
+              <td class="table_cell "                 align="right" id="short_expired_tb_2013-05-02_{$instrument_name}" >Loading...</td>
+              <td class="table_cell "                 align="right" id="short_expired_tb_2013-06-02_{$instrument_name}" >Loading...</td>
+              <td class="table_cell "                 align="right" id="short_expired_tb_2013-07-02_{$instrument_name}" >Loading...</td>
               <td class="table_cell "                 align="right" id="medium_usage_files_{$instrument_name}"          >Loading...</td>
               <td class="table_cell highlighted "     align="right" id="medium_usage_tb_{$instrument_name}"             >Loading...</td>
               <td class="table_cell table_cell_right" align="right" id="medium_quota_tb_{$instrument_name}"             >Loading...</td>
@@ -715,13 +780,13 @@ HERE;
               <td class="table_cell table_cell_left  table_cell_bottom"             align="left"  >Total:</td>
               <td class="table_cell                  table_cell_bottom"             align="right" id="total_short_usage_files"           >Loading</td>
               <td class="table_cell                  table_cell_bottom highlighted" align="right" id="total_short_usage_tb"              >Loading...</td>
-              <td class="table_cell                  table_cell_bottom highlighted" align="right" id="total_short_expired_tb_2012-10-02" >Loading...</td>
-              <td class="table_cell                  table_cell_bottom"             align="right" id="total_short_expired_tb_2012-11-02" >Loading...</td>
-              <td class="table_cell                  table_cell_bottom"             align="right" id="total_short_expired_tb_2012-12-02" >Loading...</td>
               <td class="table_cell                  table_cell_bottom"             align="right" id="total_short_expired_tb_2013-01-02" >Loading...</td>
               <td class="table_cell                  table_cell_bottom"             align="right" id="total_short_expired_tb_2013-02-02" >Loading...</td>
               <td class="table_cell                  table_cell_bottom"             align="right" id="total_short_expired_tb_2013-03-02" >Loading...</td>
               <td class="table_cell                  table_cell_bottom"             align="right" id="total_short_expired_tb_2013-04-02" >Loading...</td>
+              <td class="table_cell                  table_cell_bottom"             align="right" id="total_short_expired_tb_2013-05-02" >Loading...</td>
+              <td class="table_cell                  table_cell_bottom"             align="right" id="total_short_expired_tb_2013-06-02" >Loading...</td>
+              <td class="table_cell                  table_cell_bottom"             align="right" id="total_short_expired_tb_2013-07-02" >Loading...</td>
               <td class="table_cell                  table_cell_bottom"             align="right" id="total_medium_usage_files"          >Loading...</td>
               <td class="table_cell                  table_cell_bottom highlighted" align="right" id="total_medium_usage_tb"             >Loading...</td>
               <td class="table_cell table_cell_right table_cell_bottom"             align="right" id="total_medium_quota_tb"             >Loading...</td>
