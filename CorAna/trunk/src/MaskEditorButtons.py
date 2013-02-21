@@ -28,6 +28,7 @@ __version__ = "$Revision: 4 $"
 #--------------------------------
 import sys
 import os
+import time
 import numpy as np
 
 from PyQt4 import QtGui, QtCore
@@ -59,7 +60,7 @@ class MaskEditorButtons (QtGui.QWidget) :
     #  Constructor --
     #----------------
 
-    def __init__(self, parent=None, widgimage=None, ifname=None, ofname='./roi-mask.png', mfname='./roi-mask', xyc=None, lw=2, col='b', picker=5):
+    def __init__(self, parent=None, widgimage=None, ifname=None, ofname='./roi-mask.png', mfname='./roi-mask', xyc=None, lw=2, col='b', picker=5, verb=False):
         QtGui.QWidget.__init__(self, parent)
         self.setWindowTitle('GUI of buttons')
 
@@ -68,6 +69,7 @@ class MaskEditorButtons (QtGui.QWidget) :
         self.parent    = parent
         self.ofname    = ofname
         self.mfname    = mfname
+        self.verb      = verb
 
         self.mfname_img  = ifname
         self.mfname_mask = self.mfname + '.txt'
@@ -83,7 +85,7 @@ class MaskEditorButtons (QtGui.QWidget) :
             if xyc != None : self.fig.my_xyc = xyc
             else           : self.fig.my_xyc = self.widgimage.get_xy_img_center()
 
-            print 'Image center: ', self.fig.my_xyc
+            if self.verb : print 'Image center: ', self.fig.my_xyc
 
             self.set_lines      = DragObjectSet(self.fig, self.axes, DragLine,      useKeyboard=False, lw=lw, col=col, picker=picker)
             self.set_wedges     = DragObjectSet(self.fig, self.axes, DragWedge,     useKeyboard=False, lw=lw, col=col, picker=picker, use_xyc=True)
@@ -118,9 +120,13 @@ class MaskEditorButtons (QtGui.QWidget) :
         #self.current_form = self.list_of_forms[0]
         self.current_form = None
 
-        self.tit_modes = QtGui.QLabel('Modes:')
-        self.tit_forms = QtGui.QLabel('Forms:')
-        self.tit_io    = QtGui.QLabel('I/O:')
+        self.tit_modes  = QtGui.QLabel('Modes:')
+        self.tit_forms  = QtGui.QLabel('Forms:')
+        self.tit_io     = QtGui.QLabel('I/O:')
+        self.tit_status = QtGui.QLabel('Status:')
+        self.lab_status = QtGui.QPushButton('Good')
+        #self.lab_status = QtGui.QLabel('Good')
+        #self.lab_status = QtGui.QTextEdit()
 
         self.vbox = QtGui.QVBoxLayout()
         self.vbox.addWidget(self.tit_forms)
@@ -152,10 +158,15 @@ class MaskEditorButtons (QtGui.QWidget) :
             but.setToolTip(io_tip)
 
         self.vbox.addStretch(1)
+        self.vbox.addWidget(self.tit_status)
+        self.vbox.addWidget(self.lab_status)
+
         self.setLayout(self.vbox)
 
         self.showToolTips()
         self.setStyle()
+
+        self.setStatus()
 
 
     #def updateCenter(self,x,y):
@@ -180,9 +191,13 @@ class MaskEditorButtons (QtGui.QWidget) :
         self.tit_modes .setStyleSheet (cp.styleLabel)
         self.tit_forms .setStyleSheet (cp.styleLabel)
         self.tit_io    .setStyleSheet (cp.styleLabel)
+        self.tit_status.setStyleSheet (cp.styleLabel)
         self.tit_modes .setAlignment  (QtCore.Qt.AlignCenter)
         self.tit_forms .setAlignment  (QtCore.Qt.AlignCenter)
         self.tit_io    .setAlignment  (QtCore.Qt.AlignCenter)
+        self.tit_status.setAlignment  (QtCore.Qt.AlignCenter)
+
+        self.lab_status.setFixedHeight(50)
 
         self.setButtonStyle()
 
@@ -190,7 +205,7 @@ class MaskEditorButtons (QtGui.QWidget) :
     def setButtonStyle(self):
         for but in self.list_of_buts :
             but_text = str(but.text()) 
-            if   but_text == self.fig.my_mode : but.setStyleSheet (cp.styleButtonGood)
+            if   but_text == self.fig.my_mode  : but.setStyleSheet (cp.styleButtonGood)
             elif but_text == self.current_form : but.setStyleSheet (cp.styleButtonGood)
             else                               : but.setStyleSheet (cp.styleButton)
  
@@ -284,7 +299,7 @@ class MaskEditorButtons (QtGui.QWidget) :
         but = self.get_pushed_but()
         msg = 'on_but ' + str(but.text())
         logger.debug(msg, __name__ )
-        #print msg
+        #if self.verb : print msg
         but_text = str(but.text())
 
         #Set MODE
@@ -305,6 +320,7 @@ class MaskEditorButtons (QtGui.QWidget) :
             self.connect_form(self.current_form)    # Connect objects for NEW form
 
         self.setButtonStyle()
+        self.setStatus()
 
 
 
@@ -313,7 +329,7 @@ class MaskEditorButtons (QtGui.QWidget) :
         but = self.get_pushed_but()
         msg = 'on_but ' + str(but.text())
         logger.debug(msg, __name__ )
-        #print msg
+        #if self.verb : print msg
 
         #Set MODE
         but_text = str(but.text())
@@ -343,6 +359,7 @@ class MaskEditorButtons (QtGui.QWidget) :
             self.connect_form(self.current_form)    # Connect objects for NEW form
 
         self.setButtonStyle()
+        self.setStatus()
 
 
     def get_pushed_io_but(self):
@@ -355,90 +372,120 @@ class MaskEditorButtons (QtGui.QWidget) :
         but_text = str(but.text())
         msg = but_text + ', default file name: ' + str(fname) 
         logger.debug(msg, __name__ )
-        print msg
+        if self.verb : print msg
 
         if fname == None : path0 = '.'
         else             : path0 = fname
 
 
         if but_text == self.list_of_io_tits[0] : # 'Load Img'
+            self.setStatus(1, 'Waiting\nfor input...')
             path = gu.get_open_fname_through_dialog_box(self, path0, but_text, filter='*.txt')
-            if path == None : return
+            if path == None :
+                self.setStatus()
+                return
+            self.setStatus(2, 'WAIT!\nLoad image')
             arr = gu.get_array_from_file(path)             
             self.parent.set_image_array_new(arr, title='Image from '+path )
+            self.setStatus(0, 'Image \nloaded')
 
 
         if but_text == self.list_of_io_tits[1] : # 'Load Forms'
+            self.setStatus(1, 'Waiting\nfor input')
             path = gu.get_open_fname_through_dialog_box(self, path0, but_text, filter='*.txt')
-            if path == None : return
+            if path == None :
+                self.setStatus()
+                return
             msg='Load shaping-objects for mask from file: ' + path 
             logger.debug(msg, __name__ )
-            print msg
+            if self.verb : print msg
             #text = gu.get_text_file_content(path)
+            self.setStatus(2,'WAIT\nLoad forms')
             f=open(path,'r')
             for str_of_pars in f :
                 self.add_obj(str_of_pars.rstrip('\n'))
             f.close() 
+            self.setStatus(0, 'Forms\nloaded')
 
 
         if but_text == self.list_of_io_tits[2] : # 'Save Forms'
             #self.parent.set_image_array_new( get_array2d_for_test(), title='New array' )
             if self.list_of_objs_for_mask_is_empty() : return
+            self.setStatus(1, 'Waiting\nfor input...')
             path = gu.get_save_fname_through_dialog_box(self, path0, but_text, filter='*.txt')
-            if path == None : return
+            if path == None :
+                self.setStatus()
+                return
             msg='Save shaping-objects for mask in file: ' + path 
             logger.debug(msg, __name__ )
+            self.setStatus(2, 'WAIT!\nSave forms')
             f=open(path,'w')
             for obj in self.get_list_of_objs_for_mask() :
                 str_of_pars = obj.get_str_of_pars()
-                print str_of_pars
+                if self.verb : print str_of_pars
                 f.write(str_of_pars + '\n')
             f.close() 
+            self.setStatus(0, 'Forms\nsaved')
 
 
         if but_text == self.list_of_io_tits[3] : # 'Save Mask'
             if self.list_of_objs_for_mask_is_empty() : return
+            self.setStatus(2, 'WAIT!\nMask is\nprocessing')
+            self.enforceStatusRepaint()
+            #print 'WAIT for mask processing'
             mask_total = self.get_mask_total()
             self.parent.set_image_array_new(mask_total, title='Mask')
             #self.parent.set_image_array_new( get_array2d_for_test(), title='New array' )
+            self.setStatus(1, 'Waiting\nfor input...')
             path = gu.get_save_fname_through_dialog_box(self, path0, but_text, filter='*.txt')
-            if path == None : return
+            if path == None :
+                self.setStatus()
+                return
             np.savetxt(path, mask_total, fmt='%1i', delimiter=' ')
+            self.setStatus(0, 'Mask\nis saved')
 
 
         if but_text == self.list_of_io_tits[4] : # 'Save Inv-Mask'
             if self.list_of_objs_for_mask_is_empty() : return
+            self.setStatus(2, 'Wait!\nInv-mask is\nprocessing')
+            self.enforceStatusRepaint()
             mask_total = ~self.get_mask_total()
             self.parent.set_image_array_new(mask_total, title='Inverse Mask')
+            self.setStatus(1, 'Waiting\nfor input')
             path = gu.get_save_fname_through_dialog_box(self, path0, but_text, filter='*.txt')
-            if path == None : return
+            if path == None : 
+                self.setStatus()
+                return
             np.savetxt(path, mask_total, fmt='%1i', delimiter=' ')
+            self.setStatus(0, 'Mask\nis ready')
 
 
         if but_text == self.list_of_io_tits[5] : # 'Print Forms'
             #self.parent.set_image_array_new( get_array2d_for_test(), title='New array' )
 
             msg = '\nForm parameters for composition of the mask'
-            print msg
+            if self.verb : print msg
             logger.info(msg, __name__ )
 
             for obj in self.get_list_of_objs_for_mask() :
                 str_of_pars = obj.get_str_of_pars()
-                print str_of_pars
+                if self.verb : print str_of_pars
                 logger.info(str_of_pars)
 
 
         if but_text == self.list_of_io_tits[6] : # 'Clear Forms'
+            self.setStatus(2, 'WAIT!\nremoving\nforms')
             self.set_lines     .remove_all_objs_from_img_by_call()    
             self.set_rectangles.remove_all_objs_from_img_by_call()        
             self.set_circles   .remove_all_objs_from_img_by_call()        
             self.set_wedges    .remove_all_objs_from_img_by_call()        
             self.set_polygons  .remove_all_objs_from_img_by_call()    
+            self.setStatus(0, 'Forms\nremoved')
 
 
     def get_mask_total(self):       
         shape = self.widgimage.get_img_shape()
-        print 'get_img_shape():', shape
+        if self.verb : print 'get_img_shape():', shape
 
         self.mask_total = None
         for i, obj in enumerate(self.get_list_of_objs_for_mask()) :
@@ -503,7 +550,42 @@ class MaskEditorButtons (QtGui.QWidget) :
         #    logger.debug('Cancel is requested', __name__)
         #return clicked
 
-        
+
+    def setStatus(self, ind=None, msg='') :
+
+        if ind == None and msg == '' :
+            self.stat_msg = self.fig.my_mode
+            if self.current_form != None : self.stat_msg += '\n' + str(self.current_form)
+            self.stat_ind = 0
+
+            if   self.fig.my_mode == 'Zoom' and self.current_form != None :
+                self.stat_ind = 2
+                self.stat_msg = 'What to do\nwith\n' + self.current_form + '?'
+
+            elif self.fig.my_mode != 'Zoom' and self.current_form == None :
+                self.stat_ind = 2
+                self.stat_msg = self.fig.my_mode + '\nwhat form?'
+
+        else :
+            self.stat_ind = ind
+            self.stat_msg = msg
+
+        #self.lab_status.clear()
+        if   self.stat_ind == 0 : self.lab_status.setStyleSheet(cp.styleButtonGood) # cp.styleStatusGood)
+        elif self.stat_ind == 1 : self.lab_status.setStyleSheet(cp.styleButtonWarning) # cp.styleStatusWarning)
+        elif self.stat_ind == 2 : self.lab_status.setStyleSheet(cp.styleButtonBad) # cp.styleStatusAlarm)
+        self.lab_status.setText(self.stat_msg)
+
+
+    def enforceStatusRepaint(self) :
+        self.lab_status.repaint()
+        self.repaint()
+
+        #time.sleep(1)
+        #print 'ind :', ind
+        #print 'msg :', self.lab_status.text()
+
+
 #-----------------------------
 
 def main():

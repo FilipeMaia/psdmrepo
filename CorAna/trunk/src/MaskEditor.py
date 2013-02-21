@@ -64,7 +64,7 @@ class MaskEditor (QtGui.QWidget) :
     """Mask editor for 2d array"""
 
 
-    def __init__(self, parent=None, arr=None, xyc=None, ifname=None, ofname='./fig.png', mfname='./roi-mask', title='Mask editor', lw=1, col='b', picker=8):
+    def __init__(self, parent=None, arr=None, xyc=None, ifname=None, ofname='./fig.png', mfname='./roi-mask', title='Mask editor', lw=1, col='b', picker=8, verb=False):
         """List of input parameters:
         @param parent  parent window is used to open other window moved w.r.t. parent.
         @param arr     2D array for image. If None then image will be taken from file or generated as random.
@@ -91,7 +91,7 @@ class MaskEditor (QtGui.QWidget) :
 
         self.widgimage   = imgwidg.PlotImgSpeWidget(parent, self.arr)
         self.widgbuts    = imgbuts.PlotImgSpeButtons(self, self.widgimage, ofname, help_msg=self.help_message())
-        self.widgmebuts  = mebuts .MaskEditorButtons(self, self.widgimage, ifname, ofname, mfname, xyc, lw, col, picker)
+        self.widgmebuts  = mebuts .MaskEditorButtons(self, self.widgimage, ifname, ofname, mfname, xyc, lw, col, picker, verb)
  
         #---------------------
 
@@ -163,8 +163,8 @@ class MaskEditor (QtGui.QWidget) :
                '\n' + \
                '\nForms' + \
                '\n' + '='*5 + \
-               '\n"Rectangle", "Wedge", "Circle", "Line", and "Polygon" forms are used to compose ROI or inversed mask on image.' + \
-               'Selected forms will inverse choosen regions in composition of the mask.' + \
+               '\n"Rectangle", "Wedge", "Circle", "Line", and "Polygon" forms are used to compose ROI or inversed mask on image. ' + \
+               'Selected forms will inverse choosen regions in composition of the mask. ' + \
                'Forms can be added, moved/edited, selected, or removed using appropriate mode, as explained below.' + \
                '\n' + \
                '\n' + \

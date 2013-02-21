@@ -25,8 +25,7 @@ class DragPolygon( Drag, lines.Line2D ) :
             #self.print_pars()
 
         elif x == None or y == None : # Default line initialization
-            x0=y0=(0,0)
-            lines.Line2D.__init__(self, x0, y0, linewidth=linewidth, color=color, picker=picker)
+            lines.Line2D.__init__(self, (0,1), (0,1), linewidth=linewidth, color=color, picker=picker)
             self.isInitialized = False
         else :
             lines.Line2D.__init__(self,  x,  y, linewidth=linewidth, color=color, picker=picker)
@@ -124,7 +123,7 @@ class DragPolygon( Drag, lines.Line2D ) :
 
             
             # Try to prevent double-clicks
-            #if self.vtx>1 and clickxy == (self.xarr[self.vtx-1], self.yarr[self.vtx-1]) : return
+            if self.vtx>1 and clickxy == (self.xarr[self.vtx-1], self.yarr[self.vtx-1]) : return
 
             self.vtx += 1
             self.xarr.append(clickxy[0]+1) # take it twise, will be changed...

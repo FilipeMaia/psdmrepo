@@ -11,6 +11,11 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2013-02-21 Mikhail S. Dubrovin
+Tag: V00-00-03
+app/med and src/MaskEditor.py are ready
+	as standalone and embadded aplications
+
 2013-02-19 Mikhail S. Dubrovin
 Tag: V00-00-02
 

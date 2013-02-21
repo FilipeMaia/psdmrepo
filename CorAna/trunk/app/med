@@ -55,9 +55,8 @@ def input_options_parser() :
     parser.add_option('-p', '--picker',      dest='picker',  default=8,            action='store', type='int',    help='distance in pix, where object line can be reaced by mouse')
     parser.add_option('-w', '--lw',          dest='lw',      default=1,            action='store', type='int',    help='object line width')
     parser.add_option('-c', '--color',       dest='col',     default='b',          action='store', type='string', help='color of the form lines "b"-blue, "k"-black, etc.')
-
-    #parser.add_option('-v', dest='verbose', action='store_true',  help='set flag to print more details',  default=True)
-    #parser.add_option('-q', dest='verbose', action='store_false', help='set flag to print less details')
+    parser.add_option('-v', '--verbose',     dest='verb',    default=True,         action='store_true',           help='allows print on console')
+    parser.add_option('-q', '--quiet',       dest='verb',                          action='store_false',          help='supress print on console')
 
     (opts, args) = parser.parse_args()
     return (opts, args)
@@ -85,7 +84,8 @@ if __name__ == "__main__" :
             'title'  : opts.title, 
             'lw'     : opts.lw, 
             'col'    : opts.col,
-            'picker' : opts.picker}
+            'picker' : opts.picker,
+            'verb'   : opts.verb}
 
     print 'Start MaskEditor with input parameters:'
     for k,v in pars.items():

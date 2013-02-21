@@ -435,6 +435,7 @@ class ConfigParametersCorAna ( ConfigParameters ) :
     def defineStyles( self ) :
         self.styleYellowish = "background-color: rgb(255, 255, 220); color: rgb(0, 0, 0);" # Yellowish
         self.stylePink      = "background-color: rgb(255, 200, 220); color: rgb(0, 0, 0);" # Pinkish
+        self.styleYellowBkg = "background-color: rgb(255, 255, 120); color: rgb(0, 0, 0);" # Pinkish
         self.styleGray      = "background-color: rgb(230, 240, 230); color: rgb(0, 0, 0);" # Gray
         self.styleGreenish  = "background-color: rgb(100, 255, 200); color: rgb(0, 0, 0);" # Greenish
         self.styleGreenPure = "background-color: rgb(150, 255, 150); color: rgb(0, 0, 0);" # Green
@@ -458,6 +459,7 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.styleButton       = self.styleGray
         self.styleButtonOn     = self.styleBluish
         self.styleButtonClose  = self.stylePink
+        self.styleButtonWarning= self.styleYellowBkg
         self.styleButtonGood   = self.styleGreenPure
         self.styleButtonBad    = self.stylePink
         self.styleBox          = self.styleGray
