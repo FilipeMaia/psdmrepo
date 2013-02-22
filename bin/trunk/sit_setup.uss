@@ -240,13 +240,16 @@ else
 fi
 set_env SIT_ARCH "$sit_arch"
 
-# remove all PSDM dirs from PATHs for the moment
+# remove all PSDM dirs from PATHs for the moment, keep sw/external but remove scons and pyextra
 remove_from_path PATH "$SIT_ROOT/bin/*"
 remove_from_path PATH "$SIT_ROOT/sw/releases/.*"
+remove_from_path PATH "$SIT_ROOT/sw/external/scons/.*"
+remove_from_path PATH "$SIT_ROOT/sw/external/pyextra/.*"
 remove_from_path PATH "[.]/arch/[^/]*/bin/*"
 remove_from_path LD_LIBRARY_PATH "$SIT_ROOT/sw/.*"
 remove_from_path LD_LIBRARY_PATH "[.]/arch/[^/]*/lib/*"
 remove_from_path PYTHONPATH "$SIT_ROOT/sw/.*"
+remove_from_path PYTHONPATH "$SIT_ROOT/sw/external/pyextra/.*"
 remove_from_path PYTHONPATH "[.]/arch/[^/]*/python/*.*"
 unset_env SIT_REPOS
 
@@ -318,7 +321,7 @@ if [ $has_pyextra = "yes" ]; then
   prepend_path PYTHONPATH "./arch/$SIT_ARCH/python/pyextra"
 else
   # we have a directory with extra Python modules, add it to PATH and PYTHONPATH
-  prepend_path PYTHONPATH "$SIT_ROOT/sw/external/pyextra/$SIT_ARCH/lib/python2.4/site-packages"
+  prepend_path PYTHONPATH "$SIT_ROOT/sw/external/pyextra/$SIT_ARCH/lib/python$pyver/site-packages"
   prepend_path PATH "$SIT_ROOT/sw/external/pyextra/$SIT_ARCH/bin"
 fi
 test "$SIT_RELEASE" = "nobase" || prepend_path PYTHONPATH "$SIT_RELDIR/$SIT_RELEASE/arch/$SIT_ARCH/python"
