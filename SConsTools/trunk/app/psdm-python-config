@@ -21,6 +21,8 @@
 #                         such as "/usr/lib64"
 #        PYTHON_BIN     - full path to python binary, like "/usr/bin/python2.4"
 #
+# Currently this script relies on two envvars being set correctly: 
+#    SIT_ROOT and SIT_ARCH
 
 #
 # It does not matter which python version used here

@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-07
+2013-02-22 Andy Salnikov
+- last change to tools/psdm_python.py broke psdm-python-config script,
+  fix this, now psdm-python-config needs SIT_ROOT to be set correctly
+
 Tag: V00-08-06
 2013-02-20 Andy Salnikov
 - fixing python path in tools/psdm_python.py

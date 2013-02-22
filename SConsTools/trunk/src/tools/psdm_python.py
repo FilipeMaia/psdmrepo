@@ -41,12 +41,14 @@ def exists(env):
 #
 if __name__ == '__main__':
     
+    sit_external_sw = pjoin(os.environ['SIT_ROOT'], "sw", "external")
     sit_arch = os.environ['SIT_ARCH']
     sit_arch_split = sit_arch.split('-')
     sit_arch_os = sit_arch_split[1]
     sit_arch_base = '-'.join(sit_arch_split[:3])
     sit_arch_base_opt = sit_arch_base + '-opt'
-    env = dict(SIT_ARCH=sit_arch, SIT_ARCH_OS=sit_arch_os, SIT_ARCH_BASE=sit_arch_base, SIT_ARCH_BASE_OPT=sit_arch_base_opt)
+    env = dict(SIT_ARCH=sit_arch, SIT_ARCH_OS=sit_arch_os, SIT_ARCH_BASE=sit_arch_base, 
+               SIT_ARCH_BASE_OPT=sit_arch_base_opt, SIT_EXTERNAL_SW=sit_external_sw)
     
     generate(env)
     
