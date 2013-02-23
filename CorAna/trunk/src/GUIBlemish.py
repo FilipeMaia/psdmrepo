@@ -34,6 +34,7 @@ from FileNameManager        import fnm
 from PlotImgSpe             import *
 import GlobalUtils          as     gu
 from GUIFileBrowser         import *
+from MaskEditor             import *
 
 
 #---------------------
@@ -56,6 +57,7 @@ class GUIBlemish ( QtGui.QWidget ) :
         self.but_path = QtGui.QPushButton('File:')
         self.but_plot = QtGui.QPushButton('Plot')
         self.but_brow = QtGui.QPushButton('Browse')
+        self.but_med  = QtGui.QPushButton('Mask Editor')
 
         self.grid = QtGui.QGridLayout()
         self.grid_row = 1
@@ -65,11 +67,13 @@ class GUIBlemish ( QtGui.QWidget ) :
         self.grid.addWidget(self.edi_path, self.grid_row+1, 1, 1, 6)
         self.grid.addWidget(self.but_plot, self.grid_row+2, 0)
         self.grid.addWidget(self.but_brow, self.grid_row+2, 1)
+        self.grid.addWidget(self.but_med,  self.grid_row+2, 2)
 
         self.connect(self.cbx_use,  QtCore.SIGNAL('stateChanged(int)'), self.onCBox ) 
         self.connect(self.but_path, QtCore.SIGNAL('clicked()'), self.on_but_path )
         self.connect(self.but_plot, QtCore.SIGNAL('clicked()'), self.on_but_plot )
         self.connect(self.but_brow, QtCore.SIGNAL('clicked()'), self.on_but_browser )
+        self.connect(self.but_med,  QtCore.SIGNAL('clicked()'), self.on_but_med )
 
         self.setLayout(self.grid)
 
@@ -86,6 +90,7 @@ class GUIBlemish ( QtGui.QWidget ) :
         self.but_path   .setToolTip('Push this button and select the blemish mask file')
         self.but_plot   .setToolTip('Plot image and spectrum for blemish file')
         self.but_brow   .setToolTip('Browse blemish file')
+        self.but_med    .setToolTip('Launch Mask Editor')
         self.cbx_use    .setToolTip('Check box \nto set and use \nblemish mask correction')
         
     def setFrame(self):
@@ -106,10 +111,12 @@ class GUIBlemish ( QtGui.QWidget ) :
         self.but_path.setStyleSheet (cp.styleButton)
         self.but_plot.setStyleSheet (cp.styleButton) 
         self.but_brow.setStyleSheet (cp.styleButton) 
+        self.but_med .setStyleSheet (cp.styleButton) 
    
         self.but_path.setFixedWidth(width)
         self.but_plot.setFixedWidth(width)
         self.but_brow.setFixedWidth(width)
+        self.but_med. setFixedWidth(100)
         self.cbx_use   .setStyleSheet (cp.styleLabel)
 
         self.setButtonState()
@@ -119,6 +126,7 @@ class GUIBlemish ( QtGui.QWidget ) :
         self.but_path.setEnabled(cp.ccdcorr_blemish.value())
         self.but_plot.setEnabled(cp.ccdcorr_blemish.value())
         self.but_brow.setEnabled(cp.ccdcorr_blemish.value())
+        self.but_med. setEnabled(cp.ccdcorr_blemish.value())
 
         #self.but_path.setFlat(not cp.ccdcorr_blemish.value())
         #self.but_plot.setFlat(not cp.ccdcorr_blemish.value())
@@ -187,6 +195,29 @@ class GUIBlemish ( QtGui.QWidget ) :
             cp.plotimgspe = PlotImgSpe(None, arr, ofname=fnm.path_blem_plot())
             cp.plotimgspe.move(cp.guimain.pos().__add__(QtCore.QPoint(740,140))) # self.parentWidget().pos()
             cp.plotimgspe.show()
+
+
+    def on_but_med(self):
+        logger.info('on_mask_editor', __name__)
+        try :
+            cp.maskeditor.close()
+            try    : del cp.maskeditor
+            except : pass
+            self.but_med.setStyleSheet(cp.styleButtonBad)
+
+        except :
+            img_fname = fnm.path_data_ave()
+            logger.info( 'Open Mask Editor for image from file: ' + img_fname, __name__)
+            if img_fname == None : return
+
+            #xy_beam0_img = self.xyLabToImg((cp.x_coord_beam0.value(), cp.y_coord_beam0.value()))
+            xy_beam0_img = (cp.x_coord_beam0.value(), cp.y_coord_beam0.value())
+
+            cp.maskeditor = MaskEditor(None, ifname=img_fname, xyc=xy_beam0_img, \
+                                       ofname=fnm.path_blem_plot(), mfname=fnm.path_blem_prefix())
+            cp.maskeditor.move(cp.guimain.pos().__add__(QtCore.QPoint(860,20)))
+            cp.maskeditor.show()
+            self.but_med.setStyleSheet(cp.styleButtonGood)
 
 
     def on_but_browser (self):       

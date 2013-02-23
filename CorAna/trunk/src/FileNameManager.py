@@ -121,14 +121,17 @@ class FileNameManager :
     def path_blem(self) :
         return cp.dname_blem.value() + '/' + cp.fname_blem.value()
 
+    def path_blem_prefix(self) :
+        return os.path.splitext(self.path_blem())[0]
+
+    def path_blem_plot(self) :
+        return self.path_prefix() + self.str_exp_run_data() + 'blem-plot.png'
+
     def path_flat(self) :
         return cp.dname_flat.value() + '/' + cp.fname_flat.value()
 
     def path_flat_plot(self) :
         return self.path_prefix() + self.str_exp_run_data() + 'flat-plot.png'
-
-    def path_blem_plot(self) :
-        return self.path_prefix() + self.str_exp_run_data() + 'blem-plot.png'
 
 #-----------------------------
 

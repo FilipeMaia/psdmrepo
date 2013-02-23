@@ -48,7 +48,7 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
         self.setWindowTitle('Analysis Settings Right')
         self.setFrame()
 
-        self.list_mask_types = ['no-mask', 'new-mask', 'from-file']
+        self.list_mask_types = ['no-mask', 'from-file']
 
         self.tit_lld      = QtGui.QLabel('Low Level Discrimination (LLD):')
         self.edi_lld_adu  = QtGui.QLineEdit( str( cp.lld_adu.value() ) )        
@@ -67,15 +67,12 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
 
         self.tit_mask_set  = QtGui.QLabel('Mask Settings:')
         self.rad_mask_none = QtGui.QRadioButton('no mask (use all pixels)')
-        self.rad_mask_new  = QtGui.QRadioButton('new mask')
         self.rad_mask_file = QtGui.QRadioButton('from existing file')
         self.rad_mask_grp  = QtGui.QButtonGroup()
         self.rad_mask_grp.addButton(self.rad_mask_none)
-        self.rad_mask_grp.addButton(self.rad_mask_new )
         self.rad_mask_grp.addButton(self.rad_mask_file)
         if cp.ana_mask_type.value() == self.list_mask_types[0] : self.rad_mask_none.setChecked(True)
-        if cp.ana_mask_type.value() == self.list_mask_types[1] : self.rad_mask_new .setChecked(True)
-        if cp.ana_mask_type.value() == self.list_mask_types[2] : self.rad_mask_file.setChecked(True)
+        if cp.ana_mask_type.value() == self.list_mask_types[1] : self.rad_mask_file.setChecked(True)
 
         self.but_mask_poly = QtGui.QPushButton('ROI Mask')
         self.but_browser   = QtGui.QPushButton('Browser')
@@ -110,8 +107,7 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
         self.grid_row = 4
         self.grid.addWidget(self.tit_mask_set,      self.grid_row+1, 0, 1, 9)
         self.grid.addWidget(self.rad_mask_none,     self.grid_row+2, 1, 1, 6)
-        self.grid.addWidget(self.rad_mask_new ,     self.grid_row+3, 1, 1, 6)
-        self.grid.addWidget(self.rad_mask_file,     self.grid_row+4, 1, 1, 6)
+        self.grid.addWidget(self.rad_mask_file,     self.grid_row+3, 1, 1, 6)
         self.grid.addWidget(self.but_mask_poly,     self.grid_row+3, 7, 1, 3)
         self.grid.addWidget(self.but_browser,       self.grid_row+4, 7, 1, 3)
         self.grid.addWidget(self.edi_mask_file,     self.grid_row+5, 1, 1, 9)
@@ -146,7 +142,6 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
         self.connect(self.cbx_res_save_log   , QtCore.SIGNAL('stateChanged(int)'), self.onCBox ) 
 
         self.connect( self.rad_mask_none,    QtCore.SIGNAL('clicked()'), self.onMaskRadioGrp )
-        self.connect( self.rad_mask_new,     QtCore.SIGNAL('clicked()'), self.onMaskRadioGrp )
         self.connect( self.rad_mask_file,    QtCore.SIGNAL('clicked()'), self.onMaskRadioGrp )
         self.connect( self.but_mask_poly,    QtCore.SIGNAL('clicked()'), self.onMaskPoly     )
         self.connect( self.but_browser,      QtCore.SIGNAL('clicked()'), self.onButBrowser   )
@@ -164,7 +159,6 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
 
         msg_rad_mask = 'Use this group of radio buttons\nto select the type of mask'
         self.rad_mask_none.setToolTip(msg_rad_mask)
-        self.rad_mask_new .setToolTip(msg_rad_mask)
         self.rad_mask_file.setToolTip(msg_rad_mask)
         self.but_mask_poly.setToolTip('Click on this button\nto use the polygon mask')
         self.but_browser  .setToolTip('Click on this button\nto change the mask file.')
@@ -215,7 +209,6 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
 
         self.tit_mask_set .setStyleSheet (cp.styleTitle)
         self.rad_mask_none.setStyleSheet (cp.styleLabel)
-        self.rad_mask_new .setStyleSheet (cp.styleLabel)
         self.rad_mask_file.setStyleSheet (cp.styleLabel)
 
         self.but_mask_poly.setStyleSheet (cp.styleButton)
@@ -321,8 +314,7 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
 
     def onMaskRadioGrp(self):
         if self.rad_mask_none.isChecked() : cp.ana_mask_type.setValue(self.list_mask_types[0])
-        if self.rad_mask_new .isChecked() : cp.ana_mask_type.setValue(self.list_mask_types[1])
-        if self.rad_mask_file.isChecked() : cp.ana_mask_type.setValue(self.list_mask_types[2])
+        if self.rad_mask_file.isChecked() : cp.ana_mask_type.setValue(self.list_mask_types[1])
         logger.info('onMaskRadioGrp - set cp.ana_mask_type = ' + cp.ana_mask_type.value(), __name__)
 
     def onMaskPoly(self):
@@ -337,11 +329,38 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
             img_fname = fnm.path_data_ave()
             logger.info( 'Open Mask Editor for image from file: ' + img_fname, __name__)
             if img_fname == None : return
-            cp.maskeditor = MaskEditor(None, ifname=img_fname, ofname=fnm.path_roi_mask_plot(), mfname=fnm.path_roi_mask_prefix())
+
+            #xy_beam0_img = self.xyLabToImg((cp.x_coord_beam0.value(), cp.y_coord_beam0.value()))
+            xy_beam0_img = (cp.x_coord_beam0.value(), cp.y_coord_beam0.value())
+
+            cp.maskeditor = MaskEditor(None, ifname=img_fname, xyc=xy_beam0_img, \
+                                       ofname=fnm.path_roi_mask_plot(), mfname=fnm.path_roi_mask_prefix())
             cp.maskeditor.move(cp.guimain.pos().__add__(QtCore.QPoint(860,20)))
             cp.maskeditor.show()
             self.but_mask_poly.setStyleSheet(cp.styleButtonGood)
 
+
+    def  xyLabToImg( self, xy ) :
+        
+        rows       = cp.bat_img_rows.value()
+        cols       = cp.bat_img_cols.value()
+        size       = cp.bat_img_size.value()
+        ccd_orient = cp.ccd_orient.value()
+
+        x, y = xy
+
+        print 'Image rows, cols:', rows, cols
+        print 'Beam center Lab x, y =', x, y 
+
+        if   ccd_orient == '0'   : return (x, rows-y)
+        elif ccd_orient == '90'  : return (x, y)
+        elif ccd_orient == '180' : return (cols-x, y)
+        elif ccd_orient == '270' : return (cols-x, rows-y)
+        else :
+            logger.error('Non-existent CCD orientation: ' + str(sp.ccd_orient), __name__)            
+
+
+ 
 
     def onButBrowser(self):
         logger.info('onButBrowser', __name__)

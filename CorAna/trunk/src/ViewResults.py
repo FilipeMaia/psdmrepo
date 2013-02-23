@@ -111,6 +111,7 @@ class ViewResults :
         sp.g2_vs_itau_arr = None
         sp.mask_total = None
         sp.mask_blemish = None
+        sp.mask_roi = None
 
         sp.set_file_name(fname)
         sp.set_parameters()
@@ -608,11 +609,22 @@ class ViewResults :
         return sp.get_random_binomial_img(p=0.99)
 
 
-    def get_mask_regs(sp) :
-        msg = 'get_mask_regs IS NOT IMPLEMENTED YET! get random binomial for now...'
-        logger.warning(msg, __name__)
-        print 'WOARNING: ' + msg
-        return sp.get_random_binomial_img(p=0.50)
+    def get_mask_roi(sp) :
+
+        #msg = 'get_mask_regs IS NOT IMPLEMENTED YET! get random binomial for now...'
+        #logger.warning(msg, __name__)
+        #print 'WOARNING: ' + msg
+        #return sp.get_random_binomial_img(p=0.50)
+
+        if sp.mask_roi != None : return sp.mask_roi
+        if cp.ana_mask_type.value() == 'from-file':
+            sp.mask_roi = gu.get_array_from_file(fnm.path_roi_mask())
+            logger.info('ROI mask is taken from file ' + fnm.path_roi_mask(), __name__)
+        else :
+            logger.info('ROI mask is turned off', __name__)
+            sp.mask_roi = np.ones((sp.rows,sp.cols), dtype=np.uint8)
+            #np.savetxt(fnm.path_blem()+'-all-ones', sp.mask_blemish, fmt='%1d', delimiter=' ') 
+        return sp.mask_roi
 
 
     def get_mask_total(sp) :
@@ -621,6 +633,12 @@ class ViewResults :
         sp.mask_total = sp.get_mask_image_limits()
         if cp.ccdcorr_blemish.value() :
             sp.mask_total *= sp.get_mask_blemish()
+        if cp.ana_mask_type.value() == 'from-file' :
+            sp.mask_total *= sp.get_mask_roi()
+
+
+
+
  
         return sp.mask_total
 

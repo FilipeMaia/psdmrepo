@@ -180,7 +180,9 @@ class PlotImgSpeWidget (QtGui.QWidget) :
 
         if xmin == None or xmax == None or ymin == None or ymax == None :
             self.arrwin  = self.arr
+            rows,cols = self.arrwin.shape
             self.range   = None # original image range in pixels
+            #self.range   = [0,cols,0,rows] # original image range in pixels
         else :
             xmin = int(xmin)
             xmax = int(xmax)
@@ -189,7 +191,10 @@ class PlotImgSpeWidget (QtGui.QWidget) :
 
             #print 'xmin, xmax, ymin, ymax =', xmin, xmax, ymin, ymax
             self.arrwin =  self.arr[ymin:ymax,xmin:xmax]
+
             self.range  = [xmin, xmax, ymax, ymin]
+            #self.range  = [xmin, xmax, ymin, ymax]
+
 
         zmin = self.floatOrNone(zmin)
         zmax = self.floatOrNone(zmax)
