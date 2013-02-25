@@ -39,19 +39,6 @@ namespace H5DataTypes {
 //
 // Helper type for Pds::PNCCD::ConfigV2
 //
-struct PnCCDConfigV2_Data {
-  uint32_t numLinks;
-  uint32_t payloadSizePerLink;
-  uint32_t numChannels;
-  uint32_t numRows;
-  uint32_t numSubmoduleChannels;
-  uint32_t numSubmoduleRows;
-  uint32_t numSubmodules;
-  uint32_t camexMagic;
-  char*    info;
-  char*    timingFName;
-};
-
 class PnCCDConfigV2 : boost::noncopyable {
 public:
 
@@ -69,11 +56,18 @@ public:
 
   static size_t xtcSize( const XtcType& xtc ) { return xtc.size() ; }
 
-protected:
-
 private:
 
-  PnCCDConfigV2_Data m_data ;
+  uint32_t numLinks;
+  uint32_t payloadSizePerLink;
+  uint32_t numChannels;
+  uint32_t numRows;
+  uint32_t numSubmoduleChannels;
+  uint32_t numSubmoduleRows;
+  uint32_t numSubmodules;
+  uint32_t camexMagic;
+  char*    info;
+  char*    timingFName;
 
 };
 

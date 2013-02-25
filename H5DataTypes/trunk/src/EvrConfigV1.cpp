@@ -39,9 +39,9 @@
 namespace H5DataTypes {
 
 EvrConfigV1::EvrConfigV1 ( const Pds::EvrData::ConfigV1& data )
+  : npulses(data.npulses())
+  , noutputs(data.noutputs())
 {
-  m_data.npulses = data.npulses() ;
-  m_data.noutputs = data.noutputs() ;
 }
 
 hdf5pp::Type
@@ -54,8 +54,8 @@ hdf5pp::Type
 EvrConfigV1::native_type()
 {
   hdf5pp::CompoundType confType = hdf5pp::CompoundType::compoundType<EvrConfigV1>() ;
-  confType.insert_native<uint32_t>( "npulses", offsetof(EvrConfigV1_Data,npulses) ) ;
-  confType.insert_native<uint32_t>( "noutputs", offsetof(EvrConfigV1_Data,noutputs) ) ;
+  confType.insert_native<uint32_t>( "npulses", offsetof(EvrConfigV1,npulses) ) ;
+  confType.insert_native<uint32_t>( "noutputs", offsetof(EvrConfigV1,noutputs) ) ;
 
   return confType ;
 }

@@ -23,7 +23,6 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "hdf5pp/CompoundType.h"
-#include "hdf5pp/ArrayType.h"
 #include "hdf5pp/TypeTraits.h"
 
 //-----------------------------------------------------------------------
@@ -82,19 +81,13 @@ OceanOpticsDataV1::native_type()
 hdf5pp::Type
 OceanOpticsDataV1::stored_data_type()
 {
-  hdf5pp::Type baseType = hdf5pp::TypeTraits<uint16_t>::native_type() ;
-
-  hsize_t dims[] = { Pds::OceanOptics::DataV1::iNumPixels } ;
-  return hdf5pp::ArrayType::arrayType ( baseType, 1, dims );
+  return hdf5pp::TypeTraits<uint16_t>::native_type(Pds::OceanOptics::DataV1::iNumPixels) ;
 }
 
 hdf5pp::Type
 OceanOpticsDataV1::stored_corrected_data_type()
 {
-  hdf5pp::Type baseType = hdf5pp::TypeTraits<float>::native_type() ;
-
-  hsize_t dims[] = { Pds::OceanOptics::DataV1::iNumPixels } ;
-  return hdf5pp::ArrayType::arrayType ( baseType, 1, dims );
+  return hdf5pp::TypeTraits<float>::native_type(Pds::OceanOptics::DataV1::iNumPixels) ;
 }
 
 } // namespace H5DataTypes

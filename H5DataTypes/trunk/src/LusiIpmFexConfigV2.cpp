@@ -22,7 +22,6 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "hdf5pp/ArrayType.h"
 #include "hdf5pp/CompoundType.h"
 #include "hdf5pp/TypeTraits.h"
 #include "H5DataTypes/H5DataUtils.h"
@@ -38,12 +37,12 @@
 namespace H5DataTypes {
 
 LusiIpmFexConfigV2::LusiIpmFexConfigV2 ( const XtcType& data )
+  : xscale(data.xscale)
+  , yscale(data.yscale)
 {
   for ( int i = 0 ; i < XtcType::NCHANNELS ; ++ i ) {
-    m_data.diode[i] = LusiDiodeFexConfigV2(data.diode[i]);
+    diode[i] = LusiDiodeFexConfigV2(data.diode[i]);
   }
-  m_data.xscale = data.xscale;
-  m_data.yscale = data.yscale;
 }
 
 hdf5pp::Type
@@ -55,10 +54,10 @@ LusiIpmFexConfigV2::stored_type()
 hdf5pp::Type
 LusiIpmFexConfigV2::native_type()
 {
-  hdf5pp::CompoundType confType = hdf5pp::CompoundType::compoundType<LusiIpmFexConfigV2_Data>() ;
-  confType.insert( "diode", offsetof(LusiIpmFexConfigV2_Data, diode), LusiDiodeFexConfigV2::native_type(), XtcType::NCHANNELS );
-  confType.insert_native<float>( "xscale", offsetof(LusiIpmFexConfigV2_Data, xscale) );
-  confType.insert_native<float>( "yscale", offsetof(LusiIpmFexConfigV2_Data, yscale) );
+  hdf5pp::CompoundType confType = hdf5pp::CompoundType::compoundType<LusiIpmFexConfigV2>() ;
+  confType.insert( "diode", offsetof(LusiIpmFexConfigV2, diode), LusiDiodeFexConfigV2::native_type(), XtcType::NCHANNELS );
+  confType.insert_native<float>( "xscale", offsetof(LusiIpmFexConfigV2, xscale) );
+  confType.insert_native<float>( "yscale", offsetof(LusiIpmFexConfigV2, yscale) );
 
   return confType ;
 }

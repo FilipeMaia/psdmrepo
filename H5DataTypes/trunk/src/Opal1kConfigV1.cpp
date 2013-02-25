@@ -38,18 +38,18 @@
 namespace H5DataTypes {
 
 Opal1kConfigV1::Opal1kConfigV1 ( const Pds::Opal1k::ConfigV1& config )
+  : black_level (config.black_level())
+  , gain_percent (config.gain_percent())
+  , output_offset (config.output_offset())
+  , output_resolution (config.output_resolution())
+  , output_resolution_bits (config.output_resolution_bits())
+  , vertical_binning (config.vertical_binning())
+  , output_mirroring (config.output_mirroring())
+  , vertical_remapping (config.vertical_remapping())
+  , defect_pixel_correction_enabled (config.defect_pixel_correction_enabled())
+  , output_lookup_table_enabled (config.output_lookup_table_enabled())
+  , number_of_defect_pixels (config.number_of_defect_pixels())
 {
-  m_data.black_level = config.black_level() ;
-  m_data.gain_percent = config.gain_percent() ;
-  m_data.output_offset = config.output_offset() ;
-  m_data.output_resolution = config.output_resolution() ;
-  m_data.output_resolution_bits = config.output_resolution_bits() ;
-  m_data.vertical_binning = config.vertical_binning() ;
-  m_data.output_mirroring = config.output_mirroring() ;
-  m_data.vertical_remapping = config.vertical_remapping() ;
-  m_data.defect_pixel_correction_enabled = config.defect_pixel_correction_enabled() ;
-  m_data.output_lookup_table_enabled = config.output_lookup_table_enabled() ;
-  m_data.number_of_defect_pixels = config.number_of_defect_pixels() ;
 }
 
 hdf5pp::Type
@@ -79,17 +79,17 @@ Opal1kConfigV1::native_type()
   mirroringEnum.insert ( "HVFlip", Pds::Opal1k::ConfigV1::HVFlip ) ;
 
   hdf5pp::CompoundType confType = hdf5pp::CompoundType::compoundType<Opal1kConfigV1>() ;
-  confType.insert_native<uint16_t>( "black_level", offsetof(Opal1kConfigV1_Data,black_level) ) ;
-  confType.insert_native<uint16_t>( "gain_percent", offsetof(Opal1kConfigV1_Data,gain_percent) ) ;
-  confType.insert_native<uint16_t>( "output_offset", offsetof(Opal1kConfigV1_Data,output_offset) ) ;
-  confType.insert( "output_resolution", offsetof(Opal1kConfigV1_Data,output_resolution), depthEnum ) ;
-  confType.insert_native<uint8_t>( "output_resolution_bits", offsetof(Opal1kConfigV1_Data,output_resolution_bits) ) ;
-  confType.insert( "vertical_binning", offsetof(Opal1kConfigV1_Data,vertical_binning), binningEnum ) ;
-  confType.insert( "output_mirroring", offsetof(Opal1kConfigV1_Data,output_mirroring), mirroringEnum ) ;
-  confType.insert_native<uint8_t>( "vertical_remapping", offsetof(Opal1kConfigV1_Data,vertical_remapping) ) ;
-  confType.insert_native<uint8_t>( "defect_pixel_correction_enabled", offsetof(Opal1kConfigV1_Data,defect_pixel_correction_enabled) ) ;
-  confType.insert_native<uint8_t>( "output_lookup_table_enabled", offsetof(Opal1kConfigV1_Data,output_lookup_table_enabled) ) ;
-  confType.insert_native<uint32_t>( "number_of_defect_pixels", offsetof(Opal1kConfigV1_Data,number_of_defect_pixels) ) ;
+  confType.insert_native<uint16_t>( "black_level", offsetof(Opal1kConfigV1,black_level) ) ;
+  confType.insert_native<uint16_t>( "gain_percent", offsetof(Opal1kConfigV1,gain_percent) ) ;
+  confType.insert_native<uint16_t>( "output_offset", offsetof(Opal1kConfigV1,output_offset) ) ;
+  confType.insert( "output_resolution", offsetof(Opal1kConfigV1,output_resolution), depthEnum ) ;
+  confType.insert_native<uint8_t>( "output_resolution_bits", offsetof(Opal1kConfigV1,output_resolution_bits) ) ;
+  confType.insert( "vertical_binning", offsetof(Opal1kConfigV1,vertical_binning), binningEnum ) ;
+  confType.insert( "output_mirroring", offsetof(Opal1kConfigV1,output_mirroring), mirroringEnum ) ;
+  confType.insert_native<uint8_t>( "vertical_remapping", offsetof(Opal1kConfigV1,vertical_remapping) ) ;
+  confType.insert_native<uint8_t>( "defect_pixel_correction_enabled", offsetof(Opal1kConfigV1,defect_pixel_correction_enabled) ) ;
+  confType.insert_native<uint8_t>( "output_lookup_table_enabled", offsetof(Opal1kConfigV1,output_lookup_table_enabled) ) ;
+  confType.insert_native<uint32_t>( "number_of_defect_pixels", offsetof(Opal1kConfigV1,number_of_defect_pixels) ) ;
 
   return confType ;
 }

@@ -34,30 +34,11 @@
 // 		-- Class Interface --
 //		---------------------
 
-/**
- *
- *  This software was developed for the LUSI project.  If you use all or
- *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
- *
- *  @version $Id$
- *
- *  @author Andrei Salnikov
- */
-
 namespace H5DataTypes {
 
-struct CameraFrameFexConfigV1_Data {
-  uint32_t   forwarding;
-  uint32_t   forward_prescale;
-  uint32_t   processing;
-  CameraFrameCoordV1_Data roiBegin;
-  CameraFrameCoordV1_Data roiEnd;
-  uint32_t   threshold;
-  uint32_t   number_of_masked_pixels;
-};
-
+//
+//  Helper class for Pds::Camera::FrameFexConfigV1 class
+//
 class CameraFrameFexConfigV1  {
 public:
 
@@ -74,7 +55,13 @@ public:
   static size_t xtcSize( const XtcType& xtc ) { return xtc.size() ; }
 
 private:
-  CameraFrameFexConfigV1_Data m_data ;
+  uint32_t   forwarding;
+  uint32_t   forward_prescale;
+  uint32_t   processing;
+  CameraFrameCoordV1 roiBegin;
+  CameraFrameCoordV1 roiEnd;
+  uint32_t   threshold;
+  uint32_t   number_of_masked_pixels;
 };
 
 

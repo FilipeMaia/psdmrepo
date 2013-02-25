@@ -39,11 +39,11 @@
 namespace H5DataTypes {
 
 EvrConfigV2::EvrConfigV2 ( const Pds::EvrData::ConfigV2& data )
+  : beam(data.beam())
+  , rate(data.rate())
+  , npulses(data.npulses())
+  , noutputs(data.noutputs())
 {
-  m_data.beam = data.beam() ;
-  m_data.rate = data.rate() ;
-  m_data.npulses = data.npulses() ;
-  m_data.noutputs = data.noutputs() ;
 }
 
 hdf5pp::Type
@@ -70,10 +70,10 @@ EvrConfigV2::native_type()
   beamEnumType.insert ( "On", Pds::EvrData::ConfigV2::On ) ;
 
   hdf5pp::CompoundType confType = hdf5pp::CompoundType::compoundType<EvrConfigV2>() ;
-  confType.insert( "beam", offsetof(EvrConfigV2_Data,beam), beamEnumType ) ;
-  confType.insert( "rate", offsetof(EvrConfigV2_Data,rate), rateEnumType ) ;
-  confType.insert_native<uint32_t>( "npulses", offsetof(EvrConfigV2_Data,npulses) ) ;
-  confType.insert_native<uint32_t>( "noutputs", offsetof(EvrConfigV2_Data,noutputs) ) ;
+  confType.insert( "beam", offsetof(EvrConfigV2,beam), beamEnumType ) ;
+  confType.insert( "rate", offsetof(EvrConfigV2,rate), rateEnumType ) ;
+  confType.insert_native<uint32_t>( "npulses", offsetof(EvrConfigV2,npulses) ) ;
+  confType.insert_native<uint32_t>( "noutputs", offsetof(EvrConfigV2,noutputs) ) ;
 
   return confType ;
 }

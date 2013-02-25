@@ -34,6 +34,9 @@
 
 namespace H5DataTypes {
 
+//
+// Helper type for Pds::BldDataEBeamV1
+//
 class BldDataEBeamV1  {
 public:
 

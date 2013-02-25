@@ -67,15 +67,13 @@ CsPad2x2ElementHeader::~CsPad2x2ElementHeader ()
 hdf5pp::Type
 CsPad2x2ElementHeader::native_type()
 {
-  hdf5pp::ArrayType sb_tempType = hdf5pp::ArrayType::arrayType<uint16_t>(SbTempSize) ;
-
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<CsPad2x2ElementHeader>() ;
   type.insert_native<uint32_t>( "tid", offsetof(CsPad2x2ElementHeader, tid) );
   type.insert_native<uint32_t>( "seq_count", offsetof(CsPad2x2ElementHeader, seq_count) );
   type.insert_native<uint32_t>( "ticks", offsetof(CsPad2x2ElementHeader, ticks) );
   type.insert_native<uint32_t>( "fiducials", offsetof(CsPad2x2ElementHeader, fiducials) );
   type.insert_native<uint16_t>( "acq_count", offsetof(CsPad2x2ElementHeader, acq_count) );
-  type.insert( "sb_temp", offsetof(CsPad2x2ElementHeader, sb_temp), sb_tempType );
+  type.insert_native<uint16_t>( "sb_temp", offsetof(CsPad2x2ElementHeader, sb_temp), SbTempSize );
   type.insert_native<uint8_t>( "virtual_channel", offsetof(CsPad2x2ElementHeader, virtual_channel) );
   type.insert_native<uint8_t>( "lane", offsetof(CsPad2x2ElementHeader, lane) );
   type.insert_native<uint8_t>( "op_code", offsetof(CsPad2x2ElementHeader, op_code) );

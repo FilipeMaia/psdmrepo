@@ -39,13 +39,6 @@ namespace H5DataTypes {
 //
 // Helper type for Pds::Lusi::IpmFexConfigV1
 //
-struct LusiIpmFexConfigV1_Data  {
-  enum { NCHANNELS = Pds::Lusi::IpmFexConfigV1::NCHANNELS };
-  LusiDiodeFexConfigV1 diode[NCHANNELS];
-  float xscale;
-  float yscale;
-};
-
 class LusiIpmFexConfigV1  {
 public:
 
@@ -64,7 +57,10 @@ public:
 
 private:
 
-  LusiIpmFexConfigV1_Data m_data ;
+  enum { NCHANNELS = Pds::Lusi::IpmFexConfigV1::NCHANNELS };
+  LusiDiodeFexConfigV1 diode[NCHANNELS];
+  float xscale;
+  float yscale;
 
 };
 

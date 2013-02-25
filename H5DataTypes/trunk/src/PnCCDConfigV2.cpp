@@ -39,31 +39,30 @@ namespace H5DataTypes {
 // Constructors --
 //----------------
 PnCCDConfigV2::PnCCDConfigV2 ( const PnCCDConfigV2::XtcType& config )
+  : numLinks(config.numLinks())
+  , payloadSizePerLink(config.payloadSizePerLink())
+  , numChannels(config.numChannels())
+  , numRows(config.numRows())
+  , numSubmoduleChannels(config.numSubmoduleChannels())
+  , numSubmoduleRows(config.numSubmoduleRows())
+  , numSubmodules(config.numSubmodules())
+  , camexMagic(config.camexMagic())
 {
-  m_data.numLinks = config.numLinks();
-  m_data.payloadSizePerLink = config.payloadSizePerLink();
-  m_data.numChannels = config.numChannels();
-  m_data.numRows = config.numRows();
-  m_data.numSubmoduleChannels = config.numSubmoduleChannels();
-  m_data.numSubmoduleRows = config.numSubmoduleRows();
-  m_data.numSubmodules = config.numSubmodules();
-  m_data.camexMagic = config.camexMagic();
-
   const char* p = config.info();
   int len = strlen(p)+1;
-  m_data.info = new char[len];
-  std::copy(p, p+len, m_data.info);
+  info = new char[len];
+  std::copy(p, p+len, info);
 
   p = config.timingFName();
   len = strlen(p)+1;
-  m_data.timingFName = new char[len];
-  std::copy( p, p+len, m_data.timingFName);
+  timingFName = new char[len];
+  std::copy(p, p+len, timingFName);
 }
 
 PnCCDConfigV2::~PnCCDConfigV2()
 {
-  delete [] m_data.info;
-  delete [] m_data.timingFName;
+  delete [] info;
+  delete [] timingFName;
 }
 
 hdf5pp::Type
@@ -76,16 +75,16 @@ hdf5pp::Type
 PnCCDConfigV2::native_type()
 {
   hdf5pp::CompoundType confType = hdf5pp::CompoundType::compoundType<PnCCDConfigV2>() ;
-  confType.insert_native<uint32_t>( "numLinks", offsetof(PnCCDConfigV2_Data,numLinks) ) ;
-  confType.insert_native<uint32_t>( "payloadSizePerLink", offsetof(PnCCDConfigV2_Data,payloadSizePerLink) ) ;
-  confType.insert_native<uint32_t>( "numChannels", offsetof(PnCCDConfigV2_Data,numChannels) ) ;
-  confType.insert_native<uint32_t>( "numRows", offsetof(PnCCDConfigV2_Data,numRows) ) ;
-  confType.insert_native<uint32_t>( "numSubmoduleChannels", offsetof(PnCCDConfigV2_Data,numSubmoduleChannels) ) ;
-  confType.insert_native<uint32_t>( "numSubmoduleRows", offsetof(PnCCDConfigV2_Data,numSubmoduleRows) ) ;
-  confType.insert_native<uint32_t>( "numSubmodules", offsetof(PnCCDConfigV2_Data,numSubmodules) ) ;
-  confType.insert_native<uint32_t>( "camexMagic", offsetof(PnCCDConfigV2_Data,camexMagic) ) ;
-  confType.insert_native<const char*>( "info", offsetof(PnCCDConfigV2_Data,info) ) ;
-  confType.insert_native<const char*>( "timingFName", offsetof(PnCCDConfigV2_Data,timingFName) ) ;
+  confType.insert_native<uint32_t>( "numLinks", offsetof(PnCCDConfigV2,numLinks) ) ;
+  confType.insert_native<uint32_t>( "payloadSizePerLink", offsetof(PnCCDConfigV2,payloadSizePerLink) ) ;
+  confType.insert_native<uint32_t>( "numChannels", offsetof(PnCCDConfigV2,numChannels) ) ;
+  confType.insert_native<uint32_t>( "numRows", offsetof(PnCCDConfigV2,numRows) ) ;
+  confType.insert_native<uint32_t>( "numSubmoduleChannels", offsetof(PnCCDConfigV2,numSubmoduleChannels) ) ;
+  confType.insert_native<uint32_t>( "numSubmoduleRows", offsetof(PnCCDConfigV2,numSubmoduleRows) ) ;
+  confType.insert_native<uint32_t>( "numSubmodules", offsetof(PnCCDConfigV2,numSubmodules) ) ;
+  confType.insert_native<uint32_t>( "camexMagic", offsetof(PnCCDConfigV2,camexMagic) ) ;
+  confType.insert_native<const char*>( "info", offsetof(PnCCDConfigV2,info) ) ;
+  confType.insert_native<const char*>( "timingFName", offsetof(PnCCDConfigV2,timingFName) ) ;
 
   return confType ;
 }

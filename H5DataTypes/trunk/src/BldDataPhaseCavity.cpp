@@ -35,11 +35,11 @@
 namespace H5DataTypes {
 
 BldDataPhaseCavity::BldDataPhaseCavity ( const XtcType& xtc )
+  : fFitTime1(xtc.fFitTime1)
+  , fFitTime2(xtc.fFitTime2)
+  , fCharge1(xtc.fCharge1)
+  , fCharge2(xtc.fCharge2)
 {
-  m_data.fFitTime1 = xtc.fFitTime1 ;
-  m_data.fFitTime2 = xtc.fFitTime2 ;
-  m_data.fCharge1 = xtc.fCharge1 ;
-  m_data.fCharge2 = xtc.fCharge2 ;
 }
 
 hdf5pp::Type
@@ -51,11 +51,11 @@ BldDataPhaseCavity::stored_type()
 hdf5pp::Type
 BldDataPhaseCavity::native_type()
 {
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<BldDataPhaseCavity_Data>() ;
-  type.insert_native<double>( "fFitTime1", offsetof(BldDataPhaseCavity_Data,fFitTime1) ) ;
-  type.insert_native<double>( "fFitTime2", offsetof(BldDataPhaseCavity_Data,fFitTime2) ) ;
-  type.insert_native<double>( "fCharge1", offsetof(BldDataPhaseCavity_Data,fCharge1) ) ;
-  type.insert_native<double>( "fCharge2", offsetof(BldDataPhaseCavity_Data,fCharge2) ) ;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<BldDataPhaseCavity>() ;
+  type.insert_native<double>( "fFitTime1", offsetof(BldDataPhaseCavity, fFitTime1) ) ;
+  type.insert_native<double>( "fFitTime2", offsetof(BldDataPhaseCavity, fFitTime2) ) ;
+  type.insert_native<double>( "fCharge1", offsetof(BldDataPhaseCavity, fCharge1) ) ;
+  type.insert_native<double>( "fCharge2", offsetof(BldDataPhaseCavity, fCharge2) ) ;
 
   return type ;
 }

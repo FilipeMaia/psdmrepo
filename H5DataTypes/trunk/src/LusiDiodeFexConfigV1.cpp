@@ -40,8 +40,8 @@ namespace H5DataTypes {
 
 LusiDiodeFexConfigV1::LusiDiodeFexConfigV1 ( const XtcType& data )
 {
-  std::copy( data.base, data.base+XtcType::NRANGES, m_data.base);
-  std::copy( data.scale, data.scale+XtcType::NRANGES, m_data.scale);
+  std::copy( data.base, data.base+XtcType::NRANGES, base);
+  std::copy( data.scale, data.scale+XtcType::NRANGES, scale);
 }
 
 hdf5pp::Type
@@ -53,9 +53,9 @@ LusiDiodeFexConfigV1::stored_type()
 hdf5pp::Type
 LusiDiodeFexConfigV1::native_type()
 {
-  hdf5pp::CompoundType confType = hdf5pp::CompoundType::compoundType<LusiDiodeFexConfigV1_Data>() ;
-  confType.insert_native<float>( "base", offsetof(LusiDiodeFexConfigV1_Data, base), XtcType::NRANGES );
-  confType.insert_native<float>( "scale", offsetof(LusiDiodeFexConfigV1_Data, scale), XtcType::NRANGES );
+  hdf5pp::CompoundType confType = hdf5pp::CompoundType::compoundType<LusiDiodeFexConfigV1>() ;
+  confType.insert_native<float>( "base", offsetof(LusiDiodeFexConfigV1, base), XtcType::NRANGES );
+  confType.insert_native<float>( "scale", offsetof(LusiDiodeFexConfigV1, scale), XtcType::NRANGES );
 
   return confType ;
 }

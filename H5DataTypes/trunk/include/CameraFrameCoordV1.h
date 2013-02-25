@@ -33,25 +33,11 @@
 // 		-- Class Interface --
 //		---------------------
 
-/**
- *
- *  This software was developed for the LUSI project.  If you use all or
- *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
- *
- *  @version $Id$
- *
- *  @author Andrei Salnikov
- */
-
 namespace H5DataTypes {
 
-struct CameraFrameCoordV1_Data {
-  uint16_t column;
-  uint16_t row;
-};
-
+//
+//  Helper class for Pds::Camera::FrameCoord class
+//
 class CameraFrameCoordV1 {
 public:
   CameraFrameCoordV1() {}
@@ -61,7 +47,8 @@ public:
   static hdf5pp::Type native_type() ;
 
 private:
-  CameraFrameCoordV1_Data m_data ;
+  uint16_t column;
+  uint16_t row;
 };
 
 void storeCameraFrameCoordV1 ( hsize_t size, const Pds::Camera::FrameCoord* coord, hdf5pp::Group grp, const char* name ) ;

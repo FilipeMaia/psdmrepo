@@ -37,11 +37,6 @@ namespace H5DataTypes {
 //
 // Helper type for Pds::PNCCD::ConfigV1
 //
-struct PnCCDConfigV1_Data {
-  uint32_t numLinks;
-  uint32_t payloadSizePerLink;
-};
-
 class PnCCDConfigV1 {
 public:
 
@@ -57,11 +52,10 @@ public:
 
   static size_t xtcSize( const XtcType& xtc ) { return sizeof(XtcType) ; }
 
-protected:
-
 private:
 
-  PnCCDConfigV1_Data m_data ;
+  uint32_t numLinks;
+  uint32_t payloadSizePerLink;
 
 };
 

@@ -33,11 +33,8 @@
 //		---------------------
 
 /**
- *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
  *
  *  @version $Id$
  *
@@ -47,15 +44,8 @@
 namespace H5DataTypes {
 
 //
-//  Helper classes for Pds::Acqiris::VertV1 class
+//  Helper class for Pds::Acqiris::VertV1 class
 //
-struct AcqirisVertV1_Data {
-  double   fullScale;
-  double   offset;
-  uint32_t coupling;
-  uint32_t bandwidth;
-};
-
 struct AcqirisVertV1 {
 public:
   AcqirisVertV1 () {}
@@ -65,19 +55,15 @@ public:
   static hdf5pp::Type native_type() ;
 
 private:
-  AcqirisVertV1_Data m_data ;
+  double   fullScale;
+  double   offset;
+  uint32_t coupling;
+  uint32_t bandwidth;
 };
 
 //
-//  Helper classes for Pds::Acqiris::HorizV1 class
+//  Helper class for Pds::Acqiris::HorizV1 class
 //
-struct AcqirisHorizV1_Data {
-  double   sampInterval;
-  double   delayTime;
-  uint32_t nbrSamples;
-  uint32_t nbrSegments;
-};
-
 struct AcqirisHorizV1 {
 public:
   AcqirisHorizV1 () {}
@@ -87,19 +73,15 @@ public:
   static hdf5pp::Type native_type() ;
 
 private:
-  AcqirisHorizV1_Data m_data ;
+  double   sampInterval;
+  double   delayTime;
+  uint32_t nbrSamples;
+  uint32_t nbrSegments;
 };
 
 //
-//  Helper classes for Pds::Acqiris::TrigV1 class
+//  Helper class for Pds::Acqiris::TrigV1 class
 //
-struct AcqirisTrigV1_Data {
-  uint32_t coupling;
-  uint32_t input;
-  uint32_t slope;
-  double   level;
-};
-
 struct AcqirisTrigV1 {
 public:
   AcqirisTrigV1 () {}
@@ -109,19 +91,15 @@ public:
   static hdf5pp::Type native_type() ;
 
 private:
-  AcqirisTrigV1_Data m_data ;
+  uint32_t coupling;
+  uint32_t input;
+  uint32_t slope;
+  double   level;
 };
 
 //
 //  Helper classes for Pds::Acqiris::ConfigV1 class
 //
-struct AcqirisConfigV1_Data {
-  uint32_t nbrConvertersPerChannel;
-  uint32_t channelMask;
-  uint32_t nbrChannels;
-  uint32_t nbrBanks;
-};
-
 struct AcqirisConfigV1 {
 public:
 
@@ -138,7 +116,10 @@ public:
   static size_t xtcSize( const XtcType& xtc ) { return sizeof xtc ; }
 
 private:
-  AcqirisConfigV1_Data m_data ;
+  uint32_t nbrConvertersPerChannel;
+  uint32_t channelMask;
+  uint32_t nbrChannels;
+  uint32_t nbrBanks;
 };
 
 

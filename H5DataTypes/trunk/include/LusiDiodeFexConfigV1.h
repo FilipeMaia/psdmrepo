@@ -38,12 +38,6 @@ namespace H5DataTypes {
 //
 // Helper type for Pds::Lusi::DiodeFexConfigV1
 //
-struct LusiDiodeFexConfigV1_Data  {
-  enum { NRANGES = Pds::Lusi::DiodeFexConfigV1::NRANGES };
-  float base [NRANGES];
-  float scale[NRANGES];
-};
-
 class LusiDiodeFexConfigV1  {
 public:
 
@@ -62,7 +56,9 @@ public:
 
 private:
 
-  LusiDiodeFexConfigV1_Data m_data ;
+  enum { NRANGES = Pds::Lusi::DiodeFexConfigV1::NRANGES };
+  float base [NRANGES];
+  float scale[NRANGES];
 
 };
 

@@ -40,26 +40,6 @@ namespace H5DataTypes {
 //
 // Helper type for CsPadFilterV1
 //
-struct CsPadFilterV1_Data  {
-
-  enum { DataSize = pdscalibdata::CsPadFilterV1::DataSize };
-
-  uint32_t mode;
-  double data[DataSize];
-};
-
-/**
- *
- *  This software was developed for the LCLS project.  If you use all or 
- *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
- *
- *  @version $Id$
- *
- *  @author Andrei Salnikov
- */
-
 class CsPadFilterV1  {
 public:
 
@@ -86,12 +66,10 @@ protected:
 
 private:
 
-  // Data members
-  CsPadFilterV1_Data m_data;
+  enum { DataSize = pdscalibdata::CsPadFilterV1::DataSize };
 
-  // Copy constructor and assignment are disabled by default
-  CsPadFilterV1 ( const CsPadFilterV1& ) ;
-  CsPadFilterV1& operator = ( const CsPadFilterV1& ) ;
+  uint32_t mode;
+  double data[DataSize];
 
 };
 

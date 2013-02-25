@@ -36,8 +36,8 @@
 namespace H5DataTypes {
 
 EvrIOConfigV1::EvrIOConfigV1 ( const Pds::EvrData::IOConfigV1& data )
+  : conn(data.conn())
 {
-  m_data.conn = data.conn() ;
 }
 
 hdf5pp::Type
@@ -53,8 +53,8 @@ EvrIOConfigV1::native_type()
   hdf5pp::Type connEnumType = EvrOutputMap::conn_type() ;
 
   // config type
-  hdf5pp::CompoundType confType = hdf5pp::CompoundType::compoundType<EvrIOConfigV1_Data>() ;
-  confType.insert( "conn", offsetof(EvrIOConfigV1_Data, conn), connEnumType ) ;
+  hdf5pp::CompoundType confType = hdf5pp::CompoundType::compoundType<EvrIOConfigV1>() ;
+  confType.insert( "conn", offsetof(EvrIOConfigV1, conn), connEnumType ) ;
 
   return confType ;
 }

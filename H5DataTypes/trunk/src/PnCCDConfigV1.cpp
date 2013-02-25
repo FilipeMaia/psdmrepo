@@ -39,12 +39,10 @@ namespace H5DataTypes {
 // Constructors --
 //----------------
 PnCCDConfigV1::PnCCDConfigV1 ( const PnCCDConfigV1::XtcType& config )
+  : numLinks(config.numLinks())
+  , payloadSizePerLink(config.payloadSizePerLink())
 {
-  m_data.numLinks = config.numLinks() ;
-  m_data.payloadSizePerLink = config.payloadSizePerLink() ;
 }
-
-
 
 hdf5pp::Type
 PnCCDConfigV1::stored_type()
@@ -56,8 +54,8 @@ hdf5pp::Type
 PnCCDConfigV1::native_type()
 {
   hdf5pp::CompoundType confType = hdf5pp::CompoundType::compoundType<PnCCDConfigV1>() ;
-  confType.insert_native<uint32_t>( "numLinks", offsetof(PnCCDConfigV1_Data,numLinks) ) ;
-  confType.insert_native<uint32_t>( "payloadSizePerLink", offsetof(PnCCDConfigV1_Data,payloadSizePerLink) ) ;
+  confType.insert_native<uint32_t>( "numLinks", offsetof(PnCCDConfigV1,numLinks) ) ;
+  confType.insert_native<uint32_t>( "payloadSizePerLink", offsetof(PnCCDConfigV1,payloadSizePerLink) ) ;
 
   return confType ;
 }
@@ -69,6 +67,5 @@ PnCCDConfigV1::store ( const PnCCDConfigV1::XtcType& config, hdf5pp::Group locat
   PnCCDConfigV1 data ( config ) ;
   storeDataObject ( data, "config", location ) ;
 }
-
 
 } // namespace H5DataTypes

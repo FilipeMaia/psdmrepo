@@ -35,11 +35,11 @@
 namespace H5DataTypes {
 
 BldDataFEEGasDetEnergy::BldDataFEEGasDetEnergy ( const XtcType& xtc )
+  : f_11_ENRC(xtc.f_11_ENRC)
+  , f_12_ENRC(xtc.f_12_ENRC)
+  , f_21_ENRC(xtc.f_21_ENRC)
+  , f_22_ENRC(xtc.f_22_ENRC)
 {
-  m_data.f_11_ENRC = xtc.f_11_ENRC ;
-  m_data.f_12_ENRC = xtc.f_12_ENRC ;
-  m_data.f_21_ENRC = xtc.f_21_ENRC ;
-  m_data.f_22_ENRC = xtc.f_22_ENRC ;
 }
 
 BldDataFEEGasDetEnergy::~BldDataFEEGasDetEnergy ()
@@ -55,11 +55,11 @@ BldDataFEEGasDetEnergy::stored_type()
 hdf5pp::Type
 BldDataFEEGasDetEnergy::native_type()
 {
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<BldDataFEEGasDetEnergy_Data>() ;
-  type.insert_native<double>( "f_11_ENRC", offsetof(BldDataFEEGasDetEnergy_Data,f_11_ENRC) ) ;
-  type.insert_native<double>( "f_12_ENRC", offsetof(BldDataFEEGasDetEnergy_Data,f_12_ENRC) ) ;
-  type.insert_native<double>( "f_21_ENRC", offsetof(BldDataFEEGasDetEnergy_Data,f_21_ENRC) ) ;
-  type.insert_native<double>( "f_22_ENRC", offsetof(BldDataFEEGasDetEnergy_Data,f_22_ENRC) ) ;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<BldDataFEEGasDetEnergy>() ;
+  type.insert_native<double>( "f_11_ENRC", offsetof(BldDataFEEGasDetEnergy, f_11_ENRC) ) ;
+  type.insert_native<double>( "f_12_ENRC", offsetof(BldDataFEEGasDetEnergy, f_12_ENRC) ) ;
+  type.insert_native<double>( "f_21_ENRC", offsetof(BldDataFEEGasDetEnergy, f_21_ENRC) ) ;
+  type.insert_native<double>( "f_22_ENRC", offsetof(BldDataFEEGasDetEnergy, f_22_ENRC) ) ;
 
   return type ;
 }

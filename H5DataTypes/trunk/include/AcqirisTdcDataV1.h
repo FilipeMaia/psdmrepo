@@ -34,11 +34,8 @@
 //		---------------------
 
 /**
- *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
  *
  *  @version $Id$
  *
@@ -47,13 +44,9 @@
 
 namespace H5DataTypes {
 
-#pragma pack(push,2)
-struct AcqirisTdcDataV1_Data  {
-  uint8_t source;
-  uint8_t overflow;
-  uint32_t value;
-};
-#pragma pack(pop)
+//
+//  Helper class for Pds::Acqiris::TdcDataV1 class
+//
 
 class AcqirisTdcDataV1  {
 public:
@@ -72,6 +65,14 @@ public:
 
 protected:
 private:
+
+#pragma pack(push,2)
+  struct AcqirisTdcDataV1_Data  {
+    uint8_t source;
+    uint8_t overflow;
+    uint32_t value;
+  };
+#pragma pack(pop)
 
   size_t m_size;
   AcqirisTdcDataV1_Data* m_data;

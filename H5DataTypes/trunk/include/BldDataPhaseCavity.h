@@ -34,13 +34,9 @@
 
 namespace H5DataTypes {
 
-struct BldDataPhaseCavity_Data  {
-  double fFitTime1;   /* in pico-seconds */ 
-  double fFitTime2;   /* in pico-seconds */ 
-  double fCharge1;    /* in pico-columbs */ 
-  double fCharge2;    /* in pico-columbs */ 
-};
-
+//
+// Helper type for Pds::BldDataPhaseCavity
+//
 class BldDataPhaseCavity  {
 public:
 
@@ -57,7 +53,10 @@ public:
   static size_t xtcSize( const XtcType& xtc ) { return sizeof xtc ; }
 
 private:
-  BldDataPhaseCavity_Data m_data ;
+  double fFitTime1;   /* in pico-seconds */
+  double fFitTime2;   /* in pico-seconds */
+  double fCharge1;    /* in pico-columbs */
+  double fCharge2;    /* in pico-columbs */
 };
 
 } // namespace H5DataTypes

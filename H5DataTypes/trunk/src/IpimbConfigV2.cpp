@@ -78,13 +78,12 @@ IpimbConfigV2::native_type()
   capValType.insert("c_3p3nF", Pds::Ipimb::ConfigV2::c_3p3nF);
   capValType.insert("c_10nF", Pds::Ipimb::ConfigV2::c_10nF);
   capValType.insert("expert", Pds::Ipimb::ConfigV2::expert);
-  hdf5pp::Type capValArrType = hdf5pp::ArrayType::arrayType(capValType, 4);
 
   hdf5pp::CompoundType confType = hdf5pp::CompoundType::compoundType<IpimbConfigV2>() ;
   confType.insert_native<uint64_t>( "triggerCounter", offsetof(IpimbConfigV2,triggerCounter) );
   confType.insert_native<uint64_t>( "serialID", offsetof(IpimbConfigV2,serialID) );
   confType.insert_native<uint16_t>( "chargeAmpRange", offsetof(IpimbConfigV2,chargeAmpRange) );
-  confType.insert( "capacitorValue", offsetof(IpimbConfigV2,capacitorValue), capValArrType );
+  confType.insert( "capacitorValue", offsetof(IpimbConfigV2,capacitorValue), capValType, 4 );
   confType.insert_native<uint16_t>( "calibrationRange", offsetof(IpimbConfigV2,calibrationRange) );
   confType.insert_native<uint32_t>( "resetLength", offsetof(IpimbConfigV2,resetLength) );
   confType.insert_native<uint16_t>( "resetDelay", offsetof(IpimbConfigV2,resetDelay) );

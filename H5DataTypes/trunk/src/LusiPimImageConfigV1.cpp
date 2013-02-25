@@ -36,14 +36,9 @@
 
 namespace H5DataTypes {
 
-LusiPimImageConfigV1_Data::LusiPimImageConfigV1_Data(const Pds::Lusi::PimImageConfigV1& data)
+LusiPimImageConfigV1::LusiPimImageConfigV1 ( const XtcType& data )
   : xscale(data.xscale)
   , yscale(data.yscale)
-{
-}
-
-LusiPimImageConfigV1::LusiPimImageConfigV1 ( const XtcType& data )
-  : m_data(data)
 {
 }
 
@@ -56,9 +51,9 @@ LusiPimImageConfigV1::stored_type()
 hdf5pp::Type
 LusiPimImageConfigV1::native_type()
 {
-  hdf5pp::CompoundType confType = hdf5pp::CompoundType::compoundType<LusiPimImageConfigV1_Data>() ;
-  confType.insert_native<float>( "xscale", offsetof(LusiPimImageConfigV1_Data, xscale) );
-  confType.insert_native<float>( "yscale", offsetof(LusiPimImageConfigV1_Data, yscale) );
+  hdf5pp::CompoundType confType = hdf5pp::CompoundType::compoundType<LusiPimImageConfigV1>() ;
+  confType.insert_native<float>( "xscale", offsetof(LusiPimImageConfigV1, xscale) );
+  confType.insert_native<float>( "yscale", offsetof(LusiPimImageConfigV1, yscale) );
 
   return confType ;
 }

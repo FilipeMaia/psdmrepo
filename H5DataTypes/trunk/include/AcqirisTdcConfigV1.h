@@ -33,11 +33,8 @@
 //		---------------------
 
 /**
- *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
  *
  *  @version $Id$
  *
@@ -47,15 +44,8 @@
 namespace H5DataTypes {
 
 //
-//  Helper classes for Pds::Acqiris::TdcChannel class
+//  Helper class for Pds::Acqiris::TdcChannel class
 //
-struct AcqirisTdcChannel_Data {
-  int32_t channel;
-  uint16_t mode;
-  uint16_t slope;
-  double   level;
-};
-
 struct AcqirisTdcChannel {
 public:
   AcqirisTdcChannel () {}
@@ -65,18 +55,15 @@ public:
   static hdf5pp::Type native_type() ;
 
 private:
-  AcqirisTdcChannel_Data m_data ;
-};
-
-//
-//  Helper classes for Pds::Acqiris::TdcAuxIO class
-//
-struct AcqirisTdcAuxIO_Data {
-  uint16_t channel;
+  int32_t channel;
   uint16_t mode;
-  uint16_t term;
+  uint16_t slope;
+  double   level;
 };
 
+//
+//  Helper class for Pds::Acqiris::TdcAuxIO class
+//
 struct AcqirisTdcAuxIO {
 public:
   AcqirisTdcAuxIO () {}
@@ -86,18 +73,14 @@ public:
   static hdf5pp::Type native_type() ;
 
 private:
-  AcqirisTdcAuxIO_Data m_data ;
-};
-
-//
-//  Helper classes for Pds::Acqiris::TdcVetoIO class
-//
-struct AcqirisTdcVetoIO_Data {
   uint16_t channel;
   uint16_t mode;
   uint16_t term;
 };
 
+//
+//  Helper class for Pds::Acqiris::TdcVetoIO class
+//
 struct AcqirisTdcVetoIO {
 public:
   AcqirisTdcVetoIO () {}
@@ -107,11 +90,13 @@ public:
   static hdf5pp::Type native_type() ;
 
 private:
-  AcqirisTdcVetoIO_Data m_data ;
+  uint16_t channel;
+  uint16_t mode;
+  uint16_t term;
 };
 
 //
-//  Helper classes for Pds::Acqiris::TdcConfigV1 class
+//  Helper class for Pds::Acqiris::TdcConfigV1 class
 //
 struct AcqirisTdcConfigV1 {
 public:

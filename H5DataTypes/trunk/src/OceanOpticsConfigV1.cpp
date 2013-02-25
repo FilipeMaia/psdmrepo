@@ -24,7 +24,6 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "H5DataTypes/H5DataUtils.h"
-#include "hdf5pp/ArrayType.h"
 #include "hdf5pp/CompoundType.h"
 #include "hdf5pp/EnumType.h"
 

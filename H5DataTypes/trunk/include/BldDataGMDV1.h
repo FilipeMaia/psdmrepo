@@ -34,6 +34,9 @@
 
 namespace H5DataTypes {
 
+//
+// Helper type for Pds::BldDataGMDV1
+//
 class BldDataGMDV1  {
 public:
 

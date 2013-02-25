@@ -37,9 +37,9 @@
 namespace H5DataTypes {
 
 CameraFrameCoordV1::CameraFrameCoordV1( const Pds::Camera::FrameCoord& coord )
+  : column(coord.column)
+  , row(coord.row)
 {
-  m_data.column = coord.column ;
-  m_data.row = coord.row ;
 }
 
 hdf5pp::Type
@@ -53,8 +53,8 @@ CameraFrameCoordV1::native_type()
 {
   // make the type
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<Pds::Camera::FrameCoord>() ;
-  type.insert_native<uint16_t>( "column", offsetof(CameraFrameCoordV1_Data,column) ) ;
-  type.insert_native<uint16_t>( "row", offsetof(CameraFrameCoordV1_Data,row) ) ;
+  type.insert_native<uint16_t>( "column", offsetof(CameraFrameCoordV1, column) ) ;
+  type.insert_native<uint16_t>( "row", offsetof(CameraFrameCoordV1, row) ) ;
 
   return type ;
 }

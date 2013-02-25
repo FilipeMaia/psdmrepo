@@ -38,7 +38,24 @@ namespace H5DataTypes {
 //
 // Helper type for Pds::FCCD::FccdConfigV2
 //
-struct FccdConfigV2_Data  {
+class FccdConfigV2  {
+public:
+
+  typedef Pds::FCCD::FccdConfigV2 XtcType ;
+
+  FccdConfigV2 () {}
+  FccdConfigV2 ( const XtcType& data ) ;
+
+  static hdf5pp::Type stored_type() ;
+  static hdf5pp::Type native_type() ;
+
+  // store single config object at specified location
+  static void store( const XtcType& config, hdf5pp::Group location ) ;
+
+  static size_t xtcSize( const XtcType& xtc ) { return sizeof(xtc) ; }
+
+private:
+
   uint32_t width;
   uint32_t height;
   uint32_t trimmedWidth;
@@ -79,27 +96,6 @@ struct FccdConfigV2_Data  {
   uint16_t waveform12;
   uint16_t waveform13;
   uint16_t waveform14;
-};
-
-class FccdConfigV2  {
-public:
-
-  typedef Pds::FCCD::FccdConfigV2 XtcType ;
-
-  FccdConfigV2 () {}
-  FccdConfigV2 ( const XtcType& data ) ;
-
-  static hdf5pp::Type stored_type() ;
-  static hdf5pp::Type native_type() ;
-
-  // store single config object at specified location
-  static void store( const XtcType& config, hdf5pp::Group location ) ;
-
-  static size_t xtcSize( const XtcType& xtc ) { return sizeof(xtc) ; }
-
-private:
-
-  FccdConfigV2_Data m_data ;
 
 };
 

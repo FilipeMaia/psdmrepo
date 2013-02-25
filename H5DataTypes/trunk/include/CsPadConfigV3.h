@@ -40,38 +40,20 @@ namespace H5DataTypes {
 //
 // Helper type for Pds::CsPad::ProtectionSystemThreshold
 //
-struct CsPadProtectionSystemThreshold_Data  {
+struct CsPadProtectionSystemThreshold  {
+  CsPadProtectionSystemThreshold() {}
+  CsPadProtectionSystemThreshold(const Pds::CsPad::ProtectionSystemThreshold& o);
+
+  static hdf5pp::Type native_type() ;
+
+private:
   uint32_t adcThreshold;
   uint32_t pixelCountThreshold;
-
-  CsPadProtectionSystemThreshold_Data& operator=(const Pds::CsPad::ProtectionSystemThreshold& o);
 };
 
 //
 // Helper type for Pds::CsPad::ConfigV3
 //
-struct CsPadConfigV3_Data  {
-  enum { MaxQuadsPerSensor = Pds::CsPad::MaxQuadsPerSensor };
-  enum { SectionsPerQuad = Pds::CsPad::ASICsPerQuad/2 };
-  enum { SectionsTotal = MaxQuadsPerSensor*SectionsPerQuad };
-  uint32_t          concentratorVersion;
-  uint32_t          runDelay;
-  uint32_t          eventCode;
-  CsPadProtectionSystemThreshold_Data protectionThresholds[MaxQuadsPerSensor];
-  uint32_t          protectionEnable;
-  uint32_t          inactiveRunMode;
-  uint32_t          activeRunMode;
-  uint32_t          testDataIndex;
-  uint32_t          payloadPerQuad;
-  uint32_t          badAsicMask0;
-  uint32_t          badAsicMask1;
-  uint32_t          asicMask;
-  uint32_t          quadMask;
-  uint8_t           roiMask[MaxQuadsPerSensor];
-  CsPadConfigV1QuadReg_Data quads[MaxQuadsPerSensor];
-  int8_t sections[MaxQuadsPerSensor][SectionsPerQuad];
-};
-
 class CsPadConfigV3  {
 public:
 
@@ -90,8 +72,25 @@ public:
 
 private:
 
-  CsPadConfigV3_Data m_data ;
-
+  enum { MaxQuadsPerSensor = Pds::CsPad::MaxQuadsPerSensor };
+  enum { SectionsPerQuad = Pds::CsPad::ASICsPerQuad/2 };
+  enum { SectionsTotal = MaxQuadsPerSensor*SectionsPerQuad };
+  uint32_t          concentratorVersion;
+  uint32_t          runDelay;
+  uint32_t          eventCode;
+  CsPadProtectionSystemThreshold protectionThresholds[MaxQuadsPerSensor];
+  uint32_t          protectionEnable;
+  uint32_t          inactiveRunMode;
+  uint32_t          activeRunMode;
+  uint32_t          testDataIndex;
+  uint32_t          payloadPerQuad;
+  uint32_t          badAsicMask0;
+  uint32_t          badAsicMask1;
+  uint32_t          asicMask;
+  uint32_t          quadMask;
+  uint8_t           roiMask[MaxQuadsPerSensor];
+  CsPadConfigV1QuadReg quads[MaxQuadsPerSensor];
+  int8_t sections[MaxQuadsPerSensor][SectionsPerQuad];
 };
 
 } // namespace H5DataTypes

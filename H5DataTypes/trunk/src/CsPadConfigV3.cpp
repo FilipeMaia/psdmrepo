@@ -38,48 +38,54 @@
 
 namespace H5DataTypes {
 
-CsPadProtectionSystemThreshold_Data& 
-CsPadProtectionSystemThreshold_Data::operator=(const Pds::CsPad::ProtectionSystemThreshold& o)
+CsPadProtectionSystemThreshold::CsPadProtectionSystemThreshold(const Pds::CsPad::ProtectionSystemThreshold& o)
+  : adcThreshold(o.adcThreshold)
+  , pixelCountThreshold(o.pixelCountThreshold)
 {
-  this->adcThreshold = o.adcThreshold;
-  this->pixelCountThreshold = o.pixelCountThreshold;
-  return *this;
+}
+
+hdf5pp::Type
+CsPadProtectionSystemThreshold::native_type()
+{
+  hdf5pp::CompoundType protSysType = hdf5pp::CompoundType::compoundType<CsPadProtectionSystemThreshold>() ;
+  protSysType.insert_native<uint32_t>( "adcThreshold", offsetof(CsPadProtectionSystemThreshold, adcThreshold) ) ;
+  protSysType.insert_native<uint32_t>( "pixelCountThreshold", offsetof(CsPadProtectionSystemThreshold, pixelCountThreshold) ) ;
+  return protSysType;
 }
 
 
 CsPadConfigV3::CsPadConfigV3 ( const XtcType& data )
+  : concentratorVersion(data.concentratorVersion())
+  , runDelay(data.runDelay())
+  , eventCode(data.eventCode())
+  , protectionEnable(data.protectionEnable())
+  , inactiveRunMode(data.inactiveRunMode())
+  , activeRunMode(data.activeRunMode())
+  , testDataIndex(data.tdi())
+  , payloadPerQuad(data.payloadSize())
+  , badAsicMask0(data.badAsicMask0())
+  , badAsicMask1(data.badAsicMask1())
+  , asicMask(data.asicMask())
+  , quadMask(data.quadMask())
 {
-  m_data.concentratorVersion = data.concentratorVersion();
-  m_data.runDelay       = data.runDelay();
-  m_data.eventCode      = data.eventCode();
-  m_data.protectionEnable = data.protectionEnable();
-  m_data.inactiveRunMode = data.inactiveRunMode();
-  m_data.activeRunMode  = data.activeRunMode();
-  m_data.testDataIndex  = data.tdi();
-  m_data.payloadPerQuad = data.payloadSize();
-  m_data.badAsicMask0   = data.badAsicMask0();
-  m_data.badAsicMask1   = data.badAsicMask1();
-  m_data.asicMask       = data.asicMask();
-  m_data.quadMask       = data.quadMask();
-
-  for ( int q = 0; q < CsPadConfigV3_Data::MaxQuadsPerSensor ; ++ q ) {
-    m_data.roiMask[q] = data.roiMask(q);
+  for ( int q = 0; q < MaxQuadsPerSensor ; ++ q ) {
+    roiMask[q] = data.roiMask(q);
   }
   
-  for ( int q = 0; q < CsPadConfigV3_Data::MaxQuadsPerSensor ; ++ q ) {
-    m_data.quads[q] = data.quads()[q];
+  for ( int q = 0; q < MaxQuadsPerSensor ; ++ q ) {
+    quads[q] = data.quads()[q];
   }
 
-  for ( int q = 0; q < CsPadConfigV3_Data::MaxQuadsPerSensor ; ++ q ) {
-    m_data.protectionThresholds[q] = data.protectionThresholds()[q];
+  for ( int q = 0; q < MaxQuadsPerSensor ; ++ q ) {
+    protectionThresholds[q] = data.protectionThresholds()[q];
   }
 
   // fill the list of active sections from ROI bits
   int ns = 0 ;
-  for ( int q = 0; q < CsPadConfigV3_Data::MaxQuadsPerSensor ; ++ q ) {
-    for ( int s = 0; s < CsPadConfigV3_Data::SectionsPerQuad ; ++ s ) {
-      m_data.sections[q][s] = -1;
-      if ( m_data.roiMask[q] & (1<<s) ) m_data.sections[q][s] = ns++;
+  for ( int q = 0; q < MaxQuadsPerSensor ; ++ q ) {
+    for ( int s = 0; s < SectionsPerQuad ; ++ s ) {
+      sections[q][s] = -1;
+      if ( roiMask[q] & (1<<s) ) sections[q][s] = ns++;
     }
   }
   
@@ -94,61 +100,27 @@ CsPadConfigV3::stored_type()
 hdf5pp::Type
 CsPadConfigV3::native_type()
 {
-  hdf5pp::CompoundType digitalPotsType = hdf5pp::CompoundType::compoundType<CsPadDigitalPotsCfg_Data>() ;
-  digitalPotsType.insert_native<uint8_t>( "pots", offsetof(CsPadDigitalPotsCfg_Data, pots), CsPadDigitalPotsCfg_Data::PotsPerQuad );
-
-  hdf5pp::CompoundType readOnlyType = hdf5pp::CompoundType::compoundType<CsPadReadOnlyCfg_Data>() ;
-  readOnlyType.insert_native<uint32_t>( "shiftTest", offsetof(CsPadReadOnlyCfg_Data, shiftTest) ) ;
-  readOnlyType.insert_native<uint32_t>( "version", offsetof(CsPadReadOnlyCfg_Data, version) ) ;
-  
-  hsize_t dims[2] = {CsPadGainMapCfg_Data::ColumnsPerASIC, CsPadGainMapCfg_Data::MaxRowsPerASIC};
-  hdf5pp::Type baseMapType = hdf5pp::TypeTraits<uint16_t>::native_type();
-  hdf5pp::ArrayType gainMapArrType = hdf5pp::ArrayType::arrayType(baseMapType, 2, dims);
-  hdf5pp::CompoundType gainMapType = hdf5pp::CompoundType::compoundType<CsPadGainMapCfg_Data>() ;
-  gainMapType.insert( "gainMap", offsetof(CsPadGainMapCfg_Data, gainMap), gainMapArrType );
-
-  hsize_t sdims[2] = {CsPadConfigV3_Data::MaxQuadsPerSensor, CsPadConfigV3_Data::SectionsPerQuad};
+  hsize_t sdims[2] = {MaxQuadsPerSensor, SectionsPerQuad};
   hdf5pp::Type baseSectType = hdf5pp::TypeTraits<int8_t>::native_type();
   hdf5pp::ArrayType sectArrType = hdf5pp::ArrayType::arrayType(baseSectType, 2, sdims);
 
-  hdf5pp::CompoundType quadType = hdf5pp::CompoundType::compoundType<CsPadConfigV1QuadReg_Data>() ;
-  quadType.insert_native<uint32_t>( "shiftSelect", offsetof(CsPadConfigV1QuadReg_Data, shiftSelect), CsPadConfigV1QuadReg_Data::TwoByTwosPerQuad ) ;
-  quadType.insert_native<uint32_t>( "edgeSelect", offsetof(CsPadConfigV1QuadReg_Data, edgeSelect), CsPadConfigV1QuadReg_Data::TwoByTwosPerQuad ) ;
-  quadType.insert_native<uint32_t>( "readClkSet", offsetof(CsPadConfigV1QuadReg_Data, readClkSet) ) ;
-  quadType.insert_native<uint32_t>( "readClkHold", offsetof(CsPadConfigV1QuadReg_Data, readClkHold) ) ;
-  quadType.insert_native<uint32_t>( "dataMode", offsetof(CsPadConfigV1QuadReg_Data, dataMode) ) ;
-  quadType.insert_native<uint32_t>( "prstSel", offsetof(CsPadConfigV1QuadReg_Data, prstSel) ) ;
-  quadType.insert_native<uint32_t>( "acqDelay", offsetof(CsPadConfigV1QuadReg_Data, acqDelay) ) ;
-  quadType.insert_native<uint32_t>( "intTime", offsetof(CsPadConfigV1QuadReg_Data, intTime) ) ;
-  quadType.insert_native<uint32_t>( "digDelay", offsetof(CsPadConfigV1QuadReg_Data, digDelay) ) ;
-  quadType.insert_native<uint32_t>( "ampIdle", offsetof(CsPadConfigV1QuadReg_Data, ampIdle) ) ;
-  quadType.insert_native<uint32_t>( "injTotal", offsetof(CsPadConfigV1QuadReg_Data, injTotal) ) ;
-  quadType.insert_native<uint32_t>( "rowColShiftPer", offsetof(CsPadConfigV1QuadReg_Data, rowColShiftPer) ) ;
-  quadType.insert("readOnly", offsetof(CsPadConfigV1QuadReg_Data, readOnly), readOnlyType) ;
-  quadType.insert("digitalPots", offsetof(CsPadConfigV1QuadReg_Data, digitalPots), digitalPotsType) ;
-  quadType.insert("gainMap", offsetof(CsPadConfigV1QuadReg_Data, gainMap), gainMapType) ;
-
-  hdf5pp::CompoundType protSysType = hdf5pp::CompoundType::compoundType<CsPadProtectionSystemThreshold_Data>() ;
-  protSysType.insert_native<uint32_t>( "adcThreshold", offsetof(CsPadProtectionSystemThreshold_Data, adcThreshold) ) ;
-  protSysType.insert_native<uint32_t>( "pixelCountThreshold", offsetof(CsPadProtectionSystemThreshold_Data, pixelCountThreshold) ) ;
-  
-  hdf5pp::CompoundType confType = hdf5pp::CompoundType::compoundType<CsPadConfigV3_Data>() ;
-  confType.insert_native<uint32_t>( "concentratorVersion", offsetof(CsPadConfigV3_Data, concentratorVersion) ) ;
-  confType.insert_native<uint32_t>( "runDelay", offsetof(CsPadConfigV3_Data, runDelay) ) ;
-  confType.insert_native<uint32_t>( "eventCode", offsetof(CsPadConfigV3_Data, eventCode) ) ;
-  confType.insert("protectionThresholds", offsetof(CsPadConfigV3_Data, protectionThresholds), protSysType, CsPadConfigV3_Data::MaxQuadsPerSensor ) ;
-  confType.insert_native<uint32_t>( "protectionEnable", offsetof(CsPadConfigV3_Data, protectionEnable) ) ;
-  confType.insert_native<uint32_t>( "inactiveRunMode", offsetof(CsPadConfigV3_Data, inactiveRunMode) ) ;
-  confType.insert_native<uint32_t>( "activeRunMode", offsetof(CsPadConfigV3_Data, activeRunMode) ) ;
-  confType.insert_native<uint32_t>( "testDataIndex", offsetof(CsPadConfigV3_Data, testDataIndex) ) ;
-  confType.insert_native<uint32_t>( "payloadPerQuad", offsetof(CsPadConfigV3_Data, payloadPerQuad) ) ;
-  confType.insert_native<uint32_t>( "badAsicMask0", offsetof(CsPadConfigV3_Data, badAsicMask0) ) ;
-  confType.insert_native<uint32_t>( "badAsicMask1", offsetof(CsPadConfigV3_Data, badAsicMask1) ) ;
-  confType.insert_native<uint32_t>( "asicMask", offsetof(CsPadConfigV3_Data, asicMask) ) ;
-  confType.insert_native<uint32_t>( "quadMask", offsetof(CsPadConfigV3_Data, quadMask) ) ;
-  confType.insert_native<uint32_t>( "roiMask", offsetof(CsPadConfigV3_Data, roiMask) ) ;
-  confType.insert("quads", offsetof(CsPadConfigV3_Data, quads), quadType, CsPadConfigV3_Data::MaxQuadsPerSensor ) ;
-  confType.insert("sections", offsetof(CsPadConfigV3_Data, sections), sectArrType ) ;
+  hdf5pp::CompoundType confType = hdf5pp::CompoundType::compoundType<CsPadConfigV3>() ;
+  confType.insert_native<uint32_t>( "concentratorVersion", offsetof(CsPadConfigV3, concentratorVersion) ) ;
+  confType.insert_native<uint32_t>( "runDelay", offsetof(CsPadConfigV3, runDelay) ) ;
+  confType.insert_native<uint32_t>( "eventCode", offsetof(CsPadConfigV3, eventCode) ) ;
+  confType.insert("protectionThresholds", offsetof(CsPadConfigV3, protectionThresholds), CsPadProtectionSystemThreshold::native_type(), MaxQuadsPerSensor ) ;
+  confType.insert_native<uint32_t>( "protectionEnable", offsetof(CsPadConfigV3, protectionEnable) ) ;
+  confType.insert_native<uint32_t>( "inactiveRunMode", offsetof(CsPadConfigV3, inactiveRunMode) ) ;
+  confType.insert_native<uint32_t>( "activeRunMode", offsetof(CsPadConfigV3, activeRunMode) ) ;
+  confType.insert_native<uint32_t>( "testDataIndex", offsetof(CsPadConfigV3, testDataIndex) ) ;
+  confType.insert_native<uint32_t>( "payloadPerQuad", offsetof(CsPadConfigV3, payloadPerQuad) ) ;
+  confType.insert_native<uint32_t>( "badAsicMask0", offsetof(CsPadConfigV3, badAsicMask0) ) ;
+  confType.insert_native<uint32_t>( "badAsicMask1", offsetof(CsPadConfigV3, badAsicMask1) ) ;
+  confType.insert_native<uint32_t>( "asicMask", offsetof(CsPadConfigV3, asicMask) ) ;
+  confType.insert_native<uint32_t>( "quadMask", offsetof(CsPadConfigV3, quadMask) ) ;
+  confType.insert_native<uint32_t>( "roiMask", offsetof(CsPadConfigV3, roiMask) ) ;
+  confType.insert("quads", offsetof(CsPadConfigV3, quads), CsPadConfigV1QuadReg::native_type(), MaxQuadsPerSensor ) ;
+  confType.insert("sections", offsetof(CsPadConfigV3, sections), sectArrType ) ;
 
   return confType ;
 }

@@ -53,7 +53,7 @@ CsPadElementV1::stored_type(unsigned nQuad)
 hdf5pp::Type
 CsPadElementV1::native_type(unsigned nQuad)
 {
-  return hdf5pp::ArrayType::arrayType ( CsPadElementHeader::native_type(), nQuad );
+  return hdf5pp::TypeTraits<CsPadElementHeader>::native_type(nQuad);
 }
 
 hdf5pp::Type

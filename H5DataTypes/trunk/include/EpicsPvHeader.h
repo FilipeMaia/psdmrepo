@@ -35,12 +35,6 @@
 
 namespace H5DataTypes {
 
-struct EpicsPvHeader_Data  {
-  int16_t pvId;
-  int16_t dbrType;
-  int16_t numElements;
-};
-
 class EpicsPvHeader  {
 public:
 
@@ -56,7 +50,9 @@ public:
 
 private:
 
-  EpicsPvHeader_Data m_data ;
+  int16_t pvId;
+  int16_t dbrType;
+  int16_t numElements;
 };
 
 } // namespace H5DataTypes

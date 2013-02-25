@@ -38,7 +38,21 @@ namespace H5DataTypes {
 //
 // Helper type for Pds::Ipimb::DataV2
 //
-struct IpimbDataV2_Data  {
+class IpimbDataV2  {
+public:
+
+  typedef Pds::Ipimb::DataV2 XtcType ;
+
+  IpimbDataV2 () {}
+  IpimbDataV2 ( const XtcType& data ) ;
+
+  static hdf5pp::Type stored_type() ;
+  static hdf5pp::Type native_type() ;
+
+  static size_t xtcSize( const XtcType& xtc ) { return sizeof(xtc) ; }
+
+private:
+
   uint64_t triggerCounter;
   uint16_t config0;
   uint16_t config1;
@@ -60,24 +74,6 @@ struct IpimbDataV2_Data  {
   float channel1psVolts;
   float channel2psVolts;
   float channel3psVolts;
-};
-
-class IpimbDataV2  {
-public:
-
-  typedef Pds::Ipimb::DataV2 XtcType ;
-
-  IpimbDataV2 () {}
-  IpimbDataV2 ( const XtcType& data ) ;
-
-  static hdf5pp::Type stored_type() ;
-  static hdf5pp::Type native_type() ;
-
-  static size_t xtcSize( const XtcType& xtc ) { return sizeof(xtc) ; }
-
-private:
-
-  IpimbDataV2_Data m_data ;
 
 };
 

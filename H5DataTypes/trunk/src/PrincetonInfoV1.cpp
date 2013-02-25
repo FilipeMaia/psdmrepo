@@ -37,8 +37,8 @@
 namespace H5DataTypes {
 
 PrincetonInfoV1::PrincetonInfoV1 ( const XtcType& data )
+  : temperature(data.temperature())
 {
-  m_data.temperature = data.temperature();
 }
 
 hdf5pp::Type
@@ -51,7 +51,7 @@ hdf5pp::Type
 PrincetonInfoV1::native_type()
 {
   hdf5pp::CompoundType confType = hdf5pp::CompoundType::compoundType<PrincetonInfoV1>() ;
-  confType.insert_native<float>( "temperature", offsetof(PrincetonInfoV1_Data,temperature) );
+  confType.insert_native<float>( "temperature", offsetof(PrincetonInfoV1,temperature) );
 
   return confType ;
 }

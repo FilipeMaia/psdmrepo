@@ -37,8 +37,8 @@
 namespace H5DataTypes {
 
 LusiDiodeFexV1::LusiDiodeFexV1 ( const XtcType& data )
+  : value(data.value)
 {
-  m_data.value = data.value;
 }
 
 hdf5pp::Type
@@ -50,8 +50,8 @@ LusiDiodeFexV1::stored_type()
 hdf5pp::Type
 LusiDiodeFexV1::native_type()
 {
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<LusiDiodeFexV1_Data>() ;
-  type.insert_native<float>( "value", offsetof(LusiDiodeFexV1_Data, value) ) ;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<LusiDiodeFexV1>() ;
+  type.insert_native<float>( "value", offsetof(LusiDiodeFexV1, value) ) ;
 
   return type ;
 }

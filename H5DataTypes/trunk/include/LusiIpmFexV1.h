@@ -38,14 +38,6 @@ namespace H5DataTypes {
 //
 // Helper type for Pds::Lusi::IpmFexV1
 //
-struct LusiIpmFexV1_Data  {
-  enum { CHSIZE = 4 };
-  float channel[CHSIZE];
-  float sum;
-  float xpos;
-  float ypos;
-};
-
 class LusiIpmFexV1  {
 public:
 
@@ -61,7 +53,11 @@ public:
 
 private:
 
-  LusiIpmFexV1_Data m_data ;
+  enum { CHSIZE = 4 };
+  float channel[CHSIZE];
+  float sum;
+  float xpos;
+  float ypos;
 
 };
 

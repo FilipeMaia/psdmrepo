@@ -38,22 +38,6 @@ namespace H5DataTypes {
 //
 // Helper type for Pds::Ipimb::DataV1
 //
-struct IpimbDataV1_Data  {
-  uint64_t triggerCounter;
-  uint16_t config0;
-  uint16_t config1;
-  uint16_t config2;
-  uint16_t channel0;
-  uint16_t channel1;
-  uint16_t channel2;
-  uint16_t channel3;
-  uint16_t checksum;
-  float channel0Volts;
-  float channel1Volts;
-  float channel2Volts;
-  float channel3Volts;
-};
-
 class IpimbDataV1  {
 public:
 
@@ -69,7 +53,19 @@ public:
 
 private:
 
-  IpimbDataV1_Data m_data ;
+  uint64_t triggerCounter;
+  uint16_t config0;
+  uint16_t config1;
+  uint16_t config2;
+  uint16_t channel0;
+  uint16_t channel1;
+  uint16_t channel2;
+  uint16_t channel3;
+  uint16_t checksum;
+  float channel0Volts;
+  float channel1Volts;
+  float channel2Volts;
+  float channel3Volts;
 
 };
 

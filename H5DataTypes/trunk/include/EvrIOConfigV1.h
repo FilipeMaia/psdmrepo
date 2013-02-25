@@ -35,10 +35,6 @@
 
 namespace H5DataTypes {
 
-struct EvrIOConfigV1_Data {
-  int16_t conn ;
-};
-
 class EvrIOConfigV1  {
 public:
 
@@ -57,7 +53,7 @@ public:
 
 private:
 
-  EvrIOConfigV1_Data m_data ;
+  int16_t conn ;
 
 };
 

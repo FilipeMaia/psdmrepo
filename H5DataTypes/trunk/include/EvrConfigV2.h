@@ -51,13 +51,6 @@ namespace H5DataTypes {
 //
 // Helper type for Pds::EvrData::ConfigV2
 //
-struct EvrConfigV2_Data {
-  uint16_t beam;
-  uint16_t rate;
-  uint32_t npulses;
-  uint32_t noutputs;
-};
-
 class EvrConfigV2  {
 public:
 
@@ -76,7 +69,10 @@ public:
 
 private:
 
-  EvrConfigV2_Data m_data ;
+  uint16_t beam;
+  uint16_t rate;
+  uint32_t npulses;
+  uint32_t noutputs;
 
 };
 

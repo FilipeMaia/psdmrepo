@@ -39,7 +39,13 @@ namespace H5DataTypes {
 //
 // Helper type for Pds::CsPad2x2::ConfigV2QuadReg
 //
-struct CsPad2x2ConfigV2QuadReg_Data  {
+struct CsPad2x2ConfigV2QuadReg  {
+  CsPad2x2ConfigV2QuadReg() {}
+  CsPad2x2ConfigV2QuadReg(const Pds::CsPad2x2::ConfigV2QuadReg& o);
+
+  static hdf5pp::Type native_type() ;
+
+private:
   uint32_t                  shiftSelect;
   uint32_t                  edgeSelect;
   uint32_t                  readClkSet;
@@ -63,12 +69,9 @@ struct CsPad2x2ConfigV2QuadReg_Data  {
   uint32_t                  setPoint;
   uint32_t                  biasTuning;
   uint32_t                  pdpmndnmBalance;
-  CsPad2x2ReadOnlyCfg_Data  readOnly;
-  CsPad2x2DigitalPotsCfg_Data digitalPots;
-  CsPad2x2GainMapCfg_Data   gainMap;
-
-  CsPad2x2ConfigV2QuadReg_Data() {}
-  CsPad2x2ConfigV2QuadReg_Data(const Pds::CsPad2x2::ConfigV2QuadReg& o);
+  CsPad2x2ReadOnlyCfg       readOnly;
+  CsPad2x2DigitalPotsCfg    digitalPots;
+  CsPad2x2GainMapCfg        gainMap;
 };
 
 //
@@ -92,9 +95,9 @@ public:
 
 private:
 
-  CsPad2x2ConfigV2QuadReg_Data quad;
+  CsPad2x2ConfigV2QuadReg quad;
   uint32_t          testDataIndex;
-  CsPad2x2ProtectionSystemThreshold_Data protectionThreshold;
+  CsPad2x2ProtectionSystemThreshold protectionThreshold;
   uint32_t          protectionEnable;
   uint32_t          inactiveRunMode;
   uint32_t          activeRunMode;

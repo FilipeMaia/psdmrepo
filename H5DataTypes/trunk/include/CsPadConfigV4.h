@@ -40,7 +40,13 @@ namespace H5DataTypes {
 //
 // Helper type for Pds::CsPad::ConfigV1QuadReg
 //
-struct CsPadConfigV2QuadReg_Data  {
+struct CsPadConfigV2QuadReg  {
+  CsPadConfigV2QuadReg() {}
+  CsPadConfigV2QuadReg(const Pds::CsPad::ConfigV2QuadReg& o);
+
+  static hdf5pp::Type native_type() ;
+
+private:
   enum { TwoByTwosPerQuad = Pds::CsPad::TwoByTwosPerQuad};
   uint32_t                  shiftSelect[TwoByTwosPerQuad];
   uint32_t                  edgeSelect[TwoByTwosPerQuad];
@@ -57,11 +63,9 @@ struct CsPadConfigV2QuadReg_Data  {
   uint32_t                  ampReset;
   uint32_t                  digCount;
   uint32_t                  digPeriod;
-  CsPadReadOnlyCfg_Data     readOnly;
-  CsPadDigitalPotsCfg_Data  digitalPots;
-  CsPadGainMapCfg_Data      gainMap;
-
-  CsPadConfigV2QuadReg_Data& operator=(const Pds::CsPad::ConfigV2QuadReg& o);
+  CsPadReadOnlyCfg          readOnly;
+  CsPadDigitalPotsCfg       digitalPots;
+  CsPadGainMapCfg           gainMap;
 };
 
 //
@@ -92,7 +96,7 @@ private:
   uint32_t          concentratorVersion;
   uint32_t          runDelay;
   uint32_t          eventCode;
-  CsPadProtectionSystemThreshold_Data protectionThresholds[MaxQuadsPerSensor];
+  CsPadProtectionSystemThreshold protectionThresholds[MaxQuadsPerSensor];
   uint32_t          protectionEnable;
   uint32_t          inactiveRunMode;
   uint32_t          activeRunMode;
@@ -103,7 +107,7 @@ private:
   uint32_t          asicMask;
   uint32_t          quadMask;
   uint8_t           roiMask[MaxQuadsPerSensor];
-  CsPadConfigV2QuadReg_Data quads[MaxQuadsPerSensor];
+  CsPadConfigV2QuadReg quads[MaxQuadsPerSensor];
   int8_t sections[MaxQuadsPerSensor][SectionsPerQuad];
 
 };

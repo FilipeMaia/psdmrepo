@@ -34,14 +34,9 @@
 
 namespace H5DataTypes {
 
-
-struct BldDataFEEGasDetEnergy_Data  {
-  double f_11_ENRC;   /* in mJ */
-  double f_12_ENRC;   /* in mJ */
-  double f_21_ENRC;   /* in mJ */
-  double f_22_ENRC;   /* in mJ */
-};
-
+//
+// Helper type for Pds::BldDataFEEGasDetEnergy
+//
 class BldDataFEEGasDetEnergy  {
 public:
 
@@ -58,7 +53,10 @@ public:
   static size_t xtcSize( const XtcType& xtc ) { return sizeof xtc ; }
 
 private:
-  BldDataFEEGasDetEnergy_Data m_data ;
+  double f_11_ENRC;   /* in mJ */
+  double f_12_ENRC;   /* in mJ */
+  double f_21_ENRC;   /* in mJ */
+  double f_22_ENRC;   /* in mJ */
 };
 
 } // namespace H5DataTypes

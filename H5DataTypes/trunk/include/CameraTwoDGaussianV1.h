@@ -23,7 +23,6 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "hdf5pp/Group.h"
-#include "hdf5pp/DataSet.h"
 #include "pdsdata/camera/TwoDGaussianV1.hh"
 
 //------------------------------------
@@ -34,29 +33,11 @@
 // 		-- Class Interface --
 //		---------------------
 
-/**
- *
- *  This software was developed for the LUSI project.  If you use all or
- *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
- *
- *  @version $Id$
- *
- *  @author Andrei Salnikov
- */
-
 namespace H5DataTypes {
 
-struct CameraTwoDGaussianV1_Data {
-  uint64_t integral;
-  double xmean;
-  double ymean;
-  double major_axis_width;
-  double minor_axis_width;
-  double major_axis_tilt;
-};
-
+//
+//  Helper class for Pds::Camera::TwoDGaussianV1 class
+//
 class CameraTwoDGaussianV1  {
 public:
 
@@ -71,7 +52,12 @@ public:
   static size_t xtcSize( const XtcType& xtc ) { return sizeof xtc ; }
 
 private:
-  CameraTwoDGaussianV1_Data m_data ;
+  uint64_t integral;
+  double xmean;
+  double ymean;
+  double major_axis_width;
+  double minor_axis_width;
+  double major_axis_tilt;
 };
 
 } // namespace H5DataTypes

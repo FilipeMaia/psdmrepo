@@ -39,41 +39,57 @@ namespace H5DataTypes {
 //
 // Helper type for Pds::CsPad2x2::CsPad2x2DigitalPotsCfg
 //
-struct CsPad2x2DigitalPotsCfg_Data  {
+struct CsPad2x2DigitalPotsCfg  {
+  CsPad2x2DigitalPotsCfg() {}
+  CsPad2x2DigitalPotsCfg(const Pds::CsPad2x2::CsPad2x2DigitalPotsCfg& o);
+
+  static hdf5pp::Type native_type() ;
+
+private:
   enum { PotsPerQuad = Pds::CsPad2x2::PotsPerQuad };
   uint8_t         pots[PotsPerQuad];
-
-  CsPad2x2DigitalPotsCfg_Data() {}
-  CsPad2x2DigitalPotsCfg_Data(const Pds::CsPad2x2::CsPad2x2DigitalPotsCfg& o);
 };
 
 //
 // Helper type for Pds::CsPad2x2::CsPad2x2ReadOnlyCfg
 //
-struct CsPad2x2ReadOnlyCfg_Data  {
+struct CsPad2x2ReadOnlyCfg  {
+  CsPad2x2ReadOnlyCfg() {}
+  CsPad2x2ReadOnlyCfg(const Pds::CsPad2x2::CsPad2x2ReadOnlyCfg& o);
+
+  static hdf5pp::Type native_type() ;
+
+private:
   uint32_t        shiftTest;
   uint32_t        version;
-
-  CsPad2x2ReadOnlyCfg_Data() {}
-  CsPad2x2ReadOnlyCfg_Data(const Pds::CsPad2x2::CsPad2x2ReadOnlyCfg& o);
 };
 
 //
 // Helper type for Pds::CsPad2x2::CsPad2x2GainMapCfg
 //
-struct CsPad2x2GainMapCfg_Data  {
+struct CsPad2x2GainMapCfg  {
   enum { ColumnsPerASIC = Pds::CsPad2x2::ColumnsPerASIC };
   enum { MaxRowsPerASIC = Pds::CsPad2x2::MaxRowsPerASIC };
-  uint16_t gainMap[ColumnsPerASIC][MaxRowsPerASIC];
 
-  CsPad2x2GainMapCfg_Data() {}
-  CsPad2x2GainMapCfg_Data(const Pds::CsPad2x2::CsPad2x2GainMapCfg& o);
+  CsPad2x2GainMapCfg() {}
+  CsPad2x2GainMapCfg(const Pds::CsPad2x2::CsPad2x2GainMapCfg& o);
+
+  static hdf5pp::Type native_type() ;
+
+private:
+  uint16_t gainMap[ColumnsPerASIC][MaxRowsPerASIC];
 };
 
 //
 // Helper type for Pds::CsPad2x2::ConfigV1QuadReg
 //
-struct CsPad2x2ConfigV1QuadReg_Data  {
+struct CsPad2x2ConfigV1QuadReg  {
+  CsPad2x2ConfigV1QuadReg() {}
+  CsPad2x2ConfigV1QuadReg(const Pds::CsPad2x2::ConfigV1QuadReg& o);
+
+  static hdf5pp::Type native_type() ;
+
+private:
   uint32_t                  shiftSelect;
   uint32_t                  edgeSelect;
   uint32_t                  readClkSet;
@@ -95,23 +111,23 @@ struct CsPad2x2ConfigV1QuadReg_Data  {
   uint32_t                  kdConstant;
   uint32_t                  humidThold;
   uint32_t                  setPoint;
-  CsPad2x2ReadOnlyCfg_Data  readOnly;
-  CsPad2x2DigitalPotsCfg_Data digitalPots;
-  CsPad2x2GainMapCfg_Data   gainMap;
-
-  CsPad2x2ConfigV1QuadReg_Data() {}
-  CsPad2x2ConfigV1QuadReg_Data(const Pds::CsPad2x2::ConfigV1QuadReg& o);
+  CsPad2x2ReadOnlyCfg       readOnly;
+  CsPad2x2DigitalPotsCfg    digitalPots;
+  CsPad2x2GainMapCfg        gainMap;
 };
 
 //
 // Helper type for Pds::CsPad2x2::ProtectionSystemThreshold
 //
-struct CsPad2x2ProtectionSystemThreshold_Data  {
+struct CsPad2x2ProtectionSystemThreshold  {
+  CsPad2x2ProtectionSystemThreshold() {}
+  CsPad2x2ProtectionSystemThreshold(const Pds::CsPad2x2::ProtectionSystemThreshold& o);
+
+  static hdf5pp::Type native_type() ;
+
+private:
   uint32_t adcThreshold;
   uint32_t pixelCountThreshold;
-
-  CsPad2x2ProtectionSystemThreshold_Data() {}
-  CsPad2x2ProtectionSystemThreshold_Data(const Pds::CsPad2x2::ProtectionSystemThreshold& o);
 };
 
 //
@@ -135,9 +151,9 @@ public:
 
 private:
 
-  CsPad2x2ConfigV1QuadReg_Data quad;
+  CsPad2x2ConfigV1QuadReg quad;
   uint32_t          testDataIndex;
-  CsPad2x2ProtectionSystemThreshold_Data protectionThreshold;
+  CsPad2x2ProtectionSystemThreshold protectionThreshold;
   uint32_t          protectionEnable;
   uint32_t          inactiveRunMode;
   uint32_t          activeRunMode;

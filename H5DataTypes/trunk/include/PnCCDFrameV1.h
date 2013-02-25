@@ -36,24 +36,9 @@
 
 namespace H5DataTypes {
 
-/**
- *  This software was developed for the LUSI project.  If you use all or
- *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
- *
- *  @version $Id$
- *
- *  @author Andrei Salnikov
- */
-
-struct PnCCDFrameV1_Data {
-  uint32_t specialWord;
-  uint32_t frameNumber;
-  uint32_t timeStampHi;
-  uint32_t timeStampLo;
-};
-
+//
+// Helper type for Pds::PNCCD::FrameV1
+//
 class PnCCDFrameV1  {
 public:
 
@@ -79,7 +64,10 @@ protected:
 
 private:
 
-  PnCCDFrameV1_Data m_data ;
+  uint32_t specialWord;
+  uint32_t frameNumber;
+  uint32_t timeStampHi;
+  uint32_t timeStampLo;
 };
 
 } // namespace H5DataTypes

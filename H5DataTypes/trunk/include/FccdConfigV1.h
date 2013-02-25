@@ -38,14 +38,6 @@ namespace H5DataTypes {
 //
 // Helper type for Pds::FCCD::FccdConfigV1
 //
-struct FccdConfigV1_Data  {
-  uint32_t width;
-  uint32_t height;
-  uint32_t trimmedWidth;
-  uint32_t trimmedHeight;
-  uint16_t outputMode;
-};
-
 class FccdConfigV1  {
 public:
 
@@ -64,7 +56,11 @@ public:
 
 private:
 
-  FccdConfigV1_Data m_data ;
+  uint32_t width;
+  uint32_t height;
+  uint32_t trimmedWidth;
+  uint32_t trimmedHeight;
+  uint16_t outputMode;
 
 };
 

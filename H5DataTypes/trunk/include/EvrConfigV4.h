@@ -38,12 +38,6 @@ namespace H5DataTypes {
 //
 // Helper type for Pds::EvrData::ConfigV4
 //
-struct EvrConfigV4_Data {
-  uint32_t neventcodes;
-  uint32_t npulses;
-  uint32_t noutputs;
-};
-
 class EvrConfigV4  {
 public:
 
@@ -62,7 +56,9 @@ public:
 
 private:
 
-  EvrConfigV4_Data m_data ;
+  uint32_t neventcodes;
+  uint32_t npulses;
+  uint32_t noutputs;
 
 };
 

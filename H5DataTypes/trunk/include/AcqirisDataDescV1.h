@@ -34,23 +34,11 @@
 // 		-- Class Interface --
 //		---------------------
 
-/**
- *
- *  This software was developed for the LUSI project.  If you use all or
- *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
- *
- *  @version $Id$
- *
- *  @author Andrei Salnikov
- */
-
 namespace H5DataTypes {
 
-struct AcqirisDataDescV1_Data  {
-};
-
+//
+//  Helper class for Pds::Acqiris::DataDescV1 class
+//
 class AcqirisDataDescV1  {
 public:
 
@@ -64,8 +52,6 @@ public:
 
 protected:
 private:
-
-  AcqirisDataDescV1_Data m_data ;
 
 };
 

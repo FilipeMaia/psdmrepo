@@ -38,10 +38,6 @@ namespace H5DataTypes {
 //
 // Helper type for Pds::Lusi::DiodeFexV1
 //
-struct LusiDiodeFexV1_Data  {
-  float value;
-};
-
 class LusiDiodeFexV1  {
 public:
 
@@ -57,7 +53,7 @@ public:
 
 private:
 
-  LusiDiodeFexV1_Data m_data ;
+  float value;
 
 };
 

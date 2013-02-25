@@ -23,7 +23,6 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "hdf5pp/ArrayType.h"
 #include "hdf5pp/CompoundType.h"
 #include "hdf5pp/TypeTraits.h"
 #include "H5DataTypes/H5DataUtils.h"
@@ -38,7 +37,7 @@
 
 namespace H5DataTypes {
 
-CsPad2x2ConfigV2QuadReg_Data::CsPad2x2ConfigV2QuadReg_Data(const Pds::CsPad2x2::ConfigV2QuadReg& src)
+CsPad2x2ConfigV2QuadReg::CsPad2x2ConfigV2QuadReg(const Pds::CsPad2x2::ConfigV2QuadReg& src)
   : shiftSelect(src.shiftSelect())
   , edgeSelect(src.edgeSelect())
   , readClkSet(src.readClkSet())
@@ -68,6 +67,40 @@ CsPad2x2ConfigV2QuadReg_Data::CsPad2x2ConfigV2QuadReg_Data(const Pds::CsPad2x2::
 {
 }
 
+hdf5pp::Type
+CsPad2x2ConfigV2QuadReg::native_type()
+{
+  hdf5pp::CompoundType quadType = hdf5pp::CompoundType::compoundType<CsPad2x2ConfigV2QuadReg>() ;
+  quadType.insert_native<uint32_t>( "shiftSelect", offsetof(CsPad2x2ConfigV2QuadReg, shiftSelect) ) ;
+  quadType.insert_native<uint32_t>( "edgeSelect", offsetof(CsPad2x2ConfigV2QuadReg, edgeSelect) ) ;
+  quadType.insert_native<uint32_t>( "readClkSet", offsetof(CsPad2x2ConfigV2QuadReg, readClkSet) ) ;
+  quadType.insert_native<uint32_t>( "readClkHold", offsetof(CsPad2x2ConfigV2QuadReg, readClkHold) ) ;
+  quadType.insert_native<uint32_t>( "dataMode", offsetof(CsPad2x2ConfigV2QuadReg, dataMode) ) ;
+  quadType.insert_native<uint32_t>( "prstSel", offsetof(CsPad2x2ConfigV2QuadReg, prstSel) ) ;
+  quadType.insert_native<uint32_t>( "acqDelay", offsetof(CsPad2x2ConfigV2QuadReg, acqDelay) ) ;
+  quadType.insert_native<uint32_t>( "intTime", offsetof(CsPad2x2ConfigV2QuadReg, intTime) ) ;
+  quadType.insert_native<uint32_t>( "digDelay", offsetof(CsPad2x2ConfigV2QuadReg, digDelay) ) ;
+  quadType.insert_native<uint32_t>( "ampIdle", offsetof(CsPad2x2ConfigV2QuadReg, ampIdle) ) ;
+  quadType.insert_native<uint32_t>( "injTotal", offsetof(CsPad2x2ConfigV2QuadReg, injTotal) ) ;
+  quadType.insert_native<uint32_t>( "rowColShiftPer", offsetof(CsPad2x2ConfigV2QuadReg, rowColShiftPer) ) ;
+  quadType.insert_native<uint32_t>( "ampReset", offsetof(CsPad2x2ConfigV2QuadReg, ampReset) ) ;
+  quadType.insert_native<uint32_t>( "digCount", offsetof(CsPad2x2ConfigV2QuadReg, digCount) ) ;
+  quadType.insert_native<uint32_t>( "digPeriod", offsetof(CsPad2x2ConfigV2QuadReg, digPeriod) ) ;
+  quadType.insert_native<uint32_t>( "PeltierEnable", offsetof(CsPad2x2ConfigV2QuadReg, PeltierEnable) ) ;
+  quadType.insert_native<uint32_t>( "kpConstant", offsetof(CsPad2x2ConfigV2QuadReg, kpConstant) ) ;
+  quadType.insert_native<uint32_t>( "kiConstant", offsetof(CsPad2x2ConfigV2QuadReg, kiConstant) ) ;
+  quadType.insert_native<uint32_t>( "kdConstant", offsetof(CsPad2x2ConfigV2QuadReg, kdConstant) ) ;
+  quadType.insert_native<uint32_t>( "humidThold", offsetof(CsPad2x2ConfigV2QuadReg, humidThold) ) ;
+  quadType.insert_native<uint32_t>( "setPoint", offsetof(CsPad2x2ConfigV2QuadReg, setPoint) ) ;
+  quadType.insert_native<uint32_t>( "biasTuning", offsetof(CsPad2x2ConfigV2QuadReg, biasTuning) ) ;
+  quadType.insert_native<uint32_t>( "pdpmndnmBalance", offsetof(CsPad2x2ConfigV2QuadReg, pdpmndnmBalance) ) ;
+  quadType.insert("readOnly", offsetof(CsPad2x2ConfigV2QuadReg, readOnly), CsPad2x2ReadOnlyCfg::native_type()) ;
+  quadType.insert("digitalPots", offsetof(CsPad2x2ConfigV2QuadReg, digitalPots), CsPad2x2DigitalPotsCfg::native_type()) ;
+  quadType.insert("gainMap", offsetof(CsPad2x2ConfigV2QuadReg, gainMap), CsPad2x2GainMapCfg::native_type()) ;
+  return quadType;
+}
+
+
 CsPad2x2ConfigV2::CsPad2x2ConfigV2 ( const XtcType& data )
   : quad(*data.quad())
   , testDataIndex(data.tdi())
@@ -95,56 +128,10 @@ CsPad2x2ConfigV2::stored_type()
 hdf5pp::Type
 CsPad2x2ConfigV2::native_type()
 {
-  hdf5pp::ArrayType potsType = hdf5pp::ArrayType::arrayType<uint8_t>(CsPad2x2DigitalPotsCfg_Data::PotsPerQuad) ;
-  hdf5pp::CompoundType digitalPotsType = hdf5pp::CompoundType::compoundType<CsPad2x2DigitalPotsCfg_Data>() ;
-  digitalPotsType.insert( "pots", offsetof(CsPad2x2DigitalPotsCfg_Data, pots), potsType );
-
-  hdf5pp::CompoundType readOnlyType = hdf5pp::CompoundType::compoundType<CsPad2x2ReadOnlyCfg_Data>() ;
-  readOnlyType.insert_native<uint32_t>( "shiftTest", offsetof(CsPad2x2ReadOnlyCfg_Data, shiftTest) ) ;
-  readOnlyType.insert_native<uint32_t>( "version", offsetof(CsPad2x2ReadOnlyCfg_Data, version) ) ;
-  
-  hsize_t dims[2] = {CsPad2x2GainMapCfg_Data::ColumnsPerASIC, CsPad2x2GainMapCfg_Data::MaxRowsPerASIC};
-  hdf5pp::Type baseMapType = hdf5pp::TypeTraits<uint16_t>::native_type();
-  hdf5pp::ArrayType gainMapArrType = hdf5pp::ArrayType::arrayType(baseMapType, 2, dims);
-  hdf5pp::CompoundType gainMapType = hdf5pp::CompoundType::compoundType<CsPad2x2GainMapCfg_Data>() ;
-  gainMapType.insert( "gainMap", offsetof(CsPad2x2GainMapCfg_Data, gainMap), gainMapArrType );
-
-  hdf5pp::CompoundType quadType = hdf5pp::CompoundType::compoundType<CsPad2x2ConfigV2QuadReg_Data>() ;
-  quadType.insert_native<uint32_t>( "shiftSelect", offsetof(CsPad2x2ConfigV2QuadReg_Data, shiftSelect) ) ;
-  quadType.insert_native<uint32_t>( "edgeSelect", offsetof(CsPad2x2ConfigV2QuadReg_Data, edgeSelect) ) ;
-  quadType.insert_native<uint32_t>( "readClkSet", offsetof(CsPad2x2ConfigV2QuadReg_Data, readClkSet) ) ;
-  quadType.insert_native<uint32_t>( "readClkHold", offsetof(CsPad2x2ConfigV2QuadReg_Data, readClkHold) ) ;
-  quadType.insert_native<uint32_t>( "dataMode", offsetof(CsPad2x2ConfigV2QuadReg_Data, dataMode) ) ;
-  quadType.insert_native<uint32_t>( "prstSel", offsetof(CsPad2x2ConfigV2QuadReg_Data, prstSel) ) ;
-  quadType.insert_native<uint32_t>( "acqDelay", offsetof(CsPad2x2ConfigV2QuadReg_Data, acqDelay) ) ;
-  quadType.insert_native<uint32_t>( "intTime", offsetof(CsPad2x2ConfigV2QuadReg_Data, intTime) ) ;
-  quadType.insert_native<uint32_t>( "digDelay", offsetof(CsPad2x2ConfigV2QuadReg_Data, digDelay) ) ;
-  quadType.insert_native<uint32_t>( "ampIdle", offsetof(CsPad2x2ConfigV2QuadReg_Data, ampIdle) ) ;
-  quadType.insert_native<uint32_t>( "injTotal", offsetof(CsPad2x2ConfigV2QuadReg_Data, injTotal) ) ;
-  quadType.insert_native<uint32_t>( "rowColShiftPer", offsetof(CsPad2x2ConfigV2QuadReg_Data, rowColShiftPer) ) ;
-  quadType.insert_native<uint32_t>( "ampReset", offsetof(CsPad2x2ConfigV2QuadReg_Data, ampReset) ) ;
-  quadType.insert_native<uint32_t>( "digCount", offsetof(CsPad2x2ConfigV2QuadReg_Data, digCount) ) ;
-  quadType.insert_native<uint32_t>( "digPeriod", offsetof(CsPad2x2ConfigV2QuadReg_Data, digPeriod) ) ;
-  quadType.insert_native<uint32_t>( "PeltierEnable", offsetof(CsPad2x2ConfigV2QuadReg_Data, PeltierEnable) ) ;
-  quadType.insert_native<uint32_t>( "kpConstant", offsetof(CsPad2x2ConfigV2QuadReg_Data, kpConstant) ) ;
-  quadType.insert_native<uint32_t>( "kiConstant", offsetof(CsPad2x2ConfigV2QuadReg_Data, kiConstant) ) ;
-  quadType.insert_native<uint32_t>( "kdConstant", offsetof(CsPad2x2ConfigV2QuadReg_Data, kdConstant) ) ;
-  quadType.insert_native<uint32_t>( "humidThold", offsetof(CsPad2x2ConfigV2QuadReg_Data, humidThold) ) ;
-  quadType.insert_native<uint32_t>( "setPoint", offsetof(CsPad2x2ConfigV2QuadReg_Data, setPoint) ) ;
-  quadType.insert_native<uint32_t>( "biasTuning", offsetof(CsPad2x2ConfigV2QuadReg_Data, biasTuning) ) ;
-  quadType.insert_native<uint32_t>( "pdpmndnmBalance", offsetof(CsPad2x2ConfigV2QuadReg_Data, pdpmndnmBalance) ) ;
-  quadType.insert("readOnly", offsetof(CsPad2x2ConfigV2QuadReg_Data, readOnly), readOnlyType) ;
-  quadType.insert("digitalPots", offsetof(CsPad2x2ConfigV2QuadReg_Data, digitalPots), digitalPotsType) ;
-  quadType.insert("gainMap", offsetof(CsPad2x2ConfigV2QuadReg_Data, gainMap), gainMapType) ;
-
-  hdf5pp::CompoundType protSysType = hdf5pp::CompoundType::compoundType<CsPad2x2ProtectionSystemThreshold_Data>() ;
-  protSysType.insert_native<uint32_t>( "adcThreshold", offsetof(CsPad2x2ProtectionSystemThreshold_Data, adcThreshold) ) ;
-  protSysType.insert_native<uint32_t>( "pixelCountThreshold", offsetof(CsPad2x2ProtectionSystemThreshold_Data, pixelCountThreshold) ) ;
-  
   hdf5pp::CompoundType confType = hdf5pp::CompoundType::compoundType<CsPad2x2ConfigV2>() ;
-  confType.insert("quad", offsetof(CsPad2x2ConfigV2, quad), quadType ) ;
+  confType.insert("quad", offsetof(CsPad2x2ConfigV2, quad), CsPad2x2ConfigV2QuadReg::native_type() ) ;
   confType.insert_native<uint32_t>( "testDataIndex", offsetof(CsPad2x2ConfigV2, testDataIndex) ) ;
-  confType.insert("protectionThreshold", offsetof(CsPad2x2ConfigV2, protectionThreshold), protSysType ) ;
+  confType.insert("protectionThreshold", offsetof(CsPad2x2ConfigV2, protectionThreshold), CsPad2x2ProtectionSystemThreshold::native_type() ) ;
   confType.insert_native<uint32_t>( "protectionEnable", offsetof(CsPad2x2ConfigV2, protectionEnable) ) ;
   confType.insert_native<uint32_t>( "inactiveRunMode", offsetof(CsPad2x2ConfigV2, inactiveRunMode) ) ;
   confType.insert_native<uint32_t>( "activeRunMode", offsetof(CsPad2x2ConfigV2, activeRunMode) ) ;

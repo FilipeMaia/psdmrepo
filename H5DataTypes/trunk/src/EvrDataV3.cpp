@@ -40,9 +40,9 @@ namespace H5DataTypes {
 // Constructors --
 //----------------
 EvrDataV3::EvrDataV3 ( const XtcType& data )
+  : numFifoEvents(data.numFifoEvents())
+  , fifoEvents(&data.fifoEvent(0))
 {
-  m_data.numFifoEvents = data.numFifoEvents() ;
-  m_data.fifoEvents = &data.fifoEvent(0);
 }
 
 hdf5pp::Type
@@ -60,7 +60,7 @@ EvrDataV3::native_type()
   baseType.insert_native<uint32_t>( "eventCode", offsetof(Pds::EvrData::DataV3::FIFOEvent,EventCode) ) ;
   hdf5pp::Type fifoType = hdf5pp::VlenType::vlenType ( baseType );
 
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<EvrDataV3_Data>() ;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<EvrDataV3>() ;
   type.insert( "fifoEvents", 0, fifoType ) ;
 
   return type;

@@ -35,11 +35,6 @@
 
 namespace H5DataTypes {
 
-struct EvrDataV3_Data {
-  size_t numFifoEvents;
-  const Pds::EvrData::DataV3::FIFOEvent* fifoEvents;
-};
-
 class EvrDataV3 : boost::noncopyable {
 public:
 
@@ -56,11 +51,10 @@ public:
 
   static size_t xtcSize( const XtcType& xtc ) { return xtc.size(); }
 
-protected:
-
 private:
 
-  EvrDataV3_Data m_data ;
+  size_t numFifoEvents;
+  const Pds::EvrData::DataV3::FIFOEvent* fifoEvents;
 };
 
 } // namespace H5DataTypes

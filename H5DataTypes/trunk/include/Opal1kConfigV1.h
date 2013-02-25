@@ -33,34 +33,11 @@
 // 		-- Class Interface --
 //		---------------------
 
-/**
- *
- *  This software was developed for the LUSI project.  If you use all or
- *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
- *
- *  @version $Id$
- *
- *  @author Andrei Salnikov
- */
-
 namespace H5DataTypes {
 
-struct Opal1kConfigV1_Data {
-  uint16_t black_level ;
-  uint16_t gain_percent ;
-  uint16_t output_offset ;
-  uint8_t output_resolution ;
-  uint8_t output_resolution_bits ;
-  uint8_t vertical_binning ;
-  uint8_t output_mirroring ;
-  uint8_t vertical_remapping ;
-  uint8_t defect_pixel_correction_enabled ;
-  uint8_t output_lookup_table_enabled ;
-  uint32_t number_of_defect_pixels ;
-};
-
+//
+// Helper type for Pds::Opal1k::ConfigV1
+//
 class Opal1kConfigV1 {
 public:
 
@@ -77,7 +54,18 @@ public:
   static size_t xtcSize( const XtcType& xtc ) { return xtc.size() ; }
 
 private:
-  Opal1kConfigV1_Data m_data ;
+
+  uint16_t black_level ;
+  uint16_t gain_percent ;
+  uint16_t output_offset ;
+  uint8_t output_resolution ;
+  uint8_t output_resolution_bits ;
+  uint8_t vertical_binning ;
+  uint8_t output_mirroring ;
+  uint8_t vertical_remapping ;
+  uint8_t defect_pixel_correction_enabled ;
+  uint8_t output_lookup_table_enabled ;
+  uint32_t number_of_defect_pixels ;
 };
 
 } // namespace H5DataTypes

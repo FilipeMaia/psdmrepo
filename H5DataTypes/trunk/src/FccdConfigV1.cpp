@@ -37,12 +37,12 @@
 namespace H5DataTypes {
 
 FccdConfigV1::FccdConfigV1 ( const Pds::FCCD::FccdConfigV1& data )
+  : width(data.width())
+  , height(data.height())
+  , trimmedWidth(data.trimmedWidth())
+  , trimmedHeight(data.trimmedHeight())
+  , outputMode(data.outputMode())
 {
-  m_data.width = data.width();
-  m_data.height = data.height();
-  m_data.trimmedWidth = data.trimmedWidth();
-  m_data.trimmedHeight = data.trimmedHeight();
-  m_data.outputMode = data.outputMode();
 }
 
 hdf5pp::Type
@@ -55,11 +55,11 @@ hdf5pp::Type
 FccdConfigV1::native_type()
 {
   hdf5pp::CompoundType confType = hdf5pp::CompoundType::compoundType<FccdConfigV1>() ;
-  confType.insert_native<uint32_t>( "width", offsetof(FccdConfigV1_Data,width) );
-  confType.insert_native<uint32_t>( "height", offsetof(FccdConfigV1_Data,height) );
-  confType.insert_native<uint32_t>( "trimmedWidth", offsetof(FccdConfigV1_Data,trimmedWidth) );
-  confType.insert_native<uint32_t>( "trimmedHeight", offsetof(FccdConfigV1_Data,trimmedHeight) );
-  confType.insert_native<uint16_t>( "outputMode", offsetof(FccdConfigV1_Data,outputMode) );
+  confType.insert_native<uint32_t>( "width", offsetof(FccdConfigV1,width) );
+  confType.insert_native<uint32_t>( "height", offsetof(FccdConfigV1,height) );
+  confType.insert_native<uint32_t>( "trimmedWidth", offsetof(FccdConfigV1,trimmedWidth) );
+  confType.insert_native<uint32_t>( "trimmedHeight", offsetof(FccdConfigV1,trimmedHeight) );
+  confType.insert_native<uint16_t>( "outputMode", offsetof(FccdConfigV1,outputMode) );
 
   return confType ;
 }

@@ -38,10 +38,6 @@ namespace H5DataTypes {
 //
 // Helper type for Pds::Princeton::InfoV1
 //
-struct PrincetonInfoV1_Data  {
-  float temperature;
-};
-
 class PrincetonInfoV1  {
 public:
 
@@ -57,7 +53,7 @@ public:
 
 private:
 
-  PrincetonInfoV1_Data m_data ;
+  float temperature;
 
 };
 

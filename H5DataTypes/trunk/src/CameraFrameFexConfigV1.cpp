@@ -39,14 +39,14 @@
 namespace H5DataTypes {
 
 CameraFrameFexConfigV1::CameraFrameFexConfigV1 (const Pds::Camera::FrameFexConfigV1& config)
+  : forwarding(config.forwarding())
+  , forward_prescale(config.forward_prescale())
+  , processing(config.processing())
+  , roiBegin(config.roiBegin())
+  , roiEnd(config.roiEnd())
+  , threshold(config.threshold())
+  , number_of_masked_pixels(config.number_of_masked_pixels())
 {
-  m_data.forwarding = config.forwarding() ;
-  m_data.forward_prescale = config.forward_prescale() ;
-  m_data.processing = config.processing() ;
-  new(&m_data.roiBegin) CameraFrameCoordV1(config.roiBegin());
-  new(&m_data.roiEnd) CameraFrameCoordV1(config.roiEnd());
-  m_data.threshold = config.threshold() ;
-  m_data.number_of_masked_pixels = config.number_of_masked_pixels() ;
 }
 
 hdf5pp::Type
@@ -72,13 +72,13 @@ CameraFrameFexConfigV1::native_type()
   hdf5pp::Type coordType = hdf5pp::TypeTraits<CameraFrameCoordV1>::native_type() ;
 
   hdf5pp::CompoundType confType = hdf5pp::CompoundType::compoundType<CameraFrameFexConfigV1>() ;
-  confType.insert( "forwarding", offsetof(CameraFrameFexConfigV1_Data,forwarding), forwardingEnum ) ;
-  confType.insert_native<uint32_t>( "forward_prescale", offsetof(CameraFrameFexConfigV1_Data,forward_prescale) ) ;
-  confType.insert( "processing", offsetof(CameraFrameFexConfigV1_Data,processing), processingEnum ) ;
-  confType.insert( "roiBegin", offsetof(CameraFrameFexConfigV1_Data,roiBegin), coordType ) ;
-  confType.insert( "roiEnd", offsetof(CameraFrameFexConfigV1_Data,roiEnd), coordType ) ;
-  confType.insert_native<uint32_t>( "threshold", offsetof(CameraFrameFexConfigV1_Data,threshold) ) ;
-  confType.insert_native<uint32_t>( "number_of_masked_pixels", offsetof(CameraFrameFexConfigV1_Data,number_of_masked_pixels) ) ;
+  confType.insert( "forwarding", offsetof(CameraFrameFexConfigV1, forwarding), forwardingEnum ) ;
+  confType.insert_native<uint32_t>( "forward_prescale", offsetof(CameraFrameFexConfigV1, forward_prescale) ) ;
+  confType.insert( "processing", offsetof(CameraFrameFexConfigV1, processing), processingEnum ) ;
+  confType.insert( "roiBegin", offsetof(CameraFrameFexConfigV1, roiBegin), coordType ) ;
+  confType.insert( "roiEnd", offsetof(CameraFrameFexConfigV1, roiEnd), coordType ) ;
+  confType.insert_native<uint32_t>( "threshold", offsetof(CameraFrameFexConfigV1, threshold) ) ;
+  confType.insert_native<uint32_t>( "number_of_masked_pixels", offsetof(CameraFrameFexConfigV1, number_of_masked_pixels) ) ;
 
   return confType ;
 }

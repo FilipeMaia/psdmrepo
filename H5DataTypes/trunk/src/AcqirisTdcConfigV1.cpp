@@ -44,11 +44,11 @@ namespace H5DataTypes {
 //----------------
 
 AcqirisTdcChannel::AcqirisTdcChannel ( const Pds::Acqiris::TdcChannel& v )
+  : channel(v.channel())
+  , mode(v.mode())
+  , slope(v.slope())
+  , level(v.level())
 {
-  m_data.channel = v.channel() ;
-  m_data.mode = v.mode() ;
-  m_data.slope = v.slope() ;
-  m_data.level = v.level() ;
 }
 
 hdf5pp::Type
@@ -78,11 +78,11 @@ AcqirisTdcChannel::native_type()
   slopeType.insert("Positive", Pds::Acqiris::TdcChannel::Positive);
   slopeType.insert("Negative", Pds::Acqiris::TdcChannel::Negative);
 
-  hdf5pp::CompoundType tdcChanType = hdf5pp::CompoundType::compoundType<AcqirisTdcChannel_Data>() ;
-  tdcChanType.insert( "channel", offsetof(AcqirisTdcChannel_Data,channel), chanType ) ;
-  tdcChanType.insert( "mode", offsetof(AcqirisTdcChannel_Data,mode), modeType ) ;
-  tdcChanType.insert( "slope", offsetof(AcqirisTdcChannel_Data,slope), slopeType ) ;
-  tdcChanType.insert_native<double>( "level", offsetof(AcqirisTdcChannel_Data,level) ) ;
+  hdf5pp::CompoundType tdcChanType = hdf5pp::CompoundType::compoundType<AcqirisTdcChannel>() ;
+  tdcChanType.insert( "channel", offsetof(AcqirisTdcChannel, channel), chanType ) ;
+  tdcChanType.insert( "mode", offsetof(AcqirisTdcChannel, mode), modeType ) ;
+  tdcChanType.insert( "slope", offsetof(AcqirisTdcChannel, slope), slopeType ) ;
+  tdcChanType.insert_native<double>( "level", offsetof(AcqirisTdcChannel, level) ) ;
 
   return tdcChanType ;
 }
@@ -90,10 +90,10 @@ AcqirisTdcChannel::native_type()
 
 
 AcqirisTdcAuxIO::AcqirisTdcAuxIO ( const Pds::Acqiris::TdcAuxIO& v )
+  : channel(v.channel())
+  , mode(v.mode())
+  , term(v.term())
 {
-  m_data.channel = v.channel() ;
-  m_data.mode = v.mode() ;
-  m_data.term = v.term() ;
 }
 
 hdf5pp::Type
@@ -119,20 +119,20 @@ AcqirisTdcAuxIO::native_type()
   termType.insert("ZHigh", Pds::Acqiris::TdcAuxIO::ZHigh);
   termType.insert("Z50", Pds::Acqiris::TdcAuxIO::Z50);
 
-  hdf5pp::CompoundType tdcAuxIOType = hdf5pp::CompoundType::compoundType<AcqirisTdcAuxIO_Data>() ;
-  tdcAuxIOType.insert( "channel", offsetof(AcqirisTdcAuxIO_Data,channel), chanType ) ;
-  tdcAuxIOType.insert( "mode", offsetof(AcqirisTdcAuxIO_Data,mode), modeType ) ;
-  tdcAuxIOType.insert( "term", offsetof(AcqirisTdcAuxIO_Data,term), termType ) ;
+  hdf5pp::CompoundType tdcAuxIOType = hdf5pp::CompoundType::compoundType<AcqirisTdcAuxIO>() ;
+  tdcAuxIOType.insert( "channel", offsetof(AcqirisTdcAuxIO, channel), chanType ) ;
+  tdcAuxIOType.insert( "mode", offsetof(AcqirisTdcAuxIO, mode), modeType ) ;
+  tdcAuxIOType.insert( "term", offsetof(AcqirisTdcAuxIO, term), termType ) ;
 
   return tdcAuxIOType ;
 }
 
 
 AcqirisTdcVetoIO::AcqirisTdcVetoIO ( const Pds::Acqiris::TdcVetoIO& v )
+  : channel(v.channel())
+  , mode(v.mode())
+  , term(v.term())
 {
-  m_data.channel = v.channel() ;
-  m_data.mode = v.mode() ;
-  m_data.term = v.term() ;
 }
 
 hdf5pp::Type
@@ -157,10 +157,10 @@ AcqirisTdcVetoIO::native_type()
   termType.insert("ZHigh", Pds::Acqiris::TdcVetoIO::ZHigh);
   termType.insert("Z50", Pds::Acqiris::TdcVetoIO::Z50);
 
-  hdf5pp::CompoundType tdcVetoIOType = hdf5pp::CompoundType::compoundType<AcqirisTdcVetoIO_Data>() ;
-  tdcVetoIOType.insert( "channel", offsetof(AcqirisTdcVetoIO_Data,channel), chanType ) ;
-  tdcVetoIOType.insert( "mode", offsetof(AcqirisTdcVetoIO_Data,mode), modeType ) ;
-  tdcVetoIOType.insert( "term", offsetof(AcqirisTdcVetoIO_Data,term), termType ) ;
+  hdf5pp::CompoundType tdcVetoIOType = hdf5pp::CompoundType::compoundType<AcqirisTdcVetoIO>() ;
+  tdcVetoIOType.insert( "channel", offsetof(AcqirisTdcVetoIO,channel), chanType ) ;
+  tdcVetoIOType.insert( "mode", offsetof(AcqirisTdcVetoIO,mode), modeType ) ;
+  tdcVetoIOType.insert( "term", offsetof(AcqirisTdcVetoIO,term), termType ) ;
 
   return tdcVetoIOType ;
 }

@@ -39,26 +39,6 @@ namespace H5DataTypes {
 //
 // Helper type for CsPadCommonModeSubV1
 //
-struct CsPadCommonModeSubV1_Data  {
-
-  enum { DataSize = pdscalibdata::CsPadCommonModeSubV1::DataSize };
-
-  uint32_t mode;
-  double data[DataSize];
-};
-
-/**
- *
- *  This software was developed for the LCLS project.  If you use all or 
- *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
- *
- *  @version $Id$
- *
- *  @author Andrei Salnikov
- */
-
 class CsPadCommonModeSubV1  {
 public:
 
@@ -85,13 +65,10 @@ protected:
 
 private:
 
-  // Data members
-  CsPadCommonModeSubV1_Data m_data;
+  enum { DataSize = pdscalibdata::CsPadCommonModeSubV1::DataSize };
 
-  // Copy constructor and assignment are disabled by default
-  CsPadCommonModeSubV1 ( const CsPadCommonModeSubV1& ) ;
-  CsPadCommonModeSubV1& operator = ( const CsPadCommonModeSubV1& ) ;
-
+  uint32_t mode;
+  double data[DataSize];
 };
 
 } // namespace H5DataTypes

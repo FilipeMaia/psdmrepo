@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-00
+2013-02-25 Andy Salnikov
+- get rid of remaining _Data classes, make everything look uniform which
+  which help whomever going to continue supporting this
+
 Tag: V00-00-75
 2013-02-13 Andy Salnikov
 - CsPad2x2ConfigV2.cpp: duplicated line in composite type def

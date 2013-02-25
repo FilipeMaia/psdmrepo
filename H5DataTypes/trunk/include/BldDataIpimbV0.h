@@ -37,18 +37,9 @@
 
 namespace H5DataTypes {
 
-/**
- *
- *  This software was developed for the LCLS project.  If you use all or 
- *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
- *
- *  @version $Id$
- *
- *  @author Andrei Salnikov
- */
-
+//
+// Helper type for Pds::BldDataIpimbV0
+//
 class BldDataIpimbV0  {
 public:
 

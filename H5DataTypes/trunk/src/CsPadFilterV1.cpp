@@ -23,7 +23,6 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "hdf5pp/ArrayType.h"
 #include "hdf5pp/CompoundType.h"
 #include "hdf5pp/TypeTraits.h"
 #include "H5DataTypes/H5DataUtils.h"
@@ -43,17 +42,17 @@ namespace H5DataTypes {
 // Constructors --
 //----------------
 CsPadFilterV1::CsPadFilterV1 ()
+  : mode(0)
 {
   // fill all codes with zeros
-  m_data.mode = 0;
-  std::fill_n(m_data.data, int(CsPadFilterV1_Data::DataSize), 0.0);
+  std::fill_n(data, int(DataSize), 0.0);
 }
 
 CsPadFilterV1::CsPadFilterV1 (const DataType& data) 
+  : mode(data.mode())
 { 
-  m_data.mode = data.mode();
   const double* src = data.data();
-  std::copy(src, src+int(CsPadFilterV1_Data::DataSize), m_data.data );
+  std::copy(src, src+int(DataSize), this->data );
 }
 
 //--------------
@@ -73,9 +72,9 @@ CsPadFilterV1::stored_type()
 hdf5pp::Type
 CsPadFilterV1::native_type()
 {
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<CsPadFilterV1_Data>() ;
-  type.insert_native<uint32_t>( "mode", offsetof(CsPadFilterV1_Data,mode) ) ;
-  type.insert_native<double>( "data", offsetof(CsPadFilterV1_Data,data), CsPadFilterV1_Data::DataSize ) ;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<CsPadFilterV1>() ;
+  type.insert_native<uint32_t>( "mode", offsetof(CsPadFilterV1,mode) ) ;
+  type.insert_native<double>( "data", offsetof(CsPadFilterV1,data), DataSize ) ;
 
   return type;
 }

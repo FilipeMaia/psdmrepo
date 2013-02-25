@@ -38,15 +38,6 @@ namespace H5DataTypes {
 //
 // Helper type for Pds::Lusi::PimImageConfigV1
 //
-struct LusiPimImageConfigV1_Data  {
-
-  LusiPimImageConfigV1_Data() {}
-  LusiPimImageConfigV1_Data(const Pds::Lusi::PimImageConfigV1& data);
-
-  float xscale;
-  float yscale;
-};
-
 class LusiPimImageConfigV1  {
 public:
 
@@ -65,7 +56,8 @@ public:
 
 private:
 
-  LusiPimImageConfigV1_Data m_data ;
+  float xscale;
+  float yscale;
 
 };
 
