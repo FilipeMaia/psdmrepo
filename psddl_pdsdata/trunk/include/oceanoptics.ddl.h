@@ -85,7 +85,7 @@ public:
   int8_t numSpectraInData() const { return _i8NumSpectraInData; }
   int8_t numSpectraInQueue() const { return _i8NumSpectraInQueue; }
   int8_t numSpectraUnused() const { return _i8NumSpectraUnused; }
-  double durationOfFrame() const { return this->_tsTimeFrameEnd.tv_sec() - this->_tsTimeFrameStart.tv_sec() + (this->_tsTimeFrameEnd.tv_nsec() - this->_tsTimeFrameStart.tv_nsec()) * 1e-9; }
+  double durationOfFrame() const { return this->timeFrameEnd().tv_sec() - this->timeFrameStart().tv_sec() + (this->timeFrameEnd().tv_nsec() - this->timeFrameStart().tv_nsec()) * 1e-9; }
   double nonlinerCorrected(const OceanOptics::ConfigV1& cfg, uint32_t iPixel) const;
   static uint32_t _sizeof()  { return (((((((((((((((0+(2*(iNumPixels)))+8)+8)+8)+(OceanOptics::timespec64::_sizeof()))+(OceanOptics::timespec64::_sizeof()))+(OceanOptics::timespec64::_sizeof()))+4)+1)+1)+1)+1)+4)-1)/4)*4; }
 private:

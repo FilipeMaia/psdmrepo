@@ -70,18 +70,18 @@ public:
   return make_ndarray(data, Output_LUT_Size*this->output_lookup_table_enabled()); }
   ndarray<const Camera::FrameCoord, 1> defect_pixel_coordinates() const { ptrdiff_t offset=12+(2*(Output_LUT_Size*this->output_lookup_table_enabled()));
   const Camera::FrameCoord* data = (const Camera::FrameCoord*)(((char*)this)+offset);
-  return make_ndarray(data, this->_defectPixelCount); }
+  return make_ndarray(data, this->number_of_defect_pixels()); }
   /** offset/pedestal value in pixel counts */
   uint16_t output_offset() const;
   /** bit-depth of pixel counts */
   uint32_t output_resolution_bits() const;
-  uint32_t _sizeof() const { return (((((12+(2*(Output_LUT_Size*this->output_lookup_table_enabled())))+(Camera::FrameCoord::_sizeof()*(this->_defectPixelCount)))+4)-1)/4)*4; }
+  uint32_t _sizeof() const { return (((((12+(2*(Output_LUT_Size*this->output_lookup_table_enabled())))+(Camera::FrameCoord::_sizeof()*(this->number_of_defect_pixels())))+4)-1)/4)*4; }
 private:
   uint32_t	_offsetAndGain;	/**< offset and gain */
   uint32_t	_outputOptions;	/**< bit mask of output formatting options */
   uint32_t	_defectPixelCount;
   //uint16_t	_lookup_table[Output_LUT_Size*this->output_lookup_table_enabled()];
-  //Camera::FrameCoord	_defectPixels[this->_defectPixelCount];
+  //Camera::FrameCoord	_defectPixels[this->number_of_defect_pixels()];
 };
 } // namespace Opal1k
 } // namespace PsddlPds

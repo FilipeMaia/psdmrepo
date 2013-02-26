@@ -168,7 +168,7 @@ public:
   enum { Version = 2 /**< XTC type version number */ };
   enum { ChipCount = 4 };
   enum { ChipNameMax = 16 };
-  enum { PixelThreshMax = ChipCount*256*256 };
+  enum { PixelThreshMax = 4*256*256 };
   enum ReadoutSpeed {
     ReadoutSpeed_Slow = 0,
     ReadoutSpeed_Fast = 1,
@@ -340,7 +340,7 @@ public:
   enum { Version = 3 /**< XTC type version number */ };
   enum { ChipCount = 4 };
   enum { ChipNameMax = 16 };
-  enum { PixelThreshMax = ChipCount*256*256 };
+  enum { PixelThreshMax = 4*256*256 };
   enum ReadoutSpeed {
     ReadoutSpeed_Slow = 0,
     ReadoutSpeed_Fast = 1,
@@ -558,17 +558,17 @@ public:
   uint16_t lostRows() const { return _lostRows; }
   ndarray<const uint16_t, 2> data() const { ptrdiff_t offset=12;
   const uint16_t* data = (const uint16_t*)(((char*)this)+offset);
-  return make_ndarray(data, this->_height, this->_width); }
+  return make_ndarray(data, this->height(), this->width()); }
   uint32_t depth() const { return Depth; }
   uint32_t depth_bytes() const { return (Depth+7)/8; }
-  uint32_t _sizeof() const { return ((((12+(2*(this->_height)*(this->_width)))+4)-1)/4)*4; }
+  uint32_t _sizeof() const { return ((((12+(2*(this->height())*(this->width())))+4)-1)/4)*4; }
 private:
   uint16_t	_width;	/**< Pixels per row */
   uint16_t	_height;	/**< Pixels per column */
   uint32_t	_timestamp;	/**< hardware timestamp */
   uint16_t	_frameCounter;	/**< hardware frame counter */
   uint16_t	_lostRows;	/**< lost row count */
-  //uint16_t	_data[this->_height][this->_width];
+  //uint16_t	_data[this->height()][this->width()];
 };
 } // namespace Timepix
 } // namespace PsddlPds

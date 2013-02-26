@@ -12,7 +12,7 @@ namespace Camera {
 
 /** @class FrameCoord
 
-  Class representing the coordinates of pixels iside the camera frame.
+  Class representing the coordinates of pixels inside the camera frame.
 */
 
 
@@ -86,8 +86,8 @@ public:
   /** Location of masked pixel coordinates. */
   ndarray<const Camera::FrameCoord, 1> masked_pixel_coordinates() const { ptrdiff_t offset=28;
   const Camera::FrameCoord* data = (const Camera::FrameCoord*)(((char*)this)+offset);
-  return make_ndarray(data, this->_masked_pixel_count); }
-  uint32_t _sizeof() const { return ((((((((12+(Camera::FrameCoord::_sizeof()))+(Camera::FrameCoord::_sizeof()))+4)+4)+(Camera::FrameCoord::_sizeof()*(this->_masked_pixel_count)))+4)-1)/4)*4; }
+  return make_ndarray(data, this->number_of_masked_pixels()); }
+  uint32_t _sizeof() const { return ((((((((12+(Camera::FrameCoord::_sizeof()))+(Camera::FrameCoord::_sizeof()))+4)+4)+(Camera::FrameCoord::_sizeof()*(this->number_of_masked_pixels())))+4)-1)/4)*4; }
 private:
   uint32_t	_forwarding;	/**< frame forwarding policy */
   uint32_t	_forward_prescale;	/**< Prescale of events with forwarded frames */
@@ -96,7 +96,7 @@ private:
   Camera::FrameCoord	_roiEnd;	/**< Coordinate of finish of rectangular region of interest (exclusive). */
   uint32_t	_threshold;	/**< Pixel data threshold value to apply in processing. */
   uint32_t	_masked_pixel_count;	/**< Count of masked pixels to exclude from processing. */
-  //Camera::FrameCoord	_masked_pixel_coordinates[this->_masked_pixel_count];
+  //Camera::FrameCoord	_masked_pixel_coordinates[this->number_of_masked_pixels()];
 };
 
 /** @class FrameV1
