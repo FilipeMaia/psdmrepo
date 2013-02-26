@@ -35,7 +35,7 @@ import os
 #---------------------------------
 #  Imports of base class module --
 #---------------------------------
-from LusiPython.LusiPyApp import LusiPyApp
+from AppUtils.AppBase import AppBase
 
 #-----------------------------
 # Imports for other modules --
@@ -56,13 +56,13 @@ from psddl.DdlHdf5Data import DdlHdf5Data
 #  Application class definition --
 #---------------------------------
 
-class psddlc ( LusiPyApp ) :
+class psddlc ( AppBase ) :
 
     def __init__ ( self ) :
 
-        LusiPyApp.__init__ ( self, installLogger = True, 
-                             usage = "usage: %prog [options] input-file ...",
-                             logfmt = '%(levelname)s %(message)s' )
+        AppBase.__init__ ( self, installLogger = True, 
+                           usage = "usage: %prog [options] input-file ...",
+                           logfmt = '%(levelname)-6s %(message)s' )
         
         self._parser.set_defaults(backend = "psana",
                                   header = None,
@@ -110,7 +110,7 @@ class psddlc ( LusiPyApp ) :
 
     #
     #  Run the whole thing after parsing the command argunments and 
-    #  installing logger. See BbrPyApp class for details.
+    #  installing logger. See AppBase class for details.
     #
     def _run ( self ) :
 
@@ -178,35 +178,35 @@ class psddlc ( LusiPyApp ) :
         
         header, source = self._getHeaderAndSource()
         
-        return DdlPdsdata(header, source, backend_options)
+        return DdlPdsdata(header, source, backend_options, log=self)
     
     def psanaGen(self, backend_options):
 
         header, source = self._getHeaderAndSource()
         
-        return DdlPsanaInterfaces(header, source, backend_options)
+        return DdlPsanaInterfaces(header, source, backend_options, log=self)
     
     def pythonGen(self, backend_options):
 
         header, source = self._getHeaderAndSource()
         
-        return DdlPythonInterfaces(header, source, backend_options)
+        return DdlPythonInterfaces(header, source, backend_options, log=self)
     
     def psanaDocGen(self, backend_options):
         
-        return DdlPsanaDoc(self._options.output_dir, backend_options)
+        return DdlPsanaDoc(self._options.output_dir, backend_options, log=self)
         
     def pds2psanaGen(self, backend_options):
 
         header, source = self._getHeaderAndSource()
         
-        return DdlPds2Psana(header, source, backend_options)
+        return DdlPds2Psana(header, source, backend_options, log=self)
 
     def hdf5Gen(self, backend_options):
 
         header, source = self._getHeaderAndSource()
         
-        return DdlHdf5Data(header, source, backend_options)
+        return DdlHdf5Data(header, source, backend_options, log=self)
 
 #
 #  run application when imported as a main module

@@ -61,7 +61,8 @@ class H5Attribute ( object ) :
         self._type = kw.get('type', None)   # optional type
         self.method = kw.get('method', self.name)   # corresponding method name in pstype, default is the same as name
         self._rank = kw.get('rank', -1)      # attribute array rank, -1 if unknown
-        self.schema_version = kw.get('schema_vetsion', 0)      # attribute schema version
+        self.schema_version = kw.get('schema_version', 0)      # attribute schema version
+        self.tags = kw.get('tags', {}).copy()
 
         self._shape = None
 
@@ -81,13 +82,15 @@ class H5Attribute ( object ) :
     def _method(self):
         '''find corresponding method object and return it'''
         
+        if not self.parent: raise ValueError('attribute has no parent dataset, attr=%s' % self.name)
+
         # find pstype
         pstype = self.parent.pstype
-        if not pstype: raise ValueError('no corresponding pstype found')
+        if not pstype: raise ValueError('no corresponding pstype found, attr=%s parent=%s' % (self.name, self.parent))
         
         # find method
         method = pstype.lookup(self.method, Method)
-        if not method: raise ValueError('no corresponding method is found in pstype: %s', self.method)
+        if not method: raise ValueError('no corresponding method is found in pstype: %s' % self.method)
 
         return method
 
@@ -115,6 +118,26 @@ class H5Attribute ( object ) :
             attr = self._method().attribute
             if attr: self._shape = attr.shape
         return self._shape
+
+    def sizeIsConst(self):
+        """Returns true for scalar attribute or attribute whose dimensions are constant"""
+
+        return (self.shape is None) or self.shape.isfixed()
+
+    def sizeIsFixed(self):
+        """Returns true for scalar attribute or attribute whose dimensions do not change"""
+
+        if self._shape is not None:
+            return '{self}' not in str(self.shape.size)
+        return True
+
+    def sizeIsVlen(self):
+        """Returns true for array attribute whose dimensions can change every event"""
+
+        if self._shape is not None:
+            return 'vlen' in self.tags
+        return False
+
 
 #
 #  In case someone decides to run this module

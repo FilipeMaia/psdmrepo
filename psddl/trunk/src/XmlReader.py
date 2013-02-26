@@ -49,7 +49,7 @@ except:
 from psddl.Attribute import Attribute
 from psddl.Bitfield import Bitfield
 from psddl.Constant import Constant
-from psddl.Constructor import Constructor
+from psddl.Constructor import Constructor, CtorArg, CtorInit
 from psddl.Enum import Enum
 from psddl.Method import Method
 from psddl.Namespace import Namespace
@@ -263,13 +263,12 @@ class XmlReader ( object ) :
                     included = included,
                     location = self.location[-1] )
 
-        # get attributes
+        # get all sub-objects
         for propel in list(typeel) :
 
             if propel.tag == _const_tag :
                 
                 self._parseConstant(propel, type, included)
-                
                 
             elif propel.tag == 'enum' :
                 
@@ -282,10 +281,6 @@ class XmlReader ( object ) :
             elif propel.tag == 'method' :
                 
                 self._parseMeth(propel, type)
-
-            elif propel.tag == 'ctor' :
-                
-                self._parseCtor(propel, type)
 
             elif propel.tag == 'xtc-config' :
                 
@@ -303,6 +298,11 @@ class XmlReader ( object ) :
             elif propel.tag == 'tag' :
 
                 _setTag(type, propel)
+
+        # constructors need to be parsed last as they may depend on other types
+        for propel in list(typeel) :
+            if propel.tag == 'ctor' :
+                self._parseCtor(propel, type)
 
 
         # calculate offsets for the data members
@@ -485,35 +485,60 @@ class XmlReader ( object ) :
 
     def _parseCtor(self, ctorel, parent):
     
-        # constructor type, any string
-        ctor_type = ctorel.get('type')
 
-        # may have arguments defined as <arg name='argname' type='typename' dest='attrname'/> 
-        # build a list of triplets (argname, argtype, attrname), argtype is a Type/Enum object
+        # may have arguments defined as <arg name='argname' type='typename' dest='attrname' method='meth_name' expr='expr'/> 
+        # build a list of CtorArg objects
         args = []
         for argel in list(ctorel) :
             if argel.tag == "arg" :
+                
+                # name and optional type
                 argname = argel.get('name')
                 atype = None
-                typename = argel.get('type')
-                if typename:
-                    atype = parent.lookup(typename, (Type, Enum))
-                    if not atype: raise ValueError('argument element has unknown type '+typename)
-                dest = argel.get('dest')
-                args.append((argname, atype, dest))
+                if argel.get('type'):
+                    atype = parent.lookup(argel.get('type'), (Type, Enum))
+                    if not atype: raise ValueError('argument element has unknown type '+argel.get('type'))
+                
+                # destination must be given
+                dest_name = argel.get('dest')
+                if not dest_name: raise ValueError('argument element missing dest attribute')
+                dest = [d for d in parent.attributes_and_bitfields() if d.name == dest_name]
+                if not dest: raise ValueError('argument element defines unknown destination ' + dest_name)
+                dest = dest[0]
+                
+                # optional method
+                if argel.get('method'):
+                    meth = parent.lookup(argel.get('method'), Method)
+                    if not meth: raise ValueError('argument element specifies unknown method name ' + argel.get('method'))
+                else:
+                    meth = dest.accessor
+                    if not meth: raise ValueError('argument element needs method as attribute does not have accessor. type = %s, arg = %s' % (parent.name, argname))
+                    
+                # optional expression
+                expr = argel.get('expr')
+                
+                args.append(CtorArg(argname, dest, atype, meth, expr))
 
         # can also specify initialization values for some attributes
         # like <attr-init dest="attrname" value="value"/>
-        attr_init = {}
+        attr_init = []
         for attrel in list(ctorel) :
             if argel.tag == "attr-init" :
-                dest = argel.get('dest')
+                
+                # destination must be given
+                dest_name = argel.get('dest')
+                if not dest_name: raise ValueError('attr-init element missing dest attribute')
+                dest = [d for d in parent.attributes_and_bitfields() if d.name == dest_name]
+                if not dest: raise ValueError('attr-init element defines unknown destination ' + dest_name)
+                dest = dest[0]
+
                 value = argel.get('value')
-                attr_init[dest] = value
+                if not value: raise ValueError('attr-init element must provide value')
+                
+                attr_init.append(CtorInit(dest, value))
 
 
         ctor = Constructor(parent, 
-                           type = ctor_type,
                            args = args,
                            attr_init = attr_init,
                            access = ctorel.get('access', 'public'),

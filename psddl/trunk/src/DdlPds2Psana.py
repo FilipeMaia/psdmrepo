@@ -31,7 +31,6 @@ __version__ = "$Revision$"
 #--------------------------------
 import sys
 import os
-import logging
 import types
 
 #---------------------------------
@@ -78,7 +77,7 @@ class DdlPds2Psana ( object ) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self, incname, cppname, backend_options ) :
+    def __init__ ( self, incname, cppname, backend_options, log ) :
         """Constructor
         
             @param incname  include file name
@@ -91,6 +90,8 @@ class DdlPds2Psana ( object ) :
         self.pdsdata_inc = backend_options.get('pdsdata-inc', "psddl_pdsdata")
         self.psana_ns = backend_options.get('psana-ns', "Psana")
         self.pdsdata_ns = backend_options.get('pdsdata-ns', "PsddlPds")
+
+        self._log = log
 
         #include guard
         g = os.path.split(self.incname)[1]
@@ -147,7 +148,7 @@ class DdlPds2Psana ( object ) :
         # loop over packages in the model
         for pkg in model.packages() :
             if not pkg.included :
-                logging.debug("parseTree: package=%s", repr(pkg))
+                self._log.debug("parseTree: package=%s", repr(pkg))
                 self._parsePackage(pkg)
 
         if self.top_pkg : 
@@ -190,7 +191,7 @@ class DdlPds2Psana ( object ) :
 
     def _genEnum(self, enum):
 
-        logging.debug("_genEnum: type=%s", repr(enum))
+        self._log.debug("_genEnum: type=%s", repr(enum))
 
         if not enum.name: return
 
@@ -202,7 +203,7 @@ class DdlPds2Psana ( object ) :
 
     def _parseType(self, type):
 
-        logging.debug("_parseType: type=%s", repr(type))
+        self._log.debug("_parseType: type=%s", repr(type))
 
         # skip included types
         if type.included : return
@@ -222,21 +223,7 @@ class DdlPds2Psana ( object ) :
 
     def _genValueType(self, type):
 
-        # find attribute for a given name
-        def name2attr(name, type):
-            
-            if not name: return None
-            
-            # try argument name
-            attr = type.localName(name)
-            if isinstance(attr, Attribute): return attr
-            
-            # look for bitfield names also
-            for attr in type.attributes():
-                for bf in attr.bitfields:
-                    if bf.name == name: return bf
-
-        logging.debug("_genValueType: type=%s", repr(type))
+        self._log.debug("_genValueType: type=%s", repr(type))
 
         typename = type.fullName('C++')
 
@@ -245,33 +232,33 @@ class DdlPds2Psana ( object ) :
         for c in type.ctors:
             if c.args or 'auto' in c.tags:
                 if ctor:
-                    logging.warning('Constructor overload for %s, using first constructor', typename)
+                    self._log.warning('Constructor overload for %s, using first constructor', typename)
                 else:
                     ctor = c
 
         if not ctor : 
-            logging.warning('No suitable constructor defined for %s', typename)
+            self._log.warning('No suitable constructor defined for %s', typename)
             return
 
-        logging.debug("_genValueType: ctor args=%s", repr(ctor.args))
+        self._log.debug("_genValueType: ctor args=%s", repr(ctor.args))
         
         ctor_args = []
-        for aname, atype, dest in ctor.args:
+        for arg in ctor.args:
 
-            if not atype: atype = dest.type
+            atype = arg.type
 
-            if not dest.accessor:
-                raise ValueError('attribute %s has no access method' % dest.name)
+            if not arg.dest.accessor:
+                raise ValueError('attribute %s has no access method' % arg.dest.name)
 
-            expr = "pds."+dest.accessor.name+"()"
-            if isinstance(dest, Attribute) and dest.shape:
+            expr = "pds."+arg.method.name+"()"
+            if isinstance(arg.dest, Attribute) and arg.dest.shape:
                 if atype.name == 'char':
                     # accessor returns char* and takes few indices
-                    idx = ','.join(['0']*(len(dest.shape.dims)-1))
-                    expr = "pds."+dest.accessor.name+"("+idx+")"
+                    idx = ','.join(['0']*(len(arg.dest.shape.dims)-1))
+                    expr = "pds."+arg.method.name+"("+idx+")"
                 elif atype.value_type:
                     # accessor returns ndarray, we need pointer
-                    expr = "pds."+dest.accessor.name+"().data()"
+                    expr = "pds."+arg.method.name+"().data()"
                 
             if not atype.basic and not atype.external or isinstance(atype, Enum):
                 expr = T("pds_to_psana($expr)")(expr=expr)
@@ -298,7 +285,7 @@ class DdlPds2Psana ( object ) :
                 for t in _types(type.base): yield t
             yield type
         
-        logging.debug("_genAbsType: type=%s", repr(type))
+        self._log.debug("_genAbsType: type=%s", repr(type))
 
         pdstypename = type.fullName('C++', self.pdsdata_ns)
         psanatypename = type.fullName('C++', self.psana_ns)
@@ -348,7 +335,7 @@ class DdlPds2Psana ( object ) :
     def _genMethod(self, meth, type):
         """Generate method declaration and definition"""
 
-        logging.debug("_genMethod: meth: %s", meth)
+        self._log.debug("_genMethod: meth: %s", meth)
         
         if meth.attribute:
             
@@ -498,7 +485,7 @@ class DdlPds2Psana ( object ) :
 
     def _genCtor(self, type, cfg, cfgnum):
 
-        logging.debug("_genCtor: type: %s", type)
+        self._log.debug("_genCtor: type: %s", type)
 
         args = "const boost::shared_ptr<const XtcType>& xtcPtr"
         if cfg :

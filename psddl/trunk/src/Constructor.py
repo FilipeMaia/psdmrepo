@@ -40,6 +40,7 @@ import sys
 # Imports for other modules --
 #-----------------------------
 from psddl.Attribute import Attribute
+from psddl.Bitfield import Bitfield
 
 #----------------------------------
 # Local non-exported definitions --
@@ -52,6 +53,39 @@ from psddl.Attribute import Attribute
 #---------------------
 #  Class definition --
 #---------------------
+
+#
+# Class describing one constructor argument
+#
+class CtorArg(object):
+    
+    def __init__(self, name, dest, type = None, method = None, expr = None):
+        '''
+        name is a string
+        dest must be an attribute or bitfield object
+        type is argument type, if missing will be the same as dest type
+        method is method object, if missing will be dest accessor
+        expr is expression, if none then argument name is used
+        '''
+        self.name = name
+        self.dest = dest
+        self.type = type or dest.type
+        self.method = method or dest.accessor
+        self.expr = expr or name
+
+#
+# Class describing one constructor initializer
+#
+class CtorInit(object):
+    
+    def __init__(self, dest, expr):
+        '''
+        dest must be an attribute or bitfield object
+        expr is expression string
+        '''
+        self.dest = dest
+        self.expr = expr
+
 class Constructor ( object ) :
     #----------------
     #  Constructor --
@@ -61,7 +95,7 @@ class Constructor ( object ) :
         self.parent = parent
 
         self._args = kw.get('args', [])
-        self.attr_init = kw.get('attr_init', {})
+        self.attr_init = kw.get('attr_init', [])
         self.comment = kw.get('comment')
         self.access = kw.get('access', "public")
         self.tags = kw.get('tags', {}).copy()
@@ -79,53 +113,31 @@ class Constructor ( object ) :
         '''
         Get the list of constructor arguments.
         
-        Returns the lsit of triplets, each triplet has 
+        Returns the list of CtorArg objects 
         '''
         
-        # find attribute for a given name
-        def name2attr(name, type):
-            
-            if not name: return None
-            
-            # try attribute name
-            attr = type.localName(name)
-            if isinstance(attr, Attribute): return attr
-            
-            # look for bitfield names also
-            for attr in type.attributes():
-                for bf in attr.bitfields:
-                    if bf.name == name: return bf
-                    
-            raise ValueError('No attribute or bitfield with name %s defined in type %s' % (name, type.name))
-
-
         if self._cargs is not None: return self._cargs
         
         # build a list of arguments to ctor
-        if not self._args :
+        if self._args :
+           
+            # use pre-defined argument list
+            self._cargs = self._args
             
+        else:
+
+            # define new arg list            
             self._cargs = []
             
             if 'auto' in self.tags:
-                # make one argument per type attribute
-                for attr in self.parent.attributes():
-                    if attr.bitfields:
-                        for bf in attr.bitfields:
-                            if bf.accessor:
-                                name = "arg_bf_"+bf.name
-                                btype = bf.type
-                                dest = bf
-                                self._cargs.append((name, btype, dest))
-                    else:
-                        name = "arg_"+attr.name
-                        atype = attr.type
-                        dest = attr
-                        self._cargs.append((name, atype, dest))
-        
-        else:
-            
-            # convert destination names to attribute objects
-            self._cargs = [(name, atype, name2attr(dest, self.parent)) for name, atype, dest in self._args]
+                # make one argument per attribute or bitfield with accessor
+                for item in self.parent.attributes_and_bitfields():
+                    if item.accessor:
+                        name = "arg_"+item.name
+                        if isinstance(item, Bitfield):
+                            # not really necessary, mostly for historic reasons
+                            name = "arg_bf_"+item.name
+                        self._cargs.append(CtorArg(name, item))
 
         return self._cargs
  

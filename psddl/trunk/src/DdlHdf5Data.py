@@ -30,7 +30,6 @@ __version__ = "$Revision$"
 #--------------------------------
 import sys
 import os
-import logging
 
 #---------------------------------
 #  Imports of base class module --
@@ -39,6 +38,7 @@ import logging
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
+import jinja2 as ji
 from psddl.Attribute import Attribute
 from psddl.Enum import Enum
 from psddl.Package import Package
@@ -51,6 +51,107 @@ from psddl.Template import Template as T
 #----------------------------------
 # Local non-exported definitions --
 #----------------------------------
+
+_ds_decl_template = ji.Template('''
+namespace {{ns}} {
+struct {{dsClassName}} {
+  static hdf5pp::Type native_type();
+  static hdf5pp::Type stored_type();
+
+  {{dsClassName}}();
+  ~{{dsClassName}}();
+
+{% for attr in attributes %}
+{% if attr.vlen %}
+  size_t vlen_{{attr.name}};
+{% endif %}
+  {{attr.type}} {{attr.name}}; 
+{% endfor %}
+
+{% if conversion %}
+  operator {{conversion}}() const { return {{conversion}}({{cvt_args}}); }
+{% endif %}
+};
+}
+''', trim_blocks=True)
+
+_ds_type_method_template = ji.Template('''
+hdf5pp::Type {{ns}}_{{className}}_{{func}}_type()
+{
+  typedef {{ns}}::{{className}} DsType;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
+{% for attr in attributes %}
+{% if attr.type_decl %}
+  {{attr.type_decl}}
+{%- endif %}
+  type.insert("{{attr.name}}", offsetof(DsType, {{attr.name}}), {{attr.type}});
+{% endfor %}
+  return type;
+}
+
+hdf5pp::Type {{ns}}::{{className}}::{{func}}_type()
+{
+  static hdf5pp::Type type = {{ns}}_{{className}}_{{func}}_type();
+  return type;
+}
+''', trim_blocks=True)
+
+_enum_h5type_definition = ji.Template('''\
+  hdf5pp::EnumType<int32_t> {{type}} = hdf5pp::EnumType<int32_t>::enumType();
+{% for c in constants %}
+  {{type}}.insert("{{c.name}}", {{c.type}}::{{c.name}});
+{% endfor %}
+''', trim_blocks=True)
+
+
+
+_meth_decl = ji.Template('''\
+{% if doc %}
+  /** {{doc}} */
+{% endif %}
+  {% if static %}static{% endif %}
+{{rettype}} {{methname}}({{argsspec}}) 
+{%- if not static %} const{% endif %}
+{%- if inline and body %}
+ { {{body}} }
+{%- else %}
+;
+{% endif -%}
+''', trim_blocks=True)
+
+_meth_def = ji.Template('''\
+{% if body and not inline -%}
+{% if template %}
+template <typename {{template}}>
+{% endif %}
+{{rettype}}
+{{classname}}{% if template %}<{{template}}>{% endif %}::{{methname}}({{argsspec}})
+{%- if not static %} const{% endif -%}
+{ 
+{{body}} 
+}
+{%- endif -%}
+''', trim_blocks=True)
+
+_valtype_proxy_decl = ji.Template('''\
+class {{proxyName}} : public PSEvt::Proxy<{{psanatypename}}> {
+public:
+  typedef {{psanatypename}} PsanaType;
+
+  {{proxyName}}(hdf5pp::Group group, hsize_t idx) : m_group(group), m_idx(idx) {}
+  virtual ~{{proxyName}}() {}
+
+protected:
+
+  virtual boost::shared_ptr<PsanaType> getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key);
+
+private:
+
+  mutable hdf5pp::Group m_group;
+  hsize_t m_idx;
+  boost::shared_ptr<PsanaType> m_data;
+};
+''', trim_blocks=True)
 
 def _interpolate(expr, typeobj):
     
@@ -92,7 +193,7 @@ class DdlHdf5Data ( object ) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__(self, incname, cppname, backend_options):
+    def __init__(self, incname, cppname, backend_options, log):
         """Constructor
         
             @param incname  include file name
@@ -104,6 +205,8 @@ class DdlHdf5Data ( object ) :
         self.top_pkg = backend_options.get('top-package')
         self.psana_inc = backend_options.get('psana-inc', "psddl_psana")
         self.psana_ns = backend_options.get('psana-ns', "Psana")
+
+        self._log = log
 
         #include guard
         g = os.path.split(self.incname)[1]
@@ -170,7 +273,7 @@ class DdlHdf5Data ( object ) :
 
         # loop over packages in the model
         for pkg in model.packages() :
-            logging.debug("parseTree: package=%s", repr(pkg))
+            self._log.debug("parseTree: package=%s", repr(pkg))
             self._parsePackage(pkg)
 
         if self.top_pkg : 
@@ -188,8 +291,20 @@ class DdlHdf5Data ( object ) :
 
     def _parsePackage(self, pkg):
         
-        if pkg.included: return
+        if pkg.included:
+            # for include packages we need to make sure that types from those 
+            # packages get their schemas, they may be needed by our schemas  
+            for ns in pkg.namespaces() :
+                if isinstance(ns, Package) :
+                    self._parsePackage(ns)
+                elif isinstance(ns, Type) :
+                    if not ns.h5schemas:
+                        ns.h5schemas = [self._defaultSchema(ns)]
+                        self._log.debug("_parsePackage: included type.h5schemas=%s", repr(ns.h5schemas))
+            return
 
+        self._log.info("Processing package %s", pkg.name)
+        
         # open namespaces
         print >>self.inc, "namespace %s {" % pkg.name
         print >>self.cpp, "namespace %s {" % pkg.name
@@ -222,7 +337,7 @@ class DdlHdf5Data ( object ) :
 
     def _genConst(self, const):
         
-        print >>self._inc, "  enum {\n    %s = %s /**< %s */\n  };" % \
+        print >>self.inc, "  enum {\n    %s = %s /**< %s */\n  };" % \
                 (const.name, const.value, const.comment)
 
     def _genEnum(self, enum):
@@ -239,13 +354,15 @@ class DdlHdf5Data ( object ) :
 
     def _parseType(self, type):
 
-        logging.debug("_parseType: type=%s", repr(type))
+        self._log.debug("_parseType: type=%s", repr(type))
+        self._log.trace("Processing type %s", type.name)
 
         # skip included types
         if type.included : return
 
         if not type.h5schemas:
             type.h5schemas = [self._defaultSchema(type)]
+            self._log.debug("_parseType: type.h5schemas=%s", repr(type.h5schemas))
 
         for schema in type.h5schemas:
             self._genSchema(type, schema)
@@ -286,10 +403,10 @@ class DdlHdf5Data ( object ) :
 
     def _genSchema(self, type, schema):
 
-        logging.debug("_genSchema: %s", repr(schema))
+        self._log.debug("_genSchema: %s", repr(schema))
 
         if 'external' in schema.tags:
-            logging.debug("_genSchema: skip schema - external")
+            self._log.debug("_genSchema: skip schema - external")
             return
 
         for ds in schema.datasets:
@@ -304,40 +421,47 @@ class DdlHdf5Data ( object ) :
 
     def _genDs(self, ds, schema):
 
-
-        logging.debug("_genDs: %s", repr(ds))
-        
-        logging.debug("_genDs: schema %s", schema)
+        self._log.debug("_genDs: %s", repr(ds))
+        self._log.debug("_genDs: schema %s", schema)
 
         if 'external' in ds.tags:
-            logging.debug("_genDs: skip dataset - external")
+            self._log.debug("_genDs: skip dataset - external")
             return
 
         ns = schema.nsName()
         dsClassName = ds.className()
 
-        print >>self.inc, "\nnamespace %s {" % ns
-        
-        print >>self.inc, "struct %s {" % dsClassName
-
         self._genH5TypeFunc(ds, ns, dsClassName, "stored")
         self._genH5TypeFunc(ds, ns, dsClassName, "native")
 
+        attributes = []
         for attr in ds.attributes:
+            dattr = dict(name = attr.name)
+            
+            # base type
             if isinstance(attr.type, Enum):
                 # enum types are mapped to uint32 for now, can use shorter
                 # presentation if optimization is necessary
-                attr_type_name = "int32_t"
+                dattr['type'] = "int32_t"
             elif not attr.type.basic:
-                attr_type_name = attr._h5ds_typename
+                dattr['type'] = attr._h5ds_typename
             else:
-                attr_type_name = attr.type.name
-            if attr.rank > 0 and attr_type_name == 'char': 
-                attr_type_name = attr_type_name +'*'
-            elif attr.rank > 0:
-                print >>self.inc, T("  size_t vlen_$name;")(name=attr.name)
-                attr_type_name = attr_type_name +'*'
-            print >>self.inc, T("  $type $name;")(type=attr_type_name, name=attr.name)
+                dattr['type'] = attr.type.name
+
+            if attr.rank > 0:
+                if dattr['type'] == 'char':
+                    if attr.sizeIsConst():
+                        dattr['name'] += '[' + str(attr.shape.size()) +']'
+                    else:
+                        dattr['vlen'] = True
+                        dattr['type'] = dattr['type'] +'*'
+                else:
+                    if attr.sizeIsConst():
+                        dattr['name'] += '[' + str(attr.shape.size()) +']'
+                    else:
+                        if attr.sizeIsVlen(): dattr['vlen'] = True
+                        dattr['type'] = dattr['type'] +'*'
+            attributes.append(dattr)
 
 
         # if schema contains single dataset and corresponding data type is a value type
@@ -357,57 +481,59 @@ class DdlHdf5Data ( object ) :
                         dsattrs += [dsattr.name for dsattr in ds.attributes if dsattr.method == attr.accessor.name]
                     if len(dsattrs) != len(ctor.args): raise TypeError("Failed to find HDF5 attributes for constructor arguments")
 
-                    typename = schema.pstype.fullName('C++', self.psana_ns)
-                    args = ', '.join(dsattrs)
-                    print >>self.inc, T("  operator $typename() const { return $typename($args); }")(locals())
+                    conversion = schema.pstype.fullName('C++', self.psana_ns)
+                    cvt_args = ', '.join(dsattrs)
 
         except Exception, ex:
             # if we fail just ignore it
-            logging.debug('_genDs: exception for conv operator: %s', ex)
+            self._log.debug('_genDs: exception for conv operator: %s', ex)
 
-
-        print >>self.inc, "}; // class %s" % dsClassName
+        print >>self.inc, _ds_decl_template.render(locals())
         
-        print >>self.inc, "} // namespace %s" % ns
-
+        
+        # generate constructor and destructor
+        print >>self.cpp, T('$ns::$dsClassName::$dsClassName()\n{')(locals())
+        for attr in ds.attributes:
+            if attr.rank > 0 and not attr.sizeIsConst():
+                print >>self.cpp, T('  this->$attr = 0;')(attr = attr.name)
+        print >>self.cpp, T('}')(locals())
+        print >>self.cpp, T('$ns::$dsClassName::~$dsClassName()\n{')(locals())
+        for attr in ds.attributes:
+            if attr.rank > 0 and not attr.sizeIsConst():
+                print >>self.cpp, T('  delete [] this->$attr;')(attr = attr.name)
+        print >>self.cpp, T('}')(locals())
+        
 
     def _genH5TypeFunc(self, ds, ns, className, func):
         """
         Generate native_type()/stored_type() static method for dataset class.
         """
 
-        print >>self.inc, T("  static hdf5pp::Type ${func}_type();")(locals())
+        attributes = [self._genH5TypeFuncAttr(attr, func) for attr in ds.attributes]
+        print >>self.cpp, _ds_type_method_template.render(locals())
 
-        print >>self.cpp, T("\nhdf5pp::Type ${ns}_${className}_${func}_type()\n{")(locals())
-        print >>self.cpp, T("  typedef $ns::$className DsType;")(locals())
-        print >>self.cpp, "  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>() ;"
-        for attr in ds.attributes:
-            self._genH5TypeFuncAttr(attr, func);
-        print >>self.cpp, "  return type;\n}"
-
-        print >>self.cpp, T("\nhdf5pp::Type ${ns}::${className}::${func}_type()\n{")(locals())
-        print >>self.cpp, T("  static hdf5pp::Type type = ${ns}_${className}_${func}_type();")(locals())
-        print >>self.cpp, "  return type;\n}"
 
     def _genH5TypeFuncAttr(self, attr, func):
+        '''
+        Generate attribute data for type-definition function.
+        For a given attribute returns dictionary with the following keys:
+        'name'  - attribute name (string)
+        'type'  - expression which results in a attribute HDF5 type (string)
+        'type_decl' - optional string which produces declarations used by type
+        '''
 
         if attr.type.basic:
-            name = attr.name
+            
             if isinstance(attr.type, Enum):
-                base_type = "int32_t"
-                enum_type = T("${name}_enum")(locals())
-                print >>self.cpp, T('  hdf5pp::EnumType<$base_type> $enum_type = hdf5pp::EnumType<$base_type>::enumType();')(locals())
-                for c in attr.type.constants():
-                    # take enum values from psana
-                    ename = c.name
-                    type_name = attr.type.parent.fullName('C++', self.psana_ns)
-                    print >>self.cpp, T('  $enum_type.insert("$ename", $type_name::$ename);')(locals())
-                print >>self.cpp, T('  type.insert("$name", offsetof(DsType, $name), $enum_type);')(locals())
+                typename = attr.type.parent.fullName('C++', self.psana_ns)
+                constants = [dict(name=c.name, type=typename) for c in attr.type.constants()]
+                type = '_enum_type_' + attr.name
+                return dict(name=attr.name, type=type, type_decl=_enum_h5type_definition.render(locals()))
             else:
                 type_name = attr.type.name
                 if attr.rank > 0 and type_name == 'char': 
                     type_name = 'const char*'
-                print >>self.cpp, T('  type.insert_$func<$type_name>("$name", offsetof(DsType, $name));')(locals())
+                return dict(name=attr.name, type=T("hdf5pp::TypeTraits<$type_name>::${func}_type()")(locals()))
 
         else:
 
@@ -428,8 +554,7 @@ class DdlHdf5Data ( object ) :
             attr._h5ds = aschema.datasets[0]
             attr._h5ds_typename = attr_type_name
 
-            name = attr.name
-            print >>self.cpp, T('  type.insert("$name", offsetof(DsType, $name), ${attr_type_name}::${func}_type());')(locals())
+            return dict(name=attr.name, type=T("${attr_type_name}::${func}_type()")(locals()))
 
 
     def _genValueType(self, type, schema):
@@ -442,34 +567,12 @@ class DdlHdf5Data ( object ) :
                     yield ds, dsattr
 
         
-        logging.debug("_genValueType: type=%r", type)
+        self._log.debug("_genValueType: type=%r", type)
 
         proxyName = T("Proxy_${name}_v${version}")[schema]
         psanatypename = type.fullName('C++', self.psana_ns)
 
-        print >>self.inc, T("\nclass $proxyName : public PSEvt::Proxy<$psanatypename> {\npublic:")(locals())
-
-        print >>self.inc, T("  typedef $psanatypename PsanaType;")(locals())
-
-        print >>self.inc, T("  $proxyName(hdf5pp::Group group, hsize_t idx)")(locals())
-        print >>self.inc, "    : m_group(group), m_idx(idx) {}"
-        
-        print >>self.inc, T("  virtual ~$proxyName();")(locals())
-        print >>self.cpp, T("$proxyName::~$proxyName()\n{\n}\n")(locals())
-
-        print >>self.inc, "protected:"
-
-        print >>self.inc, "  virtual boost::shared_ptr<PsanaType> getTypedImpl(PSEvt::ProxyDictI* dict, "\
-                          "const Pds::Src& source, const std::string& key);"
-
-        print >>self.inc, "private:"
-
-        print >>self.inc, "  mutable hdf5pp::Group m_group;"
-        print >>self.inc, "  hsize_t m_idx;"
-        print >>self.inc, "  boost::shared_ptr<PsanaType> m_data;"
-        
-        # close class declaration
-        print >>self.inc, "};\n"
+        print >>self.inc, _valtype_proxy_decl.render(locals())
 
         # implementation of getTypedImpl()
         print >>self.cpp, T("boost::shared_ptr<$psanatypename>")(locals())
@@ -489,12 +592,14 @@ class DdlHdf5Data ( object ) :
 
         # map ctor parameters to schema objects
         dsattrs = []
+        self._log.debug("_genValueType: ctor args=%r", ctor.args)
         for aname, atype, attr in ctor.args:
             if not attr.accessor: raise TypeError("Attribute " + attr.name + " does not have access method")
-            for ds, dsattr in _schemaAttributes(schema):
-                if attr.accessor.name == dsattr.method:
-                    dsattrs.append((ds, dsattr))
-        if len(dsattrs) != len(ctor.args): raise TypeError("Failed to find HDF5 attributes for constructor arguments in type "+type.name)
+            ds_attr = [(ds, dsattr) for ds, dsattr in _schemaAttributes(schema) if attr.accessor.name == dsattr.method]
+            if not ds_attr:
+                raise TypeError("Failed to find HDF5 attribute for constructor argument %s in type %s" % (attr.accessor.name, type.name))
+            else:
+                dsattrs += ds_attr[:1]
 
         args = ['m_ds_'+ds.name+'->'+dsattr.name for ds, dsattr in dsattrs]
         print >>self.cpp, "  return boost::make_shared<PsanaType>(%s);" % (', '.join(args),)
@@ -510,7 +615,7 @@ class DdlHdf5Data ( object ) :
                 for t in _types(type.base): yield t
             yield type
         
-        logging.debug("_genAbsType: type=%s", repr(type))
+        self._log.debug("_genAbsType: type=%s", repr(type))
 
         className = T("${name}_v${version}")[schema]
         psanatypename = type.fullName('C++', self.psana_ns)
@@ -567,7 +672,8 @@ class DdlHdf5Data ( object ) :
                 elif not attr.type.basic and attr.rank > 0:
                     typename = attr.type.fullName('C++', self.psana_ns)
                     attrName = attr.name
-                    print >>self.inc, T("  mutable std::vector<$typename> m_ds_storage_${dsName}_${attrName};")(locals())
+                    rank = attr.rank
+                    print >>self.inc, T("  mutable ndarray<const $typename, $rank> m_ds_storage_${dsName}_${attrName};")(locals())
 
         # explicitely instantiate class with known config types
         for config in type.xtcConfig:
@@ -592,24 +698,26 @@ class DdlHdf5Data ( object ) :
 
         if meth.name == "_sizeof" : return
 
-        logging.debug("_genMethod: meth: %s", meth)
+        self._log.debug("_genMethod: meth: %s", meth)
         
 
         ds, attr = _method2ds(meth, schema)
-        logging.debug("_genMethod: h5ds: %s, h5attr: %s, schema: %s", ds, attr, schema)
+        self._log.debug("_genMethod: h5ds: %s, h5attr: %s, schema: %s", ds, attr, schema)
 
         if attr :
             
             
             # data is stored in a dataset
             args = []
-            ret_type = attr.type.fullName('C++', self.psana_ns)
+            attr_type = attr.type.fullName('C++', self.psana_ns)
+            ret_type = attr_type
+            rank = attr.rank
             if attr.rank:
                 if attr.type.name == 'char':
                     ret_type = "const char*"
                     args = [('i%d'%i, type.lookup('uint32_t')) for i in range(attr.rank-1)]
                 else:
-                    ret_type = T("ndarray<$type, $rank>")(type=ret_type, rank=attr.rank)
+                    ret_type = T("ndarray<const $attr_type, $rank>")(locals())
             elif not attr.type.basic:
                 ret_type = T("const ${ret_type}&")(locals())
                 
@@ -620,29 +728,63 @@ class DdlHdf5Data ( object ) :
             else:
                 print >>self.cpp, T("$ret_type $className::$meth_name() const {")(locals())
             print >>self.cpp, T("  if (not m_ds_$name.get()) read_ds_$name();")[ds]
-            if attr.rank and attr.type.basic:
-                if attr.type.name == 'char':
-                    print >>self.cpp, T("  return ($type)(m_ds_$name->$attr_name);")(name=ds.name, attr_name=attr.name, type=ret_type)
-                else:
-                    shape = _interpolate(str(meth.attribute.shape), type)
-                    print >>self.cpp, T("  return make_ndarray(m_ds_$name->$attr_name,$shape);")(name=ds.name, attr_name=attr.name, type=ret_type, shape=shape)
-            elif attr.rank and not attr.type.basic:
-                dsName = ds.name
-                attrName = attr.name
-                memberName = T("m_ds_storage_${dsName}_${attrName}")(locals());
-                shape = _interpolate(str(meth.attribute.shape), type)
-                print >>self.cpp, T("  if (m_ds_$dsName->vlen_$attrName and not $memberName.data()) {")(locals())
-                print >>self.cpp, T("    $memberName.insert($memberName.end(), m_ds_$dsName->$attrName, m_ds_$dsName->$attrName+m_ds_$dsName->vlen_$attrName);\n  }")(locals())
-                print >>self.cpp, T("  return make_ndarray($memberName.data(),$shape);")(locals())
-            elif not attr.type.basic:
+            
+            if attr.rank == 0 and attr.type.basic:
+                
+                # simpest case, basic type, non-array
+                print >>self.cpp, T("  return $type(m_ds_$name->$attr_name);")(name=ds.name, attr_name=attr.name, type=ret_type)
+                
+            elif attr.rank == 0 and not attr.type.basic:
+                
+                # non-array, but complex type, need to convert from HDF5 type to psana,
+                # store the result in member varibale so that we can return reference to it
                 dsName = ds.name
                 attrName = attr.name
                 memberName = T("m_ds_storage_${dsName}_${attrName}")(locals());
                 ret_type = attr.type.fullName('C++', self.psana_ns)
                 print >>self.cpp, T("  $memberName = $ret_type(m_ds_$dsName->$attrName);")(locals())
                 print >>self.cpp, T("  return $memberName;")(locals())
-            else:
-                print >>self.cpp, T("  return $type(m_ds_$name->$attr_name);")(name=ds.name, attr_name=attr.name, type=ret_type)
+                
+            elif attr.rank and attr.type.name == 'char':
+                
+                # character array
+                # TODO: if rank is >1 then methods must provide arguments for all but first index,
+                # this is not implemented yet
+                print >>self.cpp, T("  return ($type)(m_ds_$name->$attr_name);")(name=ds.name, attr_name=attr.name, type=ret_type)
+                
+            elif attr.rank and attr.type.basic:
+                
+                # array of bacis types, return ndarray, data is shared with the dataset
+                dsName = ds.name
+                attrName = attr.name
+                if attr.sizeIsVlen():
+                    # VLEN array take dimension from VLEN size, currently means that only 1-dim VLEN arrays are supported
+                    shape = T("m_ds_$dsName->vlen_$attrName")(locals())
+                else:
+                    shape = _interpolate(str(meth.attribute.shape), type)
+                print >>self.cpp, T("  boost::shared_ptr<$attr_type> ptr(m_ds_$dsName, m_ds_$dsName->$attrName);")(locals())
+                print >>self.cpp, T("  return make_ndarray(ptr, $shape);")(locals())
+                
+            elif attr.rank and not attr.type.basic:
+                
+                # array of non-basic type, have to convert
+                dsName = ds.name
+                attrName = attr.name
+                if attr.sizeIsVlen():
+                    # VLEN array take dimension from VLEN size, currently means that only 1-dim VLEN arrays are supported
+                    shape = T("m_ds_$dsName->vlen_$attrName")(locals())
+                    data_size = shape
+                else:
+                    shape = _interpolate(str(meth.attribute.shape), type)
+                    data_size = _interpolate(str(meth.attribute.shape.size()), type)
+                memberName = T("m_ds_storage_${dsName}_${attrName}")(locals());
+                print >>self.cpp, T("  if ($memberName.empty()) {")(locals())
+                print >>self.cpp, T("    unsigned shape[] = {$shape};")(locals())
+                print >>self.cpp, T("    ndarray<$attr_type, $rank> tmparr(shape);")(locals())
+                print >>self.cpp, T("    std::copy(m_ds_$dsName->$attrName, m_ds_$dsName->$attrName+$data_size, tmparr.begin());")(locals())
+                print >>self.cpp, T("    $memberName = tmparr;")(locals())
+                print >>self.cpp, T("  }")(locals())
+                print >>self.cpp, T("  return $memberName;")(locals())
             print >>self.cpp, "}"
 
             
@@ -658,7 +800,7 @@ class DdlHdf5Data ( object ) :
             else:
                 rettype = rettype.fullName('C++', self.psana_ns)
                 if meth.rank > 0:
-                    rettype = "ndarray<%s, %d>" % (rettype, meth.rank)
+                    rettype = "ndarray<const %s, %d>" % (rettype, meth.rank)
 
             # make method body
             body = meth.code.get("C++")
@@ -687,40 +829,15 @@ class DdlHdf5Data ( object ) :
         # make argument list
         argsspec = ', '.join([_argdecl(*arg) for arg in args])
 
-        if static:
-            static = "static "
-            const = ""
-        else:
-            static = ""
-            const = "const"
-        
+        print >>self.inc, _meth_decl.render(locals())
+        print >>self.cpp, _meth_def.render(locals())
 
-        if doc: print >>self.inc, T('  /** $doc */')(locals())
-
-        if not body:
-
-            # declaration only, implementation provided somewhere else
-            print >>self.inc, T("  $static$rettype $methname($argsspec) $const;")(locals())
-
-        elif inline:
-            
-            # inline method
-            print >>self.inc, T("  $static$rettype $methname($argsspec) $const { $body }")(locals())
-        
-        else:
-            
-            # out-of-line method
-            print >>self.inc, T("  $static$rettype $methname($argsspec) $const;")(locals())
-            if template:
-                print >>self.cpp, T("template<typename $template>\n$rettype\n$classname<$template>::$methname($argsspec) $const {\n  $body\n}")(locals())
-            else:
-                print >>self.cpp, T("$rettype\n$classname::$methname($argsspec) $const {\n  $body\n}")(locals())
 
 
     def _defaultSchema(self, type):
         """Generate default schema for a types from type itself"""
 
-        logging.debug("_defaultSchema: type=%s", type)
+        self._log.debug("_defaultSchema: type=%s", type)
 
         # get a list of all public methods which are accessors to attributes or bitfields or take no arguments
         methods = [ meth for meth in type.methods() 
@@ -739,11 +856,11 @@ class DdlHdf5Data ( object ) :
                 if not ds:
                     dsname = 'data'
                     if "config-type" in type.tags: dsname = 'config' 
-                    ds = H5Dataset(name=dsname, pstype=type)
+                    ds = H5Dataset(name=dsname, parent=schema, pstype=type)
                     schema.datasets.append(ds)
-                attr = H5Attribute(name=meth.name, type=meth.type, rank=meth.rank, method=meth.name)
+                attr = H5Attribute(name=meth.name, type=meth.type, rank=meth.rank, method=meth.name, parent=ds)
                 ds.attributes.append(attr)
-        if ds: logging.debug("_defaultSchema: scalars dataset: %s", ds)
+        if ds: self._log.debug("_defaultSchema: scalars dataset: %s", ds)
 
         # for non-array attributes of user-defined types create individual datasets
         for meth in methods:
@@ -755,7 +872,7 @@ class DdlHdf5Data ( object ) :
                 mschema = [s for s in meth.type.h5schemas if s.version == 0]
                 if not mschema: raise ValueError("cannot find schema V0 for type "+meth.type.name)
                 mschema = mschema[0]
-                if mschema: logging.debug("_defaultSchema: sub-typedataset: %s", mschema)
+                if mschema: self._log.debug("_defaultSchema: sub-typedataset: %s", mschema)
                 if len(mschema.datasets) != 1: raise ValueError("schema for sub-type "+type.name+"."+meth.type.name+" contains more than 1 dataset")
                 # copy it into this schema
                 schema.datasets.append(mschema.datasets[0])
@@ -763,7 +880,7 @@ class DdlHdf5Data ( object ) :
         # for array attributes create individual datasets
         for meth in methods:
             if meth.rank > 1 or (meth.type.name != 'char' and meth.rank > 0):
-                ds = H5Dataset(name=meth.name)
+                ds = H5Dataset(name=meth.name, parent=schema, pstype=type)
                 schema.datasets.append(ds)
                 attr = H5Attribute(name=meth.name, parent=ds, type=meth.type, rank=meth.rank, method=meth.name)
                 ds.attributes.append(attr)

@@ -31,7 +31,6 @@ __version__ = "$Revision$"
 #--------------------------------
 import sys
 import os
-import logging
 import types
 
 #---------------------------------
@@ -61,7 +60,7 @@ class DdlPdsdata ( object ) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self, incname, cppname, backend_options ) :
+    def __init__ ( self, incname, cppname, backend_options, log ) :
         """Constructor
         
             @param incname  include file name
@@ -71,6 +70,8 @@ class DdlPdsdata ( object ) :
         self.cppname = cppname
         self.incdirname = backend_options.get('gen-incdir', "")
         self.top_pkg = backend_options.get('top-package')
+        
+        self._log = log 
         
         #include guard
         g = os.path.split(self.incname)[1]
@@ -121,7 +122,7 @@ class DdlPdsdata ( object ) :
 
         # loop over packages in the model
         for pkg in model.packages() :
-            logging.debug("parseTree: package=%s", repr(pkg))
+            self._log.debug("parseTree: package=%s", repr(pkg))
             self._parsePackage(pkg)
 
         if self.top_pkg : 
@@ -171,7 +172,7 @@ class DdlPdsdata ( object ) :
 
     def _parseType(self, type):
 
-        logging.debug("_parseType: type=%s", repr(type))
+        self._log.debug("_parseType: type=%s", repr(type))
 
         # skip included types
         if type.included : return

@@ -148,6 +148,14 @@ class Namespace ( object ) :
         from psddl.Attribute import Attribute
         return self.__objects(Attribute)
     
+    def attributes_and_bitfields(self):
+        for attr in self.attributes():
+            if attr.bitfields:
+                for bf in attr.bitfields:
+                    yield bf
+            else:
+                yield attr
+    
     def methods(self):
         from psddl.Method import Method
         return self.__objects(Method)

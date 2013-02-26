@@ -11,6 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-04
+2013-02-12 Andy Salnikov
+- continuing work on HDF5 code generation
+- re-working constuctor stuff, need more flexible mapping of methods 
+  to constructor arguments
+
 Tag: V00-05-03
 2013-02-12 Andy Salnikov
 - use shared_ptr as a holder instead of generating wrapper classes

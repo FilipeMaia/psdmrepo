@@ -93,6 +93,9 @@ class Shape ( object ) :
         """Return total array size as ExprVal or None for unknown size array"""
         return reduce(operator.mul, [ExprVal(dim, self.ns) for dim in self.dims])
 
+    def decl(self):
+        return ''.join(['[{0}]'.format(ExprVal(d, self.ns)) for d in self.dims])
+
     def __str__(self):
         return ','.join([_str(d) for d in self.dims])
 

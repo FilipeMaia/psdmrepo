@@ -495,19 +495,18 @@ class CppTypeCodegen ( object ) :
             
         # map attributes to arguments
         attr2arg = {}
-        for name, type, dest in ctor.args:
-            attr2arg[dest] = name
+        for arg in ctor.args:
+            attr2arg[arg.dest] = arg
 
         # argument list for declaration
         arglist = []
-        for argname, argtype, attr in ctor.args:
-            if not argtype: argtype = attr.type
-            tname = _typename(argtype)
-            if isinstance(attr,Attribute) and attr.shape:
+        for arg in ctor.args:
+            tname = _typename(arg.type)
+            if isinstance(arg.dest, Attribute) and arg.dest.shape:
                 tname = "const "+tname+'*'
-            elif not attr.type.basic : 
+            elif not arg.dest.type.basic : 
                 tname = "const "+tname+'&'
-            arglist.append(tname+' '+argname)
+            arglist.append(tname+' '+arg.name)
         arglist = ", ".join(arglist)
 
         # initialization list
@@ -517,18 +516,19 @@ class CppTypeCodegen ( object ) :
             if attr.shape:
                 init = ''
             elif arg :
-                init = arg
+                init = arg.expr
             elif attr.bitfields:
                 # there may be arguments initializing individual bitfields
                 bfinit = []
                 for bf in attr.bitfields:
                     bfarg = attr2arg.get(bf)
-                    if bfarg: bfinit.append(bf.assignExpr(bfarg))
+                    if bfarg: bfinit.append(bf.assignExpr(bfarg.expr))
                 init = '|'.join(bfinit)
-            elif attr.name in ctor.attr_init:
-                init = ctor.attr_init[attr.name]
             else:
                 init = ""
+                for ctorInit in ctor.attr_init:
+                    if ctorInit.dest.name == attr.name:
+                        init = ctorInit.expr
             if init: initlist.append(T("$attr($init)")(attr=attr.name, init=init))
 
         # do we need generate definition too?
@@ -538,7 +538,7 @@ class CppTypeCodegen ( object ) :
             genDef = False
         else:
             # generate definition only if all destinations are known
-            genDef = None not in [dest for name, type, dest in ctor.args]
+            genDef = None not in [arg.dest for arg in ctor.args]
 
         if not genDef:
             
@@ -552,8 +552,9 @@ class CppTypeCodegen ( object ) :
             if initlist: print >>self._inc, "    :", ', '.join(initlist)
             print >>self._inc, "  {"
             for attr in self._type.attributes():
-                arg = attr2arg.get(attr,"")
+                arg = attr2arg.get(attr, None)
                 if attr.shape and arg:
+                    arg = arg.name
                     size = attr.shape.size()
                     first = '[0]' * (len(attr.shape.dims)-1)
                     print >>self._inc, T("    std::copy($arg, $arg+($size), $attr$first);")(locals(), attr=attr.name)
@@ -568,8 +569,9 @@ class CppTypeCodegen ( object ) :
             if initlist: print >>self._cpp, "    :", ', '.join(initlist)
             print >>self._cpp, "{"
             for attr in self._type.attributes():
-                arg = attr2arg.get(attr,"")
+                arg = attr2arg.get(attr, None)
                 if attr.shape and arg:
+                    arg = arg.name
                     size = attr.shape.size()
                     first = '[0]' * (len(attr.shape.dims)-1)
                     print >>self._inc, T("  std::copy($arg, $arg+($size), $attr$first);")(locals(), attr=attr.name)

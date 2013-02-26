@@ -31,7 +31,6 @@ __version__ = "$Revision$"
 #--------------------------------
 import sys
 import os
-import logging
 import cgi
 
 #---------------------------------
@@ -143,12 +142,14 @@ class DdlPsanaDoc ( object ) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self, output_dir, backend_options ) :
+    def __init__ ( self, output_dir, backend_options, log ) :
 
         self.dir = output_dir
         self.top_pkg = backend_options.get('top-package')
 
         self.psana_inc = backend_options.get('psana-inc', "")
+
+        self._log = log
 
     #-------------------
     #  Public methods --
@@ -252,7 +253,7 @@ class DdlPsanaDoc ( object ) :
 
         # loop over packages in the model
         for pkg in self.packages(model) :
-            logging.debug("parseTree: package=%s", repr(pkg))
+            self._log.debug("parseTree: package=%s", repr(pkg))
             self._parsePackage(pkg)
 
         self._htmlFooter(out)
@@ -293,7 +294,7 @@ class DdlPsanaDoc ( object ) :
 
     def _parseType(self, type):
 
-        logging.debug("_parseType: type=%s", repr(type))
+        self._log.debug("_parseType: type=%s", repr(type))
 
         typename = type.fullName('C++',self.top_pkg)
         filename = self._typeFileName(type)
@@ -426,7 +427,7 @@ class DdlPsanaDoc ( object ) :
 
         elif meth.args:
             
-            logging.debug("_methArgs: meth=%s args=%s", meth.name, meth.args)
+            self._log.debug("_methArgs: meth=%s args=%s", meth.name, meth.args)
             for arg in meth.args:
                 args.append('%s %s' % (arg[1].name, arg[0]))
             

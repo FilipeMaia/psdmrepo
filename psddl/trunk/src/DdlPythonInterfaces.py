@@ -31,7 +31,6 @@ __version__ = "$Revision: 3643 $"
 #--------------------------------
 import sys
 import os
-import logging
 import types
 import string
 import re
@@ -97,7 +96,7 @@ class DdlPythonInterfaces ( object ) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self, incname, cppname, backend_options ) :
+    def __init__ ( self, incname, cppname, backend_options, log ) :
         """Constructor
         
             @param incname  include file name
@@ -109,6 +108,8 @@ class DdlPythonInterfaces ( object ) :
         self.psana_inc = backend_options.get('psana-inc', "psddl_psana")
         self.psana_ns = backend_options.get('psana-ns', "Psana")
         self.generics = {}
+        
+        self._log = log
 
     #-------------------
     #  Public methods --
@@ -141,7 +142,7 @@ class DdlPythonInterfaces ( object ) :
         # loop over packages in the model
         for pkg in model.packages() :
             if not pkg.included :
-                logging.debug("parseTree: package=%s", repr(pkg))
+                self._log.debug("parseTree: package=%s", repr(pkg))
                 self._parsePackage(pkg)
 
         if self.top_pkg : 
@@ -225,7 +226,7 @@ class DdlPythonInterfaces ( object ) :
 
     def _parseType(self, type, ndconverters):
 
-        logging.debug("_parseType: type=%s", repr(type))
+        self._log.debug("_parseType: type=%s", repr(type))
 
         # skip included types
         if type.included : return
@@ -234,7 +235,7 @@ class DdlPythonInterfaces ( object ) :
 
     def codegen(self, type, ndconverters):
 
-        logging.debug("codegen: type=%s", repr(type))
+        self._log.debug("codegen: type=%s", repr(type))
         #print "codegen: type=%s" % repr(type)
 
         # this class (class being generated)
@@ -282,7 +283,7 @@ class DdlPythonInterfaces ( object ) :
     def _genMethod(self, type, method, bclass, ndconverters):
         """Generate method declaration and definition"""
 
-        logging.debug("_genMethod: method: %s", method)
+        self._log.debug("_genMethod: method: %s", method)
         
         method_name = method.name
         policy = None
