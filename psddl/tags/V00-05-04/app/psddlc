@@ -1,0 +1,217 @@
+#!@PYTHON@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  Script psddlc...
+#
+#------------------------------------------------------------------------
+
+"""Compiler from psddl into other formats.
+
+This software was developed for the LCLS project.  If you use all or 
+part of it, please give an appropriate acknowledgement.
+
+@see RelatedModule
+
+@version $Id$ 
+
+@author Andrei Salnikov
+"""
+
+#------------------------------
+#  Module's version from CVS --
+#------------------------------
+__version__ = "$Revision$"
+# $Source$
+
+#--------------------------------
+#  Imports of standard modules --
+#--------------------------------
+import sys
+import os
+
+#---------------------------------
+#  Imports of base class module --
+#---------------------------------
+from AppUtils.AppBase import AppBase
+
+#-----------------------------
+# Imports for other modules --
+#-----------------------------
+from psddl.XmlReader import XmlReader
+from psddl.DdlPds2Psana import DdlPds2Psana
+from psddl.DdlPsanaDoc import DdlPsanaDoc
+from psddl.DdlPsanaInterfaces import DdlPsanaInterfaces
+from psddl.DdlPythonInterfaces import DdlPythonInterfaces
+from psddl.DdlPdsdata import DdlPdsdata
+from psddl.DdlHdf5Data import DdlHdf5Data
+
+#---------------------
+# Local definitions --
+#---------------------
+
+#---------------------------------
+#  Application class definition --
+#---------------------------------
+
+class psddlc ( AppBase ) :
+
+    def __init__ ( self ) :
+
+        AppBase.__init__ ( self, installLogger = True, 
+                           usage = "usage: %prog [options] input-file ...",
+                           logfmt = '%(levelname)-6s %(message)s' )
+        
+        self._parser.set_defaults(backend = "psana",
+                                  header = None,
+                                  output = None,
+                                  header_dir = None,
+                                  output_dir = None,
+                                  gen_incdir = "",
+                                  include_dir = [],
+                                  top_package = None,
+                                  backend_options = [],
+                                  list_backends = False)
+        
+        self._parser.add_option("-b", "--backend", metavar="NAME", 
+                                help="use specified backend (pdsdata, psana, etc.)")
+        self._parser.add_option("-I", "--include-dir",  action="append",
+                                help="directory to search for included files", metavar="PATH")
+        self._parser.add_option("-e", "--header",
+                                help="output file name for header/declarations", metavar="PATH")
+        self._parser.add_option("-E", "--header-dir",
+                                help="output directory for header/declarations", metavar="PATH")
+        self._parser.add_option("-o", "--output",
+                                help="output file name for source", metavar="PATH")
+        self._parser.add_option("-O", "--output-dir",
+                                help="output directory for source", metavar="PATH")
+        self._parser.add_option("-i", "--gen-incdir",
+                                help="include directory for headers in generated code", metavar="PATH")
+        self._parser.add_option("-t", "--top-package",
+                                help="top-level package/namespace for generated code", metavar="NAME")
+        self._parser.add_option("-B", "--backend-options", action="append",
+                                help="options for backend, form key:value or key", metavar="OPTION")
+        self._parser.add_option("-l", "--list-backends", action="store_true",
+                                help="print list of available backends and exit")
+
+
+        self.backends = {
+            "pdsdata": self.pdsdataGen,
+            "psana": self.psanaGen,
+            "python": self.pythonGen,
+            "psana-doc": self.psanaDocGen,
+            "pds2psana": self.pds2psanaGen,
+            "hdf5": self.hdf5Gen,
+        }
+        
+
+
+    #
+    #  Run the whole thing after parsing the command argunments and 
+    #  installing logger. See AppBase class for details.
+    #
+    def _run ( self ) :
+
+        if self._options.list_backends:
+            print "Available backends: " + " ".join(self.backends.keys())
+            return 0
+
+        # check the arguments
+        if not self._args:
+            self._parser.error("one or more arguments required")
+            return 2
+        
+        # build dict with backend options
+        backend_options = dict()
+        for opt in self._options.backend_options:
+            words = opt.split(':',1) + [None]
+            backend_options[words[0]] = words[1]
+        
+        # add few standard options
+        backend_options['top-package'] = self._options.top_package
+        backend_options['gen-incdir'] = self._options.gen_incdir
+        
+        # instantiate generator
+        try:
+            genMethod = self.backends[self._options.backend]
+        except:
+            print >>sys.stderr, "incorrect back-end name:", self._options.backend
+            return 2
+        generator = genMethod(backend_options)
+            
+
+        try :
+            reader = XmlReader(self._args, self._options.include_dir)
+            model = reader.read()
+        except Exception, ex:
+            print >>sys.stderr, "parsing failed for file", self._args
+            print >>sys.stderr, "reason:", ex
+            raise
+            return 2
+
+        try :
+            generator.parseTree(model)
+        except Exception, ex:
+            print >>sys.stderr, "generation failed for file", self._args
+            print >>sys.stderr, "reason:", ex
+            raise
+            return 2
+
+        return 0
+
+    def _getHeaderAndSource(self):
+        base = os.path.basename(self._args[0])
+
+        header = self._options.header
+        source = self._options.output
+        
+        if not header : header = os.path.splitext(base)[0] + '.h'
+        if not source : source = os.path.splitext(base)[0] + '.cpp'
+        if self._options.header_dir: header = os.path.join(self._options.header_dir, header)
+        if self._options.output_dir: source = os.path.join(self._options.output_dir, source)
+
+        return (header, source)
+    
+    def pdsdataGen(self, backend_options):
+        
+        header, source = self._getHeaderAndSource()
+        
+        return DdlPdsdata(header, source, backend_options, log=self)
+    
+    def psanaGen(self, backend_options):
+
+        header, source = self._getHeaderAndSource()
+        
+        return DdlPsanaInterfaces(header, source, backend_options, log=self)
+    
+    def pythonGen(self, backend_options):
+
+        header, source = self._getHeaderAndSource()
+        
+        return DdlPythonInterfaces(header, source, backend_options, log=self)
+    
+    def psanaDocGen(self, backend_options):
+        
+        return DdlPsanaDoc(self._options.output_dir, backend_options, log=self)
+        
+    def pds2psanaGen(self, backend_options):
+
+        header, source = self._getHeaderAndSource()
+        
+        return DdlPds2Psana(header, source, backend_options, log=self)
+
+    def hdf5Gen(self, backend_options):
+
+        header, source = self._getHeaderAndSource()
+        
+        return DdlHdf5Data(header, source, backend_options, log=self)
+
+#
+#  run application when imported as a main module
+#
+if __name__ == "__main__" :
+    app = psddlc()
+    rc = app.run()
+    sys.exit(rc)
