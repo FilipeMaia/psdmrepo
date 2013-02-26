@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-06
+2013-02-26 Andy Salnikov
+- few fixes to make it work better with HDF5 generator
+
 Tag: V00-04-05
 2013-02-12 Andy Salnikov
 - removed shape method for pvName

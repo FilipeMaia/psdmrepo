@@ -90,7 +90,7 @@
                 shape="Output_LUT_Size*{self}.output_lookup_table_enabled()" accessor="output_lookup_table">
             </attribute>
 
-            <attribute name="_defectPixels" type="Camera.FrameCoord" shape="{self}._defectPixelCount"
+            <attribute name="_defectPixels" type="Camera.FrameCoord" shape="{self}.number_of_defect_pixels()"
                 accessor="defect_pixel_coordinates">
             </attribute>
 

@@ -178,7 +178,7 @@
 
             <const name="ChipCount" value="4"/>
             <const name="ChipNameMax" value="16"/>
-            <const name="PixelThreshMax" value="ChipCount*256*256"/>
+            <const name="PixelThreshMax" value="4*256*256"/>
 
             <attribute name="_readoutSpeed" type="uint8_t" />
             
@@ -360,7 +360,7 @@
 
             <const name="ChipCount" value="4"/>
             <const name="ChipNameMax" value="16"/>
-            <const name="PixelThreshMax" value="ChipCount*256*256"/>
+            <const name="PixelThreshMax" value="4*256*256"/>
 
             <attribute name="_readoutSpeed" type="uint8_t" />
             
@@ -601,7 +601,7 @@
             lost row count
             </attribute>
 
-            <attribute name="_data" type="uint16_t" shape="{self}._height,{self}._width" accessor="data">
+            <attribute name="_data" type="uint16_t" shape="{self}.height(),{self}.width()" accessor="data">
             </attribute>
 
             <method name="depth" type="uint32_t">

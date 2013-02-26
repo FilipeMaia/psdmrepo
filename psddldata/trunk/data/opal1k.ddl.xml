@@ -99,7 +99,7 @@
             </attribute>
             
             <attribute name="_defectPixels" type="Camera.FrameCoord" 
-                      shape="{self}._defectPixelCount" accessor="defect_pixel_coordinates">
+                      shape="{self}.number_of_defect_pixels()" accessor="defect_pixel_coordinates">
             </attribute>
             
             <method name="output_offset" type="uint16_t">

@@ -23,6 +23,16 @@
             <attribute name="_high" type="uint32_t" accessor="seconds">
             </attribute>
 
+            <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="auto"/>
+                <tag name="inline"/>
+            </ctor>
+
         </pstype>
         
         <!-- ========================================================================= -->
@@ -32,11 +42,21 @@
             <tag name="no-sizeof"/>
             <tag name="value-type"/>
         
-            <attribute name="_low" type="uint32_t">
+            <attribute name="_log" type="uint32_t" accessor="log">
             </attribute>
 
-            <attribute name="_phy" type="uint32_t">
+            <attribute name="_phy" type="uint32_t" accessor="phy">
             </attribute>
+
+            <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="auto"/>
+                <tag name="inline"/>
+            </ctor>
 
         </pstype>
         

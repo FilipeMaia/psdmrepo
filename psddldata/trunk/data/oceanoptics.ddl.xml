@@ -102,12 +102,12 @@
 
             <method name="durationOfFrame" type="double">
                 <tag name="inline"/>
-                <expr lang="C++" value="{self}._tsTimeFrameEnd.tv_sec() - {self}._tsTimeFrameStart.tv_sec() + ({self}._tsTimeFrameEnd.tv_nsec() - {self}._tsTimeFrameStart.tv_nsec()) * 1e-9"/>
+                <expr lang="C++" value="{self}.timeFrameEnd().tv_sec() - {self}.timeFrameStart().tv_sec() + ({self}.timeFrameEnd().tv_nsec() - {self}.timeFrameStart().tv_nsec()) * 1e-9"/>
             </method>
 
             <method name="nonlinerCorrected" type="double">
                 <arg name="iPixel" type="uint32_t"/>
-                <code lang="C++" body="double fRawValue = (double) ({self}.lu16Spetra[iPixel] ^ 0x2000); 
+                <code lang="C++" body="double fRawValue = (double) ({self}.data()[iPixel] ^ 0x2000);
                     const ndarray&lt;const double, 1&gt;&amp; corr = {xtc-config}.nonlinCorrect();
                     return fRawValue / (
                      corr[0] + fRawValue * 
