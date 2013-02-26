@@ -1,0 +1,14 @@
+#!/bin/sh
+
+set -e
+
+packages="andor camera encoder fccd fli gsc16ai ipimb lusi oceanoptics opal1k orca princeton pulnix quartz timepix usdusb"
+#packages="evr"
+
+for pkg in $packages; do 
+    f="psddldata/data/$pkg.ddl.xml" 
+    h5schema="psddl_hdf2psana/data/$pkg-h5.ddl.xml"
+    test -f "$h5schema" || h5schema=
+    psddlc -b hdf5 -I data -E psddl_hdf2psana/include -O psddl_hdf2psana/src -i psddl_hdf2psana -t psddl_hdf2psana \
+        -B psana-inc:psddl_psana -B psana-ns:Psana "$@" $f $h5schema
+done
