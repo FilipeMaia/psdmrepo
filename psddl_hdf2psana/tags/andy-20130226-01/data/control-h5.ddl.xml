@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE psddl SYSTEM "psddl.dtd">
+
+<psddl>
+
+    <use file="psddldata/control.ddl.xml" />
+
+    <use file="psddl_hdf2psana/xtc-h5.ddl.xml" cpp_headers="psddl_hdf2psana/xtc.ddl.h"/>
+
+</psddl>
