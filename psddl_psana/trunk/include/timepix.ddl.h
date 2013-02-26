@@ -103,7 +103,7 @@ public:
   enum { Version = 2 /**< XTC type version number */ };
   enum { ChipCount = 4 };
   enum { ChipNameMax = 16 };
-  enum { PixelThreshMax = ChipCount*256*256 };
+  enum { PixelThreshMax = 4*256*256 };
   enum ReadoutSpeed {
     ReadoutSpeed_Slow = 0,
     ReadoutSpeed_Fast = 1,
@@ -200,7 +200,7 @@ public:
   enum { Version = 3 /**< XTC type version number */ };
   enum { ChipCount = 4 };
   enum { ChipNameMax = 16 };
-  enum { PixelThreshMax = ChipCount*256*256 };
+  enum { PixelThreshMax = 4*256*256 };
   enum ReadoutSpeed {
     ReadoutSpeed_Slow = 0,
     ReadoutSpeed_Fast = 1,

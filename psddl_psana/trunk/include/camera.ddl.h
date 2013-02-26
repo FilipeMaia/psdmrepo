@@ -11,7 +11,7 @@ namespace Camera {
 
 /** @class FrameCoord
 
-  Class representing the coordinates of pixels iside the camera frame.
+  Class representing the coordinates of pixels inside the camera frame.
 */
 
 
