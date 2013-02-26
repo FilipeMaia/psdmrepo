@@ -46,6 +46,10 @@ uint8_t DataV1::digital_in() const { return m_xtcObj->digital_in(); }
 
 uint32_t DataV1::timestamp() const { return m_xtcObj->timestamp(); }
 
+ndarray<const uint32_t, 1> DataV1::e_count() const { return m_xtcObj->e_count(); }
+
+ndarray<const uint8_t, 1> DataV1::status() const { return m_xtcObj->status(); }
+
 ndarray<const uint16_t, 1> DataV1::analog_in() const { return m_xtcObj->analog_in(); }
 
 ndarray<const int32_t, 1> DataV1::encoder_count() const { return m_xtcObj->encoder_count(); }
