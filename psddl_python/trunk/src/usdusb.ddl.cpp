@@ -47,6 +47,8 @@ void createWrappers(PyObject* module) {
   class_<Psana::UsdUsb::DataV1, boost::shared_ptr<Psana::UsdUsb::DataV1>, boost::noncopyable >("DataV1", no_init)
     .def("digital_in", &Psana::UsdUsb::DataV1::digital_in)
     .def("timestamp", &Psana::UsdUsb::DataV1::timestamp)
+    .def("e_count", &Psana::UsdUsb::DataV1::e_count)
+    .def("status", &Psana::UsdUsb::DataV1::status)
     .def("analog_in", &Psana::UsdUsb::DataV1::analog_in)
     .def("encoder_count", &Psana::UsdUsb::DataV1::encoder_count)
     .def("__typeid__", &method_typeid<Psana::UsdUsb::DataV1>)
@@ -68,6 +70,7 @@ void createWrappers(PyObject* module) {
   }
   detail::register_ndarray_to_numpy_cvt<const uint32_t, 1>();
   detail::register_ndarray_to_numpy_cvt<const uint16_t, 1>();
+  detail::register_ndarray_to_numpy_cvt<const uint8_t, 1>();
   detail::register_ndarray_to_numpy_cvt<const int32_t, 1>();
 
 } // createWrappers()
