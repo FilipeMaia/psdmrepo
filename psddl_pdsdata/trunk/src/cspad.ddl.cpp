@@ -72,13 +72,6 @@ ConfigV3::numSect() const {
   return __builtin_popcount(this->_roiMask);
 }
 std::vector<int>
-ConfigV3::protectionThresholds_shape() const {
-  std::vector<int> shape;
-  shape.reserve(1);
-  shape.push_back(MaxQuadsPerSensor);
-  return shape;
-}
-std::vector<int>
 ConfigV3::quads_shape() const {
   std::vector<int> shape;
   shape.reserve(1);
@@ -104,13 +97,6 @@ ConfigV4::numQuads() const {
 uint32_t
 ConfigV4::numSect() const {
   return __builtin_popcount(this->_roiMask);
-}
-std::vector<int>
-ConfigV4::protectionThresholds_shape() const {
-  std::vector<int> shape;
-  shape.reserve(1);
-  shape.push_back(MaxQuadsPerSensor);
-  return shape;
 }
 std::vector<int>
 ConfigV4::quads_shape() const {

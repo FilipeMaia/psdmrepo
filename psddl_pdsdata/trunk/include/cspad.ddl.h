@@ -81,6 +81,10 @@ private:
 
 class CsPadReadOnlyCfg {
 public:
+  CsPadReadOnlyCfg(uint32_t arg__shiftTest, uint32_t arg__version)
+    : _shiftTest(arg__shiftTest), _version(arg__version)
+  {
+  }
   uint32_t shiftTest() const { return _shiftTest; }
   uint32_t version() const { return _version; }
   static uint32_t _sizeof()  { return 8; }
@@ -97,6 +101,10 @@ private:
 
 class ProtectionSystemThreshold {
 public:
+  ProtectionSystemThreshold(uint32_t arg__adcThreshold, uint32_t arg__pixelCountThreshold)
+    : _adcThreshold(arg__adcThreshold), _pixelCountThreshold(arg__pixelCountThreshold)
+  {
+  }
   uint32_t adcThreshold() const { return _adcThreshold; }
   uint32_t pixelCountThreshold() const { return _pixelCountThreshold; }
   static uint32_t _sizeof()  { return 8; }
@@ -320,7 +328,7 @@ public:
   uint32_t concentratorVersion() const { return _concentratorVersion; }
   uint32_t runDelay() const { return _runDelay; }
   uint32_t eventCode() const { return _eventCode; }
-  const CsPad::ProtectionSystemThreshold& protectionThresholds(uint32_t i0) const { return _protectionThresholds[i0]; }
+  ndarray<const CsPad::ProtectionSystemThreshold, 1> protectionThresholds() const { return make_ndarray(&_protectionThresholds[0], MaxQuadsPerSensor); }
   uint32_t protectionEnable() const { return _protectionEnable; }
   uint32_t inactiveRunMode() const { return _inactiveRunMode; }
   uint32_t activeRunMode() const { return _activeRunMode; }
@@ -341,8 +349,6 @@ public:
   /** Total number of sections (2x1) in all quadrants */
   uint32_t numSect() const;
   static uint32_t _sizeof()  { return (((((((((((((((12+(CsPad::ProtectionSystemThreshold::_sizeof()*(MaxQuadsPerSensor)))+4)+4)+4)+4)+4)+4)+4)+4)+4)+4)+(CsPad::ConfigV1QuadReg::_sizeof()*(MaxQuadsPerSensor)))+4)-1)/4)*4; }
-  /** Method which returns the shape (dimensions) of the data returned by protectionThresholds() method. */
-  std::vector<int> protectionThresholds_shape() const;
   /** Method which returns the shape (dimensions) of the data returned by quads() method. */
   std::vector<int> quads_shape() const;
 private:
@@ -376,7 +382,7 @@ public:
   uint32_t concentratorVersion() const { return _concentratorVersion; }
   uint32_t runDelay() const { return _runDelay; }
   uint32_t eventCode() const { return _eventCode; }
-  const CsPad::ProtectionSystemThreshold& protectionThresholds(uint32_t i0) const { return _protectionThresholds[i0]; }
+  ndarray<const CsPad::ProtectionSystemThreshold, 1> protectionThresholds() const { return make_ndarray(&_protectionThresholds[0], MaxQuadsPerSensor); }
   uint32_t protectionEnable() const { return _protectionEnable; }
   uint32_t inactiveRunMode() const { return _inactiveRunMode; }
   uint32_t activeRunMode() const { return _activeRunMode; }
@@ -397,8 +403,6 @@ public:
   /** Total number of sections (2x1) in all quadrants */
   uint32_t numSect() const;
   static uint32_t _sizeof()  { return (((((((((((((((12+(CsPad::ProtectionSystemThreshold::_sizeof()*(MaxQuadsPerSensor)))+4)+4)+4)+4)+4)+4)+4)+4)+4)+4)+(CsPad::ConfigV2QuadReg::_sizeof()*(MaxQuadsPerSensor)))+4)-1)/4)*4; }
-  /** Method which returns the shape (dimensions) of the data returned by protectionThresholds() method. */
-  std::vector<int> protectionThresholds_shape() const;
   /** Method which returns the shape (dimensions) of the data returned by quads() method. */
   std::vector<int> quads_shape() const;
 private:
