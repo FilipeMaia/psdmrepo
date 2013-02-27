@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-08
+2013-02-27 Andy Salnikov
+- small changes to control.ddl.xml to make it usable for HDF5 generator
+
 Tag: V00-04-07
 2013-02-26 Andy Salnikov
 - couple of classes in cspad and cspad2x2 packages made value-type

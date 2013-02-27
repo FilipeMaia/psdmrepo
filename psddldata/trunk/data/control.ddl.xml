@@ -168,12 +168,12 @@
             </attribute>
 
             <attribute name="_pvControls" type="PVControl"
-                shape="{self}._npvControls" accessor="pvControls" shape_method="pvControls_shape">
+                shape="{self}.npvControls()" accessor="pvControls" shape_method="pvControls_shape">
                 PVControl configuration objects
             </attribute>
 
             <attribute name="_pvMonitors" type="PVMonitor"
-                shape="{self}._npvMonitors" accessor="pvMonitors" shape_method="pvMonitors_shape">
+                shape="{self}.npvMonitors()" accessor="pvMonitors" shape_method="pvMonitors_shape">
                 PVMonitor configuration objects
             </attribute>
 
@@ -221,17 +221,17 @@
             </attribute>
 
             <attribute name="_pvControls" type="PVControl"
-                shape="{self}._npvControls" accessor="pvControls" shape_method="pvControls_shape">
+                shape="{self}.npvControls()" accessor="pvControls" shape_method="pvControls_shape">
                 PVControl configuration objects
             </attribute>
 
             <attribute name="_pvMonitors" type="PVMonitor"
-                shape="{self}._npvMonitors" accessor="pvMonitors" shape_method="pvMonitors_shape">
+                shape="{self}.npvMonitors()" accessor="pvMonitors" shape_method="pvMonitors_shape">
                 PVMonitor configuration objects
             </attribute>
 
             <attribute name="_pvLabels" type="PVLabel"
-                shape="{self}._npvLabels" accessor="pvLabels" shape_method="pvLabels_shape">
+                shape="{self}.npvLabels()" accessor="pvLabels" shape_method="pvLabels_shape">
                 PVLabel configuration objects
             </attribute>
 
