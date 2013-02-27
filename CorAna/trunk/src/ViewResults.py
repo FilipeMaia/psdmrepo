@@ -30,6 +30,7 @@ import sys
 import os
 import math
 import numpy as np
+import numpy.ma as ma
 
 from ConfigParametersCorAna   import confpars as cp
 from Logger                   import logger
@@ -67,6 +68,12 @@ def valueToIndexProtected(V,VRange) :
     indarr = np.int32( factor * (V-Vmin) )
     #return np.select([V<Vmin,V>Vmax], [0,Nbins-1], default=indarr)
     return np.select([indarr<0, indarr>Nbins1], [0,Nbins1], default=indarr)
+
+
+def get_limits_for_masked_array(map, mask=None) :
+    if mask==None : return map.min(), map.max()
+    else          : return map.min(), map.max()
+
 
 def q_map_partitions(map, nbins) :
     q_min = map.min()
@@ -118,6 +125,8 @@ class ViewResults :
         sp.evaluate_parameters()
         sp.print_parameters()
         sp.ccd_pixel_coordinates()
+
+
         #q_map = sp.q_map_for_direct_beam_data()
 
 #-----------------------------
@@ -145,7 +154,8 @@ class ViewResults :
         sp.x0_pos_in_data  = cp.x0_pos_in_data .value()
         sp.y0_pos_in_data  = cp.y0_pos_in_data .value()
 
-        sp.ccd_orient      = cp.ccd_orient.value()
+        sp.y_is_flip       = cp.y_is_flip.value() # True
+        sp.ccd_orient      = int(cp.ccd_orient.value())
         sp.ccd_pixsize     = cp.ccdset_pixsize.value()
 
         sp.photon_energy   = cp.photon_energy.value() # [keV]
@@ -239,24 +249,28 @@ class ViewResults :
         ir = np.arange(sp.rows)
         ic = np.arange(sp.cols)
 
-        if   sp.ccd_orient == '0' :
+        if   sp.ccd_orient == 0 :
             sp.x_ccd_pix = ic
-            sp.y_ccd_pix = sp.rows - ir
+            if sp.y_is_flip : sp.y_ccd_pix = sp.rows - ir
+            else            : sp.y_ccd_pix = ir
             sp.X_ccd_pix, sp.Y_ccd_pix = np.meshgrid(sp.x_ccd_pix, sp.y_ccd_pix)
             
-        elif sp.ccd_orient == '90' :
+        elif sp.ccd_orient == 90 :
             sp.x_ccd_pix = ir
-            sp.y_ccd_pix = ic
+            if sp.y_is_flip : sp.y_ccd_pix = ic
+            else            : sp.y_ccd_pix = sp.cols - ic
             sp.Y_ccd_pix, sp.X_ccd_pix = np.meshgrid(sp.y_ccd_pix, sp.x_ccd_pix)
 
-        elif sp.ccd_orient == '180' :
+        elif sp.ccd_orient == 180 :
             sp.x_ccd_pix = sp.cols - ic
-            sp.y_ccd_pix = ir
+            if sp.y_is_flip : sp.y_ccd_pix = ir
+            else            : sp.y_ccd_pix = sp.rows - ir
             sp.X_ccd_pix, sp.Y_ccd_pix = np.meshgrid(sp.x_ccd_pix, sp.y_ccd_pix)
 
-        elif sp.ccd_orient == '270' :
+        elif sp.ccd_orient == 270 :
             sp.x_ccd_pix = sp.rows - ir
-            sp.y_ccd_pix = sp.cols - ic
+            if sp.y_is_flip : sp.y_ccd_pix = sp.cols - ic
+            else            : sp.y_ccd_pix = ic
             sp.Y_ccd_pix, sp.X_ccd_pix = np.meshgrid(sp.y_ccd_pix, sp.x_ccd_pix)
 
         else :
@@ -337,7 +351,7 @@ class ViewResults :
 
     def get_q_map_for_stat_bins(sp) :
         if sp.q_map_stat != None : return sp.q_map_stat
-        sp.q_map_stat = q_map_partitions(sp.get_q_map(), sp.ana_stat_part_q)
+        sp.q_map_stat = q_map_partitions(sp.get_q_map()*sp.get_mask_total(), sp.ana_stat_part_q)
         return sp.q_map_stat
 
 
@@ -364,7 +378,7 @@ class ViewResults :
 
     def get_q_map_for_dyna_bins(sp) :
         if sp.q_map_dyna != None : return sp.q_map_dyna
-        sp.q_map_dyna = q_map_partitions(sp.get_q_map(), sp.ana_dyna_part_q)
+        sp.q_map_dyna = q_map_partitions(sp.get_q_map()*sp.get_mask_total(), sp.ana_dyna_part_q)
         return sp.q_map_dyna
 
 

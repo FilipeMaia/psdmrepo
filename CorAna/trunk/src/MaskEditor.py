@@ -88,10 +88,12 @@ class MaskEditor (QtGui.QWidget) :
 
         self.ifname = ifname
         self.title  = title
+        ccd_rot_n90 = int(cp.ccd_orient.value())
+        y_is_flip   = cp.y_is_flip.value() # True
 
-        self.widgimage   = imgwidg.PlotImgSpeWidget(parent, self.arr)
+        self.widgimage   = imgwidg.PlotImgSpeWidget(parent, self.arr, ccd_rot_n90, y_is_flip)
         self.widgbuts    = imgbuts.PlotImgSpeButtons(self, self.widgimage, ofname, help_msg=self.help_message())
-        self.widgmebuts  = mebuts .MaskEditorButtons(self, self.widgimage, ifname, ofname, mfname, xyc, lw, col, picker, verb)
+        self.widgmebuts  = mebuts .MaskEditorButtons(self, self.widgimage, ifname, ofname, mfname, xyc, lw, col, picker, verb, ccd_rot_n90, y_is_flip)
  
         #---------------------
 

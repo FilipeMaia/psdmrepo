@@ -60,16 +60,19 @@ class MaskEditorButtons (QtGui.QWidget) :
     #  Constructor --
     #----------------
 
-    def __init__(self, parent=None, widgimage=None, ifname=None, ofname='./roi-mask.png', mfname='./roi-mask', xyc=None, lw=2, col='b', picker=5, verb=False):
+    def __init__(self, parent=None, widgimage=None, ifname=None, ofname='./roi-mask.png', mfname='./roi-mask', \
+                 xyc=None, lw=2, col='b', picker=5, verb=False, ccd_rot_n90=0, y_is_flip=False):
         QtGui.QWidget.__init__(self, parent)
         self.setWindowTitle('GUI of buttons')
 
         self.setFrame()
 
-        self.parent    = parent
-        self.ofname    = ofname
-        self.mfname    = mfname
-        self.verb      = verb
+        self.parent      = parent
+        self.ofname      = ofname
+        self.mfname      = mfname
+        self.verb        = verb
+        self.ccd_rot_n90 = ccd_rot_n90
+        self.y_is_flip   = y_is_flip
 
         self.mfname_img  = ifname
         self.mfname_mask = self.mfname + '.txt'
@@ -501,6 +504,13 @@ class MaskEditorButtons (QtGui.QWidget) :
             else                       : self.mask_total = np.logical_and(self.mask_total, obj.get_obj_mask(shape))
             msg = 'mask for inversed object %i is ready...' % (i)            
             logger.info(msg, __name__ )
+
+        if self.y_is_flip : self.mask_total = np.flipud(gu.arr_rot_n90(self.mask_total, self.ccd_rot_n90))
+        else :
+            rot_ang = self.ccd_rot_n90
+            if self.ccd_rot_n90 ==  90 : rot_ang=270
+            if self.ccd_rot_n90 == 270 : rot_ang=90
+            self.mask_total = gu.arr_rot_n90(self.mask_total, rot_ang)
 
         return self.mask_total
 

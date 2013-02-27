@@ -464,6 +464,15 @@ def get_open_fname_through_dialog_box(parent, path0, dial_title, filter='*.txt')
     logger.info('Input file: ' + path, __name__)
     return path
 
+#----------------------------------
+
+def arr_rot_n90(arr, rot_ang_n90=0) :
+    if   rot_ang_n90==  0 : return arr
+    elif rot_ang_n90== 90 : return np.flipud(arr.T)
+    elif rot_ang_n90==180 : return np.flipud(np.fliplr(arr))
+    elif rot_ang_n90==270 : return np.fliplr(arr.T)
+    else                  : return arr
+
 
 #----------------------------------
 

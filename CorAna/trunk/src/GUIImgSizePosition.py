@@ -49,8 +49,8 @@ class GUIImgSizePosition ( QtGui.QWidget ) :
         self.setFrame()
 
         self.tit_img_size  = QtGui.QLabel('CCD Image Size (pix):')
-        self.tit_col       = QtGui.QLabel('column (x)')
-        self.tit_row       = QtGui.QLabel('row (y)')
+        self.tit_col       = QtGui.QLabel('column')
+        self.tit_row       = QtGui.QLabel('row')
         self.tit_begin     = QtGui.QLabel('begin')
         self.tit_end       = QtGui.QLabel('end')
         self.tit_size      = QtGui.QLabel('size')

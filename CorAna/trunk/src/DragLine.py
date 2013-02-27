@@ -80,6 +80,7 @@ class DragLine( Drag, lines.Line2D ) :
         if event.inaxes != self.axes: return
 
         clickxy = event.xdata, event.ydata
+        #print 'clickxy =', event.xdata, event.ydata
 
         if self.isInitialized :
             contains, attrd = self.contains(event)

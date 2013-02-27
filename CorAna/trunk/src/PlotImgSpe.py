@@ -69,7 +69,7 @@ class PlotImgSpe (QtGui.QWidget) :
 
         self.ext_ref = None
 
-        self.widgimage   = imgwidg.PlotImgSpeWidget(parent, arr)
+        self.widgimage   = imgwidg.PlotImgSpeWidget(parent, arr, int(cp.ccd_orient.value()), cp.y_is_flip.value())
         self.widgbuts    = imgbuts.PlotImgSpeButtons(self, self.widgimage, ofname)
         #self.mpl_toolbar = imgtb.ImgSpeNavToolBar(self.widgimage, self)
  

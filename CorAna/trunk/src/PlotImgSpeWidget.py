@@ -50,16 +50,25 @@ from   matplotlib.ticker import MaxNLocator, NullFormatter
 from PyQt4 import QtGui, QtCore
 
 #---------------------
-#  Class definition --
+
+def arr_rot_n90(arr, rot_ang_n90=0) :
+    if   rot_ang_n90==  0 : return arr
+    elif rot_ang_n90== 90 : return np.flipud(arr.T)
+    elif rot_ang_n90==180 : return np.flipud(np.fliplr(arr))
+    elif rot_ang_n90==270 : return np.fliplr(arr.T)
+    else                  : return arr
+
 #---------------------
 
 class PlotImgSpeWidget (QtGui.QWidget) :
     """Plots image and spectrum for 2d numpy array."""
 
-    def __init__(self, parent=None, arr=None):
+    def __init__(self, parent=None, arr=None, rot_ang_n90=0, y_is_flip=False):
         QtGui.QWidget.__init__(self, parent)
         self.setWindowTitle('Matplotlib image embadded in Qt widget')
-        self.arr = arr        
+        self.y_is_flip = y_is_flip
+        self.rot_ang_n90 = int(rot_ang_n90)
+        self.arr = arr_rot_n90(arr, self.rot_ang_n90)       
         self.fig = plt.figure(figsize=(5,10), dpi=100, facecolor='w', edgecolor='w', frameon=True)
         #self.fig = Figure(    figsize=(5,10), dpi=100, facecolor='w', edgecolor='w', frameon=True)
         #print 'fig.number =', self.fig.number
@@ -160,12 +169,12 @@ class PlotImgSpeWidget (QtGui.QWidget) :
 
 
     def set_image_array(self,arr):
-        self.arr = arr
+        self.arr = arr_rot_n90(arr, self.rot_ang_n90)
         self.processDraw()
 
 
     def set_image_array_new(self,arr):
-        self.arr = arr
+        self.arr = arr_rot_n90(arr, self.rot_ang_n90)
         self.on_draw()
 
 
@@ -178,11 +187,11 @@ class PlotImgSpeWidget (QtGui.QWidget) :
     def on_draw(self, xmin=None, xmax=None, ymin=None, ymax=None, zmin=None, zmax=None, nbins=100):
         """Redraws the figure"""
 
+        rows,cols = self.arr.shape
         if xmin == None or xmax == None or ymin == None or ymax == None :
             self.arrwin  = self.arr
-            rows,cols = self.arrwin.shape
-            self.range   = None # original image range in pixels
-            #self.range   = [0,cols,0,rows] # original image range in pixels
+            if self.y_is_flip : self.range = [0,cols,0,rows] # original image range in pixels
+            else              : self.range = None # original image range in pixels
         else :
             xmin = int(xmin)
             xmax = int(xmax)
@@ -190,11 +199,14 @@ class PlotImgSpeWidget (QtGui.QWidget) :
             ymax = int(ymax)
 
             #print 'xmin, xmax, ymin, ymax =', xmin, xmax, ymin, ymax
-            self.arrwin =  self.arr[ymin:ymax,xmin:xmax]
 
-            self.range  = [xmin, xmax, ymax, ymin]
-            #self.range  = [xmin, xmax, ymin, ymax]
-
+            if self.y_is_flip :
+                self.range = [xmin, xmax, ymin, ymax]
+                self.arrwin =  self.arr[rows-ymax:rows-ymin,xmin:xmax]
+                #self.arrwin =  self.arr[ymin:ymax,xmin:xmax]
+            else :
+                self.range = [xmin, xmax, ymax, ymin]
+                self.arrwin =  self.arr[ymin:ymax,xmin:xmax]
 
         zmin = self.floatOrNone(zmin)
         zmax = self.floatOrNone(zmax)

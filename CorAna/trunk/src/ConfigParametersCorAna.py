@@ -323,6 +323,7 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.thickness_sample        = self.declareParameter( name='THICKNESS_OF_SAMPLE',          val_def=-1,      type='float' )
         self.thickness_attlen        = self.declareParameter( name='THICKNESS_ATTENUATION_LENGTH', val_def=-2,      type='float' )
         self.ccd_orient              = self.declareParameter( name='CCD_ORIENTATION',              val_def='180',   type='str' )
+        self.y_is_flip               = self.declareParameter( name='Y_IS_FLIPPED',                 val_def='True',  type='bool' )
 
         # GUICCDSettings.py
         self.ccdset_pixsize          = self.declareParameter( name='CCD_SETTINGS_PIXEL_SIZE',      val_def=0.1,   type='float' )
