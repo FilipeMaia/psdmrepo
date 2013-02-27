@@ -43,21 +43,21 @@ void createWrappers(PyObject* module) {
   ;
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::CsPad2x2::CsPad2x2DigitalPotsCfg> >(-1, -1));
 
-  class_<Psana::CsPad2x2::CsPad2x2ReadOnlyCfg, boost::shared_ptr<Psana::CsPad2x2::CsPad2x2ReadOnlyCfg>, boost::noncopyable >("CsPad2x2ReadOnlyCfg", no_init)
+  class_<Psana::CsPad2x2::CsPad2x2ReadOnlyCfg >("CsPad2x2ReadOnlyCfg", no_init)
     .def("shiftTest", &Psana::CsPad2x2::CsPad2x2ReadOnlyCfg::shiftTest)
     .def("version", &Psana::CsPad2x2::CsPad2x2ReadOnlyCfg::version)
     .def("__typeid__", &method_typeid<Psana::CsPad2x2::CsPad2x2ReadOnlyCfg>)
     .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::CsPad2x2::CsPad2x2ReadOnlyCfg> >(-1, -1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::CsPad2x2::CsPad2x2ReadOnlyCfg> >(-1, -1));
 
-  class_<Psana::CsPad2x2::ProtectionSystemThreshold, boost::shared_ptr<Psana::CsPad2x2::ProtectionSystemThreshold>, boost::noncopyable >("ProtectionSystemThreshold", no_init)
+  class_<Psana::CsPad2x2::ProtectionSystemThreshold >("ProtectionSystemThreshold", no_init)
     .def("adcThreshold", &Psana::CsPad2x2::ProtectionSystemThreshold::adcThreshold)
     .def("pixelCountThreshold", &Psana::CsPad2x2::ProtectionSystemThreshold::pixelCountThreshold)
     .def("__typeid__", &method_typeid<Psana::CsPad2x2::ProtectionSystemThreshold>)
     .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::CsPad2x2::ProtectionSystemThreshold> >(-1, -1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::CsPad2x2::ProtectionSystemThreshold> >(-1, -1));
 
   class_<Psana::CsPad2x2::CsPad2x2GainMapCfg, boost::shared_ptr<Psana::CsPad2x2::CsPad2x2GainMapCfg>, boost::noncopyable >("CsPad2x2GainMapCfg", no_init)
     .def("gainMap", &Psana::CsPad2x2::CsPad2x2GainMapCfg::gainMap)

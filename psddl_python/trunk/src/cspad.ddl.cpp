@@ -43,21 +43,21 @@ void createWrappers(PyObject* module) {
   ;
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::CsPad::CsPadDigitalPotsCfg> >(-1, -1));
 
-  class_<Psana::CsPad::CsPadReadOnlyCfg, boost::shared_ptr<Psana::CsPad::CsPadReadOnlyCfg>, boost::noncopyable >("CsPadReadOnlyCfg", no_init)
+  class_<Psana::CsPad::CsPadReadOnlyCfg >("CsPadReadOnlyCfg", no_init)
     .def("shiftTest", &Psana::CsPad::CsPadReadOnlyCfg::shiftTest)
     .def("version", &Psana::CsPad::CsPadReadOnlyCfg::version)
     .def("__typeid__", &method_typeid<Psana::CsPad::CsPadReadOnlyCfg>)
     .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::CsPad::CsPadReadOnlyCfg> >(-1, -1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::CsPad::CsPadReadOnlyCfg> >(-1, -1));
 
-  class_<Psana::CsPad::ProtectionSystemThreshold, boost::shared_ptr<Psana::CsPad::ProtectionSystemThreshold>, boost::noncopyable >("ProtectionSystemThreshold", no_init)
+  class_<Psana::CsPad::ProtectionSystemThreshold >("ProtectionSystemThreshold", no_init)
     .def("adcThreshold", &Psana::CsPad::ProtectionSystemThreshold::adcThreshold)
     .def("pixelCountThreshold", &Psana::CsPad::ProtectionSystemThreshold::pixelCountThreshold)
     .def("__typeid__", &method_typeid<Psana::CsPad::ProtectionSystemThreshold>)
     .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::CsPad::ProtectionSystemThreshold> >(-1, -1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::CsPad::ProtectionSystemThreshold> >(-1, -1));
 
   class_<Psana::CsPad::CsPadGainMapCfg, boost::shared_ptr<Psana::CsPad::CsPadGainMapCfg>, boost::noncopyable >("CsPadGainMapCfg", no_init)
     .def("gainMap", &Psana::CsPad::CsPadGainMapCfg::gainMap)
@@ -161,7 +161,7 @@ void createWrappers(PyObject* module) {
     .def("concentratorVersion", &Psana::CsPad::ConfigV3::concentratorVersion)
     .def("runDelay", &Psana::CsPad::ConfigV3::runDelay)
     .def("eventCode", &Psana::CsPad::ConfigV3::eventCode)
-    .def("protectionThresholds", &Psana::CsPad::ConfigV3::protectionThresholds, return_internal_reference<>())
+    .def("protectionThresholds", &Psana::CsPad::ConfigV3::protectionThresholds)
     .def("protectionEnable", &Psana::CsPad::ConfigV3::protectionEnable)
     .def("inactiveRunMode", &Psana::CsPad::ConfigV3::inactiveRunMode)
     .def("activeRunMode", &Psana::CsPad::ConfigV3::activeRunMode)
@@ -177,7 +177,6 @@ void createWrappers(PyObject* module) {
     .def("numAsicsStored", &Psana::CsPad::ConfigV3::numAsicsStored)
     .def("numQuads", &Psana::CsPad::ConfigV3::numQuads)
     .def("numSect", &Psana::CsPad::ConfigV3::numSect)
-    .def("protectionThresholds_shape", &method_shape<Psana::CsPad::ConfigV3, &Psana::CsPad::ConfigV3::protectionThresholds_shape>)
     .def("quads_shape", &method_shape<Psana::CsPad::ConfigV3, &Psana::CsPad::ConfigV3::quads_shape>)
     .def("__typeid__", &method_typeid<Psana::CsPad::ConfigV3>)
     .staticmethod("__typeid__")
@@ -188,7 +187,7 @@ void createWrappers(PyObject* module) {
     .def("concentratorVersion", &Psana::CsPad::ConfigV4::concentratorVersion)
     .def("runDelay", &Psana::CsPad::ConfigV4::runDelay)
     .def("eventCode", &Psana::CsPad::ConfigV4::eventCode)
-    .def("protectionThresholds", &Psana::CsPad::ConfigV4::protectionThresholds, return_internal_reference<>())
+    .def("protectionThresholds", &Psana::CsPad::ConfigV4::protectionThresholds)
     .def("protectionEnable", &Psana::CsPad::ConfigV4::protectionEnable)
     .def("inactiveRunMode", &Psana::CsPad::ConfigV4::inactiveRunMode)
     .def("activeRunMode", &Psana::CsPad::ConfigV4::activeRunMode)
@@ -204,7 +203,6 @@ void createWrappers(PyObject* module) {
     .def("numAsicsStored", &Psana::CsPad::ConfigV4::numAsicsStored)
     .def("numQuads", &Psana::CsPad::ConfigV4::numQuads)
     .def("numSect", &Psana::CsPad::ConfigV4::numSect)
-    .def("protectionThresholds_shape", &method_shape<Psana::CsPad::ConfigV4, &Psana::CsPad::ConfigV4::protectionThresholds_shape>)
     .def("quads_shape", &method_shape<Psana::CsPad::ConfigV4, &Psana::CsPad::ConfigV4::quads_shape>)
     .def("__typeid__", &method_typeid<Psana::CsPad::ConfigV4>)
     .staticmethod("__typeid__")
@@ -283,11 +281,12 @@ void createWrappers(PyObject* module) {
     PyObject_SetAttrString(submodule, "Config", unvlist);
     Py_CLEAR(unvlist);
   }
-  detail::register_ndarray_to_numpy_cvt<const uint16_t, 2>();
+  detail::register_ndarray_to_numpy_cvt<const int16_t, 3>();
   detail::register_ndarray_to_numpy_cvt<const uint8_t, 1>();
+  detail::register_ndarray_to_numpy_cvt<const uint16_t, 2>();
   detail::register_ndarray_to_numpy_cvt<const uint16_t, 1>();
   detail::register_ndarray_to_numpy_cvt<const uint32_t, 1>();
-  detail::register_ndarray_to_numpy_cvt<const int16_t, 3>();
+  detail::register_ndarray_to_list_cvt<const Psana::CsPad::ProtectionSystemThreshold>();
 
 } // createWrappers()
 } // namespace CsPad
