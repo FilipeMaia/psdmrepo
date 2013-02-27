@@ -3,7 +3,7 @@
 set -e
 
 packages="andor camera encoder fccd fli gsc16ai ipimb lusi oceanoptics opal1k orca princeton pulnix quartz timepix usdusb"
-#packages="evr"
+#packages="cspad2x2"
 
 for pkg in $packages; do 
     f="psddldata/data/$pkg.ddl.xml" 

@@ -37,5 +37,103 @@
             
         </h5schema>
     
+        <!-- ========================================================================= -->
+    
+        <h5schema name="IOChannel" version="0">
+
+            <dataset name="data">
+
+                <attribute name="name"/>
+                <attribute name="ninfo"/>
+                <attribute name="infos"/>
+
+            </dataset>
+            
+        </h5schema>
+    
+        <!-- ========================================================================= -->
+    
+        <h5schema name="ConfigV5" version="0">
+
+            <dataset name="config">
+                <attribute name="neventcodes"/>
+                <attribute name="npulses"/>
+                <attribute name="noutputs"/>
+            </dataset>
+
+            <dataset name="eventcodes">
+                <attribute name="eventcodes"/>
+            </dataset>
+            
+            <dataset name="pulses">
+                <attribute name="pulses"/>
+            </dataset>
+            
+            <dataset name="output_maps">
+                <attribute name="output_maps"/>
+            </dataset>
+            
+            <dataset name="seq_config">
+                <attribute name="seq_config"/>
+            </dataset>
+            
+        </h5schema>
+    
+        <!-- ========================================================================= -->
+    
+        <h5schema name="ConfigV6" version="0">
+
+            <dataset name="config">
+                <attribute name="neventcodes"/>
+                <attribute name="npulses"/>
+                <attribute name="noutputs"/>
+            </dataset>
+
+            <dataset name="eventcodes">
+                <attribute name="eventcodes"/>
+            </dataset>
+            
+            <dataset name="pulses">
+                <attribute name="pulses"/>
+            </dataset>
+            
+            <dataset name="output_maps">
+                <attribute name="output_maps"/>
+            </dataset>
+            
+            <dataset name="seq_config">
+                <attribute name="seq_config"/>
+            </dataset>
+            
+        </h5schema>
+    
+        <!-- ========================================================================= -->
+    
+        <h5schema name="ConfigV7" version="0">
+
+            <dataset name="config">
+                <attribute name="neventcodes"/>
+                <attribute name="npulses"/>
+                <attribute name="noutputs"/>
+            </dataset>
+
+            <dataset name="eventcodes">
+                <attribute name="eventcodes"/>
+            </dataset>
+            
+            <dataset name="pulses">
+                <attribute name="pulses"/>
+            </dataset>
+            
+            <dataset name="output_maps">
+                <attribute name="output_maps"/>
+            </dataset>
+            
+            <dataset name="seq_config">
+                <attribute name="seq_config"/>
+            </dataset>
+            
+        </h5schema>
+    
     </package>
 </psddl>

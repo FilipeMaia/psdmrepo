@@ -57,6 +57,7 @@ struct dataset_data {
   uint64_t tv_sec; 
   uint64_t tv_nsec; 
 
+  operator Psana::OceanOptics::timespec64() const { return Psana::OceanOptics::timespec64(tv_sec, tv_nsec); }
 };
 }
 class Proxy_timespec64_v0 : public PSEvt::Proxy<Psana::OceanOptics::timespec64> {

@@ -22,6 +22,7 @@ struct dataset_data {
   uint16_t column; 
   uint16_t row; 
 
+  operator Psana::Camera::FrameCoord() const { return Psana::Camera::FrameCoord(column, row); }
 };
 }
 class Proxy_FrameCoord_v0 : public PSEvt::Proxy<Psana::Camera::FrameCoord> {

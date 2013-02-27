@@ -442,6 +442,7 @@ struct dataset_data {
 
   float temperature; 
 
+  operator Psana::Princeton::InfoV1() const { return Psana::Princeton::InfoV1(temperature); }
 };
 }
 class Proxy_InfoV1_v0 : public PSEvt::Proxy<Psana::Princeton::InfoV1> {

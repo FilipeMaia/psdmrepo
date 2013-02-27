@@ -21,6 +21,7 @@ struct dataset_config {
   float base[3]; 
   float scale[3]; 
 
+  operator Psana::Lusi::DiodeFexConfigV1() const { return Psana::Lusi::DiodeFexConfigV1(base, scale); }
 };
 }
 class Proxy_DiodeFexConfigV1_v0 : public PSEvt::Proxy<Psana::Lusi::DiodeFexConfigV1> {
@@ -53,6 +54,7 @@ struct dataset_config {
   float base[16]; 
   float scale[16]; 
 
+  operator Psana::Lusi::DiodeFexConfigV2() const { return Psana::Lusi::DiodeFexConfigV2(base, scale); }
 };
 }
 class Proxy_DiodeFexConfigV2_v0 : public PSEvt::Proxy<Psana::Lusi::DiodeFexConfigV2> {
@@ -84,6 +86,7 @@ struct dataset_data {
 
   float value; 
 
+  operator Psana::Lusi::DiodeFexV1() const { return Psana::Lusi::DiodeFexV1(value); }
 };
 }
 class Proxy_DiodeFexV1_v0 : public PSEvt::Proxy<Psana::Lusi::DiodeFexV1> {
@@ -188,6 +191,7 @@ struct dataset_data {
   float xpos; 
   float ypos; 
 
+  operator Psana::Lusi::IpmFexV1() const { return Psana::Lusi::IpmFexV1(channel, sum, xpos, ypos); }
 };
 }
 class Proxy_IpmFexV1_v0 : public PSEvt::Proxy<Psana::Lusi::IpmFexV1> {
@@ -220,6 +224,7 @@ struct dataset_config {
   float xscale; 
   float yscale; 
 
+  operator Psana::Lusi::PimImageConfigV1() const { return Psana::Lusi::PimImageConfigV1(xscale, yscale); }
 };
 }
 class Proxy_PimImageConfigV1_v0 : public PSEvt::Proxy<Psana::Lusi::PimImageConfigV1> {
