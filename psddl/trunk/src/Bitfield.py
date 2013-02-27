@@ -82,7 +82,7 @@ class Bitfield ( object ) :
 
     def assignExpr(self, name):
         
-        expr = "(%s & %#x)" % (name, self.bitmask)
+        expr = "((%s) & %#x)" % (name, self.bitmask)
         if self.offset > 0 :
             expr = "(%s<<%d)" % (expr, self.offset)
         return expr

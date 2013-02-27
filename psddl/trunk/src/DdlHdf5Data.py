@@ -476,10 +476,13 @@ class DdlHdf5Data ( object ) :
     
                     # map ctor parameters to dataset attributes
                     dsattrs = []
-                    for aname, atype, attr in ctor.args:
-                        if not attr.accessor: raise TypeError("Attribute " + attr.name + " does not have access method")
-                        dsattrs += [dsattr.name for dsattr in ds.attributes if dsattr.method == attr.accessor.name]
-                    if len(dsattrs) != len(ctor.args): raise TypeError("Failed to find HDF5 attributes for constructor arguments")
+                    for arg in ctor.args:
+                        if not arg.method: raise TypeError("Attribute " + arg.dest.name + " does not have access method")
+                        attr = [dsattr.name for dsattr in ds.attributes if dsattr.method == arg.method.name]
+                        if not attr: raise TypeError("Failed to find HDF5 attributes for constructor arguments")
+                        attr = attr[0]
+                        if isinstance(arg.type, Enum): attr = "%s(%s)" % (arg.type.fullName('C++', self.psana_ns), attr)
+                        dsattrs.append(attr)
 
                     conversion = schema.pstype.fullName('C++', self.psana_ns)
                     cvt_args = ', '.join(dsattrs)
@@ -544,7 +547,7 @@ class DdlHdf5Data ( object ) :
                 raise ValueError('No schema found for attribute %s' % attr.name)
             aschema = aschema[0]
             if len(aschema.datasets) != 1:
-                raise ValueError('Attribute schema has number of datasets != 1: %d' % len(aschema.datasets))
+                raise ValueError('Attribute schema has number of datasets != 1: %d for attr %s of type %s' % (len(aschema.datasets), attr.name, attr.type.name))
 
             attr_type_name = '::'.join([aschema.nsName(), aschema.datasets[0].className()])
             attr_type_name = attr.type.parent.fullName('C++') + '::' + attr_type_name
@@ -593,11 +596,11 @@ class DdlHdf5Data ( object ) :
         # map ctor parameters to schema objects
         dsattrs = []
         self._log.debug("_genValueType: ctor args=%r", ctor.args)
-        for aname, atype, attr in ctor.args:
-            if not attr.accessor: raise TypeError("Attribute " + attr.name + " does not have access method")
-            ds_attr = [(ds, dsattr) for ds, dsattr in _schemaAttributes(schema) if attr.accessor.name == dsattr.method]
+        for arg in ctor.args:
+            if not arg.method: raise TypeError("Attribute " + arg.dest.name + " does not have access method")
+            ds_attr = [(ds, dsattr) for ds, dsattr in _schemaAttributes(schema) if arg.method.name == dsattr.method]
             if not ds_attr:
-                raise TypeError("Failed to find HDF5 attribute for constructor argument %s in type %s" % (attr.accessor.name, type.name))
+                raise TypeError("Failed to find HDF5 attribute for constructor argument %s/%s in type %s" % (arg.name, arg.method.name, type.name))
             else:
                 dsattrs += ds_attr[:1]
 

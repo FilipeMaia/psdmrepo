@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-05
+2013-02-26 Andy Salnikov
+- small improvements for HDF5 generation
+
 Tag: V00-05-04
 2013-02-26 Andy Salnikov
 - continuing work on HDF5 code generation

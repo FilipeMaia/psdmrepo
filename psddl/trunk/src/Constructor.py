@@ -134,9 +134,6 @@ class Constructor ( object ) :
                 for item in self.parent.attributes_and_bitfields():
                     if item.accessor:
                         name = "arg_"+item.name
-                        if isinstance(item, Bitfield):
-                            # not really necessary, mostly for historic reasons
-                            name = "arg_bf_"+item.name
                         self._cargs.append(CtorArg(name, item))
 
         return self._cargs
