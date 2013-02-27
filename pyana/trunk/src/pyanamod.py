@@ -88,7 +88,7 @@ def _epicsOnly(xtcObj):
             return False
     return True
 
-def _proc(jobname, id, pipes, userObjects, jobConfig, expNameProvider):
+def _proc(jobname, id, pipes, userObjects, jobConfig, expNameProvider, idQueue):
     """ method which is running in child process when we do multi-processing """
 
     for i in range(len(pipes)):
@@ -114,6 +114,9 @@ def _proc(jobname, id, pipes, userObjects, jobConfig, expNameProvider):
     proto = mp_proto(pipe, dg_ref, 'prot-%d' % id)
     nevent = 0
     vmsize = _vmsize()
+
+    # say we are ready to accept data
+    if idQueue is not None: idQueue.put(id)
 
     # event loop
     for req in proto.getRequest():
@@ -141,6 +144,10 @@ def _proc(jobname, id, pipes, userObjects, jobConfig, expNameProvider):
 
             if evt.seq().service() == xtc.TransitionId.L1Accept : nevent += 1
 
+            # say we are ready again, producer consumes IDs from a queue only on L1Accept
+            # transitions, make sure that we do not put too many IDs to a queue
+            if idQueue is not None: idQueue.put(id)
+
         elif req[0] == OP_FINISH :
             
             logging.info("proc-%s: received FIN", id)
@@ -160,7 +167,7 @@ def _proc(jobname, id, pipes, userObjects, jobConfig, expNameProvider):
 
         # explicitly run garbage collector if memory grows too much
         vmsize = _gc(gc_debug, gc_threshod, vmsize)
-            
+
     # done with the environment
     env.finish()
 
@@ -228,8 +235,13 @@ def _pyana ( argv ) :
     dg_ref = jobConfig.getJobConfig('dg-ref', False)
     logging.info("dg-ref: %s", dg_ref)
 
+    # this is the queue for the next available worker id
+    roundRobin = jobConfig.getJobConfig("round-robin", False)
+    idQueue = mp.Queue(64) if nsub and not roundRobin else None
+
+    # in multi-process mode create all sub-processes
     conns = [ mp.Pipe() for i in range(nsub)]
-    procs = [mp.Process(target=_proc, args=(jobname, i, conns, userObjects, jobConfig, expNameProvider)) for i in range(nsub)]
+    procs = [mp.Process(target=_proc, args=(jobname, i, conns, userObjects, jobConfig, expNameProvider, idQueue)) for i in range(nsub)]
     for p in procs : p.start()
     for conn in conns : conn[1].close()
     pipes = [mp_proto(conn[0], dg_ref, 'prot-main') for conn in conns]
@@ -299,6 +311,8 @@ def _pyana ( argv ) :
                 # pass all the data to children
                 if svc == xtc.TransitionId.L1Accept :
                     # event data goes to next child
+                    if idQueue is not None: next = idQueue.get()
+                    logging.debug("sending event data to process %d", next)
                     p = pipes[next]
                     next = (next+1) % len(pipes)
                     p.sendEventData(dg, fileName, fpos, run, expNum, env)

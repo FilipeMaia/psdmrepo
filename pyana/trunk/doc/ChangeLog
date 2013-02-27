@@ -11,6 +11,14 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-58
+2013-02-27 Andy Salnikov
+- use smarter event distribution in multi-process mode. When ready each 
+  process posts its ID into a queue, dispatch reads ID of the next available 
+  process from a que and sends L1Accept there.
+- pyana adds --round-robin option to switch back to old implementation 
+  of event distribution
+
 Tag: V00-00-57
 2013-02-06 Andy Salnikov
 - added python wrappers for frame classes (princeton.FrameV2,

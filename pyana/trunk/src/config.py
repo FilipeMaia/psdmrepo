@@ -73,6 +73,7 @@ _options = {
     'calib-dir'  : ( 'calib_dir', _unity),
     'gc-threshod': ( 'gc_threshod', int),
     'gc-debug'   : ( 'gc_debug',   _str2bool),
+    'round-robin': ( 'round_robin',_str2bool),
 }
 
 
@@ -92,6 +93,7 @@ _cmdoptions = [
     make_option( '-b', "--calib-dir", metavar="STRING", help="calibration directory name, may include $experiment and $instrument" ),
     make_option( "--gc-threshod", metavar="NUMBER", type="int", help="threshold in MB for running garbage collector, use 0 to disable; def: 10" ),
     make_option( "--gc-debug", action="store_true",help="debug garbage collection" ),
+    make_option( "--round-robin", action="store_true", help="use round-robin algorithm for event distribution in multi-processing mode" ),
 ]
 
 #------------------------
