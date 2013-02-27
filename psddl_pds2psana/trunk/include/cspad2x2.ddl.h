@@ -22,33 +22,9 @@ private:
   boost::shared_ptr<const XtcType> m_xtcObj;
 };
 
+Psana::CsPad2x2::CsPad2x2ReadOnlyCfg pds_to_psana(PsddlPds::CsPad2x2::CsPad2x2ReadOnlyCfg pds);
 
-class CsPad2x2ReadOnlyCfg : public Psana::CsPad2x2::CsPad2x2ReadOnlyCfg {
-public:
-  typedef PsddlPds::CsPad2x2::CsPad2x2ReadOnlyCfg XtcType;
-  typedef Psana::CsPad2x2::CsPad2x2ReadOnlyCfg PsanaType;
-  CsPad2x2ReadOnlyCfg(const boost::shared_ptr<const XtcType>& xtcPtr);
-  virtual ~CsPad2x2ReadOnlyCfg();
-  virtual uint32_t shiftTest() const;
-  virtual uint32_t version() const;
-  const XtcType& _xtcObj() const { return *m_xtcObj; }
-private:
-  boost::shared_ptr<const XtcType> m_xtcObj;
-};
-
-
-class ProtectionSystemThreshold : public Psana::CsPad2x2::ProtectionSystemThreshold {
-public:
-  typedef PsddlPds::CsPad2x2::ProtectionSystemThreshold XtcType;
-  typedef Psana::CsPad2x2::ProtectionSystemThreshold PsanaType;
-  ProtectionSystemThreshold(const boost::shared_ptr<const XtcType>& xtcPtr);
-  virtual ~ProtectionSystemThreshold();
-  virtual uint32_t adcThreshold() const;
-  virtual uint32_t pixelCountThreshold() const;
-  const XtcType& _xtcObj() const { return *m_xtcObj; }
-private:
-  boost::shared_ptr<const XtcType> m_xtcObj;
-};
+Psana::CsPad2x2::ProtectionSystemThreshold pds_to_psana(PsddlPds::CsPad2x2::ProtectionSystemThreshold pds);
 
 
 class CsPad2x2GainMapCfg : public Psana::CsPad2x2::CsPad2x2GainMapCfg {
@@ -97,7 +73,7 @@ public:
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
-  psddl_pds2psana::CsPad2x2::CsPad2x2ReadOnlyCfg _readOnly;
+  Psana::CsPad2x2::CsPad2x2ReadOnlyCfg _readOnly;
   psddl_pds2psana::CsPad2x2::CsPad2x2DigitalPotsCfg _digitalPots;
   psddl_pds2psana::CsPad2x2::CsPad2x2GainMapCfg _gainMap;
 };
@@ -125,7 +101,7 @@ public:
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
-  psddl_pds2psana::CsPad2x2::ProtectionSystemThreshold _protectionThreshold;
+  Psana::CsPad2x2::ProtectionSystemThreshold _protectionThreshold;
   psddl_pds2psana::CsPad2x2::ConfigV1QuadReg _quad;
 };
 
@@ -165,7 +141,7 @@ public:
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
-  psddl_pds2psana::CsPad2x2::CsPad2x2ReadOnlyCfg _readOnly;
+  Psana::CsPad2x2::CsPad2x2ReadOnlyCfg _readOnly;
   psddl_pds2psana::CsPad2x2::CsPad2x2DigitalPotsCfg _digitalPots;
   psddl_pds2psana::CsPad2x2::CsPad2x2GainMapCfg _gainMap;
 };
@@ -194,7 +170,7 @@ public:
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
-  psddl_pds2psana::CsPad2x2::ProtectionSystemThreshold _protectionThreshold;
+  Psana::CsPad2x2::ProtectionSystemThreshold _protectionThreshold;
   psddl_pds2psana::CsPad2x2::ConfigV2QuadReg _quad;
 };
 

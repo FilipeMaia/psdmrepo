@@ -22,33 +22,9 @@ private:
   boost::shared_ptr<const XtcType> m_xtcObj;
 };
 
+Psana::CsPad::CsPadReadOnlyCfg pds_to_psana(PsddlPds::CsPad::CsPadReadOnlyCfg pds);
 
-class CsPadReadOnlyCfg : public Psana::CsPad::CsPadReadOnlyCfg {
-public:
-  typedef PsddlPds::CsPad::CsPadReadOnlyCfg XtcType;
-  typedef Psana::CsPad::CsPadReadOnlyCfg PsanaType;
-  CsPadReadOnlyCfg(const boost::shared_ptr<const XtcType>& xtcPtr);
-  virtual ~CsPadReadOnlyCfg();
-  virtual uint32_t shiftTest() const;
-  virtual uint32_t version() const;
-  const XtcType& _xtcObj() const { return *m_xtcObj; }
-private:
-  boost::shared_ptr<const XtcType> m_xtcObj;
-};
-
-
-class ProtectionSystemThreshold : public Psana::CsPad::ProtectionSystemThreshold {
-public:
-  typedef PsddlPds::CsPad::ProtectionSystemThreshold XtcType;
-  typedef Psana::CsPad::ProtectionSystemThreshold PsanaType;
-  ProtectionSystemThreshold(const boost::shared_ptr<const XtcType>& xtcPtr);
-  virtual ~ProtectionSystemThreshold();
-  virtual uint32_t adcThreshold() const;
-  virtual uint32_t pixelCountThreshold() const;
-  const XtcType& _xtcObj() const { return *m_xtcObj; }
-private:
-  boost::shared_ptr<const XtcType> m_xtcObj;
-};
+Psana::CsPad::ProtectionSystemThreshold pds_to_psana(PsddlPds::CsPad::ProtectionSystemThreshold pds);
 
 
 class CsPadGainMapCfg : public Psana::CsPad::CsPadGainMapCfg {
@@ -88,7 +64,7 @@ public:
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
-  psddl_pds2psana::CsPad::CsPadReadOnlyCfg _readOnly;
+  Psana::CsPad::CsPadReadOnlyCfg _readOnly;
   psddl_pds2psana::CsPad::CsPadDigitalPotsCfg _digitalPots;
   psddl_pds2psana::CsPad::CsPadGainMapCfg _gainMap;
 };
@@ -121,7 +97,7 @@ public:
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
-  psddl_pds2psana::CsPad::CsPadReadOnlyCfg _readOnly;
+  Psana::CsPad::CsPadReadOnlyCfg _readOnly;
   psddl_pds2psana::CsPad::CsPadDigitalPotsCfg _digitalPots;
   psddl_pds2psana::CsPad::CsPadGainMapCfg _gainMap;
 };
@@ -196,7 +172,7 @@ public:
   virtual uint32_t concentratorVersion() const;
   virtual uint32_t runDelay() const;
   virtual uint32_t eventCode() const;
-  virtual const Psana::CsPad::ProtectionSystemThreshold& protectionThresholds(uint32_t i0) const;
+  virtual ndarray<const Psana::CsPad::ProtectionSystemThreshold, 1> protectionThresholds() const;
   virtual uint32_t protectionEnable() const;
   virtual uint32_t inactiveRunMode() const;
   virtual uint32_t activeRunMode() const;
@@ -212,12 +188,12 @@ public:
   virtual uint32_t numAsicsStored(uint32_t iq) const;
   virtual uint32_t numQuads() const;
   virtual uint32_t numSect() const;
-  virtual std::vector<int> protectionThresholds_shape() const;
   virtual std::vector<int> quads_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
-  std::vector< psddl_pds2psana::CsPad::ProtectionSystemThreshold > _protectionThresholds;
+  std::vector<Psana::CsPad::ProtectionSystemThreshold> _protectionThresholds_ndarray_storage_;
+  unsigned _protectionThresholds_ndarray_shape_[1];
   std::vector< psddl_pds2psana::CsPad::ConfigV1QuadReg > _quads;
 };
 
@@ -231,7 +207,7 @@ public:
   virtual uint32_t concentratorVersion() const;
   virtual uint32_t runDelay() const;
   virtual uint32_t eventCode() const;
-  virtual const Psana::CsPad::ProtectionSystemThreshold& protectionThresholds(uint32_t i0) const;
+  virtual ndarray<const Psana::CsPad::ProtectionSystemThreshold, 1> protectionThresholds() const;
   virtual uint32_t protectionEnable() const;
   virtual uint32_t inactiveRunMode() const;
   virtual uint32_t activeRunMode() const;
@@ -247,12 +223,12 @@ public:
   virtual uint32_t numAsicsStored(uint32_t iq) const;
   virtual uint32_t numQuads() const;
   virtual uint32_t numSect() const;
-  virtual std::vector<int> protectionThresholds_shape() const;
   virtual std::vector<int> quads_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
-  std::vector< psddl_pds2psana::CsPad::ProtectionSystemThreshold > _protectionThresholds;
+  std::vector<Psana::CsPad::ProtectionSystemThreshold> _protectionThresholds_ndarray_storage_;
+  unsigned _protectionThresholds_ndarray_shape_[1];
   std::vector< psddl_pds2psana::CsPad::ConfigV2QuadReg > _quads;
 };
 

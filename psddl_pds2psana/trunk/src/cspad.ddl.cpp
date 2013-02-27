@@ -30,32 +30,16 @@ CsPadDigitalPotsCfg::~CsPadDigitalPotsCfg()
 
 
 ndarray<const uint8_t, 1> CsPadDigitalPotsCfg::pots() const { return m_xtcObj->pots(); }
-CsPadReadOnlyCfg::CsPadReadOnlyCfg(const boost::shared_ptr<const XtcType>& xtcPtr)
-  : Psana::CsPad::CsPadReadOnlyCfg()
-  , m_xtcObj(xtcPtr)
+Psana::CsPad::CsPadReadOnlyCfg pds_to_psana(PsddlPds::CsPad::CsPadReadOnlyCfg pds)
 {
-}
-CsPadReadOnlyCfg::~CsPadReadOnlyCfg()
-{
+  return Psana::CsPad::CsPadReadOnlyCfg(pds.shiftTest(), pds.version());
 }
 
-
-uint32_t CsPadReadOnlyCfg::shiftTest() const { return m_xtcObj->shiftTest(); }
-
-uint32_t CsPadReadOnlyCfg::version() const { return m_xtcObj->version(); }
-ProtectionSystemThreshold::ProtectionSystemThreshold(const boost::shared_ptr<const XtcType>& xtcPtr)
-  : Psana::CsPad::ProtectionSystemThreshold()
-  , m_xtcObj(xtcPtr)
+Psana::CsPad::ProtectionSystemThreshold pds_to_psana(PsddlPds::CsPad::ProtectionSystemThreshold pds)
 {
-}
-ProtectionSystemThreshold::~ProtectionSystemThreshold()
-{
+  return Psana::CsPad::ProtectionSystemThreshold(pds.adcThreshold(), pds.pixelCountThreshold());
 }
 
-
-uint32_t ProtectionSystemThreshold::adcThreshold() const { return m_xtcObj->adcThreshold(); }
-
-uint32_t ProtectionSystemThreshold::pixelCountThreshold() const { return m_xtcObj->pixelCountThreshold(); }
 CsPadGainMapCfg::CsPadGainMapCfg(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::CsPad::CsPadGainMapCfg()
   , m_xtcObj(xtcPtr)
@@ -70,7 +54,7 @@ ndarray<const uint16_t, 2> CsPadGainMapCfg::gainMap() const { return m_xtcObj->g
 ConfigV1QuadReg::ConfigV1QuadReg(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::CsPad::ConfigV1QuadReg()
   , m_xtcObj(xtcPtr)
-  , _readOnly(boost::shared_ptr<const PsddlPds::CsPad::CsPadReadOnlyCfg>(xtcPtr, &xtcPtr->ro()))
+  , _readOnly(psddl_pds2psana::CsPad::pds_to_psana(xtcPtr->ro()))
   , _digitalPots(boost::shared_ptr<const PsddlPds::CsPad::CsPadDigitalPotsCfg>(xtcPtr, &xtcPtr->dp()))
   , _gainMap(boost::shared_ptr<const PsddlPds::CsPad::CsPadGainMapCfg>(xtcPtr, &xtcPtr->gm()))
 {
@@ -112,7 +96,7 @@ const Psana::CsPad::CsPadGainMapCfg& ConfigV1QuadReg::gm() const { return _gainM
 ConfigV2QuadReg::ConfigV2QuadReg(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::CsPad::ConfigV2QuadReg()
   , m_xtcObj(xtcPtr)
-  , _readOnly(boost::shared_ptr<const PsddlPds::CsPad::CsPadReadOnlyCfg>(xtcPtr, &xtcPtr->ro()))
+  , _readOnly(psddl_pds2psana::CsPad::pds_to_psana(xtcPtr->ro()))
   , _digitalPots(boost::shared_ptr<const PsddlPds::CsPad::CsPadDigitalPotsCfg>(xtcPtr, &xtcPtr->dp()))
   , _gainMap(boost::shared_ptr<const PsddlPds::CsPad::CsPadGainMapCfg>(xtcPtr, &xtcPtr->gm()))
 {
@@ -278,13 +262,14 @@ ConfigV3::ConfigV3(const boost::shared_ptr<const XtcType>& xtcPtr)
   , m_xtcObj(xtcPtr)
 {
   {
-    const std::vector<int>& dims = xtcPtr->protectionThresholds_shape();
-    _protectionThresholds.reserve(dims[0]);
-    for (int i0=0; i0 != dims[0]; ++i0) {
-      const PsddlPds::CsPad::ProtectionSystemThreshold& d = xtcPtr->protectionThresholds(i0);
-      boost::shared_ptr<const PsddlPds::CsPad::ProtectionSystemThreshold> dPtr(m_xtcObj, &d);
-      _protectionThresholds.push_back(psddl_pds2psana::CsPad::ProtectionSystemThreshold(dPtr));
+    typedef ndarray<const PsddlPds::CsPad::ProtectionSystemThreshold, 1> XtcNDArray;
+    const XtcNDArray& xtc_ndarr = xtcPtr->protectionThresholds();
+    _protectionThresholds_ndarray_storage_.reserve(xtc_ndarr.size());
+    for (XtcNDArray::iterator it = xtc_ndarr.begin(); it != xtc_ndarr.end(); ++ it) {
+      _protectionThresholds_ndarray_storage_.push_back(psddl_pds2psana::CsPad::pds_to_psana(*it));
     }
+    const unsigned* shape = xtc_ndarr.shape();
+    std::copy(shape, shape+1, _protectionThresholds_ndarray_shape_);
   }
   {
     const std::vector<int>& dims = xtcPtr->quads_shape();
@@ -307,7 +292,7 @@ uint32_t ConfigV3::runDelay() const { return m_xtcObj->runDelay(); }
 
 uint32_t ConfigV3::eventCode() const { return m_xtcObj->eventCode(); }
 
-const Psana::CsPad::ProtectionSystemThreshold& ConfigV3::protectionThresholds(uint32_t i0) const { return _protectionThresholds[i0]; }
+ndarray<const Psana::CsPad::ProtectionSystemThreshold, 1> ConfigV3::protectionThresholds() const { return ndarray<const Psana::CsPad::ProtectionSystemThreshold, 1>(&_protectionThresholds_ndarray_storage_[0], _protectionThresholds_ndarray_shape_); }
 
 uint32_t ConfigV3::protectionEnable() const { return m_xtcObj->protectionEnable(); }
 
@@ -338,14 +323,6 @@ uint32_t ConfigV3::numAsicsStored(uint32_t iq) const { return m_xtcObj->numAsics
 uint32_t ConfigV3::numQuads() const { return m_xtcObj->numQuads(); }
 
 uint32_t ConfigV3::numSect() const { return m_xtcObj->numSect(); }
-std::vector<int> ConfigV3::protectionThresholds_shape() const
-{
-  std::vector<int> shape;
-  shape.reserve(1);
-  shape.push_back(_protectionThresholds.size());
-  return shape;
-}
-
 std::vector<int> ConfigV3::quads_shape() const
 {
   std::vector<int> shape;
@@ -359,13 +336,14 @@ ConfigV4::ConfigV4(const boost::shared_ptr<const XtcType>& xtcPtr)
   , m_xtcObj(xtcPtr)
 {
   {
-    const std::vector<int>& dims = xtcPtr->protectionThresholds_shape();
-    _protectionThresholds.reserve(dims[0]);
-    for (int i0=0; i0 != dims[0]; ++i0) {
-      const PsddlPds::CsPad::ProtectionSystemThreshold& d = xtcPtr->protectionThresholds(i0);
-      boost::shared_ptr<const PsddlPds::CsPad::ProtectionSystemThreshold> dPtr(m_xtcObj, &d);
-      _protectionThresholds.push_back(psddl_pds2psana::CsPad::ProtectionSystemThreshold(dPtr));
+    typedef ndarray<const PsddlPds::CsPad::ProtectionSystemThreshold, 1> XtcNDArray;
+    const XtcNDArray& xtc_ndarr = xtcPtr->protectionThresholds();
+    _protectionThresholds_ndarray_storage_.reserve(xtc_ndarr.size());
+    for (XtcNDArray::iterator it = xtc_ndarr.begin(); it != xtc_ndarr.end(); ++ it) {
+      _protectionThresholds_ndarray_storage_.push_back(psddl_pds2psana::CsPad::pds_to_psana(*it));
     }
+    const unsigned* shape = xtc_ndarr.shape();
+    std::copy(shape, shape+1, _protectionThresholds_ndarray_shape_);
   }
   {
     const std::vector<int>& dims = xtcPtr->quads_shape();
@@ -388,7 +366,7 @@ uint32_t ConfigV4::runDelay() const { return m_xtcObj->runDelay(); }
 
 uint32_t ConfigV4::eventCode() const { return m_xtcObj->eventCode(); }
 
-const Psana::CsPad::ProtectionSystemThreshold& ConfigV4::protectionThresholds(uint32_t i0) const { return _protectionThresholds[i0]; }
+ndarray<const Psana::CsPad::ProtectionSystemThreshold, 1> ConfigV4::protectionThresholds() const { return ndarray<const Psana::CsPad::ProtectionSystemThreshold, 1>(&_protectionThresholds_ndarray_storage_[0], _protectionThresholds_ndarray_shape_); }
 
 uint32_t ConfigV4::protectionEnable() const { return m_xtcObj->protectionEnable(); }
 
@@ -419,14 +397,6 @@ uint32_t ConfigV4::numAsicsStored(uint32_t iq) const { return m_xtcObj->numAsics
 uint32_t ConfigV4::numQuads() const { return m_xtcObj->numQuads(); }
 
 uint32_t ConfigV4::numSect() const { return m_xtcObj->numSect(); }
-std::vector<int> ConfigV4::protectionThresholds_shape() const
-{
-  std::vector<int> shape;
-  shape.reserve(1);
-  shape.push_back(_protectionThresholds.size());
-  return shape;
-}
-
 std::vector<int> ConfigV4::quads_shape() const
 {
   std::vector<int> shape;

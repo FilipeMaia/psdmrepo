@@ -30,32 +30,16 @@ CsPad2x2DigitalPotsCfg::~CsPad2x2DigitalPotsCfg()
 
 
 ndarray<const uint8_t, 1> CsPad2x2DigitalPotsCfg::pots() const { return m_xtcObj->pots(); }
-CsPad2x2ReadOnlyCfg::CsPad2x2ReadOnlyCfg(const boost::shared_ptr<const XtcType>& xtcPtr)
-  : Psana::CsPad2x2::CsPad2x2ReadOnlyCfg()
-  , m_xtcObj(xtcPtr)
+Psana::CsPad2x2::CsPad2x2ReadOnlyCfg pds_to_psana(PsddlPds::CsPad2x2::CsPad2x2ReadOnlyCfg pds)
 {
-}
-CsPad2x2ReadOnlyCfg::~CsPad2x2ReadOnlyCfg()
-{
+  return Psana::CsPad2x2::CsPad2x2ReadOnlyCfg(pds.shiftTest(), pds.version());
 }
 
-
-uint32_t CsPad2x2ReadOnlyCfg::shiftTest() const { return m_xtcObj->shiftTest(); }
-
-uint32_t CsPad2x2ReadOnlyCfg::version() const { return m_xtcObj->version(); }
-ProtectionSystemThreshold::ProtectionSystemThreshold(const boost::shared_ptr<const XtcType>& xtcPtr)
-  : Psana::CsPad2x2::ProtectionSystemThreshold()
-  , m_xtcObj(xtcPtr)
+Psana::CsPad2x2::ProtectionSystemThreshold pds_to_psana(PsddlPds::CsPad2x2::ProtectionSystemThreshold pds)
 {
-}
-ProtectionSystemThreshold::~ProtectionSystemThreshold()
-{
+  return Psana::CsPad2x2::ProtectionSystemThreshold(pds.adcThreshold(), pds.pixelCountThreshold());
 }
 
-
-uint32_t ProtectionSystemThreshold::adcThreshold() const { return m_xtcObj->adcThreshold(); }
-
-uint32_t ProtectionSystemThreshold::pixelCountThreshold() const { return m_xtcObj->pixelCountThreshold(); }
 CsPad2x2GainMapCfg::CsPad2x2GainMapCfg(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::CsPad2x2::CsPad2x2GainMapCfg()
   , m_xtcObj(xtcPtr)
@@ -70,7 +54,7 @@ ndarray<const uint16_t, 2> CsPad2x2GainMapCfg::gainMap() const { return m_xtcObj
 ConfigV1QuadReg::ConfigV1QuadReg(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::CsPad2x2::ConfigV1QuadReg()
   , m_xtcObj(xtcPtr)
-  , _readOnly(boost::shared_ptr<const PsddlPds::CsPad2x2::CsPad2x2ReadOnlyCfg>(xtcPtr, &xtcPtr->ro()))
+  , _readOnly(psddl_pds2psana::CsPad2x2::pds_to_psana(xtcPtr->ro()))
   , _digitalPots(boost::shared_ptr<const PsddlPds::CsPad2x2::CsPad2x2DigitalPotsCfg>(xtcPtr, &xtcPtr->dp()))
   , _gainMap(boost::shared_ptr<const PsddlPds::CsPad2x2::CsPad2x2GainMapCfg>(xtcPtr, &xtcPtr->gm()))
 {
@@ -130,7 +114,7 @@ const Psana::CsPad2x2::CsPad2x2GainMapCfg& ConfigV1QuadReg::gm() const { return 
 ConfigV1::ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::CsPad2x2::ConfigV1()
   , m_xtcObj(xtcPtr)
-  , _protectionThreshold(boost::shared_ptr<const PsddlPds::CsPad2x2::ProtectionSystemThreshold>(xtcPtr, &xtcPtr->protectionThreshold()))
+  , _protectionThreshold(psddl_pds2psana::CsPad2x2::pds_to_psana(xtcPtr->protectionThreshold()))
   , _quad(boost::shared_ptr<const PsddlPds::CsPad2x2::ConfigV1QuadReg>(xtcPtr, &xtcPtr->quad()))
 {
 }
@@ -167,7 +151,7 @@ uint32_t ConfigV1::numAsicsStored() const { return m_xtcObj->numAsicsStored(); }
 ConfigV2QuadReg::ConfigV2QuadReg(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::CsPad2x2::ConfigV2QuadReg()
   , m_xtcObj(xtcPtr)
-  , _readOnly(boost::shared_ptr<const PsddlPds::CsPad2x2::CsPad2x2ReadOnlyCfg>(xtcPtr, &xtcPtr->ro()))
+  , _readOnly(psddl_pds2psana::CsPad2x2::pds_to_psana(xtcPtr->ro()))
   , _digitalPots(boost::shared_ptr<const PsddlPds::CsPad2x2::CsPad2x2DigitalPotsCfg>(xtcPtr, &xtcPtr->dp()))
   , _gainMap(boost::shared_ptr<const PsddlPds::CsPad2x2::CsPad2x2GainMapCfg>(xtcPtr, &xtcPtr->gm()))
 {
@@ -231,7 +215,7 @@ const Psana::CsPad2x2::CsPad2x2GainMapCfg& ConfigV2QuadReg::gm() const { return 
 ConfigV2::ConfigV2(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::CsPad2x2::ConfigV2()
   , m_xtcObj(xtcPtr)
-  , _protectionThreshold(boost::shared_ptr<const PsddlPds::CsPad2x2::ProtectionSystemThreshold>(xtcPtr, &xtcPtr->protectionThreshold()))
+  , _protectionThreshold(psddl_pds2psana::CsPad2x2::pds_to_psana(xtcPtr->protectionThreshold()))
   , _quad(boost::shared_ptr<const PsddlPds::CsPad2x2::ConfigV2QuadReg>(xtcPtr, &xtcPtr->quad()))
 {
 }

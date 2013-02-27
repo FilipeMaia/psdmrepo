@@ -11,7 +11,7 @@ namespace psddl_pds2psana {
 namespace EvrData {
 Psana::EvrData::PulseConfig pds_to_psana(PsddlPds::EvrData::PulseConfig pds)
 {
-  return Psana::EvrData::PulseConfig(pds.pulse(), pds.bf_trigger(), pds.bf_set(), pds.bf_clear(), pds.polarity(), pds.map_set_enable(), pds.map_reset_enable(), pds.map_trigger_enable(), pds.prescale(), pds.delay(), pds.width());
+  return Psana::EvrData::PulseConfig(pds.pulse(), pds.trigger(), pds.set(), pds.clear(), pds.polarity(), pds.map_set_enable(), pds.map_reset_enable(), pds.map_trigger_enable(), pds.prescale(), pds.delay(), pds.width());
 }
 
 Psana::EvrData::PulseConfigV3 pds_to_psana(PsddlPds::EvrData::PulseConfigV3 pds)
