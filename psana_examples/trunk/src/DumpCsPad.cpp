@@ -132,8 +132,9 @@ DumpCsPad::beginCalibCycle(Event& evt, Env& env)
       str << "\n  protectionEnable = " << config3->protectionEnable();
       str << "\n  protectionThresholds:";
       for (unsigned i = 0; i < config3->numQuads(); ++ i) {
-        str << "\n    adcThreshold=" << config3->protectionThresholds(i).adcThreshold()
-            << " pixelCountThreshold=" << config3->protectionThresholds(i).pixelCountThreshold();
+        const Psana::CsPad::ProtectionSystemThreshold& thr = config3->protectionThresholds()[i];
+        str << "\n    adcThreshold=" << thr.adcThreshold()
+            << " pixelCountThreshold=" << thr.pixelCountThreshold();
       }
       str << "\n  inactiveRunMode = " << config3->inactiveRunMode();
       str << "\n  activeRunMode = " << config3->activeRunMode();
@@ -170,8 +171,9 @@ DumpCsPad::beginCalibCycle(Event& evt, Env& env)
       str << "\n  protectionEnable = " << config4->protectionEnable();
       str << "\n  protectionThresholds:";
       for (unsigned i = 0; i < config4->numQuads(); ++ i) {
-        str << "\n    adcThreshold=" << config4->protectionThresholds(i).adcThreshold()
-            << " pixelCountThreshold=" << config4->protectionThresholds(i).pixelCountThreshold();
+        const Psana::CsPad::ProtectionSystemThreshold& thr = config4->protectionThresholds()[i];
+        str << "\n    adcThreshold=" << thr.adcThreshold()
+            << " pixelCountThreshold=" << thr.pixelCountThreshold();
       }
       str << "\n  inactiveRunMode = " << config4->inactiveRunMode();
       str << "\n  activeRunMode = " << config4->activeRunMode();
