@@ -85,12 +85,20 @@
         <pstype name="CsPad2x2ReadOnlyCfg">
         
             Class defining read-only configuration.
+
+            <tag name="value-type"/>
         
             <attribute name="_shiftTest" type="uint32_t" accessor="shiftTest">
             </attribute>
 
             <attribute name="_version" type="uint32_t" accessor="version">
             </attribute>
+
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="inline"/>
+                <tag name="auto"/>
+            </ctor>
 
         </pstype>
         
@@ -99,11 +107,19 @@
 
         <pstype name="ProtectionSystemThreshold">
         
+            <tag name="value-type"/>
+        
             <attribute name="_adcThreshold" type="uint32_t" accessor="adcThreshold">
             </attribute>
 
             <attribute name="_pixelCountThreshold" type="uint32_t" accessor="pixelCountThreshold">
             </attribute>
+
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="inline"/>
+                <tag name="auto"/>
+            </ctor>
 
         </pstype>
         

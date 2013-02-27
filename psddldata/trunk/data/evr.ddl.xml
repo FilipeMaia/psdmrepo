@@ -77,7 +77,17 @@
             <ctor>
                 Constructor which takes values for every attribute
                 <tag name="inline"/>
-                <tag name="auto"/>
+                <arg name="pulse" dest="_pulse"/>
+                <arg name="trigger" dest="_bf_trigger" expr="trigger+1" method="trigger"/>
+                <arg name="set" dest="_bf_set" expr="set+1" method="set"/>
+                <arg name="clear" dest="_bf_clear" expr="clear+1" method="clear"/>
+                <arg name="polarity" dest="_bf_polarity"/>
+                <arg name="map_set_enable" dest="_bf_map_set_enable"/>
+                <arg name="map_reset_enable" dest="_bf_map_reset_enable"/>
+                <arg name="map_trigger_enable" dest="_bf_map_trigger_enable"/>
+                <arg name="prescale" dest="_prescale"/>
+                <arg name="delay" dest="_delay"/>
+                <arg name="width" dest="_width"/>
             </ctor>
 
         </pstype>
