@@ -28,8 +28,8 @@ public:
   PulseConfig()
   {
   }
-  PulseConfig(uint32_t arg__pulse, int16_t arg_bf__bf_trigger, int16_t arg_bf__bf_set, int16_t arg_bf__bf_clear, uint8_t arg_bf__bf_polarity, uint8_t arg_bf__bf_map_set_enable, uint8_t arg_bf__bf_map_reset_enable, uint8_t arg_bf__bf_map_trigger_enable, uint32_t arg__prescale, uint32_t arg__delay, uint32_t arg__width)
-    : _pulse(arg__pulse), _input_control((arg_bf__bf_trigger & 0xff)|((arg_bf__bf_set & 0xff)<<8)|((arg_bf__bf_clear & 0xff)<<16)), _output_control((arg_bf__bf_polarity & 0x1)|((arg_bf__bf_map_set_enable & 0x1)<<1)|((arg_bf__bf_map_reset_enable & 0x1)<<2)|((arg_bf__bf_map_trigger_enable & 0x1)<<3)), _prescale(arg__prescale), _delay(arg__delay), _width(arg__width)
+  PulseConfig(uint32_t pulse, int16_t trigger, int16_t set, int16_t clear, uint8_t polarity, uint8_t map_set_enable, uint8_t map_reset_enable, uint8_t map_trigger_enable, uint32_t prescale, uint32_t delay, uint32_t width)
+    : _pulse(pulse), _input_control(((trigger+1) & 0xff)|(((set+1) & 0xff)<<8)|(((clear+1) & 0xff)<<16)), _output_control(((polarity) & 0x1)|(((map_set_enable) & 0x1)<<1)|(((map_reset_enable) & 0x1)<<2)|(((map_trigger_enable) & 0x1)<<3)), _prescale(prescale), _delay(delay), _width(width)
   {
   }
   /** internal pulse generation channel */
@@ -111,8 +111,8 @@ public:
   EventCodeV3()
   {
   }
-  EventCodeV3(uint16_t arg__u16Code, uint8_t arg_bf__bf_isReadout, uint8_t arg_bf__bf_isTerminator, uint32_t arg__u32MaskTrigger, uint32_t arg__u32MaskSet, uint32_t arg__u32MaskClear)
-    : _u16Code(arg__u16Code), _u16MaskEventAttr((arg_bf__bf_isReadout & 0x1)|((arg_bf__bf_isTerminator & 0x1)<<1)), _u32MaskTrigger(arg__u32MaskTrigger), _u32MaskSet(arg__u32MaskSet), _u32MaskClear(arg__u32MaskClear)
+  EventCodeV3(uint16_t arg__u16Code, uint8_t arg__bf_isReadout, uint8_t arg__bf_isTerminator, uint32_t arg__u32MaskTrigger, uint32_t arg__u32MaskSet, uint32_t arg__u32MaskClear)
+    : _u16Code(arg__u16Code), _u16MaskEventAttr(((arg__bf_isReadout) & 0x1)|(((arg__bf_isTerminator) & 0x1)<<1)), _u32MaskTrigger(arg__u32MaskTrigger), _u32MaskSet(arg__u32MaskSet), _u32MaskClear(arg__u32MaskClear)
   {
   }
   uint16_t code() const { return _u16Code; }
@@ -144,8 +144,8 @@ public:
   EventCodeV4()
   {
   }
-  EventCodeV4(uint16_t arg__u16Code, uint8_t arg_bf__bf_isReadout, uint8_t arg_bf__bf_isTerminator, uint32_t arg__u32ReportDelay, uint32_t arg__u32ReportWidth, uint32_t arg__u32MaskTrigger, uint32_t arg__u32MaskSet, uint32_t arg__u32MaskClear)
-    : _u16Code(arg__u16Code), _u16MaskEventAttr((arg_bf__bf_isReadout & 0x1)|((arg_bf__bf_isTerminator & 0x1)<<1)), _u32ReportDelay(arg__u32ReportDelay), _u32ReportWidth(arg__u32ReportWidth), _u32MaskTrigger(arg__u32MaskTrigger), _u32MaskSet(arg__u32MaskSet), _u32MaskClear(arg__u32MaskClear)
+  EventCodeV4(uint16_t arg__u16Code, uint8_t arg__bf_isReadout, uint8_t arg__bf_isTerminator, uint32_t arg__u32ReportDelay, uint32_t arg__u32ReportWidth, uint32_t arg__u32MaskTrigger, uint32_t arg__u32MaskSet, uint32_t arg__u32MaskClear)
+    : _u16Code(arg__u16Code), _u16MaskEventAttr(((arg__bf_isReadout) & 0x1)|(((arg__bf_isTerminator) & 0x1)<<1)), _u32ReportDelay(arg__u32ReportDelay), _u32ReportWidth(arg__u32ReportWidth), _u32MaskTrigger(arg__u32MaskTrigger), _u32MaskSet(arg__u32MaskSet), _u32MaskClear(arg__u32MaskClear)
   {
   }
   uint16_t code() const { return _u16Code; }
@@ -182,8 +182,8 @@ public:
   EventCodeV5()
   {
   }
-  EventCodeV5(uint16_t arg__u16Code, uint8_t arg_bf__bf_isReadout, uint8_t arg_bf__bf_isCommand, uint8_t arg_bf__bf_isLatch, uint32_t arg__u32ReportDelay, uint32_t arg__u32ReportWidth, uint32_t arg__u32MaskTrigger, uint32_t arg__u32MaskSet, uint32_t arg__u32MaskClear, const char* arg__desc)
-    : _u16Code(arg__u16Code), _u16MaskEventAttr((arg_bf__bf_isReadout & 0x1)|((arg_bf__bf_isCommand & 0x1)<<1)|((arg_bf__bf_isLatch & 0x1)<<2)), _u32ReportDelay(arg__u32ReportDelay), _u32ReportWidth(arg__u32ReportWidth), _u32MaskTrigger(arg__u32MaskTrigger), _u32MaskSet(arg__u32MaskSet), _u32MaskClear(arg__u32MaskClear)
+  EventCodeV5(uint16_t arg__u16Code, uint8_t arg__bf_isReadout, uint8_t arg__bf_isCommand, uint8_t arg__bf_isLatch, uint32_t arg__u32ReportDelay, uint32_t arg__u32ReportWidth, uint32_t arg__u32MaskTrigger, uint32_t arg__u32MaskSet, uint32_t arg__u32MaskClear, const char* arg__desc)
+    : _u16Code(arg__u16Code), _u16MaskEventAttr(((arg__bf_isReadout) & 0x1)|(((arg__bf_isCommand) & 0x1)<<1)|(((arg__bf_isLatch) & 0x1)<<2)), _u32ReportDelay(arg__u32ReportDelay), _u32ReportWidth(arg__u32ReportWidth), _u32MaskTrigger(arg__u32MaskTrigger), _u32MaskSet(arg__u32MaskSet), _u32MaskClear(arg__u32MaskClear)
   {
     std::copy(arg__desc, arg__desc+(16), _desc);
   }
@@ -226,8 +226,8 @@ public:
   EventCodeV6()
   {
   }
-  EventCodeV6(uint16_t arg__u16Code, uint8_t arg_bf__bf_isReadout, uint8_t arg_bf__bf_isCommand, uint8_t arg_bf__bf_isLatch, uint32_t arg__u32ReportDelay, uint32_t arg__u32ReportWidth, uint32_t arg__u32MaskTrigger, uint32_t arg__u32MaskSet, uint32_t arg__u32MaskClear, const char* arg__desc, uint16_t arg__u16ReadGroup)
-    : _u16Code(arg__u16Code), _u16MaskEventAttr((arg_bf__bf_isReadout & 0x1)|((arg_bf__bf_isCommand & 0x1)<<1)|((arg_bf__bf_isLatch & 0x1)<<2)), _u32ReportDelay(arg__u32ReportDelay), _u32ReportWidth(arg__u32ReportWidth), _u32MaskTrigger(arg__u32MaskTrigger), _u32MaskSet(arg__u32MaskSet), _u32MaskClear(arg__u32MaskClear), _u16ReadGroup(arg__u16ReadGroup)
+  EventCodeV6(uint16_t arg__u16Code, uint8_t arg__bf_isReadout, uint8_t arg__bf_isCommand, uint8_t arg__bf_isLatch, uint32_t arg__u32ReportDelay, uint32_t arg__u32ReportWidth, uint32_t arg__u32MaskTrigger, uint32_t arg__u32MaskSet, uint32_t arg__u32MaskClear, const char* arg__desc, uint16_t arg__u16ReadGroup)
+    : _u16Code(arg__u16Code), _u16MaskEventAttr(((arg__bf_isReadout) & 0x1)|(((arg__bf_isCommand) & 0x1)<<1)|(((arg__bf_isLatch) & 0x1)<<2)), _u32ReportDelay(arg__u32ReportDelay), _u32ReportWidth(arg__u32ReportWidth), _u32MaskTrigger(arg__u32MaskTrigger), _u32MaskSet(arg__u32MaskSet), _u32MaskClear(arg__u32MaskClear), _u16ReadGroup(arg__u16ReadGroup)
   {
     std::copy(arg__desc, arg__desc+(16), _desc);
   }
@@ -280,8 +280,8 @@ public:
   OutputMap()
   {
   }
-  OutputMap(EvrData::OutputMap::Source arg_bf__bf_source, uint8_t arg_bf__bf_source_id, EvrData::OutputMap::Conn arg_bf__bf_conn, uint8_t arg_bf__bf_conn_id)
-    : _v((arg_bf__bf_source & 0xff)|((arg_bf__bf_source_id & 0xff)<<8)|((arg_bf__bf_conn & 0xff)<<16)|((arg_bf__bf_conn_id & 0xff)<<24))
+  OutputMap(EvrData::OutputMap::Source arg__bf_source, uint8_t arg__bf_source_id, EvrData::OutputMap::Conn arg__bf_conn, uint8_t arg__bf_conn_id)
+    : _v(((arg__bf_source) & 0xff)|(((arg__bf_source_id) & 0xff)<<8)|(((arg__bf_conn) & 0xff)<<16)|(((arg__bf_conn_id) & 0xff)<<24))
   {
   }
   uint32_t value() const { return _v; }
@@ -316,8 +316,8 @@ public:
   OutputMapV2()
   {
   }
-  OutputMapV2(EvrData::OutputMapV2::Source arg_bf__bf_source, uint8_t arg_bf__bf_source_id, EvrData::OutputMapV2::Conn arg_bf__bf_conn, uint8_t arg_bf__bf_conn_id, uint8_t arg_bf__bf_module)
-    : _v((arg_bf__bf_source & 0xf)|((arg_bf__bf_source_id & 0xff)<<4)|((arg_bf__bf_conn & 0xf)<<12)|((arg_bf__bf_conn_id & 0xff)<<16)|((arg_bf__bf_module & 0xff)<<24))
+  OutputMapV2(EvrData::OutputMapV2::Source arg__bf_source, uint8_t arg__bf_source_id, EvrData::OutputMapV2::Conn arg__bf_conn, uint8_t arg__bf_conn_id, uint8_t arg__bf_module)
+    : _v(((arg__bf_source) & 0xf)|(((arg__bf_source_id) & 0xff)<<4)|(((arg__bf_conn) & 0xf)<<12)|(((arg__bf_conn_id) & 0xff)<<16)|(((arg__bf_module) & 0xff)<<24))
   {
   }
   uint32_t value() const { return _v; }
@@ -436,7 +436,7 @@ public:
   {
   }
   SequencerEntry(uint32_t eventcode, uint32_t delay)
-    : _value((delay & 0xffffff)|((eventcode & 0xff)<<24))
+    : _value(((delay) & 0xffffff)|(((eventcode) & 0xff)<<24))
   {
   }
   uint32_t delay() const { return uint32_t(this->_value & 0xffffff); }

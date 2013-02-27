@@ -9,12 +9,6 @@ namespace CsPad {
 CsPadDigitalPotsCfg::~CsPadDigitalPotsCfg() {}
 
 
-CsPadReadOnlyCfg::~CsPadReadOnlyCfg() {}
-
-
-ProtectionSystemThreshold::~ProtectionSystemThreshold() {}
-
-
 CsPadGainMapCfg::~CsPadGainMapCfg() {}
 
 

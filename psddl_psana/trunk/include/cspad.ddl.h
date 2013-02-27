@@ -78,9 +78,16 @@ public:
 
 class CsPadReadOnlyCfg {
 public:
-  virtual ~CsPadReadOnlyCfg();
-  virtual uint32_t shiftTest() const = 0;
-  virtual uint32_t version() const = 0;
+  CsPadReadOnlyCfg(uint32_t arg__shiftTest, uint32_t arg__version)
+    : _shiftTest(arg__shiftTest), _version(arg__version)
+  {
+  }
+  uint32_t shiftTest() const { return _shiftTest; }
+  uint32_t version() const { return _version; }
+  static uint32_t _sizeof()  { return 8; }
+private:
+  uint32_t	_shiftTest;
+  uint32_t	_version;
 };
 
 /** @class ProtectionSystemThreshold
@@ -91,9 +98,16 @@ public:
 
 class ProtectionSystemThreshold {
 public:
-  virtual ~ProtectionSystemThreshold();
-  virtual uint32_t adcThreshold() const = 0;
-  virtual uint32_t pixelCountThreshold() const = 0;
+  ProtectionSystemThreshold(uint32_t arg__adcThreshold, uint32_t arg__pixelCountThreshold)
+    : _adcThreshold(arg__adcThreshold), _pixelCountThreshold(arg__pixelCountThreshold)
+  {
+  }
+  uint32_t adcThreshold() const { return _adcThreshold; }
+  uint32_t pixelCountThreshold() const { return _pixelCountThreshold; }
+  static uint32_t _sizeof()  { return 8; }
+private:
+  uint32_t	_adcThreshold;
+  uint32_t	_pixelCountThreshold;
 };
 
 /** @class CsPadGainMapCfg
@@ -248,7 +262,7 @@ public:
   virtual uint32_t concentratorVersion() const = 0;
   virtual uint32_t runDelay() const = 0;
   virtual uint32_t eventCode() const = 0;
-  virtual const CsPad::ProtectionSystemThreshold& protectionThresholds(uint32_t i0) const = 0;
+  virtual ndarray<const CsPad::ProtectionSystemThreshold, 1> protectionThresholds() const = 0;
   virtual uint32_t protectionEnable() const = 0;
   virtual uint32_t inactiveRunMode() const = 0;
   virtual uint32_t activeRunMode() const = 0;
@@ -268,8 +282,6 @@ public:
   virtual uint32_t numQuads() const = 0;
   /** Total number of sections (2x1) in all quadrants */
   virtual uint32_t numSect() const = 0;
-  /** Method which returns the shape (dimensions) of the data returned by protectionThresholds() method. */
-  virtual std::vector<int> protectionThresholds_shape() const = 0;
   /** Method which returns the shape (dimensions) of the data returned by quads() method. */
   virtual std::vector<int> quads_shape() const = 0;
 };
@@ -288,7 +300,7 @@ public:
   virtual uint32_t concentratorVersion() const = 0;
   virtual uint32_t runDelay() const = 0;
   virtual uint32_t eventCode() const = 0;
-  virtual const CsPad::ProtectionSystemThreshold& protectionThresholds(uint32_t i0) const = 0;
+  virtual ndarray<const CsPad::ProtectionSystemThreshold, 1> protectionThresholds() const = 0;
   virtual uint32_t protectionEnable() const = 0;
   virtual uint32_t inactiveRunMode() const = 0;
   virtual uint32_t activeRunMode() const = 0;
@@ -308,8 +320,6 @@ public:
   virtual uint32_t numQuads() const = 0;
   /** Total number of sections (2x1) in all quadrants */
   virtual uint32_t numSect() const = 0;
-  /** Method which returns the shape (dimensions) of the data returned by protectionThresholds() method. */
-  virtual std::vector<int> protectionThresholds_shape() const = 0;
   /** Method which returns the shape (dimensions) of the data returned by quads() method. */
   virtual std::vector<int> quads_shape() const = 0;
 };

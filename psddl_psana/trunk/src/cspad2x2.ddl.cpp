@@ -9,12 +9,6 @@ namespace CsPad2x2 {
 CsPad2x2DigitalPotsCfg::~CsPad2x2DigitalPotsCfg() {}
 
 
-CsPad2x2ReadOnlyCfg::~CsPad2x2ReadOnlyCfg() {}
-
-
-ProtectionSystemThreshold::~ProtectionSystemThreshold() {}
-
-
 CsPad2x2GainMapCfg::~CsPad2x2GainMapCfg() {}
 
 

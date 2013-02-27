@@ -78,9 +78,16 @@ public:
 
 class CsPad2x2ReadOnlyCfg {
 public:
-  virtual ~CsPad2x2ReadOnlyCfg();
-  virtual uint32_t shiftTest() const = 0;
-  virtual uint32_t version() const = 0;
+  CsPad2x2ReadOnlyCfg(uint32_t arg__shiftTest, uint32_t arg__version)
+    : _shiftTest(arg__shiftTest), _version(arg__version)
+  {
+  }
+  uint32_t shiftTest() const { return _shiftTest; }
+  uint32_t version() const { return _version; }
+  static uint32_t _sizeof()  { return 8; }
+private:
+  uint32_t	_shiftTest;
+  uint32_t	_version;
 };
 
 /** @class ProtectionSystemThreshold
@@ -91,9 +98,16 @@ public:
 
 class ProtectionSystemThreshold {
 public:
-  virtual ~ProtectionSystemThreshold();
-  virtual uint32_t adcThreshold() const = 0;
-  virtual uint32_t pixelCountThreshold() const = 0;
+  ProtectionSystemThreshold(uint32_t arg__adcThreshold, uint32_t arg__pixelCountThreshold)
+    : _adcThreshold(arg__adcThreshold), _pixelCountThreshold(arg__pixelCountThreshold)
+  {
+  }
+  uint32_t adcThreshold() const { return _adcThreshold; }
+  uint32_t pixelCountThreshold() const { return _pixelCountThreshold; }
+  static uint32_t _sizeof()  { return 8; }
+private:
+  uint32_t	_adcThreshold;
+  uint32_t	_pixelCountThreshold;
 };
 
 /** @class CsPad2x2GainMapCfg

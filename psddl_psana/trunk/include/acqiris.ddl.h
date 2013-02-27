@@ -285,8 +285,8 @@ public:
   TdcChannel()
   {
   }
-  TdcChannel(uint32_t arg__channel, Acqiris::TdcChannel::Slope arg_bf__bf_slope, Acqiris::TdcChannel::Mode arg_bf__bf_mode, double arg__level)
-    : _channel(arg__channel), _mode((arg_bf__bf_slope & 0x1)|((arg_bf__bf_mode & 0x1)<<31)), _level(arg__level)
+  TdcChannel(uint32_t arg__channel, Acqiris::TdcChannel::Slope arg__bf_slope, Acqiris::TdcChannel::Mode arg__bf_mode, double arg__level)
+    : _channel(arg__channel), _mode(((arg__bf_slope) & 0x1)|(((arg__bf_mode) & 0x1)<<31)), _level(arg__level)
   {
   }
   /** Channel type as integer number, clients should use channel() method instead. */
@@ -442,8 +442,8 @@ public:
   TdcDataV1_Item()
   {
   }
-  TdcDataV1_Item(uint32_t arg_bf__bf_val, Acqiris::TdcDataV1_Item::Source arg_bf__bf_source, uint8_t arg_bf__bf_ovf)
-    : _value((arg_bf__bf_val & 0xfffffff)|((arg_bf__bf_source & 0x7)<<28)|((arg_bf__bf_ovf & 0x1)<<31))
+  TdcDataV1_Item(uint32_t arg__bf_val, Acqiris::TdcDataV1_Item::Source arg__bf_source, uint8_t arg__bf_ovf)
+    : _value(((arg__bf_val) & 0xfffffff)|(((arg__bf_source) & 0x7)<<28)|(((arg__bf_ovf) & 0x1)<<31))
   {
   }
   /** Value as integer number whiis composed of several bit fields. Do not use value directly,
