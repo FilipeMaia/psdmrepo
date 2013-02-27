@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-59
+2013-02-27 Andy Salnikov
+- my last fix did not work weel enough, here is a fix for that fix
+
 Tag: V00-00-58
 2013-02-27 Andy Salnikov
 - use smarter event distribution in multi-process mode. When ready each 

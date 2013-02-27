@@ -146,7 +146,8 @@ def _proc(jobname, id, pipes, userObjects, jobConfig, expNameProvider, idQueue):
 
             # say we are ready again, producer consumes IDs from a queue only on L1Accept
             # transitions, make sure that we do not put too many IDs to a queue
-            if idQueue is not None: idQueue.put(id)
+            if evt.seq().service() == xtc.TransitionId.L1Accept:
+                if idQueue is not None: idQueue.put(id)
 
         elif req[0] == OP_FINISH :
             
