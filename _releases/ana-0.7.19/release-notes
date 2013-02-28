@@ -1,0 +1,3 @@
+- fix to SConsTools psdm_python tool broken by previous release
+- pyana uses new algorithm for distributings event data to worker
+  processes in multi-process mode
