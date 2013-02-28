@@ -1,0 +1,2 @@
+- switch to hdfview 2.9 to get java 7
+- fix for missing conversion for cspad2x2.ConfigV2 type
