@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-06-01
+2013-02-28 Andy Salnikov
+- in CsPad2x2Pedestals chack for ConfigV2 as well
+
 Tag: V00-06-00
 2013-01-30 Andy Salnikov
 - switching to const ndarrays for array data

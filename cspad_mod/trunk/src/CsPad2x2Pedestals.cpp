@@ -81,13 +81,18 @@ CsPad2x2Pedestals::beginRun(Event& evt, Env& env)
   Source src(configStr("source", "DetInfo(:Cspad2x2)"));
   int count = 0;
   
-  // cspad2x2 data could come with either CsPad2x2::ConfigV1 or CsPad::ConfigV3
+  // cspad2x2 data could come with either CsPad2x2::ConfigV* or CsPad::ConfigV3
   // configuration (latter happened for brief period)
   shared_ptr<Psana::CsPad2x2::ConfigV1> config1 = env.configStore().get(src, &m_src);
   if (config1.get()) {
     ++ count;
   }
   
+  shared_ptr<Psana::CsPad2x2::ConfigV2> config2 = env.configStore().get(src, &m_src);
+  if (config2.get()) {
+    ++ count;
+  }
+
   shared_ptr<Psana::CsPad::ConfigV3> config3 = env.configStore().get(src, &m_src);
   if (config3.get()) {
     ++ count;
