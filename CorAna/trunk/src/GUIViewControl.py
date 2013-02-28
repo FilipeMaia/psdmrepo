@@ -81,7 +81,7 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.but_QP_st         = QtGui.QPushButton('Q-Phi stat')
         self.but_P_dy          = QtGui.QPushButton('Phi dyna')
         self.but_Q_dy          = QtGui.QPushButton('Q dyna')
-        self.but_QP_dy         = QtGui.QPushButton('Q-Phi stat')
+        self.but_QP_dy         = QtGui.QPushButton('Q-Phi dyna')
         self.but_1oIp          = QtGui.QPushButton('1/<Ip> stat')
         self.but_1oIf          = QtGui.QPushButton('1/<If> stat')
         self.but_g2map         = QtGui.QPushButton('g2 map')
@@ -91,6 +91,7 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.but_mask_img_lims = QtGui.QPushButton('Image lims')
         self.but_mask_blemish  = QtGui.QPushButton('Blemish')
         self.but_mask_hotpix   = QtGui.QPushButton('Hot pixels')
+        self.but_mask_satpix   = QtGui.QPushButton('Satt. pixs')
         self.but_mask_roi      = QtGui.QPushButton('ROI')
         self.but_mask_total    = QtGui.QPushButton('Total')
 
@@ -135,7 +136,8 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.grid.addWidget(self.but_mask_img_lims,self.grid_row+6, 1)
         self.grid.addWidget(self.but_mask_blemish, self.grid_row+6, 2)
         self.grid.addWidget(self.but_mask_hotpix,  self.grid_row+6, 3)
-        self.grid.addWidget(self.but_mask_roi,     self.grid_row+6, 4)
+        self.grid.addWidget(self.but_mask_satpix,  self.grid_row+6, 4)
+        self.grid.addWidget(self.but_mask_roi,     self.grid_row+6, 5)
         self.grid.addWidget(self.but_mask_total,   self.grid_row+6, 6)
 
         self.grid.addWidget(self.tit_calc,         self.grid_row+7, 0)
@@ -175,6 +177,7 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.connect(self.but_mask_img_lims,QtCore.SIGNAL('clicked()'),         self.onButView )
         self.connect(self.but_mask_blemish, QtCore.SIGNAL('clicked()'),         self.onButView )
         self.connect(self.but_mask_hotpix,  QtCore.SIGNAL('clicked()'),         self.onButView )
+        self.connect(self.but_mask_satpix,  QtCore.SIGNAL('clicked()'),         self.onButView )
         self.connect(self.but_mask_roi,     QtCore.SIGNAL('clicked()'),         self.onButView )
         self.connect(self.but_mask_total,   QtCore.SIGNAL('clicked()'),         self.onButView )
         self.connect(self.sli,              QtCore.SIGNAL('valueChanged(int)'), self.onSlider  )
@@ -266,6 +269,7 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.but_mask_img_lims.setStyleSheet(cp.styleButton)
         self.but_mask_blemish .setStyleSheet(cp.styleButton)
         self.but_mask_hotpix  .setStyleSheet(cp.styleButton)
+        self.but_mask_satpix  .setStyleSheet(cp.styleButton)
         self.but_mask_roi     .setStyleSheet(cp.styleButton)
         self.but_mask_total   .setStyleSheet(cp.styleButton)
 
@@ -350,8 +354,9 @@ class GUIViewControl ( QtGui.QWidget ) :
         elif self.g_ind == 30 : self.arr2d = self.vr.get_mask_image_limits()
         elif self.g_ind == 31 : self.arr2d = self.vr.get_mask_blemish()
         elif self.g_ind == 32 : self.arr2d = self.vr.get_mask_hotpix()
-        elif self.g_ind == 33 : self.arr2d = self.vr.get_mask_roi()
-        elif self.g_ind == 34 : self.arr2d = self.vr.get_mask_total()
+        elif self.g_ind == 33 : self.arr2d = self.vr.get_mask_satpix()
+        elif self.g_ind == 34 : self.arr2d = self.vr.get_mask_roi()
+        elif self.g_ind == 35 : self.arr2d = self.vr.get_mask_total()
 
 
         else :
@@ -402,8 +407,9 @@ class GUIViewControl ( QtGui.QWidget ) :
         elif self.but_mask_img_lims.hasFocus() : self.selectedOption( 30, 'Mask image limits')
         elif self.but_mask_blemish .hasFocus() : self.selectedOption( 31, 'Mask blemish')
         elif self.but_mask_hotpix  .hasFocus() : self.selectedOption( 32, 'Mask hot pixels')
-        elif self.but_mask_roi     .hasFocus() : self.selectedOption( 33, 'Mask for good regions')
-        elif self.but_mask_total   .hasFocus() : self.selectedOption( 34, 'Mask total')
+        elif self.but_mask_satpix  .hasFocus() : self.selectedOption( 33, 'Mask satturated pixels')
+        elif self.but_mask_roi     .hasFocus() : self.selectedOption( 34, 'Mask for good regions')
+        elif self.but_mask_total   .hasFocus() : self.selectedOption( 35, 'Mask total')
         else :
             logger.warning('Request for non-implemented button ...', __name__)
 

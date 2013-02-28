@@ -74,7 +74,7 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
         if cp.ana_mask_type.value() == self.list_mask_types[0] : self.rad_mask_none.setChecked(True)
         if cp.ana_mask_type.value() == self.list_mask_types[1] : self.rad_mask_file.setChecked(True)
 
-        self.but_mask_poly = QtGui.QPushButton('ROI Mask')
+        self.but_mask_poly = QtGui.QPushButton('ROI Mask Editor')
         self.but_browser   = QtGui.QPushButton('Browser')
         self.edi_mask_file = QtGui.QLineEdit( fnm.path_roi_mask() )       
         self.edi_mask_file.setReadOnly( True )  

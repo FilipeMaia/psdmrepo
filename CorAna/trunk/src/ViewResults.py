@@ -30,7 +30,7 @@ import sys
 import os
 import math
 import numpy as np
-import numpy.ma as ma
+#import numpy.ma as ma
 
 from ConfigParametersCorAna   import confpars as cp
 from Logger                   import logger
@@ -61,7 +61,7 @@ def valueToIndex(V,VRange) :
     factor = float(Nbins) / float(Vmax-Vmin)
     return np.uint32( factor * (V-Vmin) )
 
-def valueToIndexProtected(V,VRange) :
+def valueToIndexProtected(V, VRange) :
     Vmin, Vmax, Nbins = VRange
     Nbins1 = int(Nbins)-1
     factor = float(Nbins) / float(Vmax-Vmin)
@@ -69,21 +69,34 @@ def valueToIndexProtected(V,VRange) :
     #return np.select([V<Vmin,V>Vmax], [0,Nbins-1], default=indarr)
     return np.select([indarr<0, indarr>Nbins1], [0,Nbins1], default=indarr)
 
+def valueToIndexMasked(V, VRange, mask=None) :
+    Vmin, Vmax, Nbins = VRange
+    Nbins1 = int(Nbins)-1
+    factor = float(Nbins) / float(Vmax-Vmin)
+    indarr = np.int32( factor * (V-Vmin) )
+    return np.select([mask==0, indarr<0, indarr>Nbins1], [Nbins, Nbins, Nbins], default=indarr)
+    #return np.select([mask==0, indarr<0, indarr>Nbins1], [0, 0, 0], default=indarr)
 
 def get_limits_for_masked_array(map, mask=None) :
-    if mask==None : return map.min(), map.max()
-    else          : return map.min(), map.max()
+    if mask==None :
+        return map.min(), map.max()
+    else :
+        arrm = map[mask==1]
+        return arrm.min(), arrm.max()
+
+def q_map_partitions(map, nbins, mask=None) :
+    q_min, q_max = get_limits_for_masked_array(map, mask)
+    #print 'q_min, q_max = ', q_min, q_max
+    #if mask == None : map_for_binning = map
+    #else            : map_for_binning = map*mask
+    return valueToIndexMasked(map, [q_min, q_max, nbins], mask)
 
 
-def q_map_partitions(map, nbins) :
-    q_min = map.min()
-    q_max = map.max()
-    return valueToIndexProtected(map, [q_min, q_max, nbins])
-
-def phi_map_partitions(map, nbins) :
-    phi_min = -180.
-    phi_max =  180.
-    return valueToIndexProtected(map, [phi_min, phi_max, nbins])
+def phi_map_partitions(map, nbins, mask=None) :
+    #phi_min, phi_max = -180., 180.
+    phi_min, phi_max = get_limits_for_masked_array(map, mask)
+    #print 'phi_min, phi_max = ', phi_min, phi_max
+    return valueToIndexMasked(map, [phi_min, phi_max, nbins], mask)
  
 #-----------------------------
 
@@ -351,13 +364,13 @@ class ViewResults :
 
     def get_q_map_for_stat_bins(sp) :
         if sp.q_map_stat != None : return sp.q_map_stat
-        sp.q_map_stat = q_map_partitions(sp.get_q_map()*sp.get_mask_total(), sp.ana_stat_part_q)
+        sp.q_map_stat = q_map_partitions(sp.get_q_map(), sp.ana_stat_part_q, sp.get_mask_total())
         return sp.q_map_stat
 
 
     def get_phi_map_for_stat_bins(sp) :
         if sp.phi_map_stat != None : return sp.phi_map_stat
-        sp.phi_map_stat = phi_map_partitions(sp.get_phi_map(), sp.ana_stat_part_phi)
+        sp.phi_map_stat = phi_map_partitions(sp.get_phi_map(), sp.ana_stat_part_phi, sp.get_mask_total())
         return sp.phi_map_stat
 
 
@@ -378,13 +391,13 @@ class ViewResults :
 
     def get_q_map_for_dyna_bins(sp) :
         if sp.q_map_dyna != None : return sp.q_map_dyna
-        sp.q_map_dyna = q_map_partitions(sp.get_q_map()*sp.get_mask_total(), sp.ana_dyna_part_q)
+        sp.q_map_dyna = q_map_partitions(sp.get_q_map(), sp.ana_dyna_part_q, sp.get_mask_total())
         return sp.q_map_dyna
 
 
     def get_phi_map_for_dyna_bins(sp) :
         if sp.phi_map_dyna != None : return sp.phi_map_dyna
-        sp.phi_map_dyna = phi_map_partitions(sp.get_phi_map(), sp.ana_dyna_part_phi)
+        sp.phi_map_dyna = phi_map_partitions(sp.get_phi_map(), sp.ana_dyna_part_phi, sp.get_mask_total())
         return sp.phi_map_dyna
 
   
@@ -436,7 +449,7 @@ class ViewResults :
     def get_norm_factor_map_for_stat_bins_itau(sp, intens_map) :
         q_phi_map_stat = sp.get_q_phi_map_for_stat_bins()
         counts = sp.get_counts_for_stat_bins()
-
+        # print 'counts = ', counts
         intens = sp.bincount(q_phi_map_stat, intens_map, sp.npart_stat)
         intens_prot = np.select([intens<=0.], [-1.], default=intens)
         normf = np.select([intens_prot<=0.], [0.], default=counts/intens_prot)
@@ -502,7 +515,7 @@ class ViewResults :
     def bincount(sp, map_bins, map_weights=None, length=None) :
         if map_weights == None : weights = None
         else                   : weights = map_weights.flatten() 
-
+        
         bin_count = np.bincount(map_bins.flatten(), weights, length)
         #print 'bin_count:\n',      bin_count
         #print 'bin_count.shape =', bin_count.shape
@@ -623,13 +636,18 @@ class ViewResults :
         return sp.get_random_binomial_img(p=0.99)
 
 
+    def get_mask_satpix(sp) :
+        #sp.mask_satpix = gu.get_array_from_file(fnm.path_satpix())
+        #return sp.mask_satpix
+        msg = 'get_mask_satpix IS NOT IMPLEMENTED YET! get random binomial for now...'
+        logger.warning(msg, __name__)
+        print 'WOARNING: ' + msg
+        #return sp.get_random_img()
+        return sp.get_random_binomial_img(p=0.98)
+
+
     def get_mask_roi(sp) :
-
-        #msg = 'get_mask_regs IS NOT IMPLEMENTED YET! get random binomial for now...'
-        #logger.warning(msg, __name__)
-        #print 'WOARNING: ' + msg
         #return sp.get_random_binomial_img(p=0.50)
-
         if sp.mask_roi != None : return sp.mask_roi
         if cp.ana_mask_type.value() == 'from-file':
             sp.mask_roi = gu.get_array_from_file(fnm.path_roi_mask())
@@ -649,10 +667,8 @@ class ViewResults :
             sp.mask_total *= sp.get_mask_blemish()
         if cp.ana_mask_type.value() == 'from-file' :
             sp.mask_total *= sp.get_mask_roi()
-
-
-
-
+        sp.mask_total *= sp.get_mask_hotpix()
+        sp.mask_total *= sp.get_mask_satpix()
  
         return sp.mask_total
 
