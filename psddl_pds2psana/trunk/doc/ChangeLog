@@ -11,6 +11,14 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-11
+2013-02-28 Andy Salnikov
+- merge V00-05-10 into main trunk
+
+Tag: V00-05-10 (from branch BV00-05-03)
+2013-02-28 Andy Salnikov
+- add forgotten CsPad2x2::ConfigV2 to Xtcconverter
+
 Tag: V00-05-07
 2013-02-26 Andy Salnikov
 - regenerate whole thing from psddldata V00-04-07
