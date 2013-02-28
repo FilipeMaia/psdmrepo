@@ -698,6 +698,7 @@ XtcConverter::convertConfig(const boost::shared_ptr<Pds::Xtc>& xtc, PSEnv::EnvOb
     break;
   case Pds::TypeId::Id_Cspad2x2Config:
     if (version == 1) ::storeCfgObject<CsPad2x2::ConfigV1>(xtc, cfgStore);
+    if (version == 2) ::storeCfgObject<CsPad2x2::ConfigV2>(xtc, cfgStore);
     break;
   case Pds::TypeId::Id_FexampConfig:
     break;
