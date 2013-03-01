@@ -61,7 +61,6 @@ namespace XtcInput {
 //----------------
 XtcStreamDgIter::XtcStreamDgIter(const boost::shared_ptr<ChunkFileIterI>& chunkIter)
   : m_chunkIter(chunkIter)
-  , m_file()
   , m_dgiter()
   , m_count(0)
   , m_headerQueue()
@@ -78,28 +77,21 @@ XtcStreamDgIter::~XtcStreamDgIter ()
 
 // read next datagram, return zero pointer after last file has been read,
 // throws exception for errors.
-Dgram::ptr
+Dgram
 XtcStreamDgIter::next()
 {
   // call other method to fill up and sort the queue
   readAhead();
 
   // pop one datagram if queue is not empty
-  Dgram::ptr dgram;
+  Dgram dgram;
   if (not m_headerQueue.empty()) {
     boost::shared_ptr<DgHeader> hptr = m_headerQueue.front();
     m_headerQueue.erase(m_headerQueue.begin());
-    dgram = hptr->dgram();
+    dgram = Dgram(hptr->dgram(), hptr->path());
   }
 
   return dgram ;
-}
-
-// get current file name
-XtcFileName
-XtcStreamDgIter::chunkName() const
-{
-  return m_file ;
 }
 
 // fill the read-ahead queue
@@ -112,14 +104,14 @@ XtcStreamDgIter::readAhead()
     if (not m_dgiter) {
 
       // get next file name
-      m_file = m_chunkIter->next();
+      const XtcFileName& file = m_chunkIter->next();
 
       // if no more file then stop
-      if (m_file.path().empty()) break ;
+      if (file.path().empty()) break ;
 
       // open next xtc file if there is none open
-      MsgLog(logger, trace, "processing file: " << m_file) ;
-      m_dgiter = boost::make_shared<XtcChunkDgIter>(m_file.path(), m_chunkIter->liveTimeout());
+      MsgLog(logger, trace, "processing file: " << file) ;
+      m_dgiter = boost::make_shared<XtcChunkDgIter>(file, m_chunkIter->liveTimeout());
       m_count = 0 ;
     }
 

@@ -20,7 +20,6 @@
 #include <unistd.h>
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
-#include <boost/filesystem.hpp>
 
 //----------------------
 // Base Class Headers --
@@ -29,6 +28,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "XtcInput/XtcFileName.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -76,12 +76,12 @@ public:
    *  reset to 0 (meaning that file is closed and does not need timeouts
    *  when reading).
    */
-  SharedFile(const boost::filesystem::path& path, unsigned liveTimeout = 0)
+  SharedFile(const XtcFileName& path, unsigned liveTimeout = 0)
     : m_impl(boost::make_shared<SharedFileImpl>(path, liveTimeout))
   {}
 
   /// Return file name
-  const boost::filesystem::path& path() const { return m_impl->path; }
+  const XtcFileName& path() const { return m_impl->path; }
 
   /// Return file descriptor
   int fd() const { return m_impl ? m_impl->fd : -1; }
@@ -111,9 +111,9 @@ protected:
 private:
 
   struct SharedFileImpl {
-    SharedFileImpl(const boost::filesystem::path& argPath, unsigned argLiveTimeout);
+    SharedFileImpl(const XtcFileName& argPath, unsigned argLiveTimeout);
     ~SharedFileImpl();
-    boost::filesystem::path path;
+    XtcFileName path;
     unsigned liveTimeout;
     int fd;
   };

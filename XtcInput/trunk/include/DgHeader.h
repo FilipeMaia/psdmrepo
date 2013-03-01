@@ -25,6 +25,7 @@
 #include "pdsdata/xtc/Dgram.hh"
 #include "XtcInput/SharedFile.h"
 #include "XtcInput/Dgram.h"
+#include "XtcInput/XtcFileName.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -81,6 +82,9 @@ public:
 
   /// Reads complete datagram into memory
   Dgram::ptr dgram();
+
+  /// Get file name for this header
+  const XtcFileName& path() const { return m_file.path(); }
 
 protected:
 

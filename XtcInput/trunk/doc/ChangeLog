@@ -11,9 +11,22 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-00
+2013-03-01 Andy Salnikov
+- undo V00-07-03 to make a tag for ana-0.7.x
+- after introduction of read-ahead for headers current file name 
+  does not make sense anymore
+  - removed XtcStreamDgIter::m_file member and method 
+    XtcStreamDgIter::chunkName()
+  - added DgHeader::path() method which should be used instead 
+    of XtcStreamDgIter::chunkName()
+  - replace boost::filesystem::path with XtcFileName in DgHeader
+  - XtcFileName adds extension() method
+  - XtcStreamDgIter::next() return Dgram object instead of Dgram::ptr
+
 Tag: V00-07-03
 2013-02-12 Andy Salnikov
-- use new Dataset functionality to find the list of files instead of 
+- use new Dataset functionality to find the list of files instead of
   own algorithm
 
 Tag: V00-07-02

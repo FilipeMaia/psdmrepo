@@ -14,7 +14,7 @@
 // C/C++ Headers --
 //-----------------
 #include <string>
-#include <list>
+#include <vector>
 #include <cstdio>
 #include <boost/utility.hpp>
 #include <boost/shared_ptr.hpp>
@@ -83,10 +83,7 @@ public:
    *  @throw XTCReadException Thrown for any read errors
    *  @throw XTCLiveTimeout Thrown for timeout during live data reading
    */
-  Dgram::ptr next() ;
-
-  /// Get file name of currently open chunk
-  XtcFileName chunkName() const ;
+  Dgram next() ;
 
 protected:
 
@@ -101,7 +98,6 @@ private:
   typedef std::vector<boost::shared_ptr<DgHeader> > HeaderQueue;
 
   boost::shared_ptr<ChunkFileIterI> m_chunkIter;  ///< Iterator over chunk file names
-  XtcFileName m_file;                   ///< Name of the current chunk
   boost::shared_ptr<XtcChunkDgIter> m_dgiter ;  ///< Datagram iterator for current chunk
   uint64_t m_count ;                    ///< Datagram counter for current chunk
   HeaderQueue m_headerQueue;            ///< Queue for read-ahead headers

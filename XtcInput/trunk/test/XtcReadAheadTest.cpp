@@ -326,11 +326,11 @@ XtcReadAheadTest::test(const ::DgData* in, const ::DgData* out)
   boost::shared_ptr<ChunkFileIterI> chunkFIter = boost::make_shared<ChunkFileIterList>(files+0, files+1);
   XtcStreamDgIter iter(chunkFIter);
   for ( ; out->timeSec; ++ out) {
-    Dgram::ptr dg = iter.next();
-    if (not checkDg(dg, false, *out)) return;
+    Dgram dg = iter.next();
+    if (not checkDg(dg.dg(), false, *out)) return;
   }
-  Dgram::ptr dg = iter.next();
-  if (not checkDg(dg, true, *out)) return;
+  Dgram dg = iter.next();
+  if (not checkDg(dg.dg(), true, *out)) return;
 
   unlink(fname.c_str());
 }

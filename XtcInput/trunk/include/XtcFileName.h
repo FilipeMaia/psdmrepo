@@ -70,6 +70,9 @@ public:
   // get base name
   std::string basename() const ;
 
+  // get file extension, anything that appears after last '.' in file name including '.' itself
+  std::string extension() const ;
+
   // get experiment number
   unsigned expNum() const { return m_expNum ; }
 

@@ -69,7 +69,7 @@ XtcStreamMerger::XtcStreamMerger(const boost::shared_ptr<StreamFileIterI>& strea
     const boost::shared_ptr<XtcStreamDgIter>& stream = 
         boost::make_shared<XtcStreamDgIter>(chunkFileIter) ;
     m_streams.push_back(stream) ;
-    Dgram dg(stream->next(), stream->chunkName());
+    Dgram dg(stream->next());
     if (not dg.empty()) updateDgramTime(*dg.dg());
     m_dgrams.push_back( dg ) ;
 
@@ -109,8 +109,6 @@ XtcStreamMerger::next()
 
     if (stream >= 0) {
 
-      MsgLog( logger, debug, "next -- file: " << m_streams[stream]->chunkName().basename() ) ;
-
       // send all datagrams with this timestamp to output queue
       Pds::ClockTime ts = m_dgrams[stream].dg()->seq.clock();
       for ( unsigned i = 0 ; i < ns ; ++ i ) {
@@ -120,8 +118,8 @@ XtcStreamMerger::next()
             m_outputQueue.push(m_dgrams[i]);
 
             // get next datagram from that stream
-            MsgLog( logger, debug, "next -- read datagram from file: " << m_streams[i]->chunkName().basename() ) ;
-            Dgram ndg(m_streams[i]->next(), m_streams[i]->chunkName());
+            Dgram ndg(m_streams[i]->next());
+            MsgLog( logger, debug, "next -- read datagram from file: " << ndg.file().basename() ) ;
             if (not ndg.empty()) updateDgramTime(*ndg.dg());
             m_dgrams[i] = ndg ;
 

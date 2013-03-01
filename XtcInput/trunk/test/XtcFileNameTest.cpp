@@ -148,3 +148,14 @@ BOOST_AUTO_TEST_CASE( test_cmp_4 )
   BOOST_CHECK( not ( name1 < name1 ) ) ;
   BOOST_CHECK( not ( name2 < name1 ) ) ;
 }
+
+BOOST_AUTO_TEST_CASE( test_ext )
+{
+  BOOST_CHECK_EQUAL ( XtcFileName("e1-r2-s3-c4.xtc").extension(), ".xtc" ) ;
+  BOOST_CHECK_EQUAL ( XtcFileName("/dir3/e1-r2-s3-c4.xtc").extension(), ".xtc" ) ;
+  BOOST_CHECK_EQUAL ( XtcFileName("/dir3/e1-r2-s3-c4.xtc.inprogress").extension(), ".inprogress" ) ;
+  BOOST_CHECK_EQUAL ( XtcFileName("/dir3/e1-r2-s3-c4").extension(), "" ) ;
+  BOOST_CHECK_EQUAL ( XtcFileName("/dir3.dirext/e1-r2-s3-c4").extension(), "" ) ;
+  BOOST_CHECK_EQUAL ( XtcFileName("/dir3.dirext/.hidden").extension(), ".hidden" ) ;
+  BOOST_CHECK_EQUAL ( XtcFileName("/dir3.dirext/").extension(), "" ) ;
+}

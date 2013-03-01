@@ -30,6 +30,7 @@
 //------------------------------------
 #include "XtcInput/DgHeader.h"
 #include "XtcInput/SharedFile.h"
+#include "XtcInput/XtcFileName.h"
 
 //		---------------------
 // 		-- Class Interface --
@@ -67,7 +68,7 @@ public:
    *
    *  @throw FileOpenException Thrown in case file cannot be open.
    */
-  XtcChunkDgIter (const std::string& path, unsigned liveTimeout = 0) ;
+  XtcChunkDgIter (const XtcFileName& path, unsigned liveTimeout = 0) ;
 
   // Destructor
   ~XtcChunkDgIter () ;

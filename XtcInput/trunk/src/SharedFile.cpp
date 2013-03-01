@@ -44,18 +44,20 @@ namespace XtcInput {
 //----------------
 // Constructors --
 //----------------
-SharedFile::SharedFileImpl::SharedFileImpl (const boost::filesystem::path& argPath,
+SharedFile::SharedFileImpl::SharedFileImpl (const XtcFileName& argPath,
     unsigned argLiveTimeout)
   : path(argPath)
   , liveTimeout(argLiveTimeout)
   , fd(-1)
 {
-  fd = open(path.string().c_str(), O_RDONLY|O_LARGEFILE);
+  fd = open(path.path().c_str(), O_RDONLY|O_LARGEFILE);
   if (fd < 0) {
     // try to open again after dropping inprogress extension
     if (liveTimeout > 0 and path.extension() == ".inprogress") {
-      path.replace_extension();
-      fd = open(path.string().c_str(), O_RDONLY|O_LARGEFILE);
+      std::string chop = path.path();
+      chop.erase(chop.size()-11);
+      path = XtcFileName(chop);
+      fd = open(path.path().c_str(), O_RDONLY|O_LARGEFILE);
     }
   }
 
@@ -64,7 +66,7 @@ SharedFile::SharedFileImpl::SharedFileImpl (const boost::filesystem::path& argPa
 
   if (fd < 0) {
     MsgLog( logger, error, "failed to open input XTC file: " << path );
-    throw FileOpenException(ERR_LOC, path.string()) ;
+    throw FileOpenException(ERR_LOC, path.path()) ;
   } else {
     MsgLog( logger, trace, "opened input XTC file: " << path );
   }
@@ -95,7 +97,7 @@ SharedFile::read(char* buf, size_t size)
       if (t0 and (time(0) - t0) > m_impl->liveTimeout) {
         // in live mode we reached timeout
         MsgLog(logger, error, "Timed out while waiting for data in live mode for file: " << m_impl->path);
-        throw XTCLiveTimeout(ERR_LOC, m_impl->path.string(), m_impl->liveTimeout);
+        throw XTCLiveTimeout(ERR_LOC, m_impl->path.path(), m_impl->liveTimeout);
       } else if (t0) {
         // in live mode check if we hit real EOF
         if (this->eof()) {
@@ -131,7 +133,7 @@ SharedFile::eof()
   // exactly the same as the current offset.
 
   // strip file extension
-  std::string path = m_impl->path.string();
+  std::string path = m_impl->path.path();
   std::string::size_type p = path.rfind('.');
   if (p == std::string::npos) {
     // file does not have an extension, can't tell anything, just say we

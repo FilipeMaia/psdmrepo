@@ -144,6 +144,29 @@ XtcFileName::basename() const
   return name ;
 }
 
+// get file extension, anything that appears after last '.' in file name
+std::string
+XtcFileName::extension() const
+{
+  std::string ext = m_path;
+
+  // skip directory first
+  std::string::size_type n = ext.rfind('/') ;
+  if ( n == std::string::npos ) {
+    n = 0;
+  } else {
+    ++ n;
+  }
+  std::string::size_type n1 = ext.rfind('.') ;
+  if ( n1 == std::string::npos or n1 < n ) {
+    ext.clear();
+  } else {
+    ext.erase ( 0, n1 ) ;
+  }
+
+  return ext;
+}
+
 // compare two names
 bool
 XtcFileName::operator<( const XtcFileName& other ) const

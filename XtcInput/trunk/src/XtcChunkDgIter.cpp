@@ -46,7 +46,7 @@ namespace XtcInput {
 //----------------
 // Constructors --
 //----------------
-XtcChunkDgIter::XtcChunkDgIter (const std::string& path, unsigned liveTimeout)
+XtcChunkDgIter::XtcChunkDgIter (const XtcFileName& path, unsigned liveTimeout)
   : m_file(path, liveTimeout)
   , m_off(0)
 {
@@ -64,7 +64,7 @@ XtcChunkDgIter::next()
 {
   // move to a correct position
   if (m_file.seek(m_off, SEEK_SET) == (off_t)-1) {
-    throw XTCReadException(ERR_LOC, m_file.path().string());
+    throw XTCReadException(ERR_LOC, m_file.path().path());
   }
 
   boost::shared_ptr<DgHeader> hptr;
@@ -78,7 +78,7 @@ XtcChunkDgIter::next()
     // EOF
     return hptr;
   } else if (nread < 0) {
-    throw XTCReadException(ERR_LOC, m_file.path().string());
+    throw XTCReadException(ERR_LOC, m_file.path().path());
   } else if (nread != ssize_t(headerSize)) {
     MsgLog(logger, error, "EOF while reading datagram header from file: " << m_file.path());
     return hptr;

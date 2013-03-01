@@ -75,7 +75,7 @@ DgHeader::dgram()
   // check datagram size, protection against corrupted headers
   MsgLog(logger, debug, "XTC extent size = " << m_header.xtc.extent);
   if (datagramSize > ::maxDgramSize) {
-    throw XTCSizeLimitException(ERR_LOC, m_file.path().string(), datagramSize, ::maxDgramSize);
+    throw XTCSizeLimitException(ERR_LOC, m_file.path().path(), datagramSize, ::maxDgramSize);
   }
 
   // allocate memory for header+payload
@@ -91,7 +91,7 @@ DgHeader::dgram()
   MsgLog(logger, debug, "reading payload, size = " << payloadSize);
   ssize_t nread = m_file.read(dg->xtc.payload(), payloadSize);
   if (nread < 0) {
-    throw XTCReadException(ERR_LOC, m_file.path().string());
+    throw XTCReadException(ERR_LOC, m_file.path().path());
   } else if (nread != ssize_t(payloadSize)) {
     MsgLog(logger, error, "EOF while reading datagram payload from file: " << m_file.path());
     return Dgram::ptr();
@@ -99,6 +99,5 @@ DgHeader::dgram()
 
   return Dgram::make_ptr(dg);
 }
-
 
 } // namespace XtcInput
