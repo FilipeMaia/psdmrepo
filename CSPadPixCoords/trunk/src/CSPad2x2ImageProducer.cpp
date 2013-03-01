@@ -151,20 +151,63 @@ CSPad2x2ImageProducer::getRunNumber(Event& evt)
 }
 
 //--------------------
+
 void 
 CSPad2x2ImageProducer::getConfigPars(Env& env)
 {
-  shared_ptr<Psana::CsPad2x2::ConfigV1> config = env.configStore().get(m_str_src);
-  if (config.get()) {
-    m_roiMask        = config->roiMask();
-    m_numAsicsStored = config->numAsicsStored();
+  int count = 0;
+ 
+  shared_ptr<Psana::CsPad2x2::ConfigV1> config_v1 = env.configStore().get(m_str_src);
+  if (config_v1.get()) {
+    m_roiMask        = config_v1->roiMask();
+    m_numAsicsStored = config_v1->numAsicsStored();
     WithMsgLog(name(), info, str) {
       str << "CsPad2x2::ConfigV1:";
-      str << "\n  concentratorVersion = " << config->concentratorVersion();
-      str << "\n  roiMask = "             << config->roiMask();
-      str << "\n  numAsicsStored = "      << config->numAsicsStored();
+      str << "\n  concentratorVersion = " << config_v1->concentratorVersion();
+      str << "\n  roiMask = "             << config_v1->roiMask();
+      str << "\n  numAsicsStored = "      << config_v1->numAsicsStored();
      }  
+    ++ count;
   }
+
+  shared_ptr<Psana::CsPad2x2::ConfigV2> config_v2 = env.configStore().get(m_str_src);
+  if (config_v2.get()) {
+    m_roiMask        = config_v2->roiMask();
+    m_numAsicsStored = config_v2->numAsicsStored();
+    WithMsgLog(name(), info, str) {
+      str << "CsPad2x2::ConfigV2:";
+      str << "\n  concentratorVersion = " << config_v2->concentratorVersion();
+      str << "\n  roiMask = "             << config_v2->roiMask();
+      str << "\n  numAsicsStored = "      << config_v2->numAsicsStored();
+     }  
+    ++ count;
+  }
+
+  //shared_ptr<Psana::CsPad2x2::ConfigV3> config_v3 = env.configStore().get(m_str_src);
+  //if (config_v3.get()) {
+  //  m_roiMask        = config_v3->roiMask();
+  //  m_numAsicsStored = config_v3->numAsicsStored();
+  //  WithMsgLog(name(), info, str) {
+  //    str << "CsPad2x2::ConfigV3:";
+  //    str << "\n  concentratorVersion = " << config_v3->concentratorVersion();
+  //    str << "\n  roiMask = "             << config_v3->roiMask();
+  //    str << "\n  numAsicsStored = "      << config_v3->numAsicsStored();
+  //   }  
+  //  ++ count;
+  //}
+
+  if (not count) {
+    MsgLog(name(), error, "No CsPad2x2 configuration objects found, terminating.");
+    terminate();
+    return;
+  }
+  
+  if (count > 1) {
+    MsgLog(name(), error, "Multiple CsPad2x2 configuration objects found, use more specific source address. Terminating.");
+    terminate();
+    return;
+  }
+
 
   m_n2x1         = 2;                                // 2
   m_ncols2x1     = Psana::CsPad::ColumnsPerASIC;     // 185
