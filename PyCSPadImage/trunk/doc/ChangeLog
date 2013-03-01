@@ -11,6 +11,12 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+#-----------------
+2013-02-28 Igor Gaponenko
+Tag: gapon-2013-02-28
+- migrated to explicit passing of CalParams object instead ofrelying on
+a sigleton
+
 #---------------------
 2012-02-01 Mikhail S. Dubrovin
 Tag: V00-00-09

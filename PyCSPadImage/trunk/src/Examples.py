@@ -9,7 +9,7 @@
 
 """This module provides examples of how to get and use the CSPad image
 
-This software was developed for the SIT project.  If you use all or 
+This software was developed for the SIT project.  If you use all or
 part of it, please give an appropriate acknowledgment.
 
 @see RelatedModule
@@ -26,19 +26,19 @@ __version__ = "$Revision: 4 $"
 # $Source$
 
 #----------
-#  Imports 
+#  Imports
 #----------
 import sys
 import os
 import numpy              as np
 
-import CalibPars          as calp
-import CalibParsEvaluated as cpe
-import CSPadConfigPars    as ccp
-import CSPadImageProducer as cip
+import PyCSPadImage.CalibPars          as calp
+import PyCSPadImage.CalibParsEvaluated as cpe
+import PyCSPadImage.CSPadConfigPars    as ccp
+import PyCSPadImage.CSPadImageProducer as cip
 
-import GlobalGraphics     as gg # For test purpose in main only
-import HDF5Methods        as hm # For test purpose in main only
+import PyCSPadImage.GlobalGraphics     as gg # For test purpose in main only
+import PyCSPadImage.HDF5Methods        as hm # For test purpose in main only
 
 #----------------------------------------------
 
@@ -48,18 +48,21 @@ def main_example_cxi() :
 
     #path_calib = '/reg/d/psdm/CXI/cxi35711/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0'
     #path_calib = '/reg/d/psdm/CXI/cxi37411/calib/CsPad::CalibV1/CxiDsd.0:Cspad.0'
-    path_calib = '/reg/d/psdm/CXI/cxi37411/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0'
+    #path_calib = '/reg/d/psdm/CXI/cxi37411/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0'
+    path_calib = '/reg/d/psdm/CXI/cxii0212/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0'
 
     #fname, runnum   = '/reg/d/psdm/CXI/cxi35711/hdf5/cxi35711-r0009.h5', 9
     #fname, runnum   = '/reg/d/psdm/CXI/cxi37411/hdf5/cxi37411-r0080.h5', 80
-    fname, runnum    = '/reg/d/psdm/CXI/cxi37411/hdf5/cxi37411-r0039.h5', 39
+    #fname, runnum    = '/reg/d/psdm/CXI/cxi37411/hdf5/cxi37411-r0039.h5', 39
+    fname, runnum    = '/reg/d/psdm/CXI/cxii0212/hdf5/cxii0212-r0051.h5', 39
 
     #dsname = '/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/CxiDsd.0:Cspad.0/data'
     dsname  = '/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/CxiDs1.0:Cspad.0/data'
     event   = 5
 
-    print 'Load calibration parameters from', path_calib 
-    calp.calibpars.setCalibParsForPath ( run=runnum, path=path_calib )
+    print 'Load calibration parameters from', path_calib
+    calibpars = calp.CalibPars()
+    calibpars.setCalibParsForPath ( run=runnum, path=path_calib )
 
     print 'Get raw CSPad event %d from file %s \ndataset %s' % (event, fname, dsname)
     ds1ev = hm.getOneCSPadEventForTest( fname, dsname, event )
@@ -72,7 +75,7 @@ def main_example_cxi() :
     #ds1ev -= gm.getCSPadArrayFromFile(ped_fname)
 
     print 'Make the CSPad image from raw array'
-    cspadimg = cip.CSPadImageProducer(rotation=0, tiltIsOn=True)#, mirror=True)
+    cspadimg = cip.CSPadImageProducer(calibpars, rotation=0, tiltIsOn=True)#, mirror=True)
 
     #arr = cspadimg.getImageArrayForCSPadElement( ds1ev )
     arr = cspadimg.getCSPadImage( ds1ev ) # This works faster
@@ -80,9 +83,9 @@ def main_example_cxi() :
     print 'Plot CSPad image'
     AmpRange = (-10,90)
     gg.plotImage(arr,range=AmpRange,figsize=(11.6,10))
-    gg.move(200,100)
+    #gg.move(200,100)
     gg.plotSpectrum(arr,range=AmpRange)
-    gg.move(50,50)
+    #gg.move(50,50)
     #gg.plotImageAndSpectrum(arr,range=(1,2001))
     print 'To EXIT the test click on "x" in the top-right corner of each plot window.'
     gg.show()
@@ -107,7 +110,7 @@ def main_example_xpp() :
 
     event = 0
 
-    print 'Load calibration parameters from', path_calib 
+    print 'Load calibration parameters from', path_calib
     calp.calibpars.setCalibParsForPath ( run=runnum, path=path_calib )
 
     print 'Get raw CSPad event %d from file %s \ndataset %s' % (event, fname, dsname)
@@ -145,8 +148,8 @@ def main_example_CSpad2x2() :
     event = 0
 
     h5file = hm.hdf5mets.open_hdf5_file(fname)
-    #grp = hm.hdf5mets.get_dataset_from_hdf5_file('/')    
-    grp = hm.hdf5mets.get_dataset_from_hdf5_file('/Configure:0000/Run:0000/CalibCycle:0000/CsPad2x2::ElementV1')    
+    #grp = hm.hdf5mets.get_dataset_from_hdf5_file('/')
+    grp = hm.hdf5mets.get_dataset_from_hdf5_file('/Configure:0000/Run:0000/CalibCycle:0000/CsPad2x2::ElementV1')
     hm.print_hdf5_item_structure(grp)
     arrevts = hm.hdf5mets.get_dataset_from_hdf5_file(dsname)
     arr1ev = arrevts[event]
@@ -173,12 +176,12 @@ def main_example_CSpad2x2() :
 def example_of_image_built_from_pix_coordinate_array_shaped_as_data() :
     """Some CSPAD segments may be missing in the dataset
     """
-    
+
     fname, runnum = '/reg/d/psdm/CXI/cxi80410/hdf5/cxi80410-r0628.h5',  628
     dsname        = '/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/CxiDs1.0:Cspad.0/data'
     path_calib    = '/reg/d/psdm/CXI/cxi80410/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0'
     Range         = (1000,3500)
- 
+
     calp.calibpars.setCalibParsForPath (run=runnum, path=path_calib)
     #cpe.cpeval.printCalibParsEvaluated('center_global')
     cpe.cpeval.evaluateCSPadPixCoordinatesShapedAsData(fname,dsname,rotation=0)
@@ -192,14 +195,14 @@ def example_of_image_built_from_pix_coordinate_array_shaped_as_data() :
 #----------------------------------------------
 
 def example_of_image_built_from_pix_coordinate_array_for_entire_cspad() :
-    """All CSPAD segments are assumed to be presented in this dataset 
+    """All CSPAD segments are assumed to be presented in this dataset
     """
 
     fname, runnum = '/reg/d/psdm/XPP/xppcom10/hdf5/xppcom10-r1437.h5', 1437
     dsname        = '/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/XppGon.0:Cspad.0/data'
     path_calib    = '/reg/d/psdm/XPP/xppcom10/calib/CsPad::CalibV1/XppGon.0:Cspad.0'
     Range         = (1700,2000)
-    
+
     calp.calibpars.setCalibParsForPath (run=runnum, path=path_calib)
     #cpe.cpeval.printCalibParsEvaluated ('center_global')
     cpe.cpeval.evaluateCSPadPixCoordinates (rotation=0)
@@ -215,8 +218,8 @@ def example_of_image_built_from_pix_coordinate_array_for_entire_cspad() :
 if __name__ == "__main__" :
     #example_of_image_built_from_pix_coordinate_array_shaped_as_data()
     #example_of_image_built_from_pix_coordinate_array_for_entire_cspad()
-    #main_example_cxi()
-    main_example_xpp()
+    main_example_cxi()
+    #main_example_xpp()
     #main_example_CSpad2x2()
     sys.exit ( 'End of test.' )
 

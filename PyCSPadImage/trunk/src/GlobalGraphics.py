@@ -97,6 +97,7 @@ def plotImageAndSpectrum(arr,range=(0,500)) :
     plt.title('Spectrum',color='r',fontsize=20)
     plt.xlabel('Bins')
     plt.ylabel('Stat') #u'\u03C6'
+    plt.ion()
 
 #--------------------------------
 
