@@ -96,10 +96,10 @@ void iterate_over_dgrams_in_xstream(std::vector<std::string>& v_names)
 
   while (true) {
 
-    XtcInput::Dgram::ptr dgptr = dgIter.next();
-    if (not dgptr) break;
+    XtcInput::Dgram dgram = dgIter.next();
+    if (not dgram.dg()) break;
 
-    dg = dgptr.get();
+    dg = dgram.dg().get();
 
     ndgram++; 
     //if (ndgram > 100) break;    
