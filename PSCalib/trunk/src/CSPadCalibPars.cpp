@@ -73,6 +73,8 @@ CSPadCalibPars::CSPadCalibPars ( const std::string&   calibDir,           //  /r
 
     fillCalibNameVector ();
     loadCalibPars ();
+
+    printInputPars ();
     //printCalibPars();
 }
 
@@ -90,6 +92,8 @@ void CSPadCalibPars::fillCalibNameVector ()
     v_calibname.push_back("tilt");
     v_calibname.push_back("quad_rotation");
     v_calibname.push_back("quad_tilt");
+    v_calibname.push_back("beam_vector");
+    v_calibname.push_back("beam_intersect");
 }
 
 //----------------
@@ -102,10 +106,17 @@ void CSPadCalibPars::loadCalibPars ()
         m_cur_calibname = *iterCalibName;
 
 	getCalibFileName();
-	openCalibFile   ();
-	readCalibPars   ();
-	closeCalibFile  ();
-	fillCalibParsV1 ();
+
+        if (m_fname == std::string()) { 
+	  fillDefaultCalibParsV1 ();
+        } 
+        else 
+        {
+	  openCalibFile   ();
+	  readCalibPars   ();
+	  closeCalibFile  ();
+	  fillCalibParsV1 ();
+	}
       }
 }
 
@@ -115,27 +126,14 @@ void CSPadCalibPars::getCalibFileName ()
 {
   if ( m_isTestMode ) 
     {
-      m_fname  = m_calibdir; 
-      m_fname += "/"; 
-      m_fname += m_cur_calibname; 
-      m_fname += "/"; 
+      m_fname  = m_calibdir + "/"; 
+      m_fname += m_cur_calibname + "/"; 
       m_fname += m_calibfilename; // "/0-end.data"; // !!! THIS IS A SIMPLIFIED CASE OF THE FILE NAME!!!
     }
   else
     {
       PSCalib::CalibFileFinder *calibfinder = new PSCalib::CalibFileFinder(m_calibDir, m_typeGroupName);
       m_fname = calibfinder -> findCalibFile(m_source, m_cur_calibname, m_runNumber);
-
-      // Check if the file name is empty:
-      if (m_fname == std::string()) { 
-	MsgLog("CSPadCalibPars", warning, "In getCalibFileName(): the calibration file for the source=" << m_source 
-                  << ", type=" << m_cur_calibname 
-                  << ", run=" <<  m_runNumber
-                  << " is not found ..."
-	          << "\nWARNING: Default CSPad alignment constants can not guarantee correct geometry and are not available yet."
-	          << "\nWARNING: Please provide all expected CSPad alignment constants under the directory .../<experiment>/calib/...");
-	abort();
-      }
     }
   MsgLog("CSPadCalibPars", debug, "getCalibFileName(): " << m_fname);
 }
@@ -187,6 +185,42 @@ void CSPadCalibPars::fillCalibParsV1 ()
   else if( m_cur_calibname == v_calibname[6] ) m_tilt           = new pdscalibdata::CalibParsTiltV1(v_parameters);
   else if( m_cur_calibname == v_calibname[7] ) m_quad_rotation  = new pdscalibdata::CalibParsQuadRotationV1(v_parameters);
   else if( m_cur_calibname == v_calibname[8] ) m_quad_tilt      = new pdscalibdata::CalibParsQuadTiltV1(v_parameters);
+  else if( m_cur_calibname == v_calibname[9] ) m_beam_vector    = new pdscalibdata::CsPadBeamVectorV1(v_parameters);
+  else if( m_cur_calibname == v_calibname[10]) m_beam_intersect = new pdscalibdata::CsPadBeamIntersectV1(v_parameters);
+}
+
+//----------------
+
+void CSPadCalibPars::fillDefaultCalibParsV1 ()
+{
+  // If default parameters are available - set them.
+  // For calib types where default parameters are not accaptable and the file is missing - error message and abort.
+       if( m_cur_calibname == v_calibname[0] ) m_center         = new pdscalibdata::CalibParsCenterV1();
+  else if( m_cur_calibname == v_calibname[1] ) m_center_corr    = new pdscalibdata::CalibParsCenterCorrV1();
+  else if( m_cur_calibname == v_calibname[2] ) m_marg_gap_shift = new pdscalibdata::CalibParsMargGapShiftV1();
+  else if( m_cur_calibname == v_calibname[3] ) m_offset         = new pdscalibdata::CalibParsOffsetV1();
+  else if( m_cur_calibname == v_calibname[4] ) m_offset_corr    = new pdscalibdata::CalibParsOffsetCorrV1();
+  else if( m_cur_calibname == v_calibname[5] ) m_rotation       = new pdscalibdata::CalibParsRotationV1();
+  else if( m_cur_calibname == v_calibname[6] ) m_tilt           = new pdscalibdata::CalibParsTiltV1();
+  else if( m_cur_calibname == v_calibname[7] ) m_quad_rotation  = new pdscalibdata::CalibParsQuadRotationV1();
+  else if( m_cur_calibname == v_calibname[8] ) m_quad_tilt      = new pdscalibdata::CalibParsQuadTiltV1();
+  else if( m_cur_calibname == v_calibname[9] ) m_beam_vector    = new pdscalibdata::CsPadBeamVectorV1();
+  else if( m_cur_calibname == v_calibname[10]) m_beam_intersect = new pdscalibdata::CsPadBeamIntersectV1();
+
+  else fatalMissingFileName ();
+}
+
+//----------------
+
+void CSPadCalibPars::fatalMissingFileName ()
+{
+	MsgLog("CSPadCalibPars", warning, "In getCalibFileName(): the calibration file for the source=" << m_source 
+                  << ", type=" << m_cur_calibname 
+                  << ", run=" <<  m_runNumber
+                  << " is not found ..."
+	          << "\nWARNING: Default CSPad alignment constants can not guarantee correct geometry and are not available yet."
+	          << "\nWARNING: Please provide all expected CSPad alignment constants under the directory .../<experiment>/calib/...");
+	abort();
 }
 
 //----------------
@@ -194,7 +228,7 @@ void CSPadCalibPars::fillCalibParsV1 ()
 void CSPadCalibPars::printCalibPars()
 {
     WithMsgLog("CSPadCalibPars", info, str) {
-      str << "printCSPadCalibPars()" ;
+      str << "printCalibPars()" ;
       str << "\n getColSize_um()    = " << getColSize_um() ;
       str << "\n getRowSize_um()    = " << getRowSize_um() ;
       str << "\n getGapRowSize_um() = " << getGapRowSize_um() ;
@@ -209,6 +243,21 @@ void CSPadCalibPars::printCalibPars()
      m_tilt           -> print();
      m_quad_rotation  -> print();
      m_quad_tilt      -> print();
+     m_beam_vector    -> print();
+     m_beam_intersect -> print();
+}
+
+//----------------
+
+void CSPadCalibPars::printInputPars()
+{
+    WithMsgLog("CSPadCalibPars", info, str) {
+      str << "printInputPars()" ;
+      str << "\n m_calibDir      = " << m_calibDir ;
+      str << "\n m_typeGroupName = " << m_typeGroupName ;
+      str << "\n m_source        = " << m_source ;
+      str << "\n m_runNumber     = " << m_runNumber ;
+    }        
 }
 
 //--------------

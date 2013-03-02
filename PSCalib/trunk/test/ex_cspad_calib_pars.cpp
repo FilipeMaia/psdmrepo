@@ -26,19 +26,18 @@ using std::endl;
 
 int main ()
 {
-  const std::string calibDir      = "/reg/d/psdm/cxi/cxi35711/calib";
-  const std::string typeGroupName = "CsPad::CalibV1";
-  const std::string source        = "CxiDs1.0:Cspad.0";
-  const std::string dataType      = "pedestals";
-  unsigned long     runNumber     = 10;
+  //const std::string calibDir   = "/reg/d/psdm/cxi/cxi35711/calib";
+  //const std::string calibDir   = "/reg/d/psdm/cxi/cxi35711/calib_xxx"; // to test default pars
+  const std::string calibDir   = "/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-test-calibpars";
+  const std::string groupName  = "CsPad::CalibV1";
+  const std::string source     = "CxiDs1.0:Cspad.0";
+  unsigned long     runNumber  = 10;
 
-  cout << "Test of PSCalib::CSPadCalibPars" << endl;     
+  cout << "Test of PSCalib::CSPadCalibPars\n";     
 
-
-  PSCalib::CSPadCalibPars *cspad_calibpars = new PSCalib::CSPadCalibPars(calibDir, typeGroupName, source, runNumber);  
+  PSCalib::CSPadCalibPars *cspad_calibpars = new PSCalib::CSPadCalibPars(calibDir, groupName, source, runNumber);  
 
   cspad_calibpars->printCalibPars();
-
 
   return 0;
 }

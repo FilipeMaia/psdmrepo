@@ -37,6 +37,8 @@
 #include "pdscalibdata/CalibParsTiltV1.h"        
 #include "pdscalibdata/CalibParsQuadRotationV1.h"
 #include "pdscalibdata/CalibParsQuadTiltV1.h"    
+#include "pdscalibdata/CsPadBeamVectorV1.h"    
+#include "pdscalibdata/CsPadBeamIntersectV1.h"    
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -103,15 +105,18 @@ public:
   size_t   getNRows             (){ return m_nrows;   };
   size_t   getNCols             (){ return m_ncols;   };
 
-  void fillCalibNameVector();
-  void getCalibFileName   ();
-  void loadCalibPars      ();
-  void openCalibFile      ();
-  void closeCalibFile     ();
-  void readCalibPars      ();
-  void printCalibPars     ();
+  void fillCalibNameVector   ();
+  void getCalibFileName      ();
+  void loadCalibPars         ();
+  void openCalibFile         ();
+  void closeCalibFile        ();
+  void readCalibPars         ();
+  void fillCalibParsV1       ();
+  void fillDefaultCalibParsV1();
+  void fatalMissingFileName  ();
+  void printCalibPars        ();
+  void printInputPars        ();
 
-  void fillCalibParsV1();
 
   double getCenterX(size_t quad, size_t sect){ return m_center -> getCenterX(quad,sect); };
   double getCenterY(size_t quad, size_t sect){ return m_center -> getCenterY(quad,sect); };
@@ -150,6 +155,12 @@ public:
 
   double getQuadRotation(size_t quad) { return m_quad_rotation -> getQuadRotation(quad); };
   double getQuadTilt    (size_t quad) { return m_quad_tilt     -> getQuadTilt    (quad); };
+
+  double* getBeamVector   ()         { return  m_beam_vector    -> getVector(); };
+  double  getBeamVector   (size_t i) { return  m_beam_vector    -> getVectorEl(i); };
+
+  double* getBeamIntersect()         { return  m_beam_intersect -> getVector(); };
+  double  getBeamIntersect(size_t i) { return  m_beam_intersect -> getVectorEl(i); };
 
   static double getRowSize_um()   { return 109.92; }  // pixel size of the row in um                                           
   static double getColSize_um()   { return 109.92; }  // pixel size of the column in um                                        
@@ -208,6 +219,8 @@ private:
   pdscalibdata::CalibParsTiltV1         *m_tilt;   
   pdscalibdata::CalibParsQuadRotationV1 *m_quad_rotation;    
   pdscalibdata::CalibParsQuadTiltV1     *m_quad_tilt;   
+  pdscalibdata::CsPadBeamVectorV1       *m_beam_vector;   
+  pdscalibdata::CsPadBeamIntersectV1    *m_beam_intersect;   
 
 };
 
