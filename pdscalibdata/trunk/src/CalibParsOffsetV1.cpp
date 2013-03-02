@@ -42,11 +42,17 @@ namespace pdscalibdata {
 //----------------
 CalibParsOffsetV1::CalibParsOffsetV1 ()
 {
+  double arr_x[] = { 0,    0,  820,  820 };
+  double arr_y[] = { 0,  820,  820,    0 };
+  double arr_z[] = { 0,    0,    0,    0 };
+  memcpy( &m_offset_x[0], &arr_x[0], sizeof( double ) * NQuad );
+  memcpy( &m_offset_y[0], &arr_y[0], sizeof( double ) * NQuad );
+  memcpy( &m_offset_z[0], &arr_z[0], sizeof( double ) * NQuad );
 }
 
 //----------------
 
-CalibParsOffsetV1::CalibParsOffsetV1( const std::vector<double> v_parameters )
+CalibParsOffsetV1::CalibParsOffsetV1( const std::vector<double>& v_parameters )
 {
     if (v_parameters.size() != NUMBER_OF_PARAMETERS) {
         WithMsgLog("CalibParsOffsetV1", error, str) {

@@ -43,6 +43,11 @@ namespace pdscalibdata {
 
 CsPadBeamVectorV1::CsPadBeamVectorV1 ()
 {
+  //WithMsgLog("CsPadBeamVectorV1", warning, str) {
+  //str << "Use defauld initialization to (0,0,0). CSPAD geometry IS NOT CORRECT!!!\n" 
+  //    << "Provide calibration file <run-range>.data in expected place under the calib directoy" ;
+  //}       
+  std::fill_n(&m_beam_vector[0], int(NUMBER_OF_PARAMETERS), double(0));
 }
 
 //----------------

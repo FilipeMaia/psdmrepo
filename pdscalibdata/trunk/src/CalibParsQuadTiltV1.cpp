@@ -43,6 +43,7 @@ namespace pdscalibdata {
 
 CalibParsQuadTiltV1::CalibParsQuadTiltV1 ()
 {
+  std::fill_n(&m_quad_tilt[0], int(NQuad), double(0));
 }
 
 //----------------

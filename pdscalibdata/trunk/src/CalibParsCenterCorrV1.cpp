@@ -42,6 +42,10 @@ namespace pdscalibdata {
 //----------------
 CalibParsCenterCorrV1::CalibParsCenterCorrV1 ()
 {
+  int NPars = NQuad * NSect;
+  std::fill_n(&m_center_corr_x[0][0], NPars, double(0));
+  std::fill_n(&m_center_corr_y[0][0], NPars, double(0));
+  std::fill_n(&m_center_corr_z[0][0], NPars, double(0));
 }
 
 //----------------

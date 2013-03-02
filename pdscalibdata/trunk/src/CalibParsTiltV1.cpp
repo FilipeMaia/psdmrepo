@@ -43,6 +43,7 @@ namespace pdscalibdata {
 
 CalibParsTiltV1::CalibParsTiltV1 ()
 {
+  std::fill_n(&m_tilt[0][0], int(NQuad * NSect), double(0));
 }
 
 //----------------

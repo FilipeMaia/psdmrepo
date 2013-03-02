@@ -40,6 +40,27 @@ namespace pdscalibdata {
 //----------------
 CalibParsMargGapShiftV1::CalibParsMargGapShiftV1 ()
 {
+  double arr[] = {15,   40,   0,  37,
+                  15,   40,   0,  37,
+		  0,     0,   0,   0};
+  //std::vector<double> v(arr, arr+sizeof(arr)/sizeof(double));
+  //CalibParsMargGapShiftV1((const std::vector<double>)v);
+
+    m_quad_marg_x  = arr[0];
+    m_quad_marg_y  = arr[4];
+    m_quad_marg_z  = arr[8];
+
+    m_marg_x       = arr[1];
+    m_marg_y       = arr[5];
+    m_marg_z       = arr[9];
+
+    m_gap_x        = arr[2];
+    m_gap_y        = arr[6];
+    m_gap_z        = arr[10];
+
+    m_shift_x      = arr[3];
+    m_shift_y      = arr[7];
+    m_shift_z      = arr[11];
 }
 
 //----------------

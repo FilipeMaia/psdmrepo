@@ -42,6 +42,9 @@ namespace pdscalibdata {
 //----------------
 CalibParsOffsetCorrV1::CalibParsOffsetCorrV1 ()
 {
+  std::fill_n(&m_offset_corr_x[0], int(NQuad), double(0));
+  std::fill_n(&m_offset_corr_y[0], int(NQuad), double(0));
+  std::fill_n(&m_offset_corr_z[0], int(NQuad), double(0));
 }
 //----------------
 

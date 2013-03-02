@@ -13,7 +13,8 @@ reverse time order.
 
 Tag: V00-04-01
 2013-03-01 Mikhail Dubrovin
--add new calibraion data classes CsPadBeamIntersectV1 and CsPadBeamIntersectV1 
+- add new calibraion data classes CsPadBeamVectorV1 and CsPadBeamIntersectV1;
+  in all CalibPars*.cpp add default parameters in default constructor
 	
 Tag: V00-04-00
 2013-01-30 Andy Salnikov

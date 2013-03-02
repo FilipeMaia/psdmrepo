@@ -43,6 +43,10 @@ namespace pdscalibdata {
 
 CalibParsQuadRotationV1::CalibParsQuadRotationV1 ()
 {
+  m_quad_rotation[0] = 180;
+  m_quad_rotation[1] =  90;
+  m_quad_rotation[2] =   0;
+  m_quad_rotation[3] = 270;
 }
 
 //----------------

@@ -43,6 +43,11 @@ namespace pdscalibdata {
 
 CsPadBeamIntersectV1::CsPadBeamIntersectV1 ()
 {
+    //WithMsgLog("CsPadBeamIntersectV1", warning, str) {
+    //str << "Use defauld initialization to (0,0,0). CSPAD geometry IS NOT CORRECT!!!\n" 
+    //    << "Provide calibration file <run-range>.data in expected place under the calib directoy" ;
+    //}       
+  std::fill_n(&m_beam_intersect[0], int(NUMBER_OF_PARAMETERS), double(0));
 }
 
 //----------------

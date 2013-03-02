@@ -42,6 +42,11 @@ namespace pdscalibdata {
 //----------------
 CalibParsRotationV1::CalibParsRotationV1 ()
 {
+  double arr[] = {  0,  0,  270,  270,  180,  180,  270,  270,
+                    0,  0,  270,  270,  180,  180,  270,  270,
+                    0,  0,  270,  270,  180,  180,  270,  270,
+                    0,  0,  270,  270,  180,  180,  270,  270 };
+  memcpy( &m_rotation, &arr[0], sizeof( double ) * NQuad * NSect );
 }
 
 //----------------

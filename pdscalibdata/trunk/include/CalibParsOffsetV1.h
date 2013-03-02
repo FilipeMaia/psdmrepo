@@ -55,7 +55,7 @@ public:
   enum { NQuad = Psana::CsPad::MaxQuadsPerSensor};
   enum { NUMBER_OF_PARAMETERS = 12 };
 
-  CalibParsOffsetV1( const std::vector<double> v_parameters );
+  CalibParsOffsetV1( const std::vector<double>& v_parameters );
   double getOffsetX(size_t quad){ return m_offset_x[quad]; };
   double getOffsetY(size_t quad){ return m_offset_y[quad]; };
   double getOffsetZ(size_t quad){ return m_offset_z[quad]; };
