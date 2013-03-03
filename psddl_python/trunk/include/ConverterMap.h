@@ -16,7 +16,6 @@
 #include <map>
 #include <string>
 #include <vector>
-#include <tr1/functional>
 #include <boost/shared_ptr.hpp>
 
 //----------------------

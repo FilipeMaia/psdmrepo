@@ -7,6 +7,9 @@
 //
 //------------------------------------------------------------------------
 
+// Python header first to suppress warnings
+#include "python/Python.h"
+
 //-----------------------
 // This Class's Header --
 //-----------------------

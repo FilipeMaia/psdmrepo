@@ -11,6 +11,12 @@ Package author: Joseph S. Barrera
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-05
+2013-03-02 Andy Salnikov
+- generated stuff has include boost/pythin.hpp at the top to suppress 
+  compilation warnings
+- couple of files include Python.h for the same reason
+
 Tag: V00-04-04
 2013-02-26 Andy Salnikov
 - regenerate whole thing from psddldata V00-04-07
