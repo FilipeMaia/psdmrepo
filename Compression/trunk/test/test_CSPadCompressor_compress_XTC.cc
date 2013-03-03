@@ -48,7 +48,7 @@ namespace {
                   bool         verbose )
         {
             const size_t maxDgramSize = 32*1024*1024;
-            XtcInput::XtcChunkDgIter itr( infilename, maxDgramSize );
+            XtcInput::XtcChunkDgIter itr( XtcInput::XtcFileName(infilename), maxDgramSize );
 
             FILE* outfile = 0;
             if( outfilename ) {
