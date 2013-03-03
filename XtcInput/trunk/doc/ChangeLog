@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-02
+2013-03-02 Andy Salnikov
+- update tests for changes in API
+
 Tag: V00-08-01
 2013-03-01 Andy Salnikov
 - re-apply changes in V00-07-03, make tag for nightly builds

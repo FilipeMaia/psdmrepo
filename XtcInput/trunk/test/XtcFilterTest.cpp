@@ -150,7 +150,7 @@ XtcFilterTest::runApp ()
   XtcFilter<XtcFilterTypeId> filter(XtcFilterTypeId(keep, discard), m_keepContOpt.value(), m_keepDgramOpt.value(), m_keepAnyOpt.value());
 
   const int DgSize = 16*1024*1024;
-  XtcChunkDgIter dgIter(m_inputArg.value(), DgSize);
+  XtcChunkDgIter dgIter(XtcFileName(m_inputArg.value()), DgSize);
 
   boost::shared_ptr<DgHeader> hptr = dgIter.next();
   char* buffer = new char[DgSize];

@@ -134,7 +134,7 @@ XtcChunkDgIterTest::test1()
   std::string fname = m_pathArg.value();
   writer1(5, fname);
 
-  XtcChunkDgIter iter(fname, 0);
+  XtcChunkDgIter iter(XtcFileName(fname), 0);
   boost::shared_ptr<DgHeader> hptr;
   hptr = iter.next();
   if (not checkDg(hptr, false, 100)) return;
@@ -164,7 +164,7 @@ XtcChunkDgIterTest::test2()
   std::string fname = m_pathArg.value() + ".inprogress";
   writer1(5, fname);
 
-  XtcChunkDgIter iter(fname, 3);
+  XtcChunkDgIter iter(XtcFileName(fname), 3);
   boost::shared_ptr<DgHeader> hptr;
   hptr = iter.next();
   if (not checkDg(hptr, false, 100)) return;
@@ -202,7 +202,7 @@ XtcChunkDgIterTest::test3()
 
   sleep(1);
 
-  XtcChunkDgIter iter(fname, 6);
+  XtcChunkDgIter iter(XtcFileName(fname), 6);
   boost::shared_ptr<DgHeader> hptr;
   hptr = iter.next();
   if (not checkDg(hptr, false, 100)) return;
@@ -235,7 +235,7 @@ XtcChunkDgIterTest::test4()
 
   sleep(1);
 
-  XtcChunkDgIter iter(fname, 5);
+  XtcChunkDgIter iter(XtcFileName(fname), 5);
   boost::shared_ptr<DgHeader> hptr;
   hptr = iter.next();
   if (not checkDg(hptr, false, 100)) return;
@@ -266,7 +266,7 @@ XtcChunkDgIterTest::test5()
 
   sleep(1);
 
-  XtcChunkDgIter iter(fname, 5);
+  XtcChunkDgIter iter(XtcFileName(fname), 5);
   boost::shared_ptr<DgHeader> hptr;
   hptr = iter.next();
   if (not checkDg(hptr, false, 100)) return;
