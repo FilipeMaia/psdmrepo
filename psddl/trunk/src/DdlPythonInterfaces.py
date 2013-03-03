@@ -124,6 +124,7 @@ class DdlPythonInterfaces ( object ) :
         print >>self.cpp, warning
 
         # add necessary includes to include file
+        print >>self.cpp, '#include <boost/python.hpp>'
         print >>self.cpp, '#include <boost/make_shared.hpp>'
         print >>self.cpp, '#include "ndarray/ndarray.h"'
         print >>self.cpp, '#include "pdsdata/xtc/TypeId.hh"'
