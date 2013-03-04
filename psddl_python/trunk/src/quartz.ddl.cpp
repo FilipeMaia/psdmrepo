@@ -54,7 +54,7 @@ void createWrappers(PyObject* module) {
     .def("__typeid__", &method_typeid<Psana::Quartz::ConfigV1>)
     .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Quartz::ConfigV1> >(Pds::TypeId::Id_Opal1kConfig, 1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Quartz::ConfigV1> >(Pds::TypeId::Id_QuartzConfig, 1));
 
   {
     PyObject* unvlist = PyList_New(1);

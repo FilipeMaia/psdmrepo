@@ -11,6 +11,10 @@ Package author: Joseph S. Barrera
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-07
+2013-03-04 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-10
+
 Tag: V00-04-06
 2013-03-04 Andy Salnikov
 - small change in cspad DDL, re-generate everything from psddldata V00-04-09
