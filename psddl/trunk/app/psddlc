@@ -42,6 +42,7 @@ from AppUtils.AppBase import AppBase
 #-----------------------------
 from psddl.XmlReader import XmlReader
 from psddl.DdlPds2Psana import DdlPds2Psana
+from psddl.DdlPds2PsanaDispatch import DdlPds2PsanaDispatch
 from psddl.DdlPsanaDoc import DdlPsanaDoc
 from psddl.DdlPsanaInterfaces import DdlPsanaInterfaces
 from psddl.DdlPythonInterfaces import DdlPythonInterfaces
@@ -103,6 +104,7 @@ class psddlc ( AppBase ) :
             "python": self.pythonGen,
             "psana-doc": self.psanaDocGen,
             "pds2psana": self.pds2psanaGen,
+            "pds2psana-dispatch": self.pds2psanaDispatchGen,
             "hdf5": self.hdf5Gen,
         }
         
@@ -201,6 +203,12 @@ class psddlc ( AppBase ) :
         header, source = self._getHeaderAndSource()
         
         return DdlPds2Psana(header, source, backend_options, log=self)
+
+    def pds2psanaDispatchGen(self, backend_options):
+
+        header, source = self._getHeaderAndSource()
+        
+        return DdlPds2PsanaDispatch(header, source, backend_options, log=self)
 
     def hdf5Gen(self, backend_options):
 

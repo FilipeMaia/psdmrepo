@@ -205,6 +205,7 @@ class DdlHdf5Data ( object ) :
         self.top_pkg = backend_options.get('top-package')
         self.psana_inc = backend_options.get('psana-inc', "psddl_psana")
         self.psana_ns = backend_options.get('psana-ns', "Psana")
+        self.dump_schema = 'dump-schema' in backend_options
 
         self._log = log
 
@@ -218,6 +219,8 @@ class DdlHdf5Data ( object ) :
     #-------------------
 
     def parseTree(self, model):
+        
+        if self.dump_schema: return self._dumpSchema(model)
         
         # open output files
         self.inc = file(self.incname, 'w')
@@ -257,14 +260,16 @@ class DdlHdf5Data ( object ) :
             for header in headers:
                 print >>self.inc, "#include \"%s\"" % header
 
-        # headers for externally implemented schemas or datasets
+        # headers for externally implemented schemas or datasets, headers for datasets are included
+        # into cpp file (they are likely to be needed in inplementation of make_Class functions),
+        # headers for external datasets are included into header.
         for pkg in model.packages():
             for schema in _schemas(pkg):
                 if 'external' in schema.tags:
-                    print >>self.inc, "#include \"%s\"" % schema.tags['external']
+                    if schema.tags['external']: print >>self.cpp, "#include \"%s\"" % schema.tags['external']
                 for ds in schema.datasets:
                     if 'external' in ds.tags:
-                        print >>self.inc, "#include \"%s\"" % ds.tags['external']
+                        if ds.tags['external']: print >>self.inc, "#include \"%s\"" % ds.tags['external']
 
         if self.top_pkg : 
             ns = "namespace %s {" % self.top_pkg
@@ -438,6 +443,8 @@ class DdlHdf5Data ( object ) :
         for attr in ds.attributes:
             dattr = dict(name = attr.name)
             
+            self._log.debug("_genDs: dataset attr: name=%s rank=%s shape=%s", attr.name, attr.rank, attr.shape)
+            
             # base type
             if isinstance(attr.type, Enum):
                 # enum types are mapped to uint32 for now, can use shorter
@@ -557,7 +564,7 @@ class DdlHdf5Data ( object ) :
             attr._h5ds = aschema.datasets[0]
             attr._h5ds_typename = attr_type_name
 
-            return dict(name=attr.name, type=T("${attr_type_name}::${func}_type()")(locals()))
+            return dict(name=attr.name, type=T("hdf5pp::TypeTraits<${attr_type_name}>::${func}_type()")(locals()))
 
 
     def _genValueType(self, type, schema):
@@ -585,7 +592,7 @@ class DdlHdf5Data ( object ) :
         for ds in schema.datasets:
             dsClassName = '::'.join([schema.nsName(), ds.className()])
             dsName = ds.name
-            print >>self.cpp, T("  boost::shared_ptr<$dsClassName> m_ds_$dsName = hdf5pp::Utils::readGroup<$dsClassName>(m_group, \"$dsName\", m_idx);")(locals())
+            print >>self.cpp, T("  boost::shared_ptr<$dsClassName> ds_$dsName = hdf5pp::Utils::readGroup<$dsClassName>(m_group, \"$dsName\", m_idx);")(locals())
 
         # find a constructor with some arguments
         ctors = [ctor for ctor in type.ctors if (ctor.args or 'auto' in ctor.tags)]
@@ -604,7 +611,7 @@ class DdlHdf5Data ( object ) :
             else:
                 dsattrs += ds_attr[:1]
 
-        args = ['m_ds_'+ds.name+'->'+dsattr.name for ds, dsattr in dsattrs]
+        args = ['ds_'+ds.name+'->'+dsattr.name for ds, dsattr in dsattrs]
         print >>self.cpp, "  return boost::make_shared<PsanaType>(%s);" % (', '.join(args),)
 
         print >>self.cpp, "}\n"
@@ -631,13 +638,19 @@ class DdlHdf5Data ( object ) :
         print >>self.inc, T("  typedef $psanatypename PsanaType;")(locals())
         
         # constructor
+        print >>self.inc, T("  $className() {}")(locals())
         if type.xtcConfig:
             print >>self.inc, T("  $className(hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Config>& cfg)")(locals())
             print >>self.inc, "    : m_group(group), m_idx(idx), m_cfg(cfg) {}"
         else:
             print >>self.inc, T("  $className(hdf5pp::Group group, hsize_t idx)")(locals())
             print >>self.inc, "    : m_group(group), m_idx(idx) {}"
-        
+        if len(schema.datasets) == 1:
+            ds = schema.datasets[0]
+            dsClassName = '::'.join([schema.nsName(), ds.className()])
+            dsName = ds.name
+            print >>self.inc, T("  $className(const boost::shared_ptr<$dsClassName>& ds) : m_ds_$dsName(ds) {}")(locals())
+
         # destructor
         print >>self.inc, T("  virtual ~$className() {}")(locals())
 
@@ -645,6 +658,10 @@ class DdlHdf5Data ( object ) :
         for t in _types(type):
             for meth in t.methods(): 
                 if meth.access == 'public': self._genMethod(meth, type, schema, className)
+            # generate _shape() methods for array attributes
+            for attr in t.attributes() :
+                self._genAttrShapeDecl(attr, className)
+
 
         print >>self.inc, "private:"
 
@@ -668,15 +685,22 @@ class DdlHdf5Data ( object ) :
 
             # user-defined data may need local storge as it is returned by reference
             for attr in ds.attributes:
-                if not attr.type.basic and attr.rank == 0:
+                if not attr.type.basic:
                     typename = attr.type.fullName('C++', self.psana_ns)
                     attrName = attr.name
-                    print >>self.inc, T("  mutable $typename m_ds_storage_${dsName}_${attrName};")(locals())
-                elif not attr.type.basic and attr.rank > 0:
-                    typename = attr.type.fullName('C++', self.psana_ns)
-                    attrName = attr.name
-                    rank = attr.rank
-                    print >>self.inc, T("  mutable ndarray<const $typename, $rank> m_ds_storage_${dsName}_${attrName};")(locals())
+                    if attr.type.value_type:
+                        if attr.rank == 0:
+                            print >>self.inc, T("  mutable $typename m_ds_storage_${dsName}_${attrName};")(locals())
+                        else:
+                            rank = attr.rank
+                            print >>self.inc, T("  mutable ndarray<const $typename, $rank> m_ds_storage_${dsName}_${attrName};")(locals())
+                    else:
+                        if attr.rank == 0:
+                            print >>self.inc, T("  mutable boost::shared_ptr<$typename> m_ds_storage_${dsName}_${attrName};")(locals())
+                        else:
+                            attr_class = "%s_v%d" % (attr._h5schema.name, attr._h5schema.version)
+                            rank = attr.rank
+                            print >>self.inc, T("  mutable ndarray<$attr_class, $rank> m_ds_storage_${dsName}_${attrName};")(locals())
 
         # explicitely instantiate class with known config types
         for config in type.xtcConfig:
@@ -686,6 +710,30 @@ class DdlHdf5Data ( object ) :
         # close class declaration
         print >>self.inc, "};\n"
 
+    def _genAttrShapeDecl(self, attr, className):
+
+        if not attr.shape_method: return 
+        if not attr.accessor: return
+        
+        doc = "Method which returns the shape (dimensions) of the data returned by %s() method." % \
+                attr.accessor.name
+        
+        # value-type arrays return ndarrays which do not need shape method
+        if attr.type.value_type and attr.type.name != 'char': return
+
+        shape = [str(s or -1) for s in attr.shape.dims]
+
+        body = "  std::vector<int> shape;" 
+        body += T("\n  shape.reserve($size);")(size=len(shape))
+        for s in shape:
+            body += T("\n  shape.push_back($dim);")(dim=s)
+        body += "\n  return shape;"
+
+        # guess if we need to pass cfg object to method
+        cfgNeeded = body.find('{xtc-config}') >= 0
+        body = _interpolate(body, attr.parent)
+
+        self._genMethodBody(attr.shape_method, "std::vector<int>", className, body, [], inline=False, doc=doc)
 
     def _genMethod(self, meth, type, schema, className):
         """Generate method declaration and definition"""
@@ -719,40 +767,63 @@ class DdlHdf5Data ( object ) :
                 if attr.type.name == 'char':
                     ret_type = "const char*"
                     args = [('i%d'%i, type.lookup('uint32_t')) for i in range(attr.rank-1)]
-                else:
+                elif attr.type.basic or attr.type.value_type:
                     ret_type = T("ndarray<const $attr_type, $rank>")(locals())
+                else:
+                    args = [('i%d'%i, type.lookup('uint32_t')) for i in range(attr.rank)]
+                    ret_type = T("const ${ret_type}&")(locals())
             elif not attr.type.basic:
                 ret_type = T("const ${ret_type}&")(locals())
                 
             meth_name = meth.name
-            print >>self.inc, T("  virtual $ret_type $meth_name() const;")(locals())
+            argdecl = ", ".join(["%s %s" % (type.name, arg) for arg, type in args])
+            print >>self.inc, T("  virtual $ret_type $meth_name($argdecl) const;")(locals())
             if type.xtcConfig:
-                print >>self.cpp, T("template <typename Config>\n$ret_type $className<Config>::$meth_name() const {")(locals())
+                print >>self.cpp, T("template <typename Config>\n$ret_type $className<Config>::$meth_name($argdecl) const {")(locals())
             else:
-                print >>self.cpp, T("$ret_type $className::$meth_name() const {")(locals())
-            print >>self.cpp, T("  if (not m_ds_$name.get()) read_ds_$name();")[ds]
+                print >>self.cpp, T("$ret_type $className::$meth_name($argdecl) const {")(locals())
             
             if attr.rank == 0 and attr.type.basic:
                 
                 # simpest case, basic type, non-array
+                print >>self.cpp, T("  if (not m_ds_$name.get()) read_ds_$name();")[ds]
                 print >>self.cpp, T("  return $type(m_ds_$name->$attr_name);")(name=ds.name, attr_name=attr.name, type=ret_type)
                 
-            elif attr.rank == 0 and not attr.type.basic:
+            elif attr.rank == 0 and attr.type.value_type:
                 
                 # non-array, but complex type, need to convert from HDF5 type to psana,
                 # store the result in member varibale so that we can return reference to it
                 dsName = ds.name
                 attrName = attr.name
                 memberName = T("m_ds_storage_${dsName}_${attrName}")(locals());
-                ret_type = attr.type.fullName('C++', self.psana_ns)
-                print >>self.cpp, T("  $memberName = $ret_type(m_ds_$dsName->$attrName);")(locals())
+                attr_type = attr.type.fullName('C++', self.psana_ns)
+                print >>self.cpp, T("  if (not m_ds_$name.get()) read_ds_$name();")[ds]
+                print >>self.cpp, T("  $memberName = $attr_type(m_ds_$dsName->$attrName);")(locals())
                 print >>self.cpp, T("  return $memberName;")(locals())
+                
+            elif attr.rank == 0:
+                
+                # non-array, but complex type, need to convert from HDF5 type to psana,
+                # store the result in member varibale so that we can return reference to it
+                dsName = ds.name
+                attrName = attr.name
+                memberName = T("m_ds_storage_${dsName}_${attrName}")(locals());
+                aschema = attr._h5schema
+                attr_type = attr._h5ds_typename
+                attr_class = "%s_v%d" % (aschema.name, aschema.version)
+                print >>self.cpp, T("  if (not m_ds_$name.get()) {")[ds]
+                print >>self.cpp, T("    read_ds_$name();")[ds]
+                print >>self.cpp, T("    boost::shared_ptr<$attr_type> tmp(m_ds_$dsName, &m_ds_$dsName->$attrName);")(locals())
+                print >>self.cpp, T("    $memberName = boost::make_shared<$attr_class>(tmp);")(locals())
+                print >>self.cpp, "  }"
+                print >>self.cpp, T("  return *$memberName;")(locals())
                 
             elif attr.rank and attr.type.name == 'char':
                 
                 # character array
                 # TODO: if rank is >1 then methods must provide arguments for all but first index,
                 # this is not implemented yet
+                print >>self.cpp, T("  if (not m_ds_$name.get()) read_ds_$name();")[ds]
                 print >>self.cpp, T("  return ($type)(m_ds_$name->$attr_name);")(name=ds.name, attr_name=attr.name, type=ret_type)
                 
             elif attr.rank and attr.type.basic:
@@ -765,12 +836,13 @@ class DdlHdf5Data ( object ) :
                     shape = T("m_ds_$dsName->vlen_$attrName")(locals())
                 else:
                     shape = _interpolate(str(meth.attribute.shape), type)
+                print >>self.cpp, T("  if (not m_ds_$name.get()) read_ds_$name();")[ds]
                 print >>self.cpp, T("  boost::shared_ptr<$attr_type> ptr(m_ds_$dsName, m_ds_$dsName->$attrName);")(locals())
                 print >>self.cpp, T("  return make_ndarray(ptr, $shape);")(locals())
                 
-            elif attr.rank and not attr.type.basic:
+            elif attr.rank and attr.type.value_type:
                 
-                # array of non-basic type, have to convert
+                # array of non-basic value type, have to convert
                 dsName = ds.name
                 attrName = attr.name
                 if attr.sizeIsVlen():
@@ -781,6 +853,7 @@ class DdlHdf5Data ( object ) :
                     shape = _interpolate(str(meth.attribute.shape), type)
                     data_size = _interpolate(str(meth.attribute.shape.size()), type)
                 memberName = T("m_ds_storage_${dsName}_${attrName}")(locals());
+                print >>self.cpp, T("  if (not m_ds_$name.get()) read_ds_$name();")[ds]
                 print >>self.cpp, T("  if ($memberName.empty()) {")(locals())
                 print >>self.cpp, T("    unsigned shape[] = {$shape};")(locals())
                 print >>self.cpp, T("    ndarray<$attr_type, $rank> tmparr(shape);")(locals())
@@ -788,6 +861,35 @@ class DdlHdf5Data ( object ) :
                 print >>self.cpp, T("    $memberName = tmparr;")(locals())
                 print >>self.cpp, T("  }")(locals())
                 print >>self.cpp, T("  return $memberName;")(locals())
+                
+            elif attr.rank:
+                
+                # array of non-basic abstract type, have to convert
+                dsName = ds.name
+                attrName = attr.name
+                if attr.sizeIsVlen():
+                    # VLEN array take dimension from VLEN size, currently means that only 1-dim VLEN arrays are supported
+                    shape = T("m_ds_$dsName->vlen_$attrName")(locals())
+                    data_size = shape
+                else:
+                    shape = _interpolate(str(meth.attribute.shape), type)
+                    data_size = _interpolate(str(meth.attribute.shape.size()), type)
+                memberName = T("m_ds_storage_${dsName}_${attrName}")(locals());
+                arguse = ''.join(["[%s]" % arg for arg, type in args])
+                attr_class = "%s_v%d" % (attr._h5schema.name, attr._h5schema.version)
+                attr_type = attr._h5ds_typename
+                print >>self.cpp, T("  if (not m_ds_$name.get()) read_ds_$name();")[ds]
+                print >>self.cpp, T("  if ($memberName.empty()) {")(locals())
+                print >>self.cpp, T("    unsigned shape[] = {$shape};")(locals())
+                print >>self.cpp, T("    ndarray<$attr_class, $rank> tmparr(shape);")(locals())
+                print >>self.cpp, T("    for (int i = 0; i != $data_size; ++ i) {")(locals())
+                print >>self.cpp, T("      boost::shared_ptr<$attr_type> ptr(m_ds_$dsName, &m_ds_$dsName->$attrName[i]);")(locals())
+                print >>self.cpp, T("      tmparr.begin()[i] = $attr_class(ptr);")(locals())
+                print >>self.cpp, T("    }")(locals())
+                print >>self.cpp, T("    $memberName = tmparr;")(locals())
+                print >>self.cpp, T("  }")(locals())
+                print >>self.cpp, T("  return $memberName$arguse;")(locals())
+
             print >>self.cpp, "}"
 
             
@@ -890,6 +992,55 @@ class DdlHdf5Data ( object ) :
 
         return schema
 
+
+    def _dumpSchema(self, model):
+        '''
+        Method which dumps hdf5 schema for all types in a model
+        '''
+        for pkg in model.packages():
+            self._dumpPkgSchema(pkg)
+
+    def _dumpPkgSchema(self, pkg, offset=1):
+
+        if not pkg.included: print '%s<package name="%s">' % ("    "*offset, pkg.name)
+
+        for ns in pkg.namespaces() :
+            
+            if isinstance(ns, Package) :
+                self._dumpPkgSchema(ns, offset+1)
+            elif isinstance(ns, Type) :
+                self._dumpTypeSchema(ns, offset+1)
+
+
+        if not pkg.included: print '%s</package>' % ("    "*offset,)
+
+    def _dumpTypeSchema(self, type, offset=1):
+
+        if not type.h5schemas:
+            type.h5schemas = [self._defaultSchema(type)]
+            
+        if type.included: return
+            
+        for schema in type.h5schemas:
+            
+            print '%s<h5schema name="%s" version="%d">' % ("    "*(offset), schema.name, schema.version)
+            
+            for ds in schema.datasets:
+            
+                print '%s<dataset name="%s">' % ("    "*(offset+1), ds.name)
+                
+                for attr in ds.attributes:
+                
+                    rank = ""
+                    meth = ""
+                    if attr.rank: rank = ' rank="%d"' % attr.rank
+                    if attr.method != attr.name: meth = ' method="%s"' % attr.method
+                    print '%s<attribute name="%s"%s%s/>' % ("    "*(offset+2), attr.name, meth, rank)
+                
+                print '%s</dataset>' % ("    "*(offset+1),)
+            
+            print '%s</h5schema>' % ("    "*(offset),)
+            
 
     #--------------------
     #  Private methods --

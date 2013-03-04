@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-07
+2013-03-04 Andy Salnikov
+- more progress on HDF5 generator
+- new backend pds2psana-dispatch which generates typeid-dispatch code
+
 Tag: V00-05-06
 2013-03-02 Andy Salnikov
 - in python generator add boost/python.hpp include at the top of generated
