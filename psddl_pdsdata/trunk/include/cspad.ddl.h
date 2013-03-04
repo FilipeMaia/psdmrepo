@@ -81,6 +81,9 @@ private:
 
 class CsPadReadOnlyCfg {
 public:
+  CsPadReadOnlyCfg()
+  {
+  }
   CsPadReadOnlyCfg(uint32_t arg__shiftTest, uint32_t arg__version)
     : _shiftTest(arg__shiftTest), _version(arg__version)
   {
@@ -101,6 +104,9 @@ private:
 
 class ProtectionSystemThreshold {
 public:
+  ProtectionSystemThreshold()
+  {
+  }
   ProtectionSystemThreshold(uint32_t arg__adcThreshold, uint32_t arg__pixelCountThreshold)
     : _adcThreshold(arg__adcThreshold), _pixelCountThreshold(arg__pixelCountThreshold)
   {
@@ -286,6 +292,7 @@ public:
   uint32_t badAsicMask1() const { return _badAsicMask1; }
   uint32_t asicMask() const { return _AsicMask; }
   uint32_t quadMask() const { return _quadMask; }
+  uint32_t roiMasks() const { return _roiMask; }
   const CsPad::ConfigV1QuadReg& quads(uint32_t i0) const { return _quads[i0]; }
   uint32_t numAsicsRead() const;
   /** ROI mask for given quadrant */
@@ -338,6 +345,7 @@ public:
   uint32_t badAsicMask1() const { return _badAsicMask1; }
   uint32_t asicMask() const { return _AsicMask; }
   uint32_t quadMask() const { return _quadMask; }
+  uint32_t roiMasks() const { return _roiMask; }
   const CsPad::ConfigV1QuadReg& quads(uint32_t i0) const { return _quads[i0]; }
   uint32_t numAsicsRead() const;
   /** ROI mask for given quadrant */
@@ -392,6 +400,7 @@ public:
   uint32_t badAsicMask1() const { return _badAsicMask1; }
   uint32_t asicMask() const { return _AsicMask; }
   uint32_t quadMask() const { return _quadMask; }
+  uint32_t roiMasks() const { return _roiMask; }
   const CsPad::ConfigV2QuadReg& quads(uint32_t i0) const { return _quads[i0]; }
   uint32_t numAsicsRead() const;
   /** ROI mask for given quadrant */

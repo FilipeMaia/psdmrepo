@@ -139,20 +139,20 @@ public:
   /** PVControl configuration objects */
   ndarray<const ControlData::PVControl, 1> pvControls() const { ptrdiff_t offset=24;
   const ControlData::PVControl* data = (const ControlData::PVControl*)(((char*)this)+offset);
-  return make_ndarray(data, this->_npvControls); }
+  return make_ndarray(data, this->npvControls()); }
   /** PVMonitor configuration objects */
-  ndarray<const ControlData::PVMonitor, 1> pvMonitors() const { ptrdiff_t offset=24+(44*(this->_npvControls));
+  ndarray<const ControlData::PVMonitor, 1> pvMonitors() const { ptrdiff_t offset=24+(44*(this->npvControls()));
   const ControlData::PVMonitor* data = (const ControlData::PVMonitor*)(((char*)this)+offset);
-  return make_ndarray(data, this->_npvMonitors); }
-  uint32_t _sizeof() const { return (((((24+(ControlData::PVControl::_sizeof()*(this->_npvControls)))+(ControlData::PVMonitor::_sizeof()*(this->_npvMonitors)))+4)-1)/4)*4; }
+  return make_ndarray(data, this->npvMonitors()); }
+  uint32_t _sizeof() const { return (((((24+(ControlData::PVControl::_sizeof()*(this->npvControls())))+(ControlData::PVMonitor::_sizeof()*(this->npvMonitors())))+4)-1)/4)*4; }
 private:
   uint32_t	_control;
   uint32_t	_reserved;
   Pds::ClockTime	_duration;	/**< Maximum duration of the scan. */
   uint32_t	_npvControls;	/**< Number of PVControl objects in this configuration. */
   uint32_t	_npvMonitors;	/**< Number of PVMonitor objects in this configuration. */
-  //ControlData::PVControl	_pvControls[this->_npvControls];
-  //ControlData::PVMonitor	_pvMonitors[this->_npvMonitors];
+  //ControlData::PVControl	_pvControls[this->npvControls()];
+  //ControlData::PVMonitor	_pvMonitors[this->npvMonitors()];
 };
 
 /** @class ConfigV2
@@ -182,16 +182,16 @@ public:
   /** PVControl configuration objects */
   ndarray<const ControlData::PVControl, 1> pvControls() const { ptrdiff_t offset=28;
   const ControlData::PVControl* data = (const ControlData::PVControl*)(((char*)this)+offset);
-  return make_ndarray(data, this->_npvControls); }
+  return make_ndarray(data, this->npvControls()); }
   /** PVMonitor configuration objects */
-  ndarray<const ControlData::PVMonitor, 1> pvMonitors() const { ptrdiff_t offset=28+(44*(this->_npvControls));
+  ndarray<const ControlData::PVMonitor, 1> pvMonitors() const { ptrdiff_t offset=28+(44*(this->npvControls()));
   const ControlData::PVMonitor* data = (const ControlData::PVMonitor*)(((char*)this)+offset);
-  return make_ndarray(data, this->_npvMonitors); }
+  return make_ndarray(data, this->npvMonitors()); }
   /** PVLabel configuration objects */
-  ndarray<const ControlData::PVLabel, 1> pvLabels() const { ptrdiff_t offset=(28+(44*(this->_npvControls)))+(52*(this->_npvMonitors));
+  ndarray<const ControlData::PVLabel, 1> pvLabels() const { ptrdiff_t offset=(28+(44*(this->npvControls())))+(52*(this->npvMonitors()));
   const ControlData::PVLabel* data = (const ControlData::PVLabel*)(((char*)this)+offset);
-  return make_ndarray(data, this->_npvLabels); }
-  uint32_t _sizeof() const { return ((((((28+(ControlData::PVControl::_sizeof()*(this->_npvControls)))+(ControlData::PVMonitor::_sizeof()*(this->_npvMonitors)))+(ControlData::PVLabel::_sizeof()*(this->_npvLabels)))+4)-1)/4)*4; }
+  return make_ndarray(data, this->npvLabels()); }
+  uint32_t _sizeof() const { return ((((((28+(ControlData::PVControl::_sizeof()*(this->npvControls())))+(ControlData::PVMonitor::_sizeof()*(this->npvMonitors())))+(ControlData::PVLabel::_sizeof()*(this->npvLabels())))+4)-1)/4)*4; }
 private:
   uint32_t	_control;
   uint32_t	_reserved;
@@ -199,9 +199,9 @@ private:
   uint32_t	_npvControls;	/**< Number of PVControl objects in this configuration. */
   uint32_t	_npvMonitors;	/**< Number of PVMonitor objects in this configuration. */
   uint32_t	_npvLabels;	/**< Number of PVLabel objects in this configuration. */
-  //ControlData::PVControl	_pvControls[this->_npvControls];
-  //ControlData::PVMonitor	_pvMonitors[this->_npvMonitors];
-  //ControlData::PVLabel	_pvLabels[this->_npvLabels];
+  //ControlData::PVControl	_pvControls[this->npvControls()];
+  //ControlData::PVMonitor	_pvMonitors[this->npvMonitors()];
+  //ControlData::PVLabel	_pvLabels[this->npvLabels()];
 };
 } // namespace ControlData
 } // namespace PsddlPds

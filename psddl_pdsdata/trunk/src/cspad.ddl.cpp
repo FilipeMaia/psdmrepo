@@ -11,7 +11,7 @@ ConfigV1::numAsicsRead() const {
 }
 uint32_t
 ConfigV1::numQuads() const {
-  return __builtin_popcount(this->_quadMask);
+  return __builtin_popcount(this->quadMask());
 }
 uint32_t
 ConfigV1::numSect() const {
@@ -30,7 +30,7 @@ ConfigV2::numAsicsRead() const {
 }
 uint32_t
 ConfigV2::roiMask(uint32_t iq) const {
-  return (this->_roiMask >> (8*iq)) & 0xff;
+  return (this->roiMasks() >> (8*iq)) & 0xff;
 }
 uint32_t
 ConfigV2::numAsicsStored(uint32_t iq) const {
@@ -38,11 +38,11 @@ ConfigV2::numAsicsStored(uint32_t iq) const {
 }
 uint32_t
 ConfigV2::numQuads() const {
-  return __builtin_popcount(this->_quadMask);
+  return __builtin_popcount(this->quadMask());
 }
 uint32_t
 ConfigV2::numSect() const {
-  return __builtin_popcount(this->_roiMask);
+  return __builtin_popcount(this->roiMasks());
 }
 std::vector<int>
 ConfigV2::quads_shape() const {
@@ -57,7 +57,7 @@ ConfigV3::numAsicsRead() const {
 }
 uint32_t
 ConfigV3::roiMask(uint32_t iq) const {
-  return (this->_roiMask >> (8*iq)) & 0xff;
+  return (this->roiMasks() >> (8*iq)) & 0xff;
 }
 uint32_t
 ConfigV3::numAsicsStored(uint32_t iq) const {
@@ -65,11 +65,11 @@ ConfigV3::numAsicsStored(uint32_t iq) const {
 }
 uint32_t
 ConfigV3::numQuads() const {
-  return __builtin_popcount(this->_quadMask);
+  return __builtin_popcount(this->quadMask());
 }
 uint32_t
 ConfigV3::numSect() const {
-  return __builtin_popcount(this->_roiMask);
+  return __builtin_popcount(this->roiMasks());
 }
 std::vector<int>
 ConfigV3::quads_shape() const {
@@ -84,7 +84,7 @@ ConfigV4::numAsicsRead() const {
 }
 uint32_t
 ConfigV4::roiMask(uint32_t iq) const {
-  return (this->_roiMask >> (8*iq)) & 0xff;
+  return (this->roiMasks() >> (8*iq)) & 0xff;
 }
 uint32_t
 ConfigV4::numAsicsStored(uint32_t iq) const {
@@ -92,11 +92,11 @@ ConfigV4::numAsicsStored(uint32_t iq) const {
 }
 uint32_t
 ConfigV4::numQuads() const {
-  return __builtin_popcount(this->_quadMask);
+  return __builtin_popcount(this->quadMask());
 }
 uint32_t
 ConfigV4::numSect() const {
-  return __builtin_popcount(this->_roiMask);
+  return __builtin_popcount(this->roiMasks());
 }
 std::vector<int>
 ConfigV4::quads_shape() const {
