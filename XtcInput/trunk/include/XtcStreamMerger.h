@@ -61,7 +61,6 @@ public:
    *  @brief Make iterator instance
    *
    *  @param[in]  streamIter  Iterator for input files
-   *  @param[in]  maxDgSize Maximum allowed datagram size
    *  @param[in]  l1OffsetSec Time offset to add to non-L1Accept transitions.
    */
   XtcStreamMerger(const boost::shared_ptr<StreamFileIterI>& streamIter,
