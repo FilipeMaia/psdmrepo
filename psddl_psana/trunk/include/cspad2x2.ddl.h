@@ -78,6 +78,9 @@ public:
 
 class CsPad2x2ReadOnlyCfg {
 public:
+  CsPad2x2ReadOnlyCfg()
+  {
+  }
   CsPad2x2ReadOnlyCfg(uint32_t arg__shiftTest, uint32_t arg__version)
     : _shiftTest(arg__shiftTest), _version(arg__version)
   {
@@ -98,6 +101,9 @@ private:
 
 class ProtectionSystemThreshold {
 public:
+  ProtectionSystemThreshold()
+  {
+  }
   ProtectionSystemThreshold(uint32_t arg__adcThreshold, uint32_t arg__pixelCountThreshold)
     : _adcThreshold(arg__adcThreshold), _pixelCountThreshold(arg__pixelCountThreshold)
   {

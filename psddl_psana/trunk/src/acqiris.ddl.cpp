@@ -7,7 +7,7 @@ namespace Psana {
 namespace Acqiris {
 double
 VertV1::slope() const {
-  return _fullScale / ((1 << Acqiris::DataDescV1Elem::NumberOfBits)*(1 << Acqiris::DataDescV1Elem::BitShift));
+  return this->fullScale() / ((1 << Acqiris::DataDescV1Elem::NumberOfBits)*(1 << Acqiris::DataDescV1Elem::BitShift));
 }
 
 ConfigV1::~ConfigV1() {}
