@@ -1,0 +1,3 @@
+- psana XTC converter uses generated dispatch 
+- compared to ana0.7.x there are big changes in psana-python bindings
+- XtcExplorer has been updated to new psana-python bindings
