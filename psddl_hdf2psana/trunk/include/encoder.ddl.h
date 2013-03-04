@@ -32,8 +32,10 @@ struct dataset_config {
 class ConfigV1_v0 : public Psana::Encoder::ConfigV1 {
 public:
   typedef Psana::Encoder::ConfigV1 PsanaType;
+  ConfigV1_v0() {}
   ConfigV1_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
+  ConfigV1_v0(const boost::shared_ptr<ns_ConfigV1_v0::dataset_config>& ds) : m_ds_config(ds) {}
   virtual ~ConfigV1_v0() {}
   virtual uint32_t chan_num() const;
   virtual uint32_t count_mode() const;
@@ -72,8 +74,10 @@ struct dataset_config {
 class ConfigV2_v0 : public Psana::Encoder::ConfigV2 {
 public:
   typedef Psana::Encoder::ConfigV2 PsanaType;
+  ConfigV2_v0() {}
   ConfigV2_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
+  ConfigV2_v0(const boost::shared_ptr<ns_ConfigV2_v0::dataset_config>& ds) : m_ds_config(ds) {}
   virtual ~ConfigV2_v0() {}
   virtual uint32_t chan_mask() const;
   virtual uint32_t count_mode() const;
@@ -108,8 +112,10 @@ struct dataset_data {
 class DataV1_v0 : public Psana::Encoder::DataV1 {
 public:
   typedef Psana::Encoder::DataV1 PsanaType;
+  DataV1_v0() {}
   DataV1_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
+  DataV1_v0(const boost::shared_ptr<ns_DataV1_v0::dataset_data>& ds) : m_ds_data(ds) {}
   virtual ~DataV1_v0() {}
   virtual uint32_t timestamp() const;
   virtual uint32_t encoder_count() const;
@@ -143,8 +149,10 @@ struct dataset_data {
 class DataV2_v0 : public Psana::Encoder::DataV2 {
 public:
   typedef Psana::Encoder::DataV2 PsanaType;
+  DataV2_v0() {}
   DataV2_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
+  DataV2_v0(const boost::shared_ptr<ns_DataV2_v0::dataset_data>& ds) : m_ds_data(ds) {}
   virtual ~DataV2_v0() {}
   virtual uint32_t timestamp() const;
   virtual ndarray<const uint32_t, 1> encoder_count() const;

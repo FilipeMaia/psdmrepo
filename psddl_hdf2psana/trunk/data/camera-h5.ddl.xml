@@ -22,7 +22,7 @@
             
             <dataset name="image">
 
-                <tag name="external" value="camera.ddlm.h"/>
+                <tag name="external" value="psddl_hdf2psana/camera.ddlm.h"/>
 
             </dataset>
             

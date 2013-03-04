@@ -45,8 +45,10 @@ struct dataset_config {
 class ConfigV1_v0 : public Psana::Andor::ConfigV1 {
 public:
   typedef Psana::Andor::ConfigV1 PsanaType;
+  ConfigV1_v0() {}
   ConfigV1_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
+  ConfigV1_v0(const boost::shared_ptr<ns_ConfigV1_v0::dataset_config>& ds) : m_ds_config(ds) {}
   virtual ~ConfigV1_v0() {}
   virtual uint32_t width() const;
   virtual uint32_t height() const;
@@ -109,6 +111,7 @@ template <typename Config>
 class FrameV1_v0 : public Psana::Andor::FrameV1 {
 public:
   typedef Psana::Andor::FrameV1 PsanaType;
+  FrameV1_v0() {}
   FrameV1_v0(hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Config>& cfg)
     : m_group(group), m_idx(idx), m_cfg(cfg) {}
   virtual ~FrameV1_v0() {}

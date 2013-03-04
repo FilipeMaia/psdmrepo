@@ -41,8 +41,10 @@ struct dataset_config {
 class ConfigV1_v0 : public Psana::Princeton::ConfigV1 {
 public:
   typedef Psana::Princeton::ConfigV1 PsanaType;
+  ConfigV1_v0() {}
   ConfigV1_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
+  ConfigV1_v0(const boost::shared_ptr<ns_ConfigV1_v0::dataset_config>& ds) : m_ds_config(ds) {}
   virtual ~ConfigV1_v0() {}
   virtual uint32_t width() const;
   virtual uint32_t height() const;
@@ -100,8 +102,10 @@ struct dataset_config {
 class ConfigV2_v0 : public Psana::Princeton::ConfigV2 {
 public:
   typedef Psana::Princeton::ConfigV2 PsanaType;
+  ConfigV2_v0() {}
   ConfigV2_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
+  ConfigV2_v0(const boost::shared_ptr<ns_ConfigV2_v0::dataset_config>& ds) : m_ds_config(ds) {}
   virtual ~ConfigV2_v0() {}
   virtual uint32_t width() const;
   virtual uint32_t height() const;
@@ -160,8 +164,10 @@ struct dataset_config {
 class ConfigV3_v0 : public Psana::Princeton::ConfigV3 {
 public:
   typedef Psana::Princeton::ConfigV3 PsanaType;
+  ConfigV3_v0() {}
   ConfigV3_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
+  ConfigV3_v0(const boost::shared_ptr<ns_ConfigV3_v0::dataset_config>& ds) : m_ds_config(ds) {}
   virtual ~ConfigV3_v0() {}
   virtual uint32_t width() const;
   virtual uint32_t height() const;
@@ -223,8 +229,10 @@ struct dataset_config {
 class ConfigV4_v0 : public Psana::Princeton::ConfigV4 {
 public:
   typedef Psana::Princeton::ConfigV4 PsanaType;
+  ConfigV4_v0() {}
   ConfigV4_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
+  ConfigV4_v0(const boost::shared_ptr<ns_ConfigV4_v0::dataset_config>& ds) : m_ds_config(ds) {}
   virtual ~ConfigV4_v0() {}
   virtual uint32_t width() const;
   virtual uint32_t height() const;
@@ -290,8 +298,10 @@ struct dataset_config {
 class ConfigV5_v0 : public Psana::Princeton::ConfigV5 {
 public:
   typedef Psana::Princeton::ConfigV5 PsanaType;
+  ConfigV5_v0() {}
   ConfigV5_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
+  ConfigV5_v0(const boost::shared_ptr<ns_ConfigV5_v0::dataset_config>& ds) : m_ds_config(ds) {}
   virtual ~ConfigV5_v0() {}
   virtual uint32_t width() const;
   virtual uint32_t height() const;
@@ -354,6 +364,7 @@ template <typename Config>
 class FrameV1_v0 : public Psana::Princeton::FrameV1 {
 public:
   typedef Psana::Princeton::FrameV1 PsanaType;
+  FrameV1_v0() {}
   FrameV1_v0(hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Config>& cfg)
     : m_group(group), m_idx(idx), m_cfg(cfg) {}
   virtual ~FrameV1_v0() {}
@@ -409,6 +420,7 @@ template <typename Config>
 class FrameV2_v0 : public Psana::Princeton::FrameV2 {
 public:
   typedef Psana::Princeton::FrameV2 PsanaType;
+  FrameV2_v0() {}
   FrameV2_v0(hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Config>& cfg)
     : m_group(group), m_idx(idx), m_cfg(cfg) {}
   virtual ~FrameV2_v0() {}

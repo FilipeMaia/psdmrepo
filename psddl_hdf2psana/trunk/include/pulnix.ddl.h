@@ -36,8 +36,10 @@ struct dataset_config {
 class TM6740ConfigV1_v0 : public Psana::Pulnix::TM6740ConfigV1 {
 public:
   typedef Psana::Pulnix::TM6740ConfigV1 PsanaType;
+  TM6740ConfigV1_v0() {}
   TM6740ConfigV1_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
+  TM6740ConfigV1_v0(const boost::shared_ptr<ns_TM6740ConfigV1_v0::dataset_config>& ds) : m_ds_config(ds) {}
   virtual ~TM6740ConfigV1_v0() {}
   virtual uint16_t gain_a() const;
   virtual uint16_t gain_b() const;
@@ -84,8 +86,10 @@ struct dataset_config {
 class TM6740ConfigV2_v0 : public Psana::Pulnix::TM6740ConfigV2 {
 public:
   typedef Psana::Pulnix::TM6740ConfigV2 PsanaType;
+  TM6740ConfigV2_v0() {}
   TM6740ConfigV2_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
+  TM6740ConfigV2_v0(const boost::shared_ptr<ns_TM6740ConfigV2_v0::dataset_config>& ds) : m_ds_config(ds) {}
   virtual ~TM6740ConfigV2_v0() {}
   virtual uint16_t gain_a() const;
   virtual uint16_t gain_b() const;

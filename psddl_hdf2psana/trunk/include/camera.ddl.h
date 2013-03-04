@@ -7,7 +7,7 @@
 #include "hdf5pp/Group.h"
 #include "hdf5pp/Type.h"
 #include "PSEvt/Proxy.h"
-#include "camera.ddlm.h"
+#include "psddl_hdf2psana/camera.ddlm.h"
 namespace psddl_hdf2psana {
 namespace Camera {
 
@@ -48,6 +48,7 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Camera::FrameCoord> > make_FrameCoord(int 
 class FrameFccdConfigV1_v0 : public Psana::Camera::FrameFccdConfigV1 {
 public:
   typedef Psana::Camera::FrameFccdConfigV1 PsanaType;
+  FrameFccdConfigV1_v0() {}
   FrameFccdConfigV1_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
   virtual ~FrameFccdConfigV1_v0() {}
@@ -94,6 +95,7 @@ struct dataset_masked_pixel_coordinates {
 class FrameFexConfigV1_v0 : public Psana::Camera::FrameFexConfigV1 {
 public:
   typedef Psana::Camera::FrameFexConfigV1 PsanaType;
+  FrameFexConfigV1_v0() {}
   FrameFexConfigV1_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
   virtual ~FrameFexConfigV1_v0() {}
@@ -139,6 +141,7 @@ struct dataset_data {
 class FrameV1_v0 : public Psana::Camera::FrameV1 {
 public:
   typedef Psana::Camera::FrameV1 PsanaType;
+  FrameV1_v0() {}
   FrameV1_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
   virtual ~FrameV1_v0() {}
@@ -191,8 +194,10 @@ struct dataset_data {
 class TwoDGaussianV1_v0 : public Psana::Camera::TwoDGaussianV1 {
 public:
   typedef Psana::Camera::TwoDGaussianV1 PsanaType;
+  TwoDGaussianV1_v0() {}
   TwoDGaussianV1_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
+  TwoDGaussianV1_v0(const boost::shared_ptr<ns_TwoDGaussianV1_v0::dataset_data>& ds) : m_ds_data(ds) {}
   virtual ~TwoDGaussianV1_v0() {}
   virtual uint64_t integral() const;
   virtual double xmean() const;

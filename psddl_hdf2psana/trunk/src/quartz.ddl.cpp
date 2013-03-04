@@ -135,7 +135,7 @@ hdf5pp::Type ns_ConfigV1_v0_dataset_defect_pixel_coordinates_stored_type()
 {
   typedef ns_ConfigV1_v0::dataset_defect_pixel_coordinates DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("defect_pixel_coordinates", offsetof(DsType, defect_pixel_coordinates), Camera::ns_FrameCoord_v0::dataset_data::stored_type());
+  type.insert("defect_pixel_coordinates", offsetof(DsType, defect_pixel_coordinates), hdf5pp::TypeTraits<Camera::ns_FrameCoord_v0::dataset_data>::stored_type());
   return type;
 }
 
@@ -149,7 +149,7 @@ hdf5pp::Type ns_ConfigV1_v0_dataset_defect_pixel_coordinates_native_type()
 {
   typedef ns_ConfigV1_v0::dataset_defect_pixel_coordinates DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("defect_pixel_coordinates", offsetof(DsType, defect_pixel_coordinates), Camera::ns_FrameCoord_v0::dataset_data::native_type());
+  type.insert("defect_pixel_coordinates", offsetof(DsType, defect_pixel_coordinates), hdf5pp::TypeTraits<Camera::ns_FrameCoord_v0::dataset_data>::native_type());
   return type;
 }
 

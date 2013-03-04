@@ -85,8 +85,10 @@ struct dataset_config {
 class ConfigV1_v0 : public Psana::Timepix::ConfigV1 {
 public:
   typedef Psana::Timepix::ConfigV1 PsanaType;
+  ConfigV1_v0() {}
   ConfigV1_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
+  ConfigV1_v0(const boost::shared_ptr<ns_ConfigV1_v0::dataset_config>& ds) : m_ds_config(ds) {}
   virtual ~ConfigV1_v0() {}
   virtual Psana::Timepix::ConfigV1::ReadoutSpeed readoutSpeed() const;
   virtual Psana::Timepix::ConfigV1::TriggerMode triggerMode() const;
@@ -256,6 +258,7 @@ struct dataset_pixelThresh {
 class ConfigV2_v0 : public Psana::Timepix::ConfigV2 {
 public:
   typedef Psana::Timepix::ConfigV2 PsanaType;
+  ConfigV2_v0() {}
   ConfigV2_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
   virtual ~ConfigV2_v0() {}
@@ -444,6 +447,7 @@ struct dataset_pixelThresh {
 class ConfigV3_v0 : public Psana::Timepix::ConfigV3 {
 public:
   typedef Psana::Timepix::ConfigV3 PsanaType;
+  ConfigV3_v0() {}
   ConfigV3_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
   virtual ~ConfigV3_v0() {}
@@ -564,6 +568,7 @@ struct dataset_image {
 class DataV1_v0 : public Psana::Timepix::DataV1 {
 public:
   typedef Psana::Timepix::DataV1 PsanaType;
+  DataV1_v0() {}
   DataV1_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
   virtual ~DataV1_v0() {}
@@ -620,6 +625,7 @@ struct dataset_image {
 class DataV2_v0 : public Psana::Timepix::DataV2 {
 public:
   typedef Psana::Timepix::DataV2 PsanaType;
+  DataV2_v0() {}
   DataV2_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
   virtual ~DataV2_v0() {}

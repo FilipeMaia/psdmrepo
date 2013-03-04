@@ -2,7 +2,7 @@
 
 set -e
 
-packages="andor camera control encoder fccd fli gsc16ai ipimb lusi oceanoptics opal1k orca princeton pulnix quartz timepix usdusb"
+packages="andor camera control cspad cspad2x2 encoder fccd fli gsc16ai ipimb lusi oceanoptics opal1k orca princeton pulnix quartz timepix usdusb"
 #packages=""
 
 for pkg in $packages; do 

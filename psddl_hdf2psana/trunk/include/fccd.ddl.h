@@ -31,8 +31,10 @@ struct dataset_config {
 class FccdConfigV1_v0 : public Psana::FCCD::FccdConfigV1 {
 public:
   typedef Psana::FCCD::FccdConfigV1 PsanaType;
+  FccdConfigV1_v0() {}
   FccdConfigV1_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
+  FccdConfigV1_v0(const boost::shared_ptr<ns_FccdConfigV1_v0::dataset_config>& ds) : m_ds_config(ds) {}
   virtual ~FccdConfigV1_v0() {}
   virtual uint16_t outputMode() const;
   virtual uint32_t width() const;
@@ -98,6 +100,7 @@ struct dataset_waveforms {
 class FccdConfigV2_v0 : public Psana::FCCD::FccdConfigV2 {
 public:
   typedef Psana::FCCD::FccdConfigV2 PsanaType;
+  FccdConfigV2_v0() {}
   FccdConfigV2_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
   virtual ~FccdConfigV2_v0() {}

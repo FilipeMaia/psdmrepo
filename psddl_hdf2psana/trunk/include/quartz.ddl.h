@@ -64,6 +64,7 @@ struct dataset_defect_pixel_coordinates {
 class ConfigV1_v0 : public Psana::Quartz::ConfigV1 {
 public:
   typedef Psana::Quartz::ConfigV1 PsanaType;
+  ConfigV1_v0() {}
   ConfigV1_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
   virtual ~ConfigV1_v0() {}

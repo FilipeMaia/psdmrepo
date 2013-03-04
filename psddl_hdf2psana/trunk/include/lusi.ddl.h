@@ -127,8 +127,10 @@ struct dataset_config {
 class IpmFexConfigV1_v0 : public Psana::Lusi::IpmFexConfigV1 {
 public:
   typedef Psana::Lusi::IpmFexConfigV1 PsanaType;
+  IpmFexConfigV1_v0() {}
   IpmFexConfigV1_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
+  IpmFexConfigV1_v0(const boost::shared_ptr<ns_IpmFexConfigV1_v0::dataset_config>& ds) : m_ds_config(ds) {}
   virtual ~IpmFexConfigV1_v0() {}
   virtual ndarray<const Psana::Lusi::DiodeFexConfigV1, 1> diode() const;
   virtual float xscale() const;
@@ -162,8 +164,10 @@ struct dataset_config {
 class IpmFexConfigV2_v0 : public Psana::Lusi::IpmFexConfigV2 {
 public:
   typedef Psana::Lusi::IpmFexConfigV2 PsanaType;
+  IpmFexConfigV2_v0() {}
   IpmFexConfigV2_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
+  IpmFexConfigV2_v0(const boost::shared_ptr<ns_IpmFexConfigV2_v0::dataset_config>& ds) : m_ds_config(ds) {}
   virtual ~IpmFexConfigV2_v0() {}
   virtual ndarray<const Psana::Lusi::DiodeFexConfigV2, 1> diode() const;
   virtual float xscale() const;

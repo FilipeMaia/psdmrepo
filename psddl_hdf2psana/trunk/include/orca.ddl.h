@@ -30,8 +30,10 @@ struct dataset_config {
 class ConfigV1_v0 : public Psana::Orca::ConfigV1 {
 public:
   typedef Psana::Orca::ConfigV1 PsanaType;
+  ConfigV1_v0() {}
   ConfigV1_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
+  ConfigV1_v0(const boost::shared_ptr<ns_ConfigV1_v0::dataset_config>& ds) : m_ds_config(ds) {}
   virtual ~ConfigV1_v0() {}
   virtual Psana::Orca::ConfigV1::ReadoutMode mode() const;
   virtual Psana::Orca::ConfigV1::Cooling cooling() const;

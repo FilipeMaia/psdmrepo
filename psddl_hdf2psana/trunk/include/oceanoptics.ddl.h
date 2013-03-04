@@ -30,8 +30,10 @@ struct dataset_config {
 class ConfigV1_v0 : public Psana::OceanOptics::ConfigV1 {
 public:
   typedef Psana::OceanOptics::ConfigV1 PsanaType;
+  ConfigV1_v0() {}
   ConfigV1_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
+  ConfigV1_v0(const boost::shared_ptr<ns_ConfigV1_v0::dataset_config>& ds) : m_ds_config(ds) {}
   virtual ~ConfigV1_v0() {}
   virtual float exposureTime() const;
   virtual ndarray<const double, 1> waveLenCalib() const;
@@ -107,8 +109,10 @@ template <typename Config>
 class DataV1_v0 : public Psana::OceanOptics::DataV1 {
 public:
   typedef Psana::OceanOptics::DataV1 PsanaType;
+  DataV1_v0() {}
   DataV1_v0(hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Config>& cfg)
     : m_group(group), m_idx(idx), m_cfg(cfg) {}
+  DataV1_v0(const boost::shared_ptr<ns_DataV1_v0::dataset_data>& ds) : m_ds_data(ds) {}
   virtual ~DataV1_v0() {}
   virtual ndarray<const uint16_t, 1> data() const;
   virtual uint64_t frameCounter() const;

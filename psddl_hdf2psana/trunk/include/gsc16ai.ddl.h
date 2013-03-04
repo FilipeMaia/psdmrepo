@@ -36,8 +36,10 @@ struct dataset_config {
 class ConfigV1_v0 : public Psana::Gsc16ai::ConfigV1 {
 public:
   typedef Psana::Gsc16ai::ConfigV1 PsanaType;
+  ConfigV1_v0() {}
   ConfigV1_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
+  ConfigV1_v0(const boost::shared_ptr<ns_ConfigV1_v0::dataset_config>& ds) : m_ds_config(ds) {}
   virtual ~ConfigV1_v0() {}
   virtual uint16_t voltageRange() const;
   virtual uint16_t firstChan() const;
@@ -89,6 +91,7 @@ template <typename Config>
 class DataV1_v0 : public Psana::Gsc16ai::DataV1 {
 public:
   typedef Psana::Gsc16ai::DataV1 PsanaType;
+  DataV1_v0() {}
   DataV1_v0(hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Config>& cfg)
     : m_group(group), m_idx(idx), m_cfg(cfg) {}
   virtual ~DataV1_v0() {}

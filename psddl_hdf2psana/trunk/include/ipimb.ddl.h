@@ -39,8 +39,10 @@ struct dataset_config {
 class ConfigV1_v0 : public Psana::Ipimb::ConfigV1 {
 public:
   typedef Psana::Ipimb::ConfigV1 PsanaType;
+  ConfigV1_v0() {}
   ConfigV1_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
+  ConfigV1_v0(const boost::shared_ptr<ns_ConfigV1_v0::dataset_config>& ds) : m_ds_config(ds) {}
   virtual ~ConfigV1_v0() {}
   virtual uint64_t triggerCounter() const;
   virtual uint64_t serialID() const;
@@ -97,8 +99,10 @@ struct dataset_config {
 class ConfigV2_v0 : public Psana::Ipimb::ConfigV2 {
 public:
   typedef Psana::Ipimb::ConfigV2 PsanaType;
+  ConfigV2_v0() {}
   ConfigV2_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
+  ConfigV2_v0(const boost::shared_ptr<ns_ConfigV2_v0::dataset_config>& ds) : m_ds_config(ds) {}
   virtual ~ConfigV2_v0() {}
   virtual uint64_t triggerCounter() const;
   virtual uint64_t serialID() const;
@@ -155,8 +159,10 @@ struct dataset_data {
 class DataV1_v0 : public Psana::Ipimb::DataV1 {
 public:
   typedef Psana::Ipimb::DataV1 PsanaType;
+  DataV1_v0() {}
   DataV1_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
+  DataV1_v0(const boost::shared_ptr<ns_DataV1_v0::dataset_data>& ds) : m_ds_data(ds) {}
   virtual ~DataV1_v0() {}
   virtual uint64_t triggerCounter() const;
   virtual uint16_t config0() const;
@@ -217,8 +223,10 @@ struct dataset_data {
 class DataV2_v0 : public Psana::Ipimb::DataV2 {
 public:
   typedef Psana::Ipimb::DataV2 PsanaType;
+  DataV2_v0() {}
   DataV2_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
+  DataV2_v0(const boost::shared_ptr<ns_DataV2_v0::dataset_data>& ds) : m_ds_data(ds) {}
   virtual ~DataV2_v0() {}
   virtual uint16_t config0() const;
   virtual uint16_t config1() const;

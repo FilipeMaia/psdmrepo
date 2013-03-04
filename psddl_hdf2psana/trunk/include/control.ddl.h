@@ -164,6 +164,7 @@ struct dataset_pvMonitors {
 class ConfigV1_v0 : public Psana::ControlData::ConfigV1 {
 public:
   typedef Psana::ControlData::ConfigV1 PsanaType;
+  ConfigV1_v0() {}
   ConfigV1_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
   virtual ~ConfigV1_v0() {}
@@ -253,6 +254,7 @@ struct dataset_pvLabels {
 class ConfigV2_v0 : public Psana::ControlData::ConfigV2 {
 public:
   typedef Psana::ControlData::ConfigV2 PsanaType;
+  ConfigV2_v0() {}
   ConfigV2_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
   virtual ~ConfigV2_v0() {}

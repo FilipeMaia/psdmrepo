@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE psddl SYSTEM "psddl.dtd">
+
+<psddl>
+
+    <use file="psddldata/acqiris.ddl.xml" />
+
+    <package name="Acqiris">
+    
+        <!-- ========================================================================= -->
+
+        <h5schema name="VertV1" version="0">
+            <dataset name="data">
+                <attribute name="fullScale"/>
+                <attribute name="offset"/>
+                <attribute name="coupling"/>
+                <attribute name="bandwidth"/>
+            </dataset>
+        </h5schema>
+
+        <h5schema name="ConfigV1" version="0">
+            <dataset name="config">
+                <attribute name="nbrConvertersPerChannel"/>
+                <attribute name="channelMask"/>
+                <attribute name="nbrBanks"/>
+                <attribute name="nbrChannels"/>
+            </dataset>
+            <dataset name="horiz">
+                <attribute name="horiz"/>
+            </dataset>
+            <dataset name="trig">
+                <attribute name="trig"/>
+            </dataset>
+            <dataset name="vert">
+                <attribute name="vert" rank="1"/>
+            </dataset>
+        </h5schema>
+        
+        <h5schema name="TimestampV1" version="0">
+            <dataset name="data">
+                <attribute name="pos"/>
+                <attribute name="timeStampLo"/>
+                <attribute name="timeStampHi"/>
+            </dataset>
+        </h5schema>
+        
+        
+        <h5schema name="DataDescV1Elem" version="0">
+            <dataset name="data">
+                <attribute name="nbrSamplesInSeg"/>
+                <attribute name="indexFirstPoint"/>
+                <attribute name="nbrSegments"/>
+            </dataset>
+            <dataset name="timestamp">
+                <attribute name="timestamp" rank="1"/>
+            </dataset>
+            <dataset name="waveforms">
+                <attribute name="waveforms" rank="2"/>
+            </dataset>
+        </h5schema>
+
+        <h5schema name="DataDescV1" version="0">
+            <tag name="external" value="psddl_hdf2psana/acquiris.ddlm.h"/>
+        </h5schema>
+
+
+    </package>
+
+</psddl>

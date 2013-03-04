@@ -51,8 +51,8 @@ ns_PVControl_v0::dataset_config::~dataset_config()
 boost::shared_ptr<Psana::ControlData::PVControl>
 Proxy_PVControl_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key)
 {
-  boost::shared_ptr<ns_PVControl_v0::dataset_config> m_ds_config = hdf5pp::Utils::readGroup<ns_PVControl_v0::dataset_config>(m_group, "config", m_idx);
-  return boost::make_shared<PsanaType>(m_ds_config->name, m_ds_config->index, m_ds_config->value);
+  boost::shared_ptr<ns_PVControl_v0::dataset_config> ds_config = hdf5pp::Utils::readGroup<ns_PVControl_v0::dataset_config>(m_group, "config", m_idx);
+  return boost::make_shared<PsanaType>(ds_config->name, ds_config->index, ds_config->value);
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::ControlData::PVControl> > make_PVControl(int version, hdf5pp::Group group, hsize_t idx) {
@@ -108,8 +108,8 @@ ns_PVMonitor_v0::dataset_data::~dataset_data()
 boost::shared_ptr<Psana::ControlData::PVMonitor>
 Proxy_PVMonitor_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key)
 {
-  boost::shared_ptr<ns_PVMonitor_v0::dataset_data> m_ds_data = hdf5pp::Utils::readGroup<ns_PVMonitor_v0::dataset_data>(m_group, "data", m_idx);
-  return boost::make_shared<PsanaType>(m_ds_data->name, m_ds_data->index, m_ds_data->loValue, m_ds_data->hiValue);
+  boost::shared_ptr<ns_PVMonitor_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<ns_PVMonitor_v0::dataset_data>(m_group, "data", m_idx);
+  return boost::make_shared<PsanaType>(ds_data->name, ds_data->index, ds_data->loValue, ds_data->hiValue);
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::ControlData::PVMonitor> > make_PVMonitor(int version, hdf5pp::Group group, hsize_t idx) {
@@ -159,8 +159,8 @@ ns_PVLabel_v0::dataset_data::~dataset_data()
 boost::shared_ptr<Psana::ControlData::PVLabel>
 Proxy_PVLabel_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key)
 {
-  boost::shared_ptr<ns_PVLabel_v0::dataset_data> m_ds_data = hdf5pp::Utils::readGroup<ns_PVLabel_v0::dataset_data>(m_group, "data", m_idx);
-  return boost::make_shared<PsanaType>(m_ds_data->name, m_ds_data->value);
+  boost::shared_ptr<ns_PVLabel_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<ns_PVLabel_v0::dataset_data>(m_group, "data", m_idx);
+  return boost::make_shared<PsanaType>(ds_data->name, ds_data->value);
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::ControlData::PVLabel> > make_PVLabel(int version, hdf5pp::Group group, hsize_t idx) {
@@ -179,7 +179,7 @@ hdf5pp::Type ns_ConfigV1_v0_dataset_config_stored_type()
   type.insert("events", offsetof(DsType, events), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("uses_duration", offsetof(DsType, uses_duration), hdf5pp::TypeTraits<uint8_t>::stored_type());
   type.insert("uses_events", offsetof(DsType, uses_events), hdf5pp::TypeTraits<uint8_t>::stored_type());
-  type.insert("duration", offsetof(DsType, duration), Pds::ns_ClockTime_v0::dataset_data::stored_type());
+  type.insert("duration", offsetof(DsType, duration), hdf5pp::TypeTraits<Pds::ns_ClockTime_v0::dataset_data>::stored_type());
   type.insert("npvControls", offsetof(DsType, npvControls), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("npvMonitors", offsetof(DsType, npvMonitors), hdf5pp::TypeTraits<uint32_t>::stored_type());
   return type;
@@ -198,7 +198,7 @@ hdf5pp::Type ns_ConfigV1_v0_dataset_config_native_type()
   type.insert("events", offsetof(DsType, events), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("uses_duration", offsetof(DsType, uses_duration), hdf5pp::TypeTraits<uint8_t>::native_type());
   type.insert("uses_events", offsetof(DsType, uses_events), hdf5pp::TypeTraits<uint8_t>::native_type());
-  type.insert("duration", offsetof(DsType, duration), Pds::ns_ClockTime_v0::dataset_data::native_type());
+  type.insert("duration", offsetof(DsType, duration), hdf5pp::TypeTraits<Pds::ns_ClockTime_v0::dataset_data>::native_type());
   type.insert("npvControls", offsetof(DsType, npvControls), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("npvMonitors", offsetof(DsType, npvMonitors), hdf5pp::TypeTraits<uint32_t>::native_type());
   return type;
@@ -220,7 +220,7 @@ hdf5pp::Type ns_ConfigV1_v0_dataset_pvControls_stored_type()
 {
   typedef ns_ConfigV1_v0::dataset_pvControls DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("pvControls", offsetof(DsType, pvControls), ControlData::ns_PVControl_v0::dataset_config::stored_type());
+  type.insert("pvControls", offsetof(DsType, pvControls), hdf5pp::TypeTraits<ControlData::ns_PVControl_v0::dataset_config>::stored_type());
   return type;
 }
 
@@ -234,7 +234,7 @@ hdf5pp::Type ns_ConfigV1_v0_dataset_pvControls_native_type()
 {
   typedef ns_ConfigV1_v0::dataset_pvControls DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("pvControls", offsetof(DsType, pvControls), ControlData::ns_PVControl_v0::dataset_config::native_type());
+  type.insert("pvControls", offsetof(DsType, pvControls), hdf5pp::TypeTraits<ControlData::ns_PVControl_v0::dataset_config>::native_type());
   return type;
 }
 
@@ -256,7 +256,7 @@ hdf5pp::Type ns_ConfigV1_v0_dataset_pvMonitors_stored_type()
 {
   typedef ns_ConfigV1_v0::dataset_pvMonitors DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("pvMonitors", offsetof(DsType, pvMonitors), ControlData::ns_PVMonitor_v0::dataset_data::stored_type());
+  type.insert("pvMonitors", offsetof(DsType, pvMonitors), hdf5pp::TypeTraits<ControlData::ns_PVMonitor_v0::dataset_data>::stored_type());
   return type;
 }
 
@@ -270,7 +270,7 @@ hdf5pp::Type ns_ConfigV1_v0_dataset_pvMonitors_native_type()
 {
   typedef ns_ConfigV1_v0::dataset_pvMonitors DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("pvMonitors", offsetof(DsType, pvMonitors), ControlData::ns_PVMonitor_v0::dataset_data::native_type());
+  type.insert("pvMonitors", offsetof(DsType, pvMonitors), hdf5pp::TypeTraits<ControlData::ns_PVMonitor_v0::dataset_data>::native_type());
   return type;
 }
 
@@ -357,7 +357,7 @@ hdf5pp::Type ns_ConfigV2_v0_dataset_config_stored_type()
   type.insert("events", offsetof(DsType, events), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("uses_duration", offsetof(DsType, uses_duration), hdf5pp::TypeTraits<uint8_t>::stored_type());
   type.insert("uses_events", offsetof(DsType, uses_events), hdf5pp::TypeTraits<uint8_t>::stored_type());
-  type.insert("duration", offsetof(DsType, duration), Pds::ns_ClockTime_v0::dataset_data::stored_type());
+  type.insert("duration", offsetof(DsType, duration), hdf5pp::TypeTraits<Pds::ns_ClockTime_v0::dataset_data>::stored_type());
   type.insert("npvControls", offsetof(DsType, npvControls), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("npvMonitors", offsetof(DsType, npvMonitors), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("npvLabels", offsetof(DsType, npvLabels), hdf5pp::TypeTraits<uint32_t>::stored_type());
@@ -377,7 +377,7 @@ hdf5pp::Type ns_ConfigV2_v0_dataset_config_native_type()
   type.insert("events", offsetof(DsType, events), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("uses_duration", offsetof(DsType, uses_duration), hdf5pp::TypeTraits<uint8_t>::native_type());
   type.insert("uses_events", offsetof(DsType, uses_events), hdf5pp::TypeTraits<uint8_t>::native_type());
-  type.insert("duration", offsetof(DsType, duration), Pds::ns_ClockTime_v0::dataset_data::native_type());
+  type.insert("duration", offsetof(DsType, duration), hdf5pp::TypeTraits<Pds::ns_ClockTime_v0::dataset_data>::native_type());
   type.insert("npvControls", offsetof(DsType, npvControls), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("npvMonitors", offsetof(DsType, npvMonitors), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("npvLabels", offsetof(DsType, npvLabels), hdf5pp::TypeTraits<uint32_t>::native_type());
@@ -400,7 +400,7 @@ hdf5pp::Type ns_ConfigV2_v0_dataset_pvControls_stored_type()
 {
   typedef ns_ConfigV2_v0::dataset_pvControls DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("pvControls", offsetof(DsType, pvControls), ControlData::ns_PVControl_v0::dataset_config::stored_type());
+  type.insert("pvControls", offsetof(DsType, pvControls), hdf5pp::TypeTraits<ControlData::ns_PVControl_v0::dataset_config>::stored_type());
   return type;
 }
 
@@ -414,7 +414,7 @@ hdf5pp::Type ns_ConfigV2_v0_dataset_pvControls_native_type()
 {
   typedef ns_ConfigV2_v0::dataset_pvControls DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("pvControls", offsetof(DsType, pvControls), ControlData::ns_PVControl_v0::dataset_config::native_type());
+  type.insert("pvControls", offsetof(DsType, pvControls), hdf5pp::TypeTraits<ControlData::ns_PVControl_v0::dataset_config>::native_type());
   return type;
 }
 
@@ -436,7 +436,7 @@ hdf5pp::Type ns_ConfigV2_v0_dataset_pvMonitors_stored_type()
 {
   typedef ns_ConfigV2_v0::dataset_pvMonitors DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("pvMonitors", offsetof(DsType, pvMonitors), ControlData::ns_PVMonitor_v0::dataset_data::stored_type());
+  type.insert("pvMonitors", offsetof(DsType, pvMonitors), hdf5pp::TypeTraits<ControlData::ns_PVMonitor_v0::dataset_data>::stored_type());
   return type;
 }
 
@@ -450,7 +450,7 @@ hdf5pp::Type ns_ConfigV2_v0_dataset_pvMonitors_native_type()
 {
   typedef ns_ConfigV2_v0::dataset_pvMonitors DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("pvMonitors", offsetof(DsType, pvMonitors), ControlData::ns_PVMonitor_v0::dataset_data::native_type());
+  type.insert("pvMonitors", offsetof(DsType, pvMonitors), hdf5pp::TypeTraits<ControlData::ns_PVMonitor_v0::dataset_data>::native_type());
   return type;
 }
 
@@ -472,7 +472,7 @@ hdf5pp::Type ns_ConfigV2_v0_dataset_pvLabels_stored_type()
 {
   typedef ns_ConfigV2_v0::dataset_pvLabels DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("pvLabels", offsetof(DsType, pvLabels), ControlData::ns_PVLabel_v0::dataset_data::stored_type());
+  type.insert("pvLabels", offsetof(DsType, pvLabels), hdf5pp::TypeTraits<ControlData::ns_PVLabel_v0::dataset_data>::stored_type());
   return type;
 }
 
@@ -486,7 +486,7 @@ hdf5pp::Type ns_ConfigV2_v0_dataset_pvLabels_native_type()
 {
   typedef ns_ConfigV2_v0::dataset_pvLabels DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("pvLabels", offsetof(DsType, pvLabels), ControlData::ns_PVLabel_v0::dataset_data::native_type());
+  type.insert("pvLabels", offsetof(DsType, pvLabels), hdf5pp::TypeTraits<ControlData::ns_PVLabel_v0::dataset_data>::native_type());
   return type;
 }
 

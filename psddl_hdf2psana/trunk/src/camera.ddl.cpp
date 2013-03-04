@@ -47,8 +47,8 @@ ns_FrameCoord_v0::dataset_data::~dataset_data()
 boost::shared_ptr<Psana::Camera::FrameCoord>
 Proxy_FrameCoord_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key)
 {
-  boost::shared_ptr<ns_FrameCoord_v0::dataset_data> m_ds_data = hdf5pp::Utils::readGroup<ns_FrameCoord_v0::dataset_data>(m_group, "data", m_idx);
-  return boost::make_shared<PsanaType>(m_ds_data->column, m_ds_data->row);
+  boost::shared_ptr<ns_FrameCoord_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<ns_FrameCoord_v0::dataset_data>(m_group, "data", m_idx);
+  return boost::make_shared<PsanaType>(ds_data->column, ds_data->row);
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Camera::FrameCoord> > make_FrameCoord(int version, hdf5pp::Group group, hsize_t idx) {
@@ -84,8 +84,8 @@ hdf5pp::Type ns_FrameFexConfigV1_v0_dataset_config_stored_type()
   _enum_type_processing.insert("GssRegionOfInterest", Psana::Camera::FrameFexConfigV1::GssRegionOfInterest);
   _enum_type_processing.insert("GssThreshold", Psana::Camera::FrameFexConfigV1::GssThreshold);
   type.insert("processing", offsetof(DsType, processing), _enum_type_processing);
-  type.insert("roiBegin", offsetof(DsType, roiBegin), Camera::ns_FrameCoord_v0::dataset_data::stored_type());
-  type.insert("roiEnd", offsetof(DsType, roiEnd), Camera::ns_FrameCoord_v0::dataset_data::stored_type());
+  type.insert("roiBegin", offsetof(DsType, roiBegin), hdf5pp::TypeTraits<Camera::ns_FrameCoord_v0::dataset_data>::stored_type());
+  type.insert("roiEnd", offsetof(DsType, roiEnd), hdf5pp::TypeTraits<Camera::ns_FrameCoord_v0::dataset_data>::stored_type());
   type.insert("threshold", offsetof(DsType, threshold), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("number_of_masked_pixels", offsetof(DsType, number_of_masked_pixels), hdf5pp::TypeTraits<uint32_t>::stored_type());
   return type;
@@ -113,8 +113,8 @@ hdf5pp::Type ns_FrameFexConfigV1_v0_dataset_config_native_type()
   _enum_type_processing.insert("GssRegionOfInterest", Psana::Camera::FrameFexConfigV1::GssRegionOfInterest);
   _enum_type_processing.insert("GssThreshold", Psana::Camera::FrameFexConfigV1::GssThreshold);
   type.insert("processing", offsetof(DsType, processing), _enum_type_processing);
-  type.insert("roiBegin", offsetof(DsType, roiBegin), Camera::ns_FrameCoord_v0::dataset_data::native_type());
-  type.insert("roiEnd", offsetof(DsType, roiEnd), Camera::ns_FrameCoord_v0::dataset_data::native_type());
+  type.insert("roiBegin", offsetof(DsType, roiBegin), hdf5pp::TypeTraits<Camera::ns_FrameCoord_v0::dataset_data>::native_type());
+  type.insert("roiEnd", offsetof(DsType, roiEnd), hdf5pp::TypeTraits<Camera::ns_FrameCoord_v0::dataset_data>::native_type());
   type.insert("threshold", offsetof(DsType, threshold), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("number_of_masked_pixels", offsetof(DsType, number_of_masked_pixels), hdf5pp::TypeTraits<uint32_t>::native_type());
   return type;
@@ -136,7 +136,7 @@ hdf5pp::Type ns_FrameFexConfigV1_v0_dataset_masked_pixel_coordinates_stored_type
 {
   typedef ns_FrameFexConfigV1_v0::dataset_masked_pixel_coordinates DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("masked_pixel_coordinates", offsetof(DsType, masked_pixel_coordinates), Camera::ns_FrameCoord_v0::dataset_data::stored_type());
+  type.insert("masked_pixel_coordinates", offsetof(DsType, masked_pixel_coordinates), hdf5pp::TypeTraits<Camera::ns_FrameCoord_v0::dataset_data>::stored_type());
   return type;
 }
 
@@ -150,7 +150,7 @@ hdf5pp::Type ns_FrameFexConfigV1_v0_dataset_masked_pixel_coordinates_native_type
 {
   typedef ns_FrameFexConfigV1_v0::dataset_masked_pixel_coordinates DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("masked_pixel_coordinates", offsetof(DsType, masked_pixel_coordinates), Camera::ns_FrameCoord_v0::dataset_data::native_type());
+  type.insert("masked_pixel_coordinates", offsetof(DsType, masked_pixel_coordinates), hdf5pp::TypeTraits<Camera::ns_FrameCoord_v0::dataset_data>::native_type());
   return type;
 }
 
