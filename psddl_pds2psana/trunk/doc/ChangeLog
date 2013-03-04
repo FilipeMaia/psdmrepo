@@ -11,6 +11,12 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-12
+2013-03-04 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-09
+- typeid switch (formerly in XtcConverter) is now generated from DDL,
+  new files generated are dispatch.{h,cc}
+
 Tag: V00-05-11
 2013-02-28 Andy Salnikov
 - merge V00-05-10 into main trunk

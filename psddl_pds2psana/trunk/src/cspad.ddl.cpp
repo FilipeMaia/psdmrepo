@@ -238,6 +238,8 @@ uint32_t ConfigV2::asicMask() const { return m_xtcObj->asicMask(); }
 
 uint32_t ConfigV2::quadMask() const { return m_xtcObj->quadMask(); }
 
+uint32_t ConfigV2::roiMasks() const { return m_xtcObj->roiMasks(); }
+
 const Psana::CsPad::ConfigV1QuadReg& ConfigV2::quads(uint32_t i0) const { return _quads[i0]; }
 
 uint32_t ConfigV2::numAsicsRead() const { return m_xtcObj->numAsicsRead(); }
@@ -312,6 +314,8 @@ uint32_t ConfigV3::asicMask() const { return m_xtcObj->asicMask(); }
 
 uint32_t ConfigV3::quadMask() const { return m_xtcObj->quadMask(); }
 
+uint32_t ConfigV3::roiMasks() const { return m_xtcObj->roiMasks(); }
+
 const Psana::CsPad::ConfigV1QuadReg& ConfigV3::quads(uint32_t i0) const { return _quads[i0]; }
 
 uint32_t ConfigV3::numAsicsRead() const { return m_xtcObj->numAsicsRead(); }
@@ -385,6 +389,8 @@ uint32_t ConfigV4::badAsicMask1() const { return m_xtcObj->badAsicMask1(); }
 uint32_t ConfigV4::asicMask() const { return m_xtcObj->asicMask(); }
 
 uint32_t ConfigV4::quadMask() const { return m_xtcObj->quadMask(); }
+
+uint32_t ConfigV4::roiMasks() const { return m_xtcObj->roiMasks(); }
 
 const Psana::CsPad::ConfigV2QuadReg& ConfigV4::quads(uint32_t i0) const { return _quads[i0]; }
 

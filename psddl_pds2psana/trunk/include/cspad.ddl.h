@@ -149,6 +149,7 @@ public:
   virtual uint32_t badAsicMask1() const;
   virtual uint32_t asicMask() const;
   virtual uint32_t quadMask() const;
+  virtual uint32_t roiMasks() const;
   virtual const Psana::CsPad::ConfigV1QuadReg& quads(uint32_t i0) const;
   virtual uint32_t numAsicsRead() const;
   virtual uint32_t roiMask(uint32_t iq) const;
@@ -182,6 +183,7 @@ public:
   virtual uint32_t badAsicMask1() const;
   virtual uint32_t asicMask() const;
   virtual uint32_t quadMask() const;
+  virtual uint32_t roiMasks() const;
   virtual const Psana::CsPad::ConfigV1QuadReg& quads(uint32_t i0) const;
   virtual uint32_t numAsicsRead() const;
   virtual uint32_t roiMask(uint32_t iq) const;
@@ -217,6 +219,7 @@ public:
   virtual uint32_t badAsicMask1() const;
   virtual uint32_t asicMask() const;
   virtual uint32_t quadMask() const;
+  virtual uint32_t roiMasks() const;
   virtual const Psana::CsPad::ConfigV2QuadReg& quads(uint32_t i0) const;
   virtual uint32_t numAsicsRead() const;
   virtual uint32_t roiMask(uint32_t iq) const;
