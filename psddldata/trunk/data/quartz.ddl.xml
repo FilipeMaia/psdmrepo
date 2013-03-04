@@ -12,7 +12,7 @@
         <!-- ========================================================================= -->
 
 
-        <pstype name="ConfigV1" version="1" type_id="Id_Opal1kConfig">
+        <pstype name="ConfigV1" version="1" type_id="Id_QuartzConfig">
 
             <tag name="config-type" />
 
