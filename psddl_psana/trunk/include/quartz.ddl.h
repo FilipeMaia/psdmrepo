@@ -18,7 +18,7 @@ namespace Quartz {
 
 class ConfigV1 {
 public:
-  enum { TypeId = Pds::TypeId::Id_Opal1kConfig /**< XTC type ID value (from Pds::TypeId class) */ };
+  enum { TypeId = Pds::TypeId::Id_QuartzConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
   enum { LUT_Size = 4096 };
   enum { Row_Pixels = 2048 };
