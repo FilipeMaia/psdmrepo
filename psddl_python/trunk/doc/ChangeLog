@@ -11,9 +11,13 @@ Package author: Joseph S. Barrera
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-06
+2013-03-04 Andy Salnikov
+- small change in cspad DDL, re-generate everything from psddldata V00-04-09
+
 Tag: V00-04-05
 2013-03-02 Andy Salnikov
-- generated stuff has include boost/pythin.hpp at the top to suppress 
+- generated stuff has include boost/python.hpp at the top to suppress 
   compilation warnings
 - couple of files include Python.h for the same reason
 
