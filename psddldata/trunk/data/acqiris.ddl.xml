@@ -51,7 +51,7 @@
 
             <method name="slope" type="double">
                 Calculated slope.
-                <expr lang="C++" value="_fullScale / ((1 &lt;&lt; Acqiris::DataDescV1Elem::NumberOfBits)*(1 &lt;&lt; Acqiris::DataDescV1Elem::BitShift))" />
+                <expr lang="C++" value="{self}.fullScale() / ((1 &lt;&lt; Acqiris::DataDescV1Elem::NumberOfBits)*(1 &lt;&lt; Acqiris::DataDescV1Elem::BitShift))" />
             </method>
 
             <ctor>

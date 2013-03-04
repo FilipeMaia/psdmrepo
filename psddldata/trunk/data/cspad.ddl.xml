@@ -95,6 +95,10 @@
             </attribute>
 
             <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
                 Constructor which takes values for every attribute
                 <tag name="inline"/>
                 <tag name="auto"/>
@@ -115,6 +119,10 @@
             <attribute name="_pixelCountThreshold" type="uint32_t" accessor="pixelCountThreshold">
             </attribute>
 
+            <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
             <ctor>
                 Constructor which takes values for every attribute
                 <tag name="inline"/>
@@ -307,7 +315,7 @@
             </method>
             
             <method name="numQuads" type="uint32_t">
-                <expr lang="C++" value="__builtin_popcount({self}._quadMask)"/>
+                <expr lang="C++" value="__builtin_popcount({self}.quadMask())"/>
             </method>
             <method name="numSect" type="uint32_t">
                 <expr lang="C++" value="{self}.numAsicsRead()/2"/>
@@ -356,7 +364,7 @@
             <attribute name="_quadMask" type="uint32_t" accessor="quadMask">
             </attribute>
 
-            <attribute name="_roiMask" type="uint32_t">
+            <attribute name="_roiMask" type="uint32_t" accessor="roiMasks">
             </attribute>
 
             <attribute name="_quads" type="ConfigV1QuadReg" shape="MaxQuadsPerSensor" accessor="quads">
@@ -369,7 +377,7 @@
             <method name="roiMask" type="uint32_t">
                 ROI mask for given quadrant
                 <arg name="iq" type="uint32_t"/>
-                <expr lang="C++" value="({self}._roiMask &gt;&gt; (8*iq)) &amp; 0xff"/>
+                <expr lang="C++" value="({self}.roiMasks() &gt;&gt; (8*iq)) &amp; 0xff"/>
             </method>
             
             <method name="numAsicsStored" type="uint32_t">
@@ -380,12 +388,12 @@
             
             <method name="numQuads" type="uint32_t">
                 Total number of quadrants in setup
-                <expr lang="C++" value="__builtin_popcount({self}._quadMask)"/>
+                <expr lang="C++" value="__builtin_popcount({self}.quadMask())"/>
             </method>
 
             <method name="numSect" type="uint32_t">
                 Total number of sections (2x1) in all quadrants
-                <expr lang="C++" value="__builtin_popcount({self}._roiMask)"/>
+                <expr lang="C++" value="__builtin_popcount({self}.roiMasks())"/>
             </method>
 
         </pstype>
@@ -438,7 +446,7 @@
             <attribute name="_quadMask" type="uint32_t" accessor="quadMask">
             </attribute>
 
-            <attribute name="_roiMask" type="uint32_t">
+            <attribute name="_roiMask" type="uint32_t" accessor="roiMasks">
             </attribute>
 
             <attribute name="_quads" type="ConfigV1QuadReg" shape="MaxQuadsPerSensor" accessor="quads">
@@ -451,7 +459,7 @@
             <method name="roiMask" type="uint32_t">
                 ROI mask for given quadrant
                 <arg name="iq" type="uint32_t"/>
-                <expr lang="C++" value="({self}._roiMask &gt;&gt; (8*iq)) &amp; 0xff"/>
+                <expr lang="C++" value="({self}.roiMasks() &gt;&gt; (8*iq)) &amp; 0xff"/>
             </method>
             
             <method name="numAsicsStored" type="uint32_t">
@@ -462,12 +470,12 @@
             
             <method name="numQuads" type="uint32_t">
                 Total number of quadrants in setup
-                <expr lang="C++" value="__builtin_popcount({self}._quadMask)"/>
+                <expr lang="C++" value="__builtin_popcount({self}.quadMask())"/>
             </method>
 
             <method name="numSect" type="uint32_t">
                 Total number of sections (2x1) in all quadrants
-                <expr lang="C++" value="__builtin_popcount({self}._roiMask)"/>
+                <expr lang="C++" value="__builtin_popcount({self}.roiMasks())"/>
             </method>
 
         </pstype>
@@ -520,7 +528,7 @@
             <attribute name="_quadMask" type="uint32_t" accessor="quadMask">
             </attribute>
 
-            <attribute name="_roiMask" type="uint32_t">
+            <attribute name="_roiMask" type="uint32_t" accessor="roiMasks">
             </attribute>
 
             <attribute name="_quads" type="ConfigV2QuadReg" shape="MaxQuadsPerSensor" accessor="quads">
@@ -533,7 +541,7 @@
             <method name="roiMask" type="uint32_t">
                 ROI mask for given quadrant
                 <arg name="iq" type="uint32_t"/>
-                <expr lang="C++" value="({self}._roiMask &gt;&gt; (8*iq)) &amp; 0xff"/>
+                <expr lang="C++" value="({self}.roiMasks() &gt;&gt; (8*iq)) &amp; 0xff"/>
             </method>
             
             <method name="numAsicsStored" type="uint32_t">
@@ -544,12 +552,12 @@
             
             <method name="numQuads" type="uint32_t">
                 Total number of quadrants in setup
-                <expr lang="C++" value="__builtin_popcount({self}._quadMask)"/>
+                <expr lang="C++" value="__builtin_popcount({self}.quadMask())"/>
             </method>
 
             <method name="numSect" type="uint32_t">
                 Total number of sections (2x1) in all quadrants
-                <expr lang="C++" value="__builtin_popcount({self}._roiMask)"/>
+                <expr lang="C++" value="__builtin_popcount({self}.roiMasks())"/>
             </method>
 
         </pstype>

@@ -95,6 +95,10 @@
             </attribute>
 
             <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
                 Constructor which takes values for every attribute
                 <tag name="inline"/>
                 <tag name="auto"/>
@@ -115,6 +119,10 @@
             <attribute name="_pixelCountThreshold" type="uint32_t" accessor="pixelCountThreshold">
             </attribute>
 
+            <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
             <ctor>
                 Constructor which takes values for every attribute
                 <tag name="inline"/>
