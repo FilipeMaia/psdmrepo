@@ -66,7 +66,6 @@ _ignored_types = [
         'Id_FexampElement',
         'Id_PhasicsConfig',
         'Id_CspadCompressedElement',
-        'Id_QuartzConfig',
         'Id_SharedAcqADC',
         ]
 
@@ -169,7 +168,7 @@ try {
   case Pds::TypeId::{{type_id}}:
 {% endfor %}
     break;
-{% for type_id, block in types.items() %}
+{% for type_id, block in types|dictsort  %}
   case Pds::TypeId::{{type_id}}:
     {
 {{block}}

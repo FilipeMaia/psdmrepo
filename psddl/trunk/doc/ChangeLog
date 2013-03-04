@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-08
+2013-03-04 Andy Salnikov
+- removed Id_QuartzConfig from ignored types
+- order cases in switch by name, will be easier to track changes
+
 Tag: V00-05-07
 2013-03-04 Andy Salnikov
 - more progress on HDF5 generator
