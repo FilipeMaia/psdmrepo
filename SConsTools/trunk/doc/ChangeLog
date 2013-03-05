@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-08
+2013-03-05 Andy Salnikov
+- do not inlude _psana module into documentation, it has nothing in it
+
 Tag: V00-08-07
 2013-02-22 Andy Salnikov
 - last change to tools/psdm_python.py broke psdm-python-config script,
