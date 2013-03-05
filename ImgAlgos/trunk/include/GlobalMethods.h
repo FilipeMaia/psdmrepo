@@ -114,9 +114,9 @@ private:
 //--------------------
 // Save 2-D array in event
   template <typename T>
-  void save2DArrayInEvent(PSEvt::Event& evt, const Pds::Src& src, const std::string& key, T* data, const unsigned* shape)
+  void save2DArrayInEvent(PSEvt::Event& evt, const Pds::Src& src, const std::string& key, const ndarray<T,2>& data)
   {
-    boost::shared_ptr< ndarray<T,2> > img2d( new ndarray<T,2>(data, shape) );
+    boost::shared_ptr< ndarray<T,2> > img2d( new ndarray<T,2>(data) );
     evt.put(img2d, src, key);
   }
 

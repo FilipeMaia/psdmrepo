@@ -190,9 +190,9 @@ ImgSpectra::printSpectra(Event& evt)
   unsigned dc = 100;
   MsgLog( name(), info, "Image spectra for run=" << stringRunNumber(evt) << " Evt=" << stringFromUint(m_count) );
   std::cout <<   "Column:"; for( unsigned c=0; c<m_cols; c+=dc ) std::cout << std::setw(8) << c;
-  std::cout << "\nSignal:"; for( unsigned c=0; c<m_cols; c+=dc ) std::cout << std::setw(8) << std::setprecision(0) << std::fixed << m_data[c];
-  std::cout << "\nRefer.:"; for( unsigned c=0; c<m_cols; c+=dc ) std::cout << std::setw(8) << std::setprecision(0) << std::fixed << m_data[c+m_cols];
-  std::cout << "\nDiff. :"; for( unsigned c=0; c<m_cols; c+=dc ) std::cout << std::setw(8) << std::setprecision(3) << std::fixed << m_data[c+m_cols*2];
+  std::cout << "\nSignal:"; for( unsigned c=0; c<m_cols; c+=dc ) std::cout << std::setw(8) << std::setprecision(0) << std::fixed << m_data[0][c];
+  std::cout << "\nRefer.:"; for( unsigned c=0; c<m_cols; c+=dc ) std::cout << std::setw(8) << std::setprecision(0) << std::fixed << m_data[1][c];
+  std::cout << "\nDiff. :"; for( unsigned c=0; c<m_cols; c+=dc ) std::cout << std::setw(8) << std::setprecision(3) << std::fixed << m_data[2][c];
   std::cout << "\n";
 }
 
@@ -201,13 +201,9 @@ ImgSpectra::printSpectra(Event& evt)
 void
 ImgSpectra::difSpectrum()
 {
-      double* spec_sig = &m_data[0];
-      double* spec_ref = &m_data[m_cols];
-      double* spec_dif = &m_data[m_cols*2];
-
       for( unsigned c=0; c<m_cols; c++ ) {
-	double sum = spec_sig[c] + spec_ref[c];        
-        spec_dif[c] = (sum > 0) ? 2*(spec_sig[c] - spec_ref[c]) / sum : 0;
+	double sum = m_data[0][c] + m_data[1][c];
+	m_data[2][c] = (sum > 0) ? 2*(m_data[0][c] - m_data[1][c]) / sum : 0;
       }
 }
 
@@ -217,15 +213,15 @@ void
 ImgSpectra::procEvent(Event& evt)
 {
   shared_ptr< ndarray<double,2> > sp_img = evt.get(m_str_src, m_key_in, &m_src);
-  if (sp_img.get()) {
-    retrieveSpectra<double> (sp_img, m_print_bits & 4);
-    save2DArrayInEvent<double> (evt, m_src, m_key_out, m_data, m_shape);
+  if (sp_img) {
+    retrieveSpectra<double> (*sp_img, m_print_bits & 4);
+    save2DArrayInEvent<double> (evt, m_src, m_key_out, m_data);
   }
 
   shared_ptr< ndarray<uint16_t,2> > sp_img_u16 = evt.get(m_str_src, m_key_in, &m_src);
-  if (sp_img_u16.get()) {
-    retrieveSpectra<uint16_t> (sp_img_u16, m_print_bits & 4);
-    save2DArrayInEvent<double> (evt, m_src, m_key_out, m_data, m_shape);
+  if (sp_img_u16) {
+    retrieveSpectra<uint16_t> (*sp_img_u16, m_print_bits & 4);
+    save2DArrayInEvent<double> (evt, m_src, m_key_out, m_data);
   }
 }
 

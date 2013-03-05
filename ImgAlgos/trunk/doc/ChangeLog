@@ -11,6 +11,12 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-00
+2013-03-05 Andy Salnikov
+- fixing issues with ndarray data ownership
+- save2DArrayInEvent() now accepts ndarray instead of data pointer
+- replaced data pointers with ndarrays in few modules
+
 Tag: V00-02-00
 2013-01-30 Andy Salnikov
 - switching to const ndarrays for array data

@@ -147,8 +147,7 @@ CameraImageProducer::procEvent(Event& evt, Env& env)
   if (frmData.get()) {
 
       // reserve memory for image array:
-      if(m_count == 1) 
-        m_data = new double [frmData->height() * frmData->width()];
+      if(m_data.empty()) m_data = make_ndarray<double>(frmData->height(), frmData->width());
 
       int offset = (m_subtract_offset) ? frmData->offset() : 0;
       unsigned ind = 0;
@@ -157,19 +156,21 @@ CameraImageProducer::procEvent(Event& evt, Env& env)
       if (not data8.empty()) {
         if( m_print_bits & 8 ) MsgLog(name(), info, "procEvent(...): Get image as ndarray<const uint8_t,2>, subtract offset=" << offset);
         ndarray<const uint8_t, 2>::iterator cit;
-        for(cit=data8.begin(); cit!=data8.end(); cit++) { m_data[ind++] = double(int(*cit) - offset); }
+        ndarray<double, 2>::iterator dit;
+        for(cit=data8.begin(), dit=m_data.begin(); cit!=data8.end(); ++cit, ++dit) { *dit = double(int(*cit) - offset); }
 
-        save2DArrayInEvent<double> (evt, m_src, m_key_out, m_data, data8.shape());
+        save2DArrayInEvent<double> (evt, m_src, m_key_out, m_data);
       }
 
       const ndarray<const uint16_t, 2>& data16 = frmData->data16();
       if (not data16.empty()) {
         if( m_print_bits & 8 ) MsgLog(name(), info, "procEvent(...): Get image as ndarray<const uint16_t,2>, subtract offset=" << offset);
         ndarray<const uint16_t, 2>::iterator cit;
+        ndarray<double, 2>::iterator dit;
         // This loop consumes ~5 ms/event for Opal1000 camera with 1024x1024 image size 
-        for(cit=data16.begin(); cit!=data16.end(); cit++) { m_data[ind++] = double(*cit) - offset; }
+        for(cit=data16.begin(), dit=m_data.begin(); cit!=data16.end(); ++cit, ++dit) { *dit = double(*cit) - offset; }
 
-	save2DArrayInEvent<double> (evt, m_src, m_key_out, m_data, data16.shape());
+	save2DArrayInEvent<double> (evt, m_src, m_key_out, m_data);
       }
     }
   else

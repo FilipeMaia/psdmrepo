@@ -125,7 +125,7 @@ PnccdImageProducer::event(Event& evt, Env& env)
         cout << "\n";
       }
 
-      save2DArrayInEvent<uint16_t> (evt, m_src, m_key_out, data.data(), data.shape());
+      save2DArrayInEvent<uint16_t> (evt, m_src, m_key_out, data);
   }
   else
   {

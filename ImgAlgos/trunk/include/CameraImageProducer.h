@@ -98,8 +98,7 @@ private:
   unsigned       m_print_bits;       // control print bits
   long           m_count;            // local event counter
 
-  double*        m_data;             // pointer to output image data
-  //ndarray<double,2>* m_ndarr; 
+  ndarray<double,2> m_data;
 };
 
 } // namespace ImgAlgos

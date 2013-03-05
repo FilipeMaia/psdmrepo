@@ -223,7 +223,7 @@ PrincetonImageProducer::procEvent(Event& evt, Env& env)
       save2DArrayInEvent<double>   (evt, m_src, m_key_out, m_data, data.shape());
       */
  
-      save2DArrayInEvent<uint16_t> (evt, m_src, m_key_out, data.data(), data.shape());
+      save2DArrayInEvent<uint16_t> (evt, m_src, m_key_out, data);
 
       if( m_print_bits & 8 ) {
         std::cout << "  data =";

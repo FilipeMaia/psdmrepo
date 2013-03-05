@@ -111,10 +111,8 @@ private:
   unsigned    m_print_bits;
   long        m_count;
 
-  unsigned    m_rows;
   unsigned    m_cols;
-  double*     m_data;
-  unsigned    m_shape[2];
+  ndarray<double, 2> m_data;
 
 protected:
 
@@ -123,15 +121,13 @@ protected:
     template <typename T>
     void getSpectrum(const T* img_data, float rowc, float tilt, unsigned width, unsigned ind)
     {
-      double* p_spec = &m_data[ind*m_cols];
-
       for( unsigned c=0; c<m_cols; c++ ) {
 	int row_min = int(rowc - tilt * c - 0.5*width);
 	int row_max = row_min + width + 1;
 
 	for( int r=row_min; r<row_max; r++ ) {
 
-	  p_spec[c] += img_data[r*m_cols + c];
+	  m_data[ind][c] += img_data[r*m_cols + c];
 	}
       }
     }
@@ -139,20 +135,18 @@ protected:
 //--------------------
 
     template <typename T>
-    void retrieveSpectra(const boost::shared_ptr< ndarray<T,2> >& sp_ndarr, bool print_msg=false)
+    void retrieveSpectra(const ndarray<T,2>& sp_ndarr, bool print_msg=false)
       {
-        const T* img_data = sp_ndarr->data();               // Access to entire image
-	m_rows = sp_ndarr->shape()[0];
-	m_cols = sp_ndarr->shape()[1];
-	if(print_msg) MsgLog( name(), info, "Image shape =" << m_rows << ", " << m_cols); 
+        const T* img_data = sp_ndarr.data();               // Access to entire image
+	unsigned rows = sp_ndarr.shape()[0];
+	m_cols = sp_ndarr.shape()[1];
+	if(print_msg) MsgLog( name(), info, "Image shape =" << rows << ", " << m_cols);
 
-	if(m_count == 1) {
-          m_data = new double [3*m_cols]; // memory allocation for output array of spectra
-          m_shape[0] = 3;
-	  m_shape[1] = m_cols; 
+	if(m_data.empty()) {
+          m_data = make_ndarray<double>(3, m_cols); // memory allocation for output array of spectra
 	}
 
-        std::fill_n(m_data, 3*m_cols, double(0));
+        std::fill_n(m_data.begin(), m_data.size(), double(0));
 
         getSpectrum(img_data, m_sig_rowc, m_sig_tilt, m_sig_width, 0);
         getSpectrum(img_data, m_ref_rowc, m_ref_tilt, m_ref_width, 1);	
