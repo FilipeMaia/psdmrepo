@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V01-01-01
+2013-03-05 Andy Salnikov
+- fix constness of reference returned from operator[] in proxy
+
 Tag: V01-01-00
 2013-01-30 Andy Salnikov
 - imlemented conversion constructor from ndarray<T, N> to ndarray<const T, N>

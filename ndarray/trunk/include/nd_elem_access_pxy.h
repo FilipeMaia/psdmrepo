@@ -86,7 +86,7 @@ public:
                       const shape_t shape[], const stride_t strides[])
     : m_data(data), m_shape(shape), m_strides(strides) {}
 
-  const ElemType& operator[](int i) const { return m_data.get()[i*m_strides[0]]; }
+  ElemType& operator[](int i) const { return m_data.get()[i*m_strides[0]]; }
 
 private:
 
