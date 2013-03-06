@@ -79,8 +79,8 @@ class ConfigFileGenerator :
                          'EVENTS'         : str( cp.bat_dark_end.value() - cp.bat_dark_start.value() + 1 ),
                          'IMG_REC_MODULE' : str( cp.bat_img_rec_mod.value() ),
                          'DETINFO'        : str( cp.bat_det_info.value() ),
-                         'FILE_AVE'       : fnm.path_pedestals_ave(),
-                         'FILE_RMS'       : fnm.path_pedestals_rms()
+                         'FNAME_PEDS_AVE' : fnm.path_pedestals_ave(),
+                         'FNAME_PEDS_RMS' : fnm.path_pedestals_rms()
                          }
 
         self.print_substitution_dict()
@@ -113,9 +113,16 @@ class ConfigFileGenerator :
                          'EVENTS'         : str( cp.bat_data_end.value() - cp.bat_data_start.value() + 1 ),
                          'IMG_REC_MODULE' : str( cp.bat_img_rec_mod.value() ),
                          'DETINFO'        : str( cp.bat_det_info.value() ),
-                         'FILE_AVE'       : fnm.path_data_ave(),
-                         'FILE_RMS'       : fnm.path_data_rms()
+                         'FNAME_DATA_AVE' : fnm.path_data_ave(),
+                         'FNAME_DATA_RMS' : fnm.path_data_rms(),
+                         'SAT_THR_ADU'    : str( cp.ccdset_adcsatu.value() ),
+                         'SATPIX_MASK'    : fnm.path_satpix_mask(),
+                         'HOTPIX_MASK'    : fnm.path_hotpix_mask(),
+                         'SATPIX_FRAC'    : fnm.path_satpix_frac(),
+                         'HOTPIX_FRAC'    : fnm.path_hotpix_frac()
                          }
+        # cp.ccdset_ccdgain.value()
+        # cp.ccdset_ccdeff .value()
 
         self.print_substitution_dict()
         self.make_cfg_file()
@@ -128,15 +135,30 @@ class ConfigFileGenerator :
     def make_psana_cfg_file_for_cora_split (self) :
         self.path_in  = apputils.AppDataPath('CorAna/scripts/psana-cora-split.cfg').path()
         self.path_out = fnm.path_cora_split_psana_cfg()
+
         self.d_subs   = {'SKIP'            : str( cp.bat_data_start.value() - 1 ),
                          'EVENTS'          : str( cp.bat_data_end.value() - cp.bat_data_start.value() + 1 ),
                          'IMG_REC_MODULE'  : str( cp.bat_img_rec_mod.value() ),
                          'DETINFO'         : str( cp.bat_det_info.value() ),
                          'PATH_PREFIX_CORA': str( fnm.path_prefix_cora() ),
-                         'IMG_NPARTS'      : str( cp.bat_img_nparts.value() )
-                         #'FILE_AVE'       : fnm.path_data_ave(),
-                         #'FILE_RMS'       : fnm.path_data_rms()
+                         'IMG_NPARTS'      : str( cp.bat_img_nparts.value() ),
+                         'FNAME_PEDS_AVE'  : fnm.path_pedestals_ave(),
                          }
+
+        if cp.lld_type.value() == 'ADU' : #  ['NONE', 'ADU', 'RMS']
+            self.d_subs['THRESHOLD_ADU']  = str( cp.lld_adu.value() )
+            self.d_subs['THRESHOLD_NRMS'] = ''
+            self.d_subs['FNAME_PEDS_RMS'] = ''
+
+        elif cp.lld_type.value() == 'RMS' : 
+            self.d_subs['THRESHOLD_ADU']  = ''
+            self.d_subs['THRESHOLD_NRMS'] = str( cp.lld_rms.value() )
+            self.d_subs['FNAME_PEDS_RMS'] = fnm.path_pedestals_rms()
+
+        else : 
+            self.d_subs['THRESHOLD_ADU']  = ''
+            self.d_subs['THRESHOLD_NRMS'] = ''
+            self.d_subs['FNAME_PEDS_RMS'] = ''
 
         self.print_substitution_dict()
         self.make_cfg_file()

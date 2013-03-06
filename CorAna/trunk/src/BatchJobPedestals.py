@@ -124,7 +124,7 @@ class BatchJobPedestals (BatchJob) :
     def status_for_pedestal_file(self) :
         fname  = fnm.path_pedestals_ave()
         status = os.path.lexists(fname)
-        logger.info('Status: pedestal file ' + fname + self.dict_status[status], __name__) 
+        logger.info('Status: pedestal file ' + fname + ' ' + self.dict_status[status], __name__) 
         return status
 
 #-----------------------------

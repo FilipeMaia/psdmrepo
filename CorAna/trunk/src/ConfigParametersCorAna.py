@@ -343,6 +343,9 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.elog_post_res       = self.declareParameter( name='ELOG_POST_RESPONCE',      val_def='None',      type='str' )
         self.elog_post_msg       = self.declareParameter( name='ELOG_POST_MESSAGE',       val_def='EMPTY MSG', type='str' )
         self.elog_post_att       = self.declareParameter( name='ELOG_POST_ATTACHED_FILE', val_def='None',      type='str' )
+
+        #GUIViewControl.py 
+        self.vc_cbx_show_more    = self.declareParameter( name='SHOW_MORE_BUTTONS', val_def=True,  type='bool' )
         
 #-----------------------------
 

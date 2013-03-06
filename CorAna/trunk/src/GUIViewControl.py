@@ -57,7 +57,23 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.tau_ind = 0
 
         self.initCorArray()        
-        
+
+        self.makeLayout()        
+
+        self.showToolTips()
+        self.setStyle()
+        self.onSlider()
+
+        self.setButtonState()
+
+        #self.overlay = Overlay(self,'Load Results')
+                
+    #-------------------
+    #  Public methods --
+    #-------------------
+
+    def makeLayout(self):
+
         self.tit               = QtGui.QLabel('View Control')
         self.tit_geom          = QtGui.QLabel('Geom. maps:')
         self.tit_part          = QtGui.QLabel('Partitions:')
@@ -95,16 +111,22 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.but_mask_roi      = QtGui.QPushButton('ROI')
         self.but_mask_total    = QtGui.QPushButton('Total')
 
+        self.cbx_more = QtGui.QCheckBox('Show more', self)
+        self.cbx_more.setChecked( cp.vc_cbx_show_more.value() )
+
+
+
         self.sli = QtGui.QSlider(QtCore.Qt.Horizontal, self)        
         self.sli.setValue(0)
         self.sli.setRange(0, self.list_of_tau.shape[0]-1)
         self.sli.setTickInterval(1)
         self.edi_tau = QtGui.QLineEdit('tau(ind)')
 
-
         self.grid = QtGui.QGridLayout()
         self.grid_row = 1
-        self.grid.addWidget(self.tit,              self.grid_row,   0, 1, 9)
+        self.grid.addWidget(self.tit,              self.grid_row,   0, 1, 5)
+        self.grid.addWidget(self.cbx_more,         self.grid_row,   6, 1, 3)
+
         self.grid.addWidget(self.but,              self.grid_row+1, 0)
         self.grid.addWidget(self.edi,              self.grid_row+1, 1, 1, 9)
         self.grid.addWidget(self.edi_tau,          self.grid_row+2, 0)
@@ -118,11 +140,11 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.grid.addWidget(self.but_close,        self.grid_row+3, 6)
 
         self.grid.addWidget(self.tit_geom,         self.grid_row+4, 0)
-        self.grid.addWidget(self.but_X,            self.grid_row+4, 1)
-        self.grid.addWidget(self.but_Y,            self.grid_row+4, 2)
-        self.grid.addWidget(self.but_R,            self.grid_row+4, 3)
-        self.grid.addWidget(self.but_P,            self.grid_row+4, 4)
-        self.grid.addWidget(self.but_Q,            self.grid_row+4, 5)
+        self.grid.addWidget(self.but_P,            self.grid_row+4, 1)
+        self.grid.addWidget(self.but_Q,            self.grid_row+4, 2)
+        self.grid.addWidget(self.but_X,            self.grid_row+4, 3)
+        self.grid.addWidget(self.but_Y,            self.grid_row+4, 4)
+        self.grid.addWidget(self.but_R,            self.grid_row+4, 5)
 
         self.grid.addWidget(self.tit_part,         self.grid_row+5, 0)
         self.grid.addWidget(self.but_P_st,         self.grid_row+5, 1)
@@ -133,22 +155,22 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.grid.addWidget(self.but_QP_dy,        self.grid_row+5, 6)
 
         self.grid.addWidget(self.tit_mask,         self.grid_row+6, 0)
-        self.grid.addWidget(self.but_mask_img_lims,self.grid_row+6, 1)
-        self.grid.addWidget(self.but_mask_blemish, self.grid_row+6, 2)
-        self.grid.addWidget(self.but_mask_hotpix,  self.grid_row+6, 3)
-        self.grid.addWidget(self.but_mask_satpix,  self.grid_row+6, 4)
-        self.grid.addWidget(self.but_mask_roi,     self.grid_row+6, 5)
-        self.grid.addWidget(self.but_mask_total,   self.grid_row+6, 6)
+        self.grid.addWidget(self.but_mask_total,   self.grid_row+6, 1)
+        self.grid.addWidget(self.but_mask_img_lims,self.grid_row+6, 2)
+        self.grid.addWidget(self.but_mask_blemish, self.grid_row+6, 3)
+        self.grid.addWidget(self.but_mask_hotpix,  self.grid_row+6, 4)
+        self.grid.addWidget(self.but_mask_satpix,  self.grid_row+6, 5)
+        self.grid.addWidget(self.but_mask_roi,     self.grid_row+6, 6)
 
         self.grid.addWidget(self.tit_calc,         self.grid_row+7, 0)
-        self.grid.addWidget(self.but_1oIp,         self.grid_row+7, 1)
-        self.grid.addWidget(self.but_1oIf,         self.grid_row+7, 2)
+        self.grid.addWidget(self.but_g2tau,        self.grid_row+7, 1)
+        self.grid.addWidget(self.but_g2tau_gr,     self.grid_row+7, 2)
         self.grid.addWidget(self.but_g2map,        self.grid_row+7, 3)
         self.grid.addWidget(self.but_g2dy,         self.grid_row+7, 4)
-        self.grid.addWidget(self.but_g2tau,        self.grid_row+7, 5)
-        self.grid.addWidget(self.but_g2tau_gr,     self.grid_row+7, 6)
+        self.grid.addWidget(self.but_1oIp,         self.grid_row+7, 5)
+        self.grid.addWidget(self.but_1oIf,         self.grid_row+7, 6)
 
-        self.grid_row += 4
+        self.grid_row += 8
 
         #self.connect(self.edi,         QtCore.SIGNAL('editingFinished()'),        self.onEdit )
         self.connect(self.but,              QtCore.SIGNAL('clicked()'),         self.onBut     )
@@ -182,18 +204,10 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.connect(self.but_mask_total,   QtCore.SIGNAL('clicked()'),         self.onButView )
         self.connect(self.sli,              QtCore.SIGNAL('valueChanged(int)'), self.onSlider  )
         self.connect(self.sli,              QtCore.SIGNAL('sliderReleased()'),  self.onSliderReleased )
- 
+        self.connect(self.cbx_more,         QtCore.SIGNAL('stateChanged(int)'), self.on_cbx ) 
+  
         self.setLayout(self.grid)
 
-        self.showToolTips()
-        self.setStyle()
-        self.onSlider()
-
-        #self.overlay = Overlay(self,'Load Results')
-                
-    #-------------------
-    #  Public methods --
-    #-------------------
 
     def setFileName(self, fname=None) :
         if fname == None : pass
@@ -205,7 +219,8 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.setToolTip(msg)
         self.edi.setToolTip('Click on "File"\nto select the file')
         self.but.setToolTip('Click on this button\nand select the file')
-
+        self.cbx_more.setToolTip('Show more or less buttons')
+ 
 
     def setFrame(self):
         self.frame = QtGui.QFrame(self)
@@ -273,6 +288,8 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.but_mask_roi     .setStyleSheet(cp.styleButton)
         self.but_mask_total   .setStyleSheet(cp.styleButton)
 
+        self.cbx_more         .setStyleSheet (cp.styleLabel)
+ 
 
     def resizeEvent(self, e):
         self.frame.setGeometry(self.rect())
@@ -498,6 +515,58 @@ class GUIViewControl ( QtGui.QWidget ) :
         if cp.plotimgspe_g != None :
             self.redrawPlot()            
 
+    def on_cbx(self):
+        #if self.cbx_dark.hasFocus() :
+        par = cp.vc_cbx_show_more
+        par.setValue( self.cbx_more.isChecked() )
+        msg = 'on_cbx - set status of parameter vc_cbx_show_more: ' + str(par.value())
+        logger.info(msg, __name__ )
+        self.setButtonState()
+
+
+
+    def setButtonState(self):
+
+        is_visible = self.cbx_more.isChecked()
+
+        self.tit_data.setVisible(is_visible)
+        #self.tit_geom.setVisible(is_visible)
+        #self.tit_part.setVisible(is_visible)
+        #self.tit_calc.setVisible(is_visible)
+        #self.tit_mask.setVisible(is_visible)
+
+        self.but_Ip   .setVisible(is_visible)
+        self.but_If   .setVisible(is_visible)
+        self.but_I2   .setVisible(is_visible)
+        self.but_g2raw.setVisible(is_visible)
+
+        self.but_X            .setVisible(is_visible)
+        self.but_Y            .setVisible(is_visible)
+        self.but_R            .setVisible(is_visible)
+        #self.but_P            .setVisible(is_visible)
+        #self.but_Q            .setVisible(is_visible)
+
+        #self.but_P_st         .setVisible(is_visible)
+        #self.but_Q_st         .setVisible(is_visible)
+        #self.but_QP_st        .setVisible(is_visible)
+        #self.but_P_dy         .setVisible(is_visible)
+        #self.but_Q_dy         .setVisible(is_visible)
+        #self.but_QP_dy        .setVisible(is_visible)
+
+        self.but_1oIp         .setVisible(is_visible)
+        self.but_1oIf         .setVisible(is_visible)
+        self.but_g2map        .setVisible(is_visible)
+        self.but_g2dy         .setVisible(is_visible)
+        #self.but_g2tau        .setVisible(is_visible)
+        #self.but_g2tau_gr     .setVisible(is_visible)
+
+        self.but_mask_img_lims.setVisible(is_visible)
+        self.but_mask_blemish .setVisible(is_visible)
+        self.but_mask_hotpix  .setVisible(is_visible)
+        self.but_mask_satpix  .setVisible(is_visible)
+        self.but_mask_roi     .setVisible(is_visible)
+        #self.but_mask_total   .setVisible(is_visible)
+ 
 #-----------------------------
 
 if __name__ == "__main__" :

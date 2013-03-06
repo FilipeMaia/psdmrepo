@@ -408,14 +408,14 @@ def get_gm_time_str(time_sec, fmt='%Y-%m-%d %H:%M:%S %Z'):
 #----------------------------------
 #----------------------------------
 
-def get_array_from_file(fname) :
+def get_array_from_file(fname, dtype=np.float32) :
     if fname==None :
         logger.warning('File name is None...', __name__)         
         return None
         
     elif os.path.lexists(fname) :
         logger.info('Get array from file: ' + fname, __name__)         
-        return np.loadtxt(fname, dtype=np.float32)
+        return np.loadtxt(fname, dtype=dtype)
     else :
         logger.warning(fname + ' is not available', __name__)         
         return None

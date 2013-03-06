@@ -146,6 +146,34 @@ class FileNameManager :
 
 #-----------------------------
 
+    def path_hotpix_frac(self) :
+        return  self.path_prefix() + self.str_exp_run_data() + 'hotpix-frac.txt'
+
+    def path_hotpix_mask(self) :
+        return  self.path_prefix() + self.str_exp_run_data() + 'hotpix-mask.txt'
+
+    def path_hotpix_mask_prefix(self) :
+        return os.path.splitext(self.path_hotpix_mask())[0]
+
+    def path_hotpix_mask_plot(self) :
+        return self.path_hotpix_mask_prefix() + '-plot.png'
+
+#-----------------------------
+
+    def path_satpix_frac(self) :
+        return  self.path_prefix() + self.str_exp_run_data() + 'satpix-frac.txt' 
+
+    def path_satpix_mask(self) :
+        return  self.path_prefix() + self.str_exp_run_data() + 'satpix-mask.txt' 
+
+    def path_satpix_mask_prefix(self) :
+        return os.path.splitext(self.path_satpix_mask())[0]
+
+    def path_satpix_mask_plot(self) :
+        return self.path_satpix_mask_prefix() + '-plot.png'
+
+#-----------------------------
+
     def path_peds_scan_batch_log(self) :
         return self.path_prefix_dark() + 'peds-scan-batch-log.txt'
 
@@ -466,6 +494,9 @@ if __name__ == "__main__" :
     print '\nfnm.get_list_of_files_cora_proc_check():' 
     list =   fnm.get_list_of_files_cora_proc_check()
     for fname in list : print fname
+
+    print 'fnm.path_hotpix_mask() : ', fnm.path_hotpix_mask()
+    print 'fnm.path_satpix_mask() : ', fnm.path_satpix_mask()
     
     sys.exit ( 'End of test for FileNameManager' )
 

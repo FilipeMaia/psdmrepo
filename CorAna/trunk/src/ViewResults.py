@@ -132,6 +132,8 @@ class ViewResults :
         sp.mask_total = None
         sp.mask_blemish = None
         sp.mask_roi = None
+        sp.mask_hotpix = None
+        sp.mask_satpix = None
 
         sp.set_file_name(fname)
         sp.set_parameters()
@@ -598,7 +600,9 @@ class ViewResults :
     def get_list_of_tau_from_file(sp, fname_tau) :
         #fname_tau = fnm.path_cora_merge_tau()
         logger.info('get_list_of_tau_from_file: ' + fname_tau, __name__)
-        return np.loadtxt(fname_tau, dtype=np.uint16)
+        list_of_tau = gu.get_array_from_file(fname_tau, dtype=np.uint16) # np.loadtxt(fname_tau, dtype=np.uint16)
+        if list_of_tau == None : return np.array([1])
+        else                   : return list_of_tau
 
 #-----------------------------
 #--------- MASKS -------------
@@ -627,23 +631,29 @@ class ViewResults :
 
 
     def get_mask_hotpix(sp) :
-        #sp.mask_hotpix = gu.get_array_from_file(fnm.path_hotpix())
-        #return sp.mask_hotpix
-        msg = 'get_mask_hotpix IS NOT IMPLEMENTED YET! get random binomial for now...'
-        logger.warning(msg, __name__)
-        print 'WOARNING: ' + msg
-        #return sp.get_random_img()
-        return sp.get_random_binomial_img(p=0.99)
+
+        if sp.mask_hotpix != None : return sp.mask_hotpix
+        sp.mask_hotpix = gu.get_array_from_file(fnm.path_hotpix_mask())
+        if sp.mask_hotpix != None :
+            logger.info('HOTPIX mask is taken from file ' + fnm.path_hotpix_mask(), __name__)
+        else :
+            sp.mask_hotpix = np.ones((sp.rows,sp.cols), dtype=np.uint8)
+            #sp.mask_hotpix = sp.get_random_binomial_img(p=0.99)   
+            logger.info('HOTPIX mask is not applied', __name__)
+        return sp.mask_hotpix
 
 
     def get_mask_satpix(sp) :
-        #sp.mask_satpix = gu.get_array_from_file(fnm.path_satpix())
-        #return sp.mask_satpix
-        msg = 'get_mask_satpix IS NOT IMPLEMENTED YET! get random binomial for now...'
-        logger.warning(msg, __name__)
-        print 'WOARNING: ' + msg
-        #return sp.get_random_img()
-        return sp.get_random_binomial_img(p=0.98)
+
+        if sp.mask_satpix != None : return sp.mask_satpix
+        sp.mask_satpix = gu.get_array_from_file(fnm.path_satpix_mask())
+        if sp.mask_satpix != None :
+            logger.info('SATPIX mask is taken from file ' + fnm.path_satpix_mask(), __name__)
+        else :
+            sp.mask_satpix = np.ones((sp.rows,sp.cols), dtype=np.uint8)
+            #sp.mask_satpix = sp.get_random_binomial_img(p=0.98)   
+            logger.info('SATPIX mask is not applied', __name__)
+        return sp.mask_satpix
 
 
     def get_mask_roi(sp) :
@@ -663,12 +673,14 @@ class ViewResults :
         if sp.mask_total != None : return sp.mask_total
 
         sp.mask_total = sp.get_mask_image_limits()
-        if cp.ccdcorr_blemish.value() :
-            sp.mask_total *= sp.get_mask_blemish()
-        if cp.ana_mask_type.value() == 'from-file' :
-            sp.mask_total *= sp.get_mask_roi()
-        sp.mask_total *= sp.get_mask_hotpix()
-        sp.mask_total *= sp.get_mask_satpix()
+        if cp.ccdcorr_blemish.value() :              sp.mask_total *= sp.get_mask_blemish()
+        if cp.ana_mask_type.value() == 'from-file' : sp.mask_total *= sp.get_mask_roi()
+
+        mask_hotpix = sp.get_mask_hotpix()
+        if mask_hotpix != None :                     sp.mask_total *= mask_hotpix
+
+        mask_satpix = sp.get_mask_satpix()
+        if mask_satpix != None :                     sp.mask_total *= mask_satpix
  
         return sp.mask_total
 
