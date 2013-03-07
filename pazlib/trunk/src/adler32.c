@@ -10,9 +10,9 @@
 
 #define local static
 
-typedef unsigned long long z_off64_t;
+typedef unsigned long long ad_off64_t;
 
-local uLong adler32_combine_(uLong adler1, uLong adler2, z_off64_t len2);
+local uLong adler32_combine_(uLong adler1, uLong adler2, ad_off64_t len2);
 
 #define BASE 65521UL    /* largest prime smaller than 65536 */
 #define NMAX 5552
@@ -134,7 +134,7 @@ uLong ZEXPORT adler32(adler, buf, len)
 local uLong adler32_combine_(adler1, adler2, len2)
     uLong adler1;
     uLong adler2;
-    z_off64_t len2;
+    ad_off64_t len2;
 {
     unsigned long sum1;
     unsigned long sum2;
@@ -166,7 +166,7 @@ uLong ZEXPORT adler32_combine(adler1, adler2, len2)
 uLong ZEXPORT adler32_combine64(adler1, adler2, len2)
     uLong adler1;
     uLong adler2;
-    z_off64_t len2;
+    ad_off64_t len2;
 {
     return adler32_combine_(adler1, adler2, len2);
 }
