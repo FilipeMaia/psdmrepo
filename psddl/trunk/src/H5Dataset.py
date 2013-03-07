@@ -68,7 +68,12 @@ class H5Dataset ( object ) :
     #-------------------
 
     def className(self):
+        '''Returns name of C++ class/struct for this dataset'''
         return "dataset_{0}".format(self.name)
+
+    def classNameNs(self):
+        '''Returns full name of C++ class/struct for this dataset including parent namespace'''
+        return '::'.join([self.pstype.parent.fullName('C++'), self.parent.nsName(), self.className()])
 
     def __str__(self):
         

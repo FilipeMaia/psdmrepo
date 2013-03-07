@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-09
+2013-03-07 Andy Salnikov
+- refactoring of DdlHdf5Data, moved piece of stuff to DdlHdf5DataHelpers
+- initial implementation for array datasets, compiles, not tested
+
 Tag: V00-05-08
 2013-03-04 Andy Salnikov
 - removed Id_QuartzConfig from ignored types
