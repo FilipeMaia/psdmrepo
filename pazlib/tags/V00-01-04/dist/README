@@ -1,0 +1,8 @@
+
+This directory contains files needed to package pazlib for distribution.
+To build a tarball which includes all necessary files:
+
+1. Change to this directory (pazlib/dist)
+
+2. Run 'make tar PACKAGE=pazlib-M.N' which will create pazlib-M-N.tar.gz
+   in a current directory

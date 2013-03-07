@@ -1,0 +1,50 @@
+
+               Building and installing pazlib
+               ==============================
+
+1. Pre-requisites
+-----------------
+
+The only pre-requisite for pazlib is zlib library and header files which 
+should be installed already on all modern distributions. If you do not
+have zlib installed either use standard distribution tools (yum/rpm,
+apt-get/dpkg, etc.) to install both library and headers, or alternatively
+download recent version from http://zlib.net/. 
+
+2. Makefile
+-----------
+
+Makefile provided with a package should work on most UNIX or Linux 
+platforms. Changes may be needed if your system has zlib installed in 
+non-standard location which cannot be automatically found by compiler or
+linker. Makefile defines two variables which are empty by default but
+can be changed to point to the location of the zlib header files and
+zlib library directory:
+
+ZLIBINC = /path/to/zlib/install/include 
+ZLIBLIB = /path/to/zlib/install/lib
+
+Makefile is using gcc to compile and link shared library. If you want 
+to use different compiler or options change variables CC, CFLAGS, and
+LDFLAGS.
+
+3. Building library
+-------------------
+
+To build library in local directory simply run make or 'make all',
+this will create a single file libpazlib.so.
+
+4. Installing library
+---------------------
+
+pazlib shared library is not meant to be installed in the standard 
+locations and Makefile does not define any targets for installation.
+To install the library in the location of your choice simply copy 
+shared library to the destination directory. As usual the location
+where you copy libpazlib.so should be accessible for ld.so at run
+time (should be included in LD_LIBRARY_PATH).
+
+5. Using the library
+--------------------
+
+Consult README file for details.
