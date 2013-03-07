@@ -32,6 +32,8 @@
 // 		-- Class Interface --
 //		---------------------
 
+using namespace std;
+
 namespace ImgAlgos {
 
 /// @addtogroup ImgAlgos
@@ -158,6 +160,81 @@ private:
   double*        p_frac_nois;      // fraction of noisy events
 
   std::vector<TwoIndexes> v_indForMediane; // Vector of inexes for mediane algorithm
+
+
+protected:
+
+//-------------------
+/// Apply median algorithm for one pixel
+      template <typename T>
+      MedianResult
+      evaluateSoNForPixelForType(unsigned ind1d, const T* data)
+      {
+        unsigned col = ind1d % m_cols;
+        unsigned row = ind1d / m_cols;
+
+        unsigned sum0 = 0;
+        double   sum1 = 0;
+        double   sum2 = 0;
+        
+        for( std::vector<TwoIndexes>::const_iterator ij  = v_indForMediane.begin(); 
+                                                     ij != v_indForMediane.end(); ij++ ) { // v_indForMediane.begin();
+          int ic = col + (ij->i);
+          int ir = row + (ij->j);
+
+          if(ic < 0)       continue;
+          if(ic > m_cols1) continue;
+          if(ir < 0)       continue;
+          if(ir > m_rows1) continue;
+
+          double amp = data[ir*m_cols + ic];
+          sum0 ++;
+          sum1 += amp;
+          sum2 += amp*amp;
+        }
+
+        MedianResult res = {0,0,0,0};
+        
+        if ( sum0 > 0 ) {
+          res.avg = sum1/sum0;                                // Averaged background level
+          res.rms = std::sqrt( sum2/sum0 - res.avg*res.avg ); // RMS os the background around peak
+          double dat = data[ind1d];
+          double dif = dat - res.avg;
+          res.sig = (dif>0) ? dif : 0;                        // Signal above the background
+          res.SoN = (res.rms>0) ? res.sig/res.rms : 0;        // S/N ratio
+        }
+
+        return res;
+      }
+
+//-------------------
+
+      template <typename T>
+      bool collectStatForType(Event& evt) // const T* data, 
+      { 
+        shared_ptr< ndarray<T,2> > img = evt.get(m_str_src, m_key, &m_src);
+        if (img.get()) {
+
+            const T* _data = img->data();
+            double amp(0);
+
+            if(m_do_mask_satu || m_do_frac_satu) 
+              for (unsigned i=0; i<m_size; ++i) {
+	        amp = _data[i];
+	        if ( amp > m_thre_satu ) p_stat_satu[i] ++;
+              }          
+
+            if(m_do_mask_nois || m_do_frac_nois) 
+              for (unsigned i=0; i<m_size; ++i) {
+                if ( evaluateSoNForPixelForType<T>(i, _data).SoN > m_thre_nois ) p_stat_nois[i] ++;  
+	      }
+
+            return true;
+        } 
+        return false;
+      }          
+
+//-------------------
 
 };
 

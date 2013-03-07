@@ -233,23 +233,13 @@ ImgMaskEvaluation::resetStatArrays()
 void 
 ImgMaskEvaluation::collectStat(Event& evt)
 {
-  shared_ptr< ndarray<double,2> > img = evt.get(m_str_src, m_key, &m_src);
-  if (img.get()) {
-      const double* _data = img->data();
-      double amp(0);
+  if ( collectStatForType<uint16_t> (evt) ) return;
+  if ( collectStatForType<int>      (evt) ) return;
+  if ( collectStatForType<float>    (evt) ) return;
+  if ( collectStatForType<uint8_t>  (evt) ) return;
+  if ( collectStatForType<double>   (evt) ) return;
 
-      for (unsigned i=0; i<m_size; ++i) {
-	amp = _data[i];
-	if ( amp > m_thre_satu ) p_stat_satu[i] ++;
-
-	//if ( amp > m_thre_nois ) p_stat_nois[i] ++;
-        if ( evaluateSoNForPixel(i,_data).SoN > m_thre_nois ) p_stat_nois[i] ++;  
-      }          
-  } 
-  else
-  {
-    MsgLog(name(), info, "Image is not available in the event(...) for source:" << m_str_src << " key:" << m_key);
-  }
+  MsgLog(name(), info, "Image is not available in the event(...) for source:" << m_str_src << " key:" << m_key);
 }
 
 //--------------------
@@ -272,7 +262,7 @@ ImgMaskEvaluation::procStatArrays()
           if( p_frac_nois[i] > m_frac_nois ) p_mask_nois[i] = 0;
 	}
 
-    if(m_do_mask_comb) 
+    if(m_do_mask_comb && m_do_mask_nois && m_do_mask_satu) 
         for (unsigned i=0; i<m_size; ++i) {
           p_mask_comb[i] = p_mask_satu[i] & p_mask_nois[i];
 	}
@@ -329,48 +319,6 @@ ImgMaskEvaluation::printVectorOfIndexesForMedian()
     if ( ++n_pairs_in_line > 9 ) {cout << "\n"; n_pairs_in_line=0;}
   }   
   cout << "\nVector size: " << v_indForMediane.size() << endl;
-}
-
-//--------------------
-/// Apply median algorithm for one pixel
-MedianResult
-ImgMaskEvaluation::evaluateSoNForPixel(unsigned ind1d, const double* data)
-{
-  unsigned col = ind1d % m_cols;
-  unsigned row = ind1d / m_cols;
-
-  unsigned sum0 = 0;
-  double   sum1 = 0;
-  double   sum2 = 0;
-
-  for( vector<TwoIndexes>::const_iterator ij  = v_indForMediane.begin();
-                                          ij != v_indForMediane.end(); ij++ ) {
-    int ic = col + (ij->i);
-    int ir = row + (ij->j);
-
-    if(ic < 0)       continue;
-    if(ic > m_cols1) continue;
-    if(ir < 0)       continue;
-    if(ir > m_rows1) continue;
-
-    double  amp = data[ir*m_cols + ic];
-    sum0 ++;
-    sum1 += amp;
-    sum2 += amp*amp;
-  }
-
-  MedianResult res = {0,0,0,0};
-
-  if ( sum0 > 0 ) {
-    res.avg = sum1/sum0;                                // Averaged background level
-    res.rms = std::sqrt( sum2/sum0 - res.avg*res.avg ); // RMS os the background around peak
-    double dat = data[ind1d];
-    double dif = dat - res.avg;
-    res.sig = (dif>0) ? dif : 0;                      // Signal above the background
-    if (res.rms>0) res.SoN = res.sig/res.rms;           // S/N ratio
-  }
-
-  return res;
 }
 
 //--------------------

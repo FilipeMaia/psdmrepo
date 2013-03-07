@@ -11,6 +11,11 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2013-03-06 Mikhail S. Dubrovin
+- add more types for recognition in 
+M       include/ImgMaskEvaluation.h
+M       src/ImgMaskEvaluation.cpp
+	
 Tag: V00-03-00
 2013-03-05 Andy Salnikov
 - fixing issues with ndarray data ownership
