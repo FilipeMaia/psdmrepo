@@ -1,0 +1,3 @@
+- fixed ndarray troubles in ImgAlgos
+- bug fix in ndarray in assigment arr[i][j] = x
+- documentation generation improved for psana python module
