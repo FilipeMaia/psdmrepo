@@ -39,7 +39,7 @@ def generate(env):
         env['CXXFLAGS'] = '-Wno-invalid-offsetof'
         env['LDFLAGS'] = _ld_opt.get(opt,'')
 
-    elif comp == 'gcc44' :
+    elif comp in ['gcc44', 'gcc45'] :
         env['CC'] = 'gcc'
         env['CXX'] = 'g++'
         env['CCFLAGS'] = _gcc_opt.get(opt,'') + ' -Wall'
@@ -54,7 +54,7 @@ def generate(env):
         env['LDFLAGS'] = _ld_opt.get(opt,'')
 
     
-    trace ( "Initialized psdm_cplusplus tool", "psdm_python", 2 )
+    trace ( "Initialized psdm_cplusplus tool", "psdm_cplusplus", 2 )
 
 def exists(env):
     return True
