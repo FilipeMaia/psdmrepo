@@ -292,6 +292,7 @@ class GUIDark ( QtGui.QWidget ) :
 
     def on_but_status(self):
         logger.debug('on_but_status', __name__)
+        logger.info('='*110, __name__)
         bjpeds.check_work_files_for_pedestals()
         if bjpeds.status_for_pedestal_file() : self.but_status.setStyleSheet(cp.styleButtonGood)
         else                                 : self.but_status.setStyleSheet(cp.styleButtonBad)

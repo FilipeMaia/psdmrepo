@@ -125,7 +125,7 @@ class BatchJobData(BatchJob) :
     def status_for_data_aver_file(self) :
         fname  = fnm.path_data_ave()
         status = os.path.lexists(fname)
-        logger.info('Status: data file ' + fname + self.dict_status[status], __name__) 
+        logger.info('Status: data file ' + fname  + ' ' + self.dict_status[status], __name__) 
         return status
 
 #-----------------------------

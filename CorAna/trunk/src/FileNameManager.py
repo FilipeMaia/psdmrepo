@@ -389,6 +389,12 @@ class FileNameManager :
         self.list_of_files_data_aver.append(fnm.path_data_aver_plot())
         self.list_of_files_data_aver.append(fnm.path_data_time_plot())
         self.list_of_files_data_aver.append(fnm.path_data_mons_plot())
+
+        self.list_of_files_data_aver.append(fnm.path_satpix_frac())
+        self.list_of_files_data_aver.append(fnm.path_satpix_mask())
+        self.list_of_files_data_aver.append(fnm.path_hotpix_frac())
+        self.list_of_files_data_aver.append(fnm.path_hotpix_mask())
+
         return self.list_of_files_data_aver
 
 #-----------------------------

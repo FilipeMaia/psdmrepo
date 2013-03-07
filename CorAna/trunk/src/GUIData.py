@@ -141,8 +141,11 @@ class GUIData ( QtGui.QWidget ) :
         self.but_plot  .setToolTip('Plot image and spectrum for averaged data image')
         self.but_tspl  .setToolTip('Plot for time stamps quality check')
         self.but_brow  .setToolTip('Browse files for this procedure')
-        self.but_scan  .setToolTip('Scan entire run and \n1) count number of events \n2) save time stamps \n3) save intensity monitors')
-        self.but_aver  .setToolTip('Average image for \nselected event range')
+        self.but_scan  .setToolTip('Scan entire run and \n1) count number of events' + \
+                                   '\n2) save time stamps' + \
+                                   '\n3) save intensity monitors')
+        self.but_aver  .setToolTip('1) Average image for selected event range' + \
+                                   '\n2) Evaluate hot and saturated pix masks')
         self.but_status.setToolTip('Print batch job status \nin the logger')
         self.but_remove.setToolTip('Remove all data work\nfiles for selected run')
         self.cbx_data  .setToolTip('Lock / unlock buttons and fields')
@@ -306,6 +309,7 @@ class GUIData ( QtGui.QWidget ) :
 
     def on_but_status(self):
         logger.debug('on_but_status', __name__)
+        logger.info('='*110, __name__)
         bjdata.check_work_files_for_data_aver()
         if bjdata.status_for_data_aver_file() : self.but_status.setStyleSheet(cp.styleButtonGood)
         else                                  : self.but_status.setStyleSheet(cp.styleButtonBad)
@@ -369,6 +373,12 @@ class GUIData ( QtGui.QWidget ) :
             try    : del cp.plottime
             except : pass
         except :
+            if not os.path.lexists(fnm.path_data_scan_tstamp_list()) :
+                msg = 'Requested the time plot for NON-EXISTANT FILE: ' \
+                    + str(fnm.path_data_scan_tstamp_list()) + '\nUse "Scan" first...'
+                logger.warning(msg, __name__ )
+                return
+            
             cp.plottime = PlotTime(None, ifname = fnm.path_data_scan_tstamp_list(),\
                                    ofname = fnm.path_data_time_plot())
             cp.plottime.move(cp.guimain.pos().__add__(QtCore.QPoint(760,160)))

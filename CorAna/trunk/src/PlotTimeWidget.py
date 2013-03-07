@@ -61,6 +61,7 @@ class PlotTimeWidget (QtGui.QWidget) :
 
         self.figsize= figsize
         self.ifname = ifname
+
         self.get_array_from_file()
 
         self.fig = plt.figure(figsize=figsize, dpi=100, facecolor='w',edgecolor='w',frameon=True)

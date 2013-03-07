@@ -62,7 +62,8 @@ class ConfigFileGenerator :
     def make_psana_cfg_file_for_peds_scan (self) :
         self.path_in  = apputils.AppDataPath('CorAna/scripts/psana-peds-scan.cfg').path()
         self.path_out = fnm.path_peds_scan_psana_cfg()
-        self.d_subs   = {'SKIP'                 : 'IS_NOT_USED',
+        self.d_subs   = {'FNAME_XTC'            : fnm.path_dark_xtc_cond(),
+                         'SKIP'                 : 'IS_NOT_USED',
                          'EVENTS'               : 'FOR_ALL_EVENTS',
                          'FNAME_TIMESTAMP_LIST' : fnm.path_peds_scan_tstamp_list()
                          }
@@ -75,7 +76,8 @@ class ConfigFileGenerator :
     def make_psana_cfg_file_for_peds_aver (self) :
         self.path_in  = apputils.AppDataPath('CorAna/scripts/psana-peds-aver.cfg').path()
         self.path_out = fnm.path_peds_aver_psana_cfg()
-        self.d_subs   = {'SKIP'           : str( cp.bat_dark_start.value() - 1 ),
+        self.d_subs   = {'FNAME_XTC'      : fnm.path_dark_xtc_cond(),
+                         'SKIP'           : str( cp.bat_dark_start.value() - 1 ),
                          'EVENTS'         : str( cp.bat_dark_end.value() - cp.bat_dark_start.value() + 1 ),
                          'IMG_REC_MODULE' : str( cp.bat_img_rec_mod.value() ),
                          'DETINFO'        : str( cp.bat_det_info.value() ),
@@ -94,7 +96,8 @@ class ConfigFileGenerator :
     def make_psana_cfg_file_for_data_scan (self) :
         self.path_in  = apputils.AppDataPath('CorAna/scripts/psana-data-scan.cfg').path()
         self.path_out = fnm.path_data_scan_psana_cfg()
-        self.d_subs   = {'SKIP'                              : 'IS_NOT_USED',
+        self.d_subs   = {'FNAME_XTC'                         : fnm.path_data_xtc_cond(),
+                         'SKIP'                              : 'IS_NOT_USED',
                          'EVENTS'                            : 'FOR_ALL_EVENTS',
                          'FNAME_TIMESTAMP_LIST'              : fnm.path_data_scan_tstamp_list(),
                          'FNAME_INTENSITY_MONITORS_DATA'     : fnm.path_data_scan_monitors_data(),
@@ -109,7 +112,8 @@ class ConfigFileGenerator :
     def make_psana_cfg_file_for_data_aver (self) :
         self.path_in  = apputils.AppDataPath('CorAna/scripts/psana-data-aver.cfg').path()
         self.path_out = fnm.path_data_aver_psana_cfg()
-        self.d_subs   = {'SKIP'           : str( cp.bat_data_start.value() - 1 ),
+        self.d_subs   = {'FNAME_XTC'      : fnm.path_data_xtc_cond(),
+                         'SKIP'           : str( cp.bat_data_start.value() - 1 ),
                          'EVENTS'         : str( cp.bat_data_end.value() - cp.bat_data_start.value() + 1 ),
                          'IMG_REC_MODULE' : str( cp.bat_img_rec_mod.value() ),
                          'DETINFO'        : str( cp.bat_det_info.value() ),
@@ -136,7 +140,8 @@ class ConfigFileGenerator :
         self.path_in  = apputils.AppDataPath('CorAna/scripts/psana-cora-split.cfg').path()
         self.path_out = fnm.path_cora_split_psana_cfg()
 
-        self.d_subs   = {'SKIP'            : str( cp.bat_data_start.value() - 1 ),
+        self.d_subs   = {'FNAME_XTC'       : fnm.path_data_xtc_cond(),
+                         'SKIP'            : str( cp.bat_data_start.value() - 1 ),
                          'EVENTS'          : str( cp.bat_data_end.value() - cp.bat_data_start.value() + 1 ),
                          'IMG_REC_MODULE'  : str( cp.bat_img_rec_mod.value() ),
                          'DETINFO'         : str( cp.bat_det_info.value() ),
