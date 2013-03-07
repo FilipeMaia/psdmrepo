@@ -44,4 +44,5 @@ PREFIX = os.path.join('$SIT_EXTERNAL_SW', pkg, pkg_ver)
 PYDIR = os.path.join("lib", '$PYTHON', "site-packages", pkg)
 PYDIRSEP = True
 PKGINFO = (pkg, pkg_ver, '$PYTHON', '$SIT_ARCH.found')
+OPTIONAL = True
 standardExternalPackage ( pkg, **locals() )
