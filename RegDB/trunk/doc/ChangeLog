@@ -11,6 +11,11 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-09
+2013-03-07 Igor Gaponenko
+- added MySQL table schema to support two-staged data migration: DSS -> FFB -> ANA
+- added PHP library classes to support NERSC migration and a Web application NERSCMigrationMonitor.php
+
 Tag: V00-01-08
 2013-02-21 Igor Gaponenko
 - added MySQL table schema to keep track of file migration to NERSC
