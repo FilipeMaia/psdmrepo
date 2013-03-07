@@ -84,6 +84,10 @@ public:
   /// get the rank of the data space
   unsigned rank() const ;
 
+  // Get dataspace dimensions, size of dims array must be at least rank().
+  // Either dims or maxdims can be zero pointers.
+  void dimensions(hsize_t* dims, hsize_t* maxdims = 0);
+
   /// get number of elements in data space
   unsigned size() const ;
 

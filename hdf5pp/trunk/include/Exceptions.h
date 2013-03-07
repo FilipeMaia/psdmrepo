@@ -14,6 +14,7 @@
 // C/C++ Headers --
 //-----------------
 #include <string>
+#include <boost/lexical_cast.hpp>
 
 //----------------------
 // Base Class Headers --
@@ -78,6 +79,25 @@ public:
 
   Hdf5BadTypeCast( const ErrSvc::Context& ctx, const std::string& newtype )
     : Exception( ctx, "Hdf5BadTypeCast", "Illegal type cast to " + newtype ) {}
+
+};
+
+class Hdf5RankTooHigh : public Exception {
+public:
+
+  Hdf5RankTooHigh( const ErrSvc::Context& ctx, unsigned rank, unsigned maxrank)
+    : Exception( ctx, "Hdf5RankTooHight", "Data rank (" + boost::lexical_cast<std::string>(rank) +
+        ") is higher than max. supported rank (" + boost::lexical_cast<std::string>(maxrank) + ")") {}
+
+};
+
+class Hdf5RankMismatch : public Exception {
+public:
+
+  Hdf5RankMismatch( const ErrSvc::Context& ctx, unsigned expected, unsigned actual)
+    : Exception( ctx, "Hdf5RankMismatch", "Data rank mismatch, expected rank "
+        + boost::lexical_cast<std::string>(expected) + ", actual rank "
+        + boost::lexical_cast<std::string>(actual)) {}
 
 };
 

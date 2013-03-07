@@ -132,6 +132,15 @@ DataSpace::rank() const
   return rank ;
 }
 
+// Get dataspace dimensions, size of dims array must be at least rank().
+// Either dims or maxdims can be zero pointers.
+void
+DataSpace::dimensions(hsize_t* dims, hsize_t* maxdims)
+{
+  int rank = H5Sget_simple_extent_dims(*m_id, dims, maxdims);
+  if ( rank < 0 ) throw Hdf5CallException( ERR_LOC, "H5Sget_simple_extent_dims") ;
+}
+
 /// get number of elements in dataspace
 unsigned
 DataSpace::size() const
