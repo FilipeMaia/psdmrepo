@@ -120,7 +120,7 @@ uint32_t ConfigV1_v0::trigDelay() const {
 }
 
 void ConfigV1_v0::read_ds_config() const {
-  m_ds_config = hdf5pp::Utils::readGroup<ns_ConfigV1_v0::dataset_config>(m_group, "config", m_idx);
+  m_ds_config = hdf5pp::Utils::readGroup<Ipimb::ns_ConfigV1_v0::dataset_config>(m_group, "config", m_idx);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::Ipimb::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
@@ -254,7 +254,7 @@ uint32_t ConfigV2_v0::adcDelay() const {
 }
 
 void ConfigV2_v0::read_ds_config() const {
-  m_ds_config = hdf5pp::Utils::readGroup<ns_ConfigV2_v0::dataset_config>(m_group, "config", m_idx);
+  m_ds_config = hdf5pp::Utils::readGroup<Ipimb::ns_ConfigV2_v0::dataset_config>(m_group, "config", m_idx);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::Ipimb::ConfigV2> > make_ConfigV2(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
@@ -375,7 +375,7 @@ float DataV1_v0::channel3Volts() const {
   return float(m_ds_data->channel3Volts);
 }
 void DataV1_v0::read_ds_data() const {
-  m_ds_data = hdf5pp::Utils::readGroup<ns_DataV1_v0::dataset_data>(m_group, "data", m_idx);
+  m_ds_data = hdf5pp::Utils::readGroup<Ipimb::ns_DataV1_v0::dataset_data>(m_group, "data", m_idx);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::Ipimb::DataV1> > make_DataV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
@@ -544,7 +544,7 @@ uint64_t DataV2_v0::triggerCounter() const {
   return uint64_t(m_ds_data->triggerCounter);
 }
 void DataV2_v0::read_ds_data() const {
-  m_ds_data = hdf5pp::Utils::readGroup<ns_DataV2_v0::dataset_data>(m_group, "data", m_idx);
+  m_ds_data = hdf5pp::Utils::readGroup<Ipimb::ns_DataV2_v0::dataset_data>(m_group, "data", m_idx);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::Ipimb::DataV2> > make_DataV2(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {

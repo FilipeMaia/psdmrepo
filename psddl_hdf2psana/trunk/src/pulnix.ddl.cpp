@@ -129,7 +129,7 @@ uint8_t TM6740ConfigV1_v0::output_resolution_bits() const {
   return uint8_t(m_ds_config->output_resolution_bits);
 }
 void TM6740ConfigV1_v0::read_ds_config() const {
-  m_ds_config = hdf5pp::Utils::readGroup<ns_TM6740ConfigV1_v0::dataset_config>(m_group, "config", m_idx);
+  m_ds_config = hdf5pp::Utils::readGroup<Pulnix::ns_TM6740ConfigV1_v0::dataset_config>(m_group, "config", m_idx);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::Pulnix::TM6740ConfigV1> > make_TM6740ConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
@@ -260,7 +260,7 @@ uint8_t TM6740ConfigV2_v0::output_resolution_bits() const {
   return uint8_t(m_ds_config->output_resolution_bits);
 }
 void TM6740ConfigV2_v0::read_ds_config() const {
-  m_ds_config = hdf5pp::Utils::readGroup<ns_TM6740ConfigV2_v0::dataset_config>(m_group, "config", m_idx);
+  m_ds_config = hdf5pp::Utils::readGroup<Pulnix::ns_TM6740ConfigV2_v0::dataset_config>(m_group, "config", m_idx);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::Pulnix::TM6740ConfigV2> > make_TM6740ConfigV2(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {

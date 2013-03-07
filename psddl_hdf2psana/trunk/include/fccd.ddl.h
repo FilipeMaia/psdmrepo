@@ -34,7 +34,7 @@ public:
   FccdConfigV1_v0() {}
   FccdConfigV1_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
-  FccdConfigV1_v0(const boost::shared_ptr<ns_FccdConfigV1_v0::dataset_config>& ds) : m_ds_config(ds) {}
+  FccdConfigV1_v0(const boost::shared_ptr<FCCD::ns_FccdConfigV1_v0::dataset_config>& ds) : m_ds_config(ds) {}
   virtual ~FccdConfigV1_v0() {}
   virtual uint16_t outputMode() const;
   virtual uint32_t width() const;
@@ -44,7 +44,7 @@ public:
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
-  mutable boost::shared_ptr<ns_FccdConfigV1_v0::dataset_config> m_ds_config;
+  mutable boost::shared_ptr<FCCD::ns_FccdConfigV1_v0::dataset_config> m_ds_config;
   void read_ds_config() const;
 };
 
@@ -117,11 +117,11 @@ public:
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
-  mutable boost::shared_ptr<ns_FccdConfigV2_v0::dataset_config> m_ds_config;
+  mutable boost::shared_ptr<FCCD::ns_FccdConfigV2_v0::dataset_config> m_ds_config;
   void read_ds_config() const;
-  mutable boost::shared_ptr<ns_FccdConfigV2_v0::dataset_dacVoltages> m_ds_dacVoltages;
+  mutable boost::shared_ptr<FCCD::ns_FccdConfigV2_v0::dataset_dacVoltages> m_ds_dacVoltages;
   void read_ds_dacVoltages() const;
-  mutable boost::shared_ptr<ns_FccdConfigV2_v0::dataset_waveforms> m_ds_waveforms;
+  mutable boost::shared_ptr<FCCD::ns_FccdConfigV2_v0::dataset_waveforms> m_ds_waveforms;
   void read_ds_waveforms() const;
 };
 

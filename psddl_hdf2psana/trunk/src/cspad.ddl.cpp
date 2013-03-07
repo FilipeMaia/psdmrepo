@@ -50,7 +50,7 @@ ndarray<const uint8_t, 1> CsPadDigitalPotsCfg_v0::pots() const {
   return make_ndarray(ptr, PotsPerQuad);
 }
 void CsPadDigitalPotsCfg_v0::read_ds_pots() const {
-  m_ds_pots = hdf5pp::Utils::readGroup<ns_CsPadDigitalPotsCfg_v0::dataset_pots>(m_group, "pots", m_idx);
+  m_ds_pots = hdf5pp::Utils::readGroup<CsPad::ns_CsPadDigitalPotsCfg_v0::dataset_pots>(m_group, "pots", m_idx);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::CsPadDigitalPotsCfg> > make_CsPadDigitalPotsCfg(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
@@ -99,7 +99,7 @@ ns_CsPadReadOnlyCfg_v0::dataset_data::~dataset_data()
 boost::shared_ptr<Psana::CsPad::CsPadReadOnlyCfg>
 Proxy_CsPadReadOnlyCfg_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key)
 {
-  boost::shared_ptr<ns_CsPadReadOnlyCfg_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<ns_CsPadReadOnlyCfg_v0::dataset_data>(m_group, "data", m_idx);
+  boost::shared_ptr<CsPad::ns_CsPadReadOnlyCfg_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<CsPad::ns_CsPadReadOnlyCfg_v0::dataset_data>(m_group, "data", m_idx);
   return boost::make_shared<PsanaType>(ds_data->shiftTest, ds_data->version);
 }
 
@@ -150,7 +150,7 @@ ns_ProtectionSystemThreshold_v0::dataset_data::~dataset_data()
 boost::shared_ptr<Psana::CsPad::ProtectionSystemThreshold>
 Proxy_ProtectionSystemThreshold_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key)
 {
-  boost::shared_ptr<ns_ProtectionSystemThreshold_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<ns_ProtectionSystemThreshold_v0::dataset_data>(m_group, "data", m_idx);
+  boost::shared_ptr<CsPad::ns_ProtectionSystemThreshold_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<CsPad::ns_ProtectionSystemThreshold_v0::dataset_data>(m_group, "data", m_idx);
   return boost::make_shared<PsanaType>(ds_data->adcThreshold, ds_data->pixelCountThreshold);
 }
 
@@ -202,7 +202,7 @@ ndarray<const uint16_t, 2> CsPadGainMapCfg_v0::gainMap() const {
   return make_ndarray(ptr, ColumnsPerASIC,MaxRowsPerASIC);
 }
 void CsPadGainMapCfg_v0::read_ds_gainMap() const {
-  m_ds_gainMap = hdf5pp::Utils::readGroup<ns_CsPadGainMapCfg_v0::dataset_gainMap>(m_group, "gainMap", m_idx);
+  m_ds_gainMap = hdf5pp::Utils::readGroup<CsPad::ns_CsPadGainMapCfg_v0::dataset_gainMap>(m_group, "gainMap", m_idx);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::CsPadGainMapCfg> > make_CsPadGainMapCfg(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
@@ -346,7 +346,7 @@ const Psana::CsPad::CsPadGainMapCfg& ConfigV1QuadReg_v0::gm() const {
   return *m_ds_storage_data_gainMap;
 }
 void ConfigV1QuadReg_v0::read_ds_data() const {
-  m_ds_data = hdf5pp::Utils::readGroup<ns_ConfigV1QuadReg_v0::dataset_data>(m_group, "data", m_idx);
+  m_ds_data = hdf5pp::Utils::readGroup<CsPad::ns_ConfigV1QuadReg_v0::dataset_data>(m_group, "data", m_idx);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::ConfigV1QuadReg> > make_ConfigV1QuadReg(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
@@ -508,7 +508,7 @@ const Psana::CsPad::CsPadGainMapCfg& ConfigV2QuadReg_v0::gm() const {
   return *m_ds_storage_data_gainMap;
 }
 void ConfigV2QuadReg_v0::read_ds_data() const {
-  m_ds_data = hdf5pp::Utils::readGroup<ns_ConfigV2QuadReg_v0::dataset_data>(m_group, "data", m_idx);
+  m_ds_data = hdf5pp::Utils::readGroup<CsPad::ns_ConfigV2QuadReg_v0::dataset_data>(m_group, "data", m_idx);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::ConfigV2QuadReg> > make_ConfigV2QuadReg(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
@@ -651,13 +651,11 @@ uint32_t ConfigV1_v0::numSect() const {
 }
 std::vector<int>
 ConfigV1_v0::quads_shape() const{ 
-  std::vector<int> shape;
-  shape.reserve(1);
-  shape.push_back(MaxQuadsPerSensor);
-  return shape; 
+  int shape[] = { MaxQuadsPerSensor };
+  return std::vector<int>(shape, shape+1); 
 }
 void ConfigV1_v0::read_ds_config() const {
-  m_ds_config = hdf5pp::Utils::readGroup<ns_ConfigV1_v0::dataset_config>(m_group, "config", m_idx);
+  m_ds_config = hdf5pp::Utils::readGroup<CsPad::ns_ConfigV1_v0::dataset_config>(m_group, "config", m_idx);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
@@ -809,13 +807,11 @@ uint32_t ConfigV2_v0::numSect() const {
 }
 std::vector<int>
 ConfigV2_v0::quads_shape() const{ 
-  std::vector<int> shape;
-  shape.reserve(1);
-  shape.push_back(MaxQuadsPerSensor);
-  return shape; 
+  int shape[] = { MaxQuadsPerSensor };
+  return std::vector<int>(shape, shape+1); 
 }
 void ConfigV2_v0::read_ds_config() const {
-  m_ds_config = hdf5pp::Utils::readGroup<ns_ConfigV2_v0::dataset_config>(m_group, "config", m_idx);
+  m_ds_config = hdf5pp::Utils::readGroup<CsPad::ns_ConfigV2_v0::dataset_config>(m_group, "config", m_idx);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::ConfigV2> > make_ConfigV2(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
@@ -985,13 +981,11 @@ uint32_t ConfigV3_v0::numSect() const {
 }
 std::vector<int>
 ConfigV3_v0::quads_shape() const{ 
-  std::vector<int> shape;
-  shape.reserve(1);
-  shape.push_back(MaxQuadsPerSensor);
-  return shape; 
+  int shape[] = { MaxQuadsPerSensor };
+  return std::vector<int>(shape, shape+1); 
 }
 void ConfigV3_v0::read_ds_config() const {
-  m_ds_config = hdf5pp::Utils::readGroup<ns_ConfigV3_v0::dataset_config>(m_group, "config", m_idx);
+  m_ds_config = hdf5pp::Utils::readGroup<CsPad::ns_ConfigV3_v0::dataset_config>(m_group, "config", m_idx);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::ConfigV3> > make_ConfigV3(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
@@ -1161,13 +1155,11 @@ uint32_t ConfigV4_v0::numSect() const {
 }
 std::vector<int>
 ConfigV4_v0::quads_shape() const{ 
-  std::vector<int> shape;
-  shape.reserve(1);
-  shape.push_back(MaxQuadsPerSensor);
-  return shape; 
+  int shape[] = { MaxQuadsPerSensor };
+  return std::vector<int>(shape, shape+1); 
 }
 void ConfigV4_v0::read_ds_config() const {
-  m_ds_config = hdf5pp::Utils::readGroup<ns_ConfigV4_v0::dataset_config>(m_group, "config", m_idx);
+  m_ds_config = hdf5pp::Utils::readGroup<CsPad::ns_ConfigV4_v0::dataset_config>(m_group, "config", m_idx);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::ConfigV4> > make_ConfigV4(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
@@ -1233,42 +1225,6 @@ ns_ElementV1_v0::dataset_element::dataset_element()
 ns_ElementV1_v0::dataset_element::~dataset_element()
 {
 }
-
-hdf5pp::Type ns_ElementV1_v0_dataset_data_stored_type()
-{
-  typedef ns_ElementV1_v0::dataset_data DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("data", offsetof(DsType, data), hdf5pp::TypeTraits<int16_t>::stored_type());
-  return type;
-}
-
-hdf5pp::Type ns_ElementV1_v0::dataset_data::stored_type()
-{
-  static hdf5pp::Type type = ns_ElementV1_v0_dataset_data_stored_type();
-  return type;
-}
-
-hdf5pp::Type ns_ElementV1_v0_dataset_data_native_type()
-{
-  typedef ns_ElementV1_v0::dataset_data DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("data", offsetof(DsType, data), hdf5pp::TypeTraits<int16_t>::native_type());
-  return type;
-}
-
-hdf5pp::Type ns_ElementV1_v0::dataset_data::native_type()
-{
-  static hdf5pp::Type type = ns_ElementV1_v0_dataset_data_native_type();
-  return type;
-}
-ns_ElementV1_v0::dataset_data::dataset_data()
-{
-  this->data = 0;
-}
-ns_ElementV1_v0::dataset_data::~dataset_data()
-{
-  delete [] this->data;
-}
 template <typename Config>
 uint32_t ElementV1_v0<Config>::virtual_channel() const {
   if (not m_ds_element.get()) read_ds_element();
@@ -1327,9 +1283,8 @@ uint32_t ElementV1_v0<Config>::frame_type() const {
 }
 template <typename Config>
 ndarray<const int16_t, 3> ElementV1_v0<Config>::data() const {
-  if (not m_ds_data.get()) read_ds_data();
-  boost::shared_ptr<int16_t> ptr(m_ds_data, m_ds_data->data);
-  return make_ndarray(ptr, m_cfg->numAsicsRead()/2, ColumnsPerASIC, MaxRowsPerASIC*2);
+  if (m_ds_data.empty()) read_ds_data();
+  return m_ds_data;
 }
 template <typename Config>
 uint32_t ElementV1_v0<Config>::sectionMask() const {
@@ -1343,11 +1298,11 @@ return 0;
 }
 template <typename Config>
 void ElementV1_v0<Config>::read_ds_element() const {
-  m_ds_element = hdf5pp::Utils::readGroup<ns_ElementV1_v0::dataset_element>(m_group, "element", m_idx);
+  m_ds_element = hdf5pp::Utils::readGroup<CsPad::ns_ElementV1_v0::dataset_element>(m_group, "element", m_idx);
 }
 template <typename Config>
 void ElementV1_v0<Config>::read_ds_data() const {
-  m_ds_data = hdf5pp::Utils::readGroup<ns_ElementV1_v0::dataset_data>(m_group, "data", m_idx);
+  m_ds_data = hdf5pp::Utils::readNdarray<int16_t, 3>(m_group, "data", m_idx);
 }
 template class ElementV1_v0<Psana::CsPad::ConfigV1>;
 template class ElementV1_v0<Psana::CsPad::ConfigV2>;
@@ -1473,42 +1428,6 @@ ns_ElementV2_v0::dataset_element::dataset_element()
 ns_ElementV2_v0::dataset_element::~dataset_element()
 {
 }
-
-hdf5pp::Type ns_ElementV2_v0_dataset_data_stored_type()
-{
-  typedef ns_ElementV2_v0::dataset_data DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("data", offsetof(DsType, data), hdf5pp::TypeTraits<int16_t>::stored_type());
-  return type;
-}
-
-hdf5pp::Type ns_ElementV2_v0::dataset_data::stored_type()
-{
-  static hdf5pp::Type type = ns_ElementV2_v0_dataset_data_stored_type();
-  return type;
-}
-
-hdf5pp::Type ns_ElementV2_v0_dataset_data_native_type()
-{
-  typedef ns_ElementV2_v0::dataset_data DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("data", offsetof(DsType, data), hdf5pp::TypeTraits<int16_t>::native_type());
-  return type;
-}
-
-hdf5pp::Type ns_ElementV2_v0::dataset_data::native_type()
-{
-  static hdf5pp::Type type = ns_ElementV2_v0_dataset_data_native_type();
-  return type;
-}
-ns_ElementV2_v0::dataset_data::dataset_data()
-{
-  this->data = 0;
-}
-ns_ElementV2_v0::dataset_data::~dataset_data()
-{
-  delete [] this->data;
-}
 template <typename Config>
 uint32_t ElementV2_v0<Config>::virtual_channel() const {
   if (not m_ds_element.get()) read_ds_element();
@@ -1567,9 +1486,8 @@ uint32_t ElementV2_v0<Config>::frame_type() const {
 }
 template <typename Config>
 ndarray<const int16_t, 3> ElementV2_v0<Config>::data() const {
-  if (not m_ds_data.get()) read_ds_data();
-  boost::shared_ptr<int16_t> ptr(m_ds_data, m_ds_data->data);
-  return make_ndarray(ptr, m_cfg->numAsicsStored(this->quad())/2, ColumnsPerASIC, MaxRowsPerASIC*2);
+  if (m_ds_data.empty()) read_ds_data();
+  return m_ds_data;
 }
 template <typename Config>
 uint32_t ElementV2_v0<Config>::sectionMask() const {
@@ -1583,11 +1501,11 @@ return 0;
 }
 template <typename Config>
 void ElementV2_v0<Config>::read_ds_element() const {
-  m_ds_element = hdf5pp::Utils::readGroup<ns_ElementV2_v0::dataset_element>(m_group, "element", m_idx);
+  m_ds_element = hdf5pp::Utils::readGroup<CsPad::ns_ElementV2_v0::dataset_element>(m_group, "element", m_idx);
 }
 template <typename Config>
 void ElementV2_v0<Config>::read_ds_data() const {
-  m_ds_data = hdf5pp::Utils::readGroup<ns_ElementV2_v0::dataset_data>(m_group, "data", m_idx);
+  m_ds_data = hdf5pp::Utils::readNdarray<int16_t, 3>(m_group, "data", m_idx);
 }
 template class ElementV2_v0<Psana::CsPad::ConfigV2>;
 template class ElementV2_v0<Psana::CsPad::ConfigV3>;

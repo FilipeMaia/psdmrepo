@@ -55,7 +55,7 @@ ndarray<const uint32_t, 1> ConfigV1_v0::quadrature_mode() const {
   return make_ndarray(ptr, NCHANNELS);
 }
 void ConfigV1_v0::read_ds_config() const {
-  m_ds_config = hdf5pp::Utils::readGroup<ns_ConfigV1_v0::dataset_config>(m_group, "config", m_idx);
+  m_ds_config = hdf5pp::Utils::readGroup<UsdUsb::ns_ConfigV1_v0::dataset_config>(m_group, "config", m_idx);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::UsdUsb::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
@@ -129,7 +129,7 @@ DataV1_v0::encoder_count() const{
 unsigned shape[1]={Encoder_Inputs};                 ndarray<int32_t,1> res(shape);                 for (unsigned i=0; i!=Encoder_Inputs; ++i) res[i]=int(this->e_count()[i] << 8)/256;                 return res; 
 }
 void DataV1_v0::read_ds_data() const {
-  m_ds_data = hdf5pp::Utils::readGroup<ns_DataV1_v0::dataset_data>(m_group, "data", m_idx);
+  m_ds_data = hdf5pp::Utils::readGroup<UsdUsb::ns_DataV1_v0::dataset_data>(m_group, "data", m_idx);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::UsdUsb::DataV1> > make_DataV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {

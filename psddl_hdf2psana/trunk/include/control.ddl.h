@@ -134,32 +134,6 @@ struct dataset_config {
 };
 }
 
-namespace ns_ConfigV1_v0 {
-struct dataset_pvControls {
-  static hdf5pp::Type native_type();
-  static hdf5pp::Type stored_type();
-
-  dataset_pvControls();
-  ~dataset_pvControls();
-
-  ControlData::ns_PVControl_v0::dataset_config* pvControls; 
-
-};
-}
-
-namespace ns_ConfigV1_v0 {
-struct dataset_pvMonitors {
-  static hdf5pp::Type native_type();
-  static hdf5pp::Type stored_type();
-
-  dataset_pvMonitors();
-  ~dataset_pvMonitors();
-
-  ControlData::ns_PVMonitor_v0::dataset_data* pvMonitors; 
-
-};
-}
-
 
 class ConfigV1_v0 : public Psana::ControlData::ConfigV1 {
 public:
@@ -179,15 +153,13 @@ public:
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
-  mutable boost::shared_ptr<ns_ConfigV1_v0::dataset_config> m_ds_config;
+  mutable boost::shared_ptr<ControlData::ns_ConfigV1_v0::dataset_config> m_ds_config;
   void read_ds_config() const;
   mutable Pds::ClockTime m_ds_storage_config_duration;
-  mutable boost::shared_ptr<ns_ConfigV1_v0::dataset_pvControls> m_ds_pvControls;
+  mutable ndarray<const Psana::ControlData::PVControl, 1> m_ds_pvControls;
   void read_ds_pvControls() const;
-  mutable ndarray<const Psana::ControlData::PVControl, 1> m_ds_storage_pvControls_pvControls;
-  mutable boost::shared_ptr<ns_ConfigV1_v0::dataset_pvMonitors> m_ds_pvMonitors;
+  mutable ndarray<const Psana::ControlData::PVMonitor, 1> m_ds_pvMonitors;
   void read_ds_pvMonitors() const;
-  mutable ndarray<const Psana::ControlData::PVMonitor, 1> m_ds_storage_pvMonitors_pvMonitors;
 };
 
 boost::shared_ptr<PSEvt::Proxy<Psana::ControlData::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx);
@@ -207,45 +179,6 @@ struct dataset_config {
   uint32_t npvControls; 
   uint32_t npvMonitors; 
   uint32_t npvLabels; 
-
-};
-}
-
-namespace ns_ConfigV2_v0 {
-struct dataset_pvControls {
-  static hdf5pp::Type native_type();
-  static hdf5pp::Type stored_type();
-
-  dataset_pvControls();
-  ~dataset_pvControls();
-
-  ControlData::ns_PVControl_v0::dataset_config* pvControls; 
-
-};
-}
-
-namespace ns_ConfigV2_v0 {
-struct dataset_pvMonitors {
-  static hdf5pp::Type native_type();
-  static hdf5pp::Type stored_type();
-
-  dataset_pvMonitors();
-  ~dataset_pvMonitors();
-
-  ControlData::ns_PVMonitor_v0::dataset_data* pvMonitors; 
-
-};
-}
-
-namespace ns_ConfigV2_v0 {
-struct dataset_pvLabels {
-  static hdf5pp::Type native_type();
-  static hdf5pp::Type stored_type();
-
-  dataset_pvLabels();
-  ~dataset_pvLabels();
-
-  ControlData::ns_PVLabel_v0::dataset_data* pvLabels; 
 
 };
 }
@@ -271,18 +204,15 @@ public:
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
-  mutable boost::shared_ptr<ns_ConfigV2_v0::dataset_config> m_ds_config;
+  mutable boost::shared_ptr<ControlData::ns_ConfigV2_v0::dataset_config> m_ds_config;
   void read_ds_config() const;
   mutable Pds::ClockTime m_ds_storage_config_duration;
-  mutable boost::shared_ptr<ns_ConfigV2_v0::dataset_pvControls> m_ds_pvControls;
+  mutable ndarray<const Psana::ControlData::PVControl, 1> m_ds_pvControls;
   void read_ds_pvControls() const;
-  mutable ndarray<const Psana::ControlData::PVControl, 1> m_ds_storage_pvControls_pvControls;
-  mutable boost::shared_ptr<ns_ConfigV2_v0::dataset_pvMonitors> m_ds_pvMonitors;
+  mutable ndarray<const Psana::ControlData::PVMonitor, 1> m_ds_pvMonitors;
   void read_ds_pvMonitors() const;
-  mutable ndarray<const Psana::ControlData::PVMonitor, 1> m_ds_storage_pvMonitors_pvMonitors;
-  mutable boost::shared_ptr<ns_ConfigV2_v0::dataset_pvLabels> m_ds_pvLabels;
+  mutable ndarray<const Psana::ControlData::PVLabel, 1> m_ds_pvLabels;
   void read_ds_pvLabels() const;
-  mutable ndarray<const Psana::ControlData::PVLabel, 1> m_ds_storage_pvLabels_pvLabels;
 };
 
 boost::shared_ptr<PSEvt::Proxy<Psana::ControlData::ConfigV2> > make_ConfigV2(int version, hdf5pp::Group group, hsize_t idx);

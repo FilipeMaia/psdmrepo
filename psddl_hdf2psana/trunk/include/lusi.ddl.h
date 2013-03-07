@@ -130,7 +130,7 @@ public:
   IpmFexConfigV1_v0() {}
   IpmFexConfigV1_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
-  IpmFexConfigV1_v0(const boost::shared_ptr<ns_IpmFexConfigV1_v0::dataset_config>& ds) : m_ds_config(ds) {}
+  IpmFexConfigV1_v0(const boost::shared_ptr<Lusi::ns_IpmFexConfigV1_v0::dataset_config>& ds) : m_ds_config(ds) {}
   virtual ~IpmFexConfigV1_v0() {}
   virtual ndarray<const Psana::Lusi::DiodeFexConfigV1, 1> diode() const;
   virtual float xscale() const;
@@ -138,7 +138,7 @@ public:
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
-  mutable boost::shared_ptr<ns_IpmFexConfigV1_v0::dataset_config> m_ds_config;
+  mutable boost::shared_ptr<Lusi::ns_IpmFexConfigV1_v0::dataset_config> m_ds_config;
   void read_ds_config() const;
   mutable ndarray<const Psana::Lusi::DiodeFexConfigV1, 1> m_ds_storage_config_diode;
 };
@@ -167,7 +167,7 @@ public:
   IpmFexConfigV2_v0() {}
   IpmFexConfigV2_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
-  IpmFexConfigV2_v0(const boost::shared_ptr<ns_IpmFexConfigV2_v0::dataset_config>& ds) : m_ds_config(ds) {}
+  IpmFexConfigV2_v0(const boost::shared_ptr<Lusi::ns_IpmFexConfigV2_v0::dataset_config>& ds) : m_ds_config(ds) {}
   virtual ~IpmFexConfigV2_v0() {}
   virtual ndarray<const Psana::Lusi::DiodeFexConfigV2, 1> diode() const;
   virtual float xscale() const;
@@ -175,7 +175,7 @@ public:
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
-  mutable boost::shared_ptr<ns_IpmFexConfigV2_v0::dataset_config> m_ds_config;
+  mutable boost::shared_ptr<Lusi::ns_IpmFexConfigV2_v0::dataset_config> m_ds_config;
   void read_ds_config() const;
   mutable ndarray<const Psana::Lusi::DiodeFexConfigV2, 1> m_ds_storage_config_diode;
 };

@@ -71,7 +71,7 @@ uint32_t FccdConfigV1_v0::trimmedHeight() const {
   return uint32_t(m_ds_config->trimmedHeight);
 }
 void FccdConfigV1_v0::read_ds_config() const {
-  m_ds_config = hdf5pp::Utils::readGroup<ns_FccdConfigV1_v0::dataset_config>(m_group, "config", m_idx);
+  m_ds_config = hdf5pp::Utils::readGroup<FCCD::ns_FccdConfigV1_v0::dataset_config>(m_group, "config", m_idx);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::FCCD::FccdConfigV1> > make_FccdConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
@@ -240,13 +240,13 @@ uint32_t FccdConfigV2_v0::trimmedHeight() const {
   return uint32_t(m_ds_config->trimmedHeight);
 }
 void FccdConfigV2_v0::read_ds_config() const {
-  m_ds_config = hdf5pp::Utils::readGroup<ns_FccdConfigV2_v0::dataset_config>(m_group, "config", m_idx);
+  m_ds_config = hdf5pp::Utils::readGroup<FCCD::ns_FccdConfigV2_v0::dataset_config>(m_group, "config", m_idx);
 }
 void FccdConfigV2_v0::read_ds_dacVoltages() const {
-  m_ds_dacVoltages = hdf5pp::Utils::readGroup<ns_FccdConfigV2_v0::dataset_dacVoltages>(m_group, "dacVoltages", m_idx);
+  m_ds_dacVoltages = hdf5pp::Utils::readGroup<FCCD::ns_FccdConfigV2_v0::dataset_dacVoltages>(m_group, "dacVoltages", m_idx);
 }
 void FccdConfigV2_v0::read_ds_waveforms() const {
-  m_ds_waveforms = hdf5pp::Utils::readGroup<ns_FccdConfigV2_v0::dataset_waveforms>(m_group, "waveforms", m_idx);
+  m_ds_waveforms = hdf5pp::Utils::readGroup<FCCD::ns_FccdConfigV2_v0::dataset_waveforms>(m_group, "waveforms", m_idx);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::FCCD::FccdConfigV2> > make_FccdConfigV2(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {

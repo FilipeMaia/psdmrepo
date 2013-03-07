@@ -45,7 +45,7 @@ public:
   ConfigV1_v0() {}
   ConfigV1_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
-  ConfigV1_v0(const boost::shared_ptr<ns_ConfigV1_v0::dataset_config>& ds) : m_ds_config(ds) {}
+  ConfigV1_v0(const boost::shared_ptr<Fli::ns_ConfigV1_v0::dataset_config>& ds) : m_ds_config(ds) {}
   virtual ~ConfigV1_v0() {}
   virtual uint32_t width() const;
   virtual uint32_t height() const;
@@ -66,7 +66,7 @@ public:
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
-  mutable boost::shared_ptr<ns_ConfigV1_v0::dataset_config> m_ds_config;
+  mutable boost::shared_ptr<Fli::ns_ConfigV1_v0::dataset_config> m_ds_config;
   void read_ds_config() const;
 };
 
@@ -83,19 +83,6 @@ struct dataset_frame {
   uint32_t shotIdStart; 
   float readoutTime; 
   float temperature; 
-
-};
-}
-
-namespace ns_FrameV1_v0 {
-struct dataset_data {
-  static hdf5pp::Type native_type();
-  static hdf5pp::Type stored_type();
-
-  dataset_data();
-  ~dataset_data();
-
-  uint16_t* data; 
 
 };
 }
@@ -117,9 +104,9 @@ private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
   boost::shared_ptr<Config> m_cfg;
-  mutable boost::shared_ptr<ns_FrameV1_v0::dataset_frame> m_ds_frame;
+  mutable boost::shared_ptr<Fli::ns_FrameV1_v0::dataset_frame> m_ds_frame;
   void read_ds_frame() const;
-  mutable boost::shared_ptr<ns_FrameV1_v0::dataset_data> m_ds_data;
+  mutable ndarray<const uint16_t, 2> m_ds_data;
   void read_ds_data() const;
 };
 

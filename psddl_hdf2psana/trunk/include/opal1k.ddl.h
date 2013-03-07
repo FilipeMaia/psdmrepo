@@ -34,32 +34,6 @@ struct dataset_config {
 };
 }
 
-namespace ns_ConfigV1_v0 {
-struct dataset_output_lookup_table {
-  static hdf5pp::Type native_type();
-  static hdf5pp::Type stored_type();
-
-  dataset_output_lookup_table();
-  ~dataset_output_lookup_table();
-
-  uint16_t* output_lookup_table; 
-
-};
-}
-
-namespace ns_ConfigV1_v0 {
-struct dataset_defect_pixel_coordinates {
-  static hdf5pp::Type native_type();
-  static hdf5pp::Type stored_type();
-
-  dataset_defect_pixel_coordinates();
-  ~dataset_defect_pixel_coordinates();
-
-  Camera::ns_FrameCoord_v0::dataset_data* defect_pixel_coordinates; 
-
-};
-}
-
 
 class ConfigV1_v0 : public Psana::Opal1k::ConfigV1 {
 public:
@@ -84,13 +58,12 @@ public:
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
-  mutable boost::shared_ptr<ns_ConfigV1_v0::dataset_config> m_ds_config;
+  mutable boost::shared_ptr<Opal1k::ns_ConfigV1_v0::dataset_config> m_ds_config;
   void read_ds_config() const;
-  mutable boost::shared_ptr<ns_ConfigV1_v0::dataset_output_lookup_table> m_ds_output_lookup_table;
+  mutable ndarray<const uint16_t, 1> m_ds_output_lookup_table;
   void read_ds_output_lookup_table() const;
-  mutable boost::shared_ptr<ns_ConfigV1_v0::dataset_defect_pixel_coordinates> m_ds_defect_pixel_coordinates;
+  mutable ndarray<const Psana::Camera::FrameCoord, 1> m_ds_defect_pixel_coordinates;
   void read_ds_defect_pixel_coordinates() const;
-  mutable ndarray<const Psana::Camera::FrameCoord, 1> m_ds_storage_defect_pixel_coordinates_defect_pixel_coordinates;
 };
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Opal1k::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx);

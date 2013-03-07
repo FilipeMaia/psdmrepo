@@ -79,13 +79,13 @@ public:
   CsPad2x2DigitalPotsCfg_v0() {}
   CsPad2x2DigitalPotsCfg_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
-  CsPad2x2DigitalPotsCfg_v0(const boost::shared_ptr<ns_CsPad2x2DigitalPotsCfg_v0::dataset_pots>& ds) : m_ds_pots(ds) {}
+  CsPad2x2DigitalPotsCfg_v0(const boost::shared_ptr<CsPad2x2::ns_CsPad2x2DigitalPotsCfg_v0::dataset_pots>& ds) : m_ds_pots(ds) {}
   virtual ~CsPad2x2DigitalPotsCfg_v0() {}
   virtual ndarray<const uint8_t, 1> pots() const;
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
-  mutable boost::shared_ptr<ns_CsPad2x2DigitalPotsCfg_v0::dataset_pots> m_ds_pots;
+  mutable boost::shared_ptr<CsPad2x2::ns_CsPad2x2DigitalPotsCfg_v0::dataset_pots> m_ds_pots;
   void read_ds_pots() const;
 };
 
@@ -177,13 +177,13 @@ public:
   CsPad2x2GainMapCfg_v0() {}
   CsPad2x2GainMapCfg_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
-  CsPad2x2GainMapCfg_v0(const boost::shared_ptr<ns_CsPad2x2GainMapCfg_v0::dataset_gainMap>& ds) : m_ds_gainMap(ds) {}
+  CsPad2x2GainMapCfg_v0(const boost::shared_ptr<CsPad2x2::ns_CsPad2x2GainMapCfg_v0::dataset_gainMap>& ds) : m_ds_gainMap(ds) {}
   virtual ~CsPad2x2GainMapCfg_v0() {}
   virtual ndarray<const uint16_t, 2> gainMap() const;
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
-  mutable boost::shared_ptr<ns_CsPad2x2GainMapCfg_v0::dataset_gainMap> m_ds_gainMap;
+  mutable boost::shared_ptr<CsPad2x2::ns_CsPad2x2GainMapCfg_v0::dataset_gainMap> m_ds_gainMap;
   void read_ds_gainMap() const;
 };
 
@@ -232,7 +232,7 @@ public:
   ConfigV1QuadReg_v0() {}
   ConfigV1QuadReg_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
-  ConfigV1QuadReg_v0(const boost::shared_ptr<ns_ConfigV1QuadReg_v0::dataset_data>& ds) : m_ds_data(ds) {}
+  ConfigV1QuadReg_v0(const boost::shared_ptr<CsPad2x2::ns_ConfigV1QuadReg_v0::dataset_data>& ds) : m_ds_data(ds) {}
   virtual ~ConfigV1QuadReg_v0() {}
   virtual uint32_t shiftSelect() const;
   virtual uint32_t edgeSelect() const;
@@ -261,7 +261,7 @@ public:
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
-  mutable boost::shared_ptr<ns_ConfigV1QuadReg_v0::dataset_data> m_ds_data;
+  mutable boost::shared_ptr<CsPad2x2::ns_ConfigV1QuadReg_v0::dataset_data> m_ds_data;
   void read_ds_data() const;
   mutable Psana::CsPad2x2::CsPad2x2ReadOnlyCfg m_ds_storage_data_readOnly;
   mutable boost::shared_ptr<Psana::CsPad2x2::CsPad2x2DigitalPotsCfg> m_ds_storage_data_digitalPots;
@@ -302,7 +302,7 @@ public:
   ConfigV1_v0() {}
   ConfigV1_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
-  ConfigV1_v0(const boost::shared_ptr<ns_ConfigV1_v0::dataset_config>& ds) : m_ds_config(ds) {}
+  ConfigV1_v0(const boost::shared_ptr<CsPad2x2::ns_ConfigV1_v0::dataset_config>& ds) : m_ds_config(ds) {}
   virtual ~ConfigV1_v0() {}
   virtual uint32_t concentratorVersion() const;
   virtual const Psana::CsPad2x2::ProtectionSystemThreshold& protectionThreshold() const;
@@ -320,7 +320,7 @@ public:
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
-  mutable boost::shared_ptr<ns_ConfigV1_v0::dataset_config> m_ds_config;
+  mutable boost::shared_ptr<CsPad2x2::ns_ConfigV1_v0::dataset_config> m_ds_config;
   void read_ds_config() const;
   mutable Psana::CsPad2x2::ProtectionSystemThreshold m_ds_storage_config_protectionThreshold;
   mutable boost::shared_ptr<Psana::CsPad2x2::ConfigV1QuadReg> m_ds_storage_config_quad;
@@ -373,7 +373,7 @@ public:
   ConfigV2QuadReg_v0() {}
   ConfigV2QuadReg_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
-  ConfigV2QuadReg_v0(const boost::shared_ptr<ns_ConfigV2QuadReg_v0::dataset_data>& ds) : m_ds_data(ds) {}
+  ConfigV2QuadReg_v0(const boost::shared_ptr<CsPad2x2::ns_ConfigV2QuadReg_v0::dataset_data>& ds) : m_ds_data(ds) {}
   virtual ~ConfigV2QuadReg_v0() {}
   virtual uint32_t shiftSelect() const;
   virtual uint32_t edgeSelect() const;
@@ -404,7 +404,7 @@ public:
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
-  mutable boost::shared_ptr<ns_ConfigV2QuadReg_v0::dataset_data> m_ds_data;
+  mutable boost::shared_ptr<CsPad2x2::ns_ConfigV2QuadReg_v0::dataset_data> m_ds_data;
   void read_ds_data() const;
   mutable Psana::CsPad2x2::CsPad2x2ReadOnlyCfg m_ds_storage_data_readOnly;
   mutable boost::shared_ptr<Psana::CsPad2x2::CsPad2x2DigitalPotsCfg> m_ds_storage_data_digitalPots;
@@ -446,7 +446,7 @@ public:
   ConfigV2_v0() {}
   ConfigV2_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
-  ConfigV2_v0(const boost::shared_ptr<ns_ConfigV2_v0::dataset_config>& ds) : m_ds_config(ds) {}
+  ConfigV2_v0(const boost::shared_ptr<CsPad2x2::ns_ConfigV2_v0::dataset_config>& ds) : m_ds_config(ds) {}
   virtual ~ConfigV2_v0() {}
   virtual uint32_t concentratorVersion() const;
   virtual const Psana::CsPad2x2::ProtectionSystemThreshold& protectionThreshold() const;
@@ -465,7 +465,7 @@ public:
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
-  mutable boost::shared_ptr<ns_ConfigV2_v0::dataset_config> m_ds_config;
+  mutable boost::shared_ptr<CsPad2x2::ns_ConfigV2_v0::dataset_config> m_ds_config;
   void read_ds_config() const;
   mutable Psana::CsPad2x2::ProtectionSystemThreshold m_ds_storage_config_protectionThreshold;
   mutable boost::shared_ptr<Psana::CsPad2x2::ConfigV2QuadReg> m_ds_storage_config_quad;
@@ -492,19 +492,6 @@ struct dataset_element {
   uint32_t fiducials; 
   uint32_t frame_type; 
   uint16_t sb_temp[4]; 
-
-};
-}
-
-namespace ns_ElementV1_v0 {
-struct dataset_data {
-  static hdf5pp::Type native_type();
-  static hdf5pp::Type stored_type();
-
-  dataset_data();
-  ~dataset_data();
-
-  int16_t* data; 
 
 };
 }
@@ -536,9 +523,9 @@ public:
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
-  mutable boost::shared_ptr<ns_ElementV1_v0::dataset_element> m_ds_element;
+  mutable boost::shared_ptr<CsPad2x2::ns_ElementV1_v0::dataset_element> m_ds_element;
   void read_ds_element() const;
-  mutable boost::shared_ptr<ns_ElementV1_v0::dataset_data> m_ds_data;
+  mutable ndarray<const int16_t, 3> m_ds_data;
   void read_ds_data() const;
 };
 

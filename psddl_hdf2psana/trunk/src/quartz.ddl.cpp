@@ -94,78 +94,6 @@ ns_ConfigV1_v0::dataset_config::dataset_config()
 ns_ConfigV1_v0::dataset_config::~dataset_config()
 {
 }
-
-hdf5pp::Type ns_ConfigV1_v0_dataset_output_lookup_table_stored_type()
-{
-  typedef ns_ConfigV1_v0::dataset_output_lookup_table DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("output_lookup_table", offsetof(DsType, output_lookup_table), hdf5pp::TypeTraits<uint16_t>::stored_type());
-  return type;
-}
-
-hdf5pp::Type ns_ConfigV1_v0::dataset_output_lookup_table::stored_type()
-{
-  static hdf5pp::Type type = ns_ConfigV1_v0_dataset_output_lookup_table_stored_type();
-  return type;
-}
-
-hdf5pp::Type ns_ConfigV1_v0_dataset_output_lookup_table_native_type()
-{
-  typedef ns_ConfigV1_v0::dataset_output_lookup_table DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("output_lookup_table", offsetof(DsType, output_lookup_table), hdf5pp::TypeTraits<uint16_t>::native_type());
-  return type;
-}
-
-hdf5pp::Type ns_ConfigV1_v0::dataset_output_lookup_table::native_type()
-{
-  static hdf5pp::Type type = ns_ConfigV1_v0_dataset_output_lookup_table_native_type();
-  return type;
-}
-ns_ConfigV1_v0::dataset_output_lookup_table::dataset_output_lookup_table()
-{
-  this->output_lookup_table = 0;
-}
-ns_ConfigV1_v0::dataset_output_lookup_table::~dataset_output_lookup_table()
-{
-  delete [] this->output_lookup_table;
-}
-
-hdf5pp::Type ns_ConfigV1_v0_dataset_defect_pixel_coordinates_stored_type()
-{
-  typedef ns_ConfigV1_v0::dataset_defect_pixel_coordinates DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("defect_pixel_coordinates", offsetof(DsType, defect_pixel_coordinates), hdf5pp::TypeTraits<Camera::ns_FrameCoord_v0::dataset_data>::stored_type());
-  return type;
-}
-
-hdf5pp::Type ns_ConfigV1_v0::dataset_defect_pixel_coordinates::stored_type()
-{
-  static hdf5pp::Type type = ns_ConfigV1_v0_dataset_defect_pixel_coordinates_stored_type();
-  return type;
-}
-
-hdf5pp::Type ns_ConfigV1_v0_dataset_defect_pixel_coordinates_native_type()
-{
-  typedef ns_ConfigV1_v0::dataset_defect_pixel_coordinates DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("defect_pixel_coordinates", offsetof(DsType, defect_pixel_coordinates), hdf5pp::TypeTraits<Camera::ns_FrameCoord_v0::dataset_data>::native_type());
-  return type;
-}
-
-hdf5pp::Type ns_ConfigV1_v0::dataset_defect_pixel_coordinates::native_type()
-{
-  static hdf5pp::Type type = ns_ConfigV1_v0_dataset_defect_pixel_coordinates_native_type();
-  return type;
-}
-ns_ConfigV1_v0::dataset_defect_pixel_coordinates::dataset_defect_pixel_coordinates()
-{
-  this->defect_pixel_coordinates = 0;
-}
-ns_ConfigV1_v0::dataset_defect_pixel_coordinates::~dataset_defect_pixel_coordinates()
-{
-  delete [] this->defect_pixel_coordinates;
-}
 uint16_t ConfigV1_v0::black_level() const {
   if (not m_ds_config.get()) read_ds_config();
   return uint16_t(m_ds_config->black_level);
@@ -203,19 +131,12 @@ uint32_t ConfigV1_v0::number_of_defect_pixels() const {
   return uint32_t(m_ds_config->number_of_defect_pixels);
 }
 ndarray<const uint16_t, 1> ConfigV1_v0::output_lookup_table() const {
-  if (not m_ds_output_lookup_table.get()) read_ds_output_lookup_table();
-  boost::shared_ptr<uint16_t> ptr(m_ds_output_lookup_table, m_ds_output_lookup_table->output_lookup_table);
-  return make_ndarray(ptr, Output_LUT_Size*this->output_lookup_table_enabled());
+  if (m_ds_output_lookup_table.empty()) read_ds_output_lookup_table();
+  return m_ds_output_lookup_table;
 }
 ndarray<const Psana::Camera::FrameCoord, 1> ConfigV1_v0::defect_pixel_coordinates() const {
-  if (not m_ds_defect_pixel_coordinates.get()) read_ds_defect_pixel_coordinates();
-  if (m_ds_storage_defect_pixel_coordinates_defect_pixel_coordinates.empty()) {
-    unsigned shape[] = {this->number_of_defect_pixels()};
-    ndarray<Psana::Camera::FrameCoord, 1> tmparr(shape);
-    std::copy(m_ds_defect_pixel_coordinates->defect_pixel_coordinates, m_ds_defect_pixel_coordinates->defect_pixel_coordinates+this->number_of_defect_pixels(), tmparr.begin());
-    m_ds_storage_defect_pixel_coordinates_defect_pixel_coordinates = tmparr;
-  }
-  return m_ds_storage_defect_pixel_coordinates_defect_pixel_coordinates;
+  if (m_ds_defect_pixel_coordinates.empty()) read_ds_defect_pixel_coordinates();
+  return m_ds_defect_pixel_coordinates;
 }
 uint16_t ConfigV1_v0::output_offset() const {
   if (not m_ds_config.get()) read_ds_config();
@@ -226,13 +147,16 @@ uint32_t ConfigV1_v0::output_resolution_bits() const {
   return uint32_t(m_ds_config->output_resolution_bits);
 }
 void ConfigV1_v0::read_ds_config() const {
-  m_ds_config = hdf5pp::Utils::readGroup<ns_ConfigV1_v0::dataset_config>(m_group, "config", m_idx);
+  m_ds_config = hdf5pp::Utils::readGroup<Quartz::ns_ConfigV1_v0::dataset_config>(m_group, "config", m_idx);
 }
 void ConfigV1_v0::read_ds_output_lookup_table() const {
-  m_ds_output_lookup_table = hdf5pp::Utils::readGroup<ns_ConfigV1_v0::dataset_output_lookup_table>(m_group, "output_lookup_table", m_idx);
+  m_ds_output_lookup_table = hdf5pp::Utils::readNdarray<uint16_t, 1>(m_group, "output_lookup_table", m_idx);
 }
 void ConfigV1_v0::read_ds_defect_pixel_coordinates() const {
-  m_ds_defect_pixel_coordinates = hdf5pp::Utils::readGroup<ns_ConfigV1_v0::dataset_defect_pixel_coordinates>(m_group, "defect_pixel_coordinates", m_idx);
+  ndarray<Camera::ns_FrameCoord_v0::dataset_data, 1> arr = hdf5pp::Utils::readNdarray<Camera::ns_FrameCoord_v0::dataset_data, 1>(m_group, "defect_pixel_coordinates", m_idx);
+  ndarray<Psana::Camera::FrameCoord, 1> tmp(arr.shape());
+  std::copy(arr.begin(), arr.end(), tmp.begin());
+  m_ds_defect_pixel_coordinates = tmp;
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::Quartz::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {

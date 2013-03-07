@@ -77,7 +77,7 @@ uint32_t ConfigV1_v0::ticks_per_sec() const {
   return uint32_t(m_ds_config->ticks_per_sec);
 }
 void ConfigV1_v0::read_ds_config() const {
-  m_ds_config = hdf5pp::Utils::readGroup<ns_ConfigV1_v0::dataset_config>(m_group, "config", m_idx);
+  m_ds_config = hdf5pp::Utils::readGroup<Encoder::ns_ConfigV1_v0::dataset_config>(m_group, "config", m_idx);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::Encoder::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
@@ -156,7 +156,7 @@ uint32_t ConfigV2_v0::ticks_per_sec() const {
   return uint32_t(m_ds_config->ticks_per_sec);
 }
 void ConfigV2_v0::read_ds_config() const {
-  m_ds_config = hdf5pp::Utils::readGroup<ns_ConfigV2_v0::dataset_config>(m_group, "config", m_idx);
+  m_ds_config = hdf5pp::Utils::readGroup<Encoder::ns_ConfigV2_v0::dataset_config>(m_group, "config", m_idx);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::Encoder::ConfigV2> > make_ConfigV2(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
@@ -215,7 +215,7 @@ DataV1_v0::value() const{
 return int(this->encoder_count() << 8)/256;; 
 }
 void DataV1_v0::read_ds_data() const {
-  m_ds_data = hdf5pp::Utils::readGroup<ns_DataV1_v0::dataset_data>(m_group, "data", m_idx);
+  m_ds_data = hdf5pp::Utils::readGroup<Encoder::ns_DataV1_v0::dataset_data>(m_group, "data", m_idx);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::Encoder::DataV1> > make_DataV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
@@ -275,7 +275,7 @@ DataV2_v0::value(uint32_t i) const{
 return int(this->encoder_count()[i] << 8)/256;; 
 }
 void DataV2_v0::read_ds_data() const {
-  m_ds_data = hdf5pp::Utils::readGroup<ns_DataV2_v0::dataset_data>(m_group, "data", m_idx);
+  m_ds_data = hdf5pp::Utils::readGroup<Encoder::ns_DataV2_v0::dataset_data>(m_group, "data", m_idx);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::Encoder::DataV2> > make_DataV2(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {

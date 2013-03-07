@@ -79,13 +79,13 @@ public:
   CsPadDigitalPotsCfg_v0() {}
   CsPadDigitalPotsCfg_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
-  CsPadDigitalPotsCfg_v0(const boost::shared_ptr<ns_CsPadDigitalPotsCfg_v0::dataset_pots>& ds) : m_ds_pots(ds) {}
+  CsPadDigitalPotsCfg_v0(const boost::shared_ptr<CsPad::ns_CsPadDigitalPotsCfg_v0::dataset_pots>& ds) : m_ds_pots(ds) {}
   virtual ~CsPadDigitalPotsCfg_v0() {}
   virtual ndarray<const uint8_t, 1> pots() const;
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
-  mutable boost::shared_ptr<ns_CsPadDigitalPotsCfg_v0::dataset_pots> m_ds_pots;
+  mutable boost::shared_ptr<CsPad::ns_CsPadDigitalPotsCfg_v0::dataset_pots> m_ds_pots;
   void read_ds_pots() const;
 };
 
@@ -177,13 +177,13 @@ public:
   CsPadGainMapCfg_v0() {}
   CsPadGainMapCfg_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
-  CsPadGainMapCfg_v0(const boost::shared_ptr<ns_CsPadGainMapCfg_v0::dataset_gainMap>& ds) : m_ds_gainMap(ds) {}
+  CsPadGainMapCfg_v0(const boost::shared_ptr<CsPad::ns_CsPadGainMapCfg_v0::dataset_gainMap>& ds) : m_ds_gainMap(ds) {}
   virtual ~CsPadGainMapCfg_v0() {}
   virtual ndarray<const uint16_t, 2> gainMap() const;
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
-  mutable boost::shared_ptr<ns_CsPadGainMapCfg_v0::dataset_gainMap> m_ds_gainMap;
+  mutable boost::shared_ptr<CsPad::ns_CsPadGainMapCfg_v0::dataset_gainMap> m_ds_gainMap;
   void read_ds_gainMap() const;
 };
 
@@ -223,7 +223,7 @@ public:
   ConfigV1QuadReg_v0() {}
   ConfigV1QuadReg_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
-  ConfigV1QuadReg_v0(const boost::shared_ptr<ns_ConfigV1QuadReg_v0::dataset_data>& ds) : m_ds_data(ds) {}
+  ConfigV1QuadReg_v0(const boost::shared_ptr<CsPad::ns_ConfigV1QuadReg_v0::dataset_data>& ds) : m_ds_data(ds) {}
   virtual ~ConfigV1QuadReg_v0() {}
   virtual ndarray<const uint32_t, 1> shiftSelect() const;
   virtual ndarray<const uint32_t, 1> edgeSelect() const;
@@ -243,7 +243,7 @@ public:
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
-  mutable boost::shared_ptr<ns_ConfigV1QuadReg_v0::dataset_data> m_ds_data;
+  mutable boost::shared_ptr<CsPad::ns_ConfigV1QuadReg_v0::dataset_data> m_ds_data;
   void read_ds_data() const;
   mutable Psana::CsPad::CsPadReadOnlyCfg m_ds_storage_data_readOnly;
   mutable boost::shared_ptr<Psana::CsPad::CsPadDigitalPotsCfg> m_ds_storage_data_digitalPots;
@@ -289,7 +289,7 @@ public:
   ConfigV2QuadReg_v0() {}
   ConfigV2QuadReg_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
-  ConfigV2QuadReg_v0(const boost::shared_ptr<ns_ConfigV2QuadReg_v0::dataset_data>& ds) : m_ds_data(ds) {}
+  ConfigV2QuadReg_v0(const boost::shared_ptr<CsPad::ns_ConfigV2QuadReg_v0::dataset_data>& ds) : m_ds_data(ds) {}
   virtual ~ConfigV2QuadReg_v0() {}
   virtual ndarray<const uint32_t, 1> shiftSelect() const;
   virtual ndarray<const uint32_t, 1> edgeSelect() const;
@@ -312,7 +312,7 @@ public:
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
-  mutable boost::shared_ptr<ns_ConfigV2QuadReg_v0::dataset_data> m_ds_data;
+  mutable boost::shared_ptr<CsPad::ns_ConfigV2QuadReg_v0::dataset_data> m_ds_data;
   void read_ds_data() const;
   mutable Psana::CsPad::CsPadReadOnlyCfg m_ds_storage_data_readOnly;
   mutable boost::shared_ptr<Psana::CsPad::CsPadDigitalPotsCfg> m_ds_storage_data_digitalPots;
@@ -355,7 +355,7 @@ public:
   ConfigV1_v0() {}
   ConfigV1_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
-  ConfigV1_v0(const boost::shared_ptr<ns_ConfigV1_v0::dataset_config>& ds) : m_ds_config(ds) {}
+  ConfigV1_v0(const boost::shared_ptr<CsPad::ns_ConfigV1_v0::dataset_config>& ds) : m_ds_config(ds) {}
   virtual ~ConfigV1_v0() {}
   virtual uint32_t concentratorVersion() const;
   virtual uint32_t runDelay() const;
@@ -378,7 +378,7 @@ public:
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
-  mutable boost::shared_ptr<ns_ConfigV1_v0::dataset_config> m_ds_config;
+  mutable boost::shared_ptr<CsPad::ns_ConfigV1_v0::dataset_config> m_ds_config;
   void read_ds_config() const;
   mutable ndarray<ConfigV1QuadReg_v0, 1> m_ds_storage_config_quads;
 };
@@ -419,7 +419,7 @@ public:
   ConfigV2_v0() {}
   ConfigV2_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
-  ConfigV2_v0(const boost::shared_ptr<ns_ConfigV2_v0::dataset_config>& ds) : m_ds_config(ds) {}
+  ConfigV2_v0(const boost::shared_ptr<CsPad::ns_ConfigV2_v0::dataset_config>& ds) : m_ds_config(ds) {}
   virtual ~ConfigV2_v0() {}
   virtual uint32_t concentratorVersion() const;
   virtual uint32_t runDelay() const;
@@ -432,7 +432,7 @@ public:
   virtual uint32_t badAsicMask1() const;
   virtual uint32_t asicMask() const;
   virtual uint32_t quadMask() const;
-  uint32_t roiMasks() const;
+    uint32_t roiMasks() const;
 
   virtual const Psana::CsPad::ConfigV1QuadReg& quads(uint32_t i0) const;
   virtual uint32_t numAsicsRead() const;
@@ -450,7 +450,7 @@ public:
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
-  mutable boost::shared_ptr<ns_ConfigV2_v0::dataset_config> m_ds_config;
+  mutable boost::shared_ptr<CsPad::ns_ConfigV2_v0::dataset_config> m_ds_config;
   void read_ds_config() const;
   mutable ndarray<ConfigV1QuadReg_v0, 1> m_ds_storage_config_quads;
 };
@@ -493,7 +493,7 @@ public:
   ConfigV3_v0() {}
   ConfigV3_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
-  ConfigV3_v0(const boost::shared_ptr<ns_ConfigV3_v0::dataset_config>& ds) : m_ds_config(ds) {}
+  ConfigV3_v0(const boost::shared_ptr<CsPad::ns_ConfigV3_v0::dataset_config>& ds) : m_ds_config(ds) {}
   virtual ~ConfigV3_v0() {}
   virtual uint32_t concentratorVersion() const;
   virtual uint32_t runDelay() const;
@@ -508,7 +508,7 @@ public:
   virtual uint32_t badAsicMask1() const;
   virtual uint32_t asicMask() const;
   virtual uint32_t quadMask() const;
-  uint32_t roiMasks() const;
+    uint32_t roiMasks() const;
 
   virtual const Psana::CsPad::ConfigV1QuadReg& quads(uint32_t i0) const;
   virtual uint32_t numAsicsRead() const;
@@ -526,7 +526,7 @@ public:
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
-  mutable boost::shared_ptr<ns_ConfigV3_v0::dataset_config> m_ds_config;
+  mutable boost::shared_ptr<CsPad::ns_ConfigV3_v0::dataset_config> m_ds_config;
   void read_ds_config() const;
   mutable ndarray<const Psana::CsPad::ProtectionSystemThreshold, 1> m_ds_storage_config_protectionThresholds;
   mutable ndarray<ConfigV1QuadReg_v0, 1> m_ds_storage_config_quads;
@@ -570,7 +570,7 @@ public:
   ConfigV4_v0() {}
   ConfigV4_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
-  ConfigV4_v0(const boost::shared_ptr<ns_ConfigV4_v0::dataset_config>& ds) : m_ds_config(ds) {}
+  ConfigV4_v0(const boost::shared_ptr<CsPad::ns_ConfigV4_v0::dataset_config>& ds) : m_ds_config(ds) {}
   virtual ~ConfigV4_v0() {}
   virtual uint32_t concentratorVersion() const;
   virtual uint32_t runDelay() const;
@@ -585,7 +585,7 @@ public:
   virtual uint32_t badAsicMask1() const;
   virtual uint32_t asicMask() const;
   virtual uint32_t quadMask() const;
-  uint32_t roiMasks() const;
+    uint32_t roiMasks() const;
 
   virtual const Psana::CsPad::ConfigV2QuadReg& quads(uint32_t i0) const;
   virtual uint32_t numAsicsRead() const;
@@ -603,7 +603,7 @@ public:
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
-  mutable boost::shared_ptr<ns_ConfigV4_v0::dataset_config> m_ds_config;
+  mutable boost::shared_ptr<CsPad::ns_ConfigV4_v0::dataset_config> m_ds_config;
   void read_ds_config() const;
   mutable ndarray<const Psana::CsPad::ProtectionSystemThreshold, 1> m_ds_storage_config_protectionThresholds;
   mutable ndarray<ConfigV2QuadReg_v0, 1> m_ds_storage_config_quads;
@@ -631,19 +631,6 @@ struct dataset_element {
   uint32_t frame_type; 
   uint32_t sectionMask; 
   uint16_t sb_temp[4]; 
-
-};
-}
-
-namespace ns_ElementV1_v0 {
-struct dataset_data {
-  static hdf5pp::Type native_type();
-  static hdf5pp::Type stored_type();
-
-  dataset_data();
-  ~dataset_data();
-
-  int16_t* data; 
 
 };
 }
@@ -678,9 +665,9 @@ private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
   boost::shared_ptr<Config> m_cfg;
-  mutable boost::shared_ptr<ns_ElementV1_v0::dataset_element> m_ds_element;
+  mutable boost::shared_ptr<CsPad::ns_ElementV1_v0::dataset_element> m_ds_element;
   void read_ds_element() const;
-  mutable boost::shared_ptr<ns_ElementV1_v0::dataset_data> m_ds_data;
+  mutable ndarray<const int16_t, 3> m_ds_data;
   void read_ds_data() const;
 };
 
@@ -717,19 +704,6 @@ struct dataset_element {
 };
 }
 
-namespace ns_ElementV2_v0 {
-struct dataset_data {
-  static hdf5pp::Type native_type();
-  static hdf5pp::Type stored_type();
-
-  dataset_data();
-  ~dataset_data();
-
-  int16_t* data; 
-
-};
-}
-
 
 template <typename Config>
 class ElementV2_v0 : public Psana::CsPad::ElementV2 {
@@ -760,9 +734,9 @@ private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
   boost::shared_ptr<Config> m_cfg;
-  mutable boost::shared_ptr<ns_ElementV2_v0::dataset_element> m_ds_element;
+  mutable boost::shared_ptr<CsPad::ns_ElementV2_v0::dataset_element> m_ds_element;
   void read_ds_element() const;
-  mutable boost::shared_ptr<ns_ElementV2_v0::dataset_data> m_ds_data;
+  mutable ndarray<const int16_t, 3> m_ds_data;
   void read_ds_data() const;
 };
 

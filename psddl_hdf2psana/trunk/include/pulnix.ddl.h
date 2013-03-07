@@ -39,7 +39,7 @@ public:
   TM6740ConfigV1_v0() {}
   TM6740ConfigV1_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
-  TM6740ConfigV1_v0(const boost::shared_ptr<ns_TM6740ConfigV1_v0::dataset_config>& ds) : m_ds_config(ds) {}
+  TM6740ConfigV1_v0(const boost::shared_ptr<Pulnix::ns_TM6740ConfigV1_v0::dataset_config>& ds) : m_ds_config(ds) {}
   virtual ~TM6740ConfigV1_v0() {}
   virtual uint16_t gain_a() const;
   virtual uint16_t gain_b() const;
@@ -54,7 +54,7 @@ public:
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
-  mutable boost::shared_ptr<ns_TM6740ConfigV1_v0::dataset_config> m_ds_config;
+  mutable boost::shared_ptr<Pulnix::ns_TM6740ConfigV1_v0::dataset_config> m_ds_config;
   void read_ds_config() const;
 };
 
@@ -89,7 +89,7 @@ public:
   TM6740ConfigV2_v0() {}
   TM6740ConfigV2_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
-  TM6740ConfigV2_v0(const boost::shared_ptr<ns_TM6740ConfigV2_v0::dataset_config>& ds) : m_ds_config(ds) {}
+  TM6740ConfigV2_v0(const boost::shared_ptr<Pulnix::ns_TM6740ConfigV2_v0::dataset_config>& ds) : m_ds_config(ds) {}
   virtual ~TM6740ConfigV2_v0() {}
   virtual uint16_t gain_a() const;
   virtual uint16_t gain_b() const;
@@ -104,7 +104,7 @@ public:
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
-  mutable boost::shared_ptr<ns_TM6740ConfigV2_v0::dataset_config> m_ds_config;
+  mutable boost::shared_ptr<Pulnix::ns_TM6740ConfigV2_v0::dataset_config> m_ds_config;
   void read_ds_config() const;
 };
 

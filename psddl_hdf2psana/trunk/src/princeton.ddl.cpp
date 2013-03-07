@@ -131,7 +131,7 @@ uint32_t ConfigV1_v0::numPixels() const {
   return uint32_t(m_ds_config->numPixels);
 }
 void ConfigV1_v0::read_ds_config() const {
-  m_ds_config = hdf5pp::Utils::readGroup<ns_ConfigV1_v0::dataset_config>(m_group, "config", m_idx);
+  m_ds_config = hdf5pp::Utils::readGroup<Princeton::ns_ConfigV1_v0::dataset_config>(m_group, "config", m_idx);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
@@ -270,7 +270,7 @@ uint32_t ConfigV2_v0::numPixels() const {
   return uint32_t(m_ds_config->numPixels);
 }
 void ConfigV2_v0::read_ds_config() const {
-  m_ds_config = hdf5pp::Utils::readGroup<ns_ConfigV2_v0::dataset_config>(m_group, "config", m_idx);
+  m_ds_config = hdf5pp::Utils::readGroup<Princeton::ns_ConfigV2_v0::dataset_config>(m_group, "config", m_idx);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::ConfigV2> > make_ConfigV2(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
@@ -409,7 +409,7 @@ uint32_t ConfigV3_v0::numPixels() const {
   return uint32_t(m_ds_config->numPixels);
 }
 void ConfigV3_v0::read_ds_config() const {
-  m_ds_config = hdf5pp::Utils::readGroup<ns_ConfigV3_v0::dataset_config>(m_group, "config", m_idx);
+  m_ds_config = hdf5pp::Utils::readGroup<Princeton::ns_ConfigV3_v0::dataset_config>(m_group, "config", m_idx);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::ConfigV3> > make_ConfigV3(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
@@ -566,7 +566,7 @@ uint32_t ConfigV4_v0::numPixels() const {
   return uint32_t(m_ds_config->numPixels);
 }
 void ConfigV4_v0::read_ds_config() const {
-  m_ds_config = hdf5pp::Utils::readGroup<ns_ConfigV4_v0::dataset_config>(m_group, "config", m_idx);
+  m_ds_config = hdf5pp::Utils::readGroup<Princeton::ns_ConfigV4_v0::dataset_config>(m_group, "config", m_idx);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::ConfigV4> > make_ConfigV4(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
@@ -729,7 +729,7 @@ uint32_t ConfigV5_v0::numPixels() const {
   return uint32_t(m_ds_config->numPixels);
 }
 void ConfigV5_v0::read_ds_config() const {
-  m_ds_config = hdf5pp::Utils::readGroup<ns_ConfigV5_v0::dataset_config>(m_group, "config", m_idx);
+  m_ds_config = hdf5pp::Utils::readGroup<Princeton::ns_ConfigV5_v0::dataset_config>(m_group, "config", m_idx);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::ConfigV5> > make_ConfigV5(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
@@ -775,42 +775,6 @@ ns_FrameV1_v0::dataset_data::dataset_data()
 ns_FrameV1_v0::dataset_data::~dataset_data()
 {
 }
-
-hdf5pp::Type ns_FrameV1_v0_dataset_image_stored_type()
-{
-  typedef ns_FrameV1_v0::dataset_image DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("data", offsetof(DsType, data), hdf5pp::TypeTraits<uint16_t>::stored_type());
-  return type;
-}
-
-hdf5pp::Type ns_FrameV1_v0::dataset_image::stored_type()
-{
-  static hdf5pp::Type type = ns_FrameV1_v0_dataset_image_stored_type();
-  return type;
-}
-
-hdf5pp::Type ns_FrameV1_v0_dataset_image_native_type()
-{
-  typedef ns_FrameV1_v0::dataset_image DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("data", offsetof(DsType, data), hdf5pp::TypeTraits<uint16_t>::native_type());
-  return type;
-}
-
-hdf5pp::Type ns_FrameV1_v0::dataset_image::native_type()
-{
-  static hdf5pp::Type type = ns_FrameV1_v0_dataset_image_native_type();
-  return type;
-}
-ns_FrameV1_v0::dataset_image::dataset_image()
-{
-  this->data = 0;
-}
-ns_FrameV1_v0::dataset_image::~dataset_image()
-{
-  delete [] this->data;
-}
 template <typename Config>
 uint32_t FrameV1_v0<Config>::shotIdStart() const {
   if (not m_ds_data.get()) read_ds_data();
@@ -823,17 +787,16 @@ float FrameV1_v0<Config>::readoutTime() const {
 }
 template <typename Config>
 ndarray<const uint16_t, 2> FrameV1_v0<Config>::data() const {
-  if (not m_ds_image.get()) read_ds_image();
-  boost::shared_ptr<uint16_t> ptr(m_ds_image, m_ds_image->data);
-  return make_ndarray(ptr, m_cfg->numPixelsY(),m_cfg->numPixelsX());
+  if (m_ds_image.empty()) read_ds_image();
+  return m_ds_image;
 }
 template <typename Config>
 void FrameV1_v0<Config>::read_ds_data() const {
-  m_ds_data = hdf5pp::Utils::readGroup<ns_FrameV1_v0::dataset_data>(m_group, "data", m_idx);
+  m_ds_data = hdf5pp::Utils::readGroup<Princeton::ns_FrameV1_v0::dataset_data>(m_group, "data", m_idx);
 }
 template <typename Config>
 void FrameV1_v0<Config>::read_ds_image() const {
-  m_ds_image = hdf5pp::Utils::readGroup<ns_FrameV1_v0::dataset_image>(m_group, "image", m_idx);
+  m_ds_image = hdf5pp::Utils::readNdarray<uint16_t, 2>(m_group, "image", m_idx);
 }
 template class FrameV1_v0<Psana::Princeton::ConfigV1>;
 template class FrameV1_v0<Psana::Princeton::ConfigV2>;
@@ -918,42 +881,6 @@ ns_FrameV2_v0::dataset_data::dataset_data()
 ns_FrameV2_v0::dataset_data::~dataset_data()
 {
 }
-
-hdf5pp::Type ns_FrameV2_v0_dataset_image_stored_type()
-{
-  typedef ns_FrameV2_v0::dataset_image DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("data", offsetof(DsType, data), hdf5pp::TypeTraits<uint16_t>::stored_type());
-  return type;
-}
-
-hdf5pp::Type ns_FrameV2_v0::dataset_image::stored_type()
-{
-  static hdf5pp::Type type = ns_FrameV2_v0_dataset_image_stored_type();
-  return type;
-}
-
-hdf5pp::Type ns_FrameV2_v0_dataset_image_native_type()
-{
-  typedef ns_FrameV2_v0::dataset_image DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("data", offsetof(DsType, data), hdf5pp::TypeTraits<uint16_t>::native_type());
-  return type;
-}
-
-hdf5pp::Type ns_FrameV2_v0::dataset_image::native_type()
-{
-  static hdf5pp::Type type = ns_FrameV2_v0_dataset_image_native_type();
-  return type;
-}
-ns_FrameV2_v0::dataset_image::dataset_image()
-{
-  this->data = 0;
-}
-ns_FrameV2_v0::dataset_image::~dataset_image()
-{
-  delete [] this->data;
-}
 template <typename Config>
 uint32_t FrameV2_v0<Config>::shotIdStart() const {
   if (not m_ds_data.get()) read_ds_data();
@@ -971,17 +898,16 @@ float FrameV2_v0<Config>::temperature() const {
 }
 template <typename Config>
 ndarray<const uint16_t, 2> FrameV2_v0<Config>::data() const {
-  if (not m_ds_image.get()) read_ds_image();
-  boost::shared_ptr<uint16_t> ptr(m_ds_image, m_ds_image->data);
-  return make_ndarray(ptr, m_cfg->numPixelsY(),m_cfg->numPixelsX());
+  if (m_ds_image.empty()) read_ds_image();
+  return m_ds_image;
 }
 template <typename Config>
 void FrameV2_v0<Config>::read_ds_data() const {
-  m_ds_data = hdf5pp::Utils::readGroup<ns_FrameV2_v0::dataset_data>(m_group, "data", m_idx);
+  m_ds_data = hdf5pp::Utils::readGroup<Princeton::ns_FrameV2_v0::dataset_data>(m_group, "data", m_idx);
 }
 template <typename Config>
 void FrameV2_v0<Config>::read_ds_image() const {
-  m_ds_image = hdf5pp::Utils::readGroup<ns_FrameV2_v0::dataset_image>(m_group, "image", m_idx);
+  m_ds_image = hdf5pp::Utils::readNdarray<uint16_t, 2>(m_group, "image", m_idx);
 }
 template class FrameV2_v0<Psana::Princeton::ConfigV1>;
 template class FrameV2_v0<Psana::Princeton::ConfigV2>;
@@ -1065,7 +991,7 @@ ns_InfoV1_v0::dataset_data::~dataset_data()
 boost::shared_ptr<Psana::Princeton::InfoV1>
 Proxy_InfoV1_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key)
 {
-  boost::shared_ptr<ns_InfoV1_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<ns_InfoV1_v0::dataset_data>(m_group, "data", m_idx);
+  boost::shared_ptr<Princeton::ns_InfoV1_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<Princeton::ns_InfoV1_v0::dataset_data>(m_group, "data", m_idx);
   return boost::make_shared<PsanaType>(ds_data->temperature);
 }
 

@@ -31,14 +31,14 @@ public:
   ConfigV1_v0() {}
   ConfigV1_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
-  ConfigV1_v0(const boost::shared_ptr<ns_ConfigV1_v0::dataset_config>& ds) : m_ds_config(ds) {}
+  ConfigV1_v0(const boost::shared_ptr<UsdUsb::ns_ConfigV1_v0::dataset_config>& ds) : m_ds_config(ds) {}
   virtual ~ConfigV1_v0() {}
   virtual ndarray<const uint32_t, 1> counting_mode() const;
   virtual ndarray<const uint32_t, 1> quadrature_mode() const;
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
-  mutable boost::shared_ptr<ns_ConfigV1_v0::dataset_config> m_ds_config;
+  mutable boost::shared_ptr<UsdUsb::ns_ConfigV1_v0::dataset_config> m_ds_config;
   void read_ds_config() const;
 };
 
@@ -67,12 +67,12 @@ public:
   DataV1_v0() {}
   DataV1_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
-  DataV1_v0(const boost::shared_ptr<ns_DataV1_v0::dataset_data>& ds) : m_ds_data(ds) {}
+  DataV1_v0(const boost::shared_ptr<UsdUsb::ns_DataV1_v0::dataset_data>& ds) : m_ds_data(ds) {}
   virtual ~DataV1_v0() {}
   virtual uint8_t digital_in() const;
   virtual uint32_t timestamp() const;
   virtual ndarray<const uint32_t, 1> e_count() const;
-  ndarray<const uint8_t, 1> status() const;
+    ndarray<const uint8_t, 1> status() const;
 
   virtual ndarray<const uint16_t, 1> analog_in() const;
   /** Return lower 24 bits of _count array as signed integer values. */
@@ -81,7 +81,7 @@ public:
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
-  mutable boost::shared_ptr<ns_DataV1_v0::dataset_data> m_ds_data;
+  mutable boost::shared_ptr<UsdUsb::ns_DataV1_v0::dataset_data> m_ds_data;
   void read_ds_data() const;
 };
 

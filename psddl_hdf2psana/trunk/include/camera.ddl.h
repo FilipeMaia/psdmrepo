@@ -78,19 +78,6 @@ struct dataset_config {
 };
 }
 
-namespace ns_FrameFexConfigV1_v0 {
-struct dataset_masked_pixel_coordinates {
-  static hdf5pp::Type native_type();
-  static hdf5pp::Type stored_type();
-
-  dataset_masked_pixel_coordinates();
-  ~dataset_masked_pixel_coordinates();
-
-  Camera::ns_FrameCoord_v0::dataset_data* masked_pixel_coordinates; 
-
-};
-}
-
 
 class FrameFexConfigV1_v0 : public Psana::Camera::FrameFexConfigV1 {
 public:
@@ -110,13 +97,12 @@ public:
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
-  mutable boost::shared_ptr<ns_FrameFexConfigV1_v0::dataset_config> m_ds_config;
+  mutable boost::shared_ptr<Camera::ns_FrameFexConfigV1_v0::dataset_config> m_ds_config;
   void read_ds_config() const;
   mutable Psana::Camera::FrameCoord m_ds_storage_config_roiBegin;
   mutable Psana::Camera::FrameCoord m_ds_storage_config_roiEnd;
-  mutable boost::shared_ptr<ns_FrameFexConfigV1_v0::dataset_masked_pixel_coordinates> m_ds_masked_pixel_coordinates;
+  mutable ndarray<const Psana::Camera::FrameCoord, 1> m_ds_masked_pixel_coordinates;
   void read_ds_masked_pixel_coordinates() const;
-  mutable ndarray<const Psana::Camera::FrameCoord, 1> m_ds_storage_masked_pixel_coordinates_masked_pixel_coordinates;
 };
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Camera::FrameFexConfigV1> > make_FrameFexConfigV1(int version, hdf5pp::Group group, hsize_t idx);
@@ -164,9 +150,9 @@ public:
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
-  mutable boost::shared_ptr<ns_FrameV1_v0::dataset_data> m_ds_data;
+  mutable boost::shared_ptr<Camera::ns_FrameV1_v0::dataset_data> m_ds_data;
   void read_ds_data() const;
-  mutable boost::shared_ptr<ns_FrameV1_v0::dataset_image> m_ds_image;
+  mutable boost::shared_ptr<Camera::ns_FrameV1_v0::dataset_image> m_ds_image;
   void read_ds_image() const;
 };
 
@@ -197,7 +183,7 @@ public:
   TwoDGaussianV1_v0() {}
   TwoDGaussianV1_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
-  TwoDGaussianV1_v0(const boost::shared_ptr<ns_TwoDGaussianV1_v0::dataset_data>& ds) : m_ds_data(ds) {}
+  TwoDGaussianV1_v0(const boost::shared_ptr<Camera::ns_TwoDGaussianV1_v0::dataset_data>& ds) : m_ds_data(ds) {}
   virtual ~TwoDGaussianV1_v0() {}
   virtual uint64_t integral() const;
   virtual double xmean() const;
@@ -208,7 +194,7 @@ public:
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
-  mutable boost::shared_ptr<ns_TwoDGaussianV1_v0::dataset_data> m_ds_data;
+  mutable boost::shared_ptr<Camera::ns_TwoDGaussianV1_v0::dataset_data> m_ds_data;
   void read_ds_data() const;
 };
 

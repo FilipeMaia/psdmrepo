@@ -39,7 +39,7 @@ public:
   ConfigV1_v0() {}
   ConfigV1_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
-  ConfigV1_v0(const boost::shared_ptr<ns_ConfigV1_v0::dataset_config>& ds) : m_ds_config(ds) {}
+  ConfigV1_v0(const boost::shared_ptr<Gsc16ai::ns_ConfigV1_v0::dataset_config>& ds) : m_ds_config(ds) {}
   virtual ~ConfigV1_v0() {}
   virtual uint16_t voltageRange() const;
   virtual uint16_t firstChan() const;
@@ -54,7 +54,7 @@ public:
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
-  mutable boost::shared_ptr<ns_ConfigV1_v0::dataset_config> m_ds_config;
+  mutable boost::shared_ptr<Gsc16ai::ns_ConfigV1_v0::dataset_config> m_ds_config;
   void read_ds_config() const;
 };
 
@@ -69,19 +69,6 @@ struct dataset_timestamp {
   ~dataset_timestamp();
 
   uint16_t timestamp[3]; 
-
-};
-}
-
-namespace ns_DataV1_v0 {
-struct dataset_channelValue {
-  static hdf5pp::Type native_type();
-  static hdf5pp::Type stored_type();
-
-  dataset_channelValue();
-  ~dataset_channelValue();
-
-  uint16_t* channelValue; 
 
 };
 }
@@ -101,9 +88,9 @@ private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
   boost::shared_ptr<Config> m_cfg;
-  mutable boost::shared_ptr<ns_DataV1_v0::dataset_timestamp> m_ds_timestamp;
+  mutable boost::shared_ptr<Gsc16ai::ns_DataV1_v0::dataset_timestamp> m_ds_timestamp;
   void read_ds_timestamp() const;
-  mutable boost::shared_ptr<ns_DataV1_v0::dataset_channelValue> m_ds_channelValue;
+  mutable ndarray<const uint16_t, 1> m_ds_channelValue;
   void read_ds_channelValue() const;
 };
 

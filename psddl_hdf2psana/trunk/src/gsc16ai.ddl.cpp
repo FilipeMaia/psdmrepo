@@ -101,7 +101,7 @@ uint16_t ConfigV1_v0::numChannels() const {
   return uint16_t(m_ds_config->numChannels);
 }
 void ConfigV1_v0::read_ds_config() const {
-  m_ds_config = hdf5pp::Utils::readGroup<ns_ConfigV1_v0::dataset_config>(m_group, "config", m_idx);
+  m_ds_config = hdf5pp::Utils::readGroup<Gsc16ai::ns_ConfigV1_v0::dataset_config>(m_group, "config", m_idx);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::Gsc16ai::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
@@ -145,42 +145,6 @@ ns_DataV1_v0::dataset_timestamp::dataset_timestamp()
 ns_DataV1_v0::dataset_timestamp::~dataset_timestamp()
 {
 }
-
-hdf5pp::Type ns_DataV1_v0_dataset_channelValue_stored_type()
-{
-  typedef ns_DataV1_v0::dataset_channelValue DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("channelValue", offsetof(DsType, channelValue), hdf5pp::TypeTraits<uint16_t>::stored_type());
-  return type;
-}
-
-hdf5pp::Type ns_DataV1_v0::dataset_channelValue::stored_type()
-{
-  static hdf5pp::Type type = ns_DataV1_v0_dataset_channelValue_stored_type();
-  return type;
-}
-
-hdf5pp::Type ns_DataV1_v0_dataset_channelValue_native_type()
-{
-  typedef ns_DataV1_v0::dataset_channelValue DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("channelValue", offsetof(DsType, channelValue), hdf5pp::TypeTraits<uint16_t>::native_type());
-  return type;
-}
-
-hdf5pp::Type ns_DataV1_v0::dataset_channelValue::native_type()
-{
-  static hdf5pp::Type type = ns_DataV1_v0_dataset_channelValue_native_type();
-  return type;
-}
-ns_DataV1_v0::dataset_channelValue::dataset_channelValue()
-{
-  this->channelValue = 0;
-}
-ns_DataV1_v0::dataset_channelValue::~dataset_channelValue()
-{
-  delete [] this->channelValue;
-}
 template <typename Config>
 ndarray<const uint16_t, 1> DataV1_v0<Config>::timestamp() const {
   if (not m_ds_timestamp.get()) read_ds_timestamp();
@@ -189,17 +153,16 @@ ndarray<const uint16_t, 1> DataV1_v0<Config>::timestamp() const {
 }
 template <typename Config>
 ndarray<const uint16_t, 1> DataV1_v0<Config>::channelValue() const {
-  if (not m_ds_channelValue.get()) read_ds_channelValue();
-  boost::shared_ptr<uint16_t> ptr(m_ds_channelValue, m_ds_channelValue->channelValue);
-  return make_ndarray(ptr, m_cfg->numChannels());
+  if (m_ds_channelValue.empty()) read_ds_channelValue();
+  return m_ds_channelValue;
 }
 template <typename Config>
 void DataV1_v0<Config>::read_ds_timestamp() const {
-  m_ds_timestamp = hdf5pp::Utils::readGroup<ns_DataV1_v0::dataset_timestamp>(m_group, "timestamp", m_idx);
+  m_ds_timestamp = hdf5pp::Utils::readGroup<Gsc16ai::ns_DataV1_v0::dataset_timestamp>(m_group, "timestamp", m_idx);
 }
 template <typename Config>
 void DataV1_v0<Config>::read_ds_channelValue() const {
-  m_ds_channelValue = hdf5pp::Utils::readGroup<ns_DataV1_v0::dataset_channelValue>(m_group, "channelValue", m_idx);
+  m_ds_channelValue = hdf5pp::Utils::readNdarray<uint16_t, 1>(m_group, "channelValue", m_idx);
 }
 template class DataV1_v0<Psana::Gsc16ai::ConfigV1>;
 boost::shared_ptr<PSEvt::Proxy<Psana::Gsc16ai::DataV1> > make_DataV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::Gsc16ai::ConfigV1>& cfg) {

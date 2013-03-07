@@ -155,7 +155,7 @@ uint32_t ConfigV1_v0::numPixels() const {
   return uint32_t(m_ds_config->numPixels);
 }
 void ConfigV1_v0::read_ds_config() const {
-  m_ds_config = hdf5pp::Utils::readGroup<ns_ConfigV1_v0::dataset_config>(m_group, "config", m_idx);
+  m_ds_config = hdf5pp::Utils::readGroup<Andor::ns_ConfigV1_v0::dataset_config>(m_group, "config", m_idx);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::Andor::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
@@ -203,42 +203,6 @@ ns_FrameV1_v0::dataset_frame::dataset_frame()
 ns_FrameV1_v0::dataset_frame::~dataset_frame()
 {
 }
-
-hdf5pp::Type ns_FrameV1_v0_dataset_data_stored_type()
-{
-  typedef ns_FrameV1_v0::dataset_data DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("data", offsetof(DsType, data), hdf5pp::TypeTraits<uint16_t>::stored_type());
-  return type;
-}
-
-hdf5pp::Type ns_FrameV1_v0::dataset_data::stored_type()
-{
-  static hdf5pp::Type type = ns_FrameV1_v0_dataset_data_stored_type();
-  return type;
-}
-
-hdf5pp::Type ns_FrameV1_v0_dataset_data_native_type()
-{
-  typedef ns_FrameV1_v0::dataset_data DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("data", offsetof(DsType, data), hdf5pp::TypeTraits<uint16_t>::native_type());
-  return type;
-}
-
-hdf5pp::Type ns_FrameV1_v0::dataset_data::native_type()
-{
-  static hdf5pp::Type type = ns_FrameV1_v0_dataset_data_native_type();
-  return type;
-}
-ns_FrameV1_v0::dataset_data::dataset_data()
-{
-  this->data = 0;
-}
-ns_FrameV1_v0::dataset_data::~dataset_data()
-{
-  delete [] this->data;
-}
 template <typename Config>
 uint32_t FrameV1_v0<Config>::shotIdStart() const {
   if (not m_ds_frame.get()) read_ds_frame();
@@ -256,17 +220,16 @@ float FrameV1_v0<Config>::temperature() const {
 }
 template <typename Config>
 ndarray<const uint16_t, 2> FrameV1_v0<Config>::data() const {
-  if (not m_ds_data.get()) read_ds_data();
-  boost::shared_ptr<uint16_t> ptr(m_ds_data, m_ds_data->data);
-  return make_ndarray(ptr, m_cfg->numPixelsY(),m_cfg->numPixelsX());
+  if (m_ds_data.empty()) read_ds_data();
+  return m_ds_data;
 }
 template <typename Config>
 void FrameV1_v0<Config>::read_ds_frame() const {
-  m_ds_frame = hdf5pp::Utils::readGroup<ns_FrameV1_v0::dataset_frame>(m_group, "frame", m_idx);
+  m_ds_frame = hdf5pp::Utils::readGroup<Andor::ns_FrameV1_v0::dataset_frame>(m_group, "frame", m_idx);
 }
 template <typename Config>
 void FrameV1_v0<Config>::read_ds_data() const {
-  m_ds_data = hdf5pp::Utils::readGroup<ns_FrameV1_v0::dataset_data>(m_group, "data", m_idx);
+  m_ds_data = hdf5pp::Utils::readNdarray<uint16_t, 2>(m_group, "data", m_idx);
 }
 template class FrameV1_v0<Psana::Andor::ConfigV1>;
 boost::shared_ptr<PSEvt::Proxy<Psana::Andor::FrameV1> > make_FrameV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::Andor::ConfigV1>& cfg) {

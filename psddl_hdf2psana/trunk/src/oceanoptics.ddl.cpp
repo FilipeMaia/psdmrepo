@@ -67,7 +67,7 @@ double ConfigV1_v0::strayLightConstant() const {
   return double(m_ds_config->strayLightConstant);
 }
 void ConfigV1_v0::read_ds_config() const {
-  m_ds_config = hdf5pp::Utils::readGroup<ns_ConfigV1_v0::dataset_config>(m_group, "config", m_idx);
+  m_ds_config = hdf5pp::Utils::readGroup<OceanOptics::ns_ConfigV1_v0::dataset_config>(m_group, "config", m_idx);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::OceanOptics::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
@@ -116,7 +116,7 @@ ns_timespec64_v0::dataset_data::~dataset_data()
 boost::shared_ptr<Psana::OceanOptics::timespec64>
 Proxy_timespec64_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key)
 {
-  boost::shared_ptr<ns_timespec64_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<ns_timespec64_v0::dataset_data>(m_group, "data", m_idx);
+  boost::shared_ptr<OceanOptics::ns_timespec64_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<OceanOptics::ns_timespec64_v0::dataset_data>(m_group, "data", m_idx);
   return boost::make_shared<PsanaType>(ds_data->tv_sec, ds_data->tv_nsec);
 }
 
@@ -249,7 +249,7 @@ double fRawValue = (double) (this->data()[iPixel] ^ 0x2000);                    
 }
 template <typename Config>
 void DataV1_v0<Config>::read_ds_data() const {
-  m_ds_data = hdf5pp::Utils::readGroup<ns_DataV1_v0::dataset_data>(m_group, "data", m_idx);
+  m_ds_data = hdf5pp::Utils::readGroup<OceanOptics::ns_DataV1_v0::dataset_data>(m_group, "data", m_idx);
 }
 template class DataV1_v0<Psana::OceanOptics::ConfigV1>;
 boost::shared_ptr<PSEvt::Proxy<Psana::OceanOptics::DataV1> > make_DataV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::OceanOptics::ConfigV1>& cfg) {

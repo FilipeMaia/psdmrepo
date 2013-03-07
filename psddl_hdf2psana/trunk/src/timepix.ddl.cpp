@@ -409,7 +409,7 @@ int32_t ConfigV1_v0::dac3RefLvds() const {
   return int32_t(m_ds_config->dac3RefLvds);
 }
 void ConfigV1_v0::read_ds_config() const {
-  m_ds_config = hdf5pp::Utils::readGroup<ns_ConfigV1_v0::dataset_config>(m_group, "config", m_idx);
+  m_ds_config = hdf5pp::Utils::readGroup<Timepix::ns_ConfigV1_v0::dataset_config>(m_group, "config", m_idx);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::Timepix::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
@@ -931,10 +931,10 @@ int32_t ConfigV2_v0::chipCount() const {
   return int32_t(m_ds_config->chipCount);
 }
 void ConfigV2_v0::read_ds_config() const {
-  m_ds_config = hdf5pp::Utils::readGroup<ns_ConfigV2_v0::dataset_config>(m_group, "config", m_idx);
+  m_ds_config = hdf5pp::Utils::readGroup<Timepix::ns_ConfigV2_v0::dataset_config>(m_group, "config", m_idx);
 }
 void ConfigV2_v0::read_ds_pixelThresh() const {
-  m_ds_pixelThresh = hdf5pp::Utils::readGroup<ns_ConfigV2_v0::dataset_pixelThresh>(m_group, "pixelThresh", m_idx);
+  m_ds_pixelThresh = hdf5pp::Utils::readGroup<Timepix::ns_ConfigV2_v0::dataset_pixelThresh>(m_group, "pixelThresh", m_idx);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::Timepix::ConfigV2> > make_ConfigV2(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
@@ -1466,10 +1466,10 @@ int32_t ConfigV3_v0::chipCount() const {
   return int32_t(m_ds_config->chipCount);
 }
 void ConfigV3_v0::read_ds_config() const {
-  m_ds_config = hdf5pp::Utils::readGroup<ns_ConfigV3_v0::dataset_config>(m_group, "config", m_idx);
+  m_ds_config = hdf5pp::Utils::readGroup<Timepix::ns_ConfigV3_v0::dataset_config>(m_group, "config", m_idx);
 }
 void ConfigV3_v0::read_ds_pixelThresh() const {
-  m_ds_pixelThresh = hdf5pp::Utils::readGroup<ns_ConfigV3_v0::dataset_pixelThresh>(m_group, "pixelThresh", m_idx);
+  m_ds_pixelThresh = hdf5pp::Utils::readGroup<Timepix::ns_ConfigV3_v0::dataset_pixelThresh>(m_group, "pixelThresh", m_idx);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::Timepix::ConfigV3> > make_ConfigV3(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
@@ -1573,10 +1573,10 @@ ndarray<const uint16_t, 2> DataV1_v0::data() const {
 
 
 void DataV1_v0::read_ds_data() const {
-  m_ds_data = hdf5pp::Utils::readGroup<ns_DataV1_v0::dataset_data>(m_group, "data", m_idx);
+  m_ds_data = hdf5pp::Utils::readGroup<Timepix::ns_DataV1_v0::dataset_data>(m_group, "data", m_idx);
 }
 void DataV1_v0::read_ds_image() const {
-  m_ds_image = hdf5pp::Utils::readGroup<ns_DataV1_v0::dataset_image>(m_group, "image", m_idx);
+  m_ds_image = hdf5pp::Utils::readGroup<Timepix::ns_DataV1_v0::dataset_image>(m_group, "image", m_idx);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::Timepix::DataV1> > make_DataV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
@@ -1628,42 +1628,6 @@ ns_DataV2_v0::dataset_data::dataset_data()
 ns_DataV2_v0::dataset_data::~dataset_data()
 {
 }
-
-hdf5pp::Type ns_DataV2_v0_dataset_image_stored_type()
-{
-  typedef ns_DataV2_v0::dataset_image DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("data", offsetof(DsType, data), hdf5pp::TypeTraits<uint16_t>::stored_type());
-  return type;
-}
-
-hdf5pp::Type ns_DataV2_v0::dataset_image::stored_type()
-{
-  static hdf5pp::Type type = ns_DataV2_v0_dataset_image_stored_type();
-  return type;
-}
-
-hdf5pp::Type ns_DataV2_v0_dataset_image_native_type()
-{
-  typedef ns_DataV2_v0::dataset_image DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("data", offsetof(DsType, data), hdf5pp::TypeTraits<uint16_t>::native_type());
-  return type;
-}
-
-hdf5pp::Type ns_DataV2_v0::dataset_image::native_type()
-{
-  static hdf5pp::Type type = ns_DataV2_v0_dataset_image_native_type();
-  return type;
-}
-ns_DataV2_v0::dataset_image::dataset_image()
-{
-  this->data = 0;
-}
-ns_DataV2_v0::dataset_image::~dataset_image()
-{
-  delete [] this->data;
-}
 uint16_t DataV2_v0::width() const {
   if (not m_ds_data.get()) read_ds_data();
   return uint16_t(m_ds_data->width);
@@ -1685,17 +1649,16 @@ uint16_t DataV2_v0::lostRows() const {
   return uint16_t(m_ds_data->lostRows);
 }
 ndarray<const uint16_t, 2> DataV2_v0::data() const {
-  if (not m_ds_image.get()) read_ds_image();
-  boost::shared_ptr<uint16_t> ptr(m_ds_image, m_ds_image->data);
-  return make_ndarray(ptr, this->height(),this->width());
+  if (m_ds_image.empty()) read_ds_image();
+  return m_ds_image;
 }
 
 
 void DataV2_v0::read_ds_data() const {
-  m_ds_data = hdf5pp::Utils::readGroup<ns_DataV2_v0::dataset_data>(m_group, "data", m_idx);
+  m_ds_data = hdf5pp::Utils::readGroup<Timepix::ns_DataV2_v0::dataset_data>(m_group, "data", m_idx);
 }
 void DataV2_v0::read_ds_image() const {
-  m_ds_image = hdf5pp::Utils::readGroup<ns_DataV2_v0::dataset_image>(m_group, "image", m_idx);
+  m_ds_image = hdf5pp::Utils::readNdarray<uint16_t, 2>(m_group, "image", m_idx);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::Timepix::DataV2> > make_DataV2(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {

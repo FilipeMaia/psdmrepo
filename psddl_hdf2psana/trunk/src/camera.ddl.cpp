@@ -47,7 +47,7 @@ ns_FrameCoord_v0::dataset_data::~dataset_data()
 boost::shared_ptr<Psana::Camera::FrameCoord>
 Proxy_FrameCoord_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key)
 {
-  boost::shared_ptr<ns_FrameCoord_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<ns_FrameCoord_v0::dataset_data>(m_group, "data", m_idx);
+  boost::shared_ptr<Camera::ns_FrameCoord_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<Camera::ns_FrameCoord_v0::dataset_data>(m_group, "data", m_idx);
   return boost::make_shared<PsanaType>(ds_data->column, ds_data->row);
 }
 
@@ -131,42 +131,6 @@ ns_FrameFexConfigV1_v0::dataset_config::dataset_config()
 ns_FrameFexConfigV1_v0::dataset_config::~dataset_config()
 {
 }
-
-hdf5pp::Type ns_FrameFexConfigV1_v0_dataset_masked_pixel_coordinates_stored_type()
-{
-  typedef ns_FrameFexConfigV1_v0::dataset_masked_pixel_coordinates DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("masked_pixel_coordinates", offsetof(DsType, masked_pixel_coordinates), hdf5pp::TypeTraits<Camera::ns_FrameCoord_v0::dataset_data>::stored_type());
-  return type;
-}
-
-hdf5pp::Type ns_FrameFexConfigV1_v0::dataset_masked_pixel_coordinates::stored_type()
-{
-  static hdf5pp::Type type = ns_FrameFexConfigV1_v0_dataset_masked_pixel_coordinates_stored_type();
-  return type;
-}
-
-hdf5pp::Type ns_FrameFexConfigV1_v0_dataset_masked_pixel_coordinates_native_type()
-{
-  typedef ns_FrameFexConfigV1_v0::dataset_masked_pixel_coordinates DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("masked_pixel_coordinates", offsetof(DsType, masked_pixel_coordinates), hdf5pp::TypeTraits<Camera::ns_FrameCoord_v0::dataset_data>::native_type());
-  return type;
-}
-
-hdf5pp::Type ns_FrameFexConfigV1_v0::dataset_masked_pixel_coordinates::native_type()
-{
-  static hdf5pp::Type type = ns_FrameFexConfigV1_v0_dataset_masked_pixel_coordinates_native_type();
-  return type;
-}
-ns_FrameFexConfigV1_v0::dataset_masked_pixel_coordinates::dataset_masked_pixel_coordinates()
-{
-  this->masked_pixel_coordinates = 0;
-}
-ns_FrameFexConfigV1_v0::dataset_masked_pixel_coordinates::~dataset_masked_pixel_coordinates()
-{
-  delete [] this->masked_pixel_coordinates;
-}
 Psana::Camera::FrameFexConfigV1::Forwarding FrameFexConfigV1_v0::forwarding() const {
   if (not m_ds_config.get()) read_ds_config();
   return Psana::Camera::FrameFexConfigV1::Forwarding(m_ds_config->forwarding);
@@ -198,20 +162,17 @@ uint32_t FrameFexConfigV1_v0::number_of_masked_pixels() const {
   return uint32_t(m_ds_config->number_of_masked_pixels);
 }
 ndarray<const Psana::Camera::FrameCoord, 1> FrameFexConfigV1_v0::masked_pixel_coordinates() const {
-  if (not m_ds_masked_pixel_coordinates.get()) read_ds_masked_pixel_coordinates();
-  if (m_ds_storage_masked_pixel_coordinates_masked_pixel_coordinates.empty()) {
-    unsigned shape[] = {this->number_of_masked_pixels()};
-    ndarray<Psana::Camera::FrameCoord, 1> tmparr(shape);
-    std::copy(m_ds_masked_pixel_coordinates->masked_pixel_coordinates, m_ds_masked_pixel_coordinates->masked_pixel_coordinates+this->number_of_masked_pixels(), tmparr.begin());
-    m_ds_storage_masked_pixel_coordinates_masked_pixel_coordinates = tmparr;
-  }
-  return m_ds_storage_masked_pixel_coordinates_masked_pixel_coordinates;
+  if (m_ds_masked_pixel_coordinates.empty()) read_ds_masked_pixel_coordinates();
+  return m_ds_masked_pixel_coordinates;
 }
 void FrameFexConfigV1_v0::read_ds_config() const {
-  m_ds_config = hdf5pp::Utils::readGroup<ns_FrameFexConfigV1_v0::dataset_config>(m_group, "config", m_idx);
+  m_ds_config = hdf5pp::Utils::readGroup<Camera::ns_FrameFexConfigV1_v0::dataset_config>(m_group, "config", m_idx);
 }
 void FrameFexConfigV1_v0::read_ds_masked_pixel_coordinates() const {
-  m_ds_masked_pixel_coordinates = hdf5pp::Utils::readGroup<ns_FrameFexConfigV1_v0::dataset_masked_pixel_coordinates>(m_group, "masked_pixel_coordinates", m_idx);
+  ndarray<Camera::ns_FrameCoord_v0::dataset_data, 1> arr = hdf5pp::Utils::readNdarray<Camera::ns_FrameCoord_v0::dataset_data, 1>(m_group, "masked_pixel_coordinates", m_idx);
+  ndarray<Psana::Camera::FrameCoord, 1> tmp(arr.shape());
+  std::copy(arr.begin(), arr.end(), tmp.begin());
+  m_ds_masked_pixel_coordinates = tmp;
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::Camera::FrameFexConfigV1> > make_FrameFexConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
@@ -287,10 +248,10 @@ FrameV1_v0::data16() const{
 if (this->depth() <= 8) return ndarray<const uint16_t, 2>(); return make_ndarray((const uint16_t*)_int_pixel_data().data(), height(), width()); 
 }
 void FrameV1_v0::read_ds_data() const {
-  m_ds_data = hdf5pp::Utils::readGroup<ns_FrameV1_v0::dataset_data>(m_group, "data", m_idx);
+  m_ds_data = hdf5pp::Utils::readGroup<Camera::ns_FrameV1_v0::dataset_data>(m_group, "data", m_idx);
 }
 void FrameV1_v0::read_ds_image() const {
-  m_ds_image = hdf5pp::Utils::readGroup<ns_FrameV1_v0::dataset_image>(m_group, "image", m_idx);
+  m_ds_image = hdf5pp::Utils::readGroup<Camera::ns_FrameV1_v0::dataset_image>(m_group, "image", m_idx);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::Camera::FrameV1> > make_FrameV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
@@ -369,7 +330,7 @@ double TwoDGaussianV1_v0::major_axis_tilt() const {
   return double(m_ds_data->major_axis_tilt);
 }
 void TwoDGaussianV1_v0::read_ds_data() const {
-  m_ds_data = hdf5pp::Utils::readGroup<ns_TwoDGaussianV1_v0::dataset_data>(m_group, "data", m_idx);
+  m_ds_data = hdf5pp::Utils::readGroup<Camera::ns_TwoDGaussianV1_v0::dataset_data>(m_group, "data", m_idx);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::Camera::TwoDGaussianV1> > make_TwoDGaussianV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
