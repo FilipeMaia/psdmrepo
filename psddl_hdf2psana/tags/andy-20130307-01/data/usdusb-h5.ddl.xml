@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE psddl SYSTEM "psddl.dtd">
+
+<psddl>
+
+    <use file="psddldata/usdusb.ddl.xml" />
+
+    <package name="UsdUsb">
+
+        <!-- ========================================================================= -->
+    
+        <h5schema name="ConfigV1" version="0">
+
+            <dataset name="config">
+                <attribute name="counting_mode"/>
+                <attribute name="quadrature_mode"/>
+            </dataset>
+            
+        </h5schema>
+    
+        <!-- ========================================================================= -->
+    
+        <h5schema name="DataV1" version="0">
+
+            <dataset name="data">
+                <attribute name="e_count"/>
+                <attribute name="analog_in"/>
+                <attribute name="timestamp"/>
+                <attribute name="digital_in"/>
+            </dataset>
+            
+        </h5schema>
+    
+    </package>
+</psddl>
