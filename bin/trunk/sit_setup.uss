@@ -179,6 +179,12 @@ if [ -z "$sit_arch" -a -z "$os" ] ; then
       Scientific_Linux_*_release_5.*)           os=rhel5 ;;
       Scientific_Linux_*_release_6.*)           os=rhel6 ;;
     esac
+  elif [ "$os" = "Linux" -a -r /etc/SuSE-release ] ; then
+    rel=`cat /etc/SuSE-release | grep VERSION | tr -d ' '`
+    case $rel in
+      VERSION=11.*) os=suse11 ;;
+      VERSION=12.*) os=suse12 ;;
+    esac
   elif [ "$os" = "Linux" -a -r /etc/lsb-release ] ; then
     . /etc/lsb-release
     if [ "$DISTRIB_ID" = "Ubuntu" ] ; then
