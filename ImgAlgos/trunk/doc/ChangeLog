@@ -11,7 +11,14 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
-2013-03-06 Mikhail S. Dubrovin
+Tag: V00-03-01	
+2013-03-07 Mikhail S. Dubrovin
+- add N*RMS-dependent threshold, make type of output data equal to type of input data 
+M       include/ImgCalib.h
+M       src/ImgCalib.cpp
+- add scale factor for input array
+M       include/ImgParametersV1.h
+M       src/ImgParametersV1.cpp
 - add more types for recognition in 
 M       include/ImgMaskEvaluation.h
 M       src/ImgMaskEvaluation.cpp

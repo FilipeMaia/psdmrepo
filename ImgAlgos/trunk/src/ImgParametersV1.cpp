@@ -52,6 +52,7 @@ ImgParametersV1::ImgParametersV1 (const unsigned* shape, pars_t val)
   m_cols = shape[1];
   m_size = m_rows * m_cols;
   m_pars = new pars_t [m_size];
+  m_factor = 1;
   std::fill_n(m_pars, int(m_size), val);
 }
 
@@ -64,6 +65,7 @@ ImgParametersV1::ImgParametersV1 (const std::string& fname, const unsigned* shap
   m_cols = shape[1];
   m_size = m_rows * m_cols;
   m_pars = new pars_t [m_size];
+  m_factor = 1;
 
   // open file
   std::ifstream in(fname.c_str());
@@ -101,9 +103,10 @@ ImgParametersV1::ImgParametersV1 (const std::string& fname, const unsigned* shap
 
 //--------------------
 
-ImgParametersV1::ImgParametersV1 (const std::string& fname) 
+ImgParametersV1::ImgParametersV1 (const std::string& fname, double factor) 
 { 
-  m_fname= fname;
+  m_fname  = fname;
+  m_factor = (pars_t) factor;
 
   // open file
   std::ifstream in(fname.c_str());
@@ -134,8 +137,8 @@ ImgParametersV1::ImgParametersV1 (const std::string& fname)
       throw std::runtime_error(msg);
     }
     cols_prev = cols;
-  }  
-
+  } 
+ 
   m_rows = row;
   m_cols = cols;
   m_size = m_rows * m_cols;
@@ -157,7 +160,7 @@ unsigned ImgParametersV1::input_data_from_string(std::string& s)
       while(true) { 
         ss >> val; 
 	if(!ss.good()) break;
-        v_work.push_back(val);
+        v_work.push_back(val * m_factor);
         col++;
       }
       return col;
@@ -183,6 +186,7 @@ void ImgParametersV1::print(std::string comment)
         << "\n rows         : " << m_rows
         << "\n cols         : " << m_cols
         << "\n size         : " << m_size
+        << "\n factor       : " << m_factor
         << "\n pars         : "
         << "\n col:     ";
 

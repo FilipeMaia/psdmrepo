@@ -72,7 +72,7 @@ public:
   ImgParametersV1 (const std::string& fname, const unsigned* shape) ;
 
   // read 2d table of parameters from file and define the shape from rows, cols in file
-  ImgParametersV1 (const std::string& fname) ;
+  ImgParametersV1 (const std::string& fname, double factor=1) ;
 
   // Destructor
   ~ImgParametersV1 () ;
@@ -102,6 +102,7 @@ private:
   unsigned    m_rows;
   unsigned    m_cols;
   unsigned    m_size;
+  pars_t      m_factor;
 };
 
 } // namespace ImgAlgos
