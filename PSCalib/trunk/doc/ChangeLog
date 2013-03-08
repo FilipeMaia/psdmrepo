@@ -11,9 +11,14 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-05
+2013-03-08 Mikhail S. Dubrovin
+- add CSPad2x2CalibPars and example in test/ex_cspad2x2_calib_pars.cpp
+
 Tag: V00-01-04
 2013-03-01 Mikhail S. Dubrovin
 - in CSPadCalibPars add beam_vector and beam_intersect types
+- add default constants in default constructor for all types.
 	
 Tag: V00-01-03
 2012-05-10 Mikhail S. Dubrovin
