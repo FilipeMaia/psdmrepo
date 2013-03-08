@@ -11,6 +11,13 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2013-03-07 Mikhail S. Dubrovin
+Tag: V00-00-04
+- add 
+	1) pedestal subtraction,
+	2) hot and saturated pixels mask evaluation
+	3) threshold for const level and N*rms
+	
 2013-02-21 Mikhail S. Dubrovin
 Tag: V00-00-03
 app/med and src/MaskEditor.py are ready
