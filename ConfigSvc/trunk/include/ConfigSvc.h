@@ -65,61 +65,74 @@ public:
   // helper classes to handle conversion
   class Result {
   public:
-    Result(const boost::shared_ptr<const std::string>& pstr) : m_pstr(pstr) {}
+    Result(const boost::shared_ptr<const std::string>& pstr, const std::string& sect,
+        const std::string& parm) : m_pstr(pstr), m_sect(sect), m_parm(parm) {}
     
     // conversion to final value
     template <typename T>
-    operator T() const { return ConfigSvcTypeTraits<T>::fromString(*m_pstr); }
+    operator T() const { return ConfigSvcTypeTraits<T>::fromString(*m_pstr, m_sect, m_parm); }
     
   private:
     boost::shared_ptr<const std::string> m_pstr;
+    const std::string& m_sect;
+    const std::string& m_parm;
   };
 
   template <typename Def>
   class ResultDef {
   public:
-    ResultDef(const boost::shared_ptr<const std::string>& pstr, const Def& def) 
-      : m_pstr(pstr), m_def(def) {}
+    ResultDef(const boost::shared_ptr<const std::string>& pstr, const std::string& sect,
+        const std::string& parm, const Def& def)
+      : m_pstr(pstr), m_sect(sect), m_parm(parm), m_def(def) {}
     
     // conversion to final value
     template <typename T>
     operator T() const {
-      if ( m_pstr.get() ) {
-        return ConfigSvcTypeTraits<T>::fromString(*m_pstr);
+      if (m_pstr) {
+        return ConfigSvcTypeTraits<T>::fromString(*m_pstr, m_sect, m_parm);
       } else {
         return m_def;
       }
     }
+
+    // retursn true if result is a default value
+    bool isDefault() const { return not m_pstr; }
     
   private:
     boost::shared_ptr<const std::string> m_pstr;
+    const std::string& m_sect;
+    const std::string& m_parm;
     Def m_def;
   };
   
   class ResultList {
   public:
-    ResultList(const boost::shared_ptr<const std::list<std::string> >& pstr) 
-      : m_pstr(pstr) {}
+    ResultList(const boost::shared_ptr<const std::list<std::string> >& pstr, const std::string& sect,
+        const std::string& parm)
+    : m_pstr(pstr), m_sect(sect), m_parm(parm) {}
     
     // conversion to final value
     template <typename Container>
     operator Container() const {
       Container res ;
       for (std::list<std::string>::const_iterator it = m_pstr->begin() ; it != m_pstr->end() ; ++ it ) {      
-        res.push_back( ConfigSvcTypeTraits<typename Container::value_type>::fromString(*it) );
+        res.push_back( ConfigSvcTypeTraits<typename Container::value_type>::fromString(*it, m_sect, m_parm) );
       }
       return res;
     }
     
   private:
     boost::shared_ptr<const std::list<std::string> > m_pstr;
+    const std::string& m_sect;
+    const std::string& m_parm;
   };
 
   template <typename Def>
   class ResultListDef {
   public:
-    ResultListDef(const boost::shared_ptr<const std::list<std::string> >& pstr, const Def& def) 
-      : m_pstr(pstr), m_def(def) {}
+    ResultListDef(const boost::shared_ptr<const std::list<std::string> >& pstr, const std::string& sect,
+        const std::string& parm, const Def& def)
+      : m_pstr(pstr), m_sect(sect), m_parm(parm), m_def(def) {}
     
     // conversion to final value
     template <typename Container>
@@ -128,13 +141,15 @@ public:
       
       Container res ;
       for (std::list<std::string>::const_iterator it = m_pstr->begin() ; it != m_pstr->end() ; ++ it ) {      
-        res.push_back( ConfigSvcTypeTraits<typename Container::value_type>::fromString(*it) );
+        res.push_back( ConfigSvcTypeTraits<typename Container::value_type>::fromString(*it, m_sect, m_parm) );
       }
       return res;
     }
     
   private:
     boost::shared_ptr<const std::list<std::string> > m_pstr;
+    const std::string& m_sect;
+    const std::string& m_parm;
     Def m_def;
   };
 
@@ -171,7 +186,7 @@ public:
   Result get(const std::string& section, const std::string& param) const {
     boost::shared_ptr<const std::string> pstr = impl(m_ctx).get(section, param);
     if (not pstr.get()) throw ExceptionMissing(section, param);
-    return Result( pstr );
+    return Result( pstr, section, param );
   }
 
   /**
@@ -207,7 +222,7 @@ public:
   ResultDef<T> get(const std::string& section, const std::string& param, const T& def) const
   {
     boost::shared_ptr<const std::string> pstr = impl(m_ctx).get(section, param);
-    return ResultDef<T>( pstr, def );
+    return ResultDef<T>( pstr, section, param, def );
   }
 
   /**
@@ -246,7 +261,7 @@ public:
   ResultList getList(const std::string& section, const std::string& param) const {
     boost::shared_ptr<const std::list<std::string> > pstr = impl(m_ctx).getList(section, param);
     if (not pstr.get()) throw ExceptionMissing(section, param);
-    return ResultList(pstr);
+    return ResultList(pstr, section, param);
   }
   
   /**
@@ -264,7 +279,7 @@ public:
   ResultListDef<Cont> getList(const std::string& section, const std::string& param, const Cont& def) const
   {
     boost::shared_ptr<const std::list<std::string> > pstr = impl(m_ctx).getList(section, param);
-    return ResultListDef<Cont>(pstr, def);
+    return ResultListDef<Cont>(pstr, section, param, def);
   }
   
   /**

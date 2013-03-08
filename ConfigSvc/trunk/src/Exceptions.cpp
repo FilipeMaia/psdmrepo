@@ -77,8 +77,10 @@ ExceptionMissing::ExceptionMissing ( const std::string& section,
 {
 }
 
-ExceptionCvtFail::ExceptionCvtFail ( const std::string& string )
-  : Exception("conversion from string failed for value: " + string)
+ExceptionCvtFail::ExceptionCvtFail (const std::string& section,
+    const std::string& parameter, const std::string& string)
+  : Exception("conversion from string failed for parameter '" + section + "." +
+      parameter + "', value: '" + string + "'")
 {
 }
 

@@ -55,11 +55,11 @@ namespace ConfigSvc {
 template <typename T>
 struct ConfigSvcTypeTraits {
   
-  static T fromString(const std::string& str) {
+  static T fromString(const std::string& str, const std::string& sect, const std::string& parm) {
     try {
       return boost::lexical_cast<T>(str);
     } catch (const boost::bad_lexical_cast& ex) {
-      throw ExceptionCvtFail(str);
+      throw ExceptionCvtFail(sect, parm, str);
     }
   }
   
@@ -69,7 +69,7 @@ struct ConfigSvcTypeTraits {
 template <>
 struct ConfigSvcTypeTraits<bool> {
   
-  static bool fromString(const std::string& str) {
+  static bool fromString(const std::string& str, const std::string& sect, const std::string& parm) {
     std::string lstr = boost::algorithm::to_lower_copy(str);
     if (lstr == "yes") return true;
     if (lstr == "no") return false;
@@ -80,7 +80,7 @@ struct ConfigSvcTypeTraits<bool> {
     try {
       return boost::lexical_cast<bool>(str);
     } catch (const boost::bad_lexical_cast& ex) {
-      throw ExceptionCvtFail(str);
+      throw ExceptionCvtFail(sect, parm, str);
     }
   }
   
@@ -90,7 +90,7 @@ struct ConfigSvcTypeTraits<bool> {
 template <>
 struct ConfigSvcTypeTraits<std::string> {
   
-  static const std::string& fromString(const std::string& str) {
+  static const std::string& fromString(const std::string& str, const std::string& sect, const std::string& parm) {
     return str;
   }
   
@@ -99,8 +99,8 @@ struct ConfigSvcTypeTraits<std::string> {
 // specialized trait class for strings
 template <>
 struct ConfigSvcTypeTraits<const char*> {
-  // this assumes that lifetime of the string is longer than pointer 
-  static const char* fromString(const std::string& str) {
+  // this assumes that lifetime of the string is longer than of the returned pointer
+  static const char* fromString(const std::string& str, const std::string& sect, const std::string& parm) {
     return str.c_str();
   }  
 };

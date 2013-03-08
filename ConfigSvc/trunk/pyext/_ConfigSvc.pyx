@@ -153,7 +153,7 @@ def initConfigSvc(object file not None):
         if hasattr(file, 'name'):
             strfname = string(<char*>file.name)
         else:
-            sstr = str(file)
+            sstr = PyObject_Str(file)
             strfname = string(<char*>sstr)
         sstr = file.read()
         istr.str(string(<char*>sstr))

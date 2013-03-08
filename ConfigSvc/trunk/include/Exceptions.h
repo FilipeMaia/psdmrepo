@@ -113,8 +113,9 @@ public:
 class ExceptionCvtFail : public Exception {
 public:
 
-  /// Constructor takes the name of the section
-  ExceptionCvtFail ( const std::string& string ) ;
+  /// Constructor takes the name of the section, parameter and string value
+  ExceptionCvtFail (const std::string& section, const std::string& parameter,
+      const std::string& string);
 
 };
 

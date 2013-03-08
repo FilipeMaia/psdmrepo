@@ -11,6 +11,15 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-00
+2013-03-08 Andy Salnikov
+- exception generated during string conversion was lacking information 
+  about the source of the problem. Now adding section/parameter name to
+  the exception, this needs these names to be passed around to all result
+  types and conversion method. Things become more heavyweight, the result
+  classes was probably bad idea.
+- ResultDef class gets method isDefault(), needed for psana::Configurable
+
 Tag: V00-01-00
 2013-02-12 Andy Salnikov
 - enable support for multiple instances of the configuration service
