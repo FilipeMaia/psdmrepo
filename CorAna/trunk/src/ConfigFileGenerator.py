@@ -151,18 +151,18 @@ class ConfigFileGenerator :
                          }
 
         if cp.lld_type.value() == 'ADU' : #  ['NONE', 'ADU', 'RMS']
-            self.d_subs['THRESHOLD_ADU']  = str( cp.lld_adu.value() )
-            self.d_subs['THRESHOLD_NRMS'] = ''
+            self.d_subs['THRESHOLD_ADU' ] = str( cp.lld_adu.value() )
+            self.d_subs['THRESHOLD_NRMS'] = '0'
             self.d_subs['FNAME_PEDS_RMS'] = ''
 
         elif cp.lld_type.value() == 'RMS' : 
-            self.d_subs['THRESHOLD_ADU']  = ''
+            self.d_subs['THRESHOLD_ADU' ] = '-123456' # = default value - will not use trheshold
             self.d_subs['THRESHOLD_NRMS'] = str( cp.lld_rms.value() )
             self.d_subs['FNAME_PEDS_RMS'] = fnm.path_pedestals_rms()
 
         else : 
-            self.d_subs['THRESHOLD_ADU']  = ''
-            self.d_subs['THRESHOLD_NRMS'] = ''
+            self.d_subs['THRESHOLD_ADU' ] = '-123456' # = default value - will not use trheshold
+            self.d_subs['THRESHOLD_NRMS'] = '0'
             self.d_subs['FNAME_PEDS_RMS'] = ''
 
         self.print_substitution_dict()
