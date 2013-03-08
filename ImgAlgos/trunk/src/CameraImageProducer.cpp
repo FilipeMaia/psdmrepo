@@ -150,7 +150,6 @@ CameraImageProducer::procEvent(Event& evt, Env& env)
       if(m_data.empty()) m_data = make_ndarray<double>(frmData->height(), frmData->width());
 
       int offset = (m_subtract_offset) ? frmData->offset() : 0;
-      unsigned ind = 0;
 
       const ndarray<const uint8_t, 2>& data8 = frmData->data8();
       if (not data8.empty()) {
