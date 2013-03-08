@@ -11,6 +11,11 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-02	
+2013-03-08 Mikhail S. Dubrovin
+- In ImgCalib add do_threshold switch to On/Off low level threshold
+- In ImgParametersV1 improve print() method
+	
 Tag: V00-03-01	
 2013-03-07 Mikhail S. Dubrovin
 - add N*RMS-dependent threshold, make type of output data equal to type of input data 

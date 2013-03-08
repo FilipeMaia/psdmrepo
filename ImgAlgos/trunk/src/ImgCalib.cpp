@@ -58,6 +58,7 @@ ImgCalib::ImgCalib (const std::string& name)
   , m_low_nrms()
   , m_low_thre()
   , m_low_val()
+  , m_do_thre() 
   , m_row_min()
   , m_row_max()
   , m_col_min()
@@ -65,12 +66,8 @@ ImgCalib::ImgCalib (const std::string& name)
   , m_print_bits()
   , m_count(0)
 {
-  double def_low_thre = -123456;
-
-  //std::cout << "Startt input of parameters\n";
-  
   // get the values from configuration or use defaults
-  m_str_src           = configSrc("source", "DetInfo(:Opal1000)");
+  m_str_src           = configSrc("source",   "DetInfo(:Camera)");
   m_key_in            = configStr("key_in",                   "");
   m_key_out           = configStr("key_out",        "calibrated");
   m_fname_peds        = configStr("fname_peds",               "");
@@ -80,20 +77,20 @@ ImgCalib::ImgCalib (const std::string& name)
   m_fname_nrms        = configStr("fname_rms",                "");
   m_mask_val          = config   ("masked_value",             0.);
   m_low_nrms          = config   ("threshold_nrms",           3.);
-  m_low_thre          = config   ("threshold",     def_low_thre );
+  m_low_thre          = config   ("threshold",                0.);
   m_low_val           = config   ("below_thre_value",         0.);
+  m_do_thre           = config   ("do_threshold",         false );
   m_row_min           = config   ("bkgd_row_min",             0 );
   m_row_max           = config   ("bkgd_row_max",            10 );
   m_col_min           = config   ("bkgd_col_min",             0 );
   m_col_max           = config   ("bkgd_col_max",            10 );
   m_print_bits        = config   ("print_bits",               0 );
 
-  m_do_peds = (m_fname_peds.empty())     ? false : true;
-  m_do_mask = (m_fname_mask.empty())     ? false : true;
-  m_do_bkgd = (m_fname_bkgd.empty())     ? false : true;
-  m_do_gain = (m_fname_gain.empty())     ? false : true;
-  m_do_nrms = (m_fname_nrms.empty())     ? false : true;
-  m_do_thre = (m_low_thre==def_low_thre) ? false : true;
+  m_do_peds = (m_fname_peds.empty()) ? false : true;
+  m_do_mask = (m_fname_mask.empty()) ? false : true;
+  m_do_bkgd = (m_fname_bkgd.empty()) ? false : true;
+  m_do_gain = (m_fname_gain.empty()) ? false : true;
+  m_do_nrms = (m_fname_nrms.empty()) ? false : true;
 }
 
 //--------------------
@@ -285,19 +282,5 @@ ImgCalib::printEventRecord(Event& evt)
 }
 
 //--------------------
-
-/*
-void 
-ImgCalib::saveImageInEvent(Event& evt)
-{
-  //shared_ptr< ndarray<double,2> > img2d( new ndarray<double,2>(m_cdat, m_shape) );
-  //evt.put(img2d, m_src, m_key_out);
-
-  save2DArrayInEvent<double> (evt, m_src, m_key_out, data);
-}
-*/
-
-//--------------------
-
 //--------------------
 } // namespace ImgAlgos

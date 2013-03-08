@@ -109,6 +109,7 @@ private:
   double          m_low_nrms;         // The low threshold number of RMS
   double          m_low_thre;         // The low threshold
   double          m_low_val;          // The value of substituting amplitude below threshold
+  bool            m_do_thre;          // flag: true = apply the threshold
   unsigned        m_row_min;          // window for background normalization
   unsigned        m_row_max;          // window for background normalization
   unsigned        m_col_min;          // window for background normalization
@@ -125,7 +126,6 @@ private:
   bool m_do_mask;                     // flag: true = apply mask
   bool m_do_bkgd;                     // flag: true = subtract background
   bool m_do_gain;                     // flag: true = apply the gain correction
-  bool m_do_thre;                     // flag: true = apply the threshold
   bool m_do_nrms;                     // flag: true = apply the threshold as nRMS
 
   ImgParametersV1* m_peds;
@@ -143,10 +143,7 @@ private:
   std::vector<unsigned> v_inds;       // vector of the image indexes for background normalization
 
   double           m_norm;            // Normalization factor for background subtraction
-
-  //const double*    m_rdat;            // Raw image data 
   double*          m_cdat;            // Calibrated data for image
-
 
 //-------------------
 

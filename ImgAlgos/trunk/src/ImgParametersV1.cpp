@@ -190,15 +190,15 @@ void ImgParametersV1::print(std::string comment)
         << "\n pars         : "
         << "\n col:     ";
 
-    unsigned col_min=5, col_max=35;
-    unsigned row_min=5, row_max=25;
-    unsigned width=5;
-    for(unsigned c=col_min; c<col_max; c++) log << std::setw(width) << c;
+    unsigned col_min=5, col_max=20;
+    unsigned row_min=5, row_max=30;
+    unsigned width=6;
+    for(unsigned c=col_min; c<col_max; c++) log << std::setw(width) << c << " ";
     log << "\n";
 
     for(unsigned r=row_min; r<row_max; r++) {
       log << "\n row" << std::setw(5) << r << ":";
-      for(unsigned c=col_min; c<col_max; c++) log << std::setw(width) << m_pars[r*m_cols + c];
+      for(unsigned c=col_min; c<col_max; c++) log << std::setw(width) << m_pars[r*m_cols + c] << " ";
     }
     log << "\n";
   }
