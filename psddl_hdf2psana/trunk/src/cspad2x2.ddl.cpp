@@ -97,8 +97,11 @@ ns_CsPad2x2ReadOnlyCfg_v0::dataset_data::~dataset_data()
 boost::shared_ptr<Psana::CsPad2x2::CsPad2x2ReadOnlyCfg>
 Proxy_CsPad2x2ReadOnlyCfg_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key)
 {
-  boost::shared_ptr<CsPad2x2::ns_CsPad2x2ReadOnlyCfg_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<CsPad2x2::ns_CsPad2x2ReadOnlyCfg_v0::dataset_data>(m_group, "data", m_idx);
-  return boost::make_shared<PsanaType>(ds_data->shiftTest, ds_data->version);
+  if (not m_data) {
+    boost::shared_ptr<CsPad2x2::ns_CsPad2x2ReadOnlyCfg_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<CsPad2x2::ns_CsPad2x2ReadOnlyCfg_v0::dataset_data>(m_group, "data", m_idx);
+    m_data.reset(new PsanaType(ds_data->shiftTest, ds_data->version));
+  }
+  return m_data;
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::CsPad2x2::CsPad2x2ReadOnlyCfg> > make_CsPad2x2ReadOnlyCfg(int version, hdf5pp::Group group, hsize_t idx) {
@@ -148,8 +151,11 @@ ns_ProtectionSystemThreshold_v0::dataset_data::~dataset_data()
 boost::shared_ptr<Psana::CsPad2x2::ProtectionSystemThreshold>
 Proxy_ProtectionSystemThreshold_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key)
 {
-  boost::shared_ptr<CsPad2x2::ns_ProtectionSystemThreshold_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<CsPad2x2::ns_ProtectionSystemThreshold_v0::dataset_data>(m_group, "data", m_idx);
-  return boost::make_shared<PsanaType>(ds_data->adcThreshold, ds_data->pixelCountThreshold);
+  if (not m_data) {
+    boost::shared_ptr<CsPad2x2::ns_ProtectionSystemThreshold_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<CsPad2x2::ns_ProtectionSystemThreshold_v0::dataset_data>(m_group, "data", m_idx);
+    m_data.reset(new PsanaType(ds_data->adcThreshold, ds_data->pixelCountThreshold));
+  }
+  return m_data;
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::CsPad2x2::ProtectionSystemThreshold> > make_ProtectionSystemThreshold(int version, hdf5pp::Group group, hsize_t idx) {

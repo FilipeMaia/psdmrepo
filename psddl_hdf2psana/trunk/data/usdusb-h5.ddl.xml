@@ -22,12 +22,7 @@
     
         <h5schema name="DataV1" version="0">
 
-            <dataset name="data">
-                <attribute name="e_count"/>
-                <attribute name="analog_in"/>
-                <attribute name="timestamp"/>
-                <attribute name="digital_in"/>
-            </dataset>
+            <tag name="external" value="psddl_hdf2psana/usdusb.ddlm.h"/>
             
         </h5schema>
     

@@ -6,6 +6,7 @@
 #include "hdf5pp/EnumType.h"
 #include "hdf5pp/Utils.h"
 #include "PSEvt/DataProxy.h"
+#include "psddl_hdf2psana/camera.ddlm.h"
 namespace psddl_hdf2psana {
 namespace Camera {
 
@@ -47,8 +48,11 @@ ns_FrameCoord_v0::dataset_data::~dataset_data()
 boost::shared_ptr<Psana::Camera::FrameCoord>
 Proxy_FrameCoord_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key)
 {
-  boost::shared_ptr<Camera::ns_FrameCoord_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<Camera::ns_FrameCoord_v0::dataset_data>(m_group, "data", m_idx);
-  return boost::make_shared<PsanaType>(ds_data->column, ds_data->row);
+  if (not m_data) {
+    boost::shared_ptr<Camera::ns_FrameCoord_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<Camera::ns_FrameCoord_v0::dataset_data>(m_group, "data", m_idx);
+    m_data.reset(new PsanaType(ds_data->column, ds_data->row));
+  }
+  return m_data;
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Camera::FrameCoord> > make_FrameCoord(int version, hdf5pp::Group group, hsize_t idx) {
@@ -181,77 +185,6 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Camera::FrameFexConfigV1> > make_FrameFexC
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::Camera::FrameFexConfigV1> >(boost::shared_ptr<Psana::Camera::FrameFexConfigV1>());
   }
-}
-
-hdf5pp::Type ns_FrameV1_v0_dataset_data_stored_type()
-{
-  typedef ns_FrameV1_v0::dataset_data DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("width", offsetof(DsType, width), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("height", offsetof(DsType, height), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("depth", offsetof(DsType, depth), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("offset", offsetof(DsType, offset), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  return type;
-}
-
-hdf5pp::Type ns_FrameV1_v0::dataset_data::stored_type()
-{
-  static hdf5pp::Type type = ns_FrameV1_v0_dataset_data_stored_type();
-  return type;
-}
-
-hdf5pp::Type ns_FrameV1_v0_dataset_data_native_type()
-{
-  typedef ns_FrameV1_v0::dataset_data DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("width", offsetof(DsType, width), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("height", offsetof(DsType, height), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("depth", offsetof(DsType, depth), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("offset", offsetof(DsType, offset), hdf5pp::TypeTraits<uint32_t>::native_type());
-  return type;
-}
-
-hdf5pp::Type ns_FrameV1_v0::dataset_data::native_type()
-{
-  static hdf5pp::Type type = ns_FrameV1_v0_dataset_data_native_type();
-  return type;
-}
-ns_FrameV1_v0::dataset_data::dataset_data()
-{
-}
-ns_FrameV1_v0::dataset_data::~dataset_data()
-{
-}
-uint32_t FrameV1_v0::width() const {
-  if (not m_ds_data.get()) read_ds_data();
-  return uint32_t(m_ds_data->width);
-}
-uint32_t FrameV1_v0::height() const {
-  if (not m_ds_data.get()) read_ds_data();
-  return uint32_t(m_ds_data->height);
-}
-uint32_t FrameV1_v0::depth() const {
-  if (not m_ds_data.get()) read_ds_data();
-  return uint32_t(m_ds_data->depth);
-}
-uint32_t FrameV1_v0::offset() const {
-  if (not m_ds_data.get()) read_ds_data();
-  return uint32_t(m_ds_data->offset);
-}
-
-ndarray<const uint8_t, 2>
-FrameV1_v0::data8() const{ 
-if (this->depth() > 8) return ndarray<const uint8_t, 2>(); return make_ndarray(_int_pixel_data().data(), height(), width()); 
-}
-ndarray<const uint16_t, 2>
-FrameV1_v0::data16() const{ 
-if (this->depth() <= 8) return ndarray<const uint16_t, 2>(); return make_ndarray((const uint16_t*)_int_pixel_data().data(), height(), width()); 
-}
-void FrameV1_v0::read_ds_data() const {
-  m_ds_data = hdf5pp::Utils::readGroup<Camera::ns_FrameV1_v0::dataset_data>(m_group, "data", m_idx);
-}
-void FrameV1_v0::read_ds_image() const {
-  m_ds_image = hdf5pp::Utils::readGroup<Camera::ns_FrameV1_v0::dataset_image>(m_group, "image", m_idx);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::Camera::FrameV1> > make_FrameV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {

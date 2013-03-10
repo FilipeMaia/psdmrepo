@@ -4,42 +4,87 @@
 #include <boost/shared_ptr.hpp>
 
 #include "hdf5pp/Group.h"
+#include "psddl_hdf2psana/evr.ddl.h"
+#include "psddl_hdf2psana/xtc.ddlm.h"
 #include "psddl_psana/evr.ddl.h"
+#include "PSEvt/Proxy.h"
 
 namespace psddl_hdf2psana {
 namespace EvrData {
 
-class ConfigV5 : public Psana::EvrData::ConfigV5 {
+namespace ns_IOChannel_v0 {
+struct dataset_data {
+
+  enum {NameLength = Psana::EvrData::IOChannel::NameLength};
+  enum {MaxInfos = Psana::EvrData::IOChannel::MaxInfos};
+
+  static hdf5pp::Type native_type();
+  static hdf5pp::Type stored_type();
+
+  dataset_data();
+  ~dataset_data();
+
+  char name[NameLength];
+  size_t ninfo;
+  Pds::ns_DetInfo_v0::dataset_data* infos;
+
+  operator Psana::EvrData::IOChannel() const;
+};
+}
+
+class Proxy_IOChannel_v0 : public PSEvt::Proxy<Psana::EvrData::IOChannel> {
 public:
+  typedef Psana::EvrData::IOChannel PsanaType;
 
-  typedef Psana::EvrData::ConfigV5 PsanaType;
+  Proxy_IOChannel_v0(hdf5pp::Group group, hsize_t idx) : m_group(group), m_idx(idx) {}
+  virtual ~Proxy_IOChannel_v0() {}
 
-  ConfigV5(hdf5pp::Group group);
-  virtual ~ConfigV5();
+protected:
 
-  virtual uint32_t neventcodes() const;
-  virtual uint32_t npulses() const;
-  virtual uint32_t noutputs() const;
-  virtual ndarray<const Psana::EvrData::EventCodeV5, 1> eventcodes() const;
-  virtual ndarray<const Psana::EvrData::PulseConfigV3, 1> pulses() const;
-  virtual ndarray<const Psana::EvrData::OutputMap, 1> output_maps() const;
-  virtual const Psana::EvrData::SequencerConfigV1& seq_config() const;
+  virtual boost::shared_ptr<PsanaType> getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key);
 
 private:
 
-  struct eventcodes_data;
-  struct pulses_data;
-  struct output_maps_data;
-  struct config_data;
-
-  std::vector<Psana::EvrData::EventCodeV5> m_eventcodes;
-  std::vector<Psana::EvrData::PulseConfigV3> m_pulses;
-  std::vector<Psana::EvrData::OutputMap> m_output_maps;
-  boost::shared_ptr<Psana::EvrData::SequencerConfigV1> m_seq_config;
-  std::auto_ptr<config_data> m_config;
-
+  mutable hdf5pp::Group m_group;
+  hsize_t m_idx;
+  boost::shared_ptr<PsanaType> m_data;
 };
 
+
+
+namespace ns_IOConfigV1_v0 {
+struct dataset_config {
+  static hdf5pp::Type native_type();
+  static hdf5pp::Type stored_type();
+
+  dataset_config();
+  ~dataset_config();
+
+  int32_t conn;
+};
+}
+
+
+class IOConfigV1_v0 : public Psana::EvrData::IOConfigV1 {
+public:
+  typedef Psana::EvrData::IOConfigV1 PsanaType;
+  IOConfigV1_v0() {}
+  IOConfigV1_v0(hdf5pp::Group group, hsize_t idx)
+    : m_group(group), m_idx(idx) {}
+  virtual ~IOConfigV1_v0() {}
+  virtual uint16_t nchannels() const;
+  virtual ndarray<const Psana::EvrData::IOChannel, 1> channels() const;
+  virtual Psana::EvrData::OutputMap::Conn conn() const;
+private:
+  mutable hdf5pp::Group m_group;
+  hsize_t m_idx;
+
+  mutable boost::shared_ptr<EvrData::ns_IOConfigV1_v0::dataset_config> m_ds_config;
+  void read_ds_config() const;
+
+  mutable ndarray<const Psana::EvrData::IOChannel, 1> m_ds_channels;
+  void read_ds_channels() const;
+};
 
 } // namespace EvrData
 } // namespace psddl_hdf2psana

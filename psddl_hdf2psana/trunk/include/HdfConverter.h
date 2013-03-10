@@ -13,6 +13,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <string>
 
 //----------------------
 // Base Class Headers --
@@ -91,8 +92,8 @@ protected:
   // Get schema version for the group or its parent (and its grand-parent for EPICS),
   int schemaVersion(const hdf5pp::Group& group, int levels = -1) const;
 
-  // Get TypeId for the group or its parent (and its grand-parent for EPICS),
-  Pds::TypeId typeId(const hdf5pp::Group& group, int levels = -1) const;
+  // Get type name for the group or its parent (and its grand-parent for EPICS),
+  std::string typeName(const hdf5pp::Group& group, int levels = -1) const;
 
   // Get Source for the group (or its parent for EPICS),
   Pds::Src source(const hdf5pp::Group& group, int levels = -1) const;
@@ -101,7 +102,7 @@ private:
 
   mutable std::map<hdf5pp::Group, int> m_schemaVersionCache;
   mutable std::map<hdf5pp::Group, bool> m_isEpicsCache;
-  mutable std::map<hdf5pp::Group, Pds::TypeId> m_typeIdCache;
+  mutable std::map<hdf5pp::Group, std::string> m_typeNameCache;
   mutable std::map<hdf5pp::Group, Pds::Src> m_sourceCache;
 
 };

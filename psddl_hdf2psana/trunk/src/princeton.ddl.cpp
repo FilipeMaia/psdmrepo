@@ -991,8 +991,11 @@ ns_InfoV1_v0::dataset_data::~dataset_data()
 boost::shared_ptr<Psana::Princeton::InfoV1>
 Proxy_InfoV1_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key)
 {
-  boost::shared_ptr<Princeton::ns_InfoV1_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<Princeton::ns_InfoV1_v0::dataset_data>(m_group, "data", m_idx);
-  return boost::make_shared<PsanaType>(ds_data->temperature);
+  if (not m_data) {
+    boost::shared_ptr<Princeton::ns_InfoV1_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<Princeton::ns_InfoV1_v0::dataset_data>(m_group, "data", m_idx);
+    m_data.reset(new PsanaType(ds_data->temperature));
+  }
+  return m_data;
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::InfoV1> > make_InfoV1(int version, hdf5pp::Group group, hsize_t idx) {

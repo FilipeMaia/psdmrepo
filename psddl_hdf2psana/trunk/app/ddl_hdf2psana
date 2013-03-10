@@ -2,8 +2,8 @@
 
 set -e
 
-packages="andor camera control cspad cspad2x2 encoder fccd fli gsc16ai ipimb lusi oceanoptics opal1k orca princeton pulnix quartz timepix usdusb"
-#packages=""
+packages="andor camera control cspad cspad2x2 encoder evr fccd fli gsc16ai ipimb lusi oceanoptics opal1k orca princeton pulnix quartz timepix usdusb"
+#packages="camera"
 
 for pkg in $packages; do 
     f="psddldata/data/$pkg.ddl.xml" 
@@ -12,3 +12,7 @@ for pkg in $packages; do
     psddlc -b hdf5 -I data -E psddl_hdf2psana/include -O psddl_hdf2psana/src -i psddl_hdf2psana -t psddl_hdf2psana \
         -B psana-inc:psddl_psana -B psana-ns:Psana "$@" $f $h5schema
 done
+
+files=`for p in $packages; do echo psddldata/data/$p.ddl.xml; done`
+psddlc -b hdf5-dispatch -I data -e psddl_hdf2psana/include/dispatch.h -o psddl_hdf2psana/src/dispatch.cpp \
+            -i psddl_hdf2psana -t psddl_hdf2psana -B psana-ns:Psana $files

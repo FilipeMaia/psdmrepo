@@ -116,8 +116,11 @@ ns_timespec64_v0::dataset_data::~dataset_data()
 boost::shared_ptr<Psana::OceanOptics::timespec64>
 Proxy_timespec64_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key)
 {
-  boost::shared_ptr<OceanOptics::ns_timespec64_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<OceanOptics::ns_timespec64_v0::dataset_data>(m_group, "data", m_idx);
-  return boost::make_shared<PsanaType>(ds_data->tv_sec, ds_data->tv_nsec);
+  if (not m_data) {
+    boost::shared_ptr<OceanOptics::ns_timespec64_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<OceanOptics::ns_timespec64_v0::dataset_data>(m_group, "data", m_idx);
+    m_data.reset(new PsanaType(ds_data->tv_sec, ds_data->tv_nsec));
+  }
+  return m_data;
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::OceanOptics::timespec64> > make_timespec64(int version, hdf5pp::Group group, hsize_t idx) {

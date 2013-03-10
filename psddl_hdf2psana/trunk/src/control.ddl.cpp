@@ -51,8 +51,11 @@ ns_PVControl_v0::dataset_config::~dataset_config()
 boost::shared_ptr<Psana::ControlData::PVControl>
 Proxy_PVControl_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key)
 {
-  boost::shared_ptr<ControlData::ns_PVControl_v0::dataset_config> ds_config = hdf5pp::Utils::readGroup<ControlData::ns_PVControl_v0::dataset_config>(m_group, "config", m_idx);
-  return boost::make_shared<PsanaType>(ds_config->name, ds_config->index, ds_config->value);
+  if (not m_data) {
+    boost::shared_ptr<ControlData::ns_PVControl_v0::dataset_config> ds_config = hdf5pp::Utils::readGroup<ControlData::ns_PVControl_v0::dataset_config>(m_group, "config", m_idx);
+    m_data.reset(new PsanaType(ds_config->name, ds_config->index, ds_config->value));
+  }
+  return m_data;
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::ControlData::PVControl> > make_PVControl(int version, hdf5pp::Group group, hsize_t idx) {
@@ -108,8 +111,11 @@ ns_PVMonitor_v0::dataset_data::~dataset_data()
 boost::shared_ptr<Psana::ControlData::PVMonitor>
 Proxy_PVMonitor_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key)
 {
-  boost::shared_ptr<ControlData::ns_PVMonitor_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<ControlData::ns_PVMonitor_v0::dataset_data>(m_group, "data", m_idx);
-  return boost::make_shared<PsanaType>(ds_data->name, ds_data->index, ds_data->loValue, ds_data->hiValue);
+  if (not m_data) {
+    boost::shared_ptr<ControlData::ns_PVMonitor_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<ControlData::ns_PVMonitor_v0::dataset_data>(m_group, "data", m_idx);
+    m_data.reset(new PsanaType(ds_data->name, ds_data->index, ds_data->loValue, ds_data->hiValue));
+  }
+  return m_data;
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::ControlData::PVMonitor> > make_PVMonitor(int version, hdf5pp::Group group, hsize_t idx) {
@@ -159,8 +165,11 @@ ns_PVLabel_v0::dataset_data::~dataset_data()
 boost::shared_ptr<Psana::ControlData::PVLabel>
 Proxy_PVLabel_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key)
 {
-  boost::shared_ptr<ControlData::ns_PVLabel_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<ControlData::ns_PVLabel_v0::dataset_data>(m_group, "data", m_idx);
-  return boost::make_shared<PsanaType>(ds_data->name, ds_data->value);
+  if (not m_data) {
+    boost::shared_ptr<ControlData::ns_PVLabel_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<ControlData::ns_PVLabel_v0::dataset_data>(m_group, "data", m_idx);
+    m_data.reset(new PsanaType(ds_data->name, ds_data->value));
+  }
+  return m_data;
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::ControlData::PVLabel> > make_PVLabel(int version, hdf5pp::Group group, hsize_t idx) {

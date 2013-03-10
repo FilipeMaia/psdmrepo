@@ -11,20 +11,7 @@
     
         <h5schema name="FrameV1" version="0">
 
-            <dataset name="data">
-
-                <attribute name="width"/>
-                <attribute name="height"/>
-                <attribute name="depth"/>
-                <attribute name="offset"/>
-
-            </dataset>
-            
-            <dataset name="image">
-
-                <tag name="external" value="psddl_hdf2psana/camera.ddlm.h"/>
-
-            </dataset>
+            <tag name="external" value="psddl_hdf2psana/camera.ddlm.h"/>
             
         </h5schema>
     

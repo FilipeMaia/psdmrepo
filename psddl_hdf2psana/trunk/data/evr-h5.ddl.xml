@@ -4,7 +4,7 @@
 <psddl>
 
     <use file="psddldata/evr.ddl.xml" />
-
+    
     <package name="EvrData">
 
         <!-- ========================================================================= -->
@@ -32,20 +32,6 @@
                 <attribute name="fifoEvents">
                     <tag name="vlen"/>
                 </attribute>
-
-            </dataset>
-            
-        </h5schema>
-    
-        <!-- ========================================================================= -->
-    
-        <h5schema name="IOChannel" version="0">
-
-            <dataset name="data">
-
-                <attribute name="name"/>
-                <attribute name="ninfo"/>
-                <attribute name="infos"/>
 
             </dataset>
             
@@ -132,6 +118,22 @@
             <dataset name="seq_config">
                 <attribute name="seq_config"/>
             </dataset>
+            
+        </h5schema>
+    
+        <!-- ========================================================================= -->
+    
+        <h5schema name="IOChannel" version="0">
+
+            <tag name="external" value="psddl_hdf2psana/evr.ddlm.h"/>
+            
+        </h5schema>
+    
+        <!-- ========================================================================= -->
+    
+        <h5schema name="IOConfigV1" version="0">
+
+            <tag name="external" value="psddl_hdf2psana/evr.ddlm.h"/>
             
         </h5schema>
     

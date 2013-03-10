@@ -47,8 +47,11 @@ ns_DiodeFexConfigV1_v0::dataset_config::~dataset_config()
 boost::shared_ptr<Psana::Lusi::DiodeFexConfigV1>
 Proxy_DiodeFexConfigV1_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key)
 {
-  boost::shared_ptr<Lusi::ns_DiodeFexConfigV1_v0::dataset_config> ds_config = hdf5pp::Utils::readGroup<Lusi::ns_DiodeFexConfigV1_v0::dataset_config>(m_group, "config", m_idx);
-  return boost::make_shared<PsanaType>(ds_config->base, ds_config->scale);
+  if (not m_data) {
+    boost::shared_ptr<Lusi::ns_DiodeFexConfigV1_v0::dataset_config> ds_config = hdf5pp::Utils::readGroup<Lusi::ns_DiodeFexConfigV1_v0::dataset_config>(m_group, "config", m_idx);
+    m_data.reset(new PsanaType(ds_config->base, ds_config->scale));
+  }
+  return m_data;
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Lusi::DiodeFexConfigV1> > make_DiodeFexConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
@@ -98,8 +101,11 @@ ns_DiodeFexConfigV2_v0::dataset_config::~dataset_config()
 boost::shared_ptr<Psana::Lusi::DiodeFexConfigV2>
 Proxy_DiodeFexConfigV2_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key)
 {
-  boost::shared_ptr<Lusi::ns_DiodeFexConfigV2_v0::dataset_config> ds_config = hdf5pp::Utils::readGroup<Lusi::ns_DiodeFexConfigV2_v0::dataset_config>(m_group, "config", m_idx);
-  return boost::make_shared<PsanaType>(ds_config->base, ds_config->scale);
+  if (not m_data) {
+    boost::shared_ptr<Lusi::ns_DiodeFexConfigV2_v0::dataset_config> ds_config = hdf5pp::Utils::readGroup<Lusi::ns_DiodeFexConfigV2_v0::dataset_config>(m_group, "config", m_idx);
+    m_data.reset(new PsanaType(ds_config->base, ds_config->scale));
+  }
+  return m_data;
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Lusi::DiodeFexConfigV2> > make_DiodeFexConfigV2(int version, hdf5pp::Group group, hsize_t idx) {
@@ -147,8 +153,11 @@ ns_DiodeFexV1_v0::dataset_data::~dataset_data()
 boost::shared_ptr<Psana::Lusi::DiodeFexV1>
 Proxy_DiodeFexV1_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key)
 {
-  boost::shared_ptr<Lusi::ns_DiodeFexV1_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<Lusi::ns_DiodeFexV1_v0::dataset_data>(m_group, "data", m_idx);
-  return boost::make_shared<PsanaType>(ds_data->value);
+  if (not m_data) {
+    boost::shared_ptr<Lusi::ns_DiodeFexV1_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<Lusi::ns_DiodeFexV1_v0::dataset_data>(m_group, "data", m_idx);
+    m_data.reset(new PsanaType(ds_data->value));
+  }
+  return m_data;
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Lusi::DiodeFexV1> > make_DiodeFexV1(int version, hdf5pp::Group group, hsize_t idx) {
@@ -336,8 +345,11 @@ ns_IpmFexV1_v0::dataset_data::~dataset_data()
 boost::shared_ptr<Psana::Lusi::IpmFexV1>
 Proxy_IpmFexV1_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key)
 {
-  boost::shared_ptr<Lusi::ns_IpmFexV1_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<Lusi::ns_IpmFexV1_v0::dataset_data>(m_group, "data", m_idx);
-  return boost::make_shared<PsanaType>(ds_data->channel, ds_data->sum, ds_data->xpos, ds_data->ypos);
+  if (not m_data) {
+    boost::shared_ptr<Lusi::ns_IpmFexV1_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<Lusi::ns_IpmFexV1_v0::dataset_data>(m_group, "data", m_idx);
+    m_data.reset(new PsanaType(ds_data->channel, ds_data->sum, ds_data->xpos, ds_data->ypos));
+  }
+  return m_data;
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Lusi::IpmFexV1> > make_IpmFexV1(int version, hdf5pp::Group group, hsize_t idx) {
@@ -387,8 +399,11 @@ ns_PimImageConfigV1_v0::dataset_config::~dataset_config()
 boost::shared_ptr<Psana::Lusi::PimImageConfigV1>
 Proxy_PimImageConfigV1_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key)
 {
-  boost::shared_ptr<Lusi::ns_PimImageConfigV1_v0::dataset_config> ds_config = hdf5pp::Utils::readGroup<Lusi::ns_PimImageConfigV1_v0::dataset_config>(m_group, "config", m_idx);
-  return boost::make_shared<PsanaType>(ds_config->xscale, ds_config->yscale);
+  if (not m_data) {
+    boost::shared_ptr<Lusi::ns_PimImageConfigV1_v0::dataset_config> ds_config = hdf5pp::Utils::readGroup<Lusi::ns_PimImageConfigV1_v0::dataset_config>(m_group, "config", m_idx);
+    m_data.reset(new PsanaType(ds_config->xscale, ds_config->yscale));
+  }
+  return m_data;
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Lusi::PimImageConfigV1> > make_PimImageConfigV1(int version, hdf5pp::Group group, hsize_t idx) {

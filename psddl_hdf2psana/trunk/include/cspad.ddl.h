@@ -404,6 +404,7 @@ struct dataset_config {
   uint32_t badAsicMask1; 
   uint32_t asicMask; 
   uint32_t quadMask; 
+  uint32_t roiMasks; 
   uint32_t numAsicsRead; 
   uint32_t numQuads; 
   uint32_t numSect; 
@@ -432,8 +433,7 @@ public:
   virtual uint32_t badAsicMask1() const;
   virtual uint32_t asicMask() const;
   virtual uint32_t quadMask() const;
-    uint32_t roiMasks() const;
-
+  virtual uint32_t roiMasks() const;
   virtual const Psana::CsPad::ConfigV1QuadReg& quads(uint32_t i0) const;
   virtual uint32_t numAsicsRead() const;
   /** ROI mask for given quadrant */
@@ -477,6 +477,7 @@ struct dataset_config {
   uint32_t badAsicMask1; 
   uint32_t asicMask; 
   uint32_t quadMask; 
+  uint32_t roiMasks; 
   uint32_t numAsicsRead; 
   uint32_t numQuads; 
   uint32_t numSect; 
@@ -508,8 +509,7 @@ public:
   virtual uint32_t badAsicMask1() const;
   virtual uint32_t asicMask() const;
   virtual uint32_t quadMask() const;
-    uint32_t roiMasks() const;
-
+  virtual uint32_t roiMasks() const;
   virtual const Psana::CsPad::ConfigV1QuadReg& quads(uint32_t i0) const;
   virtual uint32_t numAsicsRead() const;
   /** ROI mask for given quadrant */
@@ -554,6 +554,7 @@ struct dataset_config {
   uint32_t badAsicMask1; 
   uint32_t asicMask; 
   uint32_t quadMask; 
+  uint32_t roiMasks; 
   uint32_t numAsicsRead; 
   uint32_t numQuads; 
   uint32_t numSect; 
@@ -585,8 +586,7 @@ public:
   virtual uint32_t badAsicMask1() const;
   virtual uint32_t asicMask() const;
   virtual uint32_t quadMask() const;
-    uint32_t roiMasks() const;
-
+  virtual uint32_t roiMasks() const;
   virtual const Psana::CsPad::ConfigV2QuadReg& quads(uint32_t i0) const;
   virtual uint32_t numAsicsRead() const;
   /** ROI mask for given quadrant */

@@ -49,6 +49,7 @@ namespace {
     ADD2MAP("EvrData::ConfigV3",            Id_EvrConfig,       3);
     ADD2MAP("EvrData::ConfigV4",            Id_EvrConfig,       4);
     ADD2MAP("EvrData::ConfigV5",            Id_EvrConfig,       5);
+    ADD2MAP("EvrData::ConfigV6",            Id_EvrConfig,       6);
     ADD2MAP("EvrData::IOConfigV1",          Id_EvrIOConfig,     1);
     ADD2MAP("ControlData::ConfigV1",        Id_ControlConfig,   1);
     ADD2MAP("PNCCD::ConfigV1",              Id_pnCCDconfig,     1);
@@ -77,6 +78,7 @@ namespace {
     ADD2MAP("Bld::BldDataEBeam",            Id_EBeam,           1);
     ADD2MAP("Bld::BldDataEBeamV1",          Id_EBeam,           1);
     ADD2MAP("Bld::BldDataEBeamV2",          Id_EBeam,           2);
+    ADD2MAP("Bld::BldDataEBeamV3",          Id_EBeam,           3);
     ADD2MAP("Bld::BldDataIpimb",            Id_SharedIpimb,     0);
     ADD2MAP("Bld::BldDataIpimbV0",          Id_SharedIpimb,     0);
     ADD2MAP("Bld::BldDataIpimbV1",          Id_SharedIpimb,     1);
