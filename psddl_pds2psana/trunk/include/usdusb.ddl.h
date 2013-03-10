@@ -32,7 +32,6 @@ public:
   virtual ~DataV1();
   virtual uint8_t digital_in() const;
   virtual uint32_t timestamp() const;
-  virtual ndarray<const uint32_t, 1> e_count() const;
   virtual ndarray<const uint8_t, 1> status() const;
   virtual ndarray<const uint16_t, 1> analog_in() const;
   virtual ndarray<const int32_t, 1> encoder_count() const;
