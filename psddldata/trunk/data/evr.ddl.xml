@@ -585,20 +585,7 @@
 
             <attribute name="_cycles" type="uint32_t" accessor="cycles"/>
 
-            <attribute name="_entries" type="SequencerEntry" shape="{self}._length" accessor="entries"/>
-
-            <ctor>
-                Default constructor without arguments
-                <tag name="inline"/>
-            </ctor>
-            <ctor>
-                Standard constructor
-                <tag name="inline"/>
-                <arg name="sync_source" type="Source" dest="_bf_sync_source"/>
-                <arg name="beam_source" type="Source" dest="_bf_beam_source"/>
-                <arg name="length" type="uint32_t" dest="_length"/>
-                <arg name="cycles" type="uint32_t" dest="_cycles"/>
-            </ctor>
+            <attribute name="_entries" type="SequencerEntry" shape="{self}.length()" accessor="entries"/>
 
 
         </pstype>

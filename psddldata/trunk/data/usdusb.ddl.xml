@@ -56,7 +56,7 @@
             <attribute name="_timestamp" type="uint32_t" accessor="timestamp">
             </attribute>
 
-            <attribute name="_count" type="uint32_t" shape="Encoder_Inputs" accessor="e_count">
+            <attribute name="_count" type="uint32_t" shape="Encoder_Inputs">
             </attribute>
 
             <attribute name="_status" type="uint8_t" shape="4" accessor="status">
@@ -69,7 +69,7 @@
                 Return lower 24 bits of _count array as signed integer values.
                 <code lang="C++" body="unsigned shape[1]={Encoder_Inputs};
                 ndarray&lt;int32_t,1&gt; res(shape);
-                for (unsigned i=0; i!=Encoder_Inputs; ++i) res[i]=int({self}.e_count()[i] &lt;&lt; 8)/256;
+                for (unsigned i=0; i!=Encoder_Inputs; ++i) res[i]=int({self}._count[i] &lt;&lt; 8)/256;
                 return res;"/>
             </method>
 

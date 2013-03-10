@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-11
+2013-03-10 Andy Salnikov
+- small fixes to schema for HDF5 generator
+
 Tag: V00-04-10
 2013-03-04 Andy Salnikov
 - fixing type id for quartz.Config class
