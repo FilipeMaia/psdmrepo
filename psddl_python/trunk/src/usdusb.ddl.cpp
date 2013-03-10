@@ -48,7 +48,6 @@ void createWrappers(PyObject* module) {
   class_<Psana::UsdUsb::DataV1, boost::shared_ptr<Psana::UsdUsb::DataV1>, boost::noncopyable >("DataV1", no_init)
     .def("digital_in", &Psana::UsdUsb::DataV1::digital_in)
     .def("timestamp", &Psana::UsdUsb::DataV1::timestamp)
-    .def("e_count", &Psana::UsdUsb::DataV1::e_count)
     .def("status", &Psana::UsdUsb::DataV1::status)
     .def("analog_in", &Psana::UsdUsb::DataV1::analog_in)
     .def("encoder_count", &Psana::UsdUsb::DataV1::encoder_count)
