@@ -53,7 +53,6 @@ public:
   virtual ~DataV1();
   virtual uint8_t digital_in() const = 0;
   virtual uint32_t timestamp() const = 0;
-  virtual ndarray<const uint32_t, 1> e_count() const = 0;
   virtual ndarray<const uint8_t, 1> status() const = 0;
   virtual ndarray<const uint16_t, 1> analog_in() const = 0;
   /** Return lower 24 bits of _count array as signed integer values. */
