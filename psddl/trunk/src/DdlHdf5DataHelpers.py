@@ -95,13 +95,13 @@ _ds_ctor_dtor_template = ji.Template('''\
 {{ns}}::{{className}}::{{className}}()
 {
 {% for attr in pointers %}
-  self->{{attr}} = 0;
+  this->{{attr}} = 0;
 {% endfor %}
 }
 {{ns}}::{{className}}::~{{className}}()
 {
 {% for attr in pointers %}
-  delete [] self->{{attr}};
+  delete [] this->{{attr}};
 {% endfor %}
 }
 ''', trim_blocks=True)
@@ -139,10 +139,17 @@ _getTypedImpl_template = ji.Template('''\
 boost::shared_ptr<{{psanatypename}}>
 Proxy_{{schema.name}}_v{{schema.version}}::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key)
 {
+  if (not m_data) {
 {% for ds in schema.datasets %}
-  boost::shared_ptr<{{ds.classNameNs()}}> ds_{{ds.name}} = hdf5pp::Utils::readGroup<{{ds.classNameNs()}}>(m_group, "{{ds.name}}", m_idx);
+    boost::shared_ptr<{{ds.classNameNs()}}> ds_{{ds.name}} = hdf5pp::Utils::readGroup<{{ds.classNameNs()}}>(m_group, "{{ds.name}}", m_idx);
 {% endfor %}
-  return boost::make_shared<PsanaType>({{args|join(', ')}});
+{% if 1 %}
+    m_data.reset(new PsanaType({{args|join(', ')}}));
+{% else %}
+    m_data = boost::make_shared<PsanaType>({{args|join(', ')}});
+{% endif %}
+  }
+  return m_data;
 }
 
 ''', trim_blocks=True)
@@ -570,7 +577,12 @@ class SchemaValueType(SchemaType):
             else:
                 dsattrs += ds_attr[:1]
 
-        args = ['ds_'+ds.name+'->'+dsattr.name for ds, dsattr in dsattrs]
+        args = []
+        for ds, dsattr in dsattrs:
+            expr = 'ds_{0}->{1}'.format(ds.name, dsattr.name)
+            if isinstance(dsattr.type, Enum):
+                expr = '{0}({1})'.format(dsattr.type.fullName('C++', psana_ns), expr)
+            args.append(expr)
 
         print >>inc, _valtype_proxy_decl.render(locals())
         print >>cpp, _getTypedImpl_template.render(locals())

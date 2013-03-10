@@ -48,6 +48,7 @@ from psddl.DdlPsanaInterfaces import DdlPsanaInterfaces
 from psddl.DdlPythonInterfaces import DdlPythonInterfaces
 from psddl.DdlPdsdata import DdlPdsdata
 from psddl.DdlHdf5Data import DdlHdf5Data
+from psddl.DdlHdf5DataDispatch import DdlHdf5DataDispatch
 
 #---------------------
 # Local definitions --
@@ -106,6 +107,7 @@ class psddlc ( AppBase ) :
             "pds2psana": self.pds2psanaGen,
             "pds2psana-dispatch": self.pds2psanaDispatchGen,
             "hdf5": self.hdf5Gen,
+            "hdf5-dispatch": self.hdf5DispatchGen,
         }
         
 
@@ -215,6 +217,12 @@ class psddlc ( AppBase ) :
         header, source = self._getHeaderAndSource()
         
         return DdlHdf5Data(header, source, backend_options, log=self)
+
+    def hdf5DispatchGen(self, backend_options):
+
+        header, source = self._getHeaderAndSource()
+        
+        return DdlHdf5DataDispatch(header, source, backend_options, log=self)
 
 #
 #  run application when imported as a main module

@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-10
+2013-03-10 Andy Salnikov
+- adding new backend for HDF5 dispatch code
+- small fixes for HDF5 backend
+
 Tag: V00-05-09
 2013-03-07 Andy Salnikov
 - refactoring of DdlHdf5Data, moved piece of stuff to DdlHdf5DataHelpers
