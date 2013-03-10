@@ -32,20 +32,23 @@
 // 		-- Class Interface --
 //		---------------------
 
+namespace hdf5pp {
+
+/// @addtogroup hdf5pp
+
 /**
+ *  @ingroup hdf5pp
+ *
  *  Type traits library
  *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
  *
  *  @version $Id$
  *
  *  @author Andrei Salnikov
  */
 
-namespace hdf5pp {
 
 struct TypeTraitsHelper {
   static Type string_h5type(size_t size) ;

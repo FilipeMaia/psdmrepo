@@ -33,23 +33,25 @@
 // 		-- Class Interface --
 //		---------------------
 
+namespace hdf5pp {
+
+class Group ;
+template <typename T> class DataSet ;
+
+/// @addtogroup hdf5pp
+
 /**
+ *  @ingroup hdf5pp
+ *
  *  Class representing HDF5 attribute.
  *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
  *
- *  @see AdditionalClass
- *
  *  @version $Id$
  *
  *  @author Andrei Salnikov
  */
-
-namespace hdf5pp {
-
-class Group ;
-template <typename T> class DataSet ;
 
 template <typename T>
 class Attribute  {

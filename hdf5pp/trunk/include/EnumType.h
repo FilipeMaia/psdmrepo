@@ -34,24 +34,23 @@
 // 		-- Class Interface --
 //		---------------------
 
+namespace hdf5pp {
+
+/// @addtogroup hdf5pp
+
 /**
- *  HDF5 type interface
+ *  @ingroup hdf5pp
+ *
+ *  Class for the enum types, supports operations applicable to enum types only
  *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
  *
  *  @version $Id: Type.h 250 2009-04-08 01:02:05Z salnikov $
  *
  *  @author Andrei Salnikov
  */
 
-namespace hdf5pp {
-
-/**
- *  Class for the enum types, supports operations applicable to enum types only
- */
 template <typename T>
 class EnumType : public Type {
 public:

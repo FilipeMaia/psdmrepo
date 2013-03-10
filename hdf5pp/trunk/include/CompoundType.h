@@ -32,24 +32,23 @@
 // 		-- Class Interface --
 //		---------------------
 
+namespace hdf5pp {
+
+/// @addtogroup hdf5pp
+
 /**
- *  HDF5 type interface
+ *  @ingroup hdf5pp
+ *
+ *  Class for the compound types, supports operations applicable to compound types only
  *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
  *
  *  @version $Id: Type.h 250 2009-04-08 01:02:05Z salnikov $
  *
  *  @author Andrei Salnikov
  */
 
-namespace hdf5pp {
-
-/**
- *  Class for the compound types, supports operations applicable to compound types only
- */
 class CompoundType : public Type {
 public:
 

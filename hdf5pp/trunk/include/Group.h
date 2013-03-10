@@ -38,22 +38,24 @@
 // 		-- Class Interface --
 //		---------------------
 
+namespace hdf5pp {
+
+class File ;
+
+/// @addtogroup hdf5pp
+
 /**
+ *  @ingroup hdf5pp
+ *
  *  Class representing HDF5 group.
  *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
  *
- *  @see AdditionalClass
- *
  *  @version $Id$
  *
  *  @author Andrei Salnikov
  */
-
-namespace hdf5pp {
-
-class File ;
 
 class Group  {
 public:
@@ -76,7 +78,7 @@ public:
     return openGroup ( *m_id, name ) ;
   }
 
-  /// Determines if the group has a child (link) with the given nae
+  /// Determines if the group has a child (link) with the given name
   bool hasChild ( const std::string& name ) const ;
 
   // get parent for this group, returns non-valid object if no parent group exists

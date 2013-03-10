@@ -34,7 +34,11 @@
 
 namespace hdf5pp {
 
+/// @addtogroup hdf5pp
+
 /**
+ *  @ingroup hdf5pp
+ *
  *  @brief Class which implements iteration over groups in HDF5 group/file. 
  *
  *  This software was developed for the LCLS project.  If you use all or 

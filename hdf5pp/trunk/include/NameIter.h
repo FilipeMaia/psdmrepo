@@ -35,7 +35,11 @@
 
 namespace hdf5pp {
 
+/// @addtogroup hdf5pp
+
 /**
+ *  @ingroup hdf5pp
+ *
  *  @brief Class which implements iteration over link names in HDF5 group.
  *
  *  This software was developed for the LCLS project.  If you use all or 

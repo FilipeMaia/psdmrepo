@@ -38,21 +38,23 @@
 // 		-- Class Interface --
 //		---------------------
 
+namespace hdf5pp {
+
+/// @addtogroup hdf5pp
+
 /**
+ *  @ingroup hdf5pp
+ *
  *  Class that represents HDF5 file. Has an interface for the usual
  *  file operation: open, create, make group, open group.
  *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
  *
- *  @see AdditionalClass
- *
  *  @version $Id$
  *
  *  @author Andrei Salnikov
  */
-
-namespace hdf5pp {
 
 class File  {
 public:

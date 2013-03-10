@@ -32,17 +32,19 @@
 // 		-- Class Interface --
 //		---------------------
 
+namespace hdf5pp {
+
+/// @addtogroup hdf5pp
+
 /**
- *  Class for data space.
+ *  @ingroup hdf5pp
  *
- *  @see AdditionalClass
+ *  Class for data space.
  *
  *  @version $Id$
  *
  *  @author Andrei Salnikov
  */
-
-namespace hdf5pp {
 
 class DataSpace  {
 public:

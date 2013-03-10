@@ -35,13 +35,15 @@
 
 namespace hdf5pp {
 
+/// @addtogroup hdf5pp
+
 /**
+ *  @ingroup hdf5pp
+ *
  *  HDF5 variable length type interface
  *
  *  This software was developed for the LCLS project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
  *
  *  @version $Id$
  *
@@ -51,7 +53,7 @@ namespace hdf5pp {
 class VlenType : public Type {
 public:
 
-  // make an array type of rank 1
+  // make a variable-length array type with base type defined in the argument
   static VlenType vlenType( const Type& baseType ) ;
 
 protected:

@@ -33,22 +33,24 @@
 // 		-- Class Interface --
 //		---------------------
 
+namespace hdf5pp {
+
+/// @addtogroup hdf5pp
+
 /**
- *  Exception classes used throughout the package.
+ *  @ingroup hdf5pp
+ *
+ *  Base class for all exceptions in the package
  *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
  *
  *  @version $Id$
  *
  *  @author Andrei Salnikov
  */
 
-namespace hdf5pp {
 
-/// Base class for all exceptions in the package
 class Exception : public ErrSvc::Issue {
 public:
 

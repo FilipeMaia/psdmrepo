@@ -31,17 +31,19 @@
 // 		-- Class Interface --
 //		---------------------
 
+namespace hdf5pp {
+
+/// @addtogroup hdf5pp
+
 /**
- *  Property list wrapper
+ *  @ingroup hdf5pp
  *
- *  @see AdditionalClass
+ *  Property list wrapper
  *
  *  @version $Id$
  *
  *  @author Andrei Salnikov
  */
-
-namespace hdf5pp {
 
 class PListImpl  {
 public:
