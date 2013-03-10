@@ -57,6 +57,15 @@ public:
 };
 
 /// Exception thrown for empty file list
+class NotHdf5Dataset : public Exception {
+public:
+
+  NotHdf5Dataset(const ErrSvc::Context& ctx, const std::string& ds)
+    : Exception( ctx, "NotHdf5Dataset", "Input dataset is not an HDF5 data: " + ds ) {}
+
+};
+
+/// Exception thrown for empty file list
 class EmptyFileList : public Exception {
 public:
 

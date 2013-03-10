@@ -18,10 +18,12 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <list>
 
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "IData/Dataset.h"
 #include "MsgLogger/MsgLogger.h"
 #include "PSHdf5Input/Exceptions.h"
 #include "PSHdf5Input/Hdf5EventId.h"
@@ -46,6 +48,7 @@ namespace PSHdf5Input {
 //----------------
 Hdf5InputModule::Hdf5InputModule (const std::string& name)
   : psana::InputModule(name)
+  , m_datasets()
   , m_iter()
   , m_cvt()
   , m_skipEvents(0)
@@ -56,6 +59,15 @@ Hdf5InputModule::Hdf5InputModule (const std::string& name)
   ConfigSvc::ConfigSvc cfg;
   m_skipEvents = cfg.get("psana", "skip-events", 0UL);
   m_maxEvents = cfg.get("psana", "events", 0UL);
+  m_datasets = configList("files");
+  if ( m_datasets.empty() ) {
+    throw EmptyFileList(ERR_LOC);
+  }
+  
+  WithMsgLog(this->name(), debug, str) {
+    str << "Input datasets: ";
+    std::copy(m_datasets.begin(), m_datasets.end(), std::ostream_iterator<std::string>(str, " "));
+  }
 }
 
 //--------------
@@ -68,28 +80,45 @@ Hdf5InputModule::~Hdf5InputModule ()
 
 // Method which is called once at the beginning of the job
 void 
-Hdf5InputModule::beginJob(Env& env)
+Hdf5InputModule::beginJob(Event& evt, Env& env)
 {
   MsgLog(name(), debug, name() << ": in beginJob()");
-  
-  // will throw if no files were defined in config
-  std::list<std::string> fileNames = configList("files");
-  if ( fileNames.empty() ) {
-    throw EmptyFileList(ERR_LOC);
-  }
-  WithMsgLog(name(), debug, str) {
-    str << "Input files: ";
-    std::copy(fileNames.begin(), fileNames.end(), std::ostream_iterator<std::string>(str, " "));
+
+  // make the list of files from the dataset names
+  std::list<std::string> files;
+  for (std::vector<std::string>::const_iterator dsiter = m_datasets.begin(); dsiter != m_datasets.end(); ++ dsiter) {
+    
+    IData::Dataset ds(*dsiter);
+    
+    // check that dataset is an HDF5 dataset
+    if (not ds.exists("h5")) {
+      throw NotHdf5Dataset(ERR_LOC, *dsiter);
+    }
+
+    const IData::Dataset::NameList& strfiles = ds.files();
+    for (IData::Dataset::NameList::const_iterator it = strfiles.begin(); it != strfiles.end(); ++ it) {
+      MsgLog(name(), debug, "Hdf5InputModule::beginJob -- add file: " << *it);
+      files.push_back(*it);
+    }
+    
   }
   
   // make iterator
-  m_iter.reset(new Hdf5FileListIter(fileNames));
+  m_iter.reset(new Hdf5FileListIter(files));
   
   // At the beginJob fill environment with configuration data 
   // from the first configure transition of the first file   
-
   Hdf5IterData data = m_iter->next();
-  MsgLog(name(), debug, "First data item: " << data)
+  MsgLog(name(), debug, "First data item: " << data);
+
+  if (data.type() != Hdf5IterData::Configure) {
+    throw FileStructure(ERR_LOC, "Non-configure data at the beginning of file");
+  }
+
+  // fill everything
+  fillConfig(data, env);
+  fillEventId(data, evt);
+  fillEpics(data, env);
 }
 
 // Method which is called with event data
@@ -97,7 +126,7 @@ InputModule::Status
 Hdf5InputModule::event(Event& evt, Env& env)
 {
   Hdf5IterData data = m_iter->next();
-  MsgLog(name(), debug, "Hdf5InputModule::event -- data: " << data)
+  MsgLog(name(), debug, "Hdf5InputModule::event -- data: " << data);
 
   InputModule::Status ret = InputModule::Abort;
   switch(data.type()) {
@@ -154,7 +183,7 @@ Hdf5InputModule::event(Event& evt, Env& env)
 
 // Method which is called once at the end of the job
 void 
-Hdf5InputModule::endJob(Env& env)
+Hdf5InputModule::endJob(Event& evt, Env& env)
 {
     
 }

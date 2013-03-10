@@ -13,6 +13,8 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <vector>
+#include <string>
 #include <boost/scoped_ptr.hpp>
 
 //----------------------
@@ -69,13 +71,13 @@ public:
   virtual ~Hdf5InputModule () ;
 
   /// Method which is called once at the beginning of the job
-  virtual void beginJob(Env& env);
+  virtual void beginJob(Event& evt, Env& env);
 
   /// Method which is called with event data
   virtual Status event(Event& evt, Env& env);
 
   /// Method which is called once at the end of the job
-  virtual void endJob(Env& env);
+  virtual void endJob(Event& evt, Env& env);
 
 protected:
 
@@ -93,6 +95,7 @@ protected:
 
 private:
 
+  std::vector<std::string> m_datasets;                ///< List of file names/datasets to read data from
   boost::scoped_ptr<Hdf5FileListIter> m_iter;
   psddl_hdf2psana::HdfConverter m_cvt;
   unsigned long m_skipEvents;                         ///< Number of events to skip
