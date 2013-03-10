@@ -94,6 +94,16 @@ struct nd_data  {
     return *this;
   }
 
+  /**
+   *  Return shared pointer to contained data.
+   *
+   *  This could be used in rare cases when it's necessary to provide
+   *  access to data without loosing ownership.
+   */
+  boost::shared_ptr<ElemType> data_ptr() const { return m_data; }
+
+
+
   boost::shared_ptr<ElemType> m_data;          ///< Pointer to the data array
   shape_t m_shape[NDim];    ///< Array dimensions
   stride_t m_strides[NDim];  ///< Array strides
