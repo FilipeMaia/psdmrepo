@@ -514,26 +514,19 @@ public:
     r0_5Hz,
     Disable,
   };
-  SequencerConfigV1()
-  {
-  }
-  SequencerConfigV1(EvrData::SequencerConfigV1::Source sync_source, EvrData::SequencerConfigV1::Source beam_source, uint32_t length, uint32_t cycles)
-    : _source(((sync_source) & 0xff)|(((beam_source) & 0xff)<<8)), _length(length), _cycles(cycles)
-  {
-  }
   EvrData::SequencerConfigV1::Source sync_source() const { return Source(this->_source & 0xff); }
   EvrData::SequencerConfigV1::Source beam_source() const { return Source((this->_source>>8) & 0xff); }
   uint32_t length() const { return _length; }
   uint32_t cycles() const { return _cycles; }
   ndarray<const EvrData::SequencerEntry, 1> entries() const { ptrdiff_t offset=12;
   const EvrData::SequencerEntry* data = (const EvrData::SequencerEntry*)(((char*)this)+offset);
-  return make_ndarray(data, this->_length); }
-  uint32_t _sizeof() const { return ((((12+(EvrData::SequencerEntry::_sizeof()*(this->_length)))+4)-1)/4)*4; }
+  return make_ndarray(data, this->length()); }
+  uint32_t _sizeof() const { return ((((12+(EvrData::SequencerEntry::_sizeof()*(this->length())))+4)-1)/4)*4; }
 private:
   uint32_t	_source;
   uint32_t	_length;
   uint32_t	_cycles;
-  //EvrData::SequencerEntry	_entries[this->_length];
+  //EvrData::SequencerEntry	_entries[this->length()];
 };
 
 /** @class ConfigV5

@@ -56,7 +56,6 @@ public:
   enum { Digital_Inputs = 8 };
   uint8_t digital_in() const { return _din; }
   uint32_t timestamp() const { return _timestamp; }
-  ndarray<const uint32_t, 1> e_count() const { return make_ndarray(&_count[0], Encoder_Inputs); }
   ndarray<const uint8_t, 1> status() const { return make_ndarray(&_status[0], 4); }
   ndarray<const uint16_t, 1> analog_in() const { return make_ndarray(&_ain[0], Analog_Inputs); }
   /** Return lower 24 bits of _count array as signed integer values. */
