@@ -62,6 +62,11 @@ def valueToIndex(V,VRange) :
     return np.uint32( factor * (V-Vmin) )
 
 def valueToIndexProtected(V, VRange) :
+    """Input: V - numpy array of values,
+              VRange - Vmin, Vmax, contains the binning parameters Vmin, Vmax, and Nbins
+       Output: Array of indexes from 0 to Nbins (Nbins+1 index) with shape of V.
+       The last index Nbins is used for overflow and underflow.
+    """
     Vmin, Vmax, Nbins = VRange
     Nbins1 = int(Nbins)-1
     factor = float(Nbins) / float(Vmax-Vmin)
@@ -70,6 +75,12 @@ def valueToIndexProtected(V, VRange) :
     return np.select([indarr<0, indarr>Nbins1], [0,Nbins1], default=indarr)
 
 def valueToIndexMasked(V, VRange, mask=None) :
+    """Input: V - numpy array of values,
+              VRange - Vmin, Vmax, contains the binning parameters Vmin, Vmax, and Nbins
+              mask - array containing 0 and 1 of the same shape as V
+       Output: Array of indexes from 0 to Nbins (Nbins+1 index) with shape of V.
+       The last index Nbins is used for overflow, underflow and masked values.
+    """
     Vmin, Vmax, Nbins = VRange
     Nbins1 = int(Nbins)-1
     factor = float(Nbins) / float(Vmax-Vmin)
@@ -195,8 +206,9 @@ class ViewResults :
         if  sp.ana_dyna_meth_phi == cp.ana_dyna_meth_phi.value_def() :
             sp.ana_dyna_part_phi = int(cp.ana_dyna_part_phi.value())
 
-        sp.npart_stat = sp.ana_stat_part_q * sp.ana_stat_part_phi
-        sp.npart_dyna = sp.ana_dyna_part_q * sp.ana_dyna_part_phi
+        # N useful bins are numerated from 0 to N-1, N-th bin is for overflow  
+        sp.npart_stat = (sp.ana_stat_part_q+1) * (sp.ana_stat_part_phi+1) # +1 - for the last overflow bin index 
+        sp.npart_dyna = (sp.ana_dyna_part_q+1) * (sp.ana_dyna_part_phi+1)
         
 
 
@@ -365,25 +377,40 @@ class ViewResults :
 #-----------------------------
 
     def get_q_map_for_stat_bins(sp) :
+        """Returns the map of indexes for static q bins.
+           The last (maximal) index is used for overflow, underflow and masked pixels.
+           Map shape is the same as for image.
+        """
         if sp.q_map_stat != None : return sp.q_map_stat
         sp.q_map_stat = q_map_partitions(sp.get_q_map(), sp.ana_stat_part_q, sp.get_mask_total())
         return sp.q_map_stat
 
 
     def get_phi_map_for_stat_bins(sp) :
+        """Returns the map of indexes for static phi bins. 
+           The last (maximal) index is used for overflow, underflow and masked pixels.
+           Map shape is the same as for image.
+        """
         if sp.phi_map_stat != None : return sp.phi_map_stat
         sp.phi_map_stat = phi_map_partitions(sp.get_phi_map(), sp.ana_stat_part_phi, sp.get_mask_total())
         return sp.phi_map_stat
 
 
     def get_q_phi_map_for_stat_bins(sp) :
-        if sp.q_phi_map_stat != None : return sp.q_phi_map_stat
-        sp.q_phi_map_stat = sp.get_q_map_for_stat_bins() * sp.ana_stat_part_phi \
-                          + sp.get_phi_map_for_stat_bins()#* sp.ana_stat_part_q 
+        """Returns the map of indexes for static q-phi bins.
+           The last (maximal) index both in phi and in q is used for overflow, underflow and masked pixels.
+           Map shape is the same as for image.
+        """
+        if sp.q_phi_map_stat != None : return sp.q_phi_map_stat               # +1 - for last overflow bin index 
+        sp.q_phi_map_stat = sp.get_q_map_for_stat_bins() * (sp.ana_stat_part_phi+1) \
+                          + sp.get_phi_map_for_stat_bins()#* sp.ana_stat_part_q
         return sp.q_phi_map_stat
 
 
     def get_counts_for_stat_bins(sp) :
+        """Returns array with the number of pixels for each statis q-phi bin.
+           Bins reserved for overflow contain zeros due to mask.
+        """
         if sp.counts_stat != None : return sp.counts_stat
         weights = sp.get_mask_total() # Apply mask for bin counts
         sp.counts_stat = sp.bincount(sp.get_q_phi_map_for_stat_bins(), weights, length=sp.npart_stat)
@@ -392,25 +419,40 @@ class ViewResults :
 #-----------------------------
 
     def get_q_map_for_dyna_bins(sp) :
+        """Returns the map of indexes for dynamic q bins. 
+           The last (maximal) index is used for overflow, underflow and masked pixels.
+           Map shape is the same as for image.
+        """
         if sp.q_map_dyna != None : return sp.q_map_dyna
         sp.q_map_dyna = q_map_partitions(sp.get_q_map(), sp.ana_dyna_part_q, sp.get_mask_total())
         return sp.q_map_dyna
 
 
     def get_phi_map_for_dyna_bins(sp) :
+        """Returns the map of indexes for dynamic phi bins. 
+           The last (maximal) index is used for overflow, underflow and masked pixels.
+           Map shape is the same as for image.
+        """
         if sp.phi_map_dyna != None : return sp.phi_map_dyna
         sp.phi_map_dyna = phi_map_partitions(sp.get_phi_map(), sp.ana_dyna_part_phi, sp.get_mask_total())
         return sp.phi_map_dyna
 
   
     def get_q_phi_map_for_dyna_bins(sp) :
-        if sp.q_phi_map_dyna != None : return sp.q_phi_map_dyna
-        sp.q_phi_map_dyna = sp.get_q_map_for_dyna_bins() * sp.ana_dyna_part_phi \
+        """Returns the map of indexes for dynamic q-phi bins.
+           The last (maximal) index both in phi and in q is used for overflow, underflow and masked pixels.
+           Map shape is the same as for image.
+        """
+        if sp.q_phi_map_dyna != None : return sp.q_phi_map_dyna               # +1 - for last overflow bin index 
+        sp.q_phi_map_dyna = sp.get_q_map_for_dyna_bins() * (sp.ana_dyna_part_phi+1) \
                           + sp.get_phi_map_for_dyna_bins() # * sp.ana_dyna_part_q
         return sp.q_phi_map_dyna
 
 
     def get_counts_for_dyna_bins(sp) :
+        """Returns array with the number of pixels for each dynamic q-phi bin.
+           Bins reserved for overflow contain zeros due to mask.
+        """
         if sp.counts_dyna != None : return sp.counts_dyna
         weights = sp.get_mask_total() # Apply mask for bin counts
         sp.counts_dyna = sp.bincount(sp.get_q_phi_map_for_dyna_bins(), weights, length=sp.npart_dyna)
@@ -423,32 +465,56 @@ class ViewResults :
         q_map_masked      = sp.get_q_map() * sp.get_mask_total()
         sum_q_dyna        = sp.bincount(sp.get_q_phi_map_for_dyna_bins(), q_map_masked, length=sp.npart_dyna)
         counts_dyna       = sp.get_counts_for_dyna_bins()
-        counts_dyna_prot  = np.select([counts_dyna<=0.], [-1.], counts_dyna)
-        sp.q_average_dyna = np.select([counts_dyna_prot<=0.], [0.], default=sum_q_dyna/counts_dyna)
+        counts_dyna_prot  = np.select([counts_dyna<=0], [-1], counts_dyna)
+        sp.q_average_dyna = np.select([counts_dyna_prot<0], [0], default=sum_q_dyna/counts_dyna_prot)
         print 'get_q_average_for_dyna_bins():\n', sp.q_average_dyna
         return sp.q_average_dyna
+
+
+    def get_q_average_for_dyna_bins_trancated_overflow(sp) :
+        return sp.trancate_overflowed_dyna_bins( sp.get_q_average_for_dyna_bins() )
+
+
+    def trancate_overflowed_dyna_bins(sp, arr_for_dyna_bins) :
+        """Returns array with trancated bins reserved for overflow; anothr words:
+           shape (sp.ana_dyna_part_q+1, sp.ana_dyna_part_phi+1) -> (sp.ana_dyna_part_q, sp.ana_dyna_part_phi)
+        """
+        ###sp.npart_dyna = (sp.ana_dyna_part_q+1) * (sp.ana_dyna_part_phi+1)
+        if arr_for_dyna_bins.shape[0] != sp.npart_dyna :            
+            msg = 'trancate_overflowed_dyna_bins(): input array size: '+str(arr_for_dyna_bins.shape[0]) +\
+                  '\ndoes not coinside with expected number of dynamic partitions (including overflow):' + str(sp.npart_dyna) +\
+                  '\nWARNING: overflow bins are not trancated in output array!'
+            logger.warning(msg, __name__)
+            return arr_for_dyna_bins
+
+        arr = arr_for_dyna_bins
+        arr.shape = (sp.ana_dyna_part_q+1, sp.ana_dyna_part_phi+1)
+        arr_trancated = arr[0:sp.ana_dyna_part_q, 0:sp.ana_dyna_part_phi]
+        return arr_trancated.flatten()
 
 #-----------------------------
 
     def get_1oIp_map_for_stat_bins_itau(sp, itau) :
-        sp.Ip_normf_map = sp.get_norm_factor_map_masked_for_stat_bins_itau(sp.get_Ip_for_itau(itau))
+        """Returns the map of 1/<Ip> factors, where Ip is averaged over statis bins."""
+        sp.Ip_normf_map = sp.get_norm_factor_map_masked_for_stat_bins(sp.get_Ip_for_itau(itau))
         return sp.Ip_normf_map
 
     def get_1oIf_map_for_stat_bins_itau(sp, itau) :
-        sp.If_normf_map = sp.get_norm_factor_map_masked_for_stat_bins_itau(sp.get_If_for_itau(itau))
+        """Returns the map of 1/<If> factors, where If is averaged over statis bins."""
+        sp.If_normf_map = sp.get_norm_factor_map_masked_for_stat_bins(sp.get_If_for_itau(itau))
         return sp.If_normf_map
 
 #-----------------------------
 
-    def get_norm_factor_map_masked_for_stat_bins_itau(sp, intens_map) :
+    def get_norm_factor_map_masked_for_stat_bins(sp, intens_map) :
         """Apply mask to the input and output mask to get correct normalization and output, respectively."""
         intens_map_masked = intens_map * sp.get_mask_total() # Apply mask for bin counts
-        norm_factor_map = sp.get_norm_factor_map_for_stat_bins_itau(intens_map_masked)
+        norm_factor_map = sp.get_norm_factor_map_for_stat_bins(intens_map_masked)
         return norm_factor_map * sp.get_mask_total() # Apply mask for intensity map
 
 #-----------------------------
 
-    def get_norm_factor_map_for_stat_bins_itau(sp, intens_map) :
+    def get_norm_factor_map_for_stat_bins(sp, intens_map) :
         q_phi_map_stat = sp.get_q_phi_map_for_stat_bins()
         counts = sp.get_counts_for_stat_bins()
         # print 'counts = ', counts
@@ -466,6 +532,9 @@ class ViewResults :
 #-----------------------------
 
     def get_g2_map_for_itau(sp, itau) :
+        """Returns the map of g2 values for each pixel of the image.
+           The shape of the map is the same as shape of image.
+        """
         Ip_normf_map = sp.get_1oIp_map_for_stat_bins_itau(itau)
         If_normf_map = sp.get_1oIp_map_for_stat_bins_itau(itau)
         I2_map       = sp.get_I2_for_itau(itau)
@@ -500,7 +569,7 @@ class ViewResults :
         g2_vs_itau = []
         for itau, tau in enumerate(sp.list_of_tau) :
             g2_for_dyna_bins = sp.get_g2_for_dyna_bins_itau(itau)
-            g2_vs_itau.append(g2_for_dyna_bins)
+            g2_vs_itau.append( sp.trancate_overflowed_dyna_bins(g2_for_dyna_bins) )
 
             msg = 'get_g2_vs_itau_arr: itau=' + str(itau) + \
                   '  tau='                    + str(tau) + \

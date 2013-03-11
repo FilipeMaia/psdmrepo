@@ -11,6 +11,11 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2013-03-11 Mikhail S. Dubrovin
+Tag: V00-00-06
+- add GlobalExternal.py
+- trancate bins reserved for overflow in output g2_vs_tau array.
+
 2013-03-08 Mikhail S. Dubrovin
 Tag: V00-00-05
 - add parameter in ImgAlgos::ImgCalib to turn on/off the const low level threshold
