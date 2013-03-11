@@ -206,7 +206,7 @@ class PlotG2Widget (QtGui.QWidget) :
             axgr.set_xlim(xmin,xmax) 
             axgr.set_ylim(ymin,ymax) 
             axgr.set_title(q_str, fontsize=10, color='b')
-            axgr.tick_params(axis='both', which='major', labelsize=10)
+            axgr.tick_params(axis='both', which='major', labelsize=8)
             axgr.yaxis.set_major_locator(MaxNLocator(5))
             axgr.grid(self.gridIsOn)
 
