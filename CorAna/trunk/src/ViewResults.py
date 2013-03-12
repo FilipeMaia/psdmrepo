@@ -174,8 +174,8 @@ class ViewResults :
 
         sp.x_coord_spec    = cp.x_coord_specular.value()
         sp.y_coord_spec    = cp.y_coord_specular.value()
-        sp.x0_pos_spec     = cp.x0_pos_in_specular.value()
-        sp.y0_pos_spec     = cp.y0_pos_in_specular.value()
+        sp.x0_pos_in_spec  = cp.x0_pos_in_specular.value()
+        sp.y0_pos_in_spec  = cp.y0_pos_in_specular.value()
 
         sp.x0_pos_in_data  = cp.x0_pos_in_data .value()
         sp.y0_pos_in_data  = cp.y0_pos_in_data .value()
@@ -238,8 +238,8 @@ class ViewResults :
                                                                    
         logger.info('x_coord_spec    = ' + str(sp.x_coord_spec   ), __name__)
         logger.info('y_coord_spec    = ' + str(sp.y_coord_spec   ), __name__)
-        logger.info('x0_pos_spec     = ' + str(sp.x0_pos_spec    ), __name__)
-        logger.info('y0_pos_spec     = ' + str(sp.y0_pos_spec    ), __name__)
+        logger.info('x0_pos_in_spec  = ' + str(sp.x0_pos_in_spec ), __name__)
+        logger.info('y0_pos_in_spec  = ' + str(sp.y0_pos_in_spec ), __name__)
                                                                    
         logger.info('x0_pos_in_data  = ' + str(sp.x0_pos_in_data ), __name__)
         logger.info('y0_pos_in_data  = ' + str(sp.y0_pos_in_data ), __name__)
@@ -331,9 +331,31 @@ class ViewResults :
 #-----------------------------
 
     def get_xy_maps_for_direct_beam_data(sp) :
+        """The x and y coordinate maps for direct beam data are defined w.r.t. direct beam position on image.
+        """
         x_db_pix = sp.x_coord_beam0 + (sp.x0_pos_in_data - sp.x0_pos_in_beam0) / sp.ccd_pixsize
         y_db_pix = sp.y_coord_beam0 + (sp.y0_pos_in_data - sp.y0_pos_in_beam0) / sp.ccd_pixsize
         return sp.X_ccd_pix - x_db_pix, sp.Y_ccd_pix - y_db_pix  
+
+#-----------------------------
+
+    def get_reflected_beam_geometry_pars(sp) :
+        """Returns:
+           1) distance [pixels] between direct and reflected beam spots on image,
+           2) angle alpha [rad] between direct and reflected beams,
+           3) tilt angle [rad] of the reflection plane w.r.t. y axis
+        """
+        x_db_pix = sp.x_coord_beam0 + (sp.x0_pos_in_data - sp.x0_pos_in_beam0) / sp.ccd_pixsize
+        y_db_pix = sp.y_coord_beam0 + (sp.y0_pos_in_data - sp.y0_pos_in_beam0) / sp.ccd_pixsize
+        x_rb_pix = sp.x_coord_spec  + (sp.x0_pos_in_data - sp.x0_pos_in_spec ) / sp.ccd_pixsize
+        y_rb_pix = sp.y_coord_spec  + (sp.y0_pos_in_data - sp.y0_pos_in_spec ) / sp.ccd_pixsize
+
+        dx, dy = x_rb_pix - x_db_pix, y_rb_pix - y_db_pix
+        dr     = math.sqrt(dx*dx + dy*dy)
+        alpha  = 0.5*math.atan2(dr, sp.distance_pix)
+        tilt   = math.atan2(dx, dy) # The result is between -pi and pi.
+
+        return dx, dy, dr, alpha, tilt
 
 #-----------------------------
 
@@ -361,19 +383,58 @@ class ViewResults :
   
 #-----------------------------
 
-    def get_q_map(sp) :
-        if sp.q_map != None : return sp.q_map
-        r_map = sp.get_r_map()
-        sp.q_map = sp.factor * np.sin(0.5*np.arctan2(r_map, sp.distance_pix))
-        return sp.q_map
-  
-#-----------------------------
-
     def get_phi_map(sp) :
         if sp.phi_map != None : return sp.phi_map
         sp.phi_map = cart2phi(sp.x_map, sp.y_map)
         return sp.phi_map
   
+#-----------------------------
+
+    def get_q_map(sp) :
+        """Select between DIRECT and REFLECTED beam geometry here
+        """
+        if sp.q_map != None : return sp.q_map
+        if cp.exp_setup_geom.value() == 'Specular' : sp.q_map = sp.get_q_map_for_rb()
+        else                                       : sp.q_map = sp.get_q_map_for_db()
+        return sp.q_map
+
+#-----------------------------
+        
+    def get_q_map_for_db(sp) :
+        """q map for DIRECT BEAM geometry in transmission experiments"""
+        r_map = sp.get_r_map()
+        return sp.factor * np.sin(0.5*np.arctan2(r_map, sp.distance_pix))
+  
+#-----------------------------
+
+    def get_q_map_for_rb(sp) :
+        """q map for REFLECTED BEAM geometry in specular experiments"""
+        theta_map = sp.get_theta_map_for_rb()
+        return sp.factor * np.sin(0.5*theta_map)
+
+#-----------------------------
+
+    def get_theta_map_for_rb(sp) :
+        """Evaluate theta scattering angle for REFLECTED BEAM geometry,
+        using scalar product of two vectors:
+        1) from IP to reflected beam center (dx, dy, sp.distance_pix),
+        2) from IP to pixel                 (sp.x_map, sp.y_map, sp.distance_pix)
+        """
+        dx, dy, dr, alpha, tilt = sp.get_reflected_beam_geometry_pars()
+        alpha_deg, tilt_deg = math.degrees(alpha),  math.degrees(tilt)
+        msg = 'Reflected beam geometry: dx_rb[pix]=%7.1f, dy_rb[pix]=%7.1f, dr_rb[pix]=%7.1f, alpha[deg]=%7.3f, tilt[deg]=%7.3f' % (dx, dy, dr, alpha_deg, tilt_deg)
+        logger.info(msg, __name__)
+
+        d2 = sp.distance_pix * sp.distance_pix
+        dist_to_rb      = math.sqrt(dr*dr + d2)
+        dist_to_pix_map = np.sqrt(sp.x_map * sp.x_map + sp.y_map * sp.y_map + d2)
+        scal_prod_map   = sp.x_map * dx + sp.y_map * dy + d2
+        cos_theta_map   = scal_prod_map / dist_to_pix_map / dist_to_rb
+        return np.arccos(cos_theta_map) # [rad]
+  
+#-----------------------------
+#-----------------------------
+#-----------------------------
 #-----------------------------
 
     def get_q_map_for_stat_bins(sp) :

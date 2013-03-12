@@ -32,18 +32,18 @@ __version__ = "$Revision: 4 $"
 
 import numpy as np
 import math
-
+from math import sqrt, cos
 
 
 def map_image(s,beam0, pixel_size, sample_detector,energy,det_pos,sense):
 	# s - data image size
-	# beam0[x0,y0] - coordinates of direct beam
-	# pixel_size[x,y] - pixel size in x and y direction
-	# sample to detector - sample to detector distance
-	# energy - energy of x-rays
+	# beam0[x0,y0] - coordinates of direct beam (pix)
+	# pixel_size[x,y] - pixel size in x and y direction (mm)
+	# sample to detector - sample to detector distance  (mm)
+	# energy - energy of x-rays                         (keV)
 	# det_pos - detector position (CCDx and CCDy motor values) 
-	#	det_pos[ [CCDx,CCDy],		- for diret beam measurements
-	#	         [CCDx,CCDy] ]          - for data acquisition
+	#	det_pos[ [CCDx,CCDy],		- for direct beam measurements (mm)
+	#	         [CCDx,CCDy] ]          - for data acquisition         (mm)
 	# sense[a,b] - a=-1,1 and b=-1,1   this variable takes into account rotation of the camera (during mounting at the detector stage)
 
 
@@ -66,21 +66,20 @@ def map_image(s,beam0, pixel_size, sample_detector,energy,det_pos,sense):
 
 
 
-def map_image_refl(s,alpha,beam0,beam_s,pixel_size, sample_detector,energy,det_pos, sense = [1,1]):
-	# input parameters:
-		#  s: frame size
-		#  alpha: incident angle in [rad] (nominal value)
-		#  beam0[x0,y0]: direct beam position ([x0,y0])
-		#  beam_s[xs,ys]: specular beam position
-		#  pixel_size
-		#  sample_detector: sample to detector distance
-		#  energy:  energy of x-rays [keV]
-	        #  det_pos: 3x2 array of detector postion during direct beam measurements, specular beam measurements, spekcle pattern collection
-    		#  sense[a,b] - a=-1,1 and b=-1,1   this variable takes into account rotation of the camera (during mounting at the detector stage)
+def map_image_refl(s, alpha, beam0, beam_s, pixel_size, sample_detector, energy, det_pos, sense = [1,1]):
+	#  s: frame size
+	#  alpha: incident angle in degree (nominal value)
+	#  beam0[x0,y0]: direct beam position ([x0,y0]) (pix)
+	#  beam_s[xs,ys]: specular beam position (pix)
+	#  pixel_size                                   (mm/pix)
+	#  sample_detector: sample to detector distance (mm)
+	#  energy:  energy of x-rays [keV]
+	#  det_pos: 3x2 array of detector postion during direct beam measurements, specular beam measurements, spekcle pattern collection (mm)
+    	#  sense[a,b] - a=-1,1 and b=-1,1   this variable takes into account rotation of the camera (during mounting at the detector stage)
          
      alpha = (math.pi/180.0)*alpha
      q_map = np.zeros(s,np.float64)
-     wavelength = (1.236)/energy  #   [nm] are desired units 
+     wavelength = (1.236)/energy  #   [nm] are desired units  should be: 1.23984
      xmm = np.zeros(s,np.float64)
      ymm = np.zeros(s,np.float64)
      d2Beam0 = np.zeros(s,np.float64)
@@ -115,7 +114,8 @@ def map_image_refl(s,alpha,beam0,beam_s,pixel_size, sample_detector,energy,det_p
      if ( yDB2RB != 0 ):
         tilt = math.atan( xDB2RB / yDB2RB )                                     
      else:
-        tilt = signum(xDB2RB) * math.pi / 2    
+        #tilt = signum(xDB2RB) * math.pi / 2    
+        tilt = math.copysign(1,xDB2RB) * math.pi / 2    
                                    
      # projected distance of each pixel to Plane Of Reflection [POR])
      # [positive means above the streak, negative below the streak]
@@ -166,3 +166,119 @@ def map_image_refl(s,alpha,beam0,beam_s,pixel_size, sample_detector,energy,det_p
      qy = 2*math.pi/wavelength * np.multiply( np.cos(exitAngle),np.sin(outOfPlaneAngle))              
      qp   = np.sqrt(qx**2 + qy**2)                 
      return qp    
+
+
+#-----------------------------
+#-----------------------------
+#-----------------------------
+#-----------------------------
+# Test
+#-----------------------------
+#-----------------------------
+#-----------------------------
+#-----------------------------
+
+import sys
+from time import localtime, gmtime, strftime, clock, time, sleep
+
+from PyQt4 import QtGui, QtCore
+import PlotImgSpe as pis
+from ConfigParametersCorAna import confpars as cp
+
+#-----------------------------
+
+
+def get_q_map_transition() :
+    s               = (1300, 1340)
+    beam0           = [300.,  400.]
+    pixel_size      = [0.1, 0.1]
+    sample_detector = 2000.
+    energy          = 7.
+    det_pos         = [[0,0],[0,0]]
+    sense           = [1,1]
+    t_start_sec = time()
+    q_map = map_image(s,beam0, pixel_size, sample_detector, energy, det_pos, sense)
+    print 'Time (sec) to produce q-map: ', time() - t_start_sec
+    return q_map
+
+#def map_image(s,beam0, pixel_size, sample_detector,energy,det_pos,sense):
+	# s - data image size
+	# beam0[x0,y0] - coordinates of direct beam (in pix)
+	# pixel_size[x,y] - pixel size in x and y direction
+	# sample to detector - sample to detector distance
+	# energy - energy of x-rays
+	# det_pos - detector position (CCDx and CCDy motor values) 
+	#	det_pos[ [CCDx,CCDy],		- for direct beam measurements
+	#	         [CCDx,CCDy] ]          - for data acquisition
+	# sense[a,b] - a=-1,1 and b=-1,1   this variable takes into account rotation of the camera (during mounting at the detector stage)
+
+
+
+def get_q_map_reflection() :
+    s               = (1300, 1340)
+    alpha           = 1
+    beam0           = [300.,  400.]
+    beam_s          = [400.,  500.]
+    pixel_size      = [0.1, 0.1]
+    sample_detector = 2000.
+    energy          = 7.
+    det_pos         = [[0,0],[0,0],[0,0]]
+    sense           = [1,1]
+    t_start_sec = time()
+    q_map = map_image_refl(s, alpha, beam0, beam_s, pixel_size, sample_detector, energy, det_pos, sense)
+    print 'Time (sec) to produce q-map: ', time() - t_start_sec
+    return q_map
+
+#def map_image_refl(s, alpha, beam0, beam_s, pixel_size, sample_detector, energy, det_pos, sense = [1,1]):
+	#  s: frame size
+	#  alpha: incident angle in [degree] (nominal value)
+	#  beam0[x0,y0]: direct beam position ([x0,y0])
+	#  beam_s[xs,ys]: specular beam position
+	#  pixel_size
+	#  sample_detector: sample to detector distance
+	#  energy:  energy of x-rays [keV]
+	#  det_pos: 3x2 array of detector postion during direct beam measurements, specular beam measurements, spekcle pattern collection
+    	#  sense[a,b] - a=-1,1 and b=-1,1   this variable takes into account rotation of the camera (during mounting at the detector stage)
+
+#-----------------------------
+
+def get_array2d_for_test() :
+    mu, sigma = 200, 25
+
+    shape = (rows, cols) = (1300, 1340)
+    size = rows * cols
+    #arr = mu + sigma*np.random.standard_normal(size=2400)
+    arr = 100*np.random.standard_exponential(size=size)
+    #arr = np.arange(2400)
+    arr.shape = shape
+    return arr
+
+#-----------------------------
+
+def main():
+
+    app = QtGui.QApplication(sys.argv)
+    #w  = pis.PlotImgSpe(None, get_array2d_for_test())
+    #w  = pis.PlotImgSpe(None, get_q_map_transition())
+    w  = pis.PlotImgSpe(None, get_q_map_reflection())
+    #w  = PlotImgSpe(None)
+    #w.set_image_array( get_array2d_for_test() )
+    w.move(QtCore.QPoint(50,50))
+    w.show()
+
+    app.exec_()
+        
+#-----------------------------
+#  In case someone decides to run this module
+#
+if __name__ == "__main__" :
+    main()
+
+#-----------------------------
+
+
+
+
+
+
+
