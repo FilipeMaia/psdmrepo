@@ -4,61 +4,52 @@
 #include "hdf5pp/Group.h"
 #include "hdf5pp/Type.h"
 #include "psddl_psana/bld.ddl.h"
+#include "psddl_hdf2psana/camera.ddlm.h"
+#include "psddl_hdf2psana/lusi.ddl.h"
+#include "psddl_hdf2psana/pulnix.ddl.h"
 
 namespace psddl_hdf2psana {
 namespace Bld {
 
-struct BldDataEBeamV0_schemaV0_data {
-    
-    static int schemaVersion() { return 0; }
-    static const char* datasetName() { return "data"; }
-    
-    static hdf5pp::Type native_type() ;
-    static hdf5pp::Type stored_type() ;
+namespace ns_BldDataPimV1_v0 {
+struct dataset_data {
+  static hdf5pp::Type native_type() ;
+  static hdf5pp::Type stored_type() ;
 
-    uint32_t    uDamageMask;
-    double      fEbeamCharge;    /* in nC */
-    double      fEbeamL3Energy;  /* in MeV */
-    double      fEbeamLTUPosX;   /* in mm */
-    double      fEbeamLTUPosY;   /* in mm */
-    double      fEbeamLTUAngX;   /* in mrad */
-    double      fEbeamLTUAngY;   /* in mrad */
+  Pulnix::ns_TM6740ConfigV2_v0::dataset_config camConfig;
+  Lusi::ns_PimImageConfigV1_v0::dataset_config pimConfig;
+  Camera::ns_FrameV1_v0::dataset_data frame;
+
 };
+}
 
-    
-class BldDataEBeamV0 {
+class BldDataPimV1_v0 : public Psana::Bld::BldDataPimV1 {
 public:
-  typedef Psana::Bld::BldDataEBeamV0 PsanaType;
-  boost::shared_ptr<PsanaType> operator()(hdf5pp::Group group, uint64_t idx);
+
+  typedef Psana::Bld::BldDataPimV1 PsanaType;
+
+  BldDataPimV1_v0() {}
+  BldDataPimV1_v0(hdf5pp::Group group, hsize_t idx)
+    : m_group(group), m_idx(idx) {}
+
+  virtual ~BldDataPimV1_v0() {}
+
+  virtual const Psana::Pulnix::TM6740ConfigV2& camConfig() const;
+  virtual const Psana::Lusi::PimImageConfigV1& pimConfig() const;
+  virtual const Psana::Camera::FrameV1& frame() const;
+
 private:
-  struct dataset_data;
-};
 
-struct BldDataEBeamV1_schemaV0_data {
-    
-    static int schemaVersion() { return 0; }
-    static const char* datasetName() { return "data"; }
-    
-    static hdf5pp::Type native_type() ;
-    static hdf5pp::Type stored_type() ;
+  mutable hdf5pp::Group m_group;
+  hsize_t m_idx;
 
-    uint32_t    uDamageMask;
-    double      fEbeamCharge;    /* in nC */
-    double      fEbeamL3Energy;  /* in MeV */
-    double      fEbeamLTUPosX;   /* in mm */
-    double      fEbeamLTUPosY;   /* in mm */
-    double      fEbeamLTUAngX;   /* in mrad */
-    double      fEbeamLTUAngY;   /* in mrad */
-    double      fEbeamPkCurrBC2; /* in Amps */
-};
+  mutable boost::shared_ptr<Bld::ns_BldDataPimV1_v0::dataset_data> m_ds_data;
+  void read_ds_data() const;
 
+  mutable boost::shared_ptr<Psana::Pulnix::TM6740ConfigV2> m_storage_camConfig;
+  mutable Psana::Lusi::PimImageConfigV1 m_storage_pimConfig;
+  mutable boost::shared_ptr<Psana::Camera::FrameV1> m_storage_frame;
 
-class BldDataEBeamV1 {
-public:
-  typedef Psana::Bld::BldDataEBeamV1 PsanaType;
-  boost::shared_ptr<PsanaType> operator()(hdf5pp::Group group, uint64_t idx);
-private:
-  struct dataset_data;
 };
 
 

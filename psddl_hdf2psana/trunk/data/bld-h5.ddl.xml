@@ -3,6 +3,107 @@
 
 <psddl>
 
-    <use file="psddl_hdf2psana/lusi-h5.ddl.xml" />
+    <use file="psddl_hdf2psana/lusi-h5.ddl.xml" cpp_headers="psddl_hdf2psana/lusi.ddl.h"/>
+    
+    <package name="Bld">
+
+        <!-- ========================================================================= -->
+        <h5schema name="BldDataEBeamV0" version="0">
+            <dataset name="data">
+                <attribute name="uDamageMask" method="damageMask"/>
+                <attribute name="fEbeamCharge" method="ebeamCharge"/>
+                <attribute name="fEbeamL3Energy" method="ebeamL3Energy"/>
+                <attribute name="fEbeamLTUPosX" method="ebeamLTUPosX"/>
+                <attribute name="fEbeamLTUPosY" method="ebeamLTUPosY"/>
+                <attribute name="fEbeamLTUAngX" method="ebeamLTUAngX"/>
+                <attribute name="fEbeamLTUAngY" method="ebeamLTUAngY"/>
+            </dataset>
+        </h5schema>
+
+        <!-- ========================================================================= -->
+        <h5schema name="BldDataEBeamV1" version="0">
+            <dataset name="data">
+                <attribute name="uDamageMask" method="damageMask"/>
+                <attribute name="fEbeamCharge" method="ebeamCharge"/>
+                <attribute name="fEbeamL3Energy" method="ebeamL3Energy"/>
+                <attribute name="fEbeamLTUPosX" method="ebeamLTUPosX"/>
+                <attribute name="fEbeamLTUPosY" method="ebeamLTUPosY"/>
+                <attribute name="fEbeamLTUAngX" method="ebeamLTUAngX"/>
+                <attribute name="fEbeamLTUAngY" method="ebeamLTUAngY"/>
+                <attribute name="fEbeamPkCurrBC2" method="ebeamPkCurrBC2"/>
+            </dataset>
+        </h5schema>
+        <!-- ========================================================================= -->
+        <h5schema name="BldDataEBeamV2" version="0">
+            <dataset name="data">
+                <attribute name="uDamageMask" method="damageMask"/>
+                <attribute name="fEbeamCharge" method="ebeamCharge"/>
+                <attribute name="fEbeamL3Energy" method="ebeamL3Energy"/>
+                <attribute name="fEbeamLTUPosX" method="ebeamLTUPosX"/>
+                <attribute name="fEbeamLTUPosY" method="ebeamLTUPosY"/>
+                <attribute name="fEbeamLTUAngX" method="ebeamLTUAngX"/>
+                <attribute name="fEbeamLTUAngY" method="ebeamLTUAngY"/>
+                <attribute name="fEbeamPkCurrBC2" method="ebeamPkCurrBC2"/>
+                <attribute name="fEbeamEnergyBC2" method="ebeamEnergyBC2"/>
+            </dataset>
+        </h5schema>
+        <!-- ========================================================================= -->
+        <h5schema name="BldDataEBeamV3" version="0">
+            <dataset name="data">
+                <attribute name="uDamageMask" method="damageMask"/>
+                <attribute name="fEbeamCharge" method="ebeamCharge"/>
+                <attribute name="fEbeamL3Energy" method="ebeamL3Energy"/>
+                <attribute name="fEbeamLTUPosX" method="ebeamLTUPosX"/>
+                <attribute name="fEbeamLTUPosY" method="ebeamLTUPosY"/>
+                <attribute name="fEbeamLTUAngX" method="ebeamLTUAngX"/>
+                <attribute name="fEbeamLTUAngY" method="ebeamLTUAngY"/>
+                <attribute name="fEbeamPkCurrBC2" method="ebeamPkCurrBC2"/>
+                <attribute name="fEbeamEnergyBC2" method="ebeamEnergyBC2"/>
+                <attribute name="fEbeamPkCurrBC1" method="ebeamPkCurrBC1"/>
+                <attribute name="fEbeamEnergyBC1" method="ebeamEnergyBC1"/>
+            </dataset>
+        </h5schema>
+        <!-- ========================================================================= -->
+        <h5schema name="BldDataPhaseCavity" version="0">
+            <dataset name="data">
+                <attribute name="fFitTime1" method="fitTime1"/>
+                <attribute name="fFitTime2" method="fitTime2"/>
+                <attribute name="fCharge1" method="charge1"/>
+                <attribute name="fCharge2" method="charge2"/>
+            </dataset>
+        </h5schema>
+        <!-- ========================================================================= -->
+    
+        <h5schema name="BldDataPimV1" version="0">
+
+            <tag name="external" value="psddl_hdf2psana/bld.ddlm.h"/>
+            
+        </h5schema>
+
+        <!-- ========================================================================= -->
+    
+        <h5schema name="BldDataIpimbV0" version="0">
+
+            <dataset name="data">
+                <attribute name="ipimbData"/>
+                <attribute name="ipimbConfig"/>
+                <attribute name="ipmFexData"/>
+            </dataset>
+            
+        </h5schema>
+
+        <!-- ========================================================================= -->
+    
+        <h5schema name="BldDataIpimbV1" version="0">
+
+            <dataset name="data">
+                <attribute name="ipimbData"/>
+                <attribute name="ipimbConfig"/>
+                <attribute name="ipmFexData"/>
+            </dataset>
+            
+        </h5schema>
+
+    </package>
 
 </psddl>

@@ -30,10 +30,17 @@ struct dataset_data {
 class FrameV1_v0 : public Psana::Camera::FrameV1 {
 public:
   typedef Psana::Camera::FrameV1 PsanaType;
+
   FrameV1_v0() {}
   FrameV1_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
+
+  // very specia constructor needed by BldDataPimV1_v0
+  FrameV1_v0(const boost::shared_ptr<Camera::ns_FrameV1_v0::dataset_data>& ds_data,
+      hdf5pp::Group group, hsize_t idx) : m_group(group), m_idx(idx), m_ds_data(ds_data) {}
+
   virtual ~FrameV1_v0() {}
+
   virtual uint32_t width() const;
   virtual uint32_t height() const;
   virtual uint32_t depth() const;

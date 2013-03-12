@@ -186,7 +186,7 @@ struct dataset_data {
   uint32_t maskTrigger; 
   uint32_t maskSet; 
   uint32_t maskClear; 
-  char desc[16]; 
+  char* desc; 
 
   operator Psana::EvrData::EventCodeV5() const { return Psana::EvrData::EventCodeV5(code, isReadout, isCommand, isLatch, reportDelay, reportWidth, maskTrigger, maskSet, maskClear, desc); }
 };
@@ -227,7 +227,7 @@ struct dataset_data {
   uint32_t maskTrigger; 
   uint32_t maskSet; 
   uint32_t maskClear; 
-  char desc[16]; 
+  char* desc; 
   uint16_t readoutGroup; 
 
   operator Psana::EvrData::EventCodeV6() const { return Psana::EvrData::EventCodeV6(code, isReadout, isCommand, isLatch, reportDelay, reportWidth, maskTrigger, maskSet, maskClear, desc, readoutGroup); }
@@ -542,6 +542,7 @@ struct dataset_config {
   int32_t beam_source; 
   uint32_t length; 
   uint32_t cycles; 
+  size_t vlen_entries;
   EvrData::ns_SequencerEntry_v0::dataset_data* entries; 
 
 };
@@ -789,12 +790,12 @@ private:
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::FIFOEvent> > make_FIFOEvent(int version, hdf5pp::Group group, hsize_t idx);
 
 namespace ns_DataV3_v0 {
-struct dataset_data {
+struct dataset_evrData {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
-  dataset_data();
-  ~dataset_data();
+  dataset_evrData();
+  ~dataset_evrData();
 
   size_t vlen_fifoEvents;
   EvrData::ns_FIFOEvent_v0::dataset_data* fifoEvents; 
@@ -809,7 +810,7 @@ public:
   DataV3_v0() {}
   DataV3_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
-  DataV3_v0(const boost::shared_ptr<EvrData::ns_DataV3_v0::dataset_data>& ds) : m_ds_data(ds) {}
+  DataV3_v0(const boost::shared_ptr<EvrData::ns_DataV3_v0::dataset_evrData>& ds) : m_ds_evrData(ds) {}
   virtual ~DataV3_v0() {}
     uint32_t numFifoEvents() const;
 
@@ -817,9 +818,9 @@ public:
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
-  mutable boost::shared_ptr<EvrData::ns_DataV3_v0::dataset_data> m_ds_data;
-  void read_ds_data() const;
-  mutable ndarray<const Psana::EvrData::FIFOEvent, 1> m_ds_storage_data_fifoEvents;
+  mutable boost::shared_ptr<EvrData::ns_DataV3_v0::dataset_evrData> m_ds_evrData;
+  void read_ds_evrData() const;
+  mutable ndarray<const Psana::EvrData::FIFOEvent, 1> m_ds_storage_evrData_fifoEvents;
 };
 
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::DataV3> > make_DataV3(int version, hdf5pp::Group group, hsize_t idx);
