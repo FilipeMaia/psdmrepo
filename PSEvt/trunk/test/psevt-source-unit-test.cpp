@@ -104,6 +104,21 @@ namespace {
     BOOST_CHECK( not src.match(binfo2) ) ;
   }
   
+  void checkDetInfo(Source src, Pds::DetInfo::Detector det, unsigned detId, Pds::DetInfo::Device dev, unsigned devId)
+  {
+    BOOST_CHECK( not src.isNoSource() ) ;
+    BOOST_CHECK( src.isExact() ) ;
+
+    const Pds::Src& psrc = src.src();
+    BOOST_CHECK_EQUAL(psrc.level(), Pds::Level::Source) ;
+
+    const Pds::DetInfo& deti = static_cast<const Pds::DetInfo&>(psrc);
+    BOOST_CHECK_EQUAL(deti.detector(), det) ;
+    BOOST_CHECK_EQUAL(deti.detId(), detId) ;
+    BOOST_CHECK_EQUAL(deti.device(), dev) ;
+    BOOST_CHECK_EQUAL(deti.devId(), devId) ;
+  }
+
   void checkDetInfoMatch(Source src)
   {
     BOOST_CHECK( not src.isNoSource() ) ;
@@ -138,6 +153,18 @@ namespace {
     BOOST_CHECK( not src.match(binfo2) ) ;
   }
   
+  void checkBldInfo(Source src, Pds::BldInfo::Type type)
+  {
+    BOOST_CHECK( not src.isNoSource() ) ;
+    BOOST_CHECK( src.isExact() ) ;
+
+    const Pds::Src& psrc = src.src();
+    BOOST_CHECK_EQUAL(psrc.level(), Pds::Level::Reporter) ;
+
+    const Pds::BldInfo& bld = static_cast<const Pds::BldInfo&>(psrc);
+    BOOST_CHECK_EQUAL(bld.type(), type) ;
+  }
+
   void checkAnyBldInfo(Source src)
   {
     BOOST_CHECK( not src.isNoSource() ) ;
@@ -281,6 +308,9 @@ BOOST_AUTO_TEST_CASE( test_str_detinfo )
 {
   ::checkDetInfo0000(Source("DetInfo(NoDetector.0:NoDevice.0)"));
   ::checkDetInfo0000(Source("NoDetector.0:NoDevice.0"));
+
+  ::checkDetInfo(Source("DetInfo(NoDetector.0:NoDevice.0)"), Pds::DetInfo::NoDetector, 0, Pds::DetInfo::NoDevice, 0);
+  ::checkDetInfo(Source("DetInfo(AmoGasdet.5:Princeton.9)"), Pds::DetInfo::AmoGasdet, 5, Pds::DetInfo::Princeton, 9);
 }
 
 // ==============================================================
@@ -315,6 +345,10 @@ BOOST_AUTO_TEST_CASE( test_str_bldinfo )
 {
   ::checkBldInfoEBeam(Source("BldInfo(EBeam)"));
   ::checkBldInfoEBeam(Source("EBeam"));
+
+  ::checkBldInfo(Source("BldInfo(EBeam)"), Pds::BldInfo::EBeam);
+  ::checkBldInfo(Source("BldInfo(PhaseCavity)"), Pds::BldInfo::PhaseCavity);
+  ::checkBldInfo(Source("BldInfo(FEEGasDetEnergy)"), Pds::BldInfo::FEEGasDetEnergy);
 }
 
 // ==============================================================
