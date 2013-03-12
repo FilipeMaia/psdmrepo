@@ -32,6 +32,6 @@ PREFIX = pjoin('$SIT_EXTERNAL_SW', "hdf5", hdf5_ver)
 INCDIR = "include"
 LIBDIR = "lib"
 BINDIR = "bin"
-PKGLIBS = "hdf5"
+PKGLIBS = "hdf5 hdf5_hl"
 DEPS = "szip"
 standardExternalPackage('hdf5', **locals())
