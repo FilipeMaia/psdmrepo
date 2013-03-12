@@ -89,12 +89,20 @@ class Shape ( object ) :
             if not expr.isconst(): return False
         return True
 
+    @property
+    def rank(self):
+        return len(self.dims)
+    
     def size(self):
         """Return total array size as ExprVal or None for unknown size array"""
         return reduce(operator.mul, [ExprVal(dim, self.ns) for dim in self.dims])
 
     def decl(self):
         return ''.join(['[{0}]'.format(ExprVal(d, self.ns)) for d in self.dims])
+
+    def cs_dims(self):
+        '''Returns a list of comma-separated dimensions'''
+        return ', '.join([str(ExprVal(d, self.ns)) for d in self.dims])
 
     def __str__(self):
         return ','.join([_str(d) for d in self.dims])

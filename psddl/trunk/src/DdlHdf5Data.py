@@ -178,8 +178,10 @@ class DdlHdf5Data ( object ) :
         print >>self.inc, "#include \"hdf5pp/Group.h\""
         print >>self.inc, "#include \"hdf5pp/Type.h\""
         print >>self.inc, "#include \"PSEvt/Proxy.h\""
+        print >>self.cpp, "#include \"hdf5pp/ArrayType.h\""
         print >>self.cpp, "#include \"hdf5pp/CompoundType.h\""
         print >>self.cpp, "#include \"hdf5pp/EnumType.h\""
+        print >>self.cpp, "#include \"hdf5pp/VlenType.h\""
         print >>self.cpp, "#include \"hdf5pp/Utils.h\""
         print >>self.cpp, "#include \"PSEvt/DataProxy.h\""
 

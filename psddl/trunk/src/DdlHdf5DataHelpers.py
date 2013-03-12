@@ -76,9 +76,9 @@ hdf5pp::Type {{ns}}_{{className}}_{{func}}_type()
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
 {% for attr in attributes %}
 {% if attr.type_decl %}
-  {{attr.type_decl}}
+{{attr.type_decl}}
 {%- endif %}
-  type.insert("{{attr.name}}", offsetof(DsType, {{attr.name}}), {{attr.type}});
+  type.insert("{{attr.name}}", offsetof(DsType, {{attr.member}}), {{attr.type}});
 {% endfor %}
   return type;
 }
@@ -101,7 +101,7 @@ _ds_ctor_dtor_template = ji.Template('''\
 {{ns}}::{{className}}::~{{className}}()
 {
 {% for attr in pointers %}
-  delete [] this->{{attr}};
+  free(this->{{attr}});
 {% endfor %}
 }
 ''', trim_blocks=True)
@@ -112,6 +112,15 @@ _enum_h5type_definition = ji.Template('''\
 {% for c in constants %}
   {{type}}.insert("{{c.name}}", {{c.type}}::{{c.name}});
 {% endfor %}
+''', trim_blocks=True)
+
+_array_h5type_definition = ji.Template('''\
+{% if rank > 0 %}
+  hsize_t {{type}}_shape[] = { {{shape}} };
+  hdf5pp::ArrayType {{type}} = hdf5pp::ArrayType::arrayType({{baseType}}, {{rank}}, {{type}}_shape);
+{% else %}
+  hdf5pp::VlenType {{type}} = hdf5pp::VlenType::vlenType({{baseType}});
+{% endif %}
 ''', trim_blocks=True)
 
 
@@ -371,16 +380,17 @@ class DatasetComposite(object):
 
             if attr.rank > 0:
                 if dattr['type'] == 'char':
-                    if attr.sizeIsConst():
-                        dattr['name'] += '[' + str(attr.shape.size()) +']'
+                    if attr.sizeIsVlen():
+                        dattr['type'] = dattr['type'] +'*'
                     else:
+                        dattr['name'] += '[' + str(attr.shape.size()) +']'
+                else:
+                    if attr.sizeIsVlen(): 
                         dattr['vlen'] = True
                         dattr['type'] = dattr['type'] +'*'
-                else:
-                    if attr.sizeIsConst():
+                    elif attr.sizeIsConst():
                         dattr['name'] += '[' + str(attr.shape.size()) +']'
                     else:
-                        if attr.sizeIsVlen(): dattr['vlen'] = True
                         dattr['type'] = dattr['type'] +'*'
             attributes.append(dattr)
 
@@ -440,18 +450,52 @@ class DatasetComposite(object):
         'type_decl' - optional string which produces declarations used by type
         '''
 
+        _log.debug("_genH5TypeFuncAttr: attr = %s", attr)
+        _log.debug("_genH5TypeFuncAttr: attr.sizeIsVlen() = %s attr.sizeIsConst() = %s", attr.sizeIsVlen(), attr.sizeIsConst())
+
+        attr_name = attr.name
+        attr_member = attr.name
+        if attr.rank > 0 and attr.type.name != 'char' and attr.sizeIsVlen():
+            attr_member = 'vlen_'+attr.name
+
         if attr.type.basic:
             
             if isinstance(attr.type, Enum):
+                
                 typename = attr.type.parent.fullName('C++', psana_ns)
                 constants = [dict(name=c.name, type=typename) for c in attr.type.constants()]
                 type = '_enum_type_' + attr.name
-                return dict(name=attr.name, type=type, type_decl=_enum_h5type_definition.render(locals()))
-            else:
+                type_decl = _enum_h5type_definition.render(locals())
+                if attr.rank > 0:
+                    baseType = type
+                    type = '_array_type_' + attr.name
+                    rank = -1 if attr.sizeIsVlen() else attr.rank
+                    shape = attr.shape.cs_dims()
+                    type_decl += _array_h5type_definition.render(locals())
+                return dict(name=attr_name, member=attr_member, type=type, type_decl=type_decl)
+            
+            elif attr.type.name == 'char':
+                
                 type_name = attr.type.name
-                if attr.rank > 0 and type_name == 'char': 
+                size = ""
+                if attr.rank > 0:
                     type_name = 'const char*'
-                return dict(name=attr.name, type=T("hdf5pp::TypeTraits<$type_name>::${func}_type()")(locals()))
+                    if not attr.sizeIsVlen():
+                        size = str(attr.shape.size())
+                return dict(name=attr.name, member=attr_member, type=T("hdf5pp::TypeTraits<$type_name>::${func}_type($size)")(locals()))
+
+            else:
+                
+                type_name = attr.type.name
+                type_decl = None
+                type=T("hdf5pp::TypeTraits<$type_name>::${func}_type()")(locals())
+                if attr.rank > 0:
+                    baseType = type
+                    type = '_array_type_' + attr.name
+                    rank = -1 if attr.sizeIsVlen() else attr.rank
+                    shape = attr.shape.cs_dims()
+                    type_decl = _array_h5type_definition.render(locals())
+                return dict(name=attr_name, member=attr_member, type_decl=type_decl, type=type)
 
         else:
 
@@ -471,7 +515,16 @@ class DatasetComposite(object):
             attr._h5ds = aschema.datasets[0]
             attr._h5ds_typename = attr_type_name
 
-            return dict(name=attr.name, type=T("hdf5pp::TypeTraits<${attr_type_name}>::${func}_type()")(locals()))
+            type = T("hdf5pp::TypeTraits<${attr_type_name}>::${func}_type()")(locals())
+            type_decl = None
+            if attr.rank > 0:
+                baseType = type
+                type = '_array_type_' + attr.name
+                rank = -1 if attr.sizeIsVlen() else attr.rank
+                shape = attr.shape.cs_dims()
+                type_decl = _array_h5type_definition.render(locals())
+
+            return dict(name=attr_name, member=attr_member, type_decl=type_decl, type=type)
 
 
 class DatasetArray(object):
@@ -719,7 +772,7 @@ class SchemaAbstractType(SchemaType):
                 if attr.type.basic:
                     
                     # simpest case, basic type, non-array
-                    impl += [T("  if (not m_ds_$name.get()) read_ds_$name();")[ds]]
+                    impl += [T("  if (not m_ds_$name) read_ds_$name();")[ds]]
                     impl += [T("  return $type(m_ds_$name->$attr_name);")(name=ds.name, attr_name=attr.name, type=ret_type)]
                     
                 elif attr.type.value_type:
@@ -730,7 +783,7 @@ class SchemaAbstractType(SchemaType):
                     attrName = attr.name
                     memberName = T("m_ds_storage_${dsName}_${attrName}")(locals());
                     attr_type = attr.type.fullName('C++', psana_ns)
-                    impl += [T("  if (not m_ds_$name.get()) read_ds_$name();")[ds]]
+                    impl += [T("  if (not m_ds_$name) read_ds_$name();")[ds]]
                     impl += [T("  $memberName = $attr_type(m_ds_$dsName->$attrName);")(locals())]
                     impl += [T("  return $memberName;")(locals())]
                     
@@ -743,9 +796,9 @@ class SchemaAbstractType(SchemaType):
                     memberName = T("m_ds_storage_${dsName}_${attrName}")(locals());
                     aschema = attr._h5schema
                     attr_type = attr._h5ds_typename
-                    attr_class = "%s_v%d" % (aschema.name, aschema.version)
-                    impl += [T("  if (not m_ds_$name.get()) {")[ds]]
-                    impl += [T("    read_ds_$name();")[ds]]
+                    attr_class = "%s_v%d" % (aschema.pstype.fullName('C++'), aschema.version)
+                    impl += [T("  if (not $memberName) {")(locals())]
+                    impl += [T("    if (not m_ds_$name) read_ds_$name();")[ds]]
                     impl += [T("    boost::shared_ptr<$attr_type> tmp(m_ds_$dsName, &m_ds_$dsName->$attrName);")(locals())]
                     impl += [T("    $memberName = boost::make_shared<$attr_class>(tmp);")(locals())]
                     impl += ["  }"]
@@ -779,7 +832,7 @@ class SchemaAbstractType(SchemaType):
                     # character array
                     # TODO: if rank is >1 then methods must provide arguments for all but first index,
                     # this is not implemented yet
-                    impl += [T("  if (not m_ds_$name.get()) read_ds_$name();")[ds]]
+                    impl += [T("  if (not m_ds_$name) read_ds_$name();")[ds]]
                     impl += [T("  return ($type)(m_ds_$name->$attr_name);")(name=ds.name, attr_name=attr.name, type=ret_type)]
                     
                 elif attr.type.basic:
@@ -792,7 +845,7 @@ class SchemaAbstractType(SchemaType):
                         shape = T("m_ds_$dsName->vlen_$attrName")(locals())
                     else:
                         shape = _interpolate(str(meth.attribute.shape), type)
-                    impl += [T("  if (not m_ds_$name.get()) read_ds_$name();")[ds]]
+                    impl += [T("  if (not m_ds_$name) read_ds_$name();")[ds]]
                     impl += [T("  boost::shared_ptr<$attr_type> ptr(m_ds_$dsName, m_ds_$dsName->$attrName);")(locals())]
                     impl += [T("  return make_ndarray(ptr, $shape);")(locals())]
                     
@@ -809,7 +862,7 @@ class SchemaAbstractType(SchemaType):
                         shape = _interpolate(str(meth.attribute.shape), type)
                         data_size = _interpolate(str(meth.attribute.shape.size()), type)
                     memberName = T("m_ds_storage_${dsName}_${attrName}")(locals());
-                    impl += [T("  if (not m_ds_$name.get()) read_ds_$name();")[ds]]
+                    impl += [T("  if (not m_ds_$name) read_ds_$name();")[ds]]
                     impl += [T("  if ($memberName.empty()) {")(locals())]
                     impl += [T("    unsigned shape[] = {$shape};")(locals())]
                     impl += [T("    ndarray<$attr_type, $rank> tmparr(shape);")(locals())]
@@ -834,7 +887,7 @@ class SchemaAbstractType(SchemaType):
                     arguse = ''.join(["[%s]" % arg for arg, type in args])
                     attr_class = "%s_v%d" % (attr._h5schema.name, attr._h5schema.version)
                     attr_type = attr._h5ds_typename
-                    impl += [T("  if (not m_ds_$name.get()) read_ds_$name();")[ds]]
+                    impl += [T("  if (not m_ds_$name) read_ds_$name();")[ds]]
                     impl += [T("  if ($memberName.empty()) {")(locals())]
                     impl += [T("    unsigned shape[] = {$shape};")(locals())]
                     impl += [T("    ndarray<$attr_class, $rank> tmparr(shape);")(locals())]
