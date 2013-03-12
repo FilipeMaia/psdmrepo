@@ -23,10 +23,17 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "hdf5pp/Exceptions.h"
+#include "MsgLogger/MsgLogger.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
 //-----------------------------------------------------------------------
+
+namespace {
+
+  char logger[] = "DataSetImpl";
+
+}
 
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
@@ -91,7 +98,10 @@ DataSetImpl::read(const Type& memType,
                   void* data)
 {
   herr_t stat = H5Dread(*m_id, memType.id(), memDspc.id(), fileDspc.id(), H5P_DEFAULT, data);
-  if ( stat < 0 ) throw Hdf5CallException( ERR_LOC, "H5Dread" ) ;
+  if ( stat < 0 ) {
+    MsgLog(logger, debug, "H5Dread failed, memtype = " << memType);
+    throw Hdf5CallException( ERR_LOC, "H5Dread" ) ;
+  }
 }
 
 // reclaim space allocated to vlen structures

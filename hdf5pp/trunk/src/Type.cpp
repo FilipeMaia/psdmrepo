@@ -18,10 +18,12 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <iostream>
 
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "hdf5/hdf5_hl.h"
 #include "hdf5pp/Exceptions.h"
 
 //-----------------------------------------------------------------------
@@ -125,6 +127,21 @@ Type::set_precision( size_t precision )
   if ( H5Tset_precision( *m_id, precision ) ) {
     throw Hdf5CallException( ERR_LOC, "H5Tset_precision" ) ;
   }
+}
+
+/// Insertion operator dumps type information in HDF5 DDL format.
+std::ostream&
+operator<<(std::ostream& out, const Type& dtype)
+{
+  size_t len = 0;
+  herr_t err = H5LTdtype_to_text(dtype.id(), 0, H5LT_DDL, &len);
+  if (err >= 0) {
+    char* buf = new char[len];
+    err = H5LTdtype_to_text(dtype.id(), buf, H5LT_DDL, &len);
+    if (err >= 0) out << buf;
+    delete [] buf;
+  }
+  return out;
 }
 
 } // namespace hdf5pp

@@ -13,6 +13,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <iosfwd>
 #include <boost/shared_ptr.hpp>
 
 //----------------------
@@ -101,6 +102,10 @@ protected:
   boost::shared_ptr<hid_t> m_id ;
 
 };
+
+/// Insertion operator dumps type information in HDF5 DDL format.
+std::ostream&
+operator<<(std::ostream& out, const Type& dtype);
 
 } // namespace hdf5pp
 

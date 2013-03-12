@@ -11,6 +11,12 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-04
+2013-03-12 Andy Salnikov
+- added stream insertion operator to Type class, needs high-level
+  HDF5 library
+- slightly improve dignostics in case H5Dread fails
+
 Tag: V00-03-03
 2013-03-10 Andy Salnikov
 - improve doxygen comments
