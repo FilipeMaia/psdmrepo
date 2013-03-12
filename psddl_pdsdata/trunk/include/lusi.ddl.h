@@ -79,6 +79,9 @@ class DiodeFexV1 {
 public:
   enum { TypeId = Pds::TypeId::Id_DiodeFex /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
+  DiodeFexV1()
+  {
+  }
   DiodeFexV1(float arg__value)
     : _value(arg__value)
   {
@@ -148,6 +151,9 @@ public:
   enum { TypeId = Pds::TypeId::Id_IpmFex /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
   enum { NCHANNELS = 4 };
+  IpmFexV1()
+  {
+  }
   IpmFexV1(const float* arg__channel, float arg__sum, float arg__xpos, float arg__ypos)
     : _sum(arg__sum), _xpos(arg__xpos), _ypos(arg__ypos)
   {
@@ -177,6 +183,9 @@ class PimImageConfigV1 {
 public:
   enum { TypeId = Pds::TypeId::Id_PimImageConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
+  PimImageConfigV1()
+  {
+  }
   PimImageConfigV1(float arg__xscale, float arg__yscale)
     : _xscale(arg__xscale), _yscale(arg__yscale)
   {
