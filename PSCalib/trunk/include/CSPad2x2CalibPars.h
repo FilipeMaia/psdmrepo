@@ -27,6 +27,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "psddl_psana/cspad.ddl.h"
+#include "pdsdata/xtc/Src.hh"
 
 #include "pdscalibdata/CsPad2x2CenterV1.h"      
 #include "pdscalibdata/CsPad2x2TiltV1.h"        
@@ -80,9 +81,18 @@ public:
    *  @param[in] source         The name of the data source.
    *  @param[in] runNumber      Run number to search the valid file name.
    */ 
+
+  // DEPRICATED constructor, which use string& source ...
+  /*
   CSPad2x2CalibPars ( const std::string&   calibDir,           //  /reg/d/psdm/mec/mec73313/calib
                       const std::string&   typeGroupName,      //  CsPad2x2::CalibV1
                       const std::string&   source,             //  MecTargetChamber.0:Cspad2x2.1
+                      const unsigned long& runNumber ) ;       //  10
+  */
+
+  CSPad2x2CalibPars ( const std::string&   calibDir,           //  /reg/d/psdm/mec/mec73313/calib
+                      const std::string&   typeGroupName,      //  CsPad2x2::CalibV1
+                      const Pds::Src&      src,                //  Pds::Src m_src; <- is defined in env.get(...,&m_src)
                       const unsigned long& runNumber ) ;       //  10
 
   // Destructor
@@ -100,6 +110,7 @@ public:
   void fillCalibParsV1       ();
   void fillDefaultCalibParsV1();
   void fatalMissingFileName  ();
+  void msgUseDefault         ();
   void printCalibPars        ();
   void printInputPars        ();
 
@@ -139,6 +150,7 @@ private:
   std::string   m_calibDir;
   std::string   m_typeGroupName;
   std::string   m_source;
+  Pds::Src      m_src;
   std::string   m_dataType;
   unsigned long m_runNumber;
 

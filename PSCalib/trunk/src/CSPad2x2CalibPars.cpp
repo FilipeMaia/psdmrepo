@@ -61,13 +61,36 @@ CSPad2x2CalibPars::CSPad2x2CalibPars ()
 
 //----------------
 
-CSPad2x2CalibPars::CSPad2x2CalibPars ( const std::string&   calibDir,           //  /reg/d/psdm/cxi/cxi35711/calib
-                                 const std::string&   typeGroupName,      //  CsPad::CalibV1
-                                 const std::string&   source,             //  CxiDs1.0:Cspad.0
-                                 const unsigned long& runNumber )         //  10
+/*
+CSPad2x2CalibPars::CSPad2x2CalibPars ( const std::string&   calibDir,      //  /reg/d/psdm/cxi/cxi35711/calib
+                                       const std::string&   typeGroupName, //  CsPad::CalibV1
+                                       const std::string&   source,        //  CxiDs1.0:Cspad.0
+                                       const unsigned long& runNumber )    //  10
   : m_calibDir(calibDir)
   , m_typeGroupName(typeGroupName)
   , m_source(source)
+  , m_runNumber(runNumber)
+{
+    m_isTestMode = false;
+
+    fillCalibNameVector ();
+    loadCalibPars ();
+
+    printInputPars ();
+    //printCalibPars();
+}
+*/
+
+//----------------
+
+CSPad2x2CalibPars::CSPad2x2CalibPars ( const std::string&   calibDir,      //  /reg/d/psdm/cxi/cxi35711/calib
+                                       const std::string&   typeGroupName, //  CsPad::CalibV1
+                                       const Pds::Src&      src,           //  Pds::Src m_src; <- is defined in get(...,&m_src)
+                                       const unsigned long& runNumber )    //  10
+  : m_calibDir(calibDir)
+  , m_typeGroupName(typeGroupName)
+  , m_source(std::string())
+  , m_src(src)
   , m_runNumber(runNumber)
 {
     m_isTestMode = false;
@@ -101,6 +124,7 @@ void CSPad2x2CalibPars::loadCalibPars ()
 
         if (m_fname == std::string()) { 
 	  fillDefaultCalibParsV1 ();
+          msgUseDefault ();
         } 
         else 
         {
@@ -125,7 +149,14 @@ void CSPad2x2CalibPars::getCalibFileName ()
   else
     {
       PSCalib::CalibFileFinder *calibfinder = new PSCalib::CalibFileFinder(m_calibDir, m_typeGroupName);
-      m_fname = calibfinder -> findCalibFile(m_source, m_cur_calibname, m_runNumber);
+      m_fname = calibfinder -> findCalibFile(m_src, m_cur_calibname, m_runNumber);
+
+      /*
+      if (m_source == std::string())
+          m_fname = calibfinder -> findCalibFile(m_src, m_cur_calibname, m_runNumber);
+      else
+          m_fname = calibfinder -> findCalibFile(m_source, m_cur_calibname, m_runNumber);
+      */
     }
   MsgLog("CSPad2x2CalibPars", debug, "getCalibFileName(): " << m_fname);
 }
@@ -168,8 +199,8 @@ void CSPad2x2CalibPars::readCalibPars ()
 
 void CSPad2x2CalibPars::fillCalibParsV1 ()
 {
-       if( m_cur_calibname == v_calibname[0] ) m_center         = new pdscalibdata::CsPad2x2CenterV1(v_parameters);
-  else if( m_cur_calibname == v_calibname[1] ) m_tilt           = new pdscalibdata::CsPad2x2TiltV1(v_parameters);
+       if( m_cur_calibname == v_calibname[0] ) m_center = new pdscalibdata::CsPad2x2CenterV1(v_parameters);
+  else if( m_cur_calibname == v_calibname[1] ) m_tilt   = new pdscalibdata::CsPad2x2TiltV1(v_parameters);
 }
 
 //----------------
@@ -178,8 +209,8 @@ void CSPad2x2CalibPars::fillDefaultCalibParsV1 ()
 {
   // If default parameters are available - set them.
   // For calib types where default parameters are not accaptable and the file is missing - error message and abort.
-       if( m_cur_calibname == v_calibname[0] ) m_center         = new pdscalibdata::CsPad2x2CenterV1();
-  else if( m_cur_calibname == v_calibname[1] ) m_tilt           = new pdscalibdata::CsPad2x2TiltV1();
+       if( m_cur_calibname == v_calibname[0] ) m_center = new pdscalibdata::CsPad2x2CenterV1();
+  else if( m_cur_calibname == v_calibname[1] ) m_tilt   = new pdscalibdata::CsPad2x2TiltV1();
 
   else fatalMissingFileName ();
 }
@@ -192,9 +223,20 @@ void CSPad2x2CalibPars::fatalMissingFileName ()
                   << ", type=" << m_cur_calibname 
                   << ", run=" <<  m_runNumber
                   << " is not found ..."
-	          << "\nWARNING: Default CSPad alignment constants can not guarantee correct geometry and are not available yet."
+	          << "\nWARNING: Default CSPad2x2 alignment constants can not guarantee correct geometry and are not available yet."
 	          << "\nWARNING: Please provide all expected CSPad alignment constants under the directory .../<experiment>/calib/...");
 	abort();
+}
+
+//----------------
+
+void CSPad2x2CalibPars::msgUseDefault ()
+{
+	MsgLog("CSPad2x2CalibPars", warning, "In getCalibFileName(): the calibration file for the source=" << m_source 
+                  << ", type=" << m_cur_calibname 
+                  << ", run=" <<  m_runNumber
+                  << " is not found ..."
+	          << "\nWARNING: Default CSPad2x2 alignment constants will be used.");
 }
 
 //----------------

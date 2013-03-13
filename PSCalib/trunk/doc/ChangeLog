@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-06
+2013-03-13 Mikhail S. Dubrovin
+- in CSPadCalibPars and CSPad2x2CalibPars std::string m_str_src -> Pds::Src m_src;
+
 Tag: V00-01-05
 2013-03-08 Mikhail S. Dubrovin
 - add CSPad2x2CalibPars and example in test/ex_cspad2x2_calib_pars.cpp

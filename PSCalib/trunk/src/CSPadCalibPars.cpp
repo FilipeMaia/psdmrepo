@@ -67,6 +67,28 @@ CSPadCalibPars::CSPadCalibPars ( const std::string&   calibDir,           //  /r
   : m_calibDir(calibDir)
   , m_typeGroupName(typeGroupName)
   , m_source(source)
+//, m_src(source)
+  , m_runNumber(runNumber)
+{
+    m_isTestMode = false;
+
+    fillCalibNameVector ();
+    loadCalibPars ();
+
+    printInputPars ();
+    //printCalibPars();
+}
+
+//----------------
+
+CSPadCalibPars::CSPadCalibPars ( const std::string&   calibDir,           //  /reg/d/psdm/cxi/cxi35711/calib
+                                 const std::string&   typeGroupName,      //  CsPad::CalibV1
+                                 const Pds::Src&      src,                //  Pds::Src m_src; <- is defined in get(...,&m_src)
+                                 const unsigned long& runNumber )         //  10
+  : m_calibDir(calibDir)
+  , m_typeGroupName(typeGroupName)
+  , m_source(std::string())
+  , m_src(src)
   , m_runNumber(runNumber)
 {
     m_isTestMode = false;
@@ -109,6 +131,7 @@ void CSPadCalibPars::loadCalibPars ()
 
         if (m_fname == std::string()) { 
 	  fillDefaultCalibParsV1 ();
+          msgUseDefault ();
         } 
         else 
         {
@@ -133,7 +156,12 @@ void CSPadCalibPars::getCalibFileName ()
   else
     {
       PSCalib::CalibFileFinder *calibfinder = new PSCalib::CalibFileFinder(m_calibDir, m_typeGroupName);
-      m_fname = calibfinder -> findCalibFile(m_source, m_cur_calibname, m_runNumber);
+      //m_fname = calibfinder -> findCalibFile(m_src, m_cur_calibname, m_runNumber);
+
+      if (m_source == std::string())
+          m_fname = calibfinder -> findCalibFile(m_src, m_cur_calibname, m_runNumber);
+      else
+          m_fname = calibfinder -> findCalibFile(m_source, m_cur_calibname, m_runNumber);
     }
   MsgLog("CSPadCalibPars", debug, "getCalibFileName(): " << m_fname);
 }
@@ -221,6 +249,17 @@ void CSPadCalibPars::fatalMissingFileName ()
 	          << "\nWARNING: Default CSPad alignment constants can not guarantee correct geometry and are not available yet."
 	          << "\nWARNING: Please provide all expected CSPad alignment constants under the directory .../<experiment>/calib/...");
 	abort();
+}
+
+//----------------
+
+void CSPadCalibPars::msgUseDefault ()
+{
+	MsgLog("CSPadCalibPars", warning, "In getCalibFileName(): the calibration file for the source=" << m_source 
+                  << ", type=" << m_cur_calibname 
+                  << ", run=" <<  m_runNumber
+                  << " is not found ..."
+	          << "\nWARNING: Default CSPad alignment constants will be used.");
 }
 
 //----------------
