@@ -88,26 +88,6 @@ boost::shared_ptr<PSEvt::Proxy<{{psanatypename}}> > make_{{type.name}}(int versi
 
 
 
-def _interpolate(expr, typeobj):
-    
-    expr = expr.replace('{xtc-config}.', 'm_cfg->')
-    expr = expr.replace('{type}.', typeobj.name+"::")
-    expr = expr.replace('{self}.', "this->")
-    return expr
-
-def _typename(type):
-    
-    return type.fullName('C++')
-
-def _typedecl(type):
-    typename = _typename(type)
-    if not type.basic : typename = "const "+typename+'&'
-    return typename
-
-def _argdecl(name, type):    
-    return _typedecl(type) + ' ' + name
-
-
 def _schemas(pkg):
     '''generator function for all schemas inside a package'''
     for ns in pkg.namespaces() :
@@ -309,6 +289,9 @@ class DdlHdf5Data ( object ) :
         for schema in type.h5schemas:
             self._genSchema(type, schema)
 
+        # if all schemas have skip-proxy tag stop here
+        if all('skip-proxy' in schema.tags for schema in type.h5schemas): return
+
         psanatypename = type.fullName('C++', self.psana_ns)
         typename = type.name
 
@@ -370,23 +353,35 @@ class DdlHdf5Data ( object ) :
             
         for schema in type.h5schemas:
             
-            print '%s<h5schema name="%s" version="%d">' % ("    "*(offset), schema.name, schema.version)
+            print '{}<h5schema name="{}" version="{}">'.format("    "*(offset), schema.name, schema.version)
+            
+            for tag, val in schema.tags.items():
+                print '{}<tag name="{}" value="{}">'.format("    "*(offset+1), tag, val)
             
             for ds in schema.datasets:
             
-                print '%s<dataset name="%s">' % ("    "*(offset+1), ds.name)
+                print '{}<dataset name="{}">'.format("    "*(offset+1), ds.name)
                 
+                for tag, val in ds.tags.items():
+                    print '{}<tag name="{}" value="{}">'.format("    "*(offset+2), tag, val)
+                    
                 for attr in ds.attributes:
                 
                     rank = ""
                     meth = ""
                     if attr.rank: rank = ' rank="%d"' % attr.rank
                     if attr.method != attr.name: meth = ' method="%s"' % attr.method
-                    print '%s<attribute name="%s"%s%s/>' % ("    "*(offset+2), attr.name, meth, rank)
+                    if attr.tags:
+                        print '{}<attribute name="{}"{}{}>'.format("    "*(offset+2), attr.name, meth, rank)
+                        for tag, val in attr.tags.items():
+                            print '{}<tag name="{}" value="{}">'.format("    "*(offset+3), tag, val)
+                        print '{}</attribute>'.format("    "*(offset+2))
+                    else:
+                        print '{}<attribute name="{}"{}{}/>'.format("    "*(offset+2), attr.name, meth, rank)
                 
-                print '%s</dataset>' % ("    "*(offset+1),)
+                print '{}</dataset>'.format("    "*(offset+1))
             
-            print '%s</h5schema>' % ("    "*(offset),)
+            print '{}</h5schema>'.format("    "*(offset))
             
 
     #--------------------

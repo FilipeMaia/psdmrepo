@@ -41,6 +41,7 @@ import types
 # Imports for other modules --
 #-----------------------------
 import jinja2 as ji
+from psddl.H5Type import H5Type
 from psddl.Package import Package
 from psddl.Type import Type
 from psddl.Template import Template as T
@@ -326,6 +327,12 @@ class DdlHdf5DataDispatch ( object ) :
         headers = set()
         
         for type in types:
+
+            if not type.h5schemas:
+                type.h5schemas = [H5Type.defaultSchema(type)]
+
+            # if all schemas have skip-proxy tag stop here
+            if all('skip-proxy' in schema.tags for schema in type.h5schemas): continue
             
             code, header = self._typecode(type)
             headers.add(header)

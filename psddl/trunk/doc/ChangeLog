@@ -11,6 +11,13 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-12
+2013-03-13 Andy Salnikov
+- more HDF5 development:
+  - more vlen improvements
+  - char types of rank-1 are now vlen by default
+  - skip-proxy tag added
+
 Tag: V00-05-11
 2013-03-12 Andy Salnikov
 - more progress on HDF5 generator, vlen arrays should work better now

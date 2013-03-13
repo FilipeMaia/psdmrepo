@@ -120,23 +120,12 @@ class H5Attribute ( object ) :
         return self._shape
 
     def sizeIsConst(self):
-        """Returns true for scalar attribute or attribute whose dimensions are constant"""
-
-        return (self.shape is None) or self.shape.isfixed()
-
-    def sizeIsFixed(self):
-        """Returns true for scalar attribute or attribute whose dimensions do not change"""
-
-        if self._shape is not None:
-            return '{self}' not in str(self.shape.size)
-        return True
+        """Returns true for scalar attribute or attribute whose dimensions are known and constant"""
+        return self.shape is not None and self.shape.isfixed()
 
     def sizeIsVlen(self):
         """Returns true for array attribute whose dimensions can change every event"""
-
-        if self._shape is not None:
-            return 'vlen' in self.tags
-        return False
+        return self.rank > 0 and 'vlen' in self.tags
 
 
 #

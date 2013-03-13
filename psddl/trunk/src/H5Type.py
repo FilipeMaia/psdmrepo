@@ -111,11 +111,11 @@ class H5Type ( object ) :
         for meth in methods:
             if (meth.rank == 0 and meth.type.value_type) or (meth.rank == 1 and meth.type.name == 'char'):
                 if not ds:
-                    dsname = 'data'
-                    if "config-type" in type.tags: dsname = 'config' 
+                    dsname = 'config' if "config-type" in type.tags else 'data' 
                     ds = H5Dataset(name=dsname, parent=schema, pstype=type)
                     schema.datasets.append(ds)
                 attr = H5Attribute(name=meth.name, type=meth.type, rank=meth.rank, method=meth.name, parent=ds)
+                if meth.rank == 1 and meth.type.name == 'char': attr.tags['vlen'] = None
                 ds.attributes.append(attr)
         if ds: _log.debug("_defaultSchema: scalars dataset: %s", ds)
 
@@ -136,7 +136,7 @@ class H5Type ( object ) :
 
         # for array attributes create individual datasets
         for meth in methods:
-            if meth.rank > 1 or (meth.type.name != 'char' and meth.rank > 0):
+            if meth.rank > 0 and not (meth.type.name == 'char' and meth.rank == 1):
                 ds = H5Dataset(name=meth.name, parent=schema, pstype=type)
                 schema.datasets.append(ds)
                 attr = H5Attribute(name=meth.name, parent=ds, type=meth.type, rank=meth.rank, method=meth.name)
