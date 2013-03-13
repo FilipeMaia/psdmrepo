@@ -31,7 +31,7 @@
 
 namespace {
 
-  char logger[] = "DataSetImpl";
+  char logger[] = "hdf5pp.DataSetImpl";
 
 }
 

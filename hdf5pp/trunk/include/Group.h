@@ -14,6 +14,7 @@
 // C/C++ Headers --
 //-----------------
 #include <string>
+#include <iosfwd>
 #include <boost/shared_ptr.hpp>
 
 //----------------------
@@ -146,6 +147,9 @@ public:
   // get group name (absolute, may be ambiguous)
   std::string name() const;
 
+  // get group id
+  hid_t id() const { return *m_id; }
+
   // get group name (relative to some parent)
   std::string basename() const;
 
@@ -159,7 +163,6 @@ protected:
   // allow these guys to call my factory methods
   friend class File ;
   friend class GroupIter ;
-  friend class NameIter ;
 
   // factory methods
   static Group createGroup ( hid_t parent, const std::string& name ) ;
@@ -174,6 +177,10 @@ private:
   boost::shared_ptr<hid_t> m_id ;
 
 };
+
+/// Insertion operator dumps name and ID of the group.
+std::ostream&
+operator<<(std::ostream& out, const Group& grp);
 
 } // namespace hdf5pp
 

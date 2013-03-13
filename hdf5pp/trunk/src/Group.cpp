@@ -31,10 +31,15 @@
 
 namespace {
 
+  const char logger[] = "hdf5pp.Group";
+
   // deleter for  boost smart pointer
   struct GroupPtrDeleter {
     void operator()( hid_t* id ) {
-      if ( id ) H5Gclose ( *id );
+      if ( id ) {
+        MsgLog(logger, debug, "GroupPtrDeleter: group=" << *id) ;
+        H5Gclose ( *id );
+      }
       delete id ;
     }
   };
@@ -53,6 +58,7 @@ namespace hdf5pp {
 Group::Group ( hid_t grp )
   : m_id( new hid_t(grp), ::GroupPtrDeleter() )
 {
+  MsgLog(logger, debug, "Group ctor: " << *this) ;
 }
 
 //--------------
@@ -66,7 +72,7 @@ Group::~Group ()
 Group
 Group::createGroup ( hid_t parent, const std::string& name )
 {
-  MsgLog("hdf5pp::Group", debug, "Group::createGroup: parent=" << parent << " name=" << name ) ;
+  MsgLog(logger, debug, "Group::createGroup: parent=" << parent << " name=" << name ) ;
   // allow creation of intermediate directories
   hid_t lcpl_id = H5Pcreate( H5P_LINK_CREATE ) ;
   H5Pset_create_intermediate_group( lcpl_id, 1 ) ;
@@ -81,6 +87,7 @@ Group::createGroup ( hid_t parent, const std::string& name )
 Group
 Group::openGroup ( hid_t parent, const std::string& name )
 {
+  MsgLog(logger, debug, "Group::openGroup: parent=" << parent << " name=" << name ) ;
   hid_t f_id = H5Gopen2 ( parent, name.c_str(), H5P_DEFAULT ) ;
   if ( f_id < 0 ) {
     throw Hdf5CallException( ERR_LOC, "H5Gopen2") ;
@@ -91,6 +98,8 @@ Group::openGroup ( hid_t parent, const std::string& name )
 bool
 Group::hasChild ( const std::string& name ) const
 {
+  MsgLog(logger, debug, "Group::hasChild: this=" << *this << " name=" << name) ;
+
   std::string child = name;
   std::string::size_type p = name.find('/');
   if (p != std::string::npos) child.erase(p);
@@ -115,6 +124,8 @@ Group::hasChild ( const std::string& name ) const
 Group
 Group::parent() const
 {
+  MsgLog(logger, debug, "Group::parent: this=" << *this);
+
   std::string path = name();
   if (path.empty() or path == "/") return Group();
 
@@ -205,6 +216,17 @@ Group::operator==( const Group& other ) const
 
   // compare IDs
   return *m_id == *(other.m_id) ;
+}
+
+/// Insertion operator dumps name and ID of the group.
+std::ostream&
+operator<<(std::ostream& out, const Group& grp)
+{
+  if (grp.valid()) {
+    return out << "Group(id=" << grp.id() << ", name='" << grp.name() << "')";
+  } else {
+    return out << "Group(id=None)";
+  }
 }
 
 } // namespace hdf5pp
