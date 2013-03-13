@@ -66,7 +66,7 @@ CsPad2x2TiltV1::CsPad2x2TiltV1( const std::vector<double> v_parameters )
 
 void CsPad2x2TiltV1::print()
 {
-    cout << endl << "Tilt:" << endl;  
+    cout << endl << "Tilt:";  
     for( int sect=0; sect<NSect; ++sect ) { cout << "  " << m_tilt[sect]; }
     cout << endl;
 }

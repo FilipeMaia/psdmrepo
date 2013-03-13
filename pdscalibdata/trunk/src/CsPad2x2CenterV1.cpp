@@ -74,15 +74,15 @@ CsPad2x2CenterV1::CsPad2x2CenterV1( const std::vector<double> v_parameters )
 
 void CsPad2x2CenterV1::print()
 {
-    cout << endl << "X:" << endl;  
+    cout << endl << "X:";  
     for( int sect=0; sect<NSect; ++sect ) { cout << "  " << m_center_x[sect]; }
     cout << endl;
 
-    cout << "Y:" << endl;  
+    cout << "Y:";  
     for( int sect=0; sect<NSect; ++sect ) { cout << "  " << m_center_y[sect]; }
     cout << endl;
 
-    cout << "Z:" << endl;  
+    cout << "Z:";  
     for( int sect=0; sect<NSect; ++sect ) { cout << "  " << m_center_z[sect]; }
     cout << endl;
 }
