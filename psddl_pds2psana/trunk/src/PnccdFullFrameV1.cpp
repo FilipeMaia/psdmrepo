@@ -55,15 +55,14 @@ PnccdFullFrameV1::PnccdFullFrameV1 (const Psana::PNCCD::FramesV1& frames)
   _frameNumber = frame0.frameNumber();
 
   // take the lowest timestamp of four frames
-  std::vector<std::pair<uint32_t, uint32_t> > ts;
-  ts.reserve(4);
   for (unsigned i = 0; i != 4; ++ i) {
     const Psana::PNCCD::FrameV1& frame = frames.frame(i);
-    ts.push_back(std::make_pair(frame.timeStampHi(), frame.timeStampLo()));
+    uint32_t tshi = frame.timeStampHi(), tslo = frame.timeStampLo();
+    if (i == 0 or tshi < _timeStampHi or (tshi == _timeStampHi and tslo < _timeStampLo)) {
+      _timeStampHi = tshi;
+      _timeStampLo = tslo;
+    }
   }
-  std::sort(ts.begin(), ts.end());
-  _timeStampHi = ts[0].first;
-  _timeStampLo = ts[0].second;
 
   // make large image out of four small images
   uint16_t* dest = &_data[0][0];

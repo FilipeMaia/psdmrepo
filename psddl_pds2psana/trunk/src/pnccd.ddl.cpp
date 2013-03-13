@@ -93,9 +93,16 @@ ndarray<const uint16_t, 2> FrameV1::data() const {
   throw std::runtime_error("FrameV1::data: config object pointer is zero");
 }
 
-FullFrameV1::FullFrameV1(const boost::shared_ptr<const XtcType>& xtcPtr)
+FullFrameV1::FullFrameV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::PNCCD::ConfigV1>& cfgPtr)
   : Psana::PNCCD::FullFrameV1()
   , m_xtcObj(xtcPtr)
+  , m_cfgPtr0(cfgPtr)
+{
+}
+FullFrameV1::FullFrameV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::PNCCD::ConfigV2>& cfgPtr)
+  : Psana::PNCCD::FullFrameV1()
+  , m_xtcObj(xtcPtr)
+  , m_cfgPtr1(cfgPtr)
 {
 }
 FullFrameV1::~FullFrameV1()
