@@ -22,7 +22,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-//#include "PSCalib/CSPadCalibPars.h"
+#include "PSCalib/CSPad2x2CalibPars.h"
 #include "CSPadPixCoords/PixCoords2x1.h"
 #include "CSPadPixCoords/PixCoordsCSPad2x2.h"
 
@@ -118,11 +118,11 @@ private:
 
   // Data members, this is for example purposes only
 
-  //std::string m_calibDir;       // i.e. ./calib
-  //std::string m_typeGroupName;  // i.e. CsPad::CalibV1
-  //Source      m_src;         // Data source set from config file
-  Source      m_str_src;        // i.e. CxiDs1.0:Cspad.0
-  Pds::Src    m_actualSrc;
+  std::string m_calibDir;       // i.e. ./calib
+  std::string m_typeGroupName;  // i.e. CsPad2x2::CalibV1
+  //std::string m_str_src;        // i.e. MecTargetChamber.0:Cspad2x2.1
+  Source      m_source;         // i.e. Detinfo(MecTargetChamber.0:Cspad2x2.1)
+  Pds::Src    m_src;
   std::string m_inkey; 
   std::string m_outimgkey;   // i.e. "CSPad:Image"
   bool        m_tiltIsApplied;
@@ -137,7 +137,7 @@ private:
   uint32_t m_nrows2x1;     // 388
   uint32_t m_sizeOf2x1Img; // 185*388;
 
-  PSCalib::CSPadCalibPars        *m_cspad_calibpar;
+  PSCalib::CSPad2x2CalibPars     *m_cspad2x2_calibpars;
   CSPadPixCoords::PixCoords2x1   *m_pix_coords_2x1;
   //CSPadPixCoords::PixCoordsQuad  *m_pix_coords_quad;
   //CSPadPixCoords::PixCoordsCSPad *m_pix_coords_cspad;

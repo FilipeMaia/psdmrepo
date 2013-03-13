@@ -19,6 +19,7 @@
 // C/C++ Headers --
 //-----------------
 #include <time.h>
+#include <sstream>   // for stringstream
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -39,6 +40,8 @@
 
 // This declares this class as psana module
 using namespace CSPadPixCoords;
+using namespace std;
+
 PSANA_MODULE_FACTORY(CSPad2x2ImageProducer)
 
 //		----------------------------------------
@@ -53,10 +56,9 @@ namespace CSPadPixCoords {
 
 CSPad2x2ImageProducer::CSPad2x2ImageProducer (const std::string& name)
   : Module(name)
-//, m_calibDir()
-//, m_typeGroupName()
-//, m_source()
-  , m_str_src()
+  , m_calibDir()
+  , m_typeGroupName()
+  , m_source()
   , m_inkey()
   , m_outimgkey()
   , m_tiltIsApplied()
@@ -64,14 +66,17 @@ CSPad2x2ImageProducer::CSPad2x2ImageProducer (const std::string& name)
   , m_count(0)
 {
   // get the values from configuration or use defaults
-  //m_calibDir      = configStr("calibDir",      ""); // if not provided default from env will be used
-  //m_typeGroupName = configStr("typeGroupName", "CsPad::CalibV1");
-
-  m_str_src       = configSrc("source",        "DetInfo(:Cspad2x2)");
+  m_calibDir      = configStr("calibDir",      ""); // if not provided default from env will be used
+  m_typeGroupName = configStr("typeGroupName", "CsPad2x2::CalibV1");
+  m_source        = configSrc("source",        "DetInfo(:Cspad2x2.1)");
+  //m_str_src       = configStr("source",        "MecTargetChamber.0:Cspad2x2.1");
   m_inkey         = configStr("inkey",         "");
   m_outimgkey     = configStr("outimgkey",     "Image2D");
   m_tiltIsApplied = config   ("tiltIsApplied", true);
   m_print_bits    = config   ("print_bits",    0);
+  //m_source = Source(m_str_src);
+  //stringstream ssrc; ssrc << m_source;
+  //m_str_src = ssrc.str();
 }
 
 //--------------
@@ -90,7 +95,9 @@ CSPad2x2ImageProducer::printInputParameters()
 {
   WithMsgLog(name(), info, log) {
     log << "\n Input parameters:"
-        << "\n str_src               : " << m_str_src
+        << "\n calibDir              : " << m_calibDir
+        << "\n typeGroupName         : " << m_typeGroupName
+        << "\n source                : " << m_source
         << "\n inkey                 : " << m_inkey      
         << "\n outimgkey             : " << m_outimgkey
         << "\n tiltIsApplied         : " << m_tiltIsApplied
@@ -120,20 +127,20 @@ CSPad2x2ImageProducer::beginRun(Event& evt, Env& env)
 {
   if( m_print_bits & 1<<1 ) MsgLog(name(), info, "ImageCSPad::beginRun ");
 
+  this -> getConfigPars(env); // get m_src here
 
-  //std::string calib_dir = (m_calibDir == "") ? env.calibDir() : m_calibDir;
+  std::string calib_dir = (m_calibDir == "") ? env.calibDir() : m_calibDir;
 
-  //m_cspad_calibpar   = new PSCalib::CSPadCalibPars(calib_dir, m_typeGroupName, m_str_src, getRunNumber(evt));
-  m_pix_coords_2x1   = new CSPadPixCoords::PixCoords2x1   ();
-  //m_pix_coords_quad  = new CSPadPixCoords::PixCoordsQuad  ( m_pix_coords_2x1,  m_cspad_calibpar, m_tiltIsApplied );
-  //m_pix_coords_cspad = new CSPadPixCoords::PixCoordsCSPad ( m_pix_coords_quad, m_cspad_calibpar, m_tiltIsApplied );
-  m_pix_coords_cspad2x2 = new CSPadPixCoords::PixCoordsCSPad2x2 (m_pix_coords_2x1, m_tiltIsApplied);
+  m_cspad2x2_calibpars = new PSCalib::CSPad2x2CalibPars(calib_dir, m_typeGroupName, m_src, getRunNumber(evt));
 
-  //if( m_print_bits & 1<<0 ) m_cspad_calibpar  -> printCalibPars();
-  m_pix_coords_2x1  -> print_member_data();
-  //m_pix_coords_quad -> print_member_data(); 
+  m_pix_coords_2x1      = new CSPadPixCoords::PixCoords2x1 ();
+  m_pix_coords_cspad2x2 = new CSPadPixCoords::PixCoordsCSPad2x2 (m_pix_coords_2x1, m_cspad2x2_calibpars, m_tiltIsApplied);
 
-  this -> getConfigPars(env);
+  if( m_print_bits & 1 ) {
+    m_cspad2x2_calibpars -> printInputPars();
+    m_cspad2x2_calibpars -> printCalibPars();
+    m_pix_coords_2x1  -> print_member_data();
+  }
 }
 
 //--------------------
@@ -157,7 +164,7 @@ CSPad2x2ImageProducer::getConfigPars(Env& env)
 {
   int count = 0;
  
-  shared_ptr<Psana::CsPad2x2::ConfigV1> config_v1 = env.configStore().get(m_str_src);
+  shared_ptr<Psana::CsPad2x2::ConfigV1> config_v1 = env.configStore().get(m_source, &m_src);
   if (config_v1.get()) {
     m_roiMask        = config_v1->roiMask();
     m_numAsicsStored = config_v1->numAsicsStored();
@@ -170,7 +177,7 @@ CSPad2x2ImageProducer::getConfigPars(Env& env)
     ++ count;
   }
 
-  shared_ptr<Psana::CsPad2x2::ConfigV2> config_v2 = env.configStore().get(m_str_src);
+  shared_ptr<Psana::CsPad2x2::ConfigV2> config_v2 = env.configStore().get(m_source, &m_src);
   if (config_v2.get()) {
     m_roiMask        = config_v2->roiMask();
     m_numAsicsStored = config_v2->numAsicsStored();
@@ -183,7 +190,7 @@ CSPad2x2ImageProducer::getConfigPars(Env& env)
     ++ count;
   }
 
-  //shared_ptr<Psana::CsPad2x2::ConfigV3> config_v3 = env.configStore().get(m_str_src);
+  //shared_ptr<Psana::CsPad2x2::ConfigV3> config_v3 = env.configStore().get(m_source);
   //if (config_v3.get()) {
   //  m_roiMask        = config_v3->roiMask();
   //  m_numAsicsStored = config_v3->numAsicsStored();
@@ -264,7 +271,7 @@ CSPad2x2ImageProducer::endJob(Event& evt, Env& env)
 void 
 CSPad2x2ImageProducer::processEvent(Event& evt, Env& env)
 {
-  shared_ptr<Psana::CsPad2x2::ElementV1> elem1 = evt.get(m_str_src, m_inkey, &m_actualSrc); // get m_actualSrc here
+  shared_ptr<Psana::CsPad2x2::ElementV1> elem1 = evt.get(m_source, m_inkey, &m_src); // get m_src here
 
   if (elem1.get()) {
 
@@ -321,13 +328,13 @@ CSPad2x2ImageProducer::cspad_image_add_in_event(Event& evt)
   if(m_outimgkey == "Image2D") {
 
     shared_ptr< CSPadPixCoords::Image2D<double> > img2d( new CSPadPixCoords::Image2D<double>(&m_arr_cspad2x2_image[0][0],NY_CSPAD2X2,NX_CSPAD2X2) );
-    evt.put(img2d, m_actualSrc, m_outimgkey);
+    evt.put(img2d, m_src, m_outimgkey);
 
   } else {
 
     const unsigned shape[] = {NY_CSPAD2X2,NX_CSPAD2X2};
     shared_ptr< ndarray<double,2> > img2d( new ndarray<double,2>(&m_arr_cspad2x2_image[0][0],shape) );
-    evt.put(img2d, m_actualSrc, m_outimgkey);
+    evt.put(img2d, m_src, m_outimgkey);
   }
 }
 

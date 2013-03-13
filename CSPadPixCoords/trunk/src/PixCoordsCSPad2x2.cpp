@@ -54,9 +54,9 @@ namespace CSPadPixCoords {
 
 //--------------
 
-PixCoordsCSPad2x2::PixCoordsCSPad2x2 (PixCoords2x1 *pix_coords_2x1,  PSCalib::CSPadCalibPars *cspad_calibpar, bool tiltIsApplied)
+PixCoordsCSPad2x2::PixCoordsCSPad2x2 (PixCoords2x1 *pix_coords_2x1,  PSCalib::CSPad2x2CalibPars *cspad2x2_calibpar, bool tiltIsApplied)
   : m_pix_coords_2x1(pix_coords_2x1)
-  , m_cspad_calibpar(cspad_calibpar)
+  , m_cspad2x2_calibpar(cspad2x2_calibpar)
   , m_tiltIsApplied (tiltIsApplied)
 {
   XCOOR = CSPadPixCoords::PixCoords2x1::X;
@@ -78,40 +78,25 @@ void PixCoordsCSPad2x2::fillPixelCoordinateArrays()
 
         m_degToRad = 3.14159265359 / 180.; 
 
-	double xcenter_pix []={201,201};
-	double ycenter_pix []={101,301};
-	double zcenter_pix []={  0,  0};
+	// For test purpose use large deviation in x center and large tilt:
+	//double xcenter_pix []={201,205};
+	//double ycenter_pix []={101,301};
+	//double tilt_2x1    []={0.0,3.0};
+	double rotation_2x1[]={180,180}; // ...Just because of conventions in this code...
 
-	double tilt_2x1    []={0.0,0.0};
-	double rotation_2x1[]={180,180};
-
-        double pixSize_um = PSCalib::CSPadCalibPars::getRowSize_um();
+        double pixSize_um = PSCalib::CSPad2x2CalibPars::getRowSize_um();
 
         for (uint32_t sect=0; sect < N2x1InDet; ++sect)
           {
-	    /*
-            double xcenter  = m_cspad_calibpar -> getQuadMargX ()
-                            + m_cspad_calibpar -> getCenterX    (quad,sect)
-                            + m_cspad_calibpar -> getCenterCorrX(quad,sect);
-
-            double ycenter  = m_cspad_calibpar -> getQuadMargY ()
-                            + m_cspad_calibpar -> getCenterY    (quad,sect)
-                            + m_cspad_calibpar -> getCenterCorrY(quad,sect);
-
-            double zcenter  = m_cspad_calibpar -> getQuadMargZ ()
-                            + m_cspad_calibpar -> getCenterZ    (quad,sect)
-                            + m_cspad_calibpar -> getCenterCorrZ(quad,sect);
-
-            double rotation = m_cspad_calibpar -> getRotation  (quad,sect);
-
-            double tilt     = m_cspad_calibpar -> getTilt      (quad,sect);
-	    */
-
-            double xcenter  = xcenter_pix [sect] * pixSize_um;
-            double ycenter  = ycenter_pix [sect] * pixSize_um;
-            double zcenter  = zcenter_pix [sect];
-            double tilt     = tilt_2x1    [sect];
+            //double xcenter  = xcenter_pix [sect] * pixSize_um;
+            //double ycenter  = ycenter_pix [sect] * pixSize_um;
+            //double tilt     = tilt_2x1    [sect];
             double rotation = rotation_2x1[sect];
+
+            double xcenter  = m_cspad2x2_calibpar -> getCenterX (sect) * pixSize_um;
+            double ycenter  = m_cspad2x2_calibpar -> getCenterY (sect) * pixSize_um;
+            double zcenter  = m_cspad2x2_calibpar -> getCenterZ (sect) * pixSize_um;
+            double tilt     = m_cspad2x2_calibpar -> getTilt    (sect);
 
             if (m_tiltIsApplied) fillOneSectionTiltedInDet(sect, xcenter, ycenter, zcenter, rotation, tilt);
             else                 fillOneSectionInDet      (sect, xcenter, ycenter, zcenter, rotation);
@@ -211,7 +196,7 @@ void PixCoordsCSPad2x2::fillOneSectionTiltedInDet(uint32_t sect, double xcenter,
 
 void PixCoordsCSPad2x2::setConstXYMinMax()
 {
-    double pixSize_um = PSCalib::CSPadCalibPars::getRowSize_um();
+    double pixSize_um = PSCalib::CSPad2x2CalibPars::getRowSize_um();
 
     m_coor_x_min = 0;
     m_coor_y_min = 0;
@@ -241,8 +226,8 @@ double PixCoordsCSPad2x2::getPixCoor_pix (CSPadPixCoords::PixCoords2x1::COORDINA
 {
   switch (icoor)
     {
-    case CSPadPixCoords::PixCoords2x1::X : return getPixCoor_um (icoor, sect, row, col) * PSCalib::CSPadCalibPars::getRowUmToPix();
-    case CSPadPixCoords::PixCoords2x1::Y : return getPixCoor_um (icoor, sect, row, col) * PSCalib::CSPadCalibPars::getColUmToPix();
+    case CSPadPixCoords::PixCoords2x1::X : return getPixCoor_um (icoor, sect, row, col) * PSCalib::CSPad2x2CalibPars::getRowUmToPix();
+    case CSPadPixCoords::PixCoords2x1::Y : return getPixCoor_um (icoor, sect, row, col) * PSCalib::CSPad2x2CalibPars::getColUmToPix();
     case CSPadPixCoords::PixCoords2x1::Z : return 0;
     default: return 0;
     }

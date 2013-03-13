@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-02
+2013-03-13 Mikhail S. Dubrovin
+- in PixCoordsCSPad2x2 and CSPad2x2ImageProducer take into account geometry alignment
+	
 Tag: V00-03-01
 2013-02-28 Mikhail S. Dubrovin
 - src/CSPad2x2ImageProducer.cpp add ConfigV2

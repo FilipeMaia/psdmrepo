@@ -22,7 +22,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "CSPadPixCoords/PixCoords2x1.h"
-#include "PSCalib/CSPadCalibPars.h"
+#include "PSCalib/CSPad2x2CalibPars.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -72,7 +72,7 @@ public:
    *             Currently is not used, because tilts for 2x1 in 2x2 are not presented in calibtration parameters. 
    */
   PixCoordsCSPad2x2 (PixCoords2x1 *pix_coords_2x1, bool tiltIsApplied = false);
-  PixCoordsCSPad2x2 (PixCoords2x1 *pix_coords_2x1, PSCalib::CSPadCalibPars *cspad_calibpar, bool tiltIsApplied = false);
+  PixCoordsCSPad2x2 (PixCoords2x1 *pix_coords_2x1, PSCalib::CSPad2x2CalibPars *cspad_calibpar, bool tiltIsApplied = false);
 
   // Destructor
   virtual ~PixCoordsCSPad2x2 () ;
@@ -102,9 +102,9 @@ private:
 
   double m_degToRad; 
 
-  PixCoords2x1            *m_pix_coords_2x1;  
-  PSCalib::CSPadCalibPars *m_cspad_calibpar;  
-  bool                     m_tiltIsApplied;
+  PixCoords2x1               *m_pix_coords_2x1;  
+  PSCalib::CSPad2x2CalibPars *m_cspad2x2_calibpar;  
+  bool                        m_tiltIsApplied;
 
   double m_coor_x[NCols2x1][NRows2x1][N2x1InDet];
   double m_coor_y[NCols2x1][NRows2x1][N2x1InDet];
