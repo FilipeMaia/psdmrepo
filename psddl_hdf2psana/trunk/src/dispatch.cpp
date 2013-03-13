@@ -4,27 +4,29 @@
 #include "PSEvt/Exceptions.h"
 
 #include "psddl_hdf2psana/dispatch.h"
-#include "psddl_hdf2psana/ipimb.ddl.h"
-#include "psddl_hdf2psana/gsc16ai.ddl.h"
-#include "psddl_hdf2psana/princeton.ddl.h"
-#include "psddl_hdf2psana/cspad2x2.ddl.h"
 #include "psddl_hdf2psana/cspad.ddl.h"
-#include "psddl_hdf2psana/control.ddl.h"
-#include "psddl_hdf2psana/lusi.ddl.h"
-#include "psddl_hdf2psana/pulnix.ddl.h"
-#include "psddl_hdf2psana/camera.ddl.h"
-#include "psddl_hdf2psana/fccd.ddl.h"
-#include "psddl_hdf2psana/timepix.ddl.h"
-#include "psddl_hdf2psana/orca.ddl.h"
-#include "psddl_hdf2psana/opal1k.ddl.h"
+#include "psddl_hdf2psana/evr.ddl.h"
+#include "psddl_hdf2psana/princeton.ddl.h"
 #include "psddl_hdf2psana/usdusb.ddl.h"
-#include "psddl_hdf2psana/andor.ddl.h"
+#include "psddl_hdf2psana/timepix.ddl.h"
+#include "psddl_hdf2psana/camera.ddl.h"
+#include "psddl_hdf2psana/orca.ddl.h"
+#include "psddl_hdf2psana/quartz.ddl.h"
+#include "psddl_hdf2psana/gsc16ai.ddl.h"
 #include "psddl_hdf2psana/bld.ddl.h"
+#include "psddl_hdf2psana/pulnix.ddl.h"
+#include "psddl_hdf2psana/fccd.ddl.h"
+#include "psddl_hdf2psana/pnccd.ddl.h"
+#include "psddl_hdf2psana/ipimb.ddl.h"
+#include "psddl_hdf2psana/control.ddl.h"
+#include "psddl_hdf2psana/cspad2x2.ddl.h"
+#include "psddl_hdf2psana/opal1k.ddl.h"
+#include "psddl_hdf2psana/andor.ddl.h"
 #include "psddl_hdf2psana/fli.ddl.h"
 #include "psddl_hdf2psana/oceanoptics.ddl.h"
-#include "psddl_hdf2psana/evr.ddl.h"
 #include "psddl_hdf2psana/encoder.ddl.h"
-#include "psddl_hdf2psana/quartz.ddl.h"
+#include "psddl_hdf2psana/lusi.ddl.h"
+#include "psddl_hdf2psana/acqiris.ddl.h"
 
 
 namespace {
@@ -48,11 +50,6 @@ try {
   case 2899606017:
     if (evt) {
       evt->putProxy(psddl_hdf2psana::CsPad::make_CsPadReadOnlyCfg(schema_version, group, idx), src);
-    }
-    break;
-  case 843751943:
-    if (evt) {
-      evt->putProxy(psddl_hdf2psana::CsPad2x2::make_ConfigV2QuadReg(schema_version, group, idx), src);
     }
     break;
   case 77859337:
@@ -90,14 +87,12 @@ try {
       evt->putProxy(psddl_hdf2psana::EvrData::make_OutputMapV2(schema_version, group, idx), src);
     }
     break;
+  case 3565044250:
+    cfgStore.putProxy(psddl_hdf2psana::Acqiris::make_ConfigV1(schema_version, group, -1), src);
+    break;
   case 3124602907:
     if (evt) {
       evt->putProxy(psddl_hdf2psana::Bld::make_BldDataEBeamV1(schema_version, group, idx), src);
-    }
-    break;
-  case 4059955740:
-    if (evt) {
-      evt->putProxy(psddl_hdf2psana::CsPad::make_ConfigV1QuadReg(schema_version, group, idx), src);
     }
     break;
   case 1133035550:
@@ -105,11 +100,24 @@ try {
       evt->putProxy(psddl_hdf2psana::EvrData::make_FIFOEvent(schema_version, group, idx), src);
     }
     break;
-  case 1624433407:
-    cfgStore.putProxy(psddl_hdf2psana::Encoder::make_ConfigV2(schema_version, group, -1), src);
+  case 245364150:
+    if (evt) {
+      if (boost::shared_ptr<Psana::PNCCD::ConfigV1> cfgPtr = cfgStore.get(src)) {
+        evt->putProxy(psddl_hdf2psana::PNCCD::make_FullFrameV1(schema_version, group, idx, cfgPtr), src);
+      } else if (boost::shared_ptr<Psana::PNCCD::ConfigV2> cfgPtr = cfgStore.get(src)) {
+        evt->putProxy(psddl_hdf2psana::PNCCD::make_FullFrameV1(schema_version, group, idx, cfgPtr), src);
+      }
+    }
     break;
   case 3801204302:
     cfgStore.putProxy(psddl_hdf2psana::UsdUsb::make_ConfigV1(schema_version, group, -1), src);
+    break;
+  case 2947916881:
+    if (evt) {
+      if (boost::shared_ptr<Psana::Acqiris::ConfigV1> cfgPtr = cfgStore.get(src)) {
+        evt->putProxy(psddl_hdf2psana::Acqiris::make_DataDescV1(schema_version, group, idx, cfgPtr), src);
+      }
+    }
     break;
   case 1422110804:
     if (evt) {
@@ -129,6 +137,11 @@ try {
       evt->putProxy(psddl_hdf2psana::Bld::make_BldDataPhaseCavity(schema_version, group, idx), src);
     }
     break;
+  case 1005088878:
+    if (evt) {
+      evt->putProxy(psddl_hdf2psana::Acqiris::make_TdcAuxIO(schema_version, group, idx), src);
+    }
+    break;
   case 1551708791:
     cfgStore.putProxy(psddl_hdf2psana::Orca::make_ConfigV1(schema_version, group, -1), src);
     break;
@@ -141,6 +154,11 @@ try {
     break;
   case 2103238272:
     cfgStore.putProxy(psddl_hdf2psana::Opal1k::make_ConfigV1(schema_version, group, -1), src);
+    break;
+  case 3210462341:
+    if (evt) {
+      evt->putProxy(psddl_hdf2psana::Acqiris::make_VertV1(schema_version, group, idx), src);
+    }
     break;
   case 690012314:
     if (evt) {
@@ -155,6 +173,9 @@ try {
     break;
   case 1170742431:
     cfgStore.putProxy(psddl_hdf2psana::Timepix::make_ConfigV2(schema_version, group, -1), src);
+    break;
+  case 169144489:
+    cfgStore.putProxy(psddl_hdf2psana::Acqiris::make_TdcConfigV1(schema_version, group, -1), src);
     break;
   case 3139117226:
     if (evt) {
@@ -181,9 +202,19 @@ try {
       evt->putProxy(psddl_hdf2psana::EvrData::make_EventCodeV4(schema_version, group, idx), src);
     }
     break;
+  case 2533780153:
+    if (evt) {
+      evt->putProxy(psddl_hdf2psana::Acqiris::make_TdcDataV1_Item(schema_version, group, idx), src);
+    }
+    break;
   case 3110430406:
     if (evt) {
       evt->putProxy(psddl_hdf2psana::Bld::make_BldDataPimV1(schema_version, group, idx), src);
+    }
+    break;
+  case 2436058311:
+    if (evt) {
+      evt->putProxy(psddl_hdf2psana::Acqiris::make_TdcChannel(schema_version, group, idx), src);
     }
     break;
   case 2478618317:
@@ -214,6 +245,11 @@ try {
   case 1022640350:
     cfgStore.putProxy(psddl_hdf2psana::Andor::make_ConfigV1(schema_version, group, -1), src);
     break;
+  case 1048460753:
+    if (evt) {
+      evt->putProxy(psddl_hdf2psana::Bld::make_BldDataFEEGasDetEnergy(schema_version, group, idx), src);
+    }
+    break;
   case 3580200696:
     cfgStore.putProxy(psddl_hdf2psana::Lusi::make_PimImageConfigV1(schema_version, group, -1), src);
     break;
@@ -235,10 +271,8 @@ try {
       evt->putProxy(psddl_hdf2psana::Bld::make_BldDataEBeamV3(schema_version, group, idx), src);
     }
     break;
-  case 1078464767:
-    if (evt) {
-      evt->putProxy(psddl_hdf2psana::Bld::make_BldDataEBeamV2(schema_version, group, idx), src);
-    }
+  case 1624433407:
+    cfgStore.putProxy(psddl_hdf2psana::Encoder::make_ConfigV2(schema_version, group, -1), src);
     break;
   case 1543725316:
     if (evt) {
@@ -276,13 +310,13 @@ try {
       evt->putProxy(psddl_hdf2psana::Princeton::make_InfoV1(schema_version, group, idx), src);
     }
     break;
-  case 3034215716:
-    if (evt) {
-      evt->putProxy(psddl_hdf2psana::CsPad2x2::make_ConfigV1QuadReg(schema_version, group, idx), src);
-    }
-    break;
   case 2160030172:
     cfgStore.putProxy(psddl_hdf2psana::ControlData::make_ConfigV2(schema_version, group, -1), src);
+    break;
+  case 3523858218:
+    if (evt) {
+      evt->putProxy(psddl_hdf2psana::Acqiris::make_TdcVetoIO(schema_version, group, idx), src);
+    }
     break;
   case 670963505:
     cfgStore.putProxy(psddl_hdf2psana::Quartz::make_ConfigV1(schema_version, group, -1), src);
@@ -323,6 +357,11 @@ try {
   case 2940448591:
     cfgStore.putProxy(psddl_hdf2psana::CsPad::make_ConfigV3(schema_version, group, -1), src);
     break;
+  case 1656086870:
+    if (evt) {
+      evt->putProxy(psddl_hdf2psana::Acqiris::make_HorizV1(schema_version, group, idx), src);
+    }
+    break;
   case 150950753:
     if (evt) {
       evt->putProxy(psddl_hdf2psana::CsPad2x2::make_CsPad2x2ReadOnlyCfg(schema_version, group, idx), src);
@@ -356,11 +395,19 @@ try {
       evt->putProxy(psddl_hdf2psana::EvrData::make_OutputMap(schema_version, group, idx), src);
     }
     break;
-  case 1705456020:
-    cfgStore.putProxy(psddl_hdf2psana::Ipimb::make_ConfigV2(schema_version, group, -1), src);
+  case 3467424660:
+    if (evt) {
+      if (boost::shared_ptr<Psana::CsPad::ConfigV2> cfgPtr = cfgStore.get(src)) {
+        evt->putProxy(psddl_hdf2psana::CsPad::make_DataV2(schema_version, group, idx, cfgPtr), src);
+      } else if (boost::shared_ptr<Psana::CsPad::ConfigV3> cfgPtr = cfgStore.get(src)) {
+        evt->putProxy(psddl_hdf2psana::CsPad::make_DataV2(schema_version, group, idx, cfgPtr), src);
+      } else if (boost::shared_ptr<Psana::CsPad::ConfigV4> cfgPtr = cfgStore.get(src)) {
+        evt->putProxy(psddl_hdf2psana::CsPad::make_DataV2(schema_version, group, idx, cfgPtr), src);
+      }
+    }
     break;
-  case 2275609067:
-    cfgStore.putProxy(psddl_hdf2psana::Fli::make_ConfigV1(schema_version, group, -1), src);
+  case 4103916011:
+    cfgStore.putProxy(psddl_hdf2psana::FCCD::make_FccdConfigV2(schema_version, group, -1), src);
     break;
   case 2119303557:
     if (evt) {
@@ -387,19 +434,15 @@ try {
       }
     }
     break;
-  case 860824977:
-    if (evt) {
-      evt->putProxy(psddl_hdf2psana::EvrData::make_IOChannel(schema_version, group, idx), src);
-    }
+  case 1705456020:
+    cfgStore.putProxy(psddl_hdf2psana::Ipimb::make_ConfigV2(schema_version, group, -1), src);
     break;
-  case 3467424660:
+  case 1254115734:
     if (evt) {
-      if (boost::shared_ptr<Psana::CsPad::ConfigV2> cfgPtr = cfgStore.get(src)) {
-        evt->putProxy(psddl_hdf2psana::CsPad::make_DataV2(schema_version, group, idx, cfgPtr), src);
-      } else if (boost::shared_ptr<Psana::CsPad::ConfigV3> cfgPtr = cfgStore.get(src)) {
-        evt->putProxy(psddl_hdf2psana::CsPad::make_DataV2(schema_version, group, idx, cfgPtr), src);
-      } else if (boost::shared_ptr<Psana::CsPad::ConfigV4> cfgPtr = cfgStore.get(src)) {
-        evt->putProxy(psddl_hdf2psana::CsPad::make_DataV2(schema_version, group, idx, cfgPtr), src);
+      if (boost::shared_ptr<Psana::PNCCD::ConfigV1> cfgPtr = cfgStore.get(src)) {
+        evt->putProxy(psddl_hdf2psana::PNCCD::make_FramesV1(schema_version, group, idx, cfgPtr), src);
+      } else if (boost::shared_ptr<Psana::PNCCD::ConfigV2> cfgPtr = cfgStore.get(src)) {
+        evt->putProxy(psddl_hdf2psana::PNCCD::make_FramesV1(schema_version, group, idx, cfgPtr), src);
       }
     }
     break;
@@ -437,9 +480,9 @@ try {
       evt->putProxy(psddl_hdf2psana::Encoder::make_DataV1(schema_version, group, idx), src);
     }
     break;
-  case 1020644788:
+  case 2968036851:
     if (evt) {
-      evt->putProxy(psddl_hdf2psana::EvrData::make_SequencerConfigV1(schema_version, group, idx), src);
+      evt->putProxy(psddl_hdf2psana::Acqiris::make_TdcDataV1(schema_version, group, idx), src);
     }
     break;
   case 3486939573:
@@ -447,6 +490,11 @@ try {
     break;
   case 3486939574:
     cfgStore.putProxy(psddl_hdf2psana::CsPad2x2::make_ConfigV2(schema_version, group, -1), src);
+    break;
+  case 3151987128:
+    if (evt) {
+      evt->putProxy(psddl_hdf2psana::Acqiris::make_TrigV1(schema_version, group, idx), src);
+    }
     break;
   case 913738682:
     cfgStore.putProxy(psddl_hdf2psana::Princeton::make_ConfigV5(schema_version, group, -1), src);
@@ -490,37 +538,14 @@ try {
       evt->putProxy(psddl_hdf2psana::Ipimb::make_DataV2(schema_version, group, idx), src);
     }
     break;
-  case 1048460753:
-    if (evt) {
-      evt->putProxy(psddl_hdf2psana::Bld::make_BldDataFEEGasDetEnergy(schema_version, group, idx), src);
-    }
+  case 1242681297:
+    cfgStore.putProxy(psddl_hdf2psana::PNCCD::make_ConfigV2(schema_version, group, -1), src);
+    break;
+  case 1242681298:
+    cfgStore.putProxy(psddl_hdf2psana::PNCCD::make_ConfigV1(schema_version, group, -1), src);
     break;
   case 1694947283:
     cfgStore.putProxy(psddl_hdf2psana::ControlData::make_PVControl(schema_version, group, -1), src);
-    break;
-  case 1461968857:
-    if (evt) {
-      if (boost::shared_ptr<Psana::CsPad::ConfigV1> cfgPtr = cfgStore.get(src)) {
-        evt->putProxy(psddl_hdf2psana::CsPad::make_ElementV1(schema_version, group, idx, cfgPtr), src);
-      } else if (boost::shared_ptr<Psana::CsPad::ConfigV2> cfgPtr = cfgStore.get(src)) {
-        evt->putProxy(psddl_hdf2psana::CsPad::make_ElementV1(schema_version, group, idx, cfgPtr), src);
-      } else if (boost::shared_ptr<Psana::CsPad::ConfigV3> cfgPtr = cfgStore.get(src)) {
-        evt->putProxy(psddl_hdf2psana::CsPad::make_ElementV1(schema_version, group, idx, cfgPtr), src);
-      } else if (boost::shared_ptr<Psana::CsPad::ConfigV4> cfgPtr = cfgStore.get(src)) {
-        evt->putProxy(psddl_hdf2psana::CsPad::make_ElementV1(schema_version, group, idx, cfgPtr), src);
-      }
-    }
-    break;
-  case 1461968858:
-    if (evt) {
-      if (boost::shared_ptr<Psana::CsPad::ConfigV2> cfgPtr = cfgStore.get(src)) {
-        evt->putProxy(psddl_hdf2psana::CsPad::make_ElementV2(schema_version, group, idx, cfgPtr), src);
-      } else if (boost::shared_ptr<Psana::CsPad::ConfigV3> cfgPtr = cfgStore.get(src)) {
-        evt->putProxy(psddl_hdf2psana::CsPad::make_ElementV2(schema_version, group, idx, cfgPtr), src);
-      } else if (boost::shared_ptr<Psana::CsPad::ConfigV4> cfgPtr = cfgStore.get(src)) {
-        evt->putProxy(psddl_hdf2psana::CsPad::make_ElementV2(schema_version, group, idx, cfgPtr), src);
-      }
-    }
     break;
   case 1387299804:
     cfgStore.putProxy(psddl_hdf2psana::OceanOptics::make_ConfigV1(schema_version, group, -1), src);
@@ -546,8 +571,8 @@ try {
       evt->putProxy(psddl_hdf2psana::Bld::make_BldDataEBeamV1(schema_version, group, idx), src);
     }
     break;
-  case 4103916011:
-    cfgStore.putProxy(psddl_hdf2psana::FCCD::make_FccdConfigV2(schema_version, group, -1), src);
+  case 2275609067:
+    cfgStore.putProxy(psddl_hdf2psana::Fli::make_ConfigV1(schema_version, group, -1), src);
     break;
   case 512147952:
     cfgStore.putProxy(psddl_hdf2psana::Lusi::make_DiodeFexConfigV2(schema_version, group, -1), src);
@@ -565,9 +590,9 @@ try {
       evt->putProxy(psddl_hdf2psana::ControlData::make_PVMonitor(schema_version, group, idx), src);
     }
     break;
-  case 4263170303:
+  case 1078464767:
     if (evt) {
-      evt->putProxy(psddl_hdf2psana::CsPad::make_ConfigV2QuadReg(schema_version, group, idx), src);
+      evt->putProxy(psddl_hdf2psana::Bld::make_BldDataEBeamV2(schema_version, group, idx), src);
     }
     break;
   } // end switch

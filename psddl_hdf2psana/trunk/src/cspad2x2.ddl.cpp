@@ -414,14 +414,6 @@ const Psana::CsPad2x2::CsPad2x2GainMapCfg& ConfigV1QuadReg_v0::gm() const {
 void ConfigV1QuadReg_v0::read_ds_data() const {
   m_ds_data = hdf5pp::Utils::readGroup<CsPad2x2::ns_ConfigV1QuadReg_v0::dataset_data>(m_group, "data", m_idx);
 }
-boost::shared_ptr<PSEvt::Proxy<Psana::CsPad2x2::ConfigV1QuadReg> > make_ConfigV1QuadReg(int version, hdf5pp::Group group, hsize_t idx) {
-  switch (version) {
-  case 0:
-    return boost::make_shared<PSEvt::DataProxy<Psana::CsPad2x2::ConfigV1QuadReg> >(boost::make_shared<ConfigV1QuadReg_v0>(group, idx));
-  default:
-    return boost::make_shared<PSEvt::DataProxy<Psana::CsPad2x2::ConfigV1QuadReg> >(boost::shared_ptr<Psana::CsPad2x2::ConfigV1QuadReg>());
-  }
-}
 
 hdf5pp::Type ns_ConfigV1_v0_dataset_config_stored_type()
 {
@@ -747,14 +739,6 @@ const Psana::CsPad2x2::CsPad2x2GainMapCfg& ConfigV2QuadReg_v0::gm() const {
 }
 void ConfigV2QuadReg_v0::read_ds_data() const {
   m_ds_data = hdf5pp::Utils::readGroup<CsPad2x2::ns_ConfigV2QuadReg_v0::dataset_data>(m_group, "data", m_idx);
-}
-boost::shared_ptr<PSEvt::Proxy<Psana::CsPad2x2::ConfigV2QuadReg> > make_ConfigV2QuadReg(int version, hdf5pp::Group group, hsize_t idx) {
-  switch (version) {
-  case 0:
-    return boost::make_shared<PSEvt::DataProxy<Psana::CsPad2x2::ConfigV2QuadReg> >(boost::make_shared<ConfigV2QuadReg_v0>(group, idx));
-  default:
-    return boost::make_shared<PSEvt::DataProxy<Psana::CsPad2x2::ConfigV2QuadReg> >(boost::shared_ptr<Psana::CsPad2x2::ConfigV2QuadReg>());
-  }
 }
 
 hdf5pp::Type ns_ConfigV2_v0_dataset_config_stored_type()

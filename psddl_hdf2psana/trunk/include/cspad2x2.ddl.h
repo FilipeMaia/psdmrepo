@@ -268,7 +268,6 @@ private:
   mutable boost::shared_ptr<Psana::CsPad2x2::CsPad2x2GainMapCfg> m_ds_storage_data_gainMap;
 };
 
-boost::shared_ptr<PSEvt::Proxy<Psana::CsPad2x2::ConfigV1QuadReg> > make_ConfigV1QuadReg(int version, hdf5pp::Group group, hsize_t idx);
 
 namespace ns_ConfigV1_v0 {
 struct dataset_config {
@@ -411,7 +410,6 @@ private:
   mutable boost::shared_ptr<Psana::CsPad2x2::CsPad2x2GainMapCfg> m_ds_storage_data_gainMap;
 };
 
-boost::shared_ptr<PSEvt::Proxy<Psana::CsPad2x2::ConfigV2QuadReg> > make_ConfigV2QuadReg(int version, hdf5pp::Group group, hsize_t idx);
 
 namespace ns_ConfigV2_v0 {
 struct dataset_config {

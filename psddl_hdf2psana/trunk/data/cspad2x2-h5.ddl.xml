@@ -10,6 +10,7 @@
         <!-- ========================================================================= -->
 
         <h5schema name="ConfigV1QuadReg" version="0">
+            <tag name="skip-proxy"/>
             <dataset name="data">
                 <attribute name="shiftSelect"/>
                 <attribute name="edgeSelect"/>
@@ -40,6 +41,7 @@
         
         
 	<h5schema name="ConfigV2QuadReg" version="0">
+            <tag name="skip-proxy"/>
             <dataset name="data">
                 <attribute name="shiftSelect"/>
                 <attribute name="edgeSelect"/>

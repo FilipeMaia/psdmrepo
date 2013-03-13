@@ -20,7 +20,7 @@ struct dataset_config {
   dataset_config();
   ~dataset_config();
 
-  char name[32]; 
+  char* name; 
   uint32_t index; 
   double value; 
   uint8_t array; 
@@ -55,7 +55,7 @@ struct dataset_data {
   dataset_data();
   ~dataset_data();
 
-  char name[32]; 
+  char* name; 
   uint32_t index; 
   double loValue; 
   double hiValue; 
@@ -91,8 +91,8 @@ struct dataset_data {
   dataset_data();
   ~dataset_data();
 
-  char name[32]; 
-  char value[64]; 
+  char* name; 
+  char* value; 
 
   operator Psana::ControlData::PVLabel() const { return Psana::ControlData::PVLabel(name, value); }
 };

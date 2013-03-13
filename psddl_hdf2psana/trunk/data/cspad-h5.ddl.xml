@@ -11,6 +11,7 @@
 
 
         <h5schema name="ConfigV1QuadReg" version="0">
+            <tag name="skip-proxy"/>
             <dataset name="data">
                 <attribute name="readClkSet"/>
                 <attribute name="readClkHold"/>
@@ -31,6 +32,7 @@
         </h5schema>
         
         <h5schema name="ConfigV2QuadReg" version="0">
+            <tag name="skip-proxy"/>
             <dataset name="data">
                 <attribute name="readClkSet"/>
                 <attribute name="readClkHold"/>
@@ -140,6 +142,7 @@
         </h5schema>
         
         <h5schema name="ElementV1" version="0">
+            <tag name="skip-proxy"/>
             <dataset name="element">
                 <attribute name="virtual_channel"/>
                 <attribute name="lane"/>
@@ -164,6 +167,7 @@
         </h5schema>
 
         <h5schema name="ElementV2" version="0">
+            <tag name="skip-proxy"/>
             <dataset name="element">
                 <attribute name="virtual_channel"/>
                 <attribute name="lane"/>

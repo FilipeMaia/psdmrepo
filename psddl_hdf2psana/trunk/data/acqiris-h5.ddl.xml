@@ -37,6 +37,7 @@
         </h5schema>
         
         <h5schema name="TimestampV1" version="0">
+            <tag name="skip-proxy"/>
             <dataset name="data">
                 <attribute name="pos"/>
                 <attribute name="timeStampLo"/>
@@ -46,23 +47,44 @@
         
         
         <h5schema name="DataDescV1Elem" version="0">
-            <dataset name="data">
-                <attribute name="nbrSamplesInSeg"/>
-                <attribute name="indexFirstPoint"/>
-                <attribute name="nbrSegments"/>
-            </dataset>
-            <dataset name="timestamp">
-                <attribute name="timestamp" rank="1"/>
-            </dataset>
-            <dataset name="waveforms">
-                <attribute name="waveforms" rank="2"/>
-            </dataset>
+            <tag name="skip-proxy"/>
+            <tag name="external" value="psddl_hdf2psana/acqiris.ddlm.h"/>
         </h5schema>
 
         <h5schema name="DataDescV1" version="0">
-            <tag name="external" value="psddl_hdf2psana/acquiris.ddlm.h"/>
+            <tag name="external" value="psddl_hdf2psana/acqiris.ddlm.h"/>
         </h5schema>
 
+
+
+        <h5schema name="TdcDataV1_Item" version="0">
+            <dataset name="data">
+                <attribute name="source" method="source"/>
+                <attribute name="overflow" method="bf_ofv_"/>
+                <attribute name="value" method="bf_val_"/>
+            </dataset>
+        </h5schema>
+        
+        <h5schema name="TdcDataV1Common" version="0">
+            <tag name="skip-proxy"/>
+            <tag name="external" value="psddl_hdf2psana/acqiris.ddlm.h"/>
+        </h5schema>
+        <h5schema name="TdcDataV1Channel" version="0">
+            <tag name="skip-proxy"/>
+            <tag name="external" value="psddl_hdf2psana/acqiris.ddlm.h"/>
+        </h5schema>
+        <h5schema name="TdcDataV1Marker" version="0">
+            <tag name="skip-proxy"/>
+            <tag name="external" value="psddl_hdf2psana/acqiris.ddlm.h"/>
+        </h5schema>
+
+        <h5schema name="TdcDataV1" version="0">
+            <dataset name="data">
+                <attribute name="data" rank="1">
+                    <tag name="vlen"/>
+                </attribute>
+            </dataset>
+        </h5schema>
 
     </package>
 

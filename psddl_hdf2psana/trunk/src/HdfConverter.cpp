@@ -45,7 +45,7 @@ namespace {
   const std::string srcAttrName("_xtcSrc");
 
   // name of the group holding EPICS data
-  const std::string epicsGroupName("Epics::EpicsPv");
+  const std::string epicsGroupName("/Epics::EpicsPv/");
 
   // helper class to build Src from stored 64-bit code
   class _SrcBuilder : public Pds::Src {
@@ -84,7 +84,7 @@ HdfConverter::~HdfConverter ()
 void
 HdfConverter::convert(const hdf5pp::Group& group, uint64_t idx, PSEvt::Event& evt, PSEnv::EnvObjectStore& cfgStore)
 {
-  const std::string& typeName = this->typeName(group);
+  const std::string& typeName = this->typeName(group.name());
   const Pds::Src& src = this->source(group);
   int schema = schemaVersion(group);
   
@@ -97,7 +97,7 @@ HdfConverter::convert(const hdf5pp::Group& group, uint64_t idx, PSEvt::Event& ev
 void
 HdfConverter::convertConfig(const hdf5pp::Group& group, uint64_t idx, PSEnv::EnvObjectStore& cfgStore)
 {
-  const std::string& typeName = this->typeName(group);
+  const std::string& typeName = this->typeName(group.name());
   const Pds::Src& src = this->source(group);
   int schema = schemaVersion(group);
   
@@ -118,29 +118,19 @@ HdfConverter::convertEpics(const hdf5pp::Group& group, uint64_t idx, PSEnv::Epic
 void
 HdfConverter::resetCache()
 {
+  MsgLog(logger, debug, "HdfConverter::resetCache");
   m_schemaVersionCache.clear();
-  m_isEpicsCache.clear();
-  m_typeNameCache.clear();
   m_sourceCache.clear();
 }
 
+// test if the group is inside EPICS group (has a parent named Epics::EpicsPv)
 bool
-HdfConverter::isEpics(const hdf5pp::Group& group, int levels) const
+HdfConverter::isEpics(const std::string& group) const
 {
-  // check cache first
-  std::map<hdf5pp::Group, bool>::const_iterator it = m_isEpicsCache.find(group);
-  if (it !=  m_isEpicsCache.end()) return it->second;
+  MsgLog(logger, debug, "HdfConverter::isEpics - group: " << group);
 
   // look at group name
-  bool res = group.basename() == ::epicsGroupName;
-  if (not res and levels > 0) {
-    // try its parent
-    hdf5pp::Group parent = group.parent();
-    if (parent.valid()) res = isEpics(parent, levels - 1);
-  }
-
-  // update cache
-  m_isEpicsCache.insert(std::make_pair(group, res));
+  bool res = group.find(::epicsGroupName) != std::string::npos;
 
   return res;
 }
@@ -148,15 +138,27 @@ HdfConverter::isEpics(const hdf5pp::Group& group, int levels) const
 int
 HdfConverter::schemaVersion(const hdf5pp::Group& group, int levels) const
 {
-  // with default argument call myself with correct level depending on type of group
-  if (levels < 0) return schemaVersion(group, isEpics(group) ? 2 : 1);
+  MsgLog(logger, debug, "HdfConverter::schemaVersion - group: " << group);
 
-  // check cache first
-  std::map<hdf5pp::Group, int>::const_iterator it = m_schemaVersionCache.find(group);
-  if (it !=  m_schemaVersionCache.end()) return it->second;
+  const std::string& name = group.name();
+  int version = 0;
+
+  // with default argument call myself with correct level depending on type of group
+  if (levels < 0) {
+
+    // check cache first
+    std::map<std::string, int>::const_iterator it = m_schemaVersionCache.find(name);
+    if (it !=  m_schemaVersionCache.end()) return it->second;
+
+    version = schemaVersion(group, isEpics(name) ? 2 : 1);
+
+    // update cache
+    m_schemaVersionCache.insert(std::make_pair(name, version));
+
+    return version;
+  }
 
   // look at attribute
-  int version = 0;
   hdf5pp::Attribute<int> attr = group.openAttr<int>(::versionAttrName);
   if (attr.valid()) {
     version = attr.read();
@@ -166,35 +168,24 @@ HdfConverter::schemaVersion(const hdf5pp::Group& group, int levels) const
     if (parent.valid()) version = schemaVersion(parent, levels - 1);
   }
 
-  // update cache
-  m_schemaVersionCache.insert(std::make_pair(group, version));
-
   return version;
 }
 
 // Get TypeId for the group or its parent (and its grand-parent for EPICS),
 std::string
-HdfConverter::typeName(const hdf5pp::Group& group, int levels) const
+HdfConverter::typeName(const std::string& group) const
 {
-  std::string typeName;
-  
-  // check cache first
-  std::map<hdf5pp::Group, std::string>::const_iterator it = m_typeNameCache.find(group);
-  if (it !=  m_typeNameCache.end()) {
-    typeName = it->second;
-  } else if (levels < 0) {
-    // with default argument call myself with correct level depending on type of group
-    typeName = this->typeName(group, isEpics(group) ? 2 : 1);
-  } else if (levels == 0) {
-    // type name is a group name for top-level type group
-    typeName = group.basename();
-    // update cache
-    m_typeNameCache.insert(std::make_pair(group, typeName));
-  } else {
-    // try parent group
-    hdf5pp::Group parent = group.parent();
-    if (parent.valid()) typeName = this->typeName(parent, levels - 1);
+  MsgLog(logger, debug, "HdfConverter::typeName - group: " << group);
+
+  std::string typeName = group;
+  std::string::size_type p = typeName.rfind('/');
+  typeName.erase(p);
+  if (isEpics(group)) {
+    p = typeName.rfind('/');
+    typeName.erase(p);
   }
+  p = typeName.rfind('/');
+  typeName.erase(0, p+1);
 
   return typeName;
 }
@@ -204,11 +195,15 @@ HdfConverter::typeName(const hdf5pp::Group& group, int levels) const
 Pds::Src
 HdfConverter::source(const hdf5pp::Group& group, int levels) const
 {
+  MsgLog(logger, debug, "HdfConverter::source - group: " << group);
+
+  const std::string& name = group.name();
+
   // with default argument call myself with correct level depending on type of group
-  if (levels < 0) return source(group, isEpics(group) ? 1 : 0);
+  if (levels < 0) return source(group, isEpics(name) ? 1 : 0);
 
   // check cache first
-  std::map<hdf5pp::Group, Pds::Src>::const_iterator it = m_sourceCache.find(group);
+  std::map<std::string, Pds::Src>::const_iterator it = m_sourceCache.find(name);
   if (it !=  m_sourceCache.end()) return it->second;
 
   // look at attribute
@@ -236,7 +231,7 @@ HdfConverter::source(const hdf5pp::Group& group, int levels) const
   }
 
   // update cache
-  m_sourceCache.insert(std::make_pair(group, src));
+  m_sourceCache.insert(std::make_pair(name, src));
 
   return src;
 }

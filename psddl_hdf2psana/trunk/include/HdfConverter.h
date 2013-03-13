@@ -85,25 +85,22 @@ public:
 
 protected:
 
-  // test if the group is or inside EPICS group (named Epics::EpicsPv),
-  // check only limited number of levels up
-  bool isEpics(const hdf5pp::Group& group, int levels=2) const;
+  // test if the group is inside EPICS group (has a parent named Epics::EpicsPv)
+  bool isEpics(const std::string& group) const;
 
   // Get schema version for the group or its parent (and its grand-parent for EPICS),
   int schemaVersion(const hdf5pp::Group& group, int levels = -1) const;
 
-  // Get type name for the group or its parent (and its grand-parent for EPICS),
-  std::string typeName(const hdf5pp::Group& group, int levels = -1) const;
+  // Get type name for the parent of this group (or its grand-parent for EPICS),
+  std::string typeName(const std::string& group) const;
 
   // Get Source for the group (or its parent for EPICS),
   Pds::Src source(const hdf5pp::Group& group, int levels = -1) const;
 
 private:
 
-  mutable std::map<hdf5pp::Group, int> m_schemaVersionCache;
-  mutable std::map<hdf5pp::Group, bool> m_isEpicsCache;
-  mutable std::map<hdf5pp::Group, std::string> m_typeNameCache;
-  mutable std::map<hdf5pp::Group, Pds::Src> m_sourceCache;
+  mutable std::map<std::string, int> m_schemaVersionCache;
+  mutable std::map<std::string, Pds::Src> m_sourceCache;
 
 };
 

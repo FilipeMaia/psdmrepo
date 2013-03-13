@@ -331,7 +331,7 @@ struct dataset_data {
   dataset_data();
   ~dataset_data();
 
-  char gasType[32]; 
+  char* gasType; 
   double pressure; 
   double temperature; 
   double current; 

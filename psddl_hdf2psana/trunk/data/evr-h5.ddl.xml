@@ -11,6 +11,8 @@
     
         <h5schema name="SequencerConfigV1" version="0">
 
+            <tag name="skip-proxy"/>
+
             <dataset name="config">
 
                 <attribute name="sync_source"/>
@@ -39,47 +41,6 @@
             
         </h5schema>
     
-        <!-- ========================================================================= -->
-
-        <h5schema name="EventCodeV5" version="0">
-
-            <dataset name="data">
-                <attribute name="code"/>
-                <attribute name="isReadout"/>
-                <attribute name="isCommand"/>
-                <attribute name="isLatch"/>
-                <attribute name="reportDelay"/>
-                <attribute name="reportWidth"/>
-                <attribute name="maskTrigger"/>
-                <attribute name="maskSet"/>
-                <attribute name="maskClear"/>
-                <attribute name="desc" rank="1">
-                    <tag name="vlen"/>
-                </attribute>
-            </dataset>
-
-        </h5schema>
-
-        <!-- ========================================================================= -->
-
-        <h5schema name="EventCodeV6" version="0">
-            <dataset name="data">
-                <attribute name="code"/>
-                <attribute name="isReadout"/>
-                <attribute name="isCommand"/>
-                <attribute name="isLatch"/>
-                <attribute name="reportDelay"/>
-                <attribute name="reportWidth"/>
-                <attribute name="maskTrigger"/>
-                <attribute name="maskSet"/>
-                <attribute name="maskClear"/>
-                <attribute name="desc" rank="1">
-                    <tag name="vlen"/>
-                </attribute>
-                <attribute name="readoutGroup"/>
-            </dataset>
-        </h5schema>
-
         <!-- ========================================================================= -->
     
         <h5schema name="ConfigV5" version="0">
@@ -168,6 +129,7 @@
     
         <h5schema name="IOChannel" version="0">
 
+            <tag name="skip-proxy"/>
             <tag name="external" value="psddl_hdf2psana/evr.ddlm.h"/>
             
         </h5schema>

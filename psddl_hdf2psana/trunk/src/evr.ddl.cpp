@@ -1121,14 +1121,6 @@ ndarray<const Psana::EvrData::SequencerEntry, 1> SequencerConfigV1_v0::entries()
 void SequencerConfigV1_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<EvrData::ns_SequencerConfigV1_v0::dataset_config>(m_group, "config", m_idx);
 }
-boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::SequencerConfigV1> > make_SequencerConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
-  switch (version) {
-  case 0:
-    return boost::make_shared<PSEvt::DataProxy<Psana::EvrData::SequencerConfigV1> >(boost::make_shared<SequencerConfigV1_v0>(group, idx));
-  default:
-    return boost::make_shared<PSEvt::DataProxy<Psana::EvrData::SequencerConfigV1> >(boost::shared_ptr<Psana::EvrData::SequencerConfigV1>());
-  }
-}
 
 hdf5pp::Type ns_ConfigV5_v0_dataset_config_stored_type()
 {
@@ -1651,14 +1643,6 @@ boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::DataV3> > make_DataV3(int version
     return boost::make_shared<PSEvt::DataProxy<Psana::EvrData::DataV3> >(boost::make_shared<DataV3_v0>(group, idx));
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::EvrData::DataV3> >(boost::shared_ptr<Psana::EvrData::DataV3>());
-  }
-}
-boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::IOChannel> > make_IOChannel(int version, hdf5pp::Group group, hsize_t idx) {
-  switch (version) {
-  case 0:
-    return boost::make_shared<Proxy_IOChannel_v0>(group, idx);
-  default:
-    return boost::make_shared<PSEvt::DataProxy<Psana::EvrData::IOChannel> >(boost::shared_ptr<Psana::EvrData::IOChannel>());
   }
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::IOConfigV1> > make_IOConfigV1(int version, hdf5pp::Group group, hsize_t idx) {

@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: andy-20130313-01
+2013-03-13 Andy Salnikov
+- added acqiris and pnccd
+
 Tag: andy-20130312-01
 2013-03-12 Andy Salnikov
 - progress on vlen arrays, adding evr abd bld to the bunch

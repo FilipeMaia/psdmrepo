@@ -372,14 +372,6 @@ const Psana::CsPad::CsPadGainMapCfg& ConfigV1QuadReg_v0::gm() const {
 void ConfigV1QuadReg_v0::read_ds_data() const {
   m_ds_data = hdf5pp::Utils::readGroup<CsPad::ns_ConfigV1QuadReg_v0::dataset_data>(m_group, "data", m_idx);
 }
-boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::ConfigV1QuadReg> > make_ConfigV1QuadReg(int version, hdf5pp::Group group, hsize_t idx) {
-  switch (version) {
-  case 0:
-    return boost::make_shared<PSEvt::DataProxy<Psana::CsPad::ConfigV1QuadReg> >(boost::make_shared<ConfigV1QuadReg_v0>(group, idx));
-  default:
-    return boost::make_shared<PSEvt::DataProxy<Psana::CsPad::ConfigV1QuadReg> >(boost::shared_ptr<Psana::CsPad::ConfigV1QuadReg>());
-  }
-}
 
 hdf5pp::Type ns_ConfigV2QuadReg_v0_dataset_data_stored_type()
 {
@@ -541,14 +533,6 @@ const Psana::CsPad::CsPadGainMapCfg& ConfigV2QuadReg_v0::gm() const {
 }
 void ConfigV2QuadReg_v0::read_ds_data() const {
   m_ds_data = hdf5pp::Utils::readGroup<CsPad::ns_ConfigV2QuadReg_v0::dataset_data>(m_group, "data", m_idx);
-}
-boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::ConfigV2QuadReg> > make_ConfigV2QuadReg(int version, hdf5pp::Group group, hsize_t idx) {
-  switch (version) {
-  case 0:
-    return boost::make_shared<PSEvt::DataProxy<Psana::CsPad::ConfigV2QuadReg> >(boost::make_shared<ConfigV2QuadReg_v0>(group, idx));
-  default:
-    return boost::make_shared<PSEvt::DataProxy<Psana::CsPad::ConfigV2QuadReg> >(boost::shared_ptr<Psana::CsPad::ConfigV2QuadReg>());
-  }
 }
 
 hdf5pp::Type ns_ConfigV1_v0_dataset_config_stored_type()
@@ -1383,38 +1367,6 @@ template class ElementV1_v0<Psana::CsPad::ConfigV1>;
 template class ElementV1_v0<Psana::CsPad::ConfigV2>;
 template class ElementV1_v0<Psana::CsPad::ConfigV3>;
 template class ElementV1_v0<Psana::CsPad::ConfigV4>;
-boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::ElementV1> > make_ElementV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::CsPad::ConfigV1>& cfg) {
-  switch (version) {
-  case 0:
-    return boost::make_shared<PSEvt::DataProxy<Psana::CsPad::ElementV1> >(boost::make_shared<ElementV1_v0<Psana::CsPad::ConfigV1> >(group, idx, cfg));
-  default:
-    return boost::make_shared<PSEvt::DataProxy<Psana::CsPad::ElementV1> >(boost::shared_ptr<Psana::CsPad::ElementV1>());
-  }
-}
-boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::ElementV1> > make_ElementV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::CsPad::ConfigV2>& cfg) {
-  switch (version) {
-  case 0:
-    return boost::make_shared<PSEvt::DataProxy<Psana::CsPad::ElementV1> >(boost::make_shared<ElementV1_v0<Psana::CsPad::ConfigV2> >(group, idx, cfg));
-  default:
-    return boost::make_shared<PSEvt::DataProxy<Psana::CsPad::ElementV1> >(boost::shared_ptr<Psana::CsPad::ElementV1>());
-  }
-}
-boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::ElementV1> > make_ElementV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::CsPad::ConfigV3>& cfg) {
-  switch (version) {
-  case 0:
-    return boost::make_shared<PSEvt::DataProxy<Psana::CsPad::ElementV1> >(boost::make_shared<ElementV1_v0<Psana::CsPad::ConfigV3> >(group, idx, cfg));
-  default:
-    return boost::make_shared<PSEvt::DataProxy<Psana::CsPad::ElementV1> >(boost::shared_ptr<Psana::CsPad::ElementV1>());
-  }
-}
-boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::ElementV1> > make_ElementV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::CsPad::ConfigV4>& cfg) {
-  switch (version) {
-  case 0:
-    return boost::make_shared<PSEvt::DataProxy<Psana::CsPad::ElementV1> >(boost::make_shared<ElementV1_v0<Psana::CsPad::ConfigV4> >(group, idx, cfg));
-  default:
-    return boost::make_shared<PSEvt::DataProxy<Psana::CsPad::ElementV1> >(boost::shared_ptr<Psana::CsPad::ElementV1>());
-  }
-}
 boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::DataV1> > make_DataV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::CsPad::ConfigV1>& cfg) {
   switch (version) {
   case 0:
@@ -1589,30 +1541,6 @@ void ElementV2_v0<Config>::read_ds_data() const {
 template class ElementV2_v0<Psana::CsPad::ConfigV2>;
 template class ElementV2_v0<Psana::CsPad::ConfigV3>;
 template class ElementV2_v0<Psana::CsPad::ConfigV4>;
-boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::ElementV2> > make_ElementV2(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::CsPad::ConfigV2>& cfg) {
-  switch (version) {
-  case 0:
-    return boost::make_shared<PSEvt::DataProxy<Psana::CsPad::ElementV2> >(boost::make_shared<ElementV2_v0<Psana::CsPad::ConfigV2> >(group, idx, cfg));
-  default:
-    return boost::make_shared<PSEvt::DataProxy<Psana::CsPad::ElementV2> >(boost::shared_ptr<Psana::CsPad::ElementV2>());
-  }
-}
-boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::ElementV2> > make_ElementV2(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::CsPad::ConfigV3>& cfg) {
-  switch (version) {
-  case 0:
-    return boost::make_shared<PSEvt::DataProxy<Psana::CsPad::ElementV2> >(boost::make_shared<ElementV2_v0<Psana::CsPad::ConfigV3> >(group, idx, cfg));
-  default:
-    return boost::make_shared<PSEvt::DataProxy<Psana::CsPad::ElementV2> >(boost::shared_ptr<Psana::CsPad::ElementV2>());
-  }
-}
-boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::ElementV2> > make_ElementV2(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::CsPad::ConfigV4>& cfg) {
-  switch (version) {
-  case 0:
-    return boost::make_shared<PSEvt::DataProxy<Psana::CsPad::ElementV2> >(boost::make_shared<ElementV2_v0<Psana::CsPad::ConfigV4> >(group, idx, cfg));
-  default:
-    return boost::make_shared<PSEvt::DataProxy<Psana::CsPad::ElementV2> >(boost::shared_ptr<Psana::CsPad::ElementV2>());
-  }
-}
 boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::DataV2> > make_DataV2(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::CsPad::ConfigV2>& cfg) {
   switch (version) {
   case 0:

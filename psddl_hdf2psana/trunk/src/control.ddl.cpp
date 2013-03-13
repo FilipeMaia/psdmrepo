@@ -15,7 +15,7 @@ hdf5pp::Type ns_PVControl_v0_dataset_config_stored_type()
 {
   typedef ns_PVControl_v0::dataset_config DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("name", offsetof(DsType, name), hdf5pp::TypeTraits<const char*>::stored_type(32));
+  type.insert("name", offsetof(DsType, name), hdf5pp::TypeTraits<const char*>::stored_type());
   type.insert("index", offsetof(DsType, index), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("value", offsetof(DsType, value), hdf5pp::TypeTraits<double>::stored_type());
   type.insert("array", offsetof(DsType, array), hdf5pp::TypeTraits<uint8_t>::stored_type());
@@ -32,7 +32,7 @@ hdf5pp::Type ns_PVControl_v0_dataset_config_native_type()
 {
   typedef ns_PVControl_v0::dataset_config DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("name", offsetof(DsType, name), hdf5pp::TypeTraits<const char*>::native_type(32));
+  type.insert("name", offsetof(DsType, name), hdf5pp::TypeTraits<const char*>::native_type());
   type.insert("index", offsetof(DsType, index), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("value", offsetof(DsType, value), hdf5pp::TypeTraits<double>::native_type());
   type.insert("array", offsetof(DsType, array), hdf5pp::TypeTraits<uint8_t>::native_type());
@@ -73,7 +73,7 @@ hdf5pp::Type ns_PVMonitor_v0_dataset_data_stored_type()
 {
   typedef ns_PVMonitor_v0::dataset_data DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("name", offsetof(DsType, name), hdf5pp::TypeTraits<const char*>::stored_type(32));
+  type.insert("name", offsetof(DsType, name), hdf5pp::TypeTraits<const char*>::stored_type());
   type.insert("index", offsetof(DsType, index), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("loValue", offsetof(DsType, loValue), hdf5pp::TypeTraits<double>::stored_type());
   type.insert("hiValue", offsetof(DsType, hiValue), hdf5pp::TypeTraits<double>::stored_type());
@@ -91,7 +91,7 @@ hdf5pp::Type ns_PVMonitor_v0_dataset_data_native_type()
 {
   typedef ns_PVMonitor_v0::dataset_data DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("name", offsetof(DsType, name), hdf5pp::TypeTraits<const char*>::native_type(32));
+  type.insert("name", offsetof(DsType, name), hdf5pp::TypeTraits<const char*>::native_type());
   type.insert("index", offsetof(DsType, index), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("loValue", offsetof(DsType, loValue), hdf5pp::TypeTraits<double>::native_type());
   type.insert("hiValue", offsetof(DsType, hiValue), hdf5pp::TypeTraits<double>::native_type());
@@ -133,8 +133,8 @@ hdf5pp::Type ns_PVLabel_v0_dataset_data_stored_type()
 {
   typedef ns_PVLabel_v0::dataset_data DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("name", offsetof(DsType, name), hdf5pp::TypeTraits<const char*>::stored_type(32));
-  type.insert("value", offsetof(DsType, value), hdf5pp::TypeTraits<const char*>::stored_type(64));
+  type.insert("name", offsetof(DsType, name), hdf5pp::TypeTraits<const char*>::stored_type());
+  type.insert("value", offsetof(DsType, value), hdf5pp::TypeTraits<const char*>::stored_type());
   return type;
 }
 
@@ -148,8 +148,8 @@ hdf5pp::Type ns_PVLabel_v0_dataset_data_native_type()
 {
   typedef ns_PVLabel_v0::dataset_data DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("name", offsetof(DsType, name), hdf5pp::TypeTraits<const char*>::native_type(32));
-  type.insert("value", offsetof(DsType, value), hdf5pp::TypeTraits<const char*>::native_type(64));
+  type.insert("name", offsetof(DsType, name), hdf5pp::TypeTraits<const char*>::native_type());
+  type.insert("value", offsetof(DsType, value), hdf5pp::TypeTraits<const char*>::native_type());
   return type;
 }
 

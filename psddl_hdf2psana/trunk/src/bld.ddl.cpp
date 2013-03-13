@@ -550,7 +550,7 @@ hdf5pp::Type ns_BldDataGMDV0_v0_dataset_data_stored_type()
 {
   typedef ns_BldDataGMDV0_v0::dataset_data DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("gasType", offsetof(DsType, gasType), hdf5pp::TypeTraits<const char*>::stored_type(32));
+  type.insert("gasType", offsetof(DsType, gasType), hdf5pp::TypeTraits<const char*>::stored_type());
   type.insert("pressure", offsetof(DsType, pressure), hdf5pp::TypeTraits<double>::stored_type());
   type.insert("temperature", offsetof(DsType, temperature), hdf5pp::TypeTraits<double>::stored_type());
   type.insert("current", offsetof(DsType, current), hdf5pp::TypeTraits<double>::stored_type());
@@ -578,7 +578,7 @@ hdf5pp::Type ns_BldDataGMDV0_v0_dataset_data_native_type()
 {
   typedef ns_BldDataGMDV0_v0::dataset_data DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("gasType", offsetof(DsType, gasType), hdf5pp::TypeTraits<const char*>::native_type(32));
+  type.insert("gasType", offsetof(DsType, gasType), hdf5pp::TypeTraits<const char*>::native_type());
   type.insert("pressure", offsetof(DsType, pressure), hdf5pp::TypeTraits<double>::native_type());
   type.insert("temperature", offsetof(DsType, temperature), hdf5pp::TypeTraits<double>::native_type());
   type.insert("current", offsetof(DsType, current), hdf5pp::TypeTraits<double>::native_type());

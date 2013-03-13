@@ -12,6 +12,7 @@
     
         <h5schema name="ClockTime" version="0">
 
+            <tag name="skip-proxy"/>
             <dataset name="data">
 
                 <attribute type="uint32_t" name="nanoseconds"/>
@@ -25,6 +26,7 @@
     
         <h5schema name="DetInfo" version="0">
 
+            <tag name="skip-proxy"/>
             <dataset name="data">
                 <attribute type="uint32_t" name="log"/>
                 <attribute type="uint32_t" name="phy"/>

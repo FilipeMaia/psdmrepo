@@ -570,7 +570,6 @@ private:
   mutable ndarray<const Psana::EvrData::SequencerEntry, 1> m_ds_storage_config_entries;
 };
 
-boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::SequencerConfigV1> > make_SequencerConfigV1(int version, hdf5pp::Group group, hsize_t idx);
 
 namespace ns_ConfigV5_v0 {
 struct dataset_config {
@@ -824,7 +823,6 @@ private:
 };
 
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::DataV3> > make_DataV3(int version, hdf5pp::Group group, hsize_t idx);
-boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::IOChannel> > make_IOChannel(int version, hdf5pp::Group group, hsize_t idx);
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::IOConfigV1> > make_IOConfigV1(int version, hdf5pp::Group group, hsize_t idx);
 } // namespace EvrData
 } // namespace psddl_hdf2psana
