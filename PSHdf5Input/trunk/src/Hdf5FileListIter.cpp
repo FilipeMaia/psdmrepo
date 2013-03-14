@@ -54,12 +54,17 @@ Hdf5FileListIter::~Hdf5FileListIter ()
 Hdf5FileListIter::value_type 
 Hdf5FileListIter::next()
 {
+  value_type res;
+
   while (true) {
 
     if (not m_fileIter.get()) {
     
       // no more files left - we are done
-      if (m_fileNames.empty()) return value_type(value_type::Stop);
+      if (m_fileNames.empty()) {
+        res = value_type(value_type::Stop, boost::shared_ptr<PSEvt::EventId>());
+        break;
+      }
 
       // open next file
       std::string fileName = m_fileNames.front();
@@ -69,16 +74,17 @@ Hdf5FileListIter::next()
     }
     
     // read next event from file
-    value_type res = m_fileIter->next();
+    res = m_fileIter->next();
 
     // close the file if it sends us Stop
     if (res.type() == value_type::Stop) {
       m_fileIter.reset();
     } else {
-      return res;
+      break;
     }
   }
 
+  return res;
 }
 
 } // namespace PSHdf5Input

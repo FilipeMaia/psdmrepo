@@ -81,17 +81,14 @@ public:
 
 protected:
 
-  // Store config object in environment
-  void fillConfig(const Hdf5IterData& data, Env& env);
-
   // Store EPICS data in environment
   void fillEpics(const Hdf5IterData& data, Env& env);
 
   // Store event ID object
   void fillEventId(const Hdf5IterData& data, Event& evt);
 
-  // Store event data objects
-  void fillEvent(const Hdf5IterData& data, Event& evt, Env& env);
+  // Store data objects in even and environment
+  void fillEventEnv(const Hdf5IterData& data, Event& evt, Env& env);
 
 private:
 

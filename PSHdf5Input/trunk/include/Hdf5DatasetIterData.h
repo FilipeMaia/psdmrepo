@@ -53,6 +53,9 @@ namespace PSHdf5Input {
 struct Hdf5DatasetIterData  {
 public:
 
+  Hdf5DatasetIterData()
+    : index(0), sec(0), nsec(0), ticks(0), fiducials(0), control(0), vector(0) {}
+
   /// Compare two objects, time only
   bool operator<(const Hdf5DatasetIterData& other) const 
   {
@@ -66,6 +69,10 @@ public:
   uint64_t      index;   ///< Object index in a datasets
   uint32_t      sec;     ///< Time (seconds part) at current index
   uint32_t      nsec;    ///< Time (nanoseconds part) at current index
+  uint32_t      ticks;
+  uint32_t      fiducials;
+  uint32_t      control;
+  uint32_t      vector;
 };
 
 } // namespace PSHdf5Input

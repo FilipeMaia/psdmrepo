@@ -116,7 +116,7 @@ Hdf5InputModule::beginJob(Event& evt, Env& env)
   }
 
   // fill everything
-  fillConfig(data, env);
+  fillEventEnv(data, evt, env);
   fillEventId(data, evt);
   fillEpics(data, env);
 }
@@ -131,7 +131,7 @@ Hdf5InputModule::event(Event& evt, Env& env)
   InputModule::Status ret = InputModule::Abort;
   switch(data.type()) {
   case Hdf5IterData::Configure:
-    fillConfig(data, env);
+    fillEventEnv(data, evt, env);
     fillEventId(data, evt);
     fillEpics(data, env);
     ret = InputModule::Skip;
@@ -141,7 +141,7 @@ Hdf5InputModule::event(Event& evt, Env& env)
     ret = InputModule::BeginRun;
     break;
   case Hdf5IterData::BeginCalibCycle:
-    fillConfig(data, env);
+    fillEventEnv(data, evt, env);
     fillEventId(data, evt);
     ret = InputModule::BeginCalibCycle;
     break;
@@ -151,8 +151,8 @@ Hdf5InputModule::event(Event& evt, Env& env)
     } else if (m_l1Count < m_skipEvents) {
       ret = InputModule::Skip;
     } else {
+      fillEventEnv(data, evt, env);
       fillEventId(data, evt);
-      fillEvent(data, evt, env);
       fillEpics(data, env);
       ret = InputModule::DoEvent;
     }
@@ -185,20 +185,6 @@ Hdf5InputModule::event(Event& evt, Env& env)
 void 
 Hdf5InputModule::endJob(Event& evt, Env& env)
 {
-    
-}
-
-// Store config object in environment
-void
-Hdf5InputModule::fillConfig(const Hdf5IterData& data, Env& env)
-{
-  MsgLog(name(), debug, name() << ": in fillConfig()");
-
-  // call converter for every piece of data
-  const Hdf5IterData::seq_type& pieces = data.data();
-  for (Hdf5IterData::const_iterator it = pieces.begin(); it != pieces.end(); ++ it) {
-    m_cvt.convertConfig(it->group, it->index, env.configStore());
-  }
 }
 
 // Store EPICS data in environment
@@ -221,20 +207,19 @@ Hdf5InputModule::fillEventId(const Hdf5IterData& data, Event& evt)
   MsgLog(name(), debug, name() << ": in fillEventId()");
 
   // Store event ID
-  boost::shared_ptr<PSEvt::EventId> eventId( new Hdf5EventId(data.run(), data.time()) );
-  evt.put(eventId);
+  evt.put(data.eventId());
 }
 
 // Store event data objects
 void
-Hdf5InputModule::fillEvent(const Hdf5IterData& data, Event& evt, Env& env)
+Hdf5InputModule::fillEventEnv(const Hdf5IterData& data, Event& evt, Env& env)
 {
   MsgLog(name(), debug, name() << ": in fillEvent()");
 
   // call converter for every piece of data
   const Hdf5IterData::seq_type& pieces = data.data();
   for (Hdf5IterData::const_iterator it = pieces.begin(); it != pieces.end(); ++ it) {
-    m_cvt.convert(it->group, it->index, evt, env.configStore());
+    m_cvt.convert(it->group, it->index, evt, env);
   }
 }
 

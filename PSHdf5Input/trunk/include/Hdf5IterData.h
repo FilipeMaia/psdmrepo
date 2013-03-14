@@ -13,18 +13,19 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
-#include <list>
+#include <vector>
 #include <iosfwd>
 
 //----------------------
 // Base Class Headers --
 //----------------------
+#include <boost/shared_ptr.hpp>
 
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
 #include "hdf5pp/Group.h"
-#include "PSTime/Time.h"
+#include "PSEvt/EventId.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -61,10 +62,10 @@ public:
   /// Description of the single data object in HDF5 file
   struct SingleDataItem {
     SingleDataItem() {}
-    SingleDataItem(const hdf5pp::Group& agroup, uint64_t aindex) 
+    SingleDataItem(const hdf5pp::Group& agroup, int64_t aindex)
       : group(agroup), index(aindex) {}
     hdf5pp::Group group;   ///< Group where object resides
-    uint64_t      index;   ///< Object index in a datasets
+    int64_t      index;   ///< Object index in a datasets
   };
 
   /// Type of the event for the iterator
@@ -82,16 +83,19 @@ public:
   /// Typedef for single data object
   typedef SingleDataItem value_type;
   /// Typedef for set of data objects
-  typedef std::list<value_type> seq_type;
+  typedef std::vector<value_type> seq_type;
   /// Typedef for data object iterator
   typedef seq_type::const_iterator const_iterator;
   
+  /// Default constructor
+  Hdf5IterData () : m_type(Stop), m_data(), m_eid() {}
+
   /// Constructor takes event type, use add() method to add data objects
-  Hdf5IterData (EventType type) 
-    : m_type(type), m_data(), m_run(-1), m_time() {}
+  Hdf5IterData (EventType type, const boost::shared_ptr<PSEvt::EventId>& eid)
+    : m_type(type), m_data(), m_eid(eid) {}
 
   /// Add one more data object
-  void add(const hdf5pp::Group& group, uint64_t index) {
+  void add(const hdf5pp::Group& group, int64_t index) {
     m_data.push_back(value_type(group, index));
   }
   
@@ -101,17 +105,8 @@ public:
   /// Returns sequence of data objects
   const seq_type& data() const { return m_data; }
 
-  /// Returns run number
-  int run() const { return m_run; }
-  
-  /// Returns event time
-  const PSTime::Time& time() const { return m_time; }
-
-  /// Update run number
-  void setRun(int run) { m_run = run; }
-
-  /// Update event time
-  void setTime(const PSTime::Time& time) { m_time = time; }
+  /// Returns eventId for this instance
+  const boost::shared_ptr<PSEvt::EventId>& eventId() const { return m_eid; }
   
 protected:
 
@@ -119,8 +114,7 @@ private:
 
   EventType m_type;     ///< Event type for current iteration
   seq_type m_data;      ///< Set of data objects
-  int m_run;
-  PSTime::Time m_time;
+  boost::shared_ptr<PSEvt::EventId> m_eid;  ///< EventId for this event data
 };
 
 /// Standard stream insertion operator for enum type

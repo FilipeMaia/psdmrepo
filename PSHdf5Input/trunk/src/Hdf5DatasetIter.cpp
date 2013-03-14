@@ -41,6 +41,10 @@ namespace {
     hdf5pp::CompoundType dataType = hdf5pp::CompoundType::compoundType<PSHdf5Input::Hdf5DatasetIterData>() ;
     dataType.insert_native<uint32_t>("seconds", offsetof(PSHdf5Input::Hdf5DatasetIterData, sec));
     dataType.insert_native<uint32_t>("nanoseconds", offsetof(PSHdf5Input::Hdf5DatasetIterData, nsec));
+    dataType.insert_native<uint32_t>("ticks", offsetof(PSHdf5Input::Hdf5DatasetIterData, ticks));
+    dataType.insert_native<uint32_t>("fiducials", offsetof(PSHdf5Input::Hdf5DatasetIterData, fiducials));
+    dataType.insert_native<uint32_t>("control", offsetof(PSHdf5Input::Hdf5DatasetIterData, control));
+    dataType.insert_native<uint32_t>("vector", offsetof(PSHdf5Input::Hdf5DatasetIterData, vector));
     return dataType;
   }
 
@@ -99,10 +103,8 @@ Hdf5DatasetIter::updateData()
   // in-memory dataspace
   hdf5pp::DataSpace mem_ds = hdf5pp::DataSpace::makeScalar();
 
-  // define hyper-slab for in-file dataspace
-  hsize_t offset[1] = { m_index };
-  hsize_t count[1] = { 1 };
-  m_dsp.select_hyperslab(H5S_SELECT_SET, offset, 0, count, 0);
+  // define single-item hyper-slab for in-file dataspace
+  m_dsp.select_single(m_index);
   
   m_ds.read(mem_ds, m_dsp, &m_data, ::iterDataType);
 }

@@ -18,6 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <boost/make_shared.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 
 //-------------------------------
@@ -26,6 +27,7 @@
 #include "hdf5pp/GroupIter.h"
 #include "PSHdf5Input/Exceptions.h"
 #include "PSHdf5Input/Hdf5CalibCycleIter.h"
+#include "PSHdf5Input/Hdf5EventId.h"
 #include "PSHdf5Input/Hdf5Utils.h"
 #include "MsgLogger/MsgLogger.h"
 
@@ -55,8 +57,9 @@ namespace PSHdf5Input {
 //----------------
 // Constructors --
 //----------------
-Hdf5RunIter::Hdf5RunIter (const hdf5pp::Group& grp)
+Hdf5RunIter::Hdf5RunIter (const hdf5pp::Group& grp, int runNumber)
   : m_grp(grp)
+  , m_runNumber(runNumber)
   , m_groups()
   , m_ccIter()
 {
@@ -84,53 +87,65 @@ Hdf5RunIter::~Hdf5RunIter ()
 Hdf5RunIter::value_type 
 Hdf5RunIter::next()
 {
+  Hdf5IterData res;
+
   if (not m_ccIter.get()) {
     
     // no more run groups left - we are done
     if (m_groups.empty()) {
+
       MsgLog(logger, debug, "stop iterating in group: " << m_grp.name());
-      return value_type(value_type::Stop);
-    }
+      res = value_type(value_type::Stop, boost::shared_ptr<PSEvt::EventId>());
 
-    // open next group
-    hdf5pp::Group grp = m_groups.front();
-    m_groups.pop_front();  
-    MsgLog(logger, debug, "switching to group: " << grp.name());
+    } else {
 
-    // make iter for this new group
-    m_ccIter.reset(new Hdf5CalibCycleIter(grp));
+      // open next group
+      hdf5pp::Group grp = m_groups.front();
+      m_groups.pop_front();
+      MsgLog(logger, debug, "switching to group: " << grp.name());
 
-    // fill result with the configuration object data locations
-    Hdf5IterData res(Hdf5IterData::BeginCalibCycle);
-    hdf5pp::GroupIter giter(grp);
-    for (hdf5pp::Group grp1 = giter.next(); grp1.valid(); grp1 = giter.next()) {
-      if (grp1.basename() != "Epics::EpicsPv") {
-        hdf5pp::GroupIter subgiter(grp1);
-        for (hdf5pp::Group grp2 = subgiter.next(); grp2.valid(); grp2 = subgiter.next()) {
-          if (not grp2.hasChild("time")) {
-            res.add(grp2, 0);
+      // make iter for this new group
+      m_ccIter.reset(new Hdf5CalibCycleIter(grp, m_runNumber));
+
+      // make event id
+      PSTime::Time etime = Hdf5Utils::getTime(m_ccIter->group(), "start");
+      boost::shared_ptr<PSEvt::EventId> eid = boost::make_shared<Hdf5EventId>(m_runNumber, etime, 0, 0, 0);
+      res = Hdf5IterData(Hdf5IterData::BeginCalibCycle, eid);
+
+      // fill result with the configuration object data locations
+      hdf5pp::GroupIter giter(grp);
+      for (hdf5pp::Group grp1 = giter.next(); grp1.valid(); grp1 = giter.next()) {
+        if (grp1.basename() != "Epics::EpicsPv") {
+          hdf5pp::GroupIter subgiter(grp1);
+          for (hdf5pp::Group grp2 = subgiter.next(); grp2.valid(); grp2 = subgiter.next()) {
+            if (not grp2.hasChild("time")) {
+              res.add(grp2, 0);
+            }
           }
         }
       }
+
     }
 
-    res.setTime(Hdf5Utils::getTime(m_ccIter->group(), "start"));
-    return res;
-  }
-  
-  // read next event from this iterator
-  const value_type& res = m_ccIter->next();
-
-  // switch to next group if it sends us Stop
-  if (res.type() == value_type::Stop) {
-    Hdf5IterData res(Hdf5IterData::EndCalibCycle);
-    res.setTime(Hdf5Utils::getTime(m_ccIter->group(), "end"));
-    m_ccIter.reset();
-    return res;
   } else {
-    return res;
+
+    // read next event from this iterator
+    res = m_ccIter->next();
+  
+    // switch to next group if it sends us Stop
+    if (res.type() == value_type::Stop) {
+
+      PSTime::Time etime = Hdf5Utils::getTime(m_ccIter->group(), "end");
+      boost::shared_ptr<PSEvt::EventId> eid = boost::make_shared<Hdf5EventId>(m_runNumber, etime, 0, 0, 0);
+      res = Hdf5IterData(Hdf5IterData::EndCalibCycle, eid);
+
+      m_ccIter.reset();
+
+    }
+
   }
 
+  return res;
 }
 
 } // namespace PSHdf5Input

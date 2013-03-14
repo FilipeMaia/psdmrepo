@@ -64,14 +64,21 @@ Hdf5EventId::run() const
 unsigned
 Hdf5EventId::fiducials() const
 {
-  return 0;
+  return m_fiducials;
+}
+
+// Returns 119MHz counter within the fiducial.
+unsigned
+Hdf5EventId::ticks() const
+{
+  return m_ticks;
 }
 
 // Returns event counter since Configure.
 unsigned
 Hdf5EventId::vector() const
 {
-  return 0;
+  return m_vector;
 }
 
 /// check if two event IDs refer to the same event
@@ -92,7 +99,8 @@ Hdf5EventId::operator<(const EventId& other) const
 void
 Hdf5EventId::print(std::ostream& os) const
 {
-  os << "Hdf5EventId(run=" << m_run << ", time=" << m_time << ')';
+  os << "Hdf5EventId(run=" << m_run << ", time=" << m_time << ", fiducials=" << m_fiducials
+      << ", ticks=" << m_ticks << ", vector=" << m_vector << ")";
 }
 
 } // namespace PSHdf5Input

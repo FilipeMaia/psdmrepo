@@ -61,7 +61,7 @@ public:
   typedef Hdf5IterData value_type;
 
   // Default constructor
-  explicit Hdf5ConfigIter (const hdf5pp::Group& grp) ;
+  explicit Hdf5ConfigIter (const hdf5pp::Group& grp, int runNumber) ;
 
   // Destructor
   ~Hdf5ConfigIter () ;
@@ -74,11 +74,15 @@ public:
    */
   value_type next();
 
+  /// get its group
+  hdf5pp::Group& group() { return m_grp; }
+
 protected:
 
 private:
 
   hdf5pp::Group m_grp;    ///< Configure group
+  int m_runNumber;
   std::list<hdf5pp::Group> m_groups;   ///< List of Run groups
   boost::scoped_ptr<Hdf5RunIter> m_runIter;  ///< Iterator for current run group
   

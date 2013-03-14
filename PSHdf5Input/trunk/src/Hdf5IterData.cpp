@@ -73,8 +73,8 @@ std::ostream&
 operator<<(std::ostream& out, const Hdf5IterData& data)
 {
   out << "Hdf5IterData(type=" << data.type() ;
-  if (data.run() >= 0) out << ", run=" << data.run() ;
-  if (data.time() != PSTime::Time()) out << ", time=" << data.time() ;
+  const boost::shared_ptr<PSEvt::EventId>& eid = data.eventId();
+  if (eid) out << ", eventId=" << *eid;
   const Hdf5IterData::seq_type& seq = data.data();
   for (Hdf5IterData::const_iterator it = seq.begin(); it != seq.end(); ++it) {
     out << ", ";

@@ -18,6 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <boost/make_shared.hpp>
 #include <boost/algorithm/string/predicate.hpp>
 
 //-------------------------------
@@ -25,6 +26,7 @@
 //-------------------------------
 #include "hdf5pp/GroupIter.h"
 #include "PSHdf5Input/Exceptions.h"
+#include "PSHdf5Input/Hdf5EventId.h"
 #include "PSHdf5Input/Hdf5RunIter.h"
 #include "PSHdf5Input/Hdf5Utils.h"
 #include "MsgLogger/MsgLogger.h"
@@ -55,8 +57,9 @@ namespace PSHdf5Input {
 //----------------
 // Constructors --
 //----------------
-Hdf5ConfigIter::Hdf5ConfigIter (const hdf5pp::Group& grp)
+Hdf5ConfigIter::Hdf5ConfigIter (const hdf5pp::Group& grp, int runNumber)
   : m_grp(grp)
+  , m_runNumber(runNumber)
   , m_groups()
   , m_runIter()
 {
@@ -84,40 +87,49 @@ Hdf5ConfigIter::~Hdf5ConfigIter ()
 Hdf5ConfigIter::value_type 
 Hdf5ConfigIter::next()
 {
+  Hdf5IterData res;
+
   if (not m_runIter.get()) {
     
     // no more run groups left - we are done
     if (m_groups.empty()) {
+
       MsgLog(logger, debug, "stop iterating in group: " << m_grp.name());
-      return value_type(value_type::Stop);
+      res = value_type(value_type::Stop, boost::shared_ptr<PSEvt::EventId>());
+
+    } else {
+
+      // open next group
+      hdf5pp::Group grp = m_groups.front();
+      m_groups.pop_front();
+      MsgLog(logger, debug, "switching to group: " << grp.name());
+
+      // make iter for this new group
+      m_runIter.reset(new Hdf5RunIter(grp, m_runNumber));
+
+      PSTime::Time etime = Hdf5Utils::getTime(m_runIter->group(), "start");
+      boost::shared_ptr<PSEvt::EventId> eid = boost::make_shared<Hdf5EventId>(m_runNumber, etime, 0, 0, 0);
+      res = Hdf5IterData(Hdf5IterData::BeginRun, eid);
+
     }
 
-    // open next group
-    hdf5pp::Group grp = m_groups.front();
-    m_groups.pop_front();  
-    MsgLog(logger, debug, "switching to group: " << grp.name());
-
-    // make iter for this new group
-    m_runIter.reset(new Hdf5RunIter(grp));
-    
-    Hdf5IterData res(Hdf5IterData::BeginRun);
-    res.setTime(Hdf5Utils::getTime(m_runIter->group(), "start"));
-
-    return res;
-  }
-  
-  // read next event from this iterator
-  value_type res = m_runIter->next();
-
-  // switch to next group if it sends us Stop
-  if (res.type() == value_type::Stop) {
-    Hdf5IterData res(Hdf5IterData::EndRun);
-    res.setTime(Hdf5Utils::getTime(m_runIter->group(), "end"));
-    m_runIter.reset();
-    return res;
   } else {
-    return res;
+
+    // read next event from this iterator
+    res = m_runIter->next();
+
+    // switch to next group if it sends us Stop
+    if (res.type() == value_type::Stop) {
+  
+      PSTime::Time etime = Hdf5Utils::getTime(m_runIter->group(), "end");
+      boost::shared_ptr<PSEvt::EventId> eid = boost::make_shared<Hdf5EventId>(m_runNumber, etime, 0, 0, 0);
+      res = Hdf5IterData(Hdf5IterData::EndRun, eid);
+
+      m_runIter.reset();
+    }
   }
+
+  return res;
 
 }
 
