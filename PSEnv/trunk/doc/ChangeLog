@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-11-01
+2013-03-14 Andy Salnikov
+- Env class gets new method fwkName() which returns "psana" string
+
 Tag: V00-11-00
 2013-02-12 Andy Salnikov
 - EpicsStore class has few more methods to work with aliases 

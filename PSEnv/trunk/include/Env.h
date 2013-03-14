@@ -87,6 +87,20 @@ public:
   // Destructor
   ~Env () ;
 
+  /** 
+   *  @brief Returns name of the framework. 
+   *  
+   *  This method is supposed to be defined across different frameworks. 
+   *  It returns the name of the current framework, e.g. when client code runs 
+   *  inside pyana framework it will return string "pyana", inside  psana framework 
+   *  it will return "psana". This method should be used as a primary mechanism for 
+   *  distinguishing between different frameworks in cases when client needs to 
+   *  execute framework-specific code. This method is not very useful in C++ as
+   *  we have only one C++ framework, but is more useful in Python code which 
+   *  needs to run inside both pyana and psana.
+   */
+  const std::string& fwkName() const { return m_fwkName; }
+  
   /// Returns job name.
   const std::string& jobName() const { return m_jobName; }
   
@@ -127,6 +141,7 @@ protected:
 private:
 
   // Data members
+  std::string m_fwkName;   ///< Framework name
   std::string m_jobName;   ///< Job name
   boost::shared_ptr<EnvObjectStore> m_cfgStore;   ///< Pointer to Configuration Store
   boost::shared_ptr<EnvObjectStore> m_calibStore;   ///< Pointer to Calibration Store

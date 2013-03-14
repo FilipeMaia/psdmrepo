@@ -55,7 +55,8 @@ namespace PSEnv {
 Env::Env (const std::string& jobName,
     const boost::shared_ptr<IExpNameProvider>& expNameProvider,
     const std::string& calibDir)
-  : m_jobName(jobName)
+  : m_fwkName("psana")
+  , m_jobName(jobName)
   , m_cfgStore()
   , m_calibStore()
   , m_epicsStore(boost::make_shared<EpicsStore>())
