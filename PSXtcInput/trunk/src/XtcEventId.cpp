@@ -36,11 +36,12 @@ namespace PSXtcInput {
 //----------------
 // Constructors --
 //----------------
-XtcEventId::XtcEventId (int run, const PSTime::Time& time, unsigned fiducials, unsigned vector)
+XtcEventId::XtcEventId (int run, const PSTime::Time& time, unsigned fiducials, unsigned ticks, unsigned vector)
   : PSEvt::EventId()
   , m_run(run)
   , m_time(time)
   , m_fiducials(fiducials)
+  , m_ticks(ticks)
   , m_vector(vector)
 {
 }
@@ -82,6 +83,15 @@ XtcEventId::fiducials() const
 }
 
 /**
+ *  @brief Returns 119MHz counter within the fiducial.
+ */
+unsigned
+XtcEventId::ticks() const
+{
+  return m_ticks;
+}
+
+/**
  *  @brief Returns event counter since Configure.
  */
 unsigned
@@ -108,7 +118,8 @@ XtcEventId::operator<(const EventId& other) const
 void 
 XtcEventId::print(std::ostream& os) const
 {
-  os << "XtcEventId(run=" << m_run << ", time=" << m_time << ", fiducials=" << m_fiducials << ", vector=" << m_vector << ")";
+  os << "XtcEventId(run=" << m_run << ", time=" << m_time << ", fiducials=" << m_fiducials
+      << ", ticks=" << m_ticks << ", vector=" << m_vector << ")";
 }
 
 } // namespace PSXtcInput

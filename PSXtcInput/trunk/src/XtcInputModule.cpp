@@ -377,8 +377,9 @@ XtcInputModule::fillEventId(const XtcInput::Dgram& dg, Event& evt)
   PSTime::Time evtTime(clock.seconds(), clock.nanoseconds());
   unsigned run = dg.file().run();
   unsigned fiducials = seq.stamp().fiducials();
+  unsigned ticks = seq.stamp().ticks();
   unsigned vect = seq.stamp().vector();
-  boost::shared_ptr<PSEvt::EventId> eventId = boost::make_shared<XtcEventId>(run, evtTime, fiducials, vect);
+  boost::shared_ptr<PSEvt::EventId> eventId = boost::make_shared<XtcEventId>(run, evtTime, fiducials, ticks, vect);
   evt.put(eventId);
 }
 
