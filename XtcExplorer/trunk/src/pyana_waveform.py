@@ -128,13 +128,6 @@ class pyana_waveform (object) :
     #-------------------
 
     def beginjob( self, evt, env ) :
-        #logging.getLogger().setLevel(logging.DEBUG)
-        try:
-            env.assert_psana()
-            self.psana = True
-        except:
-            self.psana = False
-
         """This method is called once at the beginning of the job.
         It will also be called in any Xtc Configure transition, if 
         configurations have changed since last it was run.
@@ -232,14 +225,14 @@ class pyana_waveform (object) :
             source = parts[0]       # e.g. 'AmoGasdet-0|Acqiris-0' or 'Camp-0|Acqiris-0'
             channel = int(parts[1]) # e.g. 0 or 19
 
-            if self.psana:
+            if env.fwkName() == 'psana':
                 acqData = evt.get(xtc.TypeId.Type.Id_AcqWaveform, source)
             else:
                 acqData = evt.getAcqValue( source, channel, env) # pypdsdata.acqiris.DataDescV1
 
             if acqData :
                 if self.ts[label] is None:
-                    if self.psana:
+                    if env.fwkName() == 'psana':
                         num_timestamps = self.wf_window[1] - self.wf_window[0]
                         """
                         for i, d in  enumerate(acqData.data_list()):
@@ -258,7 +251,7 @@ class pyana_waveform (object) :
                     #print self.ts[label]
 
                 # a waveform
-                if self.psana:
+                if env.fwkName() == 'psana':
                     elem = acqData.data(channel) # this is a DataDescElem
                     awf = elem.waveforms()[0][self.wf_window[0]:self.wf_window[1]]
                 else:

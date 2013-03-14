@@ -58,7 +58,6 @@ class  pyana_bld ( object ) :
 
 
     def initlists(self):
-        self.time = []
 
         self.EB_damages = []
         self.EB_energies = []
@@ -80,7 +79,6 @@ class  pyana_bld ( object ) :
 
     def resetlists(self):
         self.accu_start = self.n_shots
-        del self.time[:]
 
         del self.EB_damages[:]
         del self.EB_energies[:]
@@ -102,11 +100,6 @@ class  pyana_bld ( object ) :
 
 
     def beginjob ( self, evt, env ) : 
-        try:
-            env.assert_psana()
-            self.psana = True
-        except:
-            self.psana = False
         logging.info("pyana_bld.beginjob() called, process %d"%env.subprocess())
 
         self.n_shots = 0
@@ -124,10 +117,6 @@ class  pyana_bld ( object ) :
 
         do_plot = self.doPlot and (self.n_shots%self.plot_every_n)==0 
 
-        # Event timestamp
-        if not self.psana:
-            self.time.append( evt.getTime().seconds() + 1.0e-9*evt.getTime().nanoseconds() )
-
 #        # Evr (Event receiver data)
 #        evrdata = evt.getEvrData("NoDetector-0|Evr-0")
 #        ecodes = []
@@ -140,7 +129,7 @@ class  pyana_bld ( object ) :
             ebeam = evt.get(xtc.TypeId.Type.Id_EBeam);
             self.hadEB = True
             if ebeam :
-                if self.psana:
+                if env.fwkName() == "psana":
                     beamDmgM = ebeam.damageMask()
                     beamChrg = ebeam.ebeamCharge()
                     beamEnrg = ebeam.ebeamL3Energy()
@@ -178,7 +167,7 @@ class  pyana_bld ( object ) :
             # returns array of 4 numbers obtained from the bld.BldDataFEEGasDetEnergy object
             fee_energy = evt.get(xtc.TypeId.Type.Id_FEEGasDetEnergy)
             if fee_energy is not None:
-                if self.psana:
+                if env.fwkName() == "psana":
                     fee_energy = [fee_energy.f_11_ENRC(),
                                         fee_energy.f_12_ENRC(),
                                         fee_energy.f_21_ENRC(),
@@ -204,7 +193,7 @@ class  pyana_bld ( object ) :
             # PhaseCavity object (of type bld.BldDataPhaseCavity)
             pc = evt.get(xtc.TypeId.Type.Id_PhaseCavity);
             if pc :
-                if self.psana:
+                if env.fwkName() == "psana":
                     self.PC_ftime1.append( pc.fitTime1() )
                     self.PC_ftime2.append( pc.fitTime2() )
                     self.PC_fchrg1.append( pc.charge1() )

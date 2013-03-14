@@ -90,11 +90,6 @@ class pyana_scan (object) :
     #-------------------
 
     def beginjob( self, evt, env ) :
-        try:
-            env.assert_psana()
-            self.psana = True
-        except:
-            self.psana = False
         """This method is called at an xtc Configure transition
         Assume only one Configure per job.
         Typically you should process only one run per job. 
@@ -151,7 +146,7 @@ class pyana_scan (object) :
         nControls = ctrl_config.npvControls()
         for ic in range (0, nControls ):
             #
-            if self.psana:
+            if env.fwkName() == "psana":
                 cpv = ctrl_config.pvControls()[ic]
             else:
                 cpv = ctrl_config.pvControl(ic)
@@ -185,7 +180,7 @@ class pyana_scan (object) :
                 self.evts_scalars[epv_name] = []
 
             # store the value
-            if self.psana:
+            if env.fwkName() == "psana":
                 epv = env.epicsStore().value(epv_name)
             else:
                 epv = env.epicsStore().value(epv_name)
@@ -217,7 +212,7 @@ class pyana_scan (object) :
             elif scalar.find("EBeam")>= 0 :
                 ebeam = evt.get(xtc.TypeId.Type.Id_EBeam);
                 if ebeam:
-                    if self.psana:
+                    if env.fwkName() == "psana":
                         self.evts_scalars[scalar].append(ebeam.ebeamL3Energy())
                     else:
                         self.evts_scalars[scalar].append(ebeam.fEbeamL3Energy)
@@ -225,7 +220,7 @@ class pyana_scan (object) :
                 #    self.evts_scalars[scalar].append(-99.0)
 
             elif scalar.find("FEEGasDetEnergy")>= 0 :
-                if self.psana:
+                if env.fwkName() == "psana":
                     energy = evt.get(xtc.TypeId.Type.Id_FEEGasDetEnergy);
                     if energy:
                         fee_energy_array = []
@@ -247,7 +242,7 @@ class pyana_scan (object) :
             elif scalar.find("PhaseCavity")>= 0 :
                 pc = evt.get(xtc.TypeId.Type.Id_PhaseCavity);
                 if pc:
-                    if self.psana:
+                    if env.fwkName() == "psana":
                         val = (pc.charge1() - pc.charge2()) / (pc.fitTime1() - pc.fitTime2())
                     else:
                         val = (pc.fCharge1 - pc.fCharge2) / (pc.fFitTime1 - pc.fFitTime2)
@@ -258,7 +253,7 @@ class pyana_scan (object) :
             elif ( scalar.find("IPM")>= 0 or scalar.find("DIO")>= 0 ):
                 ipm = evt.get(xtc.TypeId.Type.Id_SharedIpimb, scalar)
                 if ipm:
-                    if self.psana:
+                    if env.fwkName() == "psana":
                         self.evts_scalars[scalar].append( ipm.ipmFexData().sum )
                     else:
                         self.evts_scalars[scalar].append( ipm.ipmFexData.sum )
@@ -279,7 +274,7 @@ class pyana_scan (object) :
 
         # process the chunk of events collected in this scan cycle
         for name, list in self.evts_scalars.iteritems() :
-            if self.psana:
+            if env.fwkName() == "psana":
                 try:
                     list = [f() for f in list]
                 except:

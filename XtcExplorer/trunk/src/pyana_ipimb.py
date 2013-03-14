@@ -94,11 +94,7 @@ class  pyana_ipimb ( object ) :
 
 
     def beginjob ( self, evt, env ) : 
-        try:
-            env.assert_psana()
-            self.psana = True
-        except:
-            self.psana = False
+
         self.n_shots = 0
         self.accu_start = 0
         
@@ -203,7 +199,7 @@ class  pyana_ipimb ( object ) :
 
             # ------ fex data -------
             if ipm_fex is not None: 
-                if self.psana:
+                if env.fwkName() == "psana":
                     if inspect.ismethod(ipm_fex):
                         ipm_fex = ipm_fex()
                     self.fex_sum[source].append( ipm_fex.sum() )

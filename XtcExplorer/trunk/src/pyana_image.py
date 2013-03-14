@@ -185,7 +185,7 @@ class  pyana_image ( object ) :
             return("TM6740", addr)
 
         print "Invalid device name", addr
-        if self.psana:
+        if env.fwkName() == "psana":
             keys = env.configStore().keys()
             for k in keys:
                 if addr in str(k):
@@ -198,11 +198,6 @@ class  pyana_image ( object ) :
 
 
     def beginjob ( self, evt, env ) : 
-        try:
-            env.assert_psana()
-            self.psana = True
-        except:
-            self.psana = False
         logging.info( "pyana_image.beginjob()" )
 
         self.configtypes = { 'Cspad2x2'  : TypeId.Type.Id_Cspad2x2Config ,
@@ -282,7 +277,7 @@ class  pyana_image ( object ) :
             self.config = env.getConfig(configType, detsrc )
             if not self.config:
                 print "*** getConfig(configType='%s', detsrc='%s') failed (addr='%s')" % (configType, detsrc, addr)
-                if self.psana:
+                if env.fwkName() == "psana":
                     keys = env.configStore().keys()
                     for k in keys:
                         if detsrc in str(k):
@@ -291,7 +286,7 @@ class  pyana_image ( object ) :
 
 
             if addr.find('Cspad2x2')>=0:
-                if self.psana:
+                if env.fwkName() == "psana":
                     roimask = self.config.roiMask();
                     sections = []
                     for section in range(2):
@@ -303,7 +298,7 @@ class  pyana_image ( object ) :
                 
             elif addr.find('Cspad')>=0:
                 quads = range(4)
-                if self.psana:
+                if env.fwkName() == "psana":
                     sections = []
                     for q in quads:
                         roimask = self.config.roiMask(q);
@@ -349,7 +344,7 @@ class  pyana_image ( object ) :
                 continue
             frame = evt.get( self.datatypes[device], addr )
             if frame is None:
-                if not self.psana:
+                if env.fwkName() == "pyana":
                     print "No frame from ", addr
                 continue
             
@@ -366,7 +361,7 @@ class  pyana_image ( object ) :
                 if not addr in self.cspad:
                     print "No Cspad entry found for %s" % addr
                     continue
-                if self.psana:
+                if env.fwkName() == "psana":
                     nquads = frame.quads_shape()[0]
                     quads = [frame.quads(i) for i in range(nquads)]
                 else:
@@ -374,7 +369,7 @@ class  pyana_image ( object ) :
                 # then call cspad library to assemble the image
                 image = self.cspad[addr].get_detector_image(quads)
 
-            elif self.psana and ("Fccd" in addr or "Opal" in addr or "TM6740" in addr or "Tm6740" in addr or "-YAG-" in addr):
+            elif env.fwkName() == "psana" and ("Fccd" in addr or "Opal" in addr or "TM6740" in addr or "Tm6740" in addr or "-YAG-" in addr):
                 if frame.depth() > 8:
                     image = frame.data16()
                 else:
@@ -493,7 +488,7 @@ class  pyana_image ( object ) :
 
             # ----------- Event Image -----------
             if "image" in self.quantities:
-                if self.psana and (image is original_image_reference):
+                if env.fwkName() == "psana" and (image is original_image_reference):
                     # make a copy so we don't segfault if underlying data is deallocated
                     image = image + 0.0
                 self.data[addr].image   = image            

@@ -66,11 +66,7 @@ class  pyana_encoder ( object ) :
 
 
     def beginjob ( self, evt, env ) : 
-        try:
-            env.assert_psana()
-            self.psana = True
-        except:
-            self.psana = False
+
         self.n_shots = 0
         self.accu_start = 0
         
@@ -85,7 +81,7 @@ class  pyana_encoder ( object ) :
             try: # only for ConfigV2
                 # look for populated channel in the bitmap
                 self.channel[source] = 0
-                if self.psana: 
+                if env.fwkName() == "psana": 
                     chan_mask = config.chan_mask() 
                 else:
                     chan_mask = config._chan_mask
@@ -102,7 +98,7 @@ class  pyana_encoder ( object ) :
             except:
                 pass
 
-            if self.psana:
+            if env.fwkName() == "psana":
                 message += "  Counter mode = %s \n"            % config.count_mode()
                 message += "  Quadrature mode = %s \n"         % config.quadrature_mode()
                 message += "  Trigger input number = %s \n"    % config.input_num()
@@ -133,20 +129,20 @@ class  pyana_encoder ( object ) :
             if encoder:
                 if 'DataV1' in type(encoder).__name__:
                     self.values[source].append( encoder.value() )
-                    if self.psana:
+                    if env.fwkName() == "psana":
                         self.counts[source].append( encoder.encoder_count() )
                     else:
                         self.counts[source].append( encoder._encoder_count )
                 elif 'DataV2' in type(encoder).__name__:
                     self.values[source].append( encoder.value(self.channel[source]) )
-                    if self.psana:
+                    if env.fwkName() == "psana":
                         self.counts[source].append( encoder.encoder_count()[self.channel[source]] )
                     else:
                         self.counts[source].append( encoder._encoder_count[self.channel[source]] )
                 else:
                     print "Unknown type"
 
-                if self.psana:
+                if env.fwkName() == "psana":
                     self.timestmps[source].append( encoder.timestamp() )
                 else:
                     self.timestmps[source].append( encoder._33mhz_timestamp )

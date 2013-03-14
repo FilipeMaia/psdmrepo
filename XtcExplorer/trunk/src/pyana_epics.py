@@ -120,11 +120,6 @@ class pyana_epics (object) :
         # Preferred way to log information is via logging package
         logging.info( "pyana_epics.beginjob() called")
 
-        try:
-            env.assert_psana()
-            self.psana = True
-        except:
-            self.psana = False
 
         self.n_shots = 0
         self.accu_start = 0
@@ -134,7 +129,7 @@ class pyana_epics (object) :
         self.epics_data = {}
         for pv_name in self.pv_names :
 
-            if self.psana:
+            if env.fwkName() == "psana":
                 
                 pv = env.epicsStore().getPV( pv_name )
                 if pv:
@@ -210,7 +205,7 @@ class pyana_epics (object) :
         # Use environment object to access EPICS data
         for pv_name in self.pv_names :
 
-            if self.psana:
+            if env.fwkName() == "psana":
 
                 ## The returned value should be of the type epics.EpicsPvTime.
                 pv = env.epicsStore().getPV( pv_name )

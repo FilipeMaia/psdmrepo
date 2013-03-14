@@ -11,6 +11,9 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2013-Mar-14 salnikov V00-03-00
+	- replaced use of env.assert_psana() with env.fwkName()
+
 2013-Feb-12 salnikov V00-02-01
 	- still more changes in psana, migrating things which depend on it
 

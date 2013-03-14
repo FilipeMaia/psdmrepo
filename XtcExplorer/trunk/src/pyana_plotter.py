@@ -113,11 +113,6 @@ class pyana_plotter (object) :
         @param env    environment object
         """
         self.starttime = time.time()
-        try:
-            env.assert_psana()
-            self.psana = True
-        except:
-            self.psana = False
 
         # Preferred way to log information is via logging package
         logging.info( "pyana_plotter.beginjob() called with displaymode %d"%self.display_mode )
