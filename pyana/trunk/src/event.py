@@ -848,6 +848,18 @@ class Env(object):
         # in subprocess mode store the names of the files
         self.m_files = {}
 
+    def fwkName(self):
+        """ self.fwkName() -> string
+        
+        Returns name of the framework. This method is supposed to be defined across
+        different frameworks. It returns the name of the current framework, e.g. when
+        client code runs inside pyana framework it will return string "pyana", inside
+        psana framework it will return "psana". This method should be used as a primary 
+        mechanism for distinguishing between different frameworks in cases when client 
+        needs to execute framework-specific code.
+        """
+        return "pyana"
+    
     def jobName(self):
         """ self.jobName() -> string
         

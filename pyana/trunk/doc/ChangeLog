@@ -11,6 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-60
+2013-03-14 Andy Salnikov
+- event.Env class has new method fwkName() which returns "pyana" string.
+- identical method will exist in psana/Python Env class and it will
+  return "psana"
+
 Tag: V00-00-59
 2013-02-27 Andy Salnikov
 - my last fix did not work weel enough, here is a fix for that fix
