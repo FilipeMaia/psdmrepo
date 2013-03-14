@@ -49,13 +49,13 @@ PixCoords2x1::PixCoords2x1 ()
 {
   //cout << "PixCoords2x1" << endl;
 
-  m_row_size_um   = PSCalib::CSPadCalibPars::getRowSize_um();
-  m_col_size_um   = PSCalib::CSPadCalibPars::getColSize_um();
-  m_gap_size_um   = PSCalib::CSPadCalibPars::getGapSize_um();
+  m_row_size_um   = PSCalib::CSPadCalibPars::getRowSize_um(); // 109.92
+  m_col_size_um   = PSCalib::CSPadCalibPars::getColSize_um(); // 109.92
+  m_gap_size_um   = PSCalib::CSPadCalibPars::getGapSize_um(); // 2*274.80 - 109.92
 
-  k_row_um_to_pix = PSCalib::CSPadCalibPars::getRowUmToPix();
-  k_col_um_to_pix = PSCalib::CSPadCalibPars::getColUmToPix();
-  k_ort_um_to_pix = PSCalib::CSPadCalibPars::getOrtUmToPix();
+  k_row_um_to_pix = PSCalib::CSPadCalibPars::getRowUmToPix(); // 1/ 109.92
+  k_col_um_to_pix = PSCalib::CSPadCalibPars::getColUmToPix(); // 1/ 109.92
+  k_ort_um_to_pix = PSCalib::CSPadCalibPars::getOrtUmToPix(); // 1
 
   k_center_of_rows_um = 0.5 * (m_row_size_um * ((double)NRows2x1-3.0) + 2 * m_gap_size_um) + 1; // Add artificial 1um offset
   k_center_of_cols_um = 0.5 *  m_col_size_um * ((double)NCols2x1-1.0) + 1; // Add artificial 1um offset to remove strips in img...
@@ -345,9 +345,7 @@ double PixCoords2x1::getYCenterOffset_um(ORIENTATION n90)
 }
 
 //--------------
-
 //--------------
-
 //--------------
 //--------------
 

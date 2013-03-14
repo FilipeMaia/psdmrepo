@@ -81,7 +81,8 @@ public:
 
   void fillOneSectionInDet      (uint32_t sect, double xcenter, double ycenter, double zcenter, double rotation);
   void fillOneSectionTiltedInDet(uint32_t sect, double xcenter, double ycenter, double zcenter, double rotation, double tilt);
-  void setConstXYMinMax();
+  void resetXYOriginAndMinMax();
+  void printXYLimits();
 
   /**
    *  Access methods return the coordinate for indicated axis, quad, section, row, and column
@@ -90,6 +91,10 @@ public:
    */
   double getPixCoor_um (CSPadPixCoords::PixCoords2x1::COORDINATE icoor, unsigned sect, unsigned row, unsigned col) ;
   double getPixCoor_pix(CSPadPixCoords::PixCoords2x1::COORDINATE icoor, unsigned sect, unsigned row, unsigned col) ;
+  double get_x_min() { return m_coor_x_min; };
+  double get_x_max() { return m_coor_x_max; };
+  double get_y_min() { return m_coor_y_min; };
+  double get_y_max() { return m_coor_y_max; };
 
 protected:
 
@@ -103,7 +108,7 @@ private:
   double m_degToRad; 
 
   PixCoords2x1               *m_pix_coords_2x1;  
-  PSCalib::CSPad2x2CalibPars *m_cspad2x2_calibpar;  
+  PSCalib::CSPad2x2CalibPars *m_cspad2x2_calibpars;  
   bool                        m_tiltIsApplied;
 
   double m_coor_x[NCols2x1][NRows2x1][N2x1InDet];

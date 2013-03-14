@@ -14,6 +14,7 @@
 // This Class's Header --
 //-----------------------
 #include "CSPadPixCoords/PixCoordsCSPad2x2.h"
+#include "MsgLogger/MsgLogger.h"
 
 //-----------------
 // C/C++ Headers --
@@ -37,11 +38,14 @@ using namespace std;
 
 namespace CSPadPixCoords {
 
+const char logger[] = "PixCoordsCSPad2x2";
+
 //----------------
 // Constructors --
 //----------------
   PixCoordsCSPad2x2::PixCoordsCSPad2x2 (PixCoords2x1 *pix_coords_2x1, bool tiltIsApplied)
   : m_pix_coords_2x1(pix_coords_2x1)
+  , m_cspad2x2_calibpars(0)
   , m_tiltIsApplied (tiltIsApplied)
 {
   XCOOR = CSPadPixCoords::PixCoords2x1::X;
@@ -49,14 +53,15 @@ namespace CSPadPixCoords {
   ZCOOR = CSPadPixCoords::PixCoords2x1::Z;
 
   fillPixelCoordinateArrays();
-  setConstXYMinMax();
+  resetXYOriginAndMinMax();
+  printXYLimits();
 }
 
 //--------------
 
-PixCoordsCSPad2x2::PixCoordsCSPad2x2 (PixCoords2x1 *pix_coords_2x1,  PSCalib::CSPad2x2CalibPars *cspad2x2_calibpar, bool tiltIsApplied)
+PixCoordsCSPad2x2::PixCoordsCSPad2x2 (PixCoords2x1 *pix_coords_2x1,  PSCalib::CSPad2x2CalibPars *cspad2x2_calibpars, bool tiltIsApplied)
   : m_pix_coords_2x1(pix_coords_2x1)
-  , m_cspad2x2_calibpar(cspad2x2_calibpar)
+  , m_cspad2x2_calibpars(cspad2x2_calibpars)
   , m_tiltIsApplied (tiltIsApplied)
 {
   XCOOR = CSPadPixCoords::PixCoords2x1::X;
@@ -64,7 +69,8 @@ PixCoordsCSPad2x2::PixCoordsCSPad2x2 (PixCoords2x1 *pix_coords_2x1,  PSCalib::CS
   ZCOOR = CSPadPixCoords::PixCoords2x1::Z;
 
   fillPixelCoordinateArrays();
-  setConstXYMinMax();
+  resetXYOriginAndMinMax();
+  printXYLimits();
 }
 
 //--------------
@@ -78,25 +84,33 @@ void PixCoordsCSPad2x2::fillPixelCoordinateArrays()
 
         m_degToRad = 3.14159265359 / 180.; 
 
-	// For test purpose use large deviation in x center and large tilt:
-	//double xcenter_pix []={201,205};
-	//double ycenter_pix []={101,301};
-	//double tilt_2x1    []={0.0,3.0};
-	double rotation_2x1[]={180,180}; // ...Just because of conventions in this code...
+	// Approximate geometry for constructor w/o alignment parameters, where *cspad2x2_calibpars = 0;
+	double xcenter_pix [] = {200,200};
+	double ycenter_pix [] = { 95,308};
+	double zcenter_pix [] = {  0,  0};
+	double tilt_2x1    [] = {  0,  0};
+	double rotation_2x1[] = {180,180}; // ...Just because of conventions in this code...
 
         double pixSize_um = PSCalib::CSPad2x2CalibPars::getRowSize_um();
+	double xcenter, ycenter, zcenter, rotation, tilt;
 
         for (uint32_t sect=0; sect < N2x1InDet; ++sect)
           {
-            //double xcenter  = xcenter_pix [sect] * pixSize_um;
-            //double ycenter  = ycenter_pix [sect] * pixSize_um;
-            //double tilt     = tilt_2x1    [sect];
-            double rotation = rotation_2x1[sect];
+	    if (m_cspad2x2_calibpars) {
+              xcenter  = m_cspad2x2_calibpars -> getCenterX (sect);
+              ycenter  = m_cspad2x2_calibpars -> getCenterY (sect);
+              zcenter  = m_cspad2x2_calibpars -> getCenterZ (sect);
+              tilt     = m_cspad2x2_calibpars -> getTilt    (sect);
+	    } else {
+              xcenter  = xcenter_pix [sect];
+              ycenter  = ycenter_pix [sect];
+              zcenter  = zcenter_pix [sect];
+              tilt     = tilt_2x1    [sect];
+	    }
 
-            double xcenter  = m_cspad2x2_calibpar -> getCenterX (sect) * pixSize_um;
-            double ycenter  = m_cspad2x2_calibpar -> getCenterY (sect) * pixSize_um;
-            double zcenter  = m_cspad2x2_calibpar -> getCenterZ (sect) * pixSize_um;
-            double tilt     = m_cspad2x2_calibpar -> getTilt    (sect);
+            xcenter *= pixSize_um;
+            ycenter *= pixSize_um;
+            rotation = rotation_2x1[sect];
 
             if (m_tiltIsApplied) fillOneSectionTiltedInDet(sect, xcenter, ycenter, zcenter, rotation, tilt);
             else                 fillOneSectionInDet      (sect, xcenter, ycenter, zcenter, rotation);
@@ -194,14 +208,33 @@ void PixCoordsCSPad2x2::fillOneSectionTiltedInDet(uint32_t sect, double xcenter,
 
 //--------------
 
-void PixCoordsCSPad2x2::setConstXYMinMax()
+void PixCoordsCSPad2x2::resetXYOriginAndMinMax()
 {
-    double pixSize_um = PSCalib::CSPad2x2CalibPars::getRowSize_um();
+    for (uint32_t col=0; col<NCols2x1;  col++) {
+    for (uint32_t row=0; row<NRows2x1;  row++) {
+    for (uint32_t sec=0; sec<N2x1InDet; sec++) {
 
+       m_coor_x[col][row][sec] -= m_coor_x_min;
+       m_coor_y[col][row][sec] -= m_coor_y_min;
+    }
+    }
+    }
+
+    //double pixSize_um = PSCalib::CSPad2x2CalibPars::getRowSize_um();
+    //m_coor_x_max = 400*pixSize_um;
+    //m_coor_y_max = 400*pixSize_um;
+    m_coor_x_max -= m_coor_x_min;
+    m_coor_y_max -= m_coor_y_min;
     m_coor_x_min = 0;
     m_coor_y_min = 0;
-    m_coor_x_max = 400*pixSize_um;
-    m_coor_y_max = 400*pixSize_um;
+}
+
+//--------------
+
+void PixCoordsCSPad2x2::printXYLimits()
+{
+  MsgLog(logger, info, "  Xmin: " << m_coor_x_min << "  Xmax: " << m_coor_x_max
+	            << "  Ymin: " << m_coor_y_min << "  Ymax: " << m_coor_y_max );
 }
 
 //--------------
@@ -210,8 +243,8 @@ double PixCoordsCSPad2x2::getPixCoor_um (CSPadPixCoords::PixCoords2x1::COORDINAT
 {
   switch (icoor)
     {
-    case CSPadPixCoords::PixCoords2x1::X : return m_coor_x[col][row][sect] - m_coor_x_min;
-    case CSPadPixCoords::PixCoords2x1::Y : return m_coor_y[col][row][sect] - m_coor_y_min;
+    case CSPadPixCoords::PixCoords2x1::X : return m_coor_x[col][row][sect];
+    case CSPadPixCoords::PixCoords2x1::Y : return m_coor_y[col][row][sect];
     case CSPadPixCoords::PixCoords2x1::Z : return 0;
     default: return 0;
     }
