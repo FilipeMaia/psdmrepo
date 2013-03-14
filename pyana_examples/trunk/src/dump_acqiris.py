@@ -61,16 +61,8 @@ class dump_acqiris (object) :
     #  Public methods --
     #-------------------
     def beginjob( self, evt, env ) :
-        try:
-            env.assert_psana()
-            self.psana = True
-        except:
-            self.psana = False
         
-        if self.psana:
-            config = env.configStore().get("Psana::Acqiris::Config", self.m_src)
-        else:
-            config = env.getConfig(xtc.TypeId.Type.Id_AcqConfig, self.m_src)
+        config = env.getConfig(xtc.TypeId.Type.Id_AcqConfig, self.m_src)
         if config:
         
             print "%s: %s" % (config.__class__.__name__, self.m_src)
@@ -88,7 +80,7 @@ class dump_acqiris (object) :
 
             nch = config.nbrChannels()
             for ch in range(nch):
-                if self.psana:
+                if env.fwkName() == "psana":
                     v = config.vert()[ch]
                 else:
                     v = config.vert(ch)
@@ -107,21 +99,18 @@ class dump_acqiris (object) :
         @param env    environment object
         """
 
-        if self.psana:
-            acqData = evt.get("Psana::Acqiris::DataDesc", self.m_src).data_list()
-        else:
-            acqData = evt.get(xtc.TypeId.Type.Id_AcqWaveform, self.m_src)
+        acqData = evt.get(xtc.TypeId.Type.Id_AcqWaveform, self.m_src)
 
         for chan, elem in enumerate(acqData):
 
             print "%s: %s: channel = %d" % (elem.__class__.__name__, self.m_src, chan)
             print "  nbrSegments =", elem.nbrSegments()
             print "  nbrSamplesInSeg =", elem.nbrSamplesInSeg()
-            if self.psana:
+            if env.fwkName() == "psana":
                 print "  timestamps =", [[elem.timestamp()[seg].pos(), elem.timestamp()[seg].timeStampHi()] for seg in range(elem.nbrSegments())]
             else:
                 print "  timestamps =", [elem.timestamp(seg) for seg in range(elem.nbrSegments())]
-            if self.psana:
+            if env.fwkName() == "psana":
                 wf = elem.waveforms()[0] / 655360.0
             else:
                 wf = elem.waveform()

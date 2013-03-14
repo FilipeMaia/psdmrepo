@@ -71,16 +71,8 @@ class dump_cspad ( object ) :
     #-------------------
 
     def beginjob( self, evt, env ) :
-        try:
-            env.assert_psana()
-            self.psana = True
-        except:
-            self.psana = False
 
-        if self.psana:
-            config = env.configStore().get("Psana::CsPad::Config", self.m_src)
-        else:
-            config = env.getConfig(TypeId.Type.Id_CspadConfig, self.m_src)
+        config = env.getConfig(TypeId.Type.Id_CspadConfig, self.m_src)
         if not config:
             return
 
@@ -104,13 +96,13 @@ class dump_cspad ( object ) :
             print "  numAsicsStored: %s" % str(map(config.numAsicsStored, range(4)))
         except:
             pass
-        if not self.psana:
+        if env.fwkName() == "pyana":
             print "  sections      : %s" % str(map(config.sections, range(4)))
 
 
     def event( self, evt, env ) :
 
-        if self.psana:
+        if env.fwkName() == "psana":
             quads = evt.get("Psana::CsPad::Data", self.m_src).quads_list()
         else:
             quads = evt.get(TypeId.Type.Id_CspadElement, self.m_src)
@@ -132,7 +124,7 @@ class dump_cspad ( object ) :
             print "    ticks: %s" % q.ticks()
             print "    fiducials: %s" % q.fiducials()
             print "    frame_type: %s" % q.frame_type()
-            if not self.psana:
+            if env.fwkName() == "pyana":
                 print "    sb_temp: %s" % map(q.sb_temp, range(4))
 
             # image data as 3-dimentional array
