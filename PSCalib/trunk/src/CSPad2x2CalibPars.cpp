@@ -61,7 +61,7 @@ CSPad2x2CalibPars::CSPad2x2CalibPars ()
 
 //----------------
 
-/*
+
 CSPad2x2CalibPars::CSPad2x2CalibPars ( const std::string&   calibDir,      //  /reg/d/psdm/cxi/cxi35711/calib
                                        const std::string&   typeGroupName, //  CsPad::CalibV1
                                        const std::string&   source,        //  CxiDs1.0:Cspad.0
@@ -79,7 +79,7 @@ CSPad2x2CalibPars::CSPad2x2CalibPars ( const std::string&   calibDir,      //  /
     printInputPars ();
     //printCalibPars();
 }
-*/
+
 
 //----------------
 
@@ -149,14 +149,12 @@ void CSPad2x2CalibPars::getCalibFileName ()
   else
     {
       PSCalib::CalibFileFinder *calibfinder = new PSCalib::CalibFileFinder(m_calibDir, m_typeGroupName);
-      m_fname = calibfinder -> findCalibFile(m_src, m_cur_calibname, m_runNumber);
+      //m_fname = calibfinder -> findCalibFile(m_src, m_cur_calibname, m_runNumber);
 
-      /*
       if (m_source == std::string())
           m_fname = calibfinder -> findCalibFile(m_src, m_cur_calibname, m_runNumber);
       else
           m_fname = calibfinder -> findCalibFile(m_source, m_cur_calibname, m_runNumber);
-      */
     }
   MsgLog("CSPad2x2CalibPars", debug, "getCalibFileName(): " << m_fname);
 }

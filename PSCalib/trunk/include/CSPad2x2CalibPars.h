@@ -83,12 +83,10 @@ public:
    */ 
 
   // DEPRICATED constructor, which use string& source ...
-  /*
   CSPad2x2CalibPars ( const std::string&   calibDir,           //  /reg/d/psdm/mec/mec73313/calib
                       const std::string&   typeGroupName,      //  CsPad2x2::CalibV1
                       const std::string&   source,             //  MecTargetChamber.0:Cspad2x2.1
                       const unsigned long& runNumber ) ;       //  10
-  */
 
   CSPad2x2CalibPars ( const std::string&   calibDir,           //  /reg/d/psdm/mec/mec73313/calib
                       const std::string&   typeGroupName,      //  CsPad2x2::CalibV1
