@@ -49,7 +49,6 @@ public:
   virtual int16_t pvId() const;
   virtual int16_t dbrType() const;
   virtual int16_t numElements() const;
-  virtual void print() const;
   virtual uint8_t isCtrl() const;
   virtual uint8_t isTime() const;
   virtual uint16_t status() const;
@@ -69,7 +68,6 @@ public:
   virtual int16_t pvId() const;
   virtual int16_t dbrType() const;
   virtual int16_t numElements() const;
-  virtual void print() const;
   virtual uint8_t isCtrl() const;
   virtual uint8_t isTime() const;
   virtual uint16_t status() const;
@@ -90,7 +88,6 @@ public:
   virtual int16_t pvId() const;
   virtual int16_t dbrType() const;
   virtual int16_t numElements() const;
-  virtual void print() const;
   virtual uint8_t isCtrl() const;
   virtual uint8_t isTime() const;
   virtual uint16_t status() const;
@@ -111,7 +108,6 @@ public:
   virtual int16_t pvId() const;
   virtual int16_t dbrType() const;
   virtual int16_t numElements() const;
-  virtual void print() const;
   virtual uint8_t isCtrl() const;
   virtual uint8_t isTime() const;
   virtual uint16_t status() const;
@@ -137,7 +133,6 @@ public:
   virtual int16_t pvId() const;
   virtual int16_t dbrType() const;
   virtual int16_t numElements() const;
-  virtual void print() const;
   virtual uint8_t isCtrl() const;
   virtual uint8_t isTime() const;
   virtual uint16_t status() const;
@@ -162,7 +157,6 @@ public:
   virtual int16_t pvId() const;
   virtual int16_t dbrType() const;
   virtual int16_t numElements() const;
-  virtual void print() const;
   virtual uint8_t isCtrl() const;
   virtual uint8_t isTime() const;
   virtual uint16_t status() const;
@@ -187,7 +181,6 @@ public:
   virtual int16_t pvId() const;
   virtual int16_t dbrType() const;
   virtual int16_t numElements() const;
-  virtual void print() const;
   virtual uint8_t isCtrl() const;
   virtual uint8_t isTime() const;
   virtual uint16_t status() const;
@@ -212,7 +205,6 @@ public:
   virtual int16_t pvId() const;
   virtual int16_t dbrType() const;
   virtual int16_t numElements() const;
-  virtual void print() const;
   virtual uint8_t isCtrl() const;
   virtual uint8_t isTime() const;
   virtual uint16_t status() const;
@@ -237,7 +229,6 @@ public:
   virtual int16_t pvId() const;
   virtual int16_t dbrType() const;
   virtual int16_t numElements() const;
-  virtual void print() const;
   virtual uint8_t isCtrl() const;
   virtual uint8_t isTime() const;
   virtual uint16_t status() const;
@@ -262,7 +253,6 @@ public:
   virtual int16_t pvId() const;
   virtual int16_t dbrType() const;
   virtual int16_t numElements() const;
-  virtual void print() const;
   virtual uint8_t isCtrl() const;
   virtual uint8_t isTime() const;
   virtual uint16_t status() const;
@@ -287,7 +277,6 @@ public:
   virtual int16_t pvId() const;
   virtual int16_t dbrType() const;
   virtual int16_t numElements() const;
-  virtual void print() const;
   virtual uint8_t isCtrl() const;
   virtual uint8_t isTime() const;
   virtual uint16_t status() const;
@@ -313,7 +302,6 @@ public:
   virtual int16_t pvId() const;
   virtual int16_t dbrType() const;
   virtual int16_t numElements() const;
-  virtual void print() const;
   virtual uint8_t isCtrl() const;
   virtual uint8_t isTime() const;
   virtual uint16_t status() const;
@@ -338,7 +326,6 @@ public:
   virtual int16_t pvId() const;
   virtual int16_t dbrType() const;
   virtual int16_t numElements() const;
-  virtual void print() const;
   virtual uint8_t isCtrl() const;
   virtual uint8_t isTime() const;
   virtual uint16_t status() const;
@@ -363,7 +350,6 @@ public:
   virtual int16_t pvId() const;
   virtual int16_t dbrType() const;
   virtual int16_t numElements() const;
-  virtual void print() const;
   virtual uint8_t isCtrl() const;
   virtual uint8_t isTime() const;
   virtual uint16_t status() const;
@@ -388,7 +374,6 @@ public:
   virtual int16_t pvId() const;
   virtual int16_t dbrType() const;
   virtual int16_t numElements() const;
-  virtual void print() const;
   virtual uint8_t isCtrl() const;
   virtual uint8_t isTime() const;
   virtual uint16_t status() const;
@@ -413,7 +398,6 @@ public:
   virtual int16_t pvId() const;
   virtual int16_t dbrType() const;
   virtual int16_t numElements() const;
-  virtual void print() const;
   virtual uint8_t isCtrl() const;
   virtual uint8_t isTime() const;
   virtual uint16_t status() const;
@@ -438,7 +422,6 @@ public:
   virtual int16_t pvId() const;
   virtual int16_t dbrType() const;
   virtual int16_t numElements() const;
-  virtual void print() const;
   virtual uint8_t isCtrl() const;
   virtual uint8_t isTime() const;
   virtual uint16_t status() const;
@@ -453,20 +436,7 @@ private:
   Psana::Epics::dbr_time_double _dbr;
 };
 
-
-class PvConfigV1 : public Psana::Epics::PvConfigV1 {
-public:
-  typedef PsddlPds::Epics::PvConfigV1 XtcType;
-  typedef Psana::Epics::PvConfigV1 PsanaType;
-  PvConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr);
-  virtual ~PvConfigV1();
-  virtual int16_t pvId() const;
-  virtual const char* description() const;
-  virtual float interval() const;
-  const XtcType& _xtcObj() const { return *m_xtcObj; }
-private:
-  boost::shared_ptr<const XtcType> m_xtcObj;
-};
+Psana::Epics::PvConfigV1 pds_to_psana(PsddlPds::Epics::PvConfigV1 pds);
 
 
 class ConfigV1 : public Psana::Epics::ConfigV1 {
@@ -476,12 +446,12 @@ public:
   ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~ConfigV1();
   virtual int32_t numPv() const;
-  virtual const Psana::Epics::PvConfigV1& pvControls(uint32_t i0) const;
-  virtual std::vector<int> pvControls_shape() const;
+  virtual ndarray<const Psana::Epics::PvConfigV1, 1> pvControls() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
-  std::vector< psddl_pds2psana::Epics::PvConfigV1 > _pvControls;
+  std::vector<Psana::Epics::PvConfigV1> _pvControls_ndarray_storage_;
+  unsigned _pvControls_ndarray_shape_[1];
 };
 
 } // namespace Epics

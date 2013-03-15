@@ -105,8 +105,6 @@ int16_t EpicsPvHeader::dbrType() const { return m_xtcObj->dbrType(); }
 
 int16_t EpicsPvHeader::numElements() const { return m_xtcObj->numElements(); }
 
-void EpicsPvHeader::print() const { return m_xtcObj->print(); }
-
 uint8_t EpicsPvHeader::isCtrl() const { return m_xtcObj->isCtrl(); }
 
 uint8_t EpicsPvHeader::isTime() const { return m_xtcObj->isTime(); }
@@ -129,8 +127,6 @@ int16_t EpicsPvCtrlHeader::pvId() const { return m_xtcObj->pvId(); }
 int16_t EpicsPvCtrlHeader::dbrType() const { return m_xtcObj->dbrType(); }
 
 int16_t EpicsPvCtrlHeader::numElements() const { return m_xtcObj->numElements(); }
-
-void EpicsPvCtrlHeader::print() const { return m_xtcObj->print(); }
 
 uint8_t EpicsPvCtrlHeader::isCtrl() const { return m_xtcObj->isCtrl(); }
 
@@ -157,8 +153,6 @@ int16_t EpicsPvTimeHeader::dbrType() const { return m_xtcObj->dbrType(); }
 
 int16_t EpicsPvTimeHeader::numElements() const { return m_xtcObj->numElements(); }
 
-void EpicsPvTimeHeader::print() const { return m_xtcObj->print(); }
-
 uint8_t EpicsPvTimeHeader::isCtrl() const { return m_xtcObj->isCtrl(); }
 
 uint8_t EpicsPvTimeHeader::isTime() const { return m_xtcObj->isTime(); }
@@ -184,8 +178,6 @@ int16_t EpicsPvCtrlString::pvId() const { return m_xtcObj->pvId(); }
 int16_t EpicsPvCtrlString::dbrType() const { return m_xtcObj->dbrType(); }
 
 int16_t EpicsPvCtrlString::numElements() const { return m_xtcObj->numElements(); }
-
-void EpicsPvCtrlString::print() const { return m_xtcObj->print(); }
 
 uint8_t EpicsPvCtrlString::isCtrl() const { return m_xtcObj->isCtrl(); }
 
@@ -221,8 +213,6 @@ int16_t EpicsPvCtrlShort::dbrType() const { return m_xtcObj->dbrType(); }
 
 int16_t EpicsPvCtrlShort::numElements() const { return m_xtcObj->numElements(); }
 
-void EpicsPvCtrlShort::print() const { return m_xtcObj->print(); }
-
 uint8_t EpicsPvCtrlShort::isCtrl() const { return m_xtcObj->isCtrl(); }
 
 uint8_t EpicsPvCtrlShort::isTime() const { return m_xtcObj->isTime(); }
@@ -254,8 +244,6 @@ int16_t EpicsPvCtrlFloat::pvId() const { return m_xtcObj->pvId(); }
 int16_t EpicsPvCtrlFloat::dbrType() const { return m_xtcObj->dbrType(); }
 
 int16_t EpicsPvCtrlFloat::numElements() const { return m_xtcObj->numElements(); }
-
-void EpicsPvCtrlFloat::print() const { return m_xtcObj->print(); }
 
 uint8_t EpicsPvCtrlFloat::isCtrl() const { return m_xtcObj->isCtrl(); }
 
@@ -289,8 +277,6 @@ int16_t EpicsPvCtrlEnum::dbrType() const { return m_xtcObj->dbrType(); }
 
 int16_t EpicsPvCtrlEnum::numElements() const { return m_xtcObj->numElements(); }
 
-void EpicsPvCtrlEnum::print() const { return m_xtcObj->print(); }
-
 uint8_t EpicsPvCtrlEnum::isCtrl() const { return m_xtcObj->isCtrl(); }
 
 uint8_t EpicsPvCtrlEnum::isTime() const { return m_xtcObj->isTime(); }
@@ -322,8 +308,6 @@ int16_t EpicsPvCtrlChar::pvId() const { return m_xtcObj->pvId(); }
 int16_t EpicsPvCtrlChar::dbrType() const { return m_xtcObj->dbrType(); }
 
 int16_t EpicsPvCtrlChar::numElements() const { return m_xtcObj->numElements(); }
-
-void EpicsPvCtrlChar::print() const { return m_xtcObj->print(); }
 
 uint8_t EpicsPvCtrlChar::isCtrl() const { return m_xtcObj->isCtrl(); }
 
@@ -357,8 +341,6 @@ int16_t EpicsPvCtrlLong::dbrType() const { return m_xtcObj->dbrType(); }
 
 int16_t EpicsPvCtrlLong::numElements() const { return m_xtcObj->numElements(); }
 
-void EpicsPvCtrlLong::print() const { return m_xtcObj->print(); }
-
 uint8_t EpicsPvCtrlLong::isCtrl() const { return m_xtcObj->isCtrl(); }
 
 uint8_t EpicsPvCtrlLong::isTime() const { return m_xtcObj->isTime(); }
@@ -391,8 +373,6 @@ int16_t EpicsPvCtrlDouble::dbrType() const { return m_xtcObj->dbrType(); }
 
 int16_t EpicsPvCtrlDouble::numElements() const { return m_xtcObj->numElements(); }
 
-void EpicsPvCtrlDouble::print() const { return m_xtcObj->print(); }
-
 uint8_t EpicsPvCtrlDouble::isCtrl() const { return m_xtcObj->isCtrl(); }
 
 uint8_t EpicsPvCtrlDouble::isTime() const { return m_xtcObj->isTime(); }
@@ -424,8 +404,6 @@ int16_t EpicsPvTimeString::pvId() const { return m_xtcObj->pvId(); }
 int16_t EpicsPvTimeString::dbrType() const { return m_xtcObj->dbrType(); }
 
 int16_t EpicsPvTimeString::numElements() const { return m_xtcObj->numElements(); }
-
-void EpicsPvTimeString::print() const { return m_xtcObj->print(); }
 
 uint8_t EpicsPvTimeString::isCtrl() const { return m_xtcObj->isCtrl(); }
 
@@ -461,8 +439,6 @@ int16_t EpicsPvTimeShort::dbrType() const { return m_xtcObj->dbrType(); }
 
 int16_t EpicsPvTimeShort::numElements() const { return m_xtcObj->numElements(); }
 
-void EpicsPvTimeShort::print() const { return m_xtcObj->print(); }
-
 uint8_t EpicsPvTimeShort::isCtrl() const { return m_xtcObj->isCtrl(); }
 
 uint8_t EpicsPvTimeShort::isTime() const { return m_xtcObj->isTime(); }
@@ -494,8 +470,6 @@ int16_t EpicsPvTimeFloat::pvId() const { return m_xtcObj->pvId(); }
 int16_t EpicsPvTimeFloat::dbrType() const { return m_xtcObj->dbrType(); }
 
 int16_t EpicsPvTimeFloat::numElements() const { return m_xtcObj->numElements(); }
-
-void EpicsPvTimeFloat::print() const { return m_xtcObj->print(); }
 
 uint8_t EpicsPvTimeFloat::isCtrl() const { return m_xtcObj->isCtrl(); }
 
@@ -529,8 +503,6 @@ int16_t EpicsPvTimeEnum::dbrType() const { return m_xtcObj->dbrType(); }
 
 int16_t EpicsPvTimeEnum::numElements() const { return m_xtcObj->numElements(); }
 
-void EpicsPvTimeEnum::print() const { return m_xtcObj->print(); }
-
 uint8_t EpicsPvTimeEnum::isCtrl() const { return m_xtcObj->isCtrl(); }
 
 uint8_t EpicsPvTimeEnum::isTime() const { return m_xtcObj->isTime(); }
@@ -562,8 +534,6 @@ int16_t EpicsPvTimeChar::pvId() const { return m_xtcObj->pvId(); }
 int16_t EpicsPvTimeChar::dbrType() const { return m_xtcObj->dbrType(); }
 
 int16_t EpicsPvTimeChar::numElements() const { return m_xtcObj->numElements(); }
-
-void EpicsPvTimeChar::print() const { return m_xtcObj->print(); }
 
 uint8_t EpicsPvTimeChar::isCtrl() const { return m_xtcObj->isCtrl(); }
 
@@ -597,8 +567,6 @@ int16_t EpicsPvTimeLong::dbrType() const { return m_xtcObj->dbrType(); }
 
 int16_t EpicsPvTimeLong::numElements() const { return m_xtcObj->numElements(); }
 
-void EpicsPvTimeLong::print() const { return m_xtcObj->print(); }
-
 uint8_t EpicsPvTimeLong::isCtrl() const { return m_xtcObj->isCtrl(); }
 
 uint8_t EpicsPvTimeLong::isTime() const { return m_xtcObj->isTime(); }
@@ -631,8 +599,6 @@ int16_t EpicsPvTimeDouble::dbrType() const { return m_xtcObj->dbrType(); }
 
 int16_t EpicsPvTimeDouble::numElements() const { return m_xtcObj->numElements(); }
 
-void EpicsPvTimeDouble::print() const { return m_xtcObj->print(); }
-
 uint8_t EpicsPvTimeDouble::isCtrl() const { return m_xtcObj->isCtrl(); }
 
 uint8_t EpicsPvTimeDouble::isTime() const { return m_xtcObj->isTime(); }
@@ -648,33 +614,24 @@ const Psana::Epics::dbr_time_double& EpicsPvTimeDouble::dbr() const { return _db
 ndarray<const double, 1> EpicsPvTimeDouble::data() const { return m_xtcObj->data(); }
 
 double EpicsPvTimeDouble::value(uint32_t i) const { return m_xtcObj->value(i); }
-PvConfigV1::PvConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr)
-  : Psana::Epics::PvConfigV1()
-  , m_xtcObj(xtcPtr)
+Psana::Epics::PvConfigV1 pds_to_psana(PsddlPds::Epics::PvConfigV1 pds)
 {
-}
-PvConfigV1::~PvConfigV1()
-{
+  return Psana::Epics::PvConfigV1(pds.pvId(), pds.description(), pds.interval());
 }
 
-
-int16_t PvConfigV1::pvId() const { return m_xtcObj->pvId(); }
-
-const char* PvConfigV1::description() const { return m_xtcObj->description(); }
-
-float PvConfigV1::interval() const { return m_xtcObj->interval(); }
 ConfigV1::ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::Epics::ConfigV1()
   , m_xtcObj(xtcPtr)
 {
   {
-    const std::vector<int>& dims = xtcPtr->pvControls_shape();
-    _pvControls.reserve(dims[0]);
-    for (int i0=0; i0 != dims[0]; ++i0) {
-      const PsddlPds::Epics::PvConfigV1& d = xtcPtr->pvControls(i0);
-      boost::shared_ptr<const PsddlPds::Epics::PvConfigV1> dPtr(m_xtcObj, &d);
-      _pvControls.push_back(psddl_pds2psana::Epics::PvConfigV1(dPtr));
+    typedef ndarray<const PsddlPds::Epics::PvConfigV1, 1> XtcNDArray;
+    const XtcNDArray& xtc_ndarr = xtcPtr->pvControls();
+    _pvControls_ndarray_storage_.reserve(xtc_ndarr.size());
+    for (XtcNDArray::iterator it = xtc_ndarr.begin(); it != xtc_ndarr.end(); ++ it) {
+      _pvControls_ndarray_storage_.push_back(psddl_pds2psana::Epics::pds_to_psana(*it));
     }
+    const unsigned* shape = xtc_ndarr.shape();
+    std::copy(shape, shape+1, _pvControls_ndarray_shape_);
   }
 }
 ConfigV1::~ConfigV1()
@@ -684,14 +641,6 @@ ConfigV1::~ConfigV1()
 
 int32_t ConfigV1::numPv() const { return m_xtcObj->numPv(); }
 
-const Psana::Epics::PvConfigV1& ConfigV1::pvControls(uint32_t i0) const { return _pvControls[i0]; }
-std::vector<int> ConfigV1::pvControls_shape() const
-{
-  std::vector<int> shape;
-  shape.reserve(1);
-  shape.push_back(_pvControls.size());
-  return shape;
-}
-
+ndarray<const Psana::Epics::PvConfigV1, 1> ConfigV1::pvControls() const { return ndarray<const Psana::Epics::PvConfigV1, 1>(&_pvControls_ndarray_storage_[0], _pvControls_ndarray_shape_); }
 } // namespace Epics
 } // namespace psddl_pds2psana
