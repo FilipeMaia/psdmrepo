@@ -100,9 +100,6 @@ EpicsPvTimeLong::~EpicsPvTimeLong() {}
 EpicsPvTimeDouble::~EpicsPvTimeDouble() {}
 
 
-PvConfigV1::~PvConfigV1() {}
-
-
 ConfigV1::~ConfigV1() {}
 
 } // namespace Epics

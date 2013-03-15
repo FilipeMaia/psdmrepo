@@ -44,8 +44,6 @@ namespace EpicsLib {
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
- *  @see AdditionalClass
- *
  *  @version $Id$
  *
  *  @author Andrei Salnikov
@@ -170,6 +168,190 @@ ValueType getEpicsValue(const Epics::EpicsPvHeader& pv, int index)
         boost::lexical_cast<std::string>(pv.dbrType()));
   }
 }
+
+
+/**
+ * Type traits for epics DBR types. DBR can be one of the dbr_time_xxx or dbr_ctrl_xxx types.
+ */
+template <typename DBR>
+struct DBRTypeTraits {  
+};
+
+template <>
+struct DBRTypeTraits<Epics::dbr_time_string> {
+  typedef char value_type[Epics::MAX_STRING_SIZE];
+  typedef Epics::EpicsPvTimeString pv_type;
+};
+
+template <>
+struct DBRTypeTraits<Epics::dbr_time_enum> {
+  typedef uint16_t value_type;
+  typedef Epics::EpicsPvTimeEnum pv_type;
+};
+
+template <>
+struct DBRTypeTraits<Epics::dbr_time_char> {
+  typedef uint8_t value_type;
+  typedef Epics::EpicsPvTimeChar pv_type;
+};
+
+template <>
+struct DBRTypeTraits<Epics::dbr_time_short> {
+  typedef int16_t value_type;
+  typedef Epics::EpicsPvTimeShort pv_type;
+};
+
+template <>
+struct DBRTypeTraits<Epics::dbr_time_long> {
+  typedef int32_t value_type;
+  typedef Epics::EpicsPvTimeLong pv_type;
+};
+
+template <>
+struct DBRTypeTraits<Epics::dbr_time_float> {
+  typedef float value_type;
+  typedef Epics::EpicsPvTimeFloat pv_type;
+};
+
+template <>
+struct DBRTypeTraits<Epics::dbr_time_double> {
+  typedef double value_type;
+  typedef Epics::EpicsPvTimeDouble pv_type;
+};
+
+template <>
+struct DBRTypeTraits<Epics::dbr_sts_string> {
+  typedef char value_type[Epics::MAX_STRING_SIZE];
+  typedef Epics::EpicsPvCtrlString pv_type;
+};
+
+template <>
+struct DBRTypeTraits<Epics::dbr_ctrl_enum> {
+  typedef uint16_t value_type;
+  typedef Epics::EpicsPvCtrlEnum pv_type;
+};
+
+template <>
+struct DBRTypeTraits<Epics::dbr_ctrl_char> {
+  typedef uint8_t value_type;
+  typedef Epics::EpicsPvCtrlChar pv_type;
+};
+
+template <>
+struct DBRTypeTraits<Epics::dbr_ctrl_short> {
+  typedef int16_t value_type;
+  typedef Epics::EpicsPvCtrlShort pv_type;
+};
+
+template <>
+struct DBRTypeTraits<Epics::dbr_ctrl_long> {
+  typedef int32_t value_type;
+  typedef Epics::EpicsPvCtrlLong pv_type;
+};
+
+template <>
+struct DBRTypeTraits<Epics::dbr_ctrl_float> {
+  typedef float value_type;
+  typedef Epics::EpicsPvCtrlFloat pv_type;
+};
+
+template <>
+struct DBRTypeTraits<Epics::dbr_ctrl_double> {
+  typedef double value_type;
+  typedef Epics::EpicsPvCtrlDouble pv_type;
+};
+
+
+/**
+ * Type traits for epics PV types. PV can be one of the Epics::EpicsPvXxx types.
+ */
+template <typename PV>
+struct PVTypeTraits {  
+};
+
+template <>
+struct PVTypeTraits<Epics::EpicsPvTimeString> {
+  typedef char value_type[Epics::MAX_STRING_SIZE];
+  typedef Epics::dbr_time_string dbr_type;
+};
+
+template <>
+struct PVTypeTraits<Epics::EpicsPvTimeEnum> {
+  typedef uint16_t value_type;
+  typedef Epics::dbr_time_enum dbr_type;
+};
+
+template <>
+struct PVTypeTraits<Epics::EpicsPvTimeChar> {
+  typedef uint8_t value_type;
+  typedef Epics::dbr_time_char dbr_type;
+};
+
+template <>
+struct PVTypeTraits<Epics::EpicsPvTimeShort> {
+  typedef int16_t value_type;
+  typedef Epics::dbr_time_short dbr_type;
+};
+
+template <>
+struct PVTypeTraits<Epics::EpicsPvTimeLong> {
+  typedef int32_t value_type;
+  typedef Epics::dbr_time_long dbr_type;
+};
+
+template <>
+struct PVTypeTraits<Epics::EpicsPvTimeFloat> {
+  typedef float value_type;
+  typedef Epics::dbr_time_float dbr_type;
+};
+
+template <>
+struct PVTypeTraits<Epics::EpicsPvTimeDouble> {
+  typedef double value_type;
+  typedef Epics::dbr_time_double dbr_type;
+};
+
+template <>
+struct PVTypeTraits<Epics::EpicsPvCtrlString> {
+  typedef char value_type[Epics::MAX_STRING_SIZE];
+  typedef Epics::dbr_sts_string dbr_type;
+};
+
+template <>
+struct PVTypeTraits<Epics::EpicsPvCtrlEnum> {
+  typedef uint16_t value_type;
+  typedef Epics::dbr_ctrl_enum dbr_type;
+};
+
+template <>
+struct PVTypeTraits<Epics::EpicsPvCtrlChar> {
+  typedef uint8_t value_type;
+  typedef Epics::dbr_ctrl_char dbr_type;
+};
+
+template <>
+struct PVTypeTraits<Epics::EpicsPvCtrlShort> {
+  typedef int16_t value_type;
+  typedef Epics::dbr_ctrl_short dbr_type;
+};
+
+template <>
+struct PVTypeTraits<Epics::EpicsPvCtrlLong> {
+  typedef int32_t value_type;
+  typedef Epics::dbr_ctrl_long dbr_type;
+};
+
+template <>
+struct PVTypeTraits<Epics::EpicsPvCtrlFloat> {
+  typedef float value_type;
+  typedef Epics::dbr_ctrl_float dbr_type;
+};
+
+template <>
+struct PVTypeTraits<Epics::EpicsPvCtrlDouble> {
+  typedef double value_type;
+  typedef Epics::dbr_ctrl_double dbr_type;
+};
 
 
 } // namespace EpicsLib
