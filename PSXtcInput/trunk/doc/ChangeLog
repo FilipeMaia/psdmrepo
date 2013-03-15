@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-01
+2013-03-15 Andy Salnikov
+- small changes in epics classes interfaces
+
 Tag: V00-08-00
 2013-03-14 Andy Salnikov
 - EventId class adds ticks() method to the interface
