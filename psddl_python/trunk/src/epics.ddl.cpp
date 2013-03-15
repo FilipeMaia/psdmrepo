@@ -223,7 +223,6 @@ void createWrappers(PyObject* module) {
     .def("pvId", &Psana::Epics::EpicsPvHeader::pvId)
     .def("dbrType", &Psana::Epics::EpicsPvHeader::dbrType)
     .def("numElements", &Psana::Epics::EpicsPvHeader::numElements)
-    .def("print", &Psana::Epics::EpicsPvHeader::print)
     .def("isCtrl", &Psana::Epics::EpicsPvHeader::isCtrl)
     .def("isTime", &Psana::Epics::EpicsPvHeader::isTime)
     .def("status", &Psana::Epics::EpicsPvHeader::status)
@@ -375,19 +374,18 @@ void createWrappers(PyObject* module) {
   ;
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Epics::EpicsPvTimeDouble> >(-1, -1));
 
-  class_<Psana::Epics::PvConfigV1, boost::shared_ptr<Psana::Epics::PvConfigV1>, boost::noncopyable >("PvConfigV1", no_init)
+  class_<Psana::Epics::PvConfigV1 >("PvConfigV1", no_init)
     .def("pvId", &Psana::Epics::PvConfigV1::pvId)
     .def("description", &Psana::Epics::PvConfigV1::description)
     .def("interval", &Psana::Epics::PvConfigV1::interval)
     .def("__typeid__", &method_typeid<Psana::Epics::PvConfigV1>)
     .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Epics::PvConfigV1> >(-1, -1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Epics::PvConfigV1> >(-1, -1));
 
   class_<Psana::Epics::ConfigV1, boost::shared_ptr<Psana::Epics::ConfigV1>, boost::noncopyable >("ConfigV1", no_init)
     .def("numPv", &Psana::Epics::ConfigV1::numPv)
-    .def("pvControls", &Psana::Epics::ConfigV1::pvControls, return_internal_reference<>())
-    .def("pvControls_shape", &method_shape<Psana::Epics::ConfigV1, &Psana::Epics::ConfigV1::pvControls_shape>)
+    .def("pvControls", &Psana::Epics::ConfigV1::pvControls)
     .def("__typeid__", &method_typeid<Psana::Epics::ConfigV1>)
     .staticmethod("__typeid__")
   ;
@@ -402,6 +400,7 @@ void createWrappers(PyObject* module) {
   detail::register_ndarray_to_numpy_cvt<const double, 1>();
   detail::register_ndarray_to_numpy_cvt<const uint8_t, 1>();
   detail::register_ndarray_to_numpy_cvt<const int16_t, 1>();
+  detail::register_ndarray_to_list_cvt<const Psana::Epics::PvConfigV1>();
   detail::register_ndarray_to_numpy_cvt<const float, 1>();
   detail::register_ndarray_to_numpy_cvt<const uint16_t, 1>();
   detail::register_ndarray_to_numpy_cvt<const int32_t, 1>();
