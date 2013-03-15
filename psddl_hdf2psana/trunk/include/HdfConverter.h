@@ -25,7 +25,7 @@
 #include "hdf5pp/Group.h"
 #include "pdsdata/xtc/Src.hh"
 #include "pdsdata/xtc/TypeId.hh"
-#include "PSEnv/EnvObjectStore.h"
+#include "PSEnv/Env.h"
 #include "PSEnv/EpicsStore.h"
 #include "PSEvt/Event.h"
 
@@ -66,13 +66,8 @@ public:
   /**
    *  @brief Convert one object and store it in the event.
    */
-  void convert(const hdf5pp::Group& group, uint64_t idx, PSEvt::Event& evt, PSEnv::EnvObjectStore& cfgStore);
+  void convert(const hdf5pp::Group& group, uint64_t idx, PSEvt::Event& evt, PSEnv::Env& env);
   
-  /**
-   *  @brief Convert one object and store it in the config store.
-   */
-  void convertConfig(const hdf5pp::Group& group, uint64_t idx, PSEnv::EnvObjectStore& cfgStore);
-
   /**
    *  @brief Convert one object and store it in the epics store.
    */

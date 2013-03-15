@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-01
+2013-03-15 Andy Salnikov
+- added epics, not very efficient implementation
+- first production tag for nightlies
+
 Tag: andy-20130313-01
 2013-03-13 Andy Salnikov
 - added acqiris and pnccd

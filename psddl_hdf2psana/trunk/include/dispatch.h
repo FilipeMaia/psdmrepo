@@ -15,8 +15,8 @@ namespace psddl_hdf2psana {
    *  Function takes HDF5 group, converts its contents into psana-type instance and stores either in
    *  event or config-store. Pointer to even may be zero.
    */
-  void hdfConvert(const hdf5pp::Group& group, uint64_t idx, const std::string& typeName, int schema_version, 
-                  const Pds::Src& src, PSEvt::Event* evt, PSEnv::EnvObjectStore& cfgStore);
+  void hdfConvert(const hdf5pp::Group& group, int64_t idx, const std::string& typeName, int schema_version, 
+                  const Pds::Src& src, PSEvt::Event& evt, PSEnv::EnvObjectStore& cfgStore);
 
 } // namespace psddl_hdf2psana
 

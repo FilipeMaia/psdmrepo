@@ -2,9 +2,8 @@
 
 set -e
 
-packages="acqiris andor bld camera control cspad cspad2x2 encoder evr fccd fli gsc16ai ipimb lusi \
+packages="acqiris andor bld camera control cspad cspad2x2 encoder epics evr fccd fli gsc16ai ipimb lusi \
         oceanoptics opal1k orca pnccd princeton pulnix quartz timepix usdusb"
-#packages="pnccd"
 
 for pkg in $packages; do 
     f="psddldata/data/$pkg.ddl.xml" 

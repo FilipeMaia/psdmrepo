@@ -23,12 +23,14 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "hdf5pp/Utils.h"
 #include "MsgLogger/MsgLogger.h"
 #include "pdsdata/xtc/BldInfo.hh"
 #include "pdsdata/xtc/DetInfo.hh"
 #include "psddl_hdf2psana/HdfGroupName.h"
 #include "psddl_hdf2psana/Exceptions.h"
 #include "psddl_hdf2psana/dispatch.h"
+#include "psddl_hdf2psana/epics.ddlm.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -82,26 +84,13 @@ HdfConverter::~HdfConverter ()
  *  @brief Convert one object and store it in the event.
  */
 void
-HdfConverter::convert(const hdf5pp::Group& group, uint64_t idx, PSEvt::Event& evt, PSEnv::EnvObjectStore& cfgStore)
+HdfConverter::convert(const hdf5pp::Group& group, uint64_t idx, PSEvt::Event& evt, PSEnv::Env& env)
 {
   const std::string& typeName = this->typeName(group.name());
   const Pds::Src& src = this->source(group);
   int schema = schemaVersion(group);
   
-  hdfConvert(group, idx, typeName, schema, src, &evt, cfgStore);
-}
-
-/**
- *  @brief Convert one object and store it in the config store.
- */
-void
-HdfConverter::convertConfig(const hdf5pp::Group& group, uint64_t idx, PSEnv::EnvObjectStore& cfgStore)
-{
-  const std::string& typeName = this->typeName(group.name());
-  const Pds::Src& src = this->source(group);
-  int schema = schemaVersion(group);
-  
-  hdfConvert(group, idx, typeName, schema, src, 0, cfgStore);
+  hdfConvert(group, idx, typeName, schema, src, evt, env.configStore());
 }
 
 /**
@@ -110,6 +99,13 @@ HdfConverter::convertConfig(const hdf5pp::Group& group, uint64_t idx, PSEnv::Env
 void
 HdfConverter::convertEpics(const hdf5pp::Group& group, uint64_t idx, PSEnv::EpicsStore& eStore)
 {
+  if (isEpics(group.name())) {
+    boost::shared_ptr<Psana::Epics::EpicsPvHeader> epics = Epics::readEpics(group, idx);
+    if (epics) {
+      const Pds::Src& src = this->source(group);
+      eStore.store(epics, src);
+    }
+  }
 }
 
 /**
