@@ -85,8 +85,8 @@ namespace {{namespace}} {
    *  Function takes HDF5 group, converts its contents into psana-type instance and stores either in
    *  event or config-store. Pointer to even may be zero.
    */
-  void hdfConvert(const hdf5pp::Group& group, uint64_t idx, const std::string& typeName, int schema_version, 
-                  const Pds::Src& src, PSEvt::Event* evt, PSEnv::EnvObjectStore& cfgStore);
+  void hdfConvert(const hdf5pp::Group& group, int64_t idx, const std::string& typeName, int schema_version, 
+                  const Pds::Src& src, PSEvt::Event& evt, PSEnv::EnvObjectStore& cfgStore);
 
 {% if namespace %}
 } // namespace {{namespace}}
@@ -110,8 +110,8 @@ _impl_template = ji.Template('''\
 {% if namespace %}
 namespace {{namespace}} {
 {% endif %}
-void hdfConvert(const hdf5pp::Group& group, uint64_t idx, const std::string& typeName, int schema_version, 
-                const Pds::Src& src, PSEvt::Event* evt, PSEnv::EnvObjectStore& cfgStore)
+void hdfConvert(const hdf5pp::Group& group, int64_t idx, const std::string& typeName, int schema_version, 
+                const Pds::Src& src, PSEvt::Event& evt, PSEnv::EnvObjectStore& cfgStore)
 try {
 
   uint32_t hash = str_hash(typeName);
@@ -140,26 +140,22 @@ try {
 ''', trim_blocks=True)
 
 _config_store_template = ji.Template('''\
-    cfgStore.putProxy({{namespace}}::make_{{type.name}}(schema_version, group, -1), src);
+    cfgStore.putProxy({{namespace}}::make_{{type.name}}(schema_version, group, idx), src);
 ''', trim_blocks=True)
 
 _event_store_template = ji.Template('''\
-    if (evt) {
-      evt->putProxy({{namespace}}::make_{{type.name}}(schema_version, group, idx), src);
-    }
+    evt.putProxy({{namespace}}::make_{{type.name}}(schema_version, group, idx), src);
 ''', trim_blocks=True)
 
 _event_cfg_store_template = ji.Template('''\
-    if (evt) {
 {% for config_type in config_types %}
 {% if loop.first %}
-      if (boost::shared_ptr<{{config_type}}> cfgPtr = cfgStore.get(src)) {
+    if (boost::shared_ptr<{{config_type}}> cfgPtr = cfgStore.get(src)) {
 {% else %}
-      } else if (boost::shared_ptr<{{config_type}}> cfgPtr = cfgStore.get(src)) {
+    } else if (boost::shared_ptr<{{config_type}}> cfgPtr = cfgStore.get(src)) {
 {% endif %}
-        evt->putProxy({{namespace}}::make_{{type.name}}(schema_version, group, idx, cfgPtr), src);
+      evt.putProxy({{namespace}}::make_{{type.name}}(schema_version, group, idx, cfgPtr), src);
 {% endfor %}
-      }
     }
 ''', trim_blocks=True)
 

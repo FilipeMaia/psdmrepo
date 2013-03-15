@@ -308,6 +308,12 @@ def _typedecl(type):
 def _argdecl(name, type):    
     return _typedecl(type) + ' ' + name
 
+def _types(type):
+    """Generator for the type list of the type plus all it bases"""
+    if type:
+        for t in _types(type.base): yield t
+        yield type
+
 #------------------------
 # Exported definitions --
 #------------------------
@@ -541,8 +547,14 @@ class DatasetArray(object):
         if self.attr.type.value_type:
             return self.attr.type.fullName('C++', psana_ns)
         else:
-            attr_schema = self.attr._h5schema
-            return T("${name}_v${version}")[self.attr._h5schema]
+            # find a schema for attribute
+            aschema = [sch for sch in self.attr.type.h5schemas if sch.version == self.attr.schema_version]
+            if not aschema: raise ValueError('No schema found for attribute %s' % self.attr.name)
+            aschema = aschema[0]
+            if len(aschema.datasets) != 1:
+                raise ValueError('Attribute schema has number of datasets != 1: %d for attr %s of type %s' % (len(aschema.datasets), self.attr.name, self.attr.type.name))
+
+            return T("${name}_v${version}")[aschema]
 
     def _attr_dsname(self):
         '''Returns dataset type name for the attribute'''
@@ -553,6 +565,7 @@ class DatasetArray(object):
             return aschema[0].datasets[0].classNameNs()
 
     def ds_read_decl(self, psana_ns):
+        _log.debug("ds_read_decl: ds=%s", self.ds)
         dsClassName = self.ds.classNameNs()
         dsName = self.ds.name
         rank = self.attr.rank
@@ -648,11 +661,6 @@ class SchemaAbstractType(SchemaType):
         '''schema parameter is of type H5Type'''
         SchemaType.__init__(self, schema)
             
-    def _types(self):
-        """Generator for the type list of the type plus all it bases"""
-        if self.schema.pstype.base:
-            for t in _types(self.schema.pstype.base): yield t
-        yield self.schema.pstype
 
     def genSchema(self, inc, cpp, psana_ns):
         """Generate code for abstract types"""
@@ -668,7 +676,7 @@ class SchemaAbstractType(SchemaType):
 
         # declarations for public methods 
         methods = []
-        for t in self._types():
+        for t in _types(self.schema.pstype):
             for meth in t.methods(): 
                 if meth.access == 'public': 
                     decl, impl = self._genMethod(meth, psana_ns)

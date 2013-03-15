@@ -109,6 +109,7 @@ class H5Type ( object ) :
         # Dataset name is 'data' for event data or 'config' for config types.
         ds = None
         for meth in methods:
+            if not meth.type: continue
             if (meth.rank == 0 and meth.type.value_type) or (meth.rank == 1 and meth.type.name == 'char'):
                 if not ds:
                     dsname = 'config' if "config-type" in type.tags else 'data' 
@@ -121,6 +122,7 @@ class H5Type ( object ) :
 
         # for non-array attributes of user-defined types create individual datasets
         for meth in methods:
+            if not meth.type: continue
             if meth.rank == 0 and not meth.type.value_type:
                 # get/make that type schema
                 if not meth.type.h5schemas:
@@ -136,6 +138,7 @@ class H5Type ( object ) :
 
         # for array attributes create individual datasets
         for meth in methods:
+            if not meth.type: continue
             if meth.rank > 0 and not (meth.type.name == 'char' and meth.rank == 1):
                 ds = H5Dataset(name=meth.name, parent=schema, pstype=type)
                 schema.datasets.append(ds)
