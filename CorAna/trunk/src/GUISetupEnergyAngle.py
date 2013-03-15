@@ -49,20 +49,26 @@ class GUISetupEnergyAngle ( QtGui.QWidget ) :
         self.setFrame()
  
         self.titPhotonE    = QtGui.QLabel('X-Ray Photon Energy (keV):')
-        self.titNomAngle   = QtGui.QLabel('Nominal Angle:')
-        self.titRealAngle  = QtGui.QLabel('Real Angle:')
+        self.titNomAngle   = QtGui.QLabel('Nominal Angle (deg):')
+        self.titRealAngle  = QtGui.QLabel('Real Angle (deg):')
+        self.titTiltAngle  = QtGui.QLabel('Tilt Angle (deg):')
 
-        self.ediPhotonE    = QtGui.QLineEdit  ( str(cp.photon_energy.value()) ) 
-        self.ediNomAngle   = QtGui.QLineEdit  ( str(cp.nominal_angle.value()) ) 
-        self.ediRealAngle  = QtGui.QLineEdit  ( str(cp.real_angle.value()) ) 
+        #print 'cp.real_angle.value():', cp.real_angle.value()
+
+        self.ediPhotonE    = QtGui.QLineEdit  ( '%8.3f' % (cp.photon_energy.value()) ) 
+        self.ediNomAngle   = QtGui.QLineEdit  ( '%8.3f' % (cp.nominal_angle.value()) ) 
+        self.ediRealAngle  = QtGui.QLineEdit  ( '%8.3f' % (cp.real_angle.value()) ) 
+        self.ediTiltAngle  = QtGui.QLineEdit  ( '%8.3f' % (cp.tilt_angle.value()) ) 
 
         self.ediPhotonE  .setReadOnly( True ) 
         self.ediNomAngle .setReadOnly( True ) 
         self.ediRealAngle.setReadOnly( True ) 
+        self.ediTiltAngle.setReadOnly( True ) 
 
         self.hboxE = QtGui.QHBoxLayout()
         self.hboxA = QtGui.QHBoxLayout()
         self.hboxR = QtGui.QHBoxLayout()
+        self.hboxT = QtGui.QHBoxLayout()
 
         self.hboxA.addWidget(self.titNomAngle)
         self.hboxA.addStretch(1)     
@@ -72,6 +78,10 @@ class GUISetupEnergyAngle ( QtGui.QWidget ) :
         self.hboxR.addStretch(1)     
         self.hboxR.addWidget(self.ediRealAngle)
 
+        self.hboxT.addWidget(self.titTiltAngle)
+        self.hboxT.addStretch(1)     
+        self.hboxT.addWidget(self.ediTiltAngle)
+
         self.hboxE.addWidget(self.titPhotonE)
         self.hboxE.addStretch(1)     
         self.hboxE.addWidget(self.ediPhotonE)
@@ -80,6 +90,7 @@ class GUISetupEnergyAngle ( QtGui.QWidget ) :
         self.vbox.addLayout(self.hboxE)
         self.vbox.addLayout(self.hboxA)
         self.vbox.addLayout(self.hboxR)
+        self.vbox.addLayout(self.hboxT)
         self.setLayout(self.vbox)
         
         self.showToolTips()
@@ -99,6 +110,7 @@ class GUISetupEnergyAngle ( QtGui.QWidget ) :
         self.ediPhotonE  .setToolTip( msg_info )
         self.ediNomAngle .setToolTip( msg_info )
         self.ediRealAngle.setToolTip( msg_info )
+        self.ediTiltAngle.setToolTip( msg_info )
 
     def setFrame(self):
         self.frame = QtGui.QFrame(self)
@@ -113,19 +125,23 @@ class GUISetupEnergyAngle ( QtGui.QWidget ) :
         self.titPhotonE  .setStyleSheet (cp.styleTitle)
         self.titNomAngle .setStyleSheet (cp.styleTitle)
         self.titRealAngle.setStyleSheet (cp.styleTitle)
+        self.titTiltAngle.setStyleSheet (cp.styleTitle)
 
         self.ediPhotonE  .setStyleSheet(cp.styleEditInfo) 
         self.ediNomAngle .setStyleSheet(cp.styleEditInfo) 
         self.ediRealAngle.setStyleSheet(cp.styleEditInfo) 
+        self.ediTiltAngle.setStyleSheet(cp.styleEditInfo) 
 
         self.ediPhotonE  .setAlignment(QtCore.Qt.AlignRight)
         self.ediNomAngle .setAlignment(QtCore.Qt.AlignRight)
         self.ediRealAngle.setAlignment(QtCore.Qt.AlignRight)
+        self.ediTiltAngle.setAlignment(QtCore.Qt.AlignRight)
 
         width = 80
         self.ediPhotonE  .setFixedWidth(width)
         self.ediNomAngle .setFixedWidth(width)
         self.ediRealAngle.setFixedWidth(width)
+        self.ediTiltAngle.setFixedWidth(width)
 
     def setParent(self,parent) :
         self.parent = parent

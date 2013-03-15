@@ -206,8 +206,6 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.in_dir_data        = self.declareParameter( name='IN_DIRECTORY_DATA',  val_def='/reg/d/psdm/XCS/xcsi0112/xtc',type='str' )
         self.in_file_data       = self.declareParameter( name='IN_FILE_NAME_DATA',  val_def='e167-r0020-s00-c00.xtc',type='str' )
 
-
-
         # GUISetupBeamZero.py
         self.x_coord_beam0      = self.declareParameter( name='X_COORDINATE_BEAM_ZERO',   val_def=1234.5,     type='float' ) 
         self.y_coord_beam0      = self.declareParameter( name='Y_COORDINATE_BEAM_ZERO',   val_def=1216.5,     type='float' ) 
@@ -230,6 +228,7 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.photon_energy      = self.declareParameter( name='PHOTON_ENERGY',               val_def=7.6543,          type='float' )
         self.nominal_angle      = self.declareParameter( name='NOMINAL_ANGLE',               val_def=-1,              type='float' )
         self.real_angle         = self.declareParameter( name='REAL_ANGLE',                  val_def=-1,              type='float' )
+        self.tilt_angle         = self.declareParameter( name='TILT_ANGLE',                  val_def=-1,              type='float' )
 
         # GUIImgSizePosition.py
         self.col_begin          = self.declareParameter( name='IMG_COL_BEGIN',        val_def=0,             type='int' )
@@ -331,6 +330,10 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.ccdset_aduphot          = self.declareParameter( name='CCD_SETTINGS_ADU_PER_PHOTON',  val_def=123,   type='float' )
         self.ccdset_ccdeff           = self.declareParameter( name='CCD_SETTINGS_EFFICIENCY',      val_def=0.55,  type='float' )
         self.ccdset_ccdgain          = self.declareParameter( name='CCD_SETTINGS_GAIN',            val_def=0.8,   type='float' )
+
+        self.mask_hot_thr            = self.declareParameter( name='MASK_HOT_PIX_ADU_THR_ON_RMS',  val_def=10.0,  type='float' )
+        self.mask_hot_is_used        = self.declareParameter( name='MASK_HOT_PIX_IS_USED',         val_def=True,  type='bool' )
+
 
         # GUIELogPostingDialog.py 
         # GUIELogPostingFields.py 

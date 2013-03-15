@@ -218,9 +218,9 @@ def get_q_map_reflection() :
     s               = (1300, 1340)
     alpha           = 1
     beam0           = [300.,  400.]
-    beam_s          = [400.,  500.]
+    beam_s          = [300.,  500.]
     pixel_size      = [0.1, 0.1]
-    sample_detector = 2000.
+    sample_detector = 100.
     energy          = 7.
     det_pos         = [[0,0],[0,0],[0,0]]
     sense           = [1,1]

@@ -85,6 +85,13 @@ class ConfigFileGenerator :
                          'FNAME_PEDS_RMS' : fnm.path_pedestals_rms()
                          }
 
+        if cp.mask_hot_is_used.value() : 
+            self.d_subs['FNAME_HOTPIX_MASK'   ] = fnm.path_hotpix_mask()
+            self.d_subs['HOTPIX_THRESHOLD_ADU'] = str( cp.mask_hot_thr.value() )
+        else :
+            self.d_subs['FNAME_HOTPIX_MASK'   ] = ''
+            self.d_subs['HOTPIX_THRESHOLD_ADU'] = '10000'
+
         self.print_substitution_dict()
         self.make_cfg_file()
 
@@ -121,7 +128,7 @@ class ConfigFileGenerator :
                          'FNAME_DATA_RMS' : fnm.path_data_rms(),
                          'SAT_THR_ADU'    : str( cp.ccdset_adcsatu.value() ),
                          'SATPIX_MASK'    : fnm.path_satpix_mask(),
-                         'HOTPIX_MASK'    : fnm.path_hotpix_mask(),
+                         'HOTPIX_MASK'    : '', # fnm.path_hotpix_mask(),
                          'SATPIX_FRAC'    : fnm.path_satpix_frac(),
                          'HOTPIX_FRAC'    : fnm.path_hotpix_frac()
                          }

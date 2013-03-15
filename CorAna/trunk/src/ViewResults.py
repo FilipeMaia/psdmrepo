@@ -354,6 +354,10 @@ class ViewResults :
         dr     = math.sqrt(dx*dx + dy*dy)
         alpha  = 0.5*math.atan2(dr, sp.distance_pix)
         tilt   = math.atan2(dx, dy) # The result is between -pi and pi.
+        alpha_deg, tilt_deg = math.degrees(alpha),  math.degrees(tilt)
+
+        cp.real_angle.setValue(float(alpha_deg))
+        cp.tilt_angle.setValue(float(tilt_deg))
 
         return dx, dy, dr, alpha, tilt
 
@@ -764,7 +768,7 @@ class ViewResults :
 
         if sp.mask_hotpix != None : return sp.mask_hotpix
         sp.mask_hotpix = gu.get_array_from_file(fnm.path_hotpix_mask())
-        if sp.mask_hotpix != None :
+        if sp.mask_hotpix != None and cp.mask_hot_is_used.value() :
             logger.info('HOTPIX mask is taken from file ' + fnm.path_hotpix_mask(), __name__)
         else :
             sp.mask_hotpix = np.ones((sp.rows,sp.cols), dtype=np.uint8)

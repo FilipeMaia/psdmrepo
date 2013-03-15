@@ -147,10 +147,10 @@ class FileNameManager :
 #-----------------------------
 
     def path_hotpix_frac(self) :
-        return  self.path_prefix() + self.str_exp_run_data() + 'hotpix-frac.txt'
+        return  self.path_prefix() + self.str_exp_run_dark() + 'hotpix-frac.txt'
 
     def path_hotpix_mask(self) :
-        return  self.path_prefix() + self.str_exp_run_data() + 'hotpix-mask.txt'
+        return  self.path_prefix() + self.str_exp_run_dark() + 'hotpix-mask.txt'
 
     def path_hotpix_mask_prefix(self) :
         return os.path.splitext(self.path_hotpix_mask())[0]
@@ -419,6 +419,7 @@ class FileNameManager :
         self.list_of_files_pedestals.append(self.path_peds_aver_batch_log())
         self.list_of_files_pedestals.append(self.path_pedestals_ave())
         self.list_of_files_pedestals.append(self.path_pedestals_rms())
+        self.list_of_files_pedestals.append(self.path_hotpix_mask())
 
         self.list_of_files_pedestals.append(self.path_peds_aver_plot())
         return self.list_of_files_pedestals

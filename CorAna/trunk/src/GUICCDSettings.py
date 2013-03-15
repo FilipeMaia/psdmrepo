@@ -58,7 +58,11 @@ class GUICCDSettings ( QtGui.QWidget ) :
         self.edi_ccdset_ccdeff  = QtGui.QLineEdit( str( cp.ccdset_ccdeff .value() ) )        
         self.edi_ccdset_ccdgain = QtGui.QLineEdit( str( cp.ccdset_ccdgain.value() ) )        
 
-        self.tit_orient = QtGui.QLabel('CCD orientation (deg):')
+        self.edi_mask_hot       = QtGui.QLineEdit( str( cp.mask_hot_thr.value() ) )        
+        self.cbx_mask_hot       = QtGui.QCheckBox('Use hot pix mask; thr. on RMS [ADU]:', self)
+        self.cbx_mask_hot.setChecked( cp.mask_hot_is_used.value() )
+
+        self.tit_orient = QtGui.QLabel('CCD orientation [deg]:')
         self.list_of_orient = ['0', '90', '180', '270'] 
         self.box_orient     = QtGui.QComboBox( self ) 
         self.box_orient.addItems(self.list_of_orient)
@@ -81,8 +85,11 @@ class GUICCDSettings ( QtGui.QWidget ) :
         self.grid.addWidget(self.edi_ccdset_ccdeff ,       self.grid_row+5, 4)
         self.grid.addWidget(self.edi_ccdset_ccdgain,       self.grid_row+6, 4)
 
-        self.grid.addWidget(self.tit_orient,               self.grid_row+7, 1, 1, 3)
-        self.grid.addWidget(self.box_orient,               self.grid_row+7, 4)
+        self.grid.addWidget(self.cbx_mask_hot,             self.grid_row+7, 1)
+        self.grid.addWidget(self.edi_mask_hot,             self.grid_row+7, 4)
+
+        self.grid.addWidget(self.tit_orient,               self.grid_row+8, 1, 1, 3)
+        self.grid.addWidget(self.box_orient,               self.grid_row+8, 4)
 
         self.vbox = QtGui.QVBoxLayout()
         self.vbox.addLayout(self.grid)
@@ -95,6 +102,8 @@ class GUICCDSettings ( QtGui.QWidget ) :
         self.connect(self.edi_ccdset_aduphot, QtCore.SIGNAL('editingFinished()'), self.onEdit )
         self.connect(self.edi_ccdset_ccdeff , QtCore.SIGNAL('editingFinished()'), self.onEdit )
         self.connect(self.edi_ccdset_ccdgain, QtCore.SIGNAL('editingFinished()'), self.onEdit )
+        self.connect(self.edi_mask_hot,       QtCore.SIGNAL('editingFinished()'), self.onEdit )
+        self.connect(self.cbx_mask_hot,       QtCore.SIGNAL('stateChanged(int)'), self.on_cbx ) 
         self.connect(self.box_orient,         QtCore.SIGNAL('currentIndexChanged(int)'), self.on_box_orient )
 
         self.showToolTips()
@@ -113,7 +122,8 @@ class GUICCDSettings ( QtGui.QWidget ) :
         self.edi_ccdset_aduphot.setToolTip(msg)
         self.edi_ccdset_ccdeff .setToolTip(msg)
         self.edi_ccdset_ccdgain.setToolTip(msg)
-
+        self.cbx_mask_hot.setToolTip('On/off hot pixel mask')
+        self.edi_mask_hot.setToolTip('Threshold (ADU) on RMS for hot pixels')
 
     def setFrame(self):
         self.frame = QtGui.QFrame(self)
@@ -134,25 +144,29 @@ class GUICCDSettings ( QtGui.QWidget ) :
         self.tit_ccdset_aduphot.setStyleSheet (cp.styleLabel)
         self.tit_ccdset_ccdeff .setStyleSheet (cp.styleLabel)
         self.tit_ccdset_ccdgain.setStyleSheet (cp.styleLabel)
+        self.cbx_mask_hot      .setStyleSheet (cp.styleLabel)
 
         self.edi_ccdset_pixsize.setStyleSheet(cp.styleEdit)
         self.edi_ccdset_adcsatu.setStyleSheet(cp.styleEdit)
         self.edi_ccdset_aduphot.setStyleSheet(cp.styleEdit)
         self.edi_ccdset_ccdeff .setStyleSheet(cp.styleEdit)
         self.edi_ccdset_ccdgain.setStyleSheet(cp.styleEdit)
-
+        self.edi_mask_hot      .setStyleSheet(cp.styleEdit)
+        
         self.edi_ccdset_pixsize.setFixedWidth(width)
         self.edi_ccdset_adcsatu.setFixedWidth(width)
         self.edi_ccdset_aduphot.setFixedWidth(width)
         self.edi_ccdset_ccdeff .setFixedWidth(width)
         self.edi_ccdset_ccdgain.setFixedWidth(width)
-
+        self.edi_mask_hot      .setFixedWidth(width)
+        
         self.edi_ccdset_pixsize.setAlignment(QtCore.Qt.AlignRight) 
         self.edi_ccdset_adcsatu.setAlignment(QtCore.Qt.AlignRight) 
         self.edi_ccdset_aduphot.setAlignment(QtCore.Qt.AlignRight) 
         self.edi_ccdset_ccdeff .setAlignment(QtCore.Qt.AlignRight) 
         self.edi_ccdset_ccdgain.setAlignment(QtCore.Qt.AlignRight) 
-
+        self.edi_mask_hot      .setAlignment(QtCore.Qt.AlignRight) 
+        
         self.tit_orient        .setStyleSheet(cp.styleLabel)
         self.tit_orient        .setAlignment (QtCore.Qt.AlignLeft)
         self.box_orient        .setStyleSheet(cp.styleButton)
@@ -209,12 +223,25 @@ class GUICCDSettings ( QtGui.QWidget ) :
             self.par = cp.ccdset_ccdgain
             self.tit = 'ccdset_ccdgain'
 
+        elif self.edi_mask_hot.isModified() :            
+            self.edi = self.edi_mask_hot
+            self.par = cp.mask_hot_thr
+            self.tit = 'mask_hot_thr'
+
         else : return # no-modification
 
         self.edi.setModified(False)
         self.par.setValue( self.edi.displayText() )        
         msg = 'onEdit - set value of ' + self.tit  + ': ' + str( self.par.value())
         logger.info(msg, __name__ )
+
+    def on_cbx(self):
+        #if self.cbx_dark.hasFocus() :
+        par = cp.mask_hot_is_used
+        par.setValue( self.cbx_mask_hot.isChecked() )
+        msg = 'on_cbx - set status of parameter mask_hot_is_used: ' + str(par.value())
+        logger.info(msg, __name__ )
+        #self.setButtonState()
 
     def on_box_orient(self):
         orient_selected = self.box_orient.currentText()
