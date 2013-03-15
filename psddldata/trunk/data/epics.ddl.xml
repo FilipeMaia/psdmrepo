@@ -109,6 +109,10 @@
             <attribute name="_stamp" type="epicsTimeStamp" accessor="stamp"/>
 
             <ctor>
+            	Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
                 Constructor which takes values for every attribute
                 <tag name="inline"/>
                 <arg name="status" dest="_status"/>
@@ -131,6 +135,10 @@
             <attribute name="_stamp" type="epicsTimeStamp" accessor="stamp"/>
             <attribute name="RISC_pad" type="int16_t"/>
 
+            <ctor>
+            	Default constructor
+                <tag name="inline"/>
+            </ctor>
             <ctor>
                 Constructor which takes values for every attribute
                 <tag name="inline"/>
@@ -155,6 +163,10 @@
             <attribute name="_stamp" type="epicsTimeStamp" accessor="stamp"/>
 
             <ctor>
+            	Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
                 Constructor which takes values for every attribute
                 <tag name="inline"/>
                 <arg name="status"      dest="_status"/>
@@ -177,6 +189,10 @@
             <attribute name="_stamp" type="epicsTimeStamp" accessor="stamp"/>
             <attribute name="RISC_pad" type="int16_t"/>
 
+            <ctor>
+            	Default constructor
+                <tag name="inline"/>
+            </ctor>
             <ctor>
                 Constructor which takes values for every attribute
                 <tag name="inline"/>
@@ -203,6 +219,10 @@
             <attribute name="RISC_pad1" type="uint8_t"/>
 
             <ctor>
+            	Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
                 Constructor which takes values for every attribute
                 <tag name="inline"/>
                 <arg name="status"      dest="_status"/>
@@ -227,6 +247,10 @@
             <attribute name="_stamp" type="epicsTimeStamp" accessor="stamp"/>
 
             <ctor>
+            	Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
                 Constructor which takes values for every attribute
                 <tag name="inline"/>
                 <arg name="status"      dest="_status"/>
@@ -250,6 +274,10 @@
             <attribute name="RISC_pad" type="int32_t"/>
 
             <ctor>
+            	Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
                 Constructor which takes values for every attribute
                 <tag name="inline"/>
                 <arg name="status"      dest="_status"/>
@@ -271,6 +299,10 @@
             <attribute name="_status" type="int16_t" accessor="status"/>
             <attribute name="_severity" type="int16_t" accessor="severity"/>
 
+            <ctor>
+            	Default constructor
+                <tag name="inline"/>
+            </ctor>
             <ctor>
                 Constructor which takes values for every attribute
                 <tag name="inline"/>
@@ -300,6 +332,10 @@
             <attribute name="_upper_ctrl_limit" type="int16_t" accessor="upper_ctrl_limit"/>
             <attribute name="_lower_ctrl_limit" type="int16_t" accessor="lower_ctrl_limit"/>
 
+            <ctor>
+            	Default constructor
+                <tag name="inline"/>
+            </ctor>
             <ctor>
                 Constructor which takes values for every attribute
                 <tag name="inline"/>
@@ -341,6 +377,10 @@
             <attribute name="_lower_ctrl_limit" type="float" accessor="lower_ctrl_limit"/>
 
             <ctor>
+            	Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
                 Constructor which takes values for every attribute
                 <tag name="inline"/>
                 <arg name="status"      dest="_status"/>
@@ -374,6 +414,10 @@
             <attribute name="_strs" type="char" shape="MAX_ENUM_STATES,MAX_ENUM_STRING_SIZE" accessor="strings"/>
 
             <ctor>
+            	Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
                 Constructor which takes values for every attribute
                 <tag name="inline"/>
                 <arg name="status"      dest="_status"/>
@@ -405,6 +449,10 @@
             <attribute name="_lower_ctrl_limit" type="uint8_t" accessor="lower_ctrl_limit"/>
             <attribute name="RISC_pad" type="uint8_t"/>
 
+            <ctor>
+            	Default constructor
+                <tag name="inline"/>
+            </ctor>
             <ctor>
                 Constructor which takes values for every attribute
                 <tag name="inline"/>
@@ -444,6 +492,10 @@
             <attribute name="_upper_ctrl_limit" type="int32_t" accessor="upper_ctrl_limit"/>
             <attribute name="_lower_ctrl_limit" type="int32_t" accessor="lower_ctrl_limit"/>
 
+            <ctor>
+            	Default constructor
+                <tag name="inline"/>
+            </ctor>
             <ctor>
                 Constructor which takes values for every attribute
                 <tag name="inline"/>
@@ -485,6 +537,10 @@
             <attribute name="_lower_ctrl_limit" type="double" accessor="lower_ctrl_limit"/>
 
             <ctor>
+            	Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
                 Constructor which takes values for every attribute
                 <tag name="inline"/>
                 <arg name="status"      dest="_status"/>
@@ -520,18 +576,20 @@
             Number of elements in EPICS DBR structure
             </attribute>
             
+            <!-- 
             <method name="print">
             Dumps the content of PV to standard output.
             </method>
+            -->
             
             <method name="isCtrl" type="uint8_t">
                 Returns 1 if PV is one of CTRL types, 0 otherwise.
-                <expr lang="C++" value="_iDbrType &gt;= DBR_CTRL_STRING and _iDbrType &lt;= DBR_CTRL_DOUBLE"/>
+                <expr lang="C++" value="{self}.dbrType() &gt;= DBR_CTRL_STRING and {self}.dbrType() &lt;= DBR_CTRL_DOUBLE"/>
             </method>
             
             <method name="isTime" type="uint8_t">
                 Returns 1 if PV is one of TIME types, 0 otherwise.
-                <expr lang="C++" value="_iDbrType &gt;= DBR_TIME_STRING and _iDbrType &lt;= DBR_TIME_DOUBLE"/>
+                <expr lang="C++" value="{self}.dbrType() &gt;= DBR_TIME_STRING and {self}.dbrType() &lt;= DBR_TIME_DOUBLE"/>
             </method>
             
             <method name="status" type="uint16_t">
@@ -752,12 +810,24 @@
         
         <pstype name="PvConfigV1" pack="4">
 
+            <tag name="value-type"/>
+
             <const name="iMaxPvDescLength" value="64"/>
 
             <attribute name="iPvId" type="int16_t" accessor="pvId"/>
             <attribute name="sPvDesc" type="char" shape="iMaxPvDescLength" accessor="description" shape_method="None"/>
             <attribute name="_pad0" type="int16_t"/>            
             <attribute name="fInterval" type="float" accessor="interval"/>
+
+            <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="inline"/>
+                <tag name="auto"/>
+            </ctor>
 
         </pstype>
         
@@ -769,7 +839,7 @@
 
             <attribute name="_iNumPv" type="int32_t" accessor="numPv"/>
 
-            <attribute name="_pvControls" type="PvConfigV1" shape="{self}._iNumPv" accessor="pvControls"/>
+            <attribute name="_pvControls" type="PvConfigV1" shape="{self}.numPv()" accessor="pvControls"/>
 
         </pstype>
         

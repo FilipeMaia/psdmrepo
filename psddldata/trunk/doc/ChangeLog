@@ -11,6 +11,12 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-14
+2013-03-14 Andy Salnikov
+- changes in epics DDL:
+  - all dbr_xxx types have default constructor now
+  - PvConfigV1 is made value-type, makes it easier to work with
+
 Tag: V00-04-13
 2013-03-13 Andy Salnikov
 - add config types to pnccd.FullFrame
