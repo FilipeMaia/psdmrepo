@@ -247,7 +247,7 @@ namespace {
 namespace PsddlPds {
 namespace Epics {
 
-
+#if 0
 void
 EpicsPvHeader::print() const
 {
@@ -296,6 +296,7 @@ EpicsPvHeader::print() const
     break;
   }
 }
+#endif
 
 uint16_t
 EpicsPvHeader::status() const

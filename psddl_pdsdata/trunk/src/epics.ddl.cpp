@@ -50,11 +50,11 @@ dbr_ctrl_double::units_shape() const {
 }
 uint8_t
 EpicsPvHeader::isCtrl() const {
-  return _iDbrType >= DBR_CTRL_STRING and _iDbrType <= DBR_CTRL_DOUBLE;
+  return this->dbrType() >= DBR_CTRL_STRING and this->dbrType() <= DBR_CTRL_DOUBLE;
 }
 uint8_t
 EpicsPvHeader::isTime() const {
-  return _iDbrType >= DBR_TIME_STRING and _iDbrType <= DBR_TIME_DOUBLE;
+  return this->dbrType() >= DBR_TIME_STRING and this->dbrType() <= DBR_TIME_DOUBLE;
 }
 const char*
 EpicsPvCtrlString::value(uint32_t i) const {
@@ -127,13 +127,6 @@ EpicsPvTimeLong::value(uint32_t i) const {
 double
 EpicsPvTimeDouble::value(uint32_t i) const {
   return data()[i];
-}
-std::vector<int>
-ConfigV1::pvControls_shape() const {
-  std::vector<int> shape;
-  shape.reserve(1);
-  shape.push_back(this->_iNumPv);
-  return shape;
 }
 } // namespace Epics
 } // namespace PsddlPds

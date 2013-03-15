@@ -160,8 +160,8 @@ public:
   void process(const DetInfo&, const Epics::EpicsPvHeader& epicsPv)
   {    
     printf("*** Processing Epics object\n");
-    epicsPv.print();
-    printf( "\n" );
+    //epicsPv.print();
+    //printf( "\n" );
   }
   void process(const DetInfo&, const Bld::BldDataFEEGasDetEnergy& bldData) {
     printf("*** Processing FEEGasDetEnergy object\n");
