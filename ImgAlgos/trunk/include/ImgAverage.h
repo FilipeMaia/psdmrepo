@@ -117,6 +117,9 @@ private:
   std::string    m_key;             // string with key name
   std::string    m_aveFile;
   std::string    m_rmsFile;
+  std::string    m_hotFile;
+
+  double         m_hot_thr;
   unsigned       m_print_bits;   
   unsigned long  m_count;  // number of events from the beginning of job
   unsigned long  m_nev_stage1;
@@ -125,6 +128,8 @@ private:
   double         m_gate_width2;
 
   double         m_gate_width;
+
+  bool           m_do_mask;
 
   unsigned       m_shape[2]; // image shape
   unsigned       m_rows;
@@ -136,9 +141,24 @@ private:
   double*        m_sum2;  // sum of squares per pixel
   double*        m_ave;   // average per pixel
   double*        m_rms;   // rms per pixel
+  int*           m_hot;   // hot-pixel mask per pixel; pixel is hot if rms > m_hot_thr
 
 
 protected:
+//-------------------
+
+    template <typename T>
+    bool collectStatForType(Event& evt)
+    { 
+      shared_ptr< ndarray<T,2> > img = evt.get(m_str_src, m_key, &m_src);
+      if (img.get()) {
+          const T* data = img->data();
+          accumulateCorrelators<T>(data);
+          return true;
+      } 
+      return false;
+    }
+
 //-------------------
 
     template <typename T>

@@ -55,6 +55,8 @@ ImgAverage::ImgAverage (const std::string& name)
   , m_key()
   , m_aveFile()
   , m_rmsFile()
+  , m_hotFile()
+  , m_hot_thr()
   , m_print_bits()
   , m_count(0)
   , m_nev_stage1()
@@ -63,16 +65,20 @@ ImgAverage::ImgAverage (const std::string& name)
   , m_gate_width2()
 {
   // get the values from configuration or use defaults
-  m_str_src =  configSrc("source",  "DetInfo(:Cspad)");
-  m_key     =  configStr("key",     "");
-  m_aveFile =  configStr("avefile", "img-ave.dat");
-  m_rmsFile =  configStr("rmsfile", "img-rms.dat");
-  m_nev_stage1  = config("evts_stage1", 1000000);
-  m_nev_stage2  = config("evts_stage2",       0);
-  m_gate_width1 = config("gate_width1",       0); 
-  m_gate_width2 = config("gate_width2",       0); 
-  m_print_bits  = config("print_bits",        0);
-}
+  m_str_src =  configSrc("source",      "DetInfo(:Cspad)");
+  m_key     =  configStr("key",         "");
+  m_aveFile =  configStr("avefile",     "img-ave.dat");
+  m_rmsFile =  configStr("rmsfile",     "img-rms.dat");
+  m_hotFile =  configStr("hotpix_mask", "");
+  m_hot_thr     = config("hotpix_thr_adu", 10000.);
+  m_nev_stage1  = config("evts_stage1",  1000000);
+  m_nev_stage2  = config("evts_stage2",        0);
+  m_gate_width1 = config("gate_width1",        0); 
+  m_gate_width2 = config("gate_width2",        0); 
+  m_print_bits  = config("print_bits",         0);
+ 
+  m_do_mask = (m_hotFile.empty()) ? false : true;
+ }
 
 //--------------------
 
@@ -86,6 +92,9 @@ ImgAverage::printInputParameters()
         << "\n key        : " << m_key      
         << "\n m_aveFile  : " << m_aveFile    
         << "\n m_rmsFile  : " << m_rmsFile    
+        << "\n m_hotFile  : " << m_hotFile    
+        << "\n m_hot_thr  : " << m_hot_thr    
+        << "\n m_do_mask  : " << m_do_mask
         << "\n print_bits : " << m_print_bits
         << "\n evts_stage1: " << m_nev_stage1   
         << "\n evts_stage2: " << m_nev_stage2  
@@ -155,6 +164,7 @@ ImgAverage::endJob(Event& evt, Env& env)
   procStatArrays();
   save2DArrayInFile<double> ( m_aveFile, m_ave, m_rows, m_cols, m_print_bits & 16 );
   save2DArrayInFile<double> ( m_rmsFile, m_rms, m_rows, m_cols, m_print_bits & 16 );
+  if (m_do_mask) save2DArrayInFile<int> ( m_hotFile, m_hot, m_rows, m_cols, m_print_bits & 16 );
   if( m_print_bits & 16 ) printSummaryForParser(evt);
 }
 
@@ -177,6 +187,7 @@ ImgAverage::setCollectionMode(Event& evt)
     m_sum2 = new double  [m_size];
     m_ave  = new double  [m_size];
     m_rms  = new double  [m_size]; 
+    m_hot  = new int     [m_size]; 
     resetStatArrays();
     m_gate_width = 0;
     if( m_print_bits & 4 ) MsgLog(name(), info, "Stage 0: Event = " << m_count << " Begin to collect statistics without gate.");
@@ -216,6 +227,13 @@ ImgAverage::resetStatArrays()
 void 
 ImgAverage::collectStat(Event& evt)
 {
+  if ( collectStatForType<double>  (evt) ) return;
+  if ( collectStatForType<uint16_t>(evt) ) return;
+  if ( collectStatForType<int>     (evt) ) return;
+  if ( collectStatForType<float>   (evt) ) return;
+  if ( collectStatForType<uint8_t> (evt) ) return;
+
+  /*
   shared_ptr< ndarray<double,2> > img = evt.get(m_str_src, m_key, &m_src);
   if (img.get()) {
       const double* data = img->data();
@@ -250,6 +268,7 @@ ImgAverage::collectStat(Event& evt)
       accumulateCorrelators<uint8_t>(data);
       return;
   } 
+  */
 
   MsgLog(name(), info, "Image is not available in the event(...) for source:" << m_str_src << " key:" << m_key);
 }
@@ -275,6 +294,11 @@ ImgAverage::procStatArrays()
 	  m_ave[i] = 0;
 	  m_rms[i] = 0;
         }
+    }
+
+    if (m_do_mask) {
+      for (unsigned i=0; i!=m_size; ++i)
+         m_hot[i] = (m_rms[i] > m_hot_thr) ? 0 : 1;
     }
 }
 

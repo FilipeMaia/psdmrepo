@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-04	
+2013-03-15 Mikhail S. Dubrovin
+- in ImgAverage add evaluation of the hot-pixel mask. Pixel is hot if its rms > threshold.
+
 Tag: V00-03-03	
 2013-03-08 Andy Salnikov
 - removed unused variable to suppress comilation warnings
