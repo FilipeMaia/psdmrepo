@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-02
+2013-03-15 Andy Salnikov
+- forgot to add epics-h5.ddl
+
 Tag: V00-00-01
 2013-03-15 Andy Salnikov
 - added epics, not very efficient implementation
