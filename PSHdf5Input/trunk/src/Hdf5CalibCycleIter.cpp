@@ -41,9 +41,12 @@ namespace PSHdf5Input {
 //----------------
 // Constructors --
 //----------------
-Hdf5CalibCycleIter::Hdf5CalibCycleIter (const hdf5pp::Group& grp, int runNumber)
+Hdf5CalibCycleIter::Hdf5CalibCycleIter (const hdf5pp::Group& grp, int runNumber,
+    unsigned schemaVersion, bool fullTsFormat)
   : m_grp(grp)
   , m_runNumber(runNumber)
+  , m_schemaVersion(schemaVersion)
+  , m_fullTsFormat(fullTsFormat)
   , m_merger()
 {
 
@@ -56,11 +59,11 @@ Hdf5CalibCycleIter::Hdf5CalibCycleIter (const hdf5pp::Group& grp, int runNumber)
     if (grp1.basename() == "Epics::EpicsPv") {
       
       for (hdf5pp::Group grp2 = subgiter.next(); grp2.valid(); grp2 = subgiter.next()) {
-        hdf5pp::GroupIter subgiter2(grp2);
+        hdf5pp::GroupIter subgiter2(grp2, true);
         for (hdf5pp::Group grp3 = subgiter2.next(); grp3.valid(); grp3 = subgiter2.next()) {
           if (grp3.hasChild("time")) {
-            Hdf5DatasetIter begin(grp3);
-            Hdf5DatasetIter end(grp3, Hdf5DatasetIter::End);
+            Hdf5DatasetIter begin(grp3, m_fullTsFormat);
+            Hdf5DatasetIter end(grp3, m_fullTsFormat, Hdf5DatasetIter::End);
             m_merger.add(begin, end);
           }
         }
@@ -70,8 +73,8 @@ Hdf5CalibCycleIter::Hdf5CalibCycleIter (const hdf5pp::Group& grp, int runNumber)
       
       for (hdf5pp::Group grp2 = subgiter.next(); grp2.valid(); grp2 = subgiter.next()) {
         if (grp2.hasChild("time")) {
-          Hdf5DatasetIter begin(grp2);
-          Hdf5DatasetIter end(grp2, Hdf5DatasetIter::End);
+          Hdf5DatasetIter begin(grp2, m_fullTsFormat);
+          Hdf5DatasetIter end(grp2, m_fullTsFormat, Hdf5DatasetIter::End);
           m_merger.add(begin, end);
         }
       }

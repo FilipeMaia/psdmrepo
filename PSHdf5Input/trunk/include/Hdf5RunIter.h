@@ -61,7 +61,7 @@ public:
   typedef Hdf5IterData value_type;
 
   // Default constructor
-  explicit Hdf5RunIter (const hdf5pp::Group& grp, int runNumber) ;
+  explicit Hdf5RunIter (const hdf5pp::Group& grp, int runNumber, unsigned schemaVersion, bool fullTsFormat) ;
 
   // Destructor
   ~Hdf5RunIter () ;
@@ -83,6 +83,8 @@ private:
 
   hdf5pp::Group m_grp;   ///< Run group
   int m_runNumber;
+  unsigned m_schemaVersion;
+  bool m_fullTsFormat;
   std::list<hdf5pp::Group> m_groups; ///< Set of CalibCycle groups
   boost::scoped_ptr<Hdf5CalibCycleIter> m_ccIter;  ///< Iterator over current calib cycle
 

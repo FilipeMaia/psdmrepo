@@ -57,9 +57,12 @@ namespace PSHdf5Input {
 //----------------
 // Constructors --
 //----------------
-Hdf5ConfigIter::Hdf5ConfigIter (const hdf5pp::Group& grp, int runNumber)
+Hdf5ConfigIter::Hdf5ConfigIter (const hdf5pp::Group& grp, int runNumber,
+    unsigned schemaVersion, bool fullTsFormat)
   : m_grp(grp)
   , m_runNumber(runNumber)
+  , m_schemaVersion(schemaVersion)
+  , m_fullTsFormat(fullTsFormat)
   , m_groups()
   , m_runIter()
 {
@@ -105,7 +108,7 @@ Hdf5ConfigIter::next()
       MsgLog(logger, debug, "switching to group: " << grp.name());
 
       // make iter for this new group
-      m_runIter.reset(new Hdf5RunIter(grp, m_runNumber));
+      m_runIter.reset(new Hdf5RunIter(grp, m_runNumber, m_schemaVersion, m_fullTsFormat));
 
       PSTime::Time etime = Hdf5Utils::getTime(m_runIter->group(), "start");
       boost::shared_ptr<PSEvt::EventId> eid = boost::make_shared<Hdf5EventId>(m_runNumber, etime, 0, 0, 0);

@@ -88,6 +88,8 @@ private:
   std::list<hdf5pp::Group> m_groups;
   boost::scoped_ptr<Hdf5ConfigIter> m_configIter;
   int m_runNumber;
+  unsigned m_schemaVersion;  // schema version of the file
+  bool m_fullTsFormat;       // if true then file uses "full" timestamp format
   
 };
 

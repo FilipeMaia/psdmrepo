@@ -63,6 +63,8 @@ Hdf5FileIter::Hdf5FileIter (const std::string& fileName)
   , m_groups()
   , m_configIter()
   , m_runNumber()
+  , m_schemaVersion(0)
+  , m_fullTsFormat(false)
 {
   // open a file
   try {
@@ -74,6 +76,13 @@ Hdf5FileIter::Hdf5FileIter (const std::string& fileName)
   
   // open top group
   hdf5pp::Group top = m_file.openGroup("/");
+
+  // read some attributes
+  if (top.hasAttr(":schema:version")) m_schemaVersion = top.openAttr<uint32_t>(":schema:version").read();
+  if (top.hasAttr(":schema:timestamp-format")) {
+    std::string tsFmt = top.openAttr<const char*>(":schema:timestamp-format").read();
+    m_fullTsFormat = tsFmt == "full";
+  }
 
   // get all subgroups which start with 'Configure:'
   hdf5pp::GroupIter giter(top);
@@ -121,7 +130,7 @@ Hdf5FileIter::next()
       MsgLog(logger, debug, "switching to group: " << grp.name());
 
       // make iter for this new group
-      m_configIter.reset(new Hdf5ConfigIter(grp, m_runNumber));
+      m_configIter.reset(new Hdf5ConfigIter(grp, m_runNumber, m_schemaVersion, m_fullTsFormat));
 
       PSTime::Time etime = Hdf5Utils::getTime(m_configIter->group(), "end");
       boost::shared_ptr<PSEvt::EventId> eid = boost::make_shared<Hdf5EventId>(m_runNumber, etime, 0, 0, 0);
@@ -137,7 +146,7 @@ Hdf5FileIter::next()
 
           hdf5pp::GroupIter subgiter(grp1);
           for (hdf5pp::Group grp2 = subgiter.next(); grp2.valid(); grp2 = subgiter.next()) {
-            hdf5pp::GroupIter subgiter2(grp2);
+            hdf5pp::GroupIter subgiter2(grp2, true);
             for (hdf5pp::Group grp3 = subgiter2.next(); grp3.valid(); grp3 = subgiter2.next()) {
               res.add(grp3, 0);
             }

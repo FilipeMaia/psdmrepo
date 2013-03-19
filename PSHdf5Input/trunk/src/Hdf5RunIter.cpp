@@ -57,9 +57,12 @@ namespace PSHdf5Input {
 //----------------
 // Constructors --
 //----------------
-Hdf5RunIter::Hdf5RunIter (const hdf5pp::Group& grp, int runNumber)
+Hdf5RunIter::Hdf5RunIter (const hdf5pp::Group& grp, int runNumber,
+    unsigned schemaVersion, bool fullTsFormat)
   : m_grp(grp)
   , m_runNumber(runNumber)
+  , m_schemaVersion(schemaVersion)
+  , m_fullTsFormat(fullTsFormat)
   , m_groups()
   , m_ccIter()
 {
@@ -105,7 +108,7 @@ Hdf5RunIter::next()
       MsgLog(logger, debug, "switching to group: " << grp.name());
 
       // make iter for this new group
-      m_ccIter.reset(new Hdf5CalibCycleIter(grp, m_runNumber));
+      m_ccIter.reset(new Hdf5CalibCycleIter(grp, m_runNumber, m_schemaVersion, m_fullTsFormat));
 
       // make event id
       PSTime::Time etime = Hdf5Utils::getTime(m_ccIter->group(), "start");

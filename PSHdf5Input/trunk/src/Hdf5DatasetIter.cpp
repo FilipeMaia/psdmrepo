@@ -36,20 +36,19 @@ namespace {
 
 
   // make data type for time dataset
-  hdf5pp::Type initIterDataType()
+  hdf5pp::Type iterDataType(bool fullTsFormat)
   {
     hdf5pp::CompoundType dataType = hdf5pp::CompoundType::compoundType<PSHdf5Input::Hdf5DatasetIterData>() ;
     dataType.insert_native<uint32_t>("seconds", offsetof(PSHdf5Input::Hdf5DatasetIterData, sec));
     dataType.insert_native<uint32_t>("nanoseconds", offsetof(PSHdf5Input::Hdf5DatasetIterData, nsec));
-    dataType.insert_native<uint32_t>("ticks", offsetof(PSHdf5Input::Hdf5DatasetIterData, ticks));
-    dataType.insert_native<uint32_t>("fiducials", offsetof(PSHdf5Input::Hdf5DatasetIterData, fiducials));
-    dataType.insert_native<uint32_t>("control", offsetof(PSHdf5Input::Hdf5DatasetIterData, control));
-    dataType.insert_native<uint32_t>("vector", offsetof(PSHdf5Input::Hdf5DatasetIterData, vector));
+    if (fullTsFormat) {
+      dataType.insert_native<uint32_t>("ticks", offsetof(PSHdf5Input::Hdf5DatasetIterData, ticks));
+      dataType.insert_native<uint32_t>("fiducials", offsetof(PSHdf5Input::Hdf5DatasetIterData, fiducials));
+      dataType.insert_native<uint32_t>("control", offsetof(PSHdf5Input::Hdf5DatasetIterData, control));
+      dataType.insert_native<uint32_t>("vector", offsetof(PSHdf5Input::Hdf5DatasetIterData, vector));
+    }
     return dataType;
   }
-
-  // data type for in-memory data
-  hdf5pp::Type iterDataType = initIterDataType();
 }
 
 
@@ -60,17 +59,17 @@ namespace {
 namespace PSHdf5Input {
 
 // Constructor for "begin" iterator
-Hdf5DatasetIter::Hdf5DatasetIter (const hdf5pp::Group& grp, Tag tag)
-  : m_ds()
+Hdf5DatasetIter::Hdf5DatasetIter (const hdf5pp::Group& grp, bool fullTsFormat, Tag tag)
+  : m_group(grp)
+  , m_fullTsFormat(fullTsFormat)
+  , m_ds()
   , m_size(0)
   , m_index(0)
+  , m_dataIndex(0)
   , m_data()
 {
-  // fill constant part of data object
-  m_data.group = grp;
-  
   // open "time" dataset, will throw if cannot open
-  m_ds = m_data.group.openDataSet<Hdf5DatasetIterData>("time");
+  m_ds = m_group.openDataSet("time");
   
   // get dataset's dataspace
   m_dsp = m_ds.dataSpace();
@@ -95,18 +94,35 @@ Hdf5DatasetIter::Hdf5DatasetIter (const hdf5pp::Group& grp, Tag tag)
 void 
 Hdf5DatasetIter::updateData()
 {
-  m_data.index = m_index;
-  
   // if past end then do nothing
   if (m_index < 0 or uint64_t(m_index) >= m_size) return;
+
+  // if data for the index already there do nothing
+  if (uint64_t(m_index) >= m_dataIndex and uint64_t(m_index) < m_dataIndex + m_data.size()) return;
+
+  // determine how many items to read and where to start
+  size_t size = 512;
+  m_dataIndex = (m_index/size)*size;
+  if (m_dataIndex + size > m_size) size = m_size - m_dataIndex;
+
+  // allocate space
+  m_data.resize(size);
+
+  // set  parts of data that are not read from file
+  for (unsigned i = 0; i != size; ++ i) {
+    m_data[i].index = m_dataIndex + i;
+    m_data[i].group = m_group;
+  }
   
   // in-memory dataspace
-  hdf5pp::DataSpace mem_ds = hdf5pp::DataSpace::makeScalar();
+  hdf5pp::DataSpace mem_ds = hdf5pp::DataSpace::makeSimple(size, size);
 
-  // define single-item hyper-slab for in-file dataspace
-  m_dsp.select_single(m_index);
+  // define hyper-slab for in-file dataspace
+  hsize_t start[] = { m_dataIndex };
+  hsize_t count[] = { size };
+  m_dsp.select_hyperslab(H5S_SELECT_SET, start, 0, count, 0);
   
-  m_ds.read(mem_ds, m_dsp, &m_data, ::iterDataType);
+  m_ds.read(mem_ds, m_dsp, m_data.data(), ::iterDataType(m_fullTsFormat));
 }
 
 } // namespace PSHdf5Input

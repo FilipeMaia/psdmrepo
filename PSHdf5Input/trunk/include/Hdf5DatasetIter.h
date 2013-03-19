@@ -18,6 +18,7 @@
 // Base Class Headers --
 //----------------------
 #include <iterator>
+#include <vector>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -41,13 +42,11 @@ namespace PSHdf5Input {
  *  
  *  The only requirement for dataset is that it has a name "time" and
  *  data in it is a composite data type with members "seconds" and "nanoseconds". 
- *  The class is STL-like iterator, to construct "end" iterator just make
- *  and instance with default constructor.
+ *  The class is STL-like iterator, to construct "end" iterator make
+ *  and instance with "End" tag.
  *  
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
  *
  *  @version $Id$
  *
@@ -60,14 +59,14 @@ public:
 
   enum Tag { Begin, End };
     
-  // Constructor for "begin" iterator
-  explicit Hdf5DatasetIter (const hdf5pp::Group& grp, Tag tag = Begin) ;
+  // Constructor
+  explicit Hdf5DatasetIter (const hdf5pp::Group& grp, bool fullTsFormat, Tag tag = Begin) ;
 
   // deref
-  const Hdf5DatasetIterData& operator*() const { return m_data; }
+  const Hdf5DatasetIterData& operator*() const { return m_data[m_index-m_dataIndex]; }
 
   // arrow
-  const Hdf5DatasetIterData* operator->() const { return &m_data; }
+  const Hdf5DatasetIterData* operator->() const { return &m_data[m_index-m_dataIndex]; }
 
   // compare
   bool operator==(const Hdf5DatasetIter& other) const {
@@ -105,11 +104,14 @@ protected:
   
 private:
 
-  hdf5pp::DataSet<Hdf5DatasetIterData> m_ds;    ///< "time" dataset
-  hdf5pp::DataSpace m_dsp;  /// in-file dataspace for "time" dataset
-  uint64_t m_size;         ///< Dataset size
+  hdf5pp::Group m_group;
+  bool m_fullTsFormat;
+  hdf5pp::DataSet m_ds;    ///< "time" dataset
+  hdf5pp::DataSpace m_dsp; /// in-file dataspace for "time" dataset
+  uint64_t m_size;         ///< Full dataset size
   int64_t m_index;         ///< Current index
-  Hdf5DatasetIterData m_data;  ///< Current object
+  uint64_t m_dataIndex;    ///< Index of the beginning of the data array
+  std::vector<Hdf5DatasetIterData> m_data;  ///< Current slice
 };
 
 

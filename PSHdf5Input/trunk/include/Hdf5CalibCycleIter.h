@@ -60,7 +60,7 @@ public:
   typedef Hdf5IterData value_type;
 
   // Default constructor
-  explicit Hdf5CalibCycleIter (const hdf5pp::Group& grp, int runNumber) ;
+  explicit Hdf5CalibCycleIter (const hdf5pp::Group& grp, int runNumber, unsigned schemaVersion, bool fullTsFormat) ;
 
   // Destructor
   ~Hdf5CalibCycleIter () ;
@@ -82,6 +82,8 @@ private:
 
   hdf5pp::Group m_grp;   ///< CalibCycle group
   int m_runNumber;
+  unsigned m_schemaVersion;
+  bool m_fullTsFormat;
   MultiMerge<Hdf5DatasetIter> m_merger;
 
 };
