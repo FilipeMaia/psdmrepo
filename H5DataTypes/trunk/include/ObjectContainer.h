@@ -94,9 +94,9 @@ public:
     // make a data set
     MsgLog("ObjectContainer", trace, "ObjectContainer -- creating dataset " << name << " with chunk size " << objectsPerChunk << " (objects)") ;
     if (location.hasChild(name)) {
-      m_dataset = location.openDataSet<T> ( name ) ;
+      m_dataset = location.openDataSet(name);
     } else {
-      m_dataset = location.createDataSet<T> ( name, stored_type, dsp, plDScreate, plDSaccess ) ;
+      m_dataset = location.createDataSet(name, stored_type, dsp, plDScreate, plDSaccess);
     }
   }
 
@@ -134,7 +134,7 @@ public:
   }
 
   /// get access to data set
-  hdf5pp::DataSet<T>& dataset() { return m_dataset ; }
+  hdf5pp::DataSet& dataset() { return m_dataset ; }
 
 private:
 
@@ -158,7 +158,7 @@ private:
     return chunk;
   }
 
-  hdf5pp::DataSet<T> m_dataset ;
+  hdf5pp::DataSet m_dataset ;
   unsigned long m_count ;
 };
 

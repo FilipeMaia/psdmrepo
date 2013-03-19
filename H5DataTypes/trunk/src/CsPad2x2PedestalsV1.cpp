@@ -102,7 +102,7 @@ void
 CsPad2x2PedestalsV1::store( const DataType& data, hdf5pp::Group grp, const std::string& fileName )
 {
   CsPad2x2PedestalsV1 obj(data);
-  hdf5pp::DataSet<CsPad2x2PedestalsV1> ds = storeDataObject ( obj, "pedestals", grp ) ;
+  hdf5pp::DataSet ds = storeDataObject ( obj, "pedestals", grp ) ;
 
   // add attributes
   ds.createAttr<const char*>("source").store(fileName.c_str());

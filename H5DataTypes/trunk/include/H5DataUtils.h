@@ -47,11 +47,11 @@
 namespace H5DataTypes {
 
   template <typename T>
-  hdf5pp::DataSet<T>
+  hdf5pp::DataSet
   storeDataObject ( const T& data, const char* name, hdf5pp::Group grp )
   {
     // make scalar data set
-    hdf5pp::DataSet<T> ds = grp.createDataSet<T> ( name, hdf5pp::DataSpace::makeScalar() ) ;
+    hdf5pp::DataSet ds = grp.createDataSet<T> ( name, hdf5pp::DataSpace::makeScalar() ) ;
 
     // store data
     ds.store ( hdf5pp::DataSpace::makeScalar(), &data ) ;
@@ -60,21 +60,21 @@ namespace H5DataTypes {
   }
 
   template <typename T>
-  hdf5pp::DataSet<T>
+  hdf5pp::DataSet
   storeDataObjects ( hsize_t size, const T* data, const char* name, hdf5pp::Group grp )
   {
     if ( size > 0 ) {
       // make simple data set
       hsize_t dims[1] = { size } ;
       hdf5pp::DataSpace dsp = hdf5pp::DataSpace::makeSimple ( 1, dims, dims ) ;
-      hdf5pp::DataSet<T> ds = grp.createDataSet<T> ( name, dsp ) ;
+      hdf5pp::DataSet ds = grp.createDataSet<T> ( name, dsp ) ;
       // store data
       ds.store ( dsp, data ) ;
       return ds;
     } else {
       // for empty data set make null dataspace
       hdf5pp::DataSpace dsp = hdf5pp::DataSpace::makeNull () ;
-      hdf5pp::DataSet<T> ds = grp.createDataSet<T> ( name, dsp ) ;
+      hdf5pp::DataSet ds = grp.createDataSet<T> ( name, dsp ) ;
       // store data
       ds.store ( dsp, data ) ;
       return ds;

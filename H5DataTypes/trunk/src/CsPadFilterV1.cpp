@@ -83,7 +83,7 @@ void
 CsPadFilterV1::store( const DataType& data, hdf5pp::Group grp, const std::string& fileName )
 {
   CsPadFilterV1 obj(data);
-  hdf5pp::DataSet<CsPadFilterV1> ds = storeDataObject ( obj, "filter", grp ) ;
+  hdf5pp::DataSet ds = storeDataObject ( obj, "filter", grp ) ;
   
   // add attributes
   ds.createAttr<const char*>("source").store(fileName.c_str());

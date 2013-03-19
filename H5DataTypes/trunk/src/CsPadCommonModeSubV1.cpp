@@ -83,7 +83,7 @@ void
 CsPadCommonModeSubV1::store( const DataType& data, hdf5pp::Group grp, const std::string& fileName )
 {
   CsPadCommonModeSubV1 obj(data);
-  hdf5pp::DataSet<CsPadCommonModeSubV1> ds = storeDataObject ( obj, "common_mode", grp ) ;
+  hdf5pp::DataSet ds = storeDataObject ( obj, "common_mode", grp ) ;
   
   // add attributes
   ds.createAttr<const char*>("source").store(fileName.c_str());

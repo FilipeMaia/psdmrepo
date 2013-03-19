@@ -104,7 +104,7 @@ void
 CsPadPixelStatusV1::store( const DataType& data, hdf5pp::Group grp, const std::string& fileName )
 {
   CsPadPixelStatusV1 obj(data);
-  hdf5pp::DataSet<CsPadPixelStatusV1> ds = storeDataObject ( obj, "pixel_status", grp ) ;
+  hdf5pp::DataSet ds = storeDataObject ( obj, "pixel_status", grp ) ;
   
   // add attributes
   ds.createAttr<const char*>("source").store(fileName.c_str());
