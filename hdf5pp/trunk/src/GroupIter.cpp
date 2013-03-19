@@ -37,8 +37,9 @@ namespace hdf5pp {
 //----------------
 // Constructors --
 //----------------
-GroupIter::GroupIter (const Group& group)
+GroupIter::GroupIter (const Group& group, bool skipSoft)
   : m_group(group)
+  , m_skipSoft(skipSoft)
   , m_nlinks(0) 
   , m_idx(0)
 {
@@ -63,6 +64,16 @@ GroupIter::next()
 {
   Group grp;  
   for (; not grp.valid() and m_idx < m_nlinks; ++ m_idx) {
+
+    if (m_skipSoft) {
+      // test for soft links
+      H5L_info_t linfo;
+      herr_t err = H5Lget_info_by_idx(m_group.id(), ".", H5_INDEX_NAME, H5_ITER_NATIVE, m_idx, &linfo, H5P_DEFAULT);
+      if (err < 0) {
+        throw Hdf5CallException( ERR_LOC, "H5Lget_info_by_idx") ;
+      }
+      if (linfo.type == H5L_TYPE_SOFT) continue;
+    }
     
     // open object
     hid_t hid = H5Oopen_by_idx(m_group.id(), ".", H5_INDEX_NAME, H5_ITER_NATIVE, m_idx, H5P_DEFAULT);

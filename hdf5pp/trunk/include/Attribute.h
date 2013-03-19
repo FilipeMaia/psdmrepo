@@ -35,9 +35,6 @@
 
 namespace hdf5pp {
 
-class Group ;
-template <typename T> class DataSet ;
-
 /// @addtogroup hdf5pp
 
 /**

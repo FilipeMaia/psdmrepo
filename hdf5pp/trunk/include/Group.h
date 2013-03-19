@@ -104,30 +104,29 @@ public:
 
   // create new data set, type is determined by the template type
   template <typename T>
-  DataSet<T> createDataSet ( const std::string& name,
-                             const DataSpace& dspc,
-                             const PListDataSetCreate& plistDScreate = PListDataSetCreate(),
-                             const PListDataSetAccess& plistDSaccess = PListDataSetAccess())
+  DataSet createDataSet ( const std::string& name,
+                          const DataSpace& dspc,
+                          const PListDataSetCreate& plistDScreate = PListDataSetCreate(),
+                          const PListDataSetAccess& plistDSaccess = PListDataSetAccess())
   {
-    return DataSet<T>::createDataSet ( *m_id, name, TypeTraits<T>::stored_type(), dspc, plistDScreate, plistDSaccess ) ;
+    return DataSet::createDataSet ( *m_id, name, TypeTraits<T>::stored_type(), dspc, plistDScreate, plistDSaccess ) ;
   }
 
   // create new data set, type is determined by explicit parameter
-  template <typename T>
-  DataSet<T> createDataSet ( const std::string& name,
-                             const Type& type,
-                             const DataSpace& dspc,
-                             const PListDataSetCreate& plistDScreate = PListDataSetCreate(),
-                             const PListDataSetAccess& plistDSaccess = PListDataSetAccess())
+  DataSet createDataSet ( const std::string& name,
+                          const Type& type,
+                          const DataSpace& dspc,
+                          const PListDataSetCreate& plistDScreate = PListDataSetCreate(),
+                          const PListDataSetAccess& plistDSaccess = PListDataSetAccess())
   {
-    return DataSet<T>::createDataSet ( *m_id, name, type, dspc, plistDScreate, plistDSaccess ) ;
+    return DataSet::createDataSet ( *m_id, name, type, dspc, plistDScreate, plistDSaccess ) ;
   }
 
   // open existing data set
-  template <typename T>
-  DataSet<T> openDataSet ( const std::string& name )
+  DataSet openDataSet ( const std::string& name,
+      const PListDataSetAccess& plistDSaccess = PListDataSetAccess() ) const
   {
-    return DataSet<T>::openDataSet ( *m_id, name ) ;
+    return DataSet::openDataSet ( *m_id, name, plistDSaccess ) ;
   }
 
   /**

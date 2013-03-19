@@ -22,7 +22,6 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "hdf5pp/Attribute.h"
-#include "hdf5pp/DataSetImpl.h"
 #include "hdf5pp/DataSpace.h"
 #include "hdf5pp/PListDataSetAccess.h"
 #include "hdf5pp/PListDataSetCreate.h"
@@ -56,7 +55,6 @@ class Group ;
  *  @author Andrei Salnikov
  */
 
-template <typename T>
 class DataSet {
 public:
 
@@ -69,97 +67,118 @@ public:
   /// create attribute for this dataset
   template <typename U>
   Attribute<U> createAttr ( const std::string& name, const DataSpace& dspc = DataSpace::makeScalar() ) {
-    return m_impl.createAttr<U> ( name, dspc ) ;
+    return Attribute<U>::createAttr ( *m_id, name, dspc ) ;
   }
 
   /// open existing attribute
   template <typename U>
   Attribute<U> openAttr ( const std::string& name ) {
-    return m_impl.openAttr<U> ( name ) ;
+    return Attribute<U>::openAttr ( *m_id, name ) ;
   }
 
   /// Changes the sizes of a dataset's dimensions.
-  void set_extent ( const hsize_t size[] ) {
-    m_impl.set_extent ( size ) ;
-  }
+  void set_extent ( const hsize_t size[] );
+
   /// same operation for rank-1 data set
-  void set_extent ( hsize_t size ) {
-    m_impl.set_extent ( &size ) ;
-  }
+  void set_extent ( hsize_t size ) { set_extent(&size); }
 
   // store the data
+  template <typename T>
   void store ( const DataSpace& memDspc,
                const T* data,
                const hdf5pp::Type& native_type = TypeTraits<T>::native_type() )
   {
-    m_impl.store( native_type, memDspc, DataSpace::makeAll(), TypeTraits<T>::address( *data ) ) ;
+    _store( native_type, memDspc, DataSpace::makeAll(), TypeTraits<T>::address( *data ) ) ;
   }
 
   // store the data, give file dataspace
+  template <typename T>
   void store ( const DataSpace& memDspc,
                const DataSpace& fileDspc,
                const T* data,
                const hdf5pp::Type& native_type = TypeTraits<T>::native_type() )
   {
-    m_impl.store( native_type, memDspc, fileDspc, TypeTraits<T>::address( *data ) ) ;
+    _store( native_type, memDspc, fileDspc, TypeTraits<T>::address( *data ) ) ;
   }
 
   // retrieve the data from dataset
+  template <typename T>
   void read (const DataSpace& memDspc,
              const DataSpace& fileDspc,
              T* data,
              const hdf5pp::Type& native_type = TypeTraits<T>::native_type())
   {
-    m_impl.read( native_type, memDspc, fileDspc, TypeTraits<T>::address( *data ) ) ;
+    _read(native_type, memDspc, fileDspc, TypeTraits<T>::address(*data));
   }
 
   // reclaim space allocated to vlen structures
+  template <typename T>
   void vlen_reclaim(const DataSpace& memDspc,
                     T* data,
                     const hdf5pp::Type& native_type = TypeTraits<T>::native_type())
   {
-    m_impl.vlen_reclaim( native_type, memDspc, TypeTraits<T>::address( *data ) ) ;
+    _vlen_reclaim(native_type, memDspc, TypeTraits<T>::address(*data));
   }
 
   // close the data set
-  void close() { m_impl.close() ; }
+  void close();
 
   /// access data space
-  DataSpace dataSpace() { return m_impl.dataSpace() ; }
+  DataSpace dataSpace();
+
+  /// get chunk size, this method only works for 1-dim datasets
+  size_t chunkSize() const;
 
   /// access dataset type
-  Type type() { return m_impl.type() ; }
+  Type type();
 
   // returns true if there is a real object behind
-  bool valid() const { return m_impl.valid() ; }
+  bool valid() const { return m_id; }
+
+  // get dataset name, this will likely be a relative name
+  std::string name() const;
+
+  // get dataset id
+  hid_t id() const { return *m_id; }
 
 protected:
 
   friend class Group ;
 
   // Constructor
-  DataSet ( DataSetImpl impl ) : m_impl(impl) {}
+  DataSet(hid_t id);
 
   /// create new data set, type is determined at run time
-  static DataSet createDataSet ( hid_t parent,
-                                const std::string& name,
-                                const Type& type,
-                                const DataSpace& dspc,
-                                const PListDataSetCreate& plistDScreate,
-                                const PListDataSetAccess& plistDSaccess)
-  {
-    return DataSet ( DataSetImpl::createDataSet ( parent, name, type, dspc, plistDScreate, plistDSaccess ) ) ;
-  }
+  static DataSet createDataSet(hid_t parent,
+                               const std::string& name,
+                               const Type& type,
+                               const DataSpace& dspc,
+                               const PListDataSetCreate& plistDScreate,
+                               const PListDataSetAccess& plistDSaccess);
 
   /// open existing dataset
-  static DataSet openDataSet ( hid_t parent, const std::string& name )
-  {
-    return DataSet( DataSetImpl::openDataSet ( parent, name ) ) ;
-  }
+  static DataSet openDataSet(hid_t parent,
+      const std::string& name,
+      const PListDataSetAccess& plistDSaccess);
 
 private:
 
-  DataSetImpl m_impl ;
+  // store the data
+  void _store( const Type& memType,
+               const DataSpace& memDspc,
+               const DataSpace& fileDspc,
+               const void* data ) ;
+
+  // read the data
+  void _read(const Type& memType,
+             const DataSpace& memDspc,
+             const DataSpace& fileDspc,
+             void* data);
+
+  void _vlen_reclaim(const hdf5pp::Type& type, const DataSpace& memDspc, void* data);
+
+  // Data members
+  boost::shared_ptr<hid_t> m_id ;
 
 };
 

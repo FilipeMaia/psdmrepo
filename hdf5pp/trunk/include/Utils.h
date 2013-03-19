@@ -71,7 +71,7 @@ public:
    *  @throw hdf5pp::Exception
    */
   template <typename Data>
-  static boost::shared_ptr<Data> readDataSet(hdf5pp::DataSet<Data> ds, hsize_t index = -1)
+  static boost::shared_ptr<Data> readDataSet(hdf5pp::DataSet ds, hsize_t index = -1)
   {
     hdf5pp::DataSpace file_dsp = ds.dataSpace();
     if (index != hsize_t(-1)) file_dsp.select_single(index);
@@ -96,7 +96,7 @@ public:
    *  @throw hdf5pp::Exception
    */
   template <typename Data, unsigned Rank>
-  static ndarray<Data, Rank> readNdarray(hdf5pp::DataSet<Data> ds, hsize_t index = -1)
+  static ndarray<Data, Rank> readNdarray(hdf5pp::DataSet ds, hsize_t index = -1)
   {
     hdf5pp::DataSpace file_dsp = ds.dataSpace();
 
@@ -163,7 +163,7 @@ public:
   template <typename Data>
   static boost::shared_ptr<Data> readGroup(hdf5pp::Group group, const std::string& dataset, hsize_t index = -1)
   {
-    return readDataSet(group.openDataSet<Data>(dataset), index);
+    return readDataSet<Data>(group.openDataSet(dataset), index);
   }
 
   /**
@@ -182,7 +182,7 @@ public:
   template <typename Data, unsigned Rank>
   static ndarray<Data, Rank> readNdarray(hdf5pp::Group group, const std::string& dataset, hsize_t index = -1)
   {
-    return readNdarray<Data, Rank>(group.openDataSet<Data>(dataset), index);
+    return readNdarray<Data, Rank>(group.openDataSet(dataset), index);
   }
 
 };
