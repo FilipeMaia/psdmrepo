@@ -19,6 +19,7 @@
 // C/C++ Headers --
 //-----------------
 #include <boost/make_shared.hpp>
+#include <boost/algorithm/string.hpp>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -38,7 +39,7 @@
 
 namespace {
 
-  const std::string logger = "HdfConverter";
+  const std::string logger = "psddl_hdf2psana.HdfConverter";
 
   // name of the attribute holding schema version
   const std::string versionAttrName("_psddlSchemaVersion");
@@ -48,6 +49,33 @@ namespace {
 
   // name of the group holding EPICS data
   const std::string epicsGroupName("/Epics::EpicsPv/");
+
+  // test if the group is inside EPICS group (has a parent named Epics::EpicsPv)
+  bool isEpics(const std::string& group)
+  {
+    // look at group name
+    bool res = group.find(::epicsGroupName) != std::string::npos;
+    return res;
+  }
+
+  // test if the group is CTRL EPICS group, CTRL EPICS is located right in the Configure group,
+  // so its name will start with either /Configure/Epics::EpicsPv/ or /Configure:NNNN/Epics::EpicsPv/
+  bool isCtrlEpics(const std::string& group)
+  {
+    MsgLog(logger, debug, "HdfConverter::isCtrlEpics - group: " << group);
+
+    if (boost::starts_with(group, "/Configure:") or boost::starts_with(group, "/Configure/")) {
+      std::string::size_type p = group.find('/', 1);
+      if (p != std::string::npos) {
+        if (group.compare(p, ::epicsGroupName.size(), ::epicsGroupName) == 0) {
+          MsgLog(logger, debug, "HdfConverter::isCtrlEpics - yes");
+          return true;
+        }
+      }
+    }
+
+    return false;
+  }
 
   // helper class to build Src from stored 64-bit code
   class _SrcBuilder : public Pds::Src {
@@ -99,11 +127,50 @@ HdfConverter::convert(const hdf5pp::Group& group, uint64_t idx, PSEvt::Event& ev
 void
 HdfConverter::convertEpics(const hdf5pp::Group& group, uint64_t idx, PSEnv::EpicsStore& eStore)
 {
-  if (isEpics(group.name())) {
-    boost::shared_ptr<Psana::Epics::EpicsPvHeader> epics = Epics::readEpics(group, idx);
-    if (epics) {
-      const Pds::Src& src = this->source(group);
-      eStore.store(epics, src);
+  MsgLog(logger, debug, "HdfConverter::convertEpics - group: " << group);
+
+  return;
+  
+  const std::string& gname = group.name();
+  if (::isEpics(gname)) {
+
+    // open/cache "data" dataset
+    hdf5pp::DataSet ds;
+    std::map<std::string, hdf5pp::DataSet>::const_iterator it = m_epicsDSCache.find(gname);
+    if (it != m_epicsDSCache.end()) {
+      ds = it->second;
+    } else {
+      ds = group.openDataSet("data");
+      m_epicsDSCache.insert(std::make_pair(gname, ds));
+    }
+
+    if (::isCtrlEpics(gname)) {
+    
+      // CTRL epics should mean that we are only starting reading data and 
+      // epics store does not have anything yet.
+
+      
+      boost::shared_ptr<Psana::Epics::EpicsPvHeader> epics = Epics::readEpics(ds, idx);
+      if (epics) {
+        const Pds::Src& src = this->source(group);
+        eStore.store(epics, src);
+      }
+
+    } else {
+
+      // Non-CTRL epics should mean that CTRL was already seen, get useful info from store 
+      // to avoid reasding it from a file
+
+      
+      const std::string& pvname = group.basename();
+      MsgLog(logger, debug, "HdfConverter::convertEpics - Non-CTRL epics: " << pvname);
+      if (boost::shared_ptr<Psana::Epics::EpicsPvHeader> hdr = eStore.getPV(pvname)) {
+        boost::shared_ptr<Psana::Epics::EpicsPvHeader> epics = Epics::readEpics(ds, idx, *hdr);
+        if (epics) {
+          const Pds::Src& src = this->source(group);
+          eStore.store(epics, src);
+        }
+      }
     }
   }
 }
@@ -117,19 +184,9 @@ HdfConverter::resetCache()
   MsgLog(logger, debug, "HdfConverter::resetCache");
   m_schemaVersionCache.clear();
   m_sourceCache.clear();
+  m_epicsDSCache.clear();
 }
 
-// test if the group is inside EPICS group (has a parent named Epics::EpicsPv)
-bool
-HdfConverter::isEpics(const std::string& group) const
-{
-  MsgLog(logger, debug, "HdfConverter::isEpics - group: " << group);
-
-  // look at group name
-  bool res = group.find(::epicsGroupName) != std::string::npos;
-
-  return res;
-}
 
 int
 HdfConverter::schemaVersion(const hdf5pp::Group& group, int levels) const
@@ -146,7 +203,7 @@ HdfConverter::schemaVersion(const hdf5pp::Group& group, int levels) const
     std::map<std::string, int>::const_iterator it = m_schemaVersionCache.find(name);
     if (it !=  m_schemaVersionCache.end()) return it->second;
 
-    version = schemaVersion(group, isEpics(name) ? 2 : 1);
+    version = schemaVersion(group, ::isEpics(name) ? 2 : 1);
 
     // update cache
     m_schemaVersionCache.insert(std::make_pair(name, version));
@@ -176,7 +233,7 @@ HdfConverter::typeName(const std::string& group) const
   std::string typeName = group;
   std::string::size_type p = typeName.rfind('/');
   typeName.erase(p);
-  if (isEpics(group)) {
+  if (::isEpics(group)) {
     p = typeName.rfind('/');
     typeName.erase(p);
   }
@@ -196,7 +253,7 @@ HdfConverter::source(const hdf5pp::Group& group, int levels) const
   const std::string& name = group.name();
 
   // with default argument call myself with correct level depending on type of group
-  if (levels < 0) return source(group, isEpics(name) ? 1 : 0);
+  if (levels < 0) return source(group, ::isEpics(name) ? 1 : 0);
 
   // check cache first
   std::map<std::string, Pds::Src>::const_iterator it = m_sourceCache.find(name);

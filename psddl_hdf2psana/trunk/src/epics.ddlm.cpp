@@ -14,7 +14,12 @@
 
 namespace {
 
+  using namespace psddl_hdf2psana::Epics;
+
   const char logger[] = "psddl_hdf2psana.Epics";
+
+  boost::shared_ptr<Psana::Epics::EpicsPvHeader>
+  readEpics(const hdf5pp::DataSet& ds, int64_t idx, const ns_EpicsPvHeader_v0::dataset_data& hdr);
 
 }
 
@@ -467,8 +472,8 @@ public:
   
   typedef typename DBR::psana_dbr_t dbr_type;
   
-  EpicsPvHdr(const hdf5pp::Group& group, int64_t idx, const ns_EpicsPvHeader_v0::dataset_data& hdr) 
-    : m_group(group), m_idx(idx), m_hdr(hdr) {}
+  EpicsPvHdr(const hdf5pp::DataSet& ds, int64_t idx, const ns_EpicsPvHeader_v0::dataset_data& hdr) 
+    : m_ds(ds), m_idx(idx), m_hdr(hdr) {}
 
   /** PV ID number assigned by DAQ. */
   virtual int16_t pvId() const { return m_hdr.pvId; }
@@ -508,7 +513,7 @@ public:
 
 protected:
       
-  mutable hdf5pp::Group m_group;
+  mutable hdf5pp::DataSet m_ds;
   uint64_t m_idx;
   ns_EpicsPvHeader_v0::dataset_data m_hdr;
 
@@ -518,10 +523,9 @@ protected:
   void read_ds_data() const {
     m_ds_data = ds_type::make_dataset_epics(m_hdr.numElements);
     
-    hdf5pp::DataSet<ds_type> ds = m_group.openDataSet<ds_type>("data");
-    hdf5pp::DataSpace file_dsp = ds.dataSpace();
+    hdf5pp::DataSpace file_dsp = m_ds.dataSpace();
     file_dsp.select_single(m_idx);
-    ds.read(hdf5pp::DataSpace::makeScalar(), file_dsp, m_ds_data.get(), ds_type::native_type(m_hdr.numElements));
+    m_ds.read(hdf5pp::DataSpace::makeScalar(), file_dsp, m_ds_data.get(), ds_type::native_type(m_hdr.numElements));
     m_dbr = dbr_type(m_ds_data->dbr);
   }
 };
@@ -532,8 +536,8 @@ template <typename DBR>
 class EpicsPvCtrlHdr : public EpicsPvHdr<DBR, dataset_epics_ctrl<DBR> > {
 public:
 
-  EpicsPvCtrlHdr(const hdf5pp::Group& group, int64_t idx, const ns_EpicsPvHeader_v0::dataset_data& hdr) 
-    : EpicsPvHdr<DBR, dataset_epics_ctrl<DBR> >(group, idx, hdr) {}
+  EpicsPvCtrlHdr(const hdf5pp::DataSet& ds, int64_t idx, const ns_EpicsPvHeader_v0::dataset_data& hdr) 
+    : EpicsPvHdr<DBR, dataset_epics_ctrl<DBR> >(ds, idx, hdr) {}
   
   /** PV name. */
   virtual const char* pvName() const {
@@ -548,8 +552,8 @@ template <typename DBR>
 class EpicsPvTimeHdr : public EpicsPvHdr<DBR, dataset_epics_time<DBR> > {
 public:
 
-  EpicsPvTimeHdr(const hdf5pp::Group& group, int64_t idx, const ns_EpicsPvHeader_v0::dataset_data& hdr) 
-    : EpicsPvHdr<DBR, dataset_epics_time<DBR> >(group, idx, hdr) {}
+  EpicsPvTimeHdr(const hdf5pp::DataSet& ds, int64_t idx, const ns_EpicsPvHeader_v0::dataset_data& hdr) 
+    : EpicsPvHdr<DBR, dataset_epics_time<DBR> >(ds, idx, hdr) {}
   
   /** PV name. */
   virtual Psana::Epics::epicsTimeStamp stamp() const {
@@ -568,8 +572,8 @@ public:
   typedef typename DBR::psana_dbr_t dbr_type;
   typedef typename DBRTypeTraits<dbr_type>::value_type value_type;
   
-  EpicsPvCtrl(const hdf5pp::Group& group, int64_t idx, const ns_EpicsPvHeader_v0::dataset_data& hdr) 
-    : EpicsPvCtrlHdr<DBR>(group, idx, hdr) {}
+  EpicsPvCtrl(const hdf5pp::DataSet& ds, int64_t idx, const ns_EpicsPvHeader_v0::dataset_data& hdr) 
+    : EpicsPvCtrlHdr<DBR>(ds, idx, hdr) {}
   
   virtual ndarray<const value_type, 1> data() const {
     if (not this->m_ds_data) this->read_ds_data();
@@ -587,8 +591,8 @@ template <>
 class EpicsPvCtrl<dbr_ctrl<const char*> > : public EpicsPvCtrlHdr<dbr_ctrl<const char*> > {
 public:
 
-  EpicsPvCtrl(const hdf5pp::Group& group, int64_t idx, const ns_EpicsPvHeader_v0::dataset_data& hdr) 
-    : EpicsPvCtrlHdr<dbr_ctrl<const char*> >(group, idx, hdr) {}
+  EpicsPvCtrl(const hdf5pp::DataSet& ds, int64_t idx, const ns_EpicsPvHeader_v0::dataset_data& hdr) 
+    : EpicsPvCtrlHdr<dbr_ctrl<const char*> >(ds, idx, hdr) {}
   
   virtual const char* data(uint32_t i0) const {
     if (not this->m_ds_data) this->read_ds_data();
@@ -614,8 +618,8 @@ public:
   typedef typename DBR::psana_dbr_t dbr_type;
   typedef typename DBRTypeTraits<dbr_type>::value_type value_type;
 
-  EpicsPvTime(const hdf5pp::Group& group, int64_t idx, const ns_EpicsPvHeader_v0::dataset_data& hdr) 
-    : EpicsPvTimeHdr<DBR>(group, idx, hdr) {}
+  EpicsPvTime(const hdf5pp::DataSet& ds, int64_t idx, const ns_EpicsPvHeader_v0::dataset_data& hdr) 
+    : EpicsPvTimeHdr<DBR>(ds, idx, hdr) {}
   
   virtual ndarray<const value_type, 1> data() const {
     if (not this->m_ds_data) this->read_ds_data();
@@ -633,8 +637,8 @@ template <>
 class EpicsPvTime<dbr_time<const char*> > : public EpicsPvTimeHdr<dbr_time<const char*> > {
 public:
 
-  EpicsPvTime(const hdf5pp::Group& group, int64_t idx, const ns_EpicsPvHeader_v0::dataset_data& hdr) 
-    : EpicsPvTimeHdr<dbr_time<const char*> >(group, idx, hdr) {}
+  EpicsPvTime(const hdf5pp::DataSet& ds, int64_t idx, const ns_EpicsPvHeader_v0::dataset_data& hdr) 
+    : EpicsPvTimeHdr<dbr_time<const char*> >(ds, idx, hdr) {}
   
   virtual const char* data(uint32_t i0) const {
     if (not this->m_ds_data) this->read_ds_data();
@@ -656,58 +660,120 @@ public:
  *  Read data from specified group and convert them into EPICS object
  */
 boost::shared_ptr<Psana::Epics::EpicsPvHeader>
-readEpics(const hdf5pp::Group& group, int64_t idx)
+readEpics(const hdf5pp::DataSet& ds, int64_t idx)
 {
-  MsgLog(logger, debug, "readEpics: group = " << group.name() << " idx = " << idx);
+  MsgLog(logger, debug, "readEpics: dataset = " << ds.name() << " idx = " << idx);
   
   boost::shared_ptr<Psana::Epics::EpicsPvHeader> result;
 
   // first we need to read a header to guess the type/size of stored data
   const boost::shared_ptr<ns_EpicsPvHeader_v0::dataset_data>& hdr =
-      hdf5pp::Utils::readGroup<ns_EpicsPvHeader_v0::dataset_data>(group, "data", idx);
+      hdf5pp::Utils::readDataSet<ns_EpicsPvHeader_v0::dataset_data>(ds, idx);
 
-  switch (hdr->dbrType) {
-  case Psana::Epics::DBR_TIME_STRING:
-    result = boost::make_shared<EpicsPvTime<dbr_time<const char*> > >(group, idx, *hdr);
-    break;
-  case Psana::Epics::DBR_TIME_SHORT:
-    result = boost::make_shared<EpicsPvTime<dbr_time<int16_t> > >(group, idx, *hdr);
-    break;
-  case Psana::Epics::DBR_TIME_FLOAT:
-    result = boost::make_shared<EpicsPvTime<dbr_time<float> > >(group, idx, *hdr);
-    break;
-  case Psana::Epics::DBR_TIME_ENUM:
-    result = boost::make_shared<EpicsPvTime<dbr_time<EpicsEnumTag> > >(group, idx, *hdr);
-    break;
-  case Psana::Epics::DBR_TIME_CHAR:
-    result = boost::make_shared<EpicsPvTime<dbr_time<uint8_t> > >(group, idx, *hdr);
-    break;
-  case Psana::Epics::DBR_TIME_LONG:
-    result = boost::make_shared<EpicsPvTime<dbr_time<int32_t> > >(group, idx, *hdr);
-    break;
-  case Psana::Epics::DBR_TIME_DOUBLE:
-    result = boost::make_shared<EpicsPvTime<dbr_time<double> > >(group, idx, *hdr);
-    break;
+  return ::readEpics(ds, idx, *hdr);
+}
+
+/**
+ *  Read data from specified group and convert them into EPICS object
+ */
+boost::shared_ptr<Psana::Epics::EpicsPvHeader>
+readEpics(const hdf5pp::DataSet& ds, int64_t idx, const Psana::Epics::EpicsPvHeader& pvhdr)
+{
+  MsgLog(logger, debug, "readEpics: dataset = " << ds.name() << " idx = " << idx);
+  
+  // This method is only called for non-CTRL data while header may still come from CTRL PV 
+  ns_EpicsPvHeader_v0::dataset_data hdr;
+  hdr.pvId = pvhdr.pvId();
+  hdr.dbrType = pvhdr.dbrType();
+  hdr.numElements = pvhdr.numElements();
+  
+  switch (pvhdr.dbrType()) {
   case Psana::Epics::DBR_CTRL_STRING:
-    result = boost::make_shared<EpicsPvCtrl<dbr_ctrl<const char*> > >(group, idx, *hdr);
+    hdr.dbrType = Psana::Epics::DBR_TIME_STRING;
     break;
   case Psana::Epics::DBR_CTRL_SHORT:
-    result = boost::make_shared<EpicsPvCtrl<dbr_ctrl<int16_t> > >(group, idx, *hdr);
+    hdr.dbrType = Psana::Epics::DBR_TIME_SHORT;
     break;
   case Psana::Epics::DBR_CTRL_FLOAT:
-    result = boost::make_shared<EpicsPvCtrl<dbr_ctrl<float> > >(group, idx, *hdr);
+    hdr.dbrType = Psana::Epics::DBR_TIME_FLOAT;
     break;
   case Psana::Epics::DBR_CTRL_ENUM:
-    result = boost::make_shared<EpicsPvCtrl<dbr_ctrl<EpicsEnumTag> > >(group, idx, *hdr);
+    hdr.dbrType = Psana::Epics::DBR_TIME_ENUM;
     break;
   case Psana::Epics::DBR_CTRL_CHAR:
-    result = boost::make_shared<EpicsPvCtrl<dbr_ctrl<uint8_t> > >(group, idx, *hdr);
+    hdr.dbrType = Psana::Epics::DBR_TIME_CHAR;
     break;
   case Psana::Epics::DBR_CTRL_LONG:
-    result = boost::make_shared<EpicsPvCtrl<dbr_ctrl<int32_t> > >(group, idx, *hdr);
+    hdr.dbrType = Psana::Epics::DBR_TIME_LONG;
     break;
   case Psana::Epics::DBR_CTRL_DOUBLE: 
-    result = boost::make_shared<EpicsPvCtrl<dbr_ctrl<double> > >(group, idx, *hdr);
+    hdr.dbrType = Psana::Epics::DBR_TIME_DOUBLE;
+    break;
+  default:
+    break;
+  }
+
+  return ::readEpics(ds, idx, hdr);
+}
+
+
+} // namespace Epics
+} // namespace psddl_hdf2psana
+
+namespace {
+
+/**
+ *  Read data from specified group and convert them into EPICS object
+ */
+boost::shared_ptr<Psana::Epics::EpicsPvHeader>
+readEpics(const hdf5pp::DataSet& ds, int64_t idx, const ns_EpicsPvHeader_v0::dataset_data& hdr)
+{
+  MsgLog(logger, debug, "readEpics: dataset = " << ds.name() << " idx = " << idx);
+  
+  boost::shared_ptr<Psana::Epics::EpicsPvHeader> result;
+
+  switch (hdr.dbrType) {
+  case Psana::Epics::DBR_TIME_STRING:
+    result = boost::make_shared<EpicsPvTime<dbr_time<const char*> > >(ds, idx, hdr);
+    break;
+  case Psana::Epics::DBR_TIME_SHORT:
+    result = boost::make_shared<EpicsPvTime<dbr_time<int16_t> > >(ds, idx, hdr);
+    break;
+  case Psana::Epics::DBR_TIME_FLOAT:
+    result = boost::make_shared<EpicsPvTime<dbr_time<float> > >(ds, idx, hdr);
+    break;
+  case Psana::Epics::DBR_TIME_ENUM:
+    result = boost::make_shared<EpicsPvTime<dbr_time<EpicsEnumTag> > >(ds, idx, hdr);
+    break;
+  case Psana::Epics::DBR_TIME_CHAR:
+    result = boost::make_shared<EpicsPvTime<dbr_time<uint8_t> > >(ds, idx, hdr);
+    break;
+  case Psana::Epics::DBR_TIME_LONG:
+    result = boost::make_shared<EpicsPvTime<dbr_time<int32_t> > >(ds, idx, hdr);
+    break;
+  case Psana::Epics::DBR_TIME_DOUBLE:
+    result = boost::make_shared<EpicsPvTime<dbr_time<double> > >(ds, idx, hdr);
+    break;
+  case Psana::Epics::DBR_CTRL_STRING:
+    result = boost::make_shared<EpicsPvCtrl<dbr_ctrl<const char*> > >(ds, idx, hdr);
+    break;
+  case Psana::Epics::DBR_CTRL_SHORT:
+    result = boost::make_shared<EpicsPvCtrl<dbr_ctrl<int16_t> > >(ds, idx, hdr);
+    break;
+  case Psana::Epics::DBR_CTRL_FLOAT:
+    result = boost::make_shared<EpicsPvCtrl<dbr_ctrl<float> > >(ds, idx, hdr);
+    break;
+  case Psana::Epics::DBR_CTRL_ENUM:
+    result = boost::make_shared<EpicsPvCtrl<dbr_ctrl<EpicsEnumTag> > >(ds, idx, hdr);
+    break;
+  case Psana::Epics::DBR_CTRL_CHAR:
+    result = boost::make_shared<EpicsPvCtrl<dbr_ctrl<uint8_t> > >(ds, idx, hdr);
+    break;
+  case Psana::Epics::DBR_CTRL_LONG:
+    result = boost::make_shared<EpicsPvCtrl<dbr_ctrl<int32_t> > >(ds, idx, hdr);
+    break;
+  case Psana::Epics::DBR_CTRL_DOUBLE: 
+    result = boost::make_shared<EpicsPvCtrl<dbr_ctrl<double> > >(ds, idx, hdr);
     break;
   default:
     break;
@@ -717,6 +783,4 @@ readEpics(const hdf5pp::Group& group, int64_t idx)
 }
 
 
-
-} // namespace Epics
-} // namespace psddl_hdf2psana
+}

@@ -88,7 +88,7 @@ void FrameV1_v0::read_ds_image() const
   // Image in HDF5 is stored as rank-2 array of either 8-bit or 16-bit data
 
   // open dataset and check the type
-  hdf5pp::DataSet<uint8_t> ds = m_group.openDataSet<uint8_t>("image");
+  hdf5pp::DataSet ds = m_group.openDataSet("image");
   if (ds.type().size() == 1) {
     // single-byte
     ndarray<const uint8_t, 2> img = hdf5pp::Utils::readNdarray<uint8_t, 2>(ds, m_idx);

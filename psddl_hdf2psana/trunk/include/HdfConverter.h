@@ -23,6 +23,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "hdf5pp/Group.h"
+#include "hdf5pp/DataSet.h"
 #include "pdsdata/xtc/Src.hh"
 #include "pdsdata/xtc/TypeId.hh"
 #include "PSEnv/Env.h"
@@ -80,9 +81,6 @@ public:
 
 protected:
 
-  // test if the group is inside EPICS group (has a parent named Epics::EpicsPv)
-  bool isEpics(const std::string& group) const;
-
   // Get schema version for the group or its parent (and its grand-parent for EPICS),
   int schemaVersion(const hdf5pp::Group& group, int levels = -1) const;
 
@@ -96,6 +94,7 @@ private:
 
   mutable std::map<std::string, int> m_schemaVersionCache;
   mutable std::map<std::string, Pds::Src> m_sourceCache;
+  mutable std::map<std::string, hdf5pp::DataSet> m_epicsDSCache;
 
 };
 

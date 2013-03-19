@@ -3,9 +3,8 @@
 
 #include "psddl_psana/epics.ddl.h"
 
-#include "hdf5pp/Group.h"
-#include "hdf5pp/Type.h"
-#include "PSEnv/EpicsStore.h"
+#include "hdf5pp/DataSet.h"
+#include "psddl_psana/epics.ddl.h"
 
 namespace psddl_hdf2psana {
 namespace Epics {
@@ -13,7 +12,9 @@ namespace Epics {
   /**
    *  Read data from specified group and convert them into EPICS object
    */
-  boost::shared_ptr<Psana::Epics::EpicsPvHeader> readEpics(const hdf5pp::Group& group, int64_t idx);
+  boost::shared_ptr<Psana::Epics::EpicsPvHeader> readEpics(const hdf5pp::DataSet& ds, int64_t idx);
+  boost::shared_ptr<Psana::Epics::EpicsPvHeader> readEpics(const hdf5pp::DataSet& ds, int64_t idx, 
+      const Psana::Epics::EpicsPvHeader& pvhdr);
 
 
 } // namespace Epics
