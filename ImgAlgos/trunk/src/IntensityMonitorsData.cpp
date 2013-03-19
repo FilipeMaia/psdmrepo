@@ -60,32 +60,20 @@ IntensityMonitorsData::IntensityMonitorsData (const std::string& name)
   , m_count(0)
 {
   // get the values from configuration or use defaults
-  m_srcFEEGasDetE = configSrc("feeSource",   "BldInfo(FEEGasDetEnergy)");
-  m_srcIPM2       = configSrc("ipm2",        "BldInfo(XCS-IPM-02)");
-  m_srcIPMMono    = configSrc("ipmmono",     "BldInfo(XCS-IPM-mono)");
-  m_srcIPM4       = configSrc("ipm4",        "DetInfo(XcsBeamline.1:Ipimb.4)");
-  m_srcIPM5       = configSrc("ipm5",        "DetInfo(XcsBeamline.1:Ipimb.5)");
-  m_file_type     = configStr("file_type",   "txt");
-  m_fname         = configStr("file_data",   "intensity-monitor-data.txt");
-  m_fname_header  = configStr("file_header", "intensity-monitor-comments.txt");
-  m_print_bits    = config   ("print_bits",  0);
+  m_size_of_list = 5;
+  m_src_list     = new Source[m_size_of_list];
+  m_src_list[0]  = configSrc("imon1",       "BldInfo(FEEGasDetEnergy)");
+  m_src_list[1]  = configSrc("imon2",       "BldInfo(XCS-IPM-02)");
+  m_src_list[2]  = configSrc("imon3",       "BldInfo(XCS-IPM-mono)");
+  m_src_list[3]  = configSrc("imon4",       "DetInfo(XcsBeamline.1:Ipimb.4)");
+  m_src_list[4]  = configSrc("imon5",       "DetInfo(XcsBeamline.1:Ipimb.5)");
 
-  makeListOfSources();
+  m_file_type    = configStr("file_type",   "txt");
+  m_fname        = configStr("file_data",   "intensity-monitor-data.txt");
+  m_fname_header = configStr("file_header", "intensity-monitor-comments.txt");
+  m_print_bits   = config   ("print_bits",  0);
+
   setFileMode();
-}
-
-//--------------------
-
-void 
-IntensityMonitorsData::makeListOfSources() 
-{
-  m_size_of_list= 5;
-  m_src_list    = new Source[m_size_of_list];
-  m_src_list[0] = m_srcFEEGasDetE;
-  m_src_list[1] = m_srcIPM2;
-  m_src_list[2] = m_srcIPMMono;
-  m_src_list[3] = m_srcIPM4;
-  m_src_list[4] = m_srcIPM5;
 }
 
 //--------------------
@@ -105,18 +93,17 @@ void
 IntensityMonitorsData::printInputParameters()
 {
   WithMsgLog(name(), info, log) {
-    log << "\nInput parameters:"
-        << "\nSources         : " 
-        << "\nFEEGasDetE      : " << m_srcFEEGasDetE
-        << "\nIPM2            : " << m_srcIPM2      
-        << "\nIPMMono         : " << m_srcIPMMono   
-        << "\nIPM4            : " << m_srcIPM4      
-        << "\nIPM5            : " << m_srcIPM5      
-        << "\nfile_type       : " << m_file_type
-        << "\nfile_mode       : " << m_file_mode
-        << "\nfname           : " << m_fname
-        << "\nfname_header    : " << m_fname_header
-        << "\nm_print_bits    : " << m_print_bits;
+      log << "\nInput parameters:"
+          << "\nSources         : "; 
+
+    for(int i=0; i<m_size_of_list; i++)
+      log << "\n  imon" << i+1 << "         : " << m_src_list[i];
+
+      log << "\nfile_type       : " << m_file_type
+          << "\nfile_mode       : " << m_file_mode
+          << "\nfname           : " << m_fname
+          << "\nfname_header    : " << m_fname_header
+          << "\nm_print_bits    : " << m_print_bits;
   }
 }
 

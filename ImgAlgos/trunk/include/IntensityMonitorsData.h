@@ -112,7 +112,7 @@ protected:
   void printSummaryForParser(Event& evt, std::string comment=std::string());
   void openOutputFiles();
   void closeOutputFiles();
-  void makeListOfSources(); 
+  //void makeListOfSources(); 
   void procEvent(Event& evt, Env& env);
   std::string strOfSources();
   std::string strRecord(Event& evt, Env& env);
@@ -123,12 +123,6 @@ protected:
 
 private:
   //Pds::Src      m_src;
-
-  Source        m_srcFEEGasDetE; 
-  Source        m_srcIPM2;
-  Source        m_srcIPMMono;    
-  Source        m_srcIPM4;       
-  Source        m_srcIPM5;       
   Source*       m_src_list;
   int           m_size_of_list;
   int           m_size_of_arr;

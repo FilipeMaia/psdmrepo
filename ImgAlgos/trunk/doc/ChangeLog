@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2013-03-18 Mikhail S. Dubrovin
+- add ImgIntMonCorr - not finished yet. 
+- in IntensityMonitorsData - restracturization; now it accepts input intensity monitor sources in any order.
+	
 Tag: V00-03-04	
 2013-03-15 Mikhail S. Dubrovin
 - in ImgAverage add evaluation of the hot-pixel mask. Pixel is hot if its rms > threshold.
