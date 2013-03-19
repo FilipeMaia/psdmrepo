@@ -260,6 +260,9 @@ class FileNameManager :
     def path_cora_split_batch_log(self) :
         return self.path_prefix_cora() + '-' + self.str_exp_run_data() + 'split-log.txt'
 
+    def path_cora_split_imon_cfg(self) :
+        return self.path_prefix_cora() + '-' + self.str_exp_run_data() + 'imon-cfg.txt'
+
     def path_cora_split_med(self) :
         return self.path_prefix_cora() + '-' + self.str_run_data() + 'med.txt'
 
@@ -312,6 +315,7 @@ class FileNameManager :
 
     def  get_list_of_files_cora_split(self) :
         self.list_of_files_cora_split = []
+        self.list_of_files_cora_split.append(fnm.path_cora_split_imon_cfg())
         self.list_of_files_cora_split.append(fnm.path_cora_split_psana_cfg())
         self.list_of_files_cora_split.append(fnm.path_cora_split_batch_log())
         self.list_of_files_cora_split.append(fnm.path_cora_split_med())

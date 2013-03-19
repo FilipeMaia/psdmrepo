@@ -59,9 +59,9 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
         self.rad_sele_grp.addButton(self.rad_nonorm)
         self.connect(self.rad_nonorm, QtCore.SIGNAL('clicked()'), self.onRadio)
 
-        for i, (name, ch1, ch2, ch3, ch4, norm, sele, sele_min, sele_max, short_name) in enumerate(cp.imon_pars_list) :
+        for i, (name, ch1, ch2, ch3, ch4, norm, sele, sele_min, sele_max, norm_ave, short_name) in enumerate(cp.imon_pars_list) :
             #print i, name.value(), ch1.value(), ch2.value(), ch3.value(), ch4.value()
-            self.guiSection(name, ch1, ch2, ch3, ch4, norm, sele, sele_min, sele_max, short_name) 
+            self.guiSection(name, ch1, ch2, ch3, ch4, norm, sele, sele_min, sele_max, norm_ave, short_name) 
 
         self.grid.addWidget(self.rad_nonorm, self.grid_row, 6, 1, 3)
 
@@ -113,7 +113,7 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
 
 
     def guiSection(self, name, cbch1=None, cbch2=None, cbch3=None, cbch4=None,
-                   norm=None, sele=None, sele_min=None, sele_max=None, short_name=None) :
+                   norm=None, sele=None, sele_min=None, sele_max=None, norm_ave=None, short_name=None) :
         edi      = QtGui.QLineEdit( str(short_name.value()) )        
         but      = QtGui.QPushButton('Browse')
         #box      = QtGui.QComboBox( self ) 
@@ -142,7 +142,8 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
                      6:(rad,norm),
                      7:(cbs,sele),
                      8:(mis,sele_min),
-                     9:(mas,sele_max)
+                     9:(mas,sele_max),
+                    10:(None,norm_ave)
                      }
 
         self.list_of_dicts.append( sec_dict )
@@ -257,6 +258,14 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
         if is_selected : self.checkEdiLimits(row)
 
 
+    def setAverageForRow(self, row):
+        sec_dict = self.list_of_dicts[row]
+        field_min, par_min = sec_dict[8]
+        field_max, par_max = sec_dict[9]
+        field_ave, par_ave = sec_dict[10]
+        par_ave.setValue( (par_min.value() + par_max.value())/2 )
+
+
     def checkEdiLimits(self, row):
         sec_dict = self.list_of_dicts[row]
         mis, par_mis = sec_dict[8]
@@ -317,6 +326,7 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
                     logger.info(msg, __name__ )
 
                     self.setStyleEdiFieldsForRow(row)
+                    self.setAverageForRow(row)
 
 
     def onBut(self):

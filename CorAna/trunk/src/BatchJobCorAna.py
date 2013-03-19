@@ -85,6 +85,7 @@ class BatchJobCorAna( BatchJob, QtCore.QObject ) : # need in QtCore.QObject in o
         queue    = cp.bat_queue.value()
         log_file = fnm.path_cora_split_batch_log()
 
+        #print "!!!!!!!!! WARNING gu.batch_job_submit(...) IS COMMENTED in BatchJobCorAna.py !!!!!!!!! "
         self.job_id_cora_split, out, err = gu.batch_job_submit(command, queue, log_file)
 
 #-----------------------------

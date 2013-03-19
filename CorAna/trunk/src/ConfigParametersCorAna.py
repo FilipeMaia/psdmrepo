@@ -425,6 +425,16 @@ class ConfigParametersCorAna ( ConfigParameters ) :
 
 #-----------------------------
 
+        imon_norm_ave = [ ( 1.,  1. ,'float'), \
+                          ( 1.,  1. ,'float'), \
+                          ( 1.,  1. ,'float'), \
+                          ( 1.,  1. ,'float'), \
+                          ( 1.,  1. ,'float') ]
+
+        self.imon_norm_ave_list = self.declareListOfPars( 'IMON_NORM_AVE', imon_norm_ave )
+
+#-----------------------------
+
         self.imon_pars_list = zip( self.imon_name_list,
                                    self.imon_ch1_list,
                                    self.imon_ch2_list,
@@ -434,6 +444,7 @@ class ConfigParametersCorAna ( ConfigParameters ) :
                                    self.imon_sele_cbx_list,
                                    self.imon_sele_min_list,
                                    self.imon_sele_max_list,
+                                   self.imon_norm_ave_list,
                                    self.imon_short_name_list )
         #print self.imon_pars_list
 

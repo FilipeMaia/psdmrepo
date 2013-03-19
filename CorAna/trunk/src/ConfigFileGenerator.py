@@ -157,6 +157,11 @@ class ConfigFileGenerator :
                          'FNAME_PEDS_AVE'  : fnm.path_pedestals_ave(),
                          }
 
+        fname_imon_cfg = fnm.path_cora_split_imon_cfg()
+        self.make_imon_cfg_file (fname_imon_cfg)
+        self.d_subs['FNAME_IMON_CFG' ] = str( fname_imon_cfg )
+
+
         if cp.lld_type.value() == 'ADU' : #  ['NONE', 'ADU', 'RMS']
             self.d_subs['THRESHOLD_ADU' ] = str( cp.lld_adu.value() )
             self.d_subs['DO_CONST_THR'  ] = 'true'
@@ -177,6 +182,28 @@ class ConfigFileGenerator :
 
         self.print_substitution_dict()
         self.make_cfg_file()
+
+#-----------------------------
+#-----------------------------
+
+    def get_text_table_of_imon_pars (self) :
+        text = ''
+        for i, (name, ch1, ch2, ch3, ch4, norm, sele, sele_min, sele_max, norm_ave, short_name) in enumerate(cp.imon_pars_list) :
+            src_imon  = ' %s' % (name.value().ljust(32))
+            name_imon = ' %s' % (short_name.value().ljust(16))
+            bits      = ' %d %d %d %d %d %d' % (ch1.value(), ch2.value(), ch3.value(), ch4.value(), norm.value(), sele.value())
+            vals      = ' %f %f %f' % (sele_min.value(), sele_max.value(), norm_ave.value())
+            s         = str(i+1) + src_imon + name_imon + bits + vals
+            text     += s + '\n'
+        return text
+
+
+    def make_imon_cfg_file (self, fname='imon_cfg.txt') :
+        text_table = self.get_text_table_of_imon_pars()
+        logger.info('Make intensity monitors configuration file: ' + fname + '\n' + text_table, __name__)
+        fout = open(fname,'w')
+        fout.write(text_table)
+        fout.close() 
 
 #-----------------------------
 #-----------------------------
