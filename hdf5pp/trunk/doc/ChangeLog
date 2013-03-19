@@ -11,6 +11,13 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-01
+2013-03-19 Andy Salnikov
+- DataSet class is not template any more, only some of its methods are
+  templated, makes easier to read "polymorphic" stuff like epics
+- GroupIter constructor takes optionsl skipSoft argument, if set to true
+  it will skip soft links while iterating over group contents
+
 Tag: V00-03-05
 2013-03-13 Andy Salnikov
 - some improvements to logging
