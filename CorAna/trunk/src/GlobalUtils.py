@@ -232,8 +232,48 @@ def get_text_file_content(path) :
     return text
 
 #----------------------------------
-# assumes: path = /reg/d/psdm/XCS/xcsi0112/xtc/e167-r0015-s00-c00.xtc
+# assumes: path = .../<inst>/<experiment>/xtc/<file-name>.xtc
+#        i.e         /reg/data/ana12/xcs/xcsi0112/xtc/e167-r0020-s00-c00.xtc 
+#        or          /reg/d/psdm/XCS/xcsi0112/xtc/e167-r0015-s00-c00.xtc
 def parse_xtc_path(path='.') :
+
+    logger.debug( 'parse_xtc_path(...): ' + path, __name__)
+
+    instrument = 'INS'
+    experiment = 'expt'
+    run_str    = 'r0000'
+    run_num    = 0
+
+    bname   = os.path.basename(path)                # i.e. e167-r0015-s00-c00.xtc
+    try:
+        run_str = bname.split('-')[1]               # i.e. r0015
+        run_num = int(run_str[1:])                  # i.e. 15
+    except :
+        print 'Unexpected xtc file name:', bname 
+        print 'Use default instrument, experiment, run_str, run_num: ', instrument, experiment, run_str, run_num
+        return instrument, experiment, run_str, run_num
+        pass
+
+    dirname  = os.path.dirname(path)                # i.e /reg/data/ana12/xcs/xcsi0112/xtc
+    fields   = dirname.split('/')
+    n_fields = len(fields)
+    if n_fields < 4 :
+        msg1 = 'Unexpected xtc dirname: %s: Number of fields in dirname = %d' % (dirname, n_fields)
+        msg2 = 'Use default instrument, experiment, run_str, run_num: %s %s %s %d' % (instrument, experiment, run_str, run_num)
+        logger.warning( msg1+msg2, __name__)         
+        return instrument, experiment, run_str, run_num
+            
+    xtc_subdir = fields[-1]                         # i.e. xtc
+    experiment = fields[-2]                         # i.e. xcsi0112
+    instrument = fields[-3].upper()                 # i.e. XCS 
+    msg = 'Set instrument, experiment, run_str, run_num: %s %s %s %d' % (instrument, experiment, run_str, run_num)
+    logger.debug( msg, __name__)         
+
+    return instrument, experiment, run_str, run_num
+    
+#----------------------------------
+# assumes: path = /reg/d/psdm/XCS/xcsi0112/xtc/e167-r0015-s00-c00.xtc
+def parse_xtc_path_v0(path='.') :
 
     instrument = 'INS'
     experiment = 'expt'

@@ -41,7 +41,7 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
 
     def __init__ ( self, parent=None ) :
         QtGui.QWidget.__init__(self, parent)
-        self.setGeometry(100, 200, 850,300)
+        self.setGeometry(100, 200, 850, 300)
         self.setWindowTitle('GUI for Intensity Monitors')
         self.setFrame()
 
@@ -100,8 +100,8 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
         
     def setTitleBar(self) :
         self.list_of_titles = ['Intensity Monitor', 'Ch.1', 'Ch.2', 'Ch.3', 'Ch.4',
-                               'Plot', 'Norm', 'Select', 'Imin', 'Imax']
-        list_of_sizes       = [170, 50, 50, 50, 50, 80, 50, 50, 60, 60]
+                               'Plot', 'Norm', 'Select', 'Imin', 'Imax', 'Iave']
+        list_of_sizes       = [170, 50, 50, 50, 50, 80, 50, 50, 60, 60, 60]
 
         for i,t in enumerate(self.list_of_titles) : 
             label = QtGui.QLabel(t)
@@ -132,6 +132,7 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
         cbs = QtGui.QCheckBox('', self)
         mis = QtGui.QLineEdit( str(sele_min.value()) )        
         mas = QtGui.QLineEdit( str(sele_max.value()) )        
+        ave = QtGui.QLineEdit( str(norm_ave.value()) )        
 
         sec_dict = { 0:(edi,short_name),
                      1:(cb1,cbch1),
@@ -143,7 +144,7 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
                      7:(cbs,sele),
                      8:(mis,sele_min),
                      9:(mas,sele_max),
-                    10:(None,norm_ave)
+                    10:(ave,norm_ave)
                      }
 
         self.list_of_dicts.append( sec_dict )
@@ -169,6 +170,7 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
         edi    .setAlignment (QtCore.Qt.AlignLeft)
         mis    .setStyleSheet (cp.styleEdit) # cp.styleEditInfo
         mas    .setStyleSheet (cp.styleEdit) # cp.styleEditInfo
+        ave    .setStyleSheet (cp.styleEditInfo) # cp.styleEditInfo
 
         #mas.setObjectName('mas')
         #mas.setStyleSheet('QLineEdit#mas          {color: blue; background-color: yellow;}' +
@@ -183,6 +185,7 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
         edi    .setFixedWidth(150)
         mis    .setFixedWidth(width)
         mas    .setFixedWidth(width)
+        ave    .setFixedWidth(width)
 
         self.connect(but, QtCore.SIGNAL('clicked()'),         self.onBut  )
         self.connect(mis, QtCore.SIGNAL('editingFinished()'), self.onEdit )
@@ -260,10 +263,12 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
 
     def setAverageForRow(self, row):
         sec_dict = self.list_of_dicts[row]
-        field_min, par_min = sec_dict[8]
-        field_max, par_max = sec_dict[9]
-        field_ave, par_ave = sec_dict[10]
-        par_ave.setValue( (par_min.value() + par_max.value())/2 )
+        mis, par_mis = sec_dict[8]
+        mas, par_mas = sec_dict[9]
+        ave, par_ave = sec_dict[10]
+        par_ave.setValue( (par_mis.value() + par_mas.value())/2 )
+        ave.setText(str(par_ave.value()))
+        ave.setReadOnly(True)
 
 
     def checkEdiLimits(self, row):
@@ -290,7 +295,7 @@ class GUIIntensityMonitors ( QtGui.QWidget ) :
             rad, par = sec_dict[6]
             if par.value() :
                 rad.setChecked(True)
-                print 'initRadio: row' + str(row) + ' status:' + str(par.value())
+                logger.info('initRadio: row' + str(row) + ' status:' + str(par.value()), __name__)
                 return
         self.rad_nonorm.setChecked(True)
 
