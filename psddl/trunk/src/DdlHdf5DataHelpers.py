@@ -94,6 +94,9 @@ hdf5pp::Type {{ns}}::{{className}}::{{func}}_type()
 _ds_ctor_dtor_template = ji.Template('''\
 {{ns}}::{{className}}::{{className}}()
 {
+{% for attr in vlen_pointers %}
+  this->vlen_{{attr}} = 0;
+{% endfor %}
 {% for attr in pointers %}
   this->{{attr}} = 0;
 {% endfor %}
@@ -314,6 +317,17 @@ def _types(type):
         for t in _types(type.base): yield t
         yield type
 
+def _h5schema(attr):
+    '''find a schema for a given attribute based on attribute type'''
+    aschema = [sch for sch in attr.type.h5schemas if sch.version == attr.schema_version]
+    if not aschema: return None
+    return aschema[0]
+
+def _h5ds_typename(attr):
+    '''Return type name for a dataset structure of the attribute'''
+    aschema = _h5schema(attr)
+    if aschema: return aschema.datasets[0].classNameNs()
+
 #------------------------
 # Exported definitions --
 #------------------------
@@ -324,9 +338,27 @@ class DatasetComposite(object):
         '''Arguments must have H5Type and H5Dataset type'''
         self.schema = schema
         self.ds = ds
+        
+        # "Forwarding" dataset, only defined for cases when composite dataset has
+        # one scalar attribute of user-defined type
+        self.fwd = None
+        if len(ds.attributes) == 1:
+            attr = ds.attributes[0]
+            atype = attr.type
+            if not attr.rank and not attr.type.basic:
+                aschema = [sch for sch in attr.type.h5schemas if sch.version == attr.schema_version] + [None]
+                aschema = aschema[0]
+                if aschema and len(aschema.datasets) == 1:
+                   self.fwd = aschema.datasets[0]
+                   ds.tags['fwd'] = self.fwd
+            
 
     def ds_read_decl(self, psana_ns):
-        dsClassName = self.ds.classNameNs()
+        if self.fwd:
+            dsClassName = self.fwd.classNameNs()
+        else:
+            dsClassName = self.ds.classNameNs()
+            
         dsName = self.ds.name
         decls = [T('mutable boost::shared_ptr<$dsClassName> m_ds_$dsName;')(locals()),
                  T('void read_ds_$dsName() const;')(locals())]
@@ -344,15 +376,20 @@ class DatasetComposite(object):
                     if attr.rank == 0:
                         decls += [T("mutable boost::shared_ptr<$typename> m_ds_storage_${dsName}_${attrName};")(locals())]
                     else:
-                        attr_class = "%s_v%d" % (attr._h5schema.name, attr._h5schema.version)
+                        aschema = _h5schema(attr)
+                        attr_class = "%s_v%d" % (aschema.name, aschema.version)
                         rank = attr.rank
                         decls += [T("mutable ndarray<$attr_class, $rank> m_ds_storage_${dsName}_${attrName};")(locals())]
+                        
         return decls
 
     def ds_read_impl(self, psana_ns):
+        if self.fwd:
+            dsClassName = self.fwd.classNameNs()
+        else:
+            dsClassName = self.ds.classNameNs()
         schema = self.schema
         type = schema.pstype
-        dsClassName = self.ds.classNameNs()
         dsName = self.ds.name
         return [_read_comp_ds_impl_template.render(locals())]
 
@@ -360,6 +397,10 @@ class DatasetComposite(object):
 
         if 'external' in self.ds.tags:
             _log.debug("_genDs: skip dataset - external")
+            return
+
+        if self.fwd: 
+            _log.debug("_genDs: skip dataset - will forward")
             return
 
         ns = self.schema.nsName()
@@ -380,7 +421,7 @@ class DatasetComposite(object):
                 # presentation if optimization is necessary
                 dattr['type'] = "int32_t"
             elif not attr.type.basic:
-                dattr['type'] = attr._h5ds_typename
+                dattr['type'] = _h5ds_typename(attr)
             else:
                 dattr['type'] = attr.type.name
 
@@ -433,6 +474,7 @@ class DatasetComposite(object):
         
         # generate constructor and destructor
         pointers = [attr.name for attr in self.ds.attributes if attr.rank > 0 and not attr.sizeIsConst()]
+        vlen_pointers = [attr.name for attr in self.ds.attributes if attr.rank > 0 and attr.type.name != 'char' and attr.sizeIsVlen()]
         print >>cpp, _ds_ctor_dtor_template.render(locals())
 
     def _genH5TypeFunc(self, func, psana_ns):
@@ -507,19 +549,13 @@ class DatasetComposite(object):
 
             # for non-basic type (like composite types) find corresponding h5 schema,
             # if it has only one dataset then use it here
-            aschema = [sch for sch in attr.type.h5schemas if sch.version == attr.schema_version]
+            aschema = _h5schema(attr)
             if not aschema:
                 raise ValueError('No schema found for attribute %s' % attr.name)
-            aschema = aschema[0]
             if len(aschema.datasets) != 1:
                 raise ValueError('Attribute schema has number of datasets != 1: %d for attr %s of type %s' % (len(aschema.datasets), attr.name, attr.type.name))
 
-            attr_type_name = aschema.datasets[0].classNameNs()
-
-            # remember it for use in other places
-            attr._h5schema = aschema 
-            attr._h5ds = aschema.datasets[0]
-            attr._h5ds_typename = attr_type_name
+            attr_type_name = _h5ds_typename(attr)
 
             type = T("hdf5pp::TypeTraits<${attr_type_name}>::${func}_type()")(locals())
             type_decl = None
@@ -792,7 +828,10 @@ class SchemaAbstractType(SchemaType):
                     memberName = T("m_ds_storage_${dsName}_${attrName}")(locals());
                     attr_type = attr.type.fullName('C++', psana_ns)
                     impl += [T("  if (not m_ds_$name) read_ds_$name();")[ds]]
-                    impl += [T("  $memberName = $attr_type(m_ds_$dsName->$attrName);")(locals())]
+                    if 'fwd' in ds.tags:
+                        impl += [T("  $memberName = $attr_type(*m_ds_$dsName);")(locals())]
+                    else:
+                        impl += [T("  $memberName = $attr_type(m_ds_$dsName->$attrName);")(locals())]
                     impl += [T("  return $memberName;")(locals())]
                     
                 else:
@@ -802,14 +841,17 @@ class SchemaAbstractType(SchemaType):
                     dsName = ds.name
                     attrName = attr.name
                     memberName = T("m_ds_storage_${dsName}_${attrName}")(locals());
-                    aschema = attr._h5schema
-                    attr_type = attr._h5ds_typename
+                    aschema = _h5schema(attr)
+                    attr_type = _h5ds_typename(attr)
                     attr_class = "%s_v%d" % (aschema.pstype.fullName('C++'), aschema.version)
                     impl += [T("  if (not $memberName) {")(locals())]
                     impl += [T("    if (not m_ds_$name) read_ds_$name();")[ds]]
-                    impl += [T("    boost::shared_ptr<$attr_type> tmp(m_ds_$dsName, &m_ds_$dsName->$attrName);")(locals())]
-                    impl += [T("    $memberName = boost::make_shared<$attr_class>(tmp);")(locals())]
-                    impl += ["  }"]
+                    if 'fwd' in ds.tags:
+                        impl += [T("    $memberName = boost::make_shared<$attr_class>(m_ds_$dsName);")(locals())]
+                    else:
+                        impl += [T("    boost::shared_ptr<$attr_type> tmp(m_ds_$dsName, &m_ds_$dsName->$attrName);")(locals())]
+                        impl += [T("    $memberName = boost::make_shared<$attr_class>(tmp);")(locals())]
+                    impl += [  "  }"]
                     impl += [T("  return *$memberName;")(locals())]
                
                
@@ -893,8 +935,9 @@ class SchemaAbstractType(SchemaType):
                         data_size = _interpolate(str(meth.attribute.shape.size()), type)
                     memberName = T("m_ds_storage_${dsName}_${attrName}")(locals());
                     arguse = ''.join(["[%s]" % arg for arg, type in args])
-                    attr_class = "%s_v%d" % (attr._h5schema.name, attr._h5schema.version)
-                    attr_type = attr._h5ds_typename
+                    aschema = _h5schema(attr)
+                    attr_class = "%s_v%d" % (aschema.name, aschema.version)
+                    attr_type = _h5ds_typename(attr)
                     impl += [T("  if (not m_ds_$name) read_ds_$name();")[ds]]
                     impl += [T("  if ($memberName.empty()) {")(locals())]
                     impl += [T("    unsigned shape[] = {$shape};")(locals())]
