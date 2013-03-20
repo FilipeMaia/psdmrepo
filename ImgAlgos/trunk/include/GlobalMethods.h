@@ -16,6 +16,8 @@
 
 #include <string>
 #include <fstream>   // ofstream
+#include <iomanip>   // for setw, setfill
+#include <sstream>   // for stringstream
 
 //----------------------
 // Base Class Headers --
@@ -118,6 +120,22 @@ private:
   {
     boost::shared_ptr< ndarray<T,2> > img2d( new ndarray<T,2>(data) );
     evt.put(img2d, src, key);
+  }
+
+//--------------------
+// Get string of the 2-D array partial data for test print purpose
+  template <typename T>
+    std::string stringOf2DArrayData(const ndarray<T,2>& data, std::string comment="",
+                                  unsigned row_min=0, unsigned row_max=1, 
+                                  unsigned col_min=0, unsigned col_max=10 )
+  {
+      std::stringstream ss;
+      ss << comment; 
+          for (unsigned r = row_min; r < row_max; ++ r) {
+            for (unsigned c = col_min; c < col_max; ++ c ) ss << " " << data[r][c]; 
+            ss << " ...\n";
+	  }
+      return ss.str();
   }
 
 //--------------------

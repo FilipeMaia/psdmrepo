@@ -8,7 +8,7 @@
 // Description:
 //	Class PrincetonImageProducer.
 // 1. Get Camera data as uint16_t
-// 2.
+// 2. Do nothing for now...
 // 3. Save image in the event as ndarray<uint16_t,2>
 //------------------------------------------------------------------------
 
@@ -94,7 +94,6 @@ private:
   Source         m_str_src;          // string with source name
   std::string    m_key_in;           // string with key for input data
   std::string    m_key_out;          // string with key for output image
-  bool           m_subtract_offset;  // true - subtryct, false - do not subtract
   unsigned       m_print_bits;       // control print bits
   long           m_count;            // local event counter
 

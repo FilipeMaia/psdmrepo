@@ -333,7 +333,9 @@ IntensityMonitorsData::getDataForSource(Event& evt, Env& env, Source& src)
   }
 
 //-----
-    return  Quartet (-1,-1,-1,-1);
+  MsgLog( name(), info,  "IntensityMonitorsData::getDataForSource(): unavailable data for source: " << src << "\n"); 
+  //abort(); 
+  return  Quartet (-1,-1,-1,-1);
 }
 
 //--------------------

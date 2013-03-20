@@ -18,8 +18,6 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
-#include <iomanip>   // for setw, setfill
-#include <sstream>   // for stringstream
 #include <boost/lexical_cast.hpp>
 
 //-------------------------------

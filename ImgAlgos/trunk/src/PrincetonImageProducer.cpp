@@ -51,7 +51,6 @@ PrincetonImageProducer::PrincetonImageProducer (const std::string& name)
   , m_str_src()
   , m_key_in()
   , m_key_out() 
-//, m_subtract_offset()
   , m_print_bits()
   , m_count(0)
 {
@@ -59,7 +58,6 @@ PrincetonImageProducer::PrincetonImageProducer (const std::string& name)
   m_str_src           = configSrc("source", "DetInfo(:Princeton)");
   m_key_in            = configStr("key_in",                 "");
   m_key_out           = configStr("key_out",           "image");
-//m_subtract_offset   = config   ("subtract_offset",      true);
   m_print_bits        = config   ("print_bits",             0 );
 }
 
@@ -73,7 +71,6 @@ PrincetonImageProducer::printInputParameters()
         << "\n source           : " << m_str_src
         << "\n key_in           : " << m_key_in      
         << "\n key_out          : " << m_key_out
-      //<< "\n subtract_offset  : " << m_subtract_offset     
         << "\n print_bits       : " << m_print_bits
         << "\n";     
   }
@@ -109,7 +106,7 @@ PrincetonImageProducer::beginCalibCycle(Event& evt, Env& env)
 
     MsgLog(name(), info, "in beginCalibCycle()");
     
-    shared_ptr<Psana::Princeton::ConfigV1> config1 = env.configStore().get(m_src);
+    shared_ptr<Psana::Princeton::ConfigV1> config1 = env.configStore().get(m_str_src);
     if (config1.get()) {    
       WithMsgLog(name(), info, str) {
         str << "Princeton::ConfigV1:";
@@ -129,7 +126,7 @@ PrincetonImageProducer::beginCalibCycle(Event& evt, Env& env)
       }
     }
     
-    shared_ptr<Psana::Princeton::ConfigV2> config2 = env.configStore().get(m_src);
+    shared_ptr<Psana::Princeton::ConfigV2> config2 = env.configStore().get(m_str_src);
     if (config2.get()) {
       WithMsgLog(name(), info, str) {
         str << "Princeton::ConfigV2:";
@@ -150,10 +147,10 @@ PrincetonImageProducer::beginCalibCycle(Event& evt, Env& env)
       }    
     }
     
-    shared_ptr<Psana::Princeton::ConfigV3> config3 = env.configStore().get(m_src);
+    shared_ptr<Psana::Princeton::ConfigV3> config3 = env.configStore().get(m_str_src);
     if (config3.get()) {    
       WithMsgLog(name(), info, str) {
-        str << "Princeton::ConfigV2:";
+        str << "Princeton::ConfigV3:";
         str << "\n  width = " << config3->width();
         str << "\n  height = " << config3->height();
         str << "\n  orgX = " << config3->orgX();
@@ -212,26 +209,9 @@ PrincetonImageProducer::procEvent(Event& evt, Env& env)
   if (frame.get()) {
 
       const ndarray<uint16_t, 2>& data = frame->data().copy();
-
-      /*
-      // copy data with type changing 
-      if(m_count == 1) 
-        m_data = new double [data.size()];
-      unsigned ind = 0;
-      ndarray<const uint16_t, 2>::const_iterator cit;
-      for(cit=data.begin(); cit!=data.end(); cit++) { m_data[ind++] = double(*cit); }
-      save2DArrayInEvent<double>   (evt, m_src, m_key_out, m_data, data.shape());
-      */
- 
       save2DArrayInEvent<uint16_t> (evt, m_src, m_key_out, data);
 
-      if( m_print_bits & 8 ) {
-        std::cout << "  data =";
-        for (int i = 0; i < 10; ++ i) {
-          std::cout << " " << data[0][i];
-        }
-        std::cout << " ...\n";
-      }
+      if( m_print_bits & 8 ) MsgLog( name(), info, stringOf2DArrayData<uint16_t>(data, std::string(" data: ")) );
   }
   else
   {

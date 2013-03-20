@@ -57,9 +57,12 @@ namespace ImgAlgos {
  *
  *  @author Mikhail S. Dubrovin
  */
+
+//-------------------
+
 struct IntMonConfig {
-  unsigned    ind;
-  std::string source;
+  Source      source;
+  std::string src_name;
   std::string name;
   unsigned    ch1;
   unsigned    ch2;
@@ -72,6 +75,18 @@ struct IntMonConfig {
   double      iave;
 };
 
+//-------------------
+
+struct Quartet{
+  float v1;
+  float v2; 
+  float v3;
+  float v4; 
+   
+  Quartet(float p1, float p2, float p3, float p4): v1(p1), v2(p2), v3(p3), v4(p4) {}
+};
+
+//-------------------
 
 class ImgIntMonCorr : public Module {
 public:
@@ -106,8 +121,12 @@ public:
 
   void printInputParameters();
   void printEventRecord(Event& evt);
+  void printNormFactor();
   void readIntMonConfigFile();
   void printIntMonConfig();
+  void printIntMonData(Event& evt, Env& env);
+  bool procIntMonData(Event& evt, Env& env);
+  Quartet getIntMonDataForSource(Event& evt, Env& env, const Source& src);
 
 protected:
   void init(Event& evt, Env& env);

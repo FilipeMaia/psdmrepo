@@ -26,6 +26,7 @@
 //-------------------------------
 #include "MsgLogger/MsgLogger.h"
 #include "PSEvt/EventId.h"
+#include "psddl_psana/bld.ddl.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -62,8 +63,8 @@ ImgIntMonCorr::ImgIntMonCorr (const std::string& name)
   m_fname_imon_cfg    = configStr("fname_imon_cfg",           "");
   m_print_bits        = config   ("print_bits",               0 );
 
-  m_do_sele = (m_fname_imon_cfg.empty()) ? false : true;
-  m_do_norm = (m_fname_imon_cfg.empty()) ? false : true;
+  m_do_sele = false;
+  m_do_norm = false;
 }
 
 //--------------------
@@ -122,8 +123,17 @@ ImgIntMonCorr::event(Event& evt, Env& env)
 {
   if(!m_count) init(evt, env);
   if( m_print_bits & 2 ) printEventRecord(evt);
+  if( m_print_bits & 4 ) printIntMonData(evt, env);
 
   m_norm_factor = 1;
+
+  if (m_do_sele or m_do_norm) {
+     if( !procIntMonData(evt, env) ) { skip(); return; } // event is discarded
+  }
+
+  // m_norm_factor = 1; // for test only
+
+  if( m_print_bits & 8 ) printNormFactor();
 
   procEvent(evt, env);
   ++ m_count;
@@ -188,6 +198,14 @@ ImgIntMonCorr::printEventRecord(Event& evt)
 
 //--------------------
 
+void 
+ImgIntMonCorr::printNormFactor()
+{
+  MsgLog( name(), info, "Intensity norm. factor: " << m_norm_factor);
+}
+
+//--------------------
+
 void
 ImgIntMonCorr::readIntMonConfigFile()
 {
@@ -204,12 +222,19 @@ ImgIntMonCorr::readIntMonConfigFile()
       getline (inf,s);
       if(!inf.good()) break;
       std::stringstream ss(s); 
-      ss >> imc.ind >> imc.source  >> imc.name >> imc.ch1 >> imc.ch2 >> imc.ch3 >> imc.ch4 >> imc.norm >> imc.sele >> imc.imin >> imc.imax >> imc.iave;
+      ss >> imc.src_name  >> imc.name >> imc.ch1 >> imc.ch2 >> imc.ch3 >> imc.ch4 >> imc.norm >> imc.sele >> imc.imin >> imc.imax >> imc.iave;
+      imc.source = Source(imc.src_name);
       v_imon_cfg.push_back(imc);
+
+      if (imc.sele) m_do_sele = true;
+      if (imc.norm) m_do_norm = true;
     }
     inf.close();
   }
-  else MsgLog( name(), info,  "ImgIntMonCorr::readIntMonConfigFile(): Unable to open file: " << m_fname_imon_cfg << "\n");  
+  else {
+    MsgLog( name(), info,  "ImgIntMonCorr::readIntMonConfigFile(): Unable to open file: " << m_fname_imon_cfg << "\n"); 
+    abort(); 
+  }
 }
 
 //--------------------
@@ -222,19 +247,18 @@ ImgIntMonCorr::printIntMonConfig()
           << m_fname_imon_cfg << " size=" << v_imon_cfg.size() << "\n";
 
     for(std::vector<IntMonConfig>::const_iterator it = v_imon_cfg.begin(); 
-                                                it!= v_imon_cfg.end(); it++) {
+                                                  it!= v_imon_cfg.end(); it++) {
 
-        //<< " t_sec:"  << std::fixed << std::setw(15) << std::setprecision(3) << it->t_sec
-      log << " ind:"    << std::setw(2)  << std::right << it->ind
-          << " source:" << std::setw(32) << std::left  << it->source
+                     // << std::fixed << std::setw(15) << std::setprecision(3)
+      log << " source:" << std::setw(32) << std::left  << it->src_name // source
           << " name:"   << std::setw(16)               << it->name 
           << " ch1:"    << std::setw(1)  << std::right << it->ch1   
           << " ch2:"    << std::setw(1)                << it->ch2   
           << " ch3:"    << std::setw(1)                << it->ch3   
           << " ch4:"    << std::setw(1)                << it->ch4   
-          << " norm:"   << std::setw(1)                << it->norm  
+          <<"  norm:"   << std::setw(1)                << it->norm  
           << " sele:"   << std::setw(1)                << it->sele  
-          << " imin:"   << std::setw(8)                << it->imin  
+          <<"  imin:"   << std::setw(8)                << it->imin  
           << " imax:"   << std::setw(8)                << it->imax  
           << " iave:"   << std::setw(8)                << it->iave  
           << "\n";      
@@ -244,6 +268,93 @@ ImgIntMonCorr::printIntMonConfig()
 }
 
 //--------------------
+
+void
+ImgIntMonCorr::printIntMonData(Event& evt, Env& env)
+{
+  WithMsgLog(name(), info, log) {
+    for(std::vector<IntMonConfig>::const_iterator it = v_imon_cfg.begin(); 
+                                                  it!= v_imon_cfg.end(); it++) {
+
+      Quartet q = getIntMonDataForSource(evt, env, it->source);
+      log << "\nIntensity monitor data for source " << std::setw(32) << std::left << it->src_name
+          << ": " << std::setw(8) << std::setprecision(4) << q.v1
+          << " "  << std::setw(8) << std::setprecision(4) << q.v2
+          << " "  << std::setw(8) << std::setprecision(4) << q.v3
+          << " "  << std::setw(8) << std::setprecision(4) << q.v4;
+    }
+    //log << "\n";
+  }
+}
+
+//--------------------
+// 1) Get intensity monitor data
+// 2) Apply selector
+// 3) Evaluate correction factor
+bool 
+ImgIntMonCorr::procIntMonData(Event& evt, Env& env)
+{
+    for(std::vector<IntMonConfig>::const_iterator it = v_imon_cfg.begin(); 
+                                                  it!= v_imon_cfg.end(); it++) {
+
+      Quartet q = getIntMonDataForSource(evt, env, it->source);
+      double sum_int = q.v1 * it->ch1
+                     + q.v2 * it->ch2
+                     + q.v3 * it->ch3
+	             + q.v4 * it->ch4;
+
+      if (it->sele) {
+	if(sum_int < it->imin) return false;
+	if(sum_int > it->imax) return false;
+      }
+
+      if (it->norm) {
+        m_norm_factor = (sum_int>0) ? it->iave/sum_int : 1.;
+      }
+    }
+  return true;
+}
+
+//--------------------
+
+Quartet
+ImgIntMonCorr::getIntMonDataForSource(Event& evt, Env& env, const Source& src)
+{  
+  shared_ptr<Psana::Bld::BldDataFEEGasDetEnergy> fee = evt.get(src);
+  if (fee.get()) {
+    return Quartet ((float)fee->f_11_ENRC(), 
+                    (float)fee->f_12_ENRC(), 
+                    (float)fee->f_21_ENRC(), 
+                    (float)fee->f_22_ENRC());
+  } 
+
+//-----
+ 
+  shared_ptr<Psana::Ipimb::DataV2> data2 = evt.get(src);
+  if (data2.get()) {
+    return Quartet ((float)data2->channel0Volts(), 
+                    (float)data2->channel1Volts(), 
+                    (float)data2->channel2Volts(), 
+                    (float)data2->channel3Volts());
+  }
+
+//-----
+
+  shared_ptr<Psana::Bld::BldDataIpimbV1> ipimb1 = evt.get(src);
+  if (ipimb1.get()) {
+    const Psana::Ipimb::DataV2& ipimbData = ipimb1->ipimbData();
+
+    return Quartet ((float)ipimbData.channel0Volts(), 
+                    (float)ipimbData.channel1Volts(), 
+                    (float)ipimbData.channel2Volts(), 
+                    (float)ipimbData.channel3Volts());
+  }
+
+//-----
+  MsgLog( name(), info,  "ImgIntMonCorr::getIntMonDataForSource(): unavailable data for source: " << src << "\n"); 
+  //abort(); 
+  return  Quartet (-1,-1,-1,-1);
+}
 
 //--------------------
 //--------------------
