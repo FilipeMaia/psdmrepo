@@ -586,19 +586,6 @@ struct dataset_config {
 };
 }
 
-namespace ns_ConfigV5_v0 {
-struct dataset_seq_config {
-  static hdf5pp::Type native_type();
-  static hdf5pp::Type stored_type();
-
-  dataset_seq_config();
-  ~dataset_seq_config();
-
-  EvrData::ns_SequencerConfigV1_v0::dataset_config seq_config; 
-
-};
-}
-
 
 class ConfigV5_v0 : public Psana::EvrData::ConfigV5 {
 public:
@@ -625,7 +612,7 @@ private:
   void read_ds_pulses() const;
   mutable ndarray<const Psana::EvrData::OutputMap, 1> m_ds_output_maps;
   void read_ds_output_maps() const;
-  mutable boost::shared_ptr<EvrData::ns_ConfigV5_v0::dataset_seq_config> m_ds_seq_config;
+  mutable boost::shared_ptr<EvrData::ns_SequencerConfigV1_v0::dataset_config> m_ds_seq_config;
   void read_ds_seq_config() const;
   mutable boost::shared_ptr<Psana::EvrData::SequencerConfigV1> m_ds_storage_seq_config_seq_config;
 };
@@ -643,19 +630,6 @@ struct dataset_config {
   uint32_t neventcodes; 
   uint32_t npulses; 
   uint32_t noutputs; 
-
-};
-}
-
-namespace ns_ConfigV6_v0 {
-struct dataset_seq_config {
-  static hdf5pp::Type native_type();
-  static hdf5pp::Type stored_type();
-
-  dataset_seq_config();
-  ~dataset_seq_config();
-
-  EvrData::ns_SequencerConfigV1_v0::dataset_config seq_config; 
 
 };
 }
@@ -686,7 +660,7 @@ private:
   void read_ds_pulses() const;
   mutable ndarray<const Psana::EvrData::OutputMapV2, 1> m_ds_output_maps;
   void read_ds_output_maps() const;
-  mutable boost::shared_ptr<EvrData::ns_ConfigV6_v0::dataset_seq_config> m_ds_seq_config;
+  mutable boost::shared_ptr<EvrData::ns_SequencerConfigV1_v0::dataset_config> m_ds_seq_config;
   void read_ds_seq_config() const;
   mutable boost::shared_ptr<Psana::EvrData::SequencerConfigV1> m_ds_storage_seq_config_seq_config;
 };
@@ -704,19 +678,6 @@ struct dataset_config {
   uint32_t neventcodes; 
   uint32_t npulses; 
   uint32_t noutputs; 
-
-};
-}
-
-namespace ns_ConfigV7_v0 {
-struct dataset_seq_config {
-  static hdf5pp::Type native_type();
-  static hdf5pp::Type stored_type();
-
-  dataset_seq_config();
-  ~dataset_seq_config();
-
-  EvrData::ns_SequencerConfigV1_v0::dataset_config seq_config; 
 
 };
 }
@@ -747,7 +708,7 @@ private:
   void read_ds_pulses() const;
   mutable ndarray<const Psana::EvrData::OutputMapV2, 1> m_ds_output_maps;
   void read_ds_output_maps() const;
-  mutable boost::shared_ptr<EvrData::ns_ConfigV7_v0::dataset_seq_config> m_ds_seq_config;
+  mutable boost::shared_ptr<EvrData::ns_SequencerConfigV1_v0::dataset_config> m_ds_seq_config;
   void read_ds_seq_config() const;
   mutable boost::shared_ptr<Psana::EvrData::SequencerConfigV1> m_ds_storage_seq_config_seq_config;
 };
@@ -789,12 +750,12 @@ private:
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::FIFOEvent> > make_FIFOEvent(int version, hdf5pp::Group group, hsize_t idx);
 
 namespace ns_DataV3_v0 {
-struct dataset_evrData {
+struct dataset_data {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
-  dataset_evrData();
-  ~dataset_evrData();
+  dataset_data();
+  ~dataset_data();
 
   size_t vlen_fifoEvents;
   EvrData::ns_FIFOEvent_v0::dataset_data* fifoEvents; 
@@ -809,7 +770,7 @@ public:
   DataV3_v0() {}
   DataV3_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
-  DataV3_v0(const boost::shared_ptr<EvrData::ns_DataV3_v0::dataset_evrData>& ds) : m_ds_evrData(ds) {}
+  DataV3_v0(const boost::shared_ptr<EvrData::ns_DataV3_v0::dataset_data>& ds) : m_ds_data(ds) {}
   virtual ~DataV3_v0() {}
     uint32_t numFifoEvents() const;
 
@@ -817,9 +778,9 @@ public:
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
-  mutable boost::shared_ptr<EvrData::ns_DataV3_v0::dataset_evrData> m_ds_evrData;
-  void read_ds_evrData() const;
-  mutable ndarray<const Psana::EvrData::FIFOEvent, 1> m_ds_storage_evrData_fifoEvents;
+  mutable boost::shared_ptr<EvrData::ns_DataV3_v0::dataset_data> m_ds_data;
+  void read_ds_data() const;
+  mutable ndarray<const Psana::EvrData::FIFOEvent, 1> m_ds_storage_data_fifoEvents;
 };
 
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::DataV3> > make_DataV3(int version, hdf5pp::Group group, hsize_t idx);

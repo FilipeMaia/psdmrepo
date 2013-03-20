@@ -31,7 +31,7 @@
     
         <h5schema name="DataV3" version="0">
 
-            <dataset name="evrData">
+            <dataset name="data">
 
                 <attribute name="fifoEvents">
                     <tag name="vlen"/>

@@ -13,6 +13,7 @@
 #include "psddl_hdf2psana/acqiris.ddlm.h"
 #include "psddl_hdf2psana/acqiris.ddlm.h"
 #include "psddl_hdf2psana/acqiris.ddlm.h"
+#include "psddl_hdf2psana/acqiris.ddlm.h"
 namespace psddl_hdf2psana {
 namespace Acqiris {
 
@@ -188,200 +189,6 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::TrigV1> > make_TrigV1(int version
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::Acqiris::TrigV1> >(boost::shared_ptr<Psana::Acqiris::TrigV1>());
   }
-}
-
-hdf5pp::Type ns_ConfigV1_v0_dataset_config_stored_type()
-{
-  typedef ns_ConfigV1_v0::dataset_config DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("nbrConvertersPerChannel", offsetof(DsType, nbrConvertersPerChannel), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("channelMask", offsetof(DsType, channelMask), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("nbrBanks", offsetof(DsType, nbrBanks), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("nbrChannels", offsetof(DsType, nbrChannels), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  return type;
-}
-
-hdf5pp::Type ns_ConfigV1_v0::dataset_config::stored_type()
-{
-  static hdf5pp::Type type = ns_ConfigV1_v0_dataset_config_stored_type();
-  return type;
-}
-
-hdf5pp::Type ns_ConfigV1_v0_dataset_config_native_type()
-{
-  typedef ns_ConfigV1_v0::dataset_config DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("nbrConvertersPerChannel", offsetof(DsType, nbrConvertersPerChannel), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("channelMask", offsetof(DsType, channelMask), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("nbrBanks", offsetof(DsType, nbrBanks), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("nbrChannels", offsetof(DsType, nbrChannels), hdf5pp::TypeTraits<uint32_t>::native_type());
-  return type;
-}
-
-hdf5pp::Type ns_ConfigV1_v0::dataset_config::native_type()
-{
-  static hdf5pp::Type type = ns_ConfigV1_v0_dataset_config_native_type();
-  return type;
-}
-ns_ConfigV1_v0::dataset_config::dataset_config()
-{
-}
-ns_ConfigV1_v0::dataset_config::~dataset_config()
-{
-}
-
-hdf5pp::Type ns_ConfigV1_v0_dataset_horiz_stored_type()
-{
-  typedef ns_ConfigV1_v0::dataset_horiz DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("horiz", offsetof(DsType, horiz), hdf5pp::TypeTraits<Acqiris::ns_HorizV1_v0::dataset_data>::stored_type());
-  return type;
-}
-
-hdf5pp::Type ns_ConfigV1_v0::dataset_horiz::stored_type()
-{
-  static hdf5pp::Type type = ns_ConfigV1_v0_dataset_horiz_stored_type();
-  return type;
-}
-
-hdf5pp::Type ns_ConfigV1_v0_dataset_horiz_native_type()
-{
-  typedef ns_ConfigV1_v0::dataset_horiz DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("horiz", offsetof(DsType, horiz), hdf5pp::TypeTraits<Acqiris::ns_HorizV1_v0::dataset_data>::native_type());
-  return type;
-}
-
-hdf5pp::Type ns_ConfigV1_v0::dataset_horiz::native_type()
-{
-  static hdf5pp::Type type = ns_ConfigV1_v0_dataset_horiz_native_type();
-  return type;
-}
-ns_ConfigV1_v0::dataset_horiz::dataset_horiz()
-{
-}
-ns_ConfigV1_v0::dataset_horiz::~dataset_horiz()
-{
-}
-
-hdf5pp::Type ns_ConfigV1_v0_dataset_trig_stored_type()
-{
-  typedef ns_ConfigV1_v0::dataset_trig DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("trig", offsetof(DsType, trig), hdf5pp::TypeTraits<Acqiris::ns_TrigV1_v0::dataset_data>::stored_type());
-  return type;
-}
-
-hdf5pp::Type ns_ConfigV1_v0::dataset_trig::stored_type()
-{
-  static hdf5pp::Type type = ns_ConfigV1_v0_dataset_trig_stored_type();
-  return type;
-}
-
-hdf5pp::Type ns_ConfigV1_v0_dataset_trig_native_type()
-{
-  typedef ns_ConfigV1_v0::dataset_trig DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("trig", offsetof(DsType, trig), hdf5pp::TypeTraits<Acqiris::ns_TrigV1_v0::dataset_data>::native_type());
-  return type;
-}
-
-hdf5pp::Type ns_ConfigV1_v0::dataset_trig::native_type()
-{
-  static hdf5pp::Type type = ns_ConfigV1_v0_dataset_trig_native_type();
-  return type;
-}
-ns_ConfigV1_v0::dataset_trig::dataset_trig()
-{
-}
-ns_ConfigV1_v0::dataset_trig::~dataset_trig()
-{
-}
-
-hdf5pp::Type ns_ConfigV1_v0_dataset_vert_stored_type()
-{
-  typedef ns_ConfigV1_v0::dataset_vert DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  hsize_t _array_type_vert_shape[] = { 20 };
-  hdf5pp::ArrayType _array_type_vert = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<Acqiris::ns_VertV1_v0::dataset_data>::stored_type(), 1, _array_type_vert_shape);
-  type.insert("vert", offsetof(DsType, vert), _array_type_vert);
-  return type;
-}
-
-hdf5pp::Type ns_ConfigV1_v0::dataset_vert::stored_type()
-{
-  static hdf5pp::Type type = ns_ConfigV1_v0_dataset_vert_stored_type();
-  return type;
-}
-
-hdf5pp::Type ns_ConfigV1_v0_dataset_vert_native_type()
-{
-  typedef ns_ConfigV1_v0::dataset_vert DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  hsize_t _array_type_vert_shape[] = { 20 };
-  hdf5pp::ArrayType _array_type_vert = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<Acqiris::ns_VertV1_v0::dataset_data>::native_type(), 1, _array_type_vert_shape);
-  type.insert("vert", offsetof(DsType, vert), _array_type_vert);
-  return type;
-}
-
-hdf5pp::Type ns_ConfigV1_v0::dataset_vert::native_type()
-{
-  static hdf5pp::Type type = ns_ConfigV1_v0_dataset_vert_native_type();
-  return type;
-}
-ns_ConfigV1_v0::dataset_vert::dataset_vert()
-{
-}
-ns_ConfigV1_v0::dataset_vert::~dataset_vert()
-{
-}
-uint32_t ConfigV1_v0::nbrConvertersPerChannel() const {
-  if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->nbrConvertersPerChannel);
-}
-uint32_t ConfigV1_v0::channelMask() const {
-  if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->channelMask);
-}
-uint32_t ConfigV1_v0::nbrBanks() const {
-  if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->nbrBanks);
-}
-const Psana::Acqiris::TrigV1& ConfigV1_v0::trig() const {
-  if (not m_ds_trig) read_ds_trig();
-  m_ds_storage_trig_trig = Psana::Acqiris::TrigV1(m_ds_trig->trig);
-  return m_ds_storage_trig_trig;
-}
-const Psana::Acqiris::HorizV1& ConfigV1_v0::horiz() const {
-  if (not m_ds_horiz) read_ds_horiz();
-  m_ds_storage_horiz_horiz = Psana::Acqiris::HorizV1(m_ds_horiz->horiz);
-  return m_ds_storage_horiz_horiz;
-}
-ndarray<const Psana::Acqiris::VertV1, 1> ConfigV1_v0::vert() const {
-  if (not m_ds_vert) read_ds_vert();
-  if (m_ds_storage_vert_vert.empty()) {
-    unsigned shape[] = {MaxChan};
-    ndarray<Psana::Acqiris::VertV1, 1> tmparr(shape);
-    std::copy(m_ds_vert->vert, m_ds_vert->vert+20, tmparr.begin());
-    m_ds_storage_vert_vert = tmparr;
-  }
-  return m_ds_storage_vert_vert;
-}
-uint32_t ConfigV1_v0::nbrChannels() const {
-  if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->nbrChannels);
-}
-void ConfigV1_v0::read_ds_config() const {
-  m_ds_config = hdf5pp::Utils::readGroup<Acqiris::ns_ConfigV1_v0::dataset_config>(m_group, "config", m_idx);
-}
-void ConfigV1_v0::read_ds_horiz() const {
-  m_ds_horiz = hdf5pp::Utils::readGroup<Acqiris::ns_ConfigV1_v0::dataset_horiz>(m_group, "horiz", m_idx);
-}
-void ConfigV1_v0::read_ds_trig() const {
-  m_ds_trig = hdf5pp::Utils::readGroup<Acqiris::ns_ConfigV1_v0::dataset_trig>(m_group, "trig", m_idx);
-}
-void ConfigV1_v0::read_ds_vert() const {
-  m_ds_vert = hdf5pp::Utils::readGroup<Acqiris::ns_ConfigV1_v0::dataset_vert>(m_group, "vert", m_idx);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
@@ -704,40 +511,6 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::TdcVetoIO> > make_TdcVetoIO(int v
   }
 }
 
-hdf5pp::Type ns_TdcConfigV1_v0_dataset_config_stored_type()
-{
-  typedef ns_TdcConfigV1_v0::dataset_config DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("veto", offsetof(DsType, veto), hdf5pp::TypeTraits<Acqiris::ns_TdcVetoIO_v0::dataset_data>::stored_type());
-  return type;
-}
-
-hdf5pp::Type ns_TdcConfigV1_v0::dataset_config::stored_type()
-{
-  static hdf5pp::Type type = ns_TdcConfigV1_v0_dataset_config_stored_type();
-  return type;
-}
-
-hdf5pp::Type ns_TdcConfigV1_v0_dataset_config_native_type()
-{
-  typedef ns_TdcConfigV1_v0::dataset_config DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("veto", offsetof(DsType, veto), hdf5pp::TypeTraits<Acqiris::ns_TdcVetoIO_v0::dataset_data>::native_type());
-  return type;
-}
-
-hdf5pp::Type ns_TdcConfigV1_v0::dataset_config::native_type()
-{
-  static hdf5pp::Type type = ns_TdcConfigV1_v0_dataset_config_native_type();
-  return type;
-}
-ns_TdcConfigV1_v0::dataset_config::dataset_config()
-{
-}
-ns_TdcConfigV1_v0::dataset_config::~dataset_config()
-{
-}
-
 hdf5pp::Type ns_TdcConfigV1_v0_dataset_channels_stored_type()
 {
   typedef ns_TdcConfigV1_v0::dataset_channels DsType;
@@ -835,11 +608,11 @@ ndarray<const Psana::Acqiris::TdcAuxIO, 1> TdcConfigV1_v0::auxio() const {
 }
 const Psana::Acqiris::TdcVetoIO& TdcConfigV1_v0::veto() const {
   if (not m_ds_config) read_ds_config();
-  m_ds_storage_config_veto = Psana::Acqiris::TdcVetoIO(m_ds_config->veto);
+  m_ds_storage_config_veto = Psana::Acqiris::TdcVetoIO(*m_ds_config);
   return m_ds_storage_config_veto;
 }
 void TdcConfigV1_v0::read_ds_config() const {
-  m_ds_config = hdf5pp::Utils::readGroup<Acqiris::ns_TdcConfigV1_v0::dataset_config>(m_group, "config", m_idx);
+  m_ds_config = hdf5pp::Utils::readGroup<Acqiris::ns_TdcVetoIO_v0::dataset_data>(m_group, "config", m_idx);
 }
 void TdcConfigV1_v0::read_ds_channels() const {
   m_ds_channels = hdf5pp::Utils::readGroup<Acqiris::ns_TdcConfigV1_v0::dataset_channels>(m_group, "channels", m_idx);
@@ -961,6 +734,7 @@ hdf5pp::Type ns_TdcDataV1_v0::dataset_data::native_type()
 }
 ns_TdcDataV1_v0::dataset_data::dataset_data()
 {
+  this->vlen_data = 0;
   this->data = 0;
 }
 ns_TdcDataV1_v0::dataset_data::~dataset_data()

@@ -288,7 +288,7 @@ struct CompoundTypeDefs<Limits<Type>  > {
 template <typename T>
 struct CompoundTypeDefs<dbr_time<T> > {
 
-  static void defineFields(hdf5pp::CompoundType& type, unsigned offset) {
+  static void defineFields(hdf5pp::CompoundType& type, unsigned offset, int extra) {
     type.insert(ATTR_SPEC(dbr_time<T>, status, offset));
     type.insert(ATTR_SPEC(dbr_time<T>, severity, offset));
     type.insert(ATTR_SPEC(dbr_time<T>, stamp, offset));
@@ -299,7 +299,7 @@ struct CompoundTypeDefs<dbr_time<T> > {
 template <typename T>
 struct CompoundTypeDefs<dbr_ctrl<T> > {
 
-  static void defineFields(hdf5pp::CompoundType& type, unsigned offset) {
+  static void defineFields(hdf5pp::CompoundType& type, unsigned offset, int extra) {
     type.insert(ATTR_SPEC(dbr_ctrl<T>, status, offset));
     type.insert(ATTR_SPEC(dbr_ctrl<T>, severity, offset));
     type.insert("units", offset+offsetof(dbr_ctrl<T>, units), hdf5pp::TypeTraits<const char*>::native_type(MAX_UNITS_SIZE));
@@ -311,7 +311,7 @@ struct CompoundTypeDefs<dbr_ctrl<T> > {
 template <>
 struct CompoundTypeDefs<dbr_ctrl<const char*> > {
 
-  static void defineFields(hdf5pp::CompoundType& type, unsigned offset) {
+  static void defineFields(hdf5pp::CompoundType& type, unsigned offset, int extra) {
     type.insert(ATTR_SPEC(dbr_ctrl<const char*>, status, offset));
     type.insert(ATTR_SPEC(dbr_ctrl<const char*>, severity, offset));
   }
@@ -321,11 +321,11 @@ struct CompoundTypeDefs<dbr_ctrl<const char*> > {
 template <>
 struct CompoundTypeDefs<dbr_ctrl<EpicsEnumTag> > {
 
-  static void defineFields(hdf5pp::CompoundType& type, unsigned offset) {
+  static void defineFields(hdf5pp::CompoundType& type, unsigned offset, int extra) {
     type.insert(ATTR_SPEC(dbr_ctrl<EpicsEnumTag>, status, offset));
     type.insert(ATTR_SPEC(dbr_ctrl<EpicsEnumTag>, severity, offset));
     type.insert(ATTR_SPEC(dbr_ctrl<EpicsEnumTag>, no_str, offset));
-    type.insert("strs", offset+offsetof(dbr_ctrl<EpicsEnumTag>, strs), hdf5pp::TypeTraits<const char*>::native_type(MAX_ENUM_STRING_SIZE), MAX_ENUM_STATES);
+    type.insert("strs", offset+offsetof(dbr_ctrl<EpicsEnumTag>, strs), hdf5pp::TypeTraits<const char*>::native_type(MAX_ENUM_STRING_SIZE), extra);
   }
 
 };
@@ -333,7 +333,7 @@ struct CompoundTypeDefs<dbr_ctrl<EpicsEnumTag> > {
 template <>
 struct CompoundTypeDefs<dbr_ctrl<float> > {
 
-  static void defineFields(hdf5pp::CompoundType& type, unsigned offset) {
+  static void defineFields(hdf5pp::CompoundType& type, unsigned offset, int extra) {
     type.insert(ATTR_SPEC(dbr_ctrl<float>, status, offset));
     type.insert(ATTR_SPEC(dbr_ctrl<float>, severity, offset));
     type.insert(ATTR_SPEC(dbr_ctrl<float>, precision, offset));
@@ -346,7 +346,7 @@ struct CompoundTypeDefs<dbr_ctrl<float> > {
 template <>
 struct CompoundTypeDefs<dbr_ctrl<double> > {
 
-  static void defineFields(hdf5pp::CompoundType& type, unsigned offset) {
+  static void defineFields(hdf5pp::CompoundType& type, unsigned offset, int extra) {
     type.insert(ATTR_SPEC(dbr_ctrl<double>, status, offset));
     type.insert(ATTR_SPEC(dbr_ctrl<double>, severity, offset));
     type.insert(ATTR_SPEC(dbr_ctrl<double>, precision, offset));
@@ -403,7 +403,7 @@ struct dataset_epics_time {
   }
 
   // Get the HDF5 type
-  static hdf5pp::Type native_type(unsigned nElem) {
+  static hdf5pp::Type native_type(unsigned nElem, int extra = 0) {
     
     // need to know size of the full structure
     if (nElem < 1) nElem = 1;
@@ -411,7 +411,7 @@ struct dataset_epics_time {
 
     hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType(size);
     CompoundTypeDefs<ns_EpicsPvHeader_v0::dataset_data>::defineFields(type, offsetof(dataset_epics_time, header));
-    CompoundTypeDefs<DBR>::defineFields(type, offsetof(dataset_epics_time, dbr));
+    CompoundTypeDefs<DBR>::defineFields(type, offsetof(dataset_epics_time, dbr), extra);
     type.insert("value", offsetof(dataset_epics_time, value), hdf5pp::TypeTraits<hdf5_value_type>::native_type(nElem > 1 ? nElem : 0));
     
     return type;
@@ -440,7 +440,7 @@ struct dataset_epics_ctrl {
   }
 
   // Get the HDF5 type
-  static hdf5pp::Type native_type(unsigned nElem) {
+  static hdf5pp::Type native_type(unsigned nElem, int extra = 0) {
     
     // need to know size of the full structure
     if (nElem < 1) nElem = 1;
@@ -449,7 +449,7 @@ struct dataset_epics_ctrl {
     hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType(size);
     CompoundTypeDefs<ns_EpicsPvHeader_v0::dataset_data>::defineFields(type, offsetof(dataset_epics_ctrl, header));
     type.insert("pvname", offsetof(dataset_epics_ctrl, pvname), hdf5pp::TypeTraits<const char*>::native_type(iMaxPvNameLength));
-    CompoundTypeDefs<DBR>::defineFields(type, offsetof(dataset_epics_ctrl, dbr));
+    CompoundTypeDefs<DBR>::defineFields(type, offsetof(dataset_epics_ctrl, dbr), extra);
     type.insert("value", offsetof(dataset_epics_ctrl, value), hdf5pp::TypeTraits<hdf5_value_type>::native_type(nElem > 1 ? nElem : 0));
     
     return type;
@@ -520,7 +520,7 @@ protected:
   mutable boost::shared_ptr<ds_type> m_ds_data;
   mutable dbr_type m_dbr;
   
-  void read_ds_data() const {
+  virtual void read_ds_data() const {
     m_ds_data = ds_type::make_dataset_epics(m_hdr.numElements);
     
     hdf5pp::DataSpace file_dsp = m_ds.dataSpace();
@@ -606,6 +606,49 @@ public:
   /** Method which returns the shape (dimensions) of the data returned by data() method. */
   virtual std::vector<int> data_shape() const {
     return std::vector<int>(1, this->m_hdr.numElements);
+  }
+};
+
+
+// specialization for enum type
+template <>
+class EpicsPvCtrl<dbr_ctrl<EpicsEnumTag> > : public EpicsPvCtrlHdr<dbr_ctrl<EpicsEnumTag> > {
+public:
+
+  typedef dbr_ctrl<EpicsEnumTag>::psana_dbr_t dbr_type;
+  typedef DBRTypeTraits<dbr_type>::value_type value_type;
+  typedef dataset_epics_ctrl<dbr_ctrl<EpicsEnumTag> > ds_type;
+
+  EpicsPvCtrl(const hdf5pp::DataSet& ds, int64_t idx, const ns_EpicsPvHeader_v0::dataset_data& hdr)
+    : EpicsPvCtrlHdr<dbr_ctrl<EpicsEnumTag> >(ds, idx, hdr) {}
+
+  virtual ndarray<const value_type, 1> data() const {
+    if (not this->m_ds_data) this->read_ds_data();
+    return make_ndarray<value_type>(boost::shared_ptr<value_type>(this->m_ds_data, this->m_ds_data->value), this->m_hdr.numElements);
+  }
+
+  virtual value_type value(uint32_t i) const {
+    if (not this->m_ds_data) this->read_ds_data();
+    return this->m_ds_data->value[i];
+  }
+
+private:
+
+  virtual void read_ds_data() const {
+    m_ds_data = ds_type::make_dataset_epics(m_hdr.numElements);
+
+    hdf5pp::DataSpace file_dsp = m_ds.dataSpace();
+    file_dsp.select_single(m_idx);
+
+    // need to read no_str first
+    int16_t no_str;
+    hdf5pp::CompoundType n_type = hdf5pp::CompoundType::compoundType(sizeof(int16_t));
+    n_type.insert("no_str", 0, hdf5pp::TypeTraits<int16_t>::native_type());
+    m_ds.read(hdf5pp::DataSpace::makeScalar(), file_dsp, &no_str, n_type);
+
+    m_ds.read(hdf5pp::DataSpace::makeScalar(), file_dsp, m_ds_data.get(), ds_type::native_type(m_hdr.numElements, no_str));
+
+    m_dbr = dbr_type(m_ds_data->dbr);
   }
 };
 

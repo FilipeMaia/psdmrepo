@@ -1086,6 +1086,7 @@ hdf5pp::Type ns_SequencerConfigV1_v0::dataset_config::native_type()
 }
 ns_SequencerConfigV1_v0::dataset_config::dataset_config()
 {
+  this->vlen_entries = 0;
   this->entries = 0;
 }
 ns_SequencerConfigV1_v0::dataset_config::~dataset_config()
@@ -1159,40 +1160,6 @@ ns_ConfigV5_v0::dataset_config::dataset_config()
 ns_ConfigV5_v0::dataset_config::~dataset_config()
 {
 }
-
-hdf5pp::Type ns_ConfigV5_v0_dataset_seq_config_stored_type()
-{
-  typedef ns_ConfigV5_v0::dataset_seq_config DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("seq_config", offsetof(DsType, seq_config), hdf5pp::TypeTraits<EvrData::ns_SequencerConfigV1_v0::dataset_config>::stored_type());
-  return type;
-}
-
-hdf5pp::Type ns_ConfigV5_v0::dataset_seq_config::stored_type()
-{
-  static hdf5pp::Type type = ns_ConfigV5_v0_dataset_seq_config_stored_type();
-  return type;
-}
-
-hdf5pp::Type ns_ConfigV5_v0_dataset_seq_config_native_type()
-{
-  typedef ns_ConfigV5_v0::dataset_seq_config DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("seq_config", offsetof(DsType, seq_config), hdf5pp::TypeTraits<EvrData::ns_SequencerConfigV1_v0::dataset_config>::native_type());
-  return type;
-}
-
-hdf5pp::Type ns_ConfigV5_v0::dataset_seq_config::native_type()
-{
-  static hdf5pp::Type type = ns_ConfigV5_v0_dataset_seq_config_native_type();
-  return type;
-}
-ns_ConfigV5_v0::dataset_seq_config::dataset_seq_config()
-{
-}
-ns_ConfigV5_v0::dataset_seq_config::~dataset_seq_config()
-{
-}
 uint32_t ConfigV5_v0::neventcodes() const {
   if (not m_ds_config) read_ds_config();
   return uint32_t(m_ds_config->neventcodes);
@@ -1220,8 +1187,7 @@ ndarray<const Psana::EvrData::OutputMap, 1> ConfigV5_v0::output_maps() const {
 const Psana::EvrData::SequencerConfigV1& ConfigV5_v0::seq_config() const {
   if (not m_ds_storage_seq_config_seq_config) {
     if (not m_ds_seq_config) read_ds_seq_config();
-    boost::shared_ptr<EvrData::ns_SequencerConfigV1_v0::dataset_config> tmp(m_ds_seq_config, &m_ds_seq_config->seq_config);
-    m_ds_storage_seq_config_seq_config = boost::make_shared<EvrData::SequencerConfigV1_v0>(tmp);
+    m_ds_storage_seq_config_seq_config = boost::make_shared<EvrData::SequencerConfigV1_v0>(m_ds_seq_config);
   }
   return *m_ds_storage_seq_config_seq_config;
 }
@@ -1247,7 +1213,7 @@ void ConfigV5_v0::read_ds_output_maps() const {
   m_ds_output_maps = tmp;
 }
 void ConfigV5_v0::read_ds_seq_config() const {
-  m_ds_seq_config = hdf5pp::Utils::readGroup<EvrData::ns_ConfigV5_v0::dataset_seq_config>(m_group, "seq_config", m_idx);
+  m_ds_seq_config = hdf5pp::Utils::readGroup<EvrData::ns_SequencerConfigV1_v0::dataset_config>(m_group, "seq_config", m_idx);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::ConfigV5> > make_ConfigV5(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
@@ -1295,40 +1261,6 @@ ns_ConfigV6_v0::dataset_config::dataset_config()
 ns_ConfigV6_v0::dataset_config::~dataset_config()
 {
 }
-
-hdf5pp::Type ns_ConfigV6_v0_dataset_seq_config_stored_type()
-{
-  typedef ns_ConfigV6_v0::dataset_seq_config DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("seq_config", offsetof(DsType, seq_config), hdf5pp::TypeTraits<EvrData::ns_SequencerConfigV1_v0::dataset_config>::stored_type());
-  return type;
-}
-
-hdf5pp::Type ns_ConfigV6_v0::dataset_seq_config::stored_type()
-{
-  static hdf5pp::Type type = ns_ConfigV6_v0_dataset_seq_config_stored_type();
-  return type;
-}
-
-hdf5pp::Type ns_ConfigV6_v0_dataset_seq_config_native_type()
-{
-  typedef ns_ConfigV6_v0::dataset_seq_config DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("seq_config", offsetof(DsType, seq_config), hdf5pp::TypeTraits<EvrData::ns_SequencerConfigV1_v0::dataset_config>::native_type());
-  return type;
-}
-
-hdf5pp::Type ns_ConfigV6_v0::dataset_seq_config::native_type()
-{
-  static hdf5pp::Type type = ns_ConfigV6_v0_dataset_seq_config_native_type();
-  return type;
-}
-ns_ConfigV6_v0::dataset_seq_config::dataset_seq_config()
-{
-}
-ns_ConfigV6_v0::dataset_seq_config::~dataset_seq_config()
-{
-}
 uint32_t ConfigV6_v0::neventcodes() const {
   if (not m_ds_config) read_ds_config();
   return uint32_t(m_ds_config->neventcodes);
@@ -1356,8 +1288,7 @@ ndarray<const Psana::EvrData::OutputMapV2, 1> ConfigV6_v0::output_maps() const {
 const Psana::EvrData::SequencerConfigV1& ConfigV6_v0::seq_config() const {
   if (not m_ds_storage_seq_config_seq_config) {
     if (not m_ds_seq_config) read_ds_seq_config();
-    boost::shared_ptr<EvrData::ns_SequencerConfigV1_v0::dataset_config> tmp(m_ds_seq_config, &m_ds_seq_config->seq_config);
-    m_ds_storage_seq_config_seq_config = boost::make_shared<EvrData::SequencerConfigV1_v0>(tmp);
+    m_ds_storage_seq_config_seq_config = boost::make_shared<EvrData::SequencerConfigV1_v0>(m_ds_seq_config);
   }
   return *m_ds_storage_seq_config_seq_config;
 }
@@ -1383,7 +1314,7 @@ void ConfigV6_v0::read_ds_output_maps() const {
   m_ds_output_maps = tmp;
 }
 void ConfigV6_v0::read_ds_seq_config() const {
-  m_ds_seq_config = hdf5pp::Utils::readGroup<EvrData::ns_ConfigV6_v0::dataset_seq_config>(m_group, "seq_config", m_idx);
+  m_ds_seq_config = hdf5pp::Utils::readGroup<EvrData::ns_SequencerConfigV1_v0::dataset_config>(m_group, "seq_config", m_idx);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::ConfigV6> > make_ConfigV6(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
@@ -1431,40 +1362,6 @@ ns_ConfigV7_v0::dataset_config::dataset_config()
 ns_ConfigV7_v0::dataset_config::~dataset_config()
 {
 }
-
-hdf5pp::Type ns_ConfigV7_v0_dataset_seq_config_stored_type()
-{
-  typedef ns_ConfigV7_v0::dataset_seq_config DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("seq_config", offsetof(DsType, seq_config), hdf5pp::TypeTraits<EvrData::ns_SequencerConfigV1_v0::dataset_config>::stored_type());
-  return type;
-}
-
-hdf5pp::Type ns_ConfigV7_v0::dataset_seq_config::stored_type()
-{
-  static hdf5pp::Type type = ns_ConfigV7_v0_dataset_seq_config_stored_type();
-  return type;
-}
-
-hdf5pp::Type ns_ConfigV7_v0_dataset_seq_config_native_type()
-{
-  typedef ns_ConfigV7_v0::dataset_seq_config DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("seq_config", offsetof(DsType, seq_config), hdf5pp::TypeTraits<EvrData::ns_SequencerConfigV1_v0::dataset_config>::native_type());
-  return type;
-}
-
-hdf5pp::Type ns_ConfigV7_v0::dataset_seq_config::native_type()
-{
-  static hdf5pp::Type type = ns_ConfigV7_v0_dataset_seq_config_native_type();
-  return type;
-}
-ns_ConfigV7_v0::dataset_seq_config::dataset_seq_config()
-{
-}
-ns_ConfigV7_v0::dataset_seq_config::~dataset_seq_config()
-{
-}
 uint32_t ConfigV7_v0::neventcodes() const {
   if (not m_ds_config) read_ds_config();
   return uint32_t(m_ds_config->neventcodes);
@@ -1492,8 +1389,7 @@ ndarray<const Psana::EvrData::OutputMapV2, 1> ConfigV7_v0::output_maps() const {
 const Psana::EvrData::SequencerConfigV1& ConfigV7_v0::seq_config() const {
   if (not m_ds_storage_seq_config_seq_config) {
     if (not m_ds_seq_config) read_ds_seq_config();
-    boost::shared_ptr<EvrData::ns_SequencerConfigV1_v0::dataset_config> tmp(m_ds_seq_config, &m_ds_seq_config->seq_config);
-    m_ds_storage_seq_config_seq_config = boost::make_shared<EvrData::SequencerConfigV1_v0>(tmp);
+    m_ds_storage_seq_config_seq_config = boost::make_shared<EvrData::SequencerConfigV1_v0>(m_ds_seq_config);
   }
   return *m_ds_storage_seq_config_seq_config;
 }
@@ -1519,7 +1415,7 @@ void ConfigV7_v0::read_ds_output_maps() const {
   m_ds_output_maps = tmp;
 }
 void ConfigV7_v0::read_ds_seq_config() const {
-  m_ds_seq_config = hdf5pp::Utils::readGroup<EvrData::ns_ConfigV7_v0::dataset_seq_config>(m_group, "seq_config", m_idx);
+  m_ds_seq_config = hdf5pp::Utils::readGroup<EvrData::ns_SequencerConfigV1_v0::dataset_config>(m_group, "seq_config", m_idx);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::ConfigV7> > make_ConfigV7(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
@@ -1586,56 +1482,57 @@ boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::FIFOEvent> > make_FIFOEvent(int v
   }
 }
 
-hdf5pp::Type ns_DataV3_v0_dataset_evrData_stored_type()
+hdf5pp::Type ns_DataV3_v0_dataset_data_stored_type()
 {
-  typedef ns_DataV3_v0::dataset_evrData DsType;
+  typedef ns_DataV3_v0::dataset_data DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
   hdf5pp::VlenType _array_type_fifoEvents = hdf5pp::VlenType::vlenType(hdf5pp::TypeTraits<EvrData::ns_FIFOEvent_v0::dataset_data>::stored_type());
   type.insert("fifoEvents", offsetof(DsType, vlen_fifoEvents), _array_type_fifoEvents);
   return type;
 }
 
-hdf5pp::Type ns_DataV3_v0::dataset_evrData::stored_type()
+hdf5pp::Type ns_DataV3_v0::dataset_data::stored_type()
 {
-  static hdf5pp::Type type = ns_DataV3_v0_dataset_evrData_stored_type();
+  static hdf5pp::Type type = ns_DataV3_v0_dataset_data_stored_type();
   return type;
 }
 
-hdf5pp::Type ns_DataV3_v0_dataset_evrData_native_type()
+hdf5pp::Type ns_DataV3_v0_dataset_data_native_type()
 {
-  typedef ns_DataV3_v0::dataset_evrData DsType;
+  typedef ns_DataV3_v0::dataset_data DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
   hdf5pp::VlenType _array_type_fifoEvents = hdf5pp::VlenType::vlenType(hdf5pp::TypeTraits<EvrData::ns_FIFOEvent_v0::dataset_data>::native_type());
   type.insert("fifoEvents", offsetof(DsType, vlen_fifoEvents), _array_type_fifoEvents);
   return type;
 }
 
-hdf5pp::Type ns_DataV3_v0::dataset_evrData::native_type()
+hdf5pp::Type ns_DataV3_v0::dataset_data::native_type()
 {
-  static hdf5pp::Type type = ns_DataV3_v0_dataset_evrData_native_type();
+  static hdf5pp::Type type = ns_DataV3_v0_dataset_data_native_type();
   return type;
 }
-ns_DataV3_v0::dataset_evrData::dataset_evrData()
+ns_DataV3_v0::dataset_data::dataset_data()
 {
+  this->vlen_fifoEvents = 0;
   this->fifoEvents = 0;
 }
-ns_DataV3_v0::dataset_evrData::~dataset_evrData()
+ns_DataV3_v0::dataset_data::~dataset_data()
 {
   free(this->fifoEvents);
 }
 
 ndarray<const Psana::EvrData::FIFOEvent, 1> DataV3_v0::fifoEvents() const {
-  if (not m_ds_evrData) read_ds_evrData();
-  if (m_ds_storage_evrData_fifoEvents.empty()) {
-    unsigned shape[] = {m_ds_evrData->vlen_fifoEvents};
+  if (not m_ds_data) read_ds_data();
+  if (m_ds_storage_data_fifoEvents.empty()) {
+    unsigned shape[] = {m_ds_data->vlen_fifoEvents};
     ndarray<Psana::EvrData::FIFOEvent, 1> tmparr(shape);
-    std::copy(m_ds_evrData->fifoEvents, m_ds_evrData->fifoEvents+m_ds_evrData->vlen_fifoEvents, tmparr.begin());
-    m_ds_storage_evrData_fifoEvents = tmparr;
+    std::copy(m_ds_data->fifoEvents, m_ds_data->fifoEvents+m_ds_data->vlen_fifoEvents, tmparr.begin());
+    m_ds_storage_data_fifoEvents = tmparr;
   }
-  return m_ds_storage_evrData_fifoEvents;
+  return m_ds_storage_data_fifoEvents;
 }
-void DataV3_v0::read_ds_evrData() const {
-  m_ds_evrData = hdf5pp::Utils::readGroup<EvrData::ns_DataV3_v0::dataset_evrData>(m_group, "evrData", m_idx);
+void DataV3_v0::read_ds_data() const {
+  m_ds_data = hdf5pp::Utils::readGroup<EvrData::ns_DataV3_v0::dataset_data>(m_group, "data", m_idx);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::DataV3> > make_DataV3(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {

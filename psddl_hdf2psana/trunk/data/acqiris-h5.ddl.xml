@@ -19,21 +19,7 @@
         </h5schema>
 
         <h5schema name="ConfigV1" version="0">
-            <dataset name="config">
-                <attribute name="nbrConvertersPerChannel"/>
-                <attribute name="channelMask"/>
-                <attribute name="nbrBanks"/>
-                <attribute name="nbrChannels"/>
-            </dataset>
-            <dataset name="horiz">
-                <attribute name="horiz"/>
-            </dataset>
-            <dataset name="trig">
-                <attribute name="trig"/>
-            </dataset>
-            <dataset name="vert">
-                <attribute name="vert" rank="1"/>
-            </dataset>
+            <tag name="external" value="psddl_hdf2psana/acqiris.ddlm.h"/>
         </h5schema>
         
         <h5schema name="TimestampV1" version="0">

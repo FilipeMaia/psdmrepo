@@ -149,8 +149,8 @@ void IOConfigV1_v0::read_ds_channels() const {
 uint32_t
 DataV3_v0::numFifoEvents() const
 {
-  if (not m_ds_evrData) read_ds_evrData();
-  return m_ds_evrData->vlen_fifoEvents;
+  if (not m_ds_data) read_ds_data();
+  return m_ds_data->vlen_fifoEvents;
 }
 
 } // namespace EvrData

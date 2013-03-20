@@ -128,8 +128,6 @@ void
 HdfConverter::convertEpics(const hdf5pp::Group& group, uint64_t idx, PSEnv::EpicsStore& eStore)
 {
   MsgLog(logger, debug, "HdfConverter::convertEpics - group: " << group);
-
-  return;
   
   const std::string& gname = group.name();
   if (::isEpics(gname)) {
