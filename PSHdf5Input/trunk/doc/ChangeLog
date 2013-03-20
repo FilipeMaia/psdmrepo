@@ -11,8 +11,13 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-01
+2013-03-19 Andy Salnikov
+- fixing time of event ID in non-event transitions
+- fix index of the configuration objects
+
 Tag: V00-01-00
-2013-03-15 Andy Salnikov
+2013-03-18 Andy Salnikov
 - Hdf5DatasetIter now reads blocks of 512 objects from time container, 
   helps with performance a lot
 
