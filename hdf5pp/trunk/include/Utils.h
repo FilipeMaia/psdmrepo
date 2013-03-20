@@ -99,20 +99,22 @@ public:
   static ndarray<Data, Rank> readNdarray(hdf5pp::DataSet ds, hsize_t index = -1)
   {
     hdf5pp::DataSpace file_dsp = ds.dataSpace();
+    hdf5pp::DataSpace mem_dsp;
+    Type memType;
 
-    unsigned rank = 0;
-    const unsigned MaxRank = 6;
-    hsize_t dims[MaxRank];
+    hsize_t dims[Rank];
     if (index == hsize_t(-1)) {
 
       // read whole dataset, has to know its rank and dimensions
-      rank = file_dsp.rank();
+      unsigned rank = file_dsp.rank();
 
       // check rank
-      if (rank > MaxRank) throw Hdf5RankTooHigh(ERR_LOC, rank, MaxRank);
       if (rank != Rank) throw Hdf5RankMismatch(ERR_LOC, Rank, rank);
 
       file_dsp.dimensions(dims);
+      mem_dsp = DataSpace::makeSimple(Rank, dims, dims);
+
+      memType = TypeTraits<Data>::native_type();
 
     } else {
 
@@ -123,24 +125,24 @@ public:
       ArrayType type = ArrayType(ds.type());
 
       // check array type rank, get dimensions
-      rank = type.rank();
-      if (rank > MaxRank) throw Hdf5RankTooHigh(ERR_LOC, rank, MaxRank);
+      unsigned rank = type.rank();
       if (rank != Rank) throw Hdf5RankMismatch(ERR_LOC, Rank, rank);
       type.dimensions(dims);
 
       // select single item for dataset
       file_dsp.select_single(index);
+      mem_dsp = DataSpace::makeScalar();
 
+      memType = ArrayType::arrayType(TypeTraits<Data>::native_type(), Rank, dims);
     }
 
     // make ndarray
-    unsigned shape[MaxRank];
-    std::copy(dims, dims+rank, shape);
+    unsigned shape[Rank];
+    std::copy(dims, dims+Rank, shape);
     ndarray<Data, Rank> array(shape);
 
     // read it
-    DataSpace mem_dsp = DataSpace::makeSimple(rank, dims, dims);
-    ds.read(mem_dsp, file_dsp, array.data());
+    ds.read(mem_dsp, file_dsp, array.data(), memType);
 
     return array;
 
