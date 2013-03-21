@@ -191,8 +191,8 @@ class ConfigFileGenerator :
         for i, (name, ch1, ch2, ch3, ch4, norm, sele, sele_min, sele_max, norm_ave, short_name) in enumerate(cp.imon_pars_list) :
             src_imon  = ' %s' % (name.value().ljust(32))
             name_imon = ' %s' % (short_name.value().ljust(16))
-            bits      = ' %d %d %d %d %d %d' % (ch1.value(), ch2.value(), ch3.value(), ch4.value(), norm.value(), sele.value())
-            vals      = ' %f %f %f' % (sele_min.value(), sele_max.value(), norm_ave.value())
+            bits      = ' %d %d %d %d   %d %d' % (ch1.value(), ch2.value(), ch3.value(), ch4.value(), norm.value(), sele.value())
+            vals      = '   %9.4f %9.4f %9.4f' % (sele_min.value(), sele_max.value(), norm_ave.value())
             s         = src_imon + name_imon + bits + vals
 
             #if norm.value() or sele.value() : text += s + '\n' # Short form of the imon_cfg file
