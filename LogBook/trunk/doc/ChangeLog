@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-07
+2013-03-21 Igor Gaponenko
+- added updated schema file
+
 Tag: V00-03-06
 2013-03-20 Igor Gaponenko
 - upgraded database schema for runs to allow one more run type 'TEST'
