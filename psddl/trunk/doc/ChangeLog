@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-15
+2013-03-20 Andy Salnikov
+- HDF5: switching to non-compound datasets
+
 Tag: V00-05-14
 2013-03-19 Andy Salnikov
 - few updates for HDF5 generator

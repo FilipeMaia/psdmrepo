@@ -352,8 +352,19 @@ class XmlReader ( object ) :
 
         logging.debug("XmlReader._parseH5Dataset: new dataset: %s", dsname)
 
+        dstype = dselem.get('type')
+        if dstype:
+            dstype = pstype.lookup(dstype, (Type, Enum))
+            if not dstype: raise ValueError('dataset element has unknown type '+elem.get('type'))
+
         # make dataset
-        ds = H5Dataset(name = dsname, parent = h5type, pstype = pstype)
+        ds = H5Dataset(name = dsname, 
+                       parent = h5type, 
+                       pstype = pstype,
+                       type = dstype,
+                       method = dselem.get('method'),
+                       rank = int(dselem.get('rank', -1)),
+                       schema_version = int(dselem.get('schema_version', 0)))
         h5type.datasets.append(ds)
 
         # loop over sub-elements

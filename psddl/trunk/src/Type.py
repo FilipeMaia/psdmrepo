@@ -294,6 +294,11 @@ class Type ( Namespace ) :
         meth = Method('_sizeof', type=type, parent=self,
                       expr={"C++": expr}, tags=tags, static=static)
 
+    def h5schema(self, schema_version):
+        '''find a schema for a given type and schema version'''
+        schemas = [sch for sch in self.h5schemas if sch.version == schema_version] + [None]
+        return schemas[0]
+
 #
 #  In case someone decides to run this module
 #

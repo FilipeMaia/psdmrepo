@@ -134,16 +134,15 @@ class H5Type ( object ) :
                 if mschema: _log.debug("_defaultSchema: sub-typedataset: %s", mschema)
                 if len(mschema.datasets) != 1: raise ValueError("schema for sub-type "+type.name+"."+meth.type.name+" contains more than 1 dataset")
                 # copy it into this schema
-                schema.datasets.append(mschema.datasets[0])
+                ds = H5Dataset(name=meth.name, parent=schema, pstype=type, type=meth.type, rank=meth.rank, method=meth.name)
+                schema.datasets.append(ds)
 
         # for array attributes create individual datasets
         for meth in methods:
             if not meth.type: continue
             if meth.rank > 0 and not (meth.type.name == 'char' and meth.rank == 1):
-                ds = H5Dataset(name=meth.name, parent=schema, pstype=type)
+                ds = H5Dataset(name=meth.name, parent=schema, pstype=type, type=meth.type, rank=meth.rank, method=meth.name)
                 schema.datasets.append(ds)
-                attr = H5Attribute(name=meth.name, parent=ds, type=meth.type, rank=meth.rank, method=meth.name)
-                ds.attributes.append(attr)
 
         return schema
 

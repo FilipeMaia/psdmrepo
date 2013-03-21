@@ -59,7 +59,7 @@ class H5Attribute ( object ) :
         self.name = kw.get('name')         # attribute name
         self.parent = kw.get('parent')      # parent dataset
         self._type = kw.get('type', None)   # optional type
-        self.method = kw.get('method', self.name)   # corresponding method name in pstype, default is the same as name
+        self.method = kw.get('method') or self.name  # corresponding method name in pstype, default is the same as name
         self._rank = kw.get('rank', -1)      # attribute array rank, -1 if unknown
         self.schema_version = kw.get('schema_version', 0)      # attribute schema version
         self.tags = kw.get('tags', {}).copy()
@@ -126,6 +126,10 @@ class H5Attribute ( object ) :
     def sizeIsVlen(self):
         """Returns true for array attribute whose dimensions can change every event"""
         return self.rank > 0 and 'vlen' in self.tags
+
+    def h5schema(self):
+        '''find a schema for this attribute, attribute type should be user-defined type'''
+        return self.type.h5schema(self.schema_version)
 
 
 #

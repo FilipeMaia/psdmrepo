@@ -116,7 +116,7 @@ try {
 
   uint32_t hash = str_hash(typeName);
   switch(hash) {
-{% for hash, types in hashes.items() %}
+{% for hash, types in hashes|dictsort %}
   case {{hash}}:
 {% if types|length > 1 %}
 {% for type in types %}
