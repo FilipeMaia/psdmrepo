@@ -133,7 +133,7 @@ ImgIntMonCorr::event(Event& evt, Env& env)
 
   // m_norm_factor = 1; // for test only
 
-  if( m_print_bits & 8 ) printNormFactor();
+  if( m_print_bits & 32 ) printNormFactor();
 
   procEvent(evt, env);
   ++ m_count;
@@ -176,11 +176,11 @@ ImgIntMonCorr::init(Event& evt, Env& env)
 void 
 ImgIntMonCorr::procEvent(Event& evt, Env& env)
 {
+  if ( procEventForType<double>   (evt) ) return;
   if ( procEventForType<uint16_t> (evt) ) return;
   if ( procEventForType<int>      (evt) ) return;
   if ( procEventForType<float>    (evt) ) return;
   if ( procEventForType<uint8_t>  (evt) ) return;
-  if ( procEventForType<double>   (evt) ) return;
 
   MsgLog(name(), info, "Image is not available in the event(...) for source:" << m_str_src << " key:" << m_key_in);
 }

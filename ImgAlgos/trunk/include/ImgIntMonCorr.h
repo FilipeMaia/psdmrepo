@@ -163,6 +163,13 @@ private:
      	shared_ptr< ndarray<T,2> > img = evt.get(m_str_src, m_key_in, &m_src);
      	if (img.get()) {
 
+          if (! m_do_norm) {
+             save2DArrayInEvent<T> (evt, m_src, m_key_out, *img.get());
+             if( m_print_bits & 8 || m_print_bits & 16 ) 
+               MsgLog( name(), info, stringOf2DArrayData<T>(*img.get(), std::string("Norm OFF - data in/out :")) );
+       	     return true;
+	  }
+
      	  const T* _rdat = img->data();
 
 	  ndarray<T,2> cdata(m_shape);
@@ -171,6 +178,9 @@ private:
 
           save2DArrayInEvent<T> (evt, m_src, m_key_out, cdata);
 
+          if( m_print_bits & 8  ) MsgLog( name(), info, stringOf2DArrayData<T>(*img.get(), std::string("data in :")) );
+          if( m_print_bits & 16 ) MsgLog( name(), info, stringOf2DArrayData<T>(cdata, std::string("data out:")) );
+ 
      	  return true;
      	} 
         return false;

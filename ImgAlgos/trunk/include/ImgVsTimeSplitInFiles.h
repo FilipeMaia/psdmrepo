@@ -26,6 +26,8 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "MsgLogger/MsgLogger.h"
+#include "ImgAlgos/GlobalMethods.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -68,7 +70,8 @@ class ImgVsTimeSplitInFiles : public Module {
 public:
 
   //typedef unsigned data_split_t;
-  typedef uint16_t data_split_t;
+  //typedef uint16_t data_split_t;
+  typedef float data_split_t;
 
 
   enum FILE_MODE {BINARY, TEXT};
@@ -165,6 +168,46 @@ private:
   unsigned    m_tind_max;     // maximal value of the time index.
 
 protected:
+
+//--------------------
+// Initialization of the splitting procedure
+    template <typename T>
+    bool initSplitInFilesForType(Event& evt, Env& env)
+    {
+      shared_ptr< ndarray<T,2> > img = evt.get(m_str_src, m_key, &m_src);
+
+      if (img.get()) {
+
+            m_img_rows = img->shape()[0];
+            m_img_cols = img->shape()[1];
+            m_img_size = img->size();
+            m_blk_size = m_img_size / m_nfiles_out; 
+            m_rst_size = m_img_size % m_nfiles_out;
+	    
+            m_data = new data_split_t [m_img_size];
+	    
+            MsgLog( name(), info, "Get image parameters:"
+                           << "\n Rows             : " << m_img_rows 
+                           << "\n Cols             : " << m_img_cols
+                           << "\n Total image size : " << m_img_size
+                           << "\n m_nfiles_out     : " << m_nfiles_out
+                           << "\n m_blk_size       : " << m_blk_size
+                           << "\n m_rst_size       : " << m_rst_size
+	                   << "\n Output data type is data_split_t (???float???) with sizeof: " << sizeof(data_split_t)
+                           << "\n"  
+                           );  
+	    
+            if(m_rst_size) {
+              std::string msg = "\n  Can not split the image for integer number of files without rest...";
+                          msg+= "\n  Try to change the number of output files to split the image for equal parts.\n";
+              MsgLogRoot(error, msg);
+              throw std::runtime_error(msg);
+            }
+	    return true;
+      } 
+      return false;
+    }
+
 //--------------------
 // Apply threshold correction to the image. 
 // Data is accessible through the smart pointer.
@@ -172,10 +215,13 @@ protected:
     void procImgData(const boost::shared_ptr< ndarray<T,2> >& p_ndarr)
     {
       const T* data = p_ndarr->data();
+      procImgData<T>(data);
+      /*
       T            athr = static_cast<T>           (m_ampl_thr);
       data_split_t amin = static_cast<data_split_t>(m_ampl_min);
       for(unsigned i=0; i<m_img_size; i++)
 	m_data[i] = (data[i] > athr) ? static_cast<data_split_t>(data[i]) : amin;
+      */
     }
 
 //--------------------
@@ -190,13 +236,29 @@ protected:
 	m_data[i] = (data[i] > athr) ? static_cast<data_split_t>(data[i]) : amin;
     }
 
+
+//--------------------
+// Process event for specified data type
+    template <typename T>
+    bool procEventForType(Event& evt, std::string data_type)
+    {
+      shared_ptr< ndarray<T,2> > img = evt.get(m_str_src, m_key, &m_src);
+      if (img.get()) {
+        m_data_type = data_type; 
+        procSplitAndWriteImgInFiles<T> (img, m_print_bits & 8);
+	return true;
+      }
+      return false;      
+    }
+
 //--------------------
 // Splits the image for blocks and saves the blocks in files
     template <typename T>
     void procSplitAndWriteImgInFiles (const boost::shared_ptr< ndarray<T,2> >& p_ndarr, 
-                                  bool print_msg=false) 
+                                      bool print_msg=false) 
     {
       const T* img_data = p_ndarr->data();             // Access to entire image
+      if( m_print_bits & 32 ) MsgLog( name(), info, stringOf2DArrayData<T>(*p_ndarr.get(), std::string("data in:")) );
 
       procImgData<T>(img_data);
 

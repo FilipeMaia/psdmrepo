@@ -115,6 +115,24 @@ eventCounterSinceConfigure(PSEvt::Event& evt)
 }
 
 //--------------------
+
+void 
+printSizeOfTypes()
+{
+  std::cout << "Size Of Types:" 
+            << "\nsizeof(bool     ) = " << sizeof(bool    ) 
+            << "\nsizeof(uint8_t  ) = " << sizeof(uint8_t ) 
+            << "\nsizeof(uint16_t ) = " << sizeof(uint16_t) 
+            << "\nsizeof(uint32_t ) = " << sizeof(uint32_t) 
+            << "\nsizeof(int32_t  ) = " << sizeof(int32_t ) 
+            << "\nsizeof(int      ) = " << sizeof(int     ) 
+            << "\nsizeof(float    ) = " << sizeof(float   ) 
+            << "\nsizeof(double   ) = " << sizeof(double  ) 
+            << "\n\n";
+}
+
+
+//--------------------
 // Define the shape or throw message that can not do that.
 void 
 defineImageShape(PSEvt::Event& evt, const PSEvt::Source& str_src, const std::string& str_key, unsigned* shape)

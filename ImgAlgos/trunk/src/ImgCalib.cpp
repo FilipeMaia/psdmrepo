@@ -124,6 +124,8 @@ ImgCalib::printInputParameters()
         << "\n m_col_max         : " << m_col_max    
         << "\n m_print_bits      : " << m_print_bits
         << "\n";     
+
+    printSizeOfTypes();
   }
 }
 
@@ -235,27 +237,13 @@ ImgCalib::init(Event& evt, Env& env)
 void 
 ImgCalib::procEvent(Event& evt, Env& env)
 {
-  if ( procEventForType<uint16_t> (evt) ) return;
-  if ( procEventForType<int>      (evt) ) return;
-  if ( procEventForType<float>    (evt) ) return;
-  if ( procEventForType<uint8_t>  (evt) ) return;
-  if ( procEventForType<double>   (evt) ) return;
+  if ( procEventForType<uint16_t, double> (evt) ) return;
+  if ( procEventForType<int,      double> (evt) ) return;
+  if ( procEventForType<float,    double> (evt) ) return;
+  if ( procEventForType<uint8_t,  double> (evt) ) return;
+  if ( procEventForType<double,   double> (evt) ) return;
 
   MsgLog(name(), info, "Image is not available in the event(...) for source:" << m_str_src << " key:" << m_key_in);
-}
-
-//--------------------
-
-void
-ImgCalib::normBkgd()
-{
-  double sum_data=0;
-  double sum_bkgd=0;
-  for(std::vector<unsigned>::const_iterator it = v_inds.begin(); it != v_inds.end(); ++ it) {
-      sum_data += m_cdat[*it];
-      sum_bkgd += m_bkgd->data()[*it];
-  }
-  m_norm = (sum_bkgd != 0)? (float)(sum_data/sum_bkgd) : 1;
 }
 
 //--------------------

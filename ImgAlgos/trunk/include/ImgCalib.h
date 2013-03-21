@@ -91,7 +91,7 @@ protected:
   void init(Event& evt, Env& env);
   void defImgIndexesForBkgdNorm();
   void procEvent(Event& evt, Env& env);
-  void normBkgd();
+  //void normBkgd();
   void saveImageInEvent(Event& evt);
 
 private:
@@ -143,11 +143,11 @@ private:
   std::vector<unsigned> v_inds;       // vector of the image indexes for background normalization
 
   double           m_norm;            // Normalization factor for background subtraction
-  double*          m_cdat;            // Calibrated data for image
+  //double*          m_cdat;            // Calibrated data for image
 
 //-------------------
 
-    template <typename T>
+  template <typename T, typename TOUT>
     bool procEventForType(Event& evt)
     {
      	shared_ptr< ndarray<T,2> > img = evt.get(m_str_src, m_key_in, &m_src);
@@ -160,40 +160,44 @@ private:
      	  // 3) apply constant threshold: m_low_thre;
      	  // 4) apply nRMS threshold: m_low_nrms*m_nrms_data[i];
 
+	  //m_cdat = new double[m_size];
      	  //memcpy(m_cdat,m_rdat,m_size*sizeof(double)); 
+          //MsgLog( name(), info, "m_shape: " << m_shape[0] << " " << m_shape[1] );
 
-	  ndarray<T,2> cdata(m_shape);
-	  T* m_cdat  = cdata.data();
+	  ndarray<TOUT,2> cdata(m_shape);
+	  TOUT* p_cdata = cdata.data();
+	  TOUT low_val  = (TOUT) m_low_val; 
+	  TOUT low_thre = (TOUT) m_low_thre; 
+	  TOUT mask_val = (TOUT) m_mask_val; 
 
-     	  for(unsigned i=0; i<m_size; i++) m_cdat[i] = (T)_rdat[i];
+     	  for(unsigned i=0; i<m_size; i++) p_cdata[i] = (TOUT)_rdat[i];
 
-     	  if (m_do_peds) {             for(unsigned i=0; i<m_size; i++) m_cdat[i] -= (T) m_peds_data[i];         }
-     	  if (m_do_bkgd) { normBkgd(); for(unsigned i=0; i<m_size; i++) m_cdat[i] -= (T)(m_bkgd_data[i]*m_norm); }
-     	  if (m_do_gain) {             for(unsigned i=0; i<m_size; i++) m_cdat[i] *= (T) m_gain_data[i];         }
+     	  if (m_do_peds) {                    for(unsigned i=0; i<m_size; i++) p_cdata[i] -= (TOUT) m_peds_data[i];         }
+     	  if (m_do_bkgd) { normBkgd(p_cdata); for(unsigned i=0; i<m_size; i++) p_cdata[i] -= (TOUT)(m_bkgd_data[i]*m_norm); }
+     	  if (m_do_gain) {                    for(unsigned i=0; i<m_size; i++) p_cdata[i] *= (TOUT) m_gain_data[i];         }
 
      	  if (m_do_mask) {             
-	    T mask_val = (T)m_mask_val; 
      	    for(unsigned i=0; i<m_size; i++) {
-     	      if (m_mask_data[i]==0) m_cdat[i] = mask_val; 
+     	      if (m_mask_data[i]==0) p_cdata[i] = mask_val; 
      	    }
      	  }
 
      	  if (m_do_thre) {             
-	    T low_val  = (T) m_low_val;
-	    T low_thre = (T) m_low_thre;
      	    for(unsigned i=0; i<m_size; i++) {
-     	      if (m_cdat[i] < low_thre) m_cdat[i] = low_val; 
+     	      if (p_cdata[i] < low_thre) p_cdata[i] = low_val; 
      	    }
      	  }
 
      	  if (m_do_nrms) {             
-	    T low_val = (T) m_low_val;
      	    for(unsigned i=0; i<m_size; i++) {
-     	      if (m_cdat[i] < (T) m_nrms_data[i]) m_cdat[i] = low_val; 
+     	      if (p_cdata[i] < (TOUT) m_nrms_data[i]) p_cdata[i] = low_val; 
      	    }
      	  }
 
-          save2DArrayInEvent<T> (evt, m_src, m_key_out, cdata);
+          if( m_print_bits &  8 ) MsgLog( name(), info, stringOf2DArrayData<T>(*img.get(), std::string("Raw img data:")) );
+          if( m_print_bits & 16 ) MsgLog( name(), info, stringOf2DArrayData<TOUT>(cdata, std::string("Calibr. data:")) );
+ 	  
+          save2DArrayInEvent<TOUT> (evt, m_src, m_key_out, cdata);
 
      	  return true;
      	} 
@@ -201,6 +205,20 @@ private:
     }  
 
 //-------------------
+
+  template <typename T>
+    void normBkgd(const T* p_cdata)
+    {
+      double sum_data=0;
+      double sum_bkgd=0;
+      for(std::vector<unsigned>::const_iterator it = v_inds.begin(); it != v_inds.end(); ++ it) {
+        sum_data += p_cdata[*it];
+        sum_bkgd += m_bkgd->data()[*it];
+      }
+      m_norm = (sum_bkgd != 0)? (float)(sum_data/sum_bkgd) : 1;
+    }
+
+//--------------------
 
 };
 

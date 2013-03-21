@@ -76,7 +76,7 @@ private:
   double doubleTime(PSEvt::Event& evt);
   unsigned fiducials(PSEvt::Event& evt);                  // returns 17-bits (131071) integer value: fiducials clock runs at 360Hz.
   unsigned eventCounterSinceConfigure(PSEvt::Event& evt); // returns 15-bits (32767)  integer value: event counter since Configure.
-
+  void printSizeOfTypes();
   /// Define the shape or throw message that can not do that.
   void defineImageShape(PSEvt::Event& evt, const PSEvt::Source& m_str_src, const std::string& m_key, unsigned* shape);
 
@@ -130,10 +130,10 @@ private:
                                   unsigned col_min=0, unsigned col_max=10 )
   {
       std::stringstream ss;
-      ss << comment; 
+      ss << comment << std::setprecision(3); 
           for (unsigned r = row_min; r < row_max; ++ r) {
-            for (unsigned c = col_min; c < col_max; ++ c ) ss << " " << data[r][c]; 
-            ss << " ...\n";
+            for (unsigned c = col_min; c < col_max; ++ c ) ss << " " << std::setw(7) << data[r][c]; 
+            if(row_max > 1) ss << " ...\n";
 	  }
       return ss.str();
   }

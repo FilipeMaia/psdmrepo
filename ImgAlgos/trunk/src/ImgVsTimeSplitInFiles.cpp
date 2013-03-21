@@ -23,7 +23,6 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "MsgLogger/MsgLogger.h"
 #include "PSEvt/EventId.h"
 #include "ImgAlgos/GlobalMethods.h"
 #include "ImgAlgos/TimeInterval.h"
@@ -200,42 +199,14 @@ ImgVsTimeSplitInFiles::endJob(Event& evt, Env& env)
 void 
 ImgVsTimeSplitInFiles::initSplitInFiles(Event& evt, Env& env)
 {
-  shared_ptr< ndarray<uint16_t,2> > img = evt.get(m_str_src, m_key, &m_src);
+    if( initSplitInFilesForType<double>  (evt, env) ) return;
+    if( initSplitInFilesForType<float>   (evt, env) ) return;
+    if( initSplitInFilesForType<int>     (evt, env) ) return;
+    if( initSplitInFilesForType<uint16_t>(evt, env) ) return;
 
-  if (img.get()) {
-
-    m_img_rows = img->shape()[0];
-    m_img_cols = img->shape()[1];
-    m_img_size = img->size();
-    m_blk_size = m_img_size / m_nfiles_out; 
-    m_rst_size = m_img_size % m_nfiles_out;
-
-    m_data = new data_split_t [m_img_size];
-
-    MsgLog( name(), info, "Get image parameters:"
-                       << "\n Rows             : " << m_img_rows 
-                       << "\n Cols             : " << m_img_cols
-                       << "\n Total image size : " << m_img_size
-                       << "\n m_nfiles_out     : " << m_nfiles_out
-                       << "\n m_blk_size       : " << m_blk_size
-                       << "\n m_rst_size       : " << m_rst_size
-	               << "\n Output data type is data_split_t (uint16_t) with sizeof: " << sizeof(data_split_t)
-                       << "\n"  
-    );  
-
-    if(m_rst_size) {
-      std::string msg = "\n  Can not split the image for integer number of files without rest...";
-                  msg+= "\n  Try to change the number of output files to split the image for equal parts.\n";
-      MsgLogRoot(error, msg);
-      throw std::runtime_error(msg);
-    }
-  } 
-  else
-  {
     const std::string msg = "Image shape is not defined in the event(...) for source:" + boost::lexical_cast<std::string>(m_str_src) + " key:" + m_key;
     MsgLogRoot(error, msg);
     throw std::runtime_error(msg);
-  }
 }
 
 //--------------------
@@ -255,7 +226,7 @@ ImgVsTimeSplitInFiles::saveMetadataInFile()
       << "\nNUMBER_OF_IMGS  " << m_count
       << "\nFILE_TYPE       " << m_file_type
     //<< "\nDATA_TYPE_INPUT " << m_data_type
-      << "\nDATA_TYPE       " << "uint16_t" // typeid(m_data).name()
+      << "\nDATA_TYPE       " << "float"
       << "\nTIME_SEC_AVE    " << fixed << std::setprecision(6) << m_t_ave
       << "\nTIME_SEC_RMS    " << fixed << std::setprecision(6) << m_t_rms
       << "\nTIME_INDEX_MAX  " << std::setw(8) << m_tind_max
@@ -312,17 +283,12 @@ ImgVsTimeSplitInFiles::procEvent(Event& evt)
 {
   saveTimeRecord(evt);
 
-  shared_ptr< ndarray<double,2> > img = evt.get(m_str_src, m_key, &m_src);
-  if (img.get()) {
-    m_data_type = "double"; 
-    procSplitAndWriteImgInFiles<double> (img, m_print_bits & 8);
-  }
+  if ( procEventForType<double>   (evt, "double"  ) ) return;
+  if ( procEventForType<float>    (evt, "float"   ) ) return;
+  if ( procEventForType<int>      (evt, "int"     ) ) return;
+  if ( procEventForType<uint16_t> (evt, "uint16_t") ) return;
 
-  shared_ptr< ndarray<uint16_t,2> > img_u16 = evt.get(m_str_src, m_key, &m_src);
-  if (img_u16.get()) {
-    m_data_type = "uint16_t"; 
-    procSplitAndWriteImgInFiles<uint16_t> (img_u16, m_print_bits & 8);
-  }
+  MsgLog(name(), info, "Image is not available in the event(...) for source:" << m_str_src << " key:" << m_key);
 }
 
 //--------------------
