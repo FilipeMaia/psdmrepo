@@ -9,53 +9,6 @@
 namespace psddl_hdf2psana {
 namespace Acqiris {
 
-namespace ns_ConfigV1_v0 {
-struct dataset_config {
-  static hdf5pp::Type native_type();
-  static hdf5pp::Type stored_type();
-
-  dataset_config();
-  ~dataset_config();
-
-  uint32_t nbrConvertersPerChannel;
-  uint32_t channelMask;
-  uint32_t nbrBanks;
-  uint32_t nbrChannels;
-
-};
-}
-
-class ConfigV1_v0 : public Psana::Acqiris::ConfigV1 {
-public:
-  typedef Psana::Acqiris::ConfigV1 PsanaType;
-  ConfigV1_v0() {}
-  ConfigV1_v0(hdf5pp::Group group, hsize_t idx)
-    : m_group(group), m_idx(idx) {}
-  virtual ~ConfigV1_v0() {}
-  virtual uint32_t nbrConvertersPerChannel() const;
-  virtual uint32_t channelMask() const;
-  virtual uint32_t nbrBanks() const;
-  virtual const Psana::Acqiris::TrigV1& trig() const;
-  virtual const Psana::Acqiris::HorizV1& horiz() const;
-  virtual ndarray<const Psana::Acqiris::VertV1, 1> vert() const;
-  virtual uint32_t nbrChannels() const;
-private:
-  mutable hdf5pp::Group m_group;
-  hsize_t m_idx;
-  mutable boost::shared_ptr<Acqiris::ns_ConfigV1_v0::dataset_config> m_ds_config;
-  void read_ds_config() const;
-  mutable boost::shared_ptr<Acqiris::ns_HorizV1_v0::dataset_data> m_ds_horiz;
-  void read_ds_horiz() const;
-  mutable Psana::Acqiris::HorizV1 m_ds_storage_horiz_horiz;
-  mutable boost::shared_ptr<Acqiris::ns_TrigV1_v0::dataset_data> m_ds_trig;
-  void read_ds_trig() const;
-  mutable Psana::Acqiris::TrigV1 m_ds_storage_trig_trig;
-  mutable ndarray<Acqiris::ns_VertV1_v0::dataset_data, 1> m_ds_vert;
-  void read_ds_vert() const;
-  mutable ndarray<const Psana::Acqiris::VertV1, 1> m_ds_storage_vert_vert;
-};
-
-
 // This is not used but psddl-generated code needs this class definition
 class Proxy_TdcDataV1Common_v0 : public PSEvt::Proxy<Psana::Acqiris::TdcDataV1Common> {
 public:

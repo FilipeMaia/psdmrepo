@@ -241,19 +241,6 @@ struct dataset_config {
 };
 }
 
-namespace ns_ConfigV2_v0 {
-struct dataset_pixelThresh {
-  static hdf5pp::Type native_type();
-  static hdf5pp::Type stored_type();
-
-  dataset_pixelThresh();
-  ~dataset_pixelThresh();
-
-  uint8_t pixelThresh[4*256*256]; 
-
-};
-}
-
 
 class ConfigV2_v0 : public Psana::Timepix::ConfigV2 {
 public:
@@ -339,7 +326,7 @@ private:
   hsize_t m_idx;
   mutable boost::shared_ptr<Timepix::ns_ConfigV2_v0::dataset_config> m_ds_config;
   void read_ds_config() const;
-  mutable boost::shared_ptr<Timepix::ns_ConfigV2_v0::dataset_pixelThresh> m_ds_pixelThresh;
+  mutable ndarray<const uint8_t, 1> m_ds_pixelThresh;
   void read_ds_pixelThresh() const;
 };
 
@@ -426,19 +413,6 @@ struct dataset_config {
   int32_t chip2ID; 
   int32_t chip3ID; 
   int32_t chipCount; 
-
-};
-}
-
-namespace ns_ConfigV3_v0 {
-struct dataset_pixelThresh {
-  static hdf5pp::Type native_type();
-  static hdf5pp::Type stored_type();
-
-  dataset_pixelThresh();
-  ~dataset_pixelThresh();
-
-  uint8_t pixelThresh[4*256*256]; 
 
 };
 }
@@ -530,7 +504,7 @@ private:
   hsize_t m_idx;
   mutable boost::shared_ptr<Timepix::ns_ConfigV3_v0::dataset_config> m_ds_config;
   void read_ds_config() const;
-  mutable boost::shared_ptr<Timepix::ns_ConfigV3_v0::dataset_pixelThresh> m_ds_pixelThresh;
+  mutable ndarray<const uint8_t, 1> m_ds_pixelThresh;
   void read_ds_pixelThresh() const;
 };
 
@@ -547,19 +521,6 @@ struct dataset_data {
   uint32_t timestamp; 
   uint16_t frameCounter; 
   uint16_t lostRows; 
-
-};
-}
-
-namespace ns_DataV1_v0 {
-struct dataset_image {
-  static hdf5pp::Type native_type();
-  static hdf5pp::Type stored_type();
-
-  dataset_image();
-  ~dataset_image();
-
-  uint16_t data[262144]; 
 
 };
 }
@@ -585,7 +546,7 @@ private:
   hsize_t m_idx;
   mutable boost::shared_ptr<Timepix::ns_DataV1_v0::dataset_data> m_ds_data;
   void read_ds_data() const;
-  mutable boost::shared_ptr<Timepix::ns_DataV1_v0::dataset_image> m_ds_image;
+  mutable ndarray<const uint16_t, 2> m_ds_image;
   void read_ds_image() const;
 };
 

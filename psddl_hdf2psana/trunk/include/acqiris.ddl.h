@@ -114,6 +114,53 @@ private:
   boost::shared_ptr<PsanaType> m_data;
 };
 boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::TrigV1> > make_TrigV1(int version, hdf5pp::Group group, hsize_t idx);
+
+namespace ns_ConfigV1_v0 {
+struct dataset_config {
+  static hdf5pp::Type native_type();
+  static hdf5pp::Type stored_type();
+
+  dataset_config();
+  ~dataset_config();
+
+  uint32_t nbrConvertersPerChannel; 
+  uint32_t channelMask; 
+  uint32_t nbrBanks; 
+  uint32_t nbrChannels; 
+
+};
+}
+
+
+class ConfigV1_v0 : public Psana::Acqiris::ConfigV1 {
+public:
+  typedef Psana::Acqiris::ConfigV1 PsanaType;
+  ConfigV1_v0() {}
+  ConfigV1_v0(hdf5pp::Group group, hsize_t idx)
+    : m_group(group), m_idx(idx) {}
+  virtual ~ConfigV1_v0() {}
+  virtual uint32_t nbrConvertersPerChannel() const;
+  virtual uint32_t channelMask() const;
+  virtual uint32_t nbrBanks() const;
+  virtual const Psana::Acqiris::TrigV1& trig() const;
+  virtual const Psana::Acqiris::HorizV1& horiz() const;
+  virtual ndarray<const Psana::Acqiris::VertV1, 1> vert() const;
+  virtual uint32_t nbrChannels() const;
+private:
+  mutable hdf5pp::Group m_group;
+  hsize_t m_idx;
+  mutable boost::shared_ptr<Acqiris::ns_ConfigV1_v0::dataset_config> m_ds_config;
+  void read_ds_config() const;
+  mutable boost::shared_ptr<Acqiris::ns_HorizV1_v0::dataset_data> m_ds_horiz;
+  void read_ds_horiz() const;
+  mutable Psana::Acqiris::HorizV1 m_ds_storage_horiz;
+  mutable boost::shared_ptr<Acqiris::ns_TrigV1_v0::dataset_data> m_ds_trig;
+  void read_ds_trig() const;
+  mutable Psana::Acqiris::TrigV1 m_ds_storage_trig;
+  mutable ndarray<const Psana::Acqiris::VertV1, 1> m_ds_vert;
+  void read_ds_vert() const;
+};
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx);
 
 namespace ns_TimestampV1_v0 {
@@ -131,23 +178,6 @@ struct dataset_data {
   operator Psana::Acqiris::TimestampV1() const { return Psana::Acqiris::TimestampV1(pos, timeStampLo, timeStampHi); }
 };
 }
-class Proxy_TimestampV1_v0 : public PSEvt::Proxy<Psana::Acqiris::TimestampV1> {
-public:
-  typedef Psana::Acqiris::TimestampV1 PsanaType;
-
-  Proxy_TimestampV1_v0(hdf5pp::Group group, hsize_t idx) : m_group(group), m_idx(idx) {}
-  virtual ~Proxy_TimestampV1_v0() {}
-
-protected:
-
-  virtual boost::shared_ptr<PsanaType> getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key);
-
-private:
-
-  mutable hdf5pp::Group m_group;
-  hsize_t m_idx;
-  boost::shared_ptr<PsanaType> m_data;
-};
 boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::DataDescV1> > make_DataDescV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::Acqiris::ConfigV1>& cfg);
 
 namespace ns_TdcChannel_v0 {
@@ -261,27 +291,14 @@ private:
 boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::TdcVetoIO> > make_TdcVetoIO(int version, hdf5pp::Group group, hsize_t idx);
 
 namespace ns_TdcConfigV1_v0 {
-struct dataset_channels {
+struct dataset_config {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
-  dataset_channels();
-  ~dataset_channels();
+  dataset_config();
+  ~dataset_config();
 
-  Acqiris::ns_TdcChannel_v0::dataset_data channels[8]; 
-
-};
-}
-
-namespace ns_TdcConfigV1_v0 {
-struct dataset_auxio {
-  static hdf5pp::Type native_type();
-  static hdf5pp::Type stored_type();
-
-  dataset_auxio();
-  ~dataset_auxio();
-
-  Acqiris::ns_TdcAuxIO_v0::dataset_data auxio[2]; 
+  Acqiris::ns_TdcVetoIO_v0::dataset_data veto; 
 
 };
 }
@@ -300,15 +317,13 @@ public:
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
-  mutable boost::shared_ptr<Acqiris::ns_TdcVetoIO_v0::dataset_data> m_ds_config;
+  mutable boost::shared_ptr<Acqiris::ns_TdcConfigV1_v0::dataset_config> m_ds_config;
   void read_ds_config() const;
   mutable Psana::Acqiris::TdcVetoIO m_ds_storage_config_veto;
-  mutable boost::shared_ptr<Acqiris::ns_TdcConfigV1_v0::dataset_channels> m_ds_channels;
+  mutable ndarray<const Psana::Acqiris::TdcChannel, 1> m_ds_channels;
   void read_ds_channels() const;
-  mutable ndarray<const Psana::Acqiris::TdcChannel, 1> m_ds_storage_channels_channels;
-  mutable boost::shared_ptr<Acqiris::ns_TdcConfigV1_v0::dataset_auxio> m_ds_auxio;
+  mutable ndarray<const Psana::Acqiris::TdcAuxIO, 1> m_ds_auxio;
   void read_ds_auxio() const;
-  mutable ndarray<const Psana::Acqiris::TdcAuxIO, 1> m_ds_storage_auxio_auxio;
 };
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::TdcConfigV1> > make_TdcConfigV1(int version, hdf5pp::Group group, hsize_t idx);

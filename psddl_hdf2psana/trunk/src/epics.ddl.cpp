@@ -60,16 +60,6 @@ ns_epicsTimeStamp_v0::dataset_data::dataset_data()
 ns_epicsTimeStamp_v0::dataset_data::~dataset_data()
 {
 }
-boost::shared_ptr<Psana::Epics::epicsTimeStamp>
-Proxy_epicsTimeStamp_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key)
-{
-  if (not m_data) {
-    boost::shared_ptr<Epics::ns_epicsTimeStamp_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<Epics::ns_epicsTimeStamp_v0::dataset_data>(m_group, "data", m_idx);
-    m_data.reset(new PsanaType(ds_data->secPastEpoch, ds_data->nsec));
-  }
-  return m_data;
-}
-
 
 hdf5pp::Type ns_EpicsPvHeader_v0_dataset_data_stored_type()
 {
@@ -171,16 +161,6 @@ ns_PvConfigV1_v0::dataset_data::dataset_data()
 ns_PvConfigV1_v0::dataset_data::~dataset_data()
 {
 }
-boost::shared_ptr<Psana::Epics::PvConfigV1>
-Proxy_PvConfigV1_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key)
-{
-  if (not m_data) {
-    boost::shared_ptr<Epics::ns_PvConfigV1_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<Epics::ns_PvConfigV1_v0::dataset_data>(m_group, "data", m_idx);
-    m_data.reset(new PsanaType(ds_data->pvId, ds_data->description, ds_data->interval));
-  }
-  return m_data;
-}
-
 
 hdf5pp::Type ns_ConfigV1_v0_dataset_config_stored_type()
 {

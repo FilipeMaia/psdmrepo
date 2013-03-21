@@ -614,7 +614,7 @@ private:
   void read_ds_output_maps() const;
   mutable boost::shared_ptr<EvrData::ns_SequencerConfigV1_v0::dataset_config> m_ds_seq_config;
   void read_ds_seq_config() const;
-  mutable boost::shared_ptr<Psana::EvrData::SequencerConfigV1> m_ds_storage_seq_config_seq_config;
+  mutable boost::shared_ptr<SequencerConfigV1_v0> m_ds_storage_seq_config;
 };
 
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::ConfigV5> > make_ConfigV5(int version, hdf5pp::Group group, hsize_t idx);
@@ -662,7 +662,7 @@ private:
   void read_ds_output_maps() const;
   mutable boost::shared_ptr<EvrData::ns_SequencerConfigV1_v0::dataset_config> m_ds_seq_config;
   void read_ds_seq_config() const;
-  mutable boost::shared_ptr<Psana::EvrData::SequencerConfigV1> m_ds_storage_seq_config_seq_config;
+  mutable boost::shared_ptr<SequencerConfigV1_v0> m_ds_storage_seq_config;
 };
 
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::ConfigV6> > make_ConfigV6(int version, hdf5pp::Group group, hsize_t idx);
@@ -710,7 +710,7 @@ private:
   void read_ds_output_maps() const;
   mutable boost::shared_ptr<EvrData::ns_SequencerConfigV1_v0::dataset_config> m_ds_seq_config;
   void read_ds_seq_config() const;
-  mutable boost::shared_ptr<Psana::EvrData::SequencerConfigV1> m_ds_storage_seq_config_seq_config;
+  mutable boost::shared_ptr<SequencerConfigV1_v0> m_ds_storage_seq_config;
 };
 
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::ConfigV7> > make_ConfigV7(int version, hdf5pp::Group group, hsize_t idx);

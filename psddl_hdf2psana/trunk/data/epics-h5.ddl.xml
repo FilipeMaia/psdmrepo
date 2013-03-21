@@ -259,9 +259,7 @@
             <dataset name="config">
                 <attribute name="numPv"/>
             </dataset>
-            <dataset name="pvConfig">
-                <attribute name="pvControls"/>
-            </dataset>
+            <dataset name="pvConfig" method="pvControls"/>
         </h5schema>
         
         <!-- ========================================================================= -->

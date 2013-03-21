@@ -70,32 +70,6 @@ struct dataset_config {
 };
 }
 
-namespace ns_FccdConfigV2_v0 {
-struct dataset_dacVoltages {
-  static hdf5pp::Type native_type();
-  static hdf5pp::Type stored_type();
-
-  dataset_dacVoltages();
-  ~dataset_dacVoltages();
-
-  float dacVoltages[17]; 
-
-};
-}
-
-namespace ns_FccdConfigV2_v0 {
-struct dataset_waveforms {
-  static hdf5pp::Type native_type();
-  static hdf5pp::Type stored_type();
-
-  dataset_waveforms();
-  ~dataset_waveforms();
-
-  uint16_t waveforms[15]; 
-
-};
-}
-
 
 class FccdConfigV2_v0 : public Psana::FCCD::FccdConfigV2 {
 public:
@@ -119,9 +93,9 @@ private:
   hsize_t m_idx;
   mutable boost::shared_ptr<FCCD::ns_FccdConfigV2_v0::dataset_config> m_ds_config;
   void read_ds_config() const;
-  mutable boost::shared_ptr<FCCD::ns_FccdConfigV2_v0::dataset_dacVoltages> m_ds_dacVoltages;
+  mutable ndarray<const float, 1> m_ds_dacVoltages;
   void read_ds_dacVoltages() const;
-  mutable boost::shared_ptr<FCCD::ns_FccdConfigV2_v0::dataset_waveforms> m_ds_waveforms;
+  mutable ndarray<const uint16_t, 1> m_ds_waveforms;
   void read_ds_waveforms() const;
 };
 

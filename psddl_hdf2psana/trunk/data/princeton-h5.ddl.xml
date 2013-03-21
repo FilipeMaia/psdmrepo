@@ -16,9 +16,7 @@
                 <attribute name="readoutTime"/>
             </dataset>
             
-            <dataset name="image">
-                <attribute name="data"/>
-            </dataset>
+            <dataset name="image" method="data"/>
             
         </h5schema>
     
@@ -32,9 +30,7 @@
                 <attribute name="temperature"/>
             </dataset>
             
-            <dataset name="image">
-                <attribute name="data"/>
-            </dataset>
+            <dataset name="image" method="data"/>
             
         </h5schema>
     

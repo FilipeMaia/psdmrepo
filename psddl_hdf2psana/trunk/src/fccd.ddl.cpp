@@ -131,82 +131,6 @@ ns_FccdConfigV2_v0::dataset_config::dataset_config()
 ns_FccdConfigV2_v0::dataset_config::~dataset_config()
 {
 }
-
-hdf5pp::Type ns_FccdConfigV2_v0_dataset_dacVoltages_stored_type()
-{
-  typedef ns_FccdConfigV2_v0::dataset_dacVoltages DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  hsize_t _array_type_dacVoltages_shape[] = { 17 };
-  hdf5pp::ArrayType _array_type_dacVoltages = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<float>::stored_type(), 1, _array_type_dacVoltages_shape);
-  type.insert("dacVoltages", offsetof(DsType, dacVoltages), _array_type_dacVoltages);
-  return type;
-}
-
-hdf5pp::Type ns_FccdConfigV2_v0::dataset_dacVoltages::stored_type()
-{
-  static hdf5pp::Type type = ns_FccdConfigV2_v0_dataset_dacVoltages_stored_type();
-  return type;
-}
-
-hdf5pp::Type ns_FccdConfigV2_v0_dataset_dacVoltages_native_type()
-{
-  typedef ns_FccdConfigV2_v0::dataset_dacVoltages DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  hsize_t _array_type_dacVoltages_shape[] = { 17 };
-  hdf5pp::ArrayType _array_type_dacVoltages = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<float>::native_type(), 1, _array_type_dacVoltages_shape);
-  type.insert("dacVoltages", offsetof(DsType, dacVoltages), _array_type_dacVoltages);
-  return type;
-}
-
-hdf5pp::Type ns_FccdConfigV2_v0::dataset_dacVoltages::native_type()
-{
-  static hdf5pp::Type type = ns_FccdConfigV2_v0_dataset_dacVoltages_native_type();
-  return type;
-}
-ns_FccdConfigV2_v0::dataset_dacVoltages::dataset_dacVoltages()
-{
-}
-ns_FccdConfigV2_v0::dataset_dacVoltages::~dataset_dacVoltages()
-{
-}
-
-hdf5pp::Type ns_FccdConfigV2_v0_dataset_waveforms_stored_type()
-{
-  typedef ns_FccdConfigV2_v0::dataset_waveforms DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  hsize_t _array_type_waveforms_shape[] = { 15 };
-  hdf5pp::ArrayType _array_type_waveforms = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint16_t>::stored_type(), 1, _array_type_waveforms_shape);
-  type.insert("waveforms", offsetof(DsType, waveforms), _array_type_waveforms);
-  return type;
-}
-
-hdf5pp::Type ns_FccdConfigV2_v0::dataset_waveforms::stored_type()
-{
-  static hdf5pp::Type type = ns_FccdConfigV2_v0_dataset_waveforms_stored_type();
-  return type;
-}
-
-hdf5pp::Type ns_FccdConfigV2_v0_dataset_waveforms_native_type()
-{
-  typedef ns_FccdConfigV2_v0::dataset_waveforms DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  hsize_t _array_type_waveforms_shape[] = { 15 };
-  hdf5pp::ArrayType _array_type_waveforms = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint16_t>::native_type(), 1, _array_type_waveforms_shape);
-  type.insert("waveforms", offsetof(DsType, waveforms), _array_type_waveforms);
-  return type;
-}
-
-hdf5pp::Type ns_FccdConfigV2_v0::dataset_waveforms::native_type()
-{
-  static hdf5pp::Type type = ns_FccdConfigV2_v0_dataset_waveforms_native_type();
-  return type;
-}
-ns_FccdConfigV2_v0::dataset_waveforms::dataset_waveforms()
-{
-}
-ns_FccdConfigV2_v0::dataset_waveforms::~dataset_waveforms()
-{
-}
 uint16_t FccdConfigV2_v0::outputMode() const {
   if (not m_ds_config) read_ds_config();
   return uint16_t(m_ds_config->outputMode);
@@ -224,14 +148,12 @@ uint32_t FccdConfigV2_v0::exposureTime() const {
   return uint32_t(m_ds_config->exposureTime);
 }
 ndarray<const float, 1> FccdConfigV2_v0::dacVoltages() const {
-  if (not m_ds_dacVoltages) read_ds_dacVoltages();
-  boost::shared_ptr<float> ptr(m_ds_dacVoltages, m_ds_dacVoltages->dacVoltages);
-  return make_ndarray(ptr, NVoltages);
+  if (m_ds_dacVoltages.empty()) read_ds_dacVoltages();
+  return m_ds_dacVoltages;
 }
 ndarray<const uint16_t, 1> FccdConfigV2_v0::waveforms() const {
-  if (not m_ds_waveforms) read_ds_waveforms();
-  boost::shared_ptr<uint16_t> ptr(m_ds_waveforms, m_ds_waveforms->waveforms);
-  return make_ndarray(ptr, NWaveforms);
+  if (m_ds_waveforms.empty()) read_ds_waveforms();
+  return m_ds_waveforms;
 }
 uint32_t FccdConfigV2_v0::width() const {
   if (not m_ds_config) read_ds_config();
@@ -253,10 +175,10 @@ void FccdConfigV2_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<FCCD::ns_FccdConfigV2_v0::dataset_config>(m_group, "config", m_idx);
 }
 void FccdConfigV2_v0::read_ds_dacVoltages() const {
-  m_ds_dacVoltages = hdf5pp::Utils::readGroup<FCCD::ns_FccdConfigV2_v0::dataset_dacVoltages>(m_group, "dacVoltages", m_idx);
+  m_ds_dacVoltages = hdf5pp::Utils::readNdarray<float, 1>(m_group, "dacVoltages", m_idx);
 }
 void FccdConfigV2_v0::read_ds_waveforms() const {
-  m_ds_waveforms = hdf5pp::Utils::readGroup<FCCD::ns_FccdConfigV2_v0::dataset_waveforms>(m_group, "waveforms", m_idx);
+  m_ds_waveforms = hdf5pp::Utils::readNdarray<uint16_t, 1>(m_group, "waveforms", m_idx);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::FCCD::FccdConfigV2> > make_FccdConfigV2(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {

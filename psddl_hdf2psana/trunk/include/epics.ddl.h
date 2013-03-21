@@ -82,23 +82,6 @@ struct dataset_data {
   operator Psana::Epics::epicsTimeStamp() const { return Psana::Epics::epicsTimeStamp(secPastEpoch, nsec); }
 };
 }
-class Proxy_epicsTimeStamp_v0 : public PSEvt::Proxy<Psana::Epics::epicsTimeStamp> {
-public:
-  typedef Psana::Epics::epicsTimeStamp PsanaType;
-
-  Proxy_epicsTimeStamp_v0(hdf5pp::Group group, hsize_t idx) : m_group(group), m_idx(idx) {}
-  virtual ~Proxy_epicsTimeStamp_v0() {}
-
-protected:
-
-  virtual boost::shared_ptr<PsanaType> getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key);
-
-private:
-
-  mutable hdf5pp::Group m_group;
-  hsize_t m_idx;
-  boost::shared_ptr<PsanaType> m_data;
-};
 
 namespace ns_EpicsPvHeader_v0 {
 struct dataset_data {
@@ -162,23 +145,6 @@ struct dataset_data {
   operator Psana::Epics::PvConfigV1() const { return Psana::Epics::PvConfigV1(pvId, description, interval); }
 };
 }
-class Proxy_PvConfigV1_v0 : public PSEvt::Proxy<Psana::Epics::PvConfigV1> {
-public:
-  typedef Psana::Epics::PvConfigV1 PsanaType;
-
-  Proxy_PvConfigV1_v0(hdf5pp::Group group, hsize_t idx) : m_group(group), m_idx(idx) {}
-  virtual ~Proxy_PvConfigV1_v0() {}
-
-protected:
-
-  virtual boost::shared_ptr<PsanaType> getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key);
-
-private:
-
-  mutable hdf5pp::Group m_group;
-  hsize_t m_idx;
-  boost::shared_ptr<PsanaType> m_data;
-};
 
 namespace ns_ConfigV1_v0 {
 struct dataset_config {

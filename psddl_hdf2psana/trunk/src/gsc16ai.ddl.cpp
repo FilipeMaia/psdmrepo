@@ -113,49 +113,10 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Gsc16ai::ConfigV1> > make_ConfigV1(int ver
     return boost::make_shared<PSEvt::DataProxy<Psana::Gsc16ai::ConfigV1> >(boost::shared_ptr<Psana::Gsc16ai::ConfigV1>());
   }
 }
-
-hdf5pp::Type ns_DataV1_v0_dataset_timestamp_stored_type()
-{
-  typedef ns_DataV1_v0::dataset_timestamp DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  hsize_t _array_type_timestamp_shape[] = { 3 };
-  hdf5pp::ArrayType _array_type_timestamp = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint16_t>::stored_type(), 1, _array_type_timestamp_shape);
-  type.insert("timestamp", offsetof(DsType, timestamp), _array_type_timestamp);
-  return type;
-}
-
-hdf5pp::Type ns_DataV1_v0::dataset_timestamp::stored_type()
-{
-  static hdf5pp::Type type = ns_DataV1_v0_dataset_timestamp_stored_type();
-  return type;
-}
-
-hdf5pp::Type ns_DataV1_v0_dataset_timestamp_native_type()
-{
-  typedef ns_DataV1_v0::dataset_timestamp DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  hsize_t _array_type_timestamp_shape[] = { 3 };
-  hdf5pp::ArrayType _array_type_timestamp = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint16_t>::native_type(), 1, _array_type_timestamp_shape);
-  type.insert("timestamp", offsetof(DsType, timestamp), _array_type_timestamp);
-  return type;
-}
-
-hdf5pp::Type ns_DataV1_v0::dataset_timestamp::native_type()
-{
-  static hdf5pp::Type type = ns_DataV1_v0_dataset_timestamp_native_type();
-  return type;
-}
-ns_DataV1_v0::dataset_timestamp::dataset_timestamp()
-{
-}
-ns_DataV1_v0::dataset_timestamp::~dataset_timestamp()
-{
-}
 template <typename Config>
 ndarray<const uint16_t, 1> DataV1_v0<Config>::timestamp() const {
-  if (not m_ds_timestamp) read_ds_timestamp();
-  boost::shared_ptr<uint16_t> ptr(m_ds_timestamp, m_ds_timestamp->timestamp);
-  return make_ndarray(ptr, 3);
+  if (m_ds_timestamp.empty()) read_ds_timestamp();
+  return m_ds_timestamp;
 }
 template <typename Config>
 ndarray<const uint16_t, 1> DataV1_v0<Config>::channelValue() const {
@@ -164,7 +125,7 @@ ndarray<const uint16_t, 1> DataV1_v0<Config>::channelValue() const {
 }
 template <typename Config>
 void DataV1_v0<Config>::read_ds_timestamp() const {
-  m_ds_timestamp = hdf5pp::Utils::readGroup<Gsc16ai::ns_DataV1_v0::dataset_timestamp>(m_group, "timestamp", m_idx);
+  m_ds_timestamp = hdf5pp::Utils::readNdarray<uint16_t, 1>(m_group, "timestamp", m_idx);
 }
 template <typename Config>
 void DataV1_v0<Config>::read_ds_channelValue() const {

@@ -17,8 +17,7 @@
                 <attribute name="lostRows"/>
             </dataset>
             
-            <dataset name="image">
-                <attribute name="data"/>
+            <dataset name="image" method="data">
             </dataset>
             
         </h5schema>
@@ -35,8 +34,7 @@
                 <attribute name="lostRows"/>
             </dataset>
             
-            <dataset name="image">
-                <attribute name="data"/>
+            <dataset name="image" method="data">
             </dataset>
             
         </h5schema>

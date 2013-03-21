@@ -17,9 +17,7 @@
                 <attribute name="temperature"/>
             </dataset>
             
-            <dataset name="data">
-                <attribute name="data"/>
-            </dataset>
+            <dataset name="data"/>
             
         </h5schema>
     

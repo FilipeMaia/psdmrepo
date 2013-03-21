@@ -1185,11 +1185,11 @@ ndarray<const Psana::EvrData::OutputMap, 1> ConfigV5_v0::output_maps() const {
   return m_ds_output_maps;
 }
 const Psana::EvrData::SequencerConfigV1& ConfigV5_v0::seq_config() const {
-  if (not m_ds_storage_seq_config_seq_config) {
+  if (not m_ds_storage_seq_config) {
     if (not m_ds_seq_config) read_ds_seq_config();
-    m_ds_storage_seq_config_seq_config = boost::make_shared<EvrData::SequencerConfigV1_v0>(m_ds_seq_config);
+    m_ds_storage_seq_config = boost::make_shared<EvrData::SequencerConfigV1_v0>(m_ds_seq_config);
   }
-  return *m_ds_storage_seq_config_seq_config;
+  return *m_ds_storage_seq_config;
 }
 void ConfigV5_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<EvrData::ns_ConfigV5_v0::dataset_config>(m_group, "config", m_idx);
@@ -1214,6 +1214,7 @@ void ConfigV5_v0::read_ds_output_maps() const {
 }
 void ConfigV5_v0::read_ds_seq_config() const {
   m_ds_seq_config = hdf5pp::Utils::readGroup<EvrData::ns_SequencerConfigV1_v0::dataset_config>(m_group, "seq_config", m_idx);
+  m_ds_storage_seq_config = boost::make_shared<SequencerConfigV1_v0>(m_ds_seq_config);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::ConfigV5> > make_ConfigV5(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
@@ -1286,11 +1287,11 @@ ndarray<const Psana::EvrData::OutputMapV2, 1> ConfigV6_v0::output_maps() const {
   return m_ds_output_maps;
 }
 const Psana::EvrData::SequencerConfigV1& ConfigV6_v0::seq_config() const {
-  if (not m_ds_storage_seq_config_seq_config) {
+  if (not m_ds_storage_seq_config) {
     if (not m_ds_seq_config) read_ds_seq_config();
-    m_ds_storage_seq_config_seq_config = boost::make_shared<EvrData::SequencerConfigV1_v0>(m_ds_seq_config);
+    m_ds_storage_seq_config = boost::make_shared<EvrData::SequencerConfigV1_v0>(m_ds_seq_config);
   }
-  return *m_ds_storage_seq_config_seq_config;
+  return *m_ds_storage_seq_config;
 }
 void ConfigV6_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<EvrData::ns_ConfigV6_v0::dataset_config>(m_group, "config", m_idx);
@@ -1315,6 +1316,7 @@ void ConfigV6_v0::read_ds_output_maps() const {
 }
 void ConfigV6_v0::read_ds_seq_config() const {
   m_ds_seq_config = hdf5pp::Utils::readGroup<EvrData::ns_SequencerConfigV1_v0::dataset_config>(m_group, "seq_config", m_idx);
+  m_ds_storage_seq_config = boost::make_shared<SequencerConfigV1_v0>(m_ds_seq_config);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::ConfigV6> > make_ConfigV6(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
@@ -1387,11 +1389,11 @@ ndarray<const Psana::EvrData::OutputMapV2, 1> ConfigV7_v0::output_maps() const {
   return m_ds_output_maps;
 }
 const Psana::EvrData::SequencerConfigV1& ConfigV7_v0::seq_config() const {
-  if (not m_ds_storage_seq_config_seq_config) {
+  if (not m_ds_storage_seq_config) {
     if (not m_ds_seq_config) read_ds_seq_config();
-    m_ds_storage_seq_config_seq_config = boost::make_shared<EvrData::SequencerConfigV1_v0>(m_ds_seq_config);
+    m_ds_storage_seq_config = boost::make_shared<EvrData::SequencerConfigV1_v0>(m_ds_seq_config);
   }
-  return *m_ds_storage_seq_config_seq_config;
+  return *m_ds_storage_seq_config;
 }
 void ConfigV7_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<EvrData::ns_ConfigV7_v0::dataset_config>(m_group, "config", m_idx);
@@ -1416,6 +1418,7 @@ void ConfigV7_v0::read_ds_output_maps() const {
 }
 void ConfigV7_v0::read_ds_seq_config() const {
   m_ds_seq_config = hdf5pp::Utils::readGroup<EvrData::ns_SequencerConfigV1_v0::dataset_config>(m_group, "seq_config", m_idx);
+  m_ds_storage_seq_config = boost::make_shared<SequencerConfigV1_v0>(m_ds_seq_config);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::ConfigV7> > make_ConfigV7(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {

@@ -10,6 +10,20 @@
         <!-- ========================================================================= -->
 
 
+        <h5schema name="CsPadDigitalPotsCfg" version="0">
+            <tag name="skip-proxy"/>
+            <dataset name="data">
+                <attribute name="pots"/>
+            </dataset>
+        </h5schema>
+        
+        <h5schema name="CsPadGainMapCfg" version="0">
+            <tag name="skip-proxy"/>
+            <dataset name="data">
+                <attribute name="gainMap"/>
+            </dataset>
+        </h5schema>
+        
         <h5schema name="ConfigV1QuadReg" version="0">
             <tag name="skip-proxy"/>
             <dataset name="data">
@@ -157,9 +171,7 @@
                 <attribute name="sectionMask"/>
                 <attribute name="sb_temp" rank="1"/>
             </dataset>
-            <dataset name="data">
-                <attribute name="data" rank="3"/>
-            </dataset>
+            <dataset name="data"/>
         </h5schema>
         
         <h5schema name="DataV1" version="0">
@@ -182,9 +194,7 @@
                 <attribute name="sectionMask"/>
                 <attribute name="sb_temp" rank="1"/>
             </dataset>
-            <dataset name="data">
-                <attribute name="data" rank="3"/>
-            </dataset>
+            <dataset name="data"/>
         </h5schema>
         
         <h5schema name="DataV2" version="0">

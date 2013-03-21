@@ -13,7 +13,6 @@
 #include "psddl_hdf2psana/acqiris.ddlm.h"
 #include "psddl_hdf2psana/acqiris.ddlm.h"
 #include "psddl_hdf2psana/acqiris.ddlm.h"
-#include "psddl_hdf2psana/acqiris.ddlm.h"
 namespace psddl_hdf2psana {
 namespace Acqiris {
 
@@ -190,6 +189,93 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::TrigV1> > make_TrigV1(int version
     return boost::make_shared<PSEvt::DataProxy<Psana::Acqiris::TrigV1> >(boost::shared_ptr<Psana::Acqiris::TrigV1>());
   }
 }
+
+hdf5pp::Type ns_ConfigV1_v0_dataset_config_stored_type()
+{
+  typedef ns_ConfigV1_v0::dataset_config DsType;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
+  type.insert("nbrConvertersPerChannel", offsetof(DsType, nbrConvertersPerChannel), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("channelMask", offsetof(DsType, channelMask), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("nbrBanks", offsetof(DsType, nbrBanks), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("nbrChannels", offsetof(DsType, nbrChannels), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  return type;
+}
+
+hdf5pp::Type ns_ConfigV1_v0::dataset_config::stored_type()
+{
+  static hdf5pp::Type type = ns_ConfigV1_v0_dataset_config_stored_type();
+  return type;
+}
+
+hdf5pp::Type ns_ConfigV1_v0_dataset_config_native_type()
+{
+  typedef ns_ConfigV1_v0::dataset_config DsType;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
+  type.insert("nbrConvertersPerChannel", offsetof(DsType, nbrConvertersPerChannel), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("channelMask", offsetof(DsType, channelMask), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("nbrBanks", offsetof(DsType, nbrBanks), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("nbrChannels", offsetof(DsType, nbrChannels), hdf5pp::TypeTraits<uint32_t>::native_type());
+  return type;
+}
+
+hdf5pp::Type ns_ConfigV1_v0::dataset_config::native_type()
+{
+  static hdf5pp::Type type = ns_ConfigV1_v0_dataset_config_native_type();
+  return type;
+}
+ns_ConfigV1_v0::dataset_config::dataset_config()
+{
+}
+ns_ConfigV1_v0::dataset_config::~dataset_config()
+{
+}
+uint32_t ConfigV1_v0::nbrConvertersPerChannel() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->nbrConvertersPerChannel);
+}
+uint32_t ConfigV1_v0::channelMask() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->channelMask);
+}
+uint32_t ConfigV1_v0::nbrBanks() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->nbrBanks);
+}
+const Psana::Acqiris::TrigV1& ConfigV1_v0::trig() const {
+  if (not m_ds_trig) read_ds_trig();
+  m_ds_storage_trig = Psana::Acqiris::TrigV1(*m_ds_trig);
+  return m_ds_storage_trig;
+}
+const Psana::Acqiris::HorizV1& ConfigV1_v0::horiz() const {
+  if (not m_ds_horiz) read_ds_horiz();
+  m_ds_storage_horiz = Psana::Acqiris::HorizV1(*m_ds_horiz);
+  return m_ds_storage_horiz;
+}
+ndarray<const Psana::Acqiris::VertV1, 1> ConfigV1_v0::vert() const {
+  if (m_ds_vert.empty()) read_ds_vert();
+  return m_ds_vert;
+}
+uint32_t ConfigV1_v0::nbrChannels() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->nbrChannels);
+}
+void ConfigV1_v0::read_ds_config() const {
+  m_ds_config = hdf5pp::Utils::readGroup<Acqiris::ns_ConfigV1_v0::dataset_config>(m_group, "config", m_idx);
+}
+void ConfigV1_v0::read_ds_horiz() const {
+  m_ds_horiz = hdf5pp::Utils::readGroup<Acqiris::ns_HorizV1_v0::dataset_data>(m_group, "horiz", m_idx);
+  m_ds_storage_horiz = *m_ds_horiz;
+}
+void ConfigV1_v0::read_ds_trig() const {
+  m_ds_trig = hdf5pp::Utils::readGroup<Acqiris::ns_TrigV1_v0::dataset_data>(m_group, "trig", m_idx);
+  m_ds_storage_trig = *m_ds_trig;
+}
+void ConfigV1_v0::read_ds_vert() const {
+  ndarray<Acqiris::ns_VertV1_v0::dataset_data, 1> arr = hdf5pp::Utils::readNdarray<Acqiris::ns_VertV1_v0::dataset_data, 1>(m_group, "vert", m_idx);
+  ndarray<Psana::Acqiris::VertV1, 1> tmp(arr.shape());
+  std::copy(arr.begin(), arr.end(), tmp.begin());
+  m_ds_vert = tmp;
+}
 boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -236,16 +322,6 @@ ns_TimestampV1_v0::dataset_data::dataset_data()
 ns_TimestampV1_v0::dataset_data::~dataset_data()
 {
 }
-boost::shared_ptr<Psana::Acqiris::TimestampV1>
-Proxy_TimestampV1_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key)
-{
-  if (not m_data) {
-    boost::shared_ptr<Acqiris::ns_TimestampV1_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<Acqiris::ns_TimestampV1_v0::dataset_data>(m_group, "data", m_idx);
-    m_data.reset(new PsanaType(ds_data->pos, ds_data->timeStampLo, ds_data->timeStampHi));
-  }
-  return m_data;
-}
-
 boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::DataDescV1> > make_DataDescV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::Acqiris::ConfigV1>& cfg) {
   switch (version) {
   case 0:
@@ -511,114 +587,66 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::TdcVetoIO> > make_TdcVetoIO(int v
   }
 }
 
-hdf5pp::Type ns_TdcConfigV1_v0_dataset_channels_stored_type()
+hdf5pp::Type ns_TdcConfigV1_v0_dataset_config_stored_type()
 {
-  typedef ns_TdcConfigV1_v0::dataset_channels DsType;
+  typedef ns_TdcConfigV1_v0::dataset_config DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  hsize_t _array_type_channels_shape[] = { 8 };
-  hdf5pp::ArrayType _array_type_channels = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<Acqiris::ns_TdcChannel_v0::dataset_data>::stored_type(), 1, _array_type_channels_shape);
-  type.insert("channels", offsetof(DsType, channels), _array_type_channels);
+  type.insert("veto", offsetof(DsType, veto), hdf5pp::TypeTraits<Acqiris::ns_TdcVetoIO_v0::dataset_data>::stored_type());
   return type;
 }
 
-hdf5pp::Type ns_TdcConfigV1_v0::dataset_channels::stored_type()
+hdf5pp::Type ns_TdcConfigV1_v0::dataset_config::stored_type()
 {
-  static hdf5pp::Type type = ns_TdcConfigV1_v0_dataset_channels_stored_type();
+  static hdf5pp::Type type = ns_TdcConfigV1_v0_dataset_config_stored_type();
   return type;
 }
 
-hdf5pp::Type ns_TdcConfigV1_v0_dataset_channels_native_type()
+hdf5pp::Type ns_TdcConfigV1_v0_dataset_config_native_type()
 {
-  typedef ns_TdcConfigV1_v0::dataset_channels DsType;
+  typedef ns_TdcConfigV1_v0::dataset_config DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  hsize_t _array_type_channels_shape[] = { 8 };
-  hdf5pp::ArrayType _array_type_channels = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<Acqiris::ns_TdcChannel_v0::dataset_data>::native_type(), 1, _array_type_channels_shape);
-  type.insert("channels", offsetof(DsType, channels), _array_type_channels);
+  type.insert("veto", offsetof(DsType, veto), hdf5pp::TypeTraits<Acqiris::ns_TdcVetoIO_v0::dataset_data>::native_type());
   return type;
 }
 
-hdf5pp::Type ns_TdcConfigV1_v0::dataset_channels::native_type()
+hdf5pp::Type ns_TdcConfigV1_v0::dataset_config::native_type()
 {
-  static hdf5pp::Type type = ns_TdcConfigV1_v0_dataset_channels_native_type();
+  static hdf5pp::Type type = ns_TdcConfigV1_v0_dataset_config_native_type();
   return type;
 }
-ns_TdcConfigV1_v0::dataset_channels::dataset_channels()
+ns_TdcConfigV1_v0::dataset_config::dataset_config()
 {
 }
-ns_TdcConfigV1_v0::dataset_channels::~dataset_channels()
-{
-}
-
-hdf5pp::Type ns_TdcConfigV1_v0_dataset_auxio_stored_type()
-{
-  typedef ns_TdcConfigV1_v0::dataset_auxio DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  hsize_t _array_type_auxio_shape[] = { 2 };
-  hdf5pp::ArrayType _array_type_auxio = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<Acqiris::ns_TdcAuxIO_v0::dataset_data>::stored_type(), 1, _array_type_auxio_shape);
-  type.insert("auxio", offsetof(DsType, auxio), _array_type_auxio);
-  return type;
-}
-
-hdf5pp::Type ns_TdcConfigV1_v0::dataset_auxio::stored_type()
-{
-  static hdf5pp::Type type = ns_TdcConfigV1_v0_dataset_auxio_stored_type();
-  return type;
-}
-
-hdf5pp::Type ns_TdcConfigV1_v0_dataset_auxio_native_type()
-{
-  typedef ns_TdcConfigV1_v0::dataset_auxio DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  hsize_t _array_type_auxio_shape[] = { 2 };
-  hdf5pp::ArrayType _array_type_auxio = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<Acqiris::ns_TdcAuxIO_v0::dataset_data>::native_type(), 1, _array_type_auxio_shape);
-  type.insert("auxio", offsetof(DsType, auxio), _array_type_auxio);
-  return type;
-}
-
-hdf5pp::Type ns_TdcConfigV1_v0::dataset_auxio::native_type()
-{
-  static hdf5pp::Type type = ns_TdcConfigV1_v0_dataset_auxio_native_type();
-  return type;
-}
-ns_TdcConfigV1_v0::dataset_auxio::dataset_auxio()
-{
-}
-ns_TdcConfigV1_v0::dataset_auxio::~dataset_auxio()
+ns_TdcConfigV1_v0::dataset_config::~dataset_config()
 {
 }
 ndarray<const Psana::Acqiris::TdcChannel, 1> TdcConfigV1_v0::channels() const {
-  if (not m_ds_channels) read_ds_channels();
-  if (m_ds_storage_channels_channels.empty()) {
-    unsigned shape[] = {NChannels};
-    ndarray<Psana::Acqiris::TdcChannel, 1> tmparr(shape);
-    std::copy(m_ds_channels->channels, m_ds_channels->channels+8, tmparr.begin());
-    m_ds_storage_channels_channels = tmparr;
-  }
-  return m_ds_storage_channels_channels;
+  if (m_ds_channels.empty()) read_ds_channels();
+  return m_ds_channels;
 }
 ndarray<const Psana::Acqiris::TdcAuxIO, 1> TdcConfigV1_v0::auxio() const {
-  if (not m_ds_auxio) read_ds_auxio();
-  if (m_ds_storage_auxio_auxio.empty()) {
-    unsigned shape[] = {NAuxIO};
-    ndarray<Psana::Acqiris::TdcAuxIO, 1> tmparr(shape);
-    std::copy(m_ds_auxio->auxio, m_ds_auxio->auxio+2, tmparr.begin());
-    m_ds_storage_auxio_auxio = tmparr;
-  }
-  return m_ds_storage_auxio_auxio;
+  if (m_ds_auxio.empty()) read_ds_auxio();
+  return m_ds_auxio;
 }
 const Psana::Acqiris::TdcVetoIO& TdcConfigV1_v0::veto() const {
   if (not m_ds_config) read_ds_config();
-  m_ds_storage_config_veto = Psana::Acqiris::TdcVetoIO(*m_ds_config);
+  m_ds_storage_config_veto = Psana::Acqiris::TdcVetoIO(m_ds_config->veto);
   return m_ds_storage_config_veto;
 }
 void TdcConfigV1_v0::read_ds_config() const {
-  m_ds_config = hdf5pp::Utils::readGroup<Acqiris::ns_TdcVetoIO_v0::dataset_data>(m_group, "config", m_idx);
+  m_ds_config = hdf5pp::Utils::readGroup<Acqiris::ns_TdcConfigV1_v0::dataset_config>(m_group, "config", m_idx);
 }
 void TdcConfigV1_v0::read_ds_channels() const {
-  m_ds_channels = hdf5pp::Utils::readGroup<Acqiris::ns_TdcConfigV1_v0::dataset_channels>(m_group, "channels", m_idx);
+  ndarray<Acqiris::ns_TdcChannel_v0::dataset_data, 1> arr = hdf5pp::Utils::readNdarray<Acqiris::ns_TdcChannel_v0::dataset_data, 1>(m_group, "channels", m_idx);
+  ndarray<Psana::Acqiris::TdcChannel, 1> tmp(arr.shape());
+  std::copy(arr.begin(), arr.end(), tmp.begin());
+  m_ds_channels = tmp;
 }
 void TdcConfigV1_v0::read_ds_auxio() const {
-  m_ds_auxio = hdf5pp::Utils::readGroup<Acqiris::ns_TdcConfigV1_v0::dataset_auxio>(m_group, "auxio", m_idx);
+  ndarray<Acqiris::ns_TdcAuxIO_v0::dataset_data, 1> arr = hdf5pp::Utils::readNdarray<Acqiris::ns_TdcAuxIO_v0::dataset_data, 1>(m_group, "auxio", m_idx);
+  ndarray<Psana::Acqiris::TdcAuxIO, 1> tmp(arr.shape());
+  std::copy(arr.begin(), arr.end(), tmp.begin());
+  m_ds_auxio = tmp;
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::TdcConfigV1> > make_TdcConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {

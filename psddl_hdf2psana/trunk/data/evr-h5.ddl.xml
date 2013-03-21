@@ -51,21 +51,13 @@
                 <attribute name="noutputs"/>
             </dataset>
 
-            <dataset name="eventcodes">
-                <attribute name="eventcodes"/>
-            </dataset>
+            <dataset name="eventcodes"/>
             
-            <dataset name="pulses">
-                <attribute name="pulses"/>
-            </dataset>
+            <dataset name="pulses"/>
             
-            <dataset name="output_maps">
-                <attribute name="output_maps"/>
-            </dataset>
+            <dataset name="output_maps"/>
             
-            <dataset name="seq_config">
-                <attribute name="seq_config"/>
-            </dataset>
+            <dataset name="seq_config"/>
             
         </h5schema>
     
@@ -79,21 +71,13 @@
                 <attribute name="noutputs"/>
             </dataset>
 
-            <dataset name="eventcodes">
-                <attribute name="eventcodes"/>
-            </dataset>
+            <dataset name="eventcodes"/>
             
-            <dataset name="pulses">
-                <attribute name="pulses"/>
-            </dataset>
+            <dataset name="pulses"/>
             
-            <dataset name="output_maps">
-                <attribute name="output_maps"/>
-            </dataset>
+            <dataset name="output_maps"/>
             
-            <dataset name="seq_config">
-                <attribute name="seq_config"/>
-            </dataset>
+            <dataset name="seq_config"/>
             
         </h5schema>
     
@@ -107,21 +91,13 @@
                 <attribute name="noutputs"/>
             </dataset>
 
-            <dataset name="eventcodes">
-                <attribute name="eventcodes"/>
-            </dataset>
+            <dataset name="eventcodes"/>
             
-            <dataset name="pulses">
-                <attribute name="pulses"/>
-            </dataset>
+            <dataset name="pulses"/>
             
-            <dataset name="output_maps">
-                <attribute name="output_maps"/>
-            </dataset>
+            <dataset name="output_maps"/>
             
-            <dataset name="seq_config">
-                <attribute name="seq_config"/>
-            </dataset>
+            <dataset name="seq_config"/>
             
         </h5schema>
     

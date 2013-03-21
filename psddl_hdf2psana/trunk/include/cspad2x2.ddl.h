@@ -60,12 +60,12 @@ namespace CsPad2x2 {
   };
 
 namespace ns_CsPad2x2DigitalPotsCfg_v0 {
-struct dataset_pots {
+struct dataset_data {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
-  dataset_pots();
-  ~dataset_pots();
+  dataset_data();
+  ~dataset_data();
 
   uint8_t pots[80]; 
 
@@ -79,17 +79,16 @@ public:
   CsPad2x2DigitalPotsCfg_v0() {}
   CsPad2x2DigitalPotsCfg_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
-  CsPad2x2DigitalPotsCfg_v0(const boost::shared_ptr<CsPad2x2::ns_CsPad2x2DigitalPotsCfg_v0::dataset_pots>& ds) : m_ds_pots(ds) {}
+  CsPad2x2DigitalPotsCfg_v0(const boost::shared_ptr<CsPad2x2::ns_CsPad2x2DigitalPotsCfg_v0::dataset_data>& ds) : m_ds_data(ds) {}
   virtual ~CsPad2x2DigitalPotsCfg_v0() {}
   virtual ndarray<const uint8_t, 1> pots() const;
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
-  mutable boost::shared_ptr<CsPad2x2::ns_CsPad2x2DigitalPotsCfg_v0::dataset_pots> m_ds_pots;
-  void read_ds_pots() const;
+  mutable boost::shared_ptr<CsPad2x2::ns_CsPad2x2DigitalPotsCfg_v0::dataset_data> m_ds_data;
+  void read_ds_data() const;
 };
 
-boost::shared_ptr<PSEvt::Proxy<Psana::CsPad2x2::CsPad2x2DigitalPotsCfg> > make_CsPad2x2DigitalPotsCfg(int version, hdf5pp::Group group, hsize_t idx);
 
 namespace ns_CsPad2x2ReadOnlyCfg_v0 {
 struct dataset_data {
@@ -158,12 +157,12 @@ private:
 boost::shared_ptr<PSEvt::Proxy<Psana::CsPad2x2::ProtectionSystemThreshold> > make_ProtectionSystemThreshold(int version, hdf5pp::Group group, hsize_t idx);
 
 namespace ns_CsPad2x2GainMapCfg_v0 {
-struct dataset_gainMap {
+struct dataset_data {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
-  dataset_gainMap();
-  ~dataset_gainMap();
+  dataset_data();
+  ~dataset_data();
 
   uint16_t gainMap[35890]; 
 
@@ -177,17 +176,16 @@ public:
   CsPad2x2GainMapCfg_v0() {}
   CsPad2x2GainMapCfg_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
-  CsPad2x2GainMapCfg_v0(const boost::shared_ptr<CsPad2x2::ns_CsPad2x2GainMapCfg_v0::dataset_gainMap>& ds) : m_ds_gainMap(ds) {}
+  CsPad2x2GainMapCfg_v0(const boost::shared_ptr<CsPad2x2::ns_CsPad2x2GainMapCfg_v0::dataset_data>& ds) : m_ds_data(ds) {}
   virtual ~CsPad2x2GainMapCfg_v0() {}
   virtual ndarray<const uint16_t, 2> gainMap() const;
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
-  mutable boost::shared_ptr<CsPad2x2::ns_CsPad2x2GainMapCfg_v0::dataset_gainMap> m_ds_gainMap;
-  void read_ds_gainMap() const;
+  mutable boost::shared_ptr<CsPad2x2::ns_CsPad2x2GainMapCfg_v0::dataset_data> m_ds_data;
+  void read_ds_data() const;
 };
 
-boost::shared_ptr<PSEvt::Proxy<Psana::CsPad2x2::CsPad2x2GainMapCfg> > make_CsPad2x2GainMapCfg(int version, hdf5pp::Group group, hsize_t idx);
 
 namespace ns_ConfigV1QuadReg_v0 {
 struct dataset_data {
@@ -219,8 +217,8 @@ struct dataset_data {
   uint32_t humidThold; 
   uint32_t setPoint; 
   CsPad2x2::ns_CsPad2x2ReadOnlyCfg_v0::dataset_data readOnly; 
-  CsPad2x2::ns_CsPad2x2DigitalPotsCfg_v0::dataset_pots digitalPots; 
-  CsPad2x2::ns_CsPad2x2GainMapCfg_v0::dataset_gainMap gainMap; 
+  CsPad2x2::ns_CsPad2x2DigitalPotsCfg_v0::dataset_data digitalPots; 
+  CsPad2x2::ns_CsPad2x2GainMapCfg_v0::dataset_data gainMap; 
 
 };
 }
@@ -359,8 +357,8 @@ struct dataset_data {
   uint32_t biasTuning; 
   uint32_t pdpmndnmBalance; 
   CsPad2x2::ns_CsPad2x2ReadOnlyCfg_v0::dataset_data readOnly; 
-  CsPad2x2::ns_CsPad2x2DigitalPotsCfg_v0::dataset_pots digitalPots; 
-  CsPad2x2::ns_CsPad2x2GainMapCfg_v0::dataset_gainMap gainMap; 
+  CsPad2x2::ns_CsPad2x2DigitalPotsCfg_v0::dataset_data digitalPots; 
+  CsPad2x2::ns_CsPad2x2GainMapCfg_v0::dataset_data gainMap; 
 
 };
 }

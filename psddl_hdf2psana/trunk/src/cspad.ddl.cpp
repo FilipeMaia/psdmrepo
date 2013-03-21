@@ -13,9 +13,9 @@
 namespace psddl_hdf2psana {
 namespace CsPad {
 
-hdf5pp::Type ns_CsPadDigitalPotsCfg_v0_dataset_pots_stored_type()
+hdf5pp::Type ns_CsPadDigitalPotsCfg_v0_dataset_data_stored_type()
 {
-  typedef ns_CsPadDigitalPotsCfg_v0::dataset_pots DsType;
+  typedef ns_CsPadDigitalPotsCfg_v0::dataset_data DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
   hsize_t _array_type_pots_shape[] = { 80 };
   hdf5pp::ArrayType _array_type_pots = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint8_t>::stored_type(), 1, _array_type_pots_shape);
@@ -23,15 +23,15 @@ hdf5pp::Type ns_CsPadDigitalPotsCfg_v0_dataset_pots_stored_type()
   return type;
 }
 
-hdf5pp::Type ns_CsPadDigitalPotsCfg_v0::dataset_pots::stored_type()
+hdf5pp::Type ns_CsPadDigitalPotsCfg_v0::dataset_data::stored_type()
 {
-  static hdf5pp::Type type = ns_CsPadDigitalPotsCfg_v0_dataset_pots_stored_type();
+  static hdf5pp::Type type = ns_CsPadDigitalPotsCfg_v0_dataset_data_stored_type();
   return type;
 }
 
-hdf5pp::Type ns_CsPadDigitalPotsCfg_v0_dataset_pots_native_type()
+hdf5pp::Type ns_CsPadDigitalPotsCfg_v0_dataset_data_native_type()
 {
-  typedef ns_CsPadDigitalPotsCfg_v0::dataset_pots DsType;
+  typedef ns_CsPadDigitalPotsCfg_v0::dataset_data DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
   hsize_t _array_type_pots_shape[] = { 80 };
   hdf5pp::ArrayType _array_type_pots = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint8_t>::native_type(), 1, _array_type_pots_shape);
@@ -39,32 +39,24 @@ hdf5pp::Type ns_CsPadDigitalPotsCfg_v0_dataset_pots_native_type()
   return type;
 }
 
-hdf5pp::Type ns_CsPadDigitalPotsCfg_v0::dataset_pots::native_type()
+hdf5pp::Type ns_CsPadDigitalPotsCfg_v0::dataset_data::native_type()
 {
-  static hdf5pp::Type type = ns_CsPadDigitalPotsCfg_v0_dataset_pots_native_type();
+  static hdf5pp::Type type = ns_CsPadDigitalPotsCfg_v0_dataset_data_native_type();
   return type;
 }
-ns_CsPadDigitalPotsCfg_v0::dataset_pots::dataset_pots()
+ns_CsPadDigitalPotsCfg_v0::dataset_data::dataset_data()
 {
 }
-ns_CsPadDigitalPotsCfg_v0::dataset_pots::~dataset_pots()
+ns_CsPadDigitalPotsCfg_v0::dataset_data::~dataset_data()
 {
 }
 ndarray<const uint8_t, 1> CsPadDigitalPotsCfg_v0::pots() const {
-  if (not m_ds_pots) read_ds_pots();
-  boost::shared_ptr<uint8_t> ptr(m_ds_pots, m_ds_pots->pots);
+  if (not m_ds_data) read_ds_data();
+  boost::shared_ptr<uint8_t> ptr(m_ds_data, m_ds_data->pots);
   return make_ndarray(ptr, PotsPerQuad);
 }
-void CsPadDigitalPotsCfg_v0::read_ds_pots() const {
-  m_ds_pots = hdf5pp::Utils::readGroup<CsPad::ns_CsPadDigitalPotsCfg_v0::dataset_pots>(m_group, "pots", m_idx);
-}
-boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::CsPadDigitalPotsCfg> > make_CsPadDigitalPotsCfg(int version, hdf5pp::Group group, hsize_t idx) {
-  switch (version) {
-  case 0:
-    return boost::make_shared<PSEvt::DataProxy<Psana::CsPad::CsPadDigitalPotsCfg> >(boost::make_shared<CsPadDigitalPotsCfg_v0>(group, idx));
-  default:
-    return boost::make_shared<PSEvt::DataProxy<Psana::CsPad::CsPadDigitalPotsCfg> >(boost::shared_ptr<Psana::CsPad::CsPadDigitalPotsCfg>());
-  }
+void CsPadDigitalPotsCfg_v0::read_ds_data() const {
+  m_ds_data = hdf5pp::Utils::readGroup<CsPad::ns_CsPadDigitalPotsCfg_v0::dataset_data>(m_group, "data", m_idx);
 }
 
 hdf5pp::Type ns_CsPadReadOnlyCfg_v0_dataset_data_stored_type()
@@ -175,9 +167,9 @@ boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::ProtectionSystemThreshold> > make_P
   }
 }
 
-hdf5pp::Type ns_CsPadGainMapCfg_v0_dataset_gainMap_stored_type()
+hdf5pp::Type ns_CsPadGainMapCfg_v0_dataset_data_stored_type()
 {
-  typedef ns_CsPadGainMapCfg_v0::dataset_gainMap DsType;
+  typedef ns_CsPadGainMapCfg_v0::dataset_data DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
   hsize_t _array_type_gainMap_shape[] = { 185, 194 };
   hdf5pp::ArrayType _array_type_gainMap = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint16_t>::stored_type(), 2, _array_type_gainMap_shape);
@@ -185,15 +177,15 @@ hdf5pp::Type ns_CsPadGainMapCfg_v0_dataset_gainMap_stored_type()
   return type;
 }
 
-hdf5pp::Type ns_CsPadGainMapCfg_v0::dataset_gainMap::stored_type()
+hdf5pp::Type ns_CsPadGainMapCfg_v0::dataset_data::stored_type()
 {
-  static hdf5pp::Type type = ns_CsPadGainMapCfg_v0_dataset_gainMap_stored_type();
+  static hdf5pp::Type type = ns_CsPadGainMapCfg_v0_dataset_data_stored_type();
   return type;
 }
 
-hdf5pp::Type ns_CsPadGainMapCfg_v0_dataset_gainMap_native_type()
+hdf5pp::Type ns_CsPadGainMapCfg_v0_dataset_data_native_type()
 {
-  typedef ns_CsPadGainMapCfg_v0::dataset_gainMap DsType;
+  typedef ns_CsPadGainMapCfg_v0::dataset_data DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
   hsize_t _array_type_gainMap_shape[] = { 185, 194 };
   hdf5pp::ArrayType _array_type_gainMap = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint16_t>::native_type(), 2, _array_type_gainMap_shape);
@@ -201,32 +193,24 @@ hdf5pp::Type ns_CsPadGainMapCfg_v0_dataset_gainMap_native_type()
   return type;
 }
 
-hdf5pp::Type ns_CsPadGainMapCfg_v0::dataset_gainMap::native_type()
+hdf5pp::Type ns_CsPadGainMapCfg_v0::dataset_data::native_type()
 {
-  static hdf5pp::Type type = ns_CsPadGainMapCfg_v0_dataset_gainMap_native_type();
+  static hdf5pp::Type type = ns_CsPadGainMapCfg_v0_dataset_data_native_type();
   return type;
 }
-ns_CsPadGainMapCfg_v0::dataset_gainMap::dataset_gainMap()
+ns_CsPadGainMapCfg_v0::dataset_data::dataset_data()
 {
 }
-ns_CsPadGainMapCfg_v0::dataset_gainMap::~dataset_gainMap()
+ns_CsPadGainMapCfg_v0::dataset_data::~dataset_data()
 {
 }
 ndarray<const uint16_t, 2> CsPadGainMapCfg_v0::gainMap() const {
-  if (not m_ds_gainMap) read_ds_gainMap();
-  boost::shared_ptr<uint16_t> ptr(m_ds_gainMap, m_ds_gainMap->gainMap);
+  if (not m_ds_data) read_ds_data();
+  boost::shared_ptr<uint16_t> ptr(m_ds_data, m_ds_data->gainMap);
   return make_ndarray(ptr, ColumnsPerASIC,MaxRowsPerASIC);
 }
-void CsPadGainMapCfg_v0::read_ds_gainMap() const {
-  m_ds_gainMap = hdf5pp::Utils::readGroup<CsPad::ns_CsPadGainMapCfg_v0::dataset_gainMap>(m_group, "gainMap", m_idx);
-}
-boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::CsPadGainMapCfg> > make_CsPadGainMapCfg(int version, hdf5pp::Group group, hsize_t idx) {
-  switch (version) {
-  case 0:
-    return boost::make_shared<PSEvt::DataProxy<Psana::CsPad::CsPadGainMapCfg> >(boost::make_shared<CsPadGainMapCfg_v0>(group, idx));
-  default:
-    return boost::make_shared<PSEvt::DataProxy<Psana::CsPad::CsPadGainMapCfg> >(boost::shared_ptr<Psana::CsPad::CsPadGainMapCfg>());
-  }
+void CsPadGainMapCfg_v0::read_ds_data() const {
+  m_ds_data = hdf5pp::Utils::readGroup<CsPad::ns_CsPadGainMapCfg_v0::dataset_data>(m_group, "data", m_idx);
 }
 
 hdf5pp::Type ns_ConfigV1QuadReg_v0_dataset_data_stored_type()
@@ -244,8 +228,8 @@ hdf5pp::Type ns_ConfigV1QuadReg_v0_dataset_data_stored_type()
   type.insert("injTotal", offsetof(DsType, injTotal), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("rowColShiftPer", offsetof(DsType, rowColShiftPer), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("readOnly", offsetof(DsType, readOnly), hdf5pp::TypeTraits<CsPad::ns_CsPadReadOnlyCfg_v0::dataset_data>::stored_type());
-  type.insert("digitalPots", offsetof(DsType, digitalPots), hdf5pp::TypeTraits<CsPad::ns_CsPadDigitalPotsCfg_v0::dataset_pots>::stored_type());
-  type.insert("gainMap", offsetof(DsType, gainMap), hdf5pp::TypeTraits<CsPad::ns_CsPadGainMapCfg_v0::dataset_gainMap>::stored_type());
+  type.insert("digitalPots", offsetof(DsType, digitalPots), hdf5pp::TypeTraits<CsPad::ns_CsPadDigitalPotsCfg_v0::dataset_data>::stored_type());
+  type.insert("gainMap", offsetof(DsType, gainMap), hdf5pp::TypeTraits<CsPad::ns_CsPadGainMapCfg_v0::dataset_data>::stored_type());
   hsize_t _array_type_shiftSelect_shape[] = { 4 };
   hdf5pp::ArrayType _array_type_shiftSelect = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint32_t>::stored_type(), 1, _array_type_shiftSelect_shape);
   type.insert("shiftSelect", offsetof(DsType, shiftSelect), _array_type_shiftSelect);
@@ -276,8 +260,8 @@ hdf5pp::Type ns_ConfigV1QuadReg_v0_dataset_data_native_type()
   type.insert("injTotal", offsetof(DsType, injTotal), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("rowColShiftPer", offsetof(DsType, rowColShiftPer), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("readOnly", offsetof(DsType, readOnly), hdf5pp::TypeTraits<CsPad::ns_CsPadReadOnlyCfg_v0::dataset_data>::native_type());
-  type.insert("digitalPots", offsetof(DsType, digitalPots), hdf5pp::TypeTraits<CsPad::ns_CsPadDigitalPotsCfg_v0::dataset_pots>::native_type());
-  type.insert("gainMap", offsetof(DsType, gainMap), hdf5pp::TypeTraits<CsPad::ns_CsPadGainMapCfg_v0::dataset_gainMap>::native_type());
+  type.insert("digitalPots", offsetof(DsType, digitalPots), hdf5pp::TypeTraits<CsPad::ns_CsPadDigitalPotsCfg_v0::dataset_data>::native_type());
+  type.insert("gainMap", offsetof(DsType, gainMap), hdf5pp::TypeTraits<CsPad::ns_CsPadGainMapCfg_v0::dataset_data>::native_type());
   hsize_t _array_type_shiftSelect_shape[] = { 4 };
   hdf5pp::ArrayType _array_type_shiftSelect = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint32_t>::native_type(), 1, _array_type_shiftSelect_shape);
   type.insert("shiftSelect", offsetof(DsType, shiftSelect), _array_type_shiftSelect);
@@ -356,7 +340,7 @@ const Psana::CsPad::CsPadReadOnlyCfg& ConfigV1QuadReg_v0::ro() const {
 const Psana::CsPad::CsPadDigitalPotsCfg& ConfigV1QuadReg_v0::dp() const {
   if (not m_ds_storage_data_digitalPots) {
     if (not m_ds_data) read_ds_data();
-    boost::shared_ptr<CsPad::ns_CsPadDigitalPotsCfg_v0::dataset_pots> tmp(m_ds_data, &m_ds_data->digitalPots);
+    boost::shared_ptr<CsPad::ns_CsPadDigitalPotsCfg_v0::dataset_data> tmp(m_ds_data, &m_ds_data->digitalPots);
     m_ds_storage_data_digitalPots = boost::make_shared<CsPad::CsPadDigitalPotsCfg_v0>(tmp);
   }
   return *m_ds_storage_data_digitalPots;
@@ -364,7 +348,7 @@ const Psana::CsPad::CsPadDigitalPotsCfg& ConfigV1QuadReg_v0::dp() const {
 const Psana::CsPad::CsPadGainMapCfg& ConfigV1QuadReg_v0::gm() const {
   if (not m_ds_storage_data_gainMap) {
     if (not m_ds_data) read_ds_data();
-    boost::shared_ptr<CsPad::ns_CsPadGainMapCfg_v0::dataset_gainMap> tmp(m_ds_data, &m_ds_data->gainMap);
+    boost::shared_ptr<CsPad::ns_CsPadGainMapCfg_v0::dataset_data> tmp(m_ds_data, &m_ds_data->gainMap);
     m_ds_storage_data_gainMap = boost::make_shared<CsPad::CsPadGainMapCfg_v0>(tmp);
   }
   return *m_ds_storage_data_gainMap;
@@ -391,8 +375,8 @@ hdf5pp::Type ns_ConfigV2QuadReg_v0_dataset_data_stored_type()
   type.insert("digCount", offsetof(DsType, digCount), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("digPeriod", offsetof(DsType, digPeriod), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("readOnly", offsetof(DsType, readOnly), hdf5pp::TypeTraits<CsPad::ns_CsPadReadOnlyCfg_v0::dataset_data>::stored_type());
-  type.insert("digitalPots", offsetof(DsType, digitalPots), hdf5pp::TypeTraits<CsPad::ns_CsPadDigitalPotsCfg_v0::dataset_pots>::stored_type());
-  type.insert("gainMap", offsetof(DsType, gainMap), hdf5pp::TypeTraits<CsPad::ns_CsPadGainMapCfg_v0::dataset_gainMap>::stored_type());
+  type.insert("digitalPots", offsetof(DsType, digitalPots), hdf5pp::TypeTraits<CsPad::ns_CsPadDigitalPotsCfg_v0::dataset_data>::stored_type());
+  type.insert("gainMap", offsetof(DsType, gainMap), hdf5pp::TypeTraits<CsPad::ns_CsPadGainMapCfg_v0::dataset_data>::stored_type());
   hsize_t _array_type_shiftSelect_shape[] = { 4 };
   hdf5pp::ArrayType _array_type_shiftSelect = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint32_t>::stored_type(), 1, _array_type_shiftSelect_shape);
   type.insert("shiftSelect", offsetof(DsType, shiftSelect), _array_type_shiftSelect);
@@ -426,8 +410,8 @@ hdf5pp::Type ns_ConfigV2QuadReg_v0_dataset_data_native_type()
   type.insert("digCount", offsetof(DsType, digCount), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("digPeriod", offsetof(DsType, digPeriod), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("readOnly", offsetof(DsType, readOnly), hdf5pp::TypeTraits<CsPad::ns_CsPadReadOnlyCfg_v0::dataset_data>::native_type());
-  type.insert("digitalPots", offsetof(DsType, digitalPots), hdf5pp::TypeTraits<CsPad::ns_CsPadDigitalPotsCfg_v0::dataset_pots>::native_type());
-  type.insert("gainMap", offsetof(DsType, gainMap), hdf5pp::TypeTraits<CsPad::ns_CsPadGainMapCfg_v0::dataset_gainMap>::native_type());
+  type.insert("digitalPots", offsetof(DsType, digitalPots), hdf5pp::TypeTraits<CsPad::ns_CsPadDigitalPotsCfg_v0::dataset_data>::native_type());
+  type.insert("gainMap", offsetof(DsType, gainMap), hdf5pp::TypeTraits<CsPad::ns_CsPadGainMapCfg_v0::dataset_data>::native_type());
   hsize_t _array_type_shiftSelect_shape[] = { 4 };
   hdf5pp::ArrayType _array_type_shiftSelect = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint32_t>::native_type(), 1, _array_type_shiftSelect_shape);
   type.insert("shiftSelect", offsetof(DsType, shiftSelect), _array_type_shiftSelect);
@@ -518,7 +502,7 @@ const Psana::CsPad::CsPadReadOnlyCfg& ConfigV2QuadReg_v0::ro() const {
 const Psana::CsPad::CsPadDigitalPotsCfg& ConfigV2QuadReg_v0::dp() const {
   if (not m_ds_storage_data_digitalPots) {
     if (not m_ds_data) read_ds_data();
-    boost::shared_ptr<CsPad::ns_CsPadDigitalPotsCfg_v0::dataset_pots> tmp(m_ds_data, &m_ds_data->digitalPots);
+    boost::shared_ptr<CsPad::ns_CsPadDigitalPotsCfg_v0::dataset_data> tmp(m_ds_data, &m_ds_data->digitalPots);
     m_ds_storage_data_digitalPots = boost::make_shared<CsPad::CsPadDigitalPotsCfg_v0>(tmp);
   }
   return *m_ds_storage_data_digitalPots;
@@ -526,7 +510,7 @@ const Psana::CsPad::CsPadDigitalPotsCfg& ConfigV2QuadReg_v0::dp() const {
 const Psana::CsPad::CsPadGainMapCfg& ConfigV2QuadReg_v0::gm() const {
   if (not m_ds_storage_data_gainMap) {
     if (not m_ds_data) read_ds_data();
-    boost::shared_ptr<CsPad::ns_CsPadGainMapCfg_v0::dataset_gainMap> tmp(m_ds_data, &m_ds_data->gainMap);
+    boost::shared_ptr<CsPad::ns_CsPadGainMapCfg_v0::dataset_data> tmp(m_ds_data, &m_ds_data->gainMap);
     m_ds_storage_data_gainMap = boost::make_shared<CsPad::CsPadGainMapCfg_v0>(tmp);
   }
   return *m_ds_storage_data_gainMap;

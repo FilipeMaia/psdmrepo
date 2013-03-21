@@ -60,19 +60,6 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Gsc16ai::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx);
 
-namespace ns_DataV1_v0 {
-struct dataset_timestamp {
-  static hdf5pp::Type native_type();
-  static hdf5pp::Type stored_type();
-
-  dataset_timestamp();
-  ~dataset_timestamp();
-
-  uint16_t timestamp[3]; 
-
-};
-}
-
 
 template <typename Config>
 class DataV1_v0 : public Psana::Gsc16ai::DataV1 {
@@ -88,7 +75,7 @@ private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
   boost::shared_ptr<Config> m_cfg;
-  mutable boost::shared_ptr<Gsc16ai::ns_DataV1_v0::dataset_timestamp> m_ds_timestamp;
+  mutable ndarray<const uint16_t, 1> m_ds_timestamp;
   void read_ds_timestamp() const;
   mutable ndarray<const uint16_t, 1> m_ds_channelValue;
   void read_ds_channelValue() const;
