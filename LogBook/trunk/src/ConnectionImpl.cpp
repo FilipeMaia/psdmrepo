@@ -58,7 +58,7 @@ inline
 bool
 isValidRunType (const std::string& type)
 {
-    static const char* const validTypes[] = {"DATA", "CALIB"} ;
+    static const char* const validTypes[] = {"DATA", "CALIB", "TEST"} ;
     static const size_t numTypes = 2 ;
     for (size_t i = 0 ; i < numTypes ; ++i)
         if (0 == strcasecmp(validTypes[i], type.c_str()))
