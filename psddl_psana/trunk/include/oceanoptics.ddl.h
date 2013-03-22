@@ -73,7 +73,6 @@ public:
   virtual const OceanOptics::timespec64& timeFrameStart() const = 0;
   virtual const OceanOptics::timespec64& timeFrameFirstData() const = 0;
   virtual const OceanOptics::timespec64& timeFrameEnd() const = 0;
-  virtual int32_t version() const = 0;
   virtual int8_t numSpectraInData() const = 0;
   virtual int8_t numSpectraInQueue() const = 0;
   virtual int8_t numSpectraUnused() const = 0;
