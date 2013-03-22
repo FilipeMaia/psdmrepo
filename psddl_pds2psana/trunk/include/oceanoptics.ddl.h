@@ -41,7 +41,6 @@ public:
   virtual const Psana::OceanOptics::timespec64& timeFrameStart() const;
   virtual const Psana::OceanOptics::timespec64& timeFrameFirstData() const;
   virtual const Psana::OceanOptics::timespec64& timeFrameEnd() const;
-  virtual int32_t version() const;
   virtual int8_t numSpectraInData() const;
   virtual int8_t numSpectraInQueue() const;
   virtual int8_t numSpectraUnused() const;

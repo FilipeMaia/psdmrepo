@@ -59,8 +59,6 @@ const Psana::OceanOptics::timespec64& DataV1::timeFrameFirstData() const { retur
 
 const Psana::OceanOptics::timespec64& DataV1::timeFrameEnd() const { return _tsTimeFrameEnd; }
 
-int32_t DataV1::version() const { return m_xtcObj->version(); }
-
 int8_t DataV1::numSpectraInData() const { return m_xtcObj->numSpectraInData(); }
 
 int8_t DataV1::numSpectraInQueue() const { return m_xtcObj->numSpectraInQueue(); }
