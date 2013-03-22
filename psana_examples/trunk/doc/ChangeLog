@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-06
+2013-03-22 Andy Salnikov
+- in DumpUsdUsb print status info 
+
 Tag: V00-03-05
 2013-03-21 Andy Salnikov
 - fix default source string in DumpUsdUsb module

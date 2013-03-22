@@ -82,6 +82,8 @@ DumpUsdUsb::event(Event& evt, Env& env)
       str << "UsdUsb::DataV1:";
       str << "\n  encoder_count = " << data1->encoder_count();
       str << "\n  analog_in = " << data1->analog_in();
+      ndarray<const uint8_t, 1> st = data1->status();
+      str << "\n  status = [" << int(st[0]) << ' ' << int(st[1]) << ' ' << int(st[2]) << ' ' << int(st[3]) <<']' ;
       str << "\n  digital_in = " << int(data1->digital_in());
       str << "\n  timestamp = " << int(data1->timestamp());
     }
