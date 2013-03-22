@@ -18,6 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <algorithm>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -49,6 +50,10 @@ UsdUsbDataV1::UsdUsbDataV1 ( const XtcType& data )
   for (int i = 0; i != Analog_Inputs; ++ i) {
     analog_in[i] = data.analog_in(i);
   }
+
+  // Dirty hack, pdsdata does not provide method to access status data
+  const uint8_t* pstat = (const uint8_t*)(&data) + 28;
+  std::copy(pstat, pstat+4, status);
 }
 
 hdf5pp::Type
@@ -64,6 +69,7 @@ UsdUsbDataV1::native_type()
   type.insert_native<int32_t>( "encoder_count", offsetof(UsdUsbDataV1, encoder_count), Encoder_Inputs ) ;
   type.insert_native<uint16_t>( "analog_in", offsetof(UsdUsbDataV1, analog_in), Analog_Inputs ) ;
   type.insert_native<uint32_t>( "timestamp", offsetof(UsdUsbDataV1, timestamp) ) ;
+  type.insert_native<uint8_t>( "status", offsetof(UsdUsbDataV1, status), 4 ) ;
   type.insert_native<uint8_t>( "digital_in", offsetof(UsdUsbDataV1, digital_in) ) ;
 
   return type;

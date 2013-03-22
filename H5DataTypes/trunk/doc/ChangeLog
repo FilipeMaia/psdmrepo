@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-02
+2013-03-22 Andy Salnikov
+- UsdUsbDataV1: add status field, this should go into new schema version (1)
+
 Tag: V00-02-01
 2013-03-21 Andy Salnikov
 - in UsdUsbDataV1 type of encoder_count should be signed

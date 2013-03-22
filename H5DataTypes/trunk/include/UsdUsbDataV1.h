@@ -59,6 +59,7 @@ private:
   int32_t encoder_count[Encoder_Inputs];
   uint16_t analog_in[Analog_Inputs];
   uint32_t timestamp;
+  uint8_t  status[4];
   uint8_t  digital_in;
 
 };
