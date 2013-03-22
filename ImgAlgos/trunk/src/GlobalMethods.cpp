@@ -120,56 +120,32 @@ void
 printSizeOfTypes()
 {
   std::cout << "Size Of Types:" 
-            << "\nsizeof(bool     ) = " << sizeof(bool    ) 
-            << "\nsizeof(uint8_t  ) = " << sizeof(uint8_t ) 
-            << "\nsizeof(uint16_t ) = " << sizeof(uint16_t) 
-            << "\nsizeof(uint32_t ) = " << sizeof(uint32_t) 
-            << "\nsizeof(int32_t  ) = " << sizeof(int32_t ) 
-            << "\nsizeof(int      ) = " << sizeof(int     ) 
-            << "\nsizeof(float    ) = " << sizeof(float   ) 
-            << "\nsizeof(double   ) = " << sizeof(double  ) 
+            << "\nsizeof(bool    ) = " << sizeof(bool    ) << " with typeid(bool    ).name(): " << typeid(bool    ).name() 
+            << "\nsizeof(uint8_t ) = " << sizeof(uint8_t ) << " with typeid(uint8_t ).name(): " << typeid(uint8_t ).name()  
+            << "\nsizeof(uint16_t) = " << sizeof(uint16_t) << " with typeid(uint16_t).name(): " << typeid(uint16_t).name()  
+            << "\nsizeof(uint32_t) = " << sizeof(uint32_t) << " with typeid(uint32_t).name(): " << typeid(uint32_t).name()  
+            << "\nsizeof(int32_t ) = " << sizeof(int32_t ) << " with typeid(int32_t ).name(): " << typeid(int32_t ).name()  
+            << "\nsizeof(int     ) = " << sizeof(int     ) << " with typeid(int     ).name(): " << typeid(int     ).name()  
+            << "\nsizeof(float   ) = " << sizeof(float   ) << " with typeid(float   ).name(): " << typeid(float   ).name()  
+            << "\nsizeof(double  ) = " << sizeof(double  ) << " with typeid(double  ).name(): " << typeid(double  ).name()  
             << "\n\n";
 }
-
 
 //--------------------
 // Define the shape or throw message that can not do that.
 void 
-defineImageShape(PSEvt::Event& evt, const PSEvt::Source& str_src, const std::string& str_key, unsigned* shape)
+defineImageShape(PSEvt::Event& evt, const PSEvt::Source& src, const std::string& key, unsigned* shape)
 {
-  boost::shared_ptr< ndarray<double,2> > img = evt.get(str_src, str_key);
-  if (img.get()) {
-    for(int i=0;i<2;i++) shape[i]=img->shape()[i];
-    //shape=img->shape();
-    return;
-  } 
-
-  boost::shared_ptr< ndarray<uint16_t,2> > img_u16 = evt.get(str_src, str_key);
-  if (img_u16.get()) {
-    for(int i=0;i<2;i++) shape[i]=img_u16->shape()[i];
-    return;
-  } 
-
-  boost::shared_ptr< ndarray<int,2> > img_int = evt.get(str_src, str_key);
-  if (img_int.get()) {
-    for(int i=0;i<2;i++) shape[i]=img_int->shape()[i];
-    return;
-  } 
-
-  boost::shared_ptr< ndarray<float,2> > img_flo = evt.get(str_src, str_key);
-  if (img_flo.get()) {
-    for(int i=0;i<2;i++) shape[i]=img_flo->shape()[i];
-    return;
-  } 
-
-  boost::shared_ptr< ndarray<uint8_t,2> > img_u8 = evt.get(str_src, str_key);
-  if (img_u8.get()) {
-    for(int i=0;i<2;i++) shape[i]=img_u8->shape()[i];
-    return;
-  } 
+  if ( defineImageShapeForType<double>  (evt, src, key, shape) ) return;
+  if ( defineImageShapeForType<float>   (evt, src, key, shape) ) return;
+  if ( defineImageShapeForType<int>     (evt, src, key, shape) ) return;
+  if ( defineImageShapeForType<int32_t> (evt, src, key, shape) ) return;
+  if ( defineImageShapeForType<uint32_t>(evt, src, key, shape) ) return;
+  if ( defineImageShapeForType<uint16_t>(evt, src, key, shape) ) return;
+  if ( defineImageShapeForType<uint8_t> (evt, src, key, shape) ) return;
 
   const std::string msg = "Image shape is tested for double, uint16_t, int, float, uint8_t and is not defined in the event(...)\nfor source:" 
-                        + boost::lexical_cast<std::string>(str_src) + " key:" + str_key + "\nEXIT psana...";
+                        + boost::lexical_cast<std::string>(src) + " key:" + key + "\nEXIT psana...";
   MsgLogRoot(error, msg);
   throw std::runtime_error("EXIT psana...");
 }

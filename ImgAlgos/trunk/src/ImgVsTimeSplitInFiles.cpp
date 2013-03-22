@@ -204,7 +204,8 @@ ImgVsTimeSplitInFiles::initSplitInFiles(Event& evt, Env& env)
     if( initSplitInFilesForType<int>     (evt, env) ) return;
     if( initSplitInFilesForType<uint16_t>(evt, env) ) return;
 
-    const std::string msg = "Image shape is not defined in the event(...) for source:" + boost::lexical_cast<std::string>(m_str_src) + " key:" + m_key;
+    const std::string msg = "Image shape is not defined in the event(...) for source:" 
+                          + boost::lexical_cast<std::string>(m_str_src) + " key:" + m_key;
     MsgLogRoot(error, msg);
     throw std::runtime_error(msg);
 }
@@ -225,14 +226,15 @@ ImgVsTimeSplitInFiles::saveMetadataInFile()
       << "\nREST_SIZE       " << m_rst_size
       << "\nNUMBER_OF_IMGS  " << m_count
       << "\nFILE_TYPE       " << m_file_type
-    //<< "\nDATA_TYPE_INPUT " << m_data_type
-      << "\nDATA_TYPE       " << "float"
+    //<< "\nDATA_TYPE_INPUT " << m_data_type_input
+      << "\nDATA_TYPE       " << typeid(data_split_t).name() // i.e "f" or "d"
       << "\nTIME_SEC_AVE    " << fixed << std::setprecision(6) << m_t_ave
       << "\nTIME_SEC_RMS    " << fixed << std::setprecision(6) << m_t_rms
       << "\nTIME_INDEX_MAX  " << std::setw(8) << m_tind_max
       << "\n";
 
   out.close();
+
   if( m_print_bits & 16 ) MsgLog( name(), info, "The file with metadata: " << fname << " is created.");
 }
 
@@ -283,10 +285,10 @@ ImgVsTimeSplitInFiles::procEvent(Event& evt)
 {
   saveTimeRecord(evt);
 
-  if ( procEventForType<double>   (evt, "double"  ) ) return;
-  if ( procEventForType<float>    (evt, "float"   ) ) return;
-  if ( procEventForType<int>      (evt, "int"     ) ) return;
-  if ( procEventForType<uint16_t> (evt, "uint16_t") ) return;
+  if ( procEventForType<double>   (evt) ) return;
+  if ( procEventForType<float>    (evt) ) return;
+  if ( procEventForType<int>      (evt) ) return;
+  if ( procEventForType<uint16_t> (evt) ) return;
 
   MsgLog(name(), info, "Image is not available in the event(...) for source:" << m_str_src << " key:" << m_key);
 }

@@ -123,6 +123,7 @@ ImgCalib::printInputParameters()
         << "\n m_col_min         : " << m_col_min    
         << "\n m_col_max         : " << m_col_max    
         << "\n m_print_bits      : " << m_print_bits
+	<< "\n Output data type  : " << typeid(data_out_t).name() << " of size " << sizeof(data_out_t)
         << "\n";     
 
     printSizeOfTypes();
@@ -237,11 +238,11 @@ ImgCalib::init(Event& evt, Env& env)
 void 
 ImgCalib::procEvent(Event& evt, Env& env)
 {
-  if ( procEventForType<uint16_t, double> (evt) ) return;
-  if ( procEventForType<int,      double> (evt) ) return;
-  if ( procEventForType<float,    double> (evt) ) return;
-  if ( procEventForType<uint8_t,  double> (evt) ) return;
-  if ( procEventForType<double,   double> (evt) ) return;
+  if ( procEventForType<uint16_t, data_out_t> (evt) ) return;
+  if ( procEventForType<int,      data_out_t> (evt) ) return;
+  if ( procEventForType<float,    data_out_t> (evt) ) return;
+  if ( procEventForType<uint8_t,  data_out_t> (evt) ) return;
+  if ( procEventForType<double,   data_out_t> (evt) ) return;
 
   MsgLog(name(), info, "Image is not available in the event(...) for source:" << m_str_src << " key:" << m_key_in);
 }

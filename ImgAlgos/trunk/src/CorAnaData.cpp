@@ -93,7 +93,7 @@ CorAnaData::printData()
       || r%100== 0
       || r==m_nimgs-1 )
       {
-        m_log << "\nImg-blk " << std::setw(4) << r << ":";
+        m_log << "\nImg-blk " << std::setw(4) << r << ":" << std::setprecision(2);
         for(unsigned c=0; c<10; c++)                     m_log << " "  << std::setw(4) << m_data[r*m_blk_size + c];
 	m_log << " ...";
         for(unsigned c=m_blk_size-10; c<m_blk_size; c++) m_log << " "  << std::setw(4) << m_data[r*m_blk_size + c];
@@ -159,10 +159,12 @@ CorAnaData::evaluateCorTau(unsigned tau) // tau in number of frames between imag
 
   for (unsigned ti=0; ti<m_tind_size-tau; ti++) {
        unsigned tf=ti+tau;
+
+       if ( ! (tf<m_tind_size) ) break;
        
        // get the event index in array for time index
-       unsigned evi = m_tind_to_evind[ti];
-       unsigned evf = m_tind_to_evind[tf];
+       int evi = m_tind_to_evind[ti];
+       int evf = m_tind_to_evind[tf];
 
        // If the event does not exist for specified time index -> skip it in sum
        if(evi<0) continue;

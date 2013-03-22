@@ -11,6 +11,20 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-05	
+2013-03-22 Mikhail S. Dubrovin
+- for CorAna project make correct exchange between types in different modules:
+M       include/ImgCalib.h
+M       include/GlobalMethods.h
+M       include/ImgIntMonCorr.h
+M       include/ImgVsTimeSplitInFiles.h
+M       src/ImgCalib.cpp
+M       src/ImgParametersV1.cpp
+M       src/PrincetonImageProducer.cpp
+M       src/GlobalMethods.cpp
+M       src/ImgVsTimeSplitInFiles.cpp
+M       src/CorAnaData.cpp	
+
 2013-03-18 Mikhail S. Dubrovin
 - add ImgIntMonCorr - not finished yet. 
 - in IntensityMonitorsData - restracturization; now it accepts input intensity monitor sources in any order.

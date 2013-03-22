@@ -163,6 +163,8 @@ private:
      	shared_ptr< ndarray<T,2> > img = evt.get(m_str_src, m_key_in, &m_src);
      	if (img.get()) {
 
+          if( m_print_bits & 1 && !m_count ) MsgLog( name(), info, " I/O data type: " << strOfDataTypeAndSize<T>() );
+
           if (! m_do_norm) {
              save2DArrayInEvent<T> (evt, m_src, m_key_out, *img.get());
              if( m_print_bits & 8 || m_print_bits & 16 ) 

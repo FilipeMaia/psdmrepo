@@ -84,6 +84,30 @@ private:
 //--------------------
 //--------------------
 //--------------------
+
+//--------------------
+// For type=T returns the string with symbolic data type and its size, i.e. "d of size 8"
+  template <typename T>
+  std::string strOfDataTypeAndSize()
+  {
+    std::stringstream ss; ss << typeid(T).name() << " of size " << sizeof(T);
+    return ss.str();
+  }
+
+//--------------------
+// Define inage shape in the event for specified type, str_src, and str_key 
+  template <typename T>
+  bool defineImageShapeForType(PSEvt::Event& evt, const PSEvt::Source& str_src, const std::string& str_key, unsigned* shape)
+  {
+    boost::shared_ptr< ndarray<T,2> > img = evt.get(str_src, str_key);
+    if (img.get()) {
+      for(int i=0;i<2;i++) shape[i]=img->shape()[i];
+      //shape=img->shape();
+      return true;
+    } 
+    return false;
+  }
+
 //--------------------
 // Save 2-D array in file
   template <typename T>

@@ -210,7 +210,8 @@ PrincetonImageProducer::procEvent(Event& evt, Env& env)
 
       const ndarray<uint16_t, 2>& data = frame->data().copy();
       save2DArrayInEvent<uint16_t> (evt, m_src, m_key_out, data);
-
+          
+      if( m_print_bits & 1 && m_count < 2 ) MsgLog( name(), info, " I/O data type: " << strOfDataTypeAndSize<uint16_t>() );
       if( m_print_bits & 8 ) MsgLog( name(), info, stringOf2DArrayData<uint16_t>(data, std::string(" data: ")) );
   }
   else

@@ -56,6 +56,8 @@ namespace ImgAlgos {
 class ImgCalib : public Module {
 public:
 
+  typedef double data_out_t;
+
   // Default constructor
   ImgCalib (const std::string& name) ;
 

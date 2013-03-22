@@ -125,11 +125,11 @@ private:
   // Data members, this is for example purposes only
 
   Pds::Src    m_src;
-  Source      m_str_src;      // i.e. CxiDs1.0:Cspad.0
-  std::string m_key;          // i.e. Image2D
-  std::string m_fname_prefix; // prefix of the file name
-  std::string m_file_type;    // file type "txt" or "bin" 
-  std::string m_data_type;    // data type "double", "uint16_t", etc. 
+  Source      m_str_src;         // i.e. CxiDs1.0:Cspad.0
+  std::string m_key;             // i.e. Image2D
+  std::string m_fname_prefix;    // prefix of the file name
+  std::string m_file_type;       // file type "txt" or "bin" 
+  std::string m_data_type_input; // data type "double", "uint16_t", etc. 
   bool        m_add_tstamp;
   unsigned    m_nfiles_out;
   double      m_ampl_thr;
@@ -193,10 +193,11 @@ protected:
                            << "\n m_nfiles_out     : " << m_nfiles_out
                            << "\n m_blk_size       : " << m_blk_size
                            << "\n m_rst_size       : " << m_rst_size
-	                   << "\n Output data type is data_split_t (???float???) with sizeof: " << sizeof(data_split_t)
+                           << "\n Input data type  : " << typeid(T).name()            << " of size " << sizeof(T)
+	                   << "\n Output data type : " << typeid(data_split_t).name() << " of size " << sizeof(data_split_t)
                            << "\n"  
                            );  
-	    
+
             if(m_rst_size) {
               std::string msg = "\n  Can not split the image for integer number of files without rest...";
                           msg+= "\n  Try to change the number of output files to split the image for equal parts.\n";
@@ -216,12 +217,6 @@ protected:
     {
       const T* data = p_ndarr->data();
       procImgData<T>(data);
-      /*
-      T            athr = static_cast<T>           (m_ampl_thr);
-      data_split_t amin = static_cast<data_split_t>(m_ampl_min);
-      for(unsigned i=0; i<m_img_size; i++)
-	m_data[i] = (data[i] > athr) ? static_cast<data_split_t>(data[i]) : amin;
-      */
     }
 
 //--------------------
@@ -240,11 +235,11 @@ protected:
 //--------------------
 // Process event for specified data type
     template <typename T>
-    bool procEventForType(Event& evt, std::string data_type)
+    bool procEventForType(Event& evt)
     {
       shared_ptr< ndarray<T,2> > img = evt.get(m_str_src, m_key, &m_src);
       if (img.get()) {
-        m_data_type = data_type; 
+        m_data_type_input = typeid(T).name();
         procSplitAndWriteImgInFiles<T> (img, m_print_bits & 8);
 	return true;
       }

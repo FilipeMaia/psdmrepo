@@ -192,12 +192,12 @@ void ImgParametersV1::print(std::string comment)
 
     unsigned col_min=5, col_max=20;
     unsigned row_min=5, row_max=30;
-    unsigned width=6;
+    unsigned width=8;
     for(unsigned c=col_min; c<col_max; c++) log << std::setw(width) << c << " ";
     log << "\n";
 
     for(unsigned r=row_min; r<row_max; r++) {
-      log << "\n row" << std::setw(5) << r << ":";
+      log << "\n row" << std::setw(5) << r << ":" << std::fixed << std::setprecision(2);
       for(unsigned c=col_min; c<col_max; c++) log << std::setw(width) << m_pars[r*m_cols + c] << " ";
     }
     log << "\n";
