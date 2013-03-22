@@ -398,6 +398,7 @@ class XmlReader ( object ) :
                            type = atype,
                            method = elem.get('method') or aname,
                            rank = int(elem.get('rank', -1)),
+                           shape = elem.get('shape'),
                            schema_version = int(elem.get('schema_version', 0)))
         ds.attributes.append(attr)
 

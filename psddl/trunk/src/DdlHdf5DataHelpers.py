@@ -903,7 +903,7 @@ class SchemaAbstractType(SchemaType):
                         # VLEN array take dimension from VLEN size, currently means that only 1-dim VLEN arrays are supported
                         shape = T("m_ds_$dsName->vlen_$attrName")(locals())
                     else:
-                        shape = _interpolate(str(meth.attribute.shape), type)
+                        shape = _interpolate(str(attr.shape), type)
                     impl += [T("  if (not m_ds_$name) read_ds_$name();")[ds]]
                     impl += [T("  boost::shared_ptr<$attr_type> ptr(m_ds_$dsName, m_ds_$dsName->$attrName);")(locals())]
                     impl += [T("  return make_ndarray(ptr, $shape);")(locals())]
@@ -918,8 +918,8 @@ class SchemaAbstractType(SchemaType):
                         shape = T("m_ds_$dsName->vlen_$attrName")(locals())
                         data_size = shape
                     else:
-                        shape = _interpolate(str(meth.attribute.shape), type)
-                        data_size = _interpolate(str(meth.attribute.shape.size()), type)
+                        shape = _interpolate(str(attr.shape), type)
+                        data_size = _interpolate(str(attr.shape.size()), type)
                     memberName = T("m_ds_storage_${dsName}_${attrName}")(locals());
                     impl += [T("  if (not m_ds_$name) read_ds_$name();")[ds]]
                     impl += [T("  if ($memberName.empty()) {")(locals())]

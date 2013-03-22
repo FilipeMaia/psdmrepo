@@ -11,6 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-16
+2013-03-22 Andy Salnikov
+- hdf5 schema can specify shape of the attribute, this is mostly useful
+  for attribute that get its data from methods without corresponding
+  attributes 
+
 Tag: V00-05-15
 2013-03-20 Andy Salnikov
 - HDF5: switching to non-compound datasets

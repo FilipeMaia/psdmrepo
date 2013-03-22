@@ -37,6 +37,7 @@ import sys
 # Imports for other modules --
 #-----------------------------
 from psddl.Method import Method
+from psddl.Shape import Shape
 
 #----------------------------------
 # Local non-exported definitions --
@@ -61,10 +62,11 @@ class H5Attribute ( object ) :
         self._type = kw.get('type', None)   # optional type
         self.method = kw.get('method') or self.name  # corresponding method name in pstype, default is the same as name
         self._rank = kw.get('rank', -1)      # attribute array rank, -1 if unknown
+        self._shape = kw.get('shape')        # shape, None if not specified
+        if self._shape: 
+            self._shape = Shape(self._shape, self.parent.pstype)
         self.schema_version = kw.get('schema_version', 0)      # attribute schema version
         self.tags = kw.get('tags', {}).copy()
-
-        self._shape = None
 
     #-------------------
     #  Public methods --
