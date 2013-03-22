@@ -85,7 +85,7 @@
             <attribute name="_tsTimeFrameEnd" type="timespec64" accessor="timeFrameEnd">
             </attribute>
 
-            <attribute name="_i32Version" type="int32_t" accessor="version">
+            <attribute name="_i32Version" type="int32_t">
             </attribute>
 
             <attribute name="_i8NumSpectraInData" type="int8_t" accessor="numSpectraInData">
