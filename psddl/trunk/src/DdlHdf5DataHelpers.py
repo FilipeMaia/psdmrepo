@@ -822,13 +822,13 @@ class SchemaAbstractType(SchemaType):
             # data is stored in a dataset
             args = []
             attr_type = attr.type.fullName('C++', psana_ns)
-            ret_type = attr_type
+            ret_type = meth.type.fullName('C++', psana_ns)
             rank = attr.rank
             if attr.rank:
-                if attr.type.name == 'char':
+                if meth.type.name == 'char':
                     ret_type = "const char*"
                     args = [('i%d'%i, type.lookup('uint32_t')) for i in range(attr.rank-1)]
-                elif attr.type.basic or attr.type.value_type:
+                elif meth.type.basic or meth.type.value_type:
                     ret_type = T("ndarray<const $attr_type, $rank>")(locals())
                 else:
                     args = [('i%d'%i, type.lookup('uint32_t')) for i in range(attr.rank)]
