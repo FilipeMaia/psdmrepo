@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-05
+2013-03-22 Andy Salnikov
+- introduce new schema version for UsdUsb::DavaV1, this version has signed
+  encoder_count field.
+
 Tag: V00-01-04
 2013-03-21 Andy Salnikov
 - fix attribute name in usdusb schema

@@ -43,7 +43,7 @@ namespace {
   const std::string logger = "psddl_hdf2psana.HdfConverter";
 
   // name of the attribute holding schema version
-  const std::string versionAttrName("_psddlSchemaVersion");
+  const std::string versionAttrName("_schemaVersion");
 
   // name of the attributes holding Src info
   const std::string srcAttrName("_xtcSrc");
@@ -298,10 +298,13 @@ HdfConverter::schemaVersion(const hdf5pp::Group& group, int levels) const
   hdf5pp::Attribute<int> attr = group.openAttr<int>(::versionAttrName);
   if (attr.valid()) {
     version = attr.read();
+    MsgLog(logger, debug, "got schema version " << version << " from group attribute: " << name);
   } else if (levels > 0) {
     // try parent group if attribute is not there
     hdf5pp::Group parent = group.parent();
     if (parent.valid()) version = schemaVersion(parent, levels - 1);
+  } else {
+    MsgLog(logger, debug, "use default schema version 0 for group: " << name);
   }
 
   return version;
@@ -348,6 +351,7 @@ HdfConverter::source(const hdf5pp::Group& group, int levels) const
   if (attrSrc.valid()) {
     // build source from attributes
     src = ::_SrcBuilder(attrSrc.read());
+    MsgLog(logger, debug, "got source " << src << " from group attribute: " << name);
   } else if (levels > 0) {
     // try parent group if attribute is not there
     hdf5pp::Group parent = group.parent();
@@ -364,6 +368,7 @@ HdfConverter::source(const hdf5pp::Group& group, int levels) const
     } else if (src == Pds::DetInfo(0, Pds::DetInfo::NoDetector, 0, Pds::DetInfo::NoDevice, 2)) {
       src = Pds::BldInfo(0, Pds::BldInfo::FEEGasDetEnergy);
     }
+    MsgLog(logger, debug, "got source " << src << " from group name: " << name);
   }
 
   // update cache

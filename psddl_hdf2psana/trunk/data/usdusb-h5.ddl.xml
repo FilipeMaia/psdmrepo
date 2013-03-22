@@ -26,5 +26,13 @@
             
         </h5schema>
     
+        <!-- ========================================================================= -->
+    
+        <h5schema name="DataV1" version="1">
+
+            <tag name="external" value="psddl_hdf2psana/usdusb.ddlm.h"/>
+            
+        </h5schema>
+    
     </package>
 </psddl>

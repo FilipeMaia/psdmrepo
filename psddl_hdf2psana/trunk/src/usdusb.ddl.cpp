@@ -9,6 +9,7 @@
 #include "hdf5pp/Utils.h"
 #include "PSEvt/DataProxy.h"
 #include "psddl_hdf2psana/usdusb.ddlm.h"
+#include "psddl_hdf2psana/usdusb.ddlm.h"
 namespace psddl_hdf2psana {
 namespace UsdUsb {
 
@@ -80,6 +81,8 @@ boost::shared_ptr<PSEvt::Proxy<Psana::UsdUsb::DataV1> > make_DataV1(int version,
   switch (version) {
   case 0:
     return boost::make_shared<PSEvt::DataProxy<Psana::UsdUsb::DataV1> >(boost::make_shared<DataV1_v0>(group, idx));
+  case 1:
+    return boost::make_shared<PSEvt::DataProxy<Psana::UsdUsb::DataV1> >(boost::make_shared<DataV1_v1>(group, idx));
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::UsdUsb::DataV1> >(boost::shared_ptr<Psana::UsdUsb::DataV1>());
   }
