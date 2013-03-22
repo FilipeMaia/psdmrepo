@@ -22,20 +22,31 @@
     
         <!-- ========================================================================= -->
     
+        <h5schema name="timespec64" version="0">
+            <tag name="skip-proxy"/>
+            <dataset name="data">
+                <attribute name="seconds" type="uint32_t" method="tv_sec"/>
+                <attribute name="nanoseconds" type="uint32_t" method="tv_nsec"/>
+            </dataset>
+        </h5schema>
+        
+        <!-- ========================================================================= -->
+    
         <h5schema name="DataV1" version="0">
 
+            <dataset name="spectra" method="data"/>
+            
             <dataset name="data">
-                <attribute name="data"/>
                 <attribute name="frameCounter"/>
                 <attribute name="numDelayedFrames"/>
                 <attribute name="numDiscardFrames"/>
                 <attribute name="timeFrameStart"/>
                 <attribute name="timeFrameFirstData"/>
                 <attribute name="timeFrameEnd"/>
-                <attribute name="version"/>
                 <attribute name="numSpectraInData"/>
                 <attribute name="numSpectraInQueue"/>
                 <attribute name="numSpectraUnused"/>
+                <attribute name="durationOfFrame"/>
             </dataset>
             
         </h5schema>

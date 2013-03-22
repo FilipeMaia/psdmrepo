@@ -111,9 +111,6 @@ try {
   case 756401870:
     evt.putProxy(psddl_hdf2psana::Lusi::make_IpmFexV1(schema_version, group, idx), src);
     break;
-  case 874627555:
-    evt.putProxy(psddl_hdf2psana::OceanOptics::make_timespec64(schema_version, group, idx), src);
-    break;
   case 912501018:
     evt.putProxy(psddl_hdf2psana::Princeton::make_InfoV1(schema_version, group, idx), src);
     break;

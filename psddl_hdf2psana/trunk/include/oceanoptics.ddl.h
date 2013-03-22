@@ -56,30 +56,12 @@ struct dataset_data {
   dataset_data();
   ~dataset_data();
 
-  uint64_t tv_sec; 
-  uint64_t tv_nsec; 
+  uint32_t seconds; 
+  uint32_t nanoseconds; 
 
-  operator Psana::OceanOptics::timespec64() const { return Psana::OceanOptics::timespec64(tv_sec, tv_nsec); }
+  operator Psana::OceanOptics::timespec64() const { return Psana::OceanOptics::timespec64(seconds, nanoseconds); }
 };
 }
-class Proxy_timespec64_v0 : public PSEvt::Proxy<Psana::OceanOptics::timespec64> {
-public:
-  typedef Psana::OceanOptics::timespec64 PsanaType;
-
-  Proxy_timespec64_v0(hdf5pp::Group group, hsize_t idx) : m_group(group), m_idx(idx) {}
-  virtual ~Proxy_timespec64_v0() {}
-
-protected:
-
-  virtual boost::shared_ptr<PsanaType> getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key);
-
-private:
-
-  mutable hdf5pp::Group m_group;
-  hsize_t m_idx;
-  boost::shared_ptr<PsanaType> m_data;
-};
-boost::shared_ptr<PSEvt::Proxy<Psana::OceanOptics::timespec64> > make_timespec64(int version, hdf5pp::Group group, hsize_t idx);
 
 namespace ns_DataV1_v0 {
 struct dataset_data {
@@ -89,17 +71,16 @@ struct dataset_data {
   dataset_data();
   ~dataset_data();
 
-  uint16_t data[3840]; 
   uint64_t frameCounter; 
   uint64_t numDelayedFrames; 
   uint64_t numDiscardFrames; 
   OceanOptics::ns_timespec64_v0::dataset_data timeFrameStart; 
   OceanOptics::ns_timespec64_v0::dataset_data timeFrameFirstData; 
   OceanOptics::ns_timespec64_v0::dataset_data timeFrameEnd; 
-  int32_t version; 
   int8_t numSpectraInData; 
   int8_t numSpectraInQueue; 
   int8_t numSpectraUnused; 
+  double durationOfFrame; 
 
 };
 }
@@ -112,7 +93,6 @@ public:
   DataV1_v0() {}
   DataV1_v0(hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Config>& cfg)
     : m_group(group), m_idx(idx), m_cfg(cfg) {}
-  DataV1_v0(const boost::shared_ptr<OceanOptics::ns_DataV1_v0::dataset_data>& ds) : m_ds_data(ds) {}
   virtual ~DataV1_v0() {}
   virtual ndarray<const uint16_t, 1> data() const;
   virtual uint64_t frameCounter() const;
@@ -121,17 +101,18 @@ public:
   virtual const Psana::OceanOptics::timespec64& timeFrameStart() const;
   virtual const Psana::OceanOptics::timespec64& timeFrameFirstData() const;
   virtual const Psana::OceanOptics::timespec64& timeFrameEnd() const;
-  virtual int32_t version() const;
   virtual int8_t numSpectraInData() const;
   virtual int8_t numSpectraInQueue() const;
   virtual int8_t numSpectraUnused() const;
-    double durationOfFrame() const { return this->timeFrameEnd().tv_sec() - this->timeFrameStart().tv_sec() + (this->timeFrameEnd().tv_nsec() - this->timeFrameStart().tv_nsec()) * 1e-9; }
+  virtual double durationOfFrame() const;
     double nonlinerCorrected(uint32_t iPixel) const;
 
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
   boost::shared_ptr<Config> m_cfg;
+  mutable ndarray<const uint16_t, 1> m_ds_spectra;
+  void read_ds_spectra() const;
   mutable boost::shared_ptr<OceanOptics::ns_DataV1_v0::dataset_data> m_ds_data;
   void read_ds_data() const;
   mutable Psana::OceanOptics::timespec64 m_ds_storage_data_timeFrameStart;

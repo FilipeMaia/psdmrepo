@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-07
+2013-03-22 Andy Salnikov
+- fix schema for OceanOptics.DataV1
+
 Tag: V00-01-06
 2013-03-22 Andy Salnikov
 - for UsdUsb::DavaV1 schema version 1 use generated code

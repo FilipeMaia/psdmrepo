@@ -92,8 +92,8 @@ hdf5pp::Type ns_timespec64_v0_dataset_data_stored_type()
 {
   typedef ns_timespec64_v0::dataset_data DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("tv_sec", offsetof(DsType, tv_sec), hdf5pp::TypeTraits<uint64_t>::stored_type());
-  type.insert("tv_nsec", offsetof(DsType, tv_nsec), hdf5pp::TypeTraits<uint64_t>::stored_type());
+  type.insert("seconds", offsetof(DsType, seconds), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("nanoseconds", offsetof(DsType, nanoseconds), hdf5pp::TypeTraits<uint32_t>::stored_type());
   return type;
 }
 
@@ -107,8 +107,8 @@ hdf5pp::Type ns_timespec64_v0_dataset_data_native_type()
 {
   typedef ns_timespec64_v0::dataset_data DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("tv_sec", offsetof(DsType, tv_sec), hdf5pp::TypeTraits<uint64_t>::native_type());
-  type.insert("tv_nsec", offsetof(DsType, tv_nsec), hdf5pp::TypeTraits<uint64_t>::native_type());
+  type.insert("seconds", offsetof(DsType, seconds), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("nanoseconds", offsetof(DsType, nanoseconds), hdf5pp::TypeTraits<uint32_t>::native_type());
   return type;
 }
 
@@ -123,42 +123,21 @@ ns_timespec64_v0::dataset_data::dataset_data()
 ns_timespec64_v0::dataset_data::~dataset_data()
 {
 }
-boost::shared_ptr<Psana::OceanOptics::timespec64>
-Proxy_timespec64_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key)
-{
-  if (not m_data) {
-    boost::shared_ptr<OceanOptics::ns_timespec64_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<OceanOptics::ns_timespec64_v0::dataset_data>(m_group, "data", m_idx);
-    m_data.reset(new PsanaType(ds_data->tv_sec, ds_data->tv_nsec));
-  }
-  return m_data;
-}
-
-boost::shared_ptr<PSEvt::Proxy<Psana::OceanOptics::timespec64> > make_timespec64(int version, hdf5pp::Group group, hsize_t idx) {
-  switch (version) {
-  case 0:
-    return boost::make_shared<Proxy_timespec64_v0>(group, idx);
-  default:
-    return boost::make_shared<PSEvt::DataProxy<Psana::OceanOptics::timespec64> >(boost::shared_ptr<Psana::OceanOptics::timespec64>());
-  }
-}
 
 hdf5pp::Type ns_DataV1_v0_dataset_data_stored_type()
 {
   typedef ns_DataV1_v0::dataset_data DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  hsize_t _array_type_data_shape[] = { 3840 };
-  hdf5pp::ArrayType _array_type_data = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint16_t>::stored_type(), 1, _array_type_data_shape);
-  type.insert("data", offsetof(DsType, data), _array_type_data);
   type.insert("frameCounter", offsetof(DsType, frameCounter), hdf5pp::TypeTraits<uint64_t>::stored_type());
   type.insert("numDelayedFrames", offsetof(DsType, numDelayedFrames), hdf5pp::TypeTraits<uint64_t>::stored_type());
   type.insert("numDiscardFrames", offsetof(DsType, numDiscardFrames), hdf5pp::TypeTraits<uint64_t>::stored_type());
   type.insert("timeFrameStart", offsetof(DsType, timeFrameStart), hdf5pp::TypeTraits<OceanOptics::ns_timespec64_v0::dataset_data>::stored_type());
   type.insert("timeFrameFirstData", offsetof(DsType, timeFrameFirstData), hdf5pp::TypeTraits<OceanOptics::ns_timespec64_v0::dataset_data>::stored_type());
   type.insert("timeFrameEnd", offsetof(DsType, timeFrameEnd), hdf5pp::TypeTraits<OceanOptics::ns_timespec64_v0::dataset_data>::stored_type());
-  type.insert("version", offsetof(DsType, version), hdf5pp::TypeTraits<int32_t>::stored_type());
   type.insert("numSpectraInData", offsetof(DsType, numSpectraInData), hdf5pp::TypeTraits<int8_t>::stored_type());
   type.insert("numSpectraInQueue", offsetof(DsType, numSpectraInQueue), hdf5pp::TypeTraits<int8_t>::stored_type());
   type.insert("numSpectraUnused", offsetof(DsType, numSpectraUnused), hdf5pp::TypeTraits<int8_t>::stored_type());
+  type.insert("durationOfFrame", offsetof(DsType, durationOfFrame), hdf5pp::TypeTraits<double>::stored_type());
   return type;
 }
 
@@ -172,19 +151,16 @@ hdf5pp::Type ns_DataV1_v0_dataset_data_native_type()
 {
   typedef ns_DataV1_v0::dataset_data DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  hsize_t _array_type_data_shape[] = { 3840 };
-  hdf5pp::ArrayType _array_type_data = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint16_t>::native_type(), 1, _array_type_data_shape);
-  type.insert("data", offsetof(DsType, data), _array_type_data);
   type.insert("frameCounter", offsetof(DsType, frameCounter), hdf5pp::TypeTraits<uint64_t>::native_type());
   type.insert("numDelayedFrames", offsetof(DsType, numDelayedFrames), hdf5pp::TypeTraits<uint64_t>::native_type());
   type.insert("numDiscardFrames", offsetof(DsType, numDiscardFrames), hdf5pp::TypeTraits<uint64_t>::native_type());
   type.insert("timeFrameStart", offsetof(DsType, timeFrameStart), hdf5pp::TypeTraits<OceanOptics::ns_timespec64_v0::dataset_data>::native_type());
   type.insert("timeFrameFirstData", offsetof(DsType, timeFrameFirstData), hdf5pp::TypeTraits<OceanOptics::ns_timespec64_v0::dataset_data>::native_type());
   type.insert("timeFrameEnd", offsetof(DsType, timeFrameEnd), hdf5pp::TypeTraits<OceanOptics::ns_timespec64_v0::dataset_data>::native_type());
-  type.insert("version", offsetof(DsType, version), hdf5pp::TypeTraits<int32_t>::native_type());
   type.insert("numSpectraInData", offsetof(DsType, numSpectraInData), hdf5pp::TypeTraits<int8_t>::native_type());
   type.insert("numSpectraInQueue", offsetof(DsType, numSpectraInQueue), hdf5pp::TypeTraits<int8_t>::native_type());
   type.insert("numSpectraUnused", offsetof(DsType, numSpectraUnused), hdf5pp::TypeTraits<int8_t>::native_type());
+  type.insert("durationOfFrame", offsetof(DsType, durationOfFrame), hdf5pp::TypeTraits<double>::native_type());
   return type;
 }
 
@@ -201,9 +177,8 @@ ns_DataV1_v0::dataset_data::~dataset_data()
 }
 template <typename Config>
 ndarray<const uint16_t, 1> DataV1_v0<Config>::data() const {
-  if (not m_ds_data) read_ds_data();
-  boost::shared_ptr<uint16_t> ptr(m_ds_data, m_ds_data->data);
-  return make_ndarray(ptr, iNumPixels);
+  if (m_ds_spectra.empty()) read_ds_spectra();
+  return m_ds_spectra;
 }
 template <typename Config>
 uint64_t DataV1_v0<Config>::frameCounter() const {
@@ -239,11 +214,6 @@ const Psana::OceanOptics::timespec64& DataV1_v0<Config>::timeFrameEnd() const {
   return m_ds_storage_data_timeFrameEnd;
 }
 template <typename Config>
-int32_t DataV1_v0<Config>::version() const {
-  if (not m_ds_data) read_ds_data();
-  return int32_t(m_ds_data->version);
-}
-template <typename Config>
 int8_t DataV1_v0<Config>::numSpectraInData() const {
   if (not m_ds_data) read_ds_data();
   return int8_t(m_ds_data->numSpectraInData);
@@ -258,11 +228,19 @@ int8_t DataV1_v0<Config>::numSpectraUnused() const {
   if (not m_ds_data) read_ds_data();
   return int8_t(m_ds_data->numSpectraUnused);
 }
-
+template <typename Config>
+double DataV1_v0<Config>::durationOfFrame() const {
+  if (not m_ds_data) read_ds_data();
+  return double(m_ds_data->durationOfFrame);
+}
 template <typename Config>
 double
 DataV1_v0<Config>::nonlinerCorrected(uint32_t iPixel) const{ 
 double fRawValue = (double) (this->data()[iPixel] ^ 0x2000);                     const ndarray<const double, 1>& corr = m_cfg->nonlinCorrect();                     return fRawValue / (                      corr[0] + fRawValue *                      (corr[1] + fRawValue *                      (corr[2] + fRawValue *                      (corr[3] + fRawValue *                      (corr[4] + fRawValue *                      (corr[5] + fRawValue *                      (corr[6] + fRawValue *                       corr[7]))))))); 
+}
+template <typename Config>
+void DataV1_v0<Config>::read_ds_spectra() const {
+  m_ds_spectra = hdf5pp::Utils::readNdarray<uint16_t, 1>(m_group, "spectra", m_idx);
 }
 template <typename Config>
 void DataV1_v0<Config>::read_ds_data() const {
