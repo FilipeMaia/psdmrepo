@@ -59,7 +59,8 @@ public:
   TimepixDataV1Cvt ( const hdf5pp::Group& group,
       const std::string& typeGroupName,
       const Pds::Src& src,
-      const CvtOptions& cvtOptions ) ;
+      const CvtOptions& cvtOptions,
+      int schemaVersion ) ;
 
   // Destructor
   virtual ~TimepixDataV1Cvt () ;

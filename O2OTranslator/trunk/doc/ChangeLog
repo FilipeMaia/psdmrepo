@@ -11,6 +11,12 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-26-00
+2013-03-22 Andy Salnikov
+- store schema version and source in a group attriutes
+- UsdUsb used unsigned int in schema while data was signed, fixing
+  schema by introducing new schema version (1)
+
 Tag: V00-25-05
 2013-02-12 Andy Salnikov
 - bug fix for https://pswww.slac.stanford.edu/trac/psdm/ticket/190

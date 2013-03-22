@@ -59,8 +59,8 @@ namespace O2OTranslator {
 // Constructors --
 //----------------
 CsPad2x2ElementV1Cvt::CsPad2x2ElementV1Cvt ( const hdf5pp::Group& group, const std::string& typeGroupName,
-    const Pds::Src& src, const CalibObjectStore& calibStore, const CvtOptions& cvtOptions )
-  : EvtDataTypeCvt<XtcType>(group, typeGroupName, src, cvtOptions)
+    const Pds::Src& src, const CalibObjectStore& calibStore, const CvtOptions& cvtOptions, int schemaVersion )
+  : EvtDataTypeCvt<XtcType>(group, typeGroupName, src, cvtOptions, schemaVersion)
   , m_calibStore(calibStore)
   , m_elementCont()
   , m_pixelDataCont()

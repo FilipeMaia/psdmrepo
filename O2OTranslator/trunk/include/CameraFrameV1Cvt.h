@@ -56,7 +56,7 @@ public:
 
   // constructor takes a location where the data will be stored
   CameraFrameV1Cvt ( const hdf5pp::Group& group, const std::string& typeGroupName,
-      const Pds::Src& src, const CvtOptions& cvtOptions ) ;
+      const Pds::Src& src, const CvtOptions& cvtOptions, int schemaVersion ) ;
 
   // Destructor
   virtual ~CameraFrameV1Cvt () ;

@@ -64,11 +64,13 @@ public:
    *                            derived from type, should be unique.
    *  @param[in] src            Data source
    */
-  ConfigDataTypeCvt(hdf5pp::Group group, const std::string& typeGroupName, const Pds::Src& src)
+  ConfigDataTypeCvt(hdf5pp::Group group, const std::string& typeGroupName,
+      const Pds::Src& src, int schemaVersion)
     : DataTypeCvt<typename H5Type::XtcType>()
     , m_group(group)
     , m_typeGroupName(typeGroupName)
     , m_src(src)
+    , m_schemaVersion(schemaVersion)
   {
   }
 
@@ -105,6 +107,11 @@ public:
     // create separate group
     hdf5pp::Group group = m_group.createGroup(m_typeGroupName + "/" + srcName);
 
+    // store some group attributes
+    uint64_t srcVal = (uint64_t(m_src.phy()) << 32) + m_src.log();
+    group.createAttr<uint64_t>("_xtcSrc").store(srcVal);
+    group.createAttr<uint32_t>("_schemaVersion").store(m_schemaVersion);
+
     // store the data
     H5Type::store(data, group);
   }
@@ -126,6 +133,7 @@ private:
   hdf5pp::Group m_group;
   std::string m_typeGroupName;
   Pds::Src m_src;
+  int m_schemaVersion;
 };
 
 } // namespace O2OTranslator

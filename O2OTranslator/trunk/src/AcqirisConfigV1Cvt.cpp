@@ -41,8 +41,8 @@ namespace O2OTranslator {
 // Constructors --
 //----------------
 AcqirisConfigV1Cvt::AcqirisConfigV1Cvt (const hdf5pp::Group& group, const std::string& typeGroupName,
-    const Pds::Src& src, const CvtOptions& cvtOptions)
-  : EvtDataTypeCvt<Pds::Acqiris::ConfigV1>(group, typeGroupName, src, cvtOptions)
+    const Pds::Src& src, const CvtOptions& cvtOptions, int schemaVersion)
+  : EvtDataTypeCvt<Pds::Acqiris::ConfigV1>(group, typeGroupName, src, cvtOptions, schemaVersion)
   , m_configCont()
   , m_horizCont()
   , m_trigCont()

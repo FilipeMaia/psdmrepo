@@ -62,7 +62,8 @@ public:
                          const std::string& typeGroupName,
                          const Pds::Src& src,
                          const ConfigObjectStore& configStore,
-                         const CvtOptions& cvtOptions ) ;
+                         const CvtOptions& cvtOptions,
+                         int schemaVersion ) ;
 
   // Destructor
   virtual ~AcqirisDataDescV1Cvt () ;

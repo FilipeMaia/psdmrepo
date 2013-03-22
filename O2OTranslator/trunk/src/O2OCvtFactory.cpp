@@ -135,16 +135,17 @@ namespace {
 
   template<typename ConfigType>
   void makeConfigCvt(O2OCvtFactory::DataTypeCvtList& cvts, const hdf5pp::Group& group,
-      const std::string& typeGroupName, Pds::Src src, const O2OTranslator::CvtOptions& cvtOptions)
+      const std::string& typeGroupName, Pds::Src src, const O2OTranslator::CvtOptions& cvtOptions,
+      int schemaVersion)
   {
     // For every config type we register two converters - regular config converter
     // which works for all sources except BLD, and default event data converter for
     // all BLD sources
     if (src.level() == Pds::Level::Reporter) {
       // case for BLD data
-      cvts.push_back(make_shared<O2OTranslator::EvtDataTypeCvtDef<ConfigType> >(group, typeGroupName, src, cvtOptions, "config"));
+      cvts.push_back(make_shared<O2OTranslator::EvtDataTypeCvtDef<ConfigType> >(group, typeGroupName, src, cvtOptions, schemaVersion, "config"));
     } else {
-      cvts.push_back(make_shared<O2OTranslator::ConfigDataTypeCvt<ConfigType> >(group, typeGroupName, src));
+      cvts.push_back(make_shared<O2OTranslator::ConfigDataTypeCvt<ConfigType> >(group, typeGroupName, src, schemaVersion));
     }
   }
 
@@ -198,7 +199,7 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
   case Pds::TypeId::Id_Frame:
     switch (version) {
     case 1:
-      cvts.push_back(make_shared<CameraFrameV1Cvt>(group, "Camera::FrameV1", src, m_cvtOptions));
+      cvts.push_back(make_shared<CameraFrameV1Cvt>(group, "Camera::FrameV1", src, m_cvtOptions, 0));
       break;
     }
     break;
@@ -207,7 +208,7 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
     switch (version) {
     case 1:
       // very special converter for Acqiris::DataDescV1, it needs two types of data
-      cvts.push_back(make_shared<AcqirisDataDescV1Cvt>(group, "Acqiris::DataDescV1", src, m_configStore, m_cvtOptions));
+      cvts.push_back(make_shared<AcqirisDataDescV1Cvt>(group, "Acqiris::DataDescV1", src, m_configStore, m_cvtOptions, 0));
       break;
     }
     break;
@@ -217,9 +218,9 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
     if (version == 1) {
       if (src.level() == Pds::Level::Reporter) {
         // case for BLD data
-        cvts.push_back(make_shared<AcqirisConfigV1Cvt>(group, "Acqiris::ConfigV1", src, m_cvtOptions));
+        cvts.push_back(make_shared<AcqirisConfigV1Cvt>(group, "Acqiris::ConfigV1", src, m_cvtOptions, 0));
       } else {
-        cvts.push_back(make_shared<O2OTranslator::ConfigDataTypeCvt<AcqirisConfigV1> >(group, "Acqiris::ConfigV1", src));
+        cvts.push_back(make_shared<O2OTranslator::ConfigDataTypeCvt<AcqirisConfigV1> >(group, "Acqiris::ConfigV1", src, 0));
       }
     }
     break;
@@ -227,7 +228,7 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
   case Pds::TypeId::Id_TwoDGaussian:
     switch (version) {
     case 1:
-      cvts.push_back(make_shared<EvtDataTypeCvtDef<CameraTwoDGaussianV1> >(group, "Camera::TwoDGaussianV1", src, m_cvtOptions));
+      cvts.push_back(make_shared<EvtDataTypeCvtDef<CameraTwoDGaussianV1> >(group, "Camera::TwoDGaussianV1", src, m_cvtOptions, 0));
       break;
     }
     break;
@@ -235,7 +236,7 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
   case Pds::TypeId::Id_Opal1kConfig:
     switch (version) {
     case 1:
-      ::makeConfigCvt<Opal1kConfigV1>(cvts, group, "Opal1k::ConfigV1", src, m_cvtOptions);
+      ::makeConfigCvt<Opal1kConfigV1>(cvts, group, "Opal1k::ConfigV1", src, m_cvtOptions, 0);
       break;
     }
     break;
@@ -243,7 +244,7 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
   case Pds::TypeId::Id_FrameFexConfig:
     switch (version) {
     case 1:
-      ::makeConfigCvt<CameraFrameFexConfigV1>(cvts, group, "Camera::FrameFexConfigV1", src, m_cvtOptions);
+      ::makeConfigCvt<CameraFrameFexConfigV1>(cvts, group, "Camera::FrameFexConfigV1", src, m_cvtOptions, 0);
       break;
     }
     break;
@@ -251,25 +252,25 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
   case Pds::TypeId::Id_EvrConfig:
     switch (version) {
     case 1:
-      ::makeConfigCvt<EvrConfigV1>(cvts, group, "EvrData::ConfigV1", src, m_cvtOptions);
+      ::makeConfigCvt<EvrConfigV1>(cvts, group, "EvrData::ConfigV1", src, m_cvtOptions, 0);
       break;
     case 2:
-      ::makeConfigCvt<EvrConfigV2>(cvts, group, "EvrData::ConfigV2", src, m_cvtOptions);
+      ::makeConfigCvt<EvrConfigV2>(cvts, group, "EvrData::ConfigV2", src, m_cvtOptions, 0);
       break;
     case 3:
-      ::makeConfigCvt<EvrConfigV3>(cvts, group, "EvrData::ConfigV3", src, m_cvtOptions);
+      ::makeConfigCvt<EvrConfigV3>(cvts, group, "EvrData::ConfigV3", src, m_cvtOptions, 0);
       break;
     case 4:
-      ::makeConfigCvt<EvrConfigV4>(cvts, group, "EvrData::ConfigV4", src, m_cvtOptions);
+      ::makeConfigCvt<EvrConfigV4>(cvts, group, "EvrData::ConfigV4", src, m_cvtOptions, 0);
       break;
     case 5:
-      ::makeConfigCvt<EvrConfigV5>(cvts, group, "EvrData::ConfigV5", src, m_cvtOptions);
+      ::makeConfigCvt<EvrConfigV5>(cvts, group, "EvrData::ConfigV5", src, m_cvtOptions, 0);
       break;
     case 6:
-      ::makeConfigCvt<EvrConfigV6>(cvts, group, "EvrData::ConfigV6", src, m_cvtOptions);
+      ::makeConfigCvt<EvrConfigV6>(cvts, group, "EvrData::ConfigV6", src, m_cvtOptions, 0);
       break;
     case 7:
-      ::makeConfigCvt<EvrConfigV7>(cvts, group, "EvrData::ConfigV7", src, m_cvtOptions);
+      ::makeConfigCvt<EvrConfigV7>(cvts, group, "EvrData::ConfigV7", src, m_cvtOptions, 0);
       break;
     }
     break;
@@ -277,10 +278,10 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
   case Pds::TypeId::Id_TM6740Config:
     switch (version) {
     case 1:
-      ::makeConfigCvt<PulnixTM6740ConfigV1>(cvts, group, "Pulnix::TM6740ConfigV1", src, m_cvtOptions);
+      ::makeConfigCvt<PulnixTM6740ConfigV1>(cvts, group, "Pulnix::TM6740ConfigV1", src, m_cvtOptions, 0);
       break;
     case 2:
-      ::makeConfigCvt<PulnixTM6740ConfigV2>(cvts, group, "Pulnix::TM6740ConfigV2", src, m_cvtOptions);
+      ::makeConfigCvt<PulnixTM6740ConfigV2>(cvts, group, "Pulnix::TM6740ConfigV2", src, m_cvtOptions, 0);
       break;
     }
     break;
@@ -288,10 +289,10 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
   case Pds::TypeId::Id_ControlConfig:
     switch (version) {
     case 1:
-      ::makeConfigCvt<ControlDataConfigV1>(cvts, group, "ControlData::ConfigV1", src, m_cvtOptions);
+      ::makeConfigCvt<ControlDataConfigV1>(cvts, group, "ControlData::ConfigV1", src, m_cvtOptions, 0);
       break;
     case 2:
-      ::makeConfigCvt<ControlDataConfigV2>(cvts, group, "ControlData::ConfigV2", src, m_cvtOptions);
+      ::makeConfigCvt<ControlDataConfigV2>(cvts, group, "ControlData::ConfigV2", src, m_cvtOptions, 0);
       break;
     }
     break;
@@ -300,7 +301,7 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
     switch (version) {
     case 1:
       // very special converter for PNCCD::FrameV1, it needs two types of data
-      cvts.push_back(make_shared<PnCCDFrameV1Cvt>(group, "PNCCD::FrameV1", src, m_configStore, m_cvtOptions));
+      cvts.push_back(make_shared<PnCCDFrameV1Cvt>(group, "PNCCD::FrameV1", src, m_configStore, m_cvtOptions, 0));
       break;
     }
     break;
@@ -308,10 +309,10 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
   case Pds::TypeId::Id_pnCCDconfig:
     switch (version) {
     case 1:
-      ::makeConfigCvt<PnCCDConfigV1>(cvts, group, "PNCCD::ConfigV1", src, m_cvtOptions);
+      ::makeConfigCvt<PnCCDConfigV1>(cvts, group, "PNCCD::ConfigV1", src, m_cvtOptions, 0);
       break;
     case 2:
-      ::makeConfigCvt<PnCCDConfigV2>(cvts, group, "PNCCD::ConfigV2", src, m_cvtOptions);
+      ::makeConfigCvt<PnCCDConfigV2>(cvts, group, "PNCCD::ConfigV2", src, m_cvtOptions, 0);
       break;
     }
     break;
@@ -320,7 +321,7 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
     switch (version) {
     case 1:
       // Epics converter, non-default chunk size
-      cvts.push_back(make_shared<EpicsDataTypeCvt>(group, "Epics::EpicsPv", src, m_configStore, 16*1024, m_cvtOptions.compLevel()));
+      cvts.push_back(make_shared<EpicsDataTypeCvt>(group, "Epics::EpicsPv", src, m_configStore, 16*1024, m_cvtOptions.compLevel(), 0));
       break;
     }
     break;
@@ -329,7 +330,7 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
     switch (version) {
     case 0:
       // version for this type is 0
-      cvts.push_back(make_shared<EvtDataTypeCvtDef<BldDataFEEGasDetEnergy> >(group, "Bld::BldDataFEEGasDetEnergy", src, m_cvtOptions));
+      cvts.push_back(make_shared<EvtDataTypeCvtDef<BldDataFEEGasDetEnergy> >(group, "Bld::BldDataFEEGasDetEnergy", src, m_cvtOptions, 0));
       break;
     }
     break;
@@ -337,16 +338,16 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
   case Pds::TypeId::Id_EBeam:
     switch (version) {
     case 0:
-      cvts.push_back(make_shared<EvtDataTypeCvtDef<BldDataEBeamV0> >(group, "Bld::BldDataEBeamV0", src, m_cvtOptions));
+      cvts.push_back(make_shared<EvtDataTypeCvtDef<BldDataEBeamV0> >(group, "Bld::BldDataEBeamV0", src, m_cvtOptions, 0));
       break;
     case 1:
-      cvts.push_back(make_shared<EvtDataTypeCvtDef<BldDataEBeamV1> >(group, "Bld::BldDataEBeamV1", src, m_cvtOptions));
+      cvts.push_back(make_shared<EvtDataTypeCvtDef<BldDataEBeamV1> >(group, "Bld::BldDataEBeamV1", src, m_cvtOptions, 0));
       break;
     case 2:
-      cvts.push_back(make_shared<EvtDataTypeCvtDef<BldDataEBeamV2> >(group, "Bld::BldDataEBeamV2", src, m_cvtOptions));
+      cvts.push_back(make_shared<EvtDataTypeCvtDef<BldDataEBeamV2> >(group, "Bld::BldDataEBeamV2", src, m_cvtOptions, 0));
       break;
     case 3:
-      cvts.push_back(make_shared<EvtDataTypeCvtDef<BldDataEBeamV3> >(group, "Bld::BldDataEBeamV3", src, m_cvtOptions));
+      cvts.push_back(make_shared<EvtDataTypeCvtDef<BldDataEBeamV3> >(group, "Bld::BldDataEBeamV3", src, m_cvtOptions, 0));
       break;
     }
     break;
@@ -355,7 +356,7 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
     switch (version) {
     case 0:
       // version for this type is 0
-      cvts.push_back(make_shared<EvtDataTypeCvtDef<BldDataPhaseCavity> >(group, "Bld::BldDataPhaseCavity", src, m_cvtOptions));
+      cvts.push_back(make_shared<EvtDataTypeCvtDef<BldDataPhaseCavity> >(group, "Bld::BldDataPhaseCavity", src, m_cvtOptions, 0));
       break;
     }
     break;
@@ -364,11 +365,11 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
     switch (version) {
     case 1:
       // very special converter for Princeton::FrameV1, it needs two types of data
-      cvts.push_back(make_shared<PrincetonFrameCvt<PrincetonFrameV1>  >(group, "Princeton::FrameV1", src, m_configStore, m_cvtOptions));
+      cvts.push_back(make_shared<PrincetonFrameCvt<PrincetonFrameV1>  >(group, "Princeton::FrameV1", src, m_configStore, m_cvtOptions, 0));
       break;
     case 2:
       // very special converter for Princeton::FrameV2, it needs two types of data
-      cvts.push_back(make_shared<PrincetonFrameCvt<PrincetonFrameV2>  >(group, "Princeton::FrameV2", src, m_configStore, m_cvtOptions));
+      cvts.push_back(make_shared<PrincetonFrameCvt<PrincetonFrameV2>  >(group, "Princeton::FrameV2", src, m_configStore, m_cvtOptions, 0));
       break;
     }
     break;
@@ -376,19 +377,19 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
   case Pds::TypeId::Id_PrincetonConfig:
     switch (version) {
     case 1:
-      ::makeConfigCvt<PrincetonConfigV1>(cvts, group, "Princeton::ConfigV1", src, m_cvtOptions);
+      ::makeConfigCvt<PrincetonConfigV1>(cvts, group, "Princeton::ConfigV1", src, m_cvtOptions, 0);
       break;
     case 2:
-      ::makeConfigCvt<PrincetonConfigV2>(cvts, group, "Princeton::ConfigV2", src, m_cvtOptions);
+      ::makeConfigCvt<PrincetonConfigV2>(cvts, group, "Princeton::ConfigV2", src, m_cvtOptions, 0);
       break;
     case 3:
-      ::makeConfigCvt<PrincetonConfigV3>(cvts, group, "Princeton::ConfigV3", src, m_cvtOptions);
+      ::makeConfigCvt<PrincetonConfigV3>(cvts, group, "Princeton::ConfigV3", src, m_cvtOptions, 0);
       break;
     case 4:
-      ::makeConfigCvt<PrincetonConfigV4>(cvts, group, "Princeton::ConfigV4", src, m_cvtOptions);
+      ::makeConfigCvt<PrincetonConfigV4>(cvts, group, "Princeton::ConfigV4", src, m_cvtOptions, 0);
       break;
     case 5:
-      ::makeConfigCvt<PrincetonConfigV5>(cvts, group, "Princeton::ConfigV5", src, m_cvtOptions);
+      ::makeConfigCvt<PrincetonConfigV5>(cvts, group, "Princeton::ConfigV5", src, m_cvtOptions, 0);
       break;
     }
     break;
@@ -396,7 +397,7 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
   case Pds::TypeId::Id_EvrData:
     switch (version) {
     case 3:
-      cvts.push_back(make_shared<EvtDataTypeCvtDef<EvrDataV3> >(group, "EvrData::DataV3", src, m_cvtOptions));
+      cvts.push_back(make_shared<EvtDataTypeCvtDef<EvrDataV3> >(group, "EvrData::DataV3", src, m_cvtOptions, 0));
       break;
     }
     break;
@@ -408,10 +409,10 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
   case Pds::TypeId::Id_FccdConfig:
     switch (version) {
     case 1:
-      ::makeConfigCvt<FccdConfigV1>(cvts, group, "FCCD::FccdConfigV1", src, m_cvtOptions);
+      ::makeConfigCvt<FccdConfigV1>(cvts, group, "FCCD::FccdConfigV1", src, m_cvtOptions, 0);
       break;
     case 2:
-      ::makeConfigCvt<FccdConfigV2>(cvts, group, "FCCD::FccdConfigV2", src, m_cvtOptions);
+      ::makeConfigCvt<FccdConfigV2>(cvts, group, "FCCD::FccdConfigV2", src, m_cvtOptions, 0);
       break;
     }
     break;
@@ -419,10 +420,10 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
   case Pds::TypeId::Id_IpimbData:
     switch (version) {
     case 1:
-      cvts.push_back(make_shared<EvtDataTypeCvtDef<H5DataTypes::IpimbDataV1> >(group, "Ipimb::DataV1", src, m_cvtOptions));
+      cvts.push_back(make_shared<EvtDataTypeCvtDef<H5DataTypes::IpimbDataV1> >(group, "Ipimb::DataV1", src, m_cvtOptions, 0));
       break;
     case 2:
-      cvts.push_back(make_shared<EvtDataTypeCvtDef<H5DataTypes::IpimbDataV2> >(group, "Ipimb::DataV2", src, m_cvtOptions));
+      cvts.push_back(make_shared<EvtDataTypeCvtDef<H5DataTypes::IpimbDataV2> >(group, "Ipimb::DataV2", src, m_cvtOptions, 0));
       break;
     }
     break;
@@ -430,10 +431,10 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
   case Pds::TypeId::Id_IpimbConfig:
     switch (version) {
     case 1:
-      ::makeConfigCvt<H5DataTypes::IpimbConfigV1>(cvts, group, "Ipimb::ConfigV1", src, m_cvtOptions);
+      ::makeConfigCvt<H5DataTypes::IpimbConfigV1>(cvts, group, "Ipimb::ConfigV1", src, m_cvtOptions, 0);
       break;
     case 2:
-      ::makeConfigCvt<H5DataTypes::IpimbConfigV2>(cvts, group, "Ipimb::ConfigV2", src, m_cvtOptions);
+      ::makeConfigCvt<H5DataTypes::IpimbConfigV2>(cvts, group, "Ipimb::ConfigV2", src, m_cvtOptions, 0);
       break;
     }
     break;
@@ -441,10 +442,10 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
   case Pds::TypeId::Id_EncoderData:
     switch (version) {
     case 1:
-      cvts.push_back(make_shared<EvtDataTypeCvtDef<EncoderDataV1> >(group, "Encoder::DataV1", src, m_cvtOptions));
+      cvts.push_back(make_shared<EvtDataTypeCvtDef<EncoderDataV1> >(group, "Encoder::DataV1", src, m_cvtOptions, 0));
       break;
     case 2:
-      cvts.push_back(make_shared<EvtDataTypeCvtDef<EncoderDataV2> >(group, "Encoder::DataV2", src, m_cvtOptions));
+      cvts.push_back(make_shared<EvtDataTypeCvtDef<EncoderDataV2> >(group, "Encoder::DataV2", src, m_cvtOptions, 0));
       break;
     }
     break;
@@ -452,10 +453,10 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
   case Pds::TypeId::Id_EncoderConfig:
     switch (version) {
     case 1:
-      ::makeConfigCvt<EncoderConfigV1>(cvts, group, "Encoder::ConfigV1", src, m_cvtOptions);
+      ::makeConfigCvt<EncoderConfigV1>(cvts, group, "Encoder::ConfigV1", src, m_cvtOptions, 0);
       break;
     case 2:
-      ::makeConfigCvt<EncoderConfigV2>(cvts, group, "Encoder::ConfigV2", src, m_cvtOptions);
+      ::makeConfigCvt<EncoderConfigV2>(cvts, group, "Encoder::ConfigV2", src, m_cvtOptions, 0);
       break;
     }
     break;
@@ -463,7 +464,7 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
   case Pds::TypeId::Id_EvrIOConfig:
     switch (version) {
     case 1:
-      ::makeConfigCvt<EvrIOConfigV1>(cvts, group, "EvrData::IOConfigV1", src, m_cvtOptions);
+      ::makeConfigCvt<EvrIOConfigV1>(cvts, group, "EvrData::IOConfigV1", src, m_cvtOptions, 0);
       break;
     }
     break;
@@ -471,7 +472,7 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
   case Pds::TypeId::Id_PrincetonInfo:
     switch (version) {
     case 1:
-      cvts.push_back(make_shared<EvtDataTypeCvtDef<PrincetonInfoV1> >(group, "Princeton::InfoV1", src, m_cvtOptions));
+      cvts.push_back(make_shared<EvtDataTypeCvtDef<PrincetonInfoV1> >(group, "Princeton::InfoV1", src, m_cvtOptions, 0));
       break;
     }
     break;
@@ -480,11 +481,11 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
     switch (version) {
     case 1:
       // very special converter for CsPad::ElementV1, it needs two types of data
-      cvts.push_back(make_shared<CsPadElementV1Cvt>(group, "CsPad::ElementV1", src, m_configStore, m_calibStore, m_cvtOptions));
+      cvts.push_back(make_shared<CsPadElementV1Cvt>(group, "CsPad::ElementV1", src, m_configStore, m_calibStore, m_cvtOptions, 0));
       break;
     case 2:
       // very special converter for CsPad::ElementV2, it needs two types of data
-      cvts.push_back(make_shared<CsPadElementV2Cvt>(group, "CsPad::ElementV2", src, m_configStore, m_calibStore, m_cvtOptions));
+      cvts.push_back(make_shared<CsPadElementV2Cvt>(group, "CsPad::ElementV2", src, m_configStore, m_calibStore, m_cvtOptions, 0));
       break;
     }
     break;
@@ -492,34 +493,34 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
   case Pds::TypeId::Id_CspadConfig:
     switch (version) {
     case 1:
-      ::makeConfigCvt<CsPadConfigV1>(cvts, group, "CsPad::ConfigV1", src, m_cvtOptions);
+      ::makeConfigCvt<CsPadConfigV1>(cvts, group, "CsPad::ConfigV1", src, m_cvtOptions, 0);
       break;
     case 2:
-      ::makeConfigCvt<CsPadConfigV2>(cvts, group, "CsPad::ConfigV2", src, m_cvtOptions);
+      ::makeConfigCvt<CsPadConfigV2>(cvts, group, "CsPad::ConfigV2", src, m_cvtOptions, 0);
       break;
     case 3:
-      ::makeConfigCvt<CsPadConfigV3>(cvts, group, "CsPad::ConfigV3", src, m_cvtOptions);
+      ::makeConfigCvt<CsPadConfigV3>(cvts, group, "CsPad::ConfigV3", src, m_cvtOptions, 0);
       break;
     case 4:
-      ::makeConfigCvt<CsPadConfigV4>(cvts, group, "CsPad::ConfigV4", src, m_cvtOptions);
+      ::makeConfigCvt<CsPadConfigV4>(cvts, group, "CsPad::ConfigV4", src, m_cvtOptions, 0);
       break;
     }
     // special converter object for CsPad calibration data
-    cvts.push_back(shared_ptr<CsPadCalibV1Cvt>(new CsPadCalibV1Cvt(group, "CsPad::CalibV1", src, m_metadata, m_calibStore)));
+    cvts.push_back(shared_ptr<CsPadCalibV1Cvt>(new CsPadCalibV1Cvt(group, "CsPad::CalibV1", src, m_metadata, m_calibStore, 0)));
     if (version == 3) {
       // some cspad2x2 data was produced without Cspad2x2Config object but
       // with CspadConfig/3 instead
-      cvts.push_back(shared_ptr<CsPad2x2CalibV1Cvt>(new CsPad2x2CalibV1Cvt(group, "CsPad2x2::CalibV1", src, m_metadata, m_calibStore)));
+      cvts.push_back(shared_ptr<CsPad2x2CalibV1Cvt>(new CsPad2x2CalibV1Cvt(group, "CsPad2x2::CalibV1", src, m_metadata, m_calibStore, 0)));
     }
     break;
 
   case Pds::TypeId::Id_IpmFexConfig:
     switch (version) {
     case 1:
-      ::makeConfigCvt<LusiIpmFexConfigV1>(cvts, group, "Lusi::IpmFexConfigV1", src, m_cvtOptions);
+      ::makeConfigCvt<LusiIpmFexConfigV1>(cvts, group, "Lusi::IpmFexConfigV1", src, m_cvtOptions, 0);
       break;
     case 2:
-      ::makeConfigCvt<LusiIpmFexConfigV2>(cvts, group, "Lusi::IpmFexConfigV2", src, m_cvtOptions);
+      ::makeConfigCvt<LusiIpmFexConfigV2>(cvts, group, "Lusi::IpmFexConfigV2", src, m_cvtOptions, 0);
       break;
     }
     break;
@@ -527,7 +528,7 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
   case Pds::TypeId::Id_IpmFex:
     switch (version) {
     case 1:
-      cvts.push_back(make_shared<EvtDataTypeCvtDef<LusiIpmFexV1> >(group, "Lusi::IpmFexV1", src, m_cvtOptions));
+      cvts.push_back(make_shared<EvtDataTypeCvtDef<LusiIpmFexV1> >(group, "Lusi::IpmFexV1", src, m_cvtOptions, 0));
       break;
     }
     break;
@@ -535,10 +536,10 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
   case Pds::TypeId::Id_DiodeFexConfig:
     switch (version) {
     case 1:
-      ::makeConfigCvt<LusiDiodeFexConfigV1>(cvts, group, "Lusi::DiodeFexConfigV1", src, m_cvtOptions);
+      ::makeConfigCvt<LusiDiodeFexConfigV1>(cvts, group, "Lusi::DiodeFexConfigV1", src, m_cvtOptions, 0);
       break;
     case 2:
-      ::makeConfigCvt<LusiDiodeFexConfigV2>(cvts, group, "Lusi::DiodeFexConfigV2", src, m_cvtOptions);
+      ::makeConfigCvt<LusiDiodeFexConfigV2>(cvts, group, "Lusi::DiodeFexConfigV2", src, m_cvtOptions, 0);
       break;
     }
     break;
@@ -546,7 +547,7 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
   case Pds::TypeId::Id_DiodeFex:
     switch (version) {
     case 1:
-      cvts.push_back(make_shared<EvtDataTypeCvtDef<LusiDiodeFexV1> >(group, "Lusi::DiodeFexV1", src, m_cvtOptions));
+      cvts.push_back(make_shared<EvtDataTypeCvtDef<LusiDiodeFexV1> >(group, "Lusi::DiodeFexV1", src, m_cvtOptions, 0));
       break;
     }
     break;
@@ -554,7 +555,7 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
   case Pds::TypeId::Id_PimImageConfig:
     switch (version) {
     case 1:
-      ::makeConfigCvt<LusiPimImageConfigV1>(cvts, group, "Lusi::PimImageConfigV1", src, m_cvtOptions);
+      ::makeConfigCvt<LusiPimImageConfigV1>(cvts, group, "Lusi::PimImageConfigV1", src, m_cvtOptions, 0);
       break;
     }
     break;
@@ -574,7 +575,7 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
   case Pds::TypeId::Id_AcqTdcConfig:
     switch (version) {
     case 1:
-      ::makeConfigCvt<AcqirisTdcConfigV1>(cvts, group, "Acqiris::AcqirisTdcConfigV1", src, m_cvtOptions);
+      ::makeConfigCvt<AcqirisTdcConfigV1>(cvts, group, "Acqiris::AcqirisTdcConfigV1", src, m_cvtOptions, 0);
       break;
     }
     break;
@@ -582,7 +583,7 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
   case Pds::TypeId::Id_AcqTdcData:
     switch (version) {
     case 1:
-      cvts.push_back(make_shared<AcqirisTdcDataV1Cvt>(group, "Acqiris::TdcDataV1", src, m_cvtOptions));
+      cvts.push_back(make_shared<AcqirisTdcDataV1Cvt>(group, "Acqiris::TdcDataV1", src, m_cvtOptions, 0));
       break;
     }
     break;
@@ -603,7 +604,7 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
     switch (version) {
     case 1:
       // very special converter for CsPad2x2::ElementV1, it needs calibrations
-      cvts.push_back(make_shared<CsPad2x2ElementV1Cvt>(group, "CsPad2x2::ElementV1", src, m_calibStore, m_cvtOptions));
+      cvts.push_back(make_shared<CsPad2x2ElementV1Cvt>(group, "CsPad2x2::ElementV1", src, m_calibStore, m_cvtOptions, 0));
       break;
     }
     break;
@@ -620,14 +621,14 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
   case Pds::TypeId::Id_Cspad2x2Config:
     switch (version) {
     case 1:
-      ::makeConfigCvt<CsPad2x2ConfigV1>(cvts, group, "CsPad2x2::ConfigV1", src, m_cvtOptions);
+      ::makeConfigCvt<CsPad2x2ConfigV1>(cvts, group, "CsPad2x2::ConfigV1", src, m_cvtOptions, 0);
       break;
     case 2:
-      ::makeConfigCvt<CsPad2x2ConfigV2>(cvts, group, "CsPad2x2::ConfigV2", src, m_cvtOptions);
+      ::makeConfigCvt<CsPad2x2ConfigV2>(cvts, group, "CsPad2x2::ConfigV2", src, m_cvtOptions, 0);
       break;
     }
     // special converter object for CsPad calibration data
-    cvts.push_back(shared_ptr<CsPad2x2CalibV1Cvt>(new CsPad2x2CalibV1Cvt(group, "CsPad2x2::CalibV1", src, m_metadata, m_calibStore)));
+    cvts.push_back(shared_ptr<CsPad2x2CalibV1Cvt>(new CsPad2x2CalibV1Cvt(group, "CsPad2x2::CalibV1", src, m_metadata, m_calibStore, 0)));
     break;
 
   case Pds::TypeId::Id_FexampConfig:
@@ -641,7 +642,7 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
   case Pds::TypeId::Id_Gsc16aiConfig:
     switch (version) {
     case 1:
-      ::makeConfigCvt<Gsc16aiConfigV1>(cvts, group, "Gsc16ai::ConfigV1", src, m_cvtOptions);
+      ::makeConfigCvt<Gsc16aiConfigV1>(cvts, group, "Gsc16ai::ConfigV1", src, m_cvtOptions, 0);
       break;
     }
     break;
@@ -650,7 +651,7 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
     switch (version) {
     case 1:
       // very special converter for Gsc16ai::DataV1, it needs two types of data
-      cvts.push_back(make_shared<Gsc16aiDataV1Cvt>(group, "Gsc16ai::DataV1", src, m_configStore, m_cvtOptions));
+      cvts.push_back(make_shared<Gsc16aiDataV1Cvt>(group, "Gsc16ai::DataV1", src, m_configStore, m_cvtOptions, 0));
       break;
     }
     break;
@@ -662,13 +663,13 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
   case Pds::TypeId::Id_TimepixConfig:
     switch (version) {
     case 1:
-      ::makeConfigCvt<TimepixConfigV1>(cvts, group, "Timepix::ConfigV1", src, m_cvtOptions);
+      ::makeConfigCvt<TimepixConfigV1>(cvts, group, "Timepix::ConfigV1", src, m_cvtOptions, 0);
       break;
     case 2:
-      ::makeConfigCvt<TimepixConfigV2>(cvts, group, "Timepix::ConfigV2", src, m_cvtOptions);
+      ::makeConfigCvt<TimepixConfigV2>(cvts, group, "Timepix::ConfigV2", src, m_cvtOptions, 0);
       break;
     case 3:
-      ::makeConfigCvt<TimepixConfigV3>(cvts, group, "Timepix::ConfigV3", src, m_cvtOptions);
+      ::makeConfigCvt<TimepixConfigV3>(cvts, group, "Timepix::ConfigV3", src, m_cvtOptions, 0);
       break;
     }
     break;
@@ -678,11 +679,11 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
     case 1:
       // very special converter for Timepix::DataV1
       // Note that it makes group DataV2 as internally it converts DataV1 into DataV2
-      cvts.push_back(make_shared<TimepixDataV1Cvt>(group, "Timepix::DataV2", src, m_cvtOptions));
+      cvts.push_back(make_shared<TimepixDataV1Cvt>(group, "Timepix::DataV2", src, m_cvtOptions, 0));
       break;
     case 2:
       // very special converter for Timepix::DataV1
-      cvts.push_back(make_shared<TimepixDataV2Cvt>(group, "Timepix::DataV2", src, m_cvtOptions));
+      cvts.push_back(make_shared<TimepixDataV2Cvt>(group, "Timepix::DataV2", src, m_cvtOptions, 0));
       break;
     }
     break;
@@ -693,7 +694,7 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
   case Pds::TypeId::Id_OceanOpticsConfig:
     switch (version) {
     case 1:
-      ::makeConfigCvt<OceanOpticsConfigV1>(cvts, group, "OceanOptics::ConfigV1", src, m_cvtOptions);
+      ::makeConfigCvt<OceanOpticsConfigV1>(cvts, group, "OceanOptics::ConfigV1", src, m_cvtOptions, 0);
       break;
     }
     break;
@@ -702,7 +703,7 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
     switch (version) {
     case 1:
       // very special converter for OceanOptics::DataV1, it needs two types of data
-      cvts.push_back(make_shared<OceanOpticsDataV1Cvt>(group, "OceanOptics::DataV1", src, m_configStore, m_cvtOptions));
+      cvts.push_back(make_shared<OceanOpticsDataV1Cvt>(group, "OceanOptics::DataV1", src, m_configStore, m_cvtOptions, 0));
       break;
     }
     break;
@@ -714,7 +715,7 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
   case Pds::TypeId::Id_FliConfig:
     switch (version) {
     case 1:
-      ::makeConfigCvt<FliConfigV1>(cvts, group, "Fli::ConfigV1", src, m_cvtOptions);
+      ::makeConfigCvt<FliConfigV1>(cvts, group, "Fli::ConfigV1", src, m_cvtOptions, 0);
       break;
     }
     break;
@@ -723,7 +724,7 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
     switch (version) {
     case 1:
       // very special converter for Fli::FrameV1, it needs two types of data
-      cvts.push_back(make_shared<FliFrameV1Cvt<FliFrameV1> >(group, "Fli::FrameV1", src, m_configStore, Pds::TypeId(Pds::TypeId::Id_FliConfig, 1), m_cvtOptions));
+      cvts.push_back(make_shared<FliFrameV1Cvt<FliFrameV1> >(group, "Fli::FrameV1", src, m_configStore, Pds::TypeId(Pds::TypeId::Id_FliConfig, 1), m_cvtOptions, 0));
       break;
     }
     break;
@@ -731,7 +732,7 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
   case Pds::TypeId::Id_QuartzConfig:
     switch (version) {
     case 1:
-      ::makeConfigCvt<QuartzConfigV1>(cvts, group, "Quartz::ConfigV1", src, m_cvtOptions);
+      ::makeConfigCvt<QuartzConfigV1>(cvts, group, "Quartz::ConfigV1", src, m_cvtOptions, 0);
       break;
     }
     break;
@@ -745,7 +746,7 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
   case Pds::TypeId::Id_AndorConfig:
     switch (version) {
     case 1:
-      ::makeConfigCvt<AndorConfigV1>(cvts, group, "Andor::ConfigV1", src, m_cvtOptions);
+      ::makeConfigCvt<AndorConfigV1>(cvts, group, "Andor::ConfigV1", src, m_cvtOptions, 0);
       break;
     }
     break;
@@ -754,7 +755,7 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
     switch (version) {
     case 1:
       // very special converter for Andor::FrameV1, it needs two types of data
-      cvts.push_back(make_shared<FliFrameV1Cvt<AndorFrameV1> >(group, "Andor::FrameV1", src, m_configStore, Pds::TypeId(Pds::TypeId::Id_FliConfig, 1), m_cvtOptions));
+      cvts.push_back(make_shared<FliFrameV1Cvt<AndorFrameV1> >(group, "Andor::FrameV1", src, m_configStore, Pds::TypeId(Pds::TypeId::Id_FliConfig, 1), m_cvtOptions, 0));
       break;
     }
     break;
@@ -762,7 +763,7 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
   case Pds::TypeId::Id_UsdUsbData:
     switch (version) {
     case 1:
-      cvts.push_back(make_shared<EvtDataTypeCvtDef<UsdUsbDataV1> >(group, "UsdUsb::DataV1", src, m_cvtOptions));
+      cvts.push_back(make_shared<EvtDataTypeCvtDef<UsdUsbDataV1> >(group, "UsdUsb::DataV1", src, m_cvtOptions, 1));
       break;
     }
     break;
@@ -770,7 +771,7 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
   case Pds::TypeId::Id_UsdUsbConfig:
     switch (version) {
     case 1:
-      ::makeConfigCvt<UsdUsbConfigV1>(cvts, group, "UsdUsb::ConfigV1", src, m_cvtOptions);
+      ::makeConfigCvt<UsdUsbConfigV1>(cvts, group, "UsdUsb::ConfigV1", src, m_cvtOptions, 0);
       break;
     }
     break;
@@ -778,10 +779,10 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
   case Pds::TypeId::Id_GMD:
     switch (version) {
     case 0:
-      cvts.push_back(make_shared<EvtDataTypeCvtDef<BldDataGMDV0> >(group, "Bld::BldDataGMDV0", src, m_cvtOptions));
+      cvts.push_back(make_shared<EvtDataTypeCvtDef<BldDataGMDV0> >(group, "Bld::BldDataGMDV0", src, m_cvtOptions, 0));
       break;
     case 1:
-      cvts.push_back(make_shared<EvtDataTypeCvtDef<BldDataGMDV1> >(group, "Bld::BldDataGMDV1", src, m_cvtOptions));
+      cvts.push_back(make_shared<EvtDataTypeCvtDef<BldDataGMDV1> >(group, "Bld::BldDataGMDV1", src, m_cvtOptions, 0));
       break;
     }
     break;
@@ -793,7 +794,7 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
   case Pds::TypeId::Id_OrcaConfig:
     switch (version) {
     case 1:
-      ::makeConfigCvt<OrcaConfigV1>(cvts, group, "Orca::ConfigV1", src, m_cvtOptions);
+      ::makeConfigCvt<OrcaConfigV1>(cvts, group, "Orca::ConfigV1", src, m_cvtOptions, 0);
       break;
     }
     break;

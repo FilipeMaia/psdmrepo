@@ -70,8 +70,10 @@ public:
    *                            derived from type, should be unique.
    *  @param[in] src            Data source
    *  @param[in] cvtOptions     Object holding conversion options
+   *  @param[in] schemaVersion  Schema version 
    */
-  EvtDataTypeCvt(hdf5pp::Group group, const std::string& typeGroupName, const Pds::Src& src, const CvtOptions& cvtOptions)
+  EvtDataTypeCvt(hdf5pp::Group group, const std::string& typeGroupName, const Pds::Src& src,
+      const CvtOptions& cvtOptions, int schemaVersion)
     : DataTypeCvt<XtcType>()
     , m_typeGroupName(typeGroupName)
     , m_cvtOptions(cvtOptions)
@@ -93,6 +95,11 @@ public:
 
     // create new group
     m_group = group.createGroup(typeGroupName + "/" + srcName);
+    
+    // store some group attributes
+    uint64_t srcVal = (uint64_t(src.phy()) << 32) + src.log();
+    m_group.createAttr<uint64_t>("_xtcSrc").store(srcVal);
+    m_group.createAttr<uint32_t>("_schemaVersion").store(schemaVersion);
   }
 
   // Destructor

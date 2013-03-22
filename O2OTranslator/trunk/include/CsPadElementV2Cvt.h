@@ -62,7 +62,8 @@ public:
                       const Pds::Src& src,
                       const ConfigObjectStore& configStore,
                       const CalibObjectStore& calibStore,
-                      const CvtOptions& cvtOptions ) ;
+                      const CvtOptions& cvtOptions,
+                      int schemaVersion ) ;
 
   // Destructor
   virtual ~CsPadElementV2Cvt () ;

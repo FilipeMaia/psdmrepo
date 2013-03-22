@@ -52,8 +52,9 @@ FliFrameV1Cvt<FrameType>::FliFrameV1Cvt ( const hdf5pp::Group& group,
     const Pds::Src& src,
     const ConfigObjectStore& configStore,
     Pds::TypeId cfgTypeId,
-    const CvtOptions& cvtOptions )
-  : Super(group, typeGroupName, src, cvtOptions)
+    const CvtOptions& cvtOptions,
+    int schemaVersion )
+  : Super(group, typeGroupName, src, cvtOptions, schemaVersion)
   , m_configStore(configStore)
   , m_cfgTypeId(cfgTypeId)
   , m_frameCont()

@@ -58,11 +58,13 @@ CsPadCalibV1Cvt::CsPadCalibV1Cvt(hdf5pp::Group group,
     const std::string& typeGroupName,
     const Pds::Src& src,
     const O2OMetaData& metadata,
-    CalibObjectStore& calibStore)
+    CalibObjectStore& calibStore,
+    int schemaVersion)
   : DataTypeCvtI()
   , m_typeGroupName(typeGroupName)
   , m_metadata(metadata)
   , m_calibStore(calibStore)
+  , m_schemaVersion(schemaVersion)
   , m_group(group)
 {
 }
@@ -145,6 +147,11 @@ CsPadCalibV1Cvt::convert ( const void* data,
 
   // create separate group
   hdf5pp::Group grp = m_group.createGroup( grpName );
+
+  // store some group attributes
+  uint64_t srcVal = (uint64_t(src.top().phy()) << 32) + src.top().log();
+  grp.createAttr<uint64_t>("_xtcSrc").store(srcVal);
+  grp.createAttr<uint32_t>("_schemaVersion").store(m_schemaVersion);
 
   // store it in a file
   if (peds.get()) {

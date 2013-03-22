@@ -44,8 +44,8 @@ namespace O2OTranslator {
 // Constructors --
 //----------------
 BldDataPimV1Cvt::BldDataPimV1Cvt (const hdf5pp::Group& group, const std::string& typeGroupName,
-    const Pds::Src& src, const CvtOptions& cvtOptions )
-  : EvtDataTypeCvt<XtcType>( group, typeGroupName, src, cvtOptions )
+    const Pds::Src& src, const CvtOptions& cvtOptions, int schemaVersion )
+  : EvtDataTypeCvt<XtcType>( group, typeGroupName, src, cvtOptions, schemaVersion )
   , m_imgType()
   , m_dataCont()
   , m_imageCont()

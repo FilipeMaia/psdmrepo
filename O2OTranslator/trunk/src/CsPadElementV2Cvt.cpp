@@ -66,8 +66,9 @@ CsPadElementV2Cvt::CsPadElementV2Cvt ( const hdf5pp::Group& group,
     const Pds::Src& src,
     const ConfigObjectStore& configStore,
     const CalibObjectStore& calibStore,
-    const CvtOptions& cvtOptions )
-  : EvtDataTypeCvt<XtcType>(group, typeGroupName, src, cvtOptions)
+    const CvtOptions& cvtOptions,
+    int schemaVersion )
+  : EvtDataTypeCvt<XtcType>(group, typeGroupName, src, cvtOptions, schemaVersion)
   , m_configStore(configStore)
   , m_calibStore(calibStore)
   , m_elementCont()

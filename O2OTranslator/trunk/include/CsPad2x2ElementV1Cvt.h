@@ -58,7 +58,8 @@ public:
 
   // constructor
   CsPad2x2ElementV1Cvt ( const hdf5pp::Group& group, const std::string& typeGroupName,
-      const Pds::Src& src, const CalibObjectStore& calibStore, const CvtOptions& cvtOptions ) ;
+      const Pds::Src& src, const CalibObjectStore& calibStore, const CvtOptions& cvtOptions,
+      int schemaVersion ) ;
 
   // Destructor
   virtual ~CsPad2x2ElementV1Cvt () ;

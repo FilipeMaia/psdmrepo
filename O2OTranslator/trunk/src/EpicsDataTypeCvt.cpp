@@ -79,7 +79,8 @@ EpicsDataTypeCvt::EpicsDataTypeCvt ( hdf5pp::Group group,
     const Pds::Src& src,
     const ConfigObjectStore& configStore,
     hsize_t chunk_size,
-    int deflate )
+    int deflate,
+    int schemaVersion)
   : DataTypeCvt<Pds::EpicsPvHeader>()
   , m_typeGroupName(topGroupName)
   , m_configStore(configStore)
@@ -101,6 +102,11 @@ EpicsDataTypeCvt::EpicsDataTypeCvt ( hdf5pp::Group group,
   } else {
     MsgLog(logger, trace, "creating group " << grpName ) ;
     m_group = group.createGroup( grpName );
+
+    // store some group attributes
+    uint64_t srcVal = (uint64_t(src.phy()) << 32) + src.log();
+    m_group.createAttr<uint64_t>("_xtcSrc").store(srcVal);
+    m_group.createAttr<uint32_t>("_schemaVersion").store(schemaVersion);
   }
 }
 

@@ -53,8 +53,9 @@ AcqirisDataDescV1Cvt::AcqirisDataDescV1Cvt ( const hdf5pp::Group& group,
     const std::string& typeGroupName,
     const Pds::Src& src,
     const ConfigObjectStore& configStore,
-    const CvtOptions& cvtOptions )
-  : EvtDataTypeCvt<XtcType>(group, typeGroupName, src, cvtOptions)
+    const CvtOptions& cvtOptions,
+    int schemaVersion )
+  : EvtDataTypeCvt<XtcType>(group, typeGroupName, src, cvtOptions, schemaVersion)
   , m_configStore(configStore)
   , m_timestampCont()
   , m_waveformCont()

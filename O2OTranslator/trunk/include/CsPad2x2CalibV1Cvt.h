@@ -61,7 +61,8 @@ public:
       const std::string& typeGroupName,
       const Pds::Src& src,
       const O2OMetaData& metadata,
-      CalibObjectStore& calibStore);
+      CalibObjectStore& calibStore,
+      int schemaVersion);
 
   // Destructor
   virtual ~CsPad2x2CalibV1Cvt () ;
@@ -82,6 +83,7 @@ private:
   std::string m_typeGroupName ;
   const O2OMetaData& m_metadata;
   CalibObjectStore& m_calibStore;
+  int m_schemaVersion;
   hdf5pp::Group m_group;
 
 };

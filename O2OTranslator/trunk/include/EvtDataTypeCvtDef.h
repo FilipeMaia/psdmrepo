@@ -57,19 +57,20 @@ public:
   /**
    *  Constructor for converter
    *
+   *  @param[in] group          Group in HDF5 file
    *  @param[in] typeGroupName  Name of the group for this type, arbitrary string usually
    *                            derived from type, should be unique.
-   *  @param[in] chunk_size     Chunk size in bytes, your best guess
-   *  @param[in] deflate        Compression level, use negative number to disable compression
-   *  @param[in] dsname         Dataset name, usually it is data, may be changed to anything
-   *  @param[in] srcFilter      Source filter object, default is to allow all sources
+   *  @param[in] src            Data source
+   *  @param[in] cvtOptions     Conversion options
+   *  @param[in] dsname         Dataset name, usually it is "data", may be changed to anything
    */
   EvtDataTypeCvtDef ( const hdf5pp::Group& group,
                       const std::string& typeGroupName,
                       const Pds::Src& src,
                       const CvtOptions& cvtOptions,
+                      int schemaVersion,
                       const std::string& dsname = "data")
-    : EvtDataTypeCvt<typename H5Type::XtcType>(group, typeGroupName, src, cvtOptions)
+    : EvtDataTypeCvt<typename H5Type::XtcType>(group, typeGroupName, src, cvtOptions, schemaVersion)
     , m_dsname(dsname)
     , m_dataCont()
   {

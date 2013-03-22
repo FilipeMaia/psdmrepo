@@ -65,7 +65,8 @@ public:
       const Pds::Src& src,
       const ConfigObjectStore& configStore,
       hsize_t chunk_size,
-      int deflate ) ;
+      int deflate,
+      int schemaVersion ) ;
 
   // Destructor
   virtual ~EpicsDataTypeCvt () ;

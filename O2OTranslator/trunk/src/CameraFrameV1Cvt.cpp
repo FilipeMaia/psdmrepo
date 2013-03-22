@@ -44,8 +44,8 @@ namespace O2OTranslator {
 // Constructors --
 //----------------
 CameraFrameV1Cvt::CameraFrameV1Cvt (const hdf5pp::Group& group, const std::string& typeGroupName,
-    const Pds::Src& src, const CvtOptions& cvtOptions )
-  : EvtDataTypeCvt<Pds::Camera::FrameV1>( group, typeGroupName, src, cvtOptions )
+    const Pds::Src& src, const CvtOptions& cvtOptions, int schemaVersion )
+  : EvtDataTypeCvt<Pds::Camera::FrameV1>( group, typeGroupName, src, cvtOptions, schemaVersion )
   , m_imgType()
   , m_dataCont()
   , m_imageCont()

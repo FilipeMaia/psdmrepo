@@ -60,7 +60,8 @@ public:
                   const Pds::Src& src,
                   const ConfigObjectStore& configStore,
                   Pds::TypeId cfgTypeId,
-                  const CvtOptions& cvtOptions ) ;
+                  const CvtOptions& cvtOptions,
+                  int schemaVersion ) ;
 
   // Destructor
   virtual ~FliFrameV1Cvt () ;

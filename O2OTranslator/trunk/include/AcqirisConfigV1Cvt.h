@@ -58,7 +58,7 @@ public:
 
   // Default constructor
   AcqirisConfigV1Cvt(const hdf5pp::Group& group, const std::string& typeGroupName,
-      const Pds::Src& src, const CvtOptions& cvtOptions) ;
+      const Pds::Src& src, const CvtOptions& cvtOptions, int schemaVersion) ;
 
   // Destructor
   virtual ~AcqirisConfigV1Cvt () ;
