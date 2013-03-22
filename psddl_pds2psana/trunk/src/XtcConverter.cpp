@@ -111,8 +111,10 @@ XtcConverter::~XtcConverter ()
 void 
 XtcConverter::convert(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt, PSEnv::EnvObjectStore& cfgStore)
 {
+  // protect from zero-payload data
+  if (xtc->sizeofPayload() <= 0) return;
+
   const Pds::TypeId& typeId = xtc->contains;
-  //uint32_t size = xtc->sizeofPayload();
   
   /*
    * Special case for Shared BLD data. We split them into their individual
@@ -206,6 +208,9 @@ XtcConverter::convert(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt,
 void 
 XtcConverter::convertConfig(const boost::shared_ptr<Pds::Xtc>& xtc, PSEnv::EnvObjectStore& cfgStore)
 {
+  // protect from zero-payload data
+  if (xtc->sizeofPayload() <= 0) return;
+
   // all real stuff is done here
   xtcConvert(xtc, 0, cfgStore);
 }
