@@ -47,7 +47,7 @@ DumpUsdUsb::DumpUsdUsb (const std::string& name)
   , m_src()
 {
   // get the values from configuration or use defaults
-  m_src = configSrc("source", "DetInfo(:Acqiris)");
+  m_src = configSrc("source", "DetInfo(:USDUSB)");
 }
 
 //--------------
