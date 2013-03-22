@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE psddl SYSTEM "psddl.dtd">
+
+<psddl>
+
+    <use file="psddldata/oceanoptics.ddl.xml" />
+
+    <package name="Gsc16ai">
+
+        <!-- ========================================================================= -->
+    
+        <h5schema name="ConfigV1" version="0">
+
+            <dataset name="config">
+                <attribute name="voltageRange" type="VoltageRange"/>
+                <attribute name="firstChan"/>
+                <attribute name="lastChan"/>
+                <attribute name="inputMode" type="InputMode"/>
+                <attribute name="triggerMode" type="TriggerMode"/>
+                <attribute name="dataFormat" type="DataFormat"/>
+                <attribute name="fps"/>
+                <attribute name="autocalibEnable"/>
+                <attribute name="timeTagEnable"/>
+            </dataset>
+            
+        </h5schema>
+    
+        <!-- ========================================================================= -->
+    
+        <h5schema name="DataV1" version="0">
+
+            <dataset name="channelValue" method="channelValue"/>
+            <dataset name="timestamps" method="timestamp"/>
+            
+        </h5schema>
+    
+    </package>
+</psddl>
