@@ -97,7 +97,7 @@ public:
    *  Constructs a time from an unsigned number of seconds since the
    *  the Unix epoch of 1970-01-01; nanoseconds are optional, if needed.
    */
-  explicit Time (time_t sec_since_1970_01_01, time_t nsec = 0);
+  explicit Time (time_t sec_since_1970_01_01, uint32_t nsec = 0);
 
   /**
    * @brief Construct from broken-down representation.
@@ -117,7 +117,7 @@ public:
         int hour,
         int min,
         int sec,
-        int nsec = 0,
+        uint32_t nsec = 0,
         Zone zone = Local);
 
   /** 

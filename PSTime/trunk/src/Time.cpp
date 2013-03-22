@@ -56,7 +56,7 @@ Time::Time ()
 {
 }
 
-Time::Time (time_t utcSec, time_t utcNsec) 
+Time::Time (time_t utcSec, uint32_t utcNsec)
   : m_utcSec(utcSec)
   , m_utcNsec(utcNsec)
 {
@@ -68,7 +68,7 @@ Time::Time ( int  year,
              int  hour,
              int  min,
              int  sec,
-             int  nsec,
+             uint32_t  nsec,
              Zone zone)
   : m_utcSec(0)
   , m_utcNsec(nsec)
