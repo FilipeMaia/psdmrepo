@@ -550,21 +550,21 @@ hdf5pp::Type ns_BldDataGMDV0_v0_dataset_data_stored_type()
 {
   typedef ns_BldDataGMDV0_v0::dataset_data DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("gasType", offsetof(DsType, gasType), hdf5pp::TypeTraits<const char*>::stored_type());
-  type.insert("pressure", offsetof(DsType, pressure), hdf5pp::TypeTraits<double>::stored_type());
-  type.insert("temperature", offsetof(DsType, temperature), hdf5pp::TypeTraits<double>::stored_type());
-  type.insert("current", offsetof(DsType, current), hdf5pp::TypeTraits<double>::stored_type());
-  type.insert("hvMeshElectron", offsetof(DsType, hvMeshElectron), hdf5pp::TypeTraits<double>::stored_type());
-  type.insert("hvMeshIon", offsetof(DsType, hvMeshIon), hdf5pp::TypeTraits<double>::stored_type());
-  type.insert("hvMultIon", offsetof(DsType, hvMultIon), hdf5pp::TypeTraits<double>::stored_type());
-  type.insert("chargeQ", offsetof(DsType, chargeQ), hdf5pp::TypeTraits<double>::stored_type());
-  type.insert("photonEnergy", offsetof(DsType, photonEnergy), hdf5pp::TypeTraits<double>::stored_type());
-  type.insert("multPulseIntensity", offsetof(DsType, multPulseIntensity), hdf5pp::TypeTraits<double>::stored_type());
-  type.insert("keithleyPulseIntensity", offsetof(DsType, keithleyPulseIntensity), hdf5pp::TypeTraits<double>::stored_type());
-  type.insert("pulseEnergy", offsetof(DsType, pulseEnergy), hdf5pp::TypeTraits<double>::stored_type());
-  type.insert("pulseEnergyFEE", offsetof(DsType, pulseEnergyFEE), hdf5pp::TypeTraits<double>::stored_type());
-  type.insert("transmission", offsetof(DsType, transmission), hdf5pp::TypeTraits<double>::stored_type());
-  type.insert("transmissionFEE", offsetof(DsType, transmissionFEE), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("strGasType", offsetof(DsType, strGasType), hdf5pp::TypeTraits<const char*>::stored_type(32));
+  type.insert("fPressure", offsetof(DsType, fPressure), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fTemperature", offsetof(DsType, fTemperature), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fCurrent", offsetof(DsType, fCurrent), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fHvMeshElectron", offsetof(DsType, fHvMeshElectron), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fHvMeshIon", offsetof(DsType, fHvMeshIon), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fHvMultIon", offsetof(DsType, fHvMultIon), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fChargeQ", offsetof(DsType, fChargeQ), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fPhotonEnergy", offsetof(DsType, fPhotonEnergy), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fMultPulseIntensity", offsetof(DsType, fMultPulseIntensity), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fKeithleyPulseIntensity", offsetof(DsType, fKeithleyPulseIntensity), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fPulseEnergy", offsetof(DsType, fPulseEnergy), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fPulseEnergyFEE", offsetof(DsType, fPulseEnergyFEE), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fTransmission", offsetof(DsType, fTransmission), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fTransmissionFEE", offsetof(DsType, fTransmissionFEE), hdf5pp::TypeTraits<double>::stored_type());
   return type;
 }
 
@@ -578,21 +578,21 @@ hdf5pp::Type ns_BldDataGMDV0_v0_dataset_data_native_type()
 {
   typedef ns_BldDataGMDV0_v0::dataset_data DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("gasType", offsetof(DsType, gasType), hdf5pp::TypeTraits<const char*>::native_type());
-  type.insert("pressure", offsetof(DsType, pressure), hdf5pp::TypeTraits<double>::native_type());
-  type.insert("temperature", offsetof(DsType, temperature), hdf5pp::TypeTraits<double>::native_type());
-  type.insert("current", offsetof(DsType, current), hdf5pp::TypeTraits<double>::native_type());
-  type.insert("hvMeshElectron", offsetof(DsType, hvMeshElectron), hdf5pp::TypeTraits<double>::native_type());
-  type.insert("hvMeshIon", offsetof(DsType, hvMeshIon), hdf5pp::TypeTraits<double>::native_type());
-  type.insert("hvMultIon", offsetof(DsType, hvMultIon), hdf5pp::TypeTraits<double>::native_type());
-  type.insert("chargeQ", offsetof(DsType, chargeQ), hdf5pp::TypeTraits<double>::native_type());
-  type.insert("photonEnergy", offsetof(DsType, photonEnergy), hdf5pp::TypeTraits<double>::native_type());
-  type.insert("multPulseIntensity", offsetof(DsType, multPulseIntensity), hdf5pp::TypeTraits<double>::native_type());
-  type.insert("keithleyPulseIntensity", offsetof(DsType, keithleyPulseIntensity), hdf5pp::TypeTraits<double>::native_type());
-  type.insert("pulseEnergy", offsetof(DsType, pulseEnergy), hdf5pp::TypeTraits<double>::native_type());
-  type.insert("pulseEnergyFEE", offsetof(DsType, pulseEnergyFEE), hdf5pp::TypeTraits<double>::native_type());
-  type.insert("transmission", offsetof(DsType, transmission), hdf5pp::TypeTraits<double>::native_type());
-  type.insert("transmissionFEE", offsetof(DsType, transmissionFEE), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("strGasType", offsetof(DsType, strGasType), hdf5pp::TypeTraits<const char*>::native_type(32));
+  type.insert("fPressure", offsetof(DsType, fPressure), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fTemperature", offsetof(DsType, fTemperature), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fCurrent", offsetof(DsType, fCurrent), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fHvMeshElectron", offsetof(DsType, fHvMeshElectron), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fHvMeshIon", offsetof(DsType, fHvMeshIon), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fHvMultIon", offsetof(DsType, fHvMultIon), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fChargeQ", offsetof(DsType, fChargeQ), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fPhotonEnergy", offsetof(DsType, fPhotonEnergy), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fMultPulseIntensity", offsetof(DsType, fMultPulseIntensity), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fKeithleyPulseIntensity", offsetof(DsType, fKeithleyPulseIntensity), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fPulseEnergy", offsetof(DsType, fPulseEnergy), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fPulseEnergyFEE", offsetof(DsType, fPulseEnergyFEE), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fTransmission", offsetof(DsType, fTransmission), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fTransmissionFEE", offsetof(DsType, fTransmissionFEE), hdf5pp::TypeTraits<double>::native_type());
   return type;
 }
 
@@ -609,63 +609,63 @@ ns_BldDataGMDV0_v0::dataset_data::~dataset_data()
 }
 const char* BldDataGMDV0_v0::gasType() const {
   if (not m_ds_data) read_ds_data();
-  return (const char*)(m_ds_data->gasType);
+  return (const char*)(m_ds_data->strGasType);
 }
 double BldDataGMDV0_v0::pressure() const {
   if (not m_ds_data) read_ds_data();
-  return double(m_ds_data->pressure);
+  return double(m_ds_data->fPressure);
 }
 double BldDataGMDV0_v0::temperature() const {
   if (not m_ds_data) read_ds_data();
-  return double(m_ds_data->temperature);
+  return double(m_ds_data->fTemperature);
 }
 double BldDataGMDV0_v0::current() const {
   if (not m_ds_data) read_ds_data();
-  return double(m_ds_data->current);
+  return double(m_ds_data->fCurrent);
 }
 double BldDataGMDV0_v0::hvMeshElectron() const {
   if (not m_ds_data) read_ds_data();
-  return double(m_ds_data->hvMeshElectron);
+  return double(m_ds_data->fHvMeshElectron);
 }
 double BldDataGMDV0_v0::hvMeshIon() const {
   if (not m_ds_data) read_ds_data();
-  return double(m_ds_data->hvMeshIon);
+  return double(m_ds_data->fHvMeshIon);
 }
 double BldDataGMDV0_v0::hvMultIon() const {
   if (not m_ds_data) read_ds_data();
-  return double(m_ds_data->hvMultIon);
+  return double(m_ds_data->fHvMultIon);
 }
 double BldDataGMDV0_v0::chargeQ() const {
   if (not m_ds_data) read_ds_data();
-  return double(m_ds_data->chargeQ);
+  return double(m_ds_data->fChargeQ);
 }
 double BldDataGMDV0_v0::photonEnergy() const {
   if (not m_ds_data) read_ds_data();
-  return double(m_ds_data->photonEnergy);
+  return double(m_ds_data->fPhotonEnergy);
 }
 double BldDataGMDV0_v0::multPulseIntensity() const {
   if (not m_ds_data) read_ds_data();
-  return double(m_ds_data->multPulseIntensity);
+  return double(m_ds_data->fMultPulseIntensity);
 }
 double BldDataGMDV0_v0::keithleyPulseIntensity() const {
   if (not m_ds_data) read_ds_data();
-  return double(m_ds_data->keithleyPulseIntensity);
+  return double(m_ds_data->fKeithleyPulseIntensity);
 }
 double BldDataGMDV0_v0::pulseEnergy() const {
   if (not m_ds_data) read_ds_data();
-  return double(m_ds_data->pulseEnergy);
+  return double(m_ds_data->fPulseEnergy);
 }
 double BldDataGMDV0_v0::pulseEnergyFEE() const {
   if (not m_ds_data) read_ds_data();
-  return double(m_ds_data->pulseEnergyFEE);
+  return double(m_ds_data->fPulseEnergyFEE);
 }
 double BldDataGMDV0_v0::transmission() const {
   if (not m_ds_data) read_ds_data();
-  return double(m_ds_data->transmission);
+  return double(m_ds_data->fTransmission);
 }
 double BldDataGMDV0_v0::transmissionFEE() const {
   if (not m_ds_data) read_ds_data();
-  return double(m_ds_data->transmissionFEE);
+  return double(m_ds_data->fTransmissionFEE);
 }
 void BldDataGMDV0_v0::read_ds_data() const {
   m_ds_data = hdf5pp::Utils::readGroup<Bld::ns_BldDataGMDV0_v0::dataset_data>(m_group, "data", m_idx);
@@ -683,11 +683,11 @@ hdf5pp::Type ns_BldDataGMDV1_v0_dataset_data_stored_type()
 {
   typedef ns_BldDataGMDV1_v0::dataset_data DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("milliJoulesPerPulse", offsetof(DsType, milliJoulesPerPulse), hdf5pp::TypeTraits<double>::stored_type());
-  type.insert("milliJoulesAverage", offsetof(DsType, milliJoulesAverage), hdf5pp::TypeTraits<double>::stored_type());
-  type.insert("correctedSumPerPulse", offsetof(DsType, correctedSumPerPulse), hdf5pp::TypeTraits<double>::stored_type());
-  type.insert("bgValuePerSample", offsetof(DsType, bgValuePerSample), hdf5pp::TypeTraits<double>::stored_type());
-  type.insert("relativeEnergyPerPulse", offsetof(DsType, relativeEnergyPerPulse), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fMilliJoulesPerPulse", offsetof(DsType, fMilliJoulesPerPulse), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fMilliJoulesAverage", offsetof(DsType, fMilliJoulesAverage), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fCorrectedSumPerPulse", offsetof(DsType, fCorrectedSumPerPulse), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fBgValuePerSample", offsetof(DsType, fBgValuePerSample), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fRelativeEnergyPerPulse", offsetof(DsType, fRelativeEnergyPerPulse), hdf5pp::TypeTraits<double>::stored_type());
   return type;
 }
 
@@ -701,11 +701,11 @@ hdf5pp::Type ns_BldDataGMDV1_v0_dataset_data_native_type()
 {
   typedef ns_BldDataGMDV1_v0::dataset_data DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("milliJoulesPerPulse", offsetof(DsType, milliJoulesPerPulse), hdf5pp::TypeTraits<double>::native_type());
-  type.insert("milliJoulesAverage", offsetof(DsType, milliJoulesAverage), hdf5pp::TypeTraits<double>::native_type());
-  type.insert("correctedSumPerPulse", offsetof(DsType, correctedSumPerPulse), hdf5pp::TypeTraits<double>::native_type());
-  type.insert("bgValuePerSample", offsetof(DsType, bgValuePerSample), hdf5pp::TypeTraits<double>::native_type());
-  type.insert("relativeEnergyPerPulse", offsetof(DsType, relativeEnergyPerPulse), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fMilliJoulesPerPulse", offsetof(DsType, fMilliJoulesPerPulse), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fMilliJoulesAverage", offsetof(DsType, fMilliJoulesAverage), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fCorrectedSumPerPulse", offsetof(DsType, fCorrectedSumPerPulse), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fBgValuePerSample", offsetof(DsType, fBgValuePerSample), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fRelativeEnergyPerPulse", offsetof(DsType, fRelativeEnergyPerPulse), hdf5pp::TypeTraits<double>::native_type());
   return type;
 }
 
@@ -722,23 +722,23 @@ ns_BldDataGMDV1_v0::dataset_data::~dataset_data()
 }
 double BldDataGMDV1_v0::milliJoulesPerPulse() const {
   if (not m_ds_data) read_ds_data();
-  return double(m_ds_data->milliJoulesPerPulse);
+  return double(m_ds_data->fMilliJoulesPerPulse);
 }
 double BldDataGMDV1_v0::milliJoulesAverage() const {
   if (not m_ds_data) read_ds_data();
-  return double(m_ds_data->milliJoulesAverage);
+  return double(m_ds_data->fMilliJoulesAverage);
 }
 double BldDataGMDV1_v0::correctedSumPerPulse() const {
   if (not m_ds_data) read_ds_data();
-  return double(m_ds_data->correctedSumPerPulse);
+  return double(m_ds_data->fCorrectedSumPerPulse);
 }
 double BldDataGMDV1_v0::bgValuePerSample() const {
   if (not m_ds_data) read_ds_data();
-  return double(m_ds_data->bgValuePerSample);
+  return double(m_ds_data->fBgValuePerSample);
 }
 double BldDataGMDV1_v0::relativeEnergyPerPulse() const {
   if (not m_ds_data) read_ds_data();
-  return double(m_ds_data->relativeEnergyPerPulse);
+  return double(m_ds_data->fRelativeEnergyPerPulse);
 }
 void BldDataGMDV1_v0::read_ds_data() const {
   m_ds_data = hdf5pp::Utils::readGroup<Bld::ns_BldDataGMDV1_v0::dataset_data>(m_group, "data", m_idx);

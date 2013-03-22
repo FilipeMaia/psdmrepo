@@ -104,6 +104,40 @@
             
         </h5schema>
 
+        <!-- ========================================================================= -->
+
+        <h5schema name="BldDataGMDV0" version="0">
+            <dataset name="data">
+                <attribute name="strGasType" method="gasType" rank="1"/>
+                <attribute name="fPressure" method="pressure"/>
+                <attribute name="fTemperature" method="temperature"/>
+                <attribute name="fCurrent" method="current"/>
+                <attribute name="fHvMeshElectron" method="hvMeshElectron"/>
+                <attribute name="fHvMeshIon" method="hvMeshIon"/>
+                <attribute name="fHvMultIon" method="hvMultIon"/>
+                <attribute name="fChargeQ" method="chargeQ"/>
+                <attribute name="fPhotonEnergy" method="photonEnergy"/>
+                <attribute name="fMultPulseIntensity" method="multPulseIntensity"/>
+                <attribute name="fKeithleyPulseIntensity" method="keithleyPulseIntensity"/>
+                <attribute name="fPulseEnergy" method="pulseEnergy"/>
+                <attribute name="fPulseEnergyFEE" method="pulseEnergyFEE"/>
+                <attribute name="fTransmission" method="transmission"/>
+                <attribute name="fTransmissionFEE" method="transmissionFEE"/>
+            </dataset>
+        </h5schema>
+
+        <!-- ========================================================================= -->
+
+        <h5schema name="BldDataGMDV1" version="0">
+            <dataset name="data">
+                <attribute name="fMilliJoulesPerPulse" method="milliJoulesPerPulse"/>
+                <attribute name="fMilliJoulesAverage" method="milliJoulesAverage"/>
+                <attribute name="fCorrectedSumPerPulse" method="correctedSumPerPulse"/>
+                <attribute name="fBgValuePerSample" method="bgValuePerSample"/>
+                <attribute name="fRelativeEnergyPerPulse" method="relativeEnergyPerPulse"/>
+            </dataset>
+        </h5schema>
+
     </package>
 
 </psddl>

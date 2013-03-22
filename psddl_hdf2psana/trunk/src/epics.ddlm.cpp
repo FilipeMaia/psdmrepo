@@ -267,6 +267,25 @@ struct dbr_ctrl<double> {
 
 template <typename Type>
 struct CompoundTypeDefs {
+
+  static void defineFields(hdf5pp::CompoundType& type, unsigned offset, int extra) {
+    type.insert("value", offset, hdf5pp::TypeTraits<Type>::native_type(extra));
+  }
+
+};
+
+template <>
+struct CompoundTypeDefs<const char*> {
+
+  static void defineFields(hdf5pp::CompoundType& type, unsigned offset, int extra) {
+    hdf5pp::Type oneType = hdf5pp::TypeTraits<const char*>::native_type(MAX_STRING_SIZE);
+    if (extra == 0) {
+      type.insert("value", offset, oneType);
+    } else {
+      type.insert("value", offset, hdf5pp::ArrayType::arrayType(oneType, extra));
+    }
+  }
+
 };
 
 template <typename Type>
@@ -412,7 +431,7 @@ struct dataset_epics_time {
     hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType(size);
     CompoundTypeDefs<ns_EpicsPvHeader_v0::dataset_data>::defineFields(type, offsetof(dataset_epics_time, header));
     CompoundTypeDefs<DBR>::defineFields(type, offsetof(dataset_epics_time, dbr), extra);
-    type.insert("value", offsetof(dataset_epics_time, value), hdf5pp::TypeTraits<hdf5_value_type>::native_type(nElem > 1 ? nElem : 0));
+    CompoundTypeDefs<hdf5_value_type>::defineFields(type, offsetof(dataset_epics_time, value), nElem > 1 ? nElem : 0);
     
     return type;
   }
@@ -450,7 +469,7 @@ struct dataset_epics_ctrl {
     CompoundTypeDefs<ns_EpicsPvHeader_v0::dataset_data>::defineFields(type, offsetof(dataset_epics_ctrl, header));
     type.insert("pvname", offsetof(dataset_epics_ctrl, pvname), hdf5pp::TypeTraits<const char*>::native_type(iMaxPvNameLength));
     CompoundTypeDefs<DBR>::defineFields(type, offsetof(dataset_epics_ctrl, dbr), extra);
-    type.insert("value", offsetof(dataset_epics_ctrl, value), hdf5pp::TypeTraits<hdf5_value_type>::native_type(nElem > 1 ? nElem : 0));
+    CompoundTypeDefs<hdf5_value_type>::defineFields(type, offsetof(dataset_epics_ctrl, value), nElem > 1 ? nElem : 0);
     
     return type;
   }

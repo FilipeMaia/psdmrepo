@@ -31,6 +31,7 @@
 #include "psddl_hdf2psana/HdfGroupName.h"
 #include "psddl_hdf2psana/Exceptions.h"
 #include "psddl_hdf2psana/dispatch.h"
+#include "psddl_hdf2psana/bld.ddl.h"
 #include "psddl_hdf2psana/epics.ddlm.h"
 
 //-----------------------------------------------------------------------
@@ -86,6 +87,28 @@ namespace {
     }
   };
 
+  
+  // Special proxy which returns sub-object of the larger object 
+  template <typename Parent, typename SubObject, const SubObject& (Parent::*Method)() const>
+  class SubObjectProxy : public PSEvt::Proxy<SubObject> {
+  public:
+    SubObjectProxy(const boost::shared_ptr<PSEvt::Proxy<Parent> >& parentProxy) : m_parent(parentProxy) {}
+    
+    virtual boost::shared_ptr<SubObject> getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key) {
+      boost::shared_ptr<SubObject> res;
+      if (boost::shared_ptr<void> vptr = m_parent->get(dict, source, key)) {
+        boost::shared_ptr<Parent> parent = boost::static_pointer_cast<Parent>(vptr);
+        const SubObject& subref = (parent.get()->*Method)();
+        res = boost::shared_ptr<SubObject>(parent, const_cast<SubObject*>(&subref));
+      }
+      return res;
+    }
+    
+  private:
+    boost::shared_ptr<PSEvt::Proxy<Parent> > m_parent;
+  };
+  
+  
 }
 
 //		----------------------------------------
@@ -118,6 +141,68 @@ HdfConverter::convert(const hdf5pp::Group& group, uint64_t idx, PSEvt::Event& ev
   const Pds::Src& src = this->source(group);
   int schema = schemaVersion(group);
   
+  /*
+   * Special case for Shared BLD data. We split them into their individual
+   * components and store them as regular objects instead of one large
+   * composite object. Components include both configuration and event data
+   * objects so we update config store here as well.
+   */
+  if (typeName == "Bld::BldDataIpimbV0") {
+
+    const boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataIpimbV0> >& parent = Bld::make_BldDataIpimbV0(schema, group, idx);
+    
+    typedef SubObjectProxy<Psana::Bld::BldDataIpimbV0, Psana::Ipimb::DataV1, &Psana::Bld::BldDataIpimbV0::ipimbData> Proxy1;
+    boost::shared_ptr<PSEvt::Proxy<Psana::Ipimb::DataV1> > proxy1 = boost::make_shared<Proxy1>(parent);
+    evt.putProxy(proxy1, src);
+    
+    typedef SubObjectProxy<Psana::Bld::BldDataIpimbV0, Psana::Ipimb::ConfigV1, &Psana::Bld::BldDataIpimbV0::ipimbConfig> Proxy2;
+    boost::shared_ptr<PSEvt::Proxy<Psana::Ipimb::ConfigV1> > proxy2 = boost::make_shared<Proxy2>(parent);
+    env.configStore().putProxy(proxy2, src);
+    
+    typedef SubObjectProxy<Psana::Bld::BldDataIpimbV0, Psana::Lusi::IpmFexV1, &Psana::Bld::BldDataIpimbV0::ipmFexData> Proxy3;
+    boost::shared_ptr<PSEvt::Proxy<Psana::Lusi::IpmFexV1> > proxy3 = boost::make_shared<Proxy3>(parent);
+    evt.putProxy(proxy3, src);
+    
+    return;
+
+  } else if (typeName == "Bld::BldDataIpimbV1") {
+
+    const boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataIpimbV1> >& parent = Bld::make_BldDataIpimbV1(schema, group, idx);
+    
+    typedef SubObjectProxy<Psana::Bld::BldDataIpimbV1, Psana::Ipimb::DataV2, &Psana::Bld::BldDataIpimbV1::ipimbData> Proxy1;
+    boost::shared_ptr<PSEvt::Proxy<Psana::Ipimb::DataV2> > proxy1 = boost::make_shared<Proxy1>(parent);
+    evt.putProxy(proxy1, src);
+    
+    typedef SubObjectProxy<Psana::Bld::BldDataIpimbV1, Psana::Ipimb::ConfigV2, &Psana::Bld::BldDataIpimbV1::ipimbConfig> Proxy2;
+    boost::shared_ptr<PSEvt::Proxy<Psana::Ipimb::ConfigV2> > proxy2 = boost::make_shared<Proxy2>(parent);
+    env.configStore().putProxy(proxy2, src);
+    
+    typedef SubObjectProxy<Psana::Bld::BldDataIpimbV1, Psana::Lusi::IpmFexV1, &Psana::Bld::BldDataIpimbV1::ipmFexData> Proxy3;
+    boost::shared_ptr<PSEvt::Proxy<Psana::Lusi::IpmFexV1> > proxy3 = boost::make_shared<Proxy3>(parent);
+    evt.putProxy(proxy3, src);
+    
+    return;
+
+  } else if (typeName == "Bld::BldDataPimV1") {
+
+    const boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataPimV1> >& parent = Bld::make_BldDataPimV1(schema, group, idx);
+    
+    typedef SubObjectProxy<Psana::Bld::BldDataPimV1, Psana::Pulnix::TM6740ConfigV2, &Psana::Bld::BldDataPimV1::camConfig> Proxy1;
+    boost::shared_ptr<PSEvt::Proxy<Psana::Pulnix::TM6740ConfigV2> > proxy1 = boost::make_shared<Proxy1>(parent);
+    env.configStore().putProxy(proxy1, src);
+    
+    typedef SubObjectProxy<Psana::Bld::BldDataPimV1, Psana::Lusi::PimImageConfigV1, &Psana::Bld::BldDataPimV1::pimConfig> Proxy2;
+    boost::shared_ptr<PSEvt::Proxy<Psana::Lusi::PimImageConfigV1> > proxy2 = boost::make_shared<Proxy2>(parent);
+    env.configStore().putProxy(proxy2, src);
+    
+    typedef SubObjectProxy<Psana::Bld::BldDataPimV1, Psana::Camera::FrameV1, &Psana::Bld::BldDataPimV1::frame> Proxy3;
+    boost::shared_ptr<PSEvt::Proxy<Psana::Camera::FrameV1> > proxy3 = boost::make_shared<Proxy3>(parent);
+    evt.putProxy(proxy3, src);
+    
+    return;
+
+  }
+
   hdfConvert(group, idx, typeName, schema, src, evt, env.configStore());
 }
 

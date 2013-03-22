@@ -331,21 +331,21 @@ struct dataset_data {
   dataset_data();
   ~dataset_data();
 
-  char* gasType; 
-  double pressure; 
-  double temperature; 
-  double current; 
-  double hvMeshElectron; 
-  double hvMeshIon; 
-  double hvMultIon; 
-  double chargeQ; 
-  double photonEnergy; 
-  double multPulseIntensity; 
-  double keithleyPulseIntensity; 
-  double pulseEnergy; 
-  double pulseEnergyFEE; 
-  double transmission; 
-  double transmissionFEE; 
+  char strGasType[32]; 
+  double fPressure; 
+  double fTemperature; 
+  double fCurrent; 
+  double fHvMeshElectron; 
+  double fHvMeshIon; 
+  double fHvMultIon; 
+  double fChargeQ; 
+  double fPhotonEnergy; 
+  double fMultPulseIntensity; 
+  double fKeithleyPulseIntensity; 
+  double fPulseEnergy; 
+  double fPulseEnergyFEE; 
+  double fTransmission; 
+  double fTransmissionFEE; 
 
 };
 }
@@ -391,11 +391,11 @@ struct dataset_data {
   dataset_data();
   ~dataset_data();
 
-  double milliJoulesPerPulse; 
-  double milliJoulesAverage; 
-  double correctedSumPerPulse; 
-  double bgValuePerSample; 
-  double relativeEnergyPerPulse; 
+  double fMilliJoulesPerPulse; 
+  double fMilliJoulesAverage; 
+  double fCorrectedSumPerPulse; 
+  double fBgValuePerSample; 
+  double fRelativeEnergyPerPulse; 
 
 };
 }

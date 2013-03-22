@@ -11,6 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-03
+2013-03-21 Andy Salnikov
+- fix for string EPICS PV type
+- fix for BLD GMD schema
+- splitting of shared BLD data types implemented
+
 Tag: V00-01-02
 2013-03-19 Andy Salnikov
 - non-compound datasets
