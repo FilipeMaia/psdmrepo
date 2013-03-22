@@ -54,6 +54,8 @@ Hdf5InputModule::Hdf5InputModule (const std::string& name)
   , m_skipEvents(0)
   , m_maxEvents(0)
   , m_l1Count(0)
+  , m_simulateEOR(0)
+  , m_evtId()
 {
   // get number of events to process/skip from psana configuration
   ConfigSvc::ConfigSvc cfg;
@@ -125,6 +127,20 @@ Hdf5InputModule::beginJob(Event& evt, Env& env)
 InputModule::Status 
 Hdf5InputModule::event(Event& evt, Env& env)
 {
+  // are we in the simulated EOR/EOF
+  if (m_simulateEOR > 0) {
+    // fake EndRun, prepare to stop on next call
+    MsgLog(name(), debug, name() << ": simulated EOR");
+    evt.put(m_evtId);
+    // negative means stop at next call
+    m_simulateEOR = -1;
+    return EndRun;
+  } else if (m_simulateEOR < 0) {
+    // fake EOF
+    MsgLog(name(), debug, name() << ": simulated EOF");
+    return Stop;
+  }
+
   Hdf5IterData data = m_iter->next();
   MsgLog(name(), debug, "Hdf5InputModule::event -- data: " << data);
 
@@ -147,7 +163,10 @@ Hdf5InputModule::event(Event& evt, Env& env)
     break;
   case Hdf5IterData::Event:
     if (m_maxEvents and m_l1Count >= m_skipEvents+m_maxEvents) {
-      ret = InputModule::Stop;
+      m_evtId = data.eventId();
+      evt.put(m_evtId);
+      ret = InputModule::EndCalibCycle;
+      m_simulateEOR = 1;
     } else if (m_l1Count < m_skipEvents) {
       ret = InputModule::Skip;
     } else {

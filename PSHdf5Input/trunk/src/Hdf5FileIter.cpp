@@ -133,7 +133,8 @@ Hdf5FileIter::next()
       m_configIter.reset(new Hdf5ConfigIter(grp, m_runNumber, m_schemaVersion, m_fullTsFormat));
 
       PSTime::Time etime = Hdf5Utils::getTime(m_configIter->group(), "start");
-      boost::shared_ptr<PSEvt::EventId> eid = boost::make_shared<Hdf5EventId>(m_runNumber, etime, 0x1ffff, 0, 0);
+      boost::shared_ptr<PSEvt::EventId> eid;
+      if (etime != PSTime::Time(0,0)) eid = boost::make_shared<Hdf5EventId>(m_runNumber, etime, 0x1ffff, 0, 0);
       res = Hdf5IterData(Hdf5IterData::Configure, eid);
       
       // fill result with the configuration object data locations
@@ -177,7 +178,8 @@ Hdf5FileIter::next()
     if (res.type() == value_type::Stop) {
 
       PSTime::Time etime = Hdf5Utils::getTime(m_configIter->group(), "end");
-      boost::shared_ptr<PSEvt::EventId> eid = boost::make_shared<Hdf5EventId>(m_runNumber, etime, 0x1ffff, 0, 0);
+      boost::shared_ptr<PSEvt::EventId> eid;
+      if (etime != PSTime::Time(0,0)) eid = boost::make_shared<Hdf5EventId>(m_runNumber, etime, 0x1ffff, 0, 0);
       res = Hdf5IterData(Hdf5IterData::UnConfigure, eid);
 
       m_configIter.reset();

@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-02
+2013-03-21 Andy Salnikov
+- improve event id generatrion for "end" transitions
+
 Tag: V00-01-01
 2013-03-19 Andy Salnikov
 - fixing time of event ID in non-event transitions

@@ -112,7 +112,8 @@ Hdf5RunIter::next()
 
       // make event id
       PSTime::Time etime = Hdf5Utils::getTime(m_ccIter->group(), "start");
-      boost::shared_ptr<PSEvt::EventId> eid = boost::make_shared<Hdf5EventId>(m_runNumber, etime, 0x1ffff, 0, 0);
+      boost::shared_ptr<PSEvt::EventId> eid;
+      if (etime != PSTime::Time(0,0)) eid = boost::make_shared<Hdf5EventId>(m_runNumber, etime, 0x1ffff, 0, 0);
       res = Hdf5IterData(Hdf5IterData::BeginCalibCycle, eid);
 
       // fill result with the configuration object data locations
@@ -139,7 +140,8 @@ Hdf5RunIter::next()
     if (res.type() == value_type::Stop) {
 
       PSTime::Time etime = Hdf5Utils::getTime(m_ccIter->group(), "end");
-      boost::shared_ptr<PSEvt::EventId> eid = boost::make_shared<Hdf5EventId>(m_runNumber, etime, 0x1ffff, 0, 0);
+      boost::shared_ptr<PSEvt::EventId> eid;
+      if (etime != PSTime::Time(0,0)) eid = boost::make_shared<Hdf5EventId>(m_runNumber, etime, 0x1ffff, 0, 0);
       res = Hdf5IterData(Hdf5IterData::EndCalibCycle, eid);
 
       m_ccIter.reset();

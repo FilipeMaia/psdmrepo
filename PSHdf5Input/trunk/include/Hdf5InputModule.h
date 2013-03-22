@@ -26,6 +26,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "psddl_hdf2psana/HdfConverter.h"
+#include "PSEvt/EventId.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -98,6 +99,8 @@ private:
   unsigned long m_skipEvents;                         ///< Number of events to skip
   unsigned long m_maxEvents;                          ///< Number of events to process
   unsigned long m_l1Count;                            ///< Number of events seen so far
+  int m_simulateEOR;                                  ///< if non-zero then simulate endRun/stop
+  boost::shared_ptr<PSEvt::EventId> m_evtId;          ///< remembered EventId for simulated EOR
 
 };
 
