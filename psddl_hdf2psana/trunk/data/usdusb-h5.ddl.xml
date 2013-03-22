@@ -30,7 +30,13 @@
     
         <h5schema name="DataV1" version="1">
 
-            <tag name="external" value="psddl_hdf2psana/usdusb.ddlm.h"/>
+            <dataset name="data">
+                <attribute name="digital_in"/>
+                <attribute name="timestamp"/>
+                <attribute name="status"/>
+                <attribute name="analog_in"/>
+                <attribute name="encoder_count" shape="Encoder_Inputs" rank="1"/>
+            </dataset>
             
         </h5schema>
     

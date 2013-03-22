@@ -9,7 +9,6 @@
 #include "hdf5pp/Utils.h"
 #include "PSEvt/DataProxy.h"
 #include "psddl_hdf2psana/usdusb.ddlm.h"
-#include "psddl_hdf2psana/usdusb.ddlm.h"
 namespace psddl_hdf2psana {
 namespace UsdUsb {
 
@@ -76,6 +75,86 @@ boost::shared_ptr<PSEvt::Proxy<Psana::UsdUsb::ConfigV1> > make_ConfigV1(int vers
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::UsdUsb::ConfigV1> >(boost::shared_ptr<Psana::UsdUsb::ConfigV1>());
   }
+}
+
+hdf5pp::Type ns_DataV1_v1_dataset_data_stored_type()
+{
+  typedef ns_DataV1_v1::dataset_data DsType;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
+  type.insert("digital_in", offsetof(DsType, digital_in), hdf5pp::TypeTraits<uint8_t>::stored_type());
+  type.insert("timestamp", offsetof(DsType, timestamp), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  hsize_t _array_type_status_shape[] = { 4 };
+  hdf5pp::ArrayType _array_type_status = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint8_t>::stored_type(), 1, _array_type_status_shape);
+  type.insert("status", offsetof(DsType, status), _array_type_status);
+  hsize_t _array_type_analog_in_shape[] = { 4 };
+  hdf5pp::ArrayType _array_type_analog_in = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint16_t>::stored_type(), 1, _array_type_analog_in_shape);
+  type.insert("analog_in", offsetof(DsType, analog_in), _array_type_analog_in);
+  hsize_t _array_type_encoder_count_shape[] = { 4 };
+  hdf5pp::ArrayType _array_type_encoder_count = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<int32_t>::stored_type(), 1, _array_type_encoder_count_shape);
+  type.insert("encoder_count", offsetof(DsType, encoder_count), _array_type_encoder_count);
+  return type;
+}
+
+hdf5pp::Type ns_DataV1_v1::dataset_data::stored_type()
+{
+  static hdf5pp::Type type = ns_DataV1_v1_dataset_data_stored_type();
+  return type;
+}
+
+hdf5pp::Type ns_DataV1_v1_dataset_data_native_type()
+{
+  typedef ns_DataV1_v1::dataset_data DsType;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
+  type.insert("digital_in", offsetof(DsType, digital_in), hdf5pp::TypeTraits<uint8_t>::native_type());
+  type.insert("timestamp", offsetof(DsType, timestamp), hdf5pp::TypeTraits<uint32_t>::native_type());
+  hsize_t _array_type_status_shape[] = { 4 };
+  hdf5pp::ArrayType _array_type_status = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint8_t>::native_type(), 1, _array_type_status_shape);
+  type.insert("status", offsetof(DsType, status), _array_type_status);
+  hsize_t _array_type_analog_in_shape[] = { 4 };
+  hdf5pp::ArrayType _array_type_analog_in = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint16_t>::native_type(), 1, _array_type_analog_in_shape);
+  type.insert("analog_in", offsetof(DsType, analog_in), _array_type_analog_in);
+  hsize_t _array_type_encoder_count_shape[] = { 4 };
+  hdf5pp::ArrayType _array_type_encoder_count = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<int32_t>::native_type(), 1, _array_type_encoder_count_shape);
+  type.insert("encoder_count", offsetof(DsType, encoder_count), _array_type_encoder_count);
+  return type;
+}
+
+hdf5pp::Type ns_DataV1_v1::dataset_data::native_type()
+{
+  static hdf5pp::Type type = ns_DataV1_v1_dataset_data_native_type();
+  return type;
+}
+ns_DataV1_v1::dataset_data::dataset_data()
+{
+}
+ns_DataV1_v1::dataset_data::~dataset_data()
+{
+}
+uint8_t DataV1_v1::digital_in() const {
+  if (not m_ds_data) read_ds_data();
+  return uint8_t(m_ds_data->digital_in);
+}
+uint32_t DataV1_v1::timestamp() const {
+  if (not m_ds_data) read_ds_data();
+  return uint32_t(m_ds_data->timestamp);
+}
+ndarray<const uint8_t, 1> DataV1_v1::status() const {
+  if (not m_ds_data) read_ds_data();
+  boost::shared_ptr<uint8_t> ptr(m_ds_data, m_ds_data->status);
+  return make_ndarray(ptr, 4);
+}
+ndarray<const uint16_t, 1> DataV1_v1::analog_in() const {
+  if (not m_ds_data) read_ds_data();
+  boost::shared_ptr<uint16_t> ptr(m_ds_data, m_ds_data->analog_in);
+  return make_ndarray(ptr, Analog_Inputs);
+}
+ndarray<const int32_t, 1> DataV1_v1::encoder_count() const {
+  if (not m_ds_data) read_ds_data();
+  boost::shared_ptr<int32_t> ptr(m_ds_data, m_ds_data->encoder_count);
+  return make_ndarray(ptr, Encoder_Inputs);
+}
+void DataV1_v1::read_ds_data() const {
+  m_ds_data = hdf5pp::Utils::readGroup<UsdUsb::ns_DataV1_v1::dataset_data>(m_group, "data", m_idx);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::UsdUsb::DataV1> > make_DataV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
