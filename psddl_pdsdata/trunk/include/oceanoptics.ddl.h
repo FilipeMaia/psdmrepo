@@ -81,7 +81,6 @@ public:
   const OceanOptics::timespec64& timeFrameStart() const { return _tsTimeFrameStart; }
   const OceanOptics::timespec64& timeFrameFirstData() const { return _tsTimeFrameFirstData; }
   const OceanOptics::timespec64& timeFrameEnd() const { return _tsTimeFrameEnd; }
-  int32_t version() const { return _i32Version; }
   int8_t numSpectraInData() const { return _i8NumSpectraInData; }
   int8_t numSpectraInQueue() const { return _i8NumSpectraInQueue; }
   int8_t numSpectraUnused() const { return _i8NumSpectraUnused; }
