@@ -12,7 +12,7 @@ hdf5pp::Type ns_DataV1_v0_dataset_data_stored_type()
 {
   typedef ns_DataV1_v0::dataset_data DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("e_count", offsetof(DsType, e_count), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("encoder_count", offsetof(DsType, e_count), hdf5pp::TypeTraits<int32_t>::stored_type());
   type.insert("analog_in", offsetof(DsType, analog_in), hdf5pp::TypeTraits<uint16_t>::stored_type());
   type.insert("timestamp", offsetof(DsType, timestamp), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("digital_in", offsetof(DsType, digital_in), hdf5pp::TypeTraits<uint8_t>::stored_type());
@@ -29,7 +29,7 @@ hdf5pp::Type ns_DataV1_v0_dataset_data_native_type()
 {
   typedef ns_DataV1_v0::dataset_data DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("e_count", offsetof(DsType, e_count), hdf5pp::TypeTraits<int32_t>::native_type(), 4);
+  type.insert("encoder_count", offsetof(DsType, e_count), hdf5pp::TypeTraits<int32_t>::native_type(), 4);
   type.insert("analog_in", offsetof(DsType, analog_in), hdf5pp::TypeTraits<uint16_t>::native_type(), 4);
   type.insert("timestamp", offsetof(DsType, timestamp), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("digital_in", offsetof(DsType, digital_in), hdf5pp::TypeTraits<uint8_t>::native_type());

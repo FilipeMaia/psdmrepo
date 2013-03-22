@@ -346,14 +346,14 @@ HdfConverter::source(const hdf5pp::Group& group, int levels) const
   Pds::Src src(Pds::Level::NumberOfLevels);
   hdf5pp::Attribute<uint64_t> attrSrc = group.openAttr<uint64_t>(::srcAttrName);
   if (attrSrc.valid()) {
-    // build TypeId from attributes
+    // build source from attributes
     src = ::_SrcBuilder(attrSrc.read());
   } else if (levels > 0) {
     // try parent group if attribute is not there
     hdf5pp::Group parent = group.parent();
     if (parent.valid()) src = this->source(parent, levels - 1);
   } else if (levels == 0) {
-    // guess type id from group name for top-level type group
+    // guess source from group name for top-level type group
     src = HdfGroupName::nameToSource(group.basename());
 
     // some corrections needed for incorrectly stored names
