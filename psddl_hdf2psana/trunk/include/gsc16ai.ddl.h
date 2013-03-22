@@ -7,6 +7,7 @@
 #include "hdf5pp/Group.h"
 #include "hdf5pp/Type.h"
 #include "PSEvt/Proxy.h"
+#include "psddl_hdf2psana/oceanoptics.ddl.h"
 namespace psddl_hdf2psana {
 namespace Gsc16ai {
 
@@ -18,16 +19,15 @@ struct dataset_config {
   dataset_config();
   ~dataset_config();
 
-  uint16_t voltageRange; 
+  int32_t voltageRange; 
   uint16_t firstChan; 
   uint16_t lastChan; 
-  uint16_t inputMode; 
-  uint16_t triggerMode; 
-  uint16_t dataFormat; 
+  int32_t inputMode; 
+  int32_t triggerMode; 
+  int32_t dataFormat; 
   uint16_t fps; 
   uint8_t autocalibEnable; 
   uint8_t timeTagEnable; 
-  uint16_t numChannels; 
 
 };
 }
@@ -50,7 +50,7 @@ public:
   virtual uint16_t fps() const;
   virtual uint8_t autocalibEnable() const;
   virtual uint8_t timeTagEnable() const;
-  virtual uint16_t numChannels() const;
+    uint16_t numChannels() const { return this->lastChan() - this->firstChan() + 1; }
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
@@ -75,10 +75,10 @@ private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
   boost::shared_ptr<Config> m_cfg;
-  mutable ndarray<const uint16_t, 1> m_ds_timestamp;
-  void read_ds_timestamp() const;
   mutable ndarray<const uint16_t, 1> m_ds_channelValue;
   void read_ds_channelValue() const;
+  mutable ndarray<const uint16_t, 1> m_ds_timestamps;
+  void read_ds_timestamps() const;
 };
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Gsc16ai::DataV1> > make_DataV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::Gsc16ai::ConfigV1>& cfg);

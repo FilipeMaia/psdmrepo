@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-08
+2013-03-22 Andy Salnikov
+- fix schema for Gsc16ia, apparently HDF5 does not like conversion from 
+  enum types in file to integer types in memory
+
 Tag: V00-01-07
 2013-03-22 Andy Salnikov
 - fix schema for OceanOptics.DataV1
