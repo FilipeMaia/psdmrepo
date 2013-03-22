@@ -56,7 +56,7 @@ private:
   enum { Encoder_Inputs = Pds::UsdUsb::DataV1::Encoder_Inputs };
   enum { Analog_Inputs  = Pds::UsdUsb::DataV1::Analog_Inputs };
 
-  uint32_t encoder_count[Encoder_Inputs];
+  int32_t encoder_count[Encoder_Inputs];
   uint16_t analog_in[Analog_Inputs];
   uint32_t timestamp;
   uint8_t  digital_in;
