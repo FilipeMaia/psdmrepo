@@ -105,6 +105,8 @@ class GUIELogPostingFields ( QtGui.QWidget ) :
         self.edi_msg = QtGui.QLineEdit( cp.elog_post_msg.value() )
         self.edi_att = QtGui.QLineEdit( cp.elog_post_att.value() )
 
+        self.edi_res.setValidator(QtGui.QIntValidator(0,9000000,self))
+
         self.setFieldsSaved()
 
         self.list_of_fields = [
@@ -248,7 +250,7 @@ class GUIELogPostingFields ( QtGui.QWidget ) :
         self.edi_exp.setReadOnly(False)
         self.edi_run.setReadOnly(False)
         self.edi_tag.setReadOnly(False)
-        self.edi_res.setReadOnly(True )
+        self.edi_res.setReadOnly(False)
         self.edi_msg.setReadOnly(False)
         self.edi_att.setReadOnly(False)
 

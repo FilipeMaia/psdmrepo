@@ -30,6 +30,7 @@ from PyQt4 import QtGui, QtCore
 
 from ConfigParametersCorAna import confpars as cp
 from Logger                 import logger
+import GlobalUtils          as     gu
 
 #---------------------
 #  Class definition --
@@ -166,6 +167,8 @@ class GUIWorkResDirs ( QtGui.QWidget ) :
         edi.setText(dir)        
         par.setValue(dir)
         logger.info('Set directory for ' + label + str(par.value()), __name__)
+
+        gu.create_directory(dir)
 
 
     def onEditPrefix(self):

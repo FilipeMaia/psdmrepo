@@ -11,6 +11,13 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2013-03-22 Mikhail S. Dubrovin
+Tag: V00-00-08
+- use intensity monitors data for image correction
+- switch to the new pythonic interface for ELog submission with responce
+- many improvements in data processing; add mask for hot pixels using rms on dark, 
+	satturated pixels
+	
 2013-03-12 Mikhail S. Dubrovin
 Tag: V00-00-07
 - add reflected beam geometry for q_map evaluation. Currently use the tab status

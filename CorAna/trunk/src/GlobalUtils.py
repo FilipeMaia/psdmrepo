@@ -41,6 +41,7 @@ import subprocess # for subprocess.Popen
 
 from Logger import logger
 from PyQt4 import QtGui, QtCore
+from LogBook import message_poster
 
 #-----------------------------
 # Imports for other modules --
@@ -57,9 +58,20 @@ from PyQt4 import QtGui, QtCore
 #----------------------------------
 #----------------------------------
 #----------------------------------
+#----------------------------------        
+
+def create_directory(dir) : 
+    if os.path.exists(dir) :
+        logger.info('Directory exists: ' + dir, __name__) 
+    else :
+        os.makedirs(dir)
+        #os.fchmod(dir,770)
+        logger.info('Directory created: ' + dir, __name__) 
+
 
 def get_list_of_files_in_dir(dirname) :
     return os.listdir(dirname)
+
 
 def print_all_files_in_dir(dirname) :
     print 'List of files in the dir.', dirname
@@ -90,6 +102,22 @@ def subproc(command_seq, env=None) : # for example, command_seq=['bsub', '-q', c
 #----------------------------------
 
 def send_msg_with_att_to_elog(inst='AMO', expt='amodaq09', run='825', tag='TAG1',
+                              msg='EMPTY MESSAGE', fname_text=None, fname_att=None, resp=None) :
+
+    poster = message_poster.message_poster_self ( inst, experiment=expt )
+
+    if resp == 'None' : msg_id = poster.post ( msg, attachments=[fname_att], tags=tag )
+    else              : msg_id = poster.post ( msg, attachments=[fname_att], parent_message_id = int(resp) )    
+
+    msg_in_log = 'Message with id: %d is submitted to ELog' % (msg_id)
+
+    logger.info(msg_in_log, __name__)
+    return msg_id
+    
+
+#----------------------------------
+
+def send_msg_with_att_to_elog_v0(inst='AMO', expt='amodaq09', run='825', tag='TAG1',
                               msg='EMPTY MESSAGE', fname_text=None, fname_att=None, resp=None) :
     #pypath = os.getenv('PYTHONPATH')
     my_env = os.environ

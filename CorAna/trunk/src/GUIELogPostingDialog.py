@@ -139,10 +139,10 @@ class GUIELogPostingDialog(QtGui.QDialog) :
         res = self.widg_pars.res.value()
         msg = self.widg_pars.msg.value()
         att = self.widg_pars.att.value()
-        msg = '"' + msg + '"'
+        #msg = '"' + msg + '"'
 
-        out = gu.send_msg_with_att_to_elog(ins, exp, run, tag, msg, fname_att=att, resp=res)
-        logger.info('Sending post to ELog response:\n' + out, __name__)  
+        msg_id = gu.send_msg_with_att_to_elog(ins, exp, run, tag, msg, fname_att=att, resp=res)
+        logger.info('Sending post to ELog, msg_id: \n' + str(msg_id), __name__)  
 
         self.accept()
         #self.close()

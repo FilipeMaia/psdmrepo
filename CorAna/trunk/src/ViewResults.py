@@ -108,7 +108,13 @@ def phi_map_partitions(map, nbins, mask=None) :
     phi_min, phi_max = get_limits_for_masked_array(map, mask)
     #print 'phi_min, phi_max = ', phi_min, phi_max
     return valueToIndexMasked(map, [phi_min, phi_max, nbins], mask)
- 
+
+
+def divideZeroProteced(map_num, map_den, val_subst_zero=0) :
+    prot_map_num = np.select([map_den==0], [val_subst_zero], default=map_num)
+    prot_map_den = np.select([map_den==0], [1],              default=map_den)
+    return prot_map_num / prot_map_den
+
 #-----------------------------
 
 class ViewResults :
@@ -709,7 +715,7 @@ class ViewResults :
         Ip = cor_arr[itau, 0,...] 
         If = cor_arr[itau, 1,...] 
         I2 = cor_arr[itau, 2,...] 
-        sp.g2_raw_for_itau = I2/Ip/If
+        sp.g2_raw_for_itau = divideZeroProteced(I2, Ip*If, val_subst_zero=0)
         return sp.g2_raw_for_itau
 
 #-----------------------------
