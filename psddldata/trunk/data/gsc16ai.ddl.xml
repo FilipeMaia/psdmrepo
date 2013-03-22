@@ -69,7 +69,7 @@
             </attribute>
 
             <method name="numChannels" type="uint16_t">
-                <expr lang="C++" value="{self}._lastChan - {self}._firstChan + 1" />
+                <expr lang="C++" value="{self}.lastChan() - {self}.firstChan() + 1" />
                 <tag name="inline"/>
             </method>
 

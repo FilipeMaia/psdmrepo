@@ -13,6 +13,10 @@ reverse time order.
 
 Tag: V00-04-15
 2013-03-22 Andy Salnikov
+- gsc16ai.ddl.xml: fix numChannels() implementation to be usable with HDF5
+
+Tag: V00-04-15
+2013-03-22 Andy Salnikov
 - removed version() method from oceanoptics.DataV1 interface, pdsdata
   does not define ths method and number returned from it does not make 
   much sense 
