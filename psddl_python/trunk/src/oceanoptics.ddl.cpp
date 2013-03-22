@@ -63,7 +63,6 @@ void createWrappers(PyObject* module) {
     .def("timeFrameStart", &Psana::OceanOptics::DataV1::timeFrameStart, return_value_policy<copy_const_reference>())
     .def("timeFrameFirstData", &Psana::OceanOptics::DataV1::timeFrameFirstData, return_value_policy<copy_const_reference>())
     .def("timeFrameEnd", &Psana::OceanOptics::DataV1::timeFrameEnd, return_value_policy<copy_const_reference>())
-    .def("version", &Psana::OceanOptics::DataV1::version)
     .def("numSpectraInData", &Psana::OceanOptics::DataV1::numSpectraInData)
     .def("numSpectraInQueue", &Psana::OceanOptics::DataV1::numSpectraInQueue)
     .def("numSpectraUnused", &Psana::OceanOptics::DataV1::numSpectraUnused)
