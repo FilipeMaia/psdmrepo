@@ -16,12 +16,12 @@ public:
   typedef Psana::Gsc16ai::ConfigV1 PsanaType;
   ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~ConfigV1();
-  virtual uint16_t voltageRange() const;
+  virtual Psana::Gsc16ai::ConfigV1::VoltageRange voltageRange() const;
   virtual uint16_t firstChan() const;
   virtual uint16_t lastChan() const;
-  virtual uint16_t inputMode() const;
-  virtual uint16_t triggerMode() const;
-  virtual uint16_t dataFormat() const;
+  virtual Psana::Gsc16ai::ConfigV1::InputMode inputMode() const;
+  virtual Psana::Gsc16ai::ConfigV1::TriggerMode triggerMode() const;
+  virtual Psana::Gsc16ai::ConfigV1::DataFormat dataFormat() const;
   virtual uint16_t fps() const;
   virtual uint8_t autocalibEnable() const;
   virtual uint8_t timeTagEnable() const;

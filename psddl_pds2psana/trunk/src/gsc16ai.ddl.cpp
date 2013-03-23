@@ -39,17 +39,17 @@ ConfigV1::~ConfigV1()
 }
 
 
-uint16_t ConfigV1::voltageRange() const { return m_xtcObj->voltageRange(); }
+Psana::Gsc16ai::ConfigV1::VoltageRange ConfigV1::voltageRange() const { return pds_to_psana(m_xtcObj->voltageRange()); }
 
 uint16_t ConfigV1::firstChan() const { return m_xtcObj->firstChan(); }
 
 uint16_t ConfigV1::lastChan() const { return m_xtcObj->lastChan(); }
 
-uint16_t ConfigV1::inputMode() const { return m_xtcObj->inputMode(); }
+Psana::Gsc16ai::ConfigV1::InputMode ConfigV1::inputMode() const { return pds_to_psana(m_xtcObj->inputMode()); }
 
-uint16_t ConfigV1::triggerMode() const { return m_xtcObj->triggerMode(); }
+Psana::Gsc16ai::ConfigV1::TriggerMode ConfigV1::triggerMode() const { return pds_to_psana(m_xtcObj->triggerMode()); }
 
-uint16_t ConfigV1::dataFormat() const { return m_xtcObj->dataFormat(); }
+Psana::Gsc16ai::ConfigV1::DataFormat ConfigV1::dataFormat() const { return pds_to_psana(m_xtcObj->dataFormat()); }
 
 uint16_t ConfigV1::fps() const { return m_xtcObj->fps(); }
 
