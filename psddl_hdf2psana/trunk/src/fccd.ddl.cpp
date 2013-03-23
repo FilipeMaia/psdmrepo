@@ -8,6 +8,7 @@
 #include "hdf5pp/VlenType.h"
 #include "hdf5pp/Utils.h"
 #include "PSEvt/DataProxy.h"
+#include "psddl_hdf2psana/fccd.ddlm.h"
 namespace psddl_hdf2psana {
 namespace FCCD {
 
@@ -82,103 +83,6 @@ boost::shared_ptr<PSEvt::Proxy<Psana::FCCD::FccdConfigV1> > make_FccdConfigV1(in
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::FCCD::FccdConfigV1> >(boost::shared_ptr<Psana::FCCD::FccdConfigV1>());
   }
-}
-
-hdf5pp::Type ns_FccdConfigV2_v0_dataset_config_stored_type()
-{
-  typedef ns_FccdConfigV2_v0::dataset_config DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("outputMode", offsetof(DsType, outputMode), hdf5pp::TypeTraits<uint16_t>::stored_type());
-  type.insert("ccdEnable", offsetof(DsType, ccdEnable), hdf5pp::TypeTraits<uint8_t>::stored_type());
-  type.insert("focusMode", offsetof(DsType, focusMode), hdf5pp::TypeTraits<uint8_t>::stored_type());
-  type.insert("exposureTime", offsetof(DsType, exposureTime), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("width", offsetof(DsType, width), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("height", offsetof(DsType, height), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("trimmedWidth", offsetof(DsType, trimmedWidth), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("trimmedHeight", offsetof(DsType, trimmedHeight), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  return type;
-}
-
-hdf5pp::Type ns_FccdConfigV2_v0::dataset_config::stored_type()
-{
-  static hdf5pp::Type type = ns_FccdConfigV2_v0_dataset_config_stored_type();
-  return type;
-}
-
-hdf5pp::Type ns_FccdConfigV2_v0_dataset_config_native_type()
-{
-  typedef ns_FccdConfigV2_v0::dataset_config DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("outputMode", offsetof(DsType, outputMode), hdf5pp::TypeTraits<uint16_t>::native_type());
-  type.insert("ccdEnable", offsetof(DsType, ccdEnable), hdf5pp::TypeTraits<uint8_t>::native_type());
-  type.insert("focusMode", offsetof(DsType, focusMode), hdf5pp::TypeTraits<uint8_t>::native_type());
-  type.insert("exposureTime", offsetof(DsType, exposureTime), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("width", offsetof(DsType, width), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("height", offsetof(DsType, height), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("trimmedWidth", offsetof(DsType, trimmedWidth), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("trimmedHeight", offsetof(DsType, trimmedHeight), hdf5pp::TypeTraits<uint32_t>::native_type());
-  return type;
-}
-
-hdf5pp::Type ns_FccdConfigV2_v0::dataset_config::native_type()
-{
-  static hdf5pp::Type type = ns_FccdConfigV2_v0_dataset_config_native_type();
-  return type;
-}
-ns_FccdConfigV2_v0::dataset_config::dataset_config()
-{
-}
-ns_FccdConfigV2_v0::dataset_config::~dataset_config()
-{
-}
-uint16_t FccdConfigV2_v0::outputMode() const {
-  if (not m_ds_config) read_ds_config();
-  return uint16_t(m_ds_config->outputMode);
-}
-uint8_t FccdConfigV2_v0::ccdEnable() const {
-  if (not m_ds_config) read_ds_config();
-  return uint8_t(m_ds_config->ccdEnable);
-}
-uint8_t FccdConfigV2_v0::focusMode() const {
-  if (not m_ds_config) read_ds_config();
-  return uint8_t(m_ds_config->focusMode);
-}
-uint32_t FccdConfigV2_v0::exposureTime() const {
-  if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->exposureTime);
-}
-ndarray<const float, 1> FccdConfigV2_v0::dacVoltages() const {
-  if (m_ds_dacVoltages.empty()) read_ds_dacVoltages();
-  return m_ds_dacVoltages;
-}
-ndarray<const uint16_t, 1> FccdConfigV2_v0::waveforms() const {
-  if (m_ds_waveforms.empty()) read_ds_waveforms();
-  return m_ds_waveforms;
-}
-uint32_t FccdConfigV2_v0::width() const {
-  if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->width);
-}
-uint32_t FccdConfigV2_v0::height() const {
-  if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->height);
-}
-uint32_t FccdConfigV2_v0::trimmedWidth() const {
-  if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->trimmedWidth);
-}
-uint32_t FccdConfigV2_v0::trimmedHeight() const {
-  if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->trimmedHeight);
-}
-void FccdConfigV2_v0::read_ds_config() const {
-  m_ds_config = hdf5pp::Utils::readGroup<FCCD::ns_FccdConfigV2_v0::dataset_config>(m_group, "config", m_idx);
-}
-void FccdConfigV2_v0::read_ds_dacVoltages() const {
-  m_ds_dacVoltages = hdf5pp::Utils::readNdarray<float, 1>(m_group, "dacVoltages", m_idx);
-}
-void FccdConfigV2_v0::read_ds_waveforms() const {
-  m_ds_waveforms = hdf5pp::Utils::readNdarray<uint16_t, 1>(m_group, "waveforms", m_idx);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::FCCD::FccdConfigV2> > make_FccdConfigV2(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {

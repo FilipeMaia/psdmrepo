@@ -7,6 +7,7 @@
 #include "hdf5pp/Group.h"
 #include "hdf5pp/Type.h"
 #include "PSEvt/Proxy.h"
+#include "psddl_hdf2psana/fli.ddl.h"
 namespace psddl_hdf2psana {
 namespace FCCD {
 
@@ -49,56 +50,6 @@ private:
 };
 
 boost::shared_ptr<PSEvt::Proxy<Psana::FCCD::FccdConfigV1> > make_FccdConfigV1(int version, hdf5pp::Group group, hsize_t idx);
-
-namespace ns_FccdConfigV2_v0 {
-struct dataset_config {
-  static hdf5pp::Type native_type();
-  static hdf5pp::Type stored_type();
-
-  dataset_config();
-  ~dataset_config();
-
-  uint16_t outputMode; 
-  uint8_t ccdEnable; 
-  uint8_t focusMode; 
-  uint32_t exposureTime; 
-  uint32_t width; 
-  uint32_t height; 
-  uint32_t trimmedWidth; 
-  uint32_t trimmedHeight; 
-
-};
-}
-
-
-class FccdConfigV2_v0 : public Psana::FCCD::FccdConfigV2 {
-public:
-  typedef Psana::FCCD::FccdConfigV2 PsanaType;
-  FccdConfigV2_v0() {}
-  FccdConfigV2_v0(hdf5pp::Group group, hsize_t idx)
-    : m_group(group), m_idx(idx) {}
-  virtual ~FccdConfigV2_v0() {}
-  virtual uint16_t outputMode() const;
-  virtual uint8_t ccdEnable() const;
-  virtual uint8_t focusMode() const;
-  virtual uint32_t exposureTime() const;
-  virtual ndarray<const float, 1> dacVoltages() const;
-  virtual ndarray<const uint16_t, 1> waveforms() const;
-  virtual uint32_t width() const;
-  virtual uint32_t height() const;
-  virtual uint32_t trimmedWidth() const;
-  virtual uint32_t trimmedHeight() const;
-private:
-  mutable hdf5pp::Group m_group;
-  hsize_t m_idx;
-  mutable boost::shared_ptr<FCCD::ns_FccdConfigV2_v0::dataset_config> m_ds_config;
-  void read_ds_config() const;
-  mutable ndarray<const float, 1> m_ds_dacVoltages;
-  void read_ds_dacVoltages() const;
-  mutable ndarray<const uint16_t, 1> m_ds_waveforms;
-  void read_ds_waveforms() const;
-};
-
 boost::shared_ptr<PSEvt::Proxy<Psana::FCCD::FccdConfigV2> > make_FccdConfigV2(int version, hdf5pp::Group group, hsize_t idx);
 } // namespace FCCD
 } // namespace psddl_hdf2psana
