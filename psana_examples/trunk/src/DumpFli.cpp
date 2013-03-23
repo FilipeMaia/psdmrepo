@@ -74,8 +74,8 @@ DumpFli::beginCalibCycle(Event& evt, Env& env)
       str << "\n  exposureEventCode = " << config1->exposureEventCode();
       str << "\n  exposureTime = " << config1->exposureTime();
       str << "\n  coolingTemp = " << config1->coolingTemp();
-      str << "\n  gainIndex = " << config1->gainIndex();
-      str << "\n  readoutSpeedIndex = " << config1->readoutSpeedIndex();
+      str << "\n  gainIndex = " << int(config1->gainIndex());
+      str << "\n  readoutSpeedIndex = " << int(config1->readoutSpeedIndex());
       str << "\n  numDelayShots = " << config1->numDelayShots();
       str << "\n  frameSize = " << config1->frameSize();
       str << "\n  numPixels = " << config1->numPixels();
