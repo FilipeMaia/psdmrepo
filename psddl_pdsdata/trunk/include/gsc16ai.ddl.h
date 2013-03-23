@@ -44,16 +44,16 @@ public:
     DataFormat_TwosComplement = 0,
     DataFormat_OffsetBinary,
   };
-  uint16_t voltageRange() const { return _voltageRange; }
+  Gsc16ai::ConfigV1::VoltageRange voltageRange() const { return Gsc16ai::ConfigV1::VoltageRange(_voltageRange); }
   uint16_t firstChan() const { return _firstChan; }
   uint16_t lastChan() const { return _lastChan; }
-  uint16_t inputMode() const { return _inputMode; }
-  uint16_t triggerMode() const { return _triggerMode; }
-  uint16_t dataFormat() const { return _dataFormat; }
+  Gsc16ai::ConfigV1::InputMode inputMode() const { return Gsc16ai::ConfigV1::InputMode(_inputMode); }
+  Gsc16ai::ConfigV1::TriggerMode triggerMode() const { return Gsc16ai::ConfigV1::TriggerMode(_triggerMode); }
+  Gsc16ai::ConfigV1::DataFormat dataFormat() const { return Gsc16ai::ConfigV1::DataFormat(_dataFormat); }
   uint16_t fps() const { return _fps; }
   uint8_t autocalibEnable() const { return _autocalibEnable; }
   uint8_t timeTagEnable() const { return _timeTagEnable; }
-  uint16_t numChannels() const { return this->_lastChan - this->_firstChan + 1; }
+  uint16_t numChannels() const { return this->lastChan() - this->firstChan() + 1; }
   static uint32_t _sizeof()  { return 16; }
 private:
   uint16_t	_voltageRange;
