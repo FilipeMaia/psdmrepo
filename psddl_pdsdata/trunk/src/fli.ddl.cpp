@@ -7,7 +7,7 @@ namespace PsddlPds {
 namespace Fli {
 uint32_t
 ConfigV1::frameSize() const {
-  return sizeof(FrameV1) + this->numPixels()*2;
+  return 12 + this->numPixels()*2;
 }
 } // namespace Fli
 } // namespace PsddlPds
