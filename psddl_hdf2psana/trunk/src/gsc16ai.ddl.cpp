@@ -15,24 +15,24 @@ hdf5pp::Type ns_ConfigV1_v0_dataset_config_stored_type()
 {
   typedef ns_ConfigV1_v0::dataset_config DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  hdf5pp::EnumType<int32_t> _enum_type_voltageRange = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<uint16_t> _enum_type_voltageRange = hdf5pp::EnumType<uint16_t>::enumType();
   _enum_type_voltageRange.insert("VoltageRange_10V", Psana::Gsc16ai::ConfigV1::VoltageRange_10V);
   _enum_type_voltageRange.insert("VoltageRange_5V", Psana::Gsc16ai::ConfigV1::VoltageRange_5V);
   _enum_type_voltageRange.insert("VoltageRange_2_5V", Psana::Gsc16ai::ConfigV1::VoltageRange_2_5V);
   type.insert("voltageRange", offsetof(DsType, voltageRange), _enum_type_voltageRange);
   type.insert("firstChan", offsetof(DsType, firstChan), hdf5pp::TypeTraits<uint16_t>::stored_type());
   type.insert("lastChan", offsetof(DsType, lastChan), hdf5pp::TypeTraits<uint16_t>::stored_type());
-  hdf5pp::EnumType<int32_t> _enum_type_inputMode = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<uint16_t> _enum_type_inputMode = hdf5pp::EnumType<uint16_t>::enumType();
   _enum_type_inputMode.insert("InputMode_Differential", Psana::Gsc16ai::ConfigV1::InputMode_Differential);
   _enum_type_inputMode.insert("InputMode_Zero", Psana::Gsc16ai::ConfigV1::InputMode_Zero);
   _enum_type_inputMode.insert("InputMode_Vref", Psana::Gsc16ai::ConfigV1::InputMode_Vref);
   type.insert("inputMode", offsetof(DsType, inputMode), _enum_type_inputMode);
-  hdf5pp::EnumType<int32_t> _enum_type_triggerMode = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<uint16_t> _enum_type_triggerMode = hdf5pp::EnumType<uint16_t>::enumType();
   _enum_type_triggerMode.insert("TriggerMode_ExtPos", Psana::Gsc16ai::ConfigV1::TriggerMode_ExtPos);
   _enum_type_triggerMode.insert("TriggerMode_ExtNeg", Psana::Gsc16ai::ConfigV1::TriggerMode_ExtNeg);
   _enum_type_triggerMode.insert("TriggerMode_IntClk", Psana::Gsc16ai::ConfigV1::TriggerMode_IntClk);
   type.insert("triggerMode", offsetof(DsType, triggerMode), _enum_type_triggerMode);
-  hdf5pp::EnumType<int32_t> _enum_type_dataFormat = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<uint16_t> _enum_type_dataFormat = hdf5pp::EnumType<uint16_t>::enumType();
   _enum_type_dataFormat.insert("DataFormat_TwosComplement", Psana::Gsc16ai::ConfigV1::DataFormat_TwosComplement);
   _enum_type_dataFormat.insert("DataFormat_OffsetBinary", Psana::Gsc16ai::ConfigV1::DataFormat_OffsetBinary);
   type.insert("dataFormat", offsetof(DsType, dataFormat), _enum_type_dataFormat);
@@ -52,24 +52,24 @@ hdf5pp::Type ns_ConfigV1_v0_dataset_config_native_type()
 {
   typedef ns_ConfigV1_v0::dataset_config DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  hdf5pp::EnumType<int32_t> _enum_type_voltageRange = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<uint16_t> _enum_type_voltageRange = hdf5pp::EnumType<uint16_t>::enumType();
   _enum_type_voltageRange.insert("VoltageRange_10V", Psana::Gsc16ai::ConfigV1::VoltageRange_10V);
   _enum_type_voltageRange.insert("VoltageRange_5V", Psana::Gsc16ai::ConfigV1::VoltageRange_5V);
   _enum_type_voltageRange.insert("VoltageRange_2_5V", Psana::Gsc16ai::ConfigV1::VoltageRange_2_5V);
   type.insert("voltageRange", offsetof(DsType, voltageRange), _enum_type_voltageRange);
   type.insert("firstChan", offsetof(DsType, firstChan), hdf5pp::TypeTraits<uint16_t>::native_type());
   type.insert("lastChan", offsetof(DsType, lastChan), hdf5pp::TypeTraits<uint16_t>::native_type());
-  hdf5pp::EnumType<int32_t> _enum_type_inputMode = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<uint16_t> _enum_type_inputMode = hdf5pp::EnumType<uint16_t>::enumType();
   _enum_type_inputMode.insert("InputMode_Differential", Psana::Gsc16ai::ConfigV1::InputMode_Differential);
   _enum_type_inputMode.insert("InputMode_Zero", Psana::Gsc16ai::ConfigV1::InputMode_Zero);
   _enum_type_inputMode.insert("InputMode_Vref", Psana::Gsc16ai::ConfigV1::InputMode_Vref);
   type.insert("inputMode", offsetof(DsType, inputMode), _enum_type_inputMode);
-  hdf5pp::EnumType<int32_t> _enum_type_triggerMode = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<uint16_t> _enum_type_triggerMode = hdf5pp::EnumType<uint16_t>::enumType();
   _enum_type_triggerMode.insert("TriggerMode_ExtPos", Psana::Gsc16ai::ConfigV1::TriggerMode_ExtPos);
   _enum_type_triggerMode.insert("TriggerMode_ExtNeg", Psana::Gsc16ai::ConfigV1::TriggerMode_ExtNeg);
   _enum_type_triggerMode.insert("TriggerMode_IntClk", Psana::Gsc16ai::ConfigV1::TriggerMode_IntClk);
   type.insert("triggerMode", offsetof(DsType, triggerMode), _enum_type_triggerMode);
-  hdf5pp::EnumType<int32_t> _enum_type_dataFormat = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<uint16_t> _enum_type_dataFormat = hdf5pp::EnumType<uint16_t>::enumType();
   _enum_type_dataFormat.insert("DataFormat_TwosComplement", Psana::Gsc16ai::ConfigV1::DataFormat_TwosComplement);
   _enum_type_dataFormat.insert("DataFormat_OffsetBinary", Psana::Gsc16ai::ConfigV1::DataFormat_OffsetBinary);
   type.insert("dataFormat", offsetof(DsType, dataFormat), _enum_type_dataFormat);
@@ -90,9 +90,9 @@ ns_ConfigV1_v0::dataset_config::dataset_config()
 ns_ConfigV1_v0::dataset_config::~dataset_config()
 {
 }
-uint16_t ConfigV1_v0::voltageRange() const {
+Psana::Gsc16ai::ConfigV1::VoltageRange ConfigV1_v0::voltageRange() const {
   if (not m_ds_config) read_ds_config();
-  return uint16_t(m_ds_config->voltageRange);
+  return Psana::Gsc16ai::ConfigV1::VoltageRange(m_ds_config->voltageRange);
 }
 uint16_t ConfigV1_v0::firstChan() const {
   if (not m_ds_config) read_ds_config();
@@ -102,17 +102,17 @@ uint16_t ConfigV1_v0::lastChan() const {
   if (not m_ds_config) read_ds_config();
   return uint16_t(m_ds_config->lastChan);
 }
-uint16_t ConfigV1_v0::inputMode() const {
+Psana::Gsc16ai::ConfigV1::InputMode ConfigV1_v0::inputMode() const {
   if (not m_ds_config) read_ds_config();
-  return uint16_t(m_ds_config->inputMode);
+  return Psana::Gsc16ai::ConfigV1::InputMode(m_ds_config->inputMode);
 }
-uint16_t ConfigV1_v0::triggerMode() const {
+Psana::Gsc16ai::ConfigV1::TriggerMode ConfigV1_v0::triggerMode() const {
   if (not m_ds_config) read_ds_config();
-  return uint16_t(m_ds_config->triggerMode);
+  return Psana::Gsc16ai::ConfigV1::TriggerMode(m_ds_config->triggerMode);
 }
-uint16_t ConfigV1_v0::dataFormat() const {
+Psana::Gsc16ai::ConfigV1::DataFormat ConfigV1_v0::dataFormat() const {
   if (not m_ds_config) read_ds_config();
-  return uint16_t(m_ds_config->dataFormat);
+  return Psana::Gsc16ai::ConfigV1::DataFormat(m_ds_config->dataFormat);
 }
 uint16_t ConfigV1_v0::fps() const {
   if (not m_ds_config) read_ds_config();

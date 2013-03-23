@@ -12,12 +12,12 @@
         <h5schema name="ConfigV1" version="0">
 
             <dataset name="config">
-                <attribute name="voltageRange" type="VoltageRange"/>
+                <attribute name="voltageRange"/>
                 <attribute name="firstChan"/>
                 <attribute name="lastChan"/>
-                <attribute name="inputMode" type="InputMode"/>
-                <attribute name="triggerMode" type="TriggerMode"/>
-                <attribute name="dataFormat" type="DataFormat"/>
+                <attribute name="inputMode"/>
+                <attribute name="triggerMode"/>
+                <attribute name="dataFormat"/>
                 <attribute name="fps"/>
                 <attribute name="autocalibEnable"/>
                 <attribute name="timeTagEnable"/>

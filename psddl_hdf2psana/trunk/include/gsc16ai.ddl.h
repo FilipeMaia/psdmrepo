@@ -19,12 +19,12 @@ struct dataset_config {
   dataset_config();
   ~dataset_config();
 
-  int32_t voltageRange; 
+  uint16_t voltageRange; 
   uint16_t firstChan; 
   uint16_t lastChan; 
-  int32_t inputMode; 
-  int32_t triggerMode; 
-  int32_t dataFormat; 
+  uint16_t inputMode; 
+  uint16_t triggerMode; 
+  uint16_t dataFormat; 
   uint16_t fps; 
   uint8_t autocalibEnable; 
   uint8_t timeTagEnable; 
@@ -41,12 +41,12 @@ public:
     : m_group(group), m_idx(idx) {}
   ConfigV1_v0(const boost::shared_ptr<Gsc16ai::ns_ConfigV1_v0::dataset_config>& ds) : m_ds_config(ds) {}
   virtual ~ConfigV1_v0() {}
-  virtual uint16_t voltageRange() const;
+  virtual Psana::Gsc16ai::ConfigV1::VoltageRange voltageRange() const;
   virtual uint16_t firstChan() const;
   virtual uint16_t lastChan() const;
-  virtual uint16_t inputMode() const;
-  virtual uint16_t triggerMode() const;
-  virtual uint16_t dataFormat() const;
+  virtual Psana::Gsc16ai::ConfigV1::InputMode inputMode() const;
+  virtual Psana::Gsc16ai::ConfigV1::TriggerMode triggerMode() const;
+  virtual Psana::Gsc16ai::ConfigV1::DataFormat dataFormat() const;
   virtual uint16_t fps() const;
   virtual uint8_t autocalibEnable() const;
   virtual uint8_t timeTagEnable() const;
