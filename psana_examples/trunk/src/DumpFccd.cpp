@@ -83,10 +83,8 @@ DumpFccd::beginCalibCycle(Event& evt, Env& env)
       str << "\n  ccdEnable = " << int(config2->ccdEnable());
       str << "\n  focusMode = " << int(config2->focusMode());
       str << "\n  exposureTime = " << config2->exposureTime();
-      str << "\n  dacVoltages = [" << config2->dacVoltages()[0]
-          << " " << config2->dacVoltages()[1] << " ...]";
-      str << "\n  waveforms = [" << config2->waveforms()[0]
-          << " " << config2->waveforms()[1] << " ...]";
+      str << "\n  dacVoltages = " << config2->dacVoltages();
+      str << "\n  waveforms = " << config2->waveforms();
       str << "\n  width = " << config2->width();
       str << "\n  height = " << config2->height();
       str << "\n  trimmedWidth = " << config2->trimmedWidth();
