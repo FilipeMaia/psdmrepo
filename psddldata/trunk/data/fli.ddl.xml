@@ -48,28 +48,28 @@
 
             <attribute name="_u32NumDelayShots" type="uint32_t" accessor="numDelayShots">
             </attribute>
-            
+
             <method name="frameSize" type="uint32_t">
-            Total size in bytes of the Frame object
-                <expr lang="C++" value="sizeof(FrameV1) + {self}.numPixels()*2"/>
+            Total size in bytes of the Frame object, including image and frame header.
+                <expr lang="C++" value="12 + {self}.numPixels()*2"/>
             </method>
 
             <method name="numPixelsX" type="uint32_t">
             calculate frame X size in pixels based on the current ROI and binning settings
                 <tag name="inline"/>
-                <expr lang="C++" value="(_uWidth + _uBinX - 1) / _uBinX"/>
+                <expr lang="C++" value="({self}.width() + {self}.binX() - 1) / {self}.binX()"/>
             </method>
 
             <method name="numPixelsY" type="uint32_t">
             calculate frame Y size in pixels based on the current ROI and binning settings
                 <tag name="inline"/>
-                <expr lang="C++" value="(_uHeight+ _uBinY - 1) / _uBinY"/>
+                <expr lang="C++" value="({self}.height() + {self}.binY() - 1) / {self}.binY()"/>
             </method>
 
             <method name="numPixels" type="uint32_t">
             calculate total frame size in pixels based on the current ROI and binning settings
                 <tag name="inline"/>
-                <expr lang="C++" value="((_uWidth + _uBinX-1)/ _uBinX )*((_uHeight+ _uBinY-1)/ _uBinY )"/>
+                <expr lang="C++" value="(({self}.width() + {self}.binX() - 1)/ {self}.binX())*(({self}.height() + {self}.binY() - 1)/ {self}.binY())"/>
             </method>
 
         </pstype>
