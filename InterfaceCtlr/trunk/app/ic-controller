@@ -201,12 +201,12 @@ class Controller ( AppBase ) :
                     # check the files
                     if fs.xtc_files :
                         self.error ('expecting empty fileset: %s', fs)
-                        self._db.change_fileset_status (fs.id, 'FAIL_NOFILES')
+                        self._db.change_fileset_status (fs.id, 'FAIL_NOINPUT')
                     else :
                         files = self.__find_files( fs )
                         if not files :
                             self.error ('could not find files for fileset: %s', fs)
-                            self._db.change_fileset_status (fs.id, 'FAIL_NOFILES')
+                            self._db.change_fileset_status (fs.id, 'FAIL_NOINPUT')
                         else :
                             self._db.add_files (fs.id, 'XTC', files)
                             self._db.change_fileset_status (fs.id, 'WAIT')
@@ -225,7 +225,7 @@ class Controller ( AppBase ) :
                     if not fs.xtc_files :
                         
                         self.error ('expecting non-empty fileset: %s', fs)
-                        self._db.change_fileset_status (fs.id, 'FAIL_NOFILES')
+                        self._db.change_fileset_status (fs.id, 'FAIL_NOINPUT')
                         
                     else:
                     
