@@ -8,6 +8,25 @@
     <package name="Fli">
 
         <!-- ========================================================================= -->
+
+        <h5schema name="ConfigV1" version="0">
+            <dataset name="config">
+                <attribute name="width"/>
+                <attribute name="height"/>
+                <attribute name="orgX"/>
+                <attribute name="orgY"/>
+                <attribute name="binX"/>
+                <attribute name="binY"/>
+                <attribute name="exposureTime"/>
+                <attribute name="coolingTemp"/>
+                <attribute name="gainIndex"/>
+                <attribute name="readoutSpeedIndex"/>
+                <attribute name="exposureEventCode"/>
+                <attribute name="numDelayShots"/>
+            </dataset>
+        </h5schema>
+
+        <!-- ========================================================================= -->
     
         <h5schema name="FrameV1" version="0">
 

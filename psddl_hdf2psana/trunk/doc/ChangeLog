@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-11
+2013-03-22 Andy Salnikov
+- fix Fli schema
+
 Tag: V00-01-10
 2013-03-22 Andy Salnikov
 - regenerate whole thing from psddldata V00-04-17
