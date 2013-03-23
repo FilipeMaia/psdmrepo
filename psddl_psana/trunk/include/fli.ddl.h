@@ -32,7 +32,7 @@ public:
   virtual uint8_t readoutSpeedIndex() const = 0;
   virtual uint16_t exposureEventCode() const = 0;
   virtual uint32_t numDelayShots() const = 0;
-  /** Total size in bytes of the Frame object */
+  /** Total size in bytes of the Frame object, including image and frame header. */
   virtual uint32_t frameSize() const = 0;
   /** calculate frame X size in pixels based on the current ROI and binning settings */
   virtual uint32_t numPixelsX() const = 0;
