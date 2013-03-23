@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-17
+2013-03-22 Andy Salnikov
+- gsc16ai.ddl.xml: use new enum-base feature to define attributes to have
+  enum types instead of ints
+
 Tag: V00-04-16
 2013-03-22 Andy Salnikov
 - gsc16ai.ddl.xml: fix numChannels() implementation to be usable with HDF5

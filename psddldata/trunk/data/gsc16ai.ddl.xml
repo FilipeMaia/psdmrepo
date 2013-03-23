@@ -18,30 +18,30 @@
             <const name="LowestFps" value="1"/>
             <const name="HighestFps" value="120"/>
         
-            <enum name="InputMode">
+            <enum name="InputMode" base="uint16_t">
                 <enum-const name="InputMode_Differential" value="0"/>
                 <enum-const name="InputMode_Zero" value="1"/>
                 <enum-const name="InputMode_Vref" value="2"/>
             </enum>
         
-            <enum name="VoltageRange">
+            <enum name="VoltageRange" base="uint16_t">
                 <enum-const name="VoltageRange_10V" value="0"/>
                 <enum-const name="VoltageRange_5V"/>
                 <enum-const name="VoltageRange_2_5V"/>
             </enum>
         
-            <enum name="TriggerMode">
+            <enum name="TriggerMode" base="uint16_t">
                 <enum-const name="TriggerMode_ExtPos" value="0"/>
                 <enum-const name="TriggerMode_ExtNeg"/>
                 <enum-const name="TriggerMode_IntClk"/>
             </enum>
         
-            <enum name="DataFormat">
+            <enum name="DataFormat" base="uint16_t">
                 <enum-const name="DataFormat_TwosComplement" value="0"/>
                 <enum-const name="DataFormat_OffsetBinary"/>
             </enum>
         
-            <attribute name="_voltageRange" type="uint16_t" accessor="voltageRange">
+            <attribute name="_voltageRange" type="VoltageRange" accessor="voltageRange">
             </attribute>
 
             <attribute name="_firstChan" type="uint16_t" accessor="firstChan">
@@ -50,13 +50,13 @@
             <attribute name="_lastChan" type="uint16_t" accessor="lastChan">
             </attribute>
 
-            <attribute name="_inputMode" type="uint16_t" accessor="inputMode">
+            <attribute name="_inputMode" type="InputMode" accessor="inputMode">
             </attribute>
 
-            <attribute name="_triggerMode" type="uint16_t" accessor="triggerMode">
+            <attribute name="_triggerMode" type="TriggerMode" accessor="triggerMode">
             </attribute>
 
-            <attribute name="_dataFormat" type="uint16_t" accessor="dataFormat">
+            <attribute name="_dataFormat" type="DataFormat" accessor="dataFormat">
             </attribute>
 
             <attribute name="_fps" type="uint16_t" accessor="fps">
