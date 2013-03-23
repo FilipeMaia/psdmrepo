@@ -41,6 +41,7 @@ import sys
 #-----------------------------
 from psddl.Shape import Shape
 from psddl.ExprVal import ExprVal
+from psddl.Enum import Enum
 
 #----------------------------------
 # Local non-exported definitions --
@@ -91,16 +92,21 @@ class Attribute ( object ) :
 
         if self.parent: self.parent.add(self)
 
+    @property
+    def stor_type(self):
+        if isinstance(self.type, Enum): return self.type.base
+        return self.type
+
     def name(self):
         return self._name
 
     def align(self):
-        return self.type.align
+        return self.stor_type.align
 
     def sizeBytes(self):
         """Calculate full size in bytes of the attribute and return it as 
         number or expression"""
-        size = ExprVal(self.type.size)
+        size = ExprVal(self.stor_type.size)
         if size.value is None:
             size = ExprVal("sizeof(%s)" % self.type.name)
         if self.shape:

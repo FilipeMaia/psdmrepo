@@ -346,10 +346,12 @@ class DdlPds2Psana ( object ) :
             if attr.type.basic:
                 
                 cfgNeeded = False
+                cvt = False
                 if '{xtc-config}' in str(attr.offset) : cfgNeeded = True
+                if attr.type is not attr.stor_type: cvt = True
 
                 args = []
-                rettype = attr.type.fullName('C++')
+                rettype = attr.type.fullName('C++', self.psana_ns)
                 if attr.shape :
                     for d in attr.shape.dims:
                         if '{xtc-config}' in str(d) : cfgNeeded = True
@@ -358,7 +360,7 @@ class DdlPds2Psana ( object ) :
                         args = [('i%d'%i, type.lookup('uint32_t')) for i in range(len(attr.shape.dims)-1)]
                     else:
                         rettype = T("ndarray<const $type, $rank>")(type=rettype, rank=len(attr.shape.dims))
-                self._genFwdMeth(meth.name, rettype, type, cfgNeeded, args=args)
+                self._genFwdMeth(meth.name, rettype, type, cfgNeeded, cvt, args=args)
             
             else:
 

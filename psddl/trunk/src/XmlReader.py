@@ -418,7 +418,7 @@ class XmlReader ( object ) :
         # find type object
         atypename = attrel.get('type')
         if not atypename: raise ValueError('attribute element missing type')
-        atype = type.lookup(atypename, Type)
+        atype = type.lookup(atypename, (Type, Enum))
         if not atype: raise ValueError('attribute element has unknown type '+atypename)
 
         # get offset, make a number from it if possible
@@ -620,7 +620,11 @@ class XmlReader ( object ) :
             
     def _parseEnum(self, enumel, parent, included):
         
-        enum = Enum(enumel.get('name'), parent, included=included, comment = (enumel.text or "").strip())
+        enum = Enum(enumel.get('name'), 
+                    parent, 
+                    base=enumel.get('base', 'int32_t'), 
+                    included=included, 
+                    comment = (enumel.text or "").strip())
         for econst in list(enumel):
             if econst.tag != _enum_const_tag : raise ValueError('expecting %s tag'%_enum_const_tag)
             Constant(econst.get('name'), econst.get('value'), enum, comment = (econst.text or "").strip())

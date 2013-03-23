@@ -95,7 +95,7 @@ class Type ( Namespace ) :
         """ variable means instances may have different size """
         if self.base and self.base.variable: return True
         for attr in self.attributes():
-            if attr.type.variable: return True
+            if attr.stor_type.variable: return True
             if attr.shape: 
                 for dim in attr.shape.dims:
                     if str(dim).find('{self}') >= 0: return True
@@ -254,13 +254,13 @@ class Type ( Namespace ) :
                 expr = ExprVal(self.base.fullName('C++')+"::_sizeof()", self)
             for attr in self.attributes():
                 
-                if attr.type.variable:
+                if attr.stor_type.variable:
                     logging.warning("Cannot generate _sizeof for type "+self.fullName('C++'))
                     return
                 
-                meth = attr.type.lookup('_sizeof', Method)
+                meth = attr.stor_type.lookup('_sizeof', Method)
                 if not meth:
-                    size = ExprVal(attr.type.size, self)
+                    size = ExprVal(attr.stor_type.size, self)
                 else:
                     cfg = ''
                     if meth.expr.get('C++',"").find("{xtc-config}") >= 0: cfg = 'cfg'
@@ -270,7 +270,7 @@ class Type ( Namespace ) :
                         else:
                             size = ExprVal("{self}."+attr.accessor.name+"()._sizeof(%s)"%cfg, self)
                     else:
-                        size = ExprVal(attr.type.fullName('C++')+"::_sizeof(%s)"%cfg, self)
+                        size = ExprVal(attr.stor_type.fullName('C++')+"::_sizeof(%s)"%cfg, self)
 
                 if attr.shape: 
                     size = str(size)

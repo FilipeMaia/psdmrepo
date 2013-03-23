@@ -36,6 +36,7 @@ import sys
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
+from psddl.Enum import Enum
 from psddl.Method import Method
 from psddl.Shape import Shape
 
@@ -103,6 +104,13 @@ class H5Attribute ( object ) :
         if self._type is None :
             self._type = self._method().type
         return self._type
+
+    @property
+    def stor_type(self):
+        """Get attribute storage type"""
+        type = self.type
+        if isinstance(type, Enum): return type.base
+        return type
 
     @property
     def rank(self):

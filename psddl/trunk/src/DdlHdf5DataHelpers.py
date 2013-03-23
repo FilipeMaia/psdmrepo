@@ -111,7 +111,7 @@ _ds_ctor_dtor_template = ji.Template('''\
 
 
 _enum_h5type_definition = ji.Template('''\
-  hdf5pp::EnumType<int32_t> {{type}} = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<{{enum_base}}> {{type}} = hdf5pp::EnumType<{{enum_base}}>::enumType();
 {% for c in constants %}
   {{type}}.insert("{{c.name}}", {{c.type}}::{{c.name}});
 {% endfor %}
@@ -415,14 +415,10 @@ class DatasetCompound(object):
             _log.debug("_genDs: dataset attr: name=%s rank=%s shape=%s", attr.name, attr.rank, attr.shape)
             
             # base type
-            if isinstance(attr.type, Enum):
-                # enum types are mapped to uint32 for now, can use shorter
-                # presentation if optimization is necessary
-                dattr['type'] = "int32_t"
-            elif not attr.type.basic:
+            if not attr.stor_type.basic:
                 dattr['type'] = _h5ds_typename(attr)
             else:
-                dattr['type'] = attr.type.name
+                dattr['type'] = attr.stor_type.name
 
             if attr.rank > 0:
                 if dattr['type'] == 'char':
@@ -512,6 +508,7 @@ class DatasetCompound(object):
                 typename = attr.type.parent.fullName('C++', psana_ns)
                 constants = [dict(name=c.name, type=typename) for c in attr.type.constants()]
                 type = '_enum_type_' + attr.name
+                enum_base = attr.stor_type.name
                 type_decl = _enum_h5type_definition.render(locals())
                 if attr.rank > 0:
                     baseType = type

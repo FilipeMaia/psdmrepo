@@ -213,16 +213,16 @@ class CppTypeCodegen ( object ) :
         
         if not attr.shape :
             if attr.isfixed():
-                decl = T("  $type\t$name;$doc")(type=_typename(attr.type), name=attr.name, doc=doc)
+                decl = T("  $type\t$name;$doc")(type=_typename(attr.stor_type), name=attr.name, doc=doc)
             else:
-                decl = T("  //$type\t$name;")(type=_typename(attr.type), name=attr.name)
+                decl = T("  //$type\t$name;")(type=_typename(attr.stor_type), name=attr.name)
         else:
             if attr.isfixed():
                 dim = _interpolate(_dims(attr.shape.dims), attr.parent)
-                decl = T("  $type\t$name$shape;$doc")(type=_typename(attr.type), name=attr.name, shape=dim, doc=doc)
+                decl = T("  $type\t$name$shape;$doc")(type=_typename(attr.stor_type), name=attr.name, shape=dim, doc=doc)
             else :
                 dim = _interpolate(_dims(attr.shape.dims), attr.parent)
-                decl = T("  //$type\t$name$shape;")(type=_typename(attr.type), name=attr.name, shape=dim)
+                decl = T("  //$type\t$name$shape;")(type=_typename(attr.stor_type), name=attr.name, shape=dim)
         print >>self._inc, decl
 
 
@@ -347,6 +347,8 @@ class CppTypeCodegen ( object ) :
 
         if attr.isfixed():
 
+            if attr.type is not attr.stor_type: 
+                return T("return $type($name);")(type=_typedecl(attr.type), name=attr.name)
             return T("return $name;")[attr]
         
         else:

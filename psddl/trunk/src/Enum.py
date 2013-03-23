@@ -35,6 +35,7 @@ import sys
 #  Imports of base class module --
 #---------------------------------
 from psddl.Namespace import Namespace
+from psddl.Type import Type
 
 #-----------------------------
 # Imports for other modules --
@@ -62,6 +63,7 @@ class Enum ( Namespace ) :
 
         self.included = kw.get('included')
         self.comment = kw.get('comment', '')
+        self.base = self.lookup(kw.get('base', 'int32_t'), Type)
         
         self.basic = True
         self.value_type = True
