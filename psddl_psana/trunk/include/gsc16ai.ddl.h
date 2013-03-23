@@ -43,12 +43,12 @@ public:
     DataFormat_OffsetBinary,
   };
   virtual ~ConfigV1();
-  virtual uint16_t voltageRange() const = 0;
+  virtual Gsc16ai::ConfigV1::VoltageRange voltageRange() const = 0;
   virtual uint16_t firstChan() const = 0;
   virtual uint16_t lastChan() const = 0;
-  virtual uint16_t inputMode() const = 0;
-  virtual uint16_t triggerMode() const = 0;
-  virtual uint16_t dataFormat() const = 0;
+  virtual Gsc16ai::ConfigV1::InputMode inputMode() const = 0;
+  virtual Gsc16ai::ConfigV1::TriggerMode triggerMode() const = 0;
+  virtual Gsc16ai::ConfigV1::DataFormat dataFormat() const = 0;
   virtual uint16_t fps() const = 0;
   virtual uint8_t autocalibEnable() const = 0;
   virtual uint8_t timeTagEnable() const = 0;
