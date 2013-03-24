@@ -90,9 +90,6 @@ try {
       evt.putProxy(psddl_hdf2psana::PNCCD::make_FullFrameV1(schema_version, group, idx, cfgPtr), src);
     }
     break;
-  case 414569170:
-    evt.putProxy(psddl_hdf2psana::ControlData::make_PVLabel(schema_version, group, idx), src);
-    break;
   case 477483284:
     evt.putProxy(psddl_hdf2psana::UsdUsb::make_DataV1(schema_version, group, idx), src);
     break;
@@ -237,9 +234,6 @@ try {
   case 1656086870:
     evt.putProxy(psddl_hdf2psana::Acqiris::make_HorizV1(schema_version, group, idx), src);
     break;
-  case 1694947283:
-    cfgStore.putProxy(psddl_hdf2psana::ControlData::make_PVControl(schema_version, group, idx), src);
-    break;
   case 1705456020:
     cfgStore.putProxy(psddl_hdf2psana::Ipimb::make_ConfigV2(schema_version, group, idx), src);
     break;
@@ -368,9 +362,6 @@ try {
     break;
   case 3210462341:
     evt.putProxy(psddl_hdf2psana::Acqiris::make_VertV1(schema_version, group, idx), src);
-    break;
-  case 3416691192:
-    evt.putProxy(psddl_hdf2psana::ControlData::make_PVMonitor(schema_version, group, idx), src);
     break;
   case 3467424660:
     if (boost::shared_ptr<Psana::CsPad::ConfigV2> cfgPtr = cfgStore.get(src)) {

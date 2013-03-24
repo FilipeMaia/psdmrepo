@@ -13,39 +13,20 @@ namespace psddl_hdf2psana {
 namespace ControlData {
 
 namespace ns_PVControl_v0 {
-struct dataset_config {
+struct dataset_data {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
-  dataset_config();
-  ~dataset_config();
+  dataset_data();
+  ~dataset_data();
 
-  char* name; 
-  uint32_t index; 
+  char name[32]; 
+  int32_t index; 
   double value; 
-  uint8_t array; 
 
   operator Psana::ControlData::PVControl() const { return Psana::ControlData::PVControl(name, index, value); }
 };
 }
-class Proxy_PVControl_v0 : public PSEvt::Proxy<Psana::ControlData::PVControl> {
-public:
-  typedef Psana::ControlData::PVControl PsanaType;
-
-  Proxy_PVControl_v0(hdf5pp::Group group, hsize_t idx) : m_group(group), m_idx(idx) {}
-  virtual ~Proxy_PVControl_v0() {}
-
-protected:
-
-  virtual boost::shared_ptr<PsanaType> getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key);
-
-private:
-
-  mutable hdf5pp::Group m_group;
-  hsize_t m_idx;
-  boost::shared_ptr<PsanaType> m_data;
-};
-boost::shared_ptr<PSEvt::Proxy<Psana::ControlData::PVControl> > make_PVControl(int version, hdf5pp::Group group, hsize_t idx);
 
 namespace ns_PVMonitor_v0 {
 struct dataset_data {
@@ -55,33 +36,14 @@ struct dataset_data {
   dataset_data();
   ~dataset_data();
 
-  char* name; 
-  uint32_t index; 
+  char name[32]; 
+  int32_t index; 
   double loValue; 
   double hiValue; 
-  uint8_t array; 
 
   operator Psana::ControlData::PVMonitor() const { return Psana::ControlData::PVMonitor(name, index, loValue, hiValue); }
 };
 }
-class Proxy_PVMonitor_v0 : public PSEvt::Proxy<Psana::ControlData::PVMonitor> {
-public:
-  typedef Psana::ControlData::PVMonitor PsanaType;
-
-  Proxy_PVMonitor_v0(hdf5pp::Group group, hsize_t idx) : m_group(group), m_idx(idx) {}
-  virtual ~Proxy_PVMonitor_v0() {}
-
-protected:
-
-  virtual boost::shared_ptr<PsanaType> getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key);
-
-private:
-
-  mutable hdf5pp::Group m_group;
-  hsize_t m_idx;
-  boost::shared_ptr<PsanaType> m_data;
-};
-boost::shared_ptr<PSEvt::Proxy<Psana::ControlData::PVMonitor> > make_PVMonitor(int version, hdf5pp::Group group, hsize_t idx);
 
 namespace ns_PVLabel_v0 {
 struct dataset_data {
@@ -91,30 +53,12 @@ struct dataset_data {
   dataset_data();
   ~dataset_data();
 
-  char* name; 
-  char* value; 
+  char name[32]; 
+  char value[64]; 
 
   operator Psana::ControlData::PVLabel() const { return Psana::ControlData::PVLabel(name, value); }
 };
 }
-class Proxy_PVLabel_v0 : public PSEvt::Proxy<Psana::ControlData::PVLabel> {
-public:
-  typedef Psana::ControlData::PVLabel PsanaType;
-
-  Proxy_PVLabel_v0(hdf5pp::Group group, hsize_t idx) : m_group(group), m_idx(idx) {}
-  virtual ~Proxy_PVLabel_v0() {}
-
-protected:
-
-  virtual boost::shared_ptr<PsanaType> getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key);
-
-private:
-
-  mutable hdf5pp::Group m_group;
-  hsize_t m_idx;
-  boost::shared_ptr<PsanaType> m_data;
-};
-boost::shared_ptr<PSEvt::Proxy<Psana::ControlData::PVLabel> > make_PVLabel(int version, hdf5pp::Group group, hsize_t idx);
 
 namespace ns_ConfigV1_v0 {
 struct dataset_config {

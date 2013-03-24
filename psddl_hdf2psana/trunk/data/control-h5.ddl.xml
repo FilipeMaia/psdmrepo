@@ -6,5 +6,39 @@
     <use file="psddldata/control.ddl.xml" />
 
     <use file="psddl_hdf2psana/xtc-h5.ddl.xml" cpp_headers="psddl_hdf2psana/xtc.ddlm.h"/>
+    
+    <package name="ControlData">
+    
+        <!-- ========================================================================= -->
+        <h5schema name="PVControl" version="0">
+        	<tag name="skip-proxy"/>
+            <dataset name="data">
+                <attribute name="name" rank="1"/>
+                <attribute name="index" type="int32_t"/>
+                <attribute name="value"/>
+            </dataset>
+        </h5schema>
+        <!-- ========================================================================= -->
+        <h5schema name="PVMonitor" version="0">
+        	<tag name="skip-proxy"/>
+            <dataset name="data">
+                <attribute name="name" rank="1"/>
+                <attribute name="index" type="int32_t"/>
+                <attribute name="loValue"/>
+                <attribute name="hiValue"/>
+            </dataset>
+        </h5schema>
+        <!-- ========================================================================= -->
+        <h5schema name="PVLabel" version="0">
+        	<tag name="skip-proxy"/>
+            <dataset name="data">
+                <attribute name="name" rank="1"/>
+                <attribute name="value" rank="1"/>
+            </dataset>
+        </h5schema>
+        <!-- ========================================================================= -->
+
+
+	</package>    
 
 </psddl>
