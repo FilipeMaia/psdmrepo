@@ -123,6 +123,15 @@ DataSpace::select_single(hsize_t index)
   return select_hyperslab ( H5S_SELECT_SET, start, 0, size, 0 );
 }
 
+/// Get the type of the dataspace, returns one of the H5S_SCALAR, H5S_SIMPLE, or H5S_NULL
+H5S_class_t 
+DataSpace::get_simple_extent_type() const
+{
+  H5S_class_t type = H5Sget_simple_extent_type(*m_id) ;
+  if ( type == H5S_NO_CLASS ) throw Hdf5CallException( ERR_LOC, "H5Sget_simple_extent_type") ;
+  return type ;
+}
+
 /// get the rank of the data space
 unsigned
 DataSpace::rank() const

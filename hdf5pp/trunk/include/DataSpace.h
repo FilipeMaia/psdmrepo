@@ -82,6 +82,9 @@ public:
 
   /// Selection which includes single element from rank-1 dataset, returns this object
   DataSpace select_single(hsize_t index) ;
+  
+  /// Get the type of the dataspace, returns one of the H5S_SCALAR, H5S_SIMPLE, or H5S_NULL
+  H5S_class_t get_simple_extent_type() const; 
 
   /// get the rank of the data space
   unsigned rank() const ;

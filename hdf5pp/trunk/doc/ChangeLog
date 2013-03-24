@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-03
+2013-03-23 Andy Salnikov
+- add method DataSpace::get_simple_extent_type()
+- extend Utils::readNdarray() to handle NULL dataspaces
+
 Tag: V00-04-02
 2013-03-19 Andy Salnikov
 - fix to Utils::readNdarray()

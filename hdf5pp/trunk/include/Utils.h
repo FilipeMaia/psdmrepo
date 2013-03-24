@@ -106,15 +106,26 @@ public:
     if (index == hsize_t(-1)) {
 
       // read whole dataset, has to know its rank and dimensions
-      unsigned rank = file_dsp.rank();
-
-      // check rank
-      if (rank != Rank) throw Hdf5RankMismatch(ERR_LOC, Rank, rank);
-
-      file_dsp.dimensions(dims);
-      mem_dsp = DataSpace::makeSimple(Rank, dims, dims);
-
-      memType = TypeTraits<Data>::native_type();
+      
+      if (file_dsp.get_simple_extent_type() == H5S_NULL) {
+      
+        // translator saves empty datasets with H5S_NULL dataspace
+        // in this case create 0-sized array
+        std::fill_n(dims, Rank, hsize_t(0));
+        
+      } else {
+       
+        unsigned rank = file_dsp.rank();
+  
+        // check rank
+        if (rank != Rank) throw Hdf5RankMismatch(ERR_LOC, Rank, rank);
+  
+        file_dsp.dimensions(dims);
+        mem_dsp = DataSpace::makeSimple(Rank, dims, dims);
+  
+        memType = TypeTraits<Data>::native_type();
+        
+      }
 
     } else {
 
@@ -141,9 +152,11 @@ public:
     std::copy(dims, dims+Rank, shape);
     ndarray<Data, Rank> array(shape);
 
-    // read it
-    ds.read(mem_dsp, file_dsp, array.data(), memType);
-
+    if (array.size() > 0) {
+      // read it
+      ds.read(mem_dsp, file_dsp, array.data(), memType);
+    }
+    
     return array;
 
   }
