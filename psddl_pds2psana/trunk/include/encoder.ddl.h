@@ -17,8 +17,8 @@ public:
   ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~ConfigV1();
   virtual uint32_t chan_num() const;
-  virtual uint32_t count_mode() const;
-  virtual uint32_t quadrature_mode() const;
+  virtual Psana::Encoder::ConfigV1::count_mode_type count_mode() const;
+  virtual Psana::Encoder::ConfigV1::quad_mode quadrature_mode() const;
   virtual uint32_t input_num() const;
   virtual uint32_t input_rising() const;
   virtual uint32_t ticks_per_sec() const;
@@ -35,8 +35,8 @@ public:
   ConfigV2(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~ConfigV2();
   virtual uint32_t chan_mask() const;
-  virtual uint32_t count_mode() const;
-  virtual uint32_t quadrature_mode() const;
+  virtual Psana::Encoder::ConfigV2::count_mode_type count_mode() const;
+  virtual Psana::Encoder::ConfigV2::quad_mode quadrature_mode() const;
   virtual uint32_t input_num() const;
   virtual uint32_t input_rising() const;
   virtual uint32_t ticks_per_sec() const;

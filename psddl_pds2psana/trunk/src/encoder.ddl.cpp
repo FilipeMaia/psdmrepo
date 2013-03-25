@@ -31,9 +31,9 @@ ConfigV1::~ConfigV1()
 
 uint32_t ConfigV1::chan_num() const { return m_xtcObj->chan_num(); }
 
-uint32_t ConfigV1::count_mode() const { return m_xtcObj->count_mode(); }
+Psana::Encoder::ConfigV1::count_mode_type ConfigV1::count_mode() const { return pds_to_psana(m_xtcObj->count_mode()); }
 
-uint32_t ConfigV1::quadrature_mode() const { return m_xtcObj->quadrature_mode(); }
+Psana::Encoder::ConfigV1::quad_mode ConfigV1::quadrature_mode() const { return pds_to_psana(m_xtcObj->quadrature_mode()); }
 
 uint32_t ConfigV1::input_num() const { return m_xtcObj->input_num(); }
 
@@ -62,9 +62,9 @@ ConfigV2::~ConfigV2()
 
 uint32_t ConfigV2::chan_mask() const { return m_xtcObj->chan_mask(); }
 
-uint32_t ConfigV2::count_mode() const { return m_xtcObj->count_mode(); }
+Psana::Encoder::ConfigV2::count_mode_type ConfigV2::count_mode() const { return pds_to_psana(m_xtcObj->count_mode()); }
 
-uint32_t ConfigV2::quadrature_mode() const { return m_xtcObj->quadrature_mode(); }
+Psana::Encoder::ConfigV2::quad_mode ConfigV2::quadrature_mode() const { return pds_to_psana(m_xtcObj->quadrature_mode()); }
 
 uint32_t ConfigV2::input_num() const { return m_xtcObj->input_num(); }
 
