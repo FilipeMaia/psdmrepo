@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE psddl SYSTEM "psddl.dtd">
+
+<psddl>
+    <package name="Orca">
+
+    Package containing definitions for Orca data types.
+
+        <!-- ========================================================================= -->
+    
+        
+        <pstype name="ConfigV1" version="1" type_id="Id_OrcaConfig" pack="4">
+        
+            <tag name="config-type"/>
+        
+            <enum name="ReadoutMode">
+                <enum-const name="x1"/>
+                <enum-const name="x2"/>
+                <enum-const name="x4"/>
+                <enum-const name="Subarray"/>
+            </enum>
+        
+            <enum name="Cooling">
+                <enum-const name="Off"/>
+                <enum-const name="On"/>
+                <enum-const name="Max"/>
+            </enum>
+            
+            <const name="Row_Pixels" value="2048"/>
+            <const name="Column_Pixels" value="2048"/>
+        
+            <attribute name="_options" type="uint32_t">
+            	<bitfield name="_bf_readoutMode" size="2" type="ReadoutMode" accessor="mode"/>
+            	<bitfield name="_bf_cooling" size="2" type="Cooling" accessor="cooling"/>
+            	<bitfield name="_bf_defect_pixel_correction_enabled" size="1" type="int8_t" accessor="defect_pixel_correction_enabled"/>
+            </attribute>
+
+            <attribute name="_rows" type="uint32_t" accessor="rows">
+            </attribute>
+
+        </pstype>
+        
+        <!-- ========================================================================= -->
+                
+    </package>
+</psddl>
