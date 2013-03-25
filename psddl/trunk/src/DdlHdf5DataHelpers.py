@@ -113,7 +113,7 @@ _ds_ctor_dtor_template = ji.Template('''\
 _enum_h5type_definition = ji.Template('''\
   hdf5pp::EnumType<{{enum_base}}> {{type}} = hdf5pp::EnumType<{{enum_base}}>::enumType();
 {% for c in constants %}
-  {{type}}.insert("{{c.name}}", {{c.type}}::{{c.name}});
+  {{type}}.insert("{{c.h5name}}", {{c.type}}::{{c.name}});
 {% endfor %}
 ''', trim_blocks=True)
 
@@ -506,7 +506,7 @@ class DatasetCompound(object):
             if isinstance(attr.type, Enum):
                 
                 typename = attr.type.parent.fullName('C++', psana_ns)
-                constants = [dict(name=c.name, type=typename) for c in attr.type.constants()]
+                constants = [dict(name=c.name, h5name=self.schema.enumConstName(attr.type.name, c.name), type=typename) for c in attr.type.constants()]
                 type = '_enum_type_' + attr.name
                 enum_base = attr.stor_type.name
                 type_decl = _enum_h5type_definition.render(locals())

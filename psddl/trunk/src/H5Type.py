@@ -72,7 +72,7 @@ class H5Type ( object ) :
         self.location = kw.get('location')
         self.tags = kw.get('tags', {}).copy()
         
-        
+        self.enum_map = {}
         
     #-------------------
     #  Public methods --
@@ -145,6 +145,10 @@ class H5Type ( object ) :
                 schema.datasets.append(ds)
 
         return schema
+
+    
+    def enumConstName(self, enum_name, const_name):
+        return self.enum_map.get(enum_name, {}).get(const_name, const_name)
 
 #
 #  In case someone decides to run this module

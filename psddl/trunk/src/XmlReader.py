@@ -337,12 +337,42 @@ class XmlReader ( object ) :
             if propel.tag == "dataset" :
                 
                 self._parseH5Dataset(propel, type, pstype)
-                                
+
             elif propel.tag == 'tag' :
 
                 _setTag(type, propel)
 
+            elif propel.tag == 'enum-map' :
+
+                self._parseH5EnumMap(propel, type, pstype)
+
                 
+    def _parseH5EnumMap(self, elem, h5type, pstype):
+        '''Method which parses enum remapping'''
+        
+        # get the name of the enum type
+        enum_name = elem.get('enum')
+        if not enum_name: raise ValueError('h5 enum-map element missing enum name')
+        
+        # find enum type
+        enum_type = pstype.lookup(enum_name, Enum)
+        if not enum_type: raise ValueError('enum-map element specifies unknown enum name: '+enum_name)
+        
+        constants = enum_type.constants()
+        
+        for el in list(elem) :
+
+            if el.tag == "remap" :
+                psname = el.get('psname')
+                h5name = el.get('h5name')
+
+                # check that name is defined
+                match = [c for c in constants if c.name == psname] + [None]
+                match = match[0]
+                if match is None: raise ValueError('remap element specifies unknown enum constant name: '+psname)
+
+                h5type.enum_map.setdefault(enum_name, {})[psname] = h5name
+        
     def _parseH5Dataset(self, dselem, h5type, pstype):
         """Method which parses definition of h5 dataset"""
 
