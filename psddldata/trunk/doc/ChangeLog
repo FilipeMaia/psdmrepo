@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-19
+2013-03-24 Andy Salnikov
+- encoder schema: use new enum-base feature to define attributes 
+
 Tag: V00-04-18
 2013-03-22 Andy Salnikov
 - fli: update to support HDF5

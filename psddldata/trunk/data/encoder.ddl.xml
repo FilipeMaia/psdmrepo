@@ -13,7 +13,7 @@
         
             <tag name="config-type"/>
         
-            <enum name="count_mode_type">
+            <enum name="count_mode_type" base="uint32_t">
                 <enum-const name="WRAP_FULL"/>
                 <enum-const name="LIMIT"/>
                 <enum-const name="HALT"/>
@@ -21,7 +21,7 @@
                 <enum-const name="COUNT_END"/>
             </enum>
         
-            <enum name="quad_mode">
+            <enum name="quad_mode" base="uint32_t">
                 <enum-const name="CLOCK_DIR"/>
                 <enum-const name="X1"/>
                 <enum-const name="X2"/>
@@ -32,10 +32,10 @@
             <attribute name="_chan_num" type="uint32_t" accessor="chan_num">
             </attribute>
 
-            <attribute name="_count_mode" type="uint32_t" accessor="count_mode">
+            <attribute name="_count_mode" type="count_mode_type" accessor="count_mode">
             </attribute>
 
-            <attribute name="_quadrature_mode" type="uint32_t" accessor="quadrature_mode">
+            <attribute name="_quadrature_mode" type="quad_mode" accessor="quadrature_mode">
             </attribute>
 
             <attribute name="_input_num" type="uint32_t" accessor="input_num">
@@ -55,7 +55,7 @@
         
             <tag name="config-type"/>
         
-            <enum name="count_mode_type">
+            <enum name="count_mode_type" base="uint32_t">
                 <enum-const name="WRAP_FULL"/>
                 <enum-const name="LIMIT"/>
                 <enum-const name="HALT"/>
@@ -63,7 +63,7 @@
                 <enum-const name="COUNT_END"/>
             </enum>
         
-            <enum name="quad_mode">
+            <enum name="quad_mode" base="uint32_t">
                 <enum-const name="CLOCK_DIR"/>
                 <enum-const name="X1"/>
                 <enum-const name="X2"/>
@@ -74,10 +74,10 @@
             <attribute name="_chan_mask" type="uint32_t" accessor="chan_mask">
             </attribute>
 
-            <attribute name="_count_mode" type="uint32_t" accessor="count_mode">
+            <attribute name="_count_mode" type="count_mode_type" accessor="count_mode">
             </attribute>
 
-            <attribute name="_quadrature_mode" type="uint32_t" accessor="quadrature_mode">
+            <attribute name="_quadrature_mode" type="quad_mode" accessor="quadrature_mode">
             </attribute>
 
             <attribute name="_input_num" type="uint32_t" accessor="input_num">
