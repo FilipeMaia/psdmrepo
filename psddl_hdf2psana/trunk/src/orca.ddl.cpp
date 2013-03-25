@@ -15,18 +15,18 @@ hdf5pp::Type ns_ConfigV1_v0_dataset_config_stored_type()
 {
   typedef ns_ConfigV1_v0::dataset_config DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  hdf5pp::EnumType<int32_t> _enum_type_mode = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<uint8_t> _enum_type_mode = hdf5pp::EnumType<uint8_t>::enumType();
   _enum_type_mode.insert("x1", Psana::Orca::ConfigV1::x1);
   _enum_type_mode.insert("x2", Psana::Orca::ConfigV1::x2);
   _enum_type_mode.insert("x4", Psana::Orca::ConfigV1::x4);
   _enum_type_mode.insert("Subarray", Psana::Orca::ConfigV1::Subarray);
   type.insert("mode", offsetof(DsType, mode), _enum_type_mode);
-  hdf5pp::EnumType<int32_t> _enum_type_cooling = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<uint8_t> _enum_type_cooling = hdf5pp::EnumType<uint8_t>::enumType();
   _enum_type_cooling.insert("Off", Psana::Orca::ConfigV1::Off);
   _enum_type_cooling.insert("On", Psana::Orca::ConfigV1::On);
   _enum_type_cooling.insert("Max", Psana::Orca::ConfigV1::Max);
   type.insert("cooling", offsetof(DsType, cooling), _enum_type_cooling);
-  type.insert("defect_pixel_correction_enabled", offsetof(DsType, defect_pixel_correction_enabled), hdf5pp::TypeTraits<int8_t>::stored_type());
+  type.insert("defect_pixel_correction_enabled", offsetof(DsType, defect_pixel_correction_enabled), hdf5pp::TypeTraits<uint8_t>::stored_type());
   type.insert("rows", offsetof(DsType, rows), hdf5pp::TypeTraits<uint32_t>::stored_type());
   return type;
 }
@@ -41,18 +41,18 @@ hdf5pp::Type ns_ConfigV1_v0_dataset_config_native_type()
 {
   typedef ns_ConfigV1_v0::dataset_config DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  hdf5pp::EnumType<int32_t> _enum_type_mode = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<uint8_t> _enum_type_mode = hdf5pp::EnumType<uint8_t>::enumType();
   _enum_type_mode.insert("x1", Psana::Orca::ConfigV1::x1);
   _enum_type_mode.insert("x2", Psana::Orca::ConfigV1::x2);
   _enum_type_mode.insert("x4", Psana::Orca::ConfigV1::x4);
   _enum_type_mode.insert("Subarray", Psana::Orca::ConfigV1::Subarray);
   type.insert("mode", offsetof(DsType, mode), _enum_type_mode);
-  hdf5pp::EnumType<int32_t> _enum_type_cooling = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<uint8_t> _enum_type_cooling = hdf5pp::EnumType<uint8_t>::enumType();
   _enum_type_cooling.insert("Off", Psana::Orca::ConfigV1::Off);
   _enum_type_cooling.insert("On", Psana::Orca::ConfigV1::On);
   _enum_type_cooling.insert("Max", Psana::Orca::ConfigV1::Max);
   type.insert("cooling", offsetof(DsType, cooling), _enum_type_cooling);
-  type.insert("defect_pixel_correction_enabled", offsetof(DsType, defect_pixel_correction_enabled), hdf5pp::TypeTraits<int8_t>::native_type());
+  type.insert("defect_pixel_correction_enabled", offsetof(DsType, defect_pixel_correction_enabled), hdf5pp::TypeTraits<uint8_t>::native_type());
   type.insert("rows", offsetof(DsType, rows), hdf5pp::TypeTraits<uint32_t>::native_type());
   return type;
 }
@@ -76,9 +76,9 @@ Psana::Orca::ConfigV1::Cooling ConfigV1_v0::cooling() const {
   if (not m_ds_config) read_ds_config();
   return Psana::Orca::ConfigV1::Cooling(m_ds_config->cooling);
 }
-int8_t ConfigV1_v0::defect_pixel_correction_enabled() const {
+uint8_t ConfigV1_v0::defect_pixel_correction_enabled() const {
   if (not m_ds_config) read_ds_config();
-  return int8_t(m_ds_config->defect_pixel_correction_enabled);
+  return uint8_t(m_ds_config->defect_pixel_correction_enabled);
 }
 uint32_t ConfigV1_v0::rows() const {
   if (not m_ds_config) read_ds_config();

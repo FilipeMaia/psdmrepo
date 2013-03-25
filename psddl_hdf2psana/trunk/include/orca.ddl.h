@@ -18,9 +18,9 @@ struct dataset_config {
   dataset_config();
   ~dataset_config();
 
-  int32_t mode; 
-  int32_t cooling; 
-  int8_t defect_pixel_correction_enabled; 
+  uint8_t mode; 
+  uint8_t cooling; 
+  uint8_t defect_pixel_correction_enabled; 
   uint32_t rows; 
 
 };
@@ -37,7 +37,7 @@ public:
   virtual ~ConfigV1_v0() {}
   virtual Psana::Orca::ConfigV1::ReadoutMode mode() const;
   virtual Psana::Orca::ConfigV1::Cooling cooling() const;
-  virtual int8_t defect_pixel_correction_enabled() const;
+  virtual uint8_t defect_pixel_correction_enabled() const;
   virtual uint32_t rows() const;
 private:
   mutable hdf5pp::Group m_group;
