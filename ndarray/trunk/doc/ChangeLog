@@ -11,6 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V01-01-03
+2013-03-25 Andy Salnikov
+- improved ndarray formatting:
+  - print characes as integers
+  - print actual type name for a subset of types
+
 Tag: V01-01-02
 2013-03-10 Andy Salnikov
 - add nd_base::data_ptr() method
