@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-06-01
+2013-03-25 Andy Salnikov
+- fix missing slash when dumping hdf5 schema
+
 Tag: V00-06-00
 2013-03-24 Andy Salnikov
 - new feature: rewriting of the naes of enum constants in HDF5 schema,

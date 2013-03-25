@@ -374,7 +374,7 @@ class DdlHdf5Data ( object ) :
                     if attr.tags:
                         print '{}<attribute name="{}"{}{}>'.format("    "*(offset+2), attr.name, meth, rank)
                         for tag, val in attr.tags.items():
-                            print '{}<tag name="{}" value="{}">'.format("    "*(offset+3), tag, val)
+                            print '{}<tag name="{}" value="{}"/>'.format("    "*(offset+3), tag, val)
                         print '{}</attribute>'.format("    "*(offset+2))
                     else:
                         print '{}<attribute name="{}"{}{}/>'.format("    "*(offset+2), attr.name, meth, rank)
