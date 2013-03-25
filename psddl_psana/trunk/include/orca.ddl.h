@@ -35,7 +35,7 @@ public:
   virtual ~ConfigV1();
   virtual Orca::ConfigV1::ReadoutMode mode() const = 0;
   virtual Orca::ConfigV1::Cooling cooling() const = 0;
-  virtual int8_t defect_pixel_correction_enabled() const = 0;
+  virtual uint8_t defect_pixel_correction_enabled() const = 0;
   virtual uint32_t rows() const = 0;
 };
 } // namespace Orca
