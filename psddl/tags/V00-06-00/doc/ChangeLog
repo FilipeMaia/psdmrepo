@@ -1,0 +1,271 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package psddl
+#------------------------------------------------------------------------
+
+Package author: Andy Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-06-00
+2013-03-24 Andy Salnikov
+- new feature: rewriting of the naes of enum constants in HDF5 schema,
+  this is needed for Encoder schema which stores enums in the forma that
+  cannot be represented in C++
+
+Tag: V00-05-18
+2013-03-22 Andy Salnikov
+- adding support for specification of the enum base type
+
+Tag: V00-05-17
+2013-03-22 Andy Salnikov
+- DdlHdf5DataHelpers: for method return type use method type and not 
+  attribute type
+
+Tag: V00-05-16
+2013-03-22 Andy Salnikov
+- hdf5 schema can specify shape of the attribute, this is mostly useful
+  for attribute that get its data from methods without corresponding
+  attributes 
+
+Tag: V00-05-15
+2013-03-20 Andy Salnikov
+- HDF5: switching to non-compound datasets
+
+Tag: V00-05-14
+2013-03-19 Andy Salnikov
+- few updates for HDF5 generator
+
+Tag: V00-05-13
+2013-03-15 Andy Salnikov
+- few HDF5-related changes
+
+Tag: V00-05-12
+2013-03-13 Andy Salnikov
+- more HDF5 development:
+  - more vlen improvements
+  - char types of rank-1 are now vlen by default
+  - skip-proxy tag added
+
+Tag: V00-05-11
+2013-03-12 Andy Salnikov
+- more progress on HDF5 generator, vlen arrays should work better now
+
+Tag: V00-05-10
+2013-03-10 Andy Salnikov
+- adding new backend for HDF5 dispatch code
+- small fixes for HDF5 backend
+
+Tag: V00-05-09
+2013-03-07 Andy Salnikov
+- refactoring of DdlHdf5Data, moved piece of stuff to DdlHdf5DataHelpers
+- initial implementation for array datasets, compiles, not tested
+
+Tag: V00-05-08
+2013-03-04 Andy Salnikov
+- removed Id_QuartzConfig from ignored types
+- order cases in switch by name, will be easier to track changes
+
+Tag: V00-05-07
+2013-03-04 Andy Salnikov
+- more progress on HDF5 generator
+- new backend pds2psana-dispatch which generates typeid-dispatch code
+
+Tag: V00-05-06
+2013-03-02 Andy Salnikov
+- in python generator add boost/python.hpp include at the top of generated
+  files to suppress compilation warnings about redefined macros
+
+Tag: V00-05-05
+2013-02-26 Andy Salnikov
+- small improvements for HDF5 generation
+
+Tag: V00-05-04
+2013-02-26 Andy Salnikov
+- continuing work on HDF5 code generation
+- re-working constuctor stuff, need more flexible mapping of methods 
+  to constructor arguments
+
+Tag: V00-05-03
+2013-02-12 Andy Salnikov
+- use shared_ptr as a holder instead of generating wrapper classes
+- do not generate headers, they are not needed
+- *_list methods removed
+
+Tag: V00-05-02
+2013-02-07 Andy Salnikov
+- reduce volume of generated code by using template classes/functions
+
+Tag: V00-05-01
+2013-02-06 Andy Salnikov
+- removed _import_array() from generated code
+
+Tag: V00-05-00
+2013-02-06 Andy Salnikov
+- big changes in python generator, see details in psddl_python
+
+Tag: V00-04-01
+2013-02-05 Andy Salnikov
+- update DdlPsanaDoc for ndarray return types
+
+Tag: V00-04-00
+2013-01-31 Andy Salnikov
+- changes in python getter interfaces, update generator
+
+Tag: V00-03-00
+2013-01-30 Andy Salnikov
+- now returning ndarray<const T,N> for array data
+
+Tag: V00-02-11
+2013-01-28 Andy Salnikov
+- updatges related to ndarray constness change
+
+Tag: V00-02-10
+2013-01-26 Andy Salnikov
+- parameterize name of the output file in DdlPythonInterfaces
+
+Tag: andy-20121219-01
+2012-12-19 Andy Salnikov
+- some progress with HDF5
+
+Tag: V00-02-09
+2012-12-12 Andy Salnikov
+- few improvements to HDF5 generator
+
+Tag: V00-02-08
+2012-10-10 Andy Salnikov
+- adding fix for padding after last attribute
+
+Tag: V00-02-07
+2012-09-24 Andy Salnikov
+- DdlPythonInterfaces: rearrange includes to get rid of the warnings
+  (Python.h has to be included first)
+
+Tag: V00-02-06
+2012-09-11 Andy Salnikov
+- DdlPythonInterfaces: generated stuff goes to a separate namespace
+
+Tag: V00-02-05
+2012-07-27 Andy Salnikov
+- XmlReader: elementTree in 2.7 comes from xml package, make imports
+  work both in 2.4 and 2.5+
+
+Tag: V00-02-04
+2012-07-08 Joseph S. Barrera III
+- Added psana python support in new file DdlPythonInterfaces.py.
+- Removed psana python support from DdlPsanaInterfaces.py and CppTypeCodegen.py.
+
+Tag: V00-02-03
+2012-05-07 Andy Salnikov
+- fix for missing include file causing psddlc crash with incorrect
+  dignostics
+
+Tag: V00-02-02
+2012-05-03 Andy Salnikov
+- DdlPds2Psana did not pass all arguments to forwarded modules
+
+Tag: V00-02-01
+2012-05-02 Andy Salnikov
+- bug fix for latest commit, _parent should have been renamed to 
+  parent everywhere
+- forgot to add few files to svn
+
+Tag: V00-02-00
+2012-05-02 Andy Salnikov
+- bitfieds now have accessor attribute which generates methods
+  for accessing bitfield values
+- above is needed to generate (calls to) constructors which take
+  bitfield values, auto-generated constructors now accept
+  bitfield values instead of whole attribute value
+- more progress on HDF5 generator, Xml parser now has code
+  to parse HDF5 schema
+
+Tag: V00-01-03
+2012-01-12 Andy Salnikov
+- use templates ($name substitution) instead of formatting (%s) for 
+  code generation in many places.
+- at some point it may be beneficial to switch to more advanced
+  templating system than to keep all stuff in Python code.
+
+Tag: V00-01-02
+2012-01-12 Andy Salnikov
+- extending method generation capabilities
+- methods may have "rank" attribute which cases return type to be 
+  ndarray<Type, Rank>
+- methods may have "code" element instead of "expr" which can specify
+  full methods body
+
+Tag: V00-01-00
+2011-12-09 Andy Salnikov
+- switch to ndarray for accessing array data
+- work-in-progress hdf5 generator added
+
+Tag: V00-00-09
+2011-06-27 Andy Salnikov
+- fix missing method arguments in psanadoc
+
+Tag: V00-00-08
+2011-06-16 Andy Salnikov
+- generate CSS file in DdlPsanaDoc
+
+Tag: V00-00-07
+2011-05-10 Andy Salnikov
+- XmlReader: file name was incorrect if there were included files
+
+Tag: V00-00-06
+2011-04-07 Andy Salnikov
+- added psana-doc backend which generates documentation for psana
+  interfaces (generated by psana backend)
+- many other changes everywhere related to documentation generation
+
+Tag: V00-00-05
+2011-03-31 Andy Salnikov
+- renamed "dimensions" attribute into "shape"
+- implemented support for "shape_method" attribute in XmlReared
+- default shape_method name changed to use accessor name (if defined)
+- added "variable" property to Type meaning that instances can have
+  different size (true for CsPad::Element types)
+- generation of _sizeof and member access methods now understand 
+  variable types
+
+Tag: V00-00-04
+2011-03-30 Andy Salnikov
+- adding support for the unknown-size types in pds2psana backend:
+  - adding size argument for the constructor declaration of such types
+  - definition of the constructor cannot be generated at this time
+    and has to be added manually
+  - there is exactly one type now which needs this, so manual definition
+    is probably OK
+
+Tag: V00-00-03
+2011-03-28 Andy Salnikov
+- implemented support for base types in DdlPds2Psana
+
+Tag: V00-00-02
+2011-03-21 Andy Salnikov
+- fixing code generation for array member access
+
+Tag: V00-00-01
+2011-03-20 Andy Salnikov
+- first production tag
+- lots of changes, almost complete
+
+Tag: andy-20101209-01
+2010-12-09 Andrei Salnikov
+- adding bitfield support
+
+Tag: andy-20101208-02
+2010-12-08 Andrei Salnikov
+- added "use" directive to import types from other files
+
+Tag: andy-20101208-01
+2010-12-08 Andrei Salnikov
+- further development, introduced namespaces/lookup
+
+Tag: andy-20101027-01
+2010-10-27 Andrei Salnikov
+- First version with very limited functionality, development tag.
