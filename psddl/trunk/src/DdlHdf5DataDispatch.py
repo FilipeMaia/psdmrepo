@@ -50,10 +50,13 @@ from psddl.Template import Template as T
 # Local non-exported definitions --
 #----------------------------------
 
-# set of aliases, alias name (key in the dictionary) is replaced with the value 
+# Set of aliases, when the alias name (key) is encountered
+# in a file then the actual type used for that is value.
+# More than one actual type is possible.
 _aliases = {
-    'Bld::BldDataIpimb': 'Bld::BldDataIpimbV0',
-    'Bld::BldDataEBeam': 'Bld::BldDataEBeamV1',
+    'Bld::BldDataIpimb': ['Bld::BldDataIpimbV0'],
+    'Bld::BldDataEBeam': ['Bld::BldDataEBeamV1'],
+    'PNCCD::FrameV1'   : ['PNCCD::FramesV1', 'PNCCD::FullFrameV1'],
     }
 
 # Extra headers needed for special proxy classes of similar stuff
@@ -123,6 +126,7 @@ try {
     if (typeName == "{{type.name}}") {{type.code}}
 {% endfor %}
 {% else %}
+    // {{types[0].name}}
 {{types[0].code}}
 {% endif %}
     break;
@@ -283,11 +287,11 @@ class DdlHdf5DataDispatch ( object ) :
             hh = hash.hash(name)
             hashes.setdefault(hh, []).append(dict(name=name, code=code))
 
-        for alias, typeName in _aliases.items():
-            hh = hash.hash(alias)
-            for type, code in codes.items():
-                if type.fullName('C++') == typeName:
-                    hashes.setdefault(hh, []).append(dict(name=alias, code=code))
+        for alias, typeNames in _aliases.items():
+            acodes = [code for type, code in codes.items() if type.fullName('C++') in typeNames]
+            if acodes:
+                hh = hash.hash(alias)
+                hashes.setdefault(hh, []).append(dict(name=alias, code='\n'.join(acodes)))
 
 
         inc_guard = self.guard
