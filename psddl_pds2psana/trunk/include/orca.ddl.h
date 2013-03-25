@@ -18,7 +18,7 @@ public:
   virtual ~ConfigV1();
   virtual Psana::Orca::ConfigV1::ReadoutMode mode() const;
   virtual Psana::Orca::ConfigV1::Cooling cooling() const;
-  virtual int8_t defect_pixel_correction_enabled() const;
+  virtual uint8_t defect_pixel_correction_enabled() const;
   virtual uint32_t rows() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:

@@ -33,7 +33,7 @@ Psana::Orca::ConfigV1::ReadoutMode ConfigV1::mode() const { return pds_to_psana(
 
 Psana::Orca::ConfigV1::Cooling ConfigV1::cooling() const { return pds_to_psana(m_xtcObj->cooling()); }
 
-int8_t ConfigV1::defect_pixel_correction_enabled() const { return m_xtcObj->defect_pixel_correction_enabled(); }
+uint8_t ConfigV1::defect_pixel_correction_enabled() const { return m_xtcObj->defect_pixel_correction_enabled(); }
 
 uint32_t ConfigV1::rows() const { return m_xtcObj->rows(); }
 } // namespace Orca
