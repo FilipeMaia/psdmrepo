@@ -26,10 +26,6 @@ hdf5pp::Type ns_ConfigV1_v0_dataset_config_stored_type()
   type.insert("readoutSpeedIndex", offsetof(DsType, readoutSpeedIndex), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("readoutEventCode", offsetof(DsType, readoutEventCode), hdf5pp::TypeTraits<uint16_t>::stored_type());
   type.insert("delayMode", offsetof(DsType, delayMode), hdf5pp::TypeTraits<uint16_t>::stored_type());
-  type.insert("frameSize", offsetof(DsType, frameSize), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("numPixelsX", offsetof(DsType, numPixelsX), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("numPixelsY", offsetof(DsType, numPixelsY), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("numPixels", offsetof(DsType, numPixels), hdf5pp::TypeTraits<uint32_t>::stored_type());
   return type;
 }
 
@@ -54,10 +50,6 @@ hdf5pp::Type ns_ConfigV1_v0_dataset_config_native_type()
   type.insert("readoutSpeedIndex", offsetof(DsType, readoutSpeedIndex), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("readoutEventCode", offsetof(DsType, readoutEventCode), hdf5pp::TypeTraits<uint16_t>::native_type());
   type.insert("delayMode", offsetof(DsType, delayMode), hdf5pp::TypeTraits<uint16_t>::native_type());
-  type.insert("frameSize", offsetof(DsType, frameSize), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("numPixelsX", offsetof(DsType, numPixelsX), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("numPixelsY", offsetof(DsType, numPixelsY), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("numPixels", offsetof(DsType, numPixels), hdf5pp::TypeTraits<uint32_t>::native_type());
   return type;
 }
 
@@ -116,22 +108,13 @@ uint16_t ConfigV1_v0::delayMode() const {
   if (not m_ds_config) read_ds_config();
   return uint16_t(m_ds_config->delayMode);
 }
-uint32_t ConfigV1_v0::frameSize() const {
-  if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->frameSize);
+uint32_t
+ConfigV1_v0::frameSize() const{ 
+return 8 + this->numPixels()*2; 
 }
-uint32_t ConfigV1_v0::numPixelsX() const {
-  if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->numPixelsX);
-}
-uint32_t ConfigV1_v0::numPixelsY() const {
-  if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->numPixelsY);
-}
-uint32_t ConfigV1_v0::numPixels() const {
-  if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->numPixels);
-}
+
+
+
 void ConfigV1_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<Princeton::ns_ConfigV1_v0::dataset_config>(m_group, "config", m_idx);
 }
@@ -160,10 +143,6 @@ hdf5pp::Type ns_ConfigV2_v0_dataset_config_stored_type()
   type.insert("readoutSpeedIndex", offsetof(DsType, readoutSpeedIndex), hdf5pp::TypeTraits<uint16_t>::stored_type());
   type.insert("readoutEventCode", offsetof(DsType, readoutEventCode), hdf5pp::TypeTraits<uint16_t>::stored_type());
   type.insert("delayMode", offsetof(DsType, delayMode), hdf5pp::TypeTraits<uint16_t>::stored_type());
-  type.insert("frameSize", offsetof(DsType, frameSize), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("numPixelsX", offsetof(DsType, numPixelsX), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("numPixelsY", offsetof(DsType, numPixelsY), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("numPixels", offsetof(DsType, numPixels), hdf5pp::TypeTraits<uint32_t>::stored_type());
   return type;
 }
 
@@ -189,10 +168,6 @@ hdf5pp::Type ns_ConfigV2_v0_dataset_config_native_type()
   type.insert("readoutSpeedIndex", offsetof(DsType, readoutSpeedIndex), hdf5pp::TypeTraits<uint16_t>::native_type());
   type.insert("readoutEventCode", offsetof(DsType, readoutEventCode), hdf5pp::TypeTraits<uint16_t>::native_type());
   type.insert("delayMode", offsetof(DsType, delayMode), hdf5pp::TypeTraits<uint16_t>::native_type());
-  type.insert("frameSize", offsetof(DsType, frameSize), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("numPixelsX", offsetof(DsType, numPixelsX), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("numPixelsY", offsetof(DsType, numPixelsY), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("numPixels", offsetof(DsType, numPixels), hdf5pp::TypeTraits<uint32_t>::native_type());
   return type;
 }
 
@@ -255,22 +230,13 @@ uint16_t ConfigV2_v0::delayMode() const {
   if (not m_ds_config) read_ds_config();
   return uint16_t(m_ds_config->delayMode);
 }
-uint32_t ConfigV2_v0::frameSize() const {
-  if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->frameSize);
+uint32_t
+ConfigV2_v0::frameSize() const{ 
+return 8 + this->numPixels()*2; 
 }
-uint32_t ConfigV2_v0::numPixelsX() const {
-  if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->numPixelsX);
-}
-uint32_t ConfigV2_v0::numPixelsY() const {
-  if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->numPixelsY);
-}
-uint32_t ConfigV2_v0::numPixels() const {
-  if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->numPixels);
-}
+
+
+
 void ConfigV2_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<Princeton::ns_ConfigV2_v0::dataset_config>(m_group, "config", m_idx);
 }
@@ -299,10 +265,6 @@ hdf5pp::Type ns_ConfigV3_v0_dataset_config_stored_type()
   type.insert("readoutSpeedIndex", offsetof(DsType, readoutSpeedIndex), hdf5pp::TypeTraits<uint8_t>::stored_type());
   type.insert("exposureEventCode", offsetof(DsType, exposureEventCode), hdf5pp::TypeTraits<uint16_t>::stored_type());
   type.insert("numDelayShots", offsetof(DsType, numDelayShots), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("frameSize", offsetof(DsType, frameSize), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("numPixelsX", offsetof(DsType, numPixelsX), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("numPixelsY", offsetof(DsType, numPixelsY), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("numPixels", offsetof(DsType, numPixels), hdf5pp::TypeTraits<uint32_t>::stored_type());
   return type;
 }
 
@@ -328,10 +290,6 @@ hdf5pp::Type ns_ConfigV3_v0_dataset_config_native_type()
   type.insert("readoutSpeedIndex", offsetof(DsType, readoutSpeedIndex), hdf5pp::TypeTraits<uint8_t>::native_type());
   type.insert("exposureEventCode", offsetof(DsType, exposureEventCode), hdf5pp::TypeTraits<uint16_t>::native_type());
   type.insert("numDelayShots", offsetof(DsType, numDelayShots), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("frameSize", offsetof(DsType, frameSize), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("numPixelsX", offsetof(DsType, numPixelsX), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("numPixelsY", offsetof(DsType, numPixelsY), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("numPixels", offsetof(DsType, numPixels), hdf5pp::TypeTraits<uint32_t>::native_type());
   return type;
 }
 
@@ -394,22 +352,13 @@ uint32_t ConfigV3_v0::numDelayShots() const {
   if (not m_ds_config) read_ds_config();
   return uint32_t(m_ds_config->numDelayShots);
 }
-uint32_t ConfigV3_v0::frameSize() const {
-  if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->frameSize);
+uint32_t
+ConfigV3_v0::frameSize() const{ 
+return 8 + this->numPixels()*2; 
 }
-uint32_t ConfigV3_v0::numPixelsX() const {
-  if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->numPixelsX);
-}
-uint32_t ConfigV3_v0::numPixelsY() const {
-  if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->numPixelsY);
-}
-uint32_t ConfigV3_v0::numPixels() const {
-  if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->numPixels);
-}
+
+
+
 void ConfigV3_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<Princeton::ns_ConfigV3_v0::dataset_config>(m_group, "config", m_idx);
 }
@@ -441,10 +390,6 @@ hdf5pp::Type ns_ConfigV4_v0_dataset_config_stored_type()
   type.insert("readoutSpeedIndex", offsetof(DsType, readoutSpeedIndex), hdf5pp::TypeTraits<uint8_t>::stored_type());
   type.insert("exposureEventCode", offsetof(DsType, exposureEventCode), hdf5pp::TypeTraits<uint16_t>::stored_type());
   type.insert("numDelayShots", offsetof(DsType, numDelayShots), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("frameSize", offsetof(DsType, frameSize), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("numPixelsX", offsetof(DsType, numPixelsX), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("numPixelsY", offsetof(DsType, numPixelsY), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("numPixels", offsetof(DsType, numPixels), hdf5pp::TypeTraits<uint32_t>::stored_type());
   return type;
 }
 
@@ -473,10 +418,6 @@ hdf5pp::Type ns_ConfigV4_v0_dataset_config_native_type()
   type.insert("readoutSpeedIndex", offsetof(DsType, readoutSpeedIndex), hdf5pp::TypeTraits<uint8_t>::native_type());
   type.insert("exposureEventCode", offsetof(DsType, exposureEventCode), hdf5pp::TypeTraits<uint16_t>::native_type());
   type.insert("numDelayShots", offsetof(DsType, numDelayShots), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("frameSize", offsetof(DsType, frameSize), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("numPixelsX", offsetof(DsType, numPixelsX), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("numPixelsY", offsetof(DsType, numPixelsY), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("numPixels", offsetof(DsType, numPixels), hdf5pp::TypeTraits<uint32_t>::native_type());
   return type;
 }
 
@@ -551,22 +492,13 @@ uint32_t ConfigV4_v0::numDelayShots() const {
   if (not m_ds_config) read_ds_config();
   return uint32_t(m_ds_config->numDelayShots);
 }
-uint32_t ConfigV4_v0::frameSize() const {
-  if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->frameSize);
+uint32_t
+ConfigV4_v0::frameSize() const{ 
+return 8 + this->numPixels()*2; 
 }
-uint32_t ConfigV4_v0::numPixelsX() const {
-  if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->numPixelsX);
-}
-uint32_t ConfigV4_v0::numPixelsY() const {
-  if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->numPixelsY);
-}
-uint32_t ConfigV4_v0::numPixels() const {
-  if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->numPixels);
-}
+
+
+
 void ConfigV4_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<Princeton::ns_ConfigV4_v0::dataset_config>(m_group, "config", m_idx);
 }
@@ -599,10 +531,6 @@ hdf5pp::Type ns_ConfigV5_v0_dataset_config_stored_type()
   type.insert("infoReportInterval", offsetof(DsType, infoReportInterval), hdf5pp::TypeTraits<int16_t>::stored_type());
   type.insert("exposureEventCode", offsetof(DsType, exposureEventCode), hdf5pp::TypeTraits<uint16_t>::stored_type());
   type.insert("numDelayShots", offsetof(DsType, numDelayShots), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("frameSize", offsetof(DsType, frameSize), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("numPixelsX", offsetof(DsType, numPixelsX), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("numPixelsY", offsetof(DsType, numPixelsY), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("numPixels", offsetof(DsType, numPixels), hdf5pp::TypeTraits<uint32_t>::stored_type());
   return type;
 }
 
@@ -632,10 +560,6 @@ hdf5pp::Type ns_ConfigV5_v0_dataset_config_native_type()
   type.insert("infoReportInterval", offsetof(DsType, infoReportInterval), hdf5pp::TypeTraits<int16_t>::native_type());
   type.insert("exposureEventCode", offsetof(DsType, exposureEventCode), hdf5pp::TypeTraits<uint16_t>::native_type());
   type.insert("numDelayShots", offsetof(DsType, numDelayShots), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("frameSize", offsetof(DsType, frameSize), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("numPixelsX", offsetof(DsType, numPixelsX), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("numPixelsY", offsetof(DsType, numPixelsY), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("numPixels", offsetof(DsType, numPixels), hdf5pp::TypeTraits<uint32_t>::native_type());
   return type;
 }
 
@@ -714,22 +638,13 @@ uint32_t ConfigV5_v0::numDelayShots() const {
   if (not m_ds_config) read_ds_config();
   return uint32_t(m_ds_config->numDelayShots);
 }
-uint32_t ConfigV5_v0::frameSize() const {
-  if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->frameSize);
+uint32_t
+ConfigV5_v0::frameSize() const{ 
+return 12 + this->numPixels()*2; 
 }
-uint32_t ConfigV5_v0::numPixelsX() const {
-  if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->numPixelsX);
-}
-uint32_t ConfigV5_v0::numPixelsY() const {
-  if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->numPixelsY);
-}
-uint32_t ConfigV5_v0::numPixels() const {
-  if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->numPixels);
-}
+
+
+
 void ConfigV5_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<Princeton::ns_ConfigV5_v0::dataset_config>(m_group, "config", m_idx);
 }
@@ -742,63 +657,63 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::ConfigV5> > make_ConfigV5(int v
   }
 }
 
-hdf5pp::Type ns_FrameV1_v0_dataset_data_stored_type()
+hdf5pp::Type ns_FrameV1_v0_dataset_frame_stored_type()
 {
-  typedef ns_FrameV1_v0::dataset_data DsType;
+  typedef ns_FrameV1_v0::dataset_frame DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
   type.insert("shotIdStart", offsetof(DsType, shotIdStart), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("readoutTime", offsetof(DsType, readoutTime), hdf5pp::TypeTraits<float>::stored_type());
   return type;
 }
 
-hdf5pp::Type ns_FrameV1_v0::dataset_data::stored_type()
+hdf5pp::Type ns_FrameV1_v0::dataset_frame::stored_type()
 {
-  static hdf5pp::Type type = ns_FrameV1_v0_dataset_data_stored_type();
+  static hdf5pp::Type type = ns_FrameV1_v0_dataset_frame_stored_type();
   return type;
 }
 
-hdf5pp::Type ns_FrameV1_v0_dataset_data_native_type()
+hdf5pp::Type ns_FrameV1_v0_dataset_frame_native_type()
 {
-  typedef ns_FrameV1_v0::dataset_data DsType;
+  typedef ns_FrameV1_v0::dataset_frame DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
   type.insert("shotIdStart", offsetof(DsType, shotIdStart), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("readoutTime", offsetof(DsType, readoutTime), hdf5pp::TypeTraits<float>::native_type());
   return type;
 }
 
-hdf5pp::Type ns_FrameV1_v0::dataset_data::native_type()
+hdf5pp::Type ns_FrameV1_v0::dataset_frame::native_type()
 {
-  static hdf5pp::Type type = ns_FrameV1_v0_dataset_data_native_type();
+  static hdf5pp::Type type = ns_FrameV1_v0_dataset_frame_native_type();
   return type;
 }
-ns_FrameV1_v0::dataset_data::dataset_data()
+ns_FrameV1_v0::dataset_frame::dataset_frame()
 {
 }
-ns_FrameV1_v0::dataset_data::~dataset_data()
+ns_FrameV1_v0::dataset_frame::~dataset_frame()
 {
 }
 template <typename Config>
 uint32_t FrameV1_v0<Config>::shotIdStart() const {
-  if (not m_ds_data) read_ds_data();
-  return uint32_t(m_ds_data->shotIdStart);
+  if (not m_ds_frame) read_ds_frame();
+  return uint32_t(m_ds_frame->shotIdStart);
 }
 template <typename Config>
 float FrameV1_v0<Config>::readoutTime() const {
-  if (not m_ds_data) read_ds_data();
-  return float(m_ds_data->readoutTime);
+  if (not m_ds_frame) read_ds_frame();
+  return float(m_ds_frame->readoutTime);
 }
 template <typename Config>
 ndarray<const uint16_t, 2> FrameV1_v0<Config>::data() const {
-  if (m_ds_image.empty()) read_ds_image();
-  return m_ds_image;
+  if (m_ds_data.empty()) read_ds_data();
+  return m_ds_data;
+}
+template <typename Config>
+void FrameV1_v0<Config>::read_ds_frame() const {
+  m_ds_frame = hdf5pp::Utils::readGroup<Princeton::ns_FrameV1_v0::dataset_frame>(m_group, "frame", m_idx);
 }
 template <typename Config>
 void FrameV1_v0<Config>::read_ds_data() const {
-  m_ds_data = hdf5pp::Utils::readGroup<Princeton::ns_FrameV1_v0::dataset_data>(m_group, "data", m_idx);
-}
-template <typename Config>
-void FrameV1_v0<Config>::read_ds_image() const {
-  m_ds_image = hdf5pp::Utils::readNdarray<uint16_t, 2>(m_group, "image", m_idx);
+  m_ds_data = hdf5pp::Utils::readNdarray<uint16_t, 2>(m_group, "data", m_idx);
 }
 template class FrameV1_v0<Psana::Princeton::ConfigV1>;
 template class FrameV1_v0<Psana::Princeton::ConfigV2>;
@@ -846,9 +761,9 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::FrameV1> > make_FrameV1(int ver
   }
 }
 
-hdf5pp::Type ns_FrameV2_v0_dataset_data_stored_type()
+hdf5pp::Type ns_FrameV2_v0_dataset_frame_stored_type()
 {
-  typedef ns_FrameV2_v0::dataset_data DsType;
+  typedef ns_FrameV2_v0::dataset_frame DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
   type.insert("shotIdStart", offsetof(DsType, shotIdStart), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("readoutTime", offsetof(DsType, readoutTime), hdf5pp::TypeTraits<float>::stored_type());
@@ -856,15 +771,15 @@ hdf5pp::Type ns_FrameV2_v0_dataset_data_stored_type()
   return type;
 }
 
-hdf5pp::Type ns_FrameV2_v0::dataset_data::stored_type()
+hdf5pp::Type ns_FrameV2_v0::dataset_frame::stored_type()
 {
-  static hdf5pp::Type type = ns_FrameV2_v0_dataset_data_stored_type();
+  static hdf5pp::Type type = ns_FrameV2_v0_dataset_frame_stored_type();
   return type;
 }
 
-hdf5pp::Type ns_FrameV2_v0_dataset_data_native_type()
+hdf5pp::Type ns_FrameV2_v0_dataset_frame_native_type()
 {
-  typedef ns_FrameV2_v0::dataset_data DsType;
+  typedef ns_FrameV2_v0::dataset_frame DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
   type.insert("shotIdStart", offsetof(DsType, shotIdStart), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("readoutTime", offsetof(DsType, readoutTime), hdf5pp::TypeTraits<float>::native_type());
@@ -872,44 +787,44 @@ hdf5pp::Type ns_FrameV2_v0_dataset_data_native_type()
   return type;
 }
 
-hdf5pp::Type ns_FrameV2_v0::dataset_data::native_type()
+hdf5pp::Type ns_FrameV2_v0::dataset_frame::native_type()
 {
-  static hdf5pp::Type type = ns_FrameV2_v0_dataset_data_native_type();
+  static hdf5pp::Type type = ns_FrameV2_v0_dataset_frame_native_type();
   return type;
 }
-ns_FrameV2_v0::dataset_data::dataset_data()
+ns_FrameV2_v0::dataset_frame::dataset_frame()
 {
 }
-ns_FrameV2_v0::dataset_data::~dataset_data()
+ns_FrameV2_v0::dataset_frame::~dataset_frame()
 {
 }
 template <typename Config>
 uint32_t FrameV2_v0<Config>::shotIdStart() const {
-  if (not m_ds_data) read_ds_data();
-  return uint32_t(m_ds_data->shotIdStart);
+  if (not m_ds_frame) read_ds_frame();
+  return uint32_t(m_ds_frame->shotIdStart);
 }
 template <typename Config>
 float FrameV2_v0<Config>::readoutTime() const {
-  if (not m_ds_data) read_ds_data();
-  return float(m_ds_data->readoutTime);
+  if (not m_ds_frame) read_ds_frame();
+  return float(m_ds_frame->readoutTime);
 }
 template <typename Config>
 float FrameV2_v0<Config>::temperature() const {
-  if (not m_ds_data) read_ds_data();
-  return float(m_ds_data->temperature);
+  if (not m_ds_frame) read_ds_frame();
+  return float(m_ds_frame->temperature);
 }
 template <typename Config>
 ndarray<const uint16_t, 2> FrameV2_v0<Config>::data() const {
-  if (m_ds_image.empty()) read_ds_image();
-  return m_ds_image;
+  if (m_ds_data.empty()) read_ds_data();
+  return m_ds_data;
+}
+template <typename Config>
+void FrameV2_v0<Config>::read_ds_frame() const {
+  m_ds_frame = hdf5pp::Utils::readGroup<Princeton::ns_FrameV2_v0::dataset_frame>(m_group, "frame", m_idx);
 }
 template <typename Config>
 void FrameV2_v0<Config>::read_ds_data() const {
-  m_ds_data = hdf5pp::Utils::readGroup<Princeton::ns_FrameV2_v0::dataset_data>(m_group, "data", m_idx);
-}
-template <typename Config>
-void FrameV2_v0<Config>::read_ds_image() const {
-  m_ds_image = hdf5pp::Utils::readNdarray<uint16_t, 2>(m_group, "image", m_idx);
+  m_ds_data = hdf5pp::Utils::readNdarray<uint16_t, 2>(m_group, "data", m_idx);
 }
 template class FrameV2_v0<Psana::Princeton::ConfigV1>;
 template class FrameV2_v0<Psana::Princeton::ConfigV2>;

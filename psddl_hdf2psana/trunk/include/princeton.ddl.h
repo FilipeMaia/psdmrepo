@@ -29,10 +29,6 @@ struct dataset_config {
   uint32_t readoutSpeedIndex; 
   uint16_t readoutEventCode; 
   uint16_t delayMode; 
-  uint32_t frameSize; 
-  uint32_t numPixelsX; 
-  uint32_t numPixelsY; 
-  uint32_t numPixels; 
 
 };
 }
@@ -57,10 +53,16 @@ public:
   virtual uint32_t readoutSpeedIndex() const;
   virtual uint16_t readoutEventCode() const;
   virtual uint16_t delayMode() const;
-  virtual uint32_t frameSize() const;
-  virtual uint32_t numPixelsX() const;
-  virtual uint32_t numPixelsY() const;
-  virtual uint32_t numPixels() const;
+  /** Total size in bytes of the Frame object including header and pixel data, 
+            this returns the size of FrameV1 object, do not use this config type with FrameV2 */
+  uint32_t frameSize() const;
+
+  /** calculate frame X size in pixels based on the current ROI and binning settings */
+  uint32_t numPixelsX() const { return (this->width() + this->binX() - 1) / this->binX(); }
+  /** calculate frame Y size in pixels based on the current ROI and binning settings */
+  uint32_t numPixelsY() const { return (this->height()+ this->binY() - 1) / this->binY(); }
+  /** calculate total frame size in pixels based on the current ROI and binning settings */
+  uint32_t numPixels() const { return ((this->width() + this->binX()-1)/ this->binX() )*((this->height()+ this->binY()-1)/ this->binY() ); }
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
@@ -90,10 +92,6 @@ struct dataset_config {
   uint16_t readoutSpeedIndex; 
   uint16_t readoutEventCode; 
   uint16_t delayMode; 
-  uint32_t frameSize; 
-  uint32_t numPixelsX; 
-  uint32_t numPixelsY; 
-  uint32_t numPixels; 
 
 };
 }
@@ -119,10 +117,16 @@ public:
   virtual uint16_t readoutSpeedIndex() const;
   virtual uint16_t readoutEventCode() const;
   virtual uint16_t delayMode() const;
-  virtual uint32_t frameSize() const;
-  virtual uint32_t numPixelsX() const;
-  virtual uint32_t numPixelsY() const;
-  virtual uint32_t numPixels() const;
+  /** Total size in bytes of the Frame object including header and pixel data, 
+            this returns the size of FrameV1 object, do not use this config type with FrameV2 */
+  uint32_t frameSize() const;
+
+  /** calculate frame X size in pixels based on the current ROI and binning settings */
+  uint32_t numPixelsX() const { return (this->width() + this->binX() - 1) / this->binX(); }
+  /** calculate frame Y size in pixels based on the current ROI and binning settings */
+  uint32_t numPixelsY() const { return (this->height()+ this->binY() - 1) / this->binY(); }
+  /** calculate total frame size in pixels based on the current ROI and binning settings */
+  uint32_t numPixels() const { return ((this->width() + this->binX()-1)/ this->binX() )*((this->height()+ this->binY()-1)/ this->binY() ); }
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
@@ -152,10 +156,6 @@ struct dataset_config {
   uint8_t readoutSpeedIndex; 
   uint16_t exposureEventCode; 
   uint32_t numDelayShots; 
-  uint32_t frameSize; 
-  uint32_t numPixelsX; 
-  uint32_t numPixelsY; 
-  uint32_t numPixels; 
 
 };
 }
@@ -181,10 +181,16 @@ public:
   virtual uint8_t readoutSpeedIndex() const;
   virtual uint16_t exposureEventCode() const;
   virtual uint32_t numDelayShots() const;
-  virtual uint32_t frameSize() const;
-  virtual uint32_t numPixelsX() const;
-  virtual uint32_t numPixelsY() const;
-  virtual uint32_t numPixels() const;
+  /** Total size in bytes of the Frame object including header and pixel data, 
+            this returns the size of FrameV1 object, do not use this config type with FrameV2 */
+  uint32_t frameSize() const;
+
+  /** calculate frame X size in pixels based on the current ROI and binning settings */
+  uint32_t numPixelsX() const { return (this->width() + this->binX() - 1) / this->binX(); }
+  /** calculate frame Y size in pixels based on the current ROI and binning settings */
+  uint32_t numPixelsY() const { return (this->height()+ this->binY() - 1) / this->binY(); }
+  /** calculate total frame size in pixels based on the current ROI and binning settings */
+  uint32_t numPixels() const { return ((this->width() + this->binX()-1)/ this->binX() )*((this->height()+ this->binY()-1)/ this->binY() ); }
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
@@ -217,10 +223,6 @@ struct dataset_config {
   uint8_t readoutSpeedIndex; 
   uint16_t exposureEventCode; 
   uint32_t numDelayShots; 
-  uint32_t frameSize; 
-  uint32_t numPixelsX; 
-  uint32_t numPixelsY; 
-  uint32_t numPixels; 
 
 };
 }
@@ -249,10 +251,16 @@ public:
   virtual uint8_t readoutSpeedIndex() const;
   virtual uint16_t exposureEventCode() const;
   virtual uint32_t numDelayShots() const;
-  virtual uint32_t frameSize() const;
-  virtual uint32_t numPixelsX() const;
-  virtual uint32_t numPixelsY() const;
-  virtual uint32_t numPixels() const;
+  /** Total size in bytes of the Frame object including header and pixel data, 
+            this returns the size of FrameV1 object, do not use this config type with FrameV2 */
+  uint32_t frameSize() const;
+
+  /** calculate frame X size in pixels based on the current ROI and binning settings */
+  uint32_t numPixelsX() const { return (this->width() + this->binX() - 1) / this->binX(); }
+  /** calculate frame Y size in pixels based on the current ROI and binning settings */
+  uint32_t numPixelsY() const { return (this->height()+ this->binY() - 1) / this->binY(); }
+  /** calculate total frame size in pixels based on the current ROI and binning settings */
+  uint32_t numPixels() const { return ((this->width() + this->binX()-1)/ this->binX() )*((this->height()+ this->binY()-1)/ this->binY() ); }
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
@@ -286,10 +294,6 @@ struct dataset_config {
   int16_t infoReportInterval; 
   uint16_t exposureEventCode; 
   uint32_t numDelayShots; 
-  uint32_t frameSize; 
-  uint32_t numPixelsX; 
-  uint32_t numPixelsY; 
-  uint32_t numPixels; 
 
 };
 }
@@ -319,10 +323,16 @@ public:
   virtual int16_t infoReportInterval() const;
   virtual uint16_t exposureEventCode() const;
   virtual uint32_t numDelayShots() const;
-  virtual uint32_t frameSize() const;
-  virtual uint32_t numPixelsX() const;
-  virtual uint32_t numPixelsY() const;
-  virtual uint32_t numPixels() const;
+  /** Total size in bytes of the Frame object including header and pixel data, 
+            this returns the size of FrameV2 object, do not use this config type with FrameV1 */
+  uint32_t frameSize() const;
+
+  /** calculate frame X size in pixels based on the current ROI and binning settings */
+  uint32_t numPixelsX() const { return (this->width() + this->binX() - 1) / this->binX(); }
+  /** calculate frame Y size in pixels based on the current ROI and binning settings */
+  uint32_t numPixelsY() const { return (this->height()+ this->binY() - 1) / this->binY(); }
+  /** calculate total frame size in pixels based on the current ROI and binning settings */
+  uint32_t numPixels() const { return ((this->width() + this->binX()-1)/ this->binX() )*((this->height()+ this->binY()-1)/ this->binY() ); }
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
@@ -333,12 +343,12 @@ private:
 boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::ConfigV5> > make_ConfigV5(int version, hdf5pp::Group group, hsize_t idx);
 
 namespace ns_FrameV1_v0 {
-struct dataset_data {
+struct dataset_frame {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
-  dataset_data();
-  ~dataset_data();
+  dataset_frame();
+  ~dataset_frame();
 
   uint32_t shotIdStart; 
   float readoutTime; 
@@ -362,10 +372,10 @@ private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
   boost::shared_ptr<Config> m_cfg;
-  mutable boost::shared_ptr<Princeton::ns_FrameV1_v0::dataset_data> m_ds_data;
+  mutable boost::shared_ptr<Princeton::ns_FrameV1_v0::dataset_frame> m_ds_frame;
+  void read_ds_frame() const;
+  mutable ndarray<const uint16_t, 2> m_ds_data;
   void read_ds_data() const;
-  mutable ndarray<const uint16_t, 2> m_ds_image;
-  void read_ds_image() const;
 };
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::FrameV1> > make_FrameV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::Princeton::ConfigV1>& cfg);
@@ -375,12 +385,12 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::FrameV1> > make_FrameV1(int ver
 boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::FrameV1> > make_FrameV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::Princeton::ConfigV5>& cfg);
 
 namespace ns_FrameV2_v0 {
-struct dataset_data {
+struct dataset_frame {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
-  dataset_data();
-  ~dataset_data();
+  dataset_frame();
+  ~dataset_frame();
 
   uint32_t shotIdStart; 
   float readoutTime; 
@@ -406,10 +416,10 @@ private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
   boost::shared_ptr<Config> m_cfg;
-  mutable boost::shared_ptr<Princeton::ns_FrameV2_v0::dataset_data> m_ds_data;
+  mutable boost::shared_ptr<Princeton::ns_FrameV2_v0::dataset_frame> m_ds_frame;
+  void read_ds_frame() const;
+  mutable ndarray<const uint16_t, 2> m_ds_data;
   void read_ds_data() const;
-  mutable ndarray<const uint16_t, 2> m_ds_image;
-  void read_ds_image() const;
 };
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::FrameV2> > make_FrameV2(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::Princeton::ConfigV1>& cfg);
