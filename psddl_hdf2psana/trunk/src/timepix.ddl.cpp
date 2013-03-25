@@ -495,6 +495,9 @@ hdf5pp::Type ns_ConfigV2_v0_dataset_config_stored_type()
   type.insert("driverVersion", offsetof(DsType, driverVersion), hdf5pp::TypeTraits<int32_t>::stored_type());
   type.insert("firmwareVersion", offsetof(DsType, firmwareVersion), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("pixelThreshSize", offsetof(DsType, pixelThreshSize), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  hsize_t _array_type_pixelThresh_shape[] = { 4*256*256 };
+  hdf5pp::ArrayType _array_type_pixelThresh = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint8_t>::stored_type(), 1, _array_type_pixelThresh_shape);
+  type.insert("pixelThresh", offsetof(DsType, pixelThresh), _array_type_pixelThresh);
   type.insert("chip0Name", offsetof(DsType, chip0Name), hdf5pp::TypeTraits<const char*>::stored_type());
   type.insert("chip1Name", offsetof(DsType, chip1Name), hdf5pp::TypeTraits<const char*>::stored_type());
   type.insert("chip2Name", offsetof(DsType, chip2Name), hdf5pp::TypeTraits<const char*>::stored_type());
@@ -586,6 +589,9 @@ hdf5pp::Type ns_ConfigV2_v0_dataset_config_native_type()
   type.insert("driverVersion", offsetof(DsType, driverVersion), hdf5pp::TypeTraits<int32_t>::native_type());
   type.insert("firmwareVersion", offsetof(DsType, firmwareVersion), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("pixelThreshSize", offsetof(DsType, pixelThreshSize), hdf5pp::TypeTraits<uint32_t>::native_type());
+  hsize_t _array_type_pixelThresh_shape[] = { 4*256*256 };
+  hdf5pp::ArrayType _array_type_pixelThresh = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint8_t>::native_type(), 1, _array_type_pixelThresh_shape);
+  type.insert("pixelThresh", offsetof(DsType, pixelThresh), _array_type_pixelThresh);
   type.insert("chip0Name", offsetof(DsType, chip0Name), hdf5pp::TypeTraits<const char*>::native_type());
   type.insert("chip1Name", offsetof(DsType, chip1Name), hdf5pp::TypeTraits<const char*>::native_type());
   type.insert("chip2Name", offsetof(DsType, chip2Name), hdf5pp::TypeTraits<const char*>::native_type());
@@ -858,8 +864,9 @@ uint32_t ConfigV2_v0::pixelThreshSize() const {
   return uint32_t(m_ds_config->pixelThreshSize);
 }
 ndarray<const uint8_t, 1> ConfigV2_v0::pixelThresh() const {
-  if (m_ds_pixelThresh.empty()) read_ds_pixelThresh();
-  return m_ds_pixelThresh;
+  if (not m_ds_config) read_ds_config();
+  boost::shared_ptr<uint8_t> ptr(m_ds_config, m_ds_config->pixelThresh);
+  return make_ndarray(ptr, PixelThreshMax);
 }
 const char* ConfigV2_v0::chip0Name() const {
   if (not m_ds_config) read_ds_config();
@@ -899,9 +906,6 @@ int32_t ConfigV2_v0::chipCount() const {
 }
 void ConfigV2_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<Timepix::ns_ConfigV2_v0::dataset_config>(m_group, "config", m_idx);
-}
-void ConfigV2_v0::read_ds_pixelThresh() const {
-  m_ds_pixelThresh = hdf5pp::Utils::readNdarray<uint8_t, 1>(m_group, "pixelThresh", m_idx);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::Timepix::ConfigV2> > make_ConfigV2(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
@@ -986,6 +990,9 @@ hdf5pp::Type ns_ConfigV3_v0_dataset_config_stored_type()
   type.insert("driverVersion", offsetof(DsType, driverVersion), hdf5pp::TypeTraits<int32_t>::stored_type());
   type.insert("firmwareVersion", offsetof(DsType, firmwareVersion), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("pixelThreshSize", offsetof(DsType, pixelThreshSize), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  hsize_t _array_type_pixelThresh_shape[] = { 4*256*256 };
+  hdf5pp::ArrayType _array_type_pixelThresh = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint8_t>::stored_type(), 1, _array_type_pixelThresh_shape);
+  type.insert("pixelThresh", offsetof(DsType, pixelThresh), _array_type_pixelThresh);
   type.insert("chip0Name", offsetof(DsType, chip0Name), hdf5pp::TypeTraits<const char*>::stored_type());
   type.insert("chip1Name", offsetof(DsType, chip1Name), hdf5pp::TypeTraits<const char*>::stored_type());
   type.insert("chip2Name", offsetof(DsType, chip2Name), hdf5pp::TypeTraits<const char*>::stored_type());
@@ -1078,6 +1085,9 @@ hdf5pp::Type ns_ConfigV3_v0_dataset_config_native_type()
   type.insert("driverVersion", offsetof(DsType, driverVersion), hdf5pp::TypeTraits<int32_t>::native_type());
   type.insert("firmwareVersion", offsetof(DsType, firmwareVersion), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("pixelThreshSize", offsetof(DsType, pixelThreshSize), hdf5pp::TypeTraits<uint32_t>::native_type());
+  hsize_t _array_type_pixelThresh_shape[] = { 4*256*256 };
+  hdf5pp::ArrayType _array_type_pixelThresh = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint8_t>::native_type(), 1, _array_type_pixelThresh_shape);
+  type.insert("pixelThresh", offsetof(DsType, pixelThresh), _array_type_pixelThresh);
   type.insert("chip0Name", offsetof(DsType, chip0Name), hdf5pp::TypeTraits<const char*>::native_type());
   type.insert("chip1Name", offsetof(DsType, chip1Name), hdf5pp::TypeTraits<const char*>::native_type());
   type.insert("chip2Name", offsetof(DsType, chip2Name), hdf5pp::TypeTraits<const char*>::native_type());
@@ -1358,8 +1368,9 @@ uint32_t ConfigV3_v0::pixelThreshSize() const {
   return uint32_t(m_ds_config->pixelThreshSize);
 }
 ndarray<const uint8_t, 1> ConfigV3_v0::pixelThresh() const {
-  if (m_ds_pixelThresh.empty()) read_ds_pixelThresh();
-  return m_ds_pixelThresh;
+  if (not m_ds_config) read_ds_config();
+  boost::shared_ptr<uint8_t> ptr(m_ds_config, m_ds_config->pixelThresh);
+  return make_ndarray(ptr, PixelThreshMax);
 }
 const char* ConfigV3_v0::chip0Name() const {
   if (not m_ds_config) read_ds_config();
@@ -1399,9 +1410,6 @@ int32_t ConfigV3_v0::chipCount() const {
 }
 void ConfigV3_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<Timepix::ns_ConfigV3_v0::dataset_config>(m_group, "config", m_idx);
-}
-void ConfigV3_v0::read_ds_pixelThresh() const {
-  m_ds_pixelThresh = hdf5pp::Utils::readNdarray<uint8_t, 1>(m_group, "pixelThresh", m_idx);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::Timepix::ConfigV3> > make_ConfigV3(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {

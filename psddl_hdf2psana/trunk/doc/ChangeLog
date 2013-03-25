@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-15
+2013-03-25 Andy Salnikov
+- fix Timepix schema for config types
+
 Tag: V00-01-14
 2013-03-24 Andy Salnikov
 - use new psddlc feature to remap enum constant names ito names used 

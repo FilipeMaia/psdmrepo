@@ -228,6 +228,7 @@ struct dataset_config {
   int32_t driverVersion; 
   uint32_t firmwareVersion; 
   uint32_t pixelThreshSize; 
+  uint8_t pixelThresh[4*256*256]; 
   char* chip0Name; 
   char* chip1Name; 
   char* chip2Name; 
@@ -248,6 +249,7 @@ public:
   ConfigV2_v0() {}
   ConfigV2_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
+  ConfigV2_v0(const boost::shared_ptr<Timepix::ns_ConfigV2_v0::dataset_config>& ds) : m_ds_config(ds) {}
   virtual ~ConfigV2_v0() {}
   virtual Psana::Timepix::ConfigV2::ReadoutSpeed readoutSpeed() const;
   virtual Psana::Timepix::ConfigV2::TriggerMode triggerMode() const;
@@ -326,8 +328,6 @@ private:
   hsize_t m_idx;
   mutable boost::shared_ptr<Timepix::ns_ConfigV2_v0::dataset_config> m_ds_config;
   void read_ds_config() const;
-  mutable ndarray<const uint8_t, 1> m_ds_pixelThresh;
-  void read_ds_pixelThresh() const;
 };
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Timepix::ConfigV2> > make_ConfigV2(int version, hdf5pp::Group group, hsize_t idx);
@@ -404,6 +404,7 @@ struct dataset_config {
   int32_t driverVersion; 
   uint32_t firmwareVersion; 
   uint32_t pixelThreshSize; 
+  uint8_t pixelThresh[4*256*256]; 
   char* chip0Name; 
   char* chip1Name; 
   char* chip2Name; 
@@ -424,6 +425,7 @@ public:
   ConfigV3_v0() {}
   ConfigV3_v0(hdf5pp::Group group, hsize_t idx)
     : m_group(group), m_idx(idx) {}
+  ConfigV3_v0(const boost::shared_ptr<Timepix::ns_ConfigV3_v0::dataset_config>& ds) : m_ds_config(ds) {}
   virtual ~ConfigV3_v0() {}
   virtual Psana::Timepix::ConfigV3::ReadoutSpeed readoutSpeed() const;
   virtual Psana::Timepix::ConfigV3::TimepixMode timepixMode() const;
@@ -504,8 +506,6 @@ private:
   hsize_t m_idx;
   mutable boost::shared_ptr<Timepix::ns_ConfigV3_v0::dataset_config> m_ds_config;
   void read_ds_config() const;
-  mutable ndarray<const uint8_t, 1> m_ds_pixelThresh;
-  void read_ds_pixelThresh() const;
 };
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Timepix::ConfigV3> > make_ConfigV3(int version, hdf5pp::Group group, hsize_t idx);
