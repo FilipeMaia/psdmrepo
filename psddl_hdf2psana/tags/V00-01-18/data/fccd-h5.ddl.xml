@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE psddl SYSTEM "psddl.dtd">
+
+<psddl>
+
+    <use file="psddldata/fli.ddl.xml" />
+
+    <package name="FCCD">
+
+        <!-- ========================================================================= -->
+
+        <h5schema name="FccdConfigV2" version="0">
+            <tag name="external" value="psddl_hdf2psana/fccd.ddlm.h"/>
+        </h5schema>
+
+        <!-- ========================================================================= -->
+        
+    </package>
+</psddl>
