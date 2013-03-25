@@ -118,8 +118,8 @@ DumpPrinceton::beginCalibCycle(Event& evt, Env& env)
       str << "\n  binY = " << config3->binY();
       str << "\n  exposureTime = " << config3->exposureTime();
       str << "\n  coolingTemp = " << config3->coolingTemp();
-      str << "\n  gainIndex = " << config3->gainIndex();
-      str << "\n  readoutSpeedIndex = " << config3->readoutSpeedIndex();
+      str << "\n  gainIndex = " << int(config3->gainIndex());
+      str << "\n  readoutSpeedIndex = " << int(config3->readoutSpeedIndex());
       str << "\n  exposureEventCode = " << config3->exposureEventCode();
       str << "\n  numDelayShots = " << config3->numDelayShots();
       str << "\n  frameSize = " << config3->frameSize();
@@ -144,8 +144,8 @@ DumpPrinceton::beginCalibCycle(Event& evt, Env& env)
       str << "\n  vsSpeed = " << config4->vsSpeed();
       str << "\n  exposureTime = " << config4->exposureTime();
       str << "\n  coolingTemp = " << config4->coolingTemp();
-      str << "\n  gainIndex = " << config4->gainIndex();
-      str << "\n  readoutSpeedIndex = " << config4->readoutSpeedIndex();
+      str << "\n  gainIndex = " << int(config4->gainIndex());
+      str << "\n  readoutSpeedIndex = " << int(config4->readoutSpeedIndex());
       str << "\n  exposureEventCode = " << config4->exposureEventCode();
       str << "\n  numDelayShots = " << config4->numDelayShots();
       str << "\n  frameSize = " << config4->frameSize();
