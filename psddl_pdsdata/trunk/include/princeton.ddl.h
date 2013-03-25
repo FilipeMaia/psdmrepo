@@ -32,14 +32,15 @@ public:
   uint32_t readoutSpeedIndex() const { return _u32ReadoutSpeedIndex; }
   uint16_t readoutEventCode() const { return _u16ReadoutEventCode; }
   uint16_t delayMode() const { return _u16DelayMode; }
-  /** Total size in bytes of the Frame object */
+  /** Total size in bytes of the Frame object including header and pixel data, 
+            this returns the size of FrameV1 object, do not use this config type with FrameV2 */
   uint32_t frameSize() const;
   /** calculate frame X size in pixels based on the current ROI and binning settings */
-  uint32_t numPixelsX() const { return (_uWidth + _uBinX - 1) / _uBinX; }
+  uint32_t numPixelsX() const { return (this->width() + this->binX() - 1) / this->binX(); }
   /** calculate frame Y size in pixels based on the current ROI and binning settings */
-  uint32_t numPixelsY() const { return (_uHeight+ _uBinY - 1) / _uBinY; }
+  uint32_t numPixelsY() const { return (this->height()+ this->binY() - 1) / this->binY(); }
   /** calculate total frame size in pixels based on the current ROI and binning settings */
-  uint32_t numPixels() const { return ((_uWidth + _uBinX-1)/ _uBinX )*((_uHeight+ _uBinY-1)/ _uBinY ); }
+  uint32_t numPixels() const { return ((this->width() + this->binX()-1)/ this->binX() )*((this->height()+ this->binY()-1)/ this->binY() ); }
   static uint32_t _sizeof()  { return 40; }
 private:
   uint32_t	_uWidth;
@@ -79,14 +80,15 @@ public:
   uint16_t readoutSpeedIndex() const { return _u16ReadoutSpeedIndex; }
   uint16_t readoutEventCode() const { return _u16ReadoutEventCode; }
   uint16_t delayMode() const { return _u16DelayMode; }
-  /** Total size in bytes of the Frame object */
+  /** Total size in bytes of the Frame object including header and pixel data, 
+            this returns the size of FrameV1 object, do not use this config type with FrameV2 */
   uint32_t frameSize() const;
   /** calculate frame X size in pixels based on the current ROI and binning settings */
-  uint32_t numPixelsX() const { return (_uWidth + _uBinX - 1) / _uBinX; }
+  uint32_t numPixelsX() const { return (this->width() + this->binX() - 1) / this->binX(); }
   /** calculate frame Y size in pixels based on the current ROI and binning settings */
-  uint32_t numPixelsY() const { return (_uHeight+ _uBinY - 1) / _uBinY; }
+  uint32_t numPixelsY() const { return (this->height()+ this->binY() - 1) / this->binY(); }
   /** calculate total frame size in pixels based on the current ROI and binning settings */
-  uint32_t numPixels() const { return ((_uWidth + _uBinX-1)/ _uBinX )*((_uHeight+ _uBinY-1)/ _uBinY ); }
+  uint32_t numPixels() const { return ((this->width() + this->binX()-1)/ this->binX() )*((this->height()+ this->binY()-1)/ this->binY() ); }
   static uint32_t _sizeof()  { return 40; }
 private:
   uint32_t	_uWidth;
@@ -127,14 +129,15 @@ public:
   uint8_t readoutSpeedIndex() const { return _u8ReadoutSpeedIndex; }
   uint16_t exposureEventCode() const { return _u16ExposureEventCode; }
   uint32_t numDelayShots() const { return _u32NumDelayShots; }
-  /** Total size in bytes of the Frame object */
+  /** Total size in bytes of the Frame object including header and pixel data, 
+            this returns the size of FrameV1 object, do not use this config type with FrameV2 */
   uint32_t frameSize() const;
   /** calculate frame X size in pixels based on the current ROI and binning settings */
-  uint32_t numPixelsX() const { return (_uWidth + _uBinX - 1) / _uBinX; }
+  uint32_t numPixelsX() const { return (this->width() + this->binX() - 1) / this->binX(); }
   /** calculate frame Y size in pixels based on the current ROI and binning settings */
-  uint32_t numPixelsY() const { return (_uHeight+ _uBinY - 1) / _uBinY; }
+  uint32_t numPixelsY() const { return (this->height()+ this->binY() - 1) / this->binY(); }
   /** calculate total frame size in pixels based on the current ROI and binning settings */
-  uint32_t numPixels() const { return ((_uWidth + _uBinX-1)/ _uBinX )*((_uHeight+ _uBinY-1)/ _uBinY ); }
+  uint32_t numPixels() const { return ((this->width() + this->binX()-1)/ this->binX() )*((this->height()+ this->binY()-1)/ this->binY() ); }
   static uint32_t _sizeof()  { return 40; }
 private:
   uint32_t	_uWidth;
@@ -178,14 +181,15 @@ public:
   uint8_t readoutSpeedIndex() const { return _u8ReadoutSpeedIndex; }
   uint16_t exposureEventCode() const { return _u16ExposureEventCode; }
   uint32_t numDelayShots() const { return _u32NumDelayShots; }
-  /** Total size in bytes of the Frame object */
+  /** Total size in bytes of the Frame object including header and pixel data, 
+            this returns the size of FrameV1 object, do not use this config type with FrameV2 */
   uint32_t frameSize() const;
   /** calculate frame X size in pixels based on the current ROI and binning settings */
-  uint32_t numPixelsX() const { return (_uWidth + _uBinX - 1) / _uBinX; }
+  uint32_t numPixelsX() const { return (this->width() + this->binX() - 1) / this->binX(); }
   /** calculate frame Y size in pixels based on the current ROI and binning settings */
-  uint32_t numPixelsY() const { return (_uHeight+ _uBinY - 1) / _uBinY; }
+  uint32_t numPixelsY() const { return (this->height()+ this->binY() - 1) / this->binY(); }
   /** calculate total frame size in pixels based on the current ROI and binning settings */
-  uint32_t numPixels() const { return ((_uWidth + _uBinX-1)/ _uBinX )*((_uHeight+ _uBinY-1)/ _uBinY ); }
+  uint32_t numPixels() const { return ((this->width() + this->binX()-1)/ this->binX() )*((this->height()+ this->binY()-1)/ this->binY() ); }
   static uint32_t _sizeof()  { return 52; }
 private:
   uint32_t	_uWidth;
@@ -233,14 +237,15 @@ public:
   int16_t infoReportInterval() const { return _i16InfoReportInterval; }
   uint16_t exposureEventCode() const { return _u16ExposureEventCode; }
   uint32_t numDelayShots() const { return _u32NumDelayShots; }
-  /** Total size in bytes of the Frame object */
+  /** Total size in bytes of the Frame object including header and pixel data, 
+            this returns the size of FrameV2 object, do not use this config type with FrameV1 */
   uint32_t frameSize() const;
   /** calculate frame X size in pixels based on the current ROI and binning settings */
-  uint32_t numPixelsX() const { return (_uWidth + _uBinX - 1) / _uBinX; }
+  uint32_t numPixelsX() const { return (this->width() + this->binX() - 1) / this->binX(); }
   /** calculate frame Y size in pixels based on the current ROI and binning settings */
-  uint32_t numPixelsY() const { return (_uHeight+ _uBinY - 1) / _uBinY; }
+  uint32_t numPixelsY() const { return (this->height()+ this->binY() - 1) / this->binY(); }
   /** calculate total frame size in pixels based on the current ROI and binning settings */
-  uint32_t numPixels() const { return ((_uWidth + _uBinX-1)/ _uBinX )*((_uHeight+ _uBinY-1)/ _uBinY ); }
+  uint32_t numPixels() const { return ((this->width() + this->binX()-1)/ this->binX() )*((this->height()+ this->binY()-1)/ this->binY() ); }
   static uint32_t _sizeof()  { return 56; }
 private:
   uint32_t	_uWidth;
