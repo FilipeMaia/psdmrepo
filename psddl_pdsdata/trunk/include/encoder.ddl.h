@@ -35,8 +35,8 @@ public:
     QUAD_END,
   };
   uint32_t chan_num() const { return _chan_num; }
-  uint32_t count_mode() const { return _count_mode; }
-  uint32_t quadrature_mode() const { return _quadrature_mode; }
+  Encoder::ConfigV1::count_mode_type count_mode() const { return Encoder::ConfigV1::count_mode_type(_count_mode); }
+  Encoder::ConfigV1::quad_mode quadrature_mode() const { return Encoder::ConfigV1::quad_mode(_quadrature_mode); }
   uint32_t input_num() const { return _input_num; }
   uint32_t input_rising() const { return _input_rising; }
   uint32_t ticks_per_sec() const { return _ticks_per_sec; }
@@ -75,8 +75,8 @@ public:
     QUAD_END,
   };
   uint32_t chan_mask() const { return _chan_mask; }
-  uint32_t count_mode() const { return _count_mode; }
-  uint32_t quadrature_mode() const { return _quadrature_mode; }
+  Encoder::ConfigV2::count_mode_type count_mode() const { return Encoder::ConfigV2::count_mode_type(_count_mode); }
+  Encoder::ConfigV2::quad_mode quadrature_mode() const { return Encoder::ConfigV2::quad_mode(_quadrature_mode); }
   uint32_t input_num() const { return _input_num; }
   uint32_t input_rising() const { return _input_rising; }
   uint32_t ticks_per_sec() const { return _ticks_per_sec; }
