@@ -8,7 +8,53 @@
     <package name="Encoder">
 
         <!-- ========================================================================= -->
+
+        <h5schema name="ConfigV1" version="0">
+
+            <enum-map enum="count_mode_type">
+                <remap psname="COUNT_END" h5name="END"/>
+            </enum-map>
+        
+            <enum-map enum="quad_mode">
+                <remap psname="QUAD_END" h5name="END"/>
+            </enum-map>
+
+            <dataset name="config">
+                <attribute name="chan_num"/>
+                <attribute name="count_mode"/>
+                <attribute name="quadrature_mode"/>
+                <attribute name="input_num"/>
+                <attribute name="input_rising"/>
+                <attribute name="ticks_per_sec"/>
+            </dataset>
+            
+        </h5schema>
+
+        <!-- ========================================================================= -->
+
+        <h5schema name="ConfigV2" version="0">
+        
+            <enum-map enum="count_mode_type">
+                <remap psname="COUNT_END" h5name="END"/>
+            </enum-map>
+        
+            <enum-map enum="quad_mode">
+                <remap psname="QUAD_END" h5name="END"/>
+            </enum-map>
+
+            <dataset name="config">
+                <attribute name="chan_mask"/>
+                <attribute name="count_mode"/>
+                <attribute name="quadrature_mode"/>
+                <attribute name="input_num"/>
+                <attribute name="input_rising"/>
+                <attribute name="ticks_per_sec"/>
+            </dataset>
+            
+        </h5schema>
     
+        <!-- ========================================================================= -->
+
         <h5schema name="DataV1" version="0">
 
             <dataset name="data">

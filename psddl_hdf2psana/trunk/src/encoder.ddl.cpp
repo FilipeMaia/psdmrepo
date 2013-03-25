@@ -16,8 +16,20 @@ hdf5pp::Type ns_ConfigV1_v0_dataset_config_stored_type()
   typedef ns_ConfigV1_v0::dataset_config DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
   type.insert("chan_num", offsetof(DsType, chan_num), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("count_mode", offsetof(DsType, count_mode), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("quadrature_mode", offsetof(DsType, quadrature_mode), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  hdf5pp::EnumType<uint32_t> _enum_type_count_mode = hdf5pp::EnumType<uint32_t>::enumType();
+  _enum_type_count_mode.insert("WRAP_FULL", Psana::Encoder::ConfigV1::WRAP_FULL);
+  _enum_type_count_mode.insert("LIMIT", Psana::Encoder::ConfigV1::LIMIT);
+  _enum_type_count_mode.insert("HALT", Psana::Encoder::ConfigV1::HALT);
+  _enum_type_count_mode.insert("WRAP_PRESET", Psana::Encoder::ConfigV1::WRAP_PRESET);
+  _enum_type_count_mode.insert("END", Psana::Encoder::ConfigV1::COUNT_END);
+  type.insert("count_mode", offsetof(DsType, count_mode), _enum_type_count_mode);
+  hdf5pp::EnumType<uint32_t> _enum_type_quadrature_mode = hdf5pp::EnumType<uint32_t>::enumType();
+  _enum_type_quadrature_mode.insert("CLOCK_DIR", Psana::Encoder::ConfigV1::CLOCK_DIR);
+  _enum_type_quadrature_mode.insert("X1", Psana::Encoder::ConfigV1::X1);
+  _enum_type_quadrature_mode.insert("X2", Psana::Encoder::ConfigV1::X2);
+  _enum_type_quadrature_mode.insert("X4", Psana::Encoder::ConfigV1::X4);
+  _enum_type_quadrature_mode.insert("END", Psana::Encoder::ConfigV1::QUAD_END);
+  type.insert("quadrature_mode", offsetof(DsType, quadrature_mode), _enum_type_quadrature_mode);
   type.insert("input_num", offsetof(DsType, input_num), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("input_rising", offsetof(DsType, input_rising), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("ticks_per_sec", offsetof(DsType, ticks_per_sec), hdf5pp::TypeTraits<uint32_t>::stored_type());
@@ -35,8 +47,20 @@ hdf5pp::Type ns_ConfigV1_v0_dataset_config_native_type()
   typedef ns_ConfigV1_v0::dataset_config DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
   type.insert("chan_num", offsetof(DsType, chan_num), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("count_mode", offsetof(DsType, count_mode), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("quadrature_mode", offsetof(DsType, quadrature_mode), hdf5pp::TypeTraits<uint32_t>::native_type());
+  hdf5pp::EnumType<uint32_t> _enum_type_count_mode = hdf5pp::EnumType<uint32_t>::enumType();
+  _enum_type_count_mode.insert("WRAP_FULL", Psana::Encoder::ConfigV1::WRAP_FULL);
+  _enum_type_count_mode.insert("LIMIT", Psana::Encoder::ConfigV1::LIMIT);
+  _enum_type_count_mode.insert("HALT", Psana::Encoder::ConfigV1::HALT);
+  _enum_type_count_mode.insert("WRAP_PRESET", Psana::Encoder::ConfigV1::WRAP_PRESET);
+  _enum_type_count_mode.insert("END", Psana::Encoder::ConfigV1::COUNT_END);
+  type.insert("count_mode", offsetof(DsType, count_mode), _enum_type_count_mode);
+  hdf5pp::EnumType<uint32_t> _enum_type_quadrature_mode = hdf5pp::EnumType<uint32_t>::enumType();
+  _enum_type_quadrature_mode.insert("CLOCK_DIR", Psana::Encoder::ConfigV1::CLOCK_DIR);
+  _enum_type_quadrature_mode.insert("X1", Psana::Encoder::ConfigV1::X1);
+  _enum_type_quadrature_mode.insert("X2", Psana::Encoder::ConfigV1::X2);
+  _enum_type_quadrature_mode.insert("X4", Psana::Encoder::ConfigV1::X4);
+  _enum_type_quadrature_mode.insert("END", Psana::Encoder::ConfigV1::QUAD_END);
+  type.insert("quadrature_mode", offsetof(DsType, quadrature_mode), _enum_type_quadrature_mode);
   type.insert("input_num", offsetof(DsType, input_num), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("input_rising", offsetof(DsType, input_rising), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("ticks_per_sec", offsetof(DsType, ticks_per_sec), hdf5pp::TypeTraits<uint32_t>::native_type());
@@ -58,13 +82,13 @@ uint32_t ConfigV1_v0::chan_num() const {
   if (not m_ds_config) read_ds_config();
   return uint32_t(m_ds_config->chan_num);
 }
-uint32_t ConfigV1_v0::count_mode() const {
+Psana::Encoder::ConfigV1::count_mode_type ConfigV1_v0::count_mode() const {
   if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->count_mode);
+  return Psana::Encoder::ConfigV1::count_mode_type(m_ds_config->count_mode);
 }
-uint32_t ConfigV1_v0::quadrature_mode() const {
+Psana::Encoder::ConfigV1::quad_mode ConfigV1_v0::quadrature_mode() const {
   if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->quadrature_mode);
+  return Psana::Encoder::ConfigV1::quad_mode(m_ds_config->quadrature_mode);
 }
 uint32_t ConfigV1_v0::input_num() const {
   if (not m_ds_config) read_ds_config();
@@ -95,8 +119,20 @@ hdf5pp::Type ns_ConfigV2_v0_dataset_config_stored_type()
   typedef ns_ConfigV2_v0::dataset_config DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
   type.insert("chan_mask", offsetof(DsType, chan_mask), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("count_mode", offsetof(DsType, count_mode), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("quadrature_mode", offsetof(DsType, quadrature_mode), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  hdf5pp::EnumType<uint32_t> _enum_type_count_mode = hdf5pp::EnumType<uint32_t>::enumType();
+  _enum_type_count_mode.insert("WRAP_FULL", Psana::Encoder::ConfigV2::WRAP_FULL);
+  _enum_type_count_mode.insert("LIMIT", Psana::Encoder::ConfigV2::LIMIT);
+  _enum_type_count_mode.insert("HALT", Psana::Encoder::ConfigV2::HALT);
+  _enum_type_count_mode.insert("WRAP_PRESET", Psana::Encoder::ConfigV2::WRAP_PRESET);
+  _enum_type_count_mode.insert("END", Psana::Encoder::ConfigV2::COUNT_END);
+  type.insert("count_mode", offsetof(DsType, count_mode), _enum_type_count_mode);
+  hdf5pp::EnumType<uint32_t> _enum_type_quadrature_mode = hdf5pp::EnumType<uint32_t>::enumType();
+  _enum_type_quadrature_mode.insert("CLOCK_DIR", Psana::Encoder::ConfigV2::CLOCK_DIR);
+  _enum_type_quadrature_mode.insert("X1", Psana::Encoder::ConfigV2::X1);
+  _enum_type_quadrature_mode.insert("X2", Psana::Encoder::ConfigV2::X2);
+  _enum_type_quadrature_mode.insert("X4", Psana::Encoder::ConfigV2::X4);
+  _enum_type_quadrature_mode.insert("END", Psana::Encoder::ConfigV2::QUAD_END);
+  type.insert("quadrature_mode", offsetof(DsType, quadrature_mode), _enum_type_quadrature_mode);
   type.insert("input_num", offsetof(DsType, input_num), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("input_rising", offsetof(DsType, input_rising), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("ticks_per_sec", offsetof(DsType, ticks_per_sec), hdf5pp::TypeTraits<uint32_t>::stored_type());
@@ -114,8 +150,20 @@ hdf5pp::Type ns_ConfigV2_v0_dataset_config_native_type()
   typedef ns_ConfigV2_v0::dataset_config DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
   type.insert("chan_mask", offsetof(DsType, chan_mask), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("count_mode", offsetof(DsType, count_mode), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("quadrature_mode", offsetof(DsType, quadrature_mode), hdf5pp::TypeTraits<uint32_t>::native_type());
+  hdf5pp::EnumType<uint32_t> _enum_type_count_mode = hdf5pp::EnumType<uint32_t>::enumType();
+  _enum_type_count_mode.insert("WRAP_FULL", Psana::Encoder::ConfigV2::WRAP_FULL);
+  _enum_type_count_mode.insert("LIMIT", Psana::Encoder::ConfigV2::LIMIT);
+  _enum_type_count_mode.insert("HALT", Psana::Encoder::ConfigV2::HALT);
+  _enum_type_count_mode.insert("WRAP_PRESET", Psana::Encoder::ConfigV2::WRAP_PRESET);
+  _enum_type_count_mode.insert("END", Psana::Encoder::ConfigV2::COUNT_END);
+  type.insert("count_mode", offsetof(DsType, count_mode), _enum_type_count_mode);
+  hdf5pp::EnumType<uint32_t> _enum_type_quadrature_mode = hdf5pp::EnumType<uint32_t>::enumType();
+  _enum_type_quadrature_mode.insert("CLOCK_DIR", Psana::Encoder::ConfigV2::CLOCK_DIR);
+  _enum_type_quadrature_mode.insert("X1", Psana::Encoder::ConfigV2::X1);
+  _enum_type_quadrature_mode.insert("X2", Psana::Encoder::ConfigV2::X2);
+  _enum_type_quadrature_mode.insert("X4", Psana::Encoder::ConfigV2::X4);
+  _enum_type_quadrature_mode.insert("END", Psana::Encoder::ConfigV2::QUAD_END);
+  type.insert("quadrature_mode", offsetof(DsType, quadrature_mode), _enum_type_quadrature_mode);
   type.insert("input_num", offsetof(DsType, input_num), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("input_rising", offsetof(DsType, input_rising), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("ticks_per_sec", offsetof(DsType, ticks_per_sec), hdf5pp::TypeTraits<uint32_t>::native_type());
@@ -137,13 +185,13 @@ uint32_t ConfigV2_v0::chan_mask() const {
   if (not m_ds_config) read_ds_config();
   return uint32_t(m_ds_config->chan_mask);
 }
-uint32_t ConfigV2_v0::count_mode() const {
+Psana::Encoder::ConfigV2::count_mode_type ConfigV2_v0::count_mode() const {
   if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->count_mode);
+  return Psana::Encoder::ConfigV2::count_mode_type(m_ds_config->count_mode);
 }
-uint32_t ConfigV2_v0::quadrature_mode() const {
+Psana::Encoder::ConfigV2::quad_mode ConfigV2_v0::quadrature_mode() const {
   if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->quadrature_mode);
+  return Psana::Encoder::ConfigV2::quad_mode(m_ds_config->quadrature_mode);
 }
 uint32_t ConfigV2_v0::input_num() const {
   if (not m_ds_config) read_ds_config();

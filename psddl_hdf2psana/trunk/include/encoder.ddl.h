@@ -38,8 +38,8 @@ public:
   ConfigV1_v0(const boost::shared_ptr<Encoder::ns_ConfigV1_v0::dataset_config>& ds) : m_ds_config(ds) {}
   virtual ~ConfigV1_v0() {}
   virtual uint32_t chan_num() const;
-  virtual uint32_t count_mode() const;
-  virtual uint32_t quadrature_mode() const;
+  virtual Psana::Encoder::ConfigV1::count_mode_type count_mode() const;
+  virtual Psana::Encoder::ConfigV1::quad_mode quadrature_mode() const;
   virtual uint32_t input_num() const;
   virtual uint32_t input_rising() const;
   virtual uint32_t ticks_per_sec() const;
@@ -80,8 +80,8 @@ public:
   ConfigV2_v0(const boost::shared_ptr<Encoder::ns_ConfigV2_v0::dataset_config>& ds) : m_ds_config(ds) {}
   virtual ~ConfigV2_v0() {}
   virtual uint32_t chan_mask() const;
-  virtual uint32_t count_mode() const;
-  virtual uint32_t quadrature_mode() const;
+  virtual Psana::Encoder::ConfigV2::count_mode_type count_mode() const;
+  virtual Psana::Encoder::ConfigV2::quad_mode quadrature_mode() const;
   virtual uint32_t input_num() const;
   virtual uint32_t input_rising() const;
   virtual uint32_t ticks_per_sec() const;
