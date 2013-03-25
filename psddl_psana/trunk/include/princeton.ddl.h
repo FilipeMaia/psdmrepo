@@ -31,7 +31,8 @@ public:
   virtual uint32_t readoutSpeedIndex() const = 0;
   virtual uint16_t readoutEventCode() const = 0;
   virtual uint16_t delayMode() const = 0;
-  /** Total size in bytes of the Frame object */
+  /** Total size in bytes of the Frame object including header and pixel data, 
+            this returns the size of FrameV1 object, do not use this config type with FrameV2 */
   virtual uint32_t frameSize() const = 0;
   /** calculate frame X size in pixels based on the current ROI and binning settings */
   virtual uint32_t numPixelsX() const = 0;
@@ -64,7 +65,8 @@ public:
   virtual uint16_t readoutSpeedIndex() const = 0;
   virtual uint16_t readoutEventCode() const = 0;
   virtual uint16_t delayMode() const = 0;
-  /** Total size in bytes of the Frame object */
+  /** Total size in bytes of the Frame object including header and pixel data, 
+            this returns the size of FrameV1 object, do not use this config type with FrameV2 */
   virtual uint32_t frameSize() const = 0;
   /** calculate frame X size in pixels based on the current ROI and binning settings */
   virtual uint32_t numPixelsX() const = 0;
@@ -97,7 +99,8 @@ public:
   virtual uint8_t readoutSpeedIndex() const = 0;
   virtual uint16_t exposureEventCode() const = 0;
   virtual uint32_t numDelayShots() const = 0;
-  /** Total size in bytes of the Frame object */
+  /** Total size in bytes of the Frame object including header and pixel data, 
+            this returns the size of FrameV1 object, do not use this config type with FrameV2 */
   virtual uint32_t frameSize() const = 0;
   /** calculate frame X size in pixels based on the current ROI and binning settings */
   virtual uint32_t numPixelsX() const = 0;
@@ -133,7 +136,8 @@ public:
   virtual uint8_t readoutSpeedIndex() const = 0;
   virtual uint16_t exposureEventCode() const = 0;
   virtual uint32_t numDelayShots() const = 0;
-  /** Total size in bytes of the Frame object */
+  /** Total size in bytes of the Frame object including header and pixel data, 
+            this returns the size of FrameV1 object, do not use this config type with FrameV2 */
   virtual uint32_t frameSize() const = 0;
   /** calculate frame X size in pixels based on the current ROI and binning settings */
   virtual uint32_t numPixelsX() const = 0;
@@ -170,7 +174,8 @@ public:
   virtual int16_t infoReportInterval() const = 0;
   virtual uint16_t exposureEventCode() const = 0;
   virtual uint32_t numDelayShots() const = 0;
-  /** Total size in bytes of the Frame object */
+  /** Total size in bytes of the Frame object including header and pixel data, 
+            this returns the size of FrameV2 object, do not use this config type with FrameV1 */
   virtual uint32_t frameSize() const = 0;
   /** calculate frame X size in pixels based on the current ROI and binning settings */
   virtual uint32_t numPixelsX() const = 0;
