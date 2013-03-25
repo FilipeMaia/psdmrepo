@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-11
+2013-03-24 Andy Salnikov
+- DumpEncoder: added ConfigV2
+
 Tag: V00-03-10
 2013-03-23 Andy Salnikov
 - small update to DumpFccd

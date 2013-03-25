@@ -18,6 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <iomanip>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -71,6 +72,21 @@ DumpEncoder::beginCalibCycle(Event& evt, Env& env)
       str << "\n  input_num = " << config1->input_num();
       str << "\n  input_rising = " << config1->input_rising();
       str << "\n  ticks_per_sec = " << config1->ticks_per_sec();
+    }
+    
+  }
+
+  shared_ptr<Psana::Encoder::ConfigV2> config2 = env.configStore().get(m_src);
+  if (config2) {
+    
+    WithMsgLog(name(), info, str) {
+      str << "Encoder::ConfigV1:";
+      str << "\n  chan_mask = " << std::hex << std::showbase << config2->chan_mask() << std::dec;
+      str << "\n  count_mode = " << config2->count_mode();
+      str << "\n  quadrature_mode = " << config2->quadrature_mode();
+      str << "\n  input_num = " << config2->input_num();
+      str << "\n  input_rising = " << config2->input_rising();
+      str << "\n  ticks_per_sec = " << config2->ticks_per_sec();
     }
     
   }
