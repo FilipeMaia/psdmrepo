@@ -31,13 +31,7 @@
     
         <h5schema name="DataV3" version="0">
 
-            <dataset name="data">
-
-                <attribute name="fifoEvents">
-                    <tag name="vlen"/>
-                </attribute>
-
-            </dataset>
+            <tag name="external" value="psddl_hdf2psana/evr.ddlm.h"/>
             
         </h5schema>
     

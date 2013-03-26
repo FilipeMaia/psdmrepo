@@ -12,6 +12,44 @@
 namespace psddl_hdf2psana {
 namespace EvrData {
 
+
+
+namespace ns_DataV3_v0 {
+struct dataset_data {
+  static hdf5pp::Type native_type();
+  static hdf5pp::Type stored_type();
+
+  dataset_data();
+  ~dataset_data();
+
+  size_t vlen_fifoEvents;
+  EvrData::ns_FIFOEvent_v0::dataset_data* fifoEvents;
+
+};
+}
+
+
+class DataV3_v0 : public Psana::EvrData::DataV3 {
+public:
+  typedef Psana::EvrData::DataV3 PsanaType;
+  DataV3_v0() {}
+  DataV3_v0(hdf5pp::Group group, hsize_t idx)
+    : m_group(group), m_idx(idx) {}
+  DataV3_v0(const boost::shared_ptr<EvrData::ns_DataV3_v0::dataset_data>& ds) : m_ds_data(ds) {}
+  virtual ~DataV3_v0() {}
+    uint32_t numFifoEvents() const;
+
+  virtual ndarray<const Psana::EvrData::FIFOEvent, 1> fifoEvents() const;
+private:
+  mutable hdf5pp::Group m_group;
+  hsize_t m_idx;
+  mutable boost::shared_ptr<EvrData::ns_DataV3_v0::dataset_data> m_ds_data;
+  void read_ds_data() const;
+  mutable ndarray<const Psana::EvrData::FIFOEvent, 1> m_ds_storage_data_fifoEvents;
+};
+
+
+
 namespace ns_IOChannel_v0 {
 struct dataset_data {
 

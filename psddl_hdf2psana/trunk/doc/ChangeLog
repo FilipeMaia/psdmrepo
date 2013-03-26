@@ -11,6 +11,16 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-20
+2013-03-26 Andy Salnikov
+- checking Evr mess: in Nov 2012 translator changed silently dataset name
+  where EvrDataV3 data is stored (this happend during one big refactoring,
+  the change was not intentional)
+- as a result we now have EvrDataV3 which can be stored in "evrData" 
+  or "data" dataset depending when transtion happened
+- replacing generated EvrDataV3 code here with hand-written (adopted from 
+  generated) which checks dataset name before reading the data from it
+
 Tag: V00-01-19
 2013-03-25 Andy Salnikov
 - fix camera frame image reading

@@ -10,6 +10,7 @@
 #include "PSEvt/DataProxy.h"
 #include "psddl_hdf2psana/evr.ddlm.h"
 #include "psddl_hdf2psana/evr.ddlm.h"
+#include "psddl_hdf2psana/evr.ddlm.h"
 namespace psddl_hdf2psana {
 namespace EvrData {
 
@@ -1483,59 +1484,6 @@ boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::FIFOEvent> > make_FIFOEvent(int v
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::EvrData::FIFOEvent> >(boost::shared_ptr<Psana::EvrData::FIFOEvent>());
   }
-}
-
-hdf5pp::Type ns_DataV3_v0_dataset_data_stored_type()
-{
-  typedef ns_DataV3_v0::dataset_data DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  hdf5pp::VlenType _array_type_fifoEvents = hdf5pp::VlenType::vlenType(hdf5pp::TypeTraits<EvrData::ns_FIFOEvent_v0::dataset_data>::stored_type());
-  type.insert("fifoEvents", offsetof(DsType, vlen_fifoEvents), _array_type_fifoEvents);
-  return type;
-}
-
-hdf5pp::Type ns_DataV3_v0::dataset_data::stored_type()
-{
-  static hdf5pp::Type type = ns_DataV3_v0_dataset_data_stored_type();
-  return type;
-}
-
-hdf5pp::Type ns_DataV3_v0_dataset_data_native_type()
-{
-  typedef ns_DataV3_v0::dataset_data DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  hdf5pp::VlenType _array_type_fifoEvents = hdf5pp::VlenType::vlenType(hdf5pp::TypeTraits<EvrData::ns_FIFOEvent_v0::dataset_data>::native_type());
-  type.insert("fifoEvents", offsetof(DsType, vlen_fifoEvents), _array_type_fifoEvents);
-  return type;
-}
-
-hdf5pp::Type ns_DataV3_v0::dataset_data::native_type()
-{
-  static hdf5pp::Type type = ns_DataV3_v0_dataset_data_native_type();
-  return type;
-}
-ns_DataV3_v0::dataset_data::dataset_data()
-{
-  this->vlen_fifoEvents = 0;
-  this->fifoEvents = 0;
-}
-ns_DataV3_v0::dataset_data::~dataset_data()
-{
-  free(this->fifoEvents);
-}
-
-ndarray<const Psana::EvrData::FIFOEvent, 1> DataV3_v0::fifoEvents() const {
-  if (not m_ds_data) read_ds_data();
-  if (m_ds_storage_data_fifoEvents.empty()) {
-    unsigned shape[] = {m_ds_data->vlen_fifoEvents};
-    ndarray<Psana::EvrData::FIFOEvent, 1> tmparr(shape);
-    std::copy(m_ds_data->fifoEvents, m_ds_data->fifoEvents+m_ds_data->vlen_fifoEvents, tmparr.begin());
-    m_ds_storage_data_fifoEvents = tmparr;
-  }
-  return m_ds_storage_data_fifoEvents;
-}
-void DataV3_v0::read_ds_data() const {
-  m_ds_data = hdf5pp::Utils::readGroup<EvrData::ns_DataV3_v0::dataset_data>(m_group, "data", m_idx);
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::DataV3> > make_DataV3(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
