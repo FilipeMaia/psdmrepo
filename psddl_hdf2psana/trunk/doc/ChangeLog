@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-19
+2013-03-25 Andy Salnikov
+- fix camera frame image reading
+
 Tag: V00-01-18
 2013-03-25 Andy Salnikov
 - fixing image joining in PNCCD::FullFrame

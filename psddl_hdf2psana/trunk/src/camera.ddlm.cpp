@@ -61,23 +61,29 @@ uint32_t FrameV1_v0::offset() const {
   if (not m_ds_data.get()) read_ds_data();
   return uint32_t(m_ds_data->offset);
 }
+
 ndarray<const uint8_t, 1> FrameV1_v0::_int_pixel_data() const {
   if (m_ds_image.empty()) read_ds_image();
   return m_ds_image;
 }
+
 ndarray<const uint8_t, 2>
 FrameV1_v0::data8() const
 {
   if (this->depth() > 8) return ndarray<const uint8_t, 2>();
-  return make_ndarray(_int_pixel_data().data_ptr(), height(), width());
+  if (m_ds_image.empty()) read_ds_image();
+  return make_ndarray(m_ds_image.data_ptr(), height(), width());
 }
+
 ndarray<const uint16_t, 2>
 FrameV1_v0::data16() const
 {
   if (this->depth() <= 8) return ndarray<const uint16_t, 2>();
+  if (m_ds_image.empty()) read_ds_image();
   boost::shared_ptr<const uint16_t> tptr(m_ds_image.data_ptr(), (const uint16_t*)m_ds_image.data_ptr().get());
   return make_ndarray(tptr, height(), width());
 }
+
 void FrameV1_v0::read_ds_data() const
 {
   m_ds_data = hdf5pp::Utils::readGroup<Camera::ns_FrameV1_v0::dataset_data>(m_group, "data", m_idx);
