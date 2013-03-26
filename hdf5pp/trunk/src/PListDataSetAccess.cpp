@@ -38,7 +38,7 @@ namespace hdf5pp {
 // Constructors --
 //----------------
 PListDataSetAccess::PListDataSetAccess ()
-  : m_impl(H5P_DATASET_ACCESS)
+  : m_impl()
 {
 }
 
@@ -53,6 +53,7 @@ PListDataSetAccess::~PListDataSetAccess ()
 void
 PListDataSetAccess::set_chunk_cache(size_t rdcc_nslots, size_t rdcc_nbytes, double rdcc_w0)
 {
+  m_impl.setClass(H5P_DATASET_ACCESS);
   herr_t stat = H5Pset_chunk_cache(m_impl.id(), rdcc_nslots, rdcc_nbytes, rdcc_w0);
   if (stat < 0) {
     throw Hdf5CallException(ERR_LOC, "H5Pset_chunk");

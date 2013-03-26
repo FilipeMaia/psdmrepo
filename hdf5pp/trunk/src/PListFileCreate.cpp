@@ -38,7 +38,7 @@ namespace hdf5pp {
 // Constructors --
 //----------------
 PListFileCreate::PListFileCreate ()
-  : m_impl(H5P_FILE_CREATE)
+  : m_impl()
 {
 }
 
@@ -54,6 +54,7 @@ PListFileCreate::~PListFileCreate ()
 void 
 PListFileCreate::set_istore_k(unsigned ik) 
 {
+  m_impl.setClass(H5P_FILE_CREATE);
   herr_t stat = H5Pset_istore_k ( m_impl.id(), ik ) ;
   if ( stat < 0 ) {
     throw Hdf5CallException ( ERR_LOC, "H5Pset_istore_k" ) ;
@@ -65,6 +66,7 @@ PListFileCreate::set_istore_k(unsigned ik)
 void 
 PListFileCreate::set_sym_k(unsigned ik, unsigned lk) 
 {
+  m_impl.setClass(H5P_FILE_CREATE);
   herr_t stat = H5Pset_sym_k ( m_impl.id(), ik, lk ) ;
   if ( stat < 0 ) {
     throw Hdf5CallException ( ERR_LOC, "H5Pset_sym_k" ) ;
@@ -76,6 +78,7 @@ PListFileCreate::set_sym_k(unsigned ik, unsigned lk)
 void 
 PListFileCreate::set_userblock(hsize_t size)
 {
+  m_impl.setClass(H5P_FILE_CREATE);
   herr_t stat = H5Pset_userblock ( m_impl.id(), size ) ;
   if ( stat < 0 ) {
     throw Hdf5CallException ( ERR_LOC, "H5Pset_userblock" ) ;
@@ -87,6 +90,7 @@ PListFileCreate::set_userblock(hsize_t size)
 void 
 PListFileCreate::set_sizes(size_t sizeof_addr, size_t sizeof_size)
 {
+  m_impl.setClass(H5P_FILE_CREATE);
   herr_t stat = H5Pset_sizes ( m_impl.id(), sizeof_addr, sizeof_size ) ;
   if ( stat < 0 ) {
     throw Hdf5CallException ( ERR_LOC, "H5Pset_sizes" ) ;

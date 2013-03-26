@@ -11,6 +11,13 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-04
+2013-03-25 Andy Salnikov
+- Group implements cache of open datasets
+- new set_cache() method for file access property list
+- optimization of the property list classes when they do not define
+  any properties 
+
 Tag: V00-04-03
 2013-03-23 Andy Salnikov
 - add method DataSpace::get_simple_extent_type()

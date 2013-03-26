@@ -38,6 +38,11 @@ namespace hdf5pp {
 //----------------
 // Constructors --
 //----------------
+PListImpl::PListImpl()
+  : m_id(H5P_DEFAULT)
+{
+}
+
 PListImpl::PListImpl ( hid_t cls )
   : m_id()
 {
@@ -49,8 +54,12 @@ PListImpl::PListImpl ( hid_t cls )
 PListImpl::PListImpl ( const PListImpl& o )
   : m_id()
 {
-  m_id = H5Pcopy ( o.m_id ) ;
-  if ( m_id < 0 ) throw Hdf5CallException ( ERR_LOC, "H5Pcopy" ) ;
+  if (o.m_id == H5P_DEFAULT) {
+    m_id = o.m_id;
+  } else {
+    m_id = H5Pcopy ( o.m_id ) ;
+    if ( m_id < 0 ) throw Hdf5CallException ( ERR_LOC, "H5Pcopy" ) ;
+  }
 }
 
 //--------------
@@ -58,7 +67,7 @@ PListImpl::PListImpl ( const PListImpl& o )
 //--------------
 PListImpl::~PListImpl ()
 {
-  H5Pclose(m_id) ;
+  if (m_id != H5P_DEFAULT) H5Pclose(m_id) ;
 }
 
 // assignment
@@ -66,12 +75,27 @@ PListImpl&
 PListImpl::operator = ( const PListImpl& o )
 {
   if ( &o != this ) {
-    if ( H5Pclose(m_id) < 0 ) throw Hdf5CallException ( ERR_LOC, "H5Pclose" ) ;
-    m_id = H5Pcopy ( o.m_id ) ;
-    if ( m_id < 0 ) throw Hdf5CallException ( ERR_LOC, "H5Pcopy" ) ;
+    if (m_id != H5P_DEFAULT) {
+      if ( H5Pclose(m_id) < 0 ) throw Hdf5CallException ( ERR_LOC, "H5Pclose" ) ;
+    }
+    if (o.m_id == H5P_DEFAULT) {
+      m_id = o.m_id;
+    } else {
+      m_id = H5Pcopy ( o.m_id ) ;
+      if ( m_id < 0 ) throw Hdf5CallException ( ERR_LOC, "H5Pcopy" ) ;
+    }
   }
   return *this ;
 }
 
+// changes class, only if id is H5P_DEFAULT
+void
+PListImpl::setClass(hid_t cls) 
+{
+  if (m_id == H5P_DEFAULT) {
+    m_id = H5Pcreate ( cls ) ;
+    if ( m_id < 0 ) throw Hdf5CallException ( ERR_LOC, "H5Pcreate" ) ;
+  }
+}
 
 } // namespace hdf5pp

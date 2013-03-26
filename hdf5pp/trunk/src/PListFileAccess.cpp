@@ -38,7 +38,7 @@ namespace hdf5pp {
 // Constructors --
 //----------------
 PListFileAccess::PListFileAccess ()
-  : m_impl(H5P_FILE_ACCESS)
+  : m_impl()
 {
 }
 
@@ -53,9 +53,21 @@ PListFileAccess::~PListFileAccess ()
 void
 PListFileAccess::set_family_driver ( hsize_t memb_size, const PListFileAccess& memb_fapl )
 {
+  m_impl.setClass(H5P_FILE_ACCESS);
   herr_t stat = H5Pset_fapl_family ( m_impl.id(), memb_size, memb_fapl.plist() ) ;
   if ( stat < 0 ) {
     throw Hdf5CallException ( ERR_LOC, "H5Pset_fapl_family" ) ;
+  }
+}
+
+// define chuink cache parameters, see for parameter documentation
+void
+PListFileAccess::set_cache(size_t rdcc_nelmts, size_t rdcc_nbytes, double rdcc_w0)
+{
+  m_impl.setClass(H5P_FILE_ACCESS);
+  herr_t stat = H5Pset_cache(m_impl.id(), 0, rdcc_nelmts, rdcc_nbytes, rdcc_w0);
+  if ( stat < 0 ) {
+    throw Hdf5CallException ( ERR_LOC, "H5Pset_cache" ) ;
   }
 }
 

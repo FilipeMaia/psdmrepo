@@ -38,7 +38,7 @@ namespace hdf5pp {
 // Constructors --
 //----------------
 PListDataSetCreate::PListDataSetCreate ()
-  : m_impl(H5P_DATASET_CREATE)
+  : m_impl()
 {
 }
 
@@ -53,6 +53,7 @@ PListDataSetCreate::~PListDataSetCreate ()
 void
 PListDataSetCreate::set_chunk ( int rank, const hsize_t chunk_size[] )
 {
+  m_impl.setClass(H5P_DATASET_CREATE);
   herr_t stat = H5Pset_chunk ( m_impl.id(), rank, chunk_size ) ;
   if ( stat < 0 ) {
     throw Hdf5CallException ( ERR_LOC, "H5Pset_chunk" ) ;
@@ -63,6 +64,7 @@ PListDataSetCreate::set_chunk ( int rank, const hsize_t chunk_size[] )
 void
 PListDataSetCreate::set_chunk ( const hsize_t chunk_size )
 {
+  m_impl.setClass(H5P_DATASET_CREATE);
   herr_t stat = H5Pset_chunk ( m_impl.id(), 1, &chunk_size ) ;
   if ( stat < 0 ) {
     throw Hdf5CallException ( ERR_LOC, "H5Pset_chunk" ) ;
@@ -73,6 +75,7 @@ PListDataSetCreate::set_chunk ( const hsize_t chunk_size )
 void
 PListDataSetCreate::set_deflate ( unsigned level )
 {
+  m_impl.setClass(H5P_DATASET_CREATE);
   herr_t stat = H5Pset_deflate ( m_impl.id(), level ) ;
   if ( stat < 0 ) {
     throw Hdf5CallException ( ERR_LOC, "H5Pset_deflate" ) ;
@@ -83,6 +86,7 @@ PListDataSetCreate::set_deflate ( unsigned level )
 void
 PListDataSetCreate::set_szip( unsigned mask, unsigned block_size )
 {
+  m_impl.setClass(H5P_DATASET_CREATE);
   herr_t stat = H5Pset_szip ( m_impl.id(), mask, block_size ) ;
   if ( stat < 0 ) {
     throw Hdf5CallException ( ERR_LOC, "H5Pset_szip" ) ;
@@ -93,6 +97,7 @@ PListDataSetCreate::set_szip( unsigned mask, unsigned block_size )
 void
 PListDataSetCreate::set_shuffle ()
 {
+  m_impl.setClass(H5P_DATASET_CREATE);
   herr_t stat = H5Pset_shuffle( m_impl.id() ) ;
   if ( stat < 0 ) {
     throw Hdf5CallException ( ERR_LOC, "H5Pset_shuffle" ) ;
@@ -103,6 +108,7 @@ PListDataSetCreate::set_shuffle ()
 void
 PListDataSetCreate::set_nbit ()
 {
+  m_impl.setClass(H5P_DATASET_CREATE);
   herr_t stat = H5Pset_nbit ( m_impl.id() ) ;
   if ( stat < 0 ) {
     throw Hdf5CallException ( ERR_LOC, "H5Pset_nbit" ) ;

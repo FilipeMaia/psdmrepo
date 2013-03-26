@@ -49,6 +49,9 @@ class PListImpl  {
 public:
 
   // Default constructor
+  PListImpl();
+  
+  // Counstructor which accepts property list class
   PListImpl ( hid_t cls ) ;
 
   // Destructor
@@ -59,6 +62,11 @@ public:
   PListImpl& operator = ( const PListImpl& ) ;
 
   hid_t id() const { return m_id ; }
+  
+  bool isDefault() const { return m_id == H5P_DEFAULT; }
+
+  // changes class, only if id is H5P_DEFAULT
+  void setClass(hid_t cls);
 
 protected:
 

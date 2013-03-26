@@ -63,6 +63,9 @@ public:
   // use family driver
   void set_family_driver ( hsize_t memb_size, const PListFileAccess& memb_fapl ) ;
 
+  // define chunk cache parameters, see for parameter documentation
+  void set_cache(size_t rdcc_nelmts, size_t rdcc_nbytes, double rdcc_w0 = 0.75);
+
 protected:
 
 private:

@@ -15,6 +15,7 @@
 //-----------------
 #include <string>
 #include <iosfwd>
+#include <map>
 #include <boost/shared_ptr.hpp>
 
 //----------------------
@@ -124,10 +125,7 @@ public:
 
   // open existing data set
   DataSet openDataSet ( const std::string& name,
-      const PListDataSetAccess& plistDSaccess = PListDataSetAccess() ) const
-  {
-    return DataSet::openDataSet ( *m_id, name, plistDSaccess ) ;
-  }
+      const PListDataSetAccess& plistDSaccess = PListDataSetAccess() ) const;
 
   /**
    *   Create soft link
@@ -172,8 +170,11 @@ protected:
 
 private:
 
+  typedef std::map<std::string, DataSet> DsCache;
+
   // Data members
   boost::shared_ptr<hid_t> m_id ;
+  boost::shared_ptr<DsCache> m_dsCache;
 
 };
 

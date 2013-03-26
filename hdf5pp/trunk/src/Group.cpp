@@ -18,6 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <boost/make_shared.hpp>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -57,6 +58,7 @@ namespace hdf5pp {
 //----------------
 Group::Group ( hid_t grp )
   : m_id( new hid_t(grp), ::GroupPtrDeleter() )
+  , m_dsCache(boost::make_shared<DsCache>())
 {
   MsgLog(logger, debug, "Group ctor: " << *this) ;
 }
@@ -133,6 +135,19 @@ Group::parent() const
   if (p != std::string::npos) path.erase(p);
 
   return openGroup(*m_id, path);
+}
+
+// open existing data set
+DataSet
+Group::openDataSet (const std::string& name, const PListDataSetAccess& plistDSaccess) const
+{
+  DsCache::const_iterator it = m_dsCache->find(name);
+  if (it != m_dsCache->end()) return it->second;
+
+  DataSet res = DataSet::openDataSet ( *m_id, name, plistDSaccess ) ;
+  m_dsCache->insert(std::make_pair(name, res));
+
+  return res;
 }
 
 // Create soft link
