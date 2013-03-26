@@ -25,6 +25,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "hdf5pp/GroupIter.h"
+#include "hdf5pp/PListFileAccess.h"
 #include "PSHdf5Input/Exceptions.h"
 #include "PSHdf5Input/Hdf5ConfigIter.h"
 #include "PSHdf5Input/Hdf5EventId.h"
@@ -66,10 +67,18 @@ Hdf5FileIter::Hdf5FileIter (const std::string& fileName)
   , m_schemaVersion(0)
   , m_fullTsFormat(false)
 {
+  // Define file access properties.
+  // Do not want to cache too many chunks, but for some types chunks
+  // can be very big, up to 100MB. These numbers are per dataset.
+  hdf5pp::PListFileAccess fapl;
+  size_t rdcc_nelmts = 5;
+  size_t rdcc_nbytes = 101*1024*1024;  
+  fapl.set_cache(rdcc_nelmts, rdcc_nbytes, 0.9);
+
   // open a file
   try {
     MsgLog(logger, debug, "opening new file: " << m_fileName);
-    m_file = hdf5pp::File::open(m_fileName, hdf5pp::File::Read);
+    m_file = hdf5pp::File::open(m_fileName, hdf5pp::File::Read, fapl);
   } catch (const hdf5pp::Exception& ex) {
     throw FileOpenError(ERR_LOC, m_fileName, ex.what());
   }

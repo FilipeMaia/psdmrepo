@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-03
+2013-03-25 Andy Salnikov
+- change file access propery list to enable caching of datasets with large
+  chunk sizes
+
 Tag: V00-01-02
 2013-03-21 Andy Salnikov
 - improve event id generatrion for "end" transitions
