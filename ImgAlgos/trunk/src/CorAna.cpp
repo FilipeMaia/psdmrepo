@@ -51,6 +51,7 @@ CorAna::CorAna() : m_log(INPARS->get_ostream())
   printMetadata();
   printTimeRecords();
   printIndTau();
+  printTimeIndexToEventIndexArr();
 }
 
 //--------------
@@ -215,6 +216,22 @@ CorAna::printTimeRecords()
             << "\n";      
   }
   m_log << "\n";
+}
+
+//----------------
+
+void
+CorAna::printTimeIndexToEventIndexArr()
+{
+  m_log << "\nCorAna::printTimeIndexToEventIndexArr(): " 
+        << " size=" << m_tind_size  
+        << "\nPairs of tind:evind (evind=-1 means that the event for this ting is descarded by selection algorithm):" << "\n";
+  unsigned counter=0;
+  for(unsigned i=0; i<m_tind_size; i++) {
+    m_log << i << ":" << m_tind_to_evind[i] << "  ";
+    if ( ++counter>9 ) { counter=0; m_log << "\n"; }
+  }
+  m_log << "\n"; 
 }
 
 //----------------

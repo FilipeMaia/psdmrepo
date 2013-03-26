@@ -123,6 +123,7 @@ protected:
   void printMetadata();
   void readTimeRecordsFile();
   void printTimeRecords();
+  void printTimeIndexToEventIndexArr();
   void defineIndTau();
   int  readIndTauFromFile();
   void makeIndTau();

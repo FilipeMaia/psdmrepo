@@ -10,7 +10,10 @@ Package author: Mikhail S. Dubrovin
 
 Please describe any modifications that you made to the package in the
 reverse time order.
-
+Tag: V00-03-06	
+2013-03-24 Mikhail S. Dubrovin
+- in CorAna add print for event index vs tau index
+	
 Tag: V00-03-05	
 2013-03-22 Mikhail S. Dubrovin
 - for CorAna project make correct exchange between types in different modules:
