@@ -224,7 +224,7 @@ class ConfigParametersCorAna ( ConfigParameters ) :
 
         # GUISetupInfoLeft.py
         self.sample_det_dist    = self.declareParameter( name='SAMPLE_TO_DETECTOR_DISTANCE', val_def=4000.1,          type='float' )
-        self.exp_setup_geom     = self.declareParameter( name='EXP_SETUP_GEOMETRY',          val_def='Baem Zero',     type='str' )
+        self.exp_setup_geom     = self.declareParameter( name='EXP_SETUP_GEOMETRY',          val_def='Beam Zero',     type='str' )
         self.photon_energy      = self.declareParameter( name='PHOTON_ENERGY',               val_def=7.6543,          type='float' )
         self.nominal_angle      = self.declareParameter( name='NOMINAL_ANGLE',               val_def=-1,              type='float' )
         self.real_angle         = self.declareParameter( name='REAL_ANGLE',                  val_def=-1,              type='float' )
@@ -321,7 +321,7 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.thickness_type          = self.declareParameter( name='THICKNESS_TYPE',               val_def='NONORM',type='str' )
         self.thickness_sample        = self.declareParameter( name='THICKNESS_OF_SAMPLE',          val_def=-1,      type='float' )
         self.thickness_attlen        = self.declareParameter( name='THICKNESS_ATTENUATION_LENGTH', val_def=-2,      type='float' )
-        self.ccd_orient              = self.declareParameter( name='CCD_ORIENTATION',              val_def='180',   type='str' )
+        self.ccd_orient              = self.declareParameter( name='CCD_ORIENTATION',              val_def='0',     type='str' )
         self.y_is_flip               = self.declareParameter( name='Y_IS_FLIPPED',                 val_def='True',  type='bool' )
 
         # GUICCDSettings.py

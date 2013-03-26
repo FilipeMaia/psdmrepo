@@ -254,6 +254,12 @@ class GUIRunMerge ( QtGui.QWidget ) :
 
 
     def isReadyToStartRun(self):
+
+        if cp.autoRunStatus != 0 :            
+            msg = 'JOB IS NOT SUBMITTED !!! because Auto-processing procedure is active in stage '+str(cp.autoRunStatus)
+            logger.warning(msg, __name__)
+            return False 
+
         fstatus, fstatus_str = bjcora.status_for_cora_proc_files()
         if fstatus : 
             logger.info(fstatus_str, __name__)

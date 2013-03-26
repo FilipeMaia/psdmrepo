@@ -374,6 +374,11 @@ class GUIRunProc ( QtGui.QWidget ) :
 
     def isReadyToStartRun(self, ind):
 
+        if cp.autoRunStatus != 0 :            
+            msg = 'JOB IS NOT SUBMITTED !!! because Auto-processing procedure is active in stage '+str(cp.autoRunStatus)
+            logger.warning(msg, __name__)
+            return False 
+
         fname = fnm.get_list_of_files_cora_split_work()[ind]
         if not os.path.exists(fname) :
             msg1 = 'JOB IS NOT SUBMITTED !!!\nThe file ' + str(fname) + ' does not exist'

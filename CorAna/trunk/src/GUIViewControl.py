@@ -436,16 +436,24 @@ class GUIViewControl ( QtGui.QWidget ) :
     def drawPlot(self):
         try :
             self.redrawPlotResetLimits()
+            #print 'Redraw plot'
         except :
             #self.setImgArray()
-            cp.plotimgspe_g = PlotImgSpe(None, self.arr2d, title=self.getTitle()) 
+            if self.but_g2tau.hasFocus() :
+                cp.plotimgspe_g = PlotImgSpe(None, self.arr2d, title=self.getTitle(), orient=90, y_is_flip=True)
+            else :
+                cp.plotimgspe_g = PlotImgSpe(None, self.arr2d, title=self.getTitle(), \
+                                             orient=int(cp.ccd_orient.value()), y_is_flip=cp.y_is_flip.value()) 
             cp.plotimgspe_g.move(self.parentWidget().parentWidget().pos().__add__(QtCore.QPoint(850,20)))
             cp.plotimgspe_g.show()
 
 
     def redrawPlotResetLimits(self):
         self.setImgArray()
-        cp.plotimgspe_g.set_image_array_new(self.arr2d, self.getTitle())
+        if self.but_g2tau.hasFocus() :
+            cp.plotimgspe_g.set_image_array_new(self.arr2d, self.getTitle(), orient=90, y_is_flip=True)
+        else :
+            cp.plotimgspe_g.set_image_array_new(self.arr2d, self.getTitle(), orient=int(cp.ccd_orient.value()), y_is_flip=cp.y_is_flip.value())
 
 
     def redrawPlot(self):

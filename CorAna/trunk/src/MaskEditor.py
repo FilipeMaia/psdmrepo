@@ -86,6 +86,8 @@ class MaskEditor (QtGui.QWidget) :
         elif ifname != None : self.arr = gu.get_array_from_file(ifname)
         else                : self.arr = get_array2d_for_test()
 
+        if self.arr == None : self.arr = get_array2d_for_test()
+
         self.ifname = ifname
         self.title  = title
         ccd_rot_n90 = int(cp.ccd_orient.value())

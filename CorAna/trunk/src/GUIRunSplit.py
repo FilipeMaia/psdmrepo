@@ -255,9 +255,14 @@ class GUIRunSplit ( QtGui.QWidget ) :
 
     def isReadyToStartRun(self):
 
+        if cp.autoRunStatus != 0 :            
+            msg = 'JOB IS NOT SUBMITTED !!! because Auto-processing procedure is active in stage '+str(cp.autoRunStatus)
+            logger.warning(msg, __name__)
+            return False 
+
         msg1 = 'JOB IS NOT SUBMITTED !!!\nFirst, set the number of events for data.'
 
-        if  (cp.bat_data_end.value() == cp.bat_data_end.value_def()) :
+        if(cp.bat_data_end.value() == cp.bat_data_end.value_def()) :
             #self.edi_bat_end.setStyleSheet(cp.styleEditBad)
             logger.warning(msg1, __name__)
             return False

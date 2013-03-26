@@ -173,7 +173,9 @@ class PlotImgSpeWidget (QtGui.QWidget) :
         self.processDraw()
 
 
-    def set_image_array_new(self,arr):
+    def set_image_array_new(self, arr, rot_ang_n90=0, y_is_flip=False):
+        self.y_is_flip = y_is_flip
+        self.rot_ang_n90 = int(rot_ang_n90)
         self.arr = arr_rot_n90(arr, self.rot_ang_n90)
         self.on_draw()
 

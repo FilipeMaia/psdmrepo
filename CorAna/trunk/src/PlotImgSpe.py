@@ -60,7 +60,7 @@ class PlotImgSpe (QtGui.QWidget) :
     """Plots image and spectrum for 2d array"""
 
 
-    def __init__(self, parent=None, arr=None, ofname='./fig.png', title='Plot 2d array'):
+    def __init__(self, parent=None, arr=None, ofname='./fig.png', title='Plot 2d array', orient=0, y_is_flip=False ):
         #QtGui.QMainWindow.__init__(self, parent)
         QtGui.QWidget.__init__(self, parent)
         self.setGeometry(20, 40, 700, 800)
@@ -69,7 +69,7 @@ class PlotImgSpe (QtGui.QWidget) :
 
         self.ext_ref = None
 
-        self.widgimage   = imgwidg.PlotImgSpeWidget(parent, arr, int(cp.ccd_orient.value()), cp.y_is_flip.value())
+        self.widgimage   = imgwidg.PlotImgSpeWidget(parent, arr, orient, y_is_flip)
         self.widgbuts    = imgbuts.PlotImgSpeButtons(self, self.widgimage, ofname)
         #self.mpl_toolbar = imgtb.ImgSpeNavToolBar(self.widgimage, self)
  
@@ -94,8 +94,8 @@ class PlotImgSpe (QtGui.QWidget) :
         self.setWindowTitle(title)
 
 
-    def set_image_array_new(self,arr,title='Plot 2d array'):
-        self.widgimage.set_image_array_new(arr)
+    def set_image_array_new(self,arr,title='Plot 2d array', orient=0, y_is_flip=False):
+        self.widgimage.set_image_array_new(arr, orient, y_is_flip)
         self.setWindowTitle(title)
 
 

@@ -171,7 +171,9 @@ class BatchJobCorAna( BatchJob, QtCore.QObject ) : # need in QtCore.QObject in o
         self.kill_batch_job(self.job_id_cora_merge, 'for merge')
 
     def status_for_cora_merge_files(self, comment='of merge: ' ) :
-        return self.status_and_string_for_files(fnm.get_list_of_files_cora_merge(), comment )
+        fstatus, fstatus_str = self.status_and_string_for_files(fnm.get_list_of_files_cora_merge(), comment )
+        if fstatus : cp.res_fname.setValue(fnm.path_cora_merge_result())
+        return fstatus, fstatus_str
 
     def status_batch_job_for_cora_merge(self) :
         return self.get_batch_job_status_and_string(self.job_id_cora_merge, self.time_sub_merge)
