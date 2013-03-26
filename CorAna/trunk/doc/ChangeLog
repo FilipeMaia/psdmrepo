@@ -11,12 +11,17 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2013-03-25 Mikhail S. Dubrovin
+Tag: V00-00-09
+- minor improvements and extra protections in many places
+- do not rotate g2_vs_tau plot
+
 2013-03-22 Mikhail S. Dubrovin
 Tag: V00-00-08
 - use intensity monitors data for image correction
 - switch to the new pythonic interface for ELog submission with responce
 - many improvements in data processing; add mask for hot pixels using rms on dark, 
-	satturated pixels
+  satturated pixels
 	
 2013-03-12 Mikhail S. Dubrovin
 Tag: V00-00-07
