@@ -37,8 +37,9 @@ namespace hdf5pp {
 //----------------
 // Constructors --
 //----------------
-NameIter::NameIter (const Group& group)
+NameIter::NameIter (const Group& group, LinkType type)
   : m_group(group)
+  , m_type(type)
   , m_nlinks(0) 
   , m_idx(0)
 {
@@ -64,30 +65,43 @@ NameIter::next()
   const int maxsize = 255;
   char buf[maxsize+1];
 
-  // first try with the fixed buffer size
-  ssize_t size = H5Lget_name_by_idx(m_group.id(), ".", H5_INDEX_NAME, H5_ITER_NATIVE, m_idx, buf, maxsize, H5P_DEFAULT);
-  if (size < 0) {
-    throw Hdf5CallException( ERR_LOC, "H5Iget_name") ;
-  }
-  if (size == 0) {
-    // name is not known
-    m_idx ++;
-       return std::string();
-  }
-  if (size <= maxsize) {
-    // name has fit into buffer
-    m_idx ++;
-        return buf;
+  std::string result;
+  for (; result.empty() and m_idx < m_nlinks; ++ m_idx) {
+
+    if (m_type != Any) {
+      // test for link type
+      H5L_info_t linfo;
+      herr_t err = H5Lget_info_by_idx(m_group.id(), ".", H5_INDEX_NAME, H5_ITER_NATIVE, m_idx, &linfo, H5P_DEFAULT);
+      if (err < 0) {
+        throw Hdf5CallException( ERR_LOC, "H5Lget_info_by_idx") ;
+      }
+      if (not (linfo.type == H5L_TYPE_SOFT and int(m_type) & int(SoftLink)) and
+          not (linfo.type == H5L_TYPE_HARD and int(m_type) & int(HardLink))) continue;
+    }
+
+    // first try with the fixed buffer size
+    ssize_t size = H5Lget_name_by_idx(m_group.id(), ".", H5_INDEX_NAME, H5_ITER_NATIVE, m_idx, buf, maxsize, H5P_DEFAULT);
+    if (size < 0) {
+      throw Hdf5CallException( ERR_LOC, "H5Lget_name_by_idx") ;
+    }
+    if (size == 0) {
+      // name is not known
+      continue;
+    }
+    if (size <= maxsize) {
+      // name has fit into buffer
+      result = buf;
+    } else {
+      // another try with dynamically allocated buffer
+      char* dbuf = new char[size+1];
+      H5Lget_name_by_idx(m_group.id(), ".", H5_INDEX_NAME, H5_ITER_NATIVE, m_idx, dbuf, size, H5P_DEFAULT);
+      result = dbuf;
+      delete [] dbuf;
+    }
+
   }
 
-  // another try with dynamically allocated buffer
-  char* dbuf = new char[size+1];
-  H5Lget_name_by_idx(m_group.id(), ".", H5_INDEX_NAME, H5_ITER_NATIVE, m_idx, dbuf, size, H5P_DEFAULT);
-  std::string res(dbuf);
-  delete [] dbuf;
-  
-  m_idx ++;
-  return res;
+  return result;
 }
 
 } // namespace hdf5pp

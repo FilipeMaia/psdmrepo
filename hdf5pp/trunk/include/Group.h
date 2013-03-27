@@ -76,7 +76,7 @@ public:
 
   /// Open existing group, group name treated as relative to this group
   /// (if not absolute).
-  Group openGroup ( const std::string& name ) {
+  Group openGroup ( const std::string& name ) const {
     return openGroup ( *m_id, name ) ;
   }
 
@@ -134,6 +134,16 @@ public:
    *   @param[in] linkName   Name of this link, relative to this group
    */
   void makeSoftLink(const std::string& targetPath, const std::string& linkName);
+
+  /**
+   *   @brief Get link type.
+   */
+  H5L_type_t getLinkType(const std::string& linkName) const;
+
+  /**
+   *   @brief Get soft link value.
+   */
+  std::string getSoftLink(const std::string& linkName) const;
 
   // close the group
   void close() ;

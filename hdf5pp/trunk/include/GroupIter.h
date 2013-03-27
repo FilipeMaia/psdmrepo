@@ -54,6 +54,13 @@ namespace hdf5pp {
 class GroupIter  {
 public:
 
+  /// Enum specifying which links to include
+  enum LinkType {
+    HardLink = 0x1,
+    SoftLink = 0x2,
+    Any = 0x3
+  };
+
   /**
    *  @brief Constructor from existing group object.
    *  
@@ -62,7 +69,7 @@ public:
    *  
    *  Iterator will return all direct sub-groups of the specified group.
    */
-  GroupIter (const Group& group, bool skipSoft = false);
+  GroupIter (const Group& group, LinkType type = Any);
 
   // Destructor
   ~GroupIter () ;
@@ -79,7 +86,7 @@ protected:
 private:
 
   Group m_group;        ///< Group object
-  bool m_skipSoft;
+  LinkType m_type;      ///< type of links to include in iteration
   hsize_t m_nlinks;     ///< Total number of links in a group
   hsize_t m_idx;        ///< Current index
 };

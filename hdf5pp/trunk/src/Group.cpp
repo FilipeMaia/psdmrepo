@@ -160,6 +160,49 @@ Group::makeSoftLink(const std::string& targetPath, const std::string& linkName)
   }
 }
 
+// Get link type.
+H5L_type_t
+Group::getLinkType(const std::string& linkName) const
+{
+  H5L_info_t linkInfo;
+  herr_t err = H5Lget_info(*m_id, linkName.c_str(), &linkInfo, H5P_DEFAULT);
+  if ( err < 0 ) {
+    throw Hdf5CallException( ERR_LOC, "H5Lget_info") ;
+  }
+  return linkInfo.type;
+}
+
+// Get soft link value.
+std::string
+Group::getSoftLink(const std::string& linkName) const
+{
+  // check link type and get its size
+  H5L_info_t linkInfo;
+  herr_t err = H5Lget_info(*m_id, linkName.c_str(), &linkInfo, H5P_DEFAULT);
+  if ( err < 0 ) {
+    throw Hdf5CallException( ERR_LOC, "H5Lget_info") ;
+  }
+  if (linkInfo.type != H5L_TYPE_SOFT) {
+    throw Hdf5CallException( ERR_LOC, "H5Lget_val") ;
+  }
+
+  // allocate memory for link value
+  char buf[64];
+  char* p = buf;
+  if (linkInfo.u.val_size > sizeof buf) p = new char[linkInfo.u.val_size];
+
+  // get the value
+  err = H5Lget_val(*m_id, linkName.c_str(), p, linkInfo.u.val_size, H5P_DEFAULT);
+  if ( err < 0 ) {
+    throw Hdf5CallException( ERR_LOC, "H5Lget_val") ;
+  }
+  std::string res(p);
+
+  if (p != buf) delete [] p;
+
+  return res;
+}
+
 // close the group
 void
 Group::close()

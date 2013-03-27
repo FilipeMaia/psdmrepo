@@ -53,12 +53,19 @@ namespace hdf5pp {
 class NameIter  {
 public:
 
+  /// Enum specifying which links to include
+  enum LinkType {
+    HardLink = 0x1,
+    SoftLink = 0x2,
+    Any = 0x3
+  };
+
   /**
    *  @brief Constructor from existing group object.
    *  
    *  Iterator will return names of all links in the specified group.
    */
-  NameIter (const Group& group) ;
+  NameIter (const Group& group, LinkType type = Any);
 
   // Destructor
   ~NameIter () ;
@@ -66,7 +73,7 @@ public:
   /**
    *  @brief Returns next name.
    *  
-   *  If there are no more groups then empty string will be returned.
+   *  If there are no more links then empty string will be returned.
    */
   std::string next();
   
@@ -75,6 +82,7 @@ protected:
 private:
 
   Group m_group;        ///< Group object
+  LinkType m_type;      ///< type of links to include in iteration
   hsize_t m_nlinks;     ///< Total number of links in a group
   hsize_t m_idx;        ///< Cuyrrent index
 };
