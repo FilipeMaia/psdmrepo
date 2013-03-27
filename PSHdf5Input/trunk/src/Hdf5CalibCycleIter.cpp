@@ -59,7 +59,7 @@ Hdf5CalibCycleIter::Hdf5CalibCycleIter (const hdf5pp::Group& grp, int runNumber,
     if (grp1.basename() == "Epics::EpicsPv") {
       
       for (hdf5pp::Group grp2 = subgiter.next(); grp2.valid(); grp2 = subgiter.next()) {
-        hdf5pp::GroupIter subgiter2(grp2, true);
+        hdf5pp::GroupIter subgiter2(grp2, hdf5pp::GroupIter::HardLink);
         for (hdf5pp::Group grp3 = subgiter2.next(); grp3.valid(); grp3 = subgiter2.next()) {
           if (grp3.hasChild("time")) {
             Hdf5DatasetIter begin(grp3, m_fullTsFormat);

@@ -156,7 +156,10 @@ Hdf5FileIter::next()
 
           hdf5pp::GroupIter subgiter(grp1);
           for (hdf5pp::Group grp2 = subgiter.next(); grp2.valid(); grp2 = subgiter.next()) {
-            hdf5pp::GroupIter subgiter2(grp2, true);
+            // store this group so that converter can find aliases
+            res.add(grp2, -1);
+            // Do not include soft links
+            hdf5pp::GroupIter subgiter2(grp2, hdf5pp::GroupIter::HardLink);
             for (hdf5pp::Group grp3 = subgiter2.next(); grp3.valid(); grp3 = subgiter2.next()) {
               res.add(grp3, 0);
             }
