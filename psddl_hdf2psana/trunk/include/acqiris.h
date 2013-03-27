@@ -1,6 +1,26 @@
-#ifndef PSDDL_HDF2PSANA_ACQIRIS_DDLM_H
-#define PSDDL_HDF2PSANA_ACQIRIS_DDLM_H
+#ifndef PSDDL_HDF2PSANA_ACQIRIS_H
+#define PSDDL_HDF2PSANA_ACQIRIS_H
 
+//--------------------------------------------------------------------------
+// File and Version Information:
+//      $Id$
+//
+// Description:
+//      Hand-written supporting types for DDL-HDF5 mapping.
+//
+//------------------------------------------------------------------------
+
+//-----------------
+// C/C++ Headers --
+//-----------------
+
+//----------------------
+// Base Class Headers --
+//----------------------
+
+//-------------------------------
+// Collaborating Class Headers --
+//-------------------------------
 #include "hdf5pp/Group.h"
 #include "hdf5pp/Type.h"
 #include "psddl_psana/acqiris.ddl.h"
@@ -8,47 +28,6 @@
 
 namespace psddl_hdf2psana {
 namespace Acqiris {
-
-// This is not used but psddl-generated code needs this class definition
-class Proxy_TdcDataV1Common_v0 : public PSEvt::Proxy<Psana::Acqiris::TdcDataV1Common> {
-public:
-  typedef Psana::Acqiris::TdcDataV1Common PsanaType;
-
-  Proxy_TdcDataV1Common_v0(hdf5pp::Group group, hsize_t idx) {}
-
-protected:
-  virtual boost::shared_ptr<PsanaType> getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key) {
-    return boost::shared_ptr<PsanaType>();
-  }
-};
-
-// This is not used but psddl-generated code needs this class definition
-class Proxy_TdcDataV1Channel_v0 : public PSEvt::Proxy<Psana::Acqiris::TdcDataV1Channel> {
-public:
-  typedef Psana::Acqiris::TdcDataV1Channel PsanaType;
-
-  Proxy_TdcDataV1Channel_v0(hdf5pp::Group group, hsize_t idx) {}
-
-protected:
-  virtual boost::shared_ptr<PsanaType> getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key) {
-    return boost::shared_ptr<PsanaType>();
-  }
-};
-
-// This is not used but psddl-generated code needs this class definition
-class Proxy_TdcDataV1Marker_v0 : public PSEvt::Proxy<Psana::Acqiris::TdcDataV1Marker> {
-public:
-  typedef Psana::Acqiris::TdcDataV1Marker PsanaType;
-
-  Proxy_TdcDataV1Marker_v0(hdf5pp::Group group, hsize_t idx) {}
-
-protected:
-  virtual boost::shared_ptr<PsanaType> getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key) {
-    return boost::shared_ptr<PsanaType>();
-  }
-};
-
-
 
 
 template <typename Config>
@@ -113,4 +92,4 @@ private:
 } // namespace Acqiris
 } // namespace psddl_hdf2psana
 
-#endif // PSDDL_HDF2PSANA_ACQIRIS_DDLM_H
+#endif // PSDDL_HDF2PSANA_ACQIRIS_H

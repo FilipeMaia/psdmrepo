@@ -1,9 +1,29 @@
-#ifndef PSDDL_HDF2PSANA_USDUSB_DDLM_H
-#define PSDDL_HDF2PSANA_USDUSB_DDLM_H 1
+#ifndef PSDDL_HDF2PSANA_USDUSB_H
+#define PSDDL_HDF2PSANA_USDUSB_H 1
 
-#include "psddl_psana/usdusb.ddl.h"
+//--------------------------------------------------------------------------
+// File and Version Information:
+//      $Id$
+//
+// Description:
+//      Hand-written supporting types for DDL-HDF5 mapping.
+//
+//------------------------------------------------------------------------
+
+//-----------------
+// C/C++ Headers --
+//-----------------
+
+//----------------------
+// Base Class Headers --
+//----------------------
+
+//-------------------------------
+// Collaborating Class Headers --
+//-------------------------------
 #include "hdf5pp/Group.h"
 #include "hdf5pp/Type.h"
+#include "psddl_psana/usdusb.ddl.h"
 
 namespace psddl_hdf2psana {
 namespace UsdUsb {
@@ -54,4 +74,4 @@ private:
 } // namespace UsdUsb
 } // namespace psddl_hdf2psana
 
-#endif // PSDDL_HDF2PSANA_USDUSB_DDLM_H
+#endif // PSDDL_HDF2PSANA_USDUSB_H

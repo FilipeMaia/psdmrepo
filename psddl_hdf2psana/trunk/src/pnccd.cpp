@@ -1,13 +1,35 @@
-#include "psddl_hdf2psana/pnccd.ddlm.h"
+//--------------------------------------------------------------------------
+// File and Version Information:
+//      $Id$
+//
+// Description:
+//      Hand-written supporting types for DDL-HDF5 mapping.
+//
+//------------------------------------------------------------------------
 
+//-----------------------
+// This Class's Header --
+//-----------------------
+#include "psddl_hdf2psana/pnccd.h"
+
+//-----------------
+// C/C++ Headers --
+//-----------------
 #include <iterator>
 
+//-------------------------------
+// Collaborating Class Headers --
+//-------------------------------
 #include "hdf5pp/ArrayType.h"
 #include "hdf5pp/CompoundType.h"
 #include "hdf5pp/EnumType.h"
 #include "hdf5pp/VlenType.h"
 #include "hdf5pp/Utils.h"
 #include "MsgLogger/MsgLogger.h"
+
+//-----------------------------------------------------------------------
+// Local Macros, Typedefs, Structures, Unions and Forward Declarations --
+//-----------------------------------------------------------------------
 
 namespace {
 
@@ -24,6 +46,9 @@ namespace {
 
 }
 
+//              ----------------------------------------
+//              -- Public Function Member Definitions --
+//              ----------------------------------------
 
 
 namespace psddl_hdf2psana {

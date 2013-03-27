@@ -8,11 +8,11 @@
 #include "hdf5pp/VlenType.h"
 #include "hdf5pp/Utils.h"
 #include "PSEvt/DataProxy.h"
-#include "psddl_hdf2psana/acqiris.ddlm.h"
-#include "psddl_hdf2psana/acqiris.ddlm.h"
-#include "psddl_hdf2psana/acqiris.ddlm.h"
-#include "psddl_hdf2psana/acqiris.ddlm.h"
-#include "psddl_hdf2psana/acqiris.ddlm.h"
+#include "psddl_hdf2psana/acqiris.h"
+#include "psddl_hdf2psana/acqiris.h"
+#include "psddl_hdf2psana/acqiris.h"
+#include "psddl_hdf2psana/acqiris.h"
+#include "psddl_hdf2psana/acqiris.h"
 namespace psddl_hdf2psana {
 namespace Acqiris {
 
@@ -54,24 +54,6 @@ ns_VertV1_v0::dataset_data::dataset_data()
 }
 ns_VertV1_v0::dataset_data::~dataset_data()
 {
-}
-boost::shared_ptr<Psana::Acqiris::VertV1>
-Proxy_VertV1_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key)
-{
-  if (not m_data) {
-    boost::shared_ptr<Acqiris::ns_VertV1_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<Acqiris::ns_VertV1_v0::dataset_data>(m_group, "data", m_idx);
-    m_data.reset(new PsanaType(ds_data->fullScale, ds_data->offset, ds_data->coupling, ds_data->bandwidth));
-  }
-  return m_data;
-}
-
-boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::VertV1> > make_VertV1(int version, hdf5pp::Group group, hsize_t idx) {
-  switch (version) {
-  case 0:
-    return boost::make_shared<Proxy_VertV1_v0>(group, idx);
-  default:
-    return boost::make_shared<PSEvt::DataProxy<Psana::Acqiris::VertV1> >(boost::shared_ptr<Psana::Acqiris::VertV1>());
-  }
 }
 
 hdf5pp::Type ns_HorizV1_v0_dataset_data_stored_type()

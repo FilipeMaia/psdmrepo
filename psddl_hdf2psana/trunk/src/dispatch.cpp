@@ -474,10 +474,6 @@ try {
     // Acqiris::TrigV1
     evt.putProxy(psddl_hdf2psana::Acqiris::make_TrigV1(schema_version, group, idx), src);
     break;
-  case 3210462341:
-    // Acqiris::VertV1
-    evt.putProxy(psddl_hdf2psana::Acqiris::make_VertV1(schema_version, group, idx), src);
-    break;
   case 3467424660:
     // CsPad::DataV2
     if (boost::shared_ptr<Psana::CsPad::ConfigV2> cfgPtr = cfgStore.get(src)) {

@@ -8,8 +8,8 @@
 #include "hdf5pp/VlenType.h"
 #include "hdf5pp/Utils.h"
 #include "PSEvt/DataProxy.h"
-#include "psddl_hdf2psana/cspad.ddlm.h"
-#include "psddl_hdf2psana/cspad.ddlm.h"
+#include "psddl_hdf2psana/cspad.h"
+#include "psddl_hdf2psana/cspad.h"
 namespace psddl_hdf2psana {
 namespace CsPad {
 

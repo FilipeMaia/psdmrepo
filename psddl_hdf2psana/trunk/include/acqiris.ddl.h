@@ -26,24 +26,6 @@ struct dataset_data {
   operator Psana::Acqiris::VertV1() const { return Psana::Acqiris::VertV1(fullScale, offset, coupling, bandwidth); }
 };
 }
-class Proxy_VertV1_v0 : public PSEvt::Proxy<Psana::Acqiris::VertV1> {
-public:
-  typedef Psana::Acqiris::VertV1 PsanaType;
-
-  Proxy_VertV1_v0(hdf5pp::Group group, hsize_t idx) : m_group(group), m_idx(idx) {}
-  virtual ~Proxy_VertV1_v0() {}
-
-protected:
-
-  virtual boost::shared_ptr<PsanaType> getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key);
-
-private:
-
-  mutable hdf5pp::Group m_group;
-  hsize_t m_idx;
-  boost::shared_ptr<PsanaType> m_data;
-};
-boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::VertV1> > make_VertV1(int version, hdf5pp::Group group, hsize_t idx);
 
 namespace ns_HorizV1_v0 {
 struct dataset_data {

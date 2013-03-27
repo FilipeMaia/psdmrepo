@@ -11,7 +11,7 @@
     
         <h5schema name="FrameV1" version="0">
 
-            <tag name="external" value="psddl_hdf2psana/camera.ddlm.h"/>
+            <tag name="external" value="psddl_hdf2psana/camera.h"/>
             
         </h5schema>
     

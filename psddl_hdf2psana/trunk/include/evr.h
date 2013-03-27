@@ -1,13 +1,32 @@
-#ifndef PSDDL_HDF2PSANA_EVR_DDLM_H
-#define PSDDL_HDF2PSANA_EVR_DDLM_H
+#ifndef PSDDL_HDF2PSANA_EVR_H
+#define PSDDL_HDF2PSANA_EVR_H
 
+//--------------------------------------------------------------------------
+// File and Version Information:
+//      $Id$
+//
+// Description:
+//      Hand-written supporting types for DDL-HDF5 mapping.
+//
+//------------------------------------------------------------------------
+
+//-----------------
+// C/C++ Headers --
+//-----------------
 #include <boost/shared_ptr.hpp>
 
+//----------------------
+// Base Class Headers --
+//----------------------
+
+//-------------------------------
+// Collaborating Class Headers --
+//-------------------------------
 #include "hdf5pp/Group.h"
-#include "psddl_hdf2psana/evr.ddl.h"
-#include "psddl_hdf2psana/xtc.ddlm.h"
-#include "psddl_psana/evr.ddl.h"
 #include "PSEvt/Proxy.h"
+#include "psddl_hdf2psana/evr.ddl.h"
+#include "psddl_hdf2psana/xtc.h"
+#include "psddl_psana/evr.ddl.h"
 
 namespace psddl_hdf2psana {
 namespace EvrData {

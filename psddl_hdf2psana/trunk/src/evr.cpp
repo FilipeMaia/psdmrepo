@@ -1,11 +1,37 @@
-#include "psddl_hdf2psana/evr.ddlm.h"
+//--------------------------------------------------------------------------
+// File and Version Information:
+//      $Id$
+//
+// Description:
+//      Hand-written supporting types for DDL-HDF5 mapping.
+//
+//------------------------------------------------------------------------
 
+//-----------------------
+// This Class's Header --
+//-----------------------
+#include "psddl_hdf2psana/evr.h"
+
+//-----------------
+// C/C++ Headers --
+//-----------------
 #include <boost/make_shared.hpp>
 
+//-------------------------------
+// Collaborating Class Headers --
+//-------------------------------
 #include "hdf5pp/CompoundType.h"
 #include "hdf5pp/EnumType.h"
 #include "hdf5pp/Utils.h"
 #include "hdf5pp/VlenType.h"
+
+//-----------------------------------------------------------------------
+// Local Macros, Typedefs, Structures, Unions and Forward Declarations --
+//-----------------------------------------------------------------------
+
+//              ----------------------------------------
+//              -- Public Function Member Definitions --
+//              ----------------------------------------
 
 namespace psddl_hdf2psana {
 namespace EvrData {

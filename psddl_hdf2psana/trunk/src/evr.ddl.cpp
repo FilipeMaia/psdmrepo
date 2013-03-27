@@ -8,9 +8,9 @@
 #include "hdf5pp/VlenType.h"
 #include "hdf5pp/Utils.h"
 #include "PSEvt/DataProxy.h"
-#include "psddl_hdf2psana/evr.ddlm.h"
-#include "psddl_hdf2psana/evr.ddlm.h"
-#include "psddl_hdf2psana/evr.ddlm.h"
+#include "psddl_hdf2psana/evr.h"
+#include "psddl_hdf2psana/evr.h"
+#include "psddl_hdf2psana/evr.h"
 namespace psddl_hdf2psana {
 namespace EvrData {
 

@@ -10,7 +10,7 @@
         <!-- ========================================================================= -->
 
         <h5schema name="FccdConfigV2" version="0">
-            <tag name="external" value="psddl_hdf2psana/fccd.ddlm.h"/>
+            <tag name="external" value="psddl_hdf2psana/fccd.h"/>
         </h5schema>
 
         <!-- ========================================================================= -->

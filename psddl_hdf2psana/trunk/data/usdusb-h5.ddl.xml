@@ -22,7 +22,7 @@
     
         <h5schema name="DataV1" version="0">
 
-            <tag name="external" value="psddl_hdf2psana/usdusb.ddlm.h"/>
+            <tag name="external" value="psddl_hdf2psana/usdusb.h"/>
             
         </h5schema>
     

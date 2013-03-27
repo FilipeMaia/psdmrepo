@@ -1,12 +1,32 @@
-#ifndef PSDDL_HDF2PSANA_BLD_DDLM_H
-#define PSDDL_HDF2PSANA_BLD_DDLM_H
+#ifndef PSDDL_HDF2PSANA_BLD_H
+#define PSDDL_HDF2PSANA_BLD_H
 
+//--------------------------------------------------------------------------
+// File and Version Information:
+//      $Id$
+//
+// Description:
+//      Hand-written supporting types for DDL-HDF5 mapping.
+//
+//------------------------------------------------------------------------
+
+//-----------------
+// C/C++ Headers --
+//-----------------
+
+//----------------------
+// Base Class Headers --
+//----------------------
+
+//-------------------------------
+// Collaborating Class Headers --
+//-------------------------------
 #include "hdf5pp/Group.h"
 #include "hdf5pp/Type.h"
-#include "psddl_psana/bld.ddl.h"
-#include "psddl_hdf2psana/camera.ddlm.h"
+#include "psddl_hdf2psana/camera.h"
 #include "psddl_hdf2psana/lusi.ddl.h"
 #include "psddl_hdf2psana/pulnix.ddl.h"
+#include "psddl_psana/bld.ddl.h"
 
 namespace psddl_hdf2psana {
 namespace Bld {

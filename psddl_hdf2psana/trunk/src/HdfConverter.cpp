@@ -32,7 +32,7 @@
 #include "psddl_hdf2psana/Exceptions.h"
 #include "psddl_hdf2psana/dispatch.h"
 #include "psddl_hdf2psana/bld.ddl.h"
-#include "psddl_hdf2psana/epics.ddlm.h"
+#include "psddl_hdf2psana/epics.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --

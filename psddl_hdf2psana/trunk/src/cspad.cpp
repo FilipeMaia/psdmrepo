@@ -1,18 +1,44 @@
-#include "psddl_hdf2psana/cspad.ddlm.h"
+//--------------------------------------------------------------------------
+// File and Version Information:
+//      $Id$
+//
+// Description:
+//      Hand-written supporting types for DDL-HDF5 mapping.
+//
+//------------------------------------------------------------------------
 
+//-----------------------
+// This Class's Header --
+//-----------------------
+#include "psddl_hdf2psana/cspad.h"
+
+//-----------------
+// C/C++ Headers --
+//-----------------
 #include <algorithm>
 #include <boost/make_shared.hpp>
 
+//-------------------------------
+// Collaborating Class Headers --
+//-------------------------------
 #include "hdf5pp/CompoundType.h"
 #include "hdf5pp/EnumType.h"
 #include "hdf5pp/Utils.h"
 #include "MsgLogger/MsgLogger.h"
+
+//-----------------------------------------------------------------------
+// Local Macros, Typedefs, Structures, Unions and Forward Declarations --
+//-----------------------------------------------------------------------
 
 namespace {
 
   const char logger[] = "psddl_hdf2psana.CsPad";
 
 }
+
+//              ----------------------------------------
+//              -- Public Function Member Definitions --
+//              ----------------------------------------
 
 namespace psddl_hdf2psana {
 namespace CsPad {

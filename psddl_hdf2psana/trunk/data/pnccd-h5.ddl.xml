@@ -10,15 +10,15 @@
         <!-- ========================================================================= -->
         <h5schema name="FrameV1" version="0">
             <tag name="skip-proxy"/>
-            <tag name="external" value="psddl_hdf2psana/pnccd.ddlm.h"/>
+            <tag name="external" value="psddl_hdf2psana/pnccd.h"/>
         </h5schema>
         <!-- ========================================================================= -->
         <h5schema name="FullFrameV1" version="0">
-            <tag name="external" value="psddl_hdf2psana/pnccd.ddlm.h"/>
+            <tag name="external" value="psddl_hdf2psana/pnccd.h"/>
         </h5schema>
         <!-- ========================================================================= -->
         <h5schema name="FramesV1" version="0">
-            <tag name="external" value="psddl_hdf2psana/pnccd.ddlm.h"/>
+            <tag name="external" value="psddl_hdf2psana/pnccd.h"/>
         </h5schema>
         <!-- ========================================================================= -->
 

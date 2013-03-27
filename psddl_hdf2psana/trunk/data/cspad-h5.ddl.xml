@@ -163,7 +163,7 @@
         </h5schema>
         
         <h5schema name="DataV1" version="0">
-            <tag name="external" value="psddl_hdf2psana/cspad.ddlm.h"/>
+            <tag name="external" value="psddl_hdf2psana/cspad.h"/>
         </h5schema>
 
         <h5schema name="ElementV2" version="0">
@@ -186,7 +186,7 @@
         </h5schema>
         
         <h5schema name="DataV2" version="0">
-            <tag name="external" value="psddl_hdf2psana/cspad.ddlm.h"/>
+            <tag name="external" value="psddl_hdf2psana/cspad.h"/>
         </h5schema>
         
     </package>

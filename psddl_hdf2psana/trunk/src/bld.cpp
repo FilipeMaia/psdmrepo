@@ -1,13 +1,38 @@
-#include "psddl_hdf2psana/bld.ddlm.h"
+//--------------------------------------------------------------------------
+// File and Version Information:
+//      $Id$
+//
+// Description:
+//      Hand-written supporting types for DDL-HDF5 mapping.
+//
+//------------------------------------------------------------------------
 
+//-----------------------
+// This Class's Header --
+//-----------------------
+#include "psddl_hdf2psana/bld.h"
 
+//-----------------
+// C/C++ Headers --
+//-----------------
 #include <boost/make_shared.hpp>
 
+//-------------------------------
+// Collaborating Class Headers --
+//-------------------------------
 #include "hdf5pp/CompoundType.h"
 #include "hdf5pp/TypeTraits.h"
 #include "hdf5pp/Utils.h"
 #include "psddl_hdf2psana/lusi.ddl.h"
 #include "psddl_hdf2psana/pulnix.ddl.h"
+
+//-----------------------------------------------------------------------
+// Local Macros, Typedefs, Structures, Unions and Forward Declarations --
+//-----------------------------------------------------------------------
+
+//              ----------------------------------------
+//              -- Public Function Member Definitions --
+//              ----------------------------------------
 
 namespace psddl_hdf2psana {
 namespace Bld {

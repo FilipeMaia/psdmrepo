@@ -8,7 +8,7 @@
 #include "hdf5pp/VlenType.h"
 #include "hdf5pp/Utils.h"
 #include "PSEvt/DataProxy.h"
-#include "psddl_hdf2psana/bld.ddlm.h"
+#include "psddl_hdf2psana/bld.h"
 namespace psddl_hdf2psana {
 namespace Bld {
 

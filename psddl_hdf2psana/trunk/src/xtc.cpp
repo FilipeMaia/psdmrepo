@@ -1,10 +1,37 @@
+//--------------------------------------------------------------------------
+// File and Version Information:
+//      $Id$
+//
+// Description:
+//      Hand-written supporting types for DDL-HDF5 mapping.
+//
+//------------------------------------------------------------------------
+
+//-----------------------
+// This Class's Header --
+//-----------------------
+#include "psddl_hdf2psana/xtc.h"
+
+//-----------------
+// C/C++ Headers --
+//-----------------
 #include <cstring>
 
-#include "psddl_hdf2psana/xtc.ddlm.h"
+//-------------------------------
+// Collaborating Class Headers --
+//-------------------------------
 #include "hdf5pp/CompoundType.h"
 #include "hdf5pp/EnumType.h"
 #include "hdf5pp/Utils.h"
 #include "PSEvt/DataProxy.h"
+
+//-----------------------------------------------------------------------
+// Local Macros, Typedefs, Structures, Unions and Forward Declarations --
+//-----------------------------------------------------------------------
+
+//              ----------------------------------------
+//              -- Public Function Member Definitions --
+//              ----------------------------------------
 
 namespace Pds {
 

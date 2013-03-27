@@ -1,8 +1,35 @@
-#include "psddl_hdf2psana/usdusb.ddlm.h"
+//--------------------------------------------------------------------------
+// File and Version Information:
+//      $Id$
+//
+// Description:
+//      Hand-written supporting types for DDL-HDF5 mapping.
+//
+//------------------------------------------------------------------------
 
+//-----------------------
+// This Class's Header --
+//-----------------------
+#include "psddl_hdf2psana/usdusb.h"
+
+//-----------------
+// C/C++ Headers --
+//-----------------
+
+//-------------------------------
+// Collaborating Class Headers --
+//-------------------------------
 #include "hdf5pp/CompoundType.h"
 #include "hdf5pp/EnumType.h"
 #include "hdf5pp/Utils.h"
+
+//-----------------------------------------------------------------------
+// Local Macros, Typedefs, Structures, Unions and Forward Declarations --
+//-----------------------------------------------------------------------
+
+//              ----------------------------------------
+//              -- Public Function Member Definitions --
+//              ----------------------------------------
 
 namespace psddl_hdf2psana {
 namespace UsdUsb {

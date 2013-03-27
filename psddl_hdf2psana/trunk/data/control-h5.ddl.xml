@@ -5,7 +5,7 @@
 
     <use file="psddldata/control.ddl.xml" />
 
-    <use file="psddl_hdf2psana/xtc-h5.ddl.xml" cpp_headers="psddl_hdf2psana/xtc.ddlm.h"/>
+    <use file="psddl_hdf2psana/xtc-h5.ddl.xml" cpp_headers="psddl_hdf2psana/xtc.h"/>
     
     <package name="ControlData">
     

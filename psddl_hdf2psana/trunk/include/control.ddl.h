@@ -8,7 +8,7 @@
 #include "hdf5pp/Type.h"
 #include "PSEvt/Proxy.h"
 #include "pdsdata/xtc/ClockTime.hh"
-#include "psddl_hdf2psana/xtc.ddlm.h"
+#include "psddl_hdf2psana/xtc.h"
 namespace psddl_hdf2psana {
 namespace ControlData {
 

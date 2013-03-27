@@ -1,8 +1,27 @@
-#ifndef PSDDL_HDF2PSANA_CAMERA_DDLM_H
-#define PSDDL_HDF2PSANA_CAMERA_DDLM_H
+#ifndef PSDDL_HDF2PSANA_CAMERA_H
+#define PSDDL_HDF2PSANA_CAMERA_H
 
+//--------------------------------------------------------------------------
+// File and Version Information:
+//      $Id$
+//
+// Description:
+//      Hand-written supporting types for DDL-HDF5 mapping.
+//
+//------------------------------------------------------------------------
+
+//-----------------
+// C/C++ Headers --
+//-----------------
 #include <boost/shared_ptr.hpp>
 
+//----------------------
+// Base Class Headers --
+//----------------------
+
+//-------------------------------
+// Collaborating Class Headers --
+//-------------------------------
 #include "hdf5pp/Group.h"
 #include "psddl_psana/camera.ddl.h"
 
@@ -69,4 +88,4 @@ private:
 } // namespace Camera
 } // namespace psddl_hdf2psana
 
-#endif // PSDDL_HDF2PSANA_CAMERA_DDLM_H
+#endif // PSDDL_HDF2PSANA_CAMERA_H

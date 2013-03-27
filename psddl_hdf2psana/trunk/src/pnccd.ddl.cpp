@@ -8,9 +8,9 @@
 #include "hdf5pp/VlenType.h"
 #include "hdf5pp/Utils.h"
 #include "PSEvt/DataProxy.h"
-#include "psddl_hdf2psana/pnccd.ddlm.h"
-#include "psddl_hdf2psana/pnccd.ddlm.h"
-#include "psddl_hdf2psana/pnccd.ddlm.h"
+#include "psddl_hdf2psana/pnccd.h"
+#include "psddl_hdf2psana/pnccd.h"
+#include "psddl_hdf2psana/pnccd.h"
 namespace psddl_hdf2psana {
 namespace PNCCD {
 

@@ -31,7 +31,7 @@
     
         <h5schema name="DataV3" version="0">
 
-            <tag name="external" value="psddl_hdf2psana/evr.ddlm.h"/>
+            <tag name="external" value="psddl_hdf2psana/evr.h"/>
             
         </h5schema>
     
@@ -100,7 +100,7 @@
         <h5schema name="IOChannel" version="0">
 
             <tag name="skip-proxy"/>
-            <tag name="external" value="psddl_hdf2psana/evr.ddlm.h"/>
+            <tag name="external" value="psddl_hdf2psana/evr.h"/>
             
         </h5schema>
     
@@ -108,7 +108,7 @@
     
         <h5schema name="IOConfigV1" version="0">
 
-            <tag name="external" value="psddl_hdf2psana/evr.ddlm.h"/>
+            <tag name="external" value="psddl_hdf2psana/evr.h"/>
             
         </h5schema>
     

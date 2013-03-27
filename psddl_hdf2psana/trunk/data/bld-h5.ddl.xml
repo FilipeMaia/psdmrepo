@@ -76,7 +76,7 @@
     
         <h5schema name="BldDataPimV1" version="0">
 
-            <tag name="external" value="psddl_hdf2psana/bld.ddlm.h"/>
+            <tag name="external" value="psddl_hdf2psana/bld.h"/>
             
         </h5schema>
 

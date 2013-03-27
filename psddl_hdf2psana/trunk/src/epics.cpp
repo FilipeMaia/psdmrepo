@@ -1,8 +1,25 @@
+//--------------------------------------------------------------------------
+// File and Version Information:
+//      $Id$
+//
+// Description:
+//      Hand-written supporting types for DDL-HDF5 mapping.
+//
+//------------------------------------------------------------------------
 
-#include "psddl_hdf2psana/epics.ddlm.h"
+//-----------------------
+// This Class's Header --
+//-----------------------
+#include "psddl_hdf2psana/epics.h"
 
+//-----------------
+// C/C++ Headers --
+//-----------------
 #include <boost/make_shared.hpp>
 
+//-------------------------------
+// Collaborating Class Headers --
+//-------------------------------
 #include "hdf5pp/ArrayType.h"
 #include "hdf5pp/CompoundType.h"
 #include "hdf5pp/EnumType.h"
@@ -11,6 +28,10 @@
 #include "MsgLogger/MsgLogger.h"
 #include "psddl_hdf2psana/epics.ddl.h"
 #include "psddl_psana/EpicsLib.h"
+
+//-----------------------------------------------------------------------
+// Local Macros, Typedefs, Structures, Unions and Forward Declarations --
+//-----------------------------------------------------------------------
 
 namespace {
 
@@ -23,6 +44,9 @@ namespace {
 
 }
 
+//              ----------------------------------------
+//              -- Public Function Member Definitions --
+//              ----------------------------------------
 
 // bleh
 #define ATTR_SPEC(TYPE, MEMBER, OFFSET) #MEMBER, OFFSET + offsetof(TYPE, MEMBER), hdf5pp::TypeTraits<typeof(((TYPE*)0)->MEMBER)>::native_type()

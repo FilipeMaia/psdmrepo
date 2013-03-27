@@ -1,6 +1,26 @@
-#ifndef PSDDL_HDF2PSANA_CSPAD_DDLM_H
-#define PSDDL_HDF2PSANA_CSPAD_DDLM_H 1
+#ifndef PSDDL_HDF2PSANA_CSPAD_H
+#define PSDDL_HDF2PSANA_CSPAD_H 1
 
+//--------------------------------------------------------------------------
+// File and Version Information:
+//      $Id$
+//
+// Description:
+//      Hand-written supporting types for DDL-HDF5 mapping.
+//
+//------------------------------------------------------------------------
+
+//-----------------
+// C/C++ Headers --
+//-----------------
+
+//----------------------
+// Base Class Headers --
+//----------------------
+
+//-------------------------------
+// Collaborating Class Headers --
+//-------------------------------
 #include "psddl_hdf2psana/cspad.ddl.h"
 
 
@@ -151,4 +171,4 @@ private:
 } // namespace CsPad
 } // namespace psddl_hdf2psana
 
-#endif // PSDDL_HDF2PSANA_CSPAD_DDLM_H
+#endif // PSDDL_HDF2PSANA_CSPAD_H
