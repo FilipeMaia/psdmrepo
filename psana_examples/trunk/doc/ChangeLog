@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-14
+2013-03-27 Andy Salnikov
+- DumpEpics now prints list of aliases in beginCalibCycle()
+
 Tag: V00-03-13
 2013-03-27 Andy Salnikov
 - dump more info for cspad and cspad2x2

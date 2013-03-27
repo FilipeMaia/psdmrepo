@@ -18,7 +18,8 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
-#include <iostream>
+#include <vector>
+#include <algorithm>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -53,6 +54,25 @@ DumpEpics::~DumpEpics ()
 {
 }
 
+/// Method which is called at the beginning of the calibration cycle
+void
+DumpEpics::beginCalibCycle(Event& evt, Env& env)
+{
+  const EpicsStore& estore = env.epicsStore();
+
+  // Print the list of aliases
+  const std::vector<std::string>& aliases = estore.aliases();
+  WithMsgLog(name(), info, str) {
+    str << "Total number of EPICS Aliases: " << aliases.size();
+    for (std::vector<std::string>::const_iterator it = aliases.begin(); it != aliases.end(); ++ it) {
+      str << "\n  '" << *it << "' -> '" << estore.pvName(*it) << "'";
+    }
+  }
+
+  // and dump all values as well
+  event(evt, env);
+}
+
 // Method which is called with event data
 void 
 DumpEpics::event(Event& evt, Env& env)
@@ -62,6 +82,7 @@ DumpEpics::event(Event& evt, Env& env)
   
   // get the names of EPICS PVs
   std::vector<std::string> pvNames = estore.pvNames();
+  std::sort(pvNames.begin(), pvNames.end());
   size_t size = pvNames.size();
 
   WithMsgLog(name(), info, str) {
@@ -75,7 +96,7 @@ DumpEpics::event(Event& evt, Env& env)
       shared_ptr<Psana::Epics::EpicsPvHeader> pv = estore.getPV(pvNames[i]);
   
       // print generic info
-      str << "  " << i << ". " << pvNames[i] << " id=" << pv->pvId() 
+      str << "  " << pvNames[i] << " id=" << pv->pvId()
                 << " type=" << pv->dbrType() << " size=" << pv->numElements() << '\n';
   
       // print status info
