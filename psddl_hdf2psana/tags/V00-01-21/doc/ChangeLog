@@ -1,0 +1,137 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package psddl_hdf2psana
+#------------------------------------------------------------------------
+
+Package author: Andy Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-01-21
+2013-03-26 Andy Salnikov
+- fix to cspad schema
+
+Tag: V00-01-20
+2013-03-26 Andy Salnikov
+- checking Evr mess: in Nov 2012 translator changed silently dataset name
+  where EvrDataV3 data is stored (this happend during one big refactoring,
+  the change was not intentional)
+- as a result we now have EvrDataV3 which can be stored in "evrData" 
+  or "data" dataset depending when transtion happened
+- replacing generated EvrDataV3 code here with hand-written (adopted from 
+  generated) which checks dataset name before reading the data from it
+
+Tag: V00-01-19
+2013-03-25 Andy Salnikov
+- fix camera frame image reading
+
+Tag: V00-01-18
+2013-03-25 Andy Salnikov
+- fixing image joining in PNCCD::FullFrame
+
+Tag: V00-01-17
+2013-03-25 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-21
+
+Tag: V00-01-16
+2013-03-25 Andy Salnikov
+- fixing princeton schema
+
+Tag: V00-01-15
+2013-03-25 Andy Salnikov
+- fix Timepix schema for config types
+
+Tag: V00-01-14
+2013-03-24 Andy Salnikov
+- use new psddlc feature to remap enum constant names ito names used 
+  by HDF5 translator
+
+Tag: V00-01-13
+2013-03-23 Andy Salnikov
+- fix ControlData schema
+
+Tag: V00-01-12
+2013-03-23 Andy Salnikov
+- fix FCCD schema
+
+Tag: V00-01-11
+2013-03-22 Andy Salnikov
+- fix Fli schema
+
+Tag: V00-01-10
+2013-03-22 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-17
+- use new enum-base feature to avoid specification of attribute type
+
+Tag: V00-01-09
+2013-03-22 Andy Salnikov
+- forgot to add data/gsc16ai-h5.ddl.xml to last tag
+
+Tag: V00-01-08
+2013-03-22 Andy Salnikov
+- fix schema for Gsc16ia, apparently HDF5 does not like conversion from 
+  enum types in file to integer types in memory
+
+Tag: V00-01-07
+2013-03-22 Andy Salnikov
+- fix schema for OceanOptics.DataV1
+
+Tag: V00-01-06
+2013-03-22 Andy Salnikov
+- for UsdUsb::DavaV1 schema version 1 use generated code
+
+Tag: V00-01-05
+2013-03-22 Andy Salnikov
+- introduce new schema version for UsdUsb::DavaV1, this version has signed
+  encoder_count field.
+
+Tag: V00-01-04
+2013-03-21 Andy Salnikov
+- fix attribute name in usdusb schema
+
+Tag: V00-01-03
+2013-03-21 Andy Salnikov
+- fix for string EPICS PV type
+- fix for BLD GMD schema
+- splitting of shared BLD data types implemented
+
+Tag: V00-01-02
+2013-03-19 Andy Salnikov
+- non-compound datasets
+
+Tag: V00-01-01
+2013-03-19 Andy Salnikov
+- updates to evr, acquiris and epics
+
+Tag: V00-01-00
+2013-03-19 Andy Salnikov
+- updates to epics stuff, try to avoid reading data if possible
+
+Tag: V00-00-02
+2013-03-15 Andy Salnikov
+- forgot to add epics-h5.ddl
+
+Tag: V00-00-01
+2013-03-15 Andy Salnikov
+- added epics, not very efficient implementation
+- first production tag for nightlies
+
+Tag: andy-20130313-01
+2013-03-13 Andy Salnikov
+- added acqiris and pnccd
+
+Tag: andy-20130312-01
+2013-03-12 Andy Salnikov
+- progress on vlen arrays, adding evr abd bld to the bunch
+
+Tag: andy-20130226-02
+2013-02-26 Andy Salnikov
+- work in progress
+
+Tag: andy-20130226-01
+2013-02-26 Andy Salnikov
+- work in progress
