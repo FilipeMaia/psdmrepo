@@ -7,7 +7,7 @@ namespace PsddlPds {
 namespace CsPad {
 uint32_t
 ConfigV1::numAsicsRead() const {
-  return (this->_AsicMask & 0xf)==1 ? 4 : 16;
+  return (this->asicMask() & 0xf)==1 ? 4 : 16;
 }
 uint32_t
 ConfigV1::numQuads() const {
@@ -26,7 +26,7 @@ ConfigV1::quads_shape() const {
 }
 uint32_t
 ConfigV2::numAsicsRead() const {
-  return (this->_AsicMask & 0xf)==1 ? 4 : 16;
+  return (this->asicMask() & 0xf)==1 ? 4 : 16;
 }
 uint32_t
 ConfigV2::roiMask(uint32_t iq) const {
@@ -53,7 +53,7 @@ ConfigV2::quads_shape() const {
 }
 uint32_t
 ConfigV3::numAsicsRead() const {
-  return (this->_AsicMask & 0xf)==1 ? 4 : 16;
+  return (this->asicMask() & 0xf)==1 ? 4 : 16;
 }
 uint32_t
 ConfigV3::roiMask(uint32_t iq) const {
@@ -80,7 +80,7 @@ ConfigV3::quads_shape() const {
 }
 uint32_t
 ConfigV4::numAsicsRead() const {
-  return (this->_AsicMask & 0xf)==1 ? 4 : 16;
+  return (this->asicMask() & 0xf)==1 ? 4 : 16;
 }
 uint32_t
 ConfigV4::roiMask(uint32_t iq) const {
