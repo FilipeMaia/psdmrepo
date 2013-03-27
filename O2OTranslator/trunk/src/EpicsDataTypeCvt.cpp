@@ -156,26 +156,30 @@ EpicsDataTypeCvt::typedConvert ( const XtcType& data,
       MsgLog(logger,trace, "EpicsDataTypeCvt -- creating subgroup " << pvname ) ;
       subgroup = m_group.createGroup( pvname ) ;
 
-      // there may be an alias defined for this PV
-      const std::string& alias = aliasName(data.iPvId, src.top());
-      if (alias.empty()) {
-        // fine, means no alias
-      } else if (pvname == alias) {
-        MsgLog(logger, debug, "EpicsDataTypeCvt -- alias is the same as PV name " << alias );
-      } else if (m_group.hasChild(alias)) {
-        MsgLog(logger, warning, "EpicsDataTypeCvt -- alias has the same name as another PV or alias name: " << alias );
-      } else {
-        try {
-          MsgLog(logger,trace, "EpicsDataTypeCvt -- creating alias " << alias ) ;
-          m_group.makeSoftLink(pvname, alias);
-        } catch (const hdf5pp::Exception& ex) {
-          // complain but continue
-          MsgLog(logger,trace, "EpicsDataTypeCvt -- failed to create alias \"" << alias << "\": " << ex.what()) ;
-        }
-      }
     }
 
     m_subgroups[pvname] = subgroup ;
+  }
+
+  // there may be an alias defined for this PV
+  const std::string& alias = aliasName(data.iPvId, src.top());
+  if (alias.empty() or pvname == alias) {
+    // fine, means nothing to do
+  } else  if (m_subgroups.count(alias) == 0) {
+
+    if (m_group.hasChild(alias)) {
+      MsgLog(logger, warning, "EpicsDataTypeCvt -- alias has the same name as another PV or alias name: " << alias );
+    } else {
+      try {
+        MsgLog(logger,trace, "EpicsDataTypeCvt -- creating alias " << alias ) ;
+        m_group.makeSoftLink(pvname, alias);
+      } catch (const hdf5pp::Exception& ex) {
+        // complain but continue
+        MsgLog(logger,trace, "EpicsDataTypeCvt -- failed to create alias \"" << alias << "\": " << ex.what()) ;
+      }
+    }
+
+    m_subgroups[alias] = subgroup ;
   }
 
   // is there a type for this PV?
