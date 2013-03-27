@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-06-03
+2013-03-26 Andy Salnikov
+- DdlHdf5DataDispatch: adding aliases for CsPad data types
+
 Tag: V00-06-02
 2013-03-25 Andy Salnikov
 - PNCCD Frame classes need special support through the aliases

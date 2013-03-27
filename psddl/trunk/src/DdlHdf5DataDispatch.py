@@ -56,7 +56,9 @@ from psddl.Template import Template as T
 _aliases = {
     'Bld::BldDataIpimb': ['Bld::BldDataIpimbV0'],
     'Bld::BldDataEBeam': ['Bld::BldDataEBeamV1'],
-    'PNCCD::FrameV1'   : ['PNCCD::FramesV1', 'PNCCD::FullFrameV1'],
+    'PNCCD::FrameV1'   : ['PNCCD::FullFrameV1', 'PNCCD::FramesV1'],
+    'CsPad::ElementV1' : ['CsPad::DataV1'],
+    'CsPad::ElementV2' : ['CsPad::DataV2'],
     }
 
 # Extra headers needed for special proxy classes of similar stuff
@@ -288,7 +290,9 @@ class DdlHdf5DataDispatch ( object ) :
             hashes.setdefault(hh, []).append(dict(name=name, code=code))
 
         for alias, typeNames in _aliases.items():
-            acodes = [code for type, code in codes.items() if type.fullName('C++') in typeNames]
+            acodes = []
+            for typeName in typeNames:
+                acodes += [code for type, code in codes.items() if type.fullName('C++') == typeName]
             if acodes:
                 hh = hash.hash(alias)
                 hashes.setdefault(hh, []).append(dict(name=alias, code='\n'.join(acodes)))
