@@ -11,9 +11,13 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-23
+2013-03-27 Andy Salnikov
+- fix for cspad2x2 schema
+
 Tag: V00-01-22
 2013-03-27 Andy Salnikov
-- abit of refactoring/renaming, no code changes
+- a bit of refactoring/renaming, no code changes
 
 Tag: V00-01-21
 2013-03-26 Andy Salnikov
