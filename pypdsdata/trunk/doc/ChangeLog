@@ -6,6 +6,10 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V00-00-93
+2013-03-27 Andy Salnikov
+- pyxtcreader: print "contains" event for damaged containers
+
 Tag: V00-00-92
 2013-02-06 Andy Salnikov
 - added python wrappers for frame classes (princeton.FrameV2,
