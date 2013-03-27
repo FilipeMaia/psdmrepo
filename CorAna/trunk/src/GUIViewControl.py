@@ -483,10 +483,9 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.arr2d = self.vr.get_g2_vs_itau_arr()
         arr_tau = self.list_of_tau
 
-
-        print 'arr2d.shape', self.arr2d.shape
-        print 'q_ave.shape', q_average_for_dyna.shape
-        print 'len(self.list_of_tau)', len(self.list_of_tau)
+        #print 'arr2d.shape', self.arr2d.shape
+        #print 'q_ave.shape', q_average_for_dyna.shape
+        #print 'len(self.list_of_tau)', len(self.list_of_tau)
 
         self.arr_g2 = [self.arr2d, self.list_of_tau, q_average_for_dyna]
 

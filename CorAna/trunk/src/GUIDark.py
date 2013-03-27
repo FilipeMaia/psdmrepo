@@ -72,8 +72,8 @@ class GUIDark ( QtGui.QWidget ) :
  
         self.but_path    = QtGui.QPushButton('File:')
         self.but_status  = QtGui.QPushButton('Check status')
-        self.but_submit  = QtGui.QPushButton('Pedestal')
-        self.but_scanner = QtGui.QPushButton('Scanner')
+        self.but_aver    = QtGui.QPushButton('Pedestal')
+        self.but_scan    = QtGui.QPushButton('Scanner')
         self.but_browse  = QtGui.QPushButton('Browse')
         self.but_plot    = QtGui.QPushButton('Plot')
         self.but_remove  = QtGui.QPushButton('Remove')
@@ -93,21 +93,21 @@ class GUIDark ( QtGui.QWidget ) :
         self.grid.addWidget(self.lab_end,       self.grid_row+3, 4)
         self.grid.addWidget(self.lab_total,     self.grid_row+3, 5)
         self.grid.addWidget(self.lab_time,      self.grid_row+3, 6)
-        self.grid.addWidget(self.but_scanner,   self.grid_row+4, 0)
+        self.grid.addWidget(self.but_scan,      self.grid_row+4, 0)
         self.grid.addWidget(self.but_status,    self.grid_row+4, 1, 2, 2)
         self.grid.addWidget(self.edi_bat_start, self.grid_row+4, 3)
         self.grid.addWidget(self.edi_bat_end,   self.grid_row+4, 4)
         self.grid.addWidget(self.edi_bat_total, self.grid_row+4, 5)
         self.grid.addWidget(self.edi_bat_time,  self.grid_row+4, 6, 1, 2)
-        self.grid.addWidget(self.but_submit,    self.grid_row+5, 0)
+        self.grid.addWidget(self.but_aver,      self.grid_row+5, 0)
         self.grid.addWidget(self.but_browse,    self.grid_row+5, 3) #, 1, 2)
         self.grid.addWidget(self.but_plot,      self.grid_row+5, 4)
         self.grid.addWidget(self.but_remove,    self.grid_row+5, 7)
 
         self.connect(self.but_path,      QtCore.SIGNAL('clicked()'),          self.on_but_path      )
         self.connect(self.but_status,    QtCore.SIGNAL('clicked()'),          self.on_but_status    )
-        self.connect(self.but_submit,    QtCore.SIGNAL('clicked()'),          self.on_but_submit    )
-        self.connect(self.but_scanner,   QtCore.SIGNAL('clicked()'),          self.on_but_scanner   )
+        self.connect(self.but_aver,      QtCore.SIGNAL('clicked()'),          self.on_but_aver    )
+        self.connect(self.but_scan,      QtCore.SIGNAL('clicked()'),          self.on_but_scan   )
         self.connect(self.but_browse,    QtCore.SIGNAL('clicked()'),          self.on_but_browse    )
         self.connect(self.but_plot,      QtCore.SIGNAL('clicked()'),          self.on_but_plot      )
         self.connect(self.but_remove,    QtCore.SIGNAL('clicked()'),          self.on_but_remove    )
@@ -126,13 +126,23 @@ class GUIDark ( QtGui.QWidget ) :
     #  Public methods --
     #-------------------
 
+    def connectToThread1(self):
+        try : self.connect   ( cp.thread1, QtCore.SIGNAL('update(QString)'), self.check_status )
+        except : logger.warning('connectToThread1 is failed', __name__)
+
+
+    def disconnectFromThread1(self):
+        try : self.disconnect( cp.thread1, QtCore.SIGNAL('update(QString)'), self.check_status )
+        except : pass
+
+
     def showToolTips(self):
         #self           .setToolTip('Use this GUI to work with xtc file.')
         self.edi_path   .setToolTip('The path to the xtc file for processing in this GUI')
         self.but_path   .setToolTip('Push this button and select \nthe xtc file for dark run')
         self.but_status .setToolTip('Print batch job status \nin the logger')
-        self.but_submit .setToolTip('Submit job in batch for dark run \nand produces files with:\n1) pedestals \n2) RMS \n3) hot-pixel mask')
-        self.but_scanner.setToolTip('Submit job in batch for dark run scanner, \ncounts number of events in the file,\n and average time interval between events')
+        self.but_aver   .setToolTip('Submit job in batch for dark run \nand produces files with:\n1) pedestals \n2) RMS \n3) hot-pixel mask')
+        self.but_scan   .setToolTip('Submit job in batch for dark run scanner, \ncounts number of events in the file,\n and average time interval between events')
         self.but_browse .setToolTip('Browse files for this GUI')
         self.but_plot   .setToolTip('Plot image and spectrum for pedestals')
         self.but_remove .setToolTip('Remove all pedestal work\nfiles for selected run')
@@ -185,15 +195,15 @@ class GUIDark ( QtGui.QWidget ) :
 
         self.but_path   .setStyleSheet (cp.styleButton)
         self.but_status .setStyleSheet (cp.styleButton)
-        self.but_submit .setStyleSheet (cp.styleButton) 
-        self.but_scanner.setStyleSheet (cp.styleButton) 
+        self.but_aver   .setStyleSheet (cp.styleButton) 
+        self.but_scan   .setStyleSheet (cp.styleButton) 
         self.but_browse .setStyleSheet (cp.styleButton) 
         self.but_plot   .setStyleSheet (cp.styleButton) 
         self.but_remove .setStyleSheet (cp.styleButtonBad) 
   
         self.but_path   .setFixedWidth(width)
-        self.but_submit .setFixedWidth(width)
-        self.but_scanner.setFixedWidth(width)
+        self.but_aver   .setFixedWidth(width)
+        self.but_scan   .setFixedWidth(width)
         self.but_plot   .setFixedWidth(width)
         self.but_browse .setFixedWidth(width) 
         self.but_remove .setFixedWidth(width)
@@ -215,6 +225,8 @@ class GUIDark ( QtGui.QWidget ) :
 
     def closeEvent(self, event):
         logger.debug('closeEvent', __name__)
+
+        self.disconnectFromThread1()
 
         #try    : cp.plotimgspe.close()
         #except : pass
@@ -274,8 +286,8 @@ class GUIDark ( QtGui.QWidget ) :
             self.edi_bat_end.setStyleSheet(cp.styleEdit)
 
 
-    def on_but_submit(self):
-        logger.debug('on_but_submit', __name__)
+    def on_but_aver(self):
+        logger.debug('on_but_aver', __name__)
 
         if(cp.bat_dark_end.value() == cp.bat_dark_end.value_def()) :
             self.edi_bat_end.setStyleSheet(cp.styleEditBad)
@@ -284,18 +296,30 @@ class GUIDark ( QtGui.QWidget ) :
         else :
             self.edi_bat_end.setStyleSheet(cp.styleEdit)
         bjpeds.submit_batch_for_peds_aver()
+        self.connectToThread1()
 
-    def on_but_scanner(self):
-        logger.debug('on_but_scanner', __name__)
+
+    def on_but_scan(self):
+        logger.debug('on_but_scan', __name__)
         bjpeds.submit_batch_for_peds_scan()
+        self.connectToThread1()
 
 
     def on_but_status(self):
         logger.debug('on_but_status', __name__)
+        self.check_status()
+
+
+    def check_status(self):
         logger.info('='*110, __name__)
         bjpeds.check_work_files_for_pedestals()
-        if bjpeds.status_for_pedestal_file() : self.but_status.setStyleSheet(cp.styleButtonGood)
-        else                                 : self.but_status.setStyleSheet(cp.styleButtonBad)
+        if bjpeds.status_for_peds_scan_files() : self.but_scan.setStyleSheet(cp.styleButtonGood)
+        else                                   : self.but_scan.setStyleSheet(cp.styleButtonBad)
+        if bjpeds.status_for_peds_aver_files() :
+            self.but_aver.setStyleSheet(cp.styleButtonGood)
+            self.disconnectFromThread1()            
+        else                                   : self.but_aver.setStyleSheet(cp.styleButtonBad)
+
         bjpeds.check_batch_job_for_peds_scan()
         bjpeds.check_batch_job_for_peds_aver()
         blp.parse_batch_log_peds_scan()
@@ -369,8 +393,8 @@ class GUIDark ( QtGui.QWidget ) :
 
         self.but_path   .setEnabled(is_used)
         self.but_status .setEnabled(is_used)
-        self.but_submit .setEnabled(is_used)
-        self.but_scanner.setEnabled(is_used)
+        self.but_aver   .setEnabled(is_used)
+        self.but_scan   .setEnabled(is_used)
         self.but_browse .setEnabled(is_used)
         self.but_plot   .setEnabled(is_used)
         self.but_remove .setEnabled(is_used)
@@ -378,8 +402,8 @@ class GUIDark ( QtGui.QWidget ) :
         
         #self.but_path   .setFlat(not is_used)
         #self.but_status .setFlat(not is_used)
-        #self.but_submit .setFlat(not is_used)
-        #self.but_scanner.setFlat(not is_used)
+        #self.but_aver   .setFlat(not is_used)
+        #self.but_scan   .setFlat(not is_used)
         #self.but_browse .setFlat(not is_used)
         #self.but_plot   .setFlat(not is_used)
         #self.but_remove .setFlat(not is_used)

@@ -122,10 +122,16 @@ class BatchJobData(BatchJob) :
 
 #-----------------------------
 
-    def status_for_data_aver_file(self) :
-        fname  = fnm.path_data_ave()
-        status = os.path.lexists(fname)
-        logger.info('Status: data file ' + fname  + ' ' + self.dict_status[status], __name__) 
+    def status_for_data_aver_files(self) :
+        list_of_files = fnm.get_list_of_files_data_aver_short()
+        status = self.status_for_files(list_of_files, comment='of data average: ')
+        return status
+
+#-----------------------------
+
+    def status_for_data_scan_files(self) :
+        list_of_files = fnm.get_list_of_files_data_scan()
+        status = self.status_for_files(list_of_files, comment='of data scan: ')
         return status
 
 #-----------------------------

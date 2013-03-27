@@ -538,7 +538,9 @@ class ViewResults :
         counts_dyna       = sp.get_counts_for_dyna_bins()
         counts_dyna_prot  = np.select([counts_dyna<=0], [-1], counts_dyna)
         sp.q_average_dyna = np.select([counts_dyna_prot<0], [0], default=sum_q_dyna/counts_dyna_prot)
-        print 'get_q_average_for_dyna_bins():\n', sp.q_average_dyna
+        msg = 'get_q_average_for_dyna_bins():\n' + str(sp.q_average_dyna)
+        logger.info(msg, __name__)
+        #print msg
         return sp.q_average_dyna
 
 
@@ -637,16 +639,16 @@ class ViewResults :
         sp.list_of_tau = sp.get_list_of_tau_from_file(fnm.path_cora_merge_tau())
         #print 'sp.list_of_tau = ', sp.list_of_tau
 
+        logger.info('Begin processing for <g2> vs tau array', __name__)
+
         g2_vs_itau = []
         for itau, tau in enumerate(sp.list_of_tau) :
             g2_for_dyna_bins = sp.get_g2_for_dyna_bins_itau(itau)
             g2_vs_itau.append( sp.trancate_overflowed_dyna_bins(g2_for_dyna_bins) )
-
-            msg = 'get_g2_vs_itau_arr: itau=' + str(itau) + \
-                  '  tau='                    + str(tau) + \
-                  '  <g2>='                   + str(g2_for_dyna_bins.mean()) 
+            msg = 'get_g2_vs_itau_arr: itau=%3d  tau=%4d  <g2>=%6.3f' \
+                  % (itau, tau, g2_for_dyna_bins.mean()) 
             logger.info(msg, __name__)
-            print msg
+            #print msg
         
         sp.g2_vs_itau_arr = np.array(g2_vs_itau)
 

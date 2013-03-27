@@ -129,10 +129,22 @@ class GUIData ( QtGui.QWidget ) :
         self.showToolTips()
         self.setStyle()
         self.setButtonState()
+        #self.connectToThread1()
+
 
     #-------------------
     #  Public methods --
     #-------------------
+
+    def connectToThread1(self):
+        try : self.connect   ( cp.thread1, QtCore.SIGNAL('update(QString)'), self.check_status )
+        except : logger.warning('connectToThread1 is failed', __name__)
+
+
+    def disconnectFromThread1(self):
+        try : self.disconnect( cp.thread1, QtCore.SIGNAL('update(QString)'), self.check_status )
+        except : pass
+
 
     def showToolTips(self):
         #self          .setToolTip('Use this GUI to work with xtc file.')
@@ -231,6 +243,8 @@ class GUIData ( QtGui.QWidget ) :
     def closeEvent(self, event):
         logger.debug('closeEvent', __name__)
 
+        self.disconnectFromThread1()
+
         #try    : cp.plotimgspe.close()
         #except : pass
 
@@ -300,19 +314,33 @@ class GUIData ( QtGui.QWidget ) :
         else :
             self.edi_bat_end.setStyleSheet(cp.styleEdit)
         bjdata.submit_batch_for_data_aver()
+        self.connectToThread1()
 
 
     def on_but_scan(self):
         logger.debug('on_but_scan', __name__)
         bjdata.submit_batch_for_data_scan()
+        self.connectToThread1()
 
 
     def on_but_status(self):
         logger.debug('on_but_status', __name__)
+        self.check_status()
+
+
+    def check_status(self):
+        logger.debug('on_but_status', __name__)
         logger.info('='*110, __name__)
         bjdata.check_work_files_for_data_aver()
-        if bjdata.status_for_data_aver_file() : self.but_status.setStyleSheet(cp.styleButtonGood)
-        else                                  : self.but_status.setStyleSheet(cp.styleButtonBad)
+
+        if bjdata.status_for_data_scan_files() : self.but_scan.setStyleSheet(cp.styleButtonGood)
+        else                                   : self.but_scan.setStyleSheet(cp.styleButtonBad)
+        if bjdata.status_for_data_aver_files() :
+            self.but_aver.setStyleSheet(cp.styleButtonGood)
+            self.disconnectFromThread1()            
+        else                                   : self.but_aver.setStyleSheet(cp.styleButtonBad)
+        #self.but_status
+
         bjdata.check_batch_job_for_data_scan()
         bjdata.check_batch_job_for_data_aver()
         blp.parse_batch_log_data_scan()

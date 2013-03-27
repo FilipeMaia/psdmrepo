@@ -207,33 +207,33 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.in_file_data       = self.declareParameter( name='IN_FILE_NAME_DATA',  val_def='e167-r0020-s00-c00.xtc',type='str' )
 
         # GUISetupBeamZero.py
-        self.x_coord_beam0      = self.declareParameter( name='X_COORDINATE_BEAM_ZERO',   val_def=1234.5,     type='float' ) 
-        self.y_coord_beam0      = self.declareParameter( name='Y_COORDINATE_BEAM_ZERO',   val_def=1216.5,     type='float' ) 
-        self.x0_pos_in_beam0    = self.declareParameter( name='X_CCD_POS_IN_BEAM_ZERO',   val_def=-59,        type='float' ) 
-        self.y0_pos_in_beam0    = self.declareParameter( name='Y_CCD_POS_IN_BEAM_ZERO',   val_def=175,        type='float' ) 
+        self.x_coord_beam0      = self.declareParameter( name='X_COORDINATE_BEAM_ZERO',   val_def=722.0,      type='float' ) 
+        self.y_coord_beam0      = self.declareParameter( name='Y_COORDINATE_BEAM_ZERO',   val_def=632.0,      type='float' ) 
+        self.x0_pos_in_beam0    = self.declareParameter( name='X_CCD_POS_IN_BEAM_ZERO',   val_def=0.0,        type='float' ) 
+        self.y0_pos_in_beam0    = self.declareParameter( name='Y_CCD_POS_IN_BEAM_ZERO',   val_def=0.0,        type='float' ) 
 
         # GUISetupSpecular.py
-        self.x_coord_specular   = self.declareParameter( name='X_COORDINATE_SPECULAR',    val_def=-1,        type='float' ) 
-        self.y_coord_specular   = self.declareParameter( name='Y_COORDINATE_SPECULAR',    val_def=-2,        type='float' ) 
-        self.x0_pos_in_specular = self.declareParameter( name='X_CCD_POS_IN_SPECULAR',    val_def=-3,        type='float' ) 
-        self.y0_pos_in_specular = self.declareParameter( name='Y_CCD_POS_IN_SPECULAR',    val_def=-4,        type='float' ) 
+        self.x_coord_specular   = self.declareParameter( name='X_COORDINATE_SPECULAR',    val_def=0.0,        type='float' ) 
+        self.y_coord_specular   = self.declareParameter( name='Y_COORDINATE_SPECULAR',    val_def=0.0,        type='float' ) 
+        self.x0_pos_in_specular = self.declareParameter( name='X_CCD_POS_IN_SPECULAR',    val_def=0.0,        type='float' ) 
+        self.y0_pos_in_specular = self.declareParameter( name='Y_CCD_POS_IN_SPECULAR',    val_def=0.0,        type='float' ) 
 
         # GUISetupData.py
-        self.x0_pos_in_data     = self.declareParameter( name='X_CCD_POS_IN_DATA',        val_def=-51,       type='float' )
-        self.y0_pos_in_data     = self.declareParameter( name='Y_CCD_POS_IN_DATA',        val_def=183,       type='float' )
+        self.x0_pos_in_data     = self.declareParameter( name='X_CCD_POS_IN_DATA',        val_def=0.0,        type='float' )
+        self.y0_pos_in_data     = self.declareParameter( name='Y_CCD_POS_IN_DATA',        val_def=0.0,        type='float' )
 
         # GUISetupInfoLeft.py
-        self.sample_det_dist    = self.declareParameter( name='SAMPLE_TO_DETECTOR_DISTANCE', val_def=4000.1,          type='float' )
-        self.exp_setup_geom     = self.declareParameter( name='EXP_SETUP_GEOMETRY',          val_def='Beam Zero',     type='str' )
-        self.photon_energy      = self.declareParameter( name='PHOTON_ENERGY',               val_def=7.6543,          type='float' )
-        self.nominal_angle      = self.declareParameter( name='NOMINAL_ANGLE',               val_def=-1,              type='float' )
-        self.real_angle         = self.declareParameter( name='REAL_ANGLE',                  val_def=-1,              type='float' )
-        self.tilt_angle         = self.declareParameter( name='TILT_ANGLE',                  val_def=-1,              type='float' )
+        self.sample_det_dist    = self.declareParameter( name='SAMPLE_TO_DETECTOR_DISTANCE', val_def=2000.0,      type='float' )
+        self.exp_setup_geom     = self.declareParameter( name='EXP_SETUP_GEOMETRY',          val_def='Beam Zero', type='str' )
+        self.photon_energy      = self.declareParameter( name='PHOTON_ENERGY',               val_def=7.6543,      type='float' )
+        self.nominal_angle      = self.declareParameter( name='NOMINAL_ANGLE',               val_def=-1,          type='float' )
+        self.real_angle         = self.declareParameter( name='REAL_ANGLE',                  val_def=-1,          type='float' )
+        self.tilt_angle         = self.declareParameter( name='TILT_ANGLE',                  val_def=-1,          type='float' )
 
         # GUIImgSizePosition.py
         self.col_begin          = self.declareParameter( name='IMG_COL_BEGIN',        val_def=0,             type='int' )
         self.col_end            = self.declareParameter( name='IMG_COL_END',          val_def=1339,          type='int' )
-        self.row_begin          = self.declareParameter( name='IMG_ROW_BEGIN',        val_def=1,             type='int' )
+        self.row_begin          = self.declareParameter( name='IMG_ROW_BEGIN',        val_def=0,             type='int' )
         self.row_end            = self.declareParameter( name='IMG_ROW_END',          val_def=1299,          type='int' )
 
         # GUIKineticMode.py
@@ -285,13 +285,13 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.ana_dyna_meth_q   = self.declareParameter( name='ANA_DYNAMIC_METHOD_Q',      val_def='evenly-spaced',type='str' )
         self.ana_dyna_meth_phi = self.declareParameter( name='ANA_DYNAMIC_METHOD_PHI',    val_def='evenly-spaced',type='str' )
 
-        self.ana_stat_part_q   = self.declareParameter( name='ANA_STATIC_PARTITION_Q',    val_def='1',type='str' )
-        self.ana_stat_part_phi = self.declareParameter( name='ANA_STATIC_PARTITION_PHI',  val_def='2',type='str' )
-        self.ana_dyna_part_q   = self.declareParameter( name='ANA_DYNAMIC_PARTITION_Q',   val_def='3',type='str' )
-        self.ana_dyna_part_phi = self.declareParameter( name='ANA_DYNAMIC_PARTITION_PHI', val_def='4',type='str' )
+        self.ana_stat_part_q   = self.declareParameter( name='ANA_STATIC_PARTITION_Q',    val_def='50',type='str' )
+        self.ana_stat_part_phi = self.declareParameter( name='ANA_STATIC_PARTITION_PHI',  val_def='6',type='str' )
+        self.ana_dyna_part_q   = self.declareParameter( name='ANA_DYNAMIC_PARTITION_Q',   val_def='4',type='str' )
+        self.ana_dyna_part_phi = self.declareParameter( name='ANA_DYNAMIC_PARTITION_PHI', val_def='3',type='str' )
 
         self.ana_mask_type     = self.declareParameter( name='ANA_MASK_TYPE',             val_def='no-mask',type='str' )
-        self.ana_mask_fname    = self.declareParameter( name='ANA_MASK_FILE',             val_def='./roi-mask.txt',type='str' )
+        self.ana_mask_fname    = self.declareParameter( name='ANA_MASK_FILE',             val_def='roi-mask.txt',type='str' )
         self.ana_mask_dname    = self.declareParameter( name='ANA_MASK_DIRECTORY',        val_def='.',type='str' )
 
         # GUIAnaSettingsRight.py
@@ -304,7 +304,7 @@ class ConfigParametersCorAna ( ConfigParameters ) :
 
         self.lld_type          = self.declareParameter( name='LOW_LEVEL_DISC_TYPE',              val_def='NONE',type='str' )
         self.lld_adu           = self.declareParameter( name='LOW_LEVEL_DISC_ADU',               val_def=15,    type='float' )
-        self.lld_rms           = self.declareParameter( name='LOW_LEVEL_DISC_RMS',               val_def=4,     type='float' )
+        self.lld_rms           = self.declareParameter( name='LOW_LEVEL_DISC_RMS',               val_def=2,     type='float' )
 
         self.res_ascii_out     = self.declareParameter( name='RES_ASCII_OUTPUT',                 val_def=True,  type='bool' )
         self.res_fit1          = self.declareParameter( name='RES_PERFORM_FIT1',                 val_def=False, type='bool' )
@@ -326,10 +326,10 @@ class ConfigParametersCorAna ( ConfigParameters ) :
 
         # GUICCDSettings.py
         self.ccdset_pixsize          = self.declareParameter( name='CCD_SETTINGS_PIXEL_SIZE',      val_def=0.1,   type='float' )
-        self.ccdset_adcsatu          = self.declareParameter( name='CCD_SETTINGS_ADC_SATTURATION', val_def=12345, type='int' )
-        self.ccdset_aduphot          = self.declareParameter( name='CCD_SETTINGS_ADU_PER_PHOTON',  val_def=123,   type='float' )
-        self.ccdset_ccdeff           = self.declareParameter( name='CCD_SETTINGS_EFFICIENCY',      val_def=0.55,  type='float' )
-        self.ccdset_ccdgain          = self.declareParameter( name='CCD_SETTINGS_GAIN',            val_def=0.8,   type='float' )
+        self.ccdset_adcsatu          = self.declareParameter( name='CCD_SETTINGS_ADC_SATTURATION', val_def=1000,  type='int' )
+        self.ccdset_aduphot          = self.declareParameter( name='CCD_SETTINGS_ADU_PER_PHOTON',  val_def=10,    type='float' )
+        self.ccdset_ccdeff           = self.declareParameter( name='CCD_SETTINGS_EFFICIENCY',      val_def=0.5,   type='float' )
+        self.ccdset_ccdgain          = self.declareParameter( name='CCD_SETTINGS_GAIN',            val_def=1.0,   type='float' )
 
         self.mask_hot_thr            = self.declareParameter( name='MASK_HOT_PIX_ADU_THR_ON_RMS',  val_def=10.0,  type='float' )
         self.mask_hot_is_used        = self.declareParameter( name='MASK_HOT_PIX_IS_USED',         val_def=True,  type='bool' )

@@ -123,6 +123,7 @@ class GUILogger ( QtGui.QWidget ) :
         self.box_level .setStyleSheet (cp.styleButton) 
         self.box_txt   .setReadOnly(True)
         self.box_txt   .setStyleSheet (cp.styleWhiteFixed) 
+        #self.box_txt   .ensureCursorVisible()
         #self.tit_title.setAlignment(QtCore.Qt.AlignCenter)
         #self.titTitle.setBold()
 
@@ -210,15 +211,26 @@ class GUILogger ( QtGui.QWidget ) :
         self.setStatus(0, 'Log-file: ' + os.path.basename(self.fname_log))
 
         logger.setLevel(cp.log_level.value())
-        self.box_txt.setText( logger.getLogContent() )
+        self.box_txt.setText(logger.getLogContent())
+        
         logger.setGUILogger(self)
         logger.debug('GUILogger is open', __name__)
+        self.box_txt.moveCursor(QtGui.QTextCursor.End)
 
 
     def appendGUILog(self, msg='...'):
         self.box_txt.append(msg)
-        scrol_bar_v = self.box_txt.verticalScrollBar() # QScrollBar
-        scrol_bar_v.setValue(scrol_bar_v.maximum()) 
+        self.scrollDown()
+
+
+    def scrollDown(self):
+        #print 'scrollDown'
+        #scrol_bar_v = self.box_txt.verticalScrollBar() # QScrollBar
+        #scrol_bar_v.setValue(scrol_bar_v.maximum()) 
+        self.box_txt.moveCursor(QtGui.QTextCursor.End)
+        self.box_txt.repaint()
+        #self.raise_()
+        #self.box_txt.update()
 
         
     def setStatus(self, status_index=0, msg=''):

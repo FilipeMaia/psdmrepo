@@ -127,6 +127,18 @@ class BatchJobPedestals (BatchJob) :
         logger.info('Status: pedestal file ' + fname + ' ' + self.dict_status[status], __name__) 
         return status
 
+
+    def status_for_peds_aver_files(self) :
+        list_of_files = fnm.get_list_of_files_peds_aver()
+        status = self.status_for_files(list_of_files, comment='of peds average: ')
+        return status
+
+
+    def status_for_peds_scan_files(self) :
+        list_of_files = fnm.get_list_of_files_peds_scan()
+        status = self.status_for_files(list_of_files, comment='of peds scan: ')
+        return status
+
 #-----------------------------
 
     def get_pedestals_from_file(self) :
