@@ -123,9 +123,9 @@ void
 EpicsStoreImpl::names(std::vector<std::string>& names) const
 {
   names.clear();
-  names.reserve(m_ctrlMap.size() + m_alias2id.size());
-  for (ID2Name::const_iterator it = m_id2name.begin(); it != m_id2name.end(); ++ it) {
-    names.push_back(it->second);
+  names.reserve(m_name2id.size() + m_alias2id.size());
+  for (Name2ID::const_iterator it = m_name2id.begin(); it != m_name2id.end(); ++ it) {
+    names.push_back(it->first);
   }
   for (Name2ID::const_iterator it = m_alias2id.begin(); it != m_alias2id.end(); ++ it) {
     names.push_back(it->first);
@@ -137,9 +137,9 @@ void
 EpicsStoreImpl::pvNames(std::vector<std::string>& names) const
 {
   names.clear();
-  names.reserve(m_ctrlMap.size());
-  for (ID2Name::const_iterator it = m_id2name.begin(); it != m_id2name.end(); ++ it) {
-    names.push_back(it->second);
+  names.reserve(m_name2id.size());
+  for (Name2ID::const_iterator it = m_name2id.begin(); it != m_name2id.end(); ++ it) {
+    names.push_back(it->first);
   }
 }
 
