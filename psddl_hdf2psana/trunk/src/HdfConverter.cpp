@@ -24,6 +24,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "hdf5pp/NameIter.h"
 #include "hdf5pp/Utils.h"
 #include "MsgLogger/MsgLogger.h"
 #include "pdsdata/xtc/BldInfo.hh"
@@ -135,8 +136,10 @@ HdfConverter::~HdfConverter ()
  *  @brief Convert one object and store it in the event.
  */
 void
-HdfConverter::convert(const hdf5pp::Group& group, uint64_t idx, PSEvt::Event& evt, PSEnv::Env& env)
+HdfConverter::convert(const hdf5pp::Group& group, int64_t idx, PSEvt::Event& evt, PSEnv::Env& env)
 {
+  if (::isEpics(group.name())) return;
+
   const std::string& typeName = this->typeName(group.name());
   const Pds::Src& src = this->source(group);
   int schema = schemaVersion(group);
@@ -210,50 +213,72 @@ HdfConverter::convert(const hdf5pp::Group& group, uint64_t idx, PSEvt::Event& ev
  *  @brief Convert one object and store it in the epics store.
  */
 void
-HdfConverter::convertEpics(const hdf5pp::Group& group, uint64_t idx, PSEnv::EpicsStore& eStore)
+HdfConverter::convertEpics(const hdf5pp::Group& group, int64_t idx, PSEnv::EpicsStore& eStore)
 {
-  MsgLog(logger, debug, "HdfConverter::convertEpics - group: " << group);
+  MsgLog(logger, debug, "HdfConverter::convertEpics - group: " << group << " index: " << idx);
   
   const std::string& gname = group.name();
   if (::isEpics(gname)) {
 
-    // open/cache "data" dataset
-    hdf5pp::DataSet ds;
-    std::map<std::string, hdf5pp::DataSet>::const_iterator it = m_epicsDSCache.find(gname);
-    if (it != m_epicsDSCache.end()) {
-      ds = it->second;
-    } else {
-      ds = group.openDataSet("data");
-      m_epicsDSCache.insert(std::make_pair(gname, ds));
-    }
+    if (idx < 0) {
 
-    if (::isCtrlEpics(gname)) {
-    
-      // CTRL epics should mean that we are only starting reading data and 
-      // epics store does not have anything yet.
+      // Special case, this is the group which contain name of all epics PVs
+      // and aliases, we need to extract aliases and add them to the epics store.
+      // Aliases are sof links pointing to the original PV names
 
-      
-      boost::shared_ptr<Psana::Epics::EpicsPvHeader> epics = Epics::readEpics(ds, idx);
-      if (epics) {
-        const Pds::Src& src = this->source(group);
-        eStore.store(epics, src);
+      // also need source which is determined by the name of this group
+      Pds::Src src = this->source(group, 0);
+
+      hdf5pp::NameIter names(group, hdf5pp::NameIter::SoftLink);
+      for (std::string alias = names.next(); not alias.empty(); alias = names.next()) {
+
+        const std::string& pvName = group.getSoftLink(alias);
+        if (not pvName.empty()) {
+
+          // we need PV id which we have to read from a dataset
+          hdf5pp::Group pvGroup = group.openGroup(pvName);
+          hdf5pp::DataSet ds = pvGroup.openDataSet("data");
+          boost::shared_ptr<Psana::Epics::EpicsPvHeader> epics = Epics::readEpics(ds, 0);
+          if (epics) {
+            eStore.storeAlias(src, epics->pvId(), alias);
+          }
+        }
       }
 
     } else {
 
-      // Non-CTRL epics should mean that CTRL was already seen, get useful info from store 
-      // to avoid reasding it from a file
+      // open "data" dataset
+      hdf5pp::DataSet ds = group.openDataSet("data");
 
+      if (::isCtrlEpics(gname)) {
       
-      const std::string& pvname = group.basename();
-      MsgLog(logger, debug, "HdfConverter::convertEpics - Non-CTRL epics: " << pvname);
-      if (boost::shared_ptr<Psana::Epics::EpicsPvHeader> hdr = eStore.getPV(pvname)) {
-        boost::shared_ptr<Psana::Epics::EpicsPvHeader> epics = Epics::readEpics(ds, idx, *hdr);
+        // CTRL epics should mean that we are only starting reading data and
+        // epics store does not have anything yet.
+
+
+        boost::shared_ptr<Psana::Epics::EpicsPvHeader> epics = Epics::readEpics(ds, idx);
         if (epics) {
           const Pds::Src& src = this->source(group);
           eStore.store(epics, src);
         }
+
+      } else {
+
+        // Non-CTRL epics should mean that CTRL was already seen, get useful info from store
+        // to avoid reading it from a file
+
+
+        const std::string& pvname = group.basename();
+        MsgLog(logger, debug, "HdfConverter::convertEpics - Non-CTRL epics: " << pvname);
+        if (boost::shared_ptr<Psana::Epics::EpicsPvHeader> hdr = eStore.getPV(pvname)) {
+          boost::shared_ptr<Psana::Epics::EpicsPvHeader> epics = Epics::readEpics(ds, idx, *hdr);
+          if (epics) {
+            const Pds::Src& src = this->source(group);
+            eStore.store(epics, src);
+          }
+        }
       }
+
     }
   }
 }
@@ -267,7 +292,6 @@ HdfConverter::resetCache()
   MsgLog(logger, debug, "HdfConverter::resetCache");
   m_schemaVersionCache.clear();
   m_sourceCache.clear();
-  m_epicsDSCache.clear();
 }
 
 

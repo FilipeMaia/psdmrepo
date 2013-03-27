@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-24
+2013-03-27 Andy Salnikov
+- add support for EPICS aliases
+
 Tag: V00-01-23
 2013-03-27 Andy Salnikov
 - fix for cspad2x2 schema

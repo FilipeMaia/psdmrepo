@@ -67,12 +67,12 @@ public:
   /**
    *  @brief Convert one object and store it in the event.
    */
-  void convert(const hdf5pp::Group& group, uint64_t idx, PSEvt::Event& evt, PSEnv::Env& env);
+  void convert(const hdf5pp::Group& group, int64_t idx, PSEvt::Event& evt, PSEnv::Env& env);
   
   /**
    *  @brief Convert one object and store it in the epics store.
    */
-  void convertEpics(const hdf5pp::Group& group, uint64_t idx, PSEnv::EpicsStore& eStore);
+  void convertEpics(const hdf5pp::Group& group, int64_t idx, PSEnv::EpicsStore& eStore);
 
   /**
    *  @brief This method should be called to reset cache whenever some groups are closed
@@ -94,7 +94,6 @@ private:
 
   mutable std::map<std::string, int> m_schemaVersionCache;
   mutable std::map<std::string, Pds::Src> m_sourceCache;
-  mutable std::map<std::string, hdf5pp::DataSet> m_epicsDSCache;
 
 };
 
