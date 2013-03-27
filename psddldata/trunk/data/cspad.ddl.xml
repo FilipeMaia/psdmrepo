@@ -311,7 +311,7 @@
             </attribute>
 
             <method name="numAsicsRead" type="uint32_t">
-                <expr lang="C++" value="({self}._AsicMask &amp; 0xf)==1 ? 4 : 16"/>
+                <expr lang="C++" value="({self}.asicMask() &amp; 0xf)==1 ? 4 : 16"/>
             </method>
             
             <method name="numQuads" type="uint32_t">
@@ -371,7 +371,7 @@
             </attribute>
 
             <method name="numAsicsRead" type="uint32_t">
-                <expr lang="C++" value="({self}._AsicMask &amp; 0xf)==1 ? 4 : 16"/>
+                <expr lang="C++" value="({self}.asicMask() &amp; 0xf)==1 ? 4 : 16"/>
             </method>
             
             <method name="roiMask" type="uint32_t">
@@ -453,7 +453,7 @@
             </attribute>
 
             <method name="numAsicsRead" type="uint32_t">
-                <expr lang="C++" value="({self}._AsicMask &amp; 0xf)==1 ? 4 : 16"/>
+                <expr lang="C++" value="({self}.asicMask() &amp; 0xf)==1 ? 4 : 16"/>
             </method>
             
             <method name="roiMask" type="uint32_t">
@@ -535,7 +535,7 @@
             </attribute>
 
             <method name="numAsicsRead" type="uint32_t">
-                <expr lang="C++" value="({self}._AsicMask &amp; 0xf)==1 ? 4 : 16"/>
+                <expr lang="C++" value="({self}.asicMask() &amp; 0xf)==1 ? 4 : 16"/>
             </method>
             
             <method name="roiMask" type="uint32_t">
