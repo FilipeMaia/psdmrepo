@@ -528,15 +528,12 @@ hdf5pp::Type ns_ConfigV1_v0_dataset_config_stored_type()
   type.insert("eventCode", offsetof(DsType, eventCode), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("inactiveRunMode", offsetof(DsType, inactiveRunMode), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("activeRunMode", offsetof(DsType, activeRunMode), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("tdi", offsetof(DsType, tdi), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("payloadSize", offsetof(DsType, payloadSize), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("testDataIndex", offsetof(DsType, testDataIndex), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("payloadPerQuad", offsetof(DsType, payloadPerQuad), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("badAsicMask0", offsetof(DsType, badAsicMask0), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("badAsicMask1", offsetof(DsType, badAsicMask1), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("asicMask", offsetof(DsType, asicMask), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("quadMask", offsetof(DsType, quadMask), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("numAsicsRead", offsetof(DsType, numAsicsRead), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("numQuads", offsetof(DsType, numQuads), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("numSect", offsetof(DsType, numSect), hdf5pp::TypeTraits<uint32_t>::stored_type());
   hsize_t _array_type_quads_shape[] = { 4 };
   hdf5pp::ArrayType _array_type_quads = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<CsPad::ns_ConfigV1QuadReg_v0::dataset_data>::stored_type(), 1, _array_type_quads_shape);
   type.insert("quads", offsetof(DsType, quads), _array_type_quads);
@@ -558,15 +555,12 @@ hdf5pp::Type ns_ConfigV1_v0_dataset_config_native_type()
   type.insert("eventCode", offsetof(DsType, eventCode), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("inactiveRunMode", offsetof(DsType, inactiveRunMode), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("activeRunMode", offsetof(DsType, activeRunMode), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("tdi", offsetof(DsType, tdi), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("payloadSize", offsetof(DsType, payloadSize), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("testDataIndex", offsetof(DsType, testDataIndex), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("payloadPerQuad", offsetof(DsType, payloadPerQuad), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("badAsicMask0", offsetof(DsType, badAsicMask0), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("badAsicMask1", offsetof(DsType, badAsicMask1), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("asicMask", offsetof(DsType, asicMask), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("quadMask", offsetof(DsType, quadMask), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("numAsicsRead", offsetof(DsType, numAsicsRead), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("numQuads", offsetof(DsType, numQuads), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("numSect", offsetof(DsType, numSect), hdf5pp::TypeTraits<uint32_t>::native_type());
   hsize_t _array_type_quads_shape[] = { 4 };
   hdf5pp::ArrayType _array_type_quads = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<CsPad::ns_ConfigV1QuadReg_v0::dataset_data>::native_type(), 1, _array_type_quads_shape);
   type.insert("quads", offsetof(DsType, quads), _array_type_quads);
@@ -606,11 +600,11 @@ uint32_t ConfigV1_v0::activeRunMode() const {
 }
 uint32_t ConfigV1_v0::tdi() const {
   if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->tdi);
+  return uint32_t(m_ds_config->testDataIndex);
 }
 uint32_t ConfigV1_v0::payloadSize() const {
   if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->payloadSize);
+  return uint32_t(m_ds_config->payloadPerQuad);
 }
 uint32_t ConfigV1_v0::badAsicMask0() const {
   if (not m_ds_config) read_ds_config();
@@ -641,17 +635,17 @@ const Psana::CsPad::ConfigV1QuadReg& ConfigV1_v0::quads(uint32_t i0) const {
   }
   return m_ds_storage_config_quads[i0];
 }
-uint32_t ConfigV1_v0::numAsicsRead() const {
-  if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->numAsicsRead);
+uint32_t
+ConfigV1_v0::numAsicsRead() const{ 
+return (this->asicMask() & 0xf)==1 ? 4 : 16; 
 }
-uint32_t ConfigV1_v0::numQuads() const {
-  if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->numQuads);
+uint32_t
+ConfigV1_v0::numQuads() const{ 
+return __builtin_popcount(this->quadMask()); 
 }
-uint32_t ConfigV1_v0::numSect() const {
-  if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->numSect);
+uint32_t
+ConfigV1_v0::numSect() const{ 
+return this->numAsicsRead()/2; 
 }
 std::vector<int>
 ConfigV1_v0::quads_shape() const{ 
@@ -679,16 +673,13 @@ hdf5pp::Type ns_ConfigV2_v0_dataset_config_stored_type()
   type.insert("eventCode", offsetof(DsType, eventCode), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("inactiveRunMode", offsetof(DsType, inactiveRunMode), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("activeRunMode", offsetof(DsType, activeRunMode), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("tdi", offsetof(DsType, tdi), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("payloadSize", offsetof(DsType, payloadSize), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("testDataIndex", offsetof(DsType, testDataIndex), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("payloadPerQuad", offsetof(DsType, payloadPerQuad), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("badAsicMask0", offsetof(DsType, badAsicMask0), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("badAsicMask1", offsetof(DsType, badAsicMask1), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("asicMask", offsetof(DsType, asicMask), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("quadMask", offsetof(DsType, quadMask), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("roiMasks", offsetof(DsType, roiMasks), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("numAsicsRead", offsetof(DsType, numAsicsRead), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("numQuads", offsetof(DsType, numQuads), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("numSect", offsetof(DsType, numSect), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("roiMask", offsetof(DsType, roiMask), hdf5pp::TypeTraits<uint32_t>::stored_type());
   hsize_t _array_type_quads_shape[] = { 4 };
   hdf5pp::ArrayType _array_type_quads = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<CsPad::ns_ConfigV1QuadReg_v0::dataset_data>::stored_type(), 1, _array_type_quads_shape);
   type.insert("quads", offsetof(DsType, quads), _array_type_quads);
@@ -710,16 +701,13 @@ hdf5pp::Type ns_ConfigV2_v0_dataset_config_native_type()
   type.insert("eventCode", offsetof(DsType, eventCode), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("inactiveRunMode", offsetof(DsType, inactiveRunMode), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("activeRunMode", offsetof(DsType, activeRunMode), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("tdi", offsetof(DsType, tdi), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("payloadSize", offsetof(DsType, payloadSize), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("testDataIndex", offsetof(DsType, testDataIndex), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("payloadPerQuad", offsetof(DsType, payloadPerQuad), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("badAsicMask0", offsetof(DsType, badAsicMask0), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("badAsicMask1", offsetof(DsType, badAsicMask1), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("asicMask", offsetof(DsType, asicMask), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("quadMask", offsetof(DsType, quadMask), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("roiMasks", offsetof(DsType, roiMasks), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("numAsicsRead", offsetof(DsType, numAsicsRead), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("numQuads", offsetof(DsType, numQuads), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("numSect", offsetof(DsType, numSect), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("roiMask", offsetof(DsType, roiMask), hdf5pp::TypeTraits<uint32_t>::native_type());
   hsize_t _array_type_quads_shape[] = { 4 };
   hdf5pp::ArrayType _array_type_quads = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<CsPad::ns_ConfigV1QuadReg_v0::dataset_data>::native_type(), 1, _array_type_quads_shape);
   type.insert("quads", offsetof(DsType, quads), _array_type_quads);
@@ -759,11 +747,11 @@ uint32_t ConfigV2_v0::activeRunMode() const {
 }
 uint32_t ConfigV2_v0::tdi() const {
   if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->tdi);
+  return uint32_t(m_ds_config->testDataIndex);
 }
 uint32_t ConfigV2_v0::payloadSize() const {
   if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->payloadSize);
+  return uint32_t(m_ds_config->payloadPerQuad);
 }
 uint32_t ConfigV2_v0::badAsicMask0() const {
   if (not m_ds_config) read_ds_config();
@@ -783,7 +771,7 @@ uint32_t ConfigV2_v0::quadMask() const {
 }
 uint32_t ConfigV2_v0::roiMasks() const {
   if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->roiMasks);
+  return uint32_t(m_ds_config->roiMask);
 }
 const Psana::CsPad::ConfigV1QuadReg& ConfigV2_v0::quads(uint32_t i0) const {
   if (not m_ds_config) read_ds_config();
@@ -798,9 +786,9 @@ const Psana::CsPad::ConfigV1QuadReg& ConfigV2_v0::quads(uint32_t i0) const {
   }
   return m_ds_storage_config_quads[i0];
 }
-uint32_t ConfigV2_v0::numAsicsRead() const {
-  if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->numAsicsRead);
+uint32_t
+ConfigV2_v0::numAsicsRead() const{ 
+return (this->asicMask() & 0xf)==1 ? 4 : 16; 
 }
 uint32_t
 ConfigV2_v0::roiMask(uint32_t iq) const{ 
@@ -810,13 +798,13 @@ uint32_t
 ConfigV2_v0::numAsicsStored(uint32_t iq) const{ 
 return __builtin_popcount(this->roiMask(iq))*2; 
 }
-uint32_t ConfigV2_v0::numQuads() const {
-  if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->numQuads);
+uint32_t
+ConfigV2_v0::numQuads() const{ 
+return __builtin_popcount(this->quadMask()); 
 }
-uint32_t ConfigV2_v0::numSect() const {
-  if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->numSect);
+uint32_t
+ConfigV2_v0::numSect() const{ 
+return __builtin_popcount(this->roiMasks()); 
 }
 std::vector<int>
 ConfigV2_v0::quads_shape() const{ 
@@ -845,16 +833,13 @@ hdf5pp::Type ns_ConfigV3_v0_dataset_config_stored_type()
   type.insert("protectionEnable", offsetof(DsType, protectionEnable), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("inactiveRunMode", offsetof(DsType, inactiveRunMode), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("activeRunMode", offsetof(DsType, activeRunMode), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("tdi", offsetof(DsType, tdi), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("payloadSize", offsetof(DsType, payloadSize), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("testDataIndex", offsetof(DsType, testDataIndex), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("payloadPerQuad", offsetof(DsType, payloadPerQuad), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("badAsicMask0", offsetof(DsType, badAsicMask0), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("badAsicMask1", offsetof(DsType, badAsicMask1), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("asicMask", offsetof(DsType, asicMask), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("quadMask", offsetof(DsType, quadMask), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("roiMasks", offsetof(DsType, roiMasks), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("numAsicsRead", offsetof(DsType, numAsicsRead), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("numQuads", offsetof(DsType, numQuads), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("numSect", offsetof(DsType, numSect), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("roiMask", offsetof(DsType, roiMask), hdf5pp::TypeTraits<uint32_t>::stored_type());
   hsize_t _array_type_protectionThresholds_shape[] = { 4 };
   hdf5pp::ArrayType _array_type_protectionThresholds = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<CsPad::ns_ProtectionSystemThreshold_v0::dataset_data>::stored_type(), 1, _array_type_protectionThresholds_shape);
   type.insert("protectionThresholds", offsetof(DsType, protectionThresholds), _array_type_protectionThresholds);
@@ -880,16 +865,13 @@ hdf5pp::Type ns_ConfigV3_v0_dataset_config_native_type()
   type.insert("protectionEnable", offsetof(DsType, protectionEnable), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("inactiveRunMode", offsetof(DsType, inactiveRunMode), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("activeRunMode", offsetof(DsType, activeRunMode), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("tdi", offsetof(DsType, tdi), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("payloadSize", offsetof(DsType, payloadSize), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("testDataIndex", offsetof(DsType, testDataIndex), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("payloadPerQuad", offsetof(DsType, payloadPerQuad), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("badAsicMask0", offsetof(DsType, badAsicMask0), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("badAsicMask1", offsetof(DsType, badAsicMask1), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("asicMask", offsetof(DsType, asicMask), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("quadMask", offsetof(DsType, quadMask), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("roiMasks", offsetof(DsType, roiMasks), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("numAsicsRead", offsetof(DsType, numAsicsRead), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("numQuads", offsetof(DsType, numQuads), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("numSect", offsetof(DsType, numSect), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("roiMask", offsetof(DsType, roiMask), hdf5pp::TypeTraits<uint32_t>::native_type());
   hsize_t _array_type_protectionThresholds_shape[] = { 4 };
   hdf5pp::ArrayType _array_type_protectionThresholds = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<CsPad::ns_ProtectionSystemThreshold_v0::dataset_data>::native_type(), 1, _array_type_protectionThresholds_shape);
   type.insert("protectionThresholds", offsetof(DsType, protectionThresholds), _array_type_protectionThresholds);
@@ -946,11 +928,11 @@ uint32_t ConfigV3_v0::activeRunMode() const {
 }
 uint32_t ConfigV3_v0::tdi() const {
   if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->tdi);
+  return uint32_t(m_ds_config->testDataIndex);
 }
 uint32_t ConfigV3_v0::payloadSize() const {
   if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->payloadSize);
+  return uint32_t(m_ds_config->payloadPerQuad);
 }
 uint32_t ConfigV3_v0::badAsicMask0() const {
   if (not m_ds_config) read_ds_config();
@@ -970,7 +952,7 @@ uint32_t ConfigV3_v0::quadMask() const {
 }
 uint32_t ConfigV3_v0::roiMasks() const {
   if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->roiMasks);
+  return uint32_t(m_ds_config->roiMask);
 }
 const Psana::CsPad::ConfigV1QuadReg& ConfigV3_v0::quads(uint32_t i0) const {
   if (not m_ds_config) read_ds_config();
@@ -985,9 +967,9 @@ const Psana::CsPad::ConfigV1QuadReg& ConfigV3_v0::quads(uint32_t i0) const {
   }
   return m_ds_storage_config_quads[i0];
 }
-uint32_t ConfigV3_v0::numAsicsRead() const {
-  if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->numAsicsRead);
+uint32_t
+ConfigV3_v0::numAsicsRead() const{ 
+return (this->asicMask() & 0xf)==1 ? 4 : 16; 
 }
 uint32_t
 ConfigV3_v0::roiMask(uint32_t iq) const{ 
@@ -997,13 +979,13 @@ uint32_t
 ConfigV3_v0::numAsicsStored(uint32_t iq) const{ 
 return __builtin_popcount(this->roiMask(iq))*2; 
 }
-uint32_t ConfigV3_v0::numQuads() const {
-  if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->numQuads);
+uint32_t
+ConfigV3_v0::numQuads() const{ 
+return __builtin_popcount(this->quadMask()); 
 }
-uint32_t ConfigV3_v0::numSect() const {
-  if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->numSect);
+uint32_t
+ConfigV3_v0::numSect() const{ 
+return __builtin_popcount(this->roiMasks()); 
 }
 std::vector<int>
 ConfigV3_v0::quads_shape() const{ 
@@ -1032,16 +1014,13 @@ hdf5pp::Type ns_ConfigV4_v0_dataset_config_stored_type()
   type.insert("protectionEnable", offsetof(DsType, protectionEnable), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("inactiveRunMode", offsetof(DsType, inactiveRunMode), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("activeRunMode", offsetof(DsType, activeRunMode), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("tdi", offsetof(DsType, tdi), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("payloadSize", offsetof(DsType, payloadSize), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("testDataIndex", offsetof(DsType, testDataIndex), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("payloadPerQuad", offsetof(DsType, payloadPerQuad), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("badAsicMask0", offsetof(DsType, badAsicMask0), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("badAsicMask1", offsetof(DsType, badAsicMask1), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("asicMask", offsetof(DsType, asicMask), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("quadMask", offsetof(DsType, quadMask), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("roiMasks", offsetof(DsType, roiMasks), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("numAsicsRead", offsetof(DsType, numAsicsRead), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("numQuads", offsetof(DsType, numQuads), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("numSect", offsetof(DsType, numSect), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("roiMask", offsetof(DsType, roiMask), hdf5pp::TypeTraits<uint32_t>::stored_type());
   hsize_t _array_type_protectionThresholds_shape[] = { 4 };
   hdf5pp::ArrayType _array_type_protectionThresholds = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<CsPad::ns_ProtectionSystemThreshold_v0::dataset_data>::stored_type(), 1, _array_type_protectionThresholds_shape);
   type.insert("protectionThresholds", offsetof(DsType, protectionThresholds), _array_type_protectionThresholds);
@@ -1067,16 +1046,13 @@ hdf5pp::Type ns_ConfigV4_v0_dataset_config_native_type()
   type.insert("protectionEnable", offsetof(DsType, protectionEnable), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("inactiveRunMode", offsetof(DsType, inactiveRunMode), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("activeRunMode", offsetof(DsType, activeRunMode), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("tdi", offsetof(DsType, tdi), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("payloadSize", offsetof(DsType, payloadSize), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("testDataIndex", offsetof(DsType, testDataIndex), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("payloadPerQuad", offsetof(DsType, payloadPerQuad), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("badAsicMask0", offsetof(DsType, badAsicMask0), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("badAsicMask1", offsetof(DsType, badAsicMask1), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("asicMask", offsetof(DsType, asicMask), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("quadMask", offsetof(DsType, quadMask), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("roiMasks", offsetof(DsType, roiMasks), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("numAsicsRead", offsetof(DsType, numAsicsRead), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("numQuads", offsetof(DsType, numQuads), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("numSect", offsetof(DsType, numSect), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("roiMask", offsetof(DsType, roiMask), hdf5pp::TypeTraits<uint32_t>::native_type());
   hsize_t _array_type_protectionThresholds_shape[] = { 4 };
   hdf5pp::ArrayType _array_type_protectionThresholds = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<CsPad::ns_ProtectionSystemThreshold_v0::dataset_data>::native_type(), 1, _array_type_protectionThresholds_shape);
   type.insert("protectionThresholds", offsetof(DsType, protectionThresholds), _array_type_protectionThresholds);
@@ -1133,11 +1109,11 @@ uint32_t ConfigV4_v0::activeRunMode() const {
 }
 uint32_t ConfigV4_v0::tdi() const {
   if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->tdi);
+  return uint32_t(m_ds_config->testDataIndex);
 }
 uint32_t ConfigV4_v0::payloadSize() const {
   if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->payloadSize);
+  return uint32_t(m_ds_config->payloadPerQuad);
 }
 uint32_t ConfigV4_v0::badAsicMask0() const {
   if (not m_ds_config) read_ds_config();
@@ -1157,7 +1133,7 @@ uint32_t ConfigV4_v0::quadMask() const {
 }
 uint32_t ConfigV4_v0::roiMasks() const {
   if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->roiMasks);
+  return uint32_t(m_ds_config->roiMask);
 }
 const Psana::CsPad::ConfigV2QuadReg& ConfigV4_v0::quads(uint32_t i0) const {
   if (not m_ds_config) read_ds_config();
@@ -1172,9 +1148,9 @@ const Psana::CsPad::ConfigV2QuadReg& ConfigV4_v0::quads(uint32_t i0) const {
   }
   return m_ds_storage_config_quads[i0];
 }
-uint32_t ConfigV4_v0::numAsicsRead() const {
-  if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->numAsicsRead);
+uint32_t
+ConfigV4_v0::numAsicsRead() const{ 
+return (this->asicMask() & 0xf)==1 ? 4 : 16; 
 }
 uint32_t
 ConfigV4_v0::roiMask(uint32_t iq) const{ 
@@ -1184,13 +1160,13 @@ uint32_t
 ConfigV4_v0::numAsicsStored(uint32_t iq) const{ 
 return __builtin_popcount(this->roiMask(iq))*2; 
 }
-uint32_t ConfigV4_v0::numQuads() const {
-  if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->numQuads);
+uint32_t
+ConfigV4_v0::numQuads() const{ 
+return __builtin_popcount(this->quadMask()); 
 }
-uint32_t ConfigV4_v0::numSect() const {
-  if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->numSect);
+uint32_t
+ConfigV4_v0::numSect() const{ 
+return __builtin_popcount(this->roiMasks()); 
 }
 std::vector<int>
 ConfigV4_v0::quads_shape() const{ 

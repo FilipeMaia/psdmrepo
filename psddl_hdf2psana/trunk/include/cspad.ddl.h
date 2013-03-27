@@ -330,15 +330,12 @@ struct dataset_config {
   uint32_t eventCode; 
   uint32_t inactiveRunMode; 
   uint32_t activeRunMode; 
-  uint32_t tdi; 
-  uint32_t payloadSize; 
+  uint32_t testDataIndex; 
+  uint32_t payloadPerQuad; 
   uint32_t badAsicMask0; 
   uint32_t badAsicMask1; 
   uint32_t asicMask; 
   uint32_t quadMask; 
-  uint32_t numAsicsRead; 
-  uint32_t numQuads; 
-  uint32_t numSect; 
   CsPad::ns_ConfigV1QuadReg_v0::dataset_data quads[4]; 
 
 };
@@ -365,9 +362,12 @@ public:
   virtual uint32_t asicMask() const;
   virtual uint32_t quadMask() const;
   virtual const Psana::CsPad::ConfigV1QuadReg& quads(uint32_t i0) const;
-  virtual uint32_t numAsicsRead() const;
-  virtual uint32_t numQuads() const;
-  virtual uint32_t numSect() const;
+    uint32_t numAsicsRead() const;
+
+    uint32_t numQuads() const;
+
+    uint32_t numSect() const;
+
   /** Method which returns the shape (dimensions) of the data returned by quads() method. */
   std::vector<int> quads_shape() const;
 
@@ -394,16 +394,13 @@ struct dataset_config {
   uint32_t eventCode; 
   uint32_t inactiveRunMode; 
   uint32_t activeRunMode; 
-  uint32_t tdi; 
-  uint32_t payloadSize; 
+  uint32_t testDataIndex; 
+  uint32_t payloadPerQuad; 
   uint32_t badAsicMask0; 
   uint32_t badAsicMask1; 
   uint32_t asicMask; 
   uint32_t quadMask; 
-  uint32_t roiMasks; 
-  uint32_t numAsicsRead; 
-  uint32_t numQuads; 
-  uint32_t numSect; 
+  uint32_t roiMask; 
   CsPad::ns_ConfigV1QuadReg_v0::dataset_data quads[4]; 
 
 };
@@ -431,15 +428,20 @@ public:
   virtual uint32_t quadMask() const;
   virtual uint32_t roiMasks() const;
   virtual const Psana::CsPad::ConfigV1QuadReg& quads(uint32_t i0) const;
-  virtual uint32_t numAsicsRead() const;
+    uint32_t numAsicsRead() const;
+
   /** ROI mask for given quadrant */
   uint32_t roiMask(uint32_t iq) const;
 
   /** Number of ASICs in given quadrant */
   uint32_t numAsicsStored(uint32_t iq) const;
 
-  virtual uint32_t numQuads() const;
-  virtual uint32_t numSect() const;
+  /** Total number of quadrants in setup */
+  uint32_t numQuads() const;
+
+  /** Total number of sections (2x1) in all quadrants */
+  uint32_t numSect() const;
+
   /** Method which returns the shape (dimensions) of the data returned by quads() method. */
   std::vector<int> quads_shape() const;
 
@@ -467,16 +469,13 @@ struct dataset_config {
   uint32_t protectionEnable; 
   uint32_t inactiveRunMode; 
   uint32_t activeRunMode; 
-  uint32_t tdi; 
-  uint32_t payloadSize; 
+  uint32_t testDataIndex; 
+  uint32_t payloadPerQuad; 
   uint32_t badAsicMask0; 
   uint32_t badAsicMask1; 
   uint32_t asicMask; 
   uint32_t quadMask; 
-  uint32_t roiMasks; 
-  uint32_t numAsicsRead; 
-  uint32_t numQuads; 
-  uint32_t numSect; 
+  uint32_t roiMask; 
   CsPad::ns_ProtectionSystemThreshold_v0::dataset_data protectionThresholds[4]; 
   CsPad::ns_ConfigV1QuadReg_v0::dataset_data quads[4]; 
 
@@ -507,15 +506,20 @@ public:
   virtual uint32_t quadMask() const;
   virtual uint32_t roiMasks() const;
   virtual const Psana::CsPad::ConfigV1QuadReg& quads(uint32_t i0) const;
-  virtual uint32_t numAsicsRead() const;
+    uint32_t numAsicsRead() const;
+
   /** ROI mask for given quadrant */
   uint32_t roiMask(uint32_t iq) const;
 
   /** Number of ASICs in given quadrant */
   uint32_t numAsicsStored(uint32_t iq) const;
 
-  virtual uint32_t numQuads() const;
-  virtual uint32_t numSect() const;
+  /** Total number of quadrants in setup */
+  uint32_t numQuads() const;
+
+  /** Total number of sections (2x1) in all quadrants */
+  uint32_t numSect() const;
+
   /** Method which returns the shape (dimensions) of the data returned by quads() method. */
   std::vector<int> quads_shape() const;
 
@@ -544,16 +548,13 @@ struct dataset_config {
   uint32_t protectionEnable; 
   uint32_t inactiveRunMode; 
   uint32_t activeRunMode; 
-  uint32_t tdi; 
-  uint32_t payloadSize; 
+  uint32_t testDataIndex; 
+  uint32_t payloadPerQuad; 
   uint32_t badAsicMask0; 
   uint32_t badAsicMask1; 
   uint32_t asicMask; 
   uint32_t quadMask; 
-  uint32_t roiMasks; 
-  uint32_t numAsicsRead; 
-  uint32_t numQuads; 
-  uint32_t numSect; 
+  uint32_t roiMask; 
   CsPad::ns_ProtectionSystemThreshold_v0::dataset_data protectionThresholds[4]; 
   CsPad::ns_ConfigV2QuadReg_v0::dataset_data quads[4]; 
 
@@ -584,15 +585,20 @@ public:
   virtual uint32_t quadMask() const;
   virtual uint32_t roiMasks() const;
   virtual const Psana::CsPad::ConfigV2QuadReg& quads(uint32_t i0) const;
-  virtual uint32_t numAsicsRead() const;
+    uint32_t numAsicsRead() const;
+
   /** ROI mask for given quadrant */
   uint32_t roiMask(uint32_t iq) const;
 
   /** Number of ASICs in given quadrant */
   uint32_t numAsicsStored(uint32_t iq) const;
 
-  virtual uint32_t numQuads() const;
-  virtual uint32_t numSect() const;
+  /** Total number of quadrants in setup */
+  uint32_t numQuads() const;
+
+  /** Total number of sections (2x1) in all quadrants */
+  uint32_t numSect() const;
+
   /** Method which returns the shape (dimensions) of the data returned by quads() method. */
   std::vector<int> quads_shape() const;
 

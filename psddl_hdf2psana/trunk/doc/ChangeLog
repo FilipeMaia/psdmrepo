@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-21
+2013-03-26 Andy Salnikov
+- fix to cspad schema
+
 Tag: V00-01-20
 2013-03-26 Andy Salnikov
 - checking Evr mess: in Nov 2012 translator changed silently dataset name

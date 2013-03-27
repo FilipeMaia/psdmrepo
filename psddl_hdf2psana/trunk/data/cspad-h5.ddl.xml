@@ -76,15 +76,12 @@
                 <attribute name="eventCode"/>
                 <attribute name="inactiveRunMode"/>
                 <attribute name="activeRunMode"/>
-                <attribute name="tdi"/>
-                <attribute name="payloadSize"/>
+                <attribute name="testDataIndex" method="tdi"/>
+                <attribute name="payloadPerQuad" method="payloadSize"/>
                 <attribute name="badAsicMask0"/>
                 <attribute name="badAsicMask1"/>
                 <attribute name="asicMask"/>
                 <attribute name="quadMask"/>
-                <attribute name="numAsicsRead"/>
-                <attribute name="numQuads"/>
-                <attribute name="numSect"/>
                 <attribute name="quads" rank="1"/>
             </dataset>
         </h5schema>
@@ -96,16 +93,13 @@
                 <attribute name="eventCode"/>
                 <attribute name="inactiveRunMode"/>
                 <attribute name="activeRunMode"/>
-                <attribute name="tdi"/>
-                <attribute name="payloadSize"/>
+                <attribute name="testDataIndex" method="tdi"/>
+                <attribute name="payloadPerQuad" method="payloadSize"/>
                 <attribute name="badAsicMask0"/>
                 <attribute name="badAsicMask1"/>
                 <attribute name="asicMask"/>
                 <attribute name="quadMask"/>
-                <attribute name="roiMasks"/>
-                <attribute name="numAsicsRead"/>
-                <attribute name="numQuads"/>
-                <attribute name="numSect"/>
+                <attribute name="roiMask" method="roiMasks"/>
                 <attribute name="quads" rank="1"/>
             </dataset>
         </h5schema>
@@ -118,16 +112,13 @@
                 <attribute name="protectionEnable"/>
                 <attribute name="inactiveRunMode"/>
                 <attribute name="activeRunMode"/>
-                <attribute name="tdi"/>
-                <attribute name="payloadSize"/>
+                <attribute name="testDataIndex" method="tdi"/>
+                <attribute name="payloadPerQuad" method="payloadSize"/>
                 <attribute name="badAsicMask0"/>
                 <attribute name="badAsicMask1"/>
                 <attribute name="asicMask"/>
                 <attribute name="quadMask"/>
-                <attribute name="roiMasks"/>
-                <attribute name="numAsicsRead"/>
-                <attribute name="numQuads"/>
-                <attribute name="numSect"/>
+                <attribute name="roiMask" method="roiMasks"/>
                 <attribute name="protectionThresholds" rank="1"/>
                 <attribute name="quads" rank="1"/>
             </dataset>
@@ -140,16 +131,13 @@
                 <attribute name="protectionEnable"/>
                 <attribute name="inactiveRunMode"/>
                 <attribute name="activeRunMode"/>
-                <attribute name="tdi"/>
-                <attribute name="payloadSize"/>
+                <attribute name="testDataIndex" method="tdi"/>
+                <attribute name="payloadPerQuad" method="payloadSize"/>
                 <attribute name="badAsicMask0"/>
                 <attribute name="badAsicMask1"/>
                 <attribute name="asicMask"/>
                 <attribute name="quadMask"/>
-                <attribute name="roiMasks"/>
-                <attribute name="numAsicsRead"/>
-                <attribute name="numQuads"/>
-                <attribute name="numSect"/>
+                <attribute name="roiMask" method="roiMasks"/>
                 <attribute name="protectionThresholds" rank="1"/>
                 <attribute name="quads" rank="1"/>
             </dataset>
