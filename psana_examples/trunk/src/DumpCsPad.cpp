@@ -37,6 +37,52 @@
 using namespace psana_examples;
 PSANA_MODULE_FACTORY(DumpCsPad)
 
+namespace {
+
+  void dumpQuadReg(std::ostream& str, const Psana::CsPad::ConfigV1QuadReg& quad)
+  {
+    str << "\n    shiftSelect = " << quad.shiftSelect();
+    str << "\n    edgeSelect = " << quad.edgeSelect();
+    str << "\n    readClkSet = " << quad.readClkSet();
+    str << "\n    readClkHold = " << quad.readClkHold();
+    str << "\n    dataMode = " << quad.dataMode();
+    str << "\n    prstSel = " << quad.prstSel();
+    str << "\n    acqDelay = " << quad.acqDelay();
+    str << "\n    intTime = " << quad.intTime();
+    str << "\n    digDelay = " << quad.digDelay();
+    str << "\n    ampIdle = " << quad.ampIdle();
+    str << "\n    injTotal = " << quad.injTotal();
+    str << "\n    rowColShiftPer = " << quad.rowColShiftPer();
+    str << "\n    digitalPots = " << quad.dp().pots();
+    str << "\n    readOnly = shiftTest: " << quad.ro().shiftTest() << " verstion: " << quad.ro().version();
+    str << "\n    gainMap = " << quad.gm().gainMap();
+  }
+
+  void dumpQuadReg(std::ostream& str, const Psana::CsPad::ConfigV2QuadReg& quad)
+  {
+    str << "\n    shiftSelect = " << quad.shiftSelect();
+    str << "\n    edgeSelect = " << quad.edgeSelect();
+    str << "\n    readClkSet = " << quad.readClkSet();
+    str << "\n    readClkHold = " << quad.readClkHold();
+    str << "\n    dataMode = " << quad.dataMode();
+    str << "\n    prstSel = " << quad.prstSel();
+    str << "\n    acqDelay = " << quad.acqDelay();
+    str << "\n    intTime = " << quad.intTime();
+    str << "\n    digDelay = " << quad.digDelay();
+    str << "\n    ampIdle = " << quad.ampIdle();
+    str << "\n    injTotal = " << quad.injTotal();
+    str << "\n    rowColShiftPer = " << quad.rowColShiftPer();
+    str << "\n    ampReset = " << quad.ampReset();
+    str << "\n    digCount = " << quad.digCount();
+    str << "\n    digPeriod = " << quad.digPeriod();
+    str << "\n    digitalPots = " << quad.dp().pots();
+    str << "\n    readOnly = shiftTest: " << quad.ro().shiftTest() << " verstion: " << quad.ro().version();
+    str << "\n    gainMap = " << quad.gm().gainMap();
+  }
+
+}
+
+
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
 //		----------------------------------------
@@ -85,6 +131,10 @@ DumpCsPad::beginCalibCycle(Event& evt, Env& env)
       str << "\n  numAsicsRead = " << config1->numAsicsRead();
       str << "\n  numQuads = " << config1->numQuads();
       str << "\n  numSect = " << config1->numSect();
+      for (unsigned iq = 0; iq != config1->numQuads(); ++ iq) {
+        str << "\n  quad #" << iq;
+        dumpQuadReg(str, config1->quads(iq));
+      }
     }
     
   }
@@ -116,6 +166,10 @@ DumpCsPad::beginCalibCycle(Event& evt, Env& env)
       str << "\n  numAsicsStored =";
       for (unsigned i = 0; i < config2->numQuads(); ++ i) {
         str << ' ' << config2->numAsicsStored(i);
+      }
+      for (unsigned iq = 0; iq != config2->numQuads(); ++ iq) {
+        str << "\n  quad #" << iq;
+        dumpQuadReg(str, config2->quads(iq));
       }
     }
     
@@ -156,6 +210,10 @@ DumpCsPad::beginCalibCycle(Event& evt, Env& env)
       for (unsigned i = 0; i < config3->numQuads(); ++ i) {
         str << ' ' << config3->numAsicsStored(i);
       }
+      for (unsigned iq = 0; iq != config3->numQuads(); ++ iq) {
+        str << "\n  quad #" << iq;
+        dumpQuadReg(str, config3->quads(iq));
+      }
     }
     
   }
@@ -194,6 +252,10 @@ DumpCsPad::beginCalibCycle(Event& evt, Env& env)
       str << "\n  numAsicsStored =";
       for (unsigned i = 0; i < config4->numQuads(); ++ i) {
         str << ' ' << config4->numAsicsStored(i);
+      }
+      for (unsigned iq = 0; iq != config4->numQuads(); ++ iq) {
+        str << "\n  quad #" << iq;
+        dumpQuadReg(str, config4->quads(iq));
       }
     }
     

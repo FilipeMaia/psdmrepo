@@ -108,6 +108,9 @@ DumpCsPad2x2::beginCalibCycle(Event& evt, Env& env)
       str << "\n    kdConstant = " << quad.kdConstant();
       str << "\n    humidThold = " << quad.humidThold();
       str << "\n    setPoint = " << quad.setPoint();
+      str << "\n    digitalPots = " << quad.dp().pots();
+      str << "\n    readOnly = shiftTest: " << quad.ro().shiftTest() << " verstion: " << quad.ro().version();
+      str << "\n    gainMap = " << quad.gm().gainMap();
     }
     
   }
@@ -157,6 +160,9 @@ DumpCsPad2x2::beginCalibCycle(Event& evt, Env& env)
       str << "\n    kdConstant = " << quad.kdConstant();
       str << "\n    humidThold = " << quad.humidThold();
       str << "\n    setPoint = " << quad.setPoint();
+      str << "\n    digitalPots = " << quad.dp().pots();
+      str << "\n    readOnly = shiftTest: " << quad.ro().shiftTest() << " verstion: " << quad.ro().version();
+      str << "\n    gainMap = " << quad.gm().gainMap();
     }
 
   }

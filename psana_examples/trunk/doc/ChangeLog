@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-13
+2013-03-27 Andy Salnikov
+- dump more info for cspad and cspad2x2
+
 Tag: V00-03-12
 2013-03-25 Andy Salnikov
 - DumpPrinceton: convert some values to integers before printing
