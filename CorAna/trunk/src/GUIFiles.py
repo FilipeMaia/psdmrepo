@@ -49,7 +49,7 @@ class GUIFiles ( QtGui.QWidget ) :
     #----------------
     def __init__ ( self, parent=None ) :
         QtGui.QWidget.__init__(self, parent)
-        self.setGeometry(1, 1, 800, 300)
+        self.setGeometry(1, 1, 600, 200)
         self.setWindowTitle('Files')
         self.setFrame()
 
@@ -77,6 +77,7 @@ class GUIFiles ( QtGui.QWidget ) :
         self.vbox.addWidget(self.lab_title)
         self.vbox.addWidget(self.tab_bar)
         self.vbox.addLayout(self.hboxW)
+        self.vbox.addStretch(1)     
         self.vbox.addLayout(self.hboxB)
         self.setLayout(self.vbox)
 
@@ -122,7 +123,8 @@ class GUIFiles ( QtGui.QWidget ) :
         #self.setFixedHeight(400)
         #self.setFixedHeight(330)
         #self.setFixedSize(550,350)
-        self.setFixedSize(600,360)
+        #self.setFixedSize(600,360)
+        self.setMinimumSize(750,760)
         
     def makeTabBar(self,mode=None) :
         #if mode != None : self.tab_bar.close()
@@ -172,29 +174,35 @@ class GUIFiles ( QtGui.QWidget ) :
         if cp.current_file_tab.value() == self.list_file_types[0] :
             self.gui_win = GUIDark(self)
             self.setStatus(0, 'Status: processing for pedestals')
+            self.gui_win.setFixedHeight(580)
             
         if cp.current_file_tab.value() == self.list_file_types[1] :
             self.gui_win = GUIFlatField(self)
             self.setStatus(0, 'Status: set file for flat field')
+            self.gui_win.setFixedHeight(200)
 
         if cp.current_file_tab.value() == self.list_file_types[2] :
             self.gui_win = GUIBlemish(self)
             self.setStatus(0, 'Status: set file for blemish mask')
+            self.gui_win.setFixedHeight(200)
 
         if cp.current_file_tab.value() == self.list_file_types[3] :
             self.gui_win = GUIData(self)
             self.setStatus(0, 'Status: processing for data')
+            self.gui_win.setFixedHeight(640)
 
         if cp.current_file_tab.value() == self.list_file_types[4] :
             self.gui_win = GUIConfigParameters(self)
             self.setStatus(0, 'Status: set file for config. pars.')
+            self.gui_win.setFixedHeight(200)
 
         if cp.current_file_tab.value() == self.list_file_types[5] :
             self.gui_win = GUIWorkResDirs(self)
             self.setStatus(0, 'Status: set work and result dirs.')
+            self.gui_win.setFixedHeight(200)
 
         #self.gui_win.setFixedHeight(180)
-        self.gui_win.setFixedHeight(200)
+        #self.gui_win.setFixedHeight(600)
         self.hboxW.addWidget(self.gui_win)
 
     def onTabBar(self):

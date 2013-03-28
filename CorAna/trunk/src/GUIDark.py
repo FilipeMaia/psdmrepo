@@ -35,6 +35,7 @@ from PlotImgSpe             import *
 from BatchLogParser         import blp
 from GUIFileBrowser         import *
 from BatchJobPedestals      import bjpeds
+from GUIFilesStatusTable    import *
 #import GlobalGraphics       as gg
 
 #---------------------
@@ -78,15 +79,16 @@ class GUIDark ( QtGui.QWidget ) :
         self.but_plot    = QtGui.QPushButton('Plot')
         self.but_remove  = QtGui.QPushButton('Remove')
 
+        self.table_scan = GUIFilesStatusTable (parent=None, list_of_files=fnm.get_list_of_files_peds_scan())
+        self.table_aver = GUIFilesStatusTable (parent=None, list_of_files=fnm.get_list_of_files_peds_aver())
+
         self.grid = QtGui.QGridLayout()
-        self.grid_row = 1
+        self.grid_row = 0
         #self.grid.addWidget(self.tit_path,     self.grid_row,   0)
         self.grid.addWidget(self.cbx_dark,      self.grid_row,   0, 1, 6)
-
         self.grid.addWidget(self.but_path,      self.grid_row+1, 0)
         self.grid.addWidget(self.edi_path,      self.grid_row+1, 1, 1, 7)
         self.grid.addWidget(self.cbx_all_chunks,self.grid_row+2, 1, 1, 6)
-
         self.grid.addWidget(self.lab_batch,     self.grid_row+3, 0)
         self.grid.addWidget(self.lab_status,    self.grid_row+3, 1, 1, 2)
         self.grid.addWidget(self.lab_start,     self.grid_row+3, 3)
@@ -103,6 +105,10 @@ class GUIDark ( QtGui.QWidget ) :
         self.grid.addWidget(self.but_browse,    self.grid_row+5, 3) #, 1, 2)
         self.grid.addWidget(self.but_plot,      self.grid_row+5, 4)
         self.grid.addWidget(self.but_remove,    self.grid_row+5, 7)
+        self.grid.addWidget(self.table_scan,    self.grid_row+6, 0, 4, 8)
+        self.grid.addWidget(self.table_aver,    self.grid_row+10,0, 4, 8)
+
+        #self.grid.setRowMinimumHeight(self.grid_row+3, 5)
 
         self.connect(self.but_path,      QtCore.SIGNAL('clicked()'),          self.on_but_path      )
         self.connect(self.but_status,    QtCore.SIGNAL('clicked()'),          self.on_but_status    )
@@ -171,6 +177,7 @@ class GUIDark ( QtGui.QWidget ) :
         self.lab_end       .setStyleSheet (cp.styleLabel)
         self.lab_total     .setStyleSheet (cp.styleLabel)
         self.lab_time      .setStyleSheet (cp.styleLabel)
+        self.lab_time      .setFixedHeight(10)
 
         self.edi_path      .setStyleSheet (cp.styleEditInfo) # cp.styleEditInfo
         self.edi_path      .setAlignment  (QtCore.Qt.AlignRight)
@@ -183,7 +190,7 @@ class GUIDark ( QtGui.QWidget ) :
         self.edi_bat_start .setFixedWidth(width)
         self.edi_bat_end   .setFixedWidth(width)
         self.edi_bat_total .setFixedWidth(width)
-        self.edi_bat_time  .setFixedWidth(140)
+        self.edi_bat_time  .setMinimumWidth(140)
 
         self.edi_bat_start .setAlignment(QtCore.Qt.AlignRight)
         self.edi_bat_end   .setAlignment(QtCore.Qt.AlignRight)
@@ -307,23 +314,47 @@ class GUIDark ( QtGui.QWidget ) :
 
     def on_but_status(self):
         logger.debug('on_but_status', __name__)
+        logger.info('='*110, __name__)
+        bjpeds.check_work_files_for_pedestals()
+        bjpeds.check_batch_job_for_peds_scan()
+        bjpeds.check_batch_job_for_peds_aver()
+
         self.check_status()
 
 
     def check_status(self):
-        logger.info('='*110, __name__)
-        bjpeds.check_work_files_for_pedestals()
-        if bjpeds.status_for_peds_scan_files() : self.but_scan.setStyleSheet(cp.styleButtonGood)
-        else                                   : self.but_scan.setStyleSheet(cp.styleButtonBad)
-        if bjpeds.status_for_peds_aver_files() :
-            self.but_aver.setStyleSheet(cp.styleButtonGood)
-            self.disconnectFromThread1()            
-        else                                   : self.but_aver.setStyleSheet(cp.styleButtonBad)
+        self.check_status_scan()
+        self.check_status_aver()
+        if cp.procDarkStatus == 0 : self.disconnectFromThread1()
 
-        bjpeds.check_batch_job_for_peds_scan()
-        bjpeds.check_batch_job_for_peds_aver()
-        blp.parse_batch_log_peds_scan()
-        self.set_fields()
+
+    def check_status_scan(self):
+        bstatus, bstatus_str = bjpeds.status_batch_job_for_peds_scan()
+        fstatus, fstatus_str = bjpeds.status_for_peds_scan_files()
+        msg = 'Scan: ' + bstatus_str + '   ' + fstatus_str
+        self.set_for_status(fstatus, msg, self.but_scan, self.table_scan)
+        if fstatus :
+            blp.parse_batch_log_peds_scan()
+            self.set_fields()
+        if cp.procDarkStatus & 1 : logger.info(msg, __name__) 
+
+
+    def check_status_aver(self):
+        bstatus, bstatus_str = bjpeds.status_batch_job_for_peds_aver()
+        fstatus, fstatus_str = bjpeds.status_for_peds_aver_files()
+        msg = 'Peds: ' + bstatus_str + '   ' + fstatus_str
+        self.set_for_status(fstatus, msg, self.but_aver, self.table_aver)
+        if cp.procDarkStatus & 2 : logger.info(msg, __name__) 
+
+
+    def set_for_status(self, status, msg, but, table):
+        """Sets the status string above the table and color of the submit button"""
+        if status :
+            but  .setStyleSheet(cp.styleButtonGood)
+            table.setStatus(0, msg)
+        else :
+            but  .setStyleSheet(cp.styleButtonBad)
+            table.setStatus(2, msg)
 
 
     def on_edi_bat_start(self):

@@ -38,6 +38,7 @@ from BatchLogParser         import blp
 from GUIFileBrowser         import *
 from BatchJobData           import bjdata
 from EventTimeRecords       import *
+from GUIFilesStatusTable    import *
 
 #---------------------
 #  Class definition --
@@ -81,7 +82,12 @@ class GUIData ( QtGui.QWidget ) :
         self.but_status = QtGui.QPushButton('Check status')
         self.but_remove = QtGui.QPushButton('Remove')
 
-  
+        self.table_scan = GUIFilesStatusTable (parent=self, list_of_files=fnm.get_list_of_files_data_scan())
+        self.table_aver = GUIFilesStatusTable (parent=self, list_of_files=fnm.get_list_of_files_data_aver_short())
+        #self.table_scan.setMinimumHeight(285)
+        self.table_scan.table.setFixedWidth(self.table_scan.table.horizontalHeader().length() + 4)
+        self.table_scan.table.setFixedHeight(self.table_scan.table.verticalHeader().length() + 29)
+
         self.grid = QtGui.QGridLayout()
         self.grid_row = 1
         self.grid.addWidget(self.cbx_data,      self.grid_row,   0, 1, 6)          
@@ -110,6 +116,9 @@ class GUIData ( QtGui.QWidget ) :
         self.grid.addWidget(self.but_plot,      self.grid_row+5, 4)
         self.grid.addWidget(self.but_tspl,      self.grid_row+5, 5)
         self.grid.addWidget(self.but_remove,    self.grid_row+5, 7)
+
+        self.grid.addWidget(self.table_scan,    self.grid_row+6, 0, 7, 8)
+        self.grid.addWidget(self.table_aver,    self.grid_row+13,0, 4, 8)
 
         self.connect(self.but_path,      QtCore.SIGNAL('clicked()'),         self.on_but_path )
         self.connect(self.but_plot,      QtCore.SIGNAL('clicked()'),         self.on_but_plot )
@@ -186,6 +195,7 @@ class GUIData ( QtGui.QWidget ) :
         self.lab_end       .setStyleSheet (cp.styleLabel)
         self.lab_total     .setStyleSheet (cp.styleLabel)
         self.lab_time      .setStyleSheet (cp.styleLabel)
+        self.lab_time      .setFixedHeight(10)
 
         self.edi_path      .setStyleSheet (cp.styleEditInfo)
         self.edi_path      .setAlignment  (QtCore.Qt.AlignRight)
@@ -198,7 +208,7 @@ class GUIData ( QtGui.QWidget ) :
         self.edi_bat_start .setFixedWidth(width)
         self.edi_bat_end   .setFixedWidth(width)
         self.edi_bat_total .setFixedWidth(width)
-        self.edi_bat_time  .setFixedWidth(140)
+        self.edi_bat_time  .setMinimumWidth(140)
 
         self.edi_bat_start .setAlignment(QtCore.Qt.AlignRight)
         self.edi_bat_end   .setAlignment(QtCore.Qt.AlignRight)
@@ -325,27 +335,49 @@ class GUIData ( QtGui.QWidget ) :
 
     def on_but_status(self):
         logger.debug('on_but_status', __name__)
+        logger.info('='*110, __name__)
+        bjdata.check_work_files_for_data_aver()
+        bjdata.check_batch_job_for_data_scan()
+        bjdata.check_batch_job_for_data_aver()
+
         self.check_status()
 
 
     def check_status(self):
-        logger.debug('on_but_status', __name__)
-        logger.info('='*110, __name__)
-        bjdata.check_work_files_for_data_aver()
+        self.check_status_scan()
+        self.check_status_aver()
+        if cp.procDataStatus == 0 : self.disconnectFromThread1()
 
-        if bjdata.status_for_data_scan_files() : self.but_scan.setStyleSheet(cp.styleButtonGood)
-        else                                   : self.but_scan.setStyleSheet(cp.styleButtonBad)
-        if bjdata.status_for_data_aver_files() :
-            self.but_aver.setStyleSheet(cp.styleButtonGood)
-            self.disconnectFromThread1()            
-        else                                   : self.but_aver.setStyleSheet(cp.styleButtonBad)
-        #self.but_status
 
-        bjdata.check_batch_job_for_data_scan()
-        bjdata.check_batch_job_for_data_aver()
-        blp.parse_batch_log_data_scan()
-        blp.parse_batch_log_data_aver()
-        self.set_fields()
+    def check_status_scan(self):
+        bstatus, bstatus_str = bjdata.status_batch_job_for_data_scan()
+        fstatus, fstatus_str = bjdata.status_for_data_scan_files()
+        msg = 'Scan: ' + bstatus_str + '   ' + fstatus_str
+        self.set_for_status(fstatus, msg, self.but_scan, self.table_scan)
+        if fstatus :
+            blp.parse_batch_log_data_scan()
+            self.set_fields()
+        if cp.procDataStatus & 1 : logger.info(msg, __name__) 
+
+
+    def check_status_aver(self):
+        bstatus, bstatus_str = bjdata.status_batch_job_for_data_aver()
+        fstatus, fstatus_str = bjdata.status_for_data_aver_files()
+        msg = 'Aver: ' + bstatus_str + '   ' + fstatus_str
+        self.set_for_status(fstatus, msg, self.but_aver, self.table_aver)
+        if fstatus :
+            blp.parse_batch_log_data_aver()
+            self.set_fields()
+        if cp.procDataStatus & 2 : logger.info(msg, __name__) 
+
+
+    def set_for_status(self, status, msg, but, table):
+        if status :
+            but  .setStyleSheet(cp.styleButtonGood)
+            table.setStatus(0, msg)
+        else :
+            but  .setStyleSheet(cp.styleButtonBad)
+            table.setStatus(2, msg)
 
 
     def on_edi_bat_start(self):

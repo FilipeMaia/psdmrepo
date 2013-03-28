@@ -221,9 +221,11 @@ def batch_job_status(job_id_str, queue='psnehq') :
     if err != '' : logger.warning('batch_job_status:\n' + err, __name__) 
     status = None
     lines  = p.stdout.readlines() # returns the list of lines in file
+    #for line in lines : print 'batch_job_status: ' + line
     if len(lines)<2 : return None
     line   = lines[1].strip('\n')
     status = line.split()[2]
+    #print 'status: ', status
     return status # it might None, 'RUN', 'PEND', 'EXIT', 'DONE', etc 
 
 

@@ -11,6 +11,11 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2013-03-27 Mikhail S. Dubrovin
+Tag: V00-00-10
+- add files' status tables in GUIData and GUIDark
+- add src/GUIFilesStatusTable.py	
+
 2013-03-25 Mikhail S. Dubrovin
 Tag: V00-00-09
 - minor improvements and extra protections in many places

@@ -68,6 +68,9 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.iconsAreLoaded  = False
         self.plotarray_is_on = False
         self.plotg2_is_on    = False
+
+        self.procDarkStatus  = 0 # 0=inctive, 1=scan, 2=averaging, 3=both
+        self.procDataStatus  = 0 # 0=inctive, 1=scan, 2=averaging, 3=both
         self.autoRunStatus   = 0 # 0=inctive, 1=split, 2=process, 3=merge
 
         #self.plotimgspe      = None

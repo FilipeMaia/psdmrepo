@@ -78,6 +78,7 @@ class BatchJobData(BatchJob) :
         bat_log_file = fnm.path_data_scan_batch_log()
 
         self.job_id_data_scan, out, err = gu.batch_job_submit(command, queue, bat_log_file)
+        cp.procDataStatus ^= 1 # set bit to 1
 
 #-----------------------------
 
@@ -93,6 +94,7 @@ class BatchJobData(BatchJob) :
         bat_log_file = fnm.path_data_aver_batch_log()
 
         self.job_id_data_aver, out, err = gu.batch_job_submit(command, queue, bat_log_file)
+        cp.procDataStatus ^= 2 # set bit to 1
 
 #-----------------------------
 
@@ -104,7 +106,6 @@ class BatchJobData(BatchJob) :
     def check_batch_job_for_data_scan(self) :
         self.check_batch_job(self.job_id_data_scan, 'data scan')
 
-#-----------------------------
 #-----------------------------
 
     def print_work_files_for_data_aver(self) :
@@ -123,16 +124,34 @@ class BatchJobData(BatchJob) :
 #-----------------------------
 
     def status_for_data_aver_files(self) :
-        list_of_files = fnm.get_list_of_files_data_aver_short()
-        status = self.status_for_files(list_of_files, comment='of data average: ')
-        return status
+        stat = self.status_for_files(fnm.get_list_of_files_data_aver_short(), comment='of data average: ')
+        if stat and cp.procDataStatus & 2 : cp.procDataStatus ^= 2 # set bit to 0
+        return stat
 
 #-----------------------------
 
     def status_for_data_scan_files(self) :
-        list_of_files = fnm.get_list_of_files_data_scan()
-        status = self.status_for_files(list_of_files, comment='of data scan: ')
-        return status
+        stat = self.status_for_files(fnm.get_list_of_files_data_scan(), comment='of data scan: ')
+        if stat and cp.procDataStatus & 1 : cp.procDataStatus ^= 1 # set bit to 0
+        return stat
+
+#-----------------------------
+
+    def status_for_data_scan_files(self, comment='') :
+        stat, msg = self.status_and_string_for_files(fnm.get_list_of_files_data_scan(), comment)
+        if stat and cp.procDataStatus & 1 : cp.procDataStatus ^= 1 # set bit to 0
+        return stat, msg
+
+    def status_for_data_aver_files(self, comment='') :
+        stat, msg = self.status_and_string_for_files(fnm.get_list_of_files_data_aver_short(), comment)
+        if stat and cp.procDataStatus & 2 : cp.procDataStatus ^= 2 # set bit to 0
+        return stat, msg
+
+    def status_batch_job_for_data_scan(self) :
+        return self.get_batch_job_status_and_string(self.job_id_data_scan, self.time_scan_job_submitted)
+
+    def status_batch_job_for_data_aver(self) :
+        return self.get_batch_job_status_and_string(self.job_id_data_aver, self.time_aver_job_submitted)
 
 #-----------------------------
 

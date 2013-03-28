@@ -77,6 +77,9 @@ class BatchJobPedestals (BatchJob) :
         bat_log_file = fnm.path_peds_scan_batch_log()
 
         self.job_id_scan_str, out, err = gu.batch_job_submit(command, queue, bat_log_file)
+        cp.procDarkStatus ^= 1 # set bit to 1
+        #print 'cp.procDarkStatus: ', cp.procDarkStatus
+
 
 #-----------------------------
 
@@ -92,6 +95,8 @@ class BatchJobPedestals (BatchJob) :
         bat_log_file = fnm.path_peds_aver_batch_log()
 
         self.job_id_peds_str, out, err = gu.batch_job_submit(command, queue, bat_log_file)
+        cp.procDarkStatus ^= 2 # set bit to 1
+        #print 'cp.procDarkStatus: ', cp.procDarkStatus
 
 #-----------------------------
 
@@ -129,15 +134,32 @@ class BatchJobPedestals (BatchJob) :
 
 
     def status_for_peds_aver_files(self) :
-        list_of_files = fnm.get_list_of_files_peds_aver()
-        status = self.status_for_files(list_of_files, comment='of peds average: ')
-        return status
-
+        stat = self.status_for_files(fnm.get_list_of_files_peds_aver(), comment='of peds average: ')
+        if stat and cp.procDarkStatus & 1 : cp.procDarkStatus ^= 1 # set bit to 0
+        return stat
 
     def status_for_peds_scan_files(self) :
-        list_of_files = fnm.get_list_of_files_peds_scan()
-        status = self.status_for_files(list_of_files, comment='of peds scan: ')
-        return status
+        stat = self.status_for_files(fnm.get_list_of_files_peds_scan(), comment='of peds scan: ')
+        if stat and cp.procDarkStatus & 2 : cp.procDarkStatus ^= 2 # set bit to 0
+        return stat
+
+#-----------------------------
+
+    def status_for_peds_scan_files(self, comment='') :
+        stat, msg = self.status_and_string_for_files(fnm.get_list_of_files_peds_scan(), comment)
+        if stat and cp.procDarkStatus & 1 : cp.procDarkStatus ^= 1 # set bit to 0
+        return stat, msg
+    
+    def status_for_peds_aver_files(self, comment='') :
+        stat, msg = self.status_and_string_for_files(fnm.get_list_of_files_peds_aver(), comment)
+        if stat and cp.procDarkStatus & 2 : cp.procDarkStatus ^= 2 # set bit to 0
+        return stat, msg
+
+    def status_batch_job_for_peds_scan(self) :
+        return self.get_batch_job_status_and_string(self.job_id_scan_str, self.time_scan_job_submitted)
+
+    def status_batch_job_for_peds_aver(self) :
+        return self.get_batch_job_status_and_string(self.job_id_peds_str, self.time_peds_job_submitted)
 
 #-----------------------------
 
