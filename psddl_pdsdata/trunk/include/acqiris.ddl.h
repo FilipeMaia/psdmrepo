@@ -207,14 +207,18 @@ public:
     : _horPos(arg__horPos), _timeStampLo(arg__timeStampLo), _timeStampHi(arg__timeStampHi)
   {
   }
+  /** Horizontal position, for the segment, of the first (nominal) data point with respect 
+            to the origin of the nominal trigger delay in seconds. */
   double pos() const { return _horPos; }
   uint32_t timeStampLo() const { return _timeStampLo; }
   uint32_t timeStampHi() const { return _timeStampHi; }
-  /** Full timestamp as 64-bit number. */
+  /** 64-bit trigger timestamp, in units of picoseconds. The timestamp is the trigger time 
+                with respect to an arbitrary time origin. */
   uint64_t value() const;
   static uint32_t _sizeof()  { return 16; }
 private:
-  double	_horPos;
+  double	_horPos;	/**< Horizontal position, for the segment, of the first (nominal) data point with respect 
+            to the origin of the nominal trigger delay in seconds. */
   uint32_t	_timeStampLo;
   uint32_t	_timeStampHi;
 };
@@ -243,7 +247,9 @@ public:
   ndarray<const Acqiris::TimestampV1, 1> timestamp(const Acqiris::ConfigV1& cfg) const { ptrdiff_t offset=64;
   const Acqiris::TimestampV1* data = (const Acqiris::TimestampV1*)(((char*)this)+offset);
   return make_ndarray(data, cfg.horiz().nbrSegments()); }
-  /** Waveforms data, two-dimensional array [nbrSegments()]*[nbrSamplesInSeg()] */
+  /** Waveforms data, two-dimensional array [nbrSegments()]*[nbrSamplesInSeg()]. Note that 
+            unlike in pdsdata this already takes into account value of the indexFirstPoint so
+            that client code does not need to correct for this offset. */
   ndarray<const int16_t, 2> waveforms(const Acqiris::ConfigV1& cfg) const { ptrdiff_t offset=(64+(16*(cfg.horiz().nbrSegments())))+(2*(this->indexFirstPoint()));
   const int16_t* data = (const int16_t*)(((char*)this)+offset);
   return make_ndarray(data, cfg.horiz().nbrSegments(), cfg.horiz().nbrSamples()); }
