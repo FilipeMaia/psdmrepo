@@ -154,10 +154,8 @@ struct dataset_data {
   ~dataset_data();
 
   double pos; 
-  uint32_t timeStampLo; 
-  uint32_t timeStampHi; 
+  uint64_t value; 
 
-  operator Psana::Acqiris::TimestampV1() const { return Psana::Acqiris::TimestampV1(pos, timeStampLo, timeStampHi); }
 };
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::DataDescV1> > make_DataDescV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::Acqiris::ConfigV1>& cfg);

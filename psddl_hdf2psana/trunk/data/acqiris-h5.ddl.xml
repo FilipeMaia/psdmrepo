@@ -35,13 +35,16 @@
             <tag name="skip-proxy"/>
             <dataset name="data">
                 <attribute name="pos"/>
-                <attribute name="timeStampLo"/>
-                <attribute name="timeStampHi"/>
+                <attribute name="value"/>
             </dataset>
         </h5schema>
         
-        
         <h5schema name="DataDescV1Elem" version="0">
+            <tag name="skip-proxy"/>
+            <tag name="external" value="psddl_hdf2psana/acqiris.h"/>
+        </h5schema>
+
+        <h5schema name="DataDescV1Elem" version="1">
             <tag name="skip-proxy"/>
             <tag name="external" value="psddl_hdf2psana/acqiris.h"/>
         </h5schema>
@@ -50,6 +53,9 @@
             <tag name="external" value="psddl_hdf2psana/acqiris.h"/>
         </h5schema>
 
+        <h5schema name="DataDescV1" version="1">
+            <tag name="external" value="psddl_hdf2psana/acqiris.h"/>
+        </h5schema>
 
 
         <h5schema name="TdcDataV1_Item" version="0">

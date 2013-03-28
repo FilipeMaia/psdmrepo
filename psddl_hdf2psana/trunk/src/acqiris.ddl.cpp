@@ -13,6 +13,8 @@
 #include "psddl_hdf2psana/acqiris.h"
 #include "psddl_hdf2psana/acqiris.h"
 #include "psddl_hdf2psana/acqiris.h"
+#include "psddl_hdf2psana/acqiris.h"
+#include "psddl_hdf2psana/acqiris.h"
 namespace psddl_hdf2psana {
 namespace Acqiris {
 
@@ -272,8 +274,7 @@ hdf5pp::Type ns_TimestampV1_v0_dataset_data_stored_type()
   typedef ns_TimestampV1_v0::dataset_data DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
   type.insert("pos", offsetof(DsType, pos), hdf5pp::TypeTraits<double>::stored_type());
-  type.insert("timeStampLo", offsetof(DsType, timeStampLo), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("timeStampHi", offsetof(DsType, timeStampHi), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("value", offsetof(DsType, value), hdf5pp::TypeTraits<uint64_t>::stored_type());
   return type;
 }
 
@@ -288,8 +289,7 @@ hdf5pp::Type ns_TimestampV1_v0_dataset_data_native_type()
   typedef ns_TimestampV1_v0::dataset_data DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
   type.insert("pos", offsetof(DsType, pos), hdf5pp::TypeTraits<double>::native_type());
-  type.insert("timeStampLo", offsetof(DsType, timeStampLo), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("timeStampHi", offsetof(DsType, timeStampHi), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("value", offsetof(DsType, value), hdf5pp::TypeTraits<uint64_t>::native_type());
   return type;
 }
 
@@ -308,6 +308,8 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::DataDescV1> > make_DataDescV1(int
   switch (version) {
   case 0:
     return boost::make_shared<PSEvt::DataProxy<Psana::Acqiris::DataDescV1> >(boost::make_shared<DataDescV1_v0<Psana::Acqiris::ConfigV1> >(group, idx, cfg));
+  case 1:
+    return boost::make_shared<PSEvt::DataProxy<Psana::Acqiris::DataDescV1> >(boost::make_shared<DataDescV1_v1<Psana::Acqiris::ConfigV1> >(group, idx, cfg));
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::Acqiris::DataDescV1> >(boost::shared_ptr<Psana::Acqiris::DataDescV1>());
   }
