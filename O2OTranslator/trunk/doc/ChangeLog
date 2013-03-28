@@ -11,6 +11,14 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-27-00
+2013-03-27 Andy Salnikov
+- fix for Acqiris DataDescV1 translation, the data that were stored before
+  were not corrected for indexFirstPoint and are incorrect when 
+  indexFirstPoint is non-zero
+- schema for Acqiris DataDescV1 changed as well, new dataset added and
+  timestamps dataset type has changed, schema version changed to 1
+
 Tag: V00-26-01
 2013-03-27 Andy Salnikov
 - fix for lost EPICS aliases

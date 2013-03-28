@@ -25,6 +25,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "ndarray/ndarray.h"
 #include "O2OTranslator/ConfigObjectStore.h"
 #include "O2OTranslator/O2OExceptions.h"
 #include "pdsdata/acqiris/ConfigV1.hh"
@@ -57,6 +58,7 @@ AcqirisDataDescV1Cvt::AcqirisDataDescV1Cvt ( const hdf5pp::Group& group,
     int schemaVersion )
   : EvtDataTypeCvt<XtcType>(group, typeGroupName, src, cvtOptions, schemaVersion)
   , m_configStore(configStore)
+  , m_dataCont()
   , m_timestampCont()
   , m_waveformCont()
   , n_miss(0)
@@ -105,7 +107,8 @@ AcqirisDataDescV1Cvt::fillContainers(hdf5pp::Group group,
   }
 
   // allocate data
-  uint64_t timestamps[nChan][nSeg] ;
+  H5DataTypes::AcqirisDataDescV1 datadesc[nChan] ;
+  H5DataTypes::AcqirisTimestampV1 timestamps[nChan][nSeg] ;
   int16_t waveforms[nChan][nSeg][nSampl] ;
 
   // scan the data and fill arrays
@@ -144,12 +147,11 @@ AcqirisDataDescV1Cvt::fillContainers(hdf5pp::Group group,
       }
     }
 
-    if (dd->nbrSegments() == 0) {
-      // fill with zeros
-      std::fill_n(timestamps[ch], nSeg, uint64_t(0));
-    } else {
+    datadesc[ch] = H5DataTypes::AcqirisDataDescV1(*dd);
+
+    if (dd->nbrSegments() != 0) {
       for ( uint32_t seg = 0 ; seg < nSeg ; ++ seg ) {
-        timestamps[ch][seg] = dd->timestamp(seg).value();
+        timestamps[ch][seg] = H5DataTypes::AcqirisTimestampV1(dd->timestamp(seg));
       }
     }
 
@@ -157,12 +159,20 @@ AcqirisDataDescV1Cvt::fillContainers(hdf5pp::Group group,
       std::fill_n(waveforms[ch][0], nSampl*nSeg, int16_t(0));
     } else {
       int16_t* wf = dd->waveform(hconfig) ;
+      wf += dd->indexFirstPoint() ;
       std::copy ( wf, wf+nSampl*nSeg, waveforms[ch][0] ) ;
     }
+    
   }
 
   // store the data
-  hdf5pp::Type type = H5Type::timestampType ( *config ) ;
+  hdf5pp::Type type = H5Type::stored_type( *config ) ;
+  if (not m_dataCont) {
+    m_dataCont = makeCont<DataCont>("data", group, true, type) ;
+    if (n_miss) m_dataCont->resize(n_miss);
+  }
+  m_dataCont->append ( datadesc[0], type ) ;
+  type = H5Type::timestampType ( *config ) ;
   if (not m_timestampCont) {
     m_timestampCont = makeCont<TimestampCont>("timestamps", group, true, type) ;
     if (n_miss) m_timestampCont->resize(n_miss);
@@ -184,6 +194,7 @@ AcqirisDataDescV1Cvt::fillMissing(hdf5pp::Group group,
                          const O2OXtcSrc& src)
 {
   if (m_timestampCont) {
+    m_dataCont->resize(m_dataCont->size() + 1);
     m_timestampCont->resize(m_timestampCont->size() + 1);
     m_waveformCont->resize(m_waveformCont->size() + 1);
   } else {

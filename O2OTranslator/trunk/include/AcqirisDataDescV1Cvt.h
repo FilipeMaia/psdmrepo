@@ -87,11 +87,13 @@ protected:
 
 private:
 
-  typedef H5DataTypes::ObjectContainer<uint64_t> TimestampCont ;
+  typedef H5DataTypes::ObjectContainer<H5DataTypes::AcqirisDataDescV1> DataCont ;
+  typedef H5DataTypes::ObjectContainer<H5DataTypes::AcqirisTimestampV1> TimestampCont ;
   typedef H5DataTypes::ObjectContainer<int16_t> WaveformCont ;
 
   // Data members
   const ConfigObjectStore& m_configStore;
+  boost::shared_ptr<DataCont> m_dataCont ;
   boost::shared_ptr<TimestampCont> m_timestampCont ;
   boost::shared_ptr<WaveformCont> m_waveformCont ;
   size_t n_miss;

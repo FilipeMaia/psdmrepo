@@ -208,7 +208,7 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
     switch (version) {
     case 1:
       // very special converter for Acqiris::DataDescV1, it needs two types of data
-      cvts.push_back(make_shared<AcqirisDataDescV1Cvt>(group, "Acqiris::DataDescV1", src, m_configStore, m_cvtOptions, 0));
+      cvts.push_back(make_shared<AcqirisDataDescV1Cvt>(group, "Acqiris::DataDescV1", src, m_configStore, m_cvtOptions, 1));
       break;
     }
     break;
