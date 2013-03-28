@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-15
+2013-03-28 Andy Salnikov
+- small improvements in DumpAcqiris
+
 Tag: V00-03-14
 2013-03-27 Andy Salnikov
 - DumpEpics now prints list of aliases in beginCalibCycle()

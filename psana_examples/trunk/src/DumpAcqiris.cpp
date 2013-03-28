@@ -77,7 +77,7 @@ DumpAcqiris::beginCalibCycle(Event& evt, Env& env)
            << " nbrSamples=" << h.nbrSamples();
       
       const ndarray<const Psana::Acqiris::VertV1, 1>& vert = acqConfig->vert();
-      for (unsigned ch = 0; ch < vert.shape()[0]; ++ ch) {
+      for (unsigned ch = 0; ch < acqConfig->nbrChannels(); ++ ch) {
         const Psana::Acqiris::VertV1& v = vert[ch];
         str << "\n  vert(" << ch << "):"
             << " fullScale=" << v.fullScale()
@@ -124,16 +124,18 @@ DumpAcqiris::event(Event& evt, Env& env)
 
         // loop over segments
         for (unsigned seg = 0; seg < elem.nbrSegments(); ++ seg) {
+
+          unsigned size = elem.nbrSamplesInSeg();
+          ndarray<const int16_t, 1> raw(waveforms[seg]);
+          ndarray<float, 1> wf = make_ndarray<float>(size);
+          for (unsigned i = 0; i < size; ++ i) {
+            wf[i] = raw[i]*slope + offset;
+          }
           
           str << "\n  Segment #" << seg
-              << "\n    timestamp=" << timestamps[seg].pos()
-              << "\n    data=[";
-          
-          unsigned size = std::min(elem.nbrSamplesInSeg(), 32U);
-          for (unsigned i = 0; i < size; ++ i) {
-            str << (waveforms[seg][i]*slope + offset) << ", ";
-          }
-          str << "...]";
+              << "\n    timestamp value = " << timestamps[seg].value() << " pos = " << timestamps[seg].pos()
+              << "\n    raw = " << raw
+              << "\n    data = " << wf;
         
         }
       }
