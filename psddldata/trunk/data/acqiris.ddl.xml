@@ -214,6 +214,8 @@
             <tag name="value-type"/>
         
             <attribute name="_horPos" type="double" accessor="pos">
+            Horizontal position, for the segment, of the first (nominal) data point with respect 
+            to the origin of the nominal trigger delay in seconds.
             </attribute>
 
             <attribute name="_timeStampLo" type="uint32_t" accessor="timeStampLo">
@@ -223,7 +225,8 @@
             </attribute>
 
             <method name="value" type="uint64_t">
-                Full timestamp as 64-bit number.
+                64-bit trigger timestamp, in units of picoseconds. The timestamp is the trigger time 
+                with respect to an arbitrary time origin.
                 <expr lang="C++" value="(((uint64_t){self}._timeStampHi)&lt;&lt;32) + {self}._timeStampLo" />
             </method>
 
@@ -255,6 +258,7 @@
             </attribute>
 
             <attribute name="_indexFirstPoint" type="uint32_t" accessor="indexFirstPoint">
+            
             </attribute>
 
             <attribute name="_sampTime" type="double" accessor="">
@@ -299,7 +303,9 @@
             <attribute name="_waveforms" type="int16_t" 
                     shape="{xtc-config}.horiz().nbrSegments(),{xtc-config}.horiz().nbrSamples()" 
                     accessor="waveforms" shape_method="waveforms_shape">
-            Waveforms data, two-dimensional array [nbrSegments()]*[nbrSamplesInSeg()]
+            Waveforms data, two-dimensional array [nbrSegments()]*[nbrSamplesInSeg()]. Note that 
+            unlike in pdsdata this already takes into account value of the indexFirstPoint so
+            that client code does not need to correct for this offset.
             </attribute>
 
             <attribute name="_extraSpace" type="int16_t" shape="_extraSize-{self}.indexFirstPoint()">

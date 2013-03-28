@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-23
+2013-03-28 Andy Salnikov
+- updated comments in acqiris schema
+
 Tag: V00-04-22
 2013-03-26 Andy Salnikov
 - small changes to cspad scheme to make it work with HDF5
