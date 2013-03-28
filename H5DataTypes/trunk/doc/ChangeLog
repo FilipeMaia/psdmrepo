@@ -11,6 +11,13 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-00
+2013-03-28 Andy Salnikov
+- fixing schema for Acqiris DataDescV1, adding new dataset for DataDescV1
+  content, and switching timestamp dataset to include full timestamp 
+  information
+- this should increment schema version number in translator
+
 Tag: V00-02-02
 2013-03-22 Andy Salnikov
 - UsdUsbDataV1: add status field, this should go into new schema version (1)
