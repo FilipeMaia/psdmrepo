@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include "psddl_psana/epics.ddl.h"
+#include <iostream>
 namespace Psana {
 namespace Epics {
 std::vector<int>

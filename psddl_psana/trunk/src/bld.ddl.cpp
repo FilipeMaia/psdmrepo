@@ -3,8 +3,134 @@
 
 #include <cstddef>
 #include "psddl_psana/bld.ddl.h"
+#include <iostream>
 namespace Psana {
 namespace Bld {
+std::ostream& operator<<(std::ostream& str, Bld::BldDataEBeamV0::DamageMask enval) {
+  const char* val;
+  switch (enval) {
+  case Bld::BldDataEBeamV0::EbeamChargeDamage:
+    val = "EbeamChargeDamage";
+    break;
+  case Bld::BldDataEBeamV0::EbeamL3EnergyDamage:
+    val = "EbeamL3EnergyDamage";
+    break;
+  case Bld::BldDataEBeamV0::EbeamLTUPosXDamage:
+    val = "EbeamLTUPosXDamage";
+    break;
+  case Bld::BldDataEBeamV0::EbeamLTUPosYDamage:
+    val = "EbeamLTUPosYDamage";
+    break;
+  case Bld::BldDataEBeamV0::EbeamLTUAngXDamage:
+    val = "EbeamLTUAngXDamage";
+    break;
+  case Bld::BldDataEBeamV0::EbeamLTUAngYDamage:
+    val = "EbeamLTUAngYDamage";
+    break;
+  default:
+    return str << "DamageMask(" << int(enval) << ")";
+  }
+  return str << val;
+}
+std::ostream& operator<<(std::ostream& str, Bld::BldDataEBeamV1::DamageMask enval) {
+  const char* val;
+  switch (enval) {
+  case Bld::BldDataEBeamV1::EbeamChargeDamage:
+    val = "EbeamChargeDamage";
+    break;
+  case Bld::BldDataEBeamV1::EbeamL3EnergyDamage:
+    val = "EbeamL3EnergyDamage";
+    break;
+  case Bld::BldDataEBeamV1::EbeamLTUPosXDamage:
+    val = "EbeamLTUPosXDamage";
+    break;
+  case Bld::BldDataEBeamV1::EbeamLTUPosYDamage:
+    val = "EbeamLTUPosYDamage";
+    break;
+  case Bld::BldDataEBeamV1::EbeamLTUAngXDamage:
+    val = "EbeamLTUAngXDamage";
+    break;
+  case Bld::BldDataEBeamV1::EbeamLTUAngYDamage:
+    val = "EbeamLTUAngYDamage";
+    break;
+  case Bld::BldDataEBeamV1::EbeamPkCurrBC2Damage:
+    val = "EbeamPkCurrBC2Damage";
+    break;
+  default:
+    return str << "DamageMask(" << int(enval) << ")";
+  }
+  return str << val;
+}
+std::ostream& operator<<(std::ostream& str, Bld::BldDataEBeamV2::DamageMask enval) {
+  const char* val;
+  switch (enval) {
+  case Bld::BldDataEBeamV2::EbeamChargeDamage:
+    val = "EbeamChargeDamage";
+    break;
+  case Bld::BldDataEBeamV2::EbeamL3EnergyDamage:
+    val = "EbeamL3EnergyDamage";
+    break;
+  case Bld::BldDataEBeamV2::EbeamLTUPosXDamage:
+    val = "EbeamLTUPosXDamage";
+    break;
+  case Bld::BldDataEBeamV2::EbeamLTUPosYDamage:
+    val = "EbeamLTUPosYDamage";
+    break;
+  case Bld::BldDataEBeamV2::EbeamLTUAngXDamage:
+    val = "EbeamLTUAngXDamage";
+    break;
+  case Bld::BldDataEBeamV2::EbeamLTUAngYDamage:
+    val = "EbeamLTUAngYDamage";
+    break;
+  case Bld::BldDataEBeamV2::EbeamPkCurrBC2Damage:
+    val = "EbeamPkCurrBC2Damage";
+    break;
+  case Bld::BldDataEBeamV2::EbeamEnergyBC2Damage:
+    val = "EbeamEnergyBC2Damage";
+    break;
+  default:
+    return str << "DamageMask(" << int(enval) << ")";
+  }
+  return str << val;
+}
+std::ostream& operator<<(std::ostream& str, Bld::BldDataEBeamV3::DamageMask enval) {
+  const char* val;
+  switch (enval) {
+  case Bld::BldDataEBeamV3::EbeamChargeDamage:
+    val = "EbeamChargeDamage";
+    break;
+  case Bld::BldDataEBeamV3::EbeamL3EnergyDamage:
+    val = "EbeamL3EnergyDamage";
+    break;
+  case Bld::BldDataEBeamV3::EbeamLTUPosXDamage:
+    val = "EbeamLTUPosXDamage";
+    break;
+  case Bld::BldDataEBeamV3::EbeamLTUPosYDamage:
+    val = "EbeamLTUPosYDamage";
+    break;
+  case Bld::BldDataEBeamV3::EbeamLTUAngXDamage:
+    val = "EbeamLTUAngXDamage";
+    break;
+  case Bld::BldDataEBeamV3::EbeamLTUAngYDamage:
+    val = "EbeamLTUAngYDamage";
+    break;
+  case Bld::BldDataEBeamV3::EbeamPkCurrBC2Damage:
+    val = "EbeamPkCurrBC2Damage";
+    break;
+  case Bld::BldDataEBeamV3::EbeamEnergyBC2Damage:
+    val = "EbeamEnergyBC2Damage";
+    break;
+  case Bld::BldDataEBeamV3::EbeamPkCurrBC1Damage:
+    val = "EbeamPkCurrBC1Damage";
+    break;
+  case Bld::BldDataEBeamV3::EbeamEnergyBC1Damage:
+    val = "EbeamEnergyBC1Damage";
+    break;
+  default:
+    return str << "DamageMask(" << int(enval) << ")";
+  }
+  return str << val;
+}
 
 BldDataIpimbV0::~BldDataIpimbV0() {}
 

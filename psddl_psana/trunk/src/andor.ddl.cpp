@@ -3,11 +3,35 @@
 
 #include <cstddef>
 #include "psddl_psana/andor.ddl.h"
+#include <iostream>
 namespace Psana {
 namespace Andor {
 
 ConfigV1::~ConfigV1() {}
 
+std::ostream& operator<<(std::ostream& str, Andor::ConfigV1::EnumFanMode enval) {
+  const char* val;
+  switch (enval) {
+  case Andor::ConfigV1::ENUM_FAN_FULL:
+    val = "ENUM_FAN_FULL";
+    break;
+  case Andor::ConfigV1::ENUM_FAN_LOW:
+    val = "ENUM_FAN_LOW";
+    break;
+  case Andor::ConfigV1::ENUM_FAN_OFF:
+    val = "ENUM_FAN_OFF";
+    break;
+  case Andor::ConfigV1::ENUM_FAN_ACQOFF:
+    val = "ENUM_FAN_ACQOFF";
+    break;
+  case Andor::ConfigV1::ENUM_FAN_NUM:
+    val = "ENUM_FAN_NUM";
+    break;
+  default:
+    return str << "EnumFanMode(" << int(enval) << ")";
+  }
+  return str << val;
+}
 
 FrameV1::~FrameV1() {}
 

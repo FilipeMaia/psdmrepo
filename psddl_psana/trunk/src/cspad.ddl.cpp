@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include "psddl_psana/cspad.ddl.h"
+#include <iostream>
 namespace Psana {
 namespace CsPad {
 

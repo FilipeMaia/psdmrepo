@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include "psddl_psana/control.ddl.h"
+#include <iostream>
 namespace Psana {
 namespace ControlData {
 uint8_t

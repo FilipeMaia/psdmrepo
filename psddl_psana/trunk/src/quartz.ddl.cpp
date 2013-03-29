@@ -3,10 +3,62 @@
 
 #include <cstddef>
 #include "psddl_psana/quartz.ddl.h"
+#include <iostream>
 namespace Psana {
 namespace Quartz {
 
 ConfigV1::~ConfigV1() {}
 
+std::ostream& operator<<(std::ostream& str, Quartz::ConfigV1::Depth enval) {
+  const char* val;
+  switch (enval) {
+  case Quartz::ConfigV1::Eight_bit:
+    val = "Eight_bit";
+    break;
+  case Quartz::ConfigV1::Ten_bit:
+    val = "Ten_bit";
+    break;
+  default:
+    return str << "Depth(" << int(enval) << ")";
+  }
+  return str << val;
+}
+std::ostream& operator<<(std::ostream& str, Quartz::ConfigV1::Binning enval) {
+  const char* val;
+  switch (enval) {
+  case Quartz::ConfigV1::x1:
+    val = "x1";
+    break;
+  case Quartz::ConfigV1::x2:
+    val = "x2";
+    break;
+  case Quartz::ConfigV1::x4:
+    val = "x4";
+    break;
+  default:
+    return str << "Binning(" << int(enval) << ")";
+  }
+  return str << val;
+}
+std::ostream& operator<<(std::ostream& str, Quartz::ConfigV1::Mirroring enval) {
+  const char* val;
+  switch (enval) {
+  case Quartz::ConfigV1::None:
+    val = "None";
+    break;
+  case Quartz::ConfigV1::HFlip:
+    val = "HFlip";
+    break;
+  case Quartz::ConfigV1::VFlip:
+    val = "VFlip";
+    break;
+  case Quartz::ConfigV1::HVFlip:
+    val = "HVFlip";
+    break;
+  default:
+    return str << "Mirroring(" << int(enval) << ")";
+  }
+  return str << val;
+}
 } // namespace Quartz
 } // namespace Psana

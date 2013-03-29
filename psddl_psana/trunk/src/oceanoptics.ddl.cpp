@@ -3,6 +3,7 @@
 
 #include <cstddef>
 #include "psddl_psana/oceanoptics.ddl.h"
+#include <iostream>
 namespace Psana {
 namespace OceanOptics {
 
