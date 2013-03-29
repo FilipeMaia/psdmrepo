@@ -3,15 +3,106 @@
 
 #include "psddl_pdsdata/pulnix.ddl.h"
 
+#include <iostream>
 namespace PsddlPds {
 namespace Pulnix {
 uint8_t
 TM6740ConfigV1::output_resolution_bits() const {
   return this->output_resolution() == Eight_bit ? 8 : 10;
 }
+std::ostream& operator<<(std::ostream& str, Pulnix::TM6740ConfigV1::Depth enval) {
+  const char* val;
+  switch (enval) {
+  case Pulnix::TM6740ConfigV1::Eight_bit:
+    val = "Eight_bit";
+    break;
+  case Pulnix::TM6740ConfigV1::Ten_bit:
+    val = "Ten_bit";
+    break;
+  default:
+    return str << "Depth(" << int(enval) << ")";
+  }
+  return str << val;
+}
+std::ostream& operator<<(std::ostream& str, Pulnix::TM6740ConfigV1::Binning enval) {
+  const char* val;
+  switch (enval) {
+  case Pulnix::TM6740ConfigV1::x1:
+    val = "x1";
+    break;
+  case Pulnix::TM6740ConfigV1::x2:
+    val = "x2";
+    break;
+  case Pulnix::TM6740ConfigV1::x4:
+    val = "x4";
+    break;
+  default:
+    return str << "Binning(" << int(enval) << ")";
+  }
+  return str << val;
+}
+std::ostream& operator<<(std::ostream& str, Pulnix::TM6740ConfigV1::LookupTable enval) {
+  const char* val;
+  switch (enval) {
+  case Pulnix::TM6740ConfigV1::Gamma:
+    val = "Gamma";
+    break;
+  case Pulnix::TM6740ConfigV1::Linear:
+    val = "Linear";
+    break;
+  default:
+    return str << "LookupTable(" << int(enval) << ")";
+  }
+  return str << val;
+}
 uint8_t
 TM6740ConfigV2::output_resolution_bits() const {
   return this->output_resolution() == Eight_bit ? 8 : 10;
+}
+std::ostream& operator<<(std::ostream& str, Pulnix::TM6740ConfigV2::Depth enval) {
+  const char* val;
+  switch (enval) {
+  case Pulnix::TM6740ConfigV2::Eight_bit:
+    val = "Eight_bit";
+    break;
+  case Pulnix::TM6740ConfigV2::Ten_bit:
+    val = "Ten_bit";
+    break;
+  default:
+    return str << "Depth(" << int(enval) << ")";
+  }
+  return str << val;
+}
+std::ostream& operator<<(std::ostream& str, Pulnix::TM6740ConfigV2::Binning enval) {
+  const char* val;
+  switch (enval) {
+  case Pulnix::TM6740ConfigV2::x1:
+    val = "x1";
+    break;
+  case Pulnix::TM6740ConfigV2::x2:
+    val = "x2";
+    break;
+  case Pulnix::TM6740ConfigV2::x4:
+    val = "x4";
+    break;
+  default:
+    return str << "Binning(" << int(enval) << ")";
+  }
+  return str << val;
+}
+std::ostream& operator<<(std::ostream& str, Pulnix::TM6740ConfigV2::LookupTable enval) {
+  const char* val;
+  switch (enval) {
+  case Pulnix::TM6740ConfigV2::Gamma:
+    val = "Gamma";
+    break;
+  case Pulnix::TM6740ConfigV2::Linear:
+    val = "Linear";
+    break;
+  default:
+    return str << "LookupTable(" << int(enval) << ")";
+  }
+  return str << val;
 }
 } // namespace Pulnix
 } // namespace PsddlPds

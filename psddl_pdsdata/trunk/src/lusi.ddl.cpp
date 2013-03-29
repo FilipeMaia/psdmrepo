@@ -3,6 +3,7 @@
 
 #include "psddl_pdsdata/lusi.ddl.h"
 
+#include <iostream>
 namespace PsddlPds {
 namespace Lusi {
 } // namespace Lusi

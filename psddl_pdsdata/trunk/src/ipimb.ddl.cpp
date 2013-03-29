@@ -3,8 +3,58 @@
 
 #include "psddl_pdsdata/ipimb.ddl.h"
 
+#include <iostream>
 namespace PsddlPds {
 namespace Ipimb {
+std::ostream& operator<<(std::ostream& str, Ipimb::ConfigV1::CapacitorValue enval) {
+  const char* val;
+  switch (enval) {
+  case Ipimb::ConfigV1::c_1pF:
+    val = "c_1pF";
+    break;
+  case Ipimb::ConfigV1::c_100pF:
+    val = "c_100pF";
+    break;
+  case Ipimb::ConfigV1::c_10nF:
+    val = "c_10nF";
+    break;
+  default:
+    return str << "CapacitorValue(" << int(enval) << ")";
+  }
+  return str << val;
+}
+std::ostream& operator<<(std::ostream& str, Ipimb::ConfigV2::CapacitorValue enval) {
+  const char* val;
+  switch (enval) {
+  case Ipimb::ConfigV2::c_1pF:
+    val = "c_1pF";
+    break;
+  case Ipimb::ConfigV2::c_4p7pF:
+    val = "c_4p7pF";
+    break;
+  case Ipimb::ConfigV2::c_24pF:
+    val = "c_24pF";
+    break;
+  case Ipimb::ConfigV2::c_120pF:
+    val = "c_120pF";
+    break;
+  case Ipimb::ConfigV2::c_620pF:
+    val = "c_620pF";
+    break;
+  case Ipimb::ConfigV2::c_3p3nF:
+    val = "c_3p3nF";
+    break;
+  case Ipimb::ConfigV2::c_10nF:
+    val = "c_10nF";
+    break;
+  case Ipimb::ConfigV2::expert:
+    val = "expert";
+    break;
+  default:
+    return str << "CapacitorValue(" << int(enval) << ")";
+  }
+  return str << val;
+}
 float
 DataV1::channel0Volts() const {
   return float(this->_channel0)*3.3/65535;

@@ -3,6 +3,7 @@
 
 #include "psddl_pdsdata/fli.ddl.h"
 
+#include <iostream>
 namespace PsddlPds {
 namespace Fli {
 uint32_t

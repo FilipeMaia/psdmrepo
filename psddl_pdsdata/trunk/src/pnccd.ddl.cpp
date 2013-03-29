@@ -3,6 +3,7 @@
 
 #include "psddl_pdsdata/pnccd.ddl.h"
 
+#include <iostream>
 namespace PsddlPds {
 namespace PNCCD {
 std::vector<int>

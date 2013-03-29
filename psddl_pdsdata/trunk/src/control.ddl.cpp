@@ -3,6 +3,7 @@
 
 #include "psddl_pdsdata/control.ddl.h"
 
+#include <iostream>
 namespace PsddlPds {
 namespace ControlData {
 uint8_t

@@ -3,6 +3,7 @@
 
 #include "psddl_pdsdata/cspad2x2.ddl.h"
 
+#include <iostream>
 namespace PsddlPds {
 namespace CsPad2x2 {
 uint32_t

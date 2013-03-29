@@ -3,6 +3,7 @@
 
 #include "psddl_pdsdata/epics.ddl.h"
 
+#include <iostream>
 namespace PsddlPds {
 namespace Epics {
 std::vector<int>

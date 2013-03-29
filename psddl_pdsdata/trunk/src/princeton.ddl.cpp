@@ -3,6 +3,7 @@
 
 #include "psddl_pdsdata/princeton.ddl.h"
 
+#include <iostream>
 namespace PsddlPds {
 namespace Princeton {
 uint32_t

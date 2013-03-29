@@ -3,6 +3,7 @@
 
 #include "psddl_pdsdata/oceanoptics.ddl.h"
 
+#include <iostream>
 namespace PsddlPds {
 namespace OceanOptics {
 double

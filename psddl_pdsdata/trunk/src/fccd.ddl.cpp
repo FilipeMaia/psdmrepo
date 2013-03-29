@@ -3,6 +3,7 @@
 
 #include "psddl_pdsdata/fccd.ddl.h"
 
+#include <iostream>
 namespace PsddlPds {
 namespace FCCD {
 uint32_t
@@ -21,6 +22,31 @@ uint32_t
 FccdConfigV1::trimmedHeight() const {
   return Trimmed_Row_Pixels;
 }
+std::ostream& operator<<(std::ostream& str, FCCD::FccdConfigV1::Depth enval) {
+  const char* val;
+  switch (enval) {
+  case FCCD::FccdConfigV1::Sixteen_bit:
+    val = "Sixteen_bit";
+    break;
+  default:
+    return str << "Depth(" << int(enval) << ")";
+  }
+  return str << val;
+}
+std::ostream& operator<<(std::ostream& str, FCCD::FccdConfigV1::Output_Source enval) {
+  const char* val;
+  switch (enval) {
+  case FCCD::FccdConfigV1::Output_FIFO:
+    val = "Output_FIFO";
+    break;
+  case FCCD::FccdConfigV1::Output_Pattern4:
+    val = "Output_Pattern4";
+    break;
+  default:
+    return str << "Output_Source(" << int(enval) << ")";
+  }
+  return str << val;
+}
 uint32_t
 FccdConfigV2::width() const {
   return Column_Pixels;
@@ -36,6 +62,43 @@ FccdConfigV2::trimmedWidth() const {
 uint32_t
 FccdConfigV2::trimmedHeight() const {
   return Trimmed_Row_Pixels;
+}
+std::ostream& operator<<(std::ostream& str, FCCD::FccdConfigV2::Depth enval) {
+  const char* val;
+  switch (enval) {
+  case FCCD::FccdConfigV2::Eight_bit:
+    val = "Eight_bit";
+    break;
+  case FCCD::FccdConfigV2::Sixteen_bit:
+    val = "Sixteen_bit";
+    break;
+  default:
+    return str << "Depth(" << int(enval) << ")";
+  }
+  return str << val;
+}
+std::ostream& operator<<(std::ostream& str, FCCD::FccdConfigV2::Output_Source enval) {
+  const char* val;
+  switch (enval) {
+  case FCCD::FccdConfigV2::Output_FIFO:
+    val = "Output_FIFO";
+    break;
+  case FCCD::FccdConfigV2::Test_Pattern1:
+    val = "Test_Pattern1";
+    break;
+  case FCCD::FccdConfigV2::Test_Pattern2:
+    val = "Test_Pattern2";
+    break;
+  case FCCD::FccdConfigV2::Test_Pattern3:
+    val = "Test_Pattern3";
+    break;
+  case FCCD::FccdConfigV2::Test_Pattern4:
+    val = "Test_Pattern4";
+    break;
+  default:
+    return str << "Output_Source(" << int(enval) << ")";
+  }
+  return str << val;
 }
 } // namespace FCCD
 } // namespace PsddlPds

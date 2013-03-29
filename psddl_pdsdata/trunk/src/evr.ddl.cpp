@@ -3,6 +3,7 @@
 
 #include "psddl_pdsdata/evr.ddl.h"
 
+#include <iostream>
 namespace PsddlPds {
 namespace EvrData {
 int16_t
@@ -31,6 +32,80 @@ EventCodeV6::desc_shape() const {
   shape.push_back(DescSize);
   return shape;
 }
+std::ostream& operator<<(std::ostream& str, EvrData::OutputMap::Source enval) {
+  const char* val;
+  switch (enval) {
+  case EvrData::OutputMap::Pulse:
+    val = "Pulse";
+    break;
+  case EvrData::OutputMap::DBus:
+    val = "DBus";
+    break;
+  case EvrData::OutputMap::Prescaler:
+    val = "Prescaler";
+    break;
+  case EvrData::OutputMap::Force_High:
+    val = "Force_High";
+    break;
+  case EvrData::OutputMap::Force_Low:
+    val = "Force_Low";
+    break;
+  default:
+    return str << "Source(" << int(enval) << ")";
+  }
+  return str << val;
+}
+std::ostream& operator<<(std::ostream& str, EvrData::OutputMap::Conn enval) {
+  const char* val;
+  switch (enval) {
+  case EvrData::OutputMap::FrontPanel:
+    val = "FrontPanel";
+    break;
+  case EvrData::OutputMap::UnivIO:
+    val = "UnivIO";
+    break;
+  default:
+    return str << "Conn(" << int(enval) << ")";
+  }
+  return str << val;
+}
+std::ostream& operator<<(std::ostream& str, EvrData::OutputMapV2::Source enval) {
+  const char* val;
+  switch (enval) {
+  case EvrData::OutputMapV2::Pulse:
+    val = "Pulse";
+    break;
+  case EvrData::OutputMapV2::DBus:
+    val = "DBus";
+    break;
+  case EvrData::OutputMapV2::Prescaler:
+    val = "Prescaler";
+    break;
+  case EvrData::OutputMapV2::Force_High:
+    val = "Force_High";
+    break;
+  case EvrData::OutputMapV2::Force_Low:
+    val = "Force_Low";
+    break;
+  default:
+    return str << "Source(" << int(enval) << ")";
+  }
+  return str << val;
+}
+std::ostream& operator<<(std::ostream& str, EvrData::OutputMapV2::Conn enval) {
+  const char* val;
+  switch (enval) {
+  case EvrData::OutputMapV2::FrontPanel:
+    val = "FrontPanel";
+    break;
+  case EvrData::OutputMapV2::UnivIO:
+    val = "UnivIO";
+    break;
+  default:
+    return str << "Conn(" << int(enval) << ")";
+  }
+  return str << val;
+}
 EvrData::ConfigV2::BeamCode
 ConfigV2::beam() const {
   return (this->_opcode > beamOn) ? On : Off;
@@ -38,6 +113,87 @@ ConfigV2::beam() const {
 EvrData::ConfigV2::RateCode
 ConfigV2::rate() const {
   return (this->_opcode < beamOn) ? RateCode(this->_opcode-baseRate) :                  ((this->_opcode < singleShot) ? RateCode(this->_opcode-beamOn-baseRate) : Single);
+}
+std::ostream& operator<<(std::ostream& str, EvrData::ConfigV2::RateCode enval) {
+  const char* val;
+  switch (enval) {
+  case EvrData::ConfigV2::r120Hz:
+    val = "r120Hz";
+    break;
+  case EvrData::ConfigV2::r60Hz:
+    val = "r60Hz";
+    break;
+  case EvrData::ConfigV2::r30Hz:
+    val = "r30Hz";
+    break;
+  case EvrData::ConfigV2::r10Hz:
+    val = "r10Hz";
+    break;
+  case EvrData::ConfigV2::r5Hz:
+    val = "r5Hz";
+    break;
+  case EvrData::ConfigV2::r1Hz:
+    val = "r1Hz";
+    break;
+  case EvrData::ConfigV2::r0_5Hz:
+    val = "r0_5Hz";
+    break;
+  case EvrData::ConfigV2::Single:
+    val = "Single";
+    break;
+  case EvrData::ConfigV2::NumberOfRates:
+    val = "NumberOfRates";
+    break;
+  default:
+    return str << "RateCode(" << int(enval) << ")";
+  }
+  return str << val;
+}
+std::ostream& operator<<(std::ostream& str, EvrData::ConfigV2::BeamCode enval) {
+  const char* val;
+  switch (enval) {
+  case EvrData::ConfigV2::Off:
+    val = "Off";
+    break;
+  case EvrData::ConfigV2::On:
+    val = "On";
+    break;
+  default:
+    return str << "BeamCode(" << int(enval) << ")";
+  }
+  return str << val;
+}
+std::ostream& operator<<(std::ostream& str, EvrData::SequencerConfigV1::Source enval) {
+  const char* val;
+  switch (enval) {
+  case EvrData::SequencerConfigV1::r120Hz:
+    val = "r120Hz";
+    break;
+  case EvrData::SequencerConfigV1::r60Hz:
+    val = "r60Hz";
+    break;
+  case EvrData::SequencerConfigV1::r30Hz:
+    val = "r30Hz";
+    break;
+  case EvrData::SequencerConfigV1::r10Hz:
+    val = "r10Hz";
+    break;
+  case EvrData::SequencerConfigV1::r5Hz:
+    val = "r5Hz";
+    break;
+  case EvrData::SequencerConfigV1::r1Hz:
+    val = "r1Hz";
+    break;
+  case EvrData::SequencerConfigV1::r0_5Hz:
+    val = "r0_5Hz";
+    break;
+  case EvrData::SequencerConfigV1::Disable:
+    val = "Disable";
+    break;
+  default:
+    return str << "Source(" << int(enval) << ")";
+  }
+  return str << val;
 }
 std::vector<int>
 IOChannel::name_shape() const {
