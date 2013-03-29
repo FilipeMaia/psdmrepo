@@ -84,6 +84,10 @@ namespace IData {
  *  @li @b dir - specifies directory containing input files, by default
  *      files are located in the standard experiment directories under
  *      /reg/d/psdm directory
+ *  @li @b one-stream - this option works with live XTC input only, if the option
+ *      is given a value (number) then it specifies stream number to read,
+ *      without value arbitrary single stream will be selected. If option
+ *      is not specified then data from all stream are read.
  *
  *  If the same key appears multiple times in the input string the latter
  *  values for this key override earlier values.

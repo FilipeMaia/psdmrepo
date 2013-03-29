@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-01
+2013-03-29 Andy Salnikov
+- comment-only change, add description of 'one-stream' dataset option
+
 Tag: V00-01-00
 2013-02-12 Andy Salnikov
 - Dataset can also accept file name in a constructor
