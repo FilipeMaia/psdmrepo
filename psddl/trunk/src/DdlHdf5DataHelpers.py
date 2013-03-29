@@ -826,6 +826,7 @@ class SchemaAbstractType(SchemaType):
                     ret_type = "const char*"
                     args = [('i%d'%i, type.lookup('uint32_t')) for i in range(attr.rank-1)]
                 elif meth.type.basic or meth.type.value_type:
+                    attr_type = attr.stor_type.fullName('C++', psana_ns)
                     ret_type = T("ndarray<const $attr_type, $rank>")(locals())
                 else:
                     args = [('i%d'%i, type.lookup('uint32_t')) for i in range(attr.rank)]
@@ -922,7 +923,11 @@ class SchemaAbstractType(SchemaType):
                     impl += [T("  if ($memberName.empty()) {")(locals())]
                     impl += [T("    unsigned shape[] = {$shape};")(locals())]
                     impl += [T("    ndarray<$attr_type, $rank> tmparr(shape);")(locals())]
-                    impl += [T("    std::copy(m_ds_$dsName->$attrName, m_ds_$dsName->$attrName+$data_size, tmparr.begin());")(locals())]
+                    impl += [T("    unsigned size = tmparr.size();")(locals())]
+                    impl += [T("    ndarray<$attr_type, $rank>::iterator it = tmparr.begin();")(locals())]
+                    impl += [T("    for (unsigned i = 0; i != size; ++ i, ++ it) {")(locals())]
+                    impl += [T("      *it = $attr_type(m_ds_$dsName->$attrName[i]);")(locals())]
+                    impl += [T("    }")(locals())]
                     impl += [T("    $memberName = tmparr;")(locals())]
                     impl += [T("  }")(locals())]
                     impl += [T("  return $memberName;")(locals())]
@@ -1021,8 +1026,8 @@ class SchemaAbstractType(SchemaType):
                 
                 # non-zero rank, stored as a dataset
 
-                if ds.type.value_type:
-                    
+                if ds.type.value_type and not isinstance(ds.type, Enum):
+
                     # array of value type, have to convert
                     dsName = ds.name
                     impl += [T("  if (m_ds_$dsName.empty()) read_ds_$dsName();")(locals())]

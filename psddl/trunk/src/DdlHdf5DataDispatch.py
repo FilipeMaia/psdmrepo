@@ -59,6 +59,7 @@ _aliases = {
     'PNCCD::FrameV1'   : ['PNCCD::FullFrameV1', 'PNCCD::FramesV1'],
     'CsPad::ElementV1' : ['CsPad::DataV1'],
     'CsPad::ElementV2' : ['CsPad::DataV2'],
+    'Acqiris::AcqirisTdcConfigV1' : ['Acqiris::TdcConfigV1'],
     }
 
 # Extra headers needed for special proxy classes of similar stuff

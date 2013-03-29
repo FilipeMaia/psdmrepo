@@ -359,6 +359,8 @@ class DdlPds2Psana ( object ) :
                         rettype = "const char*"
                         args = [('i%d'%i, type.lookup('uint32_t')) for i in range(len(attr.shape.dims)-1)]
                     else:
+                        rettype = attr.stor_type.fullName('C++', self.psana_ns)
+                        cvt = False
                         rettype = T("ndarray<const $type, $rank>")(type=rettype, rank=len(attr.shape.dims))
                 self._genFwdMeth(meth.name, rettype, type, cfgNeeded, cvt, args=args)
             

@@ -47,6 +47,7 @@ from psddl.ExprVal import ExprVal
 from psddl.Method import Method
 from psddl.Package import Package
 from psddl.Template import Template as T
+from psddl.Enum import Enum
 from psddl.Type import Type
 
 #----------------------------------
@@ -318,6 +319,8 @@ class DdlPythonInterfaces ( object ) :
             
             # should also add boost converter for this ndarray type
             ctype = method.type.fullName('C++', self.psana_ns)
+            if isinstance(method.type, Enum):
+                ctype = method.type.base.fullName('C++', self.psana_ns)
             ndim = method.rank
             ndconverters.add((ctype, ndim))
 

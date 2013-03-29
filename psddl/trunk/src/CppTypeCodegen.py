@@ -176,6 +176,10 @@ class CppTypeCodegen ( object ) :
         # close class declaration
         print >>self._inc, "};"
 
+        # enum stream insertions
+        for enum in self._type.enums() :
+            self._genEnumPrint(enum)
+
         # close pragma pack
         if needPragmaPack : 
             print >>self._inc, "#pragma pack(pop)"
@@ -202,6 +206,27 @@ class CppTypeCodegen ( object ) :
             if const.comment: doc = T(' /**< $comment */')[const]
             print >>self._inc, T("    $name$value,$doc")(name=const.name, value=val, doc=doc)
         print >>self._inc, "  };"
+
+    def _genEnumPrint(self, enum):
+        
+        if not enum.name: return
+        
+        name = enum.fullName('C++')
+        ns = enum.parent.fullName('C++')
+        print >>self._inc, T('std::ostream& operator<<(std::ostream& str, $name enval);')(locals())
+        print >>self._cpp, T('std::ostream& operator<<(std::ostream& str, $name enval) {')(locals())
+        print >>self._cpp, T('  const char* val;')(locals())
+        print >>self._cpp, T('  switch (enval) {')(locals())
+        for const in enum.constants() :
+            const_name = const.name
+            print >>self._cpp, T('  case $ns::$const_name:')(locals())
+            print >>self._cpp, T('    val = "$const_name";')(locals())
+            print >>self._cpp, T('    break;')(locals())
+        print >>self._cpp, "  default:"
+        print >>self._cpp, T('    return str << "$name(" << int(enval) << ")";')[enum]
+        print >>self._cpp, "  }"
+        print >>self._cpp, "  return str << val;"
+        print >>self._cpp, "}"
 
     def _genAttrDecl(self, attr):
         """Generate attribute declaration"""
@@ -254,8 +279,7 @@ class CppTypeCodegen ( object ) :
                 
             elif attr.type.value_type :
                 
-                # return ndarray
-                rettype = "ndarray<const %s, %d>" % (_typename(attr.type), len(attr.shape.dims))
+                rettype = "ndarray<const %s, %d>" % (_typename(attr.stor_type), len(attr.shape.dims))
                 body = self._bodyNDArrray(attr)
 
             else:

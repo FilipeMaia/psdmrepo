@@ -98,12 +98,14 @@ class DdlPdsdata ( object ) :
 
         # add necessary includes
         print >>self.inc, "#include <vector>"
+        print >>self.inc, "#include <iosfwd>"
         print >>self.inc, "#include <cstddef>"
         print >>self.inc, "#include \"pdsdata/xtc/TypeId.hh\""
         print >>self.inc, "#include \"ndarray/ndarray.h\""
 
         inc = os.path.join(self.incdirname, os.path.basename(self.incname))
         print >>self.cpp, "#include \"%s\"\n" % inc
+        print >>self.cpp, "#include <iostream>"
 
         # headers for other included packages
         for use in model.use:
