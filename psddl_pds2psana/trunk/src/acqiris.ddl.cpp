@@ -169,7 +169,7 @@ Psana::Acqiris::TdcChannel::Slope pds_to_psana(PsddlPds::Acqiris::TdcChannel::Sl
 
 Psana::Acqiris::TdcChannel pds_to_psana(PsddlPds::Acqiris::TdcChannel pds)
 {
-  return Psana::Acqiris::TdcChannel(pds._channel_int(), pds_to_psana(pds.slope()), pds_to_psana(pds.mode()), pds.level());
+  return Psana::Acqiris::TdcChannel(pds_to_psana(pds.channel()), pds_to_psana(pds.slope()), pds_to_psana(pds.mode()), pds.level());
 }
 
 Psana::Acqiris::TdcAuxIO::Channel pds_to_psana(PsddlPds::Acqiris::TdcAuxIO::Channel e)
@@ -189,7 +189,7 @@ Psana::Acqiris::TdcAuxIO::Termination pds_to_psana(PsddlPds::Acqiris::TdcAuxIO::
 
 Psana::Acqiris::TdcAuxIO pds_to_psana(PsddlPds::Acqiris::TdcAuxIO pds)
 {
-  return Psana::Acqiris::TdcAuxIO(pds.channel_int(), pds.signal_int(), pds.qualifier_int());
+  return Psana::Acqiris::TdcAuxIO(pds_to_psana(pds.channel()), pds_to_psana(pds.mode()), pds_to_psana(pds.term()));
 }
 
 Psana::Acqiris::TdcVetoIO::Channel pds_to_psana(PsddlPds::Acqiris::TdcVetoIO::Channel e)
@@ -209,7 +209,7 @@ Psana::Acqiris::TdcVetoIO::Termination pds_to_psana(PsddlPds::Acqiris::TdcVetoIO
 
 Psana::Acqiris::TdcVetoIO pds_to_psana(PsddlPds::Acqiris::TdcVetoIO pds)
 {
-  return Psana::Acqiris::TdcVetoIO(pds.signal_int(), pds.qualifier_int());
+  return Psana::Acqiris::TdcVetoIO(pds_to_psana(pds.mode()), pds_to_psana(pds.term()));
 }
 
 TdcConfigV1::TdcConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr)

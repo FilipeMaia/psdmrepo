@@ -40,7 +40,7 @@ float ConfigV1::exposureTime() const { return m_xtcObj->exposureTime(); }
 
 float ConfigV1::coolingTemp() const { return m_xtcObj->coolingTemp(); }
 
-uint8_t ConfigV1::fanMode() const { return m_xtcObj->fanMode(); }
+Psana::Andor::ConfigV1::EnumFanMode ConfigV1::fanMode() const { return pds_to_psana(m_xtcObj->fanMode()); }
 
 uint8_t ConfigV1::baselineClamp() const { return m_xtcObj->baselineClamp(); }
 
