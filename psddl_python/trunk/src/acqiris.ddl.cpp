@@ -111,21 +111,17 @@ void createWrappers(PyObject* module) {
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Acqiris::DataDescV1> >(Pds::TypeId::Id_AcqWaveform, 1));
 
   class_<Psana::Acqiris::TdcChannel >("TdcChannel", no_init)
-    .def("_channel_int", &Psana::Acqiris::TdcChannel::_channel_int)
+    .def("channel", &Psana::Acqiris::TdcChannel::channel)
     .def("_mode_int", &Psana::Acqiris::TdcChannel::_mode_int)
     .def("slope", &Psana::Acqiris::TdcChannel::slope)
     .def("mode", &Psana::Acqiris::TdcChannel::mode)
     .def("level", &Psana::Acqiris::TdcChannel::level)
-    .def("channel", &Psana::Acqiris::TdcChannel::channel)
     .def("__typeid__", &method_typeid<Psana::Acqiris::TdcChannel>)
     .staticmethod("__typeid__")
   ;
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Acqiris::TdcChannel> >(-1, -1));
 
   class_<Psana::Acqiris::TdcAuxIO >("TdcAuxIO", no_init)
-    .def("channel_int", &Psana::Acqiris::TdcAuxIO::channel_int)
-    .def("signal_int", &Psana::Acqiris::TdcAuxIO::signal_int)
-    .def("qualifier_int", &Psana::Acqiris::TdcAuxIO::qualifier_int)
     .def("channel", &Psana::Acqiris::TdcAuxIO::channel)
     .def("mode", &Psana::Acqiris::TdcAuxIO::mode)
     .def("term", &Psana::Acqiris::TdcAuxIO::term)
@@ -135,8 +131,6 @@ void createWrappers(PyObject* module) {
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Acqiris::TdcAuxIO> >(-1, -1));
 
   class_<Psana::Acqiris::TdcVetoIO >("TdcVetoIO", no_init)
-    .def("signal_int", &Psana::Acqiris::TdcVetoIO::signal_int)
-    .def("qualifier_int", &Psana::Acqiris::TdcVetoIO::qualifier_int)
     .def("channel", &Psana::Acqiris::TdcVetoIO::channel)
     .def("mode", &Psana::Acqiris::TdcVetoIO::mode)
     .def("term", &Psana::Acqiris::TdcVetoIO::term)
