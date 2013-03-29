@@ -63,17 +63,19 @@ public:
    *  @param[in] begin     Iterator pointing to the beginning of run number sequence
    *  @param[in] end       Iterator pointing to the end of run number sequence
    *  @param[in] expNum    Experiment number
+   *  @param[in] stream    Stream number, or -1 for all stream, -2 for any one stream
    *  @param[in] liveTimeout Specifies timeout in second when reading live data
    *  @param[in] dbConnStr Database connection string
    *  @param[in] table     Database table name
    *  @param[in] dir       Directory to look for live files
    */
   template <typename Iter>
-  RunFileIterLive (Iter begin, Iter end, unsigned expNum, unsigned liveTimeout,
+  RunFileIterLive (Iter begin, Iter end, unsigned expNum, int stream, unsigned liveTimeout,
       const std::string& dbConnStr, const std::string& table, const std::string& dir)
     : RunFileIterI()
     , m_runs(begin, end)
     , m_expNum(expNum)
+    , m_stream(stream)
     , m_liveTimeout(liveTimeout)
     , m_run(0)
     , m_filesdb(boost::make_shared<LiveFilesDB>(dbConnStr, table, dir))
@@ -103,6 +105,7 @@ private:
   
   Runs m_runs;
   unsigned m_expNum;
+  int m_stream;
   unsigned m_liveTimeout;
   unsigned m_run;
   boost::shared_ptr<LiveFilesDB> m_filesdb;

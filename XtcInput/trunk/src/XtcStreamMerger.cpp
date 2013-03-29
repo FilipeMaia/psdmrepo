@@ -36,7 +36,7 @@
 
 namespace {
 
-  const char* logger = "XtcStreamMerger" ;
+  const char* logger = "XtcInput.XtcStreamMerger" ;
 
 }
 

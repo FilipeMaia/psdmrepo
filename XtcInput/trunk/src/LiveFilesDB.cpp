@@ -37,7 +37,7 @@ namespace fs = boost::filesystem;
 
 namespace {
 
-  const char* logger = "LiveFilesDB";
+  const char* logger = "XtcInput.LiveFilesDB";
 
 }
 

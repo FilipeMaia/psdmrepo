@@ -54,8 +54,15 @@ namespace XtcInput {
 class StreamFileIterLive : public StreamFileIterI {
 public:
 
-  // Default constructor
-  StreamFileIterLive (unsigned expNum, unsigned run, unsigned liveTimeout,
+  /**
+   *  @brief Make iterator instance.
+   *
+   *  @param[in] expNum    Experiment number
+   *  @param[in] run       Run number
+   *  @param[in] stream    Stream number, or -1 for all stream, -2 for any one stream
+   *  @param[in] filesdb   Database connection
+   */
+  StreamFileIterLive (unsigned expNum, unsigned run, int stream, unsigned liveTimeout,
       const boost::shared_ptr<LiveFilesDB>& filesdb) ;
 
   // Destructor
@@ -81,11 +88,12 @@ private:
 
   unsigned m_expNum;
   unsigned m_run;
+  int m_stream;
   unsigned m_liveTimeout;
   boost::shared_ptr<LiveFilesDB> m_filesdb;
   bool m_initialized;
   Streams m_streams;
-  unsigned m_stream;
+  unsigned m_lastStream;
 
 };
 

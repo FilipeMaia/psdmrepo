@@ -161,6 +161,15 @@ public:
 
 };
 
+/// Error generated when incorrect or conflicting live streams are specified
+class LiveStreamError : public Exception {
+public:
+
+  LiveStreamError(const ErrSvc::Context& ctx)
+    : Exception(ctx, "LiveStreamError", "incorrect or conflicting live stream specified") {}
+
+};
+
 } // namespace XtcInput
 
 #endif // XTCINPUT_EXCEPTIONS_H

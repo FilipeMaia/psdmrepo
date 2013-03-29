@@ -47,7 +47,7 @@ namespace fs = boost::filesystem;
 
 namespace {
 
-  const char* logger = "DgramReader";
+  const char* logger = "XtcInput.DgramReader";
 
 }
 
@@ -75,11 +75,13 @@ try {
   // specify live mode, other datasets do not matter.
 
   enum {Unknown, Live, Dead} liveMode = Unknown;
+  enum {AllStreams=-1, AnyOneStream=-2};
 
   std::vector<XtcFileName> files;  // file names for "dead" mode
   IData::Dataset::Runs runs;  // run numbers for live mode
   unsigned expId = 0;
   std::string liveDir;
+  int stream = AllStreams;
 
   // guess whether we have datasets or pure file names (or mixture)
   for (FileList::const_iterator it = m_files.begin(); it != m_files.end(); ++ it) {
@@ -95,7 +97,34 @@ try {
 
     } else {
 
-      bool live = liveMode == Live or ds.exists("live");
+      // get stream number
+      if (ds.exists("one-stream")) {
+        std::string strval = ds.value("one-stream");
+        if (strval.empty()) {
+          // no value means AnyOneStream, check it does not conflict
+          if (stream == AllStreams) {
+            stream = AnyOneStream; 
+          } else if (stream != AnyOneStream) {
+            throw LiveStreamError(ERR_LOC);
+          }
+        } else {
+          // string must be non-negative number
+          unsigned val;
+          try {
+            val = boost::lexical_cast<unsigned>(strval);
+          } catch (const boost::bad_lexical_cast& ex) {
+            throw LiveStreamError(ERR_LOC);
+          }
+          // check it does not conflict
+          if (stream == AllStreams) {
+            stream = val; 
+          } else if (stream != int(val)) {
+            throw LiveStreamError(ERR_LOC);
+          }
+        }
+      }
+
+      bool live = (liveMode == Live or ds.exists("live"));
       if (live) {
 
         // check or set live mode
@@ -138,6 +167,46 @@ try {
   boost::shared_ptr<RunFileIterI> fileIter;
   if (liveMode == Dead) {
 
+    // if one-stream is active filter file names
+    if (stream != AllStreams) {
+      
+      // sort all files according run and stream number
+      typedef std::map<unsigned, std::vector<XtcFileName> > StreamMap;
+      typedef std::map<unsigned, StreamMap> RunStreamMap;
+      RunStreamMap rsMap;
+      for (std::vector<XtcFileName>::const_iterator it = files.begin(); it != files.end(); ++ it) {
+        rsMap[it->run()][it->stream()].push_back(*it);
+      }
+
+      // clear the list for now
+      files.clear();
+
+      // copy only streams that match
+      for (RunStreamMap::iterator r_it = rsMap.begin(); r_it != rsMap.end(); ++ r_it) {
+        
+        StreamMap& streamMap = r_it->second;
+        StreamMap::iterator it;
+        if (stream == AnyOneStream) {
+          // leave one stream only, try to randomize but in a reproducible way
+          unsigned run = r_it->first;
+          unsigned idx = run % streamMap.size();
+          it = streamMap.begin();
+          std::advance(it, idx);
+        } else {
+          // find one specific stream
+          it = streamMap.find(stream);
+        }
+        
+        if (it == streamMap.end()) {
+          MsgLog(logger, debug, "One-stream mode, no matching streams");
+        } else {
+          files.insert(files.end(), it->second.begin(), it->second.end());
+          MsgLog(logger, debug, "One-stream mode, stream number: " << it->first);
+        }
+        
+      }
+    }
+    
     if (not files.empty()) {
       fileIter = boost::make_shared<RunFileIterList>(files.begin(), files.end(), m_mode);
     }
@@ -154,7 +223,7 @@ try {
     if (not numbers.empty()) {
       // use default table name if none was given
       if (m_liveDbConn.empty()) m_liveDbConn = "Server=psdb.slac.stanford.edu;Database=regdb;Uid=regdb_reader";
-      fileIter = boost::make_shared<RunFileIterLive>(numbers.begin(), numbers.end(), expId,
+      fileIter = boost::make_shared<RunFileIterLive>(numbers.begin(), numbers.end(), expId, stream, 
           m_liveTimeout, m_liveDbConn, m_liveTable, liveDir);
     }
   }

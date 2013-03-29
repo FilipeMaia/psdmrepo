@@ -32,7 +32,7 @@
 
 namespace {
 
-  const char* logger = "XtcChunkDgIter";
+  const char* logger = "XtcInput.XtcChunkDgIter";
 
 }
 

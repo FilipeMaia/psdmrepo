@@ -31,7 +31,7 @@
 
 namespace {
 
-  const char* logger = "SharedFile";
+  const char* logger = "XtcInput.SharedFile";
 
 }
 

@@ -31,7 +31,7 @@
 
 namespace {
 
-  const char* logger = "ChunkFileIterLive";
+  const char* logger = "XtcInput.ChunkFileIterLive";
 
 }
 

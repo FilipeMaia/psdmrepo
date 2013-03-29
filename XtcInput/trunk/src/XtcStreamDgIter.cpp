@@ -34,7 +34,7 @@
 
 namespace {
 
-  const char* logger = "XtcStreamDgIter" ;
+  const char* logger = "XtcInput.XtcStreamDgIter" ;
 
   // size of the read-ahead buffer
   const unsigned readAheadSize = 64;

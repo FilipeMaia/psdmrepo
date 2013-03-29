@@ -31,7 +31,7 @@
 
 namespace {
 
-  const char* logger = "DgHeader";
+  const char* logger = "XtcInput.DgHeader";
 
   // absolute upper limit on the size of datagram that we can ever read
   // set it to 256MB for now

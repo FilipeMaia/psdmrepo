@@ -20,6 +20,7 @@
 //-----------------
 #include <unistd.h>
 #include <boost/make_shared.hpp>
+#include <boost/lexical_cast.hpp>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -34,7 +35,7 @@
 
 namespace {
 
-  const char* logger = "StreamFileIterLive";
+  const char* logger = "XtcInput.StreamFileIterLive";
 
 }
 
@@ -47,15 +48,16 @@ namespace XtcInput {
 //----------------
 // Constructors --
 //----------------
-StreamFileIterLive::StreamFileIterLive (unsigned expNum, unsigned run,
+StreamFileIterLive::StreamFileIterLive (unsigned expNum, unsigned run, int stream, 
     unsigned liveTimeout, const boost::shared_ptr<LiveFilesDB>& filesdb)
   : StreamFileIterI()
   , m_expNum(expNum)
   , m_run(run)
+  , m_stream(stream)
   , m_liveTimeout(liveTimeout)
   , m_filesdb(filesdb)
   , m_initialized(false)
-  , m_stream(0)
+  , m_lastStream(0)
 {
 }
 
@@ -131,15 +133,40 @@ StreamFileIterLive::next()
         throw XTCLiveTimeout(ERR_LOC, files[0].path(), m_liveTimeout);
       }
 
-    }
+      // filter unwanted streams
+      if (not m_streams.empty() and m_stream != -1) {
 
-  }
+        Streams::iterator it;
+        if (m_stream == -2) {
+          // leave one stream only, try to randomize but in a reproducible way
+          unsigned idx = m_run % m_streams.size();
+          it = m_streams.begin();
+          std::advance(it, idx);
+        } else {
+          // leave one specific stream
+          it = m_streams.find(m_stream);
+        }
+      
+        if (it == m_streams.end()) {
+          m_streams.clear();
+          MsgLog(logger, debug, "One-stream mode, no matching streams");
+        } else {
+          m_streams.erase(m_streams.begin(), it);
+          m_streams.erase(++it, m_streams.end());
+          MsgLog(logger, debug, "One-stream mode, stream number: " << *m_streams.begin());
+        }
+
+      } // if (not m_streams.empty())
+      
+    } // if (not files.empty())
+
+  } // if (not m_initialized)
 
 
   if (not m_streams.empty()) {
     Streams::iterator s = m_streams.begin();
-    m_stream = *s;
-    next = boost::make_shared<ChunkFileIterLive>(m_expNum, m_run, m_stream, m_liveTimeout, m_filesdb);
+    m_lastStream = *s;
+    next = boost::make_shared<ChunkFileIterLive>(m_expNum, m_run, m_lastStream, m_liveTimeout, m_filesdb);
     m_streams.erase(s);
   }
 
@@ -152,7 +179,7 @@ StreamFileIterLive::next()
 unsigned
 StreamFileIterLive::stream() const
 {
-  return m_stream;
+  return m_lastStream;
 }
 
 } // namespace XtcInput

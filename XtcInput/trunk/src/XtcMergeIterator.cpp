@@ -31,7 +31,7 @@
 
 namespace {
 
-  const char* logger = "XtcMergeIterator";
+  const char* logger = "XtcInput.XtcMergeIterator";
 
 }
 

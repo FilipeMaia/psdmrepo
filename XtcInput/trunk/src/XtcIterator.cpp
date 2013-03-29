@@ -31,7 +31,7 @@
 
 namespace {
   
-  const char* logger = "XtcIterator";
+  const char* logger = "XtcInput.XtcIterator";
   
 }
 
