@@ -58,6 +58,13 @@
         </h5schema>
 
 
+        <h5schema name="TdcConfigV1" version="0">
+            <dataset name="veto"/>
+            <dataset name="channel" method="channels"/>
+            <dataset name="auxio"/>
+        </h5schema>
+
+
         <h5schema name="TdcDataV1_Item" version="0">
             <dataset name="data">
                 <attribute name="source" method="source"/>
@@ -81,9 +88,7 @@
 
         <h5schema name="TdcDataV1" version="0">
             <dataset name="data">
-                <attribute name="data" rank="1">
-                    <tag name="vlen"/>
-                </attribute>
+                <tag name="vlen"/>
             </dataset>
         </h5schema>
 

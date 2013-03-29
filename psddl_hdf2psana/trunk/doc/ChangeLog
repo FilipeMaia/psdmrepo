@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-26
+2013-03-29 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-24
+- improve support for enum and vlen types
+
 Tag: V00-01-25
 2013-03-28 Andy Salnikov
 - fixing acqiris schema, adding new schema version for DataDescV1

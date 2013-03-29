@@ -16,11 +16,21 @@ hdf5pp::Type ns_ConfigV1_v0_dataset_config_stored_type()
 {
   typedef ns_ConfigV1_v0::dataset_config DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
+  hdf5pp::EnumType<uint32_t> _enum_type_counting_mode = hdf5pp::EnumType<uint32_t>::enumType();
+  _enum_type_counting_mode.insert("WRAP_FULL", Psana::UsdUsb::ConfigV1::WRAP_FULL);
+  _enum_type_counting_mode.insert("LIMIT", Psana::UsdUsb::ConfigV1::LIMIT);
+  _enum_type_counting_mode.insert("HALT", Psana::UsdUsb::ConfigV1::HALT);
+  _enum_type_counting_mode.insert("WRAP_PRESET", Psana::UsdUsb::ConfigV1::WRAP_PRESET);
   hsize_t _array_type_counting_mode_shape[] = { 4 };
-  hdf5pp::ArrayType _array_type_counting_mode = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint32_t>::stored_type(), 1, _array_type_counting_mode_shape);
+  hdf5pp::ArrayType _array_type_counting_mode = hdf5pp::ArrayType::arrayType(_enum_type_counting_mode, 1, _array_type_counting_mode_shape);
   type.insert("counting_mode", offsetof(DsType, counting_mode), _array_type_counting_mode);
+  hdf5pp::EnumType<uint32_t> _enum_type_quadrature_mode = hdf5pp::EnumType<uint32_t>::enumType();
+  _enum_type_quadrature_mode.insert("CLOCK_DIR", Psana::UsdUsb::ConfigV1::CLOCK_DIR);
+  _enum_type_quadrature_mode.insert("X1", Psana::UsdUsb::ConfigV1::X1);
+  _enum_type_quadrature_mode.insert("X2", Psana::UsdUsb::ConfigV1::X2);
+  _enum_type_quadrature_mode.insert("X4", Psana::UsdUsb::ConfigV1::X4);
   hsize_t _array_type_quadrature_mode_shape[] = { 4 };
-  hdf5pp::ArrayType _array_type_quadrature_mode = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint32_t>::stored_type(), 1, _array_type_quadrature_mode_shape);
+  hdf5pp::ArrayType _array_type_quadrature_mode = hdf5pp::ArrayType::arrayType(_enum_type_quadrature_mode, 1, _array_type_quadrature_mode_shape);
   type.insert("quadrature_mode", offsetof(DsType, quadrature_mode), _array_type_quadrature_mode);
   return type;
 }
@@ -35,11 +45,21 @@ hdf5pp::Type ns_ConfigV1_v0_dataset_config_native_type()
 {
   typedef ns_ConfigV1_v0::dataset_config DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
+  hdf5pp::EnumType<uint32_t> _enum_type_counting_mode = hdf5pp::EnumType<uint32_t>::enumType();
+  _enum_type_counting_mode.insert("WRAP_FULL", Psana::UsdUsb::ConfigV1::WRAP_FULL);
+  _enum_type_counting_mode.insert("LIMIT", Psana::UsdUsb::ConfigV1::LIMIT);
+  _enum_type_counting_mode.insert("HALT", Psana::UsdUsb::ConfigV1::HALT);
+  _enum_type_counting_mode.insert("WRAP_PRESET", Psana::UsdUsb::ConfigV1::WRAP_PRESET);
   hsize_t _array_type_counting_mode_shape[] = { 4 };
-  hdf5pp::ArrayType _array_type_counting_mode = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint32_t>::native_type(), 1, _array_type_counting_mode_shape);
+  hdf5pp::ArrayType _array_type_counting_mode = hdf5pp::ArrayType::arrayType(_enum_type_counting_mode, 1, _array_type_counting_mode_shape);
   type.insert("counting_mode", offsetof(DsType, counting_mode), _array_type_counting_mode);
+  hdf5pp::EnumType<uint32_t> _enum_type_quadrature_mode = hdf5pp::EnumType<uint32_t>::enumType();
+  _enum_type_quadrature_mode.insert("CLOCK_DIR", Psana::UsdUsb::ConfigV1::CLOCK_DIR);
+  _enum_type_quadrature_mode.insert("X1", Psana::UsdUsb::ConfigV1::X1);
+  _enum_type_quadrature_mode.insert("X2", Psana::UsdUsb::ConfigV1::X2);
+  _enum_type_quadrature_mode.insert("X4", Psana::UsdUsb::ConfigV1::X4);
   hsize_t _array_type_quadrature_mode_shape[] = { 4 };
-  hdf5pp::ArrayType _array_type_quadrature_mode = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint32_t>::native_type(), 1, _array_type_quadrature_mode_shape);
+  hdf5pp::ArrayType _array_type_quadrature_mode = hdf5pp::ArrayType::arrayType(_enum_type_quadrature_mode, 1, _array_type_quadrature_mode_shape);
   type.insert("quadrature_mode", offsetof(DsType, quadrature_mode), _array_type_quadrature_mode);
   return type;
 }

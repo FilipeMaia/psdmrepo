@@ -18,8 +18,8 @@ struct dataset_config {
   dataset_config();
   ~dataset_config();
 
-  int32_t readoutSpeed; 
-  int32_t triggerMode; 
+  uint8_t readoutSpeed; 
+  uint8_t triggerMode; 
   int32_t shutterTimeout; 
   int32_t dac0Ikrum; 
   int32_t dac0Disc; 
@@ -166,8 +166,8 @@ struct dataset_config {
   dataset_config();
   ~dataset_config();
 
-  int32_t readoutSpeed; 
-  int32_t triggerMode; 
+  uint8_t readoutSpeed; 
+  uint8_t triggerMode; 
   int32_t timepixSpeed; 
   int32_t dac0Ikrum; 
   int32_t dac0Disc; 
@@ -340,8 +340,8 @@ struct dataset_config {
   dataset_config();
   ~dataset_config();
 
-  int32_t readoutSpeed; 
-  int32_t timepixMode; 
+  uint8_t readoutSpeed; 
+  uint8_t timepixMode; 
   int32_t timepixSpeed; 
   int32_t dac0Ikrum; 
   int32_t dac0Disc; 

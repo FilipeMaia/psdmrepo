@@ -23,7 +23,13 @@ hdf5pp::Type ns_ConfigV1_v0_dataset_config_stored_type()
   type.insert("binY", offsetof(DsType, binY), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("exposureTime", offsetof(DsType, exposureTime), hdf5pp::TypeTraits<float>::stored_type());
   type.insert("coolingTemp", offsetof(DsType, coolingTemp), hdf5pp::TypeTraits<float>::stored_type());
-  type.insert("fanMode", offsetof(DsType, fanMode), hdf5pp::TypeTraits<uint8_t>::stored_type());
+  hdf5pp::EnumType<uint8_t> _enum_type_fanMode = hdf5pp::EnumType<uint8_t>::enumType();
+  _enum_type_fanMode.insert("ENUM_FAN_FULL", Psana::Andor::ConfigV1::ENUM_FAN_FULL);
+  _enum_type_fanMode.insert("ENUM_FAN_LOW", Psana::Andor::ConfigV1::ENUM_FAN_LOW);
+  _enum_type_fanMode.insert("ENUM_FAN_OFF", Psana::Andor::ConfigV1::ENUM_FAN_OFF);
+  _enum_type_fanMode.insert("ENUM_FAN_ACQOFF", Psana::Andor::ConfigV1::ENUM_FAN_ACQOFF);
+  _enum_type_fanMode.insert("ENUM_FAN_NUM", Psana::Andor::ConfigV1::ENUM_FAN_NUM);
+  type.insert("fanMode", offsetof(DsType, fanMode), _enum_type_fanMode);
   type.insert("baselineClamp", offsetof(DsType, baselineClamp), hdf5pp::TypeTraits<uint8_t>::stored_type());
   type.insert("highCapacity", offsetof(DsType, highCapacity), hdf5pp::TypeTraits<uint8_t>::stored_type());
   type.insert("gainIndex", offsetof(DsType, gainIndex), hdf5pp::TypeTraits<uint8_t>::stored_type());
@@ -55,7 +61,13 @@ hdf5pp::Type ns_ConfigV1_v0_dataset_config_native_type()
   type.insert("binY", offsetof(DsType, binY), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("exposureTime", offsetof(DsType, exposureTime), hdf5pp::TypeTraits<float>::native_type());
   type.insert("coolingTemp", offsetof(DsType, coolingTemp), hdf5pp::TypeTraits<float>::native_type());
-  type.insert("fanMode", offsetof(DsType, fanMode), hdf5pp::TypeTraits<uint8_t>::native_type());
+  hdf5pp::EnumType<uint8_t> _enum_type_fanMode = hdf5pp::EnumType<uint8_t>::enumType();
+  _enum_type_fanMode.insert("ENUM_FAN_FULL", Psana::Andor::ConfigV1::ENUM_FAN_FULL);
+  _enum_type_fanMode.insert("ENUM_FAN_LOW", Psana::Andor::ConfigV1::ENUM_FAN_LOW);
+  _enum_type_fanMode.insert("ENUM_FAN_OFF", Psana::Andor::ConfigV1::ENUM_FAN_OFF);
+  _enum_type_fanMode.insert("ENUM_FAN_ACQOFF", Psana::Andor::ConfigV1::ENUM_FAN_ACQOFF);
+  _enum_type_fanMode.insert("ENUM_FAN_NUM", Psana::Andor::ConfigV1::ENUM_FAN_NUM);
+  type.insert("fanMode", offsetof(DsType, fanMode), _enum_type_fanMode);
   type.insert("baselineClamp", offsetof(DsType, baselineClamp), hdf5pp::TypeTraits<uint8_t>::native_type());
   type.insert("highCapacity", offsetof(DsType, highCapacity), hdf5pp::TypeTraits<uint8_t>::native_type());
   type.insert("gainIndex", offsetof(DsType, gainIndex), hdf5pp::TypeTraits<uint8_t>::native_type());
@@ -112,9 +124,9 @@ float ConfigV1_v0::coolingTemp() const {
   if (not m_ds_config) read_ds_config();
   return float(m_ds_config->coolingTemp);
 }
-uint8_t ConfigV1_v0::fanMode() const {
+Psana::Andor::ConfigV1::EnumFanMode ConfigV1_v0::fanMode() const {
   if (not m_ds_config) read_ds_config();
-  return uint8_t(m_ds_config->fanMode);
+  return Psana::Andor::ConfigV1::EnumFanMode(m_ds_config->fanMode);
 }
 uint8_t ConfigV1_v0::baselineClamp() const {
   if (not m_ds_config) read_ds_config();

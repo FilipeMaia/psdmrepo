@@ -23,10 +23,10 @@ struct dataset_config {
   uint16_t vref; 
   uint16_t shutter_width; 
   uint8_t gain_balance; 
-  int32_t output_resolution; 
-  int32_t horizontal_binning; 
-  int32_t vertical_binning; 
-  int32_t lookuptable_mode; 
+  uint8_t output_resolution; 
+  uint8_t horizontal_binning; 
+  uint8_t vertical_binning; 
+  uint8_t lookuptable_mode; 
   uint8_t output_resolution_bits; 
 
 };

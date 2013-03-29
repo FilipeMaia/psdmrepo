@@ -909,7 +909,11 @@ ndarray<const Psana::CsPad::ProtectionSystemThreshold, 1> ConfigV3_v0::protectio
   if (m_ds_storage_config_protectionThresholds.empty()) {
     unsigned shape[] = {MaxQuadsPerSensor};
     ndarray<Psana::CsPad::ProtectionSystemThreshold, 1> tmparr(shape);
-    std::copy(m_ds_config->protectionThresholds, m_ds_config->protectionThresholds+4, tmparr.begin());
+    unsigned size = tmparr.size();
+    ndarray<Psana::CsPad::ProtectionSystemThreshold, 1>::iterator it = tmparr.begin();
+    for (unsigned i = 0; i != size; ++ i, ++ it) {
+      *it = Psana::CsPad::ProtectionSystemThreshold(m_ds_config->protectionThresholds[i]);
+    }
     m_ds_storage_config_protectionThresholds = tmparr;
   }
   return m_ds_storage_config_protectionThresholds;
@@ -1090,7 +1094,11 @@ ndarray<const Psana::CsPad::ProtectionSystemThreshold, 1> ConfigV4_v0::protectio
   if (m_ds_storage_config_protectionThresholds.empty()) {
     unsigned shape[] = {MaxQuadsPerSensor};
     ndarray<Psana::CsPad::ProtectionSystemThreshold, 1> tmparr(shape);
-    std::copy(m_ds_config->protectionThresholds, m_ds_config->protectionThresholds+4, tmparr.begin());
+    unsigned size = tmparr.size();
+    ndarray<Psana::CsPad::ProtectionSystemThreshold, 1>::iterator it = tmparr.begin();
+    for (unsigned i = 0; i != size; ++ i, ++ it) {
+      *it = Psana::CsPad::ProtectionSystemThreshold(m_ds_config->protectionThresholds[i]);
+    }
     m_ds_storage_config_protectionThresholds = tmparr;
   }
   return m_ds_storage_config_protectionThresholds;

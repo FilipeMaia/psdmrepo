@@ -78,13 +78,13 @@ hdf5pp::Type ns_FrameFexConfigV1_v0_dataset_config_stored_type()
 {
   typedef ns_FrameFexConfigV1_v0::dataset_config DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  hdf5pp::EnumType<int32_t> _enum_type_forwarding = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<uint32_t> _enum_type_forwarding = hdf5pp::EnumType<uint32_t>::enumType();
   _enum_type_forwarding.insert("NoFrame", Psana::Camera::FrameFexConfigV1::NoFrame);
   _enum_type_forwarding.insert("FullFrame", Psana::Camera::FrameFexConfigV1::FullFrame);
   _enum_type_forwarding.insert("RegionOfInterest", Psana::Camera::FrameFexConfigV1::RegionOfInterest);
   type.insert("forwarding", offsetof(DsType, forwarding), _enum_type_forwarding);
   type.insert("forward_prescale", offsetof(DsType, forward_prescale), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  hdf5pp::EnumType<int32_t> _enum_type_processing = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<uint32_t> _enum_type_processing = hdf5pp::EnumType<uint32_t>::enumType();
   _enum_type_processing.insert("NoProcessing", Psana::Camera::FrameFexConfigV1::NoProcessing);
   _enum_type_processing.insert("GssFullFrame", Psana::Camera::FrameFexConfigV1::GssFullFrame);
   _enum_type_processing.insert("GssRegionOfInterest", Psana::Camera::FrameFexConfigV1::GssRegionOfInterest);
@@ -107,13 +107,13 @@ hdf5pp::Type ns_FrameFexConfigV1_v0_dataset_config_native_type()
 {
   typedef ns_FrameFexConfigV1_v0::dataset_config DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  hdf5pp::EnumType<int32_t> _enum_type_forwarding = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<uint32_t> _enum_type_forwarding = hdf5pp::EnumType<uint32_t>::enumType();
   _enum_type_forwarding.insert("NoFrame", Psana::Camera::FrameFexConfigV1::NoFrame);
   _enum_type_forwarding.insert("FullFrame", Psana::Camera::FrameFexConfigV1::FullFrame);
   _enum_type_forwarding.insert("RegionOfInterest", Psana::Camera::FrameFexConfigV1::RegionOfInterest);
   type.insert("forwarding", offsetof(DsType, forwarding), _enum_type_forwarding);
   type.insert("forward_prescale", offsetof(DsType, forward_prescale), hdf5pp::TypeTraits<uint32_t>::native_type());
-  hdf5pp::EnumType<int32_t> _enum_type_processing = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<uint32_t> _enum_type_processing = hdf5pp::EnumType<uint32_t>::enumType();
   _enum_type_processing.insert("NoProcessing", Psana::Camera::FrameFexConfigV1::NoProcessing);
   _enum_type_processing.insert("GssFullFrame", Psana::Camera::FrameFexConfigV1::GssFullFrame);
   _enum_type_processing.insert("GssRegionOfInterest", Psana::Camera::FrameFexConfigV1::GssRegionOfInterest);

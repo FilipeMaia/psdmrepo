@@ -319,18 +319,7 @@ hdf5pp::Type ns_TdcChannel_v0_dataset_data_stored_type()
 {
   typedef ns_TdcChannel_v0::dataset_data DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("_channel_int", offsetof(DsType, _channel_int), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("_mode_int", offsetof(DsType, _mode_int), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  hdf5pp::EnumType<int32_t> _enum_type_slope = hdf5pp::EnumType<int32_t>::enumType();
-  _enum_type_slope.insert("Positive", Psana::Acqiris::TdcChannel::Positive);
-  _enum_type_slope.insert("Negative", Psana::Acqiris::TdcChannel::Negative);
-  type.insert("slope", offsetof(DsType, slope), _enum_type_slope);
-  hdf5pp::EnumType<int32_t> _enum_type_mode = hdf5pp::EnumType<int32_t>::enumType();
-  _enum_type_mode.insert("Active", Psana::Acqiris::TdcChannel::Active);
-  _enum_type_mode.insert("Inactive", Psana::Acqiris::TdcChannel::Inactive);
-  type.insert("mode", offsetof(DsType, mode), _enum_type_mode);
-  type.insert("level", offsetof(DsType, level), hdf5pp::TypeTraits<double>::stored_type());
-  hdf5pp::EnumType<int32_t> _enum_type_channel = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<uint32_t> _enum_type_channel = hdf5pp::EnumType<uint32_t>::enumType();
   _enum_type_channel.insert("Veto", Psana::Acqiris::TdcChannel::Veto);
   _enum_type_channel.insert("Common", Psana::Acqiris::TdcChannel::Common);
   _enum_type_channel.insert("Input1", Psana::Acqiris::TdcChannel::Input1);
@@ -340,6 +329,16 @@ hdf5pp::Type ns_TdcChannel_v0_dataset_data_stored_type()
   _enum_type_channel.insert("Input5", Psana::Acqiris::TdcChannel::Input5);
   _enum_type_channel.insert("Input6", Psana::Acqiris::TdcChannel::Input6);
   type.insert("channel", offsetof(DsType, channel), _enum_type_channel);
+  type.insert("_mode_int", offsetof(DsType, _mode_int), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  hdf5pp::EnumType<uint16_t> _enum_type_slope = hdf5pp::EnumType<uint16_t>::enumType();
+  _enum_type_slope.insert("Positive", Psana::Acqiris::TdcChannel::Positive);
+  _enum_type_slope.insert("Negative", Psana::Acqiris::TdcChannel::Negative);
+  type.insert("slope", offsetof(DsType, slope), _enum_type_slope);
+  hdf5pp::EnumType<uint16_t> _enum_type_mode = hdf5pp::EnumType<uint16_t>::enumType();
+  _enum_type_mode.insert("Active", Psana::Acqiris::TdcChannel::Active);
+  _enum_type_mode.insert("Inactive", Psana::Acqiris::TdcChannel::Inactive);
+  type.insert("mode", offsetof(DsType, mode), _enum_type_mode);
+  type.insert("level", offsetof(DsType, level), hdf5pp::TypeTraits<double>::stored_type());
   return type;
 }
 
@@ -353,18 +352,7 @@ hdf5pp::Type ns_TdcChannel_v0_dataset_data_native_type()
 {
   typedef ns_TdcChannel_v0::dataset_data DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("_channel_int", offsetof(DsType, _channel_int), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("_mode_int", offsetof(DsType, _mode_int), hdf5pp::TypeTraits<uint32_t>::native_type());
-  hdf5pp::EnumType<int32_t> _enum_type_slope = hdf5pp::EnumType<int32_t>::enumType();
-  _enum_type_slope.insert("Positive", Psana::Acqiris::TdcChannel::Positive);
-  _enum_type_slope.insert("Negative", Psana::Acqiris::TdcChannel::Negative);
-  type.insert("slope", offsetof(DsType, slope), _enum_type_slope);
-  hdf5pp::EnumType<int32_t> _enum_type_mode = hdf5pp::EnumType<int32_t>::enumType();
-  _enum_type_mode.insert("Active", Psana::Acqiris::TdcChannel::Active);
-  _enum_type_mode.insert("Inactive", Psana::Acqiris::TdcChannel::Inactive);
-  type.insert("mode", offsetof(DsType, mode), _enum_type_mode);
-  type.insert("level", offsetof(DsType, level), hdf5pp::TypeTraits<double>::native_type());
-  hdf5pp::EnumType<int32_t> _enum_type_channel = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<uint32_t> _enum_type_channel = hdf5pp::EnumType<uint32_t>::enumType();
   _enum_type_channel.insert("Veto", Psana::Acqiris::TdcChannel::Veto);
   _enum_type_channel.insert("Common", Psana::Acqiris::TdcChannel::Common);
   _enum_type_channel.insert("Input1", Psana::Acqiris::TdcChannel::Input1);
@@ -374,6 +362,16 @@ hdf5pp::Type ns_TdcChannel_v0_dataset_data_native_type()
   _enum_type_channel.insert("Input5", Psana::Acqiris::TdcChannel::Input5);
   _enum_type_channel.insert("Input6", Psana::Acqiris::TdcChannel::Input6);
   type.insert("channel", offsetof(DsType, channel), _enum_type_channel);
+  type.insert("_mode_int", offsetof(DsType, _mode_int), hdf5pp::TypeTraits<uint32_t>::native_type());
+  hdf5pp::EnumType<uint16_t> _enum_type_slope = hdf5pp::EnumType<uint16_t>::enumType();
+  _enum_type_slope.insert("Positive", Psana::Acqiris::TdcChannel::Positive);
+  _enum_type_slope.insert("Negative", Psana::Acqiris::TdcChannel::Negative);
+  type.insert("slope", offsetof(DsType, slope), _enum_type_slope);
+  hdf5pp::EnumType<uint16_t> _enum_type_mode = hdf5pp::EnumType<uint16_t>::enumType();
+  _enum_type_mode.insert("Active", Psana::Acqiris::TdcChannel::Active);
+  _enum_type_mode.insert("Inactive", Psana::Acqiris::TdcChannel::Inactive);
+  type.insert("mode", offsetof(DsType, mode), _enum_type_mode);
+  type.insert("level", offsetof(DsType, level), hdf5pp::TypeTraits<double>::native_type());
   return type;
 }
 
@@ -393,7 +391,7 @@ Proxy_TdcChannel_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& sourc
 {
   if (not m_data) {
     boost::shared_ptr<Acqiris::ns_TdcChannel_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<Acqiris::ns_TdcChannel_v0::dataset_data>(m_group, "data", m_idx);
-    m_data.reset(new PsanaType(ds_data->_channel_int, Psana::Acqiris::TdcChannel::Slope(ds_data->slope), Psana::Acqiris::TdcChannel::Mode(ds_data->mode), ds_data->level));
+    m_data.reset(new PsanaType(Psana::Acqiris::TdcChannel::Channel(ds_data->channel), Psana::Acqiris::TdcChannel::Slope(ds_data->slope), Psana::Acqiris::TdcChannel::Mode(ds_data->mode), ds_data->level));
   }
   return m_data;
 }
@@ -411,20 +409,17 @@ hdf5pp::Type ns_TdcAuxIO_v0_dataset_data_stored_type()
 {
   typedef ns_TdcAuxIO_v0::dataset_data DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("channel_int", offsetof(DsType, channel_int), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("signal_int", offsetof(DsType, signal_int), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("qualifier_int", offsetof(DsType, qualifier_int), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  hdf5pp::EnumType<int32_t> _enum_type_channel = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<uint32_t> _enum_type_channel = hdf5pp::EnumType<uint32_t>::enumType();
   _enum_type_channel.insert("IOAux1", Psana::Acqiris::TdcAuxIO::IOAux1);
   _enum_type_channel.insert("IOAux2", Psana::Acqiris::TdcAuxIO::IOAux2);
   type.insert("channel", offsetof(DsType, channel), _enum_type_channel);
-  hdf5pp::EnumType<int32_t> _enum_type_mode = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<uint32_t> _enum_type_mode = hdf5pp::EnumType<uint32_t>::enumType();
   _enum_type_mode.insert("BankSwitch", Psana::Acqiris::TdcAuxIO::BankSwitch);
   _enum_type_mode.insert("Marker", Psana::Acqiris::TdcAuxIO::Marker);
   _enum_type_mode.insert("OutputLo", Psana::Acqiris::TdcAuxIO::OutputLo);
   _enum_type_mode.insert("OutputHi", Psana::Acqiris::TdcAuxIO::OutputHi);
   type.insert("mode", offsetof(DsType, mode), _enum_type_mode);
-  hdf5pp::EnumType<int32_t> _enum_type_term = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<uint32_t> _enum_type_term = hdf5pp::EnumType<uint32_t>::enumType();
   _enum_type_term.insert("ZHigh", Psana::Acqiris::TdcAuxIO::ZHigh);
   _enum_type_term.insert("Z50", Psana::Acqiris::TdcAuxIO::Z50);
   type.insert("term", offsetof(DsType, term), _enum_type_term);
@@ -441,20 +436,17 @@ hdf5pp::Type ns_TdcAuxIO_v0_dataset_data_native_type()
 {
   typedef ns_TdcAuxIO_v0::dataset_data DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("channel_int", offsetof(DsType, channel_int), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("signal_int", offsetof(DsType, signal_int), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("qualifier_int", offsetof(DsType, qualifier_int), hdf5pp::TypeTraits<uint32_t>::native_type());
-  hdf5pp::EnumType<int32_t> _enum_type_channel = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<uint32_t> _enum_type_channel = hdf5pp::EnumType<uint32_t>::enumType();
   _enum_type_channel.insert("IOAux1", Psana::Acqiris::TdcAuxIO::IOAux1);
   _enum_type_channel.insert("IOAux2", Psana::Acqiris::TdcAuxIO::IOAux2);
   type.insert("channel", offsetof(DsType, channel), _enum_type_channel);
-  hdf5pp::EnumType<int32_t> _enum_type_mode = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<uint32_t> _enum_type_mode = hdf5pp::EnumType<uint32_t>::enumType();
   _enum_type_mode.insert("BankSwitch", Psana::Acqiris::TdcAuxIO::BankSwitch);
   _enum_type_mode.insert("Marker", Psana::Acqiris::TdcAuxIO::Marker);
   _enum_type_mode.insert("OutputLo", Psana::Acqiris::TdcAuxIO::OutputLo);
   _enum_type_mode.insert("OutputHi", Psana::Acqiris::TdcAuxIO::OutputHi);
   type.insert("mode", offsetof(DsType, mode), _enum_type_mode);
-  hdf5pp::EnumType<int32_t> _enum_type_term = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<uint32_t> _enum_type_term = hdf5pp::EnumType<uint32_t>::enumType();
   _enum_type_term.insert("ZHigh", Psana::Acqiris::TdcAuxIO::ZHigh);
   _enum_type_term.insert("Z50", Psana::Acqiris::TdcAuxIO::Z50);
   type.insert("term", offsetof(DsType, term), _enum_type_term);
@@ -477,7 +469,7 @@ Proxy_TdcAuxIO_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source,
 {
   if (not m_data) {
     boost::shared_ptr<Acqiris::ns_TdcAuxIO_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<Acqiris::ns_TdcAuxIO_v0::dataset_data>(m_group, "data", m_idx);
-    m_data.reset(new PsanaType(ds_data->channel_int, ds_data->signal_int, ds_data->qualifier_int));
+    m_data.reset(new PsanaType(Psana::Acqiris::TdcAuxIO::Channel(ds_data->channel), Psana::Acqiris::TdcAuxIO::Mode(ds_data->mode), Psana::Acqiris::TdcAuxIO::Termination(ds_data->term)));
   }
   return m_data;
 }
@@ -495,18 +487,16 @@ hdf5pp::Type ns_TdcVetoIO_v0_dataset_data_stored_type()
 {
   typedef ns_TdcVetoIO_v0::dataset_data DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("signal_int", offsetof(DsType, signal_int), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("qualifier_int", offsetof(DsType, qualifier_int), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  hdf5pp::EnumType<int32_t> _enum_type_channel = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<uint32_t> _enum_type_channel = hdf5pp::EnumType<uint32_t>::enumType();
   _enum_type_channel.insert("ChVeto", Psana::Acqiris::TdcVetoIO::ChVeto);
   type.insert("channel", offsetof(DsType, channel), _enum_type_channel);
-  hdf5pp::EnumType<int32_t> _enum_type_mode = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<uint32_t> _enum_type_mode = hdf5pp::EnumType<uint32_t>::enumType();
   _enum_type_mode.insert("Veto", Psana::Acqiris::TdcVetoIO::Veto);
   _enum_type_mode.insert("SwitchVeto", Psana::Acqiris::TdcVetoIO::SwitchVeto);
   _enum_type_mode.insert("InvertedVeto", Psana::Acqiris::TdcVetoIO::InvertedVeto);
   _enum_type_mode.insert("InvertedSwitchVeto", Psana::Acqiris::TdcVetoIO::InvertedSwitchVeto);
   type.insert("mode", offsetof(DsType, mode), _enum_type_mode);
-  hdf5pp::EnumType<int32_t> _enum_type_term = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<uint32_t> _enum_type_term = hdf5pp::EnumType<uint32_t>::enumType();
   _enum_type_term.insert("ZHigh", Psana::Acqiris::TdcVetoIO::ZHigh);
   _enum_type_term.insert("Z50", Psana::Acqiris::TdcVetoIO::Z50);
   type.insert("term", offsetof(DsType, term), _enum_type_term);
@@ -523,18 +513,16 @@ hdf5pp::Type ns_TdcVetoIO_v0_dataset_data_native_type()
 {
   typedef ns_TdcVetoIO_v0::dataset_data DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("signal_int", offsetof(DsType, signal_int), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("qualifier_int", offsetof(DsType, qualifier_int), hdf5pp::TypeTraits<uint32_t>::native_type());
-  hdf5pp::EnumType<int32_t> _enum_type_channel = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<uint32_t> _enum_type_channel = hdf5pp::EnumType<uint32_t>::enumType();
   _enum_type_channel.insert("ChVeto", Psana::Acqiris::TdcVetoIO::ChVeto);
   type.insert("channel", offsetof(DsType, channel), _enum_type_channel);
-  hdf5pp::EnumType<int32_t> _enum_type_mode = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<uint32_t> _enum_type_mode = hdf5pp::EnumType<uint32_t>::enumType();
   _enum_type_mode.insert("Veto", Psana::Acqiris::TdcVetoIO::Veto);
   _enum_type_mode.insert("SwitchVeto", Psana::Acqiris::TdcVetoIO::SwitchVeto);
   _enum_type_mode.insert("InvertedVeto", Psana::Acqiris::TdcVetoIO::InvertedVeto);
   _enum_type_mode.insert("InvertedSwitchVeto", Psana::Acqiris::TdcVetoIO::InvertedSwitchVeto);
   type.insert("mode", offsetof(DsType, mode), _enum_type_mode);
-  hdf5pp::EnumType<int32_t> _enum_type_term = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<uint32_t> _enum_type_term = hdf5pp::EnumType<uint32_t>::enumType();
   _enum_type_term.insert("ZHigh", Psana::Acqiris::TdcVetoIO::ZHigh);
   _enum_type_term.insert("Z50", Psana::Acqiris::TdcVetoIO::Z50);
   type.insert("term", offsetof(DsType, term), _enum_type_term);
@@ -557,7 +545,7 @@ Proxy_TdcVetoIO_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source
 {
   if (not m_data) {
     boost::shared_ptr<Acqiris::ns_TdcVetoIO_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<Acqiris::ns_TdcVetoIO_v0::dataset_data>(m_group, "data", m_idx);
-    m_data.reset(new PsanaType(ds_data->signal_int, ds_data->qualifier_int));
+    m_data.reset(new PsanaType(Psana::Acqiris::TdcVetoIO::Mode(ds_data->mode), Psana::Acqiris::TdcVetoIO::Termination(ds_data->term)));
   }
   return m_data;
 }
@@ -570,61 +558,28 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::TdcVetoIO> > make_TdcVetoIO(int v
     return boost::make_shared<PSEvt::DataProxy<Psana::Acqiris::TdcVetoIO> >(boost::shared_ptr<Psana::Acqiris::TdcVetoIO>());
   }
 }
-
-hdf5pp::Type ns_TdcConfigV1_v0_dataset_config_stored_type()
-{
-  typedef ns_TdcConfigV1_v0::dataset_config DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("veto", offsetof(DsType, veto), hdf5pp::TypeTraits<Acqiris::ns_TdcVetoIO_v0::dataset_data>::stored_type());
-  return type;
-}
-
-hdf5pp::Type ns_TdcConfigV1_v0::dataset_config::stored_type()
-{
-  static hdf5pp::Type type = ns_TdcConfigV1_v0_dataset_config_stored_type();
-  return type;
-}
-
-hdf5pp::Type ns_TdcConfigV1_v0_dataset_config_native_type()
-{
-  typedef ns_TdcConfigV1_v0::dataset_config DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("veto", offsetof(DsType, veto), hdf5pp::TypeTraits<Acqiris::ns_TdcVetoIO_v0::dataset_data>::native_type());
-  return type;
-}
-
-hdf5pp::Type ns_TdcConfigV1_v0::dataset_config::native_type()
-{
-  static hdf5pp::Type type = ns_TdcConfigV1_v0_dataset_config_native_type();
-  return type;
-}
-ns_TdcConfigV1_v0::dataset_config::dataset_config()
-{
-}
-ns_TdcConfigV1_v0::dataset_config::~dataset_config()
-{
-}
 ndarray<const Psana::Acqiris::TdcChannel, 1> TdcConfigV1_v0::channels() const {
-  if (m_ds_channels.empty()) read_ds_channels();
-  return m_ds_channels;
+  if (m_ds_channel.empty()) read_ds_channel();
+  return m_ds_channel;
 }
 ndarray<const Psana::Acqiris::TdcAuxIO, 1> TdcConfigV1_v0::auxio() const {
   if (m_ds_auxio.empty()) read_ds_auxio();
   return m_ds_auxio;
 }
 const Psana::Acqiris::TdcVetoIO& TdcConfigV1_v0::veto() const {
-  if (not m_ds_config) read_ds_config();
-  m_ds_storage_config_veto = Psana::Acqiris::TdcVetoIO(m_ds_config->veto);
-  return m_ds_storage_config_veto;
+  if (not m_ds_veto) read_ds_veto();
+  m_ds_storage_veto = Psana::Acqiris::TdcVetoIO(*m_ds_veto);
+  return m_ds_storage_veto;
 }
-void TdcConfigV1_v0::read_ds_config() const {
-  m_ds_config = hdf5pp::Utils::readGroup<Acqiris::ns_TdcConfigV1_v0::dataset_config>(m_group, "config", m_idx);
+void TdcConfigV1_v0::read_ds_veto() const {
+  m_ds_veto = hdf5pp::Utils::readGroup<Acqiris::ns_TdcVetoIO_v0::dataset_data>(m_group, "veto", m_idx);
+  m_ds_storage_veto = *m_ds_veto;
 }
-void TdcConfigV1_v0::read_ds_channels() const {
-  ndarray<Acqiris::ns_TdcChannel_v0::dataset_data, 1> arr = hdf5pp::Utils::readNdarray<Acqiris::ns_TdcChannel_v0::dataset_data, 1>(m_group, "channels", m_idx);
+void TdcConfigV1_v0::read_ds_channel() const {
+  ndarray<Acqiris::ns_TdcChannel_v0::dataset_data, 1> arr = hdf5pp::Utils::readNdarray<Acqiris::ns_TdcChannel_v0::dataset_data, 1>(m_group, "channel", m_idx);
   ndarray<Psana::Acqiris::TdcChannel, 1> tmp(arr.shape());
   std::copy(arr.begin(), arr.end(), tmp.begin());
-  m_ds_channels = tmp;
+  m_ds_channel = tmp;
 }
 void TdcConfigV1_v0::read_ds_auxio() const {
   ndarray<Acqiris::ns_TdcAuxIO_v0::dataset_data, 1> arr = hdf5pp::Utils::readNdarray<Acqiris::ns_TdcAuxIO_v0::dataset_data, 1>(m_group, "auxio", m_idx);
@@ -714,57 +669,15 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::TdcDataV1_Item> > make_TdcDataV1_
     return boost::make_shared<PSEvt::DataProxy<Psana::Acqiris::TdcDataV1_Item> >(boost::shared_ptr<Psana::Acqiris::TdcDataV1_Item>());
   }
 }
-
-hdf5pp::Type ns_TdcDataV1_v0_dataset_data_stored_type()
-{
-  typedef ns_TdcDataV1_v0::dataset_data DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  hdf5pp::VlenType _array_type_data = hdf5pp::VlenType::vlenType(hdf5pp::TypeTraits<Acqiris::ns_TdcDataV1_Item_v0::dataset_data>::stored_type());
-  type.insert("data", offsetof(DsType, vlen_data), _array_type_data);
-  return type;
-}
-
-hdf5pp::Type ns_TdcDataV1_v0::dataset_data::stored_type()
-{
-  static hdf5pp::Type type = ns_TdcDataV1_v0_dataset_data_stored_type();
-  return type;
-}
-
-hdf5pp::Type ns_TdcDataV1_v0_dataset_data_native_type()
-{
-  typedef ns_TdcDataV1_v0::dataset_data DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  hdf5pp::VlenType _array_type_data = hdf5pp::VlenType::vlenType(hdf5pp::TypeTraits<Acqiris::ns_TdcDataV1_Item_v0::dataset_data>::native_type());
-  type.insert("data", offsetof(DsType, vlen_data), _array_type_data);
-  return type;
-}
-
-hdf5pp::Type ns_TdcDataV1_v0::dataset_data::native_type()
-{
-  static hdf5pp::Type type = ns_TdcDataV1_v0_dataset_data_native_type();
-  return type;
-}
-ns_TdcDataV1_v0::dataset_data::dataset_data()
-{
-  this->vlen_data = 0;
-  this->data = 0;
-}
-ns_TdcDataV1_v0::dataset_data::~dataset_data()
-{
-  free(this->data);
-}
 ndarray<const Psana::Acqiris::TdcDataV1_Item, 1> TdcDataV1_v0::data() const {
-  if (not m_ds_data) read_ds_data();
-  if (m_ds_storage_data_data.empty()) {
-    unsigned shape[] = {m_ds_data->vlen_data};
-    ndarray<Psana::Acqiris::TdcDataV1_Item, 1> tmparr(shape);
-    std::copy(m_ds_data->data, m_ds_data->data+m_ds_data->vlen_data, tmparr.begin());
-    m_ds_storage_data_data = tmparr;
-  }
-  return m_ds_storage_data_data;
+  if (m_ds_data.empty()) read_ds_data();
+  return m_ds_data;
 }
 void TdcDataV1_v0::read_ds_data() const {
-  m_ds_data = hdf5pp::Utils::readGroup<Acqiris::ns_TdcDataV1_v0::dataset_data>(m_group, "data", m_idx);
+  ndarray<Acqiris::ns_TdcDataV1_Item_v0::dataset_data, 1> arr = hdf5pp::Utils::readNdarray<Acqiris::ns_TdcDataV1_Item_v0::dataset_data, 1>(m_group, "data", m_idx);
+  ndarray<Psana::Acqiris::TdcDataV1_Item, 1> tmp(arr.shape());
+  std::copy(arr.begin(), arr.end(), tmp.begin());
+  m_ds_data = tmp;
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::TdcDataV1> > make_TdcDataV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {

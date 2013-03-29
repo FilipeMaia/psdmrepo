@@ -559,6 +559,10 @@ try {
     // Bld::BldDataIpimbV1
     evt.putProxy(psddl_hdf2psana::Bld::make_BldDataIpimbV1(schema_version, group, idx), src);
     break;
+  case 4055296315:
+    // Acqiris::AcqirisTdcConfigV1
+    cfgStore.putProxy(psddl_hdf2psana::Acqiris::make_TdcConfigV1(schema_version, group, idx), src);
+    break;
   case 4103916008:
     // FCCD::FccdConfigV1
     cfgStore.putProxy(psddl_hdf2psana::FCCD::make_FccdConfigV1(schema_version, group, idx), src);

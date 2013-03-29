@@ -15,11 +15,11 @@ hdf5pp::Type ns_ConfigV1_v0_dataset_config_stored_type()
 {
   typedef ns_ConfigV1_v0::dataset_config DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  hdf5pp::EnumType<int32_t> _enum_type_readoutSpeed = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<uint8_t> _enum_type_readoutSpeed = hdf5pp::EnumType<uint8_t>::enumType();
   _enum_type_readoutSpeed.insert("ReadoutSpeed_Slow", Psana::Timepix::ConfigV1::ReadoutSpeed_Slow);
   _enum_type_readoutSpeed.insert("ReadoutSpeed_Fast", Psana::Timepix::ConfigV1::ReadoutSpeed_Fast);
   type.insert("readoutSpeed", offsetof(DsType, readoutSpeed), _enum_type_readoutSpeed);
-  hdf5pp::EnumType<int32_t> _enum_type_triggerMode = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<uint8_t> _enum_type_triggerMode = hdf5pp::EnumType<uint8_t>::enumType();
   _enum_type_triggerMode.insert("TriggerMode_ExtPos", Psana::Timepix::ConfigV1::TriggerMode_ExtPos);
   _enum_type_triggerMode.insert("TriggerMode_ExtNeg", Psana::Timepix::ConfigV1::TriggerMode_ExtNeg);
   _enum_type_triggerMode.insert("TriggerMode_Soft", Psana::Timepix::ConfigV1::TriggerMode_Soft);
@@ -94,11 +94,11 @@ hdf5pp::Type ns_ConfigV1_v0_dataset_config_native_type()
 {
   typedef ns_ConfigV1_v0::dataset_config DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  hdf5pp::EnumType<int32_t> _enum_type_readoutSpeed = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<uint8_t> _enum_type_readoutSpeed = hdf5pp::EnumType<uint8_t>::enumType();
   _enum_type_readoutSpeed.insert("ReadoutSpeed_Slow", Psana::Timepix::ConfigV1::ReadoutSpeed_Slow);
   _enum_type_readoutSpeed.insert("ReadoutSpeed_Fast", Psana::Timepix::ConfigV1::ReadoutSpeed_Fast);
   type.insert("readoutSpeed", offsetof(DsType, readoutSpeed), _enum_type_readoutSpeed);
-  hdf5pp::EnumType<int32_t> _enum_type_triggerMode = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<uint8_t> _enum_type_triggerMode = hdf5pp::EnumType<uint8_t>::enumType();
   _enum_type_triggerMode.insert("TriggerMode_ExtPos", Psana::Timepix::ConfigV1::TriggerMode_ExtPos);
   _enum_type_triggerMode.insert("TriggerMode_ExtNeg", Psana::Timepix::ConfigV1::TriggerMode_ExtNeg);
   _enum_type_triggerMode.insert("TriggerMode_Soft", Psana::Timepix::ConfigV1::TriggerMode_Soft);
@@ -426,11 +426,11 @@ hdf5pp::Type ns_ConfigV2_v0_dataset_config_stored_type()
 {
   typedef ns_ConfigV2_v0::dataset_config DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  hdf5pp::EnumType<int32_t> _enum_type_readoutSpeed = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<uint8_t> _enum_type_readoutSpeed = hdf5pp::EnumType<uint8_t>::enumType();
   _enum_type_readoutSpeed.insert("ReadoutSpeed_Slow", Psana::Timepix::ConfigV2::ReadoutSpeed_Slow);
   _enum_type_readoutSpeed.insert("ReadoutSpeed_Fast", Psana::Timepix::ConfigV2::ReadoutSpeed_Fast);
   type.insert("readoutSpeed", offsetof(DsType, readoutSpeed), _enum_type_readoutSpeed);
-  hdf5pp::EnumType<int32_t> _enum_type_triggerMode = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<uint8_t> _enum_type_triggerMode = hdf5pp::EnumType<uint8_t>::enumType();
   _enum_type_triggerMode.insert("TriggerMode_ExtPos", Psana::Timepix::ConfigV2::TriggerMode_ExtPos);
   _enum_type_triggerMode.insert("TriggerMode_ExtNeg", Psana::Timepix::ConfigV2::TriggerMode_ExtNeg);
   _enum_type_triggerMode.insert("TriggerMode_Soft", Psana::Timepix::ConfigV2::TriggerMode_Soft);
@@ -520,11 +520,11 @@ hdf5pp::Type ns_ConfigV2_v0_dataset_config_native_type()
 {
   typedef ns_ConfigV2_v0::dataset_config DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  hdf5pp::EnumType<int32_t> _enum_type_readoutSpeed = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<uint8_t> _enum_type_readoutSpeed = hdf5pp::EnumType<uint8_t>::enumType();
   _enum_type_readoutSpeed.insert("ReadoutSpeed_Slow", Psana::Timepix::ConfigV2::ReadoutSpeed_Slow);
   _enum_type_readoutSpeed.insert("ReadoutSpeed_Fast", Psana::Timepix::ConfigV2::ReadoutSpeed_Fast);
   type.insert("readoutSpeed", offsetof(DsType, readoutSpeed), _enum_type_readoutSpeed);
-  hdf5pp::EnumType<int32_t> _enum_type_triggerMode = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<uint8_t> _enum_type_triggerMode = hdf5pp::EnumType<uint8_t>::enumType();
   _enum_type_triggerMode.insert("TriggerMode_ExtPos", Psana::Timepix::ConfigV2::TriggerMode_ExtPos);
   _enum_type_triggerMode.insert("TriggerMode_ExtNeg", Psana::Timepix::ConfigV2::TriggerMode_ExtNeg);
   _enum_type_triggerMode.insert("TriggerMode_Soft", Psana::Timepix::ConfigV2::TriggerMode_Soft);
@@ -920,11 +920,11 @@ hdf5pp::Type ns_ConfigV3_v0_dataset_config_stored_type()
 {
   typedef ns_ConfigV3_v0::dataset_config DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  hdf5pp::EnumType<int32_t> _enum_type_readoutSpeed = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<uint8_t> _enum_type_readoutSpeed = hdf5pp::EnumType<uint8_t>::enumType();
   _enum_type_readoutSpeed.insert("ReadoutSpeed_Slow", Psana::Timepix::ConfigV3::ReadoutSpeed_Slow);
   _enum_type_readoutSpeed.insert("ReadoutSpeed_Fast", Psana::Timepix::ConfigV3::ReadoutSpeed_Fast);
   type.insert("readoutSpeed", offsetof(DsType, readoutSpeed), _enum_type_readoutSpeed);
-  hdf5pp::EnumType<int32_t> _enum_type_timepixMode = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<uint8_t> _enum_type_timepixMode = hdf5pp::EnumType<uint8_t>::enumType();
   _enum_type_timepixMode.insert("TimepixMode_Counting", Psana::Timepix::ConfigV3::TimepixMode_Counting);
   _enum_type_timepixMode.insert("TimepixMode_TOT", Psana::Timepix::ConfigV3::TimepixMode_TOT);
   type.insert("timepixMode", offsetof(DsType, timepixMode), _enum_type_timepixMode);
@@ -1015,11 +1015,11 @@ hdf5pp::Type ns_ConfigV3_v0_dataset_config_native_type()
 {
   typedef ns_ConfigV3_v0::dataset_config DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  hdf5pp::EnumType<int32_t> _enum_type_readoutSpeed = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<uint8_t> _enum_type_readoutSpeed = hdf5pp::EnumType<uint8_t>::enumType();
   _enum_type_readoutSpeed.insert("ReadoutSpeed_Slow", Psana::Timepix::ConfigV3::ReadoutSpeed_Slow);
   _enum_type_readoutSpeed.insert("ReadoutSpeed_Fast", Psana::Timepix::ConfigV3::ReadoutSpeed_Fast);
   type.insert("readoutSpeed", offsetof(DsType, readoutSpeed), _enum_type_readoutSpeed);
-  hdf5pp::EnumType<int32_t> _enum_type_timepixMode = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<uint8_t> _enum_type_timepixMode = hdf5pp::EnumType<uint8_t>::enumType();
   _enum_type_timepixMode.insert("TimepixMode_Counting", Psana::Timepix::ConfigV3::TimepixMode_Counting);
   _enum_type_timepixMode.insert("TimepixMode_TOT", Psana::Timepix::ConfigV3::TimepixMode_TOT);
   type.insert("timepixMode", offsetof(DsType, timepixMode), _enum_type_timepixMode);

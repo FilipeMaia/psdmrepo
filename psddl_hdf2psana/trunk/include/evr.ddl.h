@@ -261,9 +261,9 @@ struct dataset_data {
   ~dataset_data();
 
   uint32_t value; 
-  int32_t source; 
+  int16_t source; 
   uint8_t source_id; 
-  int32_t conn; 
+  int16_t conn; 
   uint8_t conn_id; 
 
   operator Psana::EvrData::OutputMap() const { return Psana::EvrData::OutputMap(Psana::EvrData::OutputMap::Source(source), source_id, Psana::EvrData::OutputMap::Conn(conn), conn_id); }
@@ -297,9 +297,9 @@ struct dataset_data {
   ~dataset_data();
 
   uint32_t value; 
-  int32_t source; 
+  int16_t source; 
   uint8_t source_id; 
-  int32_t conn; 
+  int16_t conn; 
   uint8_t conn_id; 
   uint8_t module; 
 
@@ -375,8 +375,8 @@ struct dataset_config {
   uint32_t opcode; 
   uint32_t npulses; 
   uint32_t noutputs; 
-  int32_t beam; 
-  int32_t rate; 
+  int16_t beam; 
+  int16_t rate; 
 
 };
 }

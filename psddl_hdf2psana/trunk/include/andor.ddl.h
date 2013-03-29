@@ -58,7 +58,7 @@ public:
   virtual uint32_t binY() const;
   virtual float exposureTime() const;
   virtual float coolingTemp() const;
-  virtual uint8_t fanMode() const;
+  virtual Psana::Andor::ConfigV1::EnumFanMode fanMode() const;
   virtual uint8_t baselineClamp() const;
   virtual uint8_t highCapacity() const;
   virtual uint8_t gainIndex() const;

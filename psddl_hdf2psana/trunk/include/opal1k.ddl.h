@@ -21,9 +21,9 @@ struct dataset_config {
 
   uint16_t black_level; 
   uint16_t gain_percent; 
-  int32_t output_resolution; 
-  int32_t vertical_binning; 
-  int32_t output_mirroring; 
+  uint8_t output_resolution; 
+  uint8_t vertical_binning; 
+  uint8_t output_mirroring; 
   uint8_t vertical_remapping; 
   uint8_t defect_pixel_correction_enabled; 
   uint8_t output_lookup_table_enabled; 

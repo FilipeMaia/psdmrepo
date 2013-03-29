@@ -429,7 +429,7 @@ hdf5pp::Type ns_OutputMap_v0_dataset_data_stored_type()
   typedef ns_OutputMap_v0::dataset_data DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
   type.insert("value", offsetof(DsType, value), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  hdf5pp::EnumType<int32_t> _enum_type_source = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<int16_t> _enum_type_source = hdf5pp::EnumType<int16_t>::enumType();
   _enum_type_source.insert("Pulse", Psana::EvrData::OutputMap::Pulse);
   _enum_type_source.insert("DBus", Psana::EvrData::OutputMap::DBus);
   _enum_type_source.insert("Prescaler", Psana::EvrData::OutputMap::Prescaler);
@@ -437,7 +437,7 @@ hdf5pp::Type ns_OutputMap_v0_dataset_data_stored_type()
   _enum_type_source.insert("Force_Low", Psana::EvrData::OutputMap::Force_Low);
   type.insert("source", offsetof(DsType, source), _enum_type_source);
   type.insert("source_id", offsetof(DsType, source_id), hdf5pp::TypeTraits<uint8_t>::stored_type());
-  hdf5pp::EnumType<int32_t> _enum_type_conn = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<int16_t> _enum_type_conn = hdf5pp::EnumType<int16_t>::enumType();
   _enum_type_conn.insert("FrontPanel", Psana::EvrData::OutputMap::FrontPanel);
   _enum_type_conn.insert("UnivIO", Psana::EvrData::OutputMap::UnivIO);
   type.insert("conn", offsetof(DsType, conn), _enum_type_conn);
@@ -456,7 +456,7 @@ hdf5pp::Type ns_OutputMap_v0_dataset_data_native_type()
   typedef ns_OutputMap_v0::dataset_data DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
   type.insert("value", offsetof(DsType, value), hdf5pp::TypeTraits<uint32_t>::native_type());
-  hdf5pp::EnumType<int32_t> _enum_type_source = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<int16_t> _enum_type_source = hdf5pp::EnumType<int16_t>::enumType();
   _enum_type_source.insert("Pulse", Psana::EvrData::OutputMap::Pulse);
   _enum_type_source.insert("DBus", Psana::EvrData::OutputMap::DBus);
   _enum_type_source.insert("Prescaler", Psana::EvrData::OutputMap::Prescaler);
@@ -464,7 +464,7 @@ hdf5pp::Type ns_OutputMap_v0_dataset_data_native_type()
   _enum_type_source.insert("Force_Low", Psana::EvrData::OutputMap::Force_Low);
   type.insert("source", offsetof(DsType, source), _enum_type_source);
   type.insert("source_id", offsetof(DsType, source_id), hdf5pp::TypeTraits<uint8_t>::native_type());
-  hdf5pp::EnumType<int32_t> _enum_type_conn = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<int16_t> _enum_type_conn = hdf5pp::EnumType<int16_t>::enumType();
   _enum_type_conn.insert("FrontPanel", Psana::EvrData::OutputMap::FrontPanel);
   _enum_type_conn.insert("UnivIO", Psana::EvrData::OutputMap::UnivIO);
   type.insert("conn", offsetof(DsType, conn), _enum_type_conn);
@@ -507,7 +507,7 @@ hdf5pp::Type ns_OutputMapV2_v0_dataset_data_stored_type()
   typedef ns_OutputMapV2_v0::dataset_data DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
   type.insert("value", offsetof(DsType, value), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  hdf5pp::EnumType<int32_t> _enum_type_source = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<int16_t> _enum_type_source = hdf5pp::EnumType<int16_t>::enumType();
   _enum_type_source.insert("Pulse", Psana::EvrData::OutputMapV2::Pulse);
   _enum_type_source.insert("DBus", Psana::EvrData::OutputMapV2::DBus);
   _enum_type_source.insert("Prescaler", Psana::EvrData::OutputMapV2::Prescaler);
@@ -515,7 +515,7 @@ hdf5pp::Type ns_OutputMapV2_v0_dataset_data_stored_type()
   _enum_type_source.insert("Force_Low", Psana::EvrData::OutputMapV2::Force_Low);
   type.insert("source", offsetof(DsType, source), _enum_type_source);
   type.insert("source_id", offsetof(DsType, source_id), hdf5pp::TypeTraits<uint8_t>::stored_type());
-  hdf5pp::EnumType<int32_t> _enum_type_conn = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<int16_t> _enum_type_conn = hdf5pp::EnumType<int16_t>::enumType();
   _enum_type_conn.insert("FrontPanel", Psana::EvrData::OutputMapV2::FrontPanel);
   _enum_type_conn.insert("UnivIO", Psana::EvrData::OutputMapV2::UnivIO);
   type.insert("conn", offsetof(DsType, conn), _enum_type_conn);
@@ -535,7 +535,7 @@ hdf5pp::Type ns_OutputMapV2_v0_dataset_data_native_type()
   typedef ns_OutputMapV2_v0::dataset_data DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
   type.insert("value", offsetof(DsType, value), hdf5pp::TypeTraits<uint32_t>::native_type());
-  hdf5pp::EnumType<int32_t> _enum_type_source = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<int16_t> _enum_type_source = hdf5pp::EnumType<int16_t>::enumType();
   _enum_type_source.insert("Pulse", Psana::EvrData::OutputMapV2::Pulse);
   _enum_type_source.insert("DBus", Psana::EvrData::OutputMapV2::DBus);
   _enum_type_source.insert("Prescaler", Psana::EvrData::OutputMapV2::Prescaler);
@@ -543,7 +543,7 @@ hdf5pp::Type ns_OutputMapV2_v0_dataset_data_native_type()
   _enum_type_source.insert("Force_Low", Psana::EvrData::OutputMapV2::Force_Low);
   type.insert("source", offsetof(DsType, source), _enum_type_source);
   type.insert("source_id", offsetof(DsType, source_id), hdf5pp::TypeTraits<uint8_t>::native_type());
-  hdf5pp::EnumType<int32_t> _enum_type_conn = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<int16_t> _enum_type_conn = hdf5pp::EnumType<int16_t>::enumType();
   _enum_type_conn.insert("FrontPanel", Psana::EvrData::OutputMapV2::FrontPanel);
   _enum_type_conn.insert("UnivIO", Psana::EvrData::OutputMapV2::UnivIO);
   type.insert("conn", offsetof(DsType, conn), _enum_type_conn);
@@ -664,11 +664,11 @@ hdf5pp::Type ns_ConfigV2_v0_dataset_config_stored_type()
   type.insert("opcode", offsetof(DsType, opcode), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("npulses", offsetof(DsType, npulses), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("noutputs", offsetof(DsType, noutputs), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  hdf5pp::EnumType<int32_t> _enum_type_beam = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<int16_t> _enum_type_beam = hdf5pp::EnumType<int16_t>::enumType();
   _enum_type_beam.insert("Off", Psana::EvrData::ConfigV2::Off);
   _enum_type_beam.insert("On", Psana::EvrData::ConfigV2::On);
   type.insert("beam", offsetof(DsType, beam), _enum_type_beam);
-  hdf5pp::EnumType<int32_t> _enum_type_rate = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<int16_t> _enum_type_rate = hdf5pp::EnumType<int16_t>::enumType();
   _enum_type_rate.insert("r120Hz", Psana::EvrData::ConfigV2::r120Hz);
   _enum_type_rate.insert("r60Hz", Psana::EvrData::ConfigV2::r60Hz);
   _enum_type_rate.insert("r30Hz", Psana::EvrData::ConfigV2::r30Hz);
@@ -695,11 +695,11 @@ hdf5pp::Type ns_ConfigV2_v0_dataset_config_native_type()
   type.insert("opcode", offsetof(DsType, opcode), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("npulses", offsetof(DsType, npulses), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("noutputs", offsetof(DsType, noutputs), hdf5pp::TypeTraits<uint32_t>::native_type());
-  hdf5pp::EnumType<int32_t> _enum_type_beam = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<int16_t> _enum_type_beam = hdf5pp::EnumType<int16_t>::enumType();
   _enum_type_beam.insert("Off", Psana::EvrData::ConfigV2::Off);
   _enum_type_beam.insert("On", Psana::EvrData::ConfigV2::On);
   type.insert("beam", offsetof(DsType, beam), _enum_type_beam);
-  hdf5pp::EnumType<int32_t> _enum_type_rate = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<int16_t> _enum_type_rate = hdf5pp::EnumType<int16_t>::enumType();
   _enum_type_rate.insert("r120Hz", Psana::EvrData::ConfigV2::r120Hz);
   _enum_type_rate.insert("r60Hz", Psana::EvrData::ConfigV2::r60Hz);
   _enum_type_rate.insert("r30Hz", Psana::EvrData::ConfigV2::r30Hz);
@@ -1115,7 +1115,11 @@ ndarray<const Psana::EvrData::SequencerEntry, 1> SequencerConfigV1_v0::entries()
   if (m_ds_storage_config_entries.empty()) {
     unsigned shape[] = {m_ds_config->vlen_entries};
     ndarray<Psana::EvrData::SequencerEntry, 1> tmparr(shape);
-    std::copy(m_ds_config->entries, m_ds_config->entries+m_ds_config->vlen_entries, tmparr.begin());
+    unsigned size = tmparr.size();
+    ndarray<Psana::EvrData::SequencerEntry, 1>::iterator it = tmparr.begin();
+    for (unsigned i = 0; i != size; ++ i, ++ it) {
+      *it = Psana::EvrData::SequencerEntry(m_ds_config->entries[i]);
+    }
     m_ds_storage_config_entries = tmparr;
   }
   return m_ds_storage_config_entries;

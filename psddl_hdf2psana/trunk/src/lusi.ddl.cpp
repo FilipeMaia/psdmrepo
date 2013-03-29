@@ -233,7 +233,11 @@ ndarray<const Psana::Lusi::DiodeFexConfigV1, 1> IpmFexConfigV1_v0::diode() const
   if (m_ds_storage_config_diode.empty()) {
     unsigned shape[] = {NCHANNELS};
     ndarray<Psana::Lusi::DiodeFexConfigV1, 1> tmparr(shape);
-    std::copy(m_ds_config->diode, m_ds_config->diode+4, tmparr.begin());
+    unsigned size = tmparr.size();
+    ndarray<Psana::Lusi::DiodeFexConfigV1, 1>::iterator it = tmparr.begin();
+    for (unsigned i = 0; i != size; ++ i, ++ it) {
+      *it = Psana::Lusi::DiodeFexConfigV1(m_ds_config->diode[i]);
+    }
     m_ds_storage_config_diode = tmparr;
   }
   return m_ds_storage_config_diode;
@@ -304,7 +308,11 @@ ndarray<const Psana::Lusi::DiodeFexConfigV2, 1> IpmFexConfigV2_v0::diode() const
   if (m_ds_storage_config_diode.empty()) {
     unsigned shape[] = {NCHANNELS};
     ndarray<Psana::Lusi::DiodeFexConfigV2, 1> tmparr(shape);
-    std::copy(m_ds_config->diode, m_ds_config->diode+4, tmparr.begin());
+    unsigned size = tmparr.size();
+    ndarray<Psana::Lusi::DiodeFexConfigV2, 1>::iterator it = tmparr.begin();
+    for (unsigned i = 0; i != size; ++ i, ++ it) {
+      *it = Psana::Lusi::DiodeFexConfigV2(m_ds_config->diode[i]);
+    }
     m_ds_storage_config_diode = tmparr;
   }
   return m_ds_storage_config_diode;

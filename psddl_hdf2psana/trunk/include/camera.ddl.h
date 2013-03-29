@@ -66,9 +66,9 @@ struct dataset_config {
   dataset_config();
   ~dataset_config();
 
-  int32_t forwarding; 
+  uint32_t forwarding; 
   uint32_t forward_prescale; 
-  int32_t processing; 
+  uint32_t processing; 
   Camera::ns_FrameCoord_v0::dataset_data roiBegin; 
   Camera::ns_FrameCoord_v0::dataset_data roiEnd; 
   uint32_t threshold; 
