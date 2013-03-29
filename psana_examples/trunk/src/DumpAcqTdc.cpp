@@ -97,45 +97,51 @@ DumpAcqTdc::event(Event& evt, Env& env)
   shared_ptr<Psana::Acqiris::TdcDataV1> tdcData = evt.get(m_src);
   if (tdcData) {
   
-    const ndarray<const Psana::Acqiris::TdcDataV1_Item, 1>& data = tdcData->data();
-    for (unsigned i = 0; i < data.shape()[0]; ++ i) {
+    WithMsgLog(name(), info, str) {
       
-      const Psana::Acqiris::TdcDataV1_Item& item = data[i];
-      
-      if (item.source() == Psana::Acqiris::TdcDataV1_Item::Comm) {
-        
-        const Psana::Acqiris::TdcDataV1Common& comm = 
-            static_cast<const Psana::Acqiris::TdcDataV1Common&>(item);
-        MsgLog(name(), info, "Acqiris::TdcDataV1: item=" << i 
-             << " type=TdcDataV1Common" 
-             << " source=" << comm.source()
-             << " nhits= " << comm.nhits()
-             << " overflow= " << int(comm.overflow()) );
-      
-      } else if (item.source() == Psana::Acqiris::TdcDataV1_Item::AuxIO) {
-      
-        const Psana::Acqiris::TdcDataV1Marker& mark = 
-            static_cast<const Psana::Acqiris::TdcDataV1Marker&>(item);
-        MsgLog(name(), info, "Acqiris::TdcDataV1: item=" << i 
-             << " type=TdcDataV1Marker" 
-             << " source=" << mark.source()
-             << " type= " << mark.type() );
+      str << "Acqiris::TdcDataV1:";
 
-      } else {
+      const ndarray<const Psana::Acqiris::TdcDataV1_Item, 1>& data = tdcData->data();
+      for (unsigned i = 0; i < data.shape()[0]; ++ i) {
         
-        const Psana::Acqiris::TdcDataV1Channel& chan = 
-            static_cast<const Psana::Acqiris::TdcDataV1Channel&>(item);
-        MsgLog(name(), info, "Acqiris::TdcDataV1: item=" << i 
-             << " type=TdcDataV1Channel" 
-             << " source=" << chan.source()
-             << " ticks= " << chan.ticks()
-             << " overflow= " << int(chan.overflow())
-             << " time= " << chan.time() );
-
+        const Psana::Acqiris::TdcDataV1_Item& item = data[i];
+        
+        if (item.source() == Psana::Acqiris::TdcDataV1_Item::Comm) {
+          
+          const Psana::Acqiris::TdcDataV1Common& comm = 
+              static_cast<const Psana::Acqiris::TdcDataV1Common&>(item);
+          str << "\n  item=" << i 
+               << " type=TdcDataV1Common" 
+               << " source=" << comm.source()
+               << " nhits=" << comm.nhits()
+               << " overflow=" << int(comm.overflow());
+        
+        } else if (item.source() == Psana::Acqiris::TdcDataV1_Item::AuxIO) {
+        
+          const Psana::Acqiris::TdcDataV1Marker& mark = 
+              static_cast<const Psana::Acqiris::TdcDataV1Marker&>(item);
+          str << "\n  item=" << i 
+               << " type=TdcDataV1Marker" 
+               << " source=" << mark.source()
+               << " type=" << mark.type();
+  
+        } else {
+          
+          const Psana::Acqiris::TdcDataV1Channel& chan = 
+              static_cast<const Psana::Acqiris::TdcDataV1Channel&>(item);
+          str << "\n  item=" << i 
+               << " type=TdcDataV1Channel" 
+               << " source=" << chan.source()
+               << " ticks=" << chan.ticks()
+               << " overflow=" << int(chan.overflow())
+               << " time=" << chan.time();
+  
+        }
+        
       }
-      
-    }
 
+    }
+    
   }
 }
 
