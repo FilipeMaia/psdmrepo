@@ -24,8 +24,9 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "hdf5pp/ArrayType.h"
-#include "hdf5pp/Group.h"
 #include "hdf5pp/DataSet.h"
+#include "hdf5pp/Group.h"
+#include "hdf5pp/VlenType.h"
 #include "ndarray/ndarray.h"
 
 //------------------------------------
@@ -55,6 +56,12 @@ namespace hdf5pp {
 
 class Utils  {
 public:
+
+  // Special deleter for shared pointer, does not call destructor
+  template <typename T>
+  struct Unmalloc {
+    void operator()(T* p) const { free(p); }
+  };
 
   /**
    *  @brief Read one object from dataset
@@ -88,7 +95,8 @@ public:
    *  if index is not specified then whole dataset is read, ndarray rank
    *  must be the same as dataset rank. If index is specified (and is not -1)
    *  the dataset must have rank 1, single element of dataset will be read
-   *  and dataset type must be array with the same rank as ndarray rank.
+   *  and dataset type must be array with the same rank as ndarray rank
+   *  or VLEN array (then Rank must be 1).
    *
    *  @param[in] ds    dataset object
    *  @param[in] index Object index, if negative then whole dataset is read.
@@ -129,8 +137,33 @@ public:
 
     } else {
 
-      // read one element from rank-1 dataset, array dimensions should come from
-      // the type of data stored which must have array type
+      // select single item for dataset
+      file_dsp.select_single(index);
+      mem_dsp = DataSpace::makeScalar();
+
+      // read one element from rank-1 dataset, element of a dataset must
+      // have array type or VLEN type
+
+      hdf5pp::Type etype = ds.type();
+      if (etype.tclass() == H5T_VLEN) {
+
+        // read whole VLEN, Rank must be 1
+        if (Rank != 1) throw Hdf5RankMismatch(ERR_LOC, Rank, 1);
+
+        // Memory type is VLEN
+        memType = VlenType::vlenType(TypeTraits<Data>::native_type());
+
+        // read data in VLEN structure
+        hvl_t vl_data;
+        ds.read(mem_dsp, file_dsp, &vl_data, memType);
+
+        // steal a pointer, it has to be free()d
+        boost::shared_ptr<Data> shptr(static_cast<Data*>(vl_data.p), Unmalloc<Data>());
+
+        unsigned shape[] = { vl_data.len };
+        return ndarray<Data, Rank>(shptr, shape);
+
+      }
 
       // this will throw if type of data is not an array
       ArrayType type = ArrayType(ds.type());
@@ -139,10 +172,6 @@ public:
       unsigned rank = type.rank();
       if (rank != Rank) throw Hdf5RankMismatch(ERR_LOC, Rank, rank);
       type.dimensions(dims);
-
-      // select single item for dataset
-      file_dsp.select_single(index);
-      mem_dsp = DataSpace::makeScalar();
 
       memType = ArrayType::arrayType(TypeTraits<Data>::native_type(), Rank, dims);
     }
