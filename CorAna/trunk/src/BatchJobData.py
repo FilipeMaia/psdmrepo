@@ -109,17 +109,20 @@ class BatchJobData(BatchJob) :
 #-----------------------------
 
     def print_work_files_for_data_aver(self) :
-        self.print_files_for_list(fnm.get_list_of_files_data_aver(),'of data scan / average:')
+        self.print_files_for_list(fnm.get_list_of_files_data(),'of data scan / average:')
+        #self.print_files_for_list(fnm.get_list_of_files_data_aver(),'of data scan / average:')
 
 #-----------------------------
 
     def check_work_files_for_data_aver(self) :
-        self.check_files_for_list(fnm.get_list_of_files_data_aver(),'of data scan / average:')
+        self.check_files_for_list(fnm.get_list_of_files_data(),'of data scan / average:')
+        #self.check_files_for_list(fnm.get_list_of_files_data_aver(),'of data scan / average:')
 
 #-----------------------------
 
     def remove_files_data_aver(self) :
-        self.remove_files_for_list(fnm.get_list_of_files_data_aver(),'of data scan / average:')
+        self.remove_files_for_list(fnm.get_list_of_files_data(),'of data scan / average:')
+        #self.remove_files_for_list(fnm.get_list_of_files_data_aver(),'of data scan / average:')
 
 #-----------------------------
 

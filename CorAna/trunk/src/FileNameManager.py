@@ -388,7 +388,6 @@ class FileNameManager :
 
     def  get_list_of_files_data_aver_short(self) :
         self.list_of_files_data_aver_short = []
-
         self.list_of_files_data_aver_short.append(fnm.path_data_aver_psana_cfg())
         self.list_of_files_data_aver_short.append(fnm.path_data_aver_batch_log())
         self.list_of_files_data_aver_short.append(fnm.path_data_ave())
@@ -397,23 +396,23 @@ class FileNameManager :
 
 
     def  get_list_of_files_data_aver(self) :
-        self.list_of_files_data_aver = self.get_list_of_files_data_scan()
-        self.list_of_files_data_aver+= self.get_list_of_files_data_aver_short()
+        self.list_of_files_data_aver = self.get_list_of_files_data_aver_short()
         #self.list_of_files_data_aver.append(fnm.path_data_xtc())
         self.list_of_files_data_aver.append(fnm.path_data_aver_plot())
         self.list_of_files_data_aver.append(fnm.path_data_time_plot())
         self.list_of_files_data_aver.append(fnm.path_data_mons_plot())
         self.list_of_files_data_aver.append(fnm.path_satpix_frac())
         self.list_of_files_data_aver.append(fnm.path_satpix_mask())
-        self.list_of_files_data_aver.append(fnm.path_hotpix_frac())
-        self.list_of_files_data_aver.append(fnm.path_hotpix_mask())
+        #self.list_of_files_data_aver.append(fnm.path_hotpix_frac())
+        #self.list_of_files_data_aver.append(fnm.path_hotpix_mask())
         return self.list_of_files_data_aver
 
 #-----------------------------
 
     def  get_list_of_files_data(self) :
-        self.list_of_files_data  = []
-        self.list_of_files_data.append(fnm.path_data_xtc())
+        self.list_of_files_data  = self.get_list_of_files_data_scan()
+        self.list_of_files_data += self.get_list_of_files_data_aver()
+        #self.list_of_files_data.append(fnm.path_data_xtc())
         return self.list_of_files_data
 
 #-----------------------------
@@ -434,16 +433,15 @@ class FileNameManager :
         self.list_of_files_peds_aver.append(self.path_peds_aver_batch_log())
         self.list_of_files_peds_aver.append(self.path_pedestals_ave())
         self.list_of_files_peds_aver.append(self.path_pedestals_rms())
-        #self.list_of_files_peds_aver.append(self.path_hotpix_mask())
+        self.list_of_files_peds_aver.append(self.path_hotpix_mask())
         return self.list_of_files_peds_aver
 
 
     def  get_list_of_files_pedestals(self) :
         self.list_of_files_pedestals = self.get_list_of_files_peds_scan()
         self.list_of_files_pedestals+= self.get_list_of_files_peds_aver()
-        #self.list_of_files_pedestals.append(self.path_dark_xtc())
-        self.list_of_files_pedestals.append(self.path_hotpix_mask())
         self.list_of_files_pedestals.append(self.path_peds_aver_plot())
+        #self.list_of_files_pedestals.append(self.path_dark_xtc())
         return self.list_of_files_pedestals
 
 #-----------------------------

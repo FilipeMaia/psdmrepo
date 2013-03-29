@@ -83,10 +83,11 @@ class GUIData ( QtGui.QWidget ) :
         self.but_remove = QtGui.QPushButton('Remove')
 
         self.table_scan = GUIFilesStatusTable (parent=self, list_of_files=fnm.get_list_of_files_data_scan())
-        self.table_aver = GUIFilesStatusTable (parent=self, list_of_files=fnm.get_list_of_files_data_aver_short())
+        self.table_aver = GUIFilesStatusTable (parent=self, list_of_files=fnm.get_list_of_files_data_aver())
+        #self.table_aver = GUIFilesStatusTable (parent=self, list_of_files=fnm.get_list_of_files_data_aver_short())
         #self.table_scan.setMinimumHeight(285)
-        self.table_scan.table.setFixedWidth(self.table_scan.table.horizontalHeader().length() + 4)
-        self.table_scan.table.setFixedHeight(self.table_scan.table.verticalHeader().length() + 29)
+        #self.table_scan.table.setFixedWidth(self.table_scan.table.horizontalHeader().length() + 4)
+        #self.table_scan.table.setFixedHeight(self.table_scan.table.verticalHeader().length() + 29)
 
         self.grid = QtGui.QGridLayout()
         self.grid_row = 1
@@ -400,7 +401,7 @@ class GUIData ( QtGui.QWidget ) :
             self.but_brow.setStyleSheet(cp.styleButtonBad)
         except :
             self.but_brow.setStyleSheet(cp.styleButtonGood)
-            cp.guifilebrowser = GUIFileBrowser(None, fnm.get_list_of_files_data_aver(), fnm.path_data_ave())
+            cp.guifilebrowser = GUIFileBrowser(None, fnm.get_list_of_files_data(), fnm.path_data_ave())
             cp.guifilebrowser.move(cp.guimain.pos().__add__(QtCore.QPoint(720,120)))
             cp.guifilebrowser.show()
 

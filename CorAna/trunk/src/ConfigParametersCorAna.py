@@ -186,7 +186,7 @@ class ConfigParametersCorAna ( ConfigParameters ) :
 
         # GUIDark.py
         self.use_dark_xtc_all  = self.declareParameter( name='USE_DARK_XTC_ALL_CHUNKS', val_def=True,  type='bool' )
-        self.in_dir_dark       = self.declareParameter( name='IN_DIRECTORY_DARK', val_def='/reg/d/psdm/XCS/xcsi0112/xtc',type='str' )
+        self.in_dir_dark       = self.declareParameter( name='IN_DIRECTORY_DARK', val_def='/reg/d/ana12/xcs/xcsi0112/xtc',type='str' )
         self.in_file_dark      = self.declareParameter( name='IN_FILE_NAME_DARK', val_def='e167-r0020-s00-c00.xtc',type='str' )
 
         # GUIFlatField.py
@@ -206,8 +206,8 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         # GUIData.py
         self.use_data_xtc_all   = self.declareParameter( name='USE_DATA_XTC_ALL_CHUNKS', val_def=True,  type='bool' )
         self.is_active_data_gui = self.declareParameter( name='IS_ACTIVE_DATA_GUI', val_def=True,  type='bool' )
-        self.in_dir_data        = self.declareParameter( name='IN_DIRECTORY_DATA',  val_def='/reg/d/psdm/XCS/xcsi0112/xtc',type='str' )
-        self.in_file_data       = self.declareParameter( name='IN_FILE_NAME_DATA',  val_def='e167-r0020-s00-c00.xtc',type='str' )
+        self.in_dir_data        = self.declareParameter( name='IN_DIRECTORY_DATA',  val_def='/reg/d/ana12/xcs/xcsi0112/xtc',type='str' )
+        self.in_file_data       = self.declareParameter( name='IN_FILE_NAME_DATA',  val_def='e167-r0015-s00-c00.xtc',type='str' )
 
         # GUISetupBeamZero.py
         self.x_coord_beam0      = self.declareParameter( name='X_COORDINATE_BEAM_ZERO',   val_def=722.0,      type='float' ) 
