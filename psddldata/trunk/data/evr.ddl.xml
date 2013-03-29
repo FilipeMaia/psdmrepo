@@ -312,7 +312,7 @@
 		
             <tag name="value-type"/>
 
-            <enum name="Source">
+            <enum name="Source" base="int16_t">
                 <enum-const name="Pulse" />
                 <enum-const name="DBus" />
                 <enum-const name="Prescaler" />
@@ -320,7 +320,7 @@
                 <enum-const name="Force_Low" />
             </enum>
 
-            <enum name="Conn">
+            <enum name="Conn" base="int16_t">
                 <enum-const name="FrontPanel" />
                 <enum-const name="UnivIO" />
             </enum>
@@ -356,7 +356,7 @@
 		
             <tag name="value-type"/>
         
-            <enum name="Source">
+            <enum name="Source" base="int16_t">
                 <enum-const name="Pulse" />
                 <enum-const name="DBus" />
                 <enum-const name="Prescaler" />
@@ -364,7 +364,7 @@
                 <enum-const name="Force_Low" />
             </enum>
 
-            <enum name="Conn">
+            <enum name="Conn" base="int16_t">
                 <enum-const name="FrontPanel" />
                 <enum-const name="UnivIO" />
             </enum>
@@ -427,7 +427,7 @@
             <const name="baseRate" value="40"/>
             <const name="singleShot" value="150"/>
 		
-            <enum name="RateCode">
+            <enum name="RateCode" base="int16_t">
                 <enum-const name="r120Hz" />
                 <enum-const name="r60Hz" />
                 <enum-const name="r30Hz" />
@@ -439,7 +439,7 @@
                 <enum-const name="NumberOfRates" />
             </enum>
 
-            <enum name="BeamCode">
+            <enum name="BeamCode" base="int16_t">
                 <enum-const name="Off" />
                 <enum-const name="On" />
             </enum>

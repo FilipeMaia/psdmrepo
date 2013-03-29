@@ -14,24 +14,24 @@
             
             <const name="NCHANNELS" value="4"/>
         
-            <enum name="Count_Mode">
+            <enum name="Count_Mode" base="uint32_t">
                 <enum-const name="WRAP_FULL"/>
                 <enum-const name="LIMIT"/>
                 <enum-const name="HALT"/>
                 <enum-const name="WRAP_PRESET"/>
             </enum>
         
-            <enum name="Quad_Mode">
+            <enum name="Quad_Mode" base="uint32_t">
                 <enum-const name="CLOCK_DIR"/>
                 <enum-const name="X1"/>
                 <enum-const name="X2"/>
                 <enum-const name="X4"/>
             </enum>
         
-            <attribute name="_count_mode" type="uint32_t" shape="NCHANNELS" accessor="counting_mode">
+            <attribute name="_count_mode" type="Count_Mode" shape="NCHANNELS" accessor="counting_mode">
             </attribute>
 
-            <attribute name="_quad_mode" type="uint32_t" shape="NCHANNELS" accessor="quadrature_mode">
+            <attribute name="_quad_mode" type="Quad_Mode" shape="NCHANNELS" accessor="quadrature_mode">
             </attribute>
 
         </pstype>

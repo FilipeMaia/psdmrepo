@@ -16,21 +16,21 @@
         
             <tag name="config-type"/>
         
-            <enum name="Depth">
+            <enum name="Depth" base="uint8_t">
             Image bit depth modes.
                 <enum-const name="Eight_bit" />
                 <enum-const name="Ten_bit" />
                 <enum-const name="Twelve_bit" />
             </enum>
 
-            <enum name="Binning">
+            <enum name="Binning" base="uint8_t">
                 <enum-const name="x1" />
                 <enum-const name="x2" />
                 <enum-const name="x4" />
                 <enum-const name="x8" />
             </enum>
 
-            <enum name="Mirroring">
+            <enum name="Mirroring" base="uint8_t">
                 <enum-const name="None" />
                 <enum-const name="HFlip" />
                 <enum-const name="VFlip" />

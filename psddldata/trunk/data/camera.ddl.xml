@@ -51,13 +51,13 @@
         
             <tag name="config-type"/>
         
-            <enum name="Forwarding">
+            <enum name="Forwarding" base="uint32_t">
                 <enum-const name="NoFrame" />
                 <enum-const name="FullFrame" />
                 <enum-const name="RegionOfInterest" />
             </enum>
 
-            <enum name="Processing">
+            <enum name="Processing" base="uint32_t">
                 <enum-const name="NoProcessing" />
                 <enum-const name="GssFullFrame" />
                 <enum-const name="GssRegionOfInterest" />
@@ -65,29 +65,17 @@
             </enum>
 
 
-            <attribute name="_forwarding" type="uint32_t">
+            <attribute name="_forwarding" type="Forwarding" accessor="forwarding">
             frame forwarding policy
             </attribute>
-
-            <method name="forwarding" type="Forwarding">
-                Forwarding policy for frame data.
-                <tag name="inline" />
-                <expr lang="C++" value="Forwarding({self}._forwarding)"/>
-            </method>
 
             <attribute name="_forward_prescale" type="uint32_t" accessor="forward_prescale">
             Prescale of events with forwarded frames
             </attribute>
 
-            <attribute name="_processing" type="uint32_t">
+            <attribute name="_processing" type="Processing" accessor="processing">
             algorithm to apply to frames to produce processed output
             </attribute>
-
-            <method name="processing" type="Processing">
-            Algorithm to apply to frames to produce processed output.
-                <tag name="inline" />
-                <expr lang="C++" value="Processing({self}._processing)"/>
-            </method>
 
             <attribute name="_roiBegin" type="FrameCoord" accessor="roiBegin">
             Coordinate of start of rectangular region of interest (inclusive).

@@ -13,18 +13,18 @@
                 
             <tag name="config-type"/>
         
-            <enum name="Depth">
+            <enum name="Depth" base="uint8_t">
                 <enum-const name="Eight_bit" />
                 <enum-const name="Ten_bit" />
             </enum>
 
-            <enum name="Binning">
+            <enum name="Binning" base="uint8_t">
                 <enum-const name="x1" />
                 <enum-const name="x2" />
                 <enum-const name="x4" />
             </enum>
 
-            <enum name="LookupTable">
+            <enum name="LookupTable" base="uint8_t">
                 <enum-const name="Gamma" />
                 <enum-const name="Linear" />
             </enum>

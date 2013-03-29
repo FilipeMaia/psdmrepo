@@ -336,7 +336,7 @@
 
             <tag name="value-type"/>
         
-            <enum name="Channel">
+            <enum name="Channel" base="uint32_t">
               Types of channels.
               <enum-const name="Veto" value="-2" />
               <enum-const name="Common" value="-1" />
@@ -348,17 +348,17 @@
               <enum-const name="Input6" value="6" />
             </enum>
 
-            <enum name="Mode">
+            <enum name="Mode" base="uint16_t">
               <enum-const name="Active" value="0" />
               <enum-const name="Inactive" value="1" />
             </enum>
 
-            <enum name="Slope">
+            <enum name="Slope" base="uint16_t">
               <enum-const name="Positive"/>
               <enum-const name="Negative"/>
             </enum>
 
-            <attribute name="_channel" type="uint32_t" accessor="_channel_int">
+            <attribute name="_channel" type="Channel" accessor="channel">
             Channel type as integer number, clients should use channel() method instead. 
             </attribute>
 
@@ -381,11 +381,6 @@
             <attribute name="_level" type="double" accessor="level">
             </attribute>
 
-            <method name="channel" type="Channel">
-                <expr lang="C++" value="Channel({self}._channel)" />
-                <tag name="inline"/>
-            </method>
-
             <ctor>
                 Default constructor without arguments
                 <tag name="inline"/>
@@ -406,49 +401,31 @@
 
             <tag name="value-type"/>
         
-            <enum name="Channel">
+            <enum name="Channel" base="uint32_t">
               <enum-const name="IOAux1" value="1" />
               <enum-const name="IOAux2" value="2" />
             </enum>
 
-            <enum name="Mode">
+            <enum name="Mode" base="uint32_t">
               <enum-const name="BankSwitch" value="1" />
               <enum-const name="Marker" value="2" />
               <enum-const name="OutputLo" value="32" />
               <enum-const name="OutputHi" value="33" />
             </enum>
 
-            <enum name="Termination">
+            <enum name="Termination" base="uint32_t">
               <enum-const name="ZHigh" value="0"/>
               <enum-const name="Z50" value="1"/>
             </enum>
 
-            <attribute name="_channel" type="uint32_t" accessor="channel_int">
-            Channel type as integer number, clients should use channel() method instead. 
+            <attribute name="_channel" type="Channel" accessor="channel">
             </attribute>
 
-            <attribute name="_signal" type="uint32_t" accessor="signal_int">
-            Mode as integer number, clients should use mode() method instead.
+            <attribute name="_signal" type="Mode" accessor="mode">
             </attribute>
 
-            <attribute name="_qualifier" type="uint32_t" accessor="qualifier_int">
-            Termination as integer number, clients should use term() method instead.
+            <attribute name="_qualifier" type="Termination" accessor="term">
             </attribute>
-
-            <method name="channel" type="Channel">
-                <expr lang="C++" value="Channel({self}._channel)" />
-                <tag name="inline"/>
-            </method>
-
-            <method name="mode" type="Mode">
-                <expr lang="C++" value="Mode({self}._signal)" />
-                <tag name="inline"/>
-            </method>
-
-            <method name="term" type="Termination">
-                <expr lang="C++" value="Termination({self}._qualifier)" />
-                <tag name="inline"/>
-            </method>
 
             <ctor>
                 Default constructor without arguments
@@ -470,48 +447,30 @@
 
             <tag name="value-type"/>
         
-            <enum name="Channel">
+            <enum name="Channel" base="uint32_t">
               <enum-const name="ChVeto" value="13" />
             </enum>
 
-            <enum name="Mode">
+            <enum name="Mode" base="uint32_t">
               <enum-const name="Veto" value="1" />
               <enum-const name="SwitchVeto" value="2" />
               <enum-const name="InvertedVeto" value="3" />
               <enum-const name="InvertedSwitchVeto" value="4" />
             </enum>
 
-            <enum name="Termination">
+            <enum name="Termination" base="uint32_t">
               <enum-const name="ZHigh" value="0"/>
               <enum-const name="Z50" value="1"/>
             </enum>
 
-            <attribute name="_channel" type="uint32_t">
-            Channel type as integer number, clients should use channel() method instead. 
+            <attribute name="_channel" type="Channel" accessor="channel">
             </attribute>
 
-            <attribute name="_signal" type="uint32_t" accessor="signal_int">
-            Mode as integer number, clients should use mode() method instead.
+            <attribute name="_signal" type="Mode" accessor="mode">
             </attribute>
 
-            <attribute name="_qualifier" type="uint32_t" accessor="qualifier_int">
-            Termination as integer number, clients should use term() method instead.
+            <attribute name="_qualifier" type="Termination" accessor="term">
             </attribute>
-
-            <method name="channel" type="Channel">
-                <expr lang="C++" value="Channel({self}._channel)" />
-                <tag name="inline"/>
-            </method>
-
-            <method name="mode" type="Mode">
-                <expr lang="C++" value="Mode({self}._signal)" />
-                <tag name="inline"/>
-            </method>
-
-            <method name="term" type="Termination">
-                <expr lang="C++" value="Termination({self}._qualifier)" />
-                <tag name="inline"/>
-            </method>
 
             <ctor>
                 Default constructor without arguments

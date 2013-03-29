@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-24
+2013-03-29 Andy Salnikov
+- wider use of enum base type feature
+
 Tag: V00-04-23
 2013-03-28 Andy Salnikov
 - updated comments in acqiris schema

@@ -13,7 +13,7 @@
         
             <tag name="config-type"/>
         
-            <enum name="EnumFanMode">
+            <enum name="EnumFanMode" base="uint8_t">
                 <enum-const name="ENUM_FAN_FULL" value="0"/>
                 <enum-const name="ENUM_FAN_LOW" value="1"/>
                 <enum-const name="ENUM_FAN_OFF" value="2"/>
@@ -45,7 +45,7 @@
             <attribute name="_f32CoolingTemp" type="float" accessor="coolingTemp">
             </attribute>
 
-            <attribute name="_u8FanMode" type="uint8_t" accessor="fanMode">
+            <attribute name="_u8FanMode" type="EnumFanMode" accessor="fanMode">
             </attribute>
 
             <attribute name="_u8BaselineClamp" type="uint8_t" accessor="baselineClamp">

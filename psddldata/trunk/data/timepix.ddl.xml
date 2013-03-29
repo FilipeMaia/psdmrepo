@@ -13,12 +13,12 @@
                 
             <tag name="config-type"/>
         
-            <enum name="ReadoutSpeed">
+            <enum name="ReadoutSpeed" base="uint8_t">
                 <enum-const name="ReadoutSpeed_Slow" value="0" />
                 <enum-const name="ReadoutSpeed_Fast" value="1" />
             </enum>
 
-            <enum name="TriggerMode">
+            <enum name="TriggerMode" base="uint8_t">
                 <enum-const name="TriggerMode_ExtPos" value="0" />
                 <enum-const name="TriggerMode_ExtNeg" value="1" />
                 <enum-const name="TriggerMode_Soft" value="2" />
@@ -26,19 +26,9 @@
 
             <const name="ChipCount" value="4"/>
 
-            <attribute name="_readoutSpeed" type="uint8_t" />
+            <attribute name="_readoutSpeed" type="ReadoutSpeed" accessor="readoutSpeed"/>
             
-            <method name="readoutSpeed" type="ReadoutSpeed">
-                <tag name="inline"/>
-                <expr lang="C++" value="ReadoutSpeed(_readoutSpeed)"/>
-            </method>
-
-            <attribute name="_triggerMode" type="uint8_t" />
-
-            <method name="triggerMode" type="TriggerMode">
-                <tag name="inline"/>
-                <expr lang="C++" value="TriggerMode(_triggerMode)"/>
-            </method>
+            <attribute name="_triggerMode" type="TriggerMode" accessor="triggerMode"/>
             
             <attribute name="_pad" type="int16_t" />
 
@@ -165,12 +155,12 @@
                 
             <tag name="config-type"/>
         
-            <enum name="ReadoutSpeed">
+            <enum name="ReadoutSpeed" base="uint8_t">
                 <enum-const name="ReadoutSpeed_Slow" value="0" />
                 <enum-const name="ReadoutSpeed_Fast" value="1" />
             </enum>
 
-            <enum name="TriggerMode">
+            <enum name="TriggerMode" base="uint8_t">
                 <enum-const name="TriggerMode_ExtPos" value="0" />
                 <enum-const name="TriggerMode_ExtNeg" value="1" />
                 <enum-const name="TriggerMode_Soft" value="2" />
@@ -180,20 +170,10 @@
             <const name="ChipNameMax" value="16"/>
             <const name="PixelThreshMax" value="4*256*256"/>
 
-            <attribute name="_readoutSpeed" type="uint8_t" />
+            <attribute name="_readoutSpeed" type="ReadoutSpeed" accessor="readoutSpeed"/>
             
-            <method name="readoutSpeed" type="ReadoutSpeed">
-                <tag name="inline"/>
-                <expr lang="C++" value="ReadoutSpeed(_readoutSpeed)"/>
-            </method>
+            <attribute name="_triggerMode" type="TriggerMode" accessor="triggerMode"/>
 
-            <attribute name="_triggerMode" type="uint8_t" />
-
-            <method name="triggerMode" type="TriggerMode">
-                <tag name="inline"/>
-                <expr lang="C++" value="TriggerMode(_triggerMode)"/>
-            </method>
-            
             <attribute name="_pad" type="int16_t" />
 
             <attribute name="_timepixSpeed" type="int32_t" accessor="timepixSpeed" />
@@ -348,12 +328,12 @@
                 
             <tag name="config-type"/>
         
-            <enum name="ReadoutSpeed">
+            <enum name="ReadoutSpeed" base="uint8_t">
                 <enum-const name="ReadoutSpeed_Slow" value="0" />
                 <enum-const name="ReadoutSpeed_Fast" value="1" />
             </enum>
 
-            <enum name="TimepixMode">
+            <enum name="TimepixMode" base="uint8_t">
                 <enum-const name="TimepixMode_Counting" value="0" />
                 <enum-const name="TimepixMode_TOT" value="1" />
             </enum>
@@ -362,19 +342,9 @@
             <const name="ChipNameMax" value="16"/>
             <const name="PixelThreshMax" value="4*256*256"/>
 
-            <attribute name="_readoutSpeed" type="uint8_t" />
+            <attribute name="_readoutSpeed" type="ReadoutSpeed" accessor="readoutSpeed"/>
             
-            <method name="readoutSpeed" type="ReadoutSpeed">
-                <tag name="inline"/>
-                <expr lang="C++" value="ReadoutSpeed(_readoutSpeed)"/>
-            </method>
-
-            <attribute name="_timepixMode" type="uint8_t" />
-
-            <method name="timepixMode" type="TimepixMode">
-                <tag name="inline"/>
-                <expr lang="C++" value="TimepixMode(_timepixMode)"/>
-            </method>
+            <attribute name="_timepixMode" type="TimepixMode" accessor="timepixMode"/>
             
             <attribute name="_pad" type="int16_t" />
 
