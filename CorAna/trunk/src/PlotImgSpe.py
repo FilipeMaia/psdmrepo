@@ -60,17 +60,21 @@ class PlotImgSpe (QtGui.QWidget) :
     """Plots image and spectrum for 2d array"""
 
 
-    def __init__(self, parent=None, arr=None, ofname='./fig.png', title='Plot 2d array', orient=0, y_is_flip=False ):
+    def __init__(self, parent=None, arr=None, ifname='', ofname='./fig.png', title='Plot 2d array', orient=0, y_is_flip=False ):
         #QtGui.QMainWindow.__init__(self, parent)
         QtGui.QWidget.__init__(self, parent)
         self.setGeometry(20, 40, 700, 800)
         self.setWindowTitle(title)
         self.setFrame()
 
+        if      arr != None : self.arr = arr
+        elif ifname != ''   : self.arr = gu.get_array_from_file(ifname)
+        else                : self.arr = get_array2d_for_test()
+
         self.ext_ref = None
 
         self.widgimage   = imgwidg.PlotImgSpeWidget(parent, arr, orient, y_is_flip)
-        self.widgbuts    = imgbuts.PlotImgSpeButtons(self, self.widgimage, ofname)
+        self.widgbuts    = imgbuts.PlotImgSpeButtons(self, self.widgimage, ifname, ofname)
         #self.mpl_toolbar = imgtb.ImgSpeNavToolBar(self.widgimage, self)
  
         #---------------------
@@ -140,10 +144,11 @@ class PlotImgSpe (QtGui.QWidget) :
 
 def get_array2d_for_test() :
     mu, sigma = 200, 25
-    #arr = mu + sigma*np.random.standard_normal(size=2400)
-    arr = 100*np.random.standard_exponential(size=2400)
+    rows, cols = 1300, 1340
+    arr = mu + sigma*np.random.standard_normal(size=rows*cols)
+    #arr = 100*np.random.standard_exponential(size=2400)
     #arr = np.arange(2400)
-    arr.shape = (40,60)
+    arr.shape = (rows,cols)
     return arr
 
 

@@ -11,6 +11,12 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2013-03-29 Mikhail S. Dubrovin
+Tag: V00-00-11
+- add GUIListOfTau.py to select/create the file with tau indexes
+- in GUIFileBrowser.py add edit and save options
+- in PlotImgSpeButtons.py and PlotImgSpe.py add option to select and load the file
+
 2013-03-27 Mikhail S. Dubrovin
 Tag: V00-00-10
 - add files' status tables in GUIData and GUIDark

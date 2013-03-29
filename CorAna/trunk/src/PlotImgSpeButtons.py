@@ -50,13 +50,14 @@ class PlotImgSpeButtons (QtGui.QWidget) :
     #  Constructor --
     #----------------
 
-    def __init__(self, parent=None, widgimage=None, ofname='./fig.png', help_msg=None):
+    def __init__(self, parent=None, widgimage=None, ifname='', ofname='./fig.png', help_msg=None):
         QtGui.QWidget.__init__(self, parent)
         self.setWindowTitle('GUI of buttons')
 
         self.setFrame()
 
         self.parent    = parent
+        self.ifname    = ifname
         self.ofname    = ofname
 
         self.widgimage = widgimage
@@ -67,6 +68,7 @@ class PlotImgSpeButtons (QtGui.QWidget) :
 
         self.but_reset = QtGui.QPushButton('&Reset')
         self.but_help  = QtGui.QPushButton('&Help')
+        self.but_load  = QtGui.QPushButton('Load')
         self.but_save  = QtGui.QPushButton('&Save')
         self.but_elog  = QtGui.QPushButton('&ELog') #u'\u2192 &ELog'
         self.but_quit  = QtGui.QPushButton('&Close')
@@ -89,11 +91,13 @@ class PlotImgSpeButtons (QtGui.QWidget) :
  
         self.but_help .setStyleSheet (cp.styleButtonGood) 
         self.but_reset.setStyleSheet (cp.styleButton) 
+        self.but_load .setStyleSheet (cp.styleButton) 
         self.but_save .setStyleSheet (cp.styleButton) 
         self.but_quit .setStyleSheet (cp.styleButtonBad) 
 
         self.connect(self.but_help,  QtCore.SIGNAL('clicked()'),          self.on_but_help)
         self.connect(self.but_reset, QtCore.SIGNAL('clicked()'),          self.on_but_reset)
+        self.connect(self.but_load,  QtCore.SIGNAL('clicked()'),          self.on_but_load)
         self.connect(self.but_save,  QtCore.SIGNAL('clicked()'),          self.on_but_save)
         self.connect(self.but_elog,  QtCore.SIGNAL('clicked()'),          self.on_but_elog)
         self.connect(self.but_quit,  QtCore.SIGNAL('clicked()'),          self.on_but_quit)
@@ -110,6 +114,7 @@ class PlotImgSpeButtons (QtGui.QWidget) :
     def setIcons(self) :
         cp.setIcons()
         self.but_elog .setIcon(cp.icon_mail_forward)
+        self.but_load .setIcon(cp.icon_browser) # icon_contents)
         self.but_save .setIcon(cp.icon_save)
         self.but_quit .setIcon(cp.icon_exit)
         self.but_help .setIcon(cp.icon_help)
@@ -125,6 +130,7 @@ class PlotImgSpeButtons (QtGui.QWidget) :
         self.hbox.addWidget(self.cbox_log)
         self.hbox.addWidget(self.but_reset)
         self.hbox.addStretch(1)
+        self.hbox.addWidget(self.but_load)
         self.hbox.addWidget(self.but_save)
         self.hbox.addWidget(self.but_elog)
         self.hbox.addWidget(self.but_quit)
@@ -139,14 +145,16 @@ class PlotImgSpeButtons (QtGui.QWidget) :
         self.grid.addWidget(self.cbox_grid, 0, 3)
         self.grid.addWidget(self.cbox_log,  0, 4)
         self.grid.addWidget(self.but_reset, 0, 6)
-        self.grid.addWidget(self.but_save,  0, 7)
-        self.grid.addWidget(self.but_quit,  0, 8)
+        self.grid.addWidget(self.but_load,  0, 7)
+        self.grid.addWidget(self.but_save,  0, 8)
+        self.grid.addWidget(self.but_quit,  0, 9)
         self.setLayout(self.grid)
 
 
     def showToolTips(self):
         self.but_reset.setToolTip('Reset original view') 
         self.but_quit .setToolTip('Quit this GUI') 
+        self.but_load .setToolTip('Load image from file') 
         self.but_save .setToolTip('Save the figure in file') 
         self.but_elog .setToolTip('Send figure to ELog') 
         self.but_help .setToolTip('Click on this button\nand get help') 
@@ -209,6 +217,22 @@ class PlotImgSpeButtons (QtGui.QWidget) :
         self.widgimage.initParameters()
         self.set_buttons()
         self.widgimage.on_draw()
+
+
+    def on_but_load(self):
+        logger.debug('on_but_load', __name__ )
+        path = gu.get_open_fname_through_dialog_box(self, self.ifname, 'Select file with text image', filter='*.txt')
+        if path == None or path == '' :
+            logger.debug('Loading is cancelled...', __name__ )
+            return
+
+        self.ifname = path
+
+        arr = gu. get_array_from_file(path) # dtype=np.float32)
+        #print 'arr:\n', arr
+        self.widgimage.set_image_array_new(arr, \
+                                           rot_ang_n90 = self.widgimage.rot_ang_n90,
+                                           y_is_flip   = self.widgimage.y_is_flip)
 
 
     def on_but_save(self):

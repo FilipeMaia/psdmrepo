@@ -31,6 +31,7 @@ from ConfigParametersCorAna import confpars as cp
 from Logger                 import logger
 from GUIAnaSettingsLeft     import *
 from GUIAnaSettingsRight    import *
+from GUIListOfTau           import *
 
 #---------------------
 #  Class definition --
@@ -56,10 +57,16 @@ class GUIAnaSettings ( QtGui.QWidget ) :
         self.but_show   = QtGui.QPushButton('Show Mask && Partitions') 
         cp.guianasettingsleft  = GUIAnaSettingsLeft()
         cp.guianasettingsright = GUIAnaSettingsRight()
+        cp.guilistoftau        = GUIListOfTau()
+
+        self.vboxR = QtGui.QVBoxLayout()
+        self.vboxR.addWidget(cp.guianasettingsright)
+        self.vboxR.addWidget(cp.guilistoftau)
 
         self.hboxM = QtGui.QHBoxLayout()
         self.hboxM.addWidget(cp.guianasettingsleft)
-        self.hboxM.addWidget(cp.guianasettingsright)
+        #self.hboxM.addWidget(cp.guianasettingsright)
+        self.hboxM.addLayout(self.vboxR)
 
         self.hboxB = QtGui.QHBoxLayout()
         self.hboxB.addWidget(self.tit_status)

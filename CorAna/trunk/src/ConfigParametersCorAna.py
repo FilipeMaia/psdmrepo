@@ -297,6 +297,11 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.ana_mask_fname    = self.declareParameter( name='ANA_MASK_FILE',             val_def='roi-mask.txt',type='str' )
         self.ana_mask_dname    = self.declareParameter( name='ANA_MASK_DIRECTORY',        val_def='.',type='str' )
 
+        # GUIListOfTau.py
+        self.ana_tau_list_type  = self.declareParameter( name='ANA_TAU_LIST_TYPE',             val_def='auto',type='str' )
+        self.ana_tau_list_fname = self.declareParameter( name='ANA_TAU_LIST_FILE',             val_def='tau-list.txt',type='str' )
+        self.ana_tau_list_dname = self.declareParameter( name='ANA_TAU_LIST_DIRECTORY',        val_def='.',type='str' )
+
         # GUIAnaSettingsRight.py
         self.ana_ndelays       = self.declareParameter( name='ANA_NDELAYS_PER_MTAU_LEVEL',       val_def=4,     type='int' )
         self.ana_nslice_delays = self.declareParameter( name='ANA_NSLICE_DELAYS_PER_MTAU_LEVEL', val_def=4,     type='int' )

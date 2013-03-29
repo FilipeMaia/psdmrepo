@@ -39,20 +39,24 @@ import GlobalUtils          as     gu
 class GUIFileBrowser ( QtGui.QWidget ) :
     """GUI File Browser"""
 
-    def __init__ ( self, parent=None, list_of_files=['Empty list'], selected_file=None) :
+    def __init__ ( self, parent=None, list_of_files=['Empty list'], selected_file=None, is_editable=True) :
 
         QtGui.QWidget.__init__(self, parent)
 
         self.setGeometry(200, 400, 900, 500)
         self.setWindowTitle('GUI File Browser')
-        self.setWindowIcon(cp.icon_browser)
         self.setFrame()
+        try : self.setWindowIcon(cp.icon_browser)
+        except : pass
 
         self.box_txt    = QtGui.QTextEdit()
  
         self.tit_status = QtGui.QLabel('Status:')
         self.tit_file   = QtGui.QLabel('File:')
         self.but_close  = QtGui.QPushButton('Close') 
+        self.but_save   = QtGui.QPushButton('Save As') 
+
+        self.is_editable = is_editable
 
         self.box_file      = QtGui.QComboBox( self ) 
         self.setListOfFiles(list_of_files)
@@ -67,6 +71,7 @@ class GUIFileBrowser ( QtGui.QWidget ) :
         self.hboxB = QtGui.QHBoxLayout()
         self.hboxB.addWidget(self.tit_status)
         self.hboxB.addStretch(4)     
+        self.hboxB.addWidget(self.but_save)
         self.hboxB.addWidget(self.but_close)
 
         self.vbox  = QtGui.QVBoxLayout()
@@ -76,6 +81,7 @@ class GUIFileBrowser ( QtGui.QWidget ) :
         self.vbox.addLayout(self.hboxB)
         self.setLayout(self.vbox)
         
+        self.connect( self.but_save,  QtCore.SIGNAL('clicked()'), self.onSave )
         self.connect( self.but_close, QtCore.SIGNAL('clicked()'), self.onClose )
         self.connect( self.box_file, QtCore.SIGNAL('currentIndexChanged(int)'), self.onBox  )
  
@@ -109,8 +115,9 @@ class GUIFileBrowser ( QtGui.QWidget ) :
         self.tit_file  .setFixedWidth (25)
         self.tit_file  .setAlignment  (QtCore.Qt.AlignRight)
         self.box_file  .setStyleSheet (cp.styleButton) 
+        self.but_save  .setStyleSheet (cp.styleButton)
         self.but_close .setStyleSheet (cp.styleButton)
-        self.box_txt   .setReadOnly   (True)
+        self.box_txt   .setReadOnly   (not self.is_editable)
         self.box_txt   .setStyleSheet (cp.styleWhiteFixed) 
 
 
@@ -158,24 +165,35 @@ class GUIFileBrowser ( QtGui.QWidget ) :
         self.close()
 
 
+    def onSave(self):
+        logger.debug('onSave', __name__)
+        path = gu.get_save_fname_through_dialog_box(self, self.fname, 'Select file to save', filter='*.txt')
+        if path == None or path == '' : return
+        text = str(self.box_txt.toPlainText())
+        logger.info('Save in file:\n'+text, __name__)
+        f=open(path,'w')
+        f.write( text )
+        f.close() 
+ 
+
     def onBox(self):
-        fname = str( self.box_file.currentText() )
-        logger.info('onBox - selected file: ' + fname, __name__)
+        self.fname = str( self.box_file.currentText() )
+        logger.info('onBox - selected file: ' + self.fname, __name__)
 
         self.list_of_supported = 'cfg', 'log', 'txt', 'txt-tmp' 
         self.str_of_supported = ''
         for ext in self.list_of_supported : self.str_of_supported += ' ' + ext
 
 
-        if self.list_of_files.index(fname) == 0 :
+        if self.list_of_files.index(self.fname) == 0 :
             self.setStatus(0, 'Waiting for file selection...')
             self.box_txt.setText('Click on file-box and select the file from pop-up list...')
 
-        elif os.path.lexists(fname) :
-            ext = os.path.splitext(fname)[1].lstrip('.')
+        elif os.path.lexists(self.fname) :
+            ext = os.path.splitext(self.fname)[1].lstrip('.')
 
             if ext in self.list_of_supported :
-                self.box_txt.setText(gu.get_text_file_content(fname))
+                self.box_txt.setText(gu.get_text_file_content(self.fname))
                 self.setStatus(0, 'Status: enjoy browsing the selected file...')
 
             else :

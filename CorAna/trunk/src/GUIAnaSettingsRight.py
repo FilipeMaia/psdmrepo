@@ -75,7 +75,7 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
         if cp.ana_mask_type.value() == self.list_mask_types[1] : self.rad_mask_file.setChecked(True)
 
         self.but_mask_poly = QtGui.QPushButton('ROI Mask Editor')
-        self.but_browser   = QtGui.QPushButton('Browser')
+        self.but_file      = QtGui.QPushButton('File:')
         self.edi_mask_file = QtGui.QLineEdit( fnm.path_roi_mask() )       
         self.edi_mask_file.setReadOnly( True )  
 
@@ -109,8 +109,8 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
         self.grid.addWidget(self.rad_mask_none,     self.grid_row+2, 1, 1, 6)
         self.grid.addWidget(self.rad_mask_file,     self.grid_row+3, 1, 1, 6)
         self.grid.addWidget(self.but_mask_poly,     self.grid_row+3, 7, 1, 3)
-        self.grid.addWidget(self.but_browser,       self.grid_row+4, 7, 1, 3)
-        self.grid.addWidget(self.edi_mask_file,     self.grid_row+5, 1, 1, 9)
+        self.grid.addWidget(self.but_file,          self.grid_row+4, 0, 1, 2)
+        self.grid.addWidget(self.edi_mask_file,     self.grid_row+4, 2, 1, 8)
 
         self.grid_row = 9
         self.grid.addWidget(self.tit_res_sets,      self.grid_row+1, 0, 1, 8)     
@@ -144,7 +144,7 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
         self.connect( self.rad_mask_none,    QtCore.SIGNAL('clicked()'), self.onMaskRadioGrp )
         self.connect( self.rad_mask_file,    QtCore.SIGNAL('clicked()'), self.onMaskRadioGrp )
         self.connect( self.but_mask_poly,    QtCore.SIGNAL('clicked()'), self.onMaskPoly     )
-        self.connect( self.but_browser,      QtCore.SIGNAL('clicked()'), self.onButBrowser   )
+        self.connect( self.but_file,         QtCore.SIGNAL('clicked()'), self.onButFile   )
 
         self.showToolTips()
         self.setStyle()
@@ -161,7 +161,7 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
         self.rad_mask_none.setToolTip(msg_rad_mask)
         self.rad_mask_file.setToolTip(msg_rad_mask)
         self.but_mask_poly.setToolTip('Click on this button\nto use the polygon mask')
-        self.but_browser  .setToolTip('Click on this button\nto change the mask file.')
+        self.but_file  .setToolTip('Click on this button\nto change the mask file.')
         self.edi_mask_file.setToolTip('Click on "Browse"\nto change this field.')
 
 
@@ -205,14 +205,14 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
 #        self.box_kin_mode       .setStyleSheet(cp.styleBox) 
         #width = 80
         #self.but_mask_poly.setFixedWidth(width)
-        #self.but_browser  .setFixedWidth(width)
+        #self.but_file  .setFixedWidth(width)
 
         self.tit_mask_set .setStyleSheet (cp.styleTitle)
         self.rad_mask_none.setStyleSheet (cp.styleLabel)
         self.rad_mask_file.setStyleSheet (cp.styleLabel)
 
         self.but_mask_poly.setStyleSheet (cp.styleButton)
-        self.but_browser  .setStyleSheet (cp.styleButton)
+        self.but_file     .setStyleSheet (cp.styleButton)
         self.edi_mask_file.setStyleSheet (cp.styleEditInfo)
         self.edi_mask_file.setAlignment (QtCore.Qt.AlignRight)
 
@@ -359,16 +359,14 @@ class GUIAnaSettingsRight ( QtGui.QWidget ) :
         else :
             logger.error('Non-existent CCD orientation: ' + str(sp.ccd_orient), __name__)            
 
-
  
-
-    def onButBrowser(self):
-        logger.info('onButBrowser', __name__)
+    def onButFile(self):
+        logger.info('onButFile', __name__)
 
         path = fnm.path_roi_mask()
         #print 'path_roi_mask()', path
 
-        if path == None : dname, fname = '.', 'roi-mask.txt'
+        if path == None : dname, fname = cp.ana_mask_fname.value_def(), cp.ana_mask_dname.value_def()
         else            : dname, fname = os.path.split(path)
 
         path = str( QtGui.QFileDialog.getOpenFileName(self,'Select file',path) )

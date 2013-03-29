@@ -387,10 +387,10 @@ class GUIDark ( QtGui.QWidget ) :
             try    : del cp.plotimgspe
             except : pass
         except :
-            arr = bjpeds.get_pedestals_from_file()
+            arr = gu.get_array_from_file( fnm.path_pedestals_ave() )
             if arr == None : return
             #print arr.shape,'\n', arr
-            cp.plotimgspe = PlotImgSpe(None, arr, ofname=fnm.path_peds_aver_plot())
+            cp.plotimgspe = PlotImgSpe(None, arr, ifname=fnm.path_pedestals_ave(), ofname=fnm.path_peds_aver_plot())
             #cp.plotimgspe.setParent(self)
             cp.plotimgspe.move(cp.guimain.pos().__add__(QtCore.QPoint(720,120)))
             cp.plotimgspe.show()

@@ -163,11 +163,6 @@ class BatchJobPedestals (BatchJob) :
 
 #-----------------------------
 
-    def get_pedestals_from_file(self) :
-        return gu.get_array_from_file( fnm.path_pedestals_ave() )
-
-#-----------------------------
-
 bjpeds = BatchJobPedestals ()
 
 #-----------------------------

@@ -135,6 +135,11 @@ class FileNameManager :
 
 #-----------------------------
 
+    def path_tau_list(self) :
+        return  cp.ana_tau_list_dname.value() + '/' + cp.ana_tau_list_fname.value() 
+
+#-----------------------------
+
     def path_roi_mask(self) :
         return  cp.ana_mask_dname.value() + '/' + cp.ana_mask_fname.value() 
 
@@ -397,14 +402,14 @@ class FileNameManager :
 
     def  get_list_of_files_data_aver(self) :
         self.list_of_files_data_aver = self.get_list_of_files_data_aver_short()
-        #self.list_of_files_data_aver.append(fnm.path_data_xtc())
+        self.list_of_files_data_aver.append(fnm.path_satpix_frac())
+        self.list_of_files_data_aver.append(fnm.path_satpix_mask())
         self.list_of_files_data_aver.append(fnm.path_data_aver_plot())
         self.list_of_files_data_aver.append(fnm.path_data_time_plot())
         self.list_of_files_data_aver.append(fnm.path_data_mons_plot())
-        self.list_of_files_data_aver.append(fnm.path_satpix_frac())
-        self.list_of_files_data_aver.append(fnm.path_satpix_mask())
         #self.list_of_files_data_aver.append(fnm.path_hotpix_frac())
         #self.list_of_files_data_aver.append(fnm.path_hotpix_mask())
+        #self.list_of_files_data_aver.append(fnm.path_data_xtc())
         return self.list_of_files_data_aver
 
 #-----------------------------
