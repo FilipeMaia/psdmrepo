@@ -1,0 +1,4 @@
+- bug fix for interface controller which get stuck on non-existing runs
+- several fixes for translator, includeing Acqiris data fix and metadata
+  for schema version and source
+- XtcInput adds support for one-stream mode
