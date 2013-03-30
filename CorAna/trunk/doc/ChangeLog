@@ -12,6 +12,10 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 2013-03-29 Mikhail S. Dubrovin
+- in src/ViewResults.pyvalueToIndexMaskedadd protection in binning 
+	for indarr(V==Vmax) = Nbins1 (not Nbins that is overflow)
+
+2013-03-29 Mikhail S. Dubrovin
 Tag: V00-00-11
 - add GUIListOfTau.py to select/create the file with tau indexes
 - in GUIFileBrowser.py add edit and save options

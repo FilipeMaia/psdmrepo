@@ -72,7 +72,7 @@ def valueToIndexProtected(V, VRange) :
     factor = float(Nbins) / float(Vmax-Vmin)
     indarr = np.int32( factor * (V-Vmin) )
     #return np.select([V<Vmin,V>Vmax], [0,Nbins-1], default=indarr)
-    return np.select([indarr<0, indarr>Nbins1], [0,Nbins1], default=indarr)
+    return np.select([V==Vmax, indarr<0, indarr>Nbins1], [Nbins1, 0, Nbins1], default=indarr)
 
 def valueToIndexMasked(V, VRange, mask=None) :
     """Input: V - numpy array of values,
@@ -84,8 +84,9 @@ def valueToIndexMasked(V, VRange, mask=None) :
     Vmin, Vmax, Nbins = VRange
     Nbins1 = int(Nbins)-1
     factor = float(Nbins) / float(Vmax-Vmin)
+    # * (1-1e-6) may be used in order to get rid of f=1 at V=Vmax and hence indarr = Nbins (overflow) for normal bins 
     indarr = np.int32( factor * (V-Vmin) )
-    return np.select([mask==0, indarr<0, indarr>Nbins1], [Nbins, Nbins, Nbins], default=indarr)
+    return np.select([V==Vmax, mask==0, indarr<0, indarr>Nbins1], [Nbins1, Nbins, Nbins, Nbins], default=indarr)
     #return np.select([mask==0, indarr<0, indarr>Nbins1], [0, 0, 0], default=indarr)
 
 def get_limits_for_masked_array(map, mask=None) :
