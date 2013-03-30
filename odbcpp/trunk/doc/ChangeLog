@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-09
+2013-03-29 Andy Salnikov
+- remove Lusi.h include from tests too
+
 Tag: V00-00-08
 2013-03-29 Andy Salnikov
 - remove Lusi.h include
