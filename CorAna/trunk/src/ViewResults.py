@@ -542,29 +542,35 @@ class ViewResults :
         msg = 'get_q_average_for_dyna_bins():\n' + str(sp.q_average_dyna)
         logger.info(msg, __name__)
         #print msg
+        #print 'sp.npart_dyna, sp.q_average_dyna.shape=', sp.npart_dyna, sp.q_average_dyna.shape
         return sp.q_average_dyna
 
 
-    def get_q_average_for_dyna_bins_trancated_overflow(sp) :
-        return sp.trancate_overflowed_dyna_bins( sp.get_q_average_for_dyna_bins() )
+    def get_q_average_for_dyna_bins_trim_overflow(sp) :
+        q_ave_arr = np.array(sp.trim_overflow_dyna_bins(sp.get_q_average_for_dyna_bins()))
+        #print 'q_ave_arr.shape:', q_ave_arr.shape
+        #print 'q_ave_arr:', q_ave_arr
+        return q_ave_arr.flatten()
+    
 
-
-    def trancate_overflowed_dyna_bins(sp, arr_for_dyna_bins) :
+    def trim_overflow_dyna_bins(sp, arr_for_dyna_bins) :
         """Returns array with trancated bins reserved for overflow; anothr words:
            shape (sp.ana_dyna_part_q+1, sp.ana_dyna_part_phi+1) -> (sp.ana_dyna_part_q, sp.ana_dyna_part_phi)
         """
         ###sp.npart_dyna = (sp.ana_dyna_part_q+1) * (sp.ana_dyna_part_phi+1)
-        if arr_for_dyna_bins.shape[0] != sp.npart_dyna :            
-            msg = 'trancate_overflowed_dyna_bins(): input array size: '+str(arr_for_dyna_bins.shape[0]) +\
+        
+        arr = arr_for_dyna_bins.flatten()
+
+        if arr.shape[0] != sp.npart_dyna :            
+            msg = 'trim_overflow_dyna_bins(): input array size: '+str(arr.shape[0]) +\
                   '\ndoes not coinside with expected number of dynamic partitions (including overflow):' + str(sp.npart_dyna) +\
                   '\nWARNING: overflow bins are not trancated in output array!'
             logger.warning(msg, __name__)
             return arr_for_dyna_bins
 
-        arr = arr_for_dyna_bins
         arr.shape = (sp.ana_dyna_part_q+1, sp.ana_dyna_part_phi+1)
-        arr_trancated = arr[0:sp.ana_dyna_part_q, 0:sp.ana_dyna_part_phi]
-        return arr_trancated.flatten()
+        arr_trimmed = arr[0:sp.ana_dyna_part_q, 0:sp.ana_dyna_part_phi]
+        return arr_trimmed.flatten()
 
 #-----------------------------
 
@@ -626,6 +632,10 @@ class ViewResults :
         return sp.g2_for_dyna_bins
 
 
+    def get_g2_for_dyna_bins_trim_itau(sp, itau) :
+        return sp.trim_overflow_dyna_bins( sp.get_g2_for_dyna_bins_itau(itau) )
+
+
     def get_g2_map_for_dyna_bins_itau(sp, itau) :
         q_phi_map_dyna          = sp.get_q_phi_map_for_dyna_bins()
         g2_for_dyna_bins        = sp.get_g2_for_dyna_bins_itau(itau)
@@ -644,16 +654,46 @@ class ViewResults :
 
         g2_vs_itau = []
         for itau, tau in enumerate(sp.list_of_tau) :
-            g2_for_dyna_bins = sp.get_g2_for_dyna_bins_itau(itau)
-            g2_vs_itau.append( sp.trancate_overflowed_dyna_bins(g2_for_dyna_bins) )
+            g2_for_dyna_bins = sp.get_g2_for_dyna_bins_trim_itau(itau)
+            g2_vs_itau.append( g2_for_dyna_bins )
+            #print g2_for_dyna_bins
             msg = 'get_g2_vs_itau_arr: itau=%3d  tau=%4d  <g2>=%6.3f' \
-                  % (itau, tau, g2_for_dyna_bins.mean()) 
+                  % (itau, tau, np.array(g2_for_dyna_bins).mean()) 
             logger.info(msg, __name__)
             #print msg
         
         sp.g2_vs_itau_arr = np.array(g2_vs_itau)
 
+        print 'Results:\n', sp.get_formatted_table_of_results()
+        
         return sp.g2_vs_itau_arr
+
+
+#-----------------------------
+
+    def get_results_for_dyna_bins(sp) :
+        """Returns 3 numpy-arrays for dynamic bins with main results:
+           1) g2 vs itau, <q>, tau
+        """
+        return sp.get_g2_vs_itau_arr(), \
+               sp.get_q_average_for_dyna_bins_trim_overflow(), \
+               sp.list_of_tau        
+
+#-----------------------------
+
+    def get_formatted_table_of_results(sp) :
+        g2_vs_itau_arr, q_ave_arr, tau_arr = sp.get_results_for_dyna_bins()
+
+        txt = '<g2> for dynamic bins vs tau\n' + '='*28 + '\n tau \ <q> |'
+        for q_ave in q_ave_arr : txt += '%6.3f ' % q_ave
+        txt += '\n'+ '-'*(11+7*q_ave_arr.shape[0])
+
+        for tau, g2_arr in zip(tau_arr, g2_vs_itau_arr) :       
+            txt += '\n%4d       |' % tau
+            for g2 in g2_arr.flatten() : txt += '%6.3f ' % g2
+        txt += '\n'
+        
+        return txt
 
 #-----------------------------
 

@@ -479,7 +479,7 @@ class GUIViewControl ( QtGui.QWidget ) :
     def on_but_g2tau_gr(self):  
         #self.arr2d = self.vr.get_random_img()
         #self.list_of_tau
-        q_average_for_dyna = self.vr.get_q_average_for_dyna_bins_trancated_overflow()
+        q_average_for_dyna = self.vr.get_q_average_for_dyna_bins_trim_overflow()
         self.arr2d = self.vr.get_g2_vs_itau_arr()
         arr_tau = self.list_of_tau
 

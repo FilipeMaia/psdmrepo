@@ -100,11 +100,12 @@ class BatchJobCorAna( BatchJob, QtCore.QObject ) : # need in QtCore.QObject in o
         time_sub = gu.get_time_sec()
 
         fname    = fnm.get_list_of_files_cora_split_work()[ind]
-        tname    = fnm.path_cora_proc_tau_in()
+        #tname    = fnm.path_cora_proc_tau_in()
+        tname    = fnm.path_tau_list()
         log_file = fnm.get_list_of_files_cora_proc_work_log()[ind]
 
         command  = 'corana -f ' + fname # + ' -l ' + log_file
-        if os.path.exists(tname) : command +=   '-t ' + tname
+        if cp.ana_tau_list_type.value() == 'file' and os.path.exists(tname) : command +=   ' -t ' + tname
         queue    = cp.bat_queue.value()
 
         #print 'command  =', command
