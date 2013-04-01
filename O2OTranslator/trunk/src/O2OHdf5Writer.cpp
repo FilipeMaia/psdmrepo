@@ -35,6 +35,8 @@
 #include "O2OTranslator/O2OFileNameFactory.h"
 #include "O2OTranslator/O2OMetaData.h"
 #include "pdsdata/bld/bldData.hh"
+#include "pdsdata/control/ConfigV1.hh"
+#include "pdsdata/control/ConfigV2.hh"
 #include "pdsdata/xtc/DetInfo.hh"
 #include "pdsdata/xtc/Dgram.hh"
 #include "pdsdata/xtc/Level.hh"
@@ -379,6 +381,32 @@ O2OHdf5Writer::configObject(const void* data, size_t size, const Pds::TypeId& ty
   if (m_transition == Pds::TransitionId::Configure) {
     // update also special config store
     m_configStore0.store(typeId, src.top(), vdata);
+  }
+  
+  // For Control Config objects try to get estimate of event count per calib cycle
+  if (typeId.id() == Pds::TypeId::Id_ControlConfig) {
+    unsigned events = 0;
+    switch(typeId.version()) {
+    case 1: {
+      const Pds::ControlData::ConfigV1& cfg = *static_cast<const Pds::ControlData::ConfigV1*>(data);
+      if (cfg.uses_events()) events = cfg.events();
+      break;
+    }
+    case 2: {
+      const Pds::ControlData::ConfigV2& cfg = *static_cast<const Pds::ControlData::ConfigV2*>(data);
+      if (cfg.uses_events()) events = cfg.events();
+      break;
+    }
+    default:
+      MsgLog(logger, warning, "Unexpected version of ControlData::Config object, chunk size estimate will not work");
+      break;
+    }
+
+    if (events) {
+      // there will be fluctuations in actual event count, try to put some upper limit (5% plus 10 events)
+      hsize_t chunk = events + events / 20 + 10;
+      CvtOptions::setChunkSize(chunk);
+    }
   }
 }
 

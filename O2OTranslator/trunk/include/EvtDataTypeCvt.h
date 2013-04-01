@@ -146,7 +146,7 @@ protected:
   makeCont(const std::string& name, hdf5pp::Group& location, bool shuffle,
       hdf5pp::Type type = hdf5pp::TypeTraits<typename ContType::value_type>::stored_type())
   {
-    return boost::make_shared<ContType>(name, location, type, m_cvtOptions.chunkSize(), m_cvtOptions.compLevel(), shuffle);
+    return boost::make_shared<ContType>(name, location, type, m_cvtOptions.chunkSize(type), m_cvtOptions.compLevel(), shuffle);
   }
 
   /// method called to create all necessary data containers

@@ -11,6 +11,15 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-28-00
+2013-04-01 Andy Salnikov
+- implementing smart chunck size estimate based on the contol configuration
+  parameters that come in XTC file
+- if control configuration is not present then the same old parameterization
+  is used
+- calculation of chunk size and its adjastment was moved from
+  H5DataTypes/ObjectContainer to CvtOptions class in this package
+
 Tag: V00-27-00
 2013-03-27 Andy Salnikov
 - fix for Acqiris DataDescV1 translation, the data that were stored before

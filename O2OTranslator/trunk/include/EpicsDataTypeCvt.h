@@ -64,7 +64,7 @@ public:
       const std::string& topGroupName,
       const Pds::Src& src,
       const ConfigObjectStore& configStore,
-      hsize_t chunk_size,
+      hsize_t chunkSizeBytes,
       int deflate,
       int schemaVersion ) ;
 
@@ -115,7 +115,7 @@ private:
   // Data members
   const std::string m_typeGroupName ;
   const ConfigObjectStore& m_configStore;
-  hsize_t m_chunk_size ;
+  hsize_t m_chunkSizeBytes;
   int m_deflate ;
   hdf5pp::Group m_group;
   PV2Group m_subgroups ;

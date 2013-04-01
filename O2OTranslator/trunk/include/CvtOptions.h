@@ -54,21 +54,27 @@ public:
   /**
    *  @brief Constructor takes values for each option
    *
-   *  @param[in]
    *  @param[in] chunkSize   HDF5 chunk size in bytes
-   *  @param[in] compLevel     Compression level
+   *  @param[in] compLevel   Compression level
    *  @param[in] fillMissing If true then missing data is "stored" and mask dataset is created
    *  @param[in] storeDamage If true then special dataset for damage bitmask is created
    */
   CvtOptions(hsize_t chunkSize, int compLevel, bool fillMissing, bool storeDamage)
-    : m_chunkSize(chunkSize)
+    : m_chunkSizeBytes(chunkSize)
     , m_compLevel(compLevel)
     , m_fillMissing(fillMissing)
     , m_storeDamage(storeDamage)
   {}
 
-  /// Returns HDF5 chunk size in bytes
-  hsize_t chunkSize() const { return m_chunkSize; }
+  /**
+   *  @brief Returns HDF5 chunk size counted in objects of given HDF5 type.
+   *  
+   *  If chunk size was set with setChunkSize() then use that number, otherwise calculate 
+   *  optimal value based on the chunk size in bytes passed to constructor and size of object 
+   *  of stored data type. In any case algorithm limits both maximum size of chunk in bytes and 
+   *  both maximum and minimum number of objects in a chunk.
+   */
+  hsize_t chunkSize(const hdf5pp::Type& type) const;
 
   /// Returns compression level
   int compLevel() const { return m_compLevel; }
@@ -79,11 +85,23 @@ public:
   /// Returns flag for creating damage dataset
   bool storeDamage() const { return m_storeDamage; }
 
+  /// Set chunk size, if size 0 is given then use internally-calculated size.
+  static void setChunkSize(hsize_t chunkSize);
+  
+  /**
+   *  @brief Returns HDF5 chunk size counted in objects of given HDF5 type.
+   *
+   *  This method calculates chunk size like it is described above but
+   *  instead of taking into account value set with the setChunkSize() method
+   *  it uses additional parameter.
+   */
+  static hsize_t chunkSize(hsize_t chunkSizeBytes, const hdf5pp::Type& type, hsize_t chunkSize=0);
+
 protected:
 
 private:
 
-  hsize_t m_chunkSize;  ///< HDF5 chunk size in bytes
+  hsize_t m_chunkSizeBytes;  ///< HDF5 chunk size in bytes
   int m_compLevel;      ///< Compression level
   bool m_fillMissing;   ///< if true then missing data is "stored" and mask dataset is created
   bool m_storeDamage;   ///< if true then special dataset for damage bitmask is created

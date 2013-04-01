@@ -27,6 +27,7 @@
 #include "MsgLogger/MsgLogger.h"
 #include "hdf5pp/Exceptions.h"
 #include "O2OTranslator/ConfigObjectStore.h"
+#include "O2OTranslator/CvtOptions.h"
 #include "pdsdata/epics/ConfigV1.hh"
 
 //-----------------------------------------------------------------------
@@ -78,13 +79,13 @@ EpicsDataTypeCvt::EpicsDataTypeCvt ( hdf5pp::Group group,
     const std::string& topGroupName,
     const Pds::Src& src,
     const ConfigObjectStore& configStore,
-    hsize_t chunk_size,
+    hsize_t chunkSizeBytes,
     int deflate,
     int schemaVersion)
   : DataTypeCvt<Pds::EpicsPvHeader>()
   , m_typeGroupName(topGroupName)
   , m_configStore(configStore)
-  , m_chunk_size(chunk_size)
+  , m_chunkSizeBytes(chunkSizeBytes)
   , m_deflate(deflate)
   , m_group()
   , m_subgroups()
@@ -195,11 +196,13 @@ EpicsDataTypeCvt::typedConvert ( const XtcType& data,
     // new thing, create all groups/containers
 
     // make container for time
+    hsize_t chunkSize = CvtOptions::chunkSize(m_chunkSizeBytes, XtcClockTimeCont::value_type::stored_type());
     XtcClockTimeCont* timeCont = new XtcClockTimeCont("time", subgroup,
-        XtcClockTimeCont::value_type::stored_type(), m_chunk_size, m_deflate, true);
+        XtcClockTimeCont::value_type::stored_type(), chunkSize, m_deflate, true);
 
     // make container for data objects
-    DataCont* dataCont = new DataCont("data", subgroup, type, m_chunk_size, m_deflate, false);
+    chunkSize = CvtOptions::chunkSize(m_chunkSizeBytes, type);
+    DataCont* dataCont = new DataCont("data", subgroup, type, chunkSize, m_deflate, false);
 
     // store it all for later use
     _pvdata pv( timeCont, dataCont ) ;
