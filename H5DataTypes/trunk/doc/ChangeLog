@@ -11,6 +11,12 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-00
+2013-04-01 Andy Salnikov
+- ObjectContainer: chunk size calculation is moved to translator, 
+- constructor of ObjectContainer now accepts exact chunk size in object 
+  units, and not in bytes as before
+
 Tag: V00-03-00
 2013-03-28 Andy Salnikov
 - fixing schema for Acqiris DataDescV1, adding new dataset for DataDescV1
