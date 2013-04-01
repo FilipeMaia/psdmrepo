@@ -794,6 +794,17 @@ class InterfaceDb ( object ) :
         q = "DELETE FROM fileset WHERE %s" % sel
         cursor.execute ( q, qvars )
 
+
+    @_synchronized
+    @_transaction
+    def translated_runs(self, instr, exper, cursor=None):
+        """
+        Get the set of runs which are in translator already (translated or 
+        being translated). Returns set of integer numbers
+        """ 
+        q = """select run_number from fileset where instrument = %s and experiment = %s"""
+        cursor.execute( q, (instr, exper) )
+        return set(row[0] for row in cursor.fetchall())
         
 #
 #  In case someone decides to run this module

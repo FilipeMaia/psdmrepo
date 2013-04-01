@@ -10,6 +10,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V01-01-00
+2013-04-01 Andy Salnikov
+- auto-translation script modified to accovmodata new FFB system
+
 Tag: V01-00-27
 2013-03-23 Andy Salnikov
 - fix in ic-controller: FAIL_NOFILES status string was used instead of 

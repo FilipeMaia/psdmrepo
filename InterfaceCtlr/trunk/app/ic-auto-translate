@@ -50,11 +50,10 @@ from RegDB.RegDb import RegDb
 # Local definitions --
 #---------------------
 
-_icdb_conn_str = "file:/reg/g/psdm/psdatmgr/ic/.icdb-conn"
+_icdb_conn_str     = "file:/reg/g/psdm/psdatmgr/ic/.icdb-conn"
 _icdb_ffb_conn_str = "file:/reg/g/psdm/psdatmgr/ic/.icdb-ffb-conn"
-_regdb_conn_str = "file:/reg/g/psdm/psdatmgr/ic/.regdb-conn"
-_logbook_conn_str = "file:/reg/g/psdm/psdatmgr/ic/.logbook-conn"
-
+_regdb_conn_str    = "file:/reg/g/psdm/psdatmgr/ic/.regdb-conn"
+_logbook_conn_str  = "file:/reg/g/psdm/psdatmgr/ic/.logbook-conn"
 
 _xtc_path = "/reg/d/psdm/%(instr)s/%(exper)s/xtc/e%(expid)d-r%(run)04d-s%(stream)02d-c%(chunk)02d.xtc"
 
@@ -77,6 +76,7 @@ class IcAutoTranslate ( AppBase ) :
                                   check_reg=True,
                                   interval=60,
                                   interval_ffb=10,
+                                  old_instr=[],
                                   dry_run=False)
         self._parser.add_option ( '-d', "--icdb-conn", metavar="CONN_STR", help="specify controller database connection string" )
         self._parser.add_option ( '-f', "--icdb-ffb-conn", metavar="CONN_STR", help="specify FFB controller database connection string" )
@@ -87,6 +87,8 @@ class IcAutoTranslate ( AppBase ) :
         self._parser.add_option ( '-i', "--interval", type="int", help="interval in seconds for checking new runs, def: 60" )
         self._parser.add_option ( '-I', "--interval-ffb", type="int", help="interval in seconds for checking new runs for FFB, def: 10" )
         self._parser.add_option ( '-n', "--dry-run", action="store_true", help="do not submit any jobs" )
+        self._parser.add_option ( '-O', "--old-instr", action="append", 
+                                  help="instruments without FFB setup, use multiple options for multiple instruments" )
      
         self.n_old = 5  # number of latest experiments to keep AUTO flag
 
@@ -97,18 +99,14 @@ class IcAutoTranslate ( AppBase ) :
     def _run ( self ) :
 
         # Connect to databases
+        self.icdb = None
         if self._options.check_reg:
-            self.icdb_conn = DbConnection(conn_string=self._options.icdb_conn)
-            self.icdb = InterfaceDb( self.icdb_conn, self )
-        else:
-            self.icdb_conn = None
-            self.icdb = None
+            conn = DbConnection(conn_string=self._options.icdb_conn)
+            self.icdb = InterfaceDb( conn, self )
+        self.icdb_ffb = None
         if self._options.check_ffb:
-            self.icdb_ffb_conn = DbConnection(conn_string=self._options.icdb_ffb_conn)
-            self.icdb_ffb = InterfaceDb( self.icdb_ffb_conn, self )
-        else:
-            self.icdb_ffb_conn = None
-            self.icdb_ffb = None
+            conn = DbConnection(conn_string=self._options.icdb_ffb_conn)
+            self.icdb_ffb = InterfaceDb( conn, self )
         self.regdb_conn = DbConnection(conn_string=self._options.regdb_conn)
         self.logbook_conn = DbConnection(conn_string=self._options.logbook_conn)
         self.regdb = RegDb( self.regdb_conn, self )
@@ -155,7 +153,10 @@ class IcAutoTranslate ( AppBase ) :
                             auto_exp.setdefault(instr, set()).add(exper)
                             # process a single experiment
                             self.trace('processing experiment: %s %s', instr, exper)
-                            self._processRegExperiment(instr, exper, expid)
+                            if instr in self._options.old_instr:
+                                self._processOldRegExperiment(instr, exper, expid)
+                            else:
+                                self._processFFBExperiment(instr, exper, expid, self.icdb)
     
                     if ffb_count == 0 and self._options.check_ffb:
                         # do FFB controller
@@ -166,7 +167,7 @@ class IcAutoTranslate ( AppBase ) :
                             auto_exp_ffb.setdefault(instr, set()).add(exper)
                             # process a single experiment
                             self.trace('processing FFB experiment: %s %s', instr, exper)
-                            self._processFFBExperiment(instr, exper, expid)
+                            self._processFFBExperiment(instr, exper, expid, self.icdb_ffb)
     
                 # reset AUTO flags for old experiments
                 if auto_exp or auto_exp_ffb:
@@ -190,8 +191,6 @@ class IcAutoTranslate ( AppBase ) :
 
                 # commit all transaction
                 self.regdb.commit()
-                if self.icdb_conn: self.icdb_conn.cursor().execute('COMMIT')
-                if self.icdb_ffb_conn: self.icdb_ffb_conn.cursor().execute('COMMIT')
                 self.logbook_conn.cursor().execute('COMMIT')
             
             except Exception, ex:
@@ -205,10 +204,10 @@ class IcAutoTranslate ( AppBase ) :
             if ffb_count == 0: ffb_count = self._options.interval_ffb // min_interval
 
 
-    def _processRegExperiment(self, instr, exper, expid):
+    def _processOldRegExperiment(self, instr, exper, expid):
     
         # get the list of runs from existing requests 
-        old_runs = self._translatedRuns(instr, exper, self.icdb_conn)
+        old_runs = self.icdb.translated_runs(instr, exper)
         self.trace('found %d translated runs: %s %s', len(old_runs), instr, exper)
     
         # get the list of all finished runs from logbook
@@ -243,15 +242,15 @@ class IcAutoTranslate ( AppBase ) :
                 # submit a request
                 try:
                     if not self._options.dry_run: self.icdb.new_fileset(instr, exper, run, 'DATA', paths)
-                    self.info('Submitted %s %s %d', instr, exper, run)
+                    self.info('Submitted %s %s %d (file-based mode)', instr, exper, run)
                 except Exception, ex:
                     self.warning('Failed to submit %s %s %d: %s', instr, exper, run, ex)
                     continue
 
-    def _processFFBExperiment(self, instr, exper, expid):
+    def _processFFBExperiment(self, instr, exper, expid, icdb):
     
         # get the list of runs from existing requests 
-        old_runs = self._translatedRuns(instr, exper, self.icdb_ffb_conn)
+        old_runs = icdb.translated_runs(instr, exper)
         self.trace('found %d translated runs: %s %s', len(old_runs), instr, exper)
     
         # get the list of all started runs from logbook
@@ -264,7 +263,7 @@ class IcAutoTranslate ( AppBase ) :
             
             # submit a request
             try:
-                if not self._options.dry_run: self.icdb_ffb.new_fileset(instr, exper, run, 'DATA', [], status = 'WAIT_FILES')
+                if not self._options.dry_run: icdb.new_fileset(instr, exper, run, 'DATA', [], status = 'WAIT_FILES')
                 self.info('Submitted %s %s %d to FFB translator', instr, exper, run)
             except Exception, ex:
                 self.warning('Failed to submit %s %s %d: %s', instr, exper, run, ex)
@@ -279,16 +278,6 @@ class IcAutoTranslate ( AppBase ) :
         cursor = self.regdb_conn.cursor()
         cursor.execute("select stream, chunk from file where exper_id = %s and run = %s", (expid, run))
         return map(tuple, cursor.fetchall())
-
-    def _translatedRuns(self, instr, exper, icdb_conn):
-        """
-        Get the set of runs which are in translator already (translated or 
-        being translated). Returns set of integer numbers
-        """ 
-        q = """select run_number from fileset where instrument = %s and experiment = %s"""
-        cursor = icdb_conn.cursor()
-        cursor.execute( q, (instr, exper) )
-        return set(row[0] for row in cursor.fetchall())
 
     def _finishedRuns(self, expid):
         """
