@@ -10,6 +10,12 @@ Package author: Mikhail S. Dubrovin
 
 Please describe any modifications that you made to the package in the
 reverse time order.
+
+Tag: V00-03-07	
+2013-04-01 Mikhail S. Dubrovin
+- in IntensityMonitorsData and ImgIntMonCorr 
+	get calibrated data from Psana::Lusi::IpmFexV1 in stead of raw
+
 Tag: V00-03-06	
 2013-03-24 Mikhail S. Dubrovin
 - in CorAna add print for event index vs tau index

@@ -322,6 +322,80 @@ ImgIntMonCorr::getIntMonDataForSource(Event& evt, Env& env, const Source& src)
 {  
   shared_ptr<Psana::Bld::BldDataFEEGasDetEnergy> fee = evt.get(src);
   if (fee.get()) {
+
+    if( m_print_bits & 64 ) MsgLog( name(), info, "get: " << src << " from Bld::BldDataFEEGasDetEnergy, f_ij_ENRC(): " 
+				    << " " << fee->f_11_ENRC()
+				    << " " << fee->f_12_ENRC()
+				    << " " << fee->f_21_ENRC()
+				    << " " << fee->f_22_ENRC()
+    );
+
+    return Quartet ((float)fee->f_11_ENRC(), 
+                    (float)fee->f_12_ENRC(), 
+                    (float)fee->f_21_ENRC(), 
+                    (float)fee->f_22_ENRC());
+  } 
+
+//----- for XCS-IPM-02, XCS-IPM-mono, XcsBeamline.1:Ipimb.4, XcsBeamline.1:Ipimb.5, see: psana_examples/src/DumpIpimb.cpp
+
+  shared_ptr<Psana::Lusi::IpmFexV1> fex = evt.get(src);
+  if (fex) {
+
+    if( m_print_bits & 64 ) MsgLog( name(), info, "get: " << src << " from Lusi::IpmFexV1" << " channel =" << fex->channel() );
+
+    return Quartet ((float)fex->channel()[0], 
+                    (float)fex->channel()[1], 
+                    (float)fex->channel()[2], 
+                    (float)fex->channel()[3]);
+  }
+
+ 
+  shared_ptr<Psana::Ipimb::DataV2> data2 = evt.get(src);
+  if (data2.get()) {
+
+    if( m_print_bits & 64 ) MsgLog( name(), info, "get: " << src << " from Ipimb::DataV2" );
+
+    return Quartet ((float)data2->channel0Volts(), 
+                    (float)data2->channel1Volts(), 
+                    (float)data2->channel2Volts(), 
+                    (float)data2->channel3Volts());
+  }
+
+//----- for XCS-IPM-02 and XCS-IPM-mono, see psana_examples/src/DumpBld.cpp
+
+  shared_ptr<Psana::Bld::BldDataIpimbV1> ipimb1 = evt.get(src); 
+  if (ipimb1.get()) {
+
+    const Psana::Lusi::IpmFexV1& ipmFexData = ipimb1->ipmFexData();
+
+    if( m_print_bits & 64 ) MsgLog( name(), info, "get: " << src << " from BldDataIpimbV1" << ipmFexData.channel() );
+
+    return Quartet ((float)ipmFexData.channel()[0], 
+                    (float)ipmFexData.channel()[1], 
+                    (float)ipmFexData.channel()[2], 
+                    (float)ipmFexData.channel()[3]);
+    /*
+    const Psana::Ipimb::DataV2& ipimbData = ipimb1->ipimbData();
+    return Quartet ((float)ipimbData.channel0Volts(), 
+                    (float)ipimbData.channel1Volts(), 
+                    (float)ipimbData.channel2Volts(), 
+                    (float)ipimbData.channel3Volts());
+    */
+  }
+
+//-----
+  MsgLog( name(), info,  "IntensityMonitorsData::getDataForSource(): unavailable data for source: " << src << "\n"); 
+  //abort(); 
+  return  Quartet (-1,-1,-1,-1);
+}
+
+//--------------------
+
+Quartet
+ImgIntMonCorr::getIntMonDataForSourceV1(Event& evt, Env& env, const Source& src)
+{  
+  shared_ptr<Psana::Bld::BldDataFEEGasDetEnergy> fee = evt.get(src);
+  if (fee.get()) {
     return Quartet ((float)fee->f_11_ENRC(), 
                     (float)fee->f_12_ENRC(), 
                     (float)fee->f_21_ENRC(), 

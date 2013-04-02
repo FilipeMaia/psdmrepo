@@ -127,6 +127,7 @@ public:
   void printIntMonData(Event& evt, Env& env);
   bool procIntMonData(Event& evt, Env& env);
   Quartet getIntMonDataForSource(Event& evt, Env& env, const Source& src);
+  Quartet getIntMonDataForSourceV1(Event& evt, Env& env, const Source& src);
 
 protected:
   void init(Event& evt, Env& env);
