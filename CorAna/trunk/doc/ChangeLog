@@ -11,6 +11,13 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2013-04-01 Mikhail S. Dubrovin
+Tag: V00-00-12
+- in src/ConfigFileGenerator.py remove the file names for hot-pixel fraction 
+	(do not evaluate it from data).
+- in ViewResults.py, GUIViewResults.py, GUIViewControl.py - add get_formatted_table_of_results()
+	and print it from GUI
+
 2013-03-29 Mikhail S. Dubrovin
 - in src/ViewResults.pyvalueToIndexMaskedadd protection in binning 
 	for indarr(V==Vmax) = Nbins1 (not Nbins that is overflow)

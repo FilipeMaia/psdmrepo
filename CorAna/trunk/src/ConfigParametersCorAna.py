@@ -226,7 +226,7 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.y0_pos_in_data     = self.declareParameter( name='Y_CCD_POS_IN_DATA',        val_def=0.0,        type='float' )
 
         # GUISetupInfoLeft.py
-        self.sample_det_dist    = self.declareParameter( name='SAMPLE_TO_DETECTOR_DISTANCE', val_def=2000.0,      type='float' )
+        self.sample_det_dist    = self.declareParameter( name='SAMPLE_TO_DETECTOR_DISTANCE', val_def=7500.0,      type='float' )
         self.exp_setup_geom     = self.declareParameter( name='EXP_SETUP_GEOMETRY',          val_def='Beam Zero', type='str' )
         self.photon_energy      = self.declareParameter( name='PHOTON_ENERGY',               val_def=7.6543,      type='float' )
         self.nominal_angle      = self.declareParameter( name='NOMINAL_ANGLE',               val_def=-1,          type='float' )
@@ -235,9 +235,9 @@ class ConfigParametersCorAna ( ConfigParameters ) :
 
         # GUIImgSizePosition.py
         self.col_begin          = self.declareParameter( name='IMG_COL_BEGIN',        val_def=0,             type='int' )
-        self.col_end            = self.declareParameter( name='IMG_COL_END',          val_def=1339,          type='int' )
+        self.col_end            = self.declareParameter( name='IMG_COL_END',          val_def=1340,          type='int' )
         self.row_begin          = self.declareParameter( name='IMG_ROW_BEGIN',        val_def=0,             type='int' )
-        self.row_end            = self.declareParameter( name='IMG_ROW_END',          val_def=1299,          type='int' )
+        self.row_end            = self.declareParameter( name='IMG_ROW_END',          val_def=1300,          type='int' )
 
         # GUIKineticMode.py
         self.kin_mode           = self.declareParameter( name='KINETICS_MODE',        val_def='Non-Kinetics',type='str' )
@@ -311,7 +311,7 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.ana_spec_stab     = self.declareParameter( name='ANA_CHECK_SPECKLE_STABILITY',      val_def=False, type='bool' )
 
         self.lld_type          = self.declareParameter( name='LOW_LEVEL_DISC_TYPE',              val_def='NONE',type='str' )
-        self.lld_adu           = self.declareParameter( name='LOW_LEVEL_DISC_ADU',               val_def=15,    type='float' )
+        self.lld_adu           = self.declareParameter( name='LOW_LEVEL_DISC_ADU',               val_def=20,    type='float' )
         self.lld_rms           = self.declareParameter( name='LOW_LEVEL_DISC_RMS',               val_def=2,     type='float' )
 
         self.res_ascii_out     = self.declareParameter( name='RES_ASCII_OUTPUT',                 val_def=True,  type='bool' )
@@ -333,8 +333,8 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.y_is_flip               = self.declareParameter( name='Y_IS_FLIPPED',                 val_def='True',  type='bool' )
 
         # GUICCDSettings.py
-        self.ccdset_pixsize          = self.declareParameter( name='CCD_SETTINGS_PIXEL_SIZE',      val_def=0.1,   type='float' )
-        self.ccdset_adcsatu          = self.declareParameter( name='CCD_SETTINGS_ADC_SATTURATION', val_def=1000,  type='int' )
+        self.ccdset_pixsize          = self.declareParameter( name='CCD_SETTINGS_PIXEL_SIZE',      val_def=0.02,  type='float' )
+        self.ccdset_adcsatu          = self.declareParameter( name='CCD_SETTINGS_ADC_SATTURATION', val_def=65000, type='int' )
         self.ccdset_aduphot          = self.declareParameter( name='CCD_SETTINGS_ADU_PER_PHOTON',  val_def=10,    type='float' )
         self.ccdset_ccdeff           = self.declareParameter( name='CCD_SETTINGS_EFFICIENCY',      val_def=0.5,   type='float' )
         self.ccdset_ccdgain          = self.declareParameter( name='CCD_SETTINGS_GAIN',            val_def=1.0,   type='float' )

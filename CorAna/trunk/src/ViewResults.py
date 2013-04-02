@@ -663,9 +663,6 @@ class ViewResults :
             #print msg
         
         sp.g2_vs_itau_arr = np.array(g2_vs_itau)
-
-        print 'Results:\n', sp.get_formatted_table_of_results()
-        
         return sp.g2_vs_itau_arr
 
 
@@ -695,6 +692,13 @@ class ViewResults :
         
         return txt
 
+#-----------------------------
+
+    def print_table_of_results(sp) :
+        msg = sp.get_formatted_table_of_results()
+        #print msg
+        logger.info(msg, __name__)
+        
 #-----------------------------
 
     def bincount(sp, map_bins, map_weights=None, length=None) :

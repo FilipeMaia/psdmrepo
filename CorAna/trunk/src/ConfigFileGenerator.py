@@ -128,9 +128,9 @@ class ConfigFileGenerator :
                          'FNAME_DATA_RMS' : fnm.path_data_rms(),
                          'SAT_THR_ADU'    : str( cp.ccdset_adcsatu.value() ),
                          'SATPIX_MASK'    : fnm.path_satpix_mask(),
-                         'HOTPIX_MASK'    : '', # fnm.path_hotpix_mask(),
                          'SATPIX_FRAC'    : fnm.path_satpix_frac(),
-                         'HOTPIX_FRAC'    : fnm.path_hotpix_frac()
+                         'HOTPIX_MASK'    : '', # fnm.path_hotpix_mask(),
+                         'HOTPIX_FRAC'    : '' # fnm.path_hotpix_frac()
                          }
         # cp.ccdset_ccdgain.value()
         # cp.ccdset_ccdeff .value()

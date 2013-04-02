@@ -80,6 +80,7 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.tit_data          = QtGui.QLabel(u'Raw data (\u03C4):')  # tau = u"\u03C4"
         self.tit_calc          = QtGui.QLabel(u'Calc.(\u03C4):')
         self.tit_mask          = QtGui.QLabel('Masks:')
+        self.tit_save          = QtGui.QLabel('Save:')
         self.edi               = QtGui.QLineEdit( os.path.basename(cp.res_fname.value()) )        
         self.but               = QtGui.QPushButton('File')
         self.but_close         = QtGui.QPushButton('Close')
@@ -110,6 +111,7 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.but_mask_satpix   = QtGui.QPushButton('Satt. pixs')
         self.but_mask_roi      = QtGui.QPushButton('ROI')
         self.but_mask_total    = QtGui.QPushButton('Total')
+        self.but_print_res     = QtGui.QPushButton('g2(tau,<q>)')
 
         self.cbx_more = QtGui.QCheckBox('Show more', self)
         self.cbx_more.setChecked( cp.vc_cbx_show_more.value() )
@@ -170,6 +172,9 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.grid.addWidget(self.but_1oIp,         self.grid_row+7, 5)
         self.grid.addWidget(self.but_1oIf,         self.grid_row+7, 6)
 
+        self.grid.addWidget(self.tit_save,         self.grid_row+8, 0)
+        self.grid.addWidget(self.but_print_res,    self.grid_row+8, 1)
+
         self.grid_row += 8
 
         #self.connect(self.edi,         QtCore.SIGNAL('editingFinished()'),        self.onEdit )
@@ -205,6 +210,7 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.connect(self.sli,              QtCore.SIGNAL('valueChanged(int)'), self.onSlider  )
         self.connect(self.sli,              QtCore.SIGNAL('sliderReleased()'),  self.onSliderReleased )
         self.connect(self.cbx_more,         QtCore.SIGNAL('stateChanged(int)'), self.on_cbx ) 
+        self.connect(self.but_print_res,    QtCore.SIGNAL('clicked()'),         self.onSave ) 
   
         self.setLayout(self.grid)
 
@@ -252,12 +258,14 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.tit_part.setStyleSheet(cp.styleLabel)
         self.tit_data.setStyleSheet(cp.styleLabel)
         self.tit_calc.setStyleSheet(cp.styleLabel)
+        self.tit_save.setStyleSheet(cp.styleLabel)
 
         self.tit_mask.setAlignment (QtCore.Qt.AlignCenter)
         self.tit_geom.setAlignment (QtCore.Qt.AlignCenter)
         self.tit_part.setAlignment (QtCore.Qt.AlignCenter)
         self.tit_data.setAlignment (QtCore.Qt.AlignCenter)
         self.tit_calc.setAlignment (QtCore.Qt.AlignCenter)
+        self.tit_save.setAlignment (QtCore.Qt.AlignCenter)
         
         self.but_close        .setStyleSheet(cp.styleButtonBad)
         self.but_Ip           .setStyleSheet(cp.styleButton)
@@ -287,6 +295,7 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.but_mask_satpix  .setStyleSheet(cp.styleButton)
         self.but_mask_roi     .setStyleSheet(cp.styleButton)
         self.but_mask_total   .setStyleSheet(cp.styleButton)
+        self.but_print_res    .setStyleSheet(cp.styleButton)
 
         self.cbx_more         .setStyleSheet (cp.styleLabel)
  
@@ -459,6 +468,12 @@ class GUIViewControl ( QtGui.QWidget ) :
     def redrawPlot(self):
         self.setImgArray()
         cp.plotimgspe_g.set_image_array(self.arr2d, self.getTitle())
+
+
+    def onSave(self):
+        logger.debug('onSave', __name__)
+        if self.but_print_res   .hasFocus() : self.vr.print_table_of_results()
+
 
 
     def onButClose(self):

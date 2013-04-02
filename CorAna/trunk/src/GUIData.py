@@ -167,7 +167,7 @@ class GUIData ( QtGui.QWidget ) :
                                    '\n2) save time stamps' + \
                                    '\n3) save intensity monitors')
         self.but_aver  .setToolTip('1) Average image for selected event range' + \
-                                   '\n2) Evaluate hot and saturated pix masks')
+                                   '\n2) Evaluate saturated pixel mask')
         self.but_status.setToolTip('Print batch job status \nin the logger')
         self.but_remove.setToolTip('Remove all data work\nfiles for selected run')
         self.cbx_data  .setToolTip('Lock / unlock buttons and fields')
