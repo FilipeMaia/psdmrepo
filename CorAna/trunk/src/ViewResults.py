@@ -56,6 +56,18 @@ def polar2cart(r, phi) :
     y = r * np.sin(phi)
     return x, y
 
+def rotation(X, Y, C, S) :
+    """For numpy arrays X and Y returns the numpy arrays of Xrot and Yrot
+    """
+    Xrot = X*C - Y*S 
+    Yrot = X*S + Y*C 
+    return Xrot, Yrot
+
+def rotation_for_angle(X, Y, A) :
+    C = math.cos(A)
+    S = math.sin(A)
+    return rotation(X, Y, C, S)
+
 def valueToIndex(V,VRange) :
     Vmin, Vmax, Nbins = VRange
     factor = float(Nbins) / float(Vmax-Vmin)
@@ -224,6 +236,7 @@ class ViewResults :
     def evaluate_parameters(sp) :
         sp.wavelength   = 1.23984/sp.photon_energy # 1.23984 ? [nm]
         sp.factor       = 4*(math.pi/sp.wavelength)
+        sp.factor_rb    = 2*(math.pi/sp.wavelength)
         sp.distance_pix = sp.distance / sp.ccd_pixsize 
         
 #-----------------------------
@@ -370,6 +383,21 @@ class ViewResults :
 
 #-----------------------------
 
+    def get_xy_maps_wrt_reflected_plane(sp, tilt=None) :
+        """The x and y coordinate maps w.r.t. reflected plane (RP);
+        x - is a distance from image pixel to the RP (in Marcin's code d2POR)
+        y - axis along the intersection of the RP and detector
+        tilt - [radians] rotation angle
+        """
+        if tilt != None : angle = tilt
+        else            : dx, dy, dr, alpha, angle = sp.get_reflected_beam_geometry_pars()
+        x_map, y_map = sp.get_xy_maps()
+        x_map_rp, y_map_rp = rotation_for_angle(x_map, y_map, angle)
+
+        return x_map_rp, y_map_rp
+
+#-----------------------------
+
     def get_x_map(sp) :
         return sp.x_map
 
@@ -420,13 +448,59 @@ class ViewResults :
 
     def get_q_map_for_rb(sp) :
         """q map for REFLECTED BEAM geometry in specular experiments"""
-        theta_map = sp.get_theta_map_for_rb()
-        return sp.factor * np.sin(0.5*theta_map)
+
+        dx, dy, dr, alpha, tilt = sp.get_reflected_beam_geometry_pars()
+        x_map_rp, y_map_rp = sp.get_xy_maps_wrt_reflected_plane(tilt)
+
+        # All coordinates in PIXELS, alpha[rad]
+        d2POR           = x_map_rp
+        d_map           = y_map_rp
+        d2Beam0         = sp.get_r_map()
+        sample_detector = sp.distance_pix
+
+        # Below is almost original Marcin's code
+        # with isolated repeating evaluations for d2_map, l_map, sp.factor_rb
+        # np.arctan(y/x) -> np.arctan2(y,x)
+        
+        # in plane exit angle of each pixel (not true exit angle)
+        #d2_map = np.subtract(d2Beam0**2, d2POR**2)
+        inPlaneExitAngle = np.arctan2(d_map, sample_detector) - alpha
+        #inPlaneExitAngle = np.arctan(np.sqrt(d2_map)/ sample_detector) - alpha
+        
+        # distance of projected point (PPT) to sample
+        dPPt2Sample = np.sqrt(d_map**2 + sample_detector**2)
+        l_map  = np.multiply(dPPt2Sample, np.cos(inPlaneExitAngle))
+
+        # out of plane angle
+        outOfPlaneAngle = np.arctan2(d2POR, l_map)   
+
+        #outOfPlaneAngle = np.arctan(np.divide(d2POR, l_map))   
+        # true exit angle
+        exitAngle = np.multiply(np.sign(inPlaneExitAngle), np.arccos(np.divide(np.sqrt(np.add(d2POR**2, l_map**2)), np.sqrt(d2Beam0**2 + sample_detector**2))))
+
+        #qz = 2*math.pi/wavelength* np.add(np.sin(alpha), sin(exitAngle))
+        qx = math.cos(alpha) - np.multiply(np.cos(exitAngle), np.cos(outOfPlaneAngle))
+        qy = np.multiply(np.cos(exitAngle), np.sin(outOfPlaneAngle))              
+        qp = sp.factor_rb * np.sqrt(qx**2 + qy**2)
+
+        #print 'dx, dy, dr, alpha, tilt = ', dx, dy, dr, alpha, tilt
+        #print 'x_map_rp:\n', x_map_rp
+        #print 'y_map_rp:\n', y_map_rp
+        #print 'outOfPlaneAngle:\n', outOfPlaneAngle
+        #print 'outOfPlaneAngle.shape =', outOfPlaneAngle.shape
+        #print 'inPlaneExitAngle:\n', inPlaneExitAngle
+        #print 'exitAngle:\n', exitAngle
+        #print 'exitAngle.shape =', exitAngle.shape
+        #print 'qx:\n', qx
+        #print 'qp:\n', qp
+        
+        return qp    
 
 #-----------------------------
 
     def get_theta_map_for_rb(sp) :
-        """Evaluate theta scattering angle for REFLECTED BEAM geometry,
+        """ DEPRICATED
+        Evaluate theta scattering angle for REFLECTED BEAM geometry,
         using scalar product of two vectors:
         1) from IP to reflected beam center (dx, dy, sp.distance_pix),
         2) from IP to pixel                 (sp.x_map, sp.y_map, sp.distance_pix)
@@ -718,6 +792,7 @@ class ViewResults :
 
         if fname == None : sp.fname = cp.res_fname.value()
         else :             sp.fname = fname
+        logger.info('Use file with results:' + sp.fname, __name__) 
 
 #-----------------------------
 

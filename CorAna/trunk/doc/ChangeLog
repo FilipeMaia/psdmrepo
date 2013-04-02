@@ -11,6 +11,9 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2013-04-02 Mikhail S. Dubrovin
+- add correct q map for reflection geometry in ViewResults.py
+
 2013-04-01 Mikhail S. Dubrovin
 Tag: V00-00-12
 - in src/ConfigFileGenerator.py remove the file names for hot-pixel fraction 

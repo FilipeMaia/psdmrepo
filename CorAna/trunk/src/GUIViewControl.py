@@ -351,8 +351,9 @@ class GUIViewControl ( QtGui.QWidget ) :
 
 
     def initCorArray(self) :
+        #print 'initCorArray().set_file_name():'
         self.vr.set_file_name()
-
+        
 
     def setImgArray(self):
         t0 = gu.get_time_sec()

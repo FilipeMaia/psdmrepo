@@ -275,10 +275,10 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.bat_img_rec_mod   = self.declareParameter( name='BATCH_IMG_REC_MODULE',  val_def='ImgAlgos.PrincetonImageProducer',  type='str' )
 
         # BatchLogParser.py
-        self.bat_img_rows      = self.declareParameter( name='BATCH_IMG_ROWS',      val_def= -1,       type='int' )
-        self.bat_img_cols      = self.declareParameter( name='BATCH_IMG_COLS',      val_def= -1,       type='int' )
-        self.bat_img_size      = self.declareParameter( name='BATCH_IMG_SIZE',      val_def= -1,       type='int' )
-        self.bat_img_nparts    = self.declareParameter( name='BATCH_IMG_NPARTS',    val_def=  8,       type='int' )
+        self.bat_img_rows      = self.declareParameter( name='BATCH_IMG_ROWS',      val_def= 1300,       type='int' )
+        self.bat_img_cols      = self.declareParameter( name='BATCH_IMG_COLS',      val_def= 1340,       type='int' )
+        self.bat_img_size      = self.declareParameter( name='BATCH_IMG_SIZE',      val_def= 1300*1340,  type='int' )
+        self.bat_img_nparts    = self.declareParameter( name='BATCH_IMG_NPARTS',    val_def=  8,         type='int' )
 
         # GUIAnaSettingsLeft.py
         self.ana_type          = self.declareParameter( name='ANA_TYPE',              val_def='Static',type='str' )
