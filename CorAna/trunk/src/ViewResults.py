@@ -157,6 +157,10 @@ class ViewResults :
         sp.counts_dyna = None
         sp.q_average_dyna = None
 
+        sp.counts_stat_q = None
+        sp.q_average_stat_q = None
+        sp.intens_stat_q_vs_itau_arr = None
+
         sp.cor_arr = None
         sp.g2_vs_itau_arr = None
         sp.mask_total = None
@@ -554,13 +558,45 @@ class ViewResults :
 
 
     def get_counts_for_stat_bins(sp) :
-        """Returns array with the number of pixels for each statis q-phi bin.
+        """Returns array with the number of pixels for each static q-phi bin.
            Bins reserved for overflow contain zeros due to mask.
         """
         if sp.counts_stat != None : return sp.counts_stat
         weights = sp.get_mask_total() # Apply mask for bin counts
         sp.counts_stat = sp.bincount(sp.get_q_phi_map_for_stat_bins(), weights, length=sp.npart_stat)
         return sp.counts_stat
+
+
+    def get_counts_for_stat_q_bins(sp) :
+        """Returns array with the number of pixels for each static q bin.
+           Bins reserved for overflow contain zeros due to mask.
+        """
+        if sp.counts_stat_q != None : return sp.counts_stat_q
+        weights = sp.get_mask_total() # Apply mask for bin counts
+        sp.counts_stat_q = sp.bincount(sp.get_q_map_for_stat_bins(), weights, length=sp.ana_stat_part_q+1 )
+        return sp.counts_stat_q
+
+
+    def get_q_average_for_stat_q_bins(sp) :
+        if sp.q_average_stat_q != None : return sp.q_average_stat_q
+
+        q_map_masked        = sp.get_q_map() * sp.get_mask_total()
+        sum_q_stat          = sp.bincount(sp.get_q_map_for_stat_bins(), q_map_masked, length=sp.ana_stat_part_q+1)
+        counts_stat_q       = sp.get_counts_for_stat_q_bins()
+        counts_stat_q_prot  = np.select([counts_stat_q<=0], [-1], counts_stat_q)
+        sp.q_average_stat_q = np.select([counts_stat_q_prot<0], [0], default=sum_q_stat/counts_stat_q_prot)
+        #print 'sp.ana_stat_part_q, sp.q_average_stat_q.shape=', sp.ana_stat_part_q, sp.q_average_stat_q.shape
+        return sp.q_average_stat_q
+
+
+    def print_q_average_for_stat_q_bins(sp) :
+        q_ave = sp.get_q_average_for_stat_q_bins()
+        msg = '<q> for static q bins:\n'
+        msg += str(q_ave)
+        #for i, q in enumerate(q_ave) :
+        #    msg += '   q(%3d)=%10.4f \n' % (i, q) 
+        logger.info(msg, __name__)
+        #print msg
 
 #-----------------------------
 
@@ -661,7 +697,7 @@ class ViewResults :
 #-----------------------------
 
     def get_norm_factor_map_masked_for_stat_bins(sp, intens_map) :
-        """Apply mask to the input and output mask to get correct normalization and output, respectively."""
+        """Apply mask to the input and output img-array to get correct normalization and output, respectively."""
         intens_map_masked = intens_map * sp.get_mask_total() # Apply mask for bin counts
         norm_factor_map = sp.get_norm_factor_map_for_stat_bins(intens_map_masked)
         return norm_factor_map * sp.get_mask_total() # Apply mask for intensity map
@@ -682,6 +718,52 @@ class ViewResults :
         norm_facotr_map = np.array([normf[i] for i in q_phi_map_stat]) # WORKS! # 0.24sec
         norm_facotr_map.shape = (sp.rows,sp.cols)        
         return norm_facotr_map # sp.get_random_img()
+
+#-----------------------------
+
+    def get_Ip_for_stat_q_bins_itau(sp, itau) :
+        """Returns the <Ip> averaged over statis q bins."""
+        return sp.get_intens_masked_for_stat_q_bins(sp.get_Ip_for_itau(itau))
+
+
+    def get_intens_masked_for_stat_q_bins(sp, intens_map) :
+        """Apply mask to the input img-array to get correct averaging."""
+        return sp.get_intens_for_stat_q_bins(intens_map * sp.get_mask_total())
+
+
+    def get_intens_for_stat_q_bins(sp, intens_map) :
+        q_map_stat = sp.get_q_map_for_stat_bins()
+        counts = sp.get_counts_for_stat_q_bins()
+        # print 'counts = ', counts
+        intens = sp.bincount(q_map_stat, intens_map, sp.ana_stat_part_q+1)
+        counts_prot = np.select([counts<=0.], [-1.], default=counts)
+        intens_aver = np.select([counts_prot<=0.], [0.], default=intens/counts_prot)
+        return intens_aver
+
+#-----------------------------
+
+    def get_intens_stat_q_bins_vs_itau_arr(sp) :
+        if sp.intens_stat_q_vs_itau_arr != None : return sp.intens_stat_q_vs_itau_arr        
+        sp.list_of_tau = sp.get_list_of_tau_from_file(fnm.path_cora_merge_tau())
+        logger.info('Begin processing for I (<q>) vs tau array', __name__)
+
+        I_stat_q_vs_itau = []
+
+        for itau, tau in enumerate(sp.list_of_tau) :
+            I_stat_q = sp.get_Ip_for_stat_q_bins_itau(itau) [:sp.ana_stat_part_q]
+            I_stat_q_vs_itau.append( I_stat_q )
+
+            msg = ': itau=%3d  tau=%4d  I=%10.4f' \
+                  % (itau, tau, np.array(I_stat_q).mean()) 
+            logger.info(msg, __name__)
+            #print msg
+        
+        sp.intens_stat_q_vs_itau_arr = np.array(I_stat_q_vs_itau)
+
+        #q_average = sp.get_q_average_for_stat_q_bins() [:sp.ana_stat_part_q]
+        sp.print_q_average_for_stat_q_bins()
+
+        return sp.intens_stat_q_vs_itau_arr
 
 #-----------------------------
 
@@ -738,7 +820,6 @@ class ViewResults :
         
         sp.g2_vs_itau_arr = np.array(g2_vs_itau)
         return sp.g2_vs_itau_arr
-
 
 #-----------------------------
 
