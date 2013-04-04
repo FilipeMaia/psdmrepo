@@ -437,8 +437,9 @@ class ViewResults :
         """Select between DIRECT and REFLECTED beam geometry here
         """
         if sp.q_map != None : return sp.q_map
-        if cp.exp_setup_geom.value() == 'Specular' : sp.q_map = sp.get_q_map_for_rb()
-        else                                       : sp.q_map = sp.get_q_map_for_db()
+        sp.q_map = sp.get_q_map_for_db()
+        #if cp.exp_setup_geom.value() == 'Specular' : sp.q_map = sp.get_q_map_for_rb()
+        #else                                       : sp.q_map = sp.get_q_map_for_db()
         return sp.q_map
 
 #-----------------------------
@@ -480,7 +481,9 @@ class ViewResults :
 
         #outOfPlaneAngle = np.arctan(np.divide(d2POR, l_map))   
         # true exit angle
-        exitAngle = np.multiply(np.sign(inPlaneExitAngle), np.arccos(np.divide(np.sqrt(np.add(d2POR**2, l_map**2)), np.sqrt(d2Beam0**2 + sample_detector**2))))
+        exitAngle = np.multiply(np.sign(inPlaneExitAngle), \
+                                np.arccos(np.divide(np.sqrt(np.add(d2POR**2, l_map**2)), \
+                                                    np.sqrt(d2Beam0**2 + sample_detector**2))))
 
         #qz = 2*math.pi/wavelength* np.add(np.sin(alpha), sin(exitAngle))
         qx = math.cos(alpha) - np.multiply(np.cos(exitAngle), np.cos(outOfPlaneAngle))
@@ -525,6 +528,18 @@ class ViewResults :
 #-----------------------------
 #-----------------------------
 #-----------------------------
+
+    def get_and_save_map_for_stat_q_bins(sp) :
+        sp.save_map_for_stat_q_bins_in_file()
+        return sp.get_q_map_for_stat_bins()
+
+
+    def save_map_for_stat_q_bins_in_file(sp) :
+        q_map_stat = sp.get_q_map_for_stat_bins()
+        path = fnm.path_cora_split_map_static_q()
+        logger.info('Save map for static q bins in file: ' + path, __name__)            
+        np.savetxt(path, q_map_stat, fmt='%3i', delimiter=' ')
+
 
     def get_q_map_for_stat_bins(sp) :
         """Returns the map of indexes for static q bins.

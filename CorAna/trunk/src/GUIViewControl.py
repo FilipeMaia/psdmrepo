@@ -378,7 +378,7 @@ class GUIViewControl ( QtGui.QWidget ) :
         elif self.g_ind == 7  : self.arr2d = self.vr.get_phi_map()
         elif self.g_ind == 8  : self.arr2d = self.vr.get_q_map()
         elif self.g_ind == 9  : self.arr2d = self.vr.get_phi_map_for_stat_bins()
-        elif self.g_ind == 10 : self.arr2d = self.vr.get_q_map_for_stat_bins()
+        elif self.g_ind == 10 : self.arr2d = self.vr.get_and_save_map_for_stat_q_bins() # self.vr.get_q_map_for_stat_bins()
         elif self.g_ind == 11 : self.arr2d = self.vr.get_phi_map_for_dyna_bins()
         elif self.g_ind == 12 : self.arr2d = self.vr.get_q_map_for_dyna_bins()
         elif self.g_ind == 13 : self.arr2d = self.vr.get_q_phi_map_for_stat_bins()

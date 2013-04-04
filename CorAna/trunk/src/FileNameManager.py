@@ -116,6 +116,10 @@ class FileNameManager :
     def path_prefix_data(self) :
         return self.path_prefix() + self.str_exp_run_data()
 
+    def path_prefix_cora(self) :
+        #return cp.dir_work.value() + '/' + cp.fname_prefix_cora.value() 
+        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + 'cora'
+
 #-----------------------------
 
     def path_blem(self) :
@@ -152,10 +156,11 @@ class FileNameManager :
 #-----------------------------
 
     def path_hotpix_frac(self) :
-        return  self.path_prefix() + self.str_exp_run_dark() + 'hotpix-frac.txt'
+        return self.path_prefix() + self.str_exp_run_dark() + 'hotpix-frac.txt'
 
     def path_hotpix_mask(self) :
-        return  self.path_prefix() + self.str_exp_run_dark() + 'hotpix-mask.txt'
+        return self.path_prefix() + self.str_exp_run_dark() + 'hotpix-mask-thr-' \
+               + str(cp.mask_hot_thr.value()) + 'ADU.txt'
 
     def path_hotpix_mask_prefix(self) :
         return os.path.splitext(self.path_hotpix_mask())[0]
@@ -166,10 +171,12 @@ class FileNameManager :
 #-----------------------------
 
     def path_satpix_frac(self) :
-        return  self.path_prefix() + self.str_exp_run_data() + 'satpix-frac.txt' 
+        return self.path_prefix() + self.str_exp_run_data() + 'satpix-frac-level-' \
+               + str(cp.ccdset_adcsatu.value()) + 'ADU.txt' 
 
     def path_satpix_mask(self) :
-        return  self.path_prefix() + self.str_exp_run_data() + 'satpix-mask.txt' 
+        return self.path_prefix() + self.str_exp_run_data() + 'satpix-mask-level-' \
+               + str(cp.ccdset_adcsatu.value()) + 'ADU.txt' 
 
     def path_satpix_mask_prefix(self) :
         return os.path.splitext(self.path_satpix_mask())[0]
@@ -256,9 +263,6 @@ class FileNameManager :
 
 #-----------------------------
 
-    def path_prefix_cora(self) :
-        return cp.dir_work.value() + '/' + cp.fname_prefix_cora.value() 
-
     def path_cora_split_psana_cfg(self) :
         return self.path_prefix_cora() + '-' + self.str_exp_run_data() + 'split.cfg'
 
@@ -280,15 +284,17 @@ class FileNameManager :
     def path_cora_split_files(self) :
         return self.path_prefix_cora() + '-' + self.str_run_data() + 'b*.txt'
 
+    def path_cora_split_map_static_q(self) :
+        return self.path_prefix_cora() + '-' + self.str_run_data() + 'map-static-q.txt'
 
+    def path_cora_split_int_static_q(self) :
+        return self.path_prefix_cora() + '-' + self.str_run_data() + 'int-static-q.txt'
 
     def path_cora_proc_tau_in(self) :
         return self.path_prefix_cora() + '-' + self.str_run_data() + 'tau-in.txt'
 
     def path_cora_proc_tau_out(self) :
         return self.path_prefix_cora() + '-' + self.str_run_data() + 'tau.txt'
-
-
 
     def path_cora_merge_tau(self) :
         return self.path_cora_proc_tau_out()
@@ -317,6 +323,7 @@ class FileNameManager :
     def get_list_of_files_cora_split_all(self) :
         return self.get_list_of_files_cora_split() + \
                self.get_list_of_files_cora_split_work()
+               #self.get_list_of_files_cora_split_intensity()
 
     def  get_list_of_files_cora_split(self) :
         self.list_of_files_cora_split = []
@@ -328,8 +335,13 @@ class FileNameManager :
         self.list_of_files_cora_split.append(fnm.path_cora_split_time_ind())
         #self.list_of_files_cora_split.append(fnm.path_cora_split_files())
         #self.list_of_files_cora_split.append(fnm.)
-
         return self.list_of_files_cora_split
+
+    def  get_list_of_files_cora_split_intensity(self) :
+        self.list_of_files_cora_split_intensity = []
+        self.list_of_files_cora_split_intensity.append(fnm.path_cora_split_map_static_q())
+        self.list_of_files_cora_split_intensity.append(fnm.path_cora_split_int_static_q())
+        return self.list_of_files_cora_split_intensity
 
 #-----------------------------
 

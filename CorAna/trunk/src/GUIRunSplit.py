@@ -134,7 +134,7 @@ class GUIRunSplit ( QtGui.QWidget ) :
 
     def makeTable(self):
         """Makes the table for the list of output and log files"""
-        self.table = QtGui.QTableWidget(self.nparts+5, 4, self)
+        self.table = QtGui.QTableWidget(self.nparts+8, 4, self)
         self.table.setHorizontalHeaderLabels(['File', 'Exists?', 'Creation time', 'Size(Byte)'])
         #self.table.setVerticalHeaderLabels([''])
 
@@ -148,9 +148,11 @@ class GUIRunSplit ( QtGui.QWidget ) :
 
         self.row = -1
         self.list_of_items = []
-        self.list_of_files = fnm.get_list_of_files_cora_split_all()
+        self.list_of_files = fnm.get_list_of_files_cora_split_all() \
+                           + fnm.get_list_of_files_cora_split_intensity()
 
         for i, fname in enumerate(self.list_of_files) :
+            #print fname
 
             file_exists = os.path.exists(fname)
             item_fname  = QtGui.QTableWidgetItem( os.path.basename(fname) )
@@ -304,7 +306,8 @@ class GUIRunSplit ( QtGui.QWidget ) :
             self.but_brow.setStyleSheet(cp.styleButtonBad)
         except :
             self.but_brow.setStyleSheet(cp.styleButtonGood)
-            cp.guifilebrowser = GUIFileBrowser(None, fnm.get_list_of_files_cora_split(), \
+            cp.guifilebrowser = GUIFileBrowser(None, fnm.get_list_of_files_cora_split() +\
+                                               fnm.get_list_of_files_cora_split_intensity(), \
                                                fnm.path_cora_split_psana_cfg())
             cp.guifilebrowser.move(cp.guimain.pos().__add__(QtCore.QPoint(720,120)))
             cp.guifilebrowser.show()

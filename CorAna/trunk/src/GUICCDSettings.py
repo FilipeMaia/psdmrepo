@@ -51,6 +51,7 @@ class GUICCDSettings ( QtGui.QWidget ) :
         self.tit_ccdset_aduphot = QtGui.QLabel('ADU per photon')
         self.tit_ccdset_ccdeff  = QtGui.QLabel('CCD efficiency')
         self.tit_ccdset_ccdgain = QtGui.QLabel('CCD gain')
+        self.tit_mask_hot       = QtGui.QLabel('Hot pix mask thr. on RMS [ADU]:')
 
         self.edi_ccdset_pixsize = QtGui.QLineEdit( str( cp.ccdset_pixsize.value() ) )        
         self.edi_ccdset_adcsatu = QtGui.QLineEdit( str( cp.ccdset_adcsatu.value() ) )        
@@ -59,7 +60,8 @@ class GUICCDSettings ( QtGui.QWidget ) :
         self.edi_ccdset_ccdgain = QtGui.QLineEdit( str( cp.ccdset_ccdgain.value() ) )        
 
         self.edi_mask_hot       = QtGui.QLineEdit( str( cp.mask_hot_thr.value() ) )        
-        self.cbx_mask_hot       = QtGui.QCheckBox('Use hot pix mask; thr. on RMS [ADU]:', self)
+        #self.cbx_mask_hot       = QtGui.QCheckBox('Use hot pix mask', self)
+        self.cbx_mask_hot       = QtGui.QCheckBox('', self)
         self.cbx_mask_hot.setChecked( cp.mask_hot_is_used.value() )
 
         self.tit_orient = QtGui.QLabel('CCD orientation [deg]:')
@@ -85,11 +87,12 @@ class GUICCDSettings ( QtGui.QWidget ) :
         self.grid.addWidget(self.edi_ccdset_ccdeff ,       self.grid_row+5, 4)
         self.grid.addWidget(self.edi_ccdset_ccdgain,       self.grid_row+6, 4)
 
-        self.grid.addWidget(self.cbx_mask_hot,             self.grid_row+7, 1)
+        self.grid.addWidget(self.tit_mask_hot,             self.grid_row+7, 1)
         self.grid.addWidget(self.edi_mask_hot,             self.grid_row+7, 4)
+        self.grid.addWidget(self.cbx_mask_hot,             self.grid_row+7, 0)
 
-        self.grid.addWidget(self.tit_orient,               self.grid_row+8, 1, 1, 3)
-        self.grid.addWidget(self.box_orient,               self.grid_row+8, 4)
+        self.grid.addWidget(self.tit_orient,               self.grid_row+9, 1, 1, 3)
+        self.grid.addWidget(self.box_orient,               self.grid_row+9, 4)
 
         self.vbox = QtGui.QVBoxLayout()
         self.vbox.addLayout(self.grid)
@@ -122,8 +125,10 @@ class GUICCDSettings ( QtGui.QWidget ) :
         self.edi_ccdset_aduphot.setToolTip(msg)
         self.edi_ccdset_ccdeff .setToolTip(msg)
         self.edi_ccdset_ccdgain.setToolTip(msg)
-        self.cbx_mask_hot.setToolTip('On/off hot pixel mask')
-        self.edi_mask_hot.setToolTip('Threshold (ADU) on RMS for hot pixels')
+        self.tit_mask_hot.setToolTip('Hot pixel mask is generated \nat pedestals evaluation \nusing threshold on RMS '\
+                                     + str(cp.mask_hot_thr.value()) + ' ADU')
+        self.cbx_mask_hot.setToolTip('On/off hot pixel mask\nin the final analysis')
+        self.edi_mask_hot.setToolTip('Threshold [ADU] on RMS for hot pixels')
 
     def setFrame(self):
         self.frame = QtGui.QFrame(self)
@@ -144,6 +149,7 @@ class GUICCDSettings ( QtGui.QWidget ) :
         self.tit_ccdset_aduphot.setStyleSheet (cp.styleLabel)
         self.tit_ccdset_ccdeff .setStyleSheet (cp.styleLabel)
         self.tit_ccdset_ccdgain.setStyleSheet (cp.styleLabel)
+        self.tit_mask_hot      .setStyleSheet (cp.styleLabel)
         self.cbx_mask_hot      .setStyleSheet (cp.styleLabel)
 
         self.edi_ccdset_pixsize.setStyleSheet(cp.styleEdit)

@@ -218,7 +218,7 @@ class GUIListOfTau ( QtGui.QWidget ) :
         except :
             cp.guifilebrowser = GUIFileBrowser(None, \
                                                [fnm.path_tau_list(), fnm.path_cora_proc_tau_in(), fnm.path_cora_merge_tau()], \
-                                               fnm.path_tau_list(), is_editable=True)
+                                                fnm.path_tau_list(), is_editable=True)
             try    : cp.guifilebrowser.move(cp.guimain.pos().__add__(QtCore.QPoint(720,120)))
             except : cp.guifilebrowser.move(QtCore.QPoint(300,120))
             cp.guifilebrowser.show()

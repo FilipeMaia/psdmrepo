@@ -85,12 +85,15 @@ class ConfigFileGenerator :
                          'FNAME_PEDS_RMS' : fnm.path_pedestals_rms()
                          }
 
-        if cp.mask_hot_is_used.value() : 
-            self.d_subs['FNAME_HOTPIX_MASK'   ] = fnm.path_hotpix_mask()
-            self.d_subs['HOTPIX_THRESHOLD_ADU'] = str( cp.mask_hot_thr.value() )
-        else :
-            self.d_subs['FNAME_HOTPIX_MASK'   ] = ''
-            self.d_subs['HOTPIX_THRESHOLD_ADU'] = '10000'
+        self.d_subs['FNAME_HOTPIX_MASK'   ] = fnm.path_hotpix_mask()
+        self.d_subs['HOTPIX_THRESHOLD_ADU'] = str( cp.mask_hot_thr.value() )
+
+        #if cp.mask_hot_is_used.value() : 
+        #    self.d_subs['FNAME_HOTPIX_MASK'   ] = fnm.path_hotpix_mask()
+        #    self.d_subs['HOTPIX_THRESHOLD_ADU'] = str( cp.mask_hot_thr.value() )
+        #else :
+        #    self.d_subs['FNAME_HOTPIX_MASK'   ] = ''
+        #    self.d_subs['HOTPIX_THRESHOLD_ADU'] = '10000'
 
         self.print_substitution_dict()
         self.make_cfg_file()
@@ -179,6 +182,14 @@ class ConfigFileGenerator :
             self.d_subs['DO_CONST_THR'  ] = 'false'
             self.d_subs['THRESHOLD_NRMS'] = '0'
             self.d_subs['FNAME_PEDS_RMS'] = ''
+
+
+        if os.path.lexists( fnm.path_cora_split_map_static_q() ) :
+            self.d_subs['FNAME_MAP_BINS' ] = fnm.path_cora_split_map_static_q()
+        else :
+            self.d_subs['FNAME_MAP_BINS' ] = ''            
+        self.d_subs['FNAME_INT_BINS' ]     = fnm.path_cora_split_int_static_q()
+        self.d_subs['NUMBER_OF_BINS' ]     = str( cp.ana_stat_part_q.value() )
 
         self.print_substitution_dict()
         self.make_cfg_file()

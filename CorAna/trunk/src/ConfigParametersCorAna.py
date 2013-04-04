@@ -182,7 +182,7 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.dir_work          = self.declareParameter( name='DIRECTORY_WORK',        val_def='./work',       type='str' )
         self.dir_results       = self.declareParameter( name='DIRECTORY_RESULTS',     val_def='./results',    type='str' )
         self.fname_prefix      = self.declareParameter( name='FILE_NAME_PREFIX',      val_def='cora-',        type='str' )
-        self.fname_prefix_cora = self.declareParameter( name='FILE_NAME_PREFIX_CORA', val_def='cora-proc',    type='str' )
+        #self.fname_prefix_cora = self.declareParameter( name='FILE_NAME_PREFIX_CORA', val_def='cora-proc',    type='str' )
 
         # GUIDark.py
         self.use_dark_xtc_all  = self.declareParameter( name='USE_DARK_XTC_ALL_CHUNKS', val_def=True,  type='bool' )
@@ -294,7 +294,7 @@ class ConfigParametersCorAna ( ConfigParameters ) :
         self.ana_dyna_part_phi = self.declareParameter( name='ANA_DYNAMIC_PARTITION_PHI', val_def='3',type='str' )
 
         self.ana_mask_type     = self.declareParameter( name='ANA_MASK_TYPE',             val_def='no-mask',type='str' )
-        self.ana_mask_fname    = self.declareParameter( name='ANA_MASK_FILE',             val_def='roi-mask.txt',type='str' )
+        self.ana_mask_fname    = self.declareParameter( name='ANA_MASK_FILE',             val_def='mask-roi.txt',type='str' )
         self.ana_mask_dname    = self.declareParameter( name='ANA_MASK_DIRECTORY',        val_def='.',type='str' )
 
         # GUIListOfTau.py
