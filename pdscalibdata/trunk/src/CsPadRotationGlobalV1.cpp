@@ -3,7 +3,7 @@
 // 	$Id$
 //
 // Description:
-//	Class CalibParsOffsetV1...
+//	Class CsPadRotationGlobalV1...
 //
 // Author List:
 //      Mikhail S. Dubrovin
@@ -13,7 +13,7 @@
 //-----------------------
 // This Class's Header --
 //-----------------------
-#include "pdscalibdata/CalibParsOffsetV1.h"
+#include "pdscalibdata/CsPadRotationGlobalV1.h"
 
 //-----------------
 // C/C++ Headers --
@@ -40,50 +40,46 @@ namespace pdscalibdata {
 //----------------
 // Constructors --
 //----------------
-CalibParsOffsetV1::CalibParsOffsetV1 ()
+CsPadRotationGlobalV1::CsPadRotationGlobalV1 ()
 {
-  double arr_x[] = { 0,    0,  820,  820 };
-  double arr_y[] = { 0,  820,  820,    0 };
-  double arr_z[] = { 0,    0,    0,    0 };
-  memcpy( &m_offset_x[0], &arr_x[0], sizeof( double ) * NQuad );
-  memcpy( &m_offset_y[0], &arr_y[0], sizeof( double ) * NQuad );
-  memcpy( &m_offset_z[0], &arr_z[0], sizeof( double ) * NQuad );
+  double arr[] = {  0,   0,  270,  270,  180,  180,  270,  270,
+                   90,  90,    0,    0,  270,  270,    0,    0,
+                  180, 180,   90,   90,    0,    0,   90,   90,
+                  270, 270,  180,  180,   90,   90,  180,  180 };
+  memcpy( &m_rotation, &arr[0], sizeof( double ) * NQuad * NSect );
 }
 
 //----------------
 
-CalibParsOffsetV1::CalibParsOffsetV1( const std::vector<double>& v_parameters )
+CsPadRotationGlobalV1::CsPadRotationGlobalV1( const std::vector<double> v_parameters )
 {
     if (v_parameters.size() != NUMBER_OF_PARAMETERS) {
-        WithMsgLog("CalibParsOffsetV1", error, str) {
+        WithMsgLog("CsPadRotationGlobalV1", error, str) {
         str << "Expected number of parameters is " << NUMBER_OF_PARAMETERS ;
         str << ", read from file " << v_parameters.size() ;
         str << ": check the file.\n" ;
         }       
         abort();
     }
-    size_t NPars    = NQuad;
-    size_t arr_size = sizeof( double ) * v_parameters.size()/3;
-    memcpy( &m_offset_x, &v_parameters[0],       arr_size );
-    memcpy( &m_offset_y, &v_parameters[NPars],   arr_size );
-    memcpy( &m_offset_z, &v_parameters[NPars*2], arr_size );
+    size_t arr_size = sizeof( double ) * v_parameters.size();
+    memcpy( &m_rotation, &v_parameters[0], arr_size );
     //this->print();
 }
 
-void CalibParsOffsetV1::print()
+void CsPadRotationGlobalV1::print()
 {
-  cout << endl;  
-  cout << "Quad offset X:"; for( int q=0; q<NQuad; ++q ) {cout << "  " << m_offset_x[q];} cout << endl;
-  cout << "Quad offset Y:"; for( int q=0; q<NQuad; ++q ) {cout << "  " << m_offset_y[q];} cout << endl;
-  cout << "Quad offset Z:"; for( int q=0; q<NQuad; ++q ) {cout << "  " << m_offset_z[q];} cout << endl;
+  cout << endl << "Rotation global:" << endl;  
+  for( int quad=0; quad<NQuad; ++quad ) {
+    for( int sect=0; sect<NSect; ++sect ) { cout << "  " << m_rotation[quad][sect]; }
+    cout << endl;
+  }
 }
 
 //----------------
-
 //--------------
 // Destructor --
 //--------------
-CalibParsOffsetV1::~CalibParsOffsetV1 ()
+CsPadRotationGlobalV1::~CsPadRotationGlobalV1 ()
 {
 }
 

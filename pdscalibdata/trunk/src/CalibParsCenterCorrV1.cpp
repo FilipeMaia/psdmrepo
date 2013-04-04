@@ -70,7 +70,8 @@ CalibParsCenterCorrV1::CalibParsCenterCorrV1( const std::vector<double> v_parame
 
 void CalibParsCenterCorrV1::print()
 {
-  cout << endl << "X:" << endl;  
+  cout << endl << "Center correction:" << endl;  
+  cout << "X:" << endl;  
   for( int quad=0; quad<NQuad; ++quad ) {
     for( int sect=0; sect<NSect; ++sect ) { cout << "  " << m_center_corr_x[quad][sect]; }
     cout << endl;

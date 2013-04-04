@@ -11,13 +11,17 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-05
+2013-04-03 Mikhail Dubrovin
+- add new calibraion data classes: CsPadCenterGlobalV1 and CsPadRotationGlobalV1
+	
 Tag: V00-04-04
 2013-03-09 Mikhail Dubrovin
 - in CsPad2x2CenterV1 and CsPad2x2TiltV1 improve print()
 
 Tag: V00-04-03
 2013-03-08 Mikhail Dubrovin
-- add new calibraion data classes:  CsPad2x2CenterV1 and CsPad2x2TiltV1
+- add new calibraion data classes: CsPad2x2CenterV1 and CsPad2x2TiltV1
 
 Tag: V00-04-02
 2013-03-02 Andy Salnikov

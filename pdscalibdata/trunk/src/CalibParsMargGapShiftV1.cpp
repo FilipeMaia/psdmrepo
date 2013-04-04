@@ -96,8 +96,8 @@ CalibParsMargGapShiftV1::CalibParsMargGapShiftV1( const std::vector<double> v_pa
 
 void CalibParsMargGapShiftV1::print()
 {
-  cout << endl 
-       << "Quad margine X,Y,Z:"
+  cout << endl << "Margins Gaps Shifts:" << endl;  
+  cout << "Quad margine X,Y,Z:"
        << "  " << m_quad_marg_x
        << "  " << m_quad_marg_y
        << "  " << m_quad_marg_z
