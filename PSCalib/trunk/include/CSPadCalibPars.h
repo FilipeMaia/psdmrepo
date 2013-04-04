@@ -40,6 +40,8 @@
 #include "pdscalibdata/CalibParsQuadTiltV1.h"    
 #include "pdscalibdata/CsPadBeamVectorV1.h"    
 #include "pdscalibdata/CsPadBeamIntersectV1.h"    
+#include "pdscalibdata/CsPadCenterGlobalV1.h"      
+#include "pdscalibdata/CsPadRotationGlobalV1.h"    
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -184,6 +186,12 @@ public:
   static double getColUmToPix()   { return 1./getColSize_um(); } // conversion factor of um to pixels for columns 
   static double getOrtUmToPix()   { return 1.; }                 // conversion factor of um to pixels for ort
 
+  double getCenterGlobalX(size_t quad, size_t sect){ return m_center_global -> getCenterX(quad,sect); };
+  double getCenterGlobalY(size_t quad, size_t sect){ return m_center_global -> getCenterY(quad,sect); };
+  double getCenterGlobalZ(size_t quad, size_t sect){ return m_center_global -> getCenterZ(quad,sect); };
+
+  double getRotationGlobal(size_t quad, size_t sect) { return m_rotation_global -> getRotation(quad,sect); };
+
 private:
 
   // Copy constructor and assignment are disabled by default
@@ -234,6 +242,8 @@ private:
   pdscalibdata::CalibParsQuadTiltV1     *m_quad_tilt;   
   pdscalibdata::CsPadBeamVectorV1       *m_beam_vector;   
   pdscalibdata::CsPadBeamIntersectV1    *m_beam_intersect;   
+  pdscalibdata::CsPadCenterGlobalV1     *m_center_global;
+  pdscalibdata::CsPadRotationGlobalV1   *m_rotation_global;    
 
 };
 

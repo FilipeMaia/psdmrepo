@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-08
+2013-04-03 Mikhail S. Dubrovin
+- add two new calib types for center_global and rotation_global
+	
 Tag: V00-01-07
 2013-03-13 Mikhail S. Dubrovin
 - for CSPad2x2CalibPars return backward compatible method containing std::string m_str_src in order to run test/ex_cspad2x2_calib_pars.cpp

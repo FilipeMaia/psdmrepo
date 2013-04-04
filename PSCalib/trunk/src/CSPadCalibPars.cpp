@@ -116,6 +116,8 @@ void CSPadCalibPars::fillCalibNameVector ()
     v_calibname.push_back("quad_tilt");
     v_calibname.push_back("beam_vector");
     v_calibname.push_back("beam_intersect");
+    v_calibname.push_back("center_global");
+    v_calibname.push_back("rotation_global");
 }
 
 //----------------
@@ -215,6 +217,8 @@ void CSPadCalibPars::fillCalibParsV1 ()
   else if( m_cur_calibname == v_calibname[8] ) m_quad_tilt      = new pdscalibdata::CalibParsQuadTiltV1(v_parameters);
   else if( m_cur_calibname == v_calibname[9] ) m_beam_vector    = new pdscalibdata::CsPadBeamVectorV1(v_parameters);
   else if( m_cur_calibname == v_calibname[10]) m_beam_intersect = new pdscalibdata::CsPadBeamIntersectV1(v_parameters);
+  else if( m_cur_calibname == v_calibname[11]) m_center_global  = new pdscalibdata::CsPadCenterGlobalV1(v_parameters);
+  else if( m_cur_calibname == v_calibname[12]) m_rotation_global= new pdscalibdata::CsPadRotationGlobalV1(v_parameters);
 }
 
 //----------------
@@ -234,6 +238,8 @@ void CSPadCalibPars::fillDefaultCalibParsV1 ()
   else if( m_cur_calibname == v_calibname[8] ) m_quad_tilt      = new pdscalibdata::CalibParsQuadTiltV1();
   else if( m_cur_calibname == v_calibname[9] ) m_beam_vector    = new pdscalibdata::CsPadBeamVectorV1();
   else if( m_cur_calibname == v_calibname[10]) m_beam_intersect = new pdscalibdata::CsPadBeamIntersectV1();
+  else if( m_cur_calibname == v_calibname[11]) m_center_global  = new pdscalibdata::CsPadCenterGlobalV1();
+  else if( m_cur_calibname == v_calibname[12]) m_rotation_global= new pdscalibdata::CsPadRotationGlobalV1();
 
   else fatalMissingFileName ();
 }
@@ -284,6 +290,8 @@ void CSPadCalibPars::printCalibPars()
      m_quad_tilt      -> print();
      m_beam_vector    -> print();
      m_beam_intersect -> print();
+     m_center_global  -> print();
+     m_rotation_global-> print();
 }
 
 //----------------
