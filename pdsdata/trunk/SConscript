@@ -19,16 +19,57 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 # giving some or all parameters.
 #
 
-pdsdata_ver = "6.7.0"
-PREFIX = pjoin('$SIT_EXTERNAL_SW', "pdsdata", pdsdata_ver)
-BINDIR = "bin"
-LIBDIR = "lib"
-INCDIR = "pdsdata"
-PKGLIBS = """
-acqdata andordata bld camdata compressdata controldata cspad2x2data cspaddata 
-encoderdata epics evrdata fccddata fexampdata flidata gsc16aidata indexdata 
-ipimbdata lusidata oceanopticsdata opal1kdata orcadata phasicsdata pnccddata 
-princetondata pulnixdata quartzdata timepixdata usdusbdata xampsdata xtcdata
-"""
 
+pdsdata_ver = '6.7.0'
+PREFIX = pjoin('$SIT_EXTERNAL_SW', 'pdsdata', pdsdata_ver)
+
+# pdsdata package will link all the stuff, but only includes one
+# library into the build
+BINDIR = 'bin'
+LIBDIR = 'lib'
+INCDIR = 'pdsdata'
+PKGLIBS = 'xtcdata'
 standardExternalPackage('pdsdata', **locals())
+
+del LIBDIR
+del INCDIR
+del BINDIR
+
+# map package names to libraries
+packages = {
+    'acqiris'       : 'acqdata',
+    'andor'         : 'andordata',
+    'bld'           : 'bld',
+    'camera'        : 'camdata',
+    'compress'      : 'compressdata',
+    'control'       : 'controldata',
+    'cspad'         : 'cspaddata',
+    'cspad2x2'      : 'cspad2x2data',
+    'encoder'       : 'encoderdata',
+    'epics'         : 'epics',
+    'evr'           : 'evrdata',
+    'fccd'          : 'fccddata',
+    'fexamp'        : 'fexampdata',
+    'fli'           : 'flidata',
+    'gsc16ai'       : 'gsc16aidata',
+    'index'         : 'indexdata',
+    'ipimb'         : 'ipimbdata',
+    'lusi'          : 'lusidata',
+    'oceanoptics'   : 'oceanopticsdata',
+    'opal1k'        : 'opal1kdata',
+    'orca'          : 'orcadata',
+    'phasics'       : 'phasicsdata',
+    'pnCCD'         : 'pnccddata',
+    'princeton'     : 'princetondata',
+    'pulnix'        : 'pulnixdata',
+    'quartz'        : 'quartzdata',
+    'timepix'       : 'timepixdata',
+    'usdusb'        : 'usdusbdata',
+    'xamps'         : 'xampsdata',
+}
+
+for pkg, lib in packages.items():
+    PKGLIBS = lib
+    PKGINFO = None
+    DEPS = 'pdsdata'
+    standardExternalPackage('pdsdata_'+pkg, **locals())
