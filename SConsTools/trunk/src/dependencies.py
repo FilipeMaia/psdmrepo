@@ -93,6 +93,14 @@ def _guessPackage ( path ):
     
     try :
         x = f.index('geninc') 
+        if x > 2 and f[x+2] == 'arch' and f[x-1] == 'pdsdata':
+            # .../arch/$SIT_ARCH/geninc/pdsdata/package/File
+            if f[x-2] == 'xtc' : 
+                pkg = 'pdsdata'
+            else:
+                pkg = 'pdsdata_' + f[x-2]
+            trace ( 'Child comes from %s' % pkg, '_guessPackage', 8 )
+            return pkg
         if f[x+2] == 'arch' :
             # .../arch/$SIT_ARCH/geninc/Package/file
             trace ( 'Child comes from %s' % f[x-1], '_guessPackage', 8 )
