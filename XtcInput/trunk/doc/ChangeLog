@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-09-01
+2013-04-05 Andy Salnikov
+- XtcIterator was missing a protection from XTC contaier having damage
+  IncompleteContribution
+
 Tag: V00-09-00
 2013-03-29 Andy Salnikov
 - add support for one-stream input of Xtc files

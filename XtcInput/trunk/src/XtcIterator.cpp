@@ -79,9 +79,11 @@ XtcIterator::next()
     MsgLog(logger, debug, "XtcIterator: finished");
     return 0;
   }
-  
-  // finished iterating this xtc, drop it, move to previous
-  while (m_off.top() >= m_xtc.top()->sizeofPayload()) {
+
+  // if finished iterating this xtc, drop it, move to previous one in the stack,
+  // also skip over badly damaged XTCs
+  while ((m_xtc.top()->damage.value() & (1 << Pds::Damage::IncompleteContribution)) or
+      (m_off.top() >= m_xtc.top()->sizeofPayload())) {
     m_off.pop();
     m_xtc.pop();
     MsgLog(logger, debug, "XtcIterator: pop " << m_off.size());
