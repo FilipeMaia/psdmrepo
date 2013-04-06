@@ -287,6 +287,9 @@ class FileNameManager :
     def path_cora_split_map_static_q(self) :
         return self.path_prefix_cora() + '-' + self.str_run_data() + 'map-static-q.txt'
 
+    def path_cora_split_q_ave_static(self) :
+        return self.path_prefix_cora() + '-' + self.str_run_data() + 'q-ave-static.txt'
+
     def path_cora_split_int_static_q(self) :
         return self.path_prefix_cora() + '-' + self.str_run_data() + 'int-static-q.txt'
 

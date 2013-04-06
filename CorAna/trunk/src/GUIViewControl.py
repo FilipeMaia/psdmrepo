@@ -33,6 +33,8 @@ from Logger                 import logger
 from ViewResults            import *
 from PlotImgSpe             import *
 from PlotG2                 import *
+from PlotGraph              import *
+from RecordsFromFiles       import rff
 
 #---------------------
 #  Class definition --
@@ -114,7 +116,9 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.but_mask_roi      = QtGui.QPushButton('ROI')
         self.but_mask_total    = QtGui.QPushButton('Total')
         self.but_print_res     = QtGui.QPushButton('g2(<q>,tau)')
-        self.but_intens_gr     = QtGui.QPushButton('I(q-stat,tau)')
+        self.but_data_ave      = QtGui.QPushButton('<Img data>')
+        self.but_intens_t      = QtGui.QPushButton('I(q-stat,t)')
+        self.but_intens_gr     = QtGui.QPushButton('I(q-stat)')
 
         self.cbx_more = QtGui.QCheckBox('Show more', self)
         self.cbx_more.setChecked( cp.vc_cbx_show_more.value() )
@@ -179,7 +183,9 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.grid.addWidget(self.but_print_res,    self.grid_row+8, 1)
 
         self.grid.addWidget(self.tit_plot,         self.grid_row+9, 0)
-        self.grid.addWidget(self.but_intens_gr,    self.grid_row+9, 1)
+        self.grid.addWidget(self.but_data_ave,     self.grid_row+9, 1)
+        self.grid.addWidget(self.but_intens_t,     self.grid_row+9, 2)
+        self.grid.addWidget(self.but_intens_gr,    self.grid_row+9, 3)
 
         self.grid_row += 8
 
@@ -217,8 +223,9 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.connect(self.sli,              QtCore.SIGNAL('sliderReleased()'),  self.onSliderReleased )
         self.connect(self.cbx_more,         QtCore.SIGNAL('stateChanged(int)'), self.on_cbx ) 
         self.connect(self.but_print_res,    QtCore.SIGNAL('clicked()'),         self.onSave ) 
-        self.connect(self.but_intens_gr,    QtCore.SIGNAL('clicked()'),         self.onButView ) 
-        #self.connect(self.but_intens_gr,    QtCore.SIGNAL('clicked()'),         self.onButIntens ) 
+        self.connect(self.but_data_ave,     QtCore.SIGNAL('clicked()'),         self.onButView ) 
+        self.connect(self.but_intens_t,     QtCore.SIGNAL('clicked()'),         self.onButView ) 
+        self.connect(self.but_intens_gr,    QtCore.SIGNAL('clicked()'),         self.onButIntens ) 
   
         self.setLayout(self.grid)
 
@@ -306,6 +313,8 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.but_mask_roi     .setStyleSheet(cp.styleButton)
         self.but_mask_total   .setStyleSheet(cp.styleButton)
         self.but_print_res    .setStyleSheet(cp.styleButton)
+        self.but_data_ave     .setStyleSheet(cp.styleButton)
+        self.but_intens_t     .setStyleSheet(cp.styleButton)
         self.but_intens_gr    .setStyleSheet(cp.styleButton)
 
         self.cbx_more         .setStyleSheet (cp.styleLabel)
@@ -388,8 +397,9 @@ class GUIViewControl ( QtGui.QWidget ) :
         elif self.g_ind == 17 : self.arr2d = self.vr.get_g2_map_for_itau(self.tau_ind)
         elif self.g_ind == 18 : self.arr2d = self.vr.get_g2_map_for_dyna_bins_itau(self.tau_ind)
         elif self.g_ind == 19 : self.arr2d = self.vr.get_g2_vs_itau_arr()
-        elif self.g_ind == 20 : pass
-        elif self.g_ind == 21 : self.arr2d = self.vr.get_intens_stat_q_bins_vs_itau_arr()
+        elif self.g_ind == 20 : self.arr2d =     rff.get_data_ave_array()
+        #elif self.g_ind == 21 : self.arr2d = self.vr.get_intens_stat_q_bins_vs_itau_arr()
+        elif self.g_ind == 22 : self.arr2d =     rff.get_intens_stat_q_bins_arr()
         elif self.g_ind == 30 : self.arr2d = self.vr.get_mask_image_limits()
         elif self.g_ind == 31 : self.arr2d = self.vr.get_mask_blemish()
         elif self.g_ind == 32 : self.arr2d = self.vr.get_mask_hotpix()
@@ -442,7 +452,9 @@ class GUIViewControl ( QtGui.QWidget ) :
         elif self.but_g2dy         .hasFocus() : self.selectedOption( 18, 'g2 map for dynamic bins, ',          show_tau=True)
         elif self.but_g2tau        .hasFocus() : self.selectedOption( 19, 'g2 vs itau')
         #elif self.but_g2tau_gr     .hasFocus() : self.selectedOption( 20, 'g2(tau) for dynamic bins')
-        elif self.but_intens_gr    .hasFocus() : self.selectedOption( 21, 'I(<q> vs itau)')
+        #elif self.but_intens_gr    .hasFocus() : self.selectedOption( 21, 'I(itau, q-static)')
+        elif self.but_data_ave     .hasFocus() : self.selectedOption( 20, '<Img-data>')
+        elif self.but_intens_t     .hasFocus() : self.selectedOption( 22, 'I(t, q-static)')
 
         elif self.but_mask_img_lims.hasFocus() : self.selectedOption( 30, 'Mask image limits')
         elif self.but_mask_blemish .hasFocus() : self.selectedOption( 31, 'Mask blemish')
@@ -462,7 +474,8 @@ class GUIViewControl ( QtGui.QWidget ) :
             #print 'Redraw plot'
         except :
             #self.setImgArray()
-            if self.but_g2tau.hasFocus() or self.but_intens_gr.hasFocus() :
+            if self.but_g2tau.hasFocus() \
+            or self.but_intens_t.hasFocus():
                 cp.plotimgspe_g = PlotImgSpe(None, self.arr2d, title=self.getTitle(), orient=90, y_is_flip=True)
             else :
                 cp.plotimgspe_g = PlotImgSpe(None, self.arr2d, title=self.getTitle(), \
@@ -473,7 +486,8 @@ class GUIViewControl ( QtGui.QWidget ) :
 
     def redrawPlotResetLimits(self):
         self.setImgArray()
-        if self.but_g2tau.hasFocus() or self.but_intens_gr.hasFocus() :
+        if self.but_g2tau.hasFocus() \
+        or self.but_intens_t.hasFocus() :
             cp.plotimgspe_g.set_image_array_new(self.arr2d, self.getTitle(), orient=90, y_is_flip=True)
         else :
             cp.plotimgspe_g.set_image_array_new(self.arr2d, self.getTitle(), orient=int(cp.ccd_orient.value()), y_is_flip=cp.y_is_flip.value())
@@ -487,23 +501,6 @@ class GUIViewControl ( QtGui.QWidget ) :
     def onSave(self):
         logger.debug('onSave', __name__)
         if self.but_print_res   .hasFocus() : self.vr.print_table_of_results()
-
-    def onButIntens(self):
-        logger.debug('onButIntens', __name__)
-        if self.but_intens_gr   .hasFocus() :
-            logger.info('but_intens_gr', __name__)
-
-            #print 'N of pixels/static q bin:\n', self.vr.get_counts_for_stat_q_bins()[:sp.ana_dyna_part_q]
-            #print '<q> for static q bins:\n',    self.vr.get_q_average_for_stat_q_bins()[:sp.ana_dyna_part_q]
-            #print '<Ip> for static q bins:\n',    self.vr.get_Ip_for_stat_q_bins_itau(self.tau_ind)[:sp.ana_dyna_part_q]
-
-            #list_of_vars = zip( self.vr.get_q_average_for_stat_q_bins()           [:self.vr.ana_stat_part_q], \
-            #                    self.vr.get_Ip_for_stat_q_bins_itau(self.tau_ind) [:self.vr.ana_stat_part_q] )
-            #print 'I(<q>) for tau=', self.tau_ind
-            #for i, (q_ave, intens) in enumerate(list_of_vars) :
-            #    print 'i=%3d   <q>=%9.4f   <I>=%9.4f' % (i, q_ave, intens)
-
-            arr = self.vr.get_intens_stat_q_bins_vs_itau_arr()
 
             
     def onButClose(self):
@@ -545,6 +542,35 @@ class GUIViewControl ( QtGui.QWidget ) :
 
             #cp.plotg2_is_on = False
         
+
+    def onButIntens(self):
+
+        try :
+            cp.plot_gr.close()
+            try    : del cp.plot_gr
+            except : pass
+        except :
+
+            arrsy = rff.get_intens_stat_q_bins()
+            #arrsy = rff.get_intens_stat_q_bins_arr()
+            arr_x = rff.get_q_ave_for_stat_q_bins()
+            arr_n = rff.get_time_records_arr()[:,1] # take the time of event component
+
+            print 'arr_n :\n',     arr_n
+            print 'arr_n.shape :', arr_n.shape
+            print 'arr_x :\n',     arr_x
+            print 'arr_x.shape :', arr_x.shape
+            print 'arrsy :\n',     arrsy
+            print 'arrsy.shape :', arrsy.shape
+
+            arrays = (arrsy, arr_x, arr_n)
+            labs=(r'$q_{static}$', r'$<I>(q)$')
+            cp.plot_gr = PlotGraph(None, arrays, ofname='./fig_graphics.png', title='Intensity for stsic bins', axlabs=labs) 
+            cp.plot_gr.move(self.parentWidget().parentWidget().pos().__add__(QtCore.QPoint(870,20)))
+            cp.plot_gr.show()
+
+
+
 
     def stringTau(self):
         return 'tau(%d)=%d' % (self.tau_ind, self.tau_val) 

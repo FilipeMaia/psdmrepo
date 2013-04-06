@@ -37,7 +37,7 @@ from Logger                   import logger
 from FileNameManager          import fnm
 import GlobalUtils            as     gu
 from PlotImgSpe               import *
-
+from EventTimeRecords         import *
 #-----------------------------
 
 def cart2polar(x, y) :
@@ -160,8 +160,8 @@ class ViewResults :
         sp.counts_stat_q = None
         sp.q_average_stat_q = None
         sp.intens_stat_q_vs_itau_arr = None
+        sp.intens_stat_q_bins_vs_t = None
 
-        sp.cor_arr = None
         sp.g2_vs_itau_arr = None
         sp.mask_total = None
         sp.mask_blemish = None
@@ -531,6 +531,7 @@ class ViewResults :
 
     def get_and_save_map_for_stat_q_bins(sp) :
         sp.save_map_for_stat_q_bins_in_file()
+        sp.save_q_average_for_stat_q_bins_in_file()
         return sp.get_q_map_for_stat_bins()
 
 
@@ -602,6 +603,15 @@ class ViewResults :
         sp.q_average_stat_q = np.select([counts_stat_q_prot<0], [0], default=sum_q_stat/counts_stat_q_prot)
         #print 'sp.ana_stat_part_q, sp.q_average_stat_q.shape=', sp.ana_stat_part_q, sp.q_average_stat_q.shape
         return sp.q_average_stat_q
+
+  
+    def save_q_average_for_stat_q_bins_in_file(sp) :
+        arr = sp.get_q_average_for_stat_q_bins()[:-1] # trim the overflow bin
+        path = fnm.path_cora_split_q_ave_static()
+        #print 'arr.:\n', arr
+        #print 'arr.shape:', arr.shape
+        logger.info('Save <q> for static q bins in file: ' + path, __name__)            
+        np.savetxt(path, arr, fmt='%f', delimiter=' ')
 
 
     def print_q_average_for_stat_q_bins(sp) :

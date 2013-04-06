@@ -11,6 +11,9 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2013-04-04 Mikhail S. Dubrovin
+- add PlotGraphWidget.py PlotGraph.py RecordsFromFiles.py
+
 2013-04-02 Mikhail S. Dubrovin
 - add correct q map for reflection geometry in ViewResults.py
 - add I(q-stat,tau) plot in ViewResults.py

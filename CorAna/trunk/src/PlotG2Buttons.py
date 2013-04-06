@@ -128,7 +128,7 @@ class PlotG2Buttons (QtGui.QWidget) :
         self.but_help .setToolTip('Click on this button\nand get help') 
         self.cbox_grid.setToolTip('On/Off grid') 
         self.cbox_log .setToolTip('Log/Linear scale') 
-        self.edi_nbins.setToolTip('Edit the first plot index: [0:'+str(self.widgimage.arr_q.shape[0]-1) + ']')
+        self.edi_nbins.setToolTip('Edit the first plot index: [0:end]') #'+str(self.widgimage.arr_q.shape[0]-1) + ']')
 
 
     def setFrame(self):
