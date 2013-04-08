@@ -11,6 +11,11 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-05
+2013-04-08 Igor Gaponenko
+- extended database schema to support a bookkeeping for actions over
+file systems.
+
 Tag: V00-01-04
 2012-12-10 Igor Gaponenko
 - Table.js migration

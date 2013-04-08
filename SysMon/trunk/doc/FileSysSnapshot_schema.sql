@@ -95,6 +95,27 @@ CREATE  TABLE IF NOT EXISTS `SYSMON`.`FILE_CATALOG` (
 ENGINE = InnoDB;
 
 
+-- -----------------------------------------------------
+-- Table `SYSMON`.`FILE_ACTION`
+-- -----------------------------------------------------
+DROP TABLE IF EXISTS `SYSMON`.`FILE_ACTION` ;
+
+CREATE  TABLE IF NOT EXISTS `SYSMON`.`FILE_ACTION` (
+
+  `file_id`      INT     NULL ,
+
+  `action_time`  INT UNSIGNED NULL ,
+  `result_type`  ENUM('DELETED','ERROR','FILE_IS_CURRENT','NO_FILE_FOUND') NOT NULL ,
+
+  CONSTRAINT `FILE_ACTION_FK_1`
+    FOREIGN KEY (`file_id` )
+    REFERENCES `SYSMON`.`FILE_CATALOG` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE )
+
+ENGINE = InnoDB;
+
+
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;
 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS;
