@@ -212,7 +212,9 @@ class RequestController ( BaseController ) :
 
     @jsonify
     def delete ( self, id ) :
-        """Delete request, can only delete queued requests which are not executed"""
+        """Delete request, if the request is not running yet then 
+        it is simply deleted from database, otherwise the job is killed
+        but request remains in the database (with failed status)."""
 
         try:
             id = int(id)
@@ -226,16 +228,16 @@ class RequestController ( BaseController ) :
         data = data[0]
         instr = data['instrument']
         exper = data['experiment']
-        status = data['status']
-        if status not in ('WAIT', 'WAIT_FILES'):
-            abort(405, 'Cannot delete processed request: %d' % id)
 
         # check user's privileges
         h.checkAccess(instr, exper, 'delete')
 
-        # possible race condition here, somebody could have changed state of the request
-        model.delete_request(id)
-        
+        try:
+            # possible race condition here, somebody could have changed state of the request
+            model.delete_request(id)
+        except Exception, e:
+            abort(405, str(e))
+            
         return data
 
     @jsonify

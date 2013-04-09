@@ -39,6 +39,8 @@ __version__ = "$Revision$"
 import sys
 import logging
 import types
+import time
+import signal
 
 #---------------------------------
 #  Imports of base class module --
@@ -194,6 +196,19 @@ class Job ( object ) :
             raise LSBError()
 
         self._priority = priority
+
+    def kill(self, sig=None):
+        """Send signal to a job"""
+        
+        if sig is None:
+            # this follows bkill algorithm
+            lsf.lsb_signaljob(self._jobid, signal.SIGTERM)
+            lsf.lsb_signaljob(self._jobid, signal.SIGINT)
+            # give it 5 seconds to cleanup
+            time.sleep(5)
+            lsf.lsb_signaljob(self._jobid, signal.SIGKILL)
+        else:
+            lsf.lsb_signaljob(self._jobid, sig)
         
     def __update(self):
         """ Retrieves job statrus information from LSF and updates internal state."""

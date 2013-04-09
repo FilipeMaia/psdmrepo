@@ -40,6 +40,7 @@ import shutil
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
+from InterfaceCtlr.FileMgrIrods import FileMgrIrods
 from InterfaceCtlr.InterfaceDb import InterfaceDb
 from InterfaceCtlr import LSF
 from LusiTime.Time import Time
@@ -190,7 +191,7 @@ class TranslatorJob(object) :
 
         # update name from LSF
         self._name = self._job.name()
-            
+
         self.debug("[%s] %s status=%#x exitCode=%s", self._name, self._job, lsf_status, exitCode)
         if lsf_status & LSF.JOB_STAT_PEND:
             
@@ -203,25 +204,20 @@ class TranslatorJob(object) :
                 self.trace("[%s] Job %s priority change %s to %s", self._name, self._job, self._job.priority(), self._fs.priority)
                 self._job.setPriority(self._fs.priority)
             
-            return self._status
-        
         elif lsf_status & LSF.JOB_STAT_RUN:
             
             # still running
             self._update_fs_status('RUN')
-            return self._status
         
         elif lsf_status & (LSF.JOB_STAT_PSUSP|LSF.JOB_STAT_SSUSP|LSF.JOB_STAT_USUSP):
             
             # still running
             self._update_fs_status('SUSPENDED')
-            return self._status
         
         elif lsf_status & LSF.JOB_STAT_UNKWN:
             
             # do not know how to handle this thing
             self.warning("[%s] Job %s has unknown status, wait until next iteration", self._name, self._job)
-            return self._status
         
         elif lsf_status & LSF.JOB_STAT_DONE:
 
@@ -237,9 +233,15 @@ class TranslatorJob(object) :
                 exitCode = -1
             self._status = exitCode
 
-
         # if still not finished then return
-        if self._status is None: return None
+        if self._status is None: 
+            
+            # but check if anybody wants it killed
+            if self._db.test_exit_translator(self._id):
+                self.info("[%s] killing job %s", self._name, self._job)
+                self._job.kill()
+            
+            return None
 
         self.info ("[%s] translator #%d finished (%s) retcode=%s", self._name, self._id, self._job, exitCode)
         
@@ -267,7 +269,6 @@ class TranslatorJob(object) :
             else:
                 self.info ("[%s] moved data to final directory", self._name)
                 self._update_fs_status('DONE')
-
 
     # ===========================================================
     # Build a list that has the command to execute the translator
@@ -463,6 +464,30 @@ class TranslatorJob(object) :
 
         # add all files to fileset
         self._db.add_files( fs.id, 'HDF5', [os.path.join(dirname,f[0],f[1]) for f in files ] )
+
+
+        # register them with iRODS
+        irods_cmd = self._get_config('filemanager-irods-command', None, True)
+        dst_coll = self._get_config('filemanager-hdf5-dir', None, True)
+        if irods_cmd and dst_coll:
+            
+            file_mgr = FileMgrIrods(irods_cmd, self._config, self)
+            
+            for f in files:
+                
+                src = os.path.join( dirname, f[0], f[1] )
+                dst_dir = os.path.join(dst_coll, f[0])
+                
+                try:
+                    # check that file is not there yet
+                    if f[1] in file_mgr.listdir(dst_dir):
+                        self.trace("file %s is already registered", f[1] )
+                    else:
+                        dst = os.path.join( dst_dir, f[1] )
+                        file_mgr.storeFile(src, dst)
+                        self.trace("registered file in irods as %s", dst )
+                except Exception, e:
+                    self.warning("store_hdf5: failed to remove directory %s: %s", tmpdirfinal, str(e) )
 
         return 0
                 

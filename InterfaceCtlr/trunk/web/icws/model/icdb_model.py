@@ -180,10 +180,10 @@ class IcdbModel ( InterfaceDb ) :
         return res
 
     def delete_request(self, id):
-        """Create new translation request, returns request object."""
+        """Delete translation request."""
         
         icdb = InterfaceDb(self._conn.connection())
-        icdb.remove_fileset_id(id)
+        icdb.stop_fileset_id(id)
 
     def active_index(self, instrument, experiment):
         """Get the list of active experiments"""

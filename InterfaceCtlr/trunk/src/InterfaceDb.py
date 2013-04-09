@@ -69,6 +69,10 @@ class ControllerInstanceError(StandardError):
     def __init__ (self, message):
         Exception.__init__( self, message )
 
+class DatasetIdError(StandardError):
+    def __init__ (self, message):
+        Exception.__init__( self, message )
+
 # decorator for locking
 def _synchronized(fun):
     
@@ -750,10 +754,64 @@ class InterfaceDb ( object ) :
 
     @_synchronized
     @_transaction
+    def stop_fileset_id (self, id, cursor=None ) :
+        """ Either kill hte job or remove existing fileset based on its ID.
+            @param id        fileset id
+        """
+
+        # need to know the status
+        q = "SELECT fk_fileset_status FROM fileset WHERE id = %s FOR UPDATE"
+        cursor.execute ( q, (id,) )
+        row = cursor.fetchone()
+        if row is None: raise DatasetIdError("Dataset with id {} does not exist".format(id))
+        status = row[0]
+        
+        q = "SELECT name, job_state FROM fileset_status_def WHERE id = %s"
+        cursor.execute ( q, (status,) )
+        row = cursor.fetchone()
+        sname, state = row
+        
+        if state == 'QUEUE' and sname != 'PENDING':
+
+            # request has not been sent to LSF yet, simply remove it from database
+        
+            # break foreign key
+            q = "UPDATE fileset SET translator_id = NULL WHERE id = %s"
+            cursor.execute ( q, (id,) )
+            
+            # delete all translator processes for those filesets
+            q = "DELETE FROM translator_process WHERE fk_fileset = %s"
+            cursor.execute ( q, (id,) )
+        
+            # delete all files for those filesets
+            q = "DELETE FROM files WHERE fk_fileset_id = %s"
+            cursor.execute ( q, (id,) )
+    
+            # delete filesets
+            q = "DELETE FROM fileset WHERE id = %s"
+            cursor.execute ( q, (id,) )
+
+        elif state == 'RUN' or sname == 'PENDING':
+            
+            # kill the job, just set the flag in database
+            q = "UPDATE translator_process SET kill_tp = 1 WHERE fk_fileset = %s"
+            cursor.execute ( q, (id,) )
+
+        else:
+
+            # means finished already, won't do anything
+            raise _DatabaseOperatonFailed("Dataset processing already finished for dataset {}".format(id))
+
+    @_synchronized
+    @_transaction
     def remove_fileset_id (self, id, cursor=None ) :
         """ Delete existing fileset based on its ID.
             @param id        fileset id
         """
+        
+        # break foreign key
+        q = "UPDATE fileset SET translator_id = NULL WHERE id = %s"
+        cursor.execute ( q, (id,) )
         
         # delete all translator processes for those filesets
         q = "DELETE FROM translator_process WHERE fk_fileset = %s"

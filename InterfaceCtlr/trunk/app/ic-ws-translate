@@ -79,7 +79,7 @@ class IcWsTranslate ( AppBase ) :
         self._parser.add_option ( '-i', "--id", type='int',
                                   default=None, help="change the priority or delete existing requests with given ID" )
         self._parser.add_option ( '-d', "--delete", action='store_true',  
-                                  default=False, help="delete existing request" )
+                                  default=False, help="delete existing request, use together with -i option" )
 
     #
     #  Run the whole thing after parsing the command argunments and 
