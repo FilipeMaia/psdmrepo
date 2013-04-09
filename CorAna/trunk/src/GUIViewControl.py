@@ -96,13 +96,13 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.but_Y             = QtGui.QPushButton('Y')
         self.but_R             = QtGui.QPushButton('R')
         self.but_P             = QtGui.QPushButton('Phi')
-        self.but_Q             = QtGui.QPushButton('Q')
+        self.but_Q             = QtGui.QPushButton('q')
         self.but_P_st          = QtGui.QPushButton('Phi stat')
-        self.but_Q_st          = QtGui.QPushButton('Q stat')
-        self.but_QP_st         = QtGui.QPushButton('Q-Phi stat')
+        self.but_Q_st          = QtGui.QPushButton('q stat')
+        self.but_QP_st         = QtGui.QPushButton('q-Phi stat')
         self.but_P_dy          = QtGui.QPushButton('Phi dyna')
-        self.but_Q_dy          = QtGui.QPushButton('Q dyna')
-        self.but_QP_dy         = QtGui.QPushButton('Q-Phi dyna')
+        self.but_Q_dy          = QtGui.QPushButton('q dyna')
+        self.but_QP_dy         = QtGui.QPushButton('q-Phi dyna')
         self.but_1oIp          = QtGui.QPushButton('1/<Ip> stat')
         self.but_1oIf          = QtGui.QPushButton('1/<If> stat')
         self.but_g2map         = QtGui.QPushButton('g2 map')
@@ -117,8 +117,9 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.but_mask_total    = QtGui.QPushButton('Total')
         self.but_print_res     = QtGui.QPushButton('g2(<q>,tau)')
         self.but_data_ave      = QtGui.QPushButton('<Img data>')
-        self.but_intens_t      = QtGui.QPushButton('I(q-stat,t)')
-        self.but_intens_gr     = QtGui.QPushButton('I(q-stat)')
+        self.but_intens_t      = QtGui.QPushButton('I(q-st,t)-2D')
+        self.but_intens_gr1    = QtGui.QPushButton('I(q-st)-gr')
+        self.but_intens_gr     = QtGui.QPushButton('I(q-st,t)-gr')
 
         self.cbx_more = QtGui.QCheckBox('Show more', self)
         self.cbx_more.setChecked( cp.vc_cbx_show_more.value() )
@@ -184,8 +185,9 @@ class GUIViewControl ( QtGui.QWidget ) :
 
         self.grid.addWidget(self.tit_plot,         self.grid_row+9, 0)
         self.grid.addWidget(self.but_data_ave,     self.grid_row+9, 1)
-        self.grid.addWidget(self.but_intens_t,     self.grid_row+9, 2)
+        self.grid.addWidget(self.but_intens_gr1,   self.grid_row+9, 2)
         self.grid.addWidget(self.but_intens_gr,    self.grid_row+9, 3)
+        self.grid.addWidget(self.but_intens_t,     self.grid_row+9, 4)
 
         self.grid_row += 8
 
@@ -225,6 +227,7 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.connect(self.but_print_res,    QtCore.SIGNAL('clicked()'),         self.onSave ) 
         self.connect(self.but_data_ave,     QtCore.SIGNAL('clicked()'),         self.onButView ) 
         self.connect(self.but_intens_t,     QtCore.SIGNAL('clicked()'),         self.onButView ) 
+        self.connect(self.but_intens_gr1,   QtCore.SIGNAL('clicked()'),         self.onButIntens ) 
         self.connect(self.but_intens_gr,    QtCore.SIGNAL('clicked()'),         self.onButIntens ) 
   
         self.setLayout(self.grid)
@@ -316,6 +319,7 @@ class GUIViewControl ( QtGui.QWidget ) :
         self.but_data_ave     .setStyleSheet(cp.styleButton)
         self.but_intens_t     .setStyleSheet(cp.styleButton)
         self.but_intens_gr    .setStyleSheet(cp.styleButton)
+        self.but_intens_gr1   .setStyleSheet(cp.styleButton)
 
         self.cbx_more         .setStyleSheet (cp.styleLabel)
  
@@ -439,13 +443,13 @@ class GUIViewControl ( QtGui.QWidget ) :
         elif self.but_Y            .hasFocus() : self.selectedOption(  5, 'Y map')
         elif self.but_R            .hasFocus() : self.selectedOption(  6, 'R map')
         elif self.but_P            .hasFocus() : self.selectedOption(  7, 'Phi map')
-        elif self.but_Q            .hasFocus() : self.selectedOption(  8, 'Q map' )
+        elif self.but_Q            .hasFocus() : self.selectedOption(  8, 'q map' )
         elif self.but_P_st         .hasFocus() : self.selectedOption(  9, 'Phi map for static bins')
-        elif self.but_Q_st         .hasFocus() : self.selectedOption( 10, 'Q map for static bins')
+        elif self.but_Q_st         .hasFocus() : self.selectedOption( 10, 'q map for static bins')
         elif self.but_P_dy         .hasFocus() : self.selectedOption( 11, 'Phi map for dynamic bins')
-        elif self.but_Q_dy         .hasFocus() : self.selectedOption( 12, 'Q map for dynamic bins')
-        elif self.but_QP_st        .hasFocus() : self.selectedOption( 13, 'Q-Phi map for static bins')
-        elif self.but_QP_dy        .hasFocus() : self.selectedOption( 14, 'Q-Phi map for dynamic bins')
+        elif self.but_Q_dy         .hasFocus() : self.selectedOption( 12, 'q map for dynamic bins')
+        elif self.but_QP_st        .hasFocus() : self.selectedOption( 13, 'q-Phi map for static bins')
+        elif self.but_QP_dy        .hasFocus() : self.selectedOption( 14, 'q-Phi map for dynamic bins')
         elif self.but_1oIp         .hasFocus() : self.selectedOption( 15, '1/<Ip> norm. map for static bins, ', show_tau=True)
         elif self.but_1oIf         .hasFocus() : self.selectedOption( 16, '1/<If> norm. map for static bins, ', show_tau=True)
         elif self.but_g2map        .hasFocus() : self.selectedOption( 17, 'g2 map, ',                           show_tau=True)
@@ -551,21 +555,31 @@ class GUIViewControl ( QtGui.QWidget ) :
             except : pass
         except :
 
-            arrsy = rff.get_intens_stat_q_bins()
-            #arrsy = rff.get_intens_stat_q_bins_arr()
-            arr_x = rff.get_q_ave_for_stat_q_bins()
-            arr_n = rff.get_time_records_arr()[:,1] # take the time of event component
+            if self.but_intens_gr.hasFocus() : 
 
-            print 'arr_n :\n',     arr_n
-            print 'arr_n.shape :', arr_n.shape
-            print 'arr_x :\n',     arr_x
-            print 'arr_x.shape :', arr_x.shape
-            print 'arrsy :\n',     arrsy
-            print 'arrsy.shape :', arrsy.shape
-
-            arrays = (arrsy, arr_x, arr_n)
-            labs=(r'$q_{static}$', r'$<I>(q)$')
-            cp.plot_gr = PlotGraph(None, arrays, ofname='./fig_graphics.png', title='Intensity for stsic bins', axlabs=labs) 
+                #arrsy = rff.get_intens_stat_q_bins()
+                arrsy = rff.get_intens_stat_q_bins_arr()
+                arr_x = rff.get_q_ave_for_stat_q_bins()
+                arr_n = rff.get_time_records_arr()[:,1] # take the time of event component
+                
+                #print 'arr_n :\n',     arr_n
+                #print 'arr_n.shape :', arr_n.shape
+                #print 'arr_x :\n',     arr_x
+                #print 'arr_x.shape :', arr_x.shape
+                #print 'arrsy :\n',     arrsy
+                #print 'arrsy.shape :', arrsy.shape
+                
+                arrays = (arrsy, arr_x, arr_n)
+                labs=(r'$q_{static}$', r'$<I>(q)$')
+                cp.plot_gr = PlotGraph(None, None, arrays, ofname='./fig_graphics.png', title='Intensity for stsic bins', axlabs=labs) 
+                
+            elif self.but_intens_gr1.hasFocus() :  
+                arr_y = rff.get_intens_stat_q_bins()
+                arr_x = rff.get_q_ave_for_stat_q_bins()
+                arrsxy = (arr_y, arr_x)
+                labs=(r'$q_{static}$', r'$<I>(q)$')
+                cp.plot_gr = PlotGraph(None, arrsxy, None, ofname='./fig_graphics.png', title='Intensity for stsic bins', axlabs=labs) 
+                
             cp.plot_gr.move(self.parentWidget().parentWidget().pos().__add__(QtCore.QPoint(870,20)))
             cp.plot_gr.show()
 

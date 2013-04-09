@@ -34,6 +34,8 @@ import random
 import numpy as np
 from math import log10
 
+from ViewResults import valueToIndexProtected
+
 # For self-run debugging:
 #try :
 #    import matplotlib
@@ -56,18 +58,18 @@ from PyQt4 import QtGui, QtCore
 class PlotGraphWidget (QtGui.QWidget) :
     """Plot array as a graphic and as a histogram"""
 
-    def __init__(self, parent=None, arrays=None, figsize=(10,10), title='', axlabs=('','')):
+    def __init__(self, parent=None, arrsxy=None, arrays=None, figsize=(10,10), title='', axlabs=('','')):
         QtGui.QWidget.__init__(self, parent)
         self.setWindowTitle('Matplotlib image embadded in Qt widget')
         self.setGeometry(10, 25, 1000, 700)
  
-        self.arrsy, self.arr_x, self.arr_n = arrays
         # Expected shape arrsy.shape = (Ntau, Nq)
-
-        self.set_xarray(np.array(self.arr_x))
+        self.arrsxy  = arrsxy
+        self.arrays  = arrays
         self.title   = title
         self.parent  = parent
         self.figsize = figsize
+        self.nbins   = 10
 
         self.xlab, self.ylab = axlabs # (r'$g_{2}$', r'$\tau$ (in number of frames)')
 
@@ -93,7 +95,7 @@ class PlotGraphWidget (QtGui.QWidget) :
         self.on_draw()
 
 
-    def setFrame(self):
+    def setFrame(self) :
         self.frame = QtGui.QFrame(self)
         self.frame.setFrameStyle( QtGui.QFrame.Box | QtGui.QFrame.Sunken )
         self.frame.setLineWidth(0)
@@ -102,33 +104,56 @@ class PlotGraphWidget (QtGui.QWidget) :
         #self.frame.setVisible(False)
 
 
-    def getCanvas(self):
+    def getCanvas(self) :
         return self.canvas
 
 
-    def resizeEvent(self, e):
+    def resizeEvent(self, e) :
         #print 'resizeEvent' 
         self.frame.setGeometry(self.rect())
 
 
-    def closeEvent(self, event): # is called for self.close() or when click on "x"
+    def closeEvent(self, event) : # is called for self.close() or when click on "x"
         #print 'PlotGraphWidget: closeEvent'
         pass
 
 
-    #def set_array(self, arr, title=''):
-    #    self.arry  = arr
-    #    self.title = title
-    #    self.on_draw()
-    #    #self.on_draw_in_limits()
+    def set_arrays_to_plot(self) :
+        self.arrsy, self.arr_x, self.arr_n = self.arrays
 
+        if self.arr_x == None : self.arrx = np.arange(self.arrsy.shape[1])
+        else :                  self.arrx = self.arr_x
 
-    def set_xarray(self,arr):
-        if arr == None :
-            self.arrx = np.arange(self.arrsy.shape[1])
-        else :
-            self.arrx = arr
+        bin_range   = (self.arr_n[0], self.arr_n[-1], self.nbins)
+        bin_numbers = valueToIndexProtected(self.arr_n, bin_range)
 
+        # Find min/max indexes for all bins:
+        length = len(self.arr_n)
+        self.bin_ind_min     = length*np.ones(self.nbins, dtype=np.uint)
+        self.bin_ind_max     = np.zeros(self.nbins, dtype=np.uint)
+        self.bin_ind_counter = np.zeros(self.nbins, dtype=np.uint)
+
+        for i in range(length):
+            bin = bin_numbers[i]
+            if i<self.bin_ind_min[bin] : self.bin_ind_min[bin]=i
+            if i>self.bin_ind_max[bin] : self.bin_ind_max[bin]=i
+            self.bin_ind_counter[bin] += 1 
+
+        #print 'bin_numbers:', bin_numbers
+        #print 'bin_ind_min:', bin_ind_min
+        #print 'bin_ind_max:', bin_ind_max
+        #print 'bin_ind_counter:', bin_ind_counter
+
+        self.list_of_arr_y = []
+
+        for bin in range(self.nbins):
+             imin, imax, ninds = self.bin_ind_min[bin], self.bin_ind_max[bin], self.bin_ind_counter[bin]
+             #print 'bin:%2d, imin:%3d, imax:%3d, ninds:%3d' % ( bin, imin, imax, ninds )
+             arrsy_for_bin = self.arrsy[imin:imax,:]
+             arr_y = np.sum(arrsy_for_bin, axis=0)
+             if ninds>1 : arr_y /= ninds
+             #print 'arr_y = ', arr_y
+             self.list_of_arr_y.append(arr_y)
 
     def initParameters(self) :
         self.gr_xmin  = None
@@ -137,76 +162,101 @@ class PlotGraphWidget (QtGui.QWidget) :
         self.gr_ymax  = None
         self.gridIsOn = False
         self.logIsOn  = False
-        self.iq_begin = 0
 
 
     def on_draw_in_limits(self) :
-        self.on_draw(self.gr_xmin, self.gr_xmax, self.gr_ymin, self.gr_ymax, self.iq_begin)
+        self.on_draw(self.gr_xmin, self.gr_xmax, self.gr_ymin, self.gr_ymax)
 
 
+    def processDraw(self) :
+        """For backward compatability with PlotArrayButtons"""
+        self.on_draw()
 
-    def on_draw(self, gr_xmin=None, gr_xmax=None, gr_ymin=None, gr_ymax=None, iq_begin=0):
+
+    def on_draw(self, gr_xmin=None, gr_xmax=None, gr_ymin=None, gr_ymax=None):
         """Redraws the figure"""
 
         self.fig.clear()
 
-        if gr_xmin==None : xmin = self.arrx[0]
+        self.axgr = self.fig.add_axes([0.08, 0.08, 0.9, 0.8]) # [x0, y0, width, height]
+        if self.arrays != None :
+            #self.axgr = self.fig.add_axes([0.08, 0.08, 0.6, 0.8]) # [x0, y0, width, height]
+            self.on_draw_multigraphs()
+            self.set_xyaxes_limits(self.arrx, np.array(self.list_of_arr_y).flatten(), gr_xmin, gr_xmax, gr_ymin, gr_ymax)
+
+        elif self.arrsxy != None :
+            #print 'self.arrsxy=', self.arrsxy
+            self.on_draw_onegraph()
+            self.set_xyaxes_limits(self.arr_x, self.arr_y, gr_xmin, gr_xmax, gr_ymin, gr_ymax)
+
+        if self.logIsOn :
+            self.axgr.set_xscale('log')
+        else :
+            self.axgr.xaxis.set_major_locator(MaxNLocator(5))
+
+        self.axgr.set_title(self.title, fontsize=10, color='b')
+        self.axgr.tick_params(axis='both', which='major', labelsize=8)
+        self.axgr.yaxis.set_major_locator(MaxNLocator(5))
+        self.axgr.grid(self.gridIsOn)
+
+        self.axgr.set_xlabel(self.xlab, fontsize=14)
+        self.axgr.set_ylabel(self.ylab, fontsize=14)
+        #self.axgr.xaxis.set_major_formatter(NullFormatter())
+
+        self.list_of_axgr = []
+        self.list_of_axgr.append(self.axgr)
+
+        self.canvas.draw()
+
+
+    def set_xyaxes_limits(self, arrx, arry, gr_xmin=None, gr_xmax=None, gr_ymin=None, gr_ymax=None):
+
+        if gr_xmin==None : xmin = arrx[0]
         else             : xmin = gr_xmin
 
-        if gr_xmax==None : xmax = self.arrx[-1] # Last element
+        if gr_xmax==None : xmax = arrx[-1] # Last element
         else             : xmax = gr_xmax
 
         if xmin==xmax : xmax=xmin+1 # protection against equal limits
 
-        wwidth  = 0.9 
-        wheight = 0.8 
-        wx0     = 0.08
-        wy0     = 0.08
-
-        self.list_of_axgr = []
-
-        #iq_begin = 5
-        #iq_list  = self.get_iq_list(iq_begin)
-        #print 'iq_list:', iq_list, ' at self.iq_max =',self.arr_n.shape[0]
-
-        iq=0
-
-        xarr =  self.arrx
-        yarr  = self.arrsy
-        #yarr  = self.arrsy[iq,:]
-        #q_ave = self.arr_n[iq]
-        #q_str = 'q(%d)=%8.4f' % (iq, q_ave) 
-
-        q_str = self.title
-
         if gr_ymin==None : ymin = 0 # min(yarr)
         else             : ymin = gr_ymin
 
-        if gr_ymax==None : ymax = 1.1*max(yarr)
+        if gr_ymax==None : ymax = 1.05*max(arry)
         else             : ymax = gr_ymax
 
-        axgr = self.fig.add_axes([wx0, wy0, wwidth, wheight])
-        if self.logIsOn :
-            axgr.set_xscale('log')
-        else :
-            axgr.xaxis.set_major_locator(MaxNLocator(5))
+        self.axgr.set_xlim(xmin,xmax) 
+        self.axgr.set_ylim(ymin,ymax) 
 
-        axgr.plot(xarr, yarr, '-bo')# '-ro'
 
-        axgr.set_xlim(xmin,xmax) 
-        axgr.set_ylim(ymin,ymax) 
-        axgr.set_title(q_str, fontsize=10, color='b')
-        axgr.tick_params(axis='both', which='major', labelsize=8)
-        axgr.yaxis.set_major_locator(MaxNLocator(5))
-        axgr.grid(self.gridIsOn)
 
-        axgr.set_xlabel(self.xlab, fontsize=14)
-        axgr.set_ylabel(self.ylab, fontsize=14)
-        #axgr.xaxis.set_major_formatter(NullFormatter())
+    def on_draw_multigraphs(self):
+        #------------------------
+        self.set_arrays_to_plot()
+        #------------------------
 
-        self.list_of_axgr.append(axgr)
+        self.list_of_gr = []
+        list_of_markers = ('o','v','^','s','*','h','H','D','<','>','p') #,'1','2','3','4','+','x'
+        list_of_colors  = ('b','g','r','c','m','y','k') #,'w'
 
-        self.canvas.draw()
+        for bin in range(self.nbins) : 
+            xarr = self.arrx
+            yarr = self.list_of_arr_y[bin]
+            imin, imax = self.bin_ind_min[bin], self.bin_ind_max[bin]
+            s='t:%6.1f-%6.1f' % (self.arr_n[imin], self.arr_n[imax])
+            opt = '-' + list_of_colors[bin%len(list_of_colors)] + list_of_markers[bin%len(list_of_markers)] # for example: '-bo'
+            gr, = self.axgr.plot(xarr, yarr, opt, label=s)# '-ro'
+            self.list_of_gr.append(gr) 
+
+        handles, labels = self.axgr.get_legend_handles_labels()
+        self.axgr.legend(handles, labels, bbox_to_anchor=(0.65, 0.99), loc=2, borderaxespad=0., title='', numpoints=1, labelspacing=0)
+        #self.axgr.legend(handles, labels, bbox_to_anchor=(1.01, 1), loc=2, borderaxespad=0., title='', numpoints=1, labelspacing=0)
+
+
+    def on_draw_onegraph(self):
+        if self.arrsxy == None : return
+        self.arr_y, self.arr_x = self.arrsxy
+        self.axgr.plot(self.arr_x, self.arr_y, '-bo')
 
 
     def processAxesEnterEvent(self, event) :
@@ -248,7 +298,8 @@ class PlotGraphWidget (QtGui.QWidget) :
         #xmin, xmax = axes.get_xlim()
         #ymin, ymax = axes.get_ylim()
         x, y = event.xdata, event.ydata
-        s = '%6.1f' % (event.xdata)
+        s = '%6.3f' % (event.xdata)
+        #s = '%6.1f,%6.1f' % (event.xdata, event.ydata)
         try : self.curstext.remove()
         except : pass
         self.curstext = axes.text(x, y, s) #, ha='center')
@@ -269,8 +320,8 @@ class PlotGraphWidget (QtGui.QWidget) :
         x = event.x
         y = event.y
 
-        x0 = bbx0 
-        y0 = fbh  - bby0 - bbh # -1
+        x0 = bbx0-1 
+        y0 = fbh - bby0 - bbh
         w  = x - x0
 
         rect = [x0, y0, w, bbh]
@@ -320,7 +371,7 @@ class PlotGraphWidget (QtGui.QWidget) :
             pass
 
 
-    def saveFigure(self, fname='fig.png'):
+    def saveFigure(self, fname='fig.png') :
         self.fig.savefig(fname)
 
 #-----------------------------
@@ -332,8 +383,8 @@ def get_arrays_for_test() :
     mu, sigma = 1., 0.2
     arrsy = mu + sigma*np.random.standard_normal( size = rows*cols )
     arrsy.shape = (rows,cols)
-    arr_x = np.arange(rows)
-    arr_n   = np.arange(cols)
+    arr_x = np.arange(cols)
+    arr_n   = np.arange(rows)
     return arrsy, arr_x, arr_n
 
 def print_array(arr, msg='') :
@@ -342,10 +393,12 @@ def print_array(arr, msg='') :
 
 #-----------------------------
 
-def main():
+def main() :
 
     app = QtGui.QApplication(sys.argv)
-    w = PlotGraphWidget(arrays=get_arrays_for_test(), axlabs=(r'$g_{2}$', r'$\tau$ '))
+    #w = PlotGraphWidget(None, arrays=get_arrays_for_test(), axlabs=(r'$g_{2}$', r'$\tau$ '))
+    arrsy, arr_x, arr_n = arrays = get_arrays_for_test()
+    w = PlotGraphWidget(None, arrsxy=(arrsy[0,:],arr_x), axlabs=(r'$g_{2}$', r'$\tau$ '))    
     w.move(QtCore.QPoint(50,50))
     w.show()    
     app.exec_()

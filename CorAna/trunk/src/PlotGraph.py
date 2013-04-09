@@ -49,7 +49,8 @@ from PyQt4 import QtGui, QtCore
 #-----------------------------
 
 import PlotGraphWidget      as imgwidg
-import PlotG2Buttons        as imgbuts
+#import PlotG2Buttons        as imgbuts
+import PlotArrayButtons     as imgbuts
 
 from ConfigParametersCorAna import confpars as cp
 
@@ -60,15 +61,16 @@ from ConfigParametersCorAna import confpars as cp
 class PlotGraph (QtGui.QWidget) :
     """Plot for graphic arrays"""
 
-    def __init__(self, parent=None, arrays=None, ofname='./fig_graphs.png', title='', axlabs=('','')):
+    def __init__(self, parent=None, arrsxy=None, arrays=None, ofname='./fig_graphs.png', title='', axlabs=('','')):
         QtGui.QWidget.__init__(self, parent)
         self.setGeometry(20, 40, 800, 600)
         self.setWindowTitle('Plot for G2 arrays')
         self.setFrame()
 
-        self.widgimage = imgwidg.PlotGraphWidget(parent, arrays, title=title, axlabs=axlabs)
-        self.widgbuts  = imgbuts.PlotG2Buttons(self, self.widgimage, ofname)
- 
+        self.widgimage = imgwidg.PlotGraphWidget(parent, arrsxy, arrays, title=title, axlabs=axlabs)
+        #self.widgbuts  = imgbuts.PlotG2Buttons(self, self.widgimage, ofname)
+        self.widgbuts  = imgbuts.PlotArrayButtons(self, self.widgimage, ofname)#, help_msg)
+  
         #---------------------
         vbox = QtGui.QVBoxLayout()                      # <=== Begin to combine layout 
         #vbox.addWidget(self.widgimage)                 # <=== Add figure as QWidget
@@ -129,6 +131,7 @@ def get_arrays_for_test() :
     print_array(arr_n, 'arr_n')
 
     return arrsy, arr_x, arr_n
+    #return arrsy[0,:], arr_x, arr_n
 
 def print_array(arr, msg='') :
     print '\n' + msg + ':\n', arr
@@ -136,7 +139,9 @@ def print_array(arr, msg='') :
 
 def main():
     app = QtGui.QApplication(sys.argv)
-    w = PlotGraph(arrays=get_arrays_for_test(), ofname='./fig_gr.png', title='My title', axlabs=(r'$g_{2}$', r'$\tau$ '))
+    w = PlotGraph(arrays=get_arrays_for_test(), ofname='./fig_gr.png', title='My title', axlabs=( r'$\tau$[sec] ', r'$g_{2}$' ))
+    #arrsy, arr_x, arr_n = get_arrays_for_test()
+    #w = PlotGraph(arrsxy=(arrsy[0,:],arr_x), ofname='./fig_gr.png', title='My title', axlabs=( r'$\tau$[sec] ', r'$g_{2}$' ))
     w.move(QtCore.QPoint(50,50))
     w.show()
     app.exec_()
