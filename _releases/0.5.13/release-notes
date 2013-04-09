@@ -1,0 +1,4 @@
+- improvement for chank size estimate in translator
+- translator controller now register files in irods immediately
+- pdsdata version updated, improvement for compression library
+- XtcInput has a fix for incomplete top-level XTCs
