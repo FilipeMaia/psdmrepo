@@ -6,15 +6,15 @@
 #
 
 # release directory
-release=/reg/g/psdm/sw/releases/0.4.0
-#release=/reg/neh/home/salnikov/releases/test-0.2.53
+release=/reg/g/psdm/sw/releases/current
+#release=/reg/neh/home1/salnikov/releases/0.5.12
 
 # database options
 conn_file=/reg/g/psdm/psdatmgr/ic/.icdb-conn
 
 # config section names to read from database
 #config="meta-db group-time compress no-split xtc-lustre"
-config="group-time compress no-split xtc-lustre l1-offset calib-data datagram-32M pazlib"
+config="group-time compress no-split xtc-lustre l1-offset calib-data pazlib live-mode fm-irods"
 
 # log directory
 logdir=/reg/g/psdm/psdatmgr/ic/log

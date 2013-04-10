@@ -1,6 +1,6 @@
 #!/bin/sh
 #
-# Shell script which runs ic-store-files script
+# Shell script which runs ic-cleanup script
 #
 # $Id$
 #
@@ -10,7 +10,7 @@ release=/reg/g/psdm/sw/releases/current
 #release=/reg/neh/home/salnikov/ws/0.2.2
 
 # database options
-icdb_file=/reg/g/psdm/psdatmgr/ic/.icdb-conn
+icdb_files="/reg/g/psdm/psdatmgr/ic/.icdb-conn /reg/g/psdm/psdatmgr/ic/.icdb-ffb-conn"
 
 # log directory
 logdir=/reg/g/psdm/psdatmgr/ic/log
@@ -57,15 +57,17 @@ if [ -z "$oldpid" ] ; then
 
     test -n "$pidfile" && echo $$ > "$pidfile"
 
-	# have to be in release directory
-	cd "$release"
+    # have to be in release directory
+    cd "$release"
 	
-	# run setup script, it should guess everything based on the current directory
-	. /reg/g/psdm/bin/sit_setup.sh
+    # run setup script, it should guess everything based on the current directory
+    . /reg/g/psdm/bin/sit_setup.sh
 	
-	# run it
-    ic-cleanup -d "file:${icdb_file}" -v
-    status=$?
+    # run it
+    for icdb_file in ${icdb_files}; do
+        ic-cleanup -d "file:${icdb_file}" -v
+        status=$?
+    done
 
 fi
 
