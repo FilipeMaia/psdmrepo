@@ -43,7 +43,7 @@ test -d "$logdir" || mkdir -p "$logdir" || exit 2
 # redirect output
 time=`date +%Y%m%dT%H%M%S`
 log="$logdir/ic-controller/ic-auto-translate-$time-`hostname`.log"
-exec 2>&1 >"${log}"
+exec >"${log}" 2>&1
 
 echo "Running from release $release"
 
