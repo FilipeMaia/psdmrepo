@@ -1,0 +1,123 @@
+#!/bin/bash
+#
+# Shell script which strarts tracd server process
+#
+# $Id: ic-auto-translate-runner 6093 2013-04-10 05:10:24Z salnikov@SLAC.STANFORD.EDU $
+#
+
+# location of Trac venv
+venv=/reg/g/psdm/sw/external/Trac/x86_64-rhel5-gcc41-opt/
+
+# list of Trac projects
+projects="/reg/g/psdm/web/trac/psdm /reg/g/psdm/web/trac/controls /reg/g/psdm/web/trac/daq"
+
+# log directory
+logdir="/reg/g/psdm/web/trac/logs"
+
+# interface and port number for the server
+interface=127.0.0.1
+port=4444
+proto=scgi
+
+# PID file
+pid_file='/var/tmp/trac-server-start.pid'
+
+# ===================================================================
+
+usage () {
+  echo   
+  echo "Starts a process which launches tracd server and restarts it when it dies."  
+  echo   
+  echo "Usage: $(basename $0) [options]"
+  echo "  Options:"
+  echo "    -h            - print this message"
+  echo "    -i ip_address - interface to listen on (def: $interface)"
+  echo "    -p port       - port number (def: $port)"
+  echo "    -P protocol   - protocol name (def: $proto)"
+  echo "    -d path       - PID file (def: $pid_file)"
+  echo "    -l directory  - log file dir (def: $logdir)"
+  echo
+}
+
+while getopts hi:p:P:d:l: c ; do
+  case $c in
+    h) usage ; exit 0 ;;
+    i) interface="$OPTARG" ;;
+    p) port="$OPTARG" ;;
+    P) proto="$OPTARG" ;;
+    d) pid_file="$OPTARG" ;;
+    l) logdir="$OPTARG" ;;
+    \?) usage 2>&1 ; exit 2 ;;
+  esac
+done
+shift `expr $OPTIND - 1`
+
+# check pid file first
+if [ -f "$pid_file" ] ; then
+  if [ -d /proc/`cat $pid_file` ] ; then
+    echo "*** ERROR: Another process with PID" `cat $pid_file` "is already running" 1>&2
+    exit 2
+  fi
+fi
+
+# update PID file, this will need later update when we start subprocess
+echo $$ > "$pid_file"
+
+# allow world access
+umask 022
+
+# create log dir
+test -d "$logdir" || mkdir -p "$logdir" || exit 2
+
+# redirect output
+time=`date +%Y%m%dT%H%M%S`
+log="$logdir/trac-server-`hostname`-$time.log"
+exec >"${log}" 2>&1
+
+# cleanup env
+unset PYTHONPATH LD_LIBRARY_PATH
+
+# activate venv
+echo "[trac-server-start] running from virtual env $venv"
+cd "$venv"
+. bin/activate
+
+# writable location for egg files
+export PYTHON_EGG_CACHE=/tmp/trac-egg-cache-$$
+
+exit_handler() {
+
+    echo "[trac-server-start] exiting, will try to stop child process PID $1"
+    kill HUP $1 2>/dev/null
+    sleep 2
+    kill $1 2>/dev/null
+
+}
+
+loop() {
+
+    # if the shell is killed kill the child as well
+    trap 'exit_handler $child' EXIT
+
+	# run server in a loop, pause after each crash
+	while true; do
+		echo "[trac-server-start] Starting new server at" `date '+%Y-%m-%d %H:%M:%S'`
+		echo "command: tracd -b $interface -p $port --protocol=$proto $projects"
+		tracd -b $interface -p $port --protocol=$proto $projects &
+        child=$!
+        wait $child
+        test -d /proc/$child && kill $child
+		echo "[trac-server-start] server stopped at" `date '+%Y-%m-%d %H:%M:%S'`
+		echo
+		sleep 10
+	done
+			
+}
+
+# start loop in background
+loop &
+
+# update PID file 
+echo $! > "$pid_file"
+
+exit
