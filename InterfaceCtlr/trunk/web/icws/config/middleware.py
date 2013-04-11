@@ -1,4 +1,8 @@
 """Pylons middleware initialization"""
+
+import re
+from pprint import pprint
+
 from beaker.middleware import CacheMiddleware, SessionMiddleware
 from paste.cascade import Cascade
 from paste.registry import RegistryManager
@@ -12,6 +16,38 @@ from routes.middleware import RoutesMiddleware
 from icws.config.environment import load_environment
 
 
+
+class DumpEnv(object):
+
+    def __init__(self, app, config):
+        self.app = app
+        self.config = config
+        
+    def __call__(self, environ, start_response):
+        print "DumpEnv:" 
+        pprint(environ)
+        print "Config:" 
+        pprint(config)
+        return self.app(environ, start_response)
+
+class MakeScriptName(object):
+    ''' Some servers (mod_scgi) pass empty SCRIPT_NAME, fix it here '''
+    
+    def __init__(self, app, regex = None):
+        self.app = app
+        self.regex = regex
+        if self.regex: self.regex = re.compile(self.regex)
+        
+    def __call__(self, environ, start_response):
+        if self.regex and not environ.get('SCRIPT_NAME'):
+            path = environ.get('PATH_INFO')
+            match = self.regex.match(path)
+            if match:
+                script = match.group(0)
+                environ['PATH_INFO'] = path[len(script):]
+                environ['SCRIPT_NAME'] = script
+            
+        return self.app(environ, start_response)
 
 class _MyApp(PylonsApp):
     """
@@ -85,4 +121,7 @@ def make_app(global_conf, full_stack=True, static_files=True, **app_conf):
         static_app = StaticURLParser(config['pylons.paths']['static_files'])
         app = Cascade([static_app, app])
 
+    #app = DumpEnv(app, config)
+    app = MakeScriptName(app, '/ws[^/]*/icws[^/]*')
+    
     return app

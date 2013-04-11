@@ -10,6 +10,15 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V01-03-00
+2013-04-11 Andy Salnikov
+- few updates related to SCGI server (mod_scgi in particular)
+- we are switching to mod_scgi instead of mod_wsgi, services will run
+  outside apache now from our standard accout, location of few files
+  has changed because of that so config needs update
+- mod_scgi does not set SCRIPT_NAME correctly, I'm adding new middleware 
+  which takes care of this
+
 Tag: V01-02-00
 2013-04-08 Andy Salnikov
 - add support for auto-registration of files after job is complete
