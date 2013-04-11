@@ -22,7 +22,6 @@ Copyright (C) 2006 SLAC
 #  Imports of standard modules --
 #--------------------------------
 from pylons import config
-import MySQLdb as db
 from MySQLdb import cursors
 
 #---------------------------------
