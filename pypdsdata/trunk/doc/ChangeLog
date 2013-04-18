@@ -6,6 +6,10 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V00-00-94
+2013-04-17 Igor Gaponenko
+- added support for compressed XTC payload
+
 Tag: V00-00-93
 2013-03-27 Andy Salnikov
 - pyxtcreader: print "contains" event for damaged containers

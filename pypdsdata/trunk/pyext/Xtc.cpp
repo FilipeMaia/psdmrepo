@@ -30,7 +30,10 @@
 #include "ProcInfo.h"
 #include "TypeId.h"
 #include "XtcIterator.h"
+#include "XtcEmbedded.h"
 #include "types/TypeLib.h"
+
+#include "pdsdata/compress/CompressedXtc.hh"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -191,6 +194,17 @@ Xtc_payload( PyObject* self, PyObject* )
   } else if ( py_this->m_obj->contains.id() == Pds::TypeId::Any ) {
     Py_RETURN_NONE;
   } else {
+    if (py_this->m_obj->contains.compressed()) {
+      boost::shared_ptr<Pds::Xtc> xtc = Pds::CompressedXtc::uncompress(*py_this->m_obj);
+      if (!xtc) {
+        PyErr_SetString(pypdsdata::exceptionType(), "Error: XTC decompression has failed");
+        return 0;
+      }
+      PyObject* parent = pypdsdata::XtcEmbedded::PyObject_FromPds(xtc);
+      PyObject* obj = pypdsdata::DataObjectFactory::makeObject(*xtc.get(), parent);
+      Py_CLEAR(parent);
+      return obj;
+    }
     return pypdsdata::DataObjectFactory::makeObject(*py_this->m_obj, self);
   }
 }

@@ -35,6 +35,7 @@
 #include "TransitionId.h"
 #include "TypeId.h"
 #include "Xtc.h"
+#include "XtcEmbedded.h"
 #include "XtcFileIterator.h"
 #include "XtcIterator.h"
 
@@ -240,6 +241,7 @@ PyMODINIT_FUNC init_pdsdata()
   ::registerType( module, "TransitionId", pypdsdata::TransitionId::typeObject() );
   pypdsdata::TypeId::initType( module );
   pypdsdata::Xtc::initType( module );
+  pypdsdata::XtcEmbedded::initType( module );
   ::registerType( module, "XtcFileIterator", pypdsdata::XtcFileIterator::typeObject() );
   ::registerType( module, "XtcIterator", pypdsdata::XtcIterator::typeObject() );
   Py_INCREF( module );
