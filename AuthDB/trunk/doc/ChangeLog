@@ -11,6 +11,11 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-04
+2013-04-23 Igor Gaponenko
+- improved implementation of the authorization script for 'allied' instruments
+- reimplemented AuthDB::hasRole() to included POSIX groups in the operation
+
 Tag: V00-01-03
 2013-01-28 Igor Gaponenko
 - added support for 'allied' instruments in the special group management script AuthInstrGroups.php

@@ -265,7 +265,44 @@ HERE;
 
     public function hasRole( $user, $exper_id, $app, $role ) {
 
-        //return true ;
+        // First try to see if there is a direct record for the user account
+        //
+        if( $this->hasRoleImpl( $user, $exper_id, $app, $role )) return true;
+
+        // Now try via the groups.
+        //
+        $authorized_groups = array();
+        {
+            $holders = $this->rolePlayers( $exper_id, $app, $role );
+            foreach( $holders as $user_or_group ) {
+                if( "gid:" == substr( $user_or_group, 0, 4 ))
+                    array_push( $authorized_groups, substr( $user_or_group, 4 ));
+            }
+        }
+        if( count( $authorized_groups ) <= 0 ) return false;
+
+        // Check if the user has required role via one of groups
+        // his/her account is member of.
+        //
+        RegDB::instance()->begin();
+        $user_account = RegDB::instance()->find_user_account( $user );
+        if( is_null( $user_account ))
+            throw new AuthDBException (
+                __METHOD__,
+                "no such user: {$user}" );
+
+        // TODO: We may have a better implemnetation of this algorithm
+        //       instead of the nested loops as used below.
+        //
+        foreach( $authorized_groups as $g ) {
+        	foreach( $user_account['groups'] as $ug ) {
+        	    if( $ug == $g ) return true;
+        	}
+        }
+        return false;
+    }
+
+    public function hasRoleImpl( $user, $exper_id, $app, $role ) {
 
         $sql =
             "SELECT * FROM {$this->database}.user u, {$this->database}.role r".
@@ -276,6 +313,39 @@ HERE;
 
         $nrows = mysql_numrows( $result );
         return $nrows >= 1;
+    }
+
+    /**
+     * Find a list of users and/or groups who plays the specified role in
+     * the specified context (experiment and application).
+     *
+     * @param integer $exper_id
+     * @param string $app
+     * @param string $role
+     *
+     * @return array() of user and/or group names
+     */
+    public function rolePlayers( $exper_id, $app, $role) {
+
+    	// NOTE: Regardless of whether a valid experiment identifier is given
+    	//       the requested roke player is also checked among those
+    	//       role playes who're not associated with any particular experiment.
+    	//
+    	$list = array();
+
+    	$user_u = $this->database.".user u";
+    	$role_r = $this->database.".role r";
+
+        $exper_id_attr = is_null( $exper_id ) ? 'NULL' : $exper_id;
+    	$sql = "SELECT DISTINCT u.user FROM {$user_u},{$role_r} WHERE u.role_id IN (SELECT r.id FROM {$role_r} WHERE r.name='{$role}' AND r.app='{$app}') AND ((u.exp_id IS NULL) OR (u.exp_id={$exper_id_attr})) ORDER BY u.user";
+        $result = $this->query ( $sql );
+        $nrows = mysql_numrows( $result );
+        for( $i = 0; $i < $nrows; $i++ ) {
+            $row = mysql_fetch_array( $result, MYSQL_ASSOC );
+            $user = $row['user'];
+            array_push ( $list, $user );
+        }
+        return $list;
     }
 
     public function hasPrivilege_inefficient( $user, $exper_id, $app, $priv ) {
