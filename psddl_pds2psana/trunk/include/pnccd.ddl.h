@@ -73,8 +73,7 @@ class FullFrameV1 : public Psana::PNCCD::FullFrameV1 {
 public:
   typedef PsddlPds::PNCCD::FullFrameV1 XtcType;
   typedef Psana::PNCCD::FullFrameV1 PsanaType;
-  FullFrameV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::PNCCD::ConfigV1>& cfgPtr);
-  FullFrameV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::PNCCD::ConfigV2>& cfgPtr);
+  FullFrameV1(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~FullFrameV1();
   virtual uint32_t specialWord() const;
   virtual uint32_t frameNumber() const;
@@ -84,8 +83,6 @@ public:
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
-  boost::shared_ptr<const PsddlPds::PNCCD::ConfigV1> m_cfgPtr0;
-  boost::shared_ptr<const PsddlPds::PNCCD::ConfigV2> m_cfgPtr1;
 };
 
 

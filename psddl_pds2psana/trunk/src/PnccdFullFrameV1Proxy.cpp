@@ -39,7 +39,7 @@ namespace psddl_pds2psana {
 //----------------
 // Constructors --
 //----------------
-PnccdFullFrameV1Proxy::PnccdFullFrameV1Proxy ()
+PnccdFullFrameV1Proxy::PnccdFullFrameV1Proxy (const boost::shared_ptr<Pds::Xtc>& xtcObj)
   : PSEvt::Proxy<Psana::PNCCD::FullFrameV1>()
   , m_psObj()
 {

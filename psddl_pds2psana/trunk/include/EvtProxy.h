@@ -24,6 +24,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "pdsdata/xtc/Dgram.hh"
+#include "pdsdata/compress/CompressedXtc.hh"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -74,8 +75,8 @@ class EvtProxy : public PSEvt::Proxy<PSType> {
 public:
 
   // Default constructor
-  EvtProxy (const boost::shared_ptr<XTCType>& xtcObj, size_t xtcSize) 
-    : m_xtcObj(xtcObj), m_xtcSize(xtcSize) {}
+  EvtProxy (const boost::shared_ptr<Pds::Xtc>& xtcObj)
+    : m_xtcObj(xtcObj) {}
 
   // Destructor
   virtual ~EvtProxy () {}
@@ -95,8 +96,16 @@ protected:
                                             const std::string& key)
   {
     if (not m_psObj.get()) {
+      // decompress it if needed
+      if (m_xtcObj->contains.compressed()) {
+        m_xtcObj = Pds::CompressedXtc::uncompress(*m_xtcObj);
+      }
+
+      // get pointer to data
+      boost::shared_ptr<XTCType> xptr(m_xtcObj, (XTCType*)(m_xtcObj->payload()));
+
       typedef EvtProxyFactory<PDS2PSType, XTCType, UseSize> Factory;
-      m_psObj.reset(Factory::create(m_xtcObj, m_xtcSize));
+      m_psObj.reset(Factory::create(xptr, m_xtcObj->sizeofPayload()));
     }
     return m_psObj;
   }
@@ -105,8 +114,7 @@ private:
 
   
   // Data members
-  boost::shared_ptr<XTCType> m_xtcObj;
-  size_t m_xtcSize;
+  boost::shared_ptr<Pds::Xtc> m_xtcObj;
   boost::shared_ptr<PSType> m_psObj;
   
 };

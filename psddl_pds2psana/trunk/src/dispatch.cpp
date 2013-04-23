@@ -93,12 +93,16 @@ try {
       switch (version) {
       case 1:
         {
-          // XTC data object
-          boost::shared_ptr<PsddlPds::Acqiris::TdcDataV1> xptr(xtc, (PsddlPds::Acqiris::TdcDataV1*)(xtc->payload()));
-          size_t xtcSize = xtc->sizeofPayload();
           // store proxy
-          typedef EvtProxy<Psana::Acqiris::TdcDataV1, psddl_pds2psana::Acqiris::TdcDataV1, PsddlPds::Acqiris::TdcDataV1, true> ProxyType; 
-          if (evt) evt->putProxy<Psana::Acqiris::TdcDataV1>(boost::make_shared<ProxyType>(xptr, xtcSize), xtc->src);
+          typedef EvtProxy<Psana::Acqiris::TdcDataV1, psddl_pds2psana::Acqiris::TdcDataV1, PsddlPds::Acqiris::TdcDataV1, true> ProxyType;
+          if (evt) evt->putProxy<Psana::Acqiris::TdcDataV1>(boost::make_shared<ProxyType>(xtc), xtc->src);
+        }
+        break;
+      case 32769:
+        {
+          // store proxy
+          typedef EvtProxy<Psana::Acqiris::TdcDataV1, psddl_pds2psana::Acqiris::TdcDataV1, PsddlPds::Acqiris::TdcDataV1, true> ProxyType;
+          if (evt) evt->putProxy<Psana::Acqiris::TdcDataV1>(boost::make_shared<ProxyType>(xtc), xtc->src);
         }
         break;
       } // end switch (version)
@@ -109,12 +113,19 @@ try {
       switch (version) {
       case 1:
         {
-          // XTC data object
-          boost::shared_ptr<PsddlPds::Acqiris::DataDescV1> xptr(xtc, (PsddlPds::Acqiris::DataDescV1*)(xtc->payload()));
           if (boost::shared_ptr<PsddlPds::Acqiris::ConfigV1> cfgPtr = cfgStore.get(xtc->src)) {
             // store proxy
-            typedef EvtProxyCfg<Psana::Acqiris::DataDescV1, psddl_pds2psana::Acqiris::DataDescV1, PsddlPds::Acqiris::DataDescV1, PsddlPds::Acqiris::ConfigV1> ProxyType; 
-            if (evt) evt->putProxy<Psana::Acqiris::DataDescV1>(boost::make_shared<ProxyType>(xptr, cfgPtr), xtc->src);
+            typedef EvtProxyCfg<Psana::Acqiris::DataDescV1, psddl_pds2psana::Acqiris::DataDescV1, PsddlPds::Acqiris::DataDescV1, PsddlPds::Acqiris::ConfigV1> ProxyType;
+            if (evt) evt->putProxy<Psana::Acqiris::DataDescV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
+          }
+        }
+        break;
+      case 32769:
+        {
+          if (boost::shared_ptr<PsddlPds::Acqiris::ConfigV1> cfgPtr = cfgStore.get(xtc->src)) {
+            // store proxy
+            typedef EvtProxyCfg<Psana::Acqiris::DataDescV1, psddl_pds2psana::Acqiris::DataDescV1, PsddlPds::Acqiris::DataDescV1, PsddlPds::Acqiris::ConfigV1> ProxyType;
+            if (evt) evt->putProxy<Psana::Acqiris::DataDescV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
           }
         }
         break;
@@ -142,12 +153,19 @@ try {
       switch (version) {
       case 1:
         {
-          // XTC data object
-          boost::shared_ptr<PsddlPds::Andor::FrameV1> xptr(xtc, (PsddlPds::Andor::FrameV1*)(xtc->payload()));
           if (boost::shared_ptr<PsddlPds::Andor::ConfigV1> cfgPtr = cfgStore.get(xtc->src)) {
             // store proxy
-            typedef EvtProxyCfg<Psana::Andor::FrameV1, psddl_pds2psana::Andor::FrameV1, PsddlPds::Andor::FrameV1, PsddlPds::Andor::ConfigV1> ProxyType; 
-            if (evt) evt->putProxy<Psana::Andor::FrameV1>(boost::make_shared<ProxyType>(xptr, cfgPtr), xtc->src);
+            typedef EvtProxyCfg<Psana::Andor::FrameV1, psddl_pds2psana::Andor::FrameV1, PsddlPds::Andor::FrameV1, PsddlPds::Andor::ConfigV1> ProxyType;
+            if (evt) evt->putProxy<Psana::Andor::FrameV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
+          }
+        }
+        break;
+      case 32769:
+        {
+          if (boost::shared_ptr<PsddlPds::Andor::ConfigV1> cfgPtr = cfgStore.get(xtc->src)) {
+            // store proxy
+            typedef EvtProxyCfg<Psana::Andor::FrameV1, psddl_pds2psana::Andor::FrameV1, PsddlPds::Andor::FrameV1, PsddlPds::Andor::ConfigV1> ProxyType;
+            if (evt) evt->putProxy<Psana::Andor::FrameV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
           }
         }
         break;
@@ -211,12 +229,16 @@ try {
       switch (version) {
       case 1:
         {
-          // XTC data object
-          boost::shared_ptr<PsddlPds::CsPad2x2::ElementV1> xptr(xtc, (PsddlPds::CsPad2x2::ElementV1*)(xtc->payload()));
-          size_t xtcSize = xtc->sizeofPayload();
           // store proxy
-          typedef EvtProxy<Psana::CsPad2x2::ElementV1, psddl_pds2psana::CsPad2x2::ElementV1, PsddlPds::CsPad2x2::ElementV1> ProxyType; 
-          if (evt) evt->putProxy<Psana::CsPad2x2::ElementV1>(boost::make_shared<ProxyType>(xptr, xtcSize), xtc->src);
+          typedef EvtProxy<Psana::CsPad2x2::ElementV1, psddl_pds2psana::CsPad2x2::ElementV1, PsddlPds::CsPad2x2::ElementV1> ProxyType;
+          if (evt) evt->putProxy<Psana::CsPad2x2::ElementV1>(boost::make_shared<ProxyType>(xtc), xtc->src);
+        }
+        break;
+      case 32769:
+        {
+          // store proxy
+          typedef EvtProxy<Psana::CsPad2x2::ElementV1, psddl_pds2psana::CsPad2x2::ElementV1, PsddlPds::CsPad2x2::ElementV1> ProxyType;
+          if (evt) evt->putProxy<Psana::CsPad2x2::ElementV1>(boost::make_shared<ProxyType>(xtc), xtc->src);
         }
         break;
       } // end switch (version)
@@ -235,16 +257,6 @@ try {
           cfgStore.put(obj, xtc->src);
         }
         break;
-      case 3:
-        {
-          // store XTC object in config store
-          boost::shared_ptr<PsddlPds::CsPad::ConfigV3> xptr(xtc, (PsddlPds::CsPad::ConfigV3*)(xtc->payload()));
-          cfgStore.put(xptr, xtc->src);
-          // create and store psana object in config store
-          boost::shared_ptr<Psana::CsPad::ConfigV3> obj = boost::make_shared<psddl_pds2psana::CsPad::ConfigV3>(xptr);
-          cfgStore.put(obj, xtc->src);
-        }
-        break;
       case 2:
         {
           // store XTC object in config store
@@ -252,6 +264,16 @@ try {
           cfgStore.put(xptr, xtc->src);
           // create and store psana object in config store
           boost::shared_ptr<Psana::CsPad::ConfigV2> obj = boost::make_shared<psddl_pds2psana::CsPad::ConfigV2>(xptr);
+          cfgStore.put(obj, xtc->src);
+        }
+        break;
+      case 3:
+        {
+          // store XTC object in config store
+          boost::shared_ptr<PsddlPds::CsPad::ConfigV3> xptr(xtc, (PsddlPds::CsPad::ConfigV3*)(xtc->payload()));
+          cfgStore.put(xptr, xtc->src);
+          // create and store psana object in config store
+          boost::shared_ptr<Psana::CsPad::ConfigV3> obj = boost::make_shared<psddl_pds2psana::CsPad::ConfigV3>(xptr);
           cfgStore.put(obj, xtc->src);
         }
         break;
@@ -273,43 +295,77 @@ try {
       switch (version) {
       case 1:
         {
-          // XTC data object
-          boost::shared_ptr<PsddlPds::CsPad::DataV1> xptr(xtc, (PsddlPds::CsPad::DataV1*)(xtc->payload()));
           if (boost::shared_ptr<PsddlPds::CsPad::ConfigV1> cfgPtr = cfgStore.get(xtc->src)) {
             // store proxy
-            typedef EvtProxyCfg<Psana::CsPad::DataV1, psddl_pds2psana::CsPadDataOrdered<psddl_pds2psana::CsPad::DataV1, Psana::CsPad::ElementV1>, PsddlPds::CsPad::DataV1, PsddlPds::CsPad::ConfigV1> ProxyType; 
-            if (evt) evt->putProxy<Psana::CsPad::DataV1>(boost::make_shared<ProxyType>(xptr, cfgPtr), xtc->src);
+            typedef EvtProxyCfg<Psana::CsPad::DataV1, psddl_pds2psana::CsPadDataOrdered<psddl_pds2psana::CsPad::DataV1, Psana::CsPad::ElementV1>, PsddlPds::CsPad::DataV1, PsddlPds::CsPad::ConfigV1> ProxyType;
+            if (evt) evt->putProxy<Psana::CsPad::DataV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
           } else if (boost::shared_ptr<PsddlPds::CsPad::ConfigV2> cfgPtr = cfgStore.get(xtc->src)) {
             // store proxy
-            typedef EvtProxyCfg<Psana::CsPad::DataV1, psddl_pds2psana::CsPadDataOrdered<psddl_pds2psana::CsPad::DataV1, Psana::CsPad::ElementV1>, PsddlPds::CsPad::DataV1, PsddlPds::CsPad::ConfigV2> ProxyType; 
-            if (evt) evt->putProxy<Psana::CsPad::DataV1>(boost::make_shared<ProxyType>(xptr, cfgPtr), xtc->src);
+            typedef EvtProxyCfg<Psana::CsPad::DataV1, psddl_pds2psana::CsPadDataOrdered<psddl_pds2psana::CsPad::DataV1, Psana::CsPad::ElementV1>, PsddlPds::CsPad::DataV1, PsddlPds::CsPad::ConfigV2> ProxyType;
+            if (evt) evt->putProxy<Psana::CsPad::DataV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
           } else if (boost::shared_ptr<PsddlPds::CsPad::ConfigV3> cfgPtr = cfgStore.get(xtc->src)) {
             // store proxy
-            typedef EvtProxyCfg<Psana::CsPad::DataV1, psddl_pds2psana::CsPadDataOrdered<psddl_pds2psana::CsPad::DataV1, Psana::CsPad::ElementV1>, PsddlPds::CsPad::DataV1, PsddlPds::CsPad::ConfigV3> ProxyType; 
-            if (evt) evt->putProxy<Psana::CsPad::DataV1>(boost::make_shared<ProxyType>(xptr, cfgPtr), xtc->src);
+            typedef EvtProxyCfg<Psana::CsPad::DataV1, psddl_pds2psana::CsPadDataOrdered<psddl_pds2psana::CsPad::DataV1, Psana::CsPad::ElementV1>, PsddlPds::CsPad::DataV1, PsddlPds::CsPad::ConfigV3> ProxyType;
+            if (evt) evt->putProxy<Psana::CsPad::DataV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
           } else if (boost::shared_ptr<PsddlPds::CsPad::ConfigV4> cfgPtr = cfgStore.get(xtc->src)) {
             // store proxy
-            typedef EvtProxyCfg<Psana::CsPad::DataV1, psddl_pds2psana::CsPadDataOrdered<psddl_pds2psana::CsPad::DataV1, Psana::CsPad::ElementV1>, PsddlPds::CsPad::DataV1, PsddlPds::CsPad::ConfigV4> ProxyType; 
-            if (evt) evt->putProxy<Psana::CsPad::DataV1>(boost::make_shared<ProxyType>(xptr, cfgPtr), xtc->src);
+            typedef EvtProxyCfg<Psana::CsPad::DataV1, psddl_pds2psana::CsPadDataOrdered<psddl_pds2psana::CsPad::DataV1, Psana::CsPad::ElementV1>, PsddlPds::CsPad::DataV1, PsddlPds::CsPad::ConfigV4> ProxyType;
+            if (evt) evt->putProxy<Psana::CsPad::DataV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
           }
         }
         break;
       case 2:
         {
-          // XTC data object
-          boost::shared_ptr<PsddlPds::CsPad::DataV2> xptr(xtc, (PsddlPds::CsPad::DataV2*)(xtc->payload()));
           if (boost::shared_ptr<PsddlPds::CsPad::ConfigV2> cfgPtr = cfgStore.get(xtc->src)) {
             // store proxy
-            typedef EvtProxyCfg<Psana::CsPad::DataV2, psddl_pds2psana::CsPadDataOrdered<psddl_pds2psana::CsPad::DataV2, Psana::CsPad::ElementV2>, PsddlPds::CsPad::DataV2, PsddlPds::CsPad::ConfigV2> ProxyType; 
-            if (evt) evt->putProxy<Psana::CsPad::DataV2>(boost::make_shared<ProxyType>(xptr, cfgPtr), xtc->src);
+            typedef EvtProxyCfg<Psana::CsPad::DataV2, psddl_pds2psana::CsPadDataOrdered<psddl_pds2psana::CsPad::DataV2, Psana::CsPad::ElementV2>, PsddlPds::CsPad::DataV2, PsddlPds::CsPad::ConfigV2> ProxyType;
+            if (evt) evt->putProxy<Psana::CsPad::DataV2>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
           } else if (boost::shared_ptr<PsddlPds::CsPad::ConfigV3> cfgPtr = cfgStore.get(xtc->src)) {
             // store proxy
-            typedef EvtProxyCfg<Psana::CsPad::DataV2, psddl_pds2psana::CsPadDataOrdered<psddl_pds2psana::CsPad::DataV2, Psana::CsPad::ElementV2>, PsddlPds::CsPad::DataV2, PsddlPds::CsPad::ConfigV3> ProxyType; 
-            if (evt) evt->putProxy<Psana::CsPad::DataV2>(boost::make_shared<ProxyType>(xptr, cfgPtr), xtc->src);
+            typedef EvtProxyCfg<Psana::CsPad::DataV2, psddl_pds2psana::CsPadDataOrdered<psddl_pds2psana::CsPad::DataV2, Psana::CsPad::ElementV2>, PsddlPds::CsPad::DataV2, PsddlPds::CsPad::ConfigV3> ProxyType;
+            if (evt) evt->putProxy<Psana::CsPad::DataV2>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
           } else if (boost::shared_ptr<PsddlPds::CsPad::ConfigV4> cfgPtr = cfgStore.get(xtc->src)) {
             // store proxy
-            typedef EvtProxyCfg<Psana::CsPad::DataV2, psddl_pds2psana::CsPadDataOrdered<psddl_pds2psana::CsPad::DataV2, Psana::CsPad::ElementV2>, PsddlPds::CsPad::DataV2, PsddlPds::CsPad::ConfigV4> ProxyType; 
-            if (evt) evt->putProxy<Psana::CsPad::DataV2>(boost::make_shared<ProxyType>(xptr, cfgPtr), xtc->src);
+            typedef EvtProxyCfg<Psana::CsPad::DataV2, psddl_pds2psana::CsPadDataOrdered<psddl_pds2psana::CsPad::DataV2, Psana::CsPad::ElementV2>, PsddlPds::CsPad::DataV2, PsddlPds::CsPad::ConfigV4> ProxyType;
+            if (evt) evt->putProxy<Psana::CsPad::DataV2>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
+          }
+        }
+        break;
+      case 32769:
+        {
+          if (boost::shared_ptr<PsddlPds::CsPad::ConfigV1> cfgPtr = cfgStore.get(xtc->src)) {
+            // store proxy
+            typedef EvtProxyCfg<Psana::CsPad::DataV1, psddl_pds2psana::CsPadDataOrdered<psddl_pds2psana::CsPad::DataV1, Psana::CsPad::ElementV1>, PsddlPds::CsPad::DataV1, PsddlPds::CsPad::ConfigV1> ProxyType;
+            if (evt) evt->putProxy<Psana::CsPad::DataV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
+          } else if (boost::shared_ptr<PsddlPds::CsPad::ConfigV2> cfgPtr = cfgStore.get(xtc->src)) {
+            // store proxy
+            typedef EvtProxyCfg<Psana::CsPad::DataV1, psddl_pds2psana::CsPadDataOrdered<psddl_pds2psana::CsPad::DataV1, Psana::CsPad::ElementV1>, PsddlPds::CsPad::DataV1, PsddlPds::CsPad::ConfigV2> ProxyType;
+            if (evt) evt->putProxy<Psana::CsPad::DataV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
+          } else if (boost::shared_ptr<PsddlPds::CsPad::ConfigV3> cfgPtr = cfgStore.get(xtc->src)) {
+            // store proxy
+            typedef EvtProxyCfg<Psana::CsPad::DataV1, psddl_pds2psana::CsPadDataOrdered<psddl_pds2psana::CsPad::DataV1, Psana::CsPad::ElementV1>, PsddlPds::CsPad::DataV1, PsddlPds::CsPad::ConfigV3> ProxyType;
+            if (evt) evt->putProxy<Psana::CsPad::DataV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
+          } else if (boost::shared_ptr<PsddlPds::CsPad::ConfigV4> cfgPtr = cfgStore.get(xtc->src)) {
+            // store proxy
+            typedef EvtProxyCfg<Psana::CsPad::DataV1, psddl_pds2psana::CsPadDataOrdered<psddl_pds2psana::CsPad::DataV1, Psana::CsPad::ElementV1>, PsddlPds::CsPad::DataV1, PsddlPds::CsPad::ConfigV4> ProxyType;
+            if (evt) evt->putProxy<Psana::CsPad::DataV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
+          }
+        }
+        break;
+      case 32770:
+        {
+          if (boost::shared_ptr<PsddlPds::CsPad::ConfigV2> cfgPtr = cfgStore.get(xtc->src)) {
+            // store proxy
+            typedef EvtProxyCfg<Psana::CsPad::DataV2, psddl_pds2psana::CsPadDataOrdered<psddl_pds2psana::CsPad::DataV2, Psana::CsPad::ElementV2>, PsddlPds::CsPad::DataV2, PsddlPds::CsPad::ConfigV2> ProxyType;
+            if (evt) evt->putProxy<Psana::CsPad::DataV2>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
+          } else if (boost::shared_ptr<PsddlPds::CsPad::ConfigV3> cfgPtr = cfgStore.get(xtc->src)) {
+            // store proxy
+            typedef EvtProxyCfg<Psana::CsPad::DataV2, psddl_pds2psana::CsPadDataOrdered<psddl_pds2psana::CsPad::DataV2, Psana::CsPad::ElementV2>, PsddlPds::CsPad::DataV2, PsddlPds::CsPad::ConfigV3> ProxyType;
+            if (evt) evt->putProxy<Psana::CsPad::DataV2>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
+          } else if (boost::shared_ptr<PsddlPds::CsPad::ConfigV4> cfgPtr = cfgStore.get(xtc->src)) {
+            // store proxy
+            typedef EvtProxyCfg<Psana::CsPad::DataV2, psddl_pds2psana::CsPadDataOrdered<psddl_pds2psana::CsPad::DataV2, Psana::CsPad::ElementV2>, PsddlPds::CsPad::DataV2, PsddlPds::CsPad::ConfigV4> ProxyType;
+            if (evt) evt->putProxy<Psana::CsPad::DataV2>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
           }
         }
         break;
@@ -320,6 +376,16 @@ try {
     {
       switch (version) {
       case 1:
+        {
+          // XTC data object
+          const PsddlPds::Lusi::DiodeFexV1& xdata = *(PsddlPds::Lusi::DiodeFexV1*)(xtc->payload());
+          //convert XtcType to Psana type
+          const Psana::Lusi::DiodeFexV1& data = psddl_pds2psana::Lusi::pds_to_psana(xdata);
+          // store data
+          if (evt) evt->put(boost::make_shared<Psana::Lusi::DiodeFexV1>(data), xtc->src);
+        }
+        break;
+      case 32769:
         {
           // XTC data object
           const PsddlPds::Lusi::DiodeFexV1& xdata = *(PsddlPds::Lusi::DiodeFexV1*)(xtc->payload());
@@ -367,6 +433,16 @@ try {
   case Pds::TypeId::Id_EBeam:
     {
       switch (version) {
+      case 0:
+        {
+          // XTC data object
+          const PsddlPds::Bld::BldDataEBeamV0& xdata = *(PsddlPds::Bld::BldDataEBeamV0*)(xtc->payload());
+          //convert XtcType to Psana type
+          const Psana::Bld::BldDataEBeamV0& data = psddl_pds2psana::Bld::pds_to_psana(xdata);
+          // store data
+          if (evt) evt->put(boost::make_shared<Psana::Bld::BldDataEBeamV0>(data), xtc->src);
+        }
+        break;
       case 1:
         {
           // XTC data object
@@ -377,14 +453,14 @@ try {
           if (evt) evt->put(boost::make_shared<Psana::Bld::BldDataEBeamV1>(data), xtc->src);
         }
         break;
-      case 0:
+      case 2:
         {
           // XTC data object
-          const PsddlPds::Bld::BldDataEBeamV0& xdata = *(PsddlPds::Bld::BldDataEBeamV0*)(xtc->payload());
+          const PsddlPds::Bld::BldDataEBeamV2& xdata = *(PsddlPds::Bld::BldDataEBeamV2*)(xtc->payload());
           //convert XtcType to Psana type
-          const Psana::Bld::BldDataEBeamV0& data = psddl_pds2psana::Bld::pds_to_psana(xdata);
+          const Psana::Bld::BldDataEBeamV2& data = psddl_pds2psana::Bld::pds_to_psana(xdata);
           // store data
-          if (evt) evt->put(boost::make_shared<Psana::Bld::BldDataEBeamV0>(data), xtc->src);
+          if (evt) evt->put(boost::make_shared<Psana::Bld::BldDataEBeamV2>(data), xtc->src);
         }
         break;
       case 3:
@@ -397,7 +473,27 @@ try {
           if (evt) evt->put(boost::make_shared<Psana::Bld::BldDataEBeamV3>(data), xtc->src);
         }
         break;
-      case 2:
+      case 32768:
+        {
+          // XTC data object
+          const PsddlPds::Bld::BldDataEBeamV0& xdata = *(PsddlPds::Bld::BldDataEBeamV0*)(xtc->payload());
+          //convert XtcType to Psana type
+          const Psana::Bld::BldDataEBeamV0& data = psddl_pds2psana::Bld::pds_to_psana(xdata);
+          // store data
+          if (evt) evt->put(boost::make_shared<Psana::Bld::BldDataEBeamV0>(data), xtc->src);
+        }
+        break;
+      case 32769:
+        {
+          // XTC data object
+          const PsddlPds::Bld::BldDataEBeamV1& xdata = *(PsddlPds::Bld::BldDataEBeamV1*)(xtc->payload());
+          //convert XtcType to Psana type
+          const Psana::Bld::BldDataEBeamV1& data = psddl_pds2psana::Bld::pds_to_psana(xdata);
+          // store data
+          if (evt) evt->put(boost::make_shared<Psana::Bld::BldDataEBeamV1>(data), xtc->src);
+        }
+        break;
+      case 32770:
         {
           // XTC data object
           const PsddlPds::Bld::BldDataEBeamV2& xdata = *(PsddlPds::Bld::BldDataEBeamV2*)(xtc->payload());
@@ -405,6 +501,16 @@ try {
           const Psana::Bld::BldDataEBeamV2& data = psddl_pds2psana::Bld::pds_to_psana(xdata);
           // store data
           if (evt) evt->put(boost::make_shared<Psana::Bld::BldDataEBeamV2>(data), xtc->src);
+        }
+        break;
+      case 32771:
+        {
+          // XTC data object
+          const PsddlPds::Bld::BldDataEBeamV3& xdata = *(PsddlPds::Bld::BldDataEBeamV3*)(xtc->payload());
+          //convert XtcType to Psana type
+          const Psana::Bld::BldDataEBeamV3& data = psddl_pds2psana::Bld::pds_to_psana(xdata);
+          // store data
+          if (evt) evt->put(boost::make_shared<Psana::Bld::BldDataEBeamV3>(data), xtc->src);
         }
         break;
       } // end switch (version)
@@ -441,22 +547,30 @@ try {
       switch (version) {
       case 1:
         {
-          // XTC data object
-          boost::shared_ptr<PsddlPds::Encoder::DataV1> xptr(xtc, (PsddlPds::Encoder::DataV1*)(xtc->payload()));
-          size_t xtcSize = xtc->sizeofPayload();
           // store proxy
-          typedef EvtProxy<Psana::Encoder::DataV1, psddl_pds2psana::Encoder::DataV1, PsddlPds::Encoder::DataV1> ProxyType; 
-          if (evt) evt->putProxy<Psana::Encoder::DataV1>(boost::make_shared<ProxyType>(xptr, xtcSize), xtc->src);
+          typedef EvtProxy<Psana::Encoder::DataV1, psddl_pds2psana::Encoder::DataV1, PsddlPds::Encoder::DataV1> ProxyType;
+          if (evt) evt->putProxy<Psana::Encoder::DataV1>(boost::make_shared<ProxyType>(xtc), xtc->src);
         }
         break;
       case 2:
         {
-          // XTC data object
-          boost::shared_ptr<PsddlPds::Encoder::DataV2> xptr(xtc, (PsddlPds::Encoder::DataV2*)(xtc->payload()));
-          size_t xtcSize = xtc->sizeofPayload();
           // store proxy
-          typedef EvtProxy<Psana::Encoder::DataV2, psddl_pds2psana::Encoder::DataV2, PsddlPds::Encoder::DataV2> ProxyType; 
-          if (evt) evt->putProxy<Psana::Encoder::DataV2>(boost::make_shared<ProxyType>(xptr, xtcSize), xtc->src);
+          typedef EvtProxy<Psana::Encoder::DataV2, psddl_pds2psana::Encoder::DataV2, PsddlPds::Encoder::DataV2> ProxyType;
+          if (evt) evt->putProxy<Psana::Encoder::DataV2>(boost::make_shared<ProxyType>(xtc), xtc->src);
+        }
+        break;
+      case 32769:
+        {
+          // store proxy
+          typedef EvtProxy<Psana::Encoder::DataV1, psddl_pds2psana::Encoder::DataV1, PsddlPds::Encoder::DataV1> ProxyType;
+          if (evt) evt->putProxy<Psana::Encoder::DataV1>(boost::make_shared<ProxyType>(xtc), xtc->src);
+        }
+        break;
+      case 32770:
+        {
+          // store proxy
+          typedef EvtProxy<Psana::Encoder::DataV2, psddl_pds2psana::Encoder::DataV2, PsddlPds::Encoder::DataV2> ProxyType;
+          if (evt) evt->putProxy<Psana::Encoder::DataV2>(boost::make_shared<ProxyType>(xtc), xtc->src);
         }
         break;
       } // end switch (version)
@@ -491,16 +605,6 @@ try {
           cfgStore.put(obj, xtc->src);
         }
         break;
-      case 3:
-        {
-          // store XTC object in config store
-          boost::shared_ptr<PsddlPds::EvrData::ConfigV3> xptr(xtc, (PsddlPds::EvrData::ConfigV3*)(xtc->payload()));
-          cfgStore.put(xptr, xtc->src);
-          // create and store psana object in config store
-          boost::shared_ptr<Psana::EvrData::ConfigV3> obj = boost::make_shared<psddl_pds2psana::EvrData::ConfigV3>(xptr);
-          cfgStore.put(obj, xtc->src);
-        }
-        break;
       case 2:
         {
           // store XTC object in config store
@@ -511,13 +615,13 @@ try {
           cfgStore.put(obj, xtc->src);
         }
         break;
-      case 5:
+      case 3:
         {
           // store XTC object in config store
-          boost::shared_ptr<PsddlPds::EvrData::ConfigV5> xptr(xtc, (PsddlPds::EvrData::ConfigV5*)(xtc->payload()));
+          boost::shared_ptr<PsddlPds::EvrData::ConfigV3> xptr(xtc, (PsddlPds::EvrData::ConfigV3*)(xtc->payload()));
           cfgStore.put(xptr, xtc->src);
           // create and store psana object in config store
-          boost::shared_ptr<Psana::EvrData::ConfigV5> obj = boost::make_shared<psddl_pds2psana::EvrData::ConfigV5>(xptr);
+          boost::shared_ptr<Psana::EvrData::ConfigV3> obj = boost::make_shared<psddl_pds2psana::EvrData::ConfigV3>(xptr);
           cfgStore.put(obj, xtc->src);
         }
         break;
@@ -531,13 +635,13 @@ try {
           cfgStore.put(obj, xtc->src);
         }
         break;
-      case 7:
+      case 5:
         {
           // store XTC object in config store
-          boost::shared_ptr<PsddlPds::EvrData::ConfigV7> xptr(xtc, (PsddlPds::EvrData::ConfigV7*)(xtc->payload()));
+          boost::shared_ptr<PsddlPds::EvrData::ConfigV5> xptr(xtc, (PsddlPds::EvrData::ConfigV5*)(xtc->payload()));
           cfgStore.put(xptr, xtc->src);
           // create and store psana object in config store
-          boost::shared_ptr<Psana::EvrData::ConfigV7> obj = boost::make_shared<psddl_pds2psana::EvrData::ConfigV7>(xptr);
+          boost::shared_ptr<Psana::EvrData::ConfigV5> obj = boost::make_shared<psddl_pds2psana::EvrData::ConfigV5>(xptr);
           cfgStore.put(obj, xtc->src);
         }
         break;
@@ -551,6 +655,16 @@ try {
           cfgStore.put(obj, xtc->src);
         }
         break;
+      case 7:
+        {
+          // store XTC object in config store
+          boost::shared_ptr<PsddlPds::EvrData::ConfigV7> xptr(xtc, (PsddlPds::EvrData::ConfigV7*)(xtc->payload()));
+          cfgStore.put(xptr, xtc->src);
+          // create and store psana object in config store
+          boost::shared_ptr<Psana::EvrData::ConfigV7> obj = boost::make_shared<psddl_pds2psana::EvrData::ConfigV7>(xptr);
+          cfgStore.put(obj, xtc->src);
+        }
+        break;
       } // end switch (version)
     }
     break;
@@ -559,12 +673,16 @@ try {
       switch (version) {
       case 3:
         {
-          // XTC data object
-          boost::shared_ptr<PsddlPds::EvrData::DataV3> xptr(xtc, (PsddlPds::EvrData::DataV3*)(xtc->payload()));
-          size_t xtcSize = xtc->sizeofPayload();
           // store proxy
-          typedef EvtProxy<Psana::EvrData::DataV3, psddl_pds2psana::EvrData::DataV3, PsddlPds::EvrData::DataV3> ProxyType; 
-          if (evt) evt->putProxy<Psana::EvrData::DataV3>(boost::make_shared<ProxyType>(xptr, xtcSize), xtc->src);
+          typedef EvtProxy<Psana::EvrData::DataV3, psddl_pds2psana::EvrData::DataV3, PsddlPds::EvrData::DataV3> ProxyType;
+          if (evt) evt->putProxy<Psana::EvrData::DataV3>(boost::make_shared<ProxyType>(xtc), xtc->src);
+        }
+        break;
+      case 32771:
+        {
+          // store proxy
+          typedef EvtProxy<Psana::EvrData::DataV3, psddl_pds2psana::EvrData::DataV3, PsddlPds::EvrData::DataV3> ProxyType;
+          if (evt) evt->putProxy<Psana::EvrData::DataV3>(boost::make_shared<ProxyType>(xtc), xtc->src);
         }
         break;
       } // end switch (version)
@@ -625,6 +743,16 @@ try {
           if (evt) evt->put(boost::make_shared<Psana::Bld::BldDataFEEGasDetEnergy>(data), xtc->src);
         }
         break;
+      case 32768:
+        {
+          // XTC data object
+          const PsddlPds::Bld::BldDataFEEGasDetEnergy& xdata = *(PsddlPds::Bld::BldDataFEEGasDetEnergy*)(xtc->payload());
+          //convert XtcType to Psana type
+          const Psana::Bld::BldDataFEEGasDetEnergy& data = psddl_pds2psana::Bld::pds_to_psana(xdata);
+          // store data
+          if (evt) evt->put(boost::make_shared<Psana::Bld::BldDataFEEGasDetEnergy>(data), xtc->src);
+        }
+        break;
       } // end switch (version)
     }
     break;
@@ -649,12 +777,19 @@ try {
       switch (version) {
       case 1:
         {
-          // XTC data object
-          boost::shared_ptr<PsddlPds::Fli::FrameV1> xptr(xtc, (PsddlPds::Fli::FrameV1*)(xtc->payload()));
           if (boost::shared_ptr<PsddlPds::Fli::ConfigV1> cfgPtr = cfgStore.get(xtc->src)) {
             // store proxy
-            typedef EvtProxyCfg<Psana::Fli::FrameV1, psddl_pds2psana::Fli::FrameV1, PsddlPds::Fli::FrameV1, PsddlPds::Fli::ConfigV1> ProxyType; 
-            if (evt) evt->putProxy<Psana::Fli::FrameV1>(boost::make_shared<ProxyType>(xptr, cfgPtr), xtc->src);
+            typedef EvtProxyCfg<Psana::Fli::FrameV1, psddl_pds2psana::Fli::FrameV1, PsddlPds::Fli::FrameV1, PsddlPds::Fli::ConfigV1> ProxyType;
+            if (evt) evt->putProxy<Psana::Fli::FrameV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
+          }
+        }
+        break;
+      case 32769:
+        {
+          if (boost::shared_ptr<PsddlPds::Fli::ConfigV1> cfgPtr = cfgStore.get(xtc->src)) {
+            // store proxy
+            typedef EvtProxyCfg<Psana::Fli::FrameV1, psddl_pds2psana::Fli::FrameV1, PsddlPds::Fli::FrameV1, PsddlPds::Fli::ConfigV1> ProxyType;
+            if (evt) evt->putProxy<Psana::Fli::FrameV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
           }
         }
         break;
@@ -666,12 +801,16 @@ try {
       switch (version) {
       case 1:
         {
-          // XTC data object
-          boost::shared_ptr<PsddlPds::Camera::FrameV1> xptr(xtc, (PsddlPds::Camera::FrameV1*)(xtc->payload()));
-          size_t xtcSize = xtc->sizeofPayload();
           // store proxy
-          typedef EvtProxy<Psana::Camera::FrameV1, psddl_pds2psana::Camera::FrameV1, PsddlPds::Camera::FrameV1> ProxyType; 
-          if (evt) evt->putProxy<Psana::Camera::FrameV1>(boost::make_shared<ProxyType>(xptr, xtcSize), xtc->src);
+          typedef EvtProxy<Psana::Camera::FrameV1, psddl_pds2psana::Camera::FrameV1, PsddlPds::Camera::FrameV1> ProxyType;
+          if (evt) evt->putProxy<Psana::Camera::FrameV1>(boost::make_shared<ProxyType>(xtc), xtc->src);
+        }
+        break;
+      case 32769:
+        {
+          // store proxy
+          typedef EvtProxy<Psana::Camera::FrameV1, psddl_pds2psana::Camera::FrameV1, PsddlPds::Camera::FrameV1> ProxyType;
+          if (evt) evt->putProxy<Psana::Camera::FrameV1>(boost::make_shared<ProxyType>(xtc), xtc->src);
         }
         break;
       } // end switch (version)
@@ -712,24 +851,32 @@ try {
   case Pds::TypeId::Id_GMD:
     {
       switch (version) {
-      case 1:
-        {
-          // XTC data object
-          boost::shared_ptr<PsddlPds::Bld::BldDataGMDV1> xptr(xtc, (PsddlPds::Bld::BldDataGMDV1*)(xtc->payload()));
-          size_t xtcSize = xtc->sizeofPayload();
-          // store proxy
-          typedef EvtProxy<Psana::Bld::BldDataGMDV1, psddl_pds2psana::Bld::BldDataGMDV1, PsddlPds::Bld::BldDataGMDV1> ProxyType; 
-          if (evt) evt->putProxy<Psana::Bld::BldDataGMDV1>(boost::make_shared<ProxyType>(xptr, xtcSize), xtc->src);
-        }
-        break;
       case 0:
         {
-          // XTC data object
-          boost::shared_ptr<PsddlPds::Bld::BldDataGMDV0> xptr(xtc, (PsddlPds::Bld::BldDataGMDV0*)(xtc->payload()));
-          size_t xtcSize = xtc->sizeofPayload();
           // store proxy
-          typedef EvtProxy<Psana::Bld::BldDataGMDV0, psddl_pds2psana::Bld::BldDataGMDV0, PsddlPds::Bld::BldDataGMDV0> ProxyType; 
-          if (evt) evt->putProxy<Psana::Bld::BldDataGMDV0>(boost::make_shared<ProxyType>(xptr, xtcSize), xtc->src);
+          typedef EvtProxy<Psana::Bld::BldDataGMDV0, psddl_pds2psana::Bld::BldDataGMDV0, PsddlPds::Bld::BldDataGMDV0> ProxyType;
+          if (evt) evt->putProxy<Psana::Bld::BldDataGMDV0>(boost::make_shared<ProxyType>(xtc), xtc->src);
+        }
+        break;
+      case 1:
+        {
+          // store proxy
+          typedef EvtProxy<Psana::Bld::BldDataGMDV1, psddl_pds2psana::Bld::BldDataGMDV1, PsddlPds::Bld::BldDataGMDV1> ProxyType;
+          if (evt) evt->putProxy<Psana::Bld::BldDataGMDV1>(boost::make_shared<ProxyType>(xtc), xtc->src);
+        }
+        break;
+      case 32768:
+        {
+          // store proxy
+          typedef EvtProxy<Psana::Bld::BldDataGMDV0, psddl_pds2psana::Bld::BldDataGMDV0, PsddlPds::Bld::BldDataGMDV0> ProxyType;
+          if (evt) evt->putProxy<Psana::Bld::BldDataGMDV0>(boost::make_shared<ProxyType>(xtc), xtc->src);
+        }
+        break;
+      case 32769:
+        {
+          // store proxy
+          typedef EvtProxy<Psana::Bld::BldDataGMDV1, psddl_pds2psana::Bld::BldDataGMDV1, PsddlPds::Bld::BldDataGMDV1> ProxyType;
+          if (evt) evt->putProxy<Psana::Bld::BldDataGMDV1>(boost::make_shared<ProxyType>(xtc), xtc->src);
         }
         break;
       } // end switch (version)
@@ -756,12 +903,19 @@ try {
       switch (version) {
       case 1:
         {
-          // XTC data object
-          boost::shared_ptr<PsddlPds::Gsc16ai::DataV1> xptr(xtc, (PsddlPds::Gsc16ai::DataV1*)(xtc->payload()));
           if (boost::shared_ptr<PsddlPds::Gsc16ai::ConfigV1> cfgPtr = cfgStore.get(xtc->src)) {
             // store proxy
-            typedef EvtProxyCfg<Psana::Gsc16ai::DataV1, psddl_pds2psana::Gsc16ai::DataV1, PsddlPds::Gsc16ai::DataV1, PsddlPds::Gsc16ai::ConfigV1> ProxyType; 
-            if (evt) evt->putProxy<Psana::Gsc16ai::DataV1>(boost::make_shared<ProxyType>(xptr, cfgPtr), xtc->src);
+            typedef EvtProxyCfg<Psana::Gsc16ai::DataV1, psddl_pds2psana::Gsc16ai::DataV1, PsddlPds::Gsc16ai::DataV1, PsddlPds::Gsc16ai::ConfigV1> ProxyType;
+            if (evt) evt->putProxy<Psana::Gsc16ai::DataV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
+          }
+        }
+        break;
+      case 32769:
+        {
+          if (boost::shared_ptr<PsddlPds::Gsc16ai::ConfigV1> cfgPtr = cfgStore.get(xtc->src)) {
+            // store proxy
+            typedef EvtProxyCfg<Psana::Gsc16ai::DataV1, psddl_pds2psana::Gsc16ai::DataV1, PsddlPds::Gsc16ai::DataV1, PsddlPds::Gsc16ai::ConfigV1> ProxyType;
+            if (evt) evt->putProxy<Psana::Gsc16ai::DataV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
           }
         }
         break;
@@ -799,22 +953,30 @@ try {
       switch (version) {
       case 1:
         {
-          // XTC data object
-          boost::shared_ptr<PsddlPds::Ipimb::DataV1> xptr(xtc, (PsddlPds::Ipimb::DataV1*)(xtc->payload()));
-          size_t xtcSize = xtc->sizeofPayload();
           // store proxy
-          typedef EvtProxy<Psana::Ipimb::DataV1, psddl_pds2psana::Ipimb::DataV1, PsddlPds::Ipimb::DataV1> ProxyType; 
-          if (evt) evt->putProxy<Psana::Ipimb::DataV1>(boost::make_shared<ProxyType>(xptr, xtcSize), xtc->src);
+          typedef EvtProxy<Psana::Ipimb::DataV1, psddl_pds2psana::Ipimb::DataV1, PsddlPds::Ipimb::DataV1> ProxyType;
+          if (evt) evt->putProxy<Psana::Ipimb::DataV1>(boost::make_shared<ProxyType>(xtc), xtc->src);
         }
         break;
       case 2:
         {
-          // XTC data object
-          boost::shared_ptr<PsddlPds::Ipimb::DataV2> xptr(xtc, (PsddlPds::Ipimb::DataV2*)(xtc->payload()));
-          size_t xtcSize = xtc->sizeofPayload();
           // store proxy
-          typedef EvtProxy<Psana::Ipimb::DataV2, psddl_pds2psana::Ipimb::DataV2, PsddlPds::Ipimb::DataV2> ProxyType; 
-          if (evt) evt->putProxy<Psana::Ipimb::DataV2>(boost::make_shared<ProxyType>(xptr, xtcSize), xtc->src);
+          typedef EvtProxy<Psana::Ipimb::DataV2, psddl_pds2psana::Ipimb::DataV2, PsddlPds::Ipimb::DataV2> ProxyType;
+          if (evt) evt->putProxy<Psana::Ipimb::DataV2>(boost::make_shared<ProxyType>(xtc), xtc->src);
+        }
+        break;
+      case 32769:
+        {
+          // store proxy
+          typedef EvtProxy<Psana::Ipimb::DataV1, psddl_pds2psana::Ipimb::DataV1, PsddlPds::Ipimb::DataV1> ProxyType;
+          if (evt) evt->putProxy<Psana::Ipimb::DataV1>(boost::make_shared<ProxyType>(xtc), xtc->src);
+        }
+        break;
+      case 32770:
+        {
+          // store proxy
+          typedef EvtProxy<Psana::Ipimb::DataV2, psddl_pds2psana::Ipimb::DataV2, PsddlPds::Ipimb::DataV2> ProxyType;
+          if (evt) evt->putProxy<Psana::Ipimb::DataV2>(boost::make_shared<ProxyType>(xtc), xtc->src);
         }
         break;
       } // end switch (version)
@@ -824,6 +986,16 @@ try {
     {
       switch (version) {
       case 1:
+        {
+          // XTC data object
+          const PsddlPds::Lusi::IpmFexV1& xdata = *(PsddlPds::Lusi::IpmFexV1*)(xtc->payload());
+          //convert XtcType to Psana type
+          const Psana::Lusi::IpmFexV1& data = psddl_pds2psana::Lusi::pds_to_psana(xdata);
+          // store data
+          if (evt) evt->put(boost::make_shared<Psana::Lusi::IpmFexV1>(data), xtc->src);
+        }
+        break;
+      case 32769:
         {
           // XTC data object
           const PsddlPds::Lusi::IpmFexV1& xdata = *(PsddlPds::Lusi::IpmFexV1*)(xtc->payload());
@@ -883,12 +1055,19 @@ try {
       switch (version) {
       case 1:
         {
-          // XTC data object
-          boost::shared_ptr<PsddlPds::OceanOptics::DataV1> xptr(xtc, (PsddlPds::OceanOptics::DataV1*)(xtc->payload()));
           if (boost::shared_ptr<PsddlPds::OceanOptics::ConfigV1> cfgPtr = cfgStore.get(xtc->src)) {
             // store proxy
-            typedef EvtProxyCfg<Psana::OceanOptics::DataV1, psddl_pds2psana::OceanOptics::DataV1, PsddlPds::OceanOptics::DataV1, PsddlPds::OceanOptics::ConfigV1> ProxyType; 
-            if (evt) evt->putProxy<Psana::OceanOptics::DataV1>(boost::make_shared<ProxyType>(xptr, cfgPtr), xtc->src);
+            typedef EvtProxyCfg<Psana::OceanOptics::DataV1, psddl_pds2psana::OceanOptics::DataV1, PsddlPds::OceanOptics::DataV1, PsddlPds::OceanOptics::ConfigV1> ProxyType;
+            if (evt) evt->putProxy<Psana::OceanOptics::DataV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
+          }
+        }
+        break;
+      case 32769:
+        {
+          if (boost::shared_ptr<PsddlPds::OceanOptics::ConfigV1> cfgPtr = cfgStore.get(xtc->src)) {
+            // store proxy
+            typedef EvtProxyCfg<Psana::OceanOptics::DataV1, psddl_pds2psana::OceanOptics::DataV1, PsddlPds::OceanOptics::DataV1, PsddlPds::OceanOptics::ConfigV1> ProxyType;
+            if (evt) evt->putProxy<Psana::OceanOptics::DataV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
           }
         }
         break;
@@ -931,6 +1110,16 @@ try {
     {
       switch (version) {
       case 0:
+        {
+          // XTC data object
+          const PsddlPds::Bld::BldDataPhaseCavity& xdata = *(PsddlPds::Bld::BldDataPhaseCavity*)(xtc->payload());
+          //convert XtcType to Psana type
+          const Psana::Bld::BldDataPhaseCavity& data = psddl_pds2psana::Bld::pds_to_psana(xdata);
+          // store data
+          if (evt) evt->put(boost::make_shared<Psana::Bld::BldDataPhaseCavity>(data), xtc->src);
+        }
+        break;
+      case 32768:
         {
           // XTC data object
           const PsddlPds::Bld::BldDataPhaseCavity& xdata = *(PsddlPds::Bld::BldDataPhaseCavity*)(xtc->payload());
@@ -993,16 +1182,33 @@ try {
       switch (version) {
       case 1:
         {
-          // XTC data object
-          boost::shared_ptr<PsddlPds::PNCCD::FramesV1> xptr(xtc, (PsddlPds::PNCCD::FramesV1*)(xtc->payload()));
+          // store proxy
+          typedef PnccdFullFrameV1Proxy ProxyType;
+          if (evt) evt->putProxy<Psana::PNCCD::FullFrameV1>(boost::make_shared<ProxyType>(xtc), xtc->src);
           if (boost::shared_ptr<PsddlPds::PNCCD::ConfigV1> cfgPtr = cfgStore.get(xtc->src)) {
             // store proxy
-            typedef EvtProxyCfg<Psana::PNCCD::FramesV1, psddl_pds2psana::PNCCD::FramesV1, PsddlPds::PNCCD::FramesV1, PsddlPds::PNCCD::ConfigV1> ProxyType; 
-            if (evt) evt->putProxy<Psana::PNCCD::FramesV1>(boost::make_shared<ProxyType>(xptr, cfgPtr), xtc->src);
+            typedef EvtProxyCfg<Psana::PNCCD::FramesV1, psddl_pds2psana::PNCCD::FramesV1, PsddlPds::PNCCD::FramesV1, PsddlPds::PNCCD::ConfigV1> ProxyType;
+            if (evt) evt->putProxy<Psana::PNCCD::FramesV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
           } else if (boost::shared_ptr<PsddlPds::PNCCD::ConfigV2> cfgPtr = cfgStore.get(xtc->src)) {
             // store proxy
-            typedef EvtProxyCfg<Psana::PNCCD::FramesV1, psddl_pds2psana::PNCCD::FramesV1, PsddlPds::PNCCD::FramesV1, PsddlPds::PNCCD::ConfigV2> ProxyType; 
-            if (evt) evt->putProxy<Psana::PNCCD::FramesV1>(boost::make_shared<ProxyType>(xptr, cfgPtr), xtc->src);
+            typedef EvtProxyCfg<Psana::PNCCD::FramesV1, psddl_pds2psana::PNCCD::FramesV1, PsddlPds::PNCCD::FramesV1, PsddlPds::PNCCD::ConfigV2> ProxyType;
+            if (evt) evt->putProxy<Psana::PNCCD::FramesV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
+          }
+        }
+        break;
+      case 32769:
+        {
+          // store proxy
+          typedef PnccdFullFrameV1Proxy ProxyType;
+          if (evt) evt->putProxy<Psana::PNCCD::FullFrameV1>(boost::make_shared<ProxyType>(xtc), xtc->src);
+          if (boost::shared_ptr<PsddlPds::PNCCD::ConfigV1> cfgPtr = cfgStore.get(xtc->src)) {
+            // store proxy
+            typedef EvtProxyCfg<Psana::PNCCD::FramesV1, psddl_pds2psana::PNCCD::FramesV1, PsddlPds::PNCCD::FramesV1, PsddlPds::PNCCD::ConfigV1> ProxyType;
+            if (evt) evt->putProxy<Psana::PNCCD::FramesV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
+          } else if (boost::shared_ptr<PsddlPds::PNCCD::ConfigV2> cfgPtr = cfgStore.get(xtc->src)) {
+            // store proxy
+            typedef EvtProxyCfg<Psana::PNCCD::FramesV1, psddl_pds2psana::PNCCD::FramesV1, PsddlPds::PNCCD::FramesV1, PsddlPds::PNCCD::ConfigV2> ProxyType;
+            if (evt) evt->putProxy<Psana::PNCCD::FramesV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
           }
         }
         break;
@@ -1022,16 +1228,6 @@ try {
           cfgStore.put(obj, xtc->src);
         }
         break;
-      case 3:
-        {
-          // store XTC object in config store
-          boost::shared_ptr<PsddlPds::Princeton::ConfigV3> xptr(xtc, (PsddlPds::Princeton::ConfigV3*)(xtc->payload()));
-          cfgStore.put(xptr, xtc->src);
-          // create and store psana object in config store
-          boost::shared_ptr<Psana::Princeton::ConfigV3> obj = boost::make_shared<psddl_pds2psana::Princeton::ConfigV3>(xptr);
-          cfgStore.put(obj, xtc->src);
-        }
-        break;
       case 2:
         {
           // store XTC object in config store
@@ -1042,13 +1238,13 @@ try {
           cfgStore.put(obj, xtc->src);
         }
         break;
-      case 5:
+      case 3:
         {
           // store XTC object in config store
-          boost::shared_ptr<PsddlPds::Princeton::ConfigV5> xptr(xtc, (PsddlPds::Princeton::ConfigV5*)(xtc->payload()));
+          boost::shared_ptr<PsddlPds::Princeton::ConfigV3> xptr(xtc, (PsddlPds::Princeton::ConfigV3*)(xtc->payload()));
           cfgStore.put(xptr, xtc->src);
           // create and store psana object in config store
-          boost::shared_ptr<Psana::Princeton::ConfigV5> obj = boost::make_shared<psddl_pds2psana::Princeton::ConfigV5>(xptr);
+          boost::shared_ptr<Psana::Princeton::ConfigV3> obj = boost::make_shared<psddl_pds2psana::Princeton::ConfigV3>(xptr);
           cfgStore.put(obj, xtc->src);
         }
         break;
@@ -1062,6 +1258,16 @@ try {
           cfgStore.put(obj, xtc->src);
         }
         break;
+      case 5:
+        {
+          // store XTC object in config store
+          boost::shared_ptr<PsddlPds::Princeton::ConfigV5> xptr(xtc, (PsddlPds::Princeton::ConfigV5*)(xtc->payload()));
+          cfgStore.put(xptr, xtc->src);
+          // create and store psana object in config store
+          boost::shared_ptr<Psana::Princeton::ConfigV5> obj = boost::make_shared<psddl_pds2psana::Princeton::ConfigV5>(xptr);
+          cfgStore.put(obj, xtc->src);
+        }
+        break;
       } // end switch (version)
     }
     break;
@@ -1070,55 +1276,101 @@ try {
       switch (version) {
       case 1:
         {
-          // XTC data object
-          boost::shared_ptr<PsddlPds::Princeton::FrameV1> xptr(xtc, (PsddlPds::Princeton::FrameV1*)(xtc->payload()));
           if (boost::shared_ptr<PsddlPds::Princeton::ConfigV1> cfgPtr = cfgStore.get(xtc->src)) {
             // store proxy
-            typedef EvtProxyCfg<Psana::Princeton::FrameV1, psddl_pds2psana::Princeton::FrameV1, PsddlPds::Princeton::FrameV1, PsddlPds::Princeton::ConfigV1> ProxyType; 
-            if (evt) evt->putProxy<Psana::Princeton::FrameV1>(boost::make_shared<ProxyType>(xptr, cfgPtr), xtc->src);
+            typedef EvtProxyCfg<Psana::Princeton::FrameV1, psddl_pds2psana::Princeton::FrameV1, PsddlPds::Princeton::FrameV1, PsddlPds::Princeton::ConfigV1> ProxyType;
+            if (evt) evt->putProxy<Psana::Princeton::FrameV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
           } else if (boost::shared_ptr<PsddlPds::Princeton::ConfigV2> cfgPtr = cfgStore.get(xtc->src)) {
             // store proxy
-            typedef EvtProxyCfg<Psana::Princeton::FrameV1, psddl_pds2psana::Princeton::FrameV1, PsddlPds::Princeton::FrameV1, PsddlPds::Princeton::ConfigV2> ProxyType; 
-            if (evt) evt->putProxy<Psana::Princeton::FrameV1>(boost::make_shared<ProxyType>(xptr, cfgPtr), xtc->src);
+            typedef EvtProxyCfg<Psana::Princeton::FrameV1, psddl_pds2psana::Princeton::FrameV1, PsddlPds::Princeton::FrameV1, PsddlPds::Princeton::ConfigV2> ProxyType;
+            if (evt) evt->putProxy<Psana::Princeton::FrameV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
           } else if (boost::shared_ptr<PsddlPds::Princeton::ConfigV3> cfgPtr = cfgStore.get(xtc->src)) {
             // store proxy
-            typedef EvtProxyCfg<Psana::Princeton::FrameV1, psddl_pds2psana::Princeton::FrameV1, PsddlPds::Princeton::FrameV1, PsddlPds::Princeton::ConfigV3> ProxyType; 
-            if (evt) evt->putProxy<Psana::Princeton::FrameV1>(boost::make_shared<ProxyType>(xptr, cfgPtr), xtc->src);
+            typedef EvtProxyCfg<Psana::Princeton::FrameV1, psddl_pds2psana::Princeton::FrameV1, PsddlPds::Princeton::FrameV1, PsddlPds::Princeton::ConfigV3> ProxyType;
+            if (evt) evt->putProxy<Psana::Princeton::FrameV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
           } else if (boost::shared_ptr<PsddlPds::Princeton::ConfigV4> cfgPtr = cfgStore.get(xtc->src)) {
             // store proxy
-            typedef EvtProxyCfg<Psana::Princeton::FrameV1, psddl_pds2psana::Princeton::FrameV1, PsddlPds::Princeton::FrameV1, PsddlPds::Princeton::ConfigV4> ProxyType; 
-            if (evt) evt->putProxy<Psana::Princeton::FrameV1>(boost::make_shared<ProxyType>(xptr, cfgPtr), xtc->src);
+            typedef EvtProxyCfg<Psana::Princeton::FrameV1, psddl_pds2psana::Princeton::FrameV1, PsddlPds::Princeton::FrameV1, PsddlPds::Princeton::ConfigV4> ProxyType;
+            if (evt) evt->putProxy<Psana::Princeton::FrameV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
           } else if (boost::shared_ptr<PsddlPds::Princeton::ConfigV5> cfgPtr = cfgStore.get(xtc->src)) {
             // store proxy
-            typedef EvtProxyCfg<Psana::Princeton::FrameV1, psddl_pds2psana::Princeton::FrameV1, PsddlPds::Princeton::FrameV1, PsddlPds::Princeton::ConfigV5> ProxyType; 
-            if (evt) evt->putProxy<Psana::Princeton::FrameV1>(boost::make_shared<ProxyType>(xptr, cfgPtr), xtc->src);
+            typedef EvtProxyCfg<Psana::Princeton::FrameV1, psddl_pds2psana::Princeton::FrameV1, PsddlPds::Princeton::FrameV1, PsddlPds::Princeton::ConfigV5> ProxyType;
+            if (evt) evt->putProxy<Psana::Princeton::FrameV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
           }
         }
         break;
       case 2:
         {
-          // XTC data object
-          boost::shared_ptr<PsddlPds::Princeton::FrameV2> xptr(xtc, (PsddlPds::Princeton::FrameV2*)(xtc->payload()));
           if (boost::shared_ptr<PsddlPds::Princeton::ConfigV1> cfgPtr = cfgStore.get(xtc->src)) {
             // store proxy
-            typedef EvtProxyCfg<Psana::Princeton::FrameV2, psddl_pds2psana::Princeton::FrameV2, PsddlPds::Princeton::FrameV2, PsddlPds::Princeton::ConfigV1> ProxyType; 
-            if (evt) evt->putProxy<Psana::Princeton::FrameV2>(boost::make_shared<ProxyType>(xptr, cfgPtr), xtc->src);
+            typedef EvtProxyCfg<Psana::Princeton::FrameV2, psddl_pds2psana::Princeton::FrameV2, PsddlPds::Princeton::FrameV2, PsddlPds::Princeton::ConfigV1> ProxyType;
+            if (evt) evt->putProxy<Psana::Princeton::FrameV2>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
           } else if (boost::shared_ptr<PsddlPds::Princeton::ConfigV2> cfgPtr = cfgStore.get(xtc->src)) {
             // store proxy
-            typedef EvtProxyCfg<Psana::Princeton::FrameV2, psddl_pds2psana::Princeton::FrameV2, PsddlPds::Princeton::FrameV2, PsddlPds::Princeton::ConfigV2> ProxyType; 
-            if (evt) evt->putProxy<Psana::Princeton::FrameV2>(boost::make_shared<ProxyType>(xptr, cfgPtr), xtc->src);
+            typedef EvtProxyCfg<Psana::Princeton::FrameV2, psddl_pds2psana::Princeton::FrameV2, PsddlPds::Princeton::FrameV2, PsddlPds::Princeton::ConfigV2> ProxyType;
+            if (evt) evt->putProxy<Psana::Princeton::FrameV2>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
           } else if (boost::shared_ptr<PsddlPds::Princeton::ConfigV3> cfgPtr = cfgStore.get(xtc->src)) {
             // store proxy
-            typedef EvtProxyCfg<Psana::Princeton::FrameV2, psddl_pds2psana::Princeton::FrameV2, PsddlPds::Princeton::FrameV2, PsddlPds::Princeton::ConfigV3> ProxyType; 
-            if (evt) evt->putProxy<Psana::Princeton::FrameV2>(boost::make_shared<ProxyType>(xptr, cfgPtr), xtc->src);
+            typedef EvtProxyCfg<Psana::Princeton::FrameV2, psddl_pds2psana::Princeton::FrameV2, PsddlPds::Princeton::FrameV2, PsddlPds::Princeton::ConfigV3> ProxyType;
+            if (evt) evt->putProxy<Psana::Princeton::FrameV2>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
           } else if (boost::shared_ptr<PsddlPds::Princeton::ConfigV4> cfgPtr = cfgStore.get(xtc->src)) {
             // store proxy
-            typedef EvtProxyCfg<Psana::Princeton::FrameV2, psddl_pds2psana::Princeton::FrameV2, PsddlPds::Princeton::FrameV2, PsddlPds::Princeton::ConfigV4> ProxyType; 
-            if (evt) evt->putProxy<Psana::Princeton::FrameV2>(boost::make_shared<ProxyType>(xptr, cfgPtr), xtc->src);
+            typedef EvtProxyCfg<Psana::Princeton::FrameV2, psddl_pds2psana::Princeton::FrameV2, PsddlPds::Princeton::FrameV2, PsddlPds::Princeton::ConfigV4> ProxyType;
+            if (evt) evt->putProxy<Psana::Princeton::FrameV2>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
           } else if (boost::shared_ptr<PsddlPds::Princeton::ConfigV5> cfgPtr = cfgStore.get(xtc->src)) {
             // store proxy
-            typedef EvtProxyCfg<Psana::Princeton::FrameV2, psddl_pds2psana::Princeton::FrameV2, PsddlPds::Princeton::FrameV2, PsddlPds::Princeton::ConfigV5> ProxyType; 
-            if (evt) evt->putProxy<Psana::Princeton::FrameV2>(boost::make_shared<ProxyType>(xptr, cfgPtr), xtc->src);
+            typedef EvtProxyCfg<Psana::Princeton::FrameV2, psddl_pds2psana::Princeton::FrameV2, PsddlPds::Princeton::FrameV2, PsddlPds::Princeton::ConfigV5> ProxyType;
+            if (evt) evt->putProxy<Psana::Princeton::FrameV2>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
+          }
+        }
+        break;
+      case 32769:
+        {
+          if (boost::shared_ptr<PsddlPds::Princeton::ConfigV1> cfgPtr = cfgStore.get(xtc->src)) {
+            // store proxy
+            typedef EvtProxyCfg<Psana::Princeton::FrameV1, psddl_pds2psana::Princeton::FrameV1, PsddlPds::Princeton::FrameV1, PsddlPds::Princeton::ConfigV1> ProxyType;
+            if (evt) evt->putProxy<Psana::Princeton::FrameV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
+          } else if (boost::shared_ptr<PsddlPds::Princeton::ConfigV2> cfgPtr = cfgStore.get(xtc->src)) {
+            // store proxy
+            typedef EvtProxyCfg<Psana::Princeton::FrameV1, psddl_pds2psana::Princeton::FrameV1, PsddlPds::Princeton::FrameV1, PsddlPds::Princeton::ConfigV2> ProxyType;
+            if (evt) evt->putProxy<Psana::Princeton::FrameV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
+          } else if (boost::shared_ptr<PsddlPds::Princeton::ConfigV3> cfgPtr = cfgStore.get(xtc->src)) {
+            // store proxy
+            typedef EvtProxyCfg<Psana::Princeton::FrameV1, psddl_pds2psana::Princeton::FrameV1, PsddlPds::Princeton::FrameV1, PsddlPds::Princeton::ConfigV3> ProxyType;
+            if (evt) evt->putProxy<Psana::Princeton::FrameV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
+          } else if (boost::shared_ptr<PsddlPds::Princeton::ConfigV4> cfgPtr = cfgStore.get(xtc->src)) {
+            // store proxy
+            typedef EvtProxyCfg<Psana::Princeton::FrameV1, psddl_pds2psana::Princeton::FrameV1, PsddlPds::Princeton::FrameV1, PsddlPds::Princeton::ConfigV4> ProxyType;
+            if (evt) evt->putProxy<Psana::Princeton::FrameV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
+          } else if (boost::shared_ptr<PsddlPds::Princeton::ConfigV5> cfgPtr = cfgStore.get(xtc->src)) {
+            // store proxy
+            typedef EvtProxyCfg<Psana::Princeton::FrameV1, psddl_pds2psana::Princeton::FrameV1, PsddlPds::Princeton::FrameV1, PsddlPds::Princeton::ConfigV5> ProxyType;
+            if (evt) evt->putProxy<Psana::Princeton::FrameV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
+          }
+        }
+        break;
+      case 32770:
+        {
+          if (boost::shared_ptr<PsddlPds::Princeton::ConfigV1> cfgPtr = cfgStore.get(xtc->src)) {
+            // store proxy
+            typedef EvtProxyCfg<Psana::Princeton::FrameV2, psddl_pds2psana::Princeton::FrameV2, PsddlPds::Princeton::FrameV2, PsddlPds::Princeton::ConfigV1> ProxyType;
+            if (evt) evt->putProxy<Psana::Princeton::FrameV2>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
+          } else if (boost::shared_ptr<PsddlPds::Princeton::ConfigV2> cfgPtr = cfgStore.get(xtc->src)) {
+            // store proxy
+            typedef EvtProxyCfg<Psana::Princeton::FrameV2, psddl_pds2psana::Princeton::FrameV2, PsddlPds::Princeton::FrameV2, PsddlPds::Princeton::ConfigV2> ProxyType;
+            if (evt) evt->putProxy<Psana::Princeton::FrameV2>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
+          } else if (boost::shared_ptr<PsddlPds::Princeton::ConfigV3> cfgPtr = cfgStore.get(xtc->src)) {
+            // store proxy
+            typedef EvtProxyCfg<Psana::Princeton::FrameV2, psddl_pds2psana::Princeton::FrameV2, PsddlPds::Princeton::FrameV2, PsddlPds::Princeton::ConfigV3> ProxyType;
+            if (evt) evt->putProxy<Psana::Princeton::FrameV2>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
+          } else if (boost::shared_ptr<PsddlPds::Princeton::ConfigV4> cfgPtr = cfgStore.get(xtc->src)) {
+            // store proxy
+            typedef EvtProxyCfg<Psana::Princeton::FrameV2, psddl_pds2psana::Princeton::FrameV2, PsddlPds::Princeton::FrameV2, PsddlPds::Princeton::ConfigV4> ProxyType;
+            if (evt) evt->putProxy<Psana::Princeton::FrameV2>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
+          } else if (boost::shared_ptr<PsddlPds::Princeton::ConfigV5> cfgPtr = cfgStore.get(xtc->src)) {
+            // store proxy
+            typedef EvtProxyCfg<Psana::Princeton::FrameV2, psddl_pds2psana::Princeton::FrameV2, PsddlPds::Princeton::FrameV2, PsddlPds::Princeton::ConfigV5> ProxyType;
+            if (evt) evt->putProxy<Psana::Princeton::FrameV2>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
           }
         }
         break;
@@ -1129,6 +1381,16 @@ try {
     {
       switch (version) {
       case 1:
+        {
+          // XTC data object
+          const PsddlPds::Princeton::InfoV1& xdata = *(PsddlPds::Princeton::InfoV1*)(xtc->payload());
+          //convert XtcType to Psana type
+          const Psana::Princeton::InfoV1& data = psddl_pds2psana::Princeton::pds_to_psana(xdata);
+          // store data
+          if (evt) evt->put(boost::make_shared<Psana::Princeton::InfoV1>(data), xtc->src);
+        }
+        break;
+      case 32769:
         {
           // XTC data object
           const PsddlPds::Princeton::InfoV1& xdata = *(PsddlPds::Princeton::InfoV1*)(xtc->payload());
@@ -1160,24 +1422,32 @@ try {
   case Pds::TypeId::Id_SharedIpimb:
     {
       switch (version) {
-      case 1:
-        {
-          // XTC data object
-          boost::shared_ptr<PsddlPds::Bld::BldDataIpimbV1> xptr(xtc, (PsddlPds::Bld::BldDataIpimbV1*)(xtc->payload()));
-          size_t xtcSize = xtc->sizeofPayload();
-          // store proxy
-          typedef EvtProxy<Psana::Bld::BldDataIpimbV1, psddl_pds2psana::Bld::BldDataIpimbV1, PsddlPds::Bld::BldDataIpimbV1> ProxyType; 
-          if (evt) evt->putProxy<Psana::Bld::BldDataIpimbV1>(boost::make_shared<ProxyType>(xptr, xtcSize), xtc->src);
-        }
-        break;
       case 0:
         {
-          // XTC data object
-          boost::shared_ptr<PsddlPds::Bld::BldDataIpimbV0> xptr(xtc, (PsddlPds::Bld::BldDataIpimbV0*)(xtc->payload()));
-          size_t xtcSize = xtc->sizeofPayload();
           // store proxy
-          typedef EvtProxy<Psana::Bld::BldDataIpimbV0, psddl_pds2psana::Bld::BldDataIpimbV0, PsddlPds::Bld::BldDataIpimbV0> ProxyType; 
-          if (evt) evt->putProxy<Psana::Bld::BldDataIpimbV0>(boost::make_shared<ProxyType>(xptr, xtcSize), xtc->src);
+          typedef EvtProxy<Psana::Bld::BldDataIpimbV0, psddl_pds2psana::Bld::BldDataIpimbV0, PsddlPds::Bld::BldDataIpimbV0> ProxyType;
+          if (evt) evt->putProxy<Psana::Bld::BldDataIpimbV0>(boost::make_shared<ProxyType>(xtc), xtc->src);
+        }
+        break;
+      case 1:
+        {
+          // store proxy
+          typedef EvtProxy<Psana::Bld::BldDataIpimbV1, psddl_pds2psana::Bld::BldDataIpimbV1, PsddlPds::Bld::BldDataIpimbV1> ProxyType;
+          if (evt) evt->putProxy<Psana::Bld::BldDataIpimbV1>(boost::make_shared<ProxyType>(xtc), xtc->src);
+        }
+        break;
+      case 32768:
+        {
+          // store proxy
+          typedef EvtProxy<Psana::Bld::BldDataIpimbV0, psddl_pds2psana::Bld::BldDataIpimbV0, PsddlPds::Bld::BldDataIpimbV0> ProxyType;
+          if (evt) evt->putProxy<Psana::Bld::BldDataIpimbV0>(boost::make_shared<ProxyType>(xtc), xtc->src);
+        }
+        break;
+      case 32769:
+        {
+          // store proxy
+          typedef EvtProxy<Psana::Bld::BldDataIpimbV1, psddl_pds2psana::Bld::BldDataIpimbV1, PsddlPds::Bld::BldDataIpimbV1> ProxyType;
+          if (evt) evt->putProxy<Psana::Bld::BldDataIpimbV1>(boost::make_shared<ProxyType>(xtc), xtc->src);
         }
         break;
       } // end switch (version)
@@ -1188,12 +1458,16 @@ try {
       switch (version) {
       case 1:
         {
-          // XTC data object
-          boost::shared_ptr<PsddlPds::Bld::BldDataPimV1> xptr(xtc, (PsddlPds::Bld::BldDataPimV1*)(xtc->payload()));
-          size_t xtcSize = xtc->sizeofPayload();
           // store proxy
-          typedef EvtProxy<Psana::Bld::BldDataPimV1, psddl_pds2psana::Bld::BldDataPimV1, PsddlPds::Bld::BldDataPimV1> ProxyType; 
-          if (evt) evt->putProxy<Psana::Bld::BldDataPimV1>(boost::make_shared<ProxyType>(xptr, xtcSize), xtc->src);
+          typedef EvtProxy<Psana::Bld::BldDataPimV1, psddl_pds2psana::Bld::BldDataPimV1, PsddlPds::Bld::BldDataPimV1> ProxyType;
+          if (evt) evt->putProxy<Psana::Bld::BldDataPimV1>(boost::make_shared<ProxyType>(xtc), xtc->src);
+        }
+        break;
+      case 32769:
+        {
+          // store proxy
+          typedef EvtProxy<Psana::Bld::BldDataPimV1, psddl_pds2psana::Bld::BldDataPimV1, PsddlPds::Bld::BldDataPimV1> ProxyType;
+          if (evt) evt->putProxy<Psana::Bld::BldDataPimV1>(boost::make_shared<ProxyType>(xtc), xtc->src);
         }
         break;
       } // end switch (version)
@@ -1212,16 +1486,6 @@ try {
           cfgStore.put(obj, xtc->src);
         }
         break;
-      case 3:
-        {
-          // store XTC object in config store
-          boost::shared_ptr<PsddlPds::Timepix::ConfigV3> xptr(xtc, (PsddlPds::Timepix::ConfigV3*)(xtc->payload()));
-          cfgStore.put(xptr, xtc->src);
-          // create and store psana object in config store
-          boost::shared_ptr<Psana::Timepix::ConfigV3> obj = boost::make_shared<psddl_pds2psana::Timepix::ConfigV3>(xptr);
-          cfgStore.put(obj, xtc->src);
-        }
-        break;
       case 2:
         {
           // store XTC object in config store
@@ -1229,6 +1493,16 @@ try {
           cfgStore.put(xptr, xtc->src);
           // create and store psana object in config store
           boost::shared_ptr<Psana::Timepix::ConfigV2> obj = boost::make_shared<psddl_pds2psana::Timepix::ConfigV2>(xptr);
+          cfgStore.put(obj, xtc->src);
+        }
+        break;
+      case 3:
+        {
+          // store XTC object in config store
+          boost::shared_ptr<PsddlPds::Timepix::ConfigV3> xptr(xtc, (PsddlPds::Timepix::ConfigV3*)(xtc->payload()));
+          cfgStore.put(xptr, xtc->src);
+          // create and store psana object in config store
+          boost::shared_ptr<Psana::Timepix::ConfigV3> obj = boost::make_shared<psddl_pds2psana::Timepix::ConfigV3>(xptr);
           cfgStore.put(obj, xtc->src);
         }
         break;
@@ -1240,22 +1514,30 @@ try {
       switch (version) {
       case 1:
         {
-          // XTC data object
-          boost::shared_ptr<PsddlPds::Timepix::DataV1> xptr(xtc, (PsddlPds::Timepix::DataV1*)(xtc->payload()));
-          size_t xtcSize = xtc->sizeofPayload();
           // store proxy
-          typedef EvtProxy<Psana::Timepix::DataV2, psddl_pds2psana::TimepixDataV1ToV2, PsddlPds::Timepix::DataV1> ProxyType; 
-          if (evt) evt->putProxy<Psana::Timepix::DataV2>(boost::make_shared<ProxyType>(xptr, xtcSize), xtc->src);
+          typedef EvtProxy<Psana::Timepix::DataV2, psddl_pds2psana::TimepixDataV1ToV2, PsddlPds::Timepix::DataV1> ProxyType;
+          if (evt) evt->putProxy<Psana::Timepix::DataV2>(boost::make_shared<ProxyType>(xtc), xtc->src);
         }
         break;
       case 2:
         {
-          // XTC data object
-          boost::shared_ptr<PsddlPds::Timepix::DataV2> xptr(xtc, (PsddlPds::Timepix::DataV2*)(xtc->payload()));
-          size_t xtcSize = xtc->sizeofPayload();
           // store proxy
-          typedef EvtProxy<Psana::Timepix::DataV2, psddl_pds2psana::Timepix::DataV2, PsddlPds::Timepix::DataV2> ProxyType; 
-          if (evt) evt->putProxy<Psana::Timepix::DataV2>(boost::make_shared<ProxyType>(xptr, xtcSize), xtc->src);
+          typedef EvtProxy<Psana::Timepix::DataV2, psddl_pds2psana::Timepix::DataV2, PsddlPds::Timepix::DataV2> ProxyType;
+          if (evt) evt->putProxy<Psana::Timepix::DataV2>(boost::make_shared<ProxyType>(xtc), xtc->src);
+        }
+        break;
+      case 32769:
+        {
+          // store proxy
+          typedef EvtProxy<Psana::Timepix::DataV2, psddl_pds2psana::TimepixDataV1ToV2, PsddlPds::Timepix::DataV1> ProxyType;
+          if (evt) evt->putProxy<Psana::Timepix::DataV2>(boost::make_shared<ProxyType>(xtc), xtc->src);
+        }
+        break;
+      case 32770:
+        {
+          // store proxy
+          typedef EvtProxy<Psana::Timepix::DataV2, psddl_pds2psana::Timepix::DataV2, PsddlPds::Timepix::DataV2> ProxyType;
+          if (evt) evt->putProxy<Psana::Timepix::DataV2>(boost::make_shared<ProxyType>(xtc), xtc->src);
         }
         break;
       } // end switch (version)
@@ -1292,12 +1574,16 @@ try {
       switch (version) {
       case 1:
         {
-          // XTC data object
-          boost::shared_ptr<PsddlPds::Camera::TwoDGaussianV1> xptr(xtc, (PsddlPds::Camera::TwoDGaussianV1*)(xtc->payload()));
-          size_t xtcSize = xtc->sizeofPayload();
           // store proxy
-          typedef EvtProxy<Psana::Camera::TwoDGaussianV1, psddl_pds2psana::Camera::TwoDGaussianV1, PsddlPds::Camera::TwoDGaussianV1> ProxyType; 
-          if (evt) evt->putProxy<Psana::Camera::TwoDGaussianV1>(boost::make_shared<ProxyType>(xptr, xtcSize), xtc->src);
+          typedef EvtProxy<Psana::Camera::TwoDGaussianV1, psddl_pds2psana::Camera::TwoDGaussianV1, PsddlPds::Camera::TwoDGaussianV1> ProxyType;
+          if (evt) evt->putProxy<Psana::Camera::TwoDGaussianV1>(boost::make_shared<ProxyType>(xtc), xtc->src);
+        }
+        break;
+      case 32769:
+        {
+          // store proxy
+          typedef EvtProxy<Psana::Camera::TwoDGaussianV1, psddl_pds2psana::Camera::TwoDGaussianV1, PsddlPds::Camera::TwoDGaussianV1> ProxyType;
+          if (evt) evt->putProxy<Psana::Camera::TwoDGaussianV1>(boost::make_shared<ProxyType>(xtc), xtc->src);
         }
         break;
       } // end switch (version)
@@ -1324,12 +1610,16 @@ try {
       switch (version) {
       case 1:
         {
-          // XTC data object
-          boost::shared_ptr<PsddlPds::UsdUsb::DataV1> xptr(xtc, (PsddlPds::UsdUsb::DataV1*)(xtc->payload()));
-          size_t xtcSize = xtc->sizeofPayload();
           // store proxy
-          typedef EvtProxy<Psana::UsdUsb::DataV1, psddl_pds2psana::UsdUsb::DataV1, PsddlPds::UsdUsb::DataV1> ProxyType; 
-          if (evt) evt->putProxy<Psana::UsdUsb::DataV1>(boost::make_shared<ProxyType>(xptr, xtcSize), xtc->src);
+          typedef EvtProxy<Psana::UsdUsb::DataV1, psddl_pds2psana::UsdUsb::DataV1, PsddlPds::UsdUsb::DataV1> ProxyType;
+          if (evt) evt->putProxy<Psana::UsdUsb::DataV1>(boost::make_shared<ProxyType>(xtc), xtc->src);
+        }
+        break;
+      case 32769:
+        {
+          // store proxy
+          typedef EvtProxy<Psana::UsdUsb::DataV1, psddl_pds2psana::UsdUsb::DataV1, PsddlPds::UsdUsb::DataV1> ProxyType;
+          if (evt) evt->putProxy<Psana::UsdUsb::DataV1>(boost::make_shared<ProxyType>(xtc), xtc->src);
         }
         break;
       } // end switch (version)

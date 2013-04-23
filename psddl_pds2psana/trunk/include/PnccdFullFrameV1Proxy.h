@@ -22,6 +22,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "pdsdata/xtc/Xtc.hh"
 #include "psddl_psana/pnccd.ddl.h"
 
 //------------------------------------
@@ -53,7 +54,7 @@ class PnccdFullFrameV1Proxy : public PSEvt::Proxy<Psana::PNCCD::FullFrameV1> {
 public:
 
   // Default constructor
-  PnccdFullFrameV1Proxy () ;
+  PnccdFullFrameV1Proxy (const boost::shared_ptr<Pds::Xtc>& xtcObj) ;
 
   // Destructor
   virtual ~PnccdFullFrameV1Proxy () ;

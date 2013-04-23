@@ -52,7 +52,7 @@ class EvtProxyCfg : public PSEvt::Proxy<PSType> {
 public:
 
   // Default constructor
-  EvtProxyCfg (const boost::shared_ptr<XTCType>& xtcObj,
+  EvtProxyCfg (const boost::shared_ptr<Pds::Xtc>& xtcObj,
       const boost::shared_ptr<XTCConfigType>& cfgObj)
     : m_xtcObj(xtcObj), m_cfgObj(cfgObj) {}
 
@@ -74,7 +74,16 @@ protected:
                                             const std::string& key)
   {
     if (not m_psObj.get()) {
-      m_psObj.reset(new PDS2PSType(m_xtcObj, m_cfgObj));
+
+      // decompress it if needed
+      if (m_xtcObj->contains.compressed()) {
+        m_xtcObj = Pds::CompressedXtc::uncompress(*m_xtcObj);
+      }
+
+      // get pointer to data
+      boost::shared_ptr<XTCType> xptr(m_xtcObj, (XTCType*)(m_xtcObj->payload()));
+
+      m_psObj.reset(new PDS2PSType(xptr, m_cfgObj));
     }
     return m_psObj;
   }
@@ -82,7 +91,7 @@ protected:
 private:
 
   // Data members
-  boost::shared_ptr<XTCType> m_xtcObj;
+  boost::shared_ptr<Pds::Xtc> m_xtcObj;
   boost::shared_ptr<XTCConfigType> m_cfgObj;
   boost::shared_ptr<PSType> m_psObj;
 

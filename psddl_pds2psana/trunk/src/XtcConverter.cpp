@@ -193,11 +193,6 @@ XtcConverter::convert(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event& evt,
 
   }
 
-  // add special proxy for full pnccd frame
-  if (typeId.id() == Pds::TypeId::Id_pnCCDframe and typeId.version() == 1) {
-    evt.putProxy<Psana::PNCCD::FullFrameV1>(boost::make_shared<PnccdFullFrameV1Proxy>(), xtc->src);
-  }
-
   // all real stuff is done here
   xtcConvert(xtc, &evt, cfgStore);
 }
