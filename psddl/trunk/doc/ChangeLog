@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-06-05
+2013-04-23 Andy Salnikov
+- few changes to DdlPds2PsanaDispatch related to compressed data
+- integrate special PnccdFullframProxy into generator
+
 Tag: V00-06-04
 2013-03-29 Andy Salnikov
 - small improvements for enum types

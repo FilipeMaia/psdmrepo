@@ -110,6 +110,22 @@ def _psanaClass(type, psana_ns):
         typeName = type.fullName('C++', psana_ns)
     return typeName
 
+# some types need special proxy class
+def _proxyClass(type, psana_type, final_type, xtc_type, config_type=None):
+
+    typeName = type.fullName('C++')
+    if typeName == 'PNCCD::FullFrameV1':
+        return 'PnccdFullFrameV1Proxy'
+    elif not type.xtcConfig:
+        use_size = type.fullName('C++') in _use_size_types
+        if use_size:
+            return 'EvtProxy<{0}, {1}, {2}, true>'.format(psana_type, final_type, xtc_type)
+        else:
+            return 'EvtProxy<{0}, {1}, {2}>'.format(psana_type, final_type, xtc_type)
+    else:
+            return 'EvtProxyCfg<{0}, {1}, {2}, {3}>'.format(psana_type, final_type, xtc_type, config_type)
+
+
 
 # ========================================================
 # == code templates, usually do not need to touch these ==
@@ -189,10 +205,10 @@ try {
 
 _version_template = ji.Template('''\
       switch (version) {
-{% for version, block in versions.items() %}
+{% for version, blocks in versions|dictsort %}
       case {{version}}:
         {
-{{block}}
+{{blocks|join('\n')}}
         }
         break;
 {% endfor %}
@@ -230,30 +246,21 @@ _event_value_store_template = ji.Template('''\
 ''', trim_blocks=True)
 
 _event_abs_store_template = ji.Template('''\
-          // XTC data object
-          boost::shared_ptr<{{xtc_type}}> xptr(xtc, ({{xtc_type}}*)(xtc->payload()));
-          size_t xtcSize = xtc->sizeofPayload();
           // store proxy
-{% if use_size %}
-          typedef EvtProxy<{{psana_type}}, {{final_type}}, {{xtc_type}}, true> ProxyType; 
-{% else %}
-          typedef EvtProxy<{{psana_type}}, {{final_type}}, {{xtc_type}}> ProxyType; 
-{% endif %}
-          if (evt) evt->putProxy<{{psana_type}}>(boost::make_shared<ProxyType>(xptr, xtcSize), xtc->src);
+          typedef {{proxy_type}} ProxyType;
+          if (evt) evt->putProxy<{{psana_type}}>(boost::make_shared<ProxyType>(xtc), xtc->src);
 ''', trim_blocks=True)
 
 _event_cfg_store_template = ji.Template('''\
-          // XTC data object
-          boost::shared_ptr<{{xtc_type}}> xptr(xtc, ({{xtc_type}}*)(xtc->payload()));
-{% for config_type in config_types %}
+{% for config_type, proxy_type in config_types|dictsort %}
 {% if loop.first %}
           if (boost::shared_ptr<{{config_type}}> cfgPtr = cfgStore.get(xtc->src)) {
 {% else %}
           } else if (boost::shared_ptr<{{config_type}}> cfgPtr = cfgStore.get(xtc->src)) {
 {% endif %}
             // store proxy
-            typedef EvtProxyCfg<{{psana_type}}, {{final_type}}, {{xtc_type}}, {{config_type}}> ProxyType; 
-            if (evt) evt->putProxy<{{psana_type}}>(boost::make_shared<ProxyType>(xptr, cfgPtr), xtc->src);
+            typedef {{proxy_type}} ProxyType;
+            if (evt) evt->putProxy<{{psana_type}}>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
 {% endfor %}
           }
 ''', trim_blocks=True)
@@ -311,7 +318,7 @@ class DdlPds2PsanaDispatch ( object ) :
         # generate code for all collected types
         types, headers = self._codegen()
 
-        # add own hedaer to the list
+        # add own header to the list
         headers = [os.path.join(self.incdirname, os.path.basename(self.incname))] + list(headers) + _extra_headers
 
         inc_guard = self.guard
@@ -349,7 +356,11 @@ class DdlPds2PsanaDispatch ( object ) :
 
 
     def _codegen(self):
-        
+        ''' 
+        Retuns tuple containing two elements:
+        1. Dictinary mappig TypeId type name (like 'Id_AcqConfig') to the corresponding piece of code
+        2. List of heder names to be included 
+        ''' 
         codes = {}
         headers = set()
         
@@ -359,8 +370,14 @@ class DdlPds2PsanaDispatch ( object ) :
             for type in types:
                 
                 code, header = self._typecode(type)
-                versions[type.version] = code
                 headers.add(header)
+                
+                v = int(type.version)
+                versions.setdefault(v, []).append(code)
+                # for event-type data add compressed version as well
+                if 'config-type' not in type.tags:
+                    v = int(type.version) | 0x8000
+                    versions.setdefault(v, []).append(code)
                 
             codes[type_id] = _version_template.render(locals())
 
@@ -368,7 +385,11 @@ class DdlPds2PsanaDispatch ( object ) :
 
 
     def _typecode(self, type):
-
+        '''
+        For a given type returns tuple of two elements:
+        1. Piece of code which produces final objects
+        2. Name of the include file
+        '''
         header = os.path.basename(type.location)
         header = os.path.splitext(header)[0] + '.h'
         header = os.path.join(self.incdirname, header)
@@ -393,9 +414,13 @@ class DdlPds2PsanaDispatch ( object ) :
                 final_namespace = type.parent.fullName('C++', self.top_pkg)                
                 code = _event_value_store_template.render(locals())
             elif not type.xtcConfig:
+                proxy_type = _proxyClass(type, psana_type, final_type, xtc_type)
                 code = _event_abs_store_template.render(locals())
             else:
-                config_types = [t.fullName('C++', self.pdsdata_ns) for t in type.xtcConfig]
+                config_types = {}
+                for t in type.xtcConfig:
+                    cfg_type = t.fullName('C++', self.pdsdata_ns)
+                    config_types[cfg_type] = _proxyClass(type, psana_type, final_type, xtc_type, cfg_type)
                 code = _event_cfg_store_template.render(locals())
 
         return code, header
