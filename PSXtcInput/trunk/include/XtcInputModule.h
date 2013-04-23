@@ -13,23 +13,20 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <string>
 #include <vector>
 #include <boost/thread/thread.hpp>
 #include <boost/scoped_ptr.hpp>
-#include <boost/shared_ptr.hpp>
 
 //----------------------
 // Base Class Headers --
 //----------------------
-#include "psana/InputModule.h"
+#include "PSXtcInput/XtcInputModuleBase.h"
 
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
 #include "XtcInput/Dgram.h"
-#include "psddl_pds2psana/XtcConverter.h"
-#include "pdsdata/xtc/TransitionId.hh"
-#include "pdsdata/xtc/ClockTime.hh"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -65,7 +62,7 @@ namespace PSXtcInput {
  *  @author Andrei Salnikov
  */
 
-class XtcInputModule : public InputModule {
+class XtcInputModule : public XtcInputModuleBase {
 public:
 
   /// Constructor takes the name of the module.
@@ -74,43 +71,20 @@ public:
   // Destructor
   virtual ~XtcInputModule () ;
 
-  /// Method which is called once at the beginning of the job
-  virtual void beginJob(Event& evt, Env& env);
-
-  /// Method which is called with event data
-  virtual Status event(Event& evt, Env& env);
-
-  /// Method which is called once at the end of the job
-  virtual void endJob(Event& evt, Env& env);
-
 protected:
   
-  /// Fill event with datagram contents
-  void fillEvent(const XtcInput::Dgram& dg, Event& evt, Env& env);
-  
-  /// Fill event with EventId information
-  void fillEventId(const XtcInput::Dgram& dg, Event& evt);
-
-  /// Fill event with Datagram
-  void fillEventDg(const XtcInput::Dgram& dg, Event& evt);
-
-  /// Fill environment with datagram contents
-  void fillEnv(const XtcInput::Dgram& dg, Env& env);
-
 private:
+
+  // Initialization method for external datagram source
+  virtual void initDgramSource();
+
+  // Get the next datagram from some external source
+  virtual XtcInput::Dgram nextDgram();
 
   // Data members
   boost::scoped_ptr<XtcInput::DgramQueue> m_dgQueue;  ///< Input datagram queue
-  XtcInput::Dgram m_putBack;                          ///< Buffer for one put-back datagram
   boost::scoped_ptr<boost::thread> m_readerThread;    ///< Thread which does datagram reading
-  psddl_pds2psana::XtcConverter m_cvt;                ///< Data converter object
-  Pds::ClockTime m_transitions[Pds::TransitionId::NumberOf];  ///< Timestamps of the observed transitions
-  unsigned long m_skipEvents;                         ///< Number of events (L1Accept transitions) to skip
-  unsigned long m_maxEvents;                          ///< Number of events (L1Accept transitions) to process
-  bool m_skipEpics;                                   ///< If true then skip EPICS-only events
   std::vector<std::string> m_fileNames;               ///< List of file names/datasets to read data from
-  unsigned long m_l1Count;                            ///< Number of events (L1Accept transitions) seen so far
-  int m_simulateEOR;                                  ///< if non-zero then simulate endRun/stop
 };
 
 } // namespace PSXtcInput
