@@ -402,12 +402,14 @@ try {
     $file2run = array ();
     $files    = array ();
     foreach ($types as $type) {
-        foreach (FileMgrIrodsDb::instance()->runs($instrument->name(), $experiment->name(), $type, $range_of_runs['min'], $range_of_runs['max']) as $run) {
-            foreach ($run->files as $file) {
-                $files_reported_by_iRODS[$file->name] = True;
-                $file2run[$file->name] = $run->run;
+        if ($num_runs) {
+            foreach (FileMgrIrodsDb::instance()->runs($instrument->name(), $experiment->name(), $type, $range_of_runs['min'], $range_of_runs['max']) as $run) {
+                foreach ($run->files as $file) {
+                    $files_reported_by_iRODS[$file->name] = True;
+                    $file2run[$file->name] = $run->run;
+                }
+                add_files($files, $run->files, $type, $file2run, $checksum, $archived, $local);
             }
-            add_files($files, $run->files, $type, $file2run, $checksum, $archived, $local);
         }
     }
 

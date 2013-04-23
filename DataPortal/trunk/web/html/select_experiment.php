@@ -313,11 +313,16 @@ function show_email( user, addr ) {
             if( $e->is_facility())
                 $html .= table_row( $e, $e->is_facility());
 
+        $tab_title = $location;
+        switch($location) {
+            case 'NEH': $tab_title = 'Facilities'; break;
+            case 'EXT': $tab_title = 'External'; break;
+        }
         $html .= DataPortal::table_end_html();
         array_push(
             $experiment_tabs,
             array(
-                'name' => "Facilities",
+                'name' => $tab_title,
                 'id'   => 'experiments-'.$location,
                 'html' => $html,
                 'class' => 'tab-inline-content'

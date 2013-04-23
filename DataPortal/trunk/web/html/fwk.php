@@ -32,6 +32,7 @@ try {
 
 <link type="text/css" href="/jquery/css/custom-theme/jquery-ui.custom.css" rel="Stylesheet" />
 
+<link type="text/css" href="../portal/css/Fwk.css" rel="Stylesheet" />
 <link type="text/css" href="../portal/css/Table.css" rel="Stylesheet" />
 
 <script type="text/javascript" src="/jquery/js/jquery.min.js"></script>
@@ -39,376 +40,32 @@ try {
 <script type="text/javascript" src="/jquery/js/jquery.form.js"></script>
 <script type="text/javascript" src="/jquery/js/jquery.json.js"></script>
 
-<script type="text/javascript" src="js/Utilities.js"></script>
-
+<script type="text/javascript" src="../portal/js/Fwk.js"></script>
 <script type="text/javascript" src="../portal/js/Table.js"></script>
+<script type="text/javascript" src="../portal/js/Utilities.js"></script>
 
-
-<!----------- Window layout styles and support actions ----------->
-
-<style type="text/css">
-
-body {
-  margin: 0;
-  padding: 0;
-}
-#p-top {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 129px;
-  background-color: #e0e0e0;
-}
-#p-top-header {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 92px;
-  background-color: #ffffff;
-}
-#p-top-title {
-  width: 100%;
-  height: 61px;
-}
-#p-context-header {
-  width: 100%;
-  height: 36px;
-  background-color: #E0E0E0;
-  border-bottom: 1px solid #0b0b0b;
-}
-#p-title,
-#p-subtitle {
-  font-family: "Times", serif;
-  font-size: 32px;
-  font-weight: bold;
-  text-align: left;
-}
-#p-subtitle {
-  margin-left: 10px;
-  color: #0071bc;
-}
-#p-login {
-  font-size: 70%;
-  font-family: Arial, Helvetica, Verdana, Sans-Serif;
-}
-
-a, a.link {
-  text-decoration: none;
-  font-weight: bold;
-  color: #0071bc;
-}
-a:hover, a.link:hover {
-  color: red;
-}
-#p-left {
-  position: absolute;
-  left: 0;
-  top: 130px;
-  width: 200px;
-  overflow: auto;
-}
-#p-splitter {
-  position: absolute;
-  left: 200px;
-  top: 130px;
-  width: 1px;
-  overflow: none;
-  cursor: e-resize;
-  border-left: 1px solid #a0a0a0;
-  border-right: 1px solid #a0a0a0;
-}
-#p-bottom {
-  z-index: 100;
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  height: 20px;
-  width: 100%;
-  background-color: #a0a0a0;
-  border-top: 1px solid #c0c0c0;
-}
-#p-status {
-  padding: 2px;
-  font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
-  font-size: 75%;
-}
-#p-center {
-  position: relative;
-  top:130px;
-  margin: 0px 0px 20px 203px;
-  overflow: auto;
-  background-color: #ffffff;
-  border-left: 1px solid #a0a0a0;
-}
-
-#p-menu {
-  font-family: Arial, sans-serif;
-  font-size: 14px;
-  height: 32px;
-  width: 100%;
-  border: 0;
-  padding: 0;
-}
-
-#p-context {
-  margin-left: 0px;
-  padding-top: 10px;
-  padding-left: 10px;
-  font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
-  font-size: 12px;
-}
-#p-search {
-  padding-top: 2px;
-  padding-right: 10px;
-  font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
-  font-size: 11px;
-}
-
-div.m-item {
-
-  margin-left: 3px;
-  margin-top: 3px;
-
-  padding: 5px;
-  padding-left: 10px;
-  padding-right: 10px;
-
-  background: #DFEFFC url(/jquery/css/custom-theme/images/ui-bg_glass_85_dfeffc_1x400.png) 50% 50% repeat-x;
-
-  color: #0071BC;
-
-  border-top: 2px solid #c0c0c0;
-  border-right: 2px solid #c0c0c0;
-
-  border-radius: 5px;
-  border-bottom-left-radius: 0;
-  border-bottom-right-radius: 0;
-
-  -moz-border-radius: 5px;
-  -moz-border-radius-bottomleft: 0;
-  -moz-border-radius-bottomright: 0;
-
-  cursor: pointer;
-}
-
-div.m-item:hover {
-  background: #d0e5f5 url(/jquery/css/custom-theme/images/ui-bg_glass_75_d0e5f5_1x400.png) 50% 50% repeat-x;
-}
-div.m-item-first {
-  margin-left: 0px;
-  float: left;
-
-  border-top-left-radius: 0;
-
-  -moz-border-radius-topleft: 0;
-}
-.m-item-next {
-  float: left;
-}
-.m-item-last {
-  float: left;
-}
-.m-item-end {
-  clear: both;
-}
-div.m-select {
-  font-weight: bold;
-  background: #e0e0e0;
-}
-
-#v-menu {
-  width: 100%;
-  height: 100%;
-  background: url('img/menu-bg-gradient-4.png') repeat;
-  font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
-  font-size: 75%;
-}
-#menu-title {
-  height: 10px;
-}
-div.v-item {
-  padding: 4px;
-  padding-left: 10px;
-  cursor: pointer;
-}
-div.v-item:hover {
-  background:#f0f0f0;
-}
-.v-select {
-  font-weight: bold;
-}
-.v-group {
-  padding: 4px;
-  padding-left: 10px;
-  cursor: pointer;
-}
-.v-group-members {
-  padding: 4px;
-  padding-left: 20px;
-}
-.v-group-members-hidden {
-  display: none;
-}
-.v-group-members-visible {
-  display: block;
-}
-.application-workarea {
-  overflow: auto;
-  font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
-  font-size: 75%;
-}
-.hidden  { display: none; }
-.visible { display: block; }
-
-</style>
 
 
 <script type="text/javascript">
 
 
-/* ------------------------------------------------
- *          VERTICAL SPLITTER MANAGEMENT
- * ------------------------------------------------
- */
-function resize() {
-	$('#p-left').height($(window).height()-125-20);
-	$('#p-splitter').height($(window).height()-125-20);
-	$('#p-center').height($(window).height()-125-20);
-}
 
-/* Get mouse position relative to the document.
- */
-function getMousePosition(e) {
 
-	var posx = 0;
-	var posy = 0;
-	if (!e) var e = window.event;
-	if (e.pageX || e.pageY) 	{
-		posx = e.pageX;
-		posy = e.pageY;
-	}
-	else if (e.clientX || e.clientY) 	{
-		posx = e.clientX + document.body.scrollLeft
-			+ document.documentElement.scrollLeft;
-		posy = e.clientY + document.body.scrollTop
-			+ document.documentElement.scrollTop;
-	}
-	return {'x': posx, 'y': posy };
-}
 
-function move_split(e) {
-	var pos = getMousePosition(e);
-	$('#p-left').css('width', pos['x']);
-	$('#p-splitter').css('left', pos['x']);
-	$('#p-center').css('margin-left', pos['x']+3);
-}
 
 $(function() {
-
-	resize();
-
-	var mouse_down = false;
-
-	$('#p-splitter').mousedown (function(e) { mouse_down = true; return false; });
-
-	$('#p-left'    ).mousemove(function(e) { if(mouse_down) move_split(e); });
-	$('#p-center'  ).mousemove(function(e) { if(mouse_down) move_split(e); });
-
-	$('#p-left'    ).mouseup   (function(e) { mouse_down = false; });
-	$('#p-splitter').mouseup   (function(e) { mouse_down = false; });
-	$('#p-center'  ).mouseup   (function(e) { mouse_down = false; });
-});
-
-/* ---------------------------------------------
- *          AUTHENTICATION MANAGEMENT
- * ---------------------------------------------
- */
-var auth_is_authenticated="<?php echo $authdb->isAuthenticated()?>";
-var auth_type="<?php echo $authdb->authType()?>";
-var auth_remote_user="<?php echo $authdb->authName()?>";
-
-var auth_webauth_token_creation="<?php echo $_SERVER['WEBAUTH_TOKEN_CREATION']?>";
-var auth_webauth_token_expiration="<?php echo $_SERVER['WEBAUTH_TOKEN_EXPIRATION']?>";
-
-function refresh_page() {
-    window.location = "<?php echo $_SERVER['REQUEST_URI']?>";
-}
-
-var auth_timer = null;
-function auth_timer_restart() {
-    if( auth_is_authenticated && ( auth_type == 'WebAuth' ))
-        auth_timer = window.setTimeout('auth_timer_event()', 1000 );
-}
-
-var auth_last_secs = null;
-function auth_timer_event() {
-
-    var auth_expiration_info = document.getElementById('auth_expiration_info');
-    var now = mktime();
-    var seconds = auth_webauth_token_expiration - now;
-    if( seconds <= 0 ) {
-        $('#popupdialogs').html(
-        	'<p><span class="ui-icon ui-icon-alert" style="float:left;"></span>'+
-        	'Your WebAuth session has expired. Press <b>Ok</b> or use <b>Refresh</b> button'+
-        	'of the browser to renew your credentials.</p>'
-        );
-        $('#popupdialogs').dialog({
-        	resizable: false,
-        	modal: true,
-        	buttons: {
-        		'Ok': function() {
-        			$(this).dialog('close');
-        			refresh_page();
-        		}
-        	},
-        	title: 'Session Expiration Notification'
-        });
-        return;
-    }
-    var hours_left   = Math.floor(seconds / 3600);
-    var minutes_left = Math.floor((seconds % 3600) / 60);
-    var seconds_left = Math.floor((seconds % 3600) % 60);
-
-    var hours_left_str = hours_left;
-    if( hours_left < 10 ) hours_left_str = '0'+hours_left_str;
-    var minutes_left_str = minutes_left;
-    if( minutes_left < 10 ) minutes_left_str = '0'+minutes_left_str;
-    var seconds_left_str = seconds_left;
-    if( seconds_left < 10 ) seconds_left_str = '0'+seconds_left_str;
-
-    auth_expiration_info.innerHTML=
-        '<b>'+hours_left_str+':'+minutes_left_str+'.'+seconds_left_str+'</b>';
-
-    auth_timer_restart();
-}
-
-function logout() {
-	$('#popupdialogs').html(
-		'<p><span class="ui-icon ui-icon-alert" style="float:left;"></span>'+
-    	'This will log yout out from the current WebAuth session. Are you sure?</p>'
-	 );
-	$('#popupdialogs').dialog({
-		resizable: false,
-		modal: true,
-		buttons: {
-			"Yes": function() {
-				$( this ).dialog('close');
-	            document.cookie = 'webauth_wpt_krb5=; expires=Fri, 27 Jul 2001 02:47:11 UTC; path=/';
-	            document.cookie = 'webauth_at=; expires=Fri, 27 Jul 2001 02:47:11 UTC; path=/';
-	            refresh_page();
-			},
-			Cancel: function() {
-				$(this).dialog('close');
-			}
-		},
-		title: 'Session Logout Warning'
-	});
-}
-
-$(function() {
-	auth_timer_restart();
+    fwk.configure (
+        'Document Title' ,
+        'Document Subtitle' ,
+        {
+            is_authenticated:         "<?php echo $authdb->isAuthenticated()?>" ,
+            type:                     "<?php echo $authdb->authType()?>" ,
+            remote_user:              "<?php echo $authdb->authName()?>" ,
+            webauth_token_creation:   "<?php echo $_SERVER['WEBAUTH_TOKEN_CREATION']?>" ,
+            webauth_token_expiration: "<?php echo $_SERVER['WEBAUTH_TOKEN_EXPIRATION']?>"
+        } ,
+        "<?php echo $_SERVER['REQUEST_URI']?>"
+    ) ;
 });
 
 /* ----------------------------------------------
@@ -725,7 +382,7 @@ function p_appl_fifth() {
 
 </head>
 
-<body onresize="resize()">
+<body>
 
 <div id="p-top">
   <div id="p-top-header">

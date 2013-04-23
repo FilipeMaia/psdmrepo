@@ -411,7 +411,14 @@ HERE;
                '<a class="link" href="javascript:show_email('."'$1','$2'".')" title="click to see e-mail address">$1</a>$3',
                $experiment->contact_info());
     }
-
+    static function experiment_contacts( $experiment ) {
+        $addresses = array();
+        preg_match_all (
+               '/[(]+(.+@.+)[)]+/',
+               $experiment->contact_info(),
+               $addresses);
+        return $addresses[1];
+    }
     static function decorated_experiment_status( $experiment ) {
         $status = $experiment->in_interval( LusiTime::now());
         if     ( $status > 0 ) return '<b><em style="color:gray">completed</em></b>';

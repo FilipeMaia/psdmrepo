@@ -11,6 +11,13 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-10
+2013-04-23 Igor Gaponenko
+- incomplete implementation for the Fwk class
+- fixed a bug in E-Log
+- fixed a bug in the Web service searchig for files. The new implementation won't return
+errors for experiments not taken any runs
+
 Tag: V00-04-09
 2013-01-28 Igor Gaponenko
 - better implementation of the new messages highlight in e-log using JQUery animation

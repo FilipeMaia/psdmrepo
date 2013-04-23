@@ -1433,7 +1433,7 @@ hdf.exp_id = <?=$exper_id?>;
 var select_app = '<?=$select_app?>';
 var select_app_context1 = '<?=$select_app_context1?>';
 
-var extra_params = new Array();
+var global_extra_params = new Array();
 <?php
     if( isset($params)) {
         foreach( $params as $p ) {
@@ -1443,12 +1443,12 @@ var extra_params = new Array();
                 break;
             case 1:
                 $k = $kv[0];
-                echo "extra_params['{$k}']=true;\n";
+                echo "global_extra_params['{$k}']=true;\n";
                 break;
             default:
                 $k = $kv[0];
                 $v = $kv[1];
-                echo "extra_params['{$k}']='{$v}';\n";
+                echo "global_extra_params['{$k}']='{$v}';\n";
                 break;
             }
         }

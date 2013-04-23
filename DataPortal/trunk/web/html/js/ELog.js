@@ -61,7 +61,7 @@ function elog_create() {
         if(this.context1 == 'recent') {
 
             // Do nothing if nothing has changed since the previous call to the function,
-            // such as: fresh initialization, change in the slected context, subcontext, etc.
+            // such as: fresh initialization, change in the selected context, subcontext, etc.
             //
             if( just_initialized || (prev_context1 != this.context1 )) {
                 this.live_message_viewer.reload(live_selected_deleted(), live_selected_runs(), this.live_selected_range());
@@ -88,6 +88,19 @@ function elog_create() {
                 $('#el-p-message4run'       ).removeClass('hidden' ).addClass('visible');
             }
             this.post_reset();
+
+        } else if(this.context1 == 'search') {
+
+            // Do nothing if nothing has changed since the previous call to the function,
+            // such as: fresh initialization, change in the selected context, subcontext, etc.
+            //
+            if( just_initialized || (prev_context1 != this.context1 )) {
+                if ('run' in global_extra_params) {
+                    var runnum = global_extra_params['run'];
+                    $('#elog-form-search input[name="runs"]').val(runnum);
+                    this.search();
+                }
+            }
         }
     };
 
