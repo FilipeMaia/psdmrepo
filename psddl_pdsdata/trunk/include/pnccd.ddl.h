@@ -124,8 +124,6 @@ private:
             introduced to psana to simplify access to full frame data in the user code.
 */
 
-class ConfigV1;
-class ConfigV2;
 
 class FullFrameV1 {
 public:
