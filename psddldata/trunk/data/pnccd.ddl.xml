@@ -126,9 +126,6 @@
             glued together. This class does not exist in original pdsdata, it has been 
             introduced to psana to simplify access to full frame data in the user code.
 
-            <xtc-config name="ConfigV1" />
-            <xtc-config name="ConfigV2" />
-
             <attribute name="_specialWord" type="uint32_t" accessor="specialWord">
                 Special values
             </attribute>
