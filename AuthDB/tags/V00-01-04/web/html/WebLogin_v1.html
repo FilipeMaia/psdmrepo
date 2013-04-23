@@ -1,0 +1,182 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+  <head>
+    <http-equiv="pragma" content="no-cache">
+    <title>SLAC Webauth Login</title>
+    <meta http-equiv="content-type" content="text/html; charset=iso-8859-1">
+  </head>
+
+  <TMPL_IF NAME=notdefined>
+<!--
+This is the template for the WebAuth login page.  This page is called from
+login.fcgi script on the weblogin server.  It displays a form asking the
+user for username and password.  Variables used:
+
+error                  : some error occurred
+err_missinginput       : one of username or password missing
+err_username           : no username error
+err_password           : no password error
+err_loginfailed        : username and password were incorrect
+err_cookie             : browser doesn't support cookies
+err_forced             : web site requires username/password login
+RT                     : Response Token
+ST                     : Service Token
+LC                     : Login Cancel Token
+username               : the username
+login_cancel           : a cancel URL was specified
+cancel_url             : the specified cancel URL
+show_remuser           : show a button for REMOTE_USER authentication
+remuser_url            : where to send the user for REMOTE_USER auth
+-->
+  </TMPL_IF>
+
+  <body>
+    <div class="header" align="center" style="padding:10px;" >
+      <h1>LCLS Photon Systems Webauth Login</h1>
+    </div>
+    <br />
+
+    <TMPL_IF NAME=error>
+      <div class="error" align="center">
+        <p><strong>
+          <TMPL_IF NAME=err_missinginput>
+            <!-- This is just the combination of err_username and
+                 err_password if you want only one error message.  We
+                 don't use it. -->
+          </TMPL_IF>
+          <TMPL_IF NAME=err_username>
+            <!-- Error: no username submitted. -->
+            <TMPL_IF NAME=err_password>
+              Error: Enter your username and password.
+            <TMPL_ELSE>
+              Error: Enter your username.
+            </TMPL_IF>
+          </TMPL_IF>     
+          <TMPL_IF NAME=err_password>
+            <!-- Error: no password submitted. -->
+            Error: Enter your password.
+          </TMPL_IF>
+
+          <TMPL_IF NAME=err_loginfailed>
+            <!-- Error: login failed. -->
+            Error: You entered an incorrect username or password (or both).
+          </TMPL_IF>
+
+          <TMPL_IF NAME=err_cookies>
+            <!-- Error: cookies not enabled. -->
+            Error: You must enable cookies on your web browser.
+          </TMPL_IF>
+
+          <TMPL_IF NAME=err_forced>
+            <!-- Not really an error, forced login. -->
+            This web site requires that you log in with username and
+            password.
+          </TMPL_IF>
+        </strong></p>
+        <p>Click <a href="/help.html">help</a> for assistance.</p>
+      </div>
+    </TMPL_IF>
+
+    <TMPL_IF NAME=remuser_failed>
+      <div class="error" align="center">
+        <p><strong>Error: Apache authentication was tried and
+        failed.</strong></p>
+      </div>
+    </TMPL_IF>
+
+    <div class="loginbox" align="center">
+      <table border="0" width="25%">
+        <tr>
+          <td></td>
+          <td>
+            <div class="loginform" align="center" style="padding-top:15px; padding-bottom:5px;">
+              <form action="<TMPL_VAR ESCAPE=HTML NAME=script_name>"
+                    method="post" autocomplete="OFF"
+                    enctype="application/x-www-form-urlencoded">
+                <input type="hidden" name="RT"
+                       value="<TMPL_VAR ESCAPE=HTML NAME=RT>">
+                <input type="hidden" name="ST"
+                       value="<TMPL_VAR ESCAPE=HTML NAME=ST>">
+                <input type="hidden" name="LC"
+                       value="<TMPL_VAR ESCAPE=HTML NAME=LC>">
+                <input type="hidden" name="login" value="yes">
+                <table border="0">
+                  <tr>
+                    <td><strong>Username:</strong></td>
+                    <td><input name="username" type="text"
+                               value="<TMPL_VAR ESCAPE=HTML NAME=username>"
+                               size="10" maxlength="8"><br/></td>
+                  </tr>
+                  <tr>
+                    <td><strong>Password:</strong></td>
+                    <td><input name="password" type="password" size="18"></td>
+                  </tr>
+                </table>
+                <br />
+                <input type="submit" name="Submit" value="Login">
+              </form>
+            </div>
+            <div class="loginlinks">
+              <TMPL_IF NAME=login_cancel>
+                <!-- The Webauth Server has a cancel url.-->
+                <a href="<TMPL_VAR ESCAPE=HTML NAME=cancel_url>">cancel</a>
+              </TMPL_IF>
+            </div>
+          </td>
+        </tr>
+      </table>
+    </div>
+
+    <TMPL_IF NAME=show_remuser>
+      <div class="remuserbox" align="center">
+        <table border="1" width="70%">
+          <tr>
+              <td>
+                Or skip entering your username and password.  Instead,
+                log in using your computer login information via
+                Apache authentication:
+              </td>
+              <td>
+                <form action="<TMPL_VAR ESCAPE=HTML NAME=remuser_url>"
+                      method="get">
+                  <input type="hidden" name="RT"
+                         value="<TMPL_VAR ESCAPE=HTML NAME=RT>">
+                  <input type="hidden" name="ST"
+                         value="<TMPL_VAR ESCAPE=HTML NAME=ST>">
+                  <input type="submit" name="Submit" value="remuser">
+                </form>
+              </td>
+            </tr>
+        </table>
+      </div>
+    </TMPL_IF>
+
+    <div class="trailer" align="center">
+
+    <table style="border-top:#c0c0c0 2px solid; margin-top:50px;">
+      <tr>
+		<td colspan="5" height="37" valign="middle" width="100%">
+		  <table width="752" border="0" align="center" cellpadding="0"  cellspacing="0">
+			<tr>
+			  <td align="center">
+				<span class="footertext">
+				  SLAC National Accelerator Laboratory, Menlo Park, CA
+				  <br />
+				  Operated by
+				  <a href="http://www.stanford.edu/" class="subtoplinks">Stanford University</a>
+				  for the
+				  <a href="http://www.doe.gov/" class="subtoplinks">U.S. Dept. of Energy</a>
+				  <br />
+				  <a class="footerlinks" href="http://home.slac.stanford.edu/contactslac.html">Contact Us</a> |
+				  <a class="footerlinks" href="http://home.slac.stanford.edu/privacy.html">Privacy Notice, Security Notice and Terms of Use</a> |
+				  <a class="footerlinks" href="mailto:unix-admin@slac.stanford.edu?subject=Webauth Login Help">Email for help with this service.</a>
+				</span>
+			  </td>
+		    </tr>
+		  </table>
+	    </td>
+	  </tr>
+	</table>
+	</div>
+  </body>
+</html>
