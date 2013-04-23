@@ -90,11 +90,7 @@ try {
     break;
   case 245364150:
     // PNCCD::FullFrameV1
-    if (boost::shared_ptr<Psana::PNCCD::ConfigV1> cfgPtr = cfgStore.get(src)) {
-      evt.putProxy(psddl_hdf2psana::PNCCD::make_FullFrameV1(schema_version, group, idx, cfgPtr), src);
-    } else if (boost::shared_ptr<Psana::PNCCD::ConfigV2> cfgPtr = cfgStore.get(src)) {
-      evt.putProxy(psddl_hdf2psana::PNCCD::make_FullFrameV1(schema_version, group, idx, cfgPtr), src);
-    }
+    evt.putProxy(psddl_hdf2psana::PNCCD::make_FullFrameV1(schema_version, group, idx), src);
     break;
   case 477483284:
     // UsdUsb::DataV1
@@ -526,11 +522,7 @@ try {
     break;
   case 3682217189:
     // PNCCD::FrameV1
-    if (boost::shared_ptr<Psana::PNCCD::ConfigV1> cfgPtr = cfgStore.get(src)) {
-      evt.putProxy(psddl_hdf2psana::PNCCD::make_FullFrameV1(schema_version, group, idx, cfgPtr), src);
-    } else if (boost::shared_ptr<Psana::PNCCD::ConfigV2> cfgPtr = cfgStore.get(src)) {
-      evt.putProxy(psddl_hdf2psana::PNCCD::make_FullFrameV1(schema_version, group, idx, cfgPtr), src);
-    }
+    evt.putProxy(psddl_hdf2psana::PNCCD::make_FullFrameV1(schema_version, group, idx), src);
     if (boost::shared_ptr<Psana::PNCCD::ConfigV1> cfgPtr = cfgStore.get(src)) {
       evt.putProxy(psddl_hdf2psana::PNCCD::make_FramesV1(schema_version, group, idx, cfgPtr), src);
     } else if (boost::shared_ptr<Psana::PNCCD::ConfigV2> cfgPtr = cfgStore.get(src)) {

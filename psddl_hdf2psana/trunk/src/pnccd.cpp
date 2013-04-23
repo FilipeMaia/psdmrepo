@@ -159,53 +159,47 @@ template class FramesV1_v0<Psana::PNCCD::ConfigV2>;
 
 
 /** Special values */
-template <typename Config>
 uint32_t
-FullFrameV1_v0<Config>::specialWord() const
+FullFrameV1_v0::specialWord() const
 {
   if (m_frame.empty()) read_frame();
   return m_specialWord;
 }
 
 /** Frame number */
-template <typename Config>
 uint32_t
-FullFrameV1_v0<Config>::frameNumber() const
+FullFrameV1_v0::frameNumber() const
 {
   if (m_frame.empty()) read_frame();
   return m_frameNumber;
 }
 
 /** Most significant part of timestamp */
-template <typename Config>
 uint32_t
-FullFrameV1_v0<Config>::timeStampHi() const
+FullFrameV1_v0::timeStampHi() const
 {
   if (m_frame.empty()) read_frame();
   return m_timeStampHi;
 }
 
 /** Least significant part of timestamp */
-template <typename Config>
 uint32_t
-FullFrameV1_v0<Config>::timeStampLo() const
+FullFrameV1_v0::timeStampLo() const
 {
   if (m_frame.empty()) read_frame();
   return m_timeStampLo;
 }
 
 /** Full frame data, image size is 1024x1024. */
-template <typename Config>
 ndarray<const uint16_t, 2>
-FullFrameV1_v0<Config>::data() const
+FullFrameV1_v0::data() const
 {
   if (m_frame.empty()) read_frame();
   return m_frame;
 }
 
-template <typename Config>
 void
-FullFrameV1_v0<Config>::read_frame() const
+FullFrameV1_v0::read_frame() const
 {
   ndarray<const ns_FrameV1_v0::dataset_data, 1> mdata = hdf5pp::Utils::readNdarray<ns_FrameV1_v0::dataset_data, 1>(m_group, "frame", m_idx);
   ndarray<const uint16_t, 2> frdata = hdf5pp::Utils::readNdarray<uint16_t, 2>(m_group, "data", m_idx);
@@ -243,9 +237,6 @@ FullFrameV1_v0<Config>::read_frame() const
     dest = std::copy(src2, src2+512, dest);
   }
 }
-
-template class FullFrameV1_v0<Psana::PNCCD::ConfigV1>;
-template class FullFrameV1_v0<Psana::PNCCD::ConfigV2>;
 
 
 } // namespace PNCCD

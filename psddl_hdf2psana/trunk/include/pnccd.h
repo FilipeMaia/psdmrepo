@@ -101,14 +101,13 @@ private:
 };
 
 
-template <typename Config>
 class FullFrameV1_v0 : public Psana::PNCCD::FullFrameV1 {
 public:
   typedef Psana::PNCCD::FramesV1 PsanaType;
 
   FullFrameV1_v0() {}
-  FullFrameV1_v0(hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Config>& cfg)
-    : m_group(group), m_idx(idx), m_cfg(cfg) {}
+  FullFrameV1_v0(hdf5pp::Group group, hsize_t idx)
+    : m_group(group), m_idx(idx) {}
 
   virtual ~FullFrameV1_v0() {}
 
@@ -127,7 +126,6 @@ private:
 
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
-  boost::shared_ptr<Config> m_cfg;
 
   mutable uint32_t m_specialWord;
   mutable uint32_t m_frameNumber;

@@ -181,18 +181,10 @@ boost::shared_ptr<PSEvt::Proxy<Psana::PNCCD::ConfigV2> > make_ConfigV2(int versi
     return boost::make_shared<PSEvt::DataProxy<Psana::PNCCD::ConfigV2> >(boost::shared_ptr<Psana::PNCCD::ConfigV2>());
   }
 }
-boost::shared_ptr<PSEvt::Proxy<Psana::PNCCD::FullFrameV1> > make_FullFrameV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::PNCCD::ConfigV1>& cfg) {
+boost::shared_ptr<PSEvt::Proxy<Psana::PNCCD::FullFrameV1> > make_FullFrameV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
-    return boost::make_shared<PSEvt::DataProxy<Psana::PNCCD::FullFrameV1> >(boost::make_shared<FullFrameV1_v0<Psana::PNCCD::ConfigV1> >(group, idx, cfg));
-  default:
-    return boost::make_shared<PSEvt::DataProxy<Psana::PNCCD::FullFrameV1> >(boost::shared_ptr<Psana::PNCCD::FullFrameV1>());
-  }
-}
-boost::shared_ptr<PSEvt::Proxy<Psana::PNCCD::FullFrameV1> > make_FullFrameV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::PNCCD::ConfigV2>& cfg) {
-  switch (version) {
-  case 0:
-    return boost::make_shared<PSEvt::DataProxy<Psana::PNCCD::FullFrameV1> >(boost::make_shared<FullFrameV1_v0<Psana::PNCCD::ConfigV2> >(group, idx, cfg));
+    return boost::make_shared<PSEvt::DataProxy<Psana::PNCCD::FullFrameV1> >(boost::make_shared<FullFrameV1_v0>(group, idx));
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::PNCCD::FullFrameV1> >(boost::shared_ptr<Psana::PNCCD::FullFrameV1>());
   }
