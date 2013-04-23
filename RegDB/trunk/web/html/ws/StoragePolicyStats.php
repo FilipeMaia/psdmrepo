@@ -102,13 +102,13 @@ try {
         $expiration_deadlines = array();
         foreach (
             array(
-                '2013-01-02',
-                '2013-02-02',
-                '2013-03-02',
                 '2013-04-02',
                 '2013-05-02',
                 '2013-06-02',
-                '2013-07-02') as $day) {
+                '2013-07-02',
+                '2013-08-02',
+                '2013-09-02',
+                '2013-10-02') as $day) {
             array_push(
                 $expiration_deadlines,
                 array(

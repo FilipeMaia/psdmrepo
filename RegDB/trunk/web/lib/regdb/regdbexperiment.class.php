@@ -434,6 +434,30 @@ class RegDBExperiment {
     }
 
    /**
+     * Get a list of files found in the ANA data migration table.
+     *
+     * @return array
+     */
+    public function data_migration2ana_files() {
+
+    	$list   = array();
+        $table  = "{$this->connection->database}.data_migration_ana";
+        $result = $this->connection->query(
+            "SELECT * FROM {$table} WHERE exper_id=".$this->id()." ORDER BY file, file_type" );
+
+        $nrows = mysql_numrows( $result );
+        for( $i = 0; $i < $nrows; $i++ )
+            array_push (
+                $list,
+                new RegDBDataMigrationFile (
+                    $this->connection,
+                    $this,
+                    mysql_fetch_array( $result, MYSQL_ASSOC )));
+
+        return $list;
+    }
+
+   /**
      * Get a list of files found in the NERSC data migration table.
      *
      * @return array
@@ -443,7 +467,7 @@ class RegDBExperiment {
     	$list   = array();
         $table  = "{$this->connection->database}.data_migration_nersc";
         $result = $this->connection->query(
-            "SELECT * FROM {$table} WHERE exper_id=".$this->id()." ORDER BY file,file_type" );
+            "SELECT * FROM {$table} WHERE exper_id=".$this->id()." ORDER BY file, file_type" );
 
         $nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ )

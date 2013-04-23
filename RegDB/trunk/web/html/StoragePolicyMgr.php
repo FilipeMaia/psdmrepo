@@ -225,13 +225,13 @@ function load_stats_for_experiment (descr) {
 var total_short_usage_files = 0;
 var total_short_usage_tb = 0;
 var total_short_expired_tb = {
-    '2013-01-02': 0,
-    '2013-02-02': 0,
-    '2013-03-02': 0,
     '2013-04-02': 0,
     '2013-05-02': 0,
     '2013-06-02': 0,
     '2013-07-02': 0,
+    '2013-08-02': 0,
+    '2013-09-02': 0,
+    '2013-10-02': 0
 };
 var total_medium_usage_files = 0;
 var total_medium_usage_tb = 0;
@@ -716,13 +716,13 @@ HERE;
             <tr>
               <td class="table_hdr"             align="right"  >files</td>
               <td class="table_hdr"             align="right"  >TB</td>
-              <td class="table_hdr"             align="right"  >2013-01-01</td>
-              <td class="table_hdr"             align="right"  >2013-02-01</td>
-              <td class="table_hdr"             align="right"  >2013-03-01</td>
               <td class="table_hdr"             align="right"  >2013-04-01</td>
               <td class="table_hdr"             align="right"  >2013-05-01</td>
               <td class="table_hdr"             align="right"  >2013-06-01</td>
               <td class="table_hdr"             align="right"  >2013-07-01</td>
+              <td class="table_hdr"             align="right"  >2013-08-01</td>
+              <td class="table_hdr"             align="right"  >2013-09-01</td>
+              <td class="table_hdr"             align="right"  >2013-10-01</td>
               <td class="table_hdr"             align="right"  >files</td>
               <td class="table_hdr"             align="right"  >TB</td>
             </tr>
@@ -762,13 +762,13 @@ HERE;
               <td class="table_cell table_cell_left"  align="left"  >{$instrument_name}</td>
               <td class="table_cell "                 align="right" id="short_usage_files_{$instrument_name}"           >Loading</td>
               <td class="table_cell highlighted "     align="right" id="short_usage_tb_{$instrument_name}"              >Loading...</td>
-              <td class="table_cell "                 align="right" id="short_expired_tb_2013-01-02_{$instrument_name}" >Loading...</td>
-              <td class="table_cell "                 align="right" id="short_expired_tb_2013-02-02_{$instrument_name}" >Loading...</td>
-              <td class="table_cell "                 align="right" id="short_expired_tb_2013-03-02_{$instrument_name}" >Loading...</td>
               <td class="table_cell "                 align="right" id="short_expired_tb_2013-04-02_{$instrument_name}" >Loading...</td>
               <td class="table_cell "                 align="right" id="short_expired_tb_2013-05-02_{$instrument_name}" >Loading...</td>
               <td class="table_cell "                 align="right" id="short_expired_tb_2013-06-02_{$instrument_name}" >Loading...</td>
               <td class="table_cell "                 align="right" id="short_expired_tb_2013-07-02_{$instrument_name}" >Loading...</td>
+              <td class="table_cell "                 align="right" id="short_expired_tb_2013-08-02_{$instrument_name}" >Loading...</td>
+              <td class="table_cell "                 align="right" id="short_expired_tb_2013-09-02_{$instrument_name}" >Loading...</td>
+              <td class="table_cell "                 align="right" id="short_expired_tb_2013-10-02_{$instrument_name}" >Loading...</td>
               <td class="table_cell "                 align="right" id="medium_usage_files_{$instrument_name}"          >Loading...</td>
               <td class="table_cell highlighted "     align="right" id="medium_usage_tb_{$instrument_name}"             >Loading...</td>
               <td class="table_cell table_cell_right" align="right" id="medium_quota_tb_{$instrument_name}"             >Loading...</td>
@@ -780,13 +780,13 @@ HERE;
               <td class="table_cell table_cell_left  table_cell_bottom"             align="left"  >Total:</td>
               <td class="table_cell                  table_cell_bottom"             align="right" id="total_short_usage_files"           >Loading</td>
               <td class="table_cell                  table_cell_bottom highlighted" align="right" id="total_short_usage_tb"              >Loading...</td>
-              <td class="table_cell                  table_cell_bottom"             align="right" id="total_short_expired_tb_2013-01-02" >Loading...</td>
-              <td class="table_cell                  table_cell_bottom"             align="right" id="total_short_expired_tb_2013-02-02" >Loading...</td>
-              <td class="table_cell                  table_cell_bottom"             align="right" id="total_short_expired_tb_2013-03-02" >Loading...</td>
               <td class="table_cell                  table_cell_bottom"             align="right" id="total_short_expired_tb_2013-04-02" >Loading...</td>
               <td class="table_cell                  table_cell_bottom"             align="right" id="total_short_expired_tb_2013-05-02" >Loading...</td>
               <td class="table_cell                  table_cell_bottom"             align="right" id="total_short_expired_tb_2013-06-02" >Loading...</td>
               <td class="table_cell                  table_cell_bottom"             align="right" id="total_short_expired_tb_2013-07-02" >Loading...</td>
+              <td class="table_cell                  table_cell_bottom"             align="right" id="total_short_expired_tb_2013-08-02" >Loading...</td>
+              <td class="table_cell                  table_cell_bottom"             align="right" id="total_short_expired_tb_2013-09-02" >Loading...</td>
+              <td class="table_cell                  table_cell_bottom"             align="right" id="total_short_expired_tb_2013-10-02" >Loading...</td>
               <td class="table_cell                  table_cell_bottom"             align="right" id="total_medium_usage_files"          >Loading...</td>
               <td class="table_cell                  table_cell_bottom highlighted" align="right" id="total_medium_usage_tb"             >Loading...</td>
               <td class="table_cell table_cell_right table_cell_bottom"             align="right" id="total_medium_quota_tb"             >Loading...</td>
