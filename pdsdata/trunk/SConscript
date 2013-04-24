@@ -39,6 +39,7 @@ del BINDIR
 packages = {
     'acqiris'       : 'acqdata',
     'andor'         : 'andordata',
+    'app'           : 'appdata',
     'bld'           : 'bld',
     'camera'        : 'camdata',
     'compress'      : 'compressdata',
