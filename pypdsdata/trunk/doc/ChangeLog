@@ -6,6 +6,10 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V00-00-95
+2013-04-24 Andy Salnikov
+- improve python TypeId representation for compressed types
+
 Tag: V00-00-94
 2013-04-17 Igor Gaponenko
 - added support for compressed XTC payload

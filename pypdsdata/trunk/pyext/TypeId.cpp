@@ -214,7 +214,10 @@ PyObject*
 TypeId_str( PyObject* self )
 {
   pypdsdata::TypeId* py_this = (pypdsdata::TypeId*) self;
-  if ( py_this->m_obj.version() ) {
+  if ( py_this->m_obj.compressed() ) {
+    return PyString_FromFormat("%s_V%d/compressed", Pds::TypeId::name(py_this->m_obj.id()),
+        py_this->m_obj.compressed_version() );
+  } else if ( py_this->m_obj.version() ) {
     return PyString_FromFormat("%s_V%d", Pds::TypeId::name(py_this->m_obj.id()),
         py_this->m_obj.version() );
   } else {
@@ -227,7 +230,7 @@ TypeId_repr( PyObject* self )
 {
   pypdsdata::TypeId* py_this = (pypdsdata::TypeId*) self;
   return PyString_FromFormat("<TypeId(%s,%d)>", Pds::TypeId::name(py_this->m_obj.id()),
-      py_this->m_obj.version() );
+      py_this->m_obj.compressed_version() );
 }
 
 }
