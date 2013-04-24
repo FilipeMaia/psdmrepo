@@ -1,0 +1,3 @@
+- add support for compressed XTC data types to pyana
+- add support for compressed XTC data types to psana
+- support for reading XTC from shared memory in psana
