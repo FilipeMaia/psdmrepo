@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-28-01
+2013-04-24 Andy Salnikov
+- add support for compressed data objects
+- small cleanup in message logging
+
 Tag: V00-28-00
 2013-04-01 Andy Salnikov
 - implementing smart chunck size estimate based on the contol configuration

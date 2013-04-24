@@ -18,6 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <boost/shared_ptr.hpp>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -25,12 +26,19 @@
 #include "MsgLogger/MsgLogger.h"
 #include "O2OTranslator/O2OExceptions.h"
 #include "O2OTranslator/O2OXtcScannerI.h"
-#include "pdsdata/xtc/Xtc.hh"
+#include "pdsdata/compress/CompressedXtc.hh"
 #include "pdsdata/xtc/DetInfo.hh"
+#include "pdsdata/xtc/Xtc.hh"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
 //-----------------------------------------------------------------------
+
+namespace {
+
+  const char logger[] = "O2OTranslator.O2OXtcIterator";
+
+}
 
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
@@ -60,13 +68,19 @@ O2OXtcIterator::~O2OXtcIterator ()
 int
 O2OXtcIterator::process(Xtc* xtc)
 {
+  if (xtc->contains.compressed()) {
+    MsgLog(logger, debug, "Found compressed XTC, decompressing");
+    boost::shared_ptr<Pds::Xtc> uxtc = Pds::CompressedXtc::uncompress(*xtc);
+    return this->process(uxtc.get());
+  }
+
   Pds::TypeId::Type type = xtc->contains.id() ;
   uint32_t version = xtc->contains.version() ;
   Pds::Level::Type level = xtc->src.level() ;
 
   // sanity check
   if ( xtc->sizeofPayload() < 0 ) {
-    MsgLogRoot( error, "Negative payload size in XTC: " << xtc->sizeofPayload()
+    MsgLog(logger, error, "Negative payload size in XTC: " << xtc->sizeofPayload()
         << " level: " << int(level) << '#' << Pds::Level::name(level)
         << " type: " << int(type) << '#' << Pds::TypeId::name(type) << "/V" << version) ;
     throw O2OXTCGenException(ERR_LOC, "negative payload size") ;
@@ -77,10 +91,10 @@ O2OXtcIterator::process(Xtc* xtc)
   // say we are at the new XTC level
   if ( m_scanner ) m_scanner->levelStart ( xtc->src ) ;
 
-  MsgLogRoot( debug, "O2OXtcIterator::process -- new xtc: "
+  MsgLog(logger, debug, "O2OXtcIterator::process -- new xtc: "
               << int(type) << '#' << Pds::TypeId::name(type) << "/V" << version
               << " payload = " << xtc->sizeofPayload()
-              << " damage: " << std::hex << std::showbase << xtc->damage.value() ) ;
+              << " damage: " << std::hex << std::showbase << xtc->damage.value()) ;
 
   int result = 1 ;
   if ( type == Pds::TypeId::Id_Xtc ) {
@@ -104,9 +118,9 @@ O2OXtcIterator::process(Xtc* xtc)
 
   } else {
 
-    MsgLogRoot( warning, "O2OXtcIterator::process -- data object at level "
+    MsgLog(logger, warning, "O2OXtcIterator::process -- data object at level "
                 << int(level) << '#' << Pds::Level::name(level) << ": "
-                << int(type) << '#' << Pds::TypeId::name(type) << "/V" << version ) ;
+                << int(type) << '#' << Pds::TypeId::name(type) << "/V" << version);
 
   }
 

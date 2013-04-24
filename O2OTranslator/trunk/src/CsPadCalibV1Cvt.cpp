@@ -41,7 +41,7 @@
 
 namespace {
 
-  const char logger[] = "CsPadCalibV1Cvt";
+  const char logger[] = "O2OTranslator.CsPadCalibV1Cvt";
   
 }
 
@@ -119,19 +119,19 @@ CsPadCalibV1Cvt::convert ( const void* data,
   boost::shared_ptr<pdscalibdata::CsPadFilterV1> filter;
   if (not pedFileName.empty()) {
     peds.reset(new pdscalibdata::CsPadPedestalsV1(pedFileName));
-    MsgLogRoot(info, "Read CsPad pedestals from " << pedFileName);
+    MsgLog(logger, info, "Read CsPad pedestals from " << pedFileName);
   }
   if (not pixFileName.empty()) {
     pixStat.reset(new pdscalibdata::CsPadPixelStatusV1(pixFileName));
-    MsgLogRoot(info, "Read CsPad pixel status from " << pixFileName);
+    MsgLog(logger, info, "Read CsPad pixel status from " << pixFileName);
   }
   if (not cmodeFileName.empty()) {
     cmode.reset(new pdscalibdata::CsPadCommonModeSubV1(cmodeFileName));
-    MsgLogRoot(info, "Read CsPad common mode data from " << cmodeFileName);
+    MsgLog(logger, info, "Read CsPad common mode data from " << cmodeFileName);
   }
   if (not filterFileName.empty()) {
     filter.reset(new pdscalibdata::CsPadFilterV1(filterFileName));
-    MsgLogRoot(info, "Read CsPad filter data from " << filterFileName);
+    MsgLog(logger, info, "Read CsPad filter data from " << filterFileName);
   }
 
   // get the name of the group for this object
@@ -140,7 +140,7 @@ CsPadCalibV1Cvt::convert ( const void* data,
   if ( m_group.hasChild(m_typeGroupName) ) {
     hdf5pp::Group typeGroup = m_group.openGroup(m_typeGroupName);
     if ( typeGroup.hasChild(src.name()) ) {
-      MsgLog("ConfigDataTypeCvt", trace, "group " << grpName << " already exists") ;
+      MsgLog(logger, trace, "group " << grpName << " already exists") ;
       return;
     }
   }

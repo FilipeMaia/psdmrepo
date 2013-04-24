@@ -31,6 +31,12 @@
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
 //-----------------------------------------------------------------------
 
+namespace {
+
+  const char logger[] = "O2OTranslator.O2OXtcValidator";
+
+}
+
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
 //		----------------------------------------
@@ -62,7 +68,7 @@ O2OXtcValidator::process(Xtc* xtc)
   Pds::Level::Type level = xtc->src.level() ;
 
 //  if ( xtc->damage.value() != 0 ) {
-//    MsgLogRoot( error, "XTC damage: " << std::hex << xtc->damage.value() << std::dec
+//    MsgLog(logger, error, "XTC damage: " << std::hex << xtc->damage.value() << std::dec
 //        << " level: " << int(level) << '#' << Pds::Level::name(level)
 //        << " type: " << int(type) << '#' << Pds::TypeId::name(type) << "/V" << version) ;
 //    m_status = 0 ;
@@ -70,7 +76,7 @@ O2OXtcValidator::process(Xtc* xtc)
 //  }
 
   if ( xtc->sizeofPayload() < 0 ) {
-    MsgLogRoot( error, "Negative payload size in XTC: " << xtc->sizeofPayload()
+    MsgLog(logger, error, "Negative payload size in XTC: " << xtc->sizeofPayload()
         << " level: " << int(level) << '#' << Pds::Level::name(level)
         << " type: " << int(type) << '#' << Pds::TypeId::name(type) << "/V" << version) ;
     m_status = 0 ;

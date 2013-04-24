@@ -51,7 +51,7 @@ namespace fs = boost::filesystem;
 
 namespace {
 
-  const char* logger = "HDF5Writer" ;
+  const char logger[] = "O2OTranslator.O2OHdf5Writer" ;
 
   // printable state name
   std::ostream& operator<<(std::ostream& out, O2OHdf5Writer::State state ) {
@@ -144,7 +144,7 @@ O2OHdf5Writer::O2OHdf5Writer ( const O2OFileNameFactory& nameFactory,
 //--------------
 O2OHdf5Writer::~O2OHdf5Writer ()
 {
-  MsgLog( logger, debug, "O2OHdf5Writer - close output file" ) ;
+  MsgLog(logger, debug, "O2OHdf5Writer - close output file");
   closeFile();
 }
 
@@ -152,9 +152,9 @@ O2OHdf5Writer::~O2OHdf5Writer ()
 bool
 O2OHdf5Writer::eventStart ( const Pds::Dgram& dgram )
 {
-  MsgLog( logger, debug, "O2OHdf5Writer::eventStart " << Pds::TransitionId::name(dgram.seq.service())
+  MsgLog(logger, debug, "O2OHdf5Writer::eventStart " << Pds::TransitionId::name(dgram.seq.service())
           << " dgram.seq.type=" << dgram.seq.type()
-          << " dgram.seq.service=" << Pds::TransitionId::name(dgram.seq.service()) ) ;
+          << " dgram.seq.service=" << Pds::TransitionId::name(dgram.seq.service()));
 
   m_transition = dgram.seq.service();
   Pds::ClockTime clock = dgram.seq.clock();
@@ -257,10 +257,10 @@ O2OHdf5Writer::eventStart ( const Pds::Dgram& dgram )
 
       // check the time, should not be sooner than begin of calib cycle
       if ( t < m_transClock[Pds::TransitionId::BeginCalibCycle] ) {
-        MsgLog( logger, warning, "O2OHdf5Writer::eventStart: L1Accept time out of sync: "
+        MsgLog(logger, warning, "O2OHdf5Writer::eventStart: L1Accept time out of sync: "
               << Pds::TransitionId::name(dgram.seq.service())
               << " BeginCalibCycle time=" << m_transClock[Pds::TransitionId::BeginCalibCycle].toString("S%s%f")
-              << " L1Accept time=" << t.toString("S%s%f")) ;
+              << " L1Accept time=" << t.toString("S%s%f"));
         skip = true;
       }
 
@@ -433,8 +433,8 @@ O2OHdf5Writer::dataObject(const void* data, size_t size, const Pds::TypeId& type
 {
   if (size == 0) {
     // sometimes happens
-    MsgLogRoot( error, "O2OHdf5Writer::dataObject -- zero payload size: "
-                << Pds::TypeId::name(typeId.id()) << "/" << typeId.version() );
+    MsgLog(logger, error, "O2OHdf5Writer::dataObject -- zero payload size: "
+        << Pds::TypeId::name(typeId.id()) << "/" << typeId.version());
     return;
   }
 
@@ -450,8 +450,8 @@ O2OHdf5Writer::dataObject(const void* data, size_t size, const Pds::TypeId& type
   // it is handled internally by regular epics converter
   const O2OCvtFactory::DataTypeCvtList& cvts = m_cvtFactory.getConverters(m_groups.top(), typeId, src.top());
   if (cvts.empty() and typeId.id() != Pds::TypeId::Id_EpicsConfig) {
-    MsgLogRoot( error, "O2OHdf5Writer::dataObject -- unexpected type or version: "
-                << Pds::TypeId::name(typeId.id()) << "/" << typeId.version() );
+    MsgLog(logger, error, "O2OHdf5Writer::dataObject -- unexpected type or version: "
+        << Pds::TypeId::name(typeId.id()) << "/" << typeId.version());
   }
 
   // call convert method on every matching converter
@@ -553,8 +553,8 @@ O2OHdf5Writer::splitSharedObject(const void* fulldata, size_t fullsize, const Pd
 
   } else {
 
-    MsgLogRoot( error, "O2OHdf5Writer::splitSharedObject -- unexpected type or version of shared BLD data: "
-                << Pds::TypeId::name(typeId.id()) << "/" << typeId.version() );
+    MsgLog(logger, error, "O2OHdf5Writer::splitSharedObject -- unexpected type or version of shared BLD data: "
+        << Pds::TypeId::name(typeId.id()) << "/" << typeId.version());
 
   }
 }
