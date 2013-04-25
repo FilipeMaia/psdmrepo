@@ -112,6 +112,32 @@ void createWrappers(PyObject* module) {
   ;
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::CsPad::ConfigV2QuadReg> >(-1, -1));
 
+  class_<Psana::CsPad::ConfigV3QuadReg, boost::shared_ptr<Psana::CsPad::ConfigV3QuadReg>, boost::noncopyable >("ConfigV3QuadReg", no_init)
+    .def("shiftSelect", &Psana::CsPad::ConfigV3QuadReg::shiftSelect)
+    .def("edgeSelect", &Psana::CsPad::ConfigV3QuadReg::edgeSelect)
+    .def("readClkSet", &Psana::CsPad::ConfigV3QuadReg::readClkSet)
+    .def("readClkHold", &Psana::CsPad::ConfigV3QuadReg::readClkHold)
+    .def("dataMode", &Psana::CsPad::ConfigV3QuadReg::dataMode)
+    .def("prstSel", &Psana::CsPad::ConfigV3QuadReg::prstSel)
+    .def("acqDelay", &Psana::CsPad::ConfigV3QuadReg::acqDelay)
+    .def("intTime", &Psana::CsPad::ConfigV3QuadReg::intTime)
+    .def("digDelay", &Psana::CsPad::ConfigV3QuadReg::digDelay)
+    .def("ampIdle", &Psana::CsPad::ConfigV3QuadReg::ampIdle)
+    .def("injTotal", &Psana::CsPad::ConfigV3QuadReg::injTotal)
+    .def("rowColShiftPer", &Psana::CsPad::ConfigV3QuadReg::rowColShiftPer)
+    .def("ampReset", &Psana::CsPad::ConfigV3QuadReg::ampReset)
+    .def("digCount", &Psana::CsPad::ConfigV3QuadReg::digCount)
+    .def("digPeriod", &Psana::CsPad::ConfigV3QuadReg::digPeriod)
+    .def("biasTuning", &Psana::CsPad::ConfigV3QuadReg::biasTuning)
+    .def("pdpmndnmBalance", &Psana::CsPad::ConfigV3QuadReg::pdpmndnmBalance)
+    .def("ro", &Psana::CsPad::ConfigV3QuadReg::ro, return_value_policy<copy_const_reference>())
+    .def("dp", &Psana::CsPad::ConfigV3QuadReg::dp, return_value_policy<copy_const_reference>())
+    .def("gm", &Psana::CsPad::ConfigV3QuadReg::gm, return_value_policy<copy_const_reference>())
+    .def("__typeid__", &method_typeid<Psana::CsPad::ConfigV3QuadReg>)
+    .staticmethod("__typeid__")
+  ;
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::CsPad::ConfigV3QuadReg> >(-1, -1));
+
   class_<Psana::CsPad::ConfigV1, boost::shared_ptr<Psana::CsPad::ConfigV1>, boost::noncopyable >("ConfigV1", no_init)
     .def("concentratorVersion", &Psana::CsPad::ConfigV1::concentratorVersion)
     .def("runDelay", &Psana::CsPad::ConfigV1::runDelay)
@@ -213,6 +239,34 @@ void createWrappers(PyObject* module) {
   ;
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::CsPad::ConfigV4> >(Pds::TypeId::Id_CspadConfig, 4));
 
+  class_<Psana::CsPad::ConfigV5, boost::shared_ptr<Psana::CsPad::ConfigV5>, boost::noncopyable >("ConfigV5", no_init)
+    .def("concentratorVersion", &Psana::CsPad::ConfigV5::concentratorVersion)
+    .def("runDelay", &Psana::CsPad::ConfigV5::runDelay)
+    .def("eventCode", &Psana::CsPad::ConfigV5::eventCode)
+    .def("protectionThresholds", &Psana::CsPad::ConfigV5::protectionThresholds)
+    .def("protectionEnable", &Psana::CsPad::ConfigV5::protectionEnable)
+    .def("inactiveRunMode", &Psana::CsPad::ConfigV5::inactiveRunMode)
+    .def("activeRunMode", &Psana::CsPad::ConfigV5::activeRunMode)
+    .def("internalTriggerDelay", &Psana::CsPad::ConfigV5::internalTriggerDelay)
+    .def("tdi", &Psana::CsPad::ConfigV5::tdi)
+    .def("payloadSize", &Psana::CsPad::ConfigV5::payloadSize)
+    .def("badAsicMask0", &Psana::CsPad::ConfigV5::badAsicMask0)
+    .def("badAsicMask1", &Psana::CsPad::ConfigV5::badAsicMask1)
+    .def("asicMask", &Psana::CsPad::ConfigV5::asicMask)
+    .def("quadMask", &Psana::CsPad::ConfigV5::quadMask)
+    .def("roiMasks", &Psana::CsPad::ConfigV5::roiMasks)
+    .def("quads", &Psana::CsPad::ConfigV5::quads, return_internal_reference<>())
+    .def("numAsicsRead", &Psana::CsPad::ConfigV5::numAsicsRead)
+    .def("roiMask", &Psana::CsPad::ConfigV5::roiMask)
+    .def("numAsicsStored", &Psana::CsPad::ConfigV5::numAsicsStored)
+    .def("numQuads", &Psana::CsPad::ConfigV5::numQuads)
+    .def("numSect", &Psana::CsPad::ConfigV5::numSect)
+    .def("quads_shape", &method_shape<Psana::CsPad::ConfigV5, &Psana::CsPad::ConfigV5::quads_shape>)
+    .def("__typeid__", &method_typeid<Psana::CsPad::ConfigV5>)
+    .staticmethod("__typeid__")
+  ;
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::CsPad::ConfigV5> >(Pds::TypeId::Id_CspadConfig, 5));
+
   class_<Psana::CsPad::ElementV1, boost::shared_ptr<Psana::CsPad::ElementV1>, boost::noncopyable >("ElementV1", no_init)
     .def("virtual_channel", &Psana::CsPad::ElementV1::virtual_channel)
     .def("lane", &Psana::CsPad::ElementV1::lane)
@@ -277,11 +331,12 @@ void createWrappers(PyObject* module) {
     Py_CLEAR(unvlist);
   }
   {
-    PyObject* unvlist = PyList_New(4);
+    PyObject* unvlist = PyList_New(5);
     PyList_SET_ITEM(unvlist, 0, PyObject_GetAttrString(submodule, "ConfigV1"));
     PyList_SET_ITEM(unvlist, 1, PyObject_GetAttrString(submodule, "ConfigV2"));
     PyList_SET_ITEM(unvlist, 2, PyObject_GetAttrString(submodule, "ConfigV3"));
     PyList_SET_ITEM(unvlist, 3, PyObject_GetAttrString(submodule, "ConfigV4"));
+    PyList_SET_ITEM(unvlist, 4, PyObject_GetAttrString(submodule, "ConfigV5"));
     PyObject_SetAttrString(submodule, "Config", unvlist);
     Py_CLEAR(unvlist);
   }
