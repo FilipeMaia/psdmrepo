@@ -39,7 +39,6 @@ namespace {
   FUN0_WRAPPER(pypdsdata::EvrData::ConfigV1, size)
   PyObject* pulse( PyObject* self, PyObject* args );
   PyObject* output_map( PyObject* self, PyObject* args );
-  PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
     { "npulses",    npulses,     METH_NOARGS,  "self.npulses() -> int\n\nReturns number of pulse configurations" },
@@ -64,10 +63,30 @@ pypdsdata::EvrData::ConfigV1::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
-  type->tp_str = _repr;
-  type->tp_repr = _repr;
 
   BaseType::initType( "ConfigV1", module );
+}
+
+void
+pypdsdata::EvrData::ConfigV1::print(std::ostream& str) const
+{
+  str << "evr.ConfigV1(";
+
+  str << "pulses=[";
+  for (unsigned i = 0; i != m_obj->npulses(); ++ i ) {
+    if (i != 0) str << ", ";
+    str << m_obj->pulse(i).pulse();
+  }
+  str << "]";
+
+  str << ", outputs=[";
+  for (unsigned i = 0; i != m_obj->noutputs(); ++ i ) {
+    if (i != 0) str << ", ";
+    str << m_obj->output_map(i).map();
+  }
+  str << "]";
+
+  str << ")";
 }
 
 namespace {
@@ -96,33 +115,6 @@ output_map( PyObject* self, PyObject* args )
   if ( not PyArg_ParseTuple( args, "I:EvrData.ConfigV1.output_map", &idx ) ) return 0;
 
   return pypdsdata::EvrData::OutputMap::PyObject_FromPds( obj->output_map(idx) );
-}
-
-PyObject*
-_repr( PyObject *self )
-{
-  Pds::EvrData::ConfigV1* obj = pypdsdata::EvrData::ConfigV1::pdsObject(self);
-  if(not obj) return 0;
-
-  std::ostringstream str;
-  str << "evr.ConfigV1("; 
-
-  str << "pulses=["; 
-  for (unsigned i = 0; i != obj->npulses(); ++ i ) {
-    if (i != 0) str << ", ";
-    str << obj->pulse(i).pulse();
-  }
-  str << "]";
-
-  str << ", outputs=["; 
-  for (unsigned i = 0; i != obj->noutputs(); ++ i ) {
-    if (i != 0) str << ", ";
-    str << obj->output_map(i).map();
-  }
-  str << "]";
-
-  str << ")";
-  return PyString_FromString( str.str().c_str() );
 }
 
 }

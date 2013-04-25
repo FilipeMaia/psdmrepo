@@ -45,7 +45,6 @@ namespace {
   FUN0_WRAPPER(pypdsdata::Ipimb::DataV1, channel2Volts)
   FUN0_WRAPPER(pypdsdata::Ipimb::DataV1, channel3Volts)
   FUN0_WRAPPER(pypdsdata::Ipimb::DataV1, checksum)
-  PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
     { "triggerCounter", triggerCounter, METH_NOARGS, "self.triggerCounter() -> int\n\nReturns integer number" },
@@ -78,29 +77,17 @@ pypdsdata::Ipimb::DataV1::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
-  type->tp_str = _repr;
-  type->tp_repr = _repr;
 
   BaseType::initType( "DataV1", module );
 }
 
-namespace {
-  
-PyObject*
-_repr( PyObject *self )
+void
+pypdsdata::Ipimb::DataV1::print(std::ostream& str) const
 {
-  Pds::Ipimb::DataV1* obj = pypdsdata::Ipimb::DataV1::pdsObject(self);
-  if(not obj) return 0;
-
-  std::ostringstream str;
-  str << "ipimb.DataV1(triggerCounter=" << obj->triggerCounter()
-      << ", v0=" << obj->channel0Volts()
-      << ", v1=" << obj->channel1Volts()
-      << ", v2=" << obj->channel2Volts()
-      << ", v3=" << obj->channel3Volts()
+  str << "ipimb.DataV1(triggerCounter=" << m_obj->triggerCounter()
+      << ", v0=" << m_obj->channel0Volts()
+      << ", v1=" << m_obj->channel1Volts()
+      << ", v2=" << m_obj->channel2Volts()
+      << ", v3=" << m_obj->channel3Volts()
       << ", ...)" ;
-
-  return PyString_FromString( str.str().c_str() );
-}
-
 }

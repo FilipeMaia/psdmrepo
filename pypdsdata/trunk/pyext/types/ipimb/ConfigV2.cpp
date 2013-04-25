@@ -62,7 +62,6 @@ namespace {
   FUN0_WRAPPER(pypdsdata::Ipimb::ConfigV2, trigPsDelay)
   FUN0_WRAPPER(pypdsdata::Ipimb::ConfigV2, adcDelay)
   PyObject* capacitorValue(PyObject* self, PyObject* args);
-  PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
     { "triggerCounter",      triggerCounter,      METH_NOARGS, "self.triggerCounter() -> int\n\nReturns integer number" },
@@ -102,14 +101,21 @@ pypdsdata::Ipimb::ConfigV2::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
-  type->tp_str = _repr;
-  type->tp_repr = _repr;
 
   // define class attributes for enums
   type->tp_dict = PyDict_New();
   PyDict_SetItemString( type->tp_dict, "CapacitorValue", capacitorValueEnum.type() );
 
   BaseType::initType( "ConfigV2", module );
+}
+
+void
+pypdsdata::Ipimb::ConfigV2::print(std::ostream& str) const
+{
+  str << "ipimb.ConfigV2(triggerCounter=" << m_obj->triggerCounter()
+      << ", serialID=" << m_obj->serialID()
+      << ", chargeAmpRange=" << m_obj->chargeAmpRange()
+      << ", ...)" ;
 }
 
 namespace {
@@ -130,21 +136,6 @@ capacitorValue( PyObject* self, PyObject* args )
   }
   
   return capacitorValueEnum.Enum_FromLong(obj->capacitorValue(index));
-}
-
-PyObject*
-_repr( PyObject *self )
-{
-  const Pds::Ipimb::ConfigV2* obj = pypdsdata::Ipimb::ConfigV2::pdsObject(self);
-  if(not obj) return 0;
-
-  std::ostringstream str;
-  str << "ipimb.ConfigV2(triggerCounter=" << obj->triggerCounter()
-      << ", serialID=" << obj->serialID()
-      << ", chargeAmpRange=" << obj->chargeAmpRange()
-      << ", ...)" ;
-
-  return PyString_FromString( str.str().c_str() );
 }
 
 }

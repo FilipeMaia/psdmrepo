@@ -45,7 +45,6 @@ namespace {
   FUN0_WRAPPER(pypdsdata::CsPad2x2::ElementV1, frame_type)
   PyObject* sb_temp( PyObject* self, PyObject* args );
   PyObject* data( PyObject* self, PyObject* );
-  PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
     {"virtual_channel", virtual_channel, METH_NOARGS,  "self.virtual_channel() -> int\n\nReturns integer number" },
@@ -76,8 +75,6 @@ pypdsdata::CsPad2x2::ElementV1::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
-  type->tp_str = _repr;
-  type->tp_repr = _repr;
 
   // add an enum analog to this class 
   type->tp_dict = PyDict_New();
@@ -89,6 +86,22 @@ pypdsdata::CsPad2x2::ElementV1::initType( PyObject* module )
   Py_CLEAR(val);
 
   BaseType::initType( "ElementV1", module );
+}
+
+void
+pypdsdata::CsPad2x2::ElementV1::print(std::ostream& str) const
+{
+  str << "CsPad2x2.ElementV1(quad=" << m_obj->quad()
+      << ", virtual_channel=" << m_obj->virtual_channel()
+      << ", lane=" << m_obj->lane()
+      << ", tid=" << m_obj->tid()
+      << ", acq_count=" << m_obj->acq_count()
+      << ", op_code=" << m_obj->op_code()
+      << ", seq_count=" << m_obj->seq_count()
+      << ", ticks=" << m_obj->ticks()
+      << ", fiducials=" << m_obj->fiducials()
+      << ", frame_type=" << m_obj->frame_type()
+      << ")";
 }
 
 namespace {
@@ -140,28 +153,6 @@ data( PyObject* self, PyObject* )
   ((PyArrayObject*)array)->base = self ;
 
   return array;
-}
-
-PyObject*
-_repr( PyObject *self )
-{
-  Pds::CsPad2x2::ElementV1* obj = pypdsdata::CsPad2x2::ElementV1::pdsObject(self);
-  if(not obj) return 0;
-
-  std::ostringstream str;
-  str << "CsPad2x2.ElementV1(quad=" << obj->quad()
-      << ", virtual_channel=" << obj->virtual_channel()
-      << ", lane=" << obj->lane()
-      << ", tid=" << obj->tid()
-      << ", acq_count=" << obj->acq_count()
-      << ", op_code=" << obj->op_code()
-      << ", seq_count=" << obj->seq_count()
-      << ", ticks=" << obj->ticks()
-      << ", fiducials=" << obj->fiducials()
-      << ", frame_type=" << obj->frame_type()
-      << ")";
-
-  return PyString_FromString( str.str().c_str() );
 }
 
 }

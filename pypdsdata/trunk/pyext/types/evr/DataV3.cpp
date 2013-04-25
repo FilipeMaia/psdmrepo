@@ -36,7 +36,6 @@ namespace {
   FUN0_WRAPPER(pypdsdata::EvrData::DataV3, numFifoEvents)
   FUN0_WRAPPER(pypdsdata::EvrData::DataV3, size)
   PyObject* fifoEvent( PyObject* self, PyObject* args );
-  PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
     { "numFifoEvents", numFifoEvents, METH_NOARGS,  "self.numFifoEvents() -> int\n\nReturns number of :py:class:`DataV3_FIFOEvent` objects" },
@@ -59,10 +58,24 @@ pypdsdata::EvrData::DataV3::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
-  type->tp_str = _repr;
-  type->tp_repr = _repr;
 
   BaseType::initType( "DataV3", module );
+}
+
+void
+pypdsdata::EvrData::DataV3::print(std::ostream& str) const
+{
+  str << "evr.DataV3(";
+
+  str << "fifoEvents=[";
+  for (unsigned i = 0; i != m_obj->numFifoEvents(); ++ i ) {
+    if (i != 0) str << ", ";
+    const Pds::EvrData::DataV3::FIFOEvent& ev = m_obj->fifoEvent(i);
+    str << ev.EventCode << ':' << ev.TimestampHigh << '.' << ev.TimestampLow;
+  }
+  str << "]";
+
+  str << ")";
 }
 
 namespace {
@@ -78,27 +91,6 @@ fifoEvent( PyObject* self, PyObject* args )
   if ( not PyArg_ParseTuple( args, "I:EvrData.DataV3.eventcode", &idx ) ) return 0;
 
   return pypdsdata::EvrData::DataV3_FIFOEvent::PyObject_FromPds( obj->fifoEvent(idx) );
-}
-
-PyObject*
-_repr( PyObject *self )
-{
-  Pds::EvrData::DataV3* obj = pypdsdata::EvrData::DataV3::pdsObject(self);
-  if(not obj) return 0;
-
-  std::ostringstream str;
-  str << "evr.DataV3("; 
-
-  str << "fifoEvents=["; 
-  for (unsigned i = 0; i != obj->numFifoEvents(); ++ i ) {
-    if (i != 0) str << ", ";
-    const Pds::EvrData::DataV3::FIFOEvent& ev = obj->fifoEvent(i); 
-    str << ev.EventCode << ':' << ev.TimestampHigh << '.' << ev.TimestampLow;
-  }
-  str << "]";
-
-  str << ")";
-  return PyString_FromString( str.str().c_str() );
 }
 
 }

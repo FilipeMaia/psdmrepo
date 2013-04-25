@@ -63,7 +63,6 @@ namespace {
   FUN0_WRAPPER(pypdsdata::CsPad2x2::ConfigV2, numAsicsRead)
   FUN0_WRAPPER(pypdsdata::CsPad2x2::ConfigV2, numAsicsStored)
   FUN0_WRAPPER(pypdsdata::CsPad2x2::ConfigV2, concentratorVersion)
-  PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
     {"quad",                quad,                METH_NOARGS, "self.quad() -> ConfigV2QuadReg\n\nReturns :py:class:`ConfigV2QuadReg` object" },
@@ -98,8 +97,6 @@ pypdsdata::CsPad2x2::ConfigV2::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
-  type->tp_str = _repr;
-  type->tp_repr = _repr;
 
   // define class attributes for enums
   type->tp_dict = PyDict_New();
@@ -109,6 +106,19 @@ pypdsdata::CsPad2x2::ConfigV2::initType( PyObject* module )
   Py_XDECREF(val);
 
   BaseType::initType( "ConfigV2", module );
+}
+
+void
+pypdsdata::CsPad2x2::ConfigV2::print(std::ostream& str) const
+{
+  str << "CsPad2x2.ConfigV2(tdi=" << m_obj->tdi()
+      << ", inactiveRunMode=" << m_obj->inactiveRunMode()
+      << ", activeRunMode=" << m_obj->activeRunMode()
+      << ", payloadSize=" << m_obj->payloadSize()
+      << ", asicMask=" << m_obj->asicMask()
+      << ", numAsicsStored=" << m_obj->numAsicsStored(0)
+      << ", roiMask=" << m_obj->roiMask(0)
+      << ")";
 }
 
 namespace {
@@ -152,25 +162,6 @@ sections( PyObject* self, PyObject* args )
     }
   }
   return list;
-}
-
-PyObject*
-_repr( PyObject *self )
-{
-  Pds::CsPad2x2::ConfigV2* obj = pypdsdata::CsPad2x2::ConfigV2::pdsObject(self);
-  if(not obj) return 0;
-
-  std::ostringstream str;
-  str << "CsPad2x2.ConfigV2(tdi=" << obj->tdi()
-      << ", inactiveRunMode=" << obj->inactiveRunMode()
-      << ", activeRunMode=" << obj->activeRunMode()
-      << ", payloadSize=" << obj->payloadSize()
-      << ", asicMask=" << obj->asicMask()
-      << ", numAsicsStored=" << obj->numAsicsStored(0)
-      << ", roiMask=" << obj->roiMask(0)
-      << ")";
-
-  return PyString_FromString( str.str().c_str() );
 }
 
 }

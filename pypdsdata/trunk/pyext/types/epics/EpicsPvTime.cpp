@@ -33,8 +33,18 @@
 
 namespace {
 
-  // standard Python stuff
-  PyObject* _repr( PyObject *self );
+  template <int iDbrType>
+  inline
+  void
+  print(std::ostream& out, const Pds::EpicsPvHeader& header)
+  {
+    typedef Pds::EpicsPvTime<iDbrType> PVType;
+    const PVType& obj = static_cast<const PVType&>(header);
+    out << "id=" << obj.iPvId
+        << ", status=" << obj.status
+        << ", severity=" << obj.severity
+        << ", value=" << obj.value;
+  }
 
   // methods
   MEMBER_WRAPPER(pypdsdata::EpicsPvTime, iPvId)
@@ -81,78 +91,53 @@ pypdsdata::EpicsPvTime::initType( PyObject* module )
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
   type->tp_getset = ::getset;
-  type->tp_str = _repr ;
-  type->tp_repr = _repr ;
 
   BaseType::initType( "EpicsPvTime", module );
 }
 
-
-namespace {
-
-
-template <int iDbrType>
-inline
 void
-print(std::ostream& out, const Pds::EpicsPvHeader& header)
+pypdsdata::EpicsPvTime::print(std::ostream& str) const
 {
-  typedef Pds::EpicsPvTime<iDbrType> PVType;
-  const PVType& obj = static_cast<const PVType&>(header);
-  out << "id=" << obj.iPvId
-      << ", status=" << obj.status
-      << ", severity=" << obj.severity
-      << ", value=" << obj.value;
-}
-
-
-PyObject*
-_repr( PyObject *self )
-{
-  Pds::EpicsPvHeader* obj = pypdsdata::EpicsPvTime::pdsObject(self);
-  if(not obj) return 0;
-
-  std::ostringstream str;
   str << "EpicsPvTime(";
-  
-  
-  switch ( obj->iDbrType ) {
+
+  switch ( m_obj->iDbrType ) {
 
   case DBR_TIME_STRING:
-    print<DBR_STRING>(str, *obj);
+    ::print<DBR_STRING>(str, *m_obj);
     break;
 
   case DBR_TIME_SHORT:
-    print<DBR_SHORT>(str, *obj);
+    ::print<DBR_SHORT>(str, *m_obj);
     break;
 
   case DBR_TIME_FLOAT:
-    print<DBR_FLOAT>(str, *obj);
+    ::print<DBR_FLOAT>(str, *m_obj);
     break;
 
   case DBR_TIME_ENUM:
-    print<DBR_ENUM>(str, *obj);
+    ::print<DBR_ENUM>(str, *m_obj);
     break;
 
   case DBR_TIME_CHAR:
-    print<DBR_CHAR>(str, *obj);
+    ::print<DBR_CHAR>(str, *m_obj);
     break;
 
   case DBR_TIME_LONG:
-    print<DBR_LONG>(str, *obj);
+    ::print<DBR_LONG>(str, *m_obj);
     break;
 
   case DBR_TIME_DOUBLE:
-    print<DBR_DOUBLE>(str, *obj);
+    ::print<DBR_DOUBLE>(str, *m_obj);
     break;
 
   default:
-    str << "id=" << obj->iPvId;
+    str << "id=" << m_obj->iPvId;
   }
 
   str << ")";
-  
-  return PyString_FromString( str.str().c_str() );
 }
+
+namespace {
 
 PyObject*
 EpicsPvTime_status( PyObject* self, void* )

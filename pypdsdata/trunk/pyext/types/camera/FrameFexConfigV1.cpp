@@ -62,7 +62,6 @@ namespace {
   PyObject* roiBegin( PyObject* self, PyObject* );
   PyObject* roiEnd( PyObject* self, PyObject* );
   PyObject* masked_pixel_coordinates( PyObject* self, PyObject* );
-  PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
     {"forwarding",       forwarding,       METH_NOARGS,
@@ -99,8 +98,6 @@ pypdsdata::Camera::FrameFexConfigV1::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
-  type->tp_str = _repr;
-  type->tp_repr = _repr;
 
   // define class attributes for enums
   PyObject* tp_dict = PyDict_New();
@@ -109,6 +106,17 @@ pypdsdata::Camera::FrameFexConfigV1::initType( PyObject* module )
   type->tp_dict = tp_dict;
 
   BaseType::initType( "FrameFexConfigV1", module );
+}
+
+void
+pypdsdata::Camera::FrameFexConfigV1::print(std::ostream& str) const
+{
+  str << "camera.FrameFexConfigV1(forwarding=" << m_obj->forwarding()
+      << ", forward_prescale=" << m_obj->forward_prescale()
+      << ", processing=" << m_obj->processing()
+      << ", roiBegin=(" << m_obj->roiBegin().column << ',' << m_obj->roiBegin().row << ')'
+      << ", roiEnd=(" << m_obj->roiEnd().column << ',' << m_obj->roiEnd().row << ')'
+      << ", ...)" ;
 }
 
 namespace {
@@ -148,23 +156,6 @@ masked_pixel_coordinates( PyObject* self, PyObject*)
   }
 
   return list;
-}
-
-PyObject*
-_repr( PyObject *self )
-{
-  Pds::Camera::FrameFexConfigV1* obj = pypdsdata::Camera::FrameFexConfigV1::pdsObject(self);
-  if(not obj) return 0;
-
-  std::ostringstream str;
-  str << "camera.FrameFexConfigV1(forwarding=" << obj->forwarding()
-      << ", forward_prescale=" << obj->forward_prescale()
-      << ", processing=" << obj->processing()
-      << ", roiBegin=(" << obj->roiBegin().column << ',' << obj->roiBegin().row << ')'
-      << ", roiEnd=(" << obj->roiEnd().column << ',' << obj->roiEnd().row << ')'
-      << ", ...)" ;
-
-  return PyString_FromString( str.str().c_str() );
 }
 
 }

@@ -62,7 +62,6 @@ namespace {
   FUN0_WRAPPER(pypdsdata::Orca::ConfigV1, cooling)
   FUN0_WRAPPER(pypdsdata::Orca::ConfigV1, defect_pixel_correction_enabled)
   FUN0_WRAPPER(pypdsdata::Orca::ConfigV1, size)
-  PyObject* _repr( PyObject *self );
   
   PyMethodDef methods[] = {
     { "mode",             mode,             METH_NOARGS, "self.mode() -> ReadoutMode\n\nReturns readout mode" },
@@ -88,8 +87,6 @@ pypdsdata::Orca::ConfigV1::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
-  type->tp_str = _repr;
-  type->tp_repr = _repr;
 
   // define class attributes for enums
   type->tp_dict = PyDict_New();
@@ -100,22 +97,12 @@ pypdsdata::Orca::ConfigV1::initType( PyObject* module )
   BaseType::initType( "ConfigV1", module );
 }
 
-namespace {
-
-PyObject*
-_repr( PyObject *self )
+void
+pypdsdata::Orca::ConfigV1::print(std::ostream& str) const
 {
-  Pds::Orca::ConfigV1* obj = pypdsdata::Orca::ConfigV1::pdsObject(self);
-  if(not obj) return 0;
-
-  std::ostringstream str;
-  str << "Orca.ConfigV1(mode=" << obj->mode()
-      << ", rows=" << obj->rows()
-      << ", cooling=" << obj->cooling()
-      << ", defect_pixel_correction_enabled=" << (obj->defect_pixel_correction_enabled() ? "True" : "False")
+  str << "Orca.ConfigV1(mode=" << m_obj->mode()
+      << ", rows=" << m_obj->rows()
+      << ", cooling=" << m_obj->cooling()
+      << ", defect_pixel_correction_enabled=" << (m_obj->defect_pixel_correction_enabled() ? "True" : "False")
       << ")";
-
-  return PyString_FromString( str.str().c_str() );
-}
-
 }

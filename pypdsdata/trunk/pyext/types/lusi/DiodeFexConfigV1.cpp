@@ -32,9 +32,6 @@
 
 namespace {
 
-  // standard Python stuff
-  PyObject* _repr( PyObject *self );
-
   // methods
   PyObject* DiodeFexConfigV1_base( PyObject* self, void* );
   PyObject* DiodeFexConfigV1_scale( PyObject* self, void* );
@@ -61,8 +58,6 @@ pypdsdata::Lusi::DiodeFexConfigV1::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_getset = ::getset;
-  type->tp_str = _repr;
-  type->tp_repr = _repr;
 
   // define class attributes for enums
   type->tp_dict = PyDict_New();
@@ -71,6 +66,24 @@ pypdsdata::Lusi::DiodeFexConfigV1::initType( PyObject* module )
   Py_XDECREF(val);
 
   BaseType::initType( "DiodeFexConfigV1", module );
+}
+
+void
+pypdsdata::Lusi::DiodeFexConfigV1::print(std::ostream& str) const
+{
+  str << "lusi.DiodeFexConfigV1(base=[" ;
+
+  const int size = Pds::Lusi::DiodeFexConfigV1::NRANGES;
+  for ( int i = 0 ; i < size ; ++ i ) {
+    if ( i ) str << ", " ;
+    str << m_obj->base[i];
+  }
+  str << "], scale=[" ;
+  for ( int i = 0 ; i < size ; ++ i ) {
+    if ( i ) str << ", " ;
+    str << m_obj->scale[i];
+  }
+  str << "])" ;
 }
 
 
@@ -102,30 +115,6 @@ DiodeFexConfigV1_scale( PyObject* self, void* )
     PyList_SET_ITEM( list, i, pypdsdata::TypeLib::toPython(obj->scale[i]) );
   }
   return list;
-}
-
-PyObject*
-_repr( PyObject *self )
-{
-  Pds::Lusi::DiodeFexConfigV1* obj = pypdsdata::Lusi::DiodeFexConfigV1::pdsObject(self);
-  if (not obj) return 0;
-
-  std::ostringstream str ;
-  str << "lusi.DiodeFexConfigV1(base=[" ;
-  
-  const int size = Pds::Lusi::DiodeFexConfigV1::NRANGES;
-  for ( int i = 0 ; i < size ; ++ i ) {
-    if ( i ) str << ", " ;
-    str << obj->base[i];
-  }
-  str << "], scale=[" ;
-  for ( int i = 0 ; i < size ; ++ i ) {
-    if ( i ) str << ", " ;
-    str << obj->scale[i];
-  }
-  str << "])" ;
-
-  return PyString_FromString( str.str().c_str() );
 }
 
 }

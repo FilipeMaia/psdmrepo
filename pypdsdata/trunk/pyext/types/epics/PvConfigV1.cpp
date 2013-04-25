@@ -32,9 +32,6 @@
 
 namespace {
 
-  // standard Python stuff
-  PyObject* _repr( PyObject *self );
-
   // methods
   MEMBER_WRAPPER(pypdsdata::Epics::PvConfigV1, iPvId)
   MEMBER_WRAPPER(pypdsdata::Epics::PvConfigV1, sPvDesc)
@@ -63,29 +60,15 @@ pypdsdata::Epics::PvConfigV1::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_getset = ::getset;
-  type->tp_str = _repr ;
-  type->tp_repr = _repr ;
 
   BaseType::initType( "PvConfigV1", module );
 }
 
-
-namespace {
-
-
-PyObject*
-_repr( PyObject *self )
+void
+pypdsdata::Epics::PvConfigV1::print(std::ostream& str) const
 {
-  Pds::Epics::PvConfigV1* obj = pypdsdata::Epics::PvConfigV1::pdsObject(self);
-  if(not obj) return 0;
-
-  std::ostringstream str;
-  str << "PvConfigV1(iPvId=" << obj->iPvId
-      << ", sPvDesc=" << obj->sPvDesc
-      << ", fInterval=" << obj->fInterval
+  str << "PvConfigV1(iPvId=" << m_obj->iPvId
+      << ", sPvDesc=" << m_obj->sPvDesc
+      << ", fInterval=" << m_obj->fInterval
       << ")";
-  
-  return PyString_FromString(str.str().c_str());
-}
-
 }

@@ -44,7 +44,6 @@ namespace {
   PyObject* pulse( PyObject* self, PyObject* args );
   PyObject* output_map( PyObject* self, PyObject* args );
   PyObject* seq_config( PyObject* self, PyObject*);
-  PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
     { "neventcodes",neventcodes, METH_NOARGS,  "self.neventcodes() -> int\n\nReturns number of event codes" },
@@ -72,10 +71,37 @@ pypdsdata::EvrData::ConfigV5::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
-  type->tp_str = _repr;
-  type->tp_repr = _repr;
 
   BaseType::initType( "ConfigV5", module );
+}
+
+void
+pypdsdata::EvrData::ConfigV5::print(std::ostream& str) const
+{
+  str << "evr.ConfigV5(";
+
+  str << "eventcodes=[";
+  for (unsigned i = 0; i != m_obj->neventcodes(); ++ i ) {
+    if (i != 0) str << ", ";
+    str << m_obj->eventcode(i).code();
+  }
+  str << "]";
+
+  str << ", pulses=[";
+  for (unsigned i = 0; i != m_obj->npulses(); ++ i ) {
+    if (i != 0) str << ", ";
+    str << m_obj->pulse(i).pulseId();
+  }
+  str << "]";
+
+  str << ", outputs=[";
+  for (unsigned i = 0; i != m_obj->noutputs(); ++ i ) {
+    if (i != 0) str << ", ";
+    str << m_obj->output_map(i).map();
+  }
+  str << "]";
+
+  str << ")";
 }
 
 namespace {
@@ -127,40 +153,6 @@ seq_config( PyObject* self, PyObject* )
 
   Pds::EvrData::SequencerConfigV1& seq_config = const_cast<Pds::EvrData::SequencerConfigV1&>(obj->seq_config());
   return pypdsdata::EvrData::SequencerConfigV1::PyObject_FromPds( &seq_config, self, seq_config.size() );
-}
-
-PyObject*
-_repr( PyObject *self )
-{
-  Pds::EvrData::ConfigV5* pdsObj = pypdsdata::EvrData::ConfigV5::pdsObject(self);
-  if(not pdsObj) return 0;
-
-  std::ostringstream str;
-  str << "evr.ConfigV5(";
-
-  str << "eventcodes=["; 
-  for (unsigned i = 0; i != pdsObj->neventcodes(); ++ i ) {
-    if (i != 0) str << ", ";
-    str << pdsObj->eventcode(i).code();
-  }
-  str << "]";
-
-  str << ", pulses=["; 
-  for (unsigned i = 0; i != pdsObj->npulses(); ++ i ) {
-    if (i != 0) str << ", ";
-    str << pdsObj->pulse(i).pulseId();
-  }
-  str << "]";
-
-  str << ", outputs=["; 
-  for (unsigned i = 0; i != pdsObj->noutputs(); ++ i ) {
-    if (i != 0) str << ", ";
-    str << pdsObj->output_map(i).map();
-  }
-  str << "]";
-
-  str << ")";
-  return PyString_FromString( str.str().c_str() );
 }
 
 }

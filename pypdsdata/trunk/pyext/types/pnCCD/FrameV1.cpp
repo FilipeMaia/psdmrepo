@@ -44,7 +44,6 @@ namespace {
   PyObject* next( PyObject* self, PyObject* args );
   PyObject* data( PyObject* self, PyObject* args );
   PyObject* sizeofData( PyObject* self, PyObject* args );
-  PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
     {"specialWord", specialWord, METH_NOARGS,  "self.specialWord() -> int\n\nReturns integer number" },
@@ -72,10 +71,20 @@ pypdsdata::PNCCD::FrameV1::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
-  type->tp_str = _repr;
-  type->tp_repr = _repr;
 
   BaseType::initType( "FrameV1", module );
+}
+
+void
+pypdsdata::PNCCD::FrameV1::print(std::ostream& str) const
+{
+  const uint16_t* data = m_obj->data();
+  str << "pnccd.FrameV1(specialWord=" << m_obj->specialWord()
+      << ", frameNumber=" << m_obj->frameNumber()
+      << ", timeStampHi=" << m_obj->timeStampHi()
+      << ", timeStampLo=" << m_obj->timeStampLo()
+      << ", data=" << data[0] << " " << data[1] << " " << data[2]
+      << " ...)";
 }
 
 namespace {
@@ -190,24 +199,6 @@ sizeofData( PyObject* self, PyObject* args )
   }
 
   return PyInt_FromLong( size );
-}
-
-PyObject*
-_repr( PyObject *self )
-{
-  Pds::PNCCD::FrameV1* obj = pypdsdata::PNCCD::FrameV1::pdsObject(self);
-  if(not obj) return 0;
-
-  std::ostringstream str;
-  const uint16_t* data = obj->data();
-  str << "pnccd.FrameV1(specialWord=" << obj->specialWord()
-      << ", frameNumber=" << obj->frameNumber()
-      << ", timeStampHi=" << obj->timeStampHi()
-      << ", timeStampLo=" << obj->timeStampLo()
-      << ", data=" << data[0] << " " << data[1] << " " << data[2]
-      << " ...)";
-
-  return PyString_FromString( str.str().c_str() );
 }
 
 }

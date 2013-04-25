@@ -38,7 +38,6 @@ namespace {
   FUN0_WRAPPER(pypdsdata::Fli::FrameV1, readoutTime)
   FUN0_WRAPPER(pypdsdata::Fli::FrameV1, temperature)
   PyObject* data( PyObject* self, PyObject* args );
-  PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
     { "shotIdStart",    shotIdStart,    METH_NOARGS, "self.shotIdStart() -> int\n\nReturns integer number" },
@@ -62,10 +61,17 @@ pypdsdata::Fli::FrameV1::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
-  type->tp_str = _repr;
-  type->tp_repr = _repr;
 
   BaseType::initType( "FrameV1", module );
+}
+
+void
+pypdsdata::Fli::FrameV1::print(std::ostream& str) const
+{
+  str << "Fli.FrameV1(shotIdStart=" << m_obj->shotIdStart()
+      << ", readoutTime=" << m_obj->readoutTime()
+      << ", temperature=" << m_obj->temperature()
+      << ", ...)";
 }
 
 namespace {
@@ -108,21 +114,6 @@ data( PyObject* self, PyObject* args )
   ((PyArrayObject*)array)->base = self ;
 
   return array;
-}
-
-PyObject*
-_repr( PyObject *self )
-{
-  Pds::Fli::FrameV1* obj = pypdsdata::Fli::FrameV1::pdsObject(self);
-  if(not obj) return 0;
-
-  std::ostringstream str;
-  str << "Fli.FrameV1(shotIdStart=" << obj->shotIdStart()
-      << ", readoutTime=" << obj->readoutTime()
-      << ", temperature=" << obj->temperature()
-      << ", ...)";
-
-  return PyString_FromString( str.str().c_str() );
 }
 
 }

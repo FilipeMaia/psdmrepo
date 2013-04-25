@@ -290,7 +290,9 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual ( TypeId.Type.Id_GMD, 64 )
         self.assertEqual ( TypeId.Type.Id_SharedAcqADC, 65 )
         self.assertEqual ( TypeId.Type.Id_OrcaConfig, 66 )
-        self.assertEqual ( TypeId.Type.NumberOf, 67 )
+        self.assertEqual ( TypeId.Type.Id_ImpData, 67 )
+        self.assertEqual ( TypeId.Type.Id_ImpConfig, 68 )
+        self.assertEqual ( TypeId.Type.NumberOf, 69 )
 
         # chec compressed bitmask
         self.assertEqual ( TypeId.VCompressed, 0x8000 )
@@ -489,7 +491,8 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual ( DetInfo.Device.Andor, 25 )
         self.assertEqual ( DetInfo.Device.USDUSB, 26 )
         self.assertEqual ( DetInfo.Device.OrcaFl40, 27 )
-        self.assertEqual ( DetInfo.Device.NumDevice, 28 )
+        self.assertEqual ( DetInfo.Device.Imp, 28 )
+        self.assertEqual ( DetInfo.Device.NumDevice, 29 )
 
         
         o1 = DetInfo(0,0,0,0)

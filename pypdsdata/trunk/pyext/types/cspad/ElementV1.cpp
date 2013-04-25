@@ -26,6 +26,7 @@
 #include "ConfigV2.h"
 #include "ConfigV3.h"
 #include "ConfigV4.h"
+#include "ConfigV5.h"
 #include "../../Exception.h"
 #include "../TypeLib.h"
 #include "../../pdsdata_numpy.h"
@@ -155,6 +156,10 @@ next( PyObject* self, PyObject* args )
     const Pds::CsPad::ConfigV4* config = pypdsdata::CsPad::ConfigV4::pdsObject( configObj );
     sMask = config->asicMask()==1 ? 0x3 : 0xff;
     payloadSize = config->payloadSize();
+  } else if ( pypdsdata::CsPad::ConfigV5::Object_TypeCheck( configObj ) ) {
+    const Pds::CsPad::ConfigV5* config = pypdsdata::CsPad::ConfigV5::pdsObject( configObj );
+    sMask = config->asicMask()==1 ? 0x3 : 0xff;
+    payloadSize = config->payloadSize();
   } else {
     PyErr_SetString(PyExc_TypeError, "Error: parameter is not a cspad.ConfigV[1-4] object");
     return 0;
@@ -197,6 +202,9 @@ data( PyObject* self, PyObject* args )
     sMask = config->asicMask()==1 ? 0x3 : 0xff;
   } else if ( pypdsdata::CsPad::ConfigV4::Object_TypeCheck( configObj ) ) {
     const Pds::CsPad::ConfigV4* config = pypdsdata::CsPad::ConfigV4::pdsObject( configObj );
+    sMask = config->asicMask()==1 ? 0x3 : 0xff;
+  } else if ( pypdsdata::CsPad::ConfigV5::Object_TypeCheck( configObj ) ) {
+    const Pds::CsPad::ConfigV5* config = pypdsdata::CsPad::ConfigV5::pdsObject( configObj );
     sMask = config->asicMask()==1 ? 0x3 : 0xff;
   } else {
     PyErr_SetString(PyExc_TypeError, "Error: parameter is not a cspad.ConfigV[1-4] object");

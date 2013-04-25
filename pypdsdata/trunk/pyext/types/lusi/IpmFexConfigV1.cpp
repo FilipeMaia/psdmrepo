@@ -32,9 +32,6 @@
 
 namespace {
 
-  // standard Python stuff
-  PyObject* _repr( PyObject *self );
-
   // methods
   MEMBER_WRAPPER(pypdsdata::Lusi::IpmFexConfigV1, xscale)
   MEMBER_WRAPPER(pypdsdata::Lusi::IpmFexConfigV1, yscale)
@@ -63,8 +60,6 @@ pypdsdata::Lusi::IpmFexConfigV1::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_getset = ::getset;
-  type->tp_str = _repr;
-  type->tp_repr = _repr;
 
   // define class attributes for enums
   type->tp_dict = PyDict_New();
@@ -73,6 +68,12 @@ pypdsdata::Lusi::IpmFexConfigV1::initType( PyObject* module )
   Py_XDECREF(val);
 
   BaseType::initType( "IpmFexConfigV1", module );
+}
+
+void
+pypdsdata::Lusi::IpmFexConfigV1::print(std::ostream& str) const
+{
+  str << "lusi.IpmFexConfigV1(xscale=" << m_obj->xscale << ", yscale=" << m_obj->yscale << ", ...)";
 }
 
 
@@ -92,18 +93,6 @@ IpmFexConfigV1_diode( PyObject* self, void* )
     PyList_SET_ITEM( list, i, obj );
   }
   return list;
-}
-
-PyObject*
-_repr( PyObject *self )
-{
-  Pds::Lusi::IpmFexConfigV1* obj = pypdsdata::Lusi::IpmFexConfigV1::pdsObject(self);
-  if (not obj) return 0;
-
-  char buf[80];
-  snprintf( buf, sizeof buf, "lusi.IpmFexConfigV1(xscale=%g, yscale=%g, ...)", 
-      obj->xscale, obj->yscale);
-  return PyString_FromString( buf );
 }
 
 }

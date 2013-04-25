@@ -89,7 +89,9 @@
 #include "types/cspad/ConfigV2.h"
 #include "types/cspad/ConfigV2QuadReg.h"
 #include "types/cspad/ConfigV3.h"
+#include "types/cspad/ConfigV3QuadReg.h"
 #include "types/cspad/ConfigV4.h"
+#include "types/cspad/ConfigV5.h"
 #include "types/cspad/CsPadDigitalPotsCfg.h"
 #include "types/cspad/CsPadGainMapCfg.h"
 #include "types/cspad/CsPadProtectionSystemThreshold.h"
@@ -144,6 +146,10 @@
 
 #include "types/gsc16ai/ConfigV1.h"
 #include "types/gsc16ai/DataV1.h"
+
+//#include "types/imp/ConfigV1.h"
+//#include "types/imp/ElementV1.h"
+//#include "types/imp/Sample.h"
 
 #include "types/ipimb/ConfigV1.h"
 #include "types/ipimb/ConfigV2.h"
@@ -311,7 +317,9 @@ PyMODINIT_FUNC init_pdsdata()
   pypdsdata::CsPad::ConfigV2::initType( module );
   pypdsdata::CsPad::ConfigV2QuadReg::initType( module );
   pypdsdata::CsPad::ConfigV3::initType( module );
+  pypdsdata::CsPad::ConfigV3QuadReg::initType( module );
   pypdsdata::CsPad::ConfigV4::initType( module );
+  pypdsdata::CsPad::ConfigV5::initType( module );
   pypdsdata::CsPad::CsPadDigitalPotsCfg::initType( module );
   pypdsdata::CsPad::CsPadGainMapCfg::initType( module );
   pypdsdata::CsPad::CsPadProtectionSystemThreshold::initType( module );
@@ -389,6 +397,13 @@ PyMODINIT_FUNC init_pdsdata()
   pypdsdata::Gsc16ai::DataV1::initType( module );
   Py_INCREF( module );
   PyModule_AddObject( this_module, "gsc16ai", module );
+
+//  module = Py_InitModule3( "_pdsdata.imp", 0, "The Python wrapper module for pdsdata/imp" );
+//  pypdsdata::Imp::ConfigV1::initType( module );
+//  pypdsdata::Imp::ElementV1::initType( module );
+//  pypdsdata::Imp::Sample::initType( module );
+//  Py_INCREF( module );
+//  PyModule_AddObject( this_module, "imp", module );
 
   module = Py_InitModule3( "_pdsdata.ipimb", 0, "The Python wrapper module for pdsdata/ipimb" );
   pypdsdata::Ipimb::ConfigV1::initType( module );

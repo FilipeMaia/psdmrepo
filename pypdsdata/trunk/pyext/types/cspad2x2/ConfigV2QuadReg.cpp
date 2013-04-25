@@ -71,7 +71,6 @@ namespace {
   PyObject* readOnly( PyObject* self, PyObject* );
   PyObject* digitalPots( PyObject* self, PyObject* );
   PyObject* gainMap( PyObject* self, PyObject* );
-  PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
     {"shiftSelect",     shiftSelect,    METH_NOARGS, "self.shiftSelect() -> int\n\nReturns integer number" },
@@ -117,8 +116,6 @@ pypdsdata::CsPad2x2::ConfigV2QuadReg::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
-  type->tp_str = _repr;
-  type->tp_repr = _repr;
 
   // define class attributes for enums
   type->tp_dict = PyDict_New();
@@ -128,6 +125,17 @@ pypdsdata::CsPad2x2::ConfigV2QuadReg::initType( PyObject* module )
   Py_XDECREF(val);
 
   BaseType::initType( "ConfigV2QuadReg", module );
+}
+
+void
+pypdsdata::CsPad2x2::ConfigV2QuadReg::print(std::ostream& str) const
+{
+  str << "cspad2x2.ConfigV2QuadReg(shiftSelect=" << m_obj->shiftSelect()
+      << ", edgeSelect=" << m_obj->edgeSelect()
+      << ", readClkSet=" << m_obj->readClkSet()
+      << ", readClkHold=" << m_obj->readClkHold()
+      << ", dataMode=" << m_obj->dataMode()
+      << ", ...)";
 }
 
 namespace {
@@ -160,22 +168,6 @@ gainMap( PyObject* self, PyObject* )
 
   return pypdsdata::CsPad2x2::CsPad2x2GainMapCfg::PyObject_FromPds(
       obj->gm(), self, sizeof(Pds::CsPad2x2::CsPad2x2GainMapCfg) );
-}
-
-PyObject*
-_repr( PyObject *self )
-{
-  const Pds::CsPad2x2::ConfigV2QuadReg* pdsObj = pypdsdata::CsPad2x2::ConfigV2QuadReg::pdsObject( self );
-  if(not pdsObj) return 0;
-
-  std::ostringstream str;
-  str << "cspad2x2.ConfigV2QuadReg(shiftSelect=" << pdsObj->shiftSelect()
-      << ", edgeSelect=" << pdsObj->edgeSelect()
-      << ", readClkSet=" << pdsObj->readClkSet()
-      << ", readClkHold=" << pdsObj->readClkHold()
-      << ", dataMode=" << pdsObj->dataMode()
-      << ", ...)";
-  return PyString_FromString( str.str().c_str() );
 }
 
 }

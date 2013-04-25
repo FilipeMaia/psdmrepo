@@ -31,9 +31,6 @@
 
 namespace {
 
-  // standard Python stuff
-  PyObject* _repr( PyObject *self );
-
   // methods
   MEMBER_WRAPPER(pypdsdata::Lusi::PimImageConfigV1, xscale)
   MEMBER_WRAPPER(pypdsdata::Lusi::PimImageConfigV1, yscale)
@@ -60,24 +57,12 @@ pypdsdata::Lusi::PimImageConfigV1::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_getset = ::getset;
-  type->tp_str = _repr;
-  type->tp_repr = _repr;
 
   BaseType::initType( "PimImageConfigV1", module );
 }
 
-namespace {
-
-PyObject*
-_repr( PyObject *self )
+void
+pypdsdata::Lusi::PimImageConfigV1::print(std::ostream& str) const
 {
-  Pds::Lusi::PimImageConfigV1* obj = pypdsdata::Lusi::PimImageConfigV1::pdsObject(self);
-  if (not obj) return 0;
-
-  char buf[64];
-  snprintf( buf, sizeof buf, "lusi.PimImageConfigV1(xscale=%g, yscale=%g)", 
-      obj->xscale, obj->yscale );
-  return PyString_FromString( buf );
-}
- 
+  str << "lusi.PimImageConfigV1(xscale=" << m_obj->xscale << ", yscale=" << m_obj->yscale << ")";
 }

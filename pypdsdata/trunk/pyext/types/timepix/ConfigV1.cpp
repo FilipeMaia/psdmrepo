@@ -115,7 +115,6 @@ namespace {
   FUN0_WRAPPER(pypdsdata::Timepix::ConfigV1, dac3Ths)
   FUN0_WRAPPER(pypdsdata::Timepix::ConfigV1, dac3BiasLvds)
   FUN0_WRAPPER(pypdsdata::Timepix::ConfigV1, dac3RefLvds)
-  PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
     { "readoutSpeed",      readoutSpeed        , METH_NOARGS,  "self.readoutSpeed() -> ReadoutSpeed enum\n\nReturns :py:class:`ReadoutSpeed` enum" },
@@ -193,8 +192,6 @@ pypdsdata::Timepix::ConfigV1::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
-  type->tp_str = _repr;
-  type->tp_repr = _repr;
 
   // define class attributes for enums
   PyObject* tp_dict = PyDict_New();
@@ -206,21 +203,11 @@ pypdsdata::Timepix::ConfigV1::initType( PyObject* module )
   BaseType::initType( "ConfigV1", module );
 }
 
-namespace {
-  
-PyObject*
-_repr( PyObject *self )
+void
+pypdsdata::Timepix::ConfigV1::print(std::ostream& str) const
 {
-  Pds::Timepix::ConfigV1* obj = pypdsdata::Timepix::ConfigV1::pdsObject(self);
-  if(not obj) return 0;
-
-  std::ostringstream str;
-  str << "Timepix.ConfigV1(readoutSpeed=" << int(obj->readoutSpeed())
-      << ", triggerMode=" << int(obj->triggerMode())
-      << ", shutterTimeout=" << obj->shutterTimeout()
+  str << "Timepix.ConfigV1(readoutSpeed=" << int(m_obj->readoutSpeed())
+      << ", triggerMode=" << int(m_obj->triggerMode())
+      << ", shutterTimeout=" << m_obj->shutterTimeout()
       << ", ...)" ;
-
-  return PyString_FromString( str.str().c_str() );
-}
-
 }

@@ -45,7 +45,6 @@ namespace {
   PyObject* duration( PyObject* self, PyObject* );
   PyObject* pvControl( PyObject* self, PyObject* args );
   PyObject* pvMonitor( PyObject* self, PyObject* args );
-  PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
     {"uses_duration", uses_duration,  METH_NOARGS,  "self.uses_duration() -> bool\n\nReturns boolean value." },
@@ -73,10 +72,46 @@ pypdsdata::ControlData::ConfigV1::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
-  type->tp_str = _repr;
-  type->tp_repr = _repr;
 
   BaseType::initType( "ConfigV1", module );
+}
+
+void
+pypdsdata::ControlData::ConfigV1::print(std::ostream& str) const
+{
+  str << "control.ConfigV1(";
+  const char* comma = "";
+  if (m_obj->uses_duration()) {
+    const Pds::ClockTime& duration = m_obj->duration();
+    double dur = duration.seconds() + duration.nanoseconds()/1e9;
+    str << comma << "duration=" << dur << "sec";
+    comma = ", ";
+  }
+  if (m_obj->uses_events()) {
+    str << comma << "events=" << m_obj->events() ;
+    comma = ", ";
+  }
+  if (m_obj->npvControls()) {
+    str << comma << "controls=[";
+    for (unsigned i = 0; i != m_obj->npvControls(); ++ i ) {
+      if (i != 0) str << ", ";
+      const Pds::ControlData::PVControl& control = m_obj->pvControl(i);
+      str << control.name() << "=" << control.value();
+    }
+    str << "]";
+    comma = ", ";
+  }
+  if (m_obj->npvMonitors()) {
+    str << comma << "monitors=[";
+    for (unsigned i = 0; i != m_obj->npvMonitors(); ++ i ) {
+      if (i != 0) str << ", ";
+      const Pds::ControlData::PVMonitor& mon = m_obj->pvMonitor(i);
+      str << mon.name() << "=" << mon.loValue() << ":" << mon.hiValue();
+    }
+    str << "]";
+    comma = ", ";
+  }
+  str << ")";
 }
 
 namespace {
@@ -116,49 +151,6 @@ pvMonitor( PyObject* self, PyObject* args )
 
   return pypdsdata::ControlData::PVMonitor::PyObject_FromPds( (Pds::ControlData::PVMonitor*)(&obj->pvMonitor(index)),
       self, sizeof(Pds::ControlData::PVMonitor) );
-}
-
-PyObject*
-_repr( PyObject *self )
-{
-  Pds::ControlData::ConfigV1* pdsObj = pypdsdata::ControlData::ConfigV1::pdsObject(self);
-  if(not pdsObj) return 0;
-
-  std::ostringstream str;
-  str << "control.ConfigV1(";
-  const char* comma = "";
-  if (pdsObj->uses_duration()) {
-    const ClockTime& duration = pdsObj->duration();
-    double dur = duration.seconds() + duration.nanoseconds()/1e9;
-    str << comma << "duration=" << dur << "sec";
-    comma = ", ";
-  }
-  if (pdsObj->uses_events()) {
-    str << comma << "events=" << pdsObj->events() ;
-    comma = ", ";
-  }
-  if (pdsObj->npvControls()) {
-    str << comma << "controls=["; 
-    for (unsigned i = 0; i != pdsObj->npvControls(); ++ i ) {
-      if (i != 0) str << ", ";
-      const Pds::ControlData::PVControl& control = pdsObj->pvControl(i);
-      str << control.name() << "=" << control.value();
-    }
-    str << "]";
-    comma = ", ";
-  }
-  if (pdsObj->npvMonitors()) {
-    str << comma << "monitors=["; 
-    for (unsigned i = 0; i != pdsObj->npvMonitors(); ++ i ) {
-      if (i != 0) str << ", ";
-      const Pds::ControlData::PVMonitor& mon = pdsObj->pvMonitor(i);
-      str << mon.name() << "=" << mon.loValue() << ":" << mon.hiValue();
-    }
-    str << "]";
-    comma = ", ";
-  }
-  str << ")";
-  return PyString_FromString( str.str().c_str() );
 }
 
 }

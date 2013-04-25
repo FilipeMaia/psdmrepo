@@ -6,6 +6,13 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V00-00-96
+2013-04-25 Andy Salnikov
+- upgrading to pdsdata V06-07-04
+- new cspad ConfigV5 class
+- new package imp, broken completely, started writing wrapper but cannot
+  use it so it is postponed
+
 Tag: V00-00-95
 2013-04-24 Andy Salnikov
 - improve python TypeId representation for compressed types

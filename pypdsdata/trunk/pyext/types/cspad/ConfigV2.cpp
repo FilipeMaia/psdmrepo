@@ -64,7 +64,6 @@ namespace {
   FUN0_WRAPPER(pypdsdata::CsPad::ConfigV2, asicMask)
   FUN0_WRAPPER(pypdsdata::CsPad::ConfigV2, numAsicsRead)
   FUN0_WRAPPER(pypdsdata::CsPad::ConfigV2, concentratorVersion)
-  PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
     {"quads",               quads,               METH_NOARGS, "self.quads() -> list\n\nReturns list of :py:class:`ConfigV1QuadReg` objects" },
@@ -102,8 +101,6 @@ pypdsdata::CsPad::ConfigV2::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
-  type->tp_str = _repr;
-  type->tp_repr = _repr;
 
   // define class attributes for enums
   type->tp_dict = PyDict_New();
@@ -114,6 +111,32 @@ pypdsdata::CsPad::ConfigV2::initType( PyObject* module )
 
   BaseType::initType( "ConfigV2", module );
 }
+
+void
+pypdsdata::CsPad::ConfigV2::print(std::ostream& str) const
+{
+  str << "cspad.ConfigV2(quadMask=" << m_obj->quadMask()
+      << ", eventCode=" << m_obj->eventCode()
+      << ", asicMask=" << m_obj->asicMask()
+      << ", numAsicsRead=" << m_obj->numAsicsRead();
+
+  str << ", numAsicsStored=[";
+  for (int q = 0; q < 4; ++ q ) {
+    if (q) str << ", ";
+    str << m_obj->numAsicsStored(q);
+  }
+  str << "]";
+
+  str << ", roiMask=[";
+  for (int q = 0; q < 4; ++ q ) {
+    if (q) str << ", ";
+    str << m_obj->roiMask(q);
+  }
+  str << "]";
+
+  str << ")";
+}
+
 
 namespace {
 
@@ -214,37 +237,6 @@ sections( PyObject* self, PyObject* args )
     }
   }
   return list;
-}
-
-PyObject*
-_repr( PyObject *self )
-{
-  Pds::CsPad::ConfigV2* obj = pypdsdata::CsPad::ConfigV2::pdsObject(self);
-  if(not obj) return 0;
-
-  std::ostringstream str;
-  str << "cspad.ConfigV2(quadMask=" << obj->quadMask()
-      << ", eventCode=" << obj->eventCode()
-      << ", asicMask=" << obj->asicMask()
-      << ", numAsicsRead=" << obj->numAsicsRead();
-  
-  str << ", numAsicsStored=[";
-  for (int q = 0; q < 4; ++ q ) {
-    if (q) str << ", ";
-    str << obj->numAsicsStored(q);
-  }
-  str << "]";
-
-  str << ", roiMask=[";
-  for (int q = 0; q < 4; ++ q ) {
-    if (q) str << ", ";
-    str << obj->roiMask(q);
-  }
-  str << "]";
-  
-  str << ")";
-
-  return PyString_FromString( str.str().c_str() );
 }
 
 }

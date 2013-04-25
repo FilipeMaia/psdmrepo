@@ -34,7 +34,6 @@ namespace {
   // methods
   PyObject* value( PyObject* self, PyObject* args );
   PyObject* pots( PyObject* self, void* );
-  PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
     {"value",     value,      METH_VARARGS, "self.value(i: int) -> int\n\nReturns pot value for a given index." },
@@ -63,8 +62,6 @@ pypdsdata::CsPad2x2::CsPad2x2DigitalPotsCfg::initType( PyObject* module )
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
   type->tp_getset = ::getset;
-  type->tp_str = _repr;
-  type->tp_repr = _repr;
 
   // add an enum analog to this class 
   type->tp_dict = PyDict_New();
@@ -73,6 +70,16 @@ pypdsdata::CsPad2x2::CsPad2x2DigitalPotsCfg::initType( PyObject* module )
   Py_XDECREF(val);
 
   BaseType::initType( "CsPad2x2DigitalPotsCfg", module );
+}
+
+void
+pypdsdata::CsPad2x2::CsPad2x2DigitalPotsCfg::print(std::ostream& str) const
+{
+  str << "cspad2x2.CsPad2x2DigitalPotsCfg([" << int(m_obj->pots[0])
+      << ", " << int(m_obj->pots[1])
+      << ", " << int(m_obj->pots[2])
+      << ", " << int(m_obj->pots[3])
+      << ", ...])";
 }
 
 namespace {
@@ -107,21 +114,6 @@ pots( PyObject* self, void*)
   }
 
   return list;
-}
-
-PyObject*
-_repr( PyObject *self )
-{
-  const Pds::CsPad2x2::CsPad2x2DigitalPotsCfg* pdsObj = pypdsdata::CsPad2x2::CsPad2x2DigitalPotsCfg::pdsObject( self );
-  if(not pdsObj) return 0;
-
-  std::ostringstream str;
-  str << "cspad2x2.CsPad2x2DigitalPotsCfg([" << int(pdsObj->pots[0])
-      << ", " << int(pdsObj->pots[1])
-      << ", " << int(pdsObj->pots[2])
-      << ", " << int(pdsObj->pots[3])
-      << ", ...])";
-  return PyString_FromString( str.str().c_str() );
 }
 
 }

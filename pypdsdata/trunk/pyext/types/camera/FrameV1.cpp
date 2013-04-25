@@ -32,9 +32,6 @@
 
 namespace {
 
-  PyObject* FrameV1_str( PyObject* self );
-  PyObject* FrameV1_repr( PyObject* self );
-
   // methods
   FUN0_WRAPPER(pypdsdata::Camera::FrameV1, width)
   FUN0_WRAPPER(pypdsdata::Camera::FrameV1, height)
@@ -72,39 +69,17 @@ pypdsdata::Camera::FrameV1::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
-  type->tp_str = FrameV1_str;
-  type->tp_repr = FrameV1_repr;
 
   BaseType::initType( "FrameV1", module );
 }
 
+void
+pypdsdata::Camera::FrameV1::print(std::ostream& out) const
+{
+  out << "camera.FrameV1(" << m_obj->width() << "x" << m_obj->height() << "x" << m_obj->depth() << ")";
+}
+
 namespace {
-
-PyObject*
-FrameV1_str( PyObject* self )
-{
-  const Pds::Camera::FrameV1* obj = pypdsdata::Camera::FrameV1::pdsObject( self );
-  if ( not obj ) return 0;
-
-  char buf[64];
-  snprintf(buf, sizeof buf, "camera.FrameV1(%dx%dx%d)",
-      obj->width(), obj->height(), obj->depth() );
-
-  return PyString_FromString(buf);
-}
-
-PyObject*
-FrameV1_repr( PyObject* self )
-{
-  const Pds::Camera::FrameV1* obj = pypdsdata::Camera::FrameV1::pdsObject( self );
-  if ( not obj ) return 0;
-
-  char buf[64];
-  snprintf(buf, sizeof buf, "<camera.FrameV1(%dx%dx%d) at %p>",
-      obj->width(), obj->height(), obj->depth(), (void*)self );
-
-  return PyString_FromString(buf);
-}
 
 PyObject*
 FrameV1_data( PyObject* self, PyObject* args)

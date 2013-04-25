@@ -35,7 +35,6 @@ namespace {
   // methods
   MEMBER_WRAPPER(pypdsdata::Encoder::DataV2, _33mhz_timestamp)
   PyObject* _encoder_count( PyObject* self, void* );
-  PyObject* _repr( PyObject *self );
 
   // disable warnings for non-const strings, this is a temporary measure
   // newer Python versions should get constness correctly
@@ -69,10 +68,18 @@ pypdsdata::Encoder::DataV2::initType( PyObject* module )
   type->tp_doc = ::typedoc;
   type->tp_getset = ::getset;
   type->tp_methods = ::methods;
-  type->tp_str = _repr;
-  type->tp_repr = _repr;
 
   BaseType::initType( "DataV2", module );
+}
+
+void
+pypdsdata::Encoder::DataV2::print(std::ostream& str) const
+{
+  str << "encoder.DataV1(33mhz_timestamp=" << m_obj->_33mhz_timestamp
+      << ", encoder_count=[" << m_obj->_encoder_count[0]
+      << ", " << m_obj->_encoder_count[1]
+      << ", " << m_obj->_encoder_count[2]
+      << "])";
 }
 
 namespace {
@@ -110,21 +117,5 @@ _encoder_count( PyObject* self, void* )
   return list;
 }
 
-
-PyObject*
-_repr( PyObject *self )
-{
-  Pds::Encoder::DataV2* obj = pypdsdata::Encoder::DataV2::pdsObject(self);
-  if(not obj) return 0;
-
-  std::ostringstream str;
-  str << "encoder.DataV1(33mhz_timestamp=" << obj->_33mhz_timestamp
-      << ", encoder_count=[" << obj->_encoder_count[0]
-      << ", " << obj->_encoder_count[1]
-      << ", " << obj->_encoder_count[2]
-      << "])";
-  
-  return PyString_FromString( str.str().c_str() );
-}
 
 }

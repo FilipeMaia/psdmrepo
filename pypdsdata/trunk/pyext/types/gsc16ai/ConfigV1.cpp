@@ -85,7 +85,6 @@ namespace {
   FUN0_WRAPPER(pypdsdata::Gsc16ai::ConfigV1, fps)
   FUN0_WRAPPER(pypdsdata::Gsc16ai::ConfigV1, autocalibEnable)
   FUN0_WRAPPER(pypdsdata::Gsc16ai::ConfigV1, timeTagEnable)
-  PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
     { "voltageRange",      voltageRange,     METH_NOARGS, "self.voltageRange() -> VoltageRange enum\n\nReturns :py:class:`VoltageRange` enum" },
@@ -114,8 +113,6 @@ pypdsdata::Gsc16ai::ConfigV1::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
-  type->tp_str = _repr;
-  type->tp_repr = _repr;
 
   // define class attributes for enums
   PyObject* tp_dict = PyDict_New();
@@ -129,27 +126,17 @@ pypdsdata::Gsc16ai::ConfigV1::initType( PyObject* module )
   BaseType::initType( "ConfigV1", module );
 }
 
-namespace {
-  
-PyObject*
-_repr( PyObject *self )
+void
+pypdsdata::Gsc16ai::ConfigV1::print(std::ostream& str) const
 {
-  Pds::Gsc16ai::ConfigV1* obj = pypdsdata::Gsc16ai::ConfigV1::pdsObject(self);
-  if(not obj) return 0;
-
-  std::ostringstream str;
-  str << "Gsc16ai.ConfigV1(voltageRange=" << obj->voltageRange()
-      << ", firstChan=" << obj->firstChan()
-      << ", lastChan=" << obj->lastChan()
-      << ", inputMode=" << obj->inputMode()
-      << ", triggerMode=" << obj->triggerMode()
-      << ", dataFormat=" << obj->dataFormat()
-      << ", fps=" << obj->fps()
-      << ", autocalibEnable=" << (obj->autocalibEnable() ? 1 : 0)
-      << ", timeTagEnable=" << (obj->timeTagEnable() ? 1 : 0)
+  str << "Gsc16ai.ConfigV1(voltageRange=" << m_obj->voltageRange()
+      << ", firstChan=" << m_obj->firstChan()
+      << ", lastChan=" << m_obj->lastChan()
+      << ", inputMode=" << m_obj->inputMode()
+      << ", triggerMode=" << m_obj->triggerMode()
+      << ", dataFormat=" << m_obj->dataFormat()
+      << ", fps=" << m_obj->fps()
+      << ", autocalibEnable=" << (m_obj->autocalibEnable() ? 1 : 0)
+      << ", timeTagEnable=" << (m_obj->timeTagEnable() ? 1 : 0)
       << ")" ;
-
-  return PyString_FromString( str.str().c_str() );
-}
-
 }

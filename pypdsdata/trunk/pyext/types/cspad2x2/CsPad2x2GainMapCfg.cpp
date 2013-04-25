@@ -35,7 +35,6 @@ namespace {
   // methods
   PyObject* map( PyObject* self, PyObject* );
   PyObject* gainMap( PyObject* self, void* );
-  PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
     {"map",     map,      METH_NOARGS, "self.map() -> numpy.ndarray\n\nReturns gain map as an array [ColumnsPerASIC][MaxRowsPerASIC]." },
@@ -64,10 +63,18 @@ pypdsdata::CsPad2x2::CsPad2x2GainMapCfg::initType( PyObject* module )
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
   type->tp_getset = ::getset;
-  type->tp_str = _repr;
-  type->tp_repr = _repr;
 
   BaseType::initType( "CsPad2x2GainMapCfg", module );
+}
+
+void
+pypdsdata::CsPad2x2::CsPad2x2GainMapCfg::print(std::ostream& str) const
+{
+  str << "cspad2x2.CsPad2x2GainMapCfg([" << m_obj->_gainMap[0][0]
+      << ", " << m_obj->_gainMap[0][1]
+      << ", " << m_obj->_gainMap[0][2]
+      << ", " << m_obj->_gainMap[0][3]
+      << ", ...])";
 }
 
 namespace {
@@ -101,21 +108,6 @@ gainMap( PyObject* self, void* )
   ((PyArrayObject*)array)->base = self ;
 
   return array;
-}
-
-PyObject*
-_repr( PyObject *self )
-{
-  const Pds::CsPad2x2::CsPad2x2GainMapCfg* pdsObj = pypdsdata::CsPad2x2::CsPad2x2GainMapCfg::pdsObject( self );
-  if(not pdsObj) return 0;
-
-  std::ostringstream str;
-  str << "cspad2x2.CsPad2x2GainMapCfg([" << pdsObj->_gainMap[0][0]
-      << ", " << pdsObj->_gainMap[0][1]
-      << ", " << pdsObj->_gainMap[0][2]
-      << ", " << pdsObj->_gainMap[0][3]
-      << ", ...])";
-  return PyString_FromString( str.str().c_str() );
 }
 
 }

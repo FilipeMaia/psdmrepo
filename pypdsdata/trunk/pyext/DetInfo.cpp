@@ -144,6 +144,7 @@ namespace {
       { "Andor",     Pds::DetInfo::Andor },
       { "USDUSB",    Pds::DetInfo::USDUSB },
       { "OrcaFl40",  Pds::DetInfo::OrcaFl40 },
+      { "Imp",       Pds::DetInfo::Imp },
       { "NumDevice", Pds::DetInfo::NumDevice },
       { 0, 0 }
   };

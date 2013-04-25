@@ -34,7 +34,6 @@ namespace {
   // methods
   MEMBER_WRAPPER(pypdsdata::CsPad2x2::CsPad2x2ReadOnlyCfg, shiftTest)
   MEMBER_WRAPPER(pypdsdata::CsPad2x2::CsPad2x2ReadOnlyCfg, version)
-  PyObject* _repr( PyObject *self );
 
   // disable warnings for non-const strings, this is a temporary measure
   // newer Python versions should get constness correctly
@@ -58,25 +57,14 @@ pypdsdata::CsPad2x2::CsPad2x2ReadOnlyCfg::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_getset = ::getset;
-  type->tp_str = _repr;
-  type->tp_repr = _repr;
 
   BaseType::initType( "CsPad2x2ReadOnlyCfg", module );
 }
 
-namespace {
-
-PyObject*
-_repr( PyObject *self )
+void
+pypdsdata::CsPad2x2::CsPad2x2ReadOnlyCfg::print(std::ostream& str) const
 {
-  Pds::CsPad2x2::CsPad2x2ReadOnlyCfg* pdsObj = pypdsdata::CsPad2x2::CsPad2x2ReadOnlyCfg::pdsObject(self);
-  if(not pdsObj) return 0;
-
-  std::ostringstream str;
-  str << "cspad2x2.CsPad2x2ReadOnlyCfg(shiftTest=" << pdsObj->shiftTest
-      << ", version=" << pdsObj->version
+  str << "cspad2x2.CsPad2x2ReadOnlyCfg(shiftTest=" << m_obj->shiftTest
+      << ", version=" << m_obj->version
       << ")";
-  return PyString_FromString( str.str().c_str() );
-}
-
 }

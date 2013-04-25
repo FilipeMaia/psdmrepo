@@ -33,9 +33,6 @@
 namespace {
 
   // methods
-  PyObject* _repr( PyObject *self );
-
-  // methods
   FUN0_WRAPPER(pypdsdata::Epics::ConfigV1, getNumPv)
   PyObject* getPvConfigs( PyObject* self, PyObject* );
   PyObject* getPvConfig( PyObject* self, PyObject* args );
@@ -60,10 +57,23 @@ pypdsdata::Epics::ConfigV1::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
-  type->tp_str = _repr ;
-  type->tp_repr = _repr ;
 
   BaseType::initType( "ConfigV1", module );
+}
+
+void
+pypdsdata::Epics::ConfigV1::print(std::ostream& str) const
+{
+  str << "epics.ConfigV1(numPv=" << m_obj->getNumPv() << ", PvConfigs=[";
+  unsigned size = m_obj->getNumPv();
+  for ( unsigned i = 0; i < size and i < 256; ++ i ) {
+    const Pds::Epics::PvConfigV1* pv = m_obj->getPvConfig(i);
+    if (i) str << ", ";
+    str << "(pvId=" << pv->iPvId << ", desc=\"" << pv->sPvDesc
+        << "\", interval=" << pv->fInterval << ")";
+  }
+  if (size > 256) str << ", ...";
+  str << "])";
 }
 
 
@@ -100,28 +110,6 @@ getPvConfig( PyObject* self, PyObject* args )
 
   return pypdsdata::Epics::PvConfigV1::PyObject_FromPds(obj->getPvConfig(index),
       self, sizeof(Pds::Epics::PvConfigV1) );
-}
-
-
-PyObject*
-_repr( PyObject *self )
-{
-  Pds::Epics::ConfigV1* obj = pypdsdata::Epics::ConfigV1::pdsObject(self);
-  if(not obj) return 0;
-
-  std::ostringstream str;
-  str << "epics.ConfigV1(numPv=" << obj->getNumPv() << ", PvConfigs=[";
-  unsigned size = obj->getNumPv();
-  for ( unsigned i = 0; i < size and i < 256; ++ i ) {
-    const Pds::Epics::PvConfigV1* pv = obj->getPvConfig(i);
-    if (i) str << ", ";
-    str << "(pvId=" << pv->iPvId << ", desc=\"" << pv->sPvDesc
-        << "\", interval=" << pv->fInterval << ")";
-  }
-  if (size > 256) str << ", ...";
-  str << "])";
-  
-  return PyString_FromString(str.str().c_str());
 }
 
 }

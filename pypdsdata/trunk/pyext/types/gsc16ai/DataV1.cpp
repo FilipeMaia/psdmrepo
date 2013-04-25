@@ -36,7 +36,6 @@ namespace {
   // type-specific methods
   PyObject* timestamps( PyObject* self, PyObject* );
   PyObject* channelValues( PyObject* self, PyObject* args );
-  PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
     { "timestamps",    timestamps,    METH_NOARGS,  "self.timestamps() -> ndarray\n\nReturns array of integers" },
@@ -58,10 +57,18 @@ pypdsdata::Gsc16ai::DataV1::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
-  type->tp_str = _repr;
-  type->tp_repr = _repr;
 
   BaseType::initType( "DataV1", module );
+}
+
+void
+pypdsdata::Gsc16ai::DataV1::print(std::ostream& str) const
+{
+  str << "Gsc16ai.DataV1(timestamps=[" << m_obj->_timestamp[0]
+      << ", " << m_obj->_timestamp[1]
+      << ", " << m_obj->_timestamp[2]
+      << "], channelValues=[" << m_obj->_channelValue[0]
+      << ", ...])";
 }
 
 namespace {
@@ -125,22 +132,6 @@ timestamps( PyObject* self, PyObject* )
   ((PyArrayObject*)array)->base = self ;
 
   return array;
-}
-
-PyObject*
-_repr( PyObject *self )
-{
-  Pds::Gsc16ai::DataV1* obj = pypdsdata::Gsc16ai::DataV1::pdsObject(self);
-  if(not obj) return 0;
-
-  std::ostringstream str;
-  str << "Gsc16ai.DataV1(timestamps=[" << obj->_timestamp[0]
-      << ", " << obj->_timestamp[1]
-      << ", " << obj->_timestamp[2] 
-      << "], channelValues=[" << obj->_channelValue[0]
-      << ", ...])";
-
-  return PyString_FromString( str.str().c_str() );
 }
 
 }

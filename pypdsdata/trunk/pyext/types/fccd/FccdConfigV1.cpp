@@ -52,7 +52,6 @@ namespace {
   FUN0_WRAPPER(pypdsdata::FCCD::FccdConfigV1, trimmedHeight)
   FUN0_WRAPPER(pypdsdata::FCCD::FccdConfigV1, outputMode)
   FUN0_WRAPPER(pypdsdata::FCCD::FccdConfigV1, size)
-  PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
     { "width",         width,         METH_NOARGS, "self.width() -> int\n\nReturns image width" },
@@ -78,8 +77,6 @@ pypdsdata::FCCD::FccdConfigV1::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
-  type->tp_str = _repr;
-  type->tp_repr = _repr;
 
   // define class attributes for enums
   PyObject* tp_dict = PyDict_New();
@@ -90,17 +87,8 @@ pypdsdata::FCCD::FccdConfigV1::initType( PyObject* module )
   BaseType::initType( "FccdConfigV1", module );
 }
 
-namespace {
-
-PyObject*
-_repr( PyObject *self )
+void
+pypdsdata::FCCD::FccdConfigV1::print(std::ostream& str) const
 {
-  Pds::FCCD::FccdConfigV1* obj = pypdsdata::FCCD::FccdConfigV1::pdsObject(self);
-  if (not obj) return 0;
-
-  std::ostringstream str;
-  str << "fccd.FccdConfigV1(outputMode" << obj->outputMode() << ")"; 
-  return PyString_FromString( str.str().c_str() );
-}
-
+  str << "fccd.FccdConfigV1(outputMode" << m_obj->outputMode() << ")";
 }

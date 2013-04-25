@@ -132,7 +132,6 @@ namespace {
   FUN0_WRAPPER(pypdsdata::Timepix::ConfigV2, chip2ID)
   FUN0_WRAPPER(pypdsdata::Timepix::ConfigV2, chip3ID)
   PyObject* pixelThresh(PyObject *self, PyObject*);
-  PyObject* _repr(PyObject *self);
 
   PyMethodDef methods[] = {
     { "readoutSpeed",      readoutSpeed        , METH_NOARGS,  "self.readoutSpeed() -> ReadoutSpeed enum\n\nReturns :py:class:`ReadoutSpeed` enum" },
@@ -223,8 +222,6 @@ pypdsdata::Timepix::ConfigV2::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
-  type->tp_str = _repr;
-  type->tp_repr = _repr;
 
   // define class attributes for enums
   PyObject* tp_dict = PyDict_New();
@@ -234,6 +231,15 @@ pypdsdata::Timepix::ConfigV2::initType( PyObject* module )
   type->tp_dict = tp_dict;
 
   BaseType::initType( "ConfigV2", module );
+}
+
+void
+pypdsdata::Timepix::ConfigV2::print(std::ostream& str) const
+{
+  str << "Timepix.ConfigV2(readoutSpeed=" << int(m_obj->readoutSpeed())
+      << ", triggerMode=" << int(m_obj->triggerMode())
+      << ", timepixSpeed=" << m_obj->timepixSpeed()
+      << ", ...)" ;
 }
 
 namespace {
@@ -260,21 +266,6 @@ pixelThresh(PyObject *self, PyObject*)
   ((PyArrayObject*)array)->base = self ;
 
   return array;
-}
-
-PyObject*
-_repr( PyObject *self )
-{
-  Pds::Timepix::ConfigV2* obj = pypdsdata::Timepix::ConfigV2::pdsObject(self);
-  if(not obj) return 0;
-
-  std::ostringstream str;
-  str << "Timepix.ConfigV2(readoutSpeed=" << int(obj->readoutSpeed())
-      << ", triggerMode=" << int(obj->triggerMode())
-      << ", timepixSpeed=" << obj->timepixSpeed()
-      << ", ...)" ;
-
-  return PyString_FromString( str.str().c_str() );
 }
 
 }

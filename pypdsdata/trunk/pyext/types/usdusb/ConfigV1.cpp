@@ -60,7 +60,6 @@ namespace {
   // methods
   PyObject* counting_mode( PyObject *self, PyObject* );
   PyObject* quadrature_mode( PyObject *self, PyObject* );
-  PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
     {"counting_mode",   counting_mode,   METH_NOARGS,
@@ -83,8 +82,6 @@ pypdsdata::UsdUsb::ConfigV1::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
-  type->tp_str = _repr;
-  type->tp_repr = _repr;
 
   // define class attributes for enums
   PyObject* tp_dict = PyDict_New();
@@ -94,6 +91,22 @@ pypdsdata::UsdUsb::ConfigV1::initType( PyObject* module )
   type->tp_dict = tp_dict;
 
   BaseType::initType( "ConfigV1", module );
+}
+
+void
+pypdsdata::UsdUsb::ConfigV1::print(std::ostream& str) const
+{
+  str << "usdusb.ConfigV1(counting_modes=[";
+  for (int i = 0; i != Pds::UsdUsb::ConfigV1::NCHANNELS; ++ i) {
+    if (i != 0) str << ", ";
+    str << Pds::UsdUsb::ConfigV1::count_mode_labels()[m_obj->counting_mode(i)];
+  }
+  str << "], quadrature_modes=[";
+  for (int i = 0; i != Pds::UsdUsb::ConfigV1::NCHANNELS; ++ i) {
+    if (i != 0) str << ", ";
+    str << Pds::UsdUsb::ConfigV1::quad_mode_labels()[m_obj->quadrature_mode(i)];
+  }
+  str << "])" ;
 }
 
 namespace {
@@ -130,28 +143,6 @@ quadrature_mode( PyObject* self, PyObject* )
   }
 
   return list;
-}
-
-PyObject*
-_repr( PyObject *self )
-{
-  Pds::UsdUsb::ConfigV1* obj = pypdsdata::UsdUsb::ConfigV1::pdsObject(self);
-  if(not obj) return 0;
-
-  std::ostringstream str;
-  str << "usdusb.ConfigV1(counting_modes=[";
-  for (int i = 0; i != Pds::UsdUsb::ConfigV1::NCHANNELS; ++ i) {
-    if (i != 0) str << ", ";
-    str << Pds::UsdUsb::ConfigV1::count_mode_labels()[obj->counting_mode(i)];
-  }
-  str << "], quadrature_modes=[";
-  for (int i = 0; i != Pds::UsdUsb::ConfigV1::NCHANNELS; ++ i) {
-    if (i != 0) str << ", ";
-    str << Pds::UsdUsb::ConfigV1::quad_mode_labels()[obj->quadrature_mode(i)];
-  }
-  str << "])" ;
-
-  return PyString_FromString( str.str().c_str() );
 }
 
 }

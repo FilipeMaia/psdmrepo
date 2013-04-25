@@ -66,8 +66,20 @@ namespace {
 
   };
 
-  // standard Python stuff
-  PyObject* _repr( PyObject *self );
+  template <int iDbrType>
+  inline
+  void
+  print(std::ostream& out, const Pds::EpicsPvCtrlHeader& header)
+  {
+    typedef Pds::EpicsPvCtrl<iDbrType> PVType;
+    const PVType& obj = static_cast<const PVType&>(header);
+    out << "id=" << obj.iPvId
+        << ", name=" << obj.sPvName
+        << ", type=" << Pds::Epics::dbr_text[obj.iDbrType]
+        << ", status=" << obj.status
+        << ", severity=" << obj.severity
+        << ", value=" << obj.value;
+  }
 
   // methods
   MEMBER_WRAPPER(pypdsdata::EpicsPvCtrl, iPvId)
@@ -130,78 +142,53 @@ pypdsdata::EpicsPvCtrl::initType( PyObject* module )
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
   type->tp_getset = ::getset;
-  type->tp_str = _repr ;
-  type->tp_repr = _repr ;
 
   BaseType::initType( "EpicsPvCtrl", module );
 }
 
-
-namespace {
-
-template <int iDbrType>
-inline
 void
-print(std::ostream& out, const Pds::EpicsPvCtrlHeader& header)
+pypdsdata::EpicsPvCtrl::print(std::ostream& str) const
 {
-  typedef Pds::EpicsPvCtrl<iDbrType> PVType;
-  const PVType& obj = static_cast<const PVType&>(header);
-  out << "id=" << obj.iPvId
-      << ", name=" << obj.sPvName
-      << ", type=" << Pds::Epics::dbr_text[obj.iDbrType]
-      << ", status=" << obj.status
-      << ", severity=" << obj.severity
-      << ", value=" << obj.value;
-}
-
-
-PyObject*
-_repr( PyObject *self )
-{
-  Pds::EpicsPvCtrlHeader* obj = pypdsdata::EpicsPvCtrl::pdsObject(self);
-  if(not obj) return 0;
-
-  std::ostringstream str;
   str << "EpicsPvCtrl(";
   
-  switch ( obj->iDbrType ) {
+  switch ( m_obj->iDbrType ) {
 
   case DBR_CTRL_STRING:
-    print<DBR_STRING>(str, *obj);
+    ::print<DBR_STRING>(str, *m_obj);
     break;
 
   case DBR_CTRL_SHORT:
-    print<DBR_SHORT>(str, *obj);
+    ::print<DBR_SHORT>(str, *m_obj);
     break;
 
   case DBR_CTRL_FLOAT:
-    print<DBR_FLOAT>(str, *obj);
+    ::print<DBR_FLOAT>(str, *m_obj);
     break;
 
   case DBR_CTRL_ENUM:
-    print<DBR_ENUM>(str, *obj);
+    ::print<DBR_ENUM>(str, *m_obj);
     break;
 
   case DBR_CTRL_CHAR:
-    print<DBR_CHAR>(str, *obj);
+    ::print<DBR_CHAR>(str, *m_obj);
     break;
 
   case DBR_CTRL_LONG:
-    print<DBR_LONG>(str, *obj);
+    ::print<DBR_LONG>(str, *m_obj);
     break;
 
   case DBR_CTRL_DOUBLE:
-    print<DBR_DOUBLE>(str, *obj);
+    ::print<DBR_DOUBLE>(str, *m_obj);
     break;
 
   default:
-    str << "id=" << obj->iPvId;
+    str << "id=" << m_obj->iPvId;
   }
 
   str << ")";
-  
-  return PyString_FromString( str.str().c_str() );
 }
+
+namespace {
 
 PyObject*
 EpicsPvCtrl_status( PyObject* self, void* )

@@ -37,7 +37,6 @@ namespace {
   FUN0_WRAPPER(pypdsdata::ControlData::PVControl, array)
   FUN0_WRAPPER(pypdsdata::ControlData::PVControl, index)
   FUN0_WRAPPER(pypdsdata::ControlData::PVControl, value)
-  PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
     {"name",       name,       METH_NOARGS,  "self.name() -> string\n\nReturns name of the monitoring channel" },
@@ -60,32 +59,20 @@ pypdsdata::ControlData::PVControl::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
-  type->tp_str = _repr;
-  type->tp_repr = _repr;
 
   BaseType::initType( "PVControl", module );
 }
 
-namespace {
-  
-PyObject*
-_repr( PyObject *self )
+void
+pypdsdata::ControlData::PVControl::print(std::ostream& str) const
 {
-  Pds::ControlData::PVControl* obj = pypdsdata::ControlData::PVControl::pdsObject(self);
-  if(not obj) return 0;
-
-  std::ostringstream str;
-  str << "control.PVControl(name=" << obj->name();
+  str << "control.PVControl(name=" << m_obj->name();
   
-  if (obj->array()) {
-    str << ", index=" << obj->index();
+  if (m_obj->array()) {
+    str << ", index=" << m_obj->index();
   }
 
-  str << ", value=" << obj->value();
+  str << ", value=" << m_obj->value();
 
   str << ")";
-  
-  return PyString_FromString( str.str().c_str() );
-}
-
 }

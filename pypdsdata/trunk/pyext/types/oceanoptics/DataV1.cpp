@@ -46,9 +46,6 @@ namespace {
   };
 
   // methods
-  PyObject* _repr( PyObject *self );
-
-  // methods
   FUN0_WRAPPER(pypdsdata::OceanOptics::DataV1, frameCounter)
   FUN0_WRAPPER(pypdsdata::OceanOptics::DataV1, numDelayedFrames)
   FUN0_WRAPPER(pypdsdata::OceanOptics::DataV1, numDiscardFrames)
@@ -97,8 +94,6 @@ pypdsdata::OceanOptics::DataV1::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
-  type->tp_str = _repr ;
-  type->tp_repr = _repr ;
 
   // define class attributes for enums
   PyObject* tp_dict = PyDict_New();
@@ -108,6 +103,15 @@ pypdsdata::OceanOptics::DataV1::initType( PyObject* module )
   BaseType::initType( "DataV1", module );
 }
 
+void
+pypdsdata::OceanOptics::DataV1::print(std::ostream& str) const
+{
+  str << "oceanoptics.DataV1(frameCounter=" << m_obj->frameCounter()
+      << ", numDelayedFrames=" << m_obj->numDelayedFrames()
+      << ", numDiscardFrames=" << m_obj->numDiscardFrames()
+      << ", durationOfFrame=" << m_obj->durationOfFrame()
+      << ", ...)" ;
+}
 
 namespace {
 
@@ -218,23 +222,6 @@ nonlinerCorrected( PyObject* self, PyObject* args)
   }
 
   return array;
-}
-
-
-PyObject*
-_repr( PyObject *self )
-{
-  Pds::OceanOptics::DataV1* obj = pypdsdata::OceanOptics::DataV1::pdsObject(self);
-  if(not obj) return 0;
-
-  std::ostringstream str;
-  str << "oceanoptics.DataV1(frameCounter=" << obj->frameCounter()
-      << ", numDelayedFrames=" << obj->numDelayedFrames()
-      << ", numDiscardFrames=" << obj->numDiscardFrames()
-      << ", durationOfFrame=" << obj->durationOfFrame()
-      << ", ...)" ;
-
-  return PyString_FromString(str.str().c_str());
 }
 
 }

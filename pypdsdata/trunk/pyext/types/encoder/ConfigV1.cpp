@@ -59,7 +59,6 @@ namespace {
   MEMBER_WRAPPER(pypdsdata::Encoder::ConfigV1, _input_num)
   MEMBER_WRAPPER(pypdsdata::Encoder::ConfigV1, _input_rising)
   MEMBER_WRAPPER(pypdsdata::Encoder::ConfigV1, _ticks_per_sec)
-  PyObject* _repr( PyObject *self );
 
   // disable warnings for non-const strings, this is a temporary measure
   // newer Python versions should get constness correctly
@@ -88,8 +87,6 @@ pypdsdata::Encoder::ConfigV1::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_getset = ::getset;
-  type->tp_str = _repr;
-  type->tp_repr = _repr;
 
   // define class attributes for enums
   PyObject* tp_dict = PyDict_New();
@@ -100,22 +97,12 @@ pypdsdata::Encoder::ConfigV1::initType( PyObject* module )
   BaseType::initType( "ConfigV1", module );
 }
 
-namespace {
-  
-PyObject*
-_repr( PyObject *self )
+void
+pypdsdata::Encoder::ConfigV1::print(std::ostream& str) const
 {
-  Pds::Encoder::ConfigV1* obj = pypdsdata::Encoder::ConfigV1::pdsObject(self);
-  if(not obj) return 0;
-
-  std::ostringstream str;
-  str << "encoder.ConfigV1(chan_num=" << obj->_chan_num
-      << ", count_mode=" << obj->_count_mode
-      << ", quad_mode=" << obj->_quadrature_mode
-      << ", input_num=" << obj->_input_num
+  str << "encoder.ConfigV1(chan_num=" << m_obj->_chan_num
+      << ", count_mode=" << m_obj->_count_mode
+      << ", quad_mode=" << m_obj->_quadrature_mode
+      << ", input_num=" << m_obj->_input_num
       << ", ...)";
-  
-  return PyString_FromString( str.str().c_str() );
-}
-
 }

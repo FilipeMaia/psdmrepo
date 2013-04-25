@@ -33,9 +33,6 @@
 
 namespace {
 
-  // standard Python stuff
-  PyObject* _repr( PyObject *self );
-
   // methods
   MEMBER_WRAPPER(pypdsdata::Lusi::IpmFexV1, sum)
   MEMBER_WRAPPER(pypdsdata::Lusi::IpmFexV1, xpos)
@@ -66,10 +63,24 @@ pypdsdata::Lusi::IpmFexV1::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_getset = ::getset;
-  type->tp_str = _repr;
-  type->tp_repr = _repr;
 
   BaseType::initType( "IpmFexV1", module );
+}
+
+void
+pypdsdata::Lusi::IpmFexV1::print(std::ostream& str) const
+{
+  str << "lusi.IpmFexV1(sum=" << m_obj->sum
+      << ", xpos=" << m_obj->xpos
+      << ", ypos=" << m_obj->ypos
+      << ", channel=[" ;
+
+  const int size = sizeof m_obj->channel / sizeof m_obj->channel[0];
+  for ( int i = 0 ; i < size ; ++ i ) {
+    if ( i ) str << ", " ;
+    str << m_obj->channel[i];
+  }
+  str << "])" ;
 }
 
 
@@ -87,28 +98,6 @@ IpmFexV1_channel( PyObject* self, void* )
     PyList_SET_ITEM( list, i, pypdsdata::TypeLib::toPython(obj->channel[i]) );
   }
   return list;
-}
-
-PyObject*
-_repr( PyObject *self )
-{
-  Pds::Lusi::IpmFexV1* obj = pypdsdata::Lusi::IpmFexV1::pdsObject(self);
-  if (not obj) return 0;
-
-  std::ostringstream str ;
-  str << "lusi.IpmFexV1(sum=" << obj->sum
-      << ", xpos=" << obj->xpos 
-      << ", ypos=" << obj->ypos 
-      << ", channel=[" ;
-  
-  const int size = sizeof obj->channel / sizeof obj->channel[0];
-  for ( int i = 0 ; i < size ; ++ i ) {
-    if ( i ) str << ", " ;
-    str << obj->channel[i];
-  }
-  str << "])" ;
-
-  return PyString_FromString( str.str().c_str() );
 }
 
 }

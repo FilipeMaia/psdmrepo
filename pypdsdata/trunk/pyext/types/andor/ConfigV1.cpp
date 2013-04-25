@@ -60,7 +60,6 @@ namespace {
   FUN0_WRAPPER(pypdsdata::Andor::ConfigV1, numDelayShots)
   FUN0_WRAPPER(pypdsdata::Andor::ConfigV1, size)
   FUN0_WRAPPER(pypdsdata::Andor::ConfigV1, frameSize)
-  PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
     { "width",             width,             METH_NOARGS, "self.width() -> int\n\nReturns frame width" },
@@ -97,8 +96,6 @@ pypdsdata::Andor::ConfigV1::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
-  type->tp_str = _repr;
-  type->tp_repr = _repr;
 
   // define class attributes for enums
   PyObject* tp_dict = PyDict_New();
@@ -108,26 +105,16 @@ pypdsdata::Andor::ConfigV1::initType( PyObject* module )
   BaseType::initType( "ConfigV1", module );
 }
 
-namespace {
-
-PyObject*
-_repr( PyObject *self )
+void
+pypdsdata::Andor::ConfigV1::print(std::ostream& str) const
 {
-  Pds::Andor::ConfigV1* obj = pypdsdata::Andor::ConfigV1::pdsObject(self);
-  if(not obj) return 0;
-
-  std::ostringstream str;
-  str << "Andor.ConfigV1(width=" << obj->width()
-      << ", height=" << obj->height()
-      << ", orgX=" << obj->orgX()
-      << ", orgY=" << obj->orgY()
-      << ", binX=" << obj->binX()
-      << ", binY=" << obj->binY()
-      << ", exposureEventCode=" << obj->exposureEventCode()
-      << ", numDelayShots=" << obj->numDelayShots()
+  str << "Andor.ConfigV1(width=" << m_obj->width()
+      << ", height=" << m_obj->height()
+      << ", orgX=" << m_obj->orgX()
+      << ", orgY=" << m_obj->orgY()
+      << ", binX=" << m_obj->binX()
+      << ", binY=" << m_obj->binY()
+      << ", exposureEventCode=" << m_obj->exposureEventCode()
+      << ", numDelayShots=" << m_obj->numDelayShots()
       << ", ...)";
-
-  return PyString_FromString( str.str().c_str() );
-}
-
 }

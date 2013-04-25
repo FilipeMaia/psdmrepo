@@ -48,7 +48,6 @@ namespace {
   FUN0_WRAPPER(pypdsdata::Timepix::DataV2, depth_bytes)
   FUN0_WRAPPER(pypdsdata::Timepix::DataV2, data_size)
   PyObject* data( PyObject* self, PyObject* );
-  PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
     { "timestamp",      timestamp,      METH_NOARGS,  "self.timestamp() -> int\n\nReturns integer number" },
@@ -76,8 +75,6 @@ pypdsdata::Timepix::DataV2::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
-  type->tp_str = _repr;
-  type->tp_repr = _repr;
 
   // define class attributes for enums/constants
   type->tp_dict = PyDict_New();
@@ -122,6 +119,16 @@ pypdsdata::Timepix::DataV2::PyObject_FromXtc(const Pds::Xtc& xtc, PyObject* pare
 
 }
 
+void
+pypdsdata::Timepix::DataV2::print(std::ostream& str) const
+{
+  str << "Timepix.DataV2(timestamp=" << m_obj->timestamp()
+      << ", frameCounter=" << m_obj->frameCounter()
+      << ", lostRows=" << m_obj->lostRows()
+      << ", width=" << m_obj->width()
+      << ", height=" << m_obj->height()
+      << ", ...)" ;
+}
 
 namespace {
 
@@ -159,23 +166,6 @@ data( PyObject* self, PyObject* args )
   ((PyArrayObject*)array)->base = self ;
 
   return array;
-}
-
-PyObject*
-_repr( PyObject *self )
-{
-  Pds::Timepix::DataV2* obj = pypdsdata::Timepix::DataV2::pdsObject(self);
-  if(not obj) return 0;
-
-  std::ostringstream str;
-  str << "Timepix.DataV2(timestamp=" << obj->timestamp()
-      << ", frameCounter=" << obj->frameCounter()
-      << ", lostRows=" << obj->lostRows()
-      << ", width=" << obj->width()
-      << ", height=" << obj->height()
-      << ", ...)" ;
-
-  return PyString_FromString( str.str().c_str() );
 }
 
 }

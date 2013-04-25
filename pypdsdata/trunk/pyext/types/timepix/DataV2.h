@@ -58,6 +58,9 @@ public:
   // For DataV1 it creates new DataV2 object which shuffles the data from DataV1.
   static DataV2* PyObject_FromXtc( const Pds::Xtc& xtc, PyObject* parent, destructor dtor=0 );
 
+  // dump to a stream
+  void print(std::ostream& str) const;
+
 };
 
 } // namespace Timepix

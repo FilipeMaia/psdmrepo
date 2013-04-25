@@ -86,7 +86,6 @@ namespace {
   FUN0_WRAPPER(pypdsdata::Quartz::ConfigV1, size)
   PyObject* output_lookup_table( PyObject* self, PyObject* );
   PyObject* defect_pixel_coordinates( PyObject* self, PyObject* );
-  PyObject* _repr( PyObject *self );
 
   PyMethodDef methods[] = {
     {"black_level",       black_level,       METH_NOARGS,  
@@ -132,8 +131,6 @@ pypdsdata::Quartz::ConfigV1::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
-  type->tp_str = _repr;
-  type->tp_repr = _repr;
 
   // define class attributes for enums
   PyObject* tp_dict = PyDict_New();
@@ -144,6 +141,16 @@ pypdsdata::Quartz::ConfigV1::initType( PyObject* module )
   type->tp_dict = tp_dict;
 
   BaseType::initType( "ConfigV1", module );
+}
+
+void
+pypdsdata::Quartz::ConfigV1::print(std::ostream& str) const
+{
+  str << "quartz.ConfigV1(black_level=" << m_obj->black_level()
+      << ", gain_percent=" << m_obj->gain_percent()
+      << ", output_offset=" << m_obj->output_offset()
+      << ", output_bits=" << m_obj->output_resolution_bits()
+      << ", ...)";
 }
 
 namespace {
@@ -191,21 +198,6 @@ defect_pixel_coordinates( PyObject* self, PyObject* )
   }
 
   return list;
-}
-
-PyObject*
-_repr( PyObject *self )
-{
-  Pds::Quartz::ConfigV1* obj = pypdsdata::Quartz::ConfigV1::pdsObject(self);
-  if (not obj) return 0;
-
-  std::ostringstream str ;
-  str << "quartz.ConfigV1(black_level=" << obj->black_level()
-      << ", gain_percent=" << obj->gain_percent() 
-      << ", output_offset=" << obj->output_offset() 
-      << ", output_bits=" << obj->output_resolution_bits()
-      << ", ...)";
-  return PyString_FromString( str.str().c_str() );
 }
 
 }

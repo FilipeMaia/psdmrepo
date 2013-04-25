@@ -34,8 +34,6 @@ namespace {
   // standard Python stuff
   long FrameCoord_hash( PyObject* self );
   int FrameCoord_compare( PyObject *self, PyObject *other);
-  PyObject* FrameCoord_str( PyObject *self );
-  PyObject* FrameCoord_repr( PyObject *self );
 
   // disable warnings for non-const strings, this is a temporary measure
   // newer Python versions should get constness correctly
@@ -71,10 +69,14 @@ pypdsdata::Camera::FrameCoord::initType( PyObject* module )
   type->tp_members = ::members;
   type->tp_hash = FrameCoord_hash;
   type->tp_compare = FrameCoord_compare;
-  type->tp_str = FrameCoord_str;
-  type->tp_repr = FrameCoord_repr;
 
   BaseType::initType( "FrameCoord", module );
+}
+
+void
+pypdsdata::Camera::FrameCoord::print(std::ostream& out) const
+{
+  out << "camera.FrameCoord(" << m_obj.column << ", " << m_obj.row << ")";
 }
 
 namespace {
@@ -99,23 +101,6 @@ FrameCoord_compare( PyObject* self, PyObject* other )
   if ( py_this->m_obj.row > py_other->m_obj.row ) return 1 ;
   if ( py_this->m_obj.row < py_other->m_obj.row ) return -1 ;
   return 0 ;
-}
-
-PyObject*
-FrameCoord_str( PyObject *self )
-{
-  return FrameCoord_repr( self );
-}
-
-PyObject*
-FrameCoord_repr( PyObject *self )
-{
-  pypdsdata::Camera::FrameCoord* py_this = (pypdsdata::Camera::FrameCoord*) self;
-
-  char buf[32];
-  snprintf( buf, sizeof buf, "camera.FrameCoord(%d, %d)",
-            py_this->m_obj.column, py_this->m_obj.row );
-  return PyString_FromString( buf );
 }
 
 }

@@ -35,7 +35,6 @@ namespace {
   int epicsTimeStamp_init( PyObject* self, PyObject* args, PyObject* kwds );
   long epicsTimeStamp_hash( PyObject* self );
   int epicsTimeStamp_compare( PyObject *self, PyObject *other);
-  PyObject* _repr( PyObject *self );
 
   // disable warnings for non-const strings, this is a temporary measure
   // newer Python versions should get constness correctly
@@ -68,10 +67,14 @@ pypdsdata::Epics::epicsTimeStamp::initType( PyObject* module )
   type->tp_init = epicsTimeStamp_init;
   type->tp_hash = epicsTimeStamp_hash;
   type->tp_compare = epicsTimeStamp_compare;
-  type->tp_str = _repr;
-  type->tp_repr = _repr;
 
   BaseType::initType( "epicsTimeStamp", module );
+}
+
+void
+pypdsdata::Epics::epicsTimeStamp::print(std::ostream& str) const
+{
+  str << "epicsTimeStamp(" << m_obj.secPastEpoch << ", " << m_obj.nsec << ")";
 }
 
 namespace {
@@ -121,17 +124,6 @@ epicsTimeStamp_compare( PyObject* self, PyObject* other )
   if ( py_this->m_obj.nsec > py_other->m_obj.nsec ) return 1 ;
   if ( py_this->m_obj.nsec < py_other->m_obj.nsec ) return -1 ;
   return 0 ;
-}
-
-PyObject*
-_repr( PyObject *self )
-{
-  pypdsdata::Epics::epicsTimeStamp* py_this = (pypdsdata::Epics::epicsTimeStamp*) self;
-
-  char buf[48];
-  snprintf( buf, sizeof buf, "epicsTimeStamp(%d, %d)",
-            py_this->m_obj.secPastEpoch, py_this->m_obj.nsec );
-  return PyString_FromString( buf );
 }
 
 }

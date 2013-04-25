@@ -32,9 +32,6 @@
 namespace {
 
   // methods
-  PyObject* _repr( PyObject *self );
-
-  // methods
   FUN0_WRAPPER(pypdsdata::OceanOptics::ConfigV1, exposureTime)
   FUN0_WRAPPER(pypdsdata::OceanOptics::ConfigV1, strayLightConstant)
   PyObject* waveLenCalib( PyObject* self, PyObject* );
@@ -63,10 +60,26 @@ pypdsdata::OceanOptics::ConfigV1::initType( PyObject* module )
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
-  type->tp_str = _repr ;
-  type->tp_repr = _repr ;
 
   BaseType::initType( "ConfigV1", module );
+}
+
+void
+pypdsdata::OceanOptics::ConfigV1::print(std::ostream& str) const
+{
+  str << "oceanoptics.ConfigV1(exposureTime=" << m_obj->exposureTime()
+      << ", waveLenCalib=[";
+  for ( unsigned i = 0; i < 4; ++ i ) {
+    if (i) str << ",";
+    str << m_obj->waveLenCalib(i);
+  }
+  str << "], strayLightConstant=" << m_obj->strayLightConstant()
+      << ", nonlinCorrect=[";
+  for ( unsigned i = 0; i < 8; ++ i ) {
+    if (i) str << ",";
+    str << m_obj->nonlinCorrect(i);
+  }
+  str << "])";
 }
 
 
@@ -104,30 +117,6 @@ nonlinCorrect( PyObject* self, PyObject* )
   }
 
   return list;
-}
-
-PyObject*
-_repr( PyObject *self )
-{
-  Pds::OceanOptics::ConfigV1* obj = pypdsdata::OceanOptics::ConfigV1::pdsObject(self);
-  if(not obj) return 0;
-
-  std::ostringstream str;
-  str << "oceanoptics.ConfigV1(exposureTime=" << obj->exposureTime()
-      << ", waveLenCalib=[";
-  for ( unsigned i = 0; i < 4; ++ i ) {
-    if (i) str << ",";
-    str << obj->waveLenCalib(i);
-  }
-  str << "], strayLightConstant=" << obj->strayLightConstant()
-      << ", nonlinCorrect=[";
-  for ( unsigned i = 0; i < 8; ++ i ) {
-    if (i) str << ",";
-    str << obj->nonlinCorrect(i);
-  }
-  str << "])";
-  
-  return PyString_FromString(str.str().c_str());
 }
 
 }
