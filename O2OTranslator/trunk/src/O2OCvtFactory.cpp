@@ -49,6 +49,7 @@
 #include "H5DataTypes/CsPadConfigV2.h"
 #include "H5DataTypes/CsPadConfigV3.h"
 #include "H5DataTypes/CsPadConfigV4.h"
+#include "H5DataTypes/CsPadConfigV5.h"
 #include "H5DataTypes/EncoderConfigV1.h"
 #include "H5DataTypes/EncoderConfigV2.h"
 #include "H5DataTypes/EncoderDataV1.h"
@@ -503,6 +504,9 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
       break;
     case 4:
       ::makeConfigCvt<CsPadConfigV4>(cvts, group, "CsPad::ConfigV4", src, m_cvtOptions, 0);
+      break;
+    case 5:
+      ::makeConfigCvt<CsPadConfigV5>(cvts, group, "CsPad::ConfigV5", src, m_cvtOptions, 0);
       break;
     }
     // special converter object for CsPad calibration data

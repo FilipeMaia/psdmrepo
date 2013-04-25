@@ -33,6 +33,7 @@
 #include "pdsdata/cspad/ConfigV2.hh"
 #include "pdsdata/cspad/ConfigV3.hh"
 #include "pdsdata/cspad/ConfigV4.hh"
+#include "pdsdata/cspad/ConfigV5.hh"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -109,6 +110,7 @@ CsPadElementV1Cvt::fillContainers(hdf5pp::Group group,
   Pds::TypeId cfgTypeId2(Pds::TypeId::Id_CspadConfig, 2);
   Pds::TypeId cfgTypeId3(Pds::TypeId::Id_CspadConfig, 3);
   Pds::TypeId cfgTypeId4(Pds::TypeId::Id_CspadConfig, 4);
+  Pds::TypeId cfgTypeId5(Pds::TypeId::Id_CspadConfig, 5);
   if ( const Pds::CsPad::ConfigV1* config = m_configStore.find<Pds::CsPad::ConfigV1>(cfgTypeId1, src.top()) ) {
     qMask = config->quadMask();
     sMask = config->asicMask()==1 ? 0x3 : 0xff;
@@ -119,6 +121,9 @@ CsPadElementV1Cvt::fillContainers(hdf5pp::Group group,
     qMask = config->quadMask();
     sMask = config->asicMask()==1 ? 0x3 : 0xff;
   } else if ( const Pds::CsPad::ConfigV4* config = m_configStore.find<Pds::CsPad::ConfigV4>(cfgTypeId4, src.top()) ) {
+    qMask = config->quadMask();
+    sMask = config->asicMask()==1 ? 0x3 : 0xff;
+  } else if ( const Pds::CsPad::ConfigV5* config = m_configStore.find<Pds::CsPad::ConfigV5>(cfgTypeId5, src.top()) ) {
     qMask = config->quadMask();
     sMask = config->asicMask()==1 ? 0x3 : 0xff;
   } else {
