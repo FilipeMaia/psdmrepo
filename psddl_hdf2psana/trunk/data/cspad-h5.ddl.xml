@@ -69,6 +69,32 @@
             </dataset>
         </h5schema>
         
+        <h5schema name="ConfigV3QuadReg" version="0">
+            <tag name="skip-proxy"/>
+            <dataset name="data">
+                <attribute name="readClkSet"/>
+                <attribute name="readClkHold"/>
+                <attribute name="dataMode"/>
+                <attribute name="prstSel"/>
+                <attribute name="acqDelay"/>
+                <attribute name="intTime"/>
+                <attribute name="digDelay"/>
+                <attribute name="ampIdle"/>
+                <attribute name="injTotal"/>
+                <attribute name="rowColShiftPer"/>
+                <attribute name="ampReset"/>
+                <attribute name="digCount"/>
+                <attribute name="digPeriod"/>
+                <attribute name="biasTuning"/>
+                <attribute name="pdpmndnmBalance"/>
+                <attribute name="readOnly" method="ro"/>
+                <attribute name="digitalPots" method="dp"/>
+                <attribute name="gainMap" method="gm"/>
+                <attribute name="shiftSelect" rank="1"/>
+                <attribute name="edgeSelect" rank="1"/>
+            </dataset>
+        </h5schema>
+        
         <h5schema name="ConfigV1" version="0">
             <dataset name="config">
                 <attribute name="concentratorVersion"/>
@@ -123,6 +149,7 @@
                 <attribute name="quads" rank="1"/>
             </dataset>
         </h5schema>
+        
         <h5schema name="ConfigV4" version="0">
             <dataset name="config">
                 <attribute name="concentratorVersion"/>
@@ -131,6 +158,27 @@
                 <attribute name="protectionEnable"/>
                 <attribute name="inactiveRunMode"/>
                 <attribute name="activeRunMode"/>
+                <attribute name="testDataIndex" method="tdi"/>
+                <attribute name="payloadPerQuad" method="payloadSize"/>
+                <attribute name="badAsicMask0"/>
+                <attribute name="badAsicMask1"/>
+                <attribute name="asicMask"/>
+                <attribute name="quadMask"/>
+                <attribute name="roiMask" method="roiMasks"/>
+                <attribute name="protectionThresholds" rank="1"/>
+                <attribute name="quads" rank="1"/>
+            </dataset>
+        </h5schema>
+        
+        <h5schema name="ConfigV5" version="0">
+            <dataset name="config">
+                <attribute name="concentratorVersion"/>
+                <attribute name="runDelay"/>
+                <attribute name="eventCode"/>
+                <attribute name="protectionEnable"/>
+                <attribute name="inactiveRunMode"/>
+                <attribute name="activeRunMode"/>
+                <attribute name="internalTriggerDelay"/>
                 <attribute name="testDataIndex" method="tdi"/>
                 <attribute name="payloadPerQuad" method="payloadSize"/>
                 <attribute name="badAsicMask0"/>

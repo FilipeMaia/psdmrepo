@@ -317,6 +317,78 @@ private:
 };
 
 
+namespace ns_ConfigV3QuadReg_v0 {
+struct dataset_data {
+  static hdf5pp::Type native_type();
+  static hdf5pp::Type stored_type();
+
+  dataset_data();
+  ~dataset_data();
+
+  uint32_t readClkSet; 
+  uint32_t readClkHold; 
+  uint32_t dataMode; 
+  uint32_t prstSel; 
+  uint32_t acqDelay; 
+  uint32_t intTime; 
+  uint32_t digDelay; 
+  uint32_t ampIdle; 
+  uint32_t injTotal; 
+  uint32_t rowColShiftPer; 
+  uint32_t ampReset; 
+  uint32_t digCount; 
+  uint32_t digPeriod; 
+  uint32_t biasTuning; 
+  uint32_t pdpmndnmBalance; 
+  CsPad::ns_CsPadReadOnlyCfg_v0::dataset_data readOnly; 
+  CsPad::ns_CsPadDigitalPotsCfg_v0::dataset_data digitalPots; 
+  CsPad::ns_CsPadGainMapCfg_v0::dataset_data gainMap; 
+  uint32_t shiftSelect[4]; 
+  uint32_t edgeSelect[4]; 
+
+};
+}
+
+
+class ConfigV3QuadReg_v0 : public Psana::CsPad::ConfigV3QuadReg {
+public:
+  typedef Psana::CsPad::ConfigV3QuadReg PsanaType;
+  ConfigV3QuadReg_v0() {}
+  ConfigV3QuadReg_v0(hdf5pp::Group group, hsize_t idx)
+    : m_group(group), m_idx(idx) {}
+  ConfigV3QuadReg_v0(const boost::shared_ptr<CsPad::ns_ConfigV3QuadReg_v0::dataset_data>& ds) : m_ds_data(ds) {}
+  virtual ~ConfigV3QuadReg_v0() {}
+  virtual ndarray<const uint32_t, 1> shiftSelect() const;
+  virtual ndarray<const uint32_t, 1> edgeSelect() const;
+  virtual uint32_t readClkSet() const;
+  virtual uint32_t readClkHold() const;
+  virtual uint32_t dataMode() const;
+  virtual uint32_t prstSel() const;
+  virtual uint32_t acqDelay() const;
+  virtual uint32_t intTime() const;
+  virtual uint32_t digDelay() const;
+  virtual uint32_t ampIdle() const;
+  virtual uint32_t injTotal() const;
+  virtual uint32_t rowColShiftPer() const;
+  virtual uint32_t ampReset() const;
+  virtual uint32_t digCount() const;
+  virtual uint32_t digPeriod() const;
+  virtual uint32_t biasTuning() const;
+  virtual uint32_t pdpmndnmBalance() const;
+  virtual const Psana::CsPad::CsPadReadOnlyCfg& ro() const;
+  virtual const Psana::CsPad::CsPadDigitalPotsCfg& dp() const;
+  virtual const Psana::CsPad::CsPadGainMapCfg& gm() const;
+private:
+  mutable hdf5pp::Group m_group;
+  hsize_t m_idx;
+  mutable boost::shared_ptr<CsPad::ns_ConfigV3QuadReg_v0::dataset_data> m_ds_data;
+  void read_ds_data() const;
+  mutable Psana::CsPad::CsPadReadOnlyCfg m_ds_storage_data_readOnly;
+  mutable boost::shared_ptr<Psana::CsPad::CsPadDigitalPotsCfg> m_ds_storage_data_digitalPots;
+  mutable boost::shared_ptr<Psana::CsPad::CsPadGainMapCfg> m_ds_storage_data_gainMap;
+};
+
+
 namespace ns_ConfigV1_v0 {
 struct dataset_config {
   static hdf5pp::Type native_type();
@@ -613,6 +685,87 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::ConfigV4> > make_ConfigV4(int version, hdf5pp::Group group, hsize_t idx);
 
+namespace ns_ConfigV5_v0 {
+struct dataset_config {
+  static hdf5pp::Type native_type();
+  static hdf5pp::Type stored_type();
+
+  dataset_config();
+  ~dataset_config();
+
+  uint32_t concentratorVersion; 
+  uint32_t runDelay; 
+  uint32_t eventCode; 
+  uint32_t protectionEnable; 
+  uint32_t inactiveRunMode; 
+  uint32_t activeRunMode; 
+  uint32_t internalTriggerDelay; 
+  uint32_t testDataIndex; 
+  uint32_t payloadPerQuad; 
+  uint32_t badAsicMask0; 
+  uint32_t badAsicMask1; 
+  uint32_t asicMask; 
+  uint32_t quadMask; 
+  uint32_t roiMask; 
+  CsPad::ns_ProtectionSystemThreshold_v0::dataset_data protectionThresholds[4]; 
+  CsPad::ns_ConfigV3QuadReg_v0::dataset_data quads[4]; 
+
+};
+}
+
+
+class ConfigV5_v0 : public Psana::CsPad::ConfigV5 {
+public:
+  typedef Psana::CsPad::ConfigV5 PsanaType;
+  ConfigV5_v0() {}
+  ConfigV5_v0(hdf5pp::Group group, hsize_t idx)
+    : m_group(group), m_idx(idx) {}
+  ConfigV5_v0(const boost::shared_ptr<CsPad::ns_ConfigV5_v0::dataset_config>& ds) : m_ds_config(ds) {}
+  virtual ~ConfigV5_v0() {}
+  virtual uint32_t concentratorVersion() const;
+  virtual uint32_t runDelay() const;
+  virtual uint32_t eventCode() const;
+  virtual ndarray<const Psana::CsPad::ProtectionSystemThreshold, 1> protectionThresholds() const;
+  virtual uint32_t protectionEnable() const;
+  virtual uint32_t inactiveRunMode() const;
+  virtual uint32_t activeRunMode() const;
+  virtual uint32_t internalTriggerDelay() const;
+  virtual uint32_t tdi() const;
+  virtual uint32_t payloadSize() const;
+  virtual uint32_t badAsicMask0() const;
+  virtual uint32_t badAsicMask1() const;
+  virtual uint32_t asicMask() const;
+  virtual uint32_t quadMask() const;
+  virtual uint32_t roiMasks() const;
+  virtual const Psana::CsPad::ConfigV3QuadReg& quads(uint32_t i0) const;
+    uint32_t numAsicsRead() const;
+
+  /** ROI mask for given quadrant */
+  uint32_t roiMask(uint32_t iq) const;
+
+  /** Number of ASICs in given quadrant */
+  uint32_t numAsicsStored(uint32_t iq) const;
+
+  /** Total number of quadrants in setup */
+  uint32_t numQuads() const;
+
+  /** Total number of sections (2x1) in all quadrants */
+  uint32_t numSect() const;
+
+  /** Method which returns the shape (dimensions) of the data returned by quads() method. */
+  std::vector<int> quads_shape() const;
+
+private:
+  mutable hdf5pp::Group m_group;
+  hsize_t m_idx;
+  mutable boost::shared_ptr<CsPad::ns_ConfigV5_v0::dataset_config> m_ds_config;
+  void read_ds_config() const;
+  mutable ndarray<const Psana::CsPad::ProtectionSystemThreshold, 1> m_ds_storage_config_protectionThresholds;
+  mutable ndarray<ConfigV3QuadReg_v0, 1> m_ds_storage_config_quads;
+};
+
+boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::ConfigV5> > make_ConfigV5(int version, hdf5pp::Group group, hsize_t idx);
+
 namespace ns_ElementV1_v0 {
 struct dataset_element {
   static hdf5pp::Type native_type();
@@ -677,6 +830,7 @@ boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::DataV1> > make_DataV1(int version, 
 boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::DataV1> > make_DataV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::CsPad::ConfigV2>& cfg);
 boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::DataV1> > make_DataV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::CsPad::ConfigV3>& cfg);
 boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::DataV1> > make_DataV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::CsPad::ConfigV4>& cfg);
+boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::DataV1> > make_DataV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::CsPad::ConfigV5>& cfg);
 
 namespace ns_ElementV2_v0 {
 struct dataset_element {
@@ -741,6 +895,7 @@ private:
 boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::DataV2> > make_DataV2(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::CsPad::ConfigV2>& cfg);
 boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::DataV2> > make_DataV2(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::CsPad::ConfigV3>& cfg);
 boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::DataV2> > make_DataV2(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::CsPad::ConfigV4>& cfg);
+boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::DataV2> > make_DataV2(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::CsPad::ConfigV5>& cfg);
 } // namespace CsPad
 } // namespace psddl_hdf2psana
 #endif // PSDDL_HDF2PSANA_CSPAD_DDL_H

@@ -519,6 +519,180 @@ void ConfigV2QuadReg_v0::read_ds_data() const {
   m_ds_data = hdf5pp::Utils::readGroup<CsPad::ns_ConfigV2QuadReg_v0::dataset_data>(m_group, "data", m_idx);
 }
 
+hdf5pp::Type ns_ConfigV3QuadReg_v0_dataset_data_stored_type()
+{
+  typedef ns_ConfigV3QuadReg_v0::dataset_data DsType;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
+  type.insert("readClkSet", offsetof(DsType, readClkSet), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("readClkHold", offsetof(DsType, readClkHold), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("dataMode", offsetof(DsType, dataMode), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("prstSel", offsetof(DsType, prstSel), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("acqDelay", offsetof(DsType, acqDelay), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("intTime", offsetof(DsType, intTime), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("digDelay", offsetof(DsType, digDelay), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("ampIdle", offsetof(DsType, ampIdle), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("injTotal", offsetof(DsType, injTotal), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("rowColShiftPer", offsetof(DsType, rowColShiftPer), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("ampReset", offsetof(DsType, ampReset), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("digCount", offsetof(DsType, digCount), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("digPeriod", offsetof(DsType, digPeriod), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("biasTuning", offsetof(DsType, biasTuning), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("pdpmndnmBalance", offsetof(DsType, pdpmndnmBalance), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("readOnly", offsetof(DsType, readOnly), hdf5pp::TypeTraits<CsPad::ns_CsPadReadOnlyCfg_v0::dataset_data>::stored_type());
+  type.insert("digitalPots", offsetof(DsType, digitalPots), hdf5pp::TypeTraits<CsPad::ns_CsPadDigitalPotsCfg_v0::dataset_data>::stored_type());
+  type.insert("gainMap", offsetof(DsType, gainMap), hdf5pp::TypeTraits<CsPad::ns_CsPadGainMapCfg_v0::dataset_data>::stored_type());
+  hsize_t _array_type_shiftSelect_shape[] = { 4 };
+  hdf5pp::ArrayType _array_type_shiftSelect = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint32_t>::stored_type(), 1, _array_type_shiftSelect_shape);
+  type.insert("shiftSelect", offsetof(DsType, shiftSelect), _array_type_shiftSelect);
+  hsize_t _array_type_edgeSelect_shape[] = { 4 };
+  hdf5pp::ArrayType _array_type_edgeSelect = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint32_t>::stored_type(), 1, _array_type_edgeSelect_shape);
+  type.insert("edgeSelect", offsetof(DsType, edgeSelect), _array_type_edgeSelect);
+  return type;
+}
+
+hdf5pp::Type ns_ConfigV3QuadReg_v0::dataset_data::stored_type()
+{
+  static hdf5pp::Type type = ns_ConfigV3QuadReg_v0_dataset_data_stored_type();
+  return type;
+}
+
+hdf5pp::Type ns_ConfigV3QuadReg_v0_dataset_data_native_type()
+{
+  typedef ns_ConfigV3QuadReg_v0::dataset_data DsType;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
+  type.insert("readClkSet", offsetof(DsType, readClkSet), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("readClkHold", offsetof(DsType, readClkHold), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("dataMode", offsetof(DsType, dataMode), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("prstSel", offsetof(DsType, prstSel), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("acqDelay", offsetof(DsType, acqDelay), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("intTime", offsetof(DsType, intTime), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("digDelay", offsetof(DsType, digDelay), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("ampIdle", offsetof(DsType, ampIdle), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("injTotal", offsetof(DsType, injTotal), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("rowColShiftPer", offsetof(DsType, rowColShiftPer), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("ampReset", offsetof(DsType, ampReset), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("digCount", offsetof(DsType, digCount), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("digPeriod", offsetof(DsType, digPeriod), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("biasTuning", offsetof(DsType, biasTuning), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("pdpmndnmBalance", offsetof(DsType, pdpmndnmBalance), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("readOnly", offsetof(DsType, readOnly), hdf5pp::TypeTraits<CsPad::ns_CsPadReadOnlyCfg_v0::dataset_data>::native_type());
+  type.insert("digitalPots", offsetof(DsType, digitalPots), hdf5pp::TypeTraits<CsPad::ns_CsPadDigitalPotsCfg_v0::dataset_data>::native_type());
+  type.insert("gainMap", offsetof(DsType, gainMap), hdf5pp::TypeTraits<CsPad::ns_CsPadGainMapCfg_v0::dataset_data>::native_type());
+  hsize_t _array_type_shiftSelect_shape[] = { 4 };
+  hdf5pp::ArrayType _array_type_shiftSelect = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint32_t>::native_type(), 1, _array_type_shiftSelect_shape);
+  type.insert("shiftSelect", offsetof(DsType, shiftSelect), _array_type_shiftSelect);
+  hsize_t _array_type_edgeSelect_shape[] = { 4 };
+  hdf5pp::ArrayType _array_type_edgeSelect = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint32_t>::native_type(), 1, _array_type_edgeSelect_shape);
+  type.insert("edgeSelect", offsetof(DsType, edgeSelect), _array_type_edgeSelect);
+  return type;
+}
+
+hdf5pp::Type ns_ConfigV3QuadReg_v0::dataset_data::native_type()
+{
+  static hdf5pp::Type type = ns_ConfigV3QuadReg_v0_dataset_data_native_type();
+  return type;
+}
+ns_ConfigV3QuadReg_v0::dataset_data::dataset_data()
+{
+}
+ns_ConfigV3QuadReg_v0::dataset_data::~dataset_data()
+{
+}
+ndarray<const uint32_t, 1> ConfigV3QuadReg_v0::shiftSelect() const {
+  if (not m_ds_data) read_ds_data();
+  boost::shared_ptr<uint32_t> ptr(m_ds_data, m_ds_data->shiftSelect);
+  return make_ndarray(ptr, TwoByTwosPerQuad);
+}
+ndarray<const uint32_t, 1> ConfigV3QuadReg_v0::edgeSelect() const {
+  if (not m_ds_data) read_ds_data();
+  boost::shared_ptr<uint32_t> ptr(m_ds_data, m_ds_data->edgeSelect);
+  return make_ndarray(ptr, TwoByTwosPerQuad);
+}
+uint32_t ConfigV3QuadReg_v0::readClkSet() const {
+  if (not m_ds_data) read_ds_data();
+  return uint32_t(m_ds_data->readClkSet);
+}
+uint32_t ConfigV3QuadReg_v0::readClkHold() const {
+  if (not m_ds_data) read_ds_data();
+  return uint32_t(m_ds_data->readClkHold);
+}
+uint32_t ConfigV3QuadReg_v0::dataMode() const {
+  if (not m_ds_data) read_ds_data();
+  return uint32_t(m_ds_data->dataMode);
+}
+uint32_t ConfigV3QuadReg_v0::prstSel() const {
+  if (not m_ds_data) read_ds_data();
+  return uint32_t(m_ds_data->prstSel);
+}
+uint32_t ConfigV3QuadReg_v0::acqDelay() const {
+  if (not m_ds_data) read_ds_data();
+  return uint32_t(m_ds_data->acqDelay);
+}
+uint32_t ConfigV3QuadReg_v0::intTime() const {
+  if (not m_ds_data) read_ds_data();
+  return uint32_t(m_ds_data->intTime);
+}
+uint32_t ConfigV3QuadReg_v0::digDelay() const {
+  if (not m_ds_data) read_ds_data();
+  return uint32_t(m_ds_data->digDelay);
+}
+uint32_t ConfigV3QuadReg_v0::ampIdle() const {
+  if (not m_ds_data) read_ds_data();
+  return uint32_t(m_ds_data->ampIdle);
+}
+uint32_t ConfigV3QuadReg_v0::injTotal() const {
+  if (not m_ds_data) read_ds_data();
+  return uint32_t(m_ds_data->injTotal);
+}
+uint32_t ConfigV3QuadReg_v0::rowColShiftPer() const {
+  if (not m_ds_data) read_ds_data();
+  return uint32_t(m_ds_data->rowColShiftPer);
+}
+uint32_t ConfigV3QuadReg_v0::ampReset() const {
+  if (not m_ds_data) read_ds_data();
+  return uint32_t(m_ds_data->ampReset);
+}
+uint32_t ConfigV3QuadReg_v0::digCount() const {
+  if (not m_ds_data) read_ds_data();
+  return uint32_t(m_ds_data->digCount);
+}
+uint32_t ConfigV3QuadReg_v0::digPeriod() const {
+  if (not m_ds_data) read_ds_data();
+  return uint32_t(m_ds_data->digPeriod);
+}
+uint32_t ConfigV3QuadReg_v0::biasTuning() const {
+  if (not m_ds_data) read_ds_data();
+  return uint32_t(m_ds_data->biasTuning);
+}
+uint32_t ConfigV3QuadReg_v0::pdpmndnmBalance() const {
+  if (not m_ds_data) read_ds_data();
+  return uint32_t(m_ds_data->pdpmndnmBalance);
+}
+const Psana::CsPad::CsPadReadOnlyCfg& ConfigV3QuadReg_v0::ro() const {
+  if (not m_ds_data) read_ds_data();
+  m_ds_storage_data_readOnly = Psana::CsPad::CsPadReadOnlyCfg(m_ds_data->readOnly);
+  return m_ds_storage_data_readOnly;
+}
+const Psana::CsPad::CsPadDigitalPotsCfg& ConfigV3QuadReg_v0::dp() const {
+  if (not m_ds_storage_data_digitalPots) {
+    if (not m_ds_data) read_ds_data();
+    boost::shared_ptr<CsPad::ns_CsPadDigitalPotsCfg_v0::dataset_data> tmp(m_ds_data, &m_ds_data->digitalPots);
+    m_ds_storage_data_digitalPots = boost::make_shared<CsPad::CsPadDigitalPotsCfg_v0>(tmp);
+  }
+  return *m_ds_storage_data_digitalPots;
+}
+const Psana::CsPad::CsPadGainMapCfg& ConfigV3QuadReg_v0::gm() const {
+  if (not m_ds_storage_data_gainMap) {
+    if (not m_ds_data) read_ds_data();
+    boost::shared_ptr<CsPad::ns_CsPadGainMapCfg_v0::dataset_data> tmp(m_ds_data, &m_ds_data->gainMap);
+    m_ds_storage_data_gainMap = boost::make_shared<CsPad::CsPadGainMapCfg_v0>(tmp);
+  }
+  return *m_ds_storage_data_gainMap;
+}
+void ConfigV3QuadReg_v0::read_ds_data() const {
+  m_ds_data = hdf5pp::Utils::readGroup<CsPad::ns_ConfigV3QuadReg_v0::dataset_data>(m_group, "data", m_idx);
+}
+
 hdf5pp::Type ns_ConfigV1_v0_dataset_config_stored_type()
 {
   typedef ns_ConfigV1_v0::dataset_config DsType;
@@ -1193,6 +1367,197 @@ boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::ConfigV4> > make_ConfigV4(int versi
   }
 }
 
+hdf5pp::Type ns_ConfigV5_v0_dataset_config_stored_type()
+{
+  typedef ns_ConfigV5_v0::dataset_config DsType;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
+  type.insert("concentratorVersion", offsetof(DsType, concentratorVersion), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("runDelay", offsetof(DsType, runDelay), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("eventCode", offsetof(DsType, eventCode), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("protectionEnable", offsetof(DsType, protectionEnable), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("inactiveRunMode", offsetof(DsType, inactiveRunMode), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("activeRunMode", offsetof(DsType, activeRunMode), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("internalTriggerDelay", offsetof(DsType, internalTriggerDelay), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("testDataIndex", offsetof(DsType, testDataIndex), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("payloadPerQuad", offsetof(DsType, payloadPerQuad), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("badAsicMask0", offsetof(DsType, badAsicMask0), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("badAsicMask1", offsetof(DsType, badAsicMask1), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("asicMask", offsetof(DsType, asicMask), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("quadMask", offsetof(DsType, quadMask), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("roiMask", offsetof(DsType, roiMask), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  hsize_t _array_type_protectionThresholds_shape[] = { 4 };
+  hdf5pp::ArrayType _array_type_protectionThresholds = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<CsPad::ns_ProtectionSystemThreshold_v0::dataset_data>::stored_type(), 1, _array_type_protectionThresholds_shape);
+  type.insert("protectionThresholds", offsetof(DsType, protectionThresholds), _array_type_protectionThresholds);
+  hsize_t _array_type_quads_shape[] = { 4 };
+  hdf5pp::ArrayType _array_type_quads = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<CsPad::ns_ConfigV3QuadReg_v0::dataset_data>::stored_type(), 1, _array_type_quads_shape);
+  type.insert("quads", offsetof(DsType, quads), _array_type_quads);
+  return type;
+}
+
+hdf5pp::Type ns_ConfigV5_v0::dataset_config::stored_type()
+{
+  static hdf5pp::Type type = ns_ConfigV5_v0_dataset_config_stored_type();
+  return type;
+}
+
+hdf5pp::Type ns_ConfigV5_v0_dataset_config_native_type()
+{
+  typedef ns_ConfigV5_v0::dataset_config DsType;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
+  type.insert("concentratorVersion", offsetof(DsType, concentratorVersion), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("runDelay", offsetof(DsType, runDelay), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("eventCode", offsetof(DsType, eventCode), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("protectionEnable", offsetof(DsType, protectionEnable), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("inactiveRunMode", offsetof(DsType, inactiveRunMode), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("activeRunMode", offsetof(DsType, activeRunMode), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("internalTriggerDelay", offsetof(DsType, internalTriggerDelay), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("testDataIndex", offsetof(DsType, testDataIndex), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("payloadPerQuad", offsetof(DsType, payloadPerQuad), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("badAsicMask0", offsetof(DsType, badAsicMask0), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("badAsicMask1", offsetof(DsType, badAsicMask1), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("asicMask", offsetof(DsType, asicMask), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("quadMask", offsetof(DsType, quadMask), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("roiMask", offsetof(DsType, roiMask), hdf5pp::TypeTraits<uint32_t>::native_type());
+  hsize_t _array_type_protectionThresholds_shape[] = { 4 };
+  hdf5pp::ArrayType _array_type_protectionThresholds = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<CsPad::ns_ProtectionSystemThreshold_v0::dataset_data>::native_type(), 1, _array_type_protectionThresholds_shape);
+  type.insert("protectionThresholds", offsetof(DsType, protectionThresholds), _array_type_protectionThresholds);
+  hsize_t _array_type_quads_shape[] = { 4 };
+  hdf5pp::ArrayType _array_type_quads = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<CsPad::ns_ConfigV3QuadReg_v0::dataset_data>::native_type(), 1, _array_type_quads_shape);
+  type.insert("quads", offsetof(DsType, quads), _array_type_quads);
+  return type;
+}
+
+hdf5pp::Type ns_ConfigV5_v0::dataset_config::native_type()
+{
+  static hdf5pp::Type type = ns_ConfigV5_v0_dataset_config_native_type();
+  return type;
+}
+ns_ConfigV5_v0::dataset_config::dataset_config()
+{
+}
+ns_ConfigV5_v0::dataset_config::~dataset_config()
+{
+}
+uint32_t ConfigV5_v0::concentratorVersion() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->concentratorVersion);
+}
+uint32_t ConfigV5_v0::runDelay() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->runDelay);
+}
+uint32_t ConfigV5_v0::eventCode() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->eventCode);
+}
+ndarray<const Psana::CsPad::ProtectionSystemThreshold, 1> ConfigV5_v0::protectionThresholds() const {
+  if (not m_ds_config) read_ds_config();
+  if (m_ds_storage_config_protectionThresholds.empty()) {
+    unsigned shape[] = {MaxQuadsPerSensor};
+    ndarray<Psana::CsPad::ProtectionSystemThreshold, 1> tmparr(shape);
+    unsigned size = tmparr.size();
+    ndarray<Psana::CsPad::ProtectionSystemThreshold, 1>::iterator it = tmparr.begin();
+    for (unsigned i = 0; i != size; ++ i, ++ it) {
+      *it = Psana::CsPad::ProtectionSystemThreshold(m_ds_config->protectionThresholds[i]);
+    }
+    m_ds_storage_config_protectionThresholds = tmparr;
+  }
+  return m_ds_storage_config_protectionThresholds;
+}
+uint32_t ConfigV5_v0::protectionEnable() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->protectionEnable);
+}
+uint32_t ConfigV5_v0::inactiveRunMode() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->inactiveRunMode);
+}
+uint32_t ConfigV5_v0::activeRunMode() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->activeRunMode);
+}
+uint32_t ConfigV5_v0::internalTriggerDelay() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->internalTriggerDelay);
+}
+uint32_t ConfigV5_v0::tdi() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->testDataIndex);
+}
+uint32_t ConfigV5_v0::payloadSize() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->payloadPerQuad);
+}
+uint32_t ConfigV5_v0::badAsicMask0() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->badAsicMask0);
+}
+uint32_t ConfigV5_v0::badAsicMask1() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->badAsicMask1);
+}
+uint32_t ConfigV5_v0::asicMask() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->asicMask);
+}
+uint32_t ConfigV5_v0::quadMask() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->quadMask);
+}
+uint32_t ConfigV5_v0::roiMasks() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->roiMask);
+}
+const Psana::CsPad::ConfigV3QuadReg& ConfigV5_v0::quads(uint32_t i0) const {
+  if (not m_ds_config) read_ds_config();
+  if (m_ds_storage_config_quads.empty()) {
+    unsigned shape[] = {MaxQuadsPerSensor};
+    ndarray<ConfigV3QuadReg_v0, 1> tmparr(shape);
+    for (int i = 0; i != 4; ++ i) {
+      boost::shared_ptr<CsPad::ns_ConfigV3QuadReg_v0::dataset_data> ptr(m_ds_config, &m_ds_config->quads[i]);
+      tmparr.begin()[i] = ConfigV3QuadReg_v0(ptr);
+    }
+    m_ds_storage_config_quads = tmparr;
+  }
+  return m_ds_storage_config_quads[i0];
+}
+uint32_t
+ConfigV5_v0::numAsicsRead() const{ 
+return (this->asicMask() & 0xf)==1 ? 4 : 16; 
+}
+uint32_t
+ConfigV5_v0::roiMask(uint32_t iq) const{ 
+return (this->roiMasks() >> (8*iq)) & 0xff; 
+}
+uint32_t
+ConfigV5_v0::numAsicsStored(uint32_t iq) const{ 
+return __builtin_popcount(this->roiMask(iq))*2; 
+}
+uint32_t
+ConfigV5_v0::numQuads() const{ 
+return __builtin_popcount(this->quadMask()); 
+}
+uint32_t
+ConfigV5_v0::numSect() const{ 
+return __builtin_popcount(this->roiMasks()); 
+}
+std::vector<int>
+ConfigV5_v0::quads_shape() const{ 
+  int shape[] = { MaxQuadsPerSensor };
+  return std::vector<int>(shape, shape+1); 
+}
+void ConfigV5_v0::read_ds_config() const {
+  m_ds_config = hdf5pp::Utils::readGroup<CsPad::ns_ConfigV5_v0::dataset_config>(m_group, "config", m_idx);
+}
+boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::ConfigV5> > make_ConfigV5(int version, hdf5pp::Group group, hsize_t idx) {
+  switch (version) {
+  case 0:
+    return boost::make_shared<PSEvt::DataProxy<Psana::CsPad::ConfigV5> >(boost::make_shared<ConfigV5_v0>(group, idx));
+  default:
+    return boost::make_shared<PSEvt::DataProxy<Psana::CsPad::ConfigV5> >(boost::shared_ptr<Psana::CsPad::ConfigV5>());
+  }
+}
+
 hdf5pp::Type ns_ElementV1_v0_dataset_element_stored_type()
 {
   typedef ns_ElementV1_v0::dataset_element DsType;
@@ -1335,6 +1700,7 @@ template class ElementV1_v0<Psana::CsPad::ConfigV1>;
 template class ElementV1_v0<Psana::CsPad::ConfigV2>;
 template class ElementV1_v0<Psana::CsPad::ConfigV3>;
 template class ElementV1_v0<Psana::CsPad::ConfigV4>;
+template class ElementV1_v0<Psana::CsPad::ConfigV5>;
 boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::DataV1> > make_DataV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::CsPad::ConfigV1>& cfg) {
   switch (version) {
   case 0:
@@ -1363,6 +1729,14 @@ boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::DataV1> > make_DataV1(int version, 
   switch (version) {
   case 0:
     return boost::make_shared<PSEvt::DataProxy<Psana::CsPad::DataV1> >(boost::make_shared<DataV1_v0<Psana::CsPad::ConfigV4> >(group, idx, cfg));
+  default:
+    return boost::make_shared<PSEvt::DataProxy<Psana::CsPad::DataV1> >(boost::shared_ptr<Psana::CsPad::DataV1>());
+  }
+}
+boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::DataV1> > make_DataV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::CsPad::ConfigV5>& cfg) {
+  switch (version) {
+  case 0:
+    return boost::make_shared<PSEvt::DataProxy<Psana::CsPad::DataV1> >(boost::make_shared<DataV1_v0<Psana::CsPad::ConfigV5> >(group, idx, cfg));
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::CsPad::DataV1> >(boost::shared_ptr<Psana::CsPad::DataV1>());
   }
@@ -1509,6 +1883,7 @@ void ElementV2_v0<Config>::read_ds_data() const {
 template class ElementV2_v0<Psana::CsPad::ConfigV2>;
 template class ElementV2_v0<Psana::CsPad::ConfigV3>;
 template class ElementV2_v0<Psana::CsPad::ConfigV4>;
+template class ElementV2_v0<Psana::CsPad::ConfigV5>;
 boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::DataV2> > make_DataV2(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::CsPad::ConfigV2>& cfg) {
   switch (version) {
   case 0:
@@ -1529,6 +1904,14 @@ boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::DataV2> > make_DataV2(int version, 
   switch (version) {
   case 0:
     return boost::make_shared<PSEvt::DataProxy<Psana::CsPad::DataV2> >(boost::make_shared<DataV2_v0<Psana::CsPad::ConfigV4> >(group, idx, cfg));
+  default:
+    return boost::make_shared<PSEvt::DataProxy<Psana::CsPad::DataV2> >(boost::shared_ptr<Psana::CsPad::DataV2>());
+  }
+}
+boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::DataV2> > make_DataV2(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::CsPad::ConfigV5>& cfg) {
+  switch (version) {
+  case 0:
+    return boost::make_shared<PSEvt::DataProxy<Psana::CsPad::DataV2> >(boost::make_shared<DataV2_v0<Psana::CsPad::ConfigV5> >(group, idx, cfg));
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::CsPad::DataV2> >(boost::shared_ptr<Psana::CsPad::DataV2>());
   }

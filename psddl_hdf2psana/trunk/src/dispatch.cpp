@@ -264,6 +264,8 @@ try {
       evt.putProxy(psddl_hdf2psana::CsPad::make_DataV1(schema_version, group, idx, cfgPtr), src);
     } else if (boost::shared_ptr<Psana::CsPad::ConfigV4> cfgPtr = cfgStore.get(src)) {
       evt.putProxy(psddl_hdf2psana::CsPad::make_DataV1(schema_version, group, idx, cfgPtr), src);
+    } else if (boost::shared_ptr<Psana::CsPad::ConfigV5> cfgPtr = cfgStore.get(src)) {
+      evt.putProxy(psddl_hdf2psana::CsPad::make_DataV1(schema_version, group, idx, cfgPtr), src);
     }
     break;
   case 1461968858:
@@ -273,6 +275,8 @@ try {
     } else if (boost::shared_ptr<Psana::CsPad::ConfigV3> cfgPtr = cfgStore.get(src)) {
       evt.putProxy(psddl_hdf2psana::CsPad::make_DataV2(schema_version, group, idx, cfgPtr), src);
     } else if (boost::shared_ptr<Psana::CsPad::ConfigV4> cfgPtr = cfgStore.get(src)) {
+      evt.putProxy(psddl_hdf2psana::CsPad::make_DataV2(schema_version, group, idx, cfgPtr), src);
+    } else if (boost::shared_ptr<Psana::CsPad::ConfigV5> cfgPtr = cfgStore.get(src)) {
       evt.putProxy(psddl_hdf2psana::CsPad::make_DataV2(schema_version, group, idx, cfgPtr), src);
     }
     break;
@@ -424,6 +428,10 @@ try {
     // CsPad::ConfigV4
     cfgStore.putProxy(psddl_hdf2psana::CsPad::make_ConfigV4(schema_version, group, idx), src);
     break;
+  case 2940448585:
+    // CsPad::ConfigV5
+    cfgStore.putProxy(psddl_hdf2psana::CsPad::make_ConfigV5(schema_version, group, idx), src);
+    break;
   case 2940448589:
     // CsPad::ConfigV1
     cfgStore.putProxy(psddl_hdf2psana::CsPad::make_ConfigV1(schema_version, group, idx), src);
@@ -478,6 +486,8 @@ try {
       evt.putProxy(psddl_hdf2psana::CsPad::make_DataV2(schema_version, group, idx, cfgPtr), src);
     } else if (boost::shared_ptr<Psana::CsPad::ConfigV4> cfgPtr = cfgStore.get(src)) {
       evt.putProxy(psddl_hdf2psana::CsPad::make_DataV2(schema_version, group, idx, cfgPtr), src);
+    } else if (boost::shared_ptr<Psana::CsPad::ConfigV5> cfgPtr = cfgStore.get(src)) {
+      evt.putProxy(psddl_hdf2psana::CsPad::make_DataV2(schema_version, group, idx, cfgPtr), src);
     }
     break;
   case 3467424663:
@@ -489,6 +499,8 @@ try {
     } else if (boost::shared_ptr<Psana::CsPad::ConfigV3> cfgPtr = cfgStore.get(src)) {
       evt.putProxy(psddl_hdf2psana::CsPad::make_DataV1(schema_version, group, idx, cfgPtr), src);
     } else if (boost::shared_ptr<Psana::CsPad::ConfigV4> cfgPtr = cfgStore.get(src)) {
+      evt.putProxy(psddl_hdf2psana::CsPad::make_DataV1(schema_version, group, idx, cfgPtr), src);
+    } else if (boost::shared_ptr<Psana::CsPad::ConfigV5> cfgPtr = cfgStore.get(src)) {
       evt.putProxy(psddl_hdf2psana::CsPad::make_DataV1(schema_version, group, idx, cfgPtr), src);
     }
     break;
