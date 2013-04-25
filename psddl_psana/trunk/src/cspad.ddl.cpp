@@ -19,6 +19,9 @@ ConfigV1QuadReg::~ConfigV1QuadReg() {}
 ConfigV2QuadReg::~ConfigV2QuadReg() {}
 
 
+ConfigV3QuadReg::~ConfigV3QuadReg() {}
+
+
 ConfigV1::~ConfigV1() {}
 
 
@@ -29,6 +32,9 @@ ConfigV3::~ConfigV3() {}
 
 
 ConfigV4::~ConfigV4() {}
+
+
+ConfigV5::~ConfigV5() {}
 
 
 ElementV1::~ElementV1() {}
