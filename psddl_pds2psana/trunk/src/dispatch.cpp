@@ -287,6 +287,16 @@ try {
           cfgStore.put(obj, xtc->src);
         }
         break;
+      case 5:
+        {
+          // store XTC object in config store
+          boost::shared_ptr<PsddlPds::CsPad::ConfigV5> xptr(xtc, (PsddlPds::CsPad::ConfigV5*)(xtc->payload()));
+          cfgStore.put(xptr, xtc->src);
+          // create and store psana object in config store
+          boost::shared_ptr<Psana::CsPad::ConfigV5> obj = boost::make_shared<psddl_pds2psana::CsPad::ConfigV5>(xptr);
+          cfgStore.put(obj, xtc->src);
+        }
+        break;
       } // end switch (version)
     }
     break;
@@ -311,6 +321,10 @@ try {
             // store proxy
             typedef EvtProxyCfg<Psana::CsPad::DataV1, psddl_pds2psana::CsPadDataOrdered<psddl_pds2psana::CsPad::DataV1, Psana::CsPad::ElementV1>, PsddlPds::CsPad::DataV1, PsddlPds::CsPad::ConfigV4> ProxyType;
             if (evt) evt->putProxy<Psana::CsPad::DataV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
+          } else if (boost::shared_ptr<PsddlPds::CsPad::ConfigV5> cfgPtr = cfgStore.get(xtc->src)) {
+            // store proxy
+            typedef EvtProxyCfg<Psana::CsPad::DataV1, psddl_pds2psana::CsPadDataOrdered<psddl_pds2psana::CsPad::DataV1, Psana::CsPad::ElementV1>, PsddlPds::CsPad::DataV1, PsddlPds::CsPad::ConfigV5> ProxyType;
+            if (evt) evt->putProxy<Psana::CsPad::DataV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
           }
         }
         break;
@@ -327,6 +341,10 @@ try {
           } else if (boost::shared_ptr<PsddlPds::CsPad::ConfigV4> cfgPtr = cfgStore.get(xtc->src)) {
             // store proxy
             typedef EvtProxyCfg<Psana::CsPad::DataV2, psddl_pds2psana::CsPadDataOrdered<psddl_pds2psana::CsPad::DataV2, Psana::CsPad::ElementV2>, PsddlPds::CsPad::DataV2, PsddlPds::CsPad::ConfigV4> ProxyType;
+            if (evt) evt->putProxy<Psana::CsPad::DataV2>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
+          } else if (boost::shared_ptr<PsddlPds::CsPad::ConfigV5> cfgPtr = cfgStore.get(xtc->src)) {
+            // store proxy
+            typedef EvtProxyCfg<Psana::CsPad::DataV2, psddl_pds2psana::CsPadDataOrdered<psddl_pds2psana::CsPad::DataV2, Psana::CsPad::ElementV2>, PsddlPds::CsPad::DataV2, PsddlPds::CsPad::ConfigV5> ProxyType;
             if (evt) evt->putProxy<Psana::CsPad::DataV2>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
           }
         }
@@ -349,6 +367,10 @@ try {
             // store proxy
             typedef EvtProxyCfg<Psana::CsPad::DataV1, psddl_pds2psana::CsPadDataOrdered<psddl_pds2psana::CsPad::DataV1, Psana::CsPad::ElementV1>, PsddlPds::CsPad::DataV1, PsddlPds::CsPad::ConfigV4> ProxyType;
             if (evt) evt->putProxy<Psana::CsPad::DataV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
+          } else if (boost::shared_ptr<PsddlPds::CsPad::ConfigV5> cfgPtr = cfgStore.get(xtc->src)) {
+            // store proxy
+            typedef EvtProxyCfg<Psana::CsPad::DataV1, psddl_pds2psana::CsPadDataOrdered<psddl_pds2psana::CsPad::DataV1, Psana::CsPad::ElementV1>, PsddlPds::CsPad::DataV1, PsddlPds::CsPad::ConfigV5> ProxyType;
+            if (evt) evt->putProxy<Psana::CsPad::DataV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
           }
         }
         break;
@@ -365,6 +387,10 @@ try {
           } else if (boost::shared_ptr<PsddlPds::CsPad::ConfigV4> cfgPtr = cfgStore.get(xtc->src)) {
             // store proxy
             typedef EvtProxyCfg<Psana::CsPad::DataV2, psddl_pds2psana::CsPadDataOrdered<psddl_pds2psana::CsPad::DataV2, Psana::CsPad::ElementV2>, PsddlPds::CsPad::DataV2, PsddlPds::CsPad::ConfigV4> ProxyType;
+            if (evt) evt->putProxy<Psana::CsPad::DataV2>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
+          } else if (boost::shared_ptr<PsddlPds::CsPad::ConfigV5> cfgPtr = cfgStore.get(xtc->src)) {
+            // store proxy
+            typedef EvtProxyCfg<Psana::CsPad::DataV2, psddl_pds2psana::CsPadDataOrdered<psddl_pds2psana::CsPad::DataV2, Psana::CsPad::ElementV2>, PsddlPds::CsPad::DataV2, PsddlPds::CsPad::ConfigV5> ProxyType;
             if (evt) evt->putProxy<Psana::CsPad::DataV2>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
           }
         }
