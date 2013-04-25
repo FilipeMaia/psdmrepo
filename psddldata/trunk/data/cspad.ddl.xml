@@ -268,6 +268,77 @@
         
         <!-- ========================================================================= -->
         
+
+        <pstype name="ConfigV3QuadReg">
+        
+            Configuration data for single quadrant.
+        
+            <attribute name="_shiftSelect" type="uint32_t" shape="TwoByTwosPerQuad" accessor="shiftSelect">
+            </attribute>
+
+            <attribute name="_edgeSelect" type="uint32_t" shape="TwoByTwosPerQuad" accessor="edgeSelect">
+            </attribute>
+
+            <attribute name="_readClkSet" type="uint32_t" accessor="readClkSet">
+            </attribute>
+
+            <attribute name="_readClkHold" type="uint32_t" accessor="readClkHold">
+            </attribute>
+
+            <attribute name="_dataMode" type="uint32_t" accessor="dataMode">
+            </attribute>
+
+            <attribute name="_prstSel" type="uint32_t" accessor="prstSel">
+            </attribute>
+
+            <attribute name="_acqDelay" type="uint32_t" accessor="acqDelay">
+            </attribute>
+
+            <attribute name="_intTime" type="uint32_t" accessor="intTime">
+            </attribute>
+
+            <attribute name="_digDelay" type="uint32_t" accessor="digDelay">
+            </attribute>
+
+            <attribute name="_ampIdle" type="uint32_t" accessor="ampIdle">
+            </attribute>
+
+            <attribute name="_injTotal" type="uint32_t" accessor="injTotal">
+            </attribute>
+
+            <attribute name="_rowColShiftPer" type="uint32_t" accessor="rowColShiftPer">
+            </attribute>
+
+            <attribute name="_ampReset" type="uint32_t" accessor="ampReset">
+            </attribute>
+
+            <attribute name="_digCount" type="uint32_t" accessor="digCount">
+            </attribute>
+
+            <attribute name="_digPeriod" type="uint32_t" accessor="digPeriod">
+            </attribute>
+
+            <attribute name="_biasTuning" type="uint32_t" accessor="biasTuning">
+            </attribute>
+
+            <attribute name="_pdpmndnmBalance" type="uint32_t" accessor="pdpmndnmBalance">
+            </attribute>
+
+            <attribute name="_readOnly" type="CsPadReadOnlyCfg" accessor="ro">
+            read-only configuration
+            </attribute>
+
+            <attribute name="_digitalPots" type="CsPadDigitalPotsCfg" accessor="dp">
+            </attribute>
+
+            <attribute name="_gainMap" type="CsPadGainMapCfg" accessor="gm">
+            Gain map.
+            </attribute>
+
+        </pstype>
+        
+        <!-- ========================================================================= -->
+        
         <pstype name="ConfigV1" version="1" type_id="Id_CspadConfig">
 
             Configuration data for complete CsPad device.
@@ -564,6 +635,91 @@
         
         <!-- ========================================================================= -->
         
+        <pstype name="ConfigV5" version="5" type_id="Id_CspadConfig">
+        
+            Configuration data for complete CsPad device.
+        
+            <tag name="config-type"/>
+        
+            <attribute name="_concentratorVersion" type="uint32_t" accessor="concentratorVersion">
+            </attribute>
+
+            <attribute name="_runDelay" type="uint32_t" accessor="runDelay">
+            </attribute>
+
+            <attribute name="_eventCode" type="uint32_t" accessor="eventCode">
+            </attribute>
+
+            <attribute name="_protectionThresholds" type="ProtectionSystemThreshold" 
+                    shape="MaxQuadsPerSensor" accessor="protectionThresholds">
+            </attribute>
+
+            <attribute name="_protectionEnable" type="uint32_t" accessor="protectionEnable">
+            </attribute>
+
+            <attribute name="_inactiveRunMode" type="uint32_t" accessor="inactiveRunMode">
+            </attribute>
+
+            <attribute name="_activeRunMode" type="uint32_t" accessor="activeRunMode">
+            </attribute>
+
+            <attribute name="_internalTriggerDelay" type="uint32_t" accessor="internalTriggerDelay">
+            </attribute>
+
+            <attribute name="_testDataIndex" type="uint32_t" accessor="tdi">
+            </attribute>
+
+            <attribute name="_payloadPerQuad" type="uint32_t" accessor="payloadSize">
+            </attribute>
+
+            <attribute name="_badAsicMask0" type="uint32_t" accessor="badAsicMask0">
+            </attribute>
+
+            <attribute name="_badAsicMask1" type="uint32_t" accessor="badAsicMask1">
+            </attribute>
+
+            <attribute name="_AsicMask" type="uint32_t" accessor="asicMask">
+            </attribute>
+
+            <attribute name="_quadMask" type="uint32_t" accessor="quadMask">
+            </attribute>
+
+            <attribute name="_roiMask" type="uint32_t" accessor="roiMasks">
+            </attribute>
+
+            <attribute name="_quads" type="ConfigV3QuadReg" shape="MaxQuadsPerSensor" accessor="quads">
+            </attribute>
+
+            <method name="numAsicsRead" type="uint32_t">
+                <expr lang="C++" value="({self}.asicMask() &amp; 0xf)==1 ? 4 : 16"/>
+            </method>
+            
+            <method name="roiMask" type="uint32_t">
+                ROI mask for given quadrant
+                <arg name="iq" type="uint32_t"/>
+                <expr lang="C++" value="({self}.roiMasks() &gt;&gt; (8*iq)) &amp; 0xff"/>
+            </method>
+            
+            <method name="numAsicsStored" type="uint32_t">
+                Number of ASICs in given quadrant
+                <arg name="iq" type="uint32_t"/>
+                <expr lang="C++" value="__builtin_popcount({self}.roiMask(iq))*2"/>
+            </method>
+            
+            <method name="numQuads" type="uint32_t">
+                Total number of quadrants in setup
+                <expr lang="C++" value="__builtin_popcount({self}.quadMask())"/>
+            </method>
+
+            <method name="numSect" type="uint32_t">
+                Total number of sections (2x1) in all quadrants
+                <expr lang="C++" value="__builtin_popcount({self}.roiMasks())"/>
+            </method>
+
+        </pstype>
+        
+        <!-- ========================================================================= -->
+        
         <pstype name="ElementV1">
 
             CsPad data from single CsPad quadrant.
@@ -576,6 +732,7 @@
             <xtc-config name="ConfigV2" />
             <xtc-config name="ConfigV3" />
             <xtc-config name="ConfigV4" />
+            <xtc-config name="ConfigV5" />
         
             <attribute name="_word0" type="uint32_t" accessor="">
             
@@ -660,6 +817,7 @@
             <xtc-config name="ConfigV2" />
             <xtc-config name="ConfigV3" />
             <xtc-config name="ConfigV4" />
+            <xtc-config name="ConfigV5" />
 
             <attribute name="_quads" type="ElementV1" shape="{xtc-config}.numQuads()" 
                     accessor="quads">
@@ -683,6 +841,7 @@
             <xtc-config name="ConfigV2" />
             <xtc-config name="ConfigV3" />
             <xtc-config name="ConfigV4" />
+            <xtc-config name="ConfigV5" />
             
             <attribute name="_word0" type="uint32_t" accessor="">
             
@@ -764,6 +923,7 @@
             <xtc-config name="ConfigV2" />
             <xtc-config name="ConfigV3" />
             <xtc-config name="ConfigV4" />
+            <xtc-config name="ConfigV5" />
 
             <attribute name="_quads" type="ElementV2" shape="{xtc-config}.numQuads()" 
                         accessor="quads">
