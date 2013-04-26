@@ -1,0 +1,133 @@
+#!/bin/sh
+#
+# Shell script which strarts web service process
+#
+# $Id: ic-auto-translate-runner 6093 2013-04-10 05:10:24Z salnikov@SLAC.STANFORD.EDU $
+#
+
+# location of Pylons venv
+venv=/reg/g/psdm/sw/external/Pylons/0.9.7-python2.7/x86_64-rhel5-gcc41-opt
+
+# release location
+release=/reg/g/psdm/sw/releases/web-0.2.0
+#release=/reg/neh/home1/salnikov/releases/web-0.1.14
+
+# log directory
+logdir="/reg/g/psdm/web/ws/logs/`hostname`"
+
+export LANG=C
+
+# ===================================================================
+
+config=production.ini
+key=
+
+usage () {
+  echo
+  echo "Usage: $(basename $0) [options] <package> <key>"
+  echo "  Options:"
+  echo "    -h            - print this message"
+  echo "    -c file       - config file name (def: $config)"
+  echo "    -r release    - path to the release (def: $release)"
+  echo "    -l directory  - log file dir (def: $logdir)"
+  echo
+  echo "Starts a process which launches web service and restarts it when it dies."  
+  echo "Package is the name of the software package which defines the service and"  
+  echo "contains configuration file. Key is a unique string which identifies both"  
+  echo "the log file name and PID file name."  
+  echo
+}
+
+while getopts hc:r:l: c ; do
+  case $c in
+    h) usage ; exit 0 ;;
+	c) config="$OPTARG" ;;
+	r) release="$OPTARG" ;;
+	l) logdir="$OPTARG" ;;
+    \?) usage 1>&2; exit 2 ;;
+  esac
+done
+shift `expr $OPTIND - 1`
+
+# get positional args
+test $# -eq 2 || { usage 1>&2; exit 2; }
+package="$1"
+key="$2"
+
+# PID file
+pid_file="/var/tmp/web-service-start.$key.pid"
+
+# check pid file first
+if [ -f "$pid_file" ] ; then
+  if [ -d /proc/`cat $pid_file` ] ; then
+    echo "*** ERROR: Another process with PID" `cat $pid_file` "is already running" 1>&2
+    exit 2
+  fi
+fi
+
+# update PID file, this will need later update when we start subprocess
+echo $$ > "$pid_file"
+
+# allow world access
+umask 022
+
+# create log dir
+test -d "$logdir" || mkdir -p "$logdir" || exit 2
+
+# redirect output
+time=`date +%Y%m%dT%H%M%S`
+log="$logdir/web-service-$key-$time.log"
+exec >"${log}" 2>&1
+
+# cleanup env
+unset PYTHONPATH LD_LIBRARY_PATH
+
+# setup release
+test -h "$release" && sym=" -> $(readlink $release)"
+echo "[web-service-start] setup release $release$sym"
+cd "$release"
+. /reg/g/psdm/bin/sit_setup.sh
+
+# activate venv
+echo "[web-service-start] running from virtual env $venv"
+. $venv/bin/activate
+
+# writable location for egg files
+export PYTHON_EGG_CACHE=/tmp/ws-egg-cache-$$
+
+exit_handler() {
+
+    echo "[web-service-start] exiting, will try to stop child process PID $1"
+    kill HUP $1 2>/dev/null
+    sleep 2
+    kill $1 2>/dev/null
+
+}
+
+loop() {
+
+    # if the shell is killed kill the child as well
+    trap 'kill -HUP $child' EXIT
+	
+	# run server in a loop, pause after each crash
+	while true; do
+		echo "[web-service-start] Starting new server at" `date '+%Y-%m-%d %H:%M:%S'`
+		echo command: PYTHONPATH=web/$package:$PYTHONPATH paster serve -v web/$package/$config &
+		PYTHONPATH=web/$package:$PYTHONPATH paster serve -v web/$package/$config &
+        child=$!
+        wait $child
+        test -d /proc/$child && kill $child
+		echo "[web-service-start] server stopped at" `date '+%Y-%m-%d %H:%M:%S'`
+		echo
+		sleep 5
+	done
+			
+}
+
+# start loop in background
+loop &
+
+# update PID file 
+echo $! > "$pid_file"
+
+exit
