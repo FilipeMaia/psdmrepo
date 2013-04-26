@@ -62,6 +62,7 @@ ImgIntForBins::ImgIntForBins (const std::string& name)
   m_fname_map_bins = configStr("fname_map_bins",           "");
   m_fname_int_bins = configStr("fname_int_bins",           "");
   m_nbins          = config   ("number_of_bins",          10 );
+  m_print_bits     = config   ("print_bits",               0 );
 
   m_do_binning = (m_fname_map_bins.empty() or m_fname_int_bins.empty()) ? false : true;
 }

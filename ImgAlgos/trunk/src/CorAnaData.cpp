@@ -189,12 +189,15 @@ CorAnaData::sumCorTau(unsigned i, unsigned f) // i and f are the event indexes
 
    data_t* p_i = &m_data[i*m_blk_size];
    data_t* p_f = &m_data[f*m_blk_size];
+   double Ii, If;
 
    for(unsigned pix=0; pix<m_blk_size; pix++) {
-     m_sum_gi[pix] += p_i[pix]; 
-     m_sum_gf[pix] += p_f[pix]; 
-     m_sum_g2[pix] += p_i[pix]*p_f[pix]; 
-     m_sum_st[pix] += 1; 
+     Ii = p_i[pix]; 
+     If = p_f[pix]; 
+     m_sum_gi[pix] += Ii; 
+     m_sum_gf[pix] += If; 
+     m_sum_g2[pix] += Ii*If; 
+     m_sum_st[pix] ++; 
    }
 }
 
@@ -206,11 +209,10 @@ CorAnaData::saveCorTau(std::ostream& out)
    m_log << "  ->  CorAnaData::saveCorTau(tau)";
 
    for(unsigned pix=0; pix<m_blk_size; pix++) {
-     if(m_sum_st[pix]) {
+       if(m_sum_st[pix]<1) continue;
        m_cor_gi[pix] = cor_t( m_sum_gi[pix] / m_sum_st[pix] ); 
        m_cor_gf[pix] = cor_t( m_sum_gf[pix] / m_sum_st[pix] ); 
        m_cor_g2[pix] = cor_t( m_sum_g2[pix] / m_sum_st[pix] ); 
-     }
    }
 
    out.write(reinterpret_cast<const char*>(m_cor_gi), m_blk_size*sizeof(cor_t));
