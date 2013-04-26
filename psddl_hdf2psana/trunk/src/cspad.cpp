@@ -89,6 +89,7 @@ template class DataV1_v0<Psana::CsPad::ConfigV1>;
 template class DataV1_v0<Psana::CsPad::ConfigV2>;
 template class DataV1_v0<Psana::CsPad::ConfigV3>;
 template class DataV1_v0<Psana::CsPad::ConfigV4>;
+template class DataV1_v0<Psana::CsPad::ConfigV5>;
 
 template <typename Config>
 const Psana::CsPad::ElementV2&
@@ -154,6 +155,7 @@ DataV2_v0<Config>::read_elements() const
 template class DataV2_v0<Psana::CsPad::ConfigV2>;
 template class DataV2_v0<Psana::CsPad::ConfigV3>;
 template class DataV2_v0<Psana::CsPad::ConfigV4>;
+template class DataV2_v0<Psana::CsPad::ConfigV5>;
 
 } // namespace CsPad
 } // namespace psddl_hdf2psana
