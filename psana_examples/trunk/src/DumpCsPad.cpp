@@ -80,6 +80,30 @@ namespace {
     str << "\n    gainMap = " << quad.gm().gainMap();
   }
 
+  void dumpQuadReg(std::ostream& str, const Psana::CsPad::ConfigV3QuadReg& quad)
+  {
+    str << "\n    shiftSelect = " << quad.shiftSelect();
+    str << "\n    edgeSelect = " << quad.edgeSelect();
+    str << "\n    readClkSet = " << quad.readClkSet();
+    str << "\n    readClkHold = " << quad.readClkHold();
+    str << "\n    dataMode = " << quad.dataMode();
+    str << "\n    prstSel = " << quad.prstSel();
+    str << "\n    acqDelay = " << quad.acqDelay();
+    str << "\n    intTime = " << quad.intTime();
+    str << "\n    digDelay = " << quad.digDelay();
+    str << "\n    ampIdle = " << quad.ampIdle();
+    str << "\n    injTotal = " << quad.injTotal();
+    str << "\n    rowColShiftPer = " << quad.rowColShiftPer();
+    str << "\n    ampReset = " << quad.ampReset();
+    str << "\n    digCount = " << quad.digCount();
+    str << "\n    digPeriod = " << quad.digPeriod();
+    str << "\n    biasTuning = " << quad.biasTuning();
+    str << "\n    pdpmndnmBalance = " << quad.pdpmndnmBalance();
+    str << "\n    digitalPots = " << quad.dp().pots();
+    str << "\n    readOnly = shiftTest: " << quad.ro().shiftTest() << " verstion: " << quad.ro().version();
+    str << "\n    gainMap = " << quad.gm().gainMap();
+  }
+
 }
 
 
@@ -259,6 +283,50 @@ DumpCsPad::beginCalibCycle(Event& evt, Env& env)
       }
     }
     
+  }
+
+  shared_ptr<Psana::CsPad::ConfigV5> config5 = env.configStore().get(m_src);
+  if (config5) {
+
+    WithMsgLog(name(), info, str) {
+      str << "CsPad::ConfigV5:";
+      str << "\n  concentratorVersion = " << config5->concentratorVersion();
+      str << "\n  runDelay = " << config5->runDelay();
+      str << "\n  eventCode = " << config5->eventCode();
+      str << "\n  protectionEnable = " << config5->protectionEnable();
+      str << "\n  protectionThresholds:";
+      for (unsigned i = 0; i < config5->numQuads(); ++ i) {
+        const Psana::CsPad::ProtectionSystemThreshold& thr = config5->protectionThresholds()[i];
+        str << "\n    adcThreshold=" << thr.adcThreshold()
+            << " pixelCountThreshold=" << thr.pixelCountThreshold();
+      }
+      str << "\n  inactiveRunMode = " << config5->inactiveRunMode();
+      str << "\n  activeRunMode = " << config5->activeRunMode();
+      str << "\n  tdi = " << config5->tdi();
+      str << "\n  payloadSize = " << config5->payloadSize();
+      str << "\n  badAsicMask0 = " << config5->badAsicMask0();
+      str << "\n  badAsicMask1 = " << config5->badAsicMask1();
+      str << "\n  asicMask = " << config5->asicMask();
+      str << "\n  quadMask = " << config5->quadMask();
+      str << "\n  internalTriggerDelay = " << config5->internalTriggerDelay();
+      str << "\n  numAsicsRead = " << config5->numAsicsRead();
+      str << "\n  numQuads = " << config5->numQuads();
+      str << "\n  numSect = " << config5->numSect();
+      str << "\n  roiMask =";
+      for (unsigned i = 0; i < config5->numQuads(); ++ i) {
+        str.setf(std::ios::showbase);
+        str << ' ' << std::hex << config5->roiMask(i) << std::dec;
+      }
+      str << "\n  numAsicsStored =";
+      for (unsigned i = 0; i < config5->numQuads(); ++ i) {
+        str << ' ' << config5->numAsicsStored(i);
+      }
+      for (unsigned iq = 0; iq != config5->numQuads(); ++ iq) {
+        str << "\n  quad #" << iq;
+        dumpQuadReg(str, config5->quads(iq));
+      }
+    }
+
   }
 }
 

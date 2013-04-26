@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-17
+2013-04-26 Andy Salnikov
+- add ConfigV5 to DumpCsPad
+
 Tag: V00-03-16
 2013-03-29 Andy Salnikov
 - small improvements in DumpAcqTdc
