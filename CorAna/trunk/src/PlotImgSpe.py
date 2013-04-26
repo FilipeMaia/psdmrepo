@@ -33,6 +33,9 @@ import os
 import random
 import numpy as np
 
+# For self-run debugging:
+#if __name__ == "__main__" :
+
 import matplotlib
 matplotlib.use('Qt4Agg') # forse Agg rendering to a Qt4 canvas (backend)
 #import matplotlib.pyplot as plt

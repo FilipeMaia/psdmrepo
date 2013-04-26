@@ -108,7 +108,8 @@ class EventTimeRecords :
 #
 if __name__ == "__main__" :
 
-    etr = EventTimeRecords ('work/cora-xcsi0112-r0015-data-scan-tstamp-list.txt')
+    #etr = EventTimeRecords ('work/cora-xcsi0112-r0015-data-scan-tstamp-list.txt')
+    etr = EventTimeRecords ('/reg/neh/home1/dubrovin/LCLS/PSANA-V01/work-1/t1-xcsi0112-r0015-data-scan-tstamp-list.txt')
     arr = etr.get_arr_for_plot()
     print 'Array for plot of shape; ', arr.shape, '\n', arr
 

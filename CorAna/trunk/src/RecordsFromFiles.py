@@ -88,13 +88,23 @@ class RecordsFromFiles :
     def get_intens_stat_q_bins_arr(self) :
         """Returns <I>(t, q-static) 2D array"""
         #if self.intens_stat_q_bins_vs_t != None : return self.intens_stat_q_bins_vs_t
+
+        if not os.path.exists(self.fname_int_stat_q) :
+            msg = 'The file: %s is not available' % (self.fname_int_stat_q)
+            gu.confirm_dialog_box(cp.guimain, msg)
+            return None
+
         self.intens_stat_q_bins_vs_t = gu.get_array_from_file(self.fname_int_stat_q)[:,1:] # trim column with event number
 
         if self.intens_stat_q_bins_vs_t != None :
             logger.info('I(t,q-stat) is taken from file ' + fnm.path_cora_split_int_static_q(), __name__)
             return self.intens_stat_q_bins_vs_t
         else :
-            logger.info('I(t,q-stat) file is not available', __name__)
+            msg = 'I(t,q-stat) file: %s is not available' % (fnm.path_cora_split_int_static_q())
+            msg+= '\nTo produce this file: \n1) in GUI "View Results", click on button "q stat"'\
+                + '\n2) in GUI "Run/Split" click on button "Run" and repeat processing.'
+            logger.info(msg, __name__)
+            gu.confirm_dialog_box(cp.guimain, msg)
             return np.ones((self.rows,self.cols), dtype=np.uint8)
 
 

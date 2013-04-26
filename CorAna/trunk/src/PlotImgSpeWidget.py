@@ -34,12 +34,10 @@ import random
 import numpy as np
 from math import log10
 
-try : 
+# For self-run debugging:
+if __name__ == "__main__" :
     import matplotlib
-   #matplotlib.use('GTKAgg') # forse Agg rendering to a GTK canvas (backend)
     matplotlib.use('Qt4Agg') # forse Agg rendering to a Qt4 canvas (backend)
-except UserWarning :
-    pass
 
 #from   matplotlib.figure import Figure
 import matplotlib.pyplot as plt

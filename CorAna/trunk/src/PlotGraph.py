@@ -34,12 +34,15 @@ import random
 import numpy as np
 
 # For self-run debugging:
-try :
-    import matplotlib
-    matplotlib.use('Qt4Agg') # forse Agg rendering to a Qt4 canvas (backend
-except : pass
+#if __name__ == "__main__" :
+#    import matplotlib
+#    matplotlib.use('Qt4Agg') # forse Agg rendering to a Qt4 canvas (backend)
 
+import matplotlib
+if matplotlib.get_backend() != 'Qt4Agg' : matplotlib.use('Qt4Agg')
 import matplotlib.pyplot as plt
+
+#print 'Backend:', matplotlib.get_backend()
 
 #from matplotlib.figure import Figure
 from PyQt4 import QtGui, QtCore
@@ -61,13 +64,13 @@ from ConfigParametersCorAna import confpars as cp
 class PlotGraph (QtGui.QWidget) :
     """Plot for graphic arrays"""
 
-    def __init__(self, parent=None, arrsxy=None, arrays=None, ofname='./fig_graphs.png', title='', axlabs=('','')):
+    def __init__(self, parent=None, arrays=None, ofname='./fig_graphs.png', title='', axlabs=('','')):
         QtGui.QWidget.__init__(self, parent)
         self.setGeometry(20, 40, 800, 600)
         self.setWindowTitle('Plot for G2 arrays')
         self.setFrame()
 
-        self.widgimage = imgwidg.PlotGraphWidget(parent, arrsxy, arrays, title=title, axlabs=axlabs)
+        self.widgimage = imgwidg.PlotGraphWidget(parent, arrays, title=title, axlabs=axlabs)
         #self.widgbuts  = imgbuts.PlotG2Buttons(self, self.widgimage, ofname)
         self.widgbuts  = imgbuts.PlotArrayButtons(self, self.widgimage, ofname)#, help_msg)
   
@@ -130,8 +133,8 @@ def get_arrays_for_test() :
     print_array(arr_x, 'arr_x')
     print_array(arr_n, 'arr_n')
 
-    return arrsy, arr_x, arr_n
-    #return arrsy[0,:], arr_x, arr_n
+    return arrsy, arr_x, arr_n         # MULTI-graphics
+    #return arrsy[0,:], arr_x, None    # ONE-graphic
 
 def print_array(arr, msg='') :
     print '\n' + msg + ':\n', arr
@@ -140,8 +143,6 @@ def print_array(arr, msg='') :
 def main():
     app = QtGui.QApplication(sys.argv)
     w = PlotGraph(arrays=get_arrays_for_test(), ofname='./fig_gr.png', title='My title', axlabs=( r'$\tau$[sec] ', r'$g_{2}$' ))
-    #arrsy, arr_x, arr_n = get_arrays_for_test()
-    #w = PlotGraph(arrsxy=(arrsy[0,:],arr_x), ofname='./fig_gr.png', title='My title', axlabs=( r'$\tau$[sec] ', r'$g_{2}$' ))
     w.move(QtCore.QPoint(50,50))
     w.show()
     app.exec_()

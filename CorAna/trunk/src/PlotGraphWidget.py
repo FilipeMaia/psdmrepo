@@ -37,10 +37,10 @@ from math import log10
 from ViewResults import valueToIndexProtected
 
 # For self-run debugging:
-#try :
+#if __name__ == "__main__" :
 #    import matplotlib
 #    matplotlib.use('Qt4Agg') # forse Agg rendering to a Qt4 canvas (backend)
-#except : pass
+
 
 #from   matplotlib.figure import Figure
 import matplotlib.pyplot   as plt
@@ -58,13 +58,12 @@ from PyQt4 import QtGui, QtCore
 class PlotGraphWidget (QtGui.QWidget) :
     """Plot array as a graphic and as a histogram"""
 
-    def __init__(self, parent=None, arrsxy=None, arrays=None, figsize=(10,10), title='', axlabs=('','')):
+    def __init__(self, parent=None, arrays=None, figsize=(10,10), title='', axlabs=('','')):
         QtGui.QWidget.__init__(self, parent)
         self.setWindowTitle('Matplotlib image embadded in Qt widget')
         self.setGeometry(10, 25, 1000, 700)
  
         # Expected shape arrsy.shape = (Ntau, Nq)
-        self.arrsxy  = arrsxy
         self.arrays  = arrays
         self.title   = title
         self.parent  = parent
@@ -119,7 +118,6 @@ class PlotGraphWidget (QtGui.QWidget) :
 
 
     def set_arrays_to_plot(self) :
-        self.arrsy, self.arr_x, self.arr_n = self.arrays
 
         if self.arr_x == None : self.arrx = np.arange(self.arrsy.shape[1])
         else :                  self.arrx = self.arr_x
@@ -129,6 +127,9 @@ class PlotGraphWidget (QtGui.QWidget) :
 
         # Find min/max indexes for all bins:
         length = len(self.arr_n)
+        # Protection if the requested number of bins too large
+        if length < self.nbins : self.nbins = length
+
         self.bin_ind_min     = length*np.ones(self.nbins, dtype=np.uint)
         self.bin_ind_max     = np.zeros(self.nbins, dtype=np.uint)
         self.bin_ind_counter = np.zeros(self.nbins, dtype=np.uint)
@@ -179,13 +180,15 @@ class PlotGraphWidget (QtGui.QWidget) :
         self.fig.clear()
 
         self.axgr = self.fig.add_axes([0.08, 0.08, 0.9, 0.8]) # [x0, y0, width, height]
-        if self.arrays != None :
+
+        self.arrsy, self.arr_x, self.arr_n = self.arrays
+
+        if self.arr_n != None :
             #self.axgr = self.fig.add_axes([0.08, 0.08, 0.6, 0.8]) # [x0, y0, width, height]
             self.on_draw_multigraphs()
             self.set_xyaxes_limits(self.arrx, np.array(self.list_of_arr_y).flatten(), gr_xmin, gr_xmax, gr_ymin, gr_ymax)
 
-        elif self.arrsxy != None :
-            #print 'self.arrsxy=', self.arrsxy
+        else :
             self.on_draw_onegraph()
             self.set_xyaxes_limits(self.arr_x, self.arr_y, gr_xmin, gr_xmax, gr_ymin, gr_ymax)
 
@@ -194,7 +197,7 @@ class PlotGraphWidget (QtGui.QWidget) :
         else :
             self.axgr.xaxis.set_major_locator(MaxNLocator(5))
 
-        self.axgr.set_title(self.title, fontsize=10, color='b')
+        self.axgr.set_title(self.title, fontsize=14, color='k')
         self.axgr.tick_params(axis='both', which='major', labelsize=8)
         self.axgr.yaxis.set_major_locator(MaxNLocator(5))
         self.axgr.grid(self.gridIsOn)
@@ -254,8 +257,8 @@ class PlotGraphWidget (QtGui.QWidget) :
 
 
     def on_draw_onegraph(self):
-        if self.arrsxy == None : return
-        self.arr_y, self.arr_x = self.arrsxy
+        self.arr_y, self.arr_x, self.arr_n = self.arrays
+        if self.arr_n != None : return
         self.axgr.plot(self.arr_x, self.arr_y, '-bo')
 
 
@@ -385,7 +388,8 @@ def get_arrays_for_test() :
     arrsy.shape = (rows,cols)
     arr_x = np.arange(cols)
     arr_n   = np.arange(rows)
-    return arrsy, arr_x, arr_n
+    #return arrsy, arr_x, arr_n
+    return arrsy[0,:], arr_x, None
 
 def print_array(arr, msg='') :
     print '\n' + msg + ':\n', arr
@@ -396,9 +400,7 @@ def print_array(arr, msg='') :
 def main() :
 
     app = QtGui.QApplication(sys.argv)
-    #w = PlotGraphWidget(None, arrays=get_arrays_for_test(), axlabs=(r'$g_{2}$', r'$\tau$ '))
-    arrsy, arr_x, arr_n = arrays = get_arrays_for_test()
-    w = PlotGraphWidget(None, arrsxy=(arrsy[0,:],arr_x), axlabs=(r'$g_{2}$', r'$\tau$ '))    
+    w = PlotGraphWidget(None, get_arrays_for_test(), axlabs=(r'$g_{2}$', r'$\tau$ '))    
     w.move(QtCore.QPoint(50,50))
     w.show()    
     app.exec_()

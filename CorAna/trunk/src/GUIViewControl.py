@@ -415,10 +415,18 @@ class GUIViewControl ( QtGui.QWidget ) :
         else :
             logger.warning('Request for non-implemented plot ...', __name__)
 
-        msg = 'Consumed time to get map: %11.6f sec' % (gu.get_time_sec()-t0)
-        logger.info(msg, __name__)
-        logger.info('arr2d.shape: ' + str(self.arr2d.shape) , __name__)
-        #print 'arr2d:\n', self.arr2d 
+        if self.arr2d is None :
+            logger.warning('Requested array is not found (None).'
+                           '\nDrawing command is terminated.'
+                           '\nCheck if the file is available.', __name__)
+            return False
+
+        else :
+            msg = 'Consumed time to get map: %11.6f sec' % (gu.get_time_sec()-t0)
+            logger.info(msg, __name__)
+            logger.info('arr2d.shape: ' + str(self.arr2d.shape) , __name__)
+            #print 'arr2d:\n', self.arr2d 
+            return True
 
 
     def selectedOption(self, ind, title, show_tau=False):
@@ -489,7 +497,7 @@ class GUIViewControl ( QtGui.QWidget ) :
 
 
     def redrawPlotResetLimits(self):
-        self.setImgArray()
+        if not self.setImgArray() : return
         if self.but_g2tau.hasFocus() \
         or self.but_intens_t.hasFocus() :
             cp.plotimgspe_g.set_image_array_new(self.arr2d, self.getTitle(), orient=90, y_is_flip=True)
@@ -498,7 +506,7 @@ class GUIViewControl ( QtGui.QWidget ) :
 
 
     def redrawPlot(self):
-        self.setImgArray()
+        if not self.setImgArray() : return
         cp.plotimgspe_g.set_image_array(self.arr2d, self.getTitle())
 
 
@@ -555,12 +563,26 @@ class GUIViewControl ( QtGui.QWidget ) :
             except : pass
         except :
 
+            arr_x  = rff.get_q_ave_for_stat_q_bins()
+            if arr_x is None :
+                logger.warning('Requested array q_ave_for_stat_q_bins is not available.'
+                               '\nDrawing command is terminated.'
+                               '\nCheck if the file is available.', __name__)
+                return
+
             if self.but_intens_gr.hasFocus() : 
 
-                #arrsy = rff.get_intens_stat_q_bins()
-                arrsy = rff.get_intens_stat_q_bins_arr()
-                arr_x = rff.get_q_ave_for_stat_q_bins()
-                arr_n = rff.get_time_records_arr()[:,1] # take the time of event component
+                arrsy  = rff.get_intens_stat_q_bins_arr()
+                if arrsy is None :
+                    logger.warning('Requested array q_ave_for_stat_q_bins is not available.'
+                                   '\nDrawing command is terminated.'
+                                   '\nCheck if the file is available.', __name__)
+                    return
+
+                arr_n  = rff.get_time_records_arr()[:,1] # take the time of event component
+                arrays = (arrsy, arr_x, arr_n)
+                ofname = './fig_intensity_for_static_q_t-intervals.png'
+                title  = 'Intensity for static q bins in time intervals'
                 
                 #print 'arr_n :\n',     arr_n
                 #print 'arr_n.shape :', arr_n.shape
@@ -569,20 +591,18 @@ class GUIViewControl ( QtGui.QWidget ) :
                 #print 'arrsy :\n',     arrsy
                 #print 'arrsy.shape :', arrsy.shape
                 
-                arrays = (arrsy, arr_x, arr_n)
-                labs=(r'$q_{static}$', r'$<I>(q)$')
-                cp.plot_gr = PlotGraph(None, None, arrays, ofname='./fig_graphics.png', title='Intensity for stsic bins', axlabs=labs) 
                 
             elif self.but_intens_gr1.hasFocus() :  
-                arr_y = rff.get_intens_stat_q_bins()
-                arr_x = rff.get_q_ave_for_stat_q_bins()
-                arrsxy = (arr_y, arr_x)
-                labs=(r'$q_{static}$', r'$<I>(q)$')
-                cp.plot_gr = PlotGraph(None, arrsxy, None, ofname='./fig_graphics.png', title='Intensity for stsic bins', axlabs=labs) 
-                
+
+                arr_y  = rff.get_intens_stat_q_bins()
+                arrays = (arr_y, arr_x, None)
+                ofname = './fig_intensity_for_static_q_ave.png'
+                title  = 'Intensity for static q bins averaged'
+
+            labs=(r'$q_{static}$', r'$<I>(q)$')
+            cp.plot_gr = PlotGraph(None, arrays, ofname, title, axlabs=labs)                 
             cp.plot_gr.move(self.parentWidget().parentWidget().pos().__add__(QtCore.QPoint(870,20)))
             cp.plot_gr.show()
-
 
 
 

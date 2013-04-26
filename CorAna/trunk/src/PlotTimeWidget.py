@@ -34,8 +34,10 @@ import random
 import numpy as np
 from math import log10
 
-#import matplotlib
-#matplotlib.use('Qt4Agg') # forse Agg rendering to a Qt4 canvas (backend)
+# For self-run debugging:
+if __name__ == "__main__" :
+    import matplotlib
+    matplotlib.use('Qt4Agg') # forse Agg rendering to a Qt4 canvas (backend)
 
 #from   matplotlib.figure import Figure
 import matplotlib.pyplot as plt
@@ -352,7 +354,9 @@ def get_array2d_for_test() :
 def main():
 
     app = QtGui.QApplication(sys.argv)
-    w = PlotTimeWidget(None, 'work/cora-xcsi0112-r0015-data-scan-tstamp-list.txt', figsize=(10,5))
+    #fname = 'work/cora-xcsi0112-r0015-data-scan-tstamp-list.txt'
+    fname = '/reg/neh/home1/dubrovin/LCLS/PSANA-V01/work-1/t1-xcsi0112-r0015-data-scan-tstamp-list.txt'
+    w = PlotTimeWidget(None, fname, figsize=(10,5))
     w.move(QtCore.QPoint(50,50))
     w.show()    
     app.exec_()

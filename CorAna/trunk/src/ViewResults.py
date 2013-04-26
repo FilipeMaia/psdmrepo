@@ -130,6 +130,17 @@ def divideZeroProteced(map_num, map_den, val_subst_zero=0) :
 
 #-----------------------------
 
+def bincount(map_bins, map_weights=None, length=None) :
+    if map_weights == None : weights = None
+    else                   : weights = map_weights.flatten() 
+    
+    bin_count = np.bincount(map_bins.flatten(), weights, length)
+    #print 'bin_count:\n',      bin_count
+    #print 'bin_count.shape =', bin_count.shape
+    return bin_count
+
+#-----------------------------
+
 class ViewResults :
     """First look at results.
     """
@@ -569,7 +580,9 @@ class ViewResults :
         """
         if sp.q_phi_map_stat != None : return sp.q_phi_map_stat               # +1 - for last overflow bin index 
         sp.q_phi_map_stat = sp.get_q_map_for_stat_bins() * (sp.ana_stat_part_phi+1) \
-                          + sp.get_phi_map_for_stat_bins()#* sp.ana_stat_part_q
+                          + sp.get_phi_map_for_stat_bins()
+        #sp.q_phi_map_stat = sp.get_phi_map_for_stat_bins() * (sp.ana_stat_part_q+1) \
+        #                  + sp.get_q_map_for_stat_bins()
         return sp.q_phi_map_stat
 
 
@@ -578,8 +591,7 @@ class ViewResults :
            Bins reserved for overflow contain zeros due to mask.
         """
         if sp.counts_stat != None : return sp.counts_stat
-        weights = sp.get_mask_total() # Apply mask for bin counts
-        sp.counts_stat = sp.bincount(sp.get_q_phi_map_for_stat_bins(), weights, length=sp.npart_stat)
+        sp.counts_stat = bincount(sp.get_q_phi_map_for_stat_bins(), sp.get_mask_total(), length=sp.npart_stat)
         return sp.counts_stat
 
 
@@ -588,8 +600,7 @@ class ViewResults :
            Bins reserved for overflow contain zeros due to mask.
         """
         if sp.counts_stat_q != None : return sp.counts_stat_q
-        weights = sp.get_mask_total() # Apply mask for bin counts
-        sp.counts_stat_q = sp.bincount(sp.get_q_map_for_stat_bins(), weights, length=sp.ana_stat_part_q+1 )
+        sp.counts_stat_q = bincount(sp.get_q_map_for_stat_bins(), sp.get_mask_total(), length=sp.ana_stat_part_q+1 )
         return sp.counts_stat_q
 
 
@@ -597,11 +608,13 @@ class ViewResults :
         if sp.q_average_stat_q != None : return sp.q_average_stat_q
 
         q_map_masked        = sp.get_q_map() * sp.get_mask_total()
-        sum_q_stat          = sp.bincount(sp.get_q_map_for_stat_bins(), q_map_masked, length=sp.ana_stat_part_q+1)
+        sum_q_stat          = bincount(sp.get_q_map_for_stat_bins(), q_map_masked, length=sp.ana_stat_part_q+1)
         counts_stat_q       = sp.get_counts_for_stat_q_bins()
         counts_stat_q_prot  = np.select([counts_stat_q<=0], [-1], counts_stat_q)
         sp.q_average_stat_q = np.select([counts_stat_q_prot<0], [0], default=sum_q_stat/counts_stat_q_prot)
         #print 'sp.ana_stat_part_q, sp.q_average_stat_q.shape=', sp.ana_stat_part_q, sp.q_average_stat_q.shape
+        msg = 'get_q_average_for_stat_q_bins():\n' + str(sp.q_average_stat_q)
+        logger.info(msg, __name__)
         return sp.q_average_stat_q
 
   
@@ -652,7 +665,9 @@ class ViewResults :
         """
         if sp.q_phi_map_dyna != None : return sp.q_phi_map_dyna               # +1 - for last overflow bin index 
         sp.q_phi_map_dyna = sp.get_q_map_for_dyna_bins() * (sp.ana_dyna_part_phi+1) \
-                          + sp.get_phi_map_for_dyna_bins() # * sp.ana_dyna_part_q
+                          + sp.get_phi_map_for_dyna_bins()
+        #sp.q_phi_map_dyna = sp.get_phi_map_for_dyna_bins() * (sp.ana_dyna_part_q+1) \
+        #                  + sp.get_q_map_for_dyna_bins()
         return sp.q_phi_map_dyna
 
 
@@ -661,8 +676,7 @@ class ViewResults :
            Bins reserved for overflow contain zeros due to mask.
         """
         if sp.counts_dyna != None : return sp.counts_dyna
-        weights = sp.get_mask_total() # Apply mask for bin counts
-        sp.counts_dyna = sp.bincount(sp.get_q_phi_map_for_dyna_bins(), weights, length=sp.npart_dyna)
+        sp.counts_dyna = bincount(sp.get_q_phi_map_for_dyna_bins(), map_weights=sp.get_mask_total(), length=sp.npart_dyna)
         return sp.counts_dyna
 
 
@@ -670,13 +684,13 @@ class ViewResults :
         if sp.q_average_dyna != None : return sp.q_average_dyna
 
         q_map_masked      = sp.get_q_map() * sp.get_mask_total()
-        sum_q_dyna        = sp.bincount(sp.get_q_phi_map_for_dyna_bins(), q_map_masked, length=sp.npart_dyna)
+        sum_q_dyna        = bincount(sp.get_q_phi_map_for_dyna_bins(), q_map_masked, length=sp.npart_dyna)
         counts_dyna       = sp.get_counts_for_dyna_bins()
         counts_dyna_prot  = np.select([counts_dyna<=0], [-1], counts_dyna)
         sp.q_average_dyna = np.select([counts_dyna_prot<0], [0], default=sum_q_dyna/counts_dyna_prot)
         msg = 'get_q_average_for_dyna_bins():\n' + str(sp.q_average_dyna)
-        logger.info(msg, __name__)
-        #print msg
+        #logger.info(msg, __name__)
+        print msg
         #print 'sp.npart_dyna, sp.q_average_dyna.shape=', sp.npart_dyna, sp.q_average_dyna.shape
         return sp.q_average_dyna
 
@@ -732,17 +746,23 @@ class ViewResults :
     def get_norm_factor_map_for_stat_bins(sp, intens_map) :
         q_phi_map_stat = sp.get_q_phi_map_for_stat_bins()
         counts = sp.get_counts_for_stat_bins()
-        # print 'counts = ', counts
-        intens = sp.bincount(q_phi_map_stat, intens_map, sp.npart_stat)
+        
+        intens = bincount(q_phi_map_stat, intens_map, sp.npart_stat)
         intens_prot = np.select([intens<=0.], [-1.], default=intens)
         normf = np.select([intens_prot<=0.], [0.], default=counts/intens_prot)
 
-        #norm_facotr_map = np.choose(q_phi_map_stat, normf, mode='clip') # DOES NOT WORK!
-        #norm_facotr_map = q_phi_map_stat.choose(normf, mode='clip')     # DOES NOT WORK!
-        #norm_facotr_map = np.array(map(lambda i : normf[i], q_phi_map_stat)) # 0.26sec
-        norm_facotr_map = np.array([normf[i] for i in q_phi_map_stat]) # WORKS! # 0.24sec
-        norm_facotr_map.shape = (sp.rows,sp.cols)        
-        return norm_facotr_map # sp.get_random_img()
+        #print 'counts for q-phi stat bins:', counts
+        #print 'I for q-phi stat bins:', intens_prot
+
+        logger.info('1/Iave - norm. factors for q-phi stat bins: %s'%(str(normf)), __name__)
+
+        #norm_factor_map = np.choose(q_phi_map_stat, normf, mode='clip') # DOES NOT WORK!
+        #norm_factor_map = q_phi_map_stat.choose(normf, mode='clip')     # DOES NOT WORK!
+        #norm_factor_map = np.array(map(lambda i : normf[i], q_phi_map_stat)) # 0.26sec
+
+        norm_factor_map = np.array([normf[i] for i in q_phi_map_stat]) # WORKS! # 0.24sec
+        norm_factor_map.shape = (sp.rows,sp.cols) # (1300, 1340) 
+        return norm_factor_map # sp.get_random_img()
 
 #-----------------------------
 
@@ -760,7 +780,7 @@ class ViewResults :
         q_map_stat = sp.get_q_map_for_stat_bins()
         counts = sp.get_counts_for_stat_q_bins()
         # print 'counts = ', counts
-        intens = sp.bincount(q_map_stat, intens_map, sp.ana_stat_part_q+1)
+        intens = bincount(q_map_stat, intens_map, sp.ana_stat_part_q+1)
         counts_prot = np.select([counts<=0.], [-1.], default=counts)
         intens_aver = np.select([counts_prot<=0.], [0.], default=intens/counts_prot)
         return intens_aver
@@ -797,7 +817,7 @@ class ViewResults :
            The shape of the map is the same as shape of image.
         """
         Ip_normf_map = sp.get_1oIp_map_for_stat_bins_itau(itau)
-        If_normf_map = sp.get_1oIp_map_for_stat_bins_itau(itau)
+        If_normf_map = sp.get_1oIf_map_for_stat_bins_itau(itau)
         I2_map       = sp.get_I2_for_itau(itau)
         sp.g2_map = I2_map * Ip_normf_map * If_normf_map # mask is already applied to normf
         return sp.g2_map
@@ -806,10 +826,23 @@ class ViewResults :
     def get_g2_for_dyna_bins_itau(sp, itau) :
         q_phi_map_dyna = sp.get_q_phi_map_for_dyna_bins()
         g2_map         = sp.get_g2_map_for_itau(itau)
-        intens_dyna    = sp.bincount(q_phi_map_dyna, g2_map, sp.npart_dyna)
+        
+        intens_dyna    = bincount(q_phi_map_dyna, g2_map, sp.npart_dyna)
         counts         = sp.get_counts_for_dyna_bins()
         counts_prot    = np.select([counts==0], [-1], default=counts) 
         sp.g2_for_dyna_bins = np.select([counts_prot<0], [0], default=intens_dyna/counts_prot)
+
+        print '='*60
+        print 'get_g2_for_dyna_bins_itau:'
+        #print 'sp.npart_dyna', sp.npart_dyna
+        #print 'q_phi_map_dyna:\n', q_phi_map_dyna        
+        print 'q_phi_map_dyna.shape', q_phi_map_dyna.shape        
+        #print 'g2_map:\n', g2_map     
+        print 'g2_map.shape', g2_map.shape     
+        print 'intens_dyna    = ', intens_dyna
+        print 'counts = ', counts
+        print 'g2_for_dyna_bins=', sp.g2_for_dyna_bins
+        
         return sp.g2_for_dyna_bins
 
 
@@ -833,13 +866,15 @@ class ViewResults :
 
         logger.info('Begin processing for <g2> vs tau array', __name__)
 
+        dt = cp.bat_data_dt_ave.value() 
+
         g2_vs_itau = []
         for itau, tau in enumerate(sp.list_of_tau) :
             g2_for_dyna_bins = sp.get_g2_for_dyna_bins_trim_itau(itau)
             g2_vs_itau.append( g2_for_dyna_bins )
             #print g2_for_dyna_bins
-            msg = 'get_g2_vs_itau_arr: itau=%3d  tau=%4d  <g2>=%6.3f' \
-                  % (itau, tau, np.array(g2_for_dyna_bins).mean()) 
+            msg = 'get_g2_vs_itau_arr: itau=%3d  tau=%4d  tau[s]=%6.3f  <g2>=%6.3f' \
+                  % (itau, tau, tau*dt, np.array(g2_for_dyna_bins).mean()) 
             logger.info(msg, __name__)
             #print msg
         
@@ -860,13 +895,14 @@ class ViewResults :
 
     def get_formatted_table_of_results(sp) :
         g2_vs_itau_arr, q_ave_arr, tau_arr = sp.get_results_for_dyna_bins()
+        dt = cp.bat_data_dt_ave.value() 
 
-        txt = '<g2> for dynamic bins vs tau\n' + '='*28 + '\n tau \ <q> |'
+        txt = '\n<g2> for dynamic bins vs tau\n' + '='*30 + '\n tau     tau[s] \ <q> |'
         for q_ave in q_ave_arr : txt += '%6.3f ' % q_ave
-        txt += '\n'+ '-'*(11+7*q_ave_arr.shape[0])
+        txt += '\n'+ '-'*(22+7*q_ave_arr.shape[0])
 
         for tau, g2_arr in zip(tau_arr, g2_vs_itau_arr) :       
-            txt += '\n%4d       |' % tau
+            txt += '\n%4d      %11.6f |' % (tau, tau*dt)
             for g2 in g2_arr.flatten() : txt += '%6.3f ' % g2
         txt += '\n'
         
@@ -879,17 +915,6 @@ class ViewResults :
         #print msg
         logger.info(msg, __name__)
         
-#-----------------------------
-
-    def bincount(sp, map_bins, map_weights=None, length=None) :
-        if map_weights == None : weights = None
-        else                   : weights = map_weights.flatten() 
-        
-        bin_count = np.bincount(map_bins.flatten(), weights, length)
-        #print 'bin_count:\n',      bin_count
-        #print 'bin_count.shape =', bin_count.shape
-        return bin_count
-
 #-----------------------------
 
     def set_file_name(sp, fname=None) :
@@ -914,7 +939,7 @@ class ViewResults :
         sp.cor_arr = np.fromfile(sp.fname, dtype=np.float32)
         nptau = sp.cor_arr.shape[0]/cp.bat_img_size.value()/3
         sp.cor_arr.shape = (nptau, 3, sp.rows, sp.cols) # 3 stands for <Ip>, <If>, and <Ip*If>
-        logger.info('Set arr.shape = ' + str(sp.cor_arr.shape), __name__)
+        logger.info('Set arr.shape[nptau, 3, rows, cols] = ' + str(sp.cor_arr.shape), __name__)
         return sp.cor_arr
 
 #-----------------------------

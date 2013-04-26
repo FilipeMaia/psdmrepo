@@ -35,10 +35,9 @@ import numpy as np
 from math import log10
 
 # For self-run debugging:
-#try :
-#    import matplotlib
-#    matplotlib.use('Qt4Agg') # forse Agg rendering to a Qt4 canvas (backend)
-#except : pass
+if __name__ == "__main__" :
+    import matplotlib
+    matplotlib.use('Qt4Agg') # forse Agg rendering to a Qt4 canvas (backend)
 
 #from   matplotlib.figure import Figure
 import matplotlib.pyplot   as plt
