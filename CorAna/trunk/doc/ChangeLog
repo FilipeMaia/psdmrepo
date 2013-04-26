@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2013-04-26 Mikhail S. Dubrovin
+Tag: V00-00-13
+- update all changes
+
 2013-04-04 Mikhail S. Dubrovin
 - add PlotGraphWidget.py PlotGraph.py RecordsFromFiles.py
 
