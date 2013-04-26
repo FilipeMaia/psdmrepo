@@ -50,7 +50,8 @@ test -d "$logdir" || mkdir -p "$logdir" || exit 2
 time=`date +%Y%m%dT%H%M%S`
 log="$logdir/ic-controller/ic-controller-$time-`hostname`.log"
 
-echo "Running from release $release" >> "$log"
+test -h "$release" && sym=" -> $(readlink $release)"
+echo "Running from release $release$sym" >> "$log"
 echo "Using configurations $config" >> "$log"
 
 # have to be in release directory

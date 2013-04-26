@@ -22,6 +22,8 @@ proto=scgi
 # PID file
 pid_file='/var/tmp/trac-server-start.pid'
 
+export LANG=C
+
 # ===================================================================
 
 usage () {

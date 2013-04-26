@@ -15,6 +15,8 @@ release=/reg/g/psdm/sw/releases/web-0.2.0
 # log directory
 logdir="/reg/g/psdm/web/ws/logs/`hostname`"
 
+export LANG=C
+
 # ===================================================================
 
 config=production.ini
@@ -81,7 +83,8 @@ exec >"${log}" 2>&1
 unset PYTHONPATH LD_LIBRARY_PATH
 
 # setup release
-echo "[web-service-start] setup release $release"
+test -h "$release" && sym=" -> $(readlink $release)"
+echo "[web-service-start] setup release $release$sym"
 cd "$release"
 . /reg/g/psdm/bin/sit_setup.sh
 
