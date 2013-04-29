@@ -84,18 +84,23 @@ ShmemMonitorClient::processDgram(Pds::Dgram* dg)
     m_queue.push(dgobj);
   }
 
+  // check if we should stop now
   bool stop = false;
   switch (tr) {
   case Pds::TransitionId::Unmap:
-    // always stop
-    stop = true;
+    stop = m_stopTr == Pds::TransitionId::Unmap or
+           m_stopTr == Pds::TransitionId::Unconfigure or
+           m_stopTr == Pds::TransitionId::EndRun or
+           m_stopTr == Pds::TransitionId::EndCalibCycle;
     break;
   case Pds::TransitionId::Unconfigure:
-    stop = m_stopTr == Pds::TransitionId::Unconfigure or m_stopTr == Pds::TransitionId::EndRun or
-    m_stopTr == Pds::TransitionId::EndCalibCycle;
+    stop = m_stopTr == Pds::TransitionId::Unconfigure or
+           m_stopTr == Pds::TransitionId::EndRun or
+           m_stopTr == Pds::TransitionId::EndCalibCycle;
     break;
   case Pds::TransitionId::EndRun:
-    stop = m_stopTr == Pds::TransitionId::EndRun or m_stopTr == Pds::TransitionId::EndCalibCycle;
+    stop = m_stopTr == Pds::TransitionId::EndRun or
+           m_stopTr == Pds::TransitionId::EndCalibCycle;
     break;
   case Pds::TransitionId::EndCalibCycle:
     stop = m_stopTr == Pds::TransitionId::EndCalibCycle;

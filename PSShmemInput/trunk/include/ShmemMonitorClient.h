@@ -45,6 +45,17 @@ namespace PSShmemInput {
  *
  *  @brief Implementation of XtcMonitorClient which pushes data into a queue.
  *
+ *  Instance of this class is supposed to run in a separate thread so its
+ *  interface is suitable for use with boost::thread class, for example.
+ *  It is also possible to use this class without starting new thread by
+ *  calling @c operator()() like in this example:
+ *
+ *  @code
+ *    ShmemMonitorClient client(...);
+ *    // This will run until stop transition is met
+ *    client();
+ *  @endcode
+ *
  *  @version $Id$
  *
  *  @author Andy Salnikov

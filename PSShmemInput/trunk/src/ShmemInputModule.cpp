@@ -109,6 +109,11 @@ ShmemInputModule::initDgramSource()
       stopTr = Pds::TransitionId::EndRun;
     } else if (stopTrStr == "endcalibcycle") {
       stopTr = Pds::TransitionId::EndCalibCycle;
+    } else if (stopTrStr == "none" or stopTrStr == "no") {
+      // this transition cannot happen, means non-stop running
+      stopTr = Pds::TransitionId::NumberOf;
+    } else {
+      throw DatasetSpecError(ERR_LOC, "unexpected stop condition", inputs[0]);
     }
   }
 
