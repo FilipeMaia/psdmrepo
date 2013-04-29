@@ -48,7 +48,7 @@ namespace $package {
  *  with a blank line. The last paragraph before the tags (preceded by @) 
  *  should be the identification and copyright, as below.
  *
- *  This software was developed for the LCLS project.  If you use all or 
+ *  @note This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
  *  @version $$Id$$
