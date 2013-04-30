@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-28-03
+2013-04-30 Andy Salnikov
+- fix for CvtOptions::chunkSize() for the case when initial guess for
+  chunk size from configuration data is way too high
+
 Tag: V00-28-02
 2013-04-25 Andy Salnikov
 - upgrading to pdsdata V06-07-04
