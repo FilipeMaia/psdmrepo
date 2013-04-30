@@ -18,6 +18,7 @@
 #include <fstream>   // ofstream
 #include <iomanip>   // for setw, setfill
 #include <sstream>   // for stringstream
+#include <iostream>
 
 //----------------------
 // Base Class Headers --
@@ -31,6 +32,17 @@
 #include "PSEnv/Env.h"
 #include "PSEvt/Source.h"
 #include "MsgLogger/MsgLogger.h"
+#include "CSPadPixCoords/Image2D.h"
+
+//For save in PNG and TIFF formats
+#define png_infopp_NULL (png_infopp)NULL
+#define int_p_NULL (int*)NULL
+#include <boost/gil/gil_all.hpp>
+#include <boost/gil/extension/io/png_dynamic_io.hpp>
+#include <boost/gil/extension/io/tiff_dynamic_io.hpp> 
+//#include <boost/gil/extension/io/tiff_io.hpp> 
+//#include <boost/gil/extension/io/dynamic_io.hpp>
+
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -56,6 +68,10 @@ namespace ImgAlgos {
  *
  *  @author Mikhail S. Dubrovin
  */
+
+  enum FILE_MODE {BINARY, TEXT, TIFF, PNG};
+
+//using namespace boost::gil;
 
 class GlobalMethods  {
 public:
@@ -111,30 +127,98 @@ private:
 //--------------------
 // Save 2-D array in file
   template <typename T>
-  void save2DArrayInFile(const std::string& fname, const T* arr, const unsigned& rows, const unsigned& cols, bool print_msg )
+  void save2DArrayInFile(const std::string& fname, const T* arr, const unsigned& rows, const unsigned& cols, bool print_msg, FILE_MODE file_type=TEXT)
   {  
     if (fname.empty()) {
       MsgLog("GlobalMethods", warning, "The output file name is empty. 2-d array is not saved.");
       return;
     }
 
-    if( print_msg ) MsgLog("GlobalMethods", info, "Save 2-d array in file " << fname.c_str());
-    std::ofstream out(fname.c_str());
-          for (unsigned r = 0; r != rows; ++r) {
-            for (unsigned c = 0; c != cols; ++c) {
-              out << arr[r*cols + c] << ' ';
-            }
-            out << '\n';
-          }
-    out.close();
+    if( print_msg ) MsgLog("GlobalMethods", info, "Save 2-d array in file " << fname.c_str() << " file type:" << file_type);
+
+    //======================
+    if (file_type == TEXT) {
+        std::ofstream out(fname.c_str());
+              for (unsigned r = 0; r != rows; ++r) {
+                for (unsigned c = 0; c != cols; ++c) {
+                  out << arr[r*cols + c] << ' ';
+                }
+                out << '\n';
+              }
+        out.close();
+        return; 
+    }
+
+    //======================
+    if (file_type == BINARY) {
+        std::ios_base::openmode mode = std::ios_base::out | std::ios_base::binary;
+        std::ofstream out(fname.c_str(), mode);
+        //out.write(reinterpret_cast<const char*>(arr), rows*cols*sizeof(T));
+        for (unsigned r = 0; r != rows; ++r) {
+	  const T* data = &arr[r*cols];
+          out.write(reinterpret_cast<const char*>(data), cols*sizeof(T));
+	}
+        out.close();
+        return; 
+    }
+
+    //======================
+    if (file_type == PNG) {
+        using namespace boost::gil;
+        //rgb8_image_t img(rows, cols);
+        //rgb8_pixel_t red(255, 0, 0); fill_pixels(view(img), red);
+        //png_write_view(fname, const_view(img));
+        
+        //type_from_x_iterator<T*>::view_t 
+        //rgb8c_view_t image = interleaved_view(cols, rows, reinterpret_cast<const rgb8_pixel_t*>(&arr[0]), cols*sizeof(T));
+        //rgb8c_view_t image = interleaved_view(cols, rows, (const rgb8_pixel_t*)arr, cols*sizeof(T));
+        //rgb16c_view_t image = interleaved_view(cols/3, rows, (const rgb16_pixel_t*)arr, cols*sizeof(T));
+        gray16c_view_t image = interleaved_view(cols, rows, reinterpret_cast<const gray16_pixel_t*>(&arr[0]), cols*sizeof(T));
+        png_write_view(fname, image);
+        return; 
+    }
+
+    //======================
+    if (file_type == TIFF) {
+        //MsgLog("GlobalMethods", warning, "Saving of images in TIFF format is not implemented yet.");
+        using namespace boost::gil;
+        gray16c_view_t image = interleaved_view(cols, rows, reinterpret_cast<const gray16_pixel_t*>(&arr[0]), cols*sizeof(T));
+        tiff_write_view(fname, image);
+        return; 
+    }
+
+    //======================
   }
 
 //--------------------
 // Save 2-D array in file
   template <typename T>
-  void save2DArrayInFile(const std::string& fname, const boost::shared_ptr< ndarray<T,2> >& p_ndarr, bool print_msg )
+  void save2DArrayInFile(const std::string& fname, const boost::shared_ptr< ndarray<T,2> >& p_ndarr, bool print_msg, FILE_MODE file_type=TEXT)
   {  
-    save2DArrayInFile<T> (fname, p_ndarr->data(), p_ndarr->shape()[0], p_ndarr->shape()[1], print_msg);
+    save2DArrayInFile<T> (fname, p_ndarr->data(), p_ndarr->shape()[0], p_ndarr->shape()[1], print_msg, file_type);
+  }
+
+//--------------------
+// Save 2-D array in event for type
+  template <typename T>
+  bool save2DArrayInFileForType(PSEvt::Event& evt, const PSEvt::Source& src, const std::string& key, const std::string& fname, bool print_msg, FILE_MODE file_type=TEXT)
+  {
+    boost::shared_ptr< ndarray<T,2> > img = evt.get(src, key);
+    if ( ! img.get() ) return false; 
+    save2DArrayInFile<T> (fname, img, print_msg, file_type);
+    return true;
+  }
+
+//--------------------
+// Save 2-D array in event for type in case if key == "Image2D" 
+  template <typename T>
+  bool saveImage2DInFileForType(PSEvt::Event& evt, const PSEvt::Source& src, const std::string& key, const std::string& fname, bool print_msg)
+  {
+    boost::shared_ptr< CSPadPixCoords::Image2D<T> > img2d = evt.get(src, key);
+    if ( ! img2d.get() ) return false; 
+    if( print_msg ) MsgLog("GlobalMethods::saveImage2DInFileForType", info, "Get image as Image2D<T> from event and save it in file");
+    img2d -> saveImageInFile(fname,0);
+    return true;
   }
 
 //--------------------

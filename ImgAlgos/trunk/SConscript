@@ -29,5 +29,5 @@ Import('*')
 #standardSConscript(NEED_QT=1, UTESTS=[])
 #standardSConscript()
 
-standardSConscript( LIBS="gomp rt pthread", UTESTS=[], CCFLAGS="-fopenmp")
+standardSConscript( LIBS="gomp rt pthread png tiff", UTESTS=[], CCFLAGS="-fopenmp")
 

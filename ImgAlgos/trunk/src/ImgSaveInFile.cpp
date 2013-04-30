@@ -25,8 +25,6 @@
 //-------------------------------
 #include "MsgLogger/MsgLogger.h"
 #include "PSEvt/EventId.h"
-#include "CSPadPixCoords/Image2D.h"
-#include "ImgAlgos/GlobalMethods.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -58,6 +56,7 @@ ImgSaveInFile::ImgSaveInFile (const std::string& name)
   , m_eventSave()
   , m_saveAll()
   , m_fname()
+  , m_file_type()
   , m_print_bits()
   , m_count(0)
 {
@@ -67,7 +66,10 @@ ImgSaveInFile::ImgSaveInFile (const std::string& name)
   m_eventSave     = config   ("eventSave", 0);
   m_saveAll       = config   ("saveAll",   false);
   m_fname         = configStr("fname",    "img");
+  m_file_type     = configStr("ftype",    "txt");
   m_print_bits    = config   ("print_bits",0);
+
+  setFileMode();
 }
 
 //--------------------
@@ -82,11 +84,26 @@ ImgSaveInFile::printInputParameters()
         << "\neventSave    : "     << m_eventSave
         << "\nsaveAll      : "     << m_saveAll
         << "\nfname        : "     << m_fname
+        << "\nftype        : "     << m_file_type
         << "\nm_print_bits : "     << m_print_bits;
   }
 }
 
 //--------------------
+
+void 
+ImgSaveInFile::setFileMode()
+{
+  m_file_mode = TEXT;
+  if (m_file_type == "bin")  { m_file_mode = BINARY; return; }
+  if (m_file_type == "txt")  { m_file_mode = TEXT;   return; }
+  if (m_file_type == "tiff") { m_file_mode = TIFF;   return; }
+  if (m_file_type == "png")  { m_file_mode = PNG;    return; }
+
+  const std::string msg = "The output file type: " + m_file_type + " is not recognized. Known types are: bin, txt";
+  MsgLogRoot(error, msg);
+  throw std::runtime_error(msg);
+}
 
 
 //--------------
@@ -174,33 +191,26 @@ ImgSaveInFile::saveImageInFile(Event& evt)
   string fname = m_fname
         + "-r"    + stringRunNumber(evt) 
         + "-"     + stringTimeStamp(evt) 
+        + "."     + m_file_type;
       //+ "-ev"   + stringFromUint(m_count)
-        + ".txt";
+      //+ ".txt";
 
-  // In case if m_key == "Image2D" 
-  shared_ptr< CSPadPixCoords::Image2D<double> > img2d = evt.get(m_str_src, m_key, &m_src);
-  if (img2d.get()) {
-    if( m_print_bits & 2 )MsgLog(name(), info, "::saveImageInFile(...): Get image as Image2D<double> from event and save it in file");
-    img2d -> saveImageInFile(fname,0);
-  }
+  if ( save2DArrayInFileForType <double>   (evt, m_str_src, m_key, fname, m_print_bits & 2, m_file_mode) ) return;
+  if ( save2DArrayInFileForType <uint16_t> (evt, m_str_src, m_key, fname, m_print_bits & 2, m_file_mode) ) return;
+  if ( save2DArrayInFileForType <float>    (evt, m_str_src, m_key, fname, m_print_bits & 2, m_file_mode) ) return;
+  if ( save2DArrayInFileForType <int>      (evt, m_str_src, m_key, fname, m_print_bits & 2, m_file_mode) ) return;
+  if ( save2DArrayInFileForType <uint8_t>  (evt, m_str_src, m_key, fname, m_print_bits & 2, m_file_mode) ) return;
 
-  /*
-  shared_ptr< ndarray<double,2> > img = evt.get(m_str_src, m_key, &m_src);
-  if (img.get()) {
-    if( m_print_bits & 2 ) MsgLog(name(), info, "::saveImageInFile(...): Get image as ndarray<double,2> from event and save it in file");
-    CSPadPixCoords::Image2D<double> *img2d = new CSPadPixCoords::Image2D<double>(img->data(),img->shape()[0],img->shape()[1]);
-    img2d -> saveImageInFile(fname,0);
-  }
-  */
+  if ( saveImage2DInFileForType <double>   (evt, m_str_src, m_key, fname, m_print_bits & 2) ) return;
+  if ( saveImage2DInFileForType <uint16_t> (evt, m_str_src, m_key, fname, m_print_bits & 2) ) return;
+  if ( saveImage2DInFileForType <float>    (evt, m_str_src, m_key, fname, m_print_bits & 2) ) return;
+  if ( saveImage2DInFileForType <int>      (evt, m_str_src, m_key, fname, m_print_bits & 2) ) return;
+  if ( saveImage2DInFileForType <uint8_t>  (evt, m_str_src, m_key, fname, m_print_bits & 2) ) return;
 
-  shared_ptr< ndarray<double,2> > img = evt.get(m_str_src, m_key, &m_src);
-  if (img.get())
-    save2DArrayInFile<double> (fname, img, m_print_bits & 2);
-
-
-  shared_ptr< ndarray<uint16_t,2> > img_u16 = evt.get(m_str_src, m_key, &m_src);
-  if (img_u16.get()) 
-    save2DArrayInFile<uint16_t> (fname, img_u16, m_print_bits & 2);
+  const std::string msg = "Image is not defined in the event(...) for source:" 
+                          + boost::lexical_cast<std::string>(m_str_src) + " key:" + m_key;
+  MsgLogRoot(error, msg);
+  throw std::runtime_error(msg);
 }
 
 //--------------------

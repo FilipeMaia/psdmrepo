@@ -28,7 +28,7 @@
 //------------------------------------
 
 #include "PSEvt/Source.h"
-
+#include "ImgAlgos/GlobalMethods.h"
 
 //		---------------------
 // 		-- Class Interface --
@@ -90,6 +90,7 @@ public:
   /// Method which is called once at the end of the job
   virtual void endJob(Event& evt, Env& env);
 
+  void setFileMode();
   void saveImageInFile(Event& evt);
   void printInputParameters();
 
@@ -104,8 +105,10 @@ private:
   unsigned    m_eventSave;   // event number starting from 1 to be saved in file
   bool        m_saveAll;     // should be true to save all events in files
   std::string m_fname;       // common part of the file name
+  std::string m_file_type;   // file type "txt" or "bin" 
   unsigned    m_print_bits;
   long        m_count;
+  FILE_MODE   m_file_mode;   // enumerated file type for "txt", "bin", etc. 
 };
 
 } // namespace ImgAlgos
