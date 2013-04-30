@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-03
+2013-04-30 Mikhail S. Dubrovin
+M src/Image2D.cpp - add instantiation of Image2D for <float> and <uint8_t>
+	
 Tag: V00-03-02
 2013-03-14 Mikhail S. Dubrovin
 - In PixCoordsCSPad2x2 - reset (x,y) coordinates origin in (x_min,y_min)
