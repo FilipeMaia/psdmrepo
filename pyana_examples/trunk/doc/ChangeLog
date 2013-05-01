@@ -11,6 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-00
+2013-05-01 Andy Salnikov
+- update all examples:
+  - use self.configXxx() methods to get configuration data
+  - remove arguments to __init__ methods
+
 Tag: V00-00-26
 2013-03-14 Andy Salnikov
 - replaced use of env.assert_psana() with env.fwkName()

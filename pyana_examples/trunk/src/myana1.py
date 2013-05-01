@@ -65,9 +65,9 @@ class myana1 ( object ) :
     def __init__ ( self, nenergy, e1, e2 ) :
         """Constructor."""
         
-        self.nenergy = int(nenergy)
-        self.e1 = float(e1)
-        self.e2 = float(e2)
+        self.nenergy = self.configInt('nenergy')
+        self.e1 = self.configFloat('e1')
+        self.e2 = self.configFloat('e2')
         logging.info( "nenergy=%d e1=%f e2=%f", self.nenergy, self.e1, self.e2 )
         self.shotCountITof = 0
         self.sum2 = None

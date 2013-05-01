@@ -50,15 +50,10 @@ class myana_epics (object) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self, pv = "BEAM:LCLS:ELEC:Q") :
-        """Class constructor. The parameters to the constructor are passed
-        from pyana configuration file. If parameters do not have default 
-        values  here then the must be defined in pyana.cfg. All parameters 
-        are passed as strings, convert to correct type before use.
+    def __init__ ( self ) :
 
-        @param pv   Name of the EPICS PV to dump
-        """
-        self.m_pv = pv
+        # Name of the EPICS PV to dump
+        self.m_pv = self.configStr('pv', "BEAM:LCLS:ELEC:Q")
 
     #-------------------
     #  Public methods --

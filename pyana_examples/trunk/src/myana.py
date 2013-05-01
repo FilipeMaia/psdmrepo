@@ -64,18 +64,16 @@ class myana ( object ) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self, name, nenergy, e1, e2 ) :
-        """Constructor. The parameters to the constructor are passed
-        from pyana.cfg file. If parameters do not have default values
-        here then the must be defined in pyana.cfg. All parameters are
-        passed as strings, convert to correct type before use."""
+    def __init__ ( self ) :
         
         self.shotCountITof = 0
 
-        self.name = name
-        self.nenergy = int(nenergy)
-        self.e1 = float(e1)
-        self.e2 = float(e2)
+        # Read parameters from pyana.cfg file. If parameters do not 
+        # have default values here then the must be defined in pyana.cfg. 
+        self.name = self.configStr('name')
+        self.nenergy = self.configInt('nenergy')
+        self.e1 = self.configFloat('e1')
+        self.e2 = self.configFloat('e2')
         logging.info( "name=%s nenergy=%d e1=%f e2=%f", self.name, self.nenergy, self.e1, self.e2 )
 
     #-------------------

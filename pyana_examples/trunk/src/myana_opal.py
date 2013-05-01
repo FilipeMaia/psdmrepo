@@ -62,9 +62,11 @@ class myana_opal ( object ) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self, address = None ) :
+    def __init__ ( self) :
         """Constructor. """
-        self.address = address
+
+        # get source address from configuration
+        self.source = self.configSrc('source', '')
 
     #-------------------
     #  Public methods --
@@ -73,8 +75,8 @@ class myana_opal ( object ) :
     def beginjob( self, evt, env ) :
 
         # get configuration object
-        logging.debug("Get Opal1k config from address %s", self.address)
-        config = env.getOpal1kConfig(self.address)
+        logging.debug("Get Opal1k config from address %s", self.source)
+        config = env.getOpal1kConfig(self.source)
         if not config:
             print '*** opal config object is missing ***'
             return
@@ -101,8 +103,8 @@ class myana_opal ( object ) :
         # Try to get a frame from event. There are multiple devices 
         # that produce Frame type so one has to use address to 
         # chose one specific device. Use config file to change it.
-        logging.debug("Get Opal1k frame from address %s", self.address)
-        opal = evt.getOpal1kValue(self.address)
+        logging.debug("Get Opal1k frame from address %s", self.source)
+        opal = evt.getOpal1kValue(self.source)
         if not opal:
             print '*** opal information is missing ***'
             return

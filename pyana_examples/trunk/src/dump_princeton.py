@@ -49,13 +49,10 @@ class dump_princeton (object) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self, source="" ) :
-        """Class constructor takes the name of the data source.
+    def __init__ ( self ) :
 
-        @param source   data source
-        """
-        
-        self.m_src = source
+        # get optional name of data source from configuration         
+        self.m_src = self.configSrc('source', '')
 
     #-------------------
     #  Public methods --
@@ -76,8 +73,6 @@ class dump_princeton (object) :
             print "  exposureTime =", config.exposureTime();
             print "  coolingTemp =", config.coolingTemp();
             print "  readoutSpeedIndex =", config.readoutSpeedIndex();
-            print "  readoutEventCode =", config.readoutEventCode();
-            print "  delayMode =", config.delayMode();
             print "  frameSize =", config.frameSize();
 
     def event( self, evt, env ) :

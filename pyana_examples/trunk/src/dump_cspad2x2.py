@@ -58,13 +58,10 @@ class dump_cspad2x2 (object) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self, source="" ) :
-        """Class constructor takes the name of the data source.
+    def __init__ ( self ) :
 
-        @param source   data source
-        """
-        
-        self.m_src = source
+        # get optional name of data source from configuration         
+        self.m_src = self.configSrc('source', '')
 
     #-------------------
     #  Public methods --

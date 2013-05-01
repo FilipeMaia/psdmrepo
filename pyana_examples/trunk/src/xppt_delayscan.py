@@ -44,31 +44,14 @@ class xppt_delayscan (object) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self,
-                   controlpv = "",
-                   ipimb_sig = "",
-                   ipimb_norm = "",
-                   threshold = "",
-                   outputfile = "point_scan_delay.npy" ):
-        """Class constructor.
-        The parameters to the constructor are passed from pyana configuration file.
-        If parameters do not have default values  here then the must be defined in
-        pyana.cfg. All parameters are passed as strings, convert to correct type before use.
-
-        @param controlpv
-        @param ipimb_sig
-        @param ipimb_norm
-        @param threshold
-        """
+    def __init__ ( self ):
 
         # parameters
-        self.controlpv = controlpv
-        self.ipimb_sig = ipimb_sig
-        self.ipimb_norm = ipimb_norm
-        self.threshold = None
-        if threshold != "":
-            self.threshold = float(threshold) # convert to floating point value (from string)
-        self.outputfile = outputfile
+        self.controlpv = self.configStr('controlpv', "")
+        self.ipimb_sig = self.configStr('ipimb_sig', "")
+        self.ipimb_norm = self.configStr('ipimb_norm', "")
+        self.threshold = self.configFloat('threshold', None)
+        self.outputfile = self.configStr('outputfile', "point_scan_delay.npy")
 
         # other variables
         self.nevents = 0

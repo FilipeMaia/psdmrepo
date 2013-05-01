@@ -58,22 +58,11 @@ class xppt_image_analysis (object) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self,
-                   source = "",
-                   region = None, 
-                   outputfile = None ) :
-        """Class constructor. The parameters to the constructor are passed
-        from pyana configuration file. If parameters do not have default 
-        values  here then the must be defined in pyana.cfg. All parameters 
-        are passed as strings, convert to correct type before use.
+    def __init__ ( self ) :
 
-        @param source          address string of the detector source
-        @param outputfile      name of output file
-        """
-
-        self.source = source
-        self.outputfile = outputfile
-        self.roi = region
+        self.source = self.configSrc('source', "")
+        self.outputfile = self.configStr('outputfile', None)
+        self.roi = self.configStr('region', None)
         if self.roi is not None:
             self.roi = [ float(coordinate) for coordinate in region.strip('[()]').split(',') ]
             if len(self.roi) != 4:

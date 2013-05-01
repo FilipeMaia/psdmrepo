@@ -62,9 +62,11 @@ class myana_cspad ( object ) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self, address = None ) :
+    def __init__ ( self ) :
         """Constructor. """
-        self.address = address
+        
+        # get source address from configuration
+        self.source = self.configSrc('source', '')
 
     #-------------------
     #  Public methods --
@@ -72,7 +74,7 @@ class myana_cspad ( object ) :
 
     def beginjob( self, evt, env ) :
 
-        config = env.getConfig(TypeId.Type.Id_CspadConfig, self.address)
+        config = env.getConfig(TypeId.Type.Id_CspadConfig, self.source)
         if not config:
             print '*** cspad config object is missing ***'
             return
@@ -98,7 +100,7 @@ class myana_cspad ( object ) :
 
     def event( self, evt, env ) :
 
-        quads = evt.getCsPadQuads(self.address, env)
+        quads = evt.getCsPadQuads(self.source, env)
         if not quads :
             print '*** cspad information is missing ***'
             return

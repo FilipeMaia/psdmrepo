@@ -67,51 +67,36 @@ class pyana_fccd_delay (object) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self,
-                   image_source = "SxrEndstation-0|Fccd-0",
-                   encoder_source = "SxrBeamline-0|Encoder-0",
-                   ipimb_source = "SxrBeamline-0|Ipimb-1",
-                   start_time = "300", 
-                   end_time = "500",   
-                   num_bins = "100",   
-                   path = "data",
-                   ipimb_threshold_upper = "2.0",  # 0.55
-                   ipimb_threshold_lower = "0.02", # 0.35
-                   ipimb_offset = "0", # 1.22
-                   trim_images = False,
-                   ) :
-        """Class constructor. The parameters to the constructor are passed
-        from pyana configuration file. If parameters do not have default 
-        values  here then the must be defined in pyana.cfg. All parameters 
-        are passed as strings, convert to correct type before use.
+    def __init__ ( self) :
         
-        @param image_source          Address of FCCD image
-        @param encoder_source        Address of encoder
-        @param ipimb_source          Address of IPIMB
-        @param start_time            delay time first bin
-        @param end_time              delay time last bin
-        @param num_bins              delay time number of bins
-        @param path                  path directory for output files
-        @param ipimb_threshold_upper 
-        @param ipimb_threshold_lower 
-        @param ipimb_offset          
-        @param trim_images           Show only the trimmed (480x480) images
-        """
+#         Module parameters that are read from config file
+#         
+#         image_source          Address of FCCD image
+#         encoder_source        Address of encoder
+#         ipimb_source          Address of IPIMB
+#         start_time            delay time first bin
+#         end_time              delay time last bin
+#         num_bins              delay time number of bins
+#         path                  path directory for output files
+#         ipimb_threshold_upper 
+#         ipimb_threshold_lower 
+#         ipimb_offset          
+#         trim_images           Show only the trimmed (480x480) images
 
-        self.img_source = image_source
-        self.enc_source = encoder_source
-        self.ipimb_source = ipimb_source
+        self.img_source = self.configSrc('image_source', "SxrEndstation-0|Fccd-0")
+        self.enc_source = self.configSrc('encoder_source', "SxrBeamline-0|Encoder-0")
+        self.ipimb_source = self.configSrc('ipimb_source', "SxrBeamline-0|Ipimb-1")
 
-        self.fStartTime = float(start_time)
-        self.fEndTime   = float(end_time)
-        self.iNumBins   = int(num_bins)
-        self.FileFolder = path
+        self.fStartTime = self.configFloat('start_time', 300.)
+        self.fEndTime   = self.configFloat('end_time', 500.)
+        self.iNumBins   = self.configInt('num_bins', 100)
+        self.FileFolder = self.configStr('path', "data")
 
-        self.IpimbThrU   =  float(ipimb_threshold_upper)
-        self.IpimbThrL   =  float(ipimb_threshold_lower)
-        self.IpimbOffset = float(ipimb_offset)
+        self.IpimbThrU   =  self.configFloat('ipimb_threshold_upper', 2.0)  # 0.55
+        self.IpimbThrL   =  self.configFloat('ipimb_threshold_lower', 0.02) # 0.35
+        self.IpimbOffset = self.configFloat('ipimb_offset', 0.)             # 1.22
 
-        self.trim_images = trim_images
+        self.trim_images = self.configBool('trim_images', False)
 
         # collect the total average (write to dark file if that is non-existent)
         self.avg_image = None
