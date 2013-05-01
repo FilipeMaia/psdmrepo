@@ -5,11 +5,74 @@
 # 
 
 import logging
+import types
 
 from pypdsdata import xtc
 import pyana
 
 _log = logging.getLogger("pyana.userana")
+
+#
+# Bunch of special methods to augment use module with
+#
+
+_default = [[[((()))]]]  # unlikely value for a default
+
+def _val2bool(val):
+    if isinstance(val, types.StringTypes):
+        if val in ['yes', 'true', 'True', 'on']: return True
+        if val in ['no', 'false', 'False', 'off']: return False
+        raise ValueError("string cannot be converted to boolean: "+val)
+    return bool(val)
+
+def _configStr(self, parm, default=_default):
+    if default is _default:
+        return self.__pyana_config__[parm]
+    else:
+        return self.__pyana_config__.get(parm, default)
+
+def _configBool(self, parm, default=_default):
+    if parm in self.__pyana_config__: return _val2bool(self.__pyana_config__[parm])
+    if default is _default: raise KeyError(parm)
+    return default
+
+def _configInt(self, parm, default=_default):
+    if parm in self.__pyana_config__: return int(self.__pyana_config__[parm])
+    if default is _default: raise KeyError(parm)
+    return default
+
+def _configFloat(self, parm, default=_default):
+    if parm in self.__pyana_config__: return float(self.__pyana_config__[parm])
+    if default is _default: raise KeyError(parm)
+    return default
+
+def _configSrc(self, parm, default=_default):
+    # returns the string
+    return _configStr(self, parm, default)
+
+
+def _configListStr(self, parm):
+    str = self.__pyana_config__.get(parm, "")
+    return str.split()
+
+def _configListBool(self, parm):
+    return [_val2bool(x) for x in _configListStr(self, parm)]
+
+def _configListInt(self, parm):
+    return [int(x) for x in _configListStr(self, parm)]
+
+def _configListFloat(self, parm):
+    return [float(x) for x in _configListStr(self, parm)]
+
+def _configListSrc(self, parm):
+    return _configListStr(self, parm)
+
+def _modName(self):
+    return self.__modname__
+
+def _className(self):
+    return self.__modname__.split(':')[0]
+
 
 
 def mod_import(name, config):
@@ -36,12 +99,47 @@ def mod_import(name, config):
         _log.error("User module %s does not define class %s", modname, classname )
         return None
     
+    # add bunch of methods
+    setattr(userClass, 'configStr', _configStr)
+    setattr(userClass, 'configBool', _configBool)
+    setattr(userClass, 'configInt', _configInt)
+    setattr(userClass, 'configFloat', _configFloat)
+    setattr(userClass, 'configSrc', _configSrc)
+    setattr(userClass, 'configListStr', _configListStr)
+    setattr(userClass, 'configListBool', _configListBool)
+    setattr(userClass, 'configListInt', _configListInt)
+    setattr(userClass, 'configListFloat', _configListFloat)
+    setattr(userClass, 'configListSrc', _configListSrc)
+    setattr(userClass, 'name', _modName)
+    setattr(userClass, 'className', _className)
+    
+    # temporary hack to access config dict in constructor
+    configDict = config.copy()
+    setattr(userClass, '__pyana_config__', configDict)
+    setattr(userClass, "__modname__", name)
+    
     # instantiate it
+    userana = None
+    err = None
     try:
         userana = userClass(**config)
+    except TypeError, e :
+        err = str(e)
+        # possibly due to constructor not taking any arguments, try again without it
+        try:
+            userana = userClass()
+        except Exception, e :
+            err = str(e)
+            pass
     except Exception, e :
-        _log.exception("Failure while instantiating class %s: %s", classname, str(e) )
+        err = str(e)
+        pass
+    if userana is None:
+        _log.exception("Failure while instantiating class %s: %s", classname, err )
         return None
+
+    delattr(userClass, '__pyana_config__')
+    delattr(userClass, '__modname__')
 
     # some weird cases are possible, just make sure that callable
     # returns an object which has a list of attributes that we need
@@ -54,6 +152,8 @@ def mod_import(name, config):
             _log.error("User analysis class %s does not define method %s", classname, method )
             return None
 
+    # make an instance attribute of the config dict
+    setattr(userana, '__pyana_config__', configDict)
     setattr(userana, "__modname__", name)
 
     # looks OK so far
