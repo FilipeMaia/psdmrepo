@@ -2,7 +2,7 @@
 #
 # $Id$
 
-pack_psana="PSEnv PSEvt PSTime PSXtcInput PSHist RootHistoManager MsgLogger ndarray psana psddl_psana psana/doc/mainpage.dox-main"
+pack_psana="PSEnv PSEvt PSTime PSXtcInput PSShmemInput PSHist RootHistoManager MsgLogger ndarray psana psddl_psana psana/doc/mainpage.dox-main"
 pack_psana_mod="CSPadPixCoords PSCalib ImgPixSpectra cspad_mod psana_examples"
 
 usage() {

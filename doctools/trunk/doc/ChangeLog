@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-18
+2013-05-01 Andy Salnikov
+- doxy-driver: add PSShmemInput package to psana list
+
 Tag: V00-00-17
 2013-03-04 Andy Salnikov
 - accept class names starting with single underscore (but not double)
