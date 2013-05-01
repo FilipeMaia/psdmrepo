@@ -1,0 +1,4 @@
+- adding package PSShmemInput which provides psana input module 
+  for shared memory
+- both pyana and psana have number of changes to simplify migration
+  from pyana to psana
