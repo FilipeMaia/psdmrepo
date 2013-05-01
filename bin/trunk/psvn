@@ -128,12 +128,12 @@ EOD
 
 # get SVN package name in the current directory
 localpkg() {
-  svn info 2>/dev/null | gawk '/^Repository Root:/ {repo=$3} /^URL: / {url=$2} END {sub(repo, "", url); split(url, a, "[/]"); print a[2]}'
+  svn info $1 2>/dev/null | gawk '/^Repository Root:/ {repo=$3} /^URL: / {url=$2} END {sub(repo, "", url); split(url, a, "[/]"); print a[2]}'
 }
 
 # get SVN repository name for the current directory
 localrepo() {
-  svn info 2>/dev/null | gawk '/^Repository Root:/ {print $3}'
+  svn info $1 2>/dev/null | gawk '/^Repository Root:/ {print $3}'
 }
 
 #
@@ -278,11 +278,13 @@ exec_tag() {
     pkg=${pkg:?Cannot determine package name}
     repo=`localrepo`
     repo=${repo:-$svnroot}
-    svn copy -r "$rev" -m 'Tagging $pkg with $tag' \
+    svn copy -r "$rev" -m "Tagging $pkg with $tag" \
       "$repo/$pkg/trunk" "$repo/$pkg/tags/$tag"
 
   elif [ -n "$pkg" ] ; then
 
+    repo=`localrepo $pkg`
+    repo=${repo:-$svnroot}
     svn copy -m "Tagging $pkg with $tag" "$pkg" "$repo/$pkg/tags/$tag"
     
   else
@@ -315,6 +317,7 @@ case "$2" in
 esac
 
 eval svnroot="\$$repo"
+unset repo
 if [ -z "$svnroot" ] ; then
   echo "$repo environment variable is not defined"
   exit 2
