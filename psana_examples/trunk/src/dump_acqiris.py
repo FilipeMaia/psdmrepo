@@ -32,7 +32,7 @@ import logging
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
-from pypdsdata import xtc
+from psana import *
 
 #----------------------------------
 # Local non-exported definitions --
@@ -49,21 +49,16 @@ class dump_acqiris (object) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self, source="" ) :
-        """Class constructor takes the name of the data source.
-
-        @param source   data source
-        """
+    def __init__ ( self ) :
         
-        self.m_src = source
+        self.m_src = self.configSrc('source', "")
 
     #-------------------
     #  Public methods --
     #-------------------
     def beginjob( self, evt, env ) :
         
-        print "self.m_src=", self.m_src
-        config = env.getConfig(xtc.TypeId.Type.Id_AcqConfig, self.m_src)
+        config = env.configStore().get(Acqiris.Config, self.m_src)
         if config:
         
             print "%s: %s" % (config.__class__.__name__, self.m_src)
@@ -84,10 +79,10 @@ class dump_acqiris (object) :
             for ch in range(nch):
                 v = vert[ch]
                 print "  vert(%d):" % ch,
-                print "fullScale =", v.fullScale()
-                print "slope =", v.slope()
-                print "offset =", v.offset()
-                print "coupling =", v.coupling()
+                print "fullScale =", v.fullScale(),
+                print "slope =", v.slope(),
+                print "offset =", v.offset(),
+                print "coupling =", v.coupling(),
                 print "bandwidth=", v.bandwidth()
 
     def event( self, evt, env ) :
@@ -97,21 +92,19 @@ class dump_acqiris (object) :
         @param env    environment object
         """
 
-        print "hi"
-        print "self.m_src=", self.m_src           # e.g. '|Acqiris'
-        print "self.m_fullName=", self.m_fullName # e.g. 'psana_examples.dump_acqiris'
-        acqData = evt.getByType("Psana::Acqiris::DataDesc", self.m_src)
+        acqData = evt.get(Acqiris.DataDesc, self.m_src)
         if not acqData:
             return
 
         # find matching config object
-        acqConfig = env.getConfigByType("Psana::Acqiris::Config", self.m_src)
+        config = env.configStore().get(Acqiris.Config, self.m_src)
 
         # loop over channels
         nchan = acqData.data_shape()[0];
         for chan in range(nchan):
+            
             elem = acqData.data(chan);
-            v = acqConfig.vert()[chan]
+            v = config.vert()[chan]
             slope = v.slope()
             offset = v.offset()
 
@@ -121,14 +114,12 @@ class dump_acqiris (object) :
             print "  indexFirstPoint=%d" % elem.indexFirstPoint()
 
             timestamps = elem.timestamp()
-            waveforms = elem.waveforms()
+            raw = elem.waveforms()
+            wf = raw*slope + offset
 
             # loop over segments
             for seg in range(elem.nbrSegments()):
                 print "  Segment #%d" % seg
-                print "    timestamp=%d" % timestamps[seg].pos()
-                print "    data=[",
-                size = min(elem.nbrSamplesInSeg(), 32)
-                for i in range(size):
-                    print "%f," % (waveforms[seg][i]*slope + offset),
-                print "...]"
+                print "    timestamp =", timestamps[seg].pos()
+                print "    raw =", raw[seg]
+                print "    wf =", wf[seg]

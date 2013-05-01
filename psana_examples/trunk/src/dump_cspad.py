@@ -39,7 +39,7 @@ import logging
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
-from pypdsdata.xtc import *
+from psana import *
 
 #----------------------------------
 # Local non-exported definitions --
@@ -62,9 +62,10 @@ class dump_cspad ( object ) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self, address = "" ) :
+    def __init__ ( self ) :
         """Constructor. """
-        self.m_src = address
+        
+        self.m_src = self.configSrc('source', "")
 
     #-------------------
     #  Public methods --
@@ -72,7 +73,7 @@ class dump_cspad ( object ) :
 
     def beginjob( self, evt, env ) :
 
-        config = env.getConfig(TypeId.Type.Id_CspadConfig, self.m_src)
+        config = env.configStore().get(CsPad.Config, self.m_src)
         if not config:
             return
         
@@ -92,50 +93,43 @@ class dump_cspad ( object ) :
         print "  numQuads =", config.numQuads();
         try:
             # older versions may not have all methods
-            print "  roiMask       : [%s]" % ', '.join([hex(config.roiMask(q)) for q in range(4)])
-            print "  numAsicsStored: %s" % str(map(config.numAsicsStored, range(4)))
+            print "  roiMask = [%s]" % ', '.join([hex(config.roiMask(q)) for q in range(4)])
+            print "  numAsicsStored = %s" % str(map(config.numAsicsStored, range(4)))
         except:
             pass
         try:
-            print "  sections      : %s" % str(map(config.sections, range(4)))
+            print "  sections = %s" % str(map(config.sections, range(4)))
         except:
             pass
 
 
     def event( self, evt, env ) :
 
-        quads = evt.get(TypeId.Type.Id_CspadElement, self.m_src)
-        if not quads :
+        data = evt.get(CsPad.Data, self.m_src)
+        if not data:
             return
+        
+        nQuads = data.quads_shape()[0]
 
         # dump information about quadrants
-        print "dump_cspad: %s: %s" % (quads[0].__class__.__name__, self.m_src)
-        print "  Number of quadrants: %d" % len(quads)
-
-        evt_data = evt.getBySource("Psana::CsPad::Data", self.source)
-        quads = evt_data.quads
-        if not quads :
-            return
-
-        # dump information about quadrants
-        nQuads = evt_data.quads_shape()[0]
-        print "dump_cspad: %s: %s" % (quads(0).__class__.__name__, self.m_src)
+        print "dump_cspad: %s: %s" % (data.quads(0).__class__.__name__, self.m_src)
         print "  Number of quadrants: %d" % nQuads
         for i in range(nQuads):
-            q = quads(i)
+            q = data.quads(i)
             
-            print "  Quadrant %d" % q.quad()
-            print "    virtual_channel: %s" % q.virtual_channel()
-            print "    lane: %s" % q.lane()
-            print "    tid: %s" % q.tid()
-            print "    acq_count: %s" % q.acq_count()
-            print "    op_code: %s" % q.op_code()
-            print "    seq_count: %s" % q.seq_count()
-            print "    ticks: %s" % q.ticks()
-            print "    fiducials: %s" % q.fiducials()
-            print "    frame_type: %s" % q.frame_type()
-            print "    sb_temp: %s", str(q.sb_temp())
-
+            print "  Quadrant #%d" % q.quad()
+            print "    virtual_channel = %s" % q.virtual_channel()
+            print "    lane = %s" % q.lane()
+            print "    tid = %s" % q.tid()
+            print "    acq_count = %s" % q.acq_count()
+            print "    op_code = %s" % q.op_code()
+            print "    quad = %s" % q.quad()
+            print "    seq_count = %s" % q.seq_count()
+            print "    ticks = %s" % q.ticks()
+            print "    fiducials = %s" % q.fiducials()
+            print "    frame_type = %s" % q.frame_type()
+            print "    sb_temp = %s" % q.sb_temp()
+            print "    common_mode = %s" % [q.common_mode(i) for i in range(q.data().shape[0])]
             # image data as 3-dimentional array
-            data = q.data()
-            print "    Data shape: %s" % str(data.shape)
+            print "    data shape = {}".format(q.data().shape)
+            print "    data = %s" % q.data()
