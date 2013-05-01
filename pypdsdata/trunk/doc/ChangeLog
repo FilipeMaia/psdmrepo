@@ -6,6 +6,10 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V00-00-97
+2013-05-01 Andy Salnikov
+- add more info when printing camera/FrameFexConfigV1
+
 Tag: V00-00-96
 2013-04-25 Andy Salnikov
 - upgrading to pdsdata V06-07-04

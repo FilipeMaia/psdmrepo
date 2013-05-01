@@ -116,6 +116,7 @@ pypdsdata::Camera::FrameFexConfigV1::print(std::ostream& str) const
       << ", processing=" << m_obj->processing()
       << ", roiBegin=(" << m_obj->roiBegin().column << ',' << m_obj->roiBegin().row << ')'
       << ", roiEnd=(" << m_obj->roiEnd().column << ',' << m_obj->roiEnd().row << ')'
+      << ", number_of_masked_pixels=" << m_obj->number_of_masked_pixels()
       << ", ...)" ;
 }
 
