@@ -98,6 +98,8 @@ namespace {
       printDetInfo(str, static_cast<const Pds::DetInfo&>(src));
     } else if (src.level() == Pds::Level::Reporter) {
       printBldInfo(str, static_cast<const Pds::BldInfo&>(src));
+    } else if (src.level() == Pds::Level::NumberOfLevels) {
+      // special match-anything source, empty string
     } else {
       printProcInfo(str, static_cast<const Pds::ProcInfo&>(src));
     }
