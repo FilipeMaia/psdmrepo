@@ -1,0 +1,128 @@
+#!/bin/sh
+#
+# Shell script which runs irods-scan script
+#
+# $Id: irods-scan-cron 2228 2011-08-17 22:17:38Z salnikov@SLAC.STANFORD.EDU $
+#
+
+# release directory
+release=/reg/g/psdm/sw/releases/current
+
+# log directory
+logdir=/reg/g/psdm/psdatmgr/ic/log
+
+# mail
+expert=salnikov@slac.stanford.edu
+
+# file name for request ID
+reqIDfile=/reg/g/psdm/psdatmgr/ic/h5check-reqid
+
+# ===================================================================
+
+# test if first agument is in the list (remaining arguments)
+is_in() {
+  val=$1; shift
+  for w; do
+    test $val -eq $w && return
+  done
+  false
+}
+
+usage () {
+  echo "Usage: $(basename $0) [options]"
+  echo "  Options:"
+  echo "    -h        - print this message"
+  echo "    -r path   - release directory, def: $release"
+  echo "    -f path   - request ID file"
+}
+
+while getopts hr:f: c ; do
+  case $c in
+    h) usage ; exit 0 ;;
+    r) release="$OPTARG" ;;
+    r) reqIDfile="$OPTARG" ;;
+    \?) usage ; exit 2 ;;
+  esac
+done
+
+# check lock file
+lockfile="$reqIDfile.lock"
+if [ -f "$lockfile" ] ; then
+    mail -s "[h5check-cron] Lock file already exists" $expert << EOD
+$time
+Other job may be running, lock file $lockfile exists already
+EOD
+    exit 2
+fi
+
+# get last request ID from file
+lastids=`cat "$reqIDfile" 2>/dev/null`
+if [ -z "$lastids" ] ; then
+    mail -s "[h5check-cron] request ID file does not exist" $expert << EOD
+$time
+Request ID file $reqIDfile is not there or empty
+EOD
+    exit 2
+fi
+
+# create log dir if not there
+test -d "$logdir" || mkdir -p "$logdir" || exit 2
+
+touch $lockfile
+
+# redirect output
+log="$logdir/h5check-scan.log"
+exec >> "$log" 2>&1
+
+time=`date +'%Y-%m-%d %H:%M:%S'`
+echo "+++ Time: $time Release: $release"
+
+# have to be in release directory
+cd "$release"
+
+# run setup script, it should guess everything based on the current directory
+. /reg/g/psdm/bin/sit_setup.sh
+
+
+# get the list of IDs to check, use last 200 successfully finished jobs
+jobs=`ic-status -n -t -S | tail -200 | gawk '{ printf "%s:%s:%s:%s\n", $1, $2, $3, $5; }'`
+
+# loop over the jobs
+status=0
+newlast=""
+for job in $jobs; do
+	
+	set `echo $job | tr : ' '`
+	instr=$1
+	exp=$2
+	run=$3
+	reqid=$4
+
+    newlast="$newlast $reqid"
+
+	is_in $reqid $lastids && continue
+			
+	fname=`printf "/reg/d/psdm/%s/%s/hdf5/%s-r%04d.h5" $instr $exp $exp $run`
+    if [ -f "$fname" ] ; then
+    	time=`date +'%Y-%m-%d %H:%M:%S'`
+    	echo "... Time: $time Checking file $fname"
+    	h5check $fname || status=$?
+    fi
+done    		
+
+# store the list
+test -n "$newlast" && echo "$newlast" > "$reqIDfile"
+
+if [ $status -ne 0 ] ; then
+	mail -s "[irods-scan-cron] Detected corrupted HDF5 files" $expert << EOD
+$time
+Check log file $log
+EOD
+fi
+
+time=`date +'%Y-%m-%d %H:%M:%S'`
+echo "--- Time: $time"
+
+rm $lockfile
+
+exit $status
