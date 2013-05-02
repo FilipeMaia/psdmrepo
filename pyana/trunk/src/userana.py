@@ -18,12 +18,12 @@ _log = logging.getLogger("pyana.userana")
 
 _default = [[[((()))]]]  # unlikely value for a default
 
+_trues = {'yes': True, 'true': True, 'on': True, '1': True,
+          'no': False, 'false': False, 'off': False, '0':False }
 def _val2bool(val):
-    if isinstance(val, types.StringTypes):
-        if val in ['yes', 'true', 'True', 'on']: return True
-        if val in ['no', 'false', 'False', 'off']: return False
-        raise ValueError("string cannot be converted to boolean: "+val)
-    return bool(val)
+    val = _trues.get(val.lower())
+    if val is None: raise ValueError("string cannot be converted to boolean: "+val)
+    return val
 
 def _configStr(self, parm, default=_default):
     if default is _default:
