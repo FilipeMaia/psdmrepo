@@ -19,7 +19,7 @@ endif
 
 $tmp_sit_root/bin/uss.sh -c $tmp_sit_root/etc/sit_env.uss > $tmp_sh
 source $tmp_sh
-rm $tmp_sh
+/bin/rm $tmp_sh
 
 unset tmp_sh
 unset tmp_sit_root

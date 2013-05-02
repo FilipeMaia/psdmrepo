@@ -16,7 +16,7 @@ tmp_sit_root=${SIT_ROOT:-/reg/g/psdm}
 
 $tmp_sit_root/bin/uss.sh -s $tmp_sit_root/etc/sit_env.uss > $tmp_sh
 . $tmp_sh
-rm $tmp_sh
+/bin/rm $tmp_sh
 
 unset tmp_sh
 unset tmp_sit_root
