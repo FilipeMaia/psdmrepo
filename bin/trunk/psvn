@@ -225,7 +225,7 @@ exec_tar() {
   svn export "$repo" "$tmpdir/$dir" &&
      echo "$tag" > "$tmpdir/$dir/.sit-tag" &&
      tar -c $taropt -C "$tmpdir" -f "$tar" "$dir"
-  rm -rf "$tmpdir"
+  /bin/rm -rf "$tmpdir"
 }
 
 #

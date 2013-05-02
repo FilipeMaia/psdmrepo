@@ -87,4 +87,4 @@ test -n "$desc" -a -f "$desc" && cp "$desc" "$tmpdir/$rel/release-notes"
 tar -C "$tmpdir" -c -f "$file" $compress "$rel"
 
 # cleanup
-rm -rf "$tmpdir"
+/bin/rm -rf "$tmpdir"

@@ -60,7 +60,7 @@ checkout() {
 
   # link or copy SConstruct file
   if [ "$1" = "SConsTools" ] ; then
-    test -h SConstruct && rm SConstruct
+    test -h SConstruct && /bin/rm SConstruct
     test -f SConstruct && mv SConstruct SConstruct.save
     echo "Linking SConstruct to $1/src/SConstruct.main"
     ln -s "$1/src/SConstruct.main" SConstruct
