@@ -14,6 +14,7 @@
 // C/C++ Headers --
 //-----------------
 #include <vector>
+#include <cstddef>
 
 //----------------------
 // Base Class Headers --
@@ -53,7 +54,7 @@ public:
   enum { NUMBER_OF_PARAMETERS = 3 };
 
   CsPadBeamVectorV1( const std::vector<double> v_parameters );
-  double  getVectorEl(size_t i){ return m_beam_vector[i]; };
+  double  getVectorEl(std::size_t i){ return m_beam_vector[i]; };
   double* getVector(){ return &m_beam_vector[0]; };
 
   void  print();
