@@ -35,14 +35,31 @@
 #include "CSPadPixCoords/Image2D.h"
 
 //For save in PNG and TIFF formats
-#define png_infopp_NULL (png_infopp)NULL
-#define int_p_NULL (int*)NULL
+//#define png_infopp_NULL (png_infopp)NULL
+//#define int_p_NULL (int*)NULL
+
+//#include <boost/mpl/vector.hpp>
 #include <boost/gil/gil_all.hpp>
+
+//#include <boost/mpl/vector.hpp>
+//#include <boost/gil/typedefs.hpp>
+//#include <boost/gil/extension/dynamic_image/any_image.hpp>
+//#include <boost/gil/planar_pixel_reference.hpp>
+//#include <boost/gil/color_convert.hpp>
+//#include <boost/gil/typedefs.hpp>
+//#include <boost/gil/image.hpp>
+//#include <boost/gil/image_view.hpp>
+//#include <boost/gil/image_view_factory.hpp>
+
+#ifndef BOOST_GIL_NO_IO
+#include <boost/gil/extension/io/png_io.hpp> 
+#include <boost/gil/extension/io/tiff_io.hpp> 
+//#include <boost/gil/extension/io/jpeg_io.hpp>
+
 #include <boost/gil/extension/io/png_dynamic_io.hpp>
 #include <boost/gil/extension/io/tiff_dynamic_io.hpp> 
-//#include <boost/gil/extension/io/tiff_io.hpp> 
-//#include <boost/gil/extension/io/dynamic_io.hpp>
-
+//#include <boost/gil/extension/io/jpeg_dynamic_io.hpp> 
+#endif
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -69,9 +86,21 @@ namespace ImgAlgos {
  *  @author Mikhail S. Dubrovin
  */
 
-  enum FILE_MODE {BINARY, TEXT, TIFF, PNG};
+using namespace boost::gil;
+using namespace std;
 
-//using namespace boost::gil;
+//typedef boost::mpl::vector<gray8_image_t, gray16_image_t, gray32_image_t> my_images_t;
+
+//typedef pixel<float,gray_layout_t>      gray_float_pixel_t;
+//typedef image<gray_float_pixel_t,false> gray_float_image_t;
+//typedef gray_float_image_t::view_t      gray_float_view_t; 
+
+//typedef pixel<double,gray_layout_t>      gray_double_pixel_t;
+//typedef image<gray_double_pixel_t,false> gray_double_image_t;
+//typedef gray_double_image_t::view_t      gray_double_view_t; 
+
+enum FILE_MODE {BINARY, TEXT, TIFF, PNG};
+
 
 class GlobalMethods  {
 public:
@@ -111,6 +140,19 @@ private:
   }
 
 //--------------------
+
+  template <typename T>
+    bool isSupportedDataType()
+    {
+	std::cout <<  "Input data type: " << strOfDataTypeAndSize<T>() << std::endl;
+        if ( *typeid(T).name() != 't') {
+	  cout <<  "Sorry, but saving images in PNG works for uint16_t data only..." << endl;
+	  return false;
+        }
+	return true;
+    }
+
+//--------------------
 // Define inage shape in the event for specified type, str_src, and str_key 
   template <typename T>
   bool defineImageShapeForType(PSEvt::Event& evt, const PSEvt::Source& str_src, const std::string& str_key, unsigned* shape)
@@ -127,6 +169,85 @@ private:
 //--------------------
 // Save 2-D array in file
   template <typename T>
+    bool save2DArrayInPNGForType(const std::string& fname, const T* arr, const unsigned& rows, const unsigned& cols)
+    {
+        using namespace boost::gil;
+
+	//unsigned size = cols*rows;
+
+	if ( *typeid(T).name() == *typeid(uint16_t).name() ) {
+	  uint16_t* p_arr = (uint16_t*)&arr[0];
+          gray16c_view_t image = interleaved_view(cols, rows, (const gray16_pixel_t*)p_arr, cols*sizeof(T));
+          png_write_view(fname, image);
+	  return true;
+	}
+
+	else if ( *typeid(T).name() == *typeid(uint8_t).name() ) {
+	  uint8_t* p_arr = (uint8_t*)&arr[0];
+          gray8c_view_t image = interleaved_view(cols, rows, (const gray8_pixel_t*)p_arr, cols*sizeof(T));
+          png_write_view(fname, image);
+	  return true;
+	}
+
+	return false;
+    }
+
+
+//--------------------
+// Save 2-D array in file
+  template <typename T>
+    bool save2DArrayInTIFFForType(const std::string& fname, const T* arr, const unsigned& rows, const unsigned& cols)
+    {
+        using namespace boost::gil;
+
+	unsigned size = cols*rows;
+
+	if ( *typeid(T).name() == *typeid(double).name() ) {
+	  float* arr32f = new float[size]; 
+          for (unsigned i=0; i<size; i++) { arr32f[i] = (float)arr[i]; }
+	  gray32f_view_t image = interleaved_view(cols, rows, (gray32f_pixel_t*)&arr32f[0], cols*sizeof(float));
+          tiff_write_view(fname, image);
+	  return true;
+	}
+
+	else if ( *typeid(T).name() == *typeid(float).name() ) {
+	  float* p_arr = (float*)&arr[0];
+	  gray32f_view_t image = interleaved_view(cols, rows, (gray32f_pixel_t*)p_arr, cols*sizeof(T));
+          tiff_write_view(fname, image);
+	  return true;
+	}
+
+	else if ( *typeid(T).name() == *typeid(int).name() ) {
+	  //int* p_arr = (int*)&arr[0];
+	  //gray32c_view_t image = interleaved_view(cols, rows, reinterpret_cast<const gray32_pixel_t*>(p_arr), cols*sizeof(T));
+	  float* arr32f = new float[size]; 
+          for (unsigned i=0; i<size; i++) { arr32f[i] = (int)arr[i]; }
+	  gray32f_view_t image = interleaved_view(cols, rows, (gray32f_pixel_t*)&arr32f[0], cols*sizeof(float));
+          tiff_write_view(fname, image);
+	  return true;
+	}
+
+	else if ( *typeid(T).name() == *typeid(uint16_t).name() ) {
+	  uint16_t* p_arr = (uint16_t*)&arr[0];
+          gray16c_view_t image = interleaved_view(cols, rows, (const gray16_pixel_t*)p_arr, cols*sizeof(T));
+          tiff_write_view(fname, image);
+	  return true;
+	}
+
+	else if ( *typeid(T).name() == *typeid(uint8_t).name() ) {
+	  uint8_t* p_arr = (uint8_t*)&arr[0];
+          gray8c_view_t image = interleaved_view(cols, rows, (const gray8_pixel_t*)p_arr, cols*sizeof(T));
+          tiff_write_view(fname, image);
+          png_write_view(fname+".png", image);
+	  return true;
+	}
+
+	return false;
+    }
+
+//--------------------
+// Save 2-D array in file
+  template <typename T>
   void save2DArrayInFile(const std::string& fname, const T* arr, const unsigned& rows, const unsigned& cols, bool print_msg, FILE_MODE file_type=TEXT)
   {  
     if (fname.empty()) {
@@ -134,7 +255,7 @@ private:
       return;
     }
 
-    if( print_msg ) MsgLog("GlobalMethods", info, "Save 2-d array in file " << fname.c_str() << " file type:" << file_type);
+    if( print_msg ) MsgLog("GlobalMethods", info, "Save 2-d array in file " << fname.c_str() << " file type:" << strOfDataTypeAndSize<T>());
 
     //======================
     if (file_type == TEXT) {
@@ -164,7 +285,18 @@ private:
 
     //======================
     if (file_type == PNG) {
+
         using namespace boost::gil;
+
+        //gray32f_image_t img(400,200);
+        //gray32f_pixel_t col(150);
+        //fill_pixels(view(img), col);
+        //tiff_write_view("grayrect32.tiff", view(img));
+        // DOES NOT WORK: png_write_view("grayrect32.png", view(img));
+	//cout <<  "Save files : grayrect32.*" << endl;
+
+        //png_write_view("grayrect32.png", view(img)); // DOES NOT WORK!!!
+
         //rgb8_image_t img(rows, cols);
         //rgb8_pixel_t red(255, 0, 0); fill_pixels(view(img), red);
         //png_write_view(fname, const_view(img));
@@ -173,22 +305,29 @@ private:
         //rgb8c_view_t image = interleaved_view(cols, rows, reinterpret_cast<const rgb8_pixel_t*>(&arr[0]), cols*sizeof(T));
         //rgb8c_view_t image = interleaved_view(cols, rows, (const rgb8_pixel_t*)arr, cols*sizeof(T));
         //rgb16c_view_t image = interleaved_view(cols/3, rows, (const rgb16_pixel_t*)arr, cols*sizeof(T));
-        gray16c_view_t image = interleaved_view(cols, rows, reinterpret_cast<const gray16_pixel_t*>(&arr[0]), cols*sizeof(T));
-        png_write_view(fname, image);
+
+	//if (! isSupportedDataType<T>()) return;
+	//gray32c_view_t image = interleaved_view(cols, rows, reinterpret_cast<const gray32_pixel_t*>(&arr[0]), cols*sizeof(T));
+	//gray16c_view_t image = interleaved_view(cols, rows, reinterpret_cast<const gray16_pixel_t*>(&arr[0]), cols*sizeof(T));
+        //png_write_view(fname, image);
+
+        if (save2DArrayInPNGForType<T>(fname, arr, rows, cols)) return;
+        MsgLog("GlobalMethods", warning, "Input data type " << strOfDataTypeAndSize<T>() << " is not implemented for saving in PNG. File IS NOT saved!");
         return; 
     }
 
     //======================
     if (file_type == TIFF) {
         //MsgLog("GlobalMethods", warning, "Saving of images in TIFF format is not implemented yet.");
-        using namespace boost::gil;
-        gray16c_view_t image = interleaved_view(cols, rows, reinterpret_cast<const gray16_pixel_t*>(&arr[0]), cols*sizeof(T));
-        tiff_write_view(fname, image);
+
+        if (save2DArrayInTIFFForType<T>(fname, arr, rows, cols)) return;
+        MsgLog("GlobalMethods", warning, "Input data type " << strOfDataTypeAndSize<T>() << " is not implemented for saving in TIFF. File IS NOT saved!");
         return; 
     }
 
     //======================
   }
+
 
 //--------------------
 // Save 2-D array in file

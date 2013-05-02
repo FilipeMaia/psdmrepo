@@ -11,6 +11,12 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-10
+2013-05-02 Mikhail S. Dubrovin
+- in GlobalMethods.h add saving in TIFF for double, float, int, uint8_t
+	saving in PNG works for uint16_t and uint8_t only... 
+	(glitch in boost::gil library, where png_write_view does not work with other image formats...)
+
 Tag: V00-03-09
 2013-04-30 Mikhail S. Dubrovin
 M       include/ImgSaveInFile - add saving of image in BIN, TIFF, PNG formats. 
