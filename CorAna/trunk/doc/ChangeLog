@@ -11,6 +11,13 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2013-05-08 Mikhail S. Dubrovin
+Tag: V00-00-14
+- change initialization of matplotlib.use('Qt4Agg')
+- add protection in case of missing files etc.
+- a lot of print statements (test for difference in results...) 
+  need to be commented.
+	
 2013-04-26 Mikhail S. Dubrovin
 Tag: V00-00-13
 - update all changes
