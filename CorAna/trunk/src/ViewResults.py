@@ -145,6 +145,8 @@ class ViewResults :
     """First look at results.
     """
 
+    notzero = 1
+
     def __init__(sp, fname=None) :
         """
         @param fname the file name with results
@@ -592,6 +594,8 @@ class ViewResults :
         """
         if sp.counts_stat != None : return sp.counts_stat
         sp.counts_stat = bincount(sp.get_q_phi_map_for_stat_bins(), sp.get_mask_total(), length=sp.npart_stat)
+        msg = 'get_counts_for_stat_bins(): sp.counts_stat = ' + str(sp.counts_stat)
+        logger.info(msg, __name__)
         return sp.counts_stat
 
 
@@ -601,6 +605,8 @@ class ViewResults :
         """
         if sp.counts_stat_q != None : return sp.counts_stat_q
         sp.counts_stat_q = bincount(sp.get_q_map_for_stat_bins(), sp.get_mask_total(), length=sp.ana_stat_part_q+1 )
+        msg = 'get_counts_for_stat_q_bins(): sp.counts_stat_q = ' + str(sp.counts_stat_q)
+        logger.info(msg, __name__)
         return sp.counts_stat_q
 
 
@@ -677,6 +683,9 @@ class ViewResults :
         """
         if sp.counts_dyna != None : return sp.counts_dyna
         sp.counts_dyna = bincount(sp.get_q_phi_map_for_dyna_bins(), map_weights=sp.get_mask_total(), length=sp.npart_dyna)
+
+        msg = 'get_counts_for_dyna_bins(): sp.counts_dyna = ' + str(sp.counts_dyna)
+        logger.info(msg, __name__)
         return sp.counts_dyna
 
 
@@ -754,7 +763,7 @@ class ViewResults :
         #print 'counts for q-phi stat bins:', counts
         #print 'I for q-phi stat bins:', intens_prot
 
-        logger.info('1/Iave - norm. factors for q-phi stat bins: %s'%(str(normf)), __name__)
+        logger.info('1/Iave for q-phi stat bins: %s'%(str(normf)), __name__)
 
         #norm_factor_map = np.choose(q_phi_map_stat, normf, mode='clip') # DOES NOT WORK!
         #norm_factor_map = q_phi_map_stat.choose(normf, mode='clip')     # DOES NOT WORK!
@@ -816,10 +825,21 @@ class ViewResults :
         """Returns the map of g2 values for each pixel of the image.
            The shape of the map is the same as shape of image.
         """
-        Ip_normf_map = sp.get_1oIp_map_for_stat_bins_itau(itau)
-        If_normf_map = sp.get_1oIf_map_for_stat_bins_itau(itau)
-        I2_map       = sp.get_I2_for_itau(itau)
-        sp.g2_map = I2_map * Ip_normf_map * If_normf_map # mask is already applied to normf
+        Ip_normf_map   = sp.get_1oIp_map_for_stat_bins_itau(itau)
+        If_normf_map   = sp.get_1oIf_map_for_stat_bins_itau(itau)
+        I2_map         = sp.get_I2_for_itau(itau)
+        sp.g2_map_norm = I2_map * Ip_normf_map * If_normf_map # mask is already applied to normf
+
+        sp.g2_map = sp.g2_map_norm
+        #================================
+        ### APPLY CUT ON g2 IN MAP HERE
+        #sp.g2_map = np.select([sp.g2_map_norm>6], [0], default=sp.g2_map_norm)
+        #================================
+
+        print '='*64
+        #print 'sp.g2_map.shape =',sp.g2_map.shape # = (1300, 1340)
+        print 'Direct g2 calc. for entire map: np.average(sp.g2_map)', np.average(sp.g2_map)
+        print 'Direct g2 calc. for entire map: np.mean   (sp.g2_map)', np.mean   (sp.g2_map)
         return sp.g2_map
 
 
@@ -832,7 +852,7 @@ class ViewResults :
         counts_prot    = np.select([counts==0], [-1], default=counts) 
         sp.g2_for_dyna_bins = np.select([counts_prot<0], [0], default=intens_dyna/counts_prot)
 
-        print '='*60
+        print '.'*64
         print 'get_g2_for_dyna_bins_itau:'
         #print 'sp.npart_dyna', sp.npart_dyna
         #print 'q_phi_map_dyna:\n', q_phi_map_dyna        
@@ -841,8 +861,9 @@ class ViewResults :
         print 'g2_map.shape', g2_map.shape     
         print 'intens_dyna    = ', intens_dyna
         print 'counts = ', counts
-        print 'g2_for_dyna_bins=', sp.g2_for_dyna_bins
-        
+        msg = 'g2_for_dyna_bins:' + str(sp.g2_for_dyna_bins)
+        print msg
+        logger.info(msg, __name__)
         return sp.g2_for_dyna_bins
 
 
@@ -866,7 +887,7 @@ class ViewResults :
 
         logger.info('Begin processing for <g2> vs tau array', __name__)
 
-        dt = cp.bat_data_dt_ave.value() 
+        dt_ave = cp.bat_data_dt_ave.value() 
 
         g2_vs_itau = []
         for itau, tau in enumerate(sp.list_of_tau) :
@@ -874,7 +895,7 @@ class ViewResults :
             g2_vs_itau.append( g2_for_dyna_bins )
             #print g2_for_dyna_bins
             msg = 'get_g2_vs_itau_arr: itau=%3d  tau=%4d  tau[s]=%6.3f  <g2>=%6.3f' \
-                  % (itau, tau, tau*dt, np.array(g2_for_dyna_bins).mean()) 
+                  % (itau, tau, tau*dt_ave, np.array(g2_for_dyna_bins).mean()) 
             logger.info(msg, __name__)
             #print msg
         
@@ -946,19 +967,32 @@ class ViewResults :
 
     def get_Ip_for_itau(sp,itau) :
         cor_array = sp.get_cor_array_from_binary_file()
-        return cor_array[itau, 0,...]
+        Ip_map_for_itau_data = cor_array[itau, 0,...]
+        Ip_map_for_itau = np.select([Ip_map_for_itau_data < sp.notzero], [sp.notzero], default=Ip_map_for_itau_data) 
+        #Ip_map_for_itau = np.select([Ip_map_for_itau_data < sp.notzero], [0], default=Ip_map_for_itau_data) 
+        print 'Ip_map_for_itau.shape =', Ip_map_for_itau.shape
+        print 'Direct Ip map average: np.mean(Ip_map_for_itau)=', np.mean(Ip_map_for_itau)
+        return Ip_map_for_itau
 
 #-----------------------------
 
     def get_If_for_itau(sp,itau) :
         cor_array = sp.get_cor_array_from_binary_file()
-        return cor_array[itau, 1,...]
+        If_map_for_itau_data = cor_array[itau, 1,...]
+        If_map_for_itau = np.select([If_map_for_itau_data < sp.notzero], [sp.notzero], default=If_map_for_itau_data) 
+        #If_map_for_itau = np.select([If_map_for_itau_data < sp.notzero], [0], default=If_map_for_itau_data) 
+        print 'Direct If map average: np.mean(If_map_for_itau)=', np.mean(If_map_for_itau)
+        return If_map_for_itau
 
 #-----------------------------
 
     def get_I2_for_itau(sp,itau) :
         cor_array = sp.get_cor_array_from_binary_file()
-        return cor_array[itau, 2,...]
+        I2_map_for_itau_data = cor_array[itau, 2,...]
+        I2_map_for_itau = np.select([I2_map_for_itau_data < sp.notzero], [sp.notzero], default=I2_map_for_itau_data) 
+        #I2_map_for_itau = np.select([I2_map_for_itau_data < sp.notzero], [0], default=I2_map_for_itau_data) 
+        print 'Direct Ip*If map average: np.mean(I2_map_for_itau)=', np.mean(I2_map_for_itau)
+        return I2_map_for_itau
 
 #-----------------------------
 
@@ -969,6 +1003,7 @@ class ViewResults :
         If = cor_arr[itau, 1,...] 
         I2 = cor_arr[itau, 2,...] 
         sp.g2_raw_for_itau = divideZeroProteced(I2, Ip*If, val_subst_zero=0)
+        print 'Direct g2 raw map average: np.mean(sp.g2_raw_for_itau)=', np.mean(sp.g2_raw_for_itau)
         return sp.g2_raw_for_itau
 
 #-----------------------------
@@ -1015,9 +1050,13 @@ class ViewResults :
         if sp.mask_blemish != None : return sp.mask_blemish
         if cp.ccdcorr_blemish.value() :
             sp.mask_blemish = gu.get_array_from_file(fnm.path_blem())
+
+            if sp.mask_blemish == None :
+                logger.info('Blemish mask file %s is not available. Use unit mask.' % fnm.path_blem(), __name__)
+                sp.mask_blemish = np.ones((sp.rows,sp.cols), dtype=np.uint8)
             logger.info('Blemish mask is taken from file ' + fnm.path_blem(), __name__)
         else :
-            logger.info('Blemish mask is turned off', __name__)
+            logger.info('Blemish mask is turned off. Use unit mask.', __name__)
             sp.mask_blemish = np.ones((sp.rows,sp.cols), dtype=np.uint8)
             #np.savetxt(fnm.path_blem()+'-all-ones', sp.mask_blemish, fmt='%1d', delimiter=' ') 
         return sp.mask_blemish

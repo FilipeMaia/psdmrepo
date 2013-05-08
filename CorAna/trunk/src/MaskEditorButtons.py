@@ -383,7 +383,7 @@ class MaskEditorButtons (QtGui.QWidget) :
 
         if but_text == self.list_of_io_tits[0] : # 'Load Img'
             self.setStatus(1, 'Waiting\nfor input...')
-            path = gu.get_open_fname_through_dialog_box(self, path0, but_text, filter='*.txt')
+            path = gu.get_open_fname_through_dialog_box(self, path0, but_text, filter='*.txt *.npy')
             if path == None :
                 self.setStatus()
                 return

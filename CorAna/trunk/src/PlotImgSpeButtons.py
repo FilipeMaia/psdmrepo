@@ -221,14 +221,14 @@ class PlotImgSpeButtons (QtGui.QWidget) :
 
     def on_but_load(self):
         logger.debug('on_but_load', __name__ )
-        path = gu.get_open_fname_through_dialog_box(self, self.ifname, 'Select file with text image', filter='*.txt')
+        path = gu.get_open_fname_through_dialog_box(self, self.ifname, 'Select file with text image', filter='*.txt *.npy')
         if path == None or path == '' :
             logger.debug('Loading is cancelled...', __name__ )
             return
 
         self.ifname = path
 
-        arr = gu. get_array_from_file(path) # dtype=np.float32)
+        arr = gu.get_array_from_file(path) # dtype=np.float32)
         #print 'arr:\n', arr
         self.widgimage.set_image_array_new(arr, \
                                            rot_ang_n90 = self.widgimage.rot_ang_n90,

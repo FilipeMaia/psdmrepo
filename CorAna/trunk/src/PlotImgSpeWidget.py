@@ -419,11 +419,12 @@ class PlotImgSpeWidget (QtGui.QWidget) :
         x = event.x
         y = event.y
 
-        x0 = bbx0
-        y0 = fbh - bby0 - bbh
+        h  = bbh
+        x0 = bbx0 
+        y0 = fbh - bby0 - h
         w  = x - x0
 
-        rect = [x0, y0, w, bbh]
+        rect = [x0, y0, w, h]
         self.line_ver = self.fig.canvas.drawRectangle( rect )            
         #self.fig.canvas.draw()
 

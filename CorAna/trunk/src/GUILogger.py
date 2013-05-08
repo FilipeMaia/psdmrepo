@@ -173,7 +173,7 @@ class GUILogger ( QtGui.QWidget ) :
 
 
     def saveLogInFile(self):
-        logger.info('saveLogInFile' + self.fname_log, __name__)
+        logger.info('saveLogInFile' + self.fname_log, __name__)        
         logger.saveLogInFile(self.fname_log)
 
 
