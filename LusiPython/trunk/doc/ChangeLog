@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-00
+2013-05-09 Andy Salnikov
+- removed all python modules, this is empty package now
+
 Tag: V00-00-05
 2011-10-12 Andy Salnikov
 - updated comments in DbConnection module
