@@ -42,7 +42,7 @@ import errno
 #---------------------------------
 #  Imports of base class module --
 #---------------------------------
-from LusiPython.LusiPyApp import LusiPyApp
+from AppUtils.AppBase import AppBase
 
 #-----------------------------
 # Imports for other modules --
@@ -60,11 +60,11 @@ from irods_error import *
 #  Application class definition --
 #---------------------------------
 
-class irodsScan ( LusiPyApp ) :
+class irodsScan ( AppBase ) :
 
     def __init__ ( self ) :
 
-        LusiPyApp.__init__ ( self, installLogger = True, usage = "usage: %prog [options] irods-obj ..." )
+        AppBase.__init__ ( self, installLogger = True, usage = "usage: %prog [options] irods-obj ..." )
 
         # add application options, see optparse module for details
         self._parser.add_option ( '-r', "--recursive", action="store_true", 
@@ -79,7 +79,7 @@ class irodsScan ( LusiPyApp ) :
 
     #
     #  Run the whole thing after parsing the command argunments and 
-    #  installing logger. See BbrPyApp class for details.
+    #  installing logger. See AppBase class for details.
     #
     def _run ( self ) :
 

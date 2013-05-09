@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-01
+2013-05-09 Andy Salnikov
+- switch to AppUtils.AppBase as base class for python application
+
 Tag: V00-01-00
 2013-04-11 Andy Salnikov
 - few updates related to SCGI server (mod_scgi in particular)
