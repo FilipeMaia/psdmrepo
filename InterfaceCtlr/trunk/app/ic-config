@@ -40,7 +40,7 @@ from AppUtils.AppBase import AppBase
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
-from LusiPython.DbConnection import DbConnection
+from DbTools.DbConnection import DbConnection
 
 #---------------------
 # Local definitions --

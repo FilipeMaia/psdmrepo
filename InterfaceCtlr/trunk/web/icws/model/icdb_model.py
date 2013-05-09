@@ -41,7 +41,7 @@ from InterfaceCtlr.InterfaceDb import InterfaceDb
 # Imports for other modules --
 #-----------------------------
 from pylons import config
-from LusiPython.DbConnection import DbConnection
+from DbTools.DbConnection import DbConnection
 from LusiTime.Time import Time
 from RegDB.RegDb import RegDb
 

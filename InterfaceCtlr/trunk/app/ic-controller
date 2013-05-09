@@ -50,10 +50,10 @@ from AppUtils.AppBase import AppBase
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
+from DbTools.DbConnection import DbConnection
 from InterfaceCtlr.Config import Config
 from InterfaceCtlr.TranslatorJob import TranslatorJob
 from InterfaceCtlr.InterfaceDb import InterfaceDb
-from LusiPython.DbConnection import DbConnection
 from LusiTime.Time import Time
 
 #---------------------

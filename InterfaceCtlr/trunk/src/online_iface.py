@@ -44,7 +44,7 @@ import sys
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
-from LusiPython.DbConnection import DbConnection
+from DbTools.DbConnection import DbConnection
 from InterfaceCtlr.InterfaceDb import InterfaceDb
 
 #----------------------------------

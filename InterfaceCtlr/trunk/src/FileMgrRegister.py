@@ -43,8 +43,8 @@ import logging
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
+from DbTools.DbConnection import DbConnection
 from InterfaceCtlr.InterfaceDb import InterfaceDb
-from LusiPython.DbConnection import DbConnection
 from InterfaceCtlr.FileMgrIrods import FileMgrIrods
 
 #----------------------------------

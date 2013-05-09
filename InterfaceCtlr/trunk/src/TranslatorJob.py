@@ -40,11 +40,11 @@ import shutil
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
+from DbTools.DbConnection import DbConnection
 from InterfaceCtlr.FileMgrIrods import FileMgrIrods
 from InterfaceCtlr.InterfaceDb import InterfaceDb
 from InterfaceCtlr import LSF
 from LusiTime.Time import Time
-from LusiPython.DbConnection import DbConnection
 from RegDB.RegDb import RegDb
 
 #---------------------
