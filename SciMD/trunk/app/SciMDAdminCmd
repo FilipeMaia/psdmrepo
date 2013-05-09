@@ -44,7 +44,7 @@ import MySQLdb
 #  Imports of base class module --
 #---------------------------------
 from AppUtils.AppBase import AppBase
-from LusiPython.DbConnection import DbConnection
+from DbTools.DbConnection import DbConnection
 from LusiTime.Time import Time
 
 #-----------------------------
