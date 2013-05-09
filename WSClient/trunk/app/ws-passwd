@@ -36,7 +36,7 @@ import codecs
 #---------------------------------
 #  Imports of base class module --
 #---------------------------------
-from LusiPython.LusiPyApp import LusiPyApp
+from AppUtils.AppBase import AppBase
 
 #-----------------------------
 # Imports for other modules --
@@ -49,16 +49,16 @@ from LusiPython.LusiPyApp import LusiPyApp
 #---------------------------------
 #  Application class definition --
 #---------------------------------
-class WSPasswd ( LusiPyApp ) :
+class WSPasswd ( AppBase ) :
 
     def __init__ ( self ) :
 
-        LusiPyApp.__init__ ( self, installLogger = True, usage = "usage: %prog user passwd file" )
+        AppBase.__init__ ( self, installLogger = True, usage = "usage: %prog user passwd file" )
 
 
     #
     #  Run the whole thing after parsing the command argunments and 
-    #  installing logger. See BbrPyApp class for details.
+    #  installing logger. See AppBase class for details.
     #
     def _run ( self ) :
 
