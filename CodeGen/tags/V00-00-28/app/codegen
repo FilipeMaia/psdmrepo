@@ -1,0 +1,215 @@
+#!@PYTHON@
+#-------------------------------------------------------------------------------
+# Name:        codegen
+# Purpose:     
+#
+# Author:      Andy Salnikov
+#
+# Created:     16-01-2008
+#
+#-------------------------------------------------------------------------------
+
+#---------------------------
+#  Import standard modules
+#---------------------------
+import sys
+import os
+import string
+import time
+from optparse import OptionParser
+
+#---------------------
+#  Local definitions
+#---------------------
+_descr = "This script will generate code for the new class"
+_kwgen = 'codegen_kwgen.py'
+
+def _get_user_name () :
+
+    try :
+        path = os.path.expanduser("~/.codegen-user")
+        return file(path).read().strip()
+    except:
+        pass
+
+    try :
+        import pwd
+        pwde = pwd.getpwuid(os.getuid())
+        return pwde[4]
+    except :
+        return ""
+        
+
+class _KWGen(object):
+    
+    def __init__(self, fname):
+
+        # try to read the 'codegen_kwgen.py' file, ignore all errors
+        self.ldict = {}
+        try :
+            execfile ( fname, {}, self.ldict )
+        except Exception, e :
+            print >>sys.stderr, "Failed to import file %s: %s" % ( fname, str(e) )
+
+    @staticmethod
+    def lang_trans ( lang ) :
+        tr = ['_']*256
+        for x in string.ascii_letters :
+            tr[ord(x)] = x
+        for x in string.digits :
+            tr[ord(x)] = x
+        tr[ord('+')] = 'x'
+        return lang.translate ( ''.join(tr) )
+    
+    def make_keywords (self, options, args) :
+    
+        # normalized language name
+        lang = self.lang_trans(options.language)
+        
+        kw = {}
+        kw['package'] = args[0]
+        kw['class'] = args[1]
+        kw['PACKAGE'] = args[0].upper()
+        kw['CLASS'] = args[1].upper()
+        kw['author'] = _get_user_name()
+        t = time.localtime( time.time() )
+        kw['date'] = time.strftime( "%Y-%m-%d", t )
+        kw['time'] = time.strftime( "%H:%M:%S", t )
+        kw['datetime'] = kw['date'] + ' ' + kw['time'] 
+    
+        for k in [ 'BASEDECL', 'BASEINCL', 'BASEINIT' ] :
+            try :
+                method = self.ldict.get('codegen_%s_%s' % (lang,k),None)
+                if method :
+                    kw[k] = method ( options.base_class ) or ""
+            except :
+                raise
+    
+        return kw
+            
+    def list_classes (self, options) :
+
+        langs = set()
+        files = os.listdir ( options.directory )
+        for f in files :
+            if f.startswith ( "template!" ) :
+                w = f.split('!')
+                lang = w[1]
+                langs.add ( lang )
+        langs = list(langs)
+        langs.sort()
+        fmt = "%%-%ds - %%s" % max ( [ len(l) for l in langs ] )
+        for l in langs :
+            descr = self.ldict.get( 'codegen_%s_description' % _KWGen.lang_trans(l), "" )
+            print fmt % ( l, descr )
+    
+    def get_dstdir(self, lang, ext):
+        
+        tlang = _KWGen.lang_trans(lang)
+        return self.ldict.get('codegen_dstdir', {}).get(tlang, {}).get(ext, '')
+        
+
+#--------
+#  Main
+#--------
+def main( argv ):
+
+    # find default location of the _kwgen file
+    datapath = os.getenv("SIT_DATA")
+    if not datapath :
+        print >> sys.stderr, "Environment variable SIT_DATA is not defined, exiting"
+        return 2
+    dir = None
+    for d in datapath.split(':') :
+        if os.path.isfile ( os.path.join( d, "CodeGen", _kwgen ) ) :
+            dir = os.path.join( d, "CodeGen" )
+            break
+    if not dir :
+        print >> sys.stderr, "Failed to find `%s' location, exiting" % _kwgen
+        return 2
+    
+    parser = OptionParser( usage="%prog [options] [package] [class]", description=_descr )
+    parser.add_option( "-p", "--print", dest="list_classes", action="store_true", default=False,
+                       help="print the list of languages" )
+    parser.add_option( "-d", "--directory", default=dir, metavar="PATH",
+                       help="template directory, def: " + dir )
+    parser.add_option( "-l", "--language", default="C++", metavar="STRING", 
+                       help="language for generated code, def: C++" )
+    parser.add_option( "-b", "--base-class", default=[], action='append', metavar="NAME", 
+                       help="base class name, use once for every base" )
+    parser.add_option( "-o", "--output", default=None, metavar="PATH",
+                       help="output directory, default is to put it inside package" )
+    parser.add_option( "-f", "--force", default=False, action='store_true',
+                       help="override resulting files if already exist" )
+
+    (options, args) = parser.parse_args()
+
+    # read kwgen file
+    kwpath = os.path.join ( options.directory, _kwgen )
+    kwgen = _KWGen(kwpath)
+
+    if options.list_classes :
+        try :
+            # just dump the list of languages and quit
+            kwgen.list_classes( options )
+            return 0
+        except :
+            return 2
+    
+    if len(args) != 2 :
+        parser.error("exactly two arguments are required")
+
+    # generate keyword dictionary
+    kw = kwgen.make_keywords( options, args )
+
+    templName = 'template!' + options.language + '!'
+    files = os.listdir ( options.directory )
+    generated = []
+    templates = []
+    for f in files :
+        if f.startswith ( templName ) :
+            
+            templates.append(f)
+            
+            #print 'file:', f
+            w = f.split('!')
+
+            # destination directory
+            dstdir = options.output
+            if dstdir is None:
+                dstdir = kwgen.get_dstdir(options.language, '.'.join(w[2:]))
+                dstdir = os.path.join( kw['package'], dstdir )
+            
+            # class name with extension
+            genName = [ kw['class'] ]
+            if w[2] : genName.extend( w[2:] )
+            genName = '.'.join( genName )
+            
+            # path name
+            genName = os.path.join( dstdir, genName )
+            if not options.force and os.path.exists ( genName ) :
+                print >> sys.stderr, "File %s already exists, skipping code generation" % genName
+                continue
+            try :
+                templ = open( os.path.join( options.directory, f ) ).read()
+                #print "templ:", templ
+                templ = string.Template ( templ )
+                #print "kw:", kw
+                code = templ.safe_substitute ( kw )
+                open ( genName, 'w' ).write ( code )
+                generated.append( genName )
+            except Exception, e :
+                print >> sys.stderr, "Failure during code generation:", str(e)
+                break
+                
+    if generated :
+        print "Produced files:", " ".join(generated)
+    else :
+        if not templates :
+            # means no matching template found
+            print >> sys.stderr, "Language name is not known: %s" % options.language
+        else :
+            print >> sys.stderr, "No files were generated, check output for errors"
+
+if __name__ == '__main__':
+    sys.exit ( main(sys.argv) )
