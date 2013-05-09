@@ -36,12 +36,11 @@ import h5py
 #---------------------------------
 #  Imports of base class module --
 #---------------------------------
-from LusiPython.LusiPyApp import LusiPyApp
+from AppUtils.AppBase import AppBase
 
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
-#from PkgPackage.PkgModule import PkgClass
 
 #---------------------
 # Local definitions --
@@ -86,18 +85,18 @@ def _calibcycles(instr, exper, run):
 #  Application class definition --
 #---------------------------------
 
-class O2OLogStat ( LusiPyApp ) :
+class O2OLogStat ( AppBase ) :
 
     def __init__ ( self ) :
 
-        LusiPyApp.__init__ ( self, installLogger = True, usage = "usage: %prog [options] log-file ..." )
+        AppBase.__init__ ( self, installLogger = True, usage = "usage: %prog [options] log-file ..." )
 
         # add application options, see optparse module for details
         
 
     #
     #  Run the whole thing after parsing the command argunments and 
-    #  installing logger. See BbrPyApp class for details.
+    #  installing logger. See AppBase class for details.
     #
     def _run ( self ) :
 
