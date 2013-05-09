@@ -40,7 +40,7 @@ import os
 #---------------------------------
 #  Imports of base class module --
 #---------------------------------
-from LusiPython.LusiPyApp import LusiPyApp
+from AppUtils.AppBase import AppBase
 
 #-----------------------------
 # Imports for other modules --
@@ -62,22 +62,21 @@ def _localMethod() :
 #  Application class definition --
 #---------------------------------
 
-class $class ( LusiPyApp ) :
+class $class ( AppBase ) :
 
     def __init__ ( self ) :
 
-        LusiPyApp.__init__ ( self, installLogger = True, usage = "usage: %prog [options] input-file ..." )
+        AppBase.__init__ ( self, installLogger = True, usage = "usage: %prog [options] input-file ..." )
 
         # add application options, see optparse module for details
-        self._parser.add_option ( '-u', "--user", 
-								  default=None, help="specify user name" )
-        self._parser.add_option ( '-o', "--output-file", action="store", 
-								  default=None, help="send output to file" )
+        self._parser.add_option ('-u', "--user",  default=None, help="specify user name")
+        self._parser.add_option ('-o', "--output-file", action="store", default=None, 
+                                 help="send output to file" )
         
 
     #
     #  Run the whole thing after parsing the command arguments and 
-    #  installing logger. See BbrPyApp class for details.
+    #  installing logger. See AppBase class for details.
     #
     def _run ( self ) :
 
