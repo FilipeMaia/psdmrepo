@@ -43,7 +43,7 @@ import MySQLdb
 #---------------------------------
 #  Imports of base class module --
 #---------------------------------
-from LusiPython.LusiPyApp import LusiPyApp
+from AppUtils.AppBase import AppBase
 from LusiPython.DbConnection import DbConnection
 from LusiTime.Time import Time
 
@@ -91,7 +91,7 @@ class DatabaseOperatonFailed(Exception):
 # Application class definition --
 #--------------------------------
 
-class SciMDCmd ( LusiPyApp ) :
+class SciMDCmd ( AppBase ) :
 
     # ===============================================
     # An indirection for handling the standard output
@@ -138,7 +138,7 @@ class SciMDCmd ( LusiPyApp ) :
 
     def __init__ ( self ) :
 
-        LusiPyApp.__init__ (
+        AppBase.__init__ (
             self,
             installLogger = True,
             usage = "usage: %prog [<command>] [<parameters>] [<options>]" )
@@ -386,7 +386,7 @@ class SciMDCmd ( LusiPyApp ) :
 
     # ============================================================
     # Run the whole thing after parsing the command argunments and
-    # installing logger. See BbrPyApp class for details.
+    # installing logger. See AppBase class for details.
     # ============================================================
 
     def _run ( self ) :
