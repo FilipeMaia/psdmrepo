@@ -1,0 +1,80 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  README file for package DbTools
+#------------------------------------------------------------------------
+
+Package author: Andy Salnikov
+
+Brief description:
+==================
+
+This package is a collection of various tools for database support in our 
+releases. For now it contains following pieces: 
+
+  - DbConnection module containing connection class for MySQL 
+    using the standard connection string syntax and supporting
+    reconnection if the connection is lost
+
+Detailed description:
+=====================
+
+    
+                      DbConnection module
+                      ===================
+
+This module contains single class which provides connection service for 
+MySQL databases. Its constructor can take a number of the keyword
+parameters, such as the standard connection string, the file name where 
+the connection string is stored, timeout value, or any parameter 
+accepted by MySQL.connect(). 
+
+The syntax for connection string is:
+
+Server=myServerAddress;Port=1234;Database=myDataBase;\
+Uid=myUsername;Pwd=myPassword;Connection Timeout=5;
+
+or 
+
+file:/path/to/file/containing/connection_string
+
+Any part of connection string is optional, if missing the default MySQL 
+value will be used.
+
+Default timeout value can also be specified as an optional argument to 
+constructor. Here are few examples for instantiating the objects of 
+this class:
+
+    # connecting using the connection string
+    cstr="Server=psdb;Database=ic_db;Pwd=***"
+    dbconn = DbConnection( conn_string=cstr )
+    
+    # connecting with connection string in a file
+    cstr="file:/reg/g/psdm/psdatmgr/.icdb_conn_str"
+    dbconn = DbConnection( conn_string=cstr )
+
+    # modifying connection timeout
+    dbconn = DbConnection( conn_string=cstr, timeout=0 )
+
+    # connect using all individual parameters
+    dbconn = DbConnection( host='...', db='...', user='...', passwd='...' )
+
+    # combine connection string plus individual parameters which
+    # can override parts of connection string
+    dbconn = DbConnection( conn_string=cstr, port=1234, passwd='...' )
+
+Instantiating the object does not immediately create connection to 
+the database. To create a connection one needs to use connection()
+method which returns regular MySQL connection object:
+
+    conn = dbconn.connection()
+
+This method tries to connect or reconnect to the database during 
+the specified timeout. If cannot connect it throws a corresponding
+MySQL exception object.
+
+Another method() called cursor() returns cursor object and is a 
+shortcut for dbconn.connection().cursor(). If optional argument to
+cursor() is set to True then the dictionary-based cursor is returned. 
