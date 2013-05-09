@@ -99,8 +99,8 @@ def main_alignment_test() :
     #path_calib = '/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi64813-r0058-Ds1'  # 2013-01-31
     #path_calib = '/reg/d/psdm/cxi/cxi64813/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0'
     #path_calib = '/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-xpp-2013-01-29'      # 2013-01-29
-    #path_calib = '/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi-ds1-2013-01-31'  # 2013-02-21
-    path_calib = '/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi80410-r1458-Ds1'  # 2013-02-21 identic to calib-cxi-ds1-2013-01-31
+    path_calib = '/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi-ds1-2013-01-31'  # 2013-02-21
+    #path_calib = '/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi80410-r1458-Ds1'  # 2013-02-21 identic to calib-cxi-ds1-2013-01-31
 
 
 
@@ -114,14 +114,14 @@ def main_alignment_test() :
     #fname, runnum = '/reg/d/psdm/CXI/cxi49012/hdf5/cxi49012-r0020-raw.h5', 20
     #fname, runnum = '/reg/d/psdm/CXI/cxi80410/hdf5/cxi80410-r0628.h5',    628
     #fname, runnum = '/reg/d/psdm/xpp/xppcom13/hdf5/xppcom13-r0066.h5',     66
-    #fname, runnum = '/reg/d/psdm/CXI/cxi64813/hdf5/cxi64813-r0058.h5',     58
-    fname, runnum = '/reg/d/psdm/CXI/cxi80410/hdf5/cxi80410-r1458.h5',   1458
+    fname, runnum = '/reg/d/psdm/CXI/cxi64813/hdf5/cxi64813-r0058.h5',     58
+    #fname, runnum = '/reg/d/psdm/CXI/cxi80410/hdf5/cxi80410-r1458.h5',   1458
 
     #dsname = '/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/XppGon.0:Cspad.0/data'
     #dsname = '/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/CxiDsd.0:Cspad.0/data'
     dsname = '/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/CxiDs1.0:Cspad.0/data'
 
-    event   = 200
+    event   = 0
 
     print 'Load calibration parameters from', path_calib 
     calp.calibpars.setCalibParsForPath ( run=runnum, path=path_calib )
@@ -135,7 +135,8 @@ def main_alignment_test() :
 
     print 'Get raw CSPad event %d from file %s \ndataset %s' % (event, fname, dsname)
     #ds1ev = hm.getOneCSPadEventForTest( fname, dsname, event )
-    ds1ev = hm.getAverageCSPadEvent( fname, dsname, event, nevents=500 )
+    #ds1ev = hm.getAverageCSPadEvent( fname, dsname, event=200, nevents=500 )
+    ds1ev = hm.getAverageCSPadEvent( fname, dsname, event, nevents=10 )
     #print 'ds1ev.shape = ',ds1ev.shape # should be (32, 185, 388)
     #print 'ds1ev = ',ds1ev[1,:]
 
@@ -150,7 +151,7 @@ def main_alignment_test() :
     #ds1ev  = gm.getCSPadArrayFromFile(ped_fname)
     #ds1ev -= gm.getCSPadArrayFromFile('/reg/neh/home1/dubrovin/LCLS/calib-CSPad-pedestals/cspad-pedestals-cxi49012-r0027.dat')
     #ds1ev -= gm.getCSPadArrayFromFile('/reg/neh/home1/dubrovin/LCLS/calib-CSPad-pedestals/cspad-pedestals-xppcom10-r1442.dat')
-    ds1ev -= gm.getCSPadArrayFromFile(ped_fname)
+    #ds1ev -= gm.getCSPadArrayFromFile(ped_fname)
     print 'ds1ev.shape = ',ds1ev.shape # should be (32, 185, 388)
 
     print 'Make the CSPad image from raw array'

@@ -16,6 +16,26 @@ part of it, please give an appropriate acknowledgment.
 @version $Id: 2013-03-08$
 
 @author Mikhail S. Dubrovin
+
+Use matrix notations (like in data array)
+DIFFERENT from the detector map... rows<->cols:
+Assume that 2x1 has 195 rows and 388 columns
+The (r,c)=(0,0) is in the top left corner of the matrix, has coordinates (xmin,ymax)
+
+                    ^ Y          (Xmax,Ymax)
+   (0,0)            |            (0,387)
+      ------------------------------
+      |             |              |
+      |             |              |
+      |             |              |
+    --|-------------+--------------|----> X
+      |             |              |
+      |             |              |
+      |             |              |
+      ------------------------------
+   (194,0)          |           (194,387)
+   (Xmin,Ymin)
+
 """
 
 #--------------------------------
@@ -37,8 +57,8 @@ import GlobalGraphics as gg # For test purpose in main only
 def rotation(X, Y, C, S) :
     """For numpy arrays X and Y returns the numpy arrays of Xrot and Yrot
     """
-    Xrot = X*C + Y*S 
-    Yrot = Y*C - X*S 
+    Xrot = X*C - Y*S 
+    Yrot = Y*C + X*S 
     return Xrot, Yrot
 
 #------------------------------
@@ -62,6 +82,9 @@ class PixCoords2x1() :
 
         sp.use_wide_pix_center = use_wide_pix_center
 
+        sp.x_map2x1_um_offset  = None
+        sp.x_map2x1_pix_offset = None
+
         sp.make_maps_of_2x1_pix_coordinates()
 
 #------------------------------
@@ -72,16 +95,20 @@ class PixCoords2x1() :
         """        
         x_rhs = np.arange(sp.colsh)*sp.pixs + sp.pixw - sp.pixsh
         if sp.use_wide_pix_center : x_rhs[0] = sp.pixwh # set x-coordinate of the wide pixel in its geometry center
-        x_arr = np.hstack([-x_rhs[::-1],x_rhs])
+        sp.x_arr_um = np.hstack([-x_rhs[::-1],x_rhs])
 
-        y_arr = np.arange(sp.rows) * sp.pixs
-        y_arr -= y_arr[-1]/2 # move origin to the center of array
+        sp.y_arr_um = -np.arange(sp.rows) * sp.pixs
+        sp.y_arr_um -= sp.y_arr_um[-1]/2 # move origin to the center of array
 
-        sp.x_map2x1_um, sp.y_map2x1_um = np.meshgrid(x_arr, y_arr)
+        sp.x_arr_pix = sp.x_arr_um/ sp.pixs
+        sp.y_arr_pix = sp.y_arr_um/ sp.pixs
+
+        sp.x_map2x1_um,  sp.y_map2x1_um  = np.meshgrid(sp.x_arr_um,  sp.y_arr_um)
+        sp.x_map2x1_pix, sp.y_map2x1_pix = np.meshgrid(sp.x_arr_pix, sp.y_arr_pix)
         
 #------------------------------
 
-    def print_maps_2x1(sp) :
+    def print_maps_2x1_um(sp) :
         print 'x_map2x1_um = ',       sp.x_map2x1_um
         print 'x_map2x1_um.shape = ', sp.x_map2x1_um.shape
         print 'y_map2x1_um = ',       sp.y_map2x1_um
@@ -89,17 +116,78 @@ class PixCoords2x1() :
 
 #------------------------------
 
-    def get_cspad2x1_pix_maps_pix(sp) : 
-        return sp.x_map2x1_um/sp.pixs, sp.y_map2x1_um/sp.pixs
+    def print_maps_2x1_pix(sp) :
+        print 'x_map2x1_pix = ',       sp.x_map2x1_pix
+        print 'x_map2x1_pix.shape = ', sp.x_map2x1_pix.shape
+        print 'y_map2x1_pix = ',       sp.y_map2x1_pix
+        print 'y_map2x1_pix.shape = ', sp.y_map2x1_pix.shape
 
-    def get_cspad2x1_pix_maps_um(sp) : 
+#------------------------------
+
+    def print_xy_arr_um(sp) :
+        print 'x_arr_um:\n',       sp.x_arr_um
+        print 'x_arr_um.shape = ', sp.x_arr_um.shape
+        print 'y_arr_um:\n',       sp.y_arr_um
+        print 'y_arr_um.shape = ', sp.y_arr_um.shape
+
+#------------------------------
+
+    def print_xy_arr_pix(sp) :
+        print 'x_arr_pix:\n',       sp.x_arr_pix
+        print 'x_arr_pix.shape = ', sp.x_arr_pix.shape
+        print 'y_arr_pix:\n',       sp.y_arr_pix
+        print 'y_arr_pix.shape = ', sp.y_arr_pix.shape
+
+#------------------------------
+
+    def print_xy_min_max_um(sp) :
+        xmin, ymin = sp.get_xy_min_um()
+        xmax, ymax = sp.get_xy_max_um()
+        print 'In [um] xmin:%9.2f, xmax:%9.2f, ymin:%9.2f, ymax:%9.2f' % (xmin, xmax, ymin, ymax)
+
+#------------------------------
+
+    def print_xy_min_max_pix(sp) :
+        xmin, ymin = sp.get_xy_min_pix()
+        xmax, ymax = sp.get_xy_max_pix()
+        print 'In [pix] xmin:%5.0f, xmax:%5.0f, ymin:%5.0f, ymax:%5.0f' % (xmin, xmax, ymin, ymax)
+
+#------------------------------
+
+    def get_xy_min_um(sp) : 
+        return sp.x_arr_um[0], sp.y_arr_um[-1]
+
+    def get_xy_max_um(sp) : 
+        return sp.x_arr_um[-1], sp.y_arr_um[0]
+
+    def get_xy_min_pix(sp) : 
+        return sp.x_arr_pix[0], sp.y_arr_pix[-1]
+
+    def get_xy_max_pix(sp) : 
+        return sp.x_arr_pix[-1], sp.y_arr_pix[0]
+
+    def get_cspad2x1_xy_maps_um(sp) : 
         return sp.x_map2x1_um, sp.y_map2x1_um
 
-    def get_cspad2x1_pix_maps_um_with_offset(sp) : 
-        sp.xmin_um = sp.x_map2x1_um.min()
-        sp.ymin_um = sp.y_map2x1_um.min()
-        return sp.x_map2x1_um - sp.xmin_um, sp.y_map2x1_um - sp.xmin_um
+    def get_cspad2x1_xy_maps_pix(sp) : 
+        return sp.x_map2x1_pix, sp.y_map2x1_pix
 
+    def get_cspad2x1_xy_maps_um_with_offset(sp) : 
+        if  sp.x_map2x1_um_offset == None :
+            x_min_um, y_min_um = sp.get_xy_min_um()
+            sp.x_map2x1_um_offset = sp.x_map2x1_um - x_min_um
+            sp.y_map2x1_um_offset = sp.y_map2x1_um - y_min_um
+        return sp.x_map2x1_um_offset, sp.y_map2x1_um_offset
+
+    def get_cspad2x1_xy_maps_pix_with_offset(sp) : 
+        if  sp.x_map2x1_pix_offset == None :
+            x_min_pix, y_min_pix = sp.get_xy_min_pix()
+            sp.x_map2x1_pix_offset = sp.x_map2x1_pix - x_min_pix
+            sp.y_map2x1_pix_offset = sp.y_map2x1_pix - y_min_pix
+        return sp.x_map2x1_pix_offset, sp.y_map2x1_pix_offset
+
+#------------------------------
+# cspad2x1 = PixCoords2x1(use_wide_pix_center=False)
 #------------------------------
 #------------------------------
 #------------------------------
@@ -111,13 +199,13 @@ class PixCoords2x1() :
 def test_2x1_xy_maps() :
 
     w = PixCoords2x1()
-    w.make_maps_of_2x1_pix_coordinates()
-    w.print_maps_2x1()
+    w.print_maps_2x1_um()
 
+    titles = ['X map','Y map']
     #for i,arr2d in enumerate([w.x_map2x1,w.y_map2x1]) :
-    for i,arr2d in enumerate( w.get_cspad2x1_pix_maps_pix() ) :
+    for i,arr2d in enumerate( w.get_cspad2x1_xy_maps_pix() ) :
         range = (arr2d.min(), arr2d.max())
-        gg.plotImage(arr2d, range, figsize=(10,5))
+        gg.plotImage(arr2d, range, figsize=(10,5), title=titles[i])
         gg.move(200*i,100*i)
 
     gg.show()
@@ -128,22 +216,32 @@ def test_2x1_img() :
 
     t0_sec = time()
     w = PixCoords2x1(use_wide_pix_center=False)
+    #w = PixCoords2x1(use_wide_pix_center=True)
     print 'Consumed time for coordinate arrays (sec) =', time()-t0_sec
 
-    X,Y = w.get_cspad2x1_pix_maps_pix()
+    X,Y = w.get_cspad2x1_xy_maps_pix()
+    w.print_xy_arr_um()
+    w.print_xy_arr_pix()
+    w.print_xy_min_max_um()
+    w.print_xy_min_max_pix()
+
 
     #print 'X(pix) :\n', X
-    print 'X.shape =\n', X.shape
+    print 'X.shape =', X.shape
 
-    xmin, xmax, ymin, ymax = X.min(), X.max(), Y.min(), Y.max()
-    xsize = xmax - xmin + 1
-    ysize = ymax - ymin + 1
+    xmin, xmax, ymin, ymax = X.min()-0.5, X.max()+0.5, Y.min()-0.5, Y.max()+0.5
+    xsize = xmax - xmin 
+    ysize = ymax - ymin 
     print 'xsize =', xsize # 391.0 
     print 'ysize =', ysize # 185.0
 
-    H,Xedges,Yedges = np.histogram2d(X.flatten(), Y.flatten(), bins=[xsize,ysize], range=[[xmin,xmax],[ymin,ymax]], normed=False, weights=None) 
+    H, Xedges, Yedges = np.histogram2d(X.flatten(), Y.flatten(), bins=[xsize,ysize], range=[[xmin,xmax],[ymin,ymax]], normed=False, weights=X.flatten()+Y.flatten()) 
 
-    gg.plotImageLarge(H, range=(-1, 2), figsize=(8,10))
+    #print 'Xedges:', Xedges
+    #print 'Yedges:', Yedges
+    print 'H.shape:', H.shape
+
+    gg.plotImageLarge(H, range=(-250, 250), figsize=(8,10)) # range=(-1, 2), 
     gg.show()
 
 #------------------------------

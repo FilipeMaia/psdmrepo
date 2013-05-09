@@ -54,47 +54,51 @@ def getRandomImage() :
 
 #--------------------------------
 
-def plotHistogram(arr,range=(0,500),figsize=(5,5)) :
-    fig  = plt.figure(figsize=figsize, dpi=80, facecolor='w',edgecolor='w',frameon=True)
+def plotHistogram(arr, range=(0,500), figsize=(5,5)) :
+    fig  = plt.figure(figsize=figsize, dpi=80, facecolor='w',edgecolor='w', frameon=True)
     plt.hist(arr.flatten(), bins=100, range=range)
 
 #--------------------------------
 
-def plotSpectrum(arr,range=(0,500),figsize=(5,5)) :
-    plotHistogram(arr,range,figsize)
+def plotSpectrum(arr, range=(0,500), figsize=(5,5)) :
+    plotHistogram(arr, range, figsize)
 
 #--------------------------------
 
-def plotImage(arr,range=(0,500),figsize=(12,5)) :
-    fig  = plt.figure(figsize=figsize, dpi=80, facecolor='w',edgecolor='w',frameon=True)
-    axes1 = plt.imshow(arr, interpolation='nearest', aspect='auto') #,extent=self.XYRange, origin='lower'
-    colb1 = fig.colorbar(axes1, pad=0.01, fraction=0.1, shrink=1, aspect=20)
-    axes1.set_clim(range[0],range[1])
+def plotImage(arr, range=(0,500), figsize=(12,5), title='Image', origin='upper') :
+    fig  = plt.figure(figsize=figsize, dpi=80, facecolor='w', edgecolor='w', frameon=True)
+    axim = fig.add_axes([0.05,  0.05, 0.95, 0.92])
+    imsh = plt.imshow(arr, interpolation='nearest', aspect='auto', origin=origin) #,extent=self.XYRange, origin='lower'
+    colb = fig.colorbar(imsh, pad=0.005, fraction=0.1, shrink=1, aspect=20)
+    imsh.set_clim(range[0],range[1])
+    #axim.set_title(title, color='b', fontsize=20)
+    fig.canvas.set_window_title(title)
 
 #--------------------------------
 
-def plotImageLarge(arr,range=(0,500),figsize=(12,10)) :
-    fig  = plt.figure(figsize=figsize, dpi=80, facecolor='w',edgecolor='w',frameon=True)
-    axim = fig.add_axes([0.04,  0.02, 0.99, 0.96])
-    axes1 = axim.imshow(arr, interpolation='nearest', aspect='auto') #,extent=self.XYRange, origin='lower'
-    colb1 = fig.colorbar(axes1, pad=0.005, fraction=0.09, shrink=1, aspect=40)
-    axes1.set_clim(range[0],range[1])
+def plotImageLarge(arr,range=(0,500),figsize=(12,10), title='Image', origin='upper') :
+    fig  = plt.figure(figsize=figsize, dpi=80, facecolor='w', edgecolor='w', frameon=True)
+    axim = fig.add_axes([0.05,  0.03, 0.94, 0.94])
+    imsh = axim.imshow(arr, interpolation='nearest', aspect='auto', origin=origin) #,extent=self.XYRange, origin='lower'
+    colb = fig.colorbar(imsh, pad=0.005, fraction=0.09, shrink=1, aspect=40)
+    imsh.set_clim(range[0],range[1])
+    fig.canvas.set_window_title(title)
 
 #--------------------------------
 
 def plotImageAndSpectrum(arr,range=(0,500)) :
-    fig  = plt.figure(figsize=(15,5), dpi=80, facecolor='w',edgecolor='w',frameon=True)
+    fig  = plt.figure(figsize=(15,5), dpi=80, facecolor='w', edgecolor='w', frameon=True)
     fig.canvas.set_window_title('Image And Spectrum ' + u'\u03C6')
 
     ax1   = plt.subplot2grid((10,10), (0,4), rowspan=10, colspan=6)
     axim1 = ax1.imshow(arr, interpolation='nearest', aspect='auto') # , origin='lower' 
     colb1 = fig.colorbar(axim1, pad=0.01, fraction=0.1, shrink=1.00, aspect=20)
-    axim1.set_clim(range[0],range[1])
-    plt.title('Image',color='b',fontsize=20)
+    axim1.set_clim(range[0], range[1])
+    plt.title('Image', color='b', fontsize=20)
 
     ax2   = plt.subplot2grid((10,10), (0,0), rowspan=10, colspan=4)
     ax2.hist(arr.flatten(), bins=100, range=range)
-    plt.title('Spectrum',color='r',fontsize=20)
+    plt.title('Spectrum', color='r',fontsize=20)
     plt.xlabel('Bins')
     plt.ylabel('Stat') #u'\u03C6'
     plt.ion()
