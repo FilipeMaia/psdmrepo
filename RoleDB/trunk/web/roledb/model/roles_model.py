@@ -27,7 +27,7 @@ from pylons import config
 #  Imports of base class module --
 #---------------------------------
 from RoleDB.RoleDB import RoleDB
-from LusiPython.DbConnection import DbConnection
+from DbTools.DbConnection import DbConnection
 
 #-----------------------------
 # Imports for other modules --
