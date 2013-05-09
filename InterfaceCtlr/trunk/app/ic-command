@@ -121,7 +121,7 @@ class ICCommand ( AppBase ) :
 
     # ============================================================
     # Run the whole thing after parsing the command argunments and
-    # installing logger. See LusiPyApp class for details.
+    # installing logger. See AppBase class for details.
     # ============================================================
 
     def _run ( self ) :

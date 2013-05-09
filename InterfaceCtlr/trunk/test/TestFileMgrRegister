@@ -33,7 +33,7 @@ import os
 #---------------------------------
 #  Imports of base class module --
 #---------------------------------
-from LusiPython.LusiPyApp import LusiPyApp
+from AppUtils.AppBase import AppBase
 
 #-----------------------------
 # Imports for other modules --
@@ -48,17 +48,17 @@ from InterfaceCtlr.FileMgrRegister import FileMgrRegister
 #  Application class definition --
 #---------------------------------
 
-class TestFileMgrRegister ( LusiPyApp ) :
+class TestFileMgrRegister ( AppBase ) :
 
     def __init__ ( self ) :
 
-        LusiPyApp.__init__ ( self, installLogger = True, 
+        AppBase.__init__ ( self, installLogger = True, 
                 usage = "usage: %prog [options] input-file instrument experiment type" )
 
 
     #
     #  Run the whole thing after parsing the command arguments and
-    #  installing logger. See BbrPyApp class for details.
+    #  installing logger. See AppBase class for details.
     #
     def _run ( self ) :
 

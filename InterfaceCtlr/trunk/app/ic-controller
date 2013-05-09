@@ -116,7 +116,7 @@ class Controller ( AppBase ) :
 
     # ==========================================
     # Run the controller after installing logger. 
-    # See LusiPyApp class for details.
+    # See AppBase class for details.
     # ==========================================
 
     def _run ( self ) :
