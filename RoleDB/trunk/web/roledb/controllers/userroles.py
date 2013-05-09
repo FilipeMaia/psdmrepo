@@ -3,7 +3,7 @@
 #  $Id$
 #
 # Description:
-#  Module LusiPyApp
+#  Module userroles
 #------------------------------------------------------------------------
 
 """ Pylons controller for the Roles database.

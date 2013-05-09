@@ -3,7 +3,7 @@
 #  $Id$
 #
 # Description:
-#  Module LusiPyApp
+#  Module roles_model
 #------------------------------------------------------------------------
 
 """ Data model for the Roles database.
