@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-28-05
+2013-05-10 Andy Salnikov
+- O2OXtcValidator: add message about zero extent size
+
 Tag: V00-28-04
 2013-05-09 Andy Salnikov
 - switch to AppUtils.AppBase as base class for python application

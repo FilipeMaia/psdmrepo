@@ -75,6 +75,13 @@ O2OXtcValidator::process(Xtc* xtc)
 //    return m_status ;
 //  }
 
+  if ( xtc->extent == 0 ) {
+    MsgLog(logger, error, "Zero extent size in XTC, level: " << int(level) << '#' << Pds::Level::name(level)
+        << " type: " << int(type) << '#' << Pds::TypeId::name(type) << "/V" << version) ;
+    m_status = 0 ;
+    return m_status ;
+  }
+
   if ( xtc->sizeofPayload() < 0 ) {
     MsgLog(logger, error, "Negative payload size in XTC: " << xtc->sizeofPayload()
         << " level: " << int(level) << '#' << Pds::Level::name(level)
