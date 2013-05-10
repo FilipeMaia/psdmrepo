@@ -88,7 +88,7 @@ DgHeader::dgram()
   m_file.seek(m_off + headerSize, SEEK_SET);
 
   // read rest of the data
-  MsgLog(logger, debug, "reading payload, size = " << payloadSize);
+  MsgLog(logger, debug, "reading payload, size = " << payloadSize << ", offset = " << m_off);
   ssize_t nread = m_file.read(dg->xtc.payload(), payloadSize);
   if (nread < 0) {
     throw XTCReadException(ERR_LOC, m_file.path().path());
