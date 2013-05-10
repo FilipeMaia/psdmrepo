@@ -1,0 +1,103 @@
+//--------------------------------------------------------------------------
+// File and Version Information:
+// 	$Id$
+//
+// Description:
+//	Class ElementV1...
+//
+// Author List:
+//      Andy Salnikov
+//
+//------------------------------------------------------------------------
+
+//-----------------------
+// This Class's Header --
+//-----------------------
+#include "ElementV1.h"
+
+//-----------------
+// C/C++ Headers --
+//-----------------
+
+//-------------------------------
+// Collaborating Class Headers --
+//-------------------------------
+#include "Sample.h"
+#include "../../EnumType.h"
+#include "../../Exception.h"
+#include "../TypeLib.h"
+
+//-----------------------------------------------------------------------
+// Local Macros, Typedefs, Structures, Unions and Forward Declarations --
+//-----------------------------------------------------------------------
+
+namespace {
+
+  pypdsdata::EnumType::Enum frameTypesEnumValues[] = {
+    { "FrameTypeDarkImage",     Pds::Imp::ElementV1::FrameTypeDarkImage },
+    { "FrameTypeImage",         Pds::Imp::ElementV1::FrameTypeImage },
+    { 0, 0 }
+  };
+  pypdsdata::EnumType frameTypesEnum ( "frameTypes", frameTypesEnumValues );
+
+  // type-specific methods
+  FUN0_WRAPPER(pypdsdata::Imp::ElementV1, frameNumber)
+  PyObject* sample( PyObject* self, PyObject* args );
+
+  PyMethodDef methods[] = {
+    { "frameNumber",    frameNumber,    METH_NOARGS,
+        "self.frameNumber() -> int\n\nReturns frame number." },
+    { "sample",         sample,         METH_VARARGS,
+        "self.sample(index:int) -> object\n\nReturns instance of :py:class:`Sample` class for given sample index." },
+    {0, 0, 0, 0}
+   };
+
+  char typedoc[] = "Python class wrapping C++ Pds::Imp::ElementV1 class.";
+
+}
+
+//		----------------------------------------
+// 		-- Public Function Member Definitions --
+//		----------------------------------------
+
+void
+pypdsdata::Imp::ElementV1::initType( PyObject* module )
+{
+  PyTypeObject* type = BaseType::typeObject() ;
+  type->tp_doc = ::typedoc;
+  type->tp_methods = ::methods;
+
+  // define class attributes for enums
+  type->tp_dict = PyDict_New();
+  PyDict_SetItemString( type->tp_dict, "frameTypes", frameTypesEnum.type() );
+
+  BaseType::initType( "ElementV1", module );
+}
+
+void
+pypdsdata::Imp::ElementV1::print(std::ostream& out) const
+{
+  out << "imp.ElementV1(frameNumber=" << m_obj->frameNumber() << ", samples=[[";
+  Pds::Imp::Sample s = m_obj->getSample(0);
+  for (unsigned i = 0; i != Pds::Imp::channelsPerDevice; ++ i) {
+    if (i > 0) out << ", ";
+    out << s.channel(i);
+  }
+  out << "], ...])";
+}
+
+namespace {
+
+PyObject*
+sample( PyObject* self, PyObject* args )
+{
+  Pds::Imp::ElementV1* obj = pypdsdata::Imp::ElementV1::pdsObject(self);
+  if (not obj) return 0;
+
+  unsigned index;
+  if (not PyArg_ParseTuple(args, "I:imp.ElementV1.sample", &index)) return 0;
+
+  return pypdsdata::Imp::Sample::PyObject_FromPds(obj->getSample(index));
+}
+
+}
