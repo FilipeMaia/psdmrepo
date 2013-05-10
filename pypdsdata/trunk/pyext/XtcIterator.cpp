@@ -243,6 +243,24 @@ XtcIterator_next( PyObject* self )
     return 0;
   }
 
+  if (next->extent == 0) {
+    py_this->m_next = 0;
+    if (PyErr_WarnEx(PyExc_RuntimeWarning, "Zero extent size in XTC", 3) < 0) {
+      return 0;
+    }
+    PyErr_SetNone( PyExc_StopIteration );
+    return 0;
+  }
+
+  if (next->sizeofPayload() < 0) {
+    py_this->m_next = 0;
+    if (PyErr_WarnEx(PyExc_RuntimeWarning, "Negative payload size in XTC", 3) < 0) {
+      return 0;
+    }
+    PyErr_SetNone( PyExc_StopIteration );
+    return 0;
+  }
+
   // advance
   py_this->m_remaining -= next->extent;
   if ( py_this->m_remaining > 0 ) {

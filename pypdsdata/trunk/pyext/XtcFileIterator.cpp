@@ -105,21 +105,6 @@ namespace {
     PyMem_Free(dgram);
   }
 
-  // produce warning message using loggin.warning() method
-  void log_warn(const char* msg, const char* arg)
-  {
-    if (PyObject* logging = PyImport_ImportModule("logging")) {
-      if (PyObject* logfun = PyDict_GetItemString(PyModule_GetDict(logging), "warning")) {
-        PyObject* args = PyTuple_New(arg ? 2 : 1);
-        PyTuple_SET_ITEM(args, 0, PyString_FromString(msg));
-        if (arg) PyTuple_SET_ITEM(args, 1, PyString_FromString(arg));
-        PyObject_Call(logfun, args, 0);
-        Py_CLEAR(args);
-      }
-      Py_CLEAR(logging);
-    }
-  }
-
 }
 
 //              ----------------------------------------
@@ -221,9 +206,12 @@ PyObject* XtcFileIterator_next( PyObject* self )
     PyObject* fnameObj = PyFile_Name( py_this->m_file );
     if ( feof(file) ) {
       // generate error message (not an exception)
-      log_warn("EOF while reading Dgram header from file %s", PyString_AsString(fnameObj));
-      // signal end of iteration
-      PyErr_SetNone( PyExc_StopIteration );
+      char buf[1024];
+      snprintf(buf, sizeof buf, "EOF while reading Dgram header from file %s", PyString_AsString(fnameObj));
+      if (PyErr_WarnEx(PyExc_RuntimeWarning, buf, 3) == 0) {
+        // signal end of iteration after warning
+        PyErr_SetNone( PyExc_StopIteration );
+      }
     } else {
       // something bad happened
       PyErr_SetFromErrnoWithFilename( PyExc_IOError, PyString_AsString(fnameObj) );
@@ -249,9 +237,12 @@ PyObject* XtcFileIterator_next( PyObject* self )
     if ( fread( buf+headerSize, payloadSize, 1, file ) != 1 ) {
       PyObject* fnameObj = PyFile_Name( py_this->m_file );
       if ( feof(file) ) {
-        // generate message using logging.error
-        log_warn("EOF while reading Dgram payload from file %s", PyString_AsString(fnameObj));
-        PyErr_SetNone( PyExc_StopIteration );
+        char buf[1024];
+        snprintf(buf, sizeof buf, "EOF while reading Dgram payload from file %s", PyString_AsString(fnameObj));
+        if (PyErr_WarnEx(PyExc_RuntimeWarning, buf, 3) == 0) {
+          // signal end of iteration after warning
+          PyErr_SetNone( PyExc_StopIteration );
+        }
       } else {
         PyErr_SetFromErrnoWithFilename( PyExc_IOError, PyString_AsString(fnameObj) );
       }

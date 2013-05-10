@@ -265,9 +265,11 @@ class XtcFileName(str) :
 
     partsSep = '-'  #: Separator for the parts of a file name
 
-    def __init__ ( self, name ):
+    def __new__ ( cls, name ):
         
-        str.__init__( self, name )
+        return super(XtcFileName, cls).__new__( cls, name )
+
+    def __init__ ( self, name ):
         
         # get all pieces
         self.m_expNum = None

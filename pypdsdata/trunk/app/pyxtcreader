@@ -51,6 +51,9 @@ def _scan( xtc, offset=1, verbose=0 ) :
     print "%s%s level: payloadSize=%d damage=%#x src=%s" % \
             ( pfx, level, xtc.sizeofPayload(), xtc.damage.value(), xtc.src ),
     print "contains=%s" % xtc.contains
+
+    if xtc.sizeofPayload() < 0 :
+        return
     
     # some kind of damage may break even 'contains'
     if xtc.damage.hasDamage(Damage.Value.IncompleteContribution) :

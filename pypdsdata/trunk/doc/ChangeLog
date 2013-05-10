@@ -6,6 +6,10 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V00-00-98
+2013-05-10 Andy Salnikov
+- replace exceptions with runtime warnings in few classes
+
 Tag: V00-00-97
 2013-05-01 Andy Salnikov
 - add more info when printing camera/FrameFexConfigV1

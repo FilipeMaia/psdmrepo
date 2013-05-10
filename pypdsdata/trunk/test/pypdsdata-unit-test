@@ -32,6 +32,7 @@ __version__ = "$Revision$"
 import sys
 import os
 import unittest
+import warnings
 
 #---------------------------------
 #  Imports of base class module --
@@ -135,9 +136,11 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         Level( Level.Reporter )
         
         # out of range
-        self.assertRaises( TypeError, lambda : Level( Level.NumberOfLevels ) )
-        self.assertRaises( TypeError, lambda : Level( -1 ) )
-        self.assertRaises( TypeError, lambda : Level( 1000000 ) )
+        with warnings.catch_warnings():
+            warnings.simplefilter('error')
+            self.assertRaises( RuntimeWarning, lambda : Level( Level.NumberOfLevels ) )
+            self.assertRaises( RuntimeWarning, lambda : Level( -1 ) )
+            self.assertRaises( RuntimeWarning, lambda : Level( 1000000 ) )
 
         # compare
         self.assertEqual ( Level(Level.Control), Level.Control )
@@ -193,9 +196,11 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         TransitionId ( TransitionId.L1Accept )
 
         # out of range
-        self.assertRaises( TypeError, lambda : TransitionId( TransitionId.NumberOf ) )
-        self.assertRaises( TypeError, lambda : TransitionId( -1 ) )
-        self.assertRaises( TypeError, lambda : TransitionId( 1000000 ) )
+        with warnings.catch_warnings():
+            warnings.simplefilter('error')
+            self.assertRaises( RuntimeWarning, lambda : TransitionId( TransitionId.NumberOf ) )
+            self.assertRaises( RuntimeWarning, lambda : TransitionId( -1 ) )
+            self.assertRaises( RuntimeWarning, lambda : TransitionId( 1000000 ) )
 
         # compare
         for i in range(TransitionId.NumberOf) :
@@ -306,9 +311,11 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         TypeId ( TypeId.Type.Id_TimepixData, 1, True )
 
         # out of range, type error
-        self.assertRaises( TypeError, lambda : TypeId( TypeId.Type.NumberOf ) )
-        self.assertRaises( TypeError, lambda : TypeId( 1j ) )
         self.assertRaises( TypeError, lambda : TypeId( TypeId() ) )
+        self.assertRaises( TypeError, lambda : TypeId( 1j ) )
+        with warnings.catch_warnings():
+            warnings.simplefilter('error')
+            self.assertRaises( RuntimeWarning, lambda : TypeId( TypeId.Type.NumberOf ) )
 
         # compare
         for i in range(TypeId.Type.NumberOf) :

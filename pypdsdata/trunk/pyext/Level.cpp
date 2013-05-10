@@ -18,6 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <cstdio>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -142,8 +143,12 @@ Level::Level_FromInt(int value)
   }
 
   if ( value < 0 or value >= Pds::Level::NumberOfLevels ) {
-    PyErr_SetString(PyExc_TypeError, "Error: Level out of range");
-    return 0;
+    char buf[64];
+    std::snprintf(buf, sizeof buf, "Error: Level out of range: %d (range is [0..%d])", value, Pds::Level::NumberOfLevels-1);
+    if (PyErr_WarnEx(PyExc_RuntimeWarning, buf, 3) < 0) {
+      Py_DECREF((PyObject*)ob);
+      return 0;
+    }
   }
   ob->ob_ival = value;
 
@@ -169,8 +174,11 @@ Level_init(PyObject* self, PyObject* args, PyObject* kwds)
   if ( not PyArg_ParseTuple( args, "I:Level", &val ) ) return -1;
 
   if ( val >= Pds::Level::NumberOfLevels ) {
-    PyErr_SetString(PyExc_TypeError, "Error: Level out of range");
-    return -1;
+    char buf[64];
+    std::snprintf(buf, sizeof buf, "Error: Level out of range: %d (range is [0..%d])", val, Pds::Level::NumberOfLevels-1);
+    if (PyErr_WarnEx(PyExc_RuntimeWarning, buf, 3) < 0) {
+      return -1;
+    }
   }
 
   py_this->ob_ival = val;

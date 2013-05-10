@@ -20,6 +20,7 @@
 //-----------------
 #include <string>
 #include <new>
+#include <cstdio>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -185,8 +186,11 @@ TypeId_init(PyObject* self, PyObject* args, PyObject* kwds)
   if ( not PyArg_ParseTuple( args, "|IIi:TypeId", &val, &version, &compressed ) ) return -1;
 
   if ( val >= Pds::TypeId::NumberOf ) {
-    PyErr_SetString(PyExc_TypeError, "Error: TypeId out of range");
-    return -1;
+    char buf[64];
+    std::snprintf(buf, sizeof buf, "Error: TypeId out of range: %d (range is [0..%d])", val, Pds::TypeId::NumberOf-1);
+    if (PyErr_WarnEx(PyExc_RuntimeWarning, buf, 3) < 0) {
+      return -1;
+    }
   }
 
   new(&py_this->m_obj) Pds::TypeId( Pds::TypeId::Type(val), version, compressed );
