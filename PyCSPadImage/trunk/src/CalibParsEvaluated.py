@@ -33,7 +33,7 @@ import os
 import math
 import numpy as np
 import CalibPars        as calp
-import CalibParsDefault as cpdef
+import CalibParsDefault as cpd
 import CSPadConfigPars  as ccp
 
 import GlobalGraphics   as gg # For test purpose in main only
@@ -48,7 +48,9 @@ class CalibParsEvaluated (object) :
     """
 #---------------------
 
-    def __init__ (self) :
+    def __init__ (self, calibpars=None) :
+
+        self.calibpars = calibpars
 
         self.run = None # 10
         
@@ -74,16 +76,40 @@ class CalibParsEvaluated (object) :
 #---------------------
 
     def getCalibParsDefault (self, type) :
-        return cpdef.calibparsdefault.getCalibParsDefault (type)
+        return cpd.calibparsdefault.getCalibParsDefault (type)
 
 #---------------------
 
     def setCalibParsEvaluated (self) :
         print 'Set the calibration parameters evaluated'
 
+        # For now the only type of evaluated parameters is the 'center_global'
+
+        type = 'center_global'
+        if self.calibpars.cpars_status[type] == 'FROM_FILE' : return
+
+
+
+
+
+
+
+
+
+
+
+        self.calibpars.cpars_status[type] = 'EVALUATED'
+
+
+
+
+
+
+
+        
+
         self.mode = 'EVALUATED'
 
-        # For now the only type of evaluated parameters is the 'center_global'
         self.evalpars['center_global'] = self.evaluateCSPadCenterGlobal() # np.array()
         #self.printCalibParsEvaluated ('center_global') 
 
@@ -94,11 +120,11 @@ class CalibParsEvaluated (object) :
     def evaluateCSPadCenterGlobal(self) :
         """Evaluate the CSPad 'center_global' coordinates for all 2x1s and override the default version
         """
-        offset         = calp.calibpars.getCalibPars ('offset')
-        offset_corr    = calp.calibpars.getCalibPars ('offset_corr')
-        marg_gap_shift = calp.calibpars.getCalibPars ('marg_gap_shift')
-        quad_rotation  = calp.calibpars.getCalibPars ('quad_rotation')
-        quad_tilt      = calp.calibpars.getCalibPars ('quad_tilt')
+        offset         = self.calibpars.getCalibPars ('offset')
+        offset_corr    = self.calibpars.getCalibPars ('offset_corr')
+        marg_gap_shift = self.calibpars.getCalibPars ('marg_gap_shift')
+        quad_rotation  = self.calibpars.getCalibPars ('quad_rotation')
+        quad_tilt      = self.calibpars.getCalibPars ('quad_tilt')
 
         margX    = marg_gap_shift[0][1]
         margY    = marg_gap_shift[1][1]
@@ -162,16 +188,16 @@ class CalibParsEvaluated (object) :
 
         """fill2x1CentersInQuads(self) :"""
 
-        marg_gap_shift = calp.calibpars.getCalibPars ('marg_gap_shift')
+        marg_gap_shift = self.calibpars.getCalibPars ('marg_gap_shift')
 
         quadMargX= marg_gap_shift[0][0]
         quadMargY= marg_gap_shift[1][0]
         quadMargZ= marg_gap_shift[2][0]
 
-        center        = calp.calibpars.getCalibPars ('center')
-        center_corr   = calp.calibpars.getCalibPars ('center_corr')
-        quad_rotation = calp.calibpars.getCalibPars ('quad_rotation')
-        quad_tilt     = calp.calibpars.getCalibPars ('quad_tilt')
+        center        = self.calibpars.getCalibPars ('center')
+        center_corr   = self.calibpars.getCalibPars ('center_corr')
+        quad_rotation = self.calibpars.getCalibPars ('quad_rotation')
+        quad_tilt     = self.calibpars.getCalibPars ('quad_tilt')
 
         #Fill arrays [4,8] for x, y, and z:
         self.xcenter  = center[0] + center_corr[0] + quadMargX
@@ -326,7 +352,7 @@ class CalibParsEvaluated (object) :
 
     def evaluateCSPadPixCoordinates (self, rotation=0, mirror=False) :
 
-        dPhi        = calp.calibpars.getCalibPars ('tilt')
+        dPhi        = self.calibpars.getCalibPars ('tilt')
         detDimX, detDimY, segmX, segmY, segmRotInd = self.getCSPadGeometry (rotation-1) # !!! -1 in order to be consistent with getCSPadGeometry
         nquads      = ccp.cspadconfig.nquads
         nsects      = ccp.cspadconfig.nsects
@@ -452,7 +478,7 @@ class CalibParsEvaluated (object) :
     def getTestImageForEntireArray(self,ds1ev) :
         """WERY SLOW METHOD !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         """        
-        xpix, ypix = cpeval.getCSPadPixCoordinates_pix ()
+        xpix, ypix = self.getCSPadPixCoordinates_pix ()
         
         #dimX,dimY = 1750, 1750
         dimX,dimY = self.detDimX, self.detDimY
@@ -481,7 +507,7 @@ class CalibParsEvaluated (object) :
     def getTestImageShapedAsData(self,ds1ev) :
         """WERY SLOW METHOD !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
         """        
-        xpix, ypix = cpeval.getCSPadPixCoordinatesShapedAsData_pix ()
+        xpix, ypix = self.getCSPadPixCoordinatesShapedAsData_pix ()
 
         print 'Data       array shape = ', ds1ev.shape
         print 'Coordinate array shape = ',  xpix.shape
@@ -597,7 +623,7 @@ class CalibParsEvaluated (object) :
 
 #----------------------------------------------
 
-cpeval = CalibParsEvaluated() # Sets the default calibration parameters.
+# cpeval = CalibParsEvaluated() # Sets the default calibration parameters.
 
 #----------------------------------------------
 # In case someone decides to run this module --
@@ -605,13 +631,18 @@ cpeval = CalibParsEvaluated() # Sets the default calibration parameters.
 
 def main_test() :
 
+    calibpars = calp.CalibPars()
+    calibpars.setCalibParsForPath (run=10, path='/reg/d/psdm/CXI/cxi35711/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0')
+
+    cpeval = calibpars.cpeval
+
     cpeval.printCalibParsEvaluated()
     cpeval.printListOfEvaluatedTypes()
     cpeval.printCalibParsEvaluated('center_global')
     cpeval.printCalibParsEvaluated('rotation_index')
 
-    print calp.calibpars.getCalibPars('center')
-    calp.calibpars.printCalibPars() # prints the calib pars from files, if found
+    print calibpars.getCalibPars('center')
+    calibpars.printCalibPars() # prints the calib pars from files, if found
     print 'center_global =\n', cpeval.getCalibParsEvaluated('center_global')
 
 if __name__ == "__main__" :

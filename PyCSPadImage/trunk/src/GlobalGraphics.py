@@ -54,46 +54,46 @@ def getRandomImage() :
 
 #--------------------------------
 
-def plotHistogram(arr, range=(0,500), figsize=(5,5)) :
+def plotHistogram(arr, range=None, figsize=(6,6)) : # range=(0,500)
     fig  = plt.figure(figsize=figsize, dpi=80, facecolor='w',edgecolor='w', frameon=True)
     plt.hist(arr.flatten(), bins=100, range=range)
 
 #--------------------------------
 
-def plotSpectrum(arr, range=(0,500), figsize=(5,5)) :
+def plotSpectrum(arr, range=None, figsize=(6,6)) : # range=(0,500)
     plotHistogram(arr, range, figsize)
 
 #--------------------------------
 
-def plotImage(arr, range=(0,500), figsize=(12,5), title='Image', origin='upper') :
+def plotImage(arr, range=None, figsize=(12,5), title='Image', origin='upper') : #range=(0,500)
     fig  = plt.figure(figsize=figsize, dpi=80, facecolor='w', edgecolor='w', frameon=True)
     axim = fig.add_axes([0.05,  0.05, 0.95, 0.92])
     imsh = plt.imshow(arr, interpolation='nearest', aspect='auto', origin=origin) #,extent=self.XYRange, origin='lower'
     colb = fig.colorbar(imsh, pad=0.005, fraction=0.1, shrink=1, aspect=20)
-    imsh.set_clim(range[0],range[1])
+    if range is not None : imsh.set_clim(range[0],range[1])
     #axim.set_title(title, color='b', fontsize=20)
     fig.canvas.set_window_title(title)
 
 #--------------------------------
 
-def plotImageLarge(arr,range=(0,500),figsize=(12,10), title='Image', origin='upper') :
+def plotImageLarge(arr,range=None,figsize=(12,10), title='Image', origin='upper') : #range=(0,500)
     fig  = plt.figure(figsize=figsize, dpi=80, facecolor='w', edgecolor='w', frameon=True)
     axim = fig.add_axes([0.05,  0.03, 0.94, 0.94])
     imsh = axim.imshow(arr, interpolation='nearest', aspect='auto', origin=origin) #,extent=self.XYRange, origin='lower'
     colb = fig.colorbar(imsh, pad=0.005, fraction=0.09, shrink=1, aspect=40)
-    imsh.set_clim(range[0],range[1])
+    if range is not None : imsh.set_clim(range[0],range[1])
     fig.canvas.set_window_title(title)
 
 #--------------------------------
 
-def plotImageAndSpectrum(arr,range=(0,500)) :
+def plotImageAndSpectrum(arr,range=None) : #range=(0,500)
     fig  = plt.figure(figsize=(15,5), dpi=80, facecolor='w', edgecolor='w', frameon=True)
     fig.canvas.set_window_title('Image And Spectrum ' + u'\u03C6')
 
     ax1   = plt.subplot2grid((10,10), (0,4), rowspan=10, colspan=6)
     axim1 = ax1.imshow(arr, interpolation='nearest', aspect='auto') # , origin='lower' 
     colb1 = fig.colorbar(axim1, pad=0.01, fraction=0.1, shrink=1.00, aspect=20)
-    axim1.set_clim(range[0], range[1])
+    if range is not None : axim1.set_clim(range[0], range[1])
     plt.title('Image', color='b', fontsize=20)
 
     ax2   = plt.subplot2grid((10,10), (0,0), rowspan=10, colspan=4)

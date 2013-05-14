@@ -40,28 +40,31 @@ import numpy as np
 class CalibParsDefault (object) :
     """This class provides access to the calibration parameters
     """
+    list_of_clib_types =[
+         'center'
+        ,'center_corr'  
+        ,'marg_gap_shift' 
+        ,'offset'
+        ,'offset_corr'
+        ,'rotation'
+        ,'tilt'
+        ,'quad_rotation'
+        ,'quad_tilt'
+        ,'common_mode'
+        ,'pedestals'
+        ,'filter'
+        ,'pixel_status'
+        ,'center_global'  
+        ,'tilt_global'  
+        ,'beam_vector'
+        ,'beam_intersect'
+        ,'rotation_index'
+        ]
 
 #---------------------
 
     def __init__ (self) :
         """Constructor"""
-
-        self.list_of_clib_types =[  'center'
-                                   ,'center_corr'  
-                                   ,'marg_gap_shift' 
-                                   ,'offset'
-                                   ,'offset_corr'
-                                   ,'rotation'
-                                   ,'tilt'
-                                   ,'quad_rotation'
-                                   ,'quad_tilt'
-                                   ,'common_mode'
-                                   ,'pedestals'
-                                   ,'filter'
-                                   ,'pixel_status'
-                                   ,'center_global'  
-                                   ,'rotation_index'
-                                   ]
 
         self.loadCalibParsDefault()
 
@@ -87,19 +90,7 @@ class CalibParsDefault (object) :
                       [  0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.],
                       [  0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.]]])
 
-        self.defpars['center_corr'] = np.array(
-                    [[[  0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.],
-                      [  0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.],
-                      [  0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.],
-                      [  0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.]],
-                     [[  0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.],
-                      [  0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.],
-                      [  0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.],
-                      [  0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.]],
-                     [[  0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.],
-                      [  0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.],
-                      [  0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.],
-                      [  0.,    0.,    0.,    0.,    0.,    0.,    0.,    0.]]])
+        self.defpars['center_corr'] = np.zeros((3,4,8), dtype=np.float32)
 
         self.defpars['marg_gap_shift'] = np.array(
                     [[ 15.,  40.,   0.,  38.],
@@ -122,11 +113,7 @@ class CalibParsDefault (object) :
                      [   0.,    0.,  270.,  270.,  180.,  180.,  270.,  270.],
                      [   0.,    0.,  270.,  270.,  180.,  180.,  270.,  270.]])
 
-        self.defpars['tilt'] = np.array(
-                    [[0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.],  
-                     [0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.],  
-                     [0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.],  
-                     [0.,  0.,  0.,  0.,  0.,  0.,  0.,  0.]])
+        self.defpars['tilt'] = np.zeros((4,8), dtype=np.float32)
 
         self.defpars['quad_rotation'] = np.array([ 180.,   90.,    0.,  270.])
 
@@ -138,7 +125,7 @@ class CalibParsDefault (object) :
 
         self.defpars['pedestals']     = np.zeros((5920, 388), dtype=np.float32) # SHAPE: (5920, 388)
 
-        self.defpars['pixel_status']  = np.zeros((5920, 388), dtype=np.uint16) # SHAPE: (5920, 388)
+        self.defpars['pixel_status']  = np.zeros((5920, 388), dtype=np.uint16)  # SHAPE: (5920, 388)
 
         self.defpars['center_global'] = np.array(
            [[[ 473.38,  685.26,  155.01,  154.08,  266.81,   53.95,  583.04,  582.15],  
@@ -155,6 +142,15 @@ class CalibParsDefault (object) :
              [     0.,      0.,      0.,      0.,      0.,      0.,      0.,      0.],
              [     0.,      0.,      0.,      0.,      0.,      0.,      0.,      0.],
              [     0.,      0.,      0.,      0.,      0.,      0.,      0.,      0.]]])
+
+        self.defpars['tilt_global'] = np.zeros((4,8), dtype=np.float32)
+
+        self.defpars['beam_vector']    = np.zeros((3), dtype=np.float32)
+
+        self.defpars['beam_intersect'] = np.zeros((3), dtype=np.float32)
+
+#---------------------
+# Non-standard parameters are also available in the same dictionary:
 
         self.defpars['rotation_index'] = np.array(
                  [[   0,   0,   3,   3,   2,   2,   3,   3],

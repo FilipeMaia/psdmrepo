@@ -12,6 +12,20 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 #---------------------
+2012-03-14 Mikhail S. Dubrovin
+Tag: V00-00-11
+- add modules for CSPAD2x2:
+M       src/CalibParsEvaluated.py
+M       src/CalibPars.py
+M       src/CalibParsDefault.py
+M       src/PixCoords2x1.py
+A       src/CSPAD2x2CalibPars.py
+M       src/HDF5Methods.py
+A       src/CSPAD2x2CalibParsDefault.py
+M       src/Alignment.py
+M       src/GlobalGraphics.py
+D       src/CSPad2x2PixCoordsWODB.py -> src/CSPAD2x2PixCoords.py
+A       src/CSPAD2x2Examples.py
 
 2012-03-08 Mikhail S. Dubrovin
 Tag: V00-00-10

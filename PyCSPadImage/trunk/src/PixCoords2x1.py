@@ -229,13 +229,16 @@ def test_2x1_img() :
     #print 'X(pix) :\n', X
     print 'X.shape =', X.shape
 
-    xmin, xmax, ymin, ymax = X.min()-0.5, X.max()+0.5, Y.min()-0.5, Y.max()+0.5
+    xmin, ymin = w.get_xy_min_pix()
+    xmax, ymax = w.get_xy_max_pix()
+    xmin-=0.5; xmax+=0.5; ymin-=0.5; ymax+=0.5;
+
     xsize = xmax - xmin 
     ysize = ymax - ymin 
     print 'xsize =', xsize # 391.0 
     print 'ysize =', ysize # 185.0
 
-    H, Xedges, Yedges = np.histogram2d(X.flatten(), Y.flatten(), bins=[xsize,ysize], range=[[xmin,xmax],[ymin,ymax]], normed=False, weights=X.flatten()+Y.flatten()) 
+    H, Xedges, Yedges = np.histogram2d(X.flatten(), Y.flatten(), bins=[xsize,ysize], range=[[xmin, xmax], [ymin, ymax]], normed=False, weights=X.flatten()+Y.flatten()) 
 
     #print 'Xedges:', Xedges
     #print 'Yedges:', Yedges

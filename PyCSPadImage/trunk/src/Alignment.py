@@ -34,7 +34,6 @@ import numpy              as np
 
 import PyCSPadImage.CalibParsDefault   as cald
 import PyCSPadImage.CalibPars          as calp
-import PyCSPadImage.CalibParsEvaluated as cpe
 import PyCSPadImage.CSPadConfigPars    as ccp
 import PyCSPadImage.CSPadImageProducer as cip
 import PyCSPadImage.GlobalMethods      as gm # getCSPadArrayFromFile for pedestal subtraction 
@@ -131,7 +130,6 @@ def main_alignment_test() :
     #cald.calibparsdefault.printListOfCalibTypes()
     #cald.calibparsdefault.printCalibParsDefault()
     #cald.calibparsdefault.printCalibParsDefault('center_global')
-    cpe.cpeval.printCalibParsEvaluatedAll() 
 
     print 'Get raw CSPad event %d from file %s \ndataset %s' % (event, fname, dsname)
     #ds1ev = hm.getOneCSPadEventForTest( fname, dsname, event )
