@@ -95,7 +95,7 @@ namespace IData {
  *  If the string passed to a constructor looks like a file name then dataset 
  *  constructor tries to guess various pieces of information from the file name
  *  itself. To look like a file name the string should either:
- *  - do not contain colon character and contain at least on dot
+ *  - do not contain colon character and contain at least one dot
  *  - if colon character is in the string it follows by slash or digit (for 
  *    something like root://host:port/path)
  *
