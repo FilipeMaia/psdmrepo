@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-02
+2013-05-14 Andy Salnikov
+- fix CameraFrameV1::xtcSize(), must return whole words
+
 Tag: V00-04-01
 2013-04-25 Andy Salnikov
 - upgrading to pdsdata V06-07-04
