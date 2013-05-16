@@ -1,0 +1,30 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  README file for package AuthDB
+#------------------------------------------------------------------------
+
+Package author: Igor Gaponenko
+
+Brief description:
+==================
+
+The persistent database-driven Authorization service for Web applications.
+
+The package contains:
+
+  - database schema for MySQL
+  - database schema initialization script
+  - command-line python application for managing the contents
+    of the database from UNIX shells
+  - PHP library for Web applications
+  - reference Web application for managing the contents of the database
+
+Detailed description:
+=====================
+
+More detailed info goes here. Describe main classes/applications built in
+this package. Give few examples of their use.
+-
