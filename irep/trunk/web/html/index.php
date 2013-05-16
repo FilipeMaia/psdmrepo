@@ -588,6 +588,9 @@ function global_equipment_sorter_by_modified     (a,b) { return a.modified.time_
               </tr>
               <tr><td><b>Tag:</b></td>
                   <td><select name="tag" class="form-elem" disabled></select></td>
+                  <td>&nbsp;</td>
+                  <td><b>Description:</b></td>
+                  <td colspan="4"><input type="text" name="description"  size="20" class="form-elem" style="padding:2px ;" value="" /></td>
               </tr>
             </tbody></table>
           </form>

@@ -1420,7 +1420,8 @@ function p_appl_equipment () {
             pc:              form_elem.find('input[name="pc"]').val() ,
             location_id:     form_elem.find('select[name="location"]').val() ,
             custodian:       form_elem.find('select[name="custodian"]').val() ,
-            tag:             form_elem.find('select[name="tag"]').val()
+            tag:             form_elem.find('select[name="tag"]').val() ,
+            description:    form_elem.find('input[name="description"]').val()
         } ;
         this.equipment_search_impl(params) ;
     } ;
@@ -1464,6 +1465,7 @@ function p_appl_equipment () {
         form_elem.find('select[name="location"]'    ).val(0) ;
         form_elem.find('select[name="custodian"]'   ).val('') ;
         form_elem.find('select[name="tag"]'         ).val('') ;
+        form_elem.find('input[name="description"]'  ).val('') ;
         this.equipment = [] ;
         this.equipment_display() ;
     } ;

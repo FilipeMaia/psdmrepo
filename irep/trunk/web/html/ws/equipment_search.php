@@ -24,6 +24,7 @@
  *      [<room>     || <room_id>]
  *      [<custodian>]
  *      [<tag>]
+ *      [<description>]
  */
 
 require_once 'dataportal/dataportal.inc.php' ;
@@ -122,8 +123,9 @@ require_once 'irep/irep.inc.php' ;
             $SVC->abort("conflicting parameters for a room") ;
         }
     }
-    $custodian = $SVC->optional_str('custodian', '') ;
-    $tag       = $SVC->optional_str('tag', '') ;
+    $custodian   = $SVC->optional_str('custodian', '') ;
+    $tag         = $SVC->optional_str('tag', '') ;
+    $description = $SVC->optional_str('description', '') ;
 
     $SVC->finish(\Irep\IrepUtils::equipment2array (
         $SVC->irep()->search_equipment (
@@ -134,7 +136,8 @@ require_once 'irep/irep.inc.php' ;
             $serial ,
             $location_name ,
             $custodian ,
-            $tag
+            $tag ,
+            $description
         )
     )) ;
 }) ;

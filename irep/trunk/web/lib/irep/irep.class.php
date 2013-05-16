@@ -695,7 +695,7 @@ HERE
                 __METHOD__, "no sub-status exists for ID: {$id}") ;
         return $this->find_equipment_many_by_("(status='{$status2->status()->name()}' AND status2='{$status2->name()}')") ;
     }
-    public function search_equipment ($status, $status2, $manufacturer, $model, $serial, $location, $custodian, $tag) {
+    public function search_equipment ($status, $status2, $manufacturer, $model, $serial, $location, $custodian, $tag, $description) {
         $conditions_opt = '' ;
         if ($status != '') {
             $status_escaped = $this->escape_string(trim($status)) ;
@@ -727,7 +727,11 @@ HERE
         }
         if ($tag != '') {
             $tag_escaped = $this->escape_string(trim($tag)) ;
-            //$conditions_opt .= ($conditions_opt == '' ? '' : ' AND ')." (custodian LIKE '%{$tag_escaped}%') " ;
+            // FIXME: this isn't implemented yet.
+        }
+        if ($description != '') {
+            $description_escaped = $this->escape_string(trim($description)) ;
+            $conditions_opt .= ($conditions_opt == '' ? '' : ' AND ')." (description LIKE '%{$description_escaped}%') " ;
         }
         return $this->find_equipment_many_by_($conditions_opt) ;
     }

@@ -11,7 +11,12 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-05
+2013-05-16 Igor Gaponenko
+- implemented search by the description field
+
 Tag: V00-00-04
+2013-01-28 Igor Gaponenko
 - added a documentation string for SLACid ranges (schema, ws, and UI)
 
 Tag: V00-00-03
