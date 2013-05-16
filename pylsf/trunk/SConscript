@@ -19,14 +19,25 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 # giving some or all parameters.
 #
 
+pkg = "lsf_libs"
+pkg_ver = "6.1"
+
+PREFIX  = pjoin('$SIT_EXTERNAL_SW', 'lsf', pkg_ver)
+LIBDIR = 'lib'
+OPTIONAL = True
+PKGINFO = None
+
+standardExternalPackage ( pkg, **locals() )
+
+del LIBDIR
+
 pkg = "pylsf"
 pkg_ver = "20110926"
 
 PREFIX  = pjoin('$SIT_EXTERNAL_SW', pkg, pkg_ver)
 PYDIR = pjoin('$PYTHON_LIBDIRNAME', '$PYTHON', "site-packages")
-LIBDIR = "/afs/slac/package/lsf/curr/lib"
-COPYLIBS = "liblsf.so libbat.so"
 PKGINFO = (pkg, pkg_ver, '$PYTHON', '$SIT_ARCH.found')
+DEPS = 'lsf_libs'
 OPTIONAL = True
 
 standardExternalPackage ( pkg, **locals() )
