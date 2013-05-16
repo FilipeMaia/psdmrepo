@@ -91,8 +91,8 @@
 #include "types/gsc16ai/ConfigV1.h"
 #include "types/gsc16ai/DataV1.h"
 
-//#include "types/imp/ConfigV1.h"
-//#include "types/imp/ElementV1.h"
+#include "types/imp/ConfigV1.h"
+#include "types/imp/ElementV1.h"
 
 #include "types/ipimb/ConfigV1.h"
 #include "types/ipimb/ConfigV2.h"
@@ -501,13 +501,13 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
     if ( not obj ) obj = xtc2obj<Orca::ConfigV1, 1>(xtc, parent);
     break;
 
-//  case Pds::TypeId::Id_ImpData :
-//    if ( not obj ) obj = xtc2obj<Imp::ElementV1, 1>(xtc, parent);
-//    break;
-//
-//  case Pds::TypeId::Id_ImpConfig :
-//    if ( not obj ) obj = xtc2obj<Imp::ConfigV1, 1>(xtc, parent);
-//    break;
+  case Pds::TypeId::Id_ImpData :
+    if ( not obj ) obj = xtc2obj<Imp::ElementV1, 1>(xtc, parent);
+    break;
+
+  case Pds::TypeId::Id_ImpConfig :
+    if ( not obj ) obj = xtc2obj<Imp::ConfigV1, 1>(xtc, parent);
+    break;
 
   case Pds::TypeId::NumberOf :
     // just to make compiler shut up about this special unhandled enum

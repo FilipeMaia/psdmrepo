@@ -6,6 +6,10 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V00-00-99
+2013-05-15 Andy Salnikov
+- adding imp package
+
 Tag: V00-00-98
 2013-05-10 Andy Salnikov
 - replace exceptions with runtime warnings in few classes

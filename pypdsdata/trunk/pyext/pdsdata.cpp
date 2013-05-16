@@ -147,9 +147,10 @@
 #include "types/gsc16ai/ConfigV1.h"
 #include "types/gsc16ai/DataV1.h"
 
-//#include "types/imp/ConfigV1.h"
-//#include "types/imp/ElementV1.h"
-//#include "types/imp/Sample.h"
+#include "types/imp/ConfigV1.h"
+#include "types/imp/ElementV1.h"
+#include "types/imp/LaneStatus.h"
+#include "types/imp/Sample.h"
 
 #include "types/ipimb/ConfigV1.h"
 #include "types/ipimb/ConfigV2.h"
@@ -398,12 +399,13 @@ PyMODINIT_FUNC init_pdsdata()
   Py_INCREF( module );
   PyModule_AddObject( this_module, "gsc16ai", module );
 
-//  module = Py_InitModule3( "_pdsdata.imp", 0, "The Python wrapper module for pdsdata/imp" );
-//  pypdsdata::Imp::ConfigV1::initType( module );
-//  pypdsdata::Imp::ElementV1::initType( module );
-//  pypdsdata::Imp::Sample::initType( module );
-//  Py_INCREF( module );
-//  PyModule_AddObject( this_module, "imp", module );
+  module = Py_InitModule3( "_pdsdata.imp", 0, "The Python wrapper module for pdsdata/imp" );
+  pypdsdata::Imp::ConfigV1::initType( module );
+  pypdsdata::Imp::ElementV1::initType( module );
+  pypdsdata::Imp::LaneStatus::initType( module );
+  pypdsdata::Imp::Sample::initType( module );
+  Py_INCREF( module );
+  PyModule_AddObject( this_module, "imp", module );
 
   module = Py_InitModule3( "_pdsdata.ipimb", 0, "The Python wrapper module for pdsdata/ipimb" );
   pypdsdata::Ipimb::ConfigV1::initType( module );
