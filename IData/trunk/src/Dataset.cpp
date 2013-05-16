@@ -40,10 +40,10 @@ namespace fs = boost::filesystem;
 
 namespace {
 
-  const char* logger = "Dataset";
+  const char* logger = "IData.Dataset";
 
-  // parse experiment name
-  void parseExpName(const std::string& exp, unsigned& expId, std::string& instrName, std::string& expName);
+  // parse experiment name or id, returns true on success
+  bool parseExpName(const std::string& exp, unsigned& expId, std::string& instrName, std::string& expName);
 
   // parse run list
   void parseRuns(const std::string& str, IData::Dataset::Runs& runs);
@@ -79,7 +79,9 @@ std::string Dataset::s_expName;           ///< Application-wide experiment name
 void
 Dataset::setAppExpName(const std::string& exp)
 {
-  ::parseExpName(exp, s_expId, s_instrName, s_expName);
+  if (not ::parseExpName(exp, s_expId, s_instrName, s_expName)) {
+    throw IData::ExpNameException(ERR_LOC, exp);
+  }
   s_key2val["exp"] = exp;
 }
 
@@ -96,7 +98,9 @@ void
 Dataset::setDefOption(const std::string& key, const std::string& value)
 {
   if (key == "exp") {
-    ::parseExpName(value, s_expId, s_instrName, s_expName);
+    if (not ::parseExpName(value, s_expId, s_instrName, s_expName)) {
+      throw IData::ExpNameException(ERR_LOC, value);
+    }
   } else if (key == "run") {
     MsgLog(logger, warning, "setDefOption() does not accept run numbers");
   }
@@ -163,7 +167,9 @@ Dataset::Dataset(const std::string& ds)
       }
   
       if (key == "exp") {
-        ::parseExpName(val, m_expId, m_instrName, m_expName);
+        if (not ::parseExpName(val, m_expId, m_instrName, m_expName)) {
+          throw IData::ExpNameException(ERR_LOC, val);
+        }
       } else if (key == "run") {
         ::parseRuns(val, m_runs);
       }
@@ -356,8 +362,10 @@ Dataset::parseXtcFileName(std::string path)
   // must be all digits, and at least one digit
   if (run.empty() or not boost::all(run, boost::is_digit())) return;
 
-  // parse ans store these
-  ::parseExpName(expid, m_expId, m_instrName, m_expName);
+  // parse and store these
+  if (not ::parseExpName(expid, m_expId, m_instrName, m_expName)) {
+    MsgLog(logger, warning, "unrecognized experiment ID: " << expid);
+  }
   ::parseRuns(run, m_runs);
 }
 
@@ -393,8 +401,10 @@ Dataset::parseHdfFileName(std::string path)
   // must be all digits, and at least one digit
   if (run.empty() or not boost::all(run, boost::is_digit())) return;
 
-  // parse ans store these
-  ::parseExpName(expname, m_expId, m_instrName, m_expName);
+  // parse and store these
+  if (not ::parseExpName(expname, m_expId, m_instrName, m_expName)) {
+    MsgLog(logger, warning, "unrecognized experiment name: " << expname);
+  }
   ::parseRuns(run, m_runs);
 }
 
@@ -404,7 +414,7 @@ namespace {
 
 
 // parse experiment name
-void parseExpName(const std::string& exp, unsigned& expId, std::string& instrName, std::string& expName)
+bool parseExpName(const std::string& exp, unsigned& expId, std::string& instrName, std::string& expName)
 {
   ExpNameDb::ExpNameDatabase namedb;
 
@@ -414,7 +424,7 @@ void parseExpName(const std::string& exp, unsigned& expId, std::string& instrNam
     unsigned num = boost::lexical_cast<unsigned>(exp);
     std::pair<std::string, std::string> instrExp = namedb.getNames(num);
     if (instrExp.first.empty()) {
-      throw IData::ExpNameException(ERR_LOC, exp);
+      return false;
     }
 
     expId = num;
@@ -430,7 +440,7 @@ void parseExpName(const std::string& exp, unsigned& expId, std::string& instrNam
       // only experiment name is given
       std::pair<std::string, unsigned> instrExp = namedb.getInstrumentAndID(exp);
       if (instrExp.first.empty()) {
-        throw IData::ExpNameException(ERR_LOC, exp);
+        return false;
       }
 
       expId = instrExp.second;
@@ -439,13 +449,13 @@ void parseExpName(const std::string& exp, unsigned& expId, std::string& instrNam
 
     } else {
 
-      // both instrument ans experiment name is given
+      // both instrument and experiment name is given
       const std::string instrument(exp, 0, p);
       const std::string experiment(exp, p+1);
 
       unsigned num = namedb.getID(instrument, experiment);
       if (num == 0) {
-        throw IData::ExpNameException(ERR_LOC, exp);
+        return true;
       }
 
       expId = num;
@@ -457,7 +467,7 @@ void parseExpName(const std::string& exp, unsigned& expId, std::string& instrNam
 
   }
 
-
+  return true;
 }
 
 // parse run list
