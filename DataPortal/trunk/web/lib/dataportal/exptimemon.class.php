@@ -44,7 +44,7 @@ class ExpTimeMon extends DbConnection {
         'CXI',
         'MEC'
     );
-    private static $beam_destination_masks = array(
+    public static $beam_destination_masks = array(
         'FEE' =>   1,
         'AMO' =>   2,
         'SXR' =>   4,

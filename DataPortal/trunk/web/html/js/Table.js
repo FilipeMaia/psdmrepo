@@ -52,7 +52,7 @@ function define_class(constructor, base, statics, methods ) {
 /**
  * The Table class:
  * 
- *   Table(id,coldef,data,text_when_empty,default_sort_column)
+ *   Table(id, coldef, data, options, config_handler)
  * 
  * The class is designed to simplify creating dynamic tables
  * at a location specified by HTML container 'id'. Table configuration
@@ -163,11 +163,19 @@ function define_class(constructor, base, statics, methods ) {
  * 5. Extra styles for cells. For example:
  * 
  *      style: ' white-space: nowrap;'
- * Other parameters/options:
  *
- *   'data'                - data array to be preloaded when creating the table
+ * The 'data' parameter may contain static data for table cells
+ * in case if this information is available at a time when the table
+ * object is built. Otherwise use dynamic loading.
+ *
+ * Options are specified via the 'options' object (dictionary). The following
+ * options are supported in this implementation of teh class:
+ *
  *   'text_when_empty'     - HTML text to show when no data are loaded
  *   'default_sort_column' - an optional column number by which to sort (default: 0)
+ *   
+ * The 'config_handler' parameter (if provided) will be used to maintain a persistent
+ * state of table configuration on teh server side.
  */
 
 function TableCellType() {}
@@ -204,7 +212,13 @@ define_class( TableCellType_TextURL, TableCellType, {}, {
 );
 
 
-function Table(id, coldef, data, options, config_handler) {
+function TableError(message) {
+    this.message = message;
+}
+
+TableError.prototype = new Error();
+
+function Table(container, coldef, data, options, config_handler) {
 
     var that = this;
 
@@ -212,7 +226,15 @@ function Table(id, coldef, data, options, config_handler) {
 
     // Mandatory parameters of the table
 
-    this.id     = id;                               // container address where to render the table
+
+    // container address where to render the table
+
+    switch (typeof container) { 
+        case 'string' : this.container = $('#'+container) ; break ;
+        case 'object' : this.container = $(container) ; break ;
+        default :
+            throw new TableError('Table: wrong type of the table container parameter') ;
+    }
     this.coldef = jQuery.extend(true,[],coldef);    // columns definition: make a deep local copy
 
     // Optional parameters
@@ -273,7 +295,7 @@ function Table(id, coldef, data, options, config_handler) {
             function (persistent_state) { that.load_state(persistent_state) ; } ,
             function ()                 { that.save_state() ; }
         ) ;
-        if (persistent_state != null) {
+        if (persistent_state) {
             this.header.hidden = persistent_state.hidden;
             this.sorted        = persistent_state.sorted;
         }
@@ -417,8 +439,8 @@ define_class( Table, null, {
         }
         html += '</tbody></table>';
 
-        $('#'+this.id).html(html);
-        $('#'+this.id).find('.table_row_sorter').click(function() {
+        this.container.html(html);
+        this.container.find('.table_row_sorter').click(function() {
             var column = parseInt($(this).find('.table_sort_sign').attr('name'));
             that.sorted.forward = !that.sorted.forward;
             that.sorted.column  = column;
@@ -429,16 +451,16 @@ define_class( Table, null, {
         for( var i in this.header.types ) {
             this.header.types[i].after_sort(); 
         }
-        $('#'+this.id).find('.table_cell_selectable').click(function() {
+        this.container.find('.table_cell_selectable').click(function() {
             var addr = this.id.split(' ');
             var col_idx = addr[0];
             var row_idx = addr[1];
             that.selected_row  = that.data[row_idx];
             that.header.types[col_idx].select_action(that.data[row_idx][col_idx]);
-            $('#'+that.id).find('.table_cell_selectable_selected').removeClass('table_cell_selectable_selected');
+            that.container.find('.table_cell_selectable_selected').removeClass('table_cell_selectable_selected');
             $(this).addClass('table_cell_selectable_selected');
         });
-        $('#'+this.id).find('.table_column_hider').find('input[type="checkbox"]').change(function() {
+        this.container.find('.table_column_hider').find('input[type="checkbox"]').change(function() {
             var col_idx = parseInt(this.name);
             that.header.hidden[col_idx] = !this.checked;
             that.display();

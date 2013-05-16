@@ -1276,7 +1276,10 @@ div.v-item:hover {
   display: block;
 }
 .application-workarea {
+  /* Disable this because it causes sliders to show up in a wrong context,
+     and makes it complicated to see the whide content.
   overflow: auto;
+  */
   font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
   font-size: 75%;
 }
