@@ -30,6 +30,7 @@
 #include "psddl_pds2psana/ipimb.ddl.h"
 #include "psddl_pds2psana/opal1k.ddl.h"
 #include "psddl_pds2psana/cspad2x2.ddl.h"
+#include "psddl_pds2psana/imp.ddl.h"
 #include "psddl_pds2psana/CsPadDataOrdered.h"
 #include "psddl_pds2psana/PnccdFullFrameV1Proxy.h"
 #include "psddl_pds2psana/TimepixDataV1ToV2.h"
@@ -942,6 +943,46 @@ try {
             // store proxy
             typedef EvtProxyCfg<Psana::Gsc16ai::DataV1, psddl_pds2psana::Gsc16ai::DataV1, PsddlPds::Gsc16ai::DataV1, PsddlPds::Gsc16ai::ConfigV1> ProxyType;
             if (evt) evt->putProxy<Psana::Gsc16ai::DataV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
+          }
+        }
+        break;
+      } // end switch (version)
+    }
+    break;
+  case Pds::TypeId::Id_ImpConfig:
+    {
+      switch (version) {
+      case 1:
+        {
+          // store XTC object in config store
+          boost::shared_ptr<PsddlPds::Imp::ConfigV1> xptr(xtc, (PsddlPds::Imp::ConfigV1*)(xtc->payload()));
+          cfgStore.put(xptr, xtc->src);
+          // create and store psana object in config store
+          boost::shared_ptr<Psana::Imp::ConfigV1> obj = boost::make_shared<psddl_pds2psana::Imp::ConfigV1>(xptr);
+          cfgStore.put(obj, xtc->src);
+        }
+        break;
+      } // end switch (version)
+    }
+    break;
+  case Pds::TypeId::Id_ImpData:
+    {
+      switch (version) {
+      case 1:
+        {
+          if (boost::shared_ptr<PsddlPds::Imp::ConfigV1> cfgPtr = cfgStore.get(xtc->src)) {
+            // store proxy
+            typedef EvtProxyCfg<Psana::Imp::ElementV1, psddl_pds2psana::Imp::ElementV1, PsddlPds::Imp::ElementV1, PsddlPds::Imp::ConfigV1> ProxyType;
+            if (evt) evt->putProxy<Psana::Imp::ElementV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
+          }
+        }
+        break;
+      case 32769:
+        {
+          if (boost::shared_ptr<PsddlPds::Imp::ConfigV1> cfgPtr = cfgStore.get(xtc->src)) {
+            // store proxy
+            typedef EvtProxyCfg<Psana::Imp::ElementV1, psddl_pds2psana::Imp::ElementV1, PsddlPds::Imp::ElementV1, PsddlPds::Imp::ConfigV1> ProxyType;
+            if (evt) evt->putProxy<Psana::Imp::ElementV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
           }
         }
         break;
