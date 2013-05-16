@@ -2,7 +2,7 @@
 
 set -e
 
-packages="acqiris andor bld camera control cspad cspad2x2 encoder epics evr fccd fli gsc16ai ipimb lusi \
+packages="acqiris andor bld camera control cspad cspad2x2 encoder epics evr fccd fli gsc16ai imp ipimb lusi \
         oceanoptics opal1k orca pnccd princeton pulnix quartz timepix usdusb"
 
 for pkg in $packages; do 

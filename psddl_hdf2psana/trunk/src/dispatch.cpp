@@ -16,6 +16,7 @@
 #include "psddl_hdf2psana/bld.ddl.h"
 #include "psddl_hdf2psana/pulnix.ddl.h"
 #include "psddl_hdf2psana/fccd.ddl.h"
+#include "psddl_hdf2psana/imp.ddl.h"
 #include "psddl_hdf2psana/pnccd.ddl.h"
 #include "psddl_hdf2psana/epics.ddl.h"
 #include "psddl_hdf2psana/ipimb.ddl.h"
@@ -332,6 +333,10 @@ try {
     // EvrData::IOConfigV1
     cfgStore.putProxy(psddl_hdf2psana::EvrData::make_IOConfigV1(schema_version, group, idx), src);
     break;
+  case 2058892252:
+    // Imp::ConfigV1
+    cfgStore.putProxy(psddl_hdf2psana::Imp::make_ConfigV1(schema_version, group, idx), src);
+    break;
   case 2103238272:
     // Opal1k::ConfigV1
     cfgStore.putProxy(psddl_hdf2psana::Opal1k::make_ConfigV1(schema_version, group, idx), src);
@@ -578,6 +583,12 @@ try {
   case 4114962913:
     // EvrData::PulseConfig
     evt.putProxy(psddl_hdf2psana::EvrData::make_PulseConfig(schema_version, group, idx), src);
+    break;
+  case 4130246568:
+    // Imp::ElementV1
+    if (boost::shared_ptr<Psana::Imp::ConfigV1> cfgPtr = cfgStore.get(src)) {
+      evt.putProxy(psddl_hdf2psana::Imp::make_ElementV1(schema_version, group, idx, cfgPtr), src);
+    }
     break;
   case 4207593793:
     // Pulnix::TM6740ConfigV2
