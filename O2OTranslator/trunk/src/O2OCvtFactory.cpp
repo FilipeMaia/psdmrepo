@@ -69,6 +69,7 @@
 #include "H5DataTypes/FliConfigV1.h"
 #include "H5DataTypes/FliFrameV1.h"
 #include "H5DataTypes/Gsc16aiConfigV1.h"
+#include "H5DataTypes/ImpConfigV1.h"
 #include "H5DataTypes/IpimbConfigV1.h"
 #include "H5DataTypes/IpimbConfigV2.h"
 #include "H5DataTypes/IpimbDataV1.h"
@@ -115,6 +116,7 @@
 #include "O2OTranslator/EpicsDataTypeCvt.h"
 #include "O2OTranslator/FliFrameV1Cvt.h"
 #include "O2OTranslator/Gsc16aiDataV1Cvt.h"
+#include "O2OTranslator/ImpElementV1Cvt.h"
 #include "O2OTranslator/OceanOpticsDataV1Cvt.h"
 #include "O2OTranslator/PnCCDFrameV1Cvt.h"
 #include "O2OTranslator/PrincetonFrameCvt.h"
@@ -802,6 +804,23 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
       break;
     }
     break;
+
+  case Pds::TypeId::Id_ImpConfig:
+    switch (version) {
+    case 1:
+      ::makeConfigCvt<ImpConfigV1>(cvts, group, "Imp::ConfigV1", src, m_cvtOptions, 0);
+      break;
+    }
+    break;
+
+    case Pds::TypeId::Id_ImpData:
+      switch (version) {
+      case 1:
+        // very special converter for Imp::ElementV1, it needs two types of data
+        cvts.push_back(make_shared<ImpElementV1Cvt>(group, "Imp::ElementV1", src, m_configStore, m_cvtOptions, 0));
+        break;
+      }
+      break;
 
   case Pds::TypeId::NumberOf:
     break;
