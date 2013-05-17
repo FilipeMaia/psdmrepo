@@ -1,0 +1,42 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package IData
+#------------------------------------------------------------------------
+
+Package author: Andy Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-01-05
+2013-05-16 Andy Salnikov
+- fixing bug in my last commit, should have run tests before commiting
+
+Tag: V00-01-04
+2013-05-16 Andy Salnikov
+- do not always throw exception when experiment name or ID is not recognized
+
+Tag: V00-01-03
+2013-03-29 Andy Salnikov
+- fix typo in Dataset class comments
+
+Tag: V00-01-02
+2013-03-29 Andy Salnikov
+- small correction to my last comment
+
+Tag: V00-01-01
+2013-03-29 Andy Salnikov
+- comment-only change, add description of 'one-stream' dataset option
+
+Tag: V00-01-00
+2013-02-12 Andy Salnikov
+- Dataset can also accept file name in a constructor
+- Dataset class have files() method returning a list of files
+
+Tag: V00-00-01
+2012-07-10 Andy Salnikov
+- first import into repository
+- only Dataset class exists for now
