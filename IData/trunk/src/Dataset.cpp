@@ -455,7 +455,7 @@ bool parseExpName(const std::string& exp, unsigned& expId, std::string& instrNam
 
       unsigned num = namedb.getID(instrument, experiment);
       if (num == 0) {
-        return true;
+        return false;
       }
 
       expId = num;
