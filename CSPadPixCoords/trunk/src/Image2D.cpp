@@ -264,6 +264,7 @@ Image2D<T>::~Image2D ()
 //-----------------------------------
 
 template class CSPadPixCoords::Image2D<uint16_t>;
+template class CSPadPixCoords::Image2D<int16_t>;
 template class CSPadPixCoords::Image2D<double>;
 template class CSPadPixCoords::Image2D<float>;
 template class CSPadPixCoords::Image2D<int>;

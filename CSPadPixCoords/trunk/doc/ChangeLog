@@ -11,6 +11,18 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2013-05-17 Mikhail S. Dubrovin
+- in CSPadImageProducer add option to produce the CSPAD image 
+  from ndarray<T,3> data array of arbitrary type T 
+  It assumes that array has the same shape like in data 
+  (N2x1, 185, 388); array configuration is taken from 
+  Psana::CsPad::ConfigV# and Psana::CsPad::DataV# objects.
+	
+M       include/CSPadImageProducer.h
+M       src/CSPadInterpolImageProducer.cpp
+M       src/CSPadImageProducer.cpp
+M       src/Image2D.cpp
+	
 Tag: V00-03-03
 2013-04-30 Mikhail S. Dubrovin
 M src/Image2D.cpp - add instantiation of Image2D for <float> and <uint8_t>

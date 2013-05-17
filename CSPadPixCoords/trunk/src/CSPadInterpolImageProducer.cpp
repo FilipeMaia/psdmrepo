@@ -520,11 +520,14 @@ void
 CSPadInterpolImageProducer::cspad_image_init()
 {
   // Initialization
-  for (unsigned ix=0; ix<NX_CSPAD; ix++){
-  for (unsigned iy=0; iy<NY_CSPAD; iy++){
-    m_arr_cspad_image[ix][iy] = 0;
-  }
-  }
+  //for (unsigned ix=0; ix<NX_CSPAD; ix++){
+  //for (unsigned iy=0; iy<NY_CSPAD; iy++){
+  //  m_arr_cspad_image[ix][iy] = 0;
+  //}
+  //}
+
+  std::fill_n(&m_arr_cspad_image[0][0], int(NX_CSPAD*NY_CSPAD), double(0));
+
   m_cspad_ind = 0;
   m_coor_x_pix = m_pix_coords_cspad -> getPixCoorArrX_pix();
   m_coor_y_pix = m_pix_coords_cspad -> getPixCoorArrY_pix();
