@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-06-06
+2013-05-21 Andy Salnikov
+- stop generationg __typeid__ method for Python classes, not used anymore
+
 Tag: V00-06-05
 2013-04-23 Andy Salnikov
 - few changes to DdlPds2PsanaDispatch related to compressed data

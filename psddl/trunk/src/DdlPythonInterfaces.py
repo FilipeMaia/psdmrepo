@@ -171,9 +171,6 @@ class DdlPythonInterfaces ( object ) :
         print >>self.cpp, ""
 
         print >>self.cpp, 'namespace {'
-        print >>self.cpp, 'template <typename T>\nPyObject* method_typeid() {'
-        print >>self.cpp, '  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(T), 0);'
-        print >>self.cpp, '  Py_INCREF(ptypeid);\n  return ptypeid;\n}'
         print >>self.cpp, 'template<typename T, std::vector<int> (T::*MF)() const>'
         print >>self.cpp, 'PyObject* method_shape(const T *x) {'
         print >>self.cpp, '  return detail::vintToList((x->*MF)());\n}'
@@ -268,18 +265,15 @@ class DdlPythonInterfaces ( object ) :
             self._genAttrShapeAndListDecl(type, attr, wrapped)
 
         # close class declaration
-        print >>self.cpp, T('    .def("__typeid__", &method_typeid<$wrapped>)')(locals())
-        print >>self.cpp, T('    .staticmethod("__typeid__")')(locals())
         print >>self.cpp, '  ;'
 
         # generates converter instance
         type_id = "Pds::TypeId::"+type.type_id if type.type_id is not None else -1
-        version = type.version if type.version is not None else -1
         if type.value_type:
             cvt_type = T('ConverterBoostDef<$wrapped> ')(locals()) 
         else:
             cvt_type = T('ConverterBoostDefSharedPtr<$wrapped> ')(locals()) 
-        print >>self.cpp, T('  ConverterMap::instance().addConverter(boost::make_shared<$cvt_type>($type_id, $version));')(locals())
+        print >>self.cpp, T('  ConverterMap::instance().addConverter(boost::make_shared<$cvt_type>($type_id));')(locals())
         print >>self.cpp, ""
 
     def _genMethod(self, type, method, bclass, ndconverters):
