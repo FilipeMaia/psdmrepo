@@ -195,15 +195,17 @@ ImgSaveInFile::saveImageInFile(Event& evt)
       //+ "-ev"   + stringFromUint(m_count)
       //+ ".txt";
 
+  if ( save2DArrayInFileForType <float>    (evt, m_str_src, m_key, fname, m_print_bits & 2, m_file_mode) ) return;
+  if ( save2DArrayInFileForType <int16_t>  (evt, m_str_src, m_key, fname, m_print_bits & 2, m_file_mode) ) return;
   if ( save2DArrayInFileForType <double>   (evt, m_str_src, m_key, fname, m_print_bits & 2, m_file_mode) ) return;
   if ( save2DArrayInFileForType <uint16_t> (evt, m_str_src, m_key, fname, m_print_bits & 2, m_file_mode) ) return;
-  if ( save2DArrayInFileForType <float>    (evt, m_str_src, m_key, fname, m_print_bits & 2, m_file_mode) ) return;
   if ( save2DArrayInFileForType <int>      (evt, m_str_src, m_key, fname, m_print_bits & 2, m_file_mode) ) return;
   if ( save2DArrayInFileForType <uint8_t>  (evt, m_str_src, m_key, fname, m_print_bits & 2, m_file_mode) ) return;
 
+  if ( saveImage2DInFileForType <float>    (evt, m_str_src, m_key, fname, m_print_bits & 2) ) return;
+  if ( saveImage2DInFileForType <int16_t>  (evt, m_str_src, m_key, fname, m_print_bits & 2) ) return;
   if ( saveImage2DInFileForType <double>   (evt, m_str_src, m_key, fname, m_print_bits & 2) ) return;
   if ( saveImage2DInFileForType <uint16_t> (evt, m_str_src, m_key, fname, m_print_bits & 2) ) return;
-  if ( saveImage2DInFileForType <float>    (evt, m_str_src, m_key, fname, m_print_bits & 2) ) return;
   if ( saveImage2DInFileForType <int>      (evt, m_str_src, m_key, fname, m_print_bits & 2) ) return;
   if ( saveImage2DInFileForType <uint8_t>  (evt, m_str_src, m_key, fname, m_print_bits & 2) ) return;
 

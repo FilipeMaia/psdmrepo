@@ -11,6 +11,11 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-11
+2013-05-21 Mikhail S. Dubrovin
+- improvements in ImgAverage.cpp
+- in ImgSaveInFile add more data types for input array
+
 Tag: V00-03-10
 2013-05-02 Mikhail S. Dubrovin
 - in GlobalMethods.h add saving in TIFF for double, float, int, uint8_t

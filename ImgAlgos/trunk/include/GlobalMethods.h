@@ -366,6 +366,7 @@ private:
   void save2DArrayInEvent(PSEvt::Event& evt, const Pds::Src& src, const std::string& key, const ndarray<T,2>& data)
   {
     boost::shared_ptr< ndarray<T,2> > img2d( new ndarray<T,2>(data) );
+    //boost::shared_ptr< ndarray<T,2> > img2d( &data );
     evt.put(img2d, src, key);
   }
 
