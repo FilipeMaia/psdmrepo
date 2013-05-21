@@ -125,7 +125,7 @@ PixCoordsTest::getQuadConfigPars(Env& env)
   m_n2x1         = Psana::CsPad::SectorsPerQuad;     // 8
   m_ncols2x1     = Psana::CsPad::ColumnsPerASIC;     // 185
   m_nrows2x1     = Psana::CsPad::MaxRowsPerASIC * 2; // 388
-  m_sizeOf2x1Img = m_nrows2x1 * m_ncols2x1;          // 185*388;
+  m_sizeOf2x1Arr = m_nrows2x1 * m_ncols2x1;          // 185*388;
 
   XCOOR = CSPadPixCoords::PixCoords2x1::X;
   YCOOR = CSPadPixCoords::PixCoords2x1::Y;
@@ -241,7 +241,7 @@ PixCoordsTest::test_2x1(const int16_t* data, CSPadPixCoords::QuadParameters* qua
         double  mrgx=20.1;
         double  mrgy=20.1;
 
-        const int16_t *data2x1 = &data[sect * m_sizeOf2x1Img];
+        const int16_t *data2x1 = &data[sect * m_sizeOf2x1Arr];
  
         for (uint32_t c=0; c<m_ncols2x1; c++) {
         for (uint32_t r=0; r<m_nrows2x1; r++) {
@@ -288,7 +288,7 @@ PixCoordsTest::test_quad(const int16_t* data, CSPadPixCoords::QuadParameters* qu
              bool bitIsOn = roiMask & (1<<sect);
              if( !bitIsOn ) continue;
  
-             const int16_t *data2x1 = &data[sect * m_sizeOf2x1Img];
+             const int16_t *data2x1 = &data[sect * m_sizeOf2x1Arr];
 
              for (uint32_t c=0; c<m_ncols2x1; c++) {
              for (uint32_t r=0; r<m_nrows2x1; r++) {
@@ -344,9 +344,9 @@ PixCoordsTest::test_cspad(const int16_t* data, CSPadPixCoords::QuadParameters* q
 	for(uint32_t sect=0; sect < m_n2x1; sect++)
 	{
 	     bool bitIsOn = roiMask & (1<<sect);
-	     if( !bitIsOn ) { m_cspad_ind += m_sizeOf2x1Img; continue; }
+	     if( !bitIsOn ) { m_cspad_ind += m_sizeOf2x1Arr; continue; }
  
-             const int16_t *data2x1 = &data[sect * m_sizeOf2x1Img];
+             const int16_t *data2x1 = &data[sect * m_sizeOf2x1Arr];
 
              //cout  << "  add section " << sect << endl;	     
  

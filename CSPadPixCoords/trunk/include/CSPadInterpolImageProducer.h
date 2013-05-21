@@ -90,6 +90,12 @@ bool areEqual( const ArrAddr& a1, const ArrAddr& a2 ) ;
 class CSPadInterpolImageProducer : public Module {
 public:
 
+  enum { m_nquads       = 4 };
+  enum { m_n2x1         = Psana::CsPad::SectorsPerQuad     };  // 8
+  enum { m_ncols2x1     = Psana::CsPad::ColumnsPerASIC     };  // 185
+  enum { m_nrows2x1     = Psana::CsPad::MaxRowsPerASIC * 2 };  // 388
+  enum { m_sizeOf2x1Arr = m_nrows2x1 * m_ncols2x1          };  // 185*388;
+
   // Default constructor
   CSPadInterpolImageProducer (const std::string& name) ;
 
@@ -155,21 +161,15 @@ private:
   uint32_t m_roiMask        [4];
   uint32_t m_numAsicsStored [4];
 
-  uint32_t m_nquads;       // 4
-  uint32_t m_n2x1;         // 8
-  uint32_t m_ncols2x1;     // 185
-  uint32_t m_nrows2x1;     // 388
-  uint32_t m_sizeOf2x1Img; // 185*388;
+  CSPadPixCoords::PixCoords2x1::COORDINATE XCOOR;
+  CSPadPixCoords::PixCoords2x1::COORDINATE YCOOR;
+  CSPadPixCoords::PixCoords2x1::COORDINATE ZCOOR;
 
   PSCalib::CSPadCalibPars        *m_cspad_calibpar;
   CSPadPixCoords::PixCoords2x1   *m_pix_coords_2x1;
   CSPadPixCoords::PixCoordsQuad  *m_pix_coords_quad;
   CSPadPixCoords::PixCoordsCSPad *m_pix_coords_cspad;
 
-  CSPadPixCoords::PixCoords2x1::COORDINATE XCOOR;
-  CSPadPixCoords::PixCoords2x1::COORDINATE YCOOR;
-  CSPadPixCoords::PixCoords2x1::COORDINATE ZCOOR;
-	
   uint32_t  m_cspad_ind;
   double   *m_coor_x_pix;
   double   *m_coor_y_pix;

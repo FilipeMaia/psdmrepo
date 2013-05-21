@@ -11,6 +11,12 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-04
+2013-05-21 Mikhail S. Dubrovin
+- add CSPadNDArrProducer, many other improvements.
+A         include/CSPadNDArrProducer.h
+A         src/CSPadNDArrProducer.cpp
+	
 2013-05-17 Mikhail S. Dubrovin
 - in CSPadImageProducer add option to produce the CSPAD image 
   from ndarray<T,3> data array of arbitrary type T 

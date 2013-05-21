@@ -23,7 +23,6 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "MsgLogger/MsgLogger.h"
 #include "PSEvt/EventId.h"
 
 //-----------------------------------------------------------------------
@@ -63,7 +62,7 @@ CSPadImageProducer::CSPadImageProducer (const std::string& name)
   m_typeGroupName = configStr("typeGroupName", "CsPad::CalibV1");
   m_str_src       = configStr("source",        "CxiDs1.0:Cspad.0");
   m_inkey         = configStr("key",           "");
-  m_imgkey        = configStr("imgkey",        "Image2D");
+  m_imgkey        = configStr("imgkey",        "image");
   m_tiltIsApplied = config   ("tiltIsApplied", true);
   m_print_bits    = config   ("print_bits",    0);
 
@@ -140,7 +139,7 @@ CSPadImageProducer::beginRun(Event& evt, Env& env)
   //m_pix_coords_2x1  -> print_member_data();
   //m_pix_coords_quad -> print_member_data(); 
 
-  this -> getQuadConfigPars(env);
+  getQuadConfigPars(env);
 }
 
 //--------------------
@@ -148,15 +147,6 @@ CSPadImageProducer::beginRun(Event& evt, Env& env)
 void 
 CSPadImageProducer::getQuadConfigPars(Env& env)
 {
-  m_n2x1         = Psana::CsPad::SectorsPerQuad;     // 8
-  m_ncols2x1     = Psana::CsPad::ColumnsPerASIC;     // 185
-  m_nrows2x1     = Psana::CsPad::MaxRowsPerASIC * 2; // 388
-  m_sizeOf2x1Img = m_nrows2x1 * m_ncols2x1;          // 185*388;
-
-  XCOOR = CSPadPixCoords::PixCoords2x1::X;
-  YCOOR = CSPadPixCoords::PixCoords2x1::Y;
-  ZCOOR = CSPadPixCoords::PixCoords2x1::Z;
-
   if ( getQuadConfigParsForType<Psana::CsPad::ConfigV2>(env) ) return;
   if ( getQuadConfigParsForType<Psana::CsPad::ConfigV3>(env) ) return;
   if ( getQuadConfigParsForType<Psana::CsPad::ConfigV4>(env) ) return;
@@ -228,7 +218,7 @@ CSPadImageProducer::getCSPadConfigFromData(Event& evt)
   if ( getCSPadConfigFromDataForType <Psana::CsPad::DataV1, Psana::CsPad::ElementV1> (evt) ) return;
   if ( getCSPadConfigFromDataForType <Psana::CsPad::DataV2, Psana::CsPad::ElementV2> (evt) ) return;
 
-  MsgLog(name(), warning, "Psana::CsPad::DataV# / ElementV# for #=[2-5] is not available in this run.");
+  MsgLog(name(), warning, "getCSPadConfigFromData(...): Psana::CsPad::DataV# / ElementV# for #=[2-5] is not available in this event.");
 }
 
 //--------------------
@@ -244,11 +234,12 @@ CSPadImageProducer::procEvent(Event& evt, Env& env)
 
   // Check if the requested src and key are consistent with ndarray<T,3> of shape [N][185][388]
   if ( procCSPadNDArrForType <float>    (evt) ) return;
-  //if ( procCSPadNDArrForType <double>   (evt) ) return;
-  //if ( procCSPadNDArrForType <uint16_t> (evt) ) return;
-  //if ( procCSPadNDArrForType <int>      (evt) ) return;
+  if ( procCSPadNDArrForType <double>   (evt) ) return;
+  if ( procCSPadNDArrForType <int>      (evt) ) return;
+  if ( procCSPadNDArrForType <int16_t>  (evt) ) return;
+  if ( procCSPadNDArrForType <uint16_t> (evt) ) return;
 
-  MsgLog(name(), warning, "Psana::CsPad::DataV# / ElementV# for #=[2-5] is not available in this run.");
+  MsgLog(name(), warning, "procEvent(...): Psana::CsPad::DataV# / ElementV# for #=[2-5] is not available in this event.");
 }
 
 //--------------------

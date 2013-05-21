@@ -123,6 +123,10 @@ CSPadInterpolImageProducer::beginRun(Event& evt, Env& env)
   m_pix_coords_quad  = new CSPadPixCoords::PixCoordsQuad  ( m_pix_coords_2x1,  m_cspad_calibpar, m_tiltIsApplied );
   m_pix_coords_cspad = new CSPadPixCoords::PixCoordsCSPad ( m_pix_coords_quad, m_cspad_calibpar, m_tiltIsApplied );
 
+  XCOOR = CSPadPixCoords::PixCoords2x1::X;
+  YCOOR = CSPadPixCoords::PixCoords2x1::Y;
+  ZCOOR = CSPadPixCoords::PixCoords2x1::Z;
+
   if( m_print_bits & 1<<0 ) m_cspad_calibpar  -> printCalibPars();
   //m_pix_coords_2x1  -> print_member_data();
   //m_pix_coords_quad -> print_member_data(); 
@@ -146,16 +150,6 @@ CSPadInterpolImageProducer::getConfigPars(Env& env)
         m_numAsicsStored[q]  = config->numAsicsStored(q);
       }
   }
-
-  m_nquads       = 4;
-  m_n2x1         = Psana::CsPad::SectorsPerQuad;     // 8
-  m_ncols2x1     = Psana::CsPad::ColumnsPerASIC;     // 185
-  m_nrows2x1     = Psana::CsPad::MaxRowsPerASIC * 2; // 388
-  m_sizeOf2x1Img = m_nrows2x1 * m_ncols2x1;          // 185*388;
-
-  XCOOR = CSPadPixCoords::PixCoords2x1::X;
-  YCOOR = CSPadPixCoords::PixCoords2x1::Y;
-  ZCOOR = CSPadPixCoords::PixCoords2x1::Z;
 
   m_addr_empty = (ArrAddr){-1,-1,-1,-1};
   if( m_print_bits & 1<<2 ) cout << "TEST: m_addr_empty = " << m_addr_empty << endl;

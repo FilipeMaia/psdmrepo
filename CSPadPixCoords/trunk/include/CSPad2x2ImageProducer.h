@@ -135,7 +135,7 @@ private:
   uint32_t m_n2x1;         // 2
   uint32_t m_ncols2x1;     // 185
   uint32_t m_nrows2x1;     // 388
-  uint32_t m_sizeOf2x1Img; // 185*388;
+  uint32_t m_sizeOf2x1Arr; // 185*388;
 
   PSCalib::CSPad2x2CalibPars     *m_cspad2x2_calibpars;
   CSPadPixCoords::PixCoords2x1   *m_pix_coords_2x1;

@@ -219,7 +219,7 @@ CSPad2x2ImageProducer::getConfigPars(Env& env)
   m_n2x1         = 2;                                // 2
   m_ncols2x1     = Psana::CsPad::ColumnsPerASIC;     // 185
   m_nrows2x1     = Psana::CsPad::MaxRowsPerASIC * 2; // 388
-  m_sizeOf2x1Img = m_nrows2x1 * m_ncols2x1;          // 185*388;
+  m_sizeOf2x1Arr = m_nrows2x1 * m_ncols2x1;          // 185*388;
 
   XCOOR = CSPadPixCoords::PixCoords2x1::X;
   YCOOR = CSPadPixCoords::PixCoords2x1::Y;
