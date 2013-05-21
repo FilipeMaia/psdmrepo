@@ -149,7 +149,6 @@
 
 #include "types/imp/ConfigV1.h"
 #include "types/imp/ElementV1.h"
-#include "types/imp/LaneStatus.h"
 #include "types/imp/Sample.h"
 
 #include "types/ipimb/ConfigV1.h"
@@ -402,7 +401,6 @@ PyMODINIT_FUNC init_pdsdata()
   module = Py_InitModule3( "_pdsdata.imp", 0, "The Python wrapper module for pdsdata/imp" );
   pypdsdata::Imp::ConfigV1::initType( module );
   pypdsdata::Imp::ElementV1::initType( module );
-  pypdsdata::Imp::LaneStatus::initType( module );
   pypdsdata::Imp::Sample::initType( module );
   Py_INCREF( module );
   PyModule_AddObject( this_module, "imp", module );

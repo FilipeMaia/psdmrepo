@@ -22,7 +22,6 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "LaneStatus.h"
 #include "Sample.h"
 #include "../../EnumType.h"
 #include "../../Exception.h"
@@ -38,10 +37,8 @@ namespace {
   FUN0_WRAPPER(pypdsdata::Imp::ElementV1, vc)
   FUN0_WRAPPER(pypdsdata::Imp::ElementV1, lane)
   FUN0_WRAPPER(pypdsdata::Imp::ElementV1, frameNumber)
-  FUN0_WRAPPER(pypdsdata::Imp::ElementV1, ticks)
-  FUN0_WRAPPER(pypdsdata::Imp::ElementV1, fiducials)
   FUN0_WRAPPER(pypdsdata::Imp::ElementV1, range)
-  PyObject* laneStatus( PyObject* self, PyObject* args );
+  FUN0_WRAPPER(pypdsdata::Imp::ElementV1, laneStatus)
   PyObject* sample( PyObject* self, PyObject* args );
 
   PyMethodDef methods[] = {
@@ -49,10 +46,8 @@ namespace {
     { "lane",           lane,           METH_NOARGS,  "self.lane() -> int\n\nReturns integer number." },
     { "frameNumber",    frameNumber,    METH_NOARGS,
         "self.frameNumber() -> int\n\nReturns frame number." },
-    { "ticks",          ticks,          METH_NOARGS,  "self.ticks() -> int\n\nReturns integer number." },
-    { "fiducials",      fiducials,      METH_NOARGS,  "self.fiducials() -> int\n\nReturns integer number." },
     { "range",          range,          METH_NOARGS,  "self.range() -> int\n\nReturns integer number." },
-    { "laneStatus",     laneStatus,     METH_NOARGS,  "self.laneStatus() -> object\n\nReturns :py:class:`LaneStatus` object." },
+    { "laneStatus",     laneStatus,     METH_NOARGS,  "self.laneStatus() -> int\n\nReturns integer number." },
     { "sample",         sample,         METH_VARARGS,
         "self.sample(index:int) -> object\n\nReturns instance of :py:class:`Sample` class for given sample index." },
     {0, 0, 0, 0}
@@ -100,15 +95,6 @@ sample( PyObject* self, PyObject* args )
   if (not PyArg_ParseTuple(args, "I:imp.ElementV1.sample", &index)) return 0;
 
   return pypdsdata::Imp::Sample::PyObject_FromPds(obj->getSample(index));
-}
-
-PyObject*
-laneStatus( PyObject* self, PyObject* )
-{
-  Pds::Imp::ElementV1* obj = pypdsdata::Imp::ElementV1::pdsObject(self);
-  if (not obj) return 0;
-
-  return pypdsdata::Imp::LaneStatus::PyObject_FromPds(obj->laneStatus());
 }
 
 }
