@@ -15,6 +15,7 @@
 //-----------------
 #include "python/Python.h"
 #include <typeinfo>
+#include <vector>
 #include <boost/shared_ptr.hpp>
 
 //----------------------
@@ -43,13 +44,13 @@ namespace psddl_python {
  *
  *  @brief Class defining interface for "converter" object types.
  *
- *  Instances of converter types know how to convert data from data from 
- *  C++ format into Python objects. There will be one instance of getter
- *  for each corresponding C++ type.
+ *  Instances of converter types know how to convert data between
+ *  C++ format and Python objects. One converter instance can convert
+ *  C++ object to Python, or Python objects to C++, or both.
  *
  *  @see ConverterMap
  *
- *  This software was developed for the LUSI project.  If you use all or
+ *  This software was developed for the LCLS project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
  */
 
@@ -59,39 +60,56 @@ public:
   virtual ~Converter() {}
 
   /**
-   *  @brief Return type_info of the corresponding C++ type.
-   */
-  virtual const std::type_info* typeinfo() const = 0;
-
-  /**
-   *  @brief Return value of pdsdata::TypeId::Type enum a type or -1.
-   */
-  virtual int pdsTypeId() const { return -1; }
-
-  /**
-   *  @brief Get the type version.
+   *  @brief Return type_infos of source C++ types.
    *
-   *  This method will disappear at some point, it is only necessary
-   *  for current implementation based on strings.
+   *  If converter supports conversion from C++ to Python
+   *  this method shall return non-empty vector.
    */
-  virtual int getVersion() const { return -1; }
+  virtual std::vector<const std::type_info*> from_cpp_types() const = 0;
+
+  /**
+   *  @brief Returns source Python types.
+   *
+   *  If converter supports conversion from Python to C++
+   *  this method shall return non-empty vector.
+   *
+   *  @return Borrowed references
+   */
+  virtual std::vector<PyTypeObject*> from_py_types() const = 0;
+
+  /**
+   *  @brief Returns destination Python types.
+   *
+   *  If converter supports conversion from C++ to Python
+   *  this method shall return non-empty vector.
+   *
+   *  @return Borrowed references
+   */
+  virtual std::vector<PyTypeObject*> to_py_types() const = 0;
+
+  /**
+   *  @brief Return list of pdsdata::TypeId::Type enum values.
+   */
+  virtual std::vector<int> from_pds_types() const { return std::vector<int>(); }
 
   /**
    *  @brief Convert C++ object to Python
    *
-   *  @param[in] vdata  Void pointer to C++ data.
+   *  This method may return zero pointer if this converter cannot do conversion.
+   *
    *  @return New reference
    */
-  virtual PyObject* convert(const boost::shared_ptr<void>& vdata) const = 0;
+  virtual PyObject* convert(PSEvt::ProxyDictI& proxyDict, const PSEvt::Source& source, const std::string& key) const = 0;
 
   /**
-   *  @brief Returns Python type of the objects produced by this converter.
+   *  @brief Convert Python object to C++
    *
-   *  Some special converters can return PyBaseObject_Type (object).
-   *  
-   *  @return Borrowed reference
+   *  @return True for successful conversion, false otherwize
    */
-  virtual PyTypeObject* pyTypeObject() const = 0;
+  virtual bool convert(PyObject* obj, PSEvt::ProxyDictI& proxyDict, const PSEvt::Source& source, const std::string& key) const
+  {
+    return false;
+  }
 
 };
 

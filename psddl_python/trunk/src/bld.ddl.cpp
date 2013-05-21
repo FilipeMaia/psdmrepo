@@ -20,12 +20,6 @@ using boost::shared_ptr;
 using std::vector;
 
 namespace {
-template <typename T>
-PyObject* method_typeid() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(T), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
 template<typename T, std::vector<int> (T::*MF)() const>
 PyObject* method_shape(const T *x) {
   return detail::vintToList((x->*MF)());
@@ -42,10 +36,8 @@ void createWrappers(PyObject* module) {
     .def("f_12_ENRC", &Psana::Bld::BldDataFEEGasDetEnergy::f_12_ENRC)
     .def("f_21_ENRC", &Psana::Bld::BldDataFEEGasDetEnergy::f_21_ENRC)
     .def("f_22_ENRC", &Psana::Bld::BldDataFEEGasDetEnergy::f_22_ENRC)
-    .def("__typeid__", &method_typeid<Psana::Bld::BldDataFEEGasDetEnergy>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Bld::BldDataFEEGasDetEnergy> >(Pds::TypeId::Id_FEEGasDetEnergy, 0));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Bld::BldDataFEEGasDetEnergy> >(Pds::TypeId::Id_FEEGasDetEnergy));
 
   class_<Psana::Bld::BldDataEBeamV0 >("BldDataEBeamV0", no_init)
     .def("damageMask", &Psana::Bld::BldDataEBeamV0::damageMask)
@@ -55,10 +47,8 @@ void createWrappers(PyObject* module) {
     .def("ebeamLTUPosY", &Psana::Bld::BldDataEBeamV0::ebeamLTUPosY)
     .def("ebeamLTUAngX", &Psana::Bld::BldDataEBeamV0::ebeamLTUAngX)
     .def("ebeamLTUAngY", &Psana::Bld::BldDataEBeamV0::ebeamLTUAngY)
-    .def("__typeid__", &method_typeid<Psana::Bld::BldDataEBeamV0>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Bld::BldDataEBeamV0> >(Pds::TypeId::Id_EBeam, 0));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Bld::BldDataEBeamV0> >(Pds::TypeId::Id_EBeam));
 
   class_<Psana::Bld::BldDataEBeamV1 >("BldDataEBeamV1", no_init)
     .def("damageMask", &Psana::Bld::BldDataEBeamV1::damageMask)
@@ -69,10 +59,8 @@ void createWrappers(PyObject* module) {
     .def("ebeamLTUAngX", &Psana::Bld::BldDataEBeamV1::ebeamLTUAngX)
     .def("ebeamLTUAngY", &Psana::Bld::BldDataEBeamV1::ebeamLTUAngY)
     .def("ebeamPkCurrBC2", &Psana::Bld::BldDataEBeamV1::ebeamPkCurrBC2)
-    .def("__typeid__", &method_typeid<Psana::Bld::BldDataEBeamV1>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Bld::BldDataEBeamV1> >(Pds::TypeId::Id_EBeam, 1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Bld::BldDataEBeamV1> >(Pds::TypeId::Id_EBeam));
 
   class_<Psana::Bld::BldDataEBeamV2 >("BldDataEBeamV2", no_init)
     .def("damageMask", &Psana::Bld::BldDataEBeamV2::damageMask)
@@ -84,10 +72,8 @@ void createWrappers(PyObject* module) {
     .def("ebeamLTUAngY", &Psana::Bld::BldDataEBeamV2::ebeamLTUAngY)
     .def("ebeamPkCurrBC2", &Psana::Bld::BldDataEBeamV2::ebeamPkCurrBC2)
     .def("ebeamEnergyBC2", &Psana::Bld::BldDataEBeamV2::ebeamEnergyBC2)
-    .def("__typeid__", &method_typeid<Psana::Bld::BldDataEBeamV2>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Bld::BldDataEBeamV2> >(Pds::TypeId::Id_EBeam, 2));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Bld::BldDataEBeamV2> >(Pds::TypeId::Id_EBeam));
 
   class_<Psana::Bld::BldDataEBeamV3 >("BldDataEBeamV3", no_init)
     .def("damageMask", &Psana::Bld::BldDataEBeamV3::damageMask)
@@ -101,47 +87,37 @@ void createWrappers(PyObject* module) {
     .def("ebeamEnergyBC2", &Psana::Bld::BldDataEBeamV3::ebeamEnergyBC2)
     .def("ebeamPkCurrBC1", &Psana::Bld::BldDataEBeamV3::ebeamPkCurrBC1)
     .def("ebeamEnergyBC1", &Psana::Bld::BldDataEBeamV3::ebeamEnergyBC1)
-    .def("__typeid__", &method_typeid<Psana::Bld::BldDataEBeamV3>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Bld::BldDataEBeamV3> >(Pds::TypeId::Id_EBeam, 3));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Bld::BldDataEBeamV3> >(Pds::TypeId::Id_EBeam));
 
   class_<Psana::Bld::BldDataPhaseCavity >("BldDataPhaseCavity", no_init)
     .def("fitTime1", &Psana::Bld::BldDataPhaseCavity::fitTime1)
     .def("fitTime2", &Psana::Bld::BldDataPhaseCavity::fitTime2)
     .def("charge1", &Psana::Bld::BldDataPhaseCavity::charge1)
     .def("charge2", &Psana::Bld::BldDataPhaseCavity::charge2)
-    .def("__typeid__", &method_typeid<Psana::Bld::BldDataPhaseCavity>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Bld::BldDataPhaseCavity> >(Pds::TypeId::Id_PhaseCavity, 0));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Bld::BldDataPhaseCavity> >(Pds::TypeId::Id_PhaseCavity));
 
   class_<Psana::Bld::BldDataIpimbV0, boost::shared_ptr<Psana::Bld::BldDataIpimbV0>, boost::noncopyable >("BldDataIpimbV0", no_init)
     .def("ipimbData", &Psana::Bld::BldDataIpimbV0::ipimbData, return_value_policy<copy_const_reference>())
     .def("ipimbConfig", &Psana::Bld::BldDataIpimbV0::ipimbConfig, return_value_policy<copy_const_reference>())
     .def("ipmFexData", &Psana::Bld::BldDataIpimbV0::ipmFexData, return_value_policy<copy_const_reference>())
-    .def("__typeid__", &method_typeid<Psana::Bld::BldDataIpimbV0>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Bld::BldDataIpimbV0> >(Pds::TypeId::Id_SharedIpimb, 0));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Bld::BldDataIpimbV0> >(Pds::TypeId::Id_SharedIpimb));
 
   class_<Psana::Bld::BldDataIpimbV1, boost::shared_ptr<Psana::Bld::BldDataIpimbV1>, boost::noncopyable >("BldDataIpimbV1", no_init)
     .def("ipimbData", &Psana::Bld::BldDataIpimbV1::ipimbData, return_value_policy<copy_const_reference>())
     .def("ipimbConfig", &Psana::Bld::BldDataIpimbV1::ipimbConfig, return_value_policy<copy_const_reference>())
     .def("ipmFexData", &Psana::Bld::BldDataIpimbV1::ipmFexData, return_value_policy<copy_const_reference>())
-    .def("__typeid__", &method_typeid<Psana::Bld::BldDataIpimbV1>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Bld::BldDataIpimbV1> >(Pds::TypeId::Id_SharedIpimb, 1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Bld::BldDataIpimbV1> >(Pds::TypeId::Id_SharedIpimb));
 
   class_<Psana::Bld::BldDataPimV1, boost::shared_ptr<Psana::Bld::BldDataPimV1>, boost::noncopyable >("BldDataPimV1", no_init)
     .def("camConfig", &Psana::Bld::BldDataPimV1::camConfig, return_value_policy<copy_const_reference>())
     .def("pimConfig", &Psana::Bld::BldDataPimV1::pimConfig, return_value_policy<copy_const_reference>())
     .def("frame", &Psana::Bld::BldDataPimV1::frame, return_value_policy<copy_const_reference>())
-    .def("__typeid__", &method_typeid<Psana::Bld::BldDataPimV1>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Bld::BldDataPimV1> >(Pds::TypeId::Id_SharedPim, 1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Bld::BldDataPimV1> >(Pds::TypeId::Id_SharedPim));
 
   class_<Psana::Bld::BldDataGMDV0, boost::shared_ptr<Psana::Bld::BldDataGMDV0>, boost::noncopyable >("BldDataGMDV0", no_init)
     .def("gasType", &Psana::Bld::BldDataGMDV0::gasType)
@@ -159,10 +135,8 @@ void createWrappers(PyObject* module) {
     .def("pulseEnergyFEE", &Psana::Bld::BldDataGMDV0::pulseEnergyFEE)
     .def("transmission", &Psana::Bld::BldDataGMDV0::transmission)
     .def("transmissionFEE", &Psana::Bld::BldDataGMDV0::transmissionFEE)
-    .def("__typeid__", &method_typeid<Psana::Bld::BldDataGMDV0>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Bld::BldDataGMDV0> >(Pds::TypeId::Id_GMD, 0));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Bld::BldDataGMDV0> >(Pds::TypeId::Id_GMD));
 
   class_<Psana::Bld::BldDataGMDV1, boost::shared_ptr<Psana::Bld::BldDataGMDV1>, boost::noncopyable >("BldDataGMDV1", no_init)
     .def("milliJoulesPerPulse", &Psana::Bld::BldDataGMDV1::milliJoulesPerPulse)
@@ -170,10 +144,8 @@ void createWrappers(PyObject* module) {
     .def("correctedSumPerPulse", &Psana::Bld::BldDataGMDV1::correctedSumPerPulse)
     .def("bgValuePerSample", &Psana::Bld::BldDataGMDV1::bgValuePerSample)
     .def("relativeEnergyPerPulse", &Psana::Bld::BldDataGMDV1::relativeEnergyPerPulse)
-    .def("__typeid__", &method_typeid<Psana::Bld::BldDataGMDV1>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Bld::BldDataGMDV1> >(Pds::TypeId::Id_GMD, 1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Bld::BldDataGMDV1> >(Pds::TypeId::Id_GMD));
 
   {
     PyObject* unvlist = PyList_New(2);

@@ -20,12 +20,6 @@ using boost::shared_ptr;
 using std::vector;
 
 namespace {
-template <typename T>
-PyObject* method_typeid() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(T), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
 template<typename T, std::vector<int> (T::*MF)() const>
 PyObject* method_shape(const T *x) {
   return detail::vintToList((x->*MF)());
@@ -42,18 +36,14 @@ void createWrappers(PyObject* module) {
     .def("waveLenCalib", &Psana::OceanOptics::ConfigV1::waveLenCalib)
     .def("nonlinCorrect", &Psana::OceanOptics::ConfigV1::nonlinCorrect)
     .def("strayLightConstant", &Psana::OceanOptics::ConfigV1::strayLightConstant)
-    .def("__typeid__", &method_typeid<Psana::OceanOptics::ConfigV1>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::OceanOptics::ConfigV1> >(Pds::TypeId::Id_OceanOpticsConfig, 1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::OceanOptics::ConfigV1> >(Pds::TypeId::Id_OceanOpticsConfig));
 
   class_<Psana::OceanOptics::timespec64 >("timespec64", no_init)
     .def("tv_sec", &Psana::OceanOptics::timespec64::tv_sec)
     .def("tv_nsec", &Psana::OceanOptics::timespec64::tv_nsec)
-    .def("__typeid__", &method_typeid<Psana::OceanOptics::timespec64>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::OceanOptics::timespec64> >(-1, -1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::OceanOptics::timespec64> >(-1));
 
   class_<Psana::OceanOptics::DataV1, boost::shared_ptr<Psana::OceanOptics::DataV1>, boost::noncopyable >("DataV1", no_init)
     .def("data", &Psana::OceanOptics::DataV1::data)
@@ -68,10 +58,8 @@ void createWrappers(PyObject* module) {
     .def("numSpectraUnused", &Psana::OceanOptics::DataV1::numSpectraUnused)
     .def("durationOfFrame", &Psana::OceanOptics::DataV1::durationOfFrame)
     .def("nonlinerCorrected", &Psana::OceanOptics::DataV1::nonlinerCorrected)
-    .def("__typeid__", &method_typeid<Psana::OceanOptics::DataV1>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::OceanOptics::DataV1> >(Pds::TypeId::Id_OceanOpticsData, 1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::OceanOptics::DataV1> >(Pds::TypeId::Id_OceanOpticsData));
 
   {
     PyObject* unvlist = PyList_New(1);

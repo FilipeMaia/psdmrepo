@@ -20,12 +20,6 @@ using boost::shared_ptr;
 using std::vector;
 
 namespace {
-template <typename T>
-PyObject* method_typeid() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(T), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
 template<typename T, std::vector<int> (T::*MF)() const>
 PyObject* method_shape(const T *x) {
   return detail::vintToList((x->*MF)());
@@ -43,10 +37,8 @@ void createWrappers(PyObject* module) {
     .def("height", &Psana::FCCD::FccdConfigV1::height)
     .def("trimmedWidth", &Psana::FCCD::FccdConfigV1::trimmedWidth)
     .def("trimmedHeight", &Psana::FCCD::FccdConfigV1::trimmedHeight)
-    .def("__typeid__", &method_typeid<Psana::FCCD::FccdConfigV1>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::FCCD::FccdConfigV1> >(Pds::TypeId::Id_FccdConfig, 1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::FCCD::FccdConfigV1> >(Pds::TypeId::Id_FccdConfig));
 
   class_<Psana::FCCD::FccdConfigV2, boost::shared_ptr<Psana::FCCD::FccdConfigV2>, boost::noncopyable >("FccdConfigV2", no_init)
     .def("outputMode", &Psana::FCCD::FccdConfigV2::outputMode)
@@ -59,10 +51,8 @@ void createWrappers(PyObject* module) {
     .def("height", &Psana::FCCD::FccdConfigV2::height)
     .def("trimmedWidth", &Psana::FCCD::FccdConfigV2::trimmedWidth)
     .def("trimmedHeight", &Psana::FCCD::FccdConfigV2::trimmedHeight)
-    .def("__typeid__", &method_typeid<Psana::FCCD::FccdConfigV2>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::FCCD::FccdConfigV2> >(Pds::TypeId::Id_FccdConfig, 2));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::FCCD::FccdConfigV2> >(Pds::TypeId::Id_FccdConfig));
 
   {
     PyObject* unvlist = PyList_New(2);

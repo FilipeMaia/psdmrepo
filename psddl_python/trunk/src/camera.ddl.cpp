@@ -20,12 +20,6 @@ using boost::shared_ptr;
 using std::vector;
 
 namespace {
-template <typename T>
-PyObject* method_typeid() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(T), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
 template<typename T, std::vector<int> (T::*MF)() const>
 PyObject* method_shape(const T *x) {
   return detail::vintToList((x->*MF)());
@@ -40,16 +34,12 @@ void createWrappers(PyObject* module) {
   class_<Psana::Camera::FrameCoord >("FrameCoord", no_init)
     .def("column", &Psana::Camera::FrameCoord::column)
     .def("row", &Psana::Camera::FrameCoord::row)
-    .def("__typeid__", &method_typeid<Psana::Camera::FrameCoord>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Camera::FrameCoord> >(-1, -1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Camera::FrameCoord> >(-1));
 
   class_<Psana::Camera::FrameFccdConfigV1, boost::shared_ptr<Psana::Camera::FrameFccdConfigV1>, boost::noncopyable >("FrameFccdConfigV1", no_init)
-    .def("__typeid__", &method_typeid<Psana::Camera::FrameFccdConfigV1>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Camera::FrameFccdConfigV1> >(Pds::TypeId::Id_FrameFccdConfig, 1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Camera::FrameFccdConfigV1> >(Pds::TypeId::Id_FrameFccdConfig));
 
   class_<Psana::Camera::FrameFexConfigV1, boost::shared_ptr<Psana::Camera::FrameFexConfigV1>, boost::noncopyable >("FrameFexConfigV1", no_init)
     .def("forwarding", &Psana::Camera::FrameFexConfigV1::forwarding)
@@ -60,10 +50,8 @@ void createWrappers(PyObject* module) {
     .def("threshold", &Psana::Camera::FrameFexConfigV1::threshold)
     .def("number_of_masked_pixels", &Psana::Camera::FrameFexConfigV1::number_of_masked_pixels)
     .def("masked_pixel_coordinates", &Psana::Camera::FrameFexConfigV1::masked_pixel_coordinates)
-    .def("__typeid__", &method_typeid<Psana::Camera::FrameFexConfigV1>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Camera::FrameFexConfigV1> >(Pds::TypeId::Id_FrameFexConfig, 1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Camera::FrameFexConfigV1> >(Pds::TypeId::Id_FrameFexConfig));
 
   class_<Psana::Camera::FrameV1, boost::shared_ptr<Psana::Camera::FrameV1>, boost::noncopyable >("FrameV1", no_init)
     .def("width", &Psana::Camera::FrameV1::width)
@@ -73,10 +61,8 @@ void createWrappers(PyObject* module) {
     .def("_int_pixel_data", &Psana::Camera::FrameV1::_int_pixel_data)
     .def("data8", &Psana::Camera::FrameV1::data8)
     .def("data16", &Psana::Camera::FrameV1::data16)
-    .def("__typeid__", &method_typeid<Psana::Camera::FrameV1>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Camera::FrameV1> >(Pds::TypeId::Id_Frame, 1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Camera::FrameV1> >(Pds::TypeId::Id_Frame));
 
   class_<Psana::Camera::TwoDGaussianV1, boost::shared_ptr<Psana::Camera::TwoDGaussianV1>, boost::noncopyable >("TwoDGaussianV1", no_init)
     .def("integral", &Psana::Camera::TwoDGaussianV1::integral)
@@ -85,10 +71,8 @@ void createWrappers(PyObject* module) {
     .def("major_axis_width", &Psana::Camera::TwoDGaussianV1::major_axis_width)
     .def("minor_axis_width", &Psana::Camera::TwoDGaussianV1::minor_axis_width)
     .def("major_axis_tilt", &Psana::Camera::TwoDGaussianV1::major_axis_tilt)
-    .def("__typeid__", &method_typeid<Psana::Camera::TwoDGaussianV1>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Camera::TwoDGaussianV1> >(Pds::TypeId::Id_TwoDGaussian, 1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Camera::TwoDGaussianV1> >(Pds::TypeId::Id_TwoDGaussian));
 
   {
     PyObject* unvlist = PyList_New(1);

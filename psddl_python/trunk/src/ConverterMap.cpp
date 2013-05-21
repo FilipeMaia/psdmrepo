@@ -21,6 +21,7 @@
 #include <iostream>
 #include <cstring>
 #include <boost/lexical_cast.hpp>
+#include <boost/foreach.hpp>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -52,30 +53,49 @@ ConverterMap::instance()
 void ConverterMap::addConverter(const boost::shared_ptr<Converter>& cvt)
 {
   // Add mapping trom typeinfo to Converter
-  m_cvtTypeMap.insert(std::make_pair(cvt->typeinfo(), cvt));
-
-  if (cvt->pdsTypeId() >= 0) {
-    m_pdsTypeMap[cvt->pdsTypeId()].push_back(cvt->typeinfo());
+  BOOST_FOREACH(const std::type_info* type, cvt->from_cpp_types()) {
+    m_from_cpp_types[type].push_back(cvt);
+  }
+  BOOST_FOREACH(PyTypeObject* type, cvt->from_py_types()) {
+    m_from_py_types[type].push_back(cvt);
+  }
+  BOOST_FOREACH(PyTypeObject* type, cvt->to_py_types()) {
+    m_to_py_types[type].push_back(cvt);
+  }
+  BOOST_FOREACH(int type, cvt->from_pds_types()) {
+    m_from_pds_types[type].push_back(cvt);
   }
 }
 
-boost::shared_ptr<Converter>
-ConverterMap::getConverter(const std::type_info* type) const
+const ConverterMap::CvtList&
+ConverterMap::getFromCppConverters(const std::type_info* type) const
 {
-  boost::shared_ptr<Converter> res;
-  ConverterTypeMap::const_iterator it = m_cvtTypeMap.find(type);
-  if (it != m_cvtTypeMap.end()) {
-    res = it->second;
-  }
-  return res;
+  CppTypeMap::const_iterator it = m_from_cpp_types.find(type);
+  if (it == m_from_cpp_types.end()) return m_emptyCvtList;
+  return it->second;
 }
 
-// Return list of type names matching Pds::TypeId::Type value
-const ConverterMap::TypeInfoList&
-ConverterMap::pdsTypeInfos(int pdsTypeId) const
+const ConverterMap::CvtList&
+ConverterMap::getFromPyConverters(const PyTypeObject* type) const
 {
-  PdsTypeMap::const_iterator it = m_pdsTypeMap.find(pdsTypeId);
-  if (it == m_pdsTypeMap.end()) return m_emptyTypeList;
+  PyTypeMap::const_iterator it = m_from_py_types.find(type);
+  if (it == m_from_py_types.end()) return m_emptyCvtList;
+  return it->second;
+}
+
+const ConverterMap::CvtList&
+ConverterMap::getToPyConverters(const PyTypeObject* type) const
+{
+  PyTypeMap::const_iterator it = m_to_py_types.find(type);
+  if (it == m_to_py_types.end()) return m_emptyCvtList;
+  return it->second;
+}
+
+const ConverterMap::CvtList&
+ConverterMap::getFromPdsConverters(int pdsTypeId) const
+{
+  PdsTypeIdMap::const_iterator it = m_from_pds_types.find(pdsTypeId);
+  if (it == m_from_pds_types.end()) return m_emptyCvtList;
   return it->second;
 }
 

@@ -20,12 +20,6 @@ using boost::shared_ptr;
 using std::vector;
 
 namespace {
-template <typename T>
-PyObject* method_typeid() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(T), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
 template<typename T, std::vector<int> (T::*MF)() const>
 PyObject* method_shape(const T *x) {
   return detail::vintToList((x->*MF)());
@@ -42,10 +36,8 @@ void createWrappers(PyObject* module) {
     .def("index", &Psana::ControlData::PVControl::index)
     .def("value", &Psana::ControlData::PVControl::value)
     .def("array", &Psana::ControlData::PVControl::array)
-    .def("__typeid__", &method_typeid<Psana::ControlData::PVControl>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::ControlData::PVControl> >(-1, -1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::ControlData::PVControl> >(-1));
 
   class_<Psana::ControlData::PVMonitor >("PVMonitor", no_init)
     .def("name", &Psana::ControlData::PVMonitor::name)
@@ -53,18 +45,14 @@ void createWrappers(PyObject* module) {
     .def("loValue", &Psana::ControlData::PVMonitor::loValue)
     .def("hiValue", &Psana::ControlData::PVMonitor::hiValue)
     .def("array", &Psana::ControlData::PVMonitor::array)
-    .def("__typeid__", &method_typeid<Psana::ControlData::PVMonitor>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::ControlData::PVMonitor> >(-1, -1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::ControlData::PVMonitor> >(-1));
 
   class_<Psana::ControlData::PVLabel >("PVLabel", no_init)
     .def("name", &Psana::ControlData::PVLabel::name)
     .def("value", &Psana::ControlData::PVLabel::value)
-    .def("__typeid__", &method_typeid<Psana::ControlData::PVLabel>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::ControlData::PVLabel> >(-1, -1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::ControlData::PVLabel> >(-1));
 
   class_<Psana::ControlData::ConfigV1, boost::shared_ptr<Psana::ControlData::ConfigV1>, boost::noncopyable >("ConfigV1", no_init)
     .def("events", &Psana::ControlData::ConfigV1::events)
@@ -75,10 +63,8 @@ void createWrappers(PyObject* module) {
     .def("npvMonitors", &Psana::ControlData::ConfigV1::npvMonitors)
     .def("pvControls", &Psana::ControlData::ConfigV1::pvControls)
     .def("pvMonitors", &Psana::ControlData::ConfigV1::pvMonitors)
-    .def("__typeid__", &method_typeid<Psana::ControlData::ConfigV1>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::ControlData::ConfigV1> >(Pds::TypeId::Id_ControlConfig, 1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::ControlData::ConfigV1> >(Pds::TypeId::Id_ControlConfig));
 
   class_<Psana::ControlData::ConfigV2, boost::shared_ptr<Psana::ControlData::ConfigV2>, boost::noncopyable >("ConfigV2", no_init)
     .def("events", &Psana::ControlData::ConfigV2::events)
@@ -91,10 +77,8 @@ void createWrappers(PyObject* module) {
     .def("pvControls", &Psana::ControlData::ConfigV2::pvControls)
     .def("pvMonitors", &Psana::ControlData::ConfigV2::pvMonitors)
     .def("pvLabels", &Psana::ControlData::ConfigV2::pvLabels)
-    .def("__typeid__", &method_typeid<Psana::ControlData::ConfigV2>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::ControlData::ConfigV2> >(Pds::TypeId::Id_ControlConfig, 2));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::ControlData::ConfigV2> >(Pds::TypeId::Id_ControlConfig));
 
   {
     PyObject* unvlist = PyList_New(2);

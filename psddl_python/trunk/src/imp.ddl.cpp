@@ -20,12 +20,6 @@ using boost::shared_ptr;
 using std::vector;
 
 namespace {
-template <typename T>
-PyObject* method_typeid() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(T), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
 template<typename T, std::vector<int> (T::*MF)() const>
 PyObject* method_shape(const T *x) {
   return detail::vintToList((x->*MF)());
@@ -48,17 +42,13 @@ void createWrappers(PyObject* module) {
     .def("numberOfSamples", &Psana::Imp::ConfigV1::numberOfSamples)
     .def("trigDelay", &Psana::Imp::ConfigV1::trigDelay)
     .def("adcDelay", &Psana::Imp::ConfigV1::adcDelay)
-    .def("__typeid__", &method_typeid<Psana::Imp::ConfigV1>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Imp::ConfigV1> >(Pds::TypeId::Id_ImpConfig, 1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Imp::ConfigV1> >(Pds::TypeId::Id_ImpConfig));
 
   class_<Psana::Imp::Sample >("Sample", no_init)
     .def("channels", &Psana::Imp::Sample::channels)
-    .def("__typeid__", &method_typeid<Psana::Imp::Sample>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Imp::Sample> >(-1, -1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Imp::Sample> >(-1));
 
   class_<Psana::Imp::LaneStatus >("LaneStatus", no_init)
     .def("linkErrCount", &Psana::Imp::LaneStatus::linkErrCount)
@@ -69,10 +59,8 @@ void createWrappers(PyObject* module) {
     .def("remLinked", &Psana::Imp::LaneStatus::remLinked)
     .def("zeros", &Psana::Imp::LaneStatus::zeros)
     .def("powersOkay", &Psana::Imp::LaneStatus::powersOkay)
-    .def("__typeid__", &method_typeid<Psana::Imp::LaneStatus>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Imp::LaneStatus> >(-1, -1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Imp::LaneStatus> >(-1));
 
   class_<Psana::Imp::ElementV1, boost::shared_ptr<Psana::Imp::ElementV1>, boost::noncopyable >("ElementV1", no_init)
     .def("vc", &Psana::Imp::ElementV1::vc)
@@ -83,10 +71,8 @@ void createWrappers(PyObject* module) {
     .def("range", &Psana::Imp::ElementV1::range)
     .def("laneStatus", &Psana::Imp::ElementV1::laneStatus, return_value_policy<copy_const_reference>())
     .def("samples", &Psana::Imp::ElementV1::samples)
-    .def("__typeid__", &method_typeid<Psana::Imp::ElementV1>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Imp::ElementV1> >(Pds::TypeId::Id_ImpData, 1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Imp::ElementV1> >(Pds::TypeId::Id_ImpData));
 
   {
     PyObject* unvlist = PyList_New(1);

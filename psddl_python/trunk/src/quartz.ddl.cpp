@@ -20,12 +20,6 @@ using boost::shared_ptr;
 using std::vector;
 
 namespace {
-template <typename T>
-PyObject* method_typeid() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(T), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
 template<typename T, std::vector<int> (T::*MF)() const>
 PyObject* method_shape(const T *x) {
   return detail::vintToList((x->*MF)());
@@ -51,10 +45,8 @@ void createWrappers(PyObject* module) {
     .def("defect_pixel_coordinates", &Psana::Quartz::ConfigV1::defect_pixel_coordinates)
     .def("output_offset", &Psana::Quartz::ConfigV1::output_offset)
     .def("output_resolution_bits", &Psana::Quartz::ConfigV1::output_resolution_bits)
-    .def("__typeid__", &method_typeid<Psana::Quartz::ConfigV1>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Quartz::ConfigV1> >(Pds::TypeId::Id_QuartzConfig, 1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Quartz::ConfigV1> >(Pds::TypeId::Id_QuartzConfig));
 
   {
     PyObject* unvlist = PyList_New(1);

@@ -20,12 +20,6 @@ using boost::shared_ptr;
 using std::vector;
 
 namespace {
-template <typename T>
-PyObject* method_typeid() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(T), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
 template<typename T, std::vector<int> (T::*MF)() const>
 PyObject* method_shape(const T *x) {
   return detail::vintToList((x->*MF)());
@@ -40,10 +34,8 @@ void createWrappers(PyObject* module) {
   class_<Psana::PNCCD::ConfigV1, boost::shared_ptr<Psana::PNCCD::ConfigV1>, boost::noncopyable >("ConfigV1", no_init)
     .def("numLinks", &Psana::PNCCD::ConfigV1::numLinks)
     .def("payloadSizePerLink", &Psana::PNCCD::ConfigV1::payloadSizePerLink)
-    .def("__typeid__", &method_typeid<Psana::PNCCD::ConfigV1>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::PNCCD::ConfigV1> >(Pds::TypeId::Id_pnCCDconfig, 1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::PNCCD::ConfigV1> >(Pds::TypeId::Id_pnCCDconfig));
 
   class_<Psana::PNCCD::ConfigV2, boost::shared_ptr<Psana::PNCCD::ConfigV2>, boost::noncopyable >("ConfigV2", no_init)
     .def("numLinks", &Psana::PNCCD::ConfigV2::numLinks)
@@ -58,10 +50,8 @@ void createWrappers(PyObject* module) {
     .def("timingFName", &Psana::PNCCD::ConfigV2::timingFName)
     .def("info_shape", &method_shape<Psana::PNCCD::ConfigV2, &Psana::PNCCD::ConfigV2::info_shape>)
     .def("timingFName_shape", &method_shape<Psana::PNCCD::ConfigV2, &Psana::PNCCD::ConfigV2::timingFName_shape>)
-    .def("__typeid__", &method_typeid<Psana::PNCCD::ConfigV2>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::PNCCD::ConfigV2> >(Pds::TypeId::Id_pnCCDconfig, 2));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::PNCCD::ConfigV2> >(Pds::TypeId::Id_pnCCDconfig));
 
   class_<Psana::PNCCD::FrameV1, boost::shared_ptr<Psana::PNCCD::FrameV1>, boost::noncopyable >("FrameV1", no_init)
     .def("specialWord", &Psana::PNCCD::FrameV1::specialWord)
@@ -70,10 +60,8 @@ void createWrappers(PyObject* module) {
     .def("timeStampLo", &Psana::PNCCD::FrameV1::timeStampLo)
     .def("_data", &Psana::PNCCD::FrameV1::_data)
     .def("data", &Psana::PNCCD::FrameV1::data)
-    .def("__typeid__", &method_typeid<Psana::PNCCD::FrameV1>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::PNCCD::FrameV1> >(-1, -1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::PNCCD::FrameV1> >(-1));
 
   class_<Psana::PNCCD::FullFrameV1, boost::shared_ptr<Psana::PNCCD::FullFrameV1>, boost::noncopyable >("FullFrameV1", no_init)
     .def("specialWord", &Psana::PNCCD::FullFrameV1::specialWord)
@@ -81,19 +69,15 @@ void createWrappers(PyObject* module) {
     .def("timeStampHi", &Psana::PNCCD::FullFrameV1::timeStampHi)
     .def("timeStampLo", &Psana::PNCCD::FullFrameV1::timeStampLo)
     .def("data", &Psana::PNCCD::FullFrameV1::data)
-    .def("__typeid__", &method_typeid<Psana::PNCCD::FullFrameV1>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::PNCCD::FullFrameV1> >(Pds::TypeId::Id_pnCCDframe, 1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::PNCCD::FullFrameV1> >(Pds::TypeId::Id_pnCCDframe));
 
   class_<Psana::PNCCD::FramesV1, boost::shared_ptr<Psana::PNCCD::FramesV1>, boost::noncopyable >("FramesV1", no_init)
     .def("frame", &Psana::PNCCD::FramesV1::frame, return_internal_reference<>())
     .def("numLinks", &Psana::PNCCD::FramesV1::numLinks)
     .def("frame_shape", &method_shape<Psana::PNCCD::FramesV1, &Psana::PNCCD::FramesV1::frame_shape>)
-    .def("__typeid__", &method_typeid<Psana::PNCCD::FramesV1>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::PNCCD::FramesV1> >(Pds::TypeId::Id_pnCCDframe, 1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::PNCCD::FramesV1> >(Pds::TypeId::Id_pnCCDframe));
 
   {
     PyObject* unvlist = PyList_New(1);

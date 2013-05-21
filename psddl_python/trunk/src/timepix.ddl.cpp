@@ -20,12 +20,6 @@ using boost::shared_ptr;
 using std::vector;
 
 namespace {
-template <typename T>
-PyObject* method_typeid() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(T), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
 template<typename T, std::vector<int> (T::*MF)() const>
 PyObject* method_shape(const T *x) {
   return detail::vintToList((x->*MF)());
@@ -97,10 +91,8 @@ void createWrappers(PyObject* module) {
     .def("dac3Ths", &Psana::Timepix::ConfigV1::dac3Ths)
     .def("dac3BiasLvds", &Psana::Timepix::ConfigV1::dac3BiasLvds)
     .def("dac3RefLvds", &Psana::Timepix::ConfigV1::dac3RefLvds)
-    .def("__typeid__", &method_typeid<Psana::Timepix::ConfigV1>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Timepix::ConfigV1> >(Pds::TypeId::Id_TimepixConfig, 1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Timepix::ConfigV1> >(Pds::TypeId::Id_TimepixConfig));
 
   class_<Psana::Timepix::ConfigV2, boost::shared_ptr<Psana::Timepix::ConfigV2>, boost::noncopyable >("ConfigV2", no_init)
     .def("readoutSpeed", &Psana::Timepix::ConfigV2::readoutSpeed)
@@ -175,10 +167,8 @@ void createWrappers(PyObject* module) {
     .def("chip2ID", &Psana::Timepix::ConfigV2::chip2ID)
     .def("chip3ID", &Psana::Timepix::ConfigV2::chip3ID)
     .def("chipCount", &Psana::Timepix::ConfigV2::chipCount)
-    .def("__typeid__", &method_typeid<Psana::Timepix::ConfigV2>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Timepix::ConfigV2> >(Pds::TypeId::Id_TimepixConfig, 2));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Timepix::ConfigV2> >(Pds::TypeId::Id_TimepixConfig));
 
   class_<Psana::Timepix::ConfigV3, boost::shared_ptr<Psana::Timepix::ConfigV3>, boost::noncopyable >("ConfigV3", no_init)
     .def("readoutSpeed", &Psana::Timepix::ConfigV3::readoutSpeed)
@@ -255,10 +245,8 @@ void createWrappers(PyObject* module) {
     .def("chip2ID", &Psana::Timepix::ConfigV3::chip2ID)
     .def("chip3ID", &Psana::Timepix::ConfigV3::chip3ID)
     .def("chipCount", &Psana::Timepix::ConfigV3::chipCount)
-    .def("__typeid__", &method_typeid<Psana::Timepix::ConfigV3>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Timepix::ConfigV3> >(Pds::TypeId::Id_TimepixConfig, 3));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Timepix::ConfigV3> >(Pds::TypeId::Id_TimepixConfig));
 
   class_<Psana::Timepix::DataV1, boost::shared_ptr<Psana::Timepix::DataV1>, boost::noncopyable >("DataV1", no_init)
     .def("timestamp", &Psana::Timepix::DataV1::timestamp)
@@ -269,10 +257,8 @@ void createWrappers(PyObject* module) {
     .def("height", &Psana::Timepix::DataV1::height)
     .def("depth", &Psana::Timepix::DataV1::depth)
     .def("depth_bytes", &Psana::Timepix::DataV1::depth_bytes)
-    .def("__typeid__", &method_typeid<Psana::Timepix::DataV1>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Timepix::DataV1> >(Pds::TypeId::Id_TimepixData, 1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Timepix::DataV1> >(Pds::TypeId::Id_TimepixData));
 
   class_<Psana::Timepix::DataV2, boost::shared_ptr<Psana::Timepix::DataV2>, boost::noncopyable >("DataV2", no_init)
     .def("width", &Psana::Timepix::DataV2::width)
@@ -283,10 +269,8 @@ void createWrappers(PyObject* module) {
     .def("data", &Psana::Timepix::DataV2::data)
     .def("depth", &Psana::Timepix::DataV2::depth)
     .def("depth_bytes", &Psana::Timepix::DataV2::depth_bytes)
-    .def("__typeid__", &method_typeid<Psana::Timepix::DataV2>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Timepix::DataV2> >(Pds::TypeId::Id_TimepixData, 2));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Timepix::DataV2> >(Pds::TypeId::Id_TimepixData));
 
   {
     PyObject* unvlist = PyList_New(2);

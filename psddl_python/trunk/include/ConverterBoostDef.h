@@ -57,65 +57,79 @@ class ConverterBoostDef : public Converter {
 public:
 
   // Default constructor
-  ConverterBoostDef(int pdsTypeId = -1, int version = -1) : m_pdsTypeId(pdsTypeId), m_version(version) {}
+  ConverterBoostDef(int pdsTypeId = -1) : m_pdsTypeId(pdsTypeId) {}
 
   // Destructor
   virtual ~ConverterBoostDef() {}
 
   /**
-   *  @brief Return type_info of the corresponding C++ type.
-   */
-  virtual const std::type_info* typeinfo() const { return &typeid(T); }
-
-  /**
-   *  @brief Return value of pdsdata::TypeId::Type enum a type or -1.
-   */
-  virtual int pdsTypeId() const { return m_pdsTypeId; }
-
-  /**
-   *  @brief Get the type version.
+   *  @brief Return type_infos of source C++ types.
    *
-   *  This method will disappear at some point, it is only necessary
-   *  for current implementation based on strings.
+   *  If converter supports conversion from C++ to Python
+   *  this method shall return non-empty vector.
    */
-  virtual int getVersion() const { return m_version; }
-
-  /**
-   *  @brief Convert C++ object to Python
-   *
-   *  @param[in] vdata  Void pointer to C++ data.
-   *  @return New reference
-   */
-  virtual PyObject* convert(const boost::shared_ptr<void>& vdata) const {
-    const boost::shared_ptr<T>& result = boost::static_pointer_cast<T>(vdata);
-    if (result) {
-      boost::python::object obj(*result);
-      Py_INCREF(obj.ptr());
-      return obj.ptr();
-    }
-    Py_RETURN_NONE;
+  virtual std::vector<const std::type_info*> from_cpp_types() const
+  {
+    return std::vector<const std::type_info*>(1, &typeid(T));
   }
 
   /**
-   *  @brief Returns Python type of the objects produced by this converter.
+   *  @brief Returns source Python types.
    *
-   *  Some special converters can return PyBaseObject_Type (object).
-   *  
-   *  @return Borrowed reference
+   *  If converter supports conversion from Python to C++
+   *  this method shall return non-empty vector.
+   *
+   *  @return Borrowed references
    */
-  virtual PyTypeObject* pyTypeObject() const
+  virtual std::vector<PyTypeObject*> from_py_types() const
   {
     // find registration info for type T
     boost::python::converter::registration const* reg = boost::python::converter::registry::query(boost::python::type_id<T>());
     if (reg) {
       try {
-        return reg->get_class_object();
+        return std::vector<PyTypeObject*>(1, reg->get_class_object());
       } catch (const boost::python::error_already_set& ex) {
         // exception was likely generated, clear it
         PyErr_Clear();
       }
     }
-    return &PyBaseObject_Type;
+    return std::vector<PyTypeObject*>();
+  }
+
+  /**
+   *  @brief Returns destination Python types.
+   *
+   *  If converter supports conversion from C++ to Python
+   *  this method shall return non-empty vector.
+   *
+   *  @return Borrowed references
+   */
+  virtual std::vector<PyTypeObject*> to_py_types() const { return from_py_types(); }
+
+  /**
+   *  @brief Return list of pdsdata::TypeId::Type enum values.
+   */
+  virtual std::vector<int> from_pds_types() const {
+    std::vector<int> res;
+    if (m_pdsTypeId >= 0) res.push_back(m_pdsTypeId);
+    return res;
+  }
+
+  /**
+   *  @brief Convert C++ object to Python
+   *
+   *  @return New reference
+   */
+  virtual PyObject* convert(PSEvt::ProxyDictI& proxyDict, const PSEvt::Source& source, const std::string& key) const {
+    const boost::shared_ptr<void>& vdata = proxyDict.get(&typeid(T), source, key, 0);
+    const boost::shared_ptr<T>& cppobj = boost::static_pointer_cast<T>(vdata);
+    if (cppobj) {
+      boost::python::object obj(*cppobj);
+      Py_INCREF(obj.ptr());
+      return obj.ptr();
+    }
+    // 0 does not mean python error
+    return 0;
   }
 
 protected:
@@ -123,7 +137,6 @@ protected:
 private:
 
   int m_pdsTypeId;
-  int m_version;
 
 };
 

@@ -20,12 +20,6 @@ using boost::shared_ptr;
 using std::vector;
 
 namespace {
-template <typename T>
-PyObject* method_typeid() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(T), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
 template<typename T, std::vector<int> (T::*MF)() const>
 PyObject* method_shape(const T *x) {
   return detail::vintToList((x->*MF)());
@@ -57,20 +51,16 @@ void createWrappers(PyObject* module) {
     .def("numPixelsX", &Psana::Andor::ConfigV1::numPixelsX)
     .def("numPixelsY", &Psana::Andor::ConfigV1::numPixelsY)
     .def("numPixels", &Psana::Andor::ConfigV1::numPixels)
-    .def("__typeid__", &method_typeid<Psana::Andor::ConfigV1>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Andor::ConfigV1> >(Pds::TypeId::Id_AndorConfig, 1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Andor::ConfigV1> >(Pds::TypeId::Id_AndorConfig));
 
   class_<Psana::Andor::FrameV1, boost::shared_ptr<Psana::Andor::FrameV1>, boost::noncopyable >("FrameV1", no_init)
     .def("shotIdStart", &Psana::Andor::FrameV1::shotIdStart)
     .def("readoutTime", &Psana::Andor::FrameV1::readoutTime)
     .def("temperature", &Psana::Andor::FrameV1::temperature)
     .def("data", &Psana::Andor::FrameV1::data)
-    .def("__typeid__", &method_typeid<Psana::Andor::FrameV1>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Andor::FrameV1> >(Pds::TypeId::Id_AndorFrame, 1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Andor::FrameV1> >(Pds::TypeId::Id_AndorFrame));
 
   {
     PyObject* unvlist = PyList_New(1);

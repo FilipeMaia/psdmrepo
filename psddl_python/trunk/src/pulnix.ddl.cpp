@@ -20,12 +20,6 @@ using boost::shared_ptr;
 using std::vector;
 
 namespace {
-template <typename T>
-PyObject* method_typeid() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(T), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
 template<typename T, std::vector<int> (T::*MF)() const>
 PyObject* method_shape(const T *x) {
   return detail::vintToList((x->*MF)());
@@ -48,10 +42,8 @@ void createWrappers(PyObject* module) {
     .def("vertical_binning", &Psana::Pulnix::TM6740ConfigV1::vertical_binning)
     .def("lookuptable_mode", &Psana::Pulnix::TM6740ConfigV1::lookuptable_mode)
     .def("output_resolution_bits", &Psana::Pulnix::TM6740ConfigV1::output_resolution_bits)
-    .def("__typeid__", &method_typeid<Psana::Pulnix::TM6740ConfigV1>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Pulnix::TM6740ConfigV1> >(Pds::TypeId::Id_TM6740Config, 1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Pulnix::TM6740ConfigV1> >(Pds::TypeId::Id_TM6740Config));
 
   class_<Psana::Pulnix::TM6740ConfigV2, boost::shared_ptr<Psana::Pulnix::TM6740ConfigV2>, boost::noncopyable >("TM6740ConfigV2", no_init)
     .def("gain_a", &Psana::Pulnix::TM6740ConfigV2::gain_a)
@@ -64,10 +56,8 @@ void createWrappers(PyObject* module) {
     .def("vertical_binning", &Psana::Pulnix::TM6740ConfigV2::vertical_binning)
     .def("lookuptable_mode", &Psana::Pulnix::TM6740ConfigV2::lookuptable_mode)
     .def("output_resolution_bits", &Psana::Pulnix::TM6740ConfigV2::output_resolution_bits)
-    .def("__typeid__", &method_typeid<Psana::Pulnix::TM6740ConfigV2>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Pulnix::TM6740ConfigV2> >(Pds::TypeId::Id_TM6740Config, 2));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Pulnix::TM6740ConfigV2> >(Pds::TypeId::Id_TM6740Config));
 
   {
     PyObject* unvlist = PyList_New(2);

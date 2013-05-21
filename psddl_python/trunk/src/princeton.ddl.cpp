@@ -20,12 +20,6 @@ using boost::shared_ptr;
 using std::vector;
 
 namespace {
-template <typename T>
-PyObject* method_typeid() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(T), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
 template<typename T, std::vector<int> (T::*MF)() const>
 PyObject* method_shape(const T *x) {
   return detail::vintToList((x->*MF)());
@@ -53,10 +47,8 @@ void createWrappers(PyObject* module) {
     .def("numPixelsX", &Psana::Princeton::ConfigV1::numPixelsX)
     .def("numPixelsY", &Psana::Princeton::ConfigV1::numPixelsY)
     .def("numPixels", &Psana::Princeton::ConfigV1::numPixels)
-    .def("__typeid__", &method_typeid<Psana::Princeton::ConfigV1>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Princeton::ConfigV1> >(Pds::TypeId::Id_PrincetonConfig, 1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Princeton::ConfigV1> >(Pds::TypeId::Id_PrincetonConfig));
 
   class_<Psana::Princeton::ConfigV2, boost::shared_ptr<Psana::Princeton::ConfigV2>, boost::noncopyable >("ConfigV2", no_init)
     .def("width", &Psana::Princeton::ConfigV2::width)
@@ -75,10 +67,8 @@ void createWrappers(PyObject* module) {
     .def("numPixelsX", &Psana::Princeton::ConfigV2::numPixelsX)
     .def("numPixelsY", &Psana::Princeton::ConfigV2::numPixelsY)
     .def("numPixels", &Psana::Princeton::ConfigV2::numPixels)
-    .def("__typeid__", &method_typeid<Psana::Princeton::ConfigV2>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Princeton::ConfigV2> >(Pds::TypeId::Id_PrincetonConfig, 2));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Princeton::ConfigV2> >(Pds::TypeId::Id_PrincetonConfig));
 
   class_<Psana::Princeton::ConfigV3, boost::shared_ptr<Psana::Princeton::ConfigV3>, boost::noncopyable >("ConfigV3", no_init)
     .def("width", &Psana::Princeton::ConfigV3::width)
@@ -97,10 +87,8 @@ void createWrappers(PyObject* module) {
     .def("numPixelsX", &Psana::Princeton::ConfigV3::numPixelsX)
     .def("numPixelsY", &Psana::Princeton::ConfigV3::numPixelsY)
     .def("numPixels", &Psana::Princeton::ConfigV3::numPixels)
-    .def("__typeid__", &method_typeid<Psana::Princeton::ConfigV3>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Princeton::ConfigV3> >(Pds::TypeId::Id_PrincetonConfig, 3));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Princeton::ConfigV3> >(Pds::TypeId::Id_PrincetonConfig));
 
   class_<Psana::Princeton::ConfigV4, boost::shared_ptr<Psana::Princeton::ConfigV4>, boost::noncopyable >("ConfigV4", no_init)
     .def("width", &Psana::Princeton::ConfigV4::width)
@@ -122,10 +110,8 @@ void createWrappers(PyObject* module) {
     .def("numPixelsX", &Psana::Princeton::ConfigV4::numPixelsX)
     .def("numPixelsY", &Psana::Princeton::ConfigV4::numPixelsY)
     .def("numPixels", &Psana::Princeton::ConfigV4::numPixels)
-    .def("__typeid__", &method_typeid<Psana::Princeton::ConfigV4>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Princeton::ConfigV4> >(Pds::TypeId::Id_PrincetonConfig, 4));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Princeton::ConfigV4> >(Pds::TypeId::Id_PrincetonConfig));
 
   class_<Psana::Princeton::ConfigV5, boost::shared_ptr<Psana::Princeton::ConfigV5>, boost::noncopyable >("ConfigV5", no_init)
     .def("width", &Psana::Princeton::ConfigV5::width)
@@ -148,36 +134,28 @@ void createWrappers(PyObject* module) {
     .def("numPixelsX", &Psana::Princeton::ConfigV5::numPixelsX)
     .def("numPixelsY", &Psana::Princeton::ConfigV5::numPixelsY)
     .def("numPixels", &Psana::Princeton::ConfigV5::numPixels)
-    .def("__typeid__", &method_typeid<Psana::Princeton::ConfigV5>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Princeton::ConfigV5> >(Pds::TypeId::Id_PrincetonConfig, 5));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Princeton::ConfigV5> >(Pds::TypeId::Id_PrincetonConfig));
 
   class_<Psana::Princeton::FrameV1, boost::shared_ptr<Psana::Princeton::FrameV1>, boost::noncopyable >("FrameV1", no_init)
     .def("shotIdStart", &Psana::Princeton::FrameV1::shotIdStart)
     .def("readoutTime", &Psana::Princeton::FrameV1::readoutTime)
     .def("data", &Psana::Princeton::FrameV1::data)
-    .def("__typeid__", &method_typeid<Psana::Princeton::FrameV1>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Princeton::FrameV1> >(Pds::TypeId::Id_PrincetonFrame, 1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Princeton::FrameV1> >(Pds::TypeId::Id_PrincetonFrame));
 
   class_<Psana::Princeton::FrameV2, boost::shared_ptr<Psana::Princeton::FrameV2>, boost::noncopyable >("FrameV2", no_init)
     .def("shotIdStart", &Psana::Princeton::FrameV2::shotIdStart)
     .def("readoutTime", &Psana::Princeton::FrameV2::readoutTime)
     .def("temperature", &Psana::Princeton::FrameV2::temperature)
     .def("data", &Psana::Princeton::FrameV2::data)
-    .def("__typeid__", &method_typeid<Psana::Princeton::FrameV2>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Princeton::FrameV2> >(Pds::TypeId::Id_PrincetonFrame, 2));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Princeton::FrameV2> >(Pds::TypeId::Id_PrincetonFrame));
 
   class_<Psana::Princeton::InfoV1 >("InfoV1", no_init)
     .def("temperature", &Psana::Princeton::InfoV1::temperature)
-    .def("__typeid__", &method_typeid<Psana::Princeton::InfoV1>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Princeton::InfoV1> >(Pds::TypeId::Id_PrincetonInfo, 1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Princeton::InfoV1> >(Pds::TypeId::Id_PrincetonInfo));
 
   {
     PyObject* unvlist = PyList_New(1);

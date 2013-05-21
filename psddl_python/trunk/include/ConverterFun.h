@@ -56,8 +56,8 @@ class ConverterFun : public Converter {
 public:
 
   // Default constructor
-  ConverterFun(Functor func, PyTypeObject* pyTypeObject, int pdsTypeId = -1, int version = -1)
-    : m_func(func), m_pyTypeObject(pyTypeObject), m_pdsTypeId(pdsTypeId), m_version(version) 
+  ConverterFun(Functor func, PyTypeObject* pyTypeObject, int pdsTypeId = -1)
+    : m_func(func), m_pyTypeObject(pyTypeObject), m_pdsTypeId(pdsTypeId)
   {
     Py_INCREF(m_pyTypeObject);
   }
@@ -69,22 +69,47 @@ public:
   }
 
   /**
-   *  @brief Return type_info of the corresponding C++ type.
-   */
-  virtual const std::type_info* typeinfo() const { return &typeid(T); }
-
-  /**
-   *  @brief Return value of pdsdata::TypeId::Type enum a type or -1.
-   */
-  virtual int pdsTypeId() const { return m_pdsTypeId; }
-
-  /**
-   *  @brief Get the type version.
+   *  @brief Return type_infos of source C++ types.
    *
-   *  This method will disappear at some point, it is only necessary
-   *  for current implementation based on strings.
+   *  If converter supports conversion from C++ to Python
+   *  this method shall return non-empty vector.
    */
-  virtual int getVersion() const { return m_version; }
+  virtual std::vector<const std::type_info*> from_cpp_types() const
+  {
+    return std::vector<const std::type_info*>(1, &typeid(T));
+  }
+
+  /**
+   *  @brief Returns source Python types.
+   *
+   *  If converter supports conversion from Python to C++
+   *  this method shall return non-empty vector.
+   *
+   *  @return Borrowed references
+   */
+  virtual std::vector<PyTypeObject*> from_py_types() const
+  {
+    return std::vector<PyTypeObject*>(1, m_pyTypeObject);
+  }
+
+  /**
+   *  @brief Returns destination Python types.
+   *
+   *  If converter supports conversion from C++ to Python
+   *  this method shall return non-empty vector.
+   *
+   *  @return Borrowed references
+   */
+  virtual std::vector<PyTypeObject*> to_py_types() const { return from_py_types(); }
+
+  /**
+   *  @brief Return list of pdsdata::TypeId::Type enum values.
+   */
+  virtual std::vector<int> from_pds_types() const {
+    std::vector<int> res;
+    if (m_pdsTypeId >= 0) res.push_back(m_pdsTypeId);
+    return res;
+  }
 
   /**
    *  @brief Convert C++ object to Python
@@ -92,22 +117,11 @@ public:
    *  @param[in] vdata  Void pointer to C++ data.
    *  @return New reference
    */
-  virtual PyObject* convert(const boost::shared_ptr<void>& vdata) const {
-    const boost::shared_ptr<T>& result = boost::static_pointer_cast<T>(vdata);
-    if (result) return m_func(result);
-    Py_RETURN_NONE;
-  }
-
-  /**
-   *  @brief Returns Python type of the objects produced by this converter.
-   *
-   *  Some special converters can return PyBaseObject_Type (object).
-   *  
-   *  @return Borrowed reference
-   */
-  virtual PyTypeObject* pyTypeObject() const
-  {
-    return m_pyTypeObject;
+  virtual PyObject* convert(PSEvt::ProxyDictI& proxyDict, const PSEvt::Source& source, const std::string& key) const {
+    const boost::shared_ptr<void>& vdata = proxyDict.get(&typeid(T), source, key, 0);
+    const boost::shared_ptr<T>& cppobj = boost::static_pointer_cast<T>(vdata);
+    if (cppobj) return m_func(cppobj);
+    return 0;
   }
 
 protected:
@@ -117,7 +131,6 @@ private:
   Functor m_func;
   PyTypeObject* m_pyTypeObject;
   int m_pdsTypeId;
-  int m_version;
 
 };
 
@@ -126,9 +139,9 @@ private:
  */
 template <typename T, typename Functor>
 boost::shared_ptr<ConverterFun<T, Functor> >
-make_converter_fun(Functor func, PyTypeObject* pyTypeObject, int pdsTypeId = -1, int version = -1)
+make_converter_fun(Functor func, PyTypeObject* pyTypeObject, int pdsTypeId = -1)
 {
-  return boost::make_shared<ConverterFun<T, Functor> >(func, pyTypeObject, pdsTypeId, version);
+  return boost::make_shared<ConverterFun<T, Functor> >(func, pyTypeObject, pdsTypeId);
 }
 
 } // namespace psddl_python

@@ -11,6 +11,13 @@ Package author: Joseph S. Barrera
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-00
+2013-05-21 Andy Salnikov
+- re-designing Python-C++ conversion a bit to support 2-way ndarray 
+  conversion between Python and C++
+- __typeid__ method is gone from Python classes, now conversion will 
+  be based on Python type of the objects
+
 Tag: V00-04-13
 2013-05-15 Andy Salnikov
 - regenerate whole thing from psddldata V00-04-27

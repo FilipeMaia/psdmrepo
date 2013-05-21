@@ -20,12 +20,6 @@ using boost::shared_ptr;
 using std::vector;
 
 namespace {
-template <typename T>
-PyObject* method_typeid() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(T), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
 template<typename T, std::vector<int> (T::*MF)() const>
 PyObject* method_shape(const T *x) {
   return detail::vintToList((x->*MF)());
@@ -44,10 +38,8 @@ void createWrappers(PyObject* module) {
     .def("input_num", &Psana::Encoder::ConfigV1::input_num)
     .def("input_rising", &Psana::Encoder::ConfigV1::input_rising)
     .def("ticks_per_sec", &Psana::Encoder::ConfigV1::ticks_per_sec)
-    .def("__typeid__", &method_typeid<Psana::Encoder::ConfigV1>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Encoder::ConfigV1> >(Pds::TypeId::Id_EncoderConfig, 1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Encoder::ConfigV1> >(Pds::TypeId::Id_EncoderConfig));
 
   class_<Psana::Encoder::ConfigV2, boost::shared_ptr<Psana::Encoder::ConfigV2>, boost::noncopyable >("ConfigV2", no_init)
     .def("chan_mask", &Psana::Encoder::ConfigV2::chan_mask)
@@ -56,28 +48,22 @@ void createWrappers(PyObject* module) {
     .def("input_num", &Psana::Encoder::ConfigV2::input_num)
     .def("input_rising", &Psana::Encoder::ConfigV2::input_rising)
     .def("ticks_per_sec", &Psana::Encoder::ConfigV2::ticks_per_sec)
-    .def("__typeid__", &method_typeid<Psana::Encoder::ConfigV2>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Encoder::ConfigV2> >(Pds::TypeId::Id_EncoderConfig, 2));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Encoder::ConfigV2> >(Pds::TypeId::Id_EncoderConfig));
 
   class_<Psana::Encoder::DataV1, boost::shared_ptr<Psana::Encoder::DataV1>, boost::noncopyable >("DataV1", no_init)
     .def("timestamp", &Psana::Encoder::DataV1::timestamp)
     .def("encoder_count", &Psana::Encoder::DataV1::encoder_count)
     .def("value", &Psana::Encoder::DataV1::value)
-    .def("__typeid__", &method_typeid<Psana::Encoder::DataV1>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Encoder::DataV1> >(Pds::TypeId::Id_EncoderData, 1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Encoder::DataV1> >(Pds::TypeId::Id_EncoderData));
 
   class_<Psana::Encoder::DataV2, boost::shared_ptr<Psana::Encoder::DataV2>, boost::noncopyable >("DataV2", no_init)
     .def("timestamp", &Psana::Encoder::DataV2::timestamp)
     .def("encoder_count", &Psana::Encoder::DataV2::encoder_count)
     .def("value", &Psana::Encoder::DataV2::value)
-    .def("__typeid__", &method_typeid<Psana::Encoder::DataV2>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Encoder::DataV2> >(Pds::TypeId::Id_EncoderData, 2));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Encoder::DataV2> >(Pds::TypeId::Id_EncoderData));
 
   {
     PyObject* unvlist = PyList_New(2);

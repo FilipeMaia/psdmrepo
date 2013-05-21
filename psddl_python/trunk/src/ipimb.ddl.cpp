@@ -20,12 +20,6 @@ using boost::shared_ptr;
 using std::vector;
 
 namespace {
-template <typename T>
-PyObject* method_typeid() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(T), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
 template<typename T, std::vector<int> (T::*MF)() const>
 PyObject* method_shape(const T *x) {
   return detail::vintToList((x->*MF)());
@@ -52,10 +46,8 @@ void createWrappers(PyObject* module) {
     .def("calStrobeLength", &Psana::Ipimb::ConfigV1::calStrobeLength)
     .def("trigDelay", &Psana::Ipimb::ConfigV1::trigDelay)
     .def("capacitorValue", &Psana::Ipimb::ConfigV1::capacitorValue)
-    .def("__typeid__", &method_typeid<Psana::Ipimb::ConfigV1>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Ipimb::ConfigV1> >(Pds::TypeId::Id_IpimbConfig, 1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Ipimb::ConfigV1> >(Pds::TypeId::Id_IpimbConfig));
 
   class_<Psana::Ipimb::ConfigV2, boost::shared_ptr<Psana::Ipimb::ConfigV2>, boost::noncopyable >("ConfigV2", no_init)
     .def("triggerCounter", &Psana::Ipimb::ConfigV2::triggerCounter)
@@ -74,10 +66,8 @@ void createWrappers(PyObject* module) {
     .def("trigPsDelay", &Psana::Ipimb::ConfigV2::trigPsDelay)
     .def("adcDelay", &Psana::Ipimb::ConfigV2::adcDelay)
     .def("capacitorValue", &Psana::Ipimb::ConfigV2::capacitorValue)
-    .def("__typeid__", &method_typeid<Psana::Ipimb::ConfigV2>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Ipimb::ConfigV2> >(Pds::TypeId::Id_IpimbConfig, 2));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Ipimb::ConfigV2> >(Pds::TypeId::Id_IpimbConfig));
 
   class_<Psana::Ipimb::DataV1, boost::shared_ptr<Psana::Ipimb::DataV1>, boost::noncopyable >("DataV1", no_init)
     .def("triggerCounter", &Psana::Ipimb::DataV1::triggerCounter)
@@ -93,10 +83,8 @@ void createWrappers(PyObject* module) {
     .def("channel1Volts", &Psana::Ipimb::DataV1::channel1Volts)
     .def("channel2Volts", &Psana::Ipimb::DataV1::channel2Volts)
     .def("channel3Volts", &Psana::Ipimb::DataV1::channel3Volts)
-    .def("__typeid__", &method_typeid<Psana::Ipimb::DataV1>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Ipimb::DataV1> >(Pds::TypeId::Id_IpimbData, 1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Ipimb::DataV1> >(Pds::TypeId::Id_IpimbData));
 
   class_<Psana::Ipimb::DataV2, boost::shared_ptr<Psana::Ipimb::DataV2>, boost::noncopyable >("DataV2", no_init)
     .def("config0", &Psana::Ipimb::DataV2::config0)
@@ -120,10 +108,8 @@ void createWrappers(PyObject* module) {
     .def("channel2psVolts", &Psana::Ipimb::DataV2::channel2psVolts)
     .def("channel3psVolts", &Psana::Ipimb::DataV2::channel3psVolts)
     .def("triggerCounter", &Psana::Ipimb::DataV2::triggerCounter)
-    .def("__typeid__", &method_typeid<Psana::Ipimb::DataV2>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Ipimb::DataV2> >(Pds::TypeId::Id_IpimbData, 2));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Ipimb::DataV2> >(Pds::TypeId::Id_IpimbData));
 
   {
     PyObject* unvlist = PyList_New(2);

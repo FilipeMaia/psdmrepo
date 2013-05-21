@@ -53,8 +53,9 @@ namespace psddl_python {
 class ConverterMap {
 public:
 
-  typedef std::vector<std::string> NameList;
-  typedef std::vector<const std::type_info*> TypeInfoList;
+  typedef boost::shared_ptr<Converter> mapped_type;
+  typedef std::vector<mapped_type> CvtList;
+
 
   /**
    *  @brief Returns singleton instance.
@@ -67,14 +68,24 @@ public:
   void addConverter(const boost::shared_ptr<Converter>& cvt);
 
   /**
-   *  @brief Find a converter for corresponding C++ type.
+   *  @brief Find converters for corresponding source C++ type.
    */
-  boost::shared_ptr<Converter> getConverter(const std::type_info* type) const;
+  const CvtList& getFromCppConverters(const std::type_info* type) const;
 
   /**
-   *  @brief Return list of type names matching Pds::TypeId::Type value 
+   *  @brief Find converters for corresponding source Python type.
    */
-  const TypeInfoList& pdsTypeInfos(int pdsTypeId) const;
+  const CvtList& getFromPyConverters(const PyTypeObject* type) const;
+
+  /**
+   *  @brief Find converters for corresponding destination Python type.
+   */
+  const CvtList& getToPyConverters(const PyTypeObject* type) const;
+
+  /**
+   *  @brief Returns set of converters for given PDS type ID.
+   */
+  const CvtList& getFromPdsConverters(int pdsTypeId) const;
 
 protected:
 
@@ -88,12 +99,15 @@ private:
     }
   };
 
-  typedef std::map<const std::type_info*, boost::shared_ptr<Converter>, TypeInfoCmp> ConverterTypeMap;
-  typedef std::map<int, TypeInfoList> PdsTypeMap;
+  typedef std::map<const std::type_info*, CvtList, TypeInfoCmp> CppTypeMap;
+  typedef std::map<const PyTypeObject*, CvtList> PyTypeMap;
+  typedef std::map<int, CvtList> PdsTypeIdMap;
 
-  ConverterTypeMap m_cvtTypeMap;  // map C++ type to converter
-  PdsTypeMap m_pdsTypeMap;        // map TypeId number to a list of typeinfos
-  TypeInfoList m_emptyTypeList;
+  CppTypeMap m_from_cpp_types;        // map source C++ type to converter
+  PyTypeMap m_from_py_types;           // map source Python type to converter
+  PyTypeMap m_to_py_types;             // map destination Python type to converter
+  PdsTypeIdMap m_from_pds_types;       // map TypeId number to a list of converters
+  CvtList m_emptyCvtList;
 
 };
 

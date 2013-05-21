@@ -20,12 +20,6 @@ using boost::shared_ptr;
 using std::vector;
 
 namespace {
-template <typename T>
-PyObject* method_typeid() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(T), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
 template<typename T, std::vector<int> (T::*MF)() const>
 PyObject* method_shape(const T *x) {
   return detail::vintToList((x->*MF)());
@@ -43,30 +37,24 @@ void createWrappers(PyObject* module) {
     .def("coupling", &Psana::Acqiris::VertV1::coupling)
     .def("bandwidth", &Psana::Acqiris::VertV1::bandwidth)
     .def("slope", &Psana::Acqiris::VertV1::slope)
-    .def("__typeid__", &method_typeid<Psana::Acqiris::VertV1>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Acqiris::VertV1> >(-1, 1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Acqiris::VertV1> >(-1));
 
   class_<Psana::Acqiris::HorizV1 >("HorizV1", no_init)
     .def("sampInterval", &Psana::Acqiris::HorizV1::sampInterval)
     .def("delayTime", &Psana::Acqiris::HorizV1::delayTime)
     .def("nbrSamples", &Psana::Acqiris::HorizV1::nbrSamples)
     .def("nbrSegments", &Psana::Acqiris::HorizV1::nbrSegments)
-    .def("__typeid__", &method_typeid<Psana::Acqiris::HorizV1>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Acqiris::HorizV1> >(-1, 1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Acqiris::HorizV1> >(-1));
 
   class_<Psana::Acqiris::TrigV1 >("TrigV1", no_init)
     .def("coupling", &Psana::Acqiris::TrigV1::coupling)
     .def("input", &Psana::Acqiris::TrigV1::input)
     .def("slope", &Psana::Acqiris::TrigV1::slope)
     .def("level", &Psana::Acqiris::TrigV1::level)
-    .def("__typeid__", &method_typeid<Psana::Acqiris::TrigV1>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Acqiris::TrigV1> >(-1, 1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Acqiris::TrigV1> >(-1));
 
   class_<Psana::Acqiris::ConfigV1, boost::shared_ptr<Psana::Acqiris::ConfigV1>, boost::noncopyable >("ConfigV1", no_init)
     .def("nbrConvertersPerChannel", &Psana::Acqiris::ConfigV1::nbrConvertersPerChannel)
@@ -76,20 +64,16 @@ void createWrappers(PyObject* module) {
     .def("horiz", &Psana::Acqiris::ConfigV1::horiz, return_value_policy<copy_const_reference>())
     .def("vert", &Psana::Acqiris::ConfigV1::vert)
     .def("nbrChannels", &Psana::Acqiris::ConfigV1::nbrChannels)
-    .def("__typeid__", &method_typeid<Psana::Acqiris::ConfigV1>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Acqiris::ConfigV1> >(Pds::TypeId::Id_AcqConfig, 1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Acqiris::ConfigV1> >(Pds::TypeId::Id_AcqConfig));
 
   class_<Psana::Acqiris::TimestampV1 >("TimestampV1", no_init)
     .def("pos", &Psana::Acqiris::TimestampV1::pos)
     .def("timeStampLo", &Psana::Acqiris::TimestampV1::timeStampLo)
     .def("timeStampHi", &Psana::Acqiris::TimestampV1::timeStampHi)
     .def("value", &Psana::Acqiris::TimestampV1::value)
-    .def("__typeid__", &method_typeid<Psana::Acqiris::TimestampV1>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Acqiris::TimestampV1> >(-1, 1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Acqiris::TimestampV1> >(-1));
 
   class_<Psana::Acqiris::DataDescV1Elem, boost::shared_ptr<Psana::Acqiris::DataDescV1Elem>, boost::noncopyable >("DataDescV1Elem", no_init)
     .def("nbrSamplesInSeg", &Psana::Acqiris::DataDescV1Elem::nbrSamplesInSeg)
@@ -97,18 +81,14 @@ void createWrappers(PyObject* module) {
     .def("nbrSegments", &Psana::Acqiris::DataDescV1Elem::nbrSegments)
     .def("timestamp", &Psana::Acqiris::DataDescV1Elem::timestamp)
     .def("waveforms", &Psana::Acqiris::DataDescV1Elem::waveforms)
-    .def("__typeid__", &method_typeid<Psana::Acqiris::DataDescV1Elem>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Acqiris::DataDescV1Elem> >(-1, 1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Acqiris::DataDescV1Elem> >(-1));
 
   class_<Psana::Acqiris::DataDescV1, boost::shared_ptr<Psana::Acqiris::DataDescV1>, boost::noncopyable >("DataDescV1", no_init)
     .def("data", &Psana::Acqiris::DataDescV1::data, return_internal_reference<>())
     .def("data_shape", &method_shape<Psana::Acqiris::DataDescV1, &Psana::Acqiris::DataDescV1::data_shape>)
-    .def("__typeid__", &method_typeid<Psana::Acqiris::DataDescV1>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Acqiris::DataDescV1> >(Pds::TypeId::Id_AcqWaveform, 1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Acqiris::DataDescV1> >(Pds::TypeId::Id_AcqWaveform));
 
   class_<Psana::Acqiris::TdcChannel >("TdcChannel", no_init)
     .def("channel", &Psana::Acqiris::TdcChannel::channel)
@@ -116,78 +96,60 @@ void createWrappers(PyObject* module) {
     .def("slope", &Psana::Acqiris::TdcChannel::slope)
     .def("mode", &Psana::Acqiris::TdcChannel::mode)
     .def("level", &Psana::Acqiris::TdcChannel::level)
-    .def("__typeid__", &method_typeid<Psana::Acqiris::TdcChannel>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Acqiris::TdcChannel> >(-1, -1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Acqiris::TdcChannel> >(-1));
 
   class_<Psana::Acqiris::TdcAuxIO >("TdcAuxIO", no_init)
     .def("channel", &Psana::Acqiris::TdcAuxIO::channel)
     .def("mode", &Psana::Acqiris::TdcAuxIO::mode)
     .def("term", &Psana::Acqiris::TdcAuxIO::term)
-    .def("__typeid__", &method_typeid<Psana::Acqiris::TdcAuxIO>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Acqiris::TdcAuxIO> >(-1, -1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Acqiris::TdcAuxIO> >(-1));
 
   class_<Psana::Acqiris::TdcVetoIO >("TdcVetoIO", no_init)
     .def("channel", &Psana::Acqiris::TdcVetoIO::channel)
     .def("mode", &Psana::Acqiris::TdcVetoIO::mode)
     .def("term", &Psana::Acqiris::TdcVetoIO::term)
-    .def("__typeid__", &method_typeid<Psana::Acqiris::TdcVetoIO>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Acqiris::TdcVetoIO> >(-1, -1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Acqiris::TdcVetoIO> >(-1));
 
   class_<Psana::Acqiris::TdcConfigV1, boost::shared_ptr<Psana::Acqiris::TdcConfigV1>, boost::noncopyable >("TdcConfigV1", no_init)
     .def("channels", &Psana::Acqiris::TdcConfigV1::channels)
     .def("auxio", &Psana::Acqiris::TdcConfigV1::auxio)
     .def("veto", &Psana::Acqiris::TdcConfigV1::veto, return_value_policy<copy_const_reference>())
-    .def("__typeid__", &method_typeid<Psana::Acqiris::TdcConfigV1>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Acqiris::TdcConfigV1> >(Pds::TypeId::Id_AcqTdcConfig, 1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Acqiris::TdcConfigV1> >(Pds::TypeId::Id_AcqTdcConfig));
 
   class_<Psana::Acqiris::TdcDataV1_Item >("TdcDataV1_Item", no_init)
     .def("value", &Psana::Acqiris::TdcDataV1_Item::value)
     .def("bf_val_", &Psana::Acqiris::TdcDataV1_Item::bf_val_)
     .def("source", &Psana::Acqiris::TdcDataV1_Item::source)
     .def("bf_ofv_", &Psana::Acqiris::TdcDataV1_Item::bf_ofv_)
-    .def("__typeid__", &method_typeid<Psana::Acqiris::TdcDataV1_Item>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Acqiris::TdcDataV1_Item> >(-1, -1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Acqiris::TdcDataV1_Item> >(-1));
 
   class_<Psana::Acqiris::TdcDataV1Common, boost::python::bases<Psana::Acqiris::TdcDataV1_Item> >("TdcDataV1Common", no_init)
     .def("nhits", &Psana::Acqiris::TdcDataV1Common::nhits)
     .def("overflow", &Psana::Acqiris::TdcDataV1Common::overflow)
-    .def("__typeid__", &method_typeid<Psana::Acqiris::TdcDataV1Common>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Acqiris::TdcDataV1Common> >(-1, -1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Acqiris::TdcDataV1Common> >(-1));
 
   class_<Psana::Acqiris::TdcDataV1Channel, boost::python::bases<Psana::Acqiris::TdcDataV1_Item> >("TdcDataV1Channel", no_init)
     .def("ticks", &Psana::Acqiris::TdcDataV1Channel::ticks)
     .def("overflow", &Psana::Acqiris::TdcDataV1Channel::overflow)
     .def("time", &Psana::Acqiris::TdcDataV1Channel::time)
-    .def("__typeid__", &method_typeid<Psana::Acqiris::TdcDataV1Channel>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Acqiris::TdcDataV1Channel> >(-1, -1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Acqiris::TdcDataV1Channel> >(-1));
 
   class_<Psana::Acqiris::TdcDataV1Marker, boost::python::bases<Psana::Acqiris::TdcDataV1_Item> >("TdcDataV1Marker", no_init)
     .def("type", &Psana::Acqiris::TdcDataV1Marker::type)
-    .def("__typeid__", &method_typeid<Psana::Acqiris::TdcDataV1Marker>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Acqiris::TdcDataV1Marker> >(-1, -1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Acqiris::TdcDataV1Marker> >(-1));
 
   class_<Psana::Acqiris::TdcDataV1, boost::shared_ptr<Psana::Acqiris::TdcDataV1>, boost::noncopyable >("TdcDataV1", no_init)
     .def("data", &Psana::Acqiris::TdcDataV1::data)
-    .def("__typeid__", &method_typeid<Psana::Acqiris::TdcDataV1>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Acqiris::TdcDataV1> >(Pds::TypeId::Id_AcqTdcData, 1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Acqiris::TdcDataV1> >(Pds::TypeId::Id_AcqTdcData));
 
   {
     PyObject* unvlist = PyList_New(1);

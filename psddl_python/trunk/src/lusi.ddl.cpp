@@ -20,12 +20,6 @@ using boost::shared_ptr;
 using std::vector;
 
 namespace {
-template <typename T>
-PyObject* method_typeid() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(T), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
 template<typename T, std::vector<int> (T::*MF)() const>
 PyObject* method_shape(const T *x) {
   return detail::vintToList((x->*MF)());
@@ -40,61 +34,47 @@ void createWrappers(PyObject* module) {
   class_<Psana::Lusi::DiodeFexConfigV1 >("DiodeFexConfigV1", no_init)
     .def("base", &Psana::Lusi::DiodeFexConfigV1::base)
     .def("scale", &Psana::Lusi::DiodeFexConfigV1::scale)
-    .def("__typeid__", &method_typeid<Psana::Lusi::DiodeFexConfigV1>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Lusi::DiodeFexConfigV1> >(Pds::TypeId::Id_DiodeFexConfig, 1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Lusi::DiodeFexConfigV1> >(Pds::TypeId::Id_DiodeFexConfig));
 
   class_<Psana::Lusi::DiodeFexConfigV2 >("DiodeFexConfigV2", no_init)
     .def("base", &Psana::Lusi::DiodeFexConfigV2::base)
     .def("scale", &Psana::Lusi::DiodeFexConfigV2::scale)
-    .def("__typeid__", &method_typeid<Psana::Lusi::DiodeFexConfigV2>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Lusi::DiodeFexConfigV2> >(Pds::TypeId::Id_DiodeFexConfig, 2));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Lusi::DiodeFexConfigV2> >(Pds::TypeId::Id_DiodeFexConfig));
 
   class_<Psana::Lusi::DiodeFexV1 >("DiodeFexV1", no_init)
     .def("value", &Psana::Lusi::DiodeFexV1::value)
-    .def("__typeid__", &method_typeid<Psana::Lusi::DiodeFexV1>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Lusi::DiodeFexV1> >(Pds::TypeId::Id_DiodeFex, 1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Lusi::DiodeFexV1> >(Pds::TypeId::Id_DiodeFex));
 
   class_<Psana::Lusi::IpmFexConfigV1, boost::shared_ptr<Psana::Lusi::IpmFexConfigV1>, boost::noncopyable >("IpmFexConfigV1", no_init)
     .def("diode", &Psana::Lusi::IpmFexConfigV1::diode)
     .def("xscale", &Psana::Lusi::IpmFexConfigV1::xscale)
     .def("yscale", &Psana::Lusi::IpmFexConfigV1::yscale)
-    .def("__typeid__", &method_typeid<Psana::Lusi::IpmFexConfigV1>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Lusi::IpmFexConfigV1> >(Pds::TypeId::Id_IpmFexConfig, 1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Lusi::IpmFexConfigV1> >(Pds::TypeId::Id_IpmFexConfig));
 
   class_<Psana::Lusi::IpmFexConfigV2, boost::shared_ptr<Psana::Lusi::IpmFexConfigV2>, boost::noncopyable >("IpmFexConfigV2", no_init)
     .def("diode", &Psana::Lusi::IpmFexConfigV2::diode)
     .def("xscale", &Psana::Lusi::IpmFexConfigV2::xscale)
     .def("yscale", &Psana::Lusi::IpmFexConfigV2::yscale)
-    .def("__typeid__", &method_typeid<Psana::Lusi::IpmFexConfigV2>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Lusi::IpmFexConfigV2> >(Pds::TypeId::Id_IpmFexConfig, 2));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Lusi::IpmFexConfigV2> >(Pds::TypeId::Id_IpmFexConfig));
 
   class_<Psana::Lusi::IpmFexV1 >("IpmFexV1", no_init)
     .def("channel", &Psana::Lusi::IpmFexV1::channel)
     .def("sum", &Psana::Lusi::IpmFexV1::sum)
     .def("xpos", &Psana::Lusi::IpmFexV1::xpos)
     .def("ypos", &Psana::Lusi::IpmFexV1::ypos)
-    .def("__typeid__", &method_typeid<Psana::Lusi::IpmFexV1>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Lusi::IpmFexV1> >(Pds::TypeId::Id_IpmFex, 1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Lusi::IpmFexV1> >(Pds::TypeId::Id_IpmFex));
 
   class_<Psana::Lusi::PimImageConfigV1 >("PimImageConfigV1", no_init)
     .def("xscale", &Psana::Lusi::PimImageConfigV1::xscale)
     .def("yscale", &Psana::Lusi::PimImageConfigV1::yscale)
-    .def("__typeid__", &method_typeid<Psana::Lusi::PimImageConfigV1>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Lusi::PimImageConfigV1> >(Pds::TypeId::Id_PimImageConfig, 1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Lusi::PimImageConfigV1> >(Pds::TypeId::Id_PimImageConfig));
 
   {
     PyObject* unvlist = PyList_New(1);

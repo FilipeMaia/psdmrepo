@@ -20,12 +20,6 @@ using boost::shared_ptr;
 using std::vector;
 
 namespace {
-template <typename T>
-PyObject* method_typeid() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(T), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
 template<typename T, std::vector<int> (T::*MF)() const>
 PyObject* method_shape(const T *x) {
   return detail::vintToList((x->*MF)());
@@ -48,18 +42,14 @@ void createWrappers(PyObject* module) {
     .def("autocalibEnable", &Psana::Gsc16ai::ConfigV1::autocalibEnable)
     .def("timeTagEnable", &Psana::Gsc16ai::ConfigV1::timeTagEnable)
     .def("numChannels", &Psana::Gsc16ai::ConfigV1::numChannels)
-    .def("__typeid__", &method_typeid<Psana::Gsc16ai::ConfigV1>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Gsc16ai::ConfigV1> >(Pds::TypeId::Id_Gsc16aiConfig, 1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Gsc16ai::ConfigV1> >(Pds::TypeId::Id_Gsc16aiConfig));
 
   class_<Psana::Gsc16ai::DataV1, boost::shared_ptr<Psana::Gsc16ai::DataV1>, boost::noncopyable >("DataV1", no_init)
     .def("timestamp", &Psana::Gsc16ai::DataV1::timestamp)
     .def("channelValue", &Psana::Gsc16ai::DataV1::channelValue)
-    .def("__typeid__", &method_typeid<Psana::Gsc16ai::DataV1>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Gsc16ai::DataV1> >(Pds::TypeId::Id_Gsc16aiData, 1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Gsc16ai::DataV1> >(Pds::TypeId::Id_Gsc16aiData));
 
   {
     PyObject* unvlist = PyList_New(1);

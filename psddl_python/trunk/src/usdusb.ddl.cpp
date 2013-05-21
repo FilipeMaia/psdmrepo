@@ -20,12 +20,6 @@ using boost::shared_ptr;
 using std::vector;
 
 namespace {
-template <typename T>
-PyObject* method_typeid() {
-  static PyObject* ptypeid = PyCObject_FromVoidPtr((void*)&typeid(T), 0);
-  Py_INCREF(ptypeid);
-  return ptypeid;
-}
 template<typename T, std::vector<int> (T::*MF)() const>
 PyObject* method_shape(const T *x) {
   return detail::vintToList((x->*MF)());
@@ -40,10 +34,8 @@ void createWrappers(PyObject* module) {
   class_<Psana::UsdUsb::ConfigV1, boost::shared_ptr<Psana::UsdUsb::ConfigV1>, boost::noncopyable >("ConfigV1", no_init)
     .def("counting_mode", &Psana::UsdUsb::ConfigV1::counting_mode)
     .def("quadrature_mode", &Psana::UsdUsb::ConfigV1::quadrature_mode)
-    .def("__typeid__", &method_typeid<Psana::UsdUsb::ConfigV1>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::UsdUsb::ConfigV1> >(Pds::TypeId::Id_UsdUsbConfig, 1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::UsdUsb::ConfigV1> >(Pds::TypeId::Id_UsdUsbConfig));
 
   class_<Psana::UsdUsb::DataV1, boost::shared_ptr<Psana::UsdUsb::DataV1>, boost::noncopyable >("DataV1", no_init)
     .def("digital_in", &Psana::UsdUsb::DataV1::digital_in)
@@ -51,10 +43,8 @@ void createWrappers(PyObject* module) {
     .def("status", &Psana::UsdUsb::DataV1::status)
     .def("analog_in", &Psana::UsdUsb::DataV1::analog_in)
     .def("encoder_count", &Psana::UsdUsb::DataV1::encoder_count)
-    .def("__typeid__", &method_typeid<Psana::UsdUsb::DataV1>)
-    .staticmethod("__typeid__")
   ;
-  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::UsdUsb::DataV1> >(Pds::TypeId::Id_UsdUsbData, 1));
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::UsdUsb::DataV1> >(Pds::TypeId::Id_UsdUsbData));
 
   {
     PyObject* unvlist = PyList_New(1);
