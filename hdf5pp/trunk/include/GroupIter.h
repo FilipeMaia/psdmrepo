@@ -65,7 +65,7 @@ public:
    *  @brief Constructor from existing group object.
    *  
    *  @param[in] group     Group object which is iterated
-   *  @param[in] skipSoft  if set to true then soft links are skipped
+   *  @param[in] type      Type of links to return
    *  
    *  Iterator will return all direct sub-groups of the specified group.
    */
