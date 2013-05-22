@@ -33,15 +33,6 @@
 // 		-- Class Interface --
 //		---------------------
 
-/**
- *  This software was developed for the LUSI project.  If you use all or
- *  part of it, please give an appropriate acknowledgment.
- *
- *  @version $Id$
- *
- *  @author Andrei Salnikov
- */
-
 namespace H5DataTypes {
 
 //
