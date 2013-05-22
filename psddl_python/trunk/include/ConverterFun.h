@@ -114,7 +114,6 @@ public:
   /**
    *  @brief Convert C++ object to Python
    *
-   *  @param[in] vdata  Void pointer to C++ data.
    *  @return New reference
    */
   virtual PyObject* convert(PSEvt::ProxyDictI& proxyDict, const PSEvt::Source& source, const std::string& key) const {
