@@ -45,8 +45,6 @@ public:
   virtual uint8_t vc() const;
   virtual uint8_t lane() const;
   virtual uint32_t frameNumber() const;
-  virtual uint32_t ticks() const;
-  virtual uint32_t fiducials() const;
   virtual uint32_t range() const;
   virtual const Psana::Imp::LaneStatus& laneStatus() const;
   virtual ndarray<const Psana::Imp::Sample, 1> samples() const;

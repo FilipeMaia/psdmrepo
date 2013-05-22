@@ -81,10 +81,6 @@ uint8_t ElementV1::lane() const { return m_xtcObj->lane(); }
 
 uint32_t ElementV1::frameNumber() const { return m_xtcObj->frameNumber(); }
 
-uint32_t ElementV1::ticks() const { return m_xtcObj->ticks(); }
-
-uint32_t ElementV1::fiducials() const { return m_xtcObj->fiducials(); }
-
 uint32_t ElementV1::range() const { return m_xtcObj->range(); }
 
 const Psana::Imp::LaneStatus& ElementV1::laneStatus() const { return _laneStatus; }
