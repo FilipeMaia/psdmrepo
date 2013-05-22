@@ -66,8 +66,6 @@ void createWrappers(PyObject* module) {
     .def("vc", &Psana::Imp::ElementV1::vc)
     .def("lane", &Psana::Imp::ElementV1::lane)
     .def("frameNumber", &Psana::Imp::ElementV1::frameNumber)
-    .def("ticks", &Psana::Imp::ElementV1::ticks)
-    .def("fiducials", &Psana::Imp::ElementV1::fiducials)
     .def("range", &Psana::Imp::ElementV1::range)
     .def("laneStatus", &Psana::Imp::ElementV1::laneStatus, return_value_policy<copy_const_reference>())
     .def("samples", &Psana::Imp::ElementV1::samples)
@@ -86,8 +84,8 @@ void createWrappers(PyObject* module) {
     PyObject_SetAttrString(submodule, "Element", unvlist);
     Py_CLEAR(unvlist);
   }
-  detail::register_ndarray_to_numpy_cvt<const uint32_t, 1>();
   detail::register_ndarray_to_list_cvt<const Psana::Imp::Sample>();
+  detail::register_ndarray_to_numpy_cvt<const uint16_t, 1>();
 
 } // createWrappers()
 } // namespace Imp
