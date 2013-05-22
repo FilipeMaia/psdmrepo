@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-06
+2013-05-22 Andy Salnikov
+- cleanup for doxygen comments
+
 Tag: V00-04-05
 2013-05-22 Andy Salnikov
 - update ImpSamples element type
