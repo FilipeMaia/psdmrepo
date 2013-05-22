@@ -78,6 +78,7 @@ codegen_python_description = "Template for Python library module"
 codegen_python_main_description = "Template for Python executable script"
 codegen_python_unit_test_description = "Template for Python unit test script"
 codegen_pyana_module_description = "Template for Pyana user analysis module"
+codegen_psana_py_module_description = "Template for Psana user analysis Python module"
 
 codegen_README_description = "Template for README file"
 codegen_ChangeLog_description = "Template for ChangeLog file"
@@ -100,6 +101,7 @@ codegen_dstdir['python'] = dict(py='src')
 codegen_dstdir['python_main'] = {'': 'app'}
 codegen_dstdir['python_unit_test'] = {'': 'test'}
 codegen_dstdir['pyana_module'] = dict(py='src')
+codegen_dstdir['psana_py_module'] = dict(py='src')
 
 codegen_dstdir['ChangeLog'] = {'': 'doc'}
 codegen_dstdir['README'] = {'': 'doc'}

@@ -1,0 +1,140 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $$Id$$
+#
+# Description:
+#  Psana user analysis module $class...
+#
+#------------------------------------------------------------------------
+
+"""User analysis module for psana framework.
+
+This software was developed for the LCLS project.  If you use all or 
+part of it, please give an appropriate acknowledgment.
+
+@version $$Id$$
+
+@author $author
+"""
+
+#------------------------------
+#  Module's version from SVN --
+#------------------------------
+__version__ = "$$Revision$$"
+# $$Source$$
+
+#--------------------------------
+#  Imports of standard modules --
+#--------------------------------
+import sys
+import logging
+
+#-----------------------------
+# Imports for other modules --
+#-----------------------------
+
+#----------------------------------
+# Local non-exported definitions --
+#----------------------------------
+
+# local definitions usually start with _
+
+#---------------------
+#  Class definition --
+#---------------------
+class $class (object) :
+    '''Class whose instance will be used as a user analysis module.'''
+
+    #--------------------
+    #  Class variables --
+    #--------------------
+    
+    # usual convention is to prefix static variables with s_
+    s_staticVariable = 0
+
+    #----------------
+    #  Constructor --
+    #----------------
+    def __init__(self):
+        '''Class constructor. Does not need any parameters'''
+
+        # Define instance variables, usual convention is to prefix 
+        # these variables with m_ (for "member").
+        # Use self.configXxx() methods to access configuration data
+        self.m_src = self.configSrc('source', ':Acqiris')
+        self.m_maxEvents = self.configInt('events', -1)
+
+    #-------------------
+    #  Public methods --
+    #-------------------
+
+    def beginJob( self, evt, env ) :
+        """This method is called once at the beginning of the job. It should
+        do a one-time initialization possibly extracting values from event
+        data or environment.
+
+        @param evt    event data object
+        @param env    environment object
+        """
+
+        # Preferred way to log information is via logging package
+        logging.info( "$class.beginJob() called" )
+
+
+    def beginRun( self, evt, env ) :
+        """This optional method is called if present at the beginning 
+        of the new run.
+
+        @param evt    event data object
+        @param env    environment object
+        """
+
+        logging.info( "$class.beginRun() called" )
+
+    def beginCalibCycle( self, evt, env ) :
+        """This optional method is called if present at the beginning 
+        of the new calibration cycle.
+
+        @param evt    event data object
+        @param env    environment object
+        """
+
+        logging.info( "$class.beginCalibCycle() called" )
+
+    def event( self, evt, env ) :
+        """This method is called for every L1Accept transition.
+
+        @param evt    event data object
+        @param env    environment object
+        """
+
+        pass
+
+    def endCalibCycle( self, evt, env ) :
+        """This optional method is called if present at the end of the 
+        calibration cycle.
+        
+        @param evt    event data object
+        @param env    environment object
+        """
+        
+        logging.info( "$class.endCalibCycle() called" )
+
+    def endRun( self, evt, env ) :
+        """This optional method is called if present at the end of the run.
+        
+        @param evt    event data object
+        @param env    environment object
+        """
+        
+        logging.info( "$class.endRun() called" )
+
+    def endJob( self, evt, env ) :
+        """This method is called at the end of the job. It should do 
+        final cleanup, e.g. close all open files.
+        
+        @param evt    event data object
+        @param env    environment object
+        """
+        
+        logging.info( "$class.endJob() called" )
