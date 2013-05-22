@@ -39,7 +39,7 @@ namespace H5DataTypes {
 ImpSample::ImpSample ( const XtcType& data )
 {
   for (unsigned i = 0; i != 4; ++ i) {
-    channels[i] = const_cast<XtcType&>(data).channel(i);
+    channels[i] = data.channel(i);
   }
 }
 
@@ -64,15 +64,15 @@ ImpSample::native_type()
 
 
 ImpLaneStatus::ImpLaneStatus ( const XtcType& data )
-  : linkErrCount(data.usLinkErrCount)
-  , linkDownCount(data.usLinkDownCount)
-  , cellErrCount(data.usCellErrCount)
-  , rxCount(data.usRxCount)
-  , locLinked(data.usLocLinked)
-  , remLinked(data.usRemLinked)
-  , zeros(data.zeros)
-  , powersOkay(data.powersOkay)
 {
+  linkErrCount = data & 0xf;
+  linkDownCount = (data >> 4) & 0xf;
+  cellErrCount = (data >> 8) & 0xf;
+  rxCount = (data >> 12) & 0xf;
+  locLinked = (data >> 16) & 0x1;
+  remLinked = (data >> 17) & 0x1;
+  zeros = (data >> 18) & 0x3ff;
+  powersOkay = (data >> 28) & 0xf;
 }
 
 hdf5pp::Type
@@ -101,13 +101,11 @@ ImpLaneStatus::native_type()
 
 
 ImpElementV1::ImpElementV1 ( const XtcType& data )
-  : vc(const_cast<XtcType&>(data).vc()) 
-  , lane(const_cast<XtcType&>(data).lane()) 
-  , frameNumber(const_cast<XtcType&>(data).frameNumber())
-  , ticks(const_cast<XtcType&>(data).ticks())
-  , fiducials(const_cast<XtcType&>(data).fiducials())
-  , range(const_cast<XtcType&>(data).range())
-  , laneStatus(const_cast<XtcType&>(data).laneStatus())
+  : vc(data.vc()) 
+  , lane(data.lane()) 
+  , frameNumber(data.frameNumber())
+  , range(data.range())
+  , laneStatus(data.laneStatus())
 {
 }
 
@@ -125,8 +123,6 @@ ImpElementV1::native_type()
   type.insert("vc", offsetof(DsType, vc), hdf5pp::TypeTraits<uint8_t>::native_type());
   type.insert("lane", offsetof(DsType, lane), hdf5pp::TypeTraits<uint8_t>::native_type());
   type.insert("frameNumber", offsetof(DsType, frameNumber), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("ticks", offsetof(DsType, ticks), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("fiducials", offsetof(DsType, fiducials), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("range", offsetof(DsType, range), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("laneStatus", offsetof(DsType, laneStatus), hdf5pp::TypeTraits<ImpLaneStatus>::native_type());
   return type;

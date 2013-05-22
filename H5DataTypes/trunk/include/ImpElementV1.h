@@ -61,7 +61,7 @@ private:
 class ImpLaneStatus  {
 public:
 
-  typedef Pds::Imp::LaneStatus XtcType ;
+  typedef uint32_t XtcType ;
 
   ImpLaneStatus () {}
   ImpLaneStatus ( const XtcType& data ) ;
@@ -101,8 +101,6 @@ private:
   uint32_t vc; 
   uint32_t lane; 
   uint32_t frameNumber; 
-  uint32_t ticks; 
-  uint32_t fiducials; 
   uint32_t range; 
   ImpLaneStatus laneStatus; 
 
