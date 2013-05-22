@@ -73,14 +73,14 @@ public:
   Sample()
   {
   }
-  Sample(const uint32_t* arg__channels)
+  Sample(const uint16_t* arg__channels)
   {
     std::copy(arg__channels, arg__channels+(4), _channels);
   }
-  ndarray<const uint32_t, 1> channels() const { return make_ndarray(&_channels[0], 4); }
-  static uint32_t _sizeof()  { return ((((0+(4*(4)))+4)-1)/4)*4; }
+  ndarray<const uint16_t, 1> channels() const { return make_ndarray(&_channels[0], 4); }
+  static uint32_t _sizeof()  { return ((((0+(2*(4)))+2)-1)/2)*2; }
 private:
-  uint32_t	_channels[4];
+  uint16_t	_channels[4];
 };
 
 /** @class LaneStatus
@@ -126,8 +126,6 @@ public:
   uint8_t vc() const { return uint8_t(this->_first & 0x3); }
   uint8_t lane() const { return uint8_t((this->_first>>6) & 0x3); }
   uint32_t frameNumber() const { return _frameNumber; }
-  uint32_t ticks() const { return _ticks; }
-  uint32_t fiducials() const { return _fiducials; }
   uint32_t range() const { return _range; }
   const Imp::LaneStatus& laneStatus() const { return _laneStatus; }
   ndarray<const Imp::Sample, 1> samples(const Imp::ConfigV1& cfg) const { ptrdiff_t offset=32;
