@@ -52,7 +52,7 @@ public:
   static hdf5pp::Type native_type() ;
 
 private:
-  uint32_t channels[4]; 
+  uint16_t channels[4];
 };
 
 //

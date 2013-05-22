@@ -55,7 +55,7 @@ ImpSample::native_type()
   typedef ImpSample DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
   hsize_t _array_type_channels_shape[] = { 4 };
-  hdf5pp::ArrayType _array_type_channels = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint32_t>::native_type(), 1, _array_type_channels_shape);
+  hdf5pp::ArrayType _array_type_channels = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint16_t>::native_type(), 1, _array_type_channels_shape);
   type.insert("channels", offsetof(DsType, channels), _array_type_channels);
   return type;
 }
