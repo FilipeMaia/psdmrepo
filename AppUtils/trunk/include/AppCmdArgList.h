@@ -40,8 +40,13 @@ extern "C" {
 // 		-- Class Interface --
 //		---------------------
 
+namespace AppUtils {
+
+/// @addtogroup AppUtils
 
 /**
+ *  @ingroup AppUtils
+ *
  *  This class represents a multi-word positional parameter in the command
  *  line. This is a templated class parameterized by the type of the parameter.
  *  Any type supported by the AppCmdTypeTraits is allowed as a template parameter.
@@ -57,8 +62,6 @@ extern "C" {
  *
  *  @author Andy Salnikov	(originator)
  */
-
-namespace AppUtils {
 
 template<class Type>
 class AppCmdArgList : public AppCmdArgBase {

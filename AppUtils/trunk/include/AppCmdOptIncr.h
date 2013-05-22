@@ -39,8 +39,13 @@ extern "C" {
 // 		-- Class Interface --
 //		---------------------
 
+namespace AppUtils {
+
+/// @addtogroup AppUtils
 
 /**
+ *  @ingroup AppUtils
+ *
  *  This class represents a command line option without argument. Every
  *  appearance of the option on the command line will increment the current
  *  value of the option.
@@ -56,8 +61,6 @@ extern "C" {
  *
  *  @author Andy Salnikov	(originator)
  */
-
-namespace AppUtils {
 
 class AppCmdOptIncr : public AppCmdOptBase {
 
@@ -104,7 +107,7 @@ public:
   virtual const std::string& description() const throw() ;
 
   /**
-   *  Return short option symbol for -x option, or '\0' if no short option
+   *  Return short option symbol for -x option, or @c NULL if no short option
    */
   virtual char shortOption() const throw() ;
 

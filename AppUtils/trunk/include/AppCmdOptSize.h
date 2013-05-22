@@ -31,21 +31,23 @@
 // 		-- Class Interface --
 //		---------------------
 
+namespace AppUtils {
+
+/// @addtogroup AppUtils
+
 /**
+ *  @ingroup AppUtils
+ *
  *  Option class for specifying size with a number+suffix. Acceptable
  *  suffixes are k, K, M, G.
  *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
  *
- *  @see AdditionalClass
- *
  *  @version $Id$
  *
  *  @author Andrei Salnikov
  */
-
-namespace AppUtils {
 
 class AppCmdOptSize : public AppCmdOptBase {
 public:
@@ -89,7 +91,7 @@ public:
   virtual const std::string& description() const throw() ;
 
   /**
-   *  Return short option symbol for -x option, or '\0' if no short option
+   *  Return short option symbol for -x option, or @c NULL if no short option
    */
   virtual char shortOption() const throw() ;
 

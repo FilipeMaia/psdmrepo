@@ -41,9 +41,14 @@ extern "C" {
 // 		-- Class Interface --
 //		---------------------
 
+namespace AppUtils {
+
+/// @addtogroup AppUtils
 
 /**
- *  This is an interface class for representaition of the positional
+ *  @ingroup AppUtils
+ *
+ *  This is an interface class for representation of the positional
  *  arguments in the command line.
  *
  *  This software was developed for the BaBar collaboration.  If you
@@ -59,8 +64,6 @@ extern "C" {
  *
  *  @author Andy Salnikov	(originator)
  */
-
-namespace AppUtils {
 
 class AppCmdArgBase {
 

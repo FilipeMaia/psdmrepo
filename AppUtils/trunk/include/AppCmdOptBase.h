@@ -40,8 +40,13 @@ extern "C" {
 // 		-- Class Interface --
 //		---------------------
 
+namespace AppUtils {
+
+/// @addtogroup AppUtils
 
 /**
+ *  @ingroup AppUtils
+ *
  *  This is the base class for the optional arguments in the command line.
  *  Every optional argument must provide its short option name (for the -x
  *  form), long option name (for the --xxx form) and specify whether it takes
@@ -69,8 +74,6 @@ extern "C" {
  *  @author Andy Salnikov	(originator)
  */
 
-namespace AppUtils {
-
 class AppCmdOptBase {
 
 public:
@@ -95,7 +98,7 @@ public:
   virtual const std::string& description() const throw() = 0 ;
 
   /**
-   *  Return short option symbol for -x option, or '\0' if no short option
+   *  Return short option symbol for -x option, or @c NULL if no short option
    */
   virtual char shortOption() const throw() = 0 ;
 

@@ -40,7 +40,13 @@ extern "C" {
 //		---------------------
 
 
+namespace AppUtils {
+
+/// @addtogroup AppUtils
+
 /**
+ *  @ingroup AppUtils
+ *
  *  This class represents a command line option without argument. The option
  *  has boolean value which will change its value for every appearance of the
  *  option in the command line.
@@ -56,8 +62,6 @@ extern "C" {
  *
  *  @author Andy Salnikov	(originator)
  */
-
-namespace AppUtils {
 
 class AppCmdOptToggle : public AppCmdOptBase {
 
@@ -104,7 +108,7 @@ public:
   virtual const std::string& description() const throw() ;
 
   /**
-   *  Return short option symbol for -x option, or '\0' if no short option
+   *  Return short option symbol for -x option, or @c NULL if no short option
    */
   virtual char shortOption() const throw() ;
 

@@ -41,7 +41,13 @@ extern "C" {
 //		---------------------
 
 
+namespace AppUtils {
+
+/// @addtogroup AppUtils
+
 /**
+ *  @ingroup AppUtils
+ *
  *  This class defines a command line option with argument. The argument is
  *  a string which is mapped to the value of the different type. Mapping is
  *  determined by user who should provide all accepted strings and their
@@ -58,8 +64,6 @@ extern "C" {
  *
  *  @author Andy Salnikov	(originator)
  */
-
-namespace AppUtils {
 
 template<class Type>
 class AppCmdOptNamedValue : public AppCmdOptBase {
@@ -105,7 +109,7 @@ public:
   virtual const std::string& description() const throw() ;
 
   /**
-   *  Return short option symbol for -x option, or '\0' if no short option
+   *  Return short option symbol for -x option, or @c NULL if no short option
    */
   virtual char shortOption() const throw() ;
 

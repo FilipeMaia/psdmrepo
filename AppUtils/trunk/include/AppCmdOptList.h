@@ -40,7 +40,13 @@ extern "C" {
 //		---------------------
 
 
+namespace AppUtils {
+
+/// @addtogroup AppUtils
+
 /**
+ *  @ingroup AppUtils
+ *
  *  This class defines a command line option with argument. This is a templated
  *  class parameterized by the type of the argument. Any type supported by the
  *  AppCmdTypeTraits can be used as a template parameter.
@@ -56,8 +62,6 @@ extern "C" {
  *
  *  @author Andy Salnikov	(originator)
  */
-
-namespace AppUtils {
 
 template<class Type>
 class AppCmdOptList : public AppCmdOptBase {
@@ -107,7 +111,7 @@ public:
   virtual const std::string& description() const throw() ;
 
   /**
-   *  Return short option symbol for -x option, or '\0' if no short option
+   *  Return short option symbol for -x option, or @c NULL if no short option
    */
   virtual char shortOption() const throw() ;
 

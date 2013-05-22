@@ -49,19 +49,22 @@
 // 		-- Class Interface --
 //		---------------------
 
+namespace AppUtils {
+
+/// @addtogroup AppUtils
+
 /**
+ *  @ingroup AppUtils
+ *
+ *  @brief Base class for applications.
  *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
  *
  *  @version $Id$
  *
  *  @author Andrei Salnikov
  */
-
-namespace AppUtils {
 
 class AppBase  {
 public:

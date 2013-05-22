@@ -207,7 +207,7 @@ AppCmdLine::helpWanted() const throw()
  *  Prints usage information
  */
 void
-AppCmdLine::usage ( ostream& out ) const
+AppCmdLine::usage ( std::ostream& out ) const
 {
   out.setf ( ios::left, ios::adjustfield ) ;
 

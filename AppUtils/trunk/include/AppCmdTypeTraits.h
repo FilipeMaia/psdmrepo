@@ -43,7 +43,13 @@
 //		---------------------
 
 
+namespace AppUtils {
+
+/// @addtogroup AppUtils
+
 /**
+ *  @ingroup AppUtils
+ *
  *  Type traits for the command line options and arguments. Every type
  *  to be used as the template parameter for classes AppCmdArg<T> or
  *  AppCmdOpt<T> should provide specialization for the AppCmdTypeTraits<T>
@@ -61,8 +67,6 @@
  *
  *  @author Andy Salnikov	(originator)
  */
-
-namespace AppUtils {
 
 template<class T>
 struct AppCmdTypeTraits {

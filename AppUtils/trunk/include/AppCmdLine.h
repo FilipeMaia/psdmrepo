@@ -44,8 +44,17 @@ extern "C" {
 // 		-- Class Interface --
 //		---------------------
 
+namespace AppUtils {
+
+class AppCmdArgBase ;
+class AppCmdOptBase ;
+template <typename T> class AppCmdOptList ;
+
+/// @addtogroup AppUtils
 
 /**
+ *  @ingroup AppUtils
+ *
  *  This class is the command-line parser. Some ideas are borrowed from CLHEP
  *  but implementation is different, and CLHEP's bugs are fixed. Here is an
  *  example of its usage:
@@ -99,12 +108,6 @@ extern "C" {
  *
  *  @author Andy Salnikov	(originator)
  */
-
-namespace AppUtils {
-
-class AppCmdArgBase ;
-class AppCmdOptBase ;
-template <typename T> class AppCmdOptList ;
 
 class AppCmdLine {
 

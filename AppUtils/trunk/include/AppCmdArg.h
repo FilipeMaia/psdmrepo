@@ -40,7 +40,13 @@ extern "C" {
 //		---------------------
 
 
+namespace AppUtils {
+
+/// @addtogroup AppUtils
+
 /**
+ *  @ingroup AppUtils
+ *
  *  This class represents a single-word positional parameter in the command
  *  line. This is a templated class parameterized by the type of the parameter.
  *  Any type supported by the AppCmdTypeTraits is allowed as a template parameter.
@@ -48,16 +54,14 @@ extern "C" {
  *  This software was developed for the BaBar collaboration.  If you
  *  use all or part of it, please give an appropriate acknowledgment.
  *
- *  Copyright (C) 2003		SLAC
+ *  Copyright (C) 2003          SLAC
  *
  *  @see AppCmdArgBase
  *
  *  @version $Id$
  *
- *  @author Andy Salnikov	(originator)
+ *  @author Andy Salnikov       (originator)
  */
-
-namespace AppUtils {
 
 template<class Type>
 class AppCmdArg : public AppCmdArgBase {
