@@ -119,7 +119,7 @@ hdf5pp::Type ns_Sample_v0_dataset_data_stored_type()
   typedef ns_Sample_v0::dataset_data DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
   hsize_t _array_type_channels_shape[] = { 4 };
-  hdf5pp::ArrayType _array_type_channels = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint32_t>::stored_type(), 1, _array_type_channels_shape);
+  hdf5pp::ArrayType _array_type_channels = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint16_t>::stored_type(), 1, _array_type_channels_shape);
   type.insert("channels", offsetof(DsType, channels), _array_type_channels);
   return type;
 }
@@ -135,7 +135,7 @@ hdf5pp::Type ns_Sample_v0_dataset_data_native_type()
   typedef ns_Sample_v0::dataset_data DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
   hsize_t _array_type_channels_shape[] = { 4 };
-  hdf5pp::ArrayType _array_type_channels = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint32_t>::native_type(), 1, _array_type_channels_shape);
+  hdf5pp::ArrayType _array_type_channels = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint16_t>::native_type(), 1, _array_type_channels_shape);
   type.insert("channels", offsetof(DsType, channels), _array_type_channels);
   return type;
 }
@@ -207,8 +207,6 @@ hdf5pp::Type ns_ElementV1_v0_dataset_data_stored_type()
   type.insert("vc", offsetof(DsType, vc), hdf5pp::TypeTraits<uint8_t>::stored_type());
   type.insert("lane", offsetof(DsType, lane), hdf5pp::TypeTraits<uint8_t>::stored_type());
   type.insert("frameNumber", offsetof(DsType, frameNumber), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("ticks", offsetof(DsType, ticks), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("fiducials", offsetof(DsType, fiducials), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("range", offsetof(DsType, range), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("laneStatus", offsetof(DsType, laneStatus), hdf5pp::TypeTraits<Imp::ns_LaneStatus_v0::dataset_data>::stored_type());
   return type;
@@ -227,8 +225,6 @@ hdf5pp::Type ns_ElementV1_v0_dataset_data_native_type()
   type.insert("vc", offsetof(DsType, vc), hdf5pp::TypeTraits<uint8_t>::native_type());
   type.insert("lane", offsetof(DsType, lane), hdf5pp::TypeTraits<uint8_t>::native_type());
   type.insert("frameNumber", offsetof(DsType, frameNumber), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("ticks", offsetof(DsType, ticks), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("fiducials", offsetof(DsType, fiducials), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("range", offsetof(DsType, range), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("laneStatus", offsetof(DsType, laneStatus), hdf5pp::TypeTraits<Imp::ns_LaneStatus_v0::dataset_data>::native_type());
   return type;
@@ -259,16 +255,6 @@ template <typename Config>
 uint32_t ElementV1_v0<Config>::frameNumber() const {
   if (not m_ds_data) read_ds_data();
   return uint32_t(m_ds_data->frameNumber);
-}
-template <typename Config>
-uint32_t ElementV1_v0<Config>::ticks() const {
-  if (not m_ds_data) read_ds_data();
-  return uint32_t(m_ds_data->ticks);
-}
-template <typename Config>
-uint32_t ElementV1_v0<Config>::fiducials() const {
-  if (not m_ds_data) read_ds_data();
-  return uint32_t(m_ds_data->fiducials);
 }
 template <typename Config>
 uint32_t ElementV1_v0<Config>::range() const {

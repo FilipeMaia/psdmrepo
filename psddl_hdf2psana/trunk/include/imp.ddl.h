@@ -68,7 +68,7 @@ struct dataset_data {
   dataset_data();
   ~dataset_data();
 
-  uint32_t channels[4]; 
+  uint16_t channels[4]; 
 
   operator Psana::Imp::Sample() const { return Psana::Imp::Sample(channels); }
 };
@@ -106,8 +106,6 @@ struct dataset_data {
   uint8_t vc; 
   uint8_t lane; 
   uint32_t frameNumber; 
-  uint32_t ticks; 
-  uint32_t fiducials; 
   uint32_t range; 
   Imp::ns_LaneStatus_v0::dataset_data laneStatus; 
 
@@ -126,8 +124,6 @@ public:
   virtual uint8_t vc() const;
   virtual uint8_t lane() const;
   virtual uint32_t frameNumber() const;
-  virtual uint32_t ticks() const;
-  virtual uint32_t fiducials() const;
   virtual uint32_t range() const;
   virtual const Psana::Imp::LaneStatus& laneStatus() const;
   virtual ndarray<const Psana::Imp::Sample, 1> samples() const;
