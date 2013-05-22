@@ -75,7 +75,7 @@ pypdsdata::Imp::Sample::print(std::ostream& out) const
   out << "imp.Sample([";
   for (unsigned i = 0; i != Pds::Imp::channelsPerDevice; ++ i) {
     if (i > 0) out << ", ";
-    out << const_cast<Pds::Imp::Sample&>(m_obj).channel(i);
+    out << m_obj.channel(i);
   }
   out << "])";
 }
