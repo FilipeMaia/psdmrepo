@@ -11,6 +11,11 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-08
+2013-05-21 Igor Gaponenko
+- added updated schema file to support the 'EPICS' run type
+- updated C++ API and the test application accordingly
+
 Tag: V00-03-07
 2013-03-21 Igor Gaponenko
 - added updated schema file
