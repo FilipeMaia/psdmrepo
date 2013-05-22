@@ -82,8 +82,6 @@ class dump_imp (object) :
         print "  vc =", data.vc()
         print "  lane =", data.lane()
         print "  frameNumber =", data.frameNumber()
-        print "  ticks =", data.ticks()
-        print "  fiducials =", data.fiducials()
         print "  range =", data.range()
 
         laneStatus = data.laneStatus()

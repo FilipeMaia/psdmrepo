@@ -95,8 +95,6 @@ DumpImp::event(Event& evt, Env& env)
           << "\n  vc = " << int(data1->vc())
           << "\n  lane = " << int(data1->lane())
           << "\n  frameNumber = " << data1->frameNumber()
-          << "\n  ticks = " << data1->ticks()
-          << "\n  fiducials = " << data1->fiducials()
           << "\n  range = " << data1->range();
 
       Psana::Imp::LaneStatus laneStatus = data1->laneStatus();
