@@ -34,20 +34,18 @@
 // 		-- Class Interface --
 //		---------------------
 
+namespace PSXtcInput {
+
 /**
  *  Exception classes
  *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgement.
  *
- *  @see AdditionalClass
- *
  *  @version $Id$
  *
  *  @author Andrei Salnikov
  */
-
-namespace PSXtcInput {
 
 class Exception : public ErrSvc::Issue {
 public:
