@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-03
+2013-05-22 Andy Salnikov
+- fix dump_imp.py
+
 Tag: V00-04-02
 2013-05-22 Andy Salnikov
 - few mods to Imp examples

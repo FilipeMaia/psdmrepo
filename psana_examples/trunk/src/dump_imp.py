@@ -57,7 +57,7 @@ class dump_imp (object) :
 
     def beginRun( self, evt, env ) :
 
-        config = env.configStore().get(Imp.Config)
+        config = env.configStore().get(Imp.Config, self.m_src)
         if config:
             print "dump_imp: %s: %s" % (config.__class__.__name__, self.m_src)
             print "  range =", config.range()
