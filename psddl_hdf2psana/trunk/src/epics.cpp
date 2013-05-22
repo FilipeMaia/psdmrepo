@@ -742,7 +742,7 @@ public:
 };
 
 
-/**
+/*
  *  Read data from specified group and convert them into EPICS object
  */
 boost::shared_ptr<Psana::Epics::EpicsPvHeader>
@@ -759,7 +759,7 @@ readEpics(const hdf5pp::DataSet& ds, int64_t idx)
   return ::readEpics(ds, idx, *hdr);
 }
 
-/**
+/*
  *  Read data from specified group and convert them into EPICS object
  */
 boost::shared_ptr<Psana::Epics::EpicsPvHeader>
