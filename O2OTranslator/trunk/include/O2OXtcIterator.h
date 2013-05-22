@@ -33,20 +33,22 @@
 // 		-- Class Interface --
 //		---------------------
 
+namespace O2OTranslator {
+
+/// @addtogroup O2OTranslator
+
 /**
+ *  @ingroup O2OTranslator
+ *
  *  Subclass of XtcIterator which forwards all
  *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgement.
  *
- *  @see AdditionalClass
- *
  *  @version $Id$
  *
  *  @author Andrei Salnikov
  */
-
-namespace O2OTranslator {
 
 class O2OXtcScannerI ;
 class O2ODataTypeCvtI ;

@@ -45,13 +45,15 @@
 
 namespace O2OTranslator {
 
+/// @addtogroup O2OTranslator
+
 /**
+ *  @ingroup O2OTranslator
+ *
  *  Data converter class for event-type data objects
  *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
  *
  *  @version $Id$
  *

@@ -36,7 +36,11 @@ namespace O2OTranslator {
 
 class ConfigObjectStore;
 
+/// @addtogroup O2OTranslator
+
 /**
+ *  @ingroup O2OTranslator
+ *
  *  Special converter class for Princeton frame XTC class,
  *  this converter works for both FrameV1 and FrameV2 classes.
  *  Its template argument should be either H5DataTypes::PrincetonFrameV1

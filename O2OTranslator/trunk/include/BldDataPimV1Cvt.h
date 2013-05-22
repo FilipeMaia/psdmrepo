@@ -35,13 +35,15 @@
 
 namespace O2OTranslator {
 
+/// @addtogroup O2OTranslator
+
 /**
+ *  @ingroup O2OTranslator
+ *
  *  Special converter class for Pds::BldDataPimV1
  *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
  *
  *  @version $Id$
  *

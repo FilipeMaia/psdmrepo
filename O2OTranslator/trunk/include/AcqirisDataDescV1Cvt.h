@@ -38,13 +38,15 @@ namespace O2OTranslator {
 
 class ConfigObjectStore;
 
+/// @addtogroup O2OTranslator
+
 /**
- *  Special converter class for Pds::Acqiris::DataDescV1
+ *  @ingroup O2OTranslator
+ *
+ *  @brief Special converter class for Pds::Acqiris::DataDescV1
  *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
  *
  *  @version $Id$
  *

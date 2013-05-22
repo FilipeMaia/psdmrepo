@@ -35,12 +35,13 @@
 
 namespace O2OTranslator {
 
+/// @addtogroup O2OTranslator
+
 /**
+ *  @ingroup O2OTranslator
  *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
  *
  *  @version $Id$
  *
@@ -62,6 +63,7 @@ public:
    *                            derived from type, should be unique.
    *  @param[in] src            Data source
    *  @param[in] cvtOptions     Conversion options
+   *  @param[in] schemaVersion  Schema version number
    *  @param[in] dsname         Dataset name, usually it is "data", may be changed to anything
    */
   EvtDataTypeCvtDef ( const hdf5pp::Group& group,

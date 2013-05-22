@@ -37,13 +37,15 @@
 
 namespace O2OTranslator {
 
+/// @addtogroup O2OTranslator
+
 /**
- *  Data container factory for EPICS types.
+ *  @ingroup O2OTranslator
+ *
+ *  @brief Data container factory for EPICS types.
  *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
  *
  *  @version $Id$
  *

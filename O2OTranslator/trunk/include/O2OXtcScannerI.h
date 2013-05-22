@@ -38,7 +38,11 @@
 
 namespace O2OTranslator {
 
+/// @addtogroup O2OTranslator
+
 /**
+ *  @ingroup O2OTranslator
+ *
  *  @brief Interface for a "visitor" class for XTC scanning.
  *
  *  This software was developed for the LUSI project.  If you use all or

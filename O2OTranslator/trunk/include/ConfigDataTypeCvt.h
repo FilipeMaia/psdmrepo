@@ -36,19 +36,20 @@
 // 		-- Class Interface --
 //		---------------------
 
+namespace O2OTranslator {
+
+/// @addtogroup O2OTranslator
+
 /**
+ *  @ingroup O2OTranslator
  *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
  *
  *  @version $Id$
  *
  *  @author Andrei Salnikov
  */
-
-namespace O2OTranslator {
 
 template <typename H5Type>
 class ConfigDataTypeCvt : public DataTypeCvt<typename H5Type::XtcType> {
@@ -63,6 +64,7 @@ public:
    *  @param[in] typeGroupName  Name of the group for this type, arbitrary string usually
    *                            derived from type, should be unique.
    *  @param[in] src            Data source
+   *  @param[in] schemaVersion  Schema version number
    */
   ConfigDataTypeCvt(hdf5pp::Group group, const std::string& typeGroupName,
       const Pds::Src& src, int schemaVersion)

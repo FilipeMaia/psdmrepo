@@ -37,16 +37,18 @@
 
 namespace O2OTranslator {
 
+/// @addtogroup O2OTranslator
+
 /**
- *  Storage for calibration objects.
+ *  @ingroup O2OTranslator
+ *
+ *  @brief Storage for calibration objects.
  *  
  *  Object in the calibration store are identified by their C++ type
  *  and address of the detector.
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
  *
  *  @version $Id$
  *

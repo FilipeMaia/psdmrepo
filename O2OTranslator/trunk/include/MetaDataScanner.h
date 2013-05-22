@@ -41,10 +41,12 @@ namespace O2OTranslator {
 
 class O2OMetaData ;
 
+/// @addtogroup O2OTranslator
+
 /**
- *  XTC scanner class which collect metadata and stores them in SciMD database.
+ *  @ingroup O2OTranslator
  *
- *  @see AdditionalClass
+ *  XTC scanner class which collect metadata and stores them in SciMD database.
  *
  *  @version $Id$
  *

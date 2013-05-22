@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-28-07
+2013-05-22 Andy Salnikov
+- cleaning up doxygen comments
+
 Tag: V00-28-06
 2013-05-15 Andy Salnikov
 - add support for Imp types

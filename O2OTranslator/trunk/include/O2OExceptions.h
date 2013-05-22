@@ -34,20 +34,22 @@
 // 		-- Class Interface --
 //		---------------------
 
+namespace O2OTranslator {
+
+/// @addtogroup O2OTranslator
+
 /**
+ *  @ingroup O2OTranslator
+ *
  *  Exception classes
  *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgement.
  *
- *  @see AdditionalClass
- *
  *  @version $Id$
  *
  *  @author Andrei Salnikov
  */
-
-namespace O2OTranslator {
 
 class O2OException : public ErrSvc::Issue {
 public:

@@ -41,13 +41,15 @@ namespace O2OTranslator {
 
 class ConfigObjectStore;
 
+/// @addtogroup O2OTranslator
+
 /**
- *  Converter type for EPICS XTC data
+ *  @ingroup O2OTranslator
+ *
+ *  @brief Converter type for EPICS XTC data
  *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
  *
  *  @version $Id$
  *

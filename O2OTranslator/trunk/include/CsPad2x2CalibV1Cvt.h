@@ -38,15 +38,17 @@ namespace O2OTranslator {
 
 namespace O2OTranslator {
 
+/// @addtogroup O2OTranslator
+
 /**
+ *  @ingroup O2OTranslator
+ *
  *  Special converter class which reads cspad calibration data from 
  *  external source and prodices HDF5 object from it and also stores 
  *  calibration objects in calibration store.
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
  *
  *  @version $Id$
  *

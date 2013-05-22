@@ -31,19 +31,20 @@
 // 		-- Class Interface --
 //		---------------------
 
+namespace O2OTranslator {
+
+/// @addtogroup O2OTranslator
+
 /**
+ *  @ingroup O2OTranslator
  *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
  *
  *  @version $Id$
  *
  *  @author Andrei Salnikov
  */
-
-namespace O2OTranslator {
 
 template <typename T>
 class DataTypeCvt : public DataTypeCvtI {

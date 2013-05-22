@@ -37,13 +37,15 @@
 
 namespace O2OTranslator {
 
+/// @addtogroup O2OTranslator
+
 /**
- *  Special converter class for Pds::CsPad::ElementV1 XTC class
+ *  @ingroup O2OTranslator
+ *
+ *  @brief Special converter class for Pds::CsPad::ElementV1 XTC class
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
  *
  *  @version $Id$
  *

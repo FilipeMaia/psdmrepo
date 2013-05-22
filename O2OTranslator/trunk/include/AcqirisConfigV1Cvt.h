@@ -41,7 +41,7 @@ namespace O2OTranslator {
 /**
  *  @ingroup O2OTranslator
  *
- *  @brief Special coverter class for Acqiris confugration class.
+ *  @brief Special converter class for Acqiris configuration class.
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.

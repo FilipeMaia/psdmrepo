@@ -51,13 +51,15 @@ class O2OFileNameFactory;
 class O2ODataTypeCvtI;
 class O2OMetaData;
 
+/// @addtogroup O2OTranslator
+
 /**
+ *  @ingroup O2OTranslator
+ *
  *  Scanner class that sends all data to HDF5 file.
  *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
  *
  *  @version $Id$
  *

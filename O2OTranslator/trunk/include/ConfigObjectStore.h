@@ -36,13 +36,15 @@
 
 namespace O2OTranslator {
 
+/// @addtogroup O2OTranslator
+
 /**
- *  Class which stores all configuration objects.
+ *  @ingroup O2OTranslator
+ *
+ *  @brief Class which stores all configuration objects.
  *
  *  This software was developed for the LCLS project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
  *
  *  @version $Id$
  *

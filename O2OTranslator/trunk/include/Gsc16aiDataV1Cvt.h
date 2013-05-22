@@ -37,8 +37,12 @@ namespace O2OTranslator {
 
 class ConfigObjectStore;
 
+/// @addtogroup O2OTranslator
+
 /**
- *  Special converter class for Pds::Gsc16ai::DataV1 XTC class
+ *  @ingroup O2OTranslator
+ *
+ *  @brief Special converter class for Pds::Gsc16ai::DataV1 XTC class
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.

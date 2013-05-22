@@ -35,8 +35,12 @@
 
 namespace O2OTranslator {
 
+/// @addtogroup O2OTranslator
+
 /**
- *  Special converter class for Pds::Acqiris::TdcDataV1
+ *  @ingroup O2OTranslator
+ *
+ *  @brief Special converter class for Pds::Acqiris::TdcDataV1
  *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.

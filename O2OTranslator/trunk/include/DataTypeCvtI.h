@@ -37,20 +37,22 @@
 // 		-- Class Interface --
 //		---------------------
 
+namespace O2OTranslator {
+
+/// @addtogroup O2OTranslator
+
 /**
- *  Abstract base class for data type converters for event-type objects
+ *  @ingroup O2OTranslator
+ *
+ *  @brief Abstract base class for data type converters for event-type objects
  *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
  *
  *  @version $Id$
  *
  *  @author Andrei Salnikov
  */
-
-namespace O2OTranslator {
 
 class DataTypeCvtI : boost::noncopyable {
 public:
