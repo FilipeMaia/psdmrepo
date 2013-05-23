@@ -34,7 +34,7 @@
 
 namespace PSHdf5Input {
 
-/// Standard stream insertion operator for enum type
+// Standard stream insertion operator for enum type
 std::ostream&
 operator<<(std::ostream& out, Hdf5IterData::EventType type)
 {
@@ -68,7 +68,7 @@ operator<<(std::ostream& out, Hdf5IterData::EventType type)
   return out << str;
 }
 
-/// Standard stream insertion operator for data type
+// Standard stream insertion operator for data type
 std::ostream&
 operator<<(std::ostream& out, const Hdf5IterData& data)
 {

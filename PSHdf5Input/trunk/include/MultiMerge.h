@@ -37,6 +37,8 @@
 namespace PSHdf5Input {
 
 /**
+ *  @ingroup PSHdf5Input
+ *
  *  @brief Implementation of the merge function for a number of iterators.
  *
  *  This software was developed for the LCLS project.  If you use all or 

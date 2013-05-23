@@ -38,6 +38,8 @@
 namespace PSHdf5Input {
 
 /**
+ *  @ingroup PSHdf5Input
+ *
  *  @brief Class defining an iterator for time-ordered scan of datasets.
  *  
  *  The only requirement for dataset is that it has a name "time" and

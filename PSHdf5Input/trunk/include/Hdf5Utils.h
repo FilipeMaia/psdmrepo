@@ -35,8 +35,6 @@
 
 namespace PSHdf5Input {
 
-/// @addtogroup PSHdf5Input
-
 /**
  *  @ingroup PSHdf5Input
  *

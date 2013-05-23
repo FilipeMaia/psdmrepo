@@ -31,11 +31,12 @@
 // 		-- Class Interface --
 //		---------------------
 
-/// @addgroup PSHdf5Input
 
 namespace PSHdf5Input {
 
 /**
+ *  @ingroup PSHdf5Input
+ *
  *  @brief Base class for exceptions generated in PSHdf5Input package.
  *  
  *  This software was developed for the LCLS project.  If you use all or 

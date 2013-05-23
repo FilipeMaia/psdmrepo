@@ -39,7 +39,7 @@ namespace PSHdf5Input {
 
 /**
  *  @ingroup PSHdf5Input
- *  
+ *
  *  @brief Class which defines data returned from Hdf5 iterator classes.
  *  
  *  The data object returned by iterators is actually a collection of 

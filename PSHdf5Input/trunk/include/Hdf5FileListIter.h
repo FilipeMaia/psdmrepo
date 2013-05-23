@@ -42,7 +42,7 @@ namespace PSHdf5Input {
 
 /**
  *  @ingroup PSHdf5Input
- *  
+ *
  *  @brief Iterator class which merges iterators from several files.
  *  
  *  This is the class which is a merge iterator for several HDF files.

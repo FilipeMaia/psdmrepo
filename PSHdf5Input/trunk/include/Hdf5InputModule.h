@@ -43,7 +43,7 @@ class Hdf5IterData;
 /**
  *  @defgroup PSHdf5Input PSHdf5Input package
  *  
- *  @brief Package with the implementation if psana input module for HDF5 files.
+ *  @brief Package with the implementation of psana input module for HDF5 files.
  *  
  */
 

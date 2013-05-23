@@ -34,6 +34,8 @@
 namespace PSHdf5Input {
 
 /**
+ *  @ingroup PSHdf5Input
+ *
  *  @brief class for data returned by Hdf5DatasetIter iterator class.
  *  
  *  The data of this type will be merged by the MultiMerge class

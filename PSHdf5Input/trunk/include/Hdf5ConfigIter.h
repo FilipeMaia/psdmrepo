@@ -43,7 +43,7 @@ namespace PSHdf5Input {
 
 /**
  *  @ingroup PSHdf5Input
- *  
+ *
  *  @brief Iterator class which iterates over events in a single Configure group.
  *
  *  This software was developed for the LCLS project.  If you use all or 
