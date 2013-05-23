@@ -43,7 +43,11 @@ namespace XtcInput {
 
 class XtcChunkDgIter ;
 
+/// @addtogroup XtcInput
+
 /**
+ *  @ingroup XtcInput
+ *
  *  @brief Datagram iterator for datagrams in a single XTC stream
  *
  *  Class which merges the chunks from multiple chunks from a single XTC stream.

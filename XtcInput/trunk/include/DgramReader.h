@@ -37,8 +37,12 @@ namespace XtcInput {
 
 class DgramQueue ;
 
+/// @addtogroup XtcInput
+
 /**
- *  Thread which reads datagrams from the list of XTC files
+ *  @ingroup XtcInput
+ *
+ *  @brief Thread which reads datagrams from the list of XTC files
  *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.

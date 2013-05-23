@@ -35,7 +35,7 @@
 
 namespace XtcInput {
 
-/// Make merge mode from string
+// Make merge mode from string
 MergeMode 
 mergeMode(const std::string& str)
 {

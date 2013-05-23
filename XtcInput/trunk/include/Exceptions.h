@@ -34,8 +34,14 @@
 // 		-- Class Interface --
 //		---------------------
 
+namespace XtcInput {
+
+/// @addtogroup XtcInput
+
 /**
- *  Exception classes
+ *  @ingroup XtcInput
+ *
+ *  @brief Exception classes
  *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgement.
@@ -44,8 +50,6 @@
  *
  *  @author Andrei Salnikov
  */
-
-namespace XtcInput {
 
 class Exception : public ErrSvc::Issue {
 public:

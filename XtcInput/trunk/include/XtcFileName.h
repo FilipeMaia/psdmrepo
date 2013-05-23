@@ -35,8 +35,12 @@
 
 namespace XtcInput {
 
+/// @addtogroup XtcInput
+
 /**
- *  Representation of the XTC file name.
+ *  @ingroup XtcInput
+ *
+ *  @brief Representation of the XTC file name.
  *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.

@@ -32,7 +32,13 @@
 // 		-- Class Interface --
 //		---------------------
 
+namespace XtcInput {
+
+/// @addtogroup XtcInput
+
 /**
+ *  @ingroup XtcInput
+ *
  *  @brief XTC iterator which does recursive iteration and returns every 
  *  individual XTC object.
  *
@@ -43,8 +49,6 @@
  *
  *  @author Andrei Salnikov
  */
-
-namespace XtcInput {
 
 class XtcIterator {
 public:

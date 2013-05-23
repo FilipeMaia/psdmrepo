@@ -38,7 +38,11 @@
 
 namespace XtcInput {
 
+/// @addtogroup XtcInput
+
 /**
+ *  @ingroup XtcInput
+ *
  *  @brief Datagram iterator for datagrams in a single chunk file.
  *
  *  This software was developed for the LUSI project.  If you use all or

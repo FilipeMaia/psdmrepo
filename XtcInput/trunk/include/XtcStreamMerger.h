@@ -40,7 +40,11 @@
 
 namespace XtcInput {
 
+/// @addtogroup XtcInput
+
 /**
+ *  @ingroup XtcInput
+ *
  *  @brief datagram iterator which merges data from several streams.
  *
  *  Class responsible for merging of the datagrams from several

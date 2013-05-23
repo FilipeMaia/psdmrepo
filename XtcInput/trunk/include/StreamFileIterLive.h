@@ -60,6 +60,7 @@ public:
    *  @param[in] expNum    Experiment number
    *  @param[in] run       Run number
    *  @param[in] stream    Stream number, or -1 for all stream, -2 for any one stream
+   *  @param[in] liveTimeout Timeout in second to wait for live data
    *  @param[in] filesdb   Database connection
    */
   StreamFileIterLive (unsigned expNum, unsigned run, int stream, unsigned liveTimeout,

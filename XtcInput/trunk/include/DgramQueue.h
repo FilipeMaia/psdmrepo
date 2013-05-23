@@ -38,8 +38,12 @@
 
 namespace XtcInput {
 
+/// @addtogroup XtcInput
+
 /**
- *  Synchronized datagram queue.
+ *  @ingroup XtcInput
+ *
+ *  @brief Synchronized datagram queue.
  *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
