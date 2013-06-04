@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta content="text/html; charset=UTF-8" http-equiv="content-type">
+    <title>Shift Operations Report</title>
+    <script type="text/javascript" src="js/shift.js"></script>
+    <link type="text/css" href="/jquery/css/custom-theme/jquery-ui.custom.css" rel="Stylesheet">
+
+    <script type="text/javascript" src="/jquery/js/jquery.min.js"></script>
+    <script type="text/javascript" src="/jquery/js/jquery-ui.custom.min.js"></script>
+    <script type="text/javascript" src="/jquery/js/jquery.form.js"></script> 
+    <script type="text/javascript" src="/jquery/js/jquery.json.js"></script>
+
+    <style>
+      table {
+        margin-left: 40px;
+      }
+      table.borderless td {
+        border: 0;
+      }
+      table.bottomline td {
+        vertical-align: top; 
+        border-bottom: 1px solid #000;
+      }
+    </style>
+  </head>
+  <body onload="onload()" id="body">
+    <h2>LCLS Single Shift Science Staff Report</h2>
+
+    <!------------------------------ General Shift Information ------------------------------>
+    <h3>Shift Report Information</h3>
+    <p><i>Enter dates in yyyy-mm-dd format; times in hh:mm (24-hour, no am/pm) format.</i></p>
+    <table class="borderless" id="shift_report_information_table">
+      <tbody>
+      </tbody>
+    </table>
+
+    <!------------------------------ Calculated Values ------------------------------>
+    <h3 title="The calculated values section is intended to provide the staff and management with a quick overview of electronically derivable data about the shift.">Calculated Values</h3>
+    <table class="borderless" id="calculated_values_table">
+      <tbody>
+        <tr>
+          <td title="This is the integrated time that the stopper is out during the shift. No adjustments are made about the beam delivered." style="width: 150px; border-bottom: 0px">Stopper Out:</td>
+        <td style="width: 150px;" id="stopper_out_time"></td>
+        <td style="width: 100px;" id="stopper_out_percent"></td>
+        </tr>
+        <tr>
+          <td title="This is the integrated time that the hutch door is open.">Door Open:</td>
+          <td id="door_open_time"></td>
+          <td id="door_open_percent"></td>
+        </tr>
+        <tr>
+          <td title="This is the total number of x-ray shots transmitted into the beamline. This information is valuable for understanding how the beam is being used. It should not be assumed that more shots means more or better scientific output.">Total Shots:</td>
+          <td id="total_shots_count"></td>
+          <td id="total_shots_percent"></td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!------------------------------ Area Evaluation ------------------------------>
+    <h3 title="The Area Evaluation section is intended to identify problem areas. These may be major problems like a controls motor failure that prevented data from being taken and required immediate attention or a recurring but non critical problem like occasional DAQ crashes. In all cases specific problems listed will not be resolved with this form, but treated only in aggregate with other input."> Area Evaluation</h3>
+    <table class="bottomline" id="area_evaluation_table">
+      <tbody>
+        <tr>
+          <td>Area<br>
+          </td>
+          <td style="width: 60px;">OK</td>
+          <td style="width: 60px;">Problem</td>
+          <td style="width: 150px;" title="The Time Down field is only enabled when there is a problem.  If the problem is minor (taking less than 30 minutes of down time) the field does not need to be completed. If the problem accounts for over 30 minutes of down time over the entire shift, a value for the time (in hours and/or minutes) should be entered. The comment field remains optional.">Time Down (hh:mm)</td>
+          <td style="width: 300px;">Comment (Optional)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!------------------------------ Time Use Allocation ------------------------------>
+    <h3 title="The Time Use Allocation section is intended to understand how experiments are performed. It is not assumed that experiment spending the most time taking data will generate the best science. For example, if it is found that extensive time is spent on alignment it may be decided that time and effort should be directed toward improved alignment software and feedback systems."> Time Use Allocation</h3>
+    <table class="bottomline" id="time_use_allocation_table">
+      <tbody>
+        <tr>
+          <td style="width: 90px;">Activity</td>
+          <td style="width: 60px;">Time Spent (hh:mm)</td>
+          <td style="width: 60px;">Percent</td>
+          <td style="width: 300px;">Comment (Optional)</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <!------------------------------ Other Notes ------------------------------>
+    <h3 title="For entering any other notes about the shift that might be important.">Other Notes (Optional):</h3>
+    <textarea style="margin-left: 40px;" rows="10" cols="80" id="other_notes"></textarea>
+
+  </body>
+</html>
