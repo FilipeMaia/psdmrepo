@@ -105,7 +105,7 @@ CSPadNDArrProducer::beginJob(Event& evt, Env& env)
 void 
 CSPadNDArrProducer::beginRun(Event& evt, Env& env)
 {
-  getQuadConfigPars(env);
+  // getQuadConfigPars(env); // DO NOT NEED THEM TO COPY ENTIRE ARRAY
 }
 
 //--------------------

@@ -81,10 +81,11 @@ namespace CSPadPixCoords {
 class CSPadImageProducer : public Module {
 public:
 
-  enum { m_n2x1         = Psana::CsPad::SectorsPerQuad     };  // 8
-  enum { m_ncols2x1     = Psana::CsPad::ColumnsPerASIC     };  // 185
-  enum { m_nrows2x1     = Psana::CsPad::MaxRowsPerASIC * 2 };  // 388
-  enum { m_sizeOf2x1Arr = m_nrows2x1 * m_ncols2x1          };  // 185*388;
+  enum { NQuadsMax    = Psana::CsPad::MaxQuadsPerSensor  };  // 4
+  enum { N2x1         = Psana::CsPad::SectorsPerQuad     };  // 8
+  enum { NCols2x1     = Psana::CsPad::ColumnsPerASIC     };  // 185
+  enum { NRows2x1     = Psana::CsPad::MaxRowsPerASIC * 2 };  // 388
+  enum { SizeOf2x1Arr = NRows2x1 * NCols2x1              };  // 185*388;
 
   // Default constructor
   CSPadImageProducer (const std::string& name) ;
@@ -185,8 +186,7 @@ private:
 
         shared_ptr<T> config = env.configStore().get(m_source);
         if (config.get()) {
-            m_numQuadsInConfig = config->numQuads();
-            for (uint32_t q = 0; q < config->numQuads(); ++ q) {
+            for (uint32_t q = 0; q < NQuadsMax; ++ q) {
               m_roiMask[q]         = config->roiMask(q);
               m_numAsicsStored[q]  = config->numAsicsStored(q);
             }
@@ -262,18 +262,18 @@ private:
 
         int ind_in_arr = 0;
 
-	for(uint32_t sect=0; sect < m_n2x1; sect++)
+	for(uint32_t sect=0; sect < N2x1; sect++)
 	{
 	     bool bitIsOn = roiMask & (1<<sect);
 	     if( !bitIsOn ) continue; 
 
-	     int pix_in_cspad = (quad*m_n2x1 + sect) * m_sizeOf2x1Arr;
+	     int pix_in_cspad = (quad*N2x1 + sect) * SizeOf2x1Arr;
  
-             const TIN *data2x1 = &data[ind_in_arr * m_sizeOf2x1Arr];
+             const TIN *data2x1 = &data[ind_in_arr * SizeOf2x1Arr];
              //cout  << "  add section " << sect << endl;	     
  
-             for (uint32_t c=0; c<m_ncols2x1; c++) {
-             for (uint32_t r=0; r<m_nrows2x1; r++) {
+             for (uint32_t c=0; c<NCols2x1; c++) {
+             for (uint32_t r=0; r<NRows2x1; r++) {
 
                // This access takes 72ms/cspad
                //int ix = (int) m_pix_coords_cspad -> getPixCoor_pix (XCOOR, quad, sect, r, c);
@@ -289,10 +289,10 @@ private:
 	       if(ix >= NX_CSPAD) continue;
 	       if(iy >= NY_CSPAD) continue;
 
-	       //if (data2x1[c*m_nrows2x1+r] != 1 ) cout << " data=" << data2x1[c*m_nrows2x1+r]  
+	       //if (data2x1[c*NRows2x1+r] != 1 ) cout << " data=" << data2x1[c*NRows2x1+r]  
 	       //    << " q:" << quad << " s:" << sect << " r:"  << r << " c:"  <<  c << endl;	    
-               //m_arr_cspad_image[ix][iy] += (double)data2x1[c*m_nrows2x1+r];
-               img_nda[ix][iy] += (TOUT)data2x1[c*m_nrows2x1+r];
+               //m_arr_cspad_image[ix][iy] += (double)data2x1[c*NRows2x1+r];
+               img_nda[ix][iy] += (TOUT)data2x1[c*NRows2x1+r];
              }
              }
              ++ind_in_arr;
@@ -314,9 +314,9 @@ private:
       //typedef double  TOUT; // ok
       //typedef float   TOUT; // ok
 
-      shared_ptr<TDATA> data_obj = evt.get(m_source, m_inkey, &m_src); // get m_src here
+      shared_ptr<TDATA> data_shp = evt.get(m_source, m_inkey, &m_src); // get m_src here
       
-      if (data_obj.get()) {
+      if (data_shp.get()) {
       
         const unsigned shape[] = {NY_CSPAD,NX_CSPAD};
         ndarray<TOUT,2> img_nda(shape);
@@ -324,13 +324,12 @@ private:
         //std::fill_n(img_nda.data(), int(IMG_SIZE), TOUT(0));    
         //std::fill_n(&m_arr_cspad_image[0][0], int(IMG_SIZE), double(0));
       
-        int nQuads = data_obj->quads_shape()[0];
+        int nQuads = data_shp->quads_shape()[0];
         for (int q = 0; q < nQuads; ++ q) {
-            const TELEMENT& el = data_obj->quads(q);      
-            int quad = el.quad() ;
+            const TELEMENT& el = data_shp->quads(q);      
             const ndarray<const data_cspad_t,3>& data_nda = el.data();
-            //const data_cspad_t* data = data_nda.data();      
-            CSPadPixCoords::QuadParameters *quadpars = new CSPadPixCoords::QuadParameters(quad, NX_QUAD, NY_QUAD, m_numAsicsStored[q], m_roiMask[q]);      
+            uint32_t qNum = el.quad() ;
+            CSPadPixCoords::QuadParameters *quadpars = new CSPadPixCoords::QuadParameters(qNum, NX_QUAD, NY_QUAD, m_numAsicsStored[qNum], m_roiMask[qNum]);      
 
             cspadImageFillForType<data_cspad_t, TOUT>(data_nda.data(), quadpars, m_cspad_calibpar, img_nda);
         }
@@ -339,7 +338,7 @@ private:
         addImageInEventForType<TOUT>(evt, img_nda);
 
         return true;
-      } // if (data_obj.get())
+      } // if (data_shp.get())
       return false;
   }
 
@@ -369,7 +368,8 @@ private:
           int ind2x1_in_arr = 0;        
           for (uint32_t q = 0; q < m_numQuads; ++ q) {
 	      const T* data_quad = &inp_ndarr[ind2x1_in_arr][0][0]; 
-              CSPadPixCoords::QuadParameters *quadpars = new CSPadPixCoords::QuadParameters(m_quadNumber[q], NX_QUAD, NY_QUAD, m_numAsicsStored[q], m_roiMask[q]);         
+              uint32_t qNum = m_quadNumber[q]; 
+              CSPadPixCoords::QuadParameters *quadpars = new CSPadPixCoords::QuadParameters(qNum, NX_QUAD, NY_QUAD, m_numAsicsStored[qNum], m_roiMask[qNum]);         
 
               cspadImageFillForType<T,T>(data_quad, quadpars, m_cspad_calibpar, img_nda);        
               ind2x1_in_arr += m_num2x1Stored[q];

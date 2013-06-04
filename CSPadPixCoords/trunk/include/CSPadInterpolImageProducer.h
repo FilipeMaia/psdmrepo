@@ -90,11 +90,11 @@ bool areEqual( const ArrAddr& a1, const ArrAddr& a2 ) ;
 class CSPadInterpolImageProducer : public Module {
 public:
 
-  enum { m_nquads       = 4 };
-  enum { m_n2x1         = Psana::CsPad::SectorsPerQuad     };  // 8
-  enum { m_ncols2x1     = Psana::CsPad::ColumnsPerASIC     };  // 185
-  enum { m_nrows2x1     = Psana::CsPad::MaxRowsPerASIC * 2 };  // 388
-  enum { m_sizeOf2x1Arr = m_nrows2x1 * m_ncols2x1          };  // 185*388;
+  enum { NQuadsMax    = Psana::CsPad::MaxQuadsPerSensor  };  // 4
+  enum { N2x1         = Psana::CsPad::SectorsPerQuad     };  // 8
+  enum { NCols2x1     = Psana::CsPad::ColumnsPerASIC     };  // 185
+  enum { NRows2x1     = Psana::CsPad::MaxRowsPerASIC * 2 };  // 388
+  enum { SizeOf2x1Arr = NRows2x1 * NCols2x1              };  // 185*388;
 
   // Default constructor
   CSPadInterpolImageProducer (const std::string& name) ;

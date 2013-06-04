@@ -75,10 +75,11 @@ namespace CSPadPixCoords {
 class CSPadNDArrProducer : public Module {
 public:
 
-  enum { m_n2x1         = Psana::CsPad::SectorsPerQuad     };  // 8
-  enum { m_ncols2x1     = Psana::CsPad::ColumnsPerASIC     };  // 185
-  enum { m_nrows2x1     = Psana::CsPad::MaxRowsPerASIC * 2 };  // 388
-  enum { m_sizeOf2x1Arr = m_nrows2x1 * m_ncols2x1          };  // 185*388;
+  enum { NQuadsMax    = Psana::CsPad::MaxQuadsPerSensor  };  // 4
+  enum { N2x1         = Psana::CsPad::SectorsPerQuad     };  // 8
+  enum { NCols2x1     = Psana::CsPad::ColumnsPerASIC     };  // 185
+  enum { NRows2x1     = Psana::CsPad::MaxRowsPerASIC * 2 };  // 388
+  enum { SizeOf2x1Arr = NRows2x1 * NCols2x1              };  // 185*388;
 
   // Default constructor
   CSPadNDArrProducer (const std::string& name) ;
@@ -165,8 +166,7 @@ private:
 
         shared_ptr<T> config = env.configStore().get(m_source);
         if (config.get()) {
-            m_numQuadsInConfig = config->numQuads();
-            for (uint32_t q = 0; q < config->numQuads(); ++ q) {
+            for (uint32_t q = 0; q < NQuadsMax; ++ q) {
               m_roiMask[q]         = config->roiMask(q);
               m_numAsicsStored[q]  = config->numAsicsStored(q);
             }
@@ -195,7 +195,7 @@ private:
         m_quadNumber[q]    = el.quad();
         m_num2x1Stored[q]  = el.data().shape()[0];
         m_num2x1_actual   += m_num2x1Stored[q];	
-	//for(uint32_t sect=0; sect < m_n2x1; sect++)
+	//for(uint32_t sect=0; sect < N2x1; sect++)
 	//  if( m_roiMask[q] & (1<<sect) ) m_num2x1_actual ++; 
       }
       return true;
@@ -219,12 +219,14 @@ private:
       if (shp.get()) {
 
         // Create and initialize the array of the same shape as data, but for all 2x1...
-        const unsigned shape[] = {m_num2x1_actual, m_ncols2x1, m_nrows2x1};
+        const unsigned shape[] = {m_num2x1_actual, NCols2x1, NRows2x1};
         ndarray<TOUT,3> out_ndarr(shape);
         std::fill(out_ndarr.begin(), out_ndarr.end(), TOUT(0));    
 
-        //ndarray<TOUT,3>::iterator it_out = out_ndarr.begin(); 
-        TOUT* it_out = out_ndarr.data();
+        typename ndarray<TOUT,3>::iterator it_out = out_ndarr.begin(); 
+        //TOUT* it_out = out_ndarr.data();
+
+        m_numQuads = shp->quads_shape()[0];
 
         for (uint32_t q = 0; q < m_numQuads; ++ q) {
             const TELEMENT& el = shp->quads(q);      

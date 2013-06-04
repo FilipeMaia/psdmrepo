@@ -145,7 +145,7 @@ CSPadInterpolImageProducer::getConfigPars(Env& env)
 {
   shared_ptr<Psana::CsPad::ConfigV3> config = env.configStore().get(m_src);
   if (config.get()) {
-      for (uint32_t q = 0; q < config->numQuads(); ++ q) {
+      for (uint32_t q = 0; q < NQuadsMax; ++ q) {
         m_roiMask[q]         = config->roiMask(q);
         m_numAsicsStored[q]  = config->numAsicsStored(q);
       }
@@ -193,16 +193,16 @@ CSPadInterpolImageProducer::event(Event& evt, Env& env)
 
     for (int q = 0; q < nQuads; ++ q) {
         const Psana::CsPad::ElementV2& el = data2->quads(q);
-        int quad                           = el.quad();
+        int qNum                           = el.quad();
         const ndarray<const int16_t,3>& data_nda = el.data();
-        //data[quad] = &data_nda[0][0][0];
-        data[quad] = data_nda;
-        quadpars[quad] = new CSPadPixCoords::QuadParameters(quad, NX_QUAD, NY_QUAD, m_numAsicsStored[q], m_roiMask[q]);
-        quadIsAvailable[quad] = true;
+        //data[qNum] = &data_nda[0][0][0];
+        data[qNum] = data_nda;
+        quadpars[qNum] = new CSPadPixCoords::QuadParameters(qNum, NX_QUAD, NY_QUAD, m_numAsicsStored[qNum], m_roiMask[qNum]);
+        quadIsAvailable[qNum] = true;
 
 	//cout << " q = "                     << q 
-	//     << " quad = "                  << quad 
-	//     << " quadIsAvailable[quad] = " << quadIsAvailable[quad]
+	//     << " qNum = "                  << qNum 
+	//     << " quadIsAvailable[qNum] = " << quadIsAvailable[qNum]
         //     << endl;
     }
 
@@ -304,10 +304,10 @@ CSPadInterpolImageProducer::fill_address_table_1()
 {
     this -> init_address_table_1();
 
-    for (uint32_t q=0; q < m_nquads;   q++) { 
-    for (uint32_t s=0; s < m_n2x1;     s++) {
-    for (uint32_t c=0; c < m_ncols2x1; c++) {
-    for (uint32_t r=0; r < m_nrows2x1; r++) {
+    for (uint32_t q=0; q < NQuadsMax; q++) { 
+    for (uint32_t s=0; s < N2x1;      s++) {
+    for (uint32_t c=0; c < NCols2x1;  c++) {
+    for (uint32_t r=0; r < NRows2x1;  r++) {
 
         double x = m_pix_coords_cspad -> getPixCoor_pix (XCOOR, q, s, r, c);
         double y = m_pix_coords_cspad -> getPixCoor_pix (YCOOR, q, s, r, c);
@@ -416,10 +416,10 @@ CSPadInterpolImageProducer::get_address_of_4_neighbors(unsigned ix, unsigned iy)
       int r11 = r00;
       int c11 = c00;
 
-      int rp1 = (r00<(int)m_nrows2x1-1) ? r00+1 : r00;
-      int rm1 = (r00>0                ) ? r00-1 :   0;
-      int cp1 = (c00<(int)m_ncols2x1-1) ? c00+1 : c00;
-      int cm1 = (c00>0                ) ? c00-1 :   0;
+      int rp1 = (r00<(int)NRows2x1-1) ? r00+1 : r00;
+      int rm1 = (r00>0              ) ? r00-1 :   0;
+      int cp1 = (c00<(int)NCols2x1-1) ? c00+1 : c00;
+      int cm1 = (c00>0              ) ? c00-1 :   0;
 
       double x00_and_half = 0.5 + m_pix_coords_cspad -> getPixCoor_pix(XCOOR, q00, s00, r00, c00);
       double y00_and_half = 0.5 + m_pix_coords_cspad -> getPixCoor_pix(YCOOR, q00, s00, r00, c00);
