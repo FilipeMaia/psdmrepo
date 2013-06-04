@@ -26,8 +26,8 @@ def get_input_parameters() :
 
 #--------------------
 
-def plot_histogram(arr,lims=(0,500),figsize=(5,5)) :
-    fig = plt.figure(figsize=figsize, dpi=80, facecolor='w',edgecolor='w',frameon=True)
+def plot_histogram(arr, lims=(0,500), figsize=(5,5)) :
+    fig = plt.figure(figsize=figsize, dpi=80, facecolor='w', edgecolor='w', frameon=True)
     plt.hist(arr.flatten(), bins=40, range=lims)
     #fig.canvas.manager.window.move(500,10)
      
@@ -81,8 +81,7 @@ def do_main() :
     print 'arr_tau=', arr[...,0]
 
     plot_correlators(arr, figsize=(8,8))
-    plt.get_current_fig_manager().window.move(450,10)
-
+    plt.get_current_fig_manager().window.geometry("+450+10")
     plt.show()
   
 #--------------------

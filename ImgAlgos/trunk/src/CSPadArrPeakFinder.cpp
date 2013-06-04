@@ -136,6 +136,8 @@ CSPadArrPeakFinder::~CSPadArrPeakFinder ()
 void 
 CSPadArrPeakFinder::printInputParameters()
 {
+  printBaseParameters();
+
   WithMsgLog(name(), info, log) {
     log << "\n Input parameters:"
         << "\n source                : " << sourceConfigured()
@@ -166,15 +168,6 @@ CSPadArrPeakFinder::printInputParameters()
         << "\n print_bits            : " << m_print_bits
         << "\n";     
   }
-
-  MsgLog(name(), debug, 
-           "\n MaxQuads   : "      << MaxQuads  
-        << "\n MaxSectors : "      << MaxSectors
-        << "\n NumColumns : "      << NumColumns
-        << "\n NumRows    : "      << NumRows   
-        << "\n SectorSize : "      << SectorSize
-        << "\n"
-	);
 }
 
 /// Method which is called once at the beginning of the job

@@ -118,6 +118,8 @@ CSPadBkgdSubtract::endJob(Event& evt, Env& env)
 void 
 CSPadBkgdSubtract::printInputParameters()
 {
+  printBaseParameters();
+
   WithMsgLog(name(), info, log) {
     log << "\n Input parameters:"
         << "\n source     : " << sourceConfigured()
@@ -126,13 +128,6 @@ CSPadBkgdSubtract::printInputParameters()
         << "\n fname      : " << m_fname    
         << "\n norm_sector: " << m_norm_sector 
         << "\n print_bits : " << m_print_bits
-        << "\n";     
-
-    log << "\n MaxQuads   : " << MaxQuads    
-        << "\n MaxSectors : " << MaxSectors  
-        << "\n NumColumns : " << NumColumns  
-        << "\n NumRows    : " << NumRows     
-        << "\n SectorSize : " << SectorSize  
         << "\n";
   }
 }
@@ -215,7 +210,6 @@ CSPadBkgdSubtract::normalizeBkgd(Event& evt)
     m_norm_factor = ( nQuads > 0 ) ? m_norm_factor /= nQuads : 0; 
   }
 
-  if( m_print_bits & 4 ) MsgLog( name(), info, "Event="  << m_count << " Norm. factor="  << m_norm_factor ); 
 }
 
 //--------------------
@@ -269,6 +263,7 @@ CSPadBkgdSubtract::subtractBkgd(Event& evt)
   }
 
   if( m_print_bits & 2 ) printEventId(evt);
+  if( m_print_bits & 4 ) MsgLog( name(), info, "Event="  << m_count << " Norm. factor="  << m_norm_factor ); 
 }
 
 //--------------------

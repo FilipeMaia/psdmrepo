@@ -52,12 +52,6 @@ namespace ImgAlgos {
 class CSPadArrAverage : public CSPadBaseModule {
 public:
 
-    enum { MaxQuads   = Psana::CsPad::MaxQuadsPerSensor }; // 4
-    enum { MaxSectors = Psana::CsPad::SectorsPerQuad    }; // 8
-    enum { NumColumns = Psana::CsPad::ColumnsPerASIC    }; // 185 THERE IS A MESS IN ONLINE COLS<->ROWS
-    enum { NumRows    = Psana::CsPad::MaxRowsPerASIC*2  }; // 388 THERE IS A MESS IN ONLINE COLS<->ROWS 
-    enum { SectorSize = NumColumns * NumRows            }; // 185 * 388
-  
   // Default constructor
   CSPadArrAverage (const std::string& name) ;
 
@@ -84,8 +78,8 @@ public:
   virtual void endJob(Event& evt, Env& env);
 
 protected:
-  void setCollectionMode();
-  void collectStat(unsigned quad, const int16_t* data);
+  virtual void initData();
+  virtual void procQuad(unsigned quad, const int16_t* data);
   void printInputParameters();
   void printEventId(Event& evt);
   void resetStatArrays();
@@ -96,7 +90,6 @@ private:
   std::string    m_aveFile;
   std::string    m_rmsFile;
   unsigned       m_print_bits;   
-  unsigned long  m_count;  // number of events from the beginning of job
   unsigned long  m_nev_stage1;
   unsigned long  m_nev_stage2;
   double         m_gate_width1;

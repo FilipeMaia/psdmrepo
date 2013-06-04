@@ -27,10 +27,6 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "MsgLogger/MsgLogger.h"
-// to work with detector data include corresponding 
-// header from psddl_psana package
-//#include "psddl_psana/acqiris.ddl.h"
-
 #include "PSEvt/EventId.h"
 
 //-----------------------------------------------------------------------
@@ -56,9 +52,7 @@ CSPadArrSaveInFile::CSPadArrSaveInFile (const std::string& name)
   : CSPadBaseModule(name)
   , m_outFile()
   , m_print_bits()
-  , m_count(0)
 {
-  // get the values from configuration or use defaults
   m_outFile     = configStr("outfile", "cspad-arr"); // ".txt"
   m_print_bits  = config("print_bits",  0);
 }
@@ -88,35 +82,10 @@ CSPadArrSaveInFile::beginCalibCycle(Event& evt, Env& env)
 void 
 CSPadArrSaveInFile::event(Event& evt, Env& env)
 {
-  shared_ptr<Psana::CsPad::DataV1> data1 = evt.get(source(), inputKey());
-  if (data1.get()) {
+   if ( procEventForType<Psana::CsPad::DataV1, CsPad::ElementV1> (evt) ) return;
+   if ( procEventForType<Psana::CsPad::DataV2, CsPad::ElementV2> (evt) ) return;
 
-    ++ m_count;
-    
-    int nQuads = data1->quads_shape()[0];
-    for (int iq = 0; iq != nQuads; ++ iq) {
-
-      const CsPad::ElementV1& quad = data1->quads(iq);
-      const ndarray<const int16_t, 3>& data = quad.data();
-      procQuad(quad.quad(), data.data());
-    }    
-    saveInFile(evt);
-  }
-  
-  shared_ptr<Psana::CsPad::DataV2> data2 = evt.get(source(), inputKey());
-  if (data2.get()) {
-
-    ++ m_count;
-    
-    int nQuads = data2->quads_shape()[0];
-    for (int iq = 0; iq != nQuads; ++ iq) {
-      
-      const CsPad::ElementV2& quad = data2->quads(iq);
-      const ndarray<const int16_t, 3>& data = quad.data();
-      procQuad(quad.quad(), data.data());
-    } 
-    saveInFile(evt);
-  }
+   MsgLog(name(), warning, "event(...): Psana::CsPad::DataV# / ElementV# is not available in this event.");
 }
 
 
@@ -144,8 +113,6 @@ CSPadArrSaveInFile::endJob(Event& evt, Env& env)
 void 
 CSPadArrSaveInFile::procQuad(unsigned quad, const int16_t* data)
 {
-  //cout << "procQuad for quad =" << quad << endl;
-
   int ind_in_arr = 0;
   for (int sect = 0; sect < MaxSectors; ++ sect) {
     if (segMask(quad) & (1 << sect)) {
@@ -161,6 +128,15 @@ CSPadArrSaveInFile::procQuad(unsigned quad, const int16_t* data)
       ++ind_in_arr;
     }
   }
+}
+
+//--------------------
+/// Implementation for abstract method from CSPadBaseModule.h
+// Prints something, get the file name, and saves the CSPad array in file 
+void 
+CSPadArrSaveInFile::summaryData(Event& evt)
+{
+  saveInFile(evt);
 }
 
 //--------------------
@@ -205,6 +181,8 @@ CSPadArrSaveInFile::saveCSPadArrayInFile(std::string& fname, T arr[MaxQuads][Max
 void 
 CSPadArrSaveInFile::printInputParameters()
 {
+  printBaseParameters();
+
   WithMsgLog(name(), info, log) {
     log << "\n Input parameters:"
         << "\n source     : " << sourceConfigured()
@@ -212,13 +190,6 @@ CSPadArrSaveInFile::printInputParameters()
         << "\n m_outFile  : " << m_outFile    
         << "\n print_bits : " << m_print_bits
         << "\n";     
-
-    log << "\n MaxQuads   : " << MaxQuads    
-        << "\n MaxSectors : " << MaxSectors  
-        << "\n NumColumns : " << NumColumns  
-        << "\n NumRows    : " << NumRows     
-        << "\n SectorSize : " << SectorSize  
-        << "\n";
   }
 }
 
@@ -229,7 +200,7 @@ CSPadArrSaveInFile::printEventId(Event& evt)
 {
   shared_ptr<PSEvt::EventId> eventId = evt.get();
   if (eventId.get()) {
-    MsgLog( name(), info, "Event="  << m_count << " ID: " << *eventId);
+    MsgLog( name(), info, "Event="  << counter() << " ID: " << *eventId);
   }
 }
 
@@ -242,7 +213,7 @@ CSPadArrSaveInFile::printTimeStamp(Event& evt)
   if (eventId.get()) {
 
     MsgLog( name(), info, "Run="    <<  eventId->run()
-                       << " Event=" <<  m_count 
+                       << " Event=" <<  counter() 
                        << " Time="  <<  eventId->time() );
   }
 }
@@ -252,7 +223,7 @@ CSPadArrSaveInFile::printTimeStamp(Event& evt)
 std::string
 CSPadArrSaveInFile::strEventCounter()
 {
-  std::stringstream ssEvNum; ssEvNum << std::setw(6) << std::setfill('0') << m_count;
+  std::stringstream ssEvNum; ssEvNum << std::setw(6) << std::setfill('0') << counter();
   return ssEvNum.str();
 }
 
@@ -263,12 +234,6 @@ CSPadArrSaveInFile::strTimeStamp(Event& evt)
 {
   shared_ptr<PSEvt::EventId> eventId = evt.get();
   if (eventId.get()) {
-
-    //m_time = eventId->time();
-    //std::stringstream ss;
-    //ss << hex << t_msec;
-    //string hex_msec = ss.str();
-
     return (eventId->time()).asStringFormat( "%Y-%m-%d-%H%M%S%f"); // "%Y-%m-%d %H:%M:%S%f%z"
   }
   else

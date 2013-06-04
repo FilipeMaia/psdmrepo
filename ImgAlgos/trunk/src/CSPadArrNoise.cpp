@@ -58,10 +58,9 @@ CSPadArrNoise::CSPadArrNoise (const std::string& name)
   , m_SoNThr()
   , m_frac_noisy_imgs()
   , m_print_bits()
-  , m_count(0)
 {
   // get the values from configuration or use defaults
-  m_fracFile      = configStr("fracfile", "cspad-pix-frac.dat");
+  m_fracFile        = configStr("fracfile", "cspad-pix-frac.dat");
   m_maskFile        = configStr("maskfile", "cspad-pix-mask.dat");
   m_rmin            = config   ("rmin",              3);
   m_dr              = config   ("dr",                2);
@@ -101,37 +100,13 @@ CSPadArrNoise::beginCalibCycle(Event& evt, Env& env)
 void 
 CSPadArrNoise::event(Event& evt, Env& env)
 {
-  shared_ptr<Psana::CsPad::DataV1> data1 = evt.get(source(), inputKey());
-  if (data1.get()) {
-
-    ++ m_count;
-    //setCollectionMode();
-    
-    int nQuads = data1->quads_shape()[0];
-    for (int iq = 0; iq != nQuads; ++ iq) {
-
-      const CsPad::ElementV1& quad = data1->quads(iq);
-      const ndarray<const int16_t, 3>& data = quad.data();
-      collectStatInQuad(quad.quad(), data.data());
-    }    
-  }
-  
-  shared_ptr<Psana::CsPad::DataV2> data2 = evt.get(source(), inputKey());
-  if (data2.get()) {
-
-    ++ m_count;
-    //setCollectionMode();
-    
-    int nQuads = data2->quads_shape()[0];
-    for (int iq = 0; iq != nQuads; ++ iq) {
-      
-      const CsPad::ElementV2& quad = data2->quads(iq);
-      const ndarray<const int16_t, 3>& data = quad.data();
-      collectStatInQuad(quad.quad(), data.data());
-    } 
-  }
   //if( m_print_bits & 16 ) printEventId(evt);
-  if( m_print_bits & 32 ) printTimeStamp(evt);
+   if( m_print_bits & 32 ) printTimeStamp(evt);
+
+   if ( procEventForType<Psana::CsPad::DataV1, CsPad::ElementV1> (evt) ) return;
+   if ( procEventForType<Psana::CsPad::DataV2, CsPad::ElementV2> (evt) ) return;
+
+   MsgLog(name(), warning, "event(...): Psana::CsPad::DataV# / ElementV# is not available in this event.");
 }
   
 /// Method which is called at the end of the calibration cycle
@@ -152,16 +127,15 @@ CSPadArrNoise::endJob(Event& evt, Env& env)
 {
   procStatArrays();
   saveCSPadArrayInFile<float>( m_fracFile, m_status );
-  saveCSPadArrayInFile<uint16_t>( m_maskFile,   m_mask );  //or &m_mask[0][0][0][0] );
+  saveCSPadArrayInFile<uint16_t>( m_maskFile, m_mask );  //or &m_mask[0][0][0][0] );
 }
 
 //--------------------
-
 /// Process accumulated stat arrays and evaluate m_ave(rage) and m_rms arrays
 void 
 CSPadArrNoise::procStatArrays()
 {
-  if( m_print_bits & 4 ) MsgLog(name(), info, "Process statistics for collected total " << m_count << " events");
+  if( m_print_bits & 4 ) MsgLog(name(), info, "Process statistics for collected total " << counter() << " events");
 
   unsigned long  npix_noisy = 0;
   unsigned long  npix_total = 0;
@@ -174,9 +148,9 @@ CSPadArrNoise::procStatArrays()
             npix_total ++;
 	    unsigned stat = m_stat[iq][is][ic][ir];
 	    
-	    if(m_count > 0) { 
+	    if(counter() > 0) { 
 	      
-	      float fraction_of_noisy = float(stat) / m_count; 
+	      float fraction_of_noisy = float(stat) / counter(); 
 
               m_status[iq][is][ic][ir] = fraction_of_noisy;
 
@@ -188,21 +162,15 @@ CSPadArrNoise::procStatArrays()
 	      {
                 npix_noisy ++;
 	      }
-	      
-              //if (stat > 0) cout << "q,s,c,r=" << iq << " " << is << " " << ic << " " << ir
-	      //                 << " stat, total=" << stat << " " << m_count << endl;
-
             } 
           }
         }
       }
     }
-
     cout << "Nnoisy, Ntotal, Nnoisy/Ntotal pixels =" << npix_noisy << " " << npix_total  << " " << double(npix_noisy)/npix_total << endl;
 }
 
 //--------------------
-
 /// Save 4-d array of CSPad structure in file
 template <typename T>
 void 
@@ -227,7 +195,6 @@ CSPadArrNoise::saveCSPadArrayInFile(std::string& fname, T arr[MaxQuads][MaxSecto
 }
 
 //--------------------
-
 /// Reset arrays for statistics accumulation
 void
 CSPadArrNoise::resetStatArrays()
@@ -238,30 +205,16 @@ CSPadArrNoise::resetStatArrays()
 }
 
 //--------------------
-/// Check the event counter and deside what to do next accumulate/change mode/etc.
-/*
-void 
-CSPadArrNoise::setCollectionMode()
-{
-  if (m_count == 1 ) {
-    m_gate_width = 0;
-    resetStatArrays();
-    if( m_print_bits & 2 ) MsgLog(name(), info, "Stage 0: Event = " << m_count << " Begin to collect statistics without gate.");
-  }
-...
-}
-*/
-
-//--------------------
+/// Implementation for abstract method from CSPadBaseModule.h
 /// Collect statistics
 /// Loop over all 2x1 sections available in the event 
 void 
-CSPadArrNoise::collectStatInQuad(unsigned quad, const int16_t* data)
+CSPadArrNoise::procQuad(unsigned quad, const int16_t* data)
 {
-  //cout << "collectStat for quad =" << quad << endl;
+  //cout << "procQuad: collect statistics for quad =" << quad << endl;
 
   int ind_in_arr = 0;
-  for (unsigned sect = 0; sect < MaxSectors; ++ sect) {
+  for (int sect = 0; sect < MaxSectors; ++ sect) {
     if (segMask(quad) & (1 << sect)) {
      
       const int16_t* sectData = data + ind_in_arr*SectorSize;
@@ -286,13 +239,6 @@ CSPadArrNoise::collectStatInSect(unsigned quad, unsigned sect, const int16_t* se
 
       if ( abs( res.SoN ) > m_SoNThr ) m_stat[quad][sect][ic][ir] ++;
 
-      /*
-      m_bkgd_arr  [quad][sect][ic][ir] = res.avg;
-      m_rms_arr   [quad][sect][ic][ir] = res.rms;
-      m_signal_arr[quad][sect][ic][ir] = res.signal;
-      m_SoN_arr   [quad][sect][ic][ir] = res.SoN;
-      if ( res.SoN > m_SoNThr ) m_[quad][sect][ic][ir] = 1;
-      */
     }
   }
 }
@@ -322,7 +268,6 @@ CSPadArrNoise::evaluateVectorOfIndexesForMedian()
 }
 
 //--------------------
-
 void 
 CSPadArrNoise::printMatrixOfIndexesForMedian()
 {
@@ -397,11 +342,12 @@ CSPadArrNoise::evaluateSoNForPixel(unsigned col, unsigned row, const int16_t* se
 }
 
 //--------------------
-
 // Print input parameters
 void 
 CSPadArrNoise::printInputParameters()
 {
+  printBaseParameters();
+
   WithMsgLog(name(), info, log) {
     log << "\n Input parameters:"
         << "\n source            : " << sourceConfigured()
@@ -414,24 +360,16 @@ CSPadArrNoise::printInputParameters()
         << "\n m_frac_noisy_imgs : " << m_frac_noisy_imgs    
         << "\n print_bits : "        << m_print_bits
         << "\n";     
-
-    log << "\n MaxQuads   : " << MaxQuads    
-        << "\n MaxSectors : " << MaxSectors  
-        << "\n NumColumns : " << NumColumns  
-        << "\n NumRows    : " << NumRows     
-        << "\n SectorSize : " << SectorSize  
-        << "\n";
   }
 }
 
 //--------------------
-
 void 
 CSPadArrNoise::printEventId(Event& evt)
 {
   shared_ptr<PSEvt::EventId> eventId = evt.get();
   if (eventId.get()) {
-    MsgLog( name(), info, "Event="  << m_count << " ID: " << *eventId);
+    MsgLog( name(), info, "Event="  << counter() << " ID: " << *eventId);
   }
 }
 
@@ -444,7 +382,7 @@ CSPadArrNoise::printTimeStamp(Event& evt)
   if (eventId.get()) {
 
     MsgLog( name(), info, " Run="   <<  eventId->run()
-                       << " Event=" <<  m_count 
+                       << " Event=" <<  counter() 
                        << " Time="  <<  eventId->time() );
   }
 }

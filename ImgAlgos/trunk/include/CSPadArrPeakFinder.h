@@ -98,14 +98,10 @@ struct PeakWork{
 class CSPadArrPeakFinder : public CSPadBaseModule {
 public:
 
-    enum { MaxQuads      = Psana::CsPad::MaxQuadsPerSensor }; // 4
-    enum { MaxSectors    = Psana::CsPad::SectorsPerQuad    }; // 8
-    enum { NumColumns    = Psana::CsPad::ColumnsPerASIC    }; // 185 THERE IS A MESS IN ONLINE COLS<->ROWS
-    enum { NumRows       = Psana::CsPad::MaxRowsPerASIC*2  }; // 388 THERE IS A MESS IN ONLINE COLS<->ROWS 
-    enum { SectorSize    = NumColumns * NumRows            }; // 185 * 388
-    enum { SIZE_OF_ARRAY = MaxQuads * MaxSectors * SectorSize }; 
-    enum { NumColumns1   = NumColumns - 1};
-    enum { NumRows1      = NumRows    - 1};
+    const static int SIZE_OF_ARRAY = MaxQuads * MaxSectors * SectorSize; 
+    const static int NumColumns1   = NumColumns - 1;
+    const static int NumRows1      = NumRows    - 1;
+
     enum SELECTION_MODE{ SELECTION_OFF, SELECTION_ON, SELECTION_INV };
   
   // Default constructor

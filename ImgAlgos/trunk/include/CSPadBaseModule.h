@@ -58,6 +58,12 @@ namespace ImgAlgos {
 class CSPadBaseModule : public Module {
 public:
 
+  const static int MaxQuads   = Psana::CsPad::MaxQuadsPerSensor; // 4
+  const static int MaxSectors = Psana::CsPad::SectorsPerQuad;    // 8
+  const static int NumColumns = Psana::CsPad::ColumnsPerASIC;    // 185 THERE IS A MESS IN ONLINE COLS<->ROWS
+  const static int NumRows    = Psana::CsPad::MaxRowsPerASIC*2;  // 388 THERE IS A MESS IN ONLINE COLS<->ROWS 
+  const static int SectorSize = NumColumns * NumRows;            // 185 * 388
+
   // Default constructor
   CSPadBaseModule(const std::string& name,
       const std::string& keyName="key",
@@ -81,6 +87,18 @@ public:
    */
   virtual void beginRun(Event& evt, Env& env);
 
+  /// Initialization before data processing in event()
+  virtual void initData();
+
+  /// Quad data processing in event()
+  virtual void procQuad(unsigned quad, const int16_t* data);
+
+  /// Summary of the data processing in event()
+  virtual void summaryData(Event& evt);
+
+  /// Prints values of the base module parameters
+  void printBaseParameters();
+
 protected:
 
   /// Returns the source address of cspad device which was found
@@ -95,12 +113,47 @@ protected:
   /// Returns the source address of cspad device
   unsigned segMask(int seg) const { return m_segMask[seg]; }
 
+  /// Returns the counter of found data records
+  unsigned counter() const { return m_count; }
+
 private:
 
   Source         m_str_src;         // string with source name
   std::string    m_key;             // string with key name
   Pds::Src       m_src;             // source address of the data object
   unsigned       m_segMask[Psana::CsPad::MaxQuadsPerSensor];  // segment masks per quadrant
+  unsigned       m_count;  
+
+public:
+
+  /**
+   * @brief Loop over quads, get data for types TDATA and TELEMENT and call procQuad(...).
+   * 
+   */
+
+  template <typename TDATA, typename TELEMENT>
+  bool procEventForType(Event& evt) {
+
+      shared_ptr<TDATA> shp_data = evt.get(source(), inputKey());
+      if (shp_data.get()) {
+      
+        ++ m_count;
+        initData();                                             // <<===========
+        
+        int nQuads = shp_data->quads_shape()[0];
+        for (int iq = 0; iq != nQuads; ++ iq) {
+          
+          const TELEMENT& quad = shp_data->quads(iq);
+          const ndarray<const int16_t, 3>& data = quad.data();
+          procQuad(quad.quad(), data.data());                   // <<===========
+        } 
+
+        summaryData(evt);                                       // <<===========
+
+        return true;
+      }
+      return false;
+  }
 
 };
 

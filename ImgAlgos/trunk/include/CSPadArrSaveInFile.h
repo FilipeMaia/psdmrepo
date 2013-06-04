@@ -52,12 +52,6 @@ namespace ImgAlgos {
 class CSPadArrSaveInFile : public CSPadBaseModule {
 public:
 
-    enum { MaxQuads   = Psana::CsPad::MaxQuadsPerSensor }; // 4
-    enum { MaxSectors = Psana::CsPad::SectorsPerQuad    }; // 8
-    enum { NumColumns = Psana::CsPad::ColumnsPerASIC    }; // 185 THERE IS A MESS IN ONLINE COLS<->ROWS
-    enum { NumRows    = Psana::CsPad::MaxRowsPerASIC*2  }; // 388 THERE IS A MESS IN ONLINE COLS<->ROWS 
-    enum { SectorSize = NumColumns * NumRows            }; // 185 * 388
-  
   // Default constructor
   CSPadArrSaveInFile (const std::string& name) ;
 
@@ -85,7 +79,9 @@ public:
 
 protected:
 
-  void procQuad(unsigned quad, const int16_t* data);
+  virtual void procQuad(unsigned quad, const int16_t* data);
+  virtual void summaryData(Event& evt);
+
   void printInputParameters();
   void printEventId(Event& evt);
   void printTimeStamp(Event& evt);
@@ -100,9 +96,7 @@ protected:
 
 private:
   std::string    m_outFile;
-  unsigned       m_print_bits;   
-  unsigned long  m_count;  // number of events from the beginning of job
-
+  unsigned       m_print_bits;
   int16_t        m_arr    [MaxQuads][MaxSectors][NumColumns][NumRows];  // array for all cspad pixels
 };
 

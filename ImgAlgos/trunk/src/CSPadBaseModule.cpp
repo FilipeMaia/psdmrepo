@@ -46,6 +46,7 @@ CSPadBaseModule::CSPadBaseModule (const std::string& name,
   , m_str_src()
   , m_key()
   , m_src()
+  , m_count(0)
 {
   // get the values from configuration or use defaults
   m_key     = configStr(keyName, defKey);
@@ -127,6 +128,37 @@ CSPadBaseModule::beginRun(Event& evt, Env& env)
     MsgLog(name(), error, "Found CSPad configuration object with invalid address. Terminating.");
     terminate();
     return;
+  }
+}
+
+/// Methods for event processing interface
+
+void
+CSPadBaseModule::initData() {}
+
+void 
+CSPadBaseModule::procQuad(unsigned quad, const int16_t* data) {}
+
+void
+CSPadBaseModule::summaryData(Event& evt) {}
+
+//--------------------
+// Print base parameters
+void 
+CSPadBaseModule::printBaseParameters()
+{
+  WithMsgLog(name(), info, log) {
+    log << "\n Base parameters:"
+        << "\n MaxQuads   : " << MaxQuads    
+        << "\n MaxSectors : " << MaxSectors  
+        << "\n NumColumns : " << NumColumns  
+        << "\n NumRows    : " << NumRows     
+        << "\n SectorSize : " << SectorSize  
+        << "\n"
+        << "\n Input parameters:"
+        << "\n source     : " << sourceConfigured()
+        << "\n key        : " << inputKey()
+        << "\n";
   }
 }
 

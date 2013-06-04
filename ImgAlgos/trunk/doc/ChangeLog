@@ -11,6 +11,13 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-12
+2013-06-03 Mikhail S. Dubrovin
+- Code re-factoring;
+- move common stuff from modules CSPadArrAverage, CSPadArrNoise, CSPadArrSaveInFile to CSPadBaseModule
+- for other CSPad* modules use some of common things from CSPadBaseModule	
+- add more protection in python scripts in ImgAlgos/data/ directory
+
 Tag: V00-03-11
 2013-05-21 Mikhail S. Dubrovin
 - improvements in ImgAverage.cpp

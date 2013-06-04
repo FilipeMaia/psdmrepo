@@ -23,19 +23,18 @@ class Storage :
 #--------------------
 # Define graphical methods
 
-def plot_image (arr, range=None, zrange=None, title='',figsize=(12,12), dpi=80, store=None) :
-    fig = plt.figure(figsize=figsize, dpi=dpi, facecolor='w',edgecolor='w',frameon=True)
+def plot_image (arr, img_range=None, zrange=None, title='',figsize=(12,12), dpi=80, store=None) :
+    fig = plt.figure(figsize=figsize, dpi=dpi, facecolor='w',edgecolor='w', frameon=True)
     fig.subplots_adjust(left=0.10, bottom=0.08, right=0.98, top=0.92, wspace=0.2, hspace=0.1)
     store.figAxes = figAxes = fig.add_subplot(111)
-    store.imAxes  = imAxes  = figAxes.imshow(arr, origin='upper', interpolation='nearest', aspect='auto',extent=range)
-    #imAxes.set_clim(1300,2000)
+    store.imAxes  = imAxes  = figAxes.imshow(arr, origin='upper', interpolation='nearest', aspect='auto', extent=img_range)
     if zrange != None : imAxes.set_clim(zrange[0],zrange[1])
     colbar = fig.colorbar(imAxes, pad=0.03, fraction=0.04, shrink=1.0, aspect=40, orientation=1)
     fig.canvas.set_window_title(title)
 
-def plot_histogram(arr,range=(0,500),figsize=(5,5)) :
-    fig = plt.figure(figsize=figsize, dpi=80, facecolor='w',edgecolor='w',frameon=True)
-    plt.hist(arr.flatten(), bins=100, range=range)
+def plot_histogram(arr, amp_range=None, figsize=(5,5)) :
+    fig = plt.figure(figsize=figsize, dpi=80, facecolor='w', edgecolor='w', frameon=True)
+    plt.hist(arr.flatten(), bins=100, range=amp_range)
     #fig.canvas.manager.window.move(500,10)
 
 def saveHRImageInFile(arr, ampRange=None, fname='cspad-arr-hr.png', figsize=(12,12), dpi=300, store=None) :
@@ -43,7 +42,7 @@ def saveHRImageInFile(arr, ampRange=None, fname='cspad-arr-hr.png', figsize=(12,
     plot_image(arr, zrange=ampRange, figsize=figsize, dpi=dpi, store=store)
     title = ''
     for q in range(4) : title += ('Quad %d'%(q) + 20*' ')  
-    plt.title(title,color='b',fontsize=20)
+    plt.title(title, color='b', fontsize=20)
     plt.savefig(fname,dpi=dpi)
     #plt.imsave('test.png', format='png',dpi=300)
 
@@ -272,6 +271,7 @@ def get_input_parameters() :
 
     print 'Input file name:', fname
     print 'ampRange       :', ampRange
+    if ampRange[0]==None or ampRange[1]==None : ampRange = None
  
     return fname,ampRange 
 
@@ -309,16 +309,15 @@ def do_main() :
     title = ''
     for q in range(4) : title += ('Quad %d'%(q) + 20*' ')  
     plt.title(title,color='b',fontsize=20)
-    plt.get_current_fig_manager().window.move(10,10)
-
+    plt.get_current_fig_manager().window.geometry("+10+10")
     plot_peaks_for_arr(arr_peaks, store=s)
     #print_peaks(arr_peaks)
     plt.savefig('cspad-arr.png')
 
 
     # Plot 3
-    plot_histogram(arr,range=ampRange)
-    plt.get_current_fig_manager().window.move(950,10)
+    plot_histogram(arr, amp_range=ampRange)
+    plt.get_current_fig_manager().window.geometry("+950+10")
     plt.savefig('cspad-spe.png')
 
     #plt.show()
@@ -326,7 +325,7 @@ def do_main() :
 
     # Plot 2
     plot_image(arr, zrange=ampRange, store=s)
-    plt.get_current_fig_manager().window.move(450,10)
+    plt.get_current_fig_manager().window.geometry("+450+10")
     plot_peaks_for_img(arr_peaks, store=s)
     plt.savefig('cspad-img.png')
 

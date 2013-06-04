@@ -122,6 +122,8 @@ CSPadMaskApply::endJob(Event& evt, Env& env)
 void 
 CSPadMaskApply::printInputParameters()
 {
+  printBaseParameters();
+
   WithMsgLog(name(), info, log) {
     log << "\n Input parameters:"
         << "\n source            : " << sourceConfigured()
@@ -133,15 +135,6 @@ CSPadMaskApply::printInputParameters()
         << "\n print_bits        : " << m_print_bits
         << "\n";     
   }
-
-    MsgLog(name(), debug, 
-           "\n MaxQuads   : "      << MaxQuads  
-        << "\n MaxSectors : "      << MaxSectors
-        << "\n NumColumns : "      << NumColumns
-        << "\n NumRows    : "      << NumRows   
-        << "\n SectorSize : "      << SectorSize
-        << "\n"
-	);
 }
 
 //--------------------

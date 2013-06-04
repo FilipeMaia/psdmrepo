@@ -65,13 +65,8 @@ struct MedianResult {
 class CSPadArrNoise : public CSPadBaseModule {
 public:
 
-    enum { MaxQuads   = Psana::CsPad::MaxQuadsPerSensor }; // 4
-    enum { MaxSectors = Psana::CsPad::SectorsPerQuad    }; // 8
-    enum { NumColumns = Psana::CsPad::ColumnsPerASIC    }; // 185 THERE IS A MESS IN ONLINE COLS<->ROWS
-    enum { NumRows    = Psana::CsPad::MaxRowsPerASIC*2  }; // 388 THERE IS A MESS IN ONLINE COLS<->ROWS 
-    enum { SectorSize = NumColumns * NumRows            }; // 185 * 388
-    enum { NumColumns1= NumColumns - 1};
-    enum { NumRows1   = NumRows    - 1};
+  const static int NumColumns1 = NumColumns - 1;
+  const static int NumRows1    = NumRows    - 1;
   
   // Default constructor
   CSPadArrNoise (const std::string& name) ;
@@ -99,7 +94,8 @@ public:
   virtual void endJob(Event& evt, Env& env);
 
 protected:
-    void collectStatInQuad(unsigned quad, const int16_t* data);
+
+    virtual void procQuad(unsigned quad, const int16_t* data); 
     void collectStatInSect(unsigned quad, unsigned sect, const int16_t* sectData);
     MedianResult evaluateSoNForPixel(unsigned ic,unsigned ir,const int16_t* sectData);
     void evaluateVectorOfIndexesForMedian();
@@ -118,6 +114,7 @@ protected:
     void saveCSPadArrayInFile(std::string& fname, T arr[MaxQuads][MaxSectors][NumColumns][NumRows]);
 
 private:
+
   std::string    m_fracFile;        // [out] file with fraction of noisy events in eac pixel
   std::string    m_maskFile;        // [out] file with mask 
   float          m_rmin;            // radial parameter of the area for median algorithm
@@ -125,7 +122,6 @@ private:
   float          m_SoNThr;
   float          m_frac_noisy_imgs;
   unsigned       m_print_bits;   
-  unsigned long  m_count;  // number of events from the beginning of job
 
   unsigned       m_stat   [MaxQuads][MaxSectors][NumColumns][NumRows];
   uint16_t       m_mask   [MaxQuads][MaxSectors][NumColumns][NumRows];

@@ -25,10 +25,6 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "MsgLogger/MsgLogger.h"
-// to work with detector data include corresponding 
-// header from psddl_psana package
-//#include "psddl_psana/acqiris.ddl.h"
-
 #include "PSEvt/EventId.h"
 
 //-----------------------------------------------------------------------
@@ -55,7 +51,6 @@ CSPadArrAverage::CSPadArrAverage (const std::string& name)
   , m_aveFile()
   , m_rmsFile()
   , m_print_bits()
-  , m_count(0)
   , m_nev_stage1()
   , m_nev_stage2()
   , m_gate_width1()
@@ -71,7 +66,6 @@ CSPadArrAverage::CSPadArrAverage (const std::string& name)
   m_print_bits  = config("print_bits",       0);
 
   m_gate_width = 0;
-  // resetStatArrays(); // <=== moved to procEvent
 }
 
 //--------------
@@ -100,37 +94,12 @@ CSPadArrAverage::beginCalibCycle(Event& evt, Env& env)
 void 
 CSPadArrAverage::event(Event& evt, Env& env)
 {
-  shared_ptr<Psana::CsPad::DataV1> data1 = evt.get(source(), inputKey());
-  if (data1.get()) {
-
-    ++ m_count;
-    setCollectionMode();
-    
-    int nQuads = data1->quads_shape()[0];
-    for (int iq = 0; iq != nQuads; ++ iq) {
-
-      const CsPad::ElementV1& quad = data1->quads(iq);
-      const ndarray<const int16_t, 3>& data = quad.data();
-      collectStat(quad.quad(), data.data());
-    }    
-  }
-  
-  shared_ptr<Psana::CsPad::DataV2> data2 = evt.get(source(), inputKey());
-  if (data2.get()) {
-
-    ++ m_count;
-    setCollectionMode();
-    
-    int nQuads = data2->quads_shape()[0];
-    for (int iq = 0; iq != nQuads; ++ iq) {
-      
-      const CsPad::ElementV2& quad = data2->quads(iq);
-      const ndarray<const int16_t, 3>& data = quad.data();
-      collectStat(quad.quad(), data.data());
-    } 
-  }
-
    if( m_print_bits & 1<<4 ) printEventId(evt);
+
+   if ( procEventForType<Psana::CsPad::DataV1, CsPad::ElementV1> (evt) ) return;
+   if ( procEventForType<Psana::CsPad::DataV2, CsPad::ElementV2> (evt) ) return;
+
+   MsgLog(name(), warning, "event(...): Psana::CsPad::DataV# / ElementV# is not available in this event.");
 }
   
 /// Method which is called at the end of the calibration cycle
@@ -149,20 +118,17 @@ CSPadArrAverage::endRun(Event& evt, Env& env)
 void 
 CSPadArrAverage::endJob(Event& evt, Env& env)
 {
-
   procStatArrays();
   saveCSPadArrayInFile( m_aveFile, m_ave ); // &m_ave[0][0][0][0] );
   saveCSPadArrayInFile( m_rmsFile, m_rms ); // &m_rms[0][0][0][0] );
-
 }
 
 //--------------------
-
 /// Process accumulated stat arrays and evaluate m_ave(rage) and m_rms arrays
 void 
 CSPadArrAverage::procStatArrays()
 {
-  if( m_print_bits & 1<<2 ) MsgLog(name(), info, "Process statistics for collected total " << m_count << " events");
+  if( m_print_bits & 1<<2 ) MsgLog(name(), info, "Process statistics for collected total " << counter() << " events");
   
     for (int iq = 0; iq != MaxQuads; ++ iq) {
       for (int is = 0; is != MaxSectors; ++ is) {
@@ -187,7 +153,6 @@ CSPadArrAverage::procStatArrays()
 }
 
 //--------------------
-
 /// Save 4-d array of CSPad structure in file
 void 
 CSPadArrAverage::saveCSPadArrayInFile(std::string& fname, double arr[MaxQuads][MaxSectors][NumColumns][NumRows])
@@ -211,7 +176,6 @@ CSPadArrAverage::saveCSPadArrayInFile(std::string& fname, double arr[MaxQuads][M
 }
 
 //--------------------
-
 /// Reset arrays for statistics accumulation
 void
 CSPadArrAverage::resetStatArrays()
@@ -222,42 +186,42 @@ CSPadArrAverage::resetStatArrays()
 }
 
 //--------------------
-
+/// Implementation for abstract method from CSPadBaseModule.h
 /// Check the event counter and deside what to do next accumulate/change mode/etc.
 void 
-CSPadArrAverage::setCollectionMode()
+CSPadArrAverage::initData()
 {
   // Set the statistics collection mode without gate
-  if (m_count == 1 ) {
+  if (counter() == 1 ) {
     m_gate_width = 0;
     resetStatArrays();
-    if( m_print_bits & 1<<1 ) MsgLog(name(), info, "Stage 0: Event = " << m_count << " Begin to collect statistics without gate.");
+    if( m_print_bits & 1<<1 ) MsgLog(name(), info, "Stage 0: Event = " << counter() << " Begin to collect statistics without gate.");
   }
 
   // Change the statistics collection mode for gated stage 1
-  else if (m_count == m_nev_stage1 ) {
+  else if (counter() == m_nev_stage1 ) {
     procStatArrays();
     resetStatArrays();
     m_gate_width = m_gate_width1;
-    if( m_print_bits & 1<<1 ) MsgLog(name(), info, "Stage 1: Event = " << m_count << " Begin to collect statistics with gate =" << m_gate_width);
+    if( m_print_bits & 1<<1 ) MsgLog(name(), info, "Stage 1: Event = " << counter() << " Begin to collect statistics with gate =" << m_gate_width);
   } 
 
   // Change the statistics collection mode for gated stage 2
-  else if (m_count == m_nev_stage1 + m_nev_stage2 ) {
+  else if (counter() == m_nev_stage1 + m_nev_stage2 ) {
     procStatArrays();
     resetStatArrays();
     m_gate_width = m_gate_width2;
-    if( m_print_bits & 1<<1 ) MsgLog(name(), info, "Stage 2: Event = " << m_count << " Begin to collect statistics with gate =" << m_gate_width);
+    if( m_print_bits & 1<<1 ) MsgLog(name(), info, "Stage 2: Event = " << counter() << " Begin to collect statistics with gate =" << m_gate_width);
   }
 }
 
 //--------------------
-
+/// Implementation for abstract method from CSPadBaseModule.h
 /// Collect statistics
 void 
-CSPadArrAverage::collectStat(unsigned quad, const int16_t* data)
+CSPadArrAverage::procQuad(unsigned quad, const int16_t* data)
 {
-  //cout << "collectStat for quad =" << quad << endl;
+  //cout << "procQuad for quad =" << quad << endl;
 
   int ind_in_arr = 0;
   for (int sect = 0; sect < MaxSectors; ++ sect) {
@@ -288,11 +252,12 @@ CSPadArrAverage::collectStat(unsigned quad, const int16_t* data)
 }
 
 //--------------------
-
 // Print input parameters
 void 
 CSPadArrAverage::printInputParameters()
 {
+  printBaseParameters();
+
   WithMsgLog(name(), info, log) {
     log << "\n Input parameters:"
         << "\n source     : " << sourceConfigured()
@@ -305,24 +270,16 @@ CSPadArrAverage::printInputParameters()
         << "\n gate_width1: " << m_gate_width1 
         << "\n gate_width2: " << m_gate_width2 
         << "\n";     
-
-    log << "\n MaxQuads   : " << MaxQuads    
-        << "\n MaxSectors : " << MaxSectors  
-        << "\n NumColumns : " << NumColumns  
-        << "\n NumRows    : " << NumRows     
-        << "\n SectorSize : " << SectorSize  
-        << "\n";
   }
 }
 
 //--------------------
-
 void 
 CSPadArrAverage::printEventId(Event& evt)
 {
   shared_ptr<PSEvt::EventId> eventId = evt.get();
   if (eventId.get()) {
-    MsgLog( name(), info, "Event="  << m_count << " ID: " << *eventId);
+    MsgLog( name(), info, "Event="  << counter() << " ID: " << *eventId);
   }
 }
 
