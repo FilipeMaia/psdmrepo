@@ -115,6 +115,14 @@ CsPadPedestals::beginRun(Event& evt, Env& env)
     ++ count;
   }
 
+  shared_ptr<Psana::CsPad::ConfigV5> config5 = env.configStore().get(src, &m_src);
+  if (config5.get()) {
+    for (int i = 0; i < MaxQuads; ++i) {
+      m_segMask[i] = config5->roiMask(i);
+    }
+    ++ count;
+  }
+
   if (not count) {
     MsgLog(name(), error, "No CsPad configuration objects found, terminating.");
     terminate();
