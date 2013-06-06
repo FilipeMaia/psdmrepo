@@ -11,6 +11,13 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2013-06-06 Mikhail S. Dubrovin
+- add 
+A         src/PixCoordsCSPad2x2V2.cpp
+A         include/PixCoordsCSPad2x2V2.h
+A         test/ex_PixCoordsCSPad2x2V2.cpp
+- use new PixCoordsCSPad2x2V2 in CSPad2x2ImageProducer
+	
 Tag: V00-03-04
 2013-05-21 Mikhail S. Dubrovin
 - add CSPadNDArrProducer, many other improvements.

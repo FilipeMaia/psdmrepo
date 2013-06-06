@@ -75,39 +75,42 @@ namespace CSPadPixCoords {
  *
  */ 
 
-const static double DEG_TO_RAD    = 3.14159265359 / 180; 
+const static double DEG_TO_RAD = 3.14159265359 / 180; 
 
-void rotation(const double* x, const double* y, const unsigned& size, const double& angle_deg,          double* xrot, double* yrot);
-void rotation(const double* x, const double* y, const unsigned& size, const double& C, const double& S, double* xrot, double* yrot);
-double min_of_array(const double* arr, const unsigned& size);
-double max_of_array(const double* arr, const unsigned& size);
+void rotation(const double* x, const double* y, unsigned size, double angle_deg,   double* xrot, double* yrot);
+void rotation(const double* x, const double* y, unsigned size, double C, double S, double* xrot, double* yrot);
+double min_of_array(const double* arr, unsigned size);
+double max_of_array(const double* arr, unsigned size);
 
 
 class PixCoords2x1V2  {
 public:
 
-  enum AXIS { X=0, 
-              Y,
-              Z };
+  enum AXIS { AXIS_X=0, 
+              AXIS_Y,
+              AXIS_Z };
 
   enum UNITS { UM=0,
                PIX };  // coordinates in micrometers or pixels
 
-  const static int    ROWS2X1       = 185;    // Psana::CsPad::ColumnsPerASIC     };
-  const static int    COLS2X1       = 388;    // Psana::CsPad::MaxRowsPerASIC * 2 };
-  const static int    COLS2X1HALF   = 194;    // Psana::CsPad::MaxRowsPerASIC     };
-  const static int    SIZE2X1       = COLS2X1*ROWS2X1;
-  const static int    NCORNERS      =   4;
+  const static unsigned ROWS2X1     = 185;    // Psana::CsPad::ColumnsPerASIC     };
+  const static unsigned COLS2X1     = 388;    // Psana::CsPad::MaxRowsPerASIC * 2 };
+  const static unsigned COLS2X1HALF = 194;    // Psana::CsPad::MaxRowsPerASIC     };
+  const static unsigned SIZE2X1     = COLS2X1*ROWS2X1;
+  const static unsigned NCORNERS    =   4;
 
   const static double PIX_SIZE_COLS = 109.92;
   const static double PIX_SIZE_ROWS = 109.92;
   const static double PIX_SIZE_WIDE = 274.80;
+  const static double PIX_SIZE_UM   = 109.92;
+  const static double UM_TO_PIX     = 1./109.92;
 
   // Default constructor
   /**
-   *  @brief No parameters needed; everything is defined through the fixed 2x1 chip geometry.
+   *  @brief Fills/holds/provides access to the arrays of the CSPAD 2x1-section pixel coordinates.
    *  
-   *  Fills/holds/provides access to the arrays of row, column, and ortogonal coordinate of 2x1 pixels
+   *  The 2x1 pixel geometry is defined through the fixed chip configuration.
+   *  The only optional parameter can be used if the wide-pixel row coordinate is prefered to be in the raw center.
    */
   PixCoords2x1V2 (bool use_wide_pix_center=false);
 

@@ -18,13 +18,13 @@
 // Base Class Headers --
 //----------------------
 #include "psana/Module.h"
+#include "MsgLogger/MsgLogger.h"
 
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
 #include "PSCalib/CSPad2x2CalibPars.h"
-#include "CSPadPixCoords/PixCoords2x1.h"
-#include "CSPadPixCoords/PixCoordsCSPad2x2.h"
+#include "CSPadPixCoords/PixCoordsCSPad2x2V2.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -71,6 +71,11 @@ namespace CSPadPixCoords {
 class CSPad2x2ImageProducer : public Module {
 public:
 
+  typedef CSPadPixCoords::PixCoordsCSPad2x2V2 PC2X2;
+
+  const static int NX_CSPAD2X2=400; 
+  const static int NY_CSPAD2X2=400;
+
   // Default constructor
   CSPad2x2ImageProducer (const std::string& name) ;
 
@@ -105,6 +110,7 @@ protected:
   void printInputParameters();
   int  getRunNumber(Event& evt);
   void getConfigPars(Env& env);
+  void getCalibPars(Event& evt, Env& env);
   void cspad_image_init();
   void processEvent(Event& evt, Env& env);
 
@@ -126,27 +132,17 @@ private:
   std::string m_inkey; 
   std::string m_outimgkey;   // i.e. "CSPad:Image"
   bool        m_tiltIsApplied;
+  bool        m_useWidePixCenter; 
   unsigned    m_print_bits;
-  long        m_count;
+  unsigned    m_count;
+  unsigned    m_count_cfg;
 
   uint32_t m_roiMask;
   uint32_t m_numAsicsStored;
 
-  uint32_t m_n2x1;         // 2
-  uint32_t m_ncols2x1;     // 185
-  uint32_t m_nrows2x1;     // 388
-  uint32_t m_sizeOf2x1Arr; // 185*388;
+  PSCalib::CSPad2x2CalibPars  *m_cspad2x2_calibpars;
+  PC2X2                       *m_pix_coords_cspad2x2;
 
-  PSCalib::CSPad2x2CalibPars     *m_cspad2x2_calibpars;
-  CSPadPixCoords::PixCoords2x1   *m_pix_coords_2x1;
-  //CSPadPixCoords::PixCoordsQuad  *m_pix_coords_quad;
-  //CSPadPixCoords::PixCoordsCSPad *m_pix_coords_cspad;
-  CSPadPixCoords::PixCoordsCSPad2x2 *m_pix_coords_cspad2x2;
-
-  CSPadPixCoords::PixCoords2x1::COORDINATE XCOOR;
-  CSPadPixCoords::PixCoords2x1::COORDINATE YCOOR;
-  CSPadPixCoords::PixCoords2x1::COORDINATE ZCOOR;
-	
   uint32_t   m_cspad_ind;
   double    *m_coor_x_pix;
   double    *m_coor_y_pix;
@@ -155,10 +151,34 @@ private:
 
   float      m_common_mode[2];
 
-  enum{ NX_CSPAD2X2=400, 
-        NY_CSPAD2X2=400 };
   double m_arr_cspad2x2_image[NX_CSPAD2X2][NY_CSPAD2X2];
-};
+
+
+public:
+
+  /**
+   * @brief Get configuration info from Env, return true if configuration is found, othervise false.
+   * 
+   */
+  template <typename T>
+  bool getConfigParsForType(Env& env)
+  {
+      shared_ptr<T> config = env.configStore().get(m_source, &m_src);
+      if (config) {
+        m_roiMask        = config->roiMask();
+        m_numAsicsStored = config->numAsicsStored();
+        ++ m_count_cfg;
+        WithMsgLog(name(), info, str) {
+          str << "CsPad2x2::ConfigV"    << m_count_cfg << ":";
+          str << " roiMask = "          << config->roiMask();
+          str << " m_numAsicsStored = " << config->numAsicsStored();
+         }  
+	return true;
+      }
+      return false;
+  }
+
+}; // class CSPad2x2ImageProducer
 
 } // namespace CSPadPixCoords
 

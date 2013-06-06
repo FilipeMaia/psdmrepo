@@ -80,8 +80,8 @@ void test03()
   //double* x_arr = pix_coords_2x1 -> get_x_map_2x1_um ();
   //double* y_arr = pix_coords_2x1 -> get_y_map_2x1_um ();
 
-  double* x_arr = pix_coords_2x1 -> get_coord_map_2x1 (PC2X1::X, PC2X1::UM, angle);
-  double* y_arr = pix_coords_2x1 -> get_coord_map_2x1 (PC2X1::Y, PC2X1::UM, angle);
+  double* x_arr = pix_coords_2x1 -> get_coord_map_2x1 (PC2X1::AXIS_X, PC2X1::UM, angle);
+  double* y_arr = pix_coords_2x1 -> get_coord_map_2x1 (PC2X1::AXIS_Y, PC2X1::UM, angle);
 
   for (unsigned r=0; r<NROWS; r++){
   for (unsigned c=0; c<NCOLS; c++){
