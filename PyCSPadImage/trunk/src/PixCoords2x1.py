@@ -33,7 +33,7 @@ The (r,c)=(0,0) is in the top left corner of the matrix, has coordinates (xmin,y
       |             |              |
       |             |              |
       ------------------------------
-   (194,0)          |           (194,387)
+   (184,0)          |           (184,387)
    (Xmin,Ymin)
 
 """

@@ -12,6 +12,14 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 #---------------------
+2012-06-07 Mikhail S. Dubrovin
+Tag: V00-00-12
+- improve interface
+M       src/PixCoords2x1.py
+M       src/CSPAD2x2CalibPars.py
+M       src/CSPAD2x2CalibParsDefault.py
+	
+#---------------------
 2012-03-14 Mikhail S. Dubrovin
 Tag: V00-00-11
 - add modules for CSPAD2x2:

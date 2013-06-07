@@ -3,7 +3,7 @@
 #  $Id$
 #
 # Description:
-#  Module CSPAD2x2CalibParsDefault...
+#  Module CSPAD2x2CalibParsDefault
 #
 #------------------------------------------------------------------------
 
@@ -36,7 +36,10 @@ import numpy as np
 #---------------------
 
 class CSPAD2x2CalibParsDefault (object) :
-    """This class provides access to the CSPAD2x2 calibration parameters
+    """Provides access to the CSPAD2x2 calibration parameters.
+
+       This class should not be used by itself; default parameters are different from real.
+       It is used in CSPAD2x2CalibPars to get rid of undefined parameters in case of missing calibration files.
     """
     list_of_clib_types =[
          'center'
@@ -51,13 +54,16 @@ class CSPAD2x2CalibParsDefault (object) :
 #---------------------
 
     def __init__ (self) :
-
+        """Constructor does not need in input parameters.
+           All data implemented calibration types will be initialized.
+        """
         self.loadCSPAD2x2CalibParsDefault()
 
 #---------------------
 
     def loadCSPAD2x2CalibParsDefault (self) :
-
+        """Initialization of all implemented arrays of calibration parameters
+        """
         self.defpars = {}
 
         self.defpars['center'] = np.array(  [[198., 198.],
@@ -66,13 +72,13 @@ class CSPAD2x2CalibParsDefault (object) :
 
         self.defpars['tilt']          = np.zeros((2), dtype=np.float32)
 
+        self.defpars['beam_vector']   = np.zeros((3), dtype=np.float32)
+
         self.defpars['common_mode']   = np.array([1, 100, 30])
 
         self.defpars['pedestals']     = np.zeros((185, 388, 2), dtype=np.float32)
 
         self.defpars['pixel_status']  = np.zeros((185, 388, 2), dtype=np.uint16)
-
-        self.defpars['beam_vector']   = np.zeros((3), dtype=np.float32)
 
         self.defpars['filter']        = np.array([1, 100, 10])
 
@@ -97,13 +103,16 @@ class CSPAD2x2CalibParsDefault (object) :
 #---------------------
 
     def printListOfCalibTypes (self) :
+        """Print the list of calibration types.
+        """
         print '\nprintListOfCalibTypes(): list_of_clib_types:' #, self.list_of_clib_types
         for type in self.list_of_clib_types : print '    ', type
 
 #---------------------
 
     def getCalibParsDefault (self, type) :
-
+        """Returns calibration parameters of specified type as a numpy array.
+        """
         if type in self.list_of_clib_types :
             return self.defpars[type]
         else :
@@ -113,16 +122,18 @@ class CSPAD2x2CalibParsDefault (object) :
             return None
 
 #---------------------------------------
-
+# Define the default calibration parameters in the singleton object
 cspad2x2calibparsdefault = CSPAD2x2CalibParsDefault()
 
-#----------------------------------------------
-# In case someone decides to run this module --
-#----------------------------------------------
+#----------
+#-- TEST --
+#----------
 
 def main_test() :
     cspad2x2calibparsdefault.printCalibParsDefault()
     cspad2x2calibparsdefault.printListOfCalibTypes()
+    cspad2x2calibparsdefault.printCalibParsDefault('center')
+    print 'Test of getCalibParsDefault("center"):\n', cspad2x2calibparsdefault.getCalibParsDefault('center')
 
 if __name__ == "__main__" :
     main_test()

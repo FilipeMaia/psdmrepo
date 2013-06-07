@@ -24,14 +24,37 @@ import os
 
 import numpy as np
 import CSPAD2x2CalibParsDefault as cpd
-from CalibPars import findCalibFile
+from   CalibPars import findCalibFile
 
 #---------------------
 #  Class definition --
 #---------------------
 
 class CSPAD2x2CalibPars (object) :
-    """This class provides access to the calibration parameters.
+    """This class provides access to the CSPAD2x2 calibration parameters.
+
+       Interface
+       =========
+       Regular instantiation:
+           path  = '/reg/d/psdm/mec/mec73313/calib/CsPad2x2::CalibV1/MecTargetChamber.0:Cspad2x2.1/'
+           run   = 123
+           list_of_clib_types = ['center', 'tilt', 'pedestals'] # optional list of used types
+           calib = CSPAD2x2CalibPars(path, run, list_of_clib_types)
+
+       Other instantiation:
+           calib    = CSPAD2x2CalibPars() # list_of_clib_types - is an optional
+           run      = 123 
+           calibdir = '/reg/d/psdm/mec/mec73313/calib'
+           group    = 'CsPad2x2::CalibV1'
+           source   = 'MecTargetChamber.0:Cspad2x2.1'
+           calib.setCalibPars (run, calibdir, group, source)
+
+       Update run:
+           calib.setRun (run)
+
+       Get array of calibration parameters for specified type:
+           type = 'center'
+           arr  = calib.getCalibPars (type)
     """
     #enum_status = {0:'DEFAULT', 1:'FROM_FILE'}
 
@@ -46,10 +69,6 @@ class CSPAD2x2CalibPars (object) :
         ]
 
 #---------------------
-    # Example of parameters:
-    # official : path = '/reg/d/psdm/mec/mec73313/calib/CsPad2x2::CalibV1/MecTargetChamber.0:Cspad2x2.1/'
-    # local    : path = '/reg/neh/home1/dubrovin/LCLS/CSPad2x2Alignment/calib-cspad2x2-02-2013-02-13/'
-    # run = 10 
 
     def __init__ (self, path=None, run=None, list_of_clib_types=None) :
         """Class constructor:
@@ -144,7 +163,6 @@ class CSPAD2x2CalibPars (object) :
     def loadAllCalibPars (self) :
         """Loads all calibration parameters, if the files are available or set default.
         """
-
         self.cpars = {}
 
         for type in self.list_of_clib_types :
@@ -188,9 +206,11 @@ class CSPAD2x2CalibPars (object) :
     def printCalibFiles (self) :
         """Print the list of calibration files for this object.
         """
+        msg = ''
         for type in self.list_of_clib_types :
             fname = findCalibFile (self.path_to_calib_types, self.run, type)
-            print 'Calib type: %15s has file: %s' % (type, fname)
+            msg += 'Calib type: %s has file: %s\n' % (type.ljust(15), fname)
+        print msg
 
 #---------------------
 
@@ -202,13 +222,23 @@ class CSPAD2x2CalibPars (object) :
 
 #---------------------
 
-    def printCalibPars (self) :
+    def printCalibPars (self, type=None) :
         """Print all calibration parameters.
         """
-        for type in self.list_of_clib_types :
-            print '\nCalibration constants type "' + type + '" with shape' + str(self.cpars[type].shape)
-            print self.cpars[type]
-            
+        if type==None :
+            for t in self.list_of_clib_types :
+                print '\nCalibration constants type "' + t + '" with shape' + str(self.cpars[t].shape)
+                print self.cpars[t]
+
+        else :
+            if type in self.list_of_clib_types :
+                print '\nprintCalibParsDefault(): Calibration constants type "' + type + '"' # + '" with shape', self.cpars[type].shape
+                print self.cpars[type]
+            else :
+                msg =  'WARNING: THE REQUESTED TYPE OF CALIBRATION PARS "' + type + \
+                       '" IS NOT FOUND IN THE AVAILABLE LIST:\n' + str(self.list_of_clib_types)
+                print msg
+             
 #---------------------
 
     def printCalibParsStatus (self) :
@@ -221,7 +251,7 @@ class CSPAD2x2CalibPars (object) :
 #---------------------
 
     def getCalibPars (self, type) :
-        """Returns the numpy array of with calibration parameters for specified type.
+        """Returns the numpy array of calibration parameters for specified type.
         """
         if type in self.list_of_clib_types :
             return self.cpars[type]
@@ -265,19 +295,21 @@ def main_test() :
     #path = '/reg/neh/home1/dubrovin/LCLS/CSPad2x2Alignment/calib-cspad2x2-02-2013-02-13/'
     run = 180
 
-    #calib = CSPAD2x2CalibPars()                                     # Sets all default calibration parameters
+    #calib = CSPAD2x2CalibPars() # Sets all default calibration parameters
     #calib = CSPAD2x2CalibPars(list_of_clib_types=['center', 'tilt', 'pedestals']) # Sets default calibration parameters
-    #calib.setCalibParsForPath (run, path)                           
+    #calib.setCalibParsForPath(run, path)                           
     #calib = CSPAD2x2CalibPars(path, run)
     calib = CSPAD2x2CalibPars(path, run) #, ['center', 'tilt', 'pedestals'])
 
+    calib.printCalibPars()
+    calib.printCalibPars ('center')
     #print 'pedestals:\n', calib.getCalibPars('pedestals')
-    print 'center:\n', calib.getCalibPars('center')
-    print 'tilt:\n',   calib.getCalibPars('tilt')
-
+    print 'Test of getCalibPars("center"):\n', calib.getCalibPars('center')
+    print 'Test of getCalibPars("tilt"):\n',   calib.getCalibPars('tilt')
     calib.printCalibParsStatus()
-    #calib.printListOfCalibTypes()
-    #calib.printCalibPars()
+    calib.printListOfCalibTypes()
+    calib.printCalibFiles()
+
 
 def test_reshaping_arrs_for_cspad2x2() :
 
