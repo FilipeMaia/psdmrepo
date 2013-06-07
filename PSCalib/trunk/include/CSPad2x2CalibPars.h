@@ -65,9 +65,8 @@ namespace PSCalib {
 class CSPad2x2CalibPars  {
 public:
 
-  // Default constructor
-  // Test constructor
-  CSPad2x2CalibPars () ;
+  /// Default and test constructor
+  CSPad2x2CalibPars ( bool isTestMode = false ) ;
 
   // Regular constructor
   /**

@@ -37,22 +37,24 @@ using namespace std;
 
 namespace PSCalib {
 
+const char logger[] = "PSCalib";
+
 //----------------
 // Constructors --
 //----------------
 
-CSPad2x2CalibPars::CSPad2x2CalibPars ()
+CSPad2x2CalibPars::CSPad2x2CalibPars (bool isTestMode)
+  : m_calibDir     (std::string())
+  , m_typeGroupName(std::string())
+  , m_source       (std::string())
+  , m_runNumber    (0)
 {
-  cout << "CSPad2x2CalibPars::CSPad2x2CalibPars" 
-       << "\nHere we have to find from the xtc_file_name the run number and find the calib directory..." << endl;
-
-    // Temporary staff:
-
-    m_isTestMode = true;
-
-    //m_calibdir      = "/reg/neh/home1/dubrovin/LCLS/CSPad2x2Alignment/calib-cspad2x2-01-2013-02-13/";
-    m_calibdir      = "/reg/d/psdm/mec/mec73313/calib";
-    m_calibfilename = "0-end.data";
+    // Test staff:
+    m_isTestMode = isTestMode;
+    if (m_isTestMode) {
+        m_calibdir      = "/reg/d/psdm/mec/mec73313/calib";
+        m_calibfilename = "0-end.data";
+    }
 
     fillCalibNameVector ();
     loadCalibPars ();
@@ -146,6 +148,10 @@ void CSPad2x2CalibPars::getCalibFileName ()
       m_fname += m_cur_calibname + "/"; 
       m_fname += m_calibfilename; // "/0-end.data"; // !!! THIS IS A SIMPLIFIED CASE OF THE FILE NAME!!!
     }
+  else if (m_calibDir == std::string())
+    {
+      m_fname = std::string();
+    }
   else
     {
       PSCalib::CalibFileFinder *calibfinder = new PSCalib::CalibFileFinder(m_calibDir, m_typeGroupName);
@@ -230,7 +236,7 @@ void CSPad2x2CalibPars::fatalMissingFileName ()
 
 void CSPad2x2CalibPars::msgUseDefault ()
 {
-	MsgLog("CSPad2x2CalibPars", warning, "In getCalibFileName(): the calibration file for the source=" << m_source 
+	MsgLog("CSPad2x2CalibPars", info, "In getCalibFileName(): the calibration file for the source=" << m_source 
                   << ", type=" << m_cur_calibname 
                   << ", run=" <<  m_runNumber
                   << " is not found ..."

@@ -73,17 +73,11 @@ namespace PSCalib {
 
 //----------------
 
-//enum { NQuad = Psana::CsPad::MaxQuadsPerSensor};
-//enum { NSect = Psana::CsPad::SectorsPerQuad};
-
-//----------------
-
 class CSPadCalibPars  {
 public:
 
-  // Default constructor
-  // Test constructor
-  CSPadCalibPars () ;
+  /// Default and test constructor
+  CSPadCalibPars ( bool isTestMode = false ) ;
 
   // Regular constructor
   /**

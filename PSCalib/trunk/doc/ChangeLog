@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-09
+2013-06-07 Mikhail S. Dubrovin
+- improve interface for CSPadCalibPars and CSPad2x2CalibPars constructor
+	
 Tag: V00-01-08
 2013-04-03 Mikhail S. Dubrovin
 - add two new calib types for center_global and rotation_global
