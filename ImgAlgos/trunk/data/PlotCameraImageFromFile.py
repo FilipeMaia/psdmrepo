@@ -12,12 +12,14 @@ import h5py
 
 def plot_image (arr, img_range=None, zrange=None) :    # range = (left, right, low, high), zrange=(zmin,zmax)
     fig = plt.figure(num=1, figsize=(12,12), dpi=80, facecolor='w', edgecolor='w', frameon=True)
-    fig.subplots_adjust(left=0.10, bottom=0.08, right=0.98, top=0.92, wspace=0.2, hspace=0.1)
+    fig.subplots_adjust(left=0.05, bottom=0.03, right=0.98, top=0.98, wspace=0.2, hspace=0.1)
+    figAxes = fig.add_subplot(111)
+    #figAxes = fig.add_axes([0.15, 0.06, 0.78, 0.21])
     imAxes = figAxes.imshow(arr, origin='upper', interpolation='nearest', aspect='auto', extent=img_range)
     if zrange != None : imAxes.set_clim(zrange[0],zrange[1])
     colbar = fig.colorbar(imAxes, pad=0.03, fraction=0.04, shrink=1.0, aspect=40, orientation=1)
 
-def plot_histogram(arr, amp_range=(0,500),figsize=(6,6), bins=40) :
+def plot_histogram(arr, amp_range=None, figsize=(6,6), bins=40) :
     fig = plt.figure(figsize=figsize, dpi=80, facecolor='w', edgecolor='w', frameon=True)
     plt.hist(arr.flatten(), bins=bins, range=amp_range)
     #fig.canvas.manager.window.move(500,10)
@@ -41,8 +43,8 @@ def get_numpy_array_from_file(fname) :
 def get_input_parameters() :
 
     fname_def = './image0_ev000115.txt'
-    Amin_def  =   0
-    Amax_def  = 100
+    Amin_def  = None
+    Amax_def  = None
 
     nargs = len(sys.argv)
     print 'sys.argv[0]: ', sys.argv[0]

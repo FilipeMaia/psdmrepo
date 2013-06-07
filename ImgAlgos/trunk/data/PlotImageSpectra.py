@@ -32,8 +32,8 @@ def get_input_parameters_adv() :
 def get_input_parameters() :
 
     fname_def = './spec-xppi0412-r0060-20120507-125420.198726277.txt'
-    Amin_def  =   0
-    Amax_def  = 100
+    Amin_def  = None
+    Amax_def  = None
 
     nargs = len(sys.argv)
     print 'sys.argv[0]: ', sys.argv[0]

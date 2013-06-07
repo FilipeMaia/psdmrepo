@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-13
+2013-06-07 Mikhail S. Dubrovin
+- minor improvement of scripts in ImgAlgos/data/ directory 
+	
 Tag: V00-03-12
 2013-06-03 Mikhail S. Dubrovin
 - Code re-factoring;

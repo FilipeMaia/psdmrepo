@@ -116,8 +116,9 @@ private:
 //--------------------
 
   std::string stringFromUint(unsigned number, unsigned width=6, char fillchar='0');
-  std::string stringRunNumber(PSEvt::Event& evt, unsigned width=4);
   std::string stringTimeStamp(PSEvt::Event& evt, std::string fmt="%Y%m%d-%H%M%S%f"); //("%Y-%m-%d %H:%M:%S%f%z");
+  std::string stringRunNumber(PSEvt::Event& evt, unsigned width=4);
+  int getRunNumber(PSEvt::Event& evt);
   double doubleTime(PSEvt::Event& evt);
   unsigned fiducials(PSEvt::Event& evt);                  // returns 17-bits (131071) integer value: fiducials clock runs at 360Hz.
   unsigned eventCounterSinceConfigure(PSEvt::Event& evt); // returns 15-bits (32767)  integer value: event counter since Configure.

@@ -96,6 +96,21 @@ stringRunNumber(PSEvt::Event& evt, unsigned width)
 
 //--------------------
 
+/// Returns integer run number
+int 
+getRunNumber(PSEvt::Event& evt)
+{
+  boost::shared_ptr<PSEvt::EventId> eventId = evt.get();
+  if (eventId.get()) {
+    return eventId->run();
+  } else {
+    MsgLogRoot(warning, "Cannot determine run number, will use 0.");
+    return int(0);
+  }
+}
+
+//--------------------
+
 unsigned 
 fiducials(PSEvt::Event& evt)
 {

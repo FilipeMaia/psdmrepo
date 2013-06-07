@@ -169,12 +169,14 @@ def get_array_from_file(fname) :
 def getCSPadImageAligned(arr_raw, path_calib, runnum) :
 
     #print 'Load calibration parameters from', path_calib 
-    calp.calibpars.setCalibParsForPath ( run=runnum, path=path_calib )
-    cpe.cpeval.printCalibParsEvaluatedAll() 
+    #calp.calibpars.setCalibParsForPath ( run=runnum, path=path_calib )
+    #cpe.cpeval.printCalibParsEvaluatedAll() 
 
-    #print 'Make the CSPad image from raw array'
-    cspadimg = cip.CSPadImageProducer(calp.calibpars, rotation=1, tiltIsOn=True)#, mirror=True)
-    return cspadimg.getCSPadImage( arr_raw )
+    #calib = calp.CalibPars(path=path_calib, run=runnum) #, list_of_clib_types)
+
+    print 'Make the CSPad image from raw array'
+    #cspadimg = cip.CSPadImageProducer(calib, rotation=1, tiltIsOn=True)#, mirror=True)
+    #return cspadimg.getCSPadImage( arr_raw )
 
 #--------------------
 
@@ -239,6 +241,7 @@ def do_main() :
     runnum = 150
     path_calib = '/reg/d/psdm/CXI/cxi49012/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/'
     arr = getCSPadImageAligned(arr_raw, path_calib, runnum)
+
     #------------------------------------- New stuff
 
     # Plot 1
@@ -251,20 +254,20 @@ def do_main() :
 
 
     # Plot 2
-    plot_image(arr, zrange=ampRange)
-    plt.get_current_fig_manager().window.geometry("+450+10")
-    plt.savefig('cspad-img.png')
+    #plot_image(arr, zrange=ampRange)
+    #plt.get_current_fig_manager().window.geometry("+450+10")
+    #plt.savefig('cspad-img.png')
 
 
     # Plot 3
-    plot_histogram(arr, amp_range=ampRange)
+    plot_histogram(arr_segs, amp_range=ampRange)
     plt.get_current_fig_manager().window.geometry("+950+10")
     plt.savefig('cspad-spe.png')
 
     plt.show()
 
     #saveHRImageInFile(arr_segs,ampRange,fname='cspad-arr-hr.png') 
-    saveHRImageInFile(arr, ampRange, fname='cspad-img-hr.png') 
+    #saveHRImageInFile(arr, ampRange, fname='cspad-img-hr.png') 
 
 
 #--------------------

@@ -242,8 +242,8 @@ def get_input_parameters() :
     #fname_def = '/reg/neh/home/dubrovin/LCLS/PSANA-V00/cspad-cxi49012-r0027-pedestals-rms.dat'
     #fname_def = 'cspad-noise.dat'
 
-    Amin_def =   0
-    Amax_def =  10
+    Amin_def = None
+    Amax_def = None
 
     nargs = len(sys.argv)
     print 'sys.argv[0]: ', sys.argv[0]

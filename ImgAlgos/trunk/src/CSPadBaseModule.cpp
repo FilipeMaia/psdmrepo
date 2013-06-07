@@ -102,6 +102,13 @@ CSPadBaseModule::beginRun(Event& evt, Env& env)
     ++ count;
   }
 
+  shared_ptr<Psana::CsPad::ConfigV5> config5 = env.configStore().get(m_str_src, &m_src);
+  if (config5.get()) {
+    MsgLog(name(), debug, "Found CsPad::ConfigV5 object with address " << m_src);
+    for (int i = 0; i < Psana::CsPad::MaxQuadsPerSensor; ++i) { m_segMask[i] = config5->roiMask(i); }
+    ++ count;
+  }
+
   if (not count) {
     MsgLog(name(), error, "No CSPad configuration objects found. Terminating.");
     terminate();

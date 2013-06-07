@@ -57,8 +57,8 @@ def get_array_from_file(fname) :
 def get_input_parameters() :
 
     fname_def = './image0_ev000115.txt'
-    Amin_def  =   0
-    Amax_def  = 100
+    Amin_def  = None
+    Amax_def  = None
 
     nargs = len(sys.argv)
     print 'sys.argv[0]: ', sys.argv[0]

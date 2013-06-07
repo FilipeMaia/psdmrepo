@@ -69,8 +69,8 @@ def get_input_parameters() :
 #    fname_def = '/reg/d/psdm/CXI/cxi49012/scratch/hdf5/r0025-a/LCLS_2012_Feb02_r0025_184636_e4e_cspad.h5'
 #    fname_def = '/reg/d/psdm/CXI/cxi49012/scratch/hdf5/r0025-a/LCLS_2012_Feb02_r0025_184840_bd62_cspad.h5'
 #    fname_def = '/reg/d/psdm/CXI/cxi49012/scratch/hdf5/r0025-a/LCLS_2012_Feb02_r0025_185010_13b62_cspad.h5'
-    Amin_def  =   0
-    Amax_def  = 100
+    Amin_def  = None
+    Amax_def  = None
 
     dsname  = '/data/rawdata'
     #dsname  = '/data/data'
