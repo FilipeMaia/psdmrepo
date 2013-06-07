@@ -31,6 +31,7 @@
 #include "CSPadPixCoords/PixCoordsCSPad.h"
 
 #include "CSPadPixCoords/Image2D.h"
+#include "CSPadPixCoords/GlobalMethods.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -119,8 +120,8 @@ public:
 protected:
 
   void printInputParameters();
-  void getQuadConfigPars(Env& env);
-
+  void getConfigPars(Env& env);
+  void getCalibPars(Event& evt, Env& env);
   void procEvent(Event& evt, Env& env);
   void getCSPadConfigFromData(Event& evt);
 
@@ -177,14 +178,14 @@ private:
 
 //-------------------
   /**
-   * @brief Gets m_numQuadsInConfig, m_roiMask[q] and m_num2x1Stored[q] from the Psana::CsPad::ConfigV# object.
+   * @brief Gets m_src, m_numQuadsInConfig, m_roiMask[q] and m_num2x1Stored[q] from the Psana::CsPad::ConfigV# object.
    * 
    */
 
   template <typename T>
   bool getQuadConfigParsForType(Env& env) {
 
-        shared_ptr<T> config = env.configStore().get(m_source);
+        shared_ptr<T> config = env.configStore().get(m_source, &m_src);
         if (config.get()) {
             for (uint32_t q = 0; q < NQuadsMax; ++ q) {
               m_roiMask[q]         = config->roiMask(q);
@@ -223,28 +224,6 @@ private:
   }
 
 //--------------------
-  /**
-   * @brief Adds image in the event as ndarray<T,2> or Image2D<T>, depending on m_imgkey.
-   * 
-   * @param[in]  ndarr pointer to the data array with image of type T.
-   */
-
-  template <typename T>
-  void addImageInEventForType(Event& evt, ndarray<T,2>& ndarr)
-  {
-    if(m_imgkey == "Image2D") {
-
-      shared_ptr< CSPadPixCoords::Image2D<T> > img2d( new CSPadPixCoords::Image2D<T>(ndarr.data(), ndarr.shape()[0], ndarr.shape()[1]) );
-      evt.put(img2d, m_src, m_imgkey);
-
-    } else {
-
-      shared_ptr< ndarray<T,2> > img2d( new ndarray<T,2>(ndarr) );
-      evt.put(img2d, m_src, m_imgkey);
-    }
-  }
-
-//-------------------
   /**
    * @brief Fills a part of the image (img_nda) for one quad per call.
    * 
@@ -335,7 +314,8 @@ private:
         }
       
         //addImageInEventForType<double>(evt, &m_arr_cspad_image[0][0]);
-        addImageInEventForType<TOUT>(evt, img_nda);
+        //addImageInEventForType<TOUT>(evt, img_nda);
+        save2DArrayInEvent<TOUT>(evt, m_src, m_imgkey, img_nda);
 
         return true;
       } // if (data_shp.get())
@@ -375,7 +355,8 @@ private:
               ind2x1_in_arr += m_num2x1Stored[q];
           }
         
-          addImageInEventForType<T>(evt, img_nda);
+          //addImageInEventForType<T>(evt, img_nda);
+          save2DArrayInEvent<T>(evt, m_src, m_imgkey, img_nda);
         
           return true;
         } // if (shp.get())

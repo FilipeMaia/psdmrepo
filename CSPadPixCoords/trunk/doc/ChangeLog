@@ -11,11 +11,14 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-05
+2013-06-07 Mikhail S. Dubrovin
+- fix problem with "striped" cspad image
+- add GlobalMethods
+- continue code re-factoring; move common things in a single place
+	
 2013-06-06 Mikhail S. Dubrovin
-- add 
-A         src/PixCoordsCSPad2x2V2.cpp
-A         include/PixCoordsCSPad2x2V2.h
-A         test/ex_PixCoordsCSPad2x2V2.cpp
+- add PixCoordsCSPad2x2V2,ex_PixCoordsCSPad2x2V2 
 - use new PixCoordsCSPad2x2V2 in CSPad2x2ImageProducer
 	
 Tag: V00-03-04

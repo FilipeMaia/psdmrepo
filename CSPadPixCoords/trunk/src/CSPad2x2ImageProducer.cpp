@@ -14,6 +14,7 @@
 // This Class's Header --
 //-----------------------
 #include "CSPadPixCoords/CSPad2x2ImageProducer.h"
+#include "CSPadPixCoords/GlobalMethods.h"
 
 //-----------------
 // C/C++ Headers --
@@ -123,10 +124,8 @@ CSPad2x2ImageProducer::beginJob(Event& evt, Env& env)
 void 
 CSPad2x2ImageProducer::beginRun(Event& evt, Env& env)
 {
-  if( m_print_bits & 1 ) MsgLog(name(), info, "In beginRun(...)");
-
-  this -> getConfigPars(env);      // get m_src here
-  this -> getCalibPars(evt, env);  // use m_src here
+  getConfigPars(env);      // get m_src here
+  getCalibPars(evt, env);  // use m_src here
 }
 
 //--------------------
@@ -143,7 +142,7 @@ void
 CSPad2x2ImageProducer::event(Event& evt, Env& env)
 {
   ++m_count; //cout << "Event: " << m_count;
-  if( m_print_bits & 2 ) printTimeStamp(evt);
+  if( m_print_bits & 2 ) printTimeStamp(evt, m_count);
 
   processEvent(evt, env);
 }
@@ -172,21 +171,6 @@ CSPad2x2ImageProducer::endJob(Event& evt, Env& env)
 //--------------------
 //--------------------
 //--------------------
-//--------------------
-
-/// Return the run number
-int 
-CSPad2x2ImageProducer::getRunNumber(Event& evt)
-{
-  shared_ptr<EventId> eventId = evt.get();
-  if (eventId.get()) {
-    return eventId->run();
-  } else {
-    MsgLog(name(), warning, "Cannot determine run number, will use 0.");
-    return int(0);
-  }
-}
-
 //--------------------
 
 void 
@@ -265,43 +249,18 @@ CSPad2x2ImageProducer::cspad_image_fill(const ndarray<const int16_t,3>& data)
 }
 
 //--------------------
-
-void
-CSPad2x2ImageProducer::cspad_image_save_in_file(const std::string &filename)
-{
-  CSPadPixCoords::Image2D<double> *img2d = new CSPadPixCoords::Image2D<double>(&m_arr_cspad2x2_image[0][0], NY_CSPAD2X2, NX_CSPAD2X2);
-  img2d -> saveImageInFile(filename,0);
-}
-
-//--------------------
 void
 CSPad2x2ImageProducer::cspad_image_add_in_event(Event& evt)
 {
-  if(m_outimgkey == "Image2D") {
+    if(m_outimgkey == "Image2D") {
+      shared_ptr< CSPadPixCoords::Image2D<double> > img2d( new CSPadPixCoords::Image2D<double>(&m_arr_cspad2x2_image[0][0], NY_CSPAD2X2, NX_CSPAD2X2) );
+      evt.put(img2d, m_src, m_outimgkey);
+      return;
+    }
 
-    shared_ptr< CSPadPixCoords::Image2D<double> > img2d( new CSPadPixCoords::Image2D<double>(&m_arr_cspad2x2_image[0][0], NY_CSPAD2X2, NX_CSPAD2X2) );
-    evt.put(img2d, m_src, m_outimgkey);
-
-  } else {
-
-    const unsigned shape[] = {NY_CSPAD2X2, NX_CSPAD2X2};
-    shared_ptr< ndarray<double,2> > img2d( new ndarray<double,2>(&m_arr_cspad2x2_image[0][0],shape) );
-    evt.put(img2d, m_src, m_outimgkey);
-  }
-}
-
-//--------------------
-
-void 
-CSPad2x2ImageProducer::printTimeStamp(Event& evt)
-{
-  shared_ptr<PSEvt::EventId> eventId = evt.get();
-  if (eventId.get()) {
-
-    MsgLog( name(), info, " Run="   <<  eventId->run()
-                       << " Event=" <<  m_count 
-                       << " Time="  <<  eventId->time() );
-  }
+    const unsigned shape[] = {NX_CSPAD2X2, NY_CSPAD2X2};
+    ndarray<double,2> img_nda (&m_arr_cspad2x2_image[0][0],shape);
+    save2DArrayInEvent<double>(evt, m_src, m_outimgkey, img_nda);
 }
 
 //--------------------

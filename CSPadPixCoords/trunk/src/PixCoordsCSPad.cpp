@@ -206,8 +206,8 @@ void PixCoordsCSPad::fillArrsOfCSPadPixCoords()
           m_coor_x_pix [quad][sect][col][row] = coor_x_um * PSCalib::CSPadCalibPars::getRowUmToPix();
           m_coor_y_pix [quad][sect][col][row] = coor_y_um * PSCalib::CSPadCalibPars::getColUmToPix();
 
-          m_coor_x_int [quad][sect][col][row] = (int) m_coor_x_pix [quad][sect][col][row];
-          m_coor_y_int [quad][sect][col][row] = (int) m_coor_y_pix [quad][sect][col][row];
+          m_coor_x_int [quad][sect][col][row] = int (m_coor_x_pix [quad][sect][col][row] + 0.25);
+	  m_coor_y_int [quad][sect][col][row] = int (m_coor_y_pix [quad][sect][col][row] + 0.25);
 	}
       }
     }

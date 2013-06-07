@@ -13,6 +13,7 @@
 //-----------------------
 // This Class's Header --
 //-----------------------
+
 #include "CSPadPixCoords/CSPadImageProducer.h"
 
 //-----------------
@@ -112,47 +113,8 @@ CSPadImageProducer::beginJob(Event& evt, Env& env)
 void 
 CSPadImageProducer::beginRun(Event& evt, Env& env)
 {
-  // get run number
-  shared_ptr<EventId> eventId = evt.get();
-  int run = 0;
-  if (eventId.get()) {
-    run = eventId->run();
-  } else {
-    MsgLog(name(), warning, "Cannot determine run number, will use 0.");
-  }
-
-  std::string calib_dir = (m_calibDir == "") ? env.calibDir() : m_calibDir;
-
-  //m_cspad_calibpar = new PSCalib::CSPadCalibPars(); // get default calib pars from my local directory
-                                                      // ~dubrovin/LCLS/CSPadAlignment-v01/calib-cxi35711-r0009-det/
-  m_cspad_calibpar   = new PSCalib::CSPadCalibPars(calib_dir, m_typeGroupName, m_str_src, run);
-  m_pix_coords_2x1   = new CSPadPixCoords::PixCoords2x1   ();
-  m_pix_coords_quad  = new CSPadPixCoords::PixCoordsQuad  ( m_pix_coords_2x1,  m_cspad_calibpar, m_tiltIsApplied );
-  m_pix_coords_cspad = new CSPadPixCoords::PixCoordsCSPad ( m_pix_coords_quad, m_cspad_calibpar, m_tiltIsApplied );
-
-  m_coor_x_pix = m_pix_coords_cspad -> getPixCoorArrX_pix();
-  m_coor_y_pix = m_pix_coords_cspad -> getPixCoorArrY_pix();
-  m_coor_x_int = m_pix_coords_cspad -> getPixCoorArrX_int();
-  m_coor_y_int = m_pix_coords_cspad -> getPixCoorArrY_int();
-
-  if( m_print_bits & 2 ) m_cspad_calibpar  -> printCalibPars();
-  //m_pix_coords_2x1  -> print_member_data();
-  //m_pix_coords_quad -> print_member_data(); 
-
-  getQuadConfigPars(env);
-}
-
-//--------------------
-
-void 
-CSPadImageProducer::getQuadConfigPars(Env& env)
-{
-  if ( getQuadConfigParsForType<Psana::CsPad::ConfigV2>(env) ) return;
-  if ( getQuadConfigParsForType<Psana::CsPad::ConfigV3>(env) ) return;
-  if ( getQuadConfigParsForType<Psana::CsPad::ConfigV4>(env) ) return;
-  if ( getQuadConfigParsForType<Psana::CsPad::ConfigV5>(env) ) return;
-
-  MsgLog(name(), warning, "CsPad::ConfigV2 - V5 is not available in this run.");
+  getConfigPars(env);     // get m_src
+  getCalibPars(evt, env); // use m_src
 }
 
 //--------------------
@@ -172,6 +134,7 @@ CSPadImageProducer::event(Event& evt, Env& env)
 {
   // this is how to gracefully stop analysis job
   ++m_count;
+  if( m_print_bits & 2 ) printTimeStamp(evt, m_count);
 
   struct timespec start, stop;
   int status = clock_gettime( CLOCK_REALTIME, &start ); // Get LOCAL time
@@ -208,6 +171,42 @@ CSPadImageProducer::endRun(Event& evt, Env& env)
 void 
 CSPadImageProducer::endJob(Event& evt, Env& env)
 {
+}
+
+//--------------------
+
+void 
+CSPadImageProducer::getConfigPars(Env& env)
+{
+  if ( getQuadConfigParsForType<Psana::CsPad::ConfigV2>(env) ) return;
+  if ( getQuadConfigParsForType<Psana::CsPad::ConfigV3>(env) ) return;
+  if ( getQuadConfigParsForType<Psana::CsPad::ConfigV4>(env) ) return;
+  if ( getQuadConfigParsForType<Psana::CsPad::ConfigV5>(env) ) return;
+
+  MsgLog(name(), warning, "CsPad::ConfigV2 - V5 is not available in this run.");
+}
+
+//--------------------
+
+/// Method which is called at the beginning of the run
+void 
+CSPadImageProducer::getCalibPars(Event& evt, Env& env)
+{
+  std::string calib_dir = (m_calibDir == "") ? env.calibDir() : m_calibDir;
+
+  m_cspad_calibpar   = new PSCalib::CSPadCalibPars(calib_dir, m_typeGroupName, m_src, getRunNumber(evt));
+  m_pix_coords_2x1   = new CSPadPixCoords::PixCoords2x1   ();
+  m_pix_coords_quad  = new CSPadPixCoords::PixCoordsQuad  ( m_pix_coords_2x1,  m_cspad_calibpar, m_tiltIsApplied );
+  m_pix_coords_cspad = new CSPadPixCoords::PixCoordsCSPad ( m_pix_coords_quad, m_cspad_calibpar, m_tiltIsApplied );
+
+  m_coor_x_pix = m_pix_coords_cspad -> getPixCoorArrX_pix();
+  m_coor_y_pix = m_pix_coords_cspad -> getPixCoorArrY_pix();
+  m_coor_x_int = m_pix_coords_cspad -> getPixCoorArrX_int();
+  m_coor_y_int = m_pix_coords_cspad -> getPixCoorArrY_int();
+
+  if( m_print_bits & 2 ) m_cspad_calibpar  -> printCalibPars();
+  //m_pix_coords_2x1  -> print_member_data();
+  //m_pix_coords_quad -> print_member_data(); 
 }
 
 //--------------------
