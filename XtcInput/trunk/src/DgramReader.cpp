@@ -263,9 +263,8 @@ try {
 
 } catch ( std::exception& e ) {
 
-  MsgLog(logger, error, "exception caught while reading datagram: " << e.what());
-  // TODO: there is no way yet to stop gracefully, will just abort
-  throw;
+  // push exception message to a queue which will cause exception in consumer thread
+  m_queue.push_exception(e.what());
 
 }
 
