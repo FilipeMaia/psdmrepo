@@ -6,6 +6,10 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V00-01-02
+2013-06-11 Andy Salnikov
+- upgrading to pdsdata V06-09-04
+
 Tag: V00-01-01
 2013-05-22 Andy Salnikov
 - small update to imp.Sample class
