@@ -59,12 +59,16 @@ namespace {
     switch ( state ) {
       case O2OHdf5Writer::Undefined :
         name = "Undefined" ;
+        break ;
       case O2OHdf5Writer::Configured :
         name = "Configured" ;
+        break ;
       case O2OHdf5Writer::Running :
         name = "Running" ;
+        break ;
       case O2OHdf5Writer::CalibCycle :
         name = "CalibCycle" ;
+        break ;
       case O2OHdf5Writer::NumberOfStates :
         break ;
     }
