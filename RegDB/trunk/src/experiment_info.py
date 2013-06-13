@@ -152,7 +152,7 @@ def getexp_datapath(id):
     return row['val']
 
 
-def active_experiment(instr):
+def active_experiment(instr, station=0):
     """
     Get a record for the latest experiment activated for the given instrument.
     The function will return a tuple of:
@@ -183,8 +183,8 @@ def active_experiment(instr):
     row = __do_select(
         """
         SELECT e.name AS `name`, e.id AS `id`, sw.switch_time AS `switch_time`, sw.requestor_uid AS `requestor_uid` FROM expswitch sw, experiment e, instrument i
-        WHERE sw.exper_id = e.id AND e.instr_id = i.id AND i.name='%s' ORDER BY sw.switch_time DESC LIMIT 1
-        """ % instr)
+        WHERE sw.exper_id = e.id AND e.instr_id = i.id AND i.name='%s' AND sw.station=%d ORDER BY sw.switch_time DESC LIMIT 1
+        """ % (instr,station,))
 
     if not row : return None
 
@@ -244,7 +244,7 @@ def get_open_files(exper_id,runnum=None):
 
     if runnum is None:
         row = __do_select("SELECT MAX(run) AS 'run' FROM file WHERE exper_id=%d" % (exper_id,))
-        if not row: return []
+        if not row or not row['run']: return []
         runnum = int(row['run'])
 
     files = []
@@ -254,12 +254,49 @@ def get_open_files(exper_id,runnum=None):
 
     return files
 
+# --------------------------------------------------------------------------------------
+# Return a list of runs taken in a context of the specified experiment. Each run will be
+# represented with a dictionary with the following keys:
+#
+#   'exper_id'        : a numeric identifier of the experiment
+#   'num'             : a run number
+#   'begin_time_unix' : a UNIX timestamp (32-bits since Epoch) for the start of the run
+#   'end_time_unix'   : a UNIX timestamp (32-bits since Epoch) for the start of the run.
+#
+# NOTES:
+#
+#   1. if no experiment name provided to the function then  the current
+#   experiment for the specified station will be assumed. The station parameter
+#   will be ignored if the experiment name is provided.
+#
+#   2. if the run is still going on then its 'end_time_unix' will be set
+#   to None
+# --------------------------------------------------------------------------------------
+
+def experiment_runs(instr, exper=None, station=0):
+    if exper is None:
+        e = active_experiment(instr,station)
+        if e is None: return []
+        exper_id = e[2]
+    else:
+        exper_id = name2id(exper)
+    runs = []
+    for row in __do_select_many("SELECT * FROM logbook.run WHERE exper_id=%d ORDER BY begin_time" % (exper_id,)):
+        row['begin_time_unix'] =  int(row['begin_time']/1000000000L)
+        row['end_time_unix'] = None
+        if row['end_time']:  row['end_time_unix'] = int(row['end_time']/1000000000L)
+        runs.append(row)
+
+    return runs
+
 
 # -------------------------------
 # Here folow a couple of examples
 # -------------------------------
 
 if __name__ == "__main__" :
+
+    import datetime
 
     try:
         print 'experiment id 47 translates into %s' % id2name(47)
@@ -290,6 +327,25 @@ if __name__ == "__main__" :
         print 'open files of run 1332 of experiment id 55:'
         for file in get_open_files(55,1332):
             print file
+
+        print 'open files of a  non-valid experiment id 9999999:'
+        for file in get_open_files(9999999):
+            print file
+
+        print """
+
+ Runs for the current experiment at XPP:
+
+ --------+-------+---------------------+---------------------
+  exp_id |  run  |     begin  time     |      end  time
+ --------+-------+---------------------+---------------------"""
+
+        for run in experiment_runs('XPP'):
+            begin_time = datetime.datetime.fromtimestamp(run['begin_time_unix']).strftime('%Y-%m-%d %H:%M:%S')
+            end_time = ''
+            if run['end_time_unix']:
+                end_time = datetime.datetime.fromtimestamp(run['end_time_unix']).strftime('%Y-%m-%d %H:%M:%S')
+            print "  %6d | %5d | %19s | %19s" % (run['exper_id'],run['num'],begin_time,end_time,)
 
     except db.Error, e:
          print 'MySQL operation failed because of:', e

@@ -581,7 +581,8 @@ HERE;
             foreach( $this->experiments_for_instrument( $i ) as $exper ) {
                 $g = $exper->name();
                 if(( 1 == preg_match( '/^[a-z]{3}[0-9]{5}$/', $g )) ||
-                   ( 1 == preg_match( '/^[a-z]{3}[imcs][0-9]{4}$/', $g ))) $groups[$g] = True;
+                   ( 1 == preg_match( '/^[a-z]{3}[imcs][0-9]{4}$/', $g )) ||
+                   ( 1 == preg_match( '/^dia[a-z]{3}[0-9]{2}$/', $g ))) $groups[$g] = True;
             }
         }
 

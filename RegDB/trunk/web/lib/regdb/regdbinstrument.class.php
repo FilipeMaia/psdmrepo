@@ -38,6 +38,11 @@ class RegDBInstrument {
     public function description () {
         return $this->attr['descr']; }
 
+    public function is_standard () {
+        $is_standard_param = $this->find_param_by_name ('isStandard');
+    	return !is_null( $is_standard_param ) && ( $is_standard_param->value() != '0' );
+    }
+
     public function is_location () {
         $is_location_param = $this->find_param_by_name ('isLocation');
     	return !is_null( $is_location_param ) && ( $is_location_param->value() != '0' );
