@@ -466,7 +466,7 @@ class TranslatorJob(object) :
         self._db.add_files( fs.id, 'HDF5', [os.path.join(dirname,f[0],f[1]) for f in files ] )
 
 
-        # register them with iRODS
+        # register them with iRODS, do not generate errors even if registration fails
         irods_cmd = self._get_config('filemanager-irods-command', None, True)
         dst_coll = self._get_config('filemanager-hdf5-dir', None, True)
         if irods_cmd and dst_coll:
@@ -487,7 +487,7 @@ class TranslatorJob(object) :
                         file_mgr.storeFile(src, dst)
                         self.trace("registered file in irods as %s", dst )
                 except Exception, e:
-                    self.warning("store_hdf5: failed to remove directory %s: %s", tmpdirfinal, str(e) )
+                    self.warning("store_hdf5: failed to register file in irods %s: %s", os.path.join( dst_dir, f[1] ), str(e) )
 
         return 0
                 

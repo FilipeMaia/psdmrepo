@@ -10,6 +10,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V01-03-03
+2013-06-13 Andy Salnikov
+- small fix in error message generated when irods registration fails
+
 Tag: V01-03-02
 2013-05-09 Andy Salnikov
 - DbConnection class is in DbTools package now
