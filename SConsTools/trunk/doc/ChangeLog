@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-09-01
+2013-06-14 Andy Salnikov
+- make $PYDIR directory in advance to avoid race condition when symlinking
+
 Tag: V00-09-00
 2013-04-05 Andy Salnikov
 - dependencies.py: pdsdata now comes in a number of smaller packages

@@ -169,6 +169,12 @@ def standardExternalPackage(package, **kw) :
     # link python directory
     py_dir = _get_dir(package, 'PYDIR', kw, env, prefix)
     if py_dir is not None :
+        
+        # make 'python' directory if not there yet
+        archpy = Dir(env.subst("$PYDIR"))
+        archpy = str(archpy)
+        if not os.path.isdir(archpy) : os.makedirs(archpy)
+
         trace("py_dir: %s" % py_dir, "standardExternalPackage", 5)
         if kw.get('PYDIRSEP', False) :
             # make a link to the whole dir
