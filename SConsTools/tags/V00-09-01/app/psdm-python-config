@@ -1,0 +1,31 @@
+#!/bin/sh
+#
+# $Id$
+#
+# Description:
+#    Script which dumps configuration parameters for python
+#    which scons will use for building software. If called without
+#    arguments it will print all parameters in the form PARAM=value,
+#    one parameters per line. If called with parameters it will print
+#    values of specified parameters, one parameter per line in the order
+#    in which these parameters were specified. Here is partial list
+#    of known parameter names:
+#        PYTHON_VERSION - python version number like "2.4"
+#        PYTHON         - python with version, like "python2.4" or "python2.7"
+#        PYTHON_PREFIX  - directory where python is installed, such as "/usr"
+#        PYTHON_BINDIR  - directory where python binary is located, 
+#                         such as "/usr/bin"
+#        PYTHON_INCDIR  - directory where python includes are located, 
+#                         such as "/usr/include/python2.7"
+#        PYTHON_LIBDIR  - directory where python shared library is located, 
+#                         such as "/usr/lib64"
+#        PYTHON_BIN     - full path to python binary, like "/usr/bin/python2.4"
+#
+# Currently this script relies on two envvars being set correctly: 
+#    SIT_ROOT and SIT_ARCH
+
+#
+# It does not matter which python version used here
+#
+psdm_python=./SConsTools/src/tools/psdm_python.py
+test -f $psdm_python && python $psdm_python $*
