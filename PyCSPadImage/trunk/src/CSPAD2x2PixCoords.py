@@ -38,7 +38,44 @@ import GlobalGraphics as gg # For test purpose in main only
 #------------------------------
 
 class CSPAD2x2PixCoords (PixCoords2x1) :
-    """Self-sufficient class for generation of CSPad2x2 pixel coordinate array without data base (WODB)"""
+    """Self-sufficient class for generation of CSPad2x2 pixel coordinate array without data base (WODB)
+
+       Interface
+       =========
+       1.1 Instantiation with external geometry parameters:
+ 
+           All parameters optional. Default values will be used if parameters are not specified.
+           xc    = np.array([198., 198.]) * PixCoords2x1.pixs # 109.92 
+           yc    = np.array([ 95., 308.]) * PixCoords2x1.pixs # 109.92
+           tilt  = np.array([  0.,   0.])
+           coord = CSPAD2x2PixCoords(xc_um=xc, yc_um=yc, tilt_deg=tilt)
+
+
+       1.2 Instantiation with regular calibration parameters:
+
+           path  = '/reg/d/psdm/mec/mec73313/calib/CsPad2x2::CalibV1/MecTargetChamber.0:Cspad2x2.1/'
+           run   = 123
+           calib = CSPAD2x2CalibPars(path, run)
+           coord = CSPAD2x2PixCoords(calib)
+
+       1.2 Access methods:
+           Get arrays of pixel coordinates in mu with shape: [2,185,388]
+           X,Y = coord.get_cspad2x2_pix_coordinate_arrays_mu ()
+           or in pixels:
+           X,Y = coord.get_cspad2x2_pix_coordinate_arrays_pix ()
+
+       1.3 Get CSPAD2X2 image  
+
+       3.  Global methods
+       3.1 Conversion between shapes of arr2x2.shape=(185,388,2) and arrTwo2x1.shape=(2,185,388)
+           arrTwo2x1 = data2x2ToTwo2x1(arr2x2)
+           arr2x2    = two2x1ToData2x2(arrTwo2x1)           
+
+       3.2 Make image
+           img = getImage(X,Y,W=None)       
+    """
+
+##------------------------------
 
     sects = 2 # Total number of sections in quad
     xc_um_def    = np.array([198., 198.]) * PixCoords2x1.pixs # 109.92
@@ -54,22 +91,28 @@ class CSPAD2x2PixCoords (PixCoords2x1) :
 
         if calib == None :
 
-            if xc_um == None : xc = sp.xc_um_def
-            else             : xc = sp.xc_um
+            if xc_um == None : sp.xc = sp.xc_um_def
+            else             : sp.xc = xc_um
 
-            if yc_um == None : yc = sp.yc_um_def
-            else             : yc = sp.yc_um
+            if yc_um == None : sp.yc = sp.yc_um_def
+            else             : sp.yc = yc_um
 
-            tilt       = tilt_deg
+            sp.zc = 0
+
+            sp.tilt       = tilt_deg
 
         else :
+            [sp.xc,sp.yc,sp.zc] = calib.getCalibPars('center') * PixCoords2x1.pixs # 109.92
+            sp.tilt       = calib.getCalibPars('tilt')
+            #print 'USE xc, yc, zc =', sp.xc, sp.yc, sp.zc
 
-            [xc,yc,zc] = calib.getCalibPars('center') * PixCoords2x1.pixs # 109.92
-            tilt       = calib.getCalibPars('tilt')
+        sp.calib = calib
+        sp.make_cspad2x2_pix_coordinate_arrays (sp.xc, sp.yc, sp.tilt)
 
-            print 'USE xc, yc, zc =', xc, yc, zc
+#------------------------------
 
-        sp.make_cspad2x2_pix_coordinate_arrays (xc, yc, tilt)
+    def print_cspad2x2_geometry_pars (sp) :
+        print 'print_cspad2x2_geometry_pars(): xc, yc, zc, tilt =', sp.xc, sp.yc, sp.zc, sp.tilt
 
 #------------------------------
 
@@ -95,23 +138,55 @@ class CSPAD2x2PixCoords (PixCoords2x1) :
         sp.x_pix_um -= sp.x_pix_um.min()
         sp.y_pix_um -= sp.y_pix_um.min() 
 
+        sp.x_pix_pix = (sp.x_pix_um/sp.pixs+0.25).astype(int) 
+        sp.y_pix_pix = (sp.y_pix_um/sp.pixs+0.25).astype(int)
+
+        sp.x_pix_shapeed_as_data_pix = two2x1ToData2x2(sp.x_pix_pix)
+        sp.y_pix_shapeed_as_data_pix = two2x1ToData2x2(sp.y_pix_pix)
+
 #------------------------------
 
     def get_cspad2x2_pix_coordinate_arrays_um (sp) : 
         return sp.x_pix_um, sp.y_pix_um
 
-
     def get_cspad2x2_pix_coordinate_arrays_pix (sp) : 
-        return sp.x_pix_um/sp.pixs, sp.y_pix_um/sp.pixs
+        return sp.x_pix_pix, sp.y_pix_pix
+
+    def get_cspad2x2_pix_coordinate_arrays_shapeed_as_data_um (sp) : 
+        return two2x1ToData2x2(sp.x_pix_um), \
+               two2x1ToData2x2(sp.y_pix_um)
+
+    def get_cspad2x2_pix_coordinate_arrays_shapeed_as_data_pix (sp) : 
+        return sp.x_pix_shapeed_as_data_pix, \
+               sp.y_pix_shapeed_as_data_pix
 
 #------------------------------
 
     def print_cspad2x2_coordinate_arrays(sp) :
+        print 'print_cspad2x2_coordinate_arrays()'        
         print 'sp.x_pix_um:\n',      sp.x_pix_um
         print 'sp.x_pix_um.shape =', sp.x_pix_um.shape
-        print 'sp.y_pix_um\n',       sp.y_pix_um
+        print 'sp.y_pix_um:\n',      sp.y_pix_um
         print 'sp.y_pix_um.shape =', sp.y_pix_um.shape
 
+#------------------------------
+
+    def get_cspad2x2_image(sp, data_arr=None) : # preferable data_arr.shape=(185,388,2) like in data
+        """ Test of coordinate arrays, plot image map.
+        """
+        iX,iY = sp.get_cspad2x2_pix_coordinate_arrays_shapeed_as_data_pix ()
+        data = data_arr
+        if data_arr != None and data_arr.shape == (2,185,388) :
+            data = two2x1ToData2x2(data_arr)
+        #if data_arr != None and data_arr.shape == (185,388,2) :
+        #    data = data2x2ToTwo2x1(data_arr)
+        #print 'data.shape for image =', data.shape
+        return gg.getImageFromIndexArrays(iX,iY,data) # All arrays should have the same shape
+
+#------------------------------
+#------------------------------
+#------ Global methods --------
+#------------------------------
 #------------------------------
 
 def data2x2ToTwo2x1(arr2x2) :
@@ -131,19 +206,6 @@ def two2x1ToData2x2(arrTwo2x1) :
     return arr2x2
 
 #------------------------------
-
-def getImage(X,Y,W=None) :
-    """Makes image from X, Y coordinate arrays and associated weights.
-    """
-    xsize = X.max()
-    ysize = Y.max()
-    if W==None : weights = None
-    else       : weights = W.flatten()
-
-    H,Xedges,Yedges = np.histogram2d(X.flatten(), Y.flatten(), bins=[xsize,ysize], range=[[-0.5,xsize-0.5],[-0.5,ysize-0.5]], normed=False, weights=weights) 
-    return H
-
-#------------------------------
 #------------------------------
 #------------------------------
 #----------- TEST -------------
@@ -151,36 +213,100 @@ def getImage(X,Y,W=None) :
 #------------------------------
 #------------------------------
 
-def main_test_cspad2x2() :
+def test_of_coord_arrs(coord) :
+    """ Test of coordinate arrays, plot image map.
+    """
 
-    xc_arr   = np.array([198., 198.]) * PixCoords2x1.pixs # 109.92
-    yc_arr   = np.array([ 95., 308.]) * PixCoords2x1.pixs # 109.92
-    tilt_arr = np.array([  0.,   0.])
+    #coord.print_cspad2x2_coordinate_arrays()
+    iX,iY = coord.get_cspad2x2_pix_coordinate_arrays_pix ()
 
-    print 'xc_um   : ', xc_arr
-    print 'yc_um   : ', xc_arr
-    print 'tilt_deg: ', tilt_arr
+    print 'iX.shape =', iX.shape
+    print 'iY.shape =', iY.shape
 
     t0_sec = time()
-    #w = CSPAD2x2PixCoords(xc_um, yc_um, tilt_deg)
-    w = CSPAD2x2PixCoords(tilt_deg=tilt_arr)
-    print 'Consumed time for coordinate arrays (sec) =', time()-t0_sec
+    #img2d = gg.getImageAs2DHist(X,Y,W=None)
+    img2d = gg.getImageFromIndexArrays(iX,iY,W=None)
+    print 'Consumed time to create image (sec) =', time()-t0_sec
 
-    #w.print_cspad2x2_coordinate_arrays()
-    X,Y = w.get_cspad2x2_pix_coordinate_arrays_pix ()
-
-    #print 'X(pix) :\n', X
-    print 'X.shape =\n', X.shape
-
-    H = getImage(X,Y,W=None)
-
-    gg.plotImageLarge(H, range=(-1, 2), figsize=(12,11))
+    gg.plotImageLarge(img2d, amp_range=(-1, 2), figsize=(12,11))
     gg.show()
 
 #------------------------------
+
+def test_instantiation_1 () :
+    """ Instantiation with external geometry parameters.
+    """
+    xc    = np.array([198., 202.]) * PixCoords2x1.pixs # 109.92 
+    yc    = np.array([ 95., 308.]) * PixCoords2x1.pixs # 109.92
+    tilt  = np.array([  0.,   2.])
+
+    t0_sec = time()
+    coord = CSPAD2x2PixCoords(xc_um=xc, yc_um=yc, tilt_deg=tilt)
+    coord.print_cspad2x2_geometry_pars()
+    print 'Consumed time for coordinate arrays (sec) =', time()-t0_sec
+    return coord
+
+#------------------------------
+
+from CSPAD2x2CalibPars import *
+
+def test_instantiation_2() :
+    """ Instantiation with regular calibration parameters.
+    """
+    path  = '/reg/d/psdm/mec/mec73313/calib/CsPad2x2::CalibV1/MecTargetChamber.0:Cspad2x2.1/'
+    run   = 123
+    calib = CSPAD2x2CalibPars(path, run)
+    coord = CSPAD2x2PixCoords(calib)
+    coord.print_cspad2x2_geometry_pars()
+    return coord
+
+#------------------------------
+
+def test_0() :
+    """Test of default constructor.
+    """
+    coord = CSPAD2x2PixCoords() 
+    test_of_coord_arrs(coord)
+
+#------------------------------
+
+def test_1() :
+    """Test of instantiation with external parameters.
+    """
+    coord = test_instantiation_1() 
+    test_of_coord_arrs(coord)
+
+#------------------------------
+
+def test_2() :
+    """Test of instantiation with calib=CSPAD2x2CalibPars(path, run).
+    """
+    coord = test_instantiation_2() 
+    test_of_coord_arrs(coord)
+
+#------------------------------
+
+def test_3() :
+    """Test of instantiation with external parameters.
+    """
+    coord = test_instantiation_1() 
+    img2d = coord.get_cspad2x2_image(None)
+    print 'img2d.shape =', img2d.shape
+    
+    gg.plotImageLarge(img2d, amp_range=(-1, 2), figsize=(12,11))
+    gg.show()
+
+    
+#------------------------------
  
 if __name__ == "__main__" :
-    main_test_cspad2x2()
+    if len(sys.argv)==1   : print 'Use command: python', sys.argv[0], '<test-number=0-3>'
+    elif sys.argv[1]=='0' : test_0()
+    elif sys.argv[1]=='1' : test_1()
+    elif sys.argv[1]=='2' : test_2()
+    elif sys.argv[1]=='3' : test_3()
+    else : print 'Non-expected arguments: sys.argv=', sys.argv
+
     sys.exit ( 'End of test.' )
 
 #------------------------------

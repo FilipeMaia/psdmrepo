@@ -100,8 +100,11 @@ class PixCoords2x1() :
         sp.y_arr_um = -np.arange(sp.rows) * sp.pixs
         sp.y_arr_um -= sp.y_arr_um[-1]/2 # move origin to the center of array
 
-        sp.x_arr_pix = sp.x_arr_um/ sp.pixs
-        sp.y_arr_pix = sp.y_arr_um/ sp.pixs
+        sp.x_arr_pix = sp.x_arr_um/sp.pixs
+        sp.y_arr_pix = sp.y_arr_um/sp.pixs
+
+        #sp.x_arr_pix = (sp.x_arr_um/sp.pixs + 0.25).astype(int)
+        #sp.y_arr_pix = (sp.y_arr_um/sp.pixs + 0.25).astype(int)
 
         sp.x_map2x1_um,  sp.y_map2x1_um  = np.meshgrid(sp.x_arr_um,  sp.y_arr_um)
         sp.x_map2x1_pix, sp.y_map2x1_pix = np.meshgrid(sp.x_arr_pix, sp.y_arr_pix)
@@ -204,8 +207,8 @@ def test_2x1_xy_maps() :
     titles = ['X map','Y map']
     #for i,arr2d in enumerate([w.x_map2x1,w.y_map2x1]) :
     for i,arr2d in enumerate( w.get_cspad2x1_xy_maps_pix() ) :
-        range = (arr2d.min(), arr2d.max())
-        gg.plotImage(arr2d, range, figsize=(10,5), title=titles[i])
+        amp_range = (arr2d.min(), arr2d.max())
+        gg.plotImageLarge(arr2d, amp_range=amp_range, figsize=(10,5), title=titles[i])
         gg.move(200*i,100*i)
 
     gg.show()
@@ -240,19 +243,33 @@ def test_2x1_img() :
 
     H, Xedges, Yedges = np.histogram2d(X.flatten(), Y.flatten(), bins=[xsize,ysize], range=[[xmin, xmax], [ymin, ymax]], normed=False, weights=X.flatten()+Y.flatten()) 
 
-    #print 'Xedges:', Xedges
-    #print 'Yedges:', Yedges
+    print 'Xedges:', Xedges
+    print 'Yedges:', Yedges
     print 'H.shape:', H.shape
 
-    gg.plotImageLarge(H, range=(-250, 250), figsize=(8,10)) # range=(-1, 2), 
+    gg.plotImageLarge(H, amp_range=(-250, 250), figsize=(8,10)) # range=(-1, 2), 
     gg.show()
 
+#------------------------------
+
+def test_2x1_img_easy() :
+    pc2x1 = PixCoords2x1(use_wide_pix_center=False)
+    #X,Y = pc2x1.get_cspad2x1_xy_maps_pix()
+    X,Y = pc2x1.get_cspad2x1_xy_maps_pix_with_offset()
+    iX, iY = (X+0.25).astype(int), (Y+0.25).astype(int)
+    img = gg.getImageFromIndexArrays(iX,iY,iX+iY)
+    gg.plotImageLarge(img, amp_range=(0, 500), figsize=(8,10))
+    gg.show()
+ 
 #------------------------------
  
 if __name__ == "__main__" :
 
-    #test_2x1_xy_maps()
-    test_2x1_img()
+    if len(sys.argv)==1   : print 'For other test(s) use command: python', sys.argv[0], '<test-number=1-2>'
+    elif sys.argv[1]=='1' : test_2x1_xy_maps()
+    elif sys.argv[1]=='2' : test_2x1_img()
+    elif sys.argv[1]=='3' : test_2x1_img_easy()
+    else : print 'Non-expected arguments: sys.argv=', sys.argv
 
     sys.exit( 'End of test.' )
 

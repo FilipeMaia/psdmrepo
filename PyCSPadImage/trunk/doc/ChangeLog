@@ -12,6 +12,21 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 #---------------------
+2012-06-14 Mikhail S. Dubrovin
+- work on interface improvement 
+M       src/CalibPars.py
+D       src/CSPadPixCoordsWODB.py -> renamed to
+A  +    src/CSPADPixCoords.py
+M       src/PixCoords2x1.py
+M       src/CSPAD2x2CalibPars.py
+M       src/CSPAD2x2CalibParsDefault.py
+M       src/Alignment.py
+M       src/Examples.py
+M       src/CSPAD2x2PixCoords.py
+M       src/GlobalGraphics.py
+M       src/CSPAD2x2Examples.py
+
+#---------------------
 2012-06-07 Mikhail S. Dubrovin
 Tag: V00-00-12
 - improve interface

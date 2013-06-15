@@ -130,6 +130,8 @@ cspad2x2calibparsdefault = CSPAD2x2CalibParsDefault()
 #----------
 
 def main_test() :
+
+    print 'CSPAD2x2CalibParsDefault is enable as a singletone cspad2x2calibparsdefault'    
     cspad2x2calibparsdefault.printCalibParsDefault()
     cspad2x2calibparsdefault.printListOfCalibTypes()
     cspad2x2calibparsdefault.printCalibParsDefault('center')

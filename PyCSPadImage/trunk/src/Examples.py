@@ -36,8 +36,12 @@ import PyCSPadImage.CalibPars          as calp
 import PyCSPadImage.CalibParsEvaluated as cpe
 import PyCSPadImage.CSPadConfigPars    as ccp
 import PyCSPadImage.CSPadImageProducer as cip
+import PyCSPadImage.CSPADPixCoords     as pixcoor
+import PyCSPadImage.PixCoords2x1       as pixcoor2x1
+
 
 import PyCSPadImage.GlobalGraphics     as gg # For test purpose in main only
+import PyCSPadImage.GlobalMethods      as gm # For test purpose in main only
 import PyCSPadImage.HDF5Methods        as hm # For test purpose in main only
 
 #----------------------------------------------
@@ -213,14 +217,59 @@ def example_of_image_built_from_pix_coordinate_array_for_entire_cspad() :
     gg.move(200,100)
     gg.show()
 
+#------------------------------
+
+def test_cspad_image() :
+    """Test of instantiation with external parameters.
+    """
+    run   = 150
+    path  = '/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-xpp-2013-01-29'
+    calib = calp.CalibPars(path, run)
+    coord = pixcoor.CSPADPixCoords(calib)
+    #coord = pixcoor.CSPADPixCoords() # Default constructor
+    coord.print_cspad_geometry_pars()
+
+    event = 0
+    fname  = '/reg/d/psdm/xpp/xpp66213/hdf5/xpp66213-r0150.h5'
+    dsname = '/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/XppGon.0:Cspad.0/data'
+    ds1ev = hm.getOneCSPadEventForTest( fname, dsname, event )
+    #ds1ev = hm.getAverageCSPadEvent( fname, dsname, event=200, nevents=500 )
+ 
+    ped_fname = '/reg/neh/home1/dubrovin/LCLS/calib-CSPad-pedestals/cspad-pedestals-xpp66213-r0149.dat' # shape = (5920, 388)
+    peds = gm.getCSPadArrayFromFile(ped_fname)
+    print 'peds.shape:', peds.shape
+    #peds = calib.getCalibPars('pedestals')
+
+    ds1ev -= peds
+    img2d = coord.get_cspad_image(ds1ev)
+    print 'img2d.shape =', img2d.shape
+    
+    gg.plotImageLarge(img2d, amp_range=(-10, 200), figsize=(12,11))
+    gg.show()
+
 #----------------------------------------------
 
 if __name__ == "__main__" :
-    #example_of_image_built_from_pix_coordinate_array_shaped_as_data()
-    #example_of_image_built_from_pix_coordinate_array_for_entire_cspad()
-    main_example_cxi()
-    #main_example_xpp()
-    #main_example_CSpad2x2()
+    if len(sys.argv)==1   : print 'Use command: python', sys.argv[0], '<test-number=1, 10-13, 20-22, 51-55>'
+    elif sys.argv[1]=='1' : test_cspad_image()
+
+    elif sys.argv[1]=='10': pixcoor.test_cspadpixcoords_0()
+    elif sys.argv[1]=='11': pixcoor.test_cspadpixcoords_1()
+    elif sys.argv[1]=='12': pixcoor.test_cspadpixcoords_2()
+    elif sys.argv[1]=='13': pixcoor.test_cspadpixcoords_3()
+
+    elif sys.argv[1]=='20': pixcoor2x1.test_2x1_xy_maps()
+    elif sys.argv[1]=='21': pixcoor2x1.test_2x1_img()
+    elif sys.argv[1]=='22': pixcoor2x1.test_2x1_img_easy()()
+
+    elif sys.argv[1]=='51' : main_example_cxi()
+    elif sys.argv[1]=='52' : main_example_xpp()
+    elif sys.argv[1]=='53' : example_of_image_built_from_pix_coordinate_array_shaped_as_data()
+    elif sys.argv[1]=='54' : example_of_image_built_from_pix_coordinate_array_for_entire_cspad()
+    elif sys.argv[1]=='55' : main_example_CSpad2x2()
+    
+    else : print 'Non-expected arguments: sys.argv=', sys.argv
+
     sys.exit ( 'End of test.' )
 
 #----------------------------------------------

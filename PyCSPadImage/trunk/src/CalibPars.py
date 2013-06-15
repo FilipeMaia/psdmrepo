@@ -152,7 +152,7 @@ class CalibPars (object) :
         #print 'Load the calibration parameters for run ', self.run
 
         for type in self.list_of_clib_types :
-            fname = findCalibFile (self.path_to_calib_types, self.run, type) # self.path_to_calib_types + type + '/0-end.data'
+            fname = findCalibFile (self.path_to_calib_types, type, self.run) # self.path_to_calib_types + type + '/0-end.data'
             #print 'Load calibpars: ', fname
 
             cpars_for_type = self.loadCalibParsFromFileOrDefault (fname, type)
@@ -194,7 +194,7 @@ class CalibPars (object) :
 
     def printCalibFiles (self) :
         for type in self.list_of_clib_types :
-            fname = findCalibFile (self.path_to_calib_types, self.run, type) # self.path_to_calib_types + type + '/0-end.data'
+            fname = findCalibFile (self.path_to_calib_types, type, self.run) # self.path_to_calib_types + type + '/0-end.data'
             print 'Calib type: %15s has file: %s' % (type, fname)
 
 #---------------------
@@ -216,18 +216,28 @@ class CalibPars (object) :
         if type in self.list_of_clib_types :
             return self.cpars[type]
         else :
-            print  'WARNING: THE REQUESTED TYPE OF CALIBRATION PARS "', type, \
+            print  'getCalibPars() WARNING: THE REQUESTED TYPE OF CALIBRATION PARS "', type, \
                    '" IS NOT FOUND IN THE AVAILABLE LIST:\n', self.list_of_clib_types
             return None
 
 #---------------------
 
-def findCalibFile (path_to_clib_types, run=0, type='offset_corr') :
+def findCalibFile (path_to_clib_types, type=None, run=None) :
     """Use the run number, self.path_to_calib_types, and type of the calibration constants.
        From the directory self.path_to_calib_types + '/' + type select the file
        which run range is valid for requested run.
        None is returned if the file is not found.
     """
+
+    err_msg_prefix = 'findCalibFile(): ERROR in findCalibFile(path, type, run): '
+
+    if type==None :
+        print  err_msg_prefix + 'type IS NOT SPECIFIED'
+        return None
+
+    if run==None :
+        print  err_msg_prefix + 'run IS NOT SPECIFIED'
+        return None
 
     if path_to_clib_types[-1] != '/' : path = path_to_clib_types + '/' + type
     else                             : path = path_to_clib_types + type
@@ -236,7 +246,7 @@ def findCalibFile (path_to_clib_types, run=0, type='offset_corr') :
     calibfname = None
 
     if not os.path.exists(path) :
-        print  'WARNING: PATH %s DOES NOT EXIST.' % path
+        print  'WARNING in findCalibFile(): PATH %s DOES NOT EXIST.' % path
         return calibfname
 
     flist = os.listdir(path)
@@ -286,7 +296,6 @@ def main() :
     calibpars.cpeval.printCalibParsEvaluatedAll() 
 
     #calibpars.printCalibFiles()
-    #calibpars.findCalibFile(999)
     #print calibpars.getCalibPars('offset')
     #print calibpars.getCalibPars('XxX')
     #cpd.calibparsdefault.printCalibParsDefault()
