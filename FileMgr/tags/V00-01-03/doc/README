@@ -1,0 +1,23 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  README file for package FileMgr
+#------------------------------------------------------------------------
+
+Package author: Igor Gaponenko
+
+Brief description:
+==================
+
+The Web interrace to the File Manager susbsystem.
+
+Detailed description:
+=====================
+
+At the time this file was being updated there was only one Web application in
+this package. The starting point for the application is:
+
+  web/dynamic/index.php
+
