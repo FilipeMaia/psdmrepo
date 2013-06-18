@@ -76,6 +76,7 @@ require_once 'dataportal/dataportal.inc.php' ;
                 'lustre-resc' => array () ,
                 'hpss-resc'   => array ()
             ) ;
+            $file_to_size = array() ;
             foreach ($SVC->irodsdb()->runs($experiment->instrument()->name(), $experiment->name(), $file_type) as $run) {
                 foreach ($run->files as $file) {
                     if (!array_key_exists($file->resource, $files_in_irods))
@@ -84,6 +85,7 @@ require_once 'dataportal/dataportal.inc.php' ;
                         $files_in_irods[$file->resource] ,
                         $file->name
                     );
+                    $file_to_size[$file->name] = intval($file->size) ;
                 }
             }
             foreach ($files as $file_name) {
@@ -100,7 +102,8 @@ require_once 'dataportal/dataportal.inc.php' ;
                     $files_extended ,
                     array (
                         array ($exper_id,$file_type,$file_name) ,
-                        $flags
+                        $flags ,
+                        array_key_exists($file_name, $file_to_size) ? $file_to_size[$file_name] : 0
                     )
                 ) ;
             }

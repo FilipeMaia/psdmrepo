@@ -33,14 +33,14 @@ def evaluate(triplet,status):
     hpss_flag = '-'
     if file_status.HPSS in status.flags(): hpss_flag = 'x'
 
-    print "   %8d | %9s | %25s |            %1s          |    %1s    |    %1s" % (int(triplet[0]),triplet[1],triplet[2],data_migration_flag,disk_flag,hpss_flag)
+    print "   {:>8} | {:>9} | {:>25} | {:>12} |            {:>1}          |    {:>1}    |    {:>1}".format(int(triplet[0]),triplet[1],triplet[2],status.size_bytes(),data_migration_flag,disk_flag,hpss_flag)
 
     return True
 
 print """
-  ----------+-----------+---------------------------+-----------------------+---------+---------
-   exper_id | file type | file name                 | IN MIGRATION DATABASE | ON DISK | ON HPSS
-  ----------+-----------+---------------------------+-----------------------+---------+---------"""
+  ----------+-----------+---------------------------+--------------+-----------------------+---------+---------
+   exper_id | file type | file name                 | size (bytes) | IN MIGRATION DATABASE | ON DISK | ON HPSS
+  ----------+-----------+---------------------------+--------------+-----------------------+---------+---------"""
 
 fs = file_status.file_status(ws_login_user='psdm_reader', ws_login_password='pcds')
 

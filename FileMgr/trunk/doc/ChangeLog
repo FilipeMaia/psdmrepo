@@ -11,6 +11,12 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-03
+2013-06-18 Igor Gaponenko
+- extended the file status report to return the file size (if known) from iRODS File Catalog
+- modified the Python module and its ezample accordingly
+- fixed a bug in the older Explorer application
+
 Tag: V00-01-02
 2012-11-08 Igor Gaponenko
 - migrated file service to the new framework

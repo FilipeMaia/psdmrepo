@@ -107,7 +107,7 @@ Page-specific styles
       padding-bottom:5px;
       padding-right:5px;
       font-weight:bold;
-      text-align:righ;t
+      text-align:righ;
     }
     .col_hdr {
       padding-bottom:5px;
@@ -213,12 +213,9 @@ function init() {
   auth_timer_restart();
 
 }
-</script>
 
 HERE;
 ?>
-
-<script type="text/javascript">
 
 var dialog_element = "popupdialogs";
 

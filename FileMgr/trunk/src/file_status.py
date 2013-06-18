@@ -76,8 +76,11 @@ DISK = 'DISK'
 HPSS = 'HPSS'
 
 class ExtendedStatus(object):
-    def __init__(self,flags): self._flags = flags
+    def __init__(self,flags,size_bytes):
+        self._flags = flags
+        self._size_bytes = size_bytes
     def flags(self): return self._flags
+    def size_bytes(self): return self._size_bytes
 
 #---------------------
 #  Class definition --
@@ -137,6 +140,10 @@ class file_status(object):
                          flags(): a list of file status flags earlier in the header section
                                   of this file.
 
+                         size_bytes(): the file size in bytes. Note that 0 value may mean
+                                       no information available for a file (file may not be
+                                       registered in the File Manager Catalog, etc.)
+
         RETURN:
 
           a list of triples for files which were successfully selected
@@ -183,7 +190,7 @@ class file_status(object):
             for entry in result['files_extended']:
 
                 triplet = entry[0]
-                status  = ExtendedStatus(entry[1])
+                status  = ExtendedStatus(entry[1],int(entry[2]))
 
                 if evaluator(triplet,status):
                     selected_files.append(triplet)
