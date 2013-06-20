@@ -36,26 +36,43 @@ import GlobalGraphics  as gg # For test purpose in main only
 #------------------------------
 
 class CSPADPixCoords (PixCoords2x1) :
-    """Self-sufficient class for generation of CSPad pixel coordinate array without data base (WODB)"""
+    """Class for generation of CSPad pixel coordinate array with and without data base
+
+       Interface
+       =========
+       1.0 Instantiation with default parameters taken from optical measurement for XPP on 2013-01-29:
+           coord = CSPADPixCoords()
+
+       1.1 Instantiation with external geometry parameters:
+ 
+           All parameters optional. Default values will be used if parameters are not specified.
+           xc    - np.array(...), shape=(3, 4, 8)) [um]
+           yc    - np.array(...), shape=(3, 4, 8)) [um]
+           tilt  - np.array(...), shape=(4, 8)) [deg]
+           coord = CSPADPixCoords(xc_um=xc, yc_um=yc, tilt_deg=tilt)
+
+
+       1.2 Instantiation with regular calibration parameters:
+
+           path  = '/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-xpp-2013-01-29'
+           run   = 123
+           calib = CalibPars(path, run)
+           coord = CSPADPixCoords(calib)
+
+       1.2 Access methods:
+           Get arrays of pixel coordinates in mu with shape: [2,185,388]
+            X, Y = coord.get_cspad_pix_coordinate_arrays_um  ()
+           or in integer pixels:
+           iX,iY = coord.get_cspad_pix_coordinate_arrays_pix ()
+
+       1.3 Get image  
+           img = coord.get_cspad_image(data)       
+    """
 
     quads = 4 # Total number of quads in cspad
     sects = 8 # Total number of sections in quad
 
-    # Old default:
-    #xc_um_def = np.array(
-    #        [[ 473.38,  685.26,  155.01,  154.08,  266.81,   53.95,  583.04,  582.15],  
-    #         [ 989.30,  987.12, 1096.93,  884.11, 1413.16, 1414.94, 1500.83, 1288.02],  
-    #         [1142.59,  930.23, 1459.44, 1460.67, 1347.57, 1559.93, 1032.27, 1033.44],  
-    #         [ 626.78,  627.42,  516.03,  729.15,  198.28,  198.01,  115.31,  327.66]]) * PixCoords2x1.pixs # 109.92
-     
-    #yc_um_def = np.array(
-    #        [[1028.07, 1026.28, 1139.46,  926.91, 1456.78, 1457.35, 1539.71, 1327.89],  
-    #         [1180.51,  967.36, 1497.74, 1498.54, 1385.08, 1598.19, 1069.65, 1069.93],  
-    #         [ 664.89,  666.83,  553.60,  765.91,  237.53,  236.06,  152.17,  365.47],  
-    #         [ 510.38,  722.95,  193.33,  193.41,  308.04,   95.25,  625.28,  624.14]]) * PixCoords2x1.pixs # 109.92
-
-
-    # Optical measurement from 2013-01-29
+    # Default from optical measurement for XPP on 2013-01-29
     xc_um_def  = np.array(
           [[ 477.78,    690.20,    159.77,    160.06,    277.17,     64.77,    591.30,    591.01],
            [ 990.78,    989.30,   1105.38,    891.19,   1421.65,   1423.66,   1502.28,   1289.93],
@@ -111,9 +128,9 @@ class CSPADPixCoords (PixCoords2x1) :
             sp.tilt             = calib.getCalibPars('tilt')
             #print 'USE xc, yc, zc =', sp.xc, sp.yc, sp.zc
 
-        sp.orient        = sp.orient_def
+        sp.orient = sp.orient_def
+        sp.calib  = calib
 
-        sp.calib = calib
         sp.make_cspad_pix_coordinate_arrays (sp.xc, sp.yc, sp.orient, sp.tilt)
 
 #------------------------------
@@ -145,7 +162,7 @@ class CSPADPixCoords (PixCoords2x1) :
 
                 angle_rad = math.radians(angle_deg[quad][sect])                
                 S,C = math.sin(angle_rad), math.cos(angle_rad)
-                Xrot, Yrot = rotation(sp.x_map2x1_um, sp.y_map2x1_um, C, S)
+                Xrot, Yrot = rotation(sp.x_map2x1_um, sp.y_map2x1_um, C, S) # defined in PixCoords2x1
 
                 sp.x_pix_um[quad][sect][:] =  Xrot + xc_um[quad][sect]
                 sp.y_pix_um[quad][sect][:] =  Yrot + yc_um[quad][sect]
@@ -193,26 +210,6 @@ class CSPADPixCoords (PixCoords2x1) :
 #------------------------------
 #------------------------------
 
-def test_of_coord_arrs_h2(coord) :
-    """ DEPRICATED: Test of coordinate arrays, plot image map.
-    """
-    coord.print_cspad_geometry_pars()
-    X,Y = coord.get_cspad_pix_coordinate_arrays_pix ()
-    arr = np.ones((32, 185, 388), dtype=np.float32)
-
-    #print 'X(pix) :\n', X
-    print 'X.shape =\n', X.shape
-
-    xsize = X.max() + 1
-    ysize = Y.max() + 1
-    H,Xedges,Yedges = np.histogram2d(X.flatten(), Y.flatten(), bins=[xsize,ysize], range=[[0,xsize],[0,ysize]], normed=False, weights=arr.flatten()) 
-
-    range = (-5, 5)
-    gg.plotImageLarge(H, amp_range=(0, 2000), figsize=(12,11))
-    gg.show()
-
-#------------------------------
-
 def test_of_coord_arrs(coord) :
     """ Test of coordinate arrays, plot image map.
     """
@@ -223,7 +220,7 @@ def test_of_coord_arrs(coord) :
     print 'iY.shape =', iY.shape
 
     t0_sec = time()
-    #img2d = gg.getImageAs2DHist(X,Y,W=None)
+    #img2d = gg.getImageAs2DHist(iX,iY,W=None)
     img2d = gg.getImageFromIndexArrays(iX,iY,W=None)
     print 'Consumed time to create image (sec) =', time()-t0_sec
 

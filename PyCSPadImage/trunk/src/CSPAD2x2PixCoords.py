@@ -38,7 +38,7 @@ import GlobalGraphics as gg # For test purpose in main only
 #------------------------------
 
 class CSPAD2x2PixCoords (PixCoords2x1) :
-    """Self-sufficient class for generation of CSPad2x2 pixel coordinate array without data base (WODB)
+    """Class for generation of CSPad2x2 pixel coordinate array with and without data base
 
        Interface
        =========
@@ -65,15 +65,14 @@ class CSPAD2x2PixCoords (PixCoords2x1) :
            X,Y = coord.get_cspad2x2_pix_coordinate_arrays_pix ()
 
        1.3 Get CSPAD2X2 image  
+           data.shape = (185,388,2) <- preferable shape, converted if necessary...
+           img = coord.get_cspad2x2_image(data)           
 
-       3.  Global methods
-       3.1 Conversion between shapes of arr2x2.shape=(185,388,2) and arrTwo2x1.shape=(2,185,388)
+       2.  Global methods
+       2.1 Conversion between shapes of arr2x2.shape=(185,388,2) and arrTwo2x1.shape=(2,185,388)
            arrTwo2x1 = data2x2ToTwo2x1(arr2x2)
-           arr2x2    = two2x1ToData2x2(arrTwo2x1)           
-
-       3.2 Make image
-           img = getImage(X,Y,W=None)       
-    """
+           arr2x2    = two2x1ToData2x2(arrTwo2x1)
+     """
 
 ##------------------------------
 

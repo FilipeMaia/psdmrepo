@@ -12,6 +12,14 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 #---------------------
+2012-06-19 Mikhail S. Dubrovin
+- work on interface improvement 
+M       src/CSPadConfigPars.py
+M       src/HDF5Methods.py
+M       src/CSPAD2x2PixCoords.py
+M       src/CSPADPixCoords.py
+
+#---------------------
 2012-06-14 Mikhail S. Dubrovin
 - work on interface improvement 
 M       src/CalibPars.py
