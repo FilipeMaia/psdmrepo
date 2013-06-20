@@ -212,6 +212,9 @@ def getDataSetForOneEvent( fname  = '/reg/d/psdm/CXI/cxi35711/hdf5/cxi35711-r000
                            dsname = '/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/CxiDs1.0:Cspad.0/data',
                            event  = 0 ) :
 
+    #print 'fname:', fname
+    #print 'dsname:', dsname
+
     hdf5file = hdf5mets.open_hdf5_file(fname)
     dataset  = hdf5mets.get_dataset_from_hdf5_file(dsname)
     evdata   = dataset[event]
@@ -231,9 +234,11 @@ def getOneCSPadEventForTest( fname  = '/reg/d/psdm/CXI/cxi35711/hdf5/cxi35711-r0
     #dataset = file[dsname]
     #evdata  = dataset[event]
     #file.close()
+    #print 'fname:', fname
+    #print 'dsname:', dsname
     
-    hdf5file = hdf5mets.open_hdf5_file(fname)
-    ccp.cspadconfig.setCSPadConfigurationFromOpenFile( hdf5file, dsname, event )
+    h5file = hdf5mets.open_hdf5_file(fname)
+    ccp.cspadconfig.setCSPadConfigurationFromOpenFile( hdf5mets, dsname, event )
     dataset  = hdf5mets.get_dataset_from_hdf5_file(dsname)
     evdata   = dataset[event]
     hdf5mets.close_hdf5_file()
@@ -249,7 +254,7 @@ def getAverageCSPadEvent( fname   = '/reg/d/psdm/CXI/cxi35711/hdf5/cxi35711-r000
     print 'Average over', nevents, 'events, starting from', event1
 
     hdf5file = hdf5mets.open_hdf5_file(fname)
-    ccp.cspadconfig.setCSPadConfigurationFromOpenFile( hdf5file, dsname, event1 )
+    ccp.cspadconfig.setCSPadConfigurationFromOpenFile( hdf5mets, dsname, event1 )
     dataset  = hdf5mets.get_dataset_from_hdf5_file(dsname)
 
     evdata = np.zeros(dataset[event1].shape, dtype=np.float32)
