@@ -194,8 +194,7 @@ try {
   } // end switch
 
 } catch (const PSEvt::ExceptionDuplicateKey& ex) {
-  // catch exception for duplicated objects, issue warning
-  MsgLog("xtcConvert", warning, ex.what());
+  // catch exception for duplicated objects, ignore it
 } // end xtcConvert(...)
 
 {% if namespace %}

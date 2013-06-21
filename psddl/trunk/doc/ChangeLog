@@ -11,6 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-06-07
+2013-06-20 Andy Salnikov
+- DdlPds2PsanaDispatch: do not produce warnings for duplicated event keys,
+  there is alegitimate case when the same data may appear twice in the event
+  (compressed and uncompresed) and we should not produce wornings for those.
+
 Tag: V00-06-06
 2013-05-21 Andy Salnikov
 - stop generationg __typeid__ method for Python classes, not used anymore
