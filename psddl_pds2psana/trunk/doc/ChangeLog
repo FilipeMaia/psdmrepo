@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-27
+2013-06-20 Andy Salnikov
+- regenerated with psddl V00-06-07
+- do not produce warnings for duplicated event keys
+
 Tag: V00-05-26
 2013-05-22 Andy Salnikov
 - regenerate whole thing from psddldata V00-04-28
