@@ -38,8 +38,23 @@ import numpy as np
 #---------------------
 
 class CalibParsDefault (object) :
-    """This class provides access to the calibration parameters
+    """This class provides access to the CSPAD default calibration parameters
+       through the singleton object: calibparsdefault
+
+       Interface:
+       ==========
+       Instatiation for singleton calibparsdefault is already done in CalibParsDefault, so
+       import PyCSPadImage.CalibParsDefault as cpd
+
+       Access method:
+       offset = cpd.calibparsdefault.getCalibParsDefault ('offset')
+
+       Test methods: 
+       cpd.calibparsdefault.printCalibParsDefault()         # For all types
+       cpd.calibparsdefault.printCalibParsDefault('center') # for specified type
+       cpd.calibparsdefault.printListOfCalibTypes()
     """
+
     list_of_clib_types =[
          'center'
         ,'center_corr'  
@@ -204,6 +219,8 @@ def main() :
 
     calibparsdefault.printCalibParsDefault()
     calibparsdefault.printListOfCalibTypes()
+    calibparsdefault.printCalibParsDefault('center')
+    print '\nTest getCalibParsDefault("offset") :\n', calibparsdefault.getCalibParsDefault ('offset')
     print 'End of test'
 
 if __name__ == "__main__" :

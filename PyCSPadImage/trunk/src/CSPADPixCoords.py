@@ -61,12 +61,12 @@ class CSPADPixCoords (PixCoords2x1) :
 
        1.2 Access methods:
            Get arrays of pixel coordinates in mu with shape: [2,185,388]
-            X, Y = coord.get_cspad_pix_coordinate_arrays_um  ()
+            X, Y = coord.get_cspad_pix_coordinate_arrays_um  (config=None)
            or in integer pixels:
-           iX,iY = coord.get_cspad_pix_coordinate_arrays_pix ()
+           iX,iY = coord.get_cspad_pix_coordinate_arrays_pix (config=None)
 
        1.3 Get image  
-           img = coord.get_cspad_image(data)       
+           img = coord.get_cspad_image(data,config)       
     """
 
     quads = 4 # Total number of quads in cspad
@@ -175,12 +175,23 @@ class CSPADPixCoords (PixCoords2x1) :
 
 #------------------------------
 
-    def get_cspad_pix_coordinate_arrays_um (sp) : 
-        return sp.x_pix_um, sp.y_pix_um
+    def get_cspad_pix_arrays_shaped_by_config (sp, x_arr, y_arr, config=None) :
+        """Array shaping as data in case if the config parameter is defined: config = CSPadConfigPars()..."""
+        if config == None :
+            return x_arr, y_arr
+        else :
+            sp.x_arr_as_data = config.getCSPadPixArrayShapedAsData(x_arr)
+            sp.y_arr_as_data = config.getCSPadPixArrayShapedAsData(y_arr)       
+            return sp.x_arr_as_data, sp.y_arr_as_data
 
+#------------------------------
 
-    def get_cspad_pix_coordinate_arrays_pix (sp) : 
-        return sp.x_pix_pix, sp.y_pix_pix
+    def get_cspad_pix_coordinate_arrays_um (sp, config=None) : 
+        return sp.get_cspad_pix_arrays_shaped_by_config (sp.x_pix_um, sp.y_pix_um, config)
+    
+
+    def get_cspad_pix_coordinate_arrays_pix (sp, config=None) : 
+        return sp.get_cspad_pix_arrays_shaped_by_config (sp.x_pix_pix, sp.y_pix_pix, config)
 
 #------------------------------
 
@@ -192,14 +203,14 @@ class CSPADPixCoords (PixCoords2x1) :
 
 #------------------------------
 
-    def get_cspad_image(sp, data_arr=None) : # preferable data_arr.shape=(32,185,388) like in data
+    def get_cspad_image(sp, data_arr=None, config=None) : # preferable data_arr.shape=(32,185,388) like in data
         """ Test of coordinate arrays, plot image map.
         """
-        iX,iY = sp.get_cspad_pix_coordinate_arrays_pix()
+        iX,iY = sp.get_cspad_pix_coordinate_arrays_pix(config)
         data = data_arr
-        if data_arr != None and data.shape != (4,8,185,388) :
-            data.shape == (4,8,185,388)
-            data = data.flatten()
+        #if data_arr != None and data.shape != (4,8,185,388) :
+        #    data.shape == (4,8,185,388)
+        if data_arr != None : data = data_arr.flatten()
         return gg.getImageFromIndexArrays(iX.flatten(),iY.flatten(),data) # All arrays should have the same shape
 
 #------------------------------
@@ -210,23 +221,42 @@ class CSPADPixCoords (PixCoords2x1) :
 #------------------------------
 #------------------------------
 
-def test_of_coord_arrs(coord) :
+def get_test_cspad_pix_arr(config=None) :
+    secs, rows, cols = shape = (32, 185, 388)
+    arr_cspad_pix = np.zeros(shape, dtype=np.float32)
+    arr_2x1_pix = np.ones((rows, cols), dtype=np.float32)
+    for s in range(secs) :
+        factor = s+4
+        if s%2 : factor += 4
+        arr_cspad_pix[s,:] += factor*arr_2x1_pix[:]
+
+    arr_cspad_pix.shape = (4, 8, rows, cols)
+
+    arr_out = arr_cspad_pix
+    if config != None : arr_out = config.getCSPadPixArrayShapedAsData(arr_cspad_pix)
+    return np.array(arr_out)
+
+#------------------------------
+
+def test_of_coord_arrs(coord, config=None) :
     """ Test of coordinate arrays, plot image map.
     """
 
-    iX,iY = coord.get_cspad_pix_coordinate_arrays_pix ()
+    iX,iY = coord.get_cspad_pix_coordinate_arrays_pix (config)
 
     print 'iX.shape =', iX.shape
     print 'iY.shape =', iY.shape
 
+    weights = get_test_cspad_pix_arr(config)
+
     t0_sec = time()
     #img2d = gg.getImageAs2DHist(iX,iY,W=None)
-    img2d = gg.getImageFromIndexArrays(iX,iY,W=None)
+    img2d = gg.getImageFromIndexArrays(iX,iY,W=weights)
     print 'Consumed time to create image (sec) =', time()-t0_sec
 
-    gg.plotImageLarge(img2d, amp_range=(-1, 2), figsize=(12,11)) #amp_range=(0, 2000)
+    #gg.plotImageLarge(img2d, amp_range=(-1, 32), figsize=(12,11)) #amp_range=(0, 2000)
+    gg.plotImageLarge(img2d, amp_range=None, figsize=(12,11)) #amp_range=(0, 2000)
     gg.show()
-
 
 #------------------------------
 
@@ -261,7 +291,8 @@ def test_cspadpixcoords_instantiation_1() :
 
 #------------------------------
 
-from PyCSPadImage.CalibPars import *
+import PyCSPadImage.CSPadConfigPars as ccp # For test purpose only
+from   PyCSPadImage.CalibPars import *
 
 def test_cspadpixcoords_instantiation_2() :
     """ Instantiation with regular calibration parameters.
@@ -314,12 +345,33 @@ def test_cspadpixcoords_3() :
 
 #------------------------------
 
+def test_cspadpixcoords_4() :
+    """Test of default constructor for coords and non-default for config.
+    """
+    coord = CSPADPixCoords() 
+    coord.print_cspad_geometry_pars()
+
+    config = ccp.CSPadConfigPars() # instatiate object
+    indPairs = np.array( 
+        [ [ 0,   1,  -1,   3,   4,   5,   6,   7],
+          [ 8,   9,  10,  11,  12,  13,  14,  15],
+          [16,  17,  18,  19,  20,  21,  22,  23],
+          [24,  -1,  25,  26,  27,  -1,  29,  30] ] )
+    quadNums = [2, 3, 0, 1]
+    config.setCSPadConfigArrays( indPairsInQuads=indPairs, quadNumsInEvent=quadNums )
+    config.printCSPadConfigPars()
+
+    test_of_coord_arrs(coord, config)
+
+#------------------------------
+
 if __name__ == "__main__" :
-    if len(sys.argv)==1   : print 'Use command: python', sys.argv[0], '<test-number=0-3>'
+    if len(sys.argv)==1   : print 'Use command: python', sys.argv[0], '<test-number=0-4>'
     elif sys.argv[1]=='0' : test_cspadpixcoords_0() # Instatiation default
     elif sys.argv[1]=='1' : test_cspadpixcoords_1() # Instatiation using external geometry parameters
     elif sys.argv[1]=='2' : test_cspadpixcoords_2() # Instatiation using calib = CalibPars(path, run)
     elif sys.argv[1]=='3' : test_cspadpixcoords_3() # Test of coord.get_cspad_image()
+    elif sys.argv[1]=='4' : test_cspadpixcoords_4() # Test of default constructor for coords and non-default for config
     else : print 'Non-expected arguments: sys.argv=', sys.argv
 
     sys.exit ( 'End of test.' )

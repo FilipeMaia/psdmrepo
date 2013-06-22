@@ -36,11 +36,26 @@ import numpy as np
 #---------------------
 
 class CSPAD2x2CalibParsDefault (object) :
-    """Provides access to the CSPAD2x2 calibration parameters.
+    """Provides access to the CSPAD2x2 calibration parameters through the singleton object
+       cspad2x2calibparsdefault.
 
        This class should not be used by itself; default parameters are different from real.
        It is used in CSPAD2x2CalibPars to get rid of undefined parameters in case of missing calibration files.
+
+       Interface:
+       ==========
+       Instatiation for singleton cspad2x2calibparsdefault is already done in CSPAD2x2CalibParsDefault, so
+       import PyCSPadImage.CSPAD2x2CalibParsDefault as cpd
+
+       Access method:
+       center = cpd.cspad2x2calibparsdefault.getCalibParsDefault('center')
+
+       Test methods: 
+       cpd.cspad2x2calibparsdefault.printCalibParsDefault()          # For all types
+       cpd.cspad2x2calibparsdefault.printCalibParsDefault('center')  # for specified type
+       cpd.cspad2x2calibparsdefault.printListOfCalibTypes()
     """
+
     list_of_clib_types =[
          'center'
         ,'tilt'
@@ -135,7 +150,7 @@ def main_test() :
     cspad2x2calibparsdefault.printCalibParsDefault()
     cspad2x2calibparsdefault.printListOfCalibTypes()
     cspad2x2calibparsdefault.printCalibParsDefault('center')
-    print 'Test of getCalibParsDefault("center"):\n', cspad2x2calibparsdefault.getCalibParsDefault('center')
+    print '\nTest of getCalibParsDefault("center"):\n', cspad2x2calibparsdefault.getCalibParsDefault('center')
 
 if __name__ == "__main__" :
     main_test()

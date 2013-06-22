@@ -44,8 +44,9 @@ class CSPadConfigPars(object) :
     """This class provides access to the CSPAD configuration parameters.
 
     1. Sets a bunch of default configuration parameters,
-    2. Loads current coniguration parameters from hdf5 file or from external parameters.
-    3. Provides access to current coniguration parameters
+       loads current coniguration parameters from hdf5 file or from external parameters.
+    2. Provides access to current coniguration parameters
+    3. Contains conversion methods for arrays between raw data and entire cspad.
     
     Interface
     =========
@@ -58,7 +59,7 @@ class CSPadConfigPars(object) :
         fname  = '/reg/d/psdm/xpp/xpp66213/hdf5/xpp66213-r0150.h5'
         dsname = '/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/XppGon.0:Cspad.0/data'
 
-        config.setCSPadConfiguration( self, fname, dsname, event=0 ):
+        config.setCSPadConfiguration( fname, dsname, event=0 ):
 
     1.3 Initialization of configuration parameters using external arrays, for example:        
         indPairs = np.arange(32)
@@ -69,14 +70,30 @@ class CSPadConfigPars(object) :
 
     2.  Access methods:
 
+    2.1 Access to indPairsInQuads and quadNumsInEvent:
         quadNums = config.getQuadNumsInEvent()
         indPairs = config.getIndPairsInQuads()
         config.printCSPadConfigPars()
 
-    3.  Access to static class parameters:    
+    2.2 Access to static class parameters:    
         import CSPadConfigPars as ccp
         my_wid2x1 = ccp.CSPadConfigPars().wid2x1
         etc...
+
+    3.  Conversions between entire (4,8,185,388) and shaped as data (N<32,185,388) cspad pixel array shapes:
+
+    3.1 Conversion of the entire cspad pixel array arr_entire_cspad with shape (4,8,185,388)
+        in to the arr_raw_data, shaped as data (N<32,185,388):
+        arr_raw_data = config.getCSPadPixArrayShapedAsData(arr_entire_cspad)
+
+    3.2 Conversion of the cspad pixel array arr_raw_data shaped as data (N<32,185,388)
+        in to the entire cspad pixel array arr_entire_cspad with shape (4,8,185,388):
+        arr_entire_cspad = getCSPadPixArrayFromArrayShapedAsData(arr_raw_data)
+
+    4.  Tests
+        To test CSPadConfigPars from release directory use command:
+        python PyCSPadImage/src/CSPadConfigPars.py <test-number>
+        where <test-number> stands for  0, 1, 2, or 3
     """
 
     nquads      =   4    # Total number of quads in cspad
@@ -224,6 +241,55 @@ class CSPadConfigPars(object) :
 
 #---------------------
 
+    def getCSPadPixArrayShapedAsData(self, arr_in):
+        """Converts the entire cspad pixel array arr_in with shape (4,8,185,388)
+           in to the arr_out, shaped as data (nsects_in_data,185,388).
+        """
+
+        if arr_in.shape != (4,8,185,388) :
+            try :
+                arr_in.shape = (4,8,185,388)
+            except :
+                print 'ERROR in getCSPadPixArrayShapedAsData(): Input array shape=', arr_out.shape,\
+                      'can not be reshaped to (4,8,185,388)'
+                return arr_in
+
+        nsects_in_data = max(self.indPairsInQuads.flatten()) + 1
+        arr_out = np.zeros((nsects_in_data,185,388), dtype=arr_in.dtype) # dtype=np.float32)
+          
+        for iq in range(len(self.quadNumsInEvent)) :
+            quad = int(self.quadNumsInEvent[iq]) # uint8 -> int
+            for sect in range(8): # loop over ind = 0,1,2,...,7
+                ind_sect_in_data = self.indPairsInQuads[quad][sect]
+                if ind_sect_in_data == -1 : continue
+                arr_out[ind_sect_in_data][:] = arr_in[quad][sect][:]
+
+        print 'getCSPadPixArrayShapedAsData(): Created arr_out.shape=', arr_out.shape
+        return np.array(arr_out) # creates a copy of the pixel array
+ 
+#---------------------
+
+    def getCSPadPixArrayFromArrayShapedAsData(self, arr_in):
+        """Converts the cspad pixel array shaped as data (nsects_in_data,185,388).
+           in to the entire cspad pixel array arr_out with shape (4,8,185,388)
+        """
+
+        nsects_in_data = max(self.indPairsInQuads.flatten()) + 1
+        arr_out = np.zeros((4,8,185,388), dtype=arr_in.dtype) # dtype=np.float32)
+          
+        for iq in range(len(self.quadNumsInEvent)) :
+            quad = int(self.quadNumsInEvent[iq]) # uint8 -> int
+            for sect in range(8): # loop over ind = 0,1,2,...,7
+                ind_sect_in_data = self.indPairsInQuads[quad][sect]
+                if ind_sect_in_data == -1 : continue
+
+                arr_out[quad][sect][:] = arr_in[ind_sect_in_data][:]
+
+        print 'getCSPadPixArrayFromArrayShapedAsData(): Created arr_out.shape=', arr_out.shape
+        return np.array(arr_out) # creates a copy of the pixel array
+ 
+#---------------------
+
     def printCSPadConfigPars(self) :
         """Prints the CSPad current configuration parameters."""
         print 50*'-'
@@ -272,7 +338,57 @@ def test_object(config) :
 
 #----------------------------------------------
 
+def test_object_with_external_pars() :
+    """Test of CSPadConfigPars object with initialization using external parameters"""
+
+    config = CSPadConfigPars() # instatiate object
+
+    indPairs = np.array( 
+        [ [ 0,   1,   2,   3,   4,   5,   6,   7],
+          [ 8,   9,  10,  11,  12,  13,  14,  15],
+          [16,  17,  18,  19,  20,  21,  22,  23],
+          [24,  -1,  25,  26,  27,  -1,  29,  30] ] )
+    quadNums = [2, 3, 0, 1]
+    config.setCSPadConfigArrays( indPairsInQuads=indPairs, quadNumsInEvent=quadNums )
+    config.printCSPadConfigPars()
+
+    print '\nTest of conversion methods'
+    print '\n1. Conversion from entire cspad array to shaped as raw data'
+
+    arr_entire_cspad = np.arange(4*8*185*388)
+    arr_entire_cspad.shape = (4,8,185,388)
+    t1_sec = time()
+    arr_raw_data = config.getCSPadPixArrayShapedAsData(arr_entire_cspad)
+    print 'getCSPadPixArrayShapedAsData transformation time (sec) =', time()-t1_sec
+
+    #print 'arr_raw_data:\n', arr_raw_data
+    print 'arr_raw_data.shape:', arr_raw_data.shape
+    
+    print '\n2. Conversion from raw data to entire cspad array'
+    t2_sec = time()
+    arr_entire_cspad_2 = config.getCSPadPixArrayFromArrayShapedAsData(arr_raw_data)
+    print 'getCSPadPixArrayFromArrayShapedAsData transformation time (sec) =', time()-t2_sec
+
+    #print 'arr_entire_cspad_2:\n',     arr_entire_cspad_2
+    print 'arr_entire_cspad_2.shape:', arr_entire_cspad_2.shape
+
+    print '\n3. Check if arrays are equals after two transformations'
+    indPairsInQuads = config.getIndPairsInQuads()
+    print 'indPairsInQuads:\n', indPairsInQuads
+    arraysAreEqual = True
+    for q in range(4) :
+        for s in range(8) :
+            if indPairsInQuads[q,s] != -1 :
+                if not np.equal(arr_entire_cspad[q,s,:],arr_entire_cspad_2[q,s,:]).all() : arraysAreEqual = False
+
+    if arraysAreEqual : print 'Arrays are equal in expected parts after two transformations'
+    else              : print 'Arrays are NOT equal after two transformations'
+
+#----------------------------------------------
+
 if __name__ == "__main__" :
+
+    print 65*'='
 
     if len(sys.argv)==1 :
         print 'Use command: python', sys.argv[0], '<test-number=0-3>'
@@ -288,22 +404,13 @@ if __name__ == "__main__" :
         test_object(config)
 
     elif sys.argv[1]=='2' :
-        print 'Test of CSPadConfigPars object with initialization using external parameters'
-        config = CSPadConfigPars() # instatiate object
-
-        indPairs = np.array( 
-            [ [ 0,   1,   2,   3,   4,   5,   6,   7],
-              [ 8,   9,  10,  11,  12,  13,  14,  15],
-              [16,  17,  18,  19,  20,  21,  22,  23],
-              [24,  -1,  25,  26,  27,  -1,  29,  30] ] )
-        quadNums = [2, 3, 0, 1]
-        config.setCSPadConfigArrays( indPairsInQuads=indPairs, quadNumsInEvent=quadNums )
-        config.printCSPadConfigPars()
-
-    elif sys.argv[1]=='3' :
         print 'Test of access to static CSPadConfigPars parameters'
         print 'my_wid2x1:', CSPadConfigPars().wid2x1
         print 'my_len2x1:', CSPadConfigPars().len2x1
+
+    elif sys.argv[1]=='3' :
+        print 'Test of CSPadConfigPars object with initialization using external parameters'
+        test_object_with_external_pars()
 
     else :
         print 'Non-expected arguments: sys.argv=', sys.argv
