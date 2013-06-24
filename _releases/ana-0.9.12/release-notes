@@ -1,0 +1,4 @@
+- disable warnings on duplicated XTC objects to support a mixture
+  of compressed and uncompressed data in XTC
+- in psana renamed Scan classes to Step classes, plus corresponding methods
+- ipython adds few dependent packages to enable ipython notebook
