@@ -79,6 +79,7 @@ namespace {
         { "MecXt2Pim02",     Pds::BldInfo::MecXt2Pim02 },
         { "MecXt2Pim03",     Pds::BldInfo::MecXt2Pim03 },
         { "CxiDg3Spec",      Pds::BldInfo::CxiDg3Spec },
+        { "Nh2Sb1Ipm02",     Pds::BldInfo::Nh2Sb1Ipm02 },
         { "NumberOf",        Pds::BldInfo::NumberOf },
         { 0, 0 }
     };
