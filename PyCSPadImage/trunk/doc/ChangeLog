@@ -10,6 +10,21 @@ Package author: Mikhail S. Dubrovin
 
 Please describe any modifications that you made to the package in the
 reverse time order.
+	
+#---------------------
+2012-06-27 Mikhail S. Dubrovin
+Tag: V00-00-13
+- work on interface improvement 
+M       src/CalibParsEvaluated.py
+M       src/CalibPars.py
+M       src/PixCoords2x1.py
+M       src/CalibParsDefault.py
+A       src/CSPADCalibParsEvaluated.py
+M       src/CSPAD2x2CalibPars.py
+M       src/Alignment.py
+M       src/Examples.py
+M       src/CSPAD2x2PixCoords.py
+M       src/GlobalGraphics.py
 
 #---------------------
 2012-06-19 Mikhail S. Dubrovin

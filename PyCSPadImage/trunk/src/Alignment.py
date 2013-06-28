@@ -143,17 +143,17 @@ def main_alignment_test() :
     #print 'ds1ev = ',ds1ev[1,:]
 
     #print 'Subtract pedestals'
-    #ped_fname = '/reg/neh/home1/dubrovin/LCLS/calib-CSPad-pedestals/cspad-pedestals-cxi49812-r0072.dat' # shape = (5920, 388)
-    #ped_fname = '/reg/neh/home1/dubrovin/LCLS/calib-CSPad-pedestals/cspad-pedestals-cxi49012-r0008.dat' # shape = (5920, 388)
-    #ped_fname = '/reg/neh/home1/dubrovin/LCLS/calib-CSPad-pedestals/cspad-pedestals-cxi49012-r0038.dat' # shape = (5920, 388)
-    #ped_fname = '/reg/neh/home1/dubrovin/LCLS/calib-CSPad-pedestals/cspad-pedestals-cxi49012-r0027.dat' # shape = (5920, 388)
-    #ped_fname = '/reg/neh/home1/dubrovin/LCLS/calib-CSPad-pedestals/cspad-pedestals-xppcom10-r1435.dat' # shape = (5920, 388) low gain
+    #ped_fname = '/reg/neh/home1/dubrovin/LCLS/CSPadPedestals/cspad-pedestals-cxi49812-r0072.dat' # shape = (5920, 388)
+    #ped_fname = '/reg/neh/home1/dubrovin/LCLS/CSPadPedestals/cspad-pedestals-cxi49012-r0008.dat' # shape = (5920, 388)
+    #ped_fname = '/reg/neh/home1/dubrovin/LCLS/CSPadPedestals/cspad-pedestals-cxi49012-r0038.dat' # shape = (5920, 388)
+    #ped_fname = '/reg/neh/home1/dubrovin/LCLS/CSPadPedestals/cspad-pedestals-cxi49012-r0027.dat' # shape = (5920, 388)
+    #ped_fname = '/reg/neh/home1/dubrovin/LCLS/CSPadPedestals/cspad-pedestals-xppcom10-r1435.dat' # shape = (5920, 388) low gain
     #ped_fname = '/reg/d/psdm/CXI/cxi49012/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/pedestals/9-37.data' # shape = (5920, 388)
-    #ped_fname = '/reg/neh/home1/dubrovin/LCLS/calib-CSPad-pedestals/cspad-pedestals-cxi80410-r1453.dat' # shape = (5920, 388)
-    ped_fname = '/reg/neh/home1/dubrovin/LCLS/calib-CSPad-pedestals/cspad-pedestals-xpp66213-r0149.dat' # shape = (5920, 388)
+    #ped_fname = '/reg/neh/home1/dubrovin/LCLS/CSPadPedestals/cspad-pedestals-cxi80410-r1453.dat' # shape = (5920, 388)
+    ped_fname = '/reg/neh/home1/dubrovin/LCLS/CSPadPedestals/cspad-pedestals-xpp66213-r0149.dat' # shape = (5920, 388)
     #ds1ev  = gm.getCSPadArrayFromFile(ped_fname)
-    #ds1ev -= gm.getCSPadArrayFromFile('/reg/neh/home1/dubrovin/LCLS/calib-CSPad-pedestals/cspad-pedestals-cxi49012-r0027.dat')
-    #ds1ev -= gm.getCSPadArrayFromFile('/reg/neh/home1/dubrovin/LCLS/calib-CSPad-pedestals/cspad-pedestals-xppcom10-r1442.dat')
+    #ds1ev -= gm.getCSPadArrayFromFile('/reg/neh/home1/dubrovin/LCLS/CSPadPedestals/cspad-pedestals-cxi49012-r0027.dat')
+    #ds1ev -= gm.getCSPadArrayFromFile('/reg/neh/home1/dubrovin/LCLS/CSPadPedestals/cspad-pedestals-xppcom10-r1442.dat')
     ds1ev -= gm.getCSPadArrayFromFile(ped_fname)
     print 'ds1ev.shape = ',ds1ev.shape # should be (32, 185, 388)
 

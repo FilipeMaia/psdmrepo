@@ -188,7 +188,8 @@ class CSPAD2x2CalibPars (object) :
             self.cpars_status[type] = 'FROM_FILE'
             arr = np.loadtxt (fname)
             arr.shape = shape              # set default shape
-            return arr
+            self.cpars[type] = arr
+            return self.cpars[type]
 
         except IOError :
             print 80*'!'

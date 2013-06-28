@@ -70,7 +70,6 @@ class CalibParsDefault (object) :
         ,'filter'
         ,'pixel_status'
         ,'center_global'  
-        ,'tilt_global'  
         ,'beam_vector'
         ,'beam_intersect'
         ,'rotation_index'
@@ -157,8 +156,6 @@ class CalibParsDefault (object) :
              [     0.,      0.,      0.,      0.,      0.,      0.,      0.,      0.],
              [     0.,      0.,      0.,      0.,      0.,      0.,      0.,      0.],
              [     0.,      0.,      0.,      0.,      0.,      0.,      0.,      0.]]])
-
-        self.defpars['tilt_global'] = np.zeros((4,8), dtype=np.float32)
 
         self.defpars['beam_vector']    = np.zeros((3), dtype=np.float32)
 

@@ -130,6 +130,13 @@ def plotImageAndSpectrum(arr, amp_range=None) : #range=(0,500)
 
 #--------------------------------
 
+def savefig(fname='img.png', do_print=True) :
+    if do_print :
+        print 'Save plot in file: %s' % fname 
+    plt.savefig(fname)
+
+#--------------------------------
+
 def move(x0=200,y0=100) :
     #plt.get_current_fig_manager().window.move(x0, y0)
     move_str = '+' + str(x0) + '+' + str(y0)

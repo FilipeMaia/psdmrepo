@@ -74,7 +74,7 @@ def main_example_cxi() :
     print 'CSPad array shape =',ds1ev.shape
 
     #print 'Subtract pedestals, if they were not subtracted in translator...'
-    #ped_fname = '/reg/neh/home/dubrovin/LCLS/calib-CSPad-pedestals/cspad-pedestals-cxi49012-r0038.dat' # shape = (5920, 388)
+    #ped_fname = '/reg/neh/home/dubrovin/LCLS/CSPadPedestals/cspad-pedestals-cxi49012-r0038.dat' # shape = (5920, 388)
     #ped_fname = '/reg/d/psdm/CXI/cxi49012/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/pedestals/9-37.data' # shape = (5920, 388)
     #ds1ev -= gm.getCSPadArrayFromFile(ped_fname)
 
@@ -123,7 +123,7 @@ def main_example_xpp() :
     print 'CSPad array shape =',ds1ev.shape
 
     #print 'Subtract pedestals, if they were not subtracted in translator...'
-    #ped_fname = '/reg/neh/home/dubrovin/LCLS/calib-CSPad-pedestals/cspad-pedestals-cxi49012-r0038.dat' # shape = (5920, 388)
+    #ped_fname = '/reg/neh/home/dubrovin/LCLS/CSPadPedestals/cspad-pedestals-cxi49012-r0038.dat' # shape = (5920, 388)
     #ds1ev -= gm.getCSPadArrayFromFile(ped_fname)
 
     print 'Make the CSPad image from raw array'
@@ -223,7 +223,8 @@ def test_cspad_image() :
     """Test of instantiation with external parameters.
     """
     run   = 150
-    path  = '/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-xpp-2013-01-29'
+    #path  = '/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-xpp-2013-01-29'
+    path  = '/reg/d/psdm/xpp/xpptut13/calib/CsPad::CalibV1/XppGon.0:Cspad.0/'
     calib = calp.CalibPars(path, run)
     coord = pixcoor.CSPADPixCoords(calib)
     #coord = pixcoor.CSPADPixCoords() # Default constructor
@@ -235,7 +236,7 @@ def test_cspad_image() :
     ds1ev = hm.getOneCSPadEventForTest( fname, dsname, event )
     #ds1ev = hm.getAverageCSPadEvent( fname, dsname, event=200, nevents=500 )
  
-    ped_fname = '/reg/neh/home1/dubrovin/LCLS/calib-CSPad-pedestals/cspad-pedestals-xpp66213-r0149.dat' # shape = (5920, 388)
+    ped_fname = '/reg/neh/home1/dubrovin/LCLS/CSPadPedestals/cspad-pedestals-xpp66213-r0149.dat' # shape = (5920, 388)
     peds = gm.getCSPadArrayFromFile(ped_fname)
     print 'peds.shape:', peds.shape
     #peds = calib.getCalibPars('pedestals')
@@ -245,6 +246,7 @@ def test_cspad_image() :
     print 'img2d.shape =', img2d.shape
     
     gg.plotImageLarge(img2d, amp_range=(-10, 200), figsize=(12,11))
+    gg.savefig('cspad-img.png')
     gg.show()
 
 #----------------------------------------------

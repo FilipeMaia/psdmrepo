@@ -214,8 +214,8 @@ def two2x1ToData2x2(arrTwo2x1) :
 
 def test_reshaping_arrs_for_cspad2x2() :
 
-    shape_data = (185,388,2)
     raw_arr = np.arange(185*388*2)
+    raw_arr.shape = (185,388,2)
 
     ord_arr = data2x2ToTwo2x1(raw_arr)
     tst_arr = two2x1ToData2x2(ord_arr)
@@ -231,6 +231,7 @@ def test_reshaping_arrs_for_cspad2x2() :
     if np.equal(tst_arr,raw_arr).all() : print 'Arrays are equal after two transformations'
     else                               : print 'Arrays are NOT equal after two transformations'
 
+#------------------------------
 
 def test_of_coord_arrs(coord, calib=None) :
     """ Test of coordinate arrays, plot image map.
@@ -244,7 +245,7 @@ def test_of_coord_arrs(coord, calib=None) :
     amp_range = (-1, 2)
     if calib != None :
         W = calib.getCalibPars('pedestals')
-        print ' W.shape =',W.shape # W.shape = (185, 388, 2 )
+        print ' W.shape =', W.shape # W.shape = (185, 388, 2 )
         amp_range = (200,600)
 
     print 'iX.shape =', iX.shape
@@ -258,6 +259,28 @@ def test_of_coord_arrs(coord, calib=None) :
     
     #gg.plotImageLarge(img2d, amp_range=(-1, 2), figsize=(12,11))
     gg.plotImageLarge(img2d, amp_range = amp_range, figsize=(12,11))
+    gg.show()
+
+#------------------------------
+import PyCSPadImage.HDF5Methods as hm # For test purpose in main only
+
+def test_of_image(coord, calib=None) :
+    """ Test of coordinate arrays, plot image map.
+    """
+    #fname = '/reg/d/psdm/xpp/xpptut13/hdf5/xppi0513-r0008.h5'
+    fname = '/reg/d/psdm/xpp/xppi0513/hdf5/xppi0513-r0008.h5'
+    dsname = '/Configure:0000/Run:0000/CalibCycle:0000/CsPad2x2::ElementV1/XppGon.0:Cspad2x2.1/data'
+    run   = 123
+    dset = hm.getDataSetForOneEvent( fname, dsname, event  = 0 ) 
+    iX,iY = coord.get_cspad2x2_pix_coordinate_arrays_shapeed_as_data_pix ()
+
+    #dset = calib.getCalibPars('pedestals')
+    print ' dset.shape =', dset.shape # dset.shape = (185, 388, 2 )
+    t0_sec = time()
+    img2d = gg.getImageFromIndexArrays(iX,iY,dset)
+    print 'Consumed time to create image (sec) =', time()-t0_sec
+
+    gg.plotImageLarge(img2d, amp_range=None, figsize=(12,11))
     gg.show()
 
 #------------------------------
@@ -327,14 +350,23 @@ def test_3() :
     gg.show()
  
 #------------------------------
+
+def test_4() :
+    """Test of instantiation with calib=CSPAD2x2CalibPars(path, run).
+    """
+    coord, calib = test_instantiation_2() 
+    test_of_image(coord, calib)
+
+#------------------------------
  
 if __name__ == "__main__" :
-    if len(sys.argv)==1   : print 'Use command: python', sys.argv[0], '<test-number=0-3>'
+    if len(sys.argv)==1   : print 'Use command: python', sys.argv[0], '<test-number=0-5>'
     elif sys.argv[1]=='0' : test_0()
     elif sys.argv[1]=='1' : test_1()
     elif sys.argv[1]=='2' : test_2()
     elif sys.argv[1]=='3' : test_3()
-    elif sys.argv[1]=='4' : test_reshaping_arrs_for_cspad2x2()
+    elif sys.argv[1]=='4' : test_4()
+    elif sys.argv[1]=='5' : test_reshaping_arrs_for_cspad2x2()
     else : print 'Non-expected arguments: sys.argv=', sys.argv
 
     sys.exit ( 'End of test.' )

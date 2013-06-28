@@ -32,12 +32,11 @@ import sys
 import os
 import math
 import numpy as np
-import CalibPars        as calp
 import CalibParsDefault as cpd
 import CSPadConfigPars  as ccp
 
-import GlobalGraphics   as gg # For test purpose in main only
-import HDF5Methods      as hm # For test purpose in main only
+#import GlobalGraphics   as gg # For test purpose in main only
+#import HDF5Methods      as hm # For test purpose in main only
 
 #---------------------
 #  Class definition --
@@ -60,7 +59,8 @@ class CalibParsEvaluated (object) :
         self.mode = 'DEFAULT'
 
         self.setCalibParsEvaluatedFromDefault()
-        self.evaluateCSPadGeometry()
+        self.setCalibParsEvaluated()
+        #self.evaluateCSPadGeometry()
 
 #---------------------
 
@@ -83,30 +83,7 @@ class CalibParsEvaluated (object) :
     def setCalibParsEvaluated (self) :
         print 'Set the calibration parameters evaluated'
 
-        # For now the only type of evaluated parameters is the 'center_global'
-
-        type = 'center_global'
-        if self.calibpars.cpars_status[type] == 'FROM_FILE' : return
-
-
-
-
-
-
-
-
-
-
-
-        self.calibpars.cpars_status[type] = 'EVALUATED'
-
-
-
-
-
-
-
-        
+        # For now the only type of evaluated parameters is the 'center_global'        
 
         self.mode = 'EVALUATED'
 
@@ -161,7 +138,9 @@ class CalibParsEvaluated (object) :
         yc_glob = np.zeros( (4,8), dtype=np.float32 )
         zc_glob = np.zeros( (4,8), dtype=np.float32 )
 
-        #quad_rotation_default = np.array([90,0,270,180])
+        #quad_rotation_default = np.array([180., 90., 0., 270.])
+        #quad_rotation = np.array([90,0,270,180])
+        #print 'quad_rotation', quad_rotation
 
         for quad in range(4) :
 
@@ -628,6 +607,8 @@ class CalibParsEvaluated (object) :
 #----------------------------------------------
 # In case someone decides to run this module --
 #----------------------------------------------
+
+import CalibPars as calp # for test purpose only
 
 def main_test() :
 

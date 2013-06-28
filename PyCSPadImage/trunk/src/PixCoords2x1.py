@@ -265,7 +265,7 @@ def test_2x1_img_easy() :
  
 if __name__ == "__main__" :
 
-    if len(sys.argv)==1   : print 'For other test(s) use command: python', sys.argv[0], '<test-number=1-2>'
+    if len(sys.argv)==1   : print 'For other test(s) use command: python', sys.argv[0], '<test-number=1-3>'
     elif sys.argv[1]=='1' : test_2x1_xy_maps()
     elif sys.argv[1]=='2' : test_2x1_img()
     elif sys.argv[1]=='3' : test_2x1_img_easy()
