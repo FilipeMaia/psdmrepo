@@ -11,6 +11,14 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-07-00
+2013-07-01 Andy Salnikov
+- small scale refactoring of HDF5 backend, moved all Jinja2 templates to
+  a data/templates/hdf5.tmpl library
+- new class TemplateLoader implementing Jinja32 loader which finds templates
+  in the above library
+- replace more hard-coded code generation with Jinja2 templates
+
 Tag: V00-06-07
 2013-06-20 Andy Salnikov
 - DdlPds2PsanaDispatch: do not produce warnings for duplicated event keys,

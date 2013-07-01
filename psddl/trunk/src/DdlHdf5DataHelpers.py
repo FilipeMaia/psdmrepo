@@ -7,7 +7,7 @@
 #
 #------------------------------------------------------------------------
 
-"""Bunch of helper classes for implementation of the HDF5 generator
+"""Bunch of helper classes for implementation of the HDF5 backend.
 
 This software was developed for the LCLS project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
@@ -28,6 +28,7 @@ __version__ = "$Revision$"
 #  Imports of standard modules --
 #--------------------------------
 import sys
+import os
 import logging
 
 #---------------------------------
@@ -40,271 +41,17 @@ import logging
 import jinja2 as ji
 from psddl.Enum import Enum
 from psddl.Template import Template as T
+from psddl.TemplateLoader import TemplateLoader
 
 #----------------------------------
 # Local non-exported definitions --
 #----------------------------------
 
-_ds_comp_decl_template = ji.Template('''
-namespace {{ns}} {
-struct {{className}} {
-  static hdf5pp::Type native_type();
-  static hdf5pp::Type stored_type();
+# jinja environment
+_jenv = ji.Environment(loader=TemplateLoader(), trim_blocks=True)
 
-  {{className}}();
-  ~{{className}}();
-
-{% for attr in attributes %}
-{% if attr.vlen %}
-  size_t vlen_{{attr.name}};
-{% endif %}
-  {{attr.type}} {{attr.name}}; 
-{% endfor %}
-
-{% if conversion %}
-  operator {{conversion}}() const { return {{conversion}}({{cvt_args}}); }
-{% endif %}
-};
-}
-''', trim_blocks=True)
-
-
-_ds_comp_type_method_template = ji.Template('''
-hdf5pp::Type {{ns}}_{{className}}_{{func}}_type()
-{
-  typedef {{ns}}::{{className}} DsType;
-  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-{% for attr in attributes %}
-{% if attr.type_decl %}
-{{attr.type_decl}}
-{%- endif %}
-  type.insert("{{attr.name}}", offsetof(DsType, {{attr.member}}), {{attr.type}});
-{% endfor %}
-  return type;
-}
-
-hdf5pp::Type {{ns}}::{{className}}::{{func}}_type()
-{
-  static hdf5pp::Type type = {{ns}}_{{className}}_{{func}}_type();
-  return type;
-}
-''', trim_blocks=True)
-
-
-_ds_ctor_dtor_template = ji.Template('''\
-{{ns}}::{{className}}::{{className}}()
-{
-{% for attr in vlen_pointers %}
-  this->vlen_{{attr}} = 0;
-{% endfor %}
-{% for attr in pointers %}
-  this->{{attr}} = 0;
-{% endfor %}
-}
-{{ns}}::{{className}}::~{{className}}()
-{
-{% for attr in pointers %}
-  free(this->{{attr}});
-{% endfor %}
-}
-''', trim_blocks=True)
-
-
-_enum_h5type_definition = ji.Template('''\
-  hdf5pp::EnumType<{{enum_base}}> {{type}} = hdf5pp::EnumType<{{enum_base}}>::enumType();
-{% for c in constants %}
-  {{type}}.insert("{{c.h5name}}", {{c.type}}::{{c.name}});
-{% endfor %}
-''', trim_blocks=True)
-
-_array_h5type_definition = ji.Template('''\
-{% if rank > 0 %}
-  hsize_t {{type}}_shape[] = { {{shape}} };
-  hdf5pp::ArrayType {{type}} = hdf5pp::ArrayType::arrayType({{baseType}}, {{rank}}, {{type}}_shape);
-{% else %}
-  hdf5pp::VlenType {{type}} = hdf5pp::VlenType::vlenType({{baseType}});
-{% endif %}
-''', trim_blocks=True)
-
-
-_valtype_proxy_decl = ji.Template('''\
-class Proxy_{{schema.name}}_v{{schema.version}} : public PSEvt::Proxy<{{psanatypename}}> {
-public:
-  typedef {{psanatypename}} PsanaType;
-
-  Proxy_{{schema.name}}_v{{schema.version}}(hdf5pp::Group group, hsize_t idx) : m_group(group), m_idx(idx) {}
-  virtual ~Proxy_{{schema.name}}_v{{schema.version}}() {}
-
-protected:
-
-  virtual boost::shared_ptr<PsanaType> getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key);
-
-private:
-
-  mutable hdf5pp::Group m_group;
-  hsize_t m_idx;
-  boost::shared_ptr<PsanaType> m_data;
-};
-''', trim_blocks=True)
-
-_getTypedImpl_template = ji.Template('''\
-boost::shared_ptr<{{psanatypename}}>
-Proxy_{{schema.name}}_v{{schema.version}}::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key)
-{
-  if (not m_data) {
-{% for ds in schema.datasets %}
-    boost::shared_ptr<{{ds.classNameNs()}}> ds_{{ds.name}} = hdf5pp::Utils::readGroup<{{ds.classNameNs()}}>(m_group, "{{ds.name}}", m_idx);
-{% endfor %}
-{% if 1 %}
-    m_data.reset(new PsanaType({{args|join(', ')}}));
-{% else %}
-    m_data = boost::make_shared<PsanaType>({{args|join(', ')}});
-{% endif %}
-  }
-  return m_data;
-}
-
-''', trim_blocks=True)
-
-
-_shape_method_body_template = ji.Template('''\
-  int shape[] = { {{shape|join(', ')}} };
-  return std::vector<int>(shape, shape+{{shape|length}});
-''', trim_blocks=True)
-
-
-_abs_type_decl = ji.Template('''
-{% set className = type.name ~ '_v' ~ schema.version %}
-
-{% if type.xtcConfig %}
-template <typename Config>
-{% endif %}
-class {{className}} : public {{psanatypename}} {
-public:
-  typedef {{psanatypename}} PsanaType;
-  {{className}}() {}
-{% if type.xtcConfig %}
-  {{className}}(hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Config>& cfg)
-    : m_group(group), m_idx(idx), m_cfg(cfg) {}
-{% else %}
-  {{className}}(hdf5pp::Group group, hsize_t idx)
-    : m_group(group), m_idx(idx) {}
-{% endif %}
-{% if dsCtorWithArg %}
-  {{className}}{{dsCtorWithArg}}
-{% endif %}
-  virtual ~{{className}}() {}
-{% for meth in methods if meth %}
-  {{meth}}
-{% endfor %}
-private:
-  mutable hdf5pp::Group m_group;
-  hsize_t m_idx;
-{% if type.xtcConfig %}
-  boost::shared_ptr<Config> m_cfg;
-{% endif %}
-{% for decl in ds_read_decl if decl %}
-  {{decl}}
-{% endfor %}
-};
-
-''', trim_blocks=True)
-
-
-_meth_decl = ji.Template('''\
-{% if doc %}
-/** {{doc}} */
-{% endif %}
-  {% if static %}static{% endif %}
-{{rettype}} {{methname}}({{argsspec}}) 
-{%- if not static %} const{% endif %}
-{%- if inline and body %}
- { {{body}} }
-{%- else %}
-;
-{% endif -%}
-''', trim_blocks=True)
-
-
-_meth_def = ji.Template('''\
-{% set classname = type.name ~ '_v' ~ schema.version %}
-{% if body and not inline -%}
-{% if template %}
-template <typename {{template}}>
-{% endif %}
-{{rettype}}
-{{classname}}{% if template %}<{{template}}>{% endif %}::{{methname}}({{argsspec}})
-{%- if not static %} const{% endif -%}
-{ 
-{{body}} 
-}
-{%- endif -%}
-''', trim_blocks=True)
-
-_read_comp_ds_impl_template = ji.Template('''\
-{% set classname = type.name ~ '_v' ~ schema.version %}
-{% if type.xtcConfig %}
-{% set TMPL = '<Config>' %}
-template <typename Config>
-{% endif %}
-void {{classname}}{{TMPL}}::read_ds_{{dsName}}() const {
-  m_ds_{{dsName}} = hdf5pp::Utils::readGroup<{{dsClassName}}>(m_group, "{{dsName}}", m_idx);
-}
-''', trim_blocks=True)
-
-_read_arr_ds_basic_impl_template = ji.Template('''\
-{% set classname = type.name ~ '_v' ~ schema.version %}
-{% if type.xtcConfig %}
-{% set TMPL = '<Config>' %}
-template <typename Config>
-{% endif %}
-void {{classname}}{{TMPL}}::read_ds_{{dsName}}() const {
-  m_ds_{{dsName}} = hdf5pp::Utils::readNdarray<{{typename}}, {{rank}}>(m_group, "{{dsName}}", m_idx);
-}
-''', trim_blocks=True)
-
-
-_read_arr_ds_udf_impl_template = ji.Template('''\
-{% set classname = type.name ~ '_v' ~ schema.version %}
-{% if type.xtcConfig %}
-{% set TMPL = '<Config>' %}
-template <typename Config>
-{% endif %}
-void {{classname}}{{TMPL}}::read_ds_{{dsName}}() const {
-  ndarray<{{ds_struct}}, {{rank}}> arr = hdf5pp::Utils::readNdarray<{{ds_struct}}, {{rank}}>(m_group, "{{dsName}}", m_idx);
-  ndarray<{{typename}}, {{rank}}> tmp(arr.shape());
-  std::copy(arr.begin(), arr.end(), tmp.begin());
-  m_ds_{{dsName}} = tmp;
-}
-''', trim_blocks=True)
-
-
-_read_reg_ds_value_impl_template = ji.Template('''\
-{% set classname = type.name ~ '_v' ~ schema.version %}
-{% if type.xtcConfig %}
-{% set TMPL = '<Config>' %}
-template <typename Config>
-{% endif %}
-void {{classname}}{{TMPL}}::read_ds_{{dsName}}() const {
-  m_ds_{{dsName}} = hdf5pp::Utils::readGroup<{{dsClassName}}>(m_group, "{{dsName}}", m_idx);
-  m_ds_storage_{{dsName}} = *m_ds_{{dsName}};
-}
-''', trim_blocks=True)
-
-
-_read_reg_ds_abs_impl_template = ji.Template('''\
-{% set classname = type.name ~ '_v' ~ schema.version %}
-{% if type.xtcConfig %}
-{% set TMPL = '<Config>' %}
-template <typename Config>
-{% endif %}
-void {{classname}}{{TMPL}}::read_ds_{{dsName}}() const {
-  m_ds_{{dsName}} = hdf5pp::Utils::readGroup<{{dsClassName}}>(m_group, "{{dsName}}", m_idx);
-  m_ds_storage_{{dsName}} = boost::make_shared<{{typename}}>(m_ds_{{dsName}});
-}
-''', trim_blocks=True)
-
-
+def _TEMPL(template):
+    return _jenv.get_template('hdf5.tmpl?'+template)
 
 _log = logging.getLogger("DdlHdf5DataHelpers")
 
@@ -388,7 +135,7 @@ class DatasetCompound(object):
         schema = self.schema
         type = schema.pstype
         dsName = self.ds.name
-        return [_read_comp_ds_impl_template.render(locals())]
+        return [_TEMPL('read_compound_ds_method').render(locals())]
 
     def ds_decltype(self, psana_ns):
         '''Return declaration type of the dataset variable'''
@@ -465,12 +212,12 @@ class DatasetCompound(object):
             # if we fail just ignore it
             _log.debug('_genDs: exception for conv operator: %s', ex)
 
-        print >>inc, _ds_comp_decl_template.render(locals())
+        print >>inc, _TEMPL('compound_dataset_decl').render(locals())
         
         # generate constructor and destructor
         pointers = [attr.name for attr in self.ds.attributes if attr.rank > 0 and not attr.sizeIsConst()]
         vlen_pointers = [attr.name for attr in self.ds.attributes if attr.rank > 0 and attr.type.name != 'char' and attr.sizeIsVlen()]
-        print >>cpp, _ds_ctor_dtor_template.render(locals())
+        print >>cpp, _TEMPL('compound_dataset_ctor_dtor').render(locals())
 
     def _genH5TypeFunc(self, func, psana_ns):
         """
@@ -481,7 +228,7 @@ class DatasetCompound(object):
         className = self.ds.className()
 
         attributes = [self._genH5TypeFuncAttr(attr, func, psana_ns) for attr in self.ds.attributes]
-        return _ds_comp_type_method_template.render(locals())
+        return _TEMPL('compound_dataset_h5type_method').render(locals())
 
 
     def _genH5TypeFuncAttr(self, attr, func, psana_ns):
@@ -509,13 +256,13 @@ class DatasetCompound(object):
                 constants = [dict(name=c.name, h5name=self.schema.enumConstName(attr.type.name, c.name), type=typename) for c in attr.type.constants()]
                 type = '_enum_type_' + attr.name
                 enum_base = attr.stor_type.name
-                type_decl = _enum_h5type_definition.render(locals())
+                type_decl = _TEMPL('h5type_definition_enum').render(locals())
                 if attr.rank > 0:
                     baseType = type
                     type = '_array_type_' + attr.name
                     rank = -1 if attr.sizeIsVlen() else attr.rank
                     shape = attr.shape.cs_dims()
-                    type_decl += _array_h5type_definition.render(locals())
+                    type_decl += _TEMPL('h5type_definition_array').render(locals())
                 return dict(name=attr_name, member=attr_member, type=type, type_decl=type_decl)
             
             elif attr.type.name == 'char':
@@ -538,7 +285,7 @@ class DatasetCompound(object):
                     type = '_array_type_' + attr.name
                     rank = -1 if attr.sizeIsVlen() else attr.rank
                     shape = attr.shape.cs_dims()
-                    type_decl = _array_h5type_definition.render(locals())
+                    type_decl = _TEMPL('h5type_definition_array').render(locals())
                 return dict(name=attr_name, member=attr_member, type_decl=type_decl, type=type)
 
         else:
@@ -560,7 +307,7 @@ class DatasetCompound(object):
                 type = '_array_type_' + attr.name
                 rank = -1 if attr.sizeIsVlen() else attr.rank
                 shape = attr.shape.cs_dims()
-                type_decl = _array_h5type_definition.render(locals())
+                type_decl = _TEMPL('h5type_definition_array').render(locals())
 
             return dict(name=attr_name, member=attr_member, type_decl=type_decl, type=type)
 
@@ -630,16 +377,16 @@ class DatasetRegular(object):
 
         if rank > 0:
             if self.ds.type.basic:
-                return [_read_arr_ds_basic_impl_template.render(locals())]
+                return [_TEMPL('read_array_ds_basic_method').render(locals())]
             else:
                 ds_struct = self._attr_dsname()
-                return [_read_arr_ds_udf_impl_template.render(locals())]
+                return [_TEMPL('read_array_ds_udt_method').render(locals())]
         else:
             dsClassName = _h5ds_typename(self.ds)
             if self.ds.type.value_type:
-                return [_read_reg_ds_value_impl_template.render(locals())]
+                return [_TEMPL('read_regular_ds_valuetype_method').render(locals())]
             else:
-                return [_read_reg_ds_abs_impl_template.render(locals())]
+                return [_TEMPL('read_regular_ds_abstract_method').render(locals())]
 
     def genDs(self, inc, cpp, psana_ns):
 
@@ -705,8 +452,8 @@ class SchemaValueType(SchemaType):
                 expr = '{0}({1})'.format(dsattr.type.fullName('C++', psana_ns), expr)
             args.append(expr)
 
-        print >>inc, _valtype_proxy_decl.render(locals())
-        print >>cpp, _getTypedImpl_template.render(locals())
+        print >>inc, _TEMPL('proxy_valtype_declaration').render(locals())
+        print >>cpp, _TEMPL('proxy_valtype_impl_getTypedImpl').render(locals())
         
 class SchemaAbstractType(SchemaType):
     '''
@@ -760,7 +507,7 @@ class SchemaAbstractType(SchemaType):
             dsName = ds.ds.name
             dsCtorWithArg = T('(const ${decltype}& ds) : m_ds_${dsName}(ds) {}')(locals())
 
-        print >>inc, _abs_type_decl.render(locals())
+        print >>inc, _TEMPL('abstract_type_declaration').render(locals())
         for line in cpp_code:
             print >>cpp, line
 
@@ -777,7 +524,7 @@ class SchemaAbstractType(SchemaType):
 
         shape = [str(s or -1) for s in attr.shape.dims]
 
-        body = _shape_method_body_template.render(locals());
+        body = _TEMPL('shape_method_impl').render(locals());
         body = _interpolate(body, attr.parent)
 
         return self._genMethodBody(attr.shape_method, "std::vector<int>", body, [], inline=False, doc=doc)
@@ -835,50 +582,31 @@ class SchemaAbstractType(SchemaType):
                 ret_type = T("const ${ret_type}&")(locals())
                 
             meth_name = meth.name
-            argdecl = ", ".join(["%s %s" % (type.name, arg) for arg, type in args])
+            argdecl = ", ".join(["%s %s" % (atype.name, arg) for arg, atype in args])
             decl += [T("virtual $ret_type $meth_name($argdecl) const;")(locals())]
-            if type.xtcConfig:
-                impl += [T("template <typename Config>\n$ret_type $className<Config>::$meth_name($argdecl) const {")(locals())]
-            else:
-                impl += [T("$ret_type $className::$meth_name($argdecl) const {")(locals())]
             
             if attr.rank == 0:
                 
                 if attr.type.basic:
                     
-                    # simpest case, basic type, non-array
-                    impl += [T("  if (not m_ds_$name) read_ds_$name();")[ds]]
-                    impl += [T("  return $type(m_ds_$name->$attr_name);")(name=ds.name, attr_name=attr.name, type=ret_type)]
-                    
+                    # simplest case, basic type, non-array
+                    impl = _TEMPL('attr_access_method_basic').render(locals())
+
                 elif attr.type.value_type:
                     
                     # non-array, but complex type, need to convert from HDF5 type to psana,
-                    # store the result in member varibale so that we can return reference to it
-                    dsName = ds.name
-                    attrName = attr.name
-                    memberName = T("m_ds_storage_${dsName}_${attrName}")(locals());
+                    # store the result in member variable so that we can return reference to it
                     attr_type = attr.type.fullName('C++', psana_ns)
-                    impl += [T("  if (not m_ds_$name) read_ds_$name();")[ds]]
-                    impl += [T("  $memberName = $attr_type(m_ds_$dsName->$attrName);")(locals())]
-                    impl += [T("  return $memberName;")(locals())]
+                    impl = _TEMPL('attr_access_method_valtype').render(locals())
                     
                 else:
                     
                     # non-array, but complex type, need to convert from HDF5 type to psana,
-                    # store the result in member varibale so that we can return reference to it
-                    dsName = ds.name
-                    attrName = attr.name
-                    memberName = T("m_ds_storage_${dsName}_${attrName}")(locals());
+                    # store the result in member variable so that we can return reference to it
                     aschema = attr.h5schema()
                     attr_type = _h5ds_typename(attr)
                     attr_class = "%s_v%d" % (aschema.pstype.fullName('C++'), aschema.version)
-                    impl += [T("  if (not $memberName) {")(locals())]
-                    impl += [T("    if (not m_ds_$name) read_ds_$name();")[ds]]
-                    impl += [T("    boost::shared_ptr<$attr_type> tmp(m_ds_$dsName, &m_ds_$dsName->$attrName);")(locals())]
-                    impl += [T("    $memberName = boost::make_shared<$attr_class>(tmp);")(locals())]
-                    impl += [  "  }"]
-                    impl += [T("  return *$memberName;")(locals())]
-               
+                    impl = _TEMPL('attr_access_method_abstype').render(locals())
                
             else:
                 
@@ -888,86 +616,50 @@ class SchemaAbstractType(SchemaType):
                     
                     # character array
                     # TODO: if rank is >1 then methods must provide arguments for all but first index,
-                    # this is not implemented yet
-                    impl += [T("  if (not m_ds_$name) read_ds_$name();")[ds]]
-                    impl += [T("  return ($type)(m_ds_$name->$attr_name);")(name=ds.name, attr_name=attr.name, type=ret_type)]
+                    # this is not implemented yet.
+                    impl = _TEMPL('attr_access_method_array_char').render(locals())
                     
                 elif attr.type.basic:
                     
-                    # array of bacis types, return ndarray, data is shared with the dataset
-                    dsName = ds.name
-                    attrName = attr.name
+                    # array of basic types, return ndarray, data is shared with the dataset
                     if attr.sizeIsVlen():
                         # VLEN array take dimension from VLEN size, currently means that only 1-dim VLEN arrays are supported
-                        shape = T("m_ds_$dsName->vlen_$attrName")(locals())
+                        shape = T("m_ds_$dsName->vlen_$attrName")(dsName=ds.name, attrName=attr.name)
                     else:
                         shape = _interpolate(str(attr.shape), type)
-                    impl += [T("  if (not m_ds_$name) read_ds_$name();")[ds]]
-                    impl += [T("  boost::shared_ptr<$attr_type> ptr(m_ds_$dsName, m_ds_$dsName->$attrName);")(locals())]
-                    impl += [T("  return make_ndarray(ptr, $shape);")(locals())]
+                    impl = _TEMPL('attr_access_method_array_basic').render(locals())
                     
                 elif attr.type.value_type:
                     
                     # array of non-basic value type, have to convert
-                    dsName = ds.name
-                    attrName = attr.name
                     if attr.sizeIsVlen():
                         # VLEN array take dimension from VLEN size, currently means that only 1-dim VLEN arrays are supported
-                        shape = T("m_ds_$dsName->vlen_$attrName")(locals())
-                        data_size = shape
+                        shape = T("m_ds_$dsName->vlen_$attrName")(dsName=ds.name, attrName=attr.name)
                     else:
                         shape = _interpolate(str(attr.shape), type)
-                        data_size = _interpolate(str(attr.shape.size()), type)
-                    memberName = T("m_ds_storage_${dsName}_${attrName}")(locals());
-                    impl += [T("  if (not m_ds_$name) read_ds_$name();")[ds]]
-                    impl += [T("  if ($memberName.empty()) {")(locals())]
-                    impl += [T("    unsigned shape[] = {$shape};")(locals())]
-                    impl += [T("    ndarray<$attr_type, $rank> tmparr(shape);")(locals())]
-                    impl += [T("    unsigned size = tmparr.size();")(locals())]
-                    impl += [T("    ndarray<$attr_type, $rank>::iterator it = tmparr.begin();")(locals())]
-                    impl += [T("    for (unsigned i = 0; i != size; ++ i, ++ it) {")(locals())]
-                    impl += [T("      *it = $attr_type(m_ds_$dsName->$attrName[i]);")(locals())]
-                    impl += [T("    }")(locals())]
-                    impl += [T("    $memberName = tmparr;")(locals())]
-                    impl += [T("  }")(locals())]
-                    impl += [T("  return $memberName;")(locals())]
+                    impl = _TEMPL('attr_access_method_array_valtype').render(locals())
                     
                 else:
                     
                     # array of non-basic abstract type, have to convert
-                    dsName = ds.name
-                    attrName = attr.name
                     if attr.sizeIsVlen():
                         # VLEN array take dimension from VLEN size, currently means that only 1-dim VLEN arrays are supported
-                        shape = T("m_ds_$dsName->vlen_$attrName")(locals())
+                        shape = T("m_ds_$dsName->vlen_$attrName")(dsName=ds.name, attrName=attr.name)
                         data_size = shape
                     else:
                         shape = _interpolate(str(meth.attribute.shape), type)
                         data_size = _interpolate(str(meth.attribute.shape.size()), type)
-                    memberName = T("m_ds_storage_${dsName}_${attrName}")(locals());
-                    arguse = ''.join(["[%s]" % arg for arg, type in args])
+                    arguse = ''.join(["[%s]" % arg for arg, _ in args])
                     aschema = attr.h5schema()
                     attr_class = "%s_v%d" % (aschema.name, aschema.version)
                     attr_type = _h5ds_typename(attr)
-                    impl += [T("  if (not m_ds_$name) read_ds_$name();")[ds]]
-                    impl += [T("  if ($memberName.empty()) {")(locals())]
-                    impl += [T("    unsigned shape[] = {$shape};")(locals())]
-                    impl += [T("    ndarray<$attr_class, $rank> tmparr(shape);")(locals())]
-                    impl += [T("    for (int i = 0; i != $data_size; ++ i) {")(locals())]
-                    impl += [T("      boost::shared_ptr<$attr_type> ptr(m_ds_$dsName, &m_ds_$dsName->$attrName[i]);")(locals())]
-                    impl += [T("      tmparr.begin()[i] = $attr_class(ptr);")(locals())]
-                    impl += [T("    }")(locals())]
-                    impl += [T("    $memberName = tmparr;")(locals())]
-                    impl += [T("  }")(locals())]
-                    impl += [T("  return $memberName$arguse;")(locals())]
+                    impl = _TEMPL('attr_access_method_array_abstype').render(locals())
 
-            impl += ["}"]
-
-            return decl, impl
+            return decl, [impl]
             
         elif ds:
             
-            # non-compound dataset,  
+            # non-compound dataset 
 
             args = []
             ds_type = ds.type.fullName('C++', psana_ns)
@@ -986,40 +678,25 @@ class SchemaAbstractType(SchemaType):
                 ret_type = T("const ${ret_type}&")(locals())
                 
             meth_name = meth.name
-            argdecl = ", ".join(["%s %s" % (type.name, arg) for arg, type in args])
+            argdecl = ", ".join(["%s %s" % (atype.name, arg) for arg, atype in args])
             decl += [T("virtual $ret_type $meth_name($argdecl) const;")(locals())]
-            if type.xtcConfig:
-                impl += [T("template <typename Config>\n$ret_type $className<Config>::$meth_name($argdecl) const {")(locals())]
-            else:
-                impl += [T("$ret_type $className::$meth_name($argdecl) const {")(locals())]
             
             if rank == 0:
                 
                 if ds.type.value_type:
                     
                     # non-array, value type, need to convert from HDF5 type to psana,
-                    # store the result in member varibale so that we can return reference to it
-                    dsName = ds.name
-                    memberName = T("m_ds_storage_${dsName}")(locals());
+                    # store the result in member variable so that we can return reference to it
                     ds_type = ds.type.fullName('C++', psana_ns)
-                    impl += [T("  if (not m_ds_$dsName) read_ds_$dsName();")(locals())]
-                    impl += [T("  $memberName = $ds_type(*m_ds_$dsName);")(locals())]
-                    impl += [T("  return $memberName;")(locals())]
+                    impl = _TEMPL('ds_access_method_valtype').render(locals())
                     
                 else:
                     
                     # non-array, but complex type, need to convert from HDF5 type to psana,
-                    # store the result in member varibale so that we can return reference to it
-                    dsName = ds.name
-                    memberName = T("m_ds_storage_${dsName}")(locals());
+                    # store the result in member variable so that we can return reference to it
                     aschema = ds.h5schema()
-                    ds_type = _h5ds_typename(ds)
                     ds_class = "%s_v%d" % (aschema.pstype.fullName('C++'), aschema.version)
-                    impl += [T("  if (not $memberName) {")(locals())]
-                    impl += [T("    if (not m_ds_$dsName) read_ds_$dsName();")(locals())]
-                    impl += [T("    $memberName = boost::make_shared<$ds_class>(m_ds_$dsName);")(locals())]
-                    impl += [  "  }"]
-                    impl += [T("  return *$memberName;")(locals())]
+                    impl = _TEMPL('ds_access_method_abstype').render(locals())
                
                
             else:
@@ -1029,34 +706,18 @@ class SchemaAbstractType(SchemaType):
                 if ds.type.value_type and not isinstance(ds.type, Enum):
 
                     # array of value type, have to convert
-                    dsName = ds.name
-                    impl += [T("  if (m_ds_$dsName.empty()) read_ds_$dsName();")(locals())]
-                    impl += [T("  return m_ds_$dsName;")(locals())]
+                    impl = _TEMPL('ds_access_method_array_valtype').render(locals())
                     
                 else:
                     
                     # array of non-basic abstract type, have to convert
-                    dsName = ds.name
-                    memberName = T("m_ds_storage_${dsName}")(locals());
-                    arguse = ''.join(["[%s]" % arg for arg, type in args])
+                    arguse = ''.join(["[%s]" % arg for arg, _ in args])
                     aschema = ds.h5schema()
                     ds_class = "%s_v%d" % (aschema.name, aschema.version)
                     ds_type = _h5ds_typename(ds)
-                    impl += [T("  if (m_ds_$dsName.empty()) read_ds_$dsName();")(locals())]
-                    impl += [T("  if ($memberName.empty()) {")(locals())]
-                    impl += [T("    ndarray<$ds_class, $rank> tmparr(m_ds_$dsName.shape());")(locals())]
-                    impl += [T("    const unsigned size = m_ds_$dsName.size();")(locals())]
-                    impl += [T("    for (unsigned i = 0; i != $data_size; ++ i) {")(locals())]
-                    impl += [T("      boost::shared_ptr<$ds_type> ptr(m_ds_$dsName.data_ptr(), &m_ds_$dsName.begin()[i]);")(locals())]
-                    impl += [T("      tmparr.begin()[i] = $ds_class(ptr);")(locals())]
-                    impl += [T("    }")(locals())]
-                    impl += [T("    $memberName = tmparr;")(locals())]
-                    impl += [T("  }")(locals())]
-                    impl += [T("  return $memberName$arguse;")(locals())]
+                    impl = _TEMPL('ds_access_method_array_abstype').render(locals())
 
-            impl += ["}"]
-
-            return decl, impl
+            return decl, [impl]
             
         else:
             
@@ -1090,12 +751,11 @@ class SchemaAbstractType(SchemaType):
             # default is not inline, can change with a tag
             inline = 'inline' in meth.tags
             
-            template = "Config" if type.xtcConfig else None
-            return self._genMethodBody(meth.name, rettype, body, meth.args, inline, static=meth.static, doc=meth.comment, template=template)
+            return self._genMethodBody(meth.name, rettype, body, meth.args, inline, static=meth.static, doc=meth.comment)
 
 
 
-    def _genMethodBody(self, methname, rettype, body, args=[], inline=False, static=False, doc=None, template=None):
+    def _genMethodBody(self, methname, rettype, body, args=[], inline=False, static=False, doc=None):
         """ Generate method, both declaration and definition, given the body of the method.
         Returns tuple of lists of strings."""
         
@@ -1104,7 +764,7 @@ class SchemaAbstractType(SchemaType):
         schema = self.schema
         type = schema.pstype
 
-        return ([_meth_decl.render(locals())], [_meth_def.render(locals())])
+        return ([_TEMPL('method_declaration').render(locals())], [_TEMPL('method_definition').render(locals())])
 
         
 def Schema(schema):

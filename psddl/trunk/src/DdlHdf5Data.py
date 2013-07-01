@@ -7,12 +7,18 @@
 #
 #------------------------------------------------------------------------
 
-"""DDL parser which generates C++ code for HDF5 data classes.
+"""Backend for psddlc which generates C++ code for HDF5 I/O.
 
-This software was developed for the SIT project.  If you use all or 
+Backend-specific options:
+
+  gen-incdir - specifies directory name for generated header files, default is empty 
+  top-package - specifies top-level namespace for the generated code, default is no top-level namespace
+  psana-inc - specifies include directory for psana header files
+  psana-ns - specifies top-level namespace for Psana interfaces
+  dump-schema - if present the auto-generated schemas will be dumped, no code generation
+
+This software was developed for the LCLS project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
-
-@see RelatedModule
 
 @version $Id$
 
@@ -47,46 +53,18 @@ from psddl.H5Type import H5Type
 from psddl.H5Dataset import H5Dataset
 from psddl.H5Attribute import H5Attribute
 from psddl.Template import Template as T
+from psddl.TemplateLoader import TemplateLoader
 from psddl import DdlHdf5DataHelpers as Helpers
 
 #----------------------------------
 # Local non-exported definitions --
 #----------------------------------
 
-_make_proxy_decl_template = ji.Template('''\
-{% if cfgtypename %}
-boost::shared_ptr<PSEvt::Proxy<{{psanatypename}}> > make_{{type.name}}(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<{{cfgtypename}}>& cfg);\
-{% else %}
-boost::shared_ptr<PSEvt::Proxy<{{psanatypename}}> > make_{{type.name}}(int version, hdf5pp::Group group, hsize_t idx);\
-{% endif %}
-''', trim_blocks=True)
+# jinja environment
+_jenv = ji.Environment(loader=TemplateLoader(), trim_blocks=True)
 
-_make_proxy_impl_template = ji.Template('''\
-{% if cfgtypename %}
-boost::shared_ptr<PSEvt::Proxy<{{psanatypename}}> > make_{{type.name}}(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<{{cfgtypename}}>& cfg) {
-{% else %}
-boost::shared_ptr<PSEvt::Proxy<{{psanatypename}}> > make_{{type.name}}(int version, hdf5pp::Group group, hsize_t idx) {
-{% endif %}
-  switch (version) {
-{% for schema in type.h5schemas %}
-  case {{schema.version}}:
-{% if type.value_type %}
-    return boost::make_shared<Proxy_{{type.name}}_v{{schema.version}}>(group, idx);
-{% else %}
-{% if cfgtypename %}
-    return boost::make_shared<PSEvt::DataProxy<{{psanatypename}}> >(boost::make_shared<{{type.name}}_v{{schema.version}}<{{cfgtypename}}> >(group, idx, cfg));
-{% else %}
-    return boost::make_shared<PSEvt::DataProxy<{{psanatypename}}> >(boost::make_shared<{{type.name}}_v{{schema.version}}>(group, idx));
-{% endif %}
-{% endif %}
-{% endfor %}
-  default:
-    return boost::make_shared<PSEvt::DataProxy<{{psanatypename}}> >(boost::shared_ptr<{{psanatypename}}>());
-  }
-}
-''', trim_blocks=True)
-
-
+def _TEMPL(template):
+    return _jenv.get_template('hdf5.tmpl?'+template)
 
 def _schemas(pkg):
     '''generator function for all schemas inside a package'''
@@ -111,8 +89,10 @@ class DdlHdf5Data ( object ) :
     def __init__(self, incname, cppname, backend_options, log):
         """Constructor
         
-            @param incname  include file name
-            @param cppname  source file name
+            @param incname  file name for generated header file
+            @param cppname  file name for generated source file
+            @param backend_options  dictionary with backend options
+            @param log      logger instance
         """
         self.incname = incname
         self.cppname = cppname
@@ -234,12 +214,12 @@ class DdlHdf5Data ( object ) :
         # enums for constants
         for const in pkg.constants() :
             if not const.included :
-                self._genConst(const)
+                print >>self.inc, _TEMPL('const_decl').render(const=const)
 
         # regular enums
         for enum in pkg.enums() :
             if not enum.included :
-                self._genEnum(enum)
+                print >>self.inc, _TEMPL('enum_decl').render(enum=enum)
 
         # loop over packages and types
         for ns in pkg.namespaces() :
@@ -256,23 +236,6 @@ class DdlHdf5Data ( object ) :
         print >>self.inc, "} // namespace %s" % pkg.name
         print >>self.cpp, "} // namespace %s" % pkg.name
 
-
-    def _genConst(self, const):
-        
-        print >>self.inc, "  enum {\n    %s = %s /**< %s */\n  };" % \
-                (const.name, const.value, const.comment)
-
-    def _genEnum(self, enum):
-        
-        if enum.comment: print >>self.inc, "\n  /** %s */" % (enum.comment)
-        print >>self.inc, "  enum %s {" % (enum.name or "",)
-        for const in enum.constants() :
-            val = ""
-            if const.value is not None : val = " = " + const.value
-            doc = ""
-            if const.comment: doc = ' /**< %s */' % const.comment
-            print >>self.inc, "    %s%s,%s" % (const.name, val, doc)
-        print >>self.inc, "  };"
 
     def _parseType(self, type):
 
@@ -302,8 +265,8 @@ class DdlHdf5Data ( object ) :
             if config: cfgtypename = config.fullName('C++', self.psana_ns)
             psanatypename = type.fullName('C++', self.psana_ns)
 
-            print >>self.inc, _make_proxy_decl_template.render(locals())
-            print >>self.cpp, _make_proxy_impl_template.render(locals())
+            print >>self.inc, _TEMPL('make_proxy_decl').render(locals())
+            print >>self.cpp, _TEMPL('make_proxy_impl').render(locals())
 
     def _genSchema(self, type, schema):
 
@@ -313,7 +276,7 @@ class DdlHdf5Data ( object ) :
             self._log.debug("_genSchema: skip schema - external")
             return
 
-        # wrap schema into helper class which knows how to do the reset
+        # wrap schema into helper class which knows how to do the rest
         hschema = Helpers.Schema(schema)
 
         for ds in hschema.datasets:
