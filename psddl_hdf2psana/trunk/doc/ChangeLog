@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-01
+2013-07-03 Andy Salnikov
+- bug fix - forgot to implement default ctor in 
+  ns_ClockTime_v0::dataset_data class
+
 Tag: V00-02-00
 2013-07-02 Andy Salnikov
 - re-generate everyhting with psddl V00-07-01

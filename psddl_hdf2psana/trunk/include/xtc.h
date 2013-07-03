@@ -31,7 +31,7 @@ namespace Pds {
 namespace ns_ClockTime_v0 {
 struct dataset_data {
 
-  dataset_data();
+  dataset_data() {}
   dataset_data(const ::Pds::ClockTime& clock)
     : seconds(clock.seconds()), nanoseconds(clock.nanoseconds()) {}
 
