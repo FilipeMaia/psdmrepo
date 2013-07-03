@@ -229,6 +229,61 @@ public:
     return readNdarray<Data, Rank>(group.openDataSet(dataset), index);
   }
 
+  /**
+   *  @brief Store an object in a dataset in a group.
+   *
+   *  Creates new scalar dataset with a given name and stores data in it. Dataset must not exist
+   *  yet, otherwise an exception will be thrown.
+   *
+   *  @param[in] group   Group object, parent of the dataset.
+   *  @param[in] dataset Dataset name
+   *  @param[in] data    Object to store
+   *  @param[in] native_type    In-memory type of the data
+   *  @param[in] stored_type    Type of the data as stored in file
+   *
+   *  @throw hdf5pp::Exception
+   */
+  template <typename Data>
+  static void storeScalar(hdf5pp::Group group, const std::string& dataset, const Data& data,
+      const Type& native_type = TypeTraits<Data>::native_type(),
+      const Type& stored_type = TypeTraits<Data>::stored_type())
+  {
+    _storeScalar(group, dataset, static_cast<const void*>(data), native_type, stored_type);
+  }
+
+  /**
+   *  @brief Store an object in a dataset in a group.
+   *
+   *  Appends data object to a dataset which has to be rank-1 dataset. If dataset
+   *  does not exist yet it will be created first.
+   *
+   *  @param[in] group   Group object, parent of the dataset.
+   *  @param[in] dataset Dataset name
+   *  @param[in] data    Object to store
+   *  @param[in] native_type    In-memory type of the data
+   *  @param[in] stored_type    Type of the data as stored in file
+   *
+   *  @throw hdf5pp::Exception
+   */
+  template <typename Data>
+  static void append(hdf5pp::Group group, const std::string& dataset, const Data& data,
+      const Type& native_type = TypeTraits<Data>::native_type(),
+      const Type& stored_type = TypeTraits<Data>::stored_type())
+  {
+    _append(group, dataset, static_cast<const void*>(data), native_type, stored_type);
+  }
+
+
+private:
+
+  /// template-free implementation of append()
+  static void _append(hdf5pp::Group group, const std::string& dataset, const void* data,
+      const Type& native_type, const Type& stored_type);
+
+  /// template-free implementation of storeScalar()
+  static void _storeScalar(hdf5pp::Group group, const std::string& dataset, const void* data,
+      const Type& native_type, const Type& stored_type);
+
 };
 
 } // namespace hdf5pp

@@ -101,6 +101,15 @@ public:
     _store( native_type, memDspc, fileDspc, TypeTraits<T>::address( *data ) ) ;
   }
 
+  // store the data, give file dataspace
+  void store ( const DataSpace& memDspc,
+               const DataSpace& fileDspc,
+               const void* data,
+               const hdf5pp::Type& native_type)
+  {
+    _store( native_type, memDspc, fileDspc, data);
+  }
+
   // retrieve the data from dataset
   template <typename T>
   void read (const DataSpace& memDspc,
