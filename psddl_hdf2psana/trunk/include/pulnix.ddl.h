@@ -16,18 +16,20 @@ struct dataset_config {
   static hdf5pp::Type stored_type();
 
   dataset_config();
+  dataset_config(const Psana::Pulnix::TM6740ConfigV1& psanaobj);
   ~dataset_config();
 
-  uint16_t gain_a; 
-  uint16_t gain_b; 
-  uint16_t vref; 
-  uint16_t shutter_width; 
-  uint8_t gain_balance; 
-  uint8_t output_resolution; 
-  uint8_t horizontal_binning; 
-  uint8_t vertical_binning; 
-  uint8_t lookuptable_mode; 
-  uint8_t output_resolution_bits; 
+  uint16_t gain_a;
+  uint16_t gain_b;
+  uint16_t vref;
+  uint16_t shutter_width;
+  uint8_t gain_balance;
+  uint8_t output_resolution;
+  uint8_t horizontal_binning;
+  uint8_t vertical_binning;
+  uint8_t lookuptable_mode;
+  uint8_t output_resolution_bits;
+
 
 };
 }
@@ -60,24 +62,30 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Pulnix::TM6740ConfigV1> > make_TM6740ConfigV1(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::Pulnix::TM6740ConfigV1& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::Pulnix::TM6740ConfigV1& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_TM6740ConfigV2_v0 {
 struct dataset_config {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_config();
+  dataset_config(const Psana::Pulnix::TM6740ConfigV2& psanaobj);
   ~dataset_config();
 
-  uint16_t gain_a; 
-  uint16_t gain_b; 
-  uint16_t vref_a; 
-  uint16_t vref_b; 
-  uint8_t gain_balance; 
-  int32_t output_resolution; 
-  int32_t horizontal_binning; 
-  int32_t vertical_binning; 
-  int32_t lookuptable_mode; 
-  uint8_t output_resolution_bits; 
+  uint16_t gain_a;
+  uint16_t gain_b;
+  uint16_t vref_a;
+  uint16_t vref_b;
+  uint8_t gain_balance;
+  int32_t output_resolution;
+  int32_t horizontal_binning;
+  int32_t vertical_binning;
+  int32_t lookuptable_mode;
+  uint8_t output_resolution_bits;
+
 
 };
 }
@@ -109,6 +117,10 @@ private:
 };
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Pulnix::TM6740ConfigV2> > make_TM6740ConfigV2(int version, hdf5pp::Group group, hsize_t idx);
+
+void store(const Psana::Pulnix::TM6740ConfigV2& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::Pulnix::TM6740ConfigV2& obj, hdf5pp::Group group, int version = -1);
+
 } // namespace Pulnix
 } // namespace psddl_hdf2psana
 #endif // PSDDL_HDF2PSANA_PULNIX_DDL_H

@@ -8,6 +8,7 @@
 #include "hdf5pp/VlenType.h"
 #include "hdf5pp/Utils.h"
 #include "PSEvt/DataProxy.h"
+#include "psddl_hdf2psana/Exceptions.h"
 namespace psddl_hdf2psana {
 namespace Gsc16ai {
 
@@ -84,9 +85,24 @@ hdf5pp::Type ns_ConfigV1_v0::dataset_config::native_type()
   static hdf5pp::Type type = ns_ConfigV1_v0_dataset_config_native_type();
   return type;
 }
+
 ns_ConfigV1_v0::dataset_config::dataset_config()
 {
 }
+
+ns_ConfigV1_v0::dataset_config::dataset_config(const Psana::Gsc16ai::ConfigV1& psanaobj)
+  : voltageRange(psanaobj.voltageRange())
+  , firstChan(psanaobj.firstChan())
+  , lastChan(psanaobj.lastChan())
+  , inputMode(psanaobj.inputMode())
+  , triggerMode(psanaobj.triggerMode())
+  , dataFormat(psanaobj.dataFormat())
+  , fps(psanaobj.fps())
+  , autocalibEnable(psanaobj.autocalibEnable())
+  , timeTagEnable(psanaobj.timeTagEnable())
+{
+}
+
 ns_ConfigV1_v0::dataset_config::~dataset_config()
 {
 }
@@ -138,6 +154,29 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Gsc16ai::ConfigV1> > make_ConfigV1(int ver
     return boost::make_shared<PSEvt::DataProxy<Psana::Gsc16ai::ConfigV1> >(boost::shared_ptr<Psana::Gsc16ai::ConfigV1>());
   }
 }
+
+void store_ConfigV1(const Psana::Gsc16ai::ConfigV1& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_ConfigV1_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Gsc16ai.ConfigV1", version);
+  }
+}
+
+void store(const Psana::Gsc16ai::ConfigV1& obj, hdf5pp::Group group, int version) 
+{
+  store_ConfigV1(obj, group, version, false);
+}
+
+void append(const Psana::Gsc16ai::ConfigV1& obj, hdf5pp::Group group, int version)
+{
+  store_ConfigV1(obj, group, version, true);
+}
+
 template <typename Config>
 ndarray<const uint16_t, 1> DataV1_v0<Config>::timestamp() const {
   if (m_ds_timestamps.empty()) read_ds_timestamps();
@@ -165,5 +204,28 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Gsc16ai::DataV1> > make_DataV1(int version
     return boost::make_shared<PSEvt::DataProxy<Psana::Gsc16ai::DataV1> >(boost::shared_ptr<Psana::Gsc16ai::DataV1>());
   }
 }
+
+void store_DataV1(const Psana::Gsc16ai::DataV1& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_DataV1_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Gsc16ai.DataV1", version);
+  }
+}
+
+void store(const Psana::Gsc16ai::DataV1& obj, hdf5pp::Group group, int version) 
+{
+  store_DataV1(obj, group, version, false);
+}
+
+void append(const Psana::Gsc16ai::DataV1& obj, hdf5pp::Group group, int version)
+{
+  store_DataV1(obj, group, version, true);
+}
+
 } // namespace Gsc16ai
 } // namespace psddl_hdf2psana

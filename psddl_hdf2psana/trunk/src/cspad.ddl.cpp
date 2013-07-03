@@ -8,6 +8,7 @@
 #include "hdf5pp/VlenType.h"
 #include "hdf5pp/Utils.h"
 #include "PSEvt/DataProxy.h"
+#include "psddl_hdf2psana/Exceptions.h"
 #include "psddl_hdf2psana/cspad.h"
 #include "psddl_hdf2psana/cspad.h"
 namespace psddl_hdf2psana {
@@ -44,9 +45,19 @@ hdf5pp::Type ns_CsPadDigitalPotsCfg_v0::dataset_data::native_type()
   static hdf5pp::Type type = ns_CsPadDigitalPotsCfg_v0_dataset_data_native_type();
   return type;
 }
+
 ns_CsPadDigitalPotsCfg_v0::dataset_data::dataset_data()
 {
 }
+
+ns_CsPadDigitalPotsCfg_v0::dataset_data::dataset_data(const Psana::CsPad::CsPadDigitalPotsCfg& psanaobj)
+{
+  {
+    const __typeof__(psanaobj.pots())& arr = psanaobj.pots();
+    std::copy(arr.begin(), arr.begin()+80, pots);
+  }
+}
+
 ns_CsPadDigitalPotsCfg_v0::dataset_data::~dataset_data()
 {
 }
@@ -88,9 +99,17 @@ hdf5pp::Type ns_CsPadReadOnlyCfg_v0::dataset_data::native_type()
   static hdf5pp::Type type = ns_CsPadReadOnlyCfg_v0_dataset_data_native_type();
   return type;
 }
+
 ns_CsPadReadOnlyCfg_v0::dataset_data::dataset_data()
 {
 }
+
+ns_CsPadReadOnlyCfg_v0::dataset_data::dataset_data(const Psana::CsPad::CsPadReadOnlyCfg& psanaobj)
+  : shiftTest(psanaobj.shiftTest())
+  , version(psanaobj.version())
+{
+}
+
 ns_CsPadReadOnlyCfg_v0::dataset_data::~dataset_data()
 {
 }
@@ -112,6 +131,29 @@ boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::CsPadReadOnlyCfg> > make_CsPadReadO
     return boost::make_shared<PSEvt::DataProxy<Psana::CsPad::CsPadReadOnlyCfg> >(boost::shared_ptr<Psana::CsPad::CsPadReadOnlyCfg>());
   }
 }
+
+void store_CsPadReadOnlyCfg(const Psana::CsPad::CsPadReadOnlyCfg& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_CsPadReadOnlyCfg_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "CsPad.CsPadReadOnlyCfg", version);
+  }
+}
+
+void store(const Psana::CsPad::CsPadReadOnlyCfg& obj, hdf5pp::Group group, int version) 
+{
+  store_CsPadReadOnlyCfg(obj, group, version, false);
+}
+
+void append(const Psana::CsPad::CsPadReadOnlyCfg& obj, hdf5pp::Group group, int version)
+{
+  store_CsPadReadOnlyCfg(obj, group, version, true);
+}
+
 
 hdf5pp::Type ns_ProtectionSystemThreshold_v0_dataset_data_stored_type()
 {
@@ -142,9 +184,17 @@ hdf5pp::Type ns_ProtectionSystemThreshold_v0::dataset_data::native_type()
   static hdf5pp::Type type = ns_ProtectionSystemThreshold_v0_dataset_data_native_type();
   return type;
 }
+
 ns_ProtectionSystemThreshold_v0::dataset_data::dataset_data()
 {
 }
+
+ns_ProtectionSystemThreshold_v0::dataset_data::dataset_data(const Psana::CsPad::ProtectionSystemThreshold& psanaobj)
+  : adcThreshold(psanaobj.adcThreshold())
+  , pixelCountThreshold(psanaobj.pixelCountThreshold())
+{
+}
+
 ns_ProtectionSystemThreshold_v0::dataset_data::~dataset_data()
 {
 }
@@ -166,6 +216,29 @@ boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::ProtectionSystemThreshold> > make_P
     return boost::make_shared<PSEvt::DataProxy<Psana::CsPad::ProtectionSystemThreshold> >(boost::shared_ptr<Psana::CsPad::ProtectionSystemThreshold>());
   }
 }
+
+void store_ProtectionSystemThreshold(const Psana::CsPad::ProtectionSystemThreshold& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_ProtectionSystemThreshold_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "CsPad.ProtectionSystemThreshold", version);
+  }
+}
+
+void store(const Psana::CsPad::ProtectionSystemThreshold& obj, hdf5pp::Group group, int version) 
+{
+  store_ProtectionSystemThreshold(obj, group, version, false);
+}
+
+void append(const Psana::CsPad::ProtectionSystemThreshold& obj, hdf5pp::Group group, int version)
+{
+  store_ProtectionSystemThreshold(obj, group, version, true);
+}
+
 
 hdf5pp::Type ns_CsPadGainMapCfg_v0_dataset_data_stored_type()
 {
@@ -198,9 +271,19 @@ hdf5pp::Type ns_CsPadGainMapCfg_v0::dataset_data::native_type()
   static hdf5pp::Type type = ns_CsPadGainMapCfg_v0_dataset_data_native_type();
   return type;
 }
+
 ns_CsPadGainMapCfg_v0::dataset_data::dataset_data()
 {
 }
+
+ns_CsPadGainMapCfg_v0::dataset_data::dataset_data(const Psana::CsPad::CsPadGainMapCfg& psanaobj)
+{
+  {
+    const __typeof__(psanaobj.gainMap())& arr = psanaobj.gainMap();
+    std::copy(arr.begin(), arr.begin()+35890, gainMap);
+  }
+}
+
 ns_CsPadGainMapCfg_v0::dataset_data::~dataset_data()
 {
 }
@@ -276,9 +359,36 @@ hdf5pp::Type ns_ConfigV1QuadReg_v0::dataset_data::native_type()
   static hdf5pp::Type type = ns_ConfigV1QuadReg_v0_dataset_data_native_type();
   return type;
 }
+
 ns_ConfigV1QuadReg_v0::dataset_data::dataset_data()
 {
 }
+
+ns_ConfigV1QuadReg_v0::dataset_data::dataset_data(const Psana::CsPad::ConfigV1QuadReg& psanaobj)
+  : readClkSet(psanaobj.readClkSet())
+  , readClkHold(psanaobj.readClkHold())
+  , dataMode(psanaobj.dataMode())
+  , prstSel(psanaobj.prstSel())
+  , acqDelay(psanaobj.acqDelay())
+  , intTime(psanaobj.intTime())
+  , digDelay(psanaobj.digDelay())
+  , ampIdle(psanaobj.ampIdle())
+  , injTotal(psanaobj.injTotal())
+  , rowColShiftPer(psanaobj.rowColShiftPer())
+  , readOnly(psanaobj.ro())
+  , digitalPots(psanaobj.dp())
+  , gainMap(psanaobj.gm())
+{
+  {
+    const __typeof__(psanaobj.shiftSelect())& arr = psanaobj.shiftSelect();
+    std::copy(arr.begin(), arr.begin()+4, shiftSelect);
+  }
+  {
+    const __typeof__(psanaobj.edgeSelect())& arr = psanaobj.edgeSelect();
+    std::copy(arr.begin(), arr.begin()+4, edgeSelect);
+  }
+}
+
 ns_ConfigV1QuadReg_v0::dataset_data::~dataset_data()
 {
 }
@@ -426,9 +536,39 @@ hdf5pp::Type ns_ConfigV2QuadReg_v0::dataset_data::native_type()
   static hdf5pp::Type type = ns_ConfigV2QuadReg_v0_dataset_data_native_type();
   return type;
 }
+
 ns_ConfigV2QuadReg_v0::dataset_data::dataset_data()
 {
 }
+
+ns_ConfigV2QuadReg_v0::dataset_data::dataset_data(const Psana::CsPad::ConfigV2QuadReg& psanaobj)
+  : readClkSet(psanaobj.readClkSet())
+  , readClkHold(psanaobj.readClkHold())
+  , dataMode(psanaobj.dataMode())
+  , prstSel(psanaobj.prstSel())
+  , acqDelay(psanaobj.acqDelay())
+  , intTime(psanaobj.intTime())
+  , digDelay(psanaobj.digDelay())
+  , ampIdle(psanaobj.ampIdle())
+  , injTotal(psanaobj.injTotal())
+  , rowColShiftPer(psanaobj.rowColShiftPer())
+  , ampReset(psanaobj.ampReset())
+  , digCount(psanaobj.digCount())
+  , digPeriod(psanaobj.digPeriod())
+  , readOnly(psanaobj.ro())
+  , digitalPots(psanaobj.dp())
+  , gainMap(psanaobj.gm())
+{
+  {
+    const __typeof__(psanaobj.shiftSelect())& arr = psanaobj.shiftSelect();
+    std::copy(arr.begin(), arr.begin()+4, shiftSelect);
+  }
+  {
+    const __typeof__(psanaobj.edgeSelect())& arr = psanaobj.edgeSelect();
+    std::copy(arr.begin(), arr.begin()+4, edgeSelect);
+  }
+}
+
 ns_ConfigV2QuadReg_v0::dataset_data::~dataset_data()
 {
 }
@@ -592,9 +732,41 @@ hdf5pp::Type ns_ConfigV3QuadReg_v0::dataset_data::native_type()
   static hdf5pp::Type type = ns_ConfigV3QuadReg_v0_dataset_data_native_type();
   return type;
 }
+
 ns_ConfigV3QuadReg_v0::dataset_data::dataset_data()
 {
 }
+
+ns_ConfigV3QuadReg_v0::dataset_data::dataset_data(const Psana::CsPad::ConfigV3QuadReg& psanaobj)
+  : readClkSet(psanaobj.readClkSet())
+  , readClkHold(psanaobj.readClkHold())
+  , dataMode(psanaobj.dataMode())
+  , prstSel(psanaobj.prstSel())
+  , acqDelay(psanaobj.acqDelay())
+  , intTime(psanaobj.intTime())
+  , digDelay(psanaobj.digDelay())
+  , ampIdle(psanaobj.ampIdle())
+  , injTotal(psanaobj.injTotal())
+  , rowColShiftPer(psanaobj.rowColShiftPer())
+  , ampReset(psanaobj.ampReset())
+  , digCount(psanaobj.digCount())
+  , digPeriod(psanaobj.digPeriod())
+  , biasTuning(psanaobj.biasTuning())
+  , pdpmndnmBalance(psanaobj.pdpmndnmBalance())
+  , readOnly(psanaobj.ro())
+  , digitalPots(psanaobj.dp())
+  , gainMap(psanaobj.gm())
+{
+  {
+    const __typeof__(psanaobj.shiftSelect())& arr = psanaobj.shiftSelect();
+    std::copy(arr.begin(), arr.begin()+4, shiftSelect);
+  }
+  {
+    const __typeof__(psanaobj.edgeSelect())& arr = psanaobj.edgeSelect();
+    std::copy(arr.begin(), arr.begin()+4, edgeSelect);
+  }
+}
+
 ns_ConfigV3QuadReg_v0::dataset_data::~dataset_data()
 {
 }
@@ -746,9 +918,29 @@ hdf5pp::Type ns_ConfigV1_v0::dataset_config::native_type()
   static hdf5pp::Type type = ns_ConfigV1_v0_dataset_config_native_type();
   return type;
 }
+
 ns_ConfigV1_v0::dataset_config::dataset_config()
 {
 }
+
+ns_ConfigV1_v0::dataset_config::dataset_config(const Psana::CsPad::ConfigV1& psanaobj)
+  : concentratorVersion(psanaobj.concentratorVersion())
+  , runDelay(psanaobj.runDelay())
+  , eventCode(psanaobj.eventCode())
+  , inactiveRunMode(psanaobj.inactiveRunMode())
+  , activeRunMode(psanaobj.activeRunMode())
+  , testDataIndex(psanaobj.tdi())
+  , payloadPerQuad(psanaobj.payloadSize())
+  , badAsicMask0(psanaobj.badAsicMask0())
+  , badAsicMask1(psanaobj.badAsicMask1())
+  , asicMask(psanaobj.asicMask())
+  , quadMask(psanaobj.quadMask())
+{
+  for (size_t i = 0, len = 4; i != len; ++ i) {
+    quads[i] = CsPad::ns_ConfigV1QuadReg_v0::dataset_data(psanaobj.quads(i));
+  }
+}
+
 ns_ConfigV1_v0::dataset_config::~dataset_config()
 {
 }
@@ -838,6 +1030,29 @@ boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::ConfigV1> > make_ConfigV1(int versi
   }
 }
 
+void store_ConfigV1(const Psana::CsPad::ConfigV1& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_ConfigV1_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "CsPad.ConfigV1", version);
+  }
+}
+
+void store(const Psana::CsPad::ConfigV1& obj, hdf5pp::Group group, int version) 
+{
+  store_ConfigV1(obj, group, version, false);
+}
+
+void append(const Psana::CsPad::ConfigV1& obj, hdf5pp::Group group, int version)
+{
+  store_ConfigV1(obj, group, version, true);
+}
+
+
 hdf5pp::Type ns_ConfigV2_v0_dataset_config_stored_type()
 {
   typedef ns_ConfigV2_v0::dataset_config DsType;
@@ -893,9 +1108,30 @@ hdf5pp::Type ns_ConfigV2_v0::dataset_config::native_type()
   static hdf5pp::Type type = ns_ConfigV2_v0_dataset_config_native_type();
   return type;
 }
+
 ns_ConfigV2_v0::dataset_config::dataset_config()
 {
 }
+
+ns_ConfigV2_v0::dataset_config::dataset_config(const Psana::CsPad::ConfigV2& psanaobj)
+  : concentratorVersion(psanaobj.concentratorVersion())
+  , runDelay(psanaobj.runDelay())
+  , eventCode(psanaobj.eventCode())
+  , inactiveRunMode(psanaobj.inactiveRunMode())
+  , activeRunMode(psanaobj.activeRunMode())
+  , testDataIndex(psanaobj.tdi())
+  , payloadPerQuad(psanaobj.payloadSize())
+  , badAsicMask0(psanaobj.badAsicMask0())
+  , badAsicMask1(psanaobj.badAsicMask1())
+  , asicMask(psanaobj.asicMask())
+  , quadMask(psanaobj.quadMask())
+  , roiMask(psanaobj.roiMasks())
+{
+  for (size_t i = 0, len = 4; i != len; ++ i) {
+    quads[i] = CsPad::ns_ConfigV1QuadReg_v0::dataset_data(psanaobj.quads(i));
+  }
+}
+
 ns_ConfigV2_v0::dataset_config::~dataset_config()
 {
 }
@@ -997,6 +1233,29 @@ boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::ConfigV2> > make_ConfigV2(int versi
   }
 }
 
+void store_ConfigV2(const Psana::CsPad::ConfigV2& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_ConfigV2_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "CsPad.ConfigV2", version);
+  }
+}
+
+void store(const Psana::CsPad::ConfigV2& obj, hdf5pp::Group group, int version) 
+{
+  store_ConfigV2(obj, group, version, false);
+}
+
+void append(const Psana::CsPad::ConfigV2& obj, hdf5pp::Group group, int version)
+{
+  store_ConfigV2(obj, group, version, true);
+}
+
+
 hdf5pp::Type ns_ConfigV3_v0_dataset_config_stored_type()
 {
   typedef ns_ConfigV3_v0::dataset_config DsType;
@@ -1060,9 +1319,35 @@ hdf5pp::Type ns_ConfigV3_v0::dataset_config::native_type()
   static hdf5pp::Type type = ns_ConfigV3_v0_dataset_config_native_type();
   return type;
 }
+
 ns_ConfigV3_v0::dataset_config::dataset_config()
 {
 }
+
+ns_ConfigV3_v0::dataset_config::dataset_config(const Psana::CsPad::ConfigV3& psanaobj)
+  : concentratorVersion(psanaobj.concentratorVersion())
+  , runDelay(psanaobj.runDelay())
+  , eventCode(psanaobj.eventCode())
+  , protectionEnable(psanaobj.protectionEnable())
+  , inactiveRunMode(psanaobj.inactiveRunMode())
+  , activeRunMode(psanaobj.activeRunMode())
+  , testDataIndex(psanaobj.tdi())
+  , payloadPerQuad(psanaobj.payloadSize())
+  , badAsicMask0(psanaobj.badAsicMask0())
+  , badAsicMask1(psanaobj.badAsicMask1())
+  , asicMask(psanaobj.asicMask())
+  , quadMask(psanaobj.quadMask())
+  , roiMask(psanaobj.roiMasks())
+{
+  {
+    const __typeof__(psanaobj.protectionThresholds())& arr = psanaobj.protectionThresholds();
+    std::copy(arr.begin(), arr.begin()+4, protectionThresholds);
+  }
+  for (size_t i = 0, len = 4; i != len; ++ i) {
+    quads[i] = CsPad::ns_ConfigV1QuadReg_v0::dataset_data(psanaobj.quads(i));
+  }
+}
+
 ns_ConfigV3_v0::dataset_config::~dataset_config()
 {
 }
@@ -1182,6 +1467,29 @@ boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::ConfigV3> > make_ConfigV3(int versi
   }
 }
 
+void store_ConfigV3(const Psana::CsPad::ConfigV3& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_ConfigV3_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "CsPad.ConfigV3", version);
+  }
+}
+
+void store(const Psana::CsPad::ConfigV3& obj, hdf5pp::Group group, int version) 
+{
+  store_ConfigV3(obj, group, version, false);
+}
+
+void append(const Psana::CsPad::ConfigV3& obj, hdf5pp::Group group, int version)
+{
+  store_ConfigV3(obj, group, version, true);
+}
+
+
 hdf5pp::Type ns_ConfigV4_v0_dataset_config_stored_type()
 {
   typedef ns_ConfigV4_v0::dataset_config DsType;
@@ -1245,9 +1553,35 @@ hdf5pp::Type ns_ConfigV4_v0::dataset_config::native_type()
   static hdf5pp::Type type = ns_ConfigV4_v0_dataset_config_native_type();
   return type;
 }
+
 ns_ConfigV4_v0::dataset_config::dataset_config()
 {
 }
+
+ns_ConfigV4_v0::dataset_config::dataset_config(const Psana::CsPad::ConfigV4& psanaobj)
+  : concentratorVersion(psanaobj.concentratorVersion())
+  , runDelay(psanaobj.runDelay())
+  , eventCode(psanaobj.eventCode())
+  , protectionEnable(psanaobj.protectionEnable())
+  , inactiveRunMode(psanaobj.inactiveRunMode())
+  , activeRunMode(psanaobj.activeRunMode())
+  , testDataIndex(psanaobj.tdi())
+  , payloadPerQuad(psanaobj.payloadSize())
+  , badAsicMask0(psanaobj.badAsicMask0())
+  , badAsicMask1(psanaobj.badAsicMask1())
+  , asicMask(psanaobj.asicMask())
+  , quadMask(psanaobj.quadMask())
+  , roiMask(psanaobj.roiMasks())
+{
+  {
+    const __typeof__(psanaobj.protectionThresholds())& arr = psanaobj.protectionThresholds();
+    std::copy(arr.begin(), arr.begin()+4, protectionThresholds);
+  }
+  for (size_t i = 0, len = 4; i != len; ++ i) {
+    quads[i] = CsPad::ns_ConfigV2QuadReg_v0::dataset_data(psanaobj.quads(i));
+  }
+}
+
 ns_ConfigV4_v0::dataset_config::~dataset_config()
 {
 }
@@ -1367,6 +1701,29 @@ boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::ConfigV4> > make_ConfigV4(int versi
   }
 }
 
+void store_ConfigV4(const Psana::CsPad::ConfigV4& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_ConfigV4_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "CsPad.ConfigV4", version);
+  }
+}
+
+void store(const Psana::CsPad::ConfigV4& obj, hdf5pp::Group group, int version) 
+{
+  store_ConfigV4(obj, group, version, false);
+}
+
+void append(const Psana::CsPad::ConfigV4& obj, hdf5pp::Group group, int version)
+{
+  store_ConfigV4(obj, group, version, true);
+}
+
+
 hdf5pp::Type ns_ConfigV5_v0_dataset_config_stored_type()
 {
   typedef ns_ConfigV5_v0::dataset_config DsType;
@@ -1432,9 +1789,36 @@ hdf5pp::Type ns_ConfigV5_v0::dataset_config::native_type()
   static hdf5pp::Type type = ns_ConfigV5_v0_dataset_config_native_type();
   return type;
 }
+
 ns_ConfigV5_v0::dataset_config::dataset_config()
 {
 }
+
+ns_ConfigV5_v0::dataset_config::dataset_config(const Psana::CsPad::ConfigV5& psanaobj)
+  : concentratorVersion(psanaobj.concentratorVersion())
+  , runDelay(psanaobj.runDelay())
+  , eventCode(psanaobj.eventCode())
+  , protectionEnable(psanaobj.protectionEnable())
+  , inactiveRunMode(psanaobj.inactiveRunMode())
+  , activeRunMode(psanaobj.activeRunMode())
+  , internalTriggerDelay(psanaobj.internalTriggerDelay())
+  , testDataIndex(psanaobj.tdi())
+  , payloadPerQuad(psanaobj.payloadSize())
+  , badAsicMask0(psanaobj.badAsicMask0())
+  , badAsicMask1(psanaobj.badAsicMask1())
+  , asicMask(psanaobj.asicMask())
+  , quadMask(psanaobj.quadMask())
+  , roiMask(psanaobj.roiMasks())
+{
+  {
+    const __typeof__(psanaobj.protectionThresholds())& arr = psanaobj.protectionThresholds();
+    std::copy(arr.begin(), arr.begin()+4, protectionThresholds);
+  }
+  for (size_t i = 0, len = 4; i != len; ++ i) {
+    quads[i] = CsPad::ns_ConfigV3QuadReg_v0::dataset_data(psanaobj.quads(i));
+  }
+}
+
 ns_ConfigV5_v0::dataset_config::~dataset_config()
 {
 }
@@ -1558,6 +1942,29 @@ boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::ConfigV5> > make_ConfigV5(int versi
   }
 }
 
+void store_ConfigV5(const Psana::CsPad::ConfigV5& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_ConfigV5_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "CsPad.ConfigV5", version);
+  }
+}
+
+void store(const Psana::CsPad::ConfigV5& obj, hdf5pp::Group group, int version) 
+{
+  store_ConfigV5(obj, group, version, false);
+}
+
+void append(const Psana::CsPad::ConfigV5& obj, hdf5pp::Group group, int version)
+{
+  store_ConfigV5(obj, group, version, true);
+}
+
+
 hdf5pp::Type ns_ElementV1_v0_dataset_element_stored_type()
 {
   typedef ns_ElementV1_v0::dataset_element DsType;
@@ -1611,9 +2018,30 @@ hdf5pp::Type ns_ElementV1_v0::dataset_element::native_type()
   static hdf5pp::Type type = ns_ElementV1_v0_dataset_element_native_type();
   return type;
 }
+
 ns_ElementV1_v0::dataset_element::dataset_element()
 {
 }
+
+ns_ElementV1_v0::dataset_element::dataset_element(const Psana::CsPad::ElementV1& psanaobj)
+  : virtual_channel(psanaobj.virtual_channel())
+  , lane(psanaobj.lane())
+  , tid(psanaobj.tid())
+  , acq_count(psanaobj.acq_count())
+  , op_code(psanaobj.op_code())
+  , quad(psanaobj.quad())
+  , seq_count(psanaobj.seq_count())
+  , ticks(psanaobj.ticks())
+  , fiducials(psanaobj.fiducials())
+  , frame_type(psanaobj.frame_type())
+  , sectionMask(psanaobj.sectionMask())
+{
+  {
+    const __typeof__(psanaobj.sb_temp())& arr = psanaobj.sb_temp();
+    std::copy(arr.begin(), arr.begin()+4, sb_temp);
+  }
+}
+
 ns_ElementV1_v0::dataset_element::~dataset_element()
 {
 }
@@ -1742,6 +2170,29 @@ boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::DataV1> > make_DataV1(int version, 
   }
 }
 
+void store_DataV1(const Psana::CsPad::DataV1& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_DataV1_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "CsPad.DataV1", version);
+  }
+}
+
+void store(const Psana::CsPad::DataV1& obj, hdf5pp::Group group, int version) 
+{
+  store_DataV1(obj, group, version, false);
+}
+
+void append(const Psana::CsPad::DataV1& obj, hdf5pp::Group group, int version)
+{
+  store_DataV1(obj, group, version, true);
+}
+
+
 hdf5pp::Type ns_ElementV2_v0_dataset_element_stored_type()
 {
   typedef ns_ElementV2_v0::dataset_element DsType;
@@ -1795,9 +2246,30 @@ hdf5pp::Type ns_ElementV2_v0::dataset_element::native_type()
   static hdf5pp::Type type = ns_ElementV2_v0_dataset_element_native_type();
   return type;
 }
+
 ns_ElementV2_v0::dataset_element::dataset_element()
 {
 }
+
+ns_ElementV2_v0::dataset_element::dataset_element(const Psana::CsPad::ElementV2& psanaobj)
+  : virtual_channel(psanaobj.virtual_channel())
+  , lane(psanaobj.lane())
+  , tid(psanaobj.tid())
+  , acq_count(psanaobj.acq_count())
+  , op_code(psanaobj.op_code())
+  , quad(psanaobj.quad())
+  , seq_count(psanaobj.seq_count())
+  , ticks(psanaobj.ticks())
+  , fiducials(psanaobj.fiducials())
+  , frame_type(psanaobj.frame_type())
+  , sectionMask(psanaobj.sectionMask())
+{
+  {
+    const __typeof__(psanaobj.sb_temp())& arr = psanaobj.sb_temp();
+    std::copy(arr.begin(), arr.begin()+4, sb_temp);
+  }
+}
+
 ns_ElementV2_v0::dataset_element::~dataset_element()
 {
 }
@@ -1916,5 +2388,28 @@ boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::DataV2> > make_DataV2(int version, 
     return boost::make_shared<PSEvt::DataProxy<Psana::CsPad::DataV2> >(boost::shared_ptr<Psana::CsPad::DataV2>());
   }
 }
+
+void store_DataV2(const Psana::CsPad::DataV2& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_DataV2_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "CsPad.DataV2", version);
+  }
+}
+
+void store(const Psana::CsPad::DataV2& obj, hdf5pp::Group group, int version) 
+{
+  store_DataV2(obj, group, version, false);
+}
+
+void append(const Psana::CsPad::DataV2& obj, hdf5pp::Group group, int version)
+{
+  store_DataV2(obj, group, version, true);
+}
+
 } // namespace CsPad
 } // namespace psddl_hdf2psana

@@ -16,18 +16,20 @@ struct dataset_config {
   static hdf5pp::Type stored_type();
 
   dataset_config();
+  dataset_config(const Psana::Imp::ConfigV1& psanaobj);
   ~dataset_config();
 
-  uint32_t range; 
-  uint32_t calRange; 
-  uint32_t reset; 
-  uint32_t biasData; 
-  uint32_t calData; 
-  uint32_t biasDacData; 
-  uint32_t calStrobe; 
-  uint32_t numberOfSamples; 
-  uint32_t trigDelay; 
-  uint32_t adcDelay; 
+  uint32_t range;
+  uint32_t calRange;
+  uint32_t reset;
+  uint32_t biasData;
+  uint32_t calData;
+  uint32_t biasDacData;
+  uint32_t calStrobe;
+  uint32_t numberOfSamples;
+  uint32_t trigDelay;
+  uint32_t adcDelay;
+
 
 };
 }
@@ -60,17 +62,23 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Imp::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::Imp::ConfigV1& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::Imp::ConfigV1& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_Sample_v0 {
 struct dataset_data {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_data();
+  dataset_data(const Psana::Imp::Sample& psanaobj);
   ~dataset_data();
 
-  uint16_t channels[4]; 
+  uint16_t channels[4];
 
   operator Psana::Imp::Sample() const { return Psana::Imp::Sample(channels); }
+
 };
 }
 
@@ -80,18 +88,20 @@ struct dataset_data {
   static hdf5pp::Type stored_type();
 
   dataset_data();
+  dataset_data(const Psana::Imp::LaneStatus& psanaobj);
   ~dataset_data();
 
-  uint8_t linkErrCount; 
-  uint8_t linkDownCount; 
-  uint8_t cellErrCount; 
-  uint8_t rxCount; 
-  uint8_t locLinked; 
-  uint8_t remLinked; 
-  uint16_t zeros; 
-  uint8_t powersOkay; 
+  uint8_t linkErrCount;
+  uint8_t linkDownCount;
+  uint8_t cellErrCount;
+  uint8_t rxCount;
+  uint8_t locLinked;
+  uint8_t remLinked;
+  uint16_t zeros;
+  uint8_t powersOkay;
 
   operator Psana::Imp::LaneStatus() const { return Psana::Imp::LaneStatus(linkErrCount, linkDownCount, cellErrCount, rxCount, locLinked, remLinked, zeros, powersOkay); }
+
 };
 }
 
@@ -101,13 +111,15 @@ struct dataset_data {
   static hdf5pp::Type stored_type();
 
   dataset_data();
+  dataset_data(const Psana::Imp::ElementV1& psanaobj);
   ~dataset_data();
 
-  uint8_t vc; 
-  uint8_t lane; 
-  uint32_t frameNumber; 
-  uint32_t range; 
-  Imp::ns_LaneStatus_v0::dataset_data laneStatus; 
+  uint8_t vc;
+  uint8_t lane;
+  uint32_t frameNumber;
+  uint32_t range;
+  Imp::ns_LaneStatus_v0::dataset_data laneStatus;
+
 
 };
 }
@@ -139,6 +151,10 @@ private:
 };
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Imp::ElementV1> > make_ElementV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::Imp::ConfigV1>& cfg);
+
+void store(const Psana::Imp::ElementV1& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::Imp::ElementV1& obj, hdf5pp::Group group, int version = -1);
+
 } // namespace Imp
 } // namespace psddl_hdf2psana
 #endif // PSDDL_HDF2PSANA_IMP_DDL_H

@@ -58,4 +58,10 @@ ExceptionDataRank::ExceptionDataRank( const ErrSvc::Context& ctx, int rank, int 
 {
 }
 
+ExceptionSchemaVersion::ExceptionSchemaVersion( const ErrSvc::Context& ctx, const std::string& type, int version )
+  : Exception( ctx, "unknown schema version number: type " + type +
+      ", version: " + boost::lexical_cast<std::string>(version) )
+{
+}
+
 } // namespace psddl_hdf2psana

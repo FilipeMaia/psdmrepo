@@ -8,6 +8,7 @@
 #include "hdf5pp/VlenType.h"
 #include "hdf5pp/Utils.h"
 #include "PSEvt/DataProxy.h"
+#include "psddl_hdf2psana/Exceptions.h"
 namespace psddl_hdf2psana {
 namespace Quartz {
 
@@ -90,9 +91,26 @@ hdf5pp::Type ns_ConfigV1_v0::dataset_config::native_type()
   static hdf5pp::Type type = ns_ConfigV1_v0_dataset_config_native_type();
   return type;
 }
+
 ns_ConfigV1_v0::dataset_config::dataset_config()
 {
 }
+
+ns_ConfigV1_v0::dataset_config::dataset_config(const Psana::Quartz::ConfigV1& psanaobj)
+  : black_level(psanaobj.black_level())
+  , gain_percent(psanaobj.gain_percent())
+  , output_resolution(psanaobj.output_resolution())
+  , horizontal_binning(psanaobj.horizontal_binning())
+  , vertical_binning(psanaobj.vertical_binning())
+  , output_mirroring(psanaobj.output_mirroring())
+  , output_lookup_table_enabled(psanaobj.output_lookup_table_enabled())
+  , defect_pixel_correction_enabled(psanaobj.defect_pixel_correction_enabled())
+  , number_of_defect_pixels(psanaobj.number_of_defect_pixels())
+  , output_offset(psanaobj.output_offset())
+  , output_resolution_bits(psanaobj.output_resolution_bits())
+{
+}
+
 ns_ConfigV1_v0::dataset_config::~dataset_config()
 {
 }
@@ -168,5 +186,28 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Quartz::ConfigV1> > make_ConfigV1(int vers
     return boost::make_shared<PSEvt::DataProxy<Psana::Quartz::ConfigV1> >(boost::shared_ptr<Psana::Quartz::ConfigV1>());
   }
 }
+
+void store_ConfigV1(const Psana::Quartz::ConfigV1& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_ConfigV1_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Quartz.ConfigV1", version);
+  }
+}
+
+void store(const Psana::Quartz::ConfigV1& obj, hdf5pp::Group group, int version) 
+{
+  store_ConfigV1(obj, group, version, false);
+}
+
+void append(const Psana::Quartz::ConfigV1& obj, hdf5pp::Group group, int version)
+{
+  store_ConfigV1(obj, group, version, true);
+}
+
 } // namespace Quartz
 } // namespace psddl_hdf2psana

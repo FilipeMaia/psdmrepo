@@ -8,6 +8,7 @@
 #include "hdf5pp/VlenType.h"
 #include "hdf5pp/Utils.h"
 #include "PSEvt/DataProxy.h"
+#include "psddl_hdf2psana/Exceptions.h"
 namespace psddl_hdf2psana {
 namespace Timepix {
 
@@ -168,9 +169,74 @@ hdf5pp::Type ns_ConfigV1_v0::dataset_config::native_type()
   static hdf5pp::Type type = ns_ConfigV1_v0_dataset_config_native_type();
   return type;
 }
+
 ns_ConfigV1_v0::dataset_config::dataset_config()
 {
 }
+
+ns_ConfigV1_v0::dataset_config::dataset_config(const Psana::Timepix::ConfigV1& psanaobj)
+  : readoutSpeed(psanaobj.readoutSpeed())
+  , triggerMode(psanaobj.triggerMode())
+  , shutterTimeout(psanaobj.shutterTimeout())
+  , dac0Ikrum(psanaobj.dac0Ikrum())
+  , dac0Disc(psanaobj.dac0Disc())
+  , dac0Preamp(psanaobj.dac0Preamp())
+  , dac0BufAnalogA(psanaobj.dac0BufAnalogA())
+  , dac0BufAnalogB(psanaobj.dac0BufAnalogB())
+  , dac0Hist(psanaobj.dac0Hist())
+  , dac0ThlFine(psanaobj.dac0ThlFine())
+  , dac0ThlCourse(psanaobj.dac0ThlCourse())
+  , dac0Vcas(psanaobj.dac0Vcas())
+  , dac0Fbk(psanaobj.dac0Fbk())
+  , dac0Gnd(psanaobj.dac0Gnd())
+  , dac0Ths(psanaobj.dac0Ths())
+  , dac0BiasLvds(psanaobj.dac0BiasLvds())
+  , dac0RefLvds(psanaobj.dac0RefLvds())
+  , dac1Ikrum(psanaobj.dac1Ikrum())
+  , dac1Disc(psanaobj.dac1Disc())
+  , dac1Preamp(psanaobj.dac1Preamp())
+  , dac1BufAnalogA(psanaobj.dac1BufAnalogA())
+  , dac1BufAnalogB(psanaobj.dac1BufAnalogB())
+  , dac1Hist(psanaobj.dac1Hist())
+  , dac1ThlFine(psanaobj.dac1ThlFine())
+  , dac1ThlCourse(psanaobj.dac1ThlCourse())
+  , dac1Vcas(psanaobj.dac1Vcas())
+  , dac1Fbk(psanaobj.dac1Fbk())
+  , dac1Gnd(psanaobj.dac1Gnd())
+  , dac1Ths(psanaobj.dac1Ths())
+  , dac1BiasLvds(psanaobj.dac1BiasLvds())
+  , dac1RefLvds(psanaobj.dac1RefLvds())
+  , dac2Ikrum(psanaobj.dac2Ikrum())
+  , dac2Disc(psanaobj.dac2Disc())
+  , dac2Preamp(psanaobj.dac2Preamp())
+  , dac2BufAnalogA(psanaobj.dac2BufAnalogA())
+  , dac2BufAnalogB(psanaobj.dac2BufAnalogB())
+  , dac2Hist(psanaobj.dac2Hist())
+  , dac2ThlFine(psanaobj.dac2ThlFine())
+  , dac2ThlCourse(psanaobj.dac2ThlCourse())
+  , dac2Vcas(psanaobj.dac2Vcas())
+  , dac2Fbk(psanaobj.dac2Fbk())
+  , dac2Gnd(psanaobj.dac2Gnd())
+  , dac2Ths(psanaobj.dac2Ths())
+  , dac2BiasLvds(psanaobj.dac2BiasLvds())
+  , dac2RefLvds(psanaobj.dac2RefLvds())
+  , dac3Ikrum(psanaobj.dac3Ikrum())
+  , dac3Disc(psanaobj.dac3Disc())
+  , dac3Preamp(psanaobj.dac3Preamp())
+  , dac3BufAnalogA(psanaobj.dac3BufAnalogA())
+  , dac3BufAnalogB(psanaobj.dac3BufAnalogB())
+  , dac3Hist(psanaobj.dac3Hist())
+  , dac3ThlFine(psanaobj.dac3ThlFine())
+  , dac3ThlCourse(psanaobj.dac3ThlCourse())
+  , dac3Vcas(psanaobj.dac3Vcas())
+  , dac3Fbk(psanaobj.dac3Fbk())
+  , dac3Gnd(psanaobj.dac3Gnd())
+  , dac3Ths(psanaobj.dac3Ths())
+  , dac3BiasLvds(psanaobj.dac3BiasLvds())
+  , dac3RefLvds(psanaobj.dac3RefLvds())
+{
+}
+
 ns_ConfigV1_v0::dataset_config::~dataset_config()
 {
 }
@@ -422,6 +488,29 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Timepix::ConfigV1> > make_ConfigV1(int ver
   }
 }
 
+void store_ConfigV1(const Psana::Timepix::ConfigV1& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_ConfigV1_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Timepix.ConfigV1", version);
+  }
+}
+
+void store(const Psana::Timepix::ConfigV1& obj, hdf5pp::Group group, int version) 
+{
+  store_ConfigV1(obj, group, version, false);
+}
+
+void append(const Psana::Timepix::ConfigV1& obj, hdf5pp::Group group, int version)
+{
+  store_ConfigV1(obj, group, version, true);
+}
+
+
 hdf5pp::Type ns_ConfigV2_v0_dataset_config_stored_type()
 {
   typedef ns_ConfigV2_v0::dataset_config DsType;
@@ -609,9 +698,94 @@ hdf5pp::Type ns_ConfigV2_v0::dataset_config::native_type()
   static hdf5pp::Type type = ns_ConfigV2_v0_dataset_config_native_type();
   return type;
 }
+
 ns_ConfigV2_v0::dataset_config::dataset_config()
 {
 }
+
+ns_ConfigV2_v0::dataset_config::dataset_config(const Psana::Timepix::ConfigV2& psanaobj)
+  : readoutSpeed(psanaobj.readoutSpeed())
+  , triggerMode(psanaobj.triggerMode())
+  , timepixSpeed(psanaobj.timepixSpeed())
+  , dac0Ikrum(psanaobj.dac0Ikrum())
+  , dac0Disc(psanaobj.dac0Disc())
+  , dac0Preamp(psanaobj.dac0Preamp())
+  , dac0BufAnalogA(psanaobj.dac0BufAnalogA())
+  , dac0BufAnalogB(psanaobj.dac0BufAnalogB())
+  , dac0Hist(psanaobj.dac0Hist())
+  , dac0ThlFine(psanaobj.dac0ThlFine())
+  , dac0ThlCourse(psanaobj.dac0ThlCourse())
+  , dac0Vcas(psanaobj.dac0Vcas())
+  , dac0Fbk(psanaobj.dac0Fbk())
+  , dac0Gnd(psanaobj.dac0Gnd())
+  , dac0Ths(psanaobj.dac0Ths())
+  , dac0BiasLvds(psanaobj.dac0BiasLvds())
+  , dac0RefLvds(psanaobj.dac0RefLvds())
+  , dac1Ikrum(psanaobj.dac1Ikrum())
+  , dac1Disc(psanaobj.dac1Disc())
+  , dac1Preamp(psanaobj.dac1Preamp())
+  , dac1BufAnalogA(psanaobj.dac1BufAnalogA())
+  , dac1BufAnalogB(psanaobj.dac1BufAnalogB())
+  , dac1Hist(psanaobj.dac1Hist())
+  , dac1ThlFine(psanaobj.dac1ThlFine())
+  , dac1ThlCourse(psanaobj.dac1ThlCourse())
+  , dac1Vcas(psanaobj.dac1Vcas())
+  , dac1Fbk(psanaobj.dac1Fbk())
+  , dac1Gnd(psanaobj.dac1Gnd())
+  , dac1Ths(psanaobj.dac1Ths())
+  , dac1BiasLvds(psanaobj.dac1BiasLvds())
+  , dac1RefLvds(psanaobj.dac1RefLvds())
+  , dac2Ikrum(psanaobj.dac2Ikrum())
+  , dac2Disc(psanaobj.dac2Disc())
+  , dac2Preamp(psanaobj.dac2Preamp())
+  , dac2BufAnalogA(psanaobj.dac2BufAnalogA())
+  , dac2BufAnalogB(psanaobj.dac2BufAnalogB())
+  , dac2Hist(psanaobj.dac2Hist())
+  , dac2ThlFine(psanaobj.dac2ThlFine())
+  , dac2ThlCourse(psanaobj.dac2ThlCourse())
+  , dac2Vcas(psanaobj.dac2Vcas())
+  , dac2Fbk(psanaobj.dac2Fbk())
+  , dac2Gnd(psanaobj.dac2Gnd())
+  , dac2Ths(psanaobj.dac2Ths())
+  , dac2BiasLvds(psanaobj.dac2BiasLvds())
+  , dac2RefLvds(psanaobj.dac2RefLvds())
+  , dac3Ikrum(psanaobj.dac3Ikrum())
+  , dac3Disc(psanaobj.dac3Disc())
+  , dac3Preamp(psanaobj.dac3Preamp())
+  , dac3BufAnalogA(psanaobj.dac3BufAnalogA())
+  , dac3BufAnalogB(psanaobj.dac3BufAnalogB())
+  , dac3Hist(psanaobj.dac3Hist())
+  , dac3ThlFine(psanaobj.dac3ThlFine())
+  , dac3ThlCourse(psanaobj.dac3ThlCourse())
+  , dac3Vcas(psanaobj.dac3Vcas())
+  , dac3Fbk(psanaobj.dac3Fbk())
+  , dac3Gnd(psanaobj.dac3Gnd())
+  , dac3Ths(psanaobj.dac3Ths())
+  , dac3BiasLvds(psanaobj.dac3BiasLvds())
+  , dac3RefLvds(psanaobj.dac3RefLvds())
+  , driverVersion(psanaobj.driverVersion())
+  , firmwareVersion(psanaobj.firmwareVersion())
+  , pixelThreshSize(psanaobj.pixelThreshSize())
+  , chip0Name(0)
+  , chip1Name(0)
+  , chip2Name(0)
+  , chip3Name(0)
+  , chip0ID(psanaobj.chip0ID())
+  , chip1ID(psanaobj.chip1ID())
+  , chip2ID(psanaobj.chip2ID())
+  , chip3ID(psanaobj.chip3ID())
+  , chipCount(psanaobj.chipCount())
+{
+  {
+    const __typeof__(psanaobj.pixelThresh())& arr = psanaobj.pixelThresh();
+    std::copy(arr.begin(), arr.begin()+4*256*256, pixelThresh);
+  }
+  chip0Name = strdup(psanaobj.chip0Name());
+  chip1Name = strdup(psanaobj.chip1Name());
+  chip2Name = strdup(psanaobj.chip2Name());
+  chip3Name = strdup(psanaobj.chip3Name());
+}
+
 ns_ConfigV2_v0::dataset_config::~dataset_config()
 {
 }
@@ -916,6 +1090,29 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Timepix::ConfigV2> > make_ConfigV2(int ver
   }
 }
 
+void store_ConfigV2(const Psana::Timepix::ConfigV2& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_ConfigV2_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Timepix.ConfigV2", version);
+  }
+}
+
+void store(const Psana::Timepix::ConfigV2& obj, hdf5pp::Group group, int version) 
+{
+  store_ConfigV2(obj, group, version, false);
+}
+
+void append(const Psana::Timepix::ConfigV2& obj, hdf5pp::Group group, int version)
+{
+  store_ConfigV2(obj, group, version, true);
+}
+
+
 hdf5pp::Type ns_ConfigV3_v0_dataset_config_stored_type()
 {
   typedef ns_ConfigV3_v0::dataset_config DsType;
@@ -1105,9 +1302,96 @@ hdf5pp::Type ns_ConfigV3_v0::dataset_config::native_type()
   static hdf5pp::Type type = ns_ConfigV3_v0_dataset_config_native_type();
   return type;
 }
+
 ns_ConfigV3_v0::dataset_config::dataset_config()
 {
 }
+
+ns_ConfigV3_v0::dataset_config::dataset_config(const Psana::Timepix::ConfigV3& psanaobj)
+  : readoutSpeed(psanaobj.readoutSpeed())
+  , timepixMode(psanaobj.timepixMode())
+  , timepixSpeed(psanaobj.timepixSpeed())
+  , dac0Ikrum(psanaobj.dac0Ikrum())
+  , dac0Disc(psanaobj.dac0Disc())
+  , dac0Preamp(psanaobj.dac0Preamp())
+  , dac0BufAnalogA(psanaobj.dac0BufAnalogA())
+  , dac0BufAnalogB(psanaobj.dac0BufAnalogB())
+  , dac0Hist(psanaobj.dac0Hist())
+  , dac0ThlFine(psanaobj.dac0ThlFine())
+  , dac0ThlCourse(psanaobj.dac0ThlCourse())
+  , dac0Vcas(psanaobj.dac0Vcas())
+  , dac0Fbk(psanaobj.dac0Fbk())
+  , dac0Gnd(psanaobj.dac0Gnd())
+  , dac0Ths(psanaobj.dac0Ths())
+  , dac0BiasLvds(psanaobj.dac0BiasLvds())
+  , dac0RefLvds(psanaobj.dac0RefLvds())
+  , dac1Ikrum(psanaobj.dac1Ikrum())
+  , dac1Disc(psanaobj.dac1Disc())
+  , dac1Preamp(psanaobj.dac1Preamp())
+  , dac1BufAnalogA(psanaobj.dac1BufAnalogA())
+  , dac1BufAnalogB(psanaobj.dac1BufAnalogB())
+  , dac1Hist(psanaobj.dac1Hist())
+  , dac1ThlFine(psanaobj.dac1ThlFine())
+  , dac1ThlCourse(psanaobj.dac1ThlCourse())
+  , dac1Vcas(psanaobj.dac1Vcas())
+  , dac1Fbk(psanaobj.dac1Fbk())
+  , dac1Gnd(psanaobj.dac1Gnd())
+  , dac1Ths(psanaobj.dac1Ths())
+  , dac1BiasLvds(psanaobj.dac1BiasLvds())
+  , dac1RefLvds(psanaobj.dac1RefLvds())
+  , dac2Ikrum(psanaobj.dac2Ikrum())
+  , dac2Disc(psanaobj.dac2Disc())
+  , dac2Preamp(psanaobj.dac2Preamp())
+  , dac2BufAnalogA(psanaobj.dac2BufAnalogA())
+  , dac2BufAnalogB(psanaobj.dac2BufAnalogB())
+  , dac2Hist(psanaobj.dac2Hist())
+  , dac2ThlFine(psanaobj.dac2ThlFine())
+  , dac2ThlCourse(psanaobj.dac2ThlCourse())
+  , dac2Vcas(psanaobj.dac2Vcas())
+  , dac2Fbk(psanaobj.dac2Fbk())
+  , dac2Gnd(psanaobj.dac2Gnd())
+  , dac2Ths(psanaobj.dac2Ths())
+  , dac2BiasLvds(psanaobj.dac2BiasLvds())
+  , dac2RefLvds(psanaobj.dac2RefLvds())
+  , dac3Ikrum(psanaobj.dac3Ikrum())
+  , dac3Disc(psanaobj.dac3Disc())
+  , dac3Preamp(psanaobj.dac3Preamp())
+  , dac3BufAnalogA(psanaobj.dac3BufAnalogA())
+  , dac3BufAnalogB(psanaobj.dac3BufAnalogB())
+  , dac3Hist(psanaobj.dac3Hist())
+  , dac3ThlFine(psanaobj.dac3ThlFine())
+  , dac3ThlCourse(psanaobj.dac3ThlCourse())
+  , dac3Vcas(psanaobj.dac3Vcas())
+  , dac3Fbk(psanaobj.dac3Fbk())
+  , dac3Gnd(psanaobj.dac3Gnd())
+  , dac3Ths(psanaobj.dac3Ths())
+  , dac3BiasLvds(psanaobj.dac3BiasLvds())
+  , dac3RefLvds(psanaobj.dac3RefLvds())
+  , dacBias(psanaobj.dacBias())
+  , flags(psanaobj.flags())
+  , driverVersion(psanaobj.driverVersion())
+  , firmwareVersion(psanaobj.firmwareVersion())
+  , pixelThreshSize(psanaobj.pixelThreshSize())
+  , chip0Name(0)
+  , chip1Name(0)
+  , chip2Name(0)
+  , chip3Name(0)
+  , chip0ID(psanaobj.chip0ID())
+  , chip1ID(psanaobj.chip1ID())
+  , chip2ID(psanaobj.chip2ID())
+  , chip3ID(psanaobj.chip3ID())
+  , chipCount(psanaobj.chipCount())
+{
+  {
+    const __typeof__(psanaobj.pixelThresh())& arr = psanaobj.pixelThresh();
+    std::copy(arr.begin(), arr.begin()+4*256*256, pixelThresh);
+  }
+  chip0Name = strdup(psanaobj.chip0Name());
+  chip1Name = strdup(psanaobj.chip1Name());
+  chip2Name = strdup(psanaobj.chip2Name());
+  chip3Name = strdup(psanaobj.chip3Name());
+}
+
 ns_ConfigV3_v0::dataset_config::~dataset_config()
 {
 }
@@ -1420,6 +1704,29 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Timepix::ConfigV3> > make_ConfigV3(int ver
   }
 }
 
+void store_ConfigV3(const Psana::Timepix::ConfigV3& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_ConfigV3_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Timepix.ConfigV3", version);
+  }
+}
+
+void store(const Psana::Timepix::ConfigV3& obj, hdf5pp::Group group, int version) 
+{
+  store_ConfigV3(obj, group, version, false);
+}
+
+void append(const Psana::Timepix::ConfigV3& obj, hdf5pp::Group group, int version)
+{
+  store_ConfigV3(obj, group, version, true);
+}
+
+
 hdf5pp::Type ns_DataV1_v0_dataset_data_stored_type()
 {
   typedef ns_DataV1_v0::dataset_data DsType;
@@ -1451,9 +1758,18 @@ hdf5pp::Type ns_DataV1_v0::dataset_data::native_type()
   static hdf5pp::Type type = ns_DataV1_v0_dataset_data_native_type();
   return type;
 }
+
 ns_DataV1_v0::dataset_data::dataset_data()
 {
 }
+
+ns_DataV1_v0::dataset_data::dataset_data(const Psana::Timepix::DataV1& psanaobj)
+  : timestamp(psanaobj.timestamp())
+  , frameCounter(psanaobj.frameCounter())
+  , lostRows(psanaobj.lostRows())
+{
+}
+
 ns_DataV1_v0::dataset_data::~dataset_data()
 {
 }
@@ -1492,6 +1808,29 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Timepix::DataV1> > make_DataV1(int version
   }
 }
 
+void store_DataV1(const Psana::Timepix::DataV1& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_DataV1_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Timepix.DataV1", version);
+  }
+}
+
+void store(const Psana::Timepix::DataV1& obj, hdf5pp::Group group, int version) 
+{
+  store_DataV1(obj, group, version, false);
+}
+
+void append(const Psana::Timepix::DataV1& obj, hdf5pp::Group group, int version)
+{
+  store_DataV1(obj, group, version, true);
+}
+
+
 hdf5pp::Type ns_DataV2_v0_dataset_data_stored_type()
 {
   typedef ns_DataV2_v0::dataset_data DsType;
@@ -1527,9 +1866,20 @@ hdf5pp::Type ns_DataV2_v0::dataset_data::native_type()
   static hdf5pp::Type type = ns_DataV2_v0_dataset_data_native_type();
   return type;
 }
+
 ns_DataV2_v0::dataset_data::dataset_data()
 {
 }
+
+ns_DataV2_v0::dataset_data::dataset_data(const Psana::Timepix::DataV2& psanaobj)
+  : width(psanaobj.width())
+  , height(psanaobj.height())
+  , timestamp(psanaobj.timestamp())
+  , frameCounter(psanaobj.frameCounter())
+  , lostRows(psanaobj.lostRows())
+{
+}
+
 ns_DataV2_v0::dataset_data::~dataset_data()
 {
 }
@@ -1573,5 +1923,28 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Timepix::DataV2> > make_DataV2(int version
     return boost::make_shared<PSEvt::DataProxy<Psana::Timepix::DataV2> >(boost::shared_ptr<Psana::Timepix::DataV2>());
   }
 }
+
+void store_DataV2(const Psana::Timepix::DataV2& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_DataV2_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Timepix.DataV2", version);
+  }
+}
+
+void store(const Psana::Timepix::DataV2& obj, hdf5pp::Group group, int version) 
+{
+  store_DataV2(obj, group, version, false);
+}
+
+void append(const Psana::Timepix::DataV2& obj, hdf5pp::Group group, int version)
+{
+  store_DataV2(obj, group, version, true);
+}
+
 } // namespace Timepix
 } // namespace psddl_hdf2psana

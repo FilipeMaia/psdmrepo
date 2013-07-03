@@ -16,10 +16,12 @@ struct dataset_config {
   static hdf5pp::Type stored_type();
 
   dataset_config();
+  dataset_config(const Psana::UsdUsb::ConfigV1& psanaobj);
   ~dataset_config();
 
-  uint32_t counting_mode[4]; 
-  uint32_t quadrature_mode[4]; 
+  uint32_t counting_mode[4];
+  uint32_t quadrature_mode[4];
+
 
 };
 }
@@ -44,19 +46,25 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::UsdUsb::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::UsdUsb::ConfigV1& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::UsdUsb::ConfigV1& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_DataV1_v1 {
 struct dataset_data {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_data();
+  dataset_data(const Psana::UsdUsb::DataV1& psanaobj);
   ~dataset_data();
 
-  uint8_t digital_in; 
-  uint32_t timestamp; 
-  uint8_t status[4]; 
-  uint16_t analog_in[4]; 
-  int32_t encoder_count[4]; 
+  uint8_t digital_in;
+  uint32_t timestamp;
+  uint8_t status[4];
+  uint16_t analog_in[4];
+  int32_t encoder_count[4];
+
 
 };
 }
@@ -83,6 +91,10 @@ private:
 };
 
 boost::shared_ptr<PSEvt::Proxy<Psana::UsdUsb::DataV1> > make_DataV1(int version, hdf5pp::Group group, hsize_t idx);
+
+void store(const Psana::UsdUsb::DataV1& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::UsdUsb::DataV1& obj, hdf5pp::Group group, int version = -1);
+
 } // namespace UsdUsb
 } // namespace psddl_hdf2psana
 #endif // PSDDL_HDF2PSANA_USDUSB_DDL_H

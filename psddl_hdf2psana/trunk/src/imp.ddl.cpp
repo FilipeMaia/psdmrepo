@@ -8,6 +8,7 @@
 #include "hdf5pp/VlenType.h"
 #include "hdf5pp/Utils.h"
 #include "PSEvt/DataProxy.h"
+#include "psddl_hdf2psana/Exceptions.h"
 namespace psddl_hdf2psana {
 namespace Imp {
 
@@ -56,9 +57,25 @@ hdf5pp::Type ns_ConfigV1_v0::dataset_config::native_type()
   static hdf5pp::Type type = ns_ConfigV1_v0_dataset_config_native_type();
   return type;
 }
+
 ns_ConfigV1_v0::dataset_config::dataset_config()
 {
 }
+
+ns_ConfigV1_v0::dataset_config::dataset_config(const Psana::Imp::ConfigV1& psanaobj)
+  : range(psanaobj.range())
+  , calRange(psanaobj.calRange())
+  , reset(psanaobj.reset())
+  , biasData(psanaobj.biasData())
+  , calData(psanaobj.calData())
+  , biasDacData(psanaobj.biasDacData())
+  , calStrobe(psanaobj.calStrobe())
+  , numberOfSamples(psanaobj.numberOfSamples())
+  , trigDelay(psanaobj.trigDelay())
+  , adcDelay(psanaobj.adcDelay())
+{
+}
+
 ns_ConfigV1_v0::dataset_config::~dataset_config()
 {
 }
@@ -114,6 +131,29 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Imp::ConfigV1> > make_ConfigV1(int version
   }
 }
 
+void store_ConfigV1(const Psana::Imp::ConfigV1& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_ConfigV1_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Imp.ConfigV1", version);
+  }
+}
+
+void store(const Psana::Imp::ConfigV1& obj, hdf5pp::Group group, int version) 
+{
+  store_ConfigV1(obj, group, version, false);
+}
+
+void append(const Psana::Imp::ConfigV1& obj, hdf5pp::Group group, int version)
+{
+  store_ConfigV1(obj, group, version, true);
+}
+
+
 hdf5pp::Type ns_Sample_v0_dataset_data_stored_type()
 {
   typedef ns_Sample_v0::dataset_data DsType;
@@ -145,9 +185,19 @@ hdf5pp::Type ns_Sample_v0::dataset_data::native_type()
   static hdf5pp::Type type = ns_Sample_v0_dataset_data_native_type();
   return type;
 }
+
 ns_Sample_v0::dataset_data::dataset_data()
 {
 }
+
+ns_Sample_v0::dataset_data::dataset_data(const Psana::Imp::Sample& psanaobj)
+{
+  {
+    const __typeof__(psanaobj.channels())& arr = psanaobj.channels();
+    std::copy(arr.begin(), arr.begin()+4, channels);
+  }
+}
+
 ns_Sample_v0::dataset_data::~dataset_data()
 {
 }
@@ -193,9 +243,23 @@ hdf5pp::Type ns_LaneStatus_v0::dataset_data::native_type()
   static hdf5pp::Type type = ns_LaneStatus_v0_dataset_data_native_type();
   return type;
 }
+
 ns_LaneStatus_v0::dataset_data::dataset_data()
 {
 }
+
+ns_LaneStatus_v0::dataset_data::dataset_data(const Psana::Imp::LaneStatus& psanaobj)
+  : linkErrCount(psanaobj.linkErrCount())
+  , linkDownCount(psanaobj.linkDownCount())
+  , cellErrCount(psanaobj.cellErrCount())
+  , rxCount(psanaobj.rxCount())
+  , locLinked(psanaobj.locLinked())
+  , remLinked(psanaobj.remLinked())
+  , zeros(psanaobj.zeros())
+  , powersOkay(psanaobj.powersOkay())
+{
+}
+
 ns_LaneStatus_v0::dataset_data::~dataset_data()
 {
 }
@@ -235,9 +299,20 @@ hdf5pp::Type ns_ElementV1_v0::dataset_data::native_type()
   static hdf5pp::Type type = ns_ElementV1_v0_dataset_data_native_type();
   return type;
 }
+
 ns_ElementV1_v0::dataset_data::dataset_data()
 {
 }
+
+ns_ElementV1_v0::dataset_data::dataset_data(const Psana::Imp::ElementV1& psanaobj)
+  : vc(psanaobj.vc())
+  , lane(psanaobj.lane())
+  , frameNumber(psanaobj.frameNumber())
+  , range(psanaobj.range())
+  , laneStatus(psanaobj.laneStatus())
+{
+}
+
 ns_ElementV1_v0::dataset_data::~dataset_data()
 {
 }
@@ -292,5 +367,28 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Imp::ElementV1> > make_ElementV1(int versi
     return boost::make_shared<PSEvt::DataProxy<Psana::Imp::ElementV1> >(boost::shared_ptr<Psana::Imp::ElementV1>());
   }
 }
+
+void store_ElementV1(const Psana::Imp::ElementV1& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_ElementV1_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Imp.ElementV1", version);
+  }
+}
+
+void store(const Psana::Imp::ElementV1& obj, hdf5pp::Group group, int version) 
+{
+  store_ElementV1(obj, group, version, false);
+}
+
+void append(const Psana::Imp::ElementV1& obj, hdf5pp::Group group, int version)
+{
+  store_ElementV1(obj, group, version, true);
+}
+
 } // namespace Imp
 } // namespace psddl_hdf2psana

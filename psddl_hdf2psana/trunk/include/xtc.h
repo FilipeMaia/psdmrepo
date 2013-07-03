@@ -31,6 +31,10 @@ namespace Pds {
 namespace ns_ClockTime_v0 {
 struct dataset_data {
 
+  dataset_data();
+  dataset_data(const ::Pds::ClockTime& clock)
+    : seconds(clock.seconds()), nanoseconds(clock.nanoseconds()) {}
+
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
@@ -38,11 +42,19 @@ struct dataset_data {
   uint32_t nanoseconds; 
 
   operator ::Pds::ClockTime() const { return ::Pds::ClockTime(seconds, nanoseconds); }
+
+private:
+  dataset_data(const dataset_data&);
+  dataset_data& operator=(const dataset_data&);
 };
 } // namespace ns_ClockTime_v0
 
 namespace ns_DetInfo_v0 {
 struct dataset_data {
+
+  dataset_data();
+  dataset_data(const ::Pds::DetInfo& di);
+  ~dataset_data();
 
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
@@ -54,6 +66,10 @@ struct dataset_data {
   uint32_t devId;
 
   operator ::Pds::DetInfo() const ;
+
+private:
+  dataset_data(const dataset_data&);
+  dataset_data& operator=(const dataset_data&);
 };
 } // namespace ns_DetInfo_v0
 

@@ -8,6 +8,7 @@
 #include "hdf5pp/VlenType.h"
 #include "hdf5pp/Utils.h"
 #include "PSEvt/DataProxy.h"
+#include "psddl_hdf2psana/Exceptions.h"
 #include "psddl_hdf2psana/pnccd.h"
 #include "psddl_hdf2psana/pnccd.h"
 #include "psddl_hdf2psana/pnccd.h"
@@ -43,9 +44,17 @@ hdf5pp::Type ns_ConfigV1_v0::dataset_config::native_type()
   static hdf5pp::Type type = ns_ConfigV1_v0_dataset_config_native_type();
   return type;
 }
+
 ns_ConfigV1_v0::dataset_config::dataset_config()
 {
 }
+
+ns_ConfigV1_v0::dataset_config::dataset_config(const Psana::PNCCD::ConfigV1& psanaobj)
+  : numLinks(psanaobj.numLinks())
+  , payloadSizePerLink(psanaobj.payloadSizePerLink())
+{
+}
+
 ns_ConfigV1_v0::dataset_config::~dataset_config()
 {
 }
@@ -68,6 +77,29 @@ boost::shared_ptr<PSEvt::Proxy<Psana::PNCCD::ConfigV1> > make_ConfigV1(int versi
     return boost::make_shared<PSEvt::DataProxy<Psana::PNCCD::ConfigV1> >(boost::shared_ptr<Psana::PNCCD::ConfigV1>());
   }
 }
+
+void store_ConfigV1(const Psana::PNCCD::ConfigV1& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_ConfigV1_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "PNCCD.ConfigV1", version);
+  }
+}
+
+void store(const Psana::PNCCD::ConfigV1& obj, hdf5pp::Group group, int version) 
+{
+  store_ConfigV1(obj, group, version, false);
+}
+
+void append(const Psana::PNCCD::ConfigV1& obj, hdf5pp::Group group, int version)
+{
+  store_ConfigV1(obj, group, version, true);
+}
+
 
 hdf5pp::Type ns_ConfigV2_v0_dataset_config_stored_type()
 {
@@ -114,9 +146,27 @@ hdf5pp::Type ns_ConfigV2_v0::dataset_config::native_type()
   static hdf5pp::Type type = ns_ConfigV2_v0_dataset_config_native_type();
   return type;
 }
+
 ns_ConfigV2_v0::dataset_config::dataset_config()
 {
 }
+
+ns_ConfigV2_v0::dataset_config::dataset_config(const Psana::PNCCD::ConfigV2& psanaobj)
+  : numLinks(psanaobj.numLinks())
+  , payloadSizePerLink(psanaobj.payloadSizePerLink())
+  , numChannels(psanaobj.numChannels())
+  , numRows(psanaobj.numRows())
+  , numSubmoduleChannels(psanaobj.numSubmoduleChannels())
+  , numSubmoduleRows(psanaobj.numSubmoduleRows())
+  , numSubmodules(psanaobj.numSubmodules())
+  , camexMagic(psanaobj.camexMagic())
+  , info(0)
+  , timingFName(0)
+{
+  info = strdup(psanaobj.info());
+  timingFName = strdup(psanaobj.timingFName());
+}
+
 ns_ConfigV2_v0::dataset_config::~dataset_config()
 {
 }
@@ -181,6 +231,29 @@ boost::shared_ptr<PSEvt::Proxy<Psana::PNCCD::ConfigV2> > make_ConfigV2(int versi
     return boost::make_shared<PSEvt::DataProxy<Psana::PNCCD::ConfigV2> >(boost::shared_ptr<Psana::PNCCD::ConfigV2>());
   }
 }
+
+void store_ConfigV2(const Psana::PNCCD::ConfigV2& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_ConfigV2_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "PNCCD.ConfigV2", version);
+  }
+}
+
+void store(const Psana::PNCCD::ConfigV2& obj, hdf5pp::Group group, int version) 
+{
+  store_ConfigV2(obj, group, version, false);
+}
+
+void append(const Psana::PNCCD::ConfigV2& obj, hdf5pp::Group group, int version)
+{
+  store_ConfigV2(obj, group, version, true);
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::PNCCD::FullFrameV1> > make_FullFrameV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -189,6 +262,29 @@ boost::shared_ptr<PSEvt::Proxy<Psana::PNCCD::FullFrameV1> > make_FullFrameV1(int
     return boost::make_shared<PSEvt::DataProxy<Psana::PNCCD::FullFrameV1> >(boost::shared_ptr<Psana::PNCCD::FullFrameV1>());
   }
 }
+
+void store_FullFrameV1(const Psana::PNCCD::FullFrameV1& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_FullFrameV1_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "PNCCD.FullFrameV1", version);
+  }
+}
+
+void store(const Psana::PNCCD::FullFrameV1& obj, hdf5pp::Group group, int version) 
+{
+  store_FullFrameV1(obj, group, version, false);
+}
+
+void append(const Psana::PNCCD::FullFrameV1& obj, hdf5pp::Group group, int version)
+{
+  store_FullFrameV1(obj, group, version, true);
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::PNCCD::FramesV1> > make_FramesV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::PNCCD::ConfigV1>& cfg) {
   switch (version) {
   case 0:
@@ -205,5 +301,28 @@ boost::shared_ptr<PSEvt::Proxy<Psana::PNCCD::FramesV1> > make_FramesV1(int versi
     return boost::make_shared<PSEvt::DataProxy<Psana::PNCCD::FramesV1> >(boost::shared_ptr<Psana::PNCCD::FramesV1>());
   }
 }
+
+void store_FramesV1(const Psana::PNCCD::FramesV1& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_FramesV1_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "PNCCD.FramesV1", version);
+  }
+}
+
+void store(const Psana::PNCCD::FramesV1& obj, hdf5pp::Group group, int version) 
+{
+  store_FramesV1(obj, group, version, false);
+}
+
+void append(const Psana::PNCCD::FramesV1& obj, hdf5pp::Group group, int version)
+{
+  store_FramesV1(obj, group, version, true);
+}
+
 } // namespace PNCCD
 } // namespace psddl_hdf2psana

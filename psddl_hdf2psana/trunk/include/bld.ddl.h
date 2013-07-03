@@ -21,14 +21,16 @@ struct dataset_data {
   static hdf5pp::Type stored_type();
 
   dataset_data();
+  dataset_data(const Psana::Bld::BldDataFEEGasDetEnergy& psanaobj);
   ~dataset_data();
 
-  double f_11_ENRC; 
-  double f_12_ENRC; 
-  double f_21_ENRC; 
-  double f_22_ENRC; 
+  double f_11_ENRC;
+  double f_12_ENRC;
+  double f_21_ENRC;
+  double f_22_ENRC;
 
   operator Psana::Bld::BldDataFEEGasDetEnergy() const { return Psana::Bld::BldDataFEEGasDetEnergy(f_11_ENRC, f_12_ENRC, f_21_ENRC, f_22_ENRC); }
+
 };
 }
 class Proxy_BldDataFEEGasDetEnergy_v0 : public PSEvt::Proxy<Psana::Bld::BldDataFEEGasDetEnergy> {
@@ -50,23 +52,29 @@ private:
 };
 boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataFEEGasDetEnergy> > make_BldDataFEEGasDetEnergy(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::Bld::BldDataFEEGasDetEnergy& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::Bld::BldDataFEEGasDetEnergy& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_BldDataEBeamV0_v0 {
 struct dataset_data {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_data();
+  dataset_data(const Psana::Bld::BldDataEBeamV0& psanaobj);
   ~dataset_data();
 
-  uint32_t uDamageMask; 
-  double fEbeamCharge; 
-  double fEbeamL3Energy; 
-  double fEbeamLTUPosX; 
-  double fEbeamLTUPosY; 
-  double fEbeamLTUAngX; 
-  double fEbeamLTUAngY; 
+  uint32_t uDamageMask;
+  double fEbeamCharge;
+  double fEbeamL3Energy;
+  double fEbeamLTUPosX;
+  double fEbeamLTUPosY;
+  double fEbeamLTUAngX;
+  double fEbeamLTUAngY;
 
   operator Psana::Bld::BldDataEBeamV0() const { return Psana::Bld::BldDataEBeamV0(uDamageMask, fEbeamCharge, fEbeamL3Energy, fEbeamLTUPosX, fEbeamLTUPosY, fEbeamLTUAngX, fEbeamLTUAngY); }
+
 };
 }
 class Proxy_BldDataEBeamV0_v0 : public PSEvt::Proxy<Psana::Bld::BldDataEBeamV0> {
@@ -88,24 +96,30 @@ private:
 };
 boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataEBeamV0> > make_BldDataEBeamV0(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::Bld::BldDataEBeamV0& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::Bld::BldDataEBeamV0& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_BldDataEBeamV1_v0 {
 struct dataset_data {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_data();
+  dataset_data(const Psana::Bld::BldDataEBeamV1& psanaobj);
   ~dataset_data();
 
-  uint32_t uDamageMask; 
-  double fEbeamCharge; 
-  double fEbeamL3Energy; 
-  double fEbeamLTUPosX; 
-  double fEbeamLTUPosY; 
-  double fEbeamLTUAngX; 
-  double fEbeamLTUAngY; 
-  double fEbeamPkCurrBC2; 
+  uint32_t uDamageMask;
+  double fEbeamCharge;
+  double fEbeamL3Energy;
+  double fEbeamLTUPosX;
+  double fEbeamLTUPosY;
+  double fEbeamLTUAngX;
+  double fEbeamLTUAngY;
+  double fEbeamPkCurrBC2;
 
   operator Psana::Bld::BldDataEBeamV1() const { return Psana::Bld::BldDataEBeamV1(uDamageMask, fEbeamCharge, fEbeamL3Energy, fEbeamLTUPosX, fEbeamLTUPosY, fEbeamLTUAngX, fEbeamLTUAngY, fEbeamPkCurrBC2); }
+
 };
 }
 class Proxy_BldDataEBeamV1_v0 : public PSEvt::Proxy<Psana::Bld::BldDataEBeamV1> {
@@ -127,25 +141,31 @@ private:
 };
 boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataEBeamV1> > make_BldDataEBeamV1(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::Bld::BldDataEBeamV1& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::Bld::BldDataEBeamV1& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_BldDataEBeamV2_v0 {
 struct dataset_data {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_data();
+  dataset_data(const Psana::Bld::BldDataEBeamV2& psanaobj);
   ~dataset_data();
 
-  uint32_t uDamageMask; 
-  double fEbeamCharge; 
-  double fEbeamL3Energy; 
-  double fEbeamLTUPosX; 
-  double fEbeamLTUPosY; 
-  double fEbeamLTUAngX; 
-  double fEbeamLTUAngY; 
-  double fEbeamPkCurrBC2; 
-  double fEbeamEnergyBC2; 
+  uint32_t uDamageMask;
+  double fEbeamCharge;
+  double fEbeamL3Energy;
+  double fEbeamLTUPosX;
+  double fEbeamLTUPosY;
+  double fEbeamLTUAngX;
+  double fEbeamLTUAngY;
+  double fEbeamPkCurrBC2;
+  double fEbeamEnergyBC2;
 
   operator Psana::Bld::BldDataEBeamV2() const { return Psana::Bld::BldDataEBeamV2(uDamageMask, fEbeamCharge, fEbeamL3Energy, fEbeamLTUPosX, fEbeamLTUPosY, fEbeamLTUAngX, fEbeamLTUAngY, fEbeamPkCurrBC2, fEbeamEnergyBC2); }
+
 };
 }
 class Proxy_BldDataEBeamV2_v0 : public PSEvt::Proxy<Psana::Bld::BldDataEBeamV2> {
@@ -167,27 +187,33 @@ private:
 };
 boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataEBeamV2> > make_BldDataEBeamV2(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::Bld::BldDataEBeamV2& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::Bld::BldDataEBeamV2& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_BldDataEBeamV3_v0 {
 struct dataset_data {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_data();
+  dataset_data(const Psana::Bld::BldDataEBeamV3& psanaobj);
   ~dataset_data();
 
-  uint32_t uDamageMask; 
-  double fEbeamCharge; 
-  double fEbeamL3Energy; 
-  double fEbeamLTUPosX; 
-  double fEbeamLTUPosY; 
-  double fEbeamLTUAngX; 
-  double fEbeamLTUAngY; 
-  double fEbeamPkCurrBC2; 
-  double fEbeamEnergyBC2; 
-  double fEbeamPkCurrBC1; 
-  double fEbeamEnergyBC1; 
+  uint32_t uDamageMask;
+  double fEbeamCharge;
+  double fEbeamL3Energy;
+  double fEbeamLTUPosX;
+  double fEbeamLTUPosY;
+  double fEbeamLTUAngX;
+  double fEbeamLTUAngY;
+  double fEbeamPkCurrBC2;
+  double fEbeamEnergyBC2;
+  double fEbeamPkCurrBC1;
+  double fEbeamEnergyBC1;
 
   operator Psana::Bld::BldDataEBeamV3() const { return Psana::Bld::BldDataEBeamV3(uDamageMask, fEbeamCharge, fEbeamL3Energy, fEbeamLTUPosX, fEbeamLTUPosY, fEbeamLTUAngX, fEbeamLTUAngY, fEbeamPkCurrBC2, fEbeamEnergyBC2, fEbeamPkCurrBC1, fEbeamEnergyBC1); }
+
 };
 }
 class Proxy_BldDataEBeamV3_v0 : public PSEvt::Proxy<Psana::Bld::BldDataEBeamV3> {
@@ -209,20 +235,26 @@ private:
 };
 boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataEBeamV3> > make_BldDataEBeamV3(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::Bld::BldDataEBeamV3& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::Bld::BldDataEBeamV3& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_BldDataPhaseCavity_v0 {
 struct dataset_data {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_data();
+  dataset_data(const Psana::Bld::BldDataPhaseCavity& psanaobj);
   ~dataset_data();
 
-  double fFitTime1; 
-  double fFitTime2; 
-  double fCharge1; 
-  double fCharge2; 
+  double fFitTime1;
+  double fFitTime2;
+  double fCharge1;
+  double fCharge2;
 
   operator Psana::Bld::BldDataPhaseCavity() const { return Psana::Bld::BldDataPhaseCavity(fFitTime1, fFitTime2, fCharge1, fCharge2); }
+
 };
 }
 class Proxy_BldDataPhaseCavity_v0 : public PSEvt::Proxy<Psana::Bld::BldDataPhaseCavity> {
@@ -244,17 +276,23 @@ private:
 };
 boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataPhaseCavity> > make_BldDataPhaseCavity(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::Bld::BldDataPhaseCavity& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::Bld::BldDataPhaseCavity& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_BldDataIpimbV0_v0 {
 struct dataset_data {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_data();
+  dataset_data(const Psana::Bld::BldDataIpimbV0& psanaobj);
   ~dataset_data();
 
-  Ipimb::ns_DataV1_v0::dataset_data ipimbData; 
-  Ipimb::ns_ConfigV1_v0::dataset_config ipimbConfig; 
-  Lusi::ns_IpmFexV1_v0::dataset_data ipmFexData; 
+  Ipimb::ns_DataV1_v0::dataset_data ipimbData;
+  Ipimb::ns_ConfigV1_v0::dataset_config ipimbConfig;
+  Lusi::ns_IpmFexV1_v0::dataset_data ipmFexData;
+
 
 };
 }
@@ -283,17 +321,23 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataIpimbV0> > make_BldDataIpimbV0(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::Bld::BldDataIpimbV0& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::Bld::BldDataIpimbV0& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_BldDataIpimbV1_v0 {
 struct dataset_data {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_data();
+  dataset_data(const Psana::Bld::BldDataIpimbV1& psanaobj);
   ~dataset_data();
 
-  Ipimb::ns_DataV2_v0::dataset_data ipimbData; 
-  Ipimb::ns_ConfigV2_v0::dataset_config ipimbConfig; 
-  Lusi::ns_IpmFexV1_v0::dataset_data ipmFexData; 
+  Ipimb::ns_DataV2_v0::dataset_data ipimbData;
+  Ipimb::ns_ConfigV2_v0::dataset_config ipimbConfig;
+  Lusi::ns_IpmFexV1_v0::dataset_data ipmFexData;
+
 
 };
 }
@@ -321,7 +365,15 @@ private:
 };
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataIpimbV1> > make_BldDataIpimbV1(int version, hdf5pp::Group group, hsize_t idx);
+
+void store(const Psana::Bld::BldDataIpimbV1& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::Bld::BldDataIpimbV1& obj, hdf5pp::Group group, int version = -1);
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataPimV1> > make_BldDataPimV1(int version, hdf5pp::Group group, hsize_t idx);
+
+void store(const Psana::Bld::BldDataPimV1& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::Bld::BldDataPimV1& obj, hdf5pp::Group group, int version = -1);
+
 
 namespace ns_BldDataGMDV0_v0 {
 struct dataset_data {
@@ -329,23 +381,25 @@ struct dataset_data {
   static hdf5pp::Type stored_type();
 
   dataset_data();
+  dataset_data(const Psana::Bld::BldDataGMDV0& psanaobj);
   ~dataset_data();
 
-  char strGasType[32]; 
-  double fPressure; 
-  double fTemperature; 
-  double fCurrent; 
-  double fHvMeshElectron; 
-  double fHvMeshIon; 
-  double fHvMultIon; 
-  double fChargeQ; 
-  double fPhotonEnergy; 
-  double fMultPulseIntensity; 
-  double fKeithleyPulseIntensity; 
-  double fPulseEnergy; 
-  double fPulseEnergyFEE; 
-  double fTransmission; 
-  double fTransmissionFEE; 
+  char strGasType[32];
+  double fPressure;
+  double fTemperature;
+  double fCurrent;
+  double fHvMeshElectron;
+  double fHvMeshIon;
+  double fHvMultIon;
+  double fChargeQ;
+  double fPhotonEnergy;
+  double fMultPulseIntensity;
+  double fKeithleyPulseIntensity;
+  double fPulseEnergy;
+  double fPulseEnergyFEE;
+  double fTransmission;
+  double fTransmissionFEE;
+
 
 };
 }
@@ -383,19 +437,25 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataGMDV0> > make_BldDataGMDV0(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::Bld::BldDataGMDV0& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::Bld::BldDataGMDV0& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_BldDataGMDV1_v0 {
 struct dataset_data {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_data();
+  dataset_data(const Psana::Bld::BldDataGMDV1& psanaobj);
   ~dataset_data();
 
-  double fMilliJoulesPerPulse; 
-  double fMilliJoulesAverage; 
-  double fCorrectedSumPerPulse; 
-  double fBgValuePerSample; 
-  double fRelativeEnergyPerPulse; 
+  double fMilliJoulesPerPulse;
+  double fMilliJoulesAverage;
+  double fCorrectedSumPerPulse;
+  double fBgValuePerSample;
+  double fRelativeEnergyPerPulse;
+
 
 };
 }
@@ -422,6 +482,10 @@ private:
 };
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataGMDV1> > make_BldDataGMDV1(int version, hdf5pp::Group group, hsize_t idx);
+
+void store(const Psana::Bld::BldDataGMDV1& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::Bld::BldDataGMDV1& obj, hdf5pp::Group group, int version = -1);
+
 } // namespace Bld
 } // namespace psddl_hdf2psana
 #endif // PSDDL_HDF2PSANA_BLD_DDL_H

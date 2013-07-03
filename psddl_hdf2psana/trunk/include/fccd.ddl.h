@@ -17,13 +17,15 @@ struct dataset_config {
   static hdf5pp::Type stored_type();
 
   dataset_config();
+  dataset_config(const Psana::FCCD::FccdConfigV1& psanaobj);
   ~dataset_config();
 
-  uint16_t outputMode; 
-  uint32_t width; 
-  uint32_t height; 
-  uint32_t trimmedWidth; 
-  uint32_t trimmedHeight; 
+  uint16_t outputMode;
+  uint32_t width;
+  uint32_t height;
+  uint32_t trimmedWidth;
+  uint32_t trimmedHeight;
+
 
 };
 }
@@ -50,7 +52,15 @@ private:
 };
 
 boost::shared_ptr<PSEvt::Proxy<Psana::FCCD::FccdConfigV1> > make_FccdConfigV1(int version, hdf5pp::Group group, hsize_t idx);
+
+void store(const Psana::FCCD::FccdConfigV1& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::FCCD::FccdConfigV1& obj, hdf5pp::Group group, int version = -1);
+
 boost::shared_ptr<PSEvt::Proxy<Psana::FCCD::FccdConfigV2> > make_FccdConfigV2(int version, hdf5pp::Group group, hsize_t idx);
+
+void store(const Psana::FCCD::FccdConfigV2& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::FCCD::FccdConfigV2& obj, hdf5pp::Group group, int version = -1);
+
 } // namespace FCCD
 } // namespace psddl_hdf2psana
 #endif // PSDDL_HDF2PSANA_FCCD_DDL_H

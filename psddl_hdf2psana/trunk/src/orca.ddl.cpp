@@ -8,6 +8,7 @@
 #include "hdf5pp/VlenType.h"
 #include "hdf5pp/Utils.h"
 #include "PSEvt/DataProxy.h"
+#include "psddl_hdf2psana/Exceptions.h"
 namespace psddl_hdf2psana {
 namespace Orca {
 
@@ -62,9 +63,19 @@ hdf5pp::Type ns_ConfigV1_v0::dataset_config::native_type()
   static hdf5pp::Type type = ns_ConfigV1_v0_dataset_config_native_type();
   return type;
 }
+
 ns_ConfigV1_v0::dataset_config::dataset_config()
 {
 }
+
+ns_ConfigV1_v0::dataset_config::dataset_config(const Psana::Orca::ConfigV1& psanaobj)
+  : mode(psanaobj.mode())
+  , cooling(psanaobj.cooling())
+  , defect_pixel_correction_enabled(psanaobj.defect_pixel_correction_enabled())
+  , rows(psanaobj.rows())
+{
+}
+
 ns_ConfigV1_v0::dataset_config::~dataset_config()
 {
 }
@@ -95,5 +106,28 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Orca::ConfigV1> > make_ConfigV1(int versio
     return boost::make_shared<PSEvt::DataProxy<Psana::Orca::ConfigV1> >(boost::shared_ptr<Psana::Orca::ConfigV1>());
   }
 }
+
+void store_ConfigV1(const Psana::Orca::ConfigV1& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_ConfigV1_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Orca.ConfigV1", version);
+  }
+}
+
+void store(const Psana::Orca::ConfigV1& obj, hdf5pp::Group group, int version) 
+{
+  store_ConfigV1(obj, group, version, false);
+}
+
+void append(const Psana::Orca::ConfigV1& obj, hdf5pp::Group group, int version)
+{
+  store_ConfigV1(obj, group, version, true);
+}
+
 } // namespace Orca
 } // namespace psddl_hdf2psana

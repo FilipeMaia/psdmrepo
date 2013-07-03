@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-00
+2013-07-02 Andy Salnikov
+- re-generate everyhting with psddl V00-07-01
+- started adding code for storing the data in HDF5
+
 Tag: V00-01-32
 2013-05-22 Andy Salnikov
 - fixing doxygen comments

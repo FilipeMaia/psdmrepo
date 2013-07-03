@@ -74,12 +74,14 @@ struct dataset_data {
   static hdf5pp::Type stored_type();
 
   dataset_data();
+  dataset_data(const Psana::Epics::epicsTimeStamp& psanaobj);
   ~dataset_data();
 
-  uint32_t secPastEpoch; 
-  uint32_t nsec; 
+  uint32_t secPastEpoch;
+  uint32_t nsec;
 
   operator Psana::Epics::epicsTimeStamp() const { return Psana::Epics::epicsTimeStamp(secPastEpoch, nsec); }
+
 };
 }
 
@@ -89,11 +91,13 @@ struct dataset_data {
   static hdf5pp::Type stored_type();
 
   dataset_data();
+  dataset_data(const Psana::Epics::EpicsPvHeader& psanaobj);
   ~dataset_data();
 
-  int16_t pvId; 
-  int16_t dbrType; 
-  int16_t numElements; 
+  int16_t pvId;
+  int16_t dbrType;
+  int16_t numElements;
+
 
 };
 }
@@ -136,13 +140,15 @@ struct dataset_data {
   static hdf5pp::Type stored_type();
 
   dataset_data();
+  dataset_data(const Psana::Epics::PvConfigV1& psanaobj);
   ~dataset_data();
 
-  int16_t pvId; 
-  char description[64]; 
-  float interval; 
+  int16_t pvId;
+  char description[64];
+  float interval;
 
   operator Psana::Epics::PvConfigV1() const { return Psana::Epics::PvConfigV1(pvId, description, interval); }
+
 };
 }
 
@@ -152,9 +158,11 @@ struct dataset_config {
   static hdf5pp::Type stored_type();
 
   dataset_config();
+  dataset_config(const Psana::Epics::ConfigV1& psanaobj);
   ~dataset_config();
 
-  int32_t numPv; 
+  int32_t numPv;
+
 
 };
 }
@@ -179,6 +187,10 @@ private:
 };
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Epics::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx);
+
+void store(const Psana::Epics::ConfigV1& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::Epics::ConfigV1& obj, hdf5pp::Group group, int version = -1);
+
 } // namespace Epics
 } // namespace psddl_hdf2psana
 #endif // PSDDL_HDF2PSANA_EPICS_DDL_H

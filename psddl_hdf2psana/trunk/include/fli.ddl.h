@@ -16,20 +16,22 @@ struct dataset_config {
   static hdf5pp::Type stored_type();
 
   dataset_config();
+  dataset_config(const Psana::Fli::ConfigV1& psanaobj);
   ~dataset_config();
 
-  uint32_t width; 
-  uint32_t height; 
-  uint32_t orgX; 
-  uint32_t orgY; 
-  uint32_t binX; 
-  uint32_t binY; 
-  float exposureTime; 
-  float coolingTemp; 
-  uint8_t gainIndex; 
-  uint8_t readoutSpeedIndex; 
-  uint16_t exposureEventCode; 
-  uint32_t numDelayShots; 
+  uint32_t width;
+  uint32_t height;
+  uint32_t orgX;
+  uint32_t orgY;
+  uint32_t binX;
+  uint32_t binY;
+  float exposureTime;
+  float coolingTemp;
+  uint8_t gainIndex;
+  uint8_t readoutSpeedIndex;
+  uint16_t exposureEventCode;
+  uint32_t numDelayShots;
+
 
 };
 }
@@ -73,17 +75,23 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Fli::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::Fli::ConfigV1& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::Fli::ConfigV1& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_FrameV1_v0 {
 struct dataset_frame {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_frame();
+  dataset_frame(const Psana::Fli::FrameV1& psanaobj);
   ~dataset_frame();
 
-  uint32_t shotIdStart; 
-  float readoutTime; 
-  float temperature; 
+  uint32_t shotIdStart;
+  float readoutTime;
+  float temperature;
+
 
 };
 }
@@ -112,6 +120,10 @@ private:
 };
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Fli::FrameV1> > make_FrameV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::Fli::ConfigV1>& cfg);
+
+void store(const Psana::Fli::FrameV1& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::Fli::FrameV1& obj, hdf5pp::Group group, int version = -1);
+
 } // namespace Fli
 } // namespace psddl_hdf2psana
 #endif // PSDDL_HDF2PSANA_FLI_DDL_H

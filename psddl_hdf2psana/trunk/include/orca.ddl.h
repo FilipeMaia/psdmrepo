@@ -16,12 +16,14 @@ struct dataset_config {
   static hdf5pp::Type stored_type();
 
   dataset_config();
+  dataset_config(const Psana::Orca::ConfigV1& psanaobj);
   ~dataset_config();
 
-  uint8_t mode; 
-  uint8_t cooling; 
-  uint8_t defect_pixel_correction_enabled; 
-  uint32_t rows; 
+  uint8_t mode;
+  uint8_t cooling;
+  uint8_t defect_pixel_correction_enabled;
+  uint32_t rows;
+
 
 };
 }
@@ -47,6 +49,10 @@ private:
 };
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Orca::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx);
+
+void store(const Psana::Orca::ConfigV1& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::Orca::ConfigV1& obj, hdf5pp::Group group, int version = -1);
+
 } // namespace Orca
 } // namespace psddl_hdf2psana
 #endif // PSDDL_HDF2PSANA_ORCA_DDL_H

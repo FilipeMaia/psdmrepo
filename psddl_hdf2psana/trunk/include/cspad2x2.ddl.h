@@ -65,9 +65,11 @@ struct dataset_data {
   static hdf5pp::Type stored_type();
 
   dataset_data();
+  dataset_data(const Psana::CsPad2x2::CsPad2x2DigitalPotsCfg& psanaobj);
   ~dataset_data();
 
-  uint8_t pots[80]; 
+  uint8_t pots[80];
+
 
 };
 }
@@ -96,12 +98,14 @@ struct dataset_data {
   static hdf5pp::Type stored_type();
 
   dataset_data();
+  dataset_data(const Psana::CsPad2x2::CsPad2x2ReadOnlyCfg& psanaobj);
   ~dataset_data();
 
-  uint32_t shiftTest; 
-  uint32_t version; 
+  uint32_t shiftTest;
+  uint32_t version;
 
   operator Psana::CsPad2x2::CsPad2x2ReadOnlyCfg() const { return Psana::CsPad2x2::CsPad2x2ReadOnlyCfg(shiftTest, version); }
+
 };
 }
 class Proxy_CsPad2x2ReadOnlyCfg_v0 : public PSEvt::Proxy<Psana::CsPad2x2::CsPad2x2ReadOnlyCfg> {
@@ -123,18 +127,24 @@ private:
 };
 boost::shared_ptr<PSEvt::Proxy<Psana::CsPad2x2::CsPad2x2ReadOnlyCfg> > make_CsPad2x2ReadOnlyCfg(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::CsPad2x2::CsPad2x2ReadOnlyCfg& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::CsPad2x2::CsPad2x2ReadOnlyCfg& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_ProtectionSystemThreshold_v0 {
 struct dataset_data {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_data();
+  dataset_data(const Psana::CsPad2x2::ProtectionSystemThreshold& psanaobj);
   ~dataset_data();
 
-  uint32_t adcThreshold; 
-  uint32_t pixelCountThreshold; 
+  uint32_t adcThreshold;
+  uint32_t pixelCountThreshold;
 
   operator Psana::CsPad2x2::ProtectionSystemThreshold() const { return Psana::CsPad2x2::ProtectionSystemThreshold(adcThreshold, pixelCountThreshold); }
+
 };
 }
 class Proxy_ProtectionSystemThreshold_v0 : public PSEvt::Proxy<Psana::CsPad2x2::ProtectionSystemThreshold> {
@@ -156,15 +166,21 @@ private:
 };
 boost::shared_ptr<PSEvt::Proxy<Psana::CsPad2x2::ProtectionSystemThreshold> > make_ProtectionSystemThreshold(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::CsPad2x2::ProtectionSystemThreshold& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::CsPad2x2::ProtectionSystemThreshold& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_CsPad2x2GainMapCfg_v0 {
 struct dataset_data {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_data();
+  dataset_data(const Psana::CsPad2x2::CsPad2x2GainMapCfg& psanaobj);
   ~dataset_data();
 
-  uint16_t gainMap[35890]; 
+  uint16_t gainMap[35890];
+
 
 };
 }
@@ -193,32 +209,34 @@ struct dataset_data {
   static hdf5pp::Type stored_type();
 
   dataset_data();
+  dataset_data(const Psana::CsPad2x2::ConfigV1QuadReg& psanaobj);
   ~dataset_data();
 
-  uint32_t shiftSelect; 
-  uint32_t edgeSelect; 
-  uint32_t readClkSet; 
-  uint32_t readClkHold; 
-  uint32_t dataMode; 
-  uint32_t prstSel; 
-  uint32_t acqDelay; 
-  uint32_t intTime; 
-  uint32_t digDelay; 
-  uint32_t ampIdle; 
-  uint32_t injTotal; 
-  uint32_t rowColShiftPer; 
-  uint32_t ampReset; 
-  uint32_t digCount; 
-  uint32_t digPeriod; 
-  uint32_t PeltierEnable; 
-  uint32_t kpConstant; 
-  uint32_t kiConstant; 
-  uint32_t kdConstant; 
-  uint32_t humidThold; 
-  uint32_t setPoint; 
-  CsPad2x2::ns_CsPad2x2ReadOnlyCfg_v0::dataset_data readOnly; 
-  CsPad2x2::ns_CsPad2x2DigitalPotsCfg_v0::dataset_data digitalPots; 
-  CsPad2x2::ns_CsPad2x2GainMapCfg_v0::dataset_data gainMap; 
+  uint32_t shiftSelect;
+  uint32_t edgeSelect;
+  uint32_t readClkSet;
+  uint32_t readClkHold;
+  uint32_t dataMode;
+  uint32_t prstSel;
+  uint32_t acqDelay;
+  uint32_t intTime;
+  uint32_t digDelay;
+  uint32_t ampIdle;
+  uint32_t injTotal;
+  uint32_t rowColShiftPer;
+  uint32_t ampReset;
+  uint32_t digCount;
+  uint32_t digPeriod;
+  uint32_t PeltierEnable;
+  uint32_t kpConstant;
+  uint32_t kiConstant;
+  uint32_t kdConstant;
+  uint32_t humidThold;
+  uint32_t setPoint;
+  CsPad2x2::ns_CsPad2x2ReadOnlyCfg_v0::dataset_data readOnly;
+  CsPad2x2::ns_CsPad2x2DigitalPotsCfg_v0::dataset_data digitalPots;
+  CsPad2x2::ns_CsPad2x2GainMapCfg_v0::dataset_data gainMap;
+
 
 };
 }
@@ -273,21 +291,23 @@ struct dataset_config {
   static hdf5pp::Type stored_type();
 
   dataset_config();
+  dataset_config(const Psana::CsPad2x2::ConfigV1& psanaobj);
   ~dataset_config();
 
-  uint32_t concentratorVersion; 
-  CsPad2x2::ns_ProtectionSystemThreshold_v0::dataset_data protectionThreshold; 
-  uint32_t protectionEnable; 
-  uint32_t inactiveRunMode; 
-  uint32_t activeRunMode; 
-  uint32_t testDataIndex; 
-  uint32_t payloadSize; 
-  uint32_t badAsicMask; 
-  uint32_t asicMask; 
-  uint32_t roiMask; 
-  uint32_t numAsicsRead; 
-  uint32_t numAsicsStored; 
-  CsPad2x2::ns_ConfigV1QuadReg_v0::dataset_data quad; 
+  uint32_t concentratorVersion;
+  CsPad2x2::ns_ProtectionSystemThreshold_v0::dataset_data protectionThreshold;
+  uint32_t protectionEnable;
+  uint32_t inactiveRunMode;
+  uint32_t activeRunMode;
+  uint32_t testDataIndex;
+  uint32_t payloadSize;
+  uint32_t badAsicMask;
+  uint32_t asicMask;
+  uint32_t roiMask;
+  uint32_t numAsicsRead;
+  uint32_t numAsicsStored;
+  CsPad2x2::ns_ConfigV1QuadReg_v0::dataset_data quad;
+
 
 };
 }
@@ -325,40 +345,46 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::CsPad2x2::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::CsPad2x2::ConfigV1& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::CsPad2x2::ConfigV1& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_ConfigV2QuadReg_v0 {
 struct dataset_data {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_data();
+  dataset_data(const Psana::CsPad2x2::ConfigV2QuadReg& psanaobj);
   ~dataset_data();
 
-  uint32_t shiftSelect; 
-  uint32_t edgeSelect; 
-  uint32_t readClkSet; 
-  uint32_t readClkHold; 
-  uint32_t dataMode; 
-  uint32_t prstSel; 
-  uint32_t acqDelay; 
-  uint32_t intTime; 
-  uint32_t digDelay; 
-  uint32_t ampIdle; 
-  uint32_t injTotal; 
-  uint32_t rowColShiftPer; 
-  uint32_t ampReset; 
-  uint32_t digCount; 
-  uint32_t digPeriod; 
-  uint32_t PeltierEnable; 
-  uint32_t kpConstant; 
-  uint32_t kiConstant; 
-  uint32_t kdConstant; 
-  uint32_t humidThold; 
-  uint32_t setPoint; 
-  uint32_t biasTuning; 
-  uint32_t pdpmndnmBalance; 
-  CsPad2x2::ns_CsPad2x2ReadOnlyCfg_v0::dataset_data readOnly; 
-  CsPad2x2::ns_CsPad2x2DigitalPotsCfg_v0::dataset_data digitalPots; 
-  CsPad2x2::ns_CsPad2x2GainMapCfg_v0::dataset_data gainMap; 
+  uint32_t shiftSelect;
+  uint32_t edgeSelect;
+  uint32_t readClkSet;
+  uint32_t readClkHold;
+  uint32_t dataMode;
+  uint32_t prstSel;
+  uint32_t acqDelay;
+  uint32_t intTime;
+  uint32_t digDelay;
+  uint32_t ampIdle;
+  uint32_t injTotal;
+  uint32_t rowColShiftPer;
+  uint32_t ampReset;
+  uint32_t digCount;
+  uint32_t digPeriod;
+  uint32_t PeltierEnable;
+  uint32_t kpConstant;
+  uint32_t kiConstant;
+  uint32_t kdConstant;
+  uint32_t humidThold;
+  uint32_t setPoint;
+  uint32_t biasTuning;
+  uint32_t pdpmndnmBalance;
+  CsPad2x2::ns_CsPad2x2ReadOnlyCfg_v0::dataset_data readOnly;
+  CsPad2x2::ns_CsPad2x2DigitalPotsCfg_v0::dataset_data digitalPots;
+  CsPad2x2::ns_CsPad2x2GainMapCfg_v0::dataset_data gainMap;
+
 
 };
 }
@@ -415,22 +441,24 @@ struct dataset_config {
   static hdf5pp::Type stored_type();
 
   dataset_config();
+  dataset_config(const Psana::CsPad2x2::ConfigV2& psanaobj);
   ~dataset_config();
 
-  uint32_t concentratorVersion; 
-  CsPad2x2::ns_ProtectionSystemThreshold_v0::dataset_data protectionThreshold; 
-  uint32_t protectionEnable; 
-  uint32_t inactiveRunMode; 
-  uint32_t activeRunMode; 
-  uint32_t runTriggerDelay; 
-  uint32_t testDataIndex; 
-  uint32_t payloadSize; 
-  uint32_t badAsicMask; 
-  uint32_t asicMask; 
-  uint32_t roiMask; 
-  uint32_t numAsicsRead; 
-  uint32_t numAsicsStored; 
-  CsPad2x2::ns_ConfigV2QuadReg_v0::dataset_data quad; 
+  uint32_t concentratorVersion;
+  CsPad2x2::ns_ProtectionSystemThreshold_v0::dataset_data protectionThreshold;
+  uint32_t protectionEnable;
+  uint32_t inactiveRunMode;
+  uint32_t activeRunMode;
+  uint32_t runTriggerDelay;
+  uint32_t testDataIndex;
+  uint32_t payloadSize;
+  uint32_t badAsicMask;
+  uint32_t asicMask;
+  uint32_t roiMask;
+  uint32_t numAsicsRead;
+  uint32_t numAsicsStored;
+  CsPad2x2::ns_ConfigV2QuadReg_v0::dataset_data quad;
+
 
 };
 }
@@ -468,7 +496,15 @@ private:
 };
 
 boost::shared_ptr<PSEvt::Proxy<Psana::CsPad2x2::ConfigV2> > make_ConfigV2(int version, hdf5pp::Group group, hsize_t idx);
+
+void store(const Psana::CsPad2x2::ConfigV2& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::CsPad2x2::ConfigV2& obj, hdf5pp::Group group, int version = -1);
+
 boost::shared_ptr<PSEvt::Proxy<Psana::CsPad2x2::ElementV1> > make_ElementV1(int version, hdf5pp::Group group, hsize_t idx);
+
+void store(const Psana::CsPad2x2::ElementV1& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::CsPad2x2::ElementV1& obj, hdf5pp::Group group, int version = -1);
+
 } // namespace CsPad2x2
 } // namespace psddl_hdf2psana
 #endif // PSDDL_HDF2PSANA_CSPAD2X2_DDL_H

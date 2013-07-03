@@ -8,6 +8,7 @@
 #include "hdf5pp/VlenType.h"
 #include "hdf5pp/Utils.h"
 #include "PSEvt/DataProxy.h"
+#include "psddl_hdf2psana/Exceptions.h"
 namespace psddl_hdf2psana {
 namespace Fli {
 
@@ -60,9 +61,27 @@ hdf5pp::Type ns_ConfigV1_v0::dataset_config::native_type()
   static hdf5pp::Type type = ns_ConfigV1_v0_dataset_config_native_type();
   return type;
 }
+
 ns_ConfigV1_v0::dataset_config::dataset_config()
 {
 }
+
+ns_ConfigV1_v0::dataset_config::dataset_config(const Psana::Fli::ConfigV1& psanaobj)
+  : width(psanaobj.width())
+  , height(psanaobj.height())
+  , orgX(psanaobj.orgX())
+  , orgY(psanaobj.orgY())
+  , binX(psanaobj.binX())
+  , binY(psanaobj.binY())
+  , exposureTime(psanaobj.exposureTime())
+  , coolingTemp(psanaobj.coolingTemp())
+  , gainIndex(psanaobj.gainIndex())
+  , readoutSpeedIndex(psanaobj.readoutSpeedIndex())
+  , exposureEventCode(psanaobj.exposureEventCode())
+  , numDelayShots(psanaobj.numDelayShots())
+{
+}
+
 ns_ConfigV1_v0::dataset_config::~dataset_config()
 {
 }
@@ -133,6 +152,29 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Fli::ConfigV1> > make_ConfigV1(int version
   }
 }
 
+void store_ConfigV1(const Psana::Fli::ConfigV1& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_ConfigV1_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Fli.ConfigV1", version);
+  }
+}
+
+void store(const Psana::Fli::ConfigV1& obj, hdf5pp::Group group, int version) 
+{
+  store_ConfigV1(obj, group, version, false);
+}
+
+void append(const Psana::Fli::ConfigV1& obj, hdf5pp::Group group, int version)
+{
+  store_ConfigV1(obj, group, version, true);
+}
+
+
 hdf5pp::Type ns_FrameV1_v0_dataset_frame_stored_type()
 {
   typedef ns_FrameV1_v0::dataset_frame DsType;
@@ -164,9 +206,18 @@ hdf5pp::Type ns_FrameV1_v0::dataset_frame::native_type()
   static hdf5pp::Type type = ns_FrameV1_v0_dataset_frame_native_type();
   return type;
 }
+
 ns_FrameV1_v0::dataset_frame::dataset_frame()
 {
 }
+
+ns_FrameV1_v0::dataset_frame::dataset_frame(const Psana::Fli::FrameV1& psanaobj)
+  : shotIdStart(psanaobj.shotIdStart())
+  , readoutTime(psanaobj.readoutTime())
+  , temperature(psanaobj.temperature())
+{
+}
+
 ns_FrameV1_v0::dataset_frame::~dataset_frame()
 {
 }
@@ -207,5 +258,28 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Fli::FrameV1> > make_FrameV1(int version, 
     return boost::make_shared<PSEvt::DataProxy<Psana::Fli::FrameV1> >(boost::shared_ptr<Psana::Fli::FrameV1>());
   }
 }
+
+void store_FrameV1(const Psana::Fli::FrameV1& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_FrameV1_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Fli.FrameV1", version);
+  }
+}
+
+void store(const Psana::Fli::FrameV1& obj, hdf5pp::Group group, int version) 
+{
+  store_FrameV1(obj, group, version, false);
+}
+
+void append(const Psana::Fli::FrameV1& obj, hdf5pp::Group group, int version)
+{
+  store_FrameV1(obj, group, version, true);
+}
+
 } // namespace Fli
 } // namespace psddl_hdf2psana

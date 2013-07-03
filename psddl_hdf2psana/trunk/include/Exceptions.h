@@ -80,6 +80,14 @@ public:
 
 };
 
+/// Exception thrown when schema version number is not known
+class ExceptionSchemaVersion : public Exception {
+public:
+
+  ExceptionSchemaVersion( const ErrSvc::Context& ctx, const std::string& type, int version ) ;
+
+};
+
 
 } // namespace psddl_hdf2psana
 

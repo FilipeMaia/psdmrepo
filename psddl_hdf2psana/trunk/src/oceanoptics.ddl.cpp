@@ -8,6 +8,7 @@
 #include "hdf5pp/VlenType.h"
 #include "hdf5pp/Utils.h"
 #include "PSEvt/DataProxy.h"
+#include "psddl_hdf2psana/Exceptions.h"
 namespace psddl_hdf2psana {
 namespace OceanOptics {
 
@@ -52,9 +53,25 @@ hdf5pp::Type ns_ConfigV1_v0::dataset_config::native_type()
   static hdf5pp::Type type = ns_ConfigV1_v0_dataset_config_native_type();
   return type;
 }
+
 ns_ConfigV1_v0::dataset_config::dataset_config()
 {
 }
+
+ns_ConfigV1_v0::dataset_config::dataset_config(const Psana::OceanOptics::ConfigV1& psanaobj)
+  : exposureTime(psanaobj.exposureTime())
+  , strayLightConstant(psanaobj.strayLightConstant())
+{
+  {
+    const __typeof__(psanaobj.waveLenCalib())& arr = psanaobj.waveLenCalib();
+    std::copy(arr.begin(), arr.begin()+4, waveLenCalib);
+  }
+  {
+    const __typeof__(psanaobj.nonlinCorrect())& arr = psanaobj.nonlinCorrect();
+    std::copy(arr.begin(), arr.begin()+8, nonlinCorrect);
+  }
+}
+
 ns_ConfigV1_v0::dataset_config::~dataset_config()
 {
 }
@@ -88,6 +105,29 @@ boost::shared_ptr<PSEvt::Proxy<Psana::OceanOptics::ConfigV1> > make_ConfigV1(int
   }
 }
 
+void store_ConfigV1(const Psana::OceanOptics::ConfigV1& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_ConfigV1_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "OceanOptics.ConfigV1", version);
+  }
+}
+
+void store(const Psana::OceanOptics::ConfigV1& obj, hdf5pp::Group group, int version) 
+{
+  store_ConfigV1(obj, group, version, false);
+}
+
+void append(const Psana::OceanOptics::ConfigV1& obj, hdf5pp::Group group, int version)
+{
+  store_ConfigV1(obj, group, version, true);
+}
+
+
 hdf5pp::Type ns_timespec64_v0_dataset_data_stored_type()
 {
   typedef ns_timespec64_v0::dataset_data DsType;
@@ -117,9 +157,17 @@ hdf5pp::Type ns_timespec64_v0::dataset_data::native_type()
   static hdf5pp::Type type = ns_timespec64_v0_dataset_data_native_type();
   return type;
 }
+
 ns_timespec64_v0::dataset_data::dataset_data()
 {
 }
+
+ns_timespec64_v0::dataset_data::dataset_data(const Psana::OceanOptics::timespec64& psanaobj)
+  : seconds(psanaobj.tv_sec())
+  , nanoseconds(psanaobj.tv_nsec())
+{
+}
+
 ns_timespec64_v0::dataset_data::~dataset_data()
 {
 }
@@ -169,9 +217,25 @@ hdf5pp::Type ns_DataV1_v0::dataset_data::native_type()
   static hdf5pp::Type type = ns_DataV1_v0_dataset_data_native_type();
   return type;
 }
+
 ns_DataV1_v0::dataset_data::dataset_data()
 {
 }
+
+ns_DataV1_v0::dataset_data::dataset_data(const Psana::OceanOptics::DataV1& psanaobj)
+  : frameCounter(psanaobj.frameCounter())
+  , numDelayedFrames(psanaobj.numDelayedFrames())
+  , numDiscardFrames(psanaobj.numDiscardFrames())
+  , timeFrameStart(psanaobj.timeFrameStart())
+  , timeFrameFirstData(psanaobj.timeFrameFirstData())
+  , timeFrameEnd(psanaobj.timeFrameEnd())
+  , numSpectraInData(psanaobj.numSpectraInData())
+  , numSpectraInQueue(psanaobj.numSpectraInQueue())
+  , numSpectraUnused(psanaobj.numSpectraUnused())
+  , durationOfFrame(psanaobj.durationOfFrame())
+{
+}
+
 ns_DataV1_v0::dataset_data::~dataset_data()
 {
 }
@@ -255,5 +319,28 @@ boost::shared_ptr<PSEvt::Proxy<Psana::OceanOptics::DataV1> > make_DataV1(int ver
     return boost::make_shared<PSEvt::DataProxy<Psana::OceanOptics::DataV1> >(boost::shared_ptr<Psana::OceanOptics::DataV1>());
   }
 }
+
+void store_DataV1(const Psana::OceanOptics::DataV1& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_DataV1_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "OceanOptics.DataV1", version);
+  }
+}
+
+void store(const Psana::OceanOptics::DataV1& obj, hdf5pp::Group group, int version) 
+{
+  store_DataV1(obj, group, version, false);
+}
+
+void append(const Psana::OceanOptics::DataV1& obj, hdf5pp::Group group, int version)
+{
+  store_DataV1(obj, group, version, true);
+}
+
 } // namespace OceanOptics
 } // namespace psddl_hdf2psana

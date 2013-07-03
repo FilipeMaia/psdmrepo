@@ -16,12 +16,14 @@ struct dataset_config {
   static hdf5pp::Type stored_type();
 
   dataset_config();
+  dataset_config(const Psana::OceanOptics::ConfigV1& psanaobj);
   ~dataset_config();
 
-  float exposureTime; 
-  double waveLenCalib[4]; 
-  double nonlinCorrect[8]; 
-  double strayLightConstant; 
+  float exposureTime;
+  double waveLenCalib[4];
+  double nonlinCorrect[8];
+  double strayLightConstant;
+
 
 };
 }
@@ -48,18 +50,24 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::OceanOptics::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::OceanOptics::ConfigV1& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::OceanOptics::ConfigV1& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_timespec64_v0 {
 struct dataset_data {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_data();
+  dataset_data(const Psana::OceanOptics::timespec64& psanaobj);
   ~dataset_data();
 
-  uint32_t seconds; 
-  uint32_t nanoseconds; 
+  uint32_t seconds;
+  uint32_t nanoseconds;
 
   operator Psana::OceanOptics::timespec64() const { return Psana::OceanOptics::timespec64(seconds, nanoseconds); }
+
 };
 }
 
@@ -69,18 +77,20 @@ struct dataset_data {
   static hdf5pp::Type stored_type();
 
   dataset_data();
+  dataset_data(const Psana::OceanOptics::DataV1& psanaobj);
   ~dataset_data();
 
-  uint64_t frameCounter; 
-  uint64_t numDelayedFrames; 
-  uint64_t numDiscardFrames; 
-  OceanOptics::ns_timespec64_v0::dataset_data timeFrameStart; 
-  OceanOptics::ns_timespec64_v0::dataset_data timeFrameFirstData; 
-  OceanOptics::ns_timespec64_v0::dataset_data timeFrameEnd; 
-  int8_t numSpectraInData; 
-  int8_t numSpectraInQueue; 
-  int8_t numSpectraUnused; 
-  double durationOfFrame; 
+  uint64_t frameCounter;
+  uint64_t numDelayedFrames;
+  uint64_t numDiscardFrames;
+  OceanOptics::ns_timespec64_v0::dataset_data timeFrameStart;
+  OceanOptics::ns_timespec64_v0::dataset_data timeFrameFirstData;
+  OceanOptics::ns_timespec64_v0::dataset_data timeFrameEnd;
+  int8_t numSpectraInData;
+  int8_t numSpectraInQueue;
+  int8_t numSpectraUnused;
+  double durationOfFrame;
+
 
 };
 }
@@ -121,6 +131,10 @@ private:
 };
 
 boost::shared_ptr<PSEvt::Proxy<Psana::OceanOptics::DataV1> > make_DataV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::OceanOptics::ConfigV1>& cfg);
+
+void store(const Psana::OceanOptics::DataV1& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::OceanOptics::DataV1& obj, hdf5pp::Group group, int version = -1);
+
 } // namespace OceanOptics
 } // namespace psddl_hdf2psana
 #endif // PSDDL_HDF2PSANA_OCEANOPTICS_DDL_H

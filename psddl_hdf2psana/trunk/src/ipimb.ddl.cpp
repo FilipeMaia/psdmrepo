@@ -8,6 +8,7 @@
 #include "hdf5pp/VlenType.h"
 #include "hdf5pp/Utils.h"
 #include "PSEvt/DataProxy.h"
+#include "psddl_hdf2psana/Exceptions.h"
 namespace psddl_hdf2psana {
 namespace Ipimb {
 
@@ -62,9 +63,28 @@ hdf5pp::Type ns_ConfigV1_v0::dataset_config::native_type()
   static hdf5pp::Type type = ns_ConfigV1_v0_dataset_config_native_type();
   return type;
 }
+
 ns_ConfigV1_v0::dataset_config::dataset_config()
 {
 }
+
+ns_ConfigV1_v0::dataset_config::dataset_config(const Psana::Ipimb::ConfigV1& psanaobj)
+  : triggerCounter(psanaobj.triggerCounter())
+  , serialID(psanaobj.serialID())
+  , chargeAmpRange(psanaobj.chargeAmpRange())
+  , calibrationRange(psanaobj.calibrationRange())
+  , resetLength(psanaobj.resetLength())
+  , resetDelay(psanaobj.resetDelay())
+  , chargeAmpRefVoltage(psanaobj.chargeAmpRefVoltage())
+  , calibrationVoltage(psanaobj.calibrationVoltage())
+  , diodeBias(psanaobj.diodeBias())
+  , status(psanaobj.status())
+  , errors(psanaobj.errors())
+  , calStrobeLength(psanaobj.calStrobeLength())
+  , trigDelay(psanaobj.trigDelay())
+{
+}
+
 ns_ConfigV1_v0::dataset_config::~dataset_config()
 {
 }
@@ -133,6 +153,29 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Ipimb::ConfigV1> > make_ConfigV1(int versi
   }
 }
 
+void store_ConfigV1(const Psana::Ipimb::ConfigV1& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_ConfigV1_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Ipimb.ConfigV1", version);
+  }
+}
+
+void store(const Psana::Ipimb::ConfigV1& obj, hdf5pp::Group group, int version) 
+{
+  store_ConfigV1(obj, group, version, false);
+}
+
+void append(const Psana::Ipimb::ConfigV1& obj, hdf5pp::Group group, int version)
+{
+  store_ConfigV1(obj, group, version, true);
+}
+
+
 hdf5pp::Type ns_ConfigV2_v0_dataset_config_stored_type()
 {
   typedef ns_ConfigV2_v0::dataset_config DsType;
@@ -188,9 +231,30 @@ hdf5pp::Type ns_ConfigV2_v0::dataset_config::native_type()
   static hdf5pp::Type type = ns_ConfigV2_v0_dataset_config_native_type();
   return type;
 }
+
 ns_ConfigV2_v0::dataset_config::dataset_config()
 {
 }
+
+ns_ConfigV2_v0::dataset_config::dataset_config(const Psana::Ipimb::ConfigV2& psanaobj)
+  : triggerCounter(psanaobj.triggerCounter())
+  , serialID(psanaobj.serialID())
+  , chargeAmpRange(psanaobj.chargeAmpRange())
+  , calibrationRange(psanaobj.calibrationRange())
+  , resetLength(psanaobj.resetLength())
+  , resetDelay(psanaobj.resetDelay())
+  , chargeAmpRefVoltage(psanaobj.chargeAmpRefVoltage())
+  , calibrationVoltage(psanaobj.calibrationVoltage())
+  , diodeBias(psanaobj.diodeBias())
+  , status(psanaobj.status())
+  , errors(psanaobj.errors())
+  , calStrobeLength(psanaobj.calStrobeLength())
+  , trigDelay(psanaobj.trigDelay())
+  , trigPsDelay(psanaobj.trigPsDelay())
+  , adcDelay(psanaobj.adcDelay())
+{
+}
+
 ns_ConfigV2_v0::dataset_config::~dataset_config()
 {
 }
@@ -267,6 +331,29 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Ipimb::ConfigV2> > make_ConfigV2(int versi
   }
 }
 
+void store_ConfigV2(const Psana::Ipimb::ConfigV2& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_ConfigV2_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Ipimb.ConfigV2", version);
+  }
+}
+
+void store(const Psana::Ipimb::ConfigV2& obj, hdf5pp::Group group, int version) 
+{
+  store_ConfigV2(obj, group, version, false);
+}
+
+void append(const Psana::Ipimb::ConfigV2& obj, hdf5pp::Group group, int version)
+{
+  store_ConfigV2(obj, group, version, true);
+}
+
+
 hdf5pp::Type ns_DataV1_v0_dataset_data_stored_type()
 {
   typedef ns_DataV1_v0::dataset_data DsType;
@@ -318,9 +405,28 @@ hdf5pp::Type ns_DataV1_v0::dataset_data::native_type()
   static hdf5pp::Type type = ns_DataV1_v0_dataset_data_native_type();
   return type;
 }
+
 ns_DataV1_v0::dataset_data::dataset_data()
 {
 }
+
+ns_DataV1_v0::dataset_data::dataset_data(const Psana::Ipimb::DataV1& psanaobj)
+  : triggerCounter(psanaobj.triggerCounter())
+  , config0(psanaobj.config0())
+  , config1(psanaobj.config1())
+  , config2(psanaobj.config2())
+  , channel0(psanaobj.channel0())
+  , channel1(psanaobj.channel1())
+  , channel2(psanaobj.channel2())
+  , channel3(psanaobj.channel3())
+  , checksum(psanaobj.checksum())
+  , channel0Volts(psanaobj.channel0Volts())
+  , channel1Volts(psanaobj.channel1Volts())
+  , channel2Volts(psanaobj.channel2Volts())
+  , channel3Volts(psanaobj.channel3Volts())
+{
+}
+
 ns_DataV1_v0::dataset_data::~dataset_data()
 {
 }
@@ -387,6 +493,29 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Ipimb::DataV1> > make_DataV1(int version, 
     return boost::make_shared<PSEvt::DataProxy<Psana::Ipimb::DataV1> >(boost::shared_ptr<Psana::Ipimb::DataV1>());
   }
 }
+
+void store_DataV1(const Psana::Ipimb::DataV1& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_DataV1_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Ipimb.DataV1", version);
+  }
+}
+
+void store(const Psana::Ipimb::DataV1& obj, hdf5pp::Group group, int version) 
+{
+  store_DataV1(obj, group, version, false);
+}
+
+void append(const Psana::Ipimb::DataV1& obj, hdf5pp::Group group, int version)
+{
+  store_DataV1(obj, group, version, true);
+}
+
 
 hdf5pp::Type ns_DataV2_v0_dataset_data_stored_type()
 {
@@ -455,9 +584,36 @@ hdf5pp::Type ns_DataV2_v0::dataset_data::native_type()
   static hdf5pp::Type type = ns_DataV2_v0_dataset_data_native_type();
   return type;
 }
+
 ns_DataV2_v0::dataset_data::dataset_data()
 {
 }
+
+ns_DataV2_v0::dataset_data::dataset_data(const Psana::Ipimb::DataV2& psanaobj)
+  : config0(psanaobj.config0())
+  , config1(psanaobj.config1())
+  , config2(psanaobj.config2())
+  , channel0(psanaobj.channel0())
+  , channel1(psanaobj.channel1())
+  , channel2(psanaobj.channel2())
+  , channel3(psanaobj.channel3())
+  , channel0ps(psanaobj.channel0ps())
+  , channel1ps(psanaobj.channel1ps())
+  , channel2ps(psanaobj.channel2ps())
+  , channel3ps(psanaobj.channel3ps())
+  , checksum(psanaobj.checksum())
+  , channel0Volts(psanaobj.channel0Volts())
+  , channel1Volts(psanaobj.channel1Volts())
+  , channel2Volts(psanaobj.channel2Volts())
+  , channel3Volts(psanaobj.channel3Volts())
+  , channel0psVolts(psanaobj.channel0psVolts())
+  , channel1psVolts(psanaobj.channel1psVolts())
+  , channel2psVolts(psanaobj.channel2psVolts())
+  , channel3psVolts(psanaobj.channel3psVolts())
+  , triggerCounter(psanaobj.triggerCounter())
+{
+}
+
 ns_DataV2_v0::dataset_data::~dataset_data()
 {
 }
@@ -556,5 +712,28 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Ipimb::DataV2> > make_DataV2(int version, 
     return boost::make_shared<PSEvt::DataProxy<Psana::Ipimb::DataV2> >(boost::shared_ptr<Psana::Ipimb::DataV2>());
   }
 }
+
+void store_DataV2(const Psana::Ipimb::DataV2& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_DataV2_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Ipimb.DataV2", version);
+  }
+}
+
+void store(const Psana::Ipimb::DataV2& obj, hdf5pp::Group group, int version) 
+{
+  store_DataV2(obj, group, version, false);
+}
+
+void append(const Psana::Ipimb::DataV2& obj, hdf5pp::Group group, int version)
+{
+  store_DataV2(obj, group, version, true);
+}
+
 } // namespace Ipimb
 } // namespace psddl_hdf2psana

@@ -8,6 +8,7 @@
 #include "hdf5pp/VlenType.h"
 #include "hdf5pp/Utils.h"
 #include "PSEvt/DataProxy.h"
+#include "psddl_hdf2psana/Exceptions.h"
 #include "psddl_hdf2psana/camera.h"
 namespace psddl_hdf2psana {
 namespace Camera {
@@ -41,9 +42,17 @@ hdf5pp::Type ns_FrameCoord_v0::dataset_data::native_type()
   static hdf5pp::Type type = ns_FrameCoord_v0_dataset_data_native_type();
   return type;
 }
+
 ns_FrameCoord_v0::dataset_data::dataset_data()
 {
 }
+
+ns_FrameCoord_v0::dataset_data::dataset_data(const Psana::Camera::FrameCoord& psanaobj)
+  : column(psanaobj.column())
+  , row(psanaobj.row())
+{
+}
+
 ns_FrameCoord_v0::dataset_data::~dataset_data()
 {
 }
@@ -65,6 +74,29 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Camera::FrameCoord> > make_FrameCoord(int 
     return boost::make_shared<PSEvt::DataProxy<Psana::Camera::FrameCoord> >(boost::shared_ptr<Psana::Camera::FrameCoord>());
   }
 }
+
+void store_FrameCoord(const Psana::Camera::FrameCoord& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_FrameCoord_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Camera.FrameCoord", version);
+  }
+}
+
+void store(const Psana::Camera::FrameCoord& obj, hdf5pp::Group group, int version) 
+{
+  store_FrameCoord(obj, group, version, false);
+}
+
+void append(const Psana::Camera::FrameCoord& obj, hdf5pp::Group group, int version)
+{
+  store_FrameCoord(obj, group, version, true);
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Camera::FrameFccdConfigV1> > make_FrameFccdConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -73,6 +105,29 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Camera::FrameFccdConfigV1> > make_FrameFcc
     return boost::make_shared<PSEvt::DataProxy<Psana::Camera::FrameFccdConfigV1> >(boost::shared_ptr<Psana::Camera::FrameFccdConfigV1>());
   }
 }
+
+void store_FrameFccdConfigV1(const Psana::Camera::FrameFccdConfigV1& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_FrameFccdConfigV1_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Camera.FrameFccdConfigV1", version);
+  }
+}
+
+void store(const Psana::Camera::FrameFccdConfigV1& obj, hdf5pp::Group group, int version) 
+{
+  store_FrameFccdConfigV1(obj, group, version, false);
+}
+
+void append(const Psana::Camera::FrameFccdConfigV1& obj, hdf5pp::Group group, int version)
+{
+  store_FrameFccdConfigV1(obj, group, version, true);
+}
+
 
 hdf5pp::Type ns_FrameFexConfigV1_v0_dataset_config_stored_type()
 {
@@ -131,9 +186,22 @@ hdf5pp::Type ns_FrameFexConfigV1_v0::dataset_config::native_type()
   static hdf5pp::Type type = ns_FrameFexConfigV1_v0_dataset_config_native_type();
   return type;
 }
+
 ns_FrameFexConfigV1_v0::dataset_config::dataset_config()
 {
 }
+
+ns_FrameFexConfigV1_v0::dataset_config::dataset_config(const Psana::Camera::FrameFexConfigV1& psanaobj)
+  : forwarding(psanaobj.forwarding())
+  , forward_prescale(psanaobj.forward_prescale())
+  , processing(psanaobj.processing())
+  , roiBegin(psanaobj.roiBegin())
+  , roiEnd(psanaobj.roiEnd())
+  , threshold(psanaobj.threshold())
+  , number_of_masked_pixels(psanaobj.number_of_masked_pixels())
+{
+}
+
 ns_FrameFexConfigV1_v0::dataset_config::~dataset_config()
 {
 }
@@ -188,6 +256,29 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Camera::FrameFexConfigV1> > make_FrameFexC
     return boost::make_shared<PSEvt::DataProxy<Psana::Camera::FrameFexConfigV1> >(boost::shared_ptr<Psana::Camera::FrameFexConfigV1>());
   }
 }
+
+void store_FrameFexConfigV1(const Psana::Camera::FrameFexConfigV1& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_FrameFexConfigV1_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Camera.FrameFexConfigV1", version);
+  }
+}
+
+void store(const Psana::Camera::FrameFexConfigV1& obj, hdf5pp::Group group, int version) 
+{
+  store_FrameFexConfigV1(obj, group, version, false);
+}
+
+void append(const Psana::Camera::FrameFexConfigV1& obj, hdf5pp::Group group, int version)
+{
+  store_FrameFexConfigV1(obj, group, version, true);
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Camera::FrameV1> > make_FrameV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -196,6 +287,29 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Camera::FrameV1> > make_FrameV1(int versio
     return boost::make_shared<PSEvt::DataProxy<Psana::Camera::FrameV1> >(boost::shared_ptr<Psana::Camera::FrameV1>());
   }
 }
+
+void store_FrameV1(const Psana::Camera::FrameV1& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_FrameV1_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Camera.FrameV1", version);
+  }
+}
+
+void store(const Psana::Camera::FrameV1& obj, hdf5pp::Group group, int version) 
+{
+  store_FrameV1(obj, group, version, false);
+}
+
+void append(const Psana::Camera::FrameV1& obj, hdf5pp::Group group, int version)
+{
+  store_FrameV1(obj, group, version, true);
+}
+
 
 hdf5pp::Type ns_TwoDGaussianV1_v0_dataset_data_stored_type()
 {
@@ -234,9 +348,21 @@ hdf5pp::Type ns_TwoDGaussianV1_v0::dataset_data::native_type()
   static hdf5pp::Type type = ns_TwoDGaussianV1_v0_dataset_data_native_type();
   return type;
 }
+
 ns_TwoDGaussianV1_v0::dataset_data::dataset_data()
 {
 }
+
+ns_TwoDGaussianV1_v0::dataset_data::dataset_data(const Psana::Camera::TwoDGaussianV1& psanaobj)
+  : integral(psanaobj.integral())
+  , xmean(psanaobj.xmean())
+  , ymean(psanaobj.ymean())
+  , major_axis_width(psanaobj.major_axis_width())
+  , minor_axis_width(psanaobj.minor_axis_width())
+  , major_axis_tilt(psanaobj.major_axis_tilt())
+{
+}
+
 ns_TwoDGaussianV1_v0::dataset_data::~dataset_data()
 {
 }
@@ -275,5 +401,28 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Camera::TwoDGaussianV1> > make_TwoDGaussia
     return boost::make_shared<PSEvt::DataProxy<Psana::Camera::TwoDGaussianV1> >(boost::shared_ptr<Psana::Camera::TwoDGaussianV1>());
   }
 }
+
+void store_TwoDGaussianV1(const Psana::Camera::TwoDGaussianV1& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_TwoDGaussianV1_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Camera.TwoDGaussianV1", version);
+  }
+}
+
+void store(const Psana::Camera::TwoDGaussianV1& obj, hdf5pp::Group group, int version) 
+{
+  store_TwoDGaussianV1(obj, group, version, false);
+}
+
+void append(const Psana::Camera::TwoDGaussianV1& obj, hdf5pp::Group group, int version)
+{
+  store_TwoDGaussianV1(obj, group, version, true);
+}
+
 } // namespace Camera
 } // namespace psddl_hdf2psana

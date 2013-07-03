@@ -16,19 +16,21 @@ struct dataset_config {
   static hdf5pp::Type stored_type();
 
   dataset_config();
+  dataset_config(const Psana::Princeton::ConfigV1& psanaobj);
   ~dataset_config();
 
-  uint32_t width; 
-  uint32_t height; 
-  uint32_t orgX; 
-  uint32_t orgY; 
-  uint32_t binX; 
-  uint32_t binY; 
-  float exposureTime; 
-  float coolingTemp; 
-  uint32_t readoutSpeedIndex; 
-  uint16_t readoutEventCode; 
-  uint16_t delayMode; 
+  uint32_t width;
+  uint32_t height;
+  uint32_t orgX;
+  uint32_t orgY;
+  uint32_t binX;
+  uint32_t binY;
+  float exposureTime;
+  float coolingTemp;
+  uint32_t readoutSpeedIndex;
+  uint16_t readoutEventCode;
+  uint16_t delayMode;
+
 
 };
 }
@@ -72,26 +74,32 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::Princeton::ConfigV1& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::Princeton::ConfigV1& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_ConfigV2_v0 {
 struct dataset_config {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_config();
+  dataset_config(const Psana::Princeton::ConfigV2& psanaobj);
   ~dataset_config();
 
-  uint32_t width; 
-  uint32_t height; 
-  uint32_t orgX; 
-  uint32_t orgY; 
-  uint32_t binX; 
-  uint32_t binY; 
-  float exposureTime; 
-  float coolingTemp; 
-  uint16_t gainIndex; 
-  uint16_t readoutSpeedIndex; 
-  uint16_t readoutEventCode; 
-  uint16_t delayMode; 
+  uint32_t width;
+  uint32_t height;
+  uint32_t orgX;
+  uint32_t orgY;
+  uint32_t binX;
+  uint32_t binY;
+  float exposureTime;
+  float coolingTemp;
+  uint16_t gainIndex;
+  uint16_t readoutSpeedIndex;
+  uint16_t readoutEventCode;
+  uint16_t delayMode;
+
 
 };
 }
@@ -136,26 +144,32 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::ConfigV2> > make_ConfigV2(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::Princeton::ConfigV2& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::Princeton::ConfigV2& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_ConfigV3_v0 {
 struct dataset_config {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_config();
+  dataset_config(const Psana::Princeton::ConfigV3& psanaobj);
   ~dataset_config();
 
-  uint32_t width; 
-  uint32_t height; 
-  uint32_t orgX; 
-  uint32_t orgY; 
-  uint32_t binX; 
-  uint32_t binY; 
-  float exposureTime; 
-  float coolingTemp; 
-  uint8_t gainIndex; 
-  uint8_t readoutSpeedIndex; 
-  uint16_t exposureEventCode; 
-  uint32_t numDelayShots; 
+  uint32_t width;
+  uint32_t height;
+  uint32_t orgX;
+  uint32_t orgY;
+  uint32_t binX;
+  uint32_t binY;
+  float exposureTime;
+  float coolingTemp;
+  uint8_t gainIndex;
+  uint8_t readoutSpeedIndex;
+  uint16_t exposureEventCode;
+  uint32_t numDelayShots;
+
 
 };
 }
@@ -200,29 +214,35 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::ConfigV3> > make_ConfigV3(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::Princeton::ConfigV3& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::Princeton::ConfigV3& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_ConfigV4_v0 {
 struct dataset_config {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_config();
+  dataset_config(const Psana::Princeton::ConfigV4& psanaobj);
   ~dataset_config();
 
-  uint32_t width; 
-  uint32_t height; 
-  uint32_t orgX; 
-  uint32_t orgY; 
-  uint32_t binX; 
-  uint32_t binY; 
-  uint32_t maskedHeight; 
-  uint32_t kineticHeight; 
-  float vsSpeed; 
-  float exposureTime; 
-  float coolingTemp; 
-  uint8_t gainIndex; 
-  uint8_t readoutSpeedIndex; 
-  uint16_t exposureEventCode; 
-  uint32_t numDelayShots; 
+  uint32_t width;
+  uint32_t height;
+  uint32_t orgX;
+  uint32_t orgY;
+  uint32_t binX;
+  uint32_t binY;
+  uint32_t maskedHeight;
+  uint32_t kineticHeight;
+  float vsSpeed;
+  float exposureTime;
+  float coolingTemp;
+  uint8_t gainIndex;
+  uint8_t readoutSpeedIndex;
+  uint16_t exposureEventCode;
+  uint32_t numDelayShots;
+
 
 };
 }
@@ -270,30 +290,36 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::ConfigV4> > make_ConfigV4(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::Princeton::ConfigV4& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::Princeton::ConfigV4& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_ConfigV5_v0 {
 struct dataset_config {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_config();
+  dataset_config(const Psana::Princeton::ConfigV5& psanaobj);
   ~dataset_config();
 
-  uint32_t width; 
-  uint32_t height; 
-  uint32_t orgX; 
-  uint32_t orgY; 
-  uint32_t binX; 
-  uint32_t binY; 
-  float exposureTime; 
-  float coolingTemp; 
-  uint16_t gainIndex; 
-  uint16_t readoutSpeedIndex; 
-  uint32_t maskedHeight; 
-  uint32_t kineticHeight; 
-  float vsSpeed; 
-  int16_t infoReportInterval; 
-  uint16_t exposureEventCode; 
-  uint32_t numDelayShots; 
+  uint32_t width;
+  uint32_t height;
+  uint32_t orgX;
+  uint32_t orgY;
+  uint32_t binX;
+  uint32_t binY;
+  float exposureTime;
+  float coolingTemp;
+  uint16_t gainIndex;
+  uint16_t readoutSpeedIndex;
+  uint32_t maskedHeight;
+  uint32_t kineticHeight;
+  float vsSpeed;
+  int16_t infoReportInterval;
+  uint16_t exposureEventCode;
+  uint32_t numDelayShots;
+
 
 };
 }
@@ -342,16 +368,22 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::ConfigV5> > make_ConfigV5(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::Princeton::ConfigV5& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::Princeton::ConfigV5& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_FrameV1_v0 {
 struct dataset_frame {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_frame();
+  dataset_frame(const Psana::Princeton::FrameV1& psanaobj);
   ~dataset_frame();
 
-  uint32_t shotIdStart; 
-  float readoutTime; 
+  uint32_t shotIdStart;
+  float readoutTime;
+
 
 };
 }
@@ -384,17 +416,23 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::FrameV1> > make_FrameV1(int ver
 boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::FrameV1> > make_FrameV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::Princeton::ConfigV4>& cfg);
 boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::FrameV1> > make_FrameV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::Princeton::ConfigV5>& cfg);
 
+void store(const Psana::Princeton::FrameV1& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::Princeton::FrameV1& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_FrameV2_v0 {
 struct dataset_frame {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_frame();
+  dataset_frame(const Psana::Princeton::FrameV2& psanaobj);
   ~dataset_frame();
 
-  uint32_t shotIdStart; 
-  float readoutTime; 
-  float temperature; 
+  uint32_t shotIdStart;
+  float readoutTime;
+  float temperature;
+
 
 };
 }
@@ -428,17 +466,23 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::FrameV2> > make_FrameV2(int ver
 boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::FrameV2> > make_FrameV2(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::Princeton::ConfigV4>& cfg);
 boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::FrameV2> > make_FrameV2(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::Princeton::ConfigV5>& cfg);
 
+void store(const Psana::Princeton::FrameV2& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::Princeton::FrameV2& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_InfoV1_v0 {
 struct dataset_data {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_data();
+  dataset_data(const Psana::Princeton::InfoV1& psanaobj);
   ~dataset_data();
 
-  float temperature; 
+  float temperature;
 
   operator Psana::Princeton::InfoV1() const { return Psana::Princeton::InfoV1(temperature); }
+
 };
 }
 class Proxy_InfoV1_v0 : public PSEvt::Proxy<Psana::Princeton::InfoV1> {
@@ -459,6 +503,10 @@ private:
   boost::shared_ptr<PsanaType> m_data;
 };
 boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::InfoV1> > make_InfoV1(int version, hdf5pp::Group group, hsize_t idx);
+
+void store(const Psana::Princeton::InfoV1& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::Princeton::InfoV1& obj, hdf5pp::Group group, int version = -1);
+
 } // namespace Princeton
 } // namespace psddl_hdf2psana
 #endif // PSDDL_HDF2PSANA_PRINCETON_DDL_H

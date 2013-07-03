@@ -16,21 +16,23 @@ struct dataset_config {
   static hdf5pp::Type stored_type();
 
   dataset_config();
+  dataset_config(const Psana::Ipimb::ConfigV1& psanaobj);
   ~dataset_config();
 
-  uint64_t triggerCounter; 
-  uint64_t serialID; 
-  uint16_t chargeAmpRange; 
-  uint16_t calibrationRange; 
-  uint32_t resetLength; 
-  uint32_t resetDelay; 
-  float chargeAmpRefVoltage; 
-  float calibrationVoltage; 
-  float diodeBias; 
-  uint16_t status; 
-  uint16_t errors; 
-  uint16_t calStrobeLength; 
-  uint32_t trigDelay; 
+  uint64_t triggerCounter;
+  uint64_t serialID;
+  uint16_t chargeAmpRange;
+  uint16_t calibrationRange;
+  uint32_t resetLength;
+  uint32_t resetDelay;
+  float chargeAmpRefVoltage;
+  float calibrationVoltage;
+  float diodeBias;
+  uint16_t status;
+  uint16_t errors;
+  uint16_t calStrobeLength;
+  uint32_t trigDelay;
+
 
 };
 }
@@ -68,29 +70,35 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Ipimb::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::Ipimb::ConfigV1& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::Ipimb::ConfigV1& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_ConfigV2_v0 {
 struct dataset_config {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_config();
+  dataset_config(const Psana::Ipimb::ConfigV2& psanaobj);
   ~dataset_config();
 
-  uint64_t triggerCounter; 
-  uint64_t serialID; 
-  uint16_t chargeAmpRange; 
-  uint16_t calibrationRange; 
-  uint32_t resetLength; 
-  uint32_t resetDelay; 
-  float chargeAmpRefVoltage; 
-  float calibrationVoltage; 
-  float diodeBias; 
-  uint16_t status; 
-  uint16_t errors; 
-  uint16_t calStrobeLength; 
-  uint32_t trigDelay; 
-  uint32_t trigPsDelay; 
-  uint32_t adcDelay; 
+  uint64_t triggerCounter;
+  uint64_t serialID;
+  uint16_t chargeAmpRange;
+  uint16_t calibrationRange;
+  uint32_t resetLength;
+  uint32_t resetDelay;
+  float chargeAmpRefVoltage;
+  float calibrationVoltage;
+  float diodeBias;
+  uint16_t status;
+  uint16_t errors;
+  uint16_t calStrobeLength;
+  uint32_t trigDelay;
+  uint32_t trigPsDelay;
+  uint32_t adcDelay;
+
 
 };
 }
@@ -130,27 +138,33 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Ipimb::ConfigV2> > make_ConfigV2(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::Ipimb::ConfigV2& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::Ipimb::ConfigV2& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_DataV1_v0 {
 struct dataset_data {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_data();
+  dataset_data(const Psana::Ipimb::DataV1& psanaobj);
   ~dataset_data();
 
-  uint64_t triggerCounter; 
-  uint16_t config0; 
-  uint16_t config1; 
-  uint16_t config2; 
-  uint16_t channel0; 
-  uint16_t channel1; 
-  uint16_t channel2; 
-  uint16_t channel3; 
-  uint16_t checksum; 
-  float channel0Volts; 
-  float channel1Volts; 
-  float channel2Volts; 
-  float channel3Volts; 
+  uint64_t triggerCounter;
+  uint16_t config0;
+  uint16_t config1;
+  uint16_t config2;
+  uint16_t channel0;
+  uint16_t channel1;
+  uint16_t channel2;
+  uint16_t channel3;
+  uint16_t checksum;
+  float channel0Volts;
+  float channel1Volts;
+  float channel2Volts;
+  float channel3Volts;
+
 
 };
 }
@@ -186,35 +200,41 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Ipimb::DataV1> > make_DataV1(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::Ipimb::DataV1& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::Ipimb::DataV1& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_DataV2_v0 {
 struct dataset_data {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_data();
+  dataset_data(const Psana::Ipimb::DataV2& psanaobj);
   ~dataset_data();
 
-  uint16_t config0; 
-  uint16_t config1; 
-  uint16_t config2; 
-  uint16_t channel0; 
-  uint16_t channel1; 
-  uint16_t channel2; 
-  uint16_t channel3; 
-  uint16_t channel0ps; 
-  uint16_t channel1ps; 
-  uint16_t channel2ps; 
-  uint16_t channel3ps; 
-  uint16_t checksum; 
-  float channel0Volts; 
-  float channel1Volts; 
-  float channel2Volts; 
-  float channel3Volts; 
-  float channel0psVolts; 
-  float channel1psVolts; 
-  float channel2psVolts; 
-  float channel3psVolts; 
-  uint64_t triggerCounter; 
+  uint16_t config0;
+  uint16_t config1;
+  uint16_t config2;
+  uint16_t channel0;
+  uint16_t channel1;
+  uint16_t channel2;
+  uint16_t channel3;
+  uint16_t channel0ps;
+  uint16_t channel1ps;
+  uint16_t channel2ps;
+  uint16_t channel3ps;
+  uint16_t checksum;
+  float channel0Volts;
+  float channel1Volts;
+  float channel2Volts;
+  float channel3Volts;
+  float channel0psVolts;
+  float channel1psVolts;
+  float channel2psVolts;
+  float channel3psVolts;
+  uint64_t triggerCounter;
+
 
 };
 }
@@ -257,6 +277,10 @@ private:
 };
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Ipimb::DataV2> > make_DataV2(int version, hdf5pp::Group group, hsize_t idx);
+
+void store(const Psana::Ipimb::DataV2& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::Ipimb::DataV2& obj, hdf5pp::Group group, int version = -1);
+
 } // namespace Ipimb
 } // namespace psddl_hdf2psana
 #endif // PSDDL_HDF2PSANA_IPIMB_DDL_H

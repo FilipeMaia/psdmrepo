@@ -16,67 +16,69 @@ struct dataset_config {
   static hdf5pp::Type stored_type();
 
   dataset_config();
+  dataset_config(const Psana::Timepix::ConfigV1& psanaobj);
   ~dataset_config();
 
-  uint8_t readoutSpeed; 
-  uint8_t triggerMode; 
-  int32_t shutterTimeout; 
-  int32_t dac0Ikrum; 
-  int32_t dac0Disc; 
-  int32_t dac0Preamp; 
-  int32_t dac0BufAnalogA; 
-  int32_t dac0BufAnalogB; 
-  int32_t dac0Hist; 
-  int32_t dac0ThlFine; 
-  int32_t dac0ThlCourse; 
-  int32_t dac0Vcas; 
-  int32_t dac0Fbk; 
-  int32_t dac0Gnd; 
-  int32_t dac0Ths; 
-  int32_t dac0BiasLvds; 
-  int32_t dac0RefLvds; 
-  int32_t dac1Ikrum; 
-  int32_t dac1Disc; 
-  int32_t dac1Preamp; 
-  int32_t dac1BufAnalogA; 
-  int32_t dac1BufAnalogB; 
-  int32_t dac1Hist; 
-  int32_t dac1ThlFine; 
-  int32_t dac1ThlCourse; 
-  int32_t dac1Vcas; 
-  int32_t dac1Fbk; 
-  int32_t dac1Gnd; 
-  int32_t dac1Ths; 
-  int32_t dac1BiasLvds; 
-  int32_t dac1RefLvds; 
-  int32_t dac2Ikrum; 
-  int32_t dac2Disc; 
-  int32_t dac2Preamp; 
-  int32_t dac2BufAnalogA; 
-  int32_t dac2BufAnalogB; 
-  int32_t dac2Hist; 
-  int32_t dac2ThlFine; 
-  int32_t dac2ThlCourse; 
-  int32_t dac2Vcas; 
-  int32_t dac2Fbk; 
-  int32_t dac2Gnd; 
-  int32_t dac2Ths; 
-  int32_t dac2BiasLvds; 
-  int32_t dac2RefLvds; 
-  int32_t dac3Ikrum; 
-  int32_t dac3Disc; 
-  int32_t dac3Preamp; 
-  int32_t dac3BufAnalogA; 
-  int32_t dac3BufAnalogB; 
-  int32_t dac3Hist; 
-  int32_t dac3ThlFine; 
-  int32_t dac3ThlCourse; 
-  int32_t dac3Vcas; 
-  int32_t dac3Fbk; 
-  int32_t dac3Gnd; 
-  int32_t dac3Ths; 
-  int32_t dac3BiasLvds; 
-  int32_t dac3RefLvds; 
+  uint8_t readoutSpeed;
+  uint8_t triggerMode;
+  int32_t shutterTimeout;
+  int32_t dac0Ikrum;
+  int32_t dac0Disc;
+  int32_t dac0Preamp;
+  int32_t dac0BufAnalogA;
+  int32_t dac0BufAnalogB;
+  int32_t dac0Hist;
+  int32_t dac0ThlFine;
+  int32_t dac0ThlCourse;
+  int32_t dac0Vcas;
+  int32_t dac0Fbk;
+  int32_t dac0Gnd;
+  int32_t dac0Ths;
+  int32_t dac0BiasLvds;
+  int32_t dac0RefLvds;
+  int32_t dac1Ikrum;
+  int32_t dac1Disc;
+  int32_t dac1Preamp;
+  int32_t dac1BufAnalogA;
+  int32_t dac1BufAnalogB;
+  int32_t dac1Hist;
+  int32_t dac1ThlFine;
+  int32_t dac1ThlCourse;
+  int32_t dac1Vcas;
+  int32_t dac1Fbk;
+  int32_t dac1Gnd;
+  int32_t dac1Ths;
+  int32_t dac1BiasLvds;
+  int32_t dac1RefLvds;
+  int32_t dac2Ikrum;
+  int32_t dac2Disc;
+  int32_t dac2Preamp;
+  int32_t dac2BufAnalogA;
+  int32_t dac2BufAnalogB;
+  int32_t dac2Hist;
+  int32_t dac2ThlFine;
+  int32_t dac2ThlCourse;
+  int32_t dac2Vcas;
+  int32_t dac2Fbk;
+  int32_t dac2Gnd;
+  int32_t dac2Ths;
+  int32_t dac2BiasLvds;
+  int32_t dac2RefLvds;
+  int32_t dac3Ikrum;
+  int32_t dac3Disc;
+  int32_t dac3Preamp;
+  int32_t dac3BufAnalogA;
+  int32_t dac3BufAnalogB;
+  int32_t dac3Hist;
+  int32_t dac3ThlFine;
+  int32_t dac3ThlCourse;
+  int32_t dac3Vcas;
+  int32_t dac3Fbk;
+  int32_t dac3Gnd;
+  int32_t dac3Ths;
+  int32_t dac3BiasLvds;
+  int32_t dac3RefLvds;
+
 
 };
 }
@@ -158,86 +160,92 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Timepix::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::Timepix::ConfigV1& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::Timepix::ConfigV1& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_ConfigV2_v0 {
 struct dataset_config {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_config();
+  dataset_config(const Psana::Timepix::ConfigV2& psanaobj);
   ~dataset_config();
 
-  uint8_t readoutSpeed; 
-  uint8_t triggerMode; 
-  int32_t timepixSpeed; 
-  int32_t dac0Ikrum; 
-  int32_t dac0Disc; 
-  int32_t dac0Preamp; 
-  int32_t dac0BufAnalogA; 
-  int32_t dac0BufAnalogB; 
-  int32_t dac0Hist; 
-  int32_t dac0ThlFine; 
-  int32_t dac0ThlCourse; 
-  int32_t dac0Vcas; 
-  int32_t dac0Fbk; 
-  int32_t dac0Gnd; 
-  int32_t dac0Ths; 
-  int32_t dac0BiasLvds; 
-  int32_t dac0RefLvds; 
-  int32_t dac1Ikrum; 
-  int32_t dac1Disc; 
-  int32_t dac1Preamp; 
-  int32_t dac1BufAnalogA; 
-  int32_t dac1BufAnalogB; 
-  int32_t dac1Hist; 
-  int32_t dac1ThlFine; 
-  int32_t dac1ThlCourse; 
-  int32_t dac1Vcas; 
-  int32_t dac1Fbk; 
-  int32_t dac1Gnd; 
-  int32_t dac1Ths; 
-  int32_t dac1BiasLvds; 
-  int32_t dac1RefLvds; 
-  int32_t dac2Ikrum; 
-  int32_t dac2Disc; 
-  int32_t dac2Preamp; 
-  int32_t dac2BufAnalogA; 
-  int32_t dac2BufAnalogB; 
-  int32_t dac2Hist; 
-  int32_t dac2ThlFine; 
-  int32_t dac2ThlCourse; 
-  int32_t dac2Vcas; 
-  int32_t dac2Fbk; 
-  int32_t dac2Gnd; 
-  int32_t dac2Ths; 
-  int32_t dac2BiasLvds; 
-  int32_t dac2RefLvds; 
-  int32_t dac3Ikrum; 
-  int32_t dac3Disc; 
-  int32_t dac3Preamp; 
-  int32_t dac3BufAnalogA; 
-  int32_t dac3BufAnalogB; 
-  int32_t dac3Hist; 
-  int32_t dac3ThlFine; 
-  int32_t dac3ThlCourse; 
-  int32_t dac3Vcas; 
-  int32_t dac3Fbk; 
-  int32_t dac3Gnd; 
-  int32_t dac3Ths; 
-  int32_t dac3BiasLvds; 
-  int32_t dac3RefLvds; 
-  int32_t driverVersion; 
-  uint32_t firmwareVersion; 
-  uint32_t pixelThreshSize; 
-  uint8_t pixelThresh[4*256*256]; 
-  char* chip0Name; 
-  char* chip1Name; 
-  char* chip2Name; 
-  char* chip3Name; 
-  int32_t chip0ID; 
-  int32_t chip1ID; 
-  int32_t chip2ID; 
-  int32_t chip3ID; 
-  int32_t chipCount; 
+  uint8_t readoutSpeed;
+  uint8_t triggerMode;
+  int32_t timepixSpeed;
+  int32_t dac0Ikrum;
+  int32_t dac0Disc;
+  int32_t dac0Preamp;
+  int32_t dac0BufAnalogA;
+  int32_t dac0BufAnalogB;
+  int32_t dac0Hist;
+  int32_t dac0ThlFine;
+  int32_t dac0ThlCourse;
+  int32_t dac0Vcas;
+  int32_t dac0Fbk;
+  int32_t dac0Gnd;
+  int32_t dac0Ths;
+  int32_t dac0BiasLvds;
+  int32_t dac0RefLvds;
+  int32_t dac1Ikrum;
+  int32_t dac1Disc;
+  int32_t dac1Preamp;
+  int32_t dac1BufAnalogA;
+  int32_t dac1BufAnalogB;
+  int32_t dac1Hist;
+  int32_t dac1ThlFine;
+  int32_t dac1ThlCourse;
+  int32_t dac1Vcas;
+  int32_t dac1Fbk;
+  int32_t dac1Gnd;
+  int32_t dac1Ths;
+  int32_t dac1BiasLvds;
+  int32_t dac1RefLvds;
+  int32_t dac2Ikrum;
+  int32_t dac2Disc;
+  int32_t dac2Preamp;
+  int32_t dac2BufAnalogA;
+  int32_t dac2BufAnalogB;
+  int32_t dac2Hist;
+  int32_t dac2ThlFine;
+  int32_t dac2ThlCourse;
+  int32_t dac2Vcas;
+  int32_t dac2Fbk;
+  int32_t dac2Gnd;
+  int32_t dac2Ths;
+  int32_t dac2BiasLvds;
+  int32_t dac2RefLvds;
+  int32_t dac3Ikrum;
+  int32_t dac3Disc;
+  int32_t dac3Preamp;
+  int32_t dac3BufAnalogA;
+  int32_t dac3BufAnalogB;
+  int32_t dac3Hist;
+  int32_t dac3ThlFine;
+  int32_t dac3ThlCourse;
+  int32_t dac3Vcas;
+  int32_t dac3Fbk;
+  int32_t dac3Gnd;
+  int32_t dac3Ths;
+  int32_t dac3BiasLvds;
+  int32_t dac3RefLvds;
+  int32_t driverVersion;
+  uint32_t firmwareVersion;
+  uint32_t pixelThreshSize;
+  uint8_t pixelThresh[4*256*256];
+  char* chip0Name;
+  char* chip1Name;
+  char* chip2Name;
+  char* chip3Name;
+  int32_t chip0ID;
+  int32_t chip1ID;
+  int32_t chip2ID;
+  int32_t chip3ID;
+  int32_t chipCount;
+
 
 };
 }
@@ -332,88 +340,94 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Timepix::ConfigV2> > make_ConfigV2(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::Timepix::ConfigV2& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::Timepix::ConfigV2& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_ConfigV3_v0 {
 struct dataset_config {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_config();
+  dataset_config(const Psana::Timepix::ConfigV3& psanaobj);
   ~dataset_config();
 
-  uint8_t readoutSpeed; 
-  uint8_t timepixMode; 
-  int32_t timepixSpeed; 
-  int32_t dac0Ikrum; 
-  int32_t dac0Disc; 
-  int32_t dac0Preamp; 
-  int32_t dac0BufAnalogA; 
-  int32_t dac0BufAnalogB; 
-  int32_t dac0Hist; 
-  int32_t dac0ThlFine; 
-  int32_t dac0ThlCourse; 
-  int32_t dac0Vcas; 
-  int32_t dac0Fbk; 
-  int32_t dac0Gnd; 
-  int32_t dac0Ths; 
-  int32_t dac0BiasLvds; 
-  int32_t dac0RefLvds; 
-  int32_t dac1Ikrum; 
-  int32_t dac1Disc; 
-  int32_t dac1Preamp; 
-  int32_t dac1BufAnalogA; 
-  int32_t dac1BufAnalogB; 
-  int32_t dac1Hist; 
-  int32_t dac1ThlFine; 
-  int32_t dac1ThlCourse; 
-  int32_t dac1Vcas; 
-  int32_t dac1Fbk; 
-  int32_t dac1Gnd; 
-  int32_t dac1Ths; 
-  int32_t dac1BiasLvds; 
-  int32_t dac1RefLvds; 
-  int32_t dac2Ikrum; 
-  int32_t dac2Disc; 
-  int32_t dac2Preamp; 
-  int32_t dac2BufAnalogA; 
-  int32_t dac2BufAnalogB; 
-  int32_t dac2Hist; 
-  int32_t dac2ThlFine; 
-  int32_t dac2ThlCourse; 
-  int32_t dac2Vcas; 
-  int32_t dac2Fbk; 
-  int32_t dac2Gnd; 
-  int32_t dac2Ths; 
-  int32_t dac2BiasLvds; 
-  int32_t dac2RefLvds; 
-  int32_t dac3Ikrum; 
-  int32_t dac3Disc; 
-  int32_t dac3Preamp; 
-  int32_t dac3BufAnalogA; 
-  int32_t dac3BufAnalogB; 
-  int32_t dac3Hist; 
-  int32_t dac3ThlFine; 
-  int32_t dac3ThlCourse; 
-  int32_t dac3Vcas; 
-  int32_t dac3Fbk; 
-  int32_t dac3Gnd; 
-  int32_t dac3Ths; 
-  int32_t dac3BiasLvds; 
-  int32_t dac3RefLvds; 
-  int8_t dacBias; 
-  int8_t flags; 
-  int32_t driverVersion; 
-  uint32_t firmwareVersion; 
-  uint32_t pixelThreshSize; 
-  uint8_t pixelThresh[4*256*256]; 
-  char* chip0Name; 
-  char* chip1Name; 
-  char* chip2Name; 
-  char* chip3Name; 
-  int32_t chip0ID; 
-  int32_t chip1ID; 
-  int32_t chip2ID; 
-  int32_t chip3ID; 
-  int32_t chipCount; 
+  uint8_t readoutSpeed;
+  uint8_t timepixMode;
+  int32_t timepixSpeed;
+  int32_t dac0Ikrum;
+  int32_t dac0Disc;
+  int32_t dac0Preamp;
+  int32_t dac0BufAnalogA;
+  int32_t dac0BufAnalogB;
+  int32_t dac0Hist;
+  int32_t dac0ThlFine;
+  int32_t dac0ThlCourse;
+  int32_t dac0Vcas;
+  int32_t dac0Fbk;
+  int32_t dac0Gnd;
+  int32_t dac0Ths;
+  int32_t dac0BiasLvds;
+  int32_t dac0RefLvds;
+  int32_t dac1Ikrum;
+  int32_t dac1Disc;
+  int32_t dac1Preamp;
+  int32_t dac1BufAnalogA;
+  int32_t dac1BufAnalogB;
+  int32_t dac1Hist;
+  int32_t dac1ThlFine;
+  int32_t dac1ThlCourse;
+  int32_t dac1Vcas;
+  int32_t dac1Fbk;
+  int32_t dac1Gnd;
+  int32_t dac1Ths;
+  int32_t dac1BiasLvds;
+  int32_t dac1RefLvds;
+  int32_t dac2Ikrum;
+  int32_t dac2Disc;
+  int32_t dac2Preamp;
+  int32_t dac2BufAnalogA;
+  int32_t dac2BufAnalogB;
+  int32_t dac2Hist;
+  int32_t dac2ThlFine;
+  int32_t dac2ThlCourse;
+  int32_t dac2Vcas;
+  int32_t dac2Fbk;
+  int32_t dac2Gnd;
+  int32_t dac2Ths;
+  int32_t dac2BiasLvds;
+  int32_t dac2RefLvds;
+  int32_t dac3Ikrum;
+  int32_t dac3Disc;
+  int32_t dac3Preamp;
+  int32_t dac3BufAnalogA;
+  int32_t dac3BufAnalogB;
+  int32_t dac3Hist;
+  int32_t dac3ThlFine;
+  int32_t dac3ThlCourse;
+  int32_t dac3Vcas;
+  int32_t dac3Fbk;
+  int32_t dac3Gnd;
+  int32_t dac3Ths;
+  int32_t dac3BiasLvds;
+  int32_t dac3RefLvds;
+  int8_t dacBias;
+  int8_t flags;
+  int32_t driverVersion;
+  uint32_t firmwareVersion;
+  uint32_t pixelThreshSize;
+  uint8_t pixelThresh[4*256*256];
+  char* chip0Name;
+  char* chip1Name;
+  char* chip2Name;
+  char* chip3Name;
+  int32_t chip0ID;
+  int32_t chip1ID;
+  int32_t chip2ID;
+  int32_t chip3ID;
+  int32_t chipCount;
+
 
 };
 }
@@ -510,17 +524,23 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Timepix::ConfigV3> > make_ConfigV3(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::Timepix::ConfigV3& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::Timepix::ConfigV3& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_DataV1_v0 {
 struct dataset_data {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_data();
+  dataset_data(const Psana::Timepix::DataV1& psanaobj);
   ~dataset_data();
 
-  uint32_t timestamp; 
-  uint16_t frameCounter; 
-  uint16_t lostRows; 
+  uint32_t timestamp;
+  uint16_t frameCounter;
+  uint16_t lostRows;
+
 
 };
 }
@@ -552,19 +572,25 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Timepix::DataV1> > make_DataV1(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::Timepix::DataV1& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::Timepix::DataV1& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_DataV2_v0 {
 struct dataset_data {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_data();
+  dataset_data(const Psana::Timepix::DataV2& psanaobj);
   ~dataset_data();
 
-  uint16_t width; 
-  uint16_t height; 
-  uint32_t timestamp; 
-  uint16_t frameCounter; 
-  uint16_t lostRows; 
+  uint16_t width;
+  uint16_t height;
+  uint32_t timestamp;
+  uint16_t frameCounter;
+  uint16_t lostRows;
+
 
 };
 }
@@ -595,6 +621,10 @@ private:
 };
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Timepix::DataV2> > make_DataV2(int version, hdf5pp::Group group, hsize_t idx);
+
+void store(const Psana::Timepix::DataV2& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::Timepix::DataV2& obj, hdf5pp::Group group, int version = -1);
+
 } // namespace Timepix
 } // namespace psddl_hdf2psana
 #endif // PSDDL_HDF2PSANA_TIMEPIX_DDL_H

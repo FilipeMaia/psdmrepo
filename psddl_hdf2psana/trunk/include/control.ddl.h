@@ -18,13 +18,15 @@ struct dataset_data {
   static hdf5pp::Type stored_type();
 
   dataset_data();
+  dataset_data(const Psana::ControlData::PVControl& psanaobj);
   ~dataset_data();
 
-  char name[32]; 
-  int32_t index; 
-  double value; 
+  char name[32];
+  int32_t index;
+  double value;
 
   operator Psana::ControlData::PVControl() const { return Psana::ControlData::PVControl(name, index, value); }
+
 };
 }
 
@@ -34,14 +36,16 @@ struct dataset_data {
   static hdf5pp::Type stored_type();
 
   dataset_data();
+  dataset_data(const Psana::ControlData::PVMonitor& psanaobj);
   ~dataset_data();
 
-  char name[32]; 
-  int32_t index; 
-  double loValue; 
-  double hiValue; 
+  char name[32];
+  int32_t index;
+  double loValue;
+  double hiValue;
 
   operator Psana::ControlData::PVMonitor() const { return Psana::ControlData::PVMonitor(name, index, loValue, hiValue); }
+
 };
 }
 
@@ -51,12 +55,14 @@ struct dataset_data {
   static hdf5pp::Type stored_type();
 
   dataset_data();
+  dataset_data(const Psana::ControlData::PVLabel& psanaobj);
   ~dataset_data();
 
-  char name[32]; 
-  char value[64]; 
+  char name[32];
+  char value[64];
 
   operator Psana::ControlData::PVLabel() const { return Psana::ControlData::PVLabel(name, value); }
+
 };
 }
 
@@ -66,14 +72,16 @@ struct dataset_config {
   static hdf5pp::Type stored_type();
 
   dataset_config();
+  dataset_config(const Psana::ControlData::ConfigV1& psanaobj);
   ~dataset_config();
 
-  uint32_t events; 
-  uint8_t uses_duration; 
-  uint8_t uses_events; 
-  Pds::ns_ClockTime_v0::dataset_data duration; 
-  uint32_t npvControls; 
-  uint32_t npvMonitors; 
+  uint32_t events;
+  uint8_t uses_duration;
+  uint8_t uses_events;
+  Pds::ns_ClockTime_v0::dataset_data duration;
+  uint32_t npvControls;
+  uint32_t npvMonitors;
+
 
 };
 }
@@ -108,21 +116,27 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::ControlData::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::ControlData::ConfigV1& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::ControlData::ConfigV1& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_ConfigV2_v0 {
 struct dataset_config {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_config();
+  dataset_config(const Psana::ControlData::ConfigV2& psanaobj);
   ~dataset_config();
 
-  uint32_t events; 
-  uint8_t uses_duration; 
-  uint8_t uses_events; 
-  Pds::ns_ClockTime_v0::dataset_data duration; 
-  uint32_t npvControls; 
-  uint32_t npvMonitors; 
-  uint32_t npvLabels; 
+  uint32_t events;
+  uint8_t uses_duration;
+  uint8_t uses_events;
+  Pds::ns_ClockTime_v0::dataset_data duration;
+  uint32_t npvControls;
+  uint32_t npvMonitors;
+  uint32_t npvLabels;
+
 
 };
 }
@@ -160,6 +174,10 @@ private:
 };
 
 boost::shared_ptr<PSEvt::Proxy<Psana::ControlData::ConfigV2> > make_ConfigV2(int version, hdf5pp::Group group, hsize_t idx);
+
+void store(const Psana::ControlData::ConfigV2& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::ControlData::ConfigV2& obj, hdf5pp::Group group, int version = -1);
+
 } // namespace ControlData
 } // namespace psddl_hdf2psana
 #endif // PSDDL_HDF2PSANA_CONTROL_DDL_H

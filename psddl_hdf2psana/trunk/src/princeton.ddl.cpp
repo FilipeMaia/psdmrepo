@@ -8,6 +8,7 @@
 #include "hdf5pp/VlenType.h"
 #include "hdf5pp/Utils.h"
 #include "PSEvt/DataProxy.h"
+#include "psddl_hdf2psana/Exceptions.h"
 namespace psddl_hdf2psana {
 namespace Princeton {
 
@@ -58,9 +59,26 @@ hdf5pp::Type ns_ConfigV1_v0::dataset_config::native_type()
   static hdf5pp::Type type = ns_ConfigV1_v0_dataset_config_native_type();
   return type;
 }
+
 ns_ConfigV1_v0::dataset_config::dataset_config()
 {
 }
+
+ns_ConfigV1_v0::dataset_config::dataset_config(const Psana::Princeton::ConfigV1& psanaobj)
+  : width(psanaobj.width())
+  , height(psanaobj.height())
+  , orgX(psanaobj.orgX())
+  , orgY(psanaobj.orgY())
+  , binX(psanaobj.binX())
+  , binY(psanaobj.binY())
+  , exposureTime(psanaobj.exposureTime())
+  , coolingTemp(psanaobj.coolingTemp())
+  , readoutSpeedIndex(psanaobj.readoutSpeedIndex())
+  , readoutEventCode(psanaobj.readoutEventCode())
+  , delayMode(psanaobj.delayMode())
+{
+}
+
 ns_ConfigV1_v0::dataset_config::~dataset_config()
 {
 }
@@ -127,6 +145,29 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::ConfigV1> > make_ConfigV1(int v
   }
 }
 
+void store_ConfigV1(const Psana::Princeton::ConfigV1& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_ConfigV1_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Princeton.ConfigV1", version);
+  }
+}
+
+void store(const Psana::Princeton::ConfigV1& obj, hdf5pp::Group group, int version) 
+{
+  store_ConfigV1(obj, group, version, false);
+}
+
+void append(const Psana::Princeton::ConfigV1& obj, hdf5pp::Group group, int version)
+{
+  store_ConfigV1(obj, group, version, true);
+}
+
+
 hdf5pp::Type ns_ConfigV2_v0_dataset_config_stored_type()
 {
   typedef ns_ConfigV2_v0::dataset_config DsType;
@@ -176,9 +217,27 @@ hdf5pp::Type ns_ConfigV2_v0::dataset_config::native_type()
   static hdf5pp::Type type = ns_ConfigV2_v0_dataset_config_native_type();
   return type;
 }
+
 ns_ConfigV2_v0::dataset_config::dataset_config()
 {
 }
+
+ns_ConfigV2_v0::dataset_config::dataset_config(const Psana::Princeton::ConfigV2& psanaobj)
+  : width(psanaobj.width())
+  , height(psanaobj.height())
+  , orgX(psanaobj.orgX())
+  , orgY(psanaobj.orgY())
+  , binX(psanaobj.binX())
+  , binY(psanaobj.binY())
+  , exposureTime(psanaobj.exposureTime())
+  , coolingTemp(psanaobj.coolingTemp())
+  , gainIndex(psanaobj.gainIndex())
+  , readoutSpeedIndex(psanaobj.readoutSpeedIndex())
+  , readoutEventCode(psanaobj.readoutEventCode())
+  , delayMode(psanaobj.delayMode())
+{
+}
+
 ns_ConfigV2_v0::dataset_config::~dataset_config()
 {
 }
@@ -249,6 +308,29 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::ConfigV2> > make_ConfigV2(int v
   }
 }
 
+void store_ConfigV2(const Psana::Princeton::ConfigV2& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_ConfigV2_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Princeton.ConfigV2", version);
+  }
+}
+
+void store(const Psana::Princeton::ConfigV2& obj, hdf5pp::Group group, int version) 
+{
+  store_ConfigV2(obj, group, version, false);
+}
+
+void append(const Psana::Princeton::ConfigV2& obj, hdf5pp::Group group, int version)
+{
+  store_ConfigV2(obj, group, version, true);
+}
+
+
 hdf5pp::Type ns_ConfigV3_v0_dataset_config_stored_type()
 {
   typedef ns_ConfigV3_v0::dataset_config DsType;
@@ -298,9 +380,27 @@ hdf5pp::Type ns_ConfigV3_v0::dataset_config::native_type()
   static hdf5pp::Type type = ns_ConfigV3_v0_dataset_config_native_type();
   return type;
 }
+
 ns_ConfigV3_v0::dataset_config::dataset_config()
 {
 }
+
+ns_ConfigV3_v0::dataset_config::dataset_config(const Psana::Princeton::ConfigV3& psanaobj)
+  : width(psanaobj.width())
+  , height(psanaobj.height())
+  , orgX(psanaobj.orgX())
+  , orgY(psanaobj.orgY())
+  , binX(psanaobj.binX())
+  , binY(psanaobj.binY())
+  , exposureTime(psanaobj.exposureTime())
+  , coolingTemp(psanaobj.coolingTemp())
+  , gainIndex(psanaobj.gainIndex())
+  , readoutSpeedIndex(psanaobj.readoutSpeedIndex())
+  , exposureEventCode(psanaobj.exposureEventCode())
+  , numDelayShots(psanaobj.numDelayShots())
+{
+}
+
 ns_ConfigV3_v0::dataset_config::~dataset_config()
 {
 }
@@ -371,6 +471,29 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::ConfigV3> > make_ConfigV3(int v
   }
 }
 
+void store_ConfigV3(const Psana::Princeton::ConfigV3& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_ConfigV3_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Princeton.ConfigV3", version);
+  }
+}
+
+void store(const Psana::Princeton::ConfigV3& obj, hdf5pp::Group group, int version) 
+{
+  store_ConfigV3(obj, group, version, false);
+}
+
+void append(const Psana::Princeton::ConfigV3& obj, hdf5pp::Group group, int version)
+{
+  store_ConfigV3(obj, group, version, true);
+}
+
+
 hdf5pp::Type ns_ConfigV4_v0_dataset_config_stored_type()
 {
   typedef ns_ConfigV4_v0::dataset_config DsType;
@@ -426,9 +549,30 @@ hdf5pp::Type ns_ConfigV4_v0::dataset_config::native_type()
   static hdf5pp::Type type = ns_ConfigV4_v0_dataset_config_native_type();
   return type;
 }
+
 ns_ConfigV4_v0::dataset_config::dataset_config()
 {
 }
+
+ns_ConfigV4_v0::dataset_config::dataset_config(const Psana::Princeton::ConfigV4& psanaobj)
+  : width(psanaobj.width())
+  , height(psanaobj.height())
+  , orgX(psanaobj.orgX())
+  , orgY(psanaobj.orgY())
+  , binX(psanaobj.binX())
+  , binY(psanaobj.binY())
+  , maskedHeight(psanaobj.maskedHeight())
+  , kineticHeight(psanaobj.kineticHeight())
+  , vsSpeed(psanaobj.vsSpeed())
+  , exposureTime(psanaobj.exposureTime())
+  , coolingTemp(psanaobj.coolingTemp())
+  , gainIndex(psanaobj.gainIndex())
+  , readoutSpeedIndex(psanaobj.readoutSpeedIndex())
+  , exposureEventCode(psanaobj.exposureEventCode())
+  , numDelayShots(psanaobj.numDelayShots())
+{
+}
+
 ns_ConfigV4_v0::dataset_config::~dataset_config()
 {
 }
@@ -511,6 +655,29 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::ConfigV4> > make_ConfigV4(int v
   }
 }
 
+void store_ConfigV4(const Psana::Princeton::ConfigV4& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_ConfigV4_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Princeton.ConfigV4", version);
+  }
+}
+
+void store(const Psana::Princeton::ConfigV4& obj, hdf5pp::Group group, int version) 
+{
+  store_ConfigV4(obj, group, version, false);
+}
+
+void append(const Psana::Princeton::ConfigV4& obj, hdf5pp::Group group, int version)
+{
+  store_ConfigV4(obj, group, version, true);
+}
+
+
 hdf5pp::Type ns_ConfigV5_v0_dataset_config_stored_type()
 {
   typedef ns_ConfigV5_v0::dataset_config DsType;
@@ -568,9 +735,31 @@ hdf5pp::Type ns_ConfigV5_v0::dataset_config::native_type()
   static hdf5pp::Type type = ns_ConfigV5_v0_dataset_config_native_type();
   return type;
 }
+
 ns_ConfigV5_v0::dataset_config::dataset_config()
 {
 }
+
+ns_ConfigV5_v0::dataset_config::dataset_config(const Psana::Princeton::ConfigV5& psanaobj)
+  : width(psanaobj.width())
+  , height(psanaobj.height())
+  , orgX(psanaobj.orgX())
+  , orgY(psanaobj.orgY())
+  , binX(psanaobj.binX())
+  , binY(psanaobj.binY())
+  , exposureTime(psanaobj.exposureTime())
+  , coolingTemp(psanaobj.coolingTemp())
+  , gainIndex(psanaobj.gainIndex())
+  , readoutSpeedIndex(psanaobj.readoutSpeedIndex())
+  , maskedHeight(psanaobj.maskedHeight())
+  , kineticHeight(psanaobj.kineticHeight())
+  , vsSpeed(psanaobj.vsSpeed())
+  , infoReportInterval(psanaobj.infoReportInterval())
+  , exposureEventCode(psanaobj.exposureEventCode())
+  , numDelayShots(psanaobj.numDelayShots())
+{
+}
+
 ns_ConfigV5_v0::dataset_config::~dataset_config()
 {
 }
@@ -657,6 +846,29 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::ConfigV5> > make_ConfigV5(int v
   }
 }
 
+void store_ConfigV5(const Psana::Princeton::ConfigV5& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_ConfigV5_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Princeton.ConfigV5", version);
+  }
+}
+
+void store(const Psana::Princeton::ConfigV5& obj, hdf5pp::Group group, int version) 
+{
+  store_ConfigV5(obj, group, version, false);
+}
+
+void append(const Psana::Princeton::ConfigV5& obj, hdf5pp::Group group, int version)
+{
+  store_ConfigV5(obj, group, version, true);
+}
+
+
 hdf5pp::Type ns_FrameV1_v0_dataset_frame_stored_type()
 {
   typedef ns_FrameV1_v0::dataset_frame DsType;
@@ -686,9 +898,17 @@ hdf5pp::Type ns_FrameV1_v0::dataset_frame::native_type()
   static hdf5pp::Type type = ns_FrameV1_v0_dataset_frame_native_type();
   return type;
 }
+
 ns_FrameV1_v0::dataset_frame::dataset_frame()
 {
 }
+
+ns_FrameV1_v0::dataset_frame::dataset_frame(const Psana::Princeton::FrameV1& psanaobj)
+  : shotIdStart(psanaobj.shotIdStart())
+  , readoutTime(psanaobj.readoutTime())
+{
+}
+
 ns_FrameV1_v0::dataset_frame::~dataset_frame()
 {
 }
@@ -761,6 +981,29 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::FrameV1> > make_FrameV1(int ver
   }
 }
 
+void store_FrameV1(const Psana::Princeton::FrameV1& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_FrameV1_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Princeton.FrameV1", version);
+  }
+}
+
+void store(const Psana::Princeton::FrameV1& obj, hdf5pp::Group group, int version) 
+{
+  store_FrameV1(obj, group, version, false);
+}
+
+void append(const Psana::Princeton::FrameV1& obj, hdf5pp::Group group, int version)
+{
+  store_FrameV1(obj, group, version, true);
+}
+
+
 hdf5pp::Type ns_FrameV2_v0_dataset_frame_stored_type()
 {
   typedef ns_FrameV2_v0::dataset_frame DsType;
@@ -792,9 +1035,18 @@ hdf5pp::Type ns_FrameV2_v0::dataset_frame::native_type()
   static hdf5pp::Type type = ns_FrameV2_v0_dataset_frame_native_type();
   return type;
 }
+
 ns_FrameV2_v0::dataset_frame::dataset_frame()
 {
 }
+
+ns_FrameV2_v0::dataset_frame::dataset_frame(const Psana::Princeton::FrameV2& psanaobj)
+  : shotIdStart(psanaobj.shotIdStart())
+  , readoutTime(psanaobj.readoutTime())
+  , temperature(psanaobj.temperature())
+{
+}
+
 ns_FrameV2_v0::dataset_frame::~dataset_frame()
 {
 }
@@ -872,6 +1124,29 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::FrameV2> > make_FrameV2(int ver
   }
 }
 
+void store_FrameV2(const Psana::Princeton::FrameV2& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_FrameV2_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Princeton.FrameV2", version);
+  }
+}
+
+void store(const Psana::Princeton::FrameV2& obj, hdf5pp::Group group, int version) 
+{
+  store_FrameV2(obj, group, version, false);
+}
+
+void append(const Psana::Princeton::FrameV2& obj, hdf5pp::Group group, int version)
+{
+  store_FrameV2(obj, group, version, true);
+}
+
+
 hdf5pp::Type ns_InfoV1_v0_dataset_data_stored_type()
 {
   typedef ns_InfoV1_v0::dataset_data DsType;
@@ -899,9 +1174,16 @@ hdf5pp::Type ns_InfoV1_v0::dataset_data::native_type()
   static hdf5pp::Type type = ns_InfoV1_v0_dataset_data_native_type();
   return type;
 }
+
 ns_InfoV1_v0::dataset_data::dataset_data()
 {
 }
+
+ns_InfoV1_v0::dataset_data::dataset_data(const Psana::Princeton::InfoV1& psanaobj)
+  : temperature(psanaobj.temperature())
+{
+}
+
 ns_InfoV1_v0::dataset_data::~dataset_data()
 {
 }
@@ -923,5 +1205,28 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::InfoV1> > make_InfoV1(int versi
     return boost::make_shared<PSEvt::DataProxy<Psana::Princeton::InfoV1> >(boost::shared_ptr<Psana::Princeton::InfoV1>());
   }
 }
+
+void store_InfoV1(const Psana::Princeton::InfoV1& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_InfoV1_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Princeton.InfoV1", version);
+  }
+}
+
+void store(const Psana::Princeton::InfoV1& obj, hdf5pp::Group group, int version) 
+{
+  store_InfoV1(obj, group, version, false);
+}
+
+void append(const Psana::Princeton::InfoV1& obj, hdf5pp::Group group, int version)
+{
+  store_InfoV1(obj, group, version, true);
+}
+
 } // namespace Princeton
 } // namespace psddl_hdf2psana

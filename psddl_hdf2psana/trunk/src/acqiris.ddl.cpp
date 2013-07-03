@@ -8,6 +8,7 @@
 #include "hdf5pp/VlenType.h"
 #include "hdf5pp/Utils.h"
 #include "PSEvt/DataProxy.h"
+#include "psddl_hdf2psana/Exceptions.h"
 #include "psddl_hdf2psana/acqiris.h"
 #include "psddl_hdf2psana/acqiris.h"
 #include "psddl_hdf2psana/acqiris.h"
@@ -51,9 +52,19 @@ hdf5pp::Type ns_VertV1_v0::dataset_data::native_type()
   static hdf5pp::Type type = ns_VertV1_v0_dataset_data_native_type();
   return type;
 }
+
 ns_VertV1_v0::dataset_data::dataset_data()
 {
 }
+
+ns_VertV1_v0::dataset_data::dataset_data(const Psana::Acqiris::VertV1& psanaobj)
+  : fullScale(psanaobj.fullScale())
+  , offset(psanaobj.offset())
+  , coupling(psanaobj.coupling())
+  , bandwidth(psanaobj.bandwidth())
+{
+}
+
 ns_VertV1_v0::dataset_data::~dataset_data()
 {
 }
@@ -91,9 +102,19 @@ hdf5pp::Type ns_HorizV1_v0::dataset_data::native_type()
   static hdf5pp::Type type = ns_HorizV1_v0_dataset_data_native_type();
   return type;
 }
+
 ns_HorizV1_v0::dataset_data::dataset_data()
 {
 }
+
+ns_HorizV1_v0::dataset_data::dataset_data(const Psana::Acqiris::HorizV1& psanaobj)
+  : sampInterval(psanaobj.sampInterval())
+  , delayTime(psanaobj.delayTime())
+  , nbrSamples(psanaobj.nbrSamples())
+  , nbrSegments(psanaobj.nbrSegments())
+{
+}
+
 ns_HorizV1_v0::dataset_data::~dataset_data()
 {
 }
@@ -115,6 +136,29 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::HorizV1> > make_HorizV1(int versi
     return boost::make_shared<PSEvt::DataProxy<Psana::Acqiris::HorizV1> >(boost::shared_ptr<Psana::Acqiris::HorizV1>());
   }
 }
+
+void store_HorizV1(const Psana::Acqiris::HorizV1& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_HorizV1_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Acqiris.HorizV1", version);
+  }
+}
+
+void store(const Psana::Acqiris::HorizV1& obj, hdf5pp::Group group, int version) 
+{
+  store_HorizV1(obj, group, version, false);
+}
+
+void append(const Psana::Acqiris::HorizV1& obj, hdf5pp::Group group, int version)
+{
+  store_HorizV1(obj, group, version, true);
+}
+
 
 hdf5pp::Type ns_TrigV1_v0_dataset_data_stored_type()
 {
@@ -149,9 +193,19 @@ hdf5pp::Type ns_TrigV1_v0::dataset_data::native_type()
   static hdf5pp::Type type = ns_TrigV1_v0_dataset_data_native_type();
   return type;
 }
+
 ns_TrigV1_v0::dataset_data::dataset_data()
 {
 }
+
+ns_TrigV1_v0::dataset_data::dataset_data(const Psana::Acqiris::TrigV1& psanaobj)
+  : coupling(psanaobj.coupling())
+  , input(psanaobj.input())
+  , slope(psanaobj.slope())
+  , level(psanaobj.level())
+{
+}
+
 ns_TrigV1_v0::dataset_data::~dataset_data()
 {
 }
@@ -173,6 +227,29 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::TrigV1> > make_TrigV1(int version
     return boost::make_shared<PSEvt::DataProxy<Psana::Acqiris::TrigV1> >(boost::shared_ptr<Psana::Acqiris::TrigV1>());
   }
 }
+
+void store_TrigV1(const Psana::Acqiris::TrigV1& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_TrigV1_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Acqiris.TrigV1", version);
+  }
+}
+
+void store(const Psana::Acqiris::TrigV1& obj, hdf5pp::Group group, int version) 
+{
+  store_TrigV1(obj, group, version, false);
+}
+
+void append(const Psana::Acqiris::TrigV1& obj, hdf5pp::Group group, int version)
+{
+  store_TrigV1(obj, group, version, true);
+}
+
 
 hdf5pp::Type ns_ConfigV1_v0_dataset_config_stored_type()
 {
@@ -207,9 +284,19 @@ hdf5pp::Type ns_ConfigV1_v0::dataset_config::native_type()
   static hdf5pp::Type type = ns_ConfigV1_v0_dataset_config_native_type();
   return type;
 }
+
 ns_ConfigV1_v0::dataset_config::dataset_config()
 {
 }
+
+ns_ConfigV1_v0::dataset_config::dataset_config(const Psana::Acqiris::ConfigV1& psanaobj)
+  : nbrConvertersPerChannel(psanaobj.nbrConvertersPerChannel())
+  , channelMask(psanaobj.channelMask())
+  , nbrBanks(psanaobj.nbrBanks())
+  , nbrChannels(psanaobj.nbrChannels())
+{
+}
+
 ns_ConfigV1_v0::dataset_config::~dataset_config()
 {
 }
@@ -269,6 +356,29 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::ConfigV1> > make_ConfigV1(int ver
   }
 }
 
+void store_ConfigV1(const Psana::Acqiris::ConfigV1& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_ConfigV1_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Acqiris.ConfigV1", version);
+  }
+}
+
+void store(const Psana::Acqiris::ConfigV1& obj, hdf5pp::Group group, int version) 
+{
+  store_ConfigV1(obj, group, version, false);
+}
+
+void append(const Psana::Acqiris::ConfigV1& obj, hdf5pp::Group group, int version)
+{
+  store_ConfigV1(obj, group, version, true);
+}
+
+
 hdf5pp::Type ns_TimestampV1_v0_dataset_data_stored_type()
 {
   typedef ns_TimestampV1_v0::dataset_data DsType;
@@ -298,9 +408,17 @@ hdf5pp::Type ns_TimestampV1_v0::dataset_data::native_type()
   static hdf5pp::Type type = ns_TimestampV1_v0_dataset_data_native_type();
   return type;
 }
+
 ns_TimestampV1_v0::dataset_data::dataset_data()
 {
 }
+
+ns_TimestampV1_v0::dataset_data::dataset_data(const Psana::Acqiris::TimestampV1& psanaobj)
+  : pos(psanaobj.pos())
+  , value(psanaobj.value())
+{
+}
+
 ns_TimestampV1_v0::dataset_data::~dataset_data()
 {
 }
@@ -314,6 +432,32 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::DataDescV1> > make_DataDescV1(int
     return boost::make_shared<PSEvt::DataProxy<Psana::Acqiris::DataDescV1> >(boost::shared_ptr<Psana::Acqiris::DataDescV1>());
   }
 }
+
+void store_DataDescV1(const Psana::Acqiris::DataDescV1& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 1;
+  switch (version) {
+  case 0:
+    //store_DataDescV1_v0(object, group, append);
+    break;
+  case 1:
+    //store_DataDescV1_v1(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Acqiris.DataDescV1", version);
+  }
+}
+
+void store(const Psana::Acqiris::DataDescV1& obj, hdf5pp::Group group, int version) 
+{
+  store_DataDescV1(obj, group, version, false);
+}
+
+void append(const Psana::Acqiris::DataDescV1& obj, hdf5pp::Group group, int version)
+{
+  store_DataDescV1(obj, group, version, true);
+}
+
 
 hdf5pp::Type ns_TdcChannel_v0_dataset_data_stored_type()
 {
@@ -380,9 +524,20 @@ hdf5pp::Type ns_TdcChannel_v0::dataset_data::native_type()
   static hdf5pp::Type type = ns_TdcChannel_v0_dataset_data_native_type();
   return type;
 }
+
 ns_TdcChannel_v0::dataset_data::dataset_data()
 {
 }
+
+ns_TdcChannel_v0::dataset_data::dataset_data(const Psana::Acqiris::TdcChannel& psanaobj)
+  : channel(psanaobj.channel())
+  , _mode_int(psanaobj._mode_int())
+  , slope(psanaobj.slope())
+  , mode(psanaobj.mode())
+  , level(psanaobj.level())
+{
+}
+
 ns_TdcChannel_v0::dataset_data::~dataset_data()
 {
 }
@@ -404,6 +559,29 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::TdcChannel> > make_TdcChannel(int
     return boost::make_shared<PSEvt::DataProxy<Psana::Acqiris::TdcChannel> >(boost::shared_ptr<Psana::Acqiris::TdcChannel>());
   }
 }
+
+void store_TdcChannel(const Psana::Acqiris::TdcChannel& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_TdcChannel_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Acqiris.TdcChannel", version);
+  }
+}
+
+void store(const Psana::Acqiris::TdcChannel& obj, hdf5pp::Group group, int version) 
+{
+  store_TdcChannel(obj, group, version, false);
+}
+
+void append(const Psana::Acqiris::TdcChannel& obj, hdf5pp::Group group, int version)
+{
+  store_TdcChannel(obj, group, version, true);
+}
+
 
 hdf5pp::Type ns_TdcAuxIO_v0_dataset_data_stored_type()
 {
@@ -458,9 +636,18 @@ hdf5pp::Type ns_TdcAuxIO_v0::dataset_data::native_type()
   static hdf5pp::Type type = ns_TdcAuxIO_v0_dataset_data_native_type();
   return type;
 }
+
 ns_TdcAuxIO_v0::dataset_data::dataset_data()
 {
 }
+
+ns_TdcAuxIO_v0::dataset_data::dataset_data(const Psana::Acqiris::TdcAuxIO& psanaobj)
+  : channel(psanaobj.channel())
+  , mode(psanaobj.mode())
+  , term(psanaobj.term())
+{
+}
+
 ns_TdcAuxIO_v0::dataset_data::~dataset_data()
 {
 }
@@ -482,6 +669,29 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::TdcAuxIO> > make_TdcAuxIO(int ver
     return boost::make_shared<PSEvt::DataProxy<Psana::Acqiris::TdcAuxIO> >(boost::shared_ptr<Psana::Acqiris::TdcAuxIO>());
   }
 }
+
+void store_TdcAuxIO(const Psana::Acqiris::TdcAuxIO& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_TdcAuxIO_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Acqiris.TdcAuxIO", version);
+  }
+}
+
+void store(const Psana::Acqiris::TdcAuxIO& obj, hdf5pp::Group group, int version) 
+{
+  store_TdcAuxIO(obj, group, version, false);
+}
+
+void append(const Psana::Acqiris::TdcAuxIO& obj, hdf5pp::Group group, int version)
+{
+  store_TdcAuxIO(obj, group, version, true);
+}
+
 
 hdf5pp::Type ns_TdcVetoIO_v0_dataset_data_stored_type()
 {
@@ -534,9 +744,18 @@ hdf5pp::Type ns_TdcVetoIO_v0::dataset_data::native_type()
   static hdf5pp::Type type = ns_TdcVetoIO_v0_dataset_data_native_type();
   return type;
 }
+
 ns_TdcVetoIO_v0::dataset_data::dataset_data()
 {
 }
+
+ns_TdcVetoIO_v0::dataset_data::dataset_data(const Psana::Acqiris::TdcVetoIO& psanaobj)
+  : channel(psanaobj.channel())
+  , mode(psanaobj.mode())
+  , term(psanaobj.term())
+{
+}
+
 ns_TdcVetoIO_v0::dataset_data::~dataset_data()
 {
 }
@@ -558,6 +777,29 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::TdcVetoIO> > make_TdcVetoIO(int v
     return boost::make_shared<PSEvt::DataProxy<Psana::Acqiris::TdcVetoIO> >(boost::shared_ptr<Psana::Acqiris::TdcVetoIO>());
   }
 }
+
+void store_TdcVetoIO(const Psana::Acqiris::TdcVetoIO& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_TdcVetoIO_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Acqiris.TdcVetoIO", version);
+  }
+}
+
+void store(const Psana::Acqiris::TdcVetoIO& obj, hdf5pp::Group group, int version) 
+{
+  store_TdcVetoIO(obj, group, version, false);
+}
+
+void append(const Psana::Acqiris::TdcVetoIO& obj, hdf5pp::Group group, int version)
+{
+  store_TdcVetoIO(obj, group, version, true);
+}
+
 ndarray<const Psana::Acqiris::TdcChannel, 1> TdcConfigV1_v0::channels() const {
   if (m_ds_channel.empty()) read_ds_channel();
   return m_ds_channel;
@@ -595,6 +837,29 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::TdcConfigV1> > make_TdcConfigV1(i
     return boost::make_shared<PSEvt::DataProxy<Psana::Acqiris::TdcConfigV1> >(boost::shared_ptr<Psana::Acqiris::TdcConfigV1>());
   }
 }
+
+void store_TdcConfigV1(const Psana::Acqiris::TdcConfigV1& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_TdcConfigV1_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Acqiris.TdcConfigV1", version);
+  }
+}
+
+void store(const Psana::Acqiris::TdcConfigV1& obj, hdf5pp::Group group, int version) 
+{
+  store_TdcConfigV1(obj, group, version, false);
+}
+
+void append(const Psana::Acqiris::TdcConfigV1& obj, hdf5pp::Group group, int version)
+{
+  store_TdcConfigV1(obj, group, version, true);
+}
+
 
 hdf5pp::Type ns_TdcDataV1_Item_v0_dataset_data_stored_type()
 {
@@ -645,9 +910,18 @@ hdf5pp::Type ns_TdcDataV1_Item_v0::dataset_data::native_type()
   static hdf5pp::Type type = ns_TdcDataV1_Item_v0_dataset_data_native_type();
   return type;
 }
+
 ns_TdcDataV1_Item_v0::dataset_data::dataset_data()
 {
 }
+
+ns_TdcDataV1_Item_v0::dataset_data::dataset_data(const Psana::Acqiris::TdcDataV1_Item& psanaobj)
+  : source(psanaobj.source())
+  , overflow(psanaobj.bf_ofv_())
+  , value(psanaobj.bf_val_())
+{
+}
+
 ns_TdcDataV1_Item_v0::dataset_data::~dataset_data()
 {
 }
@@ -669,6 +943,29 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::TdcDataV1_Item> > make_TdcDataV1_
     return boost::make_shared<PSEvt::DataProxy<Psana::Acqiris::TdcDataV1_Item> >(boost::shared_ptr<Psana::Acqiris::TdcDataV1_Item>());
   }
 }
+
+void store_TdcDataV1_Item(const Psana::Acqiris::TdcDataV1_Item& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_TdcDataV1_Item_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Acqiris.TdcDataV1_Item", version);
+  }
+}
+
+void store(const Psana::Acqiris::TdcDataV1_Item& obj, hdf5pp::Group group, int version) 
+{
+  store_TdcDataV1_Item(obj, group, version, false);
+}
+
+void append(const Psana::Acqiris::TdcDataV1_Item& obj, hdf5pp::Group group, int version)
+{
+  store_TdcDataV1_Item(obj, group, version, true);
+}
+
 ndarray<const Psana::Acqiris::TdcDataV1_Item, 1> TdcDataV1_v0::data() const {
   if (m_ds_data.empty()) read_ds_data();
   return m_ds_data;
@@ -687,5 +984,28 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::TdcDataV1> > make_TdcDataV1(int v
     return boost::make_shared<PSEvt::DataProxy<Psana::Acqiris::TdcDataV1> >(boost::shared_ptr<Psana::Acqiris::TdcDataV1>());
   }
 }
+
+void store_TdcDataV1(const Psana::Acqiris::TdcDataV1& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_TdcDataV1_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Acqiris.TdcDataV1", version);
+  }
+}
+
+void store(const Psana::Acqiris::TdcDataV1& obj, hdf5pp::Group group, int version) 
+{
+  store_TdcDataV1(obj, group, version, false);
+}
+
+void append(const Psana::Acqiris::TdcDataV1& obj, hdf5pp::Group group, int version)
+{
+  store_TdcDataV1(obj, group, version, true);
+}
+
 } // namespace Acqiris
 } // namespace psddl_hdf2psana

@@ -8,6 +8,7 @@
 #include "hdf5pp/VlenType.h"
 #include "hdf5pp/Utils.h"
 #include "PSEvt/DataProxy.h"
+#include "psddl_hdf2psana/Exceptions.h"
 #include "psddl_hdf2psana/usdusb.h"
 namespace psddl_hdf2psana {
 namespace UsdUsb {
@@ -69,9 +70,23 @@ hdf5pp::Type ns_ConfigV1_v0::dataset_config::native_type()
   static hdf5pp::Type type = ns_ConfigV1_v0_dataset_config_native_type();
   return type;
 }
+
 ns_ConfigV1_v0::dataset_config::dataset_config()
 {
 }
+
+ns_ConfigV1_v0::dataset_config::dataset_config(const Psana::UsdUsb::ConfigV1& psanaobj)
+{
+  {
+    const __typeof__(psanaobj.counting_mode())& arr = psanaobj.counting_mode();
+    std::copy(arr.begin(), arr.begin()+4, counting_mode);
+  }
+  {
+    const __typeof__(psanaobj.quadrature_mode())& arr = psanaobj.quadrature_mode();
+    std::copy(arr.begin(), arr.begin()+4, quadrature_mode);
+  }
+}
+
 ns_ConfigV1_v0::dataset_config::~dataset_config()
 {
 }
@@ -96,6 +111,29 @@ boost::shared_ptr<PSEvt::Proxy<Psana::UsdUsb::ConfigV1> > make_ConfigV1(int vers
     return boost::make_shared<PSEvt::DataProxy<Psana::UsdUsb::ConfigV1> >(boost::shared_ptr<Psana::UsdUsb::ConfigV1>());
   }
 }
+
+void store_ConfigV1(const Psana::UsdUsb::ConfigV1& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_ConfigV1_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "UsdUsb.ConfigV1", version);
+  }
+}
+
+void store(const Psana::UsdUsb::ConfigV1& obj, hdf5pp::Group group, int version) 
+{
+  store_ConfigV1(obj, group, version, false);
+}
+
+void append(const Psana::UsdUsb::ConfigV1& obj, hdf5pp::Group group, int version)
+{
+  store_ConfigV1(obj, group, version, true);
+}
+
 
 hdf5pp::Type ns_DataV1_v1_dataset_data_stored_type()
 {
@@ -144,9 +182,29 @@ hdf5pp::Type ns_DataV1_v1::dataset_data::native_type()
   static hdf5pp::Type type = ns_DataV1_v1_dataset_data_native_type();
   return type;
 }
+
 ns_DataV1_v1::dataset_data::dataset_data()
 {
 }
+
+ns_DataV1_v1::dataset_data::dataset_data(const Psana::UsdUsb::DataV1& psanaobj)
+  : digital_in(psanaobj.digital_in())
+  , timestamp(psanaobj.timestamp())
+{
+  {
+    const __typeof__(psanaobj.status())& arr = psanaobj.status();
+    std::copy(arr.begin(), arr.begin()+4, status);
+  }
+  {
+    const __typeof__(psanaobj.analog_in())& arr = psanaobj.analog_in();
+    std::copy(arr.begin(), arr.begin()+4, analog_in);
+  }
+  {
+    const __typeof__(psanaobj.encoder_count())& arr = psanaobj.encoder_count();
+    std::copy(arr.begin(), arr.begin()+4, encoder_count);
+  }
+}
+
 ns_DataV1_v1::dataset_data::~dataset_data()
 {
 }
@@ -186,5 +244,31 @@ boost::shared_ptr<PSEvt::Proxy<Psana::UsdUsb::DataV1> > make_DataV1(int version,
     return boost::make_shared<PSEvt::DataProxy<Psana::UsdUsb::DataV1> >(boost::shared_ptr<Psana::UsdUsb::DataV1>());
   }
 }
+
+void store_DataV1(const Psana::UsdUsb::DataV1& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 1;
+  switch (version) {
+  case 0:
+    //store_DataV1_v0(object, group, append);
+    break;
+  case 1:
+    //store_DataV1_v1(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "UsdUsb.DataV1", version);
+  }
+}
+
+void store(const Psana::UsdUsb::DataV1& obj, hdf5pp::Group group, int version) 
+{
+  store_DataV1(obj, group, version, false);
+}
+
+void append(const Psana::UsdUsb::DataV1& obj, hdf5pp::Group group, int version)
+{
+  store_DataV1(obj, group, version, true);
+}
+
 } // namespace UsdUsb
 } // namespace psddl_hdf2psana

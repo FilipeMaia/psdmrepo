@@ -8,6 +8,7 @@
 #include "hdf5pp/VlenType.h"
 #include "hdf5pp/Utils.h"
 #include "PSEvt/DataProxy.h"
+#include "psddl_hdf2psana/Exceptions.h"
 namespace psddl_hdf2psana {
 namespace ControlData {
 
@@ -42,9 +43,18 @@ hdf5pp::Type ns_PVControl_v0::dataset_data::native_type()
   static hdf5pp::Type type = ns_PVControl_v0_dataset_data_native_type();
   return type;
 }
+
 ns_PVControl_v0::dataset_data::dataset_data()
 {
 }
+
+ns_PVControl_v0::dataset_data::dataset_data(const Psana::ControlData::PVControl& psanaobj)
+  : index(psanaobj.index())
+  , value(psanaobj.value())
+{
+  strncpy(name, psanaobj.name(), 32);
+}
+
 ns_PVControl_v0::dataset_data::~dataset_data()
 {
 }
@@ -82,9 +92,19 @@ hdf5pp::Type ns_PVMonitor_v0::dataset_data::native_type()
   static hdf5pp::Type type = ns_PVMonitor_v0_dataset_data_native_type();
   return type;
 }
+
 ns_PVMonitor_v0::dataset_data::dataset_data()
 {
 }
+
+ns_PVMonitor_v0::dataset_data::dataset_data(const Psana::ControlData::PVMonitor& psanaobj)
+  : index(psanaobj.index())
+  , loValue(psanaobj.loValue())
+  , hiValue(psanaobj.hiValue())
+{
+  strncpy(name, psanaobj.name(), 32);
+}
+
 ns_PVMonitor_v0::dataset_data::~dataset_data()
 {
 }
@@ -118,9 +138,17 @@ hdf5pp::Type ns_PVLabel_v0::dataset_data::native_type()
   static hdf5pp::Type type = ns_PVLabel_v0_dataset_data_native_type();
   return type;
 }
+
 ns_PVLabel_v0::dataset_data::dataset_data()
 {
 }
+
+ns_PVLabel_v0::dataset_data::dataset_data(const Psana::ControlData::PVLabel& psanaobj)
+{
+  strncpy(name, psanaobj.name(), 32);
+  strncpy(value, psanaobj.value(), 64);
+}
+
 ns_PVLabel_v0::dataset_data::~dataset_data()
 {
 }
@@ -162,9 +190,21 @@ hdf5pp::Type ns_ConfigV1_v0::dataset_config::native_type()
   static hdf5pp::Type type = ns_ConfigV1_v0_dataset_config_native_type();
   return type;
 }
+
 ns_ConfigV1_v0::dataset_config::dataset_config()
 {
 }
+
+ns_ConfigV1_v0::dataset_config::dataset_config(const Psana::ControlData::ConfigV1& psanaobj)
+  : events(psanaobj.events())
+  , uses_duration(psanaobj.uses_duration())
+  , uses_events(psanaobj.uses_events())
+  , duration(psanaobj.duration())
+  , npvControls(psanaobj.npvControls())
+  , npvMonitors(psanaobj.npvMonitors())
+{
+}
+
 ns_ConfigV1_v0::dataset_config::~dataset_config()
 {
 }
@@ -225,6 +265,29 @@ boost::shared_ptr<PSEvt::Proxy<Psana::ControlData::ConfigV1> > make_ConfigV1(int
   }
 }
 
+void store_ConfigV1(const Psana::ControlData::ConfigV1& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_ConfigV1_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "ControlData.ConfigV1", version);
+  }
+}
+
+void store(const Psana::ControlData::ConfigV1& obj, hdf5pp::Group group, int version) 
+{
+  store_ConfigV1(obj, group, version, false);
+}
+
+void append(const Psana::ControlData::ConfigV1& obj, hdf5pp::Group group, int version)
+{
+  store_ConfigV1(obj, group, version, true);
+}
+
+
 hdf5pp::Type ns_ConfigV2_v0_dataset_config_stored_type()
 {
   typedef ns_ConfigV2_v0::dataset_config DsType;
@@ -264,9 +327,22 @@ hdf5pp::Type ns_ConfigV2_v0::dataset_config::native_type()
   static hdf5pp::Type type = ns_ConfigV2_v0_dataset_config_native_type();
   return type;
 }
+
 ns_ConfigV2_v0::dataset_config::dataset_config()
 {
 }
+
+ns_ConfigV2_v0::dataset_config::dataset_config(const Psana::ControlData::ConfigV2& psanaobj)
+  : events(psanaobj.events())
+  , uses_duration(psanaobj.uses_duration())
+  , uses_events(psanaobj.uses_events())
+  , duration(psanaobj.duration())
+  , npvControls(psanaobj.npvControls())
+  , npvMonitors(psanaobj.npvMonitors())
+  , npvLabels(psanaobj.npvLabels())
+{
+}
+
 ns_ConfigV2_v0::dataset_config::~dataset_config()
 {
 }
@@ -340,5 +416,28 @@ boost::shared_ptr<PSEvt::Proxy<Psana::ControlData::ConfigV2> > make_ConfigV2(int
     return boost::make_shared<PSEvt::DataProxy<Psana::ControlData::ConfigV2> >(boost::shared_ptr<Psana::ControlData::ConfigV2>());
   }
 }
+
+void store_ConfigV2(const Psana::ControlData::ConfigV2& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_ConfigV2_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "ControlData.ConfigV2", version);
+  }
+}
+
+void store(const Psana::ControlData::ConfigV2& obj, hdf5pp::Group group, int version) 
+{
+  store_ConfigV2(obj, group, version, false);
+}
+
+void append(const Psana::ControlData::ConfigV2& obj, hdf5pp::Group group, int version)
+{
+  store_ConfigV2(obj, group, version, true);
+}
+
 } // namespace ControlData
 } // namespace psddl_hdf2psana

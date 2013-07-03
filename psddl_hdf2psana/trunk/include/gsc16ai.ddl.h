@@ -17,17 +17,19 @@ struct dataset_config {
   static hdf5pp::Type stored_type();
 
   dataset_config();
+  dataset_config(const Psana::Gsc16ai::ConfigV1& psanaobj);
   ~dataset_config();
 
-  uint16_t voltageRange; 
-  uint16_t firstChan; 
-  uint16_t lastChan; 
-  uint16_t inputMode; 
-  uint16_t triggerMode; 
-  uint16_t dataFormat; 
-  uint16_t fps; 
-  uint8_t autocalibEnable; 
-  uint8_t timeTagEnable; 
+  uint16_t voltageRange;
+  uint16_t firstChan;
+  uint16_t lastChan;
+  uint16_t inputMode;
+  uint16_t triggerMode;
+  uint16_t dataFormat;
+  uint16_t fps;
+  uint8_t autocalibEnable;
+  uint8_t timeTagEnable;
+
 
 };
 }
@@ -60,6 +62,10 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Gsc16ai::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::Gsc16ai::ConfigV1& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::Gsc16ai::ConfigV1& obj, hdf5pp::Group group, int version = -1);
+
+
 
 template <typename Config>
 class DataV1_v0 : public Psana::Gsc16ai::DataV1 {
@@ -82,6 +88,10 @@ private:
 };
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Gsc16ai::DataV1> > make_DataV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::Gsc16ai::ConfigV1>& cfg);
+
+void store(const Psana::Gsc16ai::DataV1& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::Gsc16ai::DataV1& obj, hdf5pp::Group group, int version = -1);
+
 } // namespace Gsc16ai
 } // namespace psddl_hdf2psana
 #endif // PSDDL_HDF2PSANA_GSC16AI_DDL_H

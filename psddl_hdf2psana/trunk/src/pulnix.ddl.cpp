@@ -8,6 +8,7 @@
 #include "hdf5pp/VlenType.h"
 #include "hdf5pp/Utils.h"
 #include "PSEvt/DataProxy.h"
+#include "psddl_hdf2psana/Exceptions.h"
 namespace psddl_hdf2psana {
 namespace Pulnix {
 
@@ -84,9 +85,25 @@ hdf5pp::Type ns_TM6740ConfigV1_v0::dataset_config::native_type()
   static hdf5pp::Type type = ns_TM6740ConfigV1_v0_dataset_config_native_type();
   return type;
 }
+
 ns_TM6740ConfigV1_v0::dataset_config::dataset_config()
 {
 }
+
+ns_TM6740ConfigV1_v0::dataset_config::dataset_config(const Psana::Pulnix::TM6740ConfigV1& psanaobj)
+  : gain_a(psanaobj.gain_a())
+  , gain_b(psanaobj.gain_b())
+  , vref(psanaobj.vref())
+  , shutter_width(psanaobj.shutter_width())
+  , gain_balance(psanaobj.gain_balance())
+  , output_resolution(psanaobj.output_resolution())
+  , horizontal_binning(psanaobj.horizontal_binning())
+  , vertical_binning(psanaobj.vertical_binning())
+  , lookuptable_mode(psanaobj.lookuptable_mode())
+  , output_resolution_bits(psanaobj.output_resolution_bits())
+{
+}
+
 ns_TM6740ConfigV1_v0::dataset_config::~dataset_config()
 {
 }
@@ -141,6 +158,29 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Pulnix::TM6740ConfigV1> > make_TM6740Confi
     return boost::make_shared<PSEvt::DataProxy<Psana::Pulnix::TM6740ConfigV1> >(boost::shared_ptr<Psana::Pulnix::TM6740ConfigV1>());
   }
 }
+
+void store_TM6740ConfigV1(const Psana::Pulnix::TM6740ConfigV1& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_TM6740ConfigV1_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Pulnix.TM6740ConfigV1", version);
+  }
+}
+
+void store(const Psana::Pulnix::TM6740ConfigV1& obj, hdf5pp::Group group, int version) 
+{
+  store_TM6740ConfigV1(obj, group, version, false);
+}
+
+void append(const Psana::Pulnix::TM6740ConfigV1& obj, hdf5pp::Group group, int version)
+{
+  store_TM6740ConfigV1(obj, group, version, true);
+}
+
 
 hdf5pp::Type ns_TM6740ConfigV2_v0_dataset_config_stored_type()
 {
@@ -215,9 +255,25 @@ hdf5pp::Type ns_TM6740ConfigV2_v0::dataset_config::native_type()
   static hdf5pp::Type type = ns_TM6740ConfigV2_v0_dataset_config_native_type();
   return type;
 }
+
 ns_TM6740ConfigV2_v0::dataset_config::dataset_config()
 {
 }
+
+ns_TM6740ConfigV2_v0::dataset_config::dataset_config(const Psana::Pulnix::TM6740ConfigV2& psanaobj)
+  : gain_a(psanaobj.gain_a())
+  , gain_b(psanaobj.gain_b())
+  , vref_a(psanaobj.vref_a())
+  , vref_b(psanaobj.vref_b())
+  , gain_balance(psanaobj.gain_balance())
+  , output_resolution(psanaobj.output_resolution())
+  , horizontal_binning(psanaobj.horizontal_binning())
+  , vertical_binning(psanaobj.vertical_binning())
+  , lookuptable_mode(psanaobj.lookuptable_mode())
+  , output_resolution_bits(psanaobj.output_resolution_bits())
+{
+}
+
 ns_TM6740ConfigV2_v0::dataset_config::~dataset_config()
 {
 }
@@ -272,5 +328,28 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Pulnix::TM6740ConfigV2> > make_TM6740Confi
     return boost::make_shared<PSEvt::DataProxy<Psana::Pulnix::TM6740ConfigV2> >(boost::shared_ptr<Psana::Pulnix::TM6740ConfigV2>());
   }
 }
+
+void store_TM6740ConfigV2(const Psana::Pulnix::TM6740ConfigV2& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_TM6740ConfigV2_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Pulnix.TM6740ConfigV2", version);
+  }
+}
+
+void store(const Psana::Pulnix::TM6740ConfigV2& obj, hdf5pp::Group group, int version) 
+{
+  store_TM6740ConfigV2(obj, group, version, false);
+}
+
+void append(const Psana::Pulnix::TM6740ConfigV2& obj, hdf5pp::Group group, int version)
+{
+  store_TM6740ConfigV2(obj, group, version, true);
+}
+
 } // namespace Pulnix
 } // namespace psddl_hdf2psana

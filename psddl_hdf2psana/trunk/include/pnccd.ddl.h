@@ -16,10 +16,12 @@ struct dataset_config {
   static hdf5pp::Type stored_type();
 
   dataset_config();
+  dataset_config(const Psana::PNCCD::ConfigV1& psanaobj);
   ~dataset_config();
 
-  uint32_t numLinks; 
-  uint32_t payloadSizePerLink; 
+  uint32_t numLinks;
+  uint32_t payloadSizePerLink;
+
 
 };
 }
@@ -44,24 +46,30 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::PNCCD::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::PNCCD::ConfigV1& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::PNCCD::ConfigV1& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_ConfigV2_v0 {
 struct dataset_config {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_config();
+  dataset_config(const Psana::PNCCD::ConfigV2& psanaobj);
   ~dataset_config();
 
-  uint32_t numLinks; 
-  uint32_t payloadSizePerLink; 
-  uint32_t numChannels; 
-  uint32_t numRows; 
-  uint32_t numSubmoduleChannels; 
-  uint32_t numSubmoduleRows; 
-  uint32_t numSubmodules; 
-  uint32_t camexMagic; 
-  char* info; 
-  char* timingFName; 
+  uint32_t numLinks;
+  uint32_t payloadSizePerLink;
+  uint32_t numChannels;
+  uint32_t numRows;
+  uint32_t numSubmoduleChannels;
+  uint32_t numSubmoduleRows;
+  uint32_t numSubmodules;
+  uint32_t camexMagic;
+  char* info;
+  char* timingFName;
+
 
 };
 }
@@ -99,9 +107,21 @@ private:
 };
 
 boost::shared_ptr<PSEvt::Proxy<Psana::PNCCD::ConfigV2> > make_ConfigV2(int version, hdf5pp::Group group, hsize_t idx);
+
+void store(const Psana::PNCCD::ConfigV2& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::PNCCD::ConfigV2& obj, hdf5pp::Group group, int version = -1);
+
 boost::shared_ptr<PSEvt::Proxy<Psana::PNCCD::FullFrameV1> > make_FullFrameV1(int version, hdf5pp::Group group, hsize_t idx);
+
+void store(const Psana::PNCCD::FullFrameV1& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::PNCCD::FullFrameV1& obj, hdf5pp::Group group, int version = -1);
+
 boost::shared_ptr<PSEvt::Proxy<Psana::PNCCD::FramesV1> > make_FramesV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::PNCCD::ConfigV1>& cfg);
 boost::shared_ptr<PSEvt::Proxy<Psana::PNCCD::FramesV1> > make_FramesV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::PNCCD::ConfigV2>& cfg);
+
+void store(const Psana::PNCCD::FramesV1& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::PNCCD::FramesV1& obj, hdf5pp::Group group, int version = -1);
+
 } // namespace PNCCD
 } // namespace psddl_hdf2psana
 #endif // PSDDL_HDF2PSANA_PNCCD_DDL_H

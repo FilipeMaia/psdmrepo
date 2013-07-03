@@ -16,14 +16,16 @@ struct dataset_config {
   static hdf5pp::Type stored_type();
 
   dataset_config();
+  dataset_config(const Psana::Encoder::ConfigV1& psanaobj);
   ~dataset_config();
 
-  uint32_t chan_num; 
-  uint32_t count_mode; 
-  uint32_t quadrature_mode; 
-  uint32_t input_num; 
-  uint32_t input_rising; 
-  uint32_t ticks_per_sec; 
+  uint32_t chan_num;
+  uint32_t count_mode;
+  uint32_t quadrature_mode;
+  uint32_t input_num;
+  uint32_t input_rising;
+  uint32_t ticks_per_sec;
+
 
 };
 }
@@ -52,20 +54,26 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Encoder::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::Encoder::ConfigV1& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::Encoder::ConfigV1& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_ConfigV2_v0 {
 struct dataset_config {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_config();
+  dataset_config(const Psana::Encoder::ConfigV2& psanaobj);
   ~dataset_config();
 
-  uint32_t chan_mask; 
-  uint32_t count_mode; 
-  uint32_t quadrature_mode; 
-  uint32_t input_num; 
-  uint32_t input_rising; 
-  uint32_t ticks_per_sec; 
+  uint32_t chan_mask;
+  uint32_t count_mode;
+  uint32_t quadrature_mode;
+  uint32_t input_num;
+  uint32_t input_rising;
+  uint32_t ticks_per_sec;
+
 
 };
 }
@@ -94,16 +102,22 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Encoder::ConfigV2> > make_ConfigV2(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::Encoder::ConfigV2& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::Encoder::ConfigV2& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_DataV1_v0 {
 struct dataset_data {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_data();
+  dataset_data(const Psana::Encoder::DataV1& psanaobj);
   ~dataset_data();
 
-  uint32_t _33mhz_timestamp; 
-  uint32_t encoder_count; 
+  uint32_t _33mhz_timestamp;
+  uint32_t encoder_count;
+
 
 };
 }
@@ -131,16 +145,22 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Encoder::DataV1> > make_DataV1(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::Encoder::DataV1& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::Encoder::DataV1& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_DataV2_v0 {
 struct dataset_data {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_data();
+  dataset_data(const Psana::Encoder::DataV2& psanaobj);
   ~dataset_data();
 
-  uint32_t _33mhz_timestamp; 
-  uint32_t encoder_count[3]; 
+  uint32_t _33mhz_timestamp;
+  uint32_t encoder_count[3];
+
 
 };
 }
@@ -167,6 +187,10 @@ private:
 };
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Encoder::DataV2> > make_DataV2(int version, hdf5pp::Group group, hsize_t idx);
+
+void store(const Psana::Encoder::DataV2& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::Encoder::DataV2& obj, hdf5pp::Group group, int version = -1);
+
 } // namespace Encoder
 } // namespace psddl_hdf2psana
 #endif // PSDDL_HDF2PSANA_ENCODER_DDL_H

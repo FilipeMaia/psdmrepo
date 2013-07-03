@@ -90,6 +90,29 @@ hdf5pp::Type ns_DetInfo_v0::dataset_data::native_type()
   return type;
 }
 
+ns_DetInfo_v0::dataset_data::dataset_data()
+  : detector(0)
+  , device(0)
+{
+}
+
+ns_DetInfo_v0::dataset_data::dataset_data(const ::Pds::DetInfo& di)
+  : processId(di.processId())
+  , detector(0)
+  , detId(di.detId())
+  , device(0)
+  , devId(di.devId())
+{
+  detector = strdup(::Pds::DetInfo::name(di.detector()));
+  device = strdup(::Pds::DetInfo::name(di.device()));
+}
+
+ns_DetInfo_v0::dataset_data::~dataset_data()
+{
+  free(detector);
+  free(device);
+}
+
 ns_DetInfo_v0::dataset_data::operator ::Pds::DetInfo() const
 {
   // get id from a string

@@ -16,12 +16,14 @@ struct dataset_data {
   static hdf5pp::Type stored_type();
 
   dataset_data();
+  dataset_data(const Psana::Camera::FrameCoord& psanaobj);
   ~dataset_data();
 
-  uint16_t column; 
-  uint16_t row; 
+  uint16_t column;
+  uint16_t row;
 
   operator Psana::Camera::FrameCoord() const { return Psana::Camera::FrameCoord(column, row); }
+
 };
 }
 class Proxy_FrameCoord_v0 : public PSEvt::Proxy<Psana::Camera::FrameCoord> {
@@ -43,6 +45,10 @@ private:
 };
 boost::shared_ptr<PSEvt::Proxy<Psana::Camera::FrameCoord> > make_FrameCoord(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::Camera::FrameCoord& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::Camera::FrameCoord& obj, hdf5pp::Group group, int version = -1);
+
+
 
 class FrameFccdConfigV1_v0 : public Psana::Camera::FrameFccdConfigV1 {
 public:
@@ -58,21 +64,27 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Camera::FrameFccdConfigV1> > make_FrameFccdConfigV1(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::Camera::FrameFccdConfigV1& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::Camera::FrameFccdConfigV1& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_FrameFexConfigV1_v0 {
 struct dataset_config {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_config();
+  dataset_config(const Psana::Camera::FrameFexConfigV1& psanaobj);
   ~dataset_config();
 
-  uint32_t forwarding; 
-  uint32_t forward_prescale; 
-  uint32_t processing; 
-  Camera::ns_FrameCoord_v0::dataset_data roiBegin; 
-  Camera::ns_FrameCoord_v0::dataset_data roiEnd; 
-  uint32_t threshold; 
-  uint32_t number_of_masked_pixels; 
+  uint32_t forwarding;
+  uint32_t forward_prescale;
+  uint32_t processing;
+  Camera::ns_FrameCoord_v0::dataset_data roiBegin;
+  Camera::ns_FrameCoord_v0::dataset_data roiEnd;
+  uint32_t threshold;
+  uint32_t number_of_masked_pixels;
+
 
 };
 }
@@ -105,7 +117,15 @@ private:
 };
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Camera::FrameFexConfigV1> > make_FrameFexConfigV1(int version, hdf5pp::Group group, hsize_t idx);
+
+void store(const Psana::Camera::FrameFexConfigV1& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::Camera::FrameFexConfigV1& obj, hdf5pp::Group group, int version = -1);
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Camera::FrameV1> > make_FrameV1(int version, hdf5pp::Group group, hsize_t idx);
+
+void store(const Psana::Camera::FrameV1& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::Camera::FrameV1& obj, hdf5pp::Group group, int version = -1);
+
 
 namespace ns_TwoDGaussianV1_v0 {
 struct dataset_data {
@@ -113,14 +133,16 @@ struct dataset_data {
   static hdf5pp::Type stored_type();
 
   dataset_data();
+  dataset_data(const Psana::Camera::TwoDGaussianV1& psanaobj);
   ~dataset_data();
 
-  uint64_t integral; 
-  double xmean; 
-  double ymean; 
-  double major_axis_width; 
-  double minor_axis_width; 
-  double major_axis_tilt; 
+  uint64_t integral;
+  double xmean;
+  double ymean;
+  double major_axis_width;
+  double minor_axis_width;
+  double major_axis_tilt;
+
 
 };
 }
@@ -148,6 +170,10 @@ private:
 };
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Camera::TwoDGaussianV1> > make_TwoDGaussianV1(int version, hdf5pp::Group group, hsize_t idx);
+
+void store(const Psana::Camera::TwoDGaussianV1& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::Camera::TwoDGaussianV1& obj, hdf5pp::Group group, int version = -1);
+
 } // namespace Camera
 } // namespace psddl_hdf2psana
 #endif // PSDDL_HDF2PSANA_CAMERA_DDL_H

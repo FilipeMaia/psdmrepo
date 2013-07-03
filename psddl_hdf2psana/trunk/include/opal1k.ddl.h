@@ -17,19 +17,21 @@ struct dataset_config {
   static hdf5pp::Type stored_type();
 
   dataset_config();
+  dataset_config(const Psana::Opal1k::ConfigV1& psanaobj);
   ~dataset_config();
 
-  uint16_t black_level; 
-  uint16_t gain_percent; 
-  uint8_t output_resolution; 
-  uint8_t vertical_binning; 
-  uint8_t output_mirroring; 
-  uint8_t vertical_remapping; 
-  uint8_t defect_pixel_correction_enabled; 
-  uint8_t output_lookup_table_enabled; 
-  uint32_t number_of_defect_pixels; 
-  uint16_t output_offset; 
-  uint32_t output_resolution_bits; 
+  uint16_t black_level;
+  uint16_t gain_percent;
+  uint8_t output_resolution;
+  uint8_t vertical_binning;
+  uint8_t output_mirroring;
+  uint8_t vertical_remapping;
+  uint8_t defect_pixel_correction_enabled;
+  uint8_t output_lookup_table_enabled;
+  uint32_t number_of_defect_pixels;
+  uint16_t output_offset;
+  uint32_t output_resolution_bits;
+
 
 };
 }
@@ -67,6 +69,10 @@ private:
 };
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Opal1k::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx);
+
+void store(const Psana::Opal1k::ConfigV1& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::Opal1k::ConfigV1& obj, hdf5pp::Group group, int version = -1);
+
 } // namespace Opal1k
 } // namespace psddl_hdf2psana
 #endif // PSDDL_HDF2PSANA_OPAL1K_DDL_H

@@ -8,6 +8,7 @@
 #include "hdf5pp/VlenType.h"
 #include "hdf5pp/Utils.h"
 #include "PSEvt/DataProxy.h"
+#include "psddl_hdf2psana/Exceptions.h"
 #include "psddl_hdf2psana/epics.h"
 #include "psddl_hdf2psana/epics.h"
 #include "psddl_hdf2psana/epics.h"
@@ -54,9 +55,17 @@ hdf5pp::Type ns_epicsTimeStamp_v0::dataset_data::native_type()
   static hdf5pp::Type type = ns_epicsTimeStamp_v0_dataset_data_native_type();
   return type;
 }
+
 ns_epicsTimeStamp_v0::dataset_data::dataset_data()
 {
 }
+
+ns_epicsTimeStamp_v0::dataset_data::dataset_data(const Psana::Epics::epicsTimeStamp& psanaobj)
+  : secPastEpoch(psanaobj.sec())
+  , nsec(psanaobj.nsec())
+{
+}
+
 ns_epicsTimeStamp_v0::dataset_data::~dataset_data()
 {
 }
@@ -92,9 +101,18 @@ hdf5pp::Type ns_EpicsPvHeader_v0::dataset_data::native_type()
   static hdf5pp::Type type = ns_EpicsPvHeader_v0_dataset_data_native_type();
   return type;
 }
+
 ns_EpicsPvHeader_v0::dataset_data::dataset_data()
 {
 }
+
+ns_EpicsPvHeader_v0::dataset_data::dataset_data(const Psana::Epics::EpicsPvHeader& psanaobj)
+  : pvId(psanaobj.pvId())
+  , dbrType(psanaobj.dbrType())
+  , numElements(psanaobj.numElements())
+{
+}
+
 ns_EpicsPvHeader_v0::dataset_data::~dataset_data()
 {
 }
@@ -155,9 +173,18 @@ hdf5pp::Type ns_PvConfigV1_v0::dataset_data::native_type()
   static hdf5pp::Type type = ns_PvConfigV1_v0_dataset_data_native_type();
   return type;
 }
+
 ns_PvConfigV1_v0::dataset_data::dataset_data()
 {
 }
+
+ns_PvConfigV1_v0::dataset_data::dataset_data(const Psana::Epics::PvConfigV1& psanaobj)
+  : pvId(psanaobj.pvId())
+  , interval(psanaobj.interval())
+{
+  strncpy(description, psanaobj.description(), 64);
+}
+
 ns_PvConfigV1_v0::dataset_data::~dataset_data()
 {
 }
@@ -189,9 +216,16 @@ hdf5pp::Type ns_ConfigV1_v0::dataset_config::native_type()
   static hdf5pp::Type type = ns_ConfigV1_v0_dataset_config_native_type();
   return type;
 }
+
 ns_ConfigV1_v0::dataset_config::dataset_config()
 {
 }
+
+ns_ConfigV1_v0::dataset_config::dataset_config(const Psana::Epics::ConfigV1& psanaobj)
+  : numPv(psanaobj.numPv())
+{
+}
+
 ns_ConfigV1_v0::dataset_config::~dataset_config()
 {
 }
@@ -220,5 +254,28 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Epics::ConfigV1> > make_ConfigV1(int versi
     return boost::make_shared<PSEvt::DataProxy<Psana::Epics::ConfigV1> >(boost::shared_ptr<Psana::Epics::ConfigV1>());
   }
 }
+
+void store_ConfigV1(const Psana::Epics::ConfigV1& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    //store_ConfigV1_v0(object, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Epics.ConfigV1", version);
+  }
+}
+
+void store(const Psana::Epics::ConfigV1& obj, hdf5pp::Group group, int version) 
+{
+  store_ConfigV1(obj, group, version, false);
+}
+
+void append(const Psana::Epics::ConfigV1& obj, hdf5pp::Group group, int version)
+{
+  store_ConfigV1(obj, group, version, true);
+}
+
 } // namespace Epics
 } // namespace psddl_hdf2psana

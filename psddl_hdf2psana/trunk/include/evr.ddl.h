@@ -17,23 +17,25 @@ struct dataset_data {
   static hdf5pp::Type stored_type();
 
   dataset_data();
+  dataset_data(const Psana::EvrData::PulseConfig& psanaobj);
   ~dataset_data();
 
-  uint32_t pulse; 
-  uint32_t _input_control_value; 
-  uint32_t _output_control_value; 
-  uint8_t polarity; 
-  uint8_t map_set_enable; 
-  uint8_t map_reset_enable; 
-  uint8_t map_trigger_enable; 
-  uint32_t prescale; 
-  uint32_t delay; 
-  uint32_t width; 
-  int16_t trigger; 
-  int16_t set; 
-  int16_t clear; 
+  uint32_t pulse;
+  uint32_t _input_control_value;
+  uint32_t _output_control_value;
+  uint8_t polarity;
+  uint8_t map_set_enable;
+  uint8_t map_reset_enable;
+  uint8_t map_trigger_enable;
+  uint32_t prescale;
+  uint32_t delay;
+  uint32_t width;
+  int16_t trigger;
+  int16_t set;
+  int16_t clear;
 
   operator Psana::EvrData::PulseConfig() const { return Psana::EvrData::PulseConfig(pulse, trigger, set, clear, polarity, map_set_enable, map_reset_enable, map_trigger_enable, prescale, delay, width); }
+
 };
 }
 class Proxy_PulseConfig_v0 : public PSEvt::Proxy<Psana::EvrData::PulseConfig> {
@@ -55,21 +57,27 @@ private:
 };
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::PulseConfig> > make_PulseConfig(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::EvrData::PulseConfig& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::EvrData::PulseConfig& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_PulseConfigV3_v0 {
 struct dataset_data {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_data();
+  dataset_data(const Psana::EvrData::PulseConfigV3& psanaobj);
   ~dataset_data();
 
-  uint16_t pulseId; 
-  uint16_t polarity; 
-  uint32_t prescale; 
-  uint32_t delay; 
-  uint32_t width; 
+  uint16_t pulseId;
+  uint16_t polarity;
+  uint32_t prescale;
+  uint32_t delay;
+  uint32_t width;
 
   operator Psana::EvrData::PulseConfigV3() const { return Psana::EvrData::PulseConfigV3(pulseId, polarity, prescale, delay, width); }
+
 };
 }
 class Proxy_PulseConfigV3_v0 : public PSEvt::Proxy<Psana::EvrData::PulseConfigV3> {
@@ -91,23 +99,29 @@ private:
 };
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::PulseConfigV3> > make_PulseConfigV3(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::EvrData::PulseConfigV3& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::EvrData::PulseConfigV3& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_EventCodeV3_v0 {
 struct dataset_data {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_data();
+  dataset_data(const Psana::EvrData::EventCodeV3& psanaobj);
   ~dataset_data();
 
-  uint16_t code; 
-  uint16_t _u16MaskEventAttr_value; 
-  uint8_t isReadout; 
-  uint8_t isTerminator; 
-  uint32_t maskTrigger; 
-  uint32_t maskSet; 
-  uint32_t maskClear; 
+  uint16_t code;
+  uint16_t _u16MaskEventAttr_value;
+  uint8_t isReadout;
+  uint8_t isTerminator;
+  uint32_t maskTrigger;
+  uint32_t maskSet;
+  uint32_t maskClear;
 
   operator Psana::EvrData::EventCodeV3() const { return Psana::EvrData::EventCodeV3(code, isReadout, isTerminator, maskTrigger, maskSet, maskClear); }
+
 };
 }
 class Proxy_EventCodeV3_v0 : public PSEvt::Proxy<Psana::EvrData::EventCodeV3> {
@@ -129,25 +143,31 @@ private:
 };
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::EventCodeV3> > make_EventCodeV3(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::EvrData::EventCodeV3& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::EvrData::EventCodeV3& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_EventCodeV4_v0 {
 struct dataset_data {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_data();
+  dataset_data(const Psana::EvrData::EventCodeV4& psanaobj);
   ~dataset_data();
 
-  uint16_t code; 
-  uint16_t _u16MaskEventAttr_value; 
-  uint8_t isReadout; 
-  uint8_t isTerminator; 
-  uint32_t reportDelay; 
-  uint32_t reportWidth; 
-  uint32_t maskTrigger; 
-  uint32_t maskSet; 
-  uint32_t maskClear; 
+  uint16_t code;
+  uint16_t _u16MaskEventAttr_value;
+  uint8_t isReadout;
+  uint8_t isTerminator;
+  uint32_t reportDelay;
+  uint32_t reportWidth;
+  uint32_t maskTrigger;
+  uint32_t maskSet;
+  uint32_t maskClear;
 
   operator Psana::EvrData::EventCodeV4() const { return Psana::EvrData::EventCodeV4(code, isReadout, isTerminator, reportDelay, reportWidth, maskTrigger, maskSet, maskClear); }
+
 };
 }
 class Proxy_EventCodeV4_v0 : public PSEvt::Proxy<Psana::EvrData::EventCodeV4> {
@@ -169,26 +189,32 @@ private:
 };
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::EventCodeV4> > make_EventCodeV4(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::EvrData::EventCodeV4& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::EvrData::EventCodeV4& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_EventCodeV5_v0 {
 struct dataset_data {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_data();
+  dataset_data(const Psana::EvrData::EventCodeV5& psanaobj);
   ~dataset_data();
 
-  uint16_t code; 
-  uint8_t isReadout; 
-  uint8_t isCommand; 
-  uint8_t isLatch; 
-  uint32_t reportDelay; 
-  uint32_t reportWidth; 
-  uint32_t maskTrigger; 
-  uint32_t maskSet; 
-  uint32_t maskClear; 
-  char* desc; 
+  uint16_t code;
+  uint8_t isReadout;
+  uint8_t isCommand;
+  uint8_t isLatch;
+  uint32_t reportDelay;
+  uint32_t reportWidth;
+  uint32_t maskTrigger;
+  uint32_t maskSet;
+  uint32_t maskClear;
+  char* desc;
 
   operator Psana::EvrData::EventCodeV5() const { return Psana::EvrData::EventCodeV5(code, isReadout, isCommand, isLatch, reportDelay, reportWidth, maskTrigger, maskSet, maskClear, desc); }
+
 };
 }
 class Proxy_EventCodeV5_v0 : public PSEvt::Proxy<Psana::EvrData::EventCodeV5> {
@@ -210,27 +236,33 @@ private:
 };
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::EventCodeV5> > make_EventCodeV5(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::EvrData::EventCodeV5& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::EvrData::EventCodeV5& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_EventCodeV6_v0 {
 struct dataset_data {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_data();
+  dataset_data(const Psana::EvrData::EventCodeV6& psanaobj);
   ~dataset_data();
 
-  uint16_t code; 
-  uint8_t isReadout; 
-  uint8_t isCommand; 
-  uint8_t isLatch; 
-  uint32_t reportDelay; 
-  uint32_t reportWidth; 
-  uint32_t maskTrigger; 
-  uint32_t maskSet; 
-  uint32_t maskClear; 
-  char* desc; 
-  uint16_t readoutGroup; 
+  uint16_t code;
+  uint8_t isReadout;
+  uint8_t isCommand;
+  uint8_t isLatch;
+  uint32_t reportDelay;
+  uint32_t reportWidth;
+  uint32_t maskTrigger;
+  uint32_t maskSet;
+  uint32_t maskClear;
+  char* desc;
+  uint16_t readoutGroup;
 
   operator Psana::EvrData::EventCodeV6() const { return Psana::EvrData::EventCodeV6(code, isReadout, isCommand, isLatch, reportDelay, reportWidth, maskTrigger, maskSet, maskClear, desc, readoutGroup); }
+
 };
 }
 class Proxy_EventCodeV6_v0 : public PSEvt::Proxy<Psana::EvrData::EventCodeV6> {
@@ -252,21 +284,27 @@ private:
 };
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::EventCodeV6> > make_EventCodeV6(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::EvrData::EventCodeV6& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::EvrData::EventCodeV6& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_OutputMap_v0 {
 struct dataset_data {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_data();
+  dataset_data(const Psana::EvrData::OutputMap& psanaobj);
   ~dataset_data();
 
-  uint32_t value; 
-  int16_t source; 
-  uint8_t source_id; 
-  int16_t conn; 
-  uint8_t conn_id; 
+  uint32_t value;
+  int16_t source;
+  uint8_t source_id;
+  int16_t conn;
+  uint8_t conn_id;
 
   operator Psana::EvrData::OutputMap() const { return Psana::EvrData::OutputMap(Psana::EvrData::OutputMap::Source(source), source_id, Psana::EvrData::OutputMap::Conn(conn), conn_id); }
+
 };
 }
 class Proxy_OutputMap_v0 : public PSEvt::Proxy<Psana::EvrData::OutputMap> {
@@ -288,22 +326,28 @@ private:
 };
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::OutputMap> > make_OutputMap(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::EvrData::OutputMap& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::EvrData::OutputMap& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_OutputMapV2_v0 {
 struct dataset_data {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_data();
+  dataset_data(const Psana::EvrData::OutputMapV2& psanaobj);
   ~dataset_data();
 
-  uint32_t value; 
-  int16_t source; 
-  uint8_t source_id; 
-  int16_t conn; 
-  uint8_t conn_id; 
-  uint8_t module; 
+  uint32_t value;
+  int16_t source;
+  uint8_t source_id;
+  int16_t conn;
+  uint8_t conn_id;
+  uint8_t module;
 
   operator Psana::EvrData::OutputMapV2() const { return Psana::EvrData::OutputMapV2(Psana::EvrData::OutputMapV2::Source(source), source_id, Psana::EvrData::OutputMapV2::Conn(conn), conn_id, module); }
+
 };
 }
 class Proxy_OutputMapV2_v0 : public PSEvt::Proxy<Psana::EvrData::OutputMapV2> {
@@ -325,16 +369,22 @@ private:
 };
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::OutputMapV2> > make_OutputMapV2(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::EvrData::OutputMapV2& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::EvrData::OutputMapV2& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_ConfigV1_v0 {
 struct dataset_config {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_config();
+  dataset_config(const Psana::EvrData::ConfigV1& psanaobj);
   ~dataset_config();
 
-  uint32_t npulses; 
-  uint32_t noutputs; 
+  uint32_t npulses;
+  uint32_t noutputs;
+
 
 };
 }
@@ -364,19 +414,25 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::EvrData::ConfigV1& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::EvrData::ConfigV1& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_ConfigV2_v0 {
 struct dataset_config {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_config();
+  dataset_config(const Psana::EvrData::ConfigV2& psanaobj);
   ~dataset_config();
 
-  uint32_t opcode; 
-  uint32_t npulses; 
-  uint32_t noutputs; 
-  int16_t beam; 
-  int16_t rate; 
+  uint32_t opcode;
+  uint32_t npulses;
+  uint32_t noutputs;
+  int16_t beam;
+  int16_t rate;
+
 
 };
 }
@@ -409,17 +465,23 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::ConfigV2> > make_ConfigV2(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::EvrData::ConfigV2& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::EvrData::ConfigV2& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_ConfigV3_v0 {
 struct dataset_config {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_config();
+  dataset_config(const Psana::EvrData::ConfigV3& psanaobj);
   ~dataset_config();
 
-  uint32_t neventcodes; 
-  uint32_t npulses; 
-  uint32_t noutputs; 
+  uint32_t neventcodes;
+  uint32_t npulses;
+  uint32_t noutputs;
+
 
 };
 }
@@ -453,17 +515,23 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::ConfigV3> > make_ConfigV3(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::EvrData::ConfigV3& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::EvrData::ConfigV3& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_ConfigV4_v0 {
 struct dataset_config {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_config();
+  dataset_config(const Psana::EvrData::ConfigV4& psanaobj);
   ~dataset_config();
 
-  uint32_t neventcodes; 
-  uint32_t npulses; 
-  uint32_t noutputs; 
+  uint32_t neventcodes;
+  uint32_t npulses;
+  uint32_t noutputs;
+
 
 };
 }
@@ -497,18 +565,24 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::ConfigV4> > make_ConfigV4(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::EvrData::ConfigV4& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::EvrData::ConfigV4& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_SequencerEntry_v0 {
 struct dataset_data {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_data();
+  dataset_data(const Psana::EvrData::SequencerEntry& psanaobj);
   ~dataset_data();
 
-  uint32_t delay; 
-  uint32_t eventcode; 
+  uint32_t delay;
+  uint32_t eventcode;
 
   operator Psana::EvrData::SequencerEntry() const { return Psana::EvrData::SequencerEntry(eventcode, delay); }
+
 };
 }
 class Proxy_SequencerEntry_v0 : public PSEvt::Proxy<Psana::EvrData::SequencerEntry> {
@@ -530,21 +604,30 @@ private:
 };
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::SequencerEntry> > make_SequencerEntry(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::EvrData::SequencerEntry& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::EvrData::SequencerEntry& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_SequencerConfigV1_v0 {
 struct dataset_config {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_config();
+  dataset_config(const Psana::EvrData::SequencerConfigV1& psanaobj);
   ~dataset_config();
 
-  int32_t sync_source; 
-  int32_t beam_source; 
-  uint32_t length; 
-  uint32_t cycles; 
+  int32_t sync_source;
+  int32_t beam_source;
+  uint32_t length;
+  uint32_t cycles;
   size_t vlen_entries;
-  EvrData::ns_SequencerEntry_v0::dataset_data* entries; 
+  EvrData::ns_SequencerEntry_v0::dataset_data* entries;
 
+
+private:
+  dataset_config(const dataset_config&);
+  dataset_config& operator=(const dataset_config&);
 };
 }
 
@@ -577,11 +660,13 @@ struct dataset_config {
   static hdf5pp::Type stored_type();
 
   dataset_config();
+  dataset_config(const Psana::EvrData::ConfigV5& psanaobj);
   ~dataset_config();
 
-  uint32_t neventcodes; 
-  uint32_t npulses; 
-  uint32_t noutputs; 
+  uint32_t neventcodes;
+  uint32_t npulses;
+  uint32_t noutputs;
+
 
 };
 }
@@ -619,17 +704,23 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::ConfigV5> > make_ConfigV5(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::EvrData::ConfigV5& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::EvrData::ConfigV5& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_ConfigV6_v0 {
 struct dataset_config {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_config();
+  dataset_config(const Psana::EvrData::ConfigV6& psanaobj);
   ~dataset_config();
 
-  uint32_t neventcodes; 
-  uint32_t npulses; 
-  uint32_t noutputs; 
+  uint32_t neventcodes;
+  uint32_t npulses;
+  uint32_t noutputs;
+
 
 };
 }
@@ -667,17 +758,23 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::ConfigV6> > make_ConfigV6(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::EvrData::ConfigV6& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::EvrData::ConfigV6& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_ConfigV7_v0 {
 struct dataset_config {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_config();
+  dataset_config(const Psana::EvrData::ConfigV7& psanaobj);
   ~dataset_config();
 
-  uint32_t neventcodes; 
-  uint32_t npulses; 
-  uint32_t noutputs; 
+  uint32_t neventcodes;
+  uint32_t npulses;
+  uint32_t noutputs;
+
 
 };
 }
@@ -715,19 +812,25 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::ConfigV7> > make_ConfigV7(int version, hdf5pp::Group group, hsize_t idx);
 
+void store(const Psana::EvrData::ConfigV7& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::EvrData::ConfigV7& obj, hdf5pp::Group group, int version = -1);
+
+
 namespace ns_FIFOEvent_v0 {
 struct dataset_data {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
   dataset_data();
+  dataset_data(const Psana::EvrData::FIFOEvent& psanaobj);
   ~dataset_data();
 
-  uint32_t timestampHigh; 
-  uint32_t timestampLow; 
-  uint32_t eventCode; 
+  uint32_t timestampHigh;
+  uint32_t timestampLow;
+  uint32_t eventCode;
 
   operator Psana::EvrData::FIFOEvent() const { return Psana::EvrData::FIFOEvent(timestampHigh, timestampLow, eventCode); }
+
 };
 }
 class Proxy_FIFOEvent_v0 : public PSEvt::Proxy<Psana::EvrData::FIFOEvent> {
@@ -748,8 +851,20 @@ private:
   boost::shared_ptr<PsanaType> m_data;
 };
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::FIFOEvent> > make_FIFOEvent(int version, hdf5pp::Group group, hsize_t idx);
+
+void store(const Psana::EvrData::FIFOEvent& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::EvrData::FIFOEvent& obj, hdf5pp::Group group, int version = -1);
+
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::DataV3> > make_DataV3(int version, hdf5pp::Group group, hsize_t idx);
+
+void store(const Psana::EvrData::DataV3& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::EvrData::DataV3& obj, hdf5pp::Group group, int version = -1);
+
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::IOConfigV1> > make_IOConfigV1(int version, hdf5pp::Group group, hsize_t idx);
+
+void store(const Psana::EvrData::IOConfigV1& obj, hdf5pp::Group group, int version = -1);
+void append(const Psana::EvrData::IOConfigV1& obj, hdf5pp::Group group, int version = -1);
+
 } // namespace EvrData
 } // namespace psddl_hdf2psana
 #endif // PSDDL_HDF2PSANA_EVR_DDL_H
