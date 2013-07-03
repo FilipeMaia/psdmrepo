@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE psddl SYSTEM "psddl.dtd">
+
+<psddl>
+
+    <use file="psddldata/evr.ddl.xml" />
+    
+    <package name="EvrData">
+
+        <!-- ========================================================================= -->
+    
+        <h5schema name="SequencerConfigV1" version="0">
+
+            <tag name="skip-proxy"/>
+
+            <dataset name="config">
+
+                <attribute name="sync_source"/>
+                <attribute name="beam_source"/>
+                <attribute name="length"/>
+                <attribute name="cycles"/>
+                <attribute name="entries">
+                  <tag name="vlen"/>
+                </attribute>
+
+            </dataset>
+            
+        </h5schema>
+    
+        <!-- ========================================================================= -->
+    
+        <h5schema name="DataV3" version="0">
+
+            <tag name="external" value="psddl_hdf2psana/evr.h"/>
+            
+        </h5schema>
+    
+        <!-- ========================================================================= -->
+    
+        <h5schema name="ConfigV5" version="0">
+
+            <dataset name="config">
+                <attribute name="neventcodes"/>
+                <attribute name="npulses"/>
+                <attribute name="noutputs"/>
+            </dataset>
+
+            <dataset name="eventcodes"/>
+            
+            <dataset name="pulses"/>
+            
+            <dataset name="output_maps"/>
+            
+            <dataset name="seq_config"/>
+            
+        </h5schema>
+    
+        <!-- ========================================================================= -->
+    
+        <h5schema name="ConfigV6" version="0">
+
+            <dataset name="config">
+                <attribute name="neventcodes"/>
+                <attribute name="npulses"/>
+                <attribute name="noutputs"/>
+            </dataset>
+
+            <dataset name="eventcodes"/>
+            
+            <dataset name="pulses"/>
+            
+            <dataset name="output_maps"/>
+            
+            <dataset name="seq_config"/>
+            
+        </h5schema>
+    
+        <!-- ========================================================================= -->
+    
+        <h5schema name="ConfigV7" version="0">
+
+            <dataset name="config">
+                <attribute name="neventcodes"/>
+                <attribute name="npulses"/>
+                <attribute name="noutputs"/>
+            </dataset>
+
+            <dataset name="eventcodes"/>
+            
+            <dataset name="pulses"/>
+            
+            <dataset name="output_maps"/>
+            
+            <dataset name="seq_config"/>
+            
+        </h5schema>
+    
+        <!-- ========================================================================= -->
+    
+        <h5schema name="IOChannel" version="0">
+
+            <tag name="skip-proxy"/>
+            <tag name="external" value="psddl_hdf2psana/evr.h"/>
+            
+        </h5schema>
+    
+        <!-- ========================================================================= -->
+    
+        <h5schema name="IOConfigV1" version="0">
+
+            <tag name="external" value="psddl_hdf2psana/evr.h"/>
+            
+        </h5schema>
+    
+    </package>
+</psddl>
