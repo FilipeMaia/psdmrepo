@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-07-01
+2013-07-02 Andy Salnikov
+- a bit more refactoring and simplification of templates
+- adding code to store data
+
 Tag: V00-07-00
 2013-07-01 Andy Salnikov
 - small scale refactoring of HDF5 backend, moved all Jinja2 templates to

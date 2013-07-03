@@ -144,6 +144,8 @@ class DdlHdf5Data ( object ) :
         print >>self.cpp, "#include \"hdf5pp/VlenType.h\""
         print >>self.cpp, "#include \"hdf5pp/Utils.h\""
         print >>self.cpp, "#include \"PSEvt/DataProxy.h\""
+        inc = os.path.join(self.incdirname, "Exceptions.h")
+        print >>self.cpp, "#include \"%s\"" % inc
 
 
         # headers for other included packages
@@ -256,7 +258,6 @@ class DdlHdf5Data ( object ) :
         if all('skip-proxy' in schema.tags for schema in type.h5schemas): return
 
         psanatypename = type.fullName('C++', self.psana_ns)
-        typename = type.name
 
         # generate all make_* methods
         configs = type.xtcConfig or [None]
@@ -268,6 +269,13 @@ class DdlHdf5Data ( object ) :
             print >>self.inc, _TEMPL('make_proxy_decl').render(locals())
             print >>self.cpp, _TEMPL('make_proxy_impl').render(locals())
 
+        # generate store method declaration
+        print >>self.inc, _TEMPL('store_decl').render(locals())
+        
+        versions = sorted(schema.version for schema in type.h5schemas)
+        max_version = versions[-1]
+        print >>self.cpp, _TEMPL('store_impl').render(locals())
+
     def _genSchema(self, type, schema):
 
         self._log.debug("_genSchema: %s", repr(schema))
@@ -277,13 +285,13 @@ class DdlHdf5Data ( object ) :
             return
 
         # wrap schema into helper class which knows how to do the rest
-        hschema = Helpers.Schema(schema)
+        hschema = Helpers.Schema(schema, self.psana_ns)
 
         for ds in hschema.datasets:
             # generate datasets classes
-            ds.genDs(self.inc, self.cpp, self.psana_ns)
+            ds.genDs(self.inc, self.cpp)
 
-        hschema.genSchema(self.inc, self.cpp, self.psana_ns)
+        hschema.genSchema(self.inc, self.cpp)
 
 
     def _dumpSchema(self, model):

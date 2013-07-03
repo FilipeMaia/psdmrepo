@@ -11,31 +11,35 @@
 :  compound HDF5 dataset. 
 :  
 :  Parameters for this template:
-:  ns          - C++ namespace
-:  className   - C++ class name
-: attributes  - list of attributes, each item is a dictionary with keys 
-:                name, type, and optionally vlen
-:  conversion  - optional, C++ return type of conversion method
-:  cvt_args    - arguments to constructor of conversion type
+:    hds         - instance of type DatasetCompound
+:    conversion  - optional, C++ return type of conversion method
+:    cvt_args    - arguments to constructor of conversion type
 :
+{% set classname = hds.ds.className() %}
 
-namespace {{ns}} {
-struct {{className}} {
+namespace {{hds.schema.nsName()}} {
+struct {{classname}} {
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
 
-  {{className}}();
-  ~{{className}}();
+  {{classname}}();
+  {{classname}}(const {{hds.pstypename}}& psanaobj);
+  ~{{classname}}();
 
-{% for attr in attributes %}
-{% if attr.vlen %}
-  size_t vlen_{{attr.name}};
-{% endif %}
-  {{attr.type}} {{attr.name}}; 
+{% for attr in hds.attributes %}
+{% for decl in attr.ds_attr_decl() %}
+  {{decl}}
+{% endfor %}
 {% endfor %}
 
 {% if conversion %}
   operator {{conversion}}() const { return {{conversion}}({{cvt_args}}); }
+{% endif %}
+
+{% if pointers %}
+private:
+  {{classname}}(const {{classname}}&);
+  {{classname}}& operator=(const {{classname}}&);
 {% endif %}
 };
 }
@@ -47,12 +51,14 @@ struct {{className}} {
 :  defining compound dataset/
 :
 :  Parameters for this template:
-:  ns          - C++ namespace
-:  className   - C++ class name
-:  pointers    - list of data members which are pointers
-:  vlen_pointers - list of data members which are pointers to VLEN data
+:    hds         - instance of type DatasetCompound
+:    pointers    - list of data members which are pointers
+:    vlen_pointers - list of data members which are pointers to VLEN data
 :
-{{ns}}::{{className}}::{{className}}()
+{% set ns = hds.schema.nsName() %}
+{% set classname = hds.ds.className() %}
+
+{{ns}}::{{classname}}::{{classname}}()
 {
 {% for attr in vlen_pointers %}
   this->vlen_{{attr}} = 0;
@@ -61,7 +67,23 @@ struct {{className}} {
   this->{{attr}} = 0;
 {% endfor %}
 }
-{{ns}}::{{className}}::~{{className}}()
+
+{{ns}}::{{classname}}::{{classname}}(const {{hds.pstypename}}& psanaobj)
+{% set sep = joiner(",") %}
+{% for attr in hds.attributes %}
+{% for init in attr.ds_attr_init() %}
+  {{sep() or ':'}} {{init}}
+{% endfor %}
+{% endfor %}
+{
+{% for attr in hds.attributes %}
+{% for init in attr.ds_attr_initcode() %}
+{{init}}
+{% endfor %}
+{% endfor %}
+}
+
+{{ns}}::{{classname}}::~{{classname}}()
 {
 {% for attr in pointers %}
   free(this->{{attr}});
@@ -110,9 +132,9 @@ hdf5pp::Type {{ns}}::{{className}}::{{func}}_type()
 :  Template for the definition of HDF5 type for enum type.
 :
 :  Parameters for this template:
-:  enum_base   - base type for enum, string like 'int32_t'
-:  type        - variable name for resulting type
-:  constants   - list of constants, each item is a dictionary with keys
+:    enum_base   - base type for enum, string like 'int32_t'
+:    type        - variable name for resulting type
+:    constants   - list of constants, each item is a dictionary with keys
 :      h5name    - name of the constant in HDF5
 :      type      - C++ class name where enum is defined
 :      name      - C++ class name of the enum constant
@@ -148,13 +170,12 @@ hdf5pp::Type {{ns}}::{{className}}::{{func}}_type()
 :  Template for the declaration of the proxy class for value-type
 :
 :  Parameters for this template:
-:  schema         - object with attributes name and version
-:  psanatypename  - full name of the corresponding C++ type
+:  hschema        - instance of type SchemaValueType
 :
-{% set classname = 'Proxy_' ~ schema.name ~ '_v' ~ schema.version %}
-class {{classname}} : public PSEvt::Proxy<{{psanatypename}}> {
+{% set classname = 'Proxy_' ~ hschema.schema.name ~ '_v' ~ hschema.schema.version %}
+class {{classname}} : public PSEvt::Proxy<{{hschema.pstypename}}> {
 public:
-  typedef {{psanatypename}} PsanaType;
+  typedef {{hschema.pstypename}} PsanaType;
 
   {{classname}}(hdf5pp::Group group, hsize_t idx) : m_group(group), m_idx(idx) {}
   virtual ~{{classname}}() {}
@@ -176,15 +197,14 @@ private:
 :  Template for the implementation of getTypedImpl() method for value-type proxy
 :
 :  Parameters for this template:
-:  schema         - object with attributes datasets
-:  psanatypename  - full name of the corresponding C++ type
-:  
+:    hschema        - instance of type SchemaValueType
+:    args           - list of arguments to constructor
 :
-boost::shared_ptr<{{psanatypename}}>
-Proxy_{{schema.name}}_v{{schema.version}}::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key)
+boost::shared_ptr<{{hschema.pstypename}}>
+Proxy_{{hschema.schema.name}}_v{{hschema.schema.version}}::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key)
 {
   if (not m_data) {
-{% for ds in schema.datasets %}
+{% for ds in hschema.schema.datasets %}
     boost::shared_ptr<{{ds.classNameNs()}}> ds_{{ds.name}} = hdf5pp::Utils::readGroup<{{ds.classNameNs()}}>(m_group, "{{ds.name}}", m_idx);
 {% endfor %}
 {% if 1 %}
@@ -214,24 +234,21 @@ Proxy_{{schema.name}}_v{{schema.version}}::getTypedImpl(PSEvt::ProxyDictI* dict,
 :  Template for the declaration of the class for abstract types
 :
 :  Parameters for this template:
-:  type           - object with attribute name and xtcConfig
-:  schema         - object with attribute version
-:  psanatypename  - full name of the corresponding C++ type
+:  hschema        - instance of type SchemaAbstractType
 :  methods        - list of methods declarations
-:  ds_read_decl   - list of declarations for datasets and their read() methods
 :  dsCtorWithArg  - optional, constructor arguments for construction fron dataset data
 :
 
-{% set className = type.name ~ '_v' ~ schema.version %}
+{% set className = hschema.pstype.name ~ '_v' ~ hschema.schema.version %}
 
-{% if type.xtcConfig %}
+{% if hschema.pstype.xtcConfig %}
 template <typename Config>
 {% endif %}
-class {{className}} : public {{psanatypename}} {
+class {{className}} : public {{hschema.pstypename}} {
 public:
-  typedef {{psanatypename}} PsanaType;
+  typedef {{hschema.pstypename}} PsanaType;
   {{className}}() {}
-{% if type.xtcConfig %}
+{% if hschema.pstype.xtcConfig %}
   {{className}}(hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Config>& cfg)
     : m_group(group), m_idx(idx), m_cfg(cfg) {}
 {% else %}
@@ -248,11 +265,18 @@ public:
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
-{% if type.xtcConfig %}
+{% if hschema.pstype.xtcConfig %}
   boost::shared_ptr<Config> m_cfg;
 {% endif %}
-{% for decl in ds_read_decl if decl %}
+{% for ds in hschema.datasets %}
+{% for decl in ds.ds_read_decl() %}
   {{decl}}
+{% endfor %}
+{% for attr in ds.attributes %}
+{% for sdecl in attr.storage_decl() %}
+  {{sdecl}}
+{% endfor %}
+{% endfor %}
 {% endfor %}
 };
 
@@ -608,6 +632,55 @@ boost::shared_ptr<PSEvt::Proxy<{{psanatypename}}> > make_{{type.name}}(int versi
   }
 }
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: store_decl
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for declaration of the store() and append() methods. 
+:
+:  Parameters for this template:
+:  psanatypename - name of C++ psana interface type 
+:
+
+void store(const {{psanatypename}}& obj, hdf5pp::Group group, int version = -1);
+void append(const {{psanatypename}}& obj, hdf5pp::Group group, int version = -1);
+
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: store_impl
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for implementation of the store() and append() methods. 
+:
+:  Parameters for this template:
+:    type          - instance of Type class
+:    versions      - list of all schema versions
+:    max_version   - latest schema version number
+:
+
+void store_{{type.name}}(const {{psanatypename}}& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = {{max_version}};
+  switch (version) {
+{% for v in versions %}
+  case {{v}}:
+    //store_{{type.name}}_v{{v}}(object, group, append);
+    break;
+{% endfor %}
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "{{type.fullName()}}", version);
+  }
+}
+
+void store(const {{psanatypename}}& obj, hdf5pp::Group group, int version) 
+{
+  store_{{type.name}}(obj, group, version, false);
+}
+
+void append(const {{psanatypename}}& obj, hdf5pp::Group group, int version)
+{
+  store_{{type.name}}(obj, group, version, true);
+}
+
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ::::template:::: enum_decl
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 :
@@ -889,3 +962,93 @@ template <typename Config>
   }
   return m_ds_storage_{{ds.name}}{{arguse}};
 {% endblock %}
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: malloc_copy_string
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Parameters for this template:
+:    src_method, dst
+:    
+  {{dst}} = strdup(psanaobj.{{src_method}}());
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: copy_string
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Parameters for this template:
+:    src_method, dst, dst_size
+:    
+  strncpy({{dst}}, psanaobj.{{src_method}}(), {{dst_size}});
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: copy_vlen_data
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Parameters for this template:
+:    src_method, dst, dst_type
+:  src_method shall return ndarray
+:
+  {
+    const __typeof__(psanaobj.{{src_method}}())& arr = psanaobj.{{src_method}}();
+    vlen_{{dst}} = arr.size();
+    {{dst}} = static_cast<{{dst_type}}*>(malloc(vlen_{{dst}}*sizeof({{dst_type}})));
+    std::copy(arr.begin(), arr.end(), {{dst}});
+  }
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: malloc_copy_data
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Parameters for this template:
+:    src_method, dst, dst_type
+:  src_method shall return ndarray
+:
+  {
+    {{dst}} = static_cast<{{dst_type}}*>(malloc({{src}}.size()*sizeof({{dst_type}})));
+    const __typeof__(psanaobj.{{src_method}}())& arr = psanaobj.{{src_method}}();
+    std::copy(arr.begin(), arr.end(), {{dst}});
+  }
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: copy_data
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Parameters for this template:
+:    src_method, dst, dst_size
+:    
+  {
+    const __typeof__(psanaobj.{{src_method}}())& arr = psanaobj.{{src_method}}();
+    std::copy(arr.begin(), arr.begin()+{{dst_size}}, {{dst}});
+  }
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: copy_abs_vlen_data
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Parameters for this template:
+:    src_method, dst, dst_type, dst_size
+:  src is an expression resulting in ndarray
+:
+  vlen_{{dst}} = {{dst_size}};
+  {{dst}} = static_cast<{{dst_type}}*>(malloc(vlen_{{dst}}*sizeof({{dst_type}})));
+  for (size_t i = 0; i != vlen_{{dst}}; ++ i) {
+    {{dst}}[i] = {{dst_type}}(psanaobj.{{src_method}}(i));
+  }
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: malloc_copy_abs_data
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Parameters for this template:
+:    src_method, dst, dst_type, dst_size
+:  src is an expression resulting in ndarray
+:
+  {{dst}} = static_cast<{{dst_type}}*>(malloc({{dst_size}}*sizeof({{dst_type}}));
+  for (size_t i = 0, len = {{dst_size}}; i != len; ++ i) {
+    {{dst}}[i] = {{dst_type}}(psanaobj.{{src_method}}(i));
+  }
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: copy_abs_data
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Parameters for this template:
+:    src_method, dst, dst_type, dst_size
+:  src is an expression resulting in ndarray
+:
+  for (size_t i = 0, len = {{dst_size}}; i != len; ++ i) {
+    {{dst}}[i] = {{dst_type}}(psanaobj.{{src_method}}(i));
+  }

@@ -82,6 +82,10 @@ class H5Type ( object ) :
         '''Returns namespace for all C++ constructs in this schema'''
         return "ns_{name}_v{version}".format(name=self.name, version=self.version)
 
+    def className(self):
+        '''Returns class for all C++ constructs in this schema'''
+        return "{name}_v{version}".format(name=self.name, version=self.version)
+
     def __str__(self):
         
         return "<H5Type(name=%s, version=%s, datasets=%s)>" % (self.name, self.version, self.datasets)
