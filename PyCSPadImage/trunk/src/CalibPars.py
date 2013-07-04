@@ -40,8 +40,30 @@ import CSPADCalibParsEvaluated as cpe
 #---------------------
 
 class CalibPars (object) :
-    """This class provides access to the calibration parameters
+    """This class provides access to the CSPAD calibration parameters.
+
+       Interface
+       =========
+       Regular instantiation:
+           ALL parameters are OPTIONAL NAMED parameters;
+           path  = '/reg/d/psdm/xpp/xpptut13/calib/CsPad::CalibV1/XppGon.0:Cspad.0/' 
+           run   = 123
+           calib = CalibPars(path, list_of_clib_types=['center', 'tilt', 'pedestals'])
+           arr_pedestals = calib.getCalibPars('pedestals', run)
+ 
+       Other option for instantiation:
+           calib    = CalibPars()
+           run      = 123  - is an optional, named
+           calibdir = '/reg/d/psdm/CXI/cxi35711/calib'
+           group    = 'CsPad::CalibV1'
+           source   = 'CxiDs1.0:Cspad.0'
+           calib.setCalibPars (run, calibdir, group, source)
+
+       Get array of calibration parameters for specified type and run number:
+           type = 'center'
+           arr  = calib.getCalibPars (type[,run])
     """
+
     list_of_clib_types_total = cpd.calibparsdefault.list_of_clib_types
         #[
         # 'center'
