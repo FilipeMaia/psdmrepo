@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-09-05
+2013-07-05 Andy Salnikov
+- raise an exception when dataset makes empty list of files
+
 Tag: V00-09-04
 2013-06-10 Andy Salnikov
 - implement simple exception transport for datagram queue

@@ -174,6 +174,15 @@ public:
 
 };
 
+/// Exception thrown when dataset specification does not produce any files
+class NoFilesInDataset : public Exception {
+public:
+
+    NoFilesInDataset(const ErrSvc::Context& ctx, const std::string& ds)
+    : Exception( ctx, "NoFilesInDataset", "Dataset has no files, check dataset specification: '" + ds + "'") {}
+
+};
+
 } // namespace XtcInput
 
 #endif // XTCINPUT_EXCEPTIONS_H

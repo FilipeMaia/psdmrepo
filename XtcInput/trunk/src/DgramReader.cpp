@@ -154,6 +154,7 @@ try {
         if (liveMode == Unknown) liveMode = Dead;
         // Find files on disk and add to the list
         const IData::Dataset::NameList& strfiles = ds.files();
+        if (strfiles.empty()) throw NoFilesInDataset(ERR_LOC, *it);
         for (IData::Dataset::NameList::const_iterator it = strfiles.begin(); it != strfiles.end(); ++ it) {
           files.push_back(XtcFileName(*it));
         }
