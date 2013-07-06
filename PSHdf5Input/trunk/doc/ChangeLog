@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-06
+2013-07-05 Andy Salnikov
+- raise an exception when dataset makes empty list of files
+
 Tag: V00-01-05
 2013-05-22 Andy Salnikov
 - fixing doxygen comments

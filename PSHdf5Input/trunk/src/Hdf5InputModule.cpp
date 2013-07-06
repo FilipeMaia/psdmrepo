@@ -79,7 +79,6 @@ Hdf5InputModule::~Hdf5InputModule ()
 {
 }
 
-
 // Method which is called once at the beginning of the job
 void 
 Hdf5InputModule::beginJob(Event& evt, Env& env)
@@ -98,6 +97,9 @@ Hdf5InputModule::beginJob(Event& evt, Env& env)
     }
 
     const IData::Dataset::NameList& strfiles = ds.files();
+    if (strfiles.empty()) {
+      throw NoFilesInDataset(ERR_LOC, *dsiter);
+    }
     for (IData::Dataset::NameList::const_iterator it = strfiles.begin(); it != strfiles.end(); ++ it) {
       MsgLog(name(), debug, "Hdf5InputModule::beginJob -- add file: " << *it);
       files.push_back(*it);

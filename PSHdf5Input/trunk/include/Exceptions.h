@@ -71,7 +71,16 @@ class EmptyFileList : public Exception {
 public:
 
   EmptyFileList(const ErrSvc::Context& ctx)
-    : Exception( ctx, "EmptyFileList", "No input file names specified" ) {}
+    : Exception( ctx, "EmptyFileList", "No input files or datasets specified" ) {}
+
+};
+
+/// Exception thrown when dataset specification does not produce any files
+class NoFilesInDataset : public Exception {
+public:
+
+    NoFilesInDataset(const ErrSvc::Context& ctx, const std::string& ds)
+    : Exception( ctx, "NoFilesInDataset", "Dataset has no files, check dataset specification: '" + ds + "'") {}
 
 };
 
