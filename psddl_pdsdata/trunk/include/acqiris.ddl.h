@@ -55,7 +55,7 @@ public:
   uint32_t bandwidth() const { return _bandwidth; }
   /** Calculated slope. */
   double slope() const;
-  static uint32_t _sizeof()  { return 24; }
+  static uint32_t _sizeof() { return 24; }
 private:
   double	_fullScale;	/**< Full vertical scale. */
   double	_offset;	/**< Offset value. */
@@ -91,7 +91,7 @@ public:
   uint32_t nbrSamples() const { return _nbrSamples; }
   /** Number of segments. */
   uint32_t nbrSegments() const { return _nbrSegments; }
-  static uint32_t _sizeof()  { return 24; }
+  static uint32_t _sizeof() { return 24; }
 private:
   double	_sampInterval;	/**< Interval for single sample. */
   double	_delayTime;	/**< Delay time. */
@@ -147,7 +147,7 @@ public:
   uint32_t slope() const { return _slope; }
   /** Trigger level. */
   double level() const { return _level; }
-  static uint32_t _sizeof()  { return 20; }
+  static uint32_t _sizeof() { return 20; }
 private:
   uint32_t	_coupling;
   uint32_t	_input;	/**< Trigger source */
@@ -185,7 +185,7 @@ public:
   ndarray<const Acqiris::VertV1, 1> vert() const { return make_ndarray(&_vert[0], MaxChan); }
   /** Number of channels calculated from channel bit mask. */
   uint32_t nbrChannels() const;
-  static uint32_t _sizeof()  { return ((((((12+(Acqiris::TrigV1::_sizeof()))+(Acqiris::HorizV1::_sizeof()))+(Acqiris::VertV1::_sizeof()*(MaxChan)))+4)-1)/4)*4; }
+  static uint32_t _sizeof() { return ((((((12+(Acqiris::TrigV1::_sizeof()))+(Acqiris::HorizV1::_sizeof()))+(Acqiris::VertV1::_sizeof()*(MaxChan)))+4)-1)/4)*4; }
 private:
   uint32_t	_nbrConvertersPerChannel;	/**< Number of ADCs per channel. */
   uint32_t	_channelMask;	/**< Bit mask for channels. */
@@ -221,7 +221,7 @@ public:
   /** 64-bit trigger timestamp, in units of picoseconds. The timestamp is the trigger time 
                 with respect to an arbitrary time origin. */
   uint64_t value() const;
-  static uint32_t _sizeof()  { return 16; }
+  static uint32_t _sizeof() { return 16; }
 private:
   double	_horPos;	/**< Horizontal position, for the segment, of the first (nominal) data point with respect 
             to the origin of the nominal trigger delay in seconds. */
@@ -349,7 +349,7 @@ public:
   Acqiris::TdcChannel::Slope slope() const { return Slope(this->_mode & 0x1); }
   Acqiris::TdcChannel::Mode mode() const { return Mode((this->_mode>>31) & 0x1); }
   double level() const { return _level; }
-  static uint32_t _sizeof()  { return 16; }
+  static uint32_t _sizeof() { return 16; }
 private:
   uint32_t	_channel;	/**< Channel type as integer number, clients should use channel() method instead. */
   uint32_t	_mode;	/**< Bitfield value, should not be used directly. Use mode() and slope()
@@ -394,7 +394,7 @@ public:
   Acqiris::TdcAuxIO::Channel channel() const { return Acqiris::TdcAuxIO::Channel(_channel); }
   Acqiris::TdcAuxIO::Mode mode() const { return Acqiris::TdcAuxIO::Mode(_signal); }
   Acqiris::TdcAuxIO::Termination term() const { return Acqiris::TdcAuxIO::Termination(_qualifier); }
-  static uint32_t _sizeof()  { return 12; }
+  static uint32_t _sizeof() { return 12; }
 private:
   uint32_t	_channel;
   uint32_t	_signal;
@@ -437,7 +437,7 @@ public:
   Acqiris::TdcVetoIO::Channel channel() const { return Acqiris::TdcVetoIO::Channel(_channel); }
   Acqiris::TdcVetoIO::Mode mode() const { return Acqiris::TdcVetoIO::Mode(_signal); }
   Acqiris::TdcVetoIO::Termination term() const { return Acqiris::TdcVetoIO::Termination(_qualifier); }
-  static uint32_t _sizeof()  { return 12; }
+  static uint32_t _sizeof() { return 12; }
 private:
   uint32_t	_channel;
   uint32_t	_signal;
@@ -466,7 +466,7 @@ public:
   /** Axiliary configurations, one object per channel. */
   ndarray<const Acqiris::TdcAuxIO, 1> auxio() const { return make_ndarray(&_auxIO[0], NAuxIO); }
   const Acqiris::TdcVetoIO& veto() const { return _veto; }
-  static uint32_t _sizeof()  { return ((((((0+(Acqiris::TdcChannel::_sizeof()*(NChannels)))+(Acqiris::TdcAuxIO::_sizeof()*(NAuxIO)))+(Acqiris::TdcVetoIO::_sizeof()))+4)-1)/4)*4; }
+  static uint32_t _sizeof() { return ((((((0+(Acqiris::TdcChannel::_sizeof()*(NChannels)))+(Acqiris::TdcAuxIO::_sizeof()*(NAuxIO)))+(Acqiris::TdcVetoIO::_sizeof()))+4)-1)/4)*4; }
 private:
   Acqiris::TdcChannel	_channel[NChannels];	/**< Channel configurations, one object per channel. */
   Acqiris::TdcAuxIO	_auxIO[NAuxIO];	/**< Axiliary configurations, one object per channel. */
@@ -510,7 +510,7 @@ public:
                 types of data objecs and cast appropriately. */
   Acqiris::TdcDataV1_Item::Source source() const { return Source((this->_value>>28) & 0x7); }
   uint8_t bf_ofv_() const { return uint8_t((this->_value>>31) & 0x1); }
-  static uint32_t _sizeof()  { return 4; }
+  static uint32_t _sizeof() { return 4; }
 private:
   uint32_t	_value;	/**< Value as integer number whiis composed of several bit fields. Do not use value directly,
                 instead cast this object to one of the actual types and use corresponding methods. */
@@ -529,7 +529,7 @@ public:
   uint32_t nhits() const;
   /** Returns overflow status. */
   uint8_t overflow() const;
-  static uint32_t _sizeof()  { return ((((Acqiris::TdcDataV1_Item::_sizeof())+1)-1)/1)*1; }
+  static uint32_t _sizeof() { return ((((Acqiris::TdcDataV1_Item::_sizeof())+1)-1)/1)*1; }
 };
 
 /** @class TdcDataV1Channel
@@ -546,7 +546,7 @@ public:
   uint8_t overflow() const;
   /** Ticks converted to time, tick resolution is 50 picosecond. */
   double time() const;
-  static uint32_t _sizeof()  { return ((((Acqiris::TdcDataV1_Item::_sizeof())+1)-1)/1)*1; }
+  static uint32_t _sizeof() { return ((((Acqiris::TdcDataV1_Item::_sizeof())+1)-1)/1)*1; }
 };
 
 /** @class TdcDataV1Marker
@@ -567,7 +567,7 @@ public:
   };
   /** Returns type of the marker. */
   Acqiris::TdcDataV1Marker::Type type() const;
-  static uint32_t _sizeof()  { return ((((Acqiris::TdcDataV1_Item::_sizeof())+1)-1)/1)*1; }
+  static uint32_t _sizeof() { return ((((Acqiris::TdcDataV1_Item::_sizeof())+1)-1)/1)*1; }
 };
 std::ostream& operator<<(std::ostream& str, Acqiris::TdcDataV1Marker::Type enval);
 
@@ -587,7 +587,7 @@ public:
   ndarray<const Acqiris::TdcDataV1_Item, 1> data() const { ptrdiff_t offset=0;
   const Acqiris::TdcDataV1_Item* data = (const Acqiris::TdcDataV1_Item*)(((char*)this)+offset);
   return make_ndarray(data, 0); }
-  static uint32_t _sizeof()  { return ~uint32_t(0); }
+  static uint32_t _sizeof() { return ~uint32_t(0); }
 private:
   //Acqiris::TdcDataV1_Item	_data[None];
 };

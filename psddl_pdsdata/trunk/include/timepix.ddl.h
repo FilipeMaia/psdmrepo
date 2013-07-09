@@ -91,7 +91,7 @@ public:
   int32_t dac3Ths() const { return _dac3Ths; }
   int32_t dac3BiasLvds() const { return _dac3BiasLvds; }
   int32_t dac3RefLvds() const { return _dac3RefLvds; }
-  static uint32_t _sizeof()  { return 232; }
+  static uint32_t _sizeof() { return 232; }
 private:
   uint8_t	_readoutSpeed;
   uint8_t	_triggerMode;
@@ -253,7 +253,7 @@ public:
   int32_t chip2ID() const { return _chip2ID; }
   int32_t chip3ID() const { return _chip3ID; }
   int32_t chipCount() const { return ChipCount; }
-  static uint32_t _sizeof()  { return ((((((((((((244+(1*(PixelThreshMax)))+(1*(ChipNameMax)))+(1*(ChipNameMax)))+(1*(ChipNameMax)))+(1*(ChipNameMax)))+4)+4)+4)+4)+4)-1)/4)*4; }
+  static uint32_t _sizeof() { return ((((((((((((244+(1*(PixelThreshMax)))+(1*(ChipNameMax)))+(1*(ChipNameMax)))+(1*(ChipNameMax)))+(1*(ChipNameMax)))+4)+4)+4)+4)+4)-1)/4)*4; }
 private:
   uint8_t	_readoutSpeed;
   uint8_t	_triggerMode;
@@ -428,7 +428,7 @@ public:
   int32_t chip2ID() const { return _chip2ID; }
   int32_t chip3ID() const { return _chip3ID; }
   int32_t chipCount() const { return ChipCount; }
-  static uint32_t _sizeof()  { return ((((((((((((248+(1*(PixelThreshMax)))+(1*(ChipNameMax)))+(1*(ChipNameMax)))+(1*(ChipNameMax)))+(1*(ChipNameMax)))+4)+4)+4)+4)+4)-1)/4)*4; }
+  static uint32_t _sizeof() { return ((((((((((((248+(1*(PixelThreshMax)))+(1*(ChipNameMax)))+(1*(ChipNameMax)))+(1*(ChipNameMax)))+(1*(ChipNameMax)))+4)+4)+4)+4)+4)-1)/4)*4; }
 private:
   uint8_t	_readoutSpeed;
   uint8_t	_timepixMode;
@@ -533,7 +533,7 @@ public:
   uint32_t height() const { return Height; }
   uint32_t depth() const { return Depth; }
   uint32_t depth_bytes() const { return DepthBytes; }
-  static uint32_t _sizeof()  { return ((((8+(2*(Height)*(Width)))+4)-1)/4)*4; }
+  static uint32_t _sizeof() { return ((((8+(2*(Height)*(Width)))+4)-1)/4)*4; }
 private:
   uint32_t	_timestamp;
   uint16_t	_frameCounter;

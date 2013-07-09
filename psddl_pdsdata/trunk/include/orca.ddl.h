@@ -39,7 +39,7 @@ public:
   Orca::ConfigV1::Cooling cooling() const { return Cooling((this->_options>>2) & 0x3); }
   uint8_t defect_pixel_correction_enabled() const { return uint8_t((this->_options>>4) & 0x1); }
   uint32_t rows() const { return _rows; }
-  static uint32_t _sizeof()  { return 8; }
+  static uint32_t _sizeof() { return 8; }
 private:
   uint32_t	_options;
   uint32_t	_rows;

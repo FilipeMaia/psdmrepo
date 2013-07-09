@@ -55,7 +55,7 @@ public:
   uint8_t autocalibEnable() const { return _autocalibEnable; }
   uint8_t timeTagEnable() const { return _timeTagEnable; }
   uint16_t numChannels() const { return this->lastChan() - this->firstChan() + 1; }
-  static uint32_t _sizeof()  { return 16; }
+  static uint32_t _sizeof() { return 16; }
 private:
   uint16_t	_voltageRange;
   uint16_t	_firstChan;
@@ -88,7 +88,7 @@ public:
   ndarray<const uint16_t, 1> channelValue(const Gsc16ai::ConfigV1& cfg) const { ptrdiff_t offset=6;
   const uint16_t* data = (const uint16_t*)(((char*)this)+offset);
   return make_ndarray(data, cfg.numChannels()); }
-  static uint32_t _sizeof(const Gsc16ai::ConfigV1& cfg)  { return (((((0+(2*(3)))+(2*(cfg.numChannels())))+2)-1)/2)*2; }
+  static uint32_t _sizeof(const Gsc16ai::ConfigV1& cfg) { return (((((0+(2*(3)))+(2*(cfg.numChannels())))+2)-1)/2)*2; }
 private:
   uint16_t	_timestamp[3];
   //uint16_t	_channelValue[cfg.numChannels()];

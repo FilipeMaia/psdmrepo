@@ -52,7 +52,7 @@ public:
   uint32_t numPixelsY() const { return (_uHeight+ _uBinY - 1) / _uBinY; }
   /** calculate total frame size in pixels based on the current ROI and binning settings */
   uint32_t numPixels() const { return ((_uWidth + _uBinX-1)/ _uBinX )*((_uHeight+ _uBinY-1)/ _uBinY ); }
-  static uint32_t _sizeof()  { return 44; }
+  static uint32_t _sizeof() { return 44; }
 private:
   uint32_t	_uWidth;
   uint32_t	_uHeight;
@@ -91,7 +91,7 @@ public:
   ndarray<const uint16_t, 2> data(const Andor::ConfigV1& cfg) const { ptrdiff_t offset=12;
   const uint16_t* data = (const uint16_t*)(((char*)this)+offset);
   return make_ndarray(data, cfg.numPixelsY(), cfg.numPixelsX()); }
-  static uint32_t _sizeof(const Andor::ConfigV1& cfg)  { return ((((12+(2*(cfg.numPixelsY())*(cfg.numPixelsX())))+4)-1)/4)*4; }
+  static uint32_t _sizeof(const Andor::ConfigV1& cfg) { return ((((12+(2*(cfg.numPixelsY())*(cfg.numPixelsX())))+4)-1)/4)*4; }
 private:
   uint32_t	_iShotIdStart;
   float	_fReadoutTime;

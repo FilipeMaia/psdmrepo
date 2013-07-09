@@ -42,7 +42,7 @@ public:
   uint32_t numPixelsY() const { return (this->height()+ this->binY() - 1) / this->binY(); }
   /** calculate total frame size in pixels based on the current ROI and binning settings */
   uint32_t numPixels() const { return ((this->width() + this->binX()-1)/ this->binX() )*((this->height()+ this->binY()-1)/ this->binY() ); }
-  static uint32_t _sizeof()  { return 40; }
+  static uint32_t _sizeof() { return 40; }
 private:
   uint32_t	_uWidth;
   uint32_t	_uHeight;
@@ -90,7 +90,7 @@ public:
   uint32_t numPixelsY() const { return (this->height()+ this->binY() - 1) / this->binY(); }
   /** calculate total frame size in pixels based on the current ROI and binning settings */
   uint32_t numPixels() const { return ((this->width() + this->binX()-1)/ this->binX() )*((this->height()+ this->binY()-1)/ this->binY() ); }
-  static uint32_t _sizeof()  { return 40; }
+  static uint32_t _sizeof() { return 40; }
 private:
   uint32_t	_uWidth;
   uint32_t	_uHeight;
@@ -139,7 +139,7 @@ public:
   uint32_t numPixelsY() const { return (this->height()+ this->binY() - 1) / this->binY(); }
   /** calculate total frame size in pixels based on the current ROI and binning settings */
   uint32_t numPixels() const { return ((this->width() + this->binX()-1)/ this->binX() )*((this->height()+ this->binY()-1)/ this->binY() ); }
-  static uint32_t _sizeof()  { return 40; }
+  static uint32_t _sizeof() { return 40; }
 private:
   uint32_t	_uWidth;
   uint32_t	_uHeight;
@@ -191,7 +191,7 @@ public:
   uint32_t numPixelsY() const { return (this->height()+ this->binY() - 1) / this->binY(); }
   /** calculate total frame size in pixels based on the current ROI and binning settings */
   uint32_t numPixels() const { return ((this->width() + this->binX()-1)/ this->binX() )*((this->height()+ this->binY()-1)/ this->binY() ); }
-  static uint32_t _sizeof()  { return 52; }
+  static uint32_t _sizeof() { return 52; }
 private:
   uint32_t	_uWidth;
   uint32_t	_uHeight;
@@ -247,7 +247,7 @@ public:
   uint32_t numPixelsY() const { return (this->height()+ this->binY() - 1) / this->binY(); }
   /** calculate total frame size in pixels based on the current ROI and binning settings */
   uint32_t numPixels() const { return ((this->width() + this->binX()-1)/ this->binX() )*((this->height()+ this->binY()-1)/ this->binY() ); }
-  static uint32_t _sizeof()  { return 56; }
+  static uint32_t _sizeof() { return 56; }
 private:
   uint32_t	_uWidth;
   uint32_t	_uHeight;
@@ -301,11 +301,11 @@ public:
   ndarray<const uint16_t, 2> data(const Princeton::ConfigV5& cfg) const { ptrdiff_t offset=8;
   const uint16_t* data = (const uint16_t*)(((char*)this)+offset);
   return make_ndarray(data, cfg.numPixelsY(), cfg.numPixelsX()); }
-  static uint32_t _sizeof(const Princeton::ConfigV1& cfg)  { return ((((8+(2*(cfg.numPixelsY())*(cfg.numPixelsX())))+4)-1)/4)*4; }
-  static uint32_t _sizeof(const Princeton::ConfigV2& cfg)  { return ((((8+(2*(cfg.numPixelsY())*(cfg.numPixelsX())))+4)-1)/4)*4; }
-  static uint32_t _sizeof(const Princeton::ConfigV3& cfg)  { return ((((8+(2*(cfg.numPixelsY())*(cfg.numPixelsX())))+4)-1)/4)*4; }
-  static uint32_t _sizeof(const Princeton::ConfigV4& cfg)  { return ((((8+(2*(cfg.numPixelsY())*(cfg.numPixelsX())))+4)-1)/4)*4; }
-  static uint32_t _sizeof(const Princeton::ConfigV5& cfg)  { return ((((8+(2*(cfg.numPixelsY())*(cfg.numPixelsX())))+4)-1)/4)*4; }
+  static uint32_t _sizeof(const Princeton::ConfigV1& cfg) { return ((((8+(2*(cfg.numPixelsY())*(cfg.numPixelsX())))+4)-1)/4)*4; }
+  static uint32_t _sizeof(const Princeton::ConfigV2& cfg) { return ((((8+(2*(cfg.numPixelsY())*(cfg.numPixelsX())))+4)-1)/4)*4; }
+  static uint32_t _sizeof(const Princeton::ConfigV3& cfg) { return ((((8+(2*(cfg.numPixelsY())*(cfg.numPixelsX())))+4)-1)/4)*4; }
+  static uint32_t _sizeof(const Princeton::ConfigV4& cfg) { return ((((8+(2*(cfg.numPixelsY())*(cfg.numPixelsX())))+4)-1)/4)*4; }
+  static uint32_t _sizeof(const Princeton::ConfigV5& cfg) { return ((((8+(2*(cfg.numPixelsY())*(cfg.numPixelsX())))+4)-1)/4)*4; }
 private:
   uint32_t	_iShotIdStart;
   float	_fReadoutTime;
@@ -347,11 +347,11 @@ public:
   ndarray<const uint16_t, 2> data(const Princeton::ConfigV5& cfg) const { ptrdiff_t offset=12;
   const uint16_t* data = (const uint16_t*)(((char*)this)+offset);
   return make_ndarray(data, cfg.numPixelsY(), cfg.numPixelsX()); }
-  static uint32_t _sizeof(const Princeton::ConfigV1& cfg)  { return ((((12+(2*(cfg.numPixelsY())*(cfg.numPixelsX())))+4)-1)/4)*4; }
-  static uint32_t _sizeof(const Princeton::ConfigV2& cfg)  { return ((((12+(2*(cfg.numPixelsY())*(cfg.numPixelsX())))+4)-1)/4)*4; }
-  static uint32_t _sizeof(const Princeton::ConfigV3& cfg)  { return ((((12+(2*(cfg.numPixelsY())*(cfg.numPixelsX())))+4)-1)/4)*4; }
-  static uint32_t _sizeof(const Princeton::ConfigV4& cfg)  { return ((((12+(2*(cfg.numPixelsY())*(cfg.numPixelsX())))+4)-1)/4)*4; }
-  static uint32_t _sizeof(const Princeton::ConfigV5& cfg)  { return ((((12+(2*(cfg.numPixelsY())*(cfg.numPixelsX())))+4)-1)/4)*4; }
+  static uint32_t _sizeof(const Princeton::ConfigV1& cfg) { return ((((12+(2*(cfg.numPixelsY())*(cfg.numPixelsX())))+4)-1)/4)*4; }
+  static uint32_t _sizeof(const Princeton::ConfigV2& cfg) { return ((((12+(2*(cfg.numPixelsY())*(cfg.numPixelsX())))+4)-1)/4)*4; }
+  static uint32_t _sizeof(const Princeton::ConfigV3& cfg) { return ((((12+(2*(cfg.numPixelsY())*(cfg.numPixelsX())))+4)-1)/4)*4; }
+  static uint32_t _sizeof(const Princeton::ConfigV4& cfg) { return ((((12+(2*(cfg.numPixelsY())*(cfg.numPixelsX())))+4)-1)/4)*4; }
+  static uint32_t _sizeof(const Princeton::ConfigV5& cfg) { return ((((12+(2*(cfg.numPixelsY())*(cfg.numPixelsX())))+4)-1)/4)*4; }
 private:
   uint32_t	_iShotIdStart;
   float	_fReadoutTime;
@@ -375,7 +375,7 @@ public:
   {
   }
   float temperature() const { return _fTemperature; }
-  static uint32_t _sizeof()  { return 4; }
+  static uint32_t _sizeof() { return 4; }
 private:
   float	_fTemperature;
 };

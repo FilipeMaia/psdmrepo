@@ -47,7 +47,7 @@ public:
   Pulnix::TM6740ConfigV1::LookupTable lookuptable_mode() const { return LookupTable((this->_control>>6) & 0x1); }
   /** bit-depth of pixel counts */
   uint8_t output_resolution_bits() const;
-  static uint32_t _sizeof()  { return 12; }
+  static uint32_t _sizeof() { return 12; }
 private:
   uint32_t	_gain_a_b;
   uint32_t	_vref_shutter;
@@ -93,7 +93,7 @@ public:
   Pulnix::TM6740ConfigV2::LookupTable lookuptable_mode() const { return LookupTable((this->_control>>6) & 0x1); }
   /** bit-depth of pixel counts */
   uint8_t output_resolution_bits() const;
-  static uint32_t _sizeof()  { return 12; }
+  static uint32_t _sizeof() { return 12; }
 private:
   uint32_t	_gain_a_b;
   uint32_t	_vref_shutter;

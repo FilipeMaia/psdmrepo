@@ -39,7 +39,7 @@ public:
   double f_21_ENRC() const { return _f_21_ENRC; }
   /** Value of GDET:FEE1:22:ENRC, in mJ. */
   double f_22_ENRC() const { return _f_22_ENRC; }
-  static uint32_t _sizeof()  { return 32; }
+  static uint32_t _sizeof() { return 32; }
 private:
   double	_f_11_ENRC;	/**< Value of GDET:FEE1:11:ENRC, in mJ. */
   double	_f_12_ENRC;	/**< Value of GDET:FEE1:12:ENRC, in mJ. */
@@ -87,7 +87,7 @@ public:
   double ebeamLTUAngX() const { return _fEbeamLTUAngX; }
   /** LTU beam angle in mrad. */
   double ebeamLTUAngY() const { return _fEbeamLTUAngY; }
-  static uint32_t _sizeof()  { return 52; }
+  static uint32_t _sizeof() { return 52; }
 private:
   uint32_t	_uDamageMask;	/**< Damage mask. */
   double	_fEbeamCharge;	/**< Beam charge in nC. */
@@ -142,7 +142,7 @@ public:
   double ebeamLTUAngY() const { return _fEbeamLTUAngY; }
   /** Beam current in Amps. */
   double ebeamPkCurrBC2() const { return _fEbeamPkCurrBC2; }
-  static uint32_t _sizeof()  { return 60; }
+  static uint32_t _sizeof() { return 60; }
 private:
   uint32_t	_uDamageMask;	/**< Damage mask. */
   double	_fEbeamCharge;	/**< Beam charge in nC. */
@@ -201,7 +201,7 @@ public:
   double ebeamPkCurrBC2() const { return _fEbeamPkCurrBC2; }
   /** Beam energy in MeV. */
   double ebeamEnergyBC2() const { return _fEbeamEnergyBC2; }
-  static uint32_t _sizeof()  { return 68; }
+  static uint32_t _sizeof() { return 68; }
 private:
   uint32_t	_uDamageMask;	/**< Damage mask. */
   double	_fEbeamCharge;	/**< Beam charge in nC. */
@@ -267,7 +267,7 @@ public:
   double ebeamPkCurrBC1() const { return _fEbeamPkCurrBC1; }
   /** Beam position in mm (related to beam energy). */
   double ebeamEnergyBC1() const { return _fEbeamEnergyBC1; }
-  static uint32_t _sizeof()  { return 84; }
+  static uint32_t _sizeof() { return 84; }
 private:
   uint32_t	_uDamageMask;	/**< Damage mask. */
   double	_fEbeamCharge;	/**< Beam charge in nC. */
@@ -308,7 +308,7 @@ public:
   double charge1() const { return _fCharge1; }
   /** UND:R02:IOC:16:BAT:Charge2 value in pico-columbs. */
   double charge2() const { return _fCharge2; }
-  static uint32_t _sizeof()  { return 32; }
+  static uint32_t _sizeof() { return 32; }
 private:
   double	_fFitTime1;	/**< UND:R02:IOC:16:BAT:FitTime1 value in pico-seconds. */
   double	_fFitTime2;	/**< UND:R02:IOC:16:BAT:FitTime2 value in pico-seconds. */
@@ -332,7 +332,7 @@ public:
   const Ipimb::DataV1& ipimbData() const { return _ipimbData; }
   const Ipimb::ConfigV1& ipimbConfig() const { return _ipimbConfig; }
   const Lusi::IpmFexV1& ipmFexData() const { return _ipmFexData; }
-  static uint32_t _sizeof()  { return ((((((0+(Ipimb::DataV1::_sizeof()))+(Ipimb::ConfigV1::_sizeof()))+(Lusi::IpmFexV1::_sizeof()))+4)-1)/4)*4; }
+  static uint32_t _sizeof() { return ((((((0+(Ipimb::DataV1::_sizeof()))+(Ipimb::ConfigV1::_sizeof()))+(Lusi::IpmFexV1::_sizeof()))+4)-1)/4)*4; }
 private:
   Ipimb::DataV1	_ipimbData;
   Ipimb::ConfigV1	_ipimbConfig;
@@ -355,7 +355,7 @@ public:
   const Ipimb::DataV2& ipimbData() const { return _ipimbData; }
   const Ipimb::ConfigV2& ipimbConfig() const { return _ipimbConfig; }
   const Lusi::IpmFexV1& ipmFexData() const { return _ipmFexData; }
-  static uint32_t _sizeof()  { return ((((((0+(Ipimb::DataV2::_sizeof()))+(Ipimb::ConfigV2::_sizeof()))+(Lusi::IpmFexV1::_sizeof()))+4)-1)/4)*4; }
+  static uint32_t _sizeof() { return ((((((0+(Ipimb::DataV2::_sizeof()))+(Ipimb::ConfigV2::_sizeof()))+(Lusi::IpmFexV1::_sizeof()))+4)-1)/4)*4; }
 private:
   Ipimb::DataV2	_ipimbData;
   Ipimb::ConfigV2	_ipimbConfig;
@@ -426,7 +426,7 @@ public:
   double transmission() const { return _fTransmission; }
   /** Transmission from FEE Gas Detector */
   double transmissionFEE() const { return _fTransmissionFEE; }
-  static uint32_t _sizeof()  { return (((((((((((((((((((0+(1*(32)))+8)+8)+8)+8)+8)+8)+8)+8)+8)+8)+8)+8)+8)+8)+8)+4)-1)/4)*4; }
+  static uint32_t _sizeof() { return (((((((((((((((((((0+(1*(32)))+8)+8)+8)+8)+8)+8)+8)+8)+8)+8)+8)+8)+8)+8)+8)+4)-1)/4)*4; }
 private:
   char	_strGasType[32];	/**< String describing gas type */
   double	_fPressure;	/**< Pressure from Spinning Rotor Gauge */
@@ -468,7 +468,7 @@ public:
   double bgValuePerSample() const { return _fBgValuePerSample; }
   /** Shot by shot pulse energy in arbitrary units */
   double relativeEnergyPerPulse() const { return _fRelativeEnergyPerPulse; }
-  static uint32_t _sizeof()  { return 48; }
+  static uint32_t _sizeof() { return 48; }
 private:
   double	_fMilliJoulesPerPulse;	/**< Shot to shot pulse energy (mJ) */
   double	_fMilliJoulesAverage;	/**< Average pulse energy from ION cup current (mJ) */

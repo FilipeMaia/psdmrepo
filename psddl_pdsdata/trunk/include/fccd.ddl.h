@@ -37,7 +37,7 @@ public:
   uint32_t height() const;
   uint32_t trimmedWidth() const;
   uint32_t trimmedHeight() const;
-  static uint32_t _sizeof()  { return 2; }
+  static uint32_t _sizeof() { return 2; }
 private:
   uint16_t	_u16OutputMode;
 };
@@ -82,7 +82,7 @@ public:
   uint32_t height() const;
   uint32_t trimmedWidth() const;
   uint32_t trimmedHeight() const;
-  static uint32_t _sizeof()  { return (((((8+(4*(NVoltages)))+(2*(NWaveforms)))+4)-1)/4)*4; }
+  static uint32_t _sizeof() { return (((((8+(4*(NVoltages)))+(2*(NWaveforms)))+4)-1)/4)*4; }
 private:
   uint16_t	_outputMode;
   uint8_t	_ccdEnable;

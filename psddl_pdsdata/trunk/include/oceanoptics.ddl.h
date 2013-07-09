@@ -26,7 +26,7 @@ public:
   ndarray<const double, 1> waveLenCalib() const { return make_ndarray(&_lfWaveLenCalibCoeff[0], 4); }
   ndarray<const double, 1> nonlinCorrect() const { return make_ndarray(&_lfNonlinCorrectCoeff[0], 8); }
   double strayLightConstant() const { return _fStrayLightConstant; }
-  static uint32_t _sizeof()  { return ((((((4+(8*(4)))+(8*(8)))+8)+4)-1)/4)*4; }
+  static uint32_t _sizeof() { return ((((((4+(8*(4)))+(8*(8)))+8)+4)-1)/4)*4; }
 private:
   float	_f32ExposureTime;
   double	_lfWaveLenCalibCoeff[4];
@@ -53,7 +53,7 @@ public:
   }
   uint64_t tv_sec() const { return _tv_sec; }
   uint64_t tv_nsec() const { return _tv_nsec; }
-  static uint32_t _sizeof()  { return 16; }
+  static uint32_t _sizeof() { return 16; }
 private:
   uint64_t	_tv_sec;
   uint64_t	_tv_nsec;
@@ -87,7 +87,7 @@ public:
   int8_t numSpectraUnused() const { return _i8NumSpectraUnused; }
   double durationOfFrame() const { return this->timeFrameEnd().tv_sec() - this->timeFrameStart().tv_sec() + (this->timeFrameEnd().tv_nsec() - this->timeFrameStart().tv_nsec()) * 1e-9; }
   double nonlinerCorrected(const OceanOptics::ConfigV1& cfg, uint32_t iPixel) const;
-  static uint32_t _sizeof()  { return (((((((((((((((0+(2*(iNumPixels)))+8)+8)+8)+(OceanOptics::timespec64::_sizeof()))+(OceanOptics::timespec64::_sizeof()))+(OceanOptics::timespec64::_sizeof()))+4)+1)+1)+1)+1)+4)-1)/4)*4; }
+  static uint32_t _sizeof() { return (((((((((((((((0+(2*(iNumPixels)))+8)+8)+8)+(OceanOptics::timespec64::_sizeof()))+(OceanOptics::timespec64::_sizeof()))+(OceanOptics::timespec64::_sizeof()))+4)+1)+1)+1)+1)+4)-1)/4)*4; }
 private:
   uint16_t	lu16Spetra[iNumPixels];
   uint64_t	_u64FrameCounter;

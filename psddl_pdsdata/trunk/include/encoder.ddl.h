@@ -41,7 +41,7 @@ public:
   uint32_t input_num() const { return _input_num; }
   uint32_t input_rising() const { return _input_rising; }
   uint32_t ticks_per_sec() const { return _ticks_per_sec; }
-  static uint32_t _sizeof()  { return 24; }
+  static uint32_t _sizeof() { return 24; }
 private:
   uint32_t	_chan_num;
   uint32_t	_count_mode;
@@ -83,7 +83,7 @@ public:
   uint32_t input_num() const { return _input_num; }
   uint32_t input_rising() const { return _input_rising; }
   uint32_t ticks_per_sec() const { return _ticks_per_sec; }
-  static uint32_t _sizeof()  { return 24; }
+  static uint32_t _sizeof() { return 24; }
 private:
   uint32_t	_chan_mask;
   uint32_t	_count_mode;
@@ -109,7 +109,7 @@ public:
   uint32_t encoder_count() const { return _encoder_count; }
   /** Lower 24 bits of encoder_count as signed integer value. */
   int32_t value() const;
-  static uint32_t _sizeof()  { return 8; }
+  static uint32_t _sizeof() { return 8; }
 private:
   uint32_t	_33mhz_timestamp;
   uint32_t	_encoder_count;
@@ -130,7 +130,7 @@ public:
   ndarray<const uint32_t, 1> encoder_count() const { return make_ndarray(&_encoder_count[0], NEncoders); }
   /** Lower 24 bits of encoder_count as signed integer value. */
   int32_t value(uint32_t i) const;
-  static uint32_t _sizeof()  { return ((((4+(4*(NEncoders)))+4)-1)/4)*4; }
+  static uint32_t _sizeof() { return ((((4+(4*(NEncoders)))+4)-1)/4)*4; }
 private:
   uint32_t	_33mhz_timestamp;
   uint32_t	_encoder_count[NEncoders];

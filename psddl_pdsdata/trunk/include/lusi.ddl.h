@@ -33,7 +33,7 @@ public:
   }
   ndarray<const float, 1> base() const { return make_ndarray(&_base[0], NRANGES); }
   ndarray<const float, 1> scale() const { return make_ndarray(&_scale[0], NRANGES); }
-  static uint32_t _sizeof()  { return (((((0+(4*(NRANGES)))+(4*(NRANGES)))+4)-1)/4)*4; }
+  static uint32_t _sizeof() { return (((((0+(4*(NRANGES)))+(4*(NRANGES)))+4)-1)/4)*4; }
 private:
   float	_base[NRANGES];
   float	_scale[NRANGES];
@@ -62,7 +62,7 @@ public:
   }
   ndarray<const float, 1> base() const { return make_ndarray(&_base[0], NRANGES); }
   ndarray<const float, 1> scale() const { return make_ndarray(&_scale[0], NRANGES); }
-  static uint32_t _sizeof()  { return (((((0+(4*(NRANGES)))+(4*(NRANGES)))+4)-1)/4)*4; }
+  static uint32_t _sizeof() { return (((((0+(4*(NRANGES)))+(4*(NRANGES)))+4)-1)/4)*4; }
 private:
   float	_base[NRANGES];
   float	_scale[NRANGES];
@@ -88,7 +88,7 @@ public:
   {
   }
   float value() const { return _value; }
-  static uint32_t _sizeof()  { return 4; }
+  static uint32_t _sizeof() { return 4; }
 private:
   float	_value;
 };
@@ -109,7 +109,7 @@ public:
   ndarray<const Lusi::DiodeFexConfigV1, 1> diode() const { return make_ndarray(&_diode[0], NCHANNELS); }
   float xscale() const { return _xscale; }
   float yscale() const { return _yscale; }
-  static uint32_t _sizeof()  { return ((((((0+(Lusi::DiodeFexConfigV1::_sizeof()*(NCHANNELS)))+4)+4)+4)-1)/4)*4; }
+  static uint32_t _sizeof() { return ((((((0+(Lusi::DiodeFexConfigV1::_sizeof()*(NCHANNELS)))+4)+4)+4)-1)/4)*4; }
 private:
   Lusi::DiodeFexConfigV1	_diode[NCHANNELS];
   float	_xscale;
@@ -132,7 +132,7 @@ public:
   ndarray<const Lusi::DiodeFexConfigV2, 1> diode() const { return make_ndarray(&_diode[0], NCHANNELS); }
   float xscale() const { return _xscale; }
   float yscale() const { return _yscale; }
-  static uint32_t _sizeof()  { return ((((((0+(Lusi::DiodeFexConfigV2::_sizeof()*(NCHANNELS)))+4)+4)+4)-1)/4)*4; }
+  static uint32_t _sizeof() { return ((((((0+(Lusi::DiodeFexConfigV2::_sizeof()*(NCHANNELS)))+4)+4)+4)-1)/4)*4; }
 private:
   Lusi::DiodeFexConfigV2	_diode[NCHANNELS];
   float	_xscale;
@@ -164,7 +164,7 @@ public:
   float sum() const { return _sum; }
   float xpos() const { return _xpos; }
   float ypos() const { return _ypos; }
-  static uint32_t _sizeof()  { return (((((((0+(4*(NCHANNELS)))+4)+4)+4)+4)-1)/4)*4; }
+  static uint32_t _sizeof() { return (((((((0+(4*(NCHANNELS)))+4)+4)+4)+4)-1)/4)*4; }
 private:
   float	_channel[NCHANNELS];
   float	_sum;
@@ -193,7 +193,7 @@ public:
   }
   float xscale() const { return _xscale; }
   float yscale() const { return _yscale; }
-  static uint32_t _sizeof()  { return 8; }
+  static uint32_t _sizeof() { return 8; }
 private:
   float	_xscale;
   float	_yscale;

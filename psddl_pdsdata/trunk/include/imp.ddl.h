@@ -45,7 +45,7 @@ public:
   uint32_t numberOfSamples() const { return _numberOfSamples; }
   uint32_t trigDelay() const { return _trigDelay; }
   uint32_t adcDelay() const { return _adcDelay; }
-  static uint32_t _sizeof()  { return 40; }
+  static uint32_t _sizeof() { return 40; }
 private:
   uint32_t	_range;
   uint32_t	_calRange;
@@ -78,7 +78,7 @@ public:
     std::copy(arg__channels, arg__channels+(4), _channels);
   }
   ndarray<const uint16_t, 1> channels() const { return make_ndarray(&_channels[0], 4); }
-  static uint32_t _sizeof()  { return ((((0+(2*(4)))+2)-1)/2)*2; }
+  static uint32_t _sizeof() { return ((((0+(2*(4)))+2)-1)/2)*2; }
 private:
   uint16_t	_channels[4];
 };
@@ -106,7 +106,7 @@ public:
   uint8_t remLinked() const { return uint8_t((this->_value>>17) & 0x1); }
   uint16_t zeros() const { return uint16_t((this->_value>>18) & 0x3ff); }
   uint8_t powersOkay() const { return uint8_t((this->_value>>28) & 0xf); }
-  static uint32_t _sizeof()  { return 4; }
+  static uint32_t _sizeof() { return 4; }
 private:
   uint32_t	_value;
 };
@@ -131,7 +131,7 @@ public:
   ndarray<const Imp::Sample, 1> samples(const Imp::ConfigV1& cfg) const { ptrdiff_t offset=32;
   const Imp::Sample* data = (const Imp::Sample*)(((char*)this)+offset);
   return make_ndarray(data, cfg.numberOfSamples()); }
-  static uint32_t _sizeof(const Imp::ConfigV1& cfg)  { return ((((((24+(Imp::LaneStatus::_sizeof()))+4)+(Imp::Sample::_sizeof()*(cfg.numberOfSamples())))+2)-1)/2)*2; }
+  static uint32_t _sizeof(const Imp::ConfigV1& cfg) { return ((((((24+(Imp::LaneStatus::_sizeof()))+4)+(Imp::Sample::_sizeof()*(cfg.numberOfSamples())))+2)-1)/2)*2; }
 private:
   uint32_t	_first;
   uint32_t	_second;

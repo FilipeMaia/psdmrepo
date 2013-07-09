@@ -30,7 +30,7 @@ public:
   uint16_t column() const { return _column; }
   /** Row index (y value). */
   uint16_t row() const { return _row; }
-  static uint32_t _sizeof()  { return 4; }
+  static uint32_t _sizeof() { return 4; }
 private:
   uint16_t	_column;	/**< Column index (x value). */
   uint16_t	_row;	/**< Row index (y value). */
@@ -46,7 +46,7 @@ class FrameFccdConfigV1 {
 public:
   enum { TypeId = Pds::TypeId::Id_FrameFccdConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
-  static uint32_t _sizeof()  { return 0; }
+  static uint32_t _sizeof() { return 0; }
 };
 
 /** @class FrameFexConfigV1
@@ -158,7 +158,7 @@ public:
   double major_axis_width() const { return _major_axis_width; }
   double minor_axis_width() const { return _minor_axis_width; }
   double major_axis_tilt() const { return _major_axis_tilt; }
-  static uint32_t _sizeof()  { return 48; }
+  static uint32_t _sizeof() { return 48; }
 private:
   uint64_t	_integral;
   double	_xmean;

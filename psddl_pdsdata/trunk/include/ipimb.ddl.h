@@ -42,7 +42,7 @@ public:
   uint32_t trigDelay() const { return _trigDelay; }
   /** Returns CapacitorValue enum for given channel number (0..3). */
   Ipimb::ConfigV1::CapacitorValue capacitorValue(uint32_t ch) const { return CapacitorValue((this->chargeAmpRange() >> (ch*2)) & 0x3); }
-  static uint32_t _sizeof()  { return 52; }
+  static uint32_t _sizeof() { return 52; }
 private:
   uint64_t	_triggerCounter;
   uint64_t	_serialID;
@@ -100,7 +100,7 @@ public:
   uint32_t adcDelay() const { return _adcDelay; }
   /** Returns CapacitorValue enum for given channel number (0..3). */
   Ipimb::ConfigV2::CapacitorValue capacitorValue(uint32_t ch) const { return CapacitorValue((this->chargeAmpRange() >> (ch*4)) & 0xf); }
-  static uint32_t _sizeof()  { return 60; }
+  static uint32_t _sizeof() { return 60; }
 private:
   uint64_t	_triggerCounter;
   uint64_t	_serialID;
@@ -154,7 +154,7 @@ public:
   float channel2Volts() const;
   /** Value of of channel3() converted to Volts. */
   float channel3Volts() const;
-  static uint32_t _sizeof()  { return 24; }
+  static uint32_t _sizeof() { return 24; }
 private:
   uint64_t	_triggerCounter;
   uint16_t	_config0;
@@ -219,7 +219,7 @@ public:
   float channel3psVolts() const;
   /** Trigger counter value. */
   uint64_t triggerCounter() const { return (((_triggerCounter >> 48) & 0x000000000000ffffLL) |              ((_triggerCounter >> 16) & 0x00000000ffff0000LL) |              ((_triggerCounter << 16) & 0x0000ffff00000000LL) |              ((_triggerCounter << 48) & 0xffff000000000000LL)); }
-  static uint32_t _sizeof()  { return 32; }
+  static uint32_t _sizeof() { return 32; }
 private:
   uint64_t	_triggerCounter;
   uint16_t	_config0;
