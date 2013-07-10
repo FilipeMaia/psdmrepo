@@ -105,11 +105,8 @@ uint32_t ConfigV1QuadReg::kdConstant() const { return m_xtcObj->kdConstant(); }
 uint32_t ConfigV1QuadReg::humidThold() const { return m_xtcObj->humidThold(); }
 
 uint32_t ConfigV1QuadReg::setPoint() const { return m_xtcObj->setPoint(); }
-
 const Psana::CsPad2x2::CsPad2x2ReadOnlyCfg& ConfigV1QuadReg::ro() const { return _readOnly; }
-
 const Psana::CsPad2x2::CsPad2x2DigitalPotsCfg& ConfigV1QuadReg::dp() const { return _digitalPots; }
-
 const Psana::CsPad2x2::CsPad2x2GainMapCfg& ConfigV1QuadReg::gm() const { return _gainMap; }
 ConfigV1::ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::CsPad2x2::ConfigV1()
@@ -124,7 +121,6 @@ ConfigV1::~ConfigV1()
 
 
 uint32_t ConfigV1::concentratorVersion() const { return m_xtcObj->concentratorVersion(); }
-
 const Psana::CsPad2x2::ProtectionSystemThreshold& ConfigV1::protectionThreshold() const { return _protectionThreshold; }
 
 uint32_t ConfigV1::protectionEnable() const { return m_xtcObj->protectionEnable(); }
@@ -142,7 +138,6 @@ uint32_t ConfigV1::badAsicMask() const { return m_xtcObj->badAsicMask(); }
 uint32_t ConfigV1::asicMask() const { return m_xtcObj->asicMask(); }
 
 uint32_t ConfigV1::roiMask() const { return m_xtcObj->roiMask(); }
-
 const Psana::CsPad2x2::ConfigV1QuadReg& ConfigV1::quad() const { return _quad; }
 
 uint32_t ConfigV1::numAsicsRead() const { return m_xtcObj->numAsicsRead(); }
@@ -206,11 +201,8 @@ uint32_t ConfigV2QuadReg::setPoint() const { return m_xtcObj->setPoint(); }
 uint32_t ConfigV2QuadReg::biasTuning() const { return m_xtcObj->biasTuning(); }
 
 uint32_t ConfigV2QuadReg::pdpmndnmBalance() const { return m_xtcObj->pdpmndnmBalance(); }
-
 const Psana::CsPad2x2::CsPad2x2ReadOnlyCfg& ConfigV2QuadReg::ro() const { return _readOnly; }
-
 const Psana::CsPad2x2::CsPad2x2DigitalPotsCfg& ConfigV2QuadReg::dp() const { return _digitalPots; }
-
 const Psana::CsPad2x2::CsPad2x2GainMapCfg& ConfigV2QuadReg::gm() const { return _gainMap; }
 ConfigV2::ConfigV2(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::CsPad2x2::ConfigV2()
@@ -225,7 +217,6 @@ ConfigV2::~ConfigV2()
 
 
 uint32_t ConfigV2::concentratorVersion() const { return m_xtcObj->concentratorVersion(); }
-
 const Psana::CsPad2x2::ProtectionSystemThreshold& ConfigV2::protectionThreshold() const { return _protectionThreshold; }
 
 uint32_t ConfigV2::protectionEnable() const { return m_xtcObj->protectionEnable(); }
@@ -245,7 +236,6 @@ uint32_t ConfigV2::badAsicMask() const { return m_xtcObj->badAsicMask(); }
 uint32_t ConfigV2::asicMask() const { return m_xtcObj->asicMask(); }
 
 uint32_t ConfigV2::roiMask() const { return m_xtcObj->roiMask(); }
-
 const Psana::CsPad2x2::ConfigV2QuadReg& ConfigV2::quad() const { return _quad; }
 
 uint32_t ConfigV2::numAsicsRead() const { return m_xtcObj->numAsicsRead(); }

@@ -41,11 +41,12 @@ private:
 };
 
 
+template <typename Config>
 class FrameV1 : public Psana::Andor::FrameV1 {
 public:
   typedef PsddlPds::Andor::FrameV1 XtcType;
   typedef Psana::Andor::FrameV1 PsanaType;
-  FrameV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::Andor::ConfigV1>& cfgPtr);
+  FrameV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const Config>& cfgPtr);
   virtual ~FrameV1();
   virtual uint32_t shotIdStart() const;
   virtual float readoutTime() const;
@@ -54,7 +55,7 @@ public:
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
-  boost::shared_ptr<const PsddlPds::Andor::ConfigV1> m_cfgPtr0;
+  boost::shared_ptr<const Config> m_cfgPtr;
 };
 
 } // namespace Andor

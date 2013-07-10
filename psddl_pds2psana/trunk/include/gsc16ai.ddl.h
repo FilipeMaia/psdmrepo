@@ -32,18 +32,19 @@ private:
 };
 
 
+template <typename Config>
 class DataV1 : public Psana::Gsc16ai::DataV1 {
 public:
   typedef PsddlPds::Gsc16ai::DataV1 XtcType;
   typedef Psana::Gsc16ai::DataV1 PsanaType;
-  DataV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::Gsc16ai::ConfigV1>& cfgPtr);
+  DataV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const Config>& cfgPtr);
   virtual ~DataV1();
   virtual ndarray<const uint16_t, 1> timestamp() const;
   virtual ndarray<const uint16_t, 1> channelValue() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
-  boost::shared_ptr<const PsddlPds::Gsc16ai::ConfigV1> m_cfgPtr0;
+  boost::shared_ptr<const Config> m_cfgPtr;
 };
 
 } // namespace Gsc16ai

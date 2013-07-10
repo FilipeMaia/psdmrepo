@@ -42,13 +42,14 @@ TdcDataV1::TdcDataV1(const boost::shared_ptr<const XtcType>& xtcPtr, size_t xtcS
   // the size of the data array is unknown and needs to be determined from XTC size
   size_t nItems = xtcSize / PsddlPds::Acqiris::TdcDataV1_Item::_sizeof();
 
+  typedef ndarray<Psana::Acqiris::TdcDataV1_Item, 1> NDArray;
   typedef ndarray<const PsddlPds::Acqiris::TdcDataV1_Item, 1> XtcNDArray;
   const XtcNDArray& xtc_ndarr = xtcPtr->data();
-  _data_ndarray_storage_.reserve(nItems);
-  for (unsigned i = 0; i != nItems; ++ i) {
-    _data_ndarray_storage_.push_back(pds_to_psana(xtc_ndarr[i]));
+  _data_ndarray_storage_ = NDArray(xtc_ndarr.shape());
+  NDArray::iterator out = _data_ndarray_storage_.begin();
+  for (unsigned i = 0; i != nItems; ++ i, ++ out) {
+    *out = pds_to_psana(xtc_ndarr[i]);
   }
-  _data_ndarray_shape_[0] = nItems;
 }
 
 } // namespace Acqiris

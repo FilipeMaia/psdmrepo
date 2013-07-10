@@ -450,8 +450,7 @@ public:
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
-  std::vector<Psana::Epics::PvConfigV1> _pvControls_ndarray_storage_;
-  unsigned _pvControls_ndarray_shape_[1];
+  ndarray<Psana::Epics::PvConfigV1, 1> _pvControls_ndarray_storage_;
 };
 
 } // namespace Epics

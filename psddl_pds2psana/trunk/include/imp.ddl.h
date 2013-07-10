@@ -36,11 +36,12 @@ Psana::Imp::Sample pds_to_psana(PsddlPds::Imp::Sample pds);
 Psana::Imp::LaneStatus pds_to_psana(PsddlPds::Imp::LaneStatus pds);
 
 
+template <typename Config>
 class ElementV1 : public Psana::Imp::ElementV1 {
 public:
   typedef PsddlPds::Imp::ElementV1 XtcType;
   typedef Psana::Imp::ElementV1 PsanaType;
-  ElementV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::Imp::ConfigV1>& cfgPtr);
+  ElementV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const Config>& cfgPtr);
   virtual ~ElementV1();
   virtual uint8_t vc() const;
   virtual uint8_t lane() const;
@@ -51,10 +52,9 @@ public:
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
-  boost::shared_ptr<const PsddlPds::Imp::ConfigV1> m_cfgPtr0;
+  boost::shared_ptr<const Config> m_cfgPtr;
   Psana::Imp::LaneStatus _laneStatus;
-  std::vector<Psana::Imp::Sample> _samples_ndarray_storage_;
-  unsigned _samples_ndarray_shape_[1];
+  ndarray<Psana::Imp::Sample, 1> _samples_ndarray_storage_;
 };
 
 } // namespace Imp

@@ -28,8 +28,7 @@ public:
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
-  std::vector<Psana::Lusi::DiodeFexConfigV1> _diode_ndarray_storage_;
-  unsigned _diode_ndarray_shape_[1];
+  ndarray<Psana::Lusi::DiodeFexConfigV1, 1> _diode_ndarray_storage_;
 };
 
 
@@ -45,8 +44,7 @@ public:
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
-  std::vector<Psana::Lusi::DiodeFexConfigV2> _diode_ndarray_storage_;
-  unsigned _diode_ndarray_shape_[1];
+  ndarray<Psana::Lusi::DiodeFexConfigV2, 1> _diode_ndarray_storage_;
 };
 
 Psana::Lusi::IpmFexV1 pds_to_psana(PsddlPds::Lusi::IpmFexV1 pds);

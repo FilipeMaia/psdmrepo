@@ -226,104 +226,67 @@ uint32_t ConfigV5::numPixelsX() const { return m_xtcObj->numPixelsX(); }
 uint32_t ConfigV5::numPixelsY() const { return m_xtcObj->numPixelsY(); }
 
 uint32_t ConfigV5::numPixels() const { return m_xtcObj->numPixels(); }
-FrameV1::FrameV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::Princeton::ConfigV1>& cfgPtr)
+template <typename Config>
+FrameV1<Config>::FrameV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const Config>& cfgPtr)
   : Psana::Princeton::FrameV1()
   , m_xtcObj(xtcPtr)
-  , m_cfgPtr0(cfgPtr)
+  , m_cfgPtr(cfgPtr)
 {
 }
-FrameV1::FrameV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::Princeton::ConfigV2>& cfgPtr)
-  : Psana::Princeton::FrameV1()
-  , m_xtcObj(xtcPtr)
-  , m_cfgPtr1(cfgPtr)
-{
-}
-FrameV1::FrameV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::Princeton::ConfigV3>& cfgPtr)
-  : Psana::Princeton::FrameV1()
-  , m_xtcObj(xtcPtr)
-  , m_cfgPtr2(cfgPtr)
-{
-}
-FrameV1::FrameV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::Princeton::ConfigV4>& cfgPtr)
-  : Psana::Princeton::FrameV1()
-  , m_xtcObj(xtcPtr)
-  , m_cfgPtr3(cfgPtr)
-{
-}
-FrameV1::FrameV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::Princeton::ConfigV5>& cfgPtr)
-  : Psana::Princeton::FrameV1()
-  , m_xtcObj(xtcPtr)
-  , m_cfgPtr4(cfgPtr)
-{
-}
-FrameV1::~FrameV1()
+template <typename Config>
+FrameV1<Config>::~FrameV1()
 {
 }
 
 
-uint32_t FrameV1::shotIdStart() const { return m_xtcObj->shotIdStart(); }
+template <typename Config>
+uint32_t FrameV1<Config>::shotIdStart() const { return m_xtcObj->shotIdStart(); }
 
-float FrameV1::readoutTime() const { return m_xtcObj->readoutTime(); }
+template <typename Config>
+float FrameV1<Config>::readoutTime() const { return m_xtcObj->readoutTime(); }
 
-ndarray<const uint16_t, 2> FrameV1::data() const {
-  if (m_cfgPtr0.get()) return m_xtcObj->data(*m_cfgPtr0);
-  if (m_cfgPtr1.get()) return m_xtcObj->data(*m_cfgPtr1);
-  if (m_cfgPtr2.get()) return m_xtcObj->data(*m_cfgPtr2);
-  if (m_cfgPtr3.get()) return m_xtcObj->data(*m_cfgPtr3);
-  if (m_cfgPtr4.get()) return m_xtcObj->data(*m_cfgPtr4);
-  throw std::runtime_error("FrameV1::data: config object pointer is zero");
+template <typename Config>
+ndarray<const uint16_t, 2> FrameV1<Config>::data() const {
+  return m_xtcObj->data(*m_cfgPtr);
 }
 
-FrameV2::FrameV2(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::Princeton::ConfigV1>& cfgPtr)
+template class FrameV1<PsddlPds::Princeton::ConfigV1>;
+template class FrameV1<PsddlPds::Princeton::ConfigV2>;
+template class FrameV1<PsddlPds::Princeton::ConfigV3>;
+template class FrameV1<PsddlPds::Princeton::ConfigV4>;
+template class FrameV1<PsddlPds::Princeton::ConfigV5>;
+template <typename Config>
+FrameV2<Config>::FrameV2(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const Config>& cfgPtr)
   : Psana::Princeton::FrameV2()
   , m_xtcObj(xtcPtr)
-  , m_cfgPtr0(cfgPtr)
+  , m_cfgPtr(cfgPtr)
 {
 }
-FrameV2::FrameV2(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::Princeton::ConfigV2>& cfgPtr)
-  : Psana::Princeton::FrameV2()
-  , m_xtcObj(xtcPtr)
-  , m_cfgPtr1(cfgPtr)
-{
-}
-FrameV2::FrameV2(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::Princeton::ConfigV3>& cfgPtr)
-  : Psana::Princeton::FrameV2()
-  , m_xtcObj(xtcPtr)
-  , m_cfgPtr2(cfgPtr)
-{
-}
-FrameV2::FrameV2(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::Princeton::ConfigV4>& cfgPtr)
-  : Psana::Princeton::FrameV2()
-  , m_xtcObj(xtcPtr)
-  , m_cfgPtr3(cfgPtr)
-{
-}
-FrameV2::FrameV2(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::Princeton::ConfigV5>& cfgPtr)
-  : Psana::Princeton::FrameV2()
-  , m_xtcObj(xtcPtr)
-  , m_cfgPtr4(cfgPtr)
-{
-}
-FrameV2::~FrameV2()
+template <typename Config>
+FrameV2<Config>::~FrameV2()
 {
 }
 
 
-uint32_t FrameV2::shotIdStart() const { return m_xtcObj->shotIdStart(); }
+template <typename Config>
+uint32_t FrameV2<Config>::shotIdStart() const { return m_xtcObj->shotIdStart(); }
 
-float FrameV2::readoutTime() const { return m_xtcObj->readoutTime(); }
+template <typename Config>
+float FrameV2<Config>::readoutTime() const { return m_xtcObj->readoutTime(); }
 
-float FrameV2::temperature() const { return m_xtcObj->temperature(); }
+template <typename Config>
+float FrameV2<Config>::temperature() const { return m_xtcObj->temperature(); }
 
-ndarray<const uint16_t, 2> FrameV2::data() const {
-  if (m_cfgPtr0.get()) return m_xtcObj->data(*m_cfgPtr0);
-  if (m_cfgPtr1.get()) return m_xtcObj->data(*m_cfgPtr1);
-  if (m_cfgPtr2.get()) return m_xtcObj->data(*m_cfgPtr2);
-  if (m_cfgPtr3.get()) return m_xtcObj->data(*m_cfgPtr3);
-  if (m_cfgPtr4.get()) return m_xtcObj->data(*m_cfgPtr4);
-  throw std::runtime_error("FrameV2::data: config object pointer is zero");
+template <typename Config>
+ndarray<const uint16_t, 2> FrameV2<Config>::data() const {
+  return m_xtcObj->data(*m_cfgPtr);
 }
 
+template class FrameV2<PsddlPds::Princeton::ConfigV1>;
+template class FrameV2<PsddlPds::Princeton::ConfigV2>;
+template class FrameV2<PsddlPds::Princeton::ConfigV3>;
+template class FrameV2<PsddlPds::Princeton::ConfigV4>;
+template class FrameV2<PsddlPds::Princeton::ConfigV5>;
 Psana::Princeton::InfoV1 pds_to_psana(PsddlPds::Princeton::InfoV1 pds)
 {
   return Psana::Princeton::InfoV1(pds.temperature());

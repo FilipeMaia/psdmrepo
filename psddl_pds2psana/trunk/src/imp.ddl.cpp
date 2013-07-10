@@ -53,38 +53,45 @@ Psana::Imp::LaneStatus pds_to_psana(PsddlPds::Imp::LaneStatus pds)
   return Psana::Imp::LaneStatus(pds.linkErrCount(), pds.linkDownCount(), pds.cellErrCount(), pds.rxCount(), pds.locLinked(), pds.remLinked(), pds.zeros(), pds.powersOkay());
 }
 
-ElementV1::ElementV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::Imp::ConfigV1>& cfgPtr)
+template <typename Config>
+ElementV1<Config>::ElementV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const Config>& cfgPtr)
   : Psana::Imp::ElementV1()
   , m_xtcObj(xtcPtr)
-  , m_cfgPtr0(cfgPtr)
+  , m_cfgPtr(cfgPtr)
   , _laneStatus(psddl_pds2psana::Imp::pds_to_psana(xtcPtr->laneStatus()))
 {
   {
+    typedef ndarray<Psana::Imp::Sample, 1> NDArray;
     typedef ndarray<const PsddlPds::Imp::Sample, 1> XtcNDArray;
     const XtcNDArray& xtc_ndarr = xtcPtr->samples(*cfgPtr);
-    _samples_ndarray_storage_.reserve(xtc_ndarr.size());
-    for (XtcNDArray::iterator it = xtc_ndarr.begin(); it != xtc_ndarr.end(); ++ it) {
-      _samples_ndarray_storage_.push_back(psddl_pds2psana::Imp::pds_to_psana(*it));
+    _samples_ndarray_storage_ = NDArray(xtc_ndarr.shape());
+    NDArray::iterator out = _samples_ndarray_storage_.begin();
+    for (XtcNDArray::iterator it = xtc_ndarr.begin(); it != xtc_ndarr.end(); ++ it, ++ out) {
+      *out = psddl_pds2psana::Imp::pds_to_psana(*it);
     }
-    const unsigned* shape = xtc_ndarr.shape();
-    std::copy(shape, shape+1, _samples_ndarray_shape_);
   }
 }
-ElementV1::~ElementV1()
+template <typename Config>
+ElementV1<Config>::~ElementV1()
 {
 }
 
 
-uint8_t ElementV1::vc() const { return m_xtcObj->vc(); }
+template <typename Config>
+uint8_t ElementV1<Config>::vc() const { return m_xtcObj->vc(); }
 
-uint8_t ElementV1::lane() const { return m_xtcObj->lane(); }
+template <typename Config>
+uint8_t ElementV1<Config>::lane() const { return m_xtcObj->lane(); }
 
-uint32_t ElementV1::frameNumber() const { return m_xtcObj->frameNumber(); }
+template <typename Config>
+uint32_t ElementV1<Config>::frameNumber() const { return m_xtcObj->frameNumber(); }
 
-uint32_t ElementV1::range() const { return m_xtcObj->range(); }
-
-const Psana::Imp::LaneStatus& ElementV1::laneStatus() const { return _laneStatus; }
-
-ndarray<const Psana::Imp::Sample, 1> ElementV1::samples() const { return ndarray<const Psana::Imp::Sample, 1>(&_samples_ndarray_storage_[0], _samples_ndarray_shape_); }
+template <typename Config>
+uint32_t ElementV1<Config>::range() const { return m_xtcObj->range(); }
+template <typename Config>
+const Psana::Imp::LaneStatus& ElementV1<Config>::laneStatus() const { return _laneStatus; }
+template <typename Config>
+ndarray<const Psana::Imp::Sample, 1> ElementV1<Config>::samples() const { return _samples_ndarray_storage_; }
+template class ElementV1<PsddlPds::Imp::ConfigV1>;
 } // namespace Imp
 } // namespace psddl_pds2psana

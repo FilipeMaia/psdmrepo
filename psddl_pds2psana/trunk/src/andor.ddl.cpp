@@ -61,27 +61,33 @@ uint32_t ConfigV1::numPixelsX() const { return m_xtcObj->numPixelsX(); }
 uint32_t ConfigV1::numPixelsY() const { return m_xtcObj->numPixelsY(); }
 
 uint32_t ConfigV1::numPixels() const { return m_xtcObj->numPixels(); }
-FrameV1::FrameV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::Andor::ConfigV1>& cfgPtr)
+template <typename Config>
+FrameV1<Config>::FrameV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const Config>& cfgPtr)
   : Psana::Andor::FrameV1()
   , m_xtcObj(xtcPtr)
-  , m_cfgPtr0(cfgPtr)
+  , m_cfgPtr(cfgPtr)
 {
 }
-FrameV1::~FrameV1()
+template <typename Config>
+FrameV1<Config>::~FrameV1()
 {
 }
 
 
-uint32_t FrameV1::shotIdStart() const { return m_xtcObj->shotIdStart(); }
+template <typename Config>
+uint32_t FrameV1<Config>::shotIdStart() const { return m_xtcObj->shotIdStart(); }
 
-float FrameV1::readoutTime() const { return m_xtcObj->readoutTime(); }
+template <typename Config>
+float FrameV1<Config>::readoutTime() const { return m_xtcObj->readoutTime(); }
 
-float FrameV1::temperature() const { return m_xtcObj->temperature(); }
+template <typename Config>
+float FrameV1<Config>::temperature() const { return m_xtcObj->temperature(); }
 
-ndarray<const uint16_t, 2> FrameV1::data() const {
-  if (m_cfgPtr0.get()) return m_xtcObj->data(*m_cfgPtr0);
-  throw std::runtime_error("FrameV1::data: config object pointer is zero");
+template <typename Config>
+ndarray<const uint16_t, 2> FrameV1<Config>::data() const {
+  return m_xtcObj->data(*m_cfgPtr);
 }
 
+template class FrameV1<PsddlPds::Andor::ConfigV1>;
 } // namespace Andor
 } // namespace psddl_pds2psana

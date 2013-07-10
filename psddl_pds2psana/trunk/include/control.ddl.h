@@ -35,10 +35,8 @@ public:
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
   Pds::ClockTime _duration;
-  std::vector<Psana::ControlData::PVControl> _pvControls_ndarray_storage_;
-  unsigned _pvControls_ndarray_shape_[1];
-  std::vector<Psana::ControlData::PVMonitor> _pvMonitors_ndarray_storage_;
-  unsigned _pvMonitors_ndarray_shape_[1];
+  ndarray<Psana::ControlData::PVControl, 1> _pvControls_ndarray_storage_;
+  ndarray<Psana::ControlData::PVMonitor, 1> _pvMonitors_ndarray_storage_;
 };
 
 
@@ -62,12 +60,9 @@ public:
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
   Pds::ClockTime _duration;
-  std::vector<Psana::ControlData::PVControl> _pvControls_ndarray_storage_;
-  unsigned _pvControls_ndarray_shape_[1];
-  std::vector<Psana::ControlData::PVMonitor> _pvMonitors_ndarray_storage_;
-  unsigned _pvMonitors_ndarray_shape_[1];
-  std::vector<Psana::ControlData::PVLabel> _pvLabels_ndarray_storage_;
-  unsigned _pvLabels_ndarray_shape_[1];
+  ndarray<Psana::ControlData::PVControl, 1> _pvControls_ndarray_storage_;
+  ndarray<Psana::ControlData::PVMonitor, 1> _pvMonitors_ndarray_storage_;
+  ndarray<Psana::ControlData::PVLabel, 1> _pvLabels_ndarray_storage_;
 };
 
 } // namespace ControlData

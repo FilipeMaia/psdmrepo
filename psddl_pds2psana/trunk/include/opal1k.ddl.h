@@ -33,8 +33,7 @@ public:
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
-  std::vector<Psana::Camera::FrameCoord> _defectPixels_ndarray_storage_;
-  unsigned _defectPixels_ndarray_shape_[1];
+  ndarray<Psana::Camera::FrameCoord, 1> _defectPixels_ndarray_storage_;
 };
 
 } // namespace Opal1k

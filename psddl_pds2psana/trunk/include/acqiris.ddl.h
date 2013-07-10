@@ -34,18 +34,18 @@ private:
   boost::shared_ptr<const XtcType> m_xtcObj;
   Psana::Acqiris::TrigV1 _trig;
   Psana::Acqiris::HorizV1 _horiz;
-  std::vector<Psana::Acqiris::VertV1> _vert_ndarray_storage_;
-  unsigned _vert_ndarray_shape_[1];
+  ndarray<Psana::Acqiris::VertV1, 1> _vert_ndarray_storage_;
 };
 
 Psana::Acqiris::TimestampV1 pds_to_psana(PsddlPds::Acqiris::TimestampV1 pds);
 
 
+template <typename Config>
 class DataDescV1Elem : public Psana::Acqiris::DataDescV1Elem {
 public:
   typedef PsddlPds::Acqiris::DataDescV1Elem XtcType;
   typedef Psana::Acqiris::DataDescV1Elem PsanaType;
-  DataDescV1Elem(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::Acqiris::ConfigV1>& cfgPtr);
+  DataDescV1Elem(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const Config>& cfgPtr);
   virtual ~DataDescV1Elem();
   virtual uint32_t nbrSamplesInSeg() const;
   virtual uint32_t indexFirstPoint() const;
@@ -55,25 +55,25 @@ public:
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
-  boost::shared_ptr<const PsddlPds::Acqiris::ConfigV1> m_cfgPtr0;
-  std::vector<Psana::Acqiris::TimestampV1> _timestamps_ndarray_storage_;
-  unsigned _timestamps_ndarray_shape_[1];
+  boost::shared_ptr<const Config> m_cfgPtr;
+  ndarray<Psana::Acqiris::TimestampV1, 1> _timestamps_ndarray_storage_;
 };
 
 
+template <typename Config>
 class DataDescV1 : public Psana::Acqiris::DataDescV1 {
 public:
   typedef PsddlPds::Acqiris::DataDescV1 XtcType;
   typedef Psana::Acqiris::DataDescV1 PsanaType;
-  DataDescV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::Acqiris::ConfigV1>& cfgPtr);
+  DataDescV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const Config>& cfgPtr);
   virtual ~DataDescV1();
   virtual const Psana::Acqiris::DataDescV1Elem& data(uint32_t i0) const;
   virtual std::vector<int> data_shape() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
-  boost::shared_ptr<const PsddlPds::Acqiris::ConfigV1> m_cfgPtr0;
-  std::vector< psddl_pds2psana::Acqiris::DataDescV1Elem > _data;
+  boost::shared_ptr<const Config> m_cfgPtr;
+  std::vector< psddl_pds2psana::Acqiris::DataDescV1Elem<Config> > _data;
 };
 
 Psana::Acqiris::TdcChannel pds_to_psana(PsddlPds::Acqiris::TdcChannel pds);
@@ -95,10 +95,8 @@ public:
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
-  std::vector<Psana::Acqiris::TdcChannel> _channel_ndarray_storage_;
-  unsigned _channel_ndarray_shape_[1];
-  std::vector<Psana::Acqiris::TdcAuxIO> _auxIO_ndarray_storage_;
-  unsigned _auxIO_ndarray_shape_[1];
+  ndarray<Psana::Acqiris::TdcChannel, 1> _channel_ndarray_storage_;
+  ndarray<Psana::Acqiris::TdcAuxIO, 1> _auxIO_ndarray_storage_;
   Psana::Acqiris::TdcVetoIO _veto;
 };
 
@@ -115,8 +113,7 @@ public:
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
-  std::vector<Psana::Acqiris::TdcDataV1_Item> _data_ndarray_storage_;
-  unsigned _data_ndarray_shape_[1];
+  ndarray<Psana::Acqiris::TdcDataV1_Item, 1> _data_ndarray_storage_;
 };
 
 } // namespace Acqiris

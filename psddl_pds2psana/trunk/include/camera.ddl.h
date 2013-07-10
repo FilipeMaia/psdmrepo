@@ -43,8 +43,7 @@ private:
   boost::shared_ptr<const XtcType> m_xtcObj;
   Psana::Camera::FrameCoord _roiBegin;
   Psana::Camera::FrameCoord _roiEnd;
-  std::vector<Psana::Camera::FrameCoord> _masked_pixel_coordinates_ndarray_storage_;
-  unsigned _masked_pixel_coordinates_ndarray_shape_[1];
+  ndarray<Psana::Camera::FrameCoord, 1> _masked_pixel_coordinates_ndarray_storage_;
 };
 
 

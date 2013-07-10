@@ -29,22 +29,21 @@ IpmFexConfigV1::IpmFexConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr)
   , m_xtcObj(xtcPtr)
 {
   {
+    typedef ndarray<Psana::Lusi::DiodeFexConfigV1, 1> NDArray;
     typedef ndarray<const PsddlPds::Lusi::DiodeFexConfigV1, 1> XtcNDArray;
     const XtcNDArray& xtc_ndarr = xtcPtr->diode();
-    _diode_ndarray_storage_.reserve(xtc_ndarr.size());
-    for (XtcNDArray::iterator it = xtc_ndarr.begin(); it != xtc_ndarr.end(); ++ it) {
-      _diode_ndarray_storage_.push_back(psddl_pds2psana::Lusi::pds_to_psana(*it));
+    _diode_ndarray_storage_ = NDArray(xtc_ndarr.shape());
+    NDArray::iterator out = _diode_ndarray_storage_.begin();
+    for (XtcNDArray::iterator it = xtc_ndarr.begin(); it != xtc_ndarr.end(); ++ it, ++ out) {
+      *out = psddl_pds2psana::Lusi::pds_to_psana(*it);
     }
-    const unsigned* shape = xtc_ndarr.shape();
-    std::copy(shape, shape+1, _diode_ndarray_shape_);
   }
 }
 IpmFexConfigV1::~IpmFexConfigV1()
 {
 }
 
-
-ndarray<const Psana::Lusi::DiodeFexConfigV1, 1> IpmFexConfigV1::diode() const { return ndarray<const Psana::Lusi::DiodeFexConfigV1, 1>(&_diode_ndarray_storage_[0], _diode_ndarray_shape_); }
+ndarray<const Psana::Lusi::DiodeFexConfigV1, 1> IpmFexConfigV1::diode() const { return _diode_ndarray_storage_; }
 
 float IpmFexConfigV1::xscale() const { return m_xtcObj->xscale(); }
 
@@ -54,22 +53,21 @@ IpmFexConfigV2::IpmFexConfigV2(const boost::shared_ptr<const XtcType>& xtcPtr)
   , m_xtcObj(xtcPtr)
 {
   {
+    typedef ndarray<Psana::Lusi::DiodeFexConfigV2, 1> NDArray;
     typedef ndarray<const PsddlPds::Lusi::DiodeFexConfigV2, 1> XtcNDArray;
     const XtcNDArray& xtc_ndarr = xtcPtr->diode();
-    _diode_ndarray_storage_.reserve(xtc_ndarr.size());
-    for (XtcNDArray::iterator it = xtc_ndarr.begin(); it != xtc_ndarr.end(); ++ it) {
-      _diode_ndarray_storage_.push_back(psddl_pds2psana::Lusi::pds_to_psana(*it));
+    _diode_ndarray_storage_ = NDArray(xtc_ndarr.shape());
+    NDArray::iterator out = _diode_ndarray_storage_.begin();
+    for (XtcNDArray::iterator it = xtc_ndarr.begin(); it != xtc_ndarr.end(); ++ it, ++ out) {
+      *out = psddl_pds2psana::Lusi::pds_to_psana(*it);
     }
-    const unsigned* shape = xtc_ndarr.shape();
-    std::copy(shape, shape+1, _diode_ndarray_shape_);
   }
 }
 IpmFexConfigV2::~IpmFexConfigV2()
 {
 }
 
-
-ndarray<const Psana::Lusi::DiodeFexConfigV2, 1> IpmFexConfigV2::diode() const { return ndarray<const Psana::Lusi::DiodeFexConfigV2, 1>(&_diode_ndarray_storage_[0], _diode_ndarray_shape_); }
+ndarray<const Psana::Lusi::DiodeFexConfigV2, 1> IpmFexConfigV2::diode() const { return _diode_ndarray_storage_; }
 
 float IpmFexConfigV2::xscale() const { return m_xtcObj->xscale(); }
 

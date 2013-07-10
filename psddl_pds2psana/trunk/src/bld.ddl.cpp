@@ -71,11 +71,8 @@ BldDataIpimbV0::~BldDataIpimbV0()
 {
 }
 
-
 const Psana::Ipimb::DataV1& BldDataIpimbV0::ipimbData() const { return _ipimbData; }
-
 const Psana::Ipimb::ConfigV1& BldDataIpimbV0::ipimbConfig() const { return _ipimbConfig; }
-
 const Psana::Lusi::IpmFexV1& BldDataIpimbV0::ipmFexData() const { return _ipmFexData; }
 BldDataIpimbV1::BldDataIpimbV1(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::Bld::BldDataIpimbV1()
@@ -89,11 +86,8 @@ BldDataIpimbV1::~BldDataIpimbV1()
 {
 }
 
-
 const Psana::Ipimb::DataV2& BldDataIpimbV1::ipimbData() const { return _ipimbData; }
-
 const Psana::Ipimb::ConfigV2& BldDataIpimbV1::ipimbConfig() const { return _ipimbConfig; }
-
 const Psana::Lusi::IpmFexV1& BldDataIpimbV1::ipmFexData() const { return _ipmFexData; }
 BldDataPimV1::BldDataPimV1(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::Bld::BldDataPimV1()
@@ -107,11 +101,8 @@ BldDataPimV1::~BldDataPimV1()
 {
 }
 
-
 const Psana::Pulnix::TM6740ConfigV2& BldDataPimV1::camConfig() const { return _camConfig; }
-
 const Psana::Lusi::PimImageConfigV1& BldDataPimV1::pimConfig() const { return _pimConfig; }
-
 const Psana::Camera::FrameV1& BldDataPimV1::frame() const { return _frame; }
 BldDataGMDV0::BldDataGMDV0(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::Bld::BldDataGMDV0()

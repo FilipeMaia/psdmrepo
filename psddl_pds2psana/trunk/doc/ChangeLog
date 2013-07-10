@@ -11,6 +11,15 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-07-00
+2013-07-10 Andy Salnikov
+- regenerated with psddl V00-08-00
+- switching to templated classes
+
+Tag: V00-06-00
+2013-06-20 Andy Salnikov
+- regenerated with psddl V00-07-00
+
 Tag: V00-05-27
 2013-06-20 Andy Salnikov
 - regenerated with psddl V00-06-07

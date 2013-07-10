@@ -58,23 +58,27 @@ uint8_t ConfigV1::autocalibEnable() const { return m_xtcObj->autocalibEnable(); 
 uint8_t ConfigV1::timeTagEnable() const { return m_xtcObj->timeTagEnable(); }
 
 uint16_t ConfigV1::numChannels() const { return m_xtcObj->numChannels(); }
-DataV1::DataV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::Gsc16ai::ConfigV1>& cfgPtr)
+template <typename Config>
+DataV1<Config>::DataV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const Config>& cfgPtr)
   : Psana::Gsc16ai::DataV1()
   , m_xtcObj(xtcPtr)
-  , m_cfgPtr0(cfgPtr)
+  , m_cfgPtr(cfgPtr)
 {
 }
-DataV1::~DataV1()
+template <typename Config>
+DataV1<Config>::~DataV1()
 {
 }
 
 
-ndarray<const uint16_t, 1> DataV1::timestamp() const { return m_xtcObj->timestamp(); }
+template <typename Config>
+ndarray<const uint16_t, 1> DataV1<Config>::timestamp() const { return m_xtcObj->timestamp(); }
 
-ndarray<const uint16_t, 1> DataV1::channelValue() const {
-  if (m_cfgPtr0.get()) return m_xtcObj->channelValue(*m_cfgPtr0);
-  throw std::runtime_error("DataV1::channelValue: config object pointer is zero");
+template <typename Config>
+ndarray<const uint16_t, 1> DataV1<Config>::channelValue() const {
+  return m_xtcObj->channelValue(*m_cfgPtr);
 }
 
+template class DataV1<PsddlPds::Gsc16ai::ConfigV1>;
 } // namespace Gsc16ai
 } // namespace psddl_pds2psana

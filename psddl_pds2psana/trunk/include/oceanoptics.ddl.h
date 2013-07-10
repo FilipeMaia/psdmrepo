@@ -28,11 +28,12 @@ private:
 Psana::OceanOptics::timespec64 pds_to_psana(PsddlPds::OceanOptics::timespec64 pds);
 
 
+template <typename Config>
 class DataV1 : public Psana::OceanOptics::DataV1 {
 public:
   typedef PsddlPds::OceanOptics::DataV1 XtcType;
   typedef Psana::OceanOptics::DataV1 PsanaType;
-  DataV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::OceanOptics::ConfigV1>& cfgPtr);
+  DataV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const Config>& cfgPtr);
   virtual ~DataV1();
   virtual ndarray<const uint16_t, 1> data() const;
   virtual uint64_t frameCounter() const;
@@ -49,7 +50,7 @@ public:
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
-  boost::shared_ptr<const PsddlPds::OceanOptics::ConfigV1> m_cfgPtr0;
+  boost::shared_ptr<const Config> m_cfgPtr;
   Psana::OceanOptics::timespec64 _tsTimeFrameStart;
   Psana::OceanOptics::timespec64 _tsTimeFrameFirstData;
   Psana::OceanOptics::timespec64 _tsTimeFrameEnd;

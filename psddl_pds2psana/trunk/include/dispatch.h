@@ -7,15 +7,11 @@
 #include "pdsdata/xtc/Xtc.hh"
 #include "PSEvt/Event.h"
 #include "PSEnv/EnvObjectStore.h"
-
 namespace psddl_pds2psana {
-
   /**
    *  Function takes xtc object, converts it into psana-type instance and stores either in 
    *  event or config-store. Pointer to even may be zero.
    */
   void xtcConvert(const boost::shared_ptr<Pds::Xtc>& xtc, PSEvt::Event* evt, PSEnv::EnvObjectStore& cfgStore);
-
 } // namespace psddl_pds2psana
-
 #endif // PSDDL_PDS2PSANA_DISPATCH_H

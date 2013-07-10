@@ -40,14 +40,14 @@ FrameFexConfigV1::FrameFexConfigV1(const boost::shared_ptr<const XtcType>& xtcPt
   , _roiEnd(psddl_pds2psana::Camera::pds_to_psana(xtcPtr->roiEnd()))
 {
   {
+    typedef ndarray<Psana::Camera::FrameCoord, 1> NDArray;
     typedef ndarray<const PsddlPds::Camera::FrameCoord, 1> XtcNDArray;
     const XtcNDArray& xtc_ndarr = xtcPtr->masked_pixel_coordinates();
-    _masked_pixel_coordinates_ndarray_storage_.reserve(xtc_ndarr.size());
-    for (XtcNDArray::iterator it = xtc_ndarr.begin(); it != xtc_ndarr.end(); ++ it) {
-      _masked_pixel_coordinates_ndarray_storage_.push_back(psddl_pds2psana::Camera::pds_to_psana(*it));
+    _masked_pixel_coordinates_ndarray_storage_ = NDArray(xtc_ndarr.shape());
+    NDArray::iterator out = _masked_pixel_coordinates_ndarray_storage_.begin();
+    for (XtcNDArray::iterator it = xtc_ndarr.begin(); it != xtc_ndarr.end(); ++ it, ++ out) {
+      *out = psddl_pds2psana::Camera::pds_to_psana(*it);
     }
-    const unsigned* shape = xtc_ndarr.shape();
-    std::copy(shape, shape+1, _masked_pixel_coordinates_ndarray_shape_);
   }
 }
 FrameFexConfigV1::~FrameFexConfigV1()
@@ -60,16 +60,13 @@ Psana::Camera::FrameFexConfigV1::Forwarding FrameFexConfigV1::forwarding() const
 uint32_t FrameFexConfigV1::forward_prescale() const { return m_xtcObj->forward_prescale(); }
 
 Psana::Camera::FrameFexConfigV1::Processing FrameFexConfigV1::processing() const { return pds_to_psana(m_xtcObj->processing()); }
-
 const Psana::Camera::FrameCoord& FrameFexConfigV1::roiBegin() const { return _roiBegin; }
-
 const Psana::Camera::FrameCoord& FrameFexConfigV1::roiEnd() const { return _roiEnd; }
 
 uint32_t FrameFexConfigV1::threshold() const { return m_xtcObj->threshold(); }
 
 uint32_t FrameFexConfigV1::number_of_masked_pixels() const { return m_xtcObj->number_of_masked_pixels(); }
-
-ndarray<const Psana::Camera::FrameCoord, 1> FrameFexConfigV1::masked_pixel_coordinates() const { return ndarray<const Psana::Camera::FrameCoord, 1>(&_masked_pixel_coordinates_ndarray_storage_[0], _masked_pixel_coordinates_ndarray_shape_); }
+ndarray<const Psana::Camera::FrameCoord, 1> FrameFexConfigV1::masked_pixel_coordinates() const { return _masked_pixel_coordinates_ndarray_storage_; }
 FrameV1::FrameV1(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::Camera::FrameV1()
   , m_xtcObj(xtcPtr)

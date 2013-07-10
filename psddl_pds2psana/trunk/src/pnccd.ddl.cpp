@@ -55,44 +55,44 @@ const char* ConfigV2::timingFName() const { return m_xtcObj->timingFName(); }
 std::vector<int> ConfigV2::info_shape() const { return m_xtcObj->info_shape(); }
 
 std::vector<int> ConfigV2::timingFName_shape() const { return m_xtcObj->timingFName_shape(); }
-FrameV1::FrameV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::PNCCD::ConfigV1>& cfgPtr)
+template <typename Config>
+FrameV1<Config>::FrameV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const Config>& cfgPtr)
   : Psana::PNCCD::FrameV1()
   , m_xtcObj(xtcPtr)
-  , m_cfgPtr0(cfgPtr)
+  , m_cfgPtr(cfgPtr)
 {
 }
-FrameV1::FrameV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::PNCCD::ConfigV2>& cfgPtr)
-  : Psana::PNCCD::FrameV1()
-  , m_xtcObj(xtcPtr)
-  , m_cfgPtr1(cfgPtr)
-{
-}
-FrameV1::~FrameV1()
+template <typename Config>
+FrameV1<Config>::~FrameV1()
 {
 }
 
 
-uint32_t FrameV1::specialWord() const { return m_xtcObj->specialWord(); }
+template <typename Config>
+uint32_t FrameV1<Config>::specialWord() const { return m_xtcObj->specialWord(); }
 
-uint32_t FrameV1::frameNumber() const { return m_xtcObj->frameNumber(); }
+template <typename Config>
+uint32_t FrameV1<Config>::frameNumber() const { return m_xtcObj->frameNumber(); }
 
-uint32_t FrameV1::timeStampHi() const { return m_xtcObj->timeStampHi(); }
+template <typename Config>
+uint32_t FrameV1<Config>::timeStampHi() const { return m_xtcObj->timeStampHi(); }
 
-uint32_t FrameV1::timeStampLo() const { return m_xtcObj->timeStampLo(); }
+template <typename Config>
+uint32_t FrameV1<Config>::timeStampLo() const { return m_xtcObj->timeStampLo(); }
 
-ndarray<const uint16_t, 1> FrameV1::_data() const {
-  if (m_cfgPtr0.get()) return m_xtcObj->_data(*m_cfgPtr0);
-  if (m_cfgPtr1.get()) return m_xtcObj->_data(*m_cfgPtr1);
-  throw std::runtime_error("FrameV1::_data: config object pointer is zero");
+template <typename Config>
+ndarray<const uint16_t, 1> FrameV1<Config>::_data() const {
+  return m_xtcObj->_data(*m_cfgPtr);
 }
 
 
-ndarray<const uint16_t, 2> FrameV1::data() const {
-  if (m_cfgPtr0.get()) return m_xtcObj->data(*m_cfgPtr0);
-  if (m_cfgPtr1.get()) return m_xtcObj->data(*m_cfgPtr1);
-  throw std::runtime_error("FrameV1::data: config object pointer is zero");
+template <typename Config>
+ndarray<const uint16_t, 2> FrameV1<Config>::data() const {
+  return m_xtcObj->data(*m_cfgPtr);
 }
 
+template class FrameV1<PsddlPds::PNCCD::ConfigV1>;
+template class FrameV1<PsddlPds::PNCCD::ConfigV2>;
 FullFrameV1::FullFrameV1(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::PNCCD::FullFrameV1()
   , m_xtcObj(xtcPtr)
@@ -112,10 +112,11 @@ uint32_t FullFrameV1::timeStampHi() const { return m_xtcObj->timeStampHi(); }
 uint32_t FullFrameV1::timeStampLo() const { return m_xtcObj->timeStampLo(); }
 
 ndarray<const uint16_t, 2> FullFrameV1::data() const { return m_xtcObj->data(); }
-FramesV1::FramesV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::PNCCD::ConfigV1>& cfgPtr)
+template <typename Config>
+FramesV1<Config>::FramesV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const Config>& cfgPtr)
   : Psana::PNCCD::FramesV1()
   , m_xtcObj(xtcPtr)
-  , m_cfgPtr0(cfgPtr)
+  , m_cfgPtr(cfgPtr)
 {
   {
     const std::vector<int>& dims = xtcPtr->frame_shape(*cfgPtr);
@@ -123,39 +124,25 @@ FramesV1::FramesV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::
     for (int i0=0; i0 != dims[0]; ++i0) {
       const PsddlPds::PNCCD::FrameV1& d = xtcPtr->frame(*cfgPtr, i0);
       boost::shared_ptr<const PsddlPds::PNCCD::FrameV1> dPtr(m_xtcObj, &d);
-      _frames.push_back(psddl_pds2psana::PNCCD::FrameV1(dPtr, cfgPtr));
+      _frames.push_back(psddl_pds2psana::PNCCD::FrameV1<Config>(dPtr, cfgPtr));
     }
   }
 }
-FramesV1::FramesV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::PNCCD::ConfigV2>& cfgPtr)
-  : Psana::PNCCD::FramesV1()
-  , m_xtcObj(xtcPtr)
-  , m_cfgPtr1(cfgPtr)
-{
-  {
-    const std::vector<int>& dims = xtcPtr->frame_shape(*cfgPtr);
-    _frames.reserve(dims[0]);
-    for (int i0=0; i0 != dims[0]; ++i0) {
-      const PsddlPds::PNCCD::FrameV1& d = xtcPtr->frame(*cfgPtr, i0);
-      boost::shared_ptr<const PsddlPds::PNCCD::FrameV1> dPtr(m_xtcObj, &d);
-      _frames.push_back(psddl_pds2psana::PNCCD::FrameV1(dPtr, cfgPtr));
-    }
-  }
-}
-FramesV1::~FramesV1()
+template <typename Config>
+FramesV1<Config>::~FramesV1()
 {
 }
 
+template <typename Config>
+const Psana::PNCCD::FrameV1& FramesV1<Config>::frame(uint32_t i0) const { return _frames[i0]; }
 
-const Psana::PNCCD::FrameV1& FramesV1::frame(uint32_t i0) const { return _frames[i0]; }
-
-uint32_t FramesV1::numLinks() const {
-  if (m_cfgPtr0.get()) return m_xtcObj->numLinks(*m_cfgPtr0);
-  if (m_cfgPtr1.get()) return m_xtcObj->numLinks(*m_cfgPtr1);
-  throw std::runtime_error("FramesV1::numLinks: config object pointer is zero");
+template <typename Config>
+uint32_t FramesV1<Config>::numLinks() const {
+  return m_xtcObj->numLinks(*m_cfgPtr);
 }
 
-std::vector<int> FramesV1::frame_shape() const
+template <typename Config>
+std::vector<int> FramesV1<Config>::frame_shape() const
 {
   std::vector<int> shape;
   shape.reserve(1);
@@ -163,5 +150,7 @@ std::vector<int> FramesV1::frame_shape() const
   return shape;
 }
 
+template class FramesV1<PsddlPds::PNCCD::ConfigV1>;
+template class FramesV1<PsddlPds::PNCCD::ConfigV2>;
 } // namespace PNCCD
 } // namespace psddl_pds2psana

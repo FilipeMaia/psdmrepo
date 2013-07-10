@@ -40,10 +40,8 @@ public:
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
-  std::vector<Psana::EvrData::PulseConfig> _pulses_ndarray_storage_;
-  unsigned _pulses_ndarray_shape_[1];
-  std::vector<Psana::EvrData::OutputMap> _output_maps_ndarray_storage_;
-  unsigned _output_maps_ndarray_shape_[1];
+  ndarray<Psana::EvrData::PulseConfig, 1> _pulses_ndarray_storage_;
+  ndarray<Psana::EvrData::OutputMap, 1> _output_maps_ndarray_storage_;
 };
 
 
@@ -63,10 +61,8 @@ public:
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
-  std::vector<Psana::EvrData::PulseConfig> _pulses_ndarray_storage_;
-  unsigned _pulses_ndarray_shape_[1];
-  std::vector<Psana::EvrData::OutputMap> _output_maps_ndarray_storage_;
-  unsigned _output_maps_ndarray_shape_[1];
+  ndarray<Psana::EvrData::PulseConfig, 1> _pulses_ndarray_storage_;
+  ndarray<Psana::EvrData::OutputMap, 1> _output_maps_ndarray_storage_;
 };
 
 
@@ -85,12 +81,9 @@ public:
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
-  std::vector<Psana::EvrData::EventCodeV3> _eventcodes_ndarray_storage_;
-  unsigned _eventcodes_ndarray_shape_[1];
-  std::vector<Psana::EvrData::PulseConfigV3> _pulses_ndarray_storage_;
-  unsigned _pulses_ndarray_shape_[1];
-  std::vector<Psana::EvrData::OutputMap> _output_maps_ndarray_storage_;
-  unsigned _output_maps_ndarray_shape_[1];
+  ndarray<Psana::EvrData::EventCodeV3, 1> _eventcodes_ndarray_storage_;
+  ndarray<Psana::EvrData::PulseConfigV3, 1> _pulses_ndarray_storage_;
+  ndarray<Psana::EvrData::OutputMap, 1> _output_maps_ndarray_storage_;
 };
 
 
@@ -109,12 +102,9 @@ public:
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
-  std::vector<Psana::EvrData::EventCodeV4> _eventcodes_ndarray_storage_;
-  unsigned _eventcodes_ndarray_shape_[1];
-  std::vector<Psana::EvrData::PulseConfigV3> _pulses_ndarray_storage_;
-  unsigned _pulses_ndarray_shape_[1];
-  std::vector<Psana::EvrData::OutputMap> _output_maps_ndarray_storage_;
-  unsigned _output_maps_ndarray_shape_[1];
+  ndarray<Psana::EvrData::EventCodeV4, 1> _eventcodes_ndarray_storage_;
+  ndarray<Psana::EvrData::PulseConfigV3, 1> _pulses_ndarray_storage_;
+  ndarray<Psana::EvrData::OutputMap, 1> _output_maps_ndarray_storage_;
 };
 
 Psana::EvrData::SequencerEntry pds_to_psana(PsddlPds::EvrData::SequencerEntry pds);
@@ -134,8 +124,7 @@ public:
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
-  std::vector<Psana::EvrData::SequencerEntry> _entries_ndarray_storage_;
-  unsigned _entries_ndarray_shape_[1];
+  ndarray<Psana::EvrData::SequencerEntry, 1> _entries_ndarray_storage_;
 };
 
 
@@ -155,12 +144,9 @@ public:
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
-  std::vector<Psana::EvrData::EventCodeV5> _eventcodes_ndarray_storage_;
-  unsigned _eventcodes_ndarray_shape_[1];
-  std::vector<Psana::EvrData::PulseConfigV3> _pulses_ndarray_storage_;
-  unsigned _pulses_ndarray_shape_[1];
-  std::vector<Psana::EvrData::OutputMap> _output_maps_ndarray_storage_;
-  unsigned _output_maps_ndarray_shape_[1];
+  ndarray<Psana::EvrData::EventCodeV5, 1> _eventcodes_ndarray_storage_;
+  ndarray<Psana::EvrData::PulseConfigV3, 1> _pulses_ndarray_storage_;
+  ndarray<Psana::EvrData::OutputMap, 1> _output_maps_ndarray_storage_;
   psddl_pds2psana::EvrData::SequencerConfigV1 _seq_config;
 };
 
@@ -181,12 +167,9 @@ public:
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
-  std::vector<Psana::EvrData::EventCodeV5> _eventcodes_ndarray_storage_;
-  unsigned _eventcodes_ndarray_shape_[1];
-  std::vector<Psana::EvrData::PulseConfigV3> _pulses_ndarray_storage_;
-  unsigned _pulses_ndarray_shape_[1];
-  std::vector<Psana::EvrData::OutputMapV2> _output_maps_ndarray_storage_;
-  unsigned _output_maps_ndarray_shape_[1];
+  ndarray<Psana::EvrData::EventCodeV5, 1> _eventcodes_ndarray_storage_;
+  ndarray<Psana::EvrData::PulseConfigV3, 1> _pulses_ndarray_storage_;
+  ndarray<Psana::EvrData::OutputMapV2, 1> _output_maps_ndarray_storage_;
   psddl_pds2psana::EvrData::SequencerConfigV1 _seq_config;
 };
 
@@ -207,12 +190,9 @@ public:
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
-  std::vector<Psana::EvrData::EventCodeV6> _eventcodes_ndarray_storage_;
-  unsigned _eventcodes_ndarray_shape_[1];
-  std::vector<Psana::EvrData::PulseConfigV3> _pulses_ndarray_storage_;
-  unsigned _pulses_ndarray_shape_[1];
-  std::vector<Psana::EvrData::OutputMapV2> _output_maps_ndarray_storage_;
-  unsigned _output_maps_ndarray_shape_[1];
+  ndarray<Psana::EvrData::EventCodeV6, 1> _eventcodes_ndarray_storage_;
+  ndarray<Psana::EvrData::PulseConfigV3, 1> _pulses_ndarray_storage_;
+  ndarray<Psana::EvrData::OutputMapV2, 1> _output_maps_ndarray_storage_;
   psddl_pds2psana::EvrData::SequencerConfigV1 _seq_config;
 };
 
@@ -230,8 +210,7 @@ public:
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
-  std::vector<Psana::EvrData::FIFOEvent> _fifoEvents_ndarray_storage_;
-  unsigned _fifoEvents_ndarray_shape_[1];
+  ndarray<Psana::EvrData::FIFOEvent, 1> _fifoEvents_ndarray_storage_;
 };
 
 Psana::EvrData::IOChannel pds_to_psana(PsddlPds::EvrData::IOChannel pds);
@@ -249,8 +228,7 @@ public:
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
-  std::vector<Psana::EvrData::IOChannel> _channels_ndarray_storage_;
-  unsigned _channels_ndarray_shape_[1];
+  ndarray<Psana::EvrData::IOChannel, 1> _channels_ndarray_storage_;
 };
 
 } // namespace EvrData

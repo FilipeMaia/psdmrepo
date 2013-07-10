@@ -48,12 +48,12 @@ private:
 };
 
 
+template <typename Config>
 class FrameV1 : public Psana::PNCCD::FrameV1 {
 public:
   typedef PsddlPds::PNCCD::FrameV1 XtcType;
   typedef Psana::PNCCD::FrameV1 PsanaType;
-  FrameV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::PNCCD::ConfigV1>& cfgPtr);
-  FrameV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::PNCCD::ConfigV2>& cfgPtr);
+  FrameV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const Config>& cfgPtr);
   virtual ~FrameV1();
   virtual uint32_t specialWord() const;
   virtual uint32_t frameNumber() const;
@@ -64,8 +64,7 @@ public:
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
-  boost::shared_ptr<const PsddlPds::PNCCD::ConfigV1> m_cfgPtr0;
-  boost::shared_ptr<const PsddlPds::PNCCD::ConfigV2> m_cfgPtr1;
+  boost::shared_ptr<const Config> m_cfgPtr;
 };
 
 
@@ -86,12 +85,12 @@ private:
 };
 
 
+template <typename Config>
 class FramesV1 : public Psana::PNCCD::FramesV1 {
 public:
   typedef PsddlPds::PNCCD::FramesV1 XtcType;
   typedef Psana::PNCCD::FramesV1 PsanaType;
-  FramesV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::PNCCD::ConfigV1>& cfgPtr);
-  FramesV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const PsddlPds::PNCCD::ConfigV2>& cfgPtr);
+  FramesV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const Config>& cfgPtr);
   virtual ~FramesV1();
   virtual const Psana::PNCCD::FrameV1& frame(uint32_t i0) const;
   virtual uint32_t numLinks() const;
@@ -99,9 +98,8 @@ public:
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
-  boost::shared_ptr<const PsddlPds::PNCCD::ConfigV1> m_cfgPtr0;
-  boost::shared_ptr<const PsddlPds::PNCCD::ConfigV2> m_cfgPtr1;
-  std::vector< psddl_pds2psana::PNCCD::FrameV1 > _frames;
+  boost::shared_ptr<const Config> m_cfgPtr;
+  std::vector< psddl_pds2psana::PNCCD::FrameV1<Config> > _frames;
 };
 
 } // namespace PNCCD
