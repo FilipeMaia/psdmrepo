@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-07-01
+2013-07-10 Andy Salnikov
+- regenerated with psddl V00-08-01
+- pass owning pointer to pdsdata methods returning ndarrays
+
 Tag: V00-07-00
 2013-07-10 Andy Salnikov
 - regenerated with psddl V00-08-00
