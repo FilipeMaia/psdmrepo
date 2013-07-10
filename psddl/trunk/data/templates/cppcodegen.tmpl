@@ -161,7 +161,7 @@ ptrdiff_t offset={{attr.offset}};
 :
 {% import 'cppcodegen.tmpl?macros' as macros %}
 {% set comma_shape = macros.comma_shape(attr.shape.dims) %}
-{% set type = attr.type.fullNameCpp() %}
+{% set type = attr.stor_type.fullNameCpp() %}
 {% if attr.isfixed() %}
 
     const {{type}}* data = &{{attr.name}}{% for i in attr.shape.dims %}[0]{% endfor %};

@@ -351,6 +351,7 @@ class DdlPds2Psana ( object ) :
                 
                 cfgNeeded = False
                 cvt = False
+                shptr = False
                 if '{xtc-config}' in str(attr.offset) : cfgNeeded = True
                 if attr.type is not attr.stor_type: cvt = True
 
@@ -365,8 +366,9 @@ class DdlPds2Psana ( object ) :
                     else:
                         rettype = attr.stor_type.fullName('C++', self.psana_ns)
                         cvt = False
+                        shptr = True
                         rettype = T("ndarray<const $type, $rank>")(type=rettype, rank=len(attr.shape.dims))
-                self._genFwdMeth(meth.name, rettype, type, cfgNeeded, cvt, args=args)
+                self._genFwdMeth(meth.name, rettype, type, cfgNeeded, cvt, args=args, shptr=shptr)
             
             else:
 
@@ -436,7 +438,7 @@ class DdlPds2Psana ( object ) :
 
             self._genFwdMeth(meth.name, rettype, type, cfgNeeded, cvt, meth.args)
 
-    def _genFwdMeth(self, name, typedecl, type, cfgNeeded=False, cvt=False, args=None):
+    def _genFwdMeth(self, name, typedecl, type, cfgNeeded=False, cvt=False, args=None, shptr=False):
         args = args or []
         
         argdecl = ['%s %s' % (atype.fullName('C++'), aname) for aname, atype in args]
@@ -452,21 +454,22 @@ class DdlPds2Psana ( object ) :
         if type.xtcConfig: 
             Class += '<Config>'
             print >>self.cpp, "template <typename Config>"
+        print >>self.cpp, T("$type $Class::$meth($args) const {")(type=typedecl, Class=Class, meth=name, args=argdecl)
+        
         if cfgNeeded :
-            print >>self.cpp, T("$type $Class::$meth($args) const {")(type=typedecl, Class=Class, meth=name, args=argdecl)
-            if passargs: passargs = ', '+passargs
-            if cvt:
-                print >>self.cpp, T("  return pds_to_psana(m_xtcObj->$name(*m_cfgPtr$passargs));")(locals())
+            if passargs: 
+                passargs = '*m_cfgPtr, '+passargs
             else:
-                print >>self.cpp, T("  return m_xtcObj->$name(*m_cfgPtr$passargs);")(locals())
-            print >>self.cpp, "}\n"
-        else:
-            if cvt:
-                print >>self.cpp, T("$type $Class::$meth($args) const { return pds_to_psana(m_xtcObj->$meth($passargs)); }")\
-                        (type=typedecl, Class=Class, meth=name, args=argdecl, passargs=passargs)
+                passargs = '*m_cfgPtr'
+        if shptr:
+            if passargs: 
+                passargs += ', m_xtcObj'
             else:
-                print >>self.cpp, T("$type $Class::$meth($args) const { return m_xtcObj->$meth($passargs); }")\
-                        (type=typedecl, Class=Class, meth=name, args=argdecl, passargs=passargs)
+                passargs = 'm_xtcObj'
+        expr = T("m_xtcObj->$meth($passargs)")(meth=name, passargs=passargs)
+        if cvt: expr = 'pds_to_psana({0})'.format(expr)
+        print >>self.cpp, T("  return $expr;")(expr=expr)
+        print >>self.cpp, "}\n"
 
     def _genAttrDecl(self, attr):
         
