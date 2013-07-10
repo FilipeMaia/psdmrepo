@@ -31,6 +31,34 @@ void createWrappers(PyObject* module) {
   Py_INCREF(submodule);
   PyModule_AddObject(module, "CsPad2x2", submodule);
   scope mod = object(handle<>(borrowed(submodule)));
+
+  mod.attr("QuadsPerSensor")=1;
+  mod.attr("ASICsPerQuad")=4;
+  mod.attr("RowsPerBank")=26;
+  mod.attr("FullBanksPerASIC")=7;
+  mod.attr("BanksPerASIC")=8;
+  mod.attr("ColumnsPerASIC")=185;
+  mod.attr("MaxRowsPerASIC")=194;
+  mod.attr("PotsPerQuad")=80;
+  mod.attr("TwoByTwosPerQuad")=1;
+  mod.attr("SectorsPerQuad")=2;
+
+  enum_<Psana::CsPad2x2::RunModes>("RunModes")
+    .value("NoRunning",Psana::CsPad2x2::NoRunning)
+    .value("RunButDrop",Psana::CsPad2x2::RunButDrop)
+    .value("RunAndSendToRCE",Psana::CsPad2x2::RunAndSendToRCE)
+    .value("RunAndSendTriggeredByTTL",Psana::CsPad2x2::RunAndSendTriggeredByTTL)
+    .value("ExternalTriggerSendToRCE",Psana::CsPad2x2::ExternalTriggerSendToRCE)
+    .value("ExternalTriggerDrop",Psana::CsPad2x2::ExternalTriggerDrop)
+    .value("NumberOfRunModes",Psana::CsPad2x2::NumberOfRunModes)
+  ;
+
+  enum_<Psana::CsPad2x2::DataModes>("DataModes")
+    .value("normal",Psana::CsPad2x2::normal)
+    .value("shiftTest",Psana::CsPad2x2::shiftTest)
+    .value("testData",Psana::CsPad2x2::testData)
+    .value("reserved",Psana::CsPad2x2::reserved)
+  ;
   class_<Psana::CsPad2x2::CsPad2x2DigitalPotsCfg, boost::shared_ptr<Psana::CsPad2x2::CsPad2x2DigitalPotsCfg>, boost::noncopyable >("CsPad2x2DigitalPotsCfg", no_init)
     .def("pots", &Psana::CsPad2x2::CsPad2x2DigitalPotsCfg::pots)
   ;
@@ -146,6 +174,8 @@ void createWrappers(PyObject* module) {
   ;
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::CsPad2x2::ConfigV2> >(Pds::TypeId::Id_Cspad2x2Config));
 
+  {
+  scope outer = 
   class_<Psana::CsPad2x2::ElementV1, boost::shared_ptr<Psana::CsPad2x2::ElementV1>, boost::noncopyable >("ElementV1", no_init)
     .def("virtual_channel", &Psana::CsPad2x2::ElementV1::virtual_channel)
     .def("lane", &Psana::CsPad2x2::ElementV1::lane)
@@ -161,6 +191,9 @@ void createWrappers(PyObject* module) {
     .def("data", &Psana::CsPad2x2::ElementV1::data)
     .def("common_mode", &Psana::CsPad2x2::ElementV1::common_mode)
   ;
+
+  scope().attr("Nsbtemp")=4;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::CsPad2x2::ElementV1> >(Pds::TypeId::Id_Cspad2x2Element));
 
   {

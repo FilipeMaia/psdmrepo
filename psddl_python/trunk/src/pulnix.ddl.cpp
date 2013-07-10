@@ -31,6 +31,8 @@ void createWrappers(PyObject* module) {
   Py_INCREF(submodule);
   PyModule_AddObject(module, "Pulnix", submodule);
   scope mod = object(handle<>(borrowed(submodule)));
+  {
+  scope outer = 
   class_<Psana::Pulnix::TM6740ConfigV1, boost::shared_ptr<Psana::Pulnix::TM6740ConfigV1>, boost::noncopyable >("TM6740ConfigV1", no_init)
     .def("gain_a", &Psana::Pulnix::TM6740ConfigV1::gain_a)
     .def("gain_b", &Psana::Pulnix::TM6740ConfigV1::gain_b)
@@ -43,8 +45,30 @@ void createWrappers(PyObject* module) {
     .def("lookuptable_mode", &Psana::Pulnix::TM6740ConfigV1::lookuptable_mode)
     .def("output_resolution_bits", &Psana::Pulnix::TM6740ConfigV1::output_resolution_bits)
   ;
+
+  enum_<Psana::Pulnix::TM6740ConfigV1::Depth>("Depth")
+    .value("Eight_bit",Psana::Pulnix::TM6740ConfigV1::Eight_bit)
+    .value("Ten_bit",Psana::Pulnix::TM6740ConfigV1::Ten_bit)
+  ;
+
+  enum_<Psana::Pulnix::TM6740ConfigV1::Binning>("Binning")
+    .value("x1",Psana::Pulnix::TM6740ConfigV1::x1)
+    .value("x2",Psana::Pulnix::TM6740ConfigV1::x2)
+    .value("x4",Psana::Pulnix::TM6740ConfigV1::x4)
+  ;
+
+  enum_<Psana::Pulnix::TM6740ConfigV1::LookupTable>("LookupTable")
+    .value("Gamma",Psana::Pulnix::TM6740ConfigV1::Gamma)
+    .value("Linear",Psana::Pulnix::TM6740ConfigV1::Linear)
+  ;
+
+  scope().attr("Row_Pixels")=480;
+  scope().attr("Column_Pixels")=640;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Pulnix::TM6740ConfigV1> >(Pds::TypeId::Id_TM6740Config));
 
+  {
+  scope outer = 
   class_<Psana::Pulnix::TM6740ConfigV2, boost::shared_ptr<Psana::Pulnix::TM6740ConfigV2>, boost::noncopyable >("TM6740ConfigV2", no_init)
     .def("gain_a", &Psana::Pulnix::TM6740ConfigV2::gain_a)
     .def("gain_b", &Psana::Pulnix::TM6740ConfigV2::gain_b)
@@ -57,6 +81,26 @@ void createWrappers(PyObject* module) {
     .def("lookuptable_mode", &Psana::Pulnix::TM6740ConfigV2::lookuptable_mode)
     .def("output_resolution_bits", &Psana::Pulnix::TM6740ConfigV2::output_resolution_bits)
   ;
+
+  enum_<Psana::Pulnix::TM6740ConfigV2::Depth>("Depth")
+    .value("Eight_bit",Psana::Pulnix::TM6740ConfigV2::Eight_bit)
+    .value("Ten_bit",Psana::Pulnix::TM6740ConfigV2::Ten_bit)
+  ;
+
+  enum_<Psana::Pulnix::TM6740ConfigV2::Binning>("Binning")
+    .value("x1",Psana::Pulnix::TM6740ConfigV2::x1)
+    .value("x2",Psana::Pulnix::TM6740ConfigV2::x2)
+    .value("x4",Psana::Pulnix::TM6740ConfigV2::x4)
+  ;
+
+  enum_<Psana::Pulnix::TM6740ConfigV2::LookupTable>("LookupTable")
+    .value("Gamma",Psana::Pulnix::TM6740ConfigV2::Gamma)
+    .value("Linear",Psana::Pulnix::TM6740ConfigV2::Linear)
+  ;
+
+  scope().attr("Row_Pixels")=480;
+  scope().attr("Column_Pixels")=640;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Pulnix::TM6740ConfigV2> >(Pds::TypeId::Id_TM6740Config));
 
   {

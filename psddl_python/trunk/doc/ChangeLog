@@ -11,6 +11,10 @@ Package author: Joseph S. Barrera
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-03 
+2013-07-10 David Schneider
+- exporting enums and constants from the pstypes into the python wrappers.
+	
 Tag: V00-05-02
 2013-05-22 Andy Salnikov
 - fixing doxygen comments

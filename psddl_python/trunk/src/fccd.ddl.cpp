@@ -31,6 +31,8 @@ void createWrappers(PyObject* module) {
   Py_INCREF(submodule);
   PyModule_AddObject(module, "FCCD", submodule);
   scope mod = object(handle<>(borrowed(submodule)));
+  {
+  scope outer = 
   class_<Psana::FCCD::FccdConfigV1, boost::shared_ptr<Psana::FCCD::FccdConfigV1>, boost::noncopyable >("FccdConfigV1", no_init)
     .def("outputMode", &Psana::FCCD::FccdConfigV1::outputMode)
     .def("width", &Psana::FCCD::FccdConfigV1::width)
@@ -38,8 +40,25 @@ void createWrappers(PyObject* module) {
     .def("trimmedWidth", &Psana::FCCD::FccdConfigV1::trimmedWidth)
     .def("trimmedHeight", &Psana::FCCD::FccdConfigV1::trimmedHeight)
   ;
+
+  enum_<Psana::FCCD::FccdConfigV1::Depth>("Depth")
+    .value("Sixteen_bit",Psana::FCCD::FccdConfigV1::Sixteen_bit)
+  ;
+
+  enum_<Psana::FCCD::FccdConfigV1::Output_Source>("Output_Source")
+    .value("Output_FIFO",Psana::FCCD::FccdConfigV1::Output_FIFO)
+    .value("Output_Pattern4",Psana::FCCD::FccdConfigV1::Output_Pattern4)
+  ;
+
+  scope().attr("Row_Pixels")=500;
+  scope().attr("Column_Pixels")=576;
+  scope().attr("Trimmed_Row_Pixels")=480;
+  scope().attr("Trimmed_Column_Pixels")=480;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::FCCD::FccdConfigV1> >(Pds::TypeId::Id_FccdConfig));
 
+  {
+  scope outer = 
   class_<Psana::FCCD::FccdConfigV2, boost::shared_ptr<Psana::FCCD::FccdConfigV2>, boost::noncopyable >("FccdConfigV2", no_init)
     .def("outputMode", &Psana::FCCD::FccdConfigV2::outputMode)
     .def("ccdEnable", &Psana::FCCD::FccdConfigV2::ccdEnable)
@@ -52,6 +71,27 @@ void createWrappers(PyObject* module) {
     .def("trimmedWidth", &Psana::FCCD::FccdConfigV2::trimmedWidth)
     .def("trimmedHeight", &Psana::FCCD::FccdConfigV2::trimmedHeight)
   ;
+
+  enum_<Psana::FCCD::FccdConfigV2::Depth>("Depth")
+    .value("Eight_bit",Psana::FCCD::FccdConfigV2::Eight_bit)
+    .value("Sixteen_bit",Psana::FCCD::FccdConfigV2::Sixteen_bit)
+  ;
+
+  enum_<Psana::FCCD::FccdConfigV2::Output_Source>("Output_Source")
+    .value("Output_FIFO",Psana::FCCD::FccdConfigV2::Output_FIFO)
+    .value("Test_Pattern1",Psana::FCCD::FccdConfigV2::Test_Pattern1)
+    .value("Test_Pattern2",Psana::FCCD::FccdConfigV2::Test_Pattern2)
+    .value("Test_Pattern3",Psana::FCCD::FccdConfigV2::Test_Pattern3)
+    .value("Test_Pattern4",Psana::FCCD::FccdConfigV2::Test_Pattern4)
+  ;
+
+  scope().attr("Row_Pixels")=500;
+  scope().attr("Column_Pixels")=576 * 2;
+  scope().attr("Trimmed_Row_Pixels")=480;
+  scope().attr("Trimmed_Column_Pixels")=480;
+  scope().attr("NVoltages")=17;
+  scope().attr("NWaveforms")=15;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::FCCD::FccdConfigV2> >(Pds::TypeId::Id_FccdConfig));
 
   {

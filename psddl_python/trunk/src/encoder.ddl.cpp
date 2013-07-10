@@ -31,6 +31,8 @@ void createWrappers(PyObject* module) {
   Py_INCREF(submodule);
   PyModule_AddObject(module, "Encoder", submodule);
   scope mod = object(handle<>(borrowed(submodule)));
+  {
+  scope outer = 
   class_<Psana::Encoder::ConfigV1, boost::shared_ptr<Psana::Encoder::ConfigV1>, boost::noncopyable >("ConfigV1", no_init)
     .def("chan_num", &Psana::Encoder::ConfigV1::chan_num)
     .def("count_mode", &Psana::Encoder::ConfigV1::count_mode)
@@ -39,8 +41,27 @@ void createWrappers(PyObject* module) {
     .def("input_rising", &Psana::Encoder::ConfigV1::input_rising)
     .def("ticks_per_sec", &Psana::Encoder::ConfigV1::ticks_per_sec)
   ;
+
+  enum_<Psana::Encoder::ConfigV1::count_mode_type>("count_mode_type")
+    .value("WRAP_FULL",Psana::Encoder::ConfigV1::WRAP_FULL)
+    .value("LIMIT",Psana::Encoder::ConfigV1::LIMIT)
+    .value("HALT",Psana::Encoder::ConfigV1::HALT)
+    .value("WRAP_PRESET",Psana::Encoder::ConfigV1::WRAP_PRESET)
+    .value("COUNT_END",Psana::Encoder::ConfigV1::COUNT_END)
+  ;
+
+  enum_<Psana::Encoder::ConfigV1::quad_mode>("quad_mode")
+    .value("CLOCK_DIR",Psana::Encoder::ConfigV1::CLOCK_DIR)
+    .value("X1",Psana::Encoder::ConfigV1::X1)
+    .value("X2",Psana::Encoder::ConfigV1::X2)
+    .value("X4",Psana::Encoder::ConfigV1::X4)
+    .value("QUAD_END",Psana::Encoder::ConfigV1::QUAD_END)
+  ;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Encoder::ConfigV1> >(Pds::TypeId::Id_EncoderConfig));
 
+  {
+  scope outer = 
   class_<Psana::Encoder::ConfigV2, boost::shared_ptr<Psana::Encoder::ConfigV2>, boost::noncopyable >("ConfigV2", no_init)
     .def("chan_mask", &Psana::Encoder::ConfigV2::chan_mask)
     .def("count_mode", &Psana::Encoder::ConfigV2::count_mode)
@@ -49,6 +70,23 @@ void createWrappers(PyObject* module) {
     .def("input_rising", &Psana::Encoder::ConfigV2::input_rising)
     .def("ticks_per_sec", &Psana::Encoder::ConfigV2::ticks_per_sec)
   ;
+
+  enum_<Psana::Encoder::ConfigV2::count_mode_type>("count_mode_type")
+    .value("WRAP_FULL",Psana::Encoder::ConfigV2::WRAP_FULL)
+    .value("LIMIT",Psana::Encoder::ConfigV2::LIMIT)
+    .value("HALT",Psana::Encoder::ConfigV2::HALT)
+    .value("WRAP_PRESET",Psana::Encoder::ConfigV2::WRAP_PRESET)
+    .value("COUNT_END",Psana::Encoder::ConfigV2::COUNT_END)
+  ;
+
+  enum_<Psana::Encoder::ConfigV2::quad_mode>("quad_mode")
+    .value("CLOCK_DIR",Psana::Encoder::ConfigV2::CLOCK_DIR)
+    .value("X1",Psana::Encoder::ConfigV2::X1)
+    .value("X2",Psana::Encoder::ConfigV2::X2)
+    .value("X4",Psana::Encoder::ConfigV2::X4)
+    .value("QUAD_END",Psana::Encoder::ConfigV2::QUAD_END)
+  ;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Encoder::ConfigV2> >(Pds::TypeId::Id_EncoderConfig));
 
   class_<Psana::Encoder::DataV1, boost::shared_ptr<Psana::Encoder::DataV1>, boost::noncopyable >("DataV1", no_init)
@@ -58,11 +96,16 @@ void createWrappers(PyObject* module) {
   ;
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Encoder::DataV1> >(Pds::TypeId::Id_EncoderData));
 
+  {
+  scope outer = 
   class_<Psana::Encoder::DataV2, boost::shared_ptr<Psana::Encoder::DataV2>, boost::noncopyable >("DataV2", no_init)
     .def("timestamp", &Psana::Encoder::DataV2::timestamp)
     .def("encoder_count", &Psana::Encoder::DataV2::encoder_count)
     .def("value", &Psana::Encoder::DataV2::value)
   ;
+
+  scope().attr("NEncoders")=3;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Encoder::DataV2> >(Pds::TypeId::Id_EncoderData));
 
   {

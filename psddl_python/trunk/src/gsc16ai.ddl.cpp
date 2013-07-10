@@ -31,6 +31,8 @@ void createWrappers(PyObject* module) {
   Py_INCREF(submodule);
   PyModule_AddObject(module, "Gsc16ai", submodule);
   scope mod = object(handle<>(borrowed(submodule)));
+  {
+  scope outer = 
   class_<Psana::Gsc16ai::ConfigV1, boost::shared_ptr<Psana::Gsc16ai::ConfigV1>, boost::noncopyable >("ConfigV1", no_init)
     .def("voltageRange", &Psana::Gsc16ai::ConfigV1::voltageRange)
     .def("firstChan", &Psana::Gsc16ai::ConfigV1::firstChan)
@@ -43,6 +45,35 @@ void createWrappers(PyObject* module) {
     .def("timeTagEnable", &Psana::Gsc16ai::ConfigV1::timeTagEnable)
     .def("numChannels", &Psana::Gsc16ai::ConfigV1::numChannels)
   ;
+
+  enum_<Psana::Gsc16ai::ConfigV1::InputMode>("InputMode")
+    .value("InputMode_Differential",Psana::Gsc16ai::ConfigV1::InputMode_Differential)
+    .value("InputMode_Zero",Psana::Gsc16ai::ConfigV1::InputMode_Zero)
+    .value("InputMode_Vref",Psana::Gsc16ai::ConfigV1::InputMode_Vref)
+  ;
+
+  enum_<Psana::Gsc16ai::ConfigV1::VoltageRange>("VoltageRange")
+    .value("VoltageRange_10V",Psana::Gsc16ai::ConfigV1::VoltageRange_10V)
+    .value("VoltageRange_5V",Psana::Gsc16ai::ConfigV1::VoltageRange_5V)
+    .value("VoltageRange_2_5V",Psana::Gsc16ai::ConfigV1::VoltageRange_2_5V)
+  ;
+
+  enum_<Psana::Gsc16ai::ConfigV1::TriggerMode>("TriggerMode")
+    .value("TriggerMode_ExtPos",Psana::Gsc16ai::ConfigV1::TriggerMode_ExtPos)
+    .value("TriggerMode_ExtNeg",Psana::Gsc16ai::ConfigV1::TriggerMode_ExtNeg)
+    .value("TriggerMode_IntClk",Psana::Gsc16ai::ConfigV1::TriggerMode_IntClk)
+  ;
+
+  enum_<Psana::Gsc16ai::ConfigV1::DataFormat>("DataFormat")
+    .value("DataFormat_TwosComplement",Psana::Gsc16ai::ConfigV1::DataFormat_TwosComplement)
+    .value("DataFormat_OffsetBinary",Psana::Gsc16ai::ConfigV1::DataFormat_OffsetBinary)
+  ;
+
+  scope().attr("LowestChannel")=0;
+  scope().attr("HighestChannel")=15;
+  scope().attr("LowestFps")=1;
+  scope().attr("HighestFps")=120;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Gsc16ai::ConfigV1> >(Pds::TypeId::Id_Gsc16aiConfig));
 
   class_<Psana::Gsc16ai::DataV1, boost::shared_ptr<Psana::Gsc16ai::DataV1>, boost::noncopyable >("DataV1", no_init)

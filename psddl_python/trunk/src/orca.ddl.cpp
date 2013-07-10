@@ -31,12 +31,31 @@ void createWrappers(PyObject* module) {
   Py_INCREF(submodule);
   PyModule_AddObject(module, "Orca", submodule);
   scope mod = object(handle<>(borrowed(submodule)));
+  {
+  scope outer = 
   class_<Psana::Orca::ConfigV1, boost::shared_ptr<Psana::Orca::ConfigV1>, boost::noncopyable >("ConfigV1", no_init)
     .def("mode", &Psana::Orca::ConfigV1::mode)
     .def("cooling", &Psana::Orca::ConfigV1::cooling)
     .def("defect_pixel_correction_enabled", &Psana::Orca::ConfigV1::defect_pixel_correction_enabled)
     .def("rows", &Psana::Orca::ConfigV1::rows)
   ;
+
+  enum_<Psana::Orca::ConfigV1::ReadoutMode>("ReadoutMode")
+    .value("x1",Psana::Orca::ConfigV1::x1)
+    .value("x2",Psana::Orca::ConfigV1::x2)
+    .value("x4",Psana::Orca::ConfigV1::x4)
+    .value("Subarray",Psana::Orca::ConfigV1::Subarray)
+  ;
+
+  enum_<Psana::Orca::ConfigV1::Cooling>("Cooling")
+    .value("Off",Psana::Orca::ConfigV1::Off)
+    .value("On",Psana::Orca::ConfigV1::On)
+    .value("Max",Psana::Orca::ConfigV1::Max)
+  ;
+
+  scope().attr("Row_Pixels")=2048;
+  scope().attr("Column_Pixels")=2048;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Orca::ConfigV1> >(Pds::TypeId::Id_OrcaConfig));
 
   {

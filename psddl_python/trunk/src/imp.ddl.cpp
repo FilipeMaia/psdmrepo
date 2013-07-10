@@ -31,6 +31,8 @@ void createWrappers(PyObject* module) {
   Py_INCREF(submodule);
   PyModule_AddObject(module, "Imp", submodule);
   scope mod = object(handle<>(borrowed(submodule)));
+  {
+  scope outer = 
   class_<Psana::Imp::ConfigV1, boost::shared_ptr<Psana::Imp::ConfigV1>, boost::noncopyable >("ConfigV1", no_init)
     .def("range", &Psana::Imp::ConfigV1::range)
     .def("calRange", &Psana::Imp::ConfigV1::calRange)
@@ -43,11 +45,31 @@ void createWrappers(PyObject* module) {
     .def("trigDelay", &Psana::Imp::ConfigV1::trigDelay)
     .def("adcDelay", &Psana::Imp::ConfigV1::adcDelay)
   ;
+
+  enum_<Psana::Imp::ConfigV1::Registers>("Registers")
+    .value("Range",Psana::Imp::ConfigV1::Range)
+    .value("Cal_range",Psana::Imp::ConfigV1::Cal_range)
+    .value("Reset",Psana::Imp::ConfigV1::Reset)
+    .value("Bias_data",Psana::Imp::ConfigV1::Bias_data)
+    .value("Cal_data",Psana::Imp::ConfigV1::Cal_data)
+    .value("BiasDac_data",Psana::Imp::ConfigV1::BiasDac_data)
+    .value("Cal_strobe",Psana::Imp::ConfigV1::Cal_strobe)
+    .value("NumberOfSamples",Psana::Imp::ConfigV1::NumberOfSamples)
+    .value("TrigDelay",Psana::Imp::ConfigV1::TrigDelay)
+    .value("Adc_delay",Psana::Imp::ConfigV1::Adc_delay)
+    .value("NumberOfRegisters",Psana::Imp::ConfigV1::NumberOfRegisters)
+  ;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Imp::ConfigV1> >(Pds::TypeId::Id_ImpConfig));
 
+  {
+  scope outer = 
   class_<Psana::Imp::Sample >("Sample", no_init)
     .def("channels", &Psana::Imp::Sample::channels)
   ;
+
+  scope().attr("channelsPerDevice")=4;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Imp::Sample> >(-1));
 
   class_<Psana::Imp::LaneStatus >("LaneStatus", no_init)

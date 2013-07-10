@@ -31,6 +31,34 @@ void createWrappers(PyObject* module) {
   Py_INCREF(submodule);
   PyModule_AddObject(module, "CsPad", submodule);
   scope mod = object(handle<>(borrowed(submodule)));
+
+  mod.attr("MaxQuadsPerSensor")=4;
+  mod.attr("ASICsPerQuad")=16;
+  mod.attr("RowsPerBank")=26;
+  mod.attr("FullBanksPerASIC")=7;
+  mod.attr("BanksPerASIC")=8;
+  mod.attr("ColumnsPerASIC")=185;
+  mod.attr("MaxRowsPerASIC")=194;
+  mod.attr("PotsPerQuad")=80;
+  mod.attr("TwoByTwosPerQuad")=4;
+  mod.attr("SectorsPerQuad")=8;
+
+  enum_<Psana::CsPad::RunModes>("RunModes")
+    .value("NoRunning",Psana::CsPad::NoRunning)
+    .value("RunButDrop",Psana::CsPad::RunButDrop)
+    .value("RunAndSendToRCE",Psana::CsPad::RunAndSendToRCE)
+    .value("RunAndSendTriggeredByTTL",Psana::CsPad::RunAndSendTriggeredByTTL)
+    .value("ExternalTriggerSendToRCE",Psana::CsPad::ExternalTriggerSendToRCE)
+    .value("ExternalTriggerDrop",Psana::CsPad::ExternalTriggerDrop)
+    .value("NumberOfRunModes",Psana::CsPad::NumberOfRunModes)
+  ;
+
+  enum_<Psana::CsPad::DataModes>("DataModes")
+    .value("normal",Psana::CsPad::normal)
+    .value("shiftTest",Psana::CsPad::shiftTest)
+    .value("testData",Psana::CsPad::testData)
+    .value("reserved",Psana::CsPad::reserved)
+  ;
   class_<Psana::CsPad::CsPadDigitalPotsCfg, boost::shared_ptr<Psana::CsPad::CsPadDigitalPotsCfg>, boost::noncopyable >("CsPadDigitalPotsCfg", no_init)
     .def("pots", &Psana::CsPad::CsPadDigitalPotsCfg::pots)
   ;
@@ -237,6 +265,8 @@ void createWrappers(PyObject* module) {
   ;
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::CsPad::ConfigV5> >(Pds::TypeId::Id_CspadConfig));
 
+  {
+  scope outer = 
   class_<Psana::CsPad::ElementV1, boost::shared_ptr<Psana::CsPad::ElementV1>, boost::noncopyable >("ElementV1", no_init)
     .def("virtual_channel", &Psana::CsPad::ElementV1::virtual_channel)
     .def("lane", &Psana::CsPad::ElementV1::lane)
@@ -253,6 +283,9 @@ void createWrappers(PyObject* module) {
     .def("sectionMask", &Psana::CsPad::ElementV1::sectionMask)
     .def("common_mode", &Psana::CsPad::ElementV1::common_mode)
   ;
+
+  scope().attr("Nsbtemp")=4;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::CsPad::ElementV1> >(-1));
 
   class_<Psana::CsPad::DataV1, boost::shared_ptr<Psana::CsPad::DataV1>, boost::noncopyable >("DataV1", no_init)
@@ -261,6 +294,8 @@ void createWrappers(PyObject* module) {
   ;
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::CsPad::DataV1> >(Pds::TypeId::Id_CspadElement));
 
+  {
+  scope outer = 
   class_<Psana::CsPad::ElementV2, boost::shared_ptr<Psana::CsPad::ElementV2>, boost::noncopyable >("ElementV2", no_init)
     .def("virtual_channel", &Psana::CsPad::ElementV2::virtual_channel)
     .def("lane", &Psana::CsPad::ElementV2::lane)
@@ -277,6 +312,9 @@ void createWrappers(PyObject* module) {
     .def("sectionMask", &Psana::CsPad::ElementV2::sectionMask)
     .def("common_mode", &Psana::CsPad::ElementV2::common_mode)
   ;
+
+  scope().attr("Nsbtemp")=4;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::CsPad::ElementV2> >(-1));
 
   class_<Psana::CsPad::DataV2, boost::shared_ptr<Psana::CsPad::DataV2>, boost::noncopyable >("DataV2", no_init)

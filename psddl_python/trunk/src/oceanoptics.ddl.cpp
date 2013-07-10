@@ -45,6 +45,8 @@ void createWrappers(PyObject* module) {
   ;
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::OceanOptics::timespec64> >(-1));
 
+  {
+  scope outer = 
   class_<Psana::OceanOptics::DataV1, boost::shared_ptr<Psana::OceanOptics::DataV1>, boost::noncopyable >("DataV1", no_init)
     .def("data", &Psana::OceanOptics::DataV1::data)
     .def("frameCounter", &Psana::OceanOptics::DataV1::frameCounter)
@@ -59,6 +61,11 @@ void createWrappers(PyObject* module) {
     .def("durationOfFrame", &Psana::OceanOptics::DataV1::durationOfFrame)
     .def("nonlinerCorrected", &Psana::OceanOptics::DataV1::nonlinerCorrected)
   ;
+
+  scope().attr("iDataReadSize")=8192;
+  scope().attr("iNumPixels")=3840;
+  scope().attr("iActivePixelIndex")=22;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::OceanOptics::DataV1> >(Pds::TypeId::Id_OceanOpticsData));
 
   {

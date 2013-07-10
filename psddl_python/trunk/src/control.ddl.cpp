@@ -31,14 +31,22 @@ void createWrappers(PyObject* module) {
   Py_INCREF(submodule);
   PyModule_AddObject(module, "ControlData", submodule);
   scope mod = object(handle<>(borrowed(submodule)));
+  {
+  scope outer = 
   class_<Psana::ControlData::PVControl >("PVControl", no_init)
     .def("name", &Psana::ControlData::PVControl::name)
     .def("index", &Psana::ControlData::PVControl::index)
     .def("value", &Psana::ControlData::PVControl::value)
     .def("array", &Psana::ControlData::PVControl::array)
   ;
+
+  scope().attr("NameSize")=32;
+  scope().attr("NoArray")=0xFFFFFFFF;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::ControlData::PVControl> >(-1));
 
+  {
+  scope outer = 
   class_<Psana::ControlData::PVMonitor >("PVMonitor", no_init)
     .def("name", &Psana::ControlData::PVMonitor::name)
     .def("index", &Psana::ControlData::PVMonitor::index)
@@ -46,12 +54,22 @@ void createWrappers(PyObject* module) {
     .def("hiValue", &Psana::ControlData::PVMonitor::hiValue)
     .def("array", &Psana::ControlData::PVMonitor::array)
   ;
+
+  scope().attr("NameSize")=32;
+  scope().attr("NoArray")=0xFFFFFFFF;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::ControlData::PVMonitor> >(-1));
 
+  {
+  scope outer = 
   class_<Psana::ControlData::PVLabel >("PVLabel", no_init)
     .def("name", &Psana::ControlData::PVLabel::name)
     .def("value", &Psana::ControlData::PVLabel::value)
   ;
+
+  scope().attr("NameSize")=32;
+  scope().attr("ValueSize")=64;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::ControlData::PVLabel> >(-1));
 
   class_<Psana::ControlData::ConfigV1, boost::shared_ptr<Psana::ControlData::ConfigV1>, boost::noncopyable >("ConfigV1", no_init)

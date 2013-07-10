@@ -39,6 +39,8 @@ void createWrappers(PyObject* module) {
   ;
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Bld::BldDataFEEGasDetEnergy> >(Pds::TypeId::Id_FEEGasDetEnergy));
 
+  {
+  scope outer = 
   class_<Psana::Bld::BldDataEBeamV0 >("BldDataEBeamV0", no_init)
     .def("damageMask", &Psana::Bld::BldDataEBeamV0::damageMask)
     .def("ebeamCharge", &Psana::Bld::BldDataEBeamV0::ebeamCharge)
@@ -48,8 +50,20 @@ void createWrappers(PyObject* module) {
     .def("ebeamLTUAngX", &Psana::Bld::BldDataEBeamV0::ebeamLTUAngX)
     .def("ebeamLTUAngY", &Psana::Bld::BldDataEBeamV0::ebeamLTUAngY)
   ;
+
+  enum_<Psana::Bld::BldDataEBeamV0::DamageMask>("DamageMask")
+    .value("EbeamChargeDamage",Psana::Bld::BldDataEBeamV0::EbeamChargeDamage)
+    .value("EbeamL3EnergyDamage",Psana::Bld::BldDataEBeamV0::EbeamL3EnergyDamage)
+    .value("EbeamLTUPosXDamage",Psana::Bld::BldDataEBeamV0::EbeamLTUPosXDamage)
+    .value("EbeamLTUPosYDamage",Psana::Bld::BldDataEBeamV0::EbeamLTUPosYDamage)
+    .value("EbeamLTUAngXDamage",Psana::Bld::BldDataEBeamV0::EbeamLTUAngXDamage)
+    .value("EbeamLTUAngYDamage",Psana::Bld::BldDataEBeamV0::EbeamLTUAngYDamage)
+  ;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Bld::BldDataEBeamV0> >(Pds::TypeId::Id_EBeam));
 
+  {
+  scope outer = 
   class_<Psana::Bld::BldDataEBeamV1 >("BldDataEBeamV1", no_init)
     .def("damageMask", &Psana::Bld::BldDataEBeamV1::damageMask)
     .def("ebeamCharge", &Psana::Bld::BldDataEBeamV1::ebeamCharge)
@@ -60,8 +74,21 @@ void createWrappers(PyObject* module) {
     .def("ebeamLTUAngY", &Psana::Bld::BldDataEBeamV1::ebeamLTUAngY)
     .def("ebeamPkCurrBC2", &Psana::Bld::BldDataEBeamV1::ebeamPkCurrBC2)
   ;
+
+  enum_<Psana::Bld::BldDataEBeamV1::DamageMask>("DamageMask")
+    .value("EbeamChargeDamage",Psana::Bld::BldDataEBeamV1::EbeamChargeDamage)
+    .value("EbeamL3EnergyDamage",Psana::Bld::BldDataEBeamV1::EbeamL3EnergyDamage)
+    .value("EbeamLTUPosXDamage",Psana::Bld::BldDataEBeamV1::EbeamLTUPosXDamage)
+    .value("EbeamLTUPosYDamage",Psana::Bld::BldDataEBeamV1::EbeamLTUPosYDamage)
+    .value("EbeamLTUAngXDamage",Psana::Bld::BldDataEBeamV1::EbeamLTUAngXDamage)
+    .value("EbeamLTUAngYDamage",Psana::Bld::BldDataEBeamV1::EbeamLTUAngYDamage)
+    .value("EbeamPkCurrBC2Damage",Psana::Bld::BldDataEBeamV1::EbeamPkCurrBC2Damage)
+  ;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Bld::BldDataEBeamV1> >(Pds::TypeId::Id_EBeam));
 
+  {
+  scope outer = 
   class_<Psana::Bld::BldDataEBeamV2 >("BldDataEBeamV2", no_init)
     .def("damageMask", &Psana::Bld::BldDataEBeamV2::damageMask)
     .def("ebeamCharge", &Psana::Bld::BldDataEBeamV2::ebeamCharge)
@@ -73,8 +100,22 @@ void createWrappers(PyObject* module) {
     .def("ebeamPkCurrBC2", &Psana::Bld::BldDataEBeamV2::ebeamPkCurrBC2)
     .def("ebeamEnergyBC2", &Psana::Bld::BldDataEBeamV2::ebeamEnergyBC2)
   ;
+
+  enum_<Psana::Bld::BldDataEBeamV2::DamageMask>("DamageMask")
+    .value("EbeamChargeDamage",Psana::Bld::BldDataEBeamV2::EbeamChargeDamage)
+    .value("EbeamL3EnergyDamage",Psana::Bld::BldDataEBeamV2::EbeamL3EnergyDamage)
+    .value("EbeamLTUPosXDamage",Psana::Bld::BldDataEBeamV2::EbeamLTUPosXDamage)
+    .value("EbeamLTUPosYDamage",Psana::Bld::BldDataEBeamV2::EbeamLTUPosYDamage)
+    .value("EbeamLTUAngXDamage",Psana::Bld::BldDataEBeamV2::EbeamLTUAngXDamage)
+    .value("EbeamLTUAngYDamage",Psana::Bld::BldDataEBeamV2::EbeamLTUAngYDamage)
+    .value("EbeamPkCurrBC2Damage",Psana::Bld::BldDataEBeamV2::EbeamPkCurrBC2Damage)
+    .value("EbeamEnergyBC2Damage",Psana::Bld::BldDataEBeamV2::EbeamEnergyBC2Damage)
+  ;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Bld::BldDataEBeamV2> >(Pds::TypeId::Id_EBeam));
 
+  {
+  scope outer = 
   class_<Psana::Bld::BldDataEBeamV3 >("BldDataEBeamV3", no_init)
     .def("damageMask", &Psana::Bld::BldDataEBeamV3::damageMask)
     .def("ebeamCharge", &Psana::Bld::BldDataEBeamV3::ebeamCharge)
@@ -88,6 +129,20 @@ void createWrappers(PyObject* module) {
     .def("ebeamPkCurrBC1", &Psana::Bld::BldDataEBeamV3::ebeamPkCurrBC1)
     .def("ebeamEnergyBC1", &Psana::Bld::BldDataEBeamV3::ebeamEnergyBC1)
   ;
+
+  enum_<Psana::Bld::BldDataEBeamV3::DamageMask>("DamageMask")
+    .value("EbeamChargeDamage",Psana::Bld::BldDataEBeamV3::EbeamChargeDamage)
+    .value("EbeamL3EnergyDamage",Psana::Bld::BldDataEBeamV3::EbeamL3EnergyDamage)
+    .value("EbeamLTUPosXDamage",Psana::Bld::BldDataEBeamV3::EbeamLTUPosXDamage)
+    .value("EbeamLTUPosYDamage",Psana::Bld::BldDataEBeamV3::EbeamLTUPosYDamage)
+    .value("EbeamLTUAngXDamage",Psana::Bld::BldDataEBeamV3::EbeamLTUAngXDamage)
+    .value("EbeamLTUAngYDamage",Psana::Bld::BldDataEBeamV3::EbeamLTUAngYDamage)
+    .value("EbeamPkCurrBC2Damage",Psana::Bld::BldDataEBeamV3::EbeamPkCurrBC2Damage)
+    .value("EbeamEnergyBC2Damage",Psana::Bld::BldDataEBeamV3::EbeamEnergyBC2Damage)
+    .value("EbeamPkCurrBC1Damage",Psana::Bld::BldDataEBeamV3::EbeamPkCurrBC1Damage)
+    .value("EbeamEnergyBC1Damage",Psana::Bld::BldDataEBeamV3::EbeamEnergyBC1Damage)
+  ;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Bld::BldDataEBeamV3> >(Pds::TypeId::Id_EBeam));
 
   class_<Psana::Bld::BldDataPhaseCavity >("BldDataPhaseCavity", no_init)

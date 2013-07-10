@@ -31,12 +31,33 @@ void createWrappers(PyObject* module) {
   Py_INCREF(submodule);
   PyModule_AddObject(module, "UsdUsb", submodule);
   scope mod = object(handle<>(borrowed(submodule)));
+  {
+  scope outer = 
   class_<Psana::UsdUsb::ConfigV1, boost::shared_ptr<Psana::UsdUsb::ConfigV1>, boost::noncopyable >("ConfigV1", no_init)
     .def("counting_mode", &Psana::UsdUsb::ConfigV1::counting_mode)
     .def("quadrature_mode", &Psana::UsdUsb::ConfigV1::quadrature_mode)
   ;
+
+  enum_<Psana::UsdUsb::ConfigV1::Count_Mode>("Count_Mode")
+    .value("WRAP_FULL",Psana::UsdUsb::ConfigV1::WRAP_FULL)
+    .value("LIMIT",Psana::UsdUsb::ConfigV1::LIMIT)
+    .value("HALT",Psana::UsdUsb::ConfigV1::HALT)
+    .value("WRAP_PRESET",Psana::UsdUsb::ConfigV1::WRAP_PRESET)
+  ;
+
+  enum_<Psana::UsdUsb::ConfigV1::Quad_Mode>("Quad_Mode")
+    .value("CLOCK_DIR",Psana::UsdUsb::ConfigV1::CLOCK_DIR)
+    .value("X1",Psana::UsdUsb::ConfigV1::X1)
+    .value("X2",Psana::UsdUsb::ConfigV1::X2)
+    .value("X4",Psana::UsdUsb::ConfigV1::X4)
+  ;
+
+  scope().attr("NCHANNELS")=4;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::UsdUsb::ConfigV1> >(Pds::TypeId::Id_UsdUsbConfig));
 
+  {
+  scope outer = 
   class_<Psana::UsdUsb::DataV1, boost::shared_ptr<Psana::UsdUsb::DataV1>, boost::noncopyable >("DataV1", no_init)
     .def("digital_in", &Psana::UsdUsb::DataV1::digital_in)
     .def("timestamp", &Psana::UsdUsb::DataV1::timestamp)
@@ -44,6 +65,11 @@ void createWrappers(PyObject* module) {
     .def("analog_in", &Psana::UsdUsb::DataV1::analog_in)
     .def("encoder_count", &Psana::UsdUsb::DataV1::encoder_count)
   ;
+
+  scope().attr("Encoder_Inputs")=4;
+  scope().attr("Analog_Inputs")=4;
+  scope().attr("Digital_Inputs")=8;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::UsdUsb::DataV1> >(Pds::TypeId::Id_UsdUsbData));
 
   {

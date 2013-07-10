@@ -31,6 +31,8 @@ void createWrappers(PyObject* module) {
   Py_INCREF(submodule);
   PyModule_AddObject(module, "Opal1k", submodule);
   scope mod = object(handle<>(borrowed(submodule)));
+  {
+  scope outer = 
   class_<Psana::Opal1k::ConfigV1, boost::shared_ptr<Psana::Opal1k::ConfigV1>, boost::noncopyable >("ConfigV1", no_init)
     .def("black_level", &Psana::Opal1k::ConfigV1::black_level)
     .def("gain_percent", &Psana::Opal1k::ConfigV1::gain_percent)
@@ -46,6 +48,32 @@ void createWrappers(PyObject* module) {
     .def("output_offset", &Psana::Opal1k::ConfigV1::output_offset)
     .def("output_resolution_bits", &Psana::Opal1k::ConfigV1::output_resolution_bits)
   ;
+
+  enum_<Psana::Opal1k::ConfigV1::Depth>("Depth")
+    .value("Eight_bit",Psana::Opal1k::ConfigV1::Eight_bit)
+    .value("Ten_bit",Psana::Opal1k::ConfigV1::Ten_bit)
+    .value("Twelve_bit",Psana::Opal1k::ConfigV1::Twelve_bit)
+  ;
+
+  enum_<Psana::Opal1k::ConfigV1::Binning>("Binning")
+    .value("x1",Psana::Opal1k::ConfigV1::x1)
+    .value("x2",Psana::Opal1k::ConfigV1::x2)
+    .value("x4",Psana::Opal1k::ConfigV1::x4)
+    .value("x8",Psana::Opal1k::ConfigV1::x8)
+  ;
+
+  enum_<Psana::Opal1k::ConfigV1::Mirroring>("Mirroring")
+    .value("None",Psana::Opal1k::ConfigV1::None)
+    .value("HFlip",Psana::Opal1k::ConfigV1::HFlip)
+    .value("VFlip",Psana::Opal1k::ConfigV1::VFlip)
+    .value("HVFlip",Psana::Opal1k::ConfigV1::HVFlip)
+  ;
+
+  scope().attr("LUT_Size")=4096;
+  scope().attr("Row_Pixels")=1024;
+  scope().attr("Column_Pixels")=1024;
+  scope().attr("Output_LUT_Size")=4096;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Opal1k::ConfigV1> >(Pds::TypeId::Id_Opal1kConfig));
 
   {

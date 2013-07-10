@@ -31,6 +31,8 @@ void createWrappers(PyObject* module) {
   Py_INCREF(submodule);
   PyModule_AddObject(module, "Ipimb", submodule);
   scope mod = object(handle<>(borrowed(submodule)));
+  {
+  scope outer = 
   class_<Psana::Ipimb::ConfigV1, boost::shared_ptr<Psana::Ipimb::ConfigV1>, boost::noncopyable >("ConfigV1", no_init)
     .def("triggerCounter", &Psana::Ipimb::ConfigV1::triggerCounter)
     .def("serialID", &Psana::Ipimb::ConfigV1::serialID)
@@ -47,8 +49,17 @@ void createWrappers(PyObject* module) {
     .def("trigDelay", &Psana::Ipimb::ConfigV1::trigDelay)
     .def("capacitorValue", &Psana::Ipimb::ConfigV1::capacitorValue)
   ;
+
+  enum_<Psana::Ipimb::ConfigV1::CapacitorValue>("CapacitorValue")
+    .value("c_1pF",Psana::Ipimb::ConfigV1::c_1pF)
+    .value("c_100pF",Psana::Ipimb::ConfigV1::c_100pF)
+    .value("c_10nF",Psana::Ipimb::ConfigV1::c_10nF)
+  ;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Ipimb::ConfigV1> >(Pds::TypeId::Id_IpimbConfig));
 
+  {
+  scope outer = 
   class_<Psana::Ipimb::ConfigV2, boost::shared_ptr<Psana::Ipimb::ConfigV2>, boost::noncopyable >("ConfigV2", no_init)
     .def("triggerCounter", &Psana::Ipimb::ConfigV2::triggerCounter)
     .def("serialID", &Psana::Ipimb::ConfigV2::serialID)
@@ -67,6 +78,18 @@ void createWrappers(PyObject* module) {
     .def("adcDelay", &Psana::Ipimb::ConfigV2::adcDelay)
     .def("capacitorValue", &Psana::Ipimb::ConfigV2::capacitorValue)
   ;
+
+  enum_<Psana::Ipimb::ConfigV2::CapacitorValue>("CapacitorValue")
+    .value("c_1pF",Psana::Ipimb::ConfigV2::c_1pF)
+    .value("c_4p7pF",Psana::Ipimb::ConfigV2::c_4p7pF)
+    .value("c_24pF",Psana::Ipimb::ConfigV2::c_24pF)
+    .value("c_120pF",Psana::Ipimb::ConfigV2::c_120pF)
+    .value("c_620pF",Psana::Ipimb::ConfigV2::c_620pF)
+    .value("c_3p3nF",Psana::Ipimb::ConfigV2::c_3p3nF)
+    .value("c_10nF",Psana::Ipimb::ConfigV2::c_10nF)
+    .value("expert",Psana::Ipimb::ConfigV2::expert)
+  ;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Ipimb::ConfigV2> >(Pds::TypeId::Id_IpimbConfig));
 
   class_<Psana::Ipimb::DataV1, boost::shared_ptr<Psana::Ipimb::DataV1>, boost::noncopyable >("DataV1", no_init)
@@ -86,6 +109,8 @@ void createWrappers(PyObject* module) {
   ;
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Ipimb::DataV1> >(Pds::TypeId::Id_IpimbData));
 
+  {
+  scope outer = 
   class_<Psana::Ipimb::DataV2, boost::shared_ptr<Psana::Ipimb::DataV2>, boost::noncopyable >("DataV2", no_init)
     .def("config0", &Psana::Ipimb::DataV2::config0)
     .def("config1", &Psana::Ipimb::DataV2::config1)
@@ -109,6 +134,10 @@ void createWrappers(PyObject* module) {
     .def("channel3psVolts", &Psana::Ipimb::DataV2::channel3psVolts)
     .def("triggerCounter", &Psana::Ipimb::DataV2::triggerCounter)
   ;
+
+  scope().attr("ipimbAdcRange")=5;
+  scope().attr("ipimbAdcSteps")=65536;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Ipimb::DataV2> >(Pds::TypeId::Id_IpimbData));
 
   {

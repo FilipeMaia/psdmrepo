@@ -41,6 +41,8 @@ void createWrappers(PyObject* module) {
   ;
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Camera::FrameFccdConfigV1> >(Pds::TypeId::Id_FrameFccdConfig));
 
+  {
+  scope outer = 
   class_<Psana::Camera::FrameFexConfigV1, boost::shared_ptr<Psana::Camera::FrameFexConfigV1>, boost::noncopyable >("FrameFexConfigV1", no_init)
     .def("forwarding", &Psana::Camera::FrameFexConfigV1::forwarding)
     .def("forward_prescale", &Psana::Camera::FrameFexConfigV1::forward_prescale)
@@ -51,6 +53,20 @@ void createWrappers(PyObject* module) {
     .def("number_of_masked_pixels", &Psana::Camera::FrameFexConfigV1::number_of_masked_pixels)
     .def("masked_pixel_coordinates", &Psana::Camera::FrameFexConfigV1::masked_pixel_coordinates)
   ;
+
+  enum_<Psana::Camera::FrameFexConfigV1::Forwarding>("Forwarding")
+    .value("NoFrame",Psana::Camera::FrameFexConfigV1::NoFrame)
+    .value("FullFrame",Psana::Camera::FrameFexConfigV1::FullFrame)
+    .value("RegionOfInterest",Psana::Camera::FrameFexConfigV1::RegionOfInterest)
+  ;
+
+  enum_<Psana::Camera::FrameFexConfigV1::Processing>("Processing")
+    .value("NoProcessing",Psana::Camera::FrameFexConfigV1::NoProcessing)
+    .value("GssFullFrame",Psana::Camera::FrameFexConfigV1::GssFullFrame)
+    .value("GssRegionOfInterest",Psana::Camera::FrameFexConfigV1::GssRegionOfInterest)
+    .value("GssThreshold",Psana::Camera::FrameFexConfigV1::GssThreshold)
+  ;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Camera::FrameFexConfigV1> >(Pds::TypeId::Id_FrameFexConfig));
 
   class_<Psana::Camera::FrameV1, boost::shared_ptr<Psana::Camera::FrameV1>, boost::noncopyable >("FrameV1", no_init)

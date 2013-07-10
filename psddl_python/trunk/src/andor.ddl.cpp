@@ -31,6 +31,8 @@ void createWrappers(PyObject* module) {
   Py_INCREF(submodule);
   PyModule_AddObject(module, "Andor", submodule);
   scope mod = object(handle<>(borrowed(submodule)));
+  {
+  scope outer = 
   class_<Psana::Andor::ConfigV1, boost::shared_ptr<Psana::Andor::ConfigV1>, boost::noncopyable >("ConfigV1", no_init)
     .def("width", &Psana::Andor::ConfigV1::width)
     .def("height", &Psana::Andor::ConfigV1::height)
@@ -52,6 +54,15 @@ void createWrappers(PyObject* module) {
     .def("numPixelsY", &Psana::Andor::ConfigV1::numPixelsY)
     .def("numPixels", &Psana::Andor::ConfigV1::numPixels)
   ;
+
+  enum_<Psana::Andor::ConfigV1::EnumFanMode>("EnumFanMode")
+    .value("ENUM_FAN_FULL",Psana::Andor::ConfigV1::ENUM_FAN_FULL)
+    .value("ENUM_FAN_LOW",Psana::Andor::ConfigV1::ENUM_FAN_LOW)
+    .value("ENUM_FAN_OFF",Psana::Andor::ConfigV1::ENUM_FAN_OFF)
+    .value("ENUM_FAN_ACQOFF",Psana::Andor::ConfigV1::ENUM_FAN_ACQOFF)
+    .value("ENUM_FAN_NUM",Psana::Andor::ConfigV1::ENUM_FAN_NUM)
+  ;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Andor::ConfigV1> >(Pds::TypeId::Id_AndorConfig));
 
   class_<Psana::Andor::FrameV1, boost::shared_ptr<Psana::Andor::FrameV1>, boost::noncopyable >("FrameV1", no_init)

@@ -31,6 +31,8 @@ void createWrappers(PyObject* module) {
   Py_INCREF(submodule);
   PyModule_AddObject(module, "Acqiris", submodule);
   scope mod = object(handle<>(borrowed(submodule)));
+  {
+  scope outer = 
   class_<Psana::Acqiris::VertV1 >("VertV1", no_init)
     .def("fullScale", &Psana::Acqiris::VertV1::fullScale)
     .def("offset", &Psana::Acqiris::VertV1::offset)
@@ -38,6 +40,24 @@ void createWrappers(PyObject* module) {
     .def("bandwidth", &Psana::Acqiris::VertV1::bandwidth)
     .def("slope", &Psana::Acqiris::VertV1::slope)
   ;
+
+  enum_<Psana::Acqiris::VertV1::Coupling>("Coupling")
+    .value("GND",Psana::Acqiris::VertV1::GND)
+    .value("DC",Psana::Acqiris::VertV1::DC)
+    .value("AC",Psana::Acqiris::VertV1::AC)
+    .value("DC50ohm",Psana::Acqiris::VertV1::DC50ohm)
+    .value("AC50ohm",Psana::Acqiris::VertV1::AC50ohm)
+  ;
+
+  enum_<Psana::Acqiris::VertV1::Bandwidth>("Bandwidth")
+    .value("None",Psana::Acqiris::VertV1::None)
+    .value("MHz25",Psana::Acqiris::VertV1::MHz25)
+    .value("MHz700",Psana::Acqiris::VertV1::MHz700)
+    .value("MHz200",Psana::Acqiris::VertV1::MHz200)
+    .value("MHz20",Psana::Acqiris::VertV1::MHz20)
+    .value("MHz35",Psana::Acqiris::VertV1::MHz35)
+  ;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Acqiris::VertV1> >(-1));
 
   class_<Psana::Acqiris::HorizV1 >("HorizV1", no_init)
@@ -48,14 +68,41 @@ void createWrappers(PyObject* module) {
   ;
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Acqiris::HorizV1> >(-1));
 
+  {
+  scope outer = 
   class_<Psana::Acqiris::TrigV1 >("TrigV1", no_init)
     .def("coupling", &Psana::Acqiris::TrigV1::coupling)
     .def("input", &Psana::Acqiris::TrigV1::input)
     .def("slope", &Psana::Acqiris::TrigV1::slope)
     .def("level", &Psana::Acqiris::TrigV1::level)
   ;
+
+  enum_<Psana::Acqiris::TrigV1::Source>("Source")
+    .value("Internal",Psana::Acqiris::TrigV1::Internal)
+    .value("External",Psana::Acqiris::TrigV1::External)
+  ;
+
+  enum_<Psana::Acqiris::TrigV1::Coupling>("Coupling")
+    .value("DC",Psana::Acqiris::TrigV1::DC)
+    .value("AC",Psana::Acqiris::TrigV1::AC)
+    .value("HFreject",Psana::Acqiris::TrigV1::HFreject)
+    .value("DC50ohm",Psana::Acqiris::TrigV1::DC50ohm)
+    .value("AC50ohm",Psana::Acqiris::TrigV1::AC50ohm)
+  ;
+
+  enum_<Psana::Acqiris::TrigV1::Slope>("Slope")
+    .value("Positive",Psana::Acqiris::TrigV1::Positive)
+    .value("Negative",Psana::Acqiris::TrigV1::Negative)
+    .value("OutOfWindow",Psana::Acqiris::TrigV1::OutOfWindow)
+    .value("IntoWindow",Psana::Acqiris::TrigV1::IntoWindow)
+    .value("HFDivide",Psana::Acqiris::TrigV1::HFDivide)
+    .value("SpikeStretcher",Psana::Acqiris::TrigV1::SpikeStretcher)
+  ;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Acqiris::TrigV1> >(-1));
 
+  {
+  scope outer = 
   class_<Psana::Acqiris::ConfigV1, boost::shared_ptr<Psana::Acqiris::ConfigV1>, boost::noncopyable >("ConfigV1", no_init)
     .def("nbrConvertersPerChannel", &Psana::Acqiris::ConfigV1::nbrConvertersPerChannel)
     .def("channelMask", &Psana::Acqiris::ConfigV1::channelMask)
@@ -65,6 +112,9 @@ void createWrappers(PyObject* module) {
     .def("vert", &Psana::Acqiris::ConfigV1::vert)
     .def("nbrChannels", &Psana::Acqiris::ConfigV1::nbrChannels)
   ;
+
+  scope().attr("MaxChan")=20;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Acqiris::ConfigV1> >(Pds::TypeId::Id_AcqConfig));
 
   class_<Psana::Acqiris::TimestampV1 >("TimestampV1", no_init)
@@ -75,6 +125,8 @@ void createWrappers(PyObject* module) {
   ;
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Acqiris::TimestampV1> >(-1));
 
+  {
+  scope outer = 
   class_<Psana::Acqiris::DataDescV1Elem, boost::shared_ptr<Psana::Acqiris::DataDescV1Elem>, boost::noncopyable >("DataDescV1Elem", no_init)
     .def("nbrSamplesInSeg", &Psana::Acqiris::DataDescV1Elem::nbrSamplesInSeg)
     .def("indexFirstPoint", &Psana::Acqiris::DataDescV1Elem::indexFirstPoint)
@@ -82,6 +134,11 @@ void createWrappers(PyObject* module) {
     .def("timestamp", &Psana::Acqiris::DataDescV1Elem::timestamp)
     .def("waveforms", &Psana::Acqiris::DataDescV1Elem::waveforms)
   ;
+
+  scope().attr("NumberOfBits")=10;
+  scope().attr("BitShift")=6;
+  scope().attr("_extraSize")=32;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Acqiris::DataDescV1Elem> >(-1));
 
   class_<Psana::Acqiris::DataDescV1, boost::shared_ptr<Psana::Acqiris::DataDescV1>, boost::noncopyable >("DataDescV1", no_init)
@@ -90,6 +147,8 @@ void createWrappers(PyObject* module) {
   ;
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Acqiris::DataDescV1> >(Pds::TypeId::Id_AcqWaveform));
 
+  {
+  scope outer = 
   class_<Psana::Acqiris::TdcChannel >("TdcChannel", no_init)
     .def("channel", &Psana::Acqiris::TdcChannel::channel)
     .def("_mode_int", &Psana::Acqiris::TdcChannel::_mode_int)
@@ -97,35 +156,116 @@ void createWrappers(PyObject* module) {
     .def("mode", &Psana::Acqiris::TdcChannel::mode)
     .def("level", &Psana::Acqiris::TdcChannel::level)
   ;
+
+  enum_<Psana::Acqiris::TdcChannel::Channel>("Channel")
+    .value("Veto",Psana::Acqiris::TdcChannel::Veto)
+    .value("Common",Psana::Acqiris::TdcChannel::Common)
+    .value("Input1",Psana::Acqiris::TdcChannel::Input1)
+    .value("Input2",Psana::Acqiris::TdcChannel::Input2)
+    .value("Input3",Psana::Acqiris::TdcChannel::Input3)
+    .value("Input4",Psana::Acqiris::TdcChannel::Input4)
+    .value("Input5",Psana::Acqiris::TdcChannel::Input5)
+    .value("Input6",Psana::Acqiris::TdcChannel::Input6)
+  ;
+
+  enum_<Psana::Acqiris::TdcChannel::Mode>("Mode")
+    .value("Active",Psana::Acqiris::TdcChannel::Active)
+    .value("Inactive",Psana::Acqiris::TdcChannel::Inactive)
+  ;
+
+  enum_<Psana::Acqiris::TdcChannel::Slope>("Slope")
+    .value("Positive",Psana::Acqiris::TdcChannel::Positive)
+    .value("Negative",Psana::Acqiris::TdcChannel::Negative)
+  ;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Acqiris::TdcChannel> >(-1));
 
+  {
+  scope outer = 
   class_<Psana::Acqiris::TdcAuxIO >("TdcAuxIO", no_init)
     .def("channel", &Psana::Acqiris::TdcAuxIO::channel)
     .def("mode", &Psana::Acqiris::TdcAuxIO::mode)
     .def("term", &Psana::Acqiris::TdcAuxIO::term)
   ;
+
+  enum_<Psana::Acqiris::TdcAuxIO::Channel>("Channel")
+    .value("IOAux1",Psana::Acqiris::TdcAuxIO::IOAux1)
+    .value("IOAux2",Psana::Acqiris::TdcAuxIO::IOAux2)
+  ;
+
+  enum_<Psana::Acqiris::TdcAuxIO::Mode>("Mode")
+    .value("BankSwitch",Psana::Acqiris::TdcAuxIO::BankSwitch)
+    .value("Marker",Psana::Acqiris::TdcAuxIO::Marker)
+    .value("OutputLo",Psana::Acqiris::TdcAuxIO::OutputLo)
+    .value("OutputHi",Psana::Acqiris::TdcAuxIO::OutputHi)
+  ;
+
+  enum_<Psana::Acqiris::TdcAuxIO::Termination>("Termination")
+    .value("ZHigh",Psana::Acqiris::TdcAuxIO::ZHigh)
+    .value("Z50",Psana::Acqiris::TdcAuxIO::Z50)
+  ;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Acqiris::TdcAuxIO> >(-1));
 
+  {
+  scope outer = 
   class_<Psana::Acqiris::TdcVetoIO >("TdcVetoIO", no_init)
     .def("channel", &Psana::Acqiris::TdcVetoIO::channel)
     .def("mode", &Psana::Acqiris::TdcVetoIO::mode)
     .def("term", &Psana::Acqiris::TdcVetoIO::term)
   ;
+
+  enum_<Psana::Acqiris::TdcVetoIO::Channel>("Channel")
+    .value("ChVeto",Psana::Acqiris::TdcVetoIO::ChVeto)
+  ;
+
+  enum_<Psana::Acqiris::TdcVetoIO::Mode>("Mode")
+    .value("Veto",Psana::Acqiris::TdcVetoIO::Veto)
+    .value("SwitchVeto",Psana::Acqiris::TdcVetoIO::SwitchVeto)
+    .value("InvertedVeto",Psana::Acqiris::TdcVetoIO::InvertedVeto)
+    .value("InvertedSwitchVeto",Psana::Acqiris::TdcVetoIO::InvertedSwitchVeto)
+  ;
+
+  enum_<Psana::Acqiris::TdcVetoIO::Termination>("Termination")
+    .value("ZHigh",Psana::Acqiris::TdcVetoIO::ZHigh)
+    .value("Z50",Psana::Acqiris::TdcVetoIO::Z50)
+  ;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Acqiris::TdcVetoIO> >(-1));
 
+  {
+  scope outer = 
   class_<Psana::Acqiris::TdcConfigV1, boost::shared_ptr<Psana::Acqiris::TdcConfigV1>, boost::noncopyable >("TdcConfigV1", no_init)
     .def("channels", &Psana::Acqiris::TdcConfigV1::channels)
     .def("auxio", &Psana::Acqiris::TdcConfigV1::auxio)
     .def("veto", &Psana::Acqiris::TdcConfigV1::veto, return_value_policy<copy_const_reference>())
   ;
+
+  scope().attr("NChannels")=8;
+  scope().attr("NAuxIO")=2;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Acqiris::TdcConfigV1> >(Pds::TypeId::Id_AcqTdcConfig));
 
+  {
+  scope outer = 
   class_<Psana::Acqiris::TdcDataV1_Item >("TdcDataV1_Item", no_init)
     .def("value", &Psana::Acqiris::TdcDataV1_Item::value)
     .def("bf_val_", &Psana::Acqiris::TdcDataV1_Item::bf_val_)
     .def("source", &Psana::Acqiris::TdcDataV1_Item::source)
     .def("bf_ofv_", &Psana::Acqiris::TdcDataV1_Item::bf_ofv_)
   ;
+
+  enum_<Psana::Acqiris::TdcDataV1_Item::Source>("Source")
+    .value("Comm",Psana::Acqiris::TdcDataV1_Item::Comm)
+    .value("Chan1",Psana::Acqiris::TdcDataV1_Item::Chan1)
+    .value("Chan2",Psana::Acqiris::TdcDataV1_Item::Chan2)
+    .value("Chan3",Psana::Acqiris::TdcDataV1_Item::Chan3)
+    .value("Chan4",Psana::Acqiris::TdcDataV1_Item::Chan4)
+    .value("Chan5",Psana::Acqiris::TdcDataV1_Item::Chan5)
+    .value("Chan6",Psana::Acqiris::TdcDataV1_Item::Chan6)
+    .value("AuxIO",Psana::Acqiris::TdcDataV1_Item::AuxIO)
+  ;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Acqiris::TdcDataV1_Item> >(-1));
 
   class_<Psana::Acqiris::TdcDataV1Common, boost::python::bases<Psana::Acqiris::TdcDataV1_Item> >("TdcDataV1Common", no_init)
@@ -141,9 +281,19 @@ void createWrappers(PyObject* module) {
   ;
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Acqiris::TdcDataV1Channel> >(-1));
 
+  {
+  scope outer = 
   class_<Psana::Acqiris::TdcDataV1Marker, boost::python::bases<Psana::Acqiris::TdcDataV1_Item> >("TdcDataV1Marker", no_init)
     .def("type", &Psana::Acqiris::TdcDataV1Marker::type)
   ;
+
+  enum_<Psana::Acqiris::TdcDataV1Marker::Type>("Type")
+    .value("AuxIOSwitch",Psana::Acqiris::TdcDataV1Marker::AuxIOSwitch)
+    .value("EventCntSwitch",Psana::Acqiris::TdcDataV1Marker::EventCntSwitch)
+    .value("MemFullSwitch",Psana::Acqiris::TdcDataV1Marker::MemFullSwitch)
+    .value("AuxIOMarker",Psana::Acqiris::TdcDataV1Marker::AuxIOMarker)
+  ;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Acqiris::TdcDataV1Marker> >(-1));
 
   class_<Psana::Acqiris::TdcDataV1, boost::shared_ptr<Psana::Acqiris::TdcDataV1>, boost::noncopyable >("TdcDataV1", no_init)

@@ -31,6 +31,8 @@ void createWrappers(PyObject* module) {
   Py_INCREF(submodule);
   PyModule_AddObject(module, "Quartz", submodule);
   scope mod = object(handle<>(borrowed(submodule)));
+  {
+  scope outer = 
   class_<Psana::Quartz::ConfigV1, boost::shared_ptr<Psana::Quartz::ConfigV1>, boost::noncopyable >("ConfigV1", no_init)
     .def("black_level", &Psana::Quartz::ConfigV1::black_level)
     .def("gain_percent", &Psana::Quartz::ConfigV1::gain_percent)
@@ -46,6 +48,30 @@ void createWrappers(PyObject* module) {
     .def("output_offset", &Psana::Quartz::ConfigV1::output_offset)
     .def("output_resolution_bits", &Psana::Quartz::ConfigV1::output_resolution_bits)
   ;
+
+  enum_<Psana::Quartz::ConfigV1::Depth>("Depth")
+    .value("Eight_bit",Psana::Quartz::ConfigV1::Eight_bit)
+    .value("Ten_bit",Psana::Quartz::ConfigV1::Ten_bit)
+  ;
+
+  enum_<Psana::Quartz::ConfigV1::Binning>("Binning")
+    .value("x1",Psana::Quartz::ConfigV1::x1)
+    .value("x2",Psana::Quartz::ConfigV1::x2)
+    .value("x4",Psana::Quartz::ConfigV1::x4)
+  ;
+
+  enum_<Psana::Quartz::ConfigV1::Mirroring>("Mirroring")
+    .value("None",Psana::Quartz::ConfigV1::None)
+    .value("HFlip",Psana::Quartz::ConfigV1::HFlip)
+    .value("VFlip",Psana::Quartz::ConfigV1::VFlip)
+    .value("HVFlip",Psana::Quartz::ConfigV1::HVFlip)
+  ;
+
+  scope().attr("LUT_Size")=4096;
+  scope().attr("Row_Pixels")=2048;
+  scope().attr("Column_Pixels")=2048;
+  scope().attr("Output_LUT_Size")=4096;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Quartz::ConfigV1> >(Pds::TypeId::Id_QuartzConfig));
 
   {

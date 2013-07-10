@@ -31,16 +31,26 @@ void createWrappers(PyObject* module) {
   Py_INCREF(submodule);
   PyModule_AddObject(module, "Lusi", submodule);
   scope mod = object(handle<>(borrowed(submodule)));
+  {
+  scope outer = 
   class_<Psana::Lusi::DiodeFexConfigV1 >("DiodeFexConfigV1", no_init)
     .def("base", &Psana::Lusi::DiodeFexConfigV1::base)
     .def("scale", &Psana::Lusi::DiodeFexConfigV1::scale)
   ;
+
+  scope().attr("NRANGES")=3;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Lusi::DiodeFexConfigV1> >(Pds::TypeId::Id_DiodeFexConfig));
 
+  {
+  scope outer = 
   class_<Psana::Lusi::DiodeFexConfigV2 >("DiodeFexConfigV2", no_init)
     .def("base", &Psana::Lusi::DiodeFexConfigV2::base)
     .def("scale", &Psana::Lusi::DiodeFexConfigV2::scale)
   ;
+
+  scope().attr("NRANGES")=16;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Lusi::DiodeFexConfigV2> >(Pds::TypeId::Id_DiodeFexConfig));
 
   class_<Psana::Lusi::DiodeFexV1 >("DiodeFexV1", no_init)
@@ -48,26 +58,41 @@ void createWrappers(PyObject* module) {
   ;
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Lusi::DiodeFexV1> >(Pds::TypeId::Id_DiodeFex));
 
+  {
+  scope outer = 
   class_<Psana::Lusi::IpmFexConfigV1, boost::shared_ptr<Psana::Lusi::IpmFexConfigV1>, boost::noncopyable >("IpmFexConfigV1", no_init)
     .def("diode", &Psana::Lusi::IpmFexConfigV1::diode)
     .def("xscale", &Psana::Lusi::IpmFexConfigV1::xscale)
     .def("yscale", &Psana::Lusi::IpmFexConfigV1::yscale)
   ;
+
+  scope().attr("NCHANNELS")=4;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Lusi::IpmFexConfigV1> >(Pds::TypeId::Id_IpmFexConfig));
 
+  {
+  scope outer = 
   class_<Psana::Lusi::IpmFexConfigV2, boost::shared_ptr<Psana::Lusi::IpmFexConfigV2>, boost::noncopyable >("IpmFexConfigV2", no_init)
     .def("diode", &Psana::Lusi::IpmFexConfigV2::diode)
     .def("xscale", &Psana::Lusi::IpmFexConfigV2::xscale)
     .def("yscale", &Psana::Lusi::IpmFexConfigV2::yscale)
   ;
+
+  scope().attr("NCHANNELS")=4;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Lusi::IpmFexConfigV2> >(Pds::TypeId::Id_IpmFexConfig));
 
+  {
+  scope outer = 
   class_<Psana::Lusi::IpmFexV1 >("IpmFexV1", no_init)
     .def("channel", &Psana::Lusi::IpmFexV1::channel)
     .def("sum", &Psana::Lusi::IpmFexV1::sum)
     .def("xpos", &Psana::Lusi::IpmFexV1::xpos)
     .def("ypos", &Psana::Lusi::IpmFexV1::ypos)
   ;
+
+  scope().attr("NCHANNELS")=4;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Lusi::IpmFexV1> >(Pds::TypeId::Id_IpmFex));
 
   class_<Psana::Lusi::PimImageConfigV1 >("PimImageConfigV1", no_init)

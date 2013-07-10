@@ -31,6 +31,8 @@ void createWrappers(PyObject* module) {
   Py_INCREF(submodule);
   PyModule_AddObject(module, "Timepix", submodule);
   scope mod = object(handle<>(borrowed(submodule)));
+  {
+  scope outer = 
   class_<Psana::Timepix::ConfigV1, boost::shared_ptr<Psana::Timepix::ConfigV1>, boost::noncopyable >("ConfigV1", no_init)
     .def("readoutSpeed", &Psana::Timepix::ConfigV1::readoutSpeed)
     .def("triggerMode", &Psana::Timepix::ConfigV1::triggerMode)
@@ -92,8 +94,24 @@ void createWrappers(PyObject* module) {
     .def("dac3BiasLvds", &Psana::Timepix::ConfigV1::dac3BiasLvds)
     .def("dac3RefLvds", &Psana::Timepix::ConfigV1::dac3RefLvds)
   ;
+
+  enum_<Psana::Timepix::ConfigV1::ReadoutSpeed>("ReadoutSpeed")
+    .value("ReadoutSpeed_Slow",Psana::Timepix::ConfigV1::ReadoutSpeed_Slow)
+    .value("ReadoutSpeed_Fast",Psana::Timepix::ConfigV1::ReadoutSpeed_Fast)
+  ;
+
+  enum_<Psana::Timepix::ConfigV1::TriggerMode>("TriggerMode")
+    .value("TriggerMode_ExtPos",Psana::Timepix::ConfigV1::TriggerMode_ExtPos)
+    .value("TriggerMode_ExtNeg",Psana::Timepix::ConfigV1::TriggerMode_ExtNeg)
+    .value("TriggerMode_Soft",Psana::Timepix::ConfigV1::TriggerMode_Soft)
+  ;
+
+  scope().attr("ChipCount")=4;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Timepix::ConfigV1> >(Pds::TypeId::Id_TimepixConfig));
 
+  {
+  scope outer = 
   class_<Psana::Timepix::ConfigV2, boost::shared_ptr<Psana::Timepix::ConfigV2>, boost::noncopyable >("ConfigV2", no_init)
     .def("readoutSpeed", &Psana::Timepix::ConfigV2::readoutSpeed)
     .def("triggerMode", &Psana::Timepix::ConfigV2::triggerMode)
@@ -168,8 +186,26 @@ void createWrappers(PyObject* module) {
     .def("chip3ID", &Psana::Timepix::ConfigV2::chip3ID)
     .def("chipCount", &Psana::Timepix::ConfigV2::chipCount)
   ;
+
+  enum_<Psana::Timepix::ConfigV2::ReadoutSpeed>("ReadoutSpeed")
+    .value("ReadoutSpeed_Slow",Psana::Timepix::ConfigV2::ReadoutSpeed_Slow)
+    .value("ReadoutSpeed_Fast",Psana::Timepix::ConfigV2::ReadoutSpeed_Fast)
+  ;
+
+  enum_<Psana::Timepix::ConfigV2::TriggerMode>("TriggerMode")
+    .value("TriggerMode_ExtPos",Psana::Timepix::ConfigV2::TriggerMode_ExtPos)
+    .value("TriggerMode_ExtNeg",Psana::Timepix::ConfigV2::TriggerMode_ExtNeg)
+    .value("TriggerMode_Soft",Psana::Timepix::ConfigV2::TriggerMode_Soft)
+  ;
+
+  scope().attr("ChipCount")=4;
+  scope().attr("ChipNameMax")=16;
+  scope().attr("PixelThreshMax")=4*256*256;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Timepix::ConfigV2> >(Pds::TypeId::Id_TimepixConfig));
 
+  {
+  scope outer = 
   class_<Psana::Timepix::ConfigV3, boost::shared_ptr<Psana::Timepix::ConfigV3>, boost::noncopyable >("ConfigV3", no_init)
     .def("readoutSpeed", &Psana::Timepix::ConfigV3::readoutSpeed)
     .def("timepixMode", &Psana::Timepix::ConfigV3::timepixMode)
@@ -246,8 +282,25 @@ void createWrappers(PyObject* module) {
     .def("chip3ID", &Psana::Timepix::ConfigV3::chip3ID)
     .def("chipCount", &Psana::Timepix::ConfigV3::chipCount)
   ;
+
+  enum_<Psana::Timepix::ConfigV3::ReadoutSpeed>("ReadoutSpeed")
+    .value("ReadoutSpeed_Slow",Psana::Timepix::ConfigV3::ReadoutSpeed_Slow)
+    .value("ReadoutSpeed_Fast",Psana::Timepix::ConfigV3::ReadoutSpeed_Fast)
+  ;
+
+  enum_<Psana::Timepix::ConfigV3::TimepixMode>("TimepixMode")
+    .value("TimepixMode_Counting",Psana::Timepix::ConfigV3::TimepixMode_Counting)
+    .value("TimepixMode_TOT",Psana::Timepix::ConfigV3::TimepixMode_TOT)
+  ;
+
+  scope().attr("ChipCount")=4;
+  scope().attr("ChipNameMax")=16;
+  scope().attr("PixelThreshMax")=4*256*256;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Timepix::ConfigV3> >(Pds::TypeId::Id_TimepixConfig));
 
+  {
+  scope outer = 
   class_<Psana::Timepix::DataV1, boost::shared_ptr<Psana::Timepix::DataV1>, boost::noncopyable >("DataV1", no_init)
     .def("timestamp", &Psana::Timepix::DataV1::timestamp)
     .def("frameCounter", &Psana::Timepix::DataV1::frameCounter)
@@ -258,8 +311,17 @@ void createWrappers(PyObject* module) {
     .def("depth", &Psana::Timepix::DataV1::depth)
     .def("depth_bytes", &Psana::Timepix::DataV1::depth_bytes)
   ;
+
+  scope().attr("Height")=512;
+  scope().attr("Width")=512;
+  scope().attr("Depth")=14;
+  scope().attr("DepthBytes")=2;
+  scope().attr("MaxPixelValue")=11810;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Timepix::DataV1> >(Pds::TypeId::Id_TimepixData));
 
+  {
+  scope outer = 
   class_<Psana::Timepix::DataV2, boost::shared_ptr<Psana::Timepix::DataV2>, boost::noncopyable >("DataV2", no_init)
     .def("width", &Psana::Timepix::DataV2::width)
     .def("height", &Psana::Timepix::DataV2::height)
@@ -270,6 +332,10 @@ void createWrappers(PyObject* module) {
     .def("depth", &Psana::Timepix::DataV2::depth)
     .def("depth_bytes", &Psana::Timepix::DataV2::depth_bytes)
   ;
+
+  scope().attr("Depth")=14;
+  scope().attr("MaxPixelValue")=11810;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Timepix::DataV2> >(Pds::TypeId::Id_TimepixData));
 
   {
