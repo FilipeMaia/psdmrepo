@@ -19,9 +19,15 @@ ConfigV1::~ConfigV1()
 }
 
 
-uint32_t ConfigV1::numLinks() const { return m_xtcObj->numLinks(); }
+uint32_t ConfigV1::numLinks() const {
+  return m_xtcObj->numLinks();
+}
 
-uint32_t ConfigV1::payloadSizePerLink() const { return m_xtcObj->payloadSizePerLink(); }
+
+uint32_t ConfigV1::payloadSizePerLink() const {
+  return m_xtcObj->payloadSizePerLink();
+}
+
 ConfigV2::ConfigV2(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::PNCCD::ConfigV2()
   , m_xtcObj(xtcPtr)
@@ -32,29 +38,65 @@ ConfigV2::~ConfigV2()
 }
 
 
-uint32_t ConfigV2::numLinks() const { return m_xtcObj->numLinks(); }
+uint32_t ConfigV2::numLinks() const {
+  return m_xtcObj->numLinks();
+}
 
-uint32_t ConfigV2::payloadSizePerLink() const { return m_xtcObj->payloadSizePerLink(); }
 
-uint32_t ConfigV2::numChannels() const { return m_xtcObj->numChannels(); }
+uint32_t ConfigV2::payloadSizePerLink() const {
+  return m_xtcObj->payloadSizePerLink();
+}
 
-uint32_t ConfigV2::numRows() const { return m_xtcObj->numRows(); }
 
-uint32_t ConfigV2::numSubmoduleChannels() const { return m_xtcObj->numSubmoduleChannels(); }
+uint32_t ConfigV2::numChannels() const {
+  return m_xtcObj->numChannels();
+}
 
-uint32_t ConfigV2::numSubmoduleRows() const { return m_xtcObj->numSubmoduleRows(); }
 
-uint32_t ConfigV2::numSubmodules() const { return m_xtcObj->numSubmodules(); }
+uint32_t ConfigV2::numRows() const {
+  return m_xtcObj->numRows();
+}
 
-uint32_t ConfigV2::camexMagic() const { return m_xtcObj->camexMagic(); }
 
-const char* ConfigV2::info() const { return m_xtcObj->info(); }
+uint32_t ConfigV2::numSubmoduleChannels() const {
+  return m_xtcObj->numSubmoduleChannels();
+}
 
-const char* ConfigV2::timingFName() const { return m_xtcObj->timingFName(); }
 
-std::vector<int> ConfigV2::info_shape() const { return m_xtcObj->info_shape(); }
+uint32_t ConfigV2::numSubmoduleRows() const {
+  return m_xtcObj->numSubmoduleRows();
+}
 
-std::vector<int> ConfigV2::timingFName_shape() const { return m_xtcObj->timingFName_shape(); }
+
+uint32_t ConfigV2::numSubmodules() const {
+  return m_xtcObj->numSubmodules();
+}
+
+
+uint32_t ConfigV2::camexMagic() const {
+  return m_xtcObj->camexMagic();
+}
+
+
+const char* ConfigV2::info() const {
+  return m_xtcObj->info();
+}
+
+
+const char* ConfigV2::timingFName() const {
+  return m_xtcObj->timingFName();
+}
+
+
+std::vector<int> ConfigV2::info_shape() const {
+  return m_xtcObj->info_shape();
+}
+
+
+std::vector<int> ConfigV2::timingFName_shape() const {
+  return m_xtcObj->timingFName_shape();
+}
+
 template <typename Config>
 FrameV1<Config>::FrameV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const Config>& cfgPtr)
   : Psana::PNCCD::FrameV1()
@@ -69,20 +111,32 @@ FrameV1<Config>::~FrameV1()
 
 
 template <typename Config>
-uint32_t FrameV1<Config>::specialWord() const { return m_xtcObj->specialWord(); }
+uint32_t FrameV1<Config>::specialWord() const {
+  return m_xtcObj->specialWord();
+}
+
 
 template <typename Config>
-uint32_t FrameV1<Config>::frameNumber() const { return m_xtcObj->frameNumber(); }
+uint32_t FrameV1<Config>::frameNumber() const {
+  return m_xtcObj->frameNumber();
+}
+
 
 template <typename Config>
-uint32_t FrameV1<Config>::timeStampHi() const { return m_xtcObj->timeStampHi(); }
+uint32_t FrameV1<Config>::timeStampHi() const {
+  return m_xtcObj->timeStampHi();
+}
+
 
 template <typename Config>
-uint32_t FrameV1<Config>::timeStampLo() const { return m_xtcObj->timeStampLo(); }
+uint32_t FrameV1<Config>::timeStampLo() const {
+  return m_xtcObj->timeStampLo();
+}
+
 
 template <typename Config>
 ndarray<const uint16_t, 1> FrameV1<Config>::_data() const {
-  return m_xtcObj->_data(*m_cfgPtr);
+  return m_xtcObj->_data(*m_cfgPtr, m_xtcObj);
 }
 
 
@@ -103,15 +157,30 @@ FullFrameV1::~FullFrameV1()
 }
 
 
-uint32_t FullFrameV1::specialWord() const { return m_xtcObj->specialWord(); }
+uint32_t FullFrameV1::specialWord() const {
+  return m_xtcObj->specialWord();
+}
 
-uint32_t FullFrameV1::frameNumber() const { return m_xtcObj->frameNumber(); }
 
-uint32_t FullFrameV1::timeStampHi() const { return m_xtcObj->timeStampHi(); }
+uint32_t FullFrameV1::frameNumber() const {
+  return m_xtcObj->frameNumber();
+}
 
-uint32_t FullFrameV1::timeStampLo() const { return m_xtcObj->timeStampLo(); }
 
-ndarray<const uint16_t, 2> FullFrameV1::data() const { return m_xtcObj->data(); }
+uint32_t FullFrameV1::timeStampHi() const {
+  return m_xtcObj->timeStampHi();
+}
+
+
+uint32_t FullFrameV1::timeStampLo() const {
+  return m_xtcObj->timeStampLo();
+}
+
+
+ndarray<const uint16_t, 2> FullFrameV1::data() const {
+  return m_xtcObj->data(m_xtcObj);
+}
+
 template <typename Config>
 FramesV1<Config>::FramesV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const Config>& cfgPtr)
   : Psana::PNCCD::FramesV1()

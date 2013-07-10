@@ -29,12 +29,24 @@ ConfigV1::~ConfigV1()
 }
 
 
-Psana::Orca::ConfigV1::ReadoutMode ConfigV1::mode() const { return pds_to_psana(m_xtcObj->mode()); }
+Psana::Orca::ConfigV1::ReadoutMode ConfigV1::mode() const {
+  return pds_to_psana(m_xtcObj->mode());
+}
 
-Psana::Orca::ConfigV1::Cooling ConfigV1::cooling() const { return pds_to_psana(m_xtcObj->cooling()); }
 
-uint8_t ConfigV1::defect_pixel_correction_enabled() const { return m_xtcObj->defect_pixel_correction_enabled(); }
+Psana::Orca::ConfigV1::Cooling ConfigV1::cooling() const {
+  return pds_to_psana(m_xtcObj->cooling());
+}
 
-uint32_t ConfigV1::rows() const { return m_xtcObj->rows(); }
+
+uint8_t ConfigV1::defect_pixel_correction_enabled() const {
+  return m_xtcObj->defect_pixel_correction_enabled();
+}
+
+
+uint32_t ConfigV1::rows() const {
+  return m_xtcObj->rows();
+}
+
 } // namespace Orca
 } // namespace psddl_pds2psana

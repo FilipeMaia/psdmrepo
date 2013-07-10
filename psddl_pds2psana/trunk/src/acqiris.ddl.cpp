@@ -71,16 +71,28 @@ ConfigV1::~ConfigV1()
 }
 
 
-uint32_t ConfigV1::nbrConvertersPerChannel() const { return m_xtcObj->nbrConvertersPerChannel(); }
+uint32_t ConfigV1::nbrConvertersPerChannel() const {
+  return m_xtcObj->nbrConvertersPerChannel();
+}
 
-uint32_t ConfigV1::channelMask() const { return m_xtcObj->channelMask(); }
 
-uint32_t ConfigV1::nbrBanks() const { return m_xtcObj->nbrBanks(); }
+uint32_t ConfigV1::channelMask() const {
+  return m_xtcObj->channelMask();
+}
+
+
+uint32_t ConfigV1::nbrBanks() const {
+  return m_xtcObj->nbrBanks();
+}
+
 const Psana::Acqiris::TrigV1& ConfigV1::trig() const { return _trig; }
 const Psana::Acqiris::HorizV1& ConfigV1::horiz() const { return _horiz; }
 ndarray<const Psana::Acqiris::VertV1, 1> ConfigV1::vert() const { return _vert_ndarray_storage_; }
 
-uint32_t ConfigV1::nbrChannels() const { return m_xtcObj->nbrChannels(); }
+uint32_t ConfigV1::nbrChannels() const {
+  return m_xtcObj->nbrChannels();
+}
+
 Psana::Acqiris::TimestampV1 pds_to_psana(PsddlPds::Acqiris::TimestampV1 pds)
 {
   return Psana::Acqiris::TimestampV1(pds.pos(), pds.timeStampLo(), pds.timeStampHi());
@@ -110,19 +122,28 @@ DataDescV1Elem<Config>::~DataDescV1Elem()
 
 
 template <typename Config>
-uint32_t DataDescV1Elem<Config>::nbrSamplesInSeg() const { return m_xtcObj->nbrSamplesInSeg(); }
+uint32_t DataDescV1Elem<Config>::nbrSamplesInSeg() const {
+  return m_xtcObj->nbrSamplesInSeg();
+}
+
 
 template <typename Config>
-uint32_t DataDescV1Elem<Config>::indexFirstPoint() const { return m_xtcObj->indexFirstPoint(); }
+uint32_t DataDescV1Elem<Config>::indexFirstPoint() const {
+  return m_xtcObj->indexFirstPoint();
+}
+
 
 template <typename Config>
-uint32_t DataDescV1Elem<Config>::nbrSegments() const { return m_xtcObj->nbrSegments(); }
+uint32_t DataDescV1Elem<Config>::nbrSegments() const {
+  return m_xtcObj->nbrSegments();
+}
+
 template <typename Config>
 ndarray<const Psana::Acqiris::TimestampV1, 1> DataDescV1Elem<Config>::timestamp() const { return _timestamps_ndarray_storage_; }
 
 template <typename Config>
 ndarray<const int16_t, 2> DataDescV1Elem<Config>::waveforms() const {
-  return m_xtcObj->waveforms(*m_cfgPtr);
+  return m_xtcObj->waveforms(*m_cfgPtr, m_xtcObj);
 }
 
 template class DataDescV1Elem<PsddlPds::Acqiris::ConfigV1>;

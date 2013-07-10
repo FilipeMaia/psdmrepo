@@ -19,13 +19,25 @@ ConfigV1::~ConfigV1()
 }
 
 
-float ConfigV1::exposureTime() const { return m_xtcObj->exposureTime(); }
+float ConfigV1::exposureTime() const {
+  return m_xtcObj->exposureTime();
+}
 
-ndarray<const double, 1> ConfigV1::waveLenCalib() const { return m_xtcObj->waveLenCalib(); }
 
-ndarray<const double, 1> ConfigV1::nonlinCorrect() const { return m_xtcObj->nonlinCorrect(); }
+ndarray<const double, 1> ConfigV1::waveLenCalib() const {
+  return m_xtcObj->waveLenCalib(m_xtcObj);
+}
 
-double ConfigV1::strayLightConstant() const { return m_xtcObj->strayLightConstant(); }
+
+ndarray<const double, 1> ConfigV1::nonlinCorrect() const {
+  return m_xtcObj->nonlinCorrect(m_xtcObj);
+}
+
+
+double ConfigV1::strayLightConstant() const {
+  return m_xtcObj->strayLightConstant();
+}
+
 Psana::OceanOptics::timespec64 pds_to_psana(PsddlPds::OceanOptics::timespec64 pds)
 {
   return Psana::OceanOptics::timespec64(pds.tv_sec(), pds.tv_nsec());
@@ -48,16 +60,28 @@ DataV1<Config>::~DataV1()
 
 
 template <typename Config>
-ndarray<const uint16_t, 1> DataV1<Config>::data() const { return m_xtcObj->data(); }
+ndarray<const uint16_t, 1> DataV1<Config>::data() const {
+  return m_xtcObj->data(m_xtcObj);
+}
+
 
 template <typename Config>
-uint64_t DataV1<Config>::frameCounter() const { return m_xtcObj->frameCounter(); }
+uint64_t DataV1<Config>::frameCounter() const {
+  return m_xtcObj->frameCounter();
+}
+
 
 template <typename Config>
-uint64_t DataV1<Config>::numDelayedFrames() const { return m_xtcObj->numDelayedFrames(); }
+uint64_t DataV1<Config>::numDelayedFrames() const {
+  return m_xtcObj->numDelayedFrames();
+}
+
 
 template <typename Config>
-uint64_t DataV1<Config>::numDiscardFrames() const { return m_xtcObj->numDiscardFrames(); }
+uint64_t DataV1<Config>::numDiscardFrames() const {
+  return m_xtcObj->numDiscardFrames();
+}
+
 template <typename Config>
 const Psana::OceanOptics::timespec64& DataV1<Config>::timeFrameStart() const { return _tsTimeFrameStart; }
 template <typename Config>
@@ -66,16 +90,28 @@ template <typename Config>
 const Psana::OceanOptics::timespec64& DataV1<Config>::timeFrameEnd() const { return _tsTimeFrameEnd; }
 
 template <typename Config>
-int8_t DataV1<Config>::numSpectraInData() const { return m_xtcObj->numSpectraInData(); }
+int8_t DataV1<Config>::numSpectraInData() const {
+  return m_xtcObj->numSpectraInData();
+}
+
 
 template <typename Config>
-int8_t DataV1<Config>::numSpectraInQueue() const { return m_xtcObj->numSpectraInQueue(); }
+int8_t DataV1<Config>::numSpectraInQueue() const {
+  return m_xtcObj->numSpectraInQueue();
+}
+
 
 template <typename Config>
-int8_t DataV1<Config>::numSpectraUnused() const { return m_xtcObj->numSpectraUnused(); }
+int8_t DataV1<Config>::numSpectraUnused() const {
+  return m_xtcObj->numSpectraUnused();
+}
+
 
 template <typename Config>
-double DataV1<Config>::durationOfFrame() const { return m_xtcObj->durationOfFrame(); }
+double DataV1<Config>::durationOfFrame() const {
+  return m_xtcObj->durationOfFrame();
+}
+
 
 template <typename Config>
 double DataV1<Config>::nonlinerCorrected(uint32_t iPixel) const {

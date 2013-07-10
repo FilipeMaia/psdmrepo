@@ -114,35 +114,80 @@ BldDataGMDV0::~BldDataGMDV0()
 }
 
 
-const char* BldDataGMDV0::gasType() const { return m_xtcObj->gasType(); }
+const char* BldDataGMDV0::gasType() const {
+  return m_xtcObj->gasType();
+}
 
-double BldDataGMDV0::pressure() const { return m_xtcObj->pressure(); }
 
-double BldDataGMDV0::temperature() const { return m_xtcObj->temperature(); }
+double BldDataGMDV0::pressure() const {
+  return m_xtcObj->pressure();
+}
 
-double BldDataGMDV0::current() const { return m_xtcObj->current(); }
 
-double BldDataGMDV0::hvMeshElectron() const { return m_xtcObj->hvMeshElectron(); }
+double BldDataGMDV0::temperature() const {
+  return m_xtcObj->temperature();
+}
 
-double BldDataGMDV0::hvMeshIon() const { return m_xtcObj->hvMeshIon(); }
 
-double BldDataGMDV0::hvMultIon() const { return m_xtcObj->hvMultIon(); }
+double BldDataGMDV0::current() const {
+  return m_xtcObj->current();
+}
 
-double BldDataGMDV0::chargeQ() const { return m_xtcObj->chargeQ(); }
 
-double BldDataGMDV0::photonEnergy() const { return m_xtcObj->photonEnergy(); }
+double BldDataGMDV0::hvMeshElectron() const {
+  return m_xtcObj->hvMeshElectron();
+}
 
-double BldDataGMDV0::multPulseIntensity() const { return m_xtcObj->multPulseIntensity(); }
 
-double BldDataGMDV0::keithleyPulseIntensity() const { return m_xtcObj->keithleyPulseIntensity(); }
+double BldDataGMDV0::hvMeshIon() const {
+  return m_xtcObj->hvMeshIon();
+}
 
-double BldDataGMDV0::pulseEnergy() const { return m_xtcObj->pulseEnergy(); }
 
-double BldDataGMDV0::pulseEnergyFEE() const { return m_xtcObj->pulseEnergyFEE(); }
+double BldDataGMDV0::hvMultIon() const {
+  return m_xtcObj->hvMultIon();
+}
 
-double BldDataGMDV0::transmission() const { return m_xtcObj->transmission(); }
 
-double BldDataGMDV0::transmissionFEE() const { return m_xtcObj->transmissionFEE(); }
+double BldDataGMDV0::chargeQ() const {
+  return m_xtcObj->chargeQ();
+}
+
+
+double BldDataGMDV0::photonEnergy() const {
+  return m_xtcObj->photonEnergy();
+}
+
+
+double BldDataGMDV0::multPulseIntensity() const {
+  return m_xtcObj->multPulseIntensity();
+}
+
+
+double BldDataGMDV0::keithleyPulseIntensity() const {
+  return m_xtcObj->keithleyPulseIntensity();
+}
+
+
+double BldDataGMDV0::pulseEnergy() const {
+  return m_xtcObj->pulseEnergy();
+}
+
+
+double BldDataGMDV0::pulseEnergyFEE() const {
+  return m_xtcObj->pulseEnergyFEE();
+}
+
+
+double BldDataGMDV0::transmission() const {
+  return m_xtcObj->transmission();
+}
+
+
+double BldDataGMDV0::transmissionFEE() const {
+  return m_xtcObj->transmissionFEE();
+}
+
 BldDataGMDV1::BldDataGMDV1(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::Bld::BldDataGMDV1()
   , m_xtcObj(xtcPtr)
@@ -153,14 +198,29 @@ BldDataGMDV1::~BldDataGMDV1()
 }
 
 
-double BldDataGMDV1::milliJoulesPerPulse() const { return m_xtcObj->milliJoulesPerPulse(); }
+double BldDataGMDV1::milliJoulesPerPulse() const {
+  return m_xtcObj->milliJoulesPerPulse();
+}
 
-double BldDataGMDV1::milliJoulesAverage() const { return m_xtcObj->milliJoulesAverage(); }
 
-double BldDataGMDV1::correctedSumPerPulse() const { return m_xtcObj->correctedSumPerPulse(); }
+double BldDataGMDV1::milliJoulesAverage() const {
+  return m_xtcObj->milliJoulesAverage();
+}
 
-double BldDataGMDV1::bgValuePerSample() const { return m_xtcObj->bgValuePerSample(); }
 
-double BldDataGMDV1::relativeEnergyPerPulse() const { return m_xtcObj->relativeEnergyPerPulse(); }
+double BldDataGMDV1::correctedSumPerPulse() const {
+  return m_xtcObj->correctedSumPerPulse();
+}
+
+
+double BldDataGMDV1::bgValuePerSample() const {
+  return m_xtcObj->bgValuePerSample();
+}
+
+
+double BldDataGMDV1::relativeEnergyPerPulse() const {
+  return m_xtcObj->relativeEnergyPerPulse();
+}
+
 } // namespace Bld
 } // namespace psddl_pds2psana

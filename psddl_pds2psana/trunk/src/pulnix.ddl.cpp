@@ -34,25 +34,55 @@ TM6740ConfigV1::~TM6740ConfigV1()
 }
 
 
-uint16_t TM6740ConfigV1::gain_a() const { return m_xtcObj->gain_a(); }
+uint16_t TM6740ConfigV1::gain_a() const {
+  return m_xtcObj->gain_a();
+}
 
-uint16_t TM6740ConfigV1::gain_b() const { return m_xtcObj->gain_b(); }
 
-uint16_t TM6740ConfigV1::vref() const { return m_xtcObj->vref(); }
+uint16_t TM6740ConfigV1::gain_b() const {
+  return m_xtcObj->gain_b();
+}
 
-uint16_t TM6740ConfigV1::shutter_width() const { return m_xtcObj->shutter_width(); }
 
-uint8_t TM6740ConfigV1::gain_balance() const { return m_xtcObj->gain_balance(); }
+uint16_t TM6740ConfigV1::vref() const {
+  return m_xtcObj->vref();
+}
 
-Psana::Pulnix::TM6740ConfigV1::Depth TM6740ConfigV1::output_resolution() const { return pds_to_psana(m_xtcObj->output_resolution()); }
 
-Psana::Pulnix::TM6740ConfigV1::Binning TM6740ConfigV1::horizontal_binning() const { return pds_to_psana(m_xtcObj->horizontal_binning()); }
+uint16_t TM6740ConfigV1::shutter_width() const {
+  return m_xtcObj->shutter_width();
+}
 
-Psana::Pulnix::TM6740ConfigV1::Binning TM6740ConfigV1::vertical_binning() const { return pds_to_psana(m_xtcObj->vertical_binning()); }
 
-Psana::Pulnix::TM6740ConfigV1::LookupTable TM6740ConfigV1::lookuptable_mode() const { return pds_to_psana(m_xtcObj->lookuptable_mode()); }
+uint8_t TM6740ConfigV1::gain_balance() const {
+  return m_xtcObj->gain_balance();
+}
 
-uint8_t TM6740ConfigV1::output_resolution_bits() const { return m_xtcObj->output_resolution_bits(); }
+
+Psana::Pulnix::TM6740ConfigV1::Depth TM6740ConfigV1::output_resolution() const {
+  return pds_to_psana(m_xtcObj->output_resolution());
+}
+
+
+Psana::Pulnix::TM6740ConfigV1::Binning TM6740ConfigV1::horizontal_binning() const {
+  return pds_to_psana(m_xtcObj->horizontal_binning());
+}
+
+
+Psana::Pulnix::TM6740ConfigV1::Binning TM6740ConfigV1::vertical_binning() const {
+  return pds_to_psana(m_xtcObj->vertical_binning());
+}
+
+
+Psana::Pulnix::TM6740ConfigV1::LookupTable TM6740ConfigV1::lookuptable_mode() const {
+  return pds_to_psana(m_xtcObj->lookuptable_mode());
+}
+
+
+uint8_t TM6740ConfigV1::output_resolution_bits() const {
+  return m_xtcObj->output_resolution_bits();
+}
+
 Psana::Pulnix::TM6740ConfigV2::Depth pds_to_psana(PsddlPds::Pulnix::TM6740ConfigV2::Depth e)
 {
   return Psana::Pulnix::TM6740ConfigV2::Depth(e);
@@ -78,24 +108,54 @@ TM6740ConfigV2::~TM6740ConfigV2()
 }
 
 
-uint16_t TM6740ConfigV2::gain_a() const { return m_xtcObj->gain_a(); }
+uint16_t TM6740ConfigV2::gain_a() const {
+  return m_xtcObj->gain_a();
+}
 
-uint16_t TM6740ConfigV2::gain_b() const { return m_xtcObj->gain_b(); }
 
-uint16_t TM6740ConfigV2::vref_a() const { return m_xtcObj->vref_a(); }
+uint16_t TM6740ConfigV2::gain_b() const {
+  return m_xtcObj->gain_b();
+}
 
-uint16_t TM6740ConfigV2::vref_b() const { return m_xtcObj->vref_b(); }
 
-uint8_t TM6740ConfigV2::gain_balance() const { return m_xtcObj->gain_balance(); }
+uint16_t TM6740ConfigV2::vref_a() const {
+  return m_xtcObj->vref_a();
+}
 
-Psana::Pulnix::TM6740ConfigV2::Depth TM6740ConfigV2::output_resolution() const { return pds_to_psana(m_xtcObj->output_resolution()); }
 
-Psana::Pulnix::TM6740ConfigV2::Binning TM6740ConfigV2::horizontal_binning() const { return pds_to_psana(m_xtcObj->horizontal_binning()); }
+uint16_t TM6740ConfigV2::vref_b() const {
+  return m_xtcObj->vref_b();
+}
 
-Psana::Pulnix::TM6740ConfigV2::Binning TM6740ConfigV2::vertical_binning() const { return pds_to_psana(m_xtcObj->vertical_binning()); }
 
-Psana::Pulnix::TM6740ConfigV2::LookupTable TM6740ConfigV2::lookuptable_mode() const { return pds_to_psana(m_xtcObj->lookuptable_mode()); }
+uint8_t TM6740ConfigV2::gain_balance() const {
+  return m_xtcObj->gain_balance();
+}
 
-uint8_t TM6740ConfigV2::output_resolution_bits() const { return m_xtcObj->output_resolution_bits(); }
+
+Psana::Pulnix::TM6740ConfigV2::Depth TM6740ConfigV2::output_resolution() const {
+  return pds_to_psana(m_xtcObj->output_resolution());
+}
+
+
+Psana::Pulnix::TM6740ConfigV2::Binning TM6740ConfigV2::horizontal_binning() const {
+  return pds_to_psana(m_xtcObj->horizontal_binning());
+}
+
+
+Psana::Pulnix::TM6740ConfigV2::Binning TM6740ConfigV2::vertical_binning() const {
+  return pds_to_psana(m_xtcObj->vertical_binning());
+}
+
+
+Psana::Pulnix::TM6740ConfigV2::LookupTable TM6740ConfigV2::lookuptable_mode() const {
+  return pds_to_psana(m_xtcObj->lookuptable_mode());
+}
+
+
+uint8_t TM6740ConfigV2::output_resolution_bits() const {
+  return m_xtcObj->output_resolution_bits();
+}
+
 } // namespace Pulnix
 } // namespace psddl_pds2psana

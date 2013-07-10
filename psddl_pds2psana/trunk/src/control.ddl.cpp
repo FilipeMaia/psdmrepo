@@ -55,16 +55,31 @@ ConfigV1::~ConfigV1()
 }
 
 
-uint32_t ConfigV1::events() const { return m_xtcObj->events(); }
+uint32_t ConfigV1::events() const {
+  return m_xtcObj->events();
+}
 
-uint8_t ConfigV1::uses_duration() const { return m_xtcObj->uses_duration(); }
 
-uint8_t ConfigV1::uses_events() const { return m_xtcObj->uses_events(); }
+uint8_t ConfigV1::uses_duration() const {
+  return m_xtcObj->uses_duration();
+}
+
+
+uint8_t ConfigV1::uses_events() const {
+  return m_xtcObj->uses_events();
+}
+
 const Pds::ClockTime& ConfigV1::duration() const { return _duration; }
 
-uint32_t ConfigV1::npvControls() const { return m_xtcObj->npvControls(); }
+uint32_t ConfigV1::npvControls() const {
+  return m_xtcObj->npvControls();
+}
 
-uint32_t ConfigV1::npvMonitors() const { return m_xtcObj->npvMonitors(); }
+
+uint32_t ConfigV1::npvMonitors() const {
+  return m_xtcObj->npvMonitors();
+}
+
 ndarray<const Psana::ControlData::PVControl, 1> ConfigV1::pvControls() const { return _pvControls_ndarray_storage_; }
 ndarray<const Psana::ControlData::PVMonitor, 1> ConfigV1::pvMonitors() const { return _pvMonitors_ndarray_storage_; }
 ConfigV2::ConfigV2(const boost::shared_ptr<const XtcType>& xtcPtr)
@@ -108,18 +123,36 @@ ConfigV2::~ConfigV2()
 }
 
 
-uint32_t ConfigV2::events() const { return m_xtcObj->events(); }
+uint32_t ConfigV2::events() const {
+  return m_xtcObj->events();
+}
 
-uint8_t ConfigV2::uses_duration() const { return m_xtcObj->uses_duration(); }
 
-uint8_t ConfigV2::uses_events() const { return m_xtcObj->uses_events(); }
+uint8_t ConfigV2::uses_duration() const {
+  return m_xtcObj->uses_duration();
+}
+
+
+uint8_t ConfigV2::uses_events() const {
+  return m_xtcObj->uses_events();
+}
+
 const Pds::ClockTime& ConfigV2::duration() const { return _duration; }
 
-uint32_t ConfigV2::npvControls() const { return m_xtcObj->npvControls(); }
+uint32_t ConfigV2::npvControls() const {
+  return m_xtcObj->npvControls();
+}
 
-uint32_t ConfigV2::npvMonitors() const { return m_xtcObj->npvMonitors(); }
 
-uint32_t ConfigV2::npvLabels() const { return m_xtcObj->npvLabels(); }
+uint32_t ConfigV2::npvMonitors() const {
+  return m_xtcObj->npvMonitors();
+}
+
+
+uint32_t ConfigV2::npvLabels() const {
+  return m_xtcObj->npvLabels();
+}
+
 ndarray<const Psana::ControlData::PVControl, 1> ConfigV2::pvControls() const { return _pvControls_ndarray_storage_; }
 ndarray<const Psana::ControlData::PVMonitor, 1> ConfigV2::pvMonitors() const { return _pvMonitors_ndarray_storage_; }
 ndarray<const Psana::ControlData::PVLabel, 1> ConfigV2::pvLabels() const { return _pvLabels_ndarray_storage_; }

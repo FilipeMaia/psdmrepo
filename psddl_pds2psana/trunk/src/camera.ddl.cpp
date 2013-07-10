@@ -55,17 +55,32 @@ FrameFexConfigV1::~FrameFexConfigV1()
 }
 
 
-Psana::Camera::FrameFexConfigV1::Forwarding FrameFexConfigV1::forwarding() const { return pds_to_psana(m_xtcObj->forwarding()); }
+Psana::Camera::FrameFexConfigV1::Forwarding FrameFexConfigV1::forwarding() const {
+  return pds_to_psana(m_xtcObj->forwarding());
+}
 
-uint32_t FrameFexConfigV1::forward_prescale() const { return m_xtcObj->forward_prescale(); }
 
-Psana::Camera::FrameFexConfigV1::Processing FrameFexConfigV1::processing() const { return pds_to_psana(m_xtcObj->processing()); }
+uint32_t FrameFexConfigV1::forward_prescale() const {
+  return m_xtcObj->forward_prescale();
+}
+
+
+Psana::Camera::FrameFexConfigV1::Processing FrameFexConfigV1::processing() const {
+  return pds_to_psana(m_xtcObj->processing());
+}
+
 const Psana::Camera::FrameCoord& FrameFexConfigV1::roiBegin() const { return _roiBegin; }
 const Psana::Camera::FrameCoord& FrameFexConfigV1::roiEnd() const { return _roiEnd; }
 
-uint32_t FrameFexConfigV1::threshold() const { return m_xtcObj->threshold(); }
+uint32_t FrameFexConfigV1::threshold() const {
+  return m_xtcObj->threshold();
+}
 
-uint32_t FrameFexConfigV1::number_of_masked_pixels() const { return m_xtcObj->number_of_masked_pixels(); }
+
+uint32_t FrameFexConfigV1::number_of_masked_pixels() const {
+  return m_xtcObj->number_of_masked_pixels();
+}
+
 ndarray<const Psana::Camera::FrameCoord, 1> FrameFexConfigV1::masked_pixel_coordinates() const { return _masked_pixel_coordinates_ndarray_storage_; }
 FrameV1::FrameV1(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::Camera::FrameV1()
@@ -77,19 +92,40 @@ FrameV1::~FrameV1()
 }
 
 
-uint32_t FrameV1::width() const { return m_xtcObj->width(); }
+uint32_t FrameV1::width() const {
+  return m_xtcObj->width();
+}
 
-uint32_t FrameV1::height() const { return m_xtcObj->height(); }
 
-uint32_t FrameV1::depth() const { return m_xtcObj->depth(); }
+uint32_t FrameV1::height() const {
+  return m_xtcObj->height();
+}
 
-uint32_t FrameV1::offset() const { return m_xtcObj->offset(); }
 
-ndarray<const uint8_t, 1> FrameV1::_int_pixel_data() const { return m_xtcObj->_int_pixel_data(); }
+uint32_t FrameV1::depth() const {
+  return m_xtcObj->depth();
+}
 
-ndarray<const uint8_t, 2> FrameV1::data8() const { return m_xtcObj->data8(); }
 
-ndarray<const uint16_t, 2> FrameV1::data16() const { return m_xtcObj->data16(); }
+uint32_t FrameV1::offset() const {
+  return m_xtcObj->offset();
+}
+
+
+ndarray<const uint8_t, 1> FrameV1::_int_pixel_data() const {
+  return m_xtcObj->_int_pixel_data(m_xtcObj);
+}
+
+
+ndarray<const uint8_t, 2> FrameV1::data8() const {
+  return m_xtcObj->data8();
+}
+
+
+ndarray<const uint16_t, 2> FrameV1::data16() const {
+  return m_xtcObj->data16();
+}
+
 TwoDGaussianV1::TwoDGaussianV1(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::Camera::TwoDGaussianV1()
   , m_xtcObj(xtcPtr)
@@ -100,16 +136,34 @@ TwoDGaussianV1::~TwoDGaussianV1()
 }
 
 
-uint64_t TwoDGaussianV1::integral() const { return m_xtcObj->integral(); }
+uint64_t TwoDGaussianV1::integral() const {
+  return m_xtcObj->integral();
+}
 
-double TwoDGaussianV1::xmean() const { return m_xtcObj->xmean(); }
 
-double TwoDGaussianV1::ymean() const { return m_xtcObj->ymean(); }
+double TwoDGaussianV1::xmean() const {
+  return m_xtcObj->xmean();
+}
 
-double TwoDGaussianV1::major_axis_width() const { return m_xtcObj->major_axis_width(); }
 
-double TwoDGaussianV1::minor_axis_width() const { return m_xtcObj->minor_axis_width(); }
+double TwoDGaussianV1::ymean() const {
+  return m_xtcObj->ymean();
+}
 
-double TwoDGaussianV1::major_axis_tilt() const { return m_xtcObj->major_axis_tilt(); }
+
+double TwoDGaussianV1::major_axis_width() const {
+  return m_xtcObj->major_axis_width();
+}
+
+
+double TwoDGaussianV1::minor_axis_width() const {
+  return m_xtcObj->minor_axis_width();
+}
+
+
+double TwoDGaussianV1::major_axis_tilt() const {
+  return m_xtcObj->major_axis_tilt();
+}
+
 } // namespace Camera
 } // namespace psddl_pds2psana

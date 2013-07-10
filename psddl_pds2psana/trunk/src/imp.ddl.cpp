@@ -24,25 +24,55 @@ ConfigV1::~ConfigV1()
 }
 
 
-uint32_t ConfigV1::range() const { return m_xtcObj->range(); }
+uint32_t ConfigV1::range() const {
+  return m_xtcObj->range();
+}
 
-uint32_t ConfigV1::calRange() const { return m_xtcObj->calRange(); }
 
-uint32_t ConfigV1::reset() const { return m_xtcObj->reset(); }
+uint32_t ConfigV1::calRange() const {
+  return m_xtcObj->calRange();
+}
 
-uint32_t ConfigV1::biasData() const { return m_xtcObj->biasData(); }
 
-uint32_t ConfigV1::calData() const { return m_xtcObj->calData(); }
+uint32_t ConfigV1::reset() const {
+  return m_xtcObj->reset();
+}
 
-uint32_t ConfigV1::biasDacData() const { return m_xtcObj->biasDacData(); }
 
-uint32_t ConfigV1::calStrobe() const { return m_xtcObj->calStrobe(); }
+uint32_t ConfigV1::biasData() const {
+  return m_xtcObj->biasData();
+}
 
-uint32_t ConfigV1::numberOfSamples() const { return m_xtcObj->numberOfSamples(); }
 
-uint32_t ConfigV1::trigDelay() const { return m_xtcObj->trigDelay(); }
+uint32_t ConfigV1::calData() const {
+  return m_xtcObj->calData();
+}
 
-uint32_t ConfigV1::adcDelay() const { return m_xtcObj->adcDelay(); }
+
+uint32_t ConfigV1::biasDacData() const {
+  return m_xtcObj->biasDacData();
+}
+
+
+uint32_t ConfigV1::calStrobe() const {
+  return m_xtcObj->calStrobe();
+}
+
+
+uint32_t ConfigV1::numberOfSamples() const {
+  return m_xtcObj->numberOfSamples();
+}
+
+
+uint32_t ConfigV1::trigDelay() const {
+  return m_xtcObj->trigDelay();
+}
+
+
+uint32_t ConfigV1::adcDelay() const {
+  return m_xtcObj->adcDelay();
+}
+
 Psana::Imp::Sample pds_to_psana(PsddlPds::Imp::Sample pds)
 {
   return Psana::Imp::Sample(pds.channels().data());
@@ -78,16 +108,28 @@ ElementV1<Config>::~ElementV1()
 
 
 template <typename Config>
-uint8_t ElementV1<Config>::vc() const { return m_xtcObj->vc(); }
+uint8_t ElementV1<Config>::vc() const {
+  return m_xtcObj->vc();
+}
+
 
 template <typename Config>
-uint8_t ElementV1<Config>::lane() const { return m_xtcObj->lane(); }
+uint8_t ElementV1<Config>::lane() const {
+  return m_xtcObj->lane();
+}
+
 
 template <typename Config>
-uint32_t ElementV1<Config>::frameNumber() const { return m_xtcObj->frameNumber(); }
+uint32_t ElementV1<Config>::frameNumber() const {
+  return m_xtcObj->frameNumber();
+}
+
 
 template <typename Config>
-uint32_t ElementV1<Config>::range() const { return m_xtcObj->range(); }
+uint32_t ElementV1<Config>::range() const {
+  return m_xtcObj->range();
+}
+
 template <typename Config>
 const Psana::Imp::LaneStatus& ElementV1<Config>::laneStatus() const { return _laneStatus; }
 template <typename Config>

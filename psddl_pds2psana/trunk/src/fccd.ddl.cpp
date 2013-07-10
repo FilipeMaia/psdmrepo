@@ -29,15 +29,30 @@ FccdConfigV1::~FccdConfigV1()
 }
 
 
-uint16_t FccdConfigV1::outputMode() const { return m_xtcObj->outputMode(); }
+uint16_t FccdConfigV1::outputMode() const {
+  return m_xtcObj->outputMode();
+}
 
-uint32_t FccdConfigV1::width() const { return m_xtcObj->width(); }
 
-uint32_t FccdConfigV1::height() const { return m_xtcObj->height(); }
+uint32_t FccdConfigV1::width() const {
+  return m_xtcObj->width();
+}
 
-uint32_t FccdConfigV1::trimmedWidth() const { return m_xtcObj->trimmedWidth(); }
 
-uint32_t FccdConfigV1::trimmedHeight() const { return m_xtcObj->trimmedHeight(); }
+uint32_t FccdConfigV1::height() const {
+  return m_xtcObj->height();
+}
+
+
+uint32_t FccdConfigV1::trimmedWidth() const {
+  return m_xtcObj->trimmedWidth();
+}
+
+
+uint32_t FccdConfigV1::trimmedHeight() const {
+  return m_xtcObj->trimmedHeight();
+}
+
 Psana::FCCD::FccdConfigV2::Depth pds_to_psana(PsddlPds::FCCD::FccdConfigV2::Depth e)
 {
   return Psana::FCCD::FccdConfigV2::Depth(e);
@@ -58,24 +73,54 @@ FccdConfigV2::~FccdConfigV2()
 }
 
 
-uint16_t FccdConfigV2::outputMode() const { return m_xtcObj->outputMode(); }
+uint16_t FccdConfigV2::outputMode() const {
+  return m_xtcObj->outputMode();
+}
 
-uint8_t FccdConfigV2::ccdEnable() const { return m_xtcObj->ccdEnable(); }
 
-uint8_t FccdConfigV2::focusMode() const { return m_xtcObj->focusMode(); }
+uint8_t FccdConfigV2::ccdEnable() const {
+  return m_xtcObj->ccdEnable();
+}
 
-uint32_t FccdConfigV2::exposureTime() const { return m_xtcObj->exposureTime(); }
 
-ndarray<const float, 1> FccdConfigV2::dacVoltages() const { return m_xtcObj->dacVoltages(); }
+uint8_t FccdConfigV2::focusMode() const {
+  return m_xtcObj->focusMode();
+}
 
-ndarray<const uint16_t, 1> FccdConfigV2::waveforms() const { return m_xtcObj->waveforms(); }
 
-uint32_t FccdConfigV2::width() const { return m_xtcObj->width(); }
+uint32_t FccdConfigV2::exposureTime() const {
+  return m_xtcObj->exposureTime();
+}
 
-uint32_t FccdConfigV2::height() const { return m_xtcObj->height(); }
 
-uint32_t FccdConfigV2::trimmedWidth() const { return m_xtcObj->trimmedWidth(); }
+ndarray<const float, 1> FccdConfigV2::dacVoltages() const {
+  return m_xtcObj->dacVoltages(m_xtcObj);
+}
 
-uint32_t FccdConfigV2::trimmedHeight() const { return m_xtcObj->trimmedHeight(); }
+
+ndarray<const uint16_t, 1> FccdConfigV2::waveforms() const {
+  return m_xtcObj->waveforms(m_xtcObj);
+}
+
+
+uint32_t FccdConfigV2::width() const {
+  return m_xtcObj->width();
+}
+
+
+uint32_t FccdConfigV2::height() const {
+  return m_xtcObj->height();
+}
+
+
+uint32_t FccdConfigV2::trimmedWidth() const {
+  return m_xtcObj->trimmedWidth();
+}
+
+
+uint32_t FccdConfigV2::trimmedHeight() const {
+  return m_xtcObj->trimmedHeight();
+}
+
 } // namespace FCCD
 } // namespace psddl_pds2psana

@@ -45,9 +45,15 @@ IpmFexConfigV1::~IpmFexConfigV1()
 
 ndarray<const Psana::Lusi::DiodeFexConfigV1, 1> IpmFexConfigV1::diode() const { return _diode_ndarray_storage_; }
 
-float IpmFexConfigV1::xscale() const { return m_xtcObj->xscale(); }
+float IpmFexConfigV1::xscale() const {
+  return m_xtcObj->xscale();
+}
 
-float IpmFexConfigV1::yscale() const { return m_xtcObj->yscale(); }
+
+float IpmFexConfigV1::yscale() const {
+  return m_xtcObj->yscale();
+}
+
 IpmFexConfigV2::IpmFexConfigV2(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::Lusi::IpmFexConfigV2()
   , m_xtcObj(xtcPtr)
@@ -69,9 +75,15 @@ IpmFexConfigV2::~IpmFexConfigV2()
 
 ndarray<const Psana::Lusi::DiodeFexConfigV2, 1> IpmFexConfigV2::diode() const { return _diode_ndarray_storage_; }
 
-float IpmFexConfigV2::xscale() const { return m_xtcObj->xscale(); }
+float IpmFexConfigV2::xscale() const {
+  return m_xtcObj->xscale();
+}
 
-float IpmFexConfigV2::yscale() const { return m_xtcObj->yscale(); }
+
+float IpmFexConfigV2::yscale() const {
+  return m_xtcObj->yscale();
+}
+
 Psana::Lusi::IpmFexV1 pds_to_psana(PsddlPds::Lusi::IpmFexV1 pds)
 {
   return Psana::Lusi::IpmFexV1(pds.channel().data(), pds.sum(), pds.xpos(), pds.ypos());

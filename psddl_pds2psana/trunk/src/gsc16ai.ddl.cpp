@@ -39,25 +39,55 @@ ConfigV1::~ConfigV1()
 }
 
 
-Psana::Gsc16ai::ConfigV1::VoltageRange ConfigV1::voltageRange() const { return pds_to_psana(m_xtcObj->voltageRange()); }
+Psana::Gsc16ai::ConfigV1::VoltageRange ConfigV1::voltageRange() const {
+  return pds_to_psana(m_xtcObj->voltageRange());
+}
 
-uint16_t ConfigV1::firstChan() const { return m_xtcObj->firstChan(); }
 
-uint16_t ConfigV1::lastChan() const { return m_xtcObj->lastChan(); }
+uint16_t ConfigV1::firstChan() const {
+  return m_xtcObj->firstChan();
+}
 
-Psana::Gsc16ai::ConfigV1::InputMode ConfigV1::inputMode() const { return pds_to_psana(m_xtcObj->inputMode()); }
 
-Psana::Gsc16ai::ConfigV1::TriggerMode ConfigV1::triggerMode() const { return pds_to_psana(m_xtcObj->triggerMode()); }
+uint16_t ConfigV1::lastChan() const {
+  return m_xtcObj->lastChan();
+}
 
-Psana::Gsc16ai::ConfigV1::DataFormat ConfigV1::dataFormat() const { return pds_to_psana(m_xtcObj->dataFormat()); }
 
-uint16_t ConfigV1::fps() const { return m_xtcObj->fps(); }
+Psana::Gsc16ai::ConfigV1::InputMode ConfigV1::inputMode() const {
+  return pds_to_psana(m_xtcObj->inputMode());
+}
 
-uint8_t ConfigV1::autocalibEnable() const { return m_xtcObj->autocalibEnable(); }
 
-uint8_t ConfigV1::timeTagEnable() const { return m_xtcObj->timeTagEnable(); }
+Psana::Gsc16ai::ConfigV1::TriggerMode ConfigV1::triggerMode() const {
+  return pds_to_psana(m_xtcObj->triggerMode());
+}
 
-uint16_t ConfigV1::numChannels() const { return m_xtcObj->numChannels(); }
+
+Psana::Gsc16ai::ConfigV1::DataFormat ConfigV1::dataFormat() const {
+  return pds_to_psana(m_xtcObj->dataFormat());
+}
+
+
+uint16_t ConfigV1::fps() const {
+  return m_xtcObj->fps();
+}
+
+
+uint8_t ConfigV1::autocalibEnable() const {
+  return m_xtcObj->autocalibEnable();
+}
+
+
+uint8_t ConfigV1::timeTagEnable() const {
+  return m_xtcObj->timeTagEnable();
+}
+
+
+uint16_t ConfigV1::numChannels() const {
+  return m_xtcObj->numChannels();
+}
+
 template <typename Config>
 DataV1<Config>::DataV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const Config>& cfgPtr)
   : Psana::Gsc16ai::DataV1()
@@ -72,11 +102,14 @@ DataV1<Config>::~DataV1()
 
 
 template <typename Config>
-ndarray<const uint16_t, 1> DataV1<Config>::timestamp() const { return m_xtcObj->timestamp(); }
+ndarray<const uint16_t, 1> DataV1<Config>::timestamp() const {
+  return m_xtcObj->timestamp(m_xtcObj);
+}
+
 
 template <typename Config>
 ndarray<const uint16_t, 1> DataV1<Config>::channelValue() const {
-  return m_xtcObj->channelValue(*m_cfgPtr);
+  return m_xtcObj->channelValue(*m_cfgPtr, m_xtcObj);
 }
 
 template class DataV1<PsddlPds::Gsc16ai::ConfigV1>;
