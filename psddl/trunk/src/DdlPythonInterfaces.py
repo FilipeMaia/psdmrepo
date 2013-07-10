@@ -158,6 +158,45 @@ class DdlPythonInterfaces ( object ) :
         if self.top_pkg: prefix = self.top_pkg + "::" + prefix
         return prefix
 
+    def qualifiedConstantValue(self,constant):
+        '''constant values sometimes reference previously defined 
+        constants.  If the constant value is not numeric, we search the 
+        parent namespaces to see if it is defined.  If so we qualify
+        with the namespace found.  If not, it may be a valid expression for 
+        code generation, so we just return it (so expressions like "4*34" 
+        will be returned unmodified.
+        '''
+        value = constant.value
+        try:            
+            float(value) # this will not catch expressions like 4*17 or 0xFF
+            return value
+        except ValueError:
+            enclosing = constant.parent
+            while enclosing is not None:
+                if type(enclosing) in [Type, Package]:
+                    for constant in enclosing.constants():
+                        if constant.name == value:
+                            return enclosing.fullName('C++',self.psana_ns) + '::' + value
+                    for enum in enclosing.enums():
+                        for enum_constant in enum.constants():
+                            if enum_constant.name == value:
+                                return enclosing.fullName('C++',self.psana_ns) + '::' + value
+                enclosing = enclosing.parent
+
+        self._log.debug("Coud not find parent namespace for %s", value)
+        return value
+
+    def _parseEnum(self,enum):
+        print >>self.cpp
+        print >>self.cpp, T('  enum_<$fullname>("$shortname")') \
+                           (fullname=enum.fullName('C++',self.psana_ns),
+                            shortname=enum.name)
+        enclosingFullName = enum.parent.fullName('C++',self.psana_ns)
+        for enum_constant in enum.constants():
+            print >>self.cpp, T('    .value("$constant",$enclosingFullName::$constant)') \
+                                   (constant=enum_constant.name, enclosingFullName=enclosingFullName)
+        print >>self.cpp, '  ;'
+
     def _parsePackage(self, pkgX):
         self.pkg = pkgX
 
@@ -184,7 +223,18 @@ class DdlPythonInterfaces ( object ) :
         print >>self.cpp, '  Py_INCREF(submodule);'
         print >>self.cpp, T('  PyModule_AddObject(module, "$name", submodule);')[self.pkg]
         print >>self.cpp, '  scope mod = object(handle<>(borrowed(submodule)));'
-        
+
+        # expose any package level constants
+        if len(self.pkg.constants())>0:
+            print >>self.cpp
+        for constant in self.pkg.constants():
+            print >>self.cpp, T('  mod.attr("$name")=$value;')(name=constant.name,
+                                                               value=self.qualifiedConstantValue(constant))
+
+        # expose any package level enums:
+        for enum in self.pkg.enums():
+            self._parseEnum(enum)
+
         # loop over packages and types
         ndconverters = set()
         for ns in self.pkg.namespaces() :
@@ -254,6 +304,13 @@ class DdlPythonInterfaces ( object ) :
         templ_args = ', '.join(templ_args)
         
         pkgname = self.pkg.name
+
+        has_nested_enums = len(type.enums()) > 0
+        has_nested_constants = len(type.constants()) > 0
+        if has_nested_enums or has_nested_constants:
+            print >>self.cpp, '  {'
+            print >>self.cpp, '  scope outer = '
+
         print >>self.cpp, T('  class_<$templ_args >("$cname", no_init)')(locals())
 
         # generate methods (for public methods and abstract class methods only)
@@ -266,6 +323,18 @@ class DdlPythonInterfaces ( object ) :
 
         # close class declaration
         print >>self.cpp, '  ;'
+
+        # write any nested enums or nested constants
+        if has_nested_enums:
+            for enum in type.enums():
+                self._parseEnum(enum)
+        if has_nested_constants:
+            print >>self.cpp
+            for constant in type.constants():
+                print >>self.cpp, T('  scope().attr("$name")=$value;')(name=constant.name,
+                                                                      value=self.qualifiedConstantValue(constant))
+        if has_nested_constants or has_nested_enums:
+            print >>self.cpp, '  }'
 
         # generates converter instance
         type_id = "Pds::TypeId::"+type.type_id if type.type_id is not None else -1

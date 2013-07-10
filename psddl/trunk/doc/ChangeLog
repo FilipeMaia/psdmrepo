@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-02
+2013-07-10 David Schneider
+- checking in new python wrappers that have been generated to export the enums 
+  and constants from the pstypes.
+	
 Tag: V00-08-01
 2013-07-10 Andy Salnikov
 - cppcodegen.tmpl: fixt for type array data in new template stuff
