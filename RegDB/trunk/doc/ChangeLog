@@ -11,6 +11,11 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-12
+2013-07-10 Igor Gaponenko
+- extended data migration tables and the trigger by one extra column
+allowing an efficient indexing of data bsed on the file status.
+
 Tag: V00-01-11
 2013-06-12 Igor Gaponenko
 - updated src/experiment_info to support stations and added a function to get

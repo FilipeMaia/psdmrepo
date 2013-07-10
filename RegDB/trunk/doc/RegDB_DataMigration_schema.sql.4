@@ -20,7 +20,6 @@ CREATE  TABLE IF NOT EXISTS `REGDB`.`DATA_MIGRATION` (
   `error_msg` TEXT ,
   `host` TEXT NOT NULL ,
   `dirpath` TEXT NOT NULL ,
-  `status` ENUM ('WAIT','DONE','FAIL') DEFAULT 'WAIT' ,
   PRIMARY KEY (`exper_id`,`file`) ,
   INDEX `EXPSWITCH_FK_1` (`exper_id` ASC) ,
   CONSTRAINT `DATA_MIGRATION_FK_1`
@@ -43,30 +42,87 @@ CREATE TRIGGER `REGDB`.`REGDB_FILE_INSERT` AFTER INSERT ON `REGDB`.`FILE`
   BEGIN
 
     INSERT INTO `REGDB`.`DATA_MIGRATION`
-    (  `exper_id`,
-       `file` ,
-       `file_type` ,
-       `host` ,
-       `dirpath`
-    )
     VALUES(
       NEW.exper_id ,
       CONCAT('e',NEW.exper_id,'-r',LPAD(NEW.run,4,'0000'),'-s',LPAD(NEW.stream,2,'00'),'-c',LPAD(NEW.chunk,2,'00'),'.xtc') ,
       'xtc' ,
+      NULL ,
+      NULL ,
+      NULL ,
       NEW.host ,
       REVERSE(SUBSTR(REVERSE(NEW.dirpath),LOCATE('/',REVERSE(NEW.dirpath))+1))) ;
 
     INSERT INTO `REGDB`.`DATA_MIGRATION`
-    (  `exper_id`,
-       `file` ,
-       `file_type` ,
-       `host` ,
-       `dirpath`
-    )
     VALUES(
       NEW.exper_id ,
       CONCAT('e',NEW.exper_id,'-r',LPAD(NEW.run,4,'0000'),'-s',LPAD(NEW.stream,2,'00'),'-c',LPAD(NEW.chunk,2,'00'),'.xtc.idx') ,
       'xtc.idx' ,
+      NULL ,
+      NULL ,
+      NULL ,
+      NEW.host ,
+      CONCAT(REVERSE(SUBSTR(REVERSE(NEW.dirpath),LOCATE('/',REVERSE(NEW.dirpath))+1)),'/index')) ;
+
+  END; |
+DELIMITER ;
+
+
+
+-- -----------------------------------------------------
+-- Table `REGDB`.`DATA_MIGRATION_FFB`
+-- -----------------------------------------------------
+
+DROP TABLE IF EXISTS `REGDB`.`DATA_MIGRATION_FFB` ;
+
+CREATE  TABLE IF NOT EXISTS `REGDB`.`DATA_MIGRATION_FFB` (
+  `exper_id` INT NOT NULL ,
+  `file` VARCHAR(255) NOT NULL ,
+  `file_type` TEXT NOT NULL ,
+  `start_time` BIGINT UNSIGNED DEFAULT NULL ,
+  `stop_time` BIGINT UNSIGNED DEFAULT NULL ,
+  `error_msg` TEXT ,
+  `host` TEXT NOT NULL ,
+  `dirpath` TEXT NOT NULL ,
+  PRIMARY KEY (`exper_id`,`file`) ,
+  INDEX `DATA_MIGRATION_FFB_FK_1` (`exper_id` ASC) ,
+  CONSTRAINT `DATA_MIGRATION_FFB_FK_1`
+    FOREIGN KEY (`exper_id` )
+    REFERENCES `REGDB`.`EXPERIMENT` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE)
+ENGINE = InnoDB;
+
+
+-- -----------------------------------------------------
+-- Trigger `REGDB`.`REGDB_FILE_INSERT_FFB`
+-- -----------------------------------------------------
+
+DROP TRIGGER IF EXISTS `REGDB`.`REGDB_FILE_INSERT_FFB`;
+
+DELIMITER |
+CREATE TRIGGER `REGDB`.`REGDB_FILE_INSERT_FFB` AFTER INSERT ON `REGDB`.`FILE_FFB`
+  FOR EACH ROW
+  BEGIN
+
+    INSERT INTO `REGDB`.`DATA_MIGRATION_FFB`
+    VALUES(
+      NEW.exper_id ,
+      CONCAT('e',NEW.exper_id,'-r',LPAD(NEW.run,4,'0000'),'-s',LPAD(NEW.stream,2,'00'),'-c',LPAD(NEW.chunk,2,'00'),'.xtc') ,
+      'xtc' ,
+      NULL ,
+      NULL ,
+      NULL ,
+      NEW.host ,
+      REVERSE(SUBSTR(REVERSE(NEW.dirpath),LOCATE('/',REVERSE(NEW.dirpath))+1))) ;
+
+    INSERT INTO `REGDB`.`DATA_MIGRATION_FFB`
+    VALUES(
+      NEW.exper_id ,
+      CONCAT('e',NEW.exper_id,'-r',LPAD(NEW.run,4,'0000'),'-s',LPAD(NEW.stream,2,'00'),'-c',LPAD(NEW.chunk,2,'00'),'.xtc.idx') ,
+      'xtc.idx' ,
+      NULL ,
+      NULL ,
+      NULL ,
       NEW.host ,
       CONCAT(REVERSE(SUBSTR(REVERSE(NEW.dirpath),LOCATE('/',REVERSE(NEW.dirpath))+1)),'/index')) ;
 
@@ -87,7 +143,6 @@ CREATE  TABLE IF NOT EXISTS `REGDB`.`DATA_MIGRATION_NERSC` (
   `start_time` BIGINT UNSIGNED DEFAULT NULL ,
   `stop_time` BIGINT UNSIGNED DEFAULT NULL ,
   `error_msg` TEXT ,
-  `status` ENUM ('WAIT','DONE','FAIL') DEFAULT 'WAIT' ,
   PRIMARY KEY (`exper_id`,`file`) ,
   INDEX `DATA_MIGRATION_NERSC_FK_1` (`exper_id` ASC) ,
   CONSTRAINT `DATA_MIGRATION_NERSC_FK_1`
@@ -113,7 +168,6 @@ CREATE  TABLE IF NOT EXISTS `REGDB`.`DATA_MIGRATION_ANA` (
   `error_msg` TEXT ,
   `host` TEXT NOT NULL ,
   `dirpath` TEXT NOT NULL ,
-  `status` ENUM ('WAIT','DONE','FAIL') DEFAULT 'WAIT' ,
   PRIMARY KEY (`exper_id`,`file`) ,
   INDEX `DATA_MIGRATION_ANA_FK_1` (`exper_id` ASC) ,
   CONSTRAINT `DATA_MIGRATION_ANA_FK_1`
