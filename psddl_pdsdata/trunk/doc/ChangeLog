@@ -11,9 +11,13 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-01
+2013-07-10 Andy Salnikov
+- re-generated with psddl V00-08-01
+
 Tag: V00-05-00
 2013-07-10 Andy Salnikov
-- re-generated with psddl V00-08-00 
+- re-generated with psddl V00-08-00
 - overload methods that return ndarrays with argument that
   thakes shared pointer to the owning object
 

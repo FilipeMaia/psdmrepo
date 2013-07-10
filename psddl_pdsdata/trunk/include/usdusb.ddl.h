@@ -36,14 +36,14 @@ public:
   };
   template <typename T>
   ndarray<const uint32_t, 1> counting_mode(const boost::shared_ptr<T>& owner) const { 
-    const UsdUsb::ConfigV1::Count_Mode* data = &_count_mode[0];
-    return make_ndarray(boost::shared_ptr<const UsdUsb::ConfigV1::Count_Mode>(owner, data), NCHANNELS);
+    const uint32_t* data = &_count_mode[0];
+    return make_ndarray(boost::shared_ptr<const uint32_t>(owner, data), NCHANNELS);
    }
   ndarray<const uint32_t, 1> counting_mode() const { return make_ndarray(&_count_mode[0], NCHANNELS); }
   template <typename T>
   ndarray<const uint32_t, 1> quadrature_mode(const boost::shared_ptr<T>& owner) const { 
-    const UsdUsb::ConfigV1::Quad_Mode* data = &_quad_mode[0];
-    return make_ndarray(boost::shared_ptr<const UsdUsb::ConfigV1::Quad_Mode>(owner, data), NCHANNELS);
+    const uint32_t* data = &_quad_mode[0];
+    return make_ndarray(boost::shared_ptr<const uint32_t>(owner, data), NCHANNELS);
    }
   ndarray<const uint32_t, 1> quadrature_mode() const { return make_ndarray(&_quad_mode[0], NCHANNELS); }
   static uint32_t _sizeof() { return (((((0+(4*(NCHANNELS)))+(4*(NCHANNELS)))+4)-1)/4)*4; }
