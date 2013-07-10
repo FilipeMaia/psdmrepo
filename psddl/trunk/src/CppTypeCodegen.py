@@ -7,7 +7,7 @@
 #
 #------------------------------------------------------------------------
 
-"""Calss responsible for C++ code generation for Type object 
+"""Class responsible for C++ code generation for Type object 
 
 This software was developed for the SIT project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
@@ -31,6 +31,7 @@ __version__ = "$Revision$"
 #--------------------------------
 import sys
 import logging
+import types
 
 #---------------------------------
 #  Imports of base class module --
@@ -39,15 +40,23 @@ import logging
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
+import jinja2 as ji
 from psddl.Attribute import Attribute
 from psddl.ExprVal import ExprVal
 from psddl.Method import Method
 from psddl.Type import Type
 from psddl.Template import Template as T
+from psddl.TemplateLoader import TemplateLoader
 
 #----------------------------------
 # Local non-exported definitions --
 #----------------------------------
+# jinja environment
+_jenv = ji.Environment(loader=TemplateLoader(), trim_blocks=True,
+                       line_statement_prefix='$', line_comment_prefix='$$')
+
+def _TEMPL(template):
+    return _jenv.get_template('cppcodegen.tmpl?'+template)
 
 def _interpolate(expr, typeobj):
     
@@ -61,6 +70,7 @@ def _typename(type):
     return type.fullName('C++')
 
 def _typedecl(type):
+    if isinstance(type, types.StringTypes): return type
     typename = _typename(type)
     if not type.basic : typename = "const "+typename+'&'
     return typename
@@ -197,36 +207,14 @@ class CppTypeCodegen ( object ) :
 
     def _genEnum(self, enum):
         
-        if enum.comment: print >>self._inc, T("\n  /** $comment */")[enum]
-        print >>self._inc, T("  enum $name {")(name = enum.name or "")
-        for const in enum.constants() :
-            val = ""
-            if const.value is not None : val = " = " + const.value
-            doc = ""
-            if const.comment: doc = T(' /**< $comment */')[const]
-            print >>self._inc, T("    $name$value,$doc")(name=const.name, value=val, doc=doc)
-        print >>self._inc, "  };"
+        print >>self._inc, _TEMPL('enum_decl').render(locals())
 
     def _genEnumPrint(self, enum):
         
         if not enum.name: return
         
-        name = enum.fullName('C++')
-        ns = enum.parent.fullName('C++')
-        print >>self._inc, T('std::ostream& operator<<(std::ostream& str, $name enval);')(locals())
-        print >>self._cpp, T('std::ostream& operator<<(std::ostream& str, $name enval) {')(locals())
-        print >>self._cpp, T('  const char* val;')(locals())
-        print >>self._cpp, T('  switch (enval) {')(locals())
-        for const in enum.constants() :
-            const_name = const.name
-            print >>self._cpp, T('  case $ns::$const_name:')(locals())
-            print >>self._cpp, T('    val = "$const_name";')(locals())
-            print >>self._cpp, T('    break;')(locals())
-        print >>self._cpp, "  default:"
-        print >>self._cpp, T('    return str << "$name(" << int(enval) << ")";')[enum]
-        print >>self._cpp, "  }"
-        print >>self._cpp, "  return str << val;"
-        print >>self._cpp, "}"
+        print >>self._inc, _TEMPL('enum_print_decl').render(locals())
+        print >>self._cpp, _TEMPL('enum_print_impl').render(locals())
 
     def _genAttrDecl(self, attr):
         """Generate attribute declaration"""
@@ -280,6 +268,9 @@ class CppTypeCodegen ( object ) :
             elif attr.type.value_type :
                 
                 rettype = "ndarray<const %s, %d>" % (_typename(attr.stor_type), len(attr.shape.dims))
+                body = self._bodyNDArrray(attr, 'T')
+                args_shptr = [('owner', 'const boost::shared_ptr<T>&')]
+                self._genMethodBody(meth.name, rettype, body, args=args_shptr, inline=True, doc=attr.comment, template='T')
                 body = self._bodyNDArrray(attr)
 
             else:
@@ -290,36 +281,16 @@ class CppTypeCodegen ( object ) :
                 body = self._bodyAnyArrray(attr)
 
 
-            # guess if we need to pass cfg object to method
-            cfgNeeded = body.find('{xtc-config}') >= 0
-            body = _interpolate(body, self._type)
-
-            configs = [None]
-            if cfgNeeded and not self._abs: configs = attr.parent.xtcConfig
-            for cfg in configs:
-
-                cargs = []
-                if cfg: cargs = [('cfg', cfg)]
-
-                self._genMethodBody(meth.name, rettype, body, cargs + args, inline=True, doc=attr.comment)
+            self._genMethodBody(meth.name, rettype, body, args, inline=True, doc=attr.comment)
 
         elif meth.bitfield:
 
             # generate access method for bitfield
 
             bf = meth.bitfield
-            expr = bf.expr()
-            cfgNeeded = expr.find('{xtc-config}') >= 0
-            expr = _interpolate(expr, meth.parent)
+            body = T("return $expr;")(expr=bf.expr())
 
-            configs = [None]
-            if cfgNeeded and not self._abs: configs = meth.parent.xtcConfig
-            for cfg in configs:
-
-                args = []
-                if cfg: args = [('cfg', cfg)]
-
-                self._genMethodExpr(meth.name, _typename(meth.type), expr, args, inline=True, doc=meth.comment)
+            self._genMethodBody(meth.name, _typename(meth.type), body, inline=True, doc=meth.comment)
 
         else:
 
@@ -346,40 +317,16 @@ class CppTypeCodegen ( object ) :
                     body = expr
                     if type: body = "return %s;" % expr
                 
-            # config objects may be needed 
-            cfgNeeded = False
-            if body: 
-                cfgNeeded = body.find('{xtc-config}') >= 0
-                body = _interpolate(body, meth.parent)
-
             # default is not inline, can change with a tag
             inline = 'inline' in meth.tags
             
-            configs = [None]
-            if cfgNeeded and not self._abs: configs = meth.parent.xtcConfig
-            for cfg in configs:
-
-                args = []
-                if cfg: args = [('cfg', cfg)]
-                args += meth.args
-
-                self._genMethodBody(meth.name, type, body, args, inline, static=meth.static, doc=meth.comment)
+            self._genMethodBody(meth.name, type, body, args=meth.args, inline=inline, static=meth.static, doc=meth.comment)
 
 
     def _bodyNonArray(self, attr):
         """Makes method body for methods returning non-array attribute values"""
 
-        if attr.isfixed():
-
-            if attr.type is not attr.stor_type: 
-                return T("return $type($name);")(type=_typedecl(attr.type), name=attr.name)
-            return T("return $name;")[attr]
-        
-        else:
-            
-            body = T("ptrdiff_t offset=$offset;")[attr]
-            body += T("\n  return *(const $type*)(((const char*)this)+offset);")(type=_typename(attr.type))
-            return body
+        return _TEMPL('body_non_array').render(locals())
 
     def _bodyCharArrray(self, attr):
         """Makes method body for methods returning char*"""
@@ -396,21 +343,12 @@ class CppTypeCodegen ( object ) :
             body += T("\n  return pchar$dimexpr;")(dimexpr=_dimexpr(attr.shape.dims[:-1]))
             return body
 
-    def _bodyNDArrray(self, attr):
+    def _bodyNDArrray(self, attr, template=None):
         """Makes method body for methods returning ndarray"""
 
-        shape = ', '.join([str(s or 0) for s in attr.shape.dims])
-        if attr.isfixed():
-
-            idx0 = "[0]" * len(attr.shape.dims)
-            return T("return make_ndarray(&$name$idx, $shape);")(name=attr.name, idx=idx0, shape=shape)
-
-        else:
-            
-            body = T("ptrdiff_t offset=$offset;")[attr]
-            body += T("\n  const $type* data = (const $type*)(((char*)this)+offset);")(type=_typename(attr.type))
-            body += T("\n  return make_ndarray(data, $shape);")(shape=shape)
-            return body
+        if template:
+            return _TEMPL('body_ndarray_shptr').render(locals())
+        return _TEMPL('body_ndarray').render(locals())
 
     def _bodyAnyArrray(self, attr):
         """Makes method body for methods returning array (pointer)"""
@@ -454,51 +392,31 @@ class CppTypeCodegen ( object ) :
             return body
 
 
-    def _genMethodExpr(self, methname, rettype, expr, args=[], inline=False, static=False, doc=None):
-        """ Generate method, both declaration and definition, given the expression that it returns"""
-
-        body = expr
-        if body and rettype != 'void': body = T("return $expr;")(locals())
-        self._genMethodBody(methname, rettype, body, args=args, inline=inline, static=static, doc=doc)
-        
-    def _genMethodBody(self, methname, rettype, body, args=[], inline=False, static=False, doc=None):
+    def _genMethodBody(self, methname, rettype, body, args=[], inline=False, static=False, doc=None, template=None):
         """ Generate method, both declaration and definition, given the body of the method"""
         
-        # make argument list
-        argsspec = ', '.join([_argdecl(*arg) for arg in args])
+        # guess if we need to pass cfg object to method
+        cfgNeeded = body and body.find('{xtc-config}') >= 0
+        if body: body = _interpolate(body, self._type)
 
-        if static:
-            static = "static "
-            const = ""
-        else:
-            static = ""
-            const = "const"
-        
+        configs = [None]
+        if cfgNeeded and not self._abs: configs = self._type.xtcConfig
+        for cfg in configs:
 
-        if doc: print >>self._inc, T('  /** $doc */')(locals())
+            cargs = []
+            if cfg: cargs = [('cfg', cfg)]
+            cargs += args
 
-        if self._abs and not static:
-            
-            # abstract method declaration, body is not needed
-            print >>self._inc, T("  virtual $rettype $methname($argsspec) const = 0;")(locals())
-
-        elif not body:
-
-            # declaration only, implementation provided somewhere else
-            print >>self._inc, T("  $static$rettype $methname($argsspec) $const;")(locals())
-
-        elif inline:
-            
-            # inline method
-            print >>self._inc, T("  $static$rettype $methname($argsspec) $const { $body }")(locals())
-        
-        else:
-            
-            # out-of-line method
-            classname = self._type.name
-            print >>self._inc, T("  $static$rettype $methname($argsspec) $const;")(locals())
-            print >>self._cpp, T("$rettype\n$classname::$methname($argsspec) $const {\n  $body\n}")(locals())
-
+            # make argument list
+            argsspec = ', '.join([_argdecl(*arg) for arg in cargs])
+            abstract = self._abs and not static
+    
+            print >>self._inc, _TEMPL('method_decl').render(locals())
+    
+            if not abstract and body and not inline:
+                # out-of-line method
+                classname = self._type.name
+                print >>self._cpp, _TEMPL('method_impl').render(locals())
 
 
     def _genCtor(self, ctor):
@@ -616,25 +534,9 @@ class CppTypeCodegen ( object ) :
         if attr.type.value_type and attr.type.name != 'char': return
 
         shape = [str(s or -1) for s in attr.shape.dims]
+        body = _TEMPL('body_shape').render(locals())
 
-        body = "std::vector<int> shape;" 
-        body += T("\n  shape.reserve($size);")(size=len(shape))
-        for s in shape:
-            body += T("\n  shape.push_back($dim);")(dim=s)
-        body += "\n  return shape;"
-
-        # guess if we need to pass cfg object to method
-        cfgNeeded = body.find('{xtc-config}') >= 0
-        body = _interpolate(body, self._type)
-
-        configs = [None]
-        if cfgNeeded and not self._abs: configs = attr.parent.xtcConfig
-        for cfg in configs:
-
-            cargs = []
-            if cfg: cargs = [('cfg', cfg)]
-
-            self._genMethodBody(attr.shape_method, "std::vector<int>", body, cargs, inline=False, doc=doc)
+        self._genMethodBody(attr.shape_method, "std::vector<int>", body, inline=False, doc=doc)
 
 
 

@@ -67,6 +67,9 @@ class Namespace ( object ) :
 
         if parent: parent.add(self)
 
+    def fullNameCpp(self, topNs=None):
+        return self.fullName('C++', topNs)
+    
     def fullName(self, lang=None, topNs=None):
         sep = {'C++' : '::'}.get(lang, '.')
         name = self.name

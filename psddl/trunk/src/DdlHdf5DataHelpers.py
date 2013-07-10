@@ -48,7 +48,8 @@ from psddl.TemplateLoader import TemplateLoader
 #----------------------------------
 
 # jinja environment
-_jenv = ji.Environment(loader=TemplateLoader(), trim_blocks=True)
+_jenv = ji.Environment(loader=TemplateLoader(), trim_blocks=True,
+                       line_statement_prefix='$', line_comment_prefix='$$')
 
 def _TEMPL(template):
     return _jenv.get_template('hdf5.tmpl?'+template)

@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-00
+2013-07-10 Andy Salnikov
+- more templates
+- switching to templated classes in pds2psana backend
+
 Tag: V00-07-01
 2013-07-02 Andy Salnikov
 - a bit more refactoring and simplification of templates

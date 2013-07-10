@@ -290,17 +290,21 @@ class DdlPds2Psana ( object ) :
         pdstypename = type.fullName('C++', self.pdsdata_ns)
         psanatypename = type.fullName('C++', self.psana_ns)
 
-        print >>self.inc, T("\nclass $name : public $psanatype {\npublic:")(name=type.name, psanatype=psanatypename)
+        print >>self.inc, ""
+        if type.xtcConfig: print >>self.inc, "template <typename Config>"
+        print >>self.inc, T("class $name : public $psanatype {\npublic:")(name=type.name, psanatype=psanatypename)
 
         print >>self.inc, T("  typedef $pdstypename XtcType;")(locals())
         print >>self.inc, T("  typedef $psanatypename PsanaType;")(locals())
         
-        configs = type.xtcConfig or [None]
-        for cfgnum, cfg in enumerate(configs):
-            self._genCtor(type, cfg, cfgnum)
+        self._genCtor(type)
         
         print >>self.inc, T("  virtual ~$name();")[type]
-        print >>self.cpp, T("$name::~$name()\n{\n}\n")[type]
+        if type.xtcConfig:
+            print >>self.cpp, "template <typename Config>"
+            print >>self.cpp, T("$name<Config>::~$name()\n{\n}\n")[type]
+        else:
+            print >>self.cpp, T("$name::~$name()\n{\n}\n")[type]
 
         # declarations for public methods 
         for t in _types(type):
@@ -318,11 +322,9 @@ class DdlPds2Psana ( object ) :
 
         print >>self.inc, "  boost::shared_ptr<const XtcType> m_xtcObj;"
         
-        # declaration for config pointers
-        configs = type.xtcConfig or []
-        for cfgnum, cfg in enumerate(configs):
-            print >>self.inc, T("  boost::shared_ptr<const $type> m_cfgPtr$cfgnum;")\
-                (type=cfg.fullName('C++', self.pdsdata_ns), cfgnum=cfgnum)
+        # declaration for config pointer
+        if type.xtcConfig: 
+            print >>self.inc, "  boost::shared_ptr<const Config> m_cfgPtr;"
         
         # declarations for data members
         for attr in type.attributes() :
@@ -331,6 +333,8 @@ class DdlPds2Psana ( object ) :
         # close class declaration
         print >>self.inc, "};\n"
 
+        for cfg in type.xtcConfig:
+            print >>self.cpp, T("template class $name<$config>;")(name=type.name, config=cfg.fullName('C++', self.pdsdata_ns))
 
     def _genMethod(self, meth, type):
         """Generate method declaration and definition"""
@@ -367,23 +371,26 @@ class DdlPds2Psana ( object ) :
             else:
 
                 psana_type = attr.type.fullName('C++', self.psana_ns)
+                classname = type.name
+                if type.xtcConfig:
+                    classname += '<Config>'
+                    print >>self.cpp, 'template <typename Config>'
 
                 if not attr.shape:
                     
                     # attribute is a regular non-array object
                     print >>self.inc, T("  virtual const $type& $name() const;")(type=psana_type, name=meth.name)
-                    print >>self.cpp, T("\nconst $type& $classname::$name() const { return $attr; }")\
-                            (type=psana_type, classname=type.name, name=meth.name, attr=attr.name)
+                    print >>self.cpp, T("const $type& $classname::$name() const { return $attr; }")\
+                            (type=psana_type, classname=classname, name=meth.name, attr=attr.name)
                         
                 elif attr.type.value_type:
                     
                     # attribute is an array accessed through ndarray
                     ndarray = T("ndarray<const $type, $rank>")(type=psana_type, rank=len(attr.shape.dims))
                     print >>self.inc, T("  virtual $type $name() const;")(type=ndarray, name=meth.name)
-                    expr = T("$ndtype(&${name}_ndarray_storage_[0], ${name}_ndarray_shape_)")(
-                             ndtype=ndarray, type=psana_type, name=attr.name)
-                    print >>self.cpp, T("\n$type $classname::$name() const { return $expr; }")\
-                            (type=ndarray, classname=type.name, name=meth.name, expr=expr)
+                    expr = T("${name}_ndarray_storage_")(name=attr.name)
+                    print >>self.cpp, T("$type $classname::$name() const { return $expr; }")\
+                            (type=ndarray, classname=classname, name=meth.name, expr=expr)
                         
                 else:
     
@@ -392,8 +399,8 @@ class DdlPds2Psana ( object ) :
                     expr = attr.name + _dimexpr(attr.shape)
                     print >>self.inc, T("  virtual const $type& $meth($args) const;")\
                             (type=psana_type, meth=meth.name, args=_dimargs(attr.shape))
-                    print >>self.cpp, T("\nconst $type& $classname::$meth($args) const { return $expr; }")\
-                            (type=psana_type, classname=type.name, meth=meth.name, args=_dimargs(attr.shape), expr=expr)
+                    print >>self.cpp, T("const $type& $classname::$meth($args) const { return $expr; }")\
+                            (type=psana_type, classname=classname, meth=meth.name, args=_dimargs(attr.shape), expr=expr)
 
         else:
 
@@ -439,24 +446,27 @@ class DdlPds2Psana ( object ) :
         passargs = ', '.join(passargs)
         
         print >>self.inc, T("  virtual $type $meth($args) const;")(type=typedecl, meth=name, args=argdecl)
+        print >>self.cpp, ""
         cfg = ''
+        Class = type.name
+        if type.xtcConfig: 
+            Class += '<Config>'
+            print >>self.cpp, "template <typename Config>"
         if cfgNeeded :
-            print >>self.cpp, T("\n$type $Class::$meth($args) const {")(type=typedecl, Class=type.name, meth=name, args=argdecl)
+            print >>self.cpp, T("$type $Class::$meth($args) const {")(type=typedecl, Class=Class, meth=name, args=argdecl)
             if passargs: passargs = ', '+passargs
-            for i in range(len(type.xtcConfig)):
-                if cvt:
-                    print >>self.cpp, T("  if (m_cfgPtr$i.get()) return pds_to_psana(m_xtcObj->$name(*m_cfgPtr$i$passargs));")(locals())
-                else:
-                    print >>self.cpp, T("  if (m_cfgPtr$i.get()) return m_xtcObj->$name(*m_cfgPtr$i$passargs);")(locals())
-            print >>self.cpp, T("  throw std::runtime_error(\"$Class::$meth: config object pointer is zero\");")(Class=type.name, meth=name)
+            if cvt:
+                print >>self.cpp, T("  return pds_to_psana(m_xtcObj->$name(*m_cfgPtr$passargs));")(locals())
+            else:
+                print >>self.cpp, T("  return m_xtcObj->$name(*m_cfgPtr$passargs);")(locals())
             print >>self.cpp, "}\n"
         else:
             if cvt:
-                print >>self.cpp, T("\n$type $Class::$meth($args) const { return pds_to_psana(m_xtcObj->$meth($passargs)); }")\
-                        (type=typedecl, Class=type.name, meth=name, args=argdecl, passargs=passargs)
+                print >>self.cpp, T("$type $Class::$meth($args) const { return pds_to_psana(m_xtcObj->$meth($passargs)); }")\
+                        (type=typedecl, Class=Class, meth=name, args=argdecl, passargs=passargs)
             else:
-                print >>self.cpp, T("\n$type $Class::$meth($args) const { return m_xtcObj->$meth($passargs); }")\
-                        (type=typedecl, Class=type.name, meth=name, args=argdecl, passargs=passargs)
+                print >>self.cpp, T("$type $Class::$meth($args) const { return m_xtcObj->$meth($passargs); }")\
+                        (type=typedecl, Class=Class, meth=name, args=argdecl, passargs=passargs)
 
     def _genAttrDecl(self, attr):
         
@@ -468,6 +478,7 @@ class DdlPds2Psana ( object ) :
             psana_type =  attr.type.fullName('C++', self.psana_ns)
         else :
             psana_type = attr.type.fullName('C++', self.top_pkg)
+            if attr.type.xtcConfig: psana_type += '<Config>'
 
         if not attr.shape:
             
@@ -476,25 +487,23 @@ class DdlPds2Psana ( object ) :
         elif attr.type.value_type:
             
             # for value types we return ndarray which needs contiguous memory
-            print >>self.inc, T("  std::vector<$type> ${attr}_ndarray_storage_;")(type=psana_type, attr=attr.name)
-            print >>self.inc, T("  unsigned ${attr}_ndarray_shape_[$rank];")(attr=attr.name, rank=len(attr.shape.dims))
+            print >>self.inc, T("  ndarray<$type, $rank> ${attr}_ndarray_storage_;")(type=psana_type, attr=attr.name, rank=len(attr.shape.dims))
 
         else :
 
-            atype = psana_type     
+            atype = psana_type
             for d in attr.shape.dims:
                 atype = "std::vector< %s >" % atype
             print >>self.inc, T("  $type $attr;")(type=atype, attr=attr.name)
 
 
-    def _genCtor(self, type, cfg, cfgnum):
+    def _genCtor(self, type):
 
         self._log.debug("_genCtor: type: %s", type)
 
         args = "const boost::shared_ptr<const XtcType>& xtcPtr"
-        if cfg :
-            cfgName = cfg.fullName('C++', self.pdsdata_ns)
-            args += T(", const boost::shared_ptr<const $type>& cfgPtr")(type=cfgName)
+        if type.xtcConfig:
+            args += ", const boost::shared_ptr<const Config>& cfgPtr"
         if type.size.value is None:
             # special case when the data size have to be guessed from XTC size
             args += ", size_t xtcSize"
@@ -505,10 +514,14 @@ class DdlPds2Psana ( object ) :
             
             # if size is None manual implementation of the constructor will be provided
             
-            print >>self.cpp, T("$Class::$Class($args)")(Class=type.name, args=args)
+            if type.xtcConfig:
+                print >>self.cpp, "template <typename Config>"
+                print >>self.cpp, T("$Class<Config>::$Class($args)")(Class=type.name, args=args)
+            else:
+                print >>self.cpp, T("$Class::$Class($args)")(Class=type.name, args=args)
             print >>self.cpp, T("  : $base()")(base=type.fullName('C++', self.psana_ns))
             print >>self.cpp, "  , m_xtcObj(xtcPtr)"
-            if cfg : print >>self.cpp, T("  , m_cfgPtr$i(cfgPtr)")(i=cfgnum)
+            if type.xtcConfig: print >>self.cpp, "  , m_cfgPtr(cfgPtr)"
             
             # member initialization
             for attr in type.attributes() :
@@ -611,8 +624,11 @@ class DdlPds2Psana ( object ) :
                     print >>self.cpp, offset+T("    const $type& d = $expr;")(type=attrXtcType, expr=expr)
                     print >>self.cpp, offset+T("    boost::shared_ptr<const $type> dPtr(m_xtcObj, &d);")(type=attrXtcType)
                     expr = "dPtr"
-                    if attr.type.xtcConfig: expr += ", cfgPtr"
-                    expr = T("$type($expr)")(type=attr.type.fullName('C++', self.top_pkg), expr=expr)
+                    typename = attr.type.fullName('C++', self.top_pkg)
+                    if attr.type.xtcConfig: 
+                        expr += ", cfgPtr"
+                        typename += '<Config>'
+                    expr = T("$type($expr)")(type=typename, expr=expr)
                 print >>self.cpp, offset+T("    $name$subscr.push_back($expr);")(name=name, subscr=subscr(r), expr=expr)
 
         for r in range(ndims):
@@ -648,14 +664,14 @@ class DdlPds2Psana ( object ) :
             
         # ndarray initialization
         print >>self.cpp, "  {"
+        print >>self.cpp, T("    typedef ndarray<$type, $rank> NDArray;")(type=psanatypename, rank=ndims)
         print >>self.cpp, T("    typedef ndarray<const $type, $rank> XtcNDArray;")(type=pdstypename, rank=ndims)
         print >>self.cpp, T("    const XtcNDArray& xtc_ndarr = xtcPtr->$meth($cfg);")(meth=attr.accessor.name, cfg=cfg)
-        print >>self.cpp, T("    ${name}_ndarray_storage_.reserve(xtc_ndarr.size());")(locals())
-        print >>self.cpp, "    for (XtcNDArray::iterator it = xtc_ndarr.begin(); it != xtc_ndarr.end(); ++ it) {"
-        print >>self.cpp, T("      ${name}_ndarray_storage_.push_back($elem_expr);")(locals())
+        print >>self.cpp, T("    ${name}_ndarray_storage_ = NDArray(xtc_ndarr.shape());")(locals())
+        print >>self.cpp, T("    NDArray::iterator out = ${name}_ndarray_storage_.begin();")(locals())
+        print >>self.cpp, "    for (XtcNDArray::iterator it = xtc_ndarr.begin(); it != xtc_ndarr.end(); ++ it, ++ out) {"
+        print >>self.cpp, T("      *out = $elem_expr;")(locals())
         print >>self.cpp, "    }"
-        print >>self.cpp, "    const unsigned* shape = xtc_ndarr.shape();"
-        print >>self.cpp, T("    std::copy(shape, shape+$ndims, ${name}_ndarray_shape_);")(locals())
         print >>self.cpp, "  }" 
 
 
@@ -685,7 +701,11 @@ class DdlPds2Psana ( object ) :
 
             print >>self.inc, T("  virtual std::vector<int> $meth() const;")(meth=attr.shape_method)
             
-            print >>self.cpp, T("std::vector<int> $Class::$meth() const\n{")(Class=type.name, meth=attr.shape_method)
+            Class = type.name
+            if type.xtcConfig: 
+                Class += '<Config>'
+                print >>self.cpp, 'template <typename Config>'
+            print >>self.cpp, T("std::vector<int> $Class::$meth() const\n{")(Class=Class, meth=attr.shape_method)
             print >>self.cpp, "  std::vector<int> shape;" 
             print >>self.cpp, T("  shape.reserve($rank);")(rank=len(shape))
             v = name
