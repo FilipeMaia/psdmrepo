@@ -31,7 +31,17 @@ public:
     std::copy(arg__base, arg__base+(3), _base);
     std::copy(arg__scale, arg__scale+(3), _scale);
   }
+  template <typename T>
+  ndarray<const float, 1> base(const boost::shared_ptr<T>& owner) const { 
+    const float* data = &_base[0];
+    return make_ndarray(boost::shared_ptr<const float>(owner, data), NRANGES);
+   }
   ndarray<const float, 1> base() const { return make_ndarray(&_base[0], NRANGES); }
+  template <typename T>
+  ndarray<const float, 1> scale(const boost::shared_ptr<T>& owner) const { 
+    const float* data = &_scale[0];
+    return make_ndarray(boost::shared_ptr<const float>(owner, data), NRANGES);
+   }
   ndarray<const float, 1> scale() const { return make_ndarray(&_scale[0], NRANGES); }
   static uint32_t _sizeof() { return (((((0+(4*(NRANGES)))+(4*(NRANGES)))+4)-1)/4)*4; }
 private:
@@ -60,7 +70,17 @@ public:
     std::copy(arg__base, arg__base+(16), _base);
     std::copy(arg__scale, arg__scale+(16), _scale);
   }
+  template <typename T>
+  ndarray<const float, 1> base(const boost::shared_ptr<T>& owner) const { 
+    const float* data = &_base[0];
+    return make_ndarray(boost::shared_ptr<const float>(owner, data), NRANGES);
+   }
   ndarray<const float, 1> base() const { return make_ndarray(&_base[0], NRANGES); }
+  template <typename T>
+  ndarray<const float, 1> scale(const boost::shared_ptr<T>& owner) const { 
+    const float* data = &_scale[0];
+    return make_ndarray(boost::shared_ptr<const float>(owner, data), NRANGES);
+   }
   ndarray<const float, 1> scale() const { return make_ndarray(&_scale[0], NRANGES); }
   static uint32_t _sizeof() { return (((((0+(4*(NRANGES)))+(4*(NRANGES)))+4)-1)/4)*4; }
 private:
@@ -106,6 +126,11 @@ public:
   enum { TypeId = Pds::TypeId::Id_IpmFexConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
   enum { NCHANNELS = 4 };
+  template <typename T>
+  ndarray<const Lusi::DiodeFexConfigV1, 1> diode(const boost::shared_ptr<T>& owner) const { 
+    const Lusi::DiodeFexConfigV1* data = &_diode[0];
+    return make_ndarray(boost::shared_ptr<const Lusi::DiodeFexConfigV1>(owner, data), NCHANNELS);
+   }
   ndarray<const Lusi::DiodeFexConfigV1, 1> diode() const { return make_ndarray(&_diode[0], NCHANNELS); }
   float xscale() const { return _xscale; }
   float yscale() const { return _yscale; }
@@ -129,6 +154,11 @@ public:
   enum { TypeId = Pds::TypeId::Id_IpmFexConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 2 /**< XTC type version number */ };
   enum { NCHANNELS = 4 };
+  template <typename T>
+  ndarray<const Lusi::DiodeFexConfigV2, 1> diode(const boost::shared_ptr<T>& owner) const { 
+    const Lusi::DiodeFexConfigV2* data = &_diode[0];
+    return make_ndarray(boost::shared_ptr<const Lusi::DiodeFexConfigV2>(owner, data), NCHANNELS);
+   }
   ndarray<const Lusi::DiodeFexConfigV2, 1> diode() const { return make_ndarray(&_diode[0], NCHANNELS); }
   float xscale() const { return _xscale; }
   float yscale() const { return _yscale; }
@@ -160,6 +190,11 @@ public:
   {
     std::copy(arg__channel, arg__channel+(4), _channel);
   }
+  template <typename T>
+  ndarray<const float, 1> channel(const boost::shared_ptr<T>& owner) const { 
+    const float* data = &_channel[0];
+    return make_ndarray(boost::shared_ptr<const float>(owner, data), NCHANNELS);
+   }
   ndarray<const float, 1> channel() const { return make_ndarray(&_channel[0], NCHANNELS); }
   float sum() const { return _sum; }
   float xpos() const { return _xpos; }

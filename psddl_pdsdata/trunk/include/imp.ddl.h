@@ -77,6 +77,11 @@ public:
   {
     std::copy(arg__channels, arg__channels+(4), _channels);
   }
+  template <typename T>
+  ndarray<const uint16_t, 1> channels(const boost::shared_ptr<T>& owner) const { 
+    const uint16_t* data = &_channels[0];
+    return make_ndarray(boost::shared_ptr<const uint16_t>(owner, data), 4);
+   }
   ndarray<const uint16_t, 1> channels() const { return make_ndarray(&_channels[0], 4); }
   static uint32_t _sizeof() { return ((((0+(2*(4)))+2)-1)/2)*2; }
 private:
@@ -128,6 +133,12 @@ public:
   uint32_t frameNumber() const { return _frameNumber; }
   uint32_t range() const { return _range; }
   const Imp::LaneStatus& laneStatus() const { return _laneStatus; }
+  template <typename T>
+  ndarray<const Imp::Sample, 1> samples(const Imp::ConfigV1& cfg, const boost::shared_ptr<T>& owner) const { 
+    ptrdiff_t offset=32;
+    const Imp::Sample* data = (const Imp::Sample*)(((char*)this)+offset);
+    return make_ndarray(boost::shared_ptr<const Imp::Sample>(owner, data), cfg.numberOfSamples());
+   }
   ndarray<const Imp::Sample, 1> samples(const Imp::ConfigV1& cfg) const { ptrdiff_t offset=32;
   const Imp::Sample* data = (const Imp::Sample*)(((char*)this)+offset);
   return make_ndarray(data, cfg.numberOfSamples()); }

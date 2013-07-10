@@ -34,7 +34,17 @@ public:
     X2,
     X4,
   };
+  template <typename T>
+  ndarray<const uint32_t, 1> counting_mode(const boost::shared_ptr<T>& owner) const { 
+    const UsdUsb::ConfigV1::Count_Mode* data = &_count_mode[0];
+    return make_ndarray(boost::shared_ptr<const UsdUsb::ConfigV1::Count_Mode>(owner, data), NCHANNELS);
+   }
   ndarray<const uint32_t, 1> counting_mode() const { return make_ndarray(&_count_mode[0], NCHANNELS); }
+  template <typename T>
+  ndarray<const uint32_t, 1> quadrature_mode(const boost::shared_ptr<T>& owner) const { 
+    const UsdUsb::ConfigV1::Quad_Mode* data = &_quad_mode[0];
+    return make_ndarray(boost::shared_ptr<const UsdUsb::ConfigV1::Quad_Mode>(owner, data), NCHANNELS);
+   }
   ndarray<const uint32_t, 1> quadrature_mode() const { return make_ndarray(&_quad_mode[0], NCHANNELS); }
   static uint32_t _sizeof() { return (((((0+(4*(NCHANNELS)))+(4*(NCHANNELS)))+4)-1)/4)*4; }
 private:
@@ -59,7 +69,17 @@ public:
   enum { Digital_Inputs = 8 };
   uint8_t digital_in() const { return _din; }
   uint32_t timestamp() const { return _timestamp; }
+  template <typename T>
+  ndarray<const uint8_t, 1> status(const boost::shared_ptr<T>& owner) const { 
+    const uint8_t* data = &_status[0];
+    return make_ndarray(boost::shared_ptr<const uint8_t>(owner, data), 4);
+   }
   ndarray<const uint8_t, 1> status() const { return make_ndarray(&_status[0], 4); }
+  template <typename T>
+  ndarray<const uint16_t, 1> analog_in(const boost::shared_ptr<T>& owner) const { 
+    const uint16_t* data = &_ain[0];
+    return make_ndarray(boost::shared_ptr<const uint16_t>(owner, data), Analog_Inputs);
+   }
   ndarray<const uint16_t, 1> analog_in() const { return make_ndarray(&_ain[0], Analog_Inputs); }
   /** Return lower 24 bits of _count array as signed integer values. */
   ndarray<const int32_t, 1> encoder_count() const;

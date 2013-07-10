@@ -243,6 +243,11 @@ public:
   int32_t driverVersion() const { return _driverVersion; }
   uint32_t firmwareVersion() const { return _firmwareVersion; }
   uint32_t pixelThreshSize() const { return _pixelThreshSize; }
+  template <typename T>
+  ndarray<const uint8_t, 1> pixelThresh(const boost::shared_ptr<T>& owner) const { 
+    const uint8_t* data = &_pixelThresh[0];
+    return make_ndarray(boost::shared_ptr<const uint8_t>(owner, data), PixelThreshMax);
+   }
   ndarray<const uint8_t, 1> pixelThresh() const { return make_ndarray(&_pixelThresh[0], PixelThreshMax); }
   const char* chip0Name() const { return _chip0Name; }
   const char* chip1Name() const { return _chip1Name; }
@@ -418,6 +423,11 @@ public:
   int32_t driverVersion() const { return _driverVersion; }
   uint32_t firmwareVersion() const { return _firmwareVersion; }
   uint32_t pixelThreshSize() const { return _pixelThreshSize; }
+  template <typename T>
+  ndarray<const uint8_t, 1> pixelThresh(const boost::shared_ptr<T>& owner) const { 
+    const uint8_t* data = &_pixelThresh[0];
+    return make_ndarray(boost::shared_ptr<const uint8_t>(owner, data), PixelThreshMax);
+   }
   ndarray<const uint8_t, 1> pixelThresh() const { return make_ndarray(&_pixelThresh[0], PixelThreshMax); }
   const char* chip0Name() const { return _chip0Name; }
   const char* chip1Name() const { return _chip1Name; }
@@ -528,6 +538,11 @@ public:
   uint32_t timestamp() const { return _timestamp; }
   uint16_t frameCounter() const { return _frameCounter; }
   uint16_t lostRows() const { return _lostRows; }
+  template <typename T>
+  ndarray<const uint16_t, 2> data(const boost::shared_ptr<T>& owner) const { 
+    const uint16_t* data = &_data[0][0];
+    return make_ndarray(boost::shared_ptr<const uint16_t>(owner, data), Height, Width);
+   }
   ndarray<const uint16_t, 2> data() const { return make_ndarray(&_data[0][0], Height, Width); }
   uint32_t width() const { return Width; }
   uint32_t height() const { return Height; }
@@ -563,6 +578,12 @@ public:
   uint16_t frameCounter() const { return _frameCounter; }
   /** lost row count */
   uint16_t lostRows() const { return _lostRows; }
+  template <typename T>
+  ndarray<const uint16_t, 2> data(const boost::shared_ptr<T>& owner) const { 
+    ptrdiff_t offset=12;
+    const uint16_t* data = (const uint16_t*)(((char*)this)+offset);
+    return make_ndarray(boost::shared_ptr<const uint16_t>(owner, data), this->height(), this->width());
+   }
   ndarray<const uint16_t, 2> data() const { ptrdiff_t offset=12;
   const uint16_t* data = (const uint16_t*)(((char*)this)+offset);
   return make_ndarray(data, this->height(), this->width()); }

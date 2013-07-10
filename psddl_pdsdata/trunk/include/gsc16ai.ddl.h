@@ -84,7 +84,18 @@ class DataV1 {
 public:
   enum { TypeId = Pds::TypeId::Id_Gsc16aiData /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
+  template <typename T>
+  ndarray<const uint16_t, 1> timestamp(const boost::shared_ptr<T>& owner) const { 
+    const uint16_t* data = &_timestamp[0];
+    return make_ndarray(boost::shared_ptr<const uint16_t>(owner, data), 3);
+   }
   ndarray<const uint16_t, 1> timestamp() const { return make_ndarray(&_timestamp[0], 3); }
+  template <typename T>
+  ndarray<const uint16_t, 1> channelValue(const Gsc16ai::ConfigV1& cfg, const boost::shared_ptr<T>& owner) const { 
+    ptrdiff_t offset=6;
+    const uint16_t* data = (const uint16_t*)(((char*)this)+offset);
+    return make_ndarray(boost::shared_ptr<const uint16_t>(owner, data), cfg.numChannels());
+   }
   ndarray<const uint16_t, 1> channelValue(const Gsc16ai::ConfigV1& cfg) const { ptrdiff_t offset=6;
   const uint16_t* data = (const uint16_t*)(((char*)this)+offset);
   return make_ndarray(data, cfg.numChannels()); }

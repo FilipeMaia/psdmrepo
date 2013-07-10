@@ -76,7 +76,17 @@ public:
   uint8_t ccdEnable() const { return _ccdEnable; }
   uint8_t focusMode() const { return _focusMode; }
   uint32_t exposureTime() const { return _exposureTime; }
+  template <typename T>
+  ndarray<const float, 1> dacVoltages(const boost::shared_ptr<T>& owner) const { 
+    const float* data = &_dacVoltage[0];
+    return make_ndarray(boost::shared_ptr<const float>(owner, data), NVoltages);
+   }
   ndarray<const float, 1> dacVoltages() const { return make_ndarray(&_dacVoltage[0], NVoltages); }
+  template <typename T>
+  ndarray<const uint16_t, 1> waveforms(const boost::shared_ptr<T>& owner) const { 
+    const uint16_t* data = &_waveform[0];
+    return make_ndarray(boost::shared_ptr<const uint16_t>(owner, data), NWaveforms);
+   }
   ndarray<const uint16_t, 1> waveforms() const { return make_ndarray(&_waveform[0], NWaveforms); }
   uint32_t width() const;
   uint32_t height() const;

@@ -85,6 +85,13 @@ public:
   /** Count of masked pixels to exclude from processing. */
   uint32_t number_of_masked_pixels() const { return _masked_pixel_count; }
   /** Location of masked pixel coordinates. */
+  template <typename T>
+  ndarray<const Camera::FrameCoord, 1> masked_pixel_coordinates(const boost::shared_ptr<T>& owner) const { 
+    ptrdiff_t offset=28;
+    const Camera::FrameCoord* data = (const Camera::FrameCoord*)(((char*)this)+offset);
+    return make_ndarray(boost::shared_ptr<const Camera::FrameCoord>(owner, data), this->number_of_masked_pixels());
+   }
+  /** Location of masked pixel coordinates. */
   ndarray<const Camera::FrameCoord, 1> masked_pixel_coordinates() const { ptrdiff_t offset=28;
   const Camera::FrameCoord* data = (const Camera::FrameCoord*)(((char*)this)+offset);
   return make_ndarray(data, this->number_of_masked_pixels()); }
@@ -120,6 +127,14 @@ public:
   uint32_t depth() const { return _depth; }
   /** Fixed offset/pedestal value of pixel data. */
   uint32_t offset() const { return _offset; }
+  /** Pixel data as array of bytes, method is for internal use only, use data8() or 
+            data16() for access to the data. */
+  template <typename T>
+  ndarray<const uint8_t, 1> _int_pixel_data(const boost::shared_ptr<T>& owner) const { 
+    ptrdiff_t offset=16;
+    const uint8_t* data = (const uint8_t*)(((char*)this)+offset);
+    return make_ndarray(boost::shared_ptr<const uint8_t>(owner, data), this->_width*this->_height*((this->_depth+7)/8));
+   }
   /** Pixel data as array of bytes, method is for internal use only, use data8() or 
             data16() for access to the data. */
   ndarray<const uint8_t, 1> _int_pixel_data() const { ptrdiff_t offset=16;

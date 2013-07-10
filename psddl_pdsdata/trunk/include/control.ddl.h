@@ -138,9 +138,23 @@ public:
   /** Number of PVMonitor objects in this configuration. */
   uint32_t npvMonitors() const { return _npvMonitors; }
   /** PVControl configuration objects */
+  template <typename T>
+  ndarray<const ControlData::PVControl, 1> pvControls(const boost::shared_ptr<T>& owner) const { 
+    ptrdiff_t offset=24;
+    const ControlData::PVControl* data = (const ControlData::PVControl*)(((char*)this)+offset);
+    return make_ndarray(boost::shared_ptr<const ControlData::PVControl>(owner, data), this->npvControls());
+   }
+  /** PVControl configuration objects */
   ndarray<const ControlData::PVControl, 1> pvControls() const { ptrdiff_t offset=24;
   const ControlData::PVControl* data = (const ControlData::PVControl*)(((char*)this)+offset);
   return make_ndarray(data, this->npvControls()); }
+  /** PVMonitor configuration objects */
+  template <typename T>
+  ndarray<const ControlData::PVMonitor, 1> pvMonitors(const boost::shared_ptr<T>& owner) const { 
+    ptrdiff_t offset=24+(44*(this->npvControls()));
+    const ControlData::PVMonitor* data = (const ControlData::PVMonitor*)(((char*)this)+offset);
+    return make_ndarray(boost::shared_ptr<const ControlData::PVMonitor>(owner, data), this->npvMonitors());
+   }
   /** PVMonitor configuration objects */
   ndarray<const ControlData::PVMonitor, 1> pvMonitors() const { ptrdiff_t offset=24+(44*(this->npvControls()));
   const ControlData::PVMonitor* data = (const ControlData::PVMonitor*)(((char*)this)+offset);
@@ -181,13 +195,34 @@ public:
   /** Number of PVLabel objects in this configuration. */
   uint32_t npvLabels() const { return _npvLabels; }
   /** PVControl configuration objects */
+  template <typename T>
+  ndarray<const ControlData::PVControl, 1> pvControls(const boost::shared_ptr<T>& owner) const { 
+    ptrdiff_t offset=28;
+    const ControlData::PVControl* data = (const ControlData::PVControl*)(((char*)this)+offset);
+    return make_ndarray(boost::shared_ptr<const ControlData::PVControl>(owner, data), this->npvControls());
+   }
+  /** PVControl configuration objects */
   ndarray<const ControlData::PVControl, 1> pvControls() const { ptrdiff_t offset=28;
   const ControlData::PVControl* data = (const ControlData::PVControl*)(((char*)this)+offset);
   return make_ndarray(data, this->npvControls()); }
   /** PVMonitor configuration objects */
+  template <typename T>
+  ndarray<const ControlData::PVMonitor, 1> pvMonitors(const boost::shared_ptr<T>& owner) const { 
+    ptrdiff_t offset=28+(44*(this->npvControls()));
+    const ControlData::PVMonitor* data = (const ControlData::PVMonitor*)(((char*)this)+offset);
+    return make_ndarray(boost::shared_ptr<const ControlData::PVMonitor>(owner, data), this->npvMonitors());
+   }
+  /** PVMonitor configuration objects */
   ndarray<const ControlData::PVMonitor, 1> pvMonitors() const { ptrdiff_t offset=28+(44*(this->npvControls()));
   const ControlData::PVMonitor* data = (const ControlData::PVMonitor*)(((char*)this)+offset);
   return make_ndarray(data, this->npvMonitors()); }
+  /** PVLabel configuration objects */
+  template <typename T>
+  ndarray<const ControlData::PVLabel, 1> pvLabels(const boost::shared_ptr<T>& owner) const { 
+    ptrdiff_t offset=(28+(44*(this->npvControls())))+(52*(this->npvMonitors()));
+    const ControlData::PVLabel* data = (const ControlData::PVLabel*)(((char*)this)+offset);
+    return make_ndarray(boost::shared_ptr<const ControlData::PVLabel>(owner, data), this->npvLabels());
+   }
   /** PVLabel configuration objects */
   ndarray<const ControlData::PVLabel, 1> pvLabels() const { ptrdiff_t offset=(28+(44*(this->npvControls())))+(52*(this->npvMonitors()));
   const ControlData::PVLabel* data = (const ControlData::PVLabel*)(((char*)this)+offset);

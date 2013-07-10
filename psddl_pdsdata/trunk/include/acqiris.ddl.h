@@ -182,6 +182,12 @@ public:
   /** Configuration for horizontal axis */
   const Acqiris::HorizV1& horiz() const { return _horiz; }
   /** Configuration for vertical axis (one per channel). */
+  template <typename T>
+  ndarray<const Acqiris::VertV1, 1> vert(const boost::shared_ptr<T>& owner) const { 
+    const Acqiris::VertV1* data = &_vert[0];
+    return make_ndarray(boost::shared_ptr<const Acqiris::VertV1>(owner, data), MaxChan);
+   }
+  /** Configuration for vertical axis (one per channel). */
   ndarray<const Acqiris::VertV1, 1> vert() const { return make_ndarray(&_vert[0], MaxChan); }
   /** Number of channels calculated from channel bit mask. */
   uint32_t nbrChannels() const;
@@ -250,9 +256,25 @@ public:
   /** Number of segments. */
   uint32_t nbrSegments() const { return _returnedSegments; }
   /** Timestamps, one timestamp per segment. */
+  template <typename T>
+  ndarray<const Acqiris::TimestampV1, 1> timestamp(const Acqiris::ConfigV1& cfg, const boost::shared_ptr<T>& owner) const { 
+    ptrdiff_t offset=64;
+    const Acqiris::TimestampV1* data = (const Acqiris::TimestampV1*)(((char*)this)+offset);
+    return make_ndarray(boost::shared_ptr<const Acqiris::TimestampV1>(owner, data), cfg.horiz().nbrSegments());
+   }
+  /** Timestamps, one timestamp per segment. */
   ndarray<const Acqiris::TimestampV1, 1> timestamp(const Acqiris::ConfigV1& cfg) const { ptrdiff_t offset=64;
   const Acqiris::TimestampV1* data = (const Acqiris::TimestampV1*)(((char*)this)+offset);
   return make_ndarray(data, cfg.horiz().nbrSegments()); }
+  /** Waveforms data, two-dimensional array [nbrSegments()]*[nbrSamplesInSeg()]. Note that 
+            unlike in pdsdata this already takes into account value of the indexFirstPoint so
+            that client code does not need to correct for this offset. */
+  template <typename T>
+  ndarray<const int16_t, 2> waveforms(const Acqiris::ConfigV1& cfg, const boost::shared_ptr<T>& owner) const { 
+    ptrdiff_t offset=(64+(16*(cfg.horiz().nbrSegments())))+(2*(this->indexFirstPoint()));
+    const int16_t* data = (const int16_t*)(((char*)this)+offset);
+    return make_ndarray(boost::shared_ptr<const int16_t>(owner, data), cfg.horiz().nbrSegments(), cfg.horiz().nbrSamples());
+   }
   /** Waveforms data, two-dimensional array [nbrSegments()]*[nbrSamplesInSeg()]. Note that 
             unlike in pdsdata this already takes into account value of the indexFirstPoint so
             that client code does not need to correct for this offset. */
@@ -462,7 +484,19 @@ public:
   enum { NChannels = 8 /**< Total number of channel configurations. */ };
   enum { NAuxIO = 2 /**< Total number of auxiliary IO configurations. */ };
   /** Channel configurations, one object per channel. */
+  template <typename T>
+  ndarray<const Acqiris::TdcChannel, 1> channels(const boost::shared_ptr<T>& owner) const { 
+    const Acqiris::TdcChannel* data = &_channel[0];
+    return make_ndarray(boost::shared_ptr<const Acqiris::TdcChannel>(owner, data), NChannels);
+   }
+  /** Channel configurations, one object per channel. */
   ndarray<const Acqiris::TdcChannel, 1> channels() const { return make_ndarray(&_channel[0], NChannels); }
+  /** Axiliary configurations, one object per channel. */
+  template <typename T>
+  ndarray<const Acqiris::TdcAuxIO, 1> auxio(const boost::shared_ptr<T>& owner) const { 
+    const Acqiris::TdcAuxIO* data = &_auxIO[0];
+    return make_ndarray(boost::shared_ptr<const Acqiris::TdcAuxIO>(owner, data), NAuxIO);
+   }
   /** Axiliary configurations, one object per channel. */
   ndarray<const Acqiris::TdcAuxIO, 1> auxio() const { return make_ndarray(&_auxIO[0], NAuxIO); }
   const Acqiris::TdcVetoIO& veto() const { return _veto; }
@@ -582,6 +616,14 @@ class TdcDataV1 {
 public:
   enum { TypeId = Pds::TypeId::Id_AcqTdcData /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
+  /** Access TDC data items. The data_shape() method should be used to 
+            obtain the number of elements. */
+  template <typename T>
+  ndarray<const Acqiris::TdcDataV1_Item, 1> data(const boost::shared_ptr<T>& owner) const { 
+    ptrdiff_t offset=0;
+    const Acqiris::TdcDataV1_Item* data = (const Acqiris::TdcDataV1_Item*)(((char*)this)+offset);
+    return make_ndarray(boost::shared_ptr<const Acqiris::TdcDataV1_Item>(owner, data), 0);
+   }
   /** Access TDC data items. The data_shape() method should be used to 
             obtain the number of elements. */
   ndarray<const Acqiris::TdcDataV1_Item, 1> data() const { ptrdiff_t offset=0;

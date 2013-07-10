@@ -68,6 +68,11 @@ namespace CsPad {
 
 class CsPadDigitalPotsCfg {
 public:
+  template <typename T>
+  ndarray<const uint8_t, 1> pots(const boost::shared_ptr<T>& owner) const { 
+    const uint8_t* data = &_pots[0];
+    return make_ndarray(boost::shared_ptr<const uint8_t>(owner, data), PotsPerQuad);
+   }
   ndarray<const uint8_t, 1> pots() const { return make_ndarray(&_pots[0], PotsPerQuad); }
   static uint32_t _sizeof() { return ((((0+(1*(PotsPerQuad)))+1)-1)/1)*1; }
 private:
@@ -129,6 +134,12 @@ private:
 class CsPadGainMapCfg {
 public:
   /** Array with the gain map for single ASIC. */
+  template <typename T>
+  ndarray<const uint16_t, 2> gainMap(const boost::shared_ptr<T>& owner) const { 
+    const uint16_t* data = &_gainMap[0][0];
+    return make_ndarray(boost::shared_ptr<const uint16_t>(owner, data), ColumnsPerASIC, MaxRowsPerASIC);
+   }
+  /** Array with the gain map for single ASIC. */
   ndarray<const uint16_t, 2> gainMap() const { return make_ndarray(&_gainMap[0][0], ColumnsPerASIC, MaxRowsPerASIC); }
   static uint32_t _sizeof() { return ((((0+(2*(ColumnsPerASIC)*(MaxRowsPerASIC)))+2)-1)/2)*2; }
 private:
@@ -143,7 +154,17 @@ private:
 
 class ConfigV1QuadReg {
 public:
+  template <typename T>
+  ndarray<const uint32_t, 1> shiftSelect(const boost::shared_ptr<T>& owner) const { 
+    const uint32_t* data = &_shiftSelect[0];
+    return make_ndarray(boost::shared_ptr<const uint32_t>(owner, data), TwoByTwosPerQuad);
+   }
   ndarray<const uint32_t, 1> shiftSelect() const { return make_ndarray(&_shiftSelect[0], TwoByTwosPerQuad); }
+  template <typename T>
+  ndarray<const uint32_t, 1> edgeSelect(const boost::shared_ptr<T>& owner) const { 
+    const uint32_t* data = &_edgeSelect[0];
+    return make_ndarray(boost::shared_ptr<const uint32_t>(owner, data), TwoByTwosPerQuad);
+   }
   ndarray<const uint32_t, 1> edgeSelect() const { return make_ndarray(&_edgeSelect[0], TwoByTwosPerQuad); }
   uint32_t readClkSet() const { return _readClkSet; }
   uint32_t readClkHold() const { return _readClkHold; }
@@ -187,7 +208,17 @@ private:
 
 class ConfigV2QuadReg {
 public:
+  template <typename T>
+  ndarray<const uint32_t, 1> shiftSelect(const boost::shared_ptr<T>& owner) const { 
+    const uint32_t* data = &_shiftSelect[0];
+    return make_ndarray(boost::shared_ptr<const uint32_t>(owner, data), TwoByTwosPerQuad);
+   }
   ndarray<const uint32_t, 1> shiftSelect() const { return make_ndarray(&_shiftSelect[0], TwoByTwosPerQuad); }
+  template <typename T>
+  ndarray<const uint32_t, 1> edgeSelect(const boost::shared_ptr<T>& owner) const { 
+    const uint32_t* data = &_edgeSelect[0];
+    return make_ndarray(boost::shared_ptr<const uint32_t>(owner, data), TwoByTwosPerQuad);
+   }
   ndarray<const uint32_t, 1> edgeSelect() const { return make_ndarray(&_edgeSelect[0], TwoByTwosPerQuad); }
   uint32_t readClkSet() const { return _readClkSet; }
   uint32_t readClkHold() const { return _readClkHold; }
@@ -237,7 +268,17 @@ private:
 
 class ConfigV3QuadReg {
 public:
+  template <typename T>
+  ndarray<const uint32_t, 1> shiftSelect(const boost::shared_ptr<T>& owner) const { 
+    const uint32_t* data = &_shiftSelect[0];
+    return make_ndarray(boost::shared_ptr<const uint32_t>(owner, data), TwoByTwosPerQuad);
+   }
   ndarray<const uint32_t, 1> shiftSelect() const { return make_ndarray(&_shiftSelect[0], TwoByTwosPerQuad); }
+  template <typename T>
+  ndarray<const uint32_t, 1> edgeSelect(const boost::shared_ptr<T>& owner) const { 
+    const uint32_t* data = &_edgeSelect[0];
+    return make_ndarray(boost::shared_ptr<const uint32_t>(owner, data), TwoByTwosPerQuad);
+   }
   ndarray<const uint32_t, 1> edgeSelect() const { return make_ndarray(&_edgeSelect[0], TwoByTwosPerQuad); }
   uint32_t readClkSet() const { return _readClkSet; }
   uint32_t readClkHold() const { return _readClkHold; }
@@ -390,6 +431,11 @@ public:
   uint32_t concentratorVersion() const { return _concentratorVersion; }
   uint32_t runDelay() const { return _runDelay; }
   uint32_t eventCode() const { return _eventCode; }
+  template <typename T>
+  ndarray<const CsPad::ProtectionSystemThreshold, 1> protectionThresholds(const boost::shared_ptr<T>& owner) const { 
+    const CsPad::ProtectionSystemThreshold* data = &_protectionThresholds[0];
+    return make_ndarray(boost::shared_ptr<const CsPad::ProtectionSystemThreshold>(owner, data), MaxQuadsPerSensor);
+   }
   ndarray<const CsPad::ProtectionSystemThreshold, 1> protectionThresholds() const { return make_ndarray(&_protectionThresholds[0], MaxQuadsPerSensor); }
   uint32_t protectionEnable() const { return _protectionEnable; }
   uint32_t inactiveRunMode() const { return _inactiveRunMode; }
@@ -445,6 +491,11 @@ public:
   uint32_t concentratorVersion() const { return _concentratorVersion; }
   uint32_t runDelay() const { return _runDelay; }
   uint32_t eventCode() const { return _eventCode; }
+  template <typename T>
+  ndarray<const CsPad::ProtectionSystemThreshold, 1> protectionThresholds(const boost::shared_ptr<T>& owner) const { 
+    const CsPad::ProtectionSystemThreshold* data = &_protectionThresholds[0];
+    return make_ndarray(boost::shared_ptr<const CsPad::ProtectionSystemThreshold>(owner, data), MaxQuadsPerSensor);
+   }
   ndarray<const CsPad::ProtectionSystemThreshold, 1> protectionThresholds() const { return make_ndarray(&_protectionThresholds[0], MaxQuadsPerSensor); }
   uint32_t protectionEnable() const { return _protectionEnable; }
   uint32_t inactiveRunMode() const { return _inactiveRunMode; }
@@ -500,6 +551,11 @@ public:
   uint32_t concentratorVersion() const { return _concentratorVersion; }
   uint32_t runDelay() const { return _runDelay; }
   uint32_t eventCode() const { return _eventCode; }
+  template <typename T>
+  ndarray<const CsPad::ProtectionSystemThreshold, 1> protectionThresholds(const boost::shared_ptr<T>& owner) const { 
+    const CsPad::ProtectionSystemThreshold* data = &_protectionThresholds[0];
+    return make_ndarray(boost::shared_ptr<const CsPad::ProtectionSystemThreshold>(owner, data), MaxQuadsPerSensor);
+   }
   ndarray<const CsPad::ProtectionSystemThreshold, 1> protectionThresholds() const { return make_ndarray(&_protectionThresholds[0], MaxQuadsPerSensor); }
   uint32_t protectionEnable() const { return _protectionEnable; }
   uint32_t inactiveRunMode() const { return _inactiveRunMode; }
@@ -571,8 +627,43 @@ public:
   uint32_t seq_count() const { return _seq_count; }
   uint32_t ticks() const { return _ticks; }
   uint32_t fiducials() const { return _fiducials; }
+  template <typename T>
+  ndarray<const uint16_t, 1> sb_temp(const boost::shared_ptr<T>& owner) const { 
+    const uint16_t* data = &_sbtemp[0];
+    return make_ndarray(boost::shared_ptr<const uint16_t>(owner, data), Nsbtemp);
+   }
   ndarray<const uint16_t, 1> sb_temp() const { return make_ndarray(&_sbtemp[0], Nsbtemp); }
   uint32_t frame_type() const { return _frame_type; }
+  template <typename T>
+  ndarray<const int16_t, 3> data(const CsPad::ConfigV1& cfg, const boost::shared_ptr<T>& owner) const { 
+    ptrdiff_t offset=32;
+    const int16_t* data = (const int16_t*)(((char*)this)+offset);
+    return make_ndarray(boost::shared_ptr<const int16_t>(owner, data), cfg.numAsicsRead()/2,  ColumnsPerASIC,  MaxRowsPerASIC*2);
+   }
+  template <typename T>
+  ndarray<const int16_t, 3> data(const CsPad::ConfigV2& cfg, const boost::shared_ptr<T>& owner) const { 
+    ptrdiff_t offset=32;
+    const int16_t* data = (const int16_t*)(((char*)this)+offset);
+    return make_ndarray(boost::shared_ptr<const int16_t>(owner, data), cfg.numAsicsRead()/2,  ColumnsPerASIC,  MaxRowsPerASIC*2);
+   }
+  template <typename T>
+  ndarray<const int16_t, 3> data(const CsPad::ConfigV3& cfg, const boost::shared_ptr<T>& owner) const { 
+    ptrdiff_t offset=32;
+    const int16_t* data = (const int16_t*)(((char*)this)+offset);
+    return make_ndarray(boost::shared_ptr<const int16_t>(owner, data), cfg.numAsicsRead()/2,  ColumnsPerASIC,  MaxRowsPerASIC*2);
+   }
+  template <typename T>
+  ndarray<const int16_t, 3> data(const CsPad::ConfigV4& cfg, const boost::shared_ptr<T>& owner) const { 
+    ptrdiff_t offset=32;
+    const int16_t* data = (const int16_t*)(((char*)this)+offset);
+    return make_ndarray(boost::shared_ptr<const int16_t>(owner, data), cfg.numAsicsRead()/2,  ColumnsPerASIC,  MaxRowsPerASIC*2);
+   }
+  template <typename T>
+  ndarray<const int16_t, 3> data(const CsPad::ConfigV5& cfg, const boost::shared_ptr<T>& owner) const { 
+    ptrdiff_t offset=32;
+    const int16_t* data = (const int16_t*)(((char*)this)+offset);
+    return make_ndarray(boost::shared_ptr<const int16_t>(owner, data), cfg.numAsicsRead()/2,  ColumnsPerASIC,  MaxRowsPerASIC*2);
+   }
   ndarray<const int16_t, 3> data(const CsPad::ConfigV1& cfg) const { ptrdiff_t offset=32;
   const int16_t* data = (const int16_t*)(((char*)this)+offset);
   return make_ndarray(data, cfg.numAsicsRead()/2,  ColumnsPerASIC,  MaxRowsPerASIC*2); }
@@ -712,8 +803,37 @@ public:
   uint32_t seq_count() const { return _seq_count; }
   uint32_t ticks() const { return _ticks; }
   uint32_t fiducials() const { return _fiducials; }
+  template <typename T>
+  ndarray<const uint16_t, 1> sb_temp(const boost::shared_ptr<T>& owner) const { 
+    const uint16_t* data = &_sbtemp[0];
+    return make_ndarray(boost::shared_ptr<const uint16_t>(owner, data), Nsbtemp);
+   }
   ndarray<const uint16_t, 1> sb_temp() const { return make_ndarray(&_sbtemp[0], Nsbtemp); }
   uint32_t frame_type() const { return _frame_type; }
+  template <typename T>
+  ndarray<const int16_t, 3> data(const CsPad::ConfigV2& cfg, const boost::shared_ptr<T>& owner) const { 
+    ptrdiff_t offset=32;
+    const int16_t* data = (const int16_t*)(((char*)this)+offset);
+    return make_ndarray(boost::shared_ptr<const int16_t>(owner, data), cfg.numAsicsStored(this->quad())/2,  ColumnsPerASIC,  MaxRowsPerASIC*2);
+   }
+  template <typename T>
+  ndarray<const int16_t, 3> data(const CsPad::ConfigV3& cfg, const boost::shared_ptr<T>& owner) const { 
+    ptrdiff_t offset=32;
+    const int16_t* data = (const int16_t*)(((char*)this)+offset);
+    return make_ndarray(boost::shared_ptr<const int16_t>(owner, data), cfg.numAsicsStored(this->quad())/2,  ColumnsPerASIC,  MaxRowsPerASIC*2);
+   }
+  template <typename T>
+  ndarray<const int16_t, 3> data(const CsPad::ConfigV4& cfg, const boost::shared_ptr<T>& owner) const { 
+    ptrdiff_t offset=32;
+    const int16_t* data = (const int16_t*)(((char*)this)+offset);
+    return make_ndarray(boost::shared_ptr<const int16_t>(owner, data), cfg.numAsicsStored(this->quad())/2,  ColumnsPerASIC,  MaxRowsPerASIC*2);
+   }
+  template <typename T>
+  ndarray<const int16_t, 3> data(const CsPad::ConfigV5& cfg, const boost::shared_ptr<T>& owner) const { 
+    ptrdiff_t offset=32;
+    const int16_t* data = (const int16_t*)(((char*)this)+offset);
+    return make_ndarray(boost::shared_ptr<const int16_t>(owner, data), cfg.numAsicsStored(this->quad())/2,  ColumnsPerASIC,  MaxRowsPerASIC*2);
+   }
   ndarray<const int16_t, 3> data(const CsPad::ConfigV2& cfg) const { ptrdiff_t offset=32;
   const int16_t* data = (const int16_t*)(((char*)this)+offset);
   return make_ndarray(data, cfg.numAsicsStored(this->quad())/2,  ColumnsPerASIC,  MaxRowsPerASIC*2); }

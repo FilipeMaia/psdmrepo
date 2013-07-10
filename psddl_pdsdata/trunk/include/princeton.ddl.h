@@ -286,6 +286,36 @@ public:
   enum { Version = 1 /**< XTC type version number */ };
   uint32_t shotIdStart() const { return _iShotIdStart; }
   float readoutTime() const { return _fReadoutTime; }
+  template <typename T>
+  ndarray<const uint16_t, 2> data(const Princeton::ConfigV1& cfg, const boost::shared_ptr<T>& owner) const { 
+    ptrdiff_t offset=8;
+    const uint16_t* data = (const uint16_t*)(((char*)this)+offset);
+    return make_ndarray(boost::shared_ptr<const uint16_t>(owner, data), cfg.numPixelsY(), cfg.numPixelsX());
+   }
+  template <typename T>
+  ndarray<const uint16_t, 2> data(const Princeton::ConfigV2& cfg, const boost::shared_ptr<T>& owner) const { 
+    ptrdiff_t offset=8;
+    const uint16_t* data = (const uint16_t*)(((char*)this)+offset);
+    return make_ndarray(boost::shared_ptr<const uint16_t>(owner, data), cfg.numPixelsY(), cfg.numPixelsX());
+   }
+  template <typename T>
+  ndarray<const uint16_t, 2> data(const Princeton::ConfigV3& cfg, const boost::shared_ptr<T>& owner) const { 
+    ptrdiff_t offset=8;
+    const uint16_t* data = (const uint16_t*)(((char*)this)+offset);
+    return make_ndarray(boost::shared_ptr<const uint16_t>(owner, data), cfg.numPixelsY(), cfg.numPixelsX());
+   }
+  template <typename T>
+  ndarray<const uint16_t, 2> data(const Princeton::ConfigV4& cfg, const boost::shared_ptr<T>& owner) const { 
+    ptrdiff_t offset=8;
+    const uint16_t* data = (const uint16_t*)(((char*)this)+offset);
+    return make_ndarray(boost::shared_ptr<const uint16_t>(owner, data), cfg.numPixelsY(), cfg.numPixelsX());
+   }
+  template <typename T>
+  ndarray<const uint16_t, 2> data(const Princeton::ConfigV5& cfg, const boost::shared_ptr<T>& owner) const { 
+    ptrdiff_t offset=8;
+    const uint16_t* data = (const uint16_t*)(((char*)this)+offset);
+    return make_ndarray(boost::shared_ptr<const uint16_t>(owner, data), cfg.numPixelsY(), cfg.numPixelsX());
+   }
   ndarray<const uint16_t, 2> data(const Princeton::ConfigV1& cfg) const { ptrdiff_t offset=8;
   const uint16_t* data = (const uint16_t*)(((char*)this)+offset);
   return make_ndarray(data, cfg.numPixelsY(), cfg.numPixelsX()); }
@@ -332,6 +362,36 @@ public:
   uint32_t shotIdStart() const { return _iShotIdStart; }
   float readoutTime() const { return _fReadoutTime; }
   float temperature() const { return _fTemperature; }
+  template <typename T>
+  ndarray<const uint16_t, 2> data(const Princeton::ConfigV1& cfg, const boost::shared_ptr<T>& owner) const { 
+    ptrdiff_t offset=12;
+    const uint16_t* data = (const uint16_t*)(((char*)this)+offset);
+    return make_ndarray(boost::shared_ptr<const uint16_t>(owner, data), cfg.numPixelsY(), cfg.numPixelsX());
+   }
+  template <typename T>
+  ndarray<const uint16_t, 2> data(const Princeton::ConfigV2& cfg, const boost::shared_ptr<T>& owner) const { 
+    ptrdiff_t offset=12;
+    const uint16_t* data = (const uint16_t*)(((char*)this)+offset);
+    return make_ndarray(boost::shared_ptr<const uint16_t>(owner, data), cfg.numPixelsY(), cfg.numPixelsX());
+   }
+  template <typename T>
+  ndarray<const uint16_t, 2> data(const Princeton::ConfigV3& cfg, const boost::shared_ptr<T>& owner) const { 
+    ptrdiff_t offset=12;
+    const uint16_t* data = (const uint16_t*)(((char*)this)+offset);
+    return make_ndarray(boost::shared_ptr<const uint16_t>(owner, data), cfg.numPixelsY(), cfg.numPixelsX());
+   }
+  template <typename T>
+  ndarray<const uint16_t, 2> data(const Princeton::ConfigV4& cfg, const boost::shared_ptr<T>& owner) const { 
+    ptrdiff_t offset=12;
+    const uint16_t* data = (const uint16_t*)(((char*)this)+offset);
+    return make_ndarray(boost::shared_ptr<const uint16_t>(owner, data), cfg.numPixelsY(), cfg.numPixelsX());
+   }
+  template <typename T>
+  ndarray<const uint16_t, 2> data(const Princeton::ConfigV5& cfg, const boost::shared_ptr<T>& owner) const { 
+    ptrdiff_t offset=12;
+    const uint16_t* data = (const uint16_t*)(((char*)this)+offset);
+    return make_ndarray(boost::shared_ptr<const uint16_t>(owner, data), cfg.numPixelsY(), cfg.numPixelsX());
+   }
   ndarray<const uint16_t, 2> data(const Princeton::ConfigV1& cfg) const { ptrdiff_t offset=12;
   const uint16_t* data = (const uint16_t*)(((char*)this)+offset);
   return make_ndarray(data, cfg.numPixelsY(), cfg.numPixelsX()); }

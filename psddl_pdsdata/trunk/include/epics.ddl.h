@@ -657,6 +657,12 @@ private:
 class EpicsPvCtrlShort: public EpicsPvCtrlHeader {
 public:
   const Epics::dbr_ctrl_short& dbr() const { return _dbr; }
+  template <typename T>
+  ndarray<const int16_t, 1> data(const boost::shared_ptr<T>& owner) const { 
+    ptrdiff_t offset=98;
+    const int16_t* data = (const int16_t*)(((char*)this)+offset);
+    return make_ndarray(boost::shared_ptr<const int16_t>(owner, data), this->numElements());
+   }
   ndarray<const int16_t, 1> data() const { ptrdiff_t offset=98;
   const int16_t* data = (const int16_t*)(((char*)this)+offset);
   return make_ndarray(data, this->numElements()); }
@@ -676,6 +682,12 @@ private:
 class EpicsPvCtrlFloat: public EpicsPvCtrlHeader {
 public:
   const Epics::dbr_ctrl_float& dbr() const { return _dbr; }
+  template <typename T>
+  ndarray<const float, 1> data(const boost::shared_ptr<T>& owner) const { 
+    ptrdiff_t offset=120;
+    const float* data = (const float*)(((char*)this)+offset);
+    return make_ndarray(boost::shared_ptr<const float>(owner, data), this->numElements());
+   }
   ndarray<const float, 1> data() const { ptrdiff_t offset=120;
   const float* data = (const float*)(((char*)this)+offset);
   return make_ndarray(data, this->numElements()); }
@@ -696,6 +708,12 @@ private:
 class EpicsPvCtrlEnum: public EpicsPvCtrlHeader {
 public:
   const Epics::dbr_ctrl_enum& dbr() const { return _dbr; }
+  template <typename T>
+  ndarray<const uint16_t, 1> data(const boost::shared_ptr<T>& owner) const { 
+    ptrdiff_t offset=492;
+    const uint16_t* data = (const uint16_t*)(((char*)this)+offset);
+    return make_ndarray(boost::shared_ptr<const uint16_t>(owner, data), this->numElements());
+   }
   ndarray<const uint16_t, 1> data() const { ptrdiff_t offset=492;
   const uint16_t* data = (const uint16_t*)(((char*)this)+offset);
   return make_ndarray(data, this->numElements()); }
@@ -715,6 +733,12 @@ private:
 class EpicsPvCtrlChar: public EpicsPvCtrlHeader {
 public:
   const Epics::dbr_ctrl_char& dbr() const { return _dbr; }
+  template <typename T>
+  ndarray<const uint8_t, 1> data(const boost::shared_ptr<T>& owner) const { 
+    ptrdiff_t offset=92;
+    const uint8_t* data = (const uint8_t*)(((char*)this)+offset);
+    return make_ndarray(boost::shared_ptr<const uint8_t>(owner, data), this->numElements());
+   }
   ndarray<const uint8_t, 1> data() const { ptrdiff_t offset=92;
   const uint8_t* data = (const uint8_t*)(((char*)this)+offset);
   return make_ndarray(data, this->numElements()); }
@@ -734,6 +758,12 @@ private:
 class EpicsPvCtrlLong: public EpicsPvCtrlHeader {
 public:
   const Epics::dbr_ctrl_long& dbr() const { return _dbr; }
+  template <typename T>
+  ndarray<const int32_t, 1> data(const boost::shared_ptr<T>& owner) const { 
+    ptrdiff_t offset=116;
+    const int32_t* data = (const int32_t*)(((char*)this)+offset);
+    return make_ndarray(boost::shared_ptr<const int32_t>(owner, data), this->numElements());
+   }
   ndarray<const int32_t, 1> data() const { ptrdiff_t offset=116;
   const int32_t* data = (const int32_t*)(((char*)this)+offset);
   return make_ndarray(data, this->numElements()); }
@@ -754,6 +784,12 @@ private:
 class EpicsPvCtrlDouble: public EpicsPvCtrlHeader {
 public:
   const Epics::dbr_ctrl_double& dbr() const { return _dbr; }
+  template <typename T>
+  ndarray<const double, 1> data(const boost::shared_ptr<T>& owner) const { 
+    ptrdiff_t offset=152;
+    const double* data = (const double*)(((char*)this)+offset);
+    return make_ndarray(boost::shared_ptr<const double>(owner, data), this->numElements());
+   }
   ndarray<const double, 1> data() const { ptrdiff_t offset=152;
   const double* data = (const double*)(((char*)this)+offset);
   return make_ndarray(data, this->numElements()); }
@@ -797,6 +833,12 @@ private:
 class EpicsPvTimeShort: public EpicsPvTimeHeader {
 public:
   const Epics::dbr_time_short& dbr() const { return _dbr; }
+  template <typename T>
+  ndarray<const int16_t, 1> data(const boost::shared_ptr<T>& owner) const { 
+    ptrdiff_t offset=24;
+    const int16_t* data = (const int16_t*)(((char*)this)+offset);
+    return make_ndarray(boost::shared_ptr<const int16_t>(owner, data), this->numElements());
+   }
   ndarray<const int16_t, 1> data() const { ptrdiff_t offset=24;
   const int16_t* data = (const int16_t*)(((char*)this)+offset);
   return make_ndarray(data, this->numElements()); }
@@ -817,6 +859,12 @@ private:
 class EpicsPvTimeFloat: public EpicsPvTimeHeader {
 public:
   const Epics::dbr_time_float& dbr() const { return _dbr; }
+  template <typename T>
+  ndarray<const float, 1> data(const boost::shared_ptr<T>& owner) const { 
+    ptrdiff_t offset=20;
+    const float* data = (const float*)(((char*)this)+offset);
+    return make_ndarray(boost::shared_ptr<const float>(owner, data), this->numElements());
+   }
   ndarray<const float, 1> data() const { ptrdiff_t offset=20;
   const float* data = (const float*)(((char*)this)+offset);
   return make_ndarray(data, this->numElements()); }
@@ -837,6 +885,12 @@ private:
 class EpicsPvTimeEnum: public EpicsPvTimeHeader {
 public:
   const Epics::dbr_time_enum& dbr() const { return _dbr; }
+  template <typename T>
+  ndarray<const uint16_t, 1> data(const boost::shared_ptr<T>& owner) const { 
+    ptrdiff_t offset=24;
+    const uint16_t* data = (const uint16_t*)(((char*)this)+offset);
+    return make_ndarray(boost::shared_ptr<const uint16_t>(owner, data), this->numElements());
+   }
   ndarray<const uint16_t, 1> data() const { ptrdiff_t offset=24;
   const uint16_t* data = (const uint16_t*)(((char*)this)+offset);
   return make_ndarray(data, this->numElements()); }
@@ -857,6 +911,12 @@ private:
 class EpicsPvTimeChar: public EpicsPvTimeHeader {
 public:
   const Epics::dbr_time_char& dbr() const { return _dbr; }
+  template <typename T>
+  ndarray<const uint8_t, 1> data(const boost::shared_ptr<T>& owner) const { 
+    ptrdiff_t offset=24;
+    const uint8_t* data = (const uint8_t*)(((char*)this)+offset);
+    return make_ndarray(boost::shared_ptr<const uint8_t>(owner, data), this->numElements());
+   }
   ndarray<const uint8_t, 1> data() const { ptrdiff_t offset=24;
   const uint8_t* data = (const uint8_t*)(((char*)this)+offset);
   return make_ndarray(data, this->numElements()); }
@@ -877,6 +937,12 @@ private:
 class EpicsPvTimeLong: public EpicsPvTimeHeader {
 public:
   const Epics::dbr_time_long& dbr() const { return _dbr; }
+  template <typename T>
+  ndarray<const int32_t, 1> data(const boost::shared_ptr<T>& owner) const { 
+    ptrdiff_t offset=20;
+    const int32_t* data = (const int32_t*)(((char*)this)+offset);
+    return make_ndarray(boost::shared_ptr<const int32_t>(owner, data), this->numElements());
+   }
   ndarray<const int32_t, 1> data() const { ptrdiff_t offset=20;
   const int32_t* data = (const int32_t*)(((char*)this)+offset);
   return make_ndarray(data, this->numElements()); }
@@ -897,6 +963,12 @@ private:
 class EpicsPvTimeDouble: public EpicsPvTimeHeader {
 public:
   const Epics::dbr_time_double& dbr() const { return _dbr; }
+  template <typename T>
+  ndarray<const double, 1> data(const boost::shared_ptr<T>& owner) const { 
+    ptrdiff_t offset=24;
+    const double* data = (const double*)(((char*)this)+offset);
+    return make_ndarray(boost::shared_ptr<const double>(owner, data), this->numElements());
+   }
   ndarray<const double, 1> data() const { ptrdiff_t offset=24;
   const double* data = (const double*)(((char*)this)+offset);
   return make_ndarray(data, this->numElements()); }
@@ -950,6 +1022,12 @@ public:
   enum { TypeId = Pds::TypeId::Id_EpicsConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
   int32_t numPv() const { return _iNumPv; }
+  template <typename T>
+  ndarray<const Epics::PvConfigV1, 1> pvControls(const boost::shared_ptr<T>& owner) const { 
+    ptrdiff_t offset=4;
+    const Epics::PvConfigV1* data = (const Epics::PvConfigV1*)(((char*)this)+offset);
+    return make_ndarray(boost::shared_ptr<const Epics::PvConfigV1>(owner, data), this->numPv());
+   }
   ndarray<const Epics::PvConfigV1, 1> pvControls() const { ptrdiff_t offset=4;
   const Epics::PvConfigV1* data = (const Epics::PvConfigV1*)(((char*)this)+offset);
   return make_ndarray(data, this->numPv()); }
