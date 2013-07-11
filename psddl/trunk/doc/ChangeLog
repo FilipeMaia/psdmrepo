@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-03
+2013-07-11 Andy Salnikov
+- move some pieces of code from DdlPds2Psana.py into data/templates/pds2psana.tmpl
+
 Tag: V00-08-02
 2013-07-10 David Schneider
 - checking in new python wrappers that have been generated to export the enums 
