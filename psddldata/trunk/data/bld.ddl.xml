@@ -10,7 +10,7 @@
 
     <package name="Bld">
     
-       Package (namespace) containing all data types pproduced by BLD 
+       Package (namespace) containing all data types produced by BLD 
        (BeamLine Data) devices.
     
         <pstype name="BldDataFEEGasDetEnergy" type_id="Id_FEEGasDetEnergy" version="0" pack="4">
