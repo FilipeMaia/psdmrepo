@@ -127,11 +127,15 @@ public:
   enum { Version = 2 /**< XTC type version number */ };
   enum { NEncoders = 3 /**< Number of encoders. */ };
   uint32_t timestamp() const { return _33mhz_timestamp; }
+  /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const uint32_t, 1> encoder_count(const boost::shared_ptr<T>& owner) const { 
     const uint32_t* data = &_encoder_count[0];
     return make_ndarray(boost::shared_ptr<const uint32_t>(owner, data), NEncoders);
-   }
+  }
+  /**     Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const uint32_t, 1> encoder_count() const { return make_ndarray(&_encoder_count[0], NEncoders); }
   /** Lower 24 bits of encoder_count as signed integer value. */
   int32_t value(uint32_t i) const;

@@ -34,17 +34,25 @@ public:
     X2,
     X4,
   };
+  /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const uint32_t, 1> counting_mode(const boost::shared_ptr<T>& owner) const { 
     const uint32_t* data = &_count_mode[0];
     return make_ndarray(boost::shared_ptr<const uint32_t>(owner, data), NCHANNELS);
-   }
+  }
+  /**     Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const uint32_t, 1> counting_mode() const { return make_ndarray(&_count_mode[0], NCHANNELS); }
+  /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const uint32_t, 1> quadrature_mode(const boost::shared_ptr<T>& owner) const { 
     const uint32_t* data = &_quad_mode[0];
     return make_ndarray(boost::shared_ptr<const uint32_t>(owner, data), NCHANNELS);
-   }
+  }
+  /**     Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const uint32_t, 1> quadrature_mode() const { return make_ndarray(&_quad_mode[0], NCHANNELS); }
   static uint32_t _sizeof() { return (((((0+(4*(NCHANNELS)))+(4*(NCHANNELS)))+4)-1)/4)*4; }
 private:
@@ -69,17 +77,25 @@ public:
   enum { Digital_Inputs = 8 };
   uint8_t digital_in() const { return _din; }
   uint32_t timestamp() const { return _timestamp; }
+  /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const uint8_t, 1> status(const boost::shared_ptr<T>& owner) const { 
     const uint8_t* data = &_status[0];
     return make_ndarray(boost::shared_ptr<const uint8_t>(owner, data), 4);
-   }
+  }
+  /**     Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const uint8_t, 1> status() const { return make_ndarray(&_status[0], 4); }
+  /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const uint16_t, 1> analog_in(const boost::shared_ptr<T>& owner) const { 
     const uint16_t* data = &_ain[0];
     return make_ndarray(boost::shared_ptr<const uint16_t>(owner, data), Analog_Inputs);
-   }
+  }
+  /**     Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const uint16_t, 1> analog_in() const { return make_ndarray(&_ain[0], Analog_Inputs); }
   /** Return lower 24 bits of _count array as signed integer values. */
   ndarray<const int32_t, 1> encoder_count() const;

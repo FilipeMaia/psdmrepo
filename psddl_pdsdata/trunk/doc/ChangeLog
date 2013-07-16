@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-02
+2013-07-15 Andy Salnikov
+- add comments to methods which return ndarrays explaining lifetime
+  management behavior
+
 Tag: V00-05-01
 2013-07-10 Andy Salnikov
 - re-generated with psddl V00-08-01

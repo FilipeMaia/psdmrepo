@@ -22,6 +22,7 @@ class ConfigV1 {
 public:
   enum { TypeId = Pds::TypeId::Id_ImpConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
+  enum { MaxNumberOfSamples = 0x3ff };
   enum Registers {
     Range,
     Cal_range,
@@ -77,11 +78,15 @@ public:
   {
     std::copy(arg__channels, arg__channels+(4), _channels);
   }
+  /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const uint16_t, 1> channels(const boost::shared_ptr<T>& owner) const { 
     const uint16_t* data = &_channels[0];
     return make_ndarray(boost::shared_ptr<const uint16_t>(owner, data), 4);
-   }
+  }
+  /**     Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const uint16_t, 1> channels() const { return make_ndarray(&_channels[0], 4); }
   static uint32_t _sizeof() { return ((((0+(2*(4)))+2)-1)/2)*2; }
 private:
@@ -133,12 +138,16 @@ public:
   uint32_t frameNumber() const { return _frameNumber; }
   uint32_t range() const { return _range; }
   const Imp::LaneStatus& laneStatus() const { return _laneStatus; }
+  /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const Imp::Sample, 1> samples(const Imp::ConfigV1& cfg, const boost::shared_ptr<T>& owner) const { 
     ptrdiff_t offset=32;
     const Imp::Sample* data = (const Imp::Sample*)(((char*)this)+offset);
     return make_ndarray(boost::shared_ptr<const Imp::Sample>(owner, data), cfg.numberOfSamples());
-   }
+  }
+  /**     Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const Imp::Sample, 1> samples(const Imp::ConfigV1& cfg) const { ptrdiff_t offset=32;
   const Imp::Sample* data = (const Imp::Sample*)(((char*)this)+offset);
   return make_ndarray(data, cfg.numberOfSamples()); }

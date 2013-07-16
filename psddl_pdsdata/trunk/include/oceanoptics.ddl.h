@@ -23,17 +23,25 @@ public:
   enum { TypeId = Pds::TypeId::Id_OceanOpticsConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
   float exposureTime() const { return _f32ExposureTime; }
+  /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const double, 1> waveLenCalib(const boost::shared_ptr<T>& owner) const { 
     const double* data = &_lfWaveLenCalibCoeff[0];
     return make_ndarray(boost::shared_ptr<const double>(owner, data), 4);
-   }
+  }
+  /**     Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const double, 1> waveLenCalib() const { return make_ndarray(&_lfWaveLenCalibCoeff[0], 4); }
+  /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const double, 1> nonlinCorrect(const boost::shared_ptr<T>& owner) const { 
     const double* data = &_lfNonlinCorrectCoeff[0];
     return make_ndarray(boost::shared_ptr<const double>(owner, data), 8);
-   }
+  }
+  /**     Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const double, 1> nonlinCorrect() const { return make_ndarray(&_lfNonlinCorrectCoeff[0], 8); }
   double strayLightConstant() const { return _fStrayLightConstant; }
   static uint32_t _sizeof() { return ((((((4+(8*(4)))+(8*(8)))+8)+4)-1)/4)*4; }
@@ -85,11 +93,15 @@ public:
   enum { iDataReadSize = 8192 };
   enum { iNumPixels = 3840 };
   enum { iActivePixelIndex = 22 };
+  /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const uint16_t, 1> data(const boost::shared_ptr<T>& owner) const { 
     const uint16_t* data = &lu16Spetra[0];
     return make_ndarray(boost::shared_ptr<const uint16_t>(owner, data), iNumPixels);
-   }
+  }
+  /**     Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const uint16_t, 1> data() const { return make_ndarray(&lu16Spetra[0], iNumPixels); }
   uint64_t frameCounter() const { return _u64FrameCounter; }
   uint64_t numDelayedFrames() const { return _u64NumDelayedFrames; }

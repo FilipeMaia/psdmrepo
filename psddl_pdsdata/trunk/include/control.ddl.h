@@ -137,25 +137,37 @@ public:
   uint32_t npvControls() const { return _npvControls; }
   /** Number of PVMonitor objects in this configuration. */
   uint32_t npvMonitors() const { return _npvMonitors; }
-  /** PVControl configuration objects */
+  /** PVControl configuration objects
+
+    Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const ControlData::PVControl, 1> pvControls(const boost::shared_ptr<T>& owner) const { 
     ptrdiff_t offset=24;
     const ControlData::PVControl* data = (const ControlData::PVControl*)(((char*)this)+offset);
     return make_ndarray(boost::shared_ptr<const ControlData::PVControl>(owner, data), this->npvControls());
-   }
-  /** PVControl configuration objects */
+  }
+  /** PVControl configuration objects
+
+    Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const ControlData::PVControl, 1> pvControls() const { ptrdiff_t offset=24;
   const ControlData::PVControl* data = (const ControlData::PVControl*)(((char*)this)+offset);
   return make_ndarray(data, this->npvControls()); }
-  /** PVMonitor configuration objects */
+  /** PVMonitor configuration objects
+
+    Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const ControlData::PVMonitor, 1> pvMonitors(const boost::shared_ptr<T>& owner) const { 
     ptrdiff_t offset=24+(44*(this->npvControls()));
     const ControlData::PVMonitor* data = (const ControlData::PVMonitor*)(((char*)this)+offset);
     return make_ndarray(boost::shared_ptr<const ControlData::PVMonitor>(owner, data), this->npvMonitors());
-   }
-  /** PVMonitor configuration objects */
+  }
+  /** PVMonitor configuration objects
+
+    Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const ControlData::PVMonitor, 1> pvMonitors() const { ptrdiff_t offset=24+(44*(this->npvControls()));
   const ControlData::PVMonitor* data = (const ControlData::PVMonitor*)(((char*)this)+offset);
   return make_ndarray(data, this->npvMonitors()); }
@@ -194,36 +206,54 @@ public:
   uint32_t npvMonitors() const { return _npvMonitors; }
   /** Number of PVLabel objects in this configuration. */
   uint32_t npvLabels() const { return _npvLabels; }
-  /** PVControl configuration objects */
+  /** PVControl configuration objects
+
+    Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const ControlData::PVControl, 1> pvControls(const boost::shared_ptr<T>& owner) const { 
     ptrdiff_t offset=28;
     const ControlData::PVControl* data = (const ControlData::PVControl*)(((char*)this)+offset);
     return make_ndarray(boost::shared_ptr<const ControlData::PVControl>(owner, data), this->npvControls());
-   }
-  /** PVControl configuration objects */
+  }
+  /** PVControl configuration objects
+
+    Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const ControlData::PVControl, 1> pvControls() const { ptrdiff_t offset=28;
   const ControlData::PVControl* data = (const ControlData::PVControl*)(((char*)this)+offset);
   return make_ndarray(data, this->npvControls()); }
-  /** PVMonitor configuration objects */
+  /** PVMonitor configuration objects
+
+    Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const ControlData::PVMonitor, 1> pvMonitors(const boost::shared_ptr<T>& owner) const { 
     ptrdiff_t offset=28+(44*(this->npvControls()));
     const ControlData::PVMonitor* data = (const ControlData::PVMonitor*)(((char*)this)+offset);
     return make_ndarray(boost::shared_ptr<const ControlData::PVMonitor>(owner, data), this->npvMonitors());
-   }
-  /** PVMonitor configuration objects */
+  }
+  /** PVMonitor configuration objects
+
+    Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const ControlData::PVMonitor, 1> pvMonitors() const { ptrdiff_t offset=28+(44*(this->npvControls()));
   const ControlData::PVMonitor* data = (const ControlData::PVMonitor*)(((char*)this)+offset);
   return make_ndarray(data, this->npvMonitors()); }
-  /** PVLabel configuration objects */
+  /** PVLabel configuration objects
+
+    Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const ControlData::PVLabel, 1> pvLabels(const boost::shared_ptr<T>& owner) const { 
     ptrdiff_t offset=(28+(44*(this->npvControls())))+(52*(this->npvMonitors()));
     const ControlData::PVLabel* data = (const ControlData::PVLabel*)(((char*)this)+offset);
     return make_ndarray(boost::shared_ptr<const ControlData::PVLabel>(owner, data), this->npvLabels());
-   }
-  /** PVLabel configuration objects */
+  }
+  /** PVLabel configuration objects
+
+    Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const ControlData::PVLabel, 1> pvLabels() const { ptrdiff_t offset=(28+(44*(this->npvControls())))+(52*(this->npvMonitors()));
   const ControlData::PVLabel* data = (const ControlData::PVLabel*)(((char*)this)+offset);
   return make_ndarray(data, this->npvLabels()); }

@@ -76,17 +76,25 @@ public:
   uint8_t ccdEnable() const { return _ccdEnable; }
   uint8_t focusMode() const { return _focusMode; }
   uint32_t exposureTime() const { return _exposureTime; }
+  /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const float, 1> dacVoltages(const boost::shared_ptr<T>& owner) const { 
     const float* data = &_dacVoltage[0];
     return make_ndarray(boost::shared_ptr<const float>(owner, data), NVoltages);
-   }
+  }
+  /**     Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const float, 1> dacVoltages() const { return make_ndarray(&_dacVoltage[0], NVoltages); }
+  /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const uint16_t, 1> waveforms(const boost::shared_ptr<T>& owner) const { 
     const uint16_t* data = &_waveform[0];
     return make_ndarray(boost::shared_ptr<const uint16_t>(owner, data), NWaveforms);
-   }
+  }
+  /**     Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const uint16_t, 1> waveforms() const { return make_ndarray(&_waveform[0], NWaveforms); }
   uint32_t width() const;
   uint32_t height() const;

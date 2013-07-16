@@ -66,21 +66,29 @@ public:
   /** apply output lookup table corrections */
   uint8_t output_lookup_table_enabled() const { return uint8_t((this->_outputOptions>>14) & 0x1); }
   uint32_t number_of_defect_pixels() const { return _defectPixelCount; }
+  /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const uint16_t, 1> output_lookup_table(const boost::shared_ptr<T>& owner) const { 
     ptrdiff_t offset=12;
     const uint16_t* data = (const uint16_t*)(((char*)this)+offset);
     return make_ndarray(boost::shared_ptr<const uint16_t>(owner, data), Output_LUT_Size*this->output_lookup_table_enabled());
-   }
+  }
+  /**     Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const uint16_t, 1> output_lookup_table() const { ptrdiff_t offset=12;
   const uint16_t* data = (const uint16_t*)(((char*)this)+offset);
   return make_ndarray(data, Output_LUT_Size*this->output_lookup_table_enabled()); }
+  /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const Camera::FrameCoord, 1> defect_pixel_coordinates(const boost::shared_ptr<T>& owner) const { 
     ptrdiff_t offset=12+(2*(Output_LUT_Size*this->output_lookup_table_enabled()));
     const Camera::FrameCoord* data = (const Camera::FrameCoord*)(((char*)this)+offset);
     return make_ndarray(boost::shared_ptr<const Camera::FrameCoord>(owner, data), this->number_of_defect_pixels());
-   }
+  }
+  /**     Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const Camera::FrameCoord, 1> defect_pixel_coordinates() const { ptrdiff_t offset=12+(2*(Output_LUT_Size*this->output_lookup_table_enabled()));
   const Camera::FrameCoord* data = (const Camera::FrameCoord*)(((char*)this)+offset);
   return make_ndarray(data, this->number_of_defect_pixels()); }

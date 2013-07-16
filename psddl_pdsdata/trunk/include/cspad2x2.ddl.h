@@ -68,11 +68,15 @@ namespace CsPad2x2 {
 
 class CsPad2x2DigitalPotsCfg {
 public:
+  /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const uint8_t, 1> pots(const boost::shared_ptr<T>& owner) const { 
     const uint8_t* data = &_pots[0];
     return make_ndarray(boost::shared_ptr<const uint8_t>(owner, data), PotsPerQuad);
-   }
+  }
+  /**     Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const uint8_t, 1> pots() const { return make_ndarray(&_pots[0], PotsPerQuad); }
   static uint32_t _sizeof() { return ((((0+(1*(PotsPerQuad)))+1)-1)/1)*1; }
 private:
@@ -133,13 +137,19 @@ private:
 
 class CsPad2x2GainMapCfg {
 public:
-  /** Array with the gain map for single ASIC. */
+  /** Array with the gain map for single ASIC.
+
+    Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const uint16_t, 2> gainMap(const boost::shared_ptr<T>& owner) const { 
     const uint16_t* data = &_gainMap[0][0];
     return make_ndarray(boost::shared_ptr<const uint16_t>(owner, data), ColumnsPerASIC, MaxRowsPerASIC);
-   }
-  /** Array with the gain map for single ASIC. */
+  }
+  /** Array with the gain map for single ASIC.
+
+    Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const uint16_t, 2> gainMap() const { return make_ndarray(&_gainMap[0][0], ColumnsPerASIC, MaxRowsPerASIC); }
   static uint32_t _sizeof() { return ((((0+(2*(ColumnsPerASIC)*(MaxRowsPerASIC)))+2)-1)/2)*2; }
 private:
@@ -389,19 +399,27 @@ public:
   uint32_t seq_count() const { return _seq_count; }
   uint32_t ticks() const { return _ticks; }
   uint32_t fiducials() const { return _fiducials; }
+  /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const uint16_t, 1> sb_temp(const boost::shared_ptr<T>& owner) const { 
     const uint16_t* data = &_sbtemp[0];
     return make_ndarray(boost::shared_ptr<const uint16_t>(owner, data), Nsbtemp);
-   }
+  }
+  /**     Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const uint16_t, 1> sb_temp() const { return make_ndarray(&_sbtemp[0], Nsbtemp); }
   uint32_t frame_type() const { return _frame_type; }
+  /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const int16_t, 3> data(const boost::shared_ptr<T>& owner) const { 
     ptrdiff_t offset=32;
     const int16_t* data = (const int16_t*)(((char*)this)+offset);
     return make_ndarray(boost::shared_ptr<const int16_t>(owner, data), ColumnsPerASIC,  MaxRowsPerASIC*2,  2);
-   }
+  }
+  /**     Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const int16_t, 3> data() const { ptrdiff_t offset=32;
   const int16_t* data = (const int16_t*)(((char*)this)+offset);
   return make_ndarray(data, ColumnsPerASIC,  MaxRowsPerASIC*2,  2); }

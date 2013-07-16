@@ -97,25 +97,37 @@ public:
   uint32_t timeStampHi() const { return _timeStampHi; }
   /** Least significant part of timestamp */
   uint32_t timeStampLo() const { return _timeStampLo; }
-  /** Frame data */
+  /** Frame data
+
+    Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const uint16_t, 1> _data(const PNCCD::ConfigV1& cfg, const boost::shared_ptr<T>& owner) const { 
     ptrdiff_t offset=16;
     const uint16_t* data = (const uint16_t*)(((char*)this)+offset);
     return make_ndarray(boost::shared_ptr<const uint16_t>(owner, data), (cfg.payloadSizePerLink()-16)/2);
-   }
-  /** Frame data */
+  }
+  /** Frame data
+
+    Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const uint16_t, 1> _data(const PNCCD::ConfigV2& cfg, const boost::shared_ptr<T>& owner) const { 
     ptrdiff_t offset=16;
     const uint16_t* data = (const uint16_t*)(((char*)this)+offset);
     return make_ndarray(boost::shared_ptr<const uint16_t>(owner, data), (cfg.payloadSizePerLink()-16)/2);
-   }
-  /** Frame data */
+  }
+  /** Frame data
+
+    Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const uint16_t, 1> _data(const PNCCD::ConfigV1& cfg) const { ptrdiff_t offset=16;
   const uint16_t* data = (const uint16_t*)(((char*)this)+offset);
   return make_ndarray(data, (cfg.payloadSizePerLink()-16)/2); }
-  /** Frame data */
+  /** Frame data
+
+    Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const uint16_t, 1> _data(const PNCCD::ConfigV2& cfg) const { ptrdiff_t offset=16;
   const uint16_t* data = (const uint16_t*)(((char*)this)+offset);
   return make_ndarray(data, (cfg.payloadSizePerLink()-16)/2); }
@@ -151,13 +163,19 @@ public:
   uint32_t timeStampHi() const { return _timeStampHi; }
   /** Least significant part of timestamp */
   uint32_t timeStampLo() const { return _timeStampLo; }
-  /** Full frame data, image size is 1024x1024. */
+  /** Full frame data, image size is 1024x1024.
+
+    Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const uint16_t, 2> data(const boost::shared_ptr<T>& owner) const { 
     const uint16_t* data = &_data[0][0];
     return make_ndarray(boost::shared_ptr<const uint16_t>(owner, data), 1024, 1024);
-   }
-  /** Full frame data, image size is 1024x1024. */
+  }
+  /** Full frame data, image size is 1024x1024.
+
+    Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const uint16_t, 2> data() const { return make_ndarray(&_data[0][0], 1024, 1024); }
   static uint32_t _sizeof() { return ((((16+(2*(1024)*(1024)))+4)-1)/4)*4; }
 private:

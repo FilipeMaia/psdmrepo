@@ -349,21 +349,29 @@ public:
   enum { Version = 1 /**< XTC type version number */ };
   uint32_t npulses() const { return _npulses; }
   uint32_t noutputs() const { return _noutputs; }
+  /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const EvrData::PulseConfig, 1> pulses(const boost::shared_ptr<T>& owner) const { 
     ptrdiff_t offset=8;
     const EvrData::PulseConfig* data = (const EvrData::PulseConfig*)(((char*)this)+offset);
     return make_ndarray(boost::shared_ptr<const EvrData::PulseConfig>(owner, data), this->_npulses);
-   }
+  }
+  /**     Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const EvrData::PulseConfig, 1> pulses() const { ptrdiff_t offset=8;
   const EvrData::PulseConfig* data = (const EvrData::PulseConfig*)(((char*)this)+offset);
   return make_ndarray(data, this->_npulses); }
+  /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const EvrData::OutputMap, 1> output_maps(const boost::shared_ptr<T>& owner) const { 
     ptrdiff_t offset=8+(24*(this->_npulses));
     const EvrData::OutputMap* data = (const EvrData::OutputMap*)(((char*)this)+offset);
     return make_ndarray(boost::shared_ptr<const EvrData::OutputMap>(owner, data), this->_noutputs);
-   }
+  }
+  /**     Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const EvrData::OutputMap, 1> output_maps() const { ptrdiff_t offset=8+(24*(this->_npulses));
   const EvrData::OutputMap* data = (const EvrData::OutputMap*)(((char*)this)+offset);
   return make_ndarray(data, this->_noutputs); }
@@ -406,21 +414,29 @@ public:
   uint32_t opcode() const { return _opcode; }
   uint32_t npulses() const { return _npulses; }
   uint32_t noutputs() const { return _noutputs; }
+  /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const EvrData::PulseConfig, 1> pulses(const boost::shared_ptr<T>& owner) const { 
     ptrdiff_t offset=12;
     const EvrData::PulseConfig* data = (const EvrData::PulseConfig*)(((char*)this)+offset);
     return make_ndarray(boost::shared_ptr<const EvrData::PulseConfig>(owner, data), this->_npulses);
-   }
+  }
+  /**     Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const EvrData::PulseConfig, 1> pulses() const { ptrdiff_t offset=12;
   const EvrData::PulseConfig* data = (const EvrData::PulseConfig*)(((char*)this)+offset);
   return make_ndarray(data, this->_npulses); }
+  /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const EvrData::OutputMap, 1> output_maps(const boost::shared_ptr<T>& owner) const { 
     ptrdiff_t offset=12+(24*(this->_npulses));
     const EvrData::OutputMap* data = (const EvrData::OutputMap*)(((char*)this)+offset);
     return make_ndarray(boost::shared_ptr<const EvrData::OutputMap>(owner, data), this->_noutputs);
-   }
+  }
+  /**     Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const EvrData::OutputMap, 1> output_maps() const { ptrdiff_t offset=12+(24*(this->_npulses));
   const EvrData::OutputMap* data = (const EvrData::OutputMap*)(((char*)this)+offset);
   return make_ndarray(data, this->_noutputs); }
@@ -451,30 +467,42 @@ public:
   uint32_t neventcodes() const { return _neventcodes; }
   uint32_t npulses() const { return _npulses; }
   uint32_t noutputs() const { return _noutputs; }
+  /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const EvrData::EventCodeV3, 1> eventcodes(const boost::shared_ptr<T>& owner) const { 
     ptrdiff_t offset=12;
     const EvrData::EventCodeV3* data = (const EvrData::EventCodeV3*)(((char*)this)+offset);
     return make_ndarray(boost::shared_ptr<const EvrData::EventCodeV3>(owner, data), this->_neventcodes);
-   }
+  }
+  /**     Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const EvrData::EventCodeV3, 1> eventcodes() const { ptrdiff_t offset=12;
   const EvrData::EventCodeV3* data = (const EvrData::EventCodeV3*)(((char*)this)+offset);
   return make_ndarray(data, this->_neventcodes); }
+  /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const EvrData::PulseConfigV3, 1> pulses(const boost::shared_ptr<T>& owner) const { 
     ptrdiff_t offset=12+(16*(this->_neventcodes));
     const EvrData::PulseConfigV3* data = (const EvrData::PulseConfigV3*)(((char*)this)+offset);
     return make_ndarray(boost::shared_ptr<const EvrData::PulseConfigV3>(owner, data), this->_npulses);
-   }
+  }
+  /**     Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const EvrData::PulseConfigV3, 1> pulses() const { ptrdiff_t offset=12+(16*(this->_neventcodes));
   const EvrData::PulseConfigV3* data = (const EvrData::PulseConfigV3*)(((char*)this)+offset);
   return make_ndarray(data, this->_npulses); }
+  /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const EvrData::OutputMap, 1> output_maps(const boost::shared_ptr<T>& owner) const { 
     ptrdiff_t offset=(12+(16*(this->_neventcodes)))+(16*(this->_npulses));
     const EvrData::OutputMap* data = (const EvrData::OutputMap*)(((char*)this)+offset);
     return make_ndarray(boost::shared_ptr<const EvrData::OutputMap>(owner, data), this->_noutputs);
-   }
+  }
+  /**     Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const EvrData::OutputMap, 1> output_maps() const { ptrdiff_t offset=(12+(16*(this->_neventcodes)))+(16*(this->_npulses));
   const EvrData::OutputMap* data = (const EvrData::OutputMap*)(((char*)this)+offset);
   return make_ndarray(data, this->_noutputs); }
@@ -503,30 +531,42 @@ public:
   uint32_t neventcodes() const { return _neventcodes; }
   uint32_t npulses() const { return _npulses; }
   uint32_t noutputs() const { return _noutputs; }
+  /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const EvrData::EventCodeV4, 1> eventcodes(const boost::shared_ptr<T>& owner) const { 
     ptrdiff_t offset=12;
     const EvrData::EventCodeV4* data = (const EvrData::EventCodeV4*)(((char*)this)+offset);
     return make_ndarray(boost::shared_ptr<const EvrData::EventCodeV4>(owner, data), this->_neventcodes);
-   }
+  }
+  /**     Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const EvrData::EventCodeV4, 1> eventcodes() const { ptrdiff_t offset=12;
   const EvrData::EventCodeV4* data = (const EvrData::EventCodeV4*)(((char*)this)+offset);
   return make_ndarray(data, this->_neventcodes); }
+  /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const EvrData::PulseConfigV3, 1> pulses(const boost::shared_ptr<T>& owner) const { 
     ptrdiff_t offset=12+(24*(this->_neventcodes));
     const EvrData::PulseConfigV3* data = (const EvrData::PulseConfigV3*)(((char*)this)+offset);
     return make_ndarray(boost::shared_ptr<const EvrData::PulseConfigV3>(owner, data), this->_npulses);
-   }
+  }
+  /**     Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const EvrData::PulseConfigV3, 1> pulses() const { ptrdiff_t offset=12+(24*(this->_neventcodes));
   const EvrData::PulseConfigV3* data = (const EvrData::PulseConfigV3*)(((char*)this)+offset);
   return make_ndarray(data, this->_npulses); }
+  /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const EvrData::OutputMap, 1> output_maps(const boost::shared_ptr<T>& owner) const { 
     ptrdiff_t offset=(12+(24*(this->_neventcodes)))+(16*(this->_npulses));
     const EvrData::OutputMap* data = (const EvrData::OutputMap*)(((char*)this)+offset);
     return make_ndarray(boost::shared_ptr<const EvrData::OutputMap>(owner, data), this->_noutputs);
-   }
+  }
+  /**     Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const EvrData::OutputMap, 1> output_maps() const { ptrdiff_t offset=(12+(24*(this->_neventcodes)))+(16*(this->_npulses));
   const EvrData::OutputMap* data = (const EvrData::OutputMap*)(((char*)this)+offset);
   return make_ndarray(data, this->_noutputs); }
@@ -585,12 +625,16 @@ public:
   EvrData::SequencerConfigV1::Source beam_source() const { return Source((this->_source>>8) & 0xff); }
   uint32_t length() const { return _length; }
   uint32_t cycles() const { return _cycles; }
+  /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const EvrData::SequencerEntry, 1> entries(const boost::shared_ptr<T>& owner) const { 
     ptrdiff_t offset=12;
     const EvrData::SequencerEntry* data = (const EvrData::SequencerEntry*)(((char*)this)+offset);
     return make_ndarray(boost::shared_ptr<const EvrData::SequencerEntry>(owner, data), this->length());
-   }
+  }
+  /**     Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const EvrData::SequencerEntry, 1> entries() const { ptrdiff_t offset=12;
   const EvrData::SequencerEntry* data = (const EvrData::SequencerEntry*)(((char*)this)+offset);
   return make_ndarray(data, this->length()); }
@@ -619,30 +663,42 @@ public:
   uint32_t neventcodes() const { return _neventcodes; }
   uint32_t npulses() const { return _npulses; }
   uint32_t noutputs() const { return _noutputs; }
+  /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const EvrData::EventCodeV5, 1> eventcodes(const boost::shared_ptr<T>& owner) const { 
     ptrdiff_t offset=12;
     const EvrData::EventCodeV5* data = (const EvrData::EventCodeV5*)(((char*)this)+offset);
     return make_ndarray(boost::shared_ptr<const EvrData::EventCodeV5>(owner, data), this->_neventcodes);
-   }
+  }
+  /**     Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const EvrData::EventCodeV5, 1> eventcodes() const { ptrdiff_t offset=12;
   const EvrData::EventCodeV5* data = (const EvrData::EventCodeV5*)(((char*)this)+offset);
   return make_ndarray(data, this->_neventcodes); }
+  /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const EvrData::PulseConfigV3, 1> pulses(const boost::shared_ptr<T>& owner) const { 
     ptrdiff_t offset=12+(40*(this->_neventcodes));
     const EvrData::PulseConfigV3* data = (const EvrData::PulseConfigV3*)(((char*)this)+offset);
     return make_ndarray(boost::shared_ptr<const EvrData::PulseConfigV3>(owner, data), this->_npulses);
-   }
+  }
+  /**     Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const EvrData::PulseConfigV3, 1> pulses() const { ptrdiff_t offset=12+(40*(this->_neventcodes));
   const EvrData::PulseConfigV3* data = (const EvrData::PulseConfigV3*)(((char*)this)+offset);
   return make_ndarray(data, this->_npulses); }
+  /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const EvrData::OutputMap, 1> output_maps(const boost::shared_ptr<T>& owner) const { 
     ptrdiff_t offset=(12+(40*(this->_neventcodes)))+(16*(this->_npulses));
     const EvrData::OutputMap* data = (const EvrData::OutputMap*)(((char*)this)+offset);
     return make_ndarray(boost::shared_ptr<const EvrData::OutputMap>(owner, data), this->_noutputs);
-   }
+  }
+  /**     Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const EvrData::OutputMap, 1> output_maps() const { ptrdiff_t offset=(12+(40*(this->_neventcodes)))+(16*(this->_npulses));
   const EvrData::OutputMap* data = (const EvrData::OutputMap*)(((char*)this)+offset);
   return make_ndarray(data, this->_noutputs); }
@@ -675,30 +731,42 @@ public:
   uint32_t neventcodes() const { return _neventcodes; }
   uint32_t npulses() const { return _npulses; }
   uint32_t noutputs() const { return _noutputs; }
+  /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const EvrData::EventCodeV5, 1> eventcodes(const boost::shared_ptr<T>& owner) const { 
     ptrdiff_t offset=12;
     const EvrData::EventCodeV5* data = (const EvrData::EventCodeV5*)(((char*)this)+offset);
     return make_ndarray(boost::shared_ptr<const EvrData::EventCodeV5>(owner, data), this->_neventcodes);
-   }
+  }
+  /**     Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const EvrData::EventCodeV5, 1> eventcodes() const { ptrdiff_t offset=12;
   const EvrData::EventCodeV5* data = (const EvrData::EventCodeV5*)(((char*)this)+offset);
   return make_ndarray(data, this->_neventcodes); }
+  /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const EvrData::PulseConfigV3, 1> pulses(const boost::shared_ptr<T>& owner) const { 
     ptrdiff_t offset=12+(40*(this->_neventcodes));
     const EvrData::PulseConfigV3* data = (const EvrData::PulseConfigV3*)(((char*)this)+offset);
     return make_ndarray(boost::shared_ptr<const EvrData::PulseConfigV3>(owner, data), this->_npulses);
-   }
+  }
+  /**     Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const EvrData::PulseConfigV3, 1> pulses() const { ptrdiff_t offset=12+(40*(this->_neventcodes));
   const EvrData::PulseConfigV3* data = (const EvrData::PulseConfigV3*)(((char*)this)+offset);
   return make_ndarray(data, this->_npulses); }
+  /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const EvrData::OutputMapV2, 1> output_maps(const boost::shared_ptr<T>& owner) const { 
     ptrdiff_t offset=(12+(40*(this->_neventcodes)))+(16*(this->_npulses));
     const EvrData::OutputMapV2* data = (const EvrData::OutputMapV2*)(((char*)this)+offset);
     return make_ndarray(boost::shared_ptr<const EvrData::OutputMapV2>(owner, data), this->_noutputs);
-   }
+  }
+  /**     Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const EvrData::OutputMapV2, 1> output_maps() const { ptrdiff_t offset=(12+(40*(this->_neventcodes)))+(16*(this->_npulses));
   const EvrData::OutputMapV2* data = (const EvrData::OutputMapV2*)(((char*)this)+offset);
   return make_ndarray(data, this->_noutputs); }
@@ -731,30 +799,42 @@ public:
   uint32_t neventcodes() const { return _neventcodes; }
   uint32_t npulses() const { return _npulses; }
   uint32_t noutputs() const { return _noutputs; }
+  /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const EvrData::EventCodeV6, 1> eventcodes(const boost::shared_ptr<T>& owner) const { 
     ptrdiff_t offset=12;
     const EvrData::EventCodeV6* data = (const EvrData::EventCodeV6*)(((char*)this)+offset);
     return make_ndarray(boost::shared_ptr<const EvrData::EventCodeV6>(owner, data), this->_neventcodes);
-   }
+  }
+  /**     Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const EvrData::EventCodeV6, 1> eventcodes() const { ptrdiff_t offset=12;
   const EvrData::EventCodeV6* data = (const EvrData::EventCodeV6*)(((char*)this)+offset);
   return make_ndarray(data, this->_neventcodes); }
+  /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const EvrData::PulseConfigV3, 1> pulses(const boost::shared_ptr<T>& owner) const { 
     ptrdiff_t offset=12+(44*(this->_neventcodes));
     const EvrData::PulseConfigV3* data = (const EvrData::PulseConfigV3*)(((char*)this)+offset);
     return make_ndarray(boost::shared_ptr<const EvrData::PulseConfigV3>(owner, data), this->_npulses);
-   }
+  }
+  /**     Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const EvrData::PulseConfigV3, 1> pulses() const { ptrdiff_t offset=12+(44*(this->_neventcodes));
   const EvrData::PulseConfigV3* data = (const EvrData::PulseConfigV3*)(((char*)this)+offset);
   return make_ndarray(data, this->_npulses); }
+  /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const EvrData::OutputMapV2, 1> output_maps(const boost::shared_ptr<T>& owner) const { 
     ptrdiff_t offset=(12+(44*(this->_neventcodes)))+(16*(this->_npulses));
     const EvrData::OutputMapV2* data = (const EvrData::OutputMapV2*)(((char*)this)+offset);
     return make_ndarray(boost::shared_ptr<const EvrData::OutputMapV2>(owner, data), this->_noutputs);
-   }
+  }
+  /**     Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const EvrData::OutputMapV2, 1> output_maps() const { ptrdiff_t offset=(12+(44*(this->_neventcodes)))+(16*(this->_npulses));
   const EvrData::OutputMapV2* data = (const EvrData::OutputMapV2*)(((char*)this)+offset);
   return make_ndarray(data, this->_noutputs); }
@@ -807,12 +887,16 @@ public:
   enum { TypeId = Pds::TypeId::Id_EvrData /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 3 /**< XTC type version number */ };
   uint32_t numFifoEvents() const { return _u32NumFifoEvents; }
+  /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const EvrData::FIFOEvent, 1> fifoEvents(const boost::shared_ptr<T>& owner) const { 
     ptrdiff_t offset=4;
     const EvrData::FIFOEvent* data = (const EvrData::FIFOEvent*)(((char*)this)+offset);
     return make_ndarray(boost::shared_ptr<const EvrData::FIFOEvent>(owner, data), this->_u32NumFifoEvents);
-   }
+  }
+  /**     Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const EvrData::FIFOEvent, 1> fifoEvents() const { ptrdiff_t offset=4;
   const EvrData::FIFOEvent* data = (const EvrData::FIFOEvent*)(((char*)this)+offset);
   return make_ndarray(data, this->_u32NumFifoEvents); }
@@ -843,11 +927,15 @@ public:
   }
   const char* name() const { return _name; }
   uint32_t ninfo() const { return _ninfo; }
+  /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const Pds::DetInfo, 1> infos(const boost::shared_ptr<T>& owner) const { 
     const Pds::DetInfo* data = &_info[0];
     return make_ndarray(boost::shared_ptr<const Pds::DetInfo>(owner, data), MaxInfos);
-   }
+  }
+  /**     Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const Pds::DetInfo, 1> infos() const { return make_ndarray(&_info[0], MaxInfos); }
   static uint32_t _sizeof() { return ((((((0+(1*(NameLength)))+4)+(8*(MaxInfos)))+4)-1)/4)*4; }
   /** Method which returns the shape (dimensions) of the data returned by name() method. */
@@ -870,12 +958,16 @@ public:
   enum { TypeId = Pds::TypeId::Id_EvrIOConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
   uint16_t nchannels() const { return _nchannels; }
+  /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const EvrData::IOChannel, 1> channels(const boost::shared_ptr<T>& owner) const { 
     ptrdiff_t offset=4;
     const EvrData::IOChannel* data = (const EvrData::IOChannel*)(((char*)this)+offset);
     return make_ndarray(boost::shared_ptr<const EvrData::IOChannel>(owner, data), this->_nchannels);
-   }
+  }
+  /**     Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const EvrData::IOChannel, 1> channels() const { ptrdiff_t offset=4;
   const EvrData::IOChannel* data = (const EvrData::IOChannel*)(((char*)this)+offset);
   return make_ndarray(data, this->_nchannels); }

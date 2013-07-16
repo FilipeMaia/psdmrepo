@@ -243,11 +243,15 @@ public:
   int32_t driverVersion() const { return _driverVersion; }
   uint32_t firmwareVersion() const { return _firmwareVersion; }
   uint32_t pixelThreshSize() const { return _pixelThreshSize; }
+  /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const uint8_t, 1> pixelThresh(const boost::shared_ptr<T>& owner) const { 
     const uint8_t* data = &_pixelThresh[0];
     return make_ndarray(boost::shared_ptr<const uint8_t>(owner, data), PixelThreshMax);
-   }
+  }
+  /**     Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const uint8_t, 1> pixelThresh() const { return make_ndarray(&_pixelThresh[0], PixelThreshMax); }
   const char* chip0Name() const { return _chip0Name; }
   const char* chip1Name() const { return _chip1Name; }
@@ -423,11 +427,15 @@ public:
   int32_t driverVersion() const { return _driverVersion; }
   uint32_t firmwareVersion() const { return _firmwareVersion; }
   uint32_t pixelThreshSize() const { return _pixelThreshSize; }
+  /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const uint8_t, 1> pixelThresh(const boost::shared_ptr<T>& owner) const { 
     const uint8_t* data = &_pixelThresh[0];
     return make_ndarray(boost::shared_ptr<const uint8_t>(owner, data), PixelThreshMax);
-   }
+  }
+  /**     Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const uint8_t, 1> pixelThresh() const { return make_ndarray(&_pixelThresh[0], PixelThreshMax); }
   const char* chip0Name() const { return _chip0Name; }
   const char* chip1Name() const { return _chip1Name; }
@@ -538,11 +546,15 @@ public:
   uint32_t timestamp() const { return _timestamp; }
   uint16_t frameCounter() const { return _frameCounter; }
   uint16_t lostRows() const { return _lostRows; }
+  /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const uint16_t, 2> data(const boost::shared_ptr<T>& owner) const { 
     const uint16_t* data = &_data[0][0];
     return make_ndarray(boost::shared_ptr<const uint16_t>(owner, data), Height, Width);
-   }
+  }
+  /**     Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const uint16_t, 2> data() const { return make_ndarray(&_data[0][0], Height, Width); }
   uint32_t width() const { return Width; }
   uint32_t height() const { return Height; }
@@ -578,12 +590,16 @@ public:
   uint16_t frameCounter() const { return _frameCounter; }
   /** lost row count */
   uint16_t lostRows() const { return _lostRows; }
+  /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
+    this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
   ndarray<const uint16_t, 2> data(const boost::shared_ptr<T>& owner) const { 
     ptrdiff_t offset=12;
     const uint16_t* data = (const uint16_t*)(((char*)this)+offset);
     return make_ndarray(boost::shared_ptr<const uint16_t>(owner, data), this->height(), this->width());
-   }
+  }
+  /**     Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const uint16_t, 2> data() const { ptrdiff_t offset=12;
   const uint16_t* data = (const uint16_t*)(((char*)this)+offset);
   return make_ndarray(data, this->height(), this->width()); }
