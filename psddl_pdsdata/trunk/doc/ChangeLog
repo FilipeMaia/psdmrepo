@@ -13,6 +13,7 @@ reverse time order.
 
 Tag: V00-05-02
 2013-07-15 Andy Salnikov
+- re-generated with psddl V00-08-05
 - add comments to methods which return ndarrays explaining lifetime
   management behavior
 
