@@ -15,7 +15,6 @@ namespace Lusi {
   
 */
 
-#pragma pack(push,4)
 
 class DiodeFexConfigV1 {
 public:
@@ -30,21 +29,23 @@ public:
     std::copy(arg__base, arg__base+(3), _base);
     std::copy(arg__scale, arg__scale+(3), _scale);
   }
+  /**     Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const float, 1> base() const { return make_ndarray(&_base[0], NRANGES); }
+  /**     Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const float, 1> scale() const { return make_ndarray(&_scale[0], NRANGES); }
-  static uint32_t _sizeof()  { return (((((0+(4*(NRANGES)))+(4*(NRANGES)))+4)-1)/4)*4; }
+  static uint32_t _sizeof() { return (((((0+(4*(NRANGES)))+(4*(NRANGES)))+4)-1)/4)*4; }
 private:
   float	_base[NRANGES];
   float	_scale[NRANGES];
 };
-#pragma pack(pop)
 
 /** @class DiodeFexConfigV2
 
   
 */
 
-#pragma pack(push,4)
 
 class DiodeFexConfigV2 {
 public:
@@ -59,21 +60,23 @@ public:
     std::copy(arg__base, arg__base+(16), _base);
     std::copy(arg__scale, arg__scale+(16), _scale);
   }
+  /**     Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const float, 1> base() const { return make_ndarray(&_base[0], NRANGES); }
+  /**     Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const float, 1> scale() const { return make_ndarray(&_scale[0], NRANGES); }
-  static uint32_t _sizeof()  { return (((((0+(4*(NRANGES)))+(4*(NRANGES)))+4)-1)/4)*4; }
+  static uint32_t _sizeof() { return (((((0+(4*(NRANGES)))+(4*(NRANGES)))+4)-1)/4)*4; }
 private:
   float	_base[NRANGES];
   float	_scale[NRANGES];
 };
-#pragma pack(pop)
 
 /** @class DiodeFexV1
 
   
 */
 
-#pragma pack(push,4)
 
 class DiodeFexV1 {
 public:
@@ -87,11 +90,10 @@ public:
   {
   }
   float value() const { return _value; }
-  static uint32_t _sizeof()  { return 4; }
+  static uint32_t _sizeof() { return 4; }
 private:
   float	_value;
 };
-#pragma pack(pop)
 
 /** @class IpmFexConfigV1
 
@@ -132,7 +134,6 @@ public:
   
 */
 
-#pragma pack(push,4)
 
 class IpmFexV1 {
 public:
@@ -147,25 +148,25 @@ public:
   {
     std::copy(arg__channel, arg__channel+(4), _channel);
   }
+  /**     Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const float, 1> channel() const { return make_ndarray(&_channel[0], NCHANNELS); }
   float sum() const { return _sum; }
   float xpos() const { return _xpos; }
   float ypos() const { return _ypos; }
-  static uint32_t _sizeof()  { return (((((((0+(4*(NCHANNELS)))+4)+4)+4)+4)-1)/4)*4; }
+  static uint32_t _sizeof() { return (((((((0+(4*(NCHANNELS)))+4)+4)+4)+4)-1)/4)*4; }
 private:
   float	_channel[NCHANNELS];
   float	_sum;
   float	_xpos;
   float	_ypos;
 };
-#pragma pack(pop)
 
 /** @class PimImageConfigV1
 
   
 */
 
-#pragma pack(push,4)
 
 class PimImageConfigV1 {
 public:
@@ -180,12 +181,11 @@ public:
   }
   float xscale() const { return _xscale; }
   float yscale() const { return _yscale; }
-  static uint32_t _sizeof()  { return 8; }
+  static uint32_t _sizeof() { return 8; }
 private:
   float	_xscale;
   float	_yscale;
 };
-#pragma pack(pop)
 } // namespace Lusi
 } // namespace Psana
 #endif // PSANA_LUSI_DDL_H

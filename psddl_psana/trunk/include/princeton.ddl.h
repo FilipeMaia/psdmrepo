@@ -244,7 +244,7 @@ public:
   {
   }
   float temperature() const { return _fTemperature; }
-  static uint32_t _sizeof()  { return 4; }
+  static uint32_t _sizeof() { return 4; }
 private:
   float	_fTemperature;
 };

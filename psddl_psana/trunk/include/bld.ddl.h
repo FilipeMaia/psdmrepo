@@ -20,7 +20,6 @@ namespace Bld {
                PV names: GDET:FEE1:11:ENRC, GDET:FEE1:12:ENRC, GDET:FEE1:21:ENRC, GDET:FEE1:22:ENRC.
 */
 
-#pragma pack(push,4)
 
 class BldDataFEEGasDetEnergy {
 public:
@@ -38,21 +37,19 @@ public:
   double f_21_ENRC() const { return _f_21_ENRC; }
   /** Value of GDET:FEE1:22:ENRC, in mJ. */
   double f_22_ENRC() const { return _f_22_ENRC; }
-  static uint32_t _sizeof()  { return 32; }
+  static uint32_t _sizeof() { return 32; }
 private:
   double	_f_11_ENRC;	/**< Value of GDET:FEE1:11:ENRC, in mJ. */
   double	_f_12_ENRC;	/**< Value of GDET:FEE1:12:ENRC, in mJ. */
   double	_f_21_ENRC;	/**< Value of GDET:FEE1:21:ENRC, in mJ. */
   double	_f_22_ENRC;	/**< Value of GDET:FEE1:22:ENRC, in mJ. */
 };
-#pragma pack(pop)
 
 /** @class BldDataEBeamV0
 
   Beam parameters.
 */
 
-#pragma pack(push,4)
 
 class BldDataEBeamV0 {
 public:
@@ -86,7 +83,7 @@ public:
   double ebeamLTUAngX() const { return _fEbeamLTUAngX; }
   /** LTU beam angle in mrad. */
   double ebeamLTUAngY() const { return _fEbeamLTUAngY; }
-  static uint32_t _sizeof()  { return 52; }
+  static uint32_t _sizeof() { return 52; }
 private:
   uint32_t	_uDamageMask;	/**< Damage mask. */
   double	_fEbeamCharge;	/**< Beam charge in nC. */
@@ -97,14 +94,12 @@ private:
   double	_fEbeamLTUAngY;	/**< LTU beam angle in mrad. */
 };
 std::ostream& operator<<(std::ostream& str, Bld::BldDataEBeamV0::DamageMask enval);
-#pragma pack(pop)
 
 /** @class BldDataEBeamV1
 
   
 */
 
-#pragma pack(push,4)
 
 class BldDataEBeamV1 {
 public:
@@ -141,7 +136,7 @@ public:
   double ebeamLTUAngY() const { return _fEbeamLTUAngY; }
   /** Beam current in Amps. */
   double ebeamPkCurrBC2() const { return _fEbeamPkCurrBC2; }
-  static uint32_t _sizeof()  { return 60; }
+  static uint32_t _sizeof() { return 60; }
 private:
   uint32_t	_uDamageMask;	/**< Damage mask. */
   double	_fEbeamCharge;	/**< Beam charge in nC. */
@@ -153,14 +148,12 @@ private:
   double	_fEbeamPkCurrBC2;	/**< Beam current in Amps. */
 };
 std::ostream& operator<<(std::ostream& str, Bld::BldDataEBeamV1::DamageMask enval);
-#pragma pack(pop)
 
 /** @class BldDataEBeamV2
 
   
 */
 
-#pragma pack(push,4)
 
 class BldDataEBeamV2 {
 public:
@@ -200,7 +193,7 @@ public:
   double ebeamPkCurrBC2() const { return _fEbeamPkCurrBC2; }
   /** Beam energy in MeV. */
   double ebeamEnergyBC2() const { return _fEbeamEnergyBC2; }
-  static uint32_t _sizeof()  { return 68; }
+  static uint32_t _sizeof() { return 68; }
 private:
   uint32_t	_uDamageMask;	/**< Damage mask. */
   double	_fEbeamCharge;	/**< Beam charge in nC. */
@@ -213,14 +206,12 @@ private:
   double	_fEbeamEnergyBC2;	/**< Beam energy in MeV. */
 };
 std::ostream& operator<<(std::ostream& str, Bld::BldDataEBeamV2::DamageMask enval);
-#pragma pack(pop)
 
 /** @class BldDataEBeamV3
 
   
 */
 
-#pragma pack(push,4)
 
 class BldDataEBeamV3 {
 public:
@@ -266,7 +257,7 @@ public:
   double ebeamPkCurrBC1() const { return _fEbeamPkCurrBC1; }
   /** Beam position in mm (related to beam energy). */
   double ebeamEnergyBC1() const { return _fEbeamEnergyBC1; }
-  static uint32_t _sizeof()  { return 84; }
+  static uint32_t _sizeof() { return 84; }
 private:
   uint32_t	_uDamageMask;	/**< Damage mask. */
   double	_fEbeamCharge;	/**< Beam charge in nC. */
@@ -281,7 +272,6 @@ private:
   double	_fEbeamEnergyBC1;	/**< Beam position in mm (related to beam energy). */
 };
 std::ostream& operator<<(std::ostream& str, Bld::BldDataEBeamV3::DamageMask enval);
-#pragma pack(pop)
 
 /** @class BldDataPhaseCavity
 
@@ -289,7 +279,6 @@ std::ostream& operator<<(std::ostream& str, Bld::BldDataEBeamV3::DamageMask enva
                 UND:R02:IOC:16:BAT:Charge1,  UND:R02:IOC:16:BAT:Charge2
 */
 
-#pragma pack(push,4)
 
 class BldDataPhaseCavity {
 public:
@@ -307,14 +296,13 @@ public:
   double charge1() const { return _fCharge1; }
   /** UND:R02:IOC:16:BAT:Charge2 value in pico-columbs. */
   double charge2() const { return _fCharge2; }
-  static uint32_t _sizeof()  { return 32; }
+  static uint32_t _sizeof() { return 32; }
 private:
   double	_fFitTime1;	/**< UND:R02:IOC:16:BAT:FitTime1 value in pico-seconds. */
   double	_fFitTime2;	/**< UND:R02:IOC:16:BAT:FitTime2 value in pico-seconds. */
   double	_fCharge1;	/**< UND:R02:IOC:16:BAT:Charge1 value in pico-columbs. */
   double	_fCharge2;	/**< UND:R02:IOC:16:BAT:Charge2 value in pico-columbs. */
 };
-#pragma pack(pop)
 
 /** @class BldDataIpimbV0
 

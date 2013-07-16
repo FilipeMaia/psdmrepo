@@ -88,7 +88,7 @@ public:
   }
   uint32_t shiftTest() const { return _shiftTest; }
   uint32_t version() const { return _version; }
-  static uint32_t _sizeof()  { return 8; }
+  static uint32_t _sizeof() { return 8; }
 private:
   uint32_t	_shiftTest;
   uint32_t	_version;
@@ -111,7 +111,7 @@ public:
   }
   uint32_t adcThreshold() const { return _adcThreshold; }
   uint32_t pixelCountThreshold() const { return _pixelCountThreshold; }
-  static uint32_t _sizeof()  { return 8; }
+  static uint32_t _sizeof() { return 8; }
 private:
   uint32_t	_adcThreshold;
   uint32_t	_pixelCountThreshold;

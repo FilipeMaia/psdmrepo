@@ -29,7 +29,7 @@ public:
   uint16_t column() const { return _column; }
   /** Row index (y value). */
   uint16_t row() const { return _row; }
-  static uint32_t _sizeof()  { return 4; }
+  static uint32_t _sizeof() { return 4; }
 private:
   uint16_t	_column;	/**< Column index (x value). */
   uint16_t	_row;	/**< Row index (y value). */

@@ -20,6 +20,7 @@ class ConfigV1 {
 public:
   enum { TypeId = Pds::TypeId::Id_ImpConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
+  enum { MaxNumberOfSamples = 0x3ff };
   enum Registers {
     Range,
     Cal_range,
@@ -63,8 +64,10 @@ public:
   {
     std::copy(arg__channels, arg__channels+(4), _channels);
   }
+  /**     Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const uint16_t, 1> channels() const { return make_ndarray(&_channels[0], 4); }
-  static uint32_t _sizeof()  { return ((((0+(2*(4)))+2)-1)/2)*2; }
+  static uint32_t _sizeof() { return ((((0+(2*(4)))+2)-1)/2)*2; }
 private:
   uint16_t	_channels[4];
 };
@@ -92,7 +95,7 @@ public:
   uint8_t remLinked() const { return uint8_t((this->_value>>17) & 0x1); }
   uint16_t zeros() const { return uint16_t((this->_value>>18) & 0x3ff); }
   uint8_t powersOkay() const { return uint8_t((this->_value>>28) & 0xf); }
-  static uint32_t _sizeof()  { return 4; }
+  static uint32_t _sizeof() { return 4; }
 private:
   uint32_t	_value;
 };

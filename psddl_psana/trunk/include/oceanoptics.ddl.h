@@ -32,7 +32,6 @@ public:
   
 */
 
-#pragma pack(push,4)
 
 class timespec64 {
 public:
@@ -45,12 +44,11 @@ public:
   }
   uint64_t tv_sec() const { return _tv_sec; }
   uint64_t tv_nsec() const { return _tv_nsec; }
-  static uint32_t _sizeof()  { return 16; }
+  static uint32_t _sizeof() { return 16; }
 private:
   uint64_t	_tv_sec;
   uint64_t	_tv_nsec;
 };
-#pragma pack(pop)
 
 /** @class DataV1
 

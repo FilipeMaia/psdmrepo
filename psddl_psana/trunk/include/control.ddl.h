@@ -16,7 +16,6 @@ namespace ControlData {
   
 */
 
-#pragma pack(push,4)
 
 class PVControl {
 public:
@@ -38,20 +37,18 @@ public:
   double value() const { return _value; }
   /** Returns true if the control is an array. */
   uint8_t array() const;
-  static uint32_t _sizeof()  { return ((((((0+(1*(32)))+4)+8)+4)-1)/4)*4; }
+  static uint32_t _sizeof() { return ((((((0+(1*(32)))+4)+8)+4)-1)/4)*4; }
 private:
   char	_name[32];	/**< Name of the control. */
   uint32_t	_index;	/**< Index of the control PV (for arrays) or NoArray. */
   double	_value;	/**< Value for this control. */
 };
-#pragma pack(pop)
 
 /** @class PVMonitor
 
   
 */
 
-#pragma pack(push,4)
 
 class PVMonitor {
 public:
@@ -75,21 +72,19 @@ public:
   double hiValue() const { return _hiValue; }
   /** Returns true if the monitor is an array. */
   uint8_t array() const;
-  static uint32_t _sizeof()  { return (((((((0+(1*(32)))+4)+8)+8)+4)-1)/4)*4; }
+  static uint32_t _sizeof() { return (((((((0+(1*(32)))+4)+8)+8)+4)-1)/4)*4; }
 private:
   char	_name[32];	/**< Name of the control. */
   uint32_t	_index;	/**< Index of the control PV (for arrays) or NoArray. */
   double	_loValue;	/**< Lowest value for this monitor. */
   double	_hiValue;	/**< Highest value for this monitor. */
 };
-#pragma pack(pop)
 
 /** @class PVLabel
 
   
 */
 
-#pragma pack(push,4)
 
 class PVLabel {
 public:
@@ -107,12 +102,11 @@ public:
   const char* name() const { return _name; }
   /** Label value. */
   const char* value() const { return _value; }
-  static uint32_t _sizeof()  { return (((((0+(1*(32)))+(1*(64)))+1)-1)/1)*1; }
+  static uint32_t _sizeof() { return (((((0+(1*(32)))+(1*(64)))+1)-1)/1)*1; }
 private:
   char	_name[32];	/**< PV name. */
   char	_value[64];	/**< Label value. */
 };
-#pragma pack(pop)
 
 /** @class ConfigV1
 

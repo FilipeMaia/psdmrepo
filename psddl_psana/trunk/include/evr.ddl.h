@@ -55,7 +55,7 @@ public:
   int16_t trigger() const;
   int16_t set() const;
   int16_t clear() const;
-  static uint32_t _sizeof()  { return 24; }
+  static uint32_t _sizeof() { return 24; }
 private:
   uint32_t	_pulse;	/**< internal pulse generation channel */
   uint32_t	_input_control;	/**< Pulse input control */
@@ -70,7 +70,6 @@ private:
   
 */
 
-#pragma pack(push,4)
 
 class PulseConfigV3 {
 public:
@@ -90,7 +89,7 @@ public:
   uint32_t delay() const { return _u32Delay; }
   /** Width in 119MHz clks */
   uint32_t width() const { return _u32Width; }
-  static uint32_t _sizeof()  { return 16; }
+  static uint32_t _sizeof() { return 16; }
 private:
   uint16_t	_u16PulseId;
   uint16_t	_u16Polarity;	/**< 0 -> positive polarity , 1 -> negative polarity */
@@ -98,14 +97,12 @@ private:
   uint32_t	_u32Delay;	/**< Delay in 119MHz clks */
   uint32_t	_u32Width;	/**< Width in 119MHz clks */
 };
-#pragma pack(pop)
 
 /** @class EventCodeV3
 
   
 */
 
-#pragma pack(push,4)
 
 class EventCodeV3 {
 public:
@@ -123,7 +120,7 @@ public:
   uint32_t maskTrigger() const { return _u32MaskTrigger; }
   uint32_t maskSet() const { return _u32MaskSet; }
   uint32_t maskClear() const { return _u32MaskClear; }
-  static uint32_t _sizeof()  { return 16; }
+  static uint32_t _sizeof() { return 16; }
 private:
   uint16_t	_u16Code;
   uint16_t	_u16MaskEventAttr;
@@ -131,14 +128,12 @@ private:
   uint32_t	_u32MaskSet;
   uint32_t	_u32MaskClear;
 };
-#pragma pack(pop)
 
 /** @class EventCodeV4
 
   
 */
 
-#pragma pack(push,4)
 
 class EventCodeV4 {
 public:
@@ -158,7 +153,7 @@ public:
   uint32_t maskTrigger() const { return _u32MaskTrigger; }
   uint32_t maskSet() const { return _u32MaskSet; }
   uint32_t maskClear() const { return _u32MaskClear; }
-  static uint32_t _sizeof()  { return 24; }
+  static uint32_t _sizeof() { return 24; }
 private:
   uint16_t	_u16Code;
   uint16_t	_u16MaskEventAttr;
@@ -168,14 +163,12 @@ private:
   uint32_t	_u32MaskSet;
   uint32_t	_u32MaskClear;
 };
-#pragma pack(pop)
 
 /** @class EventCodeV5
 
   
 */
 
-#pragma pack(push,4)
 
 class EventCodeV5 {
 public:
@@ -198,7 +191,7 @@ public:
   uint32_t maskSet() const { return _u32MaskSet; }
   uint32_t maskClear() const { return _u32MaskClear; }
   const char* desc() const { return _desc; }
-  static uint32_t _sizeof()  { return ((((24+(1*(DescSize)))+4)-1)/4)*4; }
+  static uint32_t _sizeof() { return ((((24+(1*(DescSize)))+4)-1)/4)*4; }
   /** Method which returns the shape (dimensions) of the data returned by desc() method. */
   std::vector<int> desc_shape() const;
 private:
@@ -211,14 +204,12 @@ private:
   uint32_t	_u32MaskClear;
   char	_desc[DescSize];
 };
-#pragma pack(pop)
 
 /** @class EventCodeV6
 
   
 */
 
-#pragma pack(push,4)
 
 class EventCodeV6 {
 public:
@@ -243,7 +234,7 @@ public:
   uint32_t maskClear() const { return _u32MaskClear; }
   const char* desc() const { return _desc; }
   uint16_t readoutGroup() const { return _u16ReadGroup; }
-  static uint32_t _sizeof()  { return (((((24+(1*(DescSize)))+2)+4)-1)/4)*4; }
+  static uint32_t _sizeof() { return (((((24+(1*(DescSize)))+2)+4)-1)/4)*4; }
   /** Method which returns the shape (dimensions) of the data returned by desc() method. */
   std::vector<int> desc_shape() const;
 private:
@@ -257,7 +248,6 @@ private:
   char	_desc[DescSize];
   uint16_t	_u16ReadGroup;
 };
-#pragma pack(pop)
 
 /** @class OutputMap
 
@@ -290,7 +280,7 @@ public:
   uint8_t source_id() const { return uint8_t((this->_v>>8) & 0xff); }
   EvrData::OutputMap::Conn conn() const { return Conn((this->_v>>16) & 0xff); }
   uint8_t conn_id() const { return uint8_t((this->_v>>24) & 0xff); }
-  static uint32_t _sizeof()  { return 4; }
+  static uint32_t _sizeof() { return 4; }
 private:
   uint32_t	_v;
 };
@@ -329,7 +319,7 @@ public:
   EvrData::OutputMapV2::Conn conn() const { return Conn((this->_v>>12) & 0xf); }
   uint8_t conn_id() const { return uint8_t((this->_v>>16) & 0xff); }
   uint8_t module() const { return uint8_t((this->_v>>24) & 0xff); }
-  static uint32_t _sizeof()  { return 4; }
+  static uint32_t _sizeof() { return 4; }
 private:
   uint32_t	_v;
 };
@@ -448,7 +438,7 @@ public:
   }
   uint32_t delay() const { return uint32_t(this->_value & 0xffffff); }
   uint32_t eventcode() const { return uint32_t((this->_value>>24) & 0xff); }
-  static uint32_t _sizeof()  { return 4; }
+  static uint32_t _sizeof() { return 4; }
 private:
   uint32_t	_value;
 };
@@ -564,7 +554,7 @@ public:
   uint32_t timestampHigh() const { return _timestampHigh; }
   uint32_t timestampLow() const { return _timestampLow; }
   uint32_t eventCode() const { return _eventCode; }
-  static uint32_t _sizeof()  { return 12; }
+  static uint32_t _sizeof() { return 12; }
 private:
   uint32_t	_timestampHigh;
   uint32_t	_timestampLow;
@@ -607,8 +597,10 @@ public:
   }
   const char* name() const { return _name; }
   uint32_t ninfo() const { return _ninfo; }
+  /**     Note: this method returns ndarray instance which does not control lifetime
+    of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const Pds::DetInfo, 1> infos() const { return make_ndarray(&_info[0], MaxInfos); }
-  static uint32_t _sizeof()  { return ((((((0+(1*(NameLength)))+4)+(8*(MaxInfos)))+4)-1)/4)*4; }
+  static uint32_t _sizeof() { return ((((((0+(1*(NameLength)))+4)+(8*(MaxInfos)))+4)-1)/4)*4; }
   /** Method which returns the shape (dimensions) of the data returned by name() method. */
   std::vector<int> name_shape() const;
 private:
