@@ -25,6 +25,8 @@
                 <enum-const name="Adc_delay" />
                 <enum-const name="NumberOfRegisters" />
             </enum>
+            
+            <const name="MaxNumberOfSamples" value="0x3ff"/>
 
             <attribute name="_range" type="uint32_t" accessor="range" />
             <attribute name="_calRange" type="uint32_t" accessor="calRange" />
