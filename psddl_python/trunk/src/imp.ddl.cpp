@@ -59,6 +59,8 @@ void createWrappers(PyObject* module) {
     .value("Adc_delay",Psana::Imp::ConfigV1::Adc_delay)
     .value("NumberOfRegisters",Psana::Imp::ConfigV1::NumberOfRegisters)
   ;
+
+  scope().attr("MaxNumberOfSamples")=0x3ff;
   }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Imp::ConfigV1> >(Pds::TypeId::Id_ImpConfig));
 

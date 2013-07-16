@@ -11,7 +11,12 @@ Package author: Joseph S. Barrera
 Please describe any modifications that you made to the package in the
 reverse time order.
 
-Tag: V00-05-03 
+Tag: V00-05-04
+2013-07-10 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-29
+- one missing const added to imp package
+
+Tag: V00-05-03
 2013-07-10 David Schneider
 - exporting enums and constants from the pstypes into the python wrappers.
 	
