@@ -11,6 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-05
+2013-07-16 Andy Salnikov
+- psana backend:
+  - get rid of pragma pack
+  - do not generate overloaded methods for ndarray return type
+
 Tag: V00-08-04
 2013-07-16 Andy Salnikov
 - few small fixed for problems noticed by pylint

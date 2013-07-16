@@ -100,13 +100,14 @@ class CppTypeCodegen ( object ) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self, inc, cpp, type, abstract=False ) :
+    def __init__ ( self, inc, cpp, type, abstract=False, pdsdata=False ) :
 
         # define instance variables
         self._inc = inc
         self._cpp = cpp
         self._type = type
         self._abs = abstract
+        self._pdsdata = pdsdata
 
     #-------------------
     #  Public methods --
@@ -124,7 +125,7 @@ class CppTypeCodegen ( object ) :
             print >>self._inc, T("class $name;")[cfg]
 
         # for non-abstract types C++ may need pack pragma
-        needPragmaPack = not self._abs and self._type.pack
+        needPragmaPack = self._pdsdata and self._type.pack
         if needPragmaPack : 
             print >>self._inc, T("#pragma pack(push,$pack)")[self._type]
 
@@ -269,18 +270,18 @@ class CppTypeCodegen ( object ) :
             elif attr.type.value_type :
                 
                 rettype = "ndarray<const %s, %d>" % (_typename(attr.stor_type), len(attr.shape.dims))
-                if not self._abs:
+                if self._pdsdata:
                     # for pdsdata only generate method which takes shared pointer to object owning the data
                     body = self._bodyNDArrray(attr, 'T')
                     args_shptr = [('owner', 'const boost::shared_ptr<T>&')]
                     docstring = attr.comment+"\n\n" if attr.comment else ""
-                    docstring += "Note: this overloaded method accepts shared pointer argument which must point to an object containing\n"\
+                    docstring += "    Note: this overloaded method accepts shared pointer argument which must point to an object containing\n"\
                         "    this instance, the returned ndarray object can be used even after this instance disappears."
                     self._genMethodBody(meth.name, rettype, body, args=args_shptr, inline=True, doc=docstring, template='T')
                     
                 if not self._abs:
                     docstring = attr.comment+"\n\n" if attr.comment else ""
-                    docstring += "Note: this overloaded method returns ndarray instance which does not control lifetime\n" \
+                    docstring += "    Note: this method returns ndarray instance which does not control lifetime\n" \
                         "    of the data, do not use returned ndarray after this instance disappears."
                 body = self._bodyNDArrray(attr)
 

@@ -179,7 +179,7 @@ class DdlPdsdata ( object ) :
         # skip included types
         if type.included : return
 
-        codegen = CppTypeCodegen(self.inc, self.cpp, type)
+        codegen = CppTypeCodegen(self.inc, self.cpp, type, pdsdata=True)
         codegen.codegen()
 
     def _genConst(self, const):
