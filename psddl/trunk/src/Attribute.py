@@ -97,9 +97,6 @@ class Attribute ( object ) :
         if isinstance(self.type, Enum): return self.type.base
         return self.type
 
-    def name(self):
-        return self._name
-
     def align(self):
         return self.stor_type.align
 

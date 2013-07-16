@@ -385,7 +385,7 @@ class XmlReader ( object ) :
         dstype = dselem.get('type')
         if dstype:
             dstype = pstype.lookup(dstype, (Type, Enum))
-            if not dstype: raise ValueError('dataset element has unknown type '+elem.get('type'))
+            if not dstype: raise ValueError('dataset element has unknown type '+dselem.get('type'))
 
         # make dataset
         ds = H5Dataset(name = dsname, 

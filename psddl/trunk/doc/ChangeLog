@@ -11,6 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-04
+2013-07-16 Andy Salnikov
+- few small fixed for problems noticed by pylint
+- add comments to the methods returning ndarrays concerning lifetime
+  of the returned objects
+
 Tag: V00-08-03
 2013-07-11 Andy Salnikov
 - move some pieces of code from DdlPds2Psana.py into data/templates/pds2psana.tmpl

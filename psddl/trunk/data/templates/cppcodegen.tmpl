@@ -171,7 +171,7 @@ ptrdiff_t offset={{attr.offset}};
     const {{type}}* data = (const {{type}}*)(((char*)this)+offset);
 {% endif %}
     return make_ndarray(boost::shared_ptr<const {{type}}>(owner, data){{comma_shape}});
-  
+ 
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ::::template:::: body_shape
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

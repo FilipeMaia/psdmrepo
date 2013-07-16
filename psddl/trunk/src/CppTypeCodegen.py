@@ -250,7 +250,8 @@ class CppTypeCodegen ( object ) :
             
             attr = meth.attribute
             args = []
-                        
+            docstring = attr.comment
+            
             if not attr.shape:
                 
                 # attribute is a regular non-array object, 
@@ -268,9 +269,19 @@ class CppTypeCodegen ( object ) :
             elif attr.type.value_type :
                 
                 rettype = "ndarray<const %s, %d>" % (_typename(attr.stor_type), len(attr.shape.dims))
-                body = self._bodyNDArrray(attr, 'T')
-                args_shptr = [('owner', 'const boost::shared_ptr<T>&')]
-                self._genMethodBody(meth.name, rettype, body, args=args_shptr, inline=True, doc=attr.comment, template='T')
+                if not self._abs:
+                    # for pdsdata only generate method which takes shared pointer to object owning the data
+                    body = self._bodyNDArrray(attr, 'T')
+                    args_shptr = [('owner', 'const boost::shared_ptr<T>&')]
+                    docstring = attr.comment+"\n\n" if attr.comment else ""
+                    docstring += "Note: this overloaded method accepts shared pointer argument which must point to an object containing\n"\
+                        "    this instance, the returned ndarray object can be used even after this instance disappears."
+                    self._genMethodBody(meth.name, rettype, body, args=args_shptr, inline=True, doc=docstring, template='T')
+                    
+                if not self._abs:
+                    docstring = attr.comment+"\n\n" if attr.comment else ""
+                    docstring += "Note: this overloaded method returns ndarray instance which does not control lifetime\n" \
+                        "    of the data, do not use returned ndarray after this instance disappears."
                 body = self._bodyNDArrray(attr)
 
             else:
@@ -281,7 +292,7 @@ class CppTypeCodegen ( object ) :
                 body = self._bodyAnyArrray(attr)
 
 
-            self._genMethodBody(meth.name, rettype, body, args, inline=True, doc=attr.comment)
+            self._genMethodBody(meth.name, rettype, body, args, inline=True, doc=docstring)
 
         elif meth.bitfield:
 

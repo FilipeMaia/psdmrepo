@@ -160,35 +160,6 @@ class DSAttribute(object):
                     return [T('$atype* $aname;')(locals())]
 
 
-    def ds_attr_decl(self):
-        '''Returns list of declarations for this attribute in a dataset structure'''
-
-        # base type
-        attr = self.attr
-        aname = attr.name
-        if not attr.stor_type.basic:
-            atype = _h5ds_typename(attr)
-        else:
-            atype = attr.stor_type.name
-
-        if attr.rank == 0:
-            return [T('$atype $aname;')(locals())]
-        else:
-            if atype == 'char':
-                if attr.sizeIsVlen():
-                    return [T('$atype* $aname;')(locals())]
-                else:
-                    size = attr.shape.size()
-                    return [T('$atype $aname[$size];')(locals())]
-            else:
-                if attr.sizeIsVlen(): 
-                    return [T('size_t vlen_$aname;')(locals()), T('$atype* $aname;')(locals())]
-                elif attr.sizeIsConst():
-                    size = attr.shape.size()
-                    return [T('$atype $aname[$size];')(locals())]
-                else:
-                    return [T('$atype* $aname;')(locals())]
-
     def ds_attr_init(self):
         '''Returns list of initializers for attribute in dataset constructor'''
 
@@ -453,7 +424,7 @@ class DatasetRegular(object):
             aschema = self.ds.h5schema()
             if not aschema: raise ValueError('No schema found for dataset %s' % self.ds.name)
             if len(aschema.datasets) != 1:
-                raise ValueError('Attribute schema has number of datasets != 1: %d for attr %s of type %s' % (len(aschema.datasets), self.name, self.ds.type.name))
+                raise ValueError('Attribute schema has number of datasets != 1: %d for attr %s of type %s' % (len(aschema.datasets), self.ds.name, self.ds.type.name))
 
             return T("${name}_v${version}")[aschema]
 

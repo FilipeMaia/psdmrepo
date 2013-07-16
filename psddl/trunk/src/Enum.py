@@ -68,10 +68,6 @@ class Enum ( Namespace ) :
         self.basic = True
         self.value_type = True
 
-    @property
-    def external(self):
-        return 'external' in self.tags
-
     def __str__(self):
         res = "<Enum(" + self.name
         for c in self.constants() :

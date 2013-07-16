@@ -110,7 +110,7 @@ class _sdbm(object):
     def hash(self, string):
         hash = 0
         for ch in string:
-            hash = ord(c) + (hash << 6) + (hash << 16) - hash
+            hash = ord(ch) + (hash << 6) + (hash << 16) - hash
             hash = (2^32 + hash) % 2^32
         return hash
 
