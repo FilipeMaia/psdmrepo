@@ -1,0 +1,169 @@
+#!@PYTHON@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  Script psddlc...
+#
+#------------------------------------------------------------------------
+
+"""Compiler from psddl into other formats.
+
+This software was developed for the LCLS project.  If you use all or 
+part of it, please give an appropriate acknowledgement.
+
+@see RelatedModule
+
+@version $Id$ 
+
+@author Andrei Salnikov
+"""
+
+#------------------------------
+#  Module's version from CVS --
+#------------------------------
+__version__ = "$Revision$"
+# $Source$
+
+#--------------------------------
+#  Imports of standard modules --
+#--------------------------------
+import sys
+import os
+
+#---------------------------------
+#  Imports of base class module --
+#---------------------------------
+from LusiPython.LusiPyApp import LusiPyApp
+
+#-----------------------------
+# Imports for other modules --
+#-----------------------------
+from psddl.XmlReader import XmlReader
+from psddl.DdlPds2Psana import DdlPds2Psana
+from psddl.DdlPsanaInterfaces import DdlPsanaInterfaces
+from psddl.DdlPdsdata import DdlPdsdata
+
+#---------------------
+# Local definitions --
+#---------------------
+
+#---------------------------------
+#  Application class definition --
+#---------------------------------
+
+class psddlc ( LusiPyApp ) :
+
+    def __init__ ( self ) :
+
+        LusiPyApp.__init__ ( self, installLogger = True, 
+                             usage = "usage: %prog [options] input-file ...",
+                             logfmt = '%(levelname)s %(message)s' )
+        
+        self._parser.set_defaults(backend = "psana",
+                                  header = None,
+                                  output = None,
+                                  header_dir = None,
+                                  output_dir = None,
+                                  gen_incdir = "",
+                                  include_dir = [],
+                                  top_package = None,
+                                  backend_options = [])
+        
+        self._parser.add_option("-b", "--backend", metavar="NAME", 
+                                help="use specified backend (pdsdata, psana, etc.)")
+        self._parser.add_option("-I", "--include-dir",  action="append",
+                                help="directory to search for included files", metavar="PATH")
+        self._parser.add_option("-e", "--header",
+                                help="output file name for header/declarations", metavar="PATH")
+        self._parser.add_option("-E", "--header-dir",
+                                help="output directory for header/declarations", metavar="PATH")
+        self._parser.add_option("-o", "--output",
+                                help="output file name for source", metavar="PATH")
+        self._parser.add_option("-O", "--output-dir",
+                                help="output directory for source", metavar="PATH")
+        self._parser.add_option("-i", "--gen-incdir",
+                                help="include directory for headers in generated code", metavar="PATH")
+        self._parser.add_option("-t", "--top-package",
+                                help="top-level package/namespace for generated code", metavar="NAME")
+        self._parser.add_option("-B", "--backend-options", action="append",
+                                help="options for backend, form key:value or key", metavar="OPTION")
+
+
+    #
+    #  Run the whole thing after parsing the command argunments and 
+    #  installing logger. See BbrPyApp class for details.
+    #
+    def _run ( self ) :
+
+        # check the arguments
+        if not self._args:
+            self._parser.error("one or more arguments required")
+            return 2
+
+        input = self._args
+        base = os.path.basename(input[0])
+
+        header = self._options.header
+        source = self._options.output
+        
+        generator = None
+
+        # build dict with backend options
+        backend_options = dict()
+        for opt in self._options.backend_options:
+            words = opt.split(':',1) + [None]
+            backend_options[words[0]] = words[1]
+        
+        # add few standard options
+        backend_options['top-package'] = self._options.top_package
+        backend_options['gen-incdir'] = self._options.gen_incdir
+        
+
+        if self._options.backend == "pdsdata" :
+            if not header : header = os.path.splitext(base)[0] + '.h'
+            if not source : source = os.path.splitext(base)[0] + '.cpp'
+            if self._options.header_dir: header = os.path.join(self._options.header_dir, header)
+            if self._options.output_dir: source = os.path.join(self._options.output_dir, source)
+            generator = DdlPdsdata(header, source, backend_options)
+        elif self._options.backend == "psana" :
+            if not header : header = os.path.splitext(base)[0] + '.h'
+            if not source : source = os.path.splitext(base)[0] + '.cpp'
+            if self._options.header_dir: header = os.path.join(self._options.header_dir, header)
+            if self._options.output_dir: source = os.path.join(self._options.output_dir, source)
+            generator = DdlPsanaInterfaces(header, source, backend_options)
+        elif self._options.backend == "pds2psana" :
+            if not header : header = os.path.splitext(base)[0] + '.h'
+            if not source : source = os.path.splitext(base)[0] + '.cpp'
+            if self._options.header_dir: header = os.path.join(self._options.header_dir, header)
+            if self._options.output_dir: source = os.path.join(self._options.output_dir, source)
+            generator = DdlPds2Psana(header, source, backend_options)
+
+        try :
+            reader = XmlReader(input, self._options.include_dir)
+            model = reader.read()
+        except Exception, ex:
+            print >>sys.stderr, "parsing failed for file", input
+            print >>sys.stderr, "reason:", ex
+            raise
+            return 2
+
+        if generator :
+            try :
+                generator.parseTree(model)
+            except Exception, ex:
+                print >>sys.stderr, "generation failed for file", input
+                print >>sys.stderr, "reason:", ex
+                raise
+                return 2
+
+        return 0
+
+#
+#  run application when imported as a main module
+#
+if __name__ == "__main__" :
+    app = psddlc()
+    rc = app.run()
+    sys.exit(rc)

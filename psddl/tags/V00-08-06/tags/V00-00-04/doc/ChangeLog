@@ -1,0 +1,50 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package psddl
+#------------------------------------------------------------------------
+
+Package author: Andy Salnikov
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-04
+2011-03-30 Andy Salnikov
+- adding support for the unknown-size types in pds2psana backend:
+  - adding size argument for the constructor declaration of such types
+  - definition of the constructor cannot be generated at this time
+    and has to be added manually
+  - there is exactly one type now which needs this, so manual definition
+    is probably OK
+
+Tag: V00-00-03
+2011-03-28 Andy Salnikov
+- implemented support for base types in DdlPds2Psana
+
+Tag: V00-00-02
+2011-03-21 Andy Salnikov
+- fixing code generation for array member access
+
+Tag: V00-00-01
+2011-03-20 Andy Salnikov
+- first production tag
+- lots of changes, almost complete
+
+Tag: andy-20101209-01
+2010-12-09 Andrei Salnikov
+- adding bitfield support
+
+Tag: andy-20101208-02
+2010-12-08 Andrei Salnikov
+- added "use" directive to import types from other files
+
+Tag: andy-20101208-01
+2010-12-08 Andrei Salnikov
+- further development, introduced namespaces/lookup
+
+Tag: andy-20101027-01
+2010-10-27 Andrei Salnikov
+- First version with very limited functionality, development tag.
