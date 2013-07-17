@@ -109,6 +109,8 @@ void createWrappers(PyObject* module) {
   ;
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::CsPad2x2::ConfigV1QuadReg> >(-1));
 
+  {
+  scope outer = 
   class_<Psana::CsPad2x2::ConfigV1, boost::shared_ptr<Psana::CsPad2x2::ConfigV1>, boost::noncopyable >("ConfigV1", no_init)
     .def("concentratorVersion", &Psana::CsPad2x2::ConfigV1::concentratorVersion)
     .def("protectionThreshold", &Psana::CsPad2x2::ConfigV1::protectionThreshold, return_value_policy<copy_const_reference>())
@@ -124,6 +126,9 @@ void createWrappers(PyObject* module) {
     .def("numAsicsRead", &Psana::CsPad2x2::ConfigV1::numAsicsRead)
     .def("numAsicsStored", &Psana::CsPad2x2::ConfigV1::numAsicsStored)
   ;
+  scope().attr("Version")=1;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_Cspad2x2Config);
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::CsPad2x2::ConfigV1> >(Pds::TypeId::Id_Cspad2x2Config));
 
   class_<Psana::CsPad2x2::ConfigV2QuadReg, boost::shared_ptr<Psana::CsPad2x2::ConfigV2QuadReg>, boost::noncopyable >("ConfigV2QuadReg", no_init)
@@ -156,6 +161,8 @@ void createWrappers(PyObject* module) {
   ;
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::CsPad2x2::ConfigV2QuadReg> >(-1));
 
+  {
+  scope outer = 
   class_<Psana::CsPad2x2::ConfigV2, boost::shared_ptr<Psana::CsPad2x2::ConfigV2>, boost::noncopyable >("ConfigV2", no_init)
     .def("concentratorVersion", &Psana::CsPad2x2::ConfigV2::concentratorVersion)
     .def("protectionThreshold", &Psana::CsPad2x2::ConfigV2::protectionThreshold, return_value_policy<copy_const_reference>())
@@ -172,6 +179,9 @@ void createWrappers(PyObject* module) {
     .def("numAsicsRead", &Psana::CsPad2x2::ConfigV2::numAsicsRead)
     .def("numAsicsStored", &Psana::CsPad2x2::ConfigV2::numAsicsStored)
   ;
+  scope().attr("Version")=2;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_Cspad2x2Config);
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::CsPad2x2::ConfigV2> >(Pds::TypeId::Id_Cspad2x2Config));
 
   {
@@ -191,7 +201,8 @@ void createWrappers(PyObject* module) {
     .def("data", &Psana::CsPad2x2::ElementV1::data)
     .def("common_mode", &Psana::CsPad2x2::ElementV1::common_mode)
   ;
-
+  scope().attr("Version")=1;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_Cspad2x2Element);
   scope().attr("Nsbtemp")=4;
   }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::CsPad2x2::ElementV1> >(Pds::TypeId::Id_Cspad2x2Element));

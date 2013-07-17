@@ -11,6 +11,12 @@ Package author: Joseph S. Barrera
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-05
+2013-07-17 David Schneider
+- Regenerating python wrappers with version and TypeId exported. Adding 
+  a unit test for enum and constant exporting into the python wrappers.
+
+	
 Tag: V00-05-04
 2013-07-10 Andy Salnikov
 - regenerate whole thing from psddldata V00-04-29

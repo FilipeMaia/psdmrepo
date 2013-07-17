@@ -31,12 +31,17 @@ void createWrappers(PyObject* module) {
   Py_INCREF(submodule);
   PyModule_AddObject(module, "OceanOptics", submodule);
   scope mod = object(handle<>(borrowed(submodule)));
+  {
+  scope outer = 
   class_<Psana::OceanOptics::ConfigV1, boost::shared_ptr<Psana::OceanOptics::ConfigV1>, boost::noncopyable >("ConfigV1", no_init)
     .def("exposureTime", &Psana::OceanOptics::ConfigV1::exposureTime)
     .def("waveLenCalib", &Psana::OceanOptics::ConfigV1::waveLenCalib)
     .def("nonlinCorrect", &Psana::OceanOptics::ConfigV1::nonlinCorrect)
     .def("strayLightConstant", &Psana::OceanOptics::ConfigV1::strayLightConstant)
   ;
+  scope().attr("Version")=1;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_OceanOpticsConfig);
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::OceanOptics::ConfigV1> >(Pds::TypeId::Id_OceanOpticsConfig));
 
   class_<Psana::OceanOptics::timespec64 >("timespec64", no_init)
@@ -61,7 +66,8 @@ void createWrappers(PyObject* module) {
     .def("durationOfFrame", &Psana::OceanOptics::DataV1::durationOfFrame)
     .def("nonlinerCorrected", &Psana::OceanOptics::DataV1::nonlinerCorrected)
   ;
-
+  scope().attr("Version")=1;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_OceanOpticsData);
   scope().attr("iDataReadSize")=8192;
   scope().attr("iNumPixels")=3840;
   scope().attr("iActivePixelIndex")=22;

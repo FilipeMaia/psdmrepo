@@ -62,15 +62,22 @@ void createWrappers(PyObject* module) {
     .value("ENUM_FAN_ACQOFF",Psana::Andor::ConfigV1::ENUM_FAN_ACQOFF)
     .value("ENUM_FAN_NUM",Psana::Andor::ConfigV1::ENUM_FAN_NUM)
   ;
+  scope().attr("Version")=1;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_AndorConfig);
   }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Andor::ConfigV1> >(Pds::TypeId::Id_AndorConfig));
 
+  {
+  scope outer = 
   class_<Psana::Andor::FrameV1, boost::shared_ptr<Psana::Andor::FrameV1>, boost::noncopyable >("FrameV1", no_init)
     .def("shotIdStart", &Psana::Andor::FrameV1::shotIdStart)
     .def("readoutTime", &Psana::Andor::FrameV1::readoutTime)
     .def("temperature", &Psana::Andor::FrameV1::temperature)
     .def("data", &Psana::Andor::FrameV1::data)
   ;
+  scope().attr("Version")=1;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_AndorFrame);
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Andor::FrameV1> >(Pds::TypeId::Id_AndorFrame));
 
   {

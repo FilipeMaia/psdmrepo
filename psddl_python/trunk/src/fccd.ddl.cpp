@@ -49,7 +49,8 @@ void createWrappers(PyObject* module) {
     .value("Output_FIFO",Psana::FCCD::FccdConfigV1::Output_FIFO)
     .value("Output_Pattern4",Psana::FCCD::FccdConfigV1::Output_Pattern4)
   ;
-
+  scope().attr("Version")=1;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_FccdConfig);
   scope().attr("Row_Pixels")=500;
   scope().attr("Column_Pixels")=576;
   scope().attr("Trimmed_Row_Pixels")=480;
@@ -84,7 +85,8 @@ void createWrappers(PyObject* module) {
     .value("Test_Pattern3",Psana::FCCD::FccdConfigV2::Test_Pattern3)
     .value("Test_Pattern4",Psana::FCCD::FccdConfigV2::Test_Pattern4)
   ;
-
+  scope().attr("Version")=2;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_FccdConfig);
   scope().attr("Row_Pixels")=500;
   scope().attr("Column_Pixels")=576 * 2;
   scope().attr("Trimmed_Row_Pixels")=480;

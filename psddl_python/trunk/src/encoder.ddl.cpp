@@ -57,6 +57,8 @@ void createWrappers(PyObject* module) {
     .value("X4",Psana::Encoder::ConfigV1::X4)
     .value("QUAD_END",Psana::Encoder::ConfigV1::QUAD_END)
   ;
+  scope().attr("Version")=1;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_EncoderConfig);
   }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Encoder::ConfigV1> >(Pds::TypeId::Id_EncoderConfig));
 
@@ -86,14 +88,21 @@ void createWrappers(PyObject* module) {
     .value("X4",Psana::Encoder::ConfigV2::X4)
     .value("QUAD_END",Psana::Encoder::ConfigV2::QUAD_END)
   ;
+  scope().attr("Version")=2;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_EncoderConfig);
   }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Encoder::ConfigV2> >(Pds::TypeId::Id_EncoderConfig));
 
+  {
+  scope outer = 
   class_<Psana::Encoder::DataV1, boost::shared_ptr<Psana::Encoder::DataV1>, boost::noncopyable >("DataV1", no_init)
     .def("timestamp", &Psana::Encoder::DataV1::timestamp)
     .def("encoder_count", &Psana::Encoder::DataV1::encoder_count)
     .def("value", &Psana::Encoder::DataV1::value)
   ;
+  scope().attr("Version")=1;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_EncoderData);
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Encoder::DataV1> >(Pds::TypeId::Id_EncoderData));
 
   {
@@ -103,7 +112,8 @@ void createWrappers(PyObject* module) {
     .def("encoder_count", &Psana::Encoder::DataV2::encoder_count)
     .def("value", &Psana::Encoder::DataV2::value)
   ;
-
+  scope().attr("Version")=2;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_EncoderData);
   scope().attr("NEncoders")=3;
   }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Encoder::DataV2> >(Pds::TypeId::Id_EncoderData));

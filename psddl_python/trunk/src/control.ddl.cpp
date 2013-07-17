@@ -39,7 +39,6 @@ void createWrappers(PyObject* module) {
     .def("value", &Psana::ControlData::PVControl::value)
     .def("array", &Psana::ControlData::PVControl::array)
   ;
-
   scope().attr("NameSize")=32;
   scope().attr("NoArray")=0xFFFFFFFF;
   }
@@ -54,7 +53,6 @@ void createWrappers(PyObject* module) {
     .def("hiValue", &Psana::ControlData::PVMonitor::hiValue)
     .def("array", &Psana::ControlData::PVMonitor::array)
   ;
-
   scope().attr("NameSize")=32;
   scope().attr("NoArray")=0xFFFFFFFF;
   }
@@ -66,12 +64,13 @@ void createWrappers(PyObject* module) {
     .def("name", &Psana::ControlData::PVLabel::name)
     .def("value", &Psana::ControlData::PVLabel::value)
   ;
-
   scope().attr("NameSize")=32;
   scope().attr("ValueSize")=64;
   }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::ControlData::PVLabel> >(-1));
 
+  {
+  scope outer = 
   class_<Psana::ControlData::ConfigV1, boost::shared_ptr<Psana::ControlData::ConfigV1>, boost::noncopyable >("ConfigV1", no_init)
     .def("events", &Psana::ControlData::ConfigV1::events)
     .def("uses_duration", &Psana::ControlData::ConfigV1::uses_duration)
@@ -82,8 +81,13 @@ void createWrappers(PyObject* module) {
     .def("pvControls", &Psana::ControlData::ConfigV1::pvControls)
     .def("pvMonitors", &Psana::ControlData::ConfigV1::pvMonitors)
   ;
+  scope().attr("Version")=1;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_ControlConfig);
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::ControlData::ConfigV1> >(Pds::TypeId::Id_ControlConfig));
 
+  {
+  scope outer = 
   class_<Psana::ControlData::ConfigV2, boost::shared_ptr<Psana::ControlData::ConfigV2>, boost::noncopyable >("ConfigV2", no_init)
     .def("events", &Psana::ControlData::ConfigV2::events)
     .def("uses_duration", &Psana::ControlData::ConfigV2::uses_duration)
@@ -96,6 +100,9 @@ void createWrappers(PyObject* module) {
     .def("pvMonitors", &Psana::ControlData::ConfigV2::pvMonitors)
     .def("pvLabels", &Psana::ControlData::ConfigV2::pvLabels)
   ;
+  scope().attr("Version")=2;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_ControlConfig);
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::ControlData::ConfigV2> >(Pds::TypeId::Id_ControlConfig));
 
   {

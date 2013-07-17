@@ -59,7 +59,8 @@ void createWrappers(PyObject* module) {
     .value("Adc_delay",Psana::Imp::ConfigV1::Adc_delay)
     .value("NumberOfRegisters",Psana::Imp::ConfigV1::NumberOfRegisters)
   ;
-
+  scope().attr("Version")=1;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_ImpConfig);
   scope().attr("MaxNumberOfSamples")=0x3ff;
   }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Imp::ConfigV1> >(Pds::TypeId::Id_ImpConfig));
@@ -69,7 +70,6 @@ void createWrappers(PyObject* module) {
   class_<Psana::Imp::Sample >("Sample", no_init)
     .def("channels", &Psana::Imp::Sample::channels)
   ;
-
   scope().attr("channelsPerDevice")=4;
   }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Imp::Sample> >(-1));
@@ -86,6 +86,8 @@ void createWrappers(PyObject* module) {
   ;
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Imp::LaneStatus> >(-1));
 
+  {
+  scope outer = 
   class_<Psana::Imp::ElementV1, boost::shared_ptr<Psana::Imp::ElementV1>, boost::noncopyable >("ElementV1", no_init)
     .def("vc", &Psana::Imp::ElementV1::vc)
     .def("lane", &Psana::Imp::ElementV1::lane)
@@ -94,6 +96,9 @@ void createWrappers(PyObject* module) {
     .def("laneStatus", &Psana::Imp::ElementV1::laneStatus, return_value_policy<copy_const_reference>())
     .def("samples", &Psana::Imp::ElementV1::samples)
   ;
+  scope().attr("Version")=1;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_ImpData);
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Imp::ElementV1> >(Pds::TypeId::Id_ImpData));
 
   {

@@ -57,15 +57,20 @@ void createWrappers(PyObject* module) {
     .value("MHz20",Psana::Acqiris::VertV1::MHz20)
     .value("MHz35",Psana::Acqiris::VertV1::MHz35)
   ;
+  scope().attr("Version")=1;
   }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Acqiris::VertV1> >(-1));
 
+  {
+  scope outer = 
   class_<Psana::Acqiris::HorizV1 >("HorizV1", no_init)
     .def("sampInterval", &Psana::Acqiris::HorizV1::sampInterval)
     .def("delayTime", &Psana::Acqiris::HorizV1::delayTime)
     .def("nbrSamples", &Psana::Acqiris::HorizV1::nbrSamples)
     .def("nbrSegments", &Psana::Acqiris::HorizV1::nbrSegments)
   ;
+  scope().attr("Version")=1;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Acqiris::HorizV1> >(-1));
 
   {
@@ -98,6 +103,7 @@ void createWrappers(PyObject* module) {
     .value("HFDivide",Psana::Acqiris::TrigV1::HFDivide)
     .value("SpikeStretcher",Psana::Acqiris::TrigV1::SpikeStretcher)
   ;
+  scope().attr("Version")=1;
   }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Acqiris::TrigV1> >(-1));
 
@@ -112,17 +118,22 @@ void createWrappers(PyObject* module) {
     .def("vert", &Psana::Acqiris::ConfigV1::vert)
     .def("nbrChannels", &Psana::Acqiris::ConfigV1::nbrChannels)
   ;
-
+  scope().attr("Version")=1;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_AcqConfig);
   scope().attr("MaxChan")=20;
   }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Acqiris::ConfigV1> >(Pds::TypeId::Id_AcqConfig));
 
+  {
+  scope outer = 
   class_<Psana::Acqiris::TimestampV1 >("TimestampV1", no_init)
     .def("pos", &Psana::Acqiris::TimestampV1::pos)
     .def("timeStampLo", &Psana::Acqiris::TimestampV1::timeStampLo)
     .def("timeStampHi", &Psana::Acqiris::TimestampV1::timeStampHi)
     .def("value", &Psana::Acqiris::TimestampV1::value)
   ;
+  scope().attr("Version")=1;
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Acqiris::TimestampV1> >(-1));
 
   {
@@ -134,17 +145,22 @@ void createWrappers(PyObject* module) {
     .def("timestamp", &Psana::Acqiris::DataDescV1Elem::timestamp)
     .def("waveforms", &Psana::Acqiris::DataDescV1Elem::waveforms)
   ;
-
+  scope().attr("Version")=1;
   scope().attr("NumberOfBits")=10;
   scope().attr("BitShift")=6;
   scope().attr("_extraSize")=32;
   }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Acqiris::DataDescV1Elem> >(-1));
 
+  {
+  scope outer = 
   class_<Psana::Acqiris::DataDescV1, boost::shared_ptr<Psana::Acqiris::DataDescV1>, boost::noncopyable >("DataDescV1", no_init)
     .def("data", &Psana::Acqiris::DataDescV1::data, return_internal_reference<>())
     .def("data_shape", &method_shape<Psana::Acqiris::DataDescV1, &Psana::Acqiris::DataDescV1::data_shape>)
   ;
+  scope().attr("Version")=1;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_AcqWaveform);
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Acqiris::DataDescV1> >(Pds::TypeId::Id_AcqWaveform));
 
   {
@@ -240,7 +256,8 @@ void createWrappers(PyObject* module) {
     .def("auxio", &Psana::Acqiris::TdcConfigV1::auxio)
     .def("veto", &Psana::Acqiris::TdcConfigV1::veto, return_value_policy<copy_const_reference>())
   ;
-
+  scope().attr("Version")=1;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_AcqTdcConfig);
   scope().attr("NChannels")=8;
   scope().attr("NAuxIO")=2;
   }
@@ -296,9 +313,14 @@ void createWrappers(PyObject* module) {
   }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Acqiris::TdcDataV1Marker> >(-1));
 
+  {
+  scope outer = 
   class_<Psana::Acqiris::TdcDataV1, boost::shared_ptr<Psana::Acqiris::TdcDataV1>, boost::noncopyable >("TdcDataV1", no_init)
     .def("data", &Psana::Acqiris::TdcDataV1::data)
   ;
+  scope().attr("Version")=1;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_AcqTdcData);
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Acqiris::TdcDataV1> >(Pds::TypeId::Id_AcqTdcData));
 
   {

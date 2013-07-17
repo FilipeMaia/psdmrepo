@@ -31,6 +31,8 @@ void createWrappers(PyObject* module) {
   Py_INCREF(submodule);
   PyModule_AddObject(module, "Princeton", submodule);
   scope mod = object(handle<>(borrowed(submodule)));
+  {
+  scope outer = 
   class_<Psana::Princeton::ConfigV1, boost::shared_ptr<Psana::Princeton::ConfigV1>, boost::noncopyable >("ConfigV1", no_init)
     .def("width", &Psana::Princeton::ConfigV1::width)
     .def("height", &Psana::Princeton::ConfigV1::height)
@@ -48,8 +50,13 @@ void createWrappers(PyObject* module) {
     .def("numPixelsY", &Psana::Princeton::ConfigV1::numPixelsY)
     .def("numPixels", &Psana::Princeton::ConfigV1::numPixels)
   ;
+  scope().attr("Version")=1;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_PrincetonConfig);
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Princeton::ConfigV1> >(Pds::TypeId::Id_PrincetonConfig));
 
+  {
+  scope outer = 
   class_<Psana::Princeton::ConfigV2, boost::shared_ptr<Psana::Princeton::ConfigV2>, boost::noncopyable >("ConfigV2", no_init)
     .def("width", &Psana::Princeton::ConfigV2::width)
     .def("height", &Psana::Princeton::ConfigV2::height)
@@ -68,8 +75,13 @@ void createWrappers(PyObject* module) {
     .def("numPixelsY", &Psana::Princeton::ConfigV2::numPixelsY)
     .def("numPixels", &Psana::Princeton::ConfigV2::numPixels)
   ;
+  scope().attr("Version")=2;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_PrincetonConfig);
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Princeton::ConfigV2> >(Pds::TypeId::Id_PrincetonConfig));
 
+  {
+  scope outer = 
   class_<Psana::Princeton::ConfigV3, boost::shared_ptr<Psana::Princeton::ConfigV3>, boost::noncopyable >("ConfigV3", no_init)
     .def("width", &Psana::Princeton::ConfigV3::width)
     .def("height", &Psana::Princeton::ConfigV3::height)
@@ -88,8 +100,13 @@ void createWrappers(PyObject* module) {
     .def("numPixelsY", &Psana::Princeton::ConfigV3::numPixelsY)
     .def("numPixels", &Psana::Princeton::ConfigV3::numPixels)
   ;
+  scope().attr("Version")=3;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_PrincetonConfig);
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Princeton::ConfigV3> >(Pds::TypeId::Id_PrincetonConfig));
 
+  {
+  scope outer = 
   class_<Psana::Princeton::ConfigV4, boost::shared_ptr<Psana::Princeton::ConfigV4>, boost::noncopyable >("ConfigV4", no_init)
     .def("width", &Psana::Princeton::ConfigV4::width)
     .def("height", &Psana::Princeton::ConfigV4::height)
@@ -111,8 +128,13 @@ void createWrappers(PyObject* module) {
     .def("numPixelsY", &Psana::Princeton::ConfigV4::numPixelsY)
     .def("numPixels", &Psana::Princeton::ConfigV4::numPixels)
   ;
+  scope().attr("Version")=4;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_PrincetonConfig);
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Princeton::ConfigV4> >(Pds::TypeId::Id_PrincetonConfig));
 
+  {
+  scope outer = 
   class_<Psana::Princeton::ConfigV5, boost::shared_ptr<Psana::Princeton::ConfigV5>, boost::noncopyable >("ConfigV5", no_init)
     .def("width", &Psana::Princeton::ConfigV5::width)
     .def("height", &Psana::Princeton::ConfigV5::height)
@@ -135,26 +157,44 @@ void createWrappers(PyObject* module) {
     .def("numPixelsY", &Psana::Princeton::ConfigV5::numPixelsY)
     .def("numPixels", &Psana::Princeton::ConfigV5::numPixels)
   ;
+  scope().attr("Version")=5;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_PrincetonConfig);
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Princeton::ConfigV5> >(Pds::TypeId::Id_PrincetonConfig));
 
+  {
+  scope outer = 
   class_<Psana::Princeton::FrameV1, boost::shared_ptr<Psana::Princeton::FrameV1>, boost::noncopyable >("FrameV1", no_init)
     .def("shotIdStart", &Psana::Princeton::FrameV1::shotIdStart)
     .def("readoutTime", &Psana::Princeton::FrameV1::readoutTime)
     .def("data", &Psana::Princeton::FrameV1::data)
   ;
+  scope().attr("Version")=1;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_PrincetonFrame);
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Princeton::FrameV1> >(Pds::TypeId::Id_PrincetonFrame));
 
+  {
+  scope outer = 
   class_<Psana::Princeton::FrameV2, boost::shared_ptr<Psana::Princeton::FrameV2>, boost::noncopyable >("FrameV2", no_init)
     .def("shotIdStart", &Psana::Princeton::FrameV2::shotIdStart)
     .def("readoutTime", &Psana::Princeton::FrameV2::readoutTime)
     .def("temperature", &Psana::Princeton::FrameV2::temperature)
     .def("data", &Psana::Princeton::FrameV2::data)
   ;
+  scope().attr("Version")=2;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_PrincetonFrame);
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Princeton::FrameV2> >(Pds::TypeId::Id_PrincetonFrame));
 
+  {
+  scope outer = 
   class_<Psana::Princeton::InfoV1 >("InfoV1", no_init)
     .def("temperature", &Psana::Princeton::InfoV1::temperature)
   ;
+  scope().attr("Version")=1;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_PrincetonInfo);
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Princeton::InfoV1> >(Pds::TypeId::Id_PrincetonInfo));
 
   {

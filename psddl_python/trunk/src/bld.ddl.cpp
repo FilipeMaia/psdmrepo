@@ -31,12 +31,17 @@ void createWrappers(PyObject* module) {
   Py_INCREF(submodule);
   PyModule_AddObject(module, "Bld", submodule);
   scope mod = object(handle<>(borrowed(submodule)));
+  {
+  scope outer = 
   class_<Psana::Bld::BldDataFEEGasDetEnergy >("BldDataFEEGasDetEnergy", no_init)
     .def("f_11_ENRC", &Psana::Bld::BldDataFEEGasDetEnergy::f_11_ENRC)
     .def("f_12_ENRC", &Psana::Bld::BldDataFEEGasDetEnergy::f_12_ENRC)
     .def("f_21_ENRC", &Psana::Bld::BldDataFEEGasDetEnergy::f_21_ENRC)
     .def("f_22_ENRC", &Psana::Bld::BldDataFEEGasDetEnergy::f_22_ENRC)
   ;
+  scope().attr("Version")=0;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_FEEGasDetEnergy);
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Bld::BldDataFEEGasDetEnergy> >(Pds::TypeId::Id_FEEGasDetEnergy));
 
   {
@@ -59,6 +64,8 @@ void createWrappers(PyObject* module) {
     .value("EbeamLTUAngXDamage",Psana::Bld::BldDataEBeamV0::EbeamLTUAngXDamage)
     .value("EbeamLTUAngYDamage",Psana::Bld::BldDataEBeamV0::EbeamLTUAngYDamage)
   ;
+  scope().attr("Version")=0;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_EBeam);
   }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Bld::BldDataEBeamV0> >(Pds::TypeId::Id_EBeam));
 
@@ -84,6 +91,8 @@ void createWrappers(PyObject* module) {
     .value("EbeamLTUAngYDamage",Psana::Bld::BldDataEBeamV1::EbeamLTUAngYDamage)
     .value("EbeamPkCurrBC2Damage",Psana::Bld::BldDataEBeamV1::EbeamPkCurrBC2Damage)
   ;
+  scope().attr("Version")=1;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_EBeam);
   }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Bld::BldDataEBeamV1> >(Pds::TypeId::Id_EBeam));
 
@@ -111,6 +120,8 @@ void createWrappers(PyObject* module) {
     .value("EbeamPkCurrBC2Damage",Psana::Bld::BldDataEBeamV2::EbeamPkCurrBC2Damage)
     .value("EbeamEnergyBC2Damage",Psana::Bld::BldDataEBeamV2::EbeamEnergyBC2Damage)
   ;
+  scope().attr("Version")=2;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_EBeam);
   }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Bld::BldDataEBeamV2> >(Pds::TypeId::Id_EBeam));
 
@@ -142,38 +153,62 @@ void createWrappers(PyObject* module) {
     .value("EbeamPkCurrBC1Damage",Psana::Bld::BldDataEBeamV3::EbeamPkCurrBC1Damage)
     .value("EbeamEnergyBC1Damage",Psana::Bld::BldDataEBeamV3::EbeamEnergyBC1Damage)
   ;
+  scope().attr("Version")=3;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_EBeam);
   }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Bld::BldDataEBeamV3> >(Pds::TypeId::Id_EBeam));
 
+  {
+  scope outer = 
   class_<Psana::Bld::BldDataPhaseCavity >("BldDataPhaseCavity", no_init)
     .def("fitTime1", &Psana::Bld::BldDataPhaseCavity::fitTime1)
     .def("fitTime2", &Psana::Bld::BldDataPhaseCavity::fitTime2)
     .def("charge1", &Psana::Bld::BldDataPhaseCavity::charge1)
     .def("charge2", &Psana::Bld::BldDataPhaseCavity::charge2)
   ;
+  scope().attr("Version")=0;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_PhaseCavity);
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Bld::BldDataPhaseCavity> >(Pds::TypeId::Id_PhaseCavity));
 
+  {
+  scope outer = 
   class_<Psana::Bld::BldDataIpimbV0, boost::shared_ptr<Psana::Bld::BldDataIpimbV0>, boost::noncopyable >("BldDataIpimbV0", no_init)
     .def("ipimbData", &Psana::Bld::BldDataIpimbV0::ipimbData, return_value_policy<copy_const_reference>())
     .def("ipimbConfig", &Psana::Bld::BldDataIpimbV0::ipimbConfig, return_value_policy<copy_const_reference>())
     .def("ipmFexData", &Psana::Bld::BldDataIpimbV0::ipmFexData, return_value_policy<copy_const_reference>())
   ;
+  scope().attr("Version")=0;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_SharedIpimb);
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Bld::BldDataIpimbV0> >(Pds::TypeId::Id_SharedIpimb));
 
+  {
+  scope outer = 
   class_<Psana::Bld::BldDataIpimbV1, boost::shared_ptr<Psana::Bld::BldDataIpimbV1>, boost::noncopyable >("BldDataIpimbV1", no_init)
     .def("ipimbData", &Psana::Bld::BldDataIpimbV1::ipimbData, return_value_policy<copy_const_reference>())
     .def("ipimbConfig", &Psana::Bld::BldDataIpimbV1::ipimbConfig, return_value_policy<copy_const_reference>())
     .def("ipmFexData", &Psana::Bld::BldDataIpimbV1::ipmFexData, return_value_policy<copy_const_reference>())
   ;
+  scope().attr("Version")=1;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_SharedIpimb);
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Bld::BldDataIpimbV1> >(Pds::TypeId::Id_SharedIpimb));
 
+  {
+  scope outer = 
   class_<Psana::Bld::BldDataPimV1, boost::shared_ptr<Psana::Bld::BldDataPimV1>, boost::noncopyable >("BldDataPimV1", no_init)
     .def("camConfig", &Psana::Bld::BldDataPimV1::camConfig, return_value_policy<copy_const_reference>())
     .def("pimConfig", &Psana::Bld::BldDataPimV1::pimConfig, return_value_policy<copy_const_reference>())
     .def("frame", &Psana::Bld::BldDataPimV1::frame, return_value_policy<copy_const_reference>())
   ;
+  scope().attr("Version")=1;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_SharedPim);
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Bld::BldDataPimV1> >(Pds::TypeId::Id_SharedPim));
 
+  {
+  scope outer = 
   class_<Psana::Bld::BldDataGMDV0, boost::shared_ptr<Psana::Bld::BldDataGMDV0>, boost::noncopyable >("BldDataGMDV0", no_init)
     .def("gasType", &Psana::Bld::BldDataGMDV0::gasType)
     .def("pressure", &Psana::Bld::BldDataGMDV0::pressure)
@@ -191,8 +226,13 @@ void createWrappers(PyObject* module) {
     .def("transmission", &Psana::Bld::BldDataGMDV0::transmission)
     .def("transmissionFEE", &Psana::Bld::BldDataGMDV0::transmissionFEE)
   ;
+  scope().attr("Version")=0;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_GMD);
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Bld::BldDataGMDV0> >(Pds::TypeId::Id_GMD));
 
+  {
+  scope outer = 
   class_<Psana::Bld::BldDataGMDV1, boost::shared_ptr<Psana::Bld::BldDataGMDV1>, boost::noncopyable >("BldDataGMDV1", no_init)
     .def("milliJoulesPerPulse", &Psana::Bld::BldDataGMDV1::milliJoulesPerPulse)
     .def("milliJoulesAverage", &Psana::Bld::BldDataGMDV1::milliJoulesAverage)
@@ -200,6 +240,9 @@ void createWrappers(PyObject* module) {
     .def("bgValuePerSample", &Psana::Bld::BldDataGMDV1::bgValuePerSample)
     .def("relativeEnergyPerPulse", &Psana::Bld::BldDataGMDV1::relativeEnergyPerPulse)
   ;
+  scope().attr("Version")=1;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_GMD);
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Bld::BldDataGMDV1> >(Pds::TypeId::Id_GMD));
 
   {

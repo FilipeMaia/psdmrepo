@@ -37,8 +37,13 @@ void createWrappers(PyObject* module) {
   ;
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Camera::FrameCoord> >(-1));
 
+  {
+  scope outer = 
   class_<Psana::Camera::FrameFccdConfigV1, boost::shared_ptr<Psana::Camera::FrameFccdConfigV1>, boost::noncopyable >("FrameFccdConfigV1", no_init)
   ;
+  scope().attr("Version")=1;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_FrameFccdConfig);
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Camera::FrameFccdConfigV1> >(Pds::TypeId::Id_FrameFccdConfig));
 
   {
@@ -66,9 +71,13 @@ void createWrappers(PyObject* module) {
     .value("GssRegionOfInterest",Psana::Camera::FrameFexConfigV1::GssRegionOfInterest)
     .value("GssThreshold",Psana::Camera::FrameFexConfigV1::GssThreshold)
   ;
+  scope().attr("Version")=1;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_FrameFexConfig);
   }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Camera::FrameFexConfigV1> >(Pds::TypeId::Id_FrameFexConfig));
 
+  {
+  scope outer = 
   class_<Psana::Camera::FrameV1, boost::shared_ptr<Psana::Camera::FrameV1>, boost::noncopyable >("FrameV1", no_init)
     .def("width", &Psana::Camera::FrameV1::width)
     .def("height", &Psana::Camera::FrameV1::height)
@@ -78,8 +87,13 @@ void createWrappers(PyObject* module) {
     .def("data8", &Psana::Camera::FrameV1::data8)
     .def("data16", &Psana::Camera::FrameV1::data16)
   ;
+  scope().attr("Version")=1;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_Frame);
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Camera::FrameV1> >(Pds::TypeId::Id_Frame));
 
+  {
+  scope outer = 
   class_<Psana::Camera::TwoDGaussianV1, boost::shared_ptr<Psana::Camera::TwoDGaussianV1>, boost::noncopyable >("TwoDGaussianV1", no_init)
     .def("integral", &Psana::Camera::TwoDGaussianV1::integral)
     .def("xmean", &Psana::Camera::TwoDGaussianV1::xmean)
@@ -88,6 +102,9 @@ void createWrappers(PyObject* module) {
     .def("minor_axis_width", &Psana::Camera::TwoDGaussianV1::minor_axis_width)
     .def("major_axis_tilt", &Psana::Camera::TwoDGaussianV1::major_axis_tilt)
   ;
+  scope().attr("Version")=1;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_TwoDGaussian);
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Camera::TwoDGaussianV1> >(Pds::TypeId::Id_TwoDGaussian));
 
   {

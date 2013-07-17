@@ -90,7 +90,6 @@ void createWrappers(PyObject* module) {
     .def("severity", &Psana::Epics::dbr_time_string::severity)
     .def("stamp", &Psana::Epics::dbr_time_string::stamp, return_value_policy<copy_const_reference>())
   ;
-
   scope().attr("DBR_TYPE_ID")=Psana::Epics::DBR_TIME_STRING;
   }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Epics::dbr_time_string> >(-1));
@@ -102,7 +101,6 @@ void createWrappers(PyObject* module) {
     .def("severity", &Psana::Epics::dbr_time_short::severity)
     .def("stamp", &Psana::Epics::dbr_time_short::stamp, return_value_policy<copy_const_reference>())
   ;
-
   scope().attr("DBR_TYPE_ID")=Psana::Epics::DBR_TIME_SHORT;
   }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Epics::dbr_time_short> >(-1));
@@ -114,7 +112,6 @@ void createWrappers(PyObject* module) {
     .def("severity", &Psana::Epics::dbr_time_float::severity)
     .def("stamp", &Psana::Epics::dbr_time_float::stamp, return_value_policy<copy_const_reference>())
   ;
-
   scope().attr("DBR_TYPE_ID")=Psana::Epics::DBR_TIME_FLOAT;
   }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Epics::dbr_time_float> >(-1));
@@ -126,7 +123,6 @@ void createWrappers(PyObject* module) {
     .def("severity", &Psana::Epics::dbr_time_enum::severity)
     .def("stamp", &Psana::Epics::dbr_time_enum::stamp, return_value_policy<copy_const_reference>())
   ;
-
   scope().attr("DBR_TYPE_ID")=Psana::Epics::DBR_TIME_ENUM;
   }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Epics::dbr_time_enum> >(-1));
@@ -138,7 +134,6 @@ void createWrappers(PyObject* module) {
     .def("severity", &Psana::Epics::dbr_time_char::severity)
     .def("stamp", &Psana::Epics::dbr_time_char::stamp, return_value_policy<copy_const_reference>())
   ;
-
   scope().attr("DBR_TYPE_ID")=Psana::Epics::DBR_TIME_CHAR;
   }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Epics::dbr_time_char> >(-1));
@@ -150,7 +145,6 @@ void createWrappers(PyObject* module) {
     .def("severity", &Psana::Epics::dbr_time_long::severity)
     .def("stamp", &Psana::Epics::dbr_time_long::stamp, return_value_policy<copy_const_reference>())
   ;
-
   scope().attr("DBR_TYPE_ID")=Psana::Epics::DBR_TIME_LONG;
   }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Epics::dbr_time_long> >(-1));
@@ -162,7 +156,6 @@ void createWrappers(PyObject* module) {
     .def("severity", &Psana::Epics::dbr_time_double::severity)
     .def("stamp", &Psana::Epics::dbr_time_double::stamp, return_value_policy<copy_const_reference>())
   ;
-
   scope().attr("DBR_TYPE_ID")=Psana::Epics::DBR_TIME_DOUBLE;
   }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Epics::dbr_time_double> >(-1));
@@ -173,7 +166,6 @@ void createWrappers(PyObject* module) {
     .def("status", &Psana::Epics::dbr_sts_string::status)
     .def("severity", &Psana::Epics::dbr_sts_string::severity)
   ;
-
   scope().attr("DBR_TYPE_ID")=Psana::Epics::DBR_CTRL_STRING;
   }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Epics::dbr_sts_string> >(-1));
@@ -194,7 +186,6 @@ void createWrappers(PyObject* module) {
     .def("lower_ctrl_limit", &Psana::Epics::dbr_ctrl_short::lower_ctrl_limit)
     .def("units_shape", &method_shape<Psana::Epics::dbr_ctrl_short, &Psana::Epics::dbr_ctrl_short::units_shape>)
   ;
-
   scope().attr("DBR_TYPE_ID")=Psana::Epics::DBR_CTRL_SHORT;
   }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Epics::dbr_ctrl_short> >(-1));
@@ -216,7 +207,6 @@ void createWrappers(PyObject* module) {
     .def("lower_ctrl_limit", &Psana::Epics::dbr_ctrl_float::lower_ctrl_limit)
     .def("units_shape", &method_shape<Psana::Epics::dbr_ctrl_float, &Psana::Epics::dbr_ctrl_float::units_shape>)
   ;
-
   scope().attr("DBR_TYPE_ID")=Psana::Epics::DBR_CTRL_FLOAT;
   }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Epics::dbr_ctrl_float> >(-1));
@@ -230,7 +220,6 @@ void createWrappers(PyObject* module) {
     .def("strings", &Psana::Epics::dbr_ctrl_enum::strings)
     .def("strings_shape", &method_shape<Psana::Epics::dbr_ctrl_enum, &Psana::Epics::dbr_ctrl_enum::strings_shape>)
   ;
-
   scope().attr("DBR_TYPE_ID")=Psana::Epics::DBR_CTRL_ENUM;
   }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Epics::dbr_ctrl_enum> >(-1));
@@ -251,7 +240,6 @@ void createWrappers(PyObject* module) {
     .def("lower_ctrl_limit", &Psana::Epics::dbr_ctrl_char::lower_ctrl_limit)
     .def("units_shape", &method_shape<Psana::Epics::dbr_ctrl_char, &Psana::Epics::dbr_ctrl_char::units_shape>)
   ;
-
   scope().attr("DBR_TYPE_ID")=Psana::Epics::DBR_CTRL_CHAR;
   }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Epics::dbr_ctrl_char> >(-1));
@@ -272,7 +260,6 @@ void createWrappers(PyObject* module) {
     .def("lower_ctrl_limit", &Psana::Epics::dbr_ctrl_long::lower_ctrl_limit)
     .def("units_shape", &method_shape<Psana::Epics::dbr_ctrl_long, &Psana::Epics::dbr_ctrl_long::units_shape>)
   ;
-
   scope().attr("DBR_TYPE_ID")=Psana::Epics::DBR_CTRL_LONG;
   }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Epics::dbr_ctrl_long> >(-1));
@@ -294,7 +281,6 @@ void createWrappers(PyObject* module) {
     .def("lower_ctrl_limit", &Psana::Epics::dbr_ctrl_double::lower_ctrl_limit)
     .def("units_shape", &method_shape<Psana::Epics::dbr_ctrl_double, &Psana::Epics::dbr_ctrl_double::units_shape>)
   ;
-
   scope().attr("DBR_TYPE_ID")=Psana::Epics::DBR_CTRL_DOUBLE;
   }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Epics::dbr_ctrl_double> >(-1));
@@ -427,15 +413,19 @@ void createWrappers(PyObject* module) {
     .def("description", &Psana::Epics::PvConfigV1::description)
     .def("interval", &Psana::Epics::PvConfigV1::interval)
   ;
-
   scope().attr("iMaxPvDescLength")=64;
   }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Epics::PvConfigV1> >(-1));
 
+  {
+  scope outer = 
   class_<Psana::Epics::ConfigV1, boost::shared_ptr<Psana::Epics::ConfigV1>, boost::noncopyable >("ConfigV1", no_init)
     .def("numPv", &Psana::Epics::ConfigV1::numPv)
     .def("pvControls", &Psana::Epics::ConfigV1::pvControls)
   ;
+  scope().attr("Version")=1;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_EpicsConfig);
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Epics::ConfigV1> >(Pds::TypeId::Id_EpicsConfig));
 
   {

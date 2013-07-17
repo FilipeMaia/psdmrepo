@@ -61,7 +61,8 @@ void createWrappers(PyObject* module) {
     .value("Gamma",Psana::Pulnix::TM6740ConfigV1::Gamma)
     .value("Linear",Psana::Pulnix::TM6740ConfigV1::Linear)
   ;
-
+  scope().attr("Version")=1;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_TM6740Config);
   scope().attr("Row_Pixels")=480;
   scope().attr("Column_Pixels")=640;
   }
@@ -97,7 +98,8 @@ void createWrappers(PyObject* module) {
     .value("Gamma",Psana::Pulnix::TM6740ConfigV2::Gamma)
     .value("Linear",Psana::Pulnix::TM6740ConfigV2::Linear)
   ;
-
+  scope().attr("Version")=2;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_TM6740Config);
   scope().attr("Row_Pixels")=480;
   scope().attr("Column_Pixels")=640;
   }

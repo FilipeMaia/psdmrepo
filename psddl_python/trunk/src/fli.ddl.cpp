@@ -31,6 +31,8 @@ void createWrappers(PyObject* module) {
   Py_INCREF(submodule);
   PyModule_AddObject(module, "Fli", submodule);
   scope mod = object(handle<>(borrowed(submodule)));
+  {
+  scope outer = 
   class_<Psana::Fli::ConfigV1, boost::shared_ptr<Psana::Fli::ConfigV1>, boost::noncopyable >("ConfigV1", no_init)
     .def("width", &Psana::Fli::ConfigV1::width)
     .def("height", &Psana::Fli::ConfigV1::height)
@@ -49,14 +51,22 @@ void createWrappers(PyObject* module) {
     .def("numPixelsY", &Psana::Fli::ConfigV1::numPixelsY)
     .def("numPixels", &Psana::Fli::ConfigV1::numPixels)
   ;
+  scope().attr("Version")=1;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_FliConfig);
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Fli::ConfigV1> >(Pds::TypeId::Id_FliConfig));
 
+  {
+  scope outer = 
   class_<Psana::Fli::FrameV1, boost::shared_ptr<Psana::Fli::FrameV1>, boost::noncopyable >("FrameV1", no_init)
     .def("shotIdStart", &Psana::Fli::FrameV1::shotIdStart)
     .def("readoutTime", &Psana::Fli::FrameV1::readoutTime)
     .def("temperature", &Psana::Fli::FrameV1::temperature)
     .def("data", &Psana::Fli::FrameV1::data)
   ;
+  scope().attr("Version")=1;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_FliFrame);
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Fli::FrameV1> >(Pds::TypeId::Id_FliFrame));
 
   {

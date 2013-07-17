@@ -105,7 +105,8 @@ void createWrappers(PyObject* module) {
     .value("TriggerMode_ExtNeg",Psana::Timepix::ConfigV1::TriggerMode_ExtNeg)
     .value("TriggerMode_Soft",Psana::Timepix::ConfigV1::TriggerMode_Soft)
   ;
-
+  scope().attr("Version")=1;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_TimepixConfig);
   scope().attr("ChipCount")=4;
   }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Timepix::ConfigV1> >(Pds::TypeId::Id_TimepixConfig));
@@ -197,7 +198,8 @@ void createWrappers(PyObject* module) {
     .value("TriggerMode_ExtNeg",Psana::Timepix::ConfigV2::TriggerMode_ExtNeg)
     .value("TriggerMode_Soft",Psana::Timepix::ConfigV2::TriggerMode_Soft)
   ;
-
+  scope().attr("Version")=2;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_TimepixConfig);
   scope().attr("ChipCount")=4;
   scope().attr("ChipNameMax")=16;
   scope().attr("PixelThreshMax")=4*256*256;
@@ -292,7 +294,8 @@ void createWrappers(PyObject* module) {
     .value("TimepixMode_Counting",Psana::Timepix::ConfigV3::TimepixMode_Counting)
     .value("TimepixMode_TOT",Psana::Timepix::ConfigV3::TimepixMode_TOT)
   ;
-
+  scope().attr("Version")=3;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_TimepixConfig);
   scope().attr("ChipCount")=4;
   scope().attr("ChipNameMax")=16;
   scope().attr("PixelThreshMax")=4*256*256;
@@ -311,7 +314,8 @@ void createWrappers(PyObject* module) {
     .def("depth", &Psana::Timepix::DataV1::depth)
     .def("depth_bytes", &Psana::Timepix::DataV1::depth_bytes)
   ;
-
+  scope().attr("Version")=1;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_TimepixData);
   scope().attr("Height")=512;
   scope().attr("Width")=512;
   scope().attr("Depth")=14;
@@ -332,7 +336,8 @@ void createWrappers(PyObject* module) {
     .def("depth", &Psana::Timepix::DataV2::depth)
     .def("depth_bytes", &Psana::Timepix::DataV2::depth_bytes)
   ;
-
+  scope().attr("Version")=2;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_TimepixData);
   scope().attr("Depth")=14;
   scope().attr("MaxPixelValue")=11810;
   }

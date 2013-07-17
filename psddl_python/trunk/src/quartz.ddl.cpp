@@ -66,7 +66,8 @@ void createWrappers(PyObject* module) {
     .value("VFlip",Psana::Quartz::ConfigV1::VFlip)
     .value("HVFlip",Psana::Quartz::ConfigV1::HVFlip)
   ;
-
+  scope().attr("Version")=1;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_QuartzConfig);
   scope().attr("LUT_Size")=4096;
   scope().attr("Row_Pixels")=2048;
   scope().attr("Column_Pixels")=2048;

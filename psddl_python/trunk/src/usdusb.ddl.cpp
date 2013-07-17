@@ -51,7 +51,8 @@ void createWrappers(PyObject* module) {
     .value("X2",Psana::UsdUsb::ConfigV1::X2)
     .value("X4",Psana::UsdUsb::ConfigV1::X4)
   ;
-
+  scope().attr("Version")=1;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_UsdUsbConfig);
   scope().attr("NCHANNELS")=4;
   }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::UsdUsb::ConfigV1> >(Pds::TypeId::Id_UsdUsbConfig));
@@ -65,7 +66,8 @@ void createWrappers(PyObject* module) {
     .def("analog_in", &Psana::UsdUsb::DataV1::analog_in)
     .def("encoder_count", &Psana::UsdUsb::DataV1::encoder_count)
   ;
-
+  scope().attr("Version")=1;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_UsdUsbData);
   scope().attr("Encoder_Inputs")=4;
   scope().attr("Analog_Inputs")=4;
   scope().attr("Digital_Inputs")=8;

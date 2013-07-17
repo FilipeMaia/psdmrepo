@@ -51,7 +51,6 @@ void createWrappers(PyObject* module) {
     .def("set", &Psana::EvrData::PulseConfig::set)
     .def("clear", &Psana::EvrData::PulseConfig::clear)
   ;
-
   scope().attr("Trigger_Shift")=0;
   scope().attr("Set_Shift")=8;
   scope().attr("Clear_Shift")=16;
@@ -110,7 +109,6 @@ void createWrappers(PyObject* module) {
     .def("desc", &Psana::EvrData::EventCodeV5::desc)
     .def("desc_shape", &method_shape<Psana::EvrData::EventCodeV5, &Psana::EvrData::EventCodeV5::desc_shape>)
   ;
-
   scope().attr("DescSize")=16;
   }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::EvrData::EventCodeV5> >(-1));
@@ -131,7 +129,6 @@ void createWrappers(PyObject* module) {
     .def("readoutGroup", &Psana::EvrData::EventCodeV6::readoutGroup)
     .def("desc_shape", &method_shape<Psana::EvrData::EventCodeV6, &Psana::EvrData::EventCodeV6::desc_shape>)
   ;
-
   scope().attr("DescSize")=16;
   scope().attr("MaxReadoutGroup")=7;
   }
@@ -188,12 +185,17 @@ void createWrappers(PyObject* module) {
   }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::EvrData::OutputMapV2> >(-1));
 
+  {
+  scope outer = 
   class_<Psana::EvrData::ConfigV1, boost::shared_ptr<Psana::EvrData::ConfigV1>, boost::noncopyable >("ConfigV1", no_init)
     .def("npulses", &Psana::EvrData::ConfigV1::npulses)
     .def("noutputs", &Psana::EvrData::ConfigV1::noutputs)
     .def("pulses", &Psana::EvrData::ConfigV1::pulses)
     .def("output_maps", &Psana::EvrData::ConfigV1::output_maps)
   ;
+  scope().attr("Version")=1;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_EvrConfig);
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::EvrData::ConfigV1> >(Pds::TypeId::Id_EvrConfig));
 
   {
@@ -224,13 +226,16 @@ void createWrappers(PyObject* module) {
     .value("Off",Psana::EvrData::ConfigV2::Off)
     .value("On",Psana::EvrData::ConfigV2::On)
   ;
-
+  scope().attr("Version")=2;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_EvrConfig);
   scope().attr("beamOn")=100;
   scope().attr("baseRate")=40;
   scope().attr("singleShot")=150;
   }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::EvrData::ConfigV2> >(Pds::TypeId::Id_EvrConfig));
 
+  {
+  scope outer = 
   class_<Psana::EvrData::ConfigV3, boost::shared_ptr<Psana::EvrData::ConfigV3>, boost::noncopyable >("ConfigV3", no_init)
     .def("neventcodes", &Psana::EvrData::ConfigV3::neventcodes)
     .def("npulses", &Psana::EvrData::ConfigV3::npulses)
@@ -239,8 +244,13 @@ void createWrappers(PyObject* module) {
     .def("pulses", &Psana::EvrData::ConfigV3::pulses)
     .def("output_maps", &Psana::EvrData::ConfigV3::output_maps)
   ;
+  scope().attr("Version")=3;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_EvrConfig);
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::EvrData::ConfigV3> >(Pds::TypeId::Id_EvrConfig));
 
+  {
+  scope outer = 
   class_<Psana::EvrData::ConfigV4, boost::shared_ptr<Psana::EvrData::ConfigV4>, boost::noncopyable >("ConfigV4", no_init)
     .def("neventcodes", &Psana::EvrData::ConfigV4::neventcodes)
     .def("npulses", &Psana::EvrData::ConfigV4::npulses)
@@ -249,6 +259,9 @@ void createWrappers(PyObject* module) {
     .def("pulses", &Psana::EvrData::ConfigV4::pulses)
     .def("output_maps", &Psana::EvrData::ConfigV4::output_maps)
   ;
+  scope().attr("Version")=4;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_EvrConfig);
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::EvrData::ConfigV4> >(Pds::TypeId::Id_EvrConfig));
 
   class_<Psana::EvrData::SequencerEntry >("SequencerEntry", no_init)
@@ -291,7 +304,8 @@ void createWrappers(PyObject* module) {
     .def("output_maps", &Psana::EvrData::ConfigV5::output_maps)
     .def("seq_config", &Psana::EvrData::ConfigV5::seq_config, return_value_policy<copy_const_reference>())
   ;
-
+  scope().attr("Version")=5;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_EvrConfig);
   scope().attr("MaxPulses")=32;
   scope().attr("EvrOutputs")=10;
   }
@@ -308,7 +322,8 @@ void createWrappers(PyObject* module) {
     .def("output_maps", &Psana::EvrData::ConfigV6::output_maps)
     .def("seq_config", &Psana::EvrData::ConfigV6::seq_config, return_value_policy<copy_const_reference>())
   ;
-
+  scope().attr("Version")=6;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_EvrConfig);
   scope().attr("MaxPulses")=256;
   scope().attr("MaxOutputs")=256;
   }
@@ -325,7 +340,8 @@ void createWrappers(PyObject* module) {
     .def("output_maps", &Psana::EvrData::ConfigV7::output_maps)
     .def("seq_config", &Psana::EvrData::ConfigV7::seq_config, return_value_policy<copy_const_reference>())
   ;
-
+  scope().attr("Version")=7;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_EvrConfig);
   scope().attr("MaxPulses")=256;
   scope().attr("MaxOutputs")=256;
   }
@@ -338,10 +354,15 @@ void createWrappers(PyObject* module) {
   ;
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::EvrData::FIFOEvent> >(-1));
 
+  {
+  scope outer = 
   class_<Psana::EvrData::DataV3, boost::shared_ptr<Psana::EvrData::DataV3>, boost::noncopyable >("DataV3", no_init)
     .def("numFifoEvents", &Psana::EvrData::DataV3::numFifoEvents)
     .def("fifoEvents", &Psana::EvrData::DataV3::fifoEvents)
   ;
+  scope().attr("Version")=3;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_EvrData);
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::EvrData::DataV3> >(Pds::TypeId::Id_EvrData));
 
   {
@@ -352,17 +373,21 @@ void createWrappers(PyObject* module) {
     .def("infos", &Psana::EvrData::IOChannel::infos)
     .def("name_shape", &method_shape<Psana::EvrData::IOChannel, &Psana::EvrData::IOChannel::name_shape>)
   ;
-
   scope().attr("NameLength")=12;
   scope().attr("MaxInfos")=8;
   }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::EvrData::IOChannel> >(-1));
 
+  {
+  scope outer = 
   class_<Psana::EvrData::IOConfigV1, boost::shared_ptr<Psana::EvrData::IOConfigV1>, boost::noncopyable >("IOConfigV1", no_init)
     .def("nchannels", &Psana::EvrData::IOConfigV1::nchannels)
     .def("channels", &Psana::EvrData::IOConfigV1::channels)
     .def("conn", &Psana::EvrData::IOConfigV1::conn)
   ;
+  scope().attr("Version")=1;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_EvrIOConfig);
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::EvrData::IOConfigV1> >(Pds::TypeId::Id_EvrIOConfig));
 
   {

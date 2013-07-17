@@ -68,7 +68,8 @@ void createWrappers(PyObject* module) {
     .value("VFlip",Psana::Opal1k::ConfigV1::VFlip)
     .value("HVFlip",Psana::Opal1k::ConfigV1::HVFlip)
   ;
-
+  scope().attr("Version")=1;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_Opal1kConfig);
   scope().attr("LUT_Size")=4096;
   scope().attr("Row_Pixels")=1024;
   scope().attr("Column_Pixels")=1024;

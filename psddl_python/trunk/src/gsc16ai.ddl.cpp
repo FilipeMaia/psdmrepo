@@ -68,7 +68,8 @@ void createWrappers(PyObject* module) {
     .value("DataFormat_TwosComplement",Psana::Gsc16ai::ConfigV1::DataFormat_TwosComplement)
     .value("DataFormat_OffsetBinary",Psana::Gsc16ai::ConfigV1::DataFormat_OffsetBinary)
   ;
-
+  scope().attr("Version")=1;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_Gsc16aiConfig);
   scope().attr("LowestChannel")=0;
   scope().attr("HighestChannel")=15;
   scope().attr("LowestFps")=1;
@@ -76,10 +77,15 @@ void createWrappers(PyObject* module) {
   }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Gsc16ai::ConfigV1> >(Pds::TypeId::Id_Gsc16aiConfig));
 
+  {
+  scope outer = 
   class_<Psana::Gsc16ai::DataV1, boost::shared_ptr<Psana::Gsc16ai::DataV1>, boost::noncopyable >("DataV1", no_init)
     .def("timestamp", &Psana::Gsc16ai::DataV1::timestamp)
     .def("channelValue", &Psana::Gsc16ai::DataV1::channelValue)
   ;
+  scope().attr("Version")=1;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_Gsc16aiData);
+  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Gsc16ai::DataV1> >(Pds::TypeId::Id_Gsc16aiData));
 
   {

@@ -52,7 +52,8 @@ void createWrappers(PyObject* module) {
     .value("On",Psana::Orca::ConfigV1::On)
     .value("Max",Psana::Orca::ConfigV1::Max)
   ;
-
+  scope().attr("Version")=1;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_OrcaConfig);
   scope().attr("Row_Pixels")=2048;
   scope().attr("Column_Pixels")=2048;
   }
