@@ -33,12 +33,12 @@ void createWrappers(PyObject* module) {
   scope mod = object(handle<>(borrowed(submodule)));
   {
   scope outer = 
-  class_<Psana::Acqiris::VertV1 >("VertV1", no_init)
-    .def("fullScale", &Psana::Acqiris::VertV1::fullScale)
-    .def("offset", &Psana::Acqiris::VertV1::offset)
-    .def("coupling", &Psana::Acqiris::VertV1::coupling)
-    .def("bandwidth", &Psana::Acqiris::VertV1::bandwidth)
-    .def("slope", &Psana::Acqiris::VertV1::slope)
+  class_<Psana::Acqiris::VertV1 >("VertV1", "Class containing Acqiris configuration data for vertical axis.", no_init)
+    .def("fullScale", &Psana::Acqiris::VertV1::fullScale,"Full vertical scale.")
+    .def("offset", &Psana::Acqiris::VertV1::offset,"Offset value.")
+    .def("coupling", &Psana::Acqiris::VertV1::coupling,"Coupling mode.")
+    .def("bandwidth", &Psana::Acqiris::VertV1::bandwidth,"Bandwidth enumeration.")
+    .def("slope", &Psana::Acqiris::VertV1::slope,"Calculated slope.")
   ;
 
   enum_<Psana::Acqiris::VertV1::Coupling>("Coupling")
@@ -63,11 +63,11 @@ void createWrappers(PyObject* module) {
 
   {
   scope outer = 
-  class_<Psana::Acqiris::HorizV1 >("HorizV1", no_init)
-    .def("sampInterval", &Psana::Acqiris::HorizV1::sampInterval)
-    .def("delayTime", &Psana::Acqiris::HorizV1::delayTime)
-    .def("nbrSamples", &Psana::Acqiris::HorizV1::nbrSamples)
-    .def("nbrSegments", &Psana::Acqiris::HorizV1::nbrSegments)
+  class_<Psana::Acqiris::HorizV1 >("HorizV1", "Class containing Acqiris configuration data for horizontal axis.", no_init)
+    .def("sampInterval", &Psana::Acqiris::HorizV1::sampInterval,"Interval for single sample.")
+    .def("delayTime", &Psana::Acqiris::HorizV1::delayTime,"Delay time.")
+    .def("nbrSamples", &Psana::Acqiris::HorizV1::nbrSamples,"Number of samples.")
+    .def("nbrSegments", &Psana::Acqiris::HorizV1::nbrSegments,"Number of segments.")
   ;
   scope().attr("Version")=1;
   }
@@ -75,11 +75,11 @@ void createWrappers(PyObject* module) {
 
   {
   scope outer = 
-  class_<Psana::Acqiris::TrigV1 >("TrigV1", no_init)
+  class_<Psana::Acqiris::TrigV1 >("TrigV1", "Class containing Acqiris configuration data for triggering.", no_init)
     .def("coupling", &Psana::Acqiris::TrigV1::coupling)
-    .def("input", &Psana::Acqiris::TrigV1::input)
-    .def("slope", &Psana::Acqiris::TrigV1::slope)
-    .def("level", &Psana::Acqiris::TrigV1::level)
+    .def("input", &Psana::Acqiris::TrigV1::input,"Trigger source")
+    .def("slope", &Psana::Acqiris::TrigV1::slope,"Triggering slope.")
+    .def("level", &Psana::Acqiris::TrigV1::level,"Trigger level.")
   ;
 
   enum_<Psana::Acqiris::TrigV1::Source>("Source")
@@ -109,14 +109,14 @@ void createWrappers(PyObject* module) {
 
   {
   scope outer = 
-  class_<Psana::Acqiris::ConfigV1, boost::shared_ptr<Psana::Acqiris::ConfigV1>, boost::noncopyable >("ConfigV1", no_init)
-    .def("nbrConvertersPerChannel", &Psana::Acqiris::ConfigV1::nbrConvertersPerChannel)
-    .def("channelMask", &Psana::Acqiris::ConfigV1::channelMask)
-    .def("nbrBanks", &Psana::Acqiris::ConfigV1::nbrBanks)
-    .def("trig", &Psana::Acqiris::ConfigV1::trig, return_value_policy<copy_const_reference>())
-    .def("horiz", &Psana::Acqiris::ConfigV1::horiz, return_value_policy<copy_const_reference>())
-    .def("vert", &Psana::Acqiris::ConfigV1::vert)
-    .def("nbrChannels", &Psana::Acqiris::ConfigV1::nbrChannels)
+  class_<Psana::Acqiris::ConfigV1, boost::shared_ptr<Psana::Acqiris::ConfigV1>, boost::noncopyable >("ConfigV1", "Class containing all Acqiris configuration data.", no_init)
+    .def("nbrConvertersPerChannel", &Psana::Acqiris::ConfigV1::nbrConvertersPerChannel,"Number of ADCs per channel.")
+    .def("channelMask", &Psana::Acqiris::ConfigV1::channelMask,"Bit mask for channels.")
+    .def("nbrBanks", &Psana::Acqiris::ConfigV1::nbrBanks,"Total number of banks.")
+    .def("trig", &Psana::Acqiris::ConfigV1::trig, return_value_policy<copy_const_reference>(),"Trigger configuration.")
+    .def("horiz", &Psana::Acqiris::ConfigV1::horiz, return_value_policy<copy_const_reference>(),"Configuration for horizontal axis")
+    .def("vert", &Psana::Acqiris::ConfigV1::vert,"Configuration for vertical axis (one per channel).")
+    .def("nbrChannels", &Psana::Acqiris::ConfigV1::nbrChannels,"Number of channels calculated from channel bit mask.")
   ;
   scope().attr("Version")=1;
   scope().attr("TypeId")=int(Pds::TypeId::Id_AcqConfig);
@@ -126,11 +126,11 @@ void createWrappers(PyObject* module) {
 
   {
   scope outer = 
-  class_<Psana::Acqiris::TimestampV1 >("TimestampV1", no_init)
-    .def("pos", &Psana::Acqiris::TimestampV1::pos)
+  class_<Psana::Acqiris::TimestampV1 >("TimestampV1", "Class representing Acqiris timestamp value.", no_init)
+    .def("pos", &Psana::Acqiris::TimestampV1::pos,"Horizontal position, for the segment, of the first (nominal) data point with respect \n            to the origin of the nominal trigger delay in seconds.")
     .def("timeStampLo", &Psana::Acqiris::TimestampV1::timeStampLo)
     .def("timeStampHi", &Psana::Acqiris::TimestampV1::timeStampHi)
-    .def("value", &Psana::Acqiris::TimestampV1::value)
+    .def("value", &Psana::Acqiris::TimestampV1::value,"64-bit trigger timestamp, in units of picoseconds. The timestamp is the trigger time \n                with respect to an arbitrary time origin.")
   ;
   scope().attr("Version")=1;
   }
@@ -138,12 +138,12 @@ void createWrappers(PyObject* module) {
 
   {
   scope outer = 
-  class_<Psana::Acqiris::DataDescV1Elem, boost::shared_ptr<Psana::Acqiris::DataDescV1Elem>, boost::noncopyable >("DataDescV1Elem", no_init)
-    .def("nbrSamplesInSeg", &Psana::Acqiris::DataDescV1Elem::nbrSamplesInSeg)
+  class_<Psana::Acqiris::DataDescV1Elem, boost::shared_ptr<Psana::Acqiris::DataDescV1Elem>, boost::noncopyable >("DataDescV1Elem", "Class representing Acqiris waveforms from single channel.", no_init)
+    .def("nbrSamplesInSeg", &Psana::Acqiris::DataDescV1Elem::nbrSamplesInSeg,"Number of samples in one segment.")
     .def("indexFirstPoint", &Psana::Acqiris::DataDescV1Elem::indexFirstPoint)
-    .def("nbrSegments", &Psana::Acqiris::DataDescV1Elem::nbrSegments)
-    .def("timestamp", &Psana::Acqiris::DataDescV1Elem::timestamp)
-    .def("waveforms", &Psana::Acqiris::DataDescV1Elem::waveforms)
+    .def("nbrSegments", &Psana::Acqiris::DataDescV1Elem::nbrSegments,"Number of segments.")
+    .def("timestamp", &Psana::Acqiris::DataDescV1Elem::timestamp,"Timestamps, one timestamp per segment.")
+    .def("waveforms", &Psana::Acqiris::DataDescV1Elem::waveforms,"Waveforms data, two-dimensional array [nbrSegments()]*[nbrSamplesInSeg()]. Note that \n            unlike in pdsdata this already takes into account value of the indexFirstPoint so\n            that client code does not need to correct for this offset.")
   ;
   scope().attr("Version")=1;
   scope().attr("NumberOfBits")=10;
@@ -154,8 +154,8 @@ void createWrappers(PyObject* module) {
 
   {
   scope outer = 
-  class_<Psana::Acqiris::DataDescV1, boost::shared_ptr<Psana::Acqiris::DataDescV1>, boost::noncopyable >("DataDescV1", no_init)
-    .def("data", &Psana::Acqiris::DataDescV1::data, return_internal_reference<>())
+  class_<Psana::Acqiris::DataDescV1, boost::shared_ptr<Psana::Acqiris::DataDescV1>, boost::noncopyable >("DataDescV1", "Class containing waveform data (DataDescV1Elem) for all channels.", no_init)
+    .def("data", &Psana::Acqiris::DataDescV1::data, return_internal_reference<>(),"Waveform data, one object per channel.")
     .def("data_shape", &method_shape<Psana::Acqiris::DataDescV1, &Psana::Acqiris::DataDescV1::data_shape>)
   ;
   scope().attr("Version")=1;
@@ -165,9 +165,9 @@ void createWrappers(PyObject* module) {
 
   {
   scope outer = 
-  class_<Psana::Acqiris::TdcChannel >("TdcChannel", no_init)
-    .def("channel", &Psana::Acqiris::TdcChannel::channel)
-    .def("_mode_int", &Psana::Acqiris::TdcChannel::_mode_int)
+  class_<Psana::Acqiris::TdcChannel >("TdcChannel", "Configuration for Acqiris TDC channel.", no_init)
+    .def("channel", &Psana::Acqiris::TdcChannel::channel,"Channel type as integer number, clients should use channel() method instead.")
+    .def("_mode_int", &Psana::Acqiris::TdcChannel::_mode_int,"Bitfield value, should not be used directly. Use mode() and slope()\n                in the client code.")
     .def("slope", &Psana::Acqiris::TdcChannel::slope)
     .def("mode", &Psana::Acqiris::TdcChannel::mode)
     .def("level", &Psana::Acqiris::TdcChannel::level)
@@ -198,7 +198,7 @@ void createWrappers(PyObject* module) {
 
   {
   scope outer = 
-  class_<Psana::Acqiris::TdcAuxIO >("TdcAuxIO", no_init)
+  class_<Psana::Acqiris::TdcAuxIO >("TdcAuxIO", "configuration for auxiliary IO channel.", no_init)
     .def("channel", &Psana::Acqiris::TdcAuxIO::channel)
     .def("mode", &Psana::Acqiris::TdcAuxIO::mode)
     .def("term", &Psana::Acqiris::TdcAuxIO::term)
@@ -225,7 +225,7 @@ void createWrappers(PyObject* module) {
 
   {
   scope outer = 
-  class_<Psana::Acqiris::TdcVetoIO >("TdcVetoIO", no_init)
+  class_<Psana::Acqiris::TdcVetoIO >("TdcVetoIO", "Class with configuration data for Veto IO channel.", no_init)
     .def("channel", &Psana::Acqiris::TdcVetoIO::channel)
     .def("mode", &Psana::Acqiris::TdcVetoIO::mode)
     .def("term", &Psana::Acqiris::TdcVetoIO::term)
@@ -251,9 +251,9 @@ void createWrappers(PyObject* module) {
 
   {
   scope outer = 
-  class_<Psana::Acqiris::TdcConfigV1, boost::shared_ptr<Psana::Acqiris::TdcConfigV1>, boost::noncopyable >("TdcConfigV1", no_init)
-    .def("channels", &Psana::Acqiris::TdcConfigV1::channels)
-    .def("auxio", &Psana::Acqiris::TdcConfigV1::auxio)
+  class_<Psana::Acqiris::TdcConfigV1, boost::shared_ptr<Psana::Acqiris::TdcConfigV1>, boost::noncopyable >("TdcConfigV1", "Class with complete Acqiris TDC configuration.", no_init)
+    .def("channels", &Psana::Acqiris::TdcConfigV1::channels,"Channel configurations, one object per channel.")
+    .def("auxio", &Psana::Acqiris::TdcConfigV1::auxio,"Axiliary configurations, one object per channel.")
     .def("veto", &Psana::Acqiris::TdcConfigV1::veto, return_value_policy<copy_const_reference>())
   ;
   scope().attr("Version")=1;
@@ -265,10 +265,10 @@ void createWrappers(PyObject* module) {
 
   {
   scope outer = 
-  class_<Psana::Acqiris::TdcDataV1_Item >("TdcDataV1_Item", no_init)
-    .def("value", &Psana::Acqiris::TdcDataV1_Item::value)
+  class_<Psana::Acqiris::TdcDataV1_Item >("TdcDataV1_Item", "Base class for all Acqiris TDC data objects.", no_init)
+    .def("value", &Psana::Acqiris::TdcDataV1_Item::value,"Value as integer number whiis composed of several bit fields. Do not use value directly,\n                instead cast this object to one of the actual types and use corresponding methods.")
     .def("bf_val_", &Psana::Acqiris::TdcDataV1_Item::bf_val_)
-    .def("source", &Psana::Acqiris::TdcDataV1_Item::source)
+    .def("source", &Psana::Acqiris::TdcDataV1_Item::source,"Source of this data object, use returned enum to distinguish between actual \n                types of data objecs and cast appropriately.")
     .def("bf_ofv_", &Psana::Acqiris::TdcDataV1_Item::bf_ofv_)
   ;
 
@@ -285,23 +285,23 @@ void createWrappers(PyObject* module) {
   }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Acqiris::TdcDataV1_Item> >(-1));
 
-  class_<Psana::Acqiris::TdcDataV1Common, boost::python::bases<Psana::Acqiris::TdcDataV1_Item> >("TdcDataV1Common", no_init)
-    .def("nhits", &Psana::Acqiris::TdcDataV1Common::nhits)
-    .def("overflow", &Psana::Acqiris::TdcDataV1Common::overflow)
+  class_<Psana::Acqiris::TdcDataV1Common, boost::python::bases<Psana::Acqiris::TdcDataV1_Item> >("TdcDataV1Common", "Class for the \"common\" TDC data object.", no_init)
+    .def("nhits", &Psana::Acqiris::TdcDataV1Common::nhits,"Returns number of hits.")
+    .def("overflow", &Psana::Acqiris::TdcDataV1Common::overflow,"Returns overflow status.")
   ;
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Acqiris::TdcDataV1Common> >(-1));
 
-  class_<Psana::Acqiris::TdcDataV1Channel, boost::python::bases<Psana::Acqiris::TdcDataV1_Item> >("TdcDataV1Channel", no_init)
-    .def("ticks", &Psana::Acqiris::TdcDataV1Channel::ticks)
-    .def("overflow", &Psana::Acqiris::TdcDataV1Channel::overflow)
-    .def("time", &Psana::Acqiris::TdcDataV1Channel::time)
+  class_<Psana::Acqiris::TdcDataV1Channel, boost::python::bases<Psana::Acqiris::TdcDataV1_Item> >("TdcDataV1Channel", "Class for the \"channel\" TDC data object.", no_init)
+    .def("ticks", &Psana::Acqiris::TdcDataV1Channel::ticks,"Returns number of ticks.")
+    .def("overflow", &Psana::Acqiris::TdcDataV1Channel::overflow,"Returns overflow status.")
+    .def("time", &Psana::Acqiris::TdcDataV1Channel::time,"Ticks converted to time, tick resolution is 50 picosecond.")
   ;
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Acqiris::TdcDataV1Channel> >(-1));
 
   {
   scope outer = 
-  class_<Psana::Acqiris::TdcDataV1Marker, boost::python::bases<Psana::Acqiris::TdcDataV1_Item> >("TdcDataV1Marker", no_init)
-    .def("type", &Psana::Acqiris::TdcDataV1Marker::type)
+  class_<Psana::Acqiris::TdcDataV1Marker, boost::python::bases<Psana::Acqiris::TdcDataV1_Item> >("TdcDataV1Marker", "Class for the \"marker\" TDC data object.", no_init)
+    .def("type", &Psana::Acqiris::TdcDataV1Marker::type,"Returns type of the marker.")
   ;
 
   enum_<Psana::Acqiris::TdcDataV1Marker::Type>("Type")
@@ -315,8 +315,8 @@ void createWrappers(PyObject* module) {
 
   {
   scope outer = 
-  class_<Psana::Acqiris::TdcDataV1, boost::shared_ptr<Psana::Acqiris::TdcDataV1>, boost::noncopyable >("TdcDataV1", no_init)
-    .def("data", &Psana::Acqiris::TdcDataV1::data)
+  class_<Psana::Acqiris::TdcDataV1, boost::shared_ptr<Psana::Acqiris::TdcDataV1>, boost::noncopyable >("TdcDataV1", "Acqiris TDS data object is a container for TdcDataV1_Item object (or their\n            sub-types).", no_init)
+    .def("data", &Psana::Acqiris::TdcDataV1::data,"Access TDC data items. The data_shape() method should be used to \n            obtain the number of elements.")
   ;
   scope().attr("Version")=1;
   scope().attr("TypeId")=int(Pds::TypeId::Id_AcqTdcData);

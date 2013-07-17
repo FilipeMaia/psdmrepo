@@ -77,9 +77,9 @@ void createWrappers(PyObject* module) {
     .value("DBR_CTRL_LONG",Psana::Epics::DBR_CTRL_LONG)
     .value("DBR_CTRL_DOUBLE",Psana::Epics::DBR_CTRL_DOUBLE)
   ;
-  class_<Psana::Epics::epicsTimeStamp >("epicsTimeStamp", no_init)
-    .def("sec", &Psana::Epics::epicsTimeStamp::sec)
-    .def("nsec", &Psana::Epics::epicsTimeStamp::nsec)
+  class_<Psana::Epics::epicsTimeStamp >("epicsTimeStamp", "EPICS timestamp type, includes seconds and nanoseconds.\n           EPICS epoch corresponds to 1990-01-01 00:00:00Z.", no_init)
+    .def("sec", &Psana::Epics::epicsTimeStamp::sec,"Seconds since Jan 1, 1990 00:00 UTC")
+    .def("nsec", &Psana::Epics::epicsTimeStamp::nsec,"Nanoseconds within second.")
   ;
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Epics::epicsTimeStamp> >(-1));
 
@@ -285,24 +285,24 @@ void createWrappers(PyObject* module) {
   }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Epics::dbr_ctrl_double> >(-1));
 
-  class_<Psana::Epics::EpicsPvHeader, boost::shared_ptr<Psana::Epics::EpicsPvHeader>, boost::noncopyable >("EpicsPvHeader", no_init)
-    .def("pvId", &Psana::Epics::EpicsPvHeader::pvId)
-    .def("dbrType", &Psana::Epics::EpicsPvHeader::dbrType)
-    .def("numElements", &Psana::Epics::EpicsPvHeader::numElements)
-    .def("isCtrl", &Psana::Epics::EpicsPvHeader::isCtrl)
-    .def("isTime", &Psana::Epics::EpicsPvHeader::isTime)
-    .def("status", &Psana::Epics::EpicsPvHeader::status)
-    .def("severity", &Psana::Epics::EpicsPvHeader::severity)
+  class_<Psana::Epics::EpicsPvHeader, boost::shared_ptr<Psana::Epics::EpicsPvHeader>, boost::noncopyable >("EpicsPvHeader", "Base class for EPICS data types stored in XTC files.", no_init)
+    .def("pvId", &Psana::Epics::EpicsPvHeader::pvId,"PV ID number assigned by DAQ.")
+    .def("dbrType", &Psana::Epics::EpicsPvHeader::dbrType,"DBR structure type.")
+    .def("numElements", &Psana::Epics::EpicsPvHeader::numElements,"Number of elements in EPICS DBR structure")
+    .def("isCtrl", &Psana::Epics::EpicsPvHeader::isCtrl,"Returns 1 if PV is one of CTRL types, 0 otherwise.")
+    .def("isTime", &Psana::Epics::EpicsPvHeader::isTime,"Returns 1 if PV is one of TIME types, 0 otherwise.")
+    .def("status", &Psana::Epics::EpicsPvHeader::status,"Returns status value for the PV.")
+    .def("severity", &Psana::Epics::EpicsPvHeader::severity,"Returns severity value for the PV.")
   ;
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Epics::EpicsPvHeader> >(-1));
 
-  class_<Psana::Epics::EpicsPvCtrlHeader, boost::python::bases<Psana::Epics::EpicsPvHeader>, boost::shared_ptr<Psana::Epics::EpicsPvCtrlHeader>, boost::noncopyable >("EpicsPvCtrlHeader", no_init)
-    .def("pvName", &Psana::Epics::EpicsPvCtrlHeader::pvName)
+  class_<Psana::Epics::EpicsPvCtrlHeader, boost::python::bases<Psana::Epics::EpicsPvHeader>, boost::shared_ptr<Psana::Epics::EpicsPvCtrlHeader>, boost::noncopyable >("EpicsPvCtrlHeader", "Base class for all CTRL-type PV values.", no_init)
+    .def("pvName", &Psana::Epics::EpicsPvCtrlHeader::pvName,"PV name.")
   ;
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Epics::EpicsPvCtrlHeader> >(-1));
 
-  class_<Psana::Epics::EpicsPvTimeHeader, boost::python::bases<Psana::Epics::EpicsPvHeader>, boost::shared_ptr<Psana::Epics::EpicsPvTimeHeader>, boost::noncopyable >("EpicsPvTimeHeader", no_init)
-    .def("stamp", &Psana::Epics::EpicsPvTimeHeader::stamp)
+  class_<Psana::Epics::EpicsPvTimeHeader, boost::python::bases<Psana::Epics::EpicsPvHeader>, boost::shared_ptr<Psana::Epics::EpicsPvTimeHeader>, boost::noncopyable >("EpicsPvTimeHeader", "Base class for all TIME-type PV values.", no_init)
+    .def("stamp", &Psana::Epics::EpicsPvTimeHeader::stamp,"EPICS timestamp value.")
   ;
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Epics::EpicsPvTimeHeader> >(-1));
 

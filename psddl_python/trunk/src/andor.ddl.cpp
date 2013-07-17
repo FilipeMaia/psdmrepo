@@ -49,10 +49,10 @@ void createWrappers(PyObject* module) {
     .def("readoutSpeedIndex", &Psana::Andor::ConfigV1::readoutSpeedIndex)
     .def("exposureEventCode", &Psana::Andor::ConfigV1::exposureEventCode)
     .def("numDelayShots", &Psana::Andor::ConfigV1::numDelayShots)
-    .def("frameSize", &Psana::Andor::ConfigV1::frameSize)
-    .def("numPixelsX", &Psana::Andor::ConfigV1::numPixelsX)
-    .def("numPixelsY", &Psana::Andor::ConfigV1::numPixelsY)
-    .def("numPixels", &Psana::Andor::ConfigV1::numPixels)
+    .def("frameSize", &Psana::Andor::ConfigV1::frameSize,"Total size in bytes of the Frame object")
+    .def("numPixelsX", &Psana::Andor::ConfigV1::numPixelsX,"calculate frame X size in pixels based on the current ROI and binning settings")
+    .def("numPixelsY", &Psana::Andor::ConfigV1::numPixelsY,"calculate frame Y size in pixels based on the current ROI and binning settings")
+    .def("numPixels", &Psana::Andor::ConfigV1::numPixels,"calculate total frame size in pixels based on the current ROI and binning settings")
   ;
 
   enum_<Psana::Andor::ConfigV1::EnumFanMode>("EnumFanMode")

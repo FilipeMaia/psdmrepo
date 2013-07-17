@@ -34,19 +34,19 @@ void createWrappers(PyObject* module) {
   {
   scope outer = 
   class_<Psana::EvrData::PulseConfig >("PulseConfig", no_init)
-    .def("pulse", &Psana::EvrData::PulseConfig::pulse)
-    .def("_input_control_value", &Psana::EvrData::PulseConfig::_input_control_value)
+    .def("pulse", &Psana::EvrData::PulseConfig::pulse,"internal pulse generation channel")
+    .def("_input_control_value", &Psana::EvrData::PulseConfig::_input_control_value,"Pulse input control")
     .def("bf_trigger", &Psana::EvrData::PulseConfig::bf_trigger)
     .def("bf_set", &Psana::EvrData::PulseConfig::bf_set)
     .def("bf_clear", &Psana::EvrData::PulseConfig::bf_clear)
-    .def("_output_control_value", &Psana::EvrData::PulseConfig::_output_control_value)
+    .def("_output_control_value", &Psana::EvrData::PulseConfig::_output_control_value,"Pulse output control")
     .def("polarity", &Psana::EvrData::PulseConfig::polarity)
     .def("map_set_enable", &Psana::EvrData::PulseConfig::map_set_enable)
     .def("map_reset_enable", &Psana::EvrData::PulseConfig::map_reset_enable)
     .def("map_trigger_enable", &Psana::EvrData::PulseConfig::map_trigger_enable)
-    .def("prescale", &Psana::EvrData::PulseConfig::prescale)
-    .def("delay", &Psana::EvrData::PulseConfig::delay)
-    .def("width", &Psana::EvrData::PulseConfig::width)
+    .def("prescale", &Psana::EvrData::PulseConfig::prescale,"pulse event prescale")
+    .def("delay", &Psana::EvrData::PulseConfig::delay,"delay in 119MHz clks")
+    .def("width", &Psana::EvrData::PulseConfig::width,"width in 119MHz clks")
     .def("trigger", &Psana::EvrData::PulseConfig::trigger)
     .def("set", &Psana::EvrData::PulseConfig::set)
     .def("clear", &Psana::EvrData::PulseConfig::clear)
@@ -63,10 +63,10 @@ void createWrappers(PyObject* module) {
 
   class_<Psana::EvrData::PulseConfigV3 >("PulseConfigV3", no_init)
     .def("pulseId", &Psana::EvrData::PulseConfigV3::pulseId)
-    .def("polarity", &Psana::EvrData::PulseConfigV3::polarity)
-    .def("prescale", &Psana::EvrData::PulseConfigV3::prescale)
-    .def("delay", &Psana::EvrData::PulseConfigV3::delay)
-    .def("width", &Psana::EvrData::PulseConfigV3::width)
+    .def("polarity", &Psana::EvrData::PulseConfigV3::polarity,"0 -> positive polarity , 1 -> negative polarity")
+    .def("prescale", &Psana::EvrData::PulseConfigV3::prescale,"Clock divider")
+    .def("delay", &Psana::EvrData::PulseConfigV3::delay,"Delay in 119MHz clks")
+    .def("width", &Psana::EvrData::PulseConfigV3::width,"Width in 119MHz clks")
   ;
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::EvrData::PulseConfigV3> >(-1));
 

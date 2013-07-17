@@ -45,10 +45,10 @@ void createWrappers(PyObject* module) {
     .def("readoutSpeedIndex", &Psana::Princeton::ConfigV1::readoutSpeedIndex)
     .def("readoutEventCode", &Psana::Princeton::ConfigV1::readoutEventCode)
     .def("delayMode", &Psana::Princeton::ConfigV1::delayMode)
-    .def("frameSize", &Psana::Princeton::ConfigV1::frameSize)
-    .def("numPixelsX", &Psana::Princeton::ConfigV1::numPixelsX)
-    .def("numPixelsY", &Psana::Princeton::ConfigV1::numPixelsY)
-    .def("numPixels", &Psana::Princeton::ConfigV1::numPixels)
+    .def("frameSize", &Psana::Princeton::ConfigV1::frameSize,"Total size in bytes of the Frame object including header and pixel data, \n            this returns the size of FrameV1 object, do not use this config type with FrameV2")
+    .def("numPixelsX", &Psana::Princeton::ConfigV1::numPixelsX,"calculate frame X size in pixels based on the current ROI and binning settings")
+    .def("numPixelsY", &Psana::Princeton::ConfigV1::numPixelsY,"calculate frame Y size in pixels based on the current ROI and binning settings")
+    .def("numPixels", &Psana::Princeton::ConfigV1::numPixels,"calculate total frame size in pixels based on the current ROI and binning settings")
   ;
   scope().attr("Version")=1;
   scope().attr("TypeId")=int(Pds::TypeId::Id_PrincetonConfig);
@@ -70,10 +70,10 @@ void createWrappers(PyObject* module) {
     .def("readoutSpeedIndex", &Psana::Princeton::ConfigV2::readoutSpeedIndex)
     .def("readoutEventCode", &Psana::Princeton::ConfigV2::readoutEventCode)
     .def("delayMode", &Psana::Princeton::ConfigV2::delayMode)
-    .def("frameSize", &Psana::Princeton::ConfigV2::frameSize)
-    .def("numPixelsX", &Psana::Princeton::ConfigV2::numPixelsX)
-    .def("numPixelsY", &Psana::Princeton::ConfigV2::numPixelsY)
-    .def("numPixels", &Psana::Princeton::ConfigV2::numPixels)
+    .def("frameSize", &Psana::Princeton::ConfigV2::frameSize,"Total size in bytes of the Frame object including header and pixel data, \n            this returns the size of FrameV1 object, do not use this config type with FrameV2")
+    .def("numPixelsX", &Psana::Princeton::ConfigV2::numPixelsX,"calculate frame X size in pixels based on the current ROI and binning settings")
+    .def("numPixelsY", &Psana::Princeton::ConfigV2::numPixelsY,"calculate frame Y size in pixels based on the current ROI and binning settings")
+    .def("numPixels", &Psana::Princeton::ConfigV2::numPixels,"calculate total frame size in pixels based on the current ROI and binning settings")
   ;
   scope().attr("Version")=2;
   scope().attr("TypeId")=int(Pds::TypeId::Id_PrincetonConfig);
@@ -95,10 +95,10 @@ void createWrappers(PyObject* module) {
     .def("readoutSpeedIndex", &Psana::Princeton::ConfigV3::readoutSpeedIndex)
     .def("exposureEventCode", &Psana::Princeton::ConfigV3::exposureEventCode)
     .def("numDelayShots", &Psana::Princeton::ConfigV3::numDelayShots)
-    .def("frameSize", &Psana::Princeton::ConfigV3::frameSize)
-    .def("numPixelsX", &Psana::Princeton::ConfigV3::numPixelsX)
-    .def("numPixelsY", &Psana::Princeton::ConfigV3::numPixelsY)
-    .def("numPixels", &Psana::Princeton::ConfigV3::numPixels)
+    .def("frameSize", &Psana::Princeton::ConfigV3::frameSize,"Total size in bytes of the Frame object including header and pixel data, \n            this returns the size of FrameV1 object, do not use this config type with FrameV2")
+    .def("numPixelsX", &Psana::Princeton::ConfigV3::numPixelsX,"calculate frame X size in pixels based on the current ROI and binning settings")
+    .def("numPixelsY", &Psana::Princeton::ConfigV3::numPixelsY,"calculate frame Y size in pixels based on the current ROI and binning settings")
+    .def("numPixels", &Psana::Princeton::ConfigV3::numPixels,"calculate total frame size in pixels based on the current ROI and binning settings")
   ;
   scope().attr("Version")=3;
   scope().attr("TypeId")=int(Pds::TypeId::Id_PrincetonConfig);
@@ -123,10 +123,10 @@ void createWrappers(PyObject* module) {
     .def("readoutSpeedIndex", &Psana::Princeton::ConfigV4::readoutSpeedIndex)
     .def("exposureEventCode", &Psana::Princeton::ConfigV4::exposureEventCode)
     .def("numDelayShots", &Psana::Princeton::ConfigV4::numDelayShots)
-    .def("frameSize", &Psana::Princeton::ConfigV4::frameSize)
-    .def("numPixelsX", &Psana::Princeton::ConfigV4::numPixelsX)
-    .def("numPixelsY", &Psana::Princeton::ConfigV4::numPixelsY)
-    .def("numPixels", &Psana::Princeton::ConfigV4::numPixels)
+    .def("frameSize", &Psana::Princeton::ConfigV4::frameSize,"Total size in bytes of the Frame object including header and pixel data, \n            this returns the size of FrameV1 object, do not use this config type with FrameV2")
+    .def("numPixelsX", &Psana::Princeton::ConfigV4::numPixelsX,"calculate frame X size in pixels based on the current ROI and binning settings")
+    .def("numPixelsY", &Psana::Princeton::ConfigV4::numPixelsY,"calculate frame Y size in pixels based on the current ROI and binning settings")
+    .def("numPixels", &Psana::Princeton::ConfigV4::numPixels,"calculate total frame size in pixels based on the current ROI and binning settings")
   ;
   scope().attr("Version")=4;
   scope().attr("TypeId")=int(Pds::TypeId::Id_PrincetonConfig);
@@ -152,10 +152,10 @@ void createWrappers(PyObject* module) {
     .def("infoReportInterval", &Psana::Princeton::ConfigV5::infoReportInterval)
     .def("exposureEventCode", &Psana::Princeton::ConfigV5::exposureEventCode)
     .def("numDelayShots", &Psana::Princeton::ConfigV5::numDelayShots)
-    .def("frameSize", &Psana::Princeton::ConfigV5::frameSize)
-    .def("numPixelsX", &Psana::Princeton::ConfigV5::numPixelsX)
-    .def("numPixelsY", &Psana::Princeton::ConfigV5::numPixelsY)
-    .def("numPixels", &Psana::Princeton::ConfigV5::numPixels)
+    .def("frameSize", &Psana::Princeton::ConfigV5::frameSize,"Total size in bytes of the Frame object including header and pixel data, \n            this returns the size of FrameV2 object, do not use this config type with FrameV1")
+    .def("numPixelsX", &Psana::Princeton::ConfigV5::numPixelsX,"calculate frame X size in pixels based on the current ROI and binning settings")
+    .def("numPixelsY", &Psana::Princeton::ConfigV5::numPixelsY,"calculate frame Y size in pixels based on the current ROI and binning settings")
+    .def("numPixels", &Psana::Princeton::ConfigV5::numPixels,"calculate total frame size in pixels based on the current ROI and binning settings")
   ;
   scope().attr("Version")=5;
   scope().attr("TypeId")=int(Pds::TypeId::Id_PrincetonConfig);

@@ -46,10 +46,10 @@ void createWrappers(PyObject* module) {
     .def("readoutSpeedIndex", &Psana::Fli::ConfigV1::readoutSpeedIndex)
     .def("exposureEventCode", &Psana::Fli::ConfigV1::exposureEventCode)
     .def("numDelayShots", &Psana::Fli::ConfigV1::numDelayShots)
-    .def("frameSize", &Psana::Fli::ConfigV1::frameSize)
-    .def("numPixelsX", &Psana::Fli::ConfigV1::numPixelsX)
-    .def("numPixelsY", &Psana::Fli::ConfigV1::numPixelsY)
-    .def("numPixels", &Psana::Fli::ConfigV1::numPixels)
+    .def("frameSize", &Psana::Fli::ConfigV1::frameSize,"Total size in bytes of the Frame object, including image and frame header.")
+    .def("numPixelsX", &Psana::Fli::ConfigV1::numPixelsX,"calculate frame X size in pixels based on the current ROI and binning settings")
+    .def("numPixelsY", &Psana::Fli::ConfigV1::numPixelsY,"calculate frame Y size in pixels based on the current ROI and binning settings")
+    .def("numPixels", &Psana::Fli::ConfigV1::numPixels,"calculate total frame size in pixels based on the current ROI and binning settings")
   ;
   scope().attr("Version")=1;
   scope().attr("TypeId")=int(Pds::TypeId::Id_FliConfig);

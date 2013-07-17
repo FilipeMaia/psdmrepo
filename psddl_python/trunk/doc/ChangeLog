@@ -11,6 +11,10 @@ Package author: Joseph S. Barrera
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-06
+2013-07-17 David Schneider
+- Added docstrings to classes and methods.  docstrings come from DDL comments.
+
 Tag: V00-05-05
 2013-07-17 David Schneider
 - Regenerating python wrappers with version and TypeId exported. Adding 

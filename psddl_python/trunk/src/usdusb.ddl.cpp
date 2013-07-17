@@ -64,7 +64,7 @@ void createWrappers(PyObject* module) {
     .def("timestamp", &Psana::UsdUsb::DataV1::timestamp)
     .def("status", &Psana::UsdUsb::DataV1::status)
     .def("analog_in", &Psana::UsdUsb::DataV1::analog_in)
-    .def("encoder_count", &Psana::UsdUsb::DataV1::encoder_count)
+    .def("encoder_count", &Psana::UsdUsb::DataV1::encoder_count,"Return lower 24 bits of _count array as signed integer values.")
   ;
   scope().attr("Version")=1;
   scope().attr("TypeId")=int(Pds::TypeId::Id_UsdUsbData);

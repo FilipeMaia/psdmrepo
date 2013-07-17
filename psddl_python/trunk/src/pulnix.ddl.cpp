@@ -43,7 +43,7 @@ void createWrappers(PyObject* module) {
     .def("horizontal_binning", &Psana::Pulnix::TM6740ConfigV1::horizontal_binning)
     .def("vertical_binning", &Psana::Pulnix::TM6740ConfigV1::vertical_binning)
     .def("lookuptable_mode", &Psana::Pulnix::TM6740ConfigV1::lookuptable_mode)
-    .def("output_resolution_bits", &Psana::Pulnix::TM6740ConfigV1::output_resolution_bits)
+    .def("output_resolution_bits", &Psana::Pulnix::TM6740ConfigV1::output_resolution_bits,"bit-depth of pixel counts")
   ;
 
   enum_<Psana::Pulnix::TM6740ConfigV1::Depth>("Depth")
@@ -80,7 +80,7 @@ void createWrappers(PyObject* module) {
     .def("horizontal_binning", &Psana::Pulnix::TM6740ConfigV2::horizontal_binning)
     .def("vertical_binning", &Psana::Pulnix::TM6740ConfigV2::vertical_binning)
     .def("lookuptable_mode", &Psana::Pulnix::TM6740ConfigV2::lookuptable_mode)
-    .def("output_resolution_bits", &Psana::Pulnix::TM6740ConfigV2::output_resolution_bits)
+    .def("output_resolution_bits", &Psana::Pulnix::TM6740ConfigV2::output_resolution_bits,"bit-depth of pixel counts")
   ;
 
   enum_<Psana::Pulnix::TM6740ConfigV2::Depth>("Depth")

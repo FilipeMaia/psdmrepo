@@ -31,15 +31,15 @@ void createWrappers(PyObject* module) {
   Py_INCREF(submodule);
   PyModule_AddObject(module, "Camera", submodule);
   scope mod = object(handle<>(borrowed(submodule)));
-  class_<Psana::Camera::FrameCoord >("FrameCoord", no_init)
-    .def("column", &Psana::Camera::FrameCoord::column)
-    .def("row", &Psana::Camera::FrameCoord::row)
+  class_<Psana::Camera::FrameCoord >("FrameCoord", "Class representing the coordinates of pixels inside the camera frame.", no_init)
+    .def("column", &Psana::Camera::FrameCoord::column,"Column index (x value).")
+    .def("row", &Psana::Camera::FrameCoord::row,"Row index (y value).")
   ;
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Camera::FrameCoord> >(-1));
 
   {
   scope outer = 
-  class_<Psana::Camera::FrameFccdConfigV1, boost::shared_ptr<Psana::Camera::FrameFccdConfigV1>, boost::noncopyable >("FrameFccdConfigV1", no_init)
+  class_<Psana::Camera::FrameFccdConfigV1, boost::shared_ptr<Psana::Camera::FrameFccdConfigV1>, boost::noncopyable >("FrameFccdConfigV1", "This class was never defined/implemented.", no_init)
   ;
   scope().attr("Version")=1;
   scope().attr("TypeId")=int(Pds::TypeId::Id_FrameFccdConfig);
@@ -48,15 +48,15 @@ void createWrappers(PyObject* module) {
 
   {
   scope outer = 
-  class_<Psana::Camera::FrameFexConfigV1, boost::shared_ptr<Psana::Camera::FrameFexConfigV1>, boost::noncopyable >("FrameFexConfigV1", no_init)
-    .def("forwarding", &Psana::Camera::FrameFexConfigV1::forwarding)
-    .def("forward_prescale", &Psana::Camera::FrameFexConfigV1::forward_prescale)
-    .def("processing", &Psana::Camera::FrameFexConfigV1::processing)
-    .def("roiBegin", &Psana::Camera::FrameFexConfigV1::roiBegin, return_value_policy<copy_const_reference>())
-    .def("roiEnd", &Psana::Camera::FrameFexConfigV1::roiEnd, return_value_policy<copy_const_reference>())
-    .def("threshold", &Psana::Camera::FrameFexConfigV1::threshold)
-    .def("number_of_masked_pixels", &Psana::Camera::FrameFexConfigV1::number_of_masked_pixels)
-    .def("masked_pixel_coordinates", &Psana::Camera::FrameFexConfigV1::masked_pixel_coordinates)
+  class_<Psana::Camera::FrameFexConfigV1, boost::shared_ptr<Psana::Camera::FrameFexConfigV1>, boost::noncopyable >("FrameFexConfigV1", "Class containing configuration data for online frame feature extraction process.", no_init)
+    .def("forwarding", &Psana::Camera::FrameFexConfigV1::forwarding,"frame forwarding policy")
+    .def("forward_prescale", &Psana::Camera::FrameFexConfigV1::forward_prescale,"Prescale of events with forwarded frames")
+    .def("processing", &Psana::Camera::FrameFexConfigV1::processing,"algorithm to apply to frames to produce processed output")
+    .def("roiBegin", &Psana::Camera::FrameFexConfigV1::roiBegin, return_value_policy<copy_const_reference>(),"Coordinate of start of rectangular region of interest (inclusive).")
+    .def("roiEnd", &Psana::Camera::FrameFexConfigV1::roiEnd, return_value_policy<copy_const_reference>(),"Coordinate of finish of rectangular region of interest (exclusive).")
+    .def("threshold", &Psana::Camera::FrameFexConfigV1::threshold,"Pixel data threshold value to apply in processing.")
+    .def("number_of_masked_pixels", &Psana::Camera::FrameFexConfigV1::number_of_masked_pixels,"Count of masked pixels to exclude from processing.")
+    .def("masked_pixel_coordinates", &Psana::Camera::FrameFexConfigV1::masked_pixel_coordinates,"Location of masked pixel coordinates.")
   ;
 
   enum_<Psana::Camera::FrameFexConfigV1::Forwarding>("Forwarding")
@@ -79,13 +79,13 @@ void createWrappers(PyObject* module) {
   {
   scope outer = 
   class_<Psana::Camera::FrameV1, boost::shared_ptr<Psana::Camera::FrameV1>, boost::noncopyable >("FrameV1", no_init)
-    .def("width", &Psana::Camera::FrameV1::width)
-    .def("height", &Psana::Camera::FrameV1::height)
-    .def("depth", &Psana::Camera::FrameV1::depth)
-    .def("offset", &Psana::Camera::FrameV1::offset)
-    .def("_int_pixel_data", &Psana::Camera::FrameV1::_int_pixel_data)
-    .def("data8", &Psana::Camera::FrameV1::data8)
-    .def("data16", &Psana::Camera::FrameV1::data16)
+    .def("width", &Psana::Camera::FrameV1::width,"Number of pixels in a row.")
+    .def("height", &Psana::Camera::FrameV1::height,"Number of pixels in a column.")
+    .def("depth", &Psana::Camera::FrameV1::depth,"Number of bits per pixel.")
+    .def("offset", &Psana::Camera::FrameV1::offset,"Fixed offset/pedestal value of pixel data.")
+    .def("_int_pixel_data", &Psana::Camera::FrameV1::_int_pixel_data,"Pixel data as array of bytes, method is for internal use only, use data8() or \n            data16() for access to the data.")
+    .def("data8", &Psana::Camera::FrameV1::data8,"Returns pixel data array when stored data type is 8-bit (depth() is less than 9).\n                If data type is 16-bit then empty array is returned, use data16() method in this case.")
+    .def("data16", &Psana::Camera::FrameV1::data16,"Returns pixel data array when stored data type is 16-bit (depth() is greater than 8).\n                If data type is 8-bit then empty array is returned, use data8() method in this case.")
   ;
   scope().attr("Version")=1;
   scope().attr("TypeId")=int(Pds::TypeId::Id_Frame);

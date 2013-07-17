@@ -59,12 +59,12 @@ void createWrappers(PyObject* module) {
     .value("testData",Psana::CsPad2x2::testData)
     .value("reserved",Psana::CsPad2x2::reserved)
   ;
-  class_<Psana::CsPad2x2::CsPad2x2DigitalPotsCfg, boost::shared_ptr<Psana::CsPad2x2::CsPad2x2DigitalPotsCfg>, boost::noncopyable >("CsPad2x2DigitalPotsCfg", no_init)
+  class_<Psana::CsPad2x2::CsPad2x2DigitalPotsCfg, boost::shared_ptr<Psana::CsPad2x2::CsPad2x2DigitalPotsCfg>, boost::noncopyable >("CsPad2x2DigitalPotsCfg", "Class defining configuration for CsPad POTs?", no_init)
     .def("pots", &Psana::CsPad2x2::CsPad2x2DigitalPotsCfg::pots)
   ;
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::CsPad2x2::CsPad2x2DigitalPotsCfg> >(-1));
 
-  class_<Psana::CsPad2x2::CsPad2x2ReadOnlyCfg >("CsPad2x2ReadOnlyCfg", no_init)
+  class_<Psana::CsPad2x2::CsPad2x2ReadOnlyCfg >("CsPad2x2ReadOnlyCfg", "Class defining read-only configuration.", no_init)
     .def("shiftTest", &Psana::CsPad2x2::CsPad2x2ReadOnlyCfg::shiftTest)
     .def("version", &Psana::CsPad2x2::CsPad2x2ReadOnlyCfg::version)
   ;
@@ -76,12 +76,12 @@ void createWrappers(PyObject* module) {
   ;
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::CsPad2x2::ProtectionSystemThreshold> >(-1));
 
-  class_<Psana::CsPad2x2::CsPad2x2GainMapCfg, boost::shared_ptr<Psana::CsPad2x2::CsPad2x2GainMapCfg>, boost::noncopyable >("CsPad2x2GainMapCfg", no_init)
-    .def("gainMap", &Psana::CsPad2x2::CsPad2x2GainMapCfg::gainMap)
+  class_<Psana::CsPad2x2::CsPad2x2GainMapCfg, boost::shared_ptr<Psana::CsPad2x2::CsPad2x2GainMapCfg>, boost::noncopyable >("CsPad2x2GainMapCfg", "Class defining ASIC gain map.", no_init)
+    .def("gainMap", &Psana::CsPad2x2::CsPad2x2GainMapCfg::gainMap,"Array with the gain map for single ASIC.")
   ;
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::CsPad2x2::CsPad2x2GainMapCfg> >(-1));
 
-  class_<Psana::CsPad2x2::ConfigV1QuadReg, boost::shared_ptr<Psana::CsPad2x2::ConfigV1QuadReg>, boost::noncopyable >("ConfigV1QuadReg", no_init)
+  class_<Psana::CsPad2x2::ConfigV1QuadReg, boost::shared_ptr<Psana::CsPad2x2::ConfigV1QuadReg>, boost::noncopyable >("ConfigV1QuadReg", "Configuration data for single \"quadrant\" which for 2x2 means a single 2x2.", no_init)
     .def("shiftSelect", &Psana::CsPad2x2::ConfigV1QuadReg::shiftSelect)
     .def("edgeSelect", &Psana::CsPad2x2::ConfigV1QuadReg::edgeSelect)
     .def("readClkSet", &Psana::CsPad2x2::ConfigV1QuadReg::readClkSet)
@@ -103,15 +103,15 @@ void createWrappers(PyObject* module) {
     .def("kdConstant", &Psana::CsPad2x2::ConfigV1QuadReg::kdConstant)
     .def("humidThold", &Psana::CsPad2x2::ConfigV1QuadReg::humidThold)
     .def("setPoint", &Psana::CsPad2x2::ConfigV1QuadReg::setPoint)
-    .def("ro", &Psana::CsPad2x2::ConfigV1QuadReg::ro, return_value_policy<copy_const_reference>())
+    .def("ro", &Psana::CsPad2x2::ConfigV1QuadReg::ro, return_value_policy<copy_const_reference>(),"read-only configuration")
     .def("dp", &Psana::CsPad2x2::ConfigV1QuadReg::dp, return_value_policy<copy_const_reference>())
-    .def("gm", &Psana::CsPad2x2::ConfigV1QuadReg::gm, return_value_policy<copy_const_reference>())
+    .def("gm", &Psana::CsPad2x2::ConfigV1QuadReg::gm, return_value_policy<copy_const_reference>(),"Gain map.")
   ;
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::CsPad2x2::ConfigV1QuadReg> >(-1));
 
   {
   scope outer = 
-  class_<Psana::CsPad2x2::ConfigV1, boost::shared_ptr<Psana::CsPad2x2::ConfigV1>, boost::noncopyable >("ConfigV1", no_init)
+  class_<Psana::CsPad2x2::ConfigV1, boost::shared_ptr<Psana::CsPad2x2::ConfigV1>, boost::noncopyable >("ConfigV1", "Configuration data for 2x2 CsPad device.", no_init)
     .def("concentratorVersion", &Psana::CsPad2x2::ConfigV1::concentratorVersion)
     .def("protectionThreshold", &Psana::CsPad2x2::ConfigV1::protectionThreshold, return_value_policy<copy_const_reference>())
     .def("protectionEnable", &Psana::CsPad2x2::ConfigV1::protectionEnable)
@@ -124,14 +124,14 @@ void createWrappers(PyObject* module) {
     .def("roiMask", &Psana::CsPad2x2::ConfigV1::roiMask)
     .def("quad", &Psana::CsPad2x2::ConfigV1::quad, return_value_policy<copy_const_reference>())
     .def("numAsicsRead", &Psana::CsPad2x2::ConfigV1::numAsicsRead)
-    .def("numAsicsStored", &Psana::CsPad2x2::ConfigV1::numAsicsStored)
+    .def("numAsicsStored", &Psana::CsPad2x2::ConfigV1::numAsicsStored,"Number of ASICs in given quadrant")
   ;
   scope().attr("Version")=1;
   scope().attr("TypeId")=int(Pds::TypeId::Id_Cspad2x2Config);
   }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::CsPad2x2::ConfigV1> >(Pds::TypeId::Id_Cspad2x2Config));
 
-  class_<Psana::CsPad2x2::ConfigV2QuadReg, boost::shared_ptr<Psana::CsPad2x2::ConfigV2QuadReg>, boost::noncopyable >("ConfigV2QuadReg", no_init)
+  class_<Psana::CsPad2x2::ConfigV2QuadReg, boost::shared_ptr<Psana::CsPad2x2::ConfigV2QuadReg>, boost::noncopyable >("ConfigV2QuadReg", "Configuration data for single \"quadrant\" which for 2x2 means a single 2x2.", no_init)
     .def("shiftSelect", &Psana::CsPad2x2::ConfigV2QuadReg::shiftSelect)
     .def("edgeSelect", &Psana::CsPad2x2::ConfigV2QuadReg::edgeSelect)
     .def("readClkSet", &Psana::CsPad2x2::ConfigV2QuadReg::readClkSet)
@@ -153,17 +153,17 @@ void createWrappers(PyObject* module) {
     .def("kdConstant", &Psana::CsPad2x2::ConfigV2QuadReg::kdConstant)
     .def("humidThold", &Psana::CsPad2x2::ConfigV2QuadReg::humidThold)
     .def("setPoint", &Psana::CsPad2x2::ConfigV2QuadReg::setPoint)
-    .def("biasTuning", &Psana::CsPad2x2::ConfigV2QuadReg::biasTuning)
-    .def("pdpmndnmBalance", &Psana::CsPad2x2::ConfigV2QuadReg::pdpmndnmBalance)
-    .def("ro", &Psana::CsPad2x2::ConfigV2QuadReg::ro, return_value_policy<copy_const_reference>())
+    .def("biasTuning", &Psana::CsPad2x2::ConfigV2QuadReg::biasTuning,"bias tuning is used, but not written;\n            2 bits per nibble, C2,C1,I5,I2;\n            bit order rc00rc00rc00rc")
+    .def("pdpmndnmBalance", &Psana::CsPad2x2::ConfigV2QuadReg::pdpmndnmBalance,"pMOS and nMOS Displacement and Main;\n            used but not written and not in GUI yet;\n            hard-wired to zero in GUI;\n            2 bits per nibble, bit order pd00pm00nd00nm")
+    .def("ro", &Psana::CsPad2x2::ConfigV2QuadReg::ro, return_value_policy<copy_const_reference>(),"read-only configuration")
     .def("dp", &Psana::CsPad2x2::ConfigV2QuadReg::dp, return_value_policy<copy_const_reference>())
-    .def("gm", &Psana::CsPad2x2::ConfigV2QuadReg::gm, return_value_policy<copy_const_reference>())
+    .def("gm", &Psana::CsPad2x2::ConfigV2QuadReg::gm, return_value_policy<copy_const_reference>(),"Gain map.")
   ;
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::CsPad2x2::ConfigV2QuadReg> >(-1));
 
   {
   scope outer = 
-  class_<Psana::CsPad2x2::ConfigV2, boost::shared_ptr<Psana::CsPad2x2::ConfigV2>, boost::noncopyable >("ConfigV2", no_init)
+  class_<Psana::CsPad2x2::ConfigV2, boost::shared_ptr<Psana::CsPad2x2::ConfigV2>, boost::noncopyable >("ConfigV2", "Configuration data for 2x2 CsPad device.", no_init)
     .def("concentratorVersion", &Psana::CsPad2x2::ConfigV2::concentratorVersion)
     .def("protectionThreshold", &Psana::CsPad2x2::ConfigV2::protectionThreshold, return_value_policy<copy_const_reference>())
     .def("protectionEnable", &Psana::CsPad2x2::ConfigV2::protectionEnable)
@@ -177,7 +177,7 @@ void createWrappers(PyObject* module) {
     .def("roiMask", &Psana::CsPad2x2::ConfigV2::roiMask)
     .def("quad", &Psana::CsPad2x2::ConfigV2::quad, return_value_policy<copy_const_reference>())
     .def("numAsicsRead", &Psana::CsPad2x2::ConfigV2::numAsicsRead)
-    .def("numAsicsStored", &Psana::CsPad2x2::ConfigV2::numAsicsStored)
+    .def("numAsicsStored", &Psana::CsPad2x2::ConfigV2::numAsicsStored,"Number of ASICs in given quadrant")
   ;
   scope().attr("Version")=2;
   scope().attr("TypeId")=int(Pds::TypeId::Id_Cspad2x2Config);
@@ -186,20 +186,20 @@ void createWrappers(PyObject* module) {
 
   {
   scope outer = 
-  class_<Psana::CsPad2x2::ElementV1, boost::shared_ptr<Psana::CsPad2x2::ElementV1>, boost::noncopyable >("ElementV1", no_init)
-    .def("virtual_channel", &Psana::CsPad2x2::ElementV1::virtual_channel)
-    .def("lane", &Psana::CsPad2x2::ElementV1::lane)
+  class_<Psana::CsPad2x2::ElementV1, boost::shared_ptr<Psana::CsPad2x2::ElementV1>, boost::noncopyable >("ElementV1", "CsPad data from single 2x2 element.", no_init)
+    .def("virtual_channel", &Psana::CsPad2x2::ElementV1::virtual_channel,"Virtual channel number.")
+    .def("lane", &Psana::CsPad2x2::ElementV1::lane,"Lane number.")
     .def("tid", &Psana::CsPad2x2::ElementV1::tid)
     .def("acq_count", &Psana::CsPad2x2::ElementV1::acq_count)
     .def("op_code", &Psana::CsPad2x2::ElementV1::op_code)
-    .def("quad", &Psana::CsPad2x2::ElementV1::quad)
+    .def("quad", &Psana::CsPad2x2::ElementV1::quad,"Quadrant number.")
     .def("seq_count", &Psana::CsPad2x2::ElementV1::seq_count)
     .def("ticks", &Psana::CsPad2x2::ElementV1::ticks)
     .def("fiducials", &Psana::CsPad2x2::ElementV1::fiducials)
     .def("sb_temp", &Psana::CsPad2x2::ElementV1::sb_temp)
     .def("frame_type", &Psana::CsPad2x2::ElementV1::frame_type)
     .def("data", &Psana::CsPad2x2::ElementV1::data)
-    .def("common_mode", &Psana::CsPad2x2::ElementV1::common_mode)
+    .def("common_mode", &Psana::CsPad2x2::ElementV1::common_mode,"Common mode value for a given section, section number can be 0 or 1.\n                Will return 0 for data read from XTC, may be non-zero after calibration.")
   ;
   scope().attr("Version")=1;
   scope().attr("TypeId")=int(Pds::TypeId::Id_Cspad2x2Element);

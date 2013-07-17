@@ -327,11 +327,11 @@ void createWrappers(PyObject* module) {
   {
   scope outer = 
   class_<Psana::Timepix::DataV2, boost::shared_ptr<Psana::Timepix::DataV2>, boost::noncopyable >("DataV2", no_init)
-    .def("width", &Psana::Timepix::DataV2::width)
-    .def("height", &Psana::Timepix::DataV2::height)
-    .def("timestamp", &Psana::Timepix::DataV2::timestamp)
-    .def("frameCounter", &Psana::Timepix::DataV2::frameCounter)
-    .def("lostRows", &Psana::Timepix::DataV2::lostRows)
+    .def("width", &Psana::Timepix::DataV2::width,"Pixels per row")
+    .def("height", &Psana::Timepix::DataV2::height,"Pixels per column")
+    .def("timestamp", &Psana::Timepix::DataV2::timestamp,"hardware timestamp")
+    .def("frameCounter", &Psana::Timepix::DataV2::frameCounter,"hardware frame counter")
+    .def("lostRows", &Psana::Timepix::DataV2::lostRows,"lost row count")
     .def("data", &Psana::Timepix::DataV2::data)
     .def("depth", &Psana::Timepix::DataV2::depth)
     .def("depth_bytes", &Psana::Timepix::DataV2::depth_bytes)

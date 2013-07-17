@@ -34,10 +34,10 @@ void createWrappers(PyObject* module) {
   {
   scope outer = 
   class_<Psana::ControlData::PVControl >("PVControl", no_init)
-    .def("name", &Psana::ControlData::PVControl::name)
-    .def("index", &Psana::ControlData::PVControl::index)
-    .def("value", &Psana::ControlData::PVControl::value)
-    .def("array", &Psana::ControlData::PVControl::array)
+    .def("name", &Psana::ControlData::PVControl::name,"Name of the control.")
+    .def("index", &Psana::ControlData::PVControl::index,"Index of the control PV (for arrays) or NoArray.")
+    .def("value", &Psana::ControlData::PVControl::value,"Value for this control.")
+    .def("array", &Psana::ControlData::PVControl::array,"Returns true if the control is an array.")
   ;
   scope().attr("NameSize")=32;
   scope().attr("NoArray")=0xFFFFFFFF;
@@ -47,11 +47,11 @@ void createWrappers(PyObject* module) {
   {
   scope outer = 
   class_<Psana::ControlData::PVMonitor >("PVMonitor", no_init)
-    .def("name", &Psana::ControlData::PVMonitor::name)
-    .def("index", &Psana::ControlData::PVMonitor::index)
-    .def("loValue", &Psana::ControlData::PVMonitor::loValue)
-    .def("hiValue", &Psana::ControlData::PVMonitor::hiValue)
-    .def("array", &Psana::ControlData::PVMonitor::array)
+    .def("name", &Psana::ControlData::PVMonitor::name,"Name of the control.")
+    .def("index", &Psana::ControlData::PVMonitor::index,"Index of the control PV (for arrays) or NoArray.")
+    .def("loValue", &Psana::ControlData::PVMonitor::loValue,"Lowest value for this monitor.")
+    .def("hiValue", &Psana::ControlData::PVMonitor::hiValue,"Highest value for this monitor.")
+    .def("array", &Psana::ControlData::PVMonitor::array,"Returns true if the monitor is an array.")
   ;
   scope().attr("NameSize")=32;
   scope().attr("NoArray")=0xFFFFFFFF;
@@ -61,8 +61,8 @@ void createWrappers(PyObject* module) {
   {
   scope outer = 
   class_<Psana::ControlData::PVLabel >("PVLabel", no_init)
-    .def("name", &Psana::ControlData::PVLabel::name)
-    .def("value", &Psana::ControlData::PVLabel::value)
+    .def("name", &Psana::ControlData::PVLabel::name,"PV name.")
+    .def("value", &Psana::ControlData::PVLabel::value,"Label value.")
   ;
   scope().attr("NameSize")=32;
   scope().attr("ValueSize")=64;
@@ -72,14 +72,14 @@ void createWrappers(PyObject* module) {
   {
   scope outer = 
   class_<Psana::ControlData::ConfigV1, boost::shared_ptr<Psana::ControlData::ConfigV1>, boost::noncopyable >("ConfigV1", no_init)
-    .def("events", &Psana::ControlData::ConfigV1::events)
-    .def("uses_duration", &Psana::ControlData::ConfigV1::uses_duration)
-    .def("uses_events", &Psana::ControlData::ConfigV1::uses_events)
-    .def("duration", &Psana::ControlData::ConfigV1::duration, return_value_policy<copy_const_reference>())
-    .def("npvControls", &Psana::ControlData::ConfigV1::npvControls)
-    .def("npvMonitors", &Psana::ControlData::ConfigV1::npvMonitors)
-    .def("pvControls", &Psana::ControlData::ConfigV1::pvControls)
-    .def("pvMonitors", &Psana::ControlData::ConfigV1::pvMonitors)
+    .def("events", &Psana::ControlData::ConfigV1::events,"Maximum number of events per scan.")
+    .def("uses_duration", &Psana::ControlData::ConfigV1::uses_duration,"returns true if the configuration uses duration control.")
+    .def("uses_events", &Psana::ControlData::ConfigV1::uses_events,"returns true if the configuration uses events limit.")
+    .def("duration", &Psana::ControlData::ConfigV1::duration, return_value_policy<copy_const_reference>(),"Maximum duration of the scan.")
+    .def("npvControls", &Psana::ControlData::ConfigV1::npvControls,"Number of PVControl objects in this configuration.")
+    .def("npvMonitors", &Psana::ControlData::ConfigV1::npvMonitors,"Number of PVMonitor objects in this configuration.")
+    .def("pvControls", &Psana::ControlData::ConfigV1::pvControls,"PVControl configuration objects")
+    .def("pvMonitors", &Psana::ControlData::ConfigV1::pvMonitors,"PVMonitor configuration objects")
   ;
   scope().attr("Version")=1;
   scope().attr("TypeId")=int(Pds::TypeId::Id_ControlConfig);
@@ -89,16 +89,16 @@ void createWrappers(PyObject* module) {
   {
   scope outer = 
   class_<Psana::ControlData::ConfigV2, boost::shared_ptr<Psana::ControlData::ConfigV2>, boost::noncopyable >("ConfigV2", no_init)
-    .def("events", &Psana::ControlData::ConfigV2::events)
-    .def("uses_duration", &Psana::ControlData::ConfigV2::uses_duration)
-    .def("uses_events", &Psana::ControlData::ConfigV2::uses_events)
-    .def("duration", &Psana::ControlData::ConfigV2::duration, return_value_policy<copy_const_reference>())
-    .def("npvControls", &Psana::ControlData::ConfigV2::npvControls)
-    .def("npvMonitors", &Psana::ControlData::ConfigV2::npvMonitors)
-    .def("npvLabels", &Psana::ControlData::ConfigV2::npvLabels)
-    .def("pvControls", &Psana::ControlData::ConfigV2::pvControls)
-    .def("pvMonitors", &Psana::ControlData::ConfigV2::pvMonitors)
-    .def("pvLabels", &Psana::ControlData::ConfigV2::pvLabels)
+    .def("events", &Psana::ControlData::ConfigV2::events,"Maximum number of events per scan.")
+    .def("uses_duration", &Psana::ControlData::ConfigV2::uses_duration,"returns true if the configuration uses duration control.")
+    .def("uses_events", &Psana::ControlData::ConfigV2::uses_events,"returns true if the configuration uses events limit.")
+    .def("duration", &Psana::ControlData::ConfigV2::duration, return_value_policy<copy_const_reference>(),"Maximum duration of the scan.")
+    .def("npvControls", &Psana::ControlData::ConfigV2::npvControls,"Number of PVControl objects in this configuration.")
+    .def("npvMonitors", &Psana::ControlData::ConfigV2::npvMonitors,"Number of PVMonitor objects in this configuration.")
+    .def("npvLabels", &Psana::ControlData::ConfigV2::npvLabels,"Number of PVLabel objects in this configuration.")
+    .def("pvControls", &Psana::ControlData::ConfigV2::pvControls,"PVControl configuration objects")
+    .def("pvMonitors", &Psana::ControlData::ConfigV2::pvMonitors,"PVMonitor configuration objects")
+    .def("pvLabels", &Psana::ControlData::ConfigV2::pvLabels,"PVLabel configuration objects")
   ;
   scope().attr("Version")=2;
   scope().attr("TypeId")=int(Pds::TypeId::Id_ControlConfig);

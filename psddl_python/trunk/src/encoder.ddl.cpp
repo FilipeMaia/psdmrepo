@@ -98,7 +98,7 @@ void createWrappers(PyObject* module) {
   class_<Psana::Encoder::DataV1, boost::shared_ptr<Psana::Encoder::DataV1>, boost::noncopyable >("DataV1", no_init)
     .def("timestamp", &Psana::Encoder::DataV1::timestamp)
     .def("encoder_count", &Psana::Encoder::DataV1::encoder_count)
-    .def("value", &Psana::Encoder::DataV1::value)
+    .def("value", &Psana::Encoder::DataV1::value,"Lower 24 bits of encoder_count as signed integer value.")
   ;
   scope().attr("Version")=1;
   scope().attr("TypeId")=int(Pds::TypeId::Id_EncoderData);
@@ -110,7 +110,7 @@ void createWrappers(PyObject* module) {
   class_<Psana::Encoder::DataV2, boost::shared_ptr<Psana::Encoder::DataV2>, boost::noncopyable >("DataV2", no_init)
     .def("timestamp", &Psana::Encoder::DataV2::timestamp)
     .def("encoder_count", &Psana::Encoder::DataV2::encoder_count)
-    .def("value", &Psana::Encoder::DataV2::value)
+    .def("value", &Psana::Encoder::DataV2::value,"Lower 24 bits of encoder_count as signed integer value.")
   ;
   scope().attr("Version")=2;
   scope().attr("TypeId")=int(Pds::TypeId::Id_EncoderData);
