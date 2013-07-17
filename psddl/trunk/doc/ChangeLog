@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-06
+2013-07-17 David Schneider
+- Exporting the pstype version and TypeId into the python wrappers.
+
+	
 Tag: V00-08-05
 2013-07-16 Andy Salnikov
 - psana backend:

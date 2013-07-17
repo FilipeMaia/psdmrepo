@@ -307,7 +307,9 @@ class DdlPythonInterfaces ( object ) :
 
         has_nested_enums = len(type.enums()) > 0
         has_nested_constants = len(type.constants()) > 0
-        if has_nested_enums or has_nested_constants:
+        has_version_or_type_id = type.version or type.type_id
+        add_scoped_attributes = has_nested_enums or has_nested_constants or has_version_or_type_id
+        if add_scoped_attributes:
             print >>self.cpp, '  {'
             print >>self.cpp, '  scope outer = '
 
@@ -324,16 +326,19 @@ class DdlPythonInterfaces ( object ) :
         # close class declaration
         print >>self.cpp, '  ;'
 
-        # write any nested enums or nested constants
-        if has_nested_enums:
-            for enum in type.enums():
-                self._parseEnum(enum)
-        if has_nested_constants:
-            print >>self.cpp
-            for constant in type.constants():
-                print >>self.cpp, T('  scope().attr("$name")=$value;')(name=constant.name,
-                                                                      value=self.qualifiedConstantValue(constant))
-        if has_nested_constants or has_nested_enums:
+        # write any nested enums, nested constants, version and type_id if present
+        for enum in type.enums():
+            self._parseEnum(enum)
+
+        if type.version:
+            print >>self.cpp, T('  scope().attr("Version")=$version;')(version=type.version)
+        if type.type_id:
+            print >>self.cpp, T('  scope().attr("TypeId")=int(Pds::TypeId::$typeid);')(typeid=type.type_id)
+            
+        for constant in type.constants():
+            print >>self.cpp, T('  scope().attr("$name")=$value;')(name=constant.name,
+                                                                   value=self.qualifiedConstantValue(constant))
+        if add_scoped_attributes:
             print >>self.cpp, '  }'
 
         # generates converter instance
