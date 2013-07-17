@@ -45,7 +45,8 @@ from ConfigParametersForApp import cp
 from GUILogger            import *
 from Logger               import logger
 from FileNameManager      import fnm
-from GUIConfigParameters  import * 
+from GUIConfig            import * 
+from GUIDark              import * 
 
 #from GUIFiles             import *
 #from GUISetupInfo         import *
@@ -74,7 +75,7 @@ class GUIMain ( QtGui.QWidget ) :
 
         cp.setIcons()
 
-        self.setGeometry(10, 25, 650, 300)
+        self.setGeometry(10, 25, 650, 500)
         self.setWindowTitle('Data Processing Environment')
         self.setWindowIcon(cp.icon_monitor)
         self.palette = QtGui.QPalette()
@@ -110,11 +111,11 @@ class GUIMain ( QtGui.QWidget ) :
         self.hboxWW.addStretch(1)
 
 
-        self.list_of_tabs = [ 'Pedestals'
+        self.list_of_tabs = [ 'Dark'
                              ,'Gain'
                              ,'Geometry'
                              ,'File Manager'
-                             ,'Config File'
+                             ,'Configuration'
                              ]
 
         #print 'number of tabs:', len(self.list_of_tabs)
@@ -249,7 +250,7 @@ class GUIMain ( QtGui.QWidget ) :
         except : pass
 
         if   cp.current_tab.value() == self.list_of_tabs[0] :
-            self.gui_win = QtGui.QTextEdit()
+            self.gui_win = GUIDark(self)
             #self.gui_win = GUIFiles(self)
             #self.setStatus(0, 'Status: processing for pedestals')
             
@@ -269,12 +270,11 @@ class GUIMain ( QtGui.QWidget ) :
             #self.setStatus(0, 'Status: processing for data')
 
         elif cp.current_tab.value() == self.list_of_tabs[4] :
-            self.gui_win = GUIConfigParameters(self)
+            self.gui_win = GUIConfig(self)
             #self.setStatus(0, 'Status: processing for data')
 
-
         #self.gui_win.setMinimumHeight(300)
-        self.gui_win.setMinimumSize(700,200)
+        self.gui_win.setMinimumSize(700,500)
 
         self.hboxW.addWidget(self.gui_win)
 

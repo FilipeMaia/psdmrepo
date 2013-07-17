@@ -88,29 +88,30 @@ class FileNameManager :
 
 #-----------------------------
 
-#    def path_dark_xtc(self) :
-#        return cp.in_dir_dark.value() + '/' + cp.in_file_dark.value()
+    def path_dark_xtc(self) :
+        return cp.in_dir_dark.value() + '/' + cp.in_file_dark.value()
+
+    def path_dark_xtc_all_chunks(self) :
+        return cp.in_dir_dark.value() + '/' + gu.xtc_fname_for_all_chunks(cp.in_file_dark.value())
+
+    def path_dark_xtc_cond(self) :
+        if cp.use_dark_xtc_all.value() : return self.path_dark_xtc_all_chunks()
+        else                           : return self.path_dark_xtc()
+
 
 #    def path_data_xtc(self) :
 #        return cp.in_dir_data.value() + '/' + cp.in_file_data.value()
 
 
-#    def path_dark_xtc_all_chunks(self) :
-#        return cp.in_dir_dark.value() + '/' + gu.xtc_fname_for_all_chunks(cp.in_file_dark.value())
-
 #    def path_data_xtc_all_chunks(self) :
 #        return cp.in_dir_data.value() + '/' + gu.xtc_fname_for_all_chunks(cp.in_file_data.value())
-
-#    def path_dark_xtc_cond(self) :
-#        if cp.use_dark_xtc_all.value() : return self.path_dark_xtc_all_chunks()
-#        else                           : return self.path_dark_xtc()
 
 #    def path_data_xtc_cond(self) :
 #        if cp.use_data_xtc_all.value() : return self.path_data_xtc_all_chunks()
 #        else                           : return self.path_data_xtc()
 
-#    def str_exp_run_dark(self) :
-#        return self.str_exp_run_for_xtc_path(self.path_dark_xtc())
+    def str_exp_run_dark(self) :
+        return self.str_exp_run_for_xtc_path(self.path_dark_xtc())
   
 #    def str_exp_run_data(self) :
 #        return self.str_exp_run_for_xtc_path(self.path_data_xtc())
@@ -118,10 +119,10 @@ class FileNameManager :
 #    def str_run_data(self) :
 #        return self.str_run_for_xtc_path(self.path_data_xtc())
 
-#    def str_exp_run_for_xtc_path(self, path) :
-#        instrument, experiment, run_str, run_num = gu.parse_xtc_path(path)
-#        if experiment == None : return 'exp-run-'
-#        else                  : return experiment + '-' + run_str + '-'
+    def str_exp_run_for_xtc_path(self, path) :
+        instrument, experiment, run_str, run_num = gu.parse_xtc_path(path)
+        if experiment == None : return 'exp-run-'
+        else                  : return experiment + '-' + run_str + '-'
 
 #    def str_run_for_xtc_path(self, path) :
 #        instrument, experiment, run_str, run_num = gu.parse_xtc_path(path)
@@ -130,11 +131,11 @@ class FileNameManager :
 
 #-----------------------------
 
-#    def path_prefix(self) :
-#        return cp.dir_work.value() + '/' + cp.fname_prefix.value() 
+    def path_prefix(self) :
+        return cp.dir_work.value() + '/' + cp.fname_prefix.value() 
 
-#    def path_prefix_dark(self) :
-#        return self.path_prefix() + self.str_exp_run_dark()
+    def path_prefix_dark(self) :
+        return self.path_prefix() + self.str_exp_run_dark()
 
 #    def path_prefix_data(self) :
 #        return self.path_prefix() + self.str_exp_run_data()
@@ -162,13 +163,57 @@ class FileNameManager :
 #    def path_data_scan_tstamp_list_tmp(self) :
 #        return  self.path_data_scan_tstamp_list() + '-tmp'
 
+
+
 #-----------------------------
 
-#    def  get_list_of_files_data(self) :
-#        self.list_of_files_data  = self.get_list_of_files_data_scan()
-#        self.list_of_files_data += self.get_list_of_files_data_aver()
-#        #self.list_of_files_data.append(fnm.path_data_xtc())
-#        return self.list_of_files_data
+    def path_peds_scan_psana_cfg(self) :
+        return self.path_prefix_dark() + 'peds-scan.cfg'
+
+    def path_peds_scan_psana_log(self) :
+        return self.path_prefix_dark() + 'peds-scan-log.txt'
+
+    def path_peds_aver_psana_cfg(self) :
+        return self.path_prefix_dark() + 'peds.cfg'
+
+    def path_peds_aver_psana_log(self) :
+        return self.path_prefix_dark() + 'peds-log.txt'
+
+    def path_peds_ave(self) :
+        return self.path_prefix_dark() + 'peds-ave.txt'
+
+    def path_peds_rms(self) :
+        return self.path_prefix_dark() + 'peds-rms.txt'
+
+    def path_peds_aver_plot(self) :
+        return self.path_prefix_dark() + 'peds-aver-plot.png'
+ 
+#-----------------------------
+
+    def  get_list_of_files_peds_scan(self) :
+        self.list_of_files_peds_scan = []
+        #self.list_of_files_peds_scan.append(self.path_dark_xtc())
+        self.list_of_files_peds_scan.append(self.path_peds_scan_psana_cfg())
+        self.list_of_files_peds_scan.append(self.path_peds_scan_psana_log())
+        return self.list_of_files_peds_scan
+
+
+    def  get_list_of_files_peds_aver(self) :
+        self.list_of_files_peds_aver = []
+        self.list_of_files_peds_aver.append(self.path_peds_aver_psana_cfg())
+        self.list_of_files_peds_aver.append(self.path_peds_aver_psana_log())
+        self.list_of_files_peds_aver.append(self.path_peds_ave())
+        self.list_of_files_peds_aver.append(self.path_peds_rms())
+        #self.list_of_files_peds_aver.append(self.path_hotpix_mask())
+        return self.list_of_files_peds_aver
+
+
+    def  get_list_of_files_pedestals(self) :
+        self.list_of_files_pedestals = self.get_list_of_files_peds_scan()
+        self.list_of_files_pedestals+= self.get_list_of_files_peds_aver()
+        self.list_of_files_pedestals.append(self.path_peds_aver_plot())
+        #self.list_of_files_pedestals.append(self.path_dark_xtc())
+        return self.list_of_files_pedestals
 
 #-----------------------------
 

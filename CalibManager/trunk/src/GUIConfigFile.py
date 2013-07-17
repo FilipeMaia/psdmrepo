@@ -3,7 +3,7 @@
 #  $Id$
 #
 # Description:
-#  Module GUIConfigParameters...
+#  Module GUIConfigFile...
 #
 #------------------------------------------------------------------------
 
@@ -34,7 +34,7 @@ from Logger                 import logger
 #---------------------
 #  Class definition --
 #---------------------
-class GUIConfigParameters ( QtGui.QWidget ) :
+class GUIConfigFile ( QtGui.QWidget ) :
     """GUI for configuration parameters management"""
 
     #----------------
@@ -69,7 +69,13 @@ class GUIConfigParameters ( QtGui.QWidget ) :
         grid.addWidget(self.butWrite,      3, 2)
         grid.addWidget(self.butDefault,    3, 3)
         grid.addWidget(self.butPrint,      3, 4)
-        self.setLayout(grid)
+        #self.setLayout(grid)
+
+        self.vbox = QtGui.QVBoxLayout() 
+        self.vbox.addLayout(grid)
+        self.vbox.addStretch(1)
+        self.setLayout(self.vbox)
+
 
         self.connect(self.ediFile,      QtCore.SIGNAL('editingFinished ()'), self.onEditFile     )
         self.connect(self.butRead,      QtCore.SIGNAL('clicked()'),          self.onRead         )
@@ -205,7 +211,7 @@ class GUIConfigParameters ( QtGui.QWidget ) :
 if __name__ == "__main__" :
 
     app = QtGui.QApplication(sys.argv)
-    widget = GUIConfigParameters ()
+    widget = GUIConfigFile ()
     widget.show()
     app.exec_()
 

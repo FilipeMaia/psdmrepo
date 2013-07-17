@@ -58,6 +58,8 @@ class ConfigParametersForApp ( ConfigParameters ) :
         self.guilogger = None
         self.guihelp   = None
 
+        self.procDarkStatus  = 0 # 0=inctive, 1=scan, 2=averaging, 3=both
+ 
 #-----------------------------
 
     def setIcons(self) :
@@ -163,6 +165,11 @@ class ConfigParametersForApp ( ConfigParameters ) :
         self.current_tab    = self.declareParameter( name='CURRENT_TAB'      , val_def='Files',        type='str' )
         #self.fname_cp       = self.declareParameter( name='FNAME_CONFIG_PARS', val=fname, val_def='confpars.txt', type='str' )
 
+        # GUIConfigPars.py
+        self.dir_work          = self.declareParameter( name='DIRECTORY_WORK',        val_def='./work',       type='str' )
+        self.dir_results       = self.declareParameter( name='DIRECTORY_RESULTS',     val_def='./results',    type='str' )
+        self.fname_prefix      = self.declareParameter( name='FILE_NAME_PREFIX',      val_def='clb-',         type='str' )
+
         # GUILogger.py
         self.log_level      = self.declareParameter( name='LOG_LEVEL_OF_MSGS',  val_def='info',         type='str' )
         self.log_file       = self.declareParameter( name='LOG_FILE_FOR_LEVEL', val_def='./log_for_level.txt',       type='str' )
@@ -187,6 +194,20 @@ class ConfigParametersForApp ( ConfigParameters ) :
         #self.elog_post_url       = self.declareParameter( name='ELOG_POST_URL',           val_def='',                type='str' )
         #self.elog_post_cmd       = self.declareParameter( name='ELOG_POST_CHILD_COMMAND', val_def='',                type='str' )
 
+        # GUIDark.py
+        self.use_dark_xtc_all  = self.declareParameter( name='USE_DARK_XTC_ALL_CHUNKS', val_def=True,  type='bool' )
+
+        self.in_dir_dark       = self.declareParameter( name='IN_DIRECTORY_DARK', val_def='/reg/d/ana12/xcs/xcsi0112/xtc',type='str' )
+        self.in_file_dark      = self.declareParameter( name='IN_FILE_NAME_DARK', val_def='e167-r0020-s00-c00.xtc',type='str' )
+
+        self.bat_dark_start    = self.declareParameter( name='BATCH_DARK_START',      val_def= 1,       type='int' )
+        self.bat_dark_end      = self.declareParameter( name='BATCH_DARK_END'  ,      val_def=-1,       type='int' )
+        self.bat_dark_total    = self.declareParameter( name='BATCH_DARK_TOTAL',      val_def=-1,       type='int' )
+
+        # GUIConfig.py
+        self.current_config_tab = self.declareParameter( name='CURRENT_CONFIG_TAB' , val_def='Config File', type='str' )
+ 
+ 
 #-----------------------------
 
     def defineStyles( self ) :
