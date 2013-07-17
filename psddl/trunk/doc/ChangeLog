@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-07
+2013-07-17 David Schneider
+- In the python wrappers, psddl_pytyon, creating docstrings for classes and methods 
+  by passing the DDL comments to the appropriate boost python method.
+
 Tag: V00-08-06
 2013-07-17 David Schneider
 - Exporting the pstype version and TypeId into the python wrappers.

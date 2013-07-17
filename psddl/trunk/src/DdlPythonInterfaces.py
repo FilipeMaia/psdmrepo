@@ -85,6 +85,10 @@ def _dimargs(rank, type):
 def _dimexpr(dims):
     return ''.join(['[i%d]'%i for i in range(len(dims))])
 
+def _escape_and_quote(comment):
+    comment = comment.replace('\n','\\n')
+    comment = comment.replace('"','\\"')
+    return '"%s"'%comment
 #------------------------
 # Exported definitions --
 #------------------------
@@ -313,7 +317,11 @@ class DdlPythonInterfaces ( object ) :
             print >>self.cpp, '  {'
             print >>self.cpp, '  scope outer = '
 
-        print >>self.cpp, T('  class_<$templ_args >("$cname", no_init)')(locals())
+        if type.comment:
+            type_comment = _escape_and_quote(type.comment)
+            print >>self.cpp, T('  class_<$templ_args >("$cname", $type_comment, no_init)')(locals())
+        else:
+            print >>self.cpp, T('  class_<$templ_args >("$cname", no_init)')(locals())
 
         # generate methods (for public methods and abstract class methods only)
         for method in type.methods(): 
@@ -405,14 +413,17 @@ class DdlPythonInterfaces ( object ) :
             # in the wrapped object, so set policy correctly. 
             policy = "return_internal_reference<>()"
 
-        self._genMethodDef(type, bclass, method_name, policy=policy)
+        self._genMethodDef(type, bclass, method_name, method.comment, policy=policy)
 
 
-    def _genMethodDef(self, type, bclass, method_name, policy=''):
+    def _genMethodDef(self, type, bclass, method_name, method_comment, policy=''):
 
         policy = ', ' + policy if policy else ''
-
-        print >>self.cpp, T('    .def("$method_name", &$bclass::$method_name$policy)')(locals())
+        if method_comment:
+            method_comment = _escape_and_quote(method_comment)
+            print >>self.cpp, T('    .def("$method_name", &$bclass::$method_name$policy,$method_comment)')(locals())
+        else:
+            print >>self.cpp, T('    .def("$method_name", &$bclass::$method_name$policy)')(locals())
 
     def isString(self, o):
         return type(o) == type("")
