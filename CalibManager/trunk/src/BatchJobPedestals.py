@@ -112,22 +112,22 @@ class BatchJobPedestals (BatchJob) :
 #-----------------------------
 
     def print_work_files_for_pedestals(self) :
-        self.print_files_for_list(fnm.get_list_of_files_pedestals(),'of dark run / pedestals:')
+        self.print_files_for_list(fnm.get_list_of_files_peds(),'of dark run / pedestals:')
 
 #-----------------------------
 
     def check_work_files_for_pedestals(self) :
-        self.check_files_for_list(fnm.get_list_of_files_pedestals(),'of dark run / pedestals:')
+        self.check_files_for_list(fnm.get_list_of_files_peds(),'of dark run / pedestals:')
 
 #-----------------------------
 
     def remove_files_pedestals(self) :
-        self.remove_files_for_list(fnm.get_list_of_files_pedestals(),'of dark run / pedestals:')
+        self.remove_files_for_list(fnm.get_list_of_files_peds(),'of dark run / pedestals:')
 
 #-----------------------------
 
     def status_for_pedestal_file(self) :
-        fname  = fnm.path_pedestals_ave()
+        fname  = fnm.path_peds_ave()
         status = os.path.lexists(fname)
         logger.info('Status: pedestal file ' + fname + ' ' + self.dict_status[status], __name__) 
         return status

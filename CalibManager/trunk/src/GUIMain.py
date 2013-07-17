@@ -62,7 +62,7 @@ from GUIDark              import *
 #  Class definition --
 #---------------------
 class GUIMain ( QtGui.QWidget ) :
-    """Main GUI for the interactive analysis project.
+    """Main GUI for calibration management project.
 
     @see BaseClass
     @see OtherClass
@@ -76,7 +76,7 @@ class GUIMain ( QtGui.QWidget ) :
         cp.setIcons()
 
         self.setGeometry(10, 25, 650, 500)
-        self.setWindowTitle('Data Processing Environment')
+        self.setWindowTitle('Calibration Manager')
         self.setWindowIcon(cp.icon_monitor)
         self.palette = QtGui.QPalette()
         self.resetColorIsSet = False

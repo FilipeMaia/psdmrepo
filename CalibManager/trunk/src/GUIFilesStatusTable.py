@@ -7,7 +7,7 @@
 #
 #------------------------------------------------------------------------
 
-"""GUI controls the merging procedure"""
+"""GUIFilesStatusTable GUI shows the status table for the list of files"""
 
 #------------------------------
 #  Module's version from CVS --
@@ -38,17 +38,17 @@ import GlobalUtils          as     gu
 class GUIFilesStatusTable ( QtGui.QWidget ) :
     """GUI controls the merging procedure"""
 
+    dict_status = {True  : 'Yes',
+                   False : 'No' }
+
     def __init__ ( self, parent=None, list_of_files=[], title='') :
         QtGui.QWidget.__init__(self, parent)
-        self.setGeometry(50, 100, 700, 50)
-        self.setWindowTitle('Run merging')
+        self.setGeometry(50, 100, 700, 150)
+        self.setWindowTitle('Files ststus table')
         self.setFrame()
 
         self.title = title
         self.list_of_files = list_of_files
-
-        self.dict_status = {True  : 'Yes',
-                            False : 'No' }
 
         #self.lab_title = QtGui.QLabel(self.title)
         #self.hboxT = QtGui.QHBoxLayout()
@@ -119,7 +119,7 @@ class GUIFilesStatusTable ( QtGui.QWidget ) :
         self.table.verticalHeader().hide()
 
         self.table.horizontalHeader().setDefaultSectionSize(60)
-        self.table.horizontalHeader().resizeSection(0,200)
+        self.table.horizontalHeader().resizeSection(0,250)
         self.table.horizontalHeader().resizeSection(1,60)
         self.table.horizontalHeader().resizeSection(2,150)
         self.table.horizontalHeader().resizeSection(3,120)
@@ -155,8 +155,8 @@ class GUIFilesStatusTable ( QtGui.QWidget ) :
             self.table.setFixedWidth(self.table.horizontalHeader().length() + 4)
         else           :
             self.table.setFixedWidth(self.table.horizontalHeader().length() + 24)
-        #self.table.setFixedHeight(self.table.verticalHeader().length() + 29)
-        self.table.setMinimumHeight(50)
+        self.table.setFixedHeight(self.table.verticalHeader().length() + 29)
+        #self.table.setMinimumHeight(150)
 
 
     def setTableItems(self) :     

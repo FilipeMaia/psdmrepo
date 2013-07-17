@@ -83,7 +83,7 @@ class GUIDark ( QtGui.QWidget ) :
         #self.grid.addWidget(self.tit_path,     self.grid_row,   0)
         self.grid.addWidget(self.but_path,      self.grid_row+1, 0)
         self.grid.addWidget(self.edi_path,      self.grid_row+1, 1, 1, 7)
-        self.grid.addWidget(self.cbx_all_chunks,self.grid_row+2, 1, 1, 6)
+        self.grid.addWidget(self.cbx_all_chunks,self.grid_row+2, 1, 1, 7)
         self.grid.addWidget(self.lab_batch,     self.grid_row+3, 0)
         #self.grid.addWidget(self.lab_status,    self.grid_row+3, 1, 1, 2)
         self.grid.addWidget(self.lab_start,     self.grid_row+3, 3)
@@ -98,9 +98,9 @@ class GUIDark ( QtGui.QWidget ) :
         self.grid.addWidget(self.but_aver,      self.grid_row+5, 0)
         self.grid.addWidget(self.but_browse,    self.grid_row+5, 3) #, 1, 2)
         self.grid.addWidget(self.but_plot,      self.grid_row+5, 4)
-        self.grid.addWidget(self.but_remove,    self.grid_row+5, 7)
-        self.grid.addWidget(self.table_scan,    self.grid_row+6, 0, 2, 10)
-        self.grid.addWidget(self.table_aver,    self.grid_row+8, 0, 3, 10)
+        self.grid.addWidget(self.but_remove,    self.grid_row+5, 5)
+        self.grid.addWidget(self.table_scan,    self.grid_row+6, 0, 2, 9)
+        self.grid.addWidget(self.table_aver,    self.grid_row+8, 0, 3, 9)
 
         #self.grid.setRowMinimumHeight(self.grid_row+3, 5)
         self.setLayout(self.grid)
@@ -363,7 +363,7 @@ class GUIDark ( QtGui.QWidget ) :
             self.but_browse.setStyleSheet(cp.styleButtonBad)
         except :
             self.but_browse.setStyleSheet(cp.styleButtonGood)
-            cp.guifilebrowser = GUIFileBrowser(None, fnm.get_list_of_files_pedestals(), selected_file=fnm.path_pedestals_ave())
+            cp.guifilebrowser = GUIFileBrowser(None, fnm.get_list_of_files_peds(), selected_file=fnm.path_peds_ave())
             cp.guifilebrowser.move(cp.guimain.pos().__add__(QtCore.QPoint(740,140))) # open window with offset w.r.t. parent
             cp.guifilebrowser.show()
 
@@ -374,10 +374,10 @@ class GUIDark ( QtGui.QWidget ) :
             try    : del cp.plotimgspe
             except : pass
         except :
-            arr = gu.get_array_from_file( fnm.path_pedestals_ave() )
+            arr = gu.get_array_from_file( fnm.path_peds_ave() )
             if arr == None : return
             #print arr.shape,'\n', arr
-            cp.plotimgspe = PlotImgSpe(None, arr, ifname=fnm.path_pedestals_ave(), ofname=fnm.path_peds_aver_plot())
+            cp.plotimgspe = PlotImgSpe(None, arr, ifname=fnm.path_peds_ave(), ofname=fnm.path_peds_aver_plot())
             #cp.plotimgspe.setParent(self)
             cp.plotimgspe.move(cp.guimain.pos().__add__(QtCore.QPoint(720,120)))
             cp.plotimgspe.show()

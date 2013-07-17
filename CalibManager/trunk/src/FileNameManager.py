@@ -208,12 +208,12 @@ class FileNameManager :
         return self.list_of_files_peds_aver
 
 
-    def  get_list_of_files_pedestals(self) :
-        self.list_of_files_pedestals = self.get_list_of_files_peds_scan()
-        self.list_of_files_pedestals+= self.get_list_of_files_peds_aver()
-        self.list_of_files_pedestals.append(self.path_peds_aver_plot())
-        #self.list_of_files_pedestals.append(self.path_dark_xtc())
-        return self.list_of_files_pedestals
+    def  get_list_of_files_peds(self) :
+        self.list_of_files_peds = self.get_list_of_files_peds_scan()
+        self.list_of_files_peds+= self.get_list_of_files_peds_aver()
+        self.list_of_files_peds.append(self.path_peds_aver_plot())
+        #self.list_of_files_peds.append(self.path_dark_xtc())
+        return self.list_of_files_peds
 
 #-----------------------------
 

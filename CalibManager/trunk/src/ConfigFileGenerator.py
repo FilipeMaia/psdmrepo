@@ -81,8 +81,8 @@ class ConfigFileGenerator :
                          'EVENTS'         : str( cp.bat_dark_end.value() - cp.bat_dark_start.value() + 1 ),
                          'IMG_REC_MODULE' : str( cp.bat_img_rec_mod.value() ),
                          'DETINFO'        : str( cp.bat_det_info.value() ),
-                         'FNAME_PEDS_AVE' : fnm.path_pedestals_ave(),
-                         'FNAME_PEDS_RMS' : fnm.path_pedestals_rms()
+                         'FNAME_PEDS_AVE' : fnm.path_peds_ave(),
+                         'FNAME_PEDS_RMS' : fnm.path_peds_rms()
                          }
 
         self.d_subs['FNAME_HOTPIX_MASK'   ] = fnm.path_hotpix_mask()

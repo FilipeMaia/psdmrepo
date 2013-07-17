@@ -614,7 +614,7 @@ def arr_rot_n90(arr, rot_ang_n90=0) :
 #----------------------------------
 
 #    def get_pedestals_from_file(self) :
-#        fname = fnm.path_pedestals_ave()
+#        fname = fnm.path_peds_ave()
 #        if os.path.lexists(fname) :
 #            return gu.get_array_from_file( fname )
 #        else :
