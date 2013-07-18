@@ -159,6 +159,10 @@ def main( argv ):
     if len(args) != 2 :
         parser.error("exactly two arguments are required")
 
+    # people using auto-completion which may leave slash at the end of 
+    # package name, just strip that stuff
+    args[0] = args[0].rstrip('/')
+
     # generate keyword dictionary
     kw = kwgen.make_keywords( options, args )
 
