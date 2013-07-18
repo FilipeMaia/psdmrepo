@@ -14,6 +14,7 @@ namespace psddl_python {
 
 namespace psddl_python {
 void createDeviceWrappers(PyObject* module) {
+  boost::python::docstring_options local_docstring_options(true, true, false);
 
   // import numpy
   _import_array();
