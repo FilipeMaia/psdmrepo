@@ -116,6 +116,11 @@ protected:
    */
   std::string cmdline() const { return _cmdline.cmdline() ; }
 
+  /**
+   * Get the reference to command line parser.
+   */
+  AppCmdLine& parser() { return _cmdline; }
+
 private:
 
   // Data members

@@ -21,12 +21,6 @@
 //-----------------------
 #include "AppUtils/AppCmdOptToggle.h"
 
-//-------------
-// C Headers --
-//-------------
-extern "C" {
-}
-
 //---------------
 // C++ Headers --
 //---------------
@@ -34,6 +28,7 @@ extern "C" {
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "AppUtils/AppCmdLine.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -45,10 +40,7 @@ extern "C" {
 
 namespace AppUtils {
 
-AppCmdOptToggle::AppCmdOptToggle ( char shortOpt,
-				   const std::string& longOpt,
-				   const std::string& descr,
-				   bool defValue )
+AppCmdOptToggle::AppCmdOptToggle(char shortOpt, const std::string& longOpt, const std::string& descr, bool defValue)
   : AppCmdOptBase(longOpt+","+std::string(1, shortOpt), "(toggle)", descr)
   , _value(defValue)
   , _defValue(defValue)
@@ -56,9 +48,7 @@ AppCmdOptToggle::AppCmdOptToggle ( char shortOpt,
 {
 }
 
-AppCmdOptToggle::AppCmdOptToggle ( const std::string& optNames,
-                                   const std::string& descr,
-                                   bool defValue )
+AppCmdOptToggle::AppCmdOptToggle(const std::string& optNames, const std::string& descr, bool defValue)
   : AppCmdOptBase(optNames, "(toggle)", descr)
   , _value(defValue)
   , _defValue(defValue)
@@ -66,9 +56,17 @@ AppCmdOptToggle::AppCmdOptToggle ( const std::string& optNames,
 {
 }
 
-AppCmdOptToggle::AppCmdOptToggle ( char shortOpt,
-                                   const std::string& descr,
-                                   bool defValue )
+AppCmdOptToggle::AppCmdOptToggle(AppCmdLine& parser, const std::string& optNames, const std::string& descr,
+    bool defValue)
+  : AppCmdOptBase(optNames, "(toggle)", descr)
+  , _value(defValue)
+  , _defValue(defValue)
+  , _changed(false)
+{
+  parser.addOption(*this);
+}
+
+AppCmdOptToggle::AppCmdOptToggle(char shortOpt, const std::string& descr, bool defValue)
   : AppCmdOptBase(std::string(1, shortOpt), "(toggle)", descr)
   , _value(defValue)
   , _defValue(defValue)

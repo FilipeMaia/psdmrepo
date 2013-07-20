@@ -12,18 +12,14 @@
 #ifndef APPUTILS_APPCMDTYPETRAITS_HH
 #define APPUTILS_APPCMDTYPETRAITS_HH
 
-//-------------
-// C Headers --
-//-------------
-#include <limits.h>
-#include <float.h>
-
 //---------------
 // C++ Headers --
 //---------------
 #include <cstdlib>
 #include <cerrno>
 #include <cmath>
+#include <limits.h>
+#include <float.h>
 
 //----------------------
 // Base Class Headers --

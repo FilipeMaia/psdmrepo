@@ -149,14 +149,10 @@ BOOST_AUTO_TEST_CASE( cmdline_test_simple_newstyle )
   AppCmdLine cmdline("command") ;
 
   // create a bunch of arguments and add them
-  AppCmdArg<std::string> argString1( "name", "specifies the name" ) ;
-  BOOST_CHECK_NO_THROW( cmdline.addArgument ( argString1 ) ) ;
+  AppCmdArg<std::string> argString1(cmdline, "name", "specifies the name");
+  AppCmdArg<int> argInt1(cmdline, "number", "specifies the number");
 
-  AppCmdArg<int> argInt1( "number", "specifies the number" ) ;
-  BOOST_CHECK_NO_THROW( cmdline.addArgument ( argInt1 ) ) ;
-
-  AppCmdArg<int> argInt2( "number", "specifies the number 2", 1000 ) ;
-  BOOST_CHECK_NO_THROW( cmdline.addArgument ( argInt2 ) ) ;
+  AppCmdArg<int> argInt2(cmdline, "number", "specifies the number 2", 1000 ) ;
 
   // make a command line
   std::list<std::string> args ;
@@ -186,28 +182,21 @@ BOOST_AUTO_TEST_CASE( cmdline_test_simple_newstyle )
   BOOST_CHECK_THROW ( cmdline.parse ( args.begin(), args.end() ), AppCmdException ) ;
 
   // add more options
-  AppCmdOptIncr optVerbose ( "verbose,v", "more noise", 0 ) ;
-  BOOST_CHECK_NO_THROW ( cmdline.addOption ( optVerbose ) ) ;
+  AppCmdOptIncr optVerbose (cmdline, "verbose,v", "more noise", 0 ) ;
 
-  AppCmdOptToggle optToggle ( "toggle,t", "toggle something", false ) ;
-  BOOST_CHECK_NO_THROW ( cmdline.addOption ( optToggle ) ) ;
+  AppCmdOptToggle optToggle (cmdline, "toggle,t", "toggle something", false ) ;
 
-  AppCmdOpt<int> optInt1 ( "int,i", "number", "some number", 123 ) ;
-  BOOST_CHECK_NO_THROW ( cmdline.addOption ( optInt1 ) ) ;
+  AppCmdOpt<int> optInt1 (cmdline, "int,i", "number", "some number", 123 ) ;
 
-  AppCmdOpt<int> optInt2 ( "I,INT", "NUMBER", "some number", 123 ) ;
-  BOOST_CHECK_NO_THROW ( cmdline.addOption ( optInt2 ) ) ;
+  AppCmdOpt<int> optInt2 (cmdline, "I,INT", "NUMBER", "some number", 123 ) ;
 
-  AppCmdOpt<std::string> optString1 ( "s,string", "astring", "some string", "<none>" ) ;
-  BOOST_CHECK_NO_THROW ( cmdline.addOption ( optString1 ) ) ;
+  AppCmdOpt<std::string> optString1 (cmdline, "s,string", "astring", "some string", "<none>" ) ;
 
-  AppCmdOpt<std::string> optString2 ( "STRING,S", "Astring", "some string", "<none>" ) ;
-  BOOST_CHECK_NO_THROW ( cmdline.addOption ( optString2 ) ) ;
+  AppCmdOpt<std::string> optString2 (cmdline, "STRING,S", "Astring", "some string", "<none>" ) ;
   // second one should fail
   BOOST_CHECK_THROW ( cmdline.addOption ( optString2 ), AppCmdException ) ;
 
-  AppCmdOpt<std::string> optString3 ( "dummy", "Astring", "some string", "<none>" ) ;
-  BOOST_CHECK_NO_THROW ( cmdline.addOption ( optString3 ) ) ;
+  AppCmdOpt<std::string> optString3 (cmdline, "dummy", "Astring", "some string", "<none>" ) ;
 
   // new command line
   args.clear() ;

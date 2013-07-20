@@ -12,12 +12,6 @@
 #ifndef APPUTILS_APPCMDARGLIST_HH
 #define APPUTILS_APPCMDARGLIST_HH
 
-//-------------
-// C Headers --
-//-------------
-extern "C" {
-}
-
 //---------------
 // C++ Headers --
 //---------------
@@ -31,6 +25,7 @@ extern "C" {
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "AppUtils/AppCmdLine.h"
 #include "AppUtils/AppCmdTypeTraits.h"
 
 //------------------------------------
@@ -79,12 +74,14 @@ public:
    *  @brief Make a required positional argument.
    *
    *  Required argument will need at least one word on the command line corresponding to it.
+   *  After argument is instantiated it has to be added to parser using
+   *  AppCmdLine::addArgument() method.
    *
    *  @param name  The name of the argument, like "files", "time", etc. This name
    *               is only used in the usage() to print info about this argument
    *  @param descr One-line description of the argument, used by usage()
    */
-  AppCmdArgList ( const std::string& name, const std::string& descr ) ;
+  AppCmdArgList(const std::string& name, const std::string& descr);
 
   /**
    *  @brief Make an optional positional argument.
@@ -93,13 +90,47 @@ public:
    *  on the command line for this argument then its value will be a default value provided
    *  as argument to this constructor. If there are words on command line corresponding
    *  to this argument then their values replace default value, but do not extend it.
+   *  After argument is instantiated it has to be added to parser using
+   *  AppCmdLine::addArgument() method.
    *
    *  @param name  The name of the argument, like "files", "time", etc. This name
    *               is only used in the usage() to print info about this argument
    *  @param descr One-line description of the argument, used by usage()
    *  @param val   Default value for this argument
    */
-  AppCmdArgList ( const std::string& name, const std::string& descr, const container& val ) ;
+  AppCmdArgList(const std::string& name, const std::string& descr, const container& val);
+
+  /**
+   *  @brief Make a required positional argument.
+   *
+   *  Required argument will need at least one word on the command line corresponding to it.
+   *  This constructor automatically add instantiated argument to parser.
+   *  This method may throw an exception if, for example, you try to add required
+   *  argument after optional one.
+   *
+   *  @param[in] parser Parser instance to which this argument will be added.
+   *  @param name  The name of the argument, like "files", "time", etc. This name
+   *               is only used in the usage() to print info about this argument
+   *  @param descr One-line description of the argument, used by usage()
+   */
+  AppCmdArgList(AppCmdLine& parser, const std::string& name, const std::string& descr);
+
+  /**
+   *  @brief Make an optional positional argument.
+   *
+   *  Optional argument could consume 0 or more words from command line. If there are no words
+   *  on the command line for this argument then its value will be a default value provided
+   *  as argument to this constructor. If there are words on command line corresponding
+   *  to this argument then their values replace default value, but do not extend it.
+   *  This constructor automatically add instantiated argument to parser.
+   *
+   *  @param[in] parser Parser instance to which this argument will be added.
+   *  @param name  The name of the argument, like "files", "time", etc. This name
+   *               is only used in the usage() to print info about this argument
+   *  @param descr One-line description of the argument, used by usage()
+   *  @param val   Default value for this argument
+   */
+  AppCmdArgList(AppCmdLine& parser, const std::string& name, const std::string& descr, const container& val);
 
   // Destructor
   virtual ~AppCmdArgList( ) {}
@@ -130,12 +161,6 @@ public:
    */
   size_type size() const { return _value.size() ; }
   bool empty() const { return _value.empty() ; }
-
-  /**
-   *  Clear the collected values. This will erase content of the list, even if non-empty
-   *  default value was provided in constructor it will not be used.
-   */
-  virtual void clear() { _value.clear() ; }
 
   /**
    *  Return default value of the argument
@@ -231,6 +256,34 @@ AppCmdArgList<Type>::AppCmdArgList ( const std::string& name, const std::string&
   , _value(val)
   , _changed(false)
 {
+}
+
+//  Make a required positional argument
+template <typename Type>
+AppCmdArgList<Type>::AppCmdArgList(AppCmdLine& parser, const std::string& name, const std::string& descr)
+  : AppCmdArgBase()
+  , _name(name)
+  , _descr(descr)
+  , _required(true)
+  , _defValue()
+  , _value()
+  , _changed(false)
+{
+  parser.addArgument(*this);
+}
+
+//  Make an optional positional argument
+template <typename Type>
+AppCmdArgList<Type>::AppCmdArgList(AppCmdLine& parser, const std::string& name, const std::string& descr, const container& val)
+  : AppCmdArgBase()
+  , _name(name)
+  , _descr(descr)
+  , _required(false)
+  , _defValue(val)
+  , _value(val)
+  , _changed(false)
+{
+  parser.addArgument(*this);
 }
 
 //  Set the value of the argument.

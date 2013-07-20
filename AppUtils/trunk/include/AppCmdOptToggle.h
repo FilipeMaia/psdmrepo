@@ -12,12 +12,6 @@
 //
 //------------------------------------------------------------------------
 
-//-------------
-// C Headers --
-//-------------
-extern "C" {
-}
-
 //---------------
 // C++ Headers --
 //---------------
@@ -34,6 +28,9 @@ extern "C" {
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
+namespace AppUtils {
+class AppCmdLine;
+}
 
 //		---------------------
 // 		-- Class Interface --
@@ -85,10 +82,7 @@ public:
    *  @param[in] descr     description, one-line string
    *  @param[in] defValue  initial value of the option
    */
-  AppCmdOptToggle ( char shortOpt,
-                    const std::string& longOpt,
-                    const std::string& descr,
-                    bool defValue = false ) ;
+  AppCmdOptToggle(char shortOpt, const std::string& longOpt, const std::string& descr, bool defValue = false);
 
   /**
    *  @brief Define toggle-type option without argument.
@@ -104,9 +98,25 @@ public:
    *  @param[in] descr     description, one-line string
    *  @param[in] defValue  initial value of the option
    */
-  AppCmdOptToggle ( const std::string& optNames,
-                    const std::string& descr,
-                    bool defValue = false ) ;
+  AppCmdOptToggle(const std::string& optNames, const std::string& descr, bool defValue = false);
+
+  /**
+   *  @brief Define toggle-type option without argument.
+   *
+   *  This constructor can define option with both short name (-o) and long name (--option).
+   *  All option names are defined via single constructor argument optNames which contains a
+   *  comma-separated list of option names (like "option,o"). Single character becomes short
+   *  name (-o), longer string becomes long name (--option).
+   *  This constructor automatically adds instantiated option to a parser.
+   *  This method may throw an exception if the option name conflicts with the previously
+   *  added options.
+   *
+   *  @param[in] parser      Parser instance to which this option will be added.
+   *  @param[in] optNames    Comma-separated option names.
+   *  @param[in] descr     description, one-line string
+   *  @param[in] defValue  initial value of the option
+   */
+  AppCmdOptToggle(AppCmdLine& parser, const std::string& optNames, const std::string& descr, bool defValue = false);
 
   /**
    *  @brief Define toggle-type option without argument.
@@ -122,9 +132,7 @@ public:
    *  @param[in] descr     description, one-line string
    *  @param[in] defValue  initial value of the option
    */
-  AppCmdOptToggle ( char shortOpt,
-                    const std::string& descr,
-                    bool defValue = false ) ;
+  AppCmdOptToggle(char shortOpt, const std::string& descr, bool defValue = false);
 
   /// Destructor
   virtual ~AppCmdOptToggle( );

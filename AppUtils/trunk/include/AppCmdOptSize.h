@@ -26,6 +26,9 @@
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
+namespace AppUtils {
+class AppCmdLine;
+}
 
 //		---------------------
 // 		-- Class Interface --
@@ -76,11 +79,8 @@ public:
    *  @param[in] defValue    Value returned from value() if option is not specified on command line.
    *
    */
-  AppCmdOptSize ( char shortOpt,
-                  const std::string& longOpt,
-                  const std::string& name,
-                  const std::string& descr,
-                  value_type defValue ) ;
+  AppCmdOptSize(char shortOpt, const std::string& longOpt, const std::string& name, const std::string& descr,
+      value_type defValue);
 
   /**
    *  @brief Define an option with a required argument.
@@ -98,10 +98,29 @@ public:
    *  @param[in] descr       Long description for the option, printed when usage() is called.
    *  @param[in] defValue    Value returned from value() if option is not specified on command line.
    */
-  AppCmdOptSize ( const std::string& optNames,
-                  const std::string& name,
-                  const std::string& descr,
-                  value_type defValue ) ;
+  AppCmdOptSize(const std::string& optNames, const std::string& name, const std::string& descr, value_type defValue);
+
+  /**
+   *  @brief Define an option with a required argument.
+   *
+   *  This constructor can define option with both short name (-o) and long name (--option).
+   *  All option names are defined via single constructor argument optNames which contains a
+   *  comma-separated list of option names (like "option,o"). Single character becomes short
+   *  name (-o), longer string becomes long name (--option).
+   *  This constructor automatically adds instantiated option to a parser.
+   *  To get current value of option argument use value() method.
+   *  This method may throw an exception if the option name conflicts with the previously
+   *  added options.
+   *
+   *  @param[in] parser      Parser instance to which this option will be added.
+   *  @param[in] optNames    Comma-separated option names.
+   *  @param[in] name        Name for option argument, something like "path", "number", etc. Used
+   *                         only for information purposes when usage() is called.
+   *  @param[in] descr       Long description for the option, printed when usage() is called.
+   *  @param[in] defValue    Value returned from value() if option is not specified on command line.
+   */
+  AppCmdOptSize(AppCmdLine& parser, const std::string& optNames, const std::string& name, const std::string& descr,
+      value_type defValue);
 
   /**
    *  @brief Define an option with a required argument.
@@ -120,10 +139,7 @@ public:
    *  @param[in] defValue    Value returned from value() if option is not specified on command line.
    *
    */
-  AppCmdOptSize ( char shortOpt,
-                  const std::string& name,
-                  const std::string& descr,
-                  value_type defValue ) ;
+  AppCmdOptSize(char shortOpt, const std::string& name, const std::string& descr, value_type defValue);
 
   // Destructor
   virtual ~AppCmdOptSize () ;

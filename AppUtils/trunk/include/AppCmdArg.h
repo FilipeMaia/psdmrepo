@@ -12,12 +12,6 @@
 #ifndef APPUTILS_APPCMDARG_HH
 #define APPUTILS_APPCMDARG_HH
 
-//-------------
-// C Headers --
-//-------------
-extern "C" {
-}
-
 //---------------
 // C++ Headers --
 //---------------
@@ -30,6 +24,7 @@ extern "C" {
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "AppUtils/AppCmdLine.h"
 #include "AppUtils/AppCmdTypeTraits.h"
 
 //------------------------------------
@@ -73,26 +68,60 @@ public:
    *  @brief Make a required positional argument.
    *
    *  The initial value will be default-constructed but it has to be specified on
-   *  command line.
+   *  command line. After argument is instantiated it has to be added to parser
+   *  using AppCmdLine::addArgument() method.
    *
-   *  @param name  The name of the argument, like "file", "time", etc. This name
+   *  @param[in] name  The name of the argument, like "file", "time", etc. This name
    *               is only used in the usage() to print info about this argument
-   *  @param descr One-line description of the argument, used by usage()
+   *  @param[in] descr One-line description of the argument, used by usage()
    */
-  AppCmdArg ( const std::string& name, const std::string& descr ) ;
+  AppCmdArg(const std::string& name, const std::string& descr);
 
   /**
    *  @brief Make an optional positional argument.
    *
-   *  @param name  The name of the argument, like "file", "time", etc. This name
+   *  After argument is instantiated it has to be added to parser using
+   *  AppCmdLine::addArgument() method.
+   *
+   *  @param[in] name  The name of the argument, like "file", "time", etc. This name
    *               is only used in the usage() to print info about this argument
-   *  @param descr One-line description of the argument, used by usage()
-   *  @param val   default value for this argument
+   *  @param[in] descr One-line description of the argument, used by usage()
+   *  @param[in] val   default value for this argument
    */
-  AppCmdArg ( const std::string& name, const std::string& descr, const Type& val ) ;
+  AppCmdArg(const std::string& name, const std::string& descr, const Type& val);
+
+  /**
+   *  @brief Make a required positional argument.
+   *
+   *  The initial value will be default-constructed but it has to be specified on
+   *  command line. This constructor automatically add instantiated argument to parser.
+   *  This method may throw an exception if, for example, you try to add required
+   *  argument after optional one.
+   *
+   *  @param[in] parser Parser instance to which this argument will be added.
+   *  @param[in] name  The name of the argument, like "file", "time", etc. This name
+   *               is only used in the usage() to print info about this argument
+   *  @param[in] descr One-line description of the argument, used by usage()
+   *
+   *  @throw AppCmdException or a subclass of it.
+   */
+  AppCmdArg(AppCmdLine& parser, const std::string& name, const std::string& descr);
+
+  /**
+   *  @brief Make an optional positional argument.
+   *
+   *  This constructor automatically add instantiated argument to parser.
+   *
+   *  @param[in] parser Parser instance to which this argument will be added.
+   *  @param[in] name  The name of the argument, like "file", "time", etc. This name
+   *               is only used in the usage() to print info about this argument
+   *  @param[in] descr One-line description of the argument, used by usage()
+   *  @param[in] val   default value for this argument
+   */
+  AppCmdArg(AppCmdLine& parser, const std::string& name, const std::string& descr, const Type& val);
 
   // Destructor
-  virtual ~AppCmdArg( ) {}
+  virtual ~AppCmdArg() {}
 
   /**
    *  Return current value of the argument
@@ -139,7 +168,7 @@ protected:
    *  Should return some big number. Note there is no function minWords() because
    *  it would always return 1.
    */
-  virtual size_t maxWords () const { return 1 ; }
+  virtual size_t maxWords() const { return 1 ; }
 
   /**
    *  Set the value of the argument. Throws an exception in case of
@@ -153,8 +182,8 @@ protected:
    *
    *  @return The number of consumed words. If it is negative then error has occurred.
    */
-  virtual int setValue ( StringList::const_iterator begin,
-                         StringList::const_iterator end ) ;
+    virtual int
+    setValue(StringList::const_iterator begin, StringList::const_iterator end);
 
   /**
    *  Reset argument to its default value
@@ -178,8 +207,8 @@ private:
   bool _changed ;
 
   // This class is non-copyable
-  AppCmdArg( const AppCmdArg& );
-  AppCmdArg& operator= ( const AppCmdArg& );
+  AppCmdArg(const AppCmdArg&);
+  AppCmdArg& operator=(const AppCmdArg&);
 
 };
 
@@ -211,6 +240,38 @@ AppCmdArg<Type>::AppCmdArg ( const std::string& name, const std::string& descr, 
   , _value(val)
   , _changed(false)
 {
+}
+
+/*
+ *  Make a required positional argument
+ */
+template <typename Type>
+AppCmdArg<Type>::AppCmdArg(AppCmdLine& parser, const std::string& name, const std::string& descr)
+  : AppCmdArgBase()
+  , _name(name)
+  , _descr(descr)
+  , _required(true)
+  , _defValue()
+  , _value()
+  , _changed(false)
+{
+  parser.addArgument(*this);
+}
+
+/*
+ *  Make an optional positional argument
+ */
+template <typename Type>
+AppCmdArg<Type>::AppCmdArg(AppCmdLine& parser, const std::string& name, const std::string& descr, const Type& val)
+  : AppCmdArgBase()
+  , _name(name)
+  , _descr(descr)
+  , _required(false)
+  , _defValue(val)
+  , _value(val)
+  , _changed(false)
+{
+  parser.addArgument(*this);
 }
 
 /*

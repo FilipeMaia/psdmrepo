@@ -12,12 +12,6 @@
 #ifndef APPUTILS_APPCMDOPTLIST_HH
 #define APPUTILS_APPCMDOPTLIST_HH
 
-//-------------
-// C Headers --
-//-------------
-extern "C" {
-}
-
 //---------------
 // C++ Headers --
 //---------------
@@ -30,6 +24,7 @@ extern "C" {
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "AppUtils/AppCmdLine.h"
 #include "AppUtils/AppCmdTypeTraits.h"
 
 //------------------------------------
@@ -111,11 +106,8 @@ public:
    *  @param[in] descr       Long description for the option, printed when usage() is called.
    *  @param[in] separator   Separator character for splitting argument into sequences of values.
    */
-  AppCmdOptList ( char shortOpt,
-                  const std::string& longOpt,
-                  const std::string& name,
-                  const std::string& descr,
-                  char separator = ',' ) ;
+  AppCmdOptList(char shortOpt, const std::string& longOpt, const std::string& name, const std::string& descr,
+      char separator = ',');
 
   /**
    *  @brief Define an option with a required argument.
@@ -135,10 +127,31 @@ public:
    *  @param[in] descr       Long description for the option, printed when usage() is called.
    *  @param[in] separator   Separator character for splitting argument into sequences of values.
    */
-  AppCmdOptList ( const std::string& optNames,
-                  const std::string& name,
-                  const std::string& descr,
-                  char separator = ',' ) ;
+  AppCmdOptList(const std::string& optNames, const std::string& name, const std::string& descr,
+      char separator = ',');
+
+  /**
+   *  @brief Define an option with a required argument.
+   *
+   *  This constructor can define option with both short name (-o) and long name (--option).
+   *  All option names are defined via single constructor argument optNames which contains a
+   *  comma-separated list of option names (like "option,o"). Single character becomes short
+   *  name (-o), longer string becomes long name (--option).  The argument is given to option
+   *  as `-o value', `--option=value' on the command line or as `option = value' in
+   *  the options file. This constructor automatically adds instantiated option to a parser.
+   *  To get current value of option argument use value() method.
+   *  This method may throw an exception if the option name conflicts with the previously
+   *  added options.
+   *
+   *  @param[in] parser      Parser instance to which this option will be added.
+   *  @param[in] optNames    Comma-separated option names.
+   *  @param[in] name        Name for option argument, something like "path", "number", etc. Used
+   *                         only for information purposes when usage() is called.
+   *  @param[in] descr       Long description for the option, printed when usage() is called.
+   *  @param[in] separator   Separator character for splitting argument into sequences of values.
+   */
+  AppCmdOptList(AppCmdLine& parser, const std::string& optNames, const std::string& name, const std::string& descr,
+      char separator = ',');
 
   /**
    *  @brief Define an option with a required argument.
@@ -158,10 +171,7 @@ public:
    *  @param[in] descr       Long description for the option, printed when usage() is called.
    *  @param[in] separator   Separator character for splitting argument into sequences of values.
    */
-  AppCmdOptList ( char shortOpt,
-                  const std::string& name,
-                  const std::string& descr,
-                  char separator = ',' ) ;
+    AppCmdOptList(char shortOpt, const std::string& name, const std::string& descr, char separator = ',');
 
   /// Destructor
   virtual ~AppCmdOptList( ) {}
@@ -187,11 +197,6 @@ public:
    */
   size_type size() const { return _value.size() ; }
   bool empty() const { return _value.empty() ; }
-
-  /**
-   *  Clear the collected values
-   */
-  virtual void clear() { _value.clear() ; }
 
 protected:
 
@@ -235,15 +240,9 @@ private:
 
 };
 
-/**
- *  Ctor
- */
 template <typename Type>
-AppCmdOptList<Type>::AppCmdOptList ( char shortOpt,
-                             const std::string& longOpt,
-                             const std::string& name,
-                             const std::string& descr,
-                             char separator )
+AppCmdOptList<Type>::AppCmdOptList(char shortOpt, const std::string& longOpt, const std::string& name,
+    const std::string& descr, char separator)
   : AppCmdOptBase(longOpt+","+std::string(1, shortOpt), name, descr)
   , _separator(separator)
   , _value()
@@ -252,10 +251,8 @@ AppCmdOptList<Type>::AppCmdOptList ( char shortOpt,
 }
 
 template <typename Type>
-AppCmdOptList<Type>::AppCmdOptList ( const std::string& optNames,
-                             const std::string& name,
-                             const std::string& descr,
-                             char separator )
+AppCmdOptList<Type>::AppCmdOptList(const std::string& optNames, const std::string& name, const std::string& descr,
+    char separator)
   : AppCmdOptBase(optNames, name, descr)
   , _separator(separator)
   , _value()
@@ -264,10 +261,18 @@ AppCmdOptList<Type>::AppCmdOptList ( const std::string& optNames,
 }
 
 template <typename Type>
-AppCmdOptList<Type>::AppCmdOptList ( char shortOpt,
-                             const std::string& name,
-                             const std::string& descr,
-                             char separator )
+AppCmdOptList<Type>::AppCmdOptList(AppCmdLine& parser, const std::string& optNames, const std::string& name,
+    const std::string& descr, char separator)
+  : AppCmdOptBase(optNames, name, descr)
+  , _separator(separator)
+  , _value()
+  , _changed(false)
+{
+  parser.addOption(*this);
+}
+
+template <typename Type>
+AppCmdOptList<Type>::AppCmdOptList(char shortOpt, const std::string& name, const std::string& descr, char separator)
   : AppCmdOptBase(std::string(1, shortOpt), name, descr)
   , _separator(separator)
   , _value()

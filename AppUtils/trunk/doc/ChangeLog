@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-01
+2013-07-20 Andy Salnikov
+- added constructor to all options and argument classes which takes
+  parser as an argument and adds options to parser
+
 Tag: V00-02-00
 2013-07-20 Andy Salnikov
 - some refactoring and small improvements in command line parser

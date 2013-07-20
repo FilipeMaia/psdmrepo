@@ -12,12 +12,6 @@
 #ifndef APPUTILS_APPCMDOPTNAMEDVALUE_HH
 #define APPUTILS_APPCMDOPTNAMEDVALUE_HH
 
-//-------------
-// C Headers --
-//-------------
-extern "C" {
-}
-
 //---------------
 // C++ Headers --
 //---------------
@@ -31,6 +25,7 @@ extern "C" {
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "AppUtils/AppCmdLine.h"
 #include "AppUtils/AppCmdTypeTraits.h"
 
 //------------------------------------
@@ -104,11 +99,8 @@ public:
    *  @param[in] descr       Long description for the option, printed when usage() is called.
    *  @param[in] defValue    Value returned from value() if option is not specified on command line.
    */
-  AppCmdOptNamedValue ( char shortOpt,
-                        const std::string& longOpt,
-                        const std::string& name,
-                        const std::string& descr,
-                        const Type& defValue ) ;
+  AppCmdOptNamedValue(char shortOpt, const std::string& longOpt, const std::string& name, const std::string& descr,
+      const Type& defValue);
 
   /**
    *  @brief Define an option with a required argument.
@@ -128,10 +120,31 @@ public:
    *  @param[in] descr       Long description for the option, printed when usage() is called.
    *  @param[in] defValue    Value returned from value() if option is not specified on command line.
    */
-  AppCmdOptNamedValue ( const std::string& optNames,
-                        const std::string& name,
-                        const std::string& descr,
-                        const Type& defValue ) ;
+  AppCmdOptNamedValue(const std::string& optNames, const std::string& name, const std::string& descr,
+      const Type& defValue);
+
+  /**
+   *  @brief Define an option with a required argument.
+   *
+   *  This constructor can define option with both short name (-o) and long name (--option).
+   *  All option names are defined via single constructor argument optNames which contains a
+   *  comma-separated list of option names (like "option,o"). Single character becomes short
+   *  name (-o), longer string becomes long name (--option).  The argument is given to option
+   *  as `-o value', `--option=value' on the command line or as `option = value' in
+   *  the options file. This constructor automatically adds instantiated option to a parser.
+   *  To get current value of option argument use value() method.
+   *  This method may throw an exception if the option name conflicts with the previously
+   *  added options.
+   *
+   *  @param[in] parser      Parser instance to which this option will be added.
+   *  @param[in] optNames    Comma-separated option names.
+   *  @param[in] name        Name for option argument, something like "path", "number", etc. Used
+   *                         only for information purposes when usage() is called.
+   *  @param[in] descr       Long description for the option, printed when usage() is called.
+   *  @param[in] defValue    Value returned from value() if option is not specified on command line.
+   */
+  AppCmdOptNamedValue(AppCmdLine& parser, const std::string& optNames, const std::string& name,
+      const std::string& descr, const Type& defValue);
 
   /**
    *  @brief Define an option with a required argument.
@@ -151,10 +164,7 @@ public:
    *  @param[in] descr       Long description for the option, printed when usage() is called.
    *  @param[in] defValue    Value returned from value() if option is not specified on command line.
    */
-  AppCmdOptNamedValue ( char shortOpt,
-                        const std::string& name,
-                        const std::string& descr,
-                        const Type& defValue ) ;
+  AppCmdOptNamedValue(char shortOpt, const std::string& name, const std::string& descr, const Type& defValue);
 
   /// Destructor
   virtual ~AppCmdOptNamedValue( ) {}
@@ -232,12 +242,9 @@ private:
 /**
  *  Ctor
  */
-template <typename Type>
-AppCmdOptNamedValue<Type>::AppCmdOptNamedValue ( char shortOpt,
-                                                 const std::string& longOpt,
-                                                 const std::string& name,
-                                                 const std::string& descr,
-                                                 const Type& defValue )
+template<typename Type>
+AppCmdOptNamedValue<Type>::AppCmdOptNamedValue(char shortOpt, const std::string& longOpt, const std::string& name,
+    const std::string& descr, const Type& defValue)
   : AppCmdOptBase(longOpt+","+std::string(1, shortOpt), name, descr)
   , _str2value()
   , _defValue(defValue)
@@ -247,10 +254,8 @@ AppCmdOptNamedValue<Type>::AppCmdOptNamedValue ( char shortOpt,
 }
 
 template <typename Type>
-AppCmdOptNamedValue<Type>::AppCmdOptNamedValue ( const std::string& optNames,
-                                                 const std::string& name,
-                                                 const std::string& descr,
-                                                 const Type& defValue )
+AppCmdOptNamedValue<Type>::AppCmdOptNamedValue(const std::string& optNames, const std::string& name,
+    const std::string& descr, const Type& defValue)
   : AppCmdOptBase(optNames, name, descr)
   , _str2value()
   , _defValue(defValue)
@@ -260,10 +265,20 @@ AppCmdOptNamedValue<Type>::AppCmdOptNamedValue ( const std::string& optNames,
 }
 
 template <typename Type>
-AppCmdOptNamedValue<Type>::AppCmdOptNamedValue ( char shortOpt,
-                                                 const std::string& name,
-                                                 const std::string& descr,
-                                                 const Type& defValue )
+AppCmdOptNamedValue<Type>::AppCmdOptNamedValue(AppCmdLine& parser, const std::string& optNames, const std::string& name,
+    const std::string& descr, const Type& defValue)
+  : AppCmdOptBase(optNames, name, descr)
+  , _str2value()
+  , _defValue(defValue)
+  , _value(defValue)
+  , _changed(false)
+{
+  parser.addOption(*this);
+}
+
+template <typename Type>
+AppCmdOptNamedValue<Type>::AppCmdOptNamedValue(char shortOpt, const std::string& name, const std::string& descr,
+    const Type& defValue)
   : AppCmdOptBase(std::string(1, shortOpt), name, descr)
   , _str2value()
   , _defValue(defValue)

@@ -34,6 +34,9 @@ extern "C" {
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
+namespace AppUtils {
+class AppCmdLine;
+}
 
 //		---------------------
 // 		-- Class Interface --
@@ -73,16 +76,15 @@ public:
    *  optNames argument in the new code.
    *
    *  This constructor defines an option with both short name (-o) and long name (--option).
+   *  After option is instantiated it has to be added to parser using AppCmdLine::addOption()
+   *  method. To get current value of option argument use value() method.
    *
    *  @param[in] shortOpt    Short one-character option name
    *  @param[in] longOpt     Long option name (not including leading --)
    *  @param[in] descr       Long description for the option, printed when usage() is called.
    *  @param[in] defValue    Initial value of the option
    */
-  AppCmdOptIncr ( char shortOpt,
-                  const std::string& longOpt,
-                  const std::string& descr,
-                  int defValue = 0 ) ;
+  AppCmdOptIncr(char shortOpt, const std::string& longOpt, const std::string& descr, int defValue = 0);
 
   /**
    *  @brief Define incremental option without argument.
@@ -91,27 +93,48 @@ public:
    *  All option names are defined via single constructor argument optNames which contains a
    *  comma-separated list of option names (like "option,o"). Single character becomes short
    *  name (-o), longer string becomes long name (--option).
+   *  After option is instantiated it has to be added to parser using AppCmdLine::addOption()
+   *  method. To get current value of option argument use value() method.
    *
    *  @param[in] optNames    Comma-separated option names.
    *  @param[in] descr       Long description for the option, printed when usage() is called.
    *  @param[in] defValue    Initial value of the option
    */
-  AppCmdOptIncr ( const std::string& optNames,
-                  const std::string& descr,
-                  int defValue = 0 ) ;
+  AppCmdOptIncr(const std::string& optNames, const std::string& descr, int defValue = 0);
+
+  /**
+   *  @brief Define incremental option without argument.
+   *
+   *  This constructor can define option with both short name (-o) and long name (--option).
+   *  All option names are defined via single constructor argument optNames which contains a
+   *  comma-separated list of option names (like "option,o"). Single character becomes short
+   *  name (-o), longer string becomes long name (--option).
+   *  This constructor automatically adds instantiated option to a parser.
+   *  To get current value of option argument use value() method.
+   *  This method may throw an exception if the option name conflicts with the previously
+   *  added options.
+   *
+   *  @param[in] parser      Parser instance to which this option will be added.
+   *  @param[in] optNames    Comma-separated option names.
+   *  @param[in] descr       Long description for the option, printed when usage() is called.
+   *  @param[in] defValue    Initial value of the option
+   *
+   *  @throw AppCmdException or a subclass of it.
+   */
+  AppCmdOptIncr(AppCmdLine& parser, const std::string& optNames, const std::string& descr, int defValue = 0);
 
   /**
    *  @brief Define incremental option without argument.
    *
    *  This constructor defines an option with short name (-o) only.
+   *  After option is instantiated it has to be added to parser using AppCmdLine::addOption()
+   *  method. To get current value of option argument use value() method.
    *
    *  @param[in] shortOpt    Short one-character option name
    *  @param[in] descr       Long description for the option, printed when usage() is called.
    *  @param[in] defValue    Initial value of the option
    */
-  AppCmdOptIncr ( char shortOpt,
-                  const std::string& descr,
-                  int defValue = 0 ) ;
+  AppCmdOptIncr(char shortOpt, const std::string& descr, int defValue = 0);
 
   /// Destructor
   virtual ~AppCmdOptIncr( ) ;
@@ -160,8 +183,8 @@ private:
   bool _changed ;
 
   // This class in non-copyable
-  AppCmdOptIncr( const AppCmdOptIncr& );
-  AppCmdOptIncr& operator= ( const AppCmdOptIncr& );
+  AppCmdOptIncr(const AppCmdOptIncr&);
+  AppCmdOptIncr& operator=(const AppCmdOptIncr&);
 
 };
 

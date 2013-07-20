@@ -25,13 +25,10 @@ private :
 
 EchoApp::EchoApp( const std::string& appname )
   : AppUtils::AppBase(appname)
-  , m_newLine( 'n', "disable output of new line", true )
-  , m_sep( 's', "separator", "string", "output word separator", " " )
-  , m_args ( "strings", "the list of strings to print", std::list<std::string>() )
+  , m_newLine(parser(), "n", "disable output of new line", true)
+  , m_sep(parser(), "separators", "string", "output word separator", " " )
+  , m_args(parser(), "strings", "the list of strings to print", std::list<std::string>())
 {
-  addOption( m_newLine ) ;
-  addOption( m_sep ) ;
-  addArgument( m_args ) ;
 }
 
 int EchoApp::runApp()

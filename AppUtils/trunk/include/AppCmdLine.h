@@ -12,12 +12,6 @@
 //
 //------------------------------------------------------------------------
 
-//-------------
-// C Headers --
-//-------------
-extern "C" {
-}
-
 //---------------
 // C++ Headers --
 //---------------
@@ -134,6 +128,12 @@ public:
    *
    *  The argument object supplied is not copied, only its address is remembered.
    *  The lifetime of the argument should extend to the parse() method of this class.
+   *  This method may throw an exception if, for example, you try to add required
+   *  argument after optional one.
+   *
+   *  @param[in] arg    Argument instance to add to the parser.
+   *
+   *  @throw AppCmdException or a subclass of it.
    */
   virtual void addArgument ( AppCmdArgBase& arg ) ;
 
@@ -142,6 +142,12 @@ public:
    *
    *  The option object supplied is not copied, only its address is remembered.
    *  The lifetime of the argument should extend to the parse() method of this class.
+   *  This method may throw an exception if the option name conflicts with the previously
+   *  added options.
+   *
+   *  @param[in] option   Option instance to add to the parser.
+   *
+   *  @throw AppCmdException or a subclass of it.
    */
   virtual void addOption ( AppCmdOptBase& option ) ;
 
@@ -150,8 +156,16 @@ public:
    *
    *  Add option which will specify the names of the options files.
    *  Only one such option is allowed per parser, attempt to add one
-   *  more will result in exception. The lifetime of the argument should
-   *  extend to the parse() method of this class.
+   *  more will result in exception. As the option type is AppCmdOptList
+   *  it is possible to specify multiple files which will be read in the
+   *  same order as they appear on command line.
+   *  The lifetime of the argument should extend to the parse() method of this class.
+   *  This method may throw an exception if the option name conflicts with the previously
+   *  added options.
+   *
+   *  @param[in] option   Option instance to add to the parser.
+   *
+   *  @throw AppCmdException or a subclass of it.
    */
   virtual void setOptionsFile ( AppCmdOptList<std::string>& option ) ;
 
