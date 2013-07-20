@@ -204,7 +204,7 @@ O2O_Translate::runApp ()
 
   // check options
   if (m_dgramsize.valueChanged()) {
-    MsgLogRoot(warning, "option --" << m_dgramsize.longOption() << " is deprecated and ignored");
+    MsgLogRoot(warning, "option --datagram-size is deprecated and ignored");
   }
 
   WithMsgLogRoot( info, log ) {
