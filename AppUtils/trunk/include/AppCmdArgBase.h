@@ -48,6 +48,8 @@ namespace AppUtils {
 /**
  *  @ingroup AppUtils
  *
+ *  @brief Base class for positional command line arguments.
+ *
  *  This is an interface class for representation of the positional
  *  arguments in the command line.
  *
@@ -72,22 +74,41 @@ public:
   typedef std::list<std::string> StringList ;
 
   /// Destructor
-  virtual ~AppCmdArgBase( ) throw() ;
+  virtual ~AppCmdArgBase( ) ;
+
+  /**
+   *  True if the value of the option was changed from command line. Only
+   *  makes sense for "optionsl arguments", for required this will always
+   *  return true.
+   */
+  virtual bool valueChanged() const = 0 ;
+
+protected:
+
+  /**
+   *  Constructor.
+   */
+  AppCmdArgBase() {}
+
+  // The methods below are protected as they do need to be exposed
+  // to user, this interface should only be used by AppCmdLine which
+  // is declared as friend. Subclasses may use these methods as well
+  // for implementing their own functionality or override them.
 
   /**
    *  Is it required?
    */
-  virtual bool isRequired() const throw() = 0 ;
+  virtual bool isRequired() const = 0 ;
 
   /**
    *  Get the name of the paramater
    */
-  virtual const std::string& name() const throw() = 0 ;
+  virtual const std::string& name() const = 0 ;
 
   /**
    *  Get one-line description
    */
-  virtual const std::string& description() const throw() = 0 ;
+  virtual const std::string& description() const = 0 ;
 
   /**
    *  How many words from command line could this argument take? Single-word
@@ -95,7 +116,7 @@ public:
    *  Should return some big number. Note there is no function minWords() because
    *  it would always return 1.
    */
-  virtual size_t maxWords () const throw() = 0 ;
+  virtual size_t maxWords () const = 0 ;
 
   /**
    *  Set the value of the argument.
@@ -110,37 +131,23 @@ public:
    *  @return The number of consumed words. If it is negative then error has occurred.
    */
   virtual int setValue ( StringList::const_iterator begin,
-                         StringList::const_iterator end ) throw(AppCmdException) = 0 ;
-
-  /**
-   *  True if the value of the option was changed from command line. Only
-   *  makes sense for "optionsl arguments", for required this will always
-   *  return true.
-   */
-  virtual bool valueChanged() const throw() = 0 ;
+                         StringList::const_iterator end ) = 0 ;
 
   /**
    *  Reset argument to its default value
    */
-  virtual void reset() throw() = 0 ;
-
-protected:
-
-  /**
-   *  Constructor.
-   */
-  AppCmdArgBase() {}
+  virtual void reset() = 0 ;
 
 private:
 
-  // Friends
+  // All private methods are accessible to the parser
+  friend class AppCmdLine;
 
   // Data members
 
-  // Note: if your class needs a copy constructor or an assignment operator,
-  //  make one of the following public and implement it.
-  AppCmdArgBase( const AppCmdArgBase& );                // Copy Constructor
-  AppCmdArgBase& operator= ( const AppCmdArgBase& );    // Assignment op
+  // This class is non-copyable
+  AppCmdArgBase( const AppCmdArgBase& );
+  AppCmdArgBase& operator= ( const AppCmdArgBase& );
 
 
 };

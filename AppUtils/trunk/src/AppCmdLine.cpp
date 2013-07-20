@@ -107,7 +107,7 @@ AppCmdLine::~AppCmdLine( )
  *  to the parse() method of this class.
  */
 void
-AppCmdLine::addArgument ( AppCmdArgBase& arg ) throw(std::exception)
+AppCmdLine::addArgument ( AppCmdArgBase& arg )
 {
   // check some things first
   if ( ! _positionals.empty() ) {
@@ -128,7 +128,7 @@ AppCmdLine::addArgument ( AppCmdArgBase& arg ) throw(std::exception)
  *  to the parse() method of this class.
  */
 void
-AppCmdLine::addOption ( AppCmdOptBase& option ) throw(std::exception)
+AppCmdLine::addOption ( AppCmdOptBase& option )
 {
   // check maybe some wants to redefine help options?
   if ( ::isHelpOption(option.longOption()) ) {
@@ -157,7 +157,7 @@ AppCmdLine::addOption ( AppCmdOptBase& option ) throw(std::exception)
  *  extend to the parse() method of this class.
  */
 void
-AppCmdLine::setOptionsFile ( AppCmdOptList<std::string>& option ) throw(std::exception)
+AppCmdLine::setOptionsFile ( AppCmdOptList<std::string>& option )
 {
   // second attempt will fail
   if ( _optionsFile ) {
@@ -176,7 +176,7 @@ AppCmdLine::setOptionsFile ( AppCmdOptList<std::string>& option ) throw(std::exc
  *  If it returns false then you should not expect anything, just exit.
  */
 void
-AppCmdLine::parse ( int argc, char* argv[] ) throw(std::exception)
+AppCmdLine::parse ( int argc, char* argv[] )
 {
   _argv.clear() ;
   std::copy ( argv+1, argv+argc, std::back_inserter( _argv ) ) ;
@@ -184,7 +184,7 @@ AppCmdLine::parse ( int argc, char* argv[] ) throw(std::exception)
   doParse() ;
 }
 void
-AppCmdLine::parse ( int argc, const char* argv[] ) throw(std::exception)
+AppCmdLine::parse ( int argc, const char* argv[] )
 {
   _argv.clear() ;
   std::copy ( argv+1, argv+argc, std::back_inserter( _argv ) ) ;
@@ -198,7 +198,7 @@ AppCmdLine::parse ( int argc, const char* argv[] ) throw(std::exception)
  *  if the help option is given then parse() stops without checking anything else.
  */
 bool
-AppCmdLine::helpWanted() const throw()
+AppCmdLine::helpWanted() const
 {
   return _helpWanted ;
 }
@@ -301,7 +301,7 @@ AppCmdLine::cmdline() const
 
 /// real parsing happens in this method
 void
-AppCmdLine::doParse() throw(std::exception)
+AppCmdLine::doParse()
 {
   _helpWanted = 0 ;
 
@@ -324,7 +324,7 @@ AppCmdLine::doParse() throw(std::exception)
 
 /// parse options
 void
-AppCmdLine::parseOptions() throw(std::exception)
+AppCmdLine::parseOptions()
 {
   _iter = _argv.begin() ;
   _nWordsLeft = _argv.size() ;
@@ -444,7 +444,7 @@ AppCmdLine::parseOptions() throw(std::exception)
 
 /// parse options file
 void
-AppCmdLine::parseOptionsFile() throw(std::exception)
+AppCmdLine::parseOptionsFile()
 {
   if ( not _optionsFile ) return ;
 
@@ -547,7 +547,7 @@ AppCmdLine::parseOptionsFile() throw(std::exception)
 
 /// parse arguments
 void
-AppCmdLine::parseArgs() throw(std::exception)
+AppCmdLine::parseArgs()
 {
   int nPosLeft = _positionals.size() ;
   for ( PositionalsList::const_iterator it = _positionals.begin() ;
@@ -595,7 +595,7 @@ AppCmdLine::parseArgs() throw(std::exception)
 
 /// find option with the long name
 AppCmdOptBase*
-AppCmdLine::findLongOpt ( const std::string& opt ) const throw()
+AppCmdLine::findLongOpt ( const std::string& opt ) const
 {
   for ( OptionsList::const_iterator it = _options.begin() ; it != _options.end() ; ++ it ) {
     if ( (*it)->longOption() == opt ) {
@@ -607,7 +607,7 @@ AppCmdLine::findLongOpt ( const std::string& opt ) const throw()
 
 /// find option with the short name
 AppCmdOptBase*
-AppCmdLine::findShortOpt ( char opt ) const throw()
+AppCmdLine::findShortOpt ( char opt ) const
 {
   for ( OptionsList::const_iterator it = _options.begin() ; it != _options.end() ; ++ it ) {
     if ( (*it)->shortOption() == opt ) {

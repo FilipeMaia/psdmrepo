@@ -75,6 +75,11 @@ public:
   AppCmdArgOrderException ( const std::string& arg ) ;
 };
 
+class AppCmdOptNameException : public AppCmdException {
+public:
+  AppCmdOptNameException ( const std::string& option ) ;
+};
+
 } // namespace AppUtils
 
 #endif // APPUTILS_APPCMDEXCEPTIONS_H

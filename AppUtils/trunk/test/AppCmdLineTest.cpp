@@ -141,6 +141,106 @@ BOOST_AUTO_TEST_CASE( cmdline_test_simple )
   //cmdline.usage ( std::cout ) ;
 }
 
+// ==============================================================
+
+
+BOOST_AUTO_TEST_CASE( cmdline_test_simple_newstyle )
+{
+  AppCmdLine cmdline("command") ;
+
+  // create a bunch of arguments and add them
+  AppCmdArg<std::string> argString1( "name", "specifies the name" ) ;
+  BOOST_CHECK_NO_THROW( cmdline.addArgument ( argString1 ) ) ;
+
+  AppCmdArg<int> argInt1( "number", "specifies the number" ) ;
+  BOOST_CHECK_NO_THROW( cmdline.addArgument ( argInt1 ) ) ;
+
+  AppCmdArg<int> argInt2( "number", "specifies the number 2", 1000 ) ;
+  BOOST_CHECK_NO_THROW( cmdline.addArgument ( argInt2 ) ) ;
+
+  // make a command line
+  std::list<std::string> args ;
+  args.push_back ( "MyName" ) ;
+  args.push_back ( "12345" ) ;
+
+  // first try, stringfor optional argument is mising
+  BOOST_CHECK_NO_THROW ( cmdline.parse ( args.begin(), args.end() ) ) ;
+  BOOST_CHECK_EQUAL ( argString1.value(), "MyName" ) ;
+  BOOST_CHECK_EQUAL ( argInt1.value(), 12345 ) ;
+  BOOST_CHECK_EQUAL ( argInt1.valueChanged(), true ) ;
+  BOOST_CHECK_EQUAL ( argInt2.value(), 1000 ) ;
+  BOOST_CHECK_EQUAL ( argInt2.valueChanged(), false ) ;
+
+  // add data for optional argument
+  args.push_back ( "123" ) ;
+
+  BOOST_CHECK_NO_THROW ( cmdline.parse ( args.begin(), args.end() ) ) ;
+  BOOST_CHECK_EQUAL ( argString1.value(), "MyName" ) ;
+  BOOST_CHECK_EQUAL ( argInt1.value(), 12345 ) ;
+  BOOST_CHECK_EQUAL ( argInt2.value(), 123 ) ;
+  BOOST_CHECK_EQUAL ( argInt2.valueChanged(), true ) ;
+
+  // one more argument should fail
+  args.push_back ( "fail" ) ;
+
+  BOOST_CHECK_THROW ( cmdline.parse ( args.begin(), args.end() ), AppCmdException ) ;
+
+  // add more options
+  AppCmdOptIncr optVerbose ( "verbose,v", "more noise", 0 ) ;
+  BOOST_CHECK_NO_THROW ( cmdline.addOption ( optVerbose ) ) ;
+
+  AppCmdOptToggle optToggle ( "toggle,t", "toggle something", false ) ;
+  BOOST_CHECK_NO_THROW ( cmdline.addOption ( optToggle ) ) ;
+
+  AppCmdOpt<int> optInt1 ( "int,i", "number", "some number", 123 ) ;
+  BOOST_CHECK_NO_THROW ( cmdline.addOption ( optInt1 ) ) ;
+
+  AppCmdOpt<int> optInt2 ( "I,INT", "NUMBER", "some number", 123 ) ;
+  BOOST_CHECK_NO_THROW ( cmdline.addOption ( optInt2 ) ) ;
+
+  AppCmdOpt<std::string> optString1 ( "s,string", "astring", "some string", "<none>" ) ;
+  BOOST_CHECK_NO_THROW ( cmdline.addOption ( optString1 ) ) ;
+
+  AppCmdOpt<std::string> optString2 ( "STRING,S", "Astring", "some string", "<none>" ) ;
+  BOOST_CHECK_NO_THROW ( cmdline.addOption ( optString2 ) ) ;
+  // second one should fail
+  BOOST_CHECK_THROW ( cmdline.addOption ( optString2 ), AppCmdException ) ;
+
+  AppCmdOpt<std::string> optString3 ( "dummy", "Astring", "some string", "<none>" ) ;
+  BOOST_CHECK_NO_THROW ( cmdline.addOption ( optString3 ) ) ;
+
+  // new command line
+  args.clear() ;
+  args.push_back ( "-v" ) ;
+  args.push_back ( "--verbose" ) ;
+  args.push_back ( "-t" ) ;
+  args.push_back ( "--toggle" ) ;
+  args.push_back ( "-vvvt" ) ;
+  args.push_back ( "--int=654" ) ;
+  args.push_back ( "--INT" ) ;
+  args.push_back ( "654" ) ;
+  args.push_back ( "-sNone" ) ;
+  args.push_back ( "-S" ) ;
+  args.push_back ( "NONE" ) ;
+  args.push_back ( "--" ) ;
+  args.push_back ( "MyName" ) ;
+  args.push_back ( "12345" ) ;
+
+  // first try, string for optional argument is mising
+  BOOST_CHECK_NO_THROW ( cmdline.parse ( args.begin(), args.end() ) ) ;
+  BOOST_CHECK_EQUAL ( optVerbose.value(), 5 ) ;
+  BOOST_CHECK_EQUAL ( optToggle.value(), true ) ;
+  BOOST_CHECK_EQUAL ( optInt1.value(), 654 ) ;
+  BOOST_CHECK_EQUAL ( optInt2.value(), 654 ) ;
+  BOOST_CHECK_EQUAL ( optString1.value(), "None" ) ;
+  BOOST_CHECK_EQUAL ( optString2.value(), "NONE" ) ;
+  BOOST_CHECK_EQUAL ( optString2.valueChanged(), true ) ;
+  BOOST_CHECK_EQUAL ( optString3.valueChanged(), false ) ;
+
+  // print usage info about command
+  //cmdline.usage ( std::cout ) ;
+}
+
 
 // ==============================================================
 

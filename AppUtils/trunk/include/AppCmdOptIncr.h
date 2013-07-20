@@ -46,16 +46,16 @@ namespace AppUtils {
 /**
  *  @ingroup AppUtils
  *
+ *  @brief Class for integer increment (counter) option.
+ *
  *  This class represents a command line option without argument. Every
  *  appearance of the option on the command line will increment the current
- *  value of the option.
+ *  value of the option. Initial value of the option can be set in constructor.
  *
  *  This software was developed for the BaBar collaboration.  If you
  *  use all or part of it, please give an appropriate acknowledgement.
  *
  *  Copyright (C) 2003		SLAC
- *
- *  @see AppCmdOpt
  *
  *  @version $Id$
  *
@@ -67,79 +67,69 @@ class AppCmdOptIncr : public AppCmdOptBase {
 public:
 
   /**
-   *  Make an option
+   *  @brief Define incremental option without argument.
    *
-   *  @param shortOpt  short form of the option, single character
-   *  @param longOpt   long form of the option, string without leading --
-   *  @param descr     description, one-line string
-   *  @param defValue  initial value of the option
+   *  @deprecated This constructor is for backward-compatibility only, use constructor with
+   *  optNames argument in the new code.
+   *
+   *  This constructor defines an option with both short name (-o) and long name (--option).
+   *
+   *  @param[in] shortOpt    Short one-character option name
+   *  @param[in] longOpt     Long option name (not including leading --)
+   *  @param[in] descr       Long description for the option, printed when usage() is called.
+   *  @param[in] defValue    Initial value of the option
    */
   AppCmdOptIncr ( char shortOpt,
                   const std::string& longOpt,
                   const std::string& descr,
                   int defValue = 0 ) ;
-  // option with the long name only
-  AppCmdOptIncr ( const std::string& longOpt,
+
+  /**
+   *  @brief Define incremental option without argument.
+   *
+   *  This constructor can define option with both short name (-o) and long name (--option).
+   *  All option names are defined via single constructor argument optNames which contains a
+   *  comma-separated list of option names (like "option,o"). Single character becomes short
+   *  name (-o), longer string becomes long name (--option).
+   *
+   *  @param[in] optNames    Comma-separated option names.
+   *  @param[in] descr       Long description for the option, printed when usage() is called.
+   *  @param[in] defValue    Initial value of the option
+   */
+  AppCmdOptIncr ( const std::string& optNames,
                   const std::string& descr,
                   int defValue = 0 ) ;
-  // option with the short name only
+
+  /**
+   *  @brief Define incremental option without argument.
+   *
+   *  This constructor defines an option with short name (-o) only.
+   *
+   *  @param[in] shortOpt    Short one-character option name
+   *  @param[in] descr       Long description for the option, printed when usage() is called.
+   *  @param[in] defValue    Initial value of the option
+   */
   AppCmdOptIncr ( char shortOpt,
                   const std::string& descr,
                   int defValue = 0 ) ;
 
   /// Destructor
-  virtual ~AppCmdOptIncr( ) throw() ;
+  virtual ~AppCmdOptIncr( ) ;
 
   /**
-   *  Returns true if option requires argument. Does not make sense for
-   *  positional arguments.
+   *  True if the value of the option was changed from command line or from option file.
    */
-  virtual bool hasArgument() const throw() ;
-
-  /**
-   *  Get the name of the argument, only used if hasArgument() returns true
-   */
-  virtual const std::string& name() const throw() ;
-
-  /**
-   *  Get one-line description
-   */
-  virtual const std::string& description() const throw() ;
-
-  /**
-   *  Return short option symbol for -x option, or @c NULL if no short option
-   */
-  virtual char shortOption() const throw() ;
-
-  /**
-   *  Return long option symbol for --xxxxx option, or empty string
-   */
-  virtual const std::string& longOption() const throw() ;
-
-  /**
-   *  Set option's argument. The value string will be empty if hasArgument() is false
-   */
-  virtual void setValue( const std::string& value ) throw(AppCmdException) ;
-
-  /**
-   *  True if the value of the option was changed from command line.
-   */
-  virtual bool valueChanged() const throw() ;
+  virtual bool valueChanged() const ;
 
   /**
    *  Return current value of the option
    */
-  virtual int value() const throw() ;
+  virtual int value() const ;
 
   /**
    *  Return default value of the argument
    */
-  int defValue() const throw() { return _defValue ; }
-
-  /**
-   *  Reset option to its default value
-   */
-  virtual void reset() throw() ;
+  int defValue() const { return _defValue ; }
 
 protected:
 
@@ -147,21 +137,31 @@ protected:
 
 private:
 
-  // Friends
+  /**
+   *  Returns true if option requires argument. Does not make sense for
+   *  positional arguments.
+   */
+  virtual bool hasArgument() const ;
+
+  /**
+   *  Set option's argument. The value string will be empty if hasArgument() is false
+   */
+  virtual void setValue( const std::string& value ) ;
+
+  /**
+   *  Reset option to its default value
+   */
+  virtual void reset() ;
+
 
   // Data members
-  const char _shortOpt ;
-  const std::string _longOpt ;
-  const std::string _name ;
-  const std::string _descr ;
   int _value ;
   const int _defValue ;
   bool _changed ;
 
-  // Note: if your class needs a copy constructor or an assignment operator,
-  //  make one of the following public and implement it.
-  AppCmdOptIncr( const AppCmdOptIncr& );                // Copy Constructor
-  AppCmdOptIncr& operator= ( const AppCmdOptIncr& );    // Assignment op
+  // This class in non-copyable
+  AppCmdOptIncr( const AppCmdOptIncr& );
+  AppCmdOptIncr& operator= ( const AppCmdOptIncr& );
 
 };
 

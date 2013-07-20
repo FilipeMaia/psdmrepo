@@ -31,6 +31,7 @@ extern "C" {
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "AppUtils/AppCmdTypeTraits.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -46,6 +47,8 @@ namespace AppUtils {
 
 /**
  *  @ingroup AppUtils
+ *
+ *  @brief Positional argument class collecting arguments into list of values.
  *
  *  This class represents a multi-word positional parameter in the command
  *  line. This is a templated class parameterized by the type of the parameter.
@@ -73,32 +76,88 @@ public:
   typedef typename container::size_type size_type ;
 
   /**
-   *  Make a required positional argument
+   *  @brief Make a required positional argument.
+   *
+   *  Required argument will need at least one word on the command line corresponding to it.
+   *
+   *  @param name  The name of the argument, like "files", "time", etc. This name
+   *               is only used in the usage() to print info about this argument
+   *  @param descr One-line description of the argument, used by usage()
    */
   AppCmdArgList ( const std::string& name, const std::string& descr ) ;
 
   /**
-   *  Make an optional positional argument
+   *  @brief Make an optional positional argument.
+   *
+   *  Optional argument could consume 0 or more words from command line. If there are no words
+   *  on the command line for this argument then its value will be a default value provided
+   *  as argument to this constructor. If there are words on command line corresponding
+   *  to this argument then their values replace default value, but do not extend it.
+   *
+   *  @param name  The name of the argument, like "files", "time", etc. This name
+   *               is only used in the usage() to print info about this argument
+   *  @param descr One-line description of the argument, used by usage()
+   *  @param val   Default value for this argument
    */
   AppCmdArgList ( const std::string& name, const std::string& descr, const container& val ) ;
 
   // Destructor
-  virtual ~AppCmdArgList( ) throw() ;
+  virtual ~AppCmdArgList( ) {}
+
+  /**
+   *  True if the value of the option was changed from command line. Only
+   *  makes sense for "optional arguments", for required this will always
+   *  return true.
+   */
+  virtual bool valueChanged() const { return _changed ; }
+
+
+  /**
+   *  Return current value of the argument
+   */
+  virtual const container& value() const { return _value ; }
+
+
+  /**
+   *  Return iterator to the begin/end of sequence
+   */
+  virtual const_iterator begin() const { return _value.begin() ; }
+  virtual const_iterator end() const { return _value.end() ; }
+
+
+  /**
+   *  Other usual container stuff
+   */
+  size_type size() const { return _value.size() ; }
+  bool empty() const { return _value.empty() ; }
+
+  /**
+   *  Clear the collected values. This will erase content of the list, even if non-empty
+   *  default value was provided in constructor it will not be used.
+   */
+  virtual void clear() { _value.clear() ; }
+
+  /**
+   *  Return default value of the argument
+   */
+  const container& defValue() const { return _defValue ; }
+
+protected:
 
   /**
    *  Is it required?
    */
-  virtual bool isRequired() const throw() ;
+  virtual bool isRequired() const { return _required ; }
 
   /**
-   *  Get the name of the paramater
+   *  Get the name of the parameter
    */
-  virtual const std::string& name() const throw() ;
+  virtual const std::string& name() const { return _name ; }
 
   /**
    *  Get one-line description
    */
-  virtual const std::string& description() const throw() ;
+  virtual const std::string& description() const { return _descr ; }
 
   /**
    *  How many words from command line could this argument take? Single-word
@@ -106,7 +165,7 @@ public:
    *  Should return some big number. Note there is no function minWords() because
    *  it would always return 1.
    */
-  virtual size_t maxWords () const throw() ;
+  virtual size_t maxWords () const { return ULONG_MAX ; }
 
   /**
    *  Set the value of the argument.
@@ -120,50 +179,15 @@ public:
    *  @return The number of consumed words. If it is negative then error has occured.
    */
   virtual int setValue ( StringList::const_iterator begin,
-                         StringList::const_iterator end ) throw(AppCmdException) ;
-
-  /**
-   *  True if the value of the option was changed from command line. Only
-   *  makes sense for "optionsl arguments", for required this will always
-   *  return true.
-   */
-  virtual bool valueChanged() const throw() ;
-
-  /**
-   *  Return current value of the argument
-   */
-  virtual const container& value() const throw() ;
-
-  /**
-   *  Return iterator to the begin/end of sequence
-   */
-  virtual const_iterator begin() const throw() ;
-  virtual const_iterator end() const throw() ;
-
-  /**
-   *  Other usual container stuff
-   */
-  size_type size() const throw() { return _value.size() ; }
-  bool empty() const throw() { return _value.empty() ; }
-
-  /**
-   *  Clear the collected values
-   */
-  virtual void clear() throw() ;
-
-  /**
-   *  Return default value of the argument
-   */
-  const container& defValue() const throw() { return _defValue ; }
+                         StringList::const_iterator end ) ;
 
   /**
    *  Reset argument to its default value
    */
-  virtual void reset() throw() ;
-
-protected:
-
-  // Helper functions
+  virtual void reset() {
+    _value = _defValue ;
+    _changed = false ;
+  }
 
 private:
 
@@ -177,15 +201,61 @@ private:
   container _value ;
   bool _changed ;
 
-  // Note: if your class needs a copy constructor or an assignment operator,
-  //  make one of the following public and implement it.
-  AppCmdArgList( const AppCmdArgList<Type>& );  // Copy Constructor
-  AppCmdArgList<Type>& operator= ( const AppCmdArgList<Type>& );
+  // This class is non-copyable
+  AppCmdArgList( const AppCmdArgList& );
+  AppCmdArgList& operator= ( const AppCmdArgList& );
 
 };
 
-} // namespace AppUtils
+//  Make a required positional argument
+template <typename Type>
+AppCmdArgList<Type>::AppCmdArgList ( const std::string& name, const std::string& descr )
+  : AppCmdArgBase()
+  , _name(name)
+  , _descr(descr)
+  , _required(true)
+  , _defValue()
+  , _value()
+  , _changed(false)
+{
+}
 
-#include  "AppUtils/AppCmdArgList.icc"
+//  Make an optional positional argument
+template <typename Type>
+AppCmdArgList<Type>::AppCmdArgList ( const std::string& name, const std::string& descr, const container& val )
+  : AppCmdArgBase()
+  , _name(name)
+  , _descr(descr)
+  , _required(false)
+  , _defValue(val)
+  , _value(val)
+  , _changed(false)
+{
+}
+
+//  Set the value of the argument.
+template <typename Type>
+int
+AppCmdArgList<Type>::setValue ( StringList::const_iterator begin,
+                                StringList::const_iterator end )
+{
+  // sequence must be non-empty
+  assert ( begin != end ) ;
+
+  container localCont ;
+
+  for ( ; begin != end ; ++ begin ) {
+    // this may throw
+    Type res = AppCmdTypeTraits<Type>::fromString ( *begin ) ;
+    localCont.push_back ( res ) ;
+  }
+
+  _value = localCont ;
+  _changed = true ;
+
+  return _value.size() ;
+}
+
+} // namespace AppUtils
 
 #endif  // APPUTILS_APPCMDARGLIST_HH

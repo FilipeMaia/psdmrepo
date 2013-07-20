@@ -11,6 +11,16 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-00
+2013-07-20 Andy Salnikov
+- some refactoring and small improvements in command line parser
+- options and arguments classes have some methods which are only 
+  useful to parser moved to protected. Only stuff that is user-facing
+  is left public
+- options names can be spcified in compact form now: "verbose,v"
+- some improvement to doxygen stuff
+- *.icc files removed, code moved to headers
+
 Tag: V00-01-12
 2013-05-22 Andy Salnikov
 - improve doxygen comments

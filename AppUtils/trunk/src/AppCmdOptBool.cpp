@@ -52,25 +52,17 @@ AppCmdOptBool::AppCmdOptBool ( char shortOpt,
                                const std::string& longOpt,
                                const std::string& descr,
                                bool defValue )
-  : AppCmdOptBase()
-  , _shortOpt(shortOpt)
-  , _longOpt(longOpt)
-  , _name()
-  , _descr(descr)
+  : AppCmdOptBase(longOpt+","+std::string(1, shortOpt), "", descr)
   , _value(defValue)
   , _defValue(defValue)
   , _changed(false)
 {
 }
 
-AppCmdOptBool::AppCmdOptBool ( const std::string& longOpt,
+AppCmdOptBool::AppCmdOptBool ( const std::string& optNames,
                                const std::string& descr,
                                bool defValue )
-  : AppCmdOptBase()
-  , _shortOpt('\0')
-  , _longOpt(longOpt)
-  , _name()
-  , _descr(descr)
+  : AppCmdOptBase(optNames, "", descr)
   , _value(defValue)
   , _defValue(defValue)
   , _changed(false)
@@ -80,11 +72,7 @@ AppCmdOptBool::AppCmdOptBool ( const std::string& longOpt,
 AppCmdOptBool::AppCmdOptBool ( char shortOpt,
                                const std::string& descr,
                                bool defValue )
-  : AppCmdOptBase()
-  , _shortOpt(shortOpt)
-  , _longOpt()
-  , _name()
-  , _descr(descr)
+  : AppCmdOptBase(std::string(1, shortOpt), "", descr)
   , _value(defValue)
   , _defValue(defValue)
   , _changed(false)
@@ -92,7 +80,7 @@ AppCmdOptBool::AppCmdOptBool ( char shortOpt,
 }
 
 // Destructor
-AppCmdOptBool::~AppCmdOptBool( ) throw()
+AppCmdOptBool::~AppCmdOptBool( )
 {
 }
 
@@ -101,45 +89,9 @@ AppCmdOptBool::~AppCmdOptBool( ) throw()
  *  positional arguments.
  */
 bool
-AppCmdOptBool::hasArgument() const throw()
+AppCmdOptBool::hasArgument() const
 {
   return false ;
-}
-
-/**
- *  Get the name of the paramater
- */
-const std::string&
-AppCmdOptBool::name() const throw()
-{
-  return _name ;
-}
-
-/**
- *  Get one-line description
- */
-const std::string&
-AppCmdOptBool::description() const throw()
-{
-  return _descr ;
-}
-
-/**
- *  Return short option symbol for -x option
- */
-char
-AppCmdOptBool::shortOption() const throw()
-{
-  return _shortOpt ;
-}
-
-/**
- *  Return long option symbol for --xxxxx option
- */
-const std::string&
-AppCmdOptBool::longOption() const throw()
-{
-  return _longOpt ;
 }
 
 /**
@@ -148,7 +100,7 @@ AppCmdOptBool::longOption() const throw()
  *  @return The number of consumed words. If it is negative then error has occured.
  */
 void
-AppCmdOptBool::setValue ( const std::string& value ) throw(AppCmdException)
+AppCmdOptBool::setValue ( const std::string& value )
 {
   _value = ! _defValue ;
   _changed = true ;
@@ -158,7 +110,7 @@ AppCmdOptBool::setValue ( const std::string& value ) throw(AppCmdException)
  *  True if the value of the option was changed from command line.
  */
 bool
-AppCmdOptBool::valueChanged () const throw()
+AppCmdOptBool::valueChanged () const
 {
   return _changed ;
 }
@@ -167,7 +119,7 @@ AppCmdOptBool::valueChanged () const throw()
  *  Return current value of the argument
  */
 bool
-AppCmdOptBool::value() const throw()
+AppCmdOptBool::value() const
 {
   return _value ;
 }
@@ -176,7 +128,7 @@ AppCmdOptBool::value() const throw()
  *  reset option to its default value
  */
 void
-AppCmdOptBool::reset() throw()
+AppCmdOptBool::reset()
 {
   _value = _defValue ;
   _changed = false ;

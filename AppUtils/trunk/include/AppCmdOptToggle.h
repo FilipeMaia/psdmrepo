@@ -47,9 +47,12 @@ namespace AppUtils {
 /**
  *  @ingroup AppUtils
  *
+ *  @brief Option class for boolean (toggle-type) flag.
+ *
  *  This class represents a command line option without argument. The option
- *  has boolean value which will change its value for every appearance of the
- *  option in the command line.
+ *  has boolean value which will change (flip between true and false) its value
+ *  for every appearance of the  option in the command line, so even number
+ *  of appearances is identical to not using an option at all.
  *
  *  This software was developed for the BaBar collaboration.  If you
  *  use all or part of it, please give an appropriate acknowledgement.
@@ -68,79 +71,78 @@ class AppCmdOptToggle : public AppCmdOptBase {
 public:
 
   /**
-   *  Make a toggle option.
+   *  @brief Define toggle-type option without argument.
    *
-   *  @param shortOpt  short form of the option, single character
-   *  @param longOpt   long form of the option, string without leading --
-   *  @param descr     description, one-line string
-   *  @param defValue  initial value of the option
+   *  @deprecated This constructor is for backward-compatibility only, use constructor with
+   *  optNames argument in the new code.
+   *
+   *  This constructor defines an option with both short name (-o) and long name (--option).
+   *  After option is instantiated it has to be added to parser using AppCmdLine::addOption()
+   *  method. To get current value of option argument use value() method.
+   *
+   *  @param[in] shortOpt    Short one-character option name
+   *  @param[in] longOpt     Long option name (not including leading --)
+   *  @param[in] descr     description, one-line string
+   *  @param[in] defValue  initial value of the option
    */
   AppCmdOptToggle ( char shortOpt,
                     const std::string& longOpt,
                     const std::string& descr,
                     bool defValue = false ) ;
-  // make option with long name only
-  AppCmdOptToggle ( const std::string& longOpt,
+
+  /**
+   *  @brief Define toggle-type option without argument.
+   *
+   *  This constructor can define option with both short name (-o) and long name (--option).
+   *  All option names are defined via single constructor argument optNames which contains a
+   *  comma-separated list of option names (like "option,o"). Single character becomes short
+   *  name (-o), longer string becomes long name (--option).
+   *  After option is instantiated it has to be added to parser using AppCmdLine::addOption()
+   *  method. To get current value of option argument use value() method.
+   *
+   *  @param[in] optNames    Comma-separated option names.
+   *  @param[in] descr     description, one-line string
+   *  @param[in] defValue  initial value of the option
+   */
+  AppCmdOptToggle ( const std::string& optNames,
                     const std::string& descr,
                     bool defValue = false ) ;
-  // make option with short name only
+
+  /**
+   *  @brief Define toggle-type option without argument.
+   *
+   *  @deprecated This constructor is for backward-compatibility only, use constructor with
+   *  optNames argument in the new code.
+   *
+   *  This constructor defines an option with short name (-o) only.
+   *  After option is instantiated it has to be added to parser using AppCmdLine::addOption()
+   *  method. To get current value of option argument use value() method.
+   *
+   *  @param[in] shortOpt  short form of the option, single character
+   *  @param[in] descr     description, one-line string
+   *  @param[in] defValue  initial value of the option
+   */
   AppCmdOptToggle ( char shortOpt,
                     const std::string& descr,
                     bool defValue = false ) ;
 
   /// Destructor
-  virtual ~AppCmdOptToggle( ) throw();
-
-  /**
-   *  Returns true if option requires argument. Does not make sense for
-   *  positional arguments.
-   */
-  virtual bool hasArgument() const throw() ;
-
-  /**
-   *  Get the name of the argument, only used if hasArgument() returns true
-   */
-  virtual const std::string& name() const throw() ;
-
-  /**
-   *  Get one-line description
-   */
-  virtual const std::string& description() const throw() ;
-
-  /**
-   *  Return short option symbol for -x option, or @c NULL if no short option
-   */
-  virtual char shortOption() const throw() ;
-
-  /**
-   *  Return long option symbol for --xxxxx option, or empty string
-   */
-  virtual const std::string& longOption() const throw() ;
-
-  /**
-   *  Set option's argument. The value string will be empty if hasArgument() is false
-   */
-  virtual void setValue( const std::string& value ) throw(AppCmdException) ;
+  virtual ~AppCmdOptToggle( );
 
   /**
    *  True if the value of the option was changed from command line.
    */
-  virtual bool valueChanged() const throw() ;
+  virtual bool valueChanged() const ;
 
   /**
    *  Return current value of the argument
    */
-  virtual bool value() const throw() ;
+  virtual bool value() const ;
 
   /**
    *  Return default value of the argument
    */
-  bool defValue() const throw() { return _defValue ; }
-
-  /**
-   *  Reset option to its default value
-   */
-  virtual void reset() throw() ;
+  bool defValue() const { return _defValue ; }
 
 protected:
 
@@ -148,21 +150,37 @@ protected:
 
 private:
 
-  // Friends
+  /**
+   *  Returns true if option requires argument. Does not make sense for
+   *  positional arguments.
+   */
+  virtual bool hasArgument() const ;
+
+  /**
+   *  @brief Set option's argument.
+   *
+   *  This method is called by parser when option is found on command line.
+   *  The value string will be empty if hasArgument() is false.
+   *  Shall throw an exception in case of value conversion error.
+   *
+   *  @throw AppCmdException Thrown if string to value conversion fails.
+   */
+  virtual void setValue( const std::string& value ) ;
+
+  /**
+   *  Reset option to its default value
+   */
+  virtual void reset() ;
+
 
   // Data members
-  const char _shortOpt ;
-  const std::string _longOpt ;
-  const std::string _name ;
-  const std::string _descr ;
   bool _value ;
   const bool _defValue ;
   bool _changed ;
 
-  // Note: if your class needs a copy constructor or an assignment operator,
-  //  make one of the following public and implement it.
-  AppCmdOptToggle( const AppCmdOptToggle& );                // Copy Constructor
-  AppCmdOptToggle& operator= ( const AppCmdOptToggle& );    // Assignment op
+  // This class in non-copyable
+  AppCmdOptToggle( const AppCmdOptToggle& );
+  AppCmdOptToggle& operator= ( const AppCmdOptToggle& );
 
 };
 

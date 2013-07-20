@@ -45,32 +45,21 @@ extern "C" {
 
 namespace AppUtils {
 
-/**
- *  Ctor
- */
 AppCmdOptIncr::AppCmdOptIncr ( char shortOpt,
 			       const std::string& longOpt,
 			       const std::string& descr,
 			       int defValue )
-  : AppCmdOptBase()
-  , _shortOpt(shortOpt)
-  , _longOpt(longOpt)
-  , _name("(incr)")
-  , _descr(descr)
+  : AppCmdOptBase(longOpt+","+std::string(1, shortOpt), "(incr)", descr)
   , _value(defValue)
   , _defValue(defValue)
   , _changed(false)
 {
 }
 
-AppCmdOptIncr::AppCmdOptIncr ( const std::string& longOpt,
+AppCmdOptIncr::AppCmdOptIncr ( const std::string& optNames,
                                const std::string& descr,
                                int defValue )
-  : AppCmdOptBase()
-  , _shortOpt('\0')
-  , _longOpt(longOpt)
-  , _name("(incr)")
-  , _descr(descr)
+  : AppCmdOptBase(optNames, "(incr)", descr)
   , _value(defValue)
   , _defValue(defValue)
   , _changed(false)
@@ -80,11 +69,7 @@ AppCmdOptIncr::AppCmdOptIncr ( const std::string& longOpt,
 AppCmdOptIncr::AppCmdOptIncr ( char shortOpt,
                                const std::string& descr,
                                int defValue )
-  : AppCmdOptBase()
-  , _shortOpt(shortOpt)
-  , _longOpt()
-  , _name("(incr)")
-  , _descr(descr)
+  : AppCmdOptBase(std::string(1, shortOpt), "(incr)", descr)
   , _value(defValue)
   , _defValue(defValue)
   , _changed(false)
@@ -92,7 +77,7 @@ AppCmdOptIncr::AppCmdOptIncr ( char shortOpt,
 }
 
 // Destructor
-AppCmdOptIncr::~AppCmdOptIncr( ) throw()
+AppCmdOptIncr::~AppCmdOptIncr( )
 {
 }
 
@@ -101,52 +86,16 @@ AppCmdOptIncr::~AppCmdOptIncr( ) throw()
  *  positional arguments.
  */
 bool
-AppCmdOptIncr::hasArgument() const throw()
+AppCmdOptIncr::hasArgument() const
 {
   return false ;
-}
-
-/**
- *  Get the name of the parameter
- */
-const std::string&
-AppCmdOptIncr::name() const throw()
-{
-  return _name ;
-}
-
-/**
- *  Get one-line description
- */
-const std::string&
-AppCmdOptIncr::description() const throw()
-{
-  return _descr ;
-}
-
-/**
- *  Return short option symbol for -x option
- */
-char
-AppCmdOptIncr::shortOption() const throw()
-{
-  return _shortOpt ;
-}
-
-/**
- *  Return long option symbol for --xxxxx option
- */
-const std::string&
-AppCmdOptIncr::longOption() const throw()
-{
-  return _longOpt ;
 }
 
 /**
  *  Set the value of the argument.
  */
 void
-AppCmdOptIncr::setValue ( const std::string& value ) throw(AppCmdException)
+AppCmdOptIncr::setValue ( const std::string& value )
 {
   ++ _value ;
   _changed = true ;
@@ -156,7 +105,7 @@ AppCmdOptIncr::setValue ( const std::string& value ) throw(AppCmdException)
  *  True if the value of the option was changed from command line.
  */
 bool
-AppCmdOptIncr::valueChanged () const throw()
+AppCmdOptIncr::valueChanged () const
 {
   return _changed ;
 }
@@ -165,7 +114,7 @@ AppCmdOptIncr::valueChanged () const throw()
  *  Return current value of the argument
  */
 int
-AppCmdOptIncr::value() const throw()
+AppCmdOptIncr::value() const
 {
   return _value ;
 }
@@ -174,7 +123,7 @@ AppCmdOptIncr::value() const throw()
  *  reset option to its default value
  */
 void
-AppCmdOptIncr::reset() throw()
+AppCmdOptIncr::reset()
 {
   _value = _defValue ;
   _changed = false ;

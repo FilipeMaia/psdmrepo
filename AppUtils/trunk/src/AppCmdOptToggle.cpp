@@ -45,32 +45,21 @@ extern "C" {
 
 namespace AppUtils {
 
-/**
- *  Ctor
- */
 AppCmdOptToggle::AppCmdOptToggle ( char shortOpt,
 				   const std::string& longOpt,
 				   const std::string& descr,
 				   bool defValue )
-  : AppCmdOptBase()
-  , _shortOpt(shortOpt)
-  , _longOpt(longOpt)
-  , _name("(toggle)")
-  , _descr(descr)
+  : AppCmdOptBase(longOpt+","+std::string(1, shortOpt), "(toggle)", descr)
   , _value(defValue)
   , _defValue(defValue)
   , _changed(false)
 {
 }
 
-AppCmdOptToggle::AppCmdOptToggle ( const std::string& longOpt,
+AppCmdOptToggle::AppCmdOptToggle ( const std::string& optNames,
                                    const std::string& descr,
                                    bool defValue )
-  : AppCmdOptBase()
-  , _shortOpt('\0')
-  , _longOpt(longOpt)
-  , _name("(toggle)")
-  , _descr(descr)
+  : AppCmdOptBase(optNames, "(toggle)", descr)
   , _value(defValue)
   , _defValue(defValue)
   , _changed(false)
@@ -80,11 +69,7 @@ AppCmdOptToggle::AppCmdOptToggle ( const std::string& longOpt,
 AppCmdOptToggle::AppCmdOptToggle ( char shortOpt,
                                    const std::string& descr,
                                    bool defValue )
-  : AppCmdOptBase()
-  , _shortOpt(shortOpt)
-  , _longOpt()
-  , _name("(toggle)")
-  , _descr(descr)
+  : AppCmdOptBase(std::string(1, shortOpt), "(toggle)", descr)
   , _value(defValue)
   , _defValue(defValue)
   , _changed(false)
@@ -92,7 +77,7 @@ AppCmdOptToggle::AppCmdOptToggle ( char shortOpt,
 }
 
 // Destructor
-AppCmdOptToggle::~AppCmdOptToggle( ) throw()
+AppCmdOptToggle::~AppCmdOptToggle( )
 {
 }
 
@@ -101,45 +86,9 @@ AppCmdOptToggle::~AppCmdOptToggle( ) throw()
  *  positional arguments.
  */
 bool
-AppCmdOptToggle::hasArgument() const throw()
+AppCmdOptToggle::hasArgument() const
 {
   return false ;
-}
-
-/**
- *  Get the name of the paramater
- */
-const std::string&
-AppCmdOptToggle::name() const throw()
-{
-  return _name ;
-}
-
-/**
- *  Get one-line description
- */
-const std::string&
-AppCmdOptToggle::description() const throw()
-{
-  return _descr ;
-}
-
-/**
- *  Return short option symbol for -x option
- */
-char
-AppCmdOptToggle::shortOption() const throw()
-{
-  return _shortOpt ;
-}
-
-/**
- *  Return long option symbol for --xxxxx option
- */
-const std::string&
-AppCmdOptToggle::longOption() const throw()
-{
-  return _longOpt ;
 }
 
 /**
@@ -148,7 +97,7 @@ AppCmdOptToggle::longOption() const throw()
  *  @return The number of consumed words. If it is negative then error has occured.
  */
 void
-AppCmdOptToggle::setValue ( const std::string& value ) throw(AppCmdException)
+AppCmdOptToggle::setValue ( const std::string& value )
 {
   _value = ! _value ;
   _changed = true ;
@@ -158,7 +107,7 @@ AppCmdOptToggle::setValue ( const std::string& value ) throw(AppCmdException)
  *  True if the value of the option was changed from command line.
  */
 bool
-AppCmdOptToggle::valueChanged () const throw()
+AppCmdOptToggle::valueChanged () const
 {
   return _changed ;
 }
@@ -167,7 +116,7 @@ AppCmdOptToggle::valueChanged () const throw()
  *  Return current value of the argument
  */
 bool
-AppCmdOptToggle::value() const throw()
+AppCmdOptToggle::value() const
 {
   return _value ;
 }
@@ -176,7 +125,7 @@ AppCmdOptToggle::value() const throw()
  *  reset option to its default value
  */
 void
-AppCmdOptToggle::reset() throw()
+AppCmdOptToggle::reset()
 {
   _value = _defValue ;
   _changed = false ;

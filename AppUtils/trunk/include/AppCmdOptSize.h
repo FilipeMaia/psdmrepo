@@ -38,8 +38,11 @@ namespace AppUtils {
 /**
  *  @ingroup AppUtils
  *
- *  Option class for specifying size with a number+suffix. Acceptable
- *  suffixes are k, K, M, G.
+ *  @brief Class defining option with argument for specifying file sizes/offsets.
+ *
+ *  This class represents option with required argument, argument value format is
+ *  number+suffix. Acceptable suffixes are k, K, M, G. This option can be useful
+ *  when specifying file size for example (e.g. --size-limit 1G).
  *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
@@ -54,91 +57,125 @@ public:
 
   typedef unsigned long long value_type ;
 
-  // option with both short and long names
+  /**
+   *  @brief Define an option with an argument.
+   *
+   *  @deprecated This constructor is for backward-compatibility only, use constructor with
+   *  optNames argument in the new code.
+   *
+   *  This constructor defines an option with both short name (-o) and long name
+   *  (--option) which has a required argument. After option is instantiated it has to
+   *  be added to parser using AppCmdLine::addOption() method. To get current value of
+   *  option argument  use value() method.
+   *
+   *  @param[in] shortOpt    Short one-character option name
+   *  @param[in] longOpt     Long option name (not including leading --)
+   *  @param[in] name        Name for option argument, something like "size", "offset", etc. Used
+   *                         only for information purposes when usage() is called.
+   *  @param[in] descr       Long description for the option, printed when usage() is called.
+   *  @param[in] defValue    Value returned from value() if option is not specified on command line.
+   *
+   */
   AppCmdOptSize ( char shortOpt,
                   const std::string& longOpt,
                   const std::string& name,
                   const std::string& descr,
                   value_type defValue ) ;
-  // option with the long name only
-  AppCmdOptSize ( const std::string& longOpt,
+
+  /**
+   *  @brief Define an option with a required argument.
+   *
+   *  This constructor can define option with both short name (-o) and long name (--option).
+   *  All option names are defined via single constructor argument optNames which contains a
+   *  comma-separated list of option names (like "option,o"). Single character becomes short
+   *  name (-o), longer string becomes long name (--option). After option is instantiated it
+   *  has to be added to parser using AppCmdLine::addOption() method. To get current value of
+   *  option argument use value() method.
+   *
+   *  @param[in] optNames    Comma-separated option names.
+   *  @param[in] name        Name for option argument, something like "path", "number", etc. Used
+   *                         only for information purposes when usage() is called.
+   *  @param[in] descr       Long description for the option, printed when usage() is called.
+   *  @param[in] defValue    Value returned from value() if option is not specified on command line.
+   */
+  AppCmdOptSize ( const std::string& optNames,
                   const std::string& name,
                   const std::string& descr,
                   value_type defValue ) ;
-  // option with the short name only
+
+  /**
+   *  @brief Define an option with a required argument.
+   *
+   *  @deprecated This constructor is for backward-compatibility only, use constructor with
+   *  optNames argument in the new code.
+   *
+   *  This constructor defines an option with short name (-o) which has a required
+   *  argument. After option is instantiated it has to be added to  parser using
+   *  AppCmdLine::addOption() method. To get current value of option argument use value() method.
+   *
+   *  @param[in] shortOpt    Short one-character option name
+   *  @param[in] name        Name for option argument, something like "path", "number", etc. Used
+   *                         only for information purposes when usage() is called.
+   *  @param[in] descr       Long description for the option, printed when usage() is called.
+   *  @param[in] defValue    Value returned from value() if option is not specified on command line.
+   *
+   */
   AppCmdOptSize ( char shortOpt,
                   const std::string& name,
                   const std::string& descr,
                   value_type defValue ) ;
 
   // Destructor
-  virtual ~AppCmdOptSize () throw() ;
+  virtual ~AppCmdOptSize () ;
 
   /**
-   *  Returns true if option requires argument. Does not make sense for
-   *  positional arguments.
+   *  True if the value of the option was changed from command line or from option file.
    */
-  virtual bool hasArgument() const throw() ;
-
-  /**
-   *  Get the name of the argument, only used if hasArgument() returns true
-   */
-  virtual const std::string& name() const throw() ;
-
-  /**
-   *  Get one-line description
-   */
-  virtual const std::string& description() const throw() ;
-
-  /**
-   *  Return short option symbol for -x option, or @c NULL if no short option
-   */
-  virtual char shortOption() const throw() ;
-
-  /**
-   *  Return long option symbol for --xxxxx option, or empty string
-   */
-  virtual const std::string& longOption() const throw() ;
-
-  /**
-   *  Set option's argument. The value string will be empty if hasArgument() is false
-   */
-  virtual void setValue( const std::string& value ) throw(AppCmdException) ;
-
-  /**
-   *  True if the value of the option was changed from command line.
-   */
-  virtual bool valueChanged() const throw() ;
+  virtual bool valueChanged() const ;
 
   /**
    *  Return current value of the option
    */
-  virtual value_type value() const throw() ;
+  virtual value_type value() const ;
 
   /**
    *  Return default value of the argument
    */
-  value_type defValue() const throw() { return _defValue ; }
-
-  /**
-   *  Reset option to its default value
-   */
-  virtual void reset() throw() ;
+  value_type defValue() const { return _defValue ; }
 
 protected:
 
 private:
 
+  /**
+   *  Returns true if option requires argument. Does not make sense for
+   *  positional arguments.
+   */
+  virtual bool hasArgument() const ;
+
+  /**
+   *  @brief Set option's argument.
+   *
+   *  This method is called by parser when option is found on command line.
+   *  The value string will be empty if hasArgument() is false.
+   *  Shall throw an exception in case of value conversion error.
+   *
+   *  @throw AppCmdException Thrown if string to value conversion fails.
+   */
+  virtual void setValue( const std::string& value ) ;
+
+  /**
+   *  Reset option to its default value
+   */
+  virtual void reset() ;
+
+
   // Data members
-  const char _shortOpt ;
-  const std::string _longOpt ;
-  const std::string _name ;
-  const std::string _descr ;
   value_type _value ;
   const value_type _defValue ;
   bool _changed ;
 
-  // Copy constructor and assignment are disabled by default
+  // This class in non-copyable
   AppCmdOptSize ( const AppCmdOptSize& ) ;
   AppCmdOptSize& operator = ( const AppCmdOptSize& ) ;
 

@@ -75,4 +75,9 @@ AppCmdArgOrderException::AppCmdArgOrderException ( const std::string& arg )
 {
 }
 
+AppCmdOptNameException::AppCmdOptNameException ( const std::string& option )
+  : AppCmdException( "option name cannot start with dash: "+option )
+{
+}
+
 } // namespace AppUtils

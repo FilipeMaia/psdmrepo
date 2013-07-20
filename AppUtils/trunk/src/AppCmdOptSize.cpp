@@ -43,26 +43,18 @@ AppCmdOptSize::AppCmdOptSize ( char shortOpt,
                                const std::string& name,
                                const std::string& descr,
                                value_type defValue )
-  : AppCmdOptBase()
-  , _shortOpt(shortOpt)
-  , _longOpt(longOpt)
-  , _name(name)
-  , _descr(descr)
+  : AppCmdOptBase(longOpt+","+std::string(1, shortOpt), name, descr)
   , _value(defValue)
   , _defValue(defValue)
   , _changed(false)
 {
 }
 
-AppCmdOptSize::AppCmdOptSize ( const std::string& longOpt,
+AppCmdOptSize::AppCmdOptSize ( const std::string& optNames,
                                const std::string& name,
                                const std::string& descr,
                                value_type defValue )
-  : AppCmdOptBase()
-  , _shortOpt('\0')
-  , _longOpt(longOpt)
-  , _name(name)
-  , _descr(descr)
+  : AppCmdOptBase(optNames, name, descr)
   , _value(defValue)
   , _defValue(defValue)
   , _changed(false)
@@ -73,11 +65,7 @@ AppCmdOptSize::AppCmdOptSize ( char shortOpt,
                                const std::string& name,
                                const std::string& descr,
                                value_type defValue )
-  : AppCmdOptBase()
-  , _shortOpt(shortOpt)
-  , _longOpt()
-  , _name(name)
-  , _descr(descr)
+  : AppCmdOptBase(std::string(1, shortOpt), name, descr)
   , _value(defValue)
   , _defValue(defValue)
   , _changed(false)
@@ -85,7 +73,7 @@ AppCmdOptSize::AppCmdOptSize ( char shortOpt,
 }
 
 // Destructor
-AppCmdOptSize::~AppCmdOptSize( ) throw()
+AppCmdOptSize::~AppCmdOptSize( )
 {
 }
 
@@ -94,52 +82,16 @@ AppCmdOptSize::~AppCmdOptSize( ) throw()
  *  positional arguments.
  */
 bool
-AppCmdOptSize::hasArgument() const throw()
+AppCmdOptSize::hasArgument() const
 {
   return true ;
-}
-
-/**
- *  Get the name of the parameter
- */
-const std::string&
-AppCmdOptSize::name() const throw()
-{
-  return _name ;
-}
-
-/**
- *  Get one-line description
- */
-const std::string&
-AppCmdOptSize::description() const throw()
-{
-  return _descr ;
-}
-
-/**
- *  Return short option symbol for -x option
- */
-char
-AppCmdOptSize::shortOption() const throw()
-{
-  return _shortOpt ;
-}
-
-/**
- *  Return long option symbol for --xxxxx option
- */
-const std::string&
-AppCmdOptSize::longOption() const throw()
-{
-  return _longOpt ;
 }
 
 /**
  *  Set the value of the argument.
  */
 void
-AppCmdOptSize::setValue ( const std::string& value ) throw(AppCmdException)
+AppCmdOptSize::setValue ( const std::string& value )
 {
   char* eptr ;
   value_type tmp = std::strtoull ( value.c_str(), &eptr, 0 ) ;
@@ -166,7 +118,7 @@ AppCmdOptSize::setValue ( const std::string& value ) throw(AppCmdException)
  *  True if the value of the option was changed from command line.
  */
 bool
-AppCmdOptSize::valueChanged () const throw()
+AppCmdOptSize::valueChanged () const
 {
   return _changed ;
 }
@@ -175,7 +127,7 @@ AppCmdOptSize::valueChanged () const throw()
  *  Return current value of the argument
  */
 AppCmdOptSize::value_type
-AppCmdOptSize::value() const throw()
+AppCmdOptSize::value() const
 {
   return _value ;
 }
@@ -184,7 +136,7 @@ AppCmdOptSize::value() const throw()
  *  reset option to its default value
  */
 void
-AppCmdOptSize::reset() throw()
+AppCmdOptSize::reset()
 {
   _value = _defValue ;
   _changed = false ;

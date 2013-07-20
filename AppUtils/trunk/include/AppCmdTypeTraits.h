@@ -50,6 +50,8 @@ namespace AppUtils {
 /**
  *  @ingroup AppUtils
  *
+ *  @brief Type traits used by AppCmdLine classes.
+ *
  *  Type traits for the command line options and arguments. Every type
  *  to be used as the template parameter for classes AppCmdArg<T> or
  *  AppCmdOpt<T> should provide specialization for the AppCmdTypeTraits<T>
@@ -77,7 +79,7 @@ struct AppCmdTypeTraits {
  */
 template<>
 struct AppCmdTypeTraits<long> {
-  static long fromString ( const std::string& str ) throw(AppCmdTypeCvtException) {
+  static long fromString ( const std::string& str ) {
     const char* nptr = str.c_str() ;
     char* end ;
     errno = 0 ; // not thread-safe
@@ -97,7 +99,7 @@ struct AppCmdTypeTraits<long> {
  */
 template<>
 struct AppCmdTypeTraits<int> {
-  static int fromString ( const std::string& str ) throw(AppCmdTypeCvtException) {
+  static int fromString ( const std::string& str ) {
     try {
       long res = AppCmdTypeTraits<long>::fromString( str ) ;
       if ( res >= INT_MIN && res <= INT_MAX ) return int(res) ;
@@ -112,7 +114,7 @@ struct AppCmdTypeTraits<int> {
  */
 template<>
 struct AppCmdTypeTraits<unsigned long> {
-  static unsigned long fromString ( const std::string& str ) throw(AppCmdTypeCvtException) {
+  static unsigned long fromString ( const std::string& str ) {
     const char* nptr = str.c_str() ;
     char* end ;
     errno = 0 ;
@@ -132,7 +134,7 @@ struct AppCmdTypeTraits<unsigned long> {
  */
 template<>
 struct AppCmdTypeTraits<unsigned int> {
-  static unsigned int fromString ( const std::string& str ) throw(AppCmdTypeCvtException) {
+  static unsigned int fromString ( const std::string& str ) {
     try {
       unsigned long res = AppCmdTypeTraits<unsigned long>::fromString( str ) ;
       // check the range
@@ -148,7 +150,7 @@ struct AppCmdTypeTraits<unsigned int> {
  */
 template<>
 struct AppCmdTypeTraits<std::string> {
-  static std::string fromString ( const std::string& str ) throw() {
+  static std::string fromString ( const std::string& str ) {
     return str ;
   }
 };
@@ -158,7 +160,7 @@ struct AppCmdTypeTraits<std::string> {
  */
 template<>
 struct AppCmdTypeTraits<bool> {
-  static bool fromString ( const std::string& str ) throw(AppCmdTypeCvtException) {
+  static bool fromString ( const std::string& str ) {
     if ( str == "true" || str == "TRUE" || str == "1" || str == "yes" || str == "YES" ) {
       return true ;
     } else if ( str == "false" || str == "FALSE" || str == "0" || str == "no" || str == "NO" ) {
@@ -174,7 +176,7 @@ struct AppCmdTypeTraits<bool> {
  */
 template<>
 struct AppCmdTypeTraits<double> {
-  static double fromString ( const std::string& str ) throw(AppCmdTypeCvtException) {
+  static double fromString ( const std::string& str ) {
     const char* nptr = str.c_str() ;
     char* end ;
     errno = 0;
@@ -194,7 +196,7 @@ struct AppCmdTypeTraits<double> {
  */
 template<>
 struct AppCmdTypeTraits<float> {
-  static float fromString ( const std::string& str ) throw(AppCmdTypeCvtException) {
+  static float fromString ( const std::string& str ) {
     const char* nptr = str.c_str() ;
     char* end ;
     errno = 0;
