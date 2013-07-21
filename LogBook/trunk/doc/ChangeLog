@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-09
+2013-07-21 Andy Salnikov
+- update LogBookTestApp for changes in CmdLine interfaces
+
 Tag: V00-03-08
 2013-05-21 Igor Gaponenko
 - added updated schema file to support the 'EPICS' run type

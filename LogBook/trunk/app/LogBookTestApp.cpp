@@ -14,7 +14,6 @@
 // C/C++ Headers --
 //-----------------
 
-#include <list>
 #include <string>
 #include <iostream>
 #include <iomanip>
@@ -256,50 +255,44 @@ private:
 
 LogBookTestApp::LogBookTestApp (const std::string& appName) :
     AppUtils::AppBase (appName),
-    m_command ("command",
+    m_command (parser(),
+               "command",
                "command name"),
-    m_args ("arguments",
+    m_args (parser(),
+            "arguments",
             "command specific arguments; use command 'help' for detail",
-            std::list<std::string >()),
-    m_source ('s',
-              "source",
+            std::vector<std::string >()),
+    m_source (parser(),
+              "s,source",
               "string",
               "a source of the modification",
               "TEST"),
-    m_config_file ('c',
-                   "config-file",
+    m_config_file (parser(),
+                   "c,config-file",
                    "string",
                    "Configuration file with MySQL connection parameters",
                    ""),
-    m_host ('H',
-            "host",
+    m_host (parser(),
+            "H,host",
             "string",
             "MySQL host to connect to",
             "localhost"),
-    m_user ('U',
-            "user",
+    m_user (parser(),
+            "U,user",
             "string",
             "MySQL user account",
             ""),
-    m_password ('P',
-            "password",
+    m_password (parser(),
+            "P,password",
             "string",
             "MySQL account password",
             ""),
-    m_update ('u',
-              "update",
+    m_update (parser(),
+              "u,update",
               "update is allowed",
               0),
     m_connection (0)
 {
-    addArgument (m_command) ;
-    addArgument (m_args) ;
-    addOption   (m_source) ;
-    addOption   (m_config_file) ;
-    addOption   (m_host) ;
-    addOption   (m_user) ;
-    addOption   (m_password) ;
-    addOption   (m_update) ;
 }
 
 LogBookTestApp::~LogBookTestApp ()
