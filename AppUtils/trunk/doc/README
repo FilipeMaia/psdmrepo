@@ -65,9 +65,11 @@ Class AppCmdLine
 Typical usage of this class:
 
   1. instantiate an object of this class
-  2. call addOption() zero or more times to define options
-  3. call addArgument() zero or more times to define positional 
-     (required) arguments
+  2. either call addOption() zero or more times to define options or
+     provide AppCmdLine as argument to constructor of option classes
+  3. either call addArgument() zero or more times to define positional 
+     arguments or provide AppCmdLine as argument to constructor of 
+     positional argument classes
   4. optionally call setOptionsFile() to define additional file with 
      optional parameters
   5. call parse() method to parse the command line and options file and 
@@ -81,7 +83,7 @@ Method AppCmdLine::addArgument
 
 Declaration:
 
-    void addArgument ( AppCmdArgBase& arg )
+    void addArgument(AppCmdArgBase& arg)
 
 Adds one more positional argument. The argument object supplied is not 
 copied, only its address is remembered. The lifetime of the argument 
@@ -89,14 +91,18 @@ should extend to the parse() method of this class. This method throws
 an exception in case of errors (for example when required argument is
 defined after optional arguments). The order of the positional arguments
 on the command line is determined by the order in which addArgument() 
-is called.  
+is called. 
+
+Instead of calling addArgument() method for each AppCmdArgBase instance 
+it is easier (and preferred) to provide AppCmdLine instance as an argument
+to the constructor of corresponding AppCmdArgBase subclass.
 
 Method AppCmdLine::addOption
 ----------------------------
 
 Declaration:
 
-    void addOption ( AppCmdOptBase& option )
+    void addOption(AppCmdOptBase& option)
 
 Adds one more command option. The option object supplied is not copied,
 only its address is remembered. The lifetime of the argument should 
@@ -104,13 +110,17 @@ extend to the parse() method of this class. This method throws
 an exception in case of errors (for example if the option name is 
 defined twice).
 
+Instead of calling addOption() method for each AppCmdOptBase instance 
+it is easier (and preferred) to provide AppCmdLine instance as an argument
+to the constructor of corresponding AppCmdOptBase subclass.
+
 Method AppCmdLine::setOptionsFile
 ---------------------------------
 
 Declaration:
 
-    void setOptionsFile ( AppCmdOpt<std::string>& option )
-    
+    void setOptionsFile(AppCmdOpt<std::string>& option)
+
 Defines an option which will specify the name of the options file.
 Only one options file is allowed per parser, attempt to add one
 more will result in exception. The lifetime of the argument should
@@ -123,21 +133,33 @@ below for the description of the options file.
 Method AppCmdLine::parse
 ------------------------
 
-Declaration:
+There are few overloaded parse() methods, their declarations:
 
-    void parse ( int argc, char* argv[] ) ;
-    void parse ( int argc, const char* argv[] ) ;
+    void parse(int argc, char* argv[]);
+    void parse(int argc, const char* argv[]);
     template <typename Iter>
-      void parse ( Iter begin, Iter end ) ;
+      void parse(Iter begin, Iter end);
 
 Parse function examines command line and options file and sets 
 corresponding arguments and options. There are few overloaded versions
-of the method accepting different form of "command line". Will throw
-and exception in case of the parsing errors.
+of the method accepting different form of "command line". First two 
+methods accept the same parameters as main() function, meaning that
+argv[0] contains application name/path. parse() does not use argv[0]
+and discards it. Last form of parse accepts pair of iterators, in
+this case it is expected that begin iterator points to the first 
+option or positional parameter, not to application name.
+
+If parse() meets help option on command line (-h or --help) it will
+stop parsing and return immediately. In this case helpWanted() method 
+will return true if called after parse() and user should not expect
+values of any options or arguments.
+
+parse() will throw an exception in case of the parsing errors. 
 
 Method AppCmdLine::helpWanted
 -----------------------------
 
+After calling parse() user should always call helpWanted() method.
 This method will return true after parse() if the help option has 
 appeared on the command line. It's user's responsibility to take 
 corresponding action in this case. Usually something like this will
@@ -154,6 +176,10 @@ appear in your application:
      cmdline.usage( cout ) ;
      exit(0) ; // exit() may not be good idea, for illustration only here
    }
+
+If helpWanted() returns true all options/arguments on command line may be 
+ignored, the only reasonable action to performa in this case is to print
+help message and exit application.
 
 Method AppCmdLine::usage
 ------------------------
@@ -189,15 +215,20 @@ base, this means you can specify it using decimal, octal or hex notation
 give false, anything else is an error.
 
 The argument made with this class can be required or non-required 
-depending on which constructor you use. Constructor
+depending on which constructor you use. Constructors
 
-  AppCmdArg<T> ( string name, string description )
+  AppCmdArg<T>(string name, string description)
+  AppCmdArg<T>(AppCmdLine& parser, string name, string description)
 
-is used to make required arguments, constructor
+is used to make required arguments, constructors
 
-  AppCmdArg<T> ( string name, string description, T defValue )
+  AppCmdArg<T>(string name, string description, T defValue)
+  AppCmdArg<T>(AppCmdLine& parser, string name, string description, T defValue)
 
-is used to make optional arguments with a default value.
+is used to make optional arguments with a default value. Out of two pairs
+of constructors the form which takes AppCmdLine& parameter automatically
+adds argument to the parser, there is no need to call addArgument() if one
+uses these constructors.
 
 To get the current value of the argument use the 
 
@@ -215,12 +246,14 @@ member functions which return iterators for the list of values.
 
 Constructor
 
-  AppCmdArgList<T> ( string name, string description )
+  AppCmdArgList<T>(string name, string description)
+  AppCmdArgList<T>(AppCmdLine& parser, string name, string description)
 
 makes a required positional argument for which there must be at least
 one argument on the command line. Constructor
 
-  AppCmdArgList<T> ( string name, string& description, list<T> defVal )
+  AppCmdArgList<T>(string name, string description, vector<T> defVal)
+  AppCmdArgList<T>(AppCmdLine& parser, string name, string description, vector<T> defVal)
 
 makes a non-required argument with some default value.
 
@@ -252,12 +285,14 @@ obtained through the value() member function.
 
 These constructors are defined for the class:
 
-  // make option with both short and long names
-  AppCmdOptToggle(char shortName, string longName, string description, bool defValue=false)
-  // make option with long name only
-  AppCmdOptToggle(string longName, string description, bool defValue=false)
-  // make option with short name only
-  AppCmdOptToggle(char shortName, string description, bool defValue=false)
+  AppCmdOptBool(string optionNames, string description, bool defValue=false)
+  AppCmdOptBool(AppCmdLine& parser, string optionNames, string description, 
+                bool defValue=false)
+
+optionNames parameter is a comma-separated list of option names, for 
+example "v,verbose". The form which takes AppCmdLine& parameter 
+automatically adds option to the parser, there is no need to call 
+addArgument() if one uses this constructor.
 
 Class AppCmdOptToggle
 ---------------------
@@ -269,12 +304,9 @@ after parse() can be obtained through the value() member function.
 
 These constructors are defined for the class:
 
-  // make option with both short and long names
-  AppCmdOptToggle(char shortName, string longName, string description, bool defValue=false)
-  // make option with long name only
-  AppCmdOptToggle(string longName, string description, bool defValue=false)
-  // make option with short name only
-  AppCmdOptToggle(char shortName, string description, bool defValue=false)
+  AppCmdOptToggle(string optionNames, string description, bool defValue=false)
+  AppCmdOptToggle(AppCmdLine& parser, string optionNames, string description, 
+                  bool defValue=false)
 
 Class AppCmdOptIncr
 -------------------
@@ -287,12 +319,9 @@ obtained through the value() member function.
 
 These constructors are defined for the class:
 
-  // make option with both short and long names
-  AppCmdOptIncr(char shortName, string& longName, string description, int defValue=0)
-  // option with the long name only
-  AppCmdOptIncr (string longName, string description, int defValue=0)
-  // option with the short name only
-  AppCmdOptIncr(char shortName, string description, int defValue=0)
+  AppCmdOptIncr(string optionNames, string description, int defValue=0)
+  AppCmdOptIncr(AppCmdLine& parser, string optionNames, string description, 
+                int defValue=0)
 
 Class AptCmdOpt<T>
 ------------------
@@ -307,13 +336,9 @@ These constructors are defined for the class (parameter argName provides
 a name for the argument, such as "path" or "number", used for displaying
 usage information):
 
-  // make option with both short and long names
-  AppCmdOpt<T>(char shortName, string& longName, string argName, 
-               string description, T defValue)
-  // option with the long name only
-  AppCmdOpt<T>(string longName, string argName, string description, T defValue)
-  // option with the short name only
-  AppCmdOpt<T>(char shortName, string argName, string description, T defValue)
+  AppCmdOpt<T>(string optionNames, string argName, string description, T defValue)
+  AppCmdOpt<T>(AppCmdLine& parser, string optionNames, string argName, string description, 
+               T defValue)
 
 Class AptCmdOptList<T>
 ----------------------
@@ -336,15 +361,10 @@ and end() return results like in the AppCmdArgList class.
 These constructors are defined for the class (parameter argName has the 
 same meaning as in the previous class):
 
-  // make option with both short and long names
-  AppCmdOptList<T>(char shortName, string longName, string argName,
-                  string description, char separator=',') ;
-  // make option with long name only
-  AppCmdOptList<T>(string longName, string argName,
-                  string description, char separator=',')
-  // make option with short name only
-  AppCmdOptList<T>(char shortName, string argName,
-                  string description, char separator=',')
+  AppCmdOptList<T>(string optionNames, string argName, string description, 
+                   char separator=',')
+  AppCmdOptList<T>(AppCmdLine& parser, string optionNames, string argName, 
+                   string description, char separator=',')
 
 Class AptCmdOptSize
 -------------------
@@ -360,13 +380,10 @@ These constructors are defined for the class (parameter argName provides
 a name for the argument, such as "size" or "bytes", used for displaying
 usage information):
 
-  // make option with both short and long names
-  AptCmdOptSize(char shortName, string& longName, string argName, 
+  AptCmdOptSize(string optionNames, string argName, string description, 
+                uint64_t defValue)
+  AptCmdOptSize(AppCmdLine& parser, string optionNames, string argName, 
                 string description, uint64_t defValue)
-  // option with the long name only
-  AptCmdOptSize(string longName, string argName, string description, uint64_t defValue)
-  // option with the short name only
-  AptCmdOptSize(char shortName, string argName, string description, uint64_t defValue)
 
 Class AptCmdOptNamedValue<T>
 ----------------------------
@@ -378,7 +395,7 @@ to transform them into a set of numbers for example. The mapping from
 possible set of names to values of other type is defined through the 
 method 
 
-  void add ( string name, T value )
+  void add(string name, T value)
   
 which has to be called once for every acceptable name, like in this 
 example:
@@ -395,42 +412,46 @@ the value() member function.
 These constructors are defined for the class (parameter argName has the 
 same meaning as in the previous class):
 
-  // make option with both short and long names
-  AppCmdOptNamedValue<T>(char shortName, string longName, string argName,
-                        string description, T defValue ) ;
-  // make option with long name only
-  AppCmdOptNamedValue<T>(string longName, string argName,
-                        string description, T defValue ) ;
-  // make option with short name only
-  AppCmdOptNamedValue<T>(char shortName, string argName,
-                        string description, T defValue ) ;
+  AppCmdOptNamedValue<T>(string optionNames, string argName, string description, 
+                         T defValue ) ;
+  AppCmdOptNamedValue<T>(AppCmdLine& parser, string optionNames, string argName, 
+                         string description, T defValue ) ;
 
 
 Options file
 ------------
 
 In addition to providing all the options on the command line the same 
-options can be defined in the options file. this can be useful when 
+options can be defined in the options file. This can be useful when 
 the options list becomes very long or if you want to keep predefined 
 set of options for standard situations. For option parser to read an
-option file one has to call parser's method setOptionsFile() and
+option files one has to call parser's method setOptionsFile() and
 pass it an option which will be used to define the name of the 
-options file. Here are examples:
+options file. setOptionsFile() accepts option of type AppCmdOptList<std::string>
+which means that one can specify multiple file names on the command 
+line, they all will be read in the order they were given. If the option 
+appears both in option files and explicitly on command line the command 
+line value overrides value in option file. setOptionsFile() can be 
+called alone or after addOption has been called() for the same option.
+
+Here are examples:
 
   // provide options file, but do not set default name for it,
   // user will provide file name on the command line like
   // '-o myoptions.cfg' or '--options-file=myoptions.cfg' 
   AppCmdLine parser( argv[0] ) ;
-  AppCmdOpt<std::string> optOptionsFile('o',"options-file","path",
-                         "name of the options file","") ;
+  AppCmdOptList<std::string> optOptionsFile("o,options-file", "path",
+                         "name of the options file") ;
   parser.setOptionsFile(optOptionsFile) ;
+
   
   // provide options file, and set default name for it (appoptions.cfg),
   // user can override file name on the command line like
   // '-o myoptions.cfg' or '--options-file=myoptions.cfg' 
   AppCmdLine parser( argv[0] ) ;
-  AppCmdOpt<std::string> optOptionsFile('o',"options-file","path",
-                         "name of the options file","appoptions.cfg") ;
+  std::vector<std::string> defOptionFile(1, "appoptions.cfg");
+  AppCmdOptList<std::string> optOptionsFile("o,options-file", "path",
+                         "name of the options file", defOptionFile) ;
   parser.setOptionsFile(optOptionsFile) ;
 
 The options file consists of the series of lines, with one option per 
@@ -562,13 +583,10 @@ private :
 
 EchoApp::EchoApp( const std::string& appname )
   : AppUtils::AppBase(appname)
-  , m_noEcho( 'n', "disable output of new line", 0 )
-  , m_sep( 's', "separator", "string", "output word separator", " " )
-  , m_args ( "strings", "the list of strings to print", std::list<std::string>() )
+  , m_noEcho(parser(), "n,no-new-line", "disable output of new line", false)
+  , m_sep(parser(), "s,separator", "string", "output word separator", " ")
+  , m_args(parser(), "strings", "the list of strings to print", std::list<std::string>())
 {
-  addOption( m_noEcho ) ;
-  addOption( m_sep ) ;
-  addArgument( m_args ) ;
 }
 
 int EchoApp::runApp()
