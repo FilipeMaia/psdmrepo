@@ -1,0 +1,151 @@
+#
+#  $Id$
+#
+
+Package coordinator: Andy Salnikov <salnikov@slac.stanford.edu>
+
+This package will contain various system-level interfaces an utilities.
+The goal is to keep the dependencies of this package at minimum, things
+which depends on a big stuff like Framework or CERNLIB are not allowed 
+here! Dependencies which are OK: libc, C++ standard library, ErrLogger.
+
+Following is a brief description of stuff currently here.
+
+
+		SysMailer class
+
+  This is a convenience utility class. Instance of this class "constructs" a 
+  mail message with the given topic and adressee (list). It gives you a 
+  stream (ostream) where you can write the body of the message. Calling 
+  send() method on instance will send it using /usr/lib/sendmail.
+
+
+		SysCmdLine and friends.
+
+  These are replacement for CLHEP CmdLine and CmdArg classes with many 
+  improvements and bug fixes. Helps you to build OO-command-line-parsing- 
+  with-dynamically-added-options-and-parameters-bla-bla-bla.
+
+  An example of usage:
+
+	int main( int argc, char* argv[] ) 
+	{
+	  // instantiate parser
+	  SysCmdLine cmdline( argv[0] ) ;
+
+	  bool ok ;
+
+	  // add some options
+	  SysCmdOptIncr optVerbose ( 'v', "verbose", "produce more noise", 0 ) ;
+	  ok = cmdline.addOption ( optVerbose ) ;
+	  SysCmdOpt<BdbTime> optTime ( 'b', "begin", "time", "start time for interval scan", BdbTime::minusInfinity ) ;
+	  ok = cmdline.addOption ( optTime ) ;
+	  
+	  // add some positional parameters, first is required, second is optional
+	  SysCmdArg<std::string> argString( "name", "specifies the name of the game" ) ;
+	  ok = cmdline.addArgument ( argString ) ;
+	  SysCmdArg<int> argInt( "retries", "optional number of retries, def: 1000", 1000 ) ;
+	  ok = cmdline.addArgument ( argInt ) ;
+	 
+	  // parse command line, set all options and arguments
+	  ok = cmdline.parse ( argc, argv ) ;
+	  if ( ! ok ) {
+            cerr << "Error parsing command line: " << cmdline.getErrorString() << "\n" ;
+	    cmdline.usage( cerr ) ;
+	    exit(2) ;  // exit() may not be good idea, for illustration only here
+	  } else if ( cmdline.helpWanted() ) {
+	    cmdline.usage( cout ) ;
+	    exit(0) ;  // exit() may not be good idea, for illustration only here
+	  }
+
+	  // using the values set by the parser
+	  if ( optVerbose.value() > 1 ) {
+	    cout << "Starting game " << argString.value() << endl ;
+	  }
+	  // etc....
+
+	}
+
+SysCmdLine class:
+
+  This is the actual command line parser. Main method is parse() which comes 
+  in to flavors, one takes ( argc-1, argv+1 ), another one takes a couple of 
+  iterators, any input iterator which derefenced can be converted to 
+  std::string is OK. Returns true if parsing was fine, false if something is 
+  wrong in the command line. There are special help options which could be 
+  present on the command line and understood by the parser: --help, -h, and 
+  -?. If parser encouters one of those then it immediately returns true from 
+  parse(). You have to call helpWanted() every time after parse() to see if 
+  any of the help option were given. Unlike CLHEP implementation, this 
+  parser does not print any help itself, you have to it yourself like in the 
+  example above.
+
+  Command line options can be specified either in the long form with two 
+  preceeding dashes (--option) or in the short form with one dash (-o). Some 
+  options can have their own arguments, this can be specified using any of 
+  these forms: 
+
+  --option=argument
+  --option argument
+  -o argument
+  -oargument
+
+  Options without argument can be combined into a single word when using 
+  their short form, e.g. -vvvxs is equivalent to -v -v -v -x -s (none of 
+  these options could have argument).
+
+  Positional arguments can be required and non-required. Non-required 
+  arguments have their default value which you can change from the command 
+  line. 
+
+  Following is the list of classes used to construct options and positional 
+  arguments.
+
+SysCmdArg<T> class:
+
+  This class represents a positional argument of a specific type. Type can 
+  be one of supported in SysCmdTypeTraits. Currently supported types are: 
+  int, long, unsigned int, unsigned long, bool, char, float, double, 
+  BdbTime. Integer types are converted from string using strto(u)l with zero 
+  base, this means you can specify it usin decimal, octal or hex notation (0 
+  or 0x prefixes). For bool type the wordc "true", "TRUE", "1", "yes, and 
+  "YES" all give true, the words "false", "FALSE", "0", "no", and "NO" all 
+  give false, anything else is an error.
+
+  The argument made with this class can be required or non-required 
+  depending on which constructor you use. To get the current value of the 
+  argument use the value() member function.
+
+SysCmdArgList<T> class:
+
+  This class can take more than one word from the command line and make a 
+  list of values from them. It behaves more or less the same as the above 
+  class, but to get the results from it you should use begin() and end() 
+  member functions which return iterators for the list of values.
+
+SysCmdOptToggle class:
+
+  This class represents a command line option without argument. The option 
+  has boolean value which will change its value for every appearance of the 
+  option in the command line.
+
+SysCmdOptIncr class:
+
+  This class represents a command line option without argument. Every 
+  appearance of the option on the command line will increment the current 
+  value of the option, value has an int type, and you can set its starting 
+  value in constructor.
+
+SysCmdOpt<T> class:
+
+  This class defines a command line option with argument. This is a templated
+  class parameterized by the type of the argument. See the description of the 
+  SysCmdArg class for information on which types can be used.
+
+SysCmdOptList<T> class:
+
+  This class makes a list of values from the command line options. Every 
+  appearance of the option on the command line adds its argument to the list 
+  of values in the option of this class. Types supported are the same as in 
+  the previous class. Methods begin() and end() return results like in the 
+  SysCmdArgList class.
