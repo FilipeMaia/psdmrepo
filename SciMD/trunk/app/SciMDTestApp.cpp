@@ -16,7 +16,6 @@
 // C/C++ Headers --
 //-----------------
 
-#include <list>
 #include <string>
 #include <iostream>
 #include <sstream>
@@ -181,38 +180,34 @@ private:
 
 SciMDTestApp::SciMDTestApp (const std::string& appName) :
     AppUtils::AppBase (appName),
-    m_command ("command",
+    m_command (parser(),
+               "command",
                "command name"),
-    m_args ("arguments",
+    m_args (parser(),
+            "arguments",
             "command specific arguments; use command 'help' for detail",
-            std::list<std::string >()),
-    m_source ('s',
-              "source",
+            std::vector<std::string >()),
+    m_source (parser(),
+              "s,source",
               "string",
               "a source of the modification",
               "TEST"),
-    m_odbc_conn_scimd ('c',
-                       "odbc-conn-scimd",
+    m_odbc_conn_scimd (parser(),
+                       "c,odbc-conn-scimd",
                        "string",
                        "ODBC connection string for SciMD",
                        "DSN=SCIMD"),
-    m_odbc_conn_regdb ('r',
-                       "odbc-conn-regdb",
+    m_odbc_conn_regdb (parser(),
+                       "rodbc-conn-regdb",
                        "string",
                        "ODBC connection string for RegDB",
                        "DSN=REGDB"),
-    m_update ('u',
-              "update",
+    m_update (parser(),
+              "u,update",
               "update is allowed",
               0),
     m_connection (0)
 {
-    addArgument (m_command) ;
-    addArgument (m_args) ;
-    addOption   (m_source) ;
-    addOption   (m_odbc_conn_scimd) ;
-    addOption   (m_odbc_conn_regdb) ;
-    addOption   (m_update) ;
 }
 
 SciMDTestApp::~SciMDTestApp ()
