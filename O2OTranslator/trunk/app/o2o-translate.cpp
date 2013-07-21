@@ -119,70 +119,43 @@ private:
 //----------------
 O2O_Translate::O2O_Translate ( const std::string& appName )
   : AppBase( appName )
-  , m_optionsFile( 'o', "options-file", "path",     "file name with options, multiple allowed", '\0' )
-  , m_calibDir   ( 'C', "calib-dir",    "path",     "directory with calibration data, def: none", "" )
-  , m_compression( 'c', "compression",  "number",   "compression level, -1..9, def: -1", -1 )
-  , m_chunkSize  ( 'k', "chunk-size",   "size",     "HDF5 chunk size, def: 16M", 16*1024*1024 )
-  , m_dgramsize  ( 'g', "datagram-size","size",     "option is ignored and deprecated", 0 )
-  , m_dgramQSize ( 'Q', "datagram-queue","number",  "datagram queue size. def: 32", 32 )
-  , m_experiment ( 'x', "experiment",   "string",   "experiment name", "" )
-  , m_extGroups  ( 'G', "group-time",               "use extended group names with timestamps", false )
-  , m_shortTimeStamp (  "short-timestamp",          "only store sends and nanoseconds in time dataset", false )
-  , m_noMissData (      "no-missing-data",          "do not fill missing data values", false )
-  , m_noDamageDs (      "no-damage-ds",             "do not store damage dataset", false )
-  , m_instrument ( 'i', "instrument",   "string",   "instrument name", "" )
-  , m_l1offset   (      "l1-offset",    "number",   "L1Accept time offset seconds, def: 0", 0 )
-  , m_mergeMode  ( 'j', "merge-mode",   "mode-name","one of one-stream, no-chunking, file-name; def: file-name", 
+  , m_optionsFile( parser(), "o,options-file", "path",     "file name with options, multiple allowed", '\0' )
+  , m_calibDir   ( parser(), "C,calib-dir",    "path",     "directory with calibration data, def: none", "" )
+  , m_compression( parser(), "c,compression",  "number",   "compression level, -1..9, def: -1", -1 )
+  , m_chunkSize  ( parser(), "k,chunk-size",   "size",     "HDF5 chunk size, def: 16M", 16*1024*1024 )
+  , m_dgramsize  ( parser(), "g,datagram-size","size",     "option is ignored and deprecated", 0 )
+  , m_dgramQSize ( parser(), "Q,datagram-queue","number",  "datagram queue size. def: 32", 32 )
+  , m_experiment ( parser(), "x,experiment",   "string",   "experiment name", "" )
+  , m_extGroups  ( parser(), "G,group-time",               "use extended group names with timestamps", false )
+  , m_shortTimeStamp ( parser(), "short-timestamp",        "only store seconds and nanoseconds in time dataset", false )
+  , m_noMissData ( parser(), "no-missing-data",          "do not fill missing data values", false )
+  , m_noDamageDs ( parser(), "no-damage-ds",             "do not store damage dataset", false )
+  , m_instrument ( parser(), "i,instrument",   "string",   "instrument name", "" )
+  , m_l1offset   ( parser(), "l1-offset",      "number",   "L1Accept time offset seconds, def: 0", 0 )
+  , m_mergeMode  ( parser(), "j,merge-mode",   "mode-name","one of one-stream, no-chunking, file-name; def: file-name",
                   XtcInput::MergeFileName )
-  , m_metadata   ( 'm', "metadata",     "name:value", "science metadata values", '\0' )
-  , m_outputDir  ( 'd', "output-dir",   "path",     "directory to store output files, def: .", "." )
-  , m_tmpDir     ( 'D', "tmp-dir",      "path",     "directory to write temporary HDF5 files, def: ''", "" )
-  , m_backupExt  (      "h5-backup-ext","string",   "extension to use for HDF5 backup, def: ''", "" )
-  , m_outputName ( 'n', "output-name",  "template", "template string for output file names, def: {seq4}.h5", "{seq4}.h5" )
-  , m_overwrite  (      "overwrite",                "overwrite output file", false )
-  , m_runNumber  ( 'r', "run-number",   "number",   "run number, non-negative number; def: 0", 0 )
-  , m_runType    ( 't', "run-type",     "string",   "run type, DATA or CALIB, def: DATA", "DATA" )
-  , m_splitMode  ( 's', "split-mode",   "mode-name","one of none, scan, or size; def: none", O2OHdf5Writer::NoSplit )
-  , m_splitSize  ( 'z', "split-size",   "size",     "max. size of output files. def: 10G", 10*1073741824ULL )
-  , m_liveDbConn (      "live-db",      "string",   "database connection string for live database", "" )
-  , m_liveTable  (      "live-table",   "string",   "table name for live database, def: file", "file" )
-  , m_liveTimeout(      "live-timeout", "number",   "timeout for live data in seconds, def: 120", 120U )
-  , m_eventData  ( "event-file",   "file name(s) with XTC event data" )
+  , m_metadata   ( parser(), "m,metadata",     "name:value", "science metadata values", '\0' )
+  , m_outputDir  ( parser(), "d,output-dir",   "path",     "directory to store output files, def: .", "." )
+  , m_tmpDir     ( parser(), "D,tmp-dir",      "path",     "directory to write temporary HDF5 files, def: ''", "" )
+  , m_backupExt  ( parser(), "h5-backup-ext",  "string",   "extension to use for HDF5 backup, def: ''", "" )
+  , m_outputName ( parser(), "n,output-name",  "template", "template string for output file names, def: {seq4}.h5", "{seq4}.h5" )
+  , m_overwrite  ( parser(), "overwrite",                "overwrite output file", false )
+  , m_runNumber  ( parser(), "r,run-number",   "number",   "run number, non-negative number; def: 0", 0 )
+  , m_runType    ( parser(), "t,run-type",     "string",   "run type, DATA or CALIB, def: DATA", "DATA" )
+  , m_splitMode  ( parser(), "s,split-mode",   "mode-name","one of none, scan, or size; def: none", O2OHdf5Writer::NoSplit )
+  , m_splitSize  ( parser(), "z,split-size",   "size",     "max. size of output files. def: 10G", 10*1073741824ULL )
+  , m_liveDbConn ( parser(), "live-db",        "string",   "database connection string for live database", "" )
+  , m_liveTable  ( parser(), "live-table",     "string",   "table name for live database, def: file", "file" )
+  , m_liveTimeout( parser(), "live-timeout",   "number",   "timeout for live data in seconds, def: 120", 120U )
+  , m_eventData  ( parser(), "event-data",     "file or dataset name(s) with XTC event data" )
 {
   setOptionsFile( m_optionsFile ) ;
-  addOption( m_calibDir ) ;
-  addOption( m_compression ) ;
-  addOption( m_chunkSize ) ;
-  addOption( m_dgramsize ) ;
-  addOption( m_dgramQSize ) ;
-  addOption( m_experiment ) ;
-  addOption( m_extGroups ) ;
-  addOption( m_shortTimeStamp ) ;
-  addOption( m_noMissData ) ;
-  addOption( m_noDamageDs ) ;
-  addOption( m_instrument ) ;
-  addOption( m_l1offset ) ;
-  addOption( m_mergeMode ) ;
   m_mergeMode.add ( "one-stream", XtcInput::MergeOneStream ) ;
   m_mergeMode.add ( "no-chunking", XtcInput::MergeNoChunking ) ;
   m_mergeMode.add ( "file-name", XtcInput::MergeFileName ) ;
-  addOption( m_metadata ) ;
-  addOption( m_outputDir ) ;
-  addOption( m_tmpDir ) ;
-  addOption( m_backupExt ) ;
-  addOption( m_outputName ) ;
-  addOption( m_overwrite ) ;
-  addOption( m_runNumber ) ;
-  addOption( m_runType ) ;
   m_splitMode.add ( "none", O2OHdf5Writer::NoSplit ) ;
   m_splitMode.add ( "size", O2OHdf5Writer::Family ) ;
   m_splitMode.add ( "scan", O2OHdf5Writer::SplitScan ) ;
-  addOption( m_splitMode ) ;
-  addOption( m_splitSize ) ;
-  addOption( m_liveDbConn ) ;
-  addOption( m_liveTable ) ;
-  addOption( m_liveTimeout ) ;
-  addArgument( m_eventData ) ;
 }
 
 //--------------

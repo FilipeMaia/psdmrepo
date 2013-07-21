@@ -15,7 +15,7 @@
 //-----------------
 #include <string>
 #include <map>
-#include <list>
+#include <vector>
 #include <boost/utility.hpp>
 
 //----------------------
@@ -63,7 +63,7 @@ public:
                 const std::string& instrument,
                 const std::string& experiment,
                 const std::string& calibDir,
-                const std::list<std::string>& extraMetaData ) ;
+                const std::vector<std::string>& extraMetaData ) ;
 
   // Destructor
   ~O2OMetaData () ;

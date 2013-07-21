@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-28-10
+2013-07-21 Andy Salnikov
+- another update for Cmdline interface improvements
+
 Tag: V00-28-09
 2013-07-20 Andy Salnikov
 - CmdLine interfaces changed slightly, need a fix here.

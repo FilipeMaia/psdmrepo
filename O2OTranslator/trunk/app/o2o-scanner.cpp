@@ -129,24 +129,17 @@ private:
 //----------------
 O2O_Scanner::O2O_Scanner ( const std::string& appName )
   : AppBase( appName )
-  , m_skipDamaged( 'd', "skip-damaged",             "skip damaged datagrams", false )
-  , m_l1offset   (      "l1-offset",    "number",   "L1Accept time offset seconds, def: 0", 0 )
-  , m_mergeMode  ( 'j', "merge-mode",   "mode-name","one of one-stream, no-chunking, file-name; def: file-name", XtcInput::MergeFileName )
-  , m_liveDbConn (      "live-db",      "string",   "database connection string for live database", "" )
-  , m_liveTable  (      "live-table",   "string",   "table name for live database, def: file", "file" )
-  , m_liveTimeout(      "live-timeout", "number",   "timeout for live data in seconds, def: 120", 120U )
-  , m_inputFiles ( "input-xtc", "the list of the input XTC files" )
+  , m_skipDamaged( parser(), "d,skip-damaged",           "skip damaged datagrams", false )
+  , m_l1offset   ( parser(), "l1-offset",    "number",   "L1Accept time offset seconds, def: 0", 0 )
+  , m_mergeMode  ( parser(), "j,merge-mode", "mode-name","one of one-stream, no-chunking, file-name; def: file-name", XtcInput::MergeFileName )
+  , m_liveDbConn ( parser(), "live-db",      "string",   "database connection string for live database", "" )
+  , m_liveTable  ( parser(), "live-table",   "string",   "table name for live database, def: file", "file" )
+  , m_liveTimeout( parser(), "live-timeout", "number",   "timeout for live data in seconds, def: 120", 120U )
+  , m_inputFiles ( parser(), "input-xtc",                "the list of the input XTC files" )
 {
-  addOption( m_skipDamaged ) ;
-  addOption( m_l1offset ) ;
-  addOption( m_mergeMode ) ;
   m_mergeMode.add ( "one-stream", XtcInput::MergeOneStream ) ;
   m_mergeMode.add ( "no-chunking", XtcInput::MergeNoChunking ) ;
   m_mergeMode.add ( "file-name", XtcInput::MergeFileName ) ;
-  addOption( m_liveDbConn ) ;
-  addOption( m_liveTable ) ;
-  addOption( m_liveTimeout ) ;
-  addArgument( m_inputFiles ) ;
 }
 
 //--------------

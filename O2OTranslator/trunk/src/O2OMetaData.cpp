@@ -41,7 +41,7 @@ O2OMetaData::O2OMetaData ( unsigned long runNumber,
                            const std::string& instrument,
                            const std::string& experiment,
                            const std::string& calibDir,
-                           const std::list<std::string>& extraMetaData )
+                           const std::vector<std::string>& extraMetaData )
   : m_runNumber(runNumber)
   , m_runType(runType)
   , m_instrument(instrument)
@@ -49,7 +49,7 @@ O2OMetaData::O2OMetaData ( unsigned long runNumber,
   , m_calibDir(calibDir)
   , m_extraMetaData()
 {
-  typedef std::list<std::string>::const_iterator MDIter ;
+  typedef std::vector<std::string>::const_iterator MDIter ;
   for ( MDIter it = extraMetaData.begin() ; it != extraMetaData.end() ; ++ it ) {
     const std::string& nameValue = *it ;
     std::string::size_type c = nameValue.find(':') ;
