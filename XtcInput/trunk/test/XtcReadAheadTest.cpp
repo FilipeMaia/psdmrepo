@@ -103,9 +103,8 @@ private:
 //----------------
 XtcReadAheadTest::XtcReadAheadTest ( const std::string& appName )
   : AppUtils::AppBase( appName )
-  , m_pathArg("path", "test file name" )
+  , m_pathArg(parser(), "path", "test file name" )
 {
-  addArgument( m_pathArg ) ;
 }
 
 /**

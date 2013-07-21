@@ -83,21 +83,14 @@ private:
 //----------------
 XtcFilterTest::XtcFilterTest ( const std::string& appName )
   : AppUtils::AppBase( appName )
-  , m_keepOpt( 'k', "keep", "number", "TypeId numbers to keep" )
-  , m_discardOpt( 'd', "discard", "number", "TypeId numbers to discard" )
-  , m_keepContOpt( 'c', "keep-empty-cont", "keep empty XTC containers", false )
-  , m_keepDgramOpt( 'g', "keep-empty-dgram", "keep empty datagrams", false )
-  , m_keepAnyOpt( 'a', "keep-any", "keep Any XTC", false )
-  , m_inputArg( "xtc-input", "input file name" )
-  , m_outputArg( "xtc-output", "output file name" )
+  , m_keepOpt( parser(), "k,keep", "number", "TypeId numbers to keep" )
+  , m_discardOpt( parser(), "d,discard", "number", "TypeId numbers to discard" )
+  , m_keepContOpt( parser(), "c,keep-empty-cont", "keep empty XTC containers", false )
+  , m_keepDgramOpt( parser(), "g,keep-empty-dgram", "keep empty datagrams", false )
+  , m_keepAnyOpt( parser(), "a,keep-any", "keep Any XTC", false )
+  , m_inputArg( parser(), "xtc-input", "input file name" )
+  , m_outputArg( parser(), "xtc-output", "output file name" )
 {
-  addOption( m_keepOpt ) ;
-  addOption( m_discardOpt ) ;
-  addOption( m_keepContOpt ) ;
-  addOption( m_keepDgramOpt ) ;
-  addOption( m_keepAnyOpt ) ;
-  addArgument( m_inputArg ) ;
-  addArgument( m_outputArg ) ;
 }
 
 //--------------

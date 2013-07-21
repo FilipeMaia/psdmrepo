@@ -91,11 +91,9 @@ private:
 //----------------
 XtcChunkDgIterTest::XtcChunkDgIterTest ( const std::string& appName )
   : AppUtils::AppBase( appName )
-  , m_timeoutOpt('t', "timeout", "number", "timeout in seconds, def: 10", 10)
-  , m_pathArg("path", "test file name" )
+  , m_timeoutOpt(parser(), "t,timeout", "number", "timeout in seconds, def: 10", 10)
+  , m_pathArg(parser(), "path", "test file name" )
 {
-  addOption( m_timeoutOpt ) ;
-  addArgument( m_pathArg ) ;
 }
 
 //--------------
