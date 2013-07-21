@@ -103,17 +103,12 @@ private:
 //----------------
 RdbMySQLDumpTable::RdbMySQLDumpTable ( const std::string& appName )
   : AppUtils::AppBase( appName )
-  , m_optHost ( 's', "host", "string", "remote host name", "" )
-  , m_optPort ( 'p', "port", "number", "remote port number", 0 )
-  , m_optUser ( 'u', "user", "string", "user name", "" )
-  , m_argDb ( "database", "database name" )
-  , m_argTable ( "table", "table name" )
+  , m_optHost ( parser(), "s,host", "string", "remote host name", "" )
+  , m_optPort ( parser(), "p,port", "number", "remote port number", 0 )
+  , m_optUser ( parser(), "u,user", "string", "user name", "" )
+  , m_argDb ( parser(), "database", "database name" )
+  , m_argTable ( parser(), "table", "table name" )
 {
-  addOption( m_optHost );
-  addOption( m_optPort );
-  addOption( m_optUser );
-  addArgument( m_argDb );
-  addArgument( m_argTable );
 }
 
 //--------------
