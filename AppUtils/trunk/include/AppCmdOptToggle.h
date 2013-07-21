@@ -70,23 +70,6 @@ public:
   /**
    *  @brief Define toggle-type option without argument.
    *
-   *  @deprecated This constructor is for backward-compatibility only, use constructor with
-   *  optNames argument in the new code.
-   *
-   *  This constructor defines an option with both short name (-o) and long name (--option).
-   *  After option is instantiated it has to be added to parser using AppCmdLine::addOption()
-   *  method. To get current value of option argument use value() method.
-   *
-   *  @param[in] shortOpt    Short one-character option name
-   *  @param[in] longOpt     Long option name (not including leading --)
-   *  @param[in] descr     description, one-line string
-   *  @param[in] defValue  initial value of the option
-   */
-  AppCmdOptToggle(char shortOpt, const std::string& longOpt, const std::string& descr, bool defValue = false);
-
-  /**
-   *  @brief Define toggle-type option without argument.
-   *
    *  This constructor can define option with both short name (-o) and long name (--option).
    *  All option names are defined via single constructor argument optNames which contains a
    *  comma-separated list of option names (like "option,o"). Single character becomes short
@@ -117,22 +100,6 @@ public:
    *  @param[in] defValue  initial value of the option
    */
   AppCmdOptToggle(AppCmdLine& parser, const std::string& optNames, const std::string& descr, bool defValue = false);
-
-  /**
-   *  @brief Define toggle-type option without argument.
-   *
-   *  @deprecated This constructor is for backward-compatibility only, use constructor with
-   *  optNames argument in the new code.
-   *
-   *  This constructor defines an option with short name (-o) only.
-   *  After option is instantiated it has to be added to parser using AppCmdLine::addOption()
-   *  method. To get current value of option argument use value() method.
-   *
-   *  @param[in] shortOpt  short form of the option, single character
-   *  @param[in] descr     description, one-line string
-   *  @param[in] defValue  initial value of the option
-   */
-  AppCmdOptToggle(char shortOpt, const std::string& descr, bool defValue = false);
 
   /// Destructor
   virtual ~AppCmdOptToggle( );

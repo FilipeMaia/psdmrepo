@@ -74,29 +74,6 @@ public:
   /**
    *  @brief Define an option with a required argument.
    *
-   *  @deprecated This constructor is for backward-compatibility only, use constructor with
-   *  optNames argument in the new code.
-   *
-   *  This constructor defines an option with both short name (-o) and long name
-   *  (--option) which has a required argument. The argument is given to option as
-   *  `-o value', `--option=value' on the command line or as `option = value' in
-   *  the options file. After option is instantiated it has to be added to parser
-   *  using AppCmdLine::addOption() method. To get current value of option argument
-   *  use value() method.
-   *
-   *  @param[in] shortOpt    Short one-character option name
-   *  @param[in] longOpt     Long option name (not including leading --)
-   *  @param[in] name        Name for option argument, something like "path", "number", etc. Used
-   *                         only for information purposes when usage() is called.
-   *  @param[in] descr       Long description for the option, printed when usage() is called.
-   *  @param[in] defValue    Value returned from value() if option is not specified on command line.
-   */
-  AppCmdOpt(char shortOpt, const std::string& longOpt, const std::string& name, const std::string& descr,
-      const Type& defValue);
-
-  /**
-   *  @brief Define an option with a required argument.
-   *
    *  This constructor can define option with both short name (-o) and long name (--option).
    *  All option names are defined via single constructor argument optNames which contains a
    *  comma-separated list of option names (like "option,o"). Single character becomes short
@@ -138,26 +115,6 @@ public:
    */
   AppCmdOpt(AppCmdLine& parser, const std::string& optNames, const std::string& name, const std::string& descr,
       const Type& defValue);
-
-  /**
-   *  @brief Define an option with a required argument.
-   *
-   *  @deprecated This constructor is for backward-compatibility only, use constructor with
-   *  optNames argument in the new code.
-   *
-   *  This constructor defines an option with short name (-o) which has a required
-   *  argument. The argument is given to option as `-o value' on the command line, option
-   *  cannot be used in the options file. After option is instantiated it has to be added to
-   *  parser using AppCmdLine::addOption() method. To get current value of option argument
-   *  use value() method.
-   *
-   *  @param[in] shortOpt    Short one-character option name
-   *  @param[in] name        Name for option argument, something like "path", "number", etc. Used
-   *                         only for information purposes when usage() is called.
-   *  @param[in] descr       Long description for the option, printed when usage() is called.
-   *  @param[in] defValue    Value returned from value() if option is not specified on command line.
-   */
-  AppCmdOpt(char shortOpt, const std::string& name, const std::string& descr, const Type& defValue);
 
   /// Destructor
   virtual ~AppCmdOpt( ) {}
@@ -225,17 +182,6 @@ private:
 
 };
 
-// constructors
-template <typename Type>
-AppCmdOpt<Type>::AppCmdOpt(char shortOpt, const std::string& longOpt, const std::string& name,
-    const std::string& descr, const Type& defValue)
-  : AppCmdOptBase(longOpt+","+std::string(1, shortOpt), name, descr)
-  , _value(defValue)
-  , _defValue(defValue)
-  , _changed(false)
-{
-}
-
 template <typename Type>
 AppCmdOpt<Type>::AppCmdOpt(const std::string& optNames, const std::string& name, const std::string& descr,
     const Type& defValue)
@@ -255,15 +201,6 @@ AppCmdOpt<Type>::AppCmdOpt(AppCmdLine& parser, const std::string& optNames, cons
   , _changed(false)
 {
   parser.addOption(*this);
-}
-
-template <typename Type>
-AppCmdOpt<Type>::AppCmdOpt(char shortOpt, const std::string& name, const std::string& descr, const Type& defValue)
-  : AppCmdOptBase(std::string(1, shortOpt), name, descr)
-  , _value(defValue)
-  , _defValue(defValue)
-  , _changed(false)
-{
 }
 
 } // namespace AppUtils

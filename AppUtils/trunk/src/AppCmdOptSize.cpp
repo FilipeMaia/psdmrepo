@@ -39,15 +39,6 @@ namespace AppUtils {
 /**
  *  Ctor
  */
-AppCmdOptSize::AppCmdOptSize(char shortOpt, const std::string& longOpt, const std::string& name,
-    const std::string& descr, value_type defValue)
-  : AppCmdOptBase(longOpt+","+std::string(1, shortOpt), name, descr)
-  , _value(defValue)
-  , _defValue(defValue)
-  , _changed(false)
-{
-}
-
 AppCmdOptSize::AppCmdOptSize(const std::string& optNames, const std::string& name, const std::string& descr,
     value_type defValue)
   : AppCmdOptBase(optNames, name, descr)
@@ -65,14 +56,6 @@ AppCmdOptSize::AppCmdOptSize(AppCmdLine& parser, const std::string& optNames, co
   , _changed(false)
 {
   parser.addOption(*this);
-}
-
-AppCmdOptSize::AppCmdOptSize(char shortOpt, const std::string& name, const std::string& descr, value_type defValue)
-  : AppCmdOptBase(std::string(1, shortOpt), name, descr)
-  , _value(defValue)
-  , _defValue(defValue)
-  , _changed(false)
-{
 }
 
 // Destructor

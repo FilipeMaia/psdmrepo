@@ -72,23 +72,6 @@ public:
   /**
    *  @brief Define incremental option without argument.
    *
-   *  @deprecated This constructor is for backward-compatibility only, use constructor with
-   *  optNames argument in the new code.
-   *
-   *  This constructor defines an option with both short name (-o) and long name (--option).
-   *  After option is instantiated it has to be added to parser using AppCmdLine::addOption()
-   *  method. To get current value of option argument use value() method.
-   *
-   *  @param[in] shortOpt    Short one-character option name
-   *  @param[in] longOpt     Long option name (not including leading --)
-   *  @param[in] descr       Long description for the option, printed when usage() is called.
-   *  @param[in] defValue    Initial value of the option
-   */
-  AppCmdOptIncr(char shortOpt, const std::string& longOpt, const std::string& descr, int defValue = 0);
-
-  /**
-   *  @brief Define incremental option without argument.
-   *
    *  This constructor can define option with both short name (-o) and long name (--option).
    *  All option names are defined via single constructor argument optNames which contains a
    *  comma-separated list of option names (like "option,o"). Single character becomes short
@@ -122,19 +105,6 @@ public:
    *  @throw AppCmdException or a subclass of it.
    */
   AppCmdOptIncr(AppCmdLine& parser, const std::string& optNames, const std::string& descr, int defValue = 0);
-
-  /**
-   *  @brief Define incremental option without argument.
-   *
-   *  This constructor defines an option with short name (-o) only.
-   *  After option is instantiated it has to be added to parser using AppCmdLine::addOption()
-   *  method. To get current value of option argument use value() method.
-   *
-   *  @param[in] shortOpt    Short one-character option name
-   *  @param[in] descr       Long description for the option, printed when usage() is called.
-   *  @param[in] defValue    Initial value of the option
-   */
-  AppCmdOptIncr(char shortOpt, const std::string& descr, int defValue = 0);
 
   /// Destructor
   virtual ~AppCmdOptIncr( ) ;

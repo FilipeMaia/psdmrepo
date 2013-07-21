@@ -40,14 +40,6 @@
 
 namespace AppUtils {
 
-AppCmdOptBool::AppCmdOptBool(char shortOpt, const std::string& longOpt, const std::string& descr, bool defValue)
-  : AppCmdOptBase(longOpt+","+std::string(1, shortOpt), "", descr)
-  , _value(defValue)
-  , _defValue(defValue)
-  , _changed(false)
-{
-}
-
 AppCmdOptBool::AppCmdOptBool(const std::string& optNames, const std::string& descr, bool defValue)
   : AppCmdOptBase(optNames, "", descr)
   , _value(defValue)
@@ -63,14 +55,6 @@ AppCmdOptBool::AppCmdOptBool(AppCmdLine& parser, const std::string& optNames, co
   , _changed(false)
 {
   parser.addOption(*this);
-}
-
-AppCmdOptBool::AppCmdOptBool(char shortOpt, const std::string& descr, bool defValue)
-  : AppCmdOptBase(std::string(1, shortOpt), "", descr)
-  , _value(defValue)
-  , _defValue(defValue)
-  , _changed(false)
-{
 }
 
 // Destructor

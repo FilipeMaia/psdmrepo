@@ -40,14 +40,6 @@
 
 namespace AppUtils {
 
-AppCmdOptToggle::AppCmdOptToggle(char shortOpt, const std::string& longOpt, const std::string& descr, bool defValue)
-  : AppCmdOptBase(longOpt+","+std::string(1, shortOpt), "(toggle)", descr)
-  , _value(defValue)
-  , _defValue(defValue)
-  , _changed(false)
-{
-}
-
 AppCmdOptToggle::AppCmdOptToggle(const std::string& optNames, const std::string& descr, bool defValue)
   : AppCmdOptBase(optNames, "(toggle)", descr)
   , _value(defValue)
@@ -64,14 +56,6 @@ AppCmdOptToggle::AppCmdOptToggle(AppCmdLine& parser, const std::string& optNames
   , _changed(false)
 {
   parser.addOption(*this);
-}
-
-AppCmdOptToggle::AppCmdOptToggle(char shortOpt, const std::string& descr, bool defValue)
-  : AppCmdOptBase(std::string(1, shortOpt), "(toggle)", descr)
-  , _value(defValue)
-  , _defValue(defValue)
-  , _changed(false)
-{
 }
 
 // Destructor

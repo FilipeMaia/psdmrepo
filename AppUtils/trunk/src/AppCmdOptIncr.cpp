@@ -40,14 +40,6 @@
 
 namespace AppUtils {
 
-AppCmdOptIncr::AppCmdOptIncr(char shortOpt, const std::string& longOpt, const std::string& descr, int defValue)
-  : AppCmdOptBase(longOpt+","+std::string(1, shortOpt), "(incr)", descr)
-  , _value(defValue)
-  , _defValue(defValue)
-  , _changed(false)
-{
-}
-
 AppCmdOptIncr::AppCmdOptIncr(const std::string& optNames, const std::string& descr, int defValue)
   : AppCmdOptBase(optNames, "(incr)", descr)
   , _value(defValue)
@@ -63,14 +55,6 @@ AppCmdOptIncr::AppCmdOptIncr(AppCmdLine& parser, const std::string& optNames, co
   , _changed(false)
 {
   parser.addOption(*this);
-}
-
-AppCmdOptIncr::AppCmdOptIncr(char shortOpt, const std::string& descr, int defValue)
-  : AppCmdOptBase(std::string(1, shortOpt), "(incr)", descr)
-  , _value(defValue)
-  , _defValue(defValue)
-  , _changed(false)
-{
 }
 
 // Destructor

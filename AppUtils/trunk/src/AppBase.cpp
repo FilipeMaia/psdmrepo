@@ -61,11 +61,9 @@ namespace AppUtils {
 //----------------
 AppBase::AppBase ( const std::string& appName )
   : _cmdline( ::fixAppName(appName) )
-  , _optVerbose( 'v', "verbose", "verbose output, multiple allowed", 0 )
-  , _optQuiet( 'q', "quiet", "quieter output, multiple allowed", 2 )
+  , _optVerbose( _cmdline, "v,verbose", "verbose output, multiple allowed", 0 )
+  , _optQuiet( _cmdline, "q,quiet", "quieter output, multiple allowed", 2 )
 {
-  addOption( _optVerbose );
-  addOption( _optQuiet );
 }
 
 //--------------

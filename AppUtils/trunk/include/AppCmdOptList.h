@@ -89,29 +89,6 @@ public:
   /**
    *  @brief Define an option with a required argument.
    *
-   *  @deprecated This constructor is for backward-compatibility only, use constructor with
-   *  optNames argument in the new code.
-   *
-   *  This constructor defines an option with both short name (-o) and long name
-   *  (--option) which has a required argument. The argument is given to option as
-   *  `-o value', `--option=value' on the command line or as `option = value' in
-   *  the options file. After option is instantiated it has to be added to parser
-   *  using AppCmdLine::addOption() method. To get current value of option argument
-   *  use value() method.
-   *
-   *  @param[in] shortOpt    Short one-character option name
-   *  @param[in] longOpt     Long option name (not including leading --)
-   *  @param[in] name        Name for option argument, something like "path", "number", etc. Used
-   *                         only for information purposes when usage() is called.
-   *  @param[in] descr       Long description for the option, printed when usage() is called.
-   *  @param[in] separator   Separator character for splitting argument into sequences of values.
-   */
-  AppCmdOptList(char shortOpt, const std::string& longOpt, const std::string& name, const std::string& descr,
-      char separator = ',');
-
-  /**
-   *  @brief Define an option with a required argument.
-   *
    *  This constructor can define option with both short name (-o) and long name (--option).
    *  All option names are defined via single constructor argument optNames which contains a
    *  comma-separated list of option names (like "option,o"). Single character becomes short
@@ -152,26 +129,6 @@ public:
    */
   AppCmdOptList(AppCmdLine& parser, const std::string& optNames, const std::string& name, const std::string& descr,
       char separator = ',');
-
-  /**
-   *  @brief Define an option with a required argument.
-   *
-   *  @deprecated This constructor is for backward-compatibility only, use constructor with
-   *  optNames argument in the new code.
-   *
-   *  This constructor defines an option with short name (-o) which has a required
-   *  argument. The argument is given to option as `-o value' on the command line, option
-   *  cannot be used in the options file. After option is instantiated it has to be added to
-   *  parser using AppCmdLine::addOption() method. To get current value of option argument
-   *  use value() method.
-   *
-   *  @param[in] shortOpt    Short one-character option name
-   *  @param[in] name        Name for option argument, something like "path", "number", etc. Used
-   *                         only for information purposes when usage() is called.
-   *  @param[in] descr       Long description for the option, printed when usage() is called.
-   *  @param[in] separator   Separator character for splitting argument into sequences of values.
-   */
-    AppCmdOptList(char shortOpt, const std::string& name, const std::string& descr, char separator = ',');
 
   /// Destructor
   virtual ~AppCmdOptList( ) {}
@@ -235,20 +192,10 @@ private:
   bool _changed ;
 
   // This class in non-copyable
-  AppCmdOptList( const AppCmdOptList& );
-  AppCmdOptList& operator= ( const AppCmdOptList& );
+  AppCmdOptList(const AppCmdOptList&);
+  AppCmdOptList& operator=(const AppCmdOptList&);
 
 };
-
-template <typename Type>
-AppCmdOptList<Type>::AppCmdOptList(char shortOpt, const std::string& longOpt, const std::string& name,
-    const std::string& descr, char separator)
-  : AppCmdOptBase(longOpt+","+std::string(1, shortOpt), name, descr)
-  , _separator(separator)
-  , _value()
-  , _changed(false)
-{
-}
 
 template <typename Type>
 AppCmdOptList<Type>::AppCmdOptList(const std::string& optNames, const std::string& name, const std::string& descr,
@@ -271,21 +218,10 @@ AppCmdOptList<Type>::AppCmdOptList(AppCmdLine& parser, const std::string& optNam
   parser.addOption(*this);
 }
 
-template <typename Type>
-AppCmdOptList<Type>::AppCmdOptList(char shortOpt, const std::string& name, const std::string& descr, char separator)
-  : AppCmdOptBase(std::string(1, shortOpt), name, descr)
-  , _separator(separator)
-  , _value()
-  , _changed(false)
-{
-}
-
-/**
- *  Set the value of the argument.
- */
+// Set the value of the argument.
 template <typename Type>
 void
-AppCmdOptList<Type>::setValue ( const std::string& value )
+AppCmdOptList<Type>::setValue(const std::string& value)
 {
   container localCont ;
 

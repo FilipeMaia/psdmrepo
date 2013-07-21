@@ -61,28 +61,6 @@ public:
   typedef unsigned long long value_type ;
 
   /**
-   *  @brief Define an option with an argument.
-   *
-   *  @deprecated This constructor is for backward-compatibility only, use constructor with
-   *  optNames argument in the new code.
-   *
-   *  This constructor defines an option with both short name (-o) and long name
-   *  (--option) which has a required argument. After option is instantiated it has to
-   *  be added to parser using AppCmdLine::addOption() method. To get current value of
-   *  option argument  use value() method.
-   *
-   *  @param[in] shortOpt    Short one-character option name
-   *  @param[in] longOpt     Long option name (not including leading --)
-   *  @param[in] name        Name for option argument, something like "size", "offset", etc. Used
-   *                         only for information purposes when usage() is called.
-   *  @param[in] descr       Long description for the option, printed when usage() is called.
-   *  @param[in] defValue    Value returned from value() if option is not specified on command line.
-   *
-   */
-  AppCmdOptSize(char shortOpt, const std::string& longOpt, const std::string& name, const std::string& descr,
-      value_type defValue);
-
-  /**
    *  @brief Define an option with a required argument.
    *
    *  This constructor can define option with both short name (-o) and long name (--option).
@@ -121,25 +99,6 @@ public:
    */
   AppCmdOptSize(AppCmdLine& parser, const std::string& optNames, const std::string& name, const std::string& descr,
       value_type defValue);
-
-  /**
-   *  @brief Define an option with a required argument.
-   *
-   *  @deprecated This constructor is for backward-compatibility only, use constructor with
-   *  optNames argument in the new code.
-   *
-   *  This constructor defines an option with short name (-o) which has a required
-   *  argument. After option is instantiated it has to be added to  parser using
-   *  AppCmdLine::addOption() method. To get current value of option argument use value() method.
-   *
-   *  @param[in] shortOpt    Short one-character option name
-   *  @param[in] name        Name for option argument, something like "path", "number", etc. Used
-   *                         only for information purposes when usage() is called.
-   *  @param[in] descr       Long description for the option, printed when usage() is called.
-   *  @param[in] defValue    Value returned from value() if option is not specified on command line.
-   *
-   */
-  AppCmdOptSize(char shortOpt, const std::string& name, const std::string& descr, value_type defValue);
 
   // Destructor
   virtual ~AppCmdOptSize () ;
