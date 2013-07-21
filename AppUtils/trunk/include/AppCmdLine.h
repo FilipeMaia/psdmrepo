@@ -269,11 +269,8 @@ protected:
   // parse arguments
   virtual void parseArgs() ;
 
-  // find option with the long name
-  AppCmdOptBase* findLongOpt ( const std::string& opt ) const ;
-
-  // find option with the short name
-  AppCmdOptBase* findShortOpt ( char opt ) const ;
+  // find option with the given name
+  AppCmdOptBase* findOpt ( const std::string& opt ) const ;
 
 private:
 

@@ -182,7 +182,7 @@ BOOST_AUTO_TEST_CASE( cmdline_test_simple_newstyle )
   BOOST_CHECK_THROW ( cmdline.parse ( args.begin(), args.end() ), AppCmdException ) ;
 
   // add more options
-  AppCmdOptIncr optVerbose (cmdline, "verbose,v", "more noise", 0 ) ;
+  AppCmdOptIncr optVerbose (cmdline, "verbose,v,V,VERB", "more noise", 0 ) ;
 
   AppCmdOptToggle optToggle (cmdline, "toggle,t", "toggle something", false ) ;
 
@@ -202,9 +202,10 @@ BOOST_AUTO_TEST_CASE( cmdline_test_simple_newstyle )
   args.clear() ;
   args.push_back ( "-v" ) ;
   args.push_back ( "--verbose" ) ;
+  args.push_back ( "--VERB" ) ;
   args.push_back ( "-t" ) ;
   args.push_back ( "--toggle" ) ;
-  args.push_back ( "-vvvt" ) ;
+  args.push_back ( "-vVt" ) ;
   args.push_back ( "--int=654" ) ;
   args.push_back ( "--INT" ) ;
   args.push_back ( "654" ) ;
@@ -264,8 +265,8 @@ BOOST_AUTO_TEST_CASE( cmdline_test_except )
   BOOST_CHECK_THROW ( cmdline.setOptionsFile( optString1l ), AppCmdException ) ;
   // this is OK
   BOOST_CHECK_NO_THROW ( cmdline.addOption( optString3l ) ) ;
-  // setting options file again will throw
-  BOOST_CHECK_THROW ( cmdline.setOptionsFile( optString3l ), AppCmdException ) ;
+  // setting options file after addOption() is OK
+  BOOST_CHECK_NO_THROW ( cmdline.setOptionsFile( optString3l ) ) ;
 
   const char* args[5] = { "" } ;
 

@@ -16,6 +16,7 @@
 // C++ Headers --
 //---------------
 #include <string>
+#include <vector>
 
 //----------------------
 // Base Class Headers --
@@ -108,14 +109,10 @@ protected:
   virtual const std::string& description() const { return _descr; }
 
   /**
-   *  Return short option symbol for -x option, or @c NUL if no short option is defined.
+   *  Return list of option names for this option. One-character options if
+   *  defined appear first on the list.
    */
-  virtual char shortOption() const { return _shortOpt; }
-
-  /**
-   *  Return long option symbol for --xxxxx option format, or empty string in no long option is defined.
-   */
-  virtual const std::string& longOption() const { return _longOpt; }
+  virtual const std::vector<std::string>& options() const { return _options; }
 
   /**
    *  @brief Set option's argument.
@@ -155,8 +152,7 @@ private:
   // All private methods are accessible to the parser
   friend class AppCmdLine;
 
-  char _shortOpt ;
-  std::string _longOpt ;
+  std::vector<std::string> _options ;
   const std::string _name ;
   const std::string _descr ;
 

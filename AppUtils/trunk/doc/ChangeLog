@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-00
+2013-07-21 Andy Salnikov
+- last step in unifying short and long options
+
 Tag: V00-04-00
 2013-07-21 Andy Salnikov
 - replace lists with vectors

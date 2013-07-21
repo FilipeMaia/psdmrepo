@@ -27,7 +27,7 @@ EchoApp::EchoApp( const std::string& appname )
   : AppUtils::AppBase(appname)
   , m_newLine(parser(), "n", "disable output of new line", true)
   , m_sep(parser(), "separators", "string", "output word separator", " " )
-  , m_args(parser(), "strings", "the list of strings to print", std::list<std::string>())
+  , m_args(parser(), "strings", "the list of strings to print", std::vector<std::string>())
 {
 }
 
