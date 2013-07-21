@@ -95,21 +95,16 @@ private:
 //----------------
 test_compress::test_compress ( const std::string& appName )
   : AppUtils::AppBase( appName )
-  , m_levelOpt( 'c', "level", "number", "compression level, number 0-9, def: 1", 1 )
-  , m_repeatOpt( 'n', "repeat", "number", "number of repeats, def: 1", 1 )
-  , m_sizeOpt( 's', "size", "number", "max size to compress, def: 0", 0UL )
-  , m_inputArg("input-file", "path to the input file")
-  , m_outputArg("output-file", "path to the output file")
+  , m_levelOpt( parser(), "c,level", "number", "compression level, number 0-9, def: 1", 1 )
+  , m_repeatOpt( parser(), "n,repeat", "number", "number of repeats, def: 1", 1 )
+  , m_sizeOpt( parser(), "s,size", "number", "max size to compress, def: 0", 0UL )
+  , m_inputArg(parser(), "input-file", "path to the input file")
+  , m_outputArg(parser(), "output-file", "path to the output file")
   , m_input(0)
   , m_inputSize(0)
   , m_output(0)
   , m_outputSize(0)
 {
-  addOption( m_levelOpt ) ;
-  addOption( m_repeatOpt ) ;
-  addOption( m_sizeOpt ) ;
-  addArgument( m_inputArg ) ;
-  addArgument( m_outputArg ) ;
 }
 
 //--------------

@@ -91,15 +91,13 @@ private:
 //----------------
 test_decompress::test_decompress ( const std::string& appName )
   : AppUtils::AppBase( appName )
-  , m_inputArg("input-file", "path to the input file")
-  , m_outputArg("output-file", "path to the output file")
+  , m_inputArg(parser(), "input-file", "path to the input file")
+  , m_outputArg(parser(), "output-file", "path to the output file")
   , m_input(0)
   , m_inputSize(0)
   , m_output(0)
   , m_outputSize(0)
 {
-  addArgument( m_inputArg ) ;
-  addArgument( m_outputArg ) ;
 }
 
 //--------------
