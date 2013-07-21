@@ -1,0 +1,66 @@
+#!@PYTHON@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  Script AppDataPathTestPy...
+#
+#------------------------------------------------------------------------
+
+"""Test suite case for the AppDataPath
+
+@version $Id$ 
+
+@author Andy Salnikov
+"""
+
+#------------------------------
+#  Module's version from CVS --
+#------------------------------
+__version__ = "$Revision: 8 $"
+# $Source$
+
+#--------------------------------
+#  Imports of standard modules --
+#--------------------------------
+import unittest
+
+#---------------------------------
+#  Imports of base class module --
+#---------------------------------
+
+#-----------------------------
+# Imports for other modules --
+#-----------------------------
+from AppUtils.AppDataPath import AppDataPath
+
+#---------------------
+# Local definitions --
+#---------------------
+
+#-------------------------------
+#  Unit test class definition --
+#-------------------------------
+
+class AppDataPathTestPy ( unittest.TestCase ) :
+
+    def setUp(self) :
+        pass
+    
+    def tearDown(self) :
+        pass
+
+    def test_exist(self):
+        path = AppDataPath("AppUtils/file-for-AppDataPath-unit-test");
+        self.assert_(path.path())
+
+    def test_not_exist(self):
+        path = AppDataPath("AppUtils/file-for-AppDataPath-unit-test-does-not-exist");
+        self.assert_(not path.path())
+
+#
+#  run unit tests when imported as a main module
+#
+if __name__ == "__main__":
+    unittest.main()
