@@ -196,20 +196,6 @@ private:
 
 };
 
-/**
- *  Ctor
- */
-template<typename Type>
-AppCmdOptNamedValue<Type>::AppCmdOptNamedValue(char shortOpt, const std::string& longOpt, const std::string& name,
-    const std::string& descr, const Type& defValue)
-  : AppCmdOptBase(longOpt+","+std::string(1, shortOpt), name, descr)
-  , _str2value()
-  , _defValue(defValue)
-  , _value(defValue)
-  , _changed(false)
-{
-}
-
 template <typename Type>
 AppCmdOptNamedValue<Type>::AppCmdOptNamedValue(const std::string& optNames, const std::string& name,
     const std::string& descr, const Type& defValue)
@@ -233,18 +219,7 @@ AppCmdOptNamedValue<Type>::AppCmdOptNamedValue(AppCmdLine& parser, const std::st
   parser.addOption(*this);
 }
 
-template <typename Type>
-AppCmdOptNamedValue<Type>::AppCmdOptNamedValue(char shortOpt, const std::string& name, const std::string& descr,
-    const Type& defValue)
-  : AppCmdOptBase(std::string(1, shortOpt), name, descr)
-  , _str2value()
-  , _defValue(defValue)
-  , _value(defValue)
-  , _changed(false)
-{
-}
-
-/**
+/*
  *  Set the value of the argument.
  *
  *  @return The number of consumed words. If it is negative then error has occured.

@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-01
+2013-07-21 Andy Salnikov
+- some pieces left which had to be removed
+
 Tag: V00-03-00
 2013-07-21 Andy Salnikov
 - removed deprecated constructors, many clients need to be migrated
