@@ -16,7 +16,7 @@
 // C++ Headers --
 //---------------
 #include <string>
-#include <list>
+#include <vector>
 
 //----------------------
 // Base Class Headers --
@@ -65,7 +65,7 @@ class AppCmdArgBase {
 
 public:
 
-  typedef std::list<std::string> StringList ;
+  typedef std::vector<std::string> StringList ;
 
   /// Destructor
   virtual ~AppCmdArgBase( ) ;

@@ -158,8 +158,11 @@ AppCmdLine::setOptionsFile ( AppCmdOptList<std::string>& option )
     throw AppCmdException ( "options file option already defined, cannot re-define" ) ;
   }
 
-  // define a regular option
-  addOption ( option ) ;
+  // it is ok to say addOption() first and then setOptionsFile() with the same option
+  if (std::find(_options.begin(), _options.end(), &option) == _options.end()) {
+    // define a regular option
+    addOption ( option ) ;
+  }
 
   // remember it
   _optionsFile = &option ;

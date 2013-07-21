@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-00
+2013-07-21 Andy Salnikov
+- replace lists with vectors
+- allow setOptionsFile() after addOption() with the same option
+
 Tag: V00-03-01
 2013-07-21 Andy Salnikov
 - some pieces left which had to be removed

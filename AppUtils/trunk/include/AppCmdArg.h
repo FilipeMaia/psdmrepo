@@ -15,6 +15,7 @@
 //---------------
 // C++ Headers --
 //---------------
+#include <cassert>
 
 //----------------------
 // Base Class Headers --

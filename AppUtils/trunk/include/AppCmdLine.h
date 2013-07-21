@@ -16,11 +16,8 @@
 // C++ Headers --
 //---------------
 #include <string>
-#include <list>
-#include <algorithm>
-#include <iterator>
-#include <iostream>
-#include <cassert>
+#include <vector>
+#include <iosfwd>
 
 //----------------------
 // Base Class Headers --
@@ -33,16 +30,17 @@
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
+namespace AppUtils {
+class AppCmdArgBase ;
+class AppCmdOptBase ;
+template <typename T> class AppCmdOptList ;
+}
 
 //		---------------------
 // 		-- Class Interface --
 //		---------------------
 
 namespace AppUtils {
-
-class AppCmdArgBase ;
-class AppCmdOptBase ;
-template <typename T> class AppCmdOptList ;
 
 /// @addtogroup AppUtils
 
@@ -158,7 +156,9 @@ public:
    *  Only one such option is allowed per parser, attempt to add one
    *  more will result in exception. As the option type is AppCmdOptList
    *  it is possible to specify multiple files which will be read in the
-   *  same order as they appear on command line.
+   *  same order as they appear on command line. It is possible (but not
+   *  required) to call addOption(option) first and then setOptionsFile(option)
+   *  for the same option instance.
    *  The lifetime of the argument should extend to the parse() method of this class.
    *  This method may throw an exception if the option name conflicts with the previously
    *  added options.
@@ -253,9 +253,9 @@ public:
 protected:
 
   // types
-  typedef std::list< std::string > StringList ;
-  typedef std::list< AppCmdArgBase* > PositionalsList ;
-  typedef std::list< AppCmdOptBase* > OptionsList ;
+  typedef std::vector< std::string > StringList ;
+  typedef std::vector< AppCmdArgBase* > PositionalsList ;
+  typedef std::vector< AppCmdOptBase* > OptionsList ;
 
   // real parsing happens in this method
   virtual void doParse() ;

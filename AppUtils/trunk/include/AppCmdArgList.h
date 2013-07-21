@@ -15,7 +15,8 @@
 //---------------
 // C++ Headers --
 //---------------
-#include <list>
+#include <vector>
+#include <cassert>
 
 //----------------------
 // Base Class Headers --
@@ -66,7 +67,7 @@ class AppCmdArgList : public AppCmdArgBase {
 
 public:
 
-  typedef std::list<Type> container ;
+  typedef std::vector<Type> container ;
   typedef typename container::const_iterator const_iterator ;
   typedef typename container::size_type size_type ;
 

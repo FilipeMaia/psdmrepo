@@ -15,6 +15,7 @@
 //---------------
 // C++ Headers --
 //---------------
+#include <vector>
 
 //----------------------
 // Base Class Headers --
@@ -43,7 +44,7 @@ namespace AppUtils {
 /**
  *  @ingroup AppUtils
  *
- *  @brief Option class collecting arguments into list of values.
+ *  @brief Option class collecting arguments into set (std::vector) of values.
  *
  *  This class defines a command line option with argument. This is a templated
  *  class parameterized by the type of the argument. Any type supported by the
@@ -63,7 +64,7 @@ namespace AppUtils {
  *    @li -n 1,2,5,100
  *    @li -n 1,2 -n 5,100
  *
- *  and the resulting value of the option will be a list with values [1, 2, 5, 100].
+ *  and the resulting value of the option will be a vector with values [1, 2, 5, 100].
  *
  *  Initial value of the option is always an empty list.
  *
@@ -82,7 +83,7 @@ class AppCmdOptList : public AppCmdOptBase {
 
 public:
 
-  typedef std::list<Type> container ;
+  typedef std::vector<Type> container ;
   typedef typename container::const_iterator const_iterator ;
   typedef typename container::size_type size_type ;
 
