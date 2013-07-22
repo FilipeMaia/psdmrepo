@@ -16,6 +16,7 @@
 // C++ Headers --
 //---------------
 #include <vector>
+#include <algorithm>
 
 //----------------------
 // Base Class Headers --
