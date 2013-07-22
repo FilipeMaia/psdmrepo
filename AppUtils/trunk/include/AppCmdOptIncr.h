@@ -35,7 +35,7 @@ extern "C" {
 // Collaborating Class Declarations --
 //------------------------------------
 namespace AppUtils {
-class AppCmdLine;
+class AppCmdOptGroup;
 }
 
 //		---------------------
@@ -97,14 +97,14 @@ public:
    *  This method may throw an exception if the option name conflicts with the previously
    *  added options.
    *
-   *  @param[in] parser      Parser instance to which this option will be added.
+   *  @param[in] group       Option group (or parser instance) to which this option will be added.
    *  @param[in] optNames    Comma-separated option names.
    *  @param[in] descr       Long description for the option, printed when usage() is called.
    *  @param[in] defValue    Initial value of the option
    *
    *  @throw AppCmdException or a subclass of it.
    */
-  AppCmdOptIncr(AppCmdLine& parser, const std::string& optNames, const std::string& descr, int defValue = 0);
+  AppCmdOptIncr(AppCmdOptGroup& group, const std::string& optNames, const std::string& descr, int defValue = 0);
 
   /// Destructor
   virtual ~AppCmdOptIncr( ) ;

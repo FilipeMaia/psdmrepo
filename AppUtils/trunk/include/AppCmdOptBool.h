@@ -29,7 +29,7 @@
 // Collaborating Class Declarations --
 //------------------------------------
 namespace AppUtils {
-class AppCmdLine;
+class AppCmdOptGroup;
 }
 
 //		---------------------
@@ -92,14 +92,14 @@ public:
    *  This method may throw an exception if the option name conflicts with the previously
    *  added options.
    *
-   *  @param[in] parser      Parser instance to which this option will be added.
+   *  @param[in] group       Option group (or parser instance) to which this option will be added.
    *  @param[in] optNames    Comma-separated option names.
    *  @param[in] descr     description, one-line string
    *  @param[in] defValue  initial value of the option
    *
    *  @throw AppCmdException or a subclass of it.
    */
-  AppCmdOptBool(AppCmdLine& parser, const std::string& optNames, const std::string& descr, bool defValue = false);
+  AppCmdOptBool(AppCmdOptGroup& group, const std::string& optNames, const std::string& descr, bool defValue = false);
 
   /// Destructor
   virtual ~AppCmdOptBool( );

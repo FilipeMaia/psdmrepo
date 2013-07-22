@@ -22,6 +22,7 @@
 //----------------------
 // Base Class Headers --
 //----------------------
+#include "AppUtils/AppCmdOptGroup.h"
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -94,6 +95,7 @@ namespace AppUtils {
  *
  *  Copyright (C) 2003		SLAC
  *
+ *  @see AppCmdOptGroup
  *  @see AppCmdArg
  *  @see AppCmdArgList
  *  @see AppCmdOpt
@@ -105,7 +107,7 @@ namespace AppUtils {
  *  @author Andy Salnikov	(originator)
  */
 
-class AppCmdLine {
+class AppCmdLine : public AppCmdOptGroup {
 
 public:
 
@@ -122,6 +124,21 @@ public:
   virtual ~AppCmdLine( );
 
   /**
+   *  @brief Add options group to the parser.
+   *
+   *  The parser may contain zero or more option sub-groups. Grouping is used to
+   *  organize options when displaying usage information. Options added directly
+   *  to parser go to a separate "General options" group, but users may create more
+   *  groups (e.g. "Input options", "Output options"). Groups should be added to
+   *  parser using this addGroup() methods. Options may be added to the sub-groups
+   *  or to the parser itself (via addOption() method inherited from AppCmdOptGroup
+   *  class).
+   *
+   *  @param[in] group    Group to add to the parser.
+   */
+  virtual void addGroup(AppCmdOptGroup& group);
+
+  /**
    *  @brief Add one positional argument to parser.
    *
    *  The argument object supplied is not copied, only its address is remembered.
@@ -134,20 +151,6 @@ public:
    *  @throw AppCmdException or a subclass of it.
    */
   virtual void addArgument ( AppCmdArgBase& arg ) ;
-
-  /**
-   *  @brief Add one option to parser.
-   *
-   *  The option object supplied is not copied, only its address is remembered.
-   *  The lifetime of the argument should extend to the parse() method of this class.
-   *  This method may throw an exception if the option name conflicts with the previously
-   *  added options.
-   *
-   *  @param[in] option   Option instance to add to the parser.
-   *
-   *  @throw AppCmdException or a subclass of it.
-   */
-  virtual void addOption ( AppCmdOptBase& option ) ;
 
   /**
    *  @brief Add option which specifies names of option files.
@@ -256,28 +259,33 @@ protected:
   typedef std::vector< std::string > StringList ;
   typedef std::vector< AppCmdArgBase* > PositionalsList ;
   typedef std::vector< AppCmdOptBase* > OptionsList ;
+  typedef std::vector< AppCmdOptGroup* > GroupsList ;
 
   // real parsing happens in this method
   virtual void doParse() ;
 
   // parse options
-  virtual void parseOptions() ;
+  virtual void parseOptions(const OptionsList& options) ;
 
   // parse options file
-  virtual void parseOptionsFile() ;
+  virtual void parseOptionsFile(const OptionsList& options) ;
 
   // parse arguments
   virtual void parseArgs() ;
 
   // find option with the given name
-  AppCmdOptBase* findOpt ( const std::string& opt ) const ;
+  AppCmdOptBase* findOpt ( const std::string& opt, const OptionsList& options ) const ;
+
+  // format group of options
+  void formatOptGroup(std::ostream& out, const std::string& groupName, const OptionsList& options, size_t optLen,
+      size_t nameLen) const;
 
 private:
 
   // Friends
 
   // Data members
-  OptionsList _options ;
+  GroupsList _groups;
   PositionalsList _positionals ;
 
   std::string _argv0 ;

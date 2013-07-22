@@ -87,11 +87,9 @@ Declaration:
 
 Adds one more positional argument. The argument object supplied is not 
 copied, only its address is remembered. The lifetime of the argument 
-should extend to the parse() method of this class. This method throws 
-an exception in case of errors (for example when required argument is
-defined after optional arguments). The order of the positional arguments
-on the command line is determined by the order in which addArgument() 
-is called. 
+should extend to the parse() method of this class. The order of the 
+positional arguments on the command line is determined by the order in 
+which addArgument() is called. 
 
 Instead of calling addArgument() method for each AppCmdArgBase instance 
 it is easier (and preferred) to provide AppCmdLine instance as an argument
@@ -106,9 +104,7 @@ Declaration:
 
 Adds one more command option. The option object supplied is not copied,
 only its address is remembered. The lifetime of the argument should 
-extend to the parse() method of this class. This method throws 
-an exception in case of errors (for example if the option name is 
-defined twice).
+extend to the parse() method of this class. 
 
 Instead of calling addOption() method for each AppCmdOptBase instance 
 it is easier (and preferred) to provide AppCmdLine instance as an argument
@@ -161,7 +157,7 @@ Method AppCmdLine::helpWanted
 
 After calling parse() user should always call helpWanted() method.
 This method will return true after parse() if the help option has 
-appeared on the command line. It's user's responsibility to take 
+appeared on the command line. It is user's responsibility to take 
 corresponding action in this case. Usually something like this will
 appear in your application:
 
@@ -178,7 +174,7 @@ appear in your application:
    }
 
 If helpWanted() returns true all options/arguments on command line may be 
-ignored, the only reasonable action to performa in this case is to print
+ignored, the only reasonable action to perform in this case is to print
 help message and exit application.
 
 Method AppCmdLine::usage
@@ -418,6 +414,69 @@ same meaning as in the previous class):
                          string description, T defValue ) ;
 
 
+Option groups
+-------------
+
+If the number of options in applications becomes large the output produced
+by usage() method of the parser class may become unwieldy. To improve this 
+situation options could be organized into the option groups according to
+their purpose or functionality (e.g. options controlling input, options
+defining output) so that usage() can section the output which might help
+users to navigate through the usage information.
+
+This library defines special class which allows options grouping, class
+name is AppCmdOptGroup. Instead of adding all options directly to parser 
+one can instantiate one or few option groups and add options to those 
+groups (and to parser which is considered a general group). Groups have to
+be added to parser by either calling AppCmdLine::addGroup() method or by
+passing parser instance as an argument to group constructor. Options are
+added to groups by either using AppCmdOptGroup::addOption() method or by 
+passing group instance to the constructor of the option class. The parser 
+class AppCmdline is a subclass of AppCmdOptGroup so adding options to the 
+parser directly just adds them to a general options group. Here is an 
+example of splitting options into few groups:
+
+    int main(int argc, char** argv)
+	{
+	  AppCmdLine parser(argv[0]);
+	
+	  // create two additional option groups
+	  AppCmdOptGroup optgrpIn(parser, "Input options");
+	  AppCmdOptGroup optgrpOut(parser, "Output options");
+	
+	  // make an option, add it to parser
+	  AppCmdOptIncr optVerbose(parser, "v,verbose", "Produce more messages", 0);
+	  // make an option, add it to input group
+	  AppCmdOptSize optBufSize(optgrpIn, "b,buf-size", "size", "Input buffer size, def: 1M", 1024*1024);
+	  // make an option, add it to output group
+	  AppCmdOpt<std::string> optOutFile(optgrpOut, "o", "path", "Output file name", "");
+	
+	  parser.parse(argc, argv);
+	  if (parser.helpWanted()) {
+	    parser.usage(std::cout);
+	    return 0;
+	  }
+	}
+
+And here is the output produced by this program running with -h option:
+
+	Usage: ./build/x86_64-rhel5-gcc41-opt/AppUtils/apptest1 [options]
+	
+	  General options:
+	    {-h|-?|--help }         print help message
+	    {-v|--verbose } (incr)  Produce more messages
+	
+	  Input options:
+	    {-b|--buf-size} size    Input buffer size, def: 1M
+	
+	  Output options:
+	    {-o           } path    Output file name
+
+As you can see --verbose option was added to General options group 
+(together with the pre-defined --help option) and two other options each
+appear in their own groups.
+
+
 Options file
 ------------
 
@@ -616,12 +675,14 @@ APPUTILS_MAIN(EchoApp)
 If you run it with -h option it will produce this help message:
 
 Usage: EchoApp [options] [strings ...]
+
   Available options:
     {-h|-?|--help    }         print help message
     {-v|--verbose    } (incr)  verbose output, multiple allowed
     {-q|--quiet      } (incr)  quieter output, multiple allowed
     {-n|--no-new-line} (incr)  disable output of new line
     {-s|--separator  } string  output word separator
+
   Positional parameters:
     strings  the list of strings to print
 

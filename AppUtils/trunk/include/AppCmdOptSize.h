@@ -27,7 +27,7 @@
 // Collaborating Class Declarations --
 //------------------------------------
 namespace AppUtils {
-class AppCmdLine;
+class AppCmdOptGroup;
 }
 
 //		---------------------
@@ -90,14 +90,14 @@ public:
    *  This method may throw an exception if the option name conflicts with the previously
    *  added options.
    *
-   *  @param[in] parser      Parser instance to which this option will be added.
+   *  @param[in] group       Option group (or parser instance) to which this option will be added.
    *  @param[in] optNames    Comma-separated option names.
    *  @param[in] name        Name for option argument, something like "path", "number", etc. Used
    *                         only for information purposes when usage() is called.
    *  @param[in] descr       Long description for the option, printed when usage() is called.
    *  @param[in] defValue    Value returned from value() if option is not specified on command line.
    */
-  AppCmdOptSize(AppCmdLine& parser, const std::string& optNames, const std::string& name, const std::string& descr,
+  AppCmdOptSize(AppCmdOptGroup& group, const std::string& optNames, const std::string& name, const std::string& descr,
       value_type defValue);
 
   // Destructor

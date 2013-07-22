@@ -24,7 +24,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "AppUtils/AppCmdExceptions.h"
-#include "AppUtils/AppCmdLine.h"
+#include "AppUtils/AppCmdOptGroup.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -48,14 +48,14 @@ AppCmdOptSize::AppCmdOptSize(const std::string& optNames, const std::string& nam
 {
 }
 
-AppCmdOptSize::AppCmdOptSize(AppCmdLine& parser, const std::string& optNames, const std::string& name,
+AppCmdOptSize::AppCmdOptSize(AppCmdOptGroup& group, const std::string& optNames, const std::string& name,
     const std::string& descr, value_type defValue)
   : AppCmdOptBase(optNames, name, descr)
   , _value(defValue)
   , _defValue(defValue)
   , _changed(false)
 {
-  parser.addOption(*this);
+  group.addOption(*this);
 }
 
 // Destructor

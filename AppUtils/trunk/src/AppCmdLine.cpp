@@ -38,6 +38,7 @@
 #include "AppUtils/AppCmdArgBase.h"
 #include "AppUtils/AppCmdExceptions.h"
 #include "AppUtils/AppCmdOptBase.h"
+#include "AppUtils/AppCmdOptBool.h"
 #include "AppUtils/AppCmdOptList.h"
 using std::ios;
 using std::ostream;
@@ -55,6 +56,9 @@ isHelpOption(const std::string& optname)
   return optname == "help" or optname == "h" or optname == "?";
 }
 
+// special help option used internally
+AppUtils::AppCmdOptBool helpOpt("h,?,help", "print help message");
+
 }
 
 //		----------------------------------------
@@ -67,7 +71,8 @@ namespace AppUtils {
  *  Constructor.
  */
 AppCmdLine::AppCmdLine(const std::string& argv0)
-    : _options()
+    : AppCmdOptGroup("General options")
+    , _groups()
     , _positionals()
     , _argv0(argv0)
     , _optionsFile(0)
@@ -76,11 +81,19 @@ AppCmdLine::AppCmdLine(const std::string& argv0)
     , _iter()
     , _nWordsLeft(0)
 {
+  this->addOption(::helpOpt);
 }
 
 // Destructor
 AppCmdLine::~AppCmdLine()
 {
+}
+
+// Add options group to the parser.
+void
+AppCmdLine::addGroup(AppCmdOptGroup& group)
+{
+  _groups.push_back(&group);
 }
 
 /*
@@ -91,41 +104,7 @@ AppCmdLine::~AppCmdLine()
 void
 AppCmdLine::addArgument(AppCmdArgBase& arg)
 {
-  // check some things first
-  if (!_positionals.empty()) {
-
-    // cannot add required after non-required
-    if (arg.isRequired() && !_positionals.back()->isRequired()) {
-      throw AppCmdArgOrderException(arg.name());
-    }
-
-  }
-
   _positionals.push_back(&arg);
-
-}
-
-/*
- *  Add one more command option. The argument supplied is not copied,
- *  only its address is remembered. The lifetime of the argument should extend
- *  to the parse() method of this class.
- */
-void
-AppCmdLine::addOption(AppCmdOptBase& option)
-{
-  // check for option name conflicts
-  const std::vector<std::string>& optnames = option.options();
-  for (std::vector<std::string>::const_iterator it = optnames.begin(); it != optnames.end(); ++it) {
-    if (::isHelpOption(*it)) {
-      throw AppCmdOptReservedException(*it);
-    }
-    if (findOpt(*it)) {
-      throw AppCmdOptDefinedException(*it);
-    }
-  }
-
-  // fine, remember it
-  _options.push_back(&option);
 }
 
 /*
@@ -140,12 +119,6 @@ AppCmdLine::setOptionsFile(AppCmdOptList<std::string>& option)
   // second attempt will fail
   if (_optionsFile) {
     throw AppCmdException("options file option already defined, cannot re-define");
-  }
-
-  // it is ok to say addOption() first and then setOptionsFile() with the same option
-  if (std::find(_options.begin(), _options.end(), &option) == _options.end()) {
-    // define a regular option
-    addOption(option);
   }
 
   // remember it
@@ -192,8 +165,15 @@ AppCmdLine::usage(std::ostream& out) const
 {
   out.setf(ios::left, ios::adjustfield);
 
-  out << "Usage: " << _argv0;
-  if (!_options.empty()) {
+  // build full list of options from all groups
+  OptionsList options = this->options();
+  for (GroupsList::const_iterator git = _groups.begin(); git != _groups.end(); ++ git) {
+    const OptionsList& groupOptions = (*git)->options();
+    options.insert(options.end(), groupOptions.begin(), groupOptions.end());
+  }
+
+  out << "\nUsage: " << _argv0;
+  if (!options.empty()) {
     out << " [options]";
   }
   for (PositionalsList::const_iterator it = _positionals.begin(); it != _positionals.end(); ++it) {
@@ -202,11 +182,12 @@ AppCmdLine::usage(std::ostream& out) const
   }
   out << '\n';
 
-  if (!_options.empty()) {
+  if (!options.empty()) {
 
-    size_t optLen = 12; // strlen("-h|-?|--help")
+    // calculate max length of the options strings (-o|--option)
+    size_t optLen = 0;
     size_t nameLen = 0;
-    for (OptionsList::const_iterator it = _options.begin(); it != _options.end(); ++it) {
+    for (OptionsList::const_iterator it = options.begin(); it != options.end(); ++it) {
       const std::vector<std::string>& optnames = (*it)->options();
       size_t moptLen = optnames.size() - 1;  // all separating '|'s
       for (std::vector<std::string>::const_iterator oit = optnames.begin(); oit != optnames.end(); ++ oit) {
@@ -220,19 +201,13 @@ AppCmdLine::usage(std::ostream& out) const
       if (nameLen < thisNameLen) nameLen = thisNameLen;
     }
 
-    out << "  Available options:\n";
-    out << "    {" << setw(optLen) << "-h|-?|--help" << "} " << setw(nameLen) << "" << "  print help message\n";
-    for (OptionsList::const_iterator it = _options.begin(); it != _options.end(); ++it) {
-      std::string fopt;
-      const std::vector<std::string>& optnames = (*it)->options();
-      for (std::vector<std::string>::const_iterator oit = optnames.begin(); oit != optnames.end(); ++ oit) {
-        if (not fopt.empty()) fopt += "|";
-        fopt += "-";
-        if (oit->size() > 1) fopt += "-";
-        fopt += *oit;
+    if (_groups.empty()) {
+      formatOptGroup(out, "Available options", this->options(), optLen, nameLen);
+    } else {
+      formatOptGroup(out, this->groupName(), this->options(), optLen, nameLen);
+      for (GroupsList::const_iterator git = _groups.begin(); git != _groups.end(); ++ git) {
+        formatOptGroup(out, (*git)->groupName(), (*git)->options(), optLen, nameLen);
       }
-      out << "    {" << setw(optLen) << fopt.c_str() << "} " << setw(nameLen) << (*it)->name().c_str() << "  "
-          << (*it)->description() << '\n';
     }
   }
 
@@ -241,12 +216,13 @@ AppCmdLine::usage(std::ostream& out) const
     for (PositionalsList::const_iterator it = _positionals.begin(); it != _positionals.end(); ++it) {
       if (nameLen < (*it)->name().size()) nameLen = (*it)->name().size();
     }
-    out << "  Positional parameters:\n";
+    out << "\n  Positional parameters:\n";
     for (PositionalsList::const_iterator it = _positionals.begin(); it != _positionals.end(); ++it) {
       out << "    " << setw(nameLen) << (*it)->name().c_str() << "  " << (*it)->description() << '\n';
     }
   }
 
+  out << "\n";
   out.setf(ios::right, ios::adjustfield);
 }
 
@@ -277,18 +253,64 @@ AppCmdLine::doParse()
 {
   _helpWanted = 0;
 
+  // build full list of options from all groups
+  OptionsList options = this->options();
+  for (GroupsList::const_iterator git = _groups.begin(); git != _groups.end(); ++ git) {
+    const OptionsList& groupOptions = (*git)->options();
+    options.insert(options.end(), groupOptions.begin(), groupOptions.end());
+  }
+
+  // if options-file option was set but it was not added to any group add it now to the parser
+  if (_optionsFile) {
+    if (std::find(options.begin(), options.end(), _optionsFile) == options.end()) {
+      // define a regular option
+      this->addOption(*_optionsFile);
+      options.push_back(_optionsFile);
+    }
+  }
+
+  // check for option name conflicts
+  std::set<std::string> allNames;
+  for (OptionsList::const_iterator oit = options.begin(); oit != options.end(); ++ oit) {
+    const std::vector<std::string>& optnames = (*oit)->options();
+    for (std::vector<std::string>::const_iterator it = optnames.begin(); it != optnames.end(); ++it) {
+      if (allNames.count(*it)) {
+        throw AppCmdOptDefinedException(*it);
+      }
+      allNames.insert(*it);
+    }
+  }
+  allNames.clear();
+
+
+  // check for arguments order
+  for (PositionalsList::const_iterator it = _positionals.begin(); it != _positionals.end(); ++ it) {
+
+    if (it != _positionals.begin()) {
+
+      AppCmdArgBase* arg = *it;
+      AppCmdArgBase* argPrev = *(it-1);
+
+      // cannot have required after non-required
+      if (arg->isRequired() and not argPrev->isRequired()) {
+        throw AppCmdArgOrderException(arg->name());
+      }
+
+    }
+  }
+
   // reset all options and arguments to their default values
-  std::for_each(_options.begin(), _options.end(), std::mem_fun(&AppCmdOptBase::reset));
+  std::for_each(options.begin(), options.end(), std::mem_fun(&AppCmdOptBase::reset));
   std::for_each(_positionals.begin(), _positionals.end(), std::mem_fun(&AppCmdArgBase::reset));
 
   // get options from command line
-  parseOptions();
+  parseOptions(options);
   if (_helpWanted) {
     return;
   }
 
   // get options from an options file if any
-  parseOptionsFile();
+  parseOptionsFile(options);
 
   // get remaining args
   parseArgs();
@@ -296,7 +318,7 @@ AppCmdLine::doParse()
 
 /// parse options
 void
-AppCmdLine::parseOptions()
+AppCmdLine::parseOptions(const OptionsList& options)
 {
   _iter = _argv.begin();
   _nWordsLeft = _argv.size();
@@ -327,7 +349,7 @@ AppCmdLine::parseOptions()
       }
 
       // find option with this name
-      AppCmdOptBase* option = findOpt(optname);
+      AppCmdOptBase* option = findOpt(optname, options);
       if (!option) {
         throw AppCmdOptUnknownException(optname);
       }
@@ -361,7 +383,7 @@ AppCmdLine::parseOptions()
       }
 
       // find option with this short name
-      AppCmdOptBase* option = findOpt(optname);
+      AppCmdOptBase* option = findOpt(optname, options);
       if (!option) {
         throw AppCmdOptUnknownException(optname);
       }
@@ -395,7 +417,7 @@ AppCmdLine::parseOptions()
             _helpWanted = true;
             return;
           }
-          AppCmdOptBase* option = findOpt(optname);
+          AppCmdOptBase* option = findOpt(optname, options);
           if (!option) {
             throw AppCmdOptUnknownException(optname);
           }
@@ -428,7 +450,7 @@ AppCmdLine::parseOptions()
 
 /// parse options file
 void
-AppCmdLine::parseOptionsFile()
+AppCmdLine::parseOptionsFile(const OptionsList& options)
 {
   if (not _optionsFile) return;
 
@@ -436,7 +458,7 @@ AppCmdLine::parseOptionsFile()
   // we do not want to change these again as command line overrides
   // options file contents.
   std::set < std::string > changedOptions;
-  for (OptionsList::const_iterator it = _options.begin(); it != _options.end(); ++it) {
+  for (OptionsList::const_iterator it = options.begin(); it != options.end(); ++it) {
     if ((*it)->valueChanged()) {
       const std::vector<std::string>& optnames = (*it)->options();
       changedOptions.insert(optnames.begin(), optnames.end());
@@ -483,7 +505,7 @@ AppCmdLine::parseOptionsFile()
       std::string optname(line, fchar, optend);
 
       // find option with this long name
-      AppCmdOptBase* option = findOpt(optname);
+      AppCmdOptBase* option = findOpt(optname, options);
       if (!option) {
         throw AppCmdException("Error parsing options file: option '" + optname + "' is unknown");
       }
@@ -546,7 +568,7 @@ AppCmdLine::parseArgs()
       // no data left
       bool ok = !(*it)->isRequired();
       if (!ok) {
-        throw AppCmdException("missing positional required argument(s)");
+        throw AppCmdArgListTooShort();
       }
       return;
     }
@@ -557,7 +579,7 @@ AppCmdLine::parseArgs()
       // but can get more
       if (_nWordsLeft <= nPosLeft) {
         // too few words left
-        throw AppCmdException("missing positional required argument(s)");
+        throw AppCmdArgListTooShort();
       }
       nWordsToGive = _nWordsLeft - nPosLeft;
     }
@@ -573,22 +595,41 @@ AppCmdLine::parseArgs()
 
   if (_iter != _argv.end()) {
     // not whole line is consumed
-    throw AppCmdException("command line is too long");
+    throw AppCmdArgListTooLong();
   }
 
 }
 
 /// find option with the long name
 AppCmdOptBase*
-AppCmdLine::findOpt(const std::string& opt) const
+AppCmdLine::findOpt(const std::string& opt, const OptionsList& options) const
 {
-  for (OptionsList::const_iterator it = _options.begin(); it != _options.end(); ++it) {
+  for (OptionsList::const_iterator it = options.begin(); it != options.end(); ++it) {
     const std::vector<std::string>& optnames = (*it)->options();
     if (std::find(optnames.begin(), optnames.end(), opt) != optnames.end()) {
       return *it;
     }
   }
   return 0;
+}
+
+void
+AppCmdLine::formatOptGroup(std::ostream& out, const std::string& groupName, const OptionsList& options, size_t optLen,
+    size_t nameLen) const
+{
+  out << "\n  " << groupName << ":\n";
+  for (OptionsList::const_iterator it = options.begin(); it != options.end(); ++it) {
+    std::string fopt;
+    const std::vector<std::string>& optnames = (*it)->options();
+    for (std::vector<std::string>::const_iterator oit = optnames.begin(); oit != optnames.end(); ++ oit) {
+      if (not fopt.empty()) fopt += "|";
+      fopt += "-";
+      if (oit->size() > 1) fopt += "-";
+      fopt += *oit;
+    }
+    out << "    {" << setw(optLen) << fopt.c_str() << "} " << setw(nameLen) << (*it)->name().c_str() << "  "
+        << (*it)->description() << '\n';
+  }
 }
 
 } // namespace AppUtils

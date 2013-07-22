@@ -27,6 +27,16 @@
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
 //-----------------------------------------------------------------------
 
+namespace {
+
+std::string optspec(const std::string& optname)
+{
+  if (optname.size() == 1) return "-" + optname;
+  return "--" + optname;
+}
+
+}
+
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
 //		----------------------------------------
@@ -43,30 +53,13 @@ AppCmdTypeCvtException::AppCmdTypeCvtException ( const std::string& string, cons
 {
 }
 
-AppCmdOptReservedException::AppCmdOptReservedException ( char option )
-  : AppCmdException( std::string("short option '-")+option+"' is reserved" )
-{
-}
-AppCmdOptReservedException::AppCmdOptReservedException ( const std::string& option )
-  : AppCmdException( "long option '--"+option+"' is reserved" )
-{
-}
-
-AppCmdOptDefinedException::AppCmdOptDefinedException ( char option )
-  : AppCmdException( std::string("short option '-")+option+"' is already defined" )
-{
-}
 AppCmdOptDefinedException::AppCmdOptDefinedException ( const std::string& option )
-  : AppCmdException( "long option '--"+option+"' is already defined" )
+  : AppCmdException( "option '" + ::optspec(option) + "' is already defined" )
 {
 }
 
-AppCmdOptUnknownException::AppCmdOptUnknownException ( char option )
-  : AppCmdException( std::string("option '-")+option+"' is unknown" )
-{
-}
 AppCmdOptUnknownException::AppCmdOptUnknownException ( const std::string& option )
-  : AppCmdException( "long option '--"+option+"' is unknown" )
+  : AppCmdException( "option '" + ::optspec(option) + "' is unknown" )
 {
 }
 
@@ -77,6 +70,16 @@ AppCmdArgOrderException::AppCmdArgOrderException ( const std::string& arg )
 
 AppCmdOptNameException::AppCmdOptNameException ( const std::string& option )
   : AppCmdException( "option name cannot start with dash: "+option )
+{
+}
+
+AppCmdArgListTooLong::AppCmdArgListTooLong()
+  : AppCmdException( "command line argument list is too long" )
+{
+}
+
+AppCmdArgListTooShort::AppCmdArgListTooShort()
+  : AppCmdException( "missing positional required argument(s)" )
 {
 }
 

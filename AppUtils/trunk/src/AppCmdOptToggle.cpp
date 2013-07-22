@@ -28,7 +28,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "AppUtils/AppCmdLine.h"
+#include "AppUtils/AppCmdOptGroup.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -48,14 +48,14 @@ AppCmdOptToggle::AppCmdOptToggle(const std::string& optNames, const std::string&
 {
 }
 
-AppCmdOptToggle::AppCmdOptToggle(AppCmdLine& parser, const std::string& optNames, const std::string& descr,
+AppCmdOptToggle::AppCmdOptToggle(AppCmdOptGroup& group, const std::string& optNames, const std::string& descr,
     bool defValue)
   : AppCmdOptBase(optNames, "(toggle)", descr)
   , _value(defValue)
   , _defValue(defValue)
   , _changed(false)
 {
-  parser.addOption(*this);
+  group.addOption(*this);
 }
 
 // Destructor

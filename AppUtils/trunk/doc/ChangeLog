@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-06-00
+2013-07-22 Andy Salnikov
+- adding option groups
+
 Tag: V00-05-01
 2013-07-22 Andy Salnikov
 - add forgotten header to AppCmdOptList.h

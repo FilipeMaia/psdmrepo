@@ -59,12 +59,12 @@ BOOST_AUTO_TEST_CASE( cmdline_test_simple )
   BOOST_CHECK_NO_THROW( cmdline.addArgument ( argInt2 ) ) ;
 
   // make a command line
-  std::list<std::string> args ;
+  std::vector<std::string> args ;
   args.push_back ( "MyName" ) ;
   args.push_back ( "12345" ) ;
 
-  // first try, stringfor optional argument is mising
-  BOOST_CHECK_NO_THROW ( cmdline.parse ( args.begin(), args.end() ) ) ;
+  // first try, string for optional argument is missing
+  BOOST_CHECK_NO_THROW ( cmdline.parse ( args.begin(), args.end() ) );
   BOOST_CHECK_EQUAL ( argString1.value(), "MyName" ) ;
   BOOST_CHECK_EQUAL ( argInt1.value(), 12345 ) ;
   BOOST_CHECK_EQUAL ( argInt1.valueChanged(), true ) ;
@@ -79,11 +79,6 @@ BOOST_AUTO_TEST_CASE( cmdline_test_simple )
   BOOST_CHECK_EQUAL ( argInt1.value(), 12345 ) ;
   BOOST_CHECK_EQUAL ( argInt2.value(), 123 ) ;
   BOOST_CHECK_EQUAL ( argInt2.valueChanged(), true ) ;
-
-  // one more argument should fail
-  args.push_back ( "fail" ) ;
-
-  BOOST_CHECK_THROW ( cmdline.parse ( args.begin(), args.end() ), AppCmdException ) ;
 
   // add more options
   AppCmdOptIncr optVerbose ( "v,verbose", "more noise", 0 ) ;
@@ -103,8 +98,6 @@ BOOST_AUTO_TEST_CASE( cmdline_test_simple )
 
   AppCmdOpt<std::string> optString2 ( "S,STRING", "Astring", "some string", "<none>" ) ;
   BOOST_CHECK_NO_THROW ( cmdline.addOption ( optString2 ) ) ;
-  // second one should fail
-  BOOST_CHECK_THROW ( cmdline.addOption ( optString2 ), AppCmdException ) ;
 
   AppCmdOpt<std::string> optString3 ( "d,dummy", "Astring", "some string", "<none>" ) ;
   BOOST_CHECK_NO_THROW ( cmdline.addOption ( optString3 ) ) ;
@@ -136,9 +129,6 @@ BOOST_AUTO_TEST_CASE( cmdline_test_simple )
   BOOST_CHECK_EQUAL ( optString2.value(), "NONE" ) ;
   BOOST_CHECK_EQUAL ( optString2.valueChanged(), true ) ;
   BOOST_CHECK_EQUAL ( optString3.valueChanged(), false ) ;
-
-  // print usage info about command
-  //cmdline.usage ( std::cout ) ;
 }
 
 // ==============================================================
@@ -151,15 +141,14 @@ BOOST_AUTO_TEST_CASE( cmdline_test_simple_newstyle )
   // create a bunch of arguments and add them
   AppCmdArg<std::string> argString1(cmdline, "name", "specifies the name");
   AppCmdArg<int> argInt1(cmdline, "number", "specifies the number");
-
   AppCmdArg<int> argInt2(cmdline, "number", "specifies the number 2", 1000 ) ;
 
   // make a command line
-  std::list<std::string> args ;
+  std::vector<std::string> args ;
   args.push_back ( "MyName" ) ;
   args.push_back ( "12345" ) ;
 
-  // first try, stringfor optional argument is mising
+  // first try, string for optional argument is missing
   BOOST_CHECK_NO_THROW ( cmdline.parse ( args.begin(), args.end() ) ) ;
   BOOST_CHECK_EQUAL ( argString1.value(), "MyName" ) ;
   BOOST_CHECK_EQUAL ( argInt1.value(), 12345 ) ;
@@ -176,11 +165,6 @@ BOOST_AUTO_TEST_CASE( cmdline_test_simple_newstyle )
   BOOST_CHECK_EQUAL ( argInt2.value(), 123 ) ;
   BOOST_CHECK_EQUAL ( argInt2.valueChanged(), true ) ;
 
-  // one more argument should fail
-  args.push_back ( "fail" ) ;
-
-  BOOST_CHECK_THROW ( cmdline.parse ( args.begin(), args.end() ), AppCmdException ) ;
-
   // add more options
   AppCmdOptIncr optVerbose (cmdline, "verbose,v,V,VERB", "more noise", 0 ) ;
 
@@ -193,8 +177,6 @@ BOOST_AUTO_TEST_CASE( cmdline_test_simple_newstyle )
   AppCmdOpt<std::string> optString1 (cmdline, "s,string", "astring", "some string", "<none>" ) ;
 
   AppCmdOpt<std::string> optString2 (cmdline, "STRING,S", "Astring", "some string", "<none>" ) ;
-  // second one should fail
-  BOOST_CHECK_THROW ( cmdline.addOption ( optString2 ), AppCmdException ) ;
 
   AppCmdOpt<std::string> optString3 (cmdline, "dummy", "Astring", "some string", "<none>" ) ;
 
@@ -226,47 +208,90 @@ BOOST_AUTO_TEST_CASE( cmdline_test_simple_newstyle )
   BOOST_CHECK_EQUAL ( optString2.value(), "NONE" ) ;
   BOOST_CHECK_EQUAL ( optString2.valueChanged(), true ) ;
   BOOST_CHECK_EQUAL ( optString3.valueChanged(), false ) ;
-
-  // print usage info about command
-  //cmdline.usage ( std::cout ) ;
 }
 
 
 // ==============================================================
 
-BOOST_AUTO_TEST_CASE( cmdline_test_except )
+// check for argument count
+BOOST_AUTO_TEST_CASE( cmdline_test_except_args_count )
 {
   AppCmdLine cmdline("command") ;
 
   // create a bunch of arguments and add them
-  AppCmdArg<std::string> argString1( "name", "specifies the name", "" ) ;
-  AppCmdArg<std::string> argString2( "name", "specifies the name" ) ;
+  AppCmdArg<std::string> argString1(cmdline, "name", "specifies the name");
+  AppCmdArg<int> argInt1(cmdline, "number", "specifies the number");
 
-  // first argument should not throw
-  BOOST_CHECK_NO_THROW( cmdline.addArgument ( argString1 ) ) ;
-  // second should throw because it is required and first one was optional
-  BOOST_CHECK_THROW ( cmdline.addArgument ( argString2 ), AppCmdException ) ;
+  // make a command line
+  std::vector<std::string> args ;
+  args.push_back ( "MyName" ) ;
+
+  // too few positional parameters yet
+  BOOST_CHECK_THROW ( cmdline.parse ( args.begin(), args.end() ), AppCmdArgListTooShort ) ;
+
+  // two is OK
+  args.push_back ( "12345" ) ;
+  BOOST_CHECK_NO_THROW ( cmdline.parse ( args.begin(), args.end() ) ) ;
+
+  // add one more, parse() will fail
+  args.push_back ( "???" ) ;
+  BOOST_CHECK_THROW ( cmdline.parse ( args.begin(), args.end() ), AppCmdArgListTooLong ) ;
+}
+
+// ==============================================================
+
+// check for argument order conflict
+BOOST_AUTO_TEST_CASE( cmdline_test_except_args_order )
+{
+  AppCmdLine cmdline("command") ;
+
+  // create a bunch of arguments and add them
+  AppCmdArg<std::string> argString1(cmdline, "name", "specifies the name", "");
+  AppCmdArg<int> argInt1(cmdline, "number", "specifies the number");
+
+  // should fail on checking arguments
+  std::vector<std::string> args ;
+  BOOST_CHECK_THROW ( cmdline.parse ( args.begin(), args.end() ), AppCmdArgOrderException ) ;
+}
+
+// ==============================================================
+
+// check for option conflicts with short options
+BOOST_AUTO_TEST_CASE( cmdline_test_except_duplicate_opt_short )
+{
+  AppCmdLine cmdline("command") ;
 
   // make few options
-  AppCmdOpt<std::string> optString1 ( "1,string1", "astring", "some string", "<none>" ) ;
-  AppCmdOpt<std::string> optString2 ( "2,string2", "astring", "some string", "<none>" ) ;
+  AppCmdOpt<std::string> optString1 (cmdline, "1,string1", "astring", "some string", "" ) ;
+  AppCmdOpt<std::string> optString2 (cmdline, "2,string2", "astring", "some string", "" ) ;
+  AppCmdOpt<std::string> optString3 (cmdline, "1,string3", "astring", "some string", "" ) ;
 
-  // first should be OK
-  BOOST_CHECK_NO_THROW ( cmdline.addOption( optString1 ) ) ;
-  // adding it again will throw
-  BOOST_CHECK_THROW ( cmdline.addOption( optString1 ), AppCmdException ) ;
-  // second should be OK
-  BOOST_CHECK_NO_THROW ( cmdline.addOption( optString2 ) ) ;
+  std::vector<std::string> args ;
+  BOOST_CHECK_THROW ( cmdline.parse ( args.begin(), args.end() ), AppCmdOptDefinedException ) ;
+}
 
-  AppCmdOptList<std::string> optString1l ( "1,string1", "astring", "some string", '\0' ) ;
-  AppCmdOptList<std::string> optString3l ( "3,string3", "astring", "some string", '\0' ) ;
+// ==============================================================
 
-  // setting options file with the same option will throw
-  BOOST_CHECK_THROW ( cmdline.setOptionsFile( optString1l ), AppCmdException ) ;
-  // this is OK
-  BOOST_CHECK_NO_THROW ( cmdline.addOption( optString3l ) ) ;
-  // setting options file after addOption() is OK
-  BOOST_CHECK_NO_THROW ( cmdline.setOptionsFile( optString3l ) ) ;
+// check for option conflicts with long options
+BOOST_AUTO_TEST_CASE( cmdline_test_except_duplicate_opt_long )
+{
+  AppCmdLine cmdline("command") ;
+
+  // make few options
+  AppCmdOpt<std::string> optString1 (cmdline, "1,string1", "astring", "some string", "" ) ;
+  AppCmdOpt<std::string> optString2 (cmdline, "2,string2", "astring", "some string", "" ) ;
+  AppCmdOpt<std::string> optString3 (cmdline, "3,string1", "astring", "some string", "" ) ;
+
+  std::vector<std::string> args ;
+  BOOST_CHECK_THROW ( cmdline.parse ( args.begin(), args.end() ), AppCmdOptDefinedException ) ;
+}
+
+// ==============================================================
+
+// check few conversions to numeric types
+BOOST_AUTO_TEST_CASE( cmdline_test_cvt )
+{
+  AppCmdLine cmdline("command") ;
 
   const char* args[5] = { "" } ;
 
@@ -388,7 +413,7 @@ BOOST_AUTO_TEST_CASE( cmdline_test_strlist )
   AppCmdOptList<std::string> optStringL( "n,name", "string", "specifies the name(s)" ) ;
   BOOST_CHECK_NO_THROW ( cmdline1.addOption ( optStringL ) ) ;
 
-  std::list<std::string> args ;
+  std::vector<std::string> args ;
   args.push_back ( "-nname1" ) ;
   args.push_back ( "-n" ) ;
   args.push_back ( "name2" ) ;
@@ -442,10 +467,6 @@ BOOST_AUTO_TEST_CASE( cmdline_test_helpopt )
   // Install one more cmd line parser, cannot fail
   AppCmdLine cmdline1( "command1" ) ;
 
-  // should not be able to add -h or --help
-  AppCmdOptIncr optHelp ( "h,help", "gimme help", 0 ) ;
-  BOOST_CHECK_THROW( cmdline1.addOption ( optHelp ), AppCmdException ) ;
-
   // check how help options work
   const char* args[5] = { "" } ;
 
@@ -460,6 +481,10 @@ BOOST_AUTO_TEST_CASE( cmdline_test_helpopt )
   args[1] = "-h" ;
   BOOST_CHECK_NO_THROW( cmdline1.parse ( 2, args ) ) ;
   BOOST_CHECK( cmdline1.helpWanted() ) ;
+
+  // should not be able to add -h or --help
+  AppCmdOptIncr optHelp ( cmdline1 ,"h,help", "gimme help", 0 ) ;
+  BOOST_CHECK_THROW( cmdline1.parse ( 2, args ), AppCmdOptDefinedException ) ;
 }
 
 // ==============================================================
@@ -599,4 +624,65 @@ BOOST_AUTO_TEST_CASE( cmdline_test_size )
   BOOST_CHECK_NO_THROW ( cmdline.parse ( 2, args ) ) ;
   BOOST_CHECK_EQUAL ( optSize.value(), 1000*1024*1024*1024ULL ) ;
 
+}
+
+// ==============================================================
+
+BOOST_AUTO_TEST_CASE( cmdline_test_groups )
+{
+  // Install one more cmd line parser, cannot fail
+  AppCmdLine cmdline( "command" ) ;
+  AppCmdOptGroup group1( "Input options" ) ;
+  BOOST_CHECK_NO_THROW ( cmdline.addGroup(group1) ) ;
+  AppCmdOptGroup group2(cmdline, "Output options");
+
+  AppCmdOptIncr optVerbose(cmdline, "v,verbose", "make more noise", 0 );
+  AppCmdOpt<int> optInt1(group1, "x,number1", "number", "some number", 1 ) ;
+  AppCmdOpt<int> optInt2(group2, "y,number2", "number", "some number", 2 ) ;
+
+  const char* args[5] = { "" } ;
+
+  args[1] = "-v" ;
+  BOOST_CHECK_NO_THROW(cmdline.parse(2, args));
+  BOOST_CHECK_EQUAL(optVerbose.value(), 1);
+  BOOST_CHECK_EQUAL(optInt1.value(), 1);
+  BOOST_CHECK_EQUAL(optInt2.value(), 2);
+
+  args[1] = "--verbose" ;
+  BOOST_CHECK_NO_THROW(cmdline.parse(2, args));
+  BOOST_CHECK_EQUAL(optVerbose.value(), 1);
+  BOOST_CHECK_EQUAL(optInt1.value(), 1);
+  BOOST_CHECK_EQUAL(optInt2.value(), 2);
+
+  args[1] = "-x100" ;
+  BOOST_CHECK_NO_THROW(cmdline.parse(2, args));
+  BOOST_CHECK_EQUAL(optVerbose.value(), 0);
+  BOOST_CHECK_EQUAL(optInt1.value(), 100);
+  BOOST_CHECK_EQUAL(optInt2.value(), 2);
+
+  args[1] = "--number1=100" ;
+  BOOST_CHECK_NO_THROW(cmdline.parse(2, args));
+  BOOST_CHECK_EQUAL(optVerbose.value(), 0);
+  BOOST_CHECK_EQUAL(optInt1.value(), 100);
+  BOOST_CHECK_EQUAL(optInt2.value(), 2);
+
+  args[1] = "-y200" ;
+  BOOST_CHECK_NO_THROW(cmdline.parse(2, args));
+  BOOST_CHECK_EQUAL(optVerbose.value(), 0);
+  BOOST_CHECK_EQUAL(optInt1.value(), 1);
+  BOOST_CHECK_EQUAL(optInt2.value(), 200);
+
+  args[1] = "--number2=200" ;
+  BOOST_CHECK_NO_THROW(cmdline.parse(2, args));
+  BOOST_CHECK_EQUAL(optVerbose.value(), 0);
+  BOOST_CHECK_EQUAL(optInt1.value(), 1);
+  BOOST_CHECK_EQUAL(optInt2.value(), 200);
+
+  args[1] = "-vvv" ;
+  args[2] = "-x3" ;
+  args[3] = "-y4" ;
+  BOOST_CHECK_NO_THROW(cmdline.parse(4, args));
+  BOOST_CHECK_EQUAL(optVerbose.value(), 3);
+  BOOST_CHECK_EQUAL(optInt1.value(), 3);
+  BOOST_CHECK_EQUAL(optInt2.value(), 4);
 }

@@ -25,7 +25,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "AppUtils/AppCmdExceptions.h"
-#include "AppUtils/AppCmdLine.h"
+#include "AppUtils/AppCmdOptGroup.h"
 #include "AppUtils/AppCmdTypeTraits.h"
 
 //------------------------------------
@@ -104,7 +104,7 @@ public:
    *  This method may throw an exception if the option name conflicts with the previously
    *  added options.
    *
-   *  @param[in] parser      Parser instance to which this option will be added.
+   *  @param[in] group       Option group (or parser instance) to which this option will be added.
    *  @param[in] optNames    Comma-separated option names.
    *  @param[in] name        Name for option argument, something like "path", "number", etc. Used
    *                         only for information purposes when usage() is called.
@@ -113,7 +113,7 @@ public:
    *
    *  @throw AppCmdException or a subclass of it.
    */
-  AppCmdOpt(AppCmdLine& parser, const std::string& optNames, const std::string& name, const std::string& descr,
+  AppCmdOpt(AppCmdOptGroup& group, const std::string& optNames, const std::string& name, const std::string& descr,
       const Type& defValue);
 
   /// Destructor
@@ -193,14 +193,14 @@ AppCmdOpt<Type>::AppCmdOpt(const std::string& optNames, const std::string& name,
 }
 
 template <typename Type>
-AppCmdOpt<Type>::AppCmdOpt(AppCmdLine& parser, const std::string& optNames, const std::string& name,
+AppCmdOpt<Type>::AppCmdOpt(AppCmdOptGroup& group, const std::string& optNames, const std::string& name,
     const std::string& descr, const Type& defValue)
   : AppCmdOptBase(optNames, name, descr)
   , _value(defValue)
   , _defValue(defValue)
   , _changed(false)
 {
-  parser.addOption(*this);
+  group.addOption(*this);
 }
 
 } // namespace AppUtils
