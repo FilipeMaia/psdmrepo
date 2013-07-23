@@ -92,12 +92,12 @@ private:
 //----------------
 O2O_XTC_Filter::O2O_XTC_Filter ( const std::string& appName )
   : AppUtils::AppBase(appName)
-  , m_calibIndexOpt(parser(), "c,calib-index", "number", "select event from given calib cycle, def: -1", -1)
+  , m_calibIndexOpt(parser(), "c,calib-index", "number", "select event from given calib cycle", -1)
   , m_eventIndexOpt(parser(), "e,event-index", "number", "select event with given index, more than one possible")
-  , m_dgramQSize(parser(), "Q,datagram-queue", "number", "datagram queue size. def: 32", 32)
+  , m_dgramQSize(parser(), "Q,datagram-queue", "number", "datagram queue size", 32)
   , m_liveDbConn(parser(), "live-db", "string", "database connection string for live database", "")
-  , m_liveTable(parser(), "live-table", "string", "table name for live database, def: file", "file")
-  , m_liveTimeout(parser(), "live-timeout", "number", "timeout for live data in seconds, def: 120", 120U)
+  , m_liveTable(parser(), "live-table", "string", "table name for live database", "file")
+  , m_liveTimeout(parser(), "live-timeout", "number", "timeout for live data in seconds", 120U)
   , m_inputFiles(parser(), "input-xtc", "the list of the input XTC files")
   , m_outputName(parser(), "output-xtc", "the name of the output XTC file")
 {

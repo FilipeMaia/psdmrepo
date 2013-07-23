@@ -130,11 +130,11 @@ private:
 O2O_Scanner::O2O_Scanner ( const std::string& appName )
   : AppBase( appName )
   , m_skipDamaged( parser(), "d,skip-damaged",           "skip damaged datagrams", false )
-  , m_l1offset   ( parser(), "l1-offset",    "number",   "L1Accept time offset seconds, def: 0", 0 )
-  , m_mergeMode  ( parser(), "j,merge-mode", "mode-name","one of one-stream, no-chunking, file-name; def: file-name", XtcInput::MergeFileName )
+  , m_l1offset   ( parser(), "l1-offset",    "number",   "L1Accept time offset seconds", 0 )
+  , m_mergeMode  ( parser(), "j,merge-mode", "mode-name","merge mode", XtcInput::MergeFileName )
   , m_liveDbConn ( parser(), "live-db",      "string",   "database connection string for live database", "" )
-  , m_liveTable  ( parser(), "live-table",   "string",   "table name for live database, def: file", "file" )
-  , m_liveTimeout( parser(), "live-timeout", "number",   "timeout for live data in seconds, def: 120", 120U )
+  , m_liveTable  ( parser(), "live-table",   "string",   "table name for live database", "file" )
+  , m_liveTimeout( parser(), "live-timeout", "number",   "timeout for live data in seconds", 120U )
   , m_inputFiles ( parser(), "input-xtc",                "the list of the input XTC files" )
 {
   m_mergeMode.add ( "one-stream", XtcInput::MergeOneStream ) ;

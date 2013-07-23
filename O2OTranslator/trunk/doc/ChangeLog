@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-28-12
+2013-07-23 Andy Salnikov
+- improve description of command line options, defaults are now printed
+  by CmdLine
+
 Tag: V00-28-11
 2013-07-22 Andy Salnikov
 - use option groups in command line parser
