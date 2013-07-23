@@ -44,6 +44,7 @@ from ConfigParametersForApp import cp
 from Logger                 import logger
 from GUIButtonBar           import *
 from GUISelectCalibDir      import *
+from GUICalibDirTree        import *
 
 #---------------------
 #  Class definition --
@@ -70,20 +71,26 @@ class GUIMain ( QtGui.QWidget ) :
 
         self.setFrame()
  
-        self.guitree = QtGui.QTextEdit()
+        self.guitree = QtGui.GUICalibDirTree()
         self.guitabs = QtGui.QTextEdit()
 
-        self.hboxB = QtGui.QHBoxLayout() 
-        self.hboxB.addWidget(self.guitree)
-        self.hboxB.addWidget(self.guitabs)
+        #self.hboxB = QtGui.QHBoxLayout() 
+        #self.hboxB.addWidget(self.guitree)
+        #self.hboxB.addWidget(self.guitabs)
 
+        self.splitterV = QtGui.QSplitter(QtCore.Qt.Vertical)
+        self.splitterV.addWidget(self.guitree)
+        self.splitterV.addWidget(self.guitabs)
+        
         self.guibuttonbar      = GUIButtonBar(self)
         self.guiselectcalibdir = GUISelectCalibDir(self)
 
         self.vbox = QtGui.QVBoxLayout() 
         self.vbox.addWidget(self.guibuttonbar)
         self.vbox.addWidget(self.guiselectcalibdir)
-        self.vbox.addLayout(self.hboxB) 
+        #self.vbox.addLayout(self.hboxB) 
+        self.vbox.addLayout(self.splitterV) 
+
         self.vbox.addStretch(1)
 
         self.setLayout(self.vbox)
