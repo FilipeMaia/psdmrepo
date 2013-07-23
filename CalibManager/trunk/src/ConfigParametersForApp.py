@@ -55,10 +55,10 @@ class ConfigParametersForApp ( ConfigParameters ) :
     def initRunTimeParameters( self ) :
         self.iconsAreLoaded  = False
         #self.char_expand = u' \u25BE' # down-head triangle
-        self.guilogger = None
-        self.guihelp   = None
+        #self.guilogger = None
+        #self.guihelp   = None
 
-        self.procDarkStatus  = 0 # 0=inctive, 1=scan, 2=averaging, 3=both
+        #self.procDarkStatus  = 0 # 0=inctive, 1=scan, 2=averaging, 3=both
  
 #-----------------------------
 
@@ -154,21 +154,25 @@ class ConfigParametersForApp ( ConfigParameters ) :
         self.icon_help          = self.icon_unknown
         self.icon_reset         = self.icon_reload
 
-
 #-----------------------------
-
         
     def declareAllParameters( self ) :
         # Possible typs for declaration : 'str', 'int', 'long', 'float', 'bool' 
 
+        # GUISelectCalibDir.py
+        self.instr_dir          = self.declareParameter( name='INSTRUMENT_DIR',    val_def='/reg/d/psdm',  type='str' ) 
+        self.instr_name         = self.declareParameter( name='INSTRUMENT_NAME',   val_def='None',         type='str' ) # 'CXI'
+        self.exp_name           = self.declareParameter( name='EXPERIMENT_NAME',   val_def='None',         type='str' ) # 'cxitut13'
+        self.calib_dir          = self.declareParameter( name='CALIB_DIRECTORY',   val_def='None',         type='str' ) # '/reg/d/psdm/CXI/cxitut13/calib'
+
         # GUIMainSplit.py
-        self.current_tab    = self.declareParameter( name='CURRENT_TAB'      , val_def='Files',        type='str' )
+        #self.current_tab    = self.declareParameter( name='CURRENT_TAB'      , val_def='Files',        type='str' )
         #self.fname_cp       = self.declareParameter( name='FNAME_CONFIG_PARS', val=fname, val_def='confpars.txt', type='str' )
 
         # GUIConfigPars.py
-        self.dir_work          = self.declareParameter( name='DIRECTORY_WORK',        val_def='./work',       type='str' )
-        self.dir_results       = self.declareParameter( name='DIRECTORY_RESULTS',     val_def='./results',    type='str' )
-        self.fname_prefix      = self.declareParameter( name='FILE_NAME_PREFIX',      val_def='clb-',         type='str' )
+        #self.dir_work          = self.declareParameter( name='DIRECTORY_WORK',        val_def='./work',       type='str' )
+        #self.dir_results       = self.declareParameter( name='DIRECTORY_RESULTS',     val_def='./results',    type='str' )
+        #self.fname_prefix      = self.declareParameter( name='FILE_NAME_PREFIX',      val_def='clb-',         type='str' )
 
         # GUILogger.py
         self.log_level      = self.declareParameter( name='LOG_LEVEL_OF_MSGS',  val_def='info',         type='str' )
@@ -177,11 +181,11 @@ class ConfigParametersForApp ( ConfigParameters ) :
 
         # GUIGrabSubmitELog.py
         #self.cbx_more_options    = self.declareParameter( name='CBX_SHOW_MORE_OPTIONS',   val_def=False,             type='bool' )
-        self.img_infname         = self.declareParameter( name='IMG_INPUT_FNAME',  val_def='./img-1.ppm',            type='str' )
-        self.img_oufname         = self.declareParameter( name='IMG_OUTPUT_FNAME', val_def='./img-1.ppm',            type='str' )
+        #self.img_infname         = self.declareParameter( name='IMG_INPUT_FNAME',  val_def='./img-1.ppm',            type='str' )
+        #self.img_oufname         = self.declareParameter( name='IMG_OUTPUT_FNAME', val_def='./img-1.ppm',            type='str' )
 
-        self.elog_post_des       = self.declareParameter( name='ELOG_POST_DESCRIPTION',   val_def='Image',           type='str' )
-        self.elog_post_tag       = self.declareParameter( name='ELOG_POST_TAG',           val_def='SCREENSHOT',      type='str' )
+        #self.elog_post_des       = self.declareParameter( name='ELOG_POST_DESCRIPTION',   val_def='Image',           type='str' )
+        #self.elog_post_tag       = self.declareParameter( name='ELOG_POST_TAG',           val_def='SCREENSHOT',      type='str' )
         #self.elog_post_ins       = self.declareParameter( name='ELOG_POST_INSTRUMENT',    val_def='AMO',             type='str' )
         #self.elog_post_exp       = self.declareParameter( name='ELOG_POST_EXPERIMENT',    val_def='amodaq09',        type='str' )
         #self.elog_post_in2       = self.declareParameter( name='ELOG_POST_INSTRUMENT_2',  val_def='NEH',             type='str' )
@@ -195,18 +199,22 @@ class ConfigParametersForApp ( ConfigParameters ) :
         #self.elog_post_cmd       = self.declareParameter( name='ELOG_POST_CHILD_COMMAND', val_def='',                type='str' )
 
         # GUIDark.py
-        self.use_dark_xtc_all  = self.declareParameter( name='USE_DARK_XTC_ALL_CHUNKS', val_def=True,  type='bool' )
+        #self.use_dark_xtc_all  = self.declareParameter( name='USE_DARK_XTC_ALL_CHUNKS', val_def=True,  type='bool' )
 
-        self.in_dir_dark       = self.declareParameter( name='IN_DIRECTORY_DARK', val_def='/reg/d/ana12/xcs/xcsi0112/xtc',type='str' )
-        self.in_file_dark      = self.declareParameter( name='IN_FILE_NAME_DARK', val_def='e167-r0020-s00-c00.xtc',type='str' )
+        #self.in_dir_dark       = self.declareParameter( name='IN_DIRECTORY_DARK', val_def='/reg/d/ana12/xcs/xcsi0112/xtc',type='str' )
+        #self.in_file_dark      = self.declareParameter( name='IN_FILE_NAME_DARK', val_def='e167-r0020-s00-c00.xtc',type='str' )
 
-        self.bat_dark_start    = self.declareParameter( name='BATCH_DARK_START',      val_def= 1,       type='int' )
-        self.bat_dark_end      = self.declareParameter( name='BATCH_DARK_END'  ,      val_def=-1,       type='int' )
-        self.bat_dark_total    = self.declareParameter( name='BATCH_DARK_TOTAL',      val_def=-1,       type='int' )
+        #self.bat_dark_start    = self.declareParameter( name='BATCH_DARK_START',      val_def= 1,       type='int' )
+        #self.bat_dark_end      = self.declareParameter( name='BATCH_DARK_END'  ,      val_def=-1,       type='int' )
+        #self.bat_dark_total    = self.declareParameter( name='BATCH_DARK_TOTAL',      val_def=-1,       type='int' )
 
         # GUIConfig.py
-        self.current_config_tab = self.declareParameter( name='CURRENT_CONFIG_TAB' , val_def='Config File', type='str' )
+        #self.current_config_tab = self.declareParameter( name='CURRENT_CONFIG_TAB', val_def='Config File', type='str' )
  
+
+        # For batch jobs
+        #self.bat_queue               = self.declareParameter( name='BATCH_QUEUE',                val_def='psfehq', type='str' )
+        #self.bat_submit_interval_sec = self.declareParameter( name='BATCH_SUBMIT_INTERVAL_SEC',  val_def=100,      type='int' )
  
 #-----------------------------
 
@@ -216,13 +224,15 @@ class ConfigParametersForApp ( ConfigParameters ) :
         self.styleYellowBkg = "background-color: rgb(255, 255, 120); color: rgb(0, 0, 0);" # Pinkish
         self.styleGreenMy   = "background-color: rgb(150, 250, 230); color: rgb(0, 0, 0);" # My
         self.styleGray      = "background-color: rgb(230, 240, 230); color: rgb(0, 0, 0);" # Gray
-        self.styleGreenish  = "background-color: rgb(100, 255, 200); color: rgb(0, 0, 0);" # Greenish
+        self.styleGreenish  = "background-color: rgb(100, 240, 200); color: rgb(0, 0, 0);" # Greenish
         self.styleGreenPure = "background-color: rgb(150, 255, 150); color: rgb(0, 0, 0);" # Green
-        self.styleBluish    = "background-color: rgb(200, 200, 255); color: rgb(0, 0, 0);" # Bluish
+        self.styleBluish    = "background-color: rgb(220, 220, 250); color: rgb(0, 0, 0);" # Bluish
         self.styleWhite     = "background-color: rgb(255, 255, 255); color: rgb(0, 0, 0);"
         self.styleRedBkgd   = "background-color: rgb(255,   0,   0); color: rgb(0, 0, 0);" # Red background
+        self.styleReddish   = "background-color: rgb(220,   0,   0); color: rgb(0, 0, 0);" # Reddish background
         self.styleTransp    = "background-color: rgb(255,   0,   0, 100);"
-        self.styleDefault   = "background-color: rgb(239, 235, 231, 255); color: rgb(0, 0, 0);" # Gray bkgd
+        #self.styleDefault   = "background-color: rgb(239, 235, 231, 255); color: rgb(0, 0, 0);" # Gray bkgd
+        self.styleDefault   = ""
         #self.styleTitle  = "color: rgb(150, 160, 100);"
         self.styleBlue   = "color: rgb(100, 0, 150);"
         self.styleBuriy  = "color: rgb(150, 100, 50);"
@@ -235,14 +245,16 @@ class ConfigParametersForApp ( ConfigParameters ) :
         self.styleTitle        = self.styleBuriy
         self.styleLabel        = self.styleBlue
         self.styleEdit         = self.styleWhite
-        self.styleEditInfo     = self.styleBkgd # self.styleGreenish
+        #self.styleEditInfo     = self.styleBkgd # self.styleGreenish
+        self.styleEditInfo     = self.styleGreenish # Bluish
         self.styleEditBad      = self.styleRedBkgd
         self.styleButton       = self.styleGray
         self.styleButtonOn     = self.styleBluish
         self.styleButtonClose  = self.stylePink
         self.styleButtonWarning= self.styleYellowBkg
         self.styleButtonGood   = self.styleGreenPure
-        self.styleButtonBad    = self.stylePink
+        #self.styleButtonBad    = self.stylePink
+        self.styleButtonBad    = self.styleReddish
         self.styleBox          = self.styleGray
         self.styleCBox         = self.styleYellowish
         self.styleStatusGood   = self.styleGreen

@@ -7,7 +7,7 @@
 #
 #------------------------------------------------------------------------
 
-"""Deals with batch jobs for pedestals
+"""Deals with batch jobs for dark runs (pedestals)
 
 This software was developed for the LCLS project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
@@ -26,24 +26,17 @@ __version__ = "$Revision: 4 $"
 #--------------------------------
 #  Imports of standard modules --
 #--------------------------------
-#import sys
-#import os
 
 from BatchJob import *
-#from ConfigParametersCorAna   import confpars as cp
-#from Logger                   import logger
-#from ConfigFileGenerator      import cfg
-#from FileNameManager          import fnm
-#import GlobalUtils            as     gu
 
 #-----------------------------
 
 class BatchJobPedestals (BatchJob) :
-    """Deals with batch jobs for pedestals.
+    """Deals with batch jobs for dark runs (pedestals).
     """
 
     def __init__ (self) :
-        """Constructor.
+        """
         @param fname  the file name for output log file
         """
 
@@ -72,14 +65,17 @@ class BatchJobPedestals (BatchJob) :
 
         self.make_psana_cfg_file_for_peds_scan()
 
-        command      = 'psana -c ' + fnm.path_peds_scan_psana_cfg() + ' ' + fnm.path_dark_xtc_cond()
+        command      = 'psana -c ' + fnm.path_peds_scan_psana_cfg() + ' ' + fnm.path_to_xtc_files_for_run() # fnm.path_dark_xtc_cond()
         queue        = cp.bat_queue.value()
         bat_log_file = fnm.path_peds_scan_batch_log()
+
+        #print 'command     :', command
+        #print 'queue       :', queue
+        #print 'bat_log_file:', bat_log_file
 
         self.job_id_scan_str, out, err = gu.batch_job_submit(command, queue, bat_log_file)
         cp.procDarkStatus ^= 1 # set bit to 1
         #print 'cp.procDarkStatus: ', cp.procDarkStatus
-
 
 #-----------------------------
 
@@ -90,7 +86,7 @@ class BatchJobPedestals (BatchJob) :
 
         self.make_psana_cfg_file_for_peds_aver()
 
-        command      = 'psana -c ' + fnm.path_peds_aver_psana_cfg() + ' ' + fnm.path_dark_xtc_cond()
+        command      = 'psana -c ' + fnm.path_peds_aver_psana_cfg() + ' ' + fnm.path_to_xtc_files_for_run() # fnm.path_dark_xtc_cond()
         queue        = cp.bat_queue.value()
         bat_log_file = fnm.path_peds_aver_batch_log()
 

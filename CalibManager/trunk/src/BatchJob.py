@@ -40,19 +40,25 @@ import GlobalUtils            as     gu
 class BatchJob :
     """Base class with common methods for batch jobs.
     """
+    dict_status = {True  : 'available',
+                   False : 'not available'}
 
     def __init__ (self) :
         """Constructor.
         @param fname the file name for ...
         """
 
-        self.time_interval_sec      = 100
-        self.dict_status = {True  : 'available',
-                            False : 'not available'}
+        self.time_interval_sec = cp.bat_submit_interval_sec.value() # 100
 
 #-----------------------------
 
     def job_can_be_submitted(self, job_id, t_sub, comment='') :
+
+        if not gu.bsub_is_available() :
+            #return False
+            sys.exit('EXIT')
+
+
         if self.job_was_recently_submitted(t_sub, comment) and \
            (self.get_batch_job_status(job_id, comment) != 'DONE') :
 

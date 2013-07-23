@@ -60,12 +60,11 @@ class ConfigFileGenerator :
 #-----------------------------
 
     def make_psana_cfg_file_for_peds_scan (self) :
-        self.path_in  = apputils.AppDataPath('CorAna/scripts/psana-peds-scan.cfg').path()
+        self.path_in  = apputils.AppDataPath('CalibManager/scripts/psana-peds-scan.cfg').path()
         self.path_out = fnm.path_peds_scan_psana_cfg()
-        self.d_subs   = {'FNAME_XTC'            : fnm.path_dark_xtc_cond(),
+        self.d_subs   = {'FNAME_XTC'            : str(fnm.path_to_xtc_files_for_run()),
                          'SKIP'                 : 'IS_NOT_USED',
                          'EVENTS'               : 'FOR_ALL_EVENTS',
-                         'FNAME_TIMESTAMP_LIST' : fnm.path_peds_scan_tstamp_list()
                          }
 
         self.print_substitution_dict()
@@ -74,7 +73,7 @@ class ConfigFileGenerator :
 #-----------------------------
 
     def make_psana_cfg_file_for_peds_aver (self) :
-        self.path_in  = apputils.AppDataPath('CorAna/scripts/psana-peds-aver.cfg').path()
+        self.path_in  = apputils.AppDataPath('CalibManager/scripts/psana-peds-aver.cfg').path()
         self.path_out = fnm.path_peds_aver_psana_cfg()
         self.d_subs   = {'FNAME_XTC'      : fnm.path_dark_xtc_cond(),
                          'SKIP'           : str( cp.bat_dark_start.value() - 1 ),
@@ -104,7 +103,7 @@ class ConfigFileGenerator :
 #-----------------------------
 
     def make_psana_cfg_file_for_data_scan (self) :
-        self.path_in  = apputils.AppDataPath('CorAna/scripts/psana-data-scan.cfg').path()
+        self.path_in  = apputils.AppDataPath('CalibManager/scripts/psana-data-scan.cfg').path()
         self.path_out = fnm.path_data_scan_psana_cfg()
         self.d_subs   = {'FNAME_XTC'                         : fnm.path_data_xtc_cond(),
                          'SKIP'                              : 'IS_NOT_USED',
@@ -120,7 +119,7 @@ class ConfigFileGenerator :
 #-----------------------------
 
     def make_psana_cfg_file_for_data_aver (self) :
-        self.path_in  = apputils.AppDataPath('CorAna/scripts/psana-data-aver.cfg').path()
+        self.path_in  = apputils.AppDataPath('CalibManager/scripts/psana-data-aver.cfg').path()
         self.path_out = fnm.path_data_aver_psana_cfg()
         self.d_subs   = {'FNAME_XTC'      : fnm.path_data_xtc_cond(),
                          'SKIP'           : str( cp.bat_data_start.value() - 1 ),
@@ -147,7 +146,7 @@ class ConfigFileGenerator :
 #-----------------------------
 
     def make_psana_cfg_file_for_cora_split (self) :
-        self.path_in  = apputils.AppDataPath('CorAna/scripts/psana-cora-split.cfg').path()
+        self.path_in  = apputils.AppDataPath('CalibManager/scripts/psana-cora-split.cfg').path()
         self.path_out = fnm.path_cora_split_psana_cfg()
 
         self.d_subs   = {'FNAME_XTC'       : fnm.path_data_xtc_cond(),

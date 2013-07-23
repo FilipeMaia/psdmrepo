@@ -93,6 +93,18 @@ def print_all_files_in_dir(dirname) :
     print '\n'
 
 
+def get_list_of_files_in_dir_for_ext(dir, ext='.xtc'):
+    """Returns the list of files in the directory for specified extension or None if directory is None."""
+    if dir is None : return []
+    list_of_files_in_dir = os.listdir(dir)
+    list_of_files = []
+    for fname in list_of_files_in_dir :
+        if os.path.splitext(fname)[1] == ext :
+            list_of_files.append(fname)
+    return sorted(list_of_files)
+
+
+
 def print_list_of_files_in_dir(dirname, path_or_fname) :
     dname, fname = os.path.split(path_or_fname)     # i.e. ('work_corana', 'img-xcs-r0015-b0000.bin')
     print 'print_list_of_files_in_dir():  directory:' + dirname + '  fname:' + fname
@@ -214,9 +226,21 @@ def batch_job_submit(command, queue='psnehq', log_file='batch-log.txt') :
 
 
 def batch_job_check(job_id_str, queue='psnehq') :
-    out, err = subproc(['bjobs', '-q', queue, job_id_str])
+    out, err = subproc(['bjobs', '-q', queue, job_id_str])    
     if err != '' : return err + '\n' + out
     else         : return out
+
+
+def bsub_is_available() :
+    out, err = subproc(['which', 'bsub'])
+    if err != '' :
+        msg = 'Check if bsub is available on this node:\n' + err + \
+              '\nbsub IS NOT available in current configuration of your node... (try command: which bsub)\n'
+        print msg
+        logger.warning(msg, __name__)         
+        return False
+    else :
+        return True
 
 
 def batch_job_kill(job_id_str) :
@@ -273,6 +297,39 @@ def get_text_file_content(path) :
     text = f.read()
     f.close() 
     return text
+
+#----------------------------------
+
+def xtc_fname_parser_helper( part, prefix ) :    
+    """In parsing the xtc file name, this function extracts the string after expected prefix, i.e. 'r0123' -> '0123'"""
+    if len(part)>1 and part[0] == prefix :
+        try :
+            return part[1:]
+        except :
+            pass
+    return None
+
+
+def parse_xtc_file_name(fname):
+    """Parse the file name like e170-r0003-s00-c00.xtc and return ('170', '0003', '00', '00', '.xtc')"""
+    name, _ext = os.path.splitext(fname) # i.e. ('e167-r0015-s00-c00', '.xtc')
+    parts = name.split('-') # it gives parts = ('e167', 'r0015', 's00', 'c00')
+
+    _expnum = None
+    _runnum = None
+    _stream = None
+    _chunk  = None
+
+    parts = map( xtc_fname_parser_helper, parts, ['e', 'r', 's', 'c'] )
+
+    if None not in parts :
+        _expnum = parts[0]
+        _runnum = parts[1]
+        _stream = parts[2]
+        _chunk  = parts[3]
+
+    #print 'e,r,s,c,ext:', _expnum, _runnum, _stream, _chunk, _ext
+    return _expnum, _runnum, _stream, _chunk, _ext
 
 #----------------------------------
 # assumes: path = .../<inst>/<experiment>/xtc/<file-name>.xtc
@@ -489,6 +546,18 @@ def get_gm_time_str(time_sec, fmt='%Y-%m-%d %H:%M:%S %Z'):
     return strftime(fmt, get_gm_time_tuple(time_sec))
 
 #----------------------------------
+
+def selectFromListInPopupMenu(list):
+    """Shows the list as a pop-up menu and returns the selected item as a string or None"""
+    popupMenu = QtGui.QMenu()
+    for item in list :
+        popupMenu.addAction( item )
+
+    item_selected = popupMenu.exec_(QtGui.QCursor.pos())
+
+    if item_selected is None : return None
+    else                     : return str(item_selected.text()) # QString -> str
+
 #----------------------------------
 
 def get_array_from_file(fname, dtype=np.float32) :
