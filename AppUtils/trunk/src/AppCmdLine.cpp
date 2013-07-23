@@ -40,6 +40,7 @@
 #include "AppUtils/AppCmdOptBase.h"
 #include "AppUtils/AppCmdOptBool.h"
 #include "AppUtils/AppCmdOptList.h"
+#include "AppUtils/AppCmdWordWrap.h"
 using std::ios;
 using std::ostream;
 using std::setw;
@@ -212,13 +213,34 @@ AppCmdLine::usage(std::ostream& out) const
   }
 
   if (!_positionals.empty()) {
+
     size_t nameLen = 0;
     for (PositionalsList::const_iterator it = _positionals.begin(); it != _positionals.end(); ++it) {
       if (nameLen < (*it)->name().size()) nameLen = (*it)->name().size();
     }
+
+    AppCmdWordWrap ww;
+    const int width = ww.pageWidth();
+    const int width2 = width/2;
+    int descrLen = width - nameLen - 7; // "....name.-.description....."
+    bool nl = false;
+    if (descrLen < width2) {
+      descrLen = width2;
+      nl = true;
+    }
+
+    // wrap description, print it on separate lines
     out << "\n  Positional parameters:\n";
     for (PositionalsList::const_iterator it = _positionals.begin(); it != _positionals.end(); ++it) {
-      out << "    " << setw(nameLen) << (*it)->name().c_str() << "  " << (*it)->description() << '\n';
+
+      out << "    " << setw(nameLen) << (*it)->name().c_str() << " - ";
+
+      std::vector<std::string> descr = ww.wrap((*it)->description(), descrLen);
+      for (std::vector<std::string>::const_iterator it = descr.begin(); it != descr.end(); ++ it) {
+        if (it == descr.begin() and nl) out << '\n';
+        if (it != descr.begin() or nl) out << setw(width-descrLen) << "";
+        out << *it << '\n';
+      }
     }
   }
 
@@ -617,9 +639,21 @@ void
 AppCmdLine::formatOptGroup(std::ostream& out, const std::string& groupName, const OptionsList& options, size_t optLen,
     size_t nameLen) const
 {
+  AppCmdWordWrap ww;
+  const int width = ww.pageWidth();
+  const int width2 = width/2;
+  int descrLen = width - optLen - nameLen - 9; // "....{options}.name..description....."
+  bool nl = false;
+  if (descrLen < width2) {
+    descrLen = width2;
+    nl = true;
+  }
+
   out << "\n  " << groupName << ":\n";
   for (OptionsList::const_iterator it = options.begin(); it != options.end(); ++it) {
     std::string fopt;
+
+    // format all options
     const std::vector<std::string>& optnames = (*it)->options();
     for (std::vector<std::string>::const_iterator oit = optnames.begin(); oit != optnames.end(); ++ oit) {
       if (not fopt.empty()) fopt += "|";
@@ -627,8 +661,15 @@ AppCmdLine::formatOptGroup(std::ostream& out, const std::string& groupName, cons
       if (oit->size() > 1) fopt += "-";
       fopt += *oit;
     }
-    out << "    {" << setw(optLen) << fopt.c_str() << "} " << setw(nameLen) << (*it)->name().c_str() << "  "
-        << (*it)->description() << '\n';
+
+    // wrap description, print it on separate lines
+    std::vector<std::string> descr = ww.wrap((*it)->description(), descrLen);
+    out << "    {" << setw(optLen) << fopt.c_str() << "} " << setw(nameLen) << (*it)->name().c_str() << "  ";
+    for (std::vector<std::string>::const_iterator it = descr.begin(); it != descr.end(); ++ it) {
+      if (it == descr.begin() and nl) out << '\n';
+      if (it != descr.begin() or nl) out << setw(width-descrLen) << "";
+      out << *it << '\n';
+    }
   }
 }
 

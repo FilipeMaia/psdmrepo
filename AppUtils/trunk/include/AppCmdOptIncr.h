@@ -66,8 +66,9 @@ namespace AppUtils {
  */
 
 class AppCmdOptIncr : public AppCmdOptBase {
-
 public:
+
+  typedef int value_type;
 
   /**
    *  @brief Define incremental option without argument.
@@ -83,7 +84,7 @@ public:
    *  @param[in] descr       Long description for the option, printed when usage() is called.
    *  @param[in] defValue    Initial value of the option
    */
-  AppCmdOptIncr(const std::string& optNames, const std::string& descr, int defValue = 0);
+  AppCmdOptIncr(const std::string& optNames, const std::string& descr, value_type defValue = 0);
 
   /**
    *  @brief Define incremental option without argument.
@@ -104,7 +105,7 @@ public:
    *
    *  @throw AppCmdException or a subclass of it.
    */
-  AppCmdOptIncr(AppCmdOptGroup& group, const std::string& optNames, const std::string& descr, int defValue = 0);
+  AppCmdOptIncr(AppCmdOptGroup& group, const std::string& optNames, const std::string& descr, value_type defValue = 0);
 
   /// Destructor
   virtual ~AppCmdOptIncr( ) ;
@@ -117,12 +118,12 @@ public:
   /**
    *  Return current value of the option
    */
-  virtual int value() const ;
+  virtual value_type value() const ;
 
   /**
    *  Return default value of the argument
    */
-  int defValue() const { return _defValue ; }
+  value_type defValue() const { return _defValue ; }
 
 protected:
 
@@ -137,6 +138,12 @@ private:
   virtual bool hasArgument() const ;
 
   /**
+   *  Get one-line description, should be brief but informational, may include default
+   *  or initial value for the option.
+   */
+  virtual std::string description() const;
+
+  /**
    *  Set option's argument. The value string will be empty if hasArgument() is false
    */
   virtual void setValue( const std::string& value ) ;
@@ -148,8 +155,8 @@ private:
 
 
   // Data members
-  int _value ;
-  const int _defValue ;
+  value_type _value ;
+  const value_type _defValue ;
   bool _changed ;
 
   // This class in non-copyable

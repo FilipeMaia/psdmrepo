@@ -20,6 +20,7 @@
 #include <cmath>
 #include <limits.h>
 #include <float.h>
+#include <boost/lexical_cast.hpp>
 
 //----------------------
 // Base Class Headers --
@@ -40,6 +41,35 @@
 
 
 namespace AppUtils {
+
+namespace detail {
+
+template<class T>
+struct DefaultAppCmdTypeTraitsFromString {
+  static T fromString (const std::string& str) {
+    // default implementation uses lexical_cast to convert value
+    try {
+      return boost::lexical_cast<T>(str);
+    } catch (const boost::bad_lexical_cast& ex) {
+      throw AppCmdLexicalCastFromStringException(str, ex.what());
+    }
+  }
+};
+
+template<class T>
+struct DefaultAppCmdTypeTraitsToString {
+  static std::string toString (const T& val) {
+    // default implementation uses lexical_cast to convert value
+    try {
+      return boost::lexical_cast<std::string>(val);
+    } catch (const boost::bad_lexical_cast& ex) {
+      throw AppCmdLexicalCastToStringException(ex.what());
+    }
+  }
+};
+
+} // namespace detail
+
 
 /// @addtogroup AppUtils
 
@@ -67,14 +97,14 @@ namespace AppUtils {
  */
 
 template<class T>
-struct AppCmdTypeTraits {
+struct AppCmdTypeTraits : detail::DefaultAppCmdTypeTraitsFromString<T>, detail::DefaultAppCmdTypeTraitsToString<T> {
 };
 
 /**
  *  Specialization for type long int
  */
 template<>
-struct AppCmdTypeTraits<long> {
+struct AppCmdTypeTraits<long> : detail::DefaultAppCmdTypeTraitsToString<long> {
   static long fromString ( const std::string& str ) {
     const char* nptr = str.c_str() ;
     char* end ;
@@ -94,7 +124,7 @@ struct AppCmdTypeTraits<long> {
  *  Specialization for type int
  */
 template<>
-struct AppCmdTypeTraits<int> {
+struct AppCmdTypeTraits<int> : detail::DefaultAppCmdTypeTraitsToString<int> {
   static int fromString ( const std::string& str ) {
     try {
       long res = AppCmdTypeTraits<long>::fromString( str ) ;
@@ -109,7 +139,7 @@ struct AppCmdTypeTraits<int> {
  *  Specialization for type unsigned long
  */
 template<>
-struct AppCmdTypeTraits<unsigned long> {
+struct AppCmdTypeTraits<unsigned long> : detail::DefaultAppCmdTypeTraitsToString<unsigned long> {
   static unsigned long fromString ( const std::string& str ) {
     const char* nptr = str.c_str() ;
     char* end ;
@@ -129,7 +159,7 @@ struct AppCmdTypeTraits<unsigned long> {
  *  Specialization for type unsigned int
  */
 template<>
-struct AppCmdTypeTraits<unsigned int> {
+struct AppCmdTypeTraits<unsigned int> : detail::DefaultAppCmdTypeTraitsToString<unsigned int> {
   static unsigned int fromString ( const std::string& str ) {
     try {
       unsigned long res = AppCmdTypeTraits<unsigned long>::fromString( str ) ;
@@ -149,6 +179,9 @@ struct AppCmdTypeTraits<std::string> {
   static std::string fromString ( const std::string& str ) {
     return str ;
   }
+  static std::string toString ( const std::string& str ) {
+    return str ;
+  }
 };
 
 /**
@@ -165,13 +198,16 @@ struct AppCmdTypeTraits<bool> {
       throw AppCmdTypeCvtException ( str, "bool" ) ;
     }
   }
+  static std::string toString ( bool val ) {
+    return val ? "true" : "false" ;
+  }
 };
 
 /**
  *  Specialization for type double
  */
 template<>
-struct AppCmdTypeTraits<double> {
+struct AppCmdTypeTraits<double> : detail::DefaultAppCmdTypeTraitsToString<double> {
   static double fromString ( const std::string& str ) {
     const char* nptr = str.c_str() ;
     char* end ;
@@ -191,7 +227,7 @@ struct AppCmdTypeTraits<double> {
  *  Specialization for type float
  */
 template<>
-struct AppCmdTypeTraits<float> {
+struct AppCmdTypeTraits<float> : detail::DefaultAppCmdTypeTraitsToString<float> {
   static float fromString ( const std::string& str ) {
     const char* nptr = str.c_str() ;
     char* end ;

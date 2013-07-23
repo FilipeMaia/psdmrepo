@@ -64,8 +64,9 @@ namespace AppUtils {
  */
 
 class AppCmdOptToggle : public AppCmdOptBase {
-
 public:
+
+  typedef bool value_type;
 
   /**
    *  @brief Define toggle-type option without argument.
@@ -81,7 +82,7 @@ public:
    *  @param[in] descr     description, one-line string
    *  @param[in] defValue  initial value of the option
    */
-  AppCmdOptToggle(const std::string& optNames, const std::string& descr, bool defValue = false);
+  AppCmdOptToggle(const std::string& optNames, const std::string& descr, value_type defValue = false);
 
   /**
    *  @brief Define toggle-type option without argument.
@@ -99,7 +100,7 @@ public:
    *  @param[in] descr     description, one-line string
    *  @param[in] defValue  initial value of the option
    */
-  AppCmdOptToggle(AppCmdOptGroup& group, const std::string& optNames, const std::string& descr, bool defValue = false);
+  AppCmdOptToggle(AppCmdOptGroup& group, const std::string& optNames, const std::string& descr, value_type defValue = false);
 
   /// Destructor
   virtual ~AppCmdOptToggle( );
@@ -112,12 +113,12 @@ public:
   /**
    *  Return current value of the argument
    */
-  virtual bool value() const ;
+  virtual value_type value() const ;
 
   /**
    *  Return default value of the argument
    */
-  bool defValue() const { return _defValue ; }
+  value_type defValue() const { return _defValue ; }
 
 protected:
 
@@ -149,8 +150,8 @@ private:
 
 
   // Data members
-  bool _value ;
-  const bool _defValue ;
+  value_type _value ;
+  const value_type _defValue ;
   bool _changed ;
 
   // This class in non-copyable

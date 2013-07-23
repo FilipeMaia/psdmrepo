@@ -25,6 +25,7 @@
 //-------------------------------
 #include "AppUtils/AppCmdExceptions.h"
 #include "AppUtils/AppCmdOptGroup.h"
+#include "AppUtils/AppCmdTypeTraits.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -116,6 +117,26 @@ AppCmdOptSize::value_type
 AppCmdOptSize::value() const
 {
   return _value ;
+}
+
+std::string
+AppCmdOptSize::description() const
+{
+  const char* suffix = "";
+  value_type val = _defValue;
+  if (val and val % 1024 == 0) {
+    val /= 1024;
+    suffix = "k";
+    if (val % 1024 == 0) {
+      val /= 1024;
+      suffix = "M";
+      if (val % 1024 == 0) {
+        val /= 1024;
+        suffix = "G";
+      }
+    }
+  }
+  return AppCmdOptBase::description() + " (default: " + AppCmdTypeTraits<value_type>::toString(val) + suffix + ")" ;
 }
 
 /**

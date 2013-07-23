@@ -53,6 +53,16 @@ AppCmdTypeCvtException::AppCmdTypeCvtException ( const std::string& string, cons
 {
 }
 
+AppCmdLexicalCastFromStringException::AppCmdLexicalCastFromStringException ( const std::string& string, const std::string& message )
+  : AppCmdException( "failed to convert string \""+string+"\" to value: "+message )
+{
+}
+
+AppCmdLexicalCastToStringException::AppCmdLexicalCastToStringException ( const std::string& message )
+  : AppCmdException( "failed to convert value to string: "+message )
+{
+}
+
 AppCmdOptDefinedException::AppCmdOptDefinedException ( const std::string& option )
   : AppCmdException( "option '" + ::optspec(option) + "' is already defined" )
 {

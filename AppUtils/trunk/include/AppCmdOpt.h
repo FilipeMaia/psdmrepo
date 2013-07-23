@@ -68,8 +68,9 @@ namespace AppUtils {
 
 template<class Type>
 class AppCmdOpt : public AppCmdOptBase {
-
 public:
+
+  typedef Type value_type;
 
   /**
    *  @brief Define an option with a required argument.
@@ -89,7 +90,7 @@ public:
    *  @param[in] descr       Long description for the option, printed when usage() is called.
    *  @param[in] defValue    Value returned from value() if option is not specified on command line.
    */
-  AppCmdOpt(const std::string& optNames, const std::string& name, const std::string& descr, const Type& defValue);
+  AppCmdOpt(const std::string& optNames, const std::string& name, const std::string& descr, const value_type& defValue);
 
   /**
    *  @brief Define an option with a required argument.
@@ -114,7 +115,7 @@ public:
    *  @throw AppCmdException or a subclass of it.
    */
   AppCmdOpt(AppCmdOptGroup& group, const std::string& optNames, const std::string& name, const std::string& descr,
-      const Type& defValue);
+      const value_type& defValue);
 
   /// Destructor
   virtual ~AppCmdOpt( ) {}
@@ -128,13 +129,13 @@ public:
   /**
    *  Return current value of the argument
    */
-  virtual const Type& value() const { return _value ; }
+  virtual const value_type& value() const { return _value ; }
 
 
   /**
    *  Return default value of the argument
    */
-  const Type& defValue() const { return _defValue ; }
+  const value_type& defValue() const { return _defValue ; }
 
 protected:
 
@@ -146,6 +147,16 @@ private:
    *  Returns true if option requires argument.
    */
   virtual bool hasArgument() const { return true; }
+
+  /**
+   *  Get one-line description, should be brief but informational, may include default
+   *  or initial value for the option.
+   */
+  virtual std::string description() const {
+    std::string def = AppCmdTypeTraits<Type>::toString(_defValue);
+    if (def.empty()) def = "\"\"";
+    return AppCmdOptBase::description() + " (default: " + def + ")" ;
+  }
 
   /**
    *  @brief Set option's argument.
@@ -172,8 +183,8 @@ private:
 
 
   // Data members
-  Type _value ;
-  const Type _defValue ;
+  value_type _value ;
+  const value_type _defValue ;
   bool _changed ;
 
   // This class is non-copyable

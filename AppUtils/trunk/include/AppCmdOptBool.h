@@ -61,8 +61,9 @@ namespace AppUtils {
  */
 
 class AppCmdOptBool : public AppCmdOptBase {
-
 public:
+
+  typedef bool value_type;
 
   /**
    *  @brief Define boolean option without argument.
@@ -78,7 +79,7 @@ public:
    *  @param[in] descr     description, one-line string
    *  @param[in] defValue  initial value of the option
    */
-  AppCmdOptBool(const std::string& optNames, const std::string& descr, bool defValue = false);
+  AppCmdOptBool(const std::string& optNames, const std::string& descr, value_type defValue = false);
 
   /**
    *  @brief Define boolean option without argument.
@@ -99,7 +100,7 @@ public:
    *
    *  @throw AppCmdException or a subclass of it.
    */
-  AppCmdOptBool(AppCmdOptGroup& group, const std::string& optNames, const std::string& descr, bool defValue = false);
+  AppCmdOptBool(AppCmdOptGroup& group, const std::string& optNames, const std::string& descr, value_type defValue = false);
 
   /// Destructor
   virtual ~AppCmdOptBool( );
@@ -112,12 +113,12 @@ public:
   /**
    *  Return current value of the argument
    */
-  virtual bool value() const ;
+  virtual value_type value() const ;
 
   /**
    *  Return default value of the argument
    */
-  bool defValue() const { return _defValue ; }
+  value_type defValue() const { return _defValue ; }
 
 protected:
 
@@ -147,8 +148,8 @@ private:
 
 
   // Data members
-  bool _value ;
-  const bool _defValue ;
+  value_type _value ;
+  const value_type _defValue ;
   bool _changed ;
 
   // This class is non-copyable

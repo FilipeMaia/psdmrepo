@@ -104,9 +104,10 @@ protected:
   virtual const std::string& name() const { return _name; }
 
   /**
-   *  Get one-line description, should be brief but informational.
+   *  Get one-line description, should be brief but informational, may include default
+   *  or initial value for the option.
    */
-  virtual const std::string& description() const { return _descr; }
+  virtual std::string description() const { return _descr; }
 
   /**
    *  Return list of option names for this option. One-character options if

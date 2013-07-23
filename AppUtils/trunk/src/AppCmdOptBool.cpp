@@ -29,6 +29,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "AppUtils/AppCmdOptGroup.h"
+#include "AppUtils/AppCmdTypeTraits.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --

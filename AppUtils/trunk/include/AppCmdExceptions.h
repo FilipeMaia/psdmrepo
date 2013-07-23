@@ -58,6 +58,24 @@ public:
   AppCmdTypeCvtException ( const std::string& string, const std::string& type ) ;
 };
 
+/// Exception thrown when conversion from string to other type via lexical_cast fails
+class AppCmdLexicalCastFromStringException : public AppCmdException {
+public:
+  AppCmdLexicalCastFromStringException ( const std::string& string, const std::string& message ) ;
+};
+
+/// Exception thrown when conversion from value to string via lexical_cast fails
+class AppCmdLexicalCastToStringException : public AppCmdException {
+public:
+  AppCmdLexicalCastToStringException ( const std::string& message ) ;
+};
+
+/// Exception thrown when conversion from string to other type via lexical_cast fails
+class AppCmdTypeLexicalCastException : public AppCmdException {
+public:
+  AppCmdTypeLexicalCastException ( const std::string& string, const std::string& message ) ;
+};
+
 /// Exception thrown when option with the same name was already defined
 class AppCmdOptDefinedException : public AppCmdException {
 public:

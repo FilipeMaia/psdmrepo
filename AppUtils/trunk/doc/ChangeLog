@@ -11,6 +11,13 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-07-00
+2013-07-23 Andy Salnikov
+- improve printing of usage info:
+  - implement pretty wrapping of the long description lines
+  - print default values for some types of options, and selection list
+    for NamedValue option type
+
 Tag: V00-06-00
 2013-07-22 Andy Salnikov
 - adding option groups

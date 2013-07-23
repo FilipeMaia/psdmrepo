@@ -129,6 +129,12 @@ private:
   virtual bool hasArgument() const ;
 
   /**
+   *  Get one-line description, should be brief but informational, may include default
+   *  or initial value for the option.
+   */
+  virtual std::string description() const;
+
+  /**
    *  @brief Set option's argument.
    *
    *  This method is called by parser when option is found on command line.

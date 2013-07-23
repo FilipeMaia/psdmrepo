@@ -76,8 +76,9 @@ namespace AppUtils {
 
 template<class Type>
 class AppCmdOptNamedValue : public AppCmdOptBase {
-
 public:
+
+  typedef Type value_type;
 
   /**
    *  @brief Define an option with a required argument.
@@ -98,7 +99,7 @@ public:
    *  @param[in] defValue    Value returned from value() if option is not specified on command line.
    */
   AppCmdOptNamedValue(const std::string& optNames, const std::string& name, const std::string& descr,
-      const Type& defValue);
+      const value_type& defValue);
 
   /**
    *  @brief Define an option with a required argument.
@@ -121,7 +122,7 @@ public:
    *  @param[in] defValue    Value returned from value() if option is not specified on command line.
    */
   AppCmdOptNamedValue(AppCmdOptGroup& group, const std::string& optNames, const std::string& name,
-      const std::string& descr, const Type& defValue);
+      const std::string& descr, const value_type& defValue);
 
   /// Destructor
   virtual ~AppCmdOptNamedValue( ) {}
@@ -134,13 +135,13 @@ public:
   /**
    *  Return current value of the argument
    */
-  virtual const Type& value() const { return _value ; }
+  virtual const value_type& value() const { return _value ; }
 
 
   /**
    *  Return default value of the argument
    */
-  const Type& defValue() const { return _defValue ; }
+  const value_type& defValue() const { return _defValue ; }
 
   /// add string-value pair
   void add ( const std::string& key, const Type& value ) {
@@ -160,6 +161,28 @@ private:
    *  positional arguments.
    */
   virtual bool hasArgument() const { return true ; }
+
+  /**
+   *  Get one-line description, should be brief but informational, may include default
+   *  or initial value for the option.
+   */
+  virtual std::string description() const {
+    std::string descr = AppCmdOptBase::description() + " (selection: ";
+
+    for (typename String2Value::const_iterator it = _str2value.begin(); it != _str2value.end(); ++ it) {
+      if (it != _str2value.begin()) descr += ", ";
+      descr += it->first;
+    }
+    descr += "; default: ";
+    for (typename String2Value::const_iterator it = _str2value.begin(); it != _str2value.end(); ++ it) {
+      if (it->second == _defValue) {
+        descr += it->first;
+        break;
+      }
+    }
+    descr += ")";
+    return descr;
+  }
 
   /**
    *  @brief Set option's argument.
@@ -182,12 +205,12 @@ private:
 
 
   // Types
-  typedef std::map< std::string, Type > String2Value ;
+  typedef std::map< std::string, value_type > String2Value ;
 
   // Data members
   String2Value _str2value ;
-  const Type _defValue ;
-  Type _value ;
+  const value_type _defValue ;
+  value_type _value ;
   bool _changed ;
 
   // This class in non-copyable

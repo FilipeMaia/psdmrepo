@@ -244,7 +244,7 @@ AppCmdOptList<Type>::setValue(const std::string& value)
   } while ( pos != value.end() ) ;
 
   // copy from local container to value
-  std::copy ( localCont.begin(), localCont.end(), std::back_inserter(_value) ) ;
+  _value.insert(_value.end(), localCont.begin(), localCont.end());
   _changed = true ;
 }
 

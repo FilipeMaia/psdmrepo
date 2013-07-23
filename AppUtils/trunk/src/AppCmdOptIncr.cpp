@@ -29,6 +29,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "AppUtils/AppCmdOptGroup.h"
+#include "AppUtils/AppCmdTypeTraits.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -109,5 +110,12 @@ AppCmdOptIncr::reset()
   _value = _defValue ;
   _changed = false ;
 }
+
+std::string
+AppCmdOptIncr::description() const
+{
+  return AppCmdOptBase::description() + " (initial: " + AppCmdTypeTraits<value_type>::toString(_defValue) + ")" ;
+}
+
 
 } // namespace AppUtils
