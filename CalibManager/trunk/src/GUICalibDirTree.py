@@ -89,10 +89,11 @@ class GUICalibDirTree (QtGui.QWidget):
         #super(GUIQTreeView, self).__init__(parent)
         QtGui.QWidget.__init__(self, parent)
 
-        self.setGeometry(100, 100, 250, 500)
+        self.setGeometry(100, 100, 200, 500)
         self.setWindowTitle('Item selection tree')
 
-
+        self.setFrame()
+ 
         #self.icon_folder_open   = QtGui.QIcon("icons/folder_open.gif")
         #self.icon_folder_closed = QtGui.QIcon("icons/folder_closed.gif")
         #self.icon_table         = QtGui.QIcon("icons/table.gif")
@@ -120,12 +121,14 @@ class GUICalibDirTree (QtGui.QWidget):
         self.view.expanded.connect(self.itemExpanded)
         self.view.collapsed.connect(self.itemCollapsed)
 
+        self.setStyle()
 
 
     def fill_calib_dir_tree(self) :
 
         self.model = QtGui.QStandardItemModel()
         self.model.setHorizontalHeaderLabels('x')
+        #self.model.setHorizontalHeaderItem(1,QtGui.QStandardItem('Project Title'))
         #self.model.setVerticalHeaderLabels('abc')
 
         for v in self.calib_vers :
@@ -186,8 +189,6 @@ class GUICalibDirTree (QtGui.QWidget):
             self._getFullName(ind_par)
 
 
-
-
     def itemExpanded(self, ind): 
         item = self.model.itemFromIndex(ind)
         #item.setIcon(self.icon_folder_open)
@@ -205,6 +206,33 @@ class GUICalibDirTree (QtGui.QWidget):
     def itemChanged(self, item):
         state = ['UNCHECKED', 'TRISTATE', 'CHECKED'][item.checkState()]
         print "Item with full name %s, is at state %s\n" % ( self.getFullNameFromItem(item),  state)
+
+    def setStyle(self):
+        pass
+        #self.setMinimumSize(100,400)
+        self.setMinimumWidth(150)
+        self.setMaximumWidth(300)
+        self.setMinimumHeight(400)
+        self.setContentsMargins (QtCore.QMargins(-9,-9,-9,-9))
+
+    def setFrame(self):
+        self.frame = QtGui.QFrame(self)
+        self.frame.setFrameStyle( QtGui.QFrame.Box | QtGui.QFrame.Sunken ) #Box, Panel | Sunken, Raised 
+        self.frame.setLineWidth(0)
+        self.frame.setMidLineWidth(1)
+        self.frame.setGeometry(self.rect())
+        self.frame.setVisible(False)
+
+    def resizeEvent(self, e):
+        #logger.debug('resizeEvent', self.name) 
+        self.frame.setGeometry(self.rect())
+
+    def moveEvent(self, e):
+        #logger.debug('moveEvent', self.name) 
+        #self.position = self.mapToGlobal(self.pos())
+        #self.position = self.pos()
+        #logger.debug('moveEvent - pos:' + str(self.position), __name__)       
+        pass
 
  
 #-----------------------------

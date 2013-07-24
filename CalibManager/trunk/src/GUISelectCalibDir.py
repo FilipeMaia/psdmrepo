@@ -75,12 +75,11 @@ class GUISelectCalibDir ( QtGui.QWidget ) :
         self.hbox = QtGui.QHBoxLayout() 
         self.hbox.addWidget(self.titIns)
         self.hbox.addWidget(self.butIns)
-        self.hbox.addStretch(1)     
         self.hbox.addWidget(self.titExp)
         self.hbox.addWidget(self.butExp)
-        self.hbox.addStretch(1)     
         self.hbox.addWidget(self.ediDir)
         self.hbox.addWidget(self.butBro)
+        self.hbox.addStretch(1)     
 
         self.setLayout(self.hbox)
 
@@ -195,10 +194,24 @@ class GUISelectCalibDir ( QtGui.QWidget ) :
         self.setDir(fnm.path_to_calib_dir())
         self.setStyleButtons()
 
+        path_to_xtc_dir = fnm.path_to_xtc_dir()
+        if os.path.lexists(path_to_xtc_dir) : return
+        
+        msg = 'XTC data are not seen on this computer for path: ' + str(path_to_xtc_dir)
+        logger.info(msg, __name__)
+        print msg
+
+
+
     def onButBro(self):
         path0 = self.calib_dir.value()
+        #print 'path0:', path0
         #dir, calib = self.calib_dir.value().rsplit('/',1)        
         dir, calib = os.path.split(path0)
+        #print 'dir, calib =', dir, calib
+
+        
+
         path1 = str( QtGui.QFileDialog.getExistingDirectory(self,
                                                             'Select non-standard calib directory',
                                                             dir,

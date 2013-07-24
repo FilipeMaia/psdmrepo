@@ -63,7 +63,7 @@ class GUIMain ( QtGui.QWidget ) :
 
         cp.setIcons()
 
-        self.setGeometry(10, 25, 650, 500)
+        self.setGeometry(10, 25, 700, 600)
         self.setWindowTitle('Calibration Manager')
         self.setWindowIcon(cp.icon_monitor)
         self.palette = QtGui.QPalette()
@@ -71,16 +71,18 @@ class GUIMain ( QtGui.QWidget ) :
 
         self.setFrame()
  
-        self.guitree = QtGui.GUICalibDirTree()
+        self.guitree = GUICalibDirTree()
         self.guitabs = QtGui.QTextEdit()
 
         #self.hboxB = QtGui.QHBoxLayout() 
         #self.hboxB.addWidget(self.guitree)
         #self.hboxB.addWidget(self.guitabs)
 
-        self.splitterV = QtGui.QSplitter(QtCore.Qt.Vertical)
-        self.splitterV.addWidget(self.guitree)
-        self.splitterV.addWidget(self.guitabs)
+        #self.splitterV = QtGui.QSplitter(QtCore.Qt.Vertical)
+
+        self.hsplit = QtGui.QSplitter(QtCore.Qt.Horizontal)
+        self.hsplit.addWidget(self.guitree)
+        self.hsplit.addWidget(self.guitabs)
         
         self.guibuttonbar      = GUIButtonBar(self)
         self.guiselectcalibdir = GUISelectCalibDir(self)
@@ -89,8 +91,7 @@ class GUIMain ( QtGui.QWidget ) :
         self.vbox.addWidget(self.guibuttonbar)
         self.vbox.addWidget(self.guiselectcalibdir)
         #self.vbox.addLayout(self.hboxB) 
-        self.vbox.addLayout(self.splitterV) 
-
+        self.vbox.addWidget(self.hsplit) 
         self.vbox.addStretch(1)
 
         self.setLayout(self.vbox)
@@ -131,6 +132,7 @@ class GUIMain ( QtGui.QWidget ) :
 
     def setStyle(self):
         pass
+        self.setMinimumSize(300,400)
 
         #self.        setStyleSheet(cp.styleBkgd)
         #self.butSave.setStyleSheet(cp.styleButton)
