@@ -1,0 +1,155 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  README file for package LusiTime
+#------------------------------------------------------------------------
+
+Package author: Andrei Salnikov
+
+Brief description:
+==================
+
+Class library for working with times, dates, durations, etc.
+
+Detailed description
+====================
+
+Time class
+==========
+
+The Time class defined in this package provides time operations with 
+nanosecond precision. The class stores time as number of seconds since 
+1970-01-01 00:00:00 UTC (regular UNIX time) plus a number of nanoseconds 
+(normalized, never larger than 999999999). The class can also represent 
+"invalid" time which may be returned as an error from some operations. 
+Regular applications should not be operating on invalid time values, so 
+many methods throw an exceptions when they encounter invalid time 
+values.
+
+Time class defines several methods for construction of the time objects 
+and accessing the values of the seconds and nanoseconds fields. 
+Additionally several free methods are defined for comparison between 
+time values and for printing. 
+
+Constructors
+------------
+
+Default constructor for Time class produces "invalid" time object which 
+cannot be used for any reasonable operations, but only on the left side 
+of assignment operator.
+
+Main constructor for the class is the one which takes two arguments - 
+seconds and nanoseconds. This constructor should not be used directly by 
+the client code, clients instead should use various static factory 
+methods.
+
+Factory methods
+---------------
+
+Static method Time::now() returns current system time. On some platforms 
+the resolution of the system clock can be lower than single nanosecond.
+
+Static method Time::parse(std::string) converts string in external time 
+format into time object. See section below on supported time formats.
+
+Static method Time::from64(long long unsigned) converts a 64-bit number
+into time object. The number is expected to be produced by an opposite
+static method Time::to64(Time). The packed numbers are meant to be used
+in various contexts, including databases.
+
+Methods
+-------
+
+Method Time::sec() returns number of seconds as time_t value. For 
+invalid time it can return anything.
+
+Method Time::nsec() return number of nanoseconds as long value. For 
+invalid times returned value will be negative.
+
+Method Time::isValid() returns true for valid time object and false for 
+invalid objects.
+
+Method toString() returns time formatted according to some predefined 
+format ("%F %T%f%z"). Method toString(std::string) returns time 
+formatted according to user-supplied format string.
+
+Time formats
+------------
+
+The method Time::parse() accepts few possible date/time formats. 
+Simplest format is a single-word string which starts with the capital S 
+followed by the decimal value of the seconds filed and optionally by the 
+decimal point and a fraction of the second. This looks very much like 
+the regular fixed point number with one exception: if the decimal point 
+is specified there has to be at least one digit following it. Here are 
+few examples and their corresponding values (seconds and nanoseconds):
+
+  "S0"                         = Time(0,0)
+  "S1000"                      = Time(1000,0)
+  "S1000.1"                    = Time(1000,100000000)
+  "S1000.123456789"            = Time(1000,123456789)
+
+Second more familiar time format is a subset of the ISO8601 with few 
+extensions. Its general format is:
+
+- 4-digit year optionally followed by two-digit month optionally 
+  followed by two-digit day of month. Year, month and day can be separated 
+  by a dash character (-).
+- Date/time separator which can consist of either single 'T' character 
+  or multiple spaces. Separator is only required when there is a time or 
+  timezone following the date part.
+- Optional time consisting of 1- or 2-digits hour, optional 2-digit 
+  minutes, optional 2-digits seconds, and optional decimal point and 
+  fractional seconds part. Hours, minutes and seconds can be separated by 
+  a colon character (:).
+- Optional timezone offset which can be either a single character 'Z' 
+  denoting zero UTC offset, or plus or minus sign with 2-digit hours and 
+  optional two-digit minutes. Hours and minutes can be separated by colon.
+- If timezone part is missing then the time is assumed to be in the local 
+  time zone. 
+
+Here are few examples of the time specification using this syntax, all 
+examples refer to the same time (January 1, 2001, 00:00:00 UTC)
+
+  "2001Z"
+  "2001-01Z"
+  "2001-01-01Z"
+  "2001-01-01+00"
+  "2001-01-01 00"
+  "2001-01-01T00:00"
+  "2001-01-01 00:00:00-00:00"
+  "2001-01-01 02:00+02"
+  "2001-01-01 02:00:00.000+02"
+  "2000-12-31 16:00:00.000-0800"
+  "20001231T160000-08"
+
+Output time format produced by toString() function is controlled by the 
+format string which uses strftime(3) control sequences with one 
+additional sequence for controlling output of nanoseconds. The new 
+sequence is "%.<N>f" where <N> is a number between 1 and 9. The sequence 
+outputs a decimal dot followed but the fractional second part with the 
+precision determined by <N> parameter. The "%f" control sequence is a 
+shorthand for "%.9f". All other control characters are passed directly 
+to strftime(3) for formatting. DEfault format string used by toString() 
+is "%F %T%f%z".
+
+Here is the example of the output produced by different control strings 
+assuming following code runs in UTC time zone:
+
+  Time t( 0, 123456789 ) ;
+  cout << t.toString(fmt) ;
+
+  fmt                   Result 
+  ---------------------------------
+  "%Y-%m-%d"            1970-01-01
+  "%F"                  1970-01-01
+  "%H:%M:%S"            00:00:00
+  "%T%z"                00:00:00-0000
+  "%T%f%z"              00:00:00.123456789-0000
+  "%T%.3f%z"            00:00:00.123-0000
+  "%F %T%f%z"           1970-01-01 00:00:00.123456789-0000
+
+For better portability one should always add %z control for the output 
+format or use the default format.
