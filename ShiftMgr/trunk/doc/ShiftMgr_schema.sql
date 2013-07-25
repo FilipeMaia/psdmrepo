@@ -8,48 +8,73 @@ USE `SHIFTMGR`;
 -- -----------------------------------------------------
 -- Table `SHIFTMGR`.`SHIFT`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `SHIFTMGR`.`SHIFT`;
-DROP TABLE IF EXISTS `SHIFTMGR`.`AREA_EVALUATION`;
-DROP TABLE IF EXISTS `SHIFTMGR`.`TIME_USE`;
+DROP TABLE IF EXISTS `SHIFTMGR`.`SHIFT` ;
+DROP TABLE IF EXISTS `SHIFTMGR`.`SHIFT_AREA_EVALUATION` ;
+DROP TABLE IF EXISTS `SHIFTMGR`.`SHIFT_TIME_ALLOCATION` ;
 
 CREATE TABLE IF NOT EXISTS `SHIFTMGR`.`SHIFT` (
-  `id`                    INT NOT NULL AUTO_INCREMENT ,
-  `last_modified_time`    INT NOT NULL,
-  `username`              VARCHAR(64) NOT NULL,
-  `hutch`                 VARCHAR(32) NOT NULL,
-  `start_time`            INT NOT NULL,
-  `end_time`              INT DEFAULT NULL,
-  `stopper_out`           INT DEFAULT NULL,
-  `door_open`             INT DEFAULT NULL,
-  `total_shots`           INT DEFAULT NULL,
-  `other_notes`           VARCHAR(5000) DEFAULT NULL,
+
+  `id`         INT             NOT NULL AUTO_INCREMENT ,
+  `instr_name` VARCHAR(32)     NOT NULL ,
+
+  `begin_time` BIGINT UNSIGNED NOT NULL ,
+  `end_time`   BIGINT UNSIGNED NOT NULL ,
+
+  `notes`      TEXT               DEFAULT '' ,
+
+  `modified_uid`  VARCHAR(32)     DEFAULT NULL ,
+  `modified_time` BIGINT UNSIGNED DEFAULT NULL ,
+
    PRIMARY KEY(`id`)
 );
 
 -- -----------------------------------------------------
--- Table `SHIFTMGR`.`AREA_EVALUATION`
+-- Table `SHIFTMGR`.`SHIFT_AREA_EVALUATION`
 -- -----------------------------------------------------
 
-CREATE TABLE IF NOT EXISTS `SHIFTMGR`.`AREA_EVALUATION` (
-  `id`                    INT NOT NULL,
-  `area`                  VARCHAR(32) NOT NULL,
-  `ok`                    BOOL NOT NULL,
-  `downtime`              INT NOT NULL,
-  `comment`               VARCHAR(5000) DEFAULT NULL,
-   PRIMARY KEY(`id`, `area`)
+CREATE TABLE IF NOT EXISTS `SHIFTMGR`.`SHIFT_AREA_EVALUATION` (
+
+  `id`       INT NOT NULL AUTO_INCREMENT ,
+  `shift_id` INT NOT NULL ,
+
+  `name`         VARCHAR(32)  NOT NULL,
+  `problems`     BOOL         NOT NULL,
+  `downtime_min` INT UNSIGNED NOT NULL,
+
+  `comments` TEXT DEFAULT '' ,
+
+  PRIMARY KEY(`id`) ,
+
+  CONSTRAINT `SHIFT_AREA_EVALUATION_FK_1`
+    FOREIGN KEY (`shift_id` )
+    REFERENCES `SHIFTMGR`.`SHIFT` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
 );
 
 -- -----------------------------------------------------
--- Table `SHIFTMGR`.`TIME_USE`
+-- Table `SHIFTMGR`.`SHIFT_TIME_ALLOCATION`
 -- -----------------------------------------------------
 
-CREATE TABLE IF NOT EXISTS `SHIFTMGR`.`TIME_USE` (
-  `id`                    INT NOT NULL,
-  `use_name`              VARCHAR(32) NOT NULL,
-  `use_time`              INT NOT NULL,
-  `comment`               VARCHAR(5000) DEFAULT NULL,
-   PRIMARY KEY(`id`, `use_name`)
+CREATE TABLE IF NOT EXISTS `SHIFTMGR`.`SHIFT_TIME_ALLOCATION` (
+
+  `id`       INT NOT NULL AUTO_INCREMENT ,
+  `shift_id` INT NOT NULL ,
+
+  `name`         VARCHAR(32)  NOT NULL,
+  `duration_min` INT UNSIGNED NOT NULL,
+
+  `comments` TEXT DEFAULT '' ,
+
+  PRIMARY KEY(`id`) ,
+
+  CONSTRAINT `SHIFT_TIME_ALLOCATION_FK_1`
+    FOREIGN KEY (`shift_id` )
+    REFERENCES `SHIFTMGR`.`SHIFT` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
 );
+
 
 SET SQL_MODE=@OLD_SQL_MODE;
 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS;

@@ -1,3 +1,9 @@
+.new-shift-hdn {
+  display: none;
+}
+.new-shift-vis {
+  display: block;
+}
 #shifts-search-info {
   color: maroon;
 }
@@ -112,21 +118,21 @@ div.shift-hdr:hover {
   width: 140px;
 }
 div.status_red {
-  margin-top: 4px;
-  width: 8px;
-  height: 8px;
+  margin-top: 3px;
+  width: 10px;
+  height: 10px;
   background-color: crimson;
 }
 div.status_green {
-  margin-top: 4px;
-  width: 8px;
-  height: 8px;
+  margin-top: 3px;
+  width: 10px;
+  height: 10px;
   background-color: darkseagreen;
 }
 div.status_neutral {
-  margin-top: 4px;
-  width: 6px;
-  height: 6px;
+  margin-top: 3px;
+  width: 8px;
+  height: 8px;
   border: solid 1px grey;
 }
 .shift-con {
@@ -144,10 +150,12 @@ div.status_neutral {
   display: block;
 }
 
+tr.shift-active-row:hover {
+  background-color: #f0f0f0;
+}
 td.shift-grid-hdr {
   font-weight: bold;
   padding: 4px;
-  background-color: #f0f0f0;
   font-size: 12px;
 }
 td.shift-grid-val  {
@@ -159,20 +167,90 @@ td.shift-table-hdr,
 td.shift-table-tot {
   font-weight: bold;
   padding: 4px;
-  background-color: #f0f0f0;
+  padding-left: 8px;
+  background-color: #e0e0e0;
+  font-size: 12px;
+}
+td.shift-table-val-first  {
+  padding: 4px;
+  padding-left: 8px;
   font-size: 12px;
 }
 td.shift-table-val  {
   padding: 4px;
+  padding-left: 8px;
   font-size: 12px;
   border-top: solid 1px #e0e0e0;
 }
-
+td.shift-table-val-hdr  {
+  padding-right: 20px;
+  border-right: solid 1px #e0e0e0;
+  font-weight: bold;
+  font-size: 11px;
+}
+div.notes {
+  width: 520px;
+  min-height: 16px;
+  max-height: 72px;
+  overflow:auto;
+}
+div.notes pre {
+  margin: 0;
+  padding: 0;
+  font-size: 14px;
+}
 div.comment {
   padding: 0px;
   min-width:  420px;
   max-width:  800px;
-  min-height:  28px;
+  min-height:  16px;
   max-height: 128px;
   overflow: auto;
+}
+div.comment pre {
+  margin: 0;
+  padding: 0;
+  font-size: 14px;
+}
+
+div.shift-area-evaluation-con,
+div.shift-time-allocation-con {
+  font-size: 11px;
+  border: solid 1px #b0b0b0;
+  padding: 25px;
+  padding-left: 20px;
+  padding-bottom: 20px;
+}
+
+a.tab_hdr[data]:hover:after {
+  content: attr(data);
+  padding: 8px;
+  color: #000000;
+  position: absolute;
+  left: 0;
+  top: 100%;
+  white-space: pre;
+  max-width: 520px;
+  z-index: 2;
+  border-radius: 3px ;
+  background-color: lemonchiffon;
+  font-weight: normal;
+  font-size: 11px;
+}
+td.annotated[data]:hover:after,
+button.annotated[data]:hover:after,
+textarea.annotated[data]:hover:after {
+  content: attr(data);
+  padding: 8px;
+  color: #000000;
+  position: absolute;
+  left: -20;
+  top: -60;
+  white-space: pre;
+  max-width: 520px;
+  z-index: 2;
+  border-radius: 3px ;
+  background-color: lemonchiffon;
+  font-weight: normal;
+  font-size: 11px;
 }

@@ -1,137 +1,254 @@
+<?php
+
+require_once 'authdb/authdb.inc.php' ;
+
+use AuthDb\AuthDb ;
+
+AuthDb::instance()->begin() ;
+
+$instruments = array('AMO','SXR','XPP','XCS','CXI','MEC') ;
+$instr2editor = array() ;
+foreach ($instruments as $instr_name) {
+    $instr2editor[$instr_name] =
+        AuthDb::instance()->hasRole (
+            AuthDb::instance()->authName() ,
+            null ,
+            'ShiftMgr' ,
+            "Manage_{$instr_name}"
+        ) ;
+}
+?>
+
 <!DOCTYPE html>
 <html>
+
 <head>
-<title>Testing the Shift Manager application</title>
+
+<title>Shift Manager</title>
+
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 
-<link type="text/css" href="/jquery/css/custom-theme/jquery-ui.custom.css" rel="Stylesheet" />
+<link type="text/css" href="/jquery/css/custom-theme-1.9.1/jquery-ui.custom.css" rel="Stylesheet" />
+<link type="text/css" href="/jquery/css/jquery-ui-timepicker-addon.css" rel="Stylesheet" />
 
+<link type="text/css" href="../portal/css/Fwk.css" rel="Stylesheet" />
 <link type="text/css" href="../portal/css/Table.css" rel="Stylesheet" />
 
-<script type="text/javascript" src="/jquery/js/jquery.min.js"></script>
-<script type="text/javascript" src="/jquery/js/jquery-ui.custom.min.js"></script>
+<link type="text/css" href="../shiftmgr/css/shiftmgr.css" rel="Stylesheet" />
 
-<script type="text/javascript" src="../portal/js/config.js"></script>
-<script type="text/javascript" src="../portal/js/Table.js"></script>
+<style>
 
-<style type="text/css">
-body {
-  margin: 0;
-  padding: 0;
-}
-.table_container {
-  margin-right: 40px;
+div.shift_reports {
+  padding: 20px;
 }
 </style>
 
+<script type="text/javascript" src="/jquery/js/jquery-1.8.2.js"></script>
+<script type="text/javascript" src="/jquery/js/jquery-ui-1.9.1.custom.min.js"></script>
+<script type="text/javascript" src="/jquery/js/jquery-ui-timepicker-addon.js"></script>
+<script type="text/javascript" src="/jquery/js/jquery.form.js"></script>
+<script type="text/javascript" src="/jquery/js/jquery.json.js"></script>
+<script type="text/javascript" src="/jquery/js/jquery.printElement.js"></script>
+
+<script type="text/javascript" src="../portal/js/Fwk.js"></script>
+<script type="text/javascript" src="../portal/js/Table.js"></script>
+
+<script type="text/javascript" src="../shiftmgr/js/Reports.js"></script>
+<script type="text/javascript" src="../shiftmgr/js/Analytics.js"></script>
+<script type="text/javascript" src="../shiftmgr/js/Access.js"></script>
+<script type="text/javascript" src="../shiftmgr/js/Notifications.js"></script>
+<script type="text/javascript" src="../shiftmgr/js/Rules.js"></script>
+
 <script type="text/javascript">
 
-var config = new config_create('shift_manager') ;
-
-function zeroPad(num, len) {
-  var s = String(num);
-  while (s.length < len) {
-    s = "0" + s;
-  }
-  return s;
-}
-
-// Return yyyy-mm-dd from Date object
-function dateToYMD(date) {
-  return zeroPad(date.getFullYear(), 4) + "-" + zeroPad(date.getMonth() + 1, 2) + "-" + zeroPad(date.getDate(), 2);
-}
-
-// Return hh:mm:ss from Date object
-function dateToHMS(date) {
-  return zeroPad(date.getHours(), 2) + ":" + zeroPad(date.getMinutes(), 2) + ":" + zeroPad(date.getSeconds(), 2);
-}
-
-// Convert unix_time (seconds since 1970 UTC) to Date() object.
-function convert_unix_time_to_Date(unix_time) {
-  if (unix_time) {
-    return new Date(1000 * unix_time);
-  }
-}
-
-// Convert unix_time (seconds since 1970 UTC) to string.
-function convert_unix_time_to_string(unix_time) {
-  var date = convert_unix_time_to_Date(unix_time);
-  if (! date) {
-    return "";
-  }
-  return dateToYMD(date) + " " + dateToHMS(date);
-}
-
-function shift_service (url, params, when_done) {
-    $.ajax({
-        type: 'GET',
-        url:  url,
-        data: params,
-        success: function(result) {
-            if(result.status != 'success') {
-                alert(result.message);
-                return;
-            }
-            var shifts_data = [];
-            for(var i in result.shifts) {
-                var shift = result.shifts[i];
-                shifts_data.push ([
-                    shift.username,
-                    shift.hutch,
-                    convert_unix_time_to_string(shift.start_time),
-                    convert_unix_time_to_string(shift.end_time),
-                    convert_unix_time_to_string(shift.last_modified_time),
-                    shift.stopper_out,
-                    shift.door_open,
-                    shift.total_shots,
-                    shift.other_notes
-                ]);
-            }
-            table_shifts.load(shifts_data);
-            if(when_done) when_done();
-        },
-        error: function() {
-            table_shifts.erase(Table.Status.error('service is not available'));
-        },
-        dataType: 'json'
-    });
-}
-
-var table_shifts = null ;
-
 $(function() {
-    table_shifts = new Table(
-        'table_shifts',
-         [
-            {   name: 'Username' },
-            {   name: 'Hutch' },
-            {   name: 'Start Time' },
-            {   name: 'End Time' },
-            {   name: 'Last Modified Time' },
-            {   name: 'Stopper Out' },
-            {   name: 'Door Open' },
-            {   name: 'Total Shots' },
-            {   name: 'Other Notes' }
-        ]
-    );
-    table_shifts.display();
-    table_shifts.erase(Table.Status.Loading);
 
-    shift_service('../shiftmgr/ws/get_shifts.php');
+    var instruments = <?php echo json_encode($instruments) ?> ;
+    var instr2editor = <?php echo json_encode($instr2editor) ?> ;
+    var menus = [] ;
+    for (var i in instruments) {
+        var instr_name = instruments[i] ;
+        menus.push ({
+            name: instr_name ,
+            menu: [
+                {   name: 'Reports' ,
+                    dispatcher: new Reports(instr_name, instr2editor[instr_name]) ,
+                    html_container: 'shift_reports_'+instr_name
+                } ,
+                {   name: 'Analytics' ,
+                    dispatcher: new Analytics(instr_name) ,
+                    html_container: 'shift_analytics_'+instr_name
+                }
+            ]
+        }) ;
+    }
+    menus.push ({
+        name: 'Admin' ,
+        menu: [
+            {   name: 'Access' ,
+                dispatcher: new Access() ,
+                html: 'Access control management to assign priviles to individual users, groups, etc.'
+            } ,
+            {   name: 'Notifications' ,
+                dispatcher: new Notifications() ,
+                html: 'View and manage push notifications: who will get an event and what kind of events (new shift created, data updated, etc.)'
+            } ,
+            {   name: 'Rules' ,
+                dispatcher: new Rules() ,
+                html: 'Various configuration parameters and rules, such: when shifts usuall begin, create shift placeholders automatically or not'
+            }
+        ]
+    }) ;
+
+    Fwk.build (
+
+        // Title and subtitle (HTML allowed)
+
+        'PCDS Shift Manager' ,  // title
+        'Instrument Hutches' ,  // subtitle
+
+        menus ,                 // menus and applications
+
+        // The uick search provider
+
+        function (text2search) { Fwk.report_info('Search', text2search) ; }
+    ) ;
 });
 
 </script>
 
 </head>
-<body>
 
-<div style="padding:20px;">
+  <body>
 
-  <h2>Shifts</h2>
-  <div class="table_container" id="table_shifts" style="float:left;"></div>
-  <div style="clear:both;">
+      Loading...
 
-</div>
+<?php foreach ($instruments as $instr_name) { ?>
 
-</body>
+      <div id="shift_reports_<?php echo $instr_name ; ?>" style="display:none">
+
+        <div class="shift_reports">
+
+          <!-- Controls for selecting shifts for display and updating the list of
+            -- the selected shifts. -->
+
+          <div id="shifts-search-controls" style="float:left;" >
+            <div>
+              <table><tbody>
+                <tr>
+                  <td><b>Range:</b></td>
+                  <td><select name="range" style="padding:1px;">
+                        <option value="week"  >Last 7 days</option>
+                        <option value="month" >Last month</option>
+                        <option value="range" >Specific range</option>
+                      </select></td>
+                  <td><div style="width:20px;"></div>&nbsp;</td>
+                  <td><input type="text" size=6 name="begin" disabled="disabled" title="specify the first day of the range (optional)" />
+                      <b>&mdash;</b>
+                      <input type="text" size=6 name="end"  disabled="disabled" title="specify the last day of the range (optional)" /></td>
+                  <td><div style="width:20px;">&nbsp;</div></td>
+                  <td><button name="reset"  title="reset the search form to the default state">Reset</button></td>
+                </tr>
+              </tbody></table>
+            </div>
+            <div>
+              <table><tbody>
+                <tr>
+                  <td><b>Display all shifts:</b></td>
+                  <td><div style="width:20px;"></div>&nbsp;</td>
+                  <td><input type="checkbox" name="display_all" title="if enabled it will also reveal empty shifts for periods when no beam or users activities detected in the hutch " /></td>
+                </tr>
+              </tbody></table>
+            </div>
+          </div>
+<?php if ($instr2editor[$instr_name]) { ?>
+          <div id="new-shift-controls" style="float:left; margin-left:60px; padding-top:5px;">
+            <button name="new_shift" style="font-weight:bold;" title="open a dialog for creating a new shift" >Create New Shift</button>
+            <div id="new-shift-con" class="new-shift-hdn" style="background-color:#f0f0f0; margin-top:5px; padding:1px 10px 5px 10px; border-radius:5px;" >
+              <div style="max-width:460px;">
+                <p>Note that shifts are usually created automatically based on rules defined
+                in the Administrative section of this application. You may still want to create
+                your own shift if that shift happens to be an exception from the rules.
+                Possible cases would be: non-planned shift, very short shift, etc. In all
+                other cases please see if there is a possibility to reuse an empty shift slot
+                by checking "Display all shifts" checkbox on the left.</p>
+              </div>
+              <div style="float:left;">
+                <table style="font-size:90%;"><tbody>
+                  <tr>
+                    <td class="shift-grid-hdr " valign="center" >Begin:</td>
+                    <td class="shift-grid-val " valign="center" >
+                      <input name="begin_day" type="text" size=8 title="specify the begin date of the shift" />
+                      <input name="begin_h"   type="text" size=1 title="hour: 0..23" />
+                      <input name="begin_m"   type="text" size=1 title="minute: 0..59" /></td>
+                  </tr>
+                  <tr>
+                    <td class="shift-grid-hdr " valign="center" >End:</td>
+                    <td class="shift-grid-val " valign="center" >
+                      <input name="end_day" type="text" size=8 title="specify the end date of the shift" />
+                      <input name="end_h"   type="text" size=1 title="hour: 0..23" />
+                      <input name="end_m"   type="text" size=1 title="minute: 0..59" /></td>
+                  </tr>
+                </tbody></table>
+              </div>
+              <div style="float:left; margin-left:20px; margin-top:40px; padding-top:5px;">
+                <button name="save"   title="submit modifications and open the editing dialog for the new shift">Save</button>
+                <button name="cancel" title="discard modifications and close this dialog">Cancel</button>
+              </div>
+              <div style="clear:both;"></div>
+            </div>
+          </div>
+<?php } ?>
+          <div style="clear:both;"></div>
+          <div style="float:right;" id="shifts-search-info">Searching...</div>
+          <div style="clear:both;"></div>
+
+          <!-- The shifts display -->
+
+          <div id="shifts-search-display">
+
+            <!-- Table header -->
+
+            <div id="shifts-search-header">
+              <div style="float:left; margin-left: 0px;                                 width: 20px;" ><div  class="shift-toggler"  >&nbsp;  </div></div>
+              <div style="float:left; margin-left:10px; text-align: right;              width: 80px;" ><span class="shift-table-hdr">Shift   </span></div>
+              <div style="float:left; margin-left:20px;                                 width: 40px;" ><span class="shift-table-hdr">begin   </span></div>
+              <div style="float:left; margin-left:10px;                                 width: 40px;" ><span class="shift-table-hdr">end     </span></div>
+              <div style="float:left; margin-left:20px; border-right:1px solid #000000; width: 50px;" ><span class="shift-table-hdr">&Delta;t</span></div>
+              <div style="float:left; margin-left:10px;                                 width: 70px;" ><span class="shift-table-hdr">Stopper </span></div>
+              <div style="float:left; margin-left:10px; border-right:1px solid #000000; width: 50px;" ><span class="shift-table-hdr">Door    </span></div>
+              <div style="float:left; margin-left:15px;                                 width: 40px;" ><span class="shift-table-hdr">FEL     </span></div>
+              <div style="float:left; margin-left: 5px;                                 width: 40px;" ><span class="shift-table-hdr">BMLN    </span></div>
+              <div style="float:left; margin-left: 5px;                                 width: 40px;" ><span class="shift-table-hdr">CTRL    </span></div>
+              <div style="float:left; margin-left: 5px;                                 width: 40px;" ><span class="shift-table-hdr">DAQ     </span></div>
+              <div style="float:left; margin-left: 5px;                                 width: 40px;" ><span class="shift-table-hdr">LASR    </span></div>
+              <div style="float:left; margin-left: 5px;                                 width: 40px;" ><span class="shift-table-hdr">TIME    </span></div>
+              <div style="float:left; margin-left: 5px;                                 width: 40px;" ><span class="shift-table-hdr">HALL    </span></div>
+              <div style="float:left; margin-left: 5px;                                 width: 50px;" ><span class="shift-table-hdr">OTHR    </span></div>
+              <div style="float:left; margin-left: 5px; padding-left: 20px; border-left:1px solid #000000;  width: 50px;" ><span class="shift-table-hdr">Editor  </span></div>
+              <div style="float:left; margin-left:10px;                                 width:140px;" ><span class="shift-table-hdr">Modified</span></div>
+              <div style="clear:both;"></div>
+            </div>
+
+            <!-- Table body is loaded dynamically by the application -->
+
+            <div id="shifts-search-list">
+              <div style="color:maroon; margin-top:10px;">
+                Use the search form to find shifts...
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+
+      <div id="shift_analytics_<?php echo $instr_name ; ?>" style="display:none">
+        Shift analytics for <?php echo $instr_name ; ?>
+      </div>
+
+<?php } ?>
+
+  </body>
+
 </html>
+

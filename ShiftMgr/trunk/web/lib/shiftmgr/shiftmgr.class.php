@@ -1,17 +1,19 @@
 <?php
 
-namespace ShiftMgr;
+namespace ShiftMgr ;
 
-require_once 'shiftmgr.inc.php';
-require_once 'authdb/authdb.inc.php';
-require_once 'regdb/regdb.inc.php';
-require_once 'filemgr/filemgr.inc.php';
-require_once 'lusitime/lusitime.inc.php';
+require_once 'shiftmgr.inc.php' ;
+require_once 'authdb/authdb.inc.php' ;
+require_once 'regdb/regdb.inc.php' ;
+require_once 'filemgr/filemgr.inc.php' ;
+require_once 'lusitime/lusitime.inc.php' ;
 
-use \AuthDB\AuthDB;
-use \FileMgr\DbConnection;
-use \LusiTime\LusiTime;
-use \RegDB\RegDB;
+use \AuthDB\AuthDB ;
+use \FileMgr\DbConnection ;
+use \LusiTime\LusiTime ;
+use \LusiTime\LusiInterval ;
+
+use \RegDB\RegDB ;
 
 /**
  * Class ShiftMgr encapsulates operations with the PCDS Shift Management database
@@ -24,7 +26,16 @@ class ShiftMgr extends DbConnection {
     // --- STATIC INTERFACE ---
     // ------------------------
 
-    private static $instance = null;
+    private static $instance = null ;
+
+    public static $area_names       = array('FEL', 'BMLN', 'CTRL', 'DAQ', 'LASR', 'TIME', 'HALL', 'OTHR') ;
+    public static $allocation_names = array('tuning', 'alignment', 'daq', 'access', 'other') ;
+
+    private static $min_begin_time = null ;
+    public static function min_begin_time () {
+        if (is_null(ShiftMgr::$min_begin_time)) ShiftMgr::$min_begin_time = LusiTime::parse('2013-07-24 00:00:00') ;
+        return ShiftMgr::$min_begin_time ;
+    }
 
     /**
      * Singleton to simplify certain operations.
@@ -34,11 +45,11 @@ class ShiftMgr extends DbConnection {
     public static function instance() {
         if (is_null(ShiftMgr::$instance)) ShiftMgr::$instance =
             new ShiftMgr (
-                SHIFTMGR_DEFAULT_HOST,
-                SHIFTMGR_DEFAULT_USER,
-                SHIFTMGR_DEFAULT_PASSWORD,
-                SHIFTMGR_DEFAULT_DATABASE);
-        return ShiftMgr::$instance;
+                SHIFTMGR_DEFAULT_HOST ,
+                SHIFTMGR_DEFAULT_USER ,
+                SHIFTMGR_DEFAULT_PASSWORD ,
+                SHIFTMGR_DEFAULT_DATABASE) ;
+        return ShiftMgr::$instance ;
     }
 
     /**
@@ -50,8 +61,8 @@ class ShiftMgr extends DbConnection {
      * @param string $password
      * @param string $database
      */
-    public function __construct($host, $user, $password, $database) {
-        parent::__construct($host, $user, $password, $database);
+    public function __construct ($host, $user, $password, $database) {
+        parent::__construct($host, $user, $password, $database) ;
     }
 
     /**
@@ -60,297 +71,254 @@ class ShiftMgr extends DbConnection {
      * @param string $name - hutch name
      * @throws ShiftMgrException
      */
-    private function assert_hutch($name) {
+    private function assert_hutch ($name) {
         
         // The implementation of the method will check if the specified
         // name matches any known hutch in the Experiment Registry Database.
         // This will may require to begin a separate transaction.
 
-        RegDB::instance()->begin();
+        RegDB::instance()->begin() ;
         if (is_null(RegDB::instance()->find_instrument_by_name($name)))
             throw new ShiftMgrException (
                 __class__.'::'.__METHOD__ ,
-                "no such hutch found in the Experiment Registry Database: '{$name}'");
+                "no such hutch found in the Experiment Registry Database: '{$name}'") ;
+    }
+
+    public function current_user () {
+        AuthDb::instance()->begin() ;
+        return AuthDB::instance()->authName() ;
     }
 
     /**
-     * Return True if the currently logged user is allowed to manage shifts for the hutch.
-     *
-     * @param string $hutch - a hutch name
-     * @return boolean
+     * Return a list of shifts in a scope of teh specified instrument and an optional time interval
+     * 
+     * @param string $instr_name
+     * @param LusiTime $begin_time
+     * @param LusiTime $end_time
+     * @return array
      */
-    public function is_manager($hutch) {
-      return true;
-      /*
-        $this->assert_hutch($hutch);
-        $hutch = strtoupper(trim($hutch));
-        AuthDb::instance()->begin();
-        return AuthDB::instance()->hasRole (
-            AuthDB::instance()->authName() ,    // UID of the current logged user
-            null ,                              // across all experiments of the hutch
-            "ShiftMgr" ,                        // the application name 
-            "Manage_{$hutch}"                   // the role name encodes the hutch name
-        );
-      */
+    public function shifts ($instr_name, $begin_time=null, $end_time=null) {
+ 
+        $shifts = array() ;
+
+        $this->assert_hutch($instr_name) ;
+        $instr_name_escaped = $this->escape_string(strtoupper(trim($instr_name))) ;
+
+        // Nothing to return for an empty or incorrect interval. Don't even bother
+        // to report this as a problem.
+
+        if (($begin_time && $end_time) && !$begin_time->less($end_time)) return $shifts ;
+
+        $opt = "instr_name='{$instr_name_escaped}'" ;
+        if ($begin_time) $opt .= " AND begin_time >= {$begin_time->to64()}" ;
+        if ($end_time)   $opt .= " AND begin_time <  {$end_time->to64()}" ;
+        return $this->find_shifts_by_($opt) ;
     }
 
-    /**
-     * Return current logged-in user.
-     */
-    public function current_user() {
-        AuthDb::instance()->begin();
-        return AuthDB::instance()->authName();
+    public function find_shift_by_id ($id) {
+        $shifts = $this->find_shifts_by_("id={$id}") ;
+        $nrows = count($shifts) ;
+        if ($nrows == 0) return null ;
+        if ($nrows == 1) return $shifts[0] ;
+        throw new ShiftMgrException (
+              __class__.'::'.__METHOD__ ,
+              "Invalid number of entries returned when looking for shift by id={$id}") ;
     }
-
-    public function get_stopper_out() {
-      return 5 * 3600; // XXX fetch from PV
+    public function find_shift_by_begin_time ($instr_name, $begin_time) {
+        $instr_name_escaped = $this->escape_string(strtoupper(trim($instr_name))) ;
+        $shifts = $this->find_shifts_by_("instr_name='{$instr_name_escaped}' AND begin_time={$begin_time->to64()}") ;
+        $nrows = count($shifts) ;
+        if ($nrows == 0) return null ;
+        if ($nrows == 1) return $shifts[0] ;
+        throw new ShiftMgrException (
+              __class__.'::'.__METHOD__ ,
+              "Invalid number of entries returned when looking for shift by begin_time={$begin_time->toStringShort()}") ;
     }
-
-    public function get_door_open() {
-      return 3 * 3600; // XXX fetch from PV
-    }
-
-    public function get_total_shots() {
-      return 60 * $this->get_stopper_out();
-    }
-
-    private static $hutches = array("SXR", "AMO", "CXI", "MEC", "XCS", "XPP");
-    private static $areas = array("FEL", "Beamline", "Controls", "DAQ", "Laser", "Hutch/Hall", "Other");
-    private static $uses = array("Tuning", "Alignment", "Data Taking", "Access", "Other", "Total");
-
-    public function get_all_hutches() {
-      return ShiftMgr::$hutches;
-    }
-
-    public function get_permitted_hutches() {
-      $permitted_hutches = array();
-      foreach (ShiftMgr::$hutches as $hutch) {
-        if ($this->is_manager($hutch)) {
-          array_push($permitted_hutches, $hutch);
+    private function find_shifts_by_ ($condition=null) {
+        $shifts = array() ;
+        $condition = $condition ? "WHERE {$condition}" : '' ;
+        $result = $this->query("SELECT * FROM {$this->database}.shift {$condition} ORDER BY instr_name, begin_time DESC") ;
+        for ($i = 0, $nrows = mysql_numrows($result); $i < $nrows; $i++) {
+             array_push (
+                $shifts ,
+                new Shift($this, mysql_fetch_array($result, MYSQL_ASSOC))
+             ) ;
         }
-      }
-      return $permitted_hutches;
+        return $shifts ;
     }
 
-    public function get_uses() {
-      return ShiftMgr::$uses;
+    public function precreate_shifts_if_needed ($instr_name, $begin_time, $end_time) {
+
+        $this->assert_hutch($instr_name) ;
+
+        // Never go before that date
+
+        $min_begin_time = ShiftMgr::min_begin_time() ;
+        $begin_time = $begin_time ? ($begin_time->less($min_begin_time) ? $min_begin_time : $begin_time) : $min_begin_time ;
+        $begin_time = LusiTime::parse("{$begin_time->toStringDay()} 00:00:00") ;
+              
+        // Never go beyond the comming midnight of the present day.
+
+        $now = LusiTime::now() ;
+        $max_end_time = LusiTime::parse("{$now->in24hours()->toStringDay()} 00:00:00") ;
+        $end_time = $end_time ? ($max_end_time->less($end_time) ? $max_end_time : LusiTime::parse("{$end_time->in24hours()->toStringDay()} 00:00:00")) : $max_end_time ;
+
+//       throw new ShiftMgrException (
+//            __class__.'::'.__METHOD__ ,
+//            "begin_time: {$begin_time->toStringShort()}, end_time: {$end_time->toStringShort()}") ;
+
+        // Create up to 2 shifts per each day, one before 12:00, and another one after.
+        // Don't create the first shift if before 9:00, and don't create the second one if before 21:00.
+
+        $range = new LusiInterval($begin_time, $end_time) ;
+        
+        foreach ($range->splitIntoDays() as $day) {
+            $shift_before_noon = null ;
+            $shift_after_noon  = null ;
+            foreach ($this->shifts($instr_name, $day->begin, $day->end) as $shift) {
+                if ($shift->begin_time()->hour() < 12) $shift_before_noon = $shift ;
+                else $shift_after_noon = $shift ;
+            }
+            if ($day->begin->less($end_time)) {
+                if (is_null($shift_before_noon)) {
+                    if (!(($day->begin->toStringDay() == $now->toStringDay()) && $now->hour() < 9)) {
+                        $shift = $this->create_shift (
+                            $instr_name ,
+                            LusiTime::parse("{$day->begin->toStringDay()} 09:00:00") ,
+                            LusiTime::parse("{$day->begin->toStringDay()} 21:00:00")
+                        ) ;
+                    }
+                }
+                if (is_null($shift_after_noon)) {
+                    if (!(($day->begin->toStringDay() == $now->toStringDay()) && ($now->hour() < 21))) {
+                        $shift = $this->create_shift (
+                            $instr_name ,
+                            LusiTime::parse("{$day->begin->toStringDay()} 21:00:00") ,
+                            LusiTime::parse("{$day->begin->in24hours()->toStringDay()}  09:00:00")
+                        ) ;
+                    }
+                }
+            }
+        }
     }
 
-    public function get_areas() {
-      return ShiftMgr::$areas;
+/*
+
+INSERT INTO shiftmgr.shift (id,instr_name,begin_time,end_time,notes) VALUES(1,'AMO', (SELECT UNIX_TIMESTAMP('2013-07-19 21:00:00')*1000000000), (SELECT UNIX_TIMESTAMP('2013-07-20 09:00:00')*1000000000),'');
+
+INSERT INTO shiftmgr.shift_area_evaluation (shift_id,name,problems,downtime_min,comments) VALUES (1,'FEL', 1, 15,'');
+INSERT INTO shiftmgr.shift_area_evaluation (shift_id,name,problems,downtime_min,comments) VALUES (1,'BMLN',0,  0,'');
+INSERT INTO shiftmgr.shift_area_evaluation (shift_id,name,problems,downtime_min,comments) VALUES (1,'CTRL',0,  0,'');
+INSERT INTO shiftmgr.shift_area_evaluation (shift_id,name,problems,downtime_min,comments) VALUES (1,'DAQ', 1,125,'Something went wrong with the DAQ');
+INSERT INTO shiftmgr.shift_area_evaluation (shift_id,name,problems,downtime_min,comments) VALUES (1,'LASR',0,  0,'');
+INSERT INTO shiftmgr.shift_area_evaluation (shift_id,name,problems,downtime_min,comments) VALUES (1,'HALL',1, 12,'');
+INSERT INTO shiftmgr.shift_area_evaluation (shift_id,name,problems,downtime_min,comments) VALUES (1,'OTHR',0,  0,'');
+
+INSERT INTO shiftmgr.shift_time_allocation (shift_id,name,duration_min,comments) VALUES (1,'tuning',   120,'');
+INSERT INTO shiftmgr.shift_time_allocation (shift_id,name,duration_min,comments) VALUES (1,'alignment', 55,'');
+INSERT INTO shiftmgr.shift_time_allocation (shift_id,name,duration_min,comments) VALUES (1,'daq',      345,'');
+INSERT INTO shiftmgr.shift_time_allocation (shift_id,name,duration_min,comments) VALUES (1,'access',     0,'');
+INSERT INTO shiftmgr.shift_time_allocation (shift_id,name,duration_min,comments) VALUES (1,'other',    200,'');
+
+*/
+    public function create_shift ($instr_name, $begin_time, $end_time) {
+
+        $this->assert_hutch($instr_name) ;
+        $instr_name_escaped = $this->escape_string(strtoupper(trim($instr_name))) ;
+
+        $sql = "INSERT INTO {$this->database}.shift (instr_name,begin_time,end_time,notes) VALUES('{$instr_name_escaped}',{$begin_time->to64()},{$end_time->to64()},'')" ;
+        $this->query($sql) ;
+
+        $shifts = $this->find_shifts_by_('id=LAST_INSERT_ID()') ;
+        if (count($shifts) != 1)
+            throw new ShiftMgrException (
+                __class__.'::'.__METHOD__ ,
+                'Failed to create the new shift') ;
+        $shift = $shifts[0] ;
+
+        foreach (ShiftMgr::$area_names as $area_name) {
+            $area_name_escaped = $this->escape_string(trim($area_name)) ;
+            $sql = "INSERT INTO {$this->database}.shift_area_evaluation (shift_id,name,problems,downtime_min,comments) VALUES ({$shift->id()},'{$area_name_escaped}',0,0,'')" ;
+            $this->query($sql) ;
+        }
+        foreach (ShiftMgr::$allocation_names as $allocation_name) {
+            $allocation_name_escaped = $this->escape_string(trim($allocation_name)) ;
+            $sql = "INSERT INTO {$this->database}.shift_time_allocation (shift_id,name,duration_min,comments) VALUES ({$shift->id()},'{$allocation_name_escaped}',0,'')" ;
+            $this->query($sql) ;
+        }
+        return $shift ;
     }
 
-    /**
-     * Return a list of shifts for specified hutch,
-     * or if no hutch was specified, then for all hutches.
-     * Returned shifts are "shallow" and do not contain area_evaluations, etc.
-     */
-    public function get_shifts($hutch = '', $earliest_start_time = 0, $latest_start_time = 0) {
-      $where_clause = "WHERE start_time >= {$earliest_start_time}";
-      if ($latest_start_time) {
-        $where_clause .= " AND start_time <= {$latest_start_time}";
-      }
-      if ($hutch) {
-        $this->assert_hutch($hutch);
-        $where_clause .= " AND hutch='".$this->escape_string(strtoupper(trim($hutch)))."'";
-      }
-      $sql = "SELECT * FROM {$this->database}.shift {$where_clause} ORDER BY start_time, hutch DESC";
-      $result = $this->query($sql);
-      $nrows = mysql_numrows($result);
+    public function update_shift ($id, $begin_time=null, $end_time=null, $notes=null, $areas=null, $allocations=null) {
 
-      $shifts = array();
-      for ($i = 0; $i < $nrows; $i++) {
-        array_push($shifts, new ShiftMgrShift($this, mysql_fetch_array($result, MYSQL_ASSOC)));
-      }
-      return $shifts;
+        // The shift object before applying first modfs
+
+        $shift = $this->find_shift_by_id($id) ;
+        if (!$shift)
+            throw new ShiftMgrException (
+                __class__.'::'.__METHOD__ ,
+                "No shift found for id={$id}") ;
+
+        if (($begin_time && $end_time) && !$begin_time->less($end_time))
+            throw new ShiftMgrException (
+                __class__.'::'.__METHOD__ ,
+                "the begin time of the interval must be strictly less than the end one") ;
+
+        $modified_time = LusiTime::now() ;
+
+        $opt = " modified_uid='{$this->current_user()}', modified_time={$modified_time->to64()}" ;
+
+        if ($begin_time) $opt .= ", begin_time={$begin_time->to64()}" ;
+        if ($end_time)   $opt .= ", end_time={$end_time->to64()}" ;
+        if ($notes)      $opt .= ", notes='".$this->escape_string($notes)."'" ;
+
+        $sql = "UPDATE {$this->database}.shift SET {$opt} WHERE id={$shift->id()}" ;
+        $this->query($sql) ;
+
+        // The updated version of the shift
+
+        $shift = $this->find_shift_by_id($id) ;
+
+        if ($areas) {
+            foreach ($areas as $area_name => $area) {
+                $area_name_escaped = $this->escape_string($area_name) ;
+                $opt = ' problems='.($area->problems ? 1 : 0).', downtime_min='.intval($area->downtime_min).", comments='".$this->escape_string($area->comments)."'" ;
+                $sql = "UPDATE {$this->database}.shift_area_evaluation SET {$opt} WHERE shift_id={$shift->id()} AND name='{$area_name_escaped}'" ;
+                $this->query($sql) ;
+            }
+        }
+        if ($allocations) {
+            function update_allocation ($shiftmgr, $shift, $allocation_name, $allocation) {
+                $allocation_name_escaped = $shiftmgr->escape_string($allocation_name) ;
+                $duration_min = intval($allocation->duration_min) ;
+                $opt = '  duration_min='.$duration_min.", comments='".$shiftmgr->escape_string($allocation->comments)."'" ;
+                $sql = "UPDATE {$shiftmgr->database}.shift_time_allocation SET {$opt} WHERE shift_id={$shift->id()} AND name='{$allocation_name_escaped}'" ;
+                $shiftmgr->query($sql) ;
+            }
+
+            $ival = new LusiInterval($shift->begin_time(), $shift->end_time()) ;
+            $allocations->other->duration_min = $ival->toMinutes() ;
+
+            foreach ($allocations as $allocation_name => $allocation) {
+                if ($allocation_name != 'other') {
+                    update_allocation($this, $shift, $allocation_name, $allocation) ;
+                    $allocations->other->duration_min -= $allocation->duration_min ;
+                }
+            }
+            if ($allocations->other->duration_min < 0) $allocations->other->duration_min = 0 ;
+
+            update_allocation($this, $shift, 'other', $allocations->other) ;
+        }
+        return $this->find_shift_by_id($id) ;
     }
+    
+    public function delete_shift_by_id ($id) {
 
-    // Returns last modified time for shift with id.
-    public function get_shift_last_modified_time($id) {
-      $sql = "SELECT last_modified_time FROM {$this->database}.shift where id={$id}"; // XXX should use prepared statements
-      $result = $this->query($sql);
-      $nrows = mysql_numrows($result);
-      if ($nrows < 1) {
-        throw new ShiftMgrException (
-            __class__.'::'.__METHOD__ ,
-            'Could not find shift with id ' . $id
-        );
-      }
-      $shift = mysql_fetch_array($result, MYSQL_ASSOC);
-      $last_modified_time = $shift["last_modified_time"];
-      return $last_modified_time;
-    }
+        $shift = $this->find_shift_by_id($id) ;
+        if (!$shift) return ;
 
-    // Returns fully populated shift (with id, area evaluations, and time uses) for this id.
-    public function get_shift($id) {
-      $sql = "SELECT * FROM {$this->database}.shift where id={$id}"; // XXX should use prepared statements
-      $result = $this->query($sql);
-      $nrows = mysql_numrows($result);
-      if ($nrows < 1) {
-        throw new ShiftMgrException (
-            __class__.'::'.__METHOD__ ,
-            'Could not find shift with id ' . $id
-        );
-      }
-      $shift = mysql_fetch_array($result, MYSQL_ASSOC);
-
-      // Fetch all area_evaluation rows for this shift.
-      $sql = "SELECT * FROM {$this->database}.area_evaluation WHERE id={$id}";
-      $result = $this->query($sql);
-      $nrows = mysql_numrows($result);
-      $area_evaluations = array();
-      for ($i = 0; $i < $nrows; $i++) {
-        $area_evaluation = mysql_fetch_array($result, MYSQL_ASSOC);
-        $area = $area_evaluation["area"];
-        $area_evaluations[$area] = $area_evaluation;
-      }
-      $shift["area_evaluation"] = $area_evaluations;
-
-      // Fetch all time_use rows for this shift.
-      $sql = "SELECT * FROM {$this->database}.time_use WHERE id={$id}";
-      $result = $this->query($sql);
-      $nrows = mysql_numrows($result);
-      $time_uses = array();
-      for ($i = 0; $i < $nrows; $i++) {
-        $time_use = mysql_fetch_array($result, MYSQL_ASSOC);
-        $use = $time_use["use_name"];
-        $time_uses[$use] = $time_use;
-      }
-      $shift["time_use"] = $time_uses;
-
-      // Return fully populated shift.
-      return $shift;
-    }
-
-    // Create a new shift.
-    // Returns a fully populated shift (with id, area_evaluation map, etc.)
-    public function create_shift($hutch, $start_time, $end_time) {
-      $this->assert_hutch($hutch);
-      $hutch_escaped = $this->escape_string(strtoupper(trim($hutch)));
-
-      // Calculate values not passed as parameters
-      $username = $this->current_user();
-      $stopper_out = $this->get_stopper_out();
-      $door_open = $this->get_door_open();
-      $total_shots = $this->get_total_shots();
-      $last_modified_time = LusiTime::now()->sec;
-
-      // Create the shift
-      $sql = "INSERT INTO {$this->database}.shift";
-      $sql .= " VALUES(NULL,{$last_modified_time},'{$username}','{$hutch_escaped}',{$start_time},{$end_time},{$stopper_out},{$door_open},{$total_shots},'')";
-      $this->query($sql);
-
-      // Fetch id from newly created shift
-      $sql = "SELECT id FROM {$this->database}.shift WHERE hutch='{$hutch_escaped}' AND start_time='{$start_time}' ORDER BY id DESC";
-      $result = $this->query($sql);
-      $nrows = mysql_numrows($result);
-      if ($nrows < 1) {
-        throw new ShiftMgrException (
-            __class__.'::'.__METHOD__ ,
-            'Could not find the shift we just created!'
-        );
-        return null;
-      }
-      $shallow_created_shift = mysql_fetch_array($result, MYSQL_ASSOC);
-      $id = $shallow_created_shift["id"];
-
-      // Create a row for each area
-      foreach (ShiftMgr::$areas as $area) {
-        $sql = "INSERT INTO {$this->database}.area_evaluation VALUES ({$id},'{$area}',1,0,'')";
-        $this->query($sql);
-      }
-
-      // Create a row for each use
-      foreach (ShiftMgr::$uses as $use) {
-        $sql = "INSERT INTO {$this->database}.time_use VALUES ({$id},'{$use}',0,'')";
-        $this->query($sql);
-      }
-
-      // Now fetch and return complete shift.
-      return $this->get_shift($id);
-    }
-
-    // Do a "shallow" update of the shift. Don't update area evaluations, etc.
-    // Return new last modified time.
-    public function update_shift($id, $hutch, $start_time, $end_time, $other_notes) {
-      $other_notes = $this->escape_string($other_notes);
-
-      // Calculate values not passed as parameters
-      $stopper_out = $this->get_stopper_out();
-      $door_open = $this->get_door_open();
-      $total_shots = $this->get_total_shots();
-      $last_modified_time = LusiTime::now()->sec;
-
-      // Do the update
-      $sql = "UPDATE {$this->database}.shift";
-      $sql .= " SET hutch='{$hutch}'";
-      $sql .= ", start_time={$start_time}";
-      $sql .= ", end_time={$end_time}";
-      $sql .= ", last_modified_time={$last_modified_time}";
-      $sql .= ", stopper_out={$stopper_out}";
-      $sql .= ", door_open={$door_open}";
-      $sql .= ", total_shots={$total_shots}";
-      $sql .= ", other_notes='{$other_notes}'";
-      $sql .= " WHERE id={$id}";
-      $this->query($sql);
-
-      // And return new last modified time.
-      return $last_modified_time;
-    }
-
-    public function get_area_evaluation($id, $area) {
-      $sql = "SELECT * FROM {$this->database}.area_evaluation WHERE id={$id} AND area='{$area}'";
-      $result = $this->query($sql);
-      $nrows = mysql_numrows($result);
-      if ($nrows < 1) {
-        return null;
-      }
-      return mysql_fetch_array($result, MYSQL_ASSOC);
-    }
-
-    public function update_area_evaluation($id, $area, $ok, $downtime, $comment) {
-      $comment = $this->escape_string($comment);
-
-      // These are the fields to update
-      $sql = "UPDATE {$this->database}.area_evaluation SET";
-      $sql .= " ok='{$ok}',";
-      $sql .= " downtime={$downtime},";
-      $sql .= "comment='{$comment}'";
-
-      // Specify the record we want to update
-      $sql .= " WHERE id={$id}";
-      $sql .= " AND area='{$area}'";
-      $this->query($sql);
-
-      // And update shift so that others know to reload.
-      $last_modified_time = LusiTime::now()->sec;
-      $sql = "UPDATE {$this->database}.shift SET last_modified_time={$last_modified_time} WHERE id={$id}";
-      $this->query($sql);
-
-      // Return last modified time so that caller can update shift.
-      return $last_modified_time;
-    }
-
-    public function update_time_use($id, $use, $use_time, $comment) {
-      $comment = $this->escape_string($comment);
-
-      // These are the fields to update
-      $sql = "UPDATE {$this->database}.time_use SET";
-      $sql .= " use_time={$use_time},";
-      $sql .= "comment='{$comment}'";
-
-      // Specify the record we want to update
-      $sql .= " WHERE id={$id}";
-      $sql .= " AND use_name='{$use}'";
-      $this->query($sql);
-
-      // And update shift so that others know to reload.
-      $last_modified_time = LusiTime::now()->sec;
-      $sql = "UPDATE {$this->database}.shift SET last_modified_time={$last_modified_time} WHERE id={$id}";
-      $this->query($sql);
-
-      // Return last modified time so that caller can update shift.
-      return $last_modified_time;
+        $sql = "DELETE FROM {$this->database}.shift WHERE id={$shift->id()}" ;
+        $this->query($sql) ;
     }
 }
 
