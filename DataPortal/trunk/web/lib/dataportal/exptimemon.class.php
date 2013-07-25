@@ -55,6 +55,15 @@ class ExpTimeMon extends DbConnection {
         'MEC' => 128
     );
 
+    public static $door_secured_pvs = array(
+        'AMO' => 'PPS:NEH1:1:RADREADY',
+        'SXR' => 'PPS:NEH1:2:RADREADY',
+        'XPP' => 'PPS:NEH1:3:RADREADY',
+        'XCS' => 'PPS:NEH1:4:RADREADY',
+        'CXI' => 'PPS:NEH1:5:RADREADY',
+        'MEC' => 'PPS:NEH1:6:RADREADY'
+    );
+
     private static $instance = null;
 
     /**
@@ -131,16 +140,31 @@ class ExpTimeMon extends DbConnection {
      * t's defined for EPICS PV 'XRAY_DESTINATIONS'. An exception is thrown if
      * a non-valid name is passed into the method for which no mask is defined.
      *
-     * @param type $name
+     * @param string $name
      * @return type integer mask
      */
     public static function beam_destination_mask($name) {
         $name_trimmed = strtoupper(trim($name));
-        if( array_key_exists($name_trimmed, ExpTimeMon::$beam_destination_masks ))
-            return ExpTimeMon::$beam_destination_masks[$name_trimmed];
+        if( array_key_exists($name_trimmed, ExpTimeMon::$beam_destination_masks )) return ExpTimeMon::$beam_destination_masks[$name_trimmed];
         throw new DataPortalException (
             __METHOD__,
-            "unexpected result set returned by the query" );
+            "invalid instrument name: {$name_trimmed}" );
+    }
+
+    /**
+     * Return the name of a PV which tracks a status of the instrument hutch's door.
+     * Throw an exception if the input name isn't found among known instrument names.
+     *
+     * @param string $name
+     * @return string
+     * @throws DataPortalException
+     */
+    public static function door_secured_pv($name) {
+        $name_trimmed = strtoupper(trim($name));
+        if( array_key_exists($name_trimmed, ExpTimeMon::$door_secured_pvs )) return ExpTimeMon::$door_secured_pvs[$name_trimmed];
+        throw new DataPortalException (
+            __METHOD__,
+            "invalid instrument name: {$name_trimmed}" );
     }
 
     /* ================================================================
@@ -541,7 +565,7 @@ class ExpTimeMon extends DbConnection {
         $instrument_names = array();
         $experiments = array();
         foreach( LogBook::instance()->regdb()->instruments() as $instrument ) {
-            if( !$instrument->is_location() && !$instrument->is_mobile()) {
+            if( $instrument->is_standard()) {
                 array_push( $instrument_names, $instrument->name());
                 $experiments[$instrument->name()] = array();
                 foreach( LogBook::instance()->experiments_for_instrument($instrument->name()) as $experiment ) {

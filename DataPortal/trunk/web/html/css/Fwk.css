@@ -45,7 +45,8 @@ body {
   width: 100%;
   height: 36px;
   background-color: #E0E0E0;
-  border-bottom: 1px solid #0b0b0b;
+  /*border-bottom: 1px solid #0b0b0b;*/
+  border-bottom: 2px solid #e0e0e0;
 }
 #fwk-context {
   margin-left: 0px;
@@ -60,10 +61,16 @@ body {
   font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
   font-size: 11px;
 }
+#fwk-search-text {
+  border-radius: 3px;
+  font-size: 12px;
+  padding: 1px;
+  margin-top: 6px;
+}
 #fwk-left {
   position: absolute;
   left: 0;
-  top: 130px;
+  top: 129px;
   width: 200px;
   overflow: auto;
 }
@@ -80,10 +87,11 @@ body {
 #fwk-center {
   position: relative;
   top:130px;
-  margin: 0px 0px 20px 203px;
+  margin: 0px 0px 20px 201px;
   overflow: auto;
   background-color: #ffffff;
   border-left: 1px solid #a0a0a0;
+  border-top: 2px solid rgba(160, 160, 160, 0.63);
 }
 #fwk-login {
   margin-top: 10px;
@@ -153,17 +161,21 @@ div.fwk-tab-select {
 #fwk-menu {
   width: 100%;
   height: 100%;
-  background: url('../img/menu-bg-gradient-4.png') repeat;
+  /*background: url('../img/menu-bg-gradient-4.png') repeat;*/
+  background-color: #E0E0E0;
   font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
   font-size: 75%;
 }
 #fwk-menu-title {
-  height: 10px;
+  height: 0px;
 }
 div.fwk-menu-item {
   padding: 4px;
   padding-left: 10px;
+  padding-bottom: 10px;
   cursor: pointer;
+  color: #0071BC;
+  font-size: 13px;
 }
 div.fwk-menu-item:hover {
   background:#f0f0f0;
@@ -174,7 +186,10 @@ div.fwk-menu-item:hover {
 .fwk-menu-group {
   padding: 4px;
   padding-left: 10px;
+  padding-bottom: 10px;
   cursor: pointer;
+  color: #0071BC;
+  font-size: 13px;
 }
 .fwk-menu-group-members {
   padding: 4px;

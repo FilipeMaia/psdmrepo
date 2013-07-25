@@ -59,7 +59,7 @@ define_class (TableShifts_Dispatcher, FwkDispatcherBase, {}, {
         this.init() ;
     } ,
 
-    on_update : function (container, sec) {
+    on_update : function (sec) {
         this.init() ;
         if (this.active)
             this.shift_service('../shiftmgr/ws/shift_get.php', {instr: this.name});

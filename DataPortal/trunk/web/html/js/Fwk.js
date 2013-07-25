@@ -410,10 +410,10 @@ function FwkCreator () {
     this.mouse_down = false ;
 
     this.resize = function () {
-        var    top_height = 130 ;
+        var    top_height = 132 ;
         var bottom_height = 0 ;
         var center_height = $(window).height() - top_height - bottom_height ;
-        $('#fwk-left'    ).height(center_height);
+        $('#fwk-left'    ).height(center_height + 2);
         $('#fwk-splitter').height(center_height);
         $('#fwk-center'  ).height(center_height);
     } ;
@@ -440,7 +440,7 @@ function FwkCreator () {
         var pos = this.getMousePosition(e) ;
         $('#fwk-left'    ).css('width',       pos['x']) ;
         $('#fwk-splitter').css('left',        pos['x']) ;
-        $('#fwk-center'  ).css('margin-left', pos['x']+3) ;
+        $('#fwk-center'  ).css('margin-left', pos['x']+1) ;
     }
 
     this.start_vsplitter_manager = function() {
@@ -544,6 +544,10 @@ function FwkCreator () {
      *   UTILITY FUNCTIONS
      * ---------------------
      */
+    this.zeroPad = function (num, base) {
+        var len = base - String(num).length + 1 ;
+        return (len ? new Array(len).join('0') : '') + num ;
+    } ;
 
     function now () {
         var date = new Date() ;
@@ -721,12 +725,12 @@ function FwkCreator () {
      * -------------------------------------------
      */
     this.set_context = function (app) {
-
+        /*
         var ctx = app.full_name+' &gt;' ;
         if (app.context1) ctx += ' '     +app.context1_to_name() ;
         if (app.context2) ctx += ' &gt; '+app.context2_to_name() ;
         $('#fwk-context').html(ctx) ;
-
+        */
         if (this.prev_app && (this.prev_app != app)) this.prev_app.deactivate() ;
         app.activate() ;
         this.prev_app = app ;
@@ -891,7 +895,7 @@ function FwkCreator () {
 '      <div style="float:right;" id="fwk-login" class="not4print">' +
 '        <table><tbody>' +
 '          <tr>' +
-'            <td rowspan="4" valign="bottom"><a href="javascript:Fwk.printer_friendly()" title="Printer friendly version of this page"><img src="img/PRINTER_icon.gif" style="border-radius: 5px;" /></a></td>' +
+'            <td rowspan="4" valign="bottom"><a href="javascript:Fwk.printer_friendly()" title="Printer friendly version of this page"><img src="../portal/img/PRINTER_icon.gif" style="border-radius: 5px;" /></a></td>' +
 '          </tr>' +
 '          <tr>' +
 '            <td>&nbsp;</td>' +
@@ -926,7 +930,7 @@ function FwkCreator () {
 '      <div id="fwk-search" style="float:right">' ;
         if (this.on_quick_search) {
             html +=
-'        quick search: <input type="text" id="fwk-search-text" value="" size=16 title="enter text to search in the application, then press RETURN to proceed"  style="font-size:80%; padding:1px; margin-top:6px;" />' ;
+'        <b>quick search:</b> <input type="text" id="fwk-search-text" value="" size=16 title="enter text to search in the application, then press ENTER to proceed" />' ;
         }
         html +=
 '      </div>' +
