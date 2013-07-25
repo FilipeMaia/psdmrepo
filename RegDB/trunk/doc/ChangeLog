@@ -11,6 +11,11 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-13
+2013-07-25 Igor Gaponenko
+- relaxed rules for the names of experiments
+- added 6 special groups for instrument scientists: ps-amo-sci, etc.
+
 Tag: V00-01-12
 2013-07-10 Igor Gaponenko
 - extended data migration tables and the trigger by one extra column

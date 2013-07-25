@@ -581,7 +581,7 @@ HERE;
             foreach( $this->experiments_for_instrument( $i ) as $exper ) {
                 $g = $exper->name();
                 if(( 1 == preg_match( '/^[a-z]{3}[0-9]{5}$/', $g )) ||
-                   ( 1 == preg_match( '/^[a-z]{3}[imcs][0-9]{4}$/', $g )) ||
+                   ( 1 == preg_match( '/^[a-z]{3}[a-z][0-9]{4}$/', $g )) ||
                    ( 1 == preg_match( '/^dia[a-z]{3}[0-9]{2}$/', $g ))) $groups[$g] = True;
             }
         }
@@ -596,6 +596,7 @@ HERE;
          */
         if( is_null( $instr ) || ( $instr == 'AMO' )) {
             $groups['ps-amo'] = True;
+            $groups['ps-amo-sci'] = True;
             $groups['amoopr'] = True;
         }
 
@@ -606,6 +607,7 @@ HERE;
             $groups['sxrsse10'] = True;
             $groups['sxrlje10'] = True;
             $groups['ps-sxr'] = True;
+            $groups['ps-sxr-sci'] = True;
             $groups['sxropr'] = True;
         }
 
@@ -618,6 +620,7 @@ HERE;
         if( is_null( $instr ) || ( $instr == 'XPP' )) {
             $groups['xpp80610'] = True;
             $groups['ps-xpp'] = True;
+            $groups['ps-xpp-sci'] = True;
             $groups['xppopr'] = True;
             $groups['xppcom12'] = True;
             $groups['xppcom13'] = True;
@@ -626,12 +629,14 @@ HERE;
          */
         if( is_null( $instr ) || ( $instr == 'CXI' )) {
             $groups['ps-cxi'] = True;
+            $groups['ps-cxi-sci'] = True;
             $groups['cxiopr'] = True;
         }
         /* MEC commissionning, in-house, etc. experiments for the year of 2010.
          */
         if( is_null( $instr ) || ( $instr == 'MEC' )) {
             $groups['ps-mec'] = True;
+            $groups['ps-mec-sci'] = True;
             $groups['mecopr'] = True;
         }
 
@@ -639,6 +644,7 @@ HERE;
          */
         if( is_null( $instr ) || ( $instr == 'XCS' )) {
             $groups['ps-xcs'] = True;
+            $groups['ps-xcs-sci'] = True;
             $groups['xcsopr'] = True;
             $groups['xcscom12'] = True;
         }
