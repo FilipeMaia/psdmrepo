@@ -67,11 +67,6 @@ class GUISelectCalibDir ( QtGui.QWidget ) :
         self.ediDir = QtGui.QLineEdit  ( self.calib_dir.value() )
         self.ediDir .setReadOnly( True ) 
 
-        self.butIns .setMaximumWidth(50)
-        self.butExp .setMaximumWidth(90)
-        self.butBro .setMaximumWidth(70)
-        self.ediDir.setMinimumWidth(330)
-        
         self.hbox = QtGui.QHBoxLayout() 
         self.hbox.addWidget(self.titIns)
         self.hbox.addWidget(self.butIns)
@@ -109,7 +104,7 @@ class GUISelectCalibDir ( QtGui.QWidget ) :
         self.frame.setLineWidth(0)
         self.frame.setMidLineWidth(1)
         self.frame.setGeometry(self.rect())
-        #self.frame.setVisible(False)
+        self.frame.setVisible(False)
 
     def setStyle(self):
         #self.setStyleSheet(cp.styleYellow)
@@ -117,6 +112,16 @@ class GUISelectCalibDir ( QtGui.QWidget ) :
         self.titExp  .setStyleSheet (cp.styleLabel)
         #self.titDir  .setStyleSheet (cp.styleLabel)
         self.ediDir  .setStyleSheet (cp.styleEditInfo)
+
+        self.        setFixedHeight(40)
+        self.butIns .setFixedWidth(50)
+        self.butExp .setFixedWidth(90)
+        self.butBro .setFixedWidth(90)
+        self.ediDir .setMinimumWidth(330)
+
+        self.butBro .setIcon(cp.icon_browser)
+        self.setContentsMargins(-5,-5,-5,-9) # (QtCore.QMargins(-9,-9,-9,-9))        
+
         self.setStyleButtons()
         
 
@@ -197,10 +202,9 @@ class GUISelectCalibDir ( QtGui.QWidget ) :
         path_to_xtc_dir = fnm.path_to_xtc_dir()
         if os.path.lexists(path_to_xtc_dir) : return
         
-        msg = 'XTC data are not seen on this computer for path: ' + str(path_to_xtc_dir)
-        logger.info(msg, __name__)
+        msg = 'XTC data are not seen on this computer for path: %s' % path_to_xtc_dir
+        logger.warning(msg, __name__)
         print msg
-
 
 
     def onButBro(self):
@@ -226,6 +230,7 @@ class GUISelectCalibDir ( QtGui.QWidget ) :
         self.instr_name.setValue( txt )
         self.butIns.setText( txt + self.char_expand )
         logger.info('Instrument selected: ' + str(txt), __name__)
+
 
     def setExp(self, txt='None'):
         self.exp_name.setValue(txt)

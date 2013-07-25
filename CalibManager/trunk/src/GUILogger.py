@@ -37,11 +37,13 @@ class GUILogger ( QtGui.QWidget ) :
 
     name = 'GUILogger'
 
-    def __init__ ( self, parent=None ) :
+    def __init__ ( self, parent=None, show_buttons=True ) :
 
         QtGui.QWidget.__init__(self, parent)
 
-        self.setGeometry(200, 400, 900, 500)
+        self.show_buttons = show_buttons
+        
+        self.setGeometry(200, 400, 900, 50)
         self.setWindowTitle('GUI Logger')
         #self.setWindowIcon(cp.icon_logger)
 
@@ -122,6 +124,16 @@ class GUILogger ( QtGui.QWidget ) :
         #self.box_txt   .ensureCursorVisible()
         #self.tit_title.setAlignment(QtCore.Qt.AlignCenter)
         #self.titTitle.setBold()
+
+        self.tit_status.setVisible(self.show_buttons)
+        self.tit_level .setVisible(self.show_buttons)
+        self.box_level .setVisible(self.show_buttons)
+        self.but_save  .setVisible(self.show_buttons)
+        self.but_close .setVisible(self.show_buttons)
+
+        if not self.show_buttons : self.setContentsMargins (QtCore.QMargins(-9,-9,-9,-9))
+        self.setMinimumHeight(50)
+        self.setBaseSize(600,50)
 
 
     def setParent(self,parent) :

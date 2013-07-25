@@ -598,6 +598,20 @@ def get_text_list_from_file(fname) :
     return list_recs
 
 #----------------------------------
+#----------------------------------
+#----------------------------------
+#----------------------------------
+
+def printStyleInfo(widg):
+    qstyle     = widg.style()
+    qpalette   = qstyle.standardPalette()
+    qcolor_bkg = qpalette.color(1)
+    #r,g,b,alp  = qcolor_bkg.getRgb()
+    msg = 'Background color: r,g,b,alpha = %d,%d,%d,%d' % ( qcolor_bkg.getRgb() )
+    logger.debug(msg)
+
+
+#----------------------------------
 
 def get_save_fname_through_dialog_box(parent, path0, dial_title, filter='*.txt'):       
 

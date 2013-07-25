@@ -26,6 +26,7 @@ from PyQt4 import QtGui, QtCore
 
 from ConfigParametersForApp import cp
 from Logger                 import logger
+from FileNameManager        import fnm
 
 #-----------------------------
 
@@ -89,7 +90,7 @@ class GUICalibDirTree (QtGui.QWidget):
         #super(GUIQTreeView, self).__init__(parent)
         QtGui.QWidget.__init__(self, parent)
 
-        self.setGeometry(100, 100, 200, 500)
+        self.setGeometry(100, 100, 200, 600)
         self.setWindowTitle('Item selection tree')
 
         self.setFrame()
@@ -133,12 +134,12 @@ class GUICalibDirTree (QtGui.QWidget):
 
         for v in self.calib_vers :
             det, vers = v.split('::',1)
-            print 'det, vers =', det, vers
+            #print 'det, vers =', det, vers
 
             parentItem = self.model.invisibleRootItem() 
             itemv = QtGui.QStandardItem(QtCore.QString(v))
-            #itemv.setIcon(self.icon_table)
-            itemv.setCheckable(True) 
+            itemv.setIcon(cp.icon_folder_closed)
+            #itemv.setCheckable(True) 
             parentItem.appendRow(itemv)
   
             if det == 'CsPad' :
@@ -152,12 +153,13 @@ class GUICalibDirTree (QtGui.QWidget):
 
             for d in self.calib_det_list :
                 itemd = QtGui.QStandardItem(QtCore.QString(d))
-                #itemd.setIcon(self.icon_table)
-                itemd.setCheckable(True) 
+                itemd.setIcon(cp.icon_folder_closed)
+                #itemd.setCheckable(True) 
                 itemv.appendRow(itemd)
  
                 for t in self.calib_type_list :
                     itemt = QtGui.QStandardItem(QtCore.QString(t))
+                    itemt.setIcon(cp.icon_folder_closed)
                     itemt.setCheckable(True) 
                     itemd.appendRow(itemt)
 
@@ -188,31 +190,44 @@ class GUICalibDirTree (QtGui.QWidget):
             self._full_name = item_par.text() + '/' + self._full_name
             self._getFullName(ind_par)
 
-
+    def itemChanged(self, item):
+        state = ['UNCHECKED', 'TRISTATE', 'CHECKED'][item.checkState()]
+        msg = 'Item with full name %s, is at state %s' % ( self.getFullNameFromItem(item),  state)
+        #print msg
+        logger.info(msg, __name__)       
+        
     def itemExpanded(self, ind): 
         item = self.model.itemFromIndex(ind)
-        #item.setIcon(self.icon_folder_open)
-        print 'Item expanded : ', item.text()  
+        item.setIcon(cp.icon_folder_open)
+        msg = 'Item expanded: %s' % item.text()  
+        logger.info(msg, __name__)       
 
     def itemCollapsed(self, ind):
         item = self.model.itemFromIndex(ind)
-        #item.setIcon(self.icon_folder_closed)
-        print 'Item collapsed : ', item.text()  
+        item.setIcon(cp.icon_folder_closed)
+        msg = 'Item collapsed: %s' % item.text()  
+        logger.info(msg, __name__)       
 
     def itemSelected(self, selected, deselected):
-        print 'items selected:'  , self.getFullNameFromIndex(selected)
-        print 'items deselected:', self.getFullNameFromIndex(deselected)
+        selected_txt = self.getFullNameFromIndex(selected)
+        msg1 = 'Item selected: %s'   % self.getFullNameFromIndex(selected)
+        self.onSelectedItem(selected_txt)
 
-    def itemChanged(self, item):
-        state = ['UNCHECKED', 'TRISTATE', 'CHECKED'][item.checkState()]
-        print "Item with full name %s, is at state %s\n" % ( self.getFullNameFromItem(item),  state)
+        logger.info(msg1, __name__)       
+        #msg2 = 'Item deselected: %s' % self.getFullNameFromIndex(deselected)
+        #logger.info(msg2, __name__)       
+
+    def onSelectedItem(self, path_from_calib) :
+        cp.guitabs.setTabByName('Status')
+        dir = os.path.join(fnm.path_to_calib_dir(), path_from_calib)        
+        cp.guistatus.statusOfDir(dir)
 
     def setStyle(self):
         pass
         #self.setMinimumSize(100,400)
         self.setMinimumWidth(150)
-        self.setMaximumWidth(300)
-        self.setMinimumHeight(400)
+        self.setMaximumWidth(500)
+        self.setMinimumHeight(500)
         self.setContentsMargins (QtCore.QMargins(-9,-9,-9,-9))
 
     def setFrame(self):

@@ -45,6 +45,8 @@ from Logger                 import logger
 from GUIButtonBar           import *
 from GUISelectCalibDir      import *
 from GUICalibDirTree        import *
+from GUILogger              import *
+from GUITabs                import *
 
 #---------------------
 #  Class definition --
@@ -71,8 +73,9 @@ class GUIMain ( QtGui.QWidget ) :
 
         self.setFrame()
  
-        self.guitree = GUICalibDirTree()
-        self.guitabs = QtGui.QTextEdit()
+        self.guitree   = GUICalibDirTree()
+        self.guitabs   = GUITabs() # QtGui.QTextEdit()
+        self.guilogger = GUILogger(show_buttons=False)
 
         #self.hboxB = QtGui.QHBoxLayout() 
         #self.hboxB.addWidget(self.guitree)
@@ -80,19 +83,24 @@ class GUIMain ( QtGui.QWidget ) :
 
         #self.splitterV = QtGui.QSplitter(QtCore.Qt.Vertical)
 
+        self.vsplit = QtGui.QSplitter(QtCore.Qt.Vertical)
+        self.vsplit.addWidget(self.guitabs)
+        self.vsplit.addWidget(self.guilogger)
+        #self.vsplit.moveSplitter(100)
+        
         self.hsplit = QtGui.QSplitter(QtCore.Qt.Horizontal)
         self.hsplit.addWidget(self.guitree)
-        self.hsplit.addWidget(self.guitabs)
-        
-        self.guibuttonbar      = GUIButtonBar(self)
+        self.hsplit.addWidget(self.vsplit)
+
+        #self.guibuttonbar      = GUIButtonBar(self)
         self.guiselectcalibdir = GUISelectCalibDir(self)
 
         self.vbox = QtGui.QVBoxLayout() 
-        self.vbox.addWidget(self.guibuttonbar)
+        #self.vbox.addWidget(self.guibuttonbar)
         self.vbox.addWidget(self.guiselectcalibdir)
         #self.vbox.addLayout(self.hboxB) 
         self.vbox.addWidget(self.hsplit) 
-        self.vbox.addStretch(1)
+        #self.vbox.addStretch(1)
 
         self.setLayout(self.vbox)
 
@@ -128,11 +136,12 @@ class GUIMain ( QtGui.QWidget ) :
         self.frame.setLineWidth(0)
         self.frame.setMidLineWidth(1)
         self.frame.setGeometry(self.rect())
-        #self.frame.setVisible(False)
+        self.frame.setVisible(False)
 
     def setStyle(self):
         pass
         self.setMinimumSize(300,400)
+        self.setContentsMargins (QtCore.QMargins(-9,-9,-9,-9))
 
         #self.        setStyleSheet(cp.styleBkgd)
         #self.butSave.setStyleSheet(cp.styleButton)
@@ -163,6 +172,8 @@ class GUIMain ( QtGui.QWidget ) :
     def closeEvent(self, event):
         logger.debug('closeEvent', self.name)
 
+        self.onSave()
+
         #if cp.res_save_log : 
         #    logger.saveLogInFile     ( fnm.log_file() )
         #    logger.saveLogTotalInFile( fnm.log_file_total() )
@@ -181,6 +192,12 @@ class GUIMain ( QtGui.QWidget ) :
 
         try    : cp.guifilebrowser.close()
         except : pass
+
+
+    def onSave(self):
+        fname = cp.fname_cp
+        logger.info('onSave - save all configuration parameters in file: ' + fname, __name__)
+        cp.saveParametersInFile( fname )
 
 #-----------------------------
 #-----------------------------

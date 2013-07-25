@@ -57,6 +57,8 @@ class ConfigParametersForApp ( ConfigParameters ) :
         #self.char_expand = u' \u25BE' # down-head triangle
         #self.guilogger = None
         #self.guihelp   = None
+        self.guitabs    = None
+        self.guistatus  = None
 
         #self.procDarkStatus  = 0 # 0=inctive, 1=scan, 2=averaging, 3=both
  
@@ -91,6 +93,10 @@ class ConfigParametersForApp ( ConfigParameters ) :
         path_icon_logviewer      = apputils.AppDataPath('CalibManager/icons/logviewer.png'    ).path()
         path_icon_lock           = apputils.AppDataPath('CalibManager/icons/locked-icon.png'  ).path()
         path_icon_unlock         = apputils.AppDataPath('CalibManager/icons/unlocked-icon.png').path()
+
+        path_icon_table          = apputils.AppDataPath('CalibManager/icons/table.gif'        ).path()
+        path_icon_folder_open    = apputils.AppDataPath('CalibManager/icons/folder_open.gif'  ).path()
+        path_icon_folder_closed  = apputils.AppDataPath('CalibManager/icons/folder_closed.gif').path()
   
         self.icon_contents      = QtGui.QIcon(path_icon_contents     )
         self.icon_mail_forward  = QtGui.QIcon(path_icon_mail_forward )
@@ -110,6 +116,10 @@ class ConfigParametersForApp ( ConfigParameters ) :
         self.icon_logviewer     = QtGui.QIcon(path_icon_logviewer    )
         self.icon_lock          = QtGui.QIcon(path_icon_lock         )
         self.icon_unlock        = QtGui.QIcon(path_icon_unlock       )
+
+        self.icon_table         = QtGui.QIcon(path_icon_table        )
+        self.icon_folder_open   = QtGui.QIcon(path_icon_folder_open  )
+        self.icon_folder_closed = QtGui.QIcon(path_icon_folder_closed)
 
         #self.icon_contents      = QtGui.QIcon(path + 'contents.png'      )
         #self.icon_mail_forward  = QtGui.QIcon(path + 'mail-forward.png'  )
@@ -159,25 +169,31 @@ class ConfigParametersForApp ( ConfigParameters ) :
     def declareAllParameters( self ) :
         # Possible typs for declaration : 'str', 'int', 'long', 'float', 'bool' 
 
+        # GUILogger.py
+        self.log_level      = self.declareParameter( name='LOG_LEVEL_OF_MSGS',  val_def='info',         type='str' )
+        self.log_file       = self.declareParameter( name='LOG_FILE_FOR_LEVEL', val_def='./log_for_level.txt',       type='str' )
+        #self.log_file_total = self.declareParameter( name='LOG_FILE_TOTAL',     val_def='./log_total.txt',           type='str' )
+
         # GUISelectCalibDir.py
         self.instr_dir          = self.declareParameter( name='INSTRUMENT_DIR',    val_def='/reg/d/psdm',  type='str' ) 
         self.instr_name         = self.declareParameter( name='INSTRUMENT_NAME',   val_def='None',         type='str' ) # 'CXI'
         self.exp_name           = self.declareParameter( name='EXPERIMENT_NAME',   val_def='None',         type='str' ) # 'cxitut13'
         self.calib_dir          = self.declareParameter( name='CALIB_DIRECTORY',   val_def='None',         type='str' ) # '/reg/d/psdm/CXI/cxitut13/calib'
 
+        # GUITabs.py
+        self.current_tab    = self.declareParameter( name='CURRENT_TAB'      , val_def='Status',        type='str' )
+
+        # GUIConfig.py
+        self.current_config_tab = self.declareParameter( name='CURRENT_CONFIG_TAB', val_def='Config File', type='str' )
+ 
+
         # GUIMainSplit.py
-        #self.current_tab    = self.declareParameter( name='CURRENT_TAB'      , val_def='Files',        type='str' )
-        #self.fname_cp       = self.declareParameter( name='FNAME_CONFIG_PARS', val=fname, val_def='confpars.txt', type='str' )
+        ####self.fname_cp       = self.declareParameter( name='FNAME_CONFIG_PARS', val=fname, val_def='confpars.txt', type='str' )
 
         # GUIConfigPars.py
-        #self.dir_work          = self.declareParameter( name='DIRECTORY_WORK',        val_def='./work',       type='str' )
-        #self.dir_results       = self.declareParameter( name='DIRECTORY_RESULTS',     val_def='./results',    type='str' )
-        #self.fname_prefix      = self.declareParameter( name='FILE_NAME_PREFIX',      val_def='clb-',         type='str' )
-
-        # GUILogger.py
-        self.log_level      = self.declareParameter( name='LOG_LEVEL_OF_MSGS',  val_def='info',         type='str' )
-        self.log_file       = self.declareParameter( name='LOG_FILE_FOR_LEVEL', val_def='./log_for_level.txt',       type='str' )
-        #self.log_file_total = self.declareParameter( name='LOG_FILE_TOTAL',     val_def='./log_total.txt',           type='str' )
+        self.dir_work          = self.declareParameter( name='DIRECTORY_WORK',        val_def='./work',       type='str' )
+        self.dir_results       = self.declareParameter( name='DIRECTORY_RESULTS',     val_def='./results',    type='str' )
+        self.fname_prefix      = self.declareParameter( name='FILE_NAME_PREFIX',      val_def='clb-',         type='str' )
 
         # GUIGrabSubmitELog.py
         #self.cbx_more_options    = self.declareParameter( name='CBX_SHOW_MORE_OPTIONS',   val_def=False,             type='bool' )
@@ -208,9 +224,6 @@ class ConfigParametersForApp ( ConfigParameters ) :
         #self.bat_dark_end      = self.declareParameter( name='BATCH_DARK_END'  ,      val_def=-1,       type='int' )
         #self.bat_dark_total    = self.declareParameter( name='BATCH_DARK_TOTAL',      val_def=-1,       type='int' )
 
-        # GUIConfig.py
-        #self.current_config_tab = self.declareParameter( name='CURRENT_CONFIG_TAB', val_def='Config File', type='str' )
- 
 
         # For batch jobs
         #self.bat_queue               = self.declareParameter( name='BATCH_QUEUE',                val_def='psfehq', type='str' )
