@@ -107,6 +107,52 @@ function p_appl_equipment () {
             click(function () {
                 that.equipment_search() ; }) ;
 
+        var inventory_controls_form = $('#equipment-inventory-form') ;
+
+        var manufacturer_elem = inventory_controls_form.find('select[name="manufacturer"]') ;
+        var model_elem        = inventory_controls_form.find('select[name="model"]') ;
+        manufacturer_elem.change (function () {
+            var manufacturer_id = this.value ;
+            var manufacturer = null ;
+            for (var i in that.search_option.manufacturer) {
+                var m = that.search_option.manufacturer[i] ;
+                if (m.id == manufacturer_id) {
+                    manufacturer = m ;
+                    break ;
+                }
+            }
+            var html = '<option value="0"></option>' ;
+            if (manufacturer) {
+                for (var i in manufacturer.model) {
+                    var model = manufacturer.model[i] ;
+                    html += '<option value="'+model.id+'">'+model.name+'</option>' ;
+                }
+            }
+            model_elem.html(html) ;
+        }) ;
+
+        var location_elem = inventory_controls_form.find('select[name="location"]') ;
+        var room_elem     = inventory_controls_form.find('select[name="room"]') ;
+        location_elem.change (function () {
+            var location_id = this.value ;
+            var location = null ;
+            for (var i in that.search_option.location) {
+                var m = that.search_option.location[i] ;
+                if (m.id == location_id) {
+                    location = m ;
+                    break ;
+                }
+            }
+            var html = '<option value="0"></option>' ;
+            if (location) {
+                for (var i in location.room) {
+                    var room = location.room[i] ;
+                    html += '<option value="'+room.id+'">'+room.name+'</option>' ;
+                }
+            }
+            room_elem.html(html) ;
+        }) ;
+
         inventory_controls.find('button[name="reset"]')
             .button().
             click(function () {
@@ -197,6 +243,7 @@ function p_appl_equipment () {
      */
     this.equipment = [] ;
     this.equipment_by_id = [] ;
+    this.search_option = [] ;
 
     this.init_inventory = function () {
 
@@ -227,6 +274,8 @@ function p_appl_equipment () {
         var selected_tag = tag_elem.val() ;
 
         web_service_GET ('../irep/ws/equipment_search_options.php', {}, function (data) {
+
+            that.search_option = data.option ;
 
             var html = '<option value=""></option>' ;
             var html2 = '<option value=""></option>' ;
@@ -265,17 +314,18 @@ function p_appl_equipment () {
             for (var i in data.option.manufacturer) {
                 var manufacturer = data.option.manufacturer[i] ;
                 html += '<option value="'+manufacturer.id+'">'+manufacturer.name+'</option>' ;
+                if (selected_manufacturer_id === manufacturer.id) {
+                    var html_model = '<option value="0"></option>' ;
+                    for (var j in manufacturer.model) {
+                        var model = data.option.model[j] ;
+                        html_model += '<option value="'+model.id+'">'+model.name+'</option>' ;
+                    }
+                    model_elem.html(html_model) ;
+                    model_elem.val(selected_model_id) ;
+                }
             }
             manufacturer_elem.html(html) ;
             manufacturer_elem.val(selected_manufacturer_id) ;
-
-            html = '<option value="0"></option>' ;
-            for (var i in data.option.model) {
-                var model = data.option.model[i] ;
-                html += '<option value="'+model.id+'">'+model.name+'</option>' ;
-            }
-            model_elem.html(html) ;
-            model_elem.val(selected_model_id) ;
 
             html = '<option value="0"></option>' ;
             for (var i in data.option.location) {
@@ -316,6 +366,9 @@ function p_appl_equipment () {
                 report_error('implementation error, unsupported view mode: '+this.equipment_view_mode) ;
                 break ;
         }
+        var num = 0 ;
+        for (var i in this.equipment) num++ ;
+        that.tabs.find('a[href="#results"]').text('Search Results ('+num+')') ;
     } ;
     this.equipment_display_table = function () {
         var option_model_image = $('#equipment-inventory').find('#option_model_image').attr('checked') ? true : false ;
@@ -700,11 +753,12 @@ function p_appl_equipment () {
 
         // Add a new panel to teh tab
         //
-        this.tabs.find('.ui-tabs-nav').append (
+        this.tabs.children('.ui-tabs-nav').append (
 '<li><a href="#'+panelId+'" style="color:red;">Editing...</a> <span class="ui-icon ui-icon-close edit">Remove Tab</span></li>'
         );
         var required_field_html = '<span style="color:red ; font-size:120% ; font-weight:bold ;"> * </span>' ;
-        this.tabs.append (
+        var html =
+
 '<div id="'+panelId+'">' +
 '  <div style="border:solid 1px #b0b0b0; padding:20px;">' +
 '    <div style="float:left; margin-bottom:10px; width:720px;">' +
@@ -734,6 +788,8 @@ function p_appl_equipment () {
 '        <li><a href="#general_tab">General</a></li>' +
 '        <li><a href="#attachments_tab">Attachments</a></li>' +
 '        <li><a href="#tags_tab">Tags</a></li>' +
+'        <li><a href="#parent_tab">Parent</a></li>' +
+'        <li><a href="#children_tab">Children</a></li>' +
 '      </ul>' +
 
 '      <div id="general_tab" >' +
@@ -792,8 +848,8 @@ function p_appl_equipment () {
 '                <td class="table_cell table_cell_right equipment-edit-cell " ><input type="text" name="elevation" class="equipment-edit-element" value="" /></td>' +
 '              </tr>' +
 '              <tr>' +
-'                <td class="table_cell table_cell_left  table_cell_bottom equipment-edit-cell" valign="top" >Description</td>' +
-'                <td class="table_cell table_cell_right table_cell_bottom equipment-edit-cell" valign="top" colspan="3"><textarea cols=56 rows=4 name="description" class="equipment-edit-element" style="padding:4px ;" title="Here be an arbitrary description"></textarea></td>' +
+'                <td class="table_cell table_cell_left  table_cell_bottom equipment-edit-cell" valign="top" >Notes</td>' +
+'                <td class="table_cell table_cell_right table_cell_bottom equipment-edit-cell" valign="top" colspan="3"><textarea cols=56 rows=4 name="description" class="equipment-edit-element" style="padding:4px ;" title="Optional notes on this equipment"></textarea></td>' +
 '              </tr>' +
 '            </tbody></table>' +
 '          </div>' +
@@ -831,9 +887,273 @@ function p_appl_equipment () {
 '        </div>' +
 '      </div>' +
 
+'      <div id="parent_tab" >' +
+'        <div style=" border:solid 1px #b0b0b0; padding:20px; padding-top:30px;" >' +
+'          <div style="margin-bottom:20px; padding-left:10px;">' +
+'            <div id="parent"></div>' +
+'          </div>' +
+'        </div>' +
+'      </div>' +
+
+'      <div id="children_tab" >' +
+'        <div style=" border:solid 1px #b0b0b0; padding:20px; padding-top:30px;" >' +
+'          <div style="margin-bottom:20px; padding-left:10px;">' +
+'            <div id="children"></div>' +
+'          </div>' +
+'        </div>' +
+'      </div>' +
+
 '  </div>' +
-'</div>'
+'</div>' ;
+        this.tabs.append(html) ;
+
+        var manufacturers = [''] ;
+        var models = [''] ;
+        for (var i in this.search_option.manufacturer) {
+            var manufacturer = this.search_option.manufacturer[i] ;
+            manufacturers.push(manufacturer.name) ;
+            if (manufacturer.name === equipment.parent.manufacturer) {
+                for (var j in manufacturer.model) {
+                    var model = manufacturer.model[j] ;
+                    models.push(model.name) ;
+                }
+            }
+        }
+        var parents = [[
+            Button_HTML('X', {
+                classes: 'equipment-parent-disconect' ,
+                title:   'click to disconnect from the parent manufacturer' }) ,
+            Select_HTML(manufacturers, equipment.parent.manufacturer , {
+                classes: 'equipment-parent-manufacturer' ,
+                title:   'change the parent' }) ,
+            Select_HTML(models, equipment.parent.model , {
+                classes: 'equipment-parent-model' ,
+                title:   'change the parent model' }) ,
+            TextInput_HTML({
+                classes: 'equipment-parent-serial' ,
+                value: equipment.parent.serial ,
+                title:   'press ENTER to validate' }) ,
+            TextInput_HTML({
+                classes: 'equipment-parent-pc' ,
+                value: equipment.parent.pc ,
+                title:   'press ENTER to validate' }) ,
+            TextInput_HTML({
+                classes: 'equipment-parent-slacid' ,
+                value: equipment.parent.slacid ,
+                title:   'press ENTER to validate' })
+        ]] ;
+        var parent_table_elem = this.tabs.find('div#'+panelId).find('div#parent') ;
+        equipment.parent_table = new Table (
+
+            parent_table_elem ,
+
+            [   {   name: 'DISCONNECT' ,
+                    sorted: false ,
+                    type: {
+                        after_sort: function () {
+                            parent_table_elem.find('.equipment-parent-disconect').
+                                button().
+                                click(function () {
+
+                                    parent_table_elem.find('.equipment-parent-disconect').button('disable') ;
+
+                                    var manufactur_elem = parent_table_elem.find('.equipment-parent-manufacturer') ;
+                                    manufactur_elem.val('') ;
+
+                                    var model_elem = parent_table_elem.find('.equipment-parent-model') ;
+                                    model_elem.html('') ;
+                                    model_elem.attr('disabled', 'disabled') ;
+
+                                    var serial_elem = parent_table_elem.find('.equipment-parent-serial') ;
+                                    serial_elem.val('') ;
+                                    serial_elem.attr('disabled', 'disabled') ;
+
+                                    var pc_elem = parent_table_elem.find('.equipment-parent-pc') ;
+                                    pc_elem.val('') ;
+                                    pc_elem.attr('disabled', 'disabled') ;
+
+                                    var slacid_elem = parent_table_elem.find('.equipment-parent-slacid') ;
+                                    slacid_elem.val('') ;
+                                    slacid_elem.attr('disabled', 'disabled') ;
+                                }
+                            ) ;
+                        }
+                    }
+                } ,
+                {   name: 'Manufacturer' ,
+                    sorted: false ,
+                    type: {
+                        after_sort: function () {
+                            parent_table_elem.find('.equipment-parent-manufacturer').
+                                change(function () {
+                                    var manuf = this.value ;
+
+                                    parent_table_elem.find('.equipment-parent-disconect').button(manuf === '' ? 'disable' : 'enable') ;
+
+                                    var model_elem = parent_table_elem.find('.equipment-parent-model') ;
+                                    var html = '<option val=""></option>' ;
+                                    for (var i in that.search_option.manufacturer) {
+                                        var manufacturer = that.search_option.manufacturer[i] ;
+                                        if (manufacturer.name === manuf) {
+                                            for (var j in manufacturer.model) {
+                                                var model = manufacturer.model[j] ;
+                                                html += '<option val="'+model.name+'">'+model.name+'</option>' ;
+                                            }
+                                        }
+                                    }
+                                    model_elem.html(html) ;
+                                    if (manuf === '') model_elem.attr('disabled', 'disabled') ;
+                                    else              model_elem.removeAttr('disabled') ;
+
+                                    var serial_elem = parent_table_elem.find('.equipment-parent-serial') ;
+                                    serial_elem.val('') ;
+                                    serial_elem.attr('disabled', 'disabled') ;
+
+                                    var pc_elem = parent_table_elem.find('.equipment-parent-pc') ;
+                                    pc_elem.val('') ;
+                                    pc_elem.attr('disabled', 'disabled') ;
+
+                                    var slacid_elem = parent_table_elem.find('.equipment-parent-slacid') ;
+                                    slacid_elem.val('') ;
+                                    slacid_elem.attr('disabled', 'disabled') ;
+                                }
+                            ) ;
+                        }
+                    }
+                } ,
+                {   name: 'Model' ,
+                    sorted: false ,
+                    type: {
+                        after_sort: function () {
+                            parent_table_elem.find('.equipment-parent-model').
+                                change(function () {
+                                    var model = this.value ;
+
+                                    var serial_elem = parent_table_elem.find('.equipment-parent-serial') ;
+                                    serial_elem.val('') ;
+                                    if (model === '') serial_elem.attr('disabled', 'disabled') ;
+                                    else              serial_elem.removeAttr('disabled') ;
+
+                                    var pc_elem = parent_table_elem.find('.equipment-parent-pc') ;
+                                    pc_elem.val('') ;
+                                    if (model === '') pc_elem.attr('disabled', 'disabled') ;
+                                    else              pc_elem.removeAttr('disabled') ;
+
+                                    var slacid_elem = parent_table_elem.find('.equipment-parent-slacid') ;
+                                    slacid_elem.val('') ;
+                                    if (model === '') slacid_elem.attr('disabled', 'disabled') ;
+                                    else              slacid_elem.removeAttr('disabled') ;
+                                }
+                            ) ;
+                        }
+                    }
+                } ,
+                {   name: 'Serial #' ,
+                    sorted: false ,
+                    type: {
+                        after_sort: function () {
+                            parent_table_elem.find('.equipment-parent-serial').
+                                change(function () {
+                                    var serial = this.value ;
+                                }
+                            ) ;
+                        }
+                    }
+                } ,
+                {   name: 'PC #' ,
+                    sorted: false ,
+                    type: {
+                        after_sort: function () {
+                            parent_table_elem.find('.equipment-parent-pc').
+                                change(function () {
+                                    var pc = this.value ;
+                                }
+                            ) ;
+                        }
+                    }
+                } ,
+                {   name: 'SLAC ID #' ,
+                    sorted: false ,
+                    type: {
+                        after_sort: function () {
+                            parent_table_elem.find('.equipment-parent-slacid').
+                                change(function () {
+                                    var slacid = this.value ;
+                                }
+                            ) ;
+                        }
+                    }
+                }
+            ] ,
+
+            parents ,
+
+            {} ,        // no options
+
+            config.handler('equipment', 'table_equipment_parent')
         ) ;
+        equipment.parent_table.display() ;
+        if (equipment.parent.id === 0) {
+            parent_table_elem.find('.equipment-parent-disconect').button('disable') ;
+        }
+        var children = [] ;
+        for (var i in equipment.children) {
+            var child = equipment.children[i] ;
+            children.push ([
+                Button_HTML('X', {
+                    name:    child.id ,
+                    classes: 'equipment-child-evict' ,
+                    title:   'click to evict the child from the composition' }) ,
+                child.manufacturer ,
+                child.model ,
+                child.serial ,
+                child.pc ,
+                child.slacid
+            ]) ;
+        }
+        var children_table_elem = this.tabs.find('div#'+panelId).find('div#children') ;
+        equipment.children_table = new Table (
+
+            children_table_elem ,
+
+            [   {   name: 'EVICT' ,
+                    sorted: false ,
+                    type: {
+                        after_sort: function () {
+                            children_table_elem.find('.equipment-child-evict').
+                                button().
+                                click(function () {
+                                    var child_id = this.name ;
+                                    alert('evict child id: '+child_id+' from its parent equipment id: '+equipment.id) ;
+                                }
+                            ) ;
+                        }
+                    }
+                } ,
+                {   name: 'Manufacturer' ,
+                    sorted: false
+                } ,
+                {   name: 'Model' ,
+                    sorted: false
+                } ,
+                {   name: 'Serial #' ,
+                    sorted: false
+                } ,
+                {   name: 'PC #' ,
+                    sorted: false
+                } ,
+                {   name: 'SLAC ID #' ,
+                    sorted: false
+                }
+            ] ,
+
+            children ,
+            {} ,        // options
+
+            config.handler('equipment', 'table_equipment_children')
+        ) ;
+        equipment.children_table.display() ;
+
         this.tabs.tabs('refresh') ;
         this.equipment_select_tab(-1) ;
 
@@ -1418,10 +1738,12 @@ function p_appl_equipment () {
             model_id:        form_elem.find('select[name="model"]').val() ,
             serial:          form_elem.find('input[name="serial"]').val() ,
             pc:              form_elem.find('input[name="pc"]').val() ,
+            slacid:          form_elem.find('input[name="slacid"]').val() ,
             location_id:     form_elem.find('select[name="location"]').val() ,
             custodian:       form_elem.find('select[name="custodian"]').val() ,
             tag:             form_elem.find('select[name="tag"]').val() ,
-            description:    form_elem.find('input[name="description"]').val()
+            description:     form_elem.find('input[name="description"]').val() ,
+            notes:           form_elem.find('input[name="notes"]').val()
         } ;
         this.equipment_search_impl(params) ;
     } ;
@@ -1432,25 +1754,32 @@ function p_appl_equipment () {
         search_button.button('disable') ;
         reset_button.button('disable') ;
 
+        $('#equipment-inventory-info').text('Searching...') ;
+
         var jqXHR = $.post('../irep/ws/equipment_search.php', params, function (data) {
             search_button.button('enable') ;
             reset_button.button ('enable') ;
             if (data.status != 'success') {
                 report_error(data.message, null) ;
+                $('#equipment-inventory-info').text('') ;
                 return ;
             }
             that.equipment = data.equipment ;
             that.equipment_by_id = {} ;
+            var num = 0 ;
             for(var i in that.equipment) {
                 var equipment = that.equipment[i] ;
                 that.equipment_by_id[equipment.id] = equipment ;
+                num++ ;
             }
             that.equipment_display() ;
+            $('#equipment-inventory-info').text('[ Last search: '+data.updated+' ]') ;
         },
         'JSON').error(function () {
             report_error('saving failed because of: '+jqXHR.statusText, null) ;
             search_button.button('enable') ;
             reset_button.button ('enable') ;
+            $('#equipment-inventory-info').text('') ;
         }) ;
     } ;
     this.equipment_search_reset = function () {
@@ -1466,6 +1795,7 @@ function p_appl_equipment () {
         form_elem.find('select[name="custodian"]'   ).val('') ;
         form_elem.find('select[name="tag"]'         ).val('') ;
         form_elem.find('input[name="description"]'  ).val('') ;
+        form_elem.find('input[name="notes"]'        ).val('') ;
         this.equipment = [] ;
         this.equipment_display() ;
     } ;

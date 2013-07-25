@@ -67,14 +67,16 @@ try {
 
 <style type="text/css">
 
+#equipment-inventory-controls {
+  margin-bottom: 8px;
+  padding-left: 10px;
+}
 #equipment-inventory-controls-left {
   margin-right: 20px;
-/*
-  border-right: 1px solid silver;
-  border-bottom: 1px solid #C0C0C1;
-  background-color: #F0F0F0;
-  padding: 10px;
-*/
+}
+
+#equipment-inventory-info {
+  color: maroon;
 }
 
 .form-elem {
@@ -559,38 +561,26 @@ function global_equipment_sorter_by_modified     (a,b) { return a.modified.time_
           <form id="equipment-inventory-form">
             <table><tbody>
               <tr>
-                 <td><b>Manufacturer:</b></td>
-                  <td><select name="manufacturer" class="form-elem" ></select></td>
-                  <td>&nbsp;</td>
-                  <td><b>Model:</b></td>
-                  <td><select name="model" class="form-elem" ></select></td>
-                  <td>&nbsp;</td>
-                  <td><b>Serial number:</b></td>
-                  <td><input type="text" name="serial" size="10" class="form-elem"  style="padding:2px ;" value="" /></td>
+                <td class="form_table_key" >Manufacturer  </td> <td class="form_table_val" ><select name="manufacturer" class="form-elem" ></select></td>
+                <td class="form_table_key" >Custodian     </td> <td class="form_table_val" ><select name="custodian"    class="form-elem" ></select></td>
+                <td class="form_table_key" >Serial #      </td> <td class="form_table_val" ><input  name="serial"       class="form-elem" type="text" size="4" value="" ></td>
+                <td class="form_table_key" >Status        </td> <td class="form_table_val" ><select name="status"       class="form-elem" ></select></td>
+                <td class="form_table_key" >Tag           </td> <td class="form_table_val" ><select name="tag"          class="form-elem" ></select></td>
               </tr>
-              <tr><td><b>Location:</b></td>
-                  <td><select name="location" class="form-elem" ></select></td>
-                  <td>&nbsp;</td>
-                  <td><b>Custodian:</b></td>
-                  <td><select name="custodian" class="form-elem" ></select></td>
-                  <td>&nbsp;</td>
-                  <td><b>Property Control #:</b></td>
-                  <td><input type="text" name="pc"  size="5" class="form-elem" style="padding:2px ;" value="" /></td>
+              <tr>
+                <td class="form_table_key" >Model         </td> <td class="form_table_val" ><select name="model"        class="form-elem" ></select></td>
+                <td class="form_table_key" >Location      </td> <td class="form_table_val" ><select name="location"     class="form-elem" ></select></td>
+                <td class="form_table_key" >PC #          </td> <td class="form_table_val" ><input  name="pc"           class="form-elem" type="text" size="4" value="" title="property control number" /></td>
+                <td class="form_table_key" >Sub-status    </td> <td class="form_table_val" ><select name="status2"      class="form-elem" ></select></td>
               </tr>
-              <tr><td><b>Status:</b></td>
-                  <td><select name="status" class="form-elem" ></select></td>
-                  <td>&nbsp;</td>
-                  <td><b>Sub-status:</b></td>
-                  <td><select name="status2" class="form-elem" ></select></td>
-                  <td>&nbsp;</td>
-                  <td><b>SLAC ID:</b></td>
-                  <td><input type="text" name="slacid"  size="5" class="form-elem" style="padding:2px ;" value="" /></td>
+              <tr>
+                <td class="form_table_key" >&nbsp;        </td> <td class="form_table_val" >&nbsp;</td>
+                <td class="form_table_key" >Room          </td> <td class="form_table_val" ><select name="room"         class="form-elem" ></select></td>
+                <td class="form_table_key" >SLAC ID #     </td> <td class="form_table_val" ><input  name="slacid"       class="form-elem" type="text" size="4" value="" ></td>
               </tr>
-              <tr><td><b>Tag:</b></td>
-                  <td><select name="tag" class="form-elem" disabled></select></td>
-                  <td>&nbsp;</td>
-                  <td><b>Description:</b></td>
-                  <td colspan="4"><input type="text" name="description"  size="20" class="form-elem" style="padding:2px ;" value="" /></td>
+              <tr>
+                <td class="form_table_key" >Description   </td> <td class="form_table_val" colspan="3" ><input  name="description"  class="form-elem" type="text" size="4" value="" title="search in the model descriptions"/></td>
+                <td class="form_table_key" >Notes         </td> <td class="form_table_val" colspan="3" ><input name="notes"         class="form-elem" type="text" size="10" value="" title="search in the equipment notes"/></td>
               </tr>
             </tbody></table>
           </form>
@@ -599,9 +589,9 @@ function global_equipment_sorter_by_modified     (a,b) { return a.modified.time_
           <button name="search" title="refresh the list">Search</button>
           <button name="reset"  title="reset the search form to the default state">Reset Form</button>
         </div>
+        <div style="clear:both ;"></div>
       </div>
-      <div style="clear:both ;"></div>
-      <div style="float:right ;" id="equipment-inventory-info">&nbsp;</div>
+      <div style="float:right ;" id="equipment-inventory-info">[ Last updated: ]</div>
       <div style="clear:both ;"></div>
 
       <div id="tabs" style="font-size:12px;">
@@ -681,8 +671,8 @@ function global_equipment_sorter_by_modified     (a,b) { return a.modified.time_
                   <td colspan="3"><input type="text" name="custodian" size="20" style="padding:2px ;" value="" />
                   ( known custodians: <select name="custodian"></select> )</td>
               </tr>
-              <tr><td><b>Description: </b></td>
-                  <td colspan="3"><textarea cols=54 rows=4 name="description" style="padding:4px ;" title="Here be an arbitrary description"></textarea></td>
+              <tr><td><b>Notes: </b></td>
+                  <td colspan="3"><textarea cols=54 rows=4 name="description" style="padding:4px ;" title="Here be arbitrary notes for this equipment"></textarea></td>
               </tr>
             </tbody></table>
           </form>
@@ -721,6 +711,10 @@ function global_equipment_sorter_by_modified     (a,b) { return a.modified.time_
     <!-- Search equipment issues -->
     <div id="issues-search" class="application-workarea hidden">
 
+      <p>This is still under implementation</p>
+
+      <!--
+
       <div id="issues-search-controls">
         <div id="issues-search-controls-left" style="float:left ;">
           <form id="issues-search-form">
@@ -754,7 +748,7 @@ function global_equipment_sorter_by_modified     (a,b) { return a.modified.time_
                   <td><input type="text" name="slacid"  size="5" class="form-elem" style="padding:2px ;" value="" /></td>
               </tr>
               <tr><td><b>Tag:</b></td>
-                  <td><select name="tag" class="form-elem" disabled></select></td>
+                  <td><select name="tag" class="form-elem"></select></td>
               </tr>
             </tbody></table>
           </form>
@@ -763,8 +757,8 @@ function global_equipment_sorter_by_modified     (a,b) { return a.modified.time_
           <button name="search" title="refresh the list">Search</button>
           <button name="reset"  title="reset the search form to the default state">Reset Form</button>
         </div>
+        <div style="clear:both ;"></div>
       </div>
-      <div style="clear:both ;"></div>
       <div style="float:right ;" id="issues-search-info">&nbsp;</div>
       <div style="clear:both ;"></div>
 
@@ -795,6 +789,8 @@ function global_equipment_sorter_by_modified     (a,b) { return a.modified.time_
           </div>
         </div>
       </div>
+
+      -->
 
     </div>
 

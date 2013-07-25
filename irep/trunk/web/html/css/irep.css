@@ -278,3 +278,12 @@ div.dict-entry-nonselectable {
 #projects-create-info {
   color: maroon;
 }
+
+td.form_table_key {
+    font-weight: bold;
+    padding-right: 2px;
+}
+
+td.form_table_val {
+    padding-right: 20px;
+}

@@ -438,17 +438,26 @@ class Irep extends DbConnection {
     }
     public function find_model_by_id ($id) {
         $id = intval($id) ;
-        $sql = "SELECT * FROM {$this->database}.dict_model WHERE id={$id}" ;
-        $result = $this->query($sql) ;
-        $nrows = mysql_numrows( $result ) ;
-        if (!$nrows) return null ;
-        if (1 != $nrows)
-            throw new IrepException (
-                __METHOD__, "inconsistent result returned by the query. Database may be corrupt. Query: {$sql}") ;
-        $attr = mysql_fetch_array( $result, MYSQL_ASSOC) ;
-        return new IrepModel (
-            $this->find_manufacturer_by_id($attr['manufacturer_id']) ,
-            $attr) ;
+        $models = $this->find_models_by_("id={$id}") ;
+        switch (count($models)) {
+            case 0: return null ;
+            case 1: return $models[0] ;
+        }
+        throw new IrepException (
+                __METHOD__, "inconsistent result returned by the query. Database may be corrupt.") ;
+    }
+    public function find_models_by_ ($condition) {
+        $list = array () ;
+        $result = $this->query("SELECT * FROM {$this->database}.dict_model WHERE {$condition}") ;
+        for ($i = 0, $nrows = mysql_numrows( $result ); $i < $nrows; $i++) {
+            $attr = mysql_fetch_array( $result, MYSQL_ASSOC) ;
+            array_push (
+                $list,
+                new IrepModel (
+                    $this->find_manufacturer_by_id($attr['manufacturer_id']) ,
+                    $attr)) ;
+        }
+        return $list ;
     }
     public function delete_model_by_id ($id) {
         $id = intval($id) ;
@@ -602,11 +611,12 @@ class Irep extends DbConnection {
      *   Equipment
      * -------------
      */
-    public function add_equipment ($manufacturer, $model, $serial, $description, $pc, $slacid, $location, $room, $rack, $elevation, $custodian) {
+    public function add_equipment ($manufacturer, $model, $serial, $description, $pc, $slacid, $location, $room, $rack, $elevation, $custodian, $parent=null) {
 
         // Step I: register new equipment to get its identifier. We will need the one
         //         later in order to associate it with the SLAC ID in the SLAC ID registry.
 
+        $parent_id = is_null($parent) ? 'NULL' : $parent->id() ;
         $slacid = intval($slacid) ;
         if ($this->find_slacid($slacid))
             throw new IrepException (
@@ -627,6 +637,7 @@ class Irep extends DbConnection {
         $this->query(<<<HERE
 INSERT INTO {$this->database}.equipment VALUES(
     NULL ,
+    {$parent_id} ,
     '{$status}' ,
     '{$status2}' ,
     '{$manufacturer_escaped}' ,
@@ -672,6 +683,10 @@ HERE
         $pc_escaped = $this->escape_string(trim($pc)) ;
         return $this->find_equipment_by_("pc='{$pc_escaped}'") ;
     }
+    public function find_equipment_by_slacid($id) {
+        $id = intval($id) ;
+        return $this->find_equipment_by_("slacid={$id}") ;
+    }
     public function find_equipment_by_slacid_range ($id) {
         $range = $this->find_slacid_range($id) ;
         if (!$range)
@@ -695,45 +710,152 @@ HERE
                 __METHOD__, "no sub-status exists for ID: {$id}") ;
         return $this->find_equipment_many_by_("(status='{$status2->status()->name()}' AND status2='{$status2->name()}')") ;
     }
-    public function search_equipment ($status, $status2, $manufacturer, $model, $serial, $location, $custodian, $tag, $description) {
+    public function search_equipment ($status, $status2, $manufacturer, $model, $serial, $location, $custodian, $tag_name, $description, $notes) {
+
+        // First search based on the properties of an equipment.
+
         $conditions_opt = '' ;
+        $status = trim($status) ;
         if ($status != '') {
-            $status_escaped = $this->escape_string(trim($status)) ;
+            $status_escaped = $this->escape_string($status) ;
             $conditions_opt .= ($conditions_opt == '' ? '' : ' AND ')." (status LIKE '%{$status_escaped}%') " ;
         }
+        $status2 = trim($status2) ;
         if ($status2 != '') {
-            $status2_escaped = $this->escape_string(trim($status2)) ;
+            $status2_escaped = $this->escape_string($status2) ;
             $conditions_opt .= ($conditions_opt == '' ? '' : ' AND ')." (status2 LIKE '%{$status2_escaped}%') " ;
         }
+        $manufacturer = trim($manufacturer) ;
         if ($manufacturer != '') {
-            $manufacturer_escaped = $this->escape_string(trim($manufacturer)) ;
+            $manufacturer_escaped = $this->escape_string($manufacturer) ;
             $conditions_opt .= ($conditions_opt == '' ? '' : ' AND ')." (manufacturer LIKE '%{$manufacturer_escaped}%') " ;
         }
+        $model = trim($model) ;
         if ($model != '') {
-            $model_escaped = $this->escape_string(trim($model)) ;
+            $model_escaped = $this->escape_string($model) ;
             $conditions_opt .= ($conditions_opt == '' ? '' : ' AND ')." (model LIKE '%{$model_escaped}%') " ;
         }
+        $serial = trim($serial) ;
         if ($serial != '') {
-            $serial_escaped = $this->escape_string(trim($serial)) ;
+            $serial_escaped = $this->escape_string($serial) ;
             $conditions_opt .= ($conditions_opt == '' ? '' : ' AND ')." (serial LIKE '%{$serial_escaped}%') " ;
         }
+        $location = trim($location) ;
         if ($location != '') {
-            $location_escaped = $this->escape_string(trim($location)) ;
+            $location_escaped = $this->escape_string($location) ;
             $conditions_opt .= ($conditions_opt == '' ? '' : ' AND ')." (location LIKE '%{$location_escaped}%') " ;
         }
+        $custodian = trim($custodian) ;
         if ($custodian != '') {
-            $custodian_escaped = $this->escape_string(trim($custodian)) ;
+            $custodian_escaped = $this->escape_string($custodian) ;
             $conditions_opt .= ($conditions_opt == '' ? '' : ' AND ')." (custodian LIKE '%{$custodian_escaped}%') " ;
         }
-        if ($tag != '') {
-            $tag_escaped = $this->escape_string(trim($tag)) ;
-            // FIXME: this isn't implemented yet.
-        }
+        $notes = trim($notes) ;
+        if ($notes != '') {
+            $notes_escaped = $this->escape_string($notes) ;
+            $conditions_opt .= ($conditions_opt == '' ? '' : ' AND ')." (description LIKE '%{$notes_escaped}%') " ;
+        }        
+        $result_prev = $conditions_opt == '' ? array() : $this->find_equipment_many_by_($conditions_opt) ;
+
+        // Apply the model description filter (if any)
+
+        $description = trim($description) ;
         if ($description != '') {
-            $description_escaped = $this->escape_string(trim($description)) ;
-            $conditions_opt .= ($conditions_opt == '' ? '' : ' AND ')." (description LIKE '%{$description_escaped}%') " ;
+
+            $result = array() ;
+
+            // Find all models which match the specified description requirement
+            // and put them into a 2-level dictionary.
+
+            $description_escaped = $this->escape_string($description) ;
+            $manuf_model = array() ;
+            foreach ($this->find_models_by_("description LIKE '%{$description_escaped}%'") as $idx => $m) {
+
+                $model_name = $m->name() ;
+                $manuf_name = $m->manufacturer()->name() ;
+                if (!array_key_exists($manuf_name, $manuf_model))              $manuf_model[$manuf_name]              = array() ;
+                if (!array_key_exists($model_name, $manuf_model[$manuf_name])) $manuf_model[$manuf_name][$model_name] = true ;
+            }
+            if (!empty($manuf_model)) {
+
+                // Now we have two scenarios: if theere we no specific conditiosn for the previous
+                // search then we should make our search puerly based on the model description
+                // pattern. Otherwise (the second scenario) we would have to merge results of
+                // the previous search against the models matching the speified description.
+
+                if ($conditions_opt == '') {
+                    
+                    // Scenario I: make the search based on the manufactures & models
+
+                    foreach ($manuf_model as $manuf_name => $models) {
+                        $manuf_name_escaped = $this->escape_string($manuf_name) ;
+                        foreach ($models as $model_name => $val) {
+                            $model_name_escaped = $this->escape_string($model_name) ;
+                            foreach ($this->find_equipment_many_by_("(manufacturer='{$manuf_name_escaped}' AND model='{$model_name_escaped}')" ) as $equip) {
+                                array_push($result, $equip) ;
+                            }
+                        }
+                    }
+
+                } else {
+
+                    // Scenario II: filter results of the previous search
+
+                    foreach ($result_prev as $idx => $equip) {
+                        $manuf_name = $equip->manufacturer() ;
+                        $model_name = $equip->model() ;
+                        if (!array_key_exists($manuf_name, $manuf_model))             continue ;
+                        if (!array_key_exists($model_name, $manuf_model[$manuf_name])) continue ;
+                        array_push($result, $equip) ;
+                    }
+                }
+            }
+            $result_prev = $result ;
         }
-        return $this->find_equipment_many_by_($conditions_opt) ;
+
+        // Apply the tag filter (if any)
+
+        $tag_name = trim($tag_name) ;
+        if ($tag_name != '') {
+
+            $result = array() ;
+
+            $tags = $this->find_equipment_tag_by_name($tag_name) ;
+
+            if (!empty($tags)) {
+
+                // Now we have two scenarios: if theere we no specific conditiosn for the previous
+                // search then we should make our search puerly based on the equipment items matched
+                // the tag. Otherwise (the second scenario) we would have to merge results of
+                // the previous search against the equipment identifiers matching the speified tag.
+
+                if (($conditions_opt == '') && ($description == '')) {
+                    
+                    // Scenario I: make the search based on the tags only
+
+                    foreach ($tags as $tag) {
+                        array_push($result, $tag->equipment()) ;
+                    }
+
+                } else {
+
+                    // Scenario II: filter results of the previous search
+                    //
+                    // TODO: The algorithm is highly inefficient due to O(x**2). Look for possible
+                    //       ways to optimize it.
+
+                    foreach ($result_prev as $equip) {
+                        foreach ($tags as $tag) {
+                            if ($equip->id() == $tag->equipment()->id()) {
+                                array_push($result, $equip) ;
+                            }
+                        }
+                    }
+                }
+            }
+            $result_prev = $result ;
+        }
+        return $result_prev ;
     }
     public function search_equipment_by_status ($status, $status2=null) {
         $status_escaped = $this->escape_string(trim($status)) ;
@@ -759,7 +881,7 @@ HERE
             $this ,
             mysql_fetch_array( $result, MYSQL_ASSOC)) ;
     }
-    private function find_equipment_many_by_ ($conditions_opt='') {
+    public function find_equipment_many_by_ ($conditions_opt='') {
         $list = array () ;
         $sql = "SELECT * FROM {$this->database}.equipment ".($conditions_opt == '' ? '' : " WHERE {$conditions_opt}") ;
         $result = $this->query($sql) ;
@@ -864,7 +986,23 @@ HERE
                 $list,
                 $attr['name']) ;
         }
-        return $list ;    }
+        return $list ;
+    }
+    public function find_equipment_tag_by_name ($name) {
+        $list = array () ;
+        $name_escaped = $this->escape_string(trim($name)) ;
+        $sql = "SELECT * FROM {$this->database}.equipment_tag WHERE name='{$name_escaped}' ORDER BY equipment_id" ;
+        $result = $this->query($sql) ;
+        for ($i = 0, $nrows = mysql_numrows( $result ); $i < $nrows; $i++) {
+            $attr = mysql_fetch_array( $result, MYSQL_ASSOC) ;
+            array_push (
+                $list,
+                new IrepEquipmentTag (
+                    $this->find_equipment_by_id($attr['equipment_id']) ,
+                    $attr)) ;
+        }
+        return $list ;
+    }
 }
 
 ?>

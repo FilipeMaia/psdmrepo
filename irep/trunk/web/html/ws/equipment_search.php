@@ -25,6 +25,7 @@
  *      [<custodian>]
  *      [<tag>]
  *      [<description>]
+ *      [<notes>]
  */
 
 require_once 'dataportal/dataportal.inc.php' ;
@@ -126,6 +127,7 @@ require_once 'irep/irep.inc.php' ;
     $custodian   = $SVC->optional_str('custodian', '') ;
     $tag         = $SVC->optional_str('tag', '') ;
     $description = $SVC->optional_str('description', '') ;
+    $notes       = $SVC->optional_str('notes', '') ;
 
     $SVC->finish(\Irep\IrepUtils::equipment2array (
         $SVC->irep()->search_equipment (
@@ -137,7 +139,8 @@ require_once 'irep/irep.inc.php' ;
             $location_name ,
             $custodian ,
             $tag ,
-            $description
+            $description ,
+            $notes
         )
     )) ;
 }) ;

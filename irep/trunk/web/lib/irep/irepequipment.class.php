@@ -35,6 +35,7 @@ class IrepEquipment {
      */
     public function irep         () { return        $this->irep ; }
     public function id           () { return intval($this->attr['id']) ; }
+    public function parent_id    () { return intval($this->attr['parent_id']) ; }
     public function status       () { return   trim($this->attr['status']) ; }
     public function status2      () { return   trim($this->attr['status2']) ; }
     public function manufacturer () { return   trim($this->attr['manufacturer']) ; }
@@ -48,6 +49,44 @@ class IrepEquipment {
     public function room         () { return   trim($this->attr['room']) ; }
     public function rack         () { return   trim($this->attr['rack']) ; }
     public function elevation    () { return   trim($this->attr['elevation']) ; }
+
+    /**
+     * Return the parent equipment object in a composition (if any). Return null otherwise.
+     *
+     * @return IrepEquipment
+     */
+    public function parent () {
+        return
+            $this->parent_id() ?
+            $this->irep()->find_equipment_by_id($this->parent_id()) :
+            null ;
+    }
+    /**
+     * Connectt/disconnect to/from the parent object.
+     *
+     * @param IrepEquipment $parent
+     */
+    public function set_parent ($parent=null) {
+        if (is_null($parent)) {
+            $prev_parent_id = $this->parent_id() ;
+            $this->update(array('parent_id' => 'NULL')) ;
+            $this->attr['parent_id'] = '' ;
+            $this->irep()->add_history_event($this->id(), 'Modified', array ("Disconnected from parent: {$prev_parent_id}")) ;
+        } else {
+            $this->update(array('parent_id' => $parent->id())) ;
+            $this->attr['parent_id'] = $parent->id() ;
+            $this->irep()->add_history_event($this->id(), 'Modified', array ("Connected to parent: {$parent->id()}")) ;
+        }
+    }
+
+    /**
+     * Return direct child equipment objects in a composition (if any).
+     * 
+     * @return array() in which each element has type IrepEquipment
+     */
+    public function children () {
+        return $this->irep->find_equipment_many_by_("parent_id={$this->id()}") ;
+    }
 
     /* --------------
      *   Properties
@@ -67,6 +106,10 @@ class IrepEquipment {
                 case 'slacid':
                     $value_int = intval($value) ;
                     $sql_options .= "{$property}={$value_int}" ;
+                    break ;
+                case 'parent_id':
+                    $value_opt = $value == 'NULL' ? $value : intval($value) ;
+                    $sql_options .= "{$property}={$value_opt}" ;
                     break ;
                 default:
                     $value_escaped = $this->irep()->escape_string(trim($value)) ;

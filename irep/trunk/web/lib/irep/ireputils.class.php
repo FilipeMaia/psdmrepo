@@ -190,10 +190,30 @@ class IrepUtils {
                             'create_time' => $t->create_time()->toStringShort() ,
                             'create_uid'  => $t->create_uid())) ;
 
+            $parent = $e->parent() ;
+
+            $children = array() ;
+            foreach ($e->children() as $child) {
+                array_push (
+                    $children, array (
+                        'manufacturer'      => $child->manufacturer() ,
+                        'model'             => $child->model() ,
+                        'serial'            => $child->serial() ,
+                        'slacid'            => $child->slacid() ,
+                        'pc'                => $child->pc())) ;
+            }
             array_push (
                 $equipment ,
                 array (
                     'id'                => $e->id() ,
+                    'parent'            => array (
+                        'id'                => $parent ? $parent->id()           : 0 ,
+                        'manufacturer'      => $parent ? $parent->manufacturer() : '' ,
+                        'model'             => $parent ? $parent->model()        : '' ,
+                        'serial'            => $parent ? $parent->serial()       : '' ,
+                        'slacid'            => $parent ? $parent->slacid()       : '' ,
+                        'pc'                => $parent ? $parent->pc()           : '') ,
+                    'children'          => $children ,
                     'status'            => $e->status() ,
                     'status2'           => $e->status2() ,
                     'manufacturer'      => $e->manufacturer() ,
