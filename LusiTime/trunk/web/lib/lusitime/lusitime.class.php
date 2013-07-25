@@ -128,6 +128,12 @@ class LusiTime {
     public function __toString() {
         return date("Y-m-d H:i:s", $this->sec).sprintf(".%09u", $this->nsec).date("O", $this->sec); }
 
+    /* Return the data and time in 24 hours from the ones encoded in
+     * the current object.
+     */
+    public function  in24hours () {
+        return new LusiTime($this->sec + 24 * 3600) ; }
+
     /* Unlike the previous method this one would return a short (no
      * nanoseconds and time-zone) representation (ISO) of a human-readable
      * date and time.
@@ -155,6 +161,12 @@ class LusiTime {
      */
     public function toStringHMS() {
         return date("H:i:s", $this->sec); }
+
+    /* Return just the hours-minutes
+     * part of the timestamp in the human-readable format.
+     */
+    public function toStringHM() {
+        return date("H:i", $this->sec); }
 
     /* Produce a string in the following format: DD_HH:MM
      */

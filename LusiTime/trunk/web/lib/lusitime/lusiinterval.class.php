@@ -41,6 +41,20 @@ class LusiInterval {
         $this->begin = $begin;
         $this->end = $end;
     }
+    public function toSeconds() {
+        return $this->end->sec - $this->begin->sec;
+    }
+    public function toMinutes() {
+        $total_sec = $this->end->sec - $this->begin->sec;
+        return intval( $total_sec / 60);
+    }
+    public function toStringHM() {
+        $total_sec = $this->end->sec - $this->begin->sec;
+        $hr  = intval( $total_sec / 3600);
+        $min = intval(($total_sec % 3600) / 60);
+        $sec =        ($total_sec % 3600) % 60;
+        return sprintf("%02d:%02d", $hr, $min);
+    }
 
     /**
      * Return an array of subintervals (of the current class) each representing
