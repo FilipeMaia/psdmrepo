@@ -65,7 +65,7 @@ class GUIMain ( QtGui.QWidget ) :
 
         cp.setIcons()
 
-        self.setGeometry(10, 25, 700, 600)
+        self.setGeometry(10, 25, 850, 600)
         self.setWindowTitle('Calibration Manager')
         self.setWindowIcon(cp.icon_monitor)
         self.palette = QtGui.QPalette()
@@ -140,7 +140,7 @@ class GUIMain ( QtGui.QWidget ) :
 
     def setStyle(self):
         pass
-        self.setMinimumSize(300,400)
+        self.setMinimumSize(1030,500)
         self.setContentsMargins (QtCore.QMargins(-9,-9,-9,-9))
 
         #self.        setStyleSheet(cp.styleBkgd)

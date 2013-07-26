@@ -35,6 +35,7 @@ class GUICalibDirTree (QtGui.QWidget):
     calib_types_cspad = [
         'center'
        ,'center_off'
+       ,'center_global'
        ,'offset'
        ,'offset_corr'
        ,'marg_gap_shift'
@@ -210,17 +211,21 @@ class GUICalibDirTree (QtGui.QWidget):
 
     def itemSelected(self, selected, deselected):
         selected_txt = self.getFullNameFromIndex(selected)
-        msg1 = 'Item selected: %s'   % self.getFullNameFromIndex(selected)
+        msg1 = 'Item selected: %s' % self.getFullNameFromIndex(selected)
         self.onSelectedItem(selected_txt)
-
         logger.info(msg1, __name__)       
+
+        #deselected_txt = self.getFullNameFromIndex(deselected)
         #msg2 = 'Item deselected: %s' % self.getFullNameFromIndex(deselected)
         #logger.info(msg2, __name__)       
+        #self.onDeselectedItem(deselected_txt)
+
 
     def onSelectedItem(self, path_from_calib) :
         cp.guitabs.setTabByName('Status')
         dir = os.path.join(fnm.path_to_calib_dir(), path_from_calib)        
         cp.guistatus.statusOfDir(dir)
+
 
     def setStyle(self):
         pass

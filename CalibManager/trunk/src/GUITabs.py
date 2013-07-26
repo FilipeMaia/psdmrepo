@@ -77,7 +77,7 @@ class GUITabs ( QtGui.QWidget ) :
 
         cp.setIcons()
 
-        self.setGeometry(10, 25, 650, 500)
+        self.setGeometry(10, 25, 750, 500)
         self.setWindowTitle('Calibration Manager')
         self.setWindowIcon(cp.icon_monitor)
         self.palette = QtGui.QPalette()
@@ -177,6 +177,7 @@ class GUITabs ( QtGui.QWidget ) :
 
     def setStyle(self):
         pass
+        self.adjustSize()
         #self.        setStyleSheet(cp.styleBkgd)
         #self.butSave.setStyleSheet(cp.styleButton)
         #self.butExit.setStyleSheet(cp.styleButton)

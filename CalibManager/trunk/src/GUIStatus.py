@@ -31,6 +31,7 @@ from PyQt4 import QtGui, QtCore
 from ConfigParametersForApp import cp
 from Logger                 import logger
 #import GlobalUtils          as     gu
+from GUIStatusTable         import *
 
 #---------------------
 #  Class definition --
@@ -42,14 +43,15 @@ class GUIStatus ( QtGui.QWidget ) :
 
         QtGui.QWidget.__init__(self, parent)
 
-        self.setGeometry(100, 100, 730, 200)
+        self.setGeometry(100, 100, 730, 500)
         self.setWindowTitle('GUI Status')
         #try : self.setWindowIcon(cp.icon_help)
         #except : pass
         self.setFrame()
 
-        self.box_txt    = QtGui.QTextEdit()
-        self.tit_status = QtGui.QLabel('Status:')
+        self.box_txt        = QtGui.QTextEdit()
+        self.tit_status     = QtGui.QLabel('Status:')
+        self.guistatustable = GUIStatusTable(parent=self, list_of_files=[])
 
         self.hboxM = QtGui.QHBoxLayout()
         self.hboxM.addWidget( self.box_txt )
@@ -61,6 +63,7 @@ class GUIStatus ( QtGui.QWidget ) :
         self.vbox  = QtGui.QVBoxLayout()
         self.vbox.addLayout(self.hboxB)
         self.vbox.addLayout(self.hboxM)
+        self.vbox.addWidget(self.guistatustable)
         self.setLayout(self.vbox)
         
         #self.connect( self.but_close, QtCore.SIGNAL('clicked()'), self.onClose )
@@ -155,18 +158,27 @@ class GUIStatus ( QtGui.QWidget ) :
             msg += ' DOES NOT EXIST'
             self.setStatus(2,msg)
             self.setStatusMessage('DOES NOT EXIST !!!')
+            self.guistatustable.clearTable()
         else :
             msg += ' IS AVAILABLE'
             self.setStatus(0,msg)
 
-            list_dir = sorted(os.listdir(dir))
-            print list_dir
+            list = sorted(os.listdir(dir))
+            list_of_files = []
+            for name in list :
+                path = os.path.join(dir,name)
+                print path
+                list_of_files.append(path)
+                
+            #print list_dir
 
-            msgw = '# of entries: %i\n' % len(list_dir)
-            for name in list_dir :
-                msgw += '\n   %s' % name
+            msgw = '# of entries %i:\n' % len(list)
+            #for name in list :
+            #    msgw += '\n   %s' % name
 
             self.setStatusMessage(msgw)
+            self.guistatustable.makeTable(list_of_files)
+            #self.guistatustable.setTableItems()
 
 #-----------------------------
 
@@ -174,7 +186,8 @@ if __name__ == "__main__" :
 
     app = QtGui.QApplication(sys.argv)
     w = GUIStatus()
-    w.setStatusMessage('This is a test message to test GUIStatus...')
+    w.setStatusMessage('Test of GUIStatus...')
+    w.statusOfDir('./')
     w.show()
     app.exec_()
 

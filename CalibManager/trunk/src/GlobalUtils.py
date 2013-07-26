@@ -31,6 +31,7 @@ __version__ = "$Revision: 4 $"
 #--------------------------------
 import sys
 import os
+import pwd
 #import time
 from time import localtime, gmtime, strftime, clock, time, sleep
 
@@ -113,6 +114,19 @@ def print_list_of_files_in_dir(dirname, path_or_fname) :
         if fname in fname_in_dir :
             print fname_in_dir    
     print '\n'
+
+
+def get_path_owner(path) :
+    stat = os.stat(path)
+    #print ' stat =', stat
+    pwuid = pwd.getpwuid(stat.st_uid)
+    #print ' pwuid =', pwuid
+    user_name  = pwuid.pw_name
+    #print ' uid = %s   user_name  = %s' % (uid, user_name)
+    return user_name
+
+def get_path_mode(path) :
+    return os.stat(path).st_mode
 
 #----------------------------------
 
