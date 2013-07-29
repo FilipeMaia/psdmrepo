@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-09-04
+2013-07-29 Andy Salnikov
+- allow modification of CCFLAGS, CPPFLAGS, etc. from scons command line 
+
 Tag: V00-09-03
 2013-07-29 Andy Salnikov
 - more (small) speedup: search for moc files onle when NEED_QT is set

@@ -48,6 +48,10 @@ def buildEnv () :
 
     vars = Variables()
     vars.AddVariables(
+        ('CPPFLAGS', "User-specified C preprocessor options", ""),
+        ('CCFLAGS', "General options that are passed to the C and C++ compilers", ""),
+        ('CFLAGS', "General options that are passed to the C compiler (C only; not C++)", ""),
+        ('CXXFLAGS', "General options that are passed to the C++ compiler", ""),
         ('SIT_ARCH', "Use to change the SIT_ARCH value during build", os.environ['SIT_ARCH']),
         ('SIT_RELEASE', "Use to change the SIT_RELEASE value during build", sit_release),
         ('SIT_REPOS', "Use to change the SIT_REPOS value during build", os.environ.get('SIT_REPOS', "")),
