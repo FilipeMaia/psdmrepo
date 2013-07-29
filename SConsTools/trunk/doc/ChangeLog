@@ -11,6 +11,12 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-09-02
+2013-07-28 Andy Salnikov
+- trying to optimize speed by reducing the number of dependencies
+- introduced special scanner class which ignores dependencies for files
+  that are not likely to change (those in arch/$SIT_ARCH/geninc)
+
 Tag: V00-09-01
 2013-06-14 Andy Salnikov
 - make $PYDIR directory in advance to avoid race condition when symlinking

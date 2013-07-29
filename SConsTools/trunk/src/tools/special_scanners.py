@@ -14,11 +14,15 @@ class CScanner(SCons.Scanner.ClassicCPP):
     def scan(self, node, path=()):
 
         if node.includes is None:
-            # do not need dependencies originating from boost headers
+            # do not need dependencies originating from headers inside arch/$SIT_ARCH/geninc
             f = str(node).split(os.sep)
-            trace ( 'node: %s' % str(f), 'findAllDependencies', 4 )
-            if len(f) > 4 and f[0] == 'arch' and f[2] == 'geninc':
-                node.includes = []
+            trace('node: %s' % f, 'CScanner.scan', 4)
+            try:
+                aidx = f.index('arch')
+                if aidx + 3 < len(f) and f[aidx+2] == 'geninc':
+                    node.includes = []
+            except ValueError:
+                pass
     
         return super(SCons.Scanner.ClassicCPP, self).scan(node, path)
 
