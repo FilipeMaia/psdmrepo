@@ -6,6 +6,10 @@
 #
 #===============================================================================
 
+import logging
+
+logging.basicConfig(level=logging.INFO, format="%(asctime)s %(message)s")
+
 trace_level = 0
 
 def setTraceLevel ( level ):
@@ -17,5 +21,4 @@ def setTraceLevel ( level ):
 def trace ( msg, src, level ) :
     #print "trace_level=", trace_level, "level=", level
     if trace_level >= level :
-        print msg, ( "{%s-%d}" % ( src, level ) )
-
+        logging.info( "{%s-%d}  %s" % ( src, level, msg) )

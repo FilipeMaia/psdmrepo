@@ -123,6 +123,13 @@ def _guessPackage ( path ):
 def findAllDependencies( node ):
 
     res = set()
+
+    # do not need dependencies originating from boost headers
+    f = str(node).split(os.sep)
+    trace ( 'node: %s' % str(f), 'findAllDependencies', 4 )
+    if len(f) > 4 and f[0] == 'arch' and f[2] == 'geninc' and f[3] == 'boost':
+        return res
+
     for child in node.children() :
         # take all children which are include files, i.e. they live in
         # .../arch/${SIT_ARCH}/genarch/Package/ or include/Package/ directory

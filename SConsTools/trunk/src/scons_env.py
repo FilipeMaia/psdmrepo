@@ -134,7 +134,7 @@ def buildEnv () :
     # extend environment with tools
     tools = ['psdm_cplusplus', 'psdm_python', 'pyext', 'cython', 'symlink', 
              'pycompile', 'unittest', 'script_install', 'pkg_list', 
-             'release_install']
+             'release_install', 'special_scanners']
     trace ("toolpath = " + pformat(toolpath), "buildEnv", 3)
     for tool in tools:
         tool = env.Tool(tool, toolpath=toolpath)
