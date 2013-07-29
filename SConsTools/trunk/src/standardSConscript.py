@@ -76,9 +76,9 @@ def standardSConscript( **kw ) :
         env.Tool('qt4', toolpath = env['TOOLPATH'])
         ukw.setdefault('LIBS', []).extend(env['QT4_LIBS'])
         ukw.setdefault('LIBPATH', []).append(env['QT4_LIBDIR'])
-        
 
-    standardMoc( env, **ukw )
+        standardMoc( env, **ukw )
+        
     standardLib( env, **ukw )
     standardPyLib( env, **ukw )
     standardPyExt( env, **ukw )
