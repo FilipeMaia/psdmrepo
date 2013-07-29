@@ -58,7 +58,7 @@ Hdf5InputModule::Hdf5InputModule (const std::string& name)
   , m_evtId()
 {
   // get number of events to process/skip from psana configuration
-  ConfigSvc::ConfigSvc cfg;
+  ConfigSvc::ConfigSvc cfg = configSvc();
   m_skipEvents = cfg.get("psana", "skip-events", 0UL);
   m_maxEvents = cfg.get("psana", "events", 0UL);
   m_datasets = configList("files");
@@ -70,6 +70,8 @@ Hdf5InputModule::Hdf5InputModule (const std::string& name)
     str << "Input datasets: ";
     std::copy(m_datasets.begin(), m_datasets.end(), std::ostream_iterator<std::string>(str, " "));
   }
+  MsgLog(this->name(), debug, "skip-events: " << m_skipEvents);
+  MsgLog(this->name(), debug, "events: " << m_maxEvents);
 }
 
 //--------------

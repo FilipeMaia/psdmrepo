@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-07
+2013-07-29 Andy Salnikov
+- bug fix in Hdf5InputModule constructor - config service was instantiated 
+  in global context and some parameters were not correct
+
 Tag: V00-01-06
 2013-07-05 Andy Salnikov
 - raise an exception when dataset makes empty list of files
