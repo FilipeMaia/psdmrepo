@@ -662,7 +662,7 @@ void store_{{type.name}}(const {{psanatypename}}& obj, hdf5pp::Group group, int 
   switch (version) {
 {% for v in versions %}
   case {{v}}:
-    //store_{{type.name}}_v{{v}}(object, group, append);
+    store_{{type.name}}_v{{v}}(obj, group, append);
     break;
 {% endfor %}
   default:
@@ -678,6 +678,32 @@ void store(const {{psanatypename}}& obj, hdf5pp::Group group, int version)
 void append(const {{psanatypename}}& obj, hdf5pp::Group group, int version)
 {
   store_{{type.name}}(obj, group, version, true);
+}
+
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: schema_store_decl
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for implementation of the store() and append() methods. 
+:
+:  Parameters for this template:
+:    hschema    - instance of SchemaType class
+:
+
+void store_{{hschema.pstype.name}}_v{{hschema.schema.version}}(const {{hschema.pstypename}}& obj, hdf5pp::Group group, bool append);
+
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: schema_store_impl
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for implementation of the store() and append() methods. 
+:
+:  Parameters for this template:
+:    hschema    - instance of SchemaType class
+:
+
+void store_{{hschema.pstype.name}}_v{{hschema.schema.version}}(const {{hschema.pstypename}}& obj, hdf5pp::Group group, bool append)
+{
 }
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

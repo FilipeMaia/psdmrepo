@@ -56,13 +56,6 @@ def _TEMPL(template):
 
 _log = logging.getLogger("DdlHdf5DataHelpers")
 
-def _isArrayDs(ds):
-    '''ds type should be H5Dataset, returns true if dataset should have array type'''
-    if not ds.attributes:
-        if ds.rank > 0 and ds.type.name != 'char' and not ds.sizeIsConst() and not ds.sizeIsVlen():
-            return True
-    return False
-
 def _dsFactory(schema, ds, psana_ns):
     '''Factory method for dataset types'''
     if ds.attributes: return DatasetCompound(schema, ds, psana_ns)
@@ -548,6 +541,8 @@ class SchemaValueType(SchemaType):
 
         print >>inc, _TEMPL('proxy_valtype_declaration').render(locals())
         print >>cpp, _TEMPL('proxy_valtype_impl_getTypedImpl').render(locals())
+
+        print >>cpp, _TEMPL('schema_store_impl').render(locals())
         
 class SchemaAbstractType(SchemaType):
     '''
@@ -599,6 +594,9 @@ class SchemaAbstractType(SchemaType):
         print >>inc, _TEMPL('abstract_type_declaration').render(locals())
         for line in cpp_code:
             print >>cpp, line
+
+        print >>cpp, _TEMPL('schema_store_impl').render(locals())
+            
 
     def _genAttrShapeDecl(self, attr):
 
