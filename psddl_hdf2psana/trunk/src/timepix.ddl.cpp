@@ -479,6 +479,11 @@ int32_t ConfigV1_v0::dac3RefLvds() const {
 void ConfigV1_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<Timepix::ns_ConfigV1_v0::dataset_config>(m_group, "config", m_idx);
 }
+
+void store_ConfigV1_v0(const Psana::Timepix::ConfigV1& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Timepix::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -493,7 +498,7 @@ void store_ConfigV1(const Psana::Timepix::ConfigV1& obj, hdf5pp::Group group, in
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_ConfigV1_v0(object, group, append);
+    store_ConfigV1_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Timepix.ConfigV1", version);
@@ -1081,6 +1086,11 @@ int32_t ConfigV2_v0::chipCount() const {
 void ConfigV2_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<Timepix::ns_ConfigV2_v0::dataset_config>(m_group, "config", m_idx);
 }
+
+void store_ConfigV2_v0(const Psana::Timepix::ConfigV2& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Timepix::ConfigV2> > make_ConfigV2(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -1095,7 +1105,7 @@ void store_ConfigV2(const Psana::Timepix::ConfigV2& obj, hdf5pp::Group group, in
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_ConfigV2_v0(object, group, append);
+    store_ConfigV2_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Timepix.ConfigV2", version);
@@ -1695,6 +1705,11 @@ int32_t ConfigV3_v0::chipCount() const {
 void ConfigV3_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<Timepix::ns_ConfigV3_v0::dataset_config>(m_group, "config", m_idx);
 }
+
+void store_ConfigV3_v0(const Psana::Timepix::ConfigV3& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Timepix::ConfigV3> > make_ConfigV3(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -1709,7 +1724,7 @@ void store_ConfigV3(const Psana::Timepix::ConfigV3& obj, hdf5pp::Group group, in
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_ConfigV3_v0(object, group, append);
+    store_ConfigV3_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Timepix.ConfigV3", version);
@@ -1799,6 +1814,11 @@ void DataV1_v0::read_ds_data() const {
 void DataV1_v0::read_ds_image() const {
   m_ds_image = hdf5pp::Utils::readNdarray<uint16_t, 2>(m_group, "image", m_idx);
 }
+
+void store_DataV1_v0(const Psana::Timepix::DataV1& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Timepix::DataV1> > make_DataV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -1813,7 +1833,7 @@ void store_DataV1(const Psana::Timepix::DataV1& obj, hdf5pp::Group group, int ve
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_DataV1_v0(object, group, append);
+    store_DataV1_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Timepix.DataV1", version);
@@ -1915,6 +1935,11 @@ void DataV2_v0::read_ds_data() const {
 void DataV2_v0::read_ds_image() const {
   m_ds_image = hdf5pp::Utils::readNdarray<uint16_t, 2>(m_group, "image", m_idx);
 }
+
+void store_DataV2_v0(const Psana::Timepix::DataV2& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Timepix::DataV2> > make_DataV2(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -1929,7 +1954,7 @@ void store_DataV2(const Psana::Timepix::DataV2& obj, hdf5pp::Group group, int ve
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_DataV2_v0(object, group, append);
+    store_DataV2_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Timepix.DataV2", version);

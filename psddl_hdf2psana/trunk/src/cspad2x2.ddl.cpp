@@ -69,6 +69,11 @@ void CsPad2x2DigitalPotsCfg_v0::read_ds_data() const {
   m_ds_data = hdf5pp::Utils::readGroup<CsPad2x2::ns_CsPad2x2DigitalPotsCfg_v0::dataset_data>(m_group, "data", m_idx);
 }
 
+void store_CsPad2x2DigitalPotsCfg_v0(const Psana::CsPad2x2::CsPad2x2DigitalPotsCfg& obj, hdf5pp::Group group, bool append)
+{
+}
+
+
 hdf5pp::Type ns_CsPad2x2ReadOnlyCfg_v0_dataset_data_stored_type()
 {
   typedef ns_CsPad2x2ReadOnlyCfg_v0::dataset_data DsType;
@@ -122,6 +127,11 @@ Proxy_CsPad2x2ReadOnlyCfg_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::S
   return m_data;
 }
 
+
+void store_CsPad2x2ReadOnlyCfg_v0(const Psana::CsPad2x2::CsPad2x2ReadOnlyCfg& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::CsPad2x2::CsPad2x2ReadOnlyCfg> > make_CsPad2x2ReadOnlyCfg(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -136,7 +146,7 @@ void store_CsPad2x2ReadOnlyCfg(const Psana::CsPad2x2::CsPad2x2ReadOnlyCfg& obj, 
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_CsPad2x2ReadOnlyCfg_v0(object, group, append);
+    store_CsPad2x2ReadOnlyCfg_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "CsPad2x2.CsPad2x2ReadOnlyCfg", version);
@@ -207,6 +217,11 @@ Proxy_ProtectionSystemThreshold_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const 
   return m_data;
 }
 
+
+void store_ProtectionSystemThreshold_v0(const Psana::CsPad2x2::ProtectionSystemThreshold& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::CsPad2x2::ProtectionSystemThreshold> > make_ProtectionSystemThreshold(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -221,7 +236,7 @@ void store_ProtectionSystemThreshold(const Psana::CsPad2x2::ProtectionSystemThre
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_ProtectionSystemThreshold_v0(object, group, append);
+    store_ProtectionSystemThreshold_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "CsPad2x2.ProtectionSystemThreshold", version);
@@ -294,6 +309,11 @@ ndarray<const uint16_t, 2> CsPad2x2GainMapCfg_v0::gainMap() const {
 void CsPad2x2GainMapCfg_v0::read_ds_data() const {
   m_ds_data = hdf5pp::Utils::readGroup<CsPad2x2::ns_CsPad2x2GainMapCfg_v0::dataset_data>(m_group, "data", m_idx);
 }
+
+void store_CsPad2x2GainMapCfg_v0(const Psana::CsPad2x2::CsPad2x2GainMapCfg& obj, hdf5pp::Group group, bool append)
+{
+}
+
 
 hdf5pp::Type ns_ConfigV1QuadReg_v0_dataset_data_stored_type()
 {
@@ -513,6 +533,11 @@ void ConfigV1QuadReg_v0::read_ds_data() const {
   m_ds_data = hdf5pp::Utils::readGroup<CsPad2x2::ns_ConfigV1QuadReg_v0::dataset_data>(m_group, "data", m_idx);
 }
 
+void store_ConfigV1QuadReg_v0(const Psana::CsPad2x2::ConfigV1QuadReg& obj, hdf5pp::Group group, bool append)
+{
+}
+
+
 hdf5pp::Type ns_ConfigV1_v0_dataset_config_stored_type()
 {
   typedef ns_ConfigV1_v0::dataset_config DsType;
@@ -649,6 +674,11 @@ uint32_t ConfigV1_v0::numAsicsStored() const {
 void ConfigV1_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<CsPad2x2::ns_ConfigV1_v0::dataset_config>(m_group, "config", m_idx);
 }
+
+void store_ConfigV1_v0(const Psana::CsPad2x2::ConfigV1& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::CsPad2x2::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -663,7 +693,7 @@ void store_ConfigV1(const Psana::CsPad2x2::ConfigV1& obj, hdf5pp::Group group, i
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_ConfigV1_v0(object, group, append);
+    store_ConfigV1_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "CsPad2x2.ConfigV1", version);
@@ -913,6 +943,11 @@ void ConfigV2QuadReg_v0::read_ds_data() const {
   m_ds_data = hdf5pp::Utils::readGroup<CsPad2x2::ns_ConfigV2QuadReg_v0::dataset_data>(m_group, "data", m_idx);
 }
 
+void store_ConfigV2QuadReg_v0(const Psana::CsPad2x2::ConfigV2QuadReg& obj, hdf5pp::Group group, bool append)
+{
+}
+
+
 hdf5pp::Type ns_ConfigV2_v0_dataset_config_stored_type()
 {
   typedef ns_ConfigV2_v0::dataset_config DsType;
@@ -1056,6 +1091,11 @@ uint32_t ConfigV2_v0::numAsicsStored() const {
 void ConfigV2_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<CsPad2x2::ns_ConfigV2_v0::dataset_config>(m_group, "config", m_idx);
 }
+
+void store_ConfigV2_v0(const Psana::CsPad2x2::ConfigV2& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::CsPad2x2::ConfigV2> > make_ConfigV2(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -1070,7 +1110,7 @@ void store_ConfigV2(const Psana::CsPad2x2::ConfigV2& obj, hdf5pp::Group group, i
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_ConfigV2_v0(object, group, append);
+    store_ConfigV2_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "CsPad2x2.ConfigV2", version);
@@ -1101,7 +1141,7 @@ void store_ElementV1(const Psana::CsPad2x2::ElementV1& obj, hdf5pp::Group group,
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_ElementV1_v0(object, group, append);
+    store_ElementV1_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "CsPad2x2.ElementV1", version);

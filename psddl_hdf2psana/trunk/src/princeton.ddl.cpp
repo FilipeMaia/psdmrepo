@@ -136,6 +136,11 @@ return 8 + this->numPixels()*2;
 void ConfigV1_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<Princeton::ns_ConfigV1_v0::dataset_config>(m_group, "config", m_idx);
 }
+
+void store_ConfigV1_v0(const Psana::Princeton::ConfigV1& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -150,7 +155,7 @@ void store_ConfigV1(const Psana::Princeton::ConfigV1& obj, hdf5pp::Group group, 
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_ConfigV1_v0(object, group, append);
+    store_ConfigV1_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Princeton.ConfigV1", version);
@@ -299,6 +304,11 @@ return 8 + this->numPixels()*2;
 void ConfigV2_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<Princeton::ns_ConfigV2_v0::dataset_config>(m_group, "config", m_idx);
 }
+
+void store_ConfigV2_v0(const Psana::Princeton::ConfigV2& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::ConfigV2> > make_ConfigV2(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -313,7 +323,7 @@ void store_ConfigV2(const Psana::Princeton::ConfigV2& obj, hdf5pp::Group group, 
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_ConfigV2_v0(object, group, append);
+    store_ConfigV2_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Princeton.ConfigV2", version);
@@ -462,6 +472,11 @@ return 8 + this->numPixels()*2;
 void ConfigV3_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<Princeton::ns_ConfigV3_v0::dataset_config>(m_group, "config", m_idx);
 }
+
+void store_ConfigV3_v0(const Psana::Princeton::ConfigV3& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::ConfigV3> > make_ConfigV3(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -476,7 +491,7 @@ void store_ConfigV3(const Psana::Princeton::ConfigV3& obj, hdf5pp::Group group, 
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_ConfigV3_v0(object, group, append);
+    store_ConfigV3_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Princeton.ConfigV3", version);
@@ -646,6 +661,11 @@ return 8 + this->numPixels()*2;
 void ConfigV4_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<Princeton::ns_ConfigV4_v0::dataset_config>(m_group, "config", m_idx);
 }
+
+void store_ConfigV4_v0(const Psana::Princeton::ConfigV4& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::ConfigV4> > make_ConfigV4(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -660,7 +680,7 @@ void store_ConfigV4(const Psana::Princeton::ConfigV4& obj, hdf5pp::Group group, 
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_ConfigV4_v0(object, group, append);
+    store_ConfigV4_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Princeton.ConfigV4", version);
@@ -837,6 +857,11 @@ return 12 + this->numPixels()*2;
 void ConfigV5_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<Princeton::ns_ConfigV5_v0::dataset_config>(m_group, "config", m_idx);
 }
+
+void store_ConfigV5_v0(const Psana::Princeton::ConfigV5& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::ConfigV5> > make_ConfigV5(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -851,7 +876,7 @@ void store_ConfigV5(const Psana::Princeton::ConfigV5& obj, hdf5pp::Group group, 
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_ConfigV5_v0(object, group, append);
+    store_ConfigV5_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Princeton.ConfigV5", version);
@@ -940,6 +965,11 @@ template class FrameV1_v0<Psana::Princeton::ConfigV2>;
 template class FrameV1_v0<Psana::Princeton::ConfigV3>;
 template class FrameV1_v0<Psana::Princeton::ConfigV4>;
 template class FrameV1_v0<Psana::Princeton::ConfigV5>;
+
+void store_FrameV1_v0(const Psana::Princeton::FrameV1& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::FrameV1> > make_FrameV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::Princeton::ConfigV1>& cfg) {
   switch (version) {
   case 0:
@@ -986,7 +1016,7 @@ void store_FrameV1(const Psana::Princeton::FrameV1& obj, hdf5pp::Group group, in
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_FrameV1_v0(object, group, append);
+    store_FrameV1_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Princeton.FrameV1", version);
@@ -1083,6 +1113,11 @@ template class FrameV2_v0<Psana::Princeton::ConfigV2>;
 template class FrameV2_v0<Psana::Princeton::ConfigV3>;
 template class FrameV2_v0<Psana::Princeton::ConfigV4>;
 template class FrameV2_v0<Psana::Princeton::ConfigV5>;
+
+void store_FrameV2_v0(const Psana::Princeton::FrameV2& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::FrameV2> > make_FrameV2(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::Princeton::ConfigV1>& cfg) {
   switch (version) {
   case 0:
@@ -1129,7 +1164,7 @@ void store_FrameV2(const Psana::Princeton::FrameV2& obj, hdf5pp::Group group, in
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_FrameV2_v0(object, group, append);
+    store_FrameV2_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Princeton.FrameV2", version);
@@ -1197,6 +1232,11 @@ Proxy_InfoV1_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, c
   return m_data;
 }
 
+
+void store_InfoV1_v0(const Psana::Princeton::InfoV1& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::InfoV1> > make_InfoV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -1211,7 +1251,7 @@ void store_InfoV1(const Psana::Princeton::InfoV1& obj, hdf5pp::Group group, int 
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_InfoV1_v0(object, group, append);
+    store_InfoV1_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Princeton.InfoV1", version);

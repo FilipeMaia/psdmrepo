@@ -134,5 +134,10 @@ void FrameV1_v0::read_ds_image() const
   }
 }
 
+void store_FrameV1_v0(const Psana::Camera::FrameV1& obj, hdf5pp::Group group, bool append)
+{
+    
+}
+
 } // namespace Camera
 } // namespace psddl_hdf2psana

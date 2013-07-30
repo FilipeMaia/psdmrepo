@@ -144,6 +144,11 @@ uint32_t ConfigV1_v0::trigDelay() const {
 void ConfigV1_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<Ipimb::ns_ConfigV1_v0::dataset_config>(m_group, "config", m_idx);
 }
+
+void store_ConfigV1_v0(const Psana::Ipimb::ConfigV1& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Ipimb::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -158,7 +163,7 @@ void store_ConfigV1(const Psana::Ipimb::ConfigV1& obj, hdf5pp::Group group, int 
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_ConfigV1_v0(object, group, append);
+    store_ConfigV1_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Ipimb.ConfigV1", version);
@@ -322,6 +327,11 @@ uint32_t ConfigV2_v0::adcDelay() const {
 void ConfigV2_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<Ipimb::ns_ConfigV2_v0::dataset_config>(m_group, "config", m_idx);
 }
+
+void store_ConfigV2_v0(const Psana::Ipimb::ConfigV2& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Ipimb::ConfigV2> > make_ConfigV2(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -336,7 +346,7 @@ void store_ConfigV2(const Psana::Ipimb::ConfigV2& obj, hdf5pp::Group group, int 
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_ConfigV2_v0(object, group, append);
+    store_ConfigV2_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Ipimb.ConfigV2", version);
@@ -485,6 +495,11 @@ float DataV1_v0::channel3Volts() const {
 void DataV1_v0::read_ds_data() const {
   m_ds_data = hdf5pp::Utils::readGroup<Ipimb::ns_DataV1_v0::dataset_data>(m_group, "data", m_idx);
 }
+
+void store_DataV1_v0(const Psana::Ipimb::DataV1& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Ipimb::DataV1> > make_DataV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -499,7 +514,7 @@ void store_DataV1(const Psana::Ipimb::DataV1& obj, hdf5pp::Group group, int vers
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_DataV1_v0(object, group, append);
+    store_DataV1_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Ipimb.DataV1", version);
@@ -704,6 +719,11 @@ uint64_t DataV2_v0::triggerCounter() const {
 void DataV2_v0::read_ds_data() const {
   m_ds_data = hdf5pp::Utils::readGroup<Ipimb::ns_DataV2_v0::dataset_data>(m_group, "data", m_idx);
 }
+
+void store_DataV2_v0(const Psana::Ipimb::DataV2& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Ipimb::DataV2> > make_DataV2(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -718,7 +738,7 @@ void store_DataV2(const Psana::Ipimb::DataV2& obj, hdf5pp::Group group, int vers
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_DataV2_v0(object, group, append);
+    store_DataV2_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Ipimb.DataV2", version);

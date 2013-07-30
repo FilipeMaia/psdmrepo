@@ -69,6 +69,11 @@ uint32_t ConfigV1_v0::payloadSizePerLink() const {
 void ConfigV1_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<PNCCD::ns_ConfigV1_v0::dataset_config>(m_group, "config", m_idx);
 }
+
+void store_ConfigV1_v0(const Psana::PNCCD::ConfigV1& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::PNCCD::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -83,7 +88,7 @@ void store_ConfigV1(const Psana::PNCCD::ConfigV1& obj, hdf5pp::Group group, int 
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_ConfigV1_v0(object, group, append);
+    store_ConfigV1_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "PNCCD.ConfigV1", version);
@@ -223,6 +228,11 @@ ConfigV2_v0::timingFName_shape() const{
 void ConfigV2_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<PNCCD::ns_ConfigV2_v0::dataset_config>(m_group, "config", m_idx);
 }
+
+void store_ConfigV2_v0(const Psana::PNCCD::ConfigV2& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::PNCCD::ConfigV2> > make_ConfigV2(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -237,7 +247,7 @@ void store_ConfigV2(const Psana::PNCCD::ConfigV2& obj, hdf5pp::Group group, int 
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_ConfigV2_v0(object, group, append);
+    store_ConfigV2_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "PNCCD.ConfigV2", version);
@@ -268,7 +278,7 @@ void store_FullFrameV1(const Psana::PNCCD::FullFrameV1& obj, hdf5pp::Group group
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_FullFrameV1_v0(object, group, append);
+    store_FullFrameV1_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "PNCCD.FullFrameV1", version);
@@ -307,7 +317,7 @@ void store_FramesV1(const Psana::PNCCD::FramesV1& obj, hdf5pp::Group group, int 
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_FramesV1_v0(object, group, append);
+    store_FramesV1_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "PNCCD.FramesV1", version);

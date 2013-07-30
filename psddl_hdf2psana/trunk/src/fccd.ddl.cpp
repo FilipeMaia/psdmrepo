@@ -88,6 +88,11 @@ uint32_t FccdConfigV1_v0::trimmedHeight() const {
 void FccdConfigV1_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<FCCD::ns_FccdConfigV1_v0::dataset_config>(m_group, "config", m_idx);
 }
+
+void store_FccdConfigV1_v0(const Psana::FCCD::FccdConfigV1& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::FCCD::FccdConfigV1> > make_FccdConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -102,7 +107,7 @@ void store_FccdConfigV1(const Psana::FCCD::FccdConfigV1& obj, hdf5pp::Group grou
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_FccdConfigV1_v0(object, group, append);
+    store_FccdConfigV1_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "FCCD.FccdConfigV1", version);
@@ -133,7 +138,7 @@ void store_FccdConfigV2(const Psana::FCCD::FccdConfigV2& obj, hdf5pp::Group grou
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_FccdConfigV2_v0(object, group, append);
+    store_FccdConfigV2_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "FCCD.FccdConfigV2", version);

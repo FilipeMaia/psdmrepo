@@ -72,6 +72,7 @@ private:
 
 };
 
+void store_BldDataPimV1_v0(const Psana::Bld::BldDataPimV1& obj, hdf5pp::Group group, bool append);
 
 } // namespace Bld
 } // namespace psddl_hdf2psana

@@ -85,6 +85,12 @@ DataV1_v0<Config>::read_elements() const
   }
 }
 
+void store_DataV1_v0(const Psana::CsPad::DataV1& obj, hdf5pp::Group group, bool append)
+{
+    
+}
+
+
 template class DataV1_v0<Psana::CsPad::ConfigV1>;
 template class DataV1_v0<Psana::CsPad::ConfigV2>;
 template class DataV1_v0<Psana::CsPad::ConfigV3>;
@@ -150,6 +156,11 @@ DataV2_v0<Config>::read_elements() const
 
     m_elements[i] = DataV2_v0_Element(ds_element[i], quad_data, cm_data);
   }
+}
+
+void store_DataV2_v0(const Psana::CsPad::DataV2& obj, hdf5pp::Group group, bool append)
+{
+    
 }
 
 template class DataV2_v0<Psana::CsPad::ConfigV2>;

@@ -125,5 +125,10 @@ DataV1_v0::read_ds_data() const
   m_ds_data = hdf5pp::Utils::readGroup<UsdUsb::ns_DataV1_v0::dataset_data>(m_group, "data", m_idx);
 }
 
+void store_DataV1_v0(const Psana::UsdUsb::DataV1& obj, hdf5pp::Group group, bool append)
+{
+    
+}
+
 } // namespace UsdUsb
 } // namespace psddl_hdf2psana

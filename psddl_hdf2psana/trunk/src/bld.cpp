@@ -112,5 +112,10 @@ BldDataPimV1_v0::read_ds_data() const
   m_ds_data = hdf5pp::Utils::readGroup<ns_BldDataPimV1_v0::dataset_data>(m_group, "data", m_idx);
 }
 
+void store_BldDataPimV1_v0(const Psana::Bld::BldDataPimV1& obj, hdf5pp::Group group, bool append)
+{
+    
+}
+
 } // namespace Bld
 } // namespace psddl_hdf2psana

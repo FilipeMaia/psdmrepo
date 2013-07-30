@@ -122,6 +122,11 @@ uint32_t ConfigV1_v0::adcDelay() const {
 void ConfigV1_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<Imp::ns_ConfigV1_v0::dataset_config>(m_group, "config", m_idx);
 }
+
+void store_ConfigV1_v0(const Psana::Imp::ConfigV1& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Imp::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -136,7 +141,7 @@ void store_ConfigV1(const Psana::Imp::ConfigV1& obj, hdf5pp::Group group, int ve
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_ConfigV1_v0(object, group, append);
+    store_ConfigV1_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Imp.ConfigV1", version);
@@ -359,6 +364,11 @@ void ElementV1_v0<Config>::read_ds_samples() const {
   m_ds_samples = tmp;
 }
 template class ElementV1_v0<Psana::Imp::ConfigV1>;
+
+void store_ElementV1_v0(const Psana::Imp::ElementV1& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Imp::ElementV1> > make_ElementV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::Imp::ConfigV1>& cfg) {
   switch (version) {
   case 0:
@@ -373,7 +383,7 @@ void store_ElementV1(const Psana::Imp::ElementV1& obj, hdf5pp::Group group, int 
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_ElementV1_v0(object, group, append);
+    store_ElementV1_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Imp.ElementV1", version);

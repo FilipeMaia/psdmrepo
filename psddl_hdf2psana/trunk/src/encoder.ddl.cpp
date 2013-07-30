@@ -118,6 +118,11 @@ uint32_t ConfigV1_v0::ticks_per_sec() const {
 void ConfigV1_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<Encoder::ns_ConfigV1_v0::dataset_config>(m_group, "config", m_idx);
 }
+
+void store_ConfigV1_v0(const Psana::Encoder::ConfigV1& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Encoder::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -132,7 +137,7 @@ void store_ConfigV1(const Psana::Encoder::ConfigV1& obj, hdf5pp::Group group, in
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_ConfigV1_v0(object, group, append);
+    store_ConfigV1_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Encoder.ConfigV1", version);
@@ -256,6 +261,11 @@ uint32_t ConfigV2_v0::ticks_per_sec() const {
 void ConfigV2_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<Encoder::ns_ConfigV2_v0::dataset_config>(m_group, "config", m_idx);
 }
+
+void store_ConfigV2_v0(const Psana::Encoder::ConfigV2& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Encoder::ConfigV2> > make_ConfigV2(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -270,7 +280,7 @@ void store_ConfigV2(const Psana::Encoder::ConfigV2& obj, hdf5pp::Group group, in
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_ConfigV2_v0(object, group, append);
+    store_ConfigV2_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Encoder.ConfigV2", version);
@@ -346,6 +356,11 @@ return int(this->encoder_count() << 8)/256;;
 void DataV1_v0::read_ds_data() const {
   m_ds_data = hdf5pp::Utils::readGroup<Encoder::ns_DataV1_v0::dataset_data>(m_group, "data", m_idx);
 }
+
+void store_DataV1_v0(const Psana::Encoder::DataV1& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Encoder::DataV1> > make_DataV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -360,7 +375,7 @@ void store_DataV1(const Psana::Encoder::DataV1& obj, hdf5pp::Group group, int ve
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_DataV1_v0(object, group, append);
+    store_DataV1_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Encoder.DataV1", version);
@@ -444,6 +459,11 @@ return int(this->encoder_count()[i] << 8)/256;;
 void DataV2_v0::read_ds_data() const {
   m_ds_data = hdf5pp::Utils::readGroup<Encoder::ns_DataV2_v0::dataset_data>(m_group, "data", m_idx);
 }
+
+void store_DataV2_v0(const Psana::Encoder::DataV2& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Encoder::DataV2> > make_DataV2(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -458,7 +478,7 @@ void store_DataV2(const Psana::Encoder::DataV2& obj, hdf5pp::Group group, int ve
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_DataV2_v0(object, group, append);
+    store_DataV2_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Encoder.DataV2", version);

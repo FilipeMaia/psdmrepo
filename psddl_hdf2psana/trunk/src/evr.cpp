@@ -96,6 +96,11 @@ void DataV3_v0::read_ds_data() const {
 }
 
 
+void store_DataV3_v0(const Psana::EvrData::DataV3& obj, hdf5pp::Group group, bool append)
+{
+    
+}
+
 
 hdf5pp::Type ns_IOChannel_v0_dataset_data_stored_type()
 {
@@ -230,6 +235,11 @@ void IOConfigV1_v0::read_ds_channels() const {
   ndarray<Psana::EvrData::IOChannel, 1> tmp(arr.shape());
   std::copy(arr.begin(), arr.end(), tmp.begin());
   m_ds_channels = tmp;
+}
+
+void store_IOConfigV1_v0(const Psana::EvrData::IOConfigV1& obj, hdf5pp::Group group, bool append)
+{
+    
 }
 
 

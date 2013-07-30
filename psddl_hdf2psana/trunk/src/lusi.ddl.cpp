@@ -79,6 +79,11 @@ Proxy_DiodeFexConfigV1_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src&
   return m_data;
 }
 
+
+void store_DiodeFexConfigV1_v0(const Psana::Lusi::DiodeFexConfigV1& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Lusi::DiodeFexConfigV1> > make_DiodeFexConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -93,7 +98,7 @@ void store_DiodeFexConfigV1(const Psana::Lusi::DiodeFexConfigV1& obj, hdf5pp::Gr
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_DiodeFexConfigV1_v0(object, group, append);
+    store_DiodeFexConfigV1_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Lusi.DiodeFexConfigV1", version);
@@ -178,6 +183,11 @@ Proxy_DiodeFexConfigV2_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src&
   return m_data;
 }
 
+
+void store_DiodeFexConfigV2_v0(const Psana::Lusi::DiodeFexConfigV2& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Lusi::DiodeFexConfigV2> > make_DiodeFexConfigV2(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -192,7 +202,7 @@ void store_DiodeFexConfigV2(const Psana::Lusi::DiodeFexConfigV2& obj, hdf5pp::Gr
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_DiodeFexConfigV2_v0(object, group, append);
+    store_DiodeFexConfigV2_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Lusi.DiodeFexConfigV2", version);
@@ -260,6 +270,11 @@ Proxy_DiodeFexV1_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& sourc
   return m_data;
 }
 
+
+void store_DiodeFexV1_v0(const Psana::Lusi::DiodeFexV1& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Lusi::DiodeFexV1> > make_DiodeFexV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -274,7 +289,7 @@ void store_DiodeFexV1(const Psana::Lusi::DiodeFexV1& obj, hdf5pp::Group group, i
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_DiodeFexV1_v0(object, group, append);
+    store_DiodeFexV1_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Lusi.DiodeFexV1", version);
@@ -370,6 +385,11 @@ float IpmFexConfigV1_v0::yscale() const {
 void IpmFexConfigV1_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<Lusi::ns_IpmFexConfigV1_v0::dataset_config>(m_group, "config", m_idx);
 }
+
+void store_IpmFexConfigV1_v0(const Psana::Lusi::IpmFexConfigV1& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Lusi::IpmFexConfigV1> > make_IpmFexConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -384,7 +404,7 @@ void store_IpmFexConfigV1(const Psana::Lusi::IpmFexConfigV1& obj, hdf5pp::Group 
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_IpmFexConfigV1_v0(object, group, append);
+    store_IpmFexConfigV1_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Lusi.IpmFexConfigV1", version);
@@ -480,6 +500,11 @@ float IpmFexConfigV2_v0::yscale() const {
 void IpmFexConfigV2_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<Lusi::ns_IpmFexConfigV2_v0::dataset_config>(m_group, "config", m_idx);
 }
+
+void store_IpmFexConfigV2_v0(const Psana::Lusi::IpmFexConfigV2& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Lusi::IpmFexConfigV2> > make_IpmFexConfigV2(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -494,7 +519,7 @@ void store_IpmFexConfigV2(const Psana::Lusi::IpmFexConfigV2& obj, hdf5pp::Group 
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_IpmFexConfigV2_v0(object, group, append);
+    store_IpmFexConfigV2_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Lusi.IpmFexConfigV2", version);
@@ -578,6 +603,11 @@ Proxy_IpmFexV1_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source,
   return m_data;
 }
 
+
+void store_IpmFexV1_v0(const Psana::Lusi::IpmFexV1& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Lusi::IpmFexV1> > make_IpmFexV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -592,7 +622,7 @@ void store_IpmFexV1(const Psana::Lusi::IpmFexV1& obj, hdf5pp::Group group, int v
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_IpmFexV1_v0(object, group, append);
+    store_IpmFexV1_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Lusi.IpmFexV1", version);
@@ -663,6 +693,11 @@ Proxy_PimImageConfigV1_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src&
   return m_data;
 }
 
+
+void store_PimImageConfigV1_v0(const Psana::Lusi::PimImageConfigV1& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Lusi::PimImageConfigV1> > make_PimImageConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -677,7 +712,7 @@ void store_PimImageConfigV1(const Psana::Lusi::PimImageConfigV1& obj, hdf5pp::Gr
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_PimImageConfigV1_v0(object, group, append);
+    store_PimImageConfigV1_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Lusi.PimImageConfigV1", version);

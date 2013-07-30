@@ -128,6 +128,11 @@ Proxy_HorizV1_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, 
   return m_data;
 }
 
+
+void store_HorizV1_v0(const Psana::Acqiris::HorizV1& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::HorizV1> > make_HorizV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -142,7 +147,7 @@ void store_HorizV1(const Psana::Acqiris::HorizV1& obj, hdf5pp::Group group, int 
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_HorizV1_v0(object, group, append);
+    store_HorizV1_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Acqiris.HorizV1", version);
@@ -219,6 +224,11 @@ Proxy_TrigV1_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, c
   return m_data;
 }
 
+
+void store_TrigV1_v0(const Psana::Acqiris::TrigV1& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::TrigV1> > make_TrigV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -233,7 +243,7 @@ void store_TrigV1(const Psana::Acqiris::TrigV1& obj, hdf5pp::Group group, int ve
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_TrigV1_v0(object, group, append);
+    store_TrigV1_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Acqiris.TrigV1", version);
@@ -347,6 +357,11 @@ void ConfigV1_v0::read_ds_vert() const {
   std::copy(arr.begin(), arr.end(), tmp.begin());
   m_ds_vert = tmp;
 }
+
+void store_ConfigV1_v0(const Psana::Acqiris::ConfigV1& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -361,7 +376,7 @@ void store_ConfigV1(const Psana::Acqiris::ConfigV1& obj, hdf5pp::Group group, in
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_ConfigV1_v0(object, group, append);
+    store_ConfigV1_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Acqiris.ConfigV1", version);
@@ -438,10 +453,10 @@ void store_DataDescV1(const Psana::Acqiris::DataDescV1& obj, hdf5pp::Group group
   if (version < 0) version = 1;
   switch (version) {
   case 0:
-    //store_DataDescV1_v0(object, group, append);
+    store_DataDescV1_v0(obj, group, append);
     break;
   case 1:
-    //store_DataDescV1_v1(object, group, append);
+    store_DataDescV1_v1(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Acqiris.DataDescV1", version);
@@ -551,6 +566,11 @@ Proxy_TdcChannel_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& sourc
   return m_data;
 }
 
+
+void store_TdcChannel_v0(const Psana::Acqiris::TdcChannel& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::TdcChannel> > make_TdcChannel(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -565,7 +585,7 @@ void store_TdcChannel(const Psana::Acqiris::TdcChannel& obj, hdf5pp::Group group
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_TdcChannel_v0(object, group, append);
+    store_TdcChannel_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Acqiris.TdcChannel", version);
@@ -661,6 +681,11 @@ Proxy_TdcAuxIO_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source,
   return m_data;
 }
 
+
+void store_TdcAuxIO_v0(const Psana::Acqiris::TdcAuxIO& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::TdcAuxIO> > make_TdcAuxIO(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -675,7 +700,7 @@ void store_TdcAuxIO(const Psana::Acqiris::TdcAuxIO& obj, hdf5pp::Group group, in
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_TdcAuxIO_v0(object, group, append);
+    store_TdcAuxIO_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Acqiris.TdcAuxIO", version);
@@ -769,6 +794,11 @@ Proxy_TdcVetoIO_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source
   return m_data;
 }
 
+
+void store_TdcVetoIO_v0(const Psana::Acqiris::TdcVetoIO& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::TdcVetoIO> > make_TdcVetoIO(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -783,7 +813,7 @@ void store_TdcVetoIO(const Psana::Acqiris::TdcVetoIO& obj, hdf5pp::Group group, 
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_TdcVetoIO_v0(object, group, append);
+    store_TdcVetoIO_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Acqiris.TdcVetoIO", version);
@@ -829,6 +859,11 @@ void TdcConfigV1_v0::read_ds_auxio() const {
   std::copy(arr.begin(), arr.end(), tmp.begin());
   m_ds_auxio = tmp;
 }
+
+void store_TdcConfigV1_v0(const Psana::Acqiris::TdcConfigV1& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::TdcConfigV1> > make_TdcConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -843,7 +878,7 @@ void store_TdcConfigV1(const Psana::Acqiris::TdcConfigV1& obj, hdf5pp::Group gro
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_TdcConfigV1_v0(object, group, append);
+    store_TdcConfigV1_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Acqiris.TdcConfigV1", version);
@@ -935,6 +970,11 @@ Proxy_TdcDataV1_Item_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& s
   return m_data;
 }
 
+
+void store_TdcDataV1_Item_v0(const Psana::Acqiris::TdcDataV1_Item& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::TdcDataV1_Item> > make_TdcDataV1_Item(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -949,7 +989,7 @@ void store_TdcDataV1_Item(const Psana::Acqiris::TdcDataV1_Item& obj, hdf5pp::Gro
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_TdcDataV1_Item_v0(object, group, append);
+    store_TdcDataV1_Item_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Acqiris.TdcDataV1_Item", version);
@@ -976,6 +1016,11 @@ void TdcDataV1_v0::read_ds_data() const {
   std::copy(arr.begin(), arr.end(), tmp.begin());
   m_ds_data = tmp;
 }
+
+void store_TdcDataV1_v0(const Psana::Acqiris::TdcDataV1& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::TdcDataV1> > make_TdcDataV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -990,7 +1035,7 @@ void store_TdcDataV1(const Psana::Acqiris::TdcDataV1& obj, hdf5pp::Group group, 
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_TdcDataV1_v0(object, group, append);
+    store_TdcDataV1_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Acqiris.TdcDataV1", version);

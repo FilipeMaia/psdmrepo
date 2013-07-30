@@ -85,6 +85,7 @@ private:
 
 };
 
+void store_DataDescV1_v0(const Psana::Acqiris::DataDescV1& obj, hdf5pp::Group group, bool append);
 
 
 namespace ns_DataDescV1Elem_v1 {
@@ -156,6 +157,7 @@ private:
 
 };
 
+void store_DataDescV1_v1(const Psana::Acqiris::DataDescV1& obj, hdf5pp::Group group, bool append);
 
 
 } // namespace Acqiris

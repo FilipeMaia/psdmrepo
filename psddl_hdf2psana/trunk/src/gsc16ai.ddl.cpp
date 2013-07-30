@@ -146,6 +146,11 @@ uint8_t ConfigV1_v0::timeTagEnable() const {
 void ConfigV1_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<Gsc16ai::ns_ConfigV1_v0::dataset_config>(m_group, "config", m_idx);
 }
+
+void store_ConfigV1_v0(const Psana::Gsc16ai::ConfigV1& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Gsc16ai::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -160,7 +165,7 @@ void store_ConfigV1(const Psana::Gsc16ai::ConfigV1& obj, hdf5pp::Group group, in
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_ConfigV1_v0(object, group, append);
+    store_ConfigV1_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Gsc16ai.ConfigV1", version);
@@ -196,6 +201,11 @@ void DataV1_v0<Config>::read_ds_timestamps() const {
   m_ds_timestamps = hdf5pp::Utils::readNdarray<uint16_t, 1>(m_group, "timestamps", m_idx);
 }
 template class DataV1_v0<Psana::Gsc16ai::ConfigV1>;
+
+void store_DataV1_v0(const Psana::Gsc16ai::DataV1& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Gsc16ai::DataV1> > make_DataV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::Gsc16ai::ConfigV1>& cfg) {
   switch (version) {
   case 0:
@@ -210,7 +220,7 @@ void store_DataV1(const Psana::Gsc16ai::DataV1& obj, hdf5pp::Group group, int ve
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_DataV1_v0(object, group, append);
+    store_DataV1_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Gsc16ai.DataV1", version);

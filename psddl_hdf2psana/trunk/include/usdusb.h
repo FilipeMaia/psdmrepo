@@ -71,6 +71,8 @@ private:
   void read_ds_data() const;
 };
 
+void store_DataV1_v0(const Psana::UsdUsb::DataV1& obj, hdf5pp::Group group, bool append);
+
 } // namespace UsdUsb
 } // namespace psddl_hdf2psana
 

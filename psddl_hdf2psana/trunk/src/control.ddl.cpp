@@ -256,6 +256,11 @@ void ConfigV1_v0::read_ds_pvMonitors() const {
   std::copy(arr.begin(), arr.end(), tmp.begin());
   m_ds_pvMonitors = tmp;
 }
+
+void store_ConfigV1_v0(const Psana::ControlData::ConfigV1& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::ControlData::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -270,7 +275,7 @@ void store_ConfigV1(const Psana::ControlData::ConfigV1& obj, hdf5pp::Group group
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_ConfigV1_v0(object, group, append);
+    store_ConfigV1_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "ControlData.ConfigV1", version);
@@ -408,6 +413,11 @@ void ConfigV2_v0::read_ds_pvLabels() const {
   std::copy(arr.begin(), arr.end(), tmp.begin());
   m_ds_pvLabels = tmp;
 }
+
+void store_ConfigV2_v0(const Psana::ControlData::ConfigV2& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::ControlData::ConfigV2> > make_ConfigV2(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -422,7 +432,7 @@ void store_ConfigV2(const Psana::ControlData::ConfigV2& obj, hdf5pp::Group group
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_ConfigV2_v0(object, group, append);
+    store_ConfigV2_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "ControlData.ConfigV2", version);

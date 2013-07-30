@@ -156,6 +156,10 @@ FramesV1_v0<Config>::read_frames() const
 template class FramesV1_v0<Psana::PNCCD::ConfigV1>;
 template class FramesV1_v0<Psana::PNCCD::ConfigV2>;
 
+void store_FramesV1_v0(const Psana::PNCCD::FramesV1& obj, hdf5pp::Group group, bool append)
+{
+    
+}
 
 
 /** Special values */
@@ -238,6 +242,10 @@ FullFrameV1_v0::read_frame() const
   }
 }
 
+void store_FullFrameV1_v0(const Psana::PNCCD::FullFrameV1& obj, hdf5pp::Group group, bool append)
+{
+    
+}
 
 } // namespace PNCCD
 } // namespace psddl_hdf2psana

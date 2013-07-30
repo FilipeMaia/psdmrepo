@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-02
+2013-07-29 Andy Salnikov
+- re-generate everyhting with psddl V00-08-08
+
 Tag: V00-02-01
 2013-07-03 Andy Salnikov
 - bug fix - forgot to implement default ctor in 

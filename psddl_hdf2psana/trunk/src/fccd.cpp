@@ -147,6 +147,11 @@ void FccdConfigV2_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<FCCD::ns_FccdConfigV2_v0::dataset_config>(m_group, "config", m_idx);
 }
 
+void store_FccdConfigV2_v0(const Psana::FCCD::FccdConfigV2& obj, hdf5pp::Group group, bool append)
+{
+    
+}
+
 
 } // namespace FCCD
 } // namespace psddl_hdf2psana

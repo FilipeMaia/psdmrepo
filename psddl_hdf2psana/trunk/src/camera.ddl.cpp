@@ -66,6 +66,11 @@ Proxy_FrameCoord_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& sourc
   return m_data;
 }
 
+
+void store_FrameCoord_v0(const Psana::Camera::FrameCoord& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Camera::FrameCoord> > make_FrameCoord(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -80,7 +85,7 @@ void store_FrameCoord(const Psana::Camera::FrameCoord& obj, hdf5pp::Group group,
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_FrameCoord_v0(object, group, append);
+    store_FrameCoord_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Camera.FrameCoord", version);
@@ -97,6 +102,11 @@ void append(const Psana::Camera::FrameCoord& obj, hdf5pp::Group group, int versi
   store_FrameCoord(obj, group, version, true);
 }
 
+
+void store_FrameFccdConfigV1_v0(const Psana::Camera::FrameFccdConfigV1& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Camera::FrameFccdConfigV1> > make_FrameFccdConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -111,7 +121,7 @@ void store_FrameFccdConfigV1(const Psana::Camera::FrameFccdConfigV1& obj, hdf5pp
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_FrameFccdConfigV1_v0(object, group, append);
+    store_FrameFccdConfigV1_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Camera.FrameFccdConfigV1", version);
@@ -248,6 +258,11 @@ void FrameFexConfigV1_v0::read_ds_masked_pixel_coordinates() const {
   std::copy(arr.begin(), arr.end(), tmp.begin());
   m_ds_masked_pixel_coordinates = tmp;
 }
+
+void store_FrameFexConfigV1_v0(const Psana::Camera::FrameFexConfigV1& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Camera::FrameFexConfigV1> > make_FrameFexConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -262,7 +277,7 @@ void store_FrameFexConfigV1(const Psana::Camera::FrameFexConfigV1& obj, hdf5pp::
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_FrameFexConfigV1_v0(object, group, append);
+    store_FrameFexConfigV1_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Camera.FrameFexConfigV1", version);
@@ -293,7 +308,7 @@ void store_FrameV1(const Psana::Camera::FrameV1& obj, hdf5pp::Group group, int v
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_FrameV1_v0(object, group, append);
+    store_FrameV1_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Camera.FrameV1", version);
@@ -393,6 +408,11 @@ double TwoDGaussianV1_v0::major_axis_tilt() const {
 void TwoDGaussianV1_v0::read_ds_data() const {
   m_ds_data = hdf5pp::Utils::readGroup<Camera::ns_TwoDGaussianV1_v0::dataset_data>(m_group, "data", m_idx);
 }
+
+void store_TwoDGaussianV1_v0(const Psana::Camera::TwoDGaussianV1& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Camera::TwoDGaussianV1> > make_TwoDGaussianV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -407,7 +427,7 @@ void store_TwoDGaussianV1(const Psana::Camera::TwoDGaussianV1& obj, hdf5pp::Grou
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_TwoDGaussianV1_v0(object, group, append);
+    store_TwoDGaussianV1_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Camera.TwoDGaussianV1", version);

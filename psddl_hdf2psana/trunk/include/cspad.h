@@ -96,6 +96,7 @@ private:
 
 
 
+void store_DataV1_v0(const Psana::CsPad::DataV1& obj, hdf5pp::Group group, bool append);
 
 
 
@@ -167,6 +168,8 @@ private:
   mutable ndarray<DataV2_v0_Element, 1> m_elements;
   void read_elements() const;
 };
+
+void store_DataV2_v0(const Psana::CsPad::DataV2& obj, hdf5pp::Group group, bool append);
 
 } // namespace CsPad
 } // namespace psddl_hdf2psana

@@ -101,6 +101,11 @@ Proxy_PulseConfig_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& sour
   return m_data;
 }
 
+
+void store_PulseConfig_v0(const Psana::EvrData::PulseConfig& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::PulseConfig> > make_PulseConfig(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -115,7 +120,7 @@ void store_PulseConfig(const Psana::EvrData::PulseConfig& obj, hdf5pp::Group gro
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_PulseConfig_v0(object, group, append);
+    store_PulseConfig_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "EvrData.PulseConfig", version);
@@ -195,6 +200,11 @@ Proxy_PulseConfigV3_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& so
   return m_data;
 }
 
+
+void store_PulseConfigV3_v0(const Psana::EvrData::PulseConfigV3& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::PulseConfigV3> > make_PulseConfigV3(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -209,7 +219,7 @@ void store_PulseConfigV3(const Psana::EvrData::PulseConfigV3& obj, hdf5pp::Group
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_PulseConfigV3_v0(object, group, append);
+    store_PulseConfigV3_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "EvrData.PulseConfigV3", version);
@@ -295,6 +305,11 @@ Proxy_EventCodeV3_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& sour
   return m_data;
 }
 
+
+void store_EventCodeV3_v0(const Psana::EvrData::EventCodeV3& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::EventCodeV3> > make_EventCodeV3(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -309,7 +324,7 @@ void store_EventCodeV3(const Psana::EvrData::EventCodeV3& obj, hdf5pp::Group gro
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_EventCodeV3_v0(object, group, append);
+    store_EventCodeV3_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "EvrData.EventCodeV3", version);
@@ -401,6 +416,11 @@ Proxy_EventCodeV4_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& sour
   return m_data;
 }
 
+
+void store_EventCodeV4_v0(const Psana::EvrData::EventCodeV4& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::EventCodeV4> > make_EventCodeV4(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -415,7 +435,7 @@ void store_EventCodeV4(const Psana::EvrData::EventCodeV4& obj, hdf5pp::Group gro
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_EventCodeV4_v0(object, group, append);
+    store_EventCodeV4_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "EvrData.EventCodeV4", version);
@@ -511,6 +531,11 @@ Proxy_EventCodeV5_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& sour
   return m_data;
 }
 
+
+void store_EventCodeV5_v0(const Psana::EvrData::EventCodeV5& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::EventCodeV5> > make_EventCodeV5(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -525,7 +550,7 @@ void store_EventCodeV5(const Psana::EvrData::EventCodeV5& obj, hdf5pp::Group gro
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_EventCodeV5_v0(object, group, append);
+    store_EventCodeV5_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "EvrData.EventCodeV5", version);
@@ -624,6 +649,11 @@ Proxy_EventCodeV6_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& sour
   return m_data;
 }
 
+
+void store_EventCodeV6_v0(const Psana::EvrData::EventCodeV6& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::EventCodeV6> > make_EventCodeV6(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -638,7 +668,7 @@ void store_EventCodeV6(const Psana::EvrData::EventCodeV6& obj, hdf5pp::Group gro
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_EventCodeV6_v0(object, group, append);
+    store_EventCodeV6_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "EvrData.EventCodeV6", version);
@@ -736,6 +766,11 @@ Proxy_OutputMap_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source
   return m_data;
 }
 
+
+void store_OutputMap_v0(const Psana::EvrData::OutputMap& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::OutputMap> > make_OutputMap(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -750,7 +785,7 @@ void store_OutputMap(const Psana::EvrData::OutputMap& obj, hdf5pp::Group group, 
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_OutputMap_v0(object, group, append);
+    store_OutputMap_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "EvrData.OutputMap", version);
@@ -851,6 +886,11 @@ Proxy_OutputMapV2_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& sour
   return m_data;
 }
 
+
+void store_OutputMapV2_v0(const Psana::EvrData::OutputMapV2& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::OutputMapV2> > make_OutputMapV2(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -865,7 +905,7 @@ void store_OutputMapV2(const Psana::EvrData::OutputMapV2& obj, hdf5pp::Group gro
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_OutputMapV2_v0(object, group, append);
+    store_OutputMapV2_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "EvrData.OutputMapV2", version);
@@ -957,6 +997,11 @@ void ConfigV1_v0::read_ds_output_maps() const {
   std::copy(arr.begin(), arr.end(), tmp.begin());
   m_ds_output_maps = tmp;
 }
+
+void store_ConfigV1_v0(const Psana::EvrData::ConfigV1& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -971,7 +1016,7 @@ void store_ConfigV1(const Psana::EvrData::ConfigV1& obj, hdf5pp::Group group, in
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_ConfigV1_v0(object, group, append);
+    store_ConfigV1_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "EvrData.ConfigV1", version);
@@ -1110,6 +1155,11 @@ void ConfigV2_v0::read_ds_output_maps() const {
   std::copy(arr.begin(), arr.end(), tmp.begin());
   m_ds_output_maps = tmp;
 }
+
+void store_ConfigV2_v0(const Psana::EvrData::ConfigV2& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::ConfigV2> > make_ConfigV2(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -1124,7 +1174,7 @@ void store_ConfigV2(const Psana::EvrData::ConfigV2& obj, hdf5pp::Group group, in
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_ConfigV2_v0(object, group, append);
+    store_ConfigV2_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "EvrData.ConfigV2", version);
@@ -1233,6 +1283,11 @@ void ConfigV3_v0::read_ds_output_maps() const {
   std::copy(arr.begin(), arr.end(), tmp.begin());
   m_ds_output_maps = tmp;
 }
+
+void store_ConfigV3_v0(const Psana::EvrData::ConfigV3& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::ConfigV3> > make_ConfigV3(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -1247,7 +1302,7 @@ void store_ConfigV3(const Psana::EvrData::ConfigV3& obj, hdf5pp::Group group, in
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_ConfigV3_v0(object, group, append);
+    store_ConfigV3_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "EvrData.ConfigV3", version);
@@ -1356,6 +1411,11 @@ void ConfigV4_v0::read_ds_output_maps() const {
   std::copy(arr.begin(), arr.end(), tmp.begin());
   m_ds_output_maps = tmp;
 }
+
+void store_ConfigV4_v0(const Psana::EvrData::ConfigV4& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::ConfigV4> > make_ConfigV4(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -1370,7 +1430,7 @@ void store_ConfigV4(const Psana::EvrData::ConfigV4& obj, hdf5pp::Group group, in
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_ConfigV4_v0(object, group, append);
+    store_ConfigV4_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "EvrData.ConfigV4", version);
@@ -1441,6 +1501,11 @@ Proxy_SequencerEntry_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& s
   return m_data;
 }
 
+
+void store_SequencerEntry_v0(const Psana::EvrData::SequencerEntry& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::SequencerEntry> > make_SequencerEntry(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -1455,7 +1520,7 @@ void store_SequencerEntry(const Psana::EvrData::SequencerEntry& obj, hdf5pp::Gro
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_SequencerEntry_v0(object, group, append);
+    store_SequencerEntry_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "EvrData.SequencerEntry", version);
@@ -1607,6 +1672,11 @@ void SequencerConfigV1_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<EvrData::ns_SequencerConfigV1_v0::dataset_config>(m_group, "config", m_idx);
 }
 
+void store_SequencerConfigV1_v0(const Psana::EvrData::SequencerConfigV1& obj, hdf5pp::Group group, bool append)
+{
+}
+
+
 hdf5pp::Type ns_ConfigV5_v0_dataset_config_stored_type()
 {
   typedef ns_ConfigV5_v0::dataset_config DsType;
@@ -1709,6 +1779,11 @@ void ConfigV5_v0::read_ds_seq_config() const {
   m_ds_seq_config = hdf5pp::Utils::readGroup<EvrData::ns_SequencerConfigV1_v0::dataset_config>(m_group, "seq_config", m_idx);
   m_ds_storage_seq_config = boost::make_shared<SequencerConfigV1_v0>(m_ds_seq_config);
 }
+
+void store_ConfigV5_v0(const Psana::EvrData::ConfigV5& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::ConfigV5> > make_ConfigV5(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -1723,7 +1798,7 @@ void store_ConfigV5(const Psana::EvrData::ConfigV5& obj, hdf5pp::Group group, in
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_ConfigV5_v0(object, group, append);
+    store_ConfigV5_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "EvrData.ConfigV5", version);
@@ -1843,6 +1918,11 @@ void ConfigV6_v0::read_ds_seq_config() const {
   m_ds_seq_config = hdf5pp::Utils::readGroup<EvrData::ns_SequencerConfigV1_v0::dataset_config>(m_group, "seq_config", m_idx);
   m_ds_storage_seq_config = boost::make_shared<SequencerConfigV1_v0>(m_ds_seq_config);
 }
+
+void store_ConfigV6_v0(const Psana::EvrData::ConfigV6& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::ConfigV6> > make_ConfigV6(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -1857,7 +1937,7 @@ void store_ConfigV6(const Psana::EvrData::ConfigV6& obj, hdf5pp::Group group, in
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_ConfigV6_v0(object, group, append);
+    store_ConfigV6_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "EvrData.ConfigV6", version);
@@ -1977,6 +2057,11 @@ void ConfigV7_v0::read_ds_seq_config() const {
   m_ds_seq_config = hdf5pp::Utils::readGroup<EvrData::ns_SequencerConfigV1_v0::dataset_config>(m_group, "seq_config", m_idx);
   m_ds_storage_seq_config = boost::make_shared<SequencerConfigV1_v0>(m_ds_seq_config);
 }
+
+void store_ConfigV7_v0(const Psana::EvrData::ConfigV7& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::ConfigV7> > make_ConfigV7(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -1991,7 +2076,7 @@ void store_ConfigV7(const Psana::EvrData::ConfigV7& obj, hdf5pp::Group group, in
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_ConfigV7_v0(object, group, append);
+    store_ConfigV7_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "EvrData.ConfigV7", version);
@@ -2065,6 +2150,11 @@ Proxy_FIFOEvent_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source
   return m_data;
 }
 
+
+void store_FIFOEvent_v0(const Psana::EvrData::FIFOEvent& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::FIFOEvent> > make_FIFOEvent(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -2079,7 +2169,7 @@ void store_FIFOEvent(const Psana::EvrData::FIFOEvent& obj, hdf5pp::Group group, 
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_FIFOEvent_v0(object, group, append);
+    store_FIFOEvent_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "EvrData.FIFOEvent", version);
@@ -2110,7 +2200,7 @@ void store_DataV3(const Psana::EvrData::DataV3& obj, hdf5pp::Group group, int ve
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_DataV3_v0(object, group, append);
+    store_DataV3_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "EvrData.DataV3", version);
@@ -2141,7 +2231,7 @@ void store_IOConfigV1(const Psana::EvrData::IOConfigV1& obj, hdf5pp::Group group
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_IOConfigV1_v0(object, group, append);
+    store_IOConfigV1_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "EvrData.IOConfigV1", version);

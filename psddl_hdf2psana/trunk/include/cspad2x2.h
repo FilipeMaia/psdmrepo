@@ -102,6 +102,8 @@ private:
   void read_ds_cm() const;
 };
 
+void store_ElementV1_v0(const Psana::CsPad2x2::ElementV1& obj, hdf5pp::Group group, bool append);
+
 } // namespace CsPad2x2
 } // namespace psddl_hdf2psana
 

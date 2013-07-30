@@ -142,6 +142,11 @@ void EpicsPvHeader_v0::read_ds_data() const {
   m_ds_data = hdf5pp::Utils::readGroup<Epics::ns_EpicsPvHeader_v0::dataset_data>(m_group, "data", m_idx);
 }
 
+void store_EpicsPvHeader_v0(const Psana::Epics::EpicsPvHeader& obj, hdf5pp::Group group, bool append)
+{
+}
+
+
 hdf5pp::Type ns_PvConfigV1_v0_dataset_data_stored_type()
 {
   typedef ns_PvConfigV1_v0::dataset_data DsType;
@@ -246,6 +251,11 @@ void ConfigV1_v0::read_ds_pvConfig() const {
   std::copy(arr.begin(), arr.end(), tmp.begin());
   m_ds_pvConfig = tmp;
 }
+
+void store_ConfigV1_v0(const Psana::Epics::ConfigV1& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Epics::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -260,7 +270,7 @@ void store_ConfigV1(const Psana::Epics::ConfigV1& obj, hdf5pp::Group group, int 
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_ConfigV1_v0(object, group, append);
+    store_ConfigV1_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Epics.ConfigV1", version);

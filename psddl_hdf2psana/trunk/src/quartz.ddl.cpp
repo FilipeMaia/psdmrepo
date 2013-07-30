@@ -178,6 +178,11 @@ void ConfigV1_v0::read_ds_defect_pixel_coordinates() const {
   std::copy(arr.begin(), arr.end(), tmp.begin());
   m_ds_defect_pixel_coordinates = tmp;
 }
+
+void store_ConfigV1_v0(const Psana::Quartz::ConfigV1& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Quartz::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -192,7 +197,7 @@ void store_ConfigV1(const Psana::Quartz::ConfigV1& obj, hdf5pp::Group group, int
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_ConfigV1_v0(object, group, append);
+    store_ConfigV1_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Quartz.ConfigV1", version);

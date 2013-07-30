@@ -72,6 +72,11 @@ Proxy_BldDataFEEGasDetEnergy_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds
   return m_data;
 }
 
+
+void store_BldDataFEEGasDetEnergy_v0(const Psana::Bld::BldDataFEEGasDetEnergy& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataFEEGasDetEnergy> > make_BldDataFEEGasDetEnergy(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -86,7 +91,7 @@ void store_BldDataFEEGasDetEnergy(const Psana::Bld::BldDataFEEGasDetEnergy& obj,
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_BldDataFEEGasDetEnergy_v0(object, group, append);
+    store_BldDataFEEGasDetEnergy_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataFEEGasDetEnergy", version);
@@ -172,6 +177,11 @@ Proxy_BldDataEBeamV0_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& s
   return m_data;
 }
 
+
+void store_BldDataEBeamV0_v0(const Psana::Bld::BldDataEBeamV0& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataEBeamV0> > make_BldDataEBeamV0(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -186,7 +196,7 @@ void store_BldDataEBeamV0(const Psana::Bld::BldDataEBeamV0& obj, hdf5pp::Group g
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_BldDataEBeamV0_v0(object, group, append);
+    store_BldDataEBeamV0_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataEBeamV0", version);
@@ -275,6 +285,11 @@ Proxy_BldDataEBeamV1_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& s
   return m_data;
 }
 
+
+void store_BldDataEBeamV1_v0(const Psana::Bld::BldDataEBeamV1& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataEBeamV1> > make_BldDataEBeamV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -289,7 +304,7 @@ void store_BldDataEBeamV1(const Psana::Bld::BldDataEBeamV1& obj, hdf5pp::Group g
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_BldDataEBeamV1_v0(object, group, append);
+    store_BldDataEBeamV1_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataEBeamV1", version);
@@ -381,6 +396,11 @@ Proxy_BldDataEBeamV2_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& s
   return m_data;
 }
 
+
+void store_BldDataEBeamV2_v0(const Psana::Bld::BldDataEBeamV2& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataEBeamV2> > make_BldDataEBeamV2(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -395,7 +415,7 @@ void store_BldDataEBeamV2(const Psana::Bld::BldDataEBeamV2& obj, hdf5pp::Group g
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_BldDataEBeamV2_v0(object, group, append);
+    store_BldDataEBeamV2_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataEBeamV2", version);
@@ -493,6 +513,11 @@ Proxy_BldDataEBeamV3_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& s
   return m_data;
 }
 
+
+void store_BldDataEBeamV3_v0(const Psana::Bld::BldDataEBeamV3& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataEBeamV3> > make_BldDataEBeamV3(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -507,7 +532,7 @@ void store_BldDataEBeamV3(const Psana::Bld::BldDataEBeamV3& obj, hdf5pp::Group g
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_BldDataEBeamV3_v0(object, group, append);
+    store_BldDataEBeamV3_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataEBeamV3", version);
@@ -584,6 +609,11 @@ Proxy_BldDataPhaseCavity_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Sr
   return m_data;
 }
 
+
+void store_BldDataPhaseCavity_v0(const Psana::Bld::BldDataPhaseCavity& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataPhaseCavity> > make_BldDataPhaseCavity(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -598,7 +628,7 @@ void store_BldDataPhaseCavity(const Psana::Bld::BldDataPhaseCavity& obj, hdf5pp:
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_BldDataPhaseCavity_v0(object, group, append);
+    store_BldDataPhaseCavity_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataPhaseCavity", version);
@@ -686,6 +716,11 @@ const Psana::Lusi::IpmFexV1& BldDataIpimbV0_v0::ipmFexData() const {
 void BldDataIpimbV0_v0::read_ds_data() const {
   m_ds_data = hdf5pp::Utils::readGroup<Bld::ns_BldDataIpimbV0_v0::dataset_data>(m_group, "data", m_idx);
 }
+
+void store_BldDataIpimbV0_v0(const Psana::Bld::BldDataIpimbV0& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataIpimbV0> > make_BldDataIpimbV0(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -700,7 +735,7 @@ void store_BldDataIpimbV0(const Psana::Bld::BldDataIpimbV0& obj, hdf5pp::Group g
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_BldDataIpimbV0_v0(object, group, append);
+    store_BldDataIpimbV0_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataIpimbV0", version);
@@ -788,6 +823,11 @@ const Psana::Lusi::IpmFexV1& BldDataIpimbV1_v0::ipmFexData() const {
 void BldDataIpimbV1_v0::read_ds_data() const {
   m_ds_data = hdf5pp::Utils::readGroup<Bld::ns_BldDataIpimbV1_v0::dataset_data>(m_group, "data", m_idx);
 }
+
+void store_BldDataIpimbV1_v0(const Psana::Bld::BldDataIpimbV1& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataIpimbV1> > make_BldDataIpimbV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -802,7 +842,7 @@ void store_BldDataIpimbV1(const Psana::Bld::BldDataIpimbV1& obj, hdf5pp::Group g
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_BldDataIpimbV1_v0(object, group, append);
+    store_BldDataIpimbV1_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataIpimbV1", version);
@@ -833,7 +873,7 @@ void store_BldDataPimV1(const Psana::Bld::BldDataPimV1& obj, hdf5pp::Group group
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_BldDataPimV1_v0(object, group, append);
+    store_BldDataPimV1_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataPimV1", version);
@@ -996,6 +1036,11 @@ double BldDataGMDV0_v0::transmissionFEE() const {
 void BldDataGMDV0_v0::read_ds_data() const {
   m_ds_data = hdf5pp::Utils::readGroup<Bld::ns_BldDataGMDV0_v0::dataset_data>(m_group, "data", m_idx);
 }
+
+void store_BldDataGMDV0_v0(const Psana::Bld::BldDataGMDV0& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataGMDV0> > make_BldDataGMDV0(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -1010,7 +1055,7 @@ void store_BldDataGMDV0(const Psana::Bld::BldDataGMDV0& obj, hdf5pp::Group group
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_BldDataGMDV0_v0(object, group, append);
+    store_BldDataGMDV0_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataGMDV0", version);
@@ -1103,6 +1148,11 @@ double BldDataGMDV1_v0::relativeEnergyPerPulse() const {
 void BldDataGMDV1_v0::read_ds_data() const {
   m_ds_data = hdf5pp::Utils::readGroup<Bld::ns_BldDataGMDV1_v0::dataset_data>(m_group, "data", m_idx);
 }
+
+void store_BldDataGMDV1_v0(const Psana::Bld::BldDataGMDV1& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataGMDV1> > make_BldDataGMDV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -1117,7 +1167,7 @@ void store_BldDataGMDV1(const Psana::Bld::BldDataGMDV1& obj, hdf5pp::Group group
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_BldDataGMDV1_v0(object, group, append);
+    store_BldDataGMDV1_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataGMDV1", version);

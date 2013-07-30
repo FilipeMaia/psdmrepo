@@ -197,6 +197,11 @@ uint32_t ConfigV1_v0::numPixels() const {
 void ConfigV1_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<Andor::ns_ConfigV1_v0::dataset_config>(m_group, "config", m_idx);
 }
+
+void store_ConfigV1_v0(const Psana::Andor::ConfigV1& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Andor::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -211,7 +216,7 @@ void store_ConfigV1(const Psana::Andor::ConfigV1& obj, hdf5pp::Group group, int 
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_ConfigV1_v0(object, group, append);
+    store_ConfigV1_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Andor.ConfigV1", version);
@@ -304,6 +309,11 @@ void FrameV1_v0<Config>::read_ds_data() const {
   m_ds_data = hdf5pp::Utils::readNdarray<uint16_t, 2>(m_group, "data", m_idx);
 }
 template class FrameV1_v0<Psana::Andor::ConfigV1>;
+
+void store_FrameV1_v0(const Psana::Andor::FrameV1& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Andor::FrameV1> > make_FrameV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::Andor::ConfigV1>& cfg) {
   switch (version) {
   case 0:
@@ -318,7 +328,7 @@ void store_FrameV1(const Psana::Andor::FrameV1& obj, hdf5pp::Group group, int ve
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_FrameV1_v0(object, group, append);
+    store_FrameV1_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Andor.FrameV1", version);

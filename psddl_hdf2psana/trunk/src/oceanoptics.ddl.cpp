@@ -96,6 +96,11 @@ double ConfigV1_v0::strayLightConstant() const {
 void ConfigV1_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<OceanOptics::ns_ConfigV1_v0::dataset_config>(m_group, "config", m_idx);
 }
+
+void store_ConfigV1_v0(const Psana::OceanOptics::ConfigV1& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::OceanOptics::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -110,7 +115,7 @@ void store_ConfigV1(const Psana::OceanOptics::ConfigV1& obj, hdf5pp::Group group
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_ConfigV1_v0(object, group, append);
+    store_ConfigV1_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "OceanOptics.ConfigV1", version);
@@ -311,6 +316,11 @@ void DataV1_v0<Config>::read_ds_data() const {
   m_ds_data = hdf5pp::Utils::readGroup<OceanOptics::ns_DataV1_v0::dataset_data>(m_group, "data", m_idx);
 }
 template class DataV1_v0<Psana::OceanOptics::ConfigV1>;
+
+void store_DataV1_v0(const Psana::OceanOptics::DataV1& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::OceanOptics::DataV1> > make_DataV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::OceanOptics::ConfigV1>& cfg) {
   switch (version) {
   case 0:
@@ -325,7 +335,7 @@ void store_DataV1(const Psana::OceanOptics::DataV1& obj, hdf5pp::Group group, in
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_DataV1_v0(object, group, append);
+    store_DataV1_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "OceanOptics.DataV1", version);

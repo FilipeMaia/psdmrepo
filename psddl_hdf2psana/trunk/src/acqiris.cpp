@@ -77,6 +77,12 @@ DataDescV1_v0<Config>::read_ds_data() const
   }
 }
 
+void store_DataDescV1_v0(const Psana::Acqiris::DataDescV1& obj, hdf5pp::Group group, bool append)
+{
+    
+}
+
+
 template class DataDescV1_v0<Psana::Acqiris::ConfigV1>;
 
 
@@ -155,6 +161,11 @@ DataDescV1_v1<Config>::read_ds_data() const
     ndarray<Psana::Acqiris::TimestampV1, 1> chts = ts[ich];
     m_ds_data[ich] = DataDescV1Elem_v1<Config>(chts, waveforms[ich], data[ich]);
   }
+}
+
+void store_DataDescV1_v1(const Psana::Acqiris::DataDescV1& obj, hdf5pp::Group group, bool append)
+{
+    
 }
 
 template class DataDescV1_v1<Psana::Acqiris::ConfigV1>;

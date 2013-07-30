@@ -103,6 +103,11 @@ ndarray<const uint32_t, 1> ConfigV1_v0::quadrature_mode() const {
 void ConfigV1_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<UsdUsb::ns_ConfigV1_v0::dataset_config>(m_group, "config", m_idx);
 }
+
+void store_ConfigV1_v0(const Psana::UsdUsb::ConfigV1& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::UsdUsb::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -117,7 +122,7 @@ void store_ConfigV1(const Psana::UsdUsb::ConfigV1& obj, hdf5pp::Group group, int
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_ConfigV1_v0(object, group, append);
+    store_ConfigV1_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "UsdUsb.ConfigV1", version);
@@ -234,6 +239,11 @@ ndarray<const int32_t, 1> DataV1_v1::encoder_count() const {
 void DataV1_v1::read_ds_data() const {
   m_ds_data = hdf5pp::Utils::readGroup<UsdUsb::ns_DataV1_v1::dataset_data>(m_group, "data", m_idx);
 }
+
+void store_DataV1_v1(const Psana::UsdUsb::DataV1& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::UsdUsb::DataV1> > make_DataV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -250,10 +260,10 @@ void store_DataV1(const Psana::UsdUsb::DataV1& obj, hdf5pp::Group group, int ver
   if (version < 0) version = 1;
   switch (version) {
   case 0:
-    //store_DataV1_v0(object, group, append);
+    store_DataV1_v0(obj, group, append);
     break;
   case 1:
-    //store_DataV1_v1(object, group, append);
+    store_DataV1_v1(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "UsdUsb.DataV1", version);

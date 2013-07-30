@@ -150,6 +150,11 @@ uint8_t TM6740ConfigV1_v0::output_resolution_bits() const {
 void TM6740ConfigV1_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<Pulnix::ns_TM6740ConfigV1_v0::dataset_config>(m_group, "config", m_idx);
 }
+
+void store_TM6740ConfigV1_v0(const Psana::Pulnix::TM6740ConfigV1& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Pulnix::TM6740ConfigV1> > make_TM6740ConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -164,7 +169,7 @@ void store_TM6740ConfigV1(const Psana::Pulnix::TM6740ConfigV1& obj, hdf5pp::Grou
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_TM6740ConfigV1_v0(object, group, append);
+    store_TM6740ConfigV1_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Pulnix.TM6740ConfigV1", version);
@@ -320,6 +325,11 @@ uint8_t TM6740ConfigV2_v0::output_resolution_bits() const {
 void TM6740ConfigV2_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<Pulnix::ns_TM6740ConfigV2_v0::dataset_config>(m_group, "config", m_idx);
 }
+
+void store_TM6740ConfigV2_v0(const Psana::Pulnix::TM6740ConfigV2& obj, hdf5pp::Group group, bool append)
+{
+}
+
 boost::shared_ptr<PSEvt::Proxy<Psana::Pulnix::TM6740ConfigV2> > make_TM6740ConfigV2(int version, hdf5pp::Group group, hsize_t idx) {
   switch (version) {
   case 0:
@@ -334,7 +344,7 @@ void store_TM6740ConfigV2(const Psana::Pulnix::TM6740ConfigV2& obj, hdf5pp::Grou
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    //store_TM6740ConfigV2_v0(object, group, append);
+    store_TM6740ConfigV2_v0(obj, group, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Pulnix.TM6740ConfigV2", version);

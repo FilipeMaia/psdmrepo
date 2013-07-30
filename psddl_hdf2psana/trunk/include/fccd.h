@@ -76,6 +76,7 @@ private:
   void read_ds_config() const;
 };
 
+void store_FccdConfigV2_v0(const Psana::FCCD::FccdConfigV2& obj, hdf5pp::Group group, bool append);
 
 } // namespace FCCD
 } // namespace psddl_hdf2psana

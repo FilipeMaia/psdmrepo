@@ -101,6 +101,9 @@ private:
 };
 
 
+void store_FramesV1_v0(const Psana::PNCCD::FramesV1& obj, hdf5pp::Group group, bool append);
+
+
 class FullFrameV1_v0 : public Psana::PNCCD::FullFrameV1 {
 public:
   typedef Psana::PNCCD::FramesV1 PsanaType;
@@ -136,6 +139,7 @@ private:
   void read_frame() const;
 };
 
+void store_FullFrameV1_v0(const Psana::PNCCD::FullFrameV1& obj, hdf5pp::Group group, bool append);
 
 } // namespace PNCCD
 } // namespace psddl_hdf2psana

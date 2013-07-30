@@ -68,6 +68,8 @@ private:
 };
 
 
+void store_DataV3_v0(const Psana::EvrData::DataV3& obj, hdf5pp::Group group, bool append);
+
 
 namespace ns_IOChannel_v0 {
 struct dataset_data {
@@ -142,6 +144,8 @@ private:
   mutable ndarray<const Psana::EvrData::IOChannel, 1> m_ds_channels;
   void read_ds_channels() const;
 };
+
+void store_IOConfigV1_v0(const Psana::EvrData::IOConfigV1& obj, hdf5pp::Group group, bool append);
 
 } // namespace EvrData
 } // namespace psddl_hdf2psana
