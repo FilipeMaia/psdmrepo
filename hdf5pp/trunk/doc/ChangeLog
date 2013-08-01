@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-04
+2013-08-01 Andy Salnikov
+- Utils.c: add storeNDArray(), appendNDArray(), and createDataset() methods;
+  fixed storeScalar() and append() methods
+
 Tag: V00-05-03
 2013-07-02 Andy Salnikov
 - Utils class: add methods to store data

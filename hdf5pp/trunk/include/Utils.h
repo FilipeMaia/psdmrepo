@@ -13,6 +13,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <vector>
 #include <boost/shared_ptr.hpp>
 #include <boost/make_shared.hpp>
 
@@ -248,7 +249,7 @@ public:
       const Type& native_type = TypeTraits<Data>::native_type(),
       const Type& stored_type = TypeTraits<Data>::stored_type())
   {
-    _storeScalar(group, dataset, static_cast<const void*>(data), native_type, stored_type);
+    _storeScalar(group, dataset, static_cast<const void*>(&data), native_type, stored_type);
   }
 
   /**
@@ -270,8 +271,71 @@ public:
       const Type& native_type = TypeTraits<Data>::native_type(),
       const Type& stored_type = TypeTraits<Data>::stored_type())
   {
-    _append(group, dataset, static_cast<const void*>(data), native_type, stored_type);
+    _append(group, dataset, static_cast<const void*>(&data), native_type, stored_type);
   }
+
+  /**
+   *  @brief Store ndarray in a dataset in a group.
+   *
+   *  Creates new aray dataset with a given name and stores data in it. Dataset must not exist
+   *  yet, otherwise an exception will be thrown.
+   *
+   *  @param[in] group   Group object, parent of the dataset.
+   *  @param[in] dataset Dataset name
+   *  @param[in] data    Object to store
+   *  @param[in] native_type    In-memory type of the data
+   *  @param[in] stored_type    Type of the data as stored in file
+   *
+   *  @throw hdf5pp::Exception
+   */
+  template <typename ElemType, unsigned NDim>
+  static void storeNDArray(hdf5pp::Group group, const std::string& dataset, const ndarray<ElemType, NDim>& array,
+      const Type& native_type = TypeTraits<ElemType>::native_type(),
+      const Type& stored_type = TypeTraits<ElemType>::stored_type())
+  {
+    _storeArray(group, dataset, static_cast<const void*>(array.data()), NDim, array.shape(), native_type, stored_type);
+  }
+
+  /**
+   *  @brief Store ndarray in a dataset in a group.
+   *
+   *  Appends data object to a dataset which has to be rank-1 dataset. If dataset
+   *  does not exist yet it will be created first.
+   *
+   *  @param[in] group   Group object, parent of the dataset.
+   *  @param[in] dataset Dataset name
+   *  @param[in] data    Object to store
+   *  @param[in] native_type    In-memory type of the data
+   *  @param[in] stored_type    Type of the data as stored in dataset
+   *
+   *  @throw hdf5pp::Exception
+   */
+  template <typename ElemType, unsigned NDim>
+  static void appendNDArray(hdf5pp::Group group, const std::string& dataset, const ndarray<ElemType, NDim>& array,
+      const Type& native_type = TypeTraits<ElemType>::native_type(),
+      const Type& stored_type = TypeTraits<ElemType>::stored_type())
+  {
+    std::vector<hsize_t> dims(array.shape(), array.shape()+NDim);
+    ArrayType array_native = ArrayType::arrayType(native_type, NDim, &dims.front());
+    ArrayType array_stored = ArrayType::arrayType(stored_type, NDim, &dims.front());
+    _append(group, dataset, static_cast<const void*>(array.data()), array_native, array_stored);
+  }
+
+  /**
+   *  @brief Create a chunked rank=1 dataset.
+   *
+   *  @param[in] group         Group object, parent of the dataset.
+   *  @param[in] dataset       Dataset name
+   *  @param[in] stored_type   Type of the data as stored in dataset
+   *  @param[in] chunk_size    Size of single chunk in objects of type stored_type.
+   *  @param[in] chunk_cache_size  Size of chunk cache in number of chunks
+   *  @param[in] deflate       Compression level, negative disables compression
+   *  @param[in] shuffle       If set to true then shuffle filter is enabled.
+   *  @return    Dataset instance
+   *  @throw hdf5pp::Exception
+   */
+  static DataSet createDataset(hdf5pp::Group group, const std::string& dataset, const Type& stored_type,
+      hsize_t chunk_size, hsize_t chunk_cache_size, int deflate, bool shuffle);
 
 
 private:
@@ -283,6 +347,10 @@ private:
   /// template-free implementation of storeScalar()
   static void _storeScalar(hdf5pp::Group group, const std::string& dataset, const void* data,
       const Type& native_type, const Type& stored_type);
+
+  /// template-free implementation of storeArray()
+  static void _storeArray(hdf5pp::Group group, const std::string& dataset, const void* data,
+      unsigned rank, const unsigned* shape, const Type& native_type, const Type& stored_type);
 
 };
 
