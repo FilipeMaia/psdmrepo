@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-09
+2013-08-01 Andy Salnikov
+- finish implementation of HDF5 writing piece
+
 Tag: V00-08-08
 2013-07-29 Andy Salnikov
 - add empty implementation of store_Type_vN() methods

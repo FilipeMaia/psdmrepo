@@ -147,6 +147,8 @@ class DdlHdf5Data ( object ) :
         print >>self.cpp, "#include \"PSEvt/DataProxy.h\""
         inc = os.path.join(self.incdirname, "Exceptions.h")
         print >>self.cpp, "#include \"%s\"" % inc
+        inc = os.path.join(self.incdirname, "HdfParameters.h")
+        print >>self.cpp, "#include \"%s\"" % inc
 
 
         # headers for other included packages

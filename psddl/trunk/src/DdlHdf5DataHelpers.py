@@ -250,6 +250,14 @@ class DatasetCompound(object):
         dsName = self.ds.name
         return [_TEMPL('read_compound_ds_method').render(locals())]
 
+    def make_ds_impl(self):
+        '''Returns piece of code implementing dataset creation code'''
+        return _TEMPL('make_compound_ds').render(ds=self.ds)
+        
+    def ds_write_impl(self):
+        '''Returns piece of code implementing writing of the data to a dataset'''
+        return _TEMPL('write_compound_ds').render(ds=self.ds)
+
     def ds_decltype(self):
         '''Return declaration type of the dataset variable'''
         dsClassName = self.ds.classNameNs()
@@ -476,6 +484,36 @@ class DatasetRegular(object):
             else:
                 return [_TEMPL('read_regular_ds_abstract_method').render(locals())]
 
+    def make_ds_impl(self):
+        '''Returns piece of code implementing dataset creation code'''
+        ds = self.ds
+        rank = ds.rank
+
+        if rank > 0:
+            if ds.type.basic:
+                return _TEMPL('make_array_ds_basic').render(locals())
+            else:
+                ds_struct = self._attr_dsname()
+                return _TEMPL('make_array_ds_udt').render(locals())
+        else:
+            ds_struct = self._attr_dsname()
+            return _TEMPL('make_regular_ds').render(locals())
+        
+    def ds_write_impl(self):
+        '''Returns piece of code implementing writing of the data to a dataset'''
+        ds = self.ds
+        rank = ds.rank
+
+        if rank > 0:
+            if ds.type.basic:
+                return _TEMPL('write_array_ds_basic').render(locals())
+            else:
+                ds_struct = self._attr_dsname()
+                return _TEMPL('write_array_ds_udt').render(locals())
+        else:
+            ds_struct = self._attr_dsname()
+            return _TEMPL('write_regular_ds').render(locals())
+
     def genDs(self, inc, cpp):
 
         pass
@@ -542,6 +580,7 @@ class SchemaValueType(SchemaType):
         print >>inc, _TEMPL('proxy_valtype_declaration').render(locals())
         print >>cpp, _TEMPL('proxy_valtype_impl_getTypedImpl').render(locals())
 
+
         print >>cpp, _TEMPL('schema_store_impl').render(locals())
         
 class SchemaAbstractType(SchemaType):
@@ -596,7 +635,7 @@ class SchemaAbstractType(SchemaType):
             print >>cpp, line
 
         print >>cpp, _TEMPL('schema_store_impl').render(locals())
-            
+        
 
     def _genAttrShapeDecl(self, attr):
 
