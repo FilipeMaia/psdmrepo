@@ -9,6 +9,7 @@
 #include "hdf5pp/Utils.h"
 #include "PSEvt/DataProxy.h"
 #include "psddl_hdf2psana/Exceptions.h"
+#include "psddl_hdf2psana/HdfParameters.h"
 namespace psddl_hdf2psana {
 namespace Opal1k {
 
@@ -175,8 +176,60 @@ void ConfigV1_v0::read_ds_defect_pixel_coordinates() const {
   m_ds_defect_pixel_coordinates = tmp;
 }
 
+void make_datasets_ConfigV1_v0(const Psana::Opal1k::ConfigV1& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = Opal1k::ns_ConfigV1_v0::dataset_config::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "config", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+  {
+    typedef __typeof__(obj.output_lookup_table()) PsanaArray;
+    const PsanaArray& psana_array = obj.output_lookup_table();
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint16_t>::stored_type(), psana_array.shape()[0]);
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "output_lookup_table", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+  {
+    typedef __typeof__(obj.defect_pixel_coordinates()) PsanaArray;
+    const PsanaArray& psana_array = obj.defect_pixel_coordinates();
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<Camera::ns_FrameCoord_v0::dataset_data>::stored_type(), psana_array.shape()[0]);
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "defect_pixel_coordinates", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_ConfigV1_v0(const Psana::Opal1k::ConfigV1& obj, hdf5pp::Group group, bool append)
 {
+  {
+    Opal1k::ns_ConfigV1_v0::dataset_config ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "config", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "config", ds_data);
+    }
+  }
+  if (append) {
+    hdf5pp::Utils::appendNDArray(group, "output_lookup_table", obj.output_lookup_table());
+  } else {
+    hdf5pp::Utils::storeNDArray(group, "output_lookup_table", obj.output_lookup_table());
+  }
+  {
+    typedef __typeof__(obj.defect_pixel_coordinates()) PsanaArray;
+    typedef ndarray<Camera::ns_FrameCoord_v0::dataset_data, 1> HdfArray;
+    PsanaArray psana_array = obj.defect_pixel_coordinates();
+    HdfArray hdf_array(psana_array.shape());
+    HdfArray::iterator out = hdf_array.begin();
+    for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
+      *out = Camera::ns_FrameCoord_v0::dataset_data(*it);
+    }
+    if (append) {
+      hdf5pp::Utils::appendNDArray(group, "defect_pixel_coordinates", hdf_array);
+    } else {
+      hdf5pp::Utils::storeNDArray(group, "defect_pixel_coordinates", hdf_array);
+    }
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Opal1k::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
@@ -185,6 +238,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Opal1k::ConfigV1> > make_ConfigV1(int vers
     return boost::make_shared<PSEvt::DataProxy<Psana::Opal1k::ConfigV1> >(boost::make_shared<ConfigV1_v0>(group, idx));
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::Opal1k::ConfigV1> >(boost::shared_ptr<Psana::Opal1k::ConfigV1>());
+  }
+}
+
+void make_datasets(const Psana::Opal1k::ConfigV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_ConfigV1_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Opal1k.ConfigV1", version);
   }
 }
 

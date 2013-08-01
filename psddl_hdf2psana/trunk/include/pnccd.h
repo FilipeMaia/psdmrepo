@@ -31,8 +31,12 @@ namespace PNCCD {
 
 namespace ns_FrameV1_v0 {
 struct dataset_data {
+
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
+
+  dataset_data() {}
+  dataset_data(const Psana::PNCCD::FrameV1& psanaobj);
 
   uint32_t specialWord; 
   uint32_t frameNumber; 
@@ -101,6 +105,8 @@ private:
 };
 
 
+void make_datasets_FramesV1_v0(const Psana::PNCCD::FramesV1& obj,
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle);
 void store_FramesV1_v0(const Psana::PNCCD::FramesV1& obj, hdf5pp::Group group, bool append);
 
 
@@ -139,6 +145,8 @@ private:
   void read_frame() const;
 };
 
+void make_datasets_FullFrameV1_v0(const Psana::PNCCD::FullFrameV1& obj,
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle);
 void store_FullFrameV1_v0(const Psana::PNCCD::FullFrameV1& obj, hdf5pp::Group group, bool append);
 
 } // namespace PNCCD

@@ -52,7 +52,12 @@ private:
 };
 boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataFEEGasDetEnergy> > make_BldDataFEEGasDetEnergy(int version, hdf5pp::Group group, hsize_t idx);
 
+/// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::Bld::BldDataFEEGasDetEnergy& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::Bld::BldDataFEEGasDetEnergy& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method
 void append(const Psana::Bld::BldDataFEEGasDetEnergy& obj, hdf5pp::Group group, int version = -1);
 
 
@@ -96,7 +101,12 @@ private:
 };
 boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataEBeamV0> > make_BldDataEBeamV0(int version, hdf5pp::Group group, hsize_t idx);
 
+/// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::Bld::BldDataEBeamV0& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::Bld::BldDataEBeamV0& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method
 void append(const Psana::Bld::BldDataEBeamV0& obj, hdf5pp::Group group, int version = -1);
 
 
@@ -141,7 +151,12 @@ private:
 };
 boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataEBeamV1> > make_BldDataEBeamV1(int version, hdf5pp::Group group, hsize_t idx);
 
+/// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::Bld::BldDataEBeamV1& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::Bld::BldDataEBeamV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method
 void append(const Psana::Bld::BldDataEBeamV1& obj, hdf5pp::Group group, int version = -1);
 
 
@@ -187,7 +202,12 @@ private:
 };
 boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataEBeamV2> > make_BldDataEBeamV2(int version, hdf5pp::Group group, hsize_t idx);
 
+/// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::Bld::BldDataEBeamV2& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::Bld::BldDataEBeamV2& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method
 void append(const Psana::Bld::BldDataEBeamV2& obj, hdf5pp::Group group, int version = -1);
 
 
@@ -235,7 +255,12 @@ private:
 };
 boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataEBeamV3> > make_BldDataEBeamV3(int version, hdf5pp::Group group, hsize_t idx);
 
+/// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::Bld::BldDataEBeamV3& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::Bld::BldDataEBeamV3& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method
 void append(const Psana::Bld::BldDataEBeamV3& obj, hdf5pp::Group group, int version = -1);
 
 
@@ -276,7 +301,12 @@ private:
 };
 boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataPhaseCavity> > make_BldDataPhaseCavity(int version, hdf5pp::Group group, hsize_t idx);
 
+/// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::Bld::BldDataPhaseCavity& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::Bld::BldDataPhaseCavity& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method
 void append(const Psana::Bld::BldDataPhaseCavity& obj, hdf5pp::Group group, int version = -1);
 
 
@@ -321,7 +351,12 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataIpimbV0> > make_BldDataIpimbV0(int version, hdf5pp::Group group, hsize_t idx);
 
+/// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::Bld::BldDataIpimbV0& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::Bld::BldDataIpimbV0& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method
 void append(const Psana::Bld::BldDataIpimbV0& obj, hdf5pp::Group group, int version = -1);
 
 
@@ -366,12 +401,22 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataIpimbV1> > make_BldDataIpimbV1(int version, hdf5pp::Group group, hsize_t idx);
 
+/// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::Bld::BldDataIpimbV1& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::Bld::BldDataIpimbV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method
 void append(const Psana::Bld::BldDataIpimbV1& obj, hdf5pp::Group group, int version = -1);
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataPimV1> > make_BldDataPimV1(int version, hdf5pp::Group group, hsize_t idx);
 
+/// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::Bld::BldDataPimV1& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::Bld::BldDataPimV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method
 void append(const Psana::Bld::BldDataPimV1& obj, hdf5pp::Group group, int version = -1);
 
 
@@ -437,7 +482,12 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataGMDV0> > make_BldDataGMDV0(int version, hdf5pp::Group group, hsize_t idx);
 
+/// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::Bld::BldDataGMDV0& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::Bld::BldDataGMDV0& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method
 void append(const Psana::Bld::BldDataGMDV0& obj, hdf5pp::Group group, int version = -1);
 
 
@@ -483,7 +533,12 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataGMDV1> > make_BldDataGMDV1(int version, hdf5pp::Group group, hsize_t idx);
 
+/// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::Bld::BldDataGMDV1& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::Bld::BldDataGMDV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method
 void append(const Psana::Bld::BldDataGMDV1& obj, hdf5pp::Group group, int version = -1);
 
 } // namespace Bld

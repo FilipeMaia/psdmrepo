@@ -35,6 +35,7 @@ struct dataset_data {
   static hdf5pp::Type stored_type();
 
   dataset_data();
+  dataset_data(const Psana::Camera::FrameV1& psanaobj);
   ~dataset_data();
 
   uint32_t width;
@@ -84,6 +85,8 @@ private:
   void read_ds_image() const;
 };
 
+void make_datasets_FrameV1_v0(const Psana::Camera::FrameV1& obj,
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle);
 void store_FrameV1_v0(const Psana::Camera::FrameV1& obj, hdf5pp::Group group, bool append);
 
 } // namespace Camera

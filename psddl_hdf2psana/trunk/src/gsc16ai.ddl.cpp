@@ -9,6 +9,7 @@
 #include "hdf5pp/Utils.h"
 #include "PSEvt/DataProxy.h"
 #include "psddl_hdf2psana/Exceptions.h"
+#include "psddl_hdf2psana/HdfParameters.h"
 namespace psddl_hdf2psana {
 namespace Gsc16ai {
 
@@ -147,8 +148,26 @@ void ConfigV1_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<Gsc16ai::ns_ConfigV1_v0::dataset_config>(m_group, "config", m_idx);
 }
 
+void make_datasets_ConfigV1_v0(const Psana::Gsc16ai::ConfigV1& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = Gsc16ai::ns_ConfigV1_v0::dataset_config::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "config", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_ConfigV1_v0(const Psana::Gsc16ai::ConfigV1& obj, hdf5pp::Group group, bool append)
 {
+  {
+    Gsc16ai::ns_ConfigV1_v0::dataset_config ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "config", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "config", ds_data);
+    }
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Gsc16ai::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
@@ -157,6 +176,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Gsc16ai::ConfigV1> > make_ConfigV1(int ver
     return boost::make_shared<PSEvt::DataProxy<Psana::Gsc16ai::ConfigV1> >(boost::make_shared<ConfigV1_v0>(group, idx));
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::Gsc16ai::ConfigV1> >(boost::shared_ptr<Psana::Gsc16ai::ConfigV1>());
+  }
+}
+
+void make_datasets(const Psana::Gsc16ai::ConfigV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_ConfigV1_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Gsc16ai.ConfigV1", version);
   }
 }
 
@@ -202,8 +234,37 @@ void DataV1_v0<Config>::read_ds_timestamps() const {
 }
 template class DataV1_v0<Psana::Gsc16ai::ConfigV1>;
 
+void make_datasets_DataV1_v0(const Psana::Gsc16ai::DataV1& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    typedef __typeof__(obj.channelValue()) PsanaArray;
+    const PsanaArray& psana_array = obj.channelValue();
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint16_t>::stored_type(), psana_array.shape()[0]);
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "channelValue", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+  {
+    typedef __typeof__(obj.timestamp()) PsanaArray;
+    const PsanaArray& psana_array = obj.timestamp();
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint16_t>::stored_type(), psana_array.shape()[0]);
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "timestamps", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_DataV1_v0(const Psana::Gsc16ai::DataV1& obj, hdf5pp::Group group, bool append)
 {
+  if (append) {
+    hdf5pp::Utils::appendNDArray(group, "channelValue", obj.channelValue());
+  } else {
+    hdf5pp::Utils::storeNDArray(group, "channelValue", obj.channelValue());
+  }
+  if (append) {
+    hdf5pp::Utils::appendNDArray(group, "timestamps", obj.timestamp());
+  } else {
+    hdf5pp::Utils::storeNDArray(group, "timestamps", obj.timestamp());
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Gsc16ai::DataV1> > make_DataV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::Gsc16ai::ConfigV1>& cfg) {
@@ -212,6 +273,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Gsc16ai::DataV1> > make_DataV1(int version
     return boost::make_shared<PSEvt::DataProxy<Psana::Gsc16ai::DataV1> >(boost::make_shared<DataV1_v0<Psana::Gsc16ai::ConfigV1> >(group, idx, cfg));
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::Gsc16ai::DataV1> >(boost::shared_ptr<Psana::Gsc16ai::DataV1>());
+  }
+}
+
+void make_datasets(const Psana::Gsc16ai::DataV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_DataV1_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Gsc16ai.DataV1", version);
   }
 }
 

@@ -66,7 +66,12 @@ private:
 };
 boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::HorizV1> > make_HorizV1(int version, hdf5pp::Group group, hsize_t idx);
 
+/// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::Acqiris::HorizV1& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::Acqiris::HorizV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method
 void append(const Psana::Acqiris::HorizV1& obj, hdf5pp::Group group, int version = -1);
 
 
@@ -107,7 +112,12 @@ private:
 };
 boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::TrigV1> > make_TrigV1(int version, hdf5pp::Group group, hsize_t idx);
 
+/// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::Acqiris::TrigV1& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::Acqiris::TrigV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method
 void append(const Psana::Acqiris::TrigV1& obj, hdf5pp::Group group, int version = -1);
 
 
@@ -161,7 +171,12 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx);
 
+/// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::Acqiris::ConfigV1& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::Acqiris::ConfigV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method
 void append(const Psana::Acqiris::ConfigV1& obj, hdf5pp::Group group, int version = -1);
 
 
@@ -182,7 +197,12 @@ struct dataset_data {
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::DataDescV1> > make_DataDescV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::Acqiris::ConfigV1>& cfg);
 
+/// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::Acqiris::DataDescV1& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::Acqiris::DataDescV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method
 void append(const Psana::Acqiris::DataDescV1& obj, hdf5pp::Group group, int version = -1);
 
 
@@ -224,7 +244,12 @@ private:
 };
 boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::TdcChannel> > make_TdcChannel(int version, hdf5pp::Group group, hsize_t idx);
 
+/// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::Acqiris::TdcChannel& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::Acqiris::TdcChannel& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method
 void append(const Psana::Acqiris::TdcChannel& obj, hdf5pp::Group group, int version = -1);
 
 
@@ -264,7 +289,12 @@ private:
 };
 boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::TdcAuxIO> > make_TdcAuxIO(int version, hdf5pp::Group group, hsize_t idx);
 
+/// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::Acqiris::TdcAuxIO& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::Acqiris::TdcAuxIO& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method
 void append(const Psana::Acqiris::TdcAuxIO& obj, hdf5pp::Group group, int version = -1);
 
 
@@ -304,7 +334,12 @@ private:
 };
 boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::TdcVetoIO> > make_TdcVetoIO(int version, hdf5pp::Group group, hsize_t idx);
 
+/// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::Acqiris::TdcVetoIO& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::Acqiris::TdcVetoIO& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method
 void append(const Psana::Acqiris::TdcVetoIO& obj, hdf5pp::Group group, int version = -1);
 
 
@@ -333,7 +368,12 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::TdcConfigV1> > make_TdcConfigV1(int version, hdf5pp::Group group, hsize_t idx);
 
+/// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::Acqiris::TdcConfigV1& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::Acqiris::TdcConfigV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method
 void append(const Psana::Acqiris::TdcConfigV1& obj, hdf5pp::Group group, int version = -1);
 
 
@@ -373,7 +413,12 @@ private:
 };
 boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::TdcDataV1_Item> > make_TdcDataV1_Item(int version, hdf5pp::Group group, hsize_t idx);
 
+/// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::Acqiris::TdcDataV1_Item& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::Acqiris::TdcDataV1_Item& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method
 void append(const Psana::Acqiris::TdcDataV1_Item& obj, hdf5pp::Group group, int version = -1);
 
 
@@ -396,7 +441,12 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::TdcDataV1> > make_TdcDataV1(int version, hdf5pp::Group group, hsize_t idx);
 
+/// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::Acqiris::TdcDataV1& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::Acqiris::TdcDataV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method
 void append(const Psana::Acqiris::TdcDataV1& obj, hdf5pp::Group group, int version = -1);
 
 } // namespace Acqiris

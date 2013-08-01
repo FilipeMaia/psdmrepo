@@ -74,7 +74,12 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx);
 
+/// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::Princeton::ConfigV1& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::Princeton::ConfigV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method
 void append(const Psana::Princeton::ConfigV1& obj, hdf5pp::Group group, int version = -1);
 
 
@@ -144,7 +149,12 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::ConfigV2> > make_ConfigV2(int version, hdf5pp::Group group, hsize_t idx);
 
+/// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::Princeton::ConfigV2& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::Princeton::ConfigV2& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method
 void append(const Psana::Princeton::ConfigV2& obj, hdf5pp::Group group, int version = -1);
 
 
@@ -214,7 +224,12 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::ConfigV3> > make_ConfigV3(int version, hdf5pp::Group group, hsize_t idx);
 
+/// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::Princeton::ConfigV3& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::Princeton::ConfigV3& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method
 void append(const Psana::Princeton::ConfigV3& obj, hdf5pp::Group group, int version = -1);
 
 
@@ -290,7 +305,12 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::ConfigV4> > make_ConfigV4(int version, hdf5pp::Group group, hsize_t idx);
 
+/// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::Princeton::ConfigV4& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::Princeton::ConfigV4& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method
 void append(const Psana::Princeton::ConfigV4& obj, hdf5pp::Group group, int version = -1);
 
 
@@ -368,7 +388,12 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::ConfigV5> > make_ConfigV5(int version, hdf5pp::Group group, hsize_t idx);
 
+/// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::Princeton::ConfigV5& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::Princeton::ConfigV5& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method
 void append(const Psana::Princeton::ConfigV5& obj, hdf5pp::Group group, int version = -1);
 
 
@@ -416,7 +441,12 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::FrameV1> > make_FrameV1(int ver
 boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::FrameV1> > make_FrameV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::Princeton::ConfigV4>& cfg);
 boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::FrameV1> > make_FrameV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::Princeton::ConfigV5>& cfg);
 
+/// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::Princeton::FrameV1& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::Princeton::FrameV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method
 void append(const Psana::Princeton::FrameV1& obj, hdf5pp::Group group, int version = -1);
 
 
@@ -466,7 +496,12 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::FrameV2> > make_FrameV2(int ver
 boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::FrameV2> > make_FrameV2(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::Princeton::ConfigV4>& cfg);
 boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::FrameV2> > make_FrameV2(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::Princeton::ConfigV5>& cfg);
 
+/// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::Princeton::FrameV2& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::Princeton::FrameV2& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method
 void append(const Psana::Princeton::FrameV2& obj, hdf5pp::Group group, int version = -1);
 
 
@@ -504,7 +539,12 @@ private:
 };
 boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::InfoV1> > make_InfoV1(int version, hdf5pp::Group group, hsize_t idx);
 
+/// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::Princeton::InfoV1& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::Princeton::InfoV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method
 void append(const Psana::Princeton::InfoV1& obj, hdf5pp::Group group, int version = -1);
 
 } // namespace Princeton

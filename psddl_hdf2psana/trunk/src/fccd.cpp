@@ -25,10 +25,22 @@
 #include "hdf5pp/EnumType.h"
 #include "hdf5pp/VlenType.h"
 #include "hdf5pp/Utils.h"
+#include "psddl_hdf2psana/HdfParameters.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
 //-----------------------------------------------------------------------
+
+namespace {
+
+  template <typename T, typename U>
+  void ndarray2array(const ndarray<T, 1>& src, U* dst, size_t size) {
+    size_t i;
+    for (i = 0; i < src.shape()[0]; ++ i) dst[i] = src[i];
+    for (; i < size; ++ i) dst[i] = U(0);
+  }
+
+}
 
 //              ----------------------------------------
 //              -- Public Function Member Definitions --
@@ -98,9 +110,25 @@ hdf5pp::Type ns_FccdConfigV2_v0::dataset_config::native_type()
 ns_FccdConfigV2_v0::dataset_config::dataset_config()
 {
 }
+
+ns_FccdConfigV2_v0::dataset_config::dataset_config(const Psana::FCCD::FccdConfigV2& psanaobj)
+  : outputMode(psanaobj.outputMode())
+  , ccdEnable(psanaobj.ccdEnable())
+  , focusMode(psanaobj.focusMode())
+  , exposureTime(psanaobj.exposureTime())
+  , width(psanaobj.width())
+  , height(psanaobj.height())
+  , trimmedWidth(psanaobj.trimmedWidth())
+  , trimmedHeight(psanaobj.trimmedHeight())
+{
+  ndarray2array(psanaobj.dacVoltages(), dacVoltage, Psana::FCCD::FccdConfigV2::NVoltages);
+  ndarray2array(psanaobj.waveforms(), waveform, Psana::FCCD::FccdConfigV2::NWaveforms);
+}
+
 ns_FccdConfigV2_v0::dataset_config::~dataset_config()
 {
 }
+
 uint16_t FccdConfigV2_v0::outputMode() const {
   if (not m_ds_config) read_ds_config();
   return uint16_t(m_ds_config->outputMode);
@@ -147,9 +175,23 @@ void FccdConfigV2_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<FCCD::ns_FccdConfigV2_v0::dataset_config>(m_group, "config", m_idx);
 }
 
+void make_datasets_FccdConfigV2_v0(const Psana::FCCD::FccdConfigV2& obj,
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = ns_FccdConfigV2_v0::dataset_config::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "config", dstype, chunk_size, chunk_cache_size, deflate, shuffle);
+  }
+}
+
 void store_FccdConfigV2_v0(const Psana::FCCD::FccdConfigV2& obj, hdf5pp::Group group, bool append)
 {
-    
+  if (append) {
+    hdf5pp::Utils::append(group, "config", ns_FccdConfigV2_v0::dataset_config(obj));
+  } else {
+    hdf5pp::Utils::storeScalar(group, "config", ns_FccdConfigV2_v0::dataset_config(obj));
+  }
 }
 
 

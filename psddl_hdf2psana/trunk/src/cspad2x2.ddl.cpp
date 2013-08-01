@@ -9,6 +9,7 @@
 #include "hdf5pp/Utils.h"
 #include "PSEvt/DataProxy.h"
 #include "psddl_hdf2psana/Exceptions.h"
+#include "psddl_hdf2psana/HdfParameters.h"
 #include "psddl_hdf2psana/cspad2x2.h"
 namespace psddl_hdf2psana {
 namespace CsPad2x2 {
@@ -69,8 +70,26 @@ void CsPad2x2DigitalPotsCfg_v0::read_ds_data() const {
   m_ds_data = hdf5pp::Utils::readGroup<CsPad2x2::ns_CsPad2x2DigitalPotsCfg_v0::dataset_data>(m_group, "data", m_idx);
 }
 
+void make_datasets_CsPad2x2DigitalPotsCfg_v0(const Psana::CsPad2x2::CsPad2x2DigitalPotsCfg& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = CsPad2x2::ns_CsPad2x2DigitalPotsCfg_v0::dataset_data::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_CsPad2x2DigitalPotsCfg_v0(const Psana::CsPad2x2::CsPad2x2DigitalPotsCfg& obj, hdf5pp::Group group, bool append)
 {
+  {
+    CsPad2x2::ns_CsPad2x2DigitalPotsCfg_v0::dataset_data ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "data", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "data", ds_data);
+    }
+  }
 }
 
 
@@ -128,8 +147,26 @@ Proxy_CsPad2x2ReadOnlyCfg_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::S
 }
 
 
+void make_datasets_CsPad2x2ReadOnlyCfg_v0(const Psana::CsPad2x2::CsPad2x2ReadOnlyCfg& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = CsPad2x2::ns_CsPad2x2ReadOnlyCfg_v0::dataset_data::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_CsPad2x2ReadOnlyCfg_v0(const Psana::CsPad2x2::CsPad2x2ReadOnlyCfg& obj, hdf5pp::Group group, bool append)
 {
+  {
+    CsPad2x2::ns_CsPad2x2ReadOnlyCfg_v0::dataset_data ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "data", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "data", ds_data);
+    }
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::CsPad2x2::CsPad2x2ReadOnlyCfg> > make_CsPad2x2ReadOnlyCfg(int version, hdf5pp::Group group, hsize_t idx) {
@@ -138,6 +175,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::CsPad2x2::CsPad2x2ReadOnlyCfg> > make_CsPa
     return boost::make_shared<Proxy_CsPad2x2ReadOnlyCfg_v0>(group, idx);
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::CsPad2x2::CsPad2x2ReadOnlyCfg> >(boost::shared_ptr<Psana::CsPad2x2::CsPad2x2ReadOnlyCfg>());
+  }
+}
+
+void make_datasets(const Psana::CsPad2x2::CsPad2x2ReadOnlyCfg& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_CsPad2x2ReadOnlyCfg_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "CsPad2x2.CsPad2x2ReadOnlyCfg", version);
   }
 }
 
@@ -218,8 +268,26 @@ Proxy_ProtectionSystemThreshold_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const 
 }
 
 
+void make_datasets_ProtectionSystemThreshold_v0(const Psana::CsPad2x2::ProtectionSystemThreshold& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = CsPad2x2::ns_ProtectionSystemThreshold_v0::dataset_data::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_ProtectionSystemThreshold_v0(const Psana::CsPad2x2::ProtectionSystemThreshold& obj, hdf5pp::Group group, bool append)
 {
+  {
+    CsPad2x2::ns_ProtectionSystemThreshold_v0::dataset_data ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "data", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "data", ds_data);
+    }
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::CsPad2x2::ProtectionSystemThreshold> > make_ProtectionSystemThreshold(int version, hdf5pp::Group group, hsize_t idx) {
@@ -228,6 +296,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::CsPad2x2::ProtectionSystemThreshold> > mak
     return boost::make_shared<Proxy_ProtectionSystemThreshold_v0>(group, idx);
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::CsPad2x2::ProtectionSystemThreshold> >(boost::shared_ptr<Psana::CsPad2x2::ProtectionSystemThreshold>());
+  }
+}
+
+void make_datasets(const Psana::CsPad2x2::ProtectionSystemThreshold& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_ProtectionSystemThreshold_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "CsPad2x2.ProtectionSystemThreshold", version);
   }
 }
 
@@ -310,8 +391,26 @@ void CsPad2x2GainMapCfg_v0::read_ds_data() const {
   m_ds_data = hdf5pp::Utils::readGroup<CsPad2x2::ns_CsPad2x2GainMapCfg_v0::dataset_data>(m_group, "data", m_idx);
 }
 
+void make_datasets_CsPad2x2GainMapCfg_v0(const Psana::CsPad2x2::CsPad2x2GainMapCfg& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = CsPad2x2::ns_CsPad2x2GainMapCfg_v0::dataset_data::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_CsPad2x2GainMapCfg_v0(const Psana::CsPad2x2::CsPad2x2GainMapCfg& obj, hdf5pp::Group group, bool append)
 {
+  {
+    CsPad2x2::ns_CsPad2x2GainMapCfg_v0::dataset_data ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "data", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "data", ds_data);
+    }
+  }
 }
 
 
@@ -533,8 +632,26 @@ void ConfigV1QuadReg_v0::read_ds_data() const {
   m_ds_data = hdf5pp::Utils::readGroup<CsPad2x2::ns_ConfigV1QuadReg_v0::dataset_data>(m_group, "data", m_idx);
 }
 
+void make_datasets_ConfigV1QuadReg_v0(const Psana::CsPad2x2::ConfigV1QuadReg& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = CsPad2x2::ns_ConfigV1QuadReg_v0::dataset_data::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_ConfigV1QuadReg_v0(const Psana::CsPad2x2::ConfigV1QuadReg& obj, hdf5pp::Group group, bool append)
 {
+  {
+    CsPad2x2::ns_ConfigV1QuadReg_v0::dataset_data ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "data", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "data", ds_data);
+    }
+  }
 }
 
 
@@ -675,8 +792,26 @@ void ConfigV1_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<CsPad2x2::ns_ConfigV1_v0::dataset_config>(m_group, "config", m_idx);
 }
 
+void make_datasets_ConfigV1_v0(const Psana::CsPad2x2::ConfigV1& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = CsPad2x2::ns_ConfigV1_v0::dataset_config::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "config", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_ConfigV1_v0(const Psana::CsPad2x2::ConfigV1& obj, hdf5pp::Group group, bool append)
 {
+  {
+    CsPad2x2::ns_ConfigV1_v0::dataset_config ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "config", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "config", ds_data);
+    }
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::CsPad2x2::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
@@ -685,6 +820,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::CsPad2x2::ConfigV1> > make_ConfigV1(int ve
     return boost::make_shared<PSEvt::DataProxy<Psana::CsPad2x2::ConfigV1> >(boost::make_shared<ConfigV1_v0>(group, idx));
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::CsPad2x2::ConfigV1> >(boost::shared_ptr<Psana::CsPad2x2::ConfigV1>());
+  }
+}
+
+void make_datasets(const Psana::CsPad2x2::ConfigV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_ConfigV1_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "CsPad2x2.ConfigV1", version);
   }
 }
 
@@ -943,8 +1091,26 @@ void ConfigV2QuadReg_v0::read_ds_data() const {
   m_ds_data = hdf5pp::Utils::readGroup<CsPad2x2::ns_ConfigV2QuadReg_v0::dataset_data>(m_group, "data", m_idx);
 }
 
+void make_datasets_ConfigV2QuadReg_v0(const Psana::CsPad2x2::ConfigV2QuadReg& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = CsPad2x2::ns_ConfigV2QuadReg_v0::dataset_data::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_ConfigV2QuadReg_v0(const Psana::CsPad2x2::ConfigV2QuadReg& obj, hdf5pp::Group group, bool append)
 {
+  {
+    CsPad2x2::ns_ConfigV2QuadReg_v0::dataset_data ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "data", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "data", ds_data);
+    }
+  }
 }
 
 
@@ -1092,8 +1258,26 @@ void ConfigV2_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<CsPad2x2::ns_ConfigV2_v0::dataset_config>(m_group, "config", m_idx);
 }
 
+void make_datasets_ConfigV2_v0(const Psana::CsPad2x2::ConfigV2& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = CsPad2x2::ns_ConfigV2_v0::dataset_config::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "config", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_ConfigV2_v0(const Psana::CsPad2x2::ConfigV2& obj, hdf5pp::Group group, bool append)
 {
+  {
+    CsPad2x2::ns_ConfigV2_v0::dataset_config ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "config", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "config", ds_data);
+    }
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::CsPad2x2::ConfigV2> > make_ConfigV2(int version, hdf5pp::Group group, hsize_t idx) {
@@ -1102,6 +1286,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::CsPad2x2::ConfigV2> > make_ConfigV2(int ve
     return boost::make_shared<PSEvt::DataProxy<Psana::CsPad2x2::ConfigV2> >(boost::make_shared<ConfigV2_v0>(group, idx));
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::CsPad2x2::ConfigV2> >(boost::shared_ptr<Psana::CsPad2x2::ConfigV2>());
+  }
+}
+
+void make_datasets(const Psana::CsPad2x2::ConfigV2& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_ConfigV2_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "CsPad2x2.ConfigV2", version);
   }
 }
 
@@ -1133,6 +1330,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::CsPad2x2::ElementV1> > make_ElementV1(int 
     return boost::make_shared<PSEvt::DataProxy<Psana::CsPad2x2::ElementV1> >(boost::make_shared<ElementV1_v0>(group, idx));
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::CsPad2x2::ElementV1> >(boost::shared_ptr<Psana::CsPad2x2::ElementV1>());
+  }
+}
+
+void make_datasets(const Psana::CsPad2x2::ElementV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_ElementV1_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "CsPad2x2.ElementV1", version);
   }
 }
 

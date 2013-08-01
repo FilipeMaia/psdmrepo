@@ -24,6 +24,7 @@
 #include "hdf5pp/EnumType.h"
 #include "hdf5pp/Utils.h"
 #include "hdf5pp/VlenType.h"
+#include "psddl_hdf2psana/HdfParameters.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -66,11 +67,23 @@ hdf5pp::Type ns_DataV3_v0::dataset_data::native_type()
   static hdf5pp::Type type = ns_DataV3_v0_dataset_data_native_type();
   return type;
 }
+
 ns_DataV3_v0::dataset_data::dataset_data()
 {
   this->vlen_fifoEvents = 0;
   this->fifoEvents = 0;
 }
+
+ns_DataV3_v0::dataset_data::dataset_data(const Psana::EvrData::DataV3& psanaobj)
+{
+  ndarray<const Psana::EvrData::FIFOEvent, 1> fifos = psanaobj.fifoEvents();
+  vlen_fifoEvents = fifos.shape()[0];
+  fifoEvents = (ns_FIFOEvent_v0::dataset_data*)malloc(sizeof(ns_FIFOEvent_v0::dataset_data)*vlen_fifoEvents);
+  for(unsigned i = 0; i != vlen_fifoEvents; ++ i) {
+    new (fifoEvents+i) ns_FIFOEvent_v0::dataset_data(fifos[i]);
+  }
+}
+
 ns_DataV3_v0::dataset_data::~dataset_data()
 {
   free(this->fifoEvents);
@@ -96,9 +109,30 @@ void DataV3_v0::read_ds_data() const {
 }
 
 
+uint32_t DataV3_v0::numFifoEvents() const
+{
+  if (not m_ds_data) read_ds_data();
+  return m_ds_data->vlen_fifoEvents;
+}
+
+void make_datasets_DataV3_v0(const Psana::EvrData::DataV3& obj,
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = ns_DataV3_v0::dataset_data::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);
+  }
+}
+
 void store_DataV3_v0(const Psana::EvrData::DataV3& obj, hdf5pp::Group group, bool append)
 {
-    
+  ns_DataV3_v0::dataset_data ds_data(obj);
+  if (append) {
+    hdf5pp::Utils::append(group, "data", ds_data);
+  } else {
+    hdf5pp::Utils::storeScalar(group, "data", ds_data);
+  }
 }
 
 
@@ -139,11 +173,56 @@ hdf5pp::Type ns_IOChannel_v0::dataset_data::native_type()
   static hdf5pp::Type type = ns_IOChannel_v0_dataset_data_native_type();
   return type;
 }
+
 ns_IOChannel_v0::dataset_data::dataset_data()
+  : ninfo(0)
+  , infos(0)
 {
+  name[0] = '\0';
 }
+
+ns_IOChannel_v0::dataset_data::dataset_data(const Psana::EvrData::IOChannel& psanaobj)
+{
+  strncpy(name, psanaobj.name(), NameLength);
+  name[NameLength-1] = '\0';
+
+  ndarray<const Pds::DetInfo, 1> dinfos = psanaobj.infos();
+  ninfo = dinfos.shape()[0];
+  infos = (Pds::ns_DetInfo_v0::dataset_data*)malloc(sizeof(Pds::ns_DetInfo_v0::dataset_data)*ninfo);
+  for(unsigned i = 0; i != ninfo; ++ i) {
+    new (infos+i) Pds::ns_DetInfo_v0::dataset_data(dinfos[i]);
+  }
+}
+
+ns_IOChannel_v0::dataset_data::dataset_data(const dataset_data& ds)
+{
+  strncpy(name, ds.name, NameLength);
+  name[NameLength-1] = '\0';
+
+  ninfo = ds.ninfo;
+  infos = (Pds::ns_DetInfo_v0::dataset_data*)malloc(sizeof(Pds::ns_DetInfo_v0::dataset_data)*ninfo);
+  std::copy(ds.infos, ds.infos+ninfo, infos);
+}
+
+ns_IOChannel_v0::dataset_data&
+ns_IOChannel_v0::dataset_data::operator=(const dataset_data& ds)
+{
+  if (this != &ds) {
+    free(infos);
+
+    strncpy(name, ds.name, NameLength);
+    name[NameLength-1] = '\0';
+
+    ninfo = ds.ninfo;
+    infos = (Pds::ns_DetInfo_v0::dataset_data*)malloc(sizeof(Pds::ns_DetInfo_v0::dataset_data)*ninfo);
+    std::copy(ds.infos, ds.infos+ninfo, infos);
+  }
+  return *this;
+}
+
 ns_IOChannel_v0::dataset_data::~dataset_data()
 {
+  free(infos);
 }
 
 ns_IOChannel_v0::dataset_data::operator Psana::EvrData::IOChannel() const
@@ -205,6 +284,11 @@ ns_IOConfigV1_v0::dataset_config::dataset_config()
 {
 }
 
+ns_IOConfigV1_v0::dataset_config::dataset_config(const Psana::EvrData::IOConfigV1& psanaobj)
+  : conn(psanaobj.conn())
+{
+}
+
 ns_IOConfigV1_v0::dataset_config::~dataset_config()
 {
 }
@@ -237,18 +321,41 @@ void IOConfigV1_v0::read_ds_channels() const {
   m_ds_channels = tmp;
 }
 
+
+void make_datasets_IOConfigV1_v0(const Psana::EvrData::IOConfigV1& obj,
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = ns_IOConfigV1_v0::dataset_config::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "config", dstype, chunk_size, chunk_cache_size, deflate, shuffle);
+  }
+  {
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<ns_IOChannel_v0::dataset_data>::stored_type(), obj.channels().shape()[0]);
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "channels", dstype, chunk_size, chunk_cache_size, deflate, shuffle);
+  }
+}
+
 void store_IOConfigV1_v0(const Psana::EvrData::IOConfigV1& obj, hdf5pp::Group group, bool append)
 {
-    
+  // convert IOChannel data
+  ndarray<const Psana::EvrData::IOChannel, 1> channels = obj.channels();
+  ndarray<ns_IOChannel_v0::dataset_data, 1> xchannels(channels.shape());
+  for (unsigned i = 0; i != channels.shape()[0]; ++ i) {
+    xchannels[i] = ns_IOChannel_v0::dataset_data(channels[i]);
+  }
+
+  if (append) {
+    hdf5pp::Utils::append(group, "config", ns_IOConfigV1_v0::dataset_config(obj));
+    hdf5pp::Utils::appendNDArray(group, "channels", xchannels);
+  } else {
+    hdf5pp::Utils::storeScalar(group, "config", ns_IOConfigV1_v0::dataset_config(obj));
+    hdf5pp::Utils::storeNDArray(group, "channels", xchannels);
+  }
+
 }
 
-
-uint32_t
-DataV3_v0::numFifoEvents() const
-{
-  if (not m_ds_data) read_ds_data();
-  return m_ds_data->vlen_fifoEvents;
-}
 
 } // namespace EvrData
 } // namespace psddl_hdf2psana

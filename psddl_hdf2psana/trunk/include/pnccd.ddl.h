@@ -46,7 +46,12 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::PNCCD::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx);
 
+/// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::PNCCD::ConfigV1& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::PNCCD::ConfigV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method
 void append(const Psana::PNCCD::ConfigV1& obj, hdf5pp::Group group, int version = -1);
 
 
@@ -108,18 +113,33 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::PNCCD::ConfigV2> > make_ConfigV2(int version, hdf5pp::Group group, hsize_t idx);
 
+/// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::PNCCD::ConfigV2& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::PNCCD::ConfigV2& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method
 void append(const Psana::PNCCD::ConfigV2& obj, hdf5pp::Group group, int version = -1);
 
 boost::shared_ptr<PSEvt::Proxy<Psana::PNCCD::FullFrameV1> > make_FullFrameV1(int version, hdf5pp::Group group, hsize_t idx);
 
+/// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::PNCCD::FullFrameV1& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::PNCCD::FullFrameV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method
 void append(const Psana::PNCCD::FullFrameV1& obj, hdf5pp::Group group, int version = -1);
 
 boost::shared_ptr<PSEvt::Proxy<Psana::PNCCD::FramesV1> > make_FramesV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::PNCCD::ConfigV1>& cfg);
 boost::shared_ptr<PSEvt::Proxy<Psana::PNCCD::FramesV1> > make_FramesV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::PNCCD::ConfigV2>& cfg);
 
+/// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::PNCCD::FramesV1& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::PNCCD::FramesV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method
 void append(const Psana::PNCCD::FramesV1& obj, hdf5pp::Group group, int version = -1);
 
 } // namespace PNCCD

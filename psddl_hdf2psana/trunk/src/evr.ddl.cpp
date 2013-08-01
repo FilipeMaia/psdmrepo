@@ -9,6 +9,7 @@
 #include "hdf5pp/Utils.h"
 #include "PSEvt/DataProxy.h"
 #include "psddl_hdf2psana/Exceptions.h"
+#include "psddl_hdf2psana/HdfParameters.h"
 #include "psddl_hdf2psana/evr.h"
 #include "psddl_hdf2psana/evr.h"
 #include "psddl_hdf2psana/evr.h"
@@ -102,8 +103,26 @@ Proxy_PulseConfig_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& sour
 }
 
 
+void make_datasets_PulseConfig_v0(const Psana::EvrData::PulseConfig& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = EvrData::ns_PulseConfig_v0::dataset_data::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_PulseConfig_v0(const Psana::EvrData::PulseConfig& obj, hdf5pp::Group group, bool append)
 {
+  {
+    EvrData::ns_PulseConfig_v0::dataset_data ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "data", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "data", ds_data);
+    }
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::PulseConfig> > make_PulseConfig(int version, hdf5pp::Group group, hsize_t idx) {
@@ -112,6 +131,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::PulseConfig> > make_PulseConfig(i
     return boost::make_shared<Proxy_PulseConfig_v0>(group, idx);
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::EvrData::PulseConfig> >(boost::shared_ptr<Psana::EvrData::PulseConfig>());
+  }
+}
+
+void make_datasets(const Psana::EvrData::PulseConfig& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_PulseConfig_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "EvrData.PulseConfig", version);
   }
 }
 
@@ -201,8 +233,26 @@ Proxy_PulseConfigV3_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& so
 }
 
 
+void make_datasets_PulseConfigV3_v0(const Psana::EvrData::PulseConfigV3& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = EvrData::ns_PulseConfigV3_v0::dataset_data::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_PulseConfigV3_v0(const Psana::EvrData::PulseConfigV3& obj, hdf5pp::Group group, bool append)
 {
+  {
+    EvrData::ns_PulseConfigV3_v0::dataset_data ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "data", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "data", ds_data);
+    }
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::PulseConfigV3> > make_PulseConfigV3(int version, hdf5pp::Group group, hsize_t idx) {
@@ -211,6 +261,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::PulseConfigV3> > make_PulseConfig
     return boost::make_shared<Proxy_PulseConfigV3_v0>(group, idx);
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::EvrData::PulseConfigV3> >(boost::shared_ptr<Psana::EvrData::PulseConfigV3>());
+  }
+}
+
+void make_datasets(const Psana::EvrData::PulseConfigV3& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_PulseConfigV3_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "EvrData.PulseConfigV3", version);
   }
 }
 
@@ -306,8 +369,26 @@ Proxy_EventCodeV3_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& sour
 }
 
 
+void make_datasets_EventCodeV3_v0(const Psana::EvrData::EventCodeV3& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = EvrData::ns_EventCodeV3_v0::dataset_data::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_EventCodeV3_v0(const Psana::EvrData::EventCodeV3& obj, hdf5pp::Group group, bool append)
 {
+  {
+    EvrData::ns_EventCodeV3_v0::dataset_data ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "data", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "data", ds_data);
+    }
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::EventCodeV3> > make_EventCodeV3(int version, hdf5pp::Group group, hsize_t idx) {
@@ -316,6 +397,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::EventCodeV3> > make_EventCodeV3(i
     return boost::make_shared<Proxy_EventCodeV3_v0>(group, idx);
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::EvrData::EventCodeV3> >(boost::shared_ptr<Psana::EvrData::EventCodeV3>());
+  }
+}
+
+void make_datasets(const Psana::EvrData::EventCodeV3& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_EventCodeV3_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "EvrData.EventCodeV3", version);
   }
 }
 
@@ -417,8 +511,26 @@ Proxy_EventCodeV4_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& sour
 }
 
 
+void make_datasets_EventCodeV4_v0(const Psana::EvrData::EventCodeV4& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = EvrData::ns_EventCodeV4_v0::dataset_data::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_EventCodeV4_v0(const Psana::EvrData::EventCodeV4& obj, hdf5pp::Group group, bool append)
 {
+  {
+    EvrData::ns_EventCodeV4_v0::dataset_data ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "data", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "data", ds_data);
+    }
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::EventCodeV4> > make_EventCodeV4(int version, hdf5pp::Group group, hsize_t idx) {
@@ -427,6 +539,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::EventCodeV4> > make_EventCodeV4(i
     return boost::make_shared<Proxy_EventCodeV4_v0>(group, idx);
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::EvrData::EventCodeV4> >(boost::shared_ptr<Psana::EvrData::EventCodeV4>());
+  }
+}
+
+void make_datasets(const Psana::EvrData::EventCodeV4& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_EventCodeV4_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "EvrData.EventCodeV4", version);
   }
 }
 
@@ -532,8 +657,26 @@ Proxy_EventCodeV5_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& sour
 }
 
 
+void make_datasets_EventCodeV5_v0(const Psana::EvrData::EventCodeV5& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = EvrData::ns_EventCodeV5_v0::dataset_data::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_EventCodeV5_v0(const Psana::EvrData::EventCodeV5& obj, hdf5pp::Group group, bool append)
 {
+  {
+    EvrData::ns_EventCodeV5_v0::dataset_data ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "data", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "data", ds_data);
+    }
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::EventCodeV5> > make_EventCodeV5(int version, hdf5pp::Group group, hsize_t idx) {
@@ -542,6 +685,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::EventCodeV5> > make_EventCodeV5(i
     return boost::make_shared<Proxy_EventCodeV5_v0>(group, idx);
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::EvrData::EventCodeV5> >(boost::shared_ptr<Psana::EvrData::EventCodeV5>());
+  }
+}
+
+void make_datasets(const Psana::EvrData::EventCodeV5& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_EventCodeV5_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "EvrData.EventCodeV5", version);
   }
 }
 
@@ -650,8 +806,26 @@ Proxy_EventCodeV6_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& sour
 }
 
 
+void make_datasets_EventCodeV6_v0(const Psana::EvrData::EventCodeV6& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = EvrData::ns_EventCodeV6_v0::dataset_data::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_EventCodeV6_v0(const Psana::EvrData::EventCodeV6& obj, hdf5pp::Group group, bool append)
 {
+  {
+    EvrData::ns_EventCodeV6_v0::dataset_data ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "data", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "data", ds_data);
+    }
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::EventCodeV6> > make_EventCodeV6(int version, hdf5pp::Group group, hsize_t idx) {
@@ -660,6 +834,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::EventCodeV6> > make_EventCodeV6(i
     return boost::make_shared<Proxy_EventCodeV6_v0>(group, idx);
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::EvrData::EventCodeV6> >(boost::shared_ptr<Psana::EvrData::EventCodeV6>());
+  }
+}
+
+void make_datasets(const Psana::EvrData::EventCodeV6& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_EventCodeV6_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "EvrData.EventCodeV6", version);
   }
 }
 
@@ -767,8 +954,26 @@ Proxy_OutputMap_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source
 }
 
 
+void make_datasets_OutputMap_v0(const Psana::EvrData::OutputMap& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = EvrData::ns_OutputMap_v0::dataset_data::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_OutputMap_v0(const Psana::EvrData::OutputMap& obj, hdf5pp::Group group, bool append)
 {
+  {
+    EvrData::ns_OutputMap_v0::dataset_data ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "data", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "data", ds_data);
+    }
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::OutputMap> > make_OutputMap(int version, hdf5pp::Group group, hsize_t idx) {
@@ -777,6 +982,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::OutputMap> > make_OutputMap(int v
     return boost::make_shared<Proxy_OutputMap_v0>(group, idx);
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::EvrData::OutputMap> >(boost::shared_ptr<Psana::EvrData::OutputMap>());
+  }
+}
+
+void make_datasets(const Psana::EvrData::OutputMap& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_OutputMap_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "EvrData.OutputMap", version);
   }
 }
 
@@ -887,8 +1105,26 @@ Proxy_OutputMapV2_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& sour
 }
 
 
+void make_datasets_OutputMapV2_v0(const Psana::EvrData::OutputMapV2& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = EvrData::ns_OutputMapV2_v0::dataset_data::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_OutputMapV2_v0(const Psana::EvrData::OutputMapV2& obj, hdf5pp::Group group, bool append)
 {
+  {
+    EvrData::ns_OutputMapV2_v0::dataset_data ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "data", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "data", ds_data);
+    }
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::OutputMapV2> > make_OutputMapV2(int version, hdf5pp::Group group, hsize_t idx) {
@@ -897,6 +1133,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::OutputMapV2> > make_OutputMapV2(i
     return boost::make_shared<Proxy_OutputMapV2_v0>(group, idx);
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::EvrData::OutputMapV2> >(boost::shared_ptr<Psana::EvrData::OutputMapV2>());
+  }
+}
+
+void make_datasets(const Psana::EvrData::OutputMapV2& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_OutputMapV2_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "EvrData.OutputMapV2", version);
   }
 }
 
@@ -998,8 +1247,70 @@ void ConfigV1_v0::read_ds_output_maps() const {
   m_ds_output_maps = tmp;
 }
 
+void make_datasets_ConfigV1_v0(const Psana::EvrData::ConfigV1& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = EvrData::ns_ConfigV1_v0::dataset_config::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "config", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+  {
+    typedef __typeof__(obj.pulses()) PsanaArray;
+    const PsanaArray& psana_array = obj.pulses();
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<EvrData::ns_PulseConfig_v0::dataset_data>::stored_type(), psana_array.shape()[0]);
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "pulses", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+  {
+    typedef __typeof__(obj.output_maps()) PsanaArray;
+    const PsanaArray& psana_array = obj.output_maps();
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<EvrData::ns_OutputMap_v0::dataset_data>::stored_type(), psana_array.shape()[0]);
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "output_maps", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_ConfigV1_v0(const Psana::EvrData::ConfigV1& obj, hdf5pp::Group group, bool append)
 {
+  {
+    EvrData::ns_ConfigV1_v0::dataset_config ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "config", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "config", ds_data);
+    }
+  }
+  {
+    typedef __typeof__(obj.pulses()) PsanaArray;
+    typedef ndarray<EvrData::ns_PulseConfig_v0::dataset_data, 1> HdfArray;
+    PsanaArray psana_array = obj.pulses();
+    HdfArray hdf_array(psana_array.shape());
+    HdfArray::iterator out = hdf_array.begin();
+    for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
+      *out = EvrData::ns_PulseConfig_v0::dataset_data(*it);
+    }
+    if (append) {
+      hdf5pp::Utils::appendNDArray(group, "pulses", hdf_array);
+    } else {
+      hdf5pp::Utils::storeNDArray(group, "pulses", hdf_array);
+    }
+  }
+  {
+    typedef __typeof__(obj.output_maps()) PsanaArray;
+    typedef ndarray<EvrData::ns_OutputMap_v0::dataset_data, 1> HdfArray;
+    PsanaArray psana_array = obj.output_maps();
+    HdfArray hdf_array(psana_array.shape());
+    HdfArray::iterator out = hdf_array.begin();
+    for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
+      *out = EvrData::ns_OutputMap_v0::dataset_data(*it);
+    }
+    if (append) {
+      hdf5pp::Utils::appendNDArray(group, "output_maps", hdf_array);
+    } else {
+      hdf5pp::Utils::storeNDArray(group, "output_maps", hdf_array);
+    }
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
@@ -1008,6 +1319,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::ConfigV1> > make_ConfigV1(int ver
     return boost::make_shared<PSEvt::DataProxy<Psana::EvrData::ConfigV1> >(boost::make_shared<ConfigV1_v0>(group, idx));
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::EvrData::ConfigV1> >(boost::shared_ptr<Psana::EvrData::ConfigV1>());
+  }
+}
+
+void make_datasets(const Psana::EvrData::ConfigV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_ConfigV1_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "EvrData.ConfigV1", version);
   }
 }
 
@@ -1156,8 +1480,70 @@ void ConfigV2_v0::read_ds_output_maps() const {
   m_ds_output_maps = tmp;
 }
 
+void make_datasets_ConfigV2_v0(const Psana::EvrData::ConfigV2& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = EvrData::ns_ConfigV2_v0::dataset_config::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "config", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+  {
+    typedef __typeof__(obj.pulses()) PsanaArray;
+    const PsanaArray& psana_array = obj.pulses();
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<EvrData::ns_PulseConfig_v0::dataset_data>::stored_type(), psana_array.shape()[0]);
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "pulses", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+  {
+    typedef __typeof__(obj.output_maps()) PsanaArray;
+    const PsanaArray& psana_array = obj.output_maps();
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<EvrData::ns_OutputMap_v0::dataset_data>::stored_type(), psana_array.shape()[0]);
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "output_maps", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_ConfigV2_v0(const Psana::EvrData::ConfigV2& obj, hdf5pp::Group group, bool append)
 {
+  {
+    EvrData::ns_ConfigV2_v0::dataset_config ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "config", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "config", ds_data);
+    }
+  }
+  {
+    typedef __typeof__(obj.pulses()) PsanaArray;
+    typedef ndarray<EvrData::ns_PulseConfig_v0::dataset_data, 1> HdfArray;
+    PsanaArray psana_array = obj.pulses();
+    HdfArray hdf_array(psana_array.shape());
+    HdfArray::iterator out = hdf_array.begin();
+    for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
+      *out = EvrData::ns_PulseConfig_v0::dataset_data(*it);
+    }
+    if (append) {
+      hdf5pp::Utils::appendNDArray(group, "pulses", hdf_array);
+    } else {
+      hdf5pp::Utils::storeNDArray(group, "pulses", hdf_array);
+    }
+  }
+  {
+    typedef __typeof__(obj.output_maps()) PsanaArray;
+    typedef ndarray<EvrData::ns_OutputMap_v0::dataset_data, 1> HdfArray;
+    PsanaArray psana_array = obj.output_maps();
+    HdfArray hdf_array(psana_array.shape());
+    HdfArray::iterator out = hdf_array.begin();
+    for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
+      *out = EvrData::ns_OutputMap_v0::dataset_data(*it);
+    }
+    if (append) {
+      hdf5pp::Utils::appendNDArray(group, "output_maps", hdf_array);
+    } else {
+      hdf5pp::Utils::storeNDArray(group, "output_maps", hdf_array);
+    }
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::ConfigV2> > make_ConfigV2(int version, hdf5pp::Group group, hsize_t idx) {
@@ -1166,6 +1552,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::ConfigV2> > make_ConfigV2(int ver
     return boost::make_shared<PSEvt::DataProxy<Psana::EvrData::ConfigV2> >(boost::make_shared<ConfigV2_v0>(group, idx));
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::EvrData::ConfigV2> >(boost::shared_ptr<Psana::EvrData::ConfigV2>());
+  }
+}
+
+void make_datasets(const Psana::EvrData::ConfigV2& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_ConfigV2_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "EvrData.ConfigV2", version);
   }
 }
 
@@ -1284,8 +1683,92 @@ void ConfigV3_v0::read_ds_output_maps() const {
   m_ds_output_maps = tmp;
 }
 
+void make_datasets_ConfigV3_v0(const Psana::EvrData::ConfigV3& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = EvrData::ns_ConfigV3_v0::dataset_config::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "config", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+  {
+    typedef __typeof__(obj.eventcodes()) PsanaArray;
+    const PsanaArray& psana_array = obj.eventcodes();
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<EvrData::ns_EventCodeV3_v0::dataset_data>::stored_type(), psana_array.shape()[0]);
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "eventcodes", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+  {
+    typedef __typeof__(obj.pulses()) PsanaArray;
+    const PsanaArray& psana_array = obj.pulses();
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<EvrData::ns_PulseConfigV3_v0::dataset_data>::stored_type(), psana_array.shape()[0]);
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "pulses", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+  {
+    typedef __typeof__(obj.output_maps()) PsanaArray;
+    const PsanaArray& psana_array = obj.output_maps();
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<EvrData::ns_OutputMap_v0::dataset_data>::stored_type(), psana_array.shape()[0]);
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "output_maps", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_ConfigV3_v0(const Psana::EvrData::ConfigV3& obj, hdf5pp::Group group, bool append)
 {
+  {
+    EvrData::ns_ConfigV3_v0::dataset_config ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "config", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "config", ds_data);
+    }
+  }
+  {
+    typedef __typeof__(obj.eventcodes()) PsanaArray;
+    typedef ndarray<EvrData::ns_EventCodeV3_v0::dataset_data, 1> HdfArray;
+    PsanaArray psana_array = obj.eventcodes();
+    HdfArray hdf_array(psana_array.shape());
+    HdfArray::iterator out = hdf_array.begin();
+    for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
+      *out = EvrData::ns_EventCodeV3_v0::dataset_data(*it);
+    }
+    if (append) {
+      hdf5pp::Utils::appendNDArray(group, "eventcodes", hdf_array);
+    } else {
+      hdf5pp::Utils::storeNDArray(group, "eventcodes", hdf_array);
+    }
+  }
+  {
+    typedef __typeof__(obj.pulses()) PsanaArray;
+    typedef ndarray<EvrData::ns_PulseConfigV3_v0::dataset_data, 1> HdfArray;
+    PsanaArray psana_array = obj.pulses();
+    HdfArray hdf_array(psana_array.shape());
+    HdfArray::iterator out = hdf_array.begin();
+    for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
+      *out = EvrData::ns_PulseConfigV3_v0::dataset_data(*it);
+    }
+    if (append) {
+      hdf5pp::Utils::appendNDArray(group, "pulses", hdf_array);
+    } else {
+      hdf5pp::Utils::storeNDArray(group, "pulses", hdf_array);
+    }
+  }
+  {
+    typedef __typeof__(obj.output_maps()) PsanaArray;
+    typedef ndarray<EvrData::ns_OutputMap_v0::dataset_data, 1> HdfArray;
+    PsanaArray psana_array = obj.output_maps();
+    HdfArray hdf_array(psana_array.shape());
+    HdfArray::iterator out = hdf_array.begin();
+    for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
+      *out = EvrData::ns_OutputMap_v0::dataset_data(*it);
+    }
+    if (append) {
+      hdf5pp::Utils::appendNDArray(group, "output_maps", hdf_array);
+    } else {
+      hdf5pp::Utils::storeNDArray(group, "output_maps", hdf_array);
+    }
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::ConfigV3> > make_ConfigV3(int version, hdf5pp::Group group, hsize_t idx) {
@@ -1294,6 +1777,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::ConfigV3> > make_ConfigV3(int ver
     return boost::make_shared<PSEvt::DataProxy<Psana::EvrData::ConfigV3> >(boost::make_shared<ConfigV3_v0>(group, idx));
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::EvrData::ConfigV3> >(boost::shared_ptr<Psana::EvrData::ConfigV3>());
+  }
+}
+
+void make_datasets(const Psana::EvrData::ConfigV3& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_ConfigV3_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "EvrData.ConfigV3", version);
   }
 }
 
@@ -1412,8 +1908,92 @@ void ConfigV4_v0::read_ds_output_maps() const {
   m_ds_output_maps = tmp;
 }
 
+void make_datasets_ConfigV4_v0(const Psana::EvrData::ConfigV4& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = EvrData::ns_ConfigV4_v0::dataset_config::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "config", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+  {
+    typedef __typeof__(obj.eventcodes()) PsanaArray;
+    const PsanaArray& psana_array = obj.eventcodes();
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<EvrData::ns_EventCodeV4_v0::dataset_data>::stored_type(), psana_array.shape()[0]);
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "eventcodes", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+  {
+    typedef __typeof__(obj.pulses()) PsanaArray;
+    const PsanaArray& psana_array = obj.pulses();
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<EvrData::ns_PulseConfigV3_v0::dataset_data>::stored_type(), psana_array.shape()[0]);
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "pulses", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+  {
+    typedef __typeof__(obj.output_maps()) PsanaArray;
+    const PsanaArray& psana_array = obj.output_maps();
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<EvrData::ns_OutputMap_v0::dataset_data>::stored_type(), psana_array.shape()[0]);
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "output_maps", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_ConfigV4_v0(const Psana::EvrData::ConfigV4& obj, hdf5pp::Group group, bool append)
 {
+  {
+    EvrData::ns_ConfigV4_v0::dataset_config ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "config", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "config", ds_data);
+    }
+  }
+  {
+    typedef __typeof__(obj.eventcodes()) PsanaArray;
+    typedef ndarray<EvrData::ns_EventCodeV4_v0::dataset_data, 1> HdfArray;
+    PsanaArray psana_array = obj.eventcodes();
+    HdfArray hdf_array(psana_array.shape());
+    HdfArray::iterator out = hdf_array.begin();
+    for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
+      *out = EvrData::ns_EventCodeV4_v0::dataset_data(*it);
+    }
+    if (append) {
+      hdf5pp::Utils::appendNDArray(group, "eventcodes", hdf_array);
+    } else {
+      hdf5pp::Utils::storeNDArray(group, "eventcodes", hdf_array);
+    }
+  }
+  {
+    typedef __typeof__(obj.pulses()) PsanaArray;
+    typedef ndarray<EvrData::ns_PulseConfigV3_v0::dataset_data, 1> HdfArray;
+    PsanaArray psana_array = obj.pulses();
+    HdfArray hdf_array(psana_array.shape());
+    HdfArray::iterator out = hdf_array.begin();
+    for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
+      *out = EvrData::ns_PulseConfigV3_v0::dataset_data(*it);
+    }
+    if (append) {
+      hdf5pp::Utils::appendNDArray(group, "pulses", hdf_array);
+    } else {
+      hdf5pp::Utils::storeNDArray(group, "pulses", hdf_array);
+    }
+  }
+  {
+    typedef __typeof__(obj.output_maps()) PsanaArray;
+    typedef ndarray<EvrData::ns_OutputMap_v0::dataset_data, 1> HdfArray;
+    PsanaArray psana_array = obj.output_maps();
+    HdfArray hdf_array(psana_array.shape());
+    HdfArray::iterator out = hdf_array.begin();
+    for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
+      *out = EvrData::ns_OutputMap_v0::dataset_data(*it);
+    }
+    if (append) {
+      hdf5pp::Utils::appendNDArray(group, "output_maps", hdf_array);
+    } else {
+      hdf5pp::Utils::storeNDArray(group, "output_maps", hdf_array);
+    }
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::ConfigV4> > make_ConfigV4(int version, hdf5pp::Group group, hsize_t idx) {
@@ -1422,6 +2002,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::ConfigV4> > make_ConfigV4(int ver
     return boost::make_shared<PSEvt::DataProxy<Psana::EvrData::ConfigV4> >(boost::make_shared<ConfigV4_v0>(group, idx));
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::EvrData::ConfigV4> >(boost::shared_ptr<Psana::EvrData::ConfigV4>());
+  }
+}
+
+void make_datasets(const Psana::EvrData::ConfigV4& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_ConfigV4_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "EvrData.ConfigV4", version);
   }
 }
 
@@ -1502,8 +2095,26 @@ Proxy_SequencerEntry_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& s
 }
 
 
+void make_datasets_SequencerEntry_v0(const Psana::EvrData::SequencerEntry& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = EvrData::ns_SequencerEntry_v0::dataset_data::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_SequencerEntry_v0(const Psana::EvrData::SequencerEntry& obj, hdf5pp::Group group, bool append)
 {
+  {
+    EvrData::ns_SequencerEntry_v0::dataset_data ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "data", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "data", ds_data);
+    }
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::SequencerEntry> > make_SequencerEntry(int version, hdf5pp::Group group, hsize_t idx) {
@@ -1512,6 +2123,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::SequencerEntry> > make_SequencerE
     return boost::make_shared<Proxy_SequencerEntry_v0>(group, idx);
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::EvrData::SequencerEntry> >(boost::shared_ptr<Psana::EvrData::SequencerEntry>());
+  }
+}
+
+void make_datasets(const Psana::EvrData::SequencerEntry& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_SequencerEntry_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "EvrData.SequencerEntry", version);
   }
 }
 
@@ -1672,8 +2296,26 @@ void SequencerConfigV1_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<EvrData::ns_SequencerConfigV1_v0::dataset_config>(m_group, "config", m_idx);
 }
 
+void make_datasets_SequencerConfigV1_v0(const Psana::EvrData::SequencerConfigV1& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = EvrData::ns_SequencerConfigV1_v0::dataset_config::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "config", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_SequencerConfigV1_v0(const Psana::EvrData::SequencerConfigV1& obj, hdf5pp::Group group, bool append)
 {
+  {
+    EvrData::ns_SequencerConfigV1_v0::dataset_config ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "config", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "config", ds_data);
+    }
+  }
 }
 
 
@@ -1780,8 +2422,105 @@ void ConfigV5_v0::read_ds_seq_config() const {
   m_ds_storage_seq_config = boost::make_shared<SequencerConfigV1_v0>(m_ds_seq_config);
 }
 
+void make_datasets_ConfigV5_v0(const Psana::EvrData::ConfigV5& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = EvrData::ns_ConfigV5_v0::dataset_config::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "config", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+  {
+    typedef __typeof__(obj.eventcodes()) PsanaArray;
+    const PsanaArray& psana_array = obj.eventcodes();
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<EvrData::ns_EventCodeV5_v0::dataset_data>::stored_type(), psana_array.shape()[0]);
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "eventcodes", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+  {
+    typedef __typeof__(obj.pulses()) PsanaArray;
+    const PsanaArray& psana_array = obj.pulses();
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<EvrData::ns_PulseConfigV3_v0::dataset_data>::stored_type(), psana_array.shape()[0]);
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "pulses", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+  {
+    typedef __typeof__(obj.output_maps()) PsanaArray;
+    const PsanaArray& psana_array = obj.output_maps();
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<EvrData::ns_OutputMap_v0::dataset_data>::stored_type(), psana_array.shape()[0]);
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "output_maps", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+  {
+    hdf5pp::Type dstype = EvrData::ns_SequencerConfigV1_v0::dataset_config::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "seq_config", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_ConfigV5_v0(const Psana::EvrData::ConfigV5& obj, hdf5pp::Group group, bool append)
 {
+  {
+    EvrData::ns_ConfigV5_v0::dataset_config ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "config", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "config", ds_data);
+    }
+  }
+  {
+    typedef __typeof__(obj.eventcodes()) PsanaArray;
+    typedef ndarray<EvrData::ns_EventCodeV5_v0::dataset_data, 1> HdfArray;
+    PsanaArray psana_array = obj.eventcodes();
+    HdfArray hdf_array(psana_array.shape());
+    HdfArray::iterator out = hdf_array.begin();
+    for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
+      *out = EvrData::ns_EventCodeV5_v0::dataset_data(*it);
+    }
+    if (append) {
+      hdf5pp::Utils::appendNDArray(group, "eventcodes", hdf_array);
+    } else {
+      hdf5pp::Utils::storeNDArray(group, "eventcodes", hdf_array);
+    }
+  }
+  {
+    typedef __typeof__(obj.pulses()) PsanaArray;
+    typedef ndarray<EvrData::ns_PulseConfigV3_v0::dataset_data, 1> HdfArray;
+    PsanaArray psana_array = obj.pulses();
+    HdfArray hdf_array(psana_array.shape());
+    HdfArray::iterator out = hdf_array.begin();
+    for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
+      *out = EvrData::ns_PulseConfigV3_v0::dataset_data(*it);
+    }
+    if (append) {
+      hdf5pp::Utils::appendNDArray(group, "pulses", hdf_array);
+    } else {
+      hdf5pp::Utils::storeNDArray(group, "pulses", hdf_array);
+    }
+  }
+  {
+    typedef __typeof__(obj.output_maps()) PsanaArray;
+    typedef ndarray<EvrData::ns_OutputMap_v0::dataset_data, 1> HdfArray;
+    PsanaArray psana_array = obj.output_maps();
+    HdfArray hdf_array(psana_array.shape());
+    HdfArray::iterator out = hdf_array.begin();
+    for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
+      *out = EvrData::ns_OutputMap_v0::dataset_data(*it);
+    }
+    if (append) {
+      hdf5pp::Utils::appendNDArray(group, "output_maps", hdf_array);
+    } else {
+      hdf5pp::Utils::storeNDArray(group, "output_maps", hdf_array);
+    }
+  }
+  {
+    EvrData::ns_SequencerConfigV1_v0::dataset_config ds_data(obj.seq_config());
+    if (append) {
+      hdf5pp::Utils::append(group, "seq_config", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "seq_config", ds_data);
+    }
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::ConfigV5> > make_ConfigV5(int version, hdf5pp::Group group, hsize_t idx) {
@@ -1790,6 +2529,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::ConfigV5> > make_ConfigV5(int ver
     return boost::make_shared<PSEvt::DataProxy<Psana::EvrData::ConfigV5> >(boost::make_shared<ConfigV5_v0>(group, idx));
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::EvrData::ConfigV5> >(boost::shared_ptr<Psana::EvrData::ConfigV5>());
+  }
+}
+
+void make_datasets(const Psana::EvrData::ConfigV5& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_ConfigV5_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "EvrData.ConfigV5", version);
   }
 }
 
@@ -1919,8 +2671,105 @@ void ConfigV6_v0::read_ds_seq_config() const {
   m_ds_storage_seq_config = boost::make_shared<SequencerConfigV1_v0>(m_ds_seq_config);
 }
 
+void make_datasets_ConfigV6_v0(const Psana::EvrData::ConfigV6& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = EvrData::ns_ConfigV6_v0::dataset_config::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "config", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+  {
+    typedef __typeof__(obj.eventcodes()) PsanaArray;
+    const PsanaArray& psana_array = obj.eventcodes();
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<EvrData::ns_EventCodeV5_v0::dataset_data>::stored_type(), psana_array.shape()[0]);
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "eventcodes", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+  {
+    typedef __typeof__(obj.pulses()) PsanaArray;
+    const PsanaArray& psana_array = obj.pulses();
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<EvrData::ns_PulseConfigV3_v0::dataset_data>::stored_type(), psana_array.shape()[0]);
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "pulses", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+  {
+    typedef __typeof__(obj.output_maps()) PsanaArray;
+    const PsanaArray& psana_array = obj.output_maps();
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<EvrData::ns_OutputMapV2_v0::dataset_data>::stored_type(), psana_array.shape()[0]);
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "output_maps", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+  {
+    hdf5pp::Type dstype = EvrData::ns_SequencerConfigV1_v0::dataset_config::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "seq_config", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_ConfigV6_v0(const Psana::EvrData::ConfigV6& obj, hdf5pp::Group group, bool append)
 {
+  {
+    EvrData::ns_ConfigV6_v0::dataset_config ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "config", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "config", ds_data);
+    }
+  }
+  {
+    typedef __typeof__(obj.eventcodes()) PsanaArray;
+    typedef ndarray<EvrData::ns_EventCodeV5_v0::dataset_data, 1> HdfArray;
+    PsanaArray psana_array = obj.eventcodes();
+    HdfArray hdf_array(psana_array.shape());
+    HdfArray::iterator out = hdf_array.begin();
+    for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
+      *out = EvrData::ns_EventCodeV5_v0::dataset_data(*it);
+    }
+    if (append) {
+      hdf5pp::Utils::appendNDArray(group, "eventcodes", hdf_array);
+    } else {
+      hdf5pp::Utils::storeNDArray(group, "eventcodes", hdf_array);
+    }
+  }
+  {
+    typedef __typeof__(obj.pulses()) PsanaArray;
+    typedef ndarray<EvrData::ns_PulseConfigV3_v0::dataset_data, 1> HdfArray;
+    PsanaArray psana_array = obj.pulses();
+    HdfArray hdf_array(psana_array.shape());
+    HdfArray::iterator out = hdf_array.begin();
+    for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
+      *out = EvrData::ns_PulseConfigV3_v0::dataset_data(*it);
+    }
+    if (append) {
+      hdf5pp::Utils::appendNDArray(group, "pulses", hdf_array);
+    } else {
+      hdf5pp::Utils::storeNDArray(group, "pulses", hdf_array);
+    }
+  }
+  {
+    typedef __typeof__(obj.output_maps()) PsanaArray;
+    typedef ndarray<EvrData::ns_OutputMapV2_v0::dataset_data, 1> HdfArray;
+    PsanaArray psana_array = obj.output_maps();
+    HdfArray hdf_array(psana_array.shape());
+    HdfArray::iterator out = hdf_array.begin();
+    for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
+      *out = EvrData::ns_OutputMapV2_v0::dataset_data(*it);
+    }
+    if (append) {
+      hdf5pp::Utils::appendNDArray(group, "output_maps", hdf_array);
+    } else {
+      hdf5pp::Utils::storeNDArray(group, "output_maps", hdf_array);
+    }
+  }
+  {
+    EvrData::ns_SequencerConfigV1_v0::dataset_config ds_data(obj.seq_config());
+    if (append) {
+      hdf5pp::Utils::append(group, "seq_config", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "seq_config", ds_data);
+    }
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::ConfigV6> > make_ConfigV6(int version, hdf5pp::Group group, hsize_t idx) {
@@ -1929,6 +2778,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::ConfigV6> > make_ConfigV6(int ver
     return boost::make_shared<PSEvt::DataProxy<Psana::EvrData::ConfigV6> >(boost::make_shared<ConfigV6_v0>(group, idx));
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::EvrData::ConfigV6> >(boost::shared_ptr<Psana::EvrData::ConfigV6>());
+  }
+}
+
+void make_datasets(const Psana::EvrData::ConfigV6& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_ConfigV6_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "EvrData.ConfigV6", version);
   }
 }
 
@@ -2058,8 +2920,105 @@ void ConfigV7_v0::read_ds_seq_config() const {
   m_ds_storage_seq_config = boost::make_shared<SequencerConfigV1_v0>(m_ds_seq_config);
 }
 
+void make_datasets_ConfigV7_v0(const Psana::EvrData::ConfigV7& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = EvrData::ns_ConfigV7_v0::dataset_config::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "config", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+  {
+    typedef __typeof__(obj.eventcodes()) PsanaArray;
+    const PsanaArray& psana_array = obj.eventcodes();
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<EvrData::ns_EventCodeV6_v0::dataset_data>::stored_type(), psana_array.shape()[0]);
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "eventcodes", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+  {
+    typedef __typeof__(obj.pulses()) PsanaArray;
+    const PsanaArray& psana_array = obj.pulses();
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<EvrData::ns_PulseConfigV3_v0::dataset_data>::stored_type(), psana_array.shape()[0]);
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "pulses", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+  {
+    typedef __typeof__(obj.output_maps()) PsanaArray;
+    const PsanaArray& psana_array = obj.output_maps();
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<EvrData::ns_OutputMapV2_v0::dataset_data>::stored_type(), psana_array.shape()[0]);
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "output_maps", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+  {
+    hdf5pp::Type dstype = EvrData::ns_SequencerConfigV1_v0::dataset_config::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "seq_config", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_ConfigV7_v0(const Psana::EvrData::ConfigV7& obj, hdf5pp::Group group, bool append)
 {
+  {
+    EvrData::ns_ConfigV7_v0::dataset_config ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "config", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "config", ds_data);
+    }
+  }
+  {
+    typedef __typeof__(obj.eventcodes()) PsanaArray;
+    typedef ndarray<EvrData::ns_EventCodeV6_v0::dataset_data, 1> HdfArray;
+    PsanaArray psana_array = obj.eventcodes();
+    HdfArray hdf_array(psana_array.shape());
+    HdfArray::iterator out = hdf_array.begin();
+    for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
+      *out = EvrData::ns_EventCodeV6_v0::dataset_data(*it);
+    }
+    if (append) {
+      hdf5pp::Utils::appendNDArray(group, "eventcodes", hdf_array);
+    } else {
+      hdf5pp::Utils::storeNDArray(group, "eventcodes", hdf_array);
+    }
+  }
+  {
+    typedef __typeof__(obj.pulses()) PsanaArray;
+    typedef ndarray<EvrData::ns_PulseConfigV3_v0::dataset_data, 1> HdfArray;
+    PsanaArray psana_array = obj.pulses();
+    HdfArray hdf_array(psana_array.shape());
+    HdfArray::iterator out = hdf_array.begin();
+    for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
+      *out = EvrData::ns_PulseConfigV3_v0::dataset_data(*it);
+    }
+    if (append) {
+      hdf5pp::Utils::appendNDArray(group, "pulses", hdf_array);
+    } else {
+      hdf5pp::Utils::storeNDArray(group, "pulses", hdf_array);
+    }
+  }
+  {
+    typedef __typeof__(obj.output_maps()) PsanaArray;
+    typedef ndarray<EvrData::ns_OutputMapV2_v0::dataset_data, 1> HdfArray;
+    PsanaArray psana_array = obj.output_maps();
+    HdfArray hdf_array(psana_array.shape());
+    HdfArray::iterator out = hdf_array.begin();
+    for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
+      *out = EvrData::ns_OutputMapV2_v0::dataset_data(*it);
+    }
+    if (append) {
+      hdf5pp::Utils::appendNDArray(group, "output_maps", hdf_array);
+    } else {
+      hdf5pp::Utils::storeNDArray(group, "output_maps", hdf_array);
+    }
+  }
+  {
+    EvrData::ns_SequencerConfigV1_v0::dataset_config ds_data(obj.seq_config());
+    if (append) {
+      hdf5pp::Utils::append(group, "seq_config", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "seq_config", ds_data);
+    }
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::ConfigV7> > make_ConfigV7(int version, hdf5pp::Group group, hsize_t idx) {
@@ -2068,6 +3027,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::ConfigV7> > make_ConfigV7(int ver
     return boost::make_shared<PSEvt::DataProxy<Psana::EvrData::ConfigV7> >(boost::make_shared<ConfigV7_v0>(group, idx));
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::EvrData::ConfigV7> >(boost::shared_ptr<Psana::EvrData::ConfigV7>());
+  }
+}
+
+void make_datasets(const Psana::EvrData::ConfigV7& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_ConfigV7_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "EvrData.ConfigV7", version);
   }
 }
 
@@ -2151,8 +3123,26 @@ Proxy_FIFOEvent_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source
 }
 
 
+void make_datasets_FIFOEvent_v0(const Psana::EvrData::FIFOEvent& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = EvrData::ns_FIFOEvent_v0::dataset_data::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_FIFOEvent_v0(const Psana::EvrData::FIFOEvent& obj, hdf5pp::Group group, bool append)
 {
+  {
+    EvrData::ns_FIFOEvent_v0::dataset_data ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "data", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "data", ds_data);
+    }
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::FIFOEvent> > make_FIFOEvent(int version, hdf5pp::Group group, hsize_t idx) {
@@ -2161,6 +3151,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::FIFOEvent> > make_FIFOEvent(int v
     return boost::make_shared<Proxy_FIFOEvent_v0>(group, idx);
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::EvrData::FIFOEvent> >(boost::shared_ptr<Psana::EvrData::FIFOEvent>());
+  }
+}
+
+void make_datasets(const Psana::EvrData::FIFOEvent& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_FIFOEvent_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "EvrData.FIFOEvent", version);
   }
 }
 
@@ -2195,6 +3198,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::DataV3> > make_DataV3(int version
   }
 }
 
+void make_datasets(const Psana::EvrData::DataV3& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_DataV3_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "EvrData.DataV3", version);
+  }
+}
+
 void store_DataV3(const Psana::EvrData::DataV3& obj, hdf5pp::Group group, int version, bool append)
 {
   if (version < 0) version = 0;
@@ -2223,6 +3239,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::IOConfigV1> > make_IOConfigV1(int
     return boost::make_shared<PSEvt::DataProxy<Psana::EvrData::IOConfigV1> >(boost::make_shared<IOConfigV1_v0>(group, idx));
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::EvrData::IOConfigV1> >(boost::shared_ptr<Psana::EvrData::IOConfigV1>());
+  }
+}
+
+void make_datasets(const Psana::EvrData::IOConfigV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_IOConfigV1_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "EvrData.IOConfigV1", version);
   }
 }
 

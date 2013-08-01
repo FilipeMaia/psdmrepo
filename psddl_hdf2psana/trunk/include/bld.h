@@ -36,6 +36,10 @@ struct dataset_data {
   static hdf5pp::Type native_type() ;
   static hdf5pp::Type stored_type() ;
 
+  dataset_data() {}
+  dataset_data(const Psana::Bld::BldDataPimV1& psanaobj);
+  ~dataset_data() {}
+
   Pulnix::ns_TM6740ConfigV2_v0::dataset_config camConfig;
   Lusi::ns_PimImageConfigV1_v0::dataset_config pimConfig;
   Camera::ns_FrameV1_v0::dataset_data frame;
@@ -72,6 +76,8 @@ private:
 
 };
 
+void make_datasets_BldDataPimV1_v0(const Psana::Bld::BldDataPimV1& obj,
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle);
 void store_BldDataPimV1_v0(const Psana::Bld::BldDataPimV1& obj, hdf5pp::Group group, bool append);
 
 } // namespace Bld

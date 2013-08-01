@@ -9,6 +9,7 @@
 #include "hdf5pp/Utils.h"
 #include "PSEvt/DataProxy.h"
 #include "psddl_hdf2psana/Exceptions.h"
+#include "psddl_hdf2psana/HdfParameters.h"
 #include "psddl_hdf2psana/bld.h"
 namespace psddl_hdf2psana {
 namespace Bld {
@@ -73,8 +74,26 @@ Proxy_BldDataFEEGasDetEnergy_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds
 }
 
 
+void make_datasets_BldDataFEEGasDetEnergy_v0(const Psana::Bld::BldDataFEEGasDetEnergy& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = Bld::ns_BldDataFEEGasDetEnergy_v0::dataset_data::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_BldDataFEEGasDetEnergy_v0(const Psana::Bld::BldDataFEEGasDetEnergy& obj, hdf5pp::Group group, bool append)
 {
+  {
+    Bld::ns_BldDataFEEGasDetEnergy_v0::dataset_data ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "data", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "data", ds_data);
+    }
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataFEEGasDetEnergy> > make_BldDataFEEGasDetEnergy(int version, hdf5pp::Group group, hsize_t idx) {
@@ -83,6 +102,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataFEEGasDetEnergy> > make_BldDat
     return boost::make_shared<Proxy_BldDataFEEGasDetEnergy_v0>(group, idx);
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::Bld::BldDataFEEGasDetEnergy> >(boost::shared_ptr<Psana::Bld::BldDataFEEGasDetEnergy>());
+  }
+}
+
+void make_datasets(const Psana::Bld::BldDataFEEGasDetEnergy& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_BldDataFEEGasDetEnergy_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataFEEGasDetEnergy", version);
   }
 }
 
@@ -178,8 +210,26 @@ Proxy_BldDataEBeamV0_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& s
 }
 
 
+void make_datasets_BldDataEBeamV0_v0(const Psana::Bld::BldDataEBeamV0& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = Bld::ns_BldDataEBeamV0_v0::dataset_data::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_BldDataEBeamV0_v0(const Psana::Bld::BldDataEBeamV0& obj, hdf5pp::Group group, bool append)
 {
+  {
+    Bld::ns_BldDataEBeamV0_v0::dataset_data ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "data", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "data", ds_data);
+    }
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataEBeamV0> > make_BldDataEBeamV0(int version, hdf5pp::Group group, hsize_t idx) {
@@ -188,6 +238,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataEBeamV0> > make_BldDataEBeamV0
     return boost::make_shared<Proxy_BldDataEBeamV0_v0>(group, idx);
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::Bld::BldDataEBeamV0> >(boost::shared_ptr<Psana::Bld::BldDataEBeamV0>());
+  }
+}
+
+void make_datasets(const Psana::Bld::BldDataEBeamV0& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_BldDataEBeamV0_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataEBeamV0", version);
   }
 }
 
@@ -286,8 +349,26 @@ Proxy_BldDataEBeamV1_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& s
 }
 
 
+void make_datasets_BldDataEBeamV1_v0(const Psana::Bld::BldDataEBeamV1& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = Bld::ns_BldDataEBeamV1_v0::dataset_data::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_BldDataEBeamV1_v0(const Psana::Bld::BldDataEBeamV1& obj, hdf5pp::Group group, bool append)
 {
+  {
+    Bld::ns_BldDataEBeamV1_v0::dataset_data ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "data", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "data", ds_data);
+    }
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataEBeamV1> > make_BldDataEBeamV1(int version, hdf5pp::Group group, hsize_t idx) {
@@ -296,6 +377,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataEBeamV1> > make_BldDataEBeamV1
     return boost::make_shared<Proxy_BldDataEBeamV1_v0>(group, idx);
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::Bld::BldDataEBeamV1> >(boost::shared_ptr<Psana::Bld::BldDataEBeamV1>());
+  }
+}
+
+void make_datasets(const Psana::Bld::BldDataEBeamV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_BldDataEBeamV1_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataEBeamV1", version);
   }
 }
 
@@ -397,8 +491,26 @@ Proxy_BldDataEBeamV2_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& s
 }
 
 
+void make_datasets_BldDataEBeamV2_v0(const Psana::Bld::BldDataEBeamV2& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = Bld::ns_BldDataEBeamV2_v0::dataset_data::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_BldDataEBeamV2_v0(const Psana::Bld::BldDataEBeamV2& obj, hdf5pp::Group group, bool append)
 {
+  {
+    Bld::ns_BldDataEBeamV2_v0::dataset_data ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "data", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "data", ds_data);
+    }
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataEBeamV2> > make_BldDataEBeamV2(int version, hdf5pp::Group group, hsize_t idx) {
@@ -407,6 +519,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataEBeamV2> > make_BldDataEBeamV2
     return boost::make_shared<Proxy_BldDataEBeamV2_v0>(group, idx);
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::Bld::BldDataEBeamV2> >(boost::shared_ptr<Psana::Bld::BldDataEBeamV2>());
+  }
+}
+
+void make_datasets(const Psana::Bld::BldDataEBeamV2& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_BldDataEBeamV2_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataEBeamV2", version);
   }
 }
 
@@ -514,8 +639,26 @@ Proxy_BldDataEBeamV3_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& s
 }
 
 
+void make_datasets_BldDataEBeamV3_v0(const Psana::Bld::BldDataEBeamV3& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = Bld::ns_BldDataEBeamV3_v0::dataset_data::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_BldDataEBeamV3_v0(const Psana::Bld::BldDataEBeamV3& obj, hdf5pp::Group group, bool append)
 {
+  {
+    Bld::ns_BldDataEBeamV3_v0::dataset_data ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "data", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "data", ds_data);
+    }
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataEBeamV3> > make_BldDataEBeamV3(int version, hdf5pp::Group group, hsize_t idx) {
@@ -524,6 +667,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataEBeamV3> > make_BldDataEBeamV3
     return boost::make_shared<Proxy_BldDataEBeamV3_v0>(group, idx);
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::Bld::BldDataEBeamV3> >(boost::shared_ptr<Psana::Bld::BldDataEBeamV3>());
+  }
+}
+
+void make_datasets(const Psana::Bld::BldDataEBeamV3& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_BldDataEBeamV3_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataEBeamV3", version);
   }
 }
 
@@ -610,8 +766,26 @@ Proxy_BldDataPhaseCavity_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Sr
 }
 
 
+void make_datasets_BldDataPhaseCavity_v0(const Psana::Bld::BldDataPhaseCavity& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = Bld::ns_BldDataPhaseCavity_v0::dataset_data::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_BldDataPhaseCavity_v0(const Psana::Bld::BldDataPhaseCavity& obj, hdf5pp::Group group, bool append)
 {
+  {
+    Bld::ns_BldDataPhaseCavity_v0::dataset_data ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "data", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "data", ds_data);
+    }
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataPhaseCavity> > make_BldDataPhaseCavity(int version, hdf5pp::Group group, hsize_t idx) {
@@ -620,6 +794,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataPhaseCavity> > make_BldDataPha
     return boost::make_shared<Proxy_BldDataPhaseCavity_v0>(group, idx);
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::Bld::BldDataPhaseCavity> >(boost::shared_ptr<Psana::Bld::BldDataPhaseCavity>());
+  }
+}
+
+void make_datasets(const Psana::Bld::BldDataPhaseCavity& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_BldDataPhaseCavity_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataPhaseCavity", version);
   }
 }
 
@@ -717,8 +904,26 @@ void BldDataIpimbV0_v0::read_ds_data() const {
   m_ds_data = hdf5pp::Utils::readGroup<Bld::ns_BldDataIpimbV0_v0::dataset_data>(m_group, "data", m_idx);
 }
 
+void make_datasets_BldDataIpimbV0_v0(const Psana::Bld::BldDataIpimbV0& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = Bld::ns_BldDataIpimbV0_v0::dataset_data::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_BldDataIpimbV0_v0(const Psana::Bld::BldDataIpimbV0& obj, hdf5pp::Group group, bool append)
 {
+  {
+    Bld::ns_BldDataIpimbV0_v0::dataset_data ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "data", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "data", ds_data);
+    }
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataIpimbV0> > make_BldDataIpimbV0(int version, hdf5pp::Group group, hsize_t idx) {
@@ -727,6 +932,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataIpimbV0> > make_BldDataIpimbV0
     return boost::make_shared<PSEvt::DataProxy<Psana::Bld::BldDataIpimbV0> >(boost::make_shared<BldDataIpimbV0_v0>(group, idx));
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::Bld::BldDataIpimbV0> >(boost::shared_ptr<Psana::Bld::BldDataIpimbV0>());
+  }
+}
+
+void make_datasets(const Psana::Bld::BldDataIpimbV0& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_BldDataIpimbV0_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataIpimbV0", version);
   }
 }
 
@@ -824,8 +1042,26 @@ void BldDataIpimbV1_v0::read_ds_data() const {
   m_ds_data = hdf5pp::Utils::readGroup<Bld::ns_BldDataIpimbV1_v0::dataset_data>(m_group, "data", m_idx);
 }
 
+void make_datasets_BldDataIpimbV1_v0(const Psana::Bld::BldDataIpimbV1& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = Bld::ns_BldDataIpimbV1_v0::dataset_data::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_BldDataIpimbV1_v0(const Psana::Bld::BldDataIpimbV1& obj, hdf5pp::Group group, bool append)
 {
+  {
+    Bld::ns_BldDataIpimbV1_v0::dataset_data ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "data", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "data", ds_data);
+    }
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataIpimbV1> > make_BldDataIpimbV1(int version, hdf5pp::Group group, hsize_t idx) {
@@ -834,6 +1070,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataIpimbV1> > make_BldDataIpimbV1
     return boost::make_shared<PSEvt::DataProxy<Psana::Bld::BldDataIpimbV1> >(boost::make_shared<BldDataIpimbV1_v0>(group, idx));
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::Bld::BldDataIpimbV1> >(boost::shared_ptr<Psana::Bld::BldDataIpimbV1>());
+  }
+}
+
+void make_datasets(const Psana::Bld::BldDataIpimbV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_BldDataIpimbV1_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataIpimbV1", version);
   }
 }
 
@@ -865,6 +1114,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataPimV1> > make_BldDataPimV1(int
     return boost::make_shared<PSEvt::DataProxy<Psana::Bld::BldDataPimV1> >(boost::make_shared<BldDataPimV1_v0>(group, idx));
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::Bld::BldDataPimV1> >(boost::shared_ptr<Psana::Bld::BldDataPimV1>());
+  }
+}
+
+void make_datasets(const Psana::Bld::BldDataPimV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_BldDataPimV1_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataPimV1", version);
   }
 }
 
@@ -1037,8 +1299,26 @@ void BldDataGMDV0_v0::read_ds_data() const {
   m_ds_data = hdf5pp::Utils::readGroup<Bld::ns_BldDataGMDV0_v0::dataset_data>(m_group, "data", m_idx);
 }
 
+void make_datasets_BldDataGMDV0_v0(const Psana::Bld::BldDataGMDV0& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = Bld::ns_BldDataGMDV0_v0::dataset_data::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_BldDataGMDV0_v0(const Psana::Bld::BldDataGMDV0& obj, hdf5pp::Group group, bool append)
 {
+  {
+    Bld::ns_BldDataGMDV0_v0::dataset_data ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "data", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "data", ds_data);
+    }
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataGMDV0> > make_BldDataGMDV0(int version, hdf5pp::Group group, hsize_t idx) {
@@ -1047,6 +1327,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataGMDV0> > make_BldDataGMDV0(int
     return boost::make_shared<PSEvt::DataProxy<Psana::Bld::BldDataGMDV0> >(boost::make_shared<BldDataGMDV0_v0>(group, idx));
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::Bld::BldDataGMDV0> >(boost::shared_ptr<Psana::Bld::BldDataGMDV0>());
+  }
+}
+
+void make_datasets(const Psana::Bld::BldDataGMDV0& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_BldDataGMDV0_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataGMDV0", version);
   }
 }
 
@@ -1149,8 +1442,26 @@ void BldDataGMDV1_v0::read_ds_data() const {
   m_ds_data = hdf5pp::Utils::readGroup<Bld::ns_BldDataGMDV1_v0::dataset_data>(m_group, "data", m_idx);
 }
 
+void make_datasets_BldDataGMDV1_v0(const Psana::Bld::BldDataGMDV1& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = Bld::ns_BldDataGMDV1_v0::dataset_data::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_BldDataGMDV1_v0(const Psana::Bld::BldDataGMDV1& obj, hdf5pp::Group group, bool append)
 {
+  {
+    Bld::ns_BldDataGMDV1_v0::dataset_data ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "data", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "data", ds_data);
+    }
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataGMDV1> > make_BldDataGMDV1(int version, hdf5pp::Group group, hsize_t idx) {
@@ -1159,6 +1470,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataGMDV1> > make_BldDataGMDV1(int
     return boost::make_shared<PSEvt::DataProxy<Psana::Bld::BldDataGMDV1> >(boost::make_shared<BldDataGMDV1_v0>(group, idx));
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::Bld::BldDataGMDV1> >(boost::shared_ptr<Psana::Bld::BldDataGMDV1>());
+  }
+}
+
+void make_datasets(const Psana::Bld::BldDataGMDV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_BldDataGMDV1_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataGMDV1", version);
   }
 }
 

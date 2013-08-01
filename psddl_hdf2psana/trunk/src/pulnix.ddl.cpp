@@ -9,6 +9,7 @@
 #include "hdf5pp/Utils.h"
 #include "PSEvt/DataProxy.h"
 #include "psddl_hdf2psana/Exceptions.h"
+#include "psddl_hdf2psana/HdfParameters.h"
 namespace psddl_hdf2psana {
 namespace Pulnix {
 
@@ -151,8 +152,26 @@ void TM6740ConfigV1_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<Pulnix::ns_TM6740ConfigV1_v0::dataset_config>(m_group, "config", m_idx);
 }
 
+void make_datasets_TM6740ConfigV1_v0(const Psana::Pulnix::TM6740ConfigV1& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = Pulnix::ns_TM6740ConfigV1_v0::dataset_config::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "config", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_TM6740ConfigV1_v0(const Psana::Pulnix::TM6740ConfigV1& obj, hdf5pp::Group group, bool append)
 {
+  {
+    Pulnix::ns_TM6740ConfigV1_v0::dataset_config ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "config", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "config", ds_data);
+    }
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Pulnix::TM6740ConfigV1> > make_TM6740ConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
@@ -161,6 +180,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Pulnix::TM6740ConfigV1> > make_TM6740Confi
     return boost::make_shared<PSEvt::DataProxy<Psana::Pulnix::TM6740ConfigV1> >(boost::make_shared<TM6740ConfigV1_v0>(group, idx));
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::Pulnix::TM6740ConfigV1> >(boost::shared_ptr<Psana::Pulnix::TM6740ConfigV1>());
+  }
+}
+
+void make_datasets(const Psana::Pulnix::TM6740ConfigV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_TM6740ConfigV1_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Pulnix.TM6740ConfigV1", version);
   }
 }
 
@@ -326,8 +358,26 @@ void TM6740ConfigV2_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<Pulnix::ns_TM6740ConfigV2_v0::dataset_config>(m_group, "config", m_idx);
 }
 
+void make_datasets_TM6740ConfigV2_v0(const Psana::Pulnix::TM6740ConfigV2& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = Pulnix::ns_TM6740ConfigV2_v0::dataset_config::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "config", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_TM6740ConfigV2_v0(const Psana::Pulnix::TM6740ConfigV2& obj, hdf5pp::Group group, bool append)
 {
+  {
+    Pulnix::ns_TM6740ConfigV2_v0::dataset_config ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "config", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "config", ds_data);
+    }
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Pulnix::TM6740ConfigV2> > make_TM6740ConfigV2(int version, hdf5pp::Group group, hsize_t idx) {
@@ -336,6 +386,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Pulnix::TM6740ConfigV2> > make_TM6740Confi
     return boost::make_shared<PSEvt::DataProxy<Psana::Pulnix::TM6740ConfigV2> >(boost::make_shared<TM6740ConfigV2_v0>(group, idx));
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::Pulnix::TM6740ConfigV2> >(boost::shared_ptr<Psana::Pulnix::TM6740ConfigV2>());
+  }
+}
+
+void make_datasets(const Psana::Pulnix::TM6740ConfigV2& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_TM6740ConfigV2_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Pulnix.TM6740ConfigV2", version);
   }
 }
 

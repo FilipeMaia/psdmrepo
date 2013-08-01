@@ -9,6 +9,7 @@
 #include "hdf5pp/Utils.h"
 #include "PSEvt/DataProxy.h"
 #include "psddl_hdf2psana/Exceptions.h"
+#include "psddl_hdf2psana/HdfParameters.h"
 namespace psddl_hdf2psana {
 namespace Princeton {
 
@@ -137,8 +138,26 @@ void ConfigV1_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<Princeton::ns_ConfigV1_v0::dataset_config>(m_group, "config", m_idx);
 }
 
+void make_datasets_ConfigV1_v0(const Psana::Princeton::ConfigV1& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = Princeton::ns_ConfigV1_v0::dataset_config::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "config", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_ConfigV1_v0(const Psana::Princeton::ConfigV1& obj, hdf5pp::Group group, bool append)
 {
+  {
+    Princeton::ns_ConfigV1_v0::dataset_config ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "config", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "config", ds_data);
+    }
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
@@ -147,6 +166,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::ConfigV1> > make_ConfigV1(int v
     return boost::make_shared<PSEvt::DataProxy<Psana::Princeton::ConfigV1> >(boost::make_shared<ConfigV1_v0>(group, idx));
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::Princeton::ConfigV1> >(boost::shared_ptr<Psana::Princeton::ConfigV1>());
+  }
+}
+
+void make_datasets(const Psana::Princeton::ConfigV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_ConfigV1_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Princeton.ConfigV1", version);
   }
 }
 
@@ -305,8 +337,26 @@ void ConfigV2_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<Princeton::ns_ConfigV2_v0::dataset_config>(m_group, "config", m_idx);
 }
 
+void make_datasets_ConfigV2_v0(const Psana::Princeton::ConfigV2& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = Princeton::ns_ConfigV2_v0::dataset_config::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "config", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_ConfigV2_v0(const Psana::Princeton::ConfigV2& obj, hdf5pp::Group group, bool append)
 {
+  {
+    Princeton::ns_ConfigV2_v0::dataset_config ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "config", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "config", ds_data);
+    }
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::ConfigV2> > make_ConfigV2(int version, hdf5pp::Group group, hsize_t idx) {
@@ -315,6 +365,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::ConfigV2> > make_ConfigV2(int v
     return boost::make_shared<PSEvt::DataProxy<Psana::Princeton::ConfigV2> >(boost::make_shared<ConfigV2_v0>(group, idx));
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::Princeton::ConfigV2> >(boost::shared_ptr<Psana::Princeton::ConfigV2>());
+  }
+}
+
+void make_datasets(const Psana::Princeton::ConfigV2& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_ConfigV2_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Princeton.ConfigV2", version);
   }
 }
 
@@ -473,8 +536,26 @@ void ConfigV3_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<Princeton::ns_ConfigV3_v0::dataset_config>(m_group, "config", m_idx);
 }
 
+void make_datasets_ConfigV3_v0(const Psana::Princeton::ConfigV3& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = Princeton::ns_ConfigV3_v0::dataset_config::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "config", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_ConfigV3_v0(const Psana::Princeton::ConfigV3& obj, hdf5pp::Group group, bool append)
 {
+  {
+    Princeton::ns_ConfigV3_v0::dataset_config ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "config", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "config", ds_data);
+    }
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::ConfigV3> > make_ConfigV3(int version, hdf5pp::Group group, hsize_t idx) {
@@ -483,6 +564,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::ConfigV3> > make_ConfigV3(int v
     return boost::make_shared<PSEvt::DataProxy<Psana::Princeton::ConfigV3> >(boost::make_shared<ConfigV3_v0>(group, idx));
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::Princeton::ConfigV3> >(boost::shared_ptr<Psana::Princeton::ConfigV3>());
+  }
+}
+
+void make_datasets(const Psana::Princeton::ConfigV3& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_ConfigV3_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Princeton.ConfigV3", version);
   }
 }
 
@@ -662,8 +756,26 @@ void ConfigV4_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<Princeton::ns_ConfigV4_v0::dataset_config>(m_group, "config", m_idx);
 }
 
+void make_datasets_ConfigV4_v0(const Psana::Princeton::ConfigV4& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = Princeton::ns_ConfigV4_v0::dataset_config::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "config", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_ConfigV4_v0(const Psana::Princeton::ConfigV4& obj, hdf5pp::Group group, bool append)
 {
+  {
+    Princeton::ns_ConfigV4_v0::dataset_config ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "config", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "config", ds_data);
+    }
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::ConfigV4> > make_ConfigV4(int version, hdf5pp::Group group, hsize_t idx) {
@@ -672,6 +784,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::ConfigV4> > make_ConfigV4(int v
     return boost::make_shared<PSEvt::DataProxy<Psana::Princeton::ConfigV4> >(boost::make_shared<ConfigV4_v0>(group, idx));
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::Princeton::ConfigV4> >(boost::shared_ptr<Psana::Princeton::ConfigV4>());
+  }
+}
+
+void make_datasets(const Psana::Princeton::ConfigV4& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_ConfigV4_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Princeton.ConfigV4", version);
   }
 }
 
@@ -858,8 +983,26 @@ void ConfigV5_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<Princeton::ns_ConfigV5_v0::dataset_config>(m_group, "config", m_idx);
 }
 
+void make_datasets_ConfigV5_v0(const Psana::Princeton::ConfigV5& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = Princeton::ns_ConfigV5_v0::dataset_config::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "config", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_ConfigV5_v0(const Psana::Princeton::ConfigV5& obj, hdf5pp::Group group, bool append)
 {
+  {
+    Princeton::ns_ConfigV5_v0::dataset_config ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "config", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "config", ds_data);
+    }
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::ConfigV5> > make_ConfigV5(int version, hdf5pp::Group group, hsize_t idx) {
@@ -868,6 +1011,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::ConfigV5> > make_ConfigV5(int v
     return boost::make_shared<PSEvt::DataProxy<Psana::Princeton::ConfigV5> >(boost::make_shared<ConfigV5_v0>(group, idx));
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::Princeton::ConfigV5> >(boost::shared_ptr<Psana::Princeton::ConfigV5>());
+  }
+}
+
+void make_datasets(const Psana::Princeton::ConfigV5& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_ConfigV5_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Princeton.ConfigV5", version);
   }
 }
 
@@ -966,8 +1122,40 @@ template class FrameV1_v0<Psana::Princeton::ConfigV3>;
 template class FrameV1_v0<Psana::Princeton::ConfigV4>;
 template class FrameV1_v0<Psana::Princeton::ConfigV5>;
 
+void make_datasets_FrameV1_v0(const Psana::Princeton::FrameV1& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = Princeton::ns_FrameV1_v0::dataset_frame::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "frame", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+  {
+    typedef __typeof__(obj.data()) PsanaArray;
+    const PsanaArray& psana_array = obj.data();
+    hsize_t dims[2];
+    std::copy(psana_array.shape(), psana_array.shape()+2, dims);
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint16_t>::stored_type(), 2, dims);
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_FrameV1_v0(const Psana::Princeton::FrameV1& obj, hdf5pp::Group group, bool append)
 {
+  {
+    Princeton::ns_FrameV1_v0::dataset_frame ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "frame", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "frame", ds_data);
+    }
+  }
+  if (append) {
+    hdf5pp::Utils::appendNDArray(group, "data", obj.data());
+  } else {
+    hdf5pp::Utils::storeNDArray(group, "data", obj.data());
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::FrameV1> > make_FrameV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::Princeton::ConfigV1>& cfg) {
@@ -1008,6 +1196,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::FrameV1> > make_FrameV1(int ver
     return boost::make_shared<PSEvt::DataProxy<Psana::Princeton::FrameV1> >(boost::make_shared<FrameV1_v0<Psana::Princeton::ConfigV5> >(group, idx, cfg));
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::Princeton::FrameV1> >(boost::shared_ptr<Psana::Princeton::FrameV1>());
+  }
+}
+
+void make_datasets(const Psana::Princeton::FrameV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_FrameV1_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Princeton.FrameV1", version);
   }
 }
 
@@ -1114,8 +1315,40 @@ template class FrameV2_v0<Psana::Princeton::ConfigV3>;
 template class FrameV2_v0<Psana::Princeton::ConfigV4>;
 template class FrameV2_v0<Psana::Princeton::ConfigV5>;
 
+void make_datasets_FrameV2_v0(const Psana::Princeton::FrameV2& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = Princeton::ns_FrameV2_v0::dataset_frame::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "frame", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+  {
+    typedef __typeof__(obj.data()) PsanaArray;
+    const PsanaArray& psana_array = obj.data();
+    hsize_t dims[2];
+    std::copy(psana_array.shape(), psana_array.shape()+2, dims);
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint16_t>::stored_type(), 2, dims);
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_FrameV2_v0(const Psana::Princeton::FrameV2& obj, hdf5pp::Group group, bool append)
 {
+  {
+    Princeton::ns_FrameV2_v0::dataset_frame ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "frame", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "frame", ds_data);
+    }
+  }
+  if (append) {
+    hdf5pp::Utils::appendNDArray(group, "data", obj.data());
+  } else {
+    hdf5pp::Utils::storeNDArray(group, "data", obj.data());
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::FrameV2> > make_FrameV2(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::Princeton::ConfigV1>& cfg) {
@@ -1156,6 +1389,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::FrameV2> > make_FrameV2(int ver
     return boost::make_shared<PSEvt::DataProxy<Psana::Princeton::FrameV2> >(boost::make_shared<FrameV2_v0<Psana::Princeton::ConfigV5> >(group, idx, cfg));
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::Princeton::FrameV2> >(boost::shared_ptr<Psana::Princeton::FrameV2>());
+  }
+}
+
+void make_datasets(const Psana::Princeton::FrameV2& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_FrameV2_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Princeton.FrameV2", version);
   }
 }
 
@@ -1233,8 +1479,26 @@ Proxy_InfoV1_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, c
 }
 
 
+void make_datasets_InfoV1_v0(const Psana::Princeton::InfoV1& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = Princeton::ns_InfoV1_v0::dataset_data::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_InfoV1_v0(const Psana::Princeton::InfoV1& obj, hdf5pp::Group group, bool append)
 {
+  {
+    Princeton::ns_InfoV1_v0::dataset_data ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "data", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "data", ds_data);
+    }
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::InfoV1> > make_InfoV1(int version, hdf5pp::Group group, hsize_t idx) {
@@ -1243,6 +1507,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::InfoV1> > make_InfoV1(int versi
     return boost::make_shared<Proxy_InfoV1_v0>(group, idx);
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::Princeton::InfoV1> >(boost::shared_ptr<Psana::Princeton::InfoV1>());
+  }
+}
+
+void make_datasets(const Psana::Princeton::InfoV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_InfoV1_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Princeton.InfoV1", version);
   }
 }
 

@@ -9,6 +9,7 @@
 #include "hdf5pp/Utils.h"
 #include "PSEvt/DataProxy.h"
 #include "psddl_hdf2psana/Exceptions.h"
+#include "psddl_hdf2psana/HdfParameters.h"
 namespace psddl_hdf2psana {
 namespace OceanOptics {
 
@@ -97,8 +98,26 @@ void ConfigV1_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<OceanOptics::ns_ConfigV1_v0::dataset_config>(m_group, "config", m_idx);
 }
 
+void make_datasets_ConfigV1_v0(const Psana::OceanOptics::ConfigV1& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = OceanOptics::ns_ConfigV1_v0::dataset_config::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "config", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_ConfigV1_v0(const Psana::OceanOptics::ConfigV1& obj, hdf5pp::Group group, bool append)
 {
+  {
+    OceanOptics::ns_ConfigV1_v0::dataset_config ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "config", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "config", ds_data);
+    }
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::OceanOptics::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
@@ -107,6 +126,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::OceanOptics::ConfigV1> > make_ConfigV1(int
     return boost::make_shared<PSEvt::DataProxy<Psana::OceanOptics::ConfigV1> >(boost::make_shared<ConfigV1_v0>(group, idx));
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::OceanOptics::ConfigV1> >(boost::shared_ptr<Psana::OceanOptics::ConfigV1>());
+  }
+}
+
+void make_datasets(const Psana::OceanOptics::ConfigV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_ConfigV1_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "OceanOptics.ConfigV1", version);
   }
 }
 
@@ -317,8 +349,38 @@ void DataV1_v0<Config>::read_ds_data() const {
 }
 template class DataV1_v0<Psana::OceanOptics::ConfigV1>;
 
+void make_datasets_DataV1_v0(const Psana::OceanOptics::DataV1& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    typedef __typeof__(obj.data()) PsanaArray;
+    const PsanaArray& psana_array = obj.data();
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint16_t>::stored_type(), psana_array.shape()[0]);
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "spectra", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+  {
+    hdf5pp::Type dstype = OceanOptics::ns_DataV1_v0::dataset_data::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_DataV1_v0(const Psana::OceanOptics::DataV1& obj, hdf5pp::Group group, bool append)
 {
+  if (append) {
+    hdf5pp::Utils::appendNDArray(group, "spectra", obj.data());
+  } else {
+    hdf5pp::Utils::storeNDArray(group, "spectra", obj.data());
+  }
+  {
+    OceanOptics::ns_DataV1_v0::dataset_data ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "data", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "data", ds_data);
+    }
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::OceanOptics::DataV1> > make_DataV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::OceanOptics::ConfigV1>& cfg) {
@@ -327,6 +389,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::OceanOptics::DataV1> > make_DataV1(int ver
     return boost::make_shared<PSEvt::DataProxy<Psana::OceanOptics::DataV1> >(boost::make_shared<DataV1_v0<Psana::OceanOptics::ConfigV1> >(group, idx, cfg));
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::OceanOptics::DataV1> >(boost::shared_ptr<Psana::OceanOptics::DataV1>());
+  }
+}
+
+void make_datasets(const Psana::OceanOptics::DataV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_DataV1_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "OceanOptics.DataV1", version);
   }
 }
 

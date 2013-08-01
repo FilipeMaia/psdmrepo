@@ -36,6 +36,7 @@ struct dataset_config {
   static hdf5pp::Type stored_type();
 
   dataset_config();
+  dataset_config(const Psana::FCCD::FccdConfigV2& psanaobj);
   ~dataset_config();
 
   uint16_t outputMode; 
@@ -76,6 +77,8 @@ private:
   void read_ds_config() const;
 };
 
+void make_datasets_FccdConfigV2_v0(const Psana::FCCD::FccdConfigV2& obj,
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle);
 void store_FccdConfigV2_v0(const Psana::FCCD::FccdConfigV2& obj, hdf5pp::Group group, bool append);
 
 } // namespace FCCD

@@ -127,7 +127,12 @@ private:
 };
 boost::shared_ptr<PSEvt::Proxy<Psana::CsPad2x2::CsPad2x2ReadOnlyCfg> > make_CsPad2x2ReadOnlyCfg(int version, hdf5pp::Group group, hsize_t idx);
 
+/// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::CsPad2x2::CsPad2x2ReadOnlyCfg& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::CsPad2x2::CsPad2x2ReadOnlyCfg& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method
 void append(const Psana::CsPad2x2::CsPad2x2ReadOnlyCfg& obj, hdf5pp::Group group, int version = -1);
 
 
@@ -166,7 +171,12 @@ private:
 };
 boost::shared_ptr<PSEvt::Proxy<Psana::CsPad2x2::ProtectionSystemThreshold> > make_ProtectionSystemThreshold(int version, hdf5pp::Group group, hsize_t idx);
 
+/// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::CsPad2x2::ProtectionSystemThreshold& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::CsPad2x2::ProtectionSystemThreshold& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method
 void append(const Psana::CsPad2x2::ProtectionSystemThreshold& obj, hdf5pp::Group group, int version = -1);
 
 
@@ -345,7 +355,12 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::CsPad2x2::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx);
 
+/// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::CsPad2x2::ConfigV1& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::CsPad2x2::ConfigV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method
 void append(const Psana::CsPad2x2::ConfigV1& obj, hdf5pp::Group group, int version = -1);
 
 
@@ -497,12 +512,22 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::CsPad2x2::ConfigV2> > make_ConfigV2(int version, hdf5pp::Group group, hsize_t idx);
 
+/// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::CsPad2x2::ConfigV2& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::CsPad2x2::ConfigV2& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method
 void append(const Psana::CsPad2x2::ConfigV2& obj, hdf5pp::Group group, int version = -1);
 
 boost::shared_ptr<PSEvt::Proxy<Psana::CsPad2x2::ElementV1> > make_ElementV1(int version, hdf5pp::Group group, hsize_t idx);
 
+/// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::CsPad2x2::ElementV1& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::CsPad2x2::ElementV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method
 void append(const Psana::CsPad2x2::ElementV1& obj, hdf5pp::Group group, int version = -1);
 
 } // namespace CsPad2x2

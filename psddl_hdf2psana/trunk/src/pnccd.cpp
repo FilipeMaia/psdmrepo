@@ -26,6 +26,7 @@
 #include "hdf5pp/VlenType.h"
 #include "hdf5pp/Utils.h"
 #include "MsgLogger/MsgLogger.h"
+#include "psddl_hdf2psana/HdfParameters.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -87,6 +88,14 @@ hdf5pp::Type ns_FrameV1_v0::dataset_data::native_type()
 {
   static hdf5pp::Type type = ns_FrameV1_v0_dataset_data_native_type();
   return type;
+}
+
+ns_FrameV1_v0::dataset_data::dataset_data(const Psana::PNCCD::FrameV1& psanaobj)
+  : specialWord(psanaobj.specialWord())
+  , frameNumber(psanaobj.frameNumber())
+  , timeStampHi(psanaobj.timeStampHi())
+  , timeStampLo(psanaobj.timeStampLo())
+{
 }
 
 uint32_t
@@ -156,9 +165,52 @@ FramesV1_v0<Config>::read_frames() const
 template class FramesV1_v0<Psana::PNCCD::ConfigV1>;
 template class FramesV1_v0<Psana::PNCCD::ConfigV2>;
 
+void make_datasets_FramesV1_v0(const Psana::PNCCD::FramesV1& obj,
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  const unsigned nLinks = obj.numLinks();
+  const unsigned data_size = obj.frame(0)._data().shape()[0];
+  {
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<ns_FrameV1_v0::dataset_data>::stored_type(), nLinks);
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "frame", dstype, chunk_size, chunk_cache_size, deflate, shuffle);
+  }
+  {
+    hsize_t dims[2] = {nLinks, data_size};
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint16_t>::stored_type(), 2, dims);
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);
+  }
+}
+
 void store_FramesV1_v0(const Psana::PNCCD::FramesV1& obj, hdf5pp::Group group, bool append)
 {
-    
+  unsigned nLinks = obj.numLinks();
+  ndarray<ns_FrameV1_v0::dataset_data, 1> frames_ds = make_ndarray<ns_FrameV1_v0::dataset_data>(nLinks);
+  for (int i = 0; i != nLinks; ++ i) {
+    frames_ds[i] = ns_FrameV1_v0::dataset_data(obj.frame(i));
+  }
+
+  // need to make 2-d array, high dimension is the number of links,
+  // low dimension is the size of data. We do not store images as images,
+  // but as 1-d data
+  unsigned data_size = obj.frame(0)._data().shape()[0];
+  ndarray<uint16_t, 2> data = make_ndarray<uint16_t>(nLinks, data_size);
+
+  // copy the data
+  for (unsigned i = 0; i != nLinks; ++ i) {
+    ndarray<const uint16_t, 1> small = obj.frame(i)._data();
+    std::copy(small.begin(), small.end(), &data[i][0]);
+  }
+
+  if (append) {
+    hdf5pp::Utils::appendNDArray(group, "frame", frames_ds);
+    hdf5pp::Utils::appendNDArray(group, "data", data);
+  } else {
+    hdf5pp::Utils::storeNDArray(group, "frame", frames_ds);
+    hdf5pp::Utils::storeNDArray(group, "data", data);
+  }
+
 }
 
 
@@ -242,9 +294,17 @@ FullFrameV1_v0::read_frame() const
   }
 }
 
+void make_datasets_FullFrameV1_v0(const Psana::PNCCD::FullFrameV1& obj,
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  // we do not want to save FullFrame in HDF5
+  MsgLog("PNCCD::make_datasets_FullFrameV1_v0", error, "type is not supported");
+}
+
 void store_FullFrameV1_v0(const Psana::PNCCD::FullFrameV1& obj, hdf5pp::Group group, bool append)
 {
-    
+  // we do not want to save FullFrame in HDF5
+  MsgLog("PNCCD::store_FullFrameV1_v0", error, "type is not supported");
 }
 
 } // namespace PNCCD

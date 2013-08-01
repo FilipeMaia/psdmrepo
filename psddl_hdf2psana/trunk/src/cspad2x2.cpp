@@ -25,6 +25,7 @@
 #include "hdf5pp/ArrayType.h"
 #include "hdf5pp/CompoundType.h"
 #include "hdf5pp/Utils.h"
+#include "psddl_hdf2psana/HdfParameters.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -199,6 +200,12 @@ ElementV1_v0::read_ds_cm() const {
     m_ds_cm = make_ndarray<float>(2);
     std::fill(m_ds_cm.begin(), m_ds_cm.end(), 0.f);
   }
+}
+
+void make_datasets_ElementV1_v0(const Psana::CsPad2x2::ElementV1& obj,
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+
 }
 
 void store_ElementV1_v0(const Psana::CsPad2x2::ElementV1& obj, hdf5pp::Group group, bool append)

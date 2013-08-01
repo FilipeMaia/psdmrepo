@@ -37,12 +37,14 @@ struct dataset_data {
   static hdf5pp::Type stored_type();
 
   dataset_data();
+  dataset_data(const Psana::UsdUsb::DataV1& psanaobj);
   ~dataset_data();
 
   int32_t e_count[4];    // data in v0 are stored as uint32_t but interface requires int32_t
-  uint16_t analog_in[4]; 
-  uint32_t timestamp; 
-  uint8_t digital_in; 
+  uint16_t analog_in[4];
+  uint32_t timestamp;
+  uint8_t status[4];
+  uint8_t digital_in;
 
 };
 }
@@ -71,6 +73,8 @@ private:
   void read_ds_data() const;
 };
 
+void make_datasets_DataV1_v0(const Psana::UsdUsb::DataV1& obj,
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle);
 void store_DataV1_v0(const Psana::UsdUsb::DataV1& obj, hdf5pp::Group group, bool append);
 
 } // namespace UsdUsb

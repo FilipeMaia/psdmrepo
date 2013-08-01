@@ -107,10 +107,36 @@ ns_DetInfo_v0::dataset_data::dataset_data(const ::Pds::DetInfo& di)
   device = strdup(::Pds::DetInfo::name(di.device()));
 }
 
+ns_DetInfo_v0::dataset_data::dataset_data(const dataset_data& di)
+  : processId(di.processId)
+  , detector(0)
+  , detId(di.detId)
+  , device(0)
+  , devId(di.devId)
+{
+  detector = strdup(di.detector);
+  device = strdup(di.device);
+}
+
 ns_DetInfo_v0::dataset_data::~dataset_data()
 {
   free(detector);
   free(device);
+}
+
+ns_DetInfo_v0::dataset_data&
+ns_DetInfo_v0::dataset_data::operator=(const dataset_data& di)
+{
+  if (this != &di) {
+    free(detector);
+    free(device);
+    processId = di.processId;
+    detId = di.detId;
+    detector = strdup(di.detector);
+    devId = di.devId;
+    device = strdup(di.device);
+  }
+  return *this;
 }
 
 ns_DetInfo_v0::dataset_data::operator ::Pds::DetInfo() const

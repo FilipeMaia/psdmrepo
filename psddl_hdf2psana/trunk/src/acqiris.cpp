@@ -21,6 +21,8 @@
 //-------------------------------
 #include "hdf5pp/CompoundType.h"
 #include "hdf5pp/Utils.h"
+#include "MsgLogger/MsgLogger.h"
+#include "psddl_hdf2psana/HdfParameters.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -77,9 +79,17 @@ DataDescV1_v0<Config>::read_ds_data() const
   }
 }
 
+void make_datasets_DataDescV1_v0(const Psana::Acqiris::DataDescV1& obj,
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  // this schema is too old, we'll not be writing this stuff anymore
+  MsgLog("Acqiris::make_datasets_DataDescV1_v0", error, "schema is not supported");
+}
+
 void store_DataDescV1_v0(const Psana::Acqiris::DataDescV1& obj, hdf5pp::Group group, bool append)
 {
-    
+  // this schema is too old, we'll not be writing this stuff anymore
+  MsgLog("Acqiris::store_DataDescV1_v0", error, "schema is not supported");
 }
 
 
@@ -117,6 +127,13 @@ hdf5pp::Type ns_DataDescV1Elem_v1::dataset_data::native_type()
 {
   static hdf5pp::Type type = ns_DataDescV1Elem_v1_dataset_data_native_type();
   return type;
+}
+
+ns_DataDescV1Elem_v1::dataset_data::dataset_data(const Psana::Acqiris::DataDescV1Elem& psanaobj)
+  : nbrSamplesInSeg(psanaobj.nbrSamplesInSeg())
+  , indexFirstPoint(psanaobj.indexFirstPoint())
+  , nbrSegments(psanaobj.nbrSegments())
+{
 }
 
 
@@ -163,9 +180,77 @@ DataDescV1_v1<Config>::read_ds_data() const
   }
 }
 
+void make_datasets_DataDescV1_v1(const Psana::Acqiris::DataDescV1& obj,
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  const unsigned nch = obj.data_shape()[0];
+  const Psana::Acqiris::DataDescV1Elem& elem = obj.data(0);
+  const ndarray<const int16_t, 2>& wf = elem.waveforms();
+  const unsigned nseg = wf.shape()[0];
+  const unsigned nsampl = wf.shape()[1];
+  {
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<ns_DataDescV1Elem_v1::dataset_data>::stored_type(), nch);
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);
+  }
+  {
+    hsize_t dim[2] = {nch, nseg};
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<ns_TimestampV1_v0::dataset_data>::stored_type(), 2, dim);
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "timestamps", dstype, chunk_size, chunk_cache_size, deflate, shuffle);
+  }
+  {
+    hsize_t dim[3] = {nch, nseg, nsampl};
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<int16_t>::stored_type(), 3, dim);
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "waveforms", dstype, chunk_size, chunk_cache_size, deflate, shuffle);
+  }
+}
+
 void store_DataDescV1_v1(const Psana::Acqiris::DataDescV1& obj, hdf5pp::Group group, bool append)
 {
-    
+  const unsigned nch = obj.data_shape()[0];
+  const Psana::Acqiris::DataDescV1Elem& elem = obj.data(0);
+  const ndarray<const int16_t, 2>& wf = elem.waveforms();
+  const unsigned nseg = wf.shape()[0];
+  const unsigned nsampl = wf.shape()[1];
+
+  {
+    ndarray<ns_DataDescV1Elem_v1::dataset_data, 1> data = make_ndarray<ns_DataDescV1Elem_v1::dataset_data>(nch);
+    for (unsigned i = 0; i != nch; ++ i) {
+      data[i] = ns_DataDescV1Elem_v1::dataset_data(obj.data(i));
+    }
+    if (append) {
+      hdf5pp::Utils::appendNDArray(group, "data", data);
+    } else {
+      hdf5pp::Utils::storeNDArray(group, "data", data);
+    }
+  }
+  {
+    ndarray<ns_TimestampV1_v0::dataset_data, 2> data = make_ndarray<ns_TimestampV1_v0::dataset_data>(nch, nseg);
+    for (unsigned i = 0; i != nch; ++ i) {
+      const ndarray<const Psana::Acqiris::TimestampV1, 1>& small = obj.data(i).timestamp();
+      std::copy(small.begin(), small.end(), &data[i][0]);
+    }
+    if (append) {
+      hdf5pp::Utils::appendNDArray(group, "timestamps", data);
+    } else {
+      hdf5pp::Utils::storeNDArray(group, "timestamps", data);
+    }
+  }
+  {
+    ndarray<int16_t, 3> data = make_ndarray<int16_t>(nch, nseg, nsampl);
+    for (unsigned i = 0; i != nch; ++ i) {
+      const ndarray<const int16_t, 2>& small = obj.data(i).waveforms();
+      std::copy(small.begin(), small.end(), &data[i][0][0]);
+    }
+    if (append) {
+      hdf5pp::Utils::appendNDArray(group, "waveforms", data);
+    } else {
+      hdf5pp::Utils::storeNDArray(group, "waveforms", data);
+    }
+  }
+  
 }
 
 template class DataDescV1_v1<Psana::Acqiris::ConfigV1>;

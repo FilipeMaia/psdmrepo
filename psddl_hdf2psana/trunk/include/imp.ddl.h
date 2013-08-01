@@ -62,7 +62,12 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Imp::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx);
 
+/// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::Imp::ConfigV1& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::Imp::ConfigV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method
 void append(const Psana::Imp::ConfigV1& obj, hdf5pp::Group group, int version = -1);
 
 
@@ -152,7 +157,12 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Imp::ElementV1> > make_ElementV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::Imp::ConfigV1>& cfg);
 
+/// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::Imp::ElementV1& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::Imp::ElementV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method
 void append(const Psana::Imp::ElementV1& obj, hdf5pp::Group group, int version = -1);
 
 } // namespace Imp

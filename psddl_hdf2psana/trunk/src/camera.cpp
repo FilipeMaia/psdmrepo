@@ -21,6 +21,7 @@
 //-------------------------------
 #include "hdf5pp/CompoundType.h"
 #include "hdf5pp/Utils.h"
+#include "psddl_hdf2psana/HdfParameters.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -66,9 +67,19 @@ hdf5pp::Type ns_FrameV1_v0::dataset_data::native_type()
   static hdf5pp::Type type = ns_FrameV1_v0_dataset_data_native_type();
   return type;
 }
+
 ns_FrameV1_v0::dataset_data::dataset_data()
 {
 }
+
+ns_FrameV1_v0::dataset_data::dataset_data(const Psana::Camera::FrameV1& psanaobj)
+  : width(psanaobj.width())
+  , height(psanaobj.height())
+  , depth(psanaobj.depth())
+  , offset(psanaobj.offset())
+{
+}
+
 ns_FrameV1_v0::dataset_data::~dataset_data()
 {
 }
@@ -134,9 +145,64 @@ void FrameV1_v0::read_ds_image() const
   }
 }
 
+void make_datasets_FrameV1_v0(const Psana::Camera::FrameV1& obj,
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = ns_FrameV1_v0::dataset_data::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);
+  }
+
+  {
+    // image can be either 8-bit or 16-bit
+    hsize_t dims[2];
+    hdf5pp::Type basetype;
+    if (obj.depth() > 8) {
+      const ndarray<const uint16_t, 2>& psana_array = obj.data16();
+      std::copy(psana_array.shape(), psana_array.shape()+2, dims);
+      basetype = hdf5pp::TypeTraits<uint16_t>::stored_type();
+    } else {
+      const ndarray<const uint8_t, 2>& psana_array = obj.data8();
+      std::copy(psana_array.shape(), psana_array.shape()+2, dims);
+      basetype = hdf5pp::TypeTraits<uint8_t>::stored_type();
+    }
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(basetype, 2, dims);
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "image", dstype, chunk_size, chunk_cache_size, deflate, shuffle);
+  }
+}
+
 void store_FrameV1_v0(const Psana::Camera::FrameV1& obj, hdf5pp::Group group, bool append)
 {
-    
+  // store metadata dataset
+  if (append) {
+    hdf5pp::Utils::append(group, "data", ns_FrameV1_v0::dataset_data::dataset_data(obj));
+  } else {
+    hdf5pp::Utils::storeScalar(group, "data", ns_FrameV1_v0::dataset_data::dataset_data(obj));
+  }
+
+  // store image, it can be either 8-bit or 16-bit
+  if (obj.depth() > 8) {
+
+    ndarray<const uint16_t, 2> img = obj.data16();
+    if (append) {
+      hdf5pp::Utils::appendNDArray(group, "image", img);
+    } else {
+      hdf5pp::Utils::storeNDArray(group, "image", img);
+    }
+
+  } else {
+
+    ndarray<const uint8_t, 2> img = obj.data8();
+    if (append) {
+      hdf5pp::Utils::appendNDArray(group, "image", img);
+    } else {
+      hdf5pp::Utils::storeNDArray(group, "image", img);
+    }
+
+  }
+
 }
 
 } // namespace Camera

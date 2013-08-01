@@ -25,6 +25,7 @@
 #include "hdf5pp/Utils.h"
 #include "psddl_hdf2psana/lusi.ddl.h"
 #include "psddl_hdf2psana/pulnix.ddl.h"
+#include "psddl_hdf2psana/HdfParameters.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -74,6 +75,13 @@ ns_BldDataPimV1_v0::dataset_data::native_type()
   return type ;
 }
 
+ns_BldDataPimV1_v0::dataset_data::dataset_data(const Psana::Bld::BldDataPimV1& psanaobj)
+  : camConfig(psanaobj.camConfig())
+  , pimConfig(psanaobj.pimConfig())
+  , frame(psanaobj.frame())
+{
+}
+
 const Psana::Pulnix::TM6740ConfigV2&
 BldDataPimV1_v0::camConfig() const
 {
@@ -112,9 +120,23 @@ BldDataPimV1_v0::read_ds_data() const
   m_ds_data = hdf5pp::Utils::readGroup<ns_BldDataPimV1_v0::dataset_data>(m_group, "data", m_idx);
 }
 
+void make_datasets_BldDataPimV1_v0(const Psana::Bld::BldDataPimV1& obj,
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = ns_BldDataPimV1_v0::dataset_data::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);
+  }
+}
+
 void store_BldDataPimV1_v0(const Psana::Bld::BldDataPimV1& obj, hdf5pp::Group group, bool append)
 {
-    
+  if (append) {
+    hdf5pp::Utils::append(group, "data", ns_BldDataPimV1_v0::dataset_data(obj));
+  } else {
+    hdf5pp::Utils::storeScalar(group, "data", ns_BldDataPimV1_v0::dataset_data(obj));
+  }
 }
 
 } // namespace Bld

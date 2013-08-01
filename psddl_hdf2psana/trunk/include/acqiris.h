@@ -85,6 +85,8 @@ private:
 
 };
 
+void make_datasets_DataDescV1_v0(const Psana::Acqiris::DataDescV1& obj,
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle);
 void store_DataDescV1_v0(const Psana::Acqiris::DataDescV1& obj, hdf5pp::Group group, bool append);
 
 
@@ -93,6 +95,9 @@ struct dataset_data {
 
   static hdf5pp::Type native_type();
   static hdf5pp::Type stored_type();
+  
+  dataset_data() {}
+  dataset_data(const Psana::Acqiris::DataDescV1Elem& psanaobj);
 
   uint32_t nbrSamplesInSeg;
   uint32_t indexFirstPoint;
@@ -157,6 +162,8 @@ private:
 
 };
 
+void make_datasets_DataDescV1_v1(const Psana::Acqiris::DataDescV1& obj,
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle);
 void store_DataDescV1_v1(const Psana::Acqiris::DataDescV1& obj, hdf5pp::Group group, bool append);
 
 

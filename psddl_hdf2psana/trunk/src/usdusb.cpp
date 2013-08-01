@@ -22,10 +22,22 @@
 #include "hdf5pp/CompoundType.h"
 #include "hdf5pp/EnumType.h"
 #include "hdf5pp/Utils.h"
+#include "psddl_hdf2psana/HdfParameters.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
 //-----------------------------------------------------------------------
+
+namespace {
+
+  template <typename T, typename U>
+  void ndarray2array(const ndarray<T, 1>& src, U* dst, size_t size) {
+    size_t i;
+    for (i = 0; i < src.shape()[0]; ++ i) dst[i] = src[i];
+    for (; i < size; ++ i) dst[i] = U(0);
+  }
+
+}
 
 //              ----------------------------------------
 //              -- Public Function Member Definitions --
@@ -62,6 +74,7 @@ hdf5pp::Type ns_DataV1_v0_dataset_data_native_type()
   type.insert("encoder_count", offsetof(DsType, e_count), hdf5pp::TypeTraits<uint32_t>::native_type(), 4);
   type.insert("analog_in", offsetof(DsType, analog_in), hdf5pp::TypeTraits<uint16_t>::native_type(), 4);
   type.insert("timestamp", offsetof(DsType, timestamp), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("status", offsetof(DsType, status), hdf5pp::TypeTraits<uint8_t>::native_type(), 4) ;
   type.insert("digital_in", offsetof(DsType, digital_in), hdf5pp::TypeTraits<uint8_t>::native_type());
   return type;
 }
@@ -75,6 +88,15 @@ ns_DataV1_v0::dataset_data::native_type()
 
 ns_DataV1_v0::dataset_data::dataset_data()
 {
+}
+
+ns_DataV1_v0::dataset_data::dataset_data(const Psana::UsdUsb::DataV1& psanaobj)
+  : timestamp(psanaobj.timestamp())
+  , digital_in(psanaobj.digital_in())
+{
+  ::ndarray2array(psanaobj.encoder_count(), e_count, 4);
+  ::ndarray2array(psanaobj.analog_in(), analog_in, 4);
+  ::ndarray2array(psanaobj.status(), status, 4);
 }
 
 ns_DataV1_v0::dataset_data::~dataset_data()
@@ -125,9 +147,23 @@ DataV1_v0::read_ds_data() const
   m_ds_data = hdf5pp::Utils::readGroup<UsdUsb::ns_DataV1_v0::dataset_data>(m_group, "data", m_idx);
 }
 
+void make_datasets_DataV1_v0(const Psana::UsdUsb::DataV1& obj,
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = ns_DataV1_v0::dataset_data::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);
+  }
+}
+
 void store_DataV1_v0(const Psana::UsdUsb::DataV1& obj, hdf5pp::Group group, bool append)
 {
-    
+  if (append) {
+    hdf5pp::Utils::append(group, "data", ns_DataV1_v0::dataset_data(obj));
+  } else {
+    hdf5pp::Utils::storeScalar(group, "data", ns_DataV1_v0::dataset_data(obj));
+  }
 }
 
 } // namespace UsdUsb

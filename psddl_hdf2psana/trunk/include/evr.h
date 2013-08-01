@@ -39,11 +39,15 @@ struct dataset_data {
   static hdf5pp::Type stored_type();
 
   dataset_data();
+  dataset_data(const Psana::EvrData::DataV3& psanaobj);
   ~dataset_data();
 
   size_t vlen_fifoEvents;
   EvrData::ns_FIFOEvent_v0::dataset_data* fifoEvents;
 
+private:
+  dataset_data(const dataset_data& ds);
+  dataset_data& operator=(const dataset_data& ds);
 };
 }
 
@@ -68,6 +72,8 @@ private:
 };
 
 
+void make_datasets_DataV3_v0(const Psana::EvrData::DataV3& obj,
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle);
 void store_DataV3_v0(const Psana::EvrData::DataV3& obj, hdf5pp::Group group, bool append);
 
 
@@ -81,13 +87,18 @@ struct dataset_data {
   static hdf5pp::Type stored_type();
 
   dataset_data();
+  dataset_data(const Psana::EvrData::IOChannel& psanaobj);
+  dataset_data(const dataset_data& ds);
   ~dataset_data();
+
+  dataset_data& operator=(const dataset_data& ds);
 
   char name[NameLength];
   size_t ninfo;
   Pds::ns_DetInfo_v0::dataset_data* infos;
 
   operator Psana::EvrData::IOChannel() const;
+
 };
 }
 
@@ -117,6 +128,7 @@ struct dataset_config {
   static hdf5pp::Type stored_type();
 
   dataset_config();
+  dataset_config(const Psana::EvrData::IOConfigV1& psanaobj);
   ~dataset_config();
 
   int32_t conn;
@@ -145,6 +157,8 @@ private:
   void read_ds_channels() const;
 };
 
+void make_datasets_IOConfigV1_v0(const Psana::EvrData::IOConfigV1& obj,
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle);
 void store_IOConfigV1_v0(const Psana::EvrData::IOConfigV1& obj, hdf5pp::Group group, bool append);
 
 } // namespace EvrData

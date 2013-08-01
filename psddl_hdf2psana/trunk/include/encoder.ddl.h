@@ -54,7 +54,12 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Encoder::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx);
 
+/// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::Encoder::ConfigV1& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::Encoder::ConfigV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method
 void append(const Psana::Encoder::ConfigV1& obj, hdf5pp::Group group, int version = -1);
 
 
@@ -102,7 +107,12 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Encoder::ConfigV2> > make_ConfigV2(int version, hdf5pp::Group group, hsize_t idx);
 
+/// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::Encoder::ConfigV2& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::Encoder::ConfigV2& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method
 void append(const Psana::Encoder::ConfigV2& obj, hdf5pp::Group group, int version = -1);
 
 
@@ -145,7 +155,12 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Encoder::DataV1> > make_DataV1(int version, hdf5pp::Group group, hsize_t idx);
 
+/// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::Encoder::DataV1& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::Encoder::DataV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method
 void append(const Psana::Encoder::DataV1& obj, hdf5pp::Group group, int version = -1);
 
 
@@ -188,7 +203,12 @@ private:
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Encoder::DataV2> > make_DataV2(int version, hdf5pp::Group group, hsize_t idx);
 
+/// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::Encoder::DataV2& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::Encoder::DataV2& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method
 void append(const Psana::Encoder::DataV2& obj, hdf5pp::Group group, int version = -1);
 
 } // namespace Encoder

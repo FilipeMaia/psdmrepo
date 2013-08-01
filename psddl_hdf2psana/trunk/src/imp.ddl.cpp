@@ -9,6 +9,7 @@
 #include "hdf5pp/Utils.h"
 #include "PSEvt/DataProxy.h"
 #include "psddl_hdf2psana/Exceptions.h"
+#include "psddl_hdf2psana/HdfParameters.h"
 namespace psddl_hdf2psana {
 namespace Imp {
 
@@ -123,8 +124,26 @@ void ConfigV1_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<Imp::ns_ConfigV1_v0::dataset_config>(m_group, "config", m_idx);
 }
 
+void make_datasets_ConfigV1_v0(const Psana::Imp::ConfigV1& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = Imp::ns_ConfigV1_v0::dataset_config::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "config", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_ConfigV1_v0(const Psana::Imp::ConfigV1& obj, hdf5pp::Group group, bool append)
 {
+  {
+    Imp::ns_ConfigV1_v0::dataset_config ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "config", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "config", ds_data);
+    }
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Imp::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
@@ -133,6 +152,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Imp::ConfigV1> > make_ConfigV1(int version
     return boost::make_shared<PSEvt::DataProxy<Psana::Imp::ConfigV1> >(boost::make_shared<ConfigV1_v0>(group, idx));
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::Imp::ConfigV1> >(boost::shared_ptr<Psana::Imp::ConfigV1>());
+  }
+}
+
+void make_datasets(const Psana::Imp::ConfigV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_ConfigV1_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Imp.ConfigV1", version);
   }
 }
 
@@ -365,8 +397,48 @@ void ElementV1_v0<Config>::read_ds_samples() const {
 }
 template class ElementV1_v0<Psana::Imp::ConfigV1>;
 
+void make_datasets_ElementV1_v0(const Psana::Imp::ElementV1& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = Imp::ns_ElementV1_v0::dataset_data::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+  {
+    typedef __typeof__(obj.samples()) PsanaArray;
+    const PsanaArray& psana_array = obj.samples();
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<Imp::ns_Sample_v0::dataset_data>::stored_type(), psana_array.shape()[0]);
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "samples", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_ElementV1_v0(const Psana::Imp::ElementV1& obj, hdf5pp::Group group, bool append)
 {
+  {
+    Imp::ns_ElementV1_v0::dataset_data ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "data", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "data", ds_data);
+    }
+  }
+  {
+    typedef __typeof__(obj.samples()) PsanaArray;
+    typedef ndarray<Imp::ns_Sample_v0::dataset_data, 1> HdfArray;
+    PsanaArray psana_array = obj.samples();
+    HdfArray hdf_array(psana_array.shape());
+    HdfArray::iterator out = hdf_array.begin();
+    for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
+      *out = Imp::ns_Sample_v0::dataset_data(*it);
+    }
+    if (append) {
+      hdf5pp::Utils::appendNDArray(group, "samples", hdf_array);
+    } else {
+      hdf5pp::Utils::storeNDArray(group, "samples", hdf_array);
+    }
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Imp::ElementV1> > make_ElementV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::Imp::ConfigV1>& cfg) {
@@ -375,6 +447,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Imp::ElementV1> > make_ElementV1(int versi
     return boost::make_shared<PSEvt::DataProxy<Psana::Imp::ElementV1> >(boost::make_shared<ElementV1_v0<Psana::Imp::ConfigV1> >(group, idx, cfg));
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::Imp::ElementV1> >(boost::shared_ptr<Psana::Imp::ElementV1>());
+  }
+}
+
+void make_datasets(const Psana::Imp::ElementV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_ElementV1_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Imp.ElementV1", version);
   }
 }
 

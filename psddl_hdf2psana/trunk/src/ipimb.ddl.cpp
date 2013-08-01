@@ -9,6 +9,7 @@
 #include "hdf5pp/Utils.h"
 #include "PSEvt/DataProxy.h"
 #include "psddl_hdf2psana/Exceptions.h"
+#include "psddl_hdf2psana/HdfParameters.h"
 namespace psddl_hdf2psana {
 namespace Ipimb {
 
@@ -145,8 +146,26 @@ void ConfigV1_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<Ipimb::ns_ConfigV1_v0::dataset_config>(m_group, "config", m_idx);
 }
 
+void make_datasets_ConfigV1_v0(const Psana::Ipimb::ConfigV1& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = Ipimb::ns_ConfigV1_v0::dataset_config::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "config", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_ConfigV1_v0(const Psana::Ipimb::ConfigV1& obj, hdf5pp::Group group, bool append)
 {
+  {
+    Ipimb::ns_ConfigV1_v0::dataset_config ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "config", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "config", ds_data);
+    }
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Ipimb::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
@@ -155,6 +174,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Ipimb::ConfigV1> > make_ConfigV1(int versi
     return boost::make_shared<PSEvt::DataProxy<Psana::Ipimb::ConfigV1> >(boost::make_shared<ConfigV1_v0>(group, idx));
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::Ipimb::ConfigV1> >(boost::shared_ptr<Psana::Ipimb::ConfigV1>());
+  }
+}
+
+void make_datasets(const Psana::Ipimb::ConfigV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_ConfigV1_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Ipimb.ConfigV1", version);
   }
 }
 
@@ -328,8 +360,26 @@ void ConfigV2_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<Ipimb::ns_ConfigV2_v0::dataset_config>(m_group, "config", m_idx);
 }
 
+void make_datasets_ConfigV2_v0(const Psana::Ipimb::ConfigV2& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = Ipimb::ns_ConfigV2_v0::dataset_config::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "config", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_ConfigV2_v0(const Psana::Ipimb::ConfigV2& obj, hdf5pp::Group group, bool append)
 {
+  {
+    Ipimb::ns_ConfigV2_v0::dataset_config ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "config", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "config", ds_data);
+    }
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Ipimb::ConfigV2> > make_ConfigV2(int version, hdf5pp::Group group, hsize_t idx) {
@@ -338,6 +388,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Ipimb::ConfigV2> > make_ConfigV2(int versi
     return boost::make_shared<PSEvt::DataProxy<Psana::Ipimb::ConfigV2> >(boost::make_shared<ConfigV2_v0>(group, idx));
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::Ipimb::ConfigV2> >(boost::shared_ptr<Psana::Ipimb::ConfigV2>());
+  }
+}
+
+void make_datasets(const Psana::Ipimb::ConfigV2& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_ConfigV2_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Ipimb.ConfigV2", version);
   }
 }
 
@@ -496,8 +559,26 @@ void DataV1_v0::read_ds_data() const {
   m_ds_data = hdf5pp::Utils::readGroup<Ipimb::ns_DataV1_v0::dataset_data>(m_group, "data", m_idx);
 }
 
+void make_datasets_DataV1_v0(const Psana::Ipimb::DataV1& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = Ipimb::ns_DataV1_v0::dataset_data::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_DataV1_v0(const Psana::Ipimb::DataV1& obj, hdf5pp::Group group, bool append)
 {
+  {
+    Ipimb::ns_DataV1_v0::dataset_data ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "data", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "data", ds_data);
+    }
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Ipimb::DataV1> > make_DataV1(int version, hdf5pp::Group group, hsize_t idx) {
@@ -506,6 +587,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Ipimb::DataV1> > make_DataV1(int version, 
     return boost::make_shared<PSEvt::DataProxy<Psana::Ipimb::DataV1> >(boost::make_shared<DataV1_v0>(group, idx));
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::Ipimb::DataV1> >(boost::shared_ptr<Psana::Ipimb::DataV1>());
+  }
+}
+
+void make_datasets(const Psana::Ipimb::DataV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_DataV1_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Ipimb.DataV1", version);
   }
 }
 
@@ -720,8 +814,26 @@ void DataV2_v0::read_ds_data() const {
   m_ds_data = hdf5pp::Utils::readGroup<Ipimb::ns_DataV2_v0::dataset_data>(m_group, "data", m_idx);
 }
 
+void make_datasets_DataV2_v0(const Psana::Ipimb::DataV2& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = Ipimb::ns_DataV2_v0::dataset_data::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
 void store_DataV2_v0(const Psana::Ipimb::DataV2& obj, hdf5pp::Group group, bool append)
 {
+  {
+    Ipimb::ns_DataV2_v0::dataset_data ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "data", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "data", ds_data);
+    }
+  }
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Ipimb::DataV2> > make_DataV2(int version, hdf5pp::Group group, hsize_t idx) {
@@ -730,6 +842,19 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Ipimb::DataV2> > make_DataV2(int version, 
     return boost::make_shared<PSEvt::DataProxy<Psana::Ipimb::DataV2> >(boost::make_shared<DataV2_v0>(group, idx));
   default:
     return boost::make_shared<PSEvt::DataProxy<Psana::Ipimb::DataV2> >(boost::shared_ptr<Psana::Ipimb::DataV2>());
+  }
+}
+
+void make_datasets(const Psana::Ipimb::DataV2& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_DataV2_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Ipimb.DataV2", version);
   }
 }
 
