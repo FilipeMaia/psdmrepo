@@ -187,7 +187,7 @@ void store_FramesV1_v0(const Psana::PNCCD::FramesV1& obj, hdf5pp::Group group, b
 {
   unsigned nLinks = obj.numLinks();
   ndarray<ns_FrameV1_v0::dataset_data, 1> frames_ds = make_ndarray<ns_FrameV1_v0::dataset_data>(nLinks);
-  for (int i = 0; i != nLinks; ++ i) {
+  for (unsigned i = 0; i != nLinks; ++ i) {
     frames_ds[i] = ns_FrameV1_v0::dataset_data(obj.frame(i));
   }
 
