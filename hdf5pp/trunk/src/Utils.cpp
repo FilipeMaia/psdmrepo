@@ -51,8 +51,10 @@ Utils::createDataset(hdf5pp::Group group, const std::string& dataset, const Type
 
   // set chunk cache parameters
   hdf5pp::PListDataSetAccess plDSaccess;
-  hsize_t chunk_cache_bytes = chunk_cache_size * chunk_size * stored_type.size();
-  plDSaccess.set_chunk_cache(chunk_cache_size*19, chunk_cache_size);
+  size_t chunk_cache_bytes = chunk_cache_size * chunk_size * stored_type.size();
+  // ideally this number should be prime, can live with non-prime for now
+  size_t rdcc_nslots = chunk_cache_size*19;
+  plDSaccess.set_chunk_cache(rdcc_nslots, chunk_cache_bytes);
 
   // make a data set
   return group.createDataSet(dataset, stored_type, dsp, plDScreate, plDSaccess);

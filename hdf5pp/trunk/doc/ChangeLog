@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-05
+2013-08-05 Andy Salnikov
+- Utils::createDataset() fix calculation of chunk cache sizes
+
 Tag: V00-05-04
 2013-08-01 Andy Salnikov
 - Utils.c: add storeNDArray(), appendNDArray(), and createDataset() methods;
