@@ -65,6 +65,7 @@ def buildEnv () :
 
     # make environment, also make it default
     env = DefaultEnvironment(ENV=os.environ, variables=vars)
+    vars.GenerateHelpText(env)
 
     # set trace level based on the command line value
     setTraceLevel(int(env['TRACE']))
@@ -138,7 +139,7 @@ def buildEnv () :
 
     # extend environment with tools
     tools = ['psdm_cplusplus', 'psdm_python', 'pyext', 'cython', 'symlink', 
-             'pycompile', 'unittest', 'script_install', 'pkg_list', 
+             'pycompile', 'pylint', 'unittest', 'script_install', 'pkg_list', 
              'release_install', 'special_scanners']
     trace ("toolpath = " + pformat(toolpath), "buildEnv", 3)
     for tool in tools:
@@ -163,6 +164,7 @@ def buildEnv () :
     env['ALL_TARGETS']['LIBS'] = []
     env['ALL_TARGETS']['BINS'] = []
     env['ALL_TARGETS']['TESTS'] = []
+    env['ALL_TARGETS']['PYLINT'] = []
 
     # generate help
     Help(vars.GenerateHelpText(env))

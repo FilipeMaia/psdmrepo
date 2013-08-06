@@ -93,15 +93,23 @@ env = buildEnv()
 env.Decider('timestamp-newer')
 
 # if help is requested then do not load any packages
-if env.GetOption('help'): Return()
-
-#
-# Special install target
-#
-destdir = env['DESTDIR']
-install = env.ReleaseInstall([Dir(destdir)], [])
-env.AlwaysBuild(install)
-env.Alias('install', [install])
+if env.GetOption('help'):
+    env.Help('\nList of standard targets:\n')
+    env.Help('    all       - same as "includes lib bin", this is default target\n')
+    env.Help('    includes  - make or link header files\n')
+    env.Help('    lib       - build libraries and Python modules\n')
+    env.Help('    bin       - build all executables\n')
+    env.Help('    doc       - generate documentation\n')
+    env.Help('    test      - run all unit tests\n')
+    env.Help('    pylint    - run pylint on all Python modules\n')
+    env.Help('\nList of less frequently used targets:\n')
+    env.Help('    install                      - install release (use DESTDIR variable)\n')
+    env.Help('    SConsTools.pkg_list          - produce package list file (use PKG_LIST_FILE)\n')
+    env.Help('    package-dependencies         - print dependencies for all packages\n')
+    env.Help('    package-dependencies-reverse - print reverse dependencies for all packages\n')
+    env.Help('    package-dependencies-base    - print dependencies for packages in base release\n')
+    env.Help('    package-dependencies-local   - print dependencies for packages in local release\n')
+    Return()
 
 #
 # find out which packages we have locally
@@ -159,6 +167,7 @@ libs = env.Alias('lib', env['ALL_TARGETS']['LIBS'])
 bins = env.Alias('bin', env['ALL_TARGETS']['BINS'])
 all = env.Alias('all', incs + libs + bins)
 tests = env.Alias('test', env['ALL_TARGETS']['TESTS'])
+tests = env.Alias('pylint', env['ALL_TARGETS']['PYLINT'])
 # these are not strictly necessary, just to make it look more make-ish
 env.Requires(env['ALL_TARGETS']['TESTS'], all)
 env.Requires(libs, incs)

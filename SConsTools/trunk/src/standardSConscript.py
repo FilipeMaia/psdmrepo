@@ -163,6 +163,10 @@ def standardPyLib( env, **kw ) :
             pyc = env.PyCompile ( pydst+"c", source=pydst )
             DefaultEnvironment()['ALL_TARGETS']['LIBS'].extend ( pyc )
 
+            # target is fake and is never created
+            lint = env.Pylint(pydst+".pylint~", source=pydst)
+            DefaultEnvironment()['ALL_TARGETS']['PYLINT'].extend(lint)
+
         if doinit :
             # make __init__.py and compile it
             ini = pjoin(pydir,pkg,"__init__.py")
