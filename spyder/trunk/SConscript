@@ -44,7 +44,7 @@ PREFIX = pjoin('$SIT_EXTERNAL_SW', pkg, pkg_ver+'-$PYTHON')
 BINDIR = 'bin'
 LINKBINS = 'spyder'
 PYDIR  = pjoin('lib', '$PYTHON', 'site-packages')
-PKGINFO = (pkg, pkg_ver+'-$PYTHON')
+PKGINFO = (pkg, pkg_ver, '$PYTHON')
 
 
 standardExternalPackage(pkg, **locals())
