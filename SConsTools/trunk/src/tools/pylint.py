@@ -7,8 +7,16 @@ import os
 import SCons
 from SCons.Builder import Builder
 from SCons.Action import Action
+from SConsTools.trace import *
 
-pylintAction = Action("$PYLINTCOM")
+
+def strfunction(target, source, env):
+    return "pylint {}".format(source[0])
+
+if trace_level == 0:
+    pylintAction = Action("$PYLINTCOM", strfunction=strfunction)
+else:
+    pylintAction = Action("$PYLINTCOM")
 
 def create_builder(env):
     try:
