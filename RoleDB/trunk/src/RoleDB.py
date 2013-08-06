@@ -313,7 +313,7 @@ class RoleDB (object):
             count_regdb = cursor.fetchall()[0]
             regdb.commit()
             
-            if res_regdb > 0 : res += implicit
+            if count_regdb > 0 : res += implicit
 
         # get explicit privileges
         if exp_id is None :
