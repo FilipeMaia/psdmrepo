@@ -60,6 +60,12 @@ class GUIConfigPars ( QtGui.QWidget ) :
         self.lab_fname_prefix = QtGui.QLabel('File prefix:')
         self.edi_fname_prefix = QtGui.QLineEdit( cp.fname_prefix.value() )        
 
+        self.lab_bat_queue  = QtGui.QLabel('Queue:') 
+        self.box_bat_queue  = QtGui.QComboBox( self ) 
+        self.box_bat_queue.addItems(cp.list_of_queues)
+        self.box_bat_queue.setCurrentIndex( cp.list_of_queues.index(cp.bat_queue.value()) )
+
+
         self.grid = QtGui.QGridLayout()
         self.grid_row = 0
         self.grid.addWidget(self.tit_dir_work,      self.grid_row,   0, 1, 9)
@@ -69,6 +75,9 @@ class GUIConfigPars ( QtGui.QWidget ) :
         self.grid.addWidget(self.edi_dir_results,   self.grid_row+2, 1, 1, 8)
         self.grid.addWidget(self.lab_fname_prefix,  self.grid_row+3, 0)
         self.grid.addWidget(self.edi_fname_prefix,  self.grid_row+3, 1, 1, 4)
+        self.grid.addWidget(self.lab_bat_queue,     self.grid_row+4, 0)
+        self.grid.addWidget(self.box_bat_queue,     self.grid_row+4, 1, 1, 4)
+
         #self.setLayout(self.grid)
 
         self.vbox = QtGui.QVBoxLayout() 
@@ -79,6 +88,8 @@ class GUIConfigPars ( QtGui.QWidget ) :
         self.connect( self.but_dir_work,     QtCore.SIGNAL('clicked()'),          self.onButDirWork )
         self.connect( self.but_dir_results,  QtCore.SIGNAL('clicked()'),          self.onButDirResults )
         self.connect( self.edi_fname_prefix, QtCore.SIGNAL('editingFinished ()'), self.onEditPrefix )
+        self.connect( self.box_bat_queue,    QtCore.SIGNAL('currentIndexChanged(int)'), self.onBoxBatQueue )
+
 
         self.showToolTips()
         self.setStyle()
@@ -114,17 +125,19 @@ class GUIConfigPars ( QtGui.QWidget ) :
         self.but_dir_results .setStyleSheet (cp.styleButton) 
         self.lab_fname_prefix.setStyleSheet (cp.styleLabel)
         self.edi_fname_prefix.setStyleSheet (cp.styleEdit)
+        self.lab_bat_queue   .setStyleSheet (cp.styleLabel)
 
         self.tit_dir_work    .setAlignment (QtCore.Qt.AlignLeft)
         self.edi_dir_work    .setAlignment (QtCore.Qt.AlignRight)
         self.edi_dir_results .setAlignment (QtCore.Qt.AlignRight)
         self.lab_fname_prefix.setAlignment (QtCore.Qt.AlignRight)
+        self.lab_bat_queue   .setAlignment (QtCore.Qt.AlignRight)
 
         self.edi_dir_work    .setMinimumWidth(300)
         self.but_dir_work    .setFixedWidth(80)
         self.edi_dir_results .setMinimumWidth(300)
         self.but_dir_results .setFixedWidth(80)
-
+        self.box_bat_queue   .setFixedWidth(100)
 
     def setParent(self,parent) :
         self.parent = parent
@@ -180,6 +193,12 @@ class GUIConfigPars ( QtGui.QWidget ) :
         logger.debug('onEditPrefix', __name__)
         cp.fname_prefix.setValue( str(self.edi_fname_prefix.displayText()) )
         logger.info('Set file name common prefix: ' + str( cp.fname_prefix.value()), __name__ )
+
+
+    def onBoxBatQueue(self):
+        queue_selected = self.box_bat_queue.currentText()
+        cp.bat_queue.setValue( queue_selected ) 
+        logger.info('onBoxBatQueue - queue_selected: ' + queue_selected, __name__)
 
 #-----------------------------
 

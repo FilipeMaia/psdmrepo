@@ -46,10 +46,10 @@ from GUILogger            import *
 from Logger               import logger
 from FileNameManager      import fnm
 from GUIConfig            import * 
-from GUIStatus            import * 
+from GUIDark              import * 
+
 
 #from GUIDark              import * 
-
 #from GUIFiles             import *
 #from GUISetupInfo         import *
 #from GUIAnaSettings       import *
@@ -69,6 +69,19 @@ class GUITabs ( QtGui.QWidget ) :
     @see BaseClass
     @see OtherClass
     """
+
+    list_of_tabs = [ 'Dark'
+                    ,'Gain'
+                    ,'ROI'
+                    ,'Geometry'
+                    ,'Configuration'
+                    ]
+
+
+    orientation = 'H'
+    #orientation = 'V'
+
+
     def __init__ (self, parent=None, app=None) :
 
         self.name = 'GUITabs'
@@ -76,7 +89,7 @@ class GUITabs ( QtGui.QWidget ) :
         QtGui.QWidget.__init__(self, parent)
 
         cp.setIcons()
-
+ 
         self.setGeometry(10, 25, 750, 500)
         self.setWindowTitle('Calibration Manager')
         self.setWindowIcon(cp.icon_monitor)
@@ -84,13 +97,6 @@ class GUITabs ( QtGui.QWidget ) :
         self.resetColorIsSet = False
 
         self.setFrame()
- 
-        #self.butSave        = QtGui.QPushButton('Save')
-        #self.butExit        = QtGui.QPushButton('Exit')
-        #self.butFile        = QtGui.QPushButton(u'GUI \u2192 &File')
-        #self.butELog        = QtGui.QPushButton(u'GUI \u2192 &ELog')
-        #self.butLogger      = QtGui.QPushButton('Logger')
-        #self.butFBrowser    = QtGui.QPushButton('File Browser')
 
         #self.butELog    .setIcon(cp.icon_mail_forward)
         #self.butFile    .setIcon(cp.icon_save)
@@ -112,40 +118,21 @@ class GUITabs ( QtGui.QWidget ) :
         self.hboxWW.addLayout(self.vboxW) 
         self.hboxWW.addStretch(1)
 
-
-        self.list_of_tabs = [ 'Status'
-                             ,'Dark'
-                             ,'Gain'
-                             ,'Geometry'
-                             ,'File Manager'
-                             ,'Configuration'
-                             ]
-
-        
-        #print 'number of tabs:', len(self.list_of_tabs)
-
         self.makeTabBar()
         self.guiSelector()
 
-        self.vbox = QtGui.QVBoxLayout() 
-        self.vbox.addWidget(self.tab_bar)
-        self.vbox.addLayout(self.hboxWW)
-        self.vbox.addStretch(1)
-        self.setLayout(self.vbox)
+        if self.orientation == 'H' : self.box = QtGui.QVBoxLayout() 
+        else :                       self.box = QtGui.QHBoxLayout() 
 
-        #self.connect(self.butExit       ,  QtCore.SIGNAL('clicked()'), self.onExit        )
-        #self.connect(self.butLogger     ,  QtCore.SIGNAL('clicked()'), self.onLogger      )
-        #self.connect(self.butSave       ,  QtCore.SIGNAL('clicked()'), self.onSave        )
-        #self.connect(self.butFile       ,  QtCore.SIGNAL('clicked()'), self.onFile        )
-        #self.connect(self.butELog       ,  QtCore.SIGNAL('clicked()'), self.onELog        )
-        #self.connect(self.butFBrowser   ,  QtCore.SIGNAL('clicked()'), self.onFBrowser    )
+        self.box.addWidget(self.tab_bar)
+        self.box.addLayout(self.hboxWW)
+        self.box.addStretch(1)
+
+        self.setLayout(self.box)
 
         self.showToolTips()
         self.setStyle()
         gu.printStyleInfo(self)
-
-        #self.onLogger()
-        #self.butFBrowser.setStyleSheet(cp.styleButtonBad)
 
         cp.guitabs = self
         self.move(10,25)
@@ -158,14 +145,7 @@ class GUITabs ( QtGui.QWidget ) :
 
     def showToolTips(self):
         pass
-        #self.butSave.setToolTip('Save all current settings in the \nfile with configuration parameters') 
         #self.butExit.setToolTip('Close all windows and \nexit this program') 
-        #self.butFile.setToolTip('Save current GUI image in PNG file')
-        #self.butELog.setToolTip('1. Save current GUI image in PNG file\n'\
-        #                        '2. Submit PNG file with msg in ELog')
-        #self.butLogger.setToolTip('On/Off logger widow')
-        #self.butFBrowser.setToolTip('On/Off file browser')
-        #self.butStop.setToolTip('Not implemented yet...')
 
     def setFrame(self):
         self.frame = QtGui.QFrame(self)
@@ -177,7 +157,7 @@ class GUITabs ( QtGui.QWidget ) :
 
     def setStyle(self):
         pass
-        self.adjustSize()
+        #self.adjustSize()
         #self.        setStyleSheet(cp.styleBkgd)
         #self.butSave.setStyleSheet(cp.styleButton)
         #self.butExit.setStyleSheet(cp.styleButton)
@@ -215,7 +195,10 @@ class GUITabs ( QtGui.QWidget ) :
         #self.tab_bar.setTabTextColor(self.ind_tab_3, QtGui.QColor('blue'))
         #self.tab_bar.setTabTextColor(self.ind_tab_4, QtGui.QColor('blue'))
 
-        self.tab_bar.setShape(QtGui.QTabBar.RoundedNorth)
+        if self.orientation == 'H' :
+            self.tab_bar.setShape(QtGui.QTabBar.RoundedNorth)
+        else :
+            self.tab_bar.setShape(QtGui.QTabBar.RoundedWest)
 
         #self.tab_bar.setTabEnabled(1, False)
         #self.tab_bar.setTabEnabled(3, False)
@@ -245,7 +228,7 @@ class GUITabs ( QtGui.QWidget ) :
         except : pass
 
         if   cp.current_tab.value() == self.list_of_tabs[0] :
-            self.gui_win = GUIStatus(self)
+            self.gui_win = GUIDark(self)
             #self.gui_win = GUIFiles(self)
             #self.setStatus(0, 'Status: processing for pedestals')
             
@@ -259,15 +242,13 @@ class GUITabs ( QtGui.QWidget ) :
             self.gui_win = QtGui.QTextEdit()
 
         elif cp.current_tab.value() == self.list_of_tabs[4] :
-            self.gui_win = QtGui.QTextEdit()
-
-        elif cp.current_tab.value() == self.list_of_tabs[5] :
             self.gui_win = GUIConfig(self)
             #self.setStatus(0, 'Status: processing for data')
 
         #self.gui_win.setMinimumWidth(500)
         #self.gui_win.setMinimumHeight(300)
-        self.gui_win.setMinimumSize(500,400)
+        #self.gui_win.setMinimumSize(500,400)
+        self.gui_win.setMinimumSize(750,400)
         #self.gui_win.setBaseSize(700,500)
         #self.gui_win.adjustSize()
 
@@ -299,27 +280,13 @@ class GUITabs ( QtGui.QWidget ) :
         pass
 
     def closeEvent(self, event):
-        logger.debug('closeEvent', self.name)
-
-        #if cp.res_save_log : 
-        #    logger.saveLogInFile     ( fnm.log_file() )
-        #    logger.saveLogTotalInFile( fnm.log_file_total() )
+        logger.info('closeEvent', self.name)
 
         try    : self.gui_win.close()
         except : pass
 
-        try    : del self.gui_win
-        except : pass
-
-        try    : cp.guilogger.close()
-        except : pass
-
-        try    : cp.guifilebrowser.close()
-        except : pass
-
-        #try    : del cp.guimain
+        #try    : del self.gui_win
         #except : pass
-
 
 
     def onExit(self):
@@ -329,35 +296,6 @@ class GUITabs ( QtGui.QWidget ) :
         
 #-----------------------------
 #-----------------------------
-#-----------------------------
-#-----------------------------
-#-----------------------------
-    #def mousePressEvent(self, event):
-    #    print 'event.x, event.y, event.button =', str(event.x()), str(event.y()), str(event.button())         
-
-    #def mouseReleaseEvent(self, event):
-    #    print 'event.x, event.y, event.button =', str(event.x()), str(event.y()), str(event.button())                
-
-#http://doc.qt.nokia.com/4.6/qt.html#Key-enum
-    def keyPressEvent(self, event):
-        #print 'event.key() = %s' % (event.key())
-        if event.key() == QtCore.Qt.Key_Escape:
-            #self.close()
-            self.SHowIsOn = False    
-            pass
-
-        if event.key() == QtCore.Qt.Key_B:
-            #print 'event.key() = %s' % (QtCore.Qt.Key_B)
-            pass
-
-        if event.key() == QtCore.Qt.Key_Return:
-            #print 'event.key() = Return'
-            pass
-
-        if event.key() == QtCore.Qt.Key_Home:
-            #print 'event.key() = Home'
-            pass
-
 #-----------------------------
 #  In case someone decides to run this module
 #

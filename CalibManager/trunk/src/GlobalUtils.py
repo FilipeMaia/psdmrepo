@@ -228,7 +228,10 @@ def batch_job_submit(command, queue='psnehq', log_file='batch-log.txt') :
     out, err = subproc(['bsub', '-q', queue, '-o', log_file, command])
     line_fields = out.split(' ')
     if line_fields[0] != 'Job' :
-        sys.exit('EXIT: Unexpected response at batch submission: ' + line)
+        msg = 'EXIT: Unexpected response at batch submission:\nout: %s \nerr: %s'%(out, err)
+        print msg
+        logger.warning(msg, __name__) 
+        #sys.exit(msg)
         job_id_str = 'JOB_ID_IS_UNKNOWN'
     else :
         job_id_str = line_fields[1].strip('<').rstrip('>')
@@ -266,6 +269,7 @@ def batch_job_kill(job_id_str) :
 
 
 def batch_job_status(job_id_str, queue='psnehq') :
+    """Returns the batch job status, for example 'RUN', 'PEND', 'EXIT', 'DONE', etc."""
     p = subprocess.Popen(['bjobs', '-q', queue, job_id_str], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
     p.wait() # short time waiting untill submission is done, 
     err = p.stderr.read() # reads entire file

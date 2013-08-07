@@ -7,8 +7,6 @@
 #
 #------------------------------------------------------------------------
 
-"""GUI for File Browser"""
-
 #------------------------------
 #  Module's version from CVS --
 #------------------------------
@@ -31,41 +29,35 @@ from PyQt4 import QtGui, QtCore
 from ConfigParametersForApp import cp
 from Logger                 import logger
 #import GlobalUtils          as     gu
-from GUIStatusTable         import *
+#from GUIStatusTable         import *
 
 #---------------------
 #  Class definition --
 #---------------------
-class GUIStatus ( QtGui.QWidget ) :
-    """GUI Help"""
+class GUIStatus ( QtGui.QGroupBox ) :
+#class GUIStatus ( QtGui.QWidget ) :
+    """GUI State"""
 
     def __init__ ( self, parent=None, msg='No message in GUIStatus...' ) :
 
-        QtGui.QWidget.__init__(self, parent)
+        QtGui.QGroupBox.__init__(self, 'State', parent)
+        #QtGui.QWidget.__init__(self, parent)
 
-        self.setGeometry(100, 100, 730, 500)
+        self.setGeometry(100, 100, 730, 50)
         self.setWindowTitle('GUI Status')
         #try : self.setWindowIcon(cp.icon_help)
         #except : pass
         self.setFrame()
 
-        self.box_txt        = QtGui.QTextEdit()
-        self.tit_status     = QtGui.QLabel('Status:')
-        self.guistatustable = GUIStatusTable(parent=self, list_of_files=[])
+        self.box_txt        = QtGui.QTextEdit(self)
+        #self.tit_status     = QtGui.QLabel(' State ', self)
 
-        self.hboxM = QtGui.QHBoxLayout()
-        self.hboxM.addWidget( self.box_txt )
-
-        self.hboxB = QtGui.QHBoxLayout()
-        self.hboxB.addWidget(self.tit_status)
-        #self.hboxB.addStretch(4)     
+        #self.setTitle('My status')
 
         self.vbox  = QtGui.QVBoxLayout()
-        self.vbox.addLayout(self.hboxB)
-        self.vbox.addLayout(self.hboxM)
-        self.vbox.addWidget(self.guistatustable)
+        self.vbox.addWidget(self.box_txt)
         self.setLayout(self.vbox)
-        
+
         #self.connect( self.but_close, QtCore.SIGNAL('clicked()'), self.onClose )
  
         self.setStatusMessage(msg)
@@ -94,13 +86,19 @@ class GUIStatus ( QtGui.QWidget ) :
 
 
     def setStyle(self):
-        self.setMinimumHeight(300)
+        self.setMinimumWidth(300)
+        self.setFixedHeight(100)
         self.           setStyleSheet (cp.styleBkgd)
-        self.tit_status.setStyleSheet (cp.styleTitle)
+        #self.tit_status.setStyleSheet (cp.styleTitle)
+        #self.tit_status.setStyleSheet (cp.styleDefault)
+        #self.tit_status.setStyleSheet (cp.styleTitleInFrame)
         self.box_txt   .setReadOnly   (True)
-        self.box_txt   .setStyleSheet (cp.styleWhiteFixed) 
-
-        self.setContentsMargins (QtCore.QMargins(-9,-9,-9,-9))
+        #self.box_txt   .setStyleSheet (cp.styleWhiteFixed) 
+        self.box_txt   .setStyleSheet (cp.styleBkgd)
+        
+        #self.setContentsMargins (QtCore.QMargins(-9,-9,-9,-9))
+        #self.setContentsMargins (QtCore.QMargins(10,10,10,10))
+        self.setContentsMargins (QtCore.QMargins(10,20,10,10))
 
 
     def setParent(self,parent) :
@@ -110,8 +108,8 @@ class GUIStatus ( QtGui.QWidget ) :
     def resizeEvent(self, e):
         #logger.debug('resizeEvent', __name__) 
         self.frame.setGeometry(self.rect())
-
-
+        self.box_txt.setGeometry(self.contentsRect())
+        
     def moveEvent(self, e):
         #logger.debug('moveEvent', __name__) 
         #cp.posGUIMain = (self.pos().x(),self.pos().y())
@@ -142,43 +140,43 @@ class GUIStatus ( QtGui.QWidget ) :
         #self.setStatus(0, 'Status: unknown')
 
 
-    def setStatus(self, status_index=0, msg=''):
-        list_of_states = ['Good','Warning','Alarm']
-        if status_index == 0 : self.tit_status.setStyleSheet(cp.styleStatusGood)
-        if status_index == 1 : self.tit_status.setStyleSheet(cp.styleStatusWarning)
-        if status_index == 2 : self.tit_status.setStyleSheet(cp.styleStatusAlarm)
+#    def setStatus(self, status_index=0, msg=''):
+#        list_of_states = ['Good','Warning','Alarm']
+#        if status_index == 0 : self.tit_status.setStyleSheet(cp.styleStatusGood)
+#        if status_index == 1 : self.tit_status.setStyleSheet(cp.styleStatusWarning)
+#        if status_index == 2 : self.tit_status.setStyleSheet(cp.styleStatusAlarm)
 
-        #self.tit_status.setText('Status: ' + list_of_states[status_index] + msg)
-        self.tit_status.setText(msg)
+#        #self.tit_status.setText('Status: ' + list_of_states[status_index] + msg)
+#        self.tit_status.setText(msg)
 
 
-    def statusOfDir(self, dir) :
-        msg = '%s' % dir
-        if not os.path.exists(dir) :
-            msg += ' DOES NOT EXIST'
-            self.setStatus(2,msg)
-            self.setStatusMessage('DOES NOT EXIST !!!')
-            self.guistatustable.clearTable()
-        else :
-            msg += ' IS AVAILABLE'
-            self.setStatus(0,msg)
-
-            list = sorted(os.listdir(dir))
-            list_of_files = []
-            for name in list :
-                path = os.path.join(dir,name)
-                print path
-                list_of_files.append(path)
+#    def statusOfDir(self, dir, list_expected=None) :
+#        msg = '%s' % dir
+#        if not os.path.exists(dir) :
+#            msg += ' DOES NOT EXIST'
+#            self.setStatus(2,msg)
+#            self.setStatusMessage('DOES NOT EXIST !!!')
+#            self.guistatustable.clearTable()
+#        else :
+#            msg += ' IS AVAILABLE'
+#            self.setStatus(0,msg)
+#
+#            list = sorted(os.listdir(dir))
+#            list_of_files = []
+#            for name in list :
+#                path = os.path.join(dir,name)
+#                #print path
+#                list_of_files.append(path)
                 
-            #print list_dir
+#            #print list_dir
 
-            msgw = '# of entries %i:\n' % len(list)
-            #for name in list :
-            #    msgw += '\n   %s' % name
+#            msgw = '# of entries %i:\n' % len(list)
+#            #for name in list :
+#            #    msgw += '\n   %s' % name
 
-            self.setStatusMessage(msgw)
-            self.guistatustable.makeTable(list_of_files)
-            #self.guistatustable.setTableItems()
+#            self.setStatusMessage(msgw)
+#            self.guistatustable.makeTable(list_of_files, list_expected)
+#            #self.guistatustable.setTableItems()
 
 #-----------------------------
 
@@ -187,7 +185,7 @@ if __name__ == "__main__" :
     app = QtGui.QApplication(sys.argv)
     w = GUIStatus()
     w.setStatusMessage('Test of GUIStatus...')
-    w.statusOfDir('./')
+    #w.statusOfDir('./')
     w.show()
     app.exec_()
 

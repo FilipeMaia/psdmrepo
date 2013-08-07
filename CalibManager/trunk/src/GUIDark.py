@@ -27,8 +27,10 @@ from PyQt4 import QtGui, QtCore
 from ConfigParametersForApp import cp
 from Logger                 import logger
 
-from GUIInsExpRun           import *
-from GUIDarkScan            import *
+from GUIInsExpDirDet        import *
+from GUIStatus              import *
+from GUIDarkRunGo           import *
+from GUIDarkMoreOpts        import *
 
 #-----------------------------
 
@@ -37,49 +39,44 @@ class GUIDark ( QtGui.QWidget ) :
 
     def __init__ ( self, parent=None ) :
         QtGui.QWidget.__init__(self, parent)
-        self.setGeometry(200, 400, 700, 300)
+        self.setGeometry(200, 400, 750, 300)
         self.setWindowTitle('Dark run processing')
         self.setFrame()
 
-        self.lab_src     = QtGui.QLabel('1. Set data source info:')
-        self.lab_scn     = QtGui.QLabel('2. Scan xtc file(s) and select detector(s):')
-        self.lab_dst     = QtGui.QLabel('3. Set destination calib file(s):')
-
-        self.gui_ins_exp_run = GUIInsExpRun(self)
-        self.gui_dark_scan   = GUIDarkScan(self)
-
+        self.guiinsexpdirdet  = GUIInsExpDirDet(self)
+        self.guistatus        = GUIStatus(self)
+        self.guidarkrungo     = GUIDarkRunGo(self)
+        self.guidarkmoreopts  = GUIDarkMoreOpts(self)
+        
         self.vbox = QtGui.QVBoxLayout() 
-        self.vbox.addWidget(self.lab_src)
-        self.vbox.addWidget(self.gui_ins_exp_run)
+        self.vbox.addWidget(self.guiinsexpdirdet)
         self.vbox.addStretch(1)
-        self.vbox.addWidget(self.lab_scn)
-        self.vbox.addWidget(self.gui_dark_scan)
+        self.vbox.addWidget(self.guistatus)
         self.vbox.addStretch(1)
-        self.vbox.addWidget(self.lab_dst)
-        #self.vbox.addLayout(self.hboxW) 
+        self.vbox.addWidget(self.guidarkrungo)
+        self.vbox.addStretch(1)
+        self.vbox.addWidget(self.guidarkmoreopts)
         self.vbox.addStretch(1)
 
         self.setLayout(self.vbox)
 
         self.showToolTips()
         self.setStyle()
+
+        cp.guidark = self
  
     def showToolTips(self):
         pass
         #self           .setToolTip('Use this GUI to work with xtc file.')
         #self.edi_path   .setToolTip('The path to the xtc file for processing in this GUI')
-        #self.but_path   .setToolTip('Push this button and select \nthe xtc file for dark run')
 
     def setStyle(self):
         pass
-        self.lab_src.setStyleSheet (cp.styleTitle)
-        self.lab_scn.setStyleSheet (cp.styleTitle)
-        self.lab_dst.setStyleSheet (cp.styleTitle)
-
         #width = 60
         #self.setMinimumWidth(700)
         #self.setStyleSheet(cp.styleBkgd)
         #tit0   .setStyleSheet (cp.styleTitle)
+        #self.guidarkmoreopts.setFixedHeight(100)
 
         #self.cbx_all_chunks.setStyleSheet (cp.styleLabel)
         #self.lab_status    .setStyleSheet (cp.styleLabel)
@@ -106,7 +103,19 @@ class GUIDark ( QtGui.QWidget ) :
         pass
 
     def closeEvent(self, event):
-        logger.debug('closeEvent', __name__)
+        logger.info('closeEvent', __name__)
+
+        try    : self.guiinsexpdirdet.close()
+        except : pass
+
+        try    : self.guistatus.close()
+        except : pass
+
+        try    : self.guidarkrungo.close()        
+        except : pass
+
+        try    : self.guidarkmoreopts.close()        
+        except : pass
 
         #if cp.res_save_log : 
         #    logger.saveLogInFile     ( fnm.log_file() )

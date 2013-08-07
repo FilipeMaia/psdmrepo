@@ -32,6 +32,7 @@ import os
 from ConfigParametersForApp import cp
 from Logger                 import logger
 from FileNameManager        import fnm
+from BatchLogScanParser     import blsp
 
 #import AppUtils.AppDataPath as apputils
 import           AppDataPath as apputils # My version, added in path the '../../data:'
@@ -73,9 +74,72 @@ class ConfigFileGenerator :
 #-----------------------------
 
     def make_psana_cfg_file_for_peds_aver (self) :
-        self.path_in  = apputils.AppDataPath('CalibManager/scripts/psana-peds-aver.cfg').path()
+
+        if blsp.list_of_sources == [] : return
+
+        self.det_name = cp.det_name.value()
+
+        # list_of_dets   = ['CSPAD', 'CSPAD2x2', 'Camera', 'Princeton', 'pnCCD'] 
+
+        if   self.det_name == cp.list_of_dets[0] : self.make_psana_cfg_file_for_peds_aver_cspad(module='cspad_mod.CsPadPedestals')
+        elif self.det_name == cp.list_of_dets[1] : self.make_psana_cfg_file_for_peds_aver_cspad(module='cspad_mod.CsPad2x2Pedestals')
+        elif self.det_name == cp.list_of_dets[2] : self.print_worning()
+        elif self.det_name == cp.list_of_dets[3] : self.make_psana_cfg_file_for_peds_aver_princeton()
+        elif self.det_name == cp.list_of_dets[4] : print_worning()
+        else : logger.warning('UNKNOWN DETECTOR: %s' % self.det_name, __name__)
+
+
+    def print_warning (self) :
+        msg = 'make_psana_cfg_file_for_peds_aver_%s - IS NOT IMPLEMENTED YET!!!' % self.det_name
+        logger.warning(msg, __name__)
+
+#-----------------------------
+
+    def make_psana_cfg_file_for_peds_aver_cspad (self, module='cspad_mod.CsPadPedestals') :
+        self.path_in  = apputils.AppDataPath('CalibManager/scripts/psana-section-psana.cfg').path()
         self.path_out = fnm.path_peds_aver_psana_cfg()
-        self.d_subs   = {'FNAME_XTC'      : fnm.path_dark_xtc_cond(),
+
+        modules = ''
+        for i in range( len(blsp.list_of_sources) ) : modules += '%s:%i ' % (module, i)
+        #print 'List of modules: %s' % modules
+
+        self.d_subs   = {'FNAME_XTC'        : str(fnm.path_to_xtc_files_for_run()),
+                         'SKIP'             : str( cp.bat_dark_start.value() - 1 ),
+                         'EVENTS'           : str( cp.bat_dark_end.value() - cp.bat_dark_start.value() + 1 ),
+                         'MODULES'          : modules
+                         }
+
+        self.print_substitution_dict()
+        self.make_cfg_file()
+
+        #Add a few similar modules in loop
+        self.path_in  = apputils.AppDataPath('CalibManager/scripts/psana-section-module-cspad-peds.cfg').path()
+
+        list_of_ave = blsp.get_list_of_files_for_all_sources(fnm.path_peds_ave())
+        list_of_rms = blsp.get_list_of_files_for_all_sources(fnm.path_peds_rms())
+        
+        for i, (source, fname_ave, fname_rms) in enumerate( zip(blsp.list_of_sources, list_of_ave, list_of_rms) ) :
+            mod = '%s:%i' % (module, i)
+            #print '   Add module with pars: ', mod, source, fname_ave, fname_rms
+
+            self.d_subs = {'MODULE'           : mod,
+                           'DETINFO'          : source,
+                           'FNAME_PEDS_AVE'   : fname_ave,
+                           'FNAME_PEDS_RMS'   : fname_rms
+                          }
+
+            #for item in self.d_subs.items() :
+            #    print '%20s : %s' % item
+
+            self.make_cfg_file(fout_mode='a')
+
+
+#-----------------------------
+
+    def make_psana_cfg_file_for_peds_aver_princeton (self) :
+        self.path_in  = apputils.AppDataPath('CalibManager/scripts/psana-peds-aver-princeton.cfg').path()
+        self.path_out = fnm.path_peds_aver_psana_cfg()
+        self.d_subs   = {'FNAME_XTC'      : str(fnm.path_to_xtc_files_for_run()),
                          'SKIP'           : str( cp.bat_dark_start.value() - 1 ),
                          'EVENTS'         : str( cp.bat_dark_end.value() - cp.bat_dark_start.value() + 1 ),
                          'IMG_REC_MODULE' : str( cp.bat_img_rec_mod.value() ),
@@ -102,127 +166,6 @@ class ConfigFileGenerator :
 #-----------------------------
 #-----------------------------
 
-    def make_psana_cfg_file_for_data_scan (self) :
-        self.path_in  = apputils.AppDataPath('CalibManager/scripts/psana-data-scan.cfg').path()
-        self.path_out = fnm.path_data_scan_psana_cfg()
-        self.d_subs   = {'FNAME_XTC'                         : fnm.path_data_xtc_cond(),
-                         'SKIP'                              : 'IS_NOT_USED',
-                         'EVENTS'                            : 'FOR_ALL_EVENTS',
-                         'FNAME_TIMESTAMP_LIST'              : fnm.path_data_scan_tstamp_list(),
-                         'FNAME_INTENSITY_MONITORS_DATA'     : fnm.path_data_scan_monitors_data(),
-                         'FNAME_INTENSITY_MONITORS_COMMENTS' : fnm.path_data_scan_monitors_commments()
-                         }
-
-        self.print_substitution_dict()
-        self.make_cfg_file()
-
-#-----------------------------
-
-    def make_psana_cfg_file_for_data_aver (self) :
-        self.path_in  = apputils.AppDataPath('CalibManager/scripts/psana-data-aver.cfg').path()
-        self.path_out = fnm.path_data_aver_psana_cfg()
-        self.d_subs   = {'FNAME_XTC'      : fnm.path_data_xtc_cond(),
-                         'SKIP'           : str( cp.bat_data_start.value() - 1 ),
-                         'EVENTS'         : str( cp.bat_data_end.value() - cp.bat_data_start.value() + 1 ),
-                         'IMG_REC_MODULE' : str( cp.bat_img_rec_mod.value() ),
-                         'DETINFO'        : str( cp.bat_det_info.value() ),
-                         'FNAME_DATA_AVE' : fnm.path_data_ave(),
-                         'FNAME_DATA_RMS' : fnm.path_data_rms(),
-                         'SAT_THR_ADU'    : str( cp.ccdset_adcsatu.value() ),
-                         'SATPIX_MASK'    : fnm.path_satpix_mask(),
-                         'SATPIX_FRAC'    : fnm.path_satpix_frac(),
-                         'HOTPIX_MASK'    : '', # fnm.path_hotpix_mask(),
-                         'HOTPIX_FRAC'    : '' # fnm.path_hotpix_frac()
-                         }
-        # cp.ccdset_ccdgain.value()
-        # cp.ccdset_ccdeff .value()
-
-        self.print_substitution_dict()
-        self.make_cfg_file()
-
-#-----------------------------
-#-----------------------------
-#-----------------------------
-#-----------------------------
-
-    def make_psana_cfg_file_for_cora_split (self) :
-        self.path_in  = apputils.AppDataPath('CalibManager/scripts/psana-cora-split.cfg').path()
-        self.path_out = fnm.path_cora_split_psana_cfg()
-
-        self.d_subs   = {'FNAME_XTC'       : fnm.path_data_xtc_cond(),
-                         'SKIP'            : str( cp.bat_data_start.value() - 1 ),
-                         'EVENTS'          : str( cp.bat_data_end.value() - cp.bat_data_start.value() + 1 ),
-                         'IMG_REC_MODULE'  : str( cp.bat_img_rec_mod.value() ),
-                         'DETINFO'         : str( cp.bat_det_info.value() ),
-                         'PATH_PREFIX_CORA': str( fnm.path_prefix_cora() ),
-                         'IMG_NPARTS'      : str( cp.bat_img_nparts.value() ),
-                         'FNAME_PEDS_AVE'  : fnm.path_pedestals_ave(),
-                         }
-
-        fname_imon_cfg = fnm.path_cora_split_imon_cfg()
-        self.make_imon_cfg_file (fname_imon_cfg)
-        self.d_subs['FNAME_IMON_CFG' ] = str( fname_imon_cfg )
-
-
-        if cp.lld_type.value() == 'ADU' : #  ['NONE', 'ADU', 'RMS']
-            self.d_subs['THRESHOLD_ADU' ] = str( cp.lld_adu.value() )
-            self.d_subs['DO_CONST_THR'  ] = 'true'
-            self.d_subs['THRESHOLD_NRMS'] = '0'
-            self.d_subs['FNAME_PEDS_RMS'] = ''
-
-        elif cp.lld_type.value() == 'RMS' : 
-            self.d_subs['THRESHOLD_ADU' ] = '0'
-            self.d_subs['DO_CONST_THR'  ] = 'false'
-            self.d_subs['THRESHOLD_NRMS'] = str( cp.lld_rms.value() )
-            self.d_subs['FNAME_PEDS_RMS'] = fnm.path_pedestals_rms()
-
-        else : 
-            self.d_subs['THRESHOLD_ADU' ] = '0'
-            self.d_subs['DO_CONST_THR'  ] = 'false'
-            self.d_subs['THRESHOLD_NRMS'] = '0'
-            self.d_subs['FNAME_PEDS_RMS'] = ''
-
-
-        if os.path.lexists( fnm.path_cora_split_map_static_q() ) :
-            self.d_subs['FNAME_MAP_BINS' ] = fnm.path_cora_split_map_static_q()
-        else :
-            self.d_subs['FNAME_MAP_BINS' ] = ''            
-        self.d_subs['FNAME_INT_BINS' ]     = fnm.path_cora_split_int_static_q()
-        self.d_subs['NUMBER_OF_BINS' ]     = str( cp.ana_stat_part_q.value() )
-
-        self.print_substitution_dict()
-        self.make_cfg_file()
-
-#-----------------------------
-#-----------------------------
-
-    def get_text_table_of_imon_pars (self) :
-        text = ''
-        for i, (name, ch1, ch2, ch3, ch4, norm, sele, sele_min, sele_max, norm_ave, short_name) in enumerate(cp.imon_pars_list) :
-            src_imon  = ' %s' % (name.value().ljust(32))
-            name_imon = ' %s' % (short_name.value().ljust(16))
-            bits      = ' %d %d %d %d   %d %d' % (ch1.value(), ch2.value(), ch3.value(), ch4.value(), norm.value(), sele.value())
-            vals      = '   %9.4f %9.4f %9.4f' % (sele_min.value(), sele_max.value(), norm_ave.value())
-            s         = src_imon + name_imon + bits + vals
-
-            #if norm.value() or sele.value() : text += s + '\n' # Short form of the imon_cfg file
-            text += s + '\n'
-        return text
-
-
-    def make_imon_cfg_file (self, fname='imon_cfg.txt') :
-        text_table = self.get_text_table_of_imon_pars()
-        logger.info('Make intensity monitors configuration file: ' + fname + '\n' + text_table, __name__)
-        fout = open(fname,'w')
-        fout.write(text_table)
-        fout.close() 
-
-#-----------------------------
-#-----------------------------
-#-----------------------------
-#-----------------------------
-#-----------------------------
-
     def print_substitution_dict (self) :
         logger.debug('Substitution dictionary:',__name__)
         for k,v in self.d_subs.iteritems() :
@@ -232,7 +175,7 @@ class ConfigFileGenerator :
 
 #-----------------------------
 
-    def make_cfg_file (self) :
+    def make_cfg_file (self, fout_mode='w') :
 
         logger.info('Make configuration file: ' + self.path_out,__name__)
         logger.debug('path_cfg_stub = ' + self.path_in)
@@ -241,8 +184,8 @@ class ConfigFileGenerator :
 
         self.keys   = self.d_subs.keys()
 
-        fin  = open(self.path_in, 'r')
-        fout = open(self.path_out,'w')
+        fin  = open(self.path_in,  'r')
+        fout = open(self.path_out, fout_mode)
         for line in fin :
             line_sub = self.line_with_substitution(line)
             fout.write(line_sub)
@@ -283,7 +226,11 @@ cfg = ConfigFileGenerator ()
 if __name__ == "__main__" :
 
     #cfg.make_psana_cfg_file_for_peds()
-    cfg.make_psana_cfg_file_for_peds_scan()
+    #cfg.make_psana_cfg_file_for_peds_scan()
+
+
+    blsp.parse_batch_log_peds_scan() # defines the blsp.list_of_sources    
+    cfg.make_psana_cfg_file_for_peds_aver()
 
     sys.exit ( 'End of test for ConfigFileGenerator' )
 

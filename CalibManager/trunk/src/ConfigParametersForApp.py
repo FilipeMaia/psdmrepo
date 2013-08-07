@@ -40,6 +40,17 @@ class ConfigParametersForApp ( ConfigParameters ) :
 
     list_pars = []
 
+    list_of_queues = ['psnehq', 'psfehq', 'psanacsq']
+    list_of_instr  = ['AMO', 'SXR', 'XPP', 'XCS', 'CXI', 'MEC']
+    list_of_dets   = ['CSPAD', 'CSPAD2x2', 'Camera', 'Princeton', 'pnCCD'] #, 'Opal1k'
+    list_of_types  = ['Psana::CsPad::Data',
+                      'Psana::CsPad2x2::Element',
+                      'Psana::Camera::Frame',
+                      'Psana::Princeton::Frame',
+                      'Psana::PNCCD::FullFrame']
+    
+    dict_of_det_types = dict( zip(list_of_dets,list_of_types) )
+
     def __init__ ( self, fname=None ) :
         """Constructor.
         @param fname  the file name with configuration parameters, if not specified then it will be set to the default value at declaration.
@@ -55,13 +66,19 @@ class ConfigParametersForApp ( ConfigParameters ) :
     def initRunTimeParameters( self ) :
         self.iconsAreLoaded  = False
         #self.char_expand = u' \u25BE' # down-head triangle
-        #self.guilogger = None
-        #self.guihelp   = None
-        self.guitabs    = None
-        self.guistatus  = None
+        self.guilogger       = None
+        self.guimain         = None
+        self.guidark         = None
+        self.guitabs         = None
+        self.guistatus       = None
+        self.guidarkrungo    = None 
+        self.guiinsexpdirdet = None
+        self.guifilebrowser  = None 
 
-        #self.procDarkStatus  = 0 # 0=inctive, 1=scan, 2=averaging, 3=both
- 
+        self.procDarkStatus  = 0 # 0=inctive, 1=scan, 2=averaging, 3=both
+
+        self.autoRunStatus = 0            
+  
 #-----------------------------
 
     def setIcons(self) :
@@ -97,7 +114,8 @@ class ConfigParametersForApp ( ConfigParameters ) :
         path_icon_table          = apputils.AppDataPath('CalibManager/icons/table.gif'        ).path()
         path_icon_folder_open    = apputils.AppDataPath('CalibManager/icons/folder_open.gif'  ).path()
         path_icon_folder_closed  = apputils.AppDataPath('CalibManager/icons/folder_closed.gif').path()
-  
+
+
         self.icon_contents      = QtGui.QIcon(path_icon_contents     )
         self.icon_mail_forward  = QtGui.QIcon(path_icon_mail_forward )
         self.icon_button_ok     = QtGui.QIcon(path_icon_button_ok    )
@@ -174,10 +192,11 @@ class ConfigParametersForApp ( ConfigParameters ) :
         self.log_file       = self.declareParameter( name='LOG_FILE_FOR_LEVEL', val_def='./log_for_level.txt',       type='str' )
         #self.log_file_total = self.declareParameter( name='LOG_FILE_TOTAL',     val_def='./log_total.txt',           type='str' )
 
-        # GUISelectCalibDir.py
+        # GUIInsExpDirDet.py
         self.instr_dir          = self.declareParameter( name='INSTRUMENT_DIR',    val_def='/reg/d/psdm',  type='str' ) 
         self.instr_name         = self.declareParameter( name='INSTRUMENT_NAME',   val_def='None',         type='str' ) # 'CXI'
         self.exp_name           = self.declareParameter( name='EXPERIMENT_NAME',   val_def='None',         type='str' ) # 'cxitut13'
+        self.det_name           = self.declareParameter( name='DETECTOR_NAME',     val_def='None',         type='str' ) # 'CSPAD'
         self.calib_dir          = self.declareParameter( name='CALIB_DIRECTORY',   val_def='None',         type='str' ) # '/reg/d/psdm/CXI/cxitut13/calib'
 
         # GUITabs.py
@@ -194,6 +213,15 @@ class ConfigParametersForApp ( ConfigParameters ) :
         self.dir_work          = self.declareParameter( name='DIRECTORY_WORK',        val_def='./work',       type='str' )
         self.dir_results       = self.declareParameter( name='DIRECTORY_RESULTS',     val_def='./results',    type='str' )
         self.fname_prefix      = self.declareParameter( name='FILE_NAME_PREFIX',      val_def='clb-',         type='str' )
+        self.save_cp_at_exit   = self.declareParameter( name='SAVE_CONFIG_AT_EXIT',   val_def=False,          type='bool' )
+
+        # GUIDark.py
+        self.dark_more_opts    = self.declareParameter( name='DARK_MORE_OPTIONS',     val_def=False,          type='bool' )
+
+        # GUIDarkRunGo.py
+        self.str_run_number    = self.declareParameter( name='STRING_RUN_NUMBER',     val_def='None',         type='str' )
+        self.str_run_from      = self.declareParameter( name='STRING_RUN_FROM',       val_def='0000',         type='str' )
+        self.str_run_to        = self.declareParameter( name='STRING_RUN_TO',         val_def='end',          type='str' )
 
         # GUIGrabSubmitELog.py
         #self.cbx_more_options    = self.declareParameter( name='CBX_SHOW_MORE_OPTIONS',   val_def=False,             type='bool' )
@@ -220,14 +248,18 @@ class ConfigParametersForApp ( ConfigParameters ) :
         #self.in_dir_dark       = self.declareParameter( name='IN_DIRECTORY_DARK', val_def='/reg/d/ana12/xcs/xcsi0112/xtc',type='str' )
         #self.in_file_dark      = self.declareParameter( name='IN_FILE_NAME_DARK', val_def='e167-r0020-s00-c00.xtc',type='str' )
 
-        #self.bat_dark_start    = self.declareParameter( name='BATCH_DARK_START',      val_def= 1,       type='int' )
-        #self.bat_dark_end      = self.declareParameter( name='BATCH_DARK_END'  ,      val_def=-1,       type='int' )
         #self.bat_dark_total    = self.declareParameter( name='BATCH_DARK_TOTAL',      val_def=-1,       type='int' )
+        self.bat_dark_start    = self.declareParameter( name='BATCH_DARK_START',      val_def= 1,       type='int' )
+        self.bat_dark_end      = self.declareParameter( name='BATCH_DARK_END'  ,      val_def=1000,     type='int' )
+        self.bat_det_info      = self.declareParameter( name='BATCH_DET_INFO',        val_def='DetInfo(:Princeton)',  type='str' )
+        self.bat_img_rec_mod   = self.declareParameter( name='BATCH_IMG_REC_MODULE',  val_def='ImgAlgos.PrincetonImageProducer',  type='str' )
+        self.mask_hot_thr            = self.declareParameter( name='MASK_HOT_PIX_ADU_THR_ON_RMS',  val_def=10.0,  type='float' )
+        self.mask_hot_is_used        = self.declareParameter( name='MASK_HOT_PIX_IS_USED',         val_def=True,  type='bool' )
 
 
         # For batch jobs
-        #self.bat_queue               = self.declareParameter( name='BATCH_QUEUE',                val_def='psfehq', type='str' )
-        #self.bat_submit_interval_sec = self.declareParameter( name='BATCH_SUBMIT_INTERVAL_SEC',  val_def=100,      type='int' )
+        self.bat_queue               = self.declareParameter( name='BATCH_QUEUE',                val_def='psfehq', type='str' )
+        self.bat_submit_interval_sec = self.declareParameter( name='BATCH_SUBMIT_INTERVAL_SEC',  val_def=100,      type='int' )
  
 #-----------------------------
 
@@ -280,9 +312,18 @@ class ConfigParametersForApp ( ConfigParameters ) :
         self.colorEditBad      = QtGui.QColor(255,   0,   0)
         self.colorEdit         = QtGui.QColor('white')
 
+        self.styleTitleInFrame = self.styleWhite # self.styleDefault # self.styleWhite # self.styleGray
+
     def printParsDirectly( self ) :
         logger.info('Direct use of parameter:' + self.fname_ped.name() + ' ' + self.fname_ped.value(), self.name )     
         logger.info('Direct use of parameter:' + self.fname_dat.name() + ' ' + self.fname_dat.value(), self.name )    
+
+    def close( self ) :
+
+        if self.save_cp_at_exit.value() :
+            fname = self.fname_cp
+            logger.info('save configuration parameters in file: %s' % fname, __name__)
+            self.saveParametersInFile( fname )
 
 #-----------------------------
 

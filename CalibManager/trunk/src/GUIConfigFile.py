@@ -59,12 +59,15 @@ class GUIConfigFile ( QtGui.QWidget ) :
         self.butDefault  = QtGui.QPushButton('Reset default')
         self.butPrint    = QtGui.QPushButton('Print current')
         self.ediFile     = QtGui.QLineEdit( cp.fname_cp )        
-
+        self.cbxSave     = QtGui.QCheckBox('&Save at exit')
+        self.cbxSave.setChecked( cp.save_cp_at_exit.value() )
+ 
         grid = QtGui.QGridLayout()
         grid.addWidget(self.titFile,       0, 0, 1, 5)
         grid.addWidget(self.butFile,       1, 0)
         grid.addWidget(self.ediFile,       1, 1, 1, 4)
-        grid.addWidget(self.titPars,       2, 0, 1, 5)
+        grid.addWidget(self.titPars,       2, 0, 1, 3)
+        grid.addWidget(self.cbxSave,       2, 4)
         grid.addWidget(self.butRead,       3, 1)
         grid.addWidget(self.butWrite,      3, 2)
         grid.addWidget(self.butDefault,    3, 3)
@@ -82,8 +85,9 @@ class GUIConfigFile ( QtGui.QWidget ) :
         self.connect(self.butWrite,     QtCore.SIGNAL('clicked()'),          self.onSave         )
         self.connect(self.butPrint,     QtCore.SIGNAL('clicked()'),          self.onPrint        )
         self.connect(self.butDefault,   QtCore.SIGNAL('clicked()'),          self.onDefault      )
-        self.connect(self.butFile,      QtCore.SIGNAL('clicked()'),          self.onFile       )
-
+        self.connect(self.butFile,      QtCore.SIGNAL('clicked()'),          self.onFile         ) 
+        self.connect(self.cbxSave,      QtCore.SIGNAL('stateChanged(int)'),  self.onCbxSave      ) 
+ 
         self.showToolTips()
         self.setStyle()
 
@@ -127,6 +131,7 @@ class GUIConfigFile ( QtGui.QWidget ) :
         self.butWrite  .setStyleSheet(cp.styleButton)
         self.butDefault.setStyleSheet(cp.styleButton)
         self.butPrint  .setStyleSheet(cp.styleButton)
+        self.cbxSave   .setStyleSheet(cp.styleLabel)
         #self.butClose  .setStyleSheet(cp.styleButtonClose)
 
         self.butFile   .setFixedWidth(50)
@@ -205,6 +210,17 @@ class GUIConfigFile ( QtGui.QWidget ) :
 
     def getFileNameFromEditField(self):
         return str( self.ediFile.displayText() )
+
+    def onCbxSave(self):
+        #if self.cbx.hasFocus() :
+        par = cp.save_cp_at_exit
+        cbx = self.cbxSave
+        tit = cbx.text()
+
+        par.setValue( cbx.isChecked() )
+        msg = 'check box ' + tit  + ' is set to: ' + str( par.value())
+        logger.info(msg, __name__ )
+
 
 #-----------------------------
 

@@ -34,7 +34,7 @@ import sys
 import os
 
 from PyQt4 import QtGui, QtCore
-#import time   # for sleep(sec)
+import time   # for sleep(sec)
 
 #-----------------------------
 # Imports for other modules --
@@ -43,10 +43,10 @@ from PyQt4 import QtGui, QtCore
 from ConfigParametersForApp import cp
 from Logger                 import logger
 from GUIButtonBar           import *
-from GUISelectCalibDir      import *
-from GUICalibDirTree        import *
 from GUILogger              import *
 from GUITabs                import *
+#from GUIInsExpDirDet        import *
+#from GUICalibDirTree        import *
 
 #---------------------
 #  Class definition --
@@ -65,7 +65,7 @@ class GUIMain ( QtGui.QWidget ) :
 
         cp.setIcons()
 
-        self.setGeometry(10, 25, 850, 600)
+        self.setGeometry(10, 25, 800, 600)
         self.setWindowTitle('Calibration Manager')
         self.setWindowIcon(cp.icon_monitor)
         self.palette = QtGui.QPalette()
@@ -73,9 +73,10 @@ class GUIMain ( QtGui.QWidget ) :
 
         self.setFrame()
  
-        self.guitree   = GUICalibDirTree()
-        self.guitabs   = GUITabs() # QtGui.QTextEdit()
+        #self.guitree   = GUICalibDirTree()
+        self.guitabs   = GUITabs(self) # QtGui.QTextEdit()
         self.guilogger = GUILogger(show_buttons=False)
+        #self.guiinsexpdirdet = GUIInsExpDirDet(self)
 
         #self.hboxB = QtGui.QHBoxLayout() 
         #self.hboxB.addWidget(self.guitree)
@@ -88,18 +89,15 @@ class GUIMain ( QtGui.QWidget ) :
         self.vsplit.addWidget(self.guilogger)
         #self.vsplit.moveSplitter(100)
         
-        self.hsplit = QtGui.QSplitter(QtCore.Qt.Horizontal)
-        self.hsplit.addWidget(self.guitree)
-        self.hsplit.addWidget(self.vsplit)
-
-        #self.guibuttonbar      = GUIButtonBar(self)
-        self.guiselectcalibdir = GUISelectCalibDir(self)
+        #self.hsplit = QtGui.QSplitter(QtCore.Qt.Horizontal)
+        #self.hsplit.addWidget(self.guitree)
+        #self.hsplit.addWidget(self.vsplit)
 
         self.vbox = QtGui.QVBoxLayout() 
         #self.vbox.addWidget(self.guibuttonbar)
-        self.vbox.addWidget(self.guiselectcalibdir)
+        #self.vbox.addWidget(self.guiselectcalibdir)
         #self.vbox.addLayout(self.hboxB) 
-        self.vbox.addWidget(self.hsplit) 
+        self.vbox.addWidget(self.vsplit) 
         #self.vbox.addStretch(1)
 
         self.setLayout(self.vbox)
@@ -107,8 +105,8 @@ class GUIMain ( QtGui.QWidget ) :
         self.showToolTips()
         self.setStyle()
 
-        cp.guimain = self
         self.move(10,25)
+        cp.guimain = self
         
         #print 'End of init'
         
@@ -140,7 +138,7 @@ class GUIMain ( QtGui.QWidget ) :
 
     def setStyle(self):
         pass
-        self.setMinimumSize(1030,500)
+        self.setMinimumSize(800,600)
         self.setContentsMargins (QtCore.QMargins(-9,-9,-9,-9))
 
         #self.        setStyleSheet(cp.styleBkgd)
@@ -170,34 +168,25 @@ class GUIMain ( QtGui.QWidget ) :
         pass
 
     def closeEvent(self, event):
-        logger.debug('closeEvent', self.name)
+        logger.info('closeEvent', self.name)
+
+        #try    : self.guiinsexpdirdet.close() 
+        #except : pass
+        
+        try    : self.guitabs.close()
+        except : pass
+        
+        try    : cp.guilogger.close()
+        except : pass
 
         self.onSave()
 
-        #if cp.res_save_log : 
-        #    logger.saveLogInFile     ( fnm.log_file() )
-        #    logger.saveLogTotalInFile( fnm.log_file_total() )
-
-        try    : cp.guilogger.close()
-        except : pass
-
-        #try    : cp.guifilebrowser.close()
-        #except : pass
-
-        #try    : del cp.guimain
-        #except : pass
-
-        try    : cp.guilogger.close()
-        except : pass
-
-        try    : cp.guifilebrowser.close()
-        except : pass
-
 
     def onSave(self):
-        fname = cp.fname_cp
-        logger.info('onSave - save all configuration parameters in file: ' + fname, __name__)
-        cp.saveParametersInFile( fname )
+        cp.close()
+        logger.saveLogInFile(fnm.log_file())
+        #logger.saveLogTotalInFile( fnm.log_file_total() )
+
 
 #-----------------------------
 #-----------------------------

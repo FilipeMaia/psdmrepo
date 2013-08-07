@@ -34,10 +34,13 @@ from Logger                   import logger
 from ConfigFileGenerator      import cfg
 from FileNameManager          import fnm
 import GlobalUtils            as     gu
+from BatchLogScanParser       import blsp
+
+from PyQt4 import QtGui, QtCore # need it in order to use QtCore.QObject for connect
 
 #-----------------------------
 
-class BatchJob :
+class BatchJob (QtCore.QObject ) : # need in QtCore.QObject in order to connect to signals:
     """Base class with common methods for batch jobs.
     """
     dict_status = {True  : 'available',
@@ -47,6 +50,8 @@ class BatchJob :
         """Constructor.
         @param fname the file name for ...
         """
+
+        QtCore.QObject.__init__(self, None)
 
         self.time_interval_sec = cp.bat_submit_interval_sec.value() # 100
 
@@ -138,6 +143,7 @@ class BatchJob :
         msg = 'Job Id: ' + str(job_id) + \
               ' was submitted at ' + str(time_str) + \
               '    Status: ' + str(status)
+        #print msg
         return status, msg
 
 #-----------------------------
@@ -187,6 +193,54 @@ class BatchJob :
             else :
                 logger.info('Not found : ' + fname)
 
+#-----------------------------
+#-----------------------------
+#----- AUTO-PROCESSING -------
+#-----------------------------
+#-----------------------------
+
+    def connectToThread1(self):
+        try : self.connect( cp.thread1, QtCore.SIGNAL('update(QString)'), self.updateStatus )
+        except : logger.warning('connectToThread1 IS FAILED !!!', __name__)
+
+
+    def disconnectFromThread1(self):
+        try : self.disconnect( cp.thread1, QtCore.SIGNAL('update(QString)'), self.updateStatus )
+        except : logger.warning('disconnectFromThread1 IS FAILED !!!', __name__)
+
+
+    def updateStatus(self, text):
+        #print 'BatchJob: Signal is recieved ' + str(text)
+        if cp.autoRunStatus : self.on_auto_processing_status()
+
+#-----------------------------
+
+    def start_auto_processing(self) :
+        if cp.autoRunStatus != 0 :            
+            logger.warning('Auto-processing procedure is already active in stage '+str(cp.autoRunStatus), __name__)
+        else :
+            self.connectToThread1()
+            self.on_auto_processing_start()
+
+    def stop_auto_processing(self, is_stop_on_button_click=True) :
+        logger.info('Auto-processing IS STOPPED', __name__)
+        cp.autoRunStatus = 0            
+        self.disconnectFromThread1()
+        if is_stop_on_button_click : self.on_auto_processing_stop()
+
+#-----------------------------
+# Interface methods which should be overloaded in the derived class 
+
+    def on_auto_processing_start(self):
+        logger.warning('DEFAULT METHOD on_auto_processing_start() SHOULD BE OVERLOADED !!!', __name__)
+
+    def on_auto_processing_stop(self):
+        logger.warning('DEFAULT METHOD on_auto_processing_stop() SHOULD BE OVERLOADED !!!', __name__)
+
+    def on_auto_processing_status(self):
+        logger.warning('DEFAULT METHOD on_auto_processing_status() SHOULD BE OVERLOADED !!!', __name__)
+        
+#-----------------------------
 #-----------------------------
 
 if __name__ == "__main__" :

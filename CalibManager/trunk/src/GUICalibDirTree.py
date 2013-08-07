@@ -34,7 +34,7 @@ class GUICalibDirTree (QtGui.QWidget):
 
     calib_types_cspad = [
         'center'
-       ,'center_off'
+       ,'center_corr_xxx'
        ,'center_global'
        ,'offset'
        ,'offset_corr'
@@ -191,6 +191,17 @@ class GUICalibDirTree (QtGui.QWidget):
             self._full_name = item_par.text() + '/' + self._full_name
             self._getFullName(ind_par)
 
+
+    def getTextListOfChildren(self, index): 
+        item = self.model.itemFromIndex(index)
+        number_of_children = item.rowCount()
+        txt_list_of_children = []
+        for row in range(number_of_children) :
+            child_item = item.child(row)
+            txt_list_of_children.append(str(child_item.text()))
+        return txt_list_of_children
+
+
     def itemChanged(self, item):
         state = ['UNCHECKED', 'TRISTATE', 'CHECKED'][item.checkState()]
         msg = 'Item with full name %s, is at state %s' % ( self.getFullNameFromItem(item),  state)
@@ -212,7 +223,10 @@ class GUICalibDirTree (QtGui.QWidget):
     def itemSelected(self, selected, deselected):
         selected_txt = self.getFullNameFromIndex(selected)
         msg1 = 'Item selected: %s' % self.getFullNameFromIndex(selected)
-        self.onSelectedItem(selected_txt)
+
+        txt_list_of_children = self.getTextListOfChildren(selected)
+        
+        self.onSelectedItem(selected_txt, txt_list_of_children)
         logger.info(msg1, __name__)       
 
         #deselected_txt = self.getFullNameFromIndex(deselected)
@@ -221,10 +235,10 @@ class GUICalibDirTree (QtGui.QWidget):
         #self.onDeselectedItem(deselected_txt)
 
 
-    def onSelectedItem(self, path_from_calib) :
+    def onSelectedItem(self, path_from_calib, list_expected) :
         cp.guitabs.setTabByName('Status')
         dir = os.path.join(fnm.path_to_calib_dir(), path_from_calib)        
-        cp.guistatus.statusOfDir(dir)
+        cp.guistatus.statusOfDir(dir, list_expected)
 
 
     def setStyle(self):

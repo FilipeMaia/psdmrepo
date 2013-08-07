@@ -207,7 +207,10 @@ class FileNameManager :
 #    def path_data_scan_tstamp_list_tmp(self) :
 #        return  self.path_data_scan_tstamp_list() + '-tmp'
 
+#-----------------------------
 
+    def log_file(self) :
+        return cp.dir_work.value() + '/' + logger.getLogFileName()
 
 #-----------------------------
 
@@ -232,7 +235,19 @@ class FileNameManager :
 
     def path_peds_aver_plot(self) :
         return self.path_prefix_dark() + 'peds-aver-plot.png'
- 
+
+#-----------------------------
+
+    def path_hotpix_mask(self) :
+        return self.path_prefix_dark() + 'hotpix-mask-thr-' \
+               + str(cp.mask_hot_thr.value()) + 'ADU.txt'
+
+    def path_hotpix_mask_prefix(self) :
+        return os.path.splitext(self.path_hotpix_mask())[0]
+
+    def path_hotpix_mask_plot(self) :
+        return self.path_hotpix_mask_prefix() + '-plot.png' 
+
 #-----------------------------
 
     def  get_list_of_files_peds_scan(self) :
@@ -247,8 +262,8 @@ class FileNameManager :
         self.list_of_files_peds_aver = []
         self.list_of_files_peds_aver.append(self.path_peds_aver_psana_cfg())
         self.list_of_files_peds_aver.append(self.path_peds_aver_batch_log())
-        self.list_of_files_peds_aver.append(self.path_peds_ave())
-        self.list_of_files_peds_aver.append(self.path_peds_rms())
+        #self.list_of_files_peds_aver.append(self.path_peds_ave())
+        #self.list_of_files_peds_aver.append(self.path_peds_rms())
         #self.list_of_files_peds_aver.append(self.path_hotpix_mask())
         return self.list_of_files_peds_aver
 
@@ -274,7 +289,7 @@ if __name__ == "__main__" :
 
 #    print 'fnm.path_hotpix_mask() : ', fnm.path_hotpix_mask()
 #    print 'fnm.path_satpix_mask() : ', fnm.path_satpix_mask()
-    
+
     sys.exit ( 'End of test for FileNameManager' )
 
 #-----------------------------

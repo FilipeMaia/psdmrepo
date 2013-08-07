@@ -89,6 +89,8 @@ class GUILogger ( QtGui.QWidget ) :
         self.showToolTips()
         self.setStyle()
 
+        self.guilogger = self
+
     #-------------------
     #  Public methods --
     #-------------------
@@ -152,7 +154,7 @@ class GUILogger ( QtGui.QWidget ) :
 
 
     def closeEvent(self, event):
-        logger.debug('closeEvent', self.name)
+        logger.info('closeEvent', self.name)
         #self.saveLogTotalInFile() # It will be saved at closing of GUIMain
 
         #try    : del cp.guilogger # GUILogger

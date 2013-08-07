@@ -41,17 +41,16 @@ class GUIStatusTable ( QtGui.QWidget ) :
     dict_status = {True  : 'Yes',
                    False : 'No' }
 
-    def __init__ ( self, parent=None, list_of_files=[], title='') :
+    def __init__ ( self, parent=None, list_of_files=[], list_expected=[], title='') :
         QtGui.QWidget.__init__(self, parent)
         self.setGeometry(50, 100, 750, 500)
         self.setWindowTitle('Files ststus table')
         self.setFrame()
 
         self.title = title
-        self.list_of_files = list_of_files
 
         self.table = QtGui.QTableWidget(self)
-        self.makeTable(self.list_of_files)
+        self.makeTable(list_of_files, list_expected)
  
         self.vbox = QtGui.QVBoxLayout()
         self.vbox.addWidget(self.table)
@@ -103,8 +102,11 @@ class GUIStatusTable ( QtGui.QWidget ) :
         self.table.setRowCount(0)
 
 
-    def makeTable(self, list_of_files):
+    def makeTable(self, list_of_files, list_expected=[]):
         """Makes the table for the list of output and log files"""
+
+        self.list_of_files = list_of_files
+        self.list_expected = list_expected
 
         self.rows = len(list_of_files)
         #self.table = QtGui.QTableWidget(self.rows, 6, self)
@@ -112,14 +114,14 @@ class GUIStatusTable ( QtGui.QWidget ) :
         self.table.setRowCount(self.rows)
         self.table.setColumnCount(6)
 
-        self.table.setHorizontalHeaderLabels(['File', 'Exists?', 'Creation time', 'Size(Byte)', 'Owner', 'Mode'])
+        self.table.setHorizontalHeaderLabels(['File', 'Structure', 'Creation time', 'Size(Byte)', 'Owner', 'Mode'])
         #self.table.setVerticalHeaderLabels([''])
 
         self.table.verticalHeader().hide()
 
         self.table.horizontalHeader().setDefaultSectionSize(60)
-        self.table.horizontalHeader().resizeSection(0,250)
-        self.table.horizontalHeader().resizeSection(1,60)
+        self.table.horizontalHeader().resizeSection(0,245)
+        self.table.horizontalHeader().resizeSection(1,65)
         self.table.horizontalHeader().resizeSection(2,150)
         self.table.horizontalHeader().resizeSection(3,100)
         self.table.horizontalHeader().resizeSection(4,80)
@@ -130,27 +132,28 @@ class GUIStatusTable ( QtGui.QWidget ) :
  
         for i, fname in enumerate(list_of_files) :
 
-            file_exists = os.path.exists(fname)
+            file_struct = os.path.exists(fname)
             item_fname  = QtGui.QTableWidgetItem( os.path.basename(fname) )
-            item_exists = QtGui.QTableWidgetItem( self.dict_status[file_exists] )
+            #item_struct = QtGui.QTableWidgetItem( self.dict_status[file_struct] )
+            item_struct = QtGui.QTableWidgetItem( self.checkNameStructure(fname, self.list_expected) )
             item_ctime  = QtGui.QTableWidgetItem( 'N/A' )
             item_size   = QtGui.QTableWidgetItem( 'N/A' )
             item_owner  = QtGui.QTableWidgetItem( 'N/A' )
             item_mode   = QtGui.QTableWidgetItem( 'N/A' )
 
-            item_exists.setTextAlignment(QtCore.Qt.AlignCenter)
+            item_struct.setTextAlignment(QtCore.Qt.AlignCenter)
             item_ctime .setTextAlignment(QtCore.Qt.AlignCenter)
             item_size  .setTextAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
 
             self.row += 1
             self.table.setItem(self.row, 0, item_fname)
-            self.table.setItem(self.row, 1, item_exists)
+            self.table.setItem(self.row, 1, item_struct)
             self.table.setItem(self.row, 2, item_ctime)
             self.table.setItem(self.row, 3, item_size)
             self.table.setItem(self.row, 4, item_owner)
             self.table.setItem(self.row, 5, item_mode)
             
-            row_of_items = [i, fname, item_fname, item_exists, item_ctime, item_size, item_owner, item_mode]
+            row_of_items = [i, fname, item_fname, item_struct, item_ctime, item_size, item_owner, item_mode]
             self.list_of_items.append(row_of_items)
 
             #self.table.setSpan(self.row, 0, 1, 5)            
@@ -171,14 +174,17 @@ class GUIStatusTable ( QtGui.QWidget ) :
         #self.fname_item_flags = QtCore.Qt.ItemFlags(QtCore.Qt.NoItemFlags|QtCore.Qt.ItemIsUserCheckable )
 
         for row_of_items in self.list_of_items :
-            i, fname, item_fname, item_exists, item_ctime, item_size, item_owner, item_mode = row_of_items
+            i, fname, item_fname, item_struct, item_ctime, item_size, item_owner, item_mode = row_of_items
 
             #item_fname.setCheckState(0)
 
-            file_exists = os.path.exists(fname)
-            item_exists.setText( self.dict_status[file_exists] )
+            #file_struct = os.path.exists(fname)
+            #item_struct.setText( self.dict_status[file_struct] )
 
-            if not file_exists : 
+            item_struct.setText( self.checkNameStructure(fname, self.list_expected) )
+
+
+            if not os.path.exists(fname) : 
                 item_ctime.setText( 'N/A' )
                 item_size .setText( 'N/A' )
                 item_owner.setText( 'N/A' )
@@ -197,6 +203,26 @@ class GUIStatusTable ( QtGui.QWidget ) :
             item_mode .setText( str(oct(file_mode)) )
 
         self.setStyle()
+
+
+    def checkNameStructure(self, fname, list_expected) :     
+        """Checks if the base name of the fname path is in the list_expected and return the status string"""
+
+        #print 'fname =', fname
+        #print 'list_expected =', list_expected
+
+        base_name = os.path.basename(fname) 
+
+        if list_expected == [] : return self.checkCalibFileNameStructure(base_name)
+        if base_name in list_expected : return 'OK'        
+        else : return 'WRONG!'
+
+
+    def checkCalibFileNameStructure(self, fname) :
+        """Check that the calibration file name structure is consistent with something like 5-10.data or 5-end.data and return string status"""
+        name, ext = os.path.splitext(fname)
+        if ext == '.data' : return 'Ext OK'
+        else : 'WRONG ext!'
 
 
     def setStyle(self):
