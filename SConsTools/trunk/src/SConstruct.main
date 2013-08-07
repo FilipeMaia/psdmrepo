@@ -95,10 +95,7 @@ env.Decider('timestamp-newer')
 # if help is requested then do not load any packages
 if env.GetOption('help'):
     env.Help('\nList of standard targets:\n')
-    env.Help('    all       - same as "includes lib bin", this is default target\n')
-    env.Help('    includes  - make or link header files\n')
-    env.Help('    lib       - build libraries and Python modules\n')
-    env.Help('    bin       - build all executables\n')
+    env.Help('    all       - build all libraries and executables, this is default target\n')
     env.Help('    doc       - generate documentation\n')
     env.Help('    test      - run all unit tests\n')
     env.Help('    pylint    - run pylint on all Python modules\n')
