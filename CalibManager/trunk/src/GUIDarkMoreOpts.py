@@ -209,6 +209,14 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         logger.info('on_but_stop', __name__)
         bjpeds.stop_auto_processing()
 
+
+    def get_list_of_files_peds(self) :
+        list_of_fnames = fnm.get_list_of_files_peds() \
+             + cp.blsp.get_list_of_files_for_all_sources(fnm.path_peds_ave()) \
+             + cp.blsp.get_list_of_files_for_all_sources(fnm.path_peds_rms())
+        list_of_fnames.append(fnm.path_hotpix_mask())
+        return list_of_fnames
+
         
     def on_but_fbro(self):
         logger.info('on_but_fbro', __name__)
@@ -217,7 +225,8 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
             #self.but_fbro.setStyleSheet(cp.styleButtonBad)
         except :
             #self.but_fbro.setStyleSheet(cp.styleButtonGood)
-            cp.guifilebrowser = GUIFileBrowser(None, fnm.get_list_of_files_peds(), fnm.path_peds_scan_psana_cfg())
+            
+            cp.guifilebrowser = GUIFileBrowser(None, self.get_list_of_files_peds(), fnm.path_peds_scan_psana_cfg())
             cp.guifilebrowser.move(self.pos().__add__(QtCore.QPoint(880,40))) # open window with offset w.r.t. parent
             cp.guifilebrowser.show()
 

@@ -45,6 +45,7 @@ class BatchLogScanParser :
         @param dict   dictionary of searched items and associated parameters
         """
         self.path              = None 
+        self.is_parsed         = False 
         self.det_name          = cp.det_name
         self.dict_of_det_types = cp.dict_of_det_types
         self.list_of_sources   = []
@@ -60,12 +61,16 @@ class BatchLogScanParser :
 #-----------------------------
 
     def parse_batch_log_peds_scan (self) :
+
+        if self.is_parsed and self.path == fnm.path_peds_scan_batch_log() : return
+
         self.path = fnm.path_peds_scan_batch_log()
         self.pattern = self.dict_of_det_types[self.det_name.value()]
 
         #self.print_dict_of_det_types()
         self.parse_scan_log()
         self.print_list_of_types_and_sources()
+        self.is_parsed = True
         
 #-----------------------------
 
@@ -106,17 +111,21 @@ class BatchLogScanParser :
 #-----------------------------
 
     def print_list_of_types_and_sources (self) :
-        msg = 'In log file: %s\nsearch pattern: %s for detector: %s' % (self.path, self.pattern, self.det_name.value())
-
+        msg   = 'In log file: %s\nsearch pattern: %s for detector: %s' % (self.path, self.pattern, self.det_name.value())
+        state = 'Sources found in scan:' 
         if self.list_of_sources == [] :
-            msg += '\nLIST OF SOURCES IS EMPTY !!!' 
-            logger.warning(msg, __name__)         
+            logger.warning(msg + '\nLIST OF SOURCES IS EMPTY !!!', __name__)         
+            cp.guistatus.setStatusMessage(state)
             return
 
         for type, src in zip(self.list_of_types, self.list_of_sources) :
-            msg += '\n    %30s : %s' % (type, src)
+            line  = '\n    %30s : %s' % (type, src)
+            msg   += line
+            state += line
+
         #print msg
         logger.info(msg, __name__)         
+        cp.guistatus.setStatusMessage(state)
 
 #-----------------------------
 
@@ -128,23 +137,14 @@ class BatchLogScanParser :
         #if self.list_of_types == [] : return None
         return self.list_of_types
 
-
-
 #-----------------------------
 
     def get_list_of_files_for_all_sources(self, path1='work/file.dat') :
-        """From pattern of the path it makes a list of files with indexes for sources.
-        For example, for path1='work/file.dat', it returns [work/file.0.dat, work/file.1.dat, ...]
-        """
-        list_of_files = []
-        len_of_list = len(self.list_of_sources) 
-        if len_of_list == 0 : return [path1]
-
-        name, ext = os.path.splitext(path1)
-        for i in range(len_of_list) :
-            name_i = '%s.%i%s' % (name, i, ext)
-            list_of_files.append(name_i)
-        return list_of_files
+        """From pattern of the path it makes a list of files with indexes for all sources."""
+        self.parse_batch_log_peds_scan()
+        len_of_list = len(self.list_of_sources)
+        #print 'len_of_list =', len_of_list
+        return fnm.get_list_of_enumerated_file_names(path1, len_of_list)
 
 #-----------------------------
 #-----------------------------
@@ -152,6 +152,7 @@ class BatchLogScanParser :
 #-----------------------------
 
 blsp = BatchLogScanParser ()
+cp.blsp = blsp
 
 #-----------------------------
 #

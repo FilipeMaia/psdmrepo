@@ -32,7 +32,6 @@ import os
 from ConfigParametersForApp import cp
 from Logger                 import logger
 from FileNameManager        import fnm
-from BatchLogScanParser     import blsp
 
 #import AppUtils.AppDataPath as apputils
 import           AppDataPath as apputils # My version, added in path the '../../data:'
@@ -75,7 +74,7 @@ class ConfigFileGenerator :
 
     def make_psana_cfg_file_for_peds_aver (self) :
 
-        if blsp.list_of_sources == [] : return
+        if cp.blsp.list_of_sources == [] : return
 
         self.det_name = cp.det_name.value()
 
@@ -100,7 +99,7 @@ class ConfigFileGenerator :
         self.path_out = fnm.path_peds_aver_psana_cfg()
 
         modules = ''
-        for i in range( len(blsp.list_of_sources) ) : modules += '%s:%i ' % (module, i)
+        for i in range( len(cp.blsp.list_of_sources) ) : modules += '%s:%i ' % (module, i)
         #print 'List of modules: %s' % modules
 
         self.d_subs   = {'FNAME_XTC'        : str(fnm.path_to_xtc_files_for_run()),
@@ -115,10 +114,10 @@ class ConfigFileGenerator :
         #Add a few similar modules in loop
         self.path_in  = apputils.AppDataPath('CalibManager/scripts/psana-section-module-cspad-peds.cfg').path()
 
-        list_of_ave = blsp.get_list_of_files_for_all_sources(fnm.path_peds_ave())
-        list_of_rms = blsp.get_list_of_files_for_all_sources(fnm.path_peds_rms())
+        list_of_ave = cp.blsp.get_list_of_files_for_all_sources(fnm.path_peds_ave())
+        list_of_rms = cp.blsp.get_list_of_files_for_all_sources(fnm.path_peds_rms())
         
-        for i, (source, fname_ave, fname_rms) in enumerate( zip(blsp.list_of_sources, list_of_ave, list_of_rms) ) :
+        for i, (source, fname_ave, fname_rms) in enumerate( zip(cp.blsp.list_of_sources, list_of_ave, list_of_rms) ) :
             mod = '%s:%i' % (module, i)
             #print '   Add module with pars: ', mod, source, fname_ave, fname_rms
 
@@ -229,7 +228,7 @@ if __name__ == "__main__" :
     #cfg.make_psana_cfg_file_for_peds_scan()
 
 
-    blsp.parse_batch_log_peds_scan() # defines the blsp.list_of_sources    
+    cp.blsp.parse_batch_log_peds_scan() # defines the cp.blsp.list_of_sources    
     cfg.make_psana_cfg_file_for_peds_aver()
 
     sys.exit ( 'End of test for ConfigFileGenerator' )

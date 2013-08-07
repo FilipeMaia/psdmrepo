@@ -616,6 +616,21 @@ def get_text_list_from_file(fname) :
     return list_recs
 
 #----------------------------------
+
+def get_list_of_enumerated_file_names(path1='file.dat', len_of_list=0) :
+    """From pattern of the path it makes a list of files with indexes.
+    For example, for path1='file.dat', it returns [file-00.dat, file-01.dat, ..., file-<N-1>.dat], where N = len_of_list
+    """
+    if len_of_list < 2 : return [path1]
+
+    list_of_files = []
+    name, ext = os.path.splitext(path1)
+    for i in range(len_of_list) :
+        name_i = '%s-%02i%s' % (name, i, ext)
+        list_of_files.append(name_i)
+    return list_of_files
+
+#----------------------------------
 #----------------------------------
 #----------------------------------
 #----------------------------------

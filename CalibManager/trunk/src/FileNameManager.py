@@ -275,6 +275,12 @@ class FileNameManager :
         #self.list_of_files_peds.append(self.path_dark_xtc())
         return self.list_of_files_peds
 
+
+#-----------------------------
+
+    def get_list_of_enumerated_file_names(self, path1='file.dat', len_of_list=0) :
+        return gu.get_list_of_enumerated_file_names(path1, len_of_list)
+
 #-----------------------------
 
 fnm = FileNameManager ()

@@ -74,6 +74,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
         self.guidarkrungo    = None 
         self.guiinsexpdirdet = None
         self.guifilebrowser  = None 
+        self.blsp            = None 
 
         self.procDarkStatus  = 0 # 0=inctive, 1=scan, 2=averaging, 3=both
 
@@ -188,9 +189,10 @@ class ConfigParametersForApp ( ConfigParameters ) :
         # Possible typs for declaration : 'str', 'int', 'long', 'float', 'bool' 
 
         # GUILogger.py
-        self.log_level      = self.declareParameter( name='LOG_LEVEL_OF_MSGS',  val_def='info',         type='str' )
-        self.log_file       = self.declareParameter( name='LOG_FILE_FOR_LEVEL', val_def='./log_for_level.txt',       type='str' )
-        #self.log_file_total = self.declareParameter( name='LOG_FILE_TOTAL',     val_def='./log_total.txt',           type='str' )
+        self.log_level        = self.declareParameter( name='LOG_LEVEL_OF_MSGS',  val_def='info',         type='str' )
+        self.log_file         = self.declareParameter( name='LOG_FILE_FOR_LEVEL', val_def='./log_for_level.txt',       type='str' )
+        #self.log_file_total  = self.declareParameter( name='LOG_FILE_TOTAL',     val_def='./log_total.txt',           type='str' )
+        self.save_log_at_exit = self.declareParameter( name='SAVE_LOG_AT_EXIT',   val_def=True,           type='bool')
 
         # GUIInsExpDirDet.py
         self.instr_dir          = self.declareParameter( name='INSTRUMENT_DIR',    val_def='/reg/d/psdm',  type='str' ) 
@@ -213,10 +215,10 @@ class ConfigParametersForApp ( ConfigParameters ) :
         self.dir_work          = self.declareParameter( name='DIRECTORY_WORK',        val_def='./work',       type='str' )
         self.dir_results       = self.declareParameter( name='DIRECTORY_RESULTS',     val_def='./results',    type='str' )
         self.fname_prefix      = self.declareParameter( name='FILE_NAME_PREFIX',      val_def='clb-',         type='str' )
-        self.save_cp_at_exit   = self.declareParameter( name='SAVE_CONFIG_AT_EXIT',   val_def=False,          type='bool' )
+        self.save_cp_at_exit   = self.declareParameter( name='SAVE_CONFIG_AT_EXIT',   val_def=True,           type='bool')
 
         # GUIDark.py
-        self.dark_more_opts    = self.declareParameter( name='DARK_MORE_OPTIONS',     val_def=False,          type='bool' )
+        self.dark_more_opts    = self.declareParameter( name='DARK_MORE_OPTIONS',     val_def=False,          type='bool')
 
         # GUIDarkRunGo.py
         self.str_run_number    = self.declareParameter( name='STRING_RUN_NUMBER',     val_def='None',         type='str' )

@@ -135,15 +135,20 @@ class BatchJobPedestals (BatchJob) :
 
 #-----------------------------
 
+    def get_list_of_files_peds_aver(self) :
+        list_of_fnames = fnm.get_list_of_files_peds_aver() \
+             + blsp.get_list_of_files_for_all_sources(fnm.path_peds_ave()) \
+             + blsp.get_list_of_files_for_all_sources(fnm.path_peds_rms())
+        return list_of_fnames
+
     def status_for_pedestal_file(self) :
         fname  = fnm.path_peds_ave()
         status = os.path.lexists(fname)
         logger.info('Status: pedestal file ' + fname + ' ' + self.dict_status[status], __name__) 
         return status
 
-
     def status_for_peds_aver_files(self) :
-        stat = self.status_for_files(fnm.get_list_of_files_peds_aver(), comment='of peds average: ')
+        stat = self.status_for_files(self.get_list_of_files_peds_aver(), comment='of peds average: ')
         if stat and cp.procDarkStatus & 1 : cp.procDarkStatus ^= 1 # set bit to 0
         return stat
 
@@ -160,7 +165,7 @@ class BatchJobPedestals (BatchJob) :
         return stat, msg
     
     def status_for_peds_aver_files(self, comment='') :
-        stat, msg = self.status_and_string_for_files(fnm.get_list_of_files_peds_aver(), comment)
+        stat, msg = self.status_and_string_for_files(self.get_list_of_files_peds_aver(), comment)
         if stat and cp.procDarkStatus & 2 : cp.procDarkStatus ^= 2 # set bit to 0
         return stat, msg
 

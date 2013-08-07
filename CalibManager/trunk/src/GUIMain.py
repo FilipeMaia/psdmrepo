@@ -184,7 +184,7 @@ class GUIMain ( QtGui.QWidget ) :
 
     def onSave(self):
         cp.close()
-        logger.saveLogInFile(fnm.log_file())
+        if cp.save_log_at_exit.value() : logger.saveLogInFile(fnm.log_file())
         #logger.saveLogTotalInFile( fnm.log_file_total() )
 
 
