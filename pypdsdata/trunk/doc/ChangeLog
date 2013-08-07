@@ -6,6 +6,10 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V00-01-04
+2013-08-06 Andy Salnikov
+- small fix in pnccd.py, pylint discovered that _pdsdata is unknown
+
 Tag: V00-01-03
 2013-06-26 Andy Salnikov
 - upgrading to pdsdata V06-10-01

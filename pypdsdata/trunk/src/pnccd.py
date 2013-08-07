@@ -46,6 +46,7 @@ import numpy as np
 # Exported definitions --
 #------------------------
 
+import _pdsdata
 from _pdsdata.pnccd import *
 
 # extend FrameV1
