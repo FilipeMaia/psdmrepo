@@ -1,0 +1,3 @@
+- new external package spyder added
+- further improvement in HDF5 writing
+- 'scons pylint' added
