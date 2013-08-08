@@ -69,10 +69,9 @@ def standardSConscript( **kw ) :
     ukw['package'] = pkg
     if 'env' in kw: del ukw['env']
     
-    env = DefaultEnvironment()
+    env = DefaultEnvironment().Clone()
     if kw.get('NEED_QT', False):
         # extend environment with QT stuff
-        env = env.Clone()
         env.Tool('qt4', toolpath = env['TOOLPATH'])
         ukw.setdefault('LIBS', []).extend(env['QT4_LIBS'])
         ukw.setdefault('LIBPATH', []).append(env['QT4_LIBDIR'])
@@ -120,10 +119,13 @@ def standardLib( env, **kw ) :
         pkg = _getpkg( kw )
         
         libdir = env['LIBDIR']
+        extalibs = _getkwlist ( kw, 'LIBS' )
+        extalibpath = _getkwlist ( kw, 'LIBPATH' )
+
 
         binkw = {}
-        binkw['LIBS'] = _getkwlist ( kw, 'LIBS' )
-        binkw['LIBPATH'] = _getkwlist ( kw, 'LIBPATH' )  + env['LIBPATH']
+        binkw['LIBS'] = extalibs
+        binkw['LIBPATH'] = extalibpath + env['LIBPATH']
         if 'CCFLAGS' in kw:
             binkw['CCFLAGS'] = env['CCFLAGS'] + ' ' + kw['CCFLAGS']
         lib = env.SharedLibrary ( pkg, source=libsrcs, **binkw )
@@ -131,9 +133,9 @@ def standardLib( env, **kw ) :
         DefaultEnvironment()['ALL_TARGETS']['LIBS'].extend ( ilib )
         
         # get the list of libraries need for this package
-        libs = [pkg] + _getkwlist ( kw, 'LIBS' )
+        libs = [pkg] + extalibs
         addPkgLib ( pkg, lib[0] )
-        addPkgLibs ( pkg, libs )
+        addPkgLibs ( pkg, libs, extalibpath )
         
         return lib
         
@@ -315,9 +317,12 @@ def _standardBins( env, appdir, binenv, install, **kw ) :
         binkw = {}
         binkw['LIBS'] = _getkwlist ( kw, 'LIBS' )
         #binkw['LIBS'].insert ( 0, _getpkg( kw ) )
-        binkw['LIBPATH'] = _getkwlist ( kw, 'LIBPATH' )  + env['LIBPATH']
+        env.Prepend(LIBPATH = _getkwlist ( kw, 'LIBPATH' ))
         if 'CCFLAGS' in kw:
             binkw['CCFLAGS'] = env['CCFLAGS'] + ' ' + kw['CCFLAGS']
+
+        trace ( "binkw = "+str(binkw), "SConscript", 2 )
+        trace ( "LIBPATH = "+str(env['LIBPATH']), "SConscript", 2 )
     
         for bin, srcs in bins.iteritems() :
             

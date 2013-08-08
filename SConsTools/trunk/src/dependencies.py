@@ -127,7 +127,7 @@ def findAllDependencies( node ):
         # take all children which are include files, i.e. they live in
         # .../arch/${SIT_ARCH}/genarch/Package/ or include/Package/ directory
         f = str(child)
-        #trace ( 'Checking child %s' % f, 'findAllDependencies', 8 )
+        trace ( 'Checking child %s' % f, 'findAllDependencies', 8 )
         p = _guessPackage ( f )
         if p : 
             res.add ( p )
@@ -244,7 +244,7 @@ def adjustPkgDeps():
     for pkg, libs in env['PKG_TREE_LIB'].iteritems() :
         for lib in libs:
             
-            trace ( "checking dependencies for package "+pkg, "adjustPkgDeps", 4 )
+            trace ( "checking dependencies for library "+str(lib), "adjustPkgDeps", 4 )
             deps = findAllDependencies ( lib )
             # self-dependencies are not needed here
             deps.discard(pkg)
@@ -293,8 +293,9 @@ def adjustPkgDeps():
             trace ( str(bin)+" deps = " + str(map(str,alldeps)), "adjustPkgDeps", 4 )
             for d in alldeps :
                 libs = pkg_tree.get(d,{}).get( 'LIBS', [] )
+                libpath = pkg_tree.get(d,{}).get( 'LIBDIRS', [] )
                 bin.env['LIBS'].extend ( libs )
-                bin.env['LIBPATH'] = env['LIBPATH']
+                bin.env['LIBPATH'].extend ( libpath )
             trace ( str(bin)+" libs = " + str(map(str,bin.env['LIBS'])), "adjustPkgDeps", 4 )
             
             #
