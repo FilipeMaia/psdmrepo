@@ -45,7 +45,7 @@ from Logger                 import logger
 from GUIButtonBar           import *
 from GUILogger              import *
 from GUITabs                import *
-#from GUIInsExpDirDet        import *
+from GUIInsExpDirDet        import *
 #from GUICalibDirTree        import *
 
 #---------------------
@@ -76,7 +76,7 @@ class GUIMain ( QtGui.QWidget ) :
         #self.guitree   = GUICalibDirTree()
         self.guitabs   = GUITabs(self) # QtGui.QTextEdit()
         self.guilogger = GUILogger(show_buttons=False)
-        #self.guiinsexpdirdet = GUIInsExpDirDet(self)
+        self.guiinsexpdirdet = GUIInsExpDirDet(self)
 
         #self.hboxB = QtGui.QHBoxLayout() 
         #self.hboxB.addWidget(self.guitree)
@@ -95,7 +95,7 @@ class GUIMain ( QtGui.QWidget ) :
 
         self.vbox = QtGui.QVBoxLayout() 
         #self.vbox.addWidget(self.guibuttonbar)
-        #self.vbox.addWidget(self.guiselectcalibdir)
+        self.vbox.addWidget(self.guiinsexpdirdet)
         #self.vbox.addLayout(self.hboxB) 
         self.vbox.addWidget(self.vsplit) 
         #self.vbox.addStretch(1)
@@ -170,8 +170,8 @@ class GUIMain ( QtGui.QWidget ) :
     def closeEvent(self, event):
         logger.info('closeEvent', self.name)
 
-        #try    : self.guiinsexpdirdet.close() 
-        #except : pass
+        try    : self.guiinsexpdirdet.close() 
+        except : pass
         
         try    : self.guitabs.close()
         except : pass

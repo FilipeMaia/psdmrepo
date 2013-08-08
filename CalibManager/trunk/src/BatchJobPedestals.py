@@ -192,6 +192,11 @@ class BatchJobPedestals (BatchJob) :
         logger.info('on_auto_processing_stop()', __name__)
         self.kill_all_batch_jobs()
 
+
+    def switch_stop_go_button(self):
+        try : cp.guidarkrungo.onStop()
+        except : pass
+
 #-----------------------------
 
     def on_auto_processing_status_v1(self):

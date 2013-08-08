@@ -59,13 +59,13 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         self.cbx_dark_more = QtGui.QCheckBox('More options')
         self.cbx_dark_more.setChecked( cp.dark_more_opts.value() )
  
-        self.but_stop = QtGui.QPushButton( 'Stop' )
+        #self.but_stop = QtGui.QPushButton( 'Stop' )
         self.but_fbro = QtGui.QPushButton( 'File browser' )
         self.but_plot = QtGui.QPushButton( 'Plot' )
         self.but_depl = QtGui.QPushButton( 'Deploy' )
 
         self.hbox = QtGui.QHBoxLayout()
-        self.hbox.addWidget(self.but_stop)
+        #self.hbox.addWidget(self.but_stop)
         self.hbox.addWidget(self.but_fbro)
         self.hbox.addWidget(self.but_plot)
         self.hbox.addWidget(self.but_depl)
@@ -81,7 +81,7 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         self.setLayout(self.vbox)
 
         self.connect(self.cbx_dark_more  , QtCore.SIGNAL('stateChanged(int)'), self.on_cbx ) 
-        self.connect( self.but_stop, QtCore.SIGNAL('clicked()'), self.on_but_stop )
+        #self.connect( self.but_stop, QtCore.SIGNAL('clicked()'), self.on_but_stop )
         self.connect( self.but_fbro, QtCore.SIGNAL('clicked()'), self.on_but_fbro )
         self.connect( self.but_plot, QtCore.SIGNAL('clicked()'), self.on_but_plot )
         self.connect( self.but_depl, QtCore.SIGNAL('clicked()'), self.on_but_depl )
@@ -130,7 +130,7 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
 
         width = 100
 
-        self.but_stop.setFixedWidth(width)
+        #self.but_stop.setFixedWidth(width)
         self.but_fbro.setFixedWidth(width)
         self.but_plot.setFixedWidth(width)
         self.but_depl.setFixedWidth(width)
@@ -157,7 +157,7 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         #self.setContentsMargins (QtCore.QMargins(10,10,10,10))
         #self.setContentsMargins (QtCore.QMargins(0,5,0,0))
 
-        self.but_stop.setVisible( self.cbx_dark_more.isChecked() )
+        #self.but_stop.setVisible( self.cbx_dark_more.isChecked() )
         self.but_fbro.setVisible( self.cbx_dark_more.isChecked() )
         self.but_plot.setVisible( self.cbx_dark_more.isChecked() )
         self.but_depl.setVisible( self.cbx_dark_more.isChecked() )

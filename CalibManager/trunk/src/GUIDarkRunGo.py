@@ -63,11 +63,10 @@ class GUIDarkRunGo ( QtGui.QGroupBox ) :
 
         self.but_run  = QtGui.QPushButton( self.str_run_number.value() + self.char_expand )
         self.but_go   = QtGui.QPushButton( 'Go' )
-        self.but_stop = QtGui.QPushButton( 'Stop' )
         self.edi_from = QtGui.QLineEdit  ( self.str_run_from  .value() )
         self.edi_to   = QtGui.QLineEdit  ( self.str_run_to    .value() )
 
-        self.but_stop.setVisible(False)
+        #self.but_stop.setVisible(False)
 
         self.edi_from.setValidator(QtGui.QIntValidator(0,9999,self))
 
@@ -81,13 +80,12 @@ class GUIDarkRunGo ( QtGui.QGroupBox ) :
         self.hbox.addWidget(self.edi_to)
         self.hbox.addStretch(1)     
         self.hbox.addWidget(self.but_go)
-        self.hbox.addWidget(self.but_stop)
+        #self.hbox.addWidget(self.but_stop)
 
         self.setLayout(self.hbox)
 
         self.connect( self.but_run , QtCore.SIGNAL('clicked()'), self.onButRun )
         self.connect( self.but_go  , QtCore.SIGNAL('clicked()'), self.onButGo )
-        self.connect( self.but_stop, QtCore.SIGNAL('clicked()'), self.onButStop )
         self.connect( self.edi_from, QtCore.SIGNAL('editingFinished()'), self.onEdiFrom )
         self.connect( self.edi_to  , QtCore.SIGNAL('editingFinished()'), self.onEdiTo )
    
@@ -102,7 +100,6 @@ class GUIDarkRunGo ( QtGui.QGroupBox ) :
     def showToolTips(self):
         self.but_run .setToolTip('Select the run for calibration.')
         self.but_go  .setToolTip('Begin data processing for calibration.')
-        self.but_stop.setToolTip('Emergency stop data processing.')
         self.edi_from.setToolTip('Type in the run number \nas a lower limit of the validity range.')
         self.edi_to  .setToolTip('Type in the run number or "end"\nas an upper limit of the validity range.')
 
@@ -122,7 +119,6 @@ class GUIDarkRunGo ( QtGui.QGroupBox ) :
 
         self.but_run  .setEnabled(is_enabled)
         self.but_go   .setEnabled(is_enabled)
-        self.but_stop .setEnabled(is_enabled)
 
         self.edi_from .setReadOnly(not is_enabled)
         self.edi_to   .setReadOnly(not is_enabled)
@@ -147,7 +143,6 @@ class GUIDarkRunGo ( QtGui.QGroupBox ) :
         self.edi_from .setFixedWidth(40)
         self.edi_to   .setFixedWidth(40)
         self.but_go   .setFixedWidth(80)        
-        self.but_stop .setFixedWidth(80)        
 
         self.edi_from .setAlignment (QtCore.Qt.AlignRight)
         self.edi_to   .setAlignment (QtCore.Qt.AlignRight)
@@ -236,7 +231,7 @@ class GUIDarkRunGo ( QtGui.QGroupBox ) :
 
         run_number = int(self.str_run_number.value())
 
-        self.str_run_from.setValue(str(run_number+1)) 
+        self.str_run_from.setValue(str(run_number)) 
         self.str_run_to  .setValue('end') 
 
         self.edi_from.setText(self.str_run_from.value())
@@ -267,14 +262,24 @@ class GUIDarkRunGo ( QtGui.QGroupBox ) :
 
  
     def onButGo(self):
-        logger.info('onButGo', __name__ )
-        self.but_go.setStyleSheet(cp.styleDefault)
-        bjpeds.start_auto_processing()
+        but = self.but_go
+        but.setStyleSheet(cp.styleDefault)
+
+        if   but.text() == 'Go' : 
+            logger.info('onButGo', __name__ )
+            bjpeds.start_auto_processing()
+            but.setText('Stop')
+            
+        elif but.text() == 'Stop' : 
+            logger.info('onButStop', __name__ )
+            bjpeds.stop_auto_processing()
+            but.setText('Go')
 
 
-    def onButStop(self):
-        logger.info('onButStop', __name__ )
-        bjpeds.stop_auto_processing()
+    def onStop(self):
+        but = self.but_go
+        if but.text() == 'Stop' : 
+            but.setText('Go')
 
 
     def setStatusMessage(self):

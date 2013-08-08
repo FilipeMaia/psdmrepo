@@ -226,6 +226,9 @@ class BatchJob (QtCore.QObject ) : # need in QtCore.QObject in order to connect 
         logger.info('Auto-processing IS STOPPED', __name__)
         cp.autoRunStatus = 0            
         self.disconnectFromThread1()
+
+        self.switch_stop_go_button()
+
         if is_stop_on_button_click : self.on_auto_processing_stop()
 
 #-----------------------------
@@ -238,6 +241,9 @@ class BatchJob (QtCore.QObject ) : # need in QtCore.QObject in order to connect 
         logger.warning('DEFAULT METHOD on_auto_processing_stop() SHOULD BE OVERLOADED !!!', __name__)
 
     def on_auto_processing_status(self):
+        logger.warning('DEFAULT METHOD on_auto_processing_status() SHOULD BE OVERLOADED !!!', __name__)
+
+    def switch_stop_go_button(self):
         logger.warning('DEFAULT METHOD on_auto_processing_status() SHOULD BE OVERLOADED !!!', __name__)
         
 #-----------------------------

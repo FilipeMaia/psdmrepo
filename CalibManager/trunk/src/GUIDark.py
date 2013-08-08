@@ -27,7 +27,7 @@ from PyQt4 import QtGui, QtCore
 from ConfigParametersForApp import cp
 from Logger                 import logger
 
-from GUIInsExpDirDet        import *
+#from GUIInsExpDirDet        import *
 from GUIStatus              import *
 from GUIDarkRunGo           import *
 from GUIDarkMoreOpts        import *
@@ -43,14 +43,14 @@ class GUIDark ( QtGui.QWidget ) :
         self.setWindowTitle('Dark run processing')
         self.setFrame()
 
-        self.guiinsexpdirdet  = GUIInsExpDirDet(self)
+        #self.guiinsexpdirdet  = GUIInsExpDirDet(self)
         self.guistatus        = GUIStatus(self)
         self.guidarkrungo     = GUIDarkRunGo(self)
         self.guidarkmoreopts  = GUIDarkMoreOpts(self)
         
         self.vbox = QtGui.QVBoxLayout() 
-        self.vbox.addWidget(self.guiinsexpdirdet)
-        self.vbox.addStretch(1)
+        #self.vbox.addWidget(self.guiinsexpdirdet)
+        #self.vbox.addStretch(1)
         self.vbox.addWidget(self.guistatus)
         self.vbox.addStretch(1)
         self.vbox.addWidget(self.guidarkrungo)
@@ -105,8 +105,8 @@ class GUIDark ( QtGui.QWidget ) :
     def closeEvent(self, event):
         logger.info('closeEvent', __name__)
 
-        try    : self.guiinsexpdirdet.close()
-        except : pass
+        #try    : self.guiinsexpdirdet.close()
+        #except : pass
 
         try    : self.guistatus.close()
         except : pass
