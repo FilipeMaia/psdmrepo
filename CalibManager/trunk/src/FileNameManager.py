@@ -156,6 +156,16 @@ class FileNameManager :
         return gu.get_list_of_files_in_dir_for_ext(dir, '.xtc')
 
 
+    def get_list_of_xtc_runs(self):
+        list_of_xtc_files = self.get_list_of_xtc_files()
+        list_of_xtc_runs = []
+        for fname in list_of_xtc_files :
+            exp, run, stream, chunk, ext = gu.parse_xtc_file_name(fname)
+            if run in list_of_xtc_runs : continue
+            list_of_xtc_runs.append(run)
+        return list_of_xtc_runs
+
+
     def path_to_xtc_files_for_run(self):
         """Returns somthing like /reg/d/psdm/CXI/cxitut13/xtc/e304-r0022-*.xtc"""
 

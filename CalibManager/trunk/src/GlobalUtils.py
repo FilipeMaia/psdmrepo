@@ -97,6 +97,8 @@ def print_all_files_in_dir(dirname) :
 def get_list_of_files_in_dir_for_ext(dir, ext='.xtc'):
     """Returns the list of files in the directory for specified extension or None if directory is None."""
     if dir is None : return []
+    if not os.path.exists(dir) : return [] 
+    
     list_of_files_in_dir = os.listdir(dir)
     list_of_files = []
     for fname in list_of_files_in_dir :
@@ -331,6 +333,7 @@ def xtc_fname_parser_helper( part, prefix ) :
 def parse_xtc_file_name(fname):
     """Parse the file name like e170-r0003-s00-c00.xtc and return ('170', '0003', '00', '00', '.xtc')"""
     name, _ext = os.path.splitext(fname) # i.e. ('e167-r0015-s00-c00', '.xtc')
+    #print 'name, _ext = ', name, _ext 
     parts = name.split('-') # it gives parts = ('e167', 'r0015', 's00', 'c00')
 
     _expnum = None
@@ -422,6 +425,40 @@ def xtc_fname_for_all_chunks(path='e167-r0015-s00-c00.xtc') :
     fields = bname.split('-')
     fname_all = fields[0] + '-' + fields[1] + '-*.xtc'
     return fname_all
+
+#----------------------------------
+# assumes: path = .../<inst>/<experiment>/calib
+# for example        /reg/d/psdm/CXI/cxitut13/calib
+# or                 /reg/d/psdm/XPP/xpptut13/calib
+
+def get_text_content_of_calib_dir_for_detector(path, det='cspad', level=0, calib_type='pedestals') :
+
+    #logger.debug( 'get_txt_content_of_calib_dir_for_detector(...): ' + path, __name__)
+    det_lower = det.lower()
+    txt = '    '
+    if level == 0 : txt = 'Content of: %s for detector: %s' % (path, det)
+
+    if not os.path.exists(path) :
+        txt = 'Path %s DOES NOT EXIST' % path
+        return txt
+
+    for file in os.listdir(path) :
+        fname_lower = file.lower()
+        cond0 = level==0 and det.lower()+'::' in fname_lower
+        cond1 = level==1 and det.lower()+'.'  in fname_lower
+        cond2 = level==2 and file == calib_type
+        cond3 = level==3
+
+        if not ( cond0 or cond1 or cond2 or cond3 ) : continue
+        
+        txt +='\n' + (level+1)*'    ' + file
+
+        path_to_child = os.path.join(path, file)
+
+        if os.path.isdir(path_to_child) : txt += get_text_content_of_calib_dir_for_detector(path_to_child, det, level=level+1, calib_type=calib_type)
+             
+    return txt
+
 
 #----------------------------------
 
@@ -777,8 +814,12 @@ if __name__ == "__main__" :
 
     #send_msg_with_att_to_elog(fname_att='../../work/cora-xcsi0112-r0015-data-time-plot.png')
 
-    print 'xtc_fname_for_all_chunks(...): ', xtc_fname_for_all_chunks('e168-r0016-s00-c00.xtc')
-    print 'xtc_fname_for_all_chunks(...): ', xtc_fname_for_all_chunks('/reg/d/psdm/XCS/xcsi0112/xtc/e167-r0015-s00-c00.xtc')
+    #print 'xtc_fname_for_all_chunks(...): ', xtc_fname_for_all_chunks('e308-r0178-s02-c00.xtc')
+    #print 'xtc_fname_for_all_chunks(...): ', xtc_fname_for_all_chunks('/reg/d/psdm/XPP/xpptut13/xtc/e308-r0178-s02-c00.xtc')
+
+    #print 'Test 1:\n' + get_text_content_of_calib_dir_for_detector(path='/reg/d/psdm/XPP/xpptut13/calibXXX', det='CSPAD')
+    #print 'Test 2:\n' + get_text_content_of_calib_dir_for_detector(path='/reg/d/psdm/XPP/xpptut13/calib/', det='CSPAD2x2')
+    print 'Test 3:\n' + get_text_content_of_calib_dir_for_detector(path='/reg/d/psdm/XPP/xpptut13/calib', det='CSPAD', calib_type='tilt')
 
     sys.exit ( "End of test" )
 

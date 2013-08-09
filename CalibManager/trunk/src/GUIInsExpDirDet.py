@@ -94,6 +94,8 @@ class GUIInsExpDirDet ( QtGui.QWidget ) :
         self.showToolTips()
         self.setStyle()
 
+        self.setStatusMessage()
+
         cp.guiinsexpdirdet = self
 
     #-------------------
@@ -222,6 +224,8 @@ class GUIInsExpDirDet ( QtGui.QWidget ) :
         self.setDet('None')
         self.setStyleButtons()
 
+        if cp.guidarklist is not None : cp.guidarklist.updateList()
+
         path_to_xtc_dir = fnm.path_to_xtc_dir()
         if os.path.lexists(path_to_xtc_dir) : return
         
@@ -274,16 +278,24 @@ class GUIInsExpDirDet ( QtGui.QWidget ) :
 
 
     def setDet(self, txt='None'):
-
-        if txt=='None' or txt != self.det_name.value() : cp.guidarkrungo.setRun('None')
-            
-        if txt=='None' : cp.guidarkrungo.setFieldsEnabled(False)
-        else           : cp.guidarkrungo.setFieldsEnabled(True)
-
+        
         self.det_name.setValue(txt)
         self.butDet.setText( txt + self.char_expand)
         #if txt == 'None' : self.list_of_exp = None        
         logger.info('Selected detector: ' + str(txt), __name__)
+        self.setStatusMessage()
+
+        if cp.guidarkrungo is not None :
+            if txt=='None' or txt != self.det_name.value() : cp.guidarkrungo.setRun('None')            
+            if txt=='None' : cp.guidarkrungo.setFieldsEnabled(False)
+            else           : cp.guidarkrungo.setFieldsEnabled(True)
+
+
+    def setStatusMessage(self):
+        if cp.guistatus is None : return
+        #msg = 'From %s to %s use dark run %s' % (self.str_run_from.value(), self.str_run_to.value(), self.str_run_number.value())
+        msg = gu.get_text_content_of_calib_dir_for_detector(path=self.calib_dir.value(), det=self.det_name.value(), calib_type='pedestals')
+        cp.guistatus.setStatusMessage(msg)
 
 #-----------------------------
 

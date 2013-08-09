@@ -29,7 +29,8 @@ from Logger                 import logger
 
 #from GUIInsExpDirDet        import *
 from GUIStatus              import *
-from GUIDarkRunGo           import *
+#from GUIDarkRunGo           import *
+from GUIDarkList            import *
 from GUIDarkMoreOpts        import *
 
 #-----------------------------
@@ -39,13 +40,14 @@ class GUIDark ( QtGui.QWidget ) :
 
     def __init__ ( self, parent=None ) :
         QtGui.QWidget.__init__(self, parent)
-        self.setGeometry(200, 400, 750, 300)
+        self.setGeometry(200, 400, 750, 400)
         self.setWindowTitle('Dark run processing')
         self.setFrame()
 
         #self.guiinsexpdirdet  = GUIInsExpDirDet(self)
         self.guistatus        = GUIStatus(self)
-        self.guidarkrungo     = GUIDarkRunGo(self)
+        #self.guidarkrungo     = GUIDarkRunGo(self)
+        self.guidarklist      = GUIDarkList(self)
         self.guidarkmoreopts  = GUIDarkMoreOpts(self)
         
         self.vbox = QtGui.QVBoxLayout() 
@@ -53,10 +55,10 @@ class GUIDark ( QtGui.QWidget ) :
         #self.vbox.addStretch(1)
         self.vbox.addWidget(self.guistatus)
         self.vbox.addStretch(1)
-        self.vbox.addWidget(self.guidarkrungo)
+        #self.vbox.addWidget(self.guidarkrungo)
+        self.vbox.addWidget(self.guidarklist)
         self.vbox.addStretch(1)
         self.vbox.addWidget(self.guidarkmoreopts)
-        self.vbox.addStretch(1)
 
         self.setLayout(self.vbox)
 
@@ -111,7 +113,10 @@ class GUIDark ( QtGui.QWidget ) :
         try    : self.guistatus.close()
         except : pass
 
-        try    : self.guidarkrungo.close()        
+        #try    : self.guidarkrungo.close()        
+        #except : pass
+
+        try    : self.guidarklist.close()        
         except : pass
 
         try    : self.guidarkmoreopts.close()        
