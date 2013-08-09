@@ -171,8 +171,9 @@ function define_class(constructor, base, statics, methods ) {
  * Options are specified via the 'options' object (dictionary). The following
  * options are supported in this implementation of teh class:
  *
- *   'text_when_empty'     - HTML text to show when no data are loaded
- *   'default_sort_column' - an optional column number by which to sort (default: 0)
+ *   'text_when_empty'      - HTML text to show when no data are loaded
+ *   'default_sort_column'  - an optional column number by which to sort (default: 0)
+ *   'default_sort_forward' - the direction of the sort (default: true)
  *   
  * The 'config_handler' parameter (if provided) will be used to maintain a persistent
  * state of table configuration on teh server side.
@@ -241,16 +242,16 @@ function Table(container, coldef, data, options, config_handler) {
 
     this.data            = data ? data : [];
     this.options         = options ? options : {};
-    this.text_when_empty = this.options.text_when_empty ? this.options.text_when_empty : Table.Status.Empty;
+    this.text_when_empty = this.options.text_when_empty !== undefined ? this.options.text_when_empty : Table.Status.Empty;
 
 
     // Sort configuration
 
     this.sorted = {
-        column:  this.options.default_sort_column ? this.options.default_sort_column : 0,   // the number of a column by which rows are sorted
-        forward: true                                                                       // sort direction
+        column:  this.options.default_sort_column  !== undefined ? this.options.default_sort_column  : 0,   // the number of a column by which rows are sorted
+        forward: this.options.default_sort_forward !== undefined ? this.options.default_sort_forward : true // sort direction
     };
-    this.selected_col = this.options.selected_col ? this.options.selected_col : 0;
+    this.selected_col = this.options.selected_col !== undefined ? this.options.selected_col : 0;
     this.selected_row = data ? data[0] : null;
 
     this.header = {

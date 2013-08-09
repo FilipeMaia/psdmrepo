@@ -173,7 +173,7 @@ HERE;
 <div style="float:left; margin-left:10px; margin-right:20px; margin-bottom:40px; padding-right:30px; border-right: 1px solid #c0c0c0;">
   <div style="height:55px;">
     <div style="float:left; font-size: 300%; font-family: Times, sans-serif;"><b>{$experiment->POSIX_gid()}</b></div>
-    <div style="float:left; margin-left:10px; padding-top:4px;"><button id="exp-m-g-refresh">Refresh</button></div>
+    <div style="float:left; margin-left:10px; padding-top:4px;"><button class="control-button" id="exp-m-g-refresh">Refresh</button></div>
     <div style="clear:both;"></div>
   </div>
   <div id="exp-m-g-members-stat"></div>
@@ -185,9 +185,9 @@ HERE;
     <div style="float:left; margin-left:5px;"><input type="text" style="padding:2px;" id="exp-m-g-string2search" value="" size=16 title="enter the pattern to search then press RETURN" /></div>
     <div style="float:left; margin-left:10px; font-weight:bold; padding-top:6px;">by:</div>
     <div style="float:left; margin-left:5px; padding-top:3px;" id="exp-m-g-scope">
-      <input type="radio" id="exp-m-g-uid"   name="scope" value="uid"                         /><label for="exp-m-g-uid"  >UID</label>
-      <input type="radio" id="exp-m-g-gecos" name="scope" value="gecos"                       /><label for="exp-m-g-gecos">name</label>
-      <input type="radio" id="exp-m-g-both"  name="scope" value="uid_gecos" checked="checked" /><label for="exp-m-g-both" >both</label>
+      <input type="radio" id="exp-m-g-uid"   name="scope" value="uid"                         /><label for="exp-m-g-uid"   class="control-label" >UID</label>
+      <input type="radio" id="exp-m-g-gecos" name="scope" value="gecos"                       /><label for="exp-m-g-gecos" class="control-label" >name</label>
+      <input type="radio" id="exp-m-g-both"  name="scope" value="uid_gecos" checked="checked" /><label for="exp-m-g-both"  class="control-label" >both</label>
     </div>
     <div style="clear:both;"></div>
   </div>
@@ -221,50 +221,45 @@ HERE;
 
 <div id="el-l-mctrl">
   <div style="float:left;">
-    <div style="font-weight:bold; margin-bottom:2px;">Messages:</div>
-    <select name="messages" style="font-size:90%; padding:1px;" title="Select non-blank option to select how many events to load">
-      <option selected="selected">100</option>
-      <option>shift</option>
-      <option>24 hrs</option>
-      <option>7 days</option>
-      <option>everything</option>
-    </select>
+    <table><tbody>
+      <tr style="font-size:12px;">
+        <td valign="center">
+          <span style="font-weight:bold;">Last messages</span></td>
+        <td valign="center">
+          <select name="num_messages" title="specify how many events to load">
+            <option value="100">100</option>
+            <option value="12h">shift</option>
+            <option value="24h">24 hrs</option>
+            <option value="7d">7 days</option>
+            <option value="">everything</option>
+          </select></td>
+        <td valign="center">
+          <span style="font-weight:bold; margin-left:20px;">Include runs</span></td>
+        <td valign="center">
+          <input name="include_runs" type="checkbox" checked="checked" title="search for runs as well"/></td>
+        <td valign="center">
+          <span style="font-weight:bold; margin-left:20px;">Show deleted</span></td>
+        <td valign="center">
+          <input name="show_deleted" type="checkbox" checked="checked" title="display deleted messages"/></td>
+      </tr>
+    </tbody></table>
   </div>
-  <div style="float:left; margin-left:20px;">
-    <div style="font-weight:bold; margin-bottom:4px;">Include runs:</div>
-    <div id="el-l-rs-selector">
-      <input type="radio" id="el-l-rs-on"  name="show_runs" value="on" checked="checked"/><label for="el-l-rs-on" >Yes</label>
-      <input type="radio" id="el-l-rs-off" name="show_runs" value="off"/><label for="el-l-rs-off">No</label>
-    </div>
-  </div>
-  <div style="float:left; margin-left:20px;">
-    <div style="font-weight:bold; margin-bottom:4px;">Include deleted:</div>
-    <div id="el-l-dm-selector">
-      <input type="radio" id="el-l-dm-on"  name="show_deleted" value="on" checked="checked"/><label for="el-l-dm-on" >Yes</label>
-      <input type="radio" id="el-l-dm-off" name="show_deleted" value="off" /><label for="el-l-dm-off">No</label>
-    </div>
-  </div>
-  <div style="float:right;" class="el-l-auto">
-    <div style="float:left;">
-      <div style="font-weight:bold; margin-bottom:4px;">Autorefresh:</div>
-      <div id="el-l-refresh-selector" style="float:left;">
-        <input type="radio" id="el-l-refresh-on"  name="refresh" value="on"  checked="checked" /><label for="el-l-refresh-on"  >On</label>
-        <input type="radio" id="el-l-refresh-off" name="refresh" value="off"                   /><label for="el-l-refresh-off" >Off</label>
-      </div>
-      <div style="float:left; margin-left:10px; font-size:80%;">
-        <select id="el-l-refresh-interval">
-          <option>2</option>
-          <option>5</option>
-          <option>10</option>
-        </select>
-        s.
-      </div>
-      <div style="clear:both;"></div>
-    </div>
-    <div style="float:right; margin-left:10px;">
-      <button id="el-l-refresh" title="check if there are new messages or runs">Refresh</button>
-    </div>    
-    <div style="clear:both;"></div>
+  <div style="float:right;">
+    <table><tbody>
+      <tr style="font-size:12px;">
+        <td valign="center">
+          <span style="font-weight:bold;">Auto-refresh</span></td>
+        <td valign="center">
+          <select name="refresh_interval">
+            <option value="0">Off</option>
+            <option value="2" selected="selected">2 sec</option>
+            <option value="5">5 sec</option>
+            <option value="10">10 sec</option>
+          </select></td>
+        <td valign="center">
+          <button class="control-button" name="refresh" title="check if there are new messages or runs">Refresh</button></td>
+      </tr>
+    </tbody></table>
   </div>
   <div style="clear:both;"></div>
 </div>
@@ -273,11 +268,11 @@ HERE;
   <div class="el-ms-info" id="el-l-ms-updated" style="float:right;">&nbsp;</div>
   <div style="clear:both;"></div>
   <div class="el-ms-mctrl">
-    <button id="el-l-expand"     title="click a few times to expand the whole tree">Expand++</button>
-    <button id="el-l-collapse"   title="each click will collapse the tree to the previous level of detail">Collapse--</button>
-    <button id="el-l-viewattach" title="view attachments of expanded messages">View Attachments</button>
-    <button id="el-l-hideattach" title="hide attachments of expanded messages">Hide Attachments</button>
-    <button id="el-l-reverse"    title="show days and messages within each day in reverse order">Show in Reverse Order</button>
+    <button class="control-button" id="el-l-expand"     title="click a few times to expand the whole tree">Expand++</button>
+    <button class="control-button" id="el-l-collapse"   title="each click will collapse the tree to the previous level of detail">Collapse--</button>
+    <button class="control-button" id="el-l-viewattach" title="view attachments of expanded messages">View Attachments</button>
+    <button class="control-button" id="el-l-hideattach" title="hide attachments of expanded messages">Hide Attachments</button>
+    <button class="control-button" id="el-l-reverse"    title="show days and messages within each day in reverse order">Show in Reverse Order</button>
   </div>  
   <div class="el-ms" id="el-l-ms"></div>
 </div>
@@ -364,8 +359,8 @@ HERE;
       </form>
     </div>
     <div style="float:left; margin-left:20px; padding-top:30px;">
-      <button id="elog-post-submit">Post</button>
-      <button id="elog-post-reset" style="margin-left:5px;">Reset form</button>
+      <button class="control-button" id="elog-post-submit">Post</button>
+      <button class="control-button" id="elog-post-reset" style="margin-left:5px;">Reset form</button>
     </div>
     <div style="clear:both;"></div>
   </div>
@@ -373,10 +368,10 @@ HERE;
     <div style="float:left;">
       <div style="font-weight:bold;">Adjust Post Time:</div>
       <div id="el-p-relevance-selector" style="margin-top:8px;">
-        <input type="radio" id="el-p-relevance-now"   name="relevance" value="now"   checked="checked" /><label for="el-p-relevance-now"   title="it will be the actual posting time"      >now</label>
-        <input type="radio" id="el-p-relevance-past"  name="relevance" value="past"                    /><label for="el-p-relevance-past"  title="use date and time selector on the right" >past</label>
-        <input type="radio" id="el-p-relevance-shift" name="relevance" value="shift"                   /><label for="el-p-relevance-shift" title="within specified shift"                  >in shift</label>
-        <input type="radio" id="el-p-relevance-run"   name="relevance" value="run"                     /><label for="el-p-relevance-run"   title="within specified run"                    >in run</label>
+        <input type="radio" id="el-p-relevance-now"   name="relevance" value="now"   checked="checked" /><label for="el-p-relevance-now"   class="control-label" title="it will be the actual posting time"      >now</label>
+        <input type="radio" id="el-p-relevance-past"  name="relevance" value="past"                    /><label for="el-p-relevance-past"  class="control-label" title="use date and time selector on the right" >past</label>
+        <input type="radio" id="el-p-relevance-shift" name="relevance" value="shift"                   /><label for="el-p-relevance-shift" class="control-label" title="within specified shift"                  >in shift</label>
+        <input type="radio" id="el-p-relevance-run"   name="relevance" value="run"                     /><label for="el-p-relevance-run"   class="control-label" title="within specified run"                    >in run</label>
       </div>
     </div>
     <div style="float:left; margin-left:10px;">
@@ -417,7 +412,7 @@ HERE;
 <div id="el-s-ctrl">
   <div style="float:left;">
     <form id="elog-form-search" action="../logbook/ws/Search.php" method="get">
-      <div style="float:left;">
+      <div style="float:left; padding-left:5px;">
         <div style="font-weight:bold;">Text to search:</div>
         <div><input type="text" name="text2search" value="" size=24 style="font-size:90%; padding:1px; margin-top:5px; width:100%;" /></div>
         <div style="float:left; margin-top:5px;">
@@ -454,7 +449,7 @@ HERE;
           <div><input type="text" name="end" value="" size=24 style="font-size:90%; padding:1px; margin-top:5px;"/></div>
         </div>
       </div>
-      <div style="float:left; margin-left:20px;">
+      <div style="float:left; margin-left:20px; padding-left:20px; border-left:dashed 1px #000000; padding-right:20px; border-right:dashed 1px #000000;">
         <div style="font-weight:bold;">Around Run(s):</div>
         <div>
           <input type="text" name="runs" value="" size=5 style="font-size:90%; padding:1px; margin-top:5px;"
@@ -463,13 +458,19 @@ where to look for messages. For a single run
 put its number. For a range the correct syntax is: 12-35
 Make sure the Begin and End time limits are not used!"/>
         </div>
+        <div style="margin-top:5px; font-weight:bold;">Message ID:</div>
+        <div>
+          <input type="text" name="message" value="" size=5 style="font-size:90%; padding:1px; margin-top:5px;"
+                 title="Enter a numeric identifier of a message to look for. These numbers
+are usually displayed on the very right side of a message bar."/>
+        </div>
       </div>
       <div style="clear:both;"></div>
     </form>
   </div>
   <div style="float:left; margin-left:20px;">
-    <button id="elog-search-submit">Search</button>
-    <button id="elog-search-reset" style="margin-left:5px;">Reset form</button>
+    <button class="control-button" id="elog-search-submit">Search</button>
+    <button class="control-button" id="elog-search-reset" style="margin-left:5px;">Reset form</button>
   </div>
   <div style="clear:both;"></div>
 </div>
@@ -478,11 +479,11 @@ Make sure the Begin and End time limits are not used!"/>
   <div class="el-ms-info" id="el-s-ms-updated" style="float:right;">&nbsp;</div>
   <div style="clear:both;"></div>
   <div class="el-ms-mctrl">
-    <button id="el-s-expand"     title="click a few times to expand the whole tree">Expand++</button>
-    <button id="el-s-collapse"   title="each click will collapse the tree to the previous level of detail">Collapse--</button>
-    <button id="el-s-viewattach" title="view attachments of expanded messages">View Attachments</button>
-    <button id="el-s-hideattach" title="hide attachments of expanded messages">Hide Attachments</button>
-    <button id="el-s-reverse"    title="show days and messages within each day in reverse order">Show in Reverse Order</button>
+    <button class="control-button" id="el-s-expand"     title="click a few times to expand the whole tree">Expand++</button>
+    <button class="control-button" id="el-s-collapse"   title="each click will collapse the tree to the previous level of detail">Collapse--</button>
+    <button class="control-button" id="el-s-viewattach" title="view attachments of expanded messages">View Attachments</button>
+    <button class="control-button" id="el-s-hideattach" title="hide attachments of expanded messages">Hide Attachments</button>
+    <button class="control-button" id="el-s-reverse"    title="show days and messages within each day in reverse order">Show in Reverse Order</button>
   </div>  
   <div class="el-ms" id="el-s-ms"></div>
 </div>
@@ -490,7 +491,7 @@ HERE;
 
         $elog_shifts_workarea =<<<HERE
 <div id="el-sh-ctrl">
-  <div style="float:right; margin-left:5px;"><button id="el-sh-refresh" title="click to refresh the shifts list">Refresh</button></div>
+  <div style="float:right; margin-left:5px;"><button class="control-button" id="el-sh-refresh" title="click to refresh the shifts list">Refresh</button></div>
   <div style="clear:both;"></div>
 </div>
 <div id="el-sh-wa">
@@ -507,9 +508,9 @@ HERE;
               <option>duration</option>
             </select></td>
         <td><div style="width:20px;"></div></td>
-        <td><button id="el-sh-reverse">Show in Reverse Order</button></td>
+        <td><button class="control-button" id="el-sh-reverse">Show in Reverse Order</button></td>
         <td><div style="width:10px;"></div></td>
-        <td><button id="el-sh-new-begin">Begin New Shift</button></td></tr>
+        <td><button class="control-button" id="el-sh-new-begin">Begin New Shift</button></td></tr>
     </tbody></table>
     <div id="el-sh-new-wa" class="el-sh-new-hdn">
       <div style="float:left;">
@@ -549,8 +550,8 @@ HERE;
           </div>
         </form>
       </div>
-      <div style="float:left; margin-left:20px;"><button id="el-sh-new-submit">Submit</button></div>
-      <div style="float:left; margin-left:10px;"><button id="el-sh-new-cancel">Cancel</button></div>
+      <div style="float:left; margin-left:20px;"><button class="control-button" id="el-sh-new-submit">Submit</button></div>
+      <div style="float:left; margin-left:10px;"><button class="control-button" id="el-sh-new-cancel">Cancel</button></div>
       <div style="clear:both;"></div>
     </div>
   </div>
@@ -575,7 +576,7 @@ HERE;
       </div>
     </div>
   </div>
-  <div style="float:left; margin-left:5px;"><button id="el-r-refresh" title="click to refresh the runs list">Search</button></div>
+  <div style="float:left; margin-left:5px;"><button class="control-button" id="el-r-refresh" title="click to refresh the runs list">Search</button></div>
   <div style="clear:both;"></div>
 </div>
 <div id="el-r-wa">
@@ -591,7 +592,7 @@ HERE;
               <option>duration</option>
             </select></td>
         <td><div style="width:20px;"></div></td>
-        <td><button id="el-r-reverse">Show in Reverse Order</button></td>
+        <td><button class="control-button" id="el-r-reverse">Show in Reverse Order</button></td>
       </tr>
     </tbody></table>
   </div>
@@ -601,7 +602,7 @@ HERE;
 
         $elog_attachments_workarea =<<<HERE
 <div id="el-at-ctrl">
-  <div style="float:right; margin-left:5px;"><button id="el-at-refresh" title="click to refresh the attachments list">Refresh</button></div>
+  <div style="float:right; margin-left:5px;"><button class="control-button" id="el-at-refresh" title="click to refresh the attachments list">Refresh</button></div>
   <div style="clear:both;"></div>
 </div>
 <div id="el-at-wa">
@@ -633,7 +634,7 @@ HERE;
               <option>yes</option>
               </select></td>
         <td><div style="width:20px;"></div></td>
-        <td><button id="el-at-reverse">Show in Reverse Order</button></td>
+        <td><button class="control-button" id="el-at-reverse">Show in Reverse Order</button></td>
       </tr>
     </tbody></table>
   </div>
@@ -651,7 +652,7 @@ HERE;
        onto your SLAC e-mail address:</p>
     <div style="padding-left: 10px;">
       <b>{$auth_svc->authName()}@slac.stanford.edu</b>
-      <button style="margin-left:10px;" id="el-unsubscribe" title="stop receiving automatic notifications">Unsubscribe</button>
+      <button class="control-button" style="margin-left:10px;" id="el-unsubscribe" title="stop receiving automatic notifications">Unsubscribe</button>
     </div>
     <p align="justify">You may subscribe or unsubscribe at any time. You'll receive a confirmation
        message shortly after unsubscribing.</p>
@@ -665,7 +666,7 @@ HERE;
        then notifications will be sent onto your SLAC e-mail address:</p>
     <div style="padding-left: 10px;">
       <b>{$auth_svc->authName()}@slac.stanford.edu</b>
-      <button style="margin-left:10px;" id="el-subscribe" title="start receiving automatic notifications">Subscribe</button>
+      <button class="control-button" style="margin-left:10px;" id="el-subscribe" title="start receiving automatic notifications">Subscribe</button>
     </div>
     <p align="justify">You may subscribe or unsubscribe at any time. You'll receive a confirmation
        message shortly after subscribing. If your primary e-mail address differs from
@@ -720,7 +721,7 @@ HERE;
 
         $datafiles_summary_workarea =<<<HERE
 <div id="datafiles-summary-ctrl">
-  <div style="float:right;"><button id="datafiles-summary-refresh" title="click to refresh the summary information">Refresh</button></div>
+  <div style="float:right;"><button class="control-button" id="datafiles-summary-refresh" title="click to refresh the summary information">Refresh</button></div>
   <div style="clear:both;"></div>
 </div>
 <div id="datafiles-summary-wa">
@@ -817,13 +818,13 @@ HERE;
   <div style="float:left; margin-left:20px;">
     <div style="font-weight:bold;">&nbsp;</div>
     <div style="margin-top:5px;">
-      <button id="datafiles-files-reset" title="click to reset the file search form">Reset Form</button>
+      <button class="control-button" id="datafiles-files-reset" title="click to reset the file search form">Reset Form</button>
     </div>
   </div>
   <div style="float:right; margin-left:5px; margin-right:10px;">
     <div style="font-weight:bold;">&nbsp;</div>
     <div style="margin-top:5px;">
-      <button id="datafiles-files-refresh" title="click to refresh the file list according to the last filter">Refresh</button>
+      <button class="control-button" id="datafiles-files-refresh" title="click to refresh the file list according to the last filter">Refresh</button>
     </div>
   </div>
   <div style="clear:both;"></div>
@@ -843,7 +844,7 @@ HERE;
         <option>50</option>
       </select>
 
-      <button id="datafiles-files-reverse">Show in Reverse Order</button>
+      <button class="control-button" id="datafiles-files-reverse">Show in Reverse Order</button>
 
       <table style="margin:5px; font-size:80%;"><tbody>
         <tr>
@@ -900,7 +901,7 @@ HERE;
     </div>
     <div style="clear:both;"></div>
   </div>
-  <div style="float:right; margin-left:5px;"><button id="hdf-manage-refresh" title="click to refresh the file list according to the last filter">Refresh</button></div>
+  <div style="float:right; margin-left:5px;"><button class="control-button" id="hdf-manage-refresh" title="click to refresh the file list according to the last filter">Refresh</button></div>
   <div style="clear:both;"></div>
 </div>
 <div id="hdf-manage-wa">
@@ -1143,6 +1144,12 @@ a, a.link {
 }
 a:hover, a.link:hover {
   color: red;
+}
+
+button.control-button,
+label.control-label {
+  font-size: 10px;
+  color: black;
 }
 
 span.toggler {
@@ -1691,47 +1698,24 @@ $(function() {
     $('.v-group').click(function() { v_group_selected(this); });
     $('.v-item' ).click(function() { v_item_selected (this); });
 
-    function simple_search() {
-        for(var id in applications) {
-            var application = applications[id];
-            if(application.name == 'elog') {
-                $('#p-menu').children('#'+id).each(function() {    m_item_selected(this); });
-                v_item_selected($('#v-menu > #elog').children('.v-item#search'));
-                application.select('search');
-                application.simple_search($('#p-search-elog-text').val());
-                break;
-            }
+    $('#p-search-elog-text').keyup(function(e) {
+        var val = $(this).val();
+        if(val && (e.keyCode == 13)) {
+            var application = global_switch_application('elog', 'search');
+            if(application) application.simple_search(val);
         }
-    }
-    $('#p-search-elog-text').keyup(function(e) { if(($('#p-search-elog-text').val() != '') && (e.keyCode == 13)) simple_search(); });
-    function simple_post() {
-        for(var id in applications) {
-            var application = applications[id];
-            if(application.name == 'elog') {
-                $('#p-menu').children('#'+id).each(function() {    m_item_selected(this); });
-                v_item_selected($('#v-menu > #elog > #post').next().children('.v-item#experiment'));
-                application.select('post','experiment');
-                application.simple_post4experiment($('#p-post-elog-text').val());
-                break;
-            }
-        }
-    }
+    });
     $('#p-post-elog-text').keyup(function(e) {
-        if(($('#p-post-elog-text').val() != '') && (e.keyCode == 13)) simple_post();
+        var val = $(this).val();
+        if(val && (e.keyCode == 13)) {
+            var application = global_switch_application('elog', 'post', 'experiment');
+            if(application) application.simple_post4experiment(val);
+        }
     });
 
     // Finally, activate the selected application.
     //
-    for(var id in applications) {
-        var application = applications[id];
-        if(application.name == select_app) {
-            $('#p-menu').children('#p-appl-'+select_app).each(function() { m_item_selected(this); });
-            if( '' != select_app_context1 ) {
-                v_item_selected($('#v-menu > #'+select_app+' > #'+select_app_context1));
-                application.select(select_app_context1);
-            }
-        }
-    }
+    global_switch_application(select_app, select_app_context1);
 });
 
 /* TODO: Merge these application objects into statically create JavaScript
@@ -1758,6 +1742,31 @@ function p_appl_help() {
     $('#p-left > #v-menu > #help').html('<center>The workarea of the HDF5 translation</center>');
 
     return this;
+}
+
+function global_switch_application(application_name, context1_name, context2_name) {
+    for(var id in applications) {
+        var application = applications[id];
+        if(application.name == application_name) {
+            $('#p-menu').children('#p-appl-'+application_name).each(function() { m_item_selected(this); });
+            if( context1_name ) {
+                v_item_selected($('#v-menu > #'+application_name+' > #'+context1_name));
+                if( context2_name ) {
+                    v_item_selected($('#v-menu > #elog > #post').next().children('.v-item#experiment'));
+                    application.select(context1_name,context2_name);
+                } else {
+                    application.select(context1_name);
+                }
+                return application;
+            }
+        }
+    }
+    return null;
+}
+
+function global_elog_search_message_by_id(id, show_in_vicinity) {
+    var application = global_switch_application('elog', 'search');
+    if(application) application.search_message_by_id(id, show_in_vicinity);
 }
 
 </script>

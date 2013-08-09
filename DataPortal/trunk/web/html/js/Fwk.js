@@ -15,7 +15,7 @@ function FwkConfigHandlerCreator (application_config, scope, parameter) {
         this.cached_value = value ;
     } ;
     this.load = function (on_found, on_not_found) {
-        if (this.cached_value != null) {
+        if (this.cached_value !== null) {
             return this.cached_value ;
         }
         this.application_config.load(this.scope, this.parameter, on_found, on_not_found, this) ;
@@ -101,9 +101,9 @@ function FwkDispatcherBase () {
         this.active = false ;
         this.on_deactivate() ;
     } ;
-    this.update = function (container, sec) {
+    this.update = function (container) {
         this.set_container(container) ;
-        this.on_update(sec) ;
+        this.on_update() ;
     } ;
 }
 
@@ -141,6 +141,12 @@ function FwkApplicationTemplate (name, full_name) {
         if (this.context[this.context1] !== undefined)
             return this.context[this.context1].name ;
         return '' ;
+    } ;
+    this.name_to_context1 = function (name) {
+        for (var context1 in this.context)
+            if (this.context[context1].name === name)
+                return context1 ;
+        return undefined ;
     } ;
     this.context2_to_name = function () {
         if ((this.context[this.context1] !== undefined) &&
@@ -225,14 +231,13 @@ function FwkApplicationTemplate (name, full_name) {
     /*
      * Ping all subscribers (for whatever reason)
      *
-     * @param {number} sec
      * @returns {undefined}
      */
-    this.update = function (sec) {
+    this.update = function () {
         this.init() ;
 
         if (this.dispatcher)
-            dispatcher.update($('#fwk-applications > #'+this.get_any_wa_id()+' > div'), sec) ;
+            dispatcher.update($('#fwk-applications > #'+this.get_any_wa_id()+' > div')) ;
 
         if (this.context)
             for (var i in this.context) {
@@ -240,7 +245,7 @@ function FwkApplicationTemplate (name, full_name) {
                 var context1 = this.context[context1_name] ;
 
                 if (context1.dispatcher)
-                     context1.dispatcher.update($('#fwk-applications > #'+this.get_any_wa_id(context1_name)+' > div'), sec) ;
+                     context1.dispatcher.update($('#fwk-applications > #'+this.get_any_wa_id(context1_name)+' > div')) ;
 
                 if (context1.context)
                     for (var j in context1.context) {
@@ -248,7 +253,7 @@ function FwkApplicationTemplate (name, full_name) {
                         var context2 = context1.context[context2_name] ;
 
                         if (context2.dispatcher)
-                            context1.dispatcher.update($('#fwk-applications > #'+this.get_any_wa_id(context1_name, context2_name)+' > div'), sec) ;
+                            context1.dispatcher.update($('#fwk-applications > #'+this.get_any_wa_id(context1_name, context2_name)+' > div')) ;
                     }
             }
     } ;
@@ -357,10 +362,10 @@ function FwkCreator () {
         if (on_quick_search) {            
             this.on_quick_search = on_quick_search ? on_quick_search : null ;
         }
-        this.on_update = function (sec) {            
+        this.on_update = function () {            
             for (var i in this.applications) {
                 var app = this.applications[i] ;
-                app.update(sec) ;
+                app.update() ;
             }
         } ;
 
@@ -474,7 +479,7 @@ function FwkCreator () {
     this.auth_last_secs = null ;
 
     this.auth_timer_event = function () {
-        var now_sec = now().sec ;
+        var now_sec = this.now().sec ;
         var seconds = this.auth.webauth_token_expiration - now_sec ;
         if (seconds <= 0) {
             $('#fwk-popupdialogs').html (
@@ -549,7 +554,7 @@ function FwkCreator () {
         return (len ? new Array(len).join('0') : '') + num ;
     } ;
 
-    function now () {
+    this.now = function () {
         var date = new Date() ;
         var msec = date.getTime() ;
         return { date: date, sec: Math.floor(msec/1000), msec: msec % 1000 } ; 
@@ -725,12 +730,6 @@ function FwkCreator () {
      * -------------------------------------------
      */
     this.set_context = function (app) {
-        /*
-        var ctx = app.full_name+' &gt;' ;
-        if (app.context1) ctx += ' '     +app.context1_to_name() ;
-        if (app.context2) ctx += ' &gt; '+app.context2_to_name() ;
-        $('#fwk-context').html(ctx) ;
-        */
         if (this.prev_app && (this.prev_app != app)) this.prev_app.deactivate() ;
         app.activate() ;
         this.prev_app = app ;
@@ -872,6 +871,28 @@ function FwkCreator () {
 	}
     } ;
 
+    /**
+     * (Forced) Activate the specified application similar to clicking
+     * UI active elements of the corresponding tab and vertical menu
+     * item(S).
+     * 
+     * @param {string} application_name - the tab name
+     * @param {string} context1_name - the vertical menu name from teh left
+     * @returns {undefined
+     */
+    this.activate = function (application_name, context1_name) {
+	for (var i in this.applications) {
+            var application = this.applications[i] ;
+            if (application.full_name === application_name) {
+                $('#fwk-tabs').children('#'+application.name).each(function() { that.m_item_selected(this) ; }) ;
+                if (context1_name) {
+                    this.v_item_selected($('#fwk-menu > #'+application.name+' > #'+application.name_to_context1(context1_name))) ;
+                    application.select(application.name_to_context1(context1_name)) ;
+                }
+                return application.get_dispatcher() ;
+            }
+	}
+    } ;
 
     /* ------------------------------------------------------------
      *   POPULATE HTML ACCORDING TO THE APPLICATION CONFIGURATION
@@ -1049,7 +1070,6 @@ function FwkCreator () {
      * -----------------------------
      */
     this.update_timer = null ;
-    this.update_last_secs = 0 ;
 
     this.update_timer_restart = function () {
         if (this.on_update) this.update_timer = window.setTimeout('Fwk.update_timer_event()', 1000 ) ;
@@ -1061,9 +1081,7 @@ function FwkCreator () {
      * @returns {undefined}
      */
     this.update_timer_event = function () {
-        var now_sec = now().sec ;
-        if (this.update_last_secs) this.on_update(now_sec - this.update_last_secs) ;
-        this.update_last_secs = now_sec ;
+        this.on_update() ;
         this.update_timer_restart() ;
     } ;
 }

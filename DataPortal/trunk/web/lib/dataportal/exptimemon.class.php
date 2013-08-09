@@ -59,9 +59,9 @@ class ExpTimeMon extends DbConnection {
         'AMO' => 'PPS:NEH1:1:RADREADY',
         'SXR' => 'PPS:NEH1:2:RADREADY',
         'XPP' => 'PPS:NEH1:3:RADREADY',
-        'XCS' => 'PPS:NEH1:4:RADREADY',
-        'CXI' => 'PPS:NEH1:5:RADREADY',
-        'MEC' => 'PPS:NEH1:6:RADREADY'
+        'XCS' => 'PPS:FEH1:4:RADREADY',
+        'CXI' => 'PPS:FEH1:5:RADREADY',
+        'MEC' => 'PPS:FEH1:6:RADREADY'
     );
 
     private static $instance = null;

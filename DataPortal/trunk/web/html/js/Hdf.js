@@ -225,9 +225,9 @@ function hdf_create() {
 		var result = this.manage_last_request;
         var autotranslate2hdf5_str = this.manage_last_request.autotranslate2hdf5 ? 'checked="checked"' : '';
 		var html =
-'<button class="reverse not4print" style="margin-right:20px;">Show in Reverse Order</button>'+
-'<button class="translate_all not4print" value="" title="request translation for all selected runs which have not been translated">Translate selected runs</button>'+
-'<button class="stop_all not4print" style="margin-left:5px;" value="" title="remove translation requests from the translation queue for selected runs">Stop translation of selected runs</button>'+
+'<button class="control-button reverse not4print" style="margin-right:20px;">Show in Reverse Order</button>'+
+'<button class="control-button translate_all not4print" value="" title="request translation for all selected runs which have not been translated">Translate selected runs</button>'+
+'<button class="control-button stop_all not4print" style="margin-left:5px;" value="" title="remove translation requests from the translation queue for selected runs">Stop translation of selected runs</button>'+
 '<span style="margin-left:20px; font-weight:bold;">enable auto-translation: </span><input type="checkbox" value=1 class="autotranslate2hdf5 not4print" '+autotranslate2hdf5_str+' />'+
 '<br><br>'+
 '<table><tbody>'+

@@ -84,13 +84,13 @@ class Translator {
 
 	        if( $xtc_files_found && !$hdf5_files_found &&
     	        !in_array( $status, array('FINISHED', 'TRANSLATING', 'QUEUED' ))) {
-	        	$actions = '<button class="translate not4print" value="'.$run_logbook->num().'">Translate</button>';
+	        	$actions = '<button class="control-button translate not4print" value="'.$run_logbook->num().'">Translate</button>';
     	    	$ready4translation = true;
         	}
         	/*
 	        if( $xtc_files_found && $hdf5_files_found &&
     	        !in_array( $status, array('TRANSLATING', 'QUEUED' ))) {
-	        	$actions = '<button class="translate not4print" value="'.$run_logbook->num().'">Retranslate</button>';
+	        	$actions = '<button class="control-button translate not4print" value="'.$run_logbook->num().'">Retranslate</button>';
     	    	$ready4translation = true;
         	}
         	*/
@@ -125,8 +125,8 @@ class Translator {
 	         */
     	    if( $status == 'QUEUED' ) {
 	    	   	$actions =
-	       			'<button class="escalate not4print" style="font-size:12px;" value="'.$run_icws->id.'">Escalate</button>'.
-       				'<button class="stop not4print" style="font-size:12px;" value="'.$run_icws->id.'">Stop</button>';
+	       			'<button class="control-button escalate not4print" style="font-size:12px;" value="'.$run_icws->id.'">Escalate</button>'.
+       				'<button class="control-button stop not4print" style="font-size:12px;" value="'.$run_icws->id.'">Stop</button>';
 	        }
 
 	        /* Note that the translation completion status for those runs for which

@@ -11,6 +11,13 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-13
+2013-08-08 Igor Gaponenko
+- changed visual style for buttons in the Web Portal
+- implemented navigation by messages id within the Portal
+- extended ExpTimeMon database API with hautch door position monitoring PVs
+- extended API of the JS Fwk class to allow external switching between contexts
+
 Tag: V00-04-12
 2013-07-25 Igor Gaponenko
 - improved CSS inthe JS Table class

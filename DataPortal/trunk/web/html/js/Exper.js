@@ -96,7 +96,7 @@ function exper_create() {
 				'<td class="table_hdr">Name</td></tr>';
 			for(var i in users) {
 				html +=
-					'<tr><td class="table_cell table_cell_left"><button class="exp-m-g-add" id="'+users[i].uid+'" title="add to the group">&lArr;</button></td>'+
+					'<tr><td class="table_cell table_cell_left"><button class="control-button exp-m-g-add" id="'+users[i].uid+'" title="add to the group">&lArr;</button></td>'+
 					'<td class="table_cell table_cell_left">'+users[i].uid+'</td>'+
 					'<td class="table_cell table_cell_right">'+users[i].name+'</td></tr>';
 			}
@@ -128,7 +128,7 @@ function exper_create() {
 				html +=
 					'<tr><td class="table_cell table_cell_left">'+users[i].uid+'</td>'+
 					'<td class="table_cell">'+users[i].name+'</td>'+
-					'<td class="table_cell table_cell_right"><button class="exp-m-g-delete" id="'+users[i].uid+'" title="remove from the group">x</button></td></tr>';
+					'<td class="table_cell table_cell_right"><button class="control-button exp-m-g-delete" id="'+users[i].uid+'" title="remove from the group">x</button></td></tr>';
 			}
 			html += '</tbody></table>';
 			$('#exp-m-g-members').html(html);

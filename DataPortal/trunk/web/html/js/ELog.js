@@ -64,7 +64,7 @@ function elog_create() {
             // such as: fresh initialization, change in the selected context, subcontext, etc.
             //
             if( just_initialized || (prev_context1 != this.context1 )) {
-                this.live_message_viewer.reload(live_selected_deleted(), live_selected_runs(), this.live_selected_range());
+                this.live_message_viewer.reload(this.live_selected_deleted(), this.live_selected_runs(), this.live_selected_range());
             }
         } else if(this.context1 == 'post') {
 
@@ -98,6 +98,10 @@ function elog_create() {
                 if ('run' in global_extra_params) {
                     var runnum = global_extra_params['run'];
                     $('#elog-form-search input[name="runs"]').val(runnum);
+                    this.search();
+                } else if ('message' in global_extra_params) {
+                    var message_id = global_extra_params['message'];
+                    $('#elog-form-search input[name="message"]').val(message_id);
                     this.search();
                 }
             }
@@ -231,7 +235,7 @@ function elog_create() {
                     //
                     if( that.post_onsuccess != null ) that.post_onsuccess();
                 },
-                error: function() {    report_error('The request can not go through due a failure to contact the server.'); },
+                error: function() { report_error('The request can not go through due a failure to contact the server.'); },
                 dataType: 'json'
             });
         });
@@ -324,57 +328,69 @@ function elog_create() {
     this.live_init = function() {
 
         this.live_message_viewer = new elog_message_viewer_create('elog.live_message_viewer', this, 'el-l');
+        this.mctrl_elem = $('#el-l-mctrl');
 
-        $('#el-l-mctrl').find('select[name="messages"]').change(function() {
-            that.live_message_viewer.reload(live_selected_deleted(), live_selected_runs(), that.live_selected_range());
-        });
-        $('#el-l-dm-selector').buttonset().change(function() {
-            that.live_message_viewer.reload(live_selected_deleted(), live_selected_runs(), that.live_selected_range());
-        });
-        $('#el-l-rs-selector').buttonset().change(function() {
-            that.live_message_viewer.reload(live_selected_deleted(), live_selected_runs(), that.live_selected_range());
-        });
-        $('#el-l-refresh-selector').buttonset().change(function() {
-            if(live_selected_refresh()) {
-                $('#el-l-refresh-interval').removeAttr('disabled');
-                that.live_schedule_refresh();
-            } else {
-                $('#el-l-refresh-interval').attr('disabled', true);
-                that.live_stop_refresh();
-            }
-        });
-        $('#el-l-refresh').button().click(function() {
-            /*
-            that.live_message_viewer.refresh(live_selected_runs(), that.live_highlight);
-            */
-            //that.live_stop_refresh();
-            that.live_message_viewer.reload(live_selected_deleted(), live_selected_runs(), that.live_selected_range());
-            //that.live_schedule_refresh();
-        });
-        $('#el-l-refresh-interval').change(function(ev) {
+        this.mctrl_num_messages_elem = this.mctrl_elem.find('select[name="num_messages"]');
+        this.mctrl_num_messages_elem.change(function () {
+            that.live_message_viewer.reload (
+                that.live_selected_deleted(),
+                that.live_selected_runs(),
+                that.live_selected_range()); });
+
+        this.mctrl_include_runs_elem = this.mctrl_elem.find('input[name="include_runs"]');
+        this.mctrl_include_runs_elem.change(function () {
+            that.live_message_viewer.reload (
+                that.live_selected_deleted(),
+                that.live_selected_runs(),
+                that.live_selected_range()); });
+
+        this.mctrl_show_deleted_elem = this.mctrl_elem.find('input[name="show_deleted"]');
+        this.mctrl_show_deleted_elem.change(function () {
+            that.live_message_viewer.reload (
+                that.live_selected_deleted(),
+                that.live_selected_runs(),
+                that.live_selected_range()); });
+
+        this.mctrl_refresh_interval_elem = this.mctrl_elem.find('select[name="refresh_interval"]');
+        this.mctrl_refresh_interval_elem.change(function () {
             that.live_stop_refresh();
-            that.live_schedule_refresh();
-        });
+            that.live_schedule_refresh(); });
 
-        this.live_message_viewer.reload(live_selected_deleted(), live_selected_runs(), this.live_selected_range());
+        this.mctrl_elem.find('button[name="refresh"]').button().click(function () {
+            that.live_message_viewer.reload (
+                that.live_selected_deleted(),
+                that.live_selected_runs(),
+                that.live_selected_range()); });
+
+        this.live_message_viewer.reload (
+            this.live_selected_deleted(),
+            this.live_selected_runs(),
+            this.live_selected_range());
+
         this.live_schedule_refresh();
     };
 
 
-    /* -------------------------------------------------
-     * Live display timers and relevant periodic actions
-     * -------------------------------------------------
+    /* -------------------------------------------------------------
+     * Live display selectors,  timers and relevant periodic actions
+     * -------------------------------------------------------------
      */
-    function live_refresh_interval() {
-        return 1000*parseInt($('#el-l-refresh-interval').val());
-    }
+
+    this.live_selected_range   = function () { return this.mctrl_num_messages_elem.val(); };
+    this.live_selected_runs    = function () { return this.mctrl_include_runs_elem.attr('checked') ? 1 : 0; };
+    this.live_selected_deleted = function () { return this.mctrl_show_deleted_elem.attr('checked') ? 1 : 0; };
+
+    this.live_selected_refresh = function () { return this.live_refresh_interval() ? 1 : 0; };
+    this.live_refresh_interval = function () { return 1000*parseInt(this.mctrl_refresh_interval_elem.val()); };
 
     this.live_highlight = function(id) {
         $(id).stop(true,true).effect('highlight', {color:'#ff6666'}, 30000);
-    }
+    };
+
     this.live_refresh_timer = null;
     this.live_schedule_refresh = function() {
-        this.live_refresh_timer = window.setTimeout('elog.live_refresh_actions()',live_refresh_interval());
+        if (this.live_refresh_interval())
+            this.live_refresh_timer = window.setTimeout('elog.live_refresh_actions()',this.live_refresh_interval());
     };
     this.live_stop_refresh = function() {
         if(this.live_refresh_timer != null) {
@@ -383,46 +399,9 @@ function elog_create() {
         }
     };
     this.live_refresh_actions = function() {
-        this.live_message_viewer.refresh(live_selected_deleted(), live_selected_runs(), this.live_highlight);
+        this.live_message_viewer.refresh(this.live_selected_deleted(), this.live_selected_runs(), this.live_highlight);
         this.live_schedule_refresh();
     };
-
-    /* -------------------------
-     *  Live display: selectors
-     * -------------------------
-     */
-    var live_id2deleted = new Array();
-    live_id2deleted['el-l-dm-on']=1;
-    live_id2deleted['el-l-dm-off']=0;
-    function live_selected_deleted() {
-        return live_id2deleted[$('#el-l-dm-selector input:checked').attr('id')];
-    }
-
-    var live_id2runs = new Array();
-    live_id2runs['el-l-rs-on']=1;
-    live_id2runs['el-l-rs-off']=0;
-    function live_selected_runs() {
-        return live_id2runs[$('#el-l-rs-selector input:checked').attr('id')];
-    }
-
-    this.live_selected_range = function() {
-        var str = $('#el-l-mctrl').find('select[name="messages"]').val();
-        switch(str) {
-        case '20': return str;
-        case '100': return str;
-        case 'shift': return '12h';
-        case 'day': return '24h';
-        case 'week': return '7d';
-        }
-        return '';
-    };
-
-    var live_id2refresh = new Array();
-    live_id2refresh['el-l-refresh-on']=1;
-    live_id2refresh['el-l-refresh-off']=0;
-    function live_selected_refresh() {
-        return live_id2refresh[$('#el-l-refresh-selector input:checked').attr('id')];
-    }
 
     /* --------------------------------------------
      *  Initialize the form for searching messages
@@ -454,9 +433,17 @@ function elog_create() {
                 for(var i=0; i < authors.length; i++) authors_html += '<option>'+authors[i]+'</option>';
                 $('#elog-form-search select[name="author"]').html(authors_html);
             },
-            'JSON').error(function () {    report_error( 'failed because of: '+jqXHR.statusText ); });
+            'JSON').error(function () { report_error( 'failed because of: '+jqXHR.statusText ); });
         });
         $('#elog-form-search').find('input[name="runs"]').keyup(function(e) { if( e.keyCode == 13 ) that.search(); });
+        $('#elog-form-search').find('input[name="message"]').keyup(function(e) {
+            var elem = $(this);
+            if (!parseInt(elem.val())) {
+                elem.elem('');
+            } else {
+                if( e.keyCode == 13 ) that.search();
+            }
+        });
     };
     this.simple_search = function(text2search) {
         this.search_reset();
@@ -473,7 +460,9 @@ function elog_create() {
             end                  = '',
             tag                  = '',
             author               = '',
-            range_of_runs        = '';
+            range_of_runs        = '',
+            message_id           = '',
+            show_in_vicinity     = 0;
         this.search_message_viewer.search(
             text2search,
             search_in_messages,
@@ -488,7 +477,46 @@ function elog_create() {
             end,
             tag,
             author,
-            range_of_runs
+            range_of_runs,
+            message_id,
+            show_in_vicinity
+        );
+    };
+    this.search_message_by_id = function(id, show_in_vicinity) {
+        this.search_reset();
+        var text2search          = '',
+            search_in_messages   = 1,
+            search_in_tags       = 0,
+            search_in_values     = 0,
+            search_in_deleted    = 1,
+            posted_at_instrument = 0,
+            posted_at_experiment = 1,
+            posted_at_shifts     = 1,
+            posted_at_runs       = 1,
+            begin                = '',
+            end                  = '',
+            tag                  = '',
+            author               = '',
+            range_of_runs        = '',
+            message_id           = id,
+            show_in_vicinity     = show_in_vicinity ? 1 : 0;
+        this.search_message_viewer.search(
+            text2search,
+            search_in_messages,
+            search_in_tags,
+            search_in_values,
+            search_in_deleted,
+            posted_at_instrument,
+            posted_at_experiment,
+            posted_at_shifts,
+            posted_at_runs,
+            begin,
+            end,
+            tag,
+            author,
+            range_of_runs,
+            message_id,
+            show_in_vicinity
         );
     };
     this.search = function() {
@@ -509,7 +537,9 @@ function elog_create() {
             $('#elog-form-search input[name="end"]').val(),
             $('#elog-form-search select[name="tag"]').val(),
             $('#elog-form-search select[name="author"]').val(),
-            $('#elog-form-search input[name="runs"]').val()
+            $('#elog-form-search input[name="runs"]').val(),
+            $('#elog-form-search input[name="message"]').val(),
+            0
         );
     };
 
@@ -536,6 +566,7 @@ function elog_create() {
         $('#elog-form-search select[name="tag"]').val('');
         $('#elog-form-search select[name="author"]').val('');
         $('#elog-form-search input[name="runs"]').val('');
+        $('#elog-form-search input[name="message"]').val('');
     };
 
     /* ---------------------------------------------
@@ -889,7 +920,11 @@ function elog_create() {
                 'posted: '+a.e_time+'\n'+
                 'author: '+a.e_author;
             html +=
-'<div style="float:left;" title="'+title+'"><a href="../logbook/attachments/'+a.a_id+'/'+a.a_name+'" target="_blank"><img style="height:160px; padding:8px;" src="../logbook/attachments/preview/'+a.a_id+'" /></a></div>';
+'<div style="float:left; margin-left:10px;">'+
+'  <div style="float:left; margin-left:10px;">'+a.e_link_url+'</div>'+
+'  <div style="float:left;" title="'+title+'"><a href="../logbook/attachments/'+a.a_id+'/'+a.a_name+'" target="_blank"><img style="height:160px; padding:8px;" src="../logbook/attachments/preview/'+a.a_id+'" /></a></div>'+
+'  <div style="clear:both;"></div>'+
+'</div>';
         }
         return html;
     };
@@ -907,7 +942,13 @@ function elog_create() {
                     'posted: '+a.e_time+'\n'+
                     'author: '+a.e_author;
                 html +=
-'<div style="float:left;" title="'+title+'"><a href="../logbook/attachments/'+a.a_id+'/'+a.a_name+'" target="_blank"><img style="height:160px;  border-top:solid 1px #d0d0d0; padding:8px; padding-left:0px;" src="../logbook/attachments/preview/'+a.a_id+'" /></a></div>';
+'<div style="float:left; border-top:solid 1px #d0d0d0;">'+
+'  <div style="float:left; margin-left:10">'+a.e_link_url+'</div>'+
+'  <div style="float:left;" title="'+title+'"><a href="../logbook/attachments/'+a.a_id+'/'+a.a_name+'" target="_blank"><img style="height:160px; padding:8px;" src="../logbook/attachments/preview/'+a.a_id+'" /></a></div>'+
+'  <div style="clear:both;"></div>'+
+'</div>';
+//'<div style="float:left; margin-left:10px;">'+a.e_link_url+'</div>'+
+//'<div style="float:left;" title="'+title+'"><a href="../logbook/attachments/'+a.a_id+'/'+a.a_name+'" target="_blank"><img style="height:160px;  border-top:solid 1px #d0d0d0; padding:8px; padding-left:0px;" src="../logbook/attachments/preview/'+a.a_id+'" /></a></div>';
             } else {
                 var title =
                     'run #: '+a.r_num+'\n'+
@@ -923,8 +964,8 @@ function elog_create() {
         var html =
 '<table><tbody>'+
 '  <tr>'+
-'    <td class="table_hdr">Attachment</td>'+
 '    <td class="table_hdr">Info</td>'+
+'    <td class="table_hdr">Attachment</td>'+
 '  </tr>';
         var title = 'open the attachment in a separate tab';
         var attachments = this.attachments_last_request;
@@ -967,8 +1008,8 @@ function elog_create() {
 '</tbody></table>';
             html +=
 '  <tr>'+
-'    <td class="table_cell '+extra_class+' table_cell_left">' +thumb+'</td>'+
-'    <td class="table_cell '+extra_class+' table_cell_right">'+info +'</td>'+
+'    <td class="table_cell '+extra_class+' table_cell_left">'+info +'</td>'+
+'    <td class="table_cell '+extra_class+' table_cell_right">' +thumb+'</td>'+
 '  </tr>';
         }
         html +=
@@ -982,8 +1023,8 @@ function elog_create() {
 '  <tr>'+
 '    <td class="table_hdr">Run</td>'+
 '    <td class="table_hdr">Started</td>'+
-'    <td class="table_hdr">Attachment</td>'+
 '    <td class="table_hdr">Info</td>'+
+'    <td class="table_hdr">Attachment</td>'+
 '  </tr>';
         var title = 'open the attachment in a separate tab';
         var attachments = this.attachments_last_request;
@@ -1028,8 +1069,8 @@ function elog_create() {
 '  <tr>'+
 '    <td class="table_cell '+extra_class+' table_cell_left"></td>'+
 '    <td class="table_cell '+extra_class+'"></td>'+
-'    <td class="table_cell '+extra_class+'">' +thumb+'</td>'+
-'    <td class="table_cell '+extra_class+' table_cell_right">'+info +'</td>'+
+'    <td class="table_cell '+extra_class+'">'+info +'</td>'+
+'    <td class="table_cell '+extra_class+' table_cell_right">' +thumb+'</td>'+
 '  </tr>';
             } else {
                 html +=
@@ -1123,7 +1164,7 @@ function elog_create() {
 '      <td class="table_cell '+extra_class+' "                >'+s.subscriber     +'</td>'+
 '      <td class="table_cell '+extra_class+' "                >'+s.subscribed_host+'</td>'+
 '      <td class="table_cell '+extra_class+' "                >'+s.subscribed_time+'</td>'+
-'      <td class="table_cell '+extra_class+' table_cell_right"><button title="Stop receiving automated notifications" value='+s.id+'>Unsubscribe</button></td></tr>';
+'      <td class="table_cell '+extra_class+' table_cell_right"><button class="control-button" title="Stop receiving automated notifications" value='+s.id+'>Unsubscribe</button></td></tr>';
             }
             if( html != '' ) {
                 html =
@@ -1286,10 +1327,11 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
         if(on) {
             entry.thread_idx = idx;
             var html =
-'    <div class="el-l-m-body">';
+'    <div class="el-l-m-body">'+
+'      <div style="float:right; margin-left:15px; margin-top:2px;" class="s-b-con">'+this.message_url(entry.id)+'</div>';
             if(entry.deleted) {
                 html +=
-'      <div style="float:right; margin-left:5px;" class="s-b-con"><button class="el-l-m-ud" id="'+this.base+'-m-ud-'+entry.id+'" onclick="'+this.address+'.live_message_undelete('+idx+');" title="undelete this message">undelete</button></div>'+
+'      <div style="float:right; margin-left:5px;" class="s-b-con"><button class="control-button el-l-m-ud" id="'+this.base+'-m-ud-'+entry.id+'" onclick="'+this.address+'.live_message_undelete('+idx+');" title="undelete this message">undelete</button></div>'+
 '      <div style="float:left; font-size:12px; width:100%; overflow:auto;">'+entry.html1+'</div>'+
 '      <div style="clear:both;"></div>'+
 '      <div id="'+this.base+'-m-dlgs-'+entry.id+'"></div>'+
@@ -1298,20 +1340,20 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
                 if(this.parent.editor) {
                     if( entry.run_id) {
                         html +=
-'      <div style="float:right;" class="s-b-con"><button class="el-l-m-mv"  id="'+this.base+'-m-mv-'+entry.id+'"  onclick="'+this.address+'.live_message_move('+idx+',false);" title="dettach this message from the run" >- run</button></div>';
+'      <div style="float:right;" class="s-b-con"><button class="control-button el-l-m-mv"  id="'+this.base+'-m-mv-'+entry.id+'"  onclick="'+this.address+'.live_message_move('+idx+',false);" title="dettach this message from the run" >- run</button></div>';
                     } else {
                         html +=
-'      <div style="float:right;" class="s-b-con"><button class="el-l-m-mv"  id="'+this.base+'-m-mv-'+entry.id+'"  onclick="'+this.address+'.live_message_move('+idx+',true);" title="attach this message to a run">+ run</button></div>';
+'      <div style="float:right;" class="s-b-con"><button class="control-button el-l-m-mv"  id="'+this.base+'-m-mv-'+entry.id+'"  onclick="'+this.address+'.live_message_move('+idx+',true);" title="attach this message to a run">+ run</button></div>';
                     }
                     html +=
-'      <div style="float:right;" class="s-b-con"><button class="el-l-m-ed"  id="'+this.base+'-m-ed-'+entry.id+'"  onclick="'+this.address+'.live_message_edit('+entry.id+',false);">edit</button></div>';
+'      <div style="float:right;" class="s-b-con"><button class="control-button el-l-m-ed"  id="'+this.base+'-m-ed-'+entry.id+'"  onclick="'+this.address+'.live_message_edit('+entry.id+',false);">edit</button></div>';
                 }
                 html +=
-'      <div style="float:right; margin-left:5px;" class="s-b-con"><button class="el-l-m-pr" id="'+this.base+'-m-pr-'+entry.id+'" onclick="'+this.address+'.live_message_print('+idx+');" title="print this message and all its children if any">print</button></div>'+
-'      <div style="float:right; margin-left:5px;" class="s-b-con"><button class="el-l-m-de" id="'+this.base+'-m-de-'+entry.id+'" onclick="'+this.address+'.live_message_delete('+idx+');" title="delete this message and all its children if any">delete</button></div>'+
-'      <div style="float:right; margin-left:5px;" class="s-b-con"><button class="el-l-m-xt" id="'+this.base+'-m-xt-'+entry.id+'" onclick="'+this.address+'.live_message_extend('+entry.id+',false, true);" title="add more tags to the message">+ tags</button></div>'+
-'      <div style="float:right; margin-left:5px;" class="s-b-con"><button class="el-l-m-xa" id="'+this.base+'-m-xa-'+entry.id+'" onclick="'+this.address+'.live_message_extend('+entry.id+',false, false);" title="add more attachments to the message">+ attachments</button></div>'+
-'      <div style="float:right;"                  class="s-b-con"><button class="el-l-m-re" id="'+this.base+'-m-re-'+entry.id+'" onclick="'+this.address+'.live_message_reply('+entry.id+',false);" title="reply to the message">reply</button></div>'+
+'      <div style="float:right; margin-left:5px;" class="s-b-con"><button class="control-button el-l-m-pr" id="'+this.base+'-m-pr-'+entry.id+'" onclick="'+this.address+'.live_message_print('+idx+');" title="print this message and all its children if any">print</button></div>'+
+'      <div style="float:right; margin-left:5px;" class="s-b-con"><button class="control-button el-l-m-de" id="'+this.base+'-m-de-'+entry.id+'" onclick="'+this.address+'.live_message_delete('+idx+');" title="delete this message and all its children if any">delete</button></div>'+
+'      <div style="float:right; margin-left:5px;" class="s-b-con"><button class="control-button el-l-m-xt" id="'+this.base+'-m-xt-'+entry.id+'" onclick="'+this.address+'.live_message_extend('+entry.id+',false, true);" title="add more tags to the message">+ tags</button></div>'+
+'      <div style="float:right; margin-left:5px;" class="s-b-con"><button class="control-button el-l-m-xa" id="'+this.base+'-m-xa-'+entry.id+'" onclick="'+this.address+'.live_message_extend('+entry.id+',false, false);" title="add more attachments to the message">+ attachments</button></div>'+
+'      <div style="float:right;"                  class="s-b-con"><button class="control-button el-l-m-re" id="'+this.base+'-m-re-'+entry.id+'" onclick="'+this.address+'.live_message_reply('+entry.id+',false);" title="reply to the message">reply</button></div>'+
 '      <div style="float:left; font-size:12px; width:100%; overflow:auto;">'+entry.html1+'</div>'+
 '      <div style="clear:both;"></div>'+
 '      <div id="'+this.base+'-m-dlgs-'+entry.id+'"></div>'+
@@ -1362,6 +1404,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
             html +=
 '    </div>';
             $(container).html(html);
+            $(container).find('.el-l-m-url').button();
             $(container).find('.el-l-m-pr').button();
             $(container).find('.el-l-m-ud').button();
             $(container).find('.el-l-m-de').button();
@@ -1496,7 +1539,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
             $('#'+this.base+'-r-con-'+entry.id).html('Loading...');
             $.get('../logbook/ws/DisplayRunParams.php',{id:entry.run_id},function(data) {
                 var html =
-'<div style="float:right;" class="s-b-con"><button class="el-l-r-re" id="'+that.base+'-r-re-'+entry.id+'" onclick="'+that.address+'.live_run_reply('+idx+');">reply</button></div>'+
+'<div style="float:right;" class="s-b-con"><button class="control-button el-l-r-re" id="'+that.base+'-r-re-'+entry.id+'" onclick="'+that.address+'.live_run_reply('+idx+');">reply</button></div>'+
 '<div style="clear:both;"></div>'+
 '<div id="'+that.base+'-r-dlgs-'+entry.id+'"></div>'+
 '<div style="width:800px; height:300px; overflow:auto; background-color:#ffffff; ">'+data+'</div>';
@@ -1571,8 +1614,8 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
             };
             if(inject_runs) params.inject_runs = '';
             if(inject_deleted_messages) params.inject_deleted_messages = '';
-
-            $.get('../logbook/ws/Search.php',params,function(data) {
+            
+            var s = $.get('../logbook/ws/Search.php',params,function(data) {
 
                 var status = data.ResultSet.Status;
                 if(status!='success') {
@@ -1701,7 +1744,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
         if(inject_deleted_messages) params.inject_deleted_messages = '';
         if(limit) params.limit = limit;
         
-        this.do_reload(params);
+        this.do_reload('../logbook/ws/Search.php', params);
     };
     this.search = function(
         text2search,
@@ -1717,32 +1760,43 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
         end,
         tag,
         author,
-        range_of_runs) {
+        range_of_runs,
+        message_id,
+        show_in_vicinity) {
 
-        var params = {
-            id                  : this.parent.exp_id,
-            format              : 'detailed',
-            text2search         : text2search,
-            search_in_messages  : search_in_messages,
-            search_in_tags      : search_in_tags,
-            search_in_values    : search_in_values,
-            posted_at_instrument: posted_at_instrument,
-            posted_at_experiment: posted_at_experiment,
-            posted_at_shifts    : posted_at_shifts,
-            posted_at_runs      : posted_at_runs,
-            begin               : begin,
-            end                 : end,
-            tag                 : tag,
-            author              : author,
-            range_of_runs       : range_of_runs
-        };
-        if( search_in_deleted ) params.inject_deleted_messages = '';
-        this.do_reload(params);
+        var id = parseInt(message_id);
+        if(id) {
+            var params = {
+                id               : id,
+                show_in_vicinity : show_in_vicinity
+            };
+            this.do_reload('../logbook/ws/SearchOne.php', params);
+        } else {
+            var params = {
+                id                  : this.parent.exp_id,
+                format              : 'detailed',
+                text2search         : text2search,
+                search_in_messages  : search_in_messages,
+                search_in_tags      : search_in_tags,
+                search_in_values    : search_in_values,
+                posted_at_instrument: posted_at_instrument,
+                posted_at_experiment: posted_at_experiment,
+                posted_at_shifts    : posted_at_shifts,
+                posted_at_runs      : posted_at_runs,
+                begin               : begin,
+                end                 : end,
+                tag                 : tag,
+                author              : author,
+                range_of_runs       : range_of_runs
+            };
+            if( search_in_deleted ) params.inject_deleted_messages = '';
+            this.do_reload('../logbook/ws/Search.php', params);
+        }
     };
-    this.do_reload = function(params) {
+    this.do_reload = function(url, params) {
 
         $('#'+this.base+'-ms-updated').html('Searching...');
-        $.get('../logbook/ws/Search.php',params,function(data) {
+        $.get(url, params, function(data) {
 
             var status = data.ResultSet.Status;
             if(status!='success') {
@@ -1788,21 +1842,22 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
                 for(var day_idx = that.days2threads.length-1; day_idx >= 0; day_idx--)
                     that.days2threads[day_idx].threads.reverse();
             }
-/*
-            var html = '';
-            for(var day_idx = that.days2threads.length-1; day_idx >= 0; day_idx--)
-                html += that.live_day2html(day_idx);
-            $('#'+that.base+'-ms').html(html);
-
-            if(that.days2threads.length) that.expand_group_day(that.days2threads.length-1, true);
-            that.live_update_info();
-*/
-            that.redisplay();
+            that.redisplay(params.show_in_vicinity ? params.id : 0);
 
         },'json');
     };
 
-    this.redisplay = function() {
+    /**
+     * Redisplay the list opf messages which are already cached locally.
+     * 
+     * The method has an optional parameter which if present will tell
+     * fore the viewer to find that entry, open the corresponding day
+     * and scroll the view to that entry. The entry will be also open.
+     *
+     * @param Number entry_id
+     * @returns {undefined}
+     */
+    this.redisplay = function(entry_id) {
 
         // Reset variables which are going to be recalculated when rebuilding
         // DOM in the below called functions.
@@ -1821,8 +1876,67 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
         $('.el-d-expand').button();
         $('.el-d-collapse').button();
 
-        if(this.days2threads.length) this.expand_group_day(this.days2threads.length-1, true);
+        if(this.days2threads.length) {
+            if (entry_id) this.scroll_to_message(entry_id);
+            else          this.expand_group_day(this.days2threads.length-1, true);
+        }
         this.live_update_info();
+    };
+
+    this.entry_has_this_child = function(entry, child_id) {
+        for(var j in entry.children) {
+            var child = entry.children[j];
+            if(typeof(child) === 'string') child = JSON.parse(child);
+            if(child.id == child_id) return true;
+            if(this.entry_has_this_child(child, child_id)) return true;
+        }
+        return false;
+    };
+    this.scroll_to_message = function(entry_id) {
+
+        if(!entry_id) return;
+
+          
+        // Find the entry and a day group to which the message belongs to
+        // If the one exists then expand both and scroll to that entry.
+
+        for(var day_idx = this.days2threads.length-1; day_idx >= 0; day_idx--) {
+            var day = that.days2threads[day_idx];
+            for(var i = day.threads.length-1; i >= 0; i--) {
+                var thread_idx = day.threads[i];
+                var entry = this.threads[thread_idx];
+
+                if(!entry.is_run) {
+
+                    // Check if the main thread entry is the one we'rte looking at.
+
+                    if(entry.id == entry_id) {
+
+                        this.expand_group_day(day_idx, true);
+                        this.toggle_message(thread_idx);
+                        var container = $('#'+this.base+'-m-con-'+entry_id);
+                        var container_offset_top = $('#p-center').scrollTop() + container.position().top -32;
+                        $('#p-center').animate({scrollTop: container_offset_top}, 'slow');
+
+                        return;
+
+                    } else {
+
+                        // Look if the entry identifier is associated with children
+                        // of the thread.
+
+                        if(this.entry_has_this_child(entry, entry_id)) {
+                            this.expand_group_day(day_idx, true);
+                            this.toggle_message(thread_idx);
+                            var container = $('#'+this.base+'-c-con-'+entry_id);
+                            var container_offset_top = $('#p-center').scrollTop() + container.position().top -32;
+                            $('#p-center').animate({scrollTop: container_offset_top}, 'slow');
+                            return;
+                        }
+                    }
+                }
+            }
+        }
     };
     this.live_update_info = function() {
         $('#'+this.base+'-ms-info').html(
@@ -1848,8 +1962,8 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 '</div>'+
 '<div class="el-l-m-d-con el-l-m-d-hdn" id="'+this.base+'-m-d-con-'+day_idx+'"">'+
 '  <div class="el-d-ctrl" >'+
-'    <button class="el-d-expand" onclick="'+this.address+'.expand_day('+"'"+day_idx+"'"+');" >Expand++</button>'+
-'    <button class="el-d-collapse" onclick="'+this.address+'.collapse_day('+"'"+day_idx+"'"+');" >Collapse--</button>'+
+'    <button class="control-button el-d-expand" onclick="'+this.address+'.expand_day('+"'"+day_idx+"'"+');" >Expand++</button>'+
+'    <button class="control-button el-d-collapse" onclick="'+this.address+'.collapse_day('+"'"+day_idx+"'"+');" >Collapse--</button>'+
 '  </div>';
 
         for(var i = day.threads.length-1; i >= 0; i--) {
@@ -1912,8 +2026,8 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 '      </div>'+
 '    </form>'+
 '  </div>'+
-'  <div style="float:right; margin-left:5px;" class="s-b-con"><button id="'+this.base+'-m-re-c-'+id+'" onclick="'+this.address+'.live_message_reply_cancel('+id+');">cancel</button></div>'+
-'  <div style="float:right; margin-left:5px;" class="s-b-con"><button id="'+this.base+'-m-re-s-'+id+'" onclick="'+this.address+'.live_message_reply_submit('+id+');">submit</button></div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button class="control-button" id="'+this.base+'-m-re-c-'+id+'" onclick="'+this.address+'.live_message_reply_cancel('+id+');">cancel</button></div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button class="control-button" id="'+this.base+'-m-re-s-'+id+'" onclick="'+this.address+'.live_message_reply_submit('+id+');">submit</button></div>'+
 '  <div style="clear:both;"></div>'+
 '</div>'+
 '<div id="'+this.base+'-m-xtdlg-'+id+'" class="el-l-m-xtdlg el-l-m-dlg-hdn">'+
@@ -1929,8 +2043,8 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 '      </div>'+
 '    </form>'+
 '  </div>'+
-'  <div style="float:right; margin-left:5px;" class="s-b-con"><button id="'+this.base+'-m-xt-c-'+id+'" onclick="'+this.address+'.live_message_extend_cancel('+id+', true);">cancel</button></div>'+
-'  <div style="float:right; margin-left:5px;" class="s-b-con"><button id="'+this.base+'-m-xt-s-'+id+'" onclick="'+this.address+'.live_message_extend_submit('+id+', true);">submit</button></div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button class="control-button" id="'+this.base+'-m-xt-c-'+id+'" onclick="'+this.address+'.live_message_extend_cancel('+id+', true);">cancel</button></div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button class="control-button" id="'+this.base+'-m-xt-s-'+id+'" onclick="'+this.address+'.live_message_extend_submit('+id+', true);">submit</button></div>'+
 '  <div style="clear:both;"></div>'+
 '</div>'+
 '<div id="'+this.base+'-m-xadlg-'+id+'" class="el-l-m-xadlg el-l-m-dlg-hdn">'+
@@ -1951,8 +2065,8 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 '      </div>'+
 '    </form>'+
 '  </div>'+
-'  <div style="float:right; margin-left:5px;" class="s-b-con"><button id="'+this.base+'-m-xa-c-'+id+'" onclick="'+this.address+'.live_message_extend_cancel('+id+', false);">cancel</button></div>'+
-'  <div style="float:right; margin-left:5px;" class="s-b-con"><button id="'+this.base+'-m-xa-s-'+id+'" onclick="'+this.address+'.live_message_extend_submit('+id+', false);">submit</button></div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button class="control-button" id="'+this.base+'-m-xa-c-'+id+'" onclick="'+this.address+'.live_message_extend_cancel('+id+', false);">cancel</button></div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button class="control-button" id="'+this.base+'-m-xa-s-'+id+'" onclick="'+this.address+'.live_message_extend_submit('+id+', false);">submit</button></div>'+
 '  <div style="clear:both;"></div>'+
 '</div>';
         if(this.parent.editor) {
@@ -1974,13 +2088,13 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 '      </div>'+
 '    </form>'+
 '  </div>'+
-'  <div style="float:right; margin-left:5px;" class="s-b-con"><button class="el-l-m-ed-c" id="'+this.base+'-m-ed-c-'+id+'" onclick="'+this.address+'.live_message_edit_cancel('+id+');">cancel</button></div>'+
-'  <div style="float:right; margin-left:5px;" class="s-b-con"><button class="el-l-m-ed-s" id="'+this.base+'-m-ed-s-'+id+'" onclick="'+this.address+'.live_message_edit_submit('+id+');">submit</button></div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button class="control-button el-l-m-ed-c" id="'+this.base+'-m-ed-c-'+id+'" onclick="'+this.address+'.live_message_edit_cancel('+id+');">cancel</button></div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button class="control-button el-l-m-ed-s" id="'+this.base+'-m-ed-s-'+id+'" onclick="'+this.address+'.live_message_edit_submit('+id+');">submit</button></div>'+
 '  <div style="clear:both;"></div>'+
 '</div>'+
 '<div id="'+this.base+'-m-mdlg-'+id+'" class="el-l-m-mdlg el-l-m-dlg-hdn">'+
-'  <div style="float:right; margin-left:5px;" class="s-b-con"><button class="el-l-m-mv-c" id="'+this.base+'-m-mv-c-'+id+'" onclick="'+this.address+'.live_message_move_cancel('+id+');">cancel</button></div>'+
-'  <div style="float:right; margin-left:5px;" class="s-b-con"><button class="el-l-m-mv-s" id="'+this.base+'-m-mv-s-'+id+'" onclick="'+this.address+'.live_message_move_submit('+id+');">submit</button></div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button class="control-button el-l-m-mv-c" id="'+this.base+'-m-mv-c-'+id+'" onclick="'+this.address+'.live_message_move_cancel('+id+');">cancel</button></div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button class="control-button el-l-m-mv-s" id="'+this.base+'-m-mv-s-'+id+'" onclick="'+this.address+'.live_message_move_submit('+id+');">submit</button></div>'+
 '  <div style="clear:both;"></div>'+
 ''+
 '  Here be the dialog allowing to move the message into some other context and/or time.'+
@@ -2072,7 +2186,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
                         function(data) {
 
                             if( data.Status != 'success' ) {
-                                that.parent.report_error( data.Message );
+                                report_error( data.Message );
                                 return;
                             }
                             $('#'+that.base+'-m-subj-'+idx).addClass( 'el-l-m-subj-deleted' );
@@ -2090,7 +2204,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
                         },
                         'JSON'
                     ).error( function () {
-                        that.parent.report_error('failed because of: '+jqXHR.statusText); }
+                        report_error('failed because of: '+jqXHR.statusText); }
                     ).complete( function() {
                         ;
                     });
@@ -2102,6 +2216,12 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
             title: 'Information Deletion Warning'
         });
     };
+    this.message_url = function(entry_id) {
+        var idx = window.location.href.indexOf( '?' );
+        var url = ( idx < 0 ? window.location.href : window.location.href.substr( 0, idx ))+'?exper_id='+this.parent.exp_id+'&app=elog:search&params=message:'+entry_id;
+        var html = '<a href="'+url+'" target="_blank" title="Click to open in a separate tab, or cut and paste to incorporate into another document as a link."><img src="../portal/img/link.png"></img></a>';
+        return html;
+    };
     this.live_message_undelete = function(idx) {
         var entry = that.threads[idx];
 
@@ -2110,7 +2230,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
             function(data) {
 
                 if( data.Status != 'success' ) {
-                    that.parent.report_error( data.Message );
+                    report_error( data.Message );
                     return;
                 }
                 $('#'+that.base+'-m-subj-'+idx).removeClass( 'el-l-m-subj-deleted' );
@@ -2128,7 +2248,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
             },
             'JSON'
         ).error( function () {
-            that.parent.report_error('failed because of: '+jqXHR.statusText); }
+            report_error('failed because of: '+jqXHR.statusText); }
         ).complete( function() {
             ;
         });
@@ -2152,7 +2272,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
                         function(data) {
 
                             if( data.Status != 'success' ) {
-                                that.parent.report_error( data.Message );
+                                report_error( data.Message );
                                 return;
                             }
                             $('#'+that.base+'-c-subj-'+entry.id).addClass( 'el-l-c-subj-deleted' );
@@ -2166,7 +2286,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
                         },
                         'JSON'
                     ).error( function () {
-                        that.parent.report_error('failed because of: '+jqXHR.statusText); }
+                        report_error('failed because of: '+jqXHR.statusText); }
                     ).complete( function() {
                         ;
                     });
@@ -2186,7 +2306,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
             function(data) {
 
                 if( data.Status != 'success' ) {
-                    that.parent.report_error( data.Message );
+                    report_error( data.Message );
                     return;
                 }
                 $('#'+that.base+'-c-subj-'+entry.id).removeClass( 'el-l-c-subj-deleted' );
@@ -2200,7 +2320,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
             },
             'JSON'
         ).error( function () {
-            that.parent.report_error('failed because of: '+jqXHR.statusText); }
+            report_error('failed because of: '+jqXHR.statusText); }
         ).complete( function() {
             ;
         });
@@ -2248,7 +2368,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
                         function(data) {
 
                             if( data.status != 'success' ) {
-                                that.parent.report_error( data.message );
+                                report_error( data.message );
                                 return;
                             }
                             entry.run_id  = data.run_id;
@@ -2266,7 +2386,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
                         },
                         'JSON'
                     ).error( function () {
-                        that.parent.report_error('failed because of: '+jqXHR.statusText); }
+                        report_error('failed because of: '+jqXHR.statusText); }
                     ).complete( function() {
                         ;
                     });
@@ -2302,7 +2422,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
         // an empty message.
         //
         if( $('#elog-form-post-'+id+' textarea[name="message_text"]').val() == '' ) {
-            this.parent.report_error('Can not post the empty message. Please put some text into the message box.');
+            report_error('Can not post the empty message. Please put some text into the message box.');
             return;
         }
 
@@ -2324,7 +2444,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 '  <input type="hidden" name="file2attach_0" value=""/ >'+
 '</div>'
                 );
-                if( data.Status != 'success' ) { that.parent.report_error( data.Message ); return; }
+                if( data.Status != 'success' ) { report_error( data.Message ); return; }
                 var entry = data.Entry;
 
                 // Find the parent message and add a new child to it.
@@ -2417,7 +2537,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
         // an empty message.
         //
         if( $('#elog-form-post-'+id+' textarea[name="message_text"]').val() == '' ) {
-            this.parent.report_error('Can not post the empty message. Please put some text into the message box.');
+            report_error('Can not post the empty message. Please put some text into the message box.');
             return;
         }
 
@@ -2439,7 +2559,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 '  <input type="hidden" name="file2attach_0" value=""/ >'+
 '</div>'
                 );
-                if( data.Status != 'success' ) { that.parent.report_error( data.Message ); return; }
+                if( data.Status != 'success' ) { report_error( data.Message ); return; }
                 that.live_run_reply_cancel(id);
             },
             complete: function() {
@@ -2484,7 +2604,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 
             $('#elog-form-extend-tags-'+id).ajaxSubmit({
                 success: function(data) {
-                    if( data.Status != 'success' ) { that.parent.report_error( data.Message ); return; }
+                    if( data.Status != 'success' ) { report_error( data.Message ); return; }
                     var tags = data.Extended.tags;
                     for( var i = 0; i < tags.length; i++ )
                         that.messages[id].tags.unshift(tags[i]);
@@ -2513,7 +2633,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 '  <input type="hidden" name="file2attach_0" value=""/ >'+
 '</div>'
                     );
-                    if( data.Status != 'success' ) { that.parent.report_error( data.Message ); return; }
+                    if( data.Status != 'success' ) { report_error( data.Message ); return; }
                     var attachments = data.Extended.attachments;
                     for( var i = 0; i < attachments.length; i++ )
                         that.messages[id].attachments.push(attachments[i]);
@@ -2581,8 +2701,8 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 '      </div>'+
 '    </form>'+
 '  </div>'+
-'  <div style="float:right; margin-left:5px;" class="s-b-con"><button id="'+this.base+'-r-re-c-'+id+'" onclick="'+this.address+'.live_run_reply_cancel('+id+');">cancel</button></div>'+
-'  <div style="float:right; margin-left:5px;" class="s-b-con"><button id="'+this.base+'-r-re-s-'+id+'" onclick="'+this.address+'.live_run_reply_submit('+id+');">submit</button></div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button class="control-button" id="'+this.base+'-r-re-c-'+id+'" onclick="'+this.address+'.live_run_reply_cancel('+id+');">cancel</button></div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button class="control-button" id="'+this.base+'-r-re-s-'+id+'" onclick="'+this.address+'.live_run_reply_submit('+id+');">submit</button></div>'+
 '  <div style="clear:both;"></div>'+
 '</div>';
 
@@ -2683,19 +2803,20 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 '  <div style="clear:both;"></div>'+
 '</div>'+
 '<div class="el-l-c-con el-l-c-hdn" id="'+this.base+'-c-con-'+entry.id+'">'+
-'  <div class="el-l-c-body">';
+'  <div class="el-l-c-body">'+
+'    <div style="float:right; margin-left:15px; margin-top:2px;" class="s-b-con">'+this.message_url(entry.id)+'</div>';
         if( !parent_is_deleted ) {
             if( entry.deleted ) {
                 html +=
-'    <div style="float:right; margin-left:5px;" class="s-b-con"><button class="el-l-m-ud" id="'+this.base+'-m-ud-'+entry.id+'" onclick="'+this.address+'.live_child_undelete('+entry.id+');" title="undelete this message">undelete</button></div>';
+'    <div style="float:right; margin-left:5px;" class="s-b-con"><button class="control-button el-l-m-ud" id="'+this.base+'-m-ud-'+entry.id+'" onclick="'+this.address+'.live_child_undelete('+entry.id+');" title="undelete this message">undelete</button></div>';
             } else {
                 if( this.parent.editor ) {
                     html +=
-'    <div style="float:right;" class="s-b-con"><button class="el-l-m-ed" id="'+this.base+'-m-ed-'+entry.id+'"  onclick="'+this.address+'.live_message_edit('+entry.id+',true);">edit</button></div>';
+'    <div style="float:right;" class="s-b-con"><button class="control-button el-l-m-ed" id="'+this.base+'-m-ed-'+entry.id+'"  onclick="'+this.address+'.live_message_edit('+entry.id+',true);">edit</button></div>';
                 }
                 html +=
-'    <div style="float:right; margin-left:5px;" class="s-b-con"><button class="el-l-m-de" id="'+this.base+'-m-de-'+entry.id+'" onclick="'+this.address+'.live_child_delete('+entry.id+');" title="delete this message and all its children if any">delete</button></div>'+
-'    <div style="float:right;" class="s-b-con"><button class="el-l-m-re" id="'+this.base+'-m-re-'+entry.id+'" onclick="'+this.address+'.live_message_reply('+entry.id+',true);">reply</button></div>';
+'    <div style="float:right; margin-left:5px;" class="s-b-con"><button class="control-button el-l-m-de" id="'+this.base+'-m-de-'+entry.id+'" onclick="'+this.address+'.live_child_delete('+entry.id+');" title="delete this message and all its children if any">delete</button></div>'+
+'    <div style="float:right;" class="s-b-con"><button class="control-button el-l-m-re" id="'+this.base+'-m-re-'+entry.id+'" onclick="'+this.address+'.live_message_reply('+entry.id+',true);">reply</button></div>';
             }
         }
         html +=
@@ -2806,22 +2927,23 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
         if(on) {
             entry.thread_idx = idx;
             var html =
-'    <div class="el-l-m-body">';
+'    <div class="el-l-m-body">'+
+'      <div style="float:right; margin-left:15px; margin-top:2px;" class="s-b-con">'+this.message_url(entry.id)+'</div>';
             if(this.parent.editor) {
                 if( entry.run_id) {
                     html +=
-'      <div style="float:right;" class="s-b-con"><button class="el-l-m-mv"  id="'+this.base+'-m-mv-'+entry.id+'"  onclick="'+this.address+'.live_message_move('+idx+',false);" title="dettach this message from the run" >- run</button></div>';
+'      <div style="float:right;" class="s-b-con"><button class="control-button el-l-m-mv"  id="'+this.base+'-m-mv-'+entry.id+'"  onclick="'+this.address+'.live_message_move('+idx+',false);" title="dettach this message from the run" >- run</button></div>';
                 } else {
                     html +=
-'      <div style="float:right;" class="s-b-con"><button class="el-l-m-mv"  id="'+this.base+'-m-mv-'+entry.id+'"  onclick="'+this.address+'.live_message_move('+idx+',true);" title="attach this message to a run">+ run</button></div>';
+'      <div style="float:right;" class="s-b-con"><button class="control-button el-l-m-mv"  id="'+this.base+'-m-mv-'+entry.id+'"  onclick="'+this.address+'.live_message_move('+idx+',true);" title="attach this message to a run">+ run</button></div>';
                 }
                 html +=
-'      <div style="float:right;" class="s-b-con"><button class="el-l-m-ed"  id="'+this.base+'-m-ed-'+entry.id+'"  onclick="'+this.address+'.live_message_edit('+entry.id+',false);">edit</button></div>';
+'      <div style="float:right;" class="s-b-con"><button class="control-button el-l-m-ed"  id="'+this.base+'-m-ed-'+entry.id+'"  onclick="'+this.address+'.live_message_edit('+entry.id+',false);">edit</button></div>';
             }
             html +=
-'      <div style="float:right; margin-left:5px;" class="s-b-con"><button class="el-l-m-xt" id="'+this.base+'-m-xt-'+entry.id+'" onclick="'+this.address+'.live_message_extend('+entry.id+',false, true);" title="add more tags to the message">+ tags</button></div>'+
-'      <div style="float:right; margin-left:5px;" class="s-b-con"><button class="el-l-m-xa" id="'+this.base+'-m-xa-'+entry.id+'" onclick="'+this.address+'.live_message_extend('+entry.id+',false, false);" title="add more attachments to the message">+ attachments</button></div>'+
-'      <div style="float:right;"                  class="s-b-con"><button class="el-l-m-re" id="'+this.base+'-m-re-'+entry.id+'" onclick="'+this.address+'.live_message_reply('+entry.id+',false);" title="reply to the message">reply</button></div>'+
+'      <div style="float:right; margin-left:5px;" class="s-b-con"><button class="control-button el-l-m-xt" id="'+this.base+'-m-xt-'+entry.id+'" onclick="'+this.address+'.live_message_extend('+entry.id+',false, true);" title="add more tags to the message">+ tags</button></div>'+
+'      <div style="float:right; margin-left:5px;" class="s-b-con"><button class="control-button el-l-m-xa" id="'+this.base+'-m-xa-'+entry.id+'" onclick="'+this.address+'.live_message_extend('+entry.id+',false, false);" title="add more attachments to the message">+ attachments</button></div>'+
+'      <div style="float:right;"                  class="s-b-con"><button class="control-button el-l-m-re" id="'+this.base+'-m-re-'+entry.id+'" onclick="'+this.address+'.live_message_reply('+entry.id+',false);" title="reply to the message">reply</button></div>'+
 '      <div style="float:left; font-size:12px; width:100%; overflow:auto;">'+entry.html1+'</div>'+
 '      <div style="clear:both;"></div>'+
 '      <div id="'+this.base+'-m-dlgs-'+entry.id+'"></div>'+
@@ -2890,6 +3012,13 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
             $(toggler).removeClass('ui-icon-triangle-1-s').addClass('ui-icon-triangle-1-e');
             $(container).removeClass('el-l-m-vis').addClass('el-l-m-hdn');
         }
+    };
+
+    this.message_url = function(entry_id) {
+        var idx = window.location.href.indexOf( '?' );
+        var url = ( idx < 0 ? window.location.href : window.location.href.substr( 0, idx ))+'?exper_id='+this.parent.exp_id+'&app=elog:search&params=message:'+entry_id;
+        var html = '<a href="'+url+'" target="_blank" title="Click to open in a separate tab, or cut and paste to incorporate into another document as a link."><img src="../portal/img/link.png"></img></a>';
+        return html;
     };
 
     this.expand_all_messages = function() {
@@ -2962,7 +3091,7 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
             $('#'+this.base+'-r-con-'+entry.id).html('Loading...');
             $.get('../logbook/ws/DisplayRunParams.php',{id:entry.run_id},function(data) {
                 var html =
-'<div style="float:right;" class="s-b-con"><button class="el-l-r-re" id="'+that.base+'-r-re-'+entry.id+'" onclick="'+that.address+'.live_run_reply('+idx+');">reply</button></div>'+
+'<div style="float:right;" class="s-b-con"><button class="control-button el-l-r-re" id="'+that.base+'-r-re-'+entry.id+'" onclick="'+that.address+'.live_run_reply('+idx+');">reply</button></div>'+
 '<div style="clear:both;"></div>'+
 '<div id="'+that.base+'-r-dlgs-'+entry.id+'"></div>'+
 '<div style="width:800px; height:300px; overflow:auto; background-color:#ffffff; ">'+data+'</div>';
@@ -3001,7 +3130,7 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
         };
         $.get('../logbook/ws/Search.php',params,function(data) {
 
-            if(data.ResultSet.Status != 'success') { that.parent.report_error( data.ResultSet.Message ); return; }
+            if(data.ResultSet.Status != 'success') { report_error( data.ResultSet.Message ); return; }
 
             that.threads = data.ResultSet.Result;
             that.messages = new Array();
@@ -3067,8 +3196,8 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 '      </div>'+
 '    </form>'+
 '  </div>'+
-'  <div style="float:right; margin-left:5px;" class="s-b-con"><button id="'+this.base+'-m-re-c-'+id+'" onclick="'+this.address+'.live_message_reply_cancel('+id+');">cancel</button></div>'+
-'  <div style="float:right; margin-left:5px;" class="s-b-con"><button id="'+this.base+'-m-re-s-'+id+'" onclick="'+this.address+'.live_message_reply_submit('+id+');">submit</button></div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button class="control-button" id="'+this.base+'-m-re-c-'+id+'" onclick="'+this.address+'.live_message_reply_cancel('+id+');">cancel</button></div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button class="control-button" id="'+this.base+'-m-re-s-'+id+'" onclick="'+this.address+'.live_message_reply_submit('+id+');">submit</button></div>'+
 '  <div style="clear:both;"></div>'+
 '</div>'+
 '<div id="'+this.base+'-m-xtdlg-'+id+'" class="el-l-m-xtdlg el-l-m-dlg-hdn">'+
@@ -3084,8 +3213,8 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 '      </div>'+
 '    </form>'+
 '  </div>'+
-'  <div style="float:right; margin-left:5px;" class="s-b-con"><button id="'+this.base+'-m-xt-c-'+id+'" onclick="'+this.address+'.live_message_extend_cancel('+id+', true);">cancel</button></div>'+
-'  <div style="float:right; margin-left:5px;" class="s-b-con"><button id="'+this.base+'-m-xt-s-'+id+'" onclick="'+this.address+'.live_message_extend_submit('+id+', true);">submit</button></div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button class="control-button" id="'+this.base+'-m-xt-c-'+id+'" onclick="'+this.address+'.live_message_extend_cancel('+id+', true);">cancel</button></div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button class="control-button" id="'+this.base+'-m-xt-s-'+id+'" onclick="'+this.address+'.live_message_extend_submit('+id+', true);">submit</button></div>'+
 '  <div style="clear:both;"></div>'+
 '</div>'+
 '<div id="'+this.base+'-m-xadlg-'+id+'" class="el-l-m-xadlg el-l-m-dlg-hdn">'+
@@ -3106,8 +3235,8 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 '      </div>'+
 '    </form>'+
 '  </div>'+
-'  <div style="float:right; margin-left:5px;" class="s-b-con"><button id="'+this.base+'-m-xa-c-'+id+'" onclick="'+this.address+'.live_message_extend_cancel('+id+', false);">cancel</button></div>'+
-'  <div style="float:right; margin-left:5px;" class="s-b-con"><button id="'+this.base+'-m-xa-s-'+id+'" onclick="'+this.address+'.live_message_extend_submit('+id+', false);">submit</button></div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button class="control-button" id="'+this.base+'-m-xa-c-'+id+'" onclick="'+this.address+'.live_message_extend_cancel('+id+', false);">cancel</button></div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button class="control-button" id="'+this.base+'-m-xa-s-'+id+'" onclick="'+this.address+'.live_message_extend_submit('+id+', false);">submit</button></div>'+
 '  <div style="clear:both;"></div>'+
 '</div>';
         if(this.parent.editor) {
@@ -3129,13 +3258,13 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 '      </div>'+
 '    </form>'+
 '  </div>'+
-'  <div style="float:right; margin-left:5px;" class="s-b-con"><button class="el-l-m-ed-c" id="'+this.base+'-m-ed-c-'+id+'" onclick="'+this.address+'.live_message_edit_cancel('+id+');">cancel</button></div>'+
-'  <div style="float:right; margin-left:5px;" class="s-b-con"><button class="el-l-m-ed-s" id="'+this.base+'-m-ed-s-'+id+'" onclick="'+this.address+'.live_message_edit_submit('+id+');">submit</button></div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button class="control-button el-l-m-ed-c" id="'+this.base+'-m-ed-c-'+id+'" onclick="'+this.address+'.live_message_edit_cancel('+id+');">cancel</button></div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button class="control-button el-l-m-ed-s" id="'+this.base+'-m-ed-s-'+id+'" onclick="'+this.address+'.live_message_edit_submit('+id+');">submit</button></div>'+
 '  <div style="clear:both;"></div>'+
 '</div>'+
 '<div id="'+this.base+'-m-mdlg-'+id+'" class="el-l-m-mdlg el-l-m-dlg-hdn">'+
-'  <div style="float:right; margin-left:5px;" class="s-b-con"><button class="el-l-m-mv-c" id="'+this.base+'-m-mv-c-'+id+'" onclick="'+this.address+'.live_message_move_cancel('+id+');">cancel</button></div>'+
-'  <div style="float:right; margin-left:5px;" class="s-b-con"><button class="el-l-m-mv-s" id="'+this.base+'-m-mv-s-'+id+'" onclick="'+this.address+'.live_message_move_submit('+id+');">submit</button></div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button class="control-button el-l-m-mv-c" id="'+this.base+'-m-mv-c-'+id+'" onclick="'+this.address+'.live_message_move_cancel('+id+');">cancel</button></div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button class="control-button el-l-m-mv-s" id="'+this.base+'-m-mv-s-'+id+'" onclick="'+this.address+'.live_message_move_submit('+id+');">submit</button></div>'+
 '  <div style="clear:both;"></div>'+
 ''+
 '  Here be the dialog allowing to move the message into some other context and/or time.'+
@@ -3238,7 +3367,7 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
                         function(data) {
 
                             if( data.status != 'success' ) {
-                                that.parent.report_error( data.message );
+                                report_error( data.message );
                                 return;
                             }
                             entry.run_id  = data.run_id;
@@ -3256,7 +3385,7 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
                         },
                         'JSON'
                     ).error( function () {
-                        that.parent.report_error('failed because of: '+jqXHR.statusText); }
+                        report_error('failed because of: '+jqXHR.statusText); }
                     ).complete( function() {
                         ;
                     });
@@ -3292,7 +3421,7 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
         // an empty message.
         //
         if( $('#elog-form-post-'+id+' textarea[name="message_text"]').val() == '' ) {
-            this.parent.report_error('Can not post the empty message. Please put some text into the message box.' );
+            report_error('Can not post the empty message. Please put some text into the message box.' );
             return;
         }
 
@@ -3314,7 +3443,7 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 '  <input type="hidden" name="file2attach_0" value=""/ >'+
 '</div>'
                 );
-                if( data.Status != 'success' ) { that.parent.report_error( data.Message ); return; }
+                if( data.Status != 'success' ) { report_error( data.Message ); return; }
                 var entry = data.Entry;
 
                 // Find the parent message and add a new child to it.
@@ -3387,7 +3516,7 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 
             $('#elog-form-extend-tags-'+id).ajaxSubmit({
                 success: function(data) {
-                    if( data.Status != 'success' ) { that.parent.report_error( data.Message ); return; }
+                    if( data.Status != 'success' ) { report_error( data.Message ); return; }
                     var tags = data.Extended.tags;
                     for( var i = 0; i < tags.length; i++ )
                         that.messages[id].tags.unshift(tags[i]);
@@ -3416,7 +3545,7 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 '  <input type="hidden" name="file2attach_0" value=""/ >'+
 '</div>'
                     );
-                    if( data.Status != 'success' ) { that.parent.report_error( data.Message ); return; }
+                    if( data.Status != 'success' ) { report_error( data.Message ); return; }
                     var attachments = data.Extended.attachments;
                     for( var i = 0; i < attachments.length; i++ )
                         that.messages[id].attachments.unshift(attachments[i]);
@@ -3485,7 +3614,7 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
         // an empty message.
         //
         if( $('#elog-form-post-'+id+' textarea[name="message_text"]').val() == '' ) {
-            this.parent.report_error('Can not post the empty message. Please put some text into the message box.');
+            report_error('Can not post the empty message. Please put some text into the message box.');
             return;
         }
 
@@ -3507,7 +3636,7 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 '  <input type="hidden" name="file2attach_0" value=""/ >'+
 '</div>'
                 );
-                if( data.Status != 'success' ) { that.parent.report_error( data.Message ); return; }
+                if( data.Status != 'success' ) { report_error( data.Message ); return; }
                 that.live_run_reply_cancel(id);
 
                 // Close and reopen the panel for the run to refresh its contents, so that
@@ -3564,8 +3693,8 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 '      </div>'+
 '    </form>'+
 '  </div>'+
-'  <div style="float:right; margin-left:5px;" class="s-b-con"><button id="'+this.base+'-r-re-c-'+id+'" onclick="'+this.address+'.live_run_reply_cancel('+id+');">cancel</button></div>'+
-'  <div style="float:right; margin-left:5px;" class="s-b-con"><button id="'+this.base+'-r-re-s-'+id+'" onclick="'+this.address+'.live_run_reply_submit('+idx+');">submit</button></div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button class="control-button" id="'+this.base+'-r-re-c-'+id+'" onclick="'+this.address+'.live_run_reply_cancel('+id+');">cancel</button></div>'+
+'  <div style="float:right; margin-left:5px;" class="s-b-con"><button class="control-button" id="'+this.base+'-r-re-s-'+id+'" onclick="'+this.address+'.live_run_reply_submit('+idx+');">submit</button></div>'+
 '  <div style="clear:both;"></div>'+
 '</div>';
 
@@ -3627,62 +3756,6 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
         }
         return html;
     };
-/*
-    this.live_child2html = function(entry) {
-        that.messages[entry.id] = entry;
-        var html =
-'<div class="el-l-c-hdr" onclick="'+this.address+'.toggle_child('+entry.id+');">'+
-'  <div style="float:left;"><span class="toggler ui-icon ui-icon-triangle-1-e el-l-c-tgl" id="'+this.base+'-c-tgl-'+entry.id+'"></span></div>'+
-'  <div style="float:left;" class="el-l-c-time">'+entry.relevance_time+'</div>'+
-'  <div style="float:left;" class="el-l-c-author">'+entry.author+'</div>'+
-'  <div style="float:left; margin-left:10px;" class="el-l-c-subj">'+entry.subject+'</div>'+id_sign(entry)+message_signs(entry)+
-'  <div style="clear:both;"></div>'+
-'</div>'+
-'<div class="el-l-c-con el-l-c-hdn" id="'+this.base+'-c-con-'+entry.id+'">'+
-'  <div class="el-l-c-body">'+
-'    <div style="float:left; font-size:12px; width:100%; overflow:auto;">'+entry.html1+'</div>';
-        if(this.parent.editor)
-            html +=
-'    <div style="float:right;" class="s-b-con"><button class="el-l-m-ed"  id="'+this.base+'-m-ed-'+entry.id+'"  onclick="'+this.address+'.live_message_edit('+entry.id+',true);">edit</button></div>';
-        html +=
-'    <div style="float:right;" class="s-b-con"><button class="el-l-m-re" id="'+this.base+'-m-re-'+entry.id+'" onclick="'+this.address+'.live_message_reply('+entry.id+',true);">reply</button></div>'+
-'    <div style="clear:both;"></div>'+
-'      <div id="'+this.base+'-m-dlgs-'+entry.id+'"></div>'+
-'  </div>';
-        that.attachments[entry.id] = entry.attachments;
-
-        var attachments_html = '';
-        for( var i in entry.attachments) {
-            var a = entry.attachments[i];
-            that.attachments_loader[a.id] = {loaded: false, descr: a};
-            attachments_html +=
-'    <div style="float:left;" class="el-l-a">'+
-'      <div style="float:left;">'+
-'        <span class="toggler ui-icon ui-icon-triangle-1-e el-l-a-tgl" id="'+this.base+'-a-tgl-'+a.id+'" onclick="'+this.address+'.toggle_attachment('+a.id+');"></span>'+
-'      </div>'+
-'      <div style="float:left;" class="el-l-a-dsc"><a class="link" href="../logbook/attachments/'+a.id+'/preview"  target="_blank">'+a.description+'</a></div>'+
-'      <div style="float:left; margin-left:10px;" class="el-l-a-info">( type: <b>'+a.type+'</b> size: <b>'+a.size+'</b> )</div>'+
-'      <div style="clear:both;"></div>'+
-'      <div class="el-l-a-con el-l-a-hdn" id="'+this.base+'-a-con-'+a.id+'">'+
-'      </div>'+
-'    </div>';
-        }
-        if(attachments_html) html +=
-'  <div class="el-l-m-as">'+attachments_html+
-'    <div style="clear:both;"></div>'+
-'  </div>';
-        html +=
-'  <div id="'+this.base+'-m-c-'+entry.id+'">';
-
-        var children = entry.children;
-        for(var i in children) html += that.live_child2html(eval("("+children[i]+")"));
-
-        html +=
-'  </div>'+
-'</div>';
-        return html;
-    };
-*/
     this.live_child2html = function(entry, thread_idx) {
         that.messages[entry.id] = entry;
         var html =
@@ -3695,12 +3768,13 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
 '</div>'+
 '<div class="el-l-c-con el-l-c-hdn" id="'+this.base+'-c-con-'+entry.id+'">'+
 '  <div class="el-l-c-body">'+
+'    <div style="float:right; margin-left:15px; margin-top:2px;" class="s-b-con">'+this.message_url(entry.id)+'</div>'+
 '    <div style="float:left; font-size:12px; width:100%; overflow:auto;">'+entry.html1+'</div>';
         if(this.parent.editor)
             html +=
-'    <div style="float:right;" class="s-b-con"><button class="el-l-m-ed"  id="'+this.base+'-m-ed-'+entry.id+'"  onclick="'+this.address+'.live_message_edit('+entry.id+',true);">edit</button></div>';
+'    <div style="float:right;" class="s-b-con"><button class="control-button el-l-m-ed"  id="'+this.base+'-m-ed-'+entry.id+'"  onclick="'+this.address+'.live_message_edit('+entry.id+',true);">edit</button></div>';
         html +=
-'    <div style="float:right;" class="s-b-con"><button class="el-l-m-re" id="'+this.base+'-m-re-'+entry.id+'" onclick="'+this.address+'.live_message_reply('+entry.id+',true);">reply</button></div>'+
+'    <div style="float:right;" class="s-b-con"><button class="control-button el-l-m-re" id="'+this.base+'-m-re-'+entry.id+'" onclick="'+this.address+'.live_message_reply('+entry.id+',true);">reply</button></div>'+
 '    <div style="clear:both;"></div>'+
 '      <div id="'+this.base+'-m-dlgs-'+entry.id+'"></div>'+
 '  </div>';

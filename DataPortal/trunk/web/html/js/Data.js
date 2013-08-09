@@ -340,15 +340,15 @@ function datafiles_create() {
                     if(first_of_a_kind) {
                         if(f.local_flag) {
                             html +=
-'<button class="move_to_medium_term df-file-button" name="'+pidx+'_'+ridx+'" onclick="datafiles.move_files('+op_params+')" title="save all '+f.type+' files of run '+f.runnum+' to MEDIUM-TERM disk storage">SAVE TO MEDIUM</button>';
+'<button class="control-button move_to_medium_term df-file-button" name="'+pidx+'_'+ridx+'" onclick="datafiles.move_files('+op_params+')" title="save all '+f.type+' files of run '+f.runnum+' to MEDIUM-TERM disk storage">SAVE TO MEDIUM</button>';
                         }
                         if(f.local_flag && f.archived_flag && this.is_data_administrator) {
                             html +=
-'<button class="delete_from_short_term df-file-button" name="'+pidx+'_'+ridx+'" onclick="datafiles.delete_from_disk('+op_params+')" title="delete all '+f.type+' files of run '+f.runnum+' from the '+f.storage+' disk storage">DELETE</button>';
+'<button class="control-button delete_from_short_term df-file-button" name="'+pidx+'_'+ridx+'" onclick="datafiles.delete_from_disk('+op_params+')" title="delete all '+f.type+' files of run '+f.runnum+' from the '+f.storage+' disk storage">DELETE</button>';
                         }
                         if(f.archived_flag && !f.local_flag && !f.restore_flag) {
                             html +=
-'<button class="restore_from_archive df-file-button" name="'+pidx+'_'+ridx+'" onclick="datafiles.restore_from_archive('+op_params+')" title="restore all '+f.type+' files of run '+f.runnum+' from tape archive to the '+f.storage+' disk storage">RESTORE FROM TAPE</button>';
+'<button class="control-button restore_from_archive df-file-button" name="'+pidx+'_'+ridx+'" onclick="datafiles.restore_from_archive('+op_params+')" title="restore all '+f.type+' files of run '+f.runnum+' from tape archive to the '+f.storage+' disk storage">RESTORE FROM TAPE</button>';
                         }
                     }
                     html +=
@@ -371,15 +371,15 @@ function datafiles_create() {
                     if(first_of_a_kind) {
                         if(f.local_flag) {
                             html +=
-'<button class="move_to_short_term df-file-button" name="'+pidx+'_'+ridx+'" onclick="datafiles.move_files('+op_params+')" title="remove all '+f.type+' files of run '+f.runnum+' from the '+f.storage+' disk storage and move them back to the SHORT-TERM storage">MOVE TO SHORT</button>';
+'<button class="control-button move_to_short_term df-file-button" name="'+pidx+'_'+ridx+'" onclick="datafiles.move_files('+op_params+')" title="remove all '+f.type+' files of run '+f.runnum+' from the '+f.storage+' disk storage and move them back to the SHORT-TERM storage">MOVE TO SHORT</button>';
                         }
                         if(f.local_flag && f.archived_flag && this.is_data_administrator) {
                             html +=
-'<button class="delete_from_medium_term df-file-button" name="'+pidx+'_'+ridx+'" onclick="datafiles.delete_from_disk('+op_params+')" title="delete all '+f.type+' files of run '+f.runnum+' from the '+f.storage+' disk storage">DELETE</button>';
+'<button class="control-button delete_from_medium_term df-file-button" name="'+pidx+'_'+ridx+'" onclick="datafiles.delete_from_disk('+op_params+')" title="delete all '+f.type+' files of run '+f.runnum+' from the '+f.storage+' disk storage">DELETE</button>';
                         }
                         if(f.archived_flag && !f.local_flag && !f.restore_flag) {
                             html +=
-'<button class="restore_from_archive df-file-button" name="'+pidx+'_'+ridx+'" onclick="datafiles.restore_from_archive('+op_params+')" title="restore all '+f.type+' files of run '+f.runnum+' from tape archive to the '+f.storage+' disk storage">RESTORE FROM TAPE</button>';
+'<button class="control-button restore_from_archive df-file-button" name="'+pidx+'_'+ridx+'" onclick="datafiles.restore_from_archive('+op_params+')" title="restore all '+f.type+' files of run '+f.runnum+' from tape archive to the '+f.storage+' disk storage">RESTORE FROM TAPE</button>';
                         }
                     }
                     html +=
