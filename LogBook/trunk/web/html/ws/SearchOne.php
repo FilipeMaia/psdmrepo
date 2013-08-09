@@ -1,16 +1,18 @@
 <?php
 
 require_once( 'logbook/logbook.inc.php' );
+require_once( 'lusitime/lusitime.inc.php' );
 
 use LogBook\LogBook;
 use LogBook\LogBookAuth;
 use LogBook\LogBookUtils;
 use LogBook\LogBookException;
+use LusiTime\LusiTime;
 
 /*
  * This script will perform the search for a single free-form entry in a scope
  * of an experiment using a numer identifier of the entry. The result is returned
- * as a JSON obejct which in case of success will have the following format:
+ * as a JSON object which in case of success will have the following format:
  *
  *   "ResultSet": {
  *     "Status": "success",
@@ -37,6 +39,10 @@ if( !isset( $_GET['id'] )) report_error( "no valid message id parameter" );
 $id = trim( $_GET['id'] );
 if( $id == '' ) report_error( "message id can't be empty" );
 
+$show_in_vicinity = false;
+if( isset($_GET['show_in_vicinity'])) {
+    $show_in_vicinity = intval(trim($_GET['show_in_vicinity'])) ? true : false;
+}
 
 /* Package the error message into a JSON object and return the one
  * back to a caller. The script's execution will end at this point.
@@ -60,27 +66,29 @@ HERE;
 try {
     LogBook::instance()->begin();
 
-    $entry      = LogBook::instance()->find_entry_by_id( $id ) or report_error( "no such message entry" );
+    $entry = LogBook::instance()->find_entry_by_id( $id ) or report_error( "no such message entry" );
     $experiment = $entry->parent();
-
     if( !LogBookAuth::instance()->canRead( $experiment->id()))
         report_error( 'not authorized to read messages for the experiment' );
 
-
-    $status_encoded = json_encode( "success" );
-    $result =<<< HERE
+    if($show_in_vicinity) {
+        print LogBookUtils::search_around($entry->id(), 'report_error') ;
+    } else {
+        $now_encoded = json_encode(LusiTime::now()->toStringShort());
+        $status_encoded = json_encode( "success" );
+        $result =<<< HERE
 {
   "ResultSet": {
     "Status": {$status_encoded},
+    "Updated": {$now_encoded},
     "Result": [
 HERE;
-    $result .= "\n".LogBookUtils::entry2json( $entry );
-    $result .=<<< HERE
+        $result .= "\n".LogBookUtils::entry2json( $entry );
+        $result .=<<< HERE
  ] } }
 HERE;
-
-    print $result;
-
+        print $result;
+    }
     LogBook::instance()->commit();
 
 } catch( LogBookException $e ) { report_error( $e->toHtml()); }
