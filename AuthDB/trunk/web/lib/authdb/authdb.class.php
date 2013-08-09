@@ -269,6 +269,12 @@ HERE;
         //
         if( $this->hasRoleImpl( $user, $exper_id, $app, $role )) return true;
 
+        // If the specified user is actually a group (starts with 'gid:')
+        // then we just quit becaus eth erest of thsi algorithm implies
+        // a real user account not a group name.
+        //
+        if( substr($user, 0, 4) == 'gid:' ) return false;
+
         // Now try via the groups.
         //
         $authorized_groups = array();

@@ -11,6 +11,13 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-06
+2013-08-08 Igor Gaponenko
+- changed implementation of html/AuthInstrGroups.php to allow LDAP management
+by special instrument science groups and make e-log 'Editor' the standard
+privilege for all such groups
+- fixed a bug in the AuthDB::hasRole() to deal correctly with POSIX groups
+
 Tag: V00-01-05
 2013-05-16 Igor Gaponenko
 - rewritten AuthenticationProfile service

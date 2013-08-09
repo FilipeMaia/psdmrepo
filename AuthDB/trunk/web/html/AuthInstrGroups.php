@@ -113,12 +113,12 @@ td.table_cell_within_group {
 
   <h2>About</h2>
   <div style="padding-left:20px;">
-    <p>This script will check if instrument-specific POSIX groups are authorized as e-log 'Writer's of
+    <p>This script will check if instrument-specific POSIX groups are authorized as e-log 'Editor's of
        the corresponding experiments, and if the optional parameter <b>fix</b> is present then assign
        the role to the groups. Specifically, for each instrument 'XYZ', the tool will:</p>
     <ol>
       <li>check if there is such POSIX group as 'ps-xyz'</li>
-      <li>check if the group is registered as e-log 'Writer' ('Editor' for XPP and XCS) for all experiments of instrument 'XYZ'</li>
+      <li>check if the group is registered as e-log 'Editor' for all experiments of instrument 'XYZ'</li>
       <li>(optionally) if not then the group will be authorized for those experiments</li>
       <li>(optionally) report which changes which had to be made at step #3</li>
       <li>report the number of shifts for each experiment:
@@ -170,37 +170,43 @@ td.table_cell_within_group {
                 '  <td class="table_hdr" rowspan="3">Instrument</td>'.
                 '  <td class="table_hdr" rowspan="3">Id</td>'.
                 '  <td class="table_hdr" rowspan="3">Experiment</td>'.
-                '  <td class="table_hdr" rowspan="3">Group</td>'.
+                '  <td class="table_hdr" rowspan="3">User Group</td>'.
                 '  <td class="table_hdr" rowspan="3"># shifts</td>'.
-                '  <td class="table_hdr" colspan="5" align="center">OWN</td>'.
-                '  <td class="table_hdr" colspan="5" align="center">ALLIED</td>'.
+                '  <td class="table_hdr" colspan="6" align="center">OWN</td>'.
+                '  <td class="table_hdr" colspan="6" align="center">ALLIED</td>'.
             ($fix ?
                 '  <td class="table_hdr" rowspan="3">Action</td>' : '').
                 '</tr>'.
                 '<tr>'.
-                '  <td class="table_hdr" rowspan="2">Instrument Group</td>'.
-                '  <td class="table_hdr" colspan="2" align="center">E-Log</td>'.
-                '  <td class="table_hdr" colspan="2" align="center">LDAP</td>'.
-                '  <td class="table_hdr" rowspan="2">Instrument Group</td>'.
-                '  <td class="table_hdr" colspan="2" align="center">E-Log</td>'.
-                '  <td class="table_hdr" colspan="2" align="center">LDAP</td>'.
+                '  <td class="table_hdr" colspan="3" align="center">E-Log</td>'.
+                '  <td class="table_hdr" colspan="3" align="center">LDAP</td>'.
+                '  <td class="table_hdr" colspan="3" align="center">E-Log</td>'.
+                '  <td class="table_hdr" colspan="3" align="center">LDAP</td>'.
                 '</tr>'.
+                '  <td class="table_hdr">Group</td>'.
                 '  <td class="table_hdr">Role</td>'.
                 '  <td class="table_hdr">Is Authorized</td>'.
+                '  <td class="table_hdr">Group</td>'.
                 '  <td class="table_hdr">Role</td>'.
                 '  <td class="table_hdr">Is Authorized</td>'.
+                '  <td class="table_hdr">Group</td>'.
                 '  <td class="table_hdr">Role</td>'.
                 '  <td class="table_hdr">Is Authorized</td>'.
+                '  <td class="table_hdr">Group</td>'.
                 '  <td class="table_hdr">Role</td>'.
                 '  <td class="table_hdr">Is Authorized</td>'.
                 '<tr>'.
                 '</tr>';
 
-            $group_own      = 'ps-'.strtolower( $instr_name_own );
-            $group4auth_own = 'gid:'.$group_own;
+            $group_own           = 'ps-'.strtolower( $instr_name_own );
+            $group4ldap_own      = $group_own.(in_array($instr_name_own, array('AMO','SXR','XPP','XCS','CXI','MEC')) ? '-sci' : '');
+            $group4auth_own      = 'gid:'.$group_own;
+            $group4auth4ldap_own = 'gid:'.$group4ldap_own;
 
-            $group_allied      = 'ps-'.strtolower( $instr_name_allied );
-            $group4auth_allied = 'gid:'.$group_allied;
+            $group_allied           = 'ps-'.strtolower( $instr_name_allied );
+            $group4ldap_allied      = $group_allied.(in_array($instr_name_allied, array('AMO','SXR','XPP','XCS','CXI','MEC')) ? '-sci' : '');
+            $group4auth_allied      = 'gid:'.$group_allied;
+            $group4auth4ldap_allied = 'gid:'.$group4ldap_allied;
 
             foreach( $experiments as $experiment ) {
                 $comment = '';
@@ -231,11 +237,12 @@ td.table_cell_within_group {
                         '<td class="table_cell">'.($has_elog_role_own ? 'Yes' : '<span style="color:red;">No</span>').'</td>';
                 }
                 print
+                    '<td class="table_cell"><a href="../authdb/?action=view_group&gid='.$group4ldap_own.'">'.$group4ldap_own.'</a></td>'.
                     '<td class="table_cell">'.$ldap_role.'</td>';
-                $has_ldap_role_own = AuthDB::instance()->hasRole( $group4auth_own,    $experiment->id(), $ldap_application, $ldap_role );
+                $has_ldap_role_own = AuthDB::instance()->hasRole( $group4auth4ldap_own,    $experiment->id(), $ldap_application, $ldap_role );
                 if( $fix ) {
                     if( !$has_ldap_role_own ) {
-                        AuthDB::instance()->createRolePlayer( $ldap_application, $ldap_role, $experiment->id(), $group4auth_own );
+                        AuthDB::instance()->createRolePlayer( $ldap_application, $ldap_role, $experiment->id(), $group4auth4ldap_own );
                         print
                             '<td class="table_cell"><span style="color:green;">Yes</span></td>';
                         $comment .= '<span style="color:green; font-weight:bold;">fixed '.$ldap_application.' for OWN</span> ';
@@ -266,12 +273,13 @@ td.table_cell_within_group {
                     print
                         '<td class="table_cell">'.($has_elog_role_allied ? 'Yes' : '<span style="color:red;">No</span>').'</td>';
                 }
-                $has_ldap_role_allied = AuthDB::instance()->hasRole( $group4auth_allied, $experiment->id(), $ldap_application, $ldap_role );
+                $has_ldap_role_allied = AuthDB::instance()->hasRole( $group4auth4ldap_allied, $experiment->id(), $ldap_application, $ldap_role );
                 print
+                    '<td class="table_cell"><a href="../authdb/?action=view_group&gid='.$group4ldap_allied.'">'.$group4ldap_allied.'</a></td>'.
                     '<td class="table_cell">'.$ldap_role.'</td>';
                 if( $fix ) {
                     if( !$has_ldap_role_allied ) {
-                        AuthDB::instance()->createRolePlayer( $ldap_application, $ldap_role, $experiment->id(), $group4auth_allied );
+                        AuthDB::instance()->createRolePlayer( $ldap_application, $ldap_role, $experiment->id(), $group4auth4ldap_allied );
                         print
                             '<td class="table_cell"><span style="color:green;">Yes</span></td>';
                         $comment .= '<span style="color:green; font-weight:bold;">fixed '.$ldap_application.' for ALLIED</span> ';
@@ -292,28 +300,31 @@ td.table_cell_within_group {
                     '</tr>';
             }
         } else {
-            $elog_role = 'Writer';
+            $elog_role = 'Editor';
             $ldap_role = 'Admin';
             print
                 '<tr>'.
                 '  <td class="table_hdr" rowspan="2">Instrument</td>'.
                 '  <td class="table_hdr" rowspan="2">Id</td>'.
                 '  <td class="table_hdr" rowspan="2">Experiment</td>'.
-                '  <td class="table_hdr" rowspan="2">Group</td>'.
+                '  <td class="table_hdr" rowspan="2">User Group</td>'.
                 '  <td class="table_hdr" rowspan="2"># shifts</td>'.
-                '  <td class="table_hdr" rowspan="2">Instrument Group</td>'.
-                '  <td class="table_hdr" colspan="2" align="center">E-Log</td>'.
-                '  <td class="table_hdr" colspan="2" align="center">LDAP</td>'.
+                '  <td class="table_hdr" colspan="3" align="center">E-Log</td>'.
+                '  <td class="table_hdr" colspan="3" align="center">LDAP</td>'.
             ($fix ? '  <td class="table_hdr" rowspan="2">Action</td>' : '').
                 '</tr>'.
+                '  <td class="table_hdr">Group</td>'.
                 '  <td class="table_hdr">Role</td>'.
                 '  <td class="table_hdr">Is Authorized</td>'.
+                '  <td class="table_hdr">Group</td>'.
                 '  <td class="table_hdr">Role</td>'.
                 '  <td class="table_hdr">Is Authorized</td>'.
                 '<tr>'.
                 '</tr>';
             $group = 'ps-'.strtolower( $instr_name );
+            $group4ldap = $group.(in_array($instr_name, array('AMO','SXR','XPP','XCS','CXI','MEC')) ? '-sci' : '');
             $group4auth = 'gid:'.$group;
+            $group4auth4ldap = 'gid:'.$group4ldap;
             foreach( $experiments as $experiment ) {
                 $comment = '';
                 $num_shifts = $experiment->num_shifts();
@@ -342,12 +353,13 @@ td.table_cell_within_group {
                     print
                         '<td class="table_cell">'.($has_elog_role ? 'Yes' : '<span style="color:red;">No</span>').'</td>';
                 }
-                $has_ldap_role = AuthDB::instance()->hasRole( $group4auth, $experiment->id(), $ldap_application, $ldap_role );
+                $has_ldap_role = AuthDB::instance()->hasRole( $group4auth4ldap, $experiment->id(), $ldap_application, $ldap_role );
                 print
+                    '<td class="table_cell"><a href="../authdb/?action=view_group&gid='.$group4ldap.'">'.$group4ldap.'</a></td>'.
                     '<td class="table_cell">'.$ldap_role.'</td>';
                 if( $fix ) {
                     if( !$has_ldap_role ) {
-                        AuthDB::instance()->createRolePlayer( $ldap_application, $ldap_role, $experiment->id(), $group4auth );
+                        AuthDB::instance()->createRolePlayer( $ldap_application, $ldap_role, $experiment->id(), $group4auth4ldap );
                         print
                             '<td class="table_cell"><span style="color:green;">Yes</span></td>';
                         $comment .= '<span style="color:green; font-weight:bold;">fixed '.$ldap_application.'</span> ';
