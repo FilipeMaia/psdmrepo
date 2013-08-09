@@ -320,9 +320,6 @@ def _standardBins( env, appdir, binenv, install, **kw ) :
         env.Prepend(LIBPATH = _getkwlist ( kw, 'LIBPATH' ))
         if 'CCFLAGS' in kw:
             binkw['CCFLAGS'] = env['CCFLAGS'] + ' ' + kw['CCFLAGS']
-
-        trace ( "binkw = "+str(binkw), "SConscript", 2 )
-        trace ( "LIBPATH = "+str(env['LIBPATH']), "SConscript", 2 )
     
         for bin, srcs in bins.iteritems() :
             

@@ -250,7 +250,7 @@ def adjustPkgDeps():
             deps.discard(pkg)
             
             # dirty hack
-            if 'boost_python' in deps: env.Append(CPPPATH=env['PYTHON_INCDIR'])
+            if 'boost_python' in deps: lib.env.Append(CPPPATH=env['PYTHON_INCDIR'])
             
             # another dirty hack, RdbMySQL package includes mysql heades but
             # does not need mysql client library 
