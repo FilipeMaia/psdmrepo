@@ -116,6 +116,7 @@ class ShiftMgr extends DbConnection {
     }
 
     public function find_shift_by_id ($id) {
+        $id = intval($id) ;
         $shifts = $this->find_shifts_by_("id={$id}") ;
         $nrows = count($shifts) ;
         if ($nrows == 0) return null ;
@@ -146,6 +147,36 @@ class ShiftMgr extends DbConnection {
         }
         return $shifts ;
     }
+    public function find_shift_area_by_id ($id) {
+        $id = intval($id) ;
+        $result = $this->query("SELECT * FROM {$this->database}.shift_area_evaluation WHERE id={$id}") ;
+        $nrows = mysql_numrows($result) ;
+        if ($nrows == 0) return null ;
+        if ($nrows == 1) {
+            $attr = mysql_fetch_array($result, MYSQL_ASSOC) ;
+            return new ShiftAreaEvaluation (
+                $this->find_shift_by_id($attr['shift_id']) ,
+                $attr) ;
+        }
+        throw new ShiftMgrException (
+            __class__.'::'.__METHOD__ ,
+            "Invalid number of entries returned when looking for shift area by id={$id}") ;
+    }
+    public function find_shift_time_by_id ($id) {
+        $id = intval($id) ;
+        $result = $this->query("SELECT * FROM {$this->database}.shift_time_allocation WHERE id={$id}") ;
+        $nrows = mysql_numrows($result) ;
+        if ($nrows == 0) return null ;
+        if ($nrows == 1) {
+            $attr = mysql_fetch_array($result, MYSQL_ASSOC) ;
+            return new ShiftTimeAllocation (
+                $this->find_shift_by_id($attr['shift_id']) ,
+                $attr) ;
+        }
+        throw new ShiftMgrException (
+            __class__.'::'.__METHOD__ ,
+            "Invalid number of entries returned when looking for shift time allocation by id={$id}") ;
+    }
 
     public function precreate_shifts_if_needed ($instr_name, $begin_time, $end_time) {
 
@@ -161,7 +192,8 @@ class ShiftMgr extends DbConnection {
 
         $now = LusiTime::now() ;
         $max_end_time = LusiTime::parse("{$now->in24hours()->toStringDay()} 00:00:00") ;
-        $end_time = $end_time ? ($max_end_time->less($end_time) ? $max_end_time : LusiTime::parse("{$end_time->in24hours()->toStringDay()} 00:00:00")) : $max_end_time ;
+        //$end_time = $end_time ? ($max_end_time->less($end_time) ? $max_end_time : LusiTime::parse("{$end_time->in24hours()->toStringDay()} 00:00:00")) : $max_end_time ;
+        $end_time = $end_time ? ($max_end_time->less($end_time) ? $max_end_time : $end_time) : $max_end_time ;
 
 //       throw new ShiftMgrException (
 //            __class__.'::'.__METHOD__ ,
@@ -246,6 +278,7 @@ INSERT INTO shiftmgr.shift_time_allocation (shift_id,name,duration_min,comments)
             $sql = "INSERT INTO {$this->database}.shift_time_allocation (shift_id,name,duration_min,comments) VALUES ({$shift->id()},'{$allocation_name_escaped}',0,'')" ;
             $this->query($sql) ;
         }
+        $this->add_create_shift_event($shift->id()) ;
         return $shift ;
     }
 
@@ -268,32 +301,45 @@ INSERT INTO shiftmgr.shift_time_allocation (shift_id,name,duration_min,comments)
 
         $opt = " modified_uid='{$this->current_user()}', modified_time={$modified_time->to64()}" ;
 
-        if ($begin_time) $opt .= ", begin_time={$begin_time->to64()}" ;
-        if ($end_time)   $opt .= ", end_time={$end_time->to64()}" ;
-        if ($notes)      $opt .= ", notes='".$this->escape_string($notes)."'" ;
+        if ($begin_time)      $opt .= ", begin_time={$begin_time->to64()}" ;
+        if ($end_time)        $opt .= ", end_time={$end_time->to64()}" ;
+        if (!is_null($notes)) $opt .= ", notes='".$this->escape_string($notes)."'" ;
 
         $sql = "UPDATE {$this->database}.shift SET {$opt} WHERE id={$shift->id()}" ;
         $this->query($sql) ;
+
+        if ($begin_time      && !$begin_time->equal($shift->begin_time())) $this->add_modify_shift_event ($shift->id(), $modified_time, 'begin_time', $shift->begin_time()->toStringShort(), $begin_time->toStringShort()) ;
+        if ($end_time        && !$end_time  ->equal($shift->end_time()))   $this->add_modify_shift_event ($shift->id(), $modified_time, 'end_time',   $shift->end_time()  ->toStringShort(), $end_time->toStringShort()) ;
+        if (!is_null($notes) && $notes           != $shift->notes())       $this->add_modify_shift_event ($shift->id(), $modified_time, 'notes',      $shift->notes(),                       $notes) ;
 
         // The updated version of the shift
 
         $shift = $this->find_shift_by_id($id) ;
 
         if ($areas) {
+            $old_areas = $shift->areas() ;
             foreach ($areas as $area_name => $area) {
                 $area_name_escaped = $this->escape_string($area_name) ;
                 $opt = ' problems='.($area->problems ? 1 : 0).', downtime_min='.intval($area->downtime_min).", comments='".$this->escape_string($area->comments)."'" ;
                 $sql = "UPDATE {$this->database}.shift_area_evaluation SET {$opt} WHERE shift_id={$shift->id()} AND name='{$area_name_escaped}'" ;
                 $this->query($sql) ;
+                $old_area = $old_areas[$area_name] ;
+                if ($old_area->problems()     != $area->problems)     $this->add_modify_area_event($old_area->id(), $modified_time, 'problems',     $old_area->problems(),     $area->problems) ;
+                if ($old_area->downtime_min() != $area->downtime_min) $this->add_modify_area_event($old_area->id(), $modified_time, 'downtime_min', $old_area->downtime_min(), $area->downtime_min) ;
+                if ($old_area->comments()     != $area->comments)     $this->add_modify_area_event($old_area->id(), $modified_time, 'comments',     $old_area->comments(),     $area->comments) ;
             }
         }
         if ($allocations) {
-            function update_allocation ($shiftmgr, $shift, $allocation_name, $allocation) {
+            $old_allocations = $shift->allocations() ;
+
+            function update_allocation ($shiftmgr, $shift, $allocation_name, $modified_time, $old_allocation, $allocation) {
                 $allocation_name_escaped = $shiftmgr->escape_string($allocation_name) ;
                 $duration_min = intval($allocation->duration_min) ;
                 $opt = '  duration_min='.$duration_min.", comments='".$shiftmgr->escape_string($allocation->comments)."'" ;
                 $sql = "UPDATE {$shiftmgr->database}.shift_time_allocation SET {$opt} WHERE shift_id={$shift->id()} AND name='{$allocation_name_escaped}'" ;
                 $shiftmgr->query($sql) ;
+                if ($old_allocation->duration_min() != $allocation->duration_min) $shiftmgr->add_modify_time_event($old_allocation->id(), $modified_time, 'duration_min', $old_allocation->duration_min(), $allocation->duration_min) ;
+                if ($old_allocation->comments()     != $allocation->comments)     $shiftmgr->add_modify_time_event($old_allocation->id(), $modified_time, 'comments',     $old_allocation->comments(),     $allocation->comments) ;
             }
 
             $ival = new LusiInterval($shift->begin_time(), $shift->end_time()) ;
@@ -301,17 +347,16 @@ INSERT INTO shiftmgr.shift_time_allocation (shift_id,name,duration_min,comments)
 
             foreach ($allocations as $allocation_name => $allocation) {
                 if ($allocation_name != 'other') {
-                    update_allocation($this, $shift, $allocation_name, $allocation) ;
+                    update_allocation($this, $shift, $allocation_name, $modified_time, $old_allocations[$allocation_name], $allocation) ;
                     $allocations->other->duration_min -= $allocation->duration_min ;
                 }
             }
             if ($allocations->other->duration_min < 0) $allocations->other->duration_min = 0 ;
 
-            update_allocation($this, $shift, 'other', $allocations->other) ;
+            update_allocation($this, $shift, 'other', $modified_time, $old_allocations['other'], $allocations->other) ;
         }
         return $this->find_shift_by_id($id) ;
     }
-    
     public function delete_shift_by_id ($id) {
 
         $shift = $this->find_shift_by_id($id) ;
@@ -319,6 +364,165 @@ INSERT INTO shiftmgr.shift_time_allocation (shift_id,name,duration_min,comments)
 
         $sql = "DELETE FROM {$this->database}.shift WHERE id={$shift->id()}" ;
         $this->query($sql) ;
+    }
+    private function add_create_shift_event ($shift_id) {
+        $modified_uid_escaped = $this->escape_string(AuthDB::instance()->authName()) ;
+        $modified_time        = LusiTime::now() ;
+
+        $sql = "INSERT INTO {$this->database}.shift_history VALUES(NULL,{$shift_id},'{$modified_uid_escaped}',{$modified_time->to64()},'CREATE','','','')" ;
+        $this->query($sql) ;
+    }
+    private function add_modify_shift_event ($shift_id, $modified_time, $parameter, $old_value, $new_value) {
+        $modified_uid_escaped = $this->escape_string(AuthDB::instance()->authName()) ;
+        $parameter_escaped    = $this->escape_string($parameter) ;
+        $old_value_escaped    = $this->escape_string($old_value) ;
+        $new_value_escaped    = $this->escape_string($new_value) ;
+
+        $sql = "INSERT INTO {$this->database}.shift_history VALUES(NULL,{$shift_id},'{$modified_uid_escaped}',{$modified_time->to64()},'MODIFY','{$parameter_escaped}','{$old_value_escaped}','{$new_value_escaped}')" ;
+        $this->query($sql) ;
+    }
+    private function add_modify_area_event($area_id, $modified_time, $parameter, $old_value, $new_value) {
+        $modified_uid_escaped = $this->escape_string(AuthDB::instance()->authName()) ;
+        $parameter_escaped    = $this->escape_string($parameter) ;
+        $old_value_escaped    = $this->escape_string($old_value) ;
+        $new_value_escaped    = $this->escape_string($new_value) ;
+
+        $sql = "INSERT INTO {$this->database}.shift_area_history VALUES(NULL,{$area_id},'{$modified_uid_escaped}',{$modified_time->to64()},'{$parameter_escaped}','{$old_value_escaped}','{$new_value_escaped}')" ;
+        $this->query($sql) ;
+    }
+    public function add_modify_time_event($time_id, $modified_time, $parameter, $old_value, $new_value) {
+        $modified_uid_escaped = $this->escape_string(AuthDB::instance()->authName()) ;
+        $parameter_escaped    = $this->escape_string($parameter) ;
+        $old_value_escaped    = $this->escape_string($old_value) ;
+        $new_value_escaped    = $this->escape_string($new_value) ;
+
+        $sql = "INSERT INTO {$this->database}.shift_time_history VALUES(NULL,{$time_id},'{$modified_uid_escaped}',{$modified_time->to64()},'{$parameter_escaped}','{$old_value_escaped}','{$new_value_escaped}')" ;
+        $this->query($sql) ;
+    }
+
+    public function history ($instr_name=null, $begin_time=null, $end_time=null, $since_time=null) {
+
+        $history = array();
+
+        $instr_opt = $instr_name ? "instr_name='".$this->escape_string(strtoupper(trim($instr_name)))."'" : '' ;
+
+        if (($begin_time && $end_time) && !$begin_time->less($end_time))
+            throw new ShiftMgrException (
+                __class__.'::'.__METHOD__ ,
+                "the begin time of the interval must be strictly less than the end one") ;
+
+        $begin_time_opt = $begin_time ? " modified_time >= {$begin_time->to64()}" : '' ;
+        $end_time_opt   = $end_time   ? " modified_time <  {$end_time->to64()}"   : '' ;
+        $since_time_opt = $since_time ? " modified_time >= {$since_time->to64()}" : '' ;
+
+        // Fetch events for shifts
+
+        $opt = '' ;
+        if ($instr_opt)      $opt = "WHERE shift_id IN (SELECT id FROM {$this->database}.shift WHERE {$instr_opt}) " ;
+        if ($begin_time_opt) $opt .= ($opt ? ' AND ' : 'WHERE ').$begin_time_opt ;
+        if ($end_time_opt)   $opt .= ($opt ? ' AND ' : 'WHERE ').$end_time_opt ;
+        if ($since_time_opt) $opt .= ($opt ? ' AND ' : 'WHERE ').$since_time_opt ;
+
+        $shifts = array() ;     // shifts cached by their identifiers
+
+        $sql = "SELECT * FROM {$this->database}.shift_history {$opt} ORDER BY modified_time DESC" ;
+
+        $result = $this->query($sql) ;
+        for ($i = 0, $nrows = mysql_numrows($result) ; $i < $nrows; $i++) {
+            $attr = mysql_fetch_array($result, MYSQL_ASSOC) ;
+            $shift_id = intval($attr['shift_id']) ;
+            $shift = null ;
+            if (array_key_exists($shift_id, $shifts)) {
+                $shift = $shifts[$shift_id] ;
+            } else {
+                $shift = $this->find_shift_by_id($shift_id) ;
+                if (!$shift)
+                    throw new ShiftMgrException (
+                        __class__.'::'.__METHOD__ ,
+                        "the shift with id={$shift_id} no longer exists inthe database") ;
+                $shifts[$shift->id()] = $shift ;
+            }
+            array_push (
+                $history ,
+                new ShiftHistoryEvent (
+                    $shift ,    // shift-specific informaton willbe extracted from here
+                    'SHIFT' ,   // scope
+                    '' ,        // scope2
+                    $attr       // event-specific information will be extracted from here
+                )
+            ) ;
+        }
+
+        // Fetch events for areas & time allocations
+
+        $opt = '' ;
+        if ($instr_opt)      $opt = "WHERE area_id IN (SELECT id FROM {$this->database}.shift_area_evaluation WHERE shift_id IN (SELECT id FROM {$this->database}.shift WHERE {$instr_opt})) " ;
+        if ($begin_time_opt) $opt .= ($opt ? ' AND ' : 'WHERE ').$begin_time_opt ;
+        if ($end_time_opt)   $opt .= ($opt ? ' AND ' : 'WHERE ').$end_time_opt ;
+        if ($since_time_opt) $opt .= ($opt ? ' AND ' : 'WHERE ').$since_time_opt ;
+
+        $areas = array() ;     // areas cached by their identifiers
+
+        $result = $this->query("SELECT * FROM {$this->database}.shift_area_history {$opt} ORDER BY modified_time DESC") ;
+        for ($i = 0, $nrows = mysql_numrows($result) ; $i < $nrows; $i++) {
+            $attr = mysql_fetch_array($result, MYSQL_ASSOC) ;
+            $area_id = intval($attr['area_id']) ;
+            $area = null ;
+            if (array_key_exists($area_id, $areas)) {
+                $area = $areas[$area_id] ;
+            } else {
+                $area = $this->find_shift_area_by_id($area_id) ;
+                if (!$area)
+                    throw new ShiftMgrException (
+                        __class__.'::'.__METHOD__ ,
+                        "the shift area with id={$area_id} no longer exists inthe database") ;
+                $areas[$area->id()] = $area ;
+            }
+            array_push (
+                $history ,
+                new ShiftHistoryEvent (
+                    $area->shift() ,    // shift-specific informaton willbe extracted from here
+                    'AREA' ,            // scope
+                    $area->name() ,     // scope2
+                    $attr               // event-specific information will be extracted from here
+                )
+            ) ;
+        }
+
+        $opt = '' ;
+        if ($instr_opt)      $opt = "WHERE time_id IN (SELECT id FROM {$this->database}.shift_time_allocation WHERE shift_id IN (SELECT id FROM {$this->database}.shift WHERE {$instr_opt})) " ;
+        if ($begin_time_opt) $opt .= ($opt ? ' AND ' : 'WHERE ').$begin_time_opt ;
+        if ($end_time_opt)   $opt .= ($opt ? ' AND ' : 'WHERE ').$end_time_opt ;
+        if ($since_time_opt) $opt .= ($opt ? ' AND ' : 'WHERE ').$since_time_opt ;
+
+        $times = array() ;     // times cached by their identifiers
+
+        $result = $this->query("SELECT * FROM {$this->database}.shift_time_history {$opt} ORDER BY modified_time DESC") ;
+        for ($i = 0, $nrows = mysql_numrows($result) ; $i < $nrows; $i++) {
+            $attr = mysql_fetch_array($result, MYSQL_ASSOC) ;
+            $time_id = intval($attr['time_id']) ;
+            $time = null ;
+            if (array_key_exists($time_id, $times)) {
+                $time = $times[$time_id] ;
+            } else {
+                $time = $this->find_shift_time_by_id($time_id) ;
+                if (!$time)
+                    throw new ShiftMgrException (
+                        __class__.'::'.__METHOD__ ,
+                        "the shift time allocation with id={$time_id} no longer exists inthe database") ;
+                $times[$time->id()] = $time ;
+            }
+            array_push (
+                $history ,
+                new ShiftHistoryEvent (
+                    $time->shift() ,    // shift-specific informaton willbe extracted from here
+                    'TIME' ,            // scope
+                    $time->name() ,     // scope2
+                    $attr               // event-specific information will be extracted from here
+                )
+            ) ;
+        }
+        return $history ;
     }
 }
 

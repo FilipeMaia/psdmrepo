@@ -11,7 +11,7 @@ use LusiTime\LusiInterval ;
 use DataPortal\ExpTimeMon ;
 
 /**
- * Class ShiftMgrShift is an abstraction for shifts.
+ * Class Shift is an abstraction for shifts.
  *
  * @author gapon
  */
@@ -94,15 +94,10 @@ class Shift {
     
     public function areas () {
         $areas = array() ;
-        $sql = "SELECT * FROM {$this->shiftmgr()->database}.shift_area_evaluation WHERE shift_id={$this->id()}" ;
-        $result = $this->shiftmgr()->query($sql) ;
+        $result = $this->shiftmgr()->query("SELECT * FROM {$this->shiftmgr()->database}.shift_area_evaluation WHERE shift_id={$this->id()}") ;
         for ($i = 0, $nrows = mysql_numrows($result) ; $i < $nrows; $i++) {
             $attr = mysql_fetch_array($result, MYSQL_ASSOC) ;
-            $areas[trim($attr['name'])] = array (
-                'problems'     => $attr['problems'] ? 1 : 0 ,
-                'downtime_min' => intval($attr['downtime_min']) ,
-                'comments'     => $attr['comments']
-            ) ;
+            $areas[trim($attr['name'])] = new ShiftAreaEvaluation($this, $attr) ;
         }
         return $areas ;
     }
@@ -111,16 +106,39 @@ class Shift {
 
     public function allocations () {
         $allocations = array() ;
-        $sql = "SELECT * FROM {$this->shiftmgr()->database}.shift_time_allocation WHERE shift_id={$this->id()}" ;
-        $result = $this->shiftmgr()->query($sql) ;
+        $result = $this->shiftmgr()->query("SELECT * FROM {$this->shiftmgr()->database}.shift_time_allocation WHERE shift_id={$this->id()}") ;
         for ($i = 0, $nrows = mysql_numrows($result) ; $i < $nrows; $i++) {
             $attr = mysql_fetch_array($result, MYSQL_ASSOC) ;
-            $allocations[trim($attr['name'])] = array (
-                'duration_min' => intval($attr['duration_min']) ,
-                'comments'     => $attr['comments']
-            ) ;
+            $allocations[trim($attr['name'])] = new ShiftTimeAllocation($this, $attr) ;
         }
         return $allocations ;
+    }
+    
+    /**
+     * Return all history events in a scope of this shift, its areas and time allocations
+     * 
+     * NOTE: The elements will be unsorted.
+     *
+     * @return array(ShiftHistoryEvent)
+     */
+    public function history () {
+        $history = array();
+        $result = $this->shiftmgr()->query("SELECT * FROM {$this->shiftmgr()->database}.shift_history WHERE shift_id={$this->id()} ORDER BY modified_time DESC") ;
+        for ($i = 0, $nrows = mysql_numrows($result) ; $i < $nrows; $i++) {
+            $attr = mysql_fetch_array($result, MYSQL_ASSOC) ;
+            array_push (
+                $history ,
+                new ShiftHistoryEvent (
+                    $this ,             // shift-specific informaton willbe extracted from here
+                    'SHIFT' ,           // scope
+                    '' ,                // scope2
+                    $attr               // event-specific information will be extracted from here
+                )
+            ) ;
+        }
+        foreach ($this->areas()       as $name => $a) $history = array_merge ($history, $a->history()) ;
+        foreach ($this->allocations() as $name => $a) $history = array_merge ($history, $a->history()) ;
+        return $history ;
     }
 }
 ?>

@@ -4,7 +4,8 @@
 .new-shift-vis {
   display: block;
 }
-#shifts-search-info {
+#shifts-search-info ,
+#shifts-history-info {
   color: maroon;
 }
 #shifts-search-header {
@@ -82,12 +83,12 @@ div.shift-hdr:hover {
 .shift-stopper {
   float: left;
   margin-left: 10px;
-  width: 70px;
+  width: 50px;
 }
 .shift-door {
   float: left;
   margin-left: 10px;
-  width: 50px;
+  width: 40px;
   border-right: 1px solid #000000;
 }
 .shift-area-first {
@@ -95,12 +96,12 @@ div.shift-hdr:hover {
   margin-left: 20px;
   width: 40px;
 }
-.shift-area {
+div.shift-area {
   float: left;
   margin-left: 5px;
   width: 40px;
 }
-.shift-area-last {
+div.shift-area-last {
   float: left;
   margin-left: 5px;
   width: 50px;
@@ -117,19 +118,19 @@ div.shift-hdr:hover {
   margin-left: 10px;
   width: 140px;
 }
-div.status_red {
+div.status-red {
   margin-top: 3px;
   width: 10px;
   height: 10px;
   background-color: crimson;
 }
-div.status_green {
+div.status-green {
   margin-top: 3px;
   width: 10px;
   height: 10px;
   background-color: darkseagreen;
 }
-div.status_neutral {
+div.status-neutral {
   margin-top: 3px;
   width: 8px;
   height: 8px;
@@ -214,7 +215,8 @@ div.comment pre {
 }
 
 div.shift-area-evaluation-con,
-div.shift-time-allocation-con {
+div.shift-time-allocation-con,
+div.shift-history-con {
   font-size: 11px;
   border: solid 1px #b0b0b0;
   padding: 25px;
@@ -222,7 +224,7 @@ div.shift-time-allocation-con {
   padding-bottom: 20px;
 }
 
-a.tab_hdr[data]:hover:after {
+a.tab-hdr[data]:hover:after {
   content: attr(data);
   padding: 8px;
   color: #000000;
@@ -254,3 +256,11 @@ textarea.annotated[data]:hover:after {
   font-weight: normal;
   font-size: 11px;
 }
+#shifts-history-display {
+  margin-top: 10px;
+}
+/*
+.shift-history-con {
+  padding: 10px 5px 5px 5px;
+}
+*/

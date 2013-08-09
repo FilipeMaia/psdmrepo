@@ -1,3 +1,8 @@
+function SafeCounter() {
+    this.counter = 0 ;
+    this.plus  = function () { this.counter++ ; } ;
+    this.minus = function() { if (this.counter > 0) this.counter-- ; } ;
+}
 function Reports (instr_name, can_edit) {
     FwkDispatcherBase.call(this) ;
     this.instr_name = instr_name ;
@@ -6,42 +11,72 @@ function Reports (instr_name, can_edit) {
 define_class (Reports, FwkDispatcherBase, {}, {
 
     is_initialized : false ,
-    num_editings : 0 ,
-    num_open: 0 ,
+
+    shifts : [] ,
+
+    num_editings : function () {
+        var num = 0 ;
+        if (this.shifts)
+            for (var i in this.shifts)
+                if (this.shifts[i].editing) num++ ;
+        return num ;
+    } ,
+
+    num_open: function () {
+        var num = 0 ;
+        if (this.shifts)
+            for (var i in this.shifts)
+                if (this.shifts[i].is_open) num++ ;
+        return num ;
+    } ,
+
+    num_loads_in_progress: new SafeCounter () ,
 
     update_allowed : function () {
-        return this.is_initialized && !this.num_editings && !this.num_open;
+        if (!this.active || !this.is_initialized) return false ;
+        var num_blocking_activities =
+            this.num_editings() +
+            this.num_open() +
+            this.num_loads_in_progress.counter ;
+        if (num_blocking_activities > 0) return false ;
+        return true ;
     } ,
 
     on_activate : function() {
-//        this.init() ;
-//        if (this.active && this.update_allowed()) this.search() ;
-//        return ;
         this.on_update() ;
     } ,
 
     on_deactivate : function() {
     } ,
 
-    on_update : function (sec) {
-//        return ;
+    on_update : function () {
         this.init() ;
-        if (this.active && this.update_allowed()) this.search() ;
+        if (this.update_allowed()) {
+            this.search() ;
+        }/* else {
+            this.search_info_elem.html (
+                'now: '+Fwk.now().sec +
+                'active: '+this.active +
+                ', is_initialized: '+this.is_initialized +
+                ', num_editings: '+this.num_editings() +
+                ', num_open: '+this.num_open() +
+                ', num_loads_in_progress: '+this.num_loads_in_progress.counter) ;
+        }*/
     } ,
 
     init : function () {
 
+        var that = this ;
+
         if (this.is_initialized) return ;
         this.is_initialized = true ;
-
-        var that = this ;
 
         var ctrl_elem = this.container.find('#shifts-search-controls') ;
 
         this.ctrl_range_elem       = ctrl_elem.find('select[name="range"]') ;
         this.ctrl_begin_elem       = ctrl_elem.find('input[name="begin"]') ;
         this.ctrl_end_elem         = ctrl_elem.find('input[name="end"]') ;
-        this.ctrl_display_all_elem = ctrl_elem.find('input[name="display_all"]') ;
+        this.ctrl_display_all_elem = ctrl_elem.find('input[name="display-all"]') ;
 
         this.ctrl_begin_elem.datepicker().datepicker('option', 'dateFormat', 'yy-mm-dd') ;
         this.ctrl_end_elem.datepicker().datepicker('option', 'dateFormat', 'yy-mm-dd') ;
@@ -92,27 +127,27 @@ define_class (Reports, FwkDispatcherBase, {}, {
         var that = this ;
 
         var new_shift_ctrl_elem = this.container.find('#new-shift-controls') ;
-        var new_shift           = new_shift_ctrl_elem.find('button[name="new_shift"]').button() ;
+        var new_shift           = new_shift_ctrl_elem.find('button[name="new-shift"]').button() ;
         var new_shift_save      = new_shift_ctrl_elem.find('button[name="save"]').button() ;
         var new_shift_cancel    = new_shift_ctrl_elem.find('button[name="cancel"]').button() ;
         var new_shift_con      = new_shift_ctrl_elem.find('#new-shift-con') ;
 
-        var new_shift_begin_day_elem = new_shift_con.find('input[name="begin_day"]') ;
+        var new_shift_begin_day_elem = new_shift_con.find('input[name="begin-day"]') ;
         new_shift_begin_day_elem.datepicker().datepicker('option', 'dateFormat', 'yy-mm-dd').val($.datepicker.formatDate('yy-mm-dd', new Date())) ;
 
-        var new_shift_begin_h_elem = new_shift_con.find('input[name="begin_h"]') ;
+        var new_shift_begin_h_elem = new_shift_con.find('input[name="begin-h"]') ;
         new_shift_begin_h_elem.val('09') ;
 
-        var new_shift_begin_m_elem = new_shift_con.find('input[name="begin_m"]') ;
+        var new_shift_begin_m_elem = new_shift_con.find('input[name="begin-m"]') ;
         new_shift_begin_m_elem.val('00') ;
 
-        var new_shift_end_day_elem = new_shift_con.find('input[name="end_day"]') ;
+        var new_shift_end_day_elem = new_shift_con.find('input[name="end-day"]') ;
         new_shift_end_day_elem.datepicker().datepicker('option', 'dateFormat', 'yy-mm-dd').val($.datepicker.formatDate('yy-mm-dd', new Date())) ;
 
-        var new_shift_end_h_elem = new_shift_con.find('input[name="end_h"]') ;
+        var new_shift_end_h_elem = new_shift_con.find('input[name="end-h"]') ;
         new_shift_end_h_elem.val('21') ;
 
-        var new_shift_end_m_elem = new_shift_con.find('input[name="end_m"]') ;
+        var new_shift_end_m_elem = new_shift_con.find('input[name="end-m"]') ;
         new_shift_end_m_elem.val('00') ;
 
         new_shift.click(function () {
@@ -140,8 +175,8 @@ define_class (Reports, FwkDispatcherBase, {}, {
                     that.shifts = shifts ;
                     that.display() ;
                     that.ctrl_range_elem.val('range') ;
-                    that.ctrl_begin_elem.removeAttr('disabled').val(begin_day+' 00:00:00') ;
-                    that.ctrl_end_elem  .removeAttr('disabled').val(end_day  +' 23:59:59') ;
+                    that.ctrl_begin_elem.removeAttr('disabled').val(begin_day) ;
+                    that.ctrl_end_elem  .removeAttr('disabled').val(end_day) ;
                     new_shift.button('enable') ;
                     new_shift_con.removeClass('new-shift-vis').addClass('new-shift-hdn') ;
                 } ,
@@ -159,11 +194,9 @@ define_class (Reports, FwkDispatcherBase, {}, {
         }) ;
     } ,
 
-    shifts : [] ,
-
     search : function () {
 
-        if (this.num_editings) return ;
+        this.init() ;
 
         var that = this ;
         var range = this.ctrl_range_elem.val() ;
@@ -176,7 +209,6 @@ define_class (Reports, FwkDispatcherBase, {}, {
             params.begin = that.ctrl_begin_elem.val() ;
             params.end   = that.ctrl_end_elem.val() ;
         }
-        this.search_info_elem.html('Searching') ;
         this.shifts_service (
             '../shiftmgr/ws/shifts_get.php', 'GET', params ,
             function (shifts) {
@@ -186,7 +218,43 @@ define_class (Reports, FwkDispatcherBase, {}, {
         ) ;
     } ,
 
+    search_shift_by_id : function(id) {
+
+        this.init() ;
+
+        var that = this ;
+        that.shifts_service (
+            '../shiftmgr/ws/shifts_get.php' ,
+            'GET' ,
+            { shift_id : id } ,
+            function (shifts) {
+
+                // Assuming a single shift
+
+                that.shifts = shifts ;
+                that.display() ;
+                that.shift_toggle(0) ;
+
+                // Re-adjust visible search criteria to be compatible with teh found
+                // shift.
+
+                var shift = that.shifts[0] ;
+                var begin_day = shift.begin.day ;
+                var end_day   = shift.end.day ;
+                that.ctrl_range_elem.val('range') ;
+                that.ctrl_begin_elem.removeAttr('disabled').val(begin_day) ;
+                that.ctrl_end_elem  .removeAttr('disabled').val(end_day) ;
+                that.ctrl_display_all_elem.attr('checked', 'checked') ;
+            } ,
+            function () {
+                alert('Shift search failed for shift ID '+id) ;
+            }
+        ) ;
+    } ,
+
     shifts_service: function (url, type, params, when_done, on_error) {
+
+        this.num_loads_in_progress.plus() ;
 
         var that = this ;
 
@@ -195,14 +263,19 @@ define_class (Reports, FwkDispatcherBase, {}, {
             url:  url ,
             data: params ,
             success: function (result) {
+                that.num_loads_in_progress.minus() ;
                 if(result.status !== 'success') {
                     Fwk.report_error(result.message) ;
                     if (on_error) on_error() ;
                     return ;
                 }
-                if (when_done) when_done(result.shifts) ;
+                if (when_done) {
+                    that.search_info_elem.html('[ Last update: '+result.updated+' ]') ;
+                    when_done(result.shifts) ;
+                }
             } ,
             error: function () {
+                that.num_loads_in_progress.minus() ;
                 Fwk.report_error('shift service is not available for instrument: '+that.inst_name) ;
                 if (on_error) on_error() ;
             } ,
@@ -220,10 +293,7 @@ define_class (Reports, FwkDispatcherBase, {}, {
             html += this.shift2html(idx);
             total++;
         }
-        var info_html = '<b>'+total+'</b> shift'+(total==1?'':'s');
-        this.search_info_elem.html(info_html) ;
         this.search_list_elem.html(html);
-
         this.search_list_elem.find('div.shift-hdr').click(function () {
             var idx = this.id ;
             that.shift_toggle(idx) ;
@@ -270,7 +340,7 @@ define_class (Reports, FwkDispatcherBase, {}, {
             else if (area_name === 'OTHR') classes += '-last' ;
             classes += ' '+area_name ;
             html +=
-'  <div class="'+classes+'" ><div class="status_'+(shift.area[area_name].problems ?'red':'neutral')+'"></div></div>' ;
+'  <div class="'+classes+'" ><div class="status-'+(shift.area[area_name].problems ?'red':'neutral')+'"></div></div>' ;
         }
         html +=
 '  <div class="shift-editor"   >&nbsp;'+shift.editor  +'</div>' +
@@ -290,6 +360,7 @@ define_class (Reports, FwkDispatcherBase, {}, {
             if (!shift.is_initialized) {
                 shift.is_initialized = true ;
                 shift.editing = false ;
+                shift.is_open = false ;
 
                 var stopper_h = Math.floor(shift.stopper_min / 60) ;
                 var stopper_m = shift.stopper_min % 60 ;
@@ -312,33 +383,33 @@ define_class (Reports, FwkDispatcherBase, {}, {
 '        <td class="annotated shift-grid-hdr " valign="center" data="This is the nominal start data & time of the shift" >Begin:</td>' +
 '        <td class="shift-grid-val " valign="center" >' +
 '          <div class="viewer" >' +
-'            <span name="begin_day" ></span>' +
-'            <span name="begin_hm" style="font-weight: bold; padding-left:10px;" ></span>' +
+'            <span name="begin-day" ></span>' +
+'            <span name="begin-hm" style="font-weight: bold; padding-left:10px;" ></span>' +
 '          </div>' +
 '          <div class="editor" >' +
-'            <input name="begin_day" type="text" size=10 />' +
-'            <input name="begin_h"   type="text" size=2 />' +
-'            <input name="begin_m"   type="text" size=2 />' +
+'            <input name="begin-day" type="text" size=10 />' +
+'            <input name="begin-h"   type="text" size=2 />' +
+'            <input name="begin-m"   type="text" size=2 />' +
 '          </div></td>' +
 '        <td class="annotated shift-grid-hdr " valign="center" data="This is the integrated time that the stopper is out\n during the shift" >Stopper Out:</td>' +
-'        <td class="shift-grid-val " valign="center" ><span name="stopper_hm">'+stopper_hm+'</span></td>' +
-'        <td class="shift-grid-val " valign="center" ><span name="stopper_percent">( '+stopper_percent+' % )</span></td>' +
+'        <td class="shift-grid-val " valign="center" ><span name="stopper-hm">'+stopper_hm+'</span></td>' +
+'        <td class="shift-grid-val " valign="center" ><span name="stopper-percent">( '+stopper_percent+' % )</span></td>' +
 '      </tr>' +
 '      <tr class="shift-active-row">' +
 '        <td class="annotated shift-grid-hdr " valign="center" data="This should default to 12 hours after the Start Shift time,\n but it should also be editable for special circumstances.\n This will be used to determine the overall shift duration\n which is an important number in the shift usage section." >End:</td>' +
 '        <td class="shift-grid-val " valign="center" >' +
 '          <div class="viewer" >' +
-'            <span name="end_day" ></span>' +
-'            <span name="end_hm" style="font-weight: bold; padding-left:10px;" ></span>' +
+'            <span name="end-day" ></span>' +
+'            <span name="end-hm" style="font-weight: bold; padding-left:10px;" ></span>' +
 '          </div>' +
 '          <div class="editor" >' +
-'            <input name="end_day" type="text" size=10 />' +
-'            <input name="end_h"   type="text" size=2  />' +
-'            <input name="end_m"   type="text" size=2  />' +
+'            <input name="end-day" type="text" size=10 />' +
+'            <input name="end-h"   type="text" size=2  />' +
+'            <input name="end-m"   type="text" size=2  />' +
 '          </div></td>' +
 '        <td class="annotated shift-grid-hdr " valign="center" data="This is the integrated time that the hutch door is open" >Door Open:</td>' +
-'        <td class="shift-grid-val " valign="center" ><span name="door_hm">'+door_open_hm+'</span></td>' +
-'        <td class="shift-grid-val " valign="center" ><span name="door_percent">( '+door_open_percent+' % )</span></td>' +
+'        <td class="shift-grid-val " valign="center" ><span name="door-hm">'+door_open_hm+'</span></td>' +
+'        <td class="shift-grid-val " valign="center" ><span name="door-percent">( '+door_open_percent+' % )</span></td>' +
 '      </tr>' +
 '      <tr class="shift-active-row">' +
 '        <td class="annotated shift-grid-hdr " valign="center" data="general notes on the shift" >Notes:</td>' +
@@ -361,6 +432,9 @@ define_class (Reports, FwkDispatcherBase, {}, {
 'data will generate the best science.   For example, if it is found that extensive\n' +
 'time is spent on alignment it may be decided that time and effort should be\n' +
 'directed toward improved alignment software and feedback systems.';
+                var history_title_data =
+'This panel is for information purposes only. It will display the known\n' +
+'history of modifications made to the shift.' ;
                 if (this.can_edit)
                     html +=
 '    <button class="annotated" name="edit"   data="Switch to the editing mode" style="color:red; font-weight:bold;" >Edit</button>' +
@@ -379,10 +453,11 @@ define_class (Reports, FwkDispatcherBase, {}, {
 
 '  <div id="tabs" style="font-size:12px; margin-top:20px;">' +
 '    <ul>' +
-'      <li><a class="tab_hdr" href="#area_evaluation_'+idx+'" data="'+area_title_data      +'" >Area Evaluation</a></li>' +
-'      <li><a class="tab_hdr" href="#time_allocation_'+idx+'" data="'+allocation_title_data+'" >Time Use Allocation</a></li>' +
+'      <li><a class="tab-hdr" href="#area-evaluation-'+idx+'" data="'+area_title_data      +'" >Area Evaluation</a></li>' +
+'      <li><a class="tab-hdr" href="#time-allocation-'+idx+'" data="'+allocation_title_data+'" >Time Use Allocation</a></li>' +
+'      <li><a class="tab-hdr" href="#history-'        +idx+'" data="'+history_title_data   +'" >Shift History</a></li>' +
 '    </ul>' +
-'    <div id="area_evaluation_'+idx+'" >' +
+'    <div id="area-evaluation-'+idx+'" >' +
 '      <div class="shift-area-evaluation-con" >' +
 '        <table><tbody>' +
 '          <tr>' +
@@ -404,7 +479,7 @@ define_class (Reports, FwkDispatcherBase, {}, {
 '              <input class="editor flag" name="'+area_name+'" type="checkbox" /></td>' +
 '            <td class="'+classes+' " valign="top">'+
 '              <div class="viewer">' +
-'                <span class="hour_minute" name="'+area_name+'" ></span>' +
+'                <span class="hour-minute" name="'+area_name+'" ></span>' +
 '              </div>' +
 '              <div class="editor">'+
 '                <input class="annotated hour"   name="'+area_name+'" type="text" size=1 data="hours: 0.." />' +
@@ -422,13 +497,13 @@ define_class (Reports, FwkDispatcherBase, {}, {
 '          <tr>' +
 '            <td class="shift-table-tot "                valign="top">Total</td>' +
 '            <td class="shift-table-tot "                valign="top">&nbsp;</td>' +
-'            <td class="shift-table-tot "                valign="top"><span class="hour_minute" name="area"></td>' +
+'            <td class="shift-table-tot "                valign="top"><span class="hour-minute" name="area"></td>' +
 '            <td class="shift-table-tot "                valign="top">&nbsp;</td>' +
 '          </tr>' +
 '        </tbody></table>' +
 '      </div>' +
 '    </div>' +
-'    <div id="time_allocation_'+idx+'" >' +
+'    <div id="time-allocation-'+idx+'" >' +
 '      <div class="shift-time-allocation-con" >' +
 '        <table><tbody>' +
 '          <tr>' +
@@ -449,12 +524,12 @@ define_class (Reports, FwkDispatcherBase, {}, {
                     if (allocation_name === 'other') {
                         html +=
 '              <div>' +
-'                <span class="hour_minute" name="'+allocation_name+'" ></span>' +
+'                <span class="hour-minute" name="'+allocation_name+'" ></span>' +
 '              </div></td>' ;
                     } else {
                         html +=
 '              <div class="viewer">' +
-'                <span class="hour_minute" name="'+allocation_name+'" ></span>' +
+'                <span class="hour-minute" name="'+allocation_name+'" ></span>' +
 '              </div>' +
 '              <div class="editor">' +
 '                <input class="annotated hour"   name="'+allocation_name+'" type="text" size=1 data="hours: 0.." />' +
@@ -478,16 +553,27 @@ define_class (Reports, FwkDispatcherBase, {}, {
 '        </tbody></table>' +
 '      </div>' +
 '    </div>' +
+'    <div id="history-'+idx+'" >' +
+'      <div class="shift-history-con" >' +
+'        Loading...' +
+'      </div>' +
+'    </div>' +
 '  </div>' +
 '</div>' ;
                 con.html(html) ;
-                con.find('div#tabs').tabs() ;
+                con.find('div#tabs').tabs({
+                    activate: function( event, ui ) {
+                        if (ui.newPanel.attr('id') === 'history-'+idx) {
+                            that.shift_load_history(idx) ;
+                        }
+                    }
+                }) ;
                 this.shift_register_handlers(idx) ;
                 this.shift_view(idx) ;
             }
             tgl.removeClass('ui-icon-triangle-1-e').addClass('ui-icon-triangle-1-s') ;
             con.removeClass('shift-hdn').addClass('shift-vis' ) ;
-            this.num_open++ ;
+            shift.is_open = true ;
         } else {
             if (shift.editing) {
                 Fwk.ask_yes_no (
@@ -497,13 +583,13 @@ define_class (Reports, FwkDispatcherBase, {}, {
                         that.shift_edit_cancel(idx) ;
                         tgl.removeClass('ui-icon-triangle-1-s').addClass('ui-icon-triangle-1-e') ;
                         con.removeClass('shift-vis').addClass('shift-hdn') ;
-                        that.num_open-- ;
+                        shift.is_open = false ;
                     }
                 ) ; 
             } else {
                 tgl.removeClass('ui-icon-triangle-1-s').addClass('ui-icon-triangle-1-e') ;
                 con.removeClass('shift-vis').addClass('shift-hdn') ;
-                this.num_open-- ;
+                shift.is_open = false ;
             }
         }
     } ,
@@ -525,7 +611,7 @@ define_class (Reports, FwkDispatcherBase, {}, {
             alert('The total amount of time reported in all areas can not exceeds the duration of the shift.') ;
             return false ;
         }
-        con.find('span.hour_minute[name="area"]').text(Fwk.zeroPad(Math.floor(total_min / 60), 2)+':'+Fwk.zeroPad(total_min % 60, 2)) ;
+        con.find('span.hour-minute[name="area"]').text(Fwk.zeroPad(Math.floor(total_min / 60), 2)+':'+Fwk.zeroPad(total_min % 60, 2)) ;
         return true ;
     } ,
 
@@ -553,7 +639,7 @@ define_class (Reports, FwkDispatcherBase, {}, {
         var percent = shift_duration_min ? Math.floor(100 * total_min / shift_duration_min) : 0;
         var other_min = shift_duration_min - total_min ;
         var other_percent = 100 - percent;
-        con.find('span.hour_minute[name="other"]').text(Fwk.zeroPad(Math.floor(other_min / 60), 2)+':'+Fwk.zeroPad(other_min % 60, 2)) ;
+        con.find('span.hour-minute[name="other"]').text(Fwk.zeroPad(Math.floor(other_min / 60), 2)+':'+Fwk.zeroPad(other_min % 60, 2)) ;
         con.find('span.percent[name="other"]').text(other_percent) ;
         return true ;
     } ,
@@ -561,14 +647,14 @@ define_class (Reports, FwkDispatcherBase, {}, {
     shift_duration_min : function (idx) {
         var con = this.search_list_elem.find('div.shift-con#'+idx) ;
 
-        var begin_day_elem = con.find('input[name="begin_day"]').datepicker() ;
-        var begin_h_elem   = con.find('input[name="begin_h"]') ;
-        var begin_m_elem   = con.find('input[name="begin_m"]') ;
+        var begin_day_elem = con.find('input[name="begin-day"]').datepicker() ;
+        var begin_h_elem   = con.find('input[name="begin-h"]') ;
+        var begin_m_elem   = con.find('input[name="begin-m"]') ;
         var begin_sec      = Math.floor(Date.parse(begin_day_elem.val()) / 1000) + 3600 * parseInt(begin_h_elem.val()) + 60 * parseInt(begin_m_elem.val()) ;
 
-        var end_day_elem  = con.find('input[name="end_day"]').datepicker() ;
-        var end_h_elem    = con.find('input[name="end_h"]') ;
-        var end_m_elem    = con.find('input[name="end_m"]') ;
+        var end_day_elem  = con.find('input[name="end-day"]').datepicker() ;
+        var end_h_elem    = con.find('input[name="end-h"]') ;
+        var end_m_elem    = con.find('input[name="end-m"]') ;
         var end_sec       = Math.floor(Date.parse(end_day_elem.val()) / 1000) + 3600 * parseInt(end_h_elem.val()) + 60 * parseInt(end_m_elem.val()) ;
         if (end_sec <= begin_sec) {
             alert('End time must be strictly bigger than the begin time. Please, correct the issue!') ;
@@ -585,13 +671,13 @@ define_class (Reports, FwkDispatcherBase, {}, {
         var shift = this.shifts[idx] ;
         var con = this.search_list_elem.find('div.shift-con#'+idx) ;
 
-        var begin_day_elem = con.find('input[name="begin_day"]').datepicker() ;
-        var begin_h_elem   = con.find('input[name="begin_h"]') ;
-        var begin_m_elem   = con.find('input[name="begin_m"]') ;
+        var begin_day_elem = con.find('input[name="begin-ay"]').datepicker() ;
+        var begin_h_elem   = con.find('input[name="begin-h"]') ;
+        var begin_m_elem   = con.find('input[name="begin-m"]') ;
 
-        var end_day_elem  = con.find('input[name="end_day"]').datepicker() ;
-        var end_h_elem    = con.find('input[name="end_h"]') ;
-        var end_m_elem    = con.find('input[name="end_m"]') ;
+        var end_day_elem  = con.find('input[name="end-day"]').datepicker() ;
+        var end_h_elem    = con.find('input[name="end-h"]') ;
+        var end_m_elem    = con.find('input[name="end-m"]') ;
 
         function begin_changed(idx) {
             if (!that.shift_duration_min(idx)) {
@@ -723,18 +809,16 @@ define_class (Reports, FwkDispatcherBase, {}, {
 
     shift_edit : function (idx) {
 
-        this.num_editings++ ;
-
         var shift = this.shifts[idx] ;
         shift.editing = true ;
         var con = this.search_list_elem.find('div.shift-con#'+idx) ;
 
-        con.find('input[name="begin_day"]').datepicker().datepicker('option', 'dateFormat', 'yy-mm-dd').val(shift.begin.day) ;
-        con.find('input[name="begin_h"]').val(shift.begin.hour) ;
-        con.find('input[name="begin_m"]').val(shift.begin.minute) ;
-        con.find('input[name="end_day"]').datepicker().datepicker('option', 'dateFormat', 'yy-mm-dd').val(shift.end.day) ;
-        con.find('input[name="end_h"]').val(shift.end.hour) ;
-        con.find('input[name="end_m"]').val(shift.end.minute) ;
+        con.find('input[name="begin-day"]').datepicker().datepicker('option', 'dateFormat', 'yy-mm-dd').val(shift.begin.day) ;
+        con.find('input[name="begin-h"]').val(shift.begin.hour) ;
+        con.find('input[name="begin-m"]').val(shift.begin.minute) ;
+        con.find('input[name="end-day"]').datepicker().datepicker('option', 'dateFormat', 'yy-mm-dd').val(shift.end.day) ;
+        con.find('input[name="end-h"]').val(shift.end.hour) ;
+        con.find('input[name="end-m"]').val(shift.end.minute) ;
         con.find('textarea[name="notes"]').val(shift.notes) ;
 
         for (var i in this.area_names) {
@@ -792,14 +876,14 @@ define_class (Reports, FwkDispatcherBase, {}, {
             notes    : con.find('textarea[name="notes"]').val() 
         } ;
 
-        var begin_day_elem = con.find('input[name="begin_day"]').datepicker() ;
-        var begin_h_elem   = con.find('input[name="begin_h"]') ;
-        var begin_m_elem   = con.find('input[name="begin_m"]') ;
+        var begin_day_elem = con.find('input[name="begin-day"]').datepicker() ;
+        var begin_h_elem   = con.find('input[name="begin-h"]') ;
+        var begin_m_elem   = con.find('input[name="begin-m"]') ;
         params.begin = begin_day_elem.val() + ' ' + Fwk.zeroPad(parseInt(begin_h_elem.val()), 2) + ':' + Fwk.zeroPad(parseInt(begin_m_elem.val()), 2) + ':00' ;
 
-        var end_day_elem  = con.find('input[name="end_day"]').datepicker() ;
-        var end_h_elem    = con.find('input[name="end_h"]') ;
-        var end_m_elem    = con.find('input[name="end_m"]') ;
+        var end_day_elem  = con.find('input[name="end-day"]').datepicker() ;
+        var end_h_elem    = con.find('input[name="end-h"]') ;
+        var end_m_elem    = con.find('input[name="end-m"]') ;
         params.end = end_day_elem.val() + ' ' + Fwk.zeroPad(parseInt(end_h_elem.val()), 2) + ':' + Fwk.zeroPad(parseInt(end_m_elem.val()), 2) + ':00' ;
 
         var area = {} ;
@@ -837,7 +921,6 @@ define_class (Reports, FwkDispatcherBase, {}, {
         this.shifts_service (
             '../shiftmgr/ws/shift_save.php', 'POST', params ,
             function (shifts) {
-                that.num_editings++ ;
                 that.shifts[idx] = shifts[0] ;
                 that.display() ;
                 that.shift_toggle(idx) ;
@@ -846,7 +929,6 @@ define_class (Reports, FwkDispatcherBase, {}, {
     } ,
 
     shift_edit_cancel : function (idx) {
-        this.num_editings-- ;
         this.shift_view(idx) ;
     } ,
 
@@ -869,26 +951,26 @@ define_class (Reports, FwkDispatcherBase, {}, {
         shift.editing = false ;
         var con = this.search_list_elem.find('div.shift-con#'+idx) ;
 
-        con.find('span[name="begin_day"]').text(shift.begin.day) ;
-        con.find('span[name="begin_hm"]').text(Fwk.zeroPad(shift.begin.hour, 2)+':'+Fwk.zeroPad(shift.begin.minute, 2)) ;
-        con.find('span[name="end_day"]').text(shift.end.day) ;
-        con.find('span[name="end_hm"]').text(Fwk.zeroPad(shift.end.hour, 2)+':'+Fwk.zeroPad(shift.end.minute, 2)) ;
+        con.find('span[name="begin-day"]').text(shift.begin.day) ;
+        con.find('span[name="begin-hm"]').text(Fwk.zeroPad(shift.begin.hour, 2)+':'+Fwk.zeroPad(shift.begin.minute, 2)) ;
+        con.find('span[name="end-day"]').text(shift.end.day) ;
+        con.find('span[name="end-hm"]').text(Fwk.zeroPad(shift.end.hour, 2)+':'+Fwk.zeroPad(shift.end.minute, 2)) ;
         con.find('div[name="notes"]').html('<pre>'+shift.notes+'</pre>') ;
 
         var area_total_min = 0 ;
         for (var i in this.area_names) {
             var area_name = this.area_names[i].key ;
-            con.find('div.flag[name="'+area_name+'"]').addClass(shift.area[area_name].problems?'status_red':'status_neutral') ;
+            con.find('div.flag[name="'+area_name+'"]').addClass(shift.area[area_name].problems?'status-red':'status-neutral') ;
             var hm = '' ;
             if (shift.area[area_name].problems) {
                 var downtime_min = shift.area[area_name].downtime_min;
                 hm = Fwk.zeroPad(Math.floor(downtime_min / 60), 2) + ':' + Fwk.zeroPad(downtime_min % 60, 2) ;
                 area_total_min += downtime_min ;
             }
-            con.find('span.hour_minute[name="' +area_name+'"]').text(hm) ;
+            con.find('span.hour-minute[name="' +area_name+'"]').text(hm) ;
             con.find('div.comment[name="'+area_name+'"]').html('<pre>'+shift.area[area_name].comments+'</pre>') ;
         }
-        con.find('span.hour_minute[name="area"]').text(Fwk.zeroPad(Math.floor(area_total_min / 60), 2)+':'+Fwk.zeroPad(area_total_min % 60, 2)) ;
+        con.find('span.hour-minute[name="area"]').text(Fwk.zeroPad(Math.floor(area_total_min / 60), 2)+':'+Fwk.zeroPad(area_total_min % 60, 2)) ;
 
         var allocation_total_min = 0 ;
         for (var i in this.allocation_names) {
@@ -897,7 +979,7 @@ define_class (Reports, FwkDispatcherBase, {}, {
             var hm = Fwk.zeroPad(Math.floor(duration_min / 60), 2) + ':' + Fwk.zeroPad(duration_min % 60, 2) ;
             var percent = shift.duration_min ? Math.floor(100 * duration_min / shift.duration_min) : 0;
             allocation_total_min += duration_min ;
-            con.find('span.hour_minute[name="' +allocation_name+'"]').text(hm) ;
+            con.find('span.hour-minute[name="' +allocation_name+'"]').text(hm) ;
             con.find('span.percent[name="'+allocation_name+'"]').text(percent) ;
             con.find('div.comment[name="'+allocation_name+'"]').html('<pre>'+shift.allocation[allocation_name].comments+'</pre>') ;
         }
@@ -908,5 +990,59 @@ define_class (Reports, FwkDispatcherBase, {}, {
 
         con.find('.viewer').removeClass('shift-hdn').addClass('shift-vis') ;
         con.find('.editor').removeClass('shift-vis').addClass('shift-hdn') ;
+    } ,
+
+    shift_load_history : function (idx) {
+        var shift = this.shifts[idx] ;
+        if (!shift.history_table) {
+            shift.history_table = new Table (
+                this.search_list_elem.find('div.shift-con#'+idx).find('div#history-'+idx).find('div.shift-history-con') ,
+                [
+                    { name: 'modified'  },
+                    { name: 'editor'  },
+                    { name: 'event' },
+                    { name: 'area/allocation' },
+                    { name: 'parameter' },
+                    { name: 'old value', sorted: false },
+                    { name: 'new value', sorted: false }
+                ] ,
+                null ,                              // data will be loaded dynamically
+                {   default_sort_column:  0 ,
+                    default_sort_forward: false ,
+                    text_when_empty:      'Loading...'
+                } ,
+                Fwk.config_handler('History', 'shifts')
+            ) ;
+            shift.history_table.display() ;
+
+            var params = {
+                shift_id : shift.id
+            } ;
+            var jqXHR = $.get('../shiftmgr/ws/history_get.php', params, function (data) {
+                if (data.status !== 'success') {
+                    Fwk.report_error(data.message, null) ;
+                    return ;
+                }
+                var rows = [] ;
+                for (var i in data.history) {
+                    var event = data.history[i] ;
+                    var row = [
+                        event.modified.full ,
+                        event.editor ,
+                        event.operation+' '+event.scope ,
+                        event.scope2 ,
+                        event.parameter ,
+                        '<div class="comment"><pre>'+event.old_value+'</pre></div>' ,
+                        '<div class="comment"><pre>'+event.new_value+'</pre></div>'
+                    ] ;
+                    rows.push (row) ;
+                }
+                shift.history_table.load(rows) ;
+            } ,
+            'JSON').error(function () {
+                Fwk.report_error('failed to obtain the cable history because of: '+jqXHR.statusText, null) ;
+                return ;
+            }) ;
+        }
     }
 });

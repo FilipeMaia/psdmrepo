@@ -5,12 +5,19 @@ SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='TRADITIONAL';
 CREATE SCHEMA IF NOT EXISTS `SHIFTMGR` ;
 USE `SHIFTMGR`;
 
+
+DROP TABLE IF EXISTS `SHIFTMGR`.`SHIFT_AREA_HISTORY` ;
+DROP TABLE IF EXISTS `SHIFTMGR`.`SHIFT_AREA_EVALUATION` ;
+
+DROP TABLE IF EXISTS `SHIFTMGR`.`SHIFT_TIME_HISTORY` ;
+DROP TABLE IF EXISTS `SHIFTMGR`.`SHIFT_TIME_ALLOCATION` ;
+
+DROP TABLE IF EXISTS `SHIFTMGR`.`SHIFT_HISTORY` ;
+DROP TABLE IF EXISTS `SHIFTMGR`.`SHIFT` ;
+
 -- -----------------------------------------------------
 -- Table `SHIFTMGR`.`SHIFT`
 -- -----------------------------------------------------
-DROP TABLE IF EXISTS `SHIFTMGR`.`SHIFT` ;
-DROP TABLE IF EXISTS `SHIFTMGR`.`SHIFT_AREA_EVALUATION` ;
-DROP TABLE IF EXISTS `SHIFTMGR`.`SHIFT_TIME_ALLOCATION` ;
 
 CREATE TABLE IF NOT EXISTS `SHIFTMGR`.`SHIFT` (
 
@@ -71,6 +78,84 @@ CREATE TABLE IF NOT EXISTS `SHIFTMGR`.`SHIFT_TIME_ALLOCATION` (
   CONSTRAINT `SHIFT_TIME_ALLOCATION_FK_1`
     FOREIGN KEY (`shift_id` )
     REFERENCES `SHIFTMGR`.`SHIFT` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);
+
+-- -----------------------------------------------------
+-- Table `SHIFTMGR`.`SHIFT_HISTORY`
+-- -----------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `SHIFTMGR`.`SHIFT_HISTORY` (
+
+  `id`       INT NOT NULL AUTO_INCREMENT ,
+  `shift_id` INT NOT NULL ,
+
+  `modified_uid`  VARCHAR(32)     NOT NULL ,
+  `modified_time` BIGINT UNSIGNED NOT NULL ,
+
+  `event` ENUM('CREATE','MODIFY') NOT NULL ,
+
+  `parameter` TEXT NOT NULL ,
+  `old_value` TEXT NOT NULL ,
+  `new_value` TEXT NOT NULL ,
+
+  PRIMARY KEY(`id`) ,
+
+  CONSTRAINT `SHIFT_HISTORY_FK_1`
+    FOREIGN KEY (`shift_id` )
+    REFERENCES `SHIFTMGR`.`SHIFT` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);
+
+
+-- -----------------------------------------------------
+-- Table `SHIFTMGR`.`SHIFT_AREA_HISTORY`
+-- -----------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `SHIFTMGR`.`SHIFT_AREA_HISTORY` (
+
+  `id`      INT NOT NULL AUTO_INCREMENT ,
+  `area_id` INT NOT NULL ,
+
+  `modified_uid`  VARCHAR(32)     NOT NULL ,
+  `modified_time` BIGINT UNSIGNED NOT NULL ,
+
+  `parameter` TEXT NOT NULL ,
+  `old_value` TEXT NOT NULL ,
+  `new_value` TEXT NOT NULL ,
+
+  PRIMARY KEY(`id`) ,
+
+  CONSTRAINT `SHIFT_AREA_HISTORY_FK_1`
+    FOREIGN KEY (`area_id` )
+    REFERENCES `SHIFTMGR`.`SHIFT_AREA_EVALUATION` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
+);
+
+-- -----------------------------------------------------
+-- Table `SHIFTMGR`.`SHIFT_TIME_HISTORY`
+-- -----------------------------------------------------
+
+CREATE TABLE IF NOT EXISTS `SHIFTMGR`.`SHIFT_TIME_HISTORY` (
+
+  `id`      INT NOT NULL AUTO_INCREMENT ,
+  `time_id` INT NOT NULL ,
+
+  `modified_uid`  VARCHAR(32)     NOT NULL ,
+  `modified_time` BIGINT UNSIGNED NOT NULL ,
+
+  `parameter` TEXT NOT NULL ,
+  `old_value` TEXT NOT NULL ,
+  `new_value` TEXT NOT NULL ,
+
+  PRIMARY KEY(`id`) ,
+
+  CONSTRAINT `SHIFT_TIME_HISTORY_FK_1`
+    FOREIGN KEY (`time_id` )
+    REFERENCES `SHIFTMGR`.`SHIFT_TIME_ALLOCATION` (`id` )
     ON DELETE CASCADE
     ON UPDATE CASCADE
 );
