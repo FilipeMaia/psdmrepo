@@ -1,0 +1,211 @@
+/* 
+ * The starting point for the application
+ */
+$(function () {
+
+    /* Very simple stack of static text fields with no layers */
+
+    var stack1 = new StackOfRows(null, null, {
+        expand_buttons: true
+    }) ;
+    for (var i = 0; i < 4; i++)
+        stack1.add_row({
+            title: '<b>row '+i+'</b>' ,
+            body:  'Here be the body of this row'}) ;
+
+    stack1.display($('#stack1')) ;
+
+    /* Nested stack of 2 layers, the bottom one is made of
+     * simple stacks of static text fields with no further layers. */
+
+    var stack2 = new StackOfRows(null, null, {
+        expand_buttons: true
+    }) ;
+    for (var i = 0; i < 4; i++) {
+
+        var stack1 = new StackOfRows(null, null, {
+            expand_buttons: true
+        }) ;
+        for (var j = 0; j < 3; j++)
+            stack1.add_row({
+                title: '<b>row '+i+'.'+j+'</b>' ,
+                body:  'Here be the body of this row'}) ;
+
+        stack2.add_row({
+            title: '<b>row '+i+'</b>' ,
+            body:  stack1}) ;
+    }
+    stack2.display($('#stack2')) ;
+
+    /* Nested stack of 3 layers, the bottom one is made of
+     * simple stacks of static text fields with no further layers. */
+
+    var stack3 = new StackOfRows(null, null, {
+        expand_buttons:   true ,
+        expand_propagate: true
+    }) ;
+    for (var i = 0; i < 3; i++) {
+
+        var stack2 = new StackOfRows(null, null, {
+            expand_buttons: true ,
+            expand_propagate: true
+        }) ;
+        for (var j = 0; j < 4; j++) {
+
+            var stack1 = new StackOfRows() ;
+            for (var k = 0; k < 3; k++)
+                stack1.add_row({
+                    title: '<b>row '+i+'.'+j+'.'+k+'</b>' ,
+                    body:  'Here be the body of this row'}) ;
+
+            stack2.add_row({
+                title: '<b>row '+i+'.'+j+'</b>' ,
+                body:  stack1}) ;
+        }
+        stack3.add_row({
+            title: '<b>row '+i+'</b>' ,
+            body:  stack2}) ;
+    }
+    stack3.display($('#stack3')) ;
+
+    /* Simple stack with the header. */
+
+    var stack4 = new StackOfRows([
+        {id: 'id',      title: 'Id',      width: 20} ,
+        {id: 'date',    title: 'Date',    width: 80} ,
+        {id: 'uid',     title: 'User',    width: 100} ,
+        {id: '|' } ,
+        {id: 'comment', title: 'Comment', width: 320} ,
+        {id: '|' } ,
+        {id: 'valid',   title: 'Is Valid?', width: 50}] ,
+        null, {
+        expand_buttons: false
+    }) ;
+    for (var i = 0; i < 4; i++)
+        stack4.add_row({
+            title: {
+                id:      '<b>'+i+'</b>' ,
+                date:    '2013-08-10' ,
+                uid:     'Igor Gaponenko' ,
+                comment: 'Here be my message...' ,
+                valid:   i % 2 ? 'Yes' : 'No'
+            } ,
+            body:  'Here be the body of this row'}) ;
+
+    stack4.display($('#stack4')) ;
+
+
+
+    /* Single-level stack with theme customization */
+
+    var stack5 = new StackOfRows([
+        {id: 'id',      title: 'Id',      width: 20} ,
+        {id: '|' } ,
+        {id: 'comment', title: 'Comment', width: 320}
+    ], null, {
+        expand_buttons: true ,
+        theme: 'stack-theme-large'
+    }) ;
+    for (var i = 0; i < 4; i++)
+        stack5.add_row({
+            title: {
+                id:      '<b>'+i+'</b>' ,
+                comment: 'Here be my comment...'
+            } ,
+            body:  'Here be the body of this row'}) ;
+
+    stack5.display($('#stack5')) ;
+
+
+
+
+
+    /* Nested stack of 3 layers, the bottom one is made of
+     * simple stacks of static text fields with no further layers. */
+
+    var stack6 = new StackOfRows(null, null, {
+        expand_buttons:   true ,
+    }) ;
+    for (var i = 0; i < 5; i++) {
+
+        var stack2 = new StackOfRows(null, null, {
+            expand_buttons: true ,
+            theme: 'stack-theme-aliceblue'
+        }) ;
+        for (var j = 0; j < 4; j++) {
+
+            var stack1 = new StackOfRows() ;
+            for (var k = 0; k < 3; k++)
+                stack1.add_row({
+                    title: '<b>row '+i+'.'+j+'.'+k+'</b>' ,
+                    body:  'Here be the body of this row'}) ;
+
+            stack2.add_row({
+                title: '<b>row '+i+'.'+j+'</b>' ,
+                body:  stack1}) ;
+        }
+        stack6.add_row({
+            title: '<b>row '+i+'</b>' ,
+            body:  stack2}) ;
+    }
+    stack6.display($('#stack6')) ;
+
+
+    /* Both size and color themes applied */
+
+    var stack7 = new StackOfRows([
+        {id: 'id',      title: 'Id',      width: 20} ,
+        {id: '|' } ,
+        {id: 'comment', title: 'Comment', width: 320}
+    ], null, {
+        expand_buttons: true ,
+        theme: 'stack-theme-large stack-theme-aliceblue'
+    }) ;
+    for (var i = 0; i < 4; i++)
+        stack7.add_row({
+            title: {
+                id:      '<b>'+i+'</b>' ,
+                comment: 'Here be my comment...'
+            } ,
+            body:  'Here be the body of this row'}) ;
+
+    stack7.display($('#stack7')) ;
+
+
+    /* Implementing non-trivial row content by subclassing the Widget */
+
+    function CustomBody(text) {
+        this.text = text ;
+    }
+    define_class(CustomBody, Widget, {}, {
+    render : function () {
+        this.container.html('<div>'+this.text+'</div>') ;
+    }
+    });
+    var stack8 = new StackOfRows([
+        {id: 'id',      title: 'Id',      width: 20} ,
+        {id: 'date',    title: 'Date',    width: 80} ,
+        {id: 'uid',     title: 'User',    width: 100} ,
+        {id: '|' } ,
+        {id: 'comment', title: 'Comment', width: 320} ,
+        {id: '|' } ,
+        {id: 'valid',   title: 'Is Valid?', width: 50}] ,
+        null, {
+        expand_buttons: false ,
+        theme: 'stack-theme-aliceblue' ,
+        hidden_header: true
+    }) ;
+    for (var i = 0; i < 4; i++)
+        stack8.add_row({
+            title: {
+                id:      '<b>'+i+'</b>' ,
+                date:    '2013-08-10' ,
+                uid:     'Igor Gaponenko' ,
+                comment: 'Here be my message...' ,
+                valid:   i % 2 ? 'Yes' : 'No'
+            } ,
+            body:  new CustomBody('Here be the body of this row')
+        }) ;
+
+    stack8.display($('#stack8')) ;
+}) ;
