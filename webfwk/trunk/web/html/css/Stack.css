@@ -14,6 +14,7 @@
 .stack-controls {
   margin: 15px 0px 5px 0px;
   font-size: 12px;
+  font-family: 'Times', serif;
 }
 .stack-controls > button {
   font-size: 9px;
@@ -24,6 +25,10 @@
   background-color: #c0c0c0;
   border-radius: 3px 3px 0px 0px;
   font-size: 12px;
+  font-family: 'Times', serif;
+  cursor: pointer;
+}
+.stack-header:hover {
 }
 .stack-header > .stack-column,
 .stack-header > .stack-column-first,
@@ -84,82 +89,48 @@
 
 /* The shape themes */
 
-.stack-theme-large {}
-.stack-theme-large > .stack-controls {
-  margin-bottom: 7px;
-  font-size: 16px;
-}
-.stack-theme-large > .stack-controls > button {
-  font-size: 12px;
-}
-.stack-theme-large > .stack-header {
-  padding: 4px;
-  border-radius: 5px 5px 0px 0px;
-  font-size: 16px;
-}
-.stack-theme-large > .stack-header > .stack-column,
-.stack-theme-large > .stack-header > .stack-column-first,
-.stack-theme-large > .stack-header > .stack-column-separator {
-  font-weight: bold;
-}
-.stack-theme-large > .stack-header > .stack-column-first {}
-.stack-theme-large > .stack-header > .stack-column-last {
-  clear: both;
-}
-.stack-theme-large > .stack-header > .stack-column-separator {
-  width: 4px;
-}
-.stack-theme-large > .stack-body {
-  font-size: 16px;
-}
-.stack-theme-large > .stack-body > .stack-row > .stack-row-header {
-  padding:4px;
-  border-radius: 5px 5px 0px 0px;
-}
-.stack-theme-large > .stack-body > .stack-row > .stack-row-header:hover {}
-.stack-theme-large > .stack-body > .stack-row > .stack-row-header > .stack-row-title {}
-.stack-theme-large > .stack-body > .stack-row > .stack-row-header > .stack-row-title > .stack-row-column,
-.stack-theme-large > .stack-body > .stack-row > .stack-row-header > .stack-row-title > .stack-row-column-separator {}
-.stack-theme-large > .stack-body > .stack-row > .stack-row-header > .stack-row-title > .stack-row-column-separator {
-  width: 4px;
-}
-.stack-theme-large > .stack-body > .stack-row > .stack-row-body {
-  padding: 15px;
-  border-radius: 0px 0px 5px 5px;
-}
+.stack-theme-large16 > .stack-controls                              { margin-bottom: 7px; font-size: 16px; }
+.stack-theme-large16 > .stack-controls > button                     { font-size: 12px; }
+.stack-theme-large16 > .stack-header                                { padding: 4px; border-radius: 5px 5px 0px 0px; font-size: 16px; }
+.stack-theme-large16 > .stack-header > .stack-column-separator      { width: 4px; }
+.stack-theme-large16 > .stack-body                                  { font-size: 16px; }
+.stack-theme-large16 > .stack-body > .stack-row > .stack-row-header { padding:4px; border-radius: 5px 5px 0px 0px; }
+.stack-theme-large16 > .stack-body > .stack-row > .stack-row-header > .stack-row-title > .stack-row-column-separator { width: 4px; }
+.stack-theme-large16 > .stack-body > .stack-row > .stack-row-body   { padding: 15px; border-radius: 0px 0px 5px 5px; }
+
+
+.stack-theme-large14 > .stack-controls                              { margin-bottom: 7px; font-size: 14px; }
+.stack-theme-large14 > .stack-controls > button                     { font-size: 11px; }
+.stack-theme-large14 > .stack-header                                { padding: 4px; border-radius: 5px 5px 0px 0px; font-size: 14px; }
+.stack-theme-large14 > .stack-header > .stack-column-separator      { width: 4px; }
+.stack-theme-large14 > .stack-body                                  { font-size: 12px; }
+.stack-theme-large14 > .stack-body > .stack-row > .stack-row-header { padding:4px; border-radius: 5px 5px 0px 0px; }
+.stack-theme-large14 > .stack-body > .stack-row > .stack-row-header > .stack-row-title > .stack-row-column-separator { width: 4px; }
+.stack-theme-large14 > .stack-body > .stack-row > .stack-row-body   { padding: 15px; border-radius: 0px 0px 5px 5px; }
 
 
 /* The color themes */
 
-.stack-theme-aliceblue {}
-.stack-theme-aliceblue > .stack-controls {}
-.stack-theme-aliceblue > .stack-controls > button {}
-.stack-theme-aliceblue > .stack-header {
-  background-color: #A6C9E2;
-}
-.stack-theme-aliceblue > .stack-header > .stack-column,
-.stack-theme-aliceblue > .stack-header > .stack-column-first,
-.stack-theme-aliceblue > .stack-header > .stack-column-separator {}
-.stack-theme-aliceblue > .stack-header > .stack-column-first {}
-.stack-theme-aliceblue > .stack-header > .stack-column-last {}
-.stack-theme-aliceblue > .stack-header > .stack-column-separator {}
-.stack-theme-aliceblue > .stack-body > .stack-row > .stack-row-header {
-  background-color: aliceblue;
-  border: solid 1px #A6C9E2;
-  border-bottom: 0;
-}
-.stack-theme-aliceblue > .stack-body > .stack-row > .stack-row-header:hover {
-  background-color: #A6C9E2;
-}
-.stack-theme-aliceblue > .stack-body > .stack-row > .stack-row-header > .stack-row-title {}
-.stack-theme-aliceblue > .stack-body > .stack-row > .stack-row-header > .stack-row-title > .stack-row-column,
-.stack-theme-aliceblue > .stack-body > .stack-row > .stack-row-header > .stack-row-title > .stack-row-column-separator {}
-.stack-theme-aliceblue > .stack-body > .stack-row > .stack-row-header > .stack-row-title > .stack-row-column-separator {}
-.stack-theme-aliceblue > .stack-body > .stack-row > .stack-row-body {
-  border: solid 1px #A6C9E2;
-  border-top: 0;
-  border-bottom: 0;
-}
-.stack-theme-aliceblue > .stack-body > .stack-row:last-child > .stack-row-body {
-  border-bottom: solid 1px #A6C9E2;
-}
+.stack-theme-aliceblue > .stack-header                                          { background-color: #A6C9E2; }
+.stack-theme-aliceblue > .stack-body > .stack-row > .stack-row-header           { background-color: aliceblue; border-color: #A6C9E2; }
+.stack-theme-aliceblue > .stack-body > .stack-row > .stack-row-header:hover     { background-color: #A6C9E2; }
+.stack-theme-aliceblue > .stack-body > .stack-row > .stack-row-body             { border-color:     #A6C9E2; }
+.stack-theme-aliceblue > .stack-body > .stack-row:last-child > .stack-row-body  { border-color:     #A6C9E2; }
+
+.stack-theme-mustard   > .stack-header                                          { background-color: #E6E680; }
+.stack-theme-mustard   > .stack-body > .stack-row > .stack-row-header           { background-color: #FAFAD2; border-color: #E6E680; }
+.stack-theme-mustard   > .stack-body > .stack-row > .stack-row-header:hover     { background-color: #E6E680; }
+.stack-theme-mustard   > .stack-body > .stack-row > .stack-row-body             { border-color:     #E6E680; }
+.stack-theme-mustard   > .stack-body > .stack-row:last-child > .stack-row-body  { border-color:     #E6E680; }
+
+.stack-theme-green     > .stack-header                                          { background-color: #B9DD97; }
+.stack-theme-green     > .stack-body > .stack-row > .stack-row-header           { background-color: #DEF0CD; border-color: #B9DD97; }
+.stack-theme-green     > .stack-body > .stack-row > .stack-row-header:hover     { background-color: #B9DD97; }
+.stack-theme-green     > .stack-body > .stack-row > .stack-row-body             { border-color:     #B9DD97; }
+.stack-theme-green     > .stack-body > .stack-row:last-child > .stack-row-body  { border-color:     #B9DD97; }
+
+.stack-theme-brown     > .stack-header                                          { background-color: #E6B85C; }
+.stack-theme-brown     > .stack-body > .stack-row > .stack-row-header           { background-color: #FAE2B1; border-color: #E6B85C; }
+.stack-theme-brown     > .stack-body > .stack-row > .stack-row-header:hover     { background-color: #E6B85C; }
+.stack-theme-brown     > .stack-body > .stack-row > .stack-row-body             { border-color:     #E6B85C; }
+.stack-theme-brown     > .stack-body > .stack-row:last-child > .stack-row-body  { border-color:     #E6B85C; }

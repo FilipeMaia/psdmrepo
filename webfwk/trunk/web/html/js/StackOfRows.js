@@ -39,14 +39,16 @@ render : function () {
 '</div>' +
 '<div class="stack-row-body stack-row-hidden"></div>' ;
     this.container.html(html) ;
+
     var header = this.container.children('.stack-row-header') ;
-    header.click(function () {
-        that.toggle() ;
-    }) ;
+    header.click(function () { that.toggle() ; }) ;
+ 
     this.toggler = header.children('div').children('span.stack-row-toggler') ;
     this.title   = header.children('.stack-row-title') ;
     this.body    = this.container.children('.stack-row-body') ;
+
     if (this.data_object.hdr) {
+        var title_as_function = typeof(this.data_object.title.html) === 'function' ;
         var html = '' ;
         for(var i in this.data_object.hdr) {
             var col = this.data_object.hdr[i] ;
@@ -55,13 +57,13 @@ render : function () {
 '  <div class="stack-row-column-separator">&nbsp</div>' ;
             else
                 html +=
-'  <div class="stack-row-column" id="'+col.id+'" style="width:'+col.width+'px;" >'+this.data_object.title[col.id]+'</div>' ;
+'  <div class="stack-row-column" id="'+col.id+'" style="width:'+col.width+'px;" >'+(title_as_function ? this.data_object.title.html(col.id) : this.data_object.title[col.id])+'</div>' ;
         }
         html +=
 '  <div class="stack-row-column-last"></div>';
         this.title.html(html) ;
     } else {
-        this.data_object.title.display(this.title) ;
+        this.title.html(this.data_object.title.html()) ;
     }
     this.data_object.body.display(this.body) ;
 } ,
@@ -139,26 +141,28 @@ add_row : function (row) {
 
     if (this.hdr) data_object.hdr = this.hdr ;
 
-    switch (typeof(row.title)) {
-    case 'string' :
-        data_object.title = {
-            display: function (container) { container.html(row.title) ; }} ;
-        break ;
-    case 'object' :
-        if (this.hdr || (typeof(row.title.display) === 'function'))
-            data_object.title = row.title ;
-        else
-            throw new WidgetError('StackOfRows: incorrect or unsupported format of the title object') ;
-        break ;
-    default:
-        throw new WidgetError('StackOfRows: missing or unsupported title') ;
+    if (this.hdr) {
+        switch (typeof(row.title)) {
+        case 'function' :
+        case 'object'   : data_object.title = row.title ; break ;
+        default :
+            throw new WidgetError('StackOfRows: missing or unsupported title') ;
+        }
+    } else {
+        function SimpleTitle(data) {
+            this.data = data ;
+            this.html = function () { return this.data ; }
+        }
+        switch (typeof(row.title)) {
+        case 'string'   : data_object.title = new SimpleTitle(row.title) ; break ;
+        case 'function' : data_object.title = row.title ; break ;
+        default:
+            throw new WidgetError('StackOfRows: missing or unsupported title') ;
+        }
     }
 
     switch (typeof(row.body)) {
-    case 'string' :
-        data_object.body = {
-            display: function (container) { container.html(row.body) ; }} ;
-        break ;
+    case 'string' : data_object.body = { display: function (container) { container.html(row.body) ; }} ; break ;
     case 'object' :
         if (typeof(row.body.display) === 'function')
             data_object.body = row.body ;
@@ -175,6 +179,13 @@ add_row : function (row) {
 
     var id = this.rows.length ;
     this.rows.push(new StackRow(id, data_object, this.options.expand_propagate)) ;
+} ,
+
+set_rows : function (rows) {
+    this.rows = [] ;
+    if (rows)
+        for(var i in rows)
+            this.add_row(rows[i]) ;
 } ,
 
 is_initialized : false ,
@@ -208,7 +219,8 @@ render : function () {
     if (this.hdr && !this.options.hidden_header) {
         html +=
 '<div class="stack-header">' +
-'  <div class="stack-column-first">&nbsp;</div>' ;
+'  <div class="stack-column-first"><span class="stack-header-toggler ui-icon ui-icon-triangle-1-e"></span></div>' ;
+
         for(var i in this.hdr) {
             var col = this.hdr[i] ;
             if (col.id === '|')
@@ -253,6 +265,18 @@ render : function () {
             that.expand_or_collapse(false) ;
         }) ;
     }
+
+    this.header = this.container.children('.stack-header') ;
+    this.header.click(function () {
+        var toggler = $(this).children('.stack-column-first').children('span.stack-header-toggler') ;
+        if (toggler.hasClass('ui-icon-triangle-1-e')) {
+            toggler.removeClass('ui-icon-triangle-1-e').addClass('ui-icon-triangle-1-s') ;
+            that.expand_or_collapse(true) ;
+        } else {
+            toggler.removeClass('ui-icon-triangle-1-s').addClass('ui-icon-triangle-1-e') ;
+            that.expand_or_collapse(false) ;
+        }
+    }) ;
 } ,
 
 /**

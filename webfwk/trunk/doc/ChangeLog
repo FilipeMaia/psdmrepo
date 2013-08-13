@@ -14,3 +14,6 @@ reverse time order.
 Tag: V00-00-01
 2013-08-12 Igor Gaponenko
 - added a hierarchy of JavaScript base classes and widgets
+- moved in Fwk.js and its CSS
+- moved in Table.js and its CSS
+- extended API and improved implementation of the StackOfRos.js

@@ -104,7 +104,7 @@ $(function () {
         {id: 'comment', title: 'Comment', width: 320}
     ], null, {
         expand_buttons: true ,
-        theme: 'stack-theme-large'
+        theme: 'stack-theme-large16'
     }) ;
     for (var i = 0; i < 4; i++)
         stack5.add_row({
@@ -159,15 +159,23 @@ $(function () {
         {id: 'comment', title: 'Comment', width: 320}
     ], null, {
         expand_buttons: true ,
-        theme: 'stack-theme-large stack-theme-aliceblue'
+        theme: 'stack-theme-large16 + stack-theme-aliceblue'
     }) ;
+    function Title(data) {
+        this.data = data ;
+        this.html = function (id) {
+            switch(id) {
+                case 'id':      return '<b>'+this.data+'</b>' ;
+                case 'comment': return 'Here be my comment...' ;
+                default:        return '' ;
+            }
+        } ;
+    }
     for (var i = 0; i < 4; i++)
         stack7.add_row({
-            title: {
-                id:      '<b>'+i+'</b>' ,
-                comment: 'Here be my comment...'
-            } ,
-            body:  'Here be the body of this row'}) ;
+            title: new Title(i) ,
+            body:  'Here be the body of this row'
+        }) ;
 
     stack7.display($('#stack7')) ;
 
@@ -208,4 +216,51 @@ $(function () {
         }) ;
 
     stack8.display($('#stack8')) ;
+
+
+    /* Color theme tests */
+
+    var hdr = [
+        {id: 'id',      title: 'Id',      width: 20} ,
+        {id: '|' } ,
+        {id: 'comment', title: 'Comment', width: 320}
+    ] ;
+    var stack9 = new StackOfRows(hdr, null, {
+        expand_buttons: true ,
+        theme: 'stack-theme-mustard'
+    }) ;
+    for (var i = 0; i < 4; i++)
+        stack9.add_row({
+            title: {
+                id:      '<b>'+i+'</b>' ,
+                comment: 'Here be my comment...'
+            } ,
+            body:  'Here be the body of this row'}) ;
+    stack9.display($('#stack9')) ;
+
+    var stack10 = new StackOfRows(hdr, null, {
+        expand_buttons: true ,
+        theme: 'stack-theme-green'
+    }) ;
+    for (var i = 0; i < 4; i++)
+        stack10.add_row({
+            title: {
+                id:      '<b>'+i+'</b>' ,
+                comment: 'Here be my comment...'
+            } ,
+            body:  'Here be the body of this row'}) ;
+    stack10.display($('#stack10')) ;
+
+    var stack11 = new StackOfRows(hdr, null, {
+        expand_buttons: true ,
+        theme: 'stack-theme-brown'
+    }) ;
+    for (var i = 0; i < 4; i++)
+        stack11.add_row({
+            title: {
+                id:      '<b>'+i+'</b>' ,
+                comment: 'Here be my comment...'
+            } ,
+            body:  'Here be the body of this row'}) ;
+    stack11.display($('#stack11')) ;
 }) ;
