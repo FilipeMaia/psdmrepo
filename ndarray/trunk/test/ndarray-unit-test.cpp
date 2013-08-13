@@ -385,3 +385,34 @@ BOOST_AUTO_TEST_CASE( test_assign )
   BOOST_CHECK_EQUAL ( arr1[0][0][1], gdata[1]+100 ) ;
   BOOST_CHECK_EQUAL ( arr1[0][0][2], gdata[2]+100 ) ;
 }
+
+// ==============================================================
+
+BOOST_AUTO_TEST_CASE( test_reshape )
+{
+  unsigned dims[3] = {2,3,4};
+  ndarray<int,3> arr(gdata, dims);
+
+  BOOST_CHECK_EQUAL ( arr[0][0][0], gdata[0] ) ;
+  BOOST_CHECK_EQUAL ( arr[0][0][1], gdata[1] ) ;
+  BOOST_CHECK_EQUAL ( arr[0][1][0], gdata[4] ) ;
+  BOOST_CHECK_EQUAL ( arr[1][0][0], gdata[12] ) ;
+  BOOST_CHECK_EQUAL ( arr[1][2][3], gdata[23] ) ;
+
+  unsigned dims2[3] = {6,2,2};
+  arr.reshape(dims2);
+
+  BOOST_CHECK_EQUAL ( arr[0][0][0], gdata[0] ) ;
+  BOOST_CHECK_EQUAL ( arr[0][0][1], gdata[1] ) ;
+  BOOST_CHECK_EQUAL ( arr[0][1][0], gdata[2] ) ;
+  BOOST_CHECK_EQUAL ( arr[1][0][0], gdata[4] ) ;
+  BOOST_CHECK_EQUAL ( arr[5][1][1], gdata[23] ) ;
+
+  arr.reshape(dims, ndns::Fortran);
+
+  BOOST_CHECK_EQUAL ( arr[0][0][0], gdata[0] ) ;
+  BOOST_CHECK_EQUAL ( arr[1][0][0], gdata[1] ) ;
+  BOOST_CHECK_EQUAL ( arr[0][1][0], gdata[2] ) ;
+  BOOST_CHECK_EQUAL ( arr[0][0][1], gdata[6] ) ;
+  BOOST_CHECK_EQUAL ( arr[1][2][3], gdata[23] ) ;
+}

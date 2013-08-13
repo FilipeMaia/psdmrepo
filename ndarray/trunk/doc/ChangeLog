@@ -11,6 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V01-01-04
+2013-08-13 Andy Salnikov
+- Matt noticed that ndarray::reshape() is sonst but calls non-const method
+- removed constness from reshape() and fix type oof its second parameter
+- added unit test for reshape()
+
 Tag: V01-01-03
 2013-03-25 Andy Salnikov
 - improved ndarray formatting:

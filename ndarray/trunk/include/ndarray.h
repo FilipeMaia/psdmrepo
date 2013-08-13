@@ -430,7 +430,7 @@ public:
    *  @param[in] shape  Pointer to dimensions array, size of array is NDim, array data will be copied.
    *  @param[in] order  Memory order of the elements.
    */
-  void reshape(const shape_t* shape, char order='C') const {
+  void reshape(const shape_t* shape, ndns::Order order = ndns::C) {
     std::copy(shape, shape+NDim, Super::m_shape);
     _setStrides(order);
   }
