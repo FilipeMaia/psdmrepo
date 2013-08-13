@@ -107,6 +107,20 @@ def get_list_of_files_in_dir_for_ext(dir, ext='.xtc'):
     return sorted(list_of_files)
 
 
+def get_list_of_files_in_dir_for_part_fname(dir, pattern='-r0022'):
+    """Returns the list of files in the directory for specified file name pattern or [] - empty list."""
+    if dir is None : return []
+    if not os.path.exists(dir) : return [] 
+    
+    list_of_files_in_dir = os.listdir(dir)
+    list_of_files = []
+    for fname in list_of_files_in_dir :
+        if pattern in fname :
+            fpath = os.path.join(dir,fname)
+            list_of_files.append(fpath)
+    return sorted(list_of_files)
+
+
 
 def print_list_of_files_in_dir(dirname, path_or_fname) :
     dname, fname = os.path.split(path_or_fname)     # i.e. ('work_corana', 'img-xcs-r0015-b0000.bin')
@@ -358,7 +372,7 @@ def parse_xtc_file_name(fname):
 #        or          /reg/d/psdm/XCS/xcsi0112/xtc/e167-r0015-s00-c00.xtc
 def parse_xtc_path(path='.') :
 
-    logger.debug( 'parse_xtc_path(...): ' + path, __name__)
+    logger.debug( 'parse_xtc_path(...): ' + str(path), __name__)
 
     instrument = 'INS'
     experiment = 'expt'

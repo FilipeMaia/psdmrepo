@@ -43,12 +43,15 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
 
     char_expand    = u' \u25BE' # down-head triangle
 
-    def __init__ ( self, parent=None ) :
+    def __init__ ( self, parent=None, run_number='0000' ) :
 
         QtGui.QWidget.__init__(self, parent)
         #QtGui.QGroupBox.__init__(self, 'More', parent)
 
-        self.setGeometry(100, 100, 600, 70)
+        self.parent     = parent
+        self.run_number = run_number
+
+        self.setGeometry(100, 100, 600, 50)
         self.setWindowTitle('GUI Dark Run Go')
         #try : self.setWindowIcon(cp.icon_help)
         #except : pass
@@ -65,7 +68,7 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         self.but_depl = QtGui.QPushButton( 'Deploy' )
 
         self.hbox = QtGui.QHBoxLayout()
-        #self.hbox.addWidget(self.but_stop)
+        self.hbox.addWidget(self.cbx_dark_more)
         self.hbox.addWidget(self.but_fbro)
         self.hbox.addWidget(self.but_plot)
         self.hbox.addWidget(self.but_depl)
@@ -75,7 +78,7 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         #self.hbox.move(50,30)
 
         self.vbox = QtGui.QVBoxLayout()
-        self.vbox.addWidget(self.cbx_dark_more)
+        #self.vbox.addWidget(self.cbx_dark_more)
         self.vbox.addLayout(self.hbox)
         self.vbox.addStretch(1)     
         self.setLayout(self.vbox)
@@ -108,7 +111,7 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         self.frame.setLineWidth(1)
         self.frame.setMidLineWidth(0)
         self.frame.setGeometry(self.rect())
-        #self.frame.setVisible(False)
+        self.frame.setVisible(False)
 
 
     def setFieldsEnabled(self, is_enabled=True):
@@ -125,9 +128,10 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
     def setStyle(self):
         #self.setMinimumSize(600,70)
         #self.setMinimumSize(600,70)
-        self.setFixedHeight(90)
+        self.setFixedHeight(40)
         self.setStyleSheet (cp.styleBkgd)
-
+        self.cbx_dark_more.setFixedHeight(30)
+        
         width = 100
 
         #self.but_stop.setFixedWidth(width)
@@ -154,6 +158,7 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         #else                          : self.edi_to.setStyleSheet (cp.styleEdit)
 
         #self.setContentsMargins (QtCore.QMargins(-9,-9,-9,-9))
+        self.setContentsMargins (QtCore.QMargins(-5,-5,-5,-5))
         #self.setContentsMargins (QtCore.QMargins(10,10,10,10))
         #self.setContentsMargins (QtCore.QMargins(0,5,0,0))
 
@@ -162,7 +167,7 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         self.but_plot.setVisible( self.cbx_dark_more.isChecked() )
         self.but_depl.setVisible( self.cbx_dark_more.isChecked() )
 
-        self.frame.setVisible( self.cbx_dark_more.isChecked() )
+        #self.frame.setVisible( self.cbx_dark_more.isChecked() )
 
 
     def setParent(self,parent) :

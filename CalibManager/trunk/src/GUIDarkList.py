@@ -29,14 +29,14 @@ from PyQt4 import QtGui, QtCore
 from ConfigParametersForApp import cp
 from Logger                 import logger
 from FileNameManager        import fnm
-from GUIDarkRunItem         import *
+from GUIDarkListItem         import *
 #import GlobalUtils          as     gu
 
 #---------------------
 #  Class definition --
 #---------------------
-class GUIDarkList ( QtGui.QGroupBox ) :
-#class GUIDarkList ( QtGui.QWidget ) :
+#class GUIDarkList ( QtGui.QGroupBox ) :
+class GUIDarkList ( QtGui.QWidget ) :
     """GUI for the list of widgers"""
 
     def __init__ ( self, parent=None ) :
@@ -44,10 +44,10 @@ class GUIDarkList ( QtGui.QGroupBox ) :
         #self.calib_dir      = cp.calib_dir
         #self.det_name       = cp.det_name
 
-        QtGui.QGroupBox.__init__(self, 'Runs', parent)
-        #QtGui.QWidget.__init__(self, parent)
+        #QtGui.QGroupBox.__init__(self, 'Runs', parent)
+        QtGui.QWidget.__init__(self, parent)
 
-        self.setGeometry(100, 100, 730, 300)
+        self.setGeometry(100, 100, 730, 500)
         self.setWindowTitle('List of dark runs')
         #self.setTitle('My status')
         #try : self.setWindowIcon(cp.icon_help)
@@ -56,8 +56,10 @@ class GUIDarkList ( QtGui.QGroupBox ) :
 
         self.list = QtGui.QListWidget(parent=self)
 
-        self.size     = QtCore.QSize(500,35)
-        self.size_ext = QtCore.QSize(500,60)
+        self.widg_width = 500
+
+        self.size     = QtCore.QSize(self.widg_width,35)
+        self.size_ext = QtCore.QSize(self.widg_width,200)
 
         self.updateList()
 
@@ -90,7 +92,7 @@ class GUIDarkList ( QtGui.QGroupBox ) :
 
         for run in self.list_of_runs :
             #print run
-            widg = GUIDarkRunItem ( self, str(run) ) # QtGui.QLabel(str(run), self)
+            widg = GUIDarkListItem ( self, str(run) ) # QtGui.QLabel(str(run), self)
             item = QtGui.QListWidgetItem('', self.list)
             #self.list.addItem(item)
             #item.setFlags (  QtCore.Qt.ItemIsEnabled ) #| QtCore.Qt.ItemIsSelectable  | QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsTristate)
@@ -106,6 +108,12 @@ class GUIDarkList ( QtGui.QGroupBox ) :
             record = run, item, widg
             self.list_of_records.append(record)
 
+
+    def getRunAndItemForWidget(self, widg_active):
+        for (run, item, widg) in self.list_of_records :
+            if widg == widg_active :
+                return run, item
+        return None, None
 
 
     def showToolTips(self):
@@ -123,9 +131,15 @@ class GUIDarkList ( QtGui.QGroupBox ) :
 
 
     def setStyle(self):
-        self.setMinimumWidth(500)
-        self.setFixedHeight(200)
+        self.setMinimumWidth(self.widg_width)
+        #self.setFixedHeight(400)
+        self.setMinimumHeight(400)
         self.           setStyleSheet (cp.styleBkgd)
+
+        #self.list.adjustSize()
+        #print 'self.list.size():',  self.list.size()
+        #self.setMinimumSize(self.list.size())
+
         #self.tit_status.setStyleSheet (cp.styleTitle)
         #self.tit_status.setStyleSheet (cp.styleDefault)
         #self.tit_status.setStyleSheet (cp.styleTitleInFrame)
@@ -133,8 +147,8 @@ class GUIDarkList ( QtGui.QGroupBox ) :
         #self.lab_txt   .setStyleSheet (cp.styleWhiteFixed) 
         #self.lab_txt   .setStyleSheet (cp.styleBkgd)
         
-        #self.setContentsMargins (QtCore.QMargins(-9,-9,-9,-9))
-        self.setContentsMargins (QtCore.QMargins(1,10,1,1))
+        self.setContentsMargins (QtCore.QMargins(-9,-9,-9,-9))
+        #self.setContentsMargins (QtCore.QMargins(1,10,1,1))
 
 
     def setParent(self,parent) :
@@ -169,13 +183,40 @@ class GUIDarkList ( QtGui.QGroupBox ) :
         logger.debug('onClose', __name__)
         self.close()
 
+        
+    def onItemExpand(self, widg):
+        run, item = self.getRunAndItemForWidget(widg)
+        logger.info('Expand widget for run %s' % run, __name__)
+        self.size_ext = QtCore.QSize(self.widg_width, widg.getHeight())
+        item.setSizeHint(self.size_ext)
+
+
+    def onItemShrink(self, widg):
+        logger.info('onItemExpand', __name__)
+        run, item = self.getRunAndItemForWidget(widg)
+        logger.info('Shrink widget for run %s' % run, __name__)
+        item.setSizeHint(self.size)
+
 
     def onItemClick(self, item):
-        logger.info('onItemClick', __name__)
+        logger.info('onItemClick - do nothing...', __name__)
         #print 'onItemClick' # , isChecked: ', str(item.checkState())
 
-        #if item.sizeHint() == self.size_ext : item.setSizeHint(self.size)
-        #else                                : item.setSizeHint(self.size_ext)
+        widg = self.list.itemWidget(item)
+
+        if item.sizeHint() == self.size_ext :
+            pass
+            #widg.onClickShrink()
+            #print 'widg.size:', widg.size()
+            #item.setSizeHint(self.size)
+        else :
+            pass
+            #widg.onClickExpand()
+            #print 'widg.size:', widg.size()
+
+            #self.size_ext = QtCore.QSize(self.widg_width, widg.getHeight())
+            #item.setSizeHint(self.size_ext)
+
 
     def onItemDoubleClick(self, item):
         logger.info('onItemDoubleClick', __name__)

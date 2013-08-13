@@ -30,7 +30,7 @@ from ConfigParametersForApp import cp
 from Logger                 import logger
 import GlobalUtils          as     gu
 from FileNameManager        import fnm
-from BatchJobPedestals      import bjpeds
+from BatchJobPedestals      import *
 
 #---------------------
 #  Class definition --
@@ -58,7 +58,7 @@ class GUIDarkRunItem ( QtGui.QWidget ) :
         self.calib_dir      = cp.calib_dir
         self.det_name       = cp.det_name
 
-        self.lab_run  = QtGui.QLabel('Dark run')
+        self.lab_run  = QtGui.QLabel('Run')
         self.lab_from = QtGui.QLabel('valid from')
         self.lab_to   = QtGui.QLabel('to')
 
@@ -111,7 +111,7 @@ class GUIDarkRunItem ( QtGui.QWidget ) :
         self.frame.setLineWidth(0)
         self.frame.setMidLineWidth(1)
         self.frame.setGeometry(self.rect())
-        #self.frame.setVisible(False)
+        self.frame.setVisible(False)
 
 
     def setFieldsEnabled(self, is_enabled=True):
@@ -133,7 +133,7 @@ class GUIDarkRunItem ( QtGui.QWidget ) :
 
 
     def setStyle(self):
-        self.setMinimumSize(600,30)
+        self.setMinimumSize(600,34)
         self.           setStyleSheet (cp.styleBkgd)
         #self.           setStyleSheet (cp.styleYellowish)
 
@@ -254,26 +254,35 @@ class GUIDarkRunItem ( QtGui.QWidget ) :
         logger.info(msg, __name__ )
         self.setStatusMessage()
 
+
+    def exportLocalPars(self):
+        """Export local parameters to configuration current"""
+        cp.str_run_number.setValue(self.str_run_number)
+        cp.str_run_from  .setValue(self.str_run_from  )
+        cp.str_run_to    .setValue(self.str_run_to    )
+
  
     def onButGo(self):
         but = self.but_go
         but.setStyleSheet(cp.styleDefault)
+        self.exportLocalPars()
 
         if   but.text() == 'Go' : 
-            logger.info('onButGo', __name__ )
-            bjpeds.start_auto_processing()
+            logger.info('onButGo for run %s' % self.str_run_number, __name__ )
+            #self.bjpeds = BatchJobPedestals() 
+            #self.bjpeds.start_auto_processing()
             but.setText('Stop')
             
         elif but.text() == 'Stop' : 
-            logger.info('onButStop', __name__ )
-            bjpeds.stop_auto_processing()
+            logger.info('onButStop for run %s' % self.str_run_number, __name__ )
+            #self.bjpeds.stop_auto_processing()
             but.setText('Go')
 
 
-    def onStop(self):
-        but = self.but_go
-        if but.text() == 'Stop' : 
-            but.setText('Go')
+#    def onStop(self):
+#        but = self.but_go
+#        if but.text() == 'Stop' : 
+#            but.setText('Go')
 
 
     def setStatusMessage(self):
@@ -281,7 +290,6 @@ class GUIDarkRunItem ( QtGui.QWidget ) :
         #msg = 'From %s to %s use dark run %s' % (self.str_run_from.value(), self.str_run_to.value(), self.str_run_number.value())
         #msg = gu.get_text_content_of_calib_dir_for_detector(path=self.calib_dir.value(), det=self.det_name.value(), calib_type='pedestals')
         #cp.guistatus.setStatusMessage(msg)
-
 
 #-----------------------------
 

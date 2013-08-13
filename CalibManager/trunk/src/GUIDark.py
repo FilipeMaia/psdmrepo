@@ -27,9 +27,7 @@ from PyQt4 import QtGui, QtCore
 from ConfigParametersForApp import cp
 from Logger                 import logger
 
-#from GUIInsExpDirDet        import *
 from GUIStatus              import *
-#from GUIDarkRunGo           import *
 from GUIDarkList            import *
 from GUIDarkMoreOpts        import *
 
@@ -40,25 +38,20 @@ class GUIDark ( QtGui.QWidget ) :
 
     def __init__ ( self, parent=None ) :
         QtGui.QWidget.__init__(self, parent)
-        self.setGeometry(200, 400, 750, 400)
+        self.setGeometry(200, 400, 750, 700)
         self.setWindowTitle('Dark run processing')
         self.setFrame()
 
-        #self.guiinsexpdirdet  = GUIInsExpDirDet(self)
         self.guistatus        = GUIStatus(self)
-        #self.guidarkrungo     = GUIDarkRunGo(self)
         self.guidarklist      = GUIDarkList(self)
-        self.guidarkmoreopts  = GUIDarkMoreOpts(self)
+        #self.guidarkmoreopts  = GUIDarkMoreOpts(self)
         
         self.vbox = QtGui.QVBoxLayout() 
-        #self.vbox.addWidget(self.guiinsexpdirdet)
-        #self.vbox.addStretch(1)
         self.vbox.addWidget(self.guistatus)
-        self.vbox.addStretch(1)
-        #self.vbox.addWidget(self.guidarkrungo)
+        #self.vbox.addStretch(1)
         self.vbox.addWidget(self.guidarklist)
-        self.vbox.addStretch(1)
-        self.vbox.addWidget(self.guidarkmoreopts)
+        #self.vbox.addStretch(1)
+        #self.vbox.addWidget(self.guidarkmoreopts)
 
         self.setLayout(self.vbox)
 
@@ -107,20 +100,14 @@ class GUIDark ( QtGui.QWidget ) :
     def closeEvent(self, event):
         logger.info('closeEvent', __name__)
 
-        #try    : self.guiinsexpdirdet.close()
-        #except : pass
-
         try    : self.guistatus.close()
         except : pass
-
-        #try    : self.guidarkrungo.close()        
-        #except : pass
 
         try    : self.guidarklist.close()        
         except : pass
 
-        try    : self.guidarkmoreopts.close()        
-        except : pass
+        #try    : self.guidarkmoreopts.close()        
+        #except : pass
 
         #if cp.res_save_log : 
         #    logger.saveLogInFile     ( fnm.log_file() )
