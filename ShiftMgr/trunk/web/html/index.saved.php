@@ -31,11 +31,10 @@ foreach ($instruments as $instr_name) {
 <link type="text/css" href="/jquery/css/custom-theme-1.9.1/jquery-ui.custom.css" rel="Stylesheet" />
 <link type="text/css" href="/jquery/css/jquery-ui-timepicker-addon.css" rel="Stylesheet" />
 
-<link type="text/css" href="../webfwk/css/Fwk.css" rel="Stylesheet" />
-<link type="text/css" href="../webfwk/css/Stack.css" rel="Stylesheet" />
-<link type="text/css" href="../webfwk/css/Table.css" rel="Stylesheet" />
+<link type="text/css" href="../portal/css/Fwk.css" rel="Stylesheet" />
+<link type="text/css" href="../portal/css/Table.css" rel="Stylesheet" />
 
-<link type="text/css" href="../shiftmgr/css/shiftmgr.css" rel="Stylesheet" />
+<link type="text/css" href="../shiftmgr/css/shiftmgr.saved.css" rel="Stylesheet" />
 
 <style>
 
@@ -52,13 +51,10 @@ div.shift-history-reports {
 <script type="text/javascript" src="/jquery/js/jquery.json.js"></script>
 <script type="text/javascript" src="/jquery/js/jquery.printElement.js"></script>
 
-<script type="text/javascript" src="../webfwk/js/Class.js" ></script>
-<script type="text/javascript" src="../webfwk/js/Widget.js" ></script>
-<script type="text/javascript" src="../webfwk/js/StackOfRows.js" ></script>
-<script type="text/javascript" src="../webfwk/js/Fwk.js"></script>
-<script type="text/javascript" src="../webfwk/js/Table.js"></script>
+<script type="text/javascript" src="../portal/js/Fwk.js"></script>
+<script type="text/javascript" src="../portal/js/Table.js"></script>
 
-<script type="text/javascript" src="../shiftmgr/js/Reports.js"></script>
+<script type="text/javascript" src="../shiftmgr/js/Reports.saved.js"></script>
 <script type="text/javascript" src="../shiftmgr/js/Reports4all.js"></script>
 <script type="text/javascript" src="../shiftmgr/js/Analytics.js"></script>
 <script type="text/javascript" src="../shiftmgr/js/Analytics4all.js"></script>
@@ -237,7 +233,7 @@ $(function() {
           <div id="shifts-search-display">
 
             <!-- Table header -->
-            <!--
+
             <div id="shifts-search-header">
               <div style="float:left; margin-left: 0px;                                 width: 20px;" ><div  class="shift-toggler"  >&nbsp;  </div></div>
               <div style="float:left; margin-left:10px; text-align: right;              width: 80px;" ><span class="shift-table-hdr">Shift   </span></div>
@@ -258,15 +254,15 @@ $(function() {
               <div style="float:left; margin-left:10px;                                 width:140px;" ><span class="shift-table-hdr">Modified</span></div>
               <div style="clear:both;"></div>
             </div>
-            -->
+
             <!-- Table body is loaded dynamically by the application -->
-            <!--
+
             <div id="shifts-search-list">
               <div style="color:maroon; margin-top:10px;">
                 Use the search form to find shifts...
               </div>
             </div>
-            -->
+
           </div>
         </div>
       </div>

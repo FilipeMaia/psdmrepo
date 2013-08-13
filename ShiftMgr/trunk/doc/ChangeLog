@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-02
+2013-08-12 Igor Gaponenko
+- migrated to use JavaScript widgets from the new package webfwk.
+
 Tag: V00-01-01
 2013-08-08 Igor Gaponenko
 - added History at all levels
