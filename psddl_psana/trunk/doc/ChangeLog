@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-28
+2013-08-14 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-30
+
 Tag: V00-04-27
 2013-07-15 Andy Salnikov
 - re-generated with psddl V00-08-05

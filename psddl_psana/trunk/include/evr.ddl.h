@@ -191,6 +191,7 @@ public:
   uint32_t maskSet() const { return _u32MaskSet; }
   uint32_t maskClear() const { return _u32MaskClear; }
   const char* desc() const { return _desc; }
+  uint32_t releaseCode() const { return this->_u32ReportWidth; }
   static uint32_t _sizeof() { return ((((24+(1*(DescSize)))+4)-1)/4)*4; }
   /** Method which returns the shape (dimensions) of the data returned by desc() method. */
   std::vector<int> desc_shape() const;
@@ -234,6 +235,7 @@ public:
   uint32_t maskClear() const { return _u32MaskClear; }
   const char* desc() const { return _desc; }
   uint16_t readoutGroup() const { return _u16ReadGroup; }
+  uint32_t releaseCode() const { return this->_u32ReportWidth; }
   static uint32_t _sizeof() { return (((((24+(1*(DescSize)))+2)+4)-1)/4)*4; }
   /** Method which returns the shape (dimensions) of the data returned by desc() method. */
   std::vector<int> desc_shape() const;
