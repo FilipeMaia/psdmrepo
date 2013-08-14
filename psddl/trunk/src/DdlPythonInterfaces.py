@@ -384,7 +384,12 @@ class DdlPythonInterfaces ( object ) :
             # non-basic types are returned by cref from wrapped method if method has 
             # corresponding attribute
             if method.attribute:
-                policy = None if method.type.basic else "return_value_policy<copy_const_reference>()"
+                if method.type.basic: 
+                    policy = None
+                elif method.type.value_type:
+                    policy = "return_value_policy<copy_const_reference>()"
+                else:
+                    policy = "return_internal_reference<1>()"
 
         elif method.type.name == 'char':
             
