@@ -140,7 +140,8 @@ class GUIMain ( QtGui.QWidget ) :
         pass
         self.setMinimumSize(800,900)
         self.setContentsMargins (QtCore.QMargins(-9,-9,-9,-9))
-
+        #self.vsplit.setMinimumHeight(700)
+        
         #self.        setStyleSheet(cp.styleBkgd)
         #self.butSave.setStyleSheet(cp.styleButton)
         #self.butExit.setStyleSheet(cp.styleButton)

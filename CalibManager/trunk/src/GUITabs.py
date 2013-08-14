@@ -90,7 +90,7 @@ class GUITabs ( QtGui.QWidget ) :
 
         cp.setIcons()
  
-        self.setGeometry(10, 25, 750, 500)
+        self.setGeometry(10, 25, 750, 900)
         self.setWindowTitle('Calibration Manager')
         self.setWindowIcon(cp.icon_monitor)
         self.palette = QtGui.QPalette()
@@ -171,6 +171,9 @@ class GUITabs ( QtGui.QWidget ) :
         #self.butExit.setText('')
         #self.butExit.setFlat(True)
 
+        self.setMinimumHeight(700)
+        self.setBaseSize(750,900)
+
 
     def makeTabBar(self,mode=None) :
         #if mode != None : self.tab_bar.close()
@@ -248,9 +251,12 @@ class GUITabs ( QtGui.QWidget ) :
         #self.gui_win.setMinimumWidth(500)
         #self.gui_win.setMinimumHeight(300)
         #self.gui_win.setMinimumSize(500,400)
-        self.gui_win.setMinimumSize(750,400)
+        #self.gui_win.setMinimumSize(750,500)
+        self.gui_win.setMinimumWidth(750)
+        self.gui_win.setMinimumHeight(400)
         #self.gui_win.setBaseSize(700,500)
         #self.gui_win.adjustSize()
+        self.setBaseSize(750,900)
 
         self.hboxW.addWidget(self.gui_win)
 

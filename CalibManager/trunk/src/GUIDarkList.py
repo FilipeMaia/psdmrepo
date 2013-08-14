@@ -41,6 +41,8 @@ class GUIDarkList ( QtGui.QWidget ) :
 
     def __init__ ( self, parent=None ) :
 
+        self.parent = parent
+
         #self.calib_dir      = cp.calib_dir
         #self.det_name       = cp.det_name
 
@@ -133,7 +135,9 @@ class GUIDarkList ( QtGui.QWidget ) :
     def setStyle(self):
         self.setMinimumWidth(self.widg_width)
         #self.setFixedHeight(400)
-        self.setMinimumHeight(400)
+        self.setMinimumHeight(200)
+        #self.setBaseSize(600, 400)
+
         self.           setStyleSheet (cp.styleBkgd)
 
         #self.list.adjustSize()
@@ -149,10 +153,6 @@ class GUIDarkList ( QtGui.QWidget ) :
         
         self.setContentsMargins (QtCore.QMargins(-9,-9,-9,-9))
         #self.setContentsMargins (QtCore.QMargins(1,10,1,1))
-
-
-    def setParent(self,parent) :
-        self.parent = parent
 
 
     def resizeEvent(self, e):

@@ -140,6 +140,12 @@ class GUIAnyFilesStatusTable ( QtGui.QWidget ) :
             item_owner  = QtGui.QTableWidgetItem( 'N/A' )
             item_mode   = QtGui.QTableWidgetItem( 'N/A' )
 
+            item_fname.setBackgroundColor (cp.colorTabItem)
+            item_ctime.setBackgroundColor (cp.colorTabItem)
+            item_size .setBackgroundColor (cp.colorTabItem)
+            item_owner.setBackgroundColor (cp.colorTabItem)
+            item_mode .setBackgroundColor (cp.colorTabItem)
+
             #item_struct.setTextAlignment(QtCore.Qt.AlignCenter)
             item_ctime .setTextAlignment(QtCore.Qt.AlignCenter)
             item_size  .setTextAlignment(QtCore.Qt.AlignRight | QtCore.Qt.AlignVCenter)
@@ -228,7 +234,10 @@ class GUIAnyFilesStatusTable ( QtGui.QWidget ) :
 
     def setStyle(self):
         #self.setMinimumSize(650,300)
-        self.setStyleSheet(cp.styleBkgd)
+        #self.setStyleSheet(cp.styleBkgd)
+        self.setStyleSheet(cp.styleGreenish)
+        #self.setStyleSheet(cp.styleBluish)
+
         #self.but_run   .setStyleSheet (cp.styleButton) 
         #self.but_remove.setStyleSheet (cp.styleButtonBad)
         #self.setFixedWidth(100)

@@ -170,10 +170,6 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         #self.frame.setVisible( self.cbx_dark_more.isChecked() )
 
 
-    def setParent(self,parent) :
-        self.parent = parent
-
-
     def resizeEvent(self, e):
         #logger.debug('resizeEvent', __name__) 
         self.frame.setGeometry(self.rect())
@@ -211,6 +207,8 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
 
 
     def on_but_stop(self):
+        self.exportLocalPars()
+
         logger.info('on_but_stop', __name__)
         bjpeds.stop_auto_processing()
 
@@ -224,6 +222,8 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
 
         
     def on_but_fbro(self):
+        self.exportLocalPars()
+
         logger.info('on_but_fbro', __name__)
         try    :
             cp.guifilebrowser.close()
@@ -237,6 +237,8 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
 
 
     def on_but_plot(self):
+        self.exportLocalPars()
+
         logger.info('on_but_plot', __name__)
         try :
             cp.plotimgspe.close()
@@ -253,6 +255,8 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
             #but.setStyleSheet(cp.styleButtonGood)
 
     def on_but_depl(self):
+        self.exportLocalPars()
+
         logger.info('on_but_depl', __name__)
 
    
@@ -272,6 +276,12 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         logger.info(msg, __name__ )
 
         self.setStyle()
+
+
+    def exportLocalPars(self):
+        """run appropriate method from GUIDarkListItemRun.py"""
+        self.parent.parent.gui_run.exportLocalPars()
+
 
 #-----------------------------
 

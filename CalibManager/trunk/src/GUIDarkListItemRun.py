@@ -3,7 +3,7 @@
 #  $Id$
 #
 # Description:
-#  Module GUIDarkRunItem ...
+#  Module GUIDarkListItemRun ...
 #
 #------------------------------------------------------------------------
 
@@ -35,7 +35,7 @@ from BatchJobPedestals      import *
 #---------------------
 #  Class definition --
 #---------------------
-class GUIDarkRunItem ( QtGui.QWidget ) :
+class GUIDarkListItemRun ( QtGui.QWidget ) :
     """GUI sets the source dark run number, validity range, and starts calibration of pedestals"""
 
     #char_expand    = u' \u25BE' # down-head triangle
@@ -161,10 +161,6 @@ class GUIDarkRunItem ( QtGui.QWidget ) :
         #self.setContentsMargins (QtCore.QMargins(0,5,0,0))
 
 
-    def setParent(self,parent) :
-        self.parent = parent
-
-
     def resizeEvent(self, e):
         #logger.debug('resizeEvent', __name__) 
         self.frame.setGeometry(self.rect())
@@ -186,7 +182,7 @@ class GUIDarkRunItem ( QtGui.QWidget ) :
 
         #self.box_txt.close()
 
-        #try    : del cp.guistatus # GUIDarkRunItem
+        #try    : del cp.guistatus # GUIDarkListItemRun
         #except : pass
 
 
@@ -269,13 +265,13 @@ class GUIDarkRunItem ( QtGui.QWidget ) :
 
         if   but.text() == 'Go' : 
             logger.info('onButGo for run %s' % self.str_run_number, __name__ )
-            #self.bjpeds = BatchJobPedestals() 
-            #self.bjpeds.start_auto_processing()
+            self.bjpeds = BatchJobPedestals() 
+            self.bjpeds.start_auto_processing()
             but.setText('Stop')
             
         elif but.text() == 'Stop' : 
             logger.info('onButStop for run %s' % self.str_run_number, __name__ )
-            #self.bjpeds.stop_auto_processing()
+            self.bjpeds.stop_auto_processing()
             but.setText('Go')
 
 
@@ -296,7 +292,7 @@ class GUIDarkRunItem ( QtGui.QWidget ) :
 if __name__ == "__main__" :
 
     app = QtGui.QApplication(sys.argv)
-    w = GUIDarkRunItem(parent=None, str_run_number='0024')
+    w = GUIDarkListItemRun(parent=None, str_run_number='0024')
     w.setFieldsEnabled(True)
     w.show()
     app.exec_()

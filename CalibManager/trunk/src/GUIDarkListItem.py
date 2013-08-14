@@ -31,7 +31,7 @@ from Logger                 import logger
 import GlobalUtils          as     gu
 from FileNameManager        import fnm
 
-from GUIDarkRunItem         import *
+from GUIDarkListItemRun        import *
 from GUIDarkListItemExpandWidg import *
 #from GUIAnyFilesStatusTable import *
 
@@ -62,18 +62,17 @@ class GUIDarkListItem ( QtGui.QWidget ) :
 
         self.run_number = run_number # cp.str_run_number
 
-        
         self.str_run_number = cp.str_run_number # cp.str_run_number
         #self.calib_dir      = cp.calib_dir
         #self.det_name       = cp.det_name
         
-        self.but_exp = QtGui.QPushButton(self.char_expand)
+        self.but_expand_shrink = QtGui.QPushButton(self.char_expand)
 
         self.gui_add = None
-        self.gui_run = GUIDarkRunItem(self, self.run_number)
+        self.gui_run = GUIDarkListItemRun(self, self.run_number)
         self.hboxTT = QtGui.QHBoxLayout()
         self.hboxTT.addSpacing(5)     
-        self.hboxTT.addWidget(self.but_exp)
+        self.hboxTT.addWidget(self.but_expand_shrink)
         self.hboxTT.addWidget(self.gui_run)
         self.hboxTT.addStretch(1)     
 
@@ -91,28 +90,15 @@ class GUIDarkListItem ( QtGui.QWidget ) :
 
         self.setLayout(self.vbox)
 
-        self.connect( self.but_exp,     QtCore.SIGNAL('clicked()'),          self.onButExpand  )
+        self.connect( self.but_expand_shrink, QtCore.SIGNAL('clicked()'), self.onButExpandShrink  )
  
-        #self.connect( self.but_go  , QtCore.SIGNAL('clicked()'),         self.onButGo )
-        #self.connect( self.edi_from, QtCore.SIGNAL('editingFinished()'), self.onEdiFrom )
-        #self.connect( self.edi_to  , QtCore.SIGNAL('editingFinished()'), self.onEdiTo )
-   
         self.showToolTips()
-
-        #self.setStatusMessage()
-        #self.setFieldsEnabled(cp.det_name.value() != 'None')
-
-        #cp.guidarkrunitem = self
 
         self.setStyle()
 
 
     def showToolTips(self):
-        pass
-        #self.lab_rnum.setToolTip('Data run for calibration.')
-        #self.but_go  .setToolTip('Begin data processing for calibration.')
-        #self.edi_from.setToolTip('Type in the run number \nas a lower limit of the validity range.')
-        #self.edi_to  .setToolTip('Type in the run number or "end"\nas an upper limit of the validity range.')
+        self.but_expand_shrink.setToolTip('Expand/shrink additional information space for this run.')
 
 
     def setFrame(self):
@@ -125,21 +111,8 @@ class GUIDarkListItem ( QtGui.QWidget ) :
 
 
     def setFieldsEnabled(self, is_enabled=True):
-
         logger.info('Set fields enabled: %s' %  is_enabled, __name__)
-
         #self.lab_rnum .setEnabled(is_enabled)
-        #self.but_go   .setEnabled(is_enabled)
-
-        #self.edi_from .setReadOnly(not is_enabled)
-        #self.edi_to   .setReadOnly(not is_enabled)
-
-        #self.edi_from .setEnabled(is_enabled)
-        #self.edi_to   .setEnabled(is_enabled)
-
-        #self.run_number == 'None'
-
-        #self.setStyle()
 
 
     def setStyle(self):
@@ -147,39 +120,16 @@ class GUIDarkListItem ( QtGui.QWidget ) :
         self.           setStyleSheet (cp.styleBkgd)
         #self.           setStyleSheet (cp.styleYellowish)
 
-        self.but_exp.setFixedSize(20,22)
-        #self.but_exp.setStyleSheet(cp.styleButtonGood)
-        self.but_exp.setStyleSheet(cp.stylePink)
+        self.but_expand_shrink.setFixedSize(20,22)
+        #self.but_expand_shrink.setStyleSheet(cp.styleButtonGood)
+        self.but_expand_shrink.setStyleSheet(cp.stylePink)
 
         #self.lab_from.setStyleSheet(cp.styleLabel)
-        #self.lab_to  .setStyleSheet(cp.styleLabel)
-        #self.lab_run .setStyleSheet(cp.styleLabel)
-
         #self.lab_rnum .setFixedWidth(80)        
-        #self.edi_from .setFixedWidth(40)
-        #self.edi_to   .setFixedWidth(40)
-        #self.but_go   .setFixedWidth(80)        
-
         #self.edi_from .setAlignment (QtCore.Qt.AlignRight)
-        #self.edi_to   .setAlignment (QtCore.Qt.AlignRight)
-
         #if self.edi_from.isReadOnly() : self.edi_from.setStyleSheet (cp.styleEditInfo)
-        #else                          : self.edi_from.setStyleSheet (cp.styleEdit)
 
-        #if self.edi_to.isReadOnly()   : self.edi_to.setStyleSheet (cp.styleEditInfo)
-        #else                          : self.edi_to.setStyleSheet (cp.styleEdit)
-
-        #self.but_go.setEnabled(self.run_number != 'None' and self.lab_rnum.isEnabled())
-
-
-        #self.setContentsMargins (QtCore.QMargins(0,0,0,0))
-        #self.setContentsMargins (QtCore.QMargins(-5,-5,-5,-5))
         self.setContentsMargins (QtCore.QMargins(-9,-9,-9,-9))
-        #self.setContentsMargins (QtCore.QMargins(0,5,0,0))
-
-
-    def setParent(self,parent) :
-        self.parent = parent
 
 
     def resizeEvent(self, e):
@@ -217,9 +167,9 @@ class GUIDarkListItem ( QtGui.QWidget ) :
         #cp.guistatus.setStatusMessage(msg)
 
 
-    def onButExpand(self):
-        #logger.debug('onButExpand', __name__)
-        but = self.but_exp
+    def onButExpandShrink(self):
+        #logger.debug('onButExpandShrink', __name__)
+        but = self.but_expand_shrink
 
         if but.text() == self.char_expand :
             #print 'Click on expand button'

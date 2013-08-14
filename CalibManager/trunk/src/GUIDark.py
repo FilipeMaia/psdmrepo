@@ -45,15 +45,20 @@ class GUIDark ( QtGui.QWidget ) :
         self.guistatus        = GUIStatus(self)
         self.guidarklist      = GUIDarkList(self)
         #self.guidarkmoreopts  = GUIDarkMoreOpts(self)
-        
-        self.vbox = QtGui.QVBoxLayout() 
-        self.vbox.addWidget(self.guistatus)
+
+        self.vsplit = QtGui.QSplitter(QtCore.Qt.Vertical)
+        self.vsplit.addWidget(self.guistatus)
+        self.vsplit.addWidget(self.guidarklist)
+         
+        self.hbox = QtGui.QVBoxLayout() 
+        self.hbox.addWidget(self.vsplit)
+        #self.hbox.addWidget(self.guistatus)
         #self.vbox.addStretch(1)
-        self.vbox.addWidget(self.guidarklist)
+        #self.vbox.addWidget(self.guidarklist)
         #self.vbox.addStretch(1)
         #self.vbox.addWidget(self.guidarkmoreopts)
 
-        self.setLayout(self.vbox)
+        self.setLayout(self.hbox)
 
         self.showToolTips()
         self.setStyle()
@@ -67,6 +72,11 @@ class GUIDark ( QtGui.QWidget ) :
 
     def setStyle(self):
         pass
+
+        self.vsplit.setMinimumHeight(640)
+        self.setMinimumHeight(700)
+        #self.setBaseSize(750,700)
+
         #width = 60
         #self.setMinimumWidth(700)
         #self.setStyleSheet(cp.styleBkgd)

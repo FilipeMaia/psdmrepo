@@ -314,6 +314,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
         self.colorEditInfo     = QtGui.QColor(100, 255, 200)
         self.colorEditBad      = QtGui.QColor(255,   0,   0)
         self.colorEdit         = QtGui.QColor('white')
+        self.colorTabItem      = QtGui.QColor('white')
 
         self.styleTitleInFrame = self.styleWhite # self.styleDefault # self.styleWhite # self.styleGray
 

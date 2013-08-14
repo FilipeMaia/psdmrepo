@@ -90,7 +90,7 @@ class GUIDarkListItemExpandWidg ( QtGui.QWidget ) :
 
 
     def setStyle(self):
-        self.gui_table.setStyleSheet(cp.styleYellowish)
+        #self.gui_table.setStyleSheet(cp.styleYellowish)
         #self.gui_table.setMinimumHeight(100)
 
         self.setContentsMargins (QtCore.QMargins(-9,-9,-9,-9))

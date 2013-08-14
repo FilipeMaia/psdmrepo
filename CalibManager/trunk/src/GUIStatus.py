@@ -86,8 +86,6 @@ class GUIStatus ( QtGui.QGroupBox ) :
 
 
     def setStyle(self):
-        self.setMinimumWidth(300)
-        self.setFixedHeight(100)
         self.           setStyleSheet (cp.styleBkgd)
         #self.tit_status.setStyleSheet (cp.styleTitle)
         #self.tit_status.setStyleSheet (cp.styleDefault)
@@ -99,6 +97,12 @@ class GUIStatus ( QtGui.QGroupBox ) :
         #self.setContentsMargins (QtCore.QMargins(-9,-9,-9,-9))
         #self.setContentsMargins (QtCore.QMargins(10,10,10,10))
         self.setContentsMargins (QtCore.QMargins(10,20,10,10))
+
+        #self.setMinimumWidth(300)
+        #self.setFixedHeight(200)
+
+        self.setMinimumHeight(200)
+        self.setBaseSize(600, 200)
 
 
     def setParent(self,parent) :
