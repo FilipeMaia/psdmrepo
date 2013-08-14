@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-09-11
+2013-08-13 Andy Salnikov
+- one more place needed default env instead of package env
+
 Tag: V00-09-10
 2013-08-08 Andy Salnikov
 - my last commit broke unrelated stuff (Python include path), fixing that now

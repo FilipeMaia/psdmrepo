@@ -201,8 +201,9 @@ def standardPyExt( env, **kw ) :
 
         objects = [env.PythonObject(src) for src in extsrcs]
         # if package builds standard library then add it to the link
-        libs = env['PKG_TREE_LIB'].get(pkg, [])
+        libs = DefaultEnvironment()['PKG_TREE_LIB'].get(pkg, [])
         if libs: libs = [pkg]
+        trace ( "pyext libs = "+str(map(str, libs)), "SConscript", 2 )
         extmod = env.PythonExtension ( extmodname, source=objects, LIBS=libs)
         iextmod = env.Install ( pydir, source=extmod )
         DefaultEnvironment()['ALL_TARGETS']['LIBS'].extend ( iextmod )
