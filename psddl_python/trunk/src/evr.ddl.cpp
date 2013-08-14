@@ -107,6 +107,7 @@ void createWrappers(PyObject* module) {
     .def("maskSet", &Psana::EvrData::EventCodeV5::maskSet)
     .def("maskClear", &Psana::EvrData::EventCodeV5::maskClear)
     .def("desc", &Psana::EvrData::EventCodeV5::desc)
+    .def("releaseCode", &Psana::EvrData::EventCodeV5::releaseCode)
     .def("desc_shape", &method_shape<Psana::EvrData::EventCodeV5, &Psana::EvrData::EventCodeV5::desc_shape>)
   ;
   scope().attr("DescSize")=16;
@@ -127,6 +128,7 @@ void createWrappers(PyObject* module) {
     .def("maskClear", &Psana::EvrData::EventCodeV6::maskClear)
     .def("desc", &Psana::EvrData::EventCodeV6::desc)
     .def("readoutGroup", &Psana::EvrData::EventCodeV6::readoutGroup)
+    .def("releaseCode", &Psana::EvrData::EventCodeV6::releaseCode)
     .def("desc_shape", &method_shape<Psana::EvrData::EventCodeV6, &Psana::EvrData::EventCodeV6::desc_shape>)
   ;
   scope().attr("DescSize")=16;
