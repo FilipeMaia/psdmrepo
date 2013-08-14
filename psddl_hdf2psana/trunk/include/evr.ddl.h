@@ -232,6 +232,7 @@ struct dataset_data {
   uint32_t maskSet;
   uint32_t maskClear;
   char* desc;
+  uint32_t releaseCode;
 
   operator Psana::EvrData::EventCodeV5() const { return Psana::EvrData::EventCodeV5(code, isReadout, isCommand, isLatch, reportDelay, reportWidth, maskTrigger, maskSet, maskClear, desc); }
 
@@ -285,6 +286,7 @@ struct dataset_data {
   uint32_t maskClear;
   char* desc;
   uint16_t readoutGroup;
+  uint32_t releaseCode;
 
   operator Psana::EvrData::EventCodeV6() const { return Psana::EvrData::EventCodeV6(code, isReadout, isCommand, isLatch, reportDelay, reportWidth, maskTrigger, maskSet, maskClear, desc, readoutGroup); }
 

@@ -592,6 +592,7 @@ hdf5pp::Type ns_EventCodeV5_v0_dataset_data_stored_type()
   type.insert("maskSet", offsetof(DsType, maskSet), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("maskClear", offsetof(DsType, maskClear), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("desc", offsetof(DsType, desc), hdf5pp::TypeTraits<const char*>::stored_type());
+  type.insert("releaseCode", offsetof(DsType, releaseCode), hdf5pp::TypeTraits<uint32_t>::stored_type());
   return type;
 }
 
@@ -615,6 +616,7 @@ hdf5pp::Type ns_EventCodeV5_v0_dataset_data_native_type()
   type.insert("maskSet", offsetof(DsType, maskSet), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("maskClear", offsetof(DsType, maskClear), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("desc", offsetof(DsType, desc), hdf5pp::TypeTraits<const char*>::native_type());
+  type.insert("releaseCode", offsetof(DsType, releaseCode), hdf5pp::TypeTraits<uint32_t>::native_type());
   return type;
 }
 
@@ -639,6 +641,7 @@ ns_EventCodeV5_v0::dataset_data::dataset_data(const Psana::EvrData::EventCodeV5&
   , maskSet(psanaobj.maskSet())
   , maskClear(psanaobj.maskClear())
   , desc(0)
+  , releaseCode(psanaobj.releaseCode())
 {
   desc = strdup(psanaobj.desc());
 }
@@ -739,6 +742,7 @@ hdf5pp::Type ns_EventCodeV6_v0_dataset_data_stored_type()
   type.insert("maskClear", offsetof(DsType, maskClear), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("desc", offsetof(DsType, desc), hdf5pp::TypeTraits<const char*>::stored_type());
   type.insert("readoutGroup", offsetof(DsType, readoutGroup), hdf5pp::TypeTraits<uint16_t>::stored_type());
+  type.insert("releaseCode", offsetof(DsType, releaseCode), hdf5pp::TypeTraits<uint32_t>::stored_type());
   return type;
 }
 
@@ -763,6 +767,7 @@ hdf5pp::Type ns_EventCodeV6_v0_dataset_data_native_type()
   type.insert("maskClear", offsetof(DsType, maskClear), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("desc", offsetof(DsType, desc), hdf5pp::TypeTraits<const char*>::native_type());
   type.insert("readoutGroup", offsetof(DsType, readoutGroup), hdf5pp::TypeTraits<uint16_t>::native_type());
+  type.insert("releaseCode", offsetof(DsType, releaseCode), hdf5pp::TypeTraits<uint32_t>::native_type());
   return type;
 }
 
@@ -788,6 +793,7 @@ ns_EventCodeV6_v0::dataset_data::dataset_data(const Psana::EvrData::EventCodeV6&
   , maskClear(psanaobj.maskClear())
   , desc(0)
   , readoutGroup(psanaobj.readoutGroup())
+  , releaseCode(psanaobj.releaseCode())
 {
   desc = strdup(psanaobj.desc());
 }
