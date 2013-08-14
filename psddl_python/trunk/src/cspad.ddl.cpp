@@ -95,8 +95,8 @@ void createWrappers(PyObject* module) {
     .def("injTotal", &Psana::CsPad::ConfigV1QuadReg::injTotal)
     .def("rowColShiftPer", &Psana::CsPad::ConfigV1QuadReg::rowColShiftPer)
     .def("ro", &Psana::CsPad::ConfigV1QuadReg::ro, return_value_policy<copy_const_reference>(),"read-only configuration")
-    .def("dp", &Psana::CsPad::ConfigV1QuadReg::dp, return_value_policy<copy_const_reference>())
-    .def("gm", &Psana::CsPad::ConfigV1QuadReg::gm, return_value_policy<copy_const_reference>(),"Gain map.")
+    .def("dp", &Psana::CsPad::ConfigV1QuadReg::dp, return_internal_reference<1>())
+    .def("gm", &Psana::CsPad::ConfigV1QuadReg::gm, return_internal_reference<1>(),"Gain map.")
   ;
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::CsPad::ConfigV1QuadReg> >(-1));
 
@@ -117,8 +117,8 @@ void createWrappers(PyObject* module) {
     .def("digCount", &Psana::CsPad::ConfigV2QuadReg::digCount)
     .def("digPeriod", &Psana::CsPad::ConfigV2QuadReg::digPeriod)
     .def("ro", &Psana::CsPad::ConfigV2QuadReg::ro, return_value_policy<copy_const_reference>(),"read-only configuration")
-    .def("dp", &Psana::CsPad::ConfigV2QuadReg::dp, return_value_policy<copy_const_reference>())
-    .def("gm", &Psana::CsPad::ConfigV2QuadReg::gm, return_value_policy<copy_const_reference>(),"Gain map.")
+    .def("dp", &Psana::CsPad::ConfigV2QuadReg::dp, return_internal_reference<1>())
+    .def("gm", &Psana::CsPad::ConfigV2QuadReg::gm, return_internal_reference<1>(),"Gain map.")
   ;
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::CsPad::ConfigV2QuadReg> >(-1));
 
@@ -141,8 +141,8 @@ void createWrappers(PyObject* module) {
     .def("biasTuning", &Psana::CsPad::ConfigV3QuadReg::biasTuning)
     .def("pdpmndnmBalance", &Psana::CsPad::ConfigV3QuadReg::pdpmndnmBalance)
     .def("ro", &Psana::CsPad::ConfigV3QuadReg::ro, return_value_policy<copy_const_reference>(),"read-only configuration")
-    .def("dp", &Psana::CsPad::ConfigV3QuadReg::dp, return_value_policy<copy_const_reference>())
-    .def("gm", &Psana::CsPad::ConfigV3QuadReg::gm, return_value_policy<copy_const_reference>(),"Gain map.")
+    .def("dp", &Psana::CsPad::ConfigV3QuadReg::dp, return_internal_reference<1>())
+    .def("gm", &Psana::CsPad::ConfigV3QuadReg::gm, return_internal_reference<1>(),"Gain map.")
   ;
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::CsPad::ConfigV3QuadReg> >(-1));
 

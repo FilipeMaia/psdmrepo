@@ -174,8 +174,8 @@ void createWrappers(PyObject* module) {
   {
   scope outer = 
   class_<Psana::Bld::BldDataIpimbV0, boost::shared_ptr<Psana::Bld::BldDataIpimbV0>, boost::noncopyable >("BldDataIpimbV0", "Combined structure which includes Ipimb.DataV1, Ipimb.ConfigV1, and \n            Lusi.IpmFexV1 objects.", no_init)
-    .def("ipimbData", &Psana::Bld::BldDataIpimbV0::ipimbData, return_value_policy<copy_const_reference>())
-    .def("ipimbConfig", &Psana::Bld::BldDataIpimbV0::ipimbConfig, return_value_policy<copy_const_reference>())
+    .def("ipimbData", &Psana::Bld::BldDataIpimbV0::ipimbData, return_internal_reference<1>())
+    .def("ipimbConfig", &Psana::Bld::BldDataIpimbV0::ipimbConfig, return_internal_reference<1>())
     .def("ipmFexData", &Psana::Bld::BldDataIpimbV0::ipmFexData, return_value_policy<copy_const_reference>())
   ;
   scope().attr("Version")=0;
@@ -186,8 +186,8 @@ void createWrappers(PyObject* module) {
   {
   scope outer = 
   class_<Psana::Bld::BldDataIpimbV1, boost::shared_ptr<Psana::Bld::BldDataIpimbV1>, boost::noncopyable >("BldDataIpimbV1", "Combined structure which includes Ipimb.DataV2, Ipimb.ConfigV2, and \n            Lusi.IpmFexV1 objects.", no_init)
-    .def("ipimbData", &Psana::Bld::BldDataIpimbV1::ipimbData, return_value_policy<copy_const_reference>())
-    .def("ipimbConfig", &Psana::Bld::BldDataIpimbV1::ipimbConfig, return_value_policy<copy_const_reference>())
+    .def("ipimbData", &Psana::Bld::BldDataIpimbV1::ipimbData, return_internal_reference<1>())
+    .def("ipimbConfig", &Psana::Bld::BldDataIpimbV1::ipimbConfig, return_internal_reference<1>())
     .def("ipmFexData", &Psana::Bld::BldDataIpimbV1::ipmFexData, return_value_policy<copy_const_reference>())
   ;
   scope().attr("Version")=1;
@@ -198,9 +198,9 @@ void createWrappers(PyObject* module) {
   {
   scope outer = 
   class_<Psana::Bld::BldDataPimV1, boost::shared_ptr<Psana::Bld::BldDataPimV1>, boost::noncopyable >("BldDataPimV1", "Combined structure which includes Pulnix.TM6740ConfigV2, Lusi.PimImageConfigV1, and \n            Camera.FrameV1 objects.", no_init)
-    .def("camConfig", &Psana::Bld::BldDataPimV1::camConfig, return_value_policy<copy_const_reference>())
+    .def("camConfig", &Psana::Bld::BldDataPimV1::camConfig, return_internal_reference<1>())
     .def("pimConfig", &Psana::Bld::BldDataPimV1::pimConfig, return_value_policy<copy_const_reference>())
-    .def("frame", &Psana::Bld::BldDataPimV1::frame, return_value_policy<copy_const_reference>())
+    .def("frame", &Psana::Bld::BldDataPimV1::frame, return_internal_reference<1>())
   ;
   scope().attr("Version")=1;
   scope().attr("TypeId")=int(Pds::TypeId::Id_SharedPim);

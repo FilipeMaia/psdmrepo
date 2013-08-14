@@ -304,7 +304,7 @@ void createWrappers(PyObject* module) {
     .def("eventcodes", &Psana::EvrData::ConfigV5::eventcodes)
     .def("pulses", &Psana::EvrData::ConfigV5::pulses)
     .def("output_maps", &Psana::EvrData::ConfigV5::output_maps)
-    .def("seq_config", &Psana::EvrData::ConfigV5::seq_config, return_value_policy<copy_const_reference>())
+    .def("seq_config", &Psana::EvrData::ConfigV5::seq_config, return_internal_reference<1>())
   ;
   scope().attr("Version")=5;
   scope().attr("TypeId")=int(Pds::TypeId::Id_EvrConfig);
@@ -322,7 +322,7 @@ void createWrappers(PyObject* module) {
     .def("eventcodes", &Psana::EvrData::ConfigV6::eventcodes)
     .def("pulses", &Psana::EvrData::ConfigV6::pulses)
     .def("output_maps", &Psana::EvrData::ConfigV6::output_maps)
-    .def("seq_config", &Psana::EvrData::ConfigV6::seq_config, return_value_policy<copy_const_reference>())
+    .def("seq_config", &Psana::EvrData::ConfigV6::seq_config, return_internal_reference<1>())
   ;
   scope().attr("Version")=6;
   scope().attr("TypeId")=int(Pds::TypeId::Id_EvrConfig);
@@ -340,7 +340,7 @@ void createWrappers(PyObject* module) {
     .def("eventcodes", &Psana::EvrData::ConfigV7::eventcodes)
     .def("pulses", &Psana::EvrData::ConfigV7::pulses)
     .def("output_maps", &Psana::EvrData::ConfigV7::output_maps)
-    .def("seq_config", &Psana::EvrData::ConfigV7::seq_config, return_value_policy<copy_const_reference>())
+    .def("seq_config", &Psana::EvrData::ConfigV7::seq_config, return_internal_reference<1>())
   ;
   scope().attr("Version")=7;
   scope().attr("TypeId")=int(Pds::TypeId::Id_EvrConfig);

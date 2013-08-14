@@ -104,8 +104,8 @@ void createWrappers(PyObject* module) {
     .def("humidThold", &Psana::CsPad2x2::ConfigV1QuadReg::humidThold)
     .def("setPoint", &Psana::CsPad2x2::ConfigV1QuadReg::setPoint)
     .def("ro", &Psana::CsPad2x2::ConfigV1QuadReg::ro, return_value_policy<copy_const_reference>(),"read-only configuration")
-    .def("dp", &Psana::CsPad2x2::ConfigV1QuadReg::dp, return_value_policy<copy_const_reference>())
-    .def("gm", &Psana::CsPad2x2::ConfigV1QuadReg::gm, return_value_policy<copy_const_reference>(),"Gain map.")
+    .def("dp", &Psana::CsPad2x2::ConfigV1QuadReg::dp, return_internal_reference<1>())
+    .def("gm", &Psana::CsPad2x2::ConfigV1QuadReg::gm, return_internal_reference<1>(),"Gain map.")
   ;
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::CsPad2x2::ConfigV1QuadReg> >(-1));
 
@@ -122,7 +122,7 @@ void createWrappers(PyObject* module) {
     .def("badAsicMask", &Psana::CsPad2x2::ConfigV1::badAsicMask)
     .def("asicMask", &Psana::CsPad2x2::ConfigV1::asicMask)
     .def("roiMask", &Psana::CsPad2x2::ConfigV1::roiMask)
-    .def("quad", &Psana::CsPad2x2::ConfigV1::quad, return_value_policy<copy_const_reference>())
+    .def("quad", &Psana::CsPad2x2::ConfigV1::quad, return_internal_reference<1>())
     .def("numAsicsRead", &Psana::CsPad2x2::ConfigV1::numAsicsRead)
     .def("numAsicsStored", &Psana::CsPad2x2::ConfigV1::numAsicsStored,"Number of ASICs in given quadrant")
   ;
@@ -156,8 +156,8 @@ void createWrappers(PyObject* module) {
     .def("biasTuning", &Psana::CsPad2x2::ConfigV2QuadReg::biasTuning,"bias tuning is used, but not written;\n            2 bits per nibble, C2,C1,I5,I2;\n            bit order rc00rc00rc00rc")
     .def("pdpmndnmBalance", &Psana::CsPad2x2::ConfigV2QuadReg::pdpmndnmBalance,"pMOS and nMOS Displacement and Main;\n            used but not written and not in GUI yet;\n            hard-wired to zero in GUI;\n            2 bits per nibble, bit order pd00pm00nd00nm")
     .def("ro", &Psana::CsPad2x2::ConfigV2QuadReg::ro, return_value_policy<copy_const_reference>(),"read-only configuration")
-    .def("dp", &Psana::CsPad2x2::ConfigV2QuadReg::dp, return_value_policy<copy_const_reference>())
-    .def("gm", &Psana::CsPad2x2::ConfigV2QuadReg::gm, return_value_policy<copy_const_reference>(),"Gain map.")
+    .def("dp", &Psana::CsPad2x2::ConfigV2QuadReg::dp, return_internal_reference<1>())
+    .def("gm", &Psana::CsPad2x2::ConfigV2QuadReg::gm, return_internal_reference<1>(),"Gain map.")
   ;
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::CsPad2x2::ConfigV2QuadReg> >(-1));
 
@@ -175,7 +175,7 @@ void createWrappers(PyObject* module) {
     .def("badAsicMask", &Psana::CsPad2x2::ConfigV2::badAsicMask)
     .def("asicMask", &Psana::CsPad2x2::ConfigV2::asicMask)
     .def("roiMask", &Psana::CsPad2x2::ConfigV2::roiMask)
-    .def("quad", &Psana::CsPad2x2::ConfigV2::quad, return_value_policy<copy_const_reference>())
+    .def("quad", &Psana::CsPad2x2::ConfigV2::quad, return_internal_reference<1>())
     .def("numAsicsRead", &Psana::CsPad2x2::ConfigV2::numAsicsRead)
     .def("numAsicsStored", &Psana::CsPad2x2::ConfigV2::numAsicsStored,"Number of ASICs in given quadrant")
   ;
