@@ -241,6 +241,11 @@
             <attribute name="_desc" type="char" shape="DescSize" accessor="desc">
             </attribute>
 
+            <method name="releaseCode" type="uint32_t">
+                <tag name="inline"/>
+                <expr lang="C++" value="{self}._u32ReportWidth"/>
+            </method>
+
             <ctor>
                 Default constructor
                 <tag name="inline"/>
@@ -292,6 +297,11 @@
 
             <attribute name="_u16ReadGroup" type="uint16_t" accessor="readoutGroup">
             </attribute>
+
+            <method name="releaseCode" type="uint32_t">
+                <tag name="inline"/>
+                <expr lang="C++" value="{self}._u32ReportWidth"/>
+            </method>
 
             <ctor>
                 Default constructor
