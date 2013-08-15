@@ -254,26 +254,35 @@ def get_open_files(exper_id,runnum=None):
 
     return files
 
-# --------------------------------------------------------------------------------------
-# Return a list of runs taken in a context of the specified experiment. Each run will be
-# represented with a dictionary with the following keys:
-#
-#   'exper_id'        : a numeric identifier of the experiment
-#   'num'             : a run number
-#   'begin_time_unix' : a UNIX timestamp (32-bits since Epoch) for the start of the run
-#   'end_time_unix'   : a UNIX timestamp (32-bits since Epoch) for the start of the run.
-#
-# NOTES:
-#
-#   1. if no experiment name provided to the function then  the current
-#   experiment for the specified station will be assumed. The station parameter
-#   will be ignored if the experiment name is provided.
-#
-#   2. if the run is still going on then its 'end_time_unix' will be set
-#   to None
-# --------------------------------------------------------------------------------------
-
 def experiment_runs(instr, exper=None, station=0):
+
+    """
+    Return a list of runs taken in a context of the specified experiment.
+
+    Each run will be represented with a dictionary with the following keys:
+
+      'exper_id'        : a numeric identifier of the experiment
+      'num'             : a run number
+      'begin_time_unix' : a UNIX timestamp (32-bits since Epoch) for the start of the run
+      'end_time_unix'   : a UNIX timestamp (32-bits since Epoch) for the start of the run.
+
+    NOTES:
+
+      1. if no experiment name provided to the function then  the current
+      experiment for the specified station will be assumed. The station parameter
+      will be ignored if the experiment name is provided.
+
+      2. if the run is still going on then its 'end_time_unix' will be set to None
+
+    PARAMETERS:
+
+      @param instr: the name of the instrument
+      @param exper: the optional name of the experiment (default is the current experiment of the instrument)
+      @param station: the optional station number (default is 0)
+      @return: the list of run descriptors as explained above
+
+    """
+
     if exper is None:
         e = active_experiment(instr,station)
         if e is None: return []
@@ -288,6 +297,26 @@ def experiment_runs(instr, exper=None, station=0):
         runs.append(row)
 
     return runs
+
+def detectors(instr, exper, run):
+
+    """
+    Return a list of detector names configured in the DAQ system for a particular
+    experiment and a run.
+ 
+    PARAMETERS:
+
+      @param instr: the name of the instrument
+      @param exper: the name of the experiment
+      @param run: the run number
+      @return: the list of detector names
+
+    """
+
+    exper_id = name2id(exper)
+    run = int(run)
+    query = "SELECT name FROM logbook.run_attr WHERE run_id IN (SELECT id from logbook.run WHERE exper_id=%d AND num=%d) AND class='DAQ_Detectors' ORDER BY name" % (exper_id,run,)
+    return [row['name'] for row in __do_select_many(query)]
 
 
 # -------------------------------
@@ -347,9 +376,29 @@ if __name__ == "__main__" :
                 end_time = datetime.datetime.fromtimestamp(run['end_time_unix']).strftime('%Y-%m-%d %H:%M:%S')
             print "  %6d | %5d | %19s | %19s" % (run['exper_id'],run['num'],begin_time,end_time,)
 
+
+        instr_name = 'XPP'
+        experiment = active_experiment(instr_name)
+        if experiment is not None:
+            exper_name = experiment[1]
+
+            print """
+
+ Detector names for all runs for experiment %s/%s :
+
+ --------+---------------------------------------------------------------------------------------------------------
+    run  |  detectors
+ --------+---------------------------------------------------------------------------------------------------------""" % (instr_name, exper_name,)
+
+            for run in experiment_runs(instr_name, exper_name):
+                runnum = run['num']
+                print "   %4d  |  %s" % (runnum, '  '.join(detectors(instr_name, exper_name, runnum,)),)
+
+
     except db.Error, e:
          print 'MySQL operation failed because of:', e
          sys.exit(1)
+
 
     sys.exit(0)
 

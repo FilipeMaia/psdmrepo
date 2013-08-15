@@ -11,6 +11,11 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-14
+2013-08-14 Igor Gaponenko
+- added function detectors() to src/experiment_info. The function will return
+names of detectors configured in DAQ for the specified experiment and a run
+
 Tag: V00-01-13
 2013-07-25 Igor Gaponenko
 - relaxed rules for the names of experiments
