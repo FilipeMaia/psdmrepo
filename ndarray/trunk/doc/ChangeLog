@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V01-01-05
+2013-08-15 Andy Salnikov
+- add makefile for building this for DAQ
+
 Tag: V01-01-04
 2013-08-13 Andy Salnikov
 - Matt noticed that ndarray::reshape() is sonst but calls non-const method
