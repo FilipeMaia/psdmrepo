@@ -90,7 +90,7 @@ class GUITabs ( QtGui.QWidget ) :
 
         cp.setIcons()
  
-        self.setGeometry(10, 25, 750, 900)
+        self.setGeometry(10, 25, 750, 670)
         self.setWindowTitle('Calibration Manager')
         self.setWindowIcon(cp.icon_monitor)
         self.palette = QtGui.QPalette()
@@ -106,6 +106,8 @@ class GUITabs ( QtGui.QWidget ) :
         #self.butSave    .setIcon(cp.icon_save_cfg)
         #self.butStop    .setIcon(cp.icon_stop)
 
+        self.gui_win = None
+
         self.hboxW = QtGui.QHBoxLayout() 
 
         self.vboxW = QtGui.QVBoxLayout() 
@@ -114,12 +116,13 @@ class GUITabs ( QtGui.QWidget ) :
         self.vboxW.addStretch(1)
 
         self.hboxWW= QtGui.QHBoxLayout() 
-        self.hboxWW.addStretch(1)
+        #self.hboxWW.addStretch(1)
         self.hboxWW.addLayout(self.vboxW) 
         self.hboxWW.addStretch(1)
 
         self.makeTabBar()
         self.guiSelector()
+
 
         if self.orientation == 'H' : self.box = QtGui.QVBoxLayout() 
         else :                       self.box = QtGui.QHBoxLayout() 
@@ -171,9 +174,12 @@ class GUITabs ( QtGui.QWidget ) :
         #self.butExit.setText('')
         #self.butExit.setFlat(True)
 
-        self.setMinimumHeight(700)
-        self.setBaseSize(750,900)
+        self.setMinimumHeight(400)
+        #self.setBaseSize(750,670)
+        self.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
 
+        self.setContentsMargins (QtCore.QMargins(-9,-9,-9,-9))
+ 
 
     def makeTabBar(self,mode=None) :
         #if mode != None : self.tab_bar.close()
@@ -230,6 +236,8 @@ class GUITabs ( QtGui.QWidget ) :
         try    : del self.gui_win
         except : pass
 
+        self.gui_win = None
+
         if   cp.current_tab.value() == self.list_of_tabs[0] :
             self.gui_win = GUIDark(self)
             #self.gui_win = GUIFiles(self)
@@ -251,18 +259,22 @@ class GUITabs ( QtGui.QWidget ) :
         #self.gui_win.setMinimumWidth(500)
         #self.gui_win.setMinimumHeight(300)
         #self.gui_win.setMinimumSize(500,400)
-        #self.gui_win.setMinimumSize(750,500)
-        self.gui_win.setMinimumWidth(750)
-        self.gui_win.setMinimumHeight(400)
-        #self.gui_win.setBaseSize(700,500)
-        #self.gui_win.adjustSize()
-        self.setBaseSize(750,900)
+        #self.setAlignment (QtCore.Qt.AlignLeft)
 
         self.hboxW.addWidget(self.gui_win)
 
-        #min_height = self.gui_win.minimumHeight() 
-        #self.setFixedHeight(min_height + 90)
-        #self.setMinimumHeight(min_height + 90)
+        #self.gui_win.setMinimumWidth(800)
+        #self.gui_win.setMinimumHeight(600)
+
+        #self.gui_win.setMinimumWidth(self.size().width()+47)
+        #self.gui_win.setMinimumHeight(self.size().height()-40)
+        #self.gui_win.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+
+        self.resize( self.size() )
+        self.gui_win.setMinimumSize( self.size().width()+47, self.size().height()-40 )
+        #self.gui_win.setBaseSize(700,500)
+        #self.gui_win.adjustSize()
+        #self.setBaseSize(750,900)
 
 
     def onTabBar(self):
@@ -277,6 +289,11 @@ class GUITabs ( QtGui.QWidget ) :
     def resizeEvent(self, e):
         #logger.debug('resizeEvent', self.name) 
         self.frame.setGeometry(self.rect())
+
+        if self.gui_win is not None :
+            #print 'size=', self.size().width(), self.size().height()
+            self.gui_win.resize( self.size().width(), self.size().height()-40 )
+
 
     def moveEvent(self, e):
         #logger.debug('moveEvent', self.name) 

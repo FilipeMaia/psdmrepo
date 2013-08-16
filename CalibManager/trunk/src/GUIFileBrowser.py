@@ -53,6 +53,7 @@ class GUIFileBrowser ( QtGui.QWidget ) :
  
         self.tit_status = QtGui.QLabel('Status:')
         self.tit_file   = QtGui.QLabel('File:')
+        self.but_brow   = QtGui.QPushButton('Browse') 
         self.but_close  = QtGui.QPushButton('Close') 
         self.but_save   = QtGui.QPushButton('Save As') 
 
@@ -67,6 +68,7 @@ class GUIFileBrowser ( QtGui.QWidget ) :
         self.hboxF = QtGui.QHBoxLayout()
         self.hboxF.addWidget(self.tit_file)
         self.hboxF.addWidget(self.box_file)
+        self.hboxF.addWidget(self.but_brow)
 
         self.hboxB = QtGui.QHBoxLayout()
         self.hboxB.addWidget(self.tit_status)
@@ -81,6 +83,7 @@ class GUIFileBrowser ( QtGui.QWidget ) :
         self.vbox.addLayout(self.hboxB)
         self.setLayout(self.vbox)
         
+        self.connect( self.but_brow,  QtCore.SIGNAL('clicked()'), self.onBrow )
         self.connect( self.but_save,  QtCore.SIGNAL('clicked()'), self.onSave )
         self.connect( self.but_close, QtCore.SIGNAL('clicked()'), self.onClose )
         self.connect( self.box_file, QtCore.SIGNAL('currentIndexChanged(int)'), self.onBox  )
@@ -115,6 +118,8 @@ class GUIFileBrowser ( QtGui.QWidget ) :
         self.tit_file  .setFixedWidth (25)
         self.tit_file  .setAlignment  (QtCore.Qt.AlignRight)
         self.box_file  .setStyleSheet (cp.styleButton) 
+        self.but_brow  .setStyleSheet (cp.styleButton)
+        self.but_brow  .setFixedWidth (60)
         self.but_save  .setStyleSheet (cp.styleButton)
         self.but_close .setStyleSheet (cp.styleButton)
         self.box_txt   .setReadOnly   (not self.is_editable)
@@ -126,7 +131,7 @@ class GUIFileBrowser ( QtGui.QWidget ) :
         self.list_of_files += list
         self.box_file.clear()
         self.box_file.addItems(self.list_of_files)
-        self.box_file.setCurrentIndex( 0 )
+        #self.box_file.setCurrentIndex( 0 )
 
 
     def setParent(self,parent) :
@@ -156,8 +161,10 @@ class GUIFileBrowser ( QtGui.QWidget ) :
 
         self.box_txt.close()
 
-        try    : del cp.guifilebrowser # GUIFileBrowser
-        except : pass
+        cp.guifilebrowser = None
+
+        #try    : del cp.guifilebrowser # GUIFileBrowser
+        #except : pass
 
 
     def onClose(self):
@@ -174,16 +181,42 @@ class GUIFileBrowser ( QtGui.QWidget ) :
         f=open(path,'w')
         f.write( text )
         f.close() 
- 
 
+
+    def onBrow(self):
+        logger.debug('onBrow - select file', __name__)
+
+        path0 ='./'
+        if len(self.list_of_files) > 1 : path0 = self.list_of_files[1]
+
+        path = gu.get_open_fname_through_dialog_box(self, path0, 'Select text file for browser', filter='Text files (*.txt *.cfg *.npy)\nAll files (*)')
+        if path == None or path == '' or path == path0 :
+            logger.debug('Loading is cancelled...', __name__ )
+            return
+
+        logger.info('File selected for browser: %s' % path, __name__)        
+
+        if not path in self.list_of_files :
+            self.list_of_files.append(path)
+            self.box_txt.setText(gu.get_text_file_content(path))
+
+            self.setListOfFiles(self.list_of_files[1:])
+            self.box_file.setCurrentIndex( len(self.list_of_files)-1 )
+            self.setStatus(0, 'Status: enjoy browsing selected file...')
+
+ 
     def onBox(self):
         self.fname = str( self.box_file.currentText() )
         logger.info('onBox - selected file: ' + self.fname, __name__)
+
+        if self.fname == '' : return
 
         self.list_of_supported = 'cfg', 'log', 'txt', 'txt-tmp' 
         self.str_of_supported = ''
         for ext in self.list_of_supported : self.str_of_supported += ' ' + ext
 
+        #print 'self.fname = ', self.fname
+        #print 'self.list_of_files', self.list_of_files
 
         if self.list_of_files.index(self.fname) == 0 :
             self.setStatus(0, 'Waiting for file selection...')

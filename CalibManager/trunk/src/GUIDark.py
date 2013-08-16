@@ -38,7 +38,7 @@ class GUIDark ( QtGui.QWidget ) :
 
     def __init__ ( self, parent=None ) :
         QtGui.QWidget.__init__(self, parent)
-        self.setGeometry(200, 400, 750, 700)
+        self.setGeometry(200, 400, 800, 600)
         self.setWindowTitle('Dark run processing')
         self.setFrame()
 
@@ -49,11 +49,11 @@ class GUIDark ( QtGui.QWidget ) :
         self.vsplit = QtGui.QSplitter(QtCore.Qt.Vertical)
         self.vsplit.addWidget(self.guistatus)
         self.vsplit.addWidget(self.guidarklist)
-         
+        
         self.hbox = QtGui.QVBoxLayout() 
         self.hbox.addWidget(self.vsplit)
         #self.hbox.addWidget(self.guistatus)
-        #self.vbox.addStretch(1)
+        #self.hbox.addStretch(1)
         #self.vbox.addWidget(self.guidarklist)
         #self.vbox.addStretch(1)
         #self.vbox.addWidget(self.guidarkmoreopts)
@@ -73,8 +73,13 @@ class GUIDark ( QtGui.QWidget ) :
     def setStyle(self):
         pass
 
-        self.vsplit.setMinimumHeight(640)
-        self.setMinimumHeight(700)
+        #self.vsplit.setMinimumHeight(200)
+        self.vsplit.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Ignored)
+        #self.vsplit.setHandleWidth(150)
+
+        #self.vsplit.moveSplitter(200, self.vsplit.indexOf(self.guidarklist))
+
+        #self.setMinimumHeight(500)
         #self.setBaseSize(750,700)
 
         #width = 60
@@ -97,8 +102,13 @@ class GUIDark ( QtGui.QWidget ) :
         self.frame.setVisible(False)
 
     def resizeEvent(self, e):
-        #logger.debug('resizeEvent', self.name) 
+        #logger.debug('resizeEvent', self.name)
         self.frame.setGeometry(self.rect())
+        #self.setGeometry(self.contentsRect())
+        #w, h = self.size().width(), self.size().height()
+        #self.guistatus  .setMinimumHeight(0.3*h)
+        #self.guidarklist.setMinimumHeight(0.5*h)
+
 
     def moveEvent(self, e):
         #logger.debug('moveEvent', self.name) 

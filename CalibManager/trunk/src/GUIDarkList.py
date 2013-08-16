@@ -49,7 +49,7 @@ class GUIDarkList ( QtGui.QWidget ) :
         #QtGui.QGroupBox.__init__(self, 'Runs', parent)
         QtGui.QWidget.__init__(self, parent)
 
-        self.setGeometry(100, 100, 730, 500)
+        self.setGeometry(100, 100, 730, 400)
         self.setWindowTitle('List of dark runs')
         #self.setTitle('My status')
         #try : self.setWindowIcon(cp.icon_help)
@@ -137,7 +137,8 @@ class GUIDarkList ( QtGui.QWidget ) :
         #self.setFixedHeight(400)
         self.setMinimumHeight(200)
         #self.setBaseSize(600, 400)
-
+        self.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+        #self.setAlignment(QtCore.Qt.AlignTop | QtCore.Qt.AlignLeft)
         self.           setStyleSheet (cp.styleBkgd)
 
         #self.list.adjustSize()

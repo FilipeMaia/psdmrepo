@@ -67,19 +67,25 @@ class BatchLogScanParser :
         self.path = fnm.path_peds_scan_batch_log()
         self.pattern = self.dict_of_det_types[self.det_name.value()]
 
+        #print 'Parse file: %s for pattern: %s' % (self.path, self.pattern)
+
         #self.print_dict_of_det_types()
         self.parse_scan_log()
-        self.print_list_of_types_and_sources()
+        #self.print_list_of_types_and_sources()
         self.is_parsed = True
         
 #-----------------------------
 
     def parse_scan_log (self) :
+
+        list_of_found_lines  = []
+        self.list_of_sources = []
+        self.list_of_types   = []
+
         if not os.path.lexists(self.path) :
             logger.debug('The requested scan log file: ' + self.path + ' is not available.', __name__)         
             return
 
-        list_of_found_lines = []
 
         fin = open(self.path, 'r')
         for line in fin :
@@ -88,9 +94,6 @@ class BatchLogScanParser :
                 list_of_found_lines.append(line)
 
         fin.close() 
-
-        self.list_of_sources = []
-        self.list_of_types   = []
 
         for line in list_of_found_lines : 
 
@@ -111,6 +114,7 @@ class BatchLogScanParser :
 #-----------------------------
 
     def print_list_of_types_and_sources (self) :
+        self.parse_batch_log_peds_scan ()
         msg   = 'In log file: %s\nsearch pattern: %s for detector: %s' % (self.path, self.pattern, self.det_name.value())
         state = 'Sources found in scan:' 
         if self.list_of_sources == [] :
@@ -125,7 +129,7 @@ class BatchLogScanParser :
 
         #print msg
         logger.info(msg, __name__)         
-        cp.guistatus.setStatusMessage(state)
+        #cp.guistatus.setStatusMessage(state)
 
 #-----------------------------
 

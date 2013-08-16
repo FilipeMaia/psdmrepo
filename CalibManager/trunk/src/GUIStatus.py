@@ -101,8 +101,8 @@ class GUIStatus ( QtGui.QGroupBox ) :
         #self.setMinimumWidth(300)
         #self.setFixedHeight(200)
 
-        self.setMinimumHeight(200)
-        self.setBaseSize(600, 200)
+        self.setMinimumHeight(100)
+        self.setBaseSize(600, 100)
 
 
     def setParent(self,parent) :

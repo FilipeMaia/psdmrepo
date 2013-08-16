@@ -87,7 +87,7 @@ class GUIMain ( QtGui.QWidget ) :
         self.vsplit = QtGui.QSplitter(QtCore.Qt.Vertical)
         self.vsplit.addWidget(self.guitabs)
         self.vsplit.addWidget(self.guilogger)
-        #self.vsplit.moveSplitter(100)
+        #self.vsplit.moveSplitter(0,200)
         
         #self.hsplit = QtGui.QSplitter(QtCore.Qt.Horizontal)
         #self.hsplit.addWidget(self.guitree)
@@ -97,8 +97,8 @@ class GUIMain ( QtGui.QWidget ) :
         #self.vbox.addWidget(self.guibuttonbar)
         self.vbox.addWidget(self.guiinsexpdirdet)
         #self.vbox.addLayout(self.hboxB) 
-        self.vbox.addWidget(self.vsplit) 
         #self.vbox.addStretch(1)
+        self.vbox.addWidget(self.vsplit) 
 
         self.setLayout(self.vbox)
 
@@ -155,6 +155,7 @@ class GUIMain ( QtGui.QWidget ) :
         #self.butExit.setText('')
         #self.butExit.setFlat(True)
 
+        #self.vsplit.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Ignored)
 
 
     def resizeEvent(self, e):

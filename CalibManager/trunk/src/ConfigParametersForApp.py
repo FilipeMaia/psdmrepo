@@ -77,9 +77,8 @@ class ConfigParametersForApp ( ConfigParameters ) :
         self.guifilebrowser  = None 
         self.blsp            = None 
 
-        self.procDarkStatus  = 0 # 0=inctive, 1=scan, 2=averaging, 3=both
-
-        self.autoRunStatus = 0            
+        #self.autoRunStatus = 0            
+        #self.procDarkStatus  = 0 # 0=inactive, 1=scan, 2=averaging, 3=both
   
 #-----------------------------
 
@@ -261,7 +260,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
 
 
         # For batch jobs
-        self.bat_queue               = self.declareParameter( name='BATCH_QUEUE',                val_def='psfehq', type='str' )
+        self.bat_queue               = self.declareParameter( name='BATCH_QUEUE',                val_def='psnehq', type='str' )
         self.bat_submit_interval_sec = self.declareParameter( name='BATCH_SUBMIT_INTERVAL_SEC',  val_def=100,      type='int' )
  
 #-----------------------------

@@ -115,10 +115,13 @@ class GUIDarkListItemExpandWidg ( QtGui.QWidget ) :
         try    : self.gui_table.close()
         except : pass
 
-        try    : del self.gui_table
-        except : pass
+        #try    : self.gui_more.close()
+        #except : pass
 
         self.gui_table = None
+
+        try    : del self.gui_table
+        except : pass
 
 
     def onClose(self):

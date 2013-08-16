@@ -30,7 +30,6 @@ from ConfigParametersForApp import cp
 from Logger                 import logger
 import GlobalUtils          as     gu
 from FileNameManager        import fnm
-from BatchJobPedestals      import bjpeds
 from GUIFileBrowser         import *
 from PlotImgSpe             import *
 
@@ -42,7 +41,10 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
     """GUI sets the source dark run number, validity range, and starts calibration of pedestals"""
 
     char_expand    = u' \u25BE' # down-head triangle
+    dict_status = {True  : 'Yes', 
+                   False : 'No' }
 
+               
     def __init__ ( self, parent=None, run_number='0000' ) :
 
         QtGui.QWidget.__init__(self, parent)
@@ -50,7 +52,8 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
 
         self.parent     = parent
         self.run_number = run_number
-
+        self.det_name   = cp.det_name
+        
         self.setGeometry(100, 100, 600, 50)
         self.setWindowTitle('GUI Dark Run Go')
         #try : self.setWindowIcon(cp.icon_help)
@@ -62,13 +65,16 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         self.cbx_dark_more = QtGui.QCheckBox('More options')
         self.cbx_dark_more.setChecked( cp.dark_more_opts.value() )
  
-        #self.but_stop = QtGui.QPushButton( 'Stop' )
-        self.but_fbro = QtGui.QPushButton( 'File browser' )
+        self.but_srcs = QtGui.QPushButton( 'Sources' )
+        self.but_flst = QtGui.QPushButton( 'O/Files' )
+        self.but_fbro = QtGui.QPushButton( 'Show files' )
         self.but_plot = QtGui.QPushButton( 'Plot' )
         self.but_depl = QtGui.QPushButton( 'Deploy' )
 
         self.hbox = QtGui.QHBoxLayout()
         self.hbox.addWidget(self.cbx_dark_more)
+        self.hbox.addWidget(self.but_srcs)
+        self.hbox.addWidget(self.but_flst)
         self.hbox.addWidget(self.but_fbro)
         self.hbox.addWidget(self.but_plot)
         self.hbox.addWidget(self.but_depl)
@@ -84,7 +90,8 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         self.setLayout(self.vbox)
 
         self.connect(self.cbx_dark_more  , QtCore.SIGNAL('stateChanged(int)'), self.on_cbx ) 
-        #self.connect( self.but_stop, QtCore.SIGNAL('clicked()'), self.on_but_stop )
+        self.connect( self.but_srcs, QtCore.SIGNAL('clicked()'), self.on_but_srcs )
+        self.connect( self.but_flst, QtCore.SIGNAL('clicked()'), self.on_but_flst )
         self.connect( self.but_fbro, QtCore.SIGNAL('clicked()'), self.on_but_fbro )
         self.connect( self.but_plot, QtCore.SIGNAL('clicked()'), self.on_but_plot )
         self.connect( self.but_depl, QtCore.SIGNAL('clicked()'), self.on_but_depl )
@@ -132,42 +139,24 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         self.setStyleSheet (cp.styleBkgd)
         self.cbx_dark_more.setFixedHeight(30)
         
-        width = 100
+        width = 80
 
-        #self.but_stop.setFixedWidth(width)
+        self.but_srcs.setFixedWidth(width)
+        self.but_flst.setFixedWidth(width)
         self.but_fbro.setFixedWidth(width)
         self.but_plot.setFixedWidth(width)
         self.but_depl.setFixedWidth(width)
-
-        #self.lab_from.setStyleSheet(cp.styleLabel)
-        #self.lab_to  .setStyleSheet(cp.styleLabel)
-        #self.lab_run .setStyleSheet(cp.styleLabel)
-
-        #self.edi_from .setAlignment (QtCore.Qt.AlignRight)
-        #self.edi_to   .setAlignment (QtCore.Qt.AlignRight)
-
-        #if self.str_run_number.value() == 'None' and self.but_run.isEnabled() :
-        #    self.but_run.setStyleSheet(cp.styleButtonBad)
-        #else :
-        #    self.but_run.setStyleSheet(cp.styleDefault)
-
-        #if self.edi_from.isReadOnly() : self.edi_from.setStyleSheet (cp.styleEditInfo)
-        #else                          : self.edi_from.setStyleSheet (cp.styleEdit)
-
-        #if self.edi_to.isReadOnly()   : self.edi_to.setStyleSheet (cp.styleEditInfo)
-        #else                          : self.edi_to.setStyleSheet (cp.styleEdit)
 
         #self.setContentsMargins (QtCore.QMargins(-9,-9,-9,-9))
         self.setContentsMargins (QtCore.QMargins(-5,-5,-5,-5))
         #self.setContentsMargins (QtCore.QMargins(10,10,10,10))
         #self.setContentsMargins (QtCore.QMargins(0,5,0,0))
 
-        #self.but_stop.setVisible( self.cbx_dark_more.isChecked() )
+        self.but_srcs.setVisible( self.cbx_dark_more.isChecked() )
+        self.but_flst.setVisible( self.cbx_dark_more.isChecked() )
         self.but_fbro.setVisible( self.cbx_dark_more.isChecked() )
         self.but_plot.setVisible( self.cbx_dark_more.isChecked() )
         self.but_depl.setVisible( self.cbx_dark_more.isChecked() )
-
-        #self.frame.setVisible( self.cbx_dark_more.isChecked() )
 
 
     def resizeEvent(self, e):
@@ -206,11 +195,26 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         self.close()
 
 
-    def on_but_stop(self):
+
+    def on_but_srcs(self) :
         self.exportLocalPars()
 
-        logger.info('on_but_stop', __name__)
-        bjpeds.stop_auto_processing()
+        #cp.blsp.parse_batch_log_peds_scan()
+        cp.blsp.print_list_of_types_and_sources()
+
+
+
+    def on_but_flst(self):
+        self.exportLocalPars()
+
+        logger.info('on_but_flst', __name__)
+        list_of_files = self.get_list_of_files_peds()
+        msg = 'File status for run %s:\n' % self.run_number
+        for fname in list_of_files :
+            exists = os.path.exists(fname)
+            msg += '%s  %s \n' % (fname.ljust(55), self.dict_status[exists].ljust(5))
+        logger.info(msg, __name__ )
+
 
 
     def get_list_of_files_peds(self) :
@@ -220,7 +224,8 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         list_of_fnames.append(fnm.path_hotpix_mask())
         return list_of_fnames
 
-        
+
+
     def on_but_fbro(self):
         self.exportLocalPars()
 
@@ -246,6 +251,14 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
             except : pass
         except :
             arr = gu.get_array_from_file( fnm.path_peds_ave() )
+
+            print 'Plot image for %s' % self.det_name.value()
+
+            #if self.det_name.value() == cp.list_of_dets[0] : # CSAPD
+            #if self.det_name.value() == cp.list_of_dets[1] : # CSAPD2x2
+
+
+            
             if arr == None : return
             #print arr.shape,'\n', arr
             cp.plotimgspe = PlotImgSpe(None, arr, ifname=fnm.path_peds_ave(), ofname=fnm.path_peds_aver_plot())

@@ -50,7 +50,7 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
         #except : pass
         self.setFrame()
 
-        self.list_of_runs    = None
+        #self.list_of_runs   = None
 
         self.str_run_number = str_run_number # cp.str_run_number
         self.str_run_from   = str_run_number # cp.str_run_from
@@ -65,6 +65,7 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
         #self.lab_rnum = QtGui.QPushButton( self.str_run_number )
         self.lab_rnum = QtGui.QLabel( self.str_run_number )
         self.but_go   = QtGui.QPushButton( 'Go' )
+        self.but_depl = QtGui.QPushButton( 'Deploy' )
         self.edi_from = QtGui.QLineEdit  ( self.str_run_from )
         self.edi_to   = QtGui.QLineEdit  ( self.str_run_to )
 
@@ -80,13 +81,16 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
         self.hbox.addWidget(self.edi_from)
         self.hbox.addWidget(self.lab_to)
         self.hbox.addWidget(self.edi_to)
-        self.hbox.addStretch(1)     
+        self.hbox.addSpacing(150)     
         self.hbox.addWidget(self.but_go)
+        self.hbox.addWidget(self.but_depl)
+        self.hbox.addStretch(1)     
         #self.hbox.addWidget(self.but_stop)
 
         self.setLayout(self.hbox)
 
         self.connect( self.but_go  , QtCore.SIGNAL('clicked()'),         self.onButGo )
+        self.connect( self.but_depl, QtCore.SIGNAL('clicked()'),         self.onButDeploy )
         self.connect( self.edi_from, QtCore.SIGNAL('editingFinished()'), self.onEdiFrom )
         self.connect( self.edi_to  , QtCore.SIGNAL('editingFinished()'), self.onEdiTo )
    
@@ -120,6 +124,7 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
 
         #self.lab_rnum .setEnabled(is_enabled)
         self.but_go   .setEnabled(is_enabled)
+        self.but_depl .setEnabled(is_enabled)
 
         self.edi_from .setReadOnly(not is_enabled)
         self.edi_to   .setReadOnly(not is_enabled)
@@ -140,11 +145,14 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
         self.lab_from.setStyleSheet(cp.styleLabel)
         self.lab_to  .setStyleSheet(cp.styleLabel)
         self.lab_run .setStyleSheet(cp.styleLabel)
-
+        
         self.lab_rnum .setFixedWidth(80)        
         self.edi_from .setFixedWidth(40)
         self.edi_to   .setFixedWidth(40)
-        self.but_go   .setFixedWidth(80)        
+        self.but_go   .setFixedWidth(60)        
+        self.but_depl .setFixedWidth(60)
+
+        self.but_depl .setVisible(False)
 
         self.edi_from .setAlignment (QtCore.Qt.AlignRight)
         self.edi_to   .setAlignment (QtCore.Qt.AlignRight)
@@ -191,47 +199,47 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
         self.close()
 
 
-    def onButRun(self):
-        logger.debug('onButRun', __name__ )
+#    def onButRun(self):
+#        logger.debug('onButRun', __name__ )
 
-        self.list_of_runs = fnm.get_list_of_xtc_runs()
-        #self.list_of_runs = fnm.get_list_of_xtc_files()
-        #if self.list_of_runs is None : self.list_of_runs=os.listdir(dir)
+#        self.list_of_runs = fnm.get_list_of_xtc_runs()
+#        #self.list_of_runs = fnm.get_list_of_xtc_files()
+#        #if self.list_of_runs is None : self.list_of_runs=os.listdir(dir)
 
-        item_selected = gu.selectFromListInPopupMenu(self.list_of_runs)
-        if item_selected is None : return            # selection is cancelled
-        #if item_selected == self.run_number : return # selected the same item 
+#        item_selected = gu.selectFromListInPopupMenu(self.list_of_runs)
+#        if item_selected is None : return            # selection is cancelled
+#        #if item_selected == self.run_number : return # selected the same item 
 
-        runnum = item_selected
-        self.setRun(runnum)
-        #self.setStyleButtons()
-
-
-    def setRun(self, txt='None'):
-        self.str_run_number.setValue(txt)
-        self.lab_rnum.setText(txt)        
-        if txt == 'None' : self.list_of_runs = None
-
-        self.setDefaultRunValidityRange()
-        self.setStyle()
+#        runnum = item_selected
+#        self.setRun(runnum)
+#        #self.setStyleButtons()
 
 
-    def setDefaultRunValidityRange(self):
-        if self.str_run_number == 'None' : return
+#    def setRun(self, txt='None'):
+#        self.str_run_number.setValue(txt)
+#        self.lab_rnum.setText(txt)        
+#        if txt == 'None' : self.list_of_runs = None
 
-        run_number = int(self.str_run_number)
+#        self.setDefaultRunValidityRange()
+#        self.setStyle()
 
-        self.str_run_from.setValue(str(run_number)) 
-        self.str_run_to  .setValue('end') 
 
-        self.edi_from.setText(self.str_run_from)
-        self.edi_to  .setText(self.str_run_to)
+#    def setDefaultRunValidityRange(self):
+#        if self.str_run_number == 'None' : return
 
-        self.but_go.setStyleSheet(cp.styleButtonGood)
+#        run_number = int(self.str_run_number)
+
+#        self.str_run_from.setValue(str(run_number)) 
+#        self.str_run_to  .setValue('end') 
+
+#        self.edi_from.setText(self.str_run_from)
+#        self.edi_to  .setText(self.str_run_to)
+
+#        self.but_go.setStyleSheet(cp.styleButtonGood)
         
-        msg = 'Set calibration run validity range from %s to %s' % (self.str_run_from, self.str_run_to)
-        logger.info(msg, __name__)
-        self.setStatusMessage()
+#        msg = 'Set calibration run validity range from %s to %s' % (self.str_run_from, self.str_run_to)
+#        logger.info(msg, __name__)
+#        self.setStatusMessage()
 
 
  
@@ -254,18 +262,25 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
     def exportLocalPars(self):
         """Export local parameters to configuration current"""
         cp.str_run_number.setValue(self.str_run_number)
-        cp.str_run_from  .setValue(self.str_run_from  )
-        cp.str_run_to    .setValue(self.str_run_to    )
+        #cp.str_run_from  .setValue(self.str_run_from  )
+        #cp.str_run_to    .setValue(self.str_run_to    )
 
  
+    def onButDeploy(self):
+        msg = 'Deploy temporary calibration file(s) for run %s in the calibration DB' % self.str_run_number
+        logger.info(msg, __name__ )
+        
+
     def onButGo(self):
+        self.exportLocalPars()
+        self.but_depl.setVisible(False)
+
         but = self.but_go
         but.setStyleSheet(cp.styleDefault)
-        self.exportLocalPars()
 
         if   but.text() == 'Go' : 
             logger.info('onButGo for run %s' % self.str_run_number, __name__ )
-            self.bjpeds = BatchJobPedestals() 
+            self.bjpeds = BatchJobPedestals(parent=self) 
             self.bjpeds.start_auto_processing()
             but.setText('Stop')
             
@@ -274,11 +289,16 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
             self.bjpeds.stop_auto_processing()
             but.setText('Go')
 
+        but.setStyleSheet(cp.styleButtonBad)
 
-#    def onStop(self):
-#        but = self.but_go
-#        if but.text() == 'Stop' : 
-#            but.setText('Go')
+
+    def onStop(self):
+        but = self.but_go
+        #if but.text() == 'Stop' : 
+            #but.setText('Go')
+        but.setText('Go')
+        but.setStyleSheet(cp.styleButtonGood)
+        self.but_depl.setVisible(True)
 
 
     def setStatusMessage(self):

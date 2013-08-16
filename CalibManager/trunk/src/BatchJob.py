@@ -31,10 +31,7 @@ import os
 
 from ConfigParametersForApp   import cp
 from Logger                   import logger
-from ConfigFileGenerator      import cfg
-from FileNameManager          import fnm
 import GlobalUtils            as     gu
-from BatchLogScanParser       import blsp
 
 from PyQt4 import QtGui, QtCore # need it in order to use QtCore.QObject for connect
 
@@ -54,7 +51,10 @@ class BatchJob (QtCore.QObject ) : # need in QtCore.QObject in order to connect 
         QtCore.QObject.__init__(self, None)
 
         self.time_interval_sec = cp.bat_submit_interval_sec.value() # 100
+        self.queue             = cp.bat_queue.value()
 
+        self.autoRunStatus = 0
+        
 #-----------------------------
 
     def job_can_be_submitted(self, job_id, t_sub, comment='') :
@@ -97,7 +97,7 @@ class BatchJob (QtCore.QObject ) : # need in QtCore.QObject in order to connect 
             logger.info('Batch job for ' + comment + ' was not submitted in this session.', __name__) 
             return
 
-        lines = gu.batch_job_check(job_id, cp.bat_queue.value())
+        lines = gu.batch_job_check(job_id, self.queue)
         msg = 'Check batch status for ' + comment + ':\n'
         for line in lines :
             msg += line
@@ -124,7 +124,7 @@ class BatchJob (QtCore.QObject ) : # need in QtCore.QObject in order to connect 
         if job_id == None :
             self.batch_job_status = None
         else :
-            self.batch_job_status = gu.batch_job_status(job_id, cp.bat_queue.value())
+            self.batch_job_status = gu.batch_job_status(job_id, self.queue)
 
         if comment != '' :
             logger.info('Status for ' + comment + ': ' + str(self.batch_job_status), __name__) 
@@ -211,20 +211,20 @@ class BatchJob (QtCore.QObject ) : # need in QtCore.QObject in order to connect 
 
     def updateStatus(self, text):
         #print 'BatchJob: Signal is recieved ' + str(text)
-        if cp.autoRunStatus : self.on_auto_processing_status()
+        if self.autoRunStatus : self.on_auto_processing_status()
 
 #-----------------------------
 
     def start_auto_processing(self) :
-        if cp.autoRunStatus != 0 :            
-            logger.warning('Auto-processing procedure is already active in stage '+str(cp.autoRunStatus), __name__)
+        if self.autoRunStatus != 0 :            
+            logger.warning('Auto-processing procedure is already active in stage '+str(self.autoRunStatus), __name__)
         else :
             self.connectToThread1()
             self.on_auto_processing_start()
 
     def stop_auto_processing(self, is_stop_on_button_click=True) :
         logger.info('Auto-processing IS STOPPED', __name__)
-        cp.autoRunStatus = 0            
+        self.autoRunStatus = 0            
         self.disconnectFromThread1()
 
         self.switch_stop_go_button()
