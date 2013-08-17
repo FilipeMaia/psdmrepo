@@ -53,7 +53,8 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         self.parent     = parent
         self.run_number = run_number
         self.det_name   = cp.det_name
-        
+        self.calib_dir  = cp.calib_dir
+
         self.setGeometry(100, 100, 600, 50)
         self.setWindowTitle('GUI Dark Run Go')
         #try : self.setWindowIcon(cp.icon_help)
@@ -69,7 +70,7 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         self.but_flst = QtGui.QPushButton( 'O/Files' )
         self.but_fbro = QtGui.QPushButton( 'Show files' )
         self.but_plot = QtGui.QPushButton( 'Plot' )
-        self.but_depl = QtGui.QPushButton( 'Deploy' )
+        self.but_show = QtGui.QPushButton( 'Show cmd' )
 
         self.hbox = QtGui.QHBoxLayout()
         self.hbox.addWidget(self.cbx_dark_more)
@@ -77,7 +78,7 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         self.hbox.addWidget(self.but_flst)
         self.hbox.addWidget(self.but_fbro)
         self.hbox.addWidget(self.but_plot)
-        self.hbox.addWidget(self.but_depl)
+        self.hbox.addWidget(self.but_show)
         self.hbox.addStretch(1)     
 
         #self.cbx_dark_more.move(50,0)
@@ -94,7 +95,7 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         self.connect( self.but_flst, QtCore.SIGNAL('clicked()'), self.on_but_flst )
         self.connect( self.but_fbro, QtCore.SIGNAL('clicked()'), self.on_but_fbro )
         self.connect( self.but_plot, QtCore.SIGNAL('clicked()'), self.on_but_plot )
-        self.connect( self.but_depl, QtCore.SIGNAL('clicked()'), self.on_but_depl )
+        self.connect( self.but_show, QtCore.SIGNAL('clicked()'), self.on_but_show )
    
         self.showToolTips()
 
@@ -145,7 +146,7 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         self.but_flst.setFixedWidth(width)
         self.but_fbro.setFixedWidth(width)
         self.but_plot.setFixedWidth(width)
-        self.but_depl.setFixedWidth(width)
+        self.but_show.setFixedWidth(width)
 
         #self.setContentsMargins (QtCore.QMargins(-9,-9,-9,-9))
         self.setContentsMargins (QtCore.QMargins(-5,-5,-5,-5))
@@ -156,7 +157,7 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         self.but_flst.setVisible( self.cbx_dark_more.isChecked() )
         self.but_fbro.setVisible( self.cbx_dark_more.isChecked() )
         self.but_plot.setVisible( self.cbx_dark_more.isChecked() )
-        self.but_depl.setVisible( self.cbx_dark_more.isChecked() )
+        self.but_show.setVisible( self.cbx_dark_more.isChecked() )
 
 
     def resizeEvent(self, e):
@@ -267,12 +268,25 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
             cp.plotimgspe.show()
             #but.setStyleSheet(cp.styleButtonGood)
 
-    def on_but_depl(self):
-        self.exportLocalPars()
 
-        logger.info('on_but_depl', __name__)
+    def get_gui_run(self):
+        return self.parent.parent.gui_run
 
-   
+
+    def exportLocalPars(self):
+        """run appropriate method from GUIDarkListItemRun.py"""
+        self.get_gui_run().exportLocalPars()
+
+
+    def on_but_show(self):
+        """Prints the list of commands for deployment of calibration file(s)"""
+        list_of_deploy_commands = self.get_gui_run().get_list_of_deploy_commands()
+        msg = 'Deploy command(s):'
+        for cmd in list_of_deploy_commands :
+            msg += '\n' + cmd
+        logger.info(msg, __name__)
+
+
     def setStatusMessage(self):
         if cp.guistatus is None : return
         msg = 'New status msg from GUIDarkMoreOpts'
@@ -289,11 +303,6 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         logger.info(msg, __name__ )
 
         self.setStyle()
-
-
-    def exportLocalPars(self):
-        """run appropriate method from GUIDarkListItemRun.py"""
-        self.parent.parent.gui_run.exportLocalPars()
 
 
 #-----------------------------

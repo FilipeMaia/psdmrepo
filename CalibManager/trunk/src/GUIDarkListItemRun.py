@@ -51,12 +51,15 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
         self.setFrame()
 
         #self.list_of_runs   = None
-
+        self.parent = parent
+        
         self.str_run_number = str_run_number # cp.str_run_number
         self.str_run_from   = str_run_number # cp.str_run_from
         self.str_run_to     = 'end'          # cp.str_run_to
         self.calib_dir      = cp.calib_dir
         self.det_name       = cp.det_name
+
+        self.bjpeds = BatchJobPedestals(parent=self) 
 
         self.lab_run  = QtGui.QLabel('Run')
         self.lab_from = QtGui.QLabel('valid from')
@@ -132,9 +135,10 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
         self.edi_from .setEnabled(is_enabled)
         self.edi_to   .setEnabled(is_enabled)
 
-        self.str_run_number == 'None'
+        #if self.str_run_number == 'None' : ...
 
         self.setStyle()
+
 
 
     def setStyle(self):
@@ -145,17 +149,31 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
         self.lab_from.setStyleSheet(cp.styleLabel)
         self.lab_to  .setStyleSheet(cp.styleLabel)
         self.lab_run .setStyleSheet(cp.styleLabel)
-        
+        self.but_depl.setStyleSheet(cp.styleButtonGood)
+
         self.lab_rnum .setFixedWidth(80)        
         self.edi_from .setFixedWidth(40)
         self.edi_to   .setFixedWidth(40)
         self.but_go   .setFixedWidth(60)        
         self.but_depl .setFixedWidth(60)
 
-        self.but_depl .setVisible(False)
-
         self.edi_from .setAlignment (QtCore.Qt.AlignRight)
         self.edi_to   .setAlignment (QtCore.Qt.AlignRight)
+
+        #self.but_go.setEnabled(self.str_run_number != 'None' and self.lab_rnum.isEnabled())
+
+        self.setContentsMargins (QtCore.QMargins(0,-9,0,-9))
+        #self.setContentsMargins (QtCore.QMargins(0,5,0,0))
+
+        self.setStatusStyleOfButtons()
+
+
+    def setStatusStyleOfButtons(self):
+        logger.info('setStyleOfButtons', __name__)
+
+        files_are_available = self.bjpeds.status_for_peds_files_essential()
+
+        #print 'Work files for run %s status: %s' % (self.str_run_number, files_are_available)
 
         if self.edi_from.isReadOnly() : self.edi_from.setStyleSheet (cp.styleEditInfo)
         else                          : self.edi_from.setStyleSheet (cp.styleEdit)
@@ -163,10 +181,15 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
         if self.edi_to.isReadOnly()   : self.edi_to.setStyleSheet (cp.styleEditInfo)
         else                          : self.edi_to.setStyleSheet (cp.styleEdit)
 
-        #self.but_go.setEnabled(self.str_run_number != 'None' and self.lab_rnum.isEnabled())
+        self.but_depl.setVisible(files_are_available)
+        self.but_go  .setVisible(self.but_go.isEnabled())
 
-        self.setContentsMargins (QtCore.QMargins(0,-9,0,-9))
-        #self.setContentsMargins (QtCore.QMargins(0,5,0,0))
+        if files_are_available : self.but_go.setStyleSheet(cp.styleButton)
+        else                   : self.but_go.setStyleSheet(cp.styleButtonGood)
+
+        #if self.but_go.text() == 'Stop' : 
+            #self.but_go.setText('Go')
+
 
 
     def resizeEvent(self, e):
@@ -199,50 +222,6 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
         self.close()
 
 
-#    def onButRun(self):
-#        logger.debug('onButRun', __name__ )
-
-#        self.list_of_runs = fnm.get_list_of_xtc_runs()
-#        #self.list_of_runs = fnm.get_list_of_xtc_files()
-#        #if self.list_of_runs is None : self.list_of_runs=os.listdir(dir)
-
-#        item_selected = gu.selectFromListInPopupMenu(self.list_of_runs)
-#        if item_selected is None : return            # selection is cancelled
-#        #if item_selected == self.run_number : return # selected the same item 
-
-#        runnum = item_selected
-#        self.setRun(runnum)
-#        #self.setStyleButtons()
-
-
-#    def setRun(self, txt='None'):
-#        self.str_run_number.setValue(txt)
-#        self.lab_rnum.setText(txt)        
-#        if txt == 'None' : self.list_of_runs = None
-
-#        self.setDefaultRunValidityRange()
-#        self.setStyle()
-
-
-#    def setDefaultRunValidityRange(self):
-#        if self.str_run_number == 'None' : return
-
-#        run_number = int(self.str_run_number)
-
-#        self.str_run_from.setValue(str(run_number)) 
-#        self.str_run_to  .setValue('end') 
-
-#        self.edi_from.setText(self.str_run_from)
-#        self.edi_to  .setText(self.str_run_to)
-
-#        self.but_go.setStyleSheet(cp.styleButtonGood)
-        
-#        msg = 'Set calibration run validity range from %s to %s' % (self.str_run_from, self.str_run_to)
-#        logger.info(msg, __name__)
-#        self.setStatusMessage()
-
-
- 
     def onEdiFrom(self):
         logger.debug('onEdiFrom', __name__ )
         self.str_run_from = str( self.edi_from.displayText() )        
@@ -266,10 +245,6 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
         #cp.str_run_to    .setValue(self.str_run_to    )
 
  
-    def onButDeploy(self):
-        msg = 'Deploy temporary calibration file(s) for run %s in the calibration DB' % self.str_run_number
-        logger.info(msg, __name__ )
-        
 
     def onButGo(self):
         self.exportLocalPars()
@@ -280,7 +255,6 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
 
         if   but.text() == 'Go' : 
             logger.info('onButGo for run %s' % self.str_run_number, __name__ )
-            self.bjpeds = BatchJobPedestals(parent=self) 
             self.bjpeds.start_auto_processing()
             but.setText('Stop')
             
@@ -293,12 +267,8 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
 
 
     def onStop(self):
-        but = self.but_go
-        #if but.text() == 'Stop' : 
-            #but.setText('Go')
-        but.setText('Go')
-        but.setStyleSheet(cp.styleButtonGood)
-        self.but_depl.setVisible(True)
+        self.but_go.setText('Go')
+        self.setStatusStyleOfButtons()
 
 
     def setStatusMessage(self):
@@ -306,6 +276,51 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
         #msg = 'From %s to %s use dark run %s' % (self.str_run_from.value(), self.str_run_to.value(), self.str_run_number.value())
         #msg = gu.get_text_content_of_calib_dir_for_detector(path=self.calib_dir.value(), det=self.det_name.value(), calib_type='pedestals')
         #cp.guistatus.setStatusMessage(msg)
+
+
+    def onButDeploy(self):
+        """Deploys the calibration file(s)"""
+        list_of_deploy_commands = self.get_list_of_deploy_commands()
+        msg = 'Deploy calibration file(s):'
+
+        if list_of_deploy_commands == [] :
+            msg += 'List of commands IS EMPTY !!!'  
+
+        for cmd in list_of_deploy_commands :
+            msg += '\n' + cmd
+        logger.info(msg, __name__)
+
+
+    def get_list_of_deploy_commands(self):
+
+        self.exportLocalPars()
+        cp.blsp.parse_batch_log_peds_scan()
+        #cp.blsp.print_list_of_types_and_sources()
+
+        list_of_sources = cp.blsp.get_list_of_sources()
+        list_of_types   = cp.blsp.get_list_of_types()
+        list_of_files   = cp.blsp.get_list_of_files_for_all_sources(fnm.path_peds_ave())
+
+        list_of_deploy_commands = []
+
+        for file, type, source in zip(list_of_files, list_of_types, list_of_sources) :
+
+            pos1 = source.find('DetInfo(') + 8
+            src  = source[pos1:-1]
+
+            pos1 = type.find('::')
+            typ  = type[:pos1] + '::CalibV1'
+
+            fname = '%s-%s.data' % ( self.str_run_from.lstrip('0'),
+                                     self.str_run_to  .lstrip('0') )
+
+            calib_path = os.path.join(self.calib_dir.value(), typ, src, 'pedestals', fname)
+            cmd = 'cp %s  %s' % (file, calib_path)
+
+            list_of_deploy_commands.append(cmd)
+
+        return list_of_deploy_commands
+   
 
 #-----------------------------
 

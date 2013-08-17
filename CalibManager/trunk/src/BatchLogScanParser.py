@@ -64,6 +64,8 @@ class BatchLogScanParser :
 
         if self.is_parsed and self.path == fnm.path_peds_scan_batch_log() : return
 
+        if self.det_name.value() == 'None' : return
+
         self.path = fnm.path_peds_scan_batch_log()
         self.pattern = self.dict_of_det_types[self.det_name.value()]
 
@@ -97,7 +99,7 @@ class BatchLogScanParser :
 
         for line in list_of_found_lines : 
 
-            pos1 = line.find('type=') + 5
+            pos1 = line.find('type=Psana::') + 12
             wid1 = line[pos1:].find(',')
             pen1 = pos1+wid1
             type = line[pos1:pen1]

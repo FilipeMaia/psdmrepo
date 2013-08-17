@@ -113,7 +113,9 @@ class GUIDarkListItem ( QtGui.QWidget ) :
     def setFieldsEnabled(self, is_enabled=True):
         logger.info('Set fields enabled: %s' %  is_enabled, __name__)
         #self.lab_rnum .setEnabled(is_enabled)
-
+        self.but_expand_shrink.setEnabled(is_enabled)
+        self.gui_run.setFieldsEnabled(is_enabled)
+        
 
     def setStyle(self):
         self.setMinimumSize(600,30)

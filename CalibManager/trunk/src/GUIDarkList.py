@@ -111,6 +111,12 @@ class GUIDarkList ( QtGui.QWidget ) :
             self.list_of_records.append(record)
 
 
+    def setFieldsEnabled(self, is_enabled=False):
+        for (run, item, widg) in self.list_of_records :
+            #print '  run:', run          
+            widg.setFieldsEnabled(is_enabled)
+
+
     def getRunAndItemForWidget(self, widg_active):
         for (run, item, widg) in self.list_of_records :
             if widg == widg_active :

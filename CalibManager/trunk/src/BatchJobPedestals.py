@@ -171,6 +171,18 @@ class BatchJobPedestals (BatchJob) :
 
 #-----------------------------
 
+    def get_list_of_files_peds_essential(self) :
+        self.exportLocalPars() # export run_number to cp.str_run_number
+        return  self.get_list_of_files_peds_scan() \
+               +self.get_list_of_files_peds_aver()
+
+#-----------------------------
+
+    def status_for_peds_files_essential(self) :
+        return self.status_for_files(self.get_list_of_files_peds_essential(), 'of dark scan and ave essential')
+
+#-----------------------------
+
     def status_for_pedestal_file(self) :
         self.exportLocalPars() # export run_number to cp.str_run_number        
         fname  = fnm.path_peds_ave()

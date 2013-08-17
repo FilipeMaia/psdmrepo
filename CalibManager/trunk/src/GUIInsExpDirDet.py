@@ -224,7 +224,7 @@ class GUIInsExpDirDet ( QtGui.QWidget ) :
         self.setDet('None')
         self.setStyleButtons()
 
-        if cp.guidarklist is not None : cp.guidarklist.updateList()
+        #if cp.guidarklist is not None : cp.guidarklist.updateList()
 
         path_to_xtc_dir = fnm.path_to_xtc_dir()
         if os.path.lexists(path_to_xtc_dir) : return
@@ -258,6 +258,7 @@ class GUIInsExpDirDet ( QtGui.QWidget ) :
         self.setDet(item_selected)
         self.setStyleButtons()
 
+
     def setIns(self, txt='None'):
         self.instr_name.setValue( txt )
         self.butIns.setText( txt + self.char_expand )
@@ -285,10 +286,14 @@ class GUIInsExpDirDet ( QtGui.QWidget ) :
         logger.info('Selected detector: ' + str(txt), __name__)
         self.setStatusMessage()
 
-        if cp.guidarkrungo is not None :
-            if txt=='None' or txt != self.det_name.value() : cp.guidarkrungo.setRun('None')            
-            if txt=='None' : cp.guidarkrungo.setFieldsEnabled(False)
-            else           : cp.guidarkrungo.setFieldsEnabled(True)
+        if cp.guidarklist is not None :
+
+            cp.guidarklist.updateList()
+
+            #if txt=='None' or txt != self.det_name.value() : cp.guidarklist.setRun('None')            
+            if txt=='None' : cp.guidarklist.setFieldsEnabled(False)
+            else           : cp.guidarklist.setFieldsEnabled(True)
+
 
 
     def setStatusMessage(self):

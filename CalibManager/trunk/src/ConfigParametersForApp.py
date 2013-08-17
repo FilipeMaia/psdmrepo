@@ -72,7 +72,6 @@ class ConfigParametersForApp ( ConfigParameters ) :
         self.guidarklist     = None
         self.guitabs         = None
         self.guistatus       = None
-        self.guidarkrungo    = None 
         self.guiinsexpdirdet = None
         self.guifilebrowser  = None 
         self.blsp            = None 
@@ -218,7 +217,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
         self.save_cp_at_exit   = self.declareParameter( name='SAVE_CONFIG_AT_EXIT',   val_def=True,           type='bool')
 
         # GUIDark.py
-        self.dark_more_opts    = self.declareParameter( name='DARK_MORE_OPTIONS',     val_def=False,          type='bool')
+        self.dark_more_opts    = self.declareParameter( name='DARK_MORE_OPTIONS',     val_def=True,          type='bool')
 
         # GUIDarkRunGo.py
         self.str_run_number    = self.declareParameter( name='STRING_RUN_NUMBER',     val_def='None',         type='str' )
