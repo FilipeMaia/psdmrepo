@@ -115,8 +115,8 @@ class GUIDarkListItemExpandWidg ( QtGui.QWidget ) :
         try    : self.gui_table.close()
         except : pass
 
-        #try    : self.gui_more.close()
-        #except : pass
+        try    : self.gui_more.close()
+        except : pass
 
         self.gui_table = None
 

@@ -185,6 +185,9 @@ class GUIDarkList ( QtGui.QWidget ) :
         #try    : del cp.guidarklist # GUIDarkList
         #except : pass
 
+        for (run, item, widg) in self.list_of_records :
+            widg.close()
+
 
     def onClose(self):
         logger.debug('onClose', __name__)

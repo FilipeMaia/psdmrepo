@@ -41,8 +41,8 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
     """GUI sets the source dark run number, validity range, and starts calibration of pedestals"""
 
     char_expand    = u' \u25BE' # down-head triangle
-    dict_status = {True  : 'Yes', 
-                   False : 'No' }
+    dict_status = {True  : 'Created:', 
+                   False : 'N/A     ' }
 
                
     def __init__ ( self, parent=None, run_number='0000' ) :
@@ -212,8 +212,19 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         list_of_files = self.get_list_of_files_peds()
         msg = 'File status for run %s:\n' % self.run_number
         for fname in list_of_files :
-            exists = os.path.exists(fname)
-            msg += '%s  %s \n' % (fname.ljust(55), self.dict_status[exists].ljust(5))
+
+            exists     = os.path.exists(fname)
+            msg += '%s  %s' % (fname.ljust(55), self.dict_status[exists].ljust(5))
+
+            if exists :
+                ctime_sec  = os.path.getctime(fname)
+                ctime_str  = gu.get_local_time_str(ctime_sec, fmt='%Y-%m-%d %H:%M:%S')
+                size_byte  = os.path.getsize(fname)
+                file_owner = gu.get_path_owner(fname)
+                #file_mode  = gu.get_path_mode(fname)
+                msg += '  %s  %12d(Byte) %s\n' % (ctime_str, size_byte, file_owner)
+            else :
+                msg += '\n'
         logger.info(msg, __name__ )
 
 
