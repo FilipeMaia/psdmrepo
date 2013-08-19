@@ -48,7 +48,7 @@ import PyCSPadImage.HDF5Methods        as hm # For test purpose in main only
 #------------------------------
 #------------------------------
 
-def test_plot_cspad_image(fname, dsname, path_calib, run, event=0, amps=None, do_peds=False) :
+def test_plot_cspad_image(fname, dsname, path_calib, run, event=0, nevents=1, amps=None, do_peds=False) :
     """Test of instantiation with external parameters.
     """
     
@@ -56,8 +56,9 @@ def test_plot_cspad_image(fname, dsname, path_calib, run, event=0, amps=None, do
     coord  = pixcoor.CSPADPixCoords(calib)
     coord.print_cspad_geometry_pars()
 
-    ds1ev  = hm.getOneCSPadEventForTest( fname, dsname, event )
-    #ds1ev = hm.getAverageCSPadEvent( fname, dsname, event1=0, nevents=10 )
+    ds1ev  = None
+    if nevents == 1 : ds1ev = hm.getOneCSPadEventForTest( fname, dsname, event )
+    else            : ds1ev = hm.getAverageCSPadEvent   ( fname, dsname, event1=event, nevents=nevents )
 
     if do_peds :
         peds = calib.getCalibPars('pedestals')
@@ -86,7 +87,8 @@ def test_cspad_image(test_num=1) :
     """Test of instantiation with external parameters.
     """
 
-    event      = 10
+    event       = 10
+    nevents     = 1
     dsname      = '/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/CxiDs1.0:Cspad.0/data'
     do_peds     = False
 
@@ -123,11 +125,21 @@ def test_cspad_image(test_num=1) :
         path_calib = '/reg/d/psdm/cxi/cxi64813/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/'
         amps       = (-10, 100)
 
+    elif test_num == 6 : # Test of T.J. alignment
+        print 'HERE!'
+        run        = 13
+        fname      = '/reg/d/psdm/CXI/cxia4113/hdf5/cxia4113-r0013.h5'
+        path_calib = '/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-test-cxia4113-r0013-Ds1/CsPad::CalibV1/CxiDs1.0:Cspad.0/'
+        do_peds    = True
+        event      = 600
+        nevents    = 100
+        amps       = (0, 500)
+
     else: 
         print 'Non-defined test number:', test_num
         sys.exit ( 'Exit, use proper input parameter.' )        
 
-    test_plot_cspad_image(fname, dsname, path_calib, run, event, amps, do_peds)
+    test_plot_cspad_image(fname, dsname, path_calib, run, event, nevents, amps, do_peds)
 
 #------------------------------
 
