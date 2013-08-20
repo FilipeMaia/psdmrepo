@@ -121,7 +121,7 @@ class BatchLogScanParser :
         state = 'Sources found in scan:' 
         if self.list_of_sources == [] :
             logger.warning(msg + '\nLIST OF SOURCES IS EMPTY !!!', __name__)         
-            cp.guistatus.setStatusMessage(state)
+            #cp.guistatus.setStatusMessage(state)
             return
 
         for type, src in zip(self.list_of_types, self.list_of_sources) :

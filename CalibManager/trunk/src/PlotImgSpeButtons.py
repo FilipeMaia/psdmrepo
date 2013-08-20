@@ -50,7 +50,7 @@ class PlotImgSpeButtons (QtGui.QWidget) :
     #  Constructor --
     #----------------
 
-    def __init__(self, parent=None, widgimage=None, ifname='', ofname='./fig.png', help_msg=None):
+    def __init__(self, parent=None, widgimage=None, ifname='', ofname='./fig.png', help_msg=None, load_is_visible=False):
         QtGui.QWidget.__init__(self, parent)
         self.setWindowTitle('GUI of buttons')
 
@@ -59,6 +59,7 @@ class PlotImgSpeButtons (QtGui.QWidget) :
         self.parent    = parent
         self.ifname    = ifname
         self.ofname    = ofname
+        self.load_is_visible = load_is_visible
 
         self.widgimage = widgimage
         self.fig       = widgimage.fig
@@ -138,6 +139,8 @@ class PlotImgSpeButtons (QtGui.QWidget) :
 
         self.but_elog.setVisible(False)
         #self.but_help.setVisible(False)
+        self.but_load.setVisible(self.load_is_visible)
+
 
     def setGridLayout(self):
         self.grid = QtGui.QGridLayout() 

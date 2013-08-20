@@ -32,7 +32,7 @@ import GlobalUtils          as     gu
 from FileNameManager        import fnm
 
 from GUIDarkListItemRun        import *
-from GUIDarkListItemExpandWidg import *
+from GUIDarkListItemAdd import *
 #from GUIAnyFilesStatusTable import *
 
 #---------------------
@@ -195,7 +195,7 @@ class GUIDarkListItem ( QtGui.QWidget ) :
         #list_of_files = gu.get_list_of_files_in_dir_for_part_fname(dir_xtc, pattern='-r'+self.run_number)
         #self.gui_add = GUIAnyFilesStatusTable(self, list_of_files)
 
-        self.gui_add = GUIDarkListItemExpandWidg(self, self.run_number) 
+        self.gui_add = GUIDarkListItemAdd(self, self.run_number) 
         self.hboxW.addWidget(self.gui_add)
 
         #self.gui_add.setStyleSheet(cp.styleYellowish)

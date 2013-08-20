@@ -3,7 +3,7 @@
 #  $Id$
 #
 # Description:
-#  Module GUIDarkListItemExpandWidg ...
+#  Module GUIDarkListItemAdd ...
 #
 #------------------------------------------------------------------------
 
@@ -37,7 +37,7 @@ from GUIDarkMoreOpts        import *
 #---------------------
 #  Class definition --
 #---------------------
-class GUIDarkListItemExpandWidg ( QtGui.QWidget ) :
+class GUIDarkListItemAdd ( QtGui.QWidget ) :
     """GUI sets the source dark run number, validity range, and starts calibration of pedestals"""
 
     def __init__ ( self, parent=None, run_number='0000') :
@@ -150,7 +150,7 @@ class GUIDarkListItemExpandWidg ( QtGui.QWidget ) :
 if __name__ == "__main__" :
 
     app = QtGui.QApplication(sys.argv)
-    w = GUIDarkListItemExpandWidg(parent=None, run_number='0005')
+    w = GUIDarkListItemAdd(parent=None, run_number='0005')
     w.show()
     app.exec_()
 

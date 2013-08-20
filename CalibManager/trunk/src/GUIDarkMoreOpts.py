@@ -32,6 +32,8 @@ import GlobalUtils          as     gu
 from FileNameManager        import fnm
 from GUIFileBrowser         import *
 from PlotImgSpe             import *
+import CSPAD2x2Image        as     cspad2x2img
+import CSPADImage           as     cspadimg
 
 #---------------------
 #  Class definition --
@@ -256,24 +258,56 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
     def on_but_plot(self):
         self.exportLocalPars()
 
-        logger.info('on_but_plot', __name__)
+        logger.debug('on_but_plot', __name__)
         try :
             cp.plotimgspe.close()
             try    : del cp.plotimgspe
             except : pass
         except :
-            arr = gu.get_array_from_file( fnm.path_peds_ave() )
 
-            print 'Plot image for %s' % self.det_name.value()
+            self.arr     = None
+            self.img_arr = None
 
-            #if self.det_name.value() == cp.list_of_dets[0] : # CSAPD
-            #if self.det_name.value() == cp.list_of_dets[1] : # CSAPD2x2
+            msg = 'Plot image for %s' % self.det_name.value()
+            logger.info('on_but_plot', __name__)
+
+            list_of_fnames = cp.blsp.get_list_of_files_for_all_sources(fnm.path_peds_ave()) \
+                           + cp.blsp.get_list_of_files_for_all_sources(fnm.path_peds_rms())
+
+            #print 'list_of_fnames = ', list_of_fnames
+
+            if list_of_fnames != [] :
+
+                fname = list_of_fnames[0]
+                if len(list_of_fnames) > 1 :
+                    fname = gu.selectFromListInPopupMenu(list_of_fnames)
+
+                self.arr = gu.get_array_from_file( fname )
+                #print self.arr.shape,'\n', self.arr.shape
+
+            if self.det_name.value() == cp.list_of_dets[0] : # CSAPD, shape = (5920,388) 
+                self.arr.shape = (32*185,388) 
+                self.img_arr = cspadimg.get_cspad_raw_data_array_image(self.arr)
+
+            if self.det_name.value() == cp.list_of_dets[1] : # CSAPD2x2
+                self.arr.shape = (185,388,2) 
+                self.img_arr = cspad2x2img.get_cspad2x2_non_corrected_image_for_raw_data_array(self.arr)
+
+            elif self.det_name.value() == cp.list_of_dets[2] : # Camera
+                pass
+
+            elif self.det_name.value() == cp.list_of_dets[3] : # Princeton
+                self.img_arr = gu.get_array_from_file( fnm.path_peds_ave() )
+
+            elif self.det_name.value() == cp.list_of_dets[4] : # pnCCD
+                pass
 
 
-            
-            if arr == None : return
-            #print arr.shape,'\n', arr
-            cp.plotimgspe = PlotImgSpe(None, arr, ifname=fnm.path_peds_ave(), ofname=fnm.path_peds_aver_plot())
+            if self.img_arr == None :
+                msg = 'self.img_arr == None'
+                return
+            #print arr.shape,'\n', arr.shape
+            cp.plotimgspe = PlotImgSpe(None, self.img_arr, ifname=fnm.path_peds_ave(), ofname=fnm.path_peds_aver_plot())
             #cp.plotimgspe.setParent(self)
             cp.plotimgspe.move(cp.guimain.pos().__add__(QtCore.QPoint(720,120)))
             cp.plotimgspe.show()
