@@ -12,6 +12,11 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 	
 #---------------------
+2012-08-20 Mikhail S. Dubrovin
+Tag: V00-00-15
+- Improve test examples, add comments, change new method name in CSPadArrayImage.py
+	
+#---------------------
 2012-08-19 Mikhail S. Dubrovin
 Tag: V00-00-14
 - add module CSPadArrayImage.py

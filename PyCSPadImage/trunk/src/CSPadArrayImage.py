@@ -55,7 +55,7 @@ def getCSPadSegments2D(arr, gap=3, hspace=0) :
     return np.hstack((arr_all[0,:],arr_hsp,arr_all[1,:],arr_hsp,arr_all[2,:],arr_hsp,arr_all[3,:]))
 
 
-def getCSPadArrayWithSpaces(arr, gap=3, hspace=5, vspace=5) :
+def getCSPadArrayAs2DImage(arr, gap=3, hspace=5, vspace=5) :
     """Returns the CSPAD array image of shape (8*185+7*vspace, 4*(388+gap)+3*hspace) with horizontal and vertical spaces"""
     arr_h = getCSPadSegments2D(arr, gap, hspace)
     hdim = (388+gap)*4 + hspace*3
@@ -79,6 +79,7 @@ import GlobalGraphics as gg # For test purpose in main only
 #------------------------------
 
 def get_raw_array_for_cspad_test() :
+    """Returns raw cspad array for test purpose"""
     #arr = getRandomImage()
     arr = np.arange(32*185*388)
     arr.shape = (32*185, 388)
@@ -86,27 +87,41 @@ def get_raw_array_for_cspad_test() :
 
 
 def plot_img(img_arr) :
+    """Plot image for test purpose"""
     print 'img_arr.shape=', img_arr.shape
     gg.plotImageLarge(img_arr) #, img_range=None, amp_range=None, ... 
-    #gg.savefig('cspad-arr-img.png')
+    gg.savefig('cspad-arr-img.png')
     gg.move(500,10)
     gg.show()
 
 
 def test1() :
-    img = getCSPadArrayWithSpaces(get_raw_array_for_cspad_test(),3,5,5)
+    """Default pars for gaps"""
+    img = getCSPadArrayAs2DImage(get_raw_array_for_cspad_test())
     plot_img(img)
+
 
 def test2() :
-    img = getCSPadArrayWithSpaces(get_raw_array_for_cspad_test(),0,0,0)
+    """Well-distinguished gaps"""
+    img = getCSPadArrayAs2DImage(get_raw_array_for_cspad_test(),3,20,20)
     plot_img(img)
+
 
 def test3() :
-    img= getCSPadSegments2D(get_raw_array_for_cspad_test())
+    """Test image with 0-gaps"""
+    img = getCSPadArrayAs2DImage(get_raw_array_for_cspad_test(),0,0,0)
     plot_img(img)
 
+
 def test4() :
-    img= getCSPadArrayWithGap(get_raw_array_for_cspad_test(), gap=3)
+    """Test helper getCSPadSegments2D"""
+    img = getCSPadSegments2D(get_raw_array_for_cspad_test())
+    plot_img(img)
+
+
+def test5() :
+    """Test helper getCSPadArrayWithGap"""
+    img = getCSPadArrayWithGap(get_raw_array_for_cspad_test())
     plot_img(img)
 
 #------------------------------
@@ -121,6 +136,7 @@ def main() :
     elif sys.argv[1]=='2' : test2()
     elif sys.argv[1]=='3' : test3()
     elif sys.argv[1]=='4' : test4()
+    elif sys.argv[1]=='5' : test5()
     else :
         print 'Non-expected arguments: sys.argv=', sys.argv
         sys.exit ('Check input parameters')
