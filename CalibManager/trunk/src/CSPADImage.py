@@ -33,19 +33,14 @@ from Logger                 import logger
 #------------------------------
 
 def get_cspad_raw_data_array_image(arr) :
+
     if arr.shape != (4*8*185,388) :
         msg = 'Non-expected array shape for cspad:', arr.shape
         print msg
         logger.info(msg, 'CSPADImage')
-
         return None
     
-    #coord = CSPAD2x2PixCoords()
-    #iX,iY = coord.get_cspad2x2_pix_coordinate_arrays_shapeed_as_data_pix ()    
-    #img2d = gg.getImageFromIndexArrays(iX,iY,arr)
-  
-    img2d = getCSPadArrayWithSpaces(arr,3,5,5)
-    return img2d
+    return getCSPadArrayAs2DImage(arr,3,6,6)
 
 #------------------------------
  

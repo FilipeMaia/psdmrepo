@@ -220,7 +220,7 @@ class GUIInsExpDirDet ( QtGui.QWidget ) :
         #if item_selected == self.exp_name.value() : return # selected the same item 
 
         self.setExp(item_selected)
-        self.setDir(fnm.path_to_calib_dir())
+        self.setDir(fnm.path_to_calib_dir_default())
         self.setDet('None')
         self.setStyleButtons()
 

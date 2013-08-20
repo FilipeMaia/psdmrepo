@@ -456,7 +456,12 @@ def get_text_content_of_calib_dir_for_detector(path, det='cspad', level=0, calib
         txt = 'Path %s DOES NOT EXIST' % path
         return txt
 
-    for file in os.listdir(path) :
+    list_of_fnames = os.listdir(path)
+    if list_of_fnames == [] :
+        txt +='\n\nDirectory IS EMPTY!'        
+        return txt
+
+    for file in list_of_fnames :
         fname_lower = file.lower()
         cond0 = level==0 and det.lower()+'::' in fname_lower
         cond1 = level==1 and det.lower()+'.'  in fname_lower

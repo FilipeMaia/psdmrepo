@@ -31,6 +31,7 @@ from Logger                 import logger
 import GlobalUtils          as     gu
 from FileNameManager        import fnm
 from BatchJobPedestals      import *
+from FileDeployer           import fd
 
 #---------------------
 #  Class definition --
@@ -123,7 +124,7 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
 
     def setFieldsEnabled(self, is_enabled=True):
 
-        logger.info('Set fields enabled: %s' %  is_enabled, __name__)
+        logger.debug('Set fields enabled: %s' %  is_enabled, __name__)
 
         #self.lab_rnum .setEnabled(is_enabled)
         self.but_go   .setEnabled(is_enabled)
@@ -169,7 +170,7 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
 
 
     def setStatusStyleOfButtons(self):
-        logger.info('setStyleOfButtons', __name__)
+        logger.debug('setStyleOfButtons', __name__)
 
         files_are_available = self.bjpeds.status_for_peds_files_essential()
 
@@ -285,14 +286,19 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
 
         if list_of_deploy_commands == [] :
             msg += 'List of commands IS EMPTY !!!'  
+            logger.info(msg, __name__)
+            return
+
+        #for cmd in list_of_deploy_commands :
+        #    msg += '\n' + cmd            
+        #logger.info(msg, __name__)
 
         for cmd in list_of_deploy_commands :
-            msg += '\n' + cmd
-        logger.info(msg, __name__)
+            fd.procDeployCommand(cmd)
 
 
     def get_list_of_deploy_commands(self):
-
+        """Get list of deploy commands for all detectors of the same type"""
         self.exportLocalPars()
         cp.blsp.parse_batch_log_peds_scan()
         #cp.blsp.print_list_of_types_and_sources()

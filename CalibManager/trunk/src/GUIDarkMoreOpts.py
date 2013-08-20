@@ -269,7 +269,7 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
             self.img_arr = None
 
             msg = 'Plot image for %s' % self.det_name.value()
-            logger.info('on_but_plot', __name__)
+            logger.info(msg, __name__)
 
             list_of_fnames = cp.blsp.get_list_of_files_for_all_sources(fnm.path_peds_ave()) \
                            + cp.blsp.get_list_of_files_for_all_sources(fnm.path_peds_rms())
@@ -282,6 +282,9 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
                 if len(list_of_fnames) > 1 :
                     fname = gu.selectFromListInPopupMenu(list_of_fnames)
 
+                msg = 'Selected file to plot: %s' % fname
+                logger.info(msg, __name__)
+
                 self.arr = gu.get_array_from_file( fname )
                 #print self.arr.shape,'\n', self.arr.shape
 
@@ -289,7 +292,7 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
                 self.arr.shape = (32*185,388) 
                 self.img_arr = cspadimg.get_cspad_raw_data_array_image(self.arr)
 
-            if self.det_name.value() == cp.list_of_dets[1] : # CSAPD2x2
+            elif self.det_name.value() == cp.list_of_dets[1] : # CSAPD2x2
                 self.arr.shape = (185,388,2) 
                 self.img_arr = cspad2x2img.get_cspad2x2_non_corrected_image_for_raw_data_array(self.arr)
 
@@ -297,7 +300,7 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
                 pass
 
             elif self.det_name.value() == cp.list_of_dets[3] : # Princeton
-                self.img_arr = gu.get_array_from_file( fnm.path_peds_ave() )
+                self.img_arr = self.arr
 
             elif self.det_name.value() == cp.list_of_dets[4] : # pnCCD
                 pass
@@ -307,7 +310,8 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
                 msg = 'self.img_arr == None'
                 return
             #print arr.shape,'\n', arr.shape
-            cp.plotimgspe = PlotImgSpe(None, self.img_arr, ifname=fnm.path_peds_ave(), ofname=fnm.path_peds_aver_plot())
+            cp.plotimgspe = PlotImgSpe(None, self.img_arr, ofname=fnm.path_peds_aver_plot())
+            #cp.plotimgspe = PlotImgSpe(None, self.img_arr, ifname=fnm.path_peds_ave(), ofname=fnm.path_peds_aver_plot())
             #cp.plotimgspe.setParent(self)
             cp.plotimgspe.move(cp.guimain.pos().__add__(QtCore.QPoint(720,120)))
             cp.plotimgspe.show()
