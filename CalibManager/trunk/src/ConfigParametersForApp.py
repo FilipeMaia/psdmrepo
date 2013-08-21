@@ -195,10 +195,10 @@ class ConfigParametersForApp ( ConfigParameters ) :
 
         # GUIInsExpDirDet.py
         self.instr_dir          = self.declareParameter( name='INSTRUMENT_DIR',    val_def='/reg/d/psdm',  type='str' ) 
-        self.instr_name         = self.declareParameter( name='INSTRUMENT_NAME',   val_def='None',         type='str' ) # 'CXI'
-        self.exp_name           = self.declareParameter( name='EXPERIMENT_NAME',   val_def='None',         type='str' ) # 'cxitut13'
-        self.det_name           = self.declareParameter( name='DETECTOR_NAME',     val_def='None',         type='str' ) # 'CSPAD'
-        self.calib_dir          = self.declareParameter( name='CALIB_DIRECTORY',   val_def='None',         type='str' ) # '/reg/d/psdm/CXI/cxitut13/calib'
+        self.instr_name         = self.declareParameter( name='INSTRUMENT_NAME',   val_def='Select',       type='str' ) # 'CXI'
+        self.exp_name           = self.declareParameter( name='EXPERIMENT_NAME',   val_def='Select',       type='str' ) # 'cxitut13'
+        self.det_name           = self.declareParameter( name='DETECTOR_NAME',     val_def='Select',       type='str' ) # 'CSPAD'
+        self.calib_dir          = self.declareParameter( name='CALIB_DIRECTORY',   val_def='Select',       type='str' ) # '/reg/d/psdm/CXI/cxitut13/calib'
 
         # GUITabs.py
         self.current_tab    = self.declareParameter( name='CURRENT_TAB'      , val_def='Status',        type='str' )
@@ -291,8 +291,8 @@ class ConfigParametersForApp ( ConfigParameters ) :
         self.styleTitle        = self.styleBuriy
         self.styleLabel        = self.styleBlue
         self.styleEdit         = self.styleWhite
-        #self.styleEditInfo     = self.styleBkgd # self.styleGreenish
-        self.styleEditInfo     = self.styleGreenish # Bluish
+        self.styleEditInfo     = self.styleBkgd # self.styleGreenish
+        #self.styleEditInfo     = self.styleGreenish # Bluish
         self.styleEditBad      = self.styleRedBkgd
         self.styleButton       = self.styleGray
         self.styleButtonOn     = self.styleBluish

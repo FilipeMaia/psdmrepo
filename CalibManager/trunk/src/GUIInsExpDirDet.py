@@ -69,7 +69,7 @@ class GUIInsExpDirDet ( QtGui.QWidget ) :
         self.butBro  = QtGui.QPushButton( 'Browse' )
 
         self.ediDir = QtGui.QLineEdit  ( self.calib_dir.value() )
-        self.ediDir .setReadOnly( True ) 
+        self.ediDir.setReadOnly(True) 
 
         self.hbox = QtGui.QHBoxLayout() 
         self.hbox.addWidget(self.titIns)
@@ -90,7 +90,8 @@ class GUIInsExpDirDet ( QtGui.QWidget ) :
         self.connect( self.butExp,     QtCore.SIGNAL('clicked()'),          self.onButExp )
         self.connect( self.butBro,     QtCore.SIGNAL('clicked()'),          self.onButBro )
         self.connect( self.butDet,     QtCore.SIGNAL('clicked()'),          self.onButDet )
-
+        #self.connect( self.ediDir,     QtCore.SIGNAL('editingFinished()'),  self.onEdiDir )
+  
         self.showToolTips()
         self.setStyle()
 
@@ -125,14 +126,17 @@ class GUIInsExpDirDet ( QtGui.QWidget ) :
         self.titIns  .setStyleSheet (cp.styleLabel)
         self.titExp  .setStyleSheet (cp.styleLabel)
         self.titDet  .setStyleSheet (cp.styleLabel)
-        self.ediDir  .setStyleSheet (cp.styleEditInfo)
 
         self.        setFixedHeight(40)
-        self.butIns .setFixedWidth(50)
+        self.butIns .setFixedWidth(60)
         self.butExp .setFixedWidth(90)
         self.butBro .setFixedWidth(90)
         self.butDet .setFixedWidth(90)
         self.ediDir .setMinimumWidth(310)
+
+        #self.ediDir.setStyleSheet(cp.styleGray)
+        self.ediDir.setStyleSheet(cp.styleEditInfo)
+        self.ediDir.setEnabled(False)            
 
         self.butBro .setIcon(cp.icon_browser)
         self.setContentsMargins(-5,-5,-5,-9) # (QtCore.QMargins(-9,-9,-9,-9))        
@@ -142,18 +146,21 @@ class GUIInsExpDirDet ( QtGui.QWidget ) :
 
     def setStyleButtons(self):
 
-        if self.instr_name.value() == 'None' :
-            self.butIns.setStyleSheet(cp.styleButtonBad)
+        if self.instr_name.value() == 'Select' :
+            self.butIns.setStyleSheet(cp.styleButtonGood)
             self.butExp.setStyleSheet(cp.styleDefault)
+            self.butDet.setStyleSheet(cp.styleDefault)
             self.butExp.setEnabled(False)            
             self.butBro.setEnabled(False)            
-            self.butDet.setEnabled(False)            
+            self.butDet.setEnabled(False)
             return
 
         self.butIns.setStyleSheet(cp.styleDefault)
 
-        if self.exp_name.value()   == 'None' :
-            self.butExp.setStyleSheet(cp.styleButtonBad)
+        if self.exp_name.value() == 'Select' :
+            self.butIns.setStyleSheet(cp.styleDefault)
+            self.butExp.setStyleSheet(cp.styleButtonGood)
+            self.butDet.setStyleSheet(cp.styleDefault)
             self.butExp.setEnabled(True)            
             self.butBro.setEnabled(False)            
             self.butDet.setEnabled(False)            
@@ -164,8 +171,8 @@ class GUIInsExpDirDet ( QtGui.QWidget ) :
         self.butDet.setStyleSheet(cp.styleDefault)
         self.butDet.setEnabled(True)            
 
-        if self.det_name.value()   == 'None' :
-            self.butDet.setStyleSheet(cp.styleButtonBad)
+        if self.det_name.value() == 'Select' :
+            self.butDet.setStyleSheet(cp.styleButtonGood)
 
         #self.but.setVisible(False)
         #self.but.setEnabled(True)
@@ -204,9 +211,9 @@ class GUIInsExpDirDet ( QtGui.QWidget ) :
         if item_selected == self.instr_name.value() : return # selected the same item  
 
         self.setIns(item_selected)
-        self.setExp('None')
-        self.setDir('None')
-        self.setDet('None')
+        self.setExp('Select')
+        self.setDir('Select')
+        self.setDet('Select')
         self.setStyleButtons()
 
 
@@ -221,7 +228,7 @@ class GUIInsExpDirDet ( QtGui.QWidget ) :
 
         self.setExp(item_selected)
         self.setDir(fnm.path_to_calib_dir_default())
-        self.setDet('None')
+        self.setDet('Select')
         self.setStyleButtons()
 
         #if cp.guidarklist is not None : cp.guidarklist.updateList()
@@ -258,31 +265,33 @@ class GUIInsExpDirDet ( QtGui.QWidget ) :
         self.setDet(item_selected)
         self.setStyleButtons()
 
+    def onEdiDir(self):
+        pass
 
-    def setIns(self, txt='None'):
+    def setIns(self, txt='Select'):
         self.instr_name.setValue( txt )
         self.butIns.setText( txt + self.char_expand )
         logger.info('Instrument selected: ' + str(txt), __name__)
 
 
-    def setExp(self, txt='None'):
+    def setExp(self, txt='Select'):
         self.exp_name.setValue(txt)
         self.butExp.setText( txt + self.char_expand)
-        if txt == 'None' : self.list_of_exp = None        
+        if txt == 'Select' : self.list_of_exp = None        
         logger.info('Experiment selected: ' + str(txt), __name__)
 
 
-    def setDir(self, txt='None'):
+    def setDir(self, txt='Select'):
         self.calib_dir.setValue(txt) 
         self.ediDir.setText(self.calib_dir.value())
         logger.info('Set calibration directory: ' + str(txt), __name__)
 
 
-    def setDet(self, txt='None'):
+    def setDet(self, txt='Select'):
         
         self.det_name.setValue(txt)
         self.butDet.setText( txt + self.char_expand)
-        #if txt == 'None' : self.list_of_exp = None        
+        #if txt == 'Select' : self.list_of_exp = None        
         logger.info('Selected detector: ' + str(txt), __name__)
         self.setStatusMessage()
 
@@ -290,9 +299,9 @@ class GUIInsExpDirDet ( QtGui.QWidget ) :
 
             cp.guidarklist.updateList()
 
-            #if txt=='None' or txt != self.det_name.value() : cp.guidarklist.setRun('None')            
-            if txt=='None' : cp.guidarklist.setFieldsEnabled(False)
-            else           : cp.guidarklist.setFieldsEnabled(True)
+            #if txt=='Select' or txt != self.det_name.value() : cp.guidarklist.setRun('Select')            
+            if txt=='Select' : cp.guidarklist.setFieldsEnabled(False)
+            else             : cp.guidarklist.setFieldsEnabled(True)
 
 
 
