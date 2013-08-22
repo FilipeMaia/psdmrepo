@@ -1,4 +1,12 @@
-
+/**
+ * This class representes a title of a row
+ * 
+ * @see StackOfRows
+ * @see ShiftRow
+ *
+ * @param object data
+ * @returns {ShiftTitle}
+ */
 function ShiftTitle(data) {
     this.data = data ;
     this.html = function (id) {
@@ -33,14 +41,39 @@ function ShiftTitle(data) {
         return html ;
     } ;
 }
+
+/**
+ * This class representes a bowdy of a row
+ * 
+ * @see StackOfRows
+ * @see ShiftRow
+ *
+ * @param object parent
+ * @param object data
+ * @param boolean can_edit
+ * @returns {ShiftBody}
+ */
 function ShiftBody (parent, data, can_edit) {
+
+    // -----------------------------------------
+    // Allways call the base class's constructor
+    // -----------------------------------------
+
+    Widget.call(this) ;
+
+    // ------------------------
+    // Parameters of the object
+    // ------------------------
+
     this.parent = parent ;
     this.data = data ;
     this.can_edit = can_edit ;
-}
-define_class (ShiftBody, Widget, {}, {
 
-    area_names : [
+    // ----------------------------
+    // Static variables & functions
+    // ----------------------------
+
+    var area_names = [
         {key: 'FEL' , name: 'FEL',        description: 'To report problems with the machine, operations, FEE, etc.'} ,
         {key: 'BMLN', name: 'Beamline',   description: 'To report problems with the photon beamline instrument\n including HPS and PPS problems'} ,
         {key: 'CTRL', name: 'Controls',   description: 'To report problems specific to controls like motors, cameras,\n MPS, laser controls, etc. '} ,
@@ -49,19 +82,23 @@ define_class (ShiftBody, Widget, {}, {
         {key: 'TIME', name: 'Timing',     description: 'To report problems with the timing system including: EVR triggers,\n RF, LBL Timing System, fstiming interface (laser related problems\n should be reported under laser)'} ,
         {key: 'HALL', name: 'Hutch/Hall', description: 'To report problem with the hutch like: PCW, temperature, setup space,\n common stock, etc.  Note that this could be confused with the overall\n name of this section of the form.'} ,
         {key: 'OTHR', name: 'Other',      description: 'Any other areas that might have problems can be addressed'}
-    ] ,
+    ] ;
 
-    allocation_names : [
+    var allocation_names = [
         {key: 'tuning'   , name: 'Tuning',       description: 'This is machine tuning time'} ,
         {key: 'alignment', name: 'Alignment',    description: 'This is time spent aligning, calibrating,  turning the photon\n instrumentation'} ,
         {key: 'daq',       name: 'Data Taking',  description: 'This is time spent taking data that can be used in publication'} ,
         {key: 'access',    name: 'Hutch Access', description: 'This is time spent in the hutch for sample changes, laser tuning,\n trouble shooting and the like'} ,
         {key: 'other',     name: 'Other',        description: 'This is any other circumstance: machine downtime, extended\n specific activities, etc. This will be atomatically calculated\n to absorb the remaining time left of the shift.'}
-    ] ,
+    ] ;
 
-    is_rendered : false ,
+    // ------------------------------------------------
+    // Override event handler defined in thw base class
+    // ------------------------------------------------
 
-    render : function () {
+    this.is_rendered = false ;
+
+    this.render = function () {
 
         if (this.is_rendered) return ;
         this.is_rendered = true ;
@@ -174,13 +211,13 @@ define_class (ShiftBody, Widget, {}, {
 '            <td class="shift-table-hdr " >Comments</td>' +
 '          </tr>' ;
         var first = true ;
-        for (var i in this.area_names) {
+        for (var i in area_names) {
             var classes = 'annotated shift-table-val'+(first?'-first':'') ;
             first = false ;
-            var area_name = this.area_names[i].key ;
+            var area_name = area_names[i].key ;
             html +=
 '          <tr class="shift-active-row" >' +
-'            <td class="'+classes+' shift-table-val-hdr " valign="top" data="'+this.area_names[i].description+'" >'+this.area_names[i].name+'</td>' +
+'            <td class="'+classes+' shift-table-val-hdr " valign="top" data="'+area_names[i].description+'" >'+area_names[i].name+'</td>' +
 '            <td class="'+classes+' " valign="top">' +
 '              <div   class="viewer flag" name="'+area_name+'" /></div>' +
 '              <input class="editor flag" name="'+area_name+'" type="checkbox" /></td>' +
@@ -277,9 +314,13 @@ define_class (ShiftBody, Widget, {}, {
         }) ;
         this.shift_register_handlers() ;
         this.shift_view() ;
-    } ,
+    } ;
 
-    shift_register_handlers : function() {
+    // --------------------
+    // Own data and methods
+    // --------------------
+
+    this.shift_register_handlers = function() {
         var that = this ;
         var shift = this.data ;
         var con = this.container ;
@@ -342,8 +383,8 @@ define_class (ShiftBody, Widget, {}, {
             end_changed() ;
         }) ;
 
-        for (var i in this.area_names) {
-            var area_name = this.area_names[i].key ;
+        for (var i in area_names) {
+            var area_name = area_names[i].key ;
             con.find('input.flag[name="'+area_name+'"]').change(function () {
                 var area_name = this.name ; // Get area name directly from the element because the one
                                             // defined in the upper scope is wrong (it will always be
@@ -418,13 +459,13 @@ define_class (ShiftBody, Widget, {}, {
                     "Confirm Shift Delete" ,
                     'Are you really going to delete that shift?' ,
                     function () { that.parent.shift_delete(that.data.id) ; }) ; }) ;
-    } ,
+    } ;
 
-    shift_area_total_update : function(shift_duration_min) {
+    this.shift_area_total_update = function(shift_duration_min) {
         var con = this.container ;
         var total_min = 0 ;
-        for (var i in this.area_names) {
-            var area_name = this.area_names[i].key ;
+        for (var i in area_names) {
+            var area_name = area_names[i].key ;
             var h = parseInt(con.find('input.hour[name="'+area_name+'"]').val() || 0);
             if (h <  0) h = 0 ;
             total_min += h * 60 ;
@@ -439,9 +480,9 @@ define_class (ShiftBody, Widget, {}, {
         }
         con.find('span.hour-minute[name="area"]').text(Fwk.zeroPad(Math.floor(total_min / 60), 2)+':'+Fwk.zeroPad(total_min % 60, 2)) ;
         return true ;
-    } ,
+    } ;
 
-    shift_allocation_total_update : function(shift_duration_min) {
+    this.shift_allocation_total_update = function(shift_duration_min) {
         var con = this.container ;
         var total_min = 0 ;
         for (var i in this.allocation_names) {
@@ -468,9 +509,9 @@ define_class (ShiftBody, Widget, {}, {
         con.find('span.hour-minute[name="other"]').text(Fwk.zeroPad(Math.floor(other_min / 60), 2)+':'+Fwk.zeroPad(other_min % 60, 2)) ;
         con.find('span.percent[name="other"]').text(other_percent) ;
         return true ;
-    } ,
+    } ;
 
-    shift_duration_min : function () {
+    this.shift_duration_min = function () {
         var con = this.container ;
 
         var begin_day_elem = con.find('input[name="begin-day"]').datepicker() ;
@@ -490,9 +531,9 @@ define_class (ShiftBody, Widget, {}, {
         this.shift_area_total_update    (duration_min) ;
         this.shift_allocation_total_update(duration_min) ;
         return duration_min ;
-    } ,
+    } ;
 
-    shift_edit : function () {
+    this.shift_edit = function () {
 
         var shift = this.data ;
         shift.editing = true ;
@@ -506,8 +547,8 @@ define_class (ShiftBody, Widget, {}, {
         con.find('input[name="end-m"]').val(shift.end.minute) ;
         con.find('textarea[name="notes"]').val(shift.notes) ;
 
-        for (var i in this.area_names) {
-            var area_name = this.area_names[i].key ;
+        for (var i in area_names) {
+            var area_name = area_names[i].key ;
             var h_elem = con.find('input.hour[name="'+area_name+'"]') ;
             var m_elem = con.find('input.minute[name="'+area_name+'"]') ;
             var h = '' ;
@@ -549,9 +590,9 @@ define_class (ShiftBody, Widget, {}, {
 
         con.find('.viewer').removeClass('shift-vis').addClass('shift-hdn') ;
         con.find('.editor').removeClass('shift-hdn').addClass('shift-vis') ;
-    } ,
+    } ;
 
-    shift_edit_save : function () {
+    this.shift_edit_save = function () {
         var that = this ;
         var shift = this.data ;
         var con = this.container ;
@@ -572,10 +613,10 @@ define_class (ShiftBody, Widget, {}, {
         params.end = end_day_elem.val() + ' ' + Fwk.zeroPad(parseInt(end_h_elem.val()), 2) + ':' + Fwk.zeroPad(parseInt(end_m_elem.val()), 2) + ':00' ;
 
         var area = {} ;
-        for (var i in this.area_names) {
-            var area_name = this.area_names[i].key ;
-            var h        = parseInt(con.find('input.hour[name="'+area_name+'"]')  .val()) || 0 ;
-            var m        = parseInt(con.find('input.minute[name="'+area_name+'"]').val()) || 0 ;
+        for (var i in area_names) {
+            var area_name = area_names[i].key ;
+            var h         = parseInt(con.find('input.hour[name="'+area_name+'"]')  .val()) || 0 ;
+            var m         = parseInt(con.find('input.minute[name="'+area_name+'"]').val()) || 0 ;
             area[area_name] = {
                 problems     : con.find('input.flag[name="'+area_name+'"]').attr('checked') === undefined ? 0 : 1,
                 downtime_min : 60 * h + m ,
@@ -609,13 +650,13 @@ define_class (ShiftBody, Widget, {}, {
             'POST' ,
             params
         ) ;
-    } ,
+    } ;
 
-    shift_edit_cancel : function () {
+    this.shift_edit_cancel = function () {
         this.shift_view() ;
     } ,
 
-    shift_view : function () {
+    this.shift_view = function () {
         var shift = this.data ;
         shift.editing = false ;
         var con = this.container ;
@@ -627,8 +668,8 @@ define_class (ShiftBody, Widget, {}, {
         con.find('div[name="notes"]').html('<pre>'+shift.notes+'</pre>') ;
 
         var area_total_min = 0 ;
-        for (var i in this.area_names) {
-            var area_name = this.area_names[i].key ;
+        for (var i in area_names) {
+            var area_name = area_names[i].key ;
             con.find('div.flag[name="'+area_name+'"]').addClass(shift.area[area_name].problems?'status-red':'status-neutral') ;
             var hm = '' ;
             if (shift.area[area_name].problems) {
@@ -659,9 +700,9 @@ define_class (ShiftBody, Widget, {}, {
 
         con.find('.viewer').removeClass('shift-hdn').addClass('shift-vis') ;
         con.find('.editor').removeClass('shift-vis').addClass('shift-hdn') ;
-    } ,
+    } ;
 
-    shift_load_history : function () {
+    this.shift_load_history = function () {
         var shift = this.data ;
         if (!shift.history_table) {
             shift.history_table = new Table (
@@ -714,75 +755,105 @@ define_class (ShiftBody, Widget, {}, {
             }) ;
         }
     }
-}) ;
-
-function SafeCounter() {
-    this.counter = 0 ;
-    this.plus  = function () { this.counter++ ; } ;
-    this.minus = function() { if (this.counter > 0) this.counter-- ; } ;
 }
+define_class (ShiftBody, Widget, {}, {}) ;
+
+/**
+ * This class binds the data with the row interface as requited by the StackOfRows class
+ *
+ * @see StackOfRows
+ *
+ * @param object parent
+ * @param object data
+ * @param boolean can_edit
+ * @returns {ShiftRow}
+ */
+function ShiftRow (parent, data, can_edit) {
+
+    // -----------------------------------------
+    // Allways call the base class's constructor
+    // -----------------------------------------
+
+    StackRowData.call(this) ;
+
+    // ------------------------
+    // Parameters of the object
+    // ------------------------
+
+    if (!data) throw new Error('ShiftRow:constructor() data is not defined') ;
+    this.data = data ;
+
+    this.title = new ShiftTitle(this.data) ;
+    this.body  = new ShiftBody (parent, this.data, can_edit) ;
+
+    // --------------------------------------------------
+    // Override methods handler defined in the base class
+    // --------------------------------------------------
+
+    this.is_locked = function () {
+        return this.data.is_editing ;
+    } ;
+}
+define_class(ShiftRow, StackRowData, {}, {}) ;
+
+/**
+ * The main class representing instrument-level reports.
+ *
+ * @param string instr_name
+ * @param boolean can_edit
+ * @returns {Reports}
+ */
 function Reports (instr_name, can_edit) {
-    FwkDispatcherBase.call(this) ;
+
+    // -----------------------------------------
+    // Allways call the base class's constructor
+    // -----------------------------------------
+
+    FwkApplication.call(this) ;
+
+    // ------------------------
+    // Parameters of the object
+    // ------------------------
+
     this.instr_name = instr_name ;
     this.can_edit = can_edit ? 1 : 0 ;
-}
-define_class (Reports, FwkDispatcherBase, {}, {
 
-    is_initialized : false ,
+    // ------------------------------------------------
+    // Override event handler defined in the base class
+    // ------------------------------------------------
 
-    shifts : [] ,
+    this.on_activate = function() {
+        this.on_update() ;
+    } ;
 
-    num_editings : function () {
-        return 0 ;
-//        var num = 0 ;
-//        if (this.shifts)
-//            for (var i in this.shifts)
-//                if (this.shifts[i].editing) num++ ;
-//        return num ;
-    } ,
+    this.on_deactivate = function() {
+        ;
+    } ;
 
-    num_open: function () {
-        return 0 ;
-//        var num = 0 ;
-//        if (this.shifts)
-//            for (var i in this.shifts)
-//                if (this.shifts[i].is_open) num++ ;
-//        return num ;
-    } ,
+    this.on_update = function () {
+        if (this.active) {
+            this.init() ;
+            if (this.update_allowed()) {
+                this.search() ;
+            }
+        }
+    } ;
 
-    num_loads_in_progress: new SafeCounter () ,
+    // --------------------
+    // Own data and methods
+    // --------------------
 
-    update_allowed : function () {
+    this.shifts = [] ;
+    this.shifts_stack = null ;
+
+    this.update_allowed = function () {
+        if (this.shifts_stack) return !this.shifts_stack.is_locked() ;
         return true ;
-//        if (!this.active || !this.is_initialized) return false ;
-//        var num_blocking_activities =
-//            this.num_editings() +
-//            this.num_open() +
-//            this.num_loads_in_progress.counter ;
-//        if (num_blocking_activities > 0) return false ;
-//        return true ;
-    } ,
+    } ;
 
-    on_activate : function() {
-        this.init() ;
-        if (this.update_allowed()) {
-            this.search() ;
-        }
-        //this.on_update() ;
-    } ,
+    this.is_initialized = false ;
 
-    on_deactivate : function() {
-    } ,
-
-    on_update : function () {
-        return ;
-        this.init() ;
-        if (this.update_allowed()) {
-            this.search() ;
-        }
-    } ,
-
-    init : function () {
+    this.init = function () {
 
         var that = this ;
 
@@ -858,13 +929,13 @@ define_class (Reports, FwkDispatcherBase, {}, {
             {id: 'editor',   title: 'Editor',   width:  80} ,
             {id: 'modified', title: 'Modified', width: 240}
         ] , null, {
-            theme: 'stack-theme-large14 stack-theme-brown'
+            theme: 'stack-theme-large14 stack-theme-mustard'
         }) ;
         
         this.init_new_shift() ;
-    } ,
+    } ;
 
-    init_new_shift : function () {
+    this.init_new_shift = function () {
 
         var that = this ;
 
@@ -872,7 +943,7 @@ define_class (Reports, FwkDispatcherBase, {}, {
         var new_shift           = new_shift_ctrl_elem.find('button[name="new-shift"]').button() ;
         var new_shift_save      = new_shift_ctrl_elem.find('button[name="save"]').button() ;
         var new_shift_cancel    = new_shift_ctrl_elem.find('button[name="cancel"]').button() ;
-        var new_shift_con      = new_shift_ctrl_elem.find('#new-shift-con') ;
+        var new_shift_con       = new_shift_ctrl_elem.find('#new-shift-con') ;
 
         var new_shift_begin_day_elem = new_shift_con.find('input[name="begin-day"]') ;
         new_shift_begin_day_elem.datepicker().datepicker('option', 'dateFormat', 'yy-mm-dd').val($.datepicker.formatDate('yy-mm-dd', new Date())) ;
@@ -917,10 +988,7 @@ define_class (Reports, FwkDispatcherBase, {}, {
                     that.shifts = [] ;
                     for (var i in shifts_data) {
                         var data = shifts_data[i] ;
-                        that.shifts.push ({
-                            title : new ShiftTitle(data) ,
-                            body  : new ShiftBody (that, data, that.can_edit)
-                        }) ;
+                        that.shifts.push(new ShiftRow(that, data, that.can_edit)) ;
                     }
                     that.display() ;
 
@@ -942,9 +1010,9 @@ define_class (Reports, FwkDispatcherBase, {}, {
             new_shift_cancel.button('disable') ;
             new_shift_con.removeClass('new-shift-vis').addClass('new-shift-hdn') ;
         }) ;
-    } ,
+    } ;
 
-    search : function () {
+    this.search = function () {
 
         this.init() ;
 
@@ -965,17 +1033,14 @@ define_class (Reports, FwkDispatcherBase, {}, {
                 that.shifts = [] ;
                 for (var i in shifts_data) {
                     var data = shifts_data[i] ;
-                    that.shifts.push ({
-                        title : new ShiftTitle(data) ,
-                        body  : new ShiftBody (that, data, that.can_edit)
-                    }) ;
+                    that.shifts.push(new ShiftRow(that, data, that.can_edit)) ;
                 }
                 that.display() ;
             }
         ) ;
-    } ,
+    } ;
 
-    search_shift_by_id : function(id) {
+    this.search_shift_by_id = function(id) {
 
         this.init() ;
 
@@ -988,33 +1053,28 @@ define_class (Reports, FwkDispatcherBase, {}, {
                 that.shifts = [] ;
                 for (var i in shifts_data) {
                     var data = shifts_data[i] ;
-                    that.shifts.push ({
-                        title : new ShiftTitle(data) ,
-                        body  : new ShiftBody (that, data, that.can_edit)
-                    }) ;
+                    that.shifts.push(new ShiftRow(that, data, that.can_edit)) ;
+
+                    // Re-adjust visible search criteria to be compatible with the found
+                    // shift.
+
+                    var begin_day = data.begin.day ;
+                    var end_day   = data.end.day ;
+
+                    that.ctrl_range_elem.val('range') ;
+                    that.ctrl_begin_elem.removeAttr('disabled').val(begin_day) ;
+                    that.ctrl_end_elem  .removeAttr('disabled').val(end_day) ;
+                    that.ctrl_display_all_elem.attr('checked', 'checked') ;
                 }
                 that.display() ;
-
-                // Re-adjust visible search criteria to be compatible with the found
-                // shift.
-
-                var begin_day = that.shifts_data[0].begin.day ;
-                var end_day   = that.shifts_data[0].end.day ;
-
-                that.ctrl_range_elem.val('range') ;
-                that.ctrl_begin_elem.removeAttr('disabled').val(begin_day) ;
-                that.ctrl_end_elem  .removeAttr('disabled').val(end_day) ;
-                that.ctrl_display_all_elem.attr('checked', 'checked') ;
             } ,
             function () {
                 alert('Shift search failed for shift ID '+id) ;
             }
         ) ;
-    } ,
+    } ;
 
-    shifts_service: function (url, type, params, when_done, on_error) {
-
-        this.num_loads_in_progress.plus() ;
+    this.shifts_service = function (url, type, params, when_done, on_error) {
 
         var that = this ;
 
@@ -1023,7 +1083,6 @@ define_class (Reports, FwkDispatcherBase, {}, {
             url:  url ,
             data: params ,
             success: function (result) {
-                that.num_loads_in_progress.minus() ;
                 if(result.status !== 'success') {
                     Fwk.report_error(result.message) ;
                     if (on_error) on_error() ;
@@ -1035,20 +1094,19 @@ define_class (Reports, FwkDispatcherBase, {}, {
                 }
             } ,
             error: function () {
-                that.num_loads_in_progress.minus() ;
                 Fwk.report_error('shift service is not available for instrument: '+that.inst_name) ;
                 if (on_error) on_error() ;
             } ,
             dataType: 'json'
         }) ;
-    } ,
+    } ;
 
-    display : function () {
+    this.display = function () {
         this.shifts_stack.set_rows(this.shifts) ;
         this.shifts_stack.display(this.shifts_search_display) ;
-    } ,
+    } ;
 
-    shift_delete : function (shift_id) {
+    this.shift_delete = function (shift_id) {
         var that = this ;
         var params = {
             shift_id : shift_id
@@ -1059,9 +1117,9 @@ define_class (Reports, FwkDispatcherBase, {}, {
                 that.search() ;
             }
         ) ;
-    } ,
+    } ;
 
-    shift_update : function (shift_id, url, request_type, params) {
+    this.shift_update = function (shift_id, url, request_type, params) {
         var that = this ;
         this.shifts_service (
             url, request_type, params ,
@@ -1069,13 +1127,11 @@ define_class (Reports, FwkDispatcherBase, {}, {
                 that.shifts = [] ;
                 for (var i in shifts_data) {
                     var data = shifts_data[i] ;
-                    that.shifts.push ({
-                        title : new ShiftTitle(data) ,
-                        body  : new ShiftBody (that, data, that.can_edit)
-                    }) ;
+                    that.shifts.push(new ShiftRow(that, data, that.can_edit)) ;
                 }
                 that.display() ;
             }
         ) ;
-    }
-});
+    } ;
+}
+define_class (Reports, FwkApplication, {}, {});

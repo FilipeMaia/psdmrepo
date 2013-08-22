@@ -1,25 +1,44 @@
+/**
+ * The application for managing e-mail notifications on changes in the database
+ *
+ * @returns {Notifications}
+ */
 function Notifications () {
-    FwkDispatcherBase.call(this) ;
-}
-define_class (Notifications, FwkDispatcherBase, {}, {
 
-    on_activate : function() {
+    // -----------------------------------------
+    // Allways call the base class's constructor
+    // -----------------------------------------
+
+    FwkApplication.call(this) ;
+
+    // ------------------------------------------------
+    // Override event handler defined in the base class
+    // ------------------------------------------------
+    
+    this.on_activate = function() {
         this.on_update() ;
-    } ,
+    } ;
 
-    on_deactivate : function() {
+    this.on_deactivate = function() {
         this.init() ;
-    } ,
+    } ;
 
-    on_update : function (sec) {
+    this.on_update = function (sec) {
         this.init() ;
-        if (this.active) ;
-    } ,
+        if (this.active) {
+            ;
+        }
+    } ;
 
-    is_initialized : false ,
+    // --------------------
+    // Own data and methods
+    // --------------------
 
-    init : function () {
+    this.is_initialized = false ;
+
+    this.init = function () {
         if (this.is_initialized) return ;
-        var that = this ;
-    }
-});
+        this.is_initialized = true ;
+    } ;
+}
+define_class (Notifications, FwkApplication, {}, {});

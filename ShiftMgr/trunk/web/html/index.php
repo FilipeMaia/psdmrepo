@@ -80,15 +80,15 @@ $(function() {
             name: instr_name ,
             menu: [
                 {   name: 'Reports' ,
-                    dispatcher: new Reports(instr_name, instr2editor[instr_name]) ,
+                    application: new Reports(instr_name, instr2editor[instr_name]) ,
                     html_container: 'shift-reports-'+instr_name
                 } ,
                 {   name: 'Analytics' ,
-                    dispatcher: new Analytics(instr_name) ,
+                    application: new Analytics(instr_name) ,
                     html_container: 'shift-analytics-'+instr_name
                 } ,
                 {   name: 'History' ,
-                    dispatcher: new History(instr_name) ,
+                    application: new History(instr_name) ,
                     html_container: 'shift-history-'+instr_name
                 }
             ]
@@ -98,15 +98,15 @@ $(function() {
         name: 'All Hutches',
         menu: [
             {   name: 'Reports' ,
-                dispatcher: new Reports4all() ,
+                application: new Reports4all() ,
                 html_container: 'shift-reports-all'
             } ,
             {   name: 'Analytics' ,
-                dispatcher: new Analytics4all() ,
+                application: new Analytics4all() ,
                 html_container: 'shift-analytics-all'
             } ,
             {   name: 'History' ,
-                dispatcher: new History() ,
+                application: new History() ,
                 html_container: 'shift-history-all'
             }
         ]
@@ -115,15 +115,15 @@ $(function() {
         name: 'Admin' ,
         menu: [
             {   name: 'Access Control' ,
-                dispatcher: new Access() ,
+                application: new Access() ,
                 html: 'Access control management to assign priviles to individual users, groups, etc.'
             } ,
             {   name: 'E-mail Notifications' ,
-                dispatcher: new Notifications() ,
+                application: new Notifications() ,
                 html: 'View and manage push notifications: who will get an event and what kind of events (new shift created, data updated, etc.)'
             } ,
             {   name: 'Rules' ,
-                dispatcher: new Rules() ,
+                application: new Rules() ,
                 html: 'Various configuration parameters and rules, such: when shifts usuall begin, create shift placeholders automatically or not'
             }
         ]

@@ -1,28 +1,50 @@
+/**
+ * The analytics application for an instrument
+ *
+ * @param string instr_name
+ * @returns {Analytics}
+ */
 function Analytics (instr_name) {
 
-    FwkDispatcherBase.call(this) ;
+    // -----------------------------------------
+    // Allways call the base class's constructor
+    // -----------------------------------------
+
+    FwkApplication.call(this) ;
+
+    // ------------------------
+    // Parameters of the object
+    // ------------------------
 
     this.instr_name = instr_name ;
-}
-define_class (Analytics, FwkDispatcherBase, {}, {
 
-    on_activate : function() {
+    // ------------------------------------------------
+    // Override event handler defined in the base class
+    // ------------------------------------------------
+
+    this.on_activate = function() {
         this.on_update() ;
-    } ,
+    } ;
 
-    on_deactivate : function() {
+    this.on_deactivate = function() {
         this.init() ;
-    } ,
+    } ;
 
-    on_update : function (sec) {
-        this.init() ;
-        if (this.active) ;
-    } ,
+    this.on_update = function () {
+        if (this.active) {
+            this.init() ;
+        }
+    } ;
 
-    is_initialized : false ,
+    // --------------------
+    // Own data and methods
+    // --------------------
 
-    init : function () {
+    this.is_initialized = false ;
+
+    this.init = function () {
         if (this.is_initialized) return ;
-        var that = this ;
-    }
-});
+        this.is_initialized = true ;
+    } ;
+}
+define_class (Analytics, FwkApplication, {}, {}) ;

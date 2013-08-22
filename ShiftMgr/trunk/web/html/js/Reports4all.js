@@ -1,25 +1,43 @@
+/**
+ * The application for making shift reports accross all instrument
+ *
+ * @returns {Reports4all}
+ */
 function Reports4all () {
-    FwkDispatcherBase.call(this) ;
-}
-define_class (Reports4all, FwkDispatcherBase, {}, {
 
-    on_activate : function() {
+    // -----------------------------------------
+    // Allways call the base class's constructor
+    // -----------------------------------------
+
+    FwkApplication.call(this) ;
+
+    // ------------------------------------------------
+    // Override event handler defined in the base class
+    // ------------------------------------------------
+
+    this.on_activate = function() {
         this.on_update() ;
-    } ,
+    } ;
 
-    on_deactivate : function() {
+    this.on_deactivate = function() {
         this.init() ;
-    } ,
+    } ;
 
-    on_update : function (sec) {
-        this.init() ;
-        if (this.active) ;
-    } ,
+    this.on_update = function (sec) {
+        if (this.active) {
+            this.init() ;
+        }
+    } ;
 
-    is_initialized : false ,
+    // --------------------
+    // Own data and methods
+    // --------------------
 
-    init : function () {
+    this.is_initialized = false ;
+
+    this.init = function () {
         if (this.is_initialized) return ;
-        var that = this ;
-    }
-});
+        this.is_initialized = true ;
+    } ;
+}
+define_class (Reports4all, FwkApplication, {}, {});

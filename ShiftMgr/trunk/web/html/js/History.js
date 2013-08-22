@@ -1,25 +1,49 @@
+/**
+ * Teh application to display the history of updates for an instrument
+ *
+ * @param string instr_name
+ * @returns {History}
+ */
 function History (instr_name) {
-    FwkDispatcherBase.call(this) ;
-    this.instr_name = instr_name || '';
-}
-define_class (History, FwkDispatcherBase, {}, {
 
-    on_activate : function() {
+    // -----------------------------------------
+    // Allways call the base class's constructor
+    // -----------------------------------------
+
+    FwkApplication.call(this) ;
+
+    // ------------------------
+    // Parameters of the object
+    // ------------------------
+
+    this.instr_name = instr_name || '' ;
+
+    // ------------------------------------------------
+    // Override event handler defined in the base class
+    // ------------------------------------------------
+    
+    this.on_activate = function() {
         this.on_update() ;
-    } ,
+    } ;
 
-    on_deactivate : function() {
+    this.on_deactivate = function() {
         this.init() ;
-    } ,
+    } ;
 
-    on_update : function () {
-        this.init() ;
-        if (this.active) this.load_history() ;
-    } ,
+    this.on_update = function () {
+        if (this.active) {
+            this.init() ;
+            this.load_history() ;
+        }
+    } ;
 
-    is_initialized : false ,
+    // --------------------
+    // Own data and methods
+    // --------------------
 
-    init : function () {
+    this.is_initialized = false ;
+
+    this.init = function () {
 
         var that = this ;
 
@@ -47,7 +71,7 @@ define_class (History, FwkDispatcherBase, {}, {
             that.ctrl_end_elem.val('') ;
             that.ctrl_begin_elem.attr('disabled', 'disabled') ;
             that.ctrl_end_elem  .attr('disabled', 'disabled') ;
-            that.load_history() ;
+            that.load_history_force() ;
         }) ;
         this.ctrl_range_elem.change(function () {
             var range = that.ctrl_range_elem.val() ;
@@ -56,20 +80,20 @@ define_class (History, FwkDispatcherBase, {}, {
                 case 'month' :
                     that.ctrl_begin_elem.attr('disabled', 'disabled') ;
                     that.ctrl_end_elem  .attr('disabled', 'disabled') ;
-                    that.load_history() ;
+                    that.load_history_force() ;
                     break ;
                 case 'range' :
                     that.ctrl_begin_elem.removeAttr('disabled') ;
                     that.ctrl_end_elem  .removeAttr('disabled') ;
-                    if (that.ctrl_begin_elem.val() || that.ctrl_end_elem.val()) that.load_history() ;
+                    if (that.ctrl_begin_elem.val() || that.ctrl_end_elem.val()) that.load_history_force() ;
                     break ;
             }
         }) ;
         this.ctrl_begin_elem.change(function () {
-            if (that.ctrl_begin_elem.val() || that.ctrl_end_elem.val()) that.load_history() ;
+            if (that.ctrl_begin_elem.val() || that.ctrl_end_elem.val()) that.load_history_force() ;
         }) ;
         this.ctrl_end_elem.change(function () {
-            if (that.ctrl_begin_elem.val() || that.ctrl_end_elem.val()) that.load_history() ;
+            if (that.ctrl_begin_elem.val() || that.ctrl_end_elem.val()) that.load_history_force() ;
         }) ;
         this.ctrl_display_create_shift_elem.change(function () { that.show_history() ; }) ;
         this.ctrl_display_modify_shift_elem.change(function () { that.show_history() ; }) ;
@@ -110,12 +134,17 @@ define_class (History, FwkDispatcherBase, {}, {
             Fwk.config_handler('History', 'instrument='+(this.instr_name ? this.instr_name : 'all'))
         ) ;
         this.history_table.display() ;
-    } ,
+    } ;
 
-    history: null ,
-    updated: null ,
+    this.history = null ;
+    this.updated = null ;
 
-    load_history : function() {
+    this.load_history_force = function () {
+        var force_update = true;
+        this.load_history(force_update) ;
+    } ;
+
+    this.load_history = function(force) {
         var that = this ;
         var range = this.ctrl_range_elem.val() ;
         var begin = this.ctrl_begin_elem.val() ;
@@ -127,7 +156,7 @@ define_class (History, FwkDispatcherBase, {}, {
         } ;
         if (this.instr_name)
             params.instr_name = this.instr_name ;
-        if (this.updated && !end)
+        if (this.updated && !end && !force)
             params.since = this.updated ;
 
         var jqXHR = $.get('../shiftmgr/ws/history_get.php', params, function (data) {
@@ -162,9 +191,9 @@ define_class (History, FwkDispatcherBase, {}, {
             that.history_info_elem.html('Update has failed') ;
             return ;
         }) ;
-    } ,
+    } ;
 
-    show_history : function() {
+    this.show_history = function() {
         var display_create_shift = this.ctrl_display_create_shift_elem.attr('checked') ;
         var display_modify_shift = this.ctrl_display_modify_shift_elem.attr('checked') ;
         var display_modify_area  = this.ctrl_display_modify_area_elem.attr ('checked') ;
@@ -203,5 +232,6 @@ define_class (History, FwkDispatcherBase, {}, {
             rows.push (row) ;
         }
         this.history_table.load(rows) ;
-    }
-});
+    } ;
+}
+define_class (History, FwkApplication, {}, {});
