@@ -161,24 +161,16 @@ $(function () {
         expand_buttons: true ,
         theme: 'stack-theme-large16 + stack-theme-aliceblue'
     }) ;
-    function Title(data) {
-        this.data = data ;
-        this.html = function (id) {
-            switch(id) {
-                case 'id':      return '<b>'+this.data+'</b>' ;
-                case 'comment': return 'Here be my comment...' ;
-                default:        return '' ;
-            }
-        } ;
-    }
     for (var i = 0; i < 4; i++)
         stack7.add_row({
-            title: new Title(i) ,
+            title: {
+                id : '<b>'+i+'</b>' ,
+                comment: 'Here be my message...'
+            } ,
             body:  'Here be the body of this row'
         }) ;
 
     stack7.display($('#stack7')) ;
-
 
     /* Implementing non-trivial row content by subclassing the Widget */
 

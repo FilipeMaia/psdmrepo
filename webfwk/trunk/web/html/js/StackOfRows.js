@@ -1,3 +1,101 @@
+/*
+ * Two wrapper classes and a factory for producing an appropriate
+ * RowTitle object from the specified input.
+ */
+function RowTitle_FromString (text) {
+    this.text = text ;
+    this.html = function () { return this.text ; } ;
+}
+function RowTitle_FromObject (obj) {
+    this.obj = obj ;
+    this.html = function (id) { return this.obj[id] ; } ;
+}
+function RowTitle_Factory (title, hdr) {
+    if (hdr) {
+        switch (typeof(title)) {
+            case 'object' : return new RowTitle_FromObject(title) ;
+        }
+    } else {
+        switch (typeof(title)) {
+            case 'string' : return new RowTitle_FromString(title) ;
+        }
+    }
+    throw new WidgetError('RowTitle_Factory: missing or unsupported row title') ;
+}
+
+/*
+ * One wrapper classe and a factory for producing an appropriate
+ * RowBody object from the specified input.
+ */
+function RowBody_FromString (text) {
+    this.text = text ;
+    this.display = function (container) { container.html(this.text) ; } ;
+}
+function RowBody_Factory (body) {
+    switch (typeof(body)) {
+        case 'string' : return new RowBody_FromString(body) ;
+        case 'object' : if (typeof(body.display) === 'function') return body ;
+    }
+    throw new WidgetError('RowBody_Factory: missing or unsupported row body') ;
+}
+
+/**
+ * The base class for user defined data objects
+ *
+ * @returns {StackRowData}
+ */
+function StackRowData () {
+    this.title = null ;
+    this.body  = null ;
+    this.is_locked = function () { return false ; } ;
+}
+
+/**
+ * The class packaging the title and the body into a single object
+ * 
+ * NOTE: No run time synchronization is assumed between the components of
+ * the row.
+ *
+ * @param object title
+ * @param object body
+ * @returns {SimpleStackRowData}
+ */
+function SimpleStackRowData (title, body) {
+    this.title = title ;
+    this.body  = body ;
+}
+define_class(SimpleStackRowData, StackRowData, {}, {}) ;
+
+/**
+ * 
+ * @param number id
+ * @param object row
+ * @param array hdr
+ * @param boolean expand_propagate
+ * @returns {StackRow}
+ */
+function StackRowData_Factory (id, row, hdr, expand_propagate) {
+    if (row instanceof StackRowData) {
+        return new StackRow (
+            id ,
+            row ,
+            hdr ,
+            expand_propagate
+        ) ;
+    } else if ((typeof row === 'object') && !row.isArray) {
+        return new StackRow (
+            id ,
+            new SimpleStackRowData (
+                RowTitle_Factory(row.title, hdr) ,
+                RowBody_Factory(row.body)
+            ) ,
+            hdr ,
+            expand_propagate
+        ) ;
+    }
+    throw new WidgetError('StackRowData_Factory: unsupported type of the row') ;
+}
+
 /**
  * The class representing rows in the stack
  *
@@ -19,9 +117,10 @@
  * @param Array data_object - the data object descriibing the title and the body of the row
  * @returns {StackRow}
  */
-function StackRow (id, data_object, expand_propagate) {
+function StackRow (id, data_object, hdr, expand_propagate) {
     this.id = id ;
     this.data_object = data_object ;
+    this.hdr = hdr ;
     this.expand_propagate = expand_propagate ? (this.data_object.body.expand_or_collapse ? true : false) : false ;
 }
 define_class (StackRow, Widget, {}, {
@@ -47,11 +146,11 @@ render : function () {
     this.title   = header.children('.stack-row-title') ;
     this.body    = this.container.children('.stack-row-body') ;
 
-    if (this.data_object.hdr) {
+    if (this.hdr) {
         var title_as_function = typeof(this.data_object.title.html) === 'function' ;
         var html = '' ;
-        for(var i in this.data_object.hdr) {
-            var col = this.data_object.hdr[i] ;
+        for(var i in this.hdr) {
+            var col = this.hdr[i] ;
             if (col.id === '|')
                 html +=
 '  <div class="stack-row-column-separator">&nbsp</div>' ;
@@ -76,7 +175,7 @@ toggle : function () {
 } ,
 
 /**
- * @function - expand or collapse the row container
+ * Expand or collapse the row container
  */
 expand_or_collapse : function (expand) {
     if (expand) {
@@ -88,7 +187,16 @@ expand_or_collapse : function (expand) {
     }
     if (this.expand_propagate)
         this.data_object.body.expand_or_collapse(expand) ;
+} ,
+
+/**
+ * Return 'true' if the row is locked from any updates either by the user data
+ * or because its body is open.
+ */
+is_locked : function () {
+    return this.data_object.is_locked() || this.toggler.hasClass('ui-icon-triangle-1-s') ;
 }
+
 }) ;
 
 /**
@@ -134,51 +242,23 @@ define_class (StackOfRows, Widget, {
 
 add_row : function (row) {
 
-    // Evaluate the row description and produce an appropriate
-    // data object representing the row.
-
-    var data_object = {} ;
-
-    if (this.hdr) data_object.hdr = this.hdr ;
-
-    if (this.hdr) {
-        switch (typeof(row.title)) {
-        case 'function' :
-        case 'object'   : data_object.title = row.title ; break ;
-        default :
-            throw new WidgetError('StackOfRows: missing or unsupported title') ;
-        }
-    } else {
-        function SimpleTitle(data) {
-            this.data = data ;
-            this.html = function () { return this.data ; }
-        }
-        switch (typeof(row.title)) {
-        case 'string'   : data_object.title = new SimpleTitle(row.title) ; break ;
-        case 'function' : data_object.title = row.title ; break ;
-        default:
-            throw new WidgetError('StackOfRows: missing or unsupported title') ;
-        }
-    }
-
-    switch (typeof(row.body)) {
-    case 'string' : data_object.body = { display: function (container) { container.html(row.body) ; }} ; break ;
-    case 'object' :
-        if (typeof(row.body.display) === 'function')
-            data_object.body = row.body ;
-        else
-            throw new WidgetError('StackOfRows: incorrect or unsupported format of the body object') ;
-        break ;
-    default:
-        throw new WidgetError('StackOfRows: missing or unsupported body') ;
-    }
-
     // The identifier is needed by the Stack only in order
     // to keep a track of a container into which a particular
     // row Widget is paced.
 
     var id = this.rows.length ;
-    this.rows.push(new StackRow(id, data_object, this.options.expand_propagate)) ;
+
+    // The Data Object can be either directly prepared by a user or be
+    // "syntechnised" from a simple form of an input.
+
+    this.rows.push (
+        StackRowData_Factory (
+            id ,
+            row ,
+            this.hdr ,
+            this.options.expand_propagate
+        )
+    ) ;
 } ,
 
 set_rows : function (rows) {
@@ -186,6 +266,16 @@ set_rows : function (rows) {
     if (rows)
         for(var i in rows)
             this.add_row(rows[i]) ;
+} ,
+
+/**
+ * This method will return true if ther eis at least one row in the 'locked' state
+ * which is meant to prevent the table from being deleted/updated, etc.
+ */
+is_locked : function () {
+    for (var i in this.rows)
+        if (this.rows[i].is_locked()) return true ;
+    return false ;
 } ,
 
 is_initialized : false ,

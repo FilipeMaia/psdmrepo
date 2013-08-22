@@ -12,8 +12,14 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 Tag: V00-00-01
-2013-08-12 Igor Gaponenko
+2013-08-21 Igor Gaponenko
 - added a hierarchy of JavaScript base classes and widgets
 - moved in Fwk.js and its CSS
 - moved in Table.js and its CSS
 - extended API and improved implementation of the StackOfRos.js
+- fixed bugs in Fwk.js
+- refactored Fwk.js and changed the API for describing applications
+- moved in the test of Fwk
+- moved in Web serviced for server-side configuration of the Fwk-based applications
+and testing Fwk
+- moved in an icon for the Fwk PRINTER button

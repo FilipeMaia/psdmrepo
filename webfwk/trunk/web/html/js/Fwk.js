@@ -27,9 +27,9 @@ function FwkConfigHandlerCreator (application_config, scope, parameter) {
     } ;
 }
 
-function FwkConfigCreator (application) {
+function FwkConfigCreator (application_name) {
 
-    this.application = application ;
+    this.application_name = application_name ;
 
     this.cached_handlers = {} ;
     
@@ -40,9 +40,9 @@ function FwkConfigCreator (application) {
     } ;
 
     this.load = function (scope, parameter, on_found, on_not_found, handler2update_on_found) {
-        var url = '../portal/ws/config_load.php' ;
+        var url = '../webfwk/ws/config_load.php' ;
         var params = {
-            application: application ,
+            application: application_name ,
             scope      : scope ,
             parameter  : parameter
         } ;
@@ -63,9 +63,9 @@ function FwkConfigCreator (application) {
     } ;
     
     this.save = function (scope, parameter, value) {
-        var url = '../portal/ws/config_save.php' ;
+        var url = '../webfwk/ws/config_save.php' ;
         var params = {
-            application: application ,
+            application: application_name ,
             scope      : scope ,
             parameter  : parameter ,
             value      : $.toJSON(value)
@@ -81,11 +81,11 @@ function FwkConfigCreator (application) {
 }
 
 /*
- * The base class for user-defined dispatchers.
+ * The base class for user-defined applications.
  *
- * @returns {FwkDispatcherBase}
+ * @returns {FwkApplication}
  */
-function FwkDispatcherBase () {
+function FwkApplication () {
 
     this.container = null ;
     this.active = false ;
@@ -105,16 +105,22 @@ function FwkDispatcherBase () {
         this.set_container(container) ;
         this.on_update() ;
     } ;
+
+    // These methods are supposed to be implemented by derived classes
+
+    this.on_activate   = function () { window.console.log('FwkApplication::on_activate() NOT IMPLEMENTED') ; } ;
+    this.on_deactivate = function () { window.console.log('FwkApplication::on_deactivate() NOT IMPLEMENTED') ; } ;
+    this.on_update     = function () { window.console.log('FwkApplication::on_update() NOT IMPLEMENTED') ; } ;
 }
 
 /*
- * The template constructor for applications.
+ * The proxy class representing applications within the framework
  * 
  * @param {String} name
  * @param {String} full_name
- * @returns {FwkApplicationTemplate}
+ * @returns {FwkApplicationProxy}
  */
-function FwkApplicationTemplate (name, full_name) {
+function FwkApplicationProxy (name, full_name) {
 
     var that = this ;
 
@@ -127,15 +133,15 @@ function FwkApplicationTemplate (name, full_name) {
     this.context = {} ;
 
     this.wa_id = null;
-    this.dispatcher = null ;
+    this.application = null ;
     this.html = null ;
     this.load_html = null ;
 
     this.is_initialized = false ;
 
     this.select = function (ctx1, ctx2) {
-        that.context1 = ctx1 ;
-        that.context2 = ctx2 ? ctx2 : '' ;
+        that.context1 = ctx1 || '' ;
+        that.context2 = ctx2 || '' ;
     } ;
     this.context1_to_name = function () {
         if (this.context[this.context1] !== undefined)
@@ -162,13 +168,13 @@ function FwkApplicationTemplate (name, full_name) {
     this.get_wa_id = function () {
         return this.get_any_wa_id (this.context1, this.context2) ;
     } ;
-    this.get_dispatcher = function () {
-        if ((this.context1 !== '') && (this.context2 !== '')  && (this.context[this.context1].context[this.context2].dispatcher))
-            return this.context[this.context1].context[this.context2].dispatcher ;
-        if ((this.context1 !== '') && this.context[this.context1].dispatcher)
-            return this.context[this.context1].dispatcher ;
-        if (this.dispatcher)
-            return this.dispatcher ;
+    this.get_application = function () {
+        if ((this.context1 !== '') && (this.context2 !== '')  && (this.context[this.context1].context[this.context2].application))
+            return this.context[this.context1].context[this.context2].application ;
+        if ((this.context1 !== '') && this.context[this.context1].application)
+            return this.context[this.context1].application ;
+        if (this.application)
+            return this.application ;
         return null ;
     } ;
 
@@ -218,14 +224,14 @@ function FwkApplicationTemplate (name, full_name) {
     this.activate = function () {
         this.init() ;
         var container = $('#fwk-applications > #'+this.get_wa_id()+' > div') ;
-        var dispatcher = this.get_dispatcher() ;
-        if (dispatcher) dispatcher.activate(container) ;
+        var application = this.get_application() ;
+        if (application) application.activate(container) ;
     } ;
     this.deactivate = function () {
         this.init() ;
         var container = $('#fwk-applications > #'+this.get_wa_id()+' > div') ;
-        var dispatcher = this.get_dispatcher() ;
-        if (dispatcher) dispatcher.deactivate(container) ;
+        var application = this.get_application() ;
+        if (application) application.deactivate(container) ;
     } ;
     
     /*
@@ -236,24 +242,24 @@ function FwkApplicationTemplate (name, full_name) {
     this.update = function () {
         this.init() ;
 
-        if (this.dispatcher)
-            dispatcher.update($('#fwk-applications > #'+this.get_any_wa_id()+' > div')) ;
+        if (this.application)
+            application.update($('#fwk-applications > #'+this.get_any_wa_id()+' > div')) ;
 
         if (this.context)
             for (var i in this.context) {
                 var context1_name = ''+i ;
                 var context1 = this.context[context1_name] ;
 
-                if (context1.dispatcher)
-                     context1.dispatcher.update($('#fwk-applications > #'+this.get_any_wa_id(context1_name)+' > div')) ;
+                if (context1.application)
+                     context1.application.update($('#fwk-applications > #'+this.get_any_wa_id(context1_name)+' > div')) ;
 
                 if (context1.context)
                     for (var j in context1.context) {
                         var context2_name = ''+j ;
                         var context2 = context1.context[context2_name] ;
 
-                        if (context2.dispatcher)
-                            context1.dispatcher.update($('#fwk-applications > #'+this.get_any_wa_id(context1_name, context2_name)+' > div')) ;
+                        if (context2.application)
+                            context1.application.update($('#fwk-applications > #'+this.get_any_wa_id(context1_name, context2_name)+' > div')) ;
                     }
             }
     } ;
@@ -273,17 +279,17 @@ function FwkCreator () {
     this.subtitle = null ;
     this.auth = null ;
     this.url = document.URL ;
-    this.applications = {} ;
+    this.app_proxies = {} ;
     this.select_app = null ;
     this.select_app_context1 = null ;
+    this.select_app_context2 = null ;
     this.on_activate = null ;
     this.on_deactivate = null ;
     this.on_quick_search = null ;
     this.on_update = null ;
     this.config_svc = null ;
     this.is_built = false ;
-    this.prev_app = null ;
-    this.current_application = null ;
+    this.app_proxy_current = null ;
 
     /*
      * The UI builder
@@ -307,65 +313,65 @@ function FwkCreator () {
 
         for (var i in ui_config) {
             var menu1 = ui_config[i] ;
-            var application = new FwkApplicationTemplate(''+i, menu1.name) ;
-            application.wa_id = null ;
+            var app_proxy = new FwkApplicationProxy(''+i, menu1.name) ;
+            app_proxy.wa_id = null ;
             if (menu1.menu) {
                 var first_menu2 = true ;
                 for (var j in menu1.menu) {
                     var menu2 = menu1.menu[j] ;
-                    if (first_menu2) application.context1 = ''+j ;
+                    if (first_menu2) app_proxy.context1 = ''+j ;
                     var descr2 = {
                         'name': ''+menu2.name ,
                          context: {} ,
                          wa_id: null
                     } ;
-                    application.context[''+j] = descr2 ;
+                    app_proxy.context[''+j] = descr2 ;
                     var first_menu3 = true ;
                     if (menu2.menu) {
                         for (var k in menu2.menu) {
                             var menu3 = menu2.menu[k] ;
-                            if (first_menu2 && first_menu3) application.context2 = ''+k ;
+                            if (first_menu2 && first_menu3) app_proxy.context2 = ''+k ;
                             var descr3 = {
                                 'name': ''+menu3.name ,
                                 context: {} ,
                                 wa_id: null
                             } ;
-                            application.context[''+j].context[''+k] = descr3 ;
-                            if (menu3.dispatcher)     descr3.dispatcher = menu3.dispatcher ;
-                            if (menu3.html_container) descr3.html       = $('#'+menu3.html_container).html() ;
-                            if (menu3.html)           descr3.html       = menu3.html ;
-                            if (menu3.load_html)      descr3.load_html  = {
+                            app_proxy.context[''+j].context[''+k] = descr3 ;
+                            if (menu3.application)    descr3.application = menu3.application ;
+                            if (menu3.html_container) descr3.html        = $('#'+menu3.html_container).html() ;
+                            if (menu3.html)           descr3.html        = menu3.html ;
+                            if (menu3.load_html)      descr3.load_html   = {
                                 url:    menu3.load_html.url ,
                                 params: menu3.load_html.params ? menu3.load_html.params : {}} ;
                             first_menu3 = false ;
                         }
                     } else {
-                        if (menu2.dispatcher)     descr2.dispatcher = menu2.dispatcher ;
-                        if (menu2.html_container) descr2.html       = $('#'+menu2.html_container).html() ;
-                        if (menu2.html)           descr2.html       = menu2.html ;
-                        if (menu2.load_html)      descr2.load_html  = {
+                        if (menu2.application)    descr2.application = menu2.application ;
+                        if (menu2.html_container) descr2.html        = $('#'+menu2.html_container).html() ;
+                        if (menu2.html)           descr2.html        = menu2.html ;
+                        if (menu2.load_html)      descr2.load_html   = {
                             url:    menu2.load_html.url ,
                             params: menu2.load_html.params ? menu2.load_html.params : {}} ;
                     }
                     first_menu2 = false ;
                 }
             } else {
-                if (menu1.dispatcher)     application.dispatcher = menu1.dispatcher ;
-                if (menu1.html_container) application.html       = $('#'+menu1.html_container).html() ;
-                if (menu1.html)           application.html       = menu1.html ;
-                if (menu1.load_html)      application.load_html  = {
+                if (menu1.application)    app_proxy.application = menu1.application ;
+                if (menu1.html_container) app_proxy.html        = $('#'+menu1.html_container).html() ;
+                if (menu1.html)           app_proxy.html        = menu1.html ;
+                if (menu1.load_html)      app_proxy.load_html   = {
                     url:    menu1.load_html.url ,
                     params: menu1.load_html.params ? menu1.load_html.params : {}} ;
             }
-            this.applications[''+i] = application ;
+            this.app_proxies[''+i] = app_proxy ;
         }
         if (on_quick_search) {            
             this.on_quick_search = on_quick_search ? on_quick_search : null ;
         }
         this.on_update = function () {            
-            for (var i in this.applications) {
-                var app = this.applications[i] ;
-                app.update() ;
+            for (var id in this.app_proxies) {
+                var app_proxy = this.app_proxies[id] ;
+                app_proxy.update() ;
             }
         } ;
 
@@ -561,8 +567,8 @@ function FwkCreator () {
     }
 
     this.printer_friendly = function () {
-        if (this.current_application) {
-            $('#fwk-applications > #'+this.current_application.get_wa_id()).printElement ({
+        if (this.app_proxy_current) {
+            $('#fwk-applications > #'+this.app_proxy_current.get_wa_id()).printElement ({
                 leaveOpen: true ,
                 printMode: 'popup' ,
                 printBodyOptions: {
@@ -729,10 +735,48 @@ function FwkCreator () {
      *   OPERATIONS WITH TABS AND VERTICAL MENUS
      * -------------------------------------------
      */
-    this.set_context = function (app) {
-        if (this.prev_app && (this.prev_app != app)) this.prev_app.deactivate() ;
-        app.activate() ;
-        this.prev_app = app ;
+    this.set_context = function (app_proxy, context1, context2) {
+
+        // Thsi is the very first call to this method
+
+        if (!this.app_proxy_current) {
+            this.app_proxy_current = app_proxy ;
+            this.app_proxy_current.select(context1, context2) ;
+            this.app_proxy_current.activate() ;
+            return ;
+        }
+
+        // Switching between tabs
+
+        if (this.app_proxy_current !== app_proxy) {
+            this.app_proxy_current.deactivate() ;
+            this.app_proxy_current = app_proxy ;
+            this.app_proxy_current.select(context1, context2) ;
+            this.app_proxy_current.activate() ;
+            return ;
+        }
+
+        // Switching between level 1 contexts of the same tab
+
+        if (this.app_proxy_current.context1 !== context1) {
+            this.app_proxy_current.deactivate() ;
+            this.app_proxy_current.select(context1, context2) ;
+            this.app_proxy_current.activate() ;
+            return ;
+        }
+ 
+        // Switching between level 2 contexts  of the same tab
+
+        if (this.app_proxy_current.context2 !== context2) {
+            this.app_proxy_current.deactivate() ;
+            this.app_proxy_current.select(context1, context2) ;
+            this.app_proxy_current.activate() ;
+            return ;
+        }
+        
+        // Otherwise nothing to be done here
+        
+        return ;
     } ;
 
     this.v_item_group = function (item) {
@@ -751,21 +795,20 @@ function FwkCreator () {
 
         if(item.hasClass('fwk-tab-select')) return ;
 
-        var previous_application = this.current_application ;
-        this.current_application = this.applications[item.attr('id')] ;
+        var app_proxy = this.app_proxies[item.attr('id')] ;
 
         $('#fwk-tabs > .fwk-tab-select').removeClass('fwk-tab-select') ;
         item.addClass('fwk-tab-select') ;
 
-        if (previous_application) $('#fwk-menu > #'+previous_application.name).removeClass('fwk-visible').addClass('fwk-hidden') ;
-        $('#fwk-menu > #'+this.current_application.name).removeClass('fwk-hidden').addClass('fwk-visible') ;
+        if (this.app_proxy_current) $('#fwk-menu > #'+this.app_proxy_current.name).removeClass('fwk-visible').addClass('fwk-hidden') ;
+        $('#fwk-menu > #'+app_proxy.name).removeClass('fwk-hidden').addClass('fwk-visible') ;
 
-        if (this.current_application.context2)
-            this.v_item_selected($('#fwk-menu > #'+this.current_application.name+' > #'+this.current_application.context1).next().children('.fwk-menu-item#'+this.current_application.context2)) ;
+        this.set_context(app_proxy, app_proxy.context1, app_proxy.context2) ;
+
+        if (app_proxy.context2)
+            this.v_item_selected($('#fwk-menu > #'+app_proxy.name+' > #'+app_proxy.context1).next().children('.fwk-menu-item#'+app_proxy.context2)) ;
         else
-            this.v_item_selected($('#fwk-menu > #'+this.current_application.name).children('.fwk-menu-item#'+this.current_application.context1)) ;
-
-        this.set_context(this.current_application) ;
+            this.v_item_selected($('#fwk-menu > #'+app_proxy.name).children('.fwk-menu-item#'+app_proxy.context1)) ;
     } ;
 
     /* Event handler for vertical menu group selections will only
@@ -794,7 +837,7 @@ function FwkCreator () {
 
         var item = $(item) ;
 
-        $('#fwk-menu > #'+this.current_application.name).find('.fwk-menu-item.fwk-menu-select').each(function () {
+        $('#fwk-menu > #'+this.app_proxy_current.name).find('.fwk-menu-item.fwk-menu-select').each(function () {
             $(this).children('.ui-icon').removeClass('ui-icon-triangle-1-s').addClass('ui-icon-triangle-1-e') ;
             $(this).removeClass('fwk-menu-select') ;
             var this_group = that.v_item_group(this) ;
@@ -821,23 +864,19 @@ function FwkCreator () {
             }
             group.addClass('fwk-menu-select') ;
 
-            this.current_application.select(group.attr('id'), item.attr('id')) ;
-
+            this.set_context(this.app_proxy_current, group.attr('id'), item.attr('id')) ;
         } else {
-
-            this.current_application.select(item.attr('id')) ;
+            this.set_context(this.app_proxy_current, item.attr('id')) ;
         }
-        this.set_context(this.current_application) ;
-
         // Hide the older work area and display the new one
 
         $('#fwk-applications > .fwk-appl-wa.fwk-visible').removeClass('fwk-visible').addClass('fwk-hidden') ;
-        $('#fwk-applications > #'+this.current_application.get_wa_id()).addClass('fwk-visible') ;
+        $('#fwk-applications > #'+this.app_proxy_current.get_wa_id()).addClass('fwk-visible') ;
     } ;
 
     this.init_tabs_menus = function () {
 
-	$('.fwk-tab' ).click(function() { that.m_item_selected (this) ; }) ;
+	$('.fwk-tab'       ).click(function() { that.m_item_selected (this) ; }) ;
 	$('.fwk-menu-group').click(function() { that.v_group_selected(this) ; }) ;
 	$('.fwk-menu-item' ).click(function() { that.v_item_selected (this) ; }) ;
 
@@ -852,20 +891,25 @@ function FwkCreator () {
 
 	// Finally, activate the selected application (if any provided). Otherwise
         // pick the first one.
+        // 
+        // TODO: extend teh logic to drill down to context2
 	//
-	for (var id in this.applications) {
-            var application = this.applications[id] ;
+	for (var id in this.app_proxies) {
+            var app_proxy = this.app_proxies[id] ;
             if (this.select_app) {
-                if (application.name === this.select_app) {
-                    $('#fwk-tabs').children('#'+application.name).each(function() { that.m_item_selected(this) ; }) ;
+                if (app_proxy.name === this.select_app) {
+                    $('#fwk-tabs').children('#'+app_proxy.name).each(function() { that.m_item_selected(this) ; }) ;
                     if (this.select_app_context1) {
-                        this.v_item_selected($('#fwk-menu > #'+application.name+' > #'+this.select_app_context1)) ;
-                        application.select(this.select_app_context1) ;
+                        this.v_item_selected($('#fwk-menu > #'+app_proxy.name+' > #'+this.select_app_context1)) ;
+                        this.set_context(app_proxy, this.select_app_context1, this.select_app_context2) ;
+                    } else {
+                        alert('Fwk.init_tabs_menus(): implementation error, code: 1') ;
                     }
                     break ;
                 }
             } else {
-                this.m_item_selected($('#fwk-tabs > #'+application.name)) ;
+                this.m_item_selected($('#fwk-tabs > #'+app_proxy.name)) ;
+                this.set_context(app_proxy, app_proxy.context1, app_proxy.context2) ;
                 break ;
             }
 	}
@@ -881,15 +925,17 @@ function FwkCreator () {
      * @returns {undefined
      */
     this.activate = function (application_name, context1_name) {
-	for (var i in this.applications) {
-            var application = this.applications[i] ;
-            if (application.full_name === application_name) {
-                $('#fwk-tabs').children('#'+application.name).each(function() { that.m_item_selected(this) ; }) ;
+	for (var id in this.app_proxies) {
+            var app_proxy = this.app_proxies[id] ;
+            if (app_proxy.full_name === application_name) {
+                $('#fwk-tabs').children('#'+app_proxy.name).each(function() { that.m_item_selected(this) ; }) ;
                 if (context1_name) {
-                    this.v_item_selected($('#fwk-menu > #'+application.name+' > #'+application.name_to_context1(context1_name))) ;
-                    application.select(application.name_to_context1(context1_name)) ;
+                    this.v_item_selected($('#fwk-menu > #'+app_proxy.name+' > #'+app_proxy.name_to_context1(context1_name))) ;
+                    this.set_context(app_proxy, app_proxy.name_to_context1(context1_name)) ;
+                } else {
+                    alert('Fwk.activate(): implementation error, code: 1') ;
                 }
-                return application.get_dispatcher() ;
+                return app_proxy.get_application() ;
             }
 	}
     } ;
@@ -916,7 +962,7 @@ function FwkCreator () {
 '      <div style="float:right;" id="fwk-login" class="not4print">' +
 '        <table><tbody>' +
 '          <tr>' +
-'            <td rowspan="4" valign="bottom"><a href="javascript:Fwk.printer_friendly()" title="Printer friendly version of this page"><img src="../portal/img/PRINTER_icon.gif" style="border-radius: 5px;" /></a></td>' +
+'            <td rowspan="4" valign="bottom"><a href="javascript:Fwk.printer_friendly()" title="Printer friendly version of this page"><img src="../webfwk/img/PRINTER_icon.gif" style="border-radius: 5px;" /></a></td>' +
 '          </tr>' +
 '          <tr>' +
 '            <td>&nbsp;</td>' +
@@ -937,10 +983,10 @@ function FwkCreator () {
 '    <div id="fwk-tabs">' ;
 
         var first_application = true ;
-        for (var i in this.applications) {
-            var application = this.applications[i] ;
+        for (var id in this.app_proxies) {
+            var app_proxy = this.app_proxies[id] ;
             html +=
-'      <div class="fwk-tab '+(first_application ? 'fwk-tab-first' : 'fwk-tab-next')+'" id="'+application.name+'">'+application.full_name+'</div>' ;
+'      <div class="fwk-tab '+(first_application ? 'fwk-tab-first' : 'fwk-tab-next')+'" id="'+app_proxy.name+'">'+app_proxy.full_name+'</div>' ;
             first_application = false ;
         }
         html +=
@@ -967,12 +1013,12 @@ function FwkCreator () {
 '    <div id="fwk-menu-title"></div>' +
 '' ;
         first_application = true ;
-        for (var i in this.applications) {
-            var application = this.applications[i] ;
+        for (var id in this.app_proxies) {
+            var app_proxy = this.app_proxies[id] ;
             html +=
-'    <div id="'+application.name+'" class="'+(first_application ? 'fwk-visible' : 'fwk-hidden')+'">' ;
-            for (var j in application.context) {
-                var context1 = application.context[j] ;
+'    <div id="'+app_proxy.name+'" class="'+(first_application ? 'fwk-visible' : 'fwk-hidden')+'">' ;
+            for (var j in app_proxy.context) {
+                var context1 = app_proxy.context[j] ;
                 var context1_empty = !num_keys_in_dict(context1.context) ;
                 html += context1_empty ?
 '      <div class="fwk-menu-item" id="'+j+'">' :
@@ -1012,31 +1058,31 @@ function FwkCreator () {
 '' +
 '<div id="fwk-center">' +
 '  <div id="fwk-applications">' ;
-        for (var i in this.applications) {
-            var application = this.applications[i] ;
+        for (var id in this.app_proxies) {
+            var app_proxy = this.app_proxies[id] ;
             var application_empty = true ;
-            for (var j in application.context) {
+            for (var j in app_proxy.context) {
                 application_empty = false ;
-                var context1 = application.context[j] ;
+                var context1 = app_proxy.context[j] ;
                 var context1_empty = true ;
                 if (context1.context) {
                     for (var k in context1.context) {
                         context1_empty = false ;
                         var context2 = context1.context[k] ;
-                        var wa_id = application.name + '-' + j + '-' + k ;
+                        var wa_id = app_proxy.name + '-' + j + '-' + k ;
                         context2.wa_id = wa_id ;
                         html += this.init_wa_html(wa_id) ;
                     }
                 }
                 if (context1_empty) {
-                    var wa_id = application.name + '-' + j ;
+                    var wa_id = app_proxy.name + '-' + j ;
                     context1.wa_id = wa_id ;
                     html += this.init_wa_html(wa_id) ;
                 }
             }
             if (application_empty) {
-                var wa_id = application.name ;
-                application.wa_id = wa_id ;
+                var wa_id = app_proxy.name ;
+                app_proxy.wa_id = wa_id ;
                 html += this.init_wa_html(wa_id) ;
             }
         }
