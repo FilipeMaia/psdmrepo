@@ -6,7 +6,7 @@
 sit_root=${1:?root directory is not specified}
 
 rpm_version=4.4.2.3
-rpm_release=6psdm
+rpm_release=7psdm
 apt_version=0.5.15lorg3.94a
 apt_release=8psdm
 
