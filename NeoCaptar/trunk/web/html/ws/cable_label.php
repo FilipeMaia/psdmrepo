@@ -53,13 +53,13 @@ function label($pdf, $cable, $now, $src2dst=true) {
     $pdf->selectFont( './fonts/Helvetica-Bold.afm' );
     $pdf->addText  (     $first, 29, $font_size, $cable->cable(),                                    $angle);
     $pdf->selectFont( './fonts/Helvetica.afm' );
-    $pdf->addText  (    38, 29, $font_size, $revision_str,                                           $angle);
+    $pdf->addText  (    40, 29, $font_size, $revision_str,                                           $angle);
     //$pdf->addText  (    58, 29, $font_size, LusiTime::now()->toStringDay(),                        $angle);
     $pdf->addText  (    53, 29, $font_size, $cable->origin_pinlist(),                                $angle);
     $pdf->selectFont( './fonts/Helvetica-Bold.afm' );
     $pdf->addText  (145+ $first, 29, $font_size, $cable->cable(),                                    $angle);
     $pdf->selectFont( './fonts/Helvetica.afm' );
-    $pdf->addText  (145+38, 29, $font_size, $revision_str,                                           $angle);
+    $pdf->addText  (145+40, 29, $font_size, $revision_str,                                           $angle);
     //$pdf->addText  (145+58, 29, $font_size, LusiTime::now()->toStringDay(),                        $angle);
     $pdf->addText  (145+53, 29, $font_size, $cable->destination_pinlist(),                           $angle);
 

@@ -1582,7 +1582,7 @@ HERE;
           <div style="font-size:11px; border:solid 1px #b0b0b0; padding:10px; padding-left:20px; padding-bottom:20px;" >
             <div style="margin-bottom:10px; ">
               <p>Each PCDS location (a building or an instrument) is associated with a set of cable numbers. The set represents
-                 a family of cable numbers starting with so called 'prefix' (an upper case character string of the length of 2).
+                 a family of cable numbers starting with so called 'prefix' (an upper case character string of the length of 2 or 3).
                  Multiple locations can share the same set (prefix). Each set is composed of one or many subranges of cable numbers.
                  Different prefixes have independent sets of numbers. Individual cable numbers are allocated from (any range) of a set
                  when a new cable is being registered in the database. This page is meant to be used by administrators to configure

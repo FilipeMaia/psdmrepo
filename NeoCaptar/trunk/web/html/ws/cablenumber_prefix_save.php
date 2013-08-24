@@ -33,9 +33,14 @@ try {
 	$neocaptar->begin();
 
     foreach( $prefix2location as $prefix => $location ) {
-        $prefix   = strtoupper(trim($prefix));
-        if(strlen($prefix) != 2)
-            NeoCaptarUtils::report_error("illegal value for parameters: each prefix must have exactly 2 symbols");
+        $prefix = strtoupper(trim($prefix));
+        switch(strlen($prefix)) {
+            case 2 :
+            case 3 :
+                break ;
+            default :
+                NeoCaptarUtils::report_error("illegal value of prefix '{$prefix}': it must have 2 or 3 symbols only");
+        }
         $prefix_obj = $neocaptar->find_cablenumber_prefix_by_name($prefix);
         if( is_null($prefix_obj)) $prefix_obj = $neocaptar->add_cablenumber_prefix($prefix);
         $location = trim($location);

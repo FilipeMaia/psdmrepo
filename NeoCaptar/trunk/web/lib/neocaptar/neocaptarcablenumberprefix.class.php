@@ -171,7 +171,7 @@ class NeoCaptarCableNumberPrefix {
                             'cable_id' => intval($cable_id)),
                         $uid
                     );
-                    return sprintf("%2s%05d", $this->name(), $number);
+                    return sprintf("%3s%05d", $this->name(), $number);
                 } catch( NeoCaptarException $e ) {
                     if( !is_null( $e->errno ) && ( $e->errno == NeoCaptarConnection::$ER_DUP_ENTRY )) continue;
                     throw $e;
