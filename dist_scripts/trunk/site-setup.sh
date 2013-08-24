@@ -27,8 +27,8 @@ warn() { echo $* 1>&2 ; }
       Red_Hat_Enterprise_Linux_*_release_6.*)   os=rhel6 ;;
       CentOS_release_5.*)                       os=rhel5 ;;
       CentOS_release_6.*)                       os=rhel6 ;;
-      Scientific_Linux_*_release_5.*)           os=rhel5 ;;
-      Scientific_Linux_*_release_6.*)           os=rhel6 ;;
+      Scientific_Linux*release_5.*)             os=rhel5 ;;
+      Scientific_Linux*release_6.*)             os=rhel6 ;;
     esac
   elif [ "$os" = "Linux" -a -r /etc/lsb-release ] ; then
     . /etc/lsb-release
