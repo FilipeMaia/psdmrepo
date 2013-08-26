@@ -465,6 +465,7 @@ std::ostream& operator<<(std::ostream& str, Acqiris::TdcDataV1_Item::Source enva
 
 class TdcDataV1Common: public TdcDataV1_Item {
 public:
+  TdcDataV1Common() {}
   /** Returns number of hits. */
   uint32_t nhits() const;
   /** Returns overflow status. */
@@ -480,6 +481,7 @@ public:
 
 class TdcDataV1Channel: public TdcDataV1_Item {
 public:
+  TdcDataV1Channel() {}
   /** Returns number of ticks. */
   uint32_t ticks() const;
   /** Returns overflow status. */
@@ -505,6 +507,7 @@ public:
     MemFullSwitch = 2,
     AuxIOMarker = 16,
   };
+  TdcDataV1Marker() {}
   /** Returns type of the marker. */
   Acqiris::TdcDataV1Marker::Type type() const;
   static uint32_t _sizeof() { return ((((Acqiris::TdcDataV1_Item::_sizeof())+1)-1)/1)*1; }

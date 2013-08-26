@@ -26,8 +26,8 @@ public:
   }
   DiodeFexConfigV1(const float* arg__base, const float* arg__scale)
   {
-    std::copy(arg__base, arg__base+(3), _base);
-    std::copy(arg__scale, arg__scale+(3), _scale);
+    if (arg__base) std::copy(arg__base, arg__base+(3), &_base[0]);
+    if (arg__scale) std::copy(arg__scale, arg__scale+(3), &_scale[0]);
   }
   /**     Note: this method returns ndarray instance which does not control lifetime
     of the data, do not use returned ndarray after this instance disappears. */
@@ -57,8 +57,8 @@ public:
   }
   DiodeFexConfigV2(const float* arg__base, const float* arg__scale)
   {
-    std::copy(arg__base, arg__base+(16), _base);
-    std::copy(arg__scale, arg__scale+(16), _scale);
+    if (arg__base) std::copy(arg__base, arg__base+(16), &_base[0]);
+    if (arg__scale) std::copy(arg__scale, arg__scale+(16), &_scale[0]);
   }
   /**     Note: this method returns ndarray instance which does not control lifetime
     of the data, do not use returned ndarray after this instance disappears. */
@@ -146,7 +146,7 @@ public:
   IpmFexV1(const float* arg__channel, float arg__sum, float arg__xpos, float arg__ypos)
     : _sum(arg__sum), _xpos(arg__xpos), _ypos(arg__ypos)
   {
-    std::copy(arg__channel, arg__channel+(4), _channel);
+    if (arg__channel) std::copy(arg__channel, arg__channel+(4), &_channel[0]);
   }
   /**     Note: this method returns ndarray instance which does not control lifetime
     of the data, do not use returned ndarray after this instance disappears. */

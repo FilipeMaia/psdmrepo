@@ -320,7 +320,7 @@ public:
   dbr_ctrl_short(int16_t status, int16_t severity, const char* units, int16_t upper_disp_limit, int16_t lower_disp_limit, int16_t upper_alarm_limit, int16_t upper_warning_limit, int16_t lower_warning_limit, int16_t lower_alarm_limit, int16_t upper_ctrl_limit, int16_t lower_ctrl_limit)
     : _status(status), _severity(severity), _upper_disp_limit(upper_disp_limit), _lower_disp_limit(lower_disp_limit), _upper_alarm_limit(upper_alarm_limit), _upper_warning_limit(upper_warning_limit), _lower_warning_limit(lower_warning_limit), _lower_alarm_limit(lower_alarm_limit), _upper_ctrl_limit(upper_ctrl_limit), _lower_ctrl_limit(lower_ctrl_limit)
   {
-    std::copy(units, units+(8), _units);
+    if (units) std::copy(units, units+(8), &_units[0]);
   }
   int16_t status() const { return _status; }
   int16_t severity() const { return _severity; }
@@ -365,7 +365,7 @@ public:
   dbr_ctrl_float(int16_t status, int16_t severity, int16_t precision, const char* units, float upper_disp_limit, float lower_disp_limit, float upper_alarm_limit, float upper_warning_limit, float lower_warning_limit, float lower_alarm_limit, float upper_ctrl_limit, float lower_ctrl_limit)
     : _status(status), _severity(severity), _precision(precision), RISC_pad(0), _upper_disp_limit(upper_disp_limit), _lower_disp_limit(lower_disp_limit), _upper_alarm_limit(upper_alarm_limit), _upper_warning_limit(upper_warning_limit), _lower_warning_limit(lower_warning_limit), _lower_alarm_limit(lower_alarm_limit), _upper_ctrl_limit(upper_ctrl_limit), _lower_ctrl_limit(lower_ctrl_limit)
   {
-    std::copy(units, units+(8), _units);
+    if (units) std::copy(units, units+(8), &_units[0]);
   }
   int16_t status() const { return _status; }
   int16_t severity() const { return _severity; }
@@ -413,7 +413,7 @@ public:
   dbr_ctrl_enum(int16_t status, int16_t severity, int16_t no_str, const char* strings)
     : _status(status), _severity(severity), _no_str(no_str)
   {
-    std::copy(strings, strings+(416), _strs[0]);
+    if (strings) std::copy(strings, strings+(416), &_strs[0][0]);
   }
   int16_t status() const { return _status; }
   int16_t severity() const { return _severity; }
@@ -444,7 +444,7 @@ public:
   dbr_ctrl_char(int16_t status, int16_t severity, const char* units, uint8_t upper_disp_limit, uint8_t lower_disp_limit, uint8_t upper_alarm_limit, uint8_t upper_warning_limit, uint8_t lower_warning_limit, uint8_t lower_alarm_limit, uint8_t upper_ctrl_limit, uint8_t lower_ctrl_limit)
     : _status(status), _severity(severity), _upper_disp_limit(upper_disp_limit), _lower_disp_limit(lower_disp_limit), _upper_alarm_limit(upper_alarm_limit), _upper_warning_limit(upper_warning_limit), _lower_warning_limit(lower_warning_limit), _lower_alarm_limit(lower_alarm_limit), _upper_ctrl_limit(upper_ctrl_limit), _lower_ctrl_limit(lower_ctrl_limit), RISC_pad(0)
   {
-    std::copy(units, units+(8), _units);
+    if (units) std::copy(units, units+(8), &_units[0]);
   }
   int16_t status() const { return _status; }
   int16_t severity() const { return _severity; }
@@ -490,7 +490,7 @@ public:
   dbr_ctrl_long(int16_t status, int16_t severity, const char* units, int32_t upper_disp_limit, int32_t lower_disp_limit, int32_t upper_alarm_limit, int32_t upper_warning_limit, int32_t lower_warning_limit, int32_t lower_alarm_limit, int32_t upper_ctrl_limit, int32_t lower_ctrl_limit)
     : _status(status), _severity(severity), _upper_disp_limit(upper_disp_limit), _lower_disp_limit(lower_disp_limit), _upper_alarm_limit(upper_alarm_limit), _upper_warning_limit(upper_warning_limit), _lower_warning_limit(lower_warning_limit), _lower_alarm_limit(lower_alarm_limit), _upper_ctrl_limit(upper_ctrl_limit), _lower_ctrl_limit(lower_ctrl_limit)
   {
-    std::copy(units, units+(8), _units);
+    if (units) std::copy(units, units+(8), &_units[0]);
   }
   int16_t status() const { return _status; }
   int16_t severity() const { return _severity; }
@@ -535,7 +535,7 @@ public:
   dbr_ctrl_double(int16_t status, int16_t severity, int16_t precision, const char* units, double upper_disp_limit, double lower_disp_limit, double upper_alarm_limit, double upper_warning_limit, double lower_warning_limit, double lower_alarm_limit, double upper_ctrl_limit, double lower_ctrl_limit)
     : _status(status), _severity(severity), _precision(precision), RISC_pad0(0), _upper_disp_limit(upper_disp_limit), _lower_disp_limit(lower_disp_limit), _upper_alarm_limit(upper_alarm_limit), _upper_warning_limit(upper_warning_limit), _lower_warning_limit(lower_warning_limit), _lower_alarm_limit(lower_alarm_limit), _upper_ctrl_limit(upper_ctrl_limit), _lower_ctrl_limit(lower_ctrl_limit)
   {
-    std::copy(units, units+(8), _units);
+    if (units) std::copy(units, units+(8), &_units[0]);
   }
   int16_t status() const { return _status; }
   int16_t severity() const { return _severity; }
@@ -834,7 +834,7 @@ public:
   PvConfigV1(int16_t arg_iPvId, const char* arg_sPvDesc, float arg_fInterval)
     : iPvId(arg_iPvId), fInterval(arg_fInterval)
   {
-    std::copy(arg_sPvDesc, arg_sPvDesc+(64), sPvDesc);
+    if (arg_sPvDesc) std::copy(arg_sPvDesc, arg_sPvDesc+(64), &sPvDesc[0]);
   }
   int16_t pvId() const { return iPvId; }
   const char* description() const { return sPvDesc; }

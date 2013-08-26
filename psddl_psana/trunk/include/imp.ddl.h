@@ -62,7 +62,7 @@ public:
   }
   Sample(const uint16_t* arg__channels)
   {
-    std::copy(arg__channels, arg__channels+(4), _channels);
+    if (arg__channels) std::copy(arg__channels, arg__channels+(4), &_channels[0]);
   }
   /**     Note: this method returns ndarray instance which does not control lifetime
     of the data, do not use returned ndarray after this instance disappears. */

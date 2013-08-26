@@ -179,7 +179,7 @@ public:
   EventCodeV5(uint16_t arg__u16Code, uint8_t arg__bf_isReadout, uint8_t arg__bf_isCommand, uint8_t arg__bf_isLatch, uint32_t arg__u32ReportDelay, uint32_t arg__u32ReportWidth, uint32_t arg__u32MaskTrigger, uint32_t arg__u32MaskSet, uint32_t arg__u32MaskClear, const char* arg__desc)
     : _u16Code(arg__u16Code), _u16MaskEventAttr(((arg__bf_isReadout) & 0x1)|(((arg__bf_isCommand) & 0x1)<<1)|(((arg__bf_isLatch) & 0x1)<<2)), _u32ReportDelay(arg__u32ReportDelay), _u32ReportWidth(arg__u32ReportWidth), _u32MaskTrigger(arg__u32MaskTrigger), _u32MaskSet(arg__u32MaskSet), _u32MaskClear(arg__u32MaskClear)
   {
-    std::copy(arg__desc, arg__desc+(16), _desc);
+    if (arg__desc) std::copy(arg__desc, arg__desc+(16), &_desc[0]);
   }
   uint16_t code() const { return _u16Code; }
   uint8_t isReadout() const { return uint8_t(this->_u16MaskEventAttr & 0x1); }
@@ -222,7 +222,7 @@ public:
   EventCodeV6(uint16_t arg__u16Code, uint8_t arg__bf_isReadout, uint8_t arg__bf_isCommand, uint8_t arg__bf_isLatch, uint32_t arg__u32ReportDelay, uint32_t arg__u32ReportWidth, uint32_t arg__u32MaskTrigger, uint32_t arg__u32MaskSet, uint32_t arg__u32MaskClear, const char* arg__desc, uint16_t arg__u16ReadGroup)
     : _u16Code(arg__u16Code), _u16MaskEventAttr(((arg__bf_isReadout) & 0x1)|(((arg__bf_isCommand) & 0x1)<<1)|(((arg__bf_isLatch) & 0x1)<<2)), _u32ReportDelay(arg__u32ReportDelay), _u32ReportWidth(arg__u32ReportWidth), _u32MaskTrigger(arg__u32MaskTrigger), _u32MaskSet(arg__u32MaskSet), _u32MaskClear(arg__u32MaskClear), _u16ReadGroup(arg__u16ReadGroup)
   {
-    std::copy(arg__desc, arg__desc+(16), _desc);
+    if (arg__desc) std::copy(arg__desc, arg__desc+(16), &_desc[0]);
   }
   uint16_t code() const { return _u16Code; }
   uint8_t isReadout() const { return uint8_t(this->_u16MaskEventAttr & 0x1); }
@@ -594,8 +594,8 @@ public:
   IOChannel(const char* arg__name, uint32_t arg__ninfo, const Pds::DetInfo* arg__info)
     : _ninfo(arg__ninfo)
   {
-    std::copy(arg__name, arg__name+(12), _name);
-    std::copy(arg__info, arg__info+(8), _info);
+    if (arg__name) std::copy(arg__name, arg__name+(12), &_name[0]);
+    if (arg__info) std::copy(arg__info, arg__info+(8), &_info[0]);
   }
   const char* name() const { return _name; }
   uint32_t ninfo() const { return _ninfo; }

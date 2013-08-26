@@ -29,6 +29,7 @@ public:
     : _f_11_ENRC(arg__f_11_ENRC), _f_12_ENRC(arg__f_12_ENRC), _f_21_ENRC(arg__f_21_ENRC), _f_22_ENRC(arg__f_22_ENRC)
   {
   }
+  BldDataFEEGasDetEnergy() {}
   /** Value of GDET:FEE1:11:ENRC, in mJ. */
   double f_11_ENRC() const { return _f_11_ENRC; }
   /** Value of GDET:FEE1:12:ENRC, in mJ. */
@@ -69,6 +70,7 @@ public:
     : _uDamageMask(arg__uDamageMask), _fEbeamCharge(arg__fEbeamCharge), _fEbeamL3Energy(arg__fEbeamL3Energy), _fEbeamLTUPosX(arg__fEbeamLTUPosX), _fEbeamLTUPosY(arg__fEbeamLTUPosY), _fEbeamLTUAngX(arg__fEbeamLTUAngX), _fEbeamLTUAngY(arg__fEbeamLTUAngY)
   {
   }
+  BldDataEBeamV0() {}
   /** Damage mask. */
   uint32_t damageMask() const { return _uDamageMask; }
   /** Beam charge in nC. */
@@ -120,6 +122,7 @@ public:
     : _uDamageMask(arg__uDamageMask), _fEbeamCharge(arg__fEbeamCharge), _fEbeamL3Energy(arg__fEbeamL3Energy), _fEbeamLTUPosX(arg__fEbeamLTUPosX), _fEbeamLTUPosY(arg__fEbeamLTUPosY), _fEbeamLTUAngX(arg__fEbeamLTUAngX), _fEbeamLTUAngY(arg__fEbeamLTUAngY), _fEbeamPkCurrBC2(arg__fEbeamPkCurrBC2)
   {
   }
+  BldDataEBeamV1() {}
   /** Damage mask. */
   uint32_t damageMask() const { return _uDamageMask; }
   /** Beam charge in nC. */
@@ -175,6 +178,7 @@ public:
     : _uDamageMask(arg__uDamageMask), _fEbeamCharge(arg__fEbeamCharge), _fEbeamL3Energy(arg__fEbeamL3Energy), _fEbeamLTUPosX(arg__fEbeamLTUPosX), _fEbeamLTUPosY(arg__fEbeamLTUPosY), _fEbeamLTUAngX(arg__fEbeamLTUAngX), _fEbeamLTUAngY(arg__fEbeamLTUAngY), _fEbeamPkCurrBC2(arg__fEbeamPkCurrBC2), _fEbeamEnergyBC2(arg__fEbeamEnergyBC2)
   {
   }
+  BldDataEBeamV2() {}
   /** Damage mask. */
   uint32_t damageMask() const { return _uDamageMask; }
   /** Beam charge in nC. */
@@ -235,6 +239,7 @@ public:
     : _uDamageMask(arg__uDamageMask), _fEbeamCharge(arg__fEbeamCharge), _fEbeamL3Energy(arg__fEbeamL3Energy), _fEbeamLTUPosX(arg__fEbeamLTUPosX), _fEbeamLTUPosY(arg__fEbeamLTUPosY), _fEbeamLTUAngX(arg__fEbeamLTUAngX), _fEbeamLTUAngY(arg__fEbeamLTUAngY), _fEbeamPkCurrBC2(arg__fEbeamPkCurrBC2), _fEbeamEnergyBC2(arg__fEbeamEnergyBC2), _fEbeamPkCurrBC1(arg__fEbeamPkCurrBC1), _fEbeamEnergyBC1(arg__fEbeamEnergyBC1)
   {
   }
+  BldDataEBeamV3() {}
   /** Damage mask. */
   uint32_t damageMask() const { return _uDamageMask; }
   /** Beam charge in nC. */
@@ -288,6 +293,7 @@ public:
     : _fFitTime1(arg__fFitTime1), _fFitTime2(arg__fFitTime2), _fCharge1(arg__fCharge1), _fCharge2(arg__fCharge2)
   {
   }
+  BldDataPhaseCavity() {}
   /** UND:R02:IOC:16:BAT:FitTime1 value in pico-seconds. */
   double fitTime1() const { return _fFitTime1; }
   /** UND:R02:IOC:16:BAT:FitTime2 value in pico-seconds. */

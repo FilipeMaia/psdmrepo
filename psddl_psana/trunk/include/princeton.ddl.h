@@ -243,6 +243,7 @@ public:
     : _fTemperature(arg__fTemperature)
   {
   }
+  InfoV1() {}
   float temperature() const { return _fTemperature; }
   static uint32_t _sizeof() { return 4; }
 private:
