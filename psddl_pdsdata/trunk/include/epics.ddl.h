@@ -577,6 +577,7 @@ private:
 
 class EpicsPvHeader {
 public:
+  EpicsPvHeader(int16_t arg__iPvId, int16_t arg__iDbrType, int16_t arg__iNumElements);
   EpicsPvHeader() {}
   EpicsPvHeader(const EpicsPvHeader& other) {
     const char* src = reinterpret_cast<const char*>(&other);
@@ -616,6 +617,7 @@ private:
 
 class EpicsPvCtrlHeader: public EpicsPvHeader {
 public:
+  EpicsPvCtrlHeader(int16_t arg__iPvId, int16_t arg__iDbrType, int16_t arg__iNumElements, const char* arg__sPvName);
   EpicsPvCtrlHeader() {}
   EpicsPvCtrlHeader(const EpicsPvCtrlHeader& other) {
     const char* src = reinterpret_cast<const char*>(&other);
@@ -641,6 +643,7 @@ private:
 
 class EpicsPvTimeHeader: public EpicsPvHeader {
 public:
+  EpicsPvTimeHeader(int16_t arg__iPvId, int16_t arg__iDbrType, int16_t arg__iNumElements);
   EpicsPvTimeHeader() {}
   EpicsPvTimeHeader(const EpicsPvTimeHeader& other) {
     const char* src = reinterpret_cast<const char*>(&other);
@@ -664,6 +667,7 @@ public:
 
 class EpicsPvCtrlString: public EpicsPvCtrlHeader {
 public:
+  EpicsPvCtrlString(int16_t arg__iPvId, int16_t arg__iDbrType, int16_t arg__iNumElements, const char* arg__sPvName, const Epics::dbr_sts_string& arg__dbr, const char* arg__data);
   EpicsPvCtrlString() {}
   EpicsPvCtrlString(const EpicsPvCtrlString& other) {
     const char* src = reinterpret_cast<const char*>(&other);
@@ -696,6 +700,7 @@ private:
 
 class EpicsPvCtrlShort: public EpicsPvCtrlHeader {
 public:
+  EpicsPvCtrlShort(int16_t arg__iPvId, int16_t arg__iDbrType, int16_t arg__iNumElements, const char* arg__sPvName, const Epics::dbr_ctrl_short& arg__dbr, const int16_t* arg__data);
   EpicsPvCtrlShort() {}
   EpicsPvCtrlShort(const EpicsPvCtrlShort& other) {
     const char* src = reinterpret_cast<const char*>(&other);
@@ -735,6 +740,7 @@ private:
 
 class EpicsPvCtrlFloat: public EpicsPvCtrlHeader {
 public:
+  EpicsPvCtrlFloat(int16_t arg__iPvId, int16_t arg__iDbrType, int16_t arg__iNumElements, const char* arg__sPvName, const Epics::dbr_ctrl_float& arg__dbr, const float* arg__data);
   EpicsPvCtrlFloat() {}
   EpicsPvCtrlFloat(const EpicsPvCtrlFloat& other) {
     const char* src = reinterpret_cast<const char*>(&other);
@@ -775,6 +781,7 @@ private:
 
 class EpicsPvCtrlEnum: public EpicsPvCtrlHeader {
 public:
+  EpicsPvCtrlEnum(int16_t arg__iPvId, int16_t arg__iDbrType, int16_t arg__iNumElements, const char* arg__sPvName, const Epics::dbr_ctrl_enum& arg__dbr, const uint16_t* arg__data);
   EpicsPvCtrlEnum() {}
   EpicsPvCtrlEnum(const EpicsPvCtrlEnum& other) {
     const char* src = reinterpret_cast<const char*>(&other);
@@ -814,6 +821,7 @@ private:
 
 class EpicsPvCtrlChar: public EpicsPvCtrlHeader {
 public:
+  EpicsPvCtrlChar(int16_t arg__iPvId, int16_t arg__iDbrType, int16_t arg__iNumElements, const char* arg__sPvName, const Epics::dbr_ctrl_char& arg__dbr, const uint8_t* arg__data);
   EpicsPvCtrlChar() {}
   EpicsPvCtrlChar(const EpicsPvCtrlChar& other) {
     const char* src = reinterpret_cast<const char*>(&other);
@@ -853,6 +861,7 @@ private:
 
 class EpicsPvCtrlLong: public EpicsPvCtrlHeader {
 public:
+  EpicsPvCtrlLong(int16_t arg__iPvId, int16_t arg__iDbrType, int16_t arg__iNumElements, const char* arg__sPvName, const Epics::dbr_ctrl_long& arg__dbr, const int32_t* arg__data);
   EpicsPvCtrlLong() {}
   EpicsPvCtrlLong(const EpicsPvCtrlLong& other) {
     const char* src = reinterpret_cast<const char*>(&other);
@@ -893,6 +902,7 @@ private:
 
 class EpicsPvCtrlDouble: public EpicsPvCtrlHeader {
 public:
+  EpicsPvCtrlDouble(int16_t arg__iPvId, int16_t arg__iDbrType, int16_t arg__iNumElements, const char* arg__sPvName, const Epics::dbr_ctrl_double& arg__dbr, const double* arg__data);
   EpicsPvCtrlDouble() {}
   EpicsPvCtrlDouble(const EpicsPvCtrlDouble& other) {
     const char* src = reinterpret_cast<const char*>(&other);
@@ -933,6 +943,7 @@ private:
 
 class EpicsPvTimeString: public EpicsPvTimeHeader {
 public:
+  EpicsPvTimeString(int16_t arg__iPvId, int16_t arg__iDbrType, int16_t arg__iNumElements, const Epics::dbr_time_string& arg__dbr, const char* arg__data);
   EpicsPvTimeString() {}
   EpicsPvTimeString(const EpicsPvTimeString& other) {
     const char* src = reinterpret_cast<const char*>(&other);
@@ -966,6 +977,7 @@ private:
 
 class EpicsPvTimeShort: public EpicsPvTimeHeader {
 public:
+  EpicsPvTimeShort(int16_t arg__iPvId, int16_t arg__iDbrType, int16_t arg__iNumElements, const Epics::dbr_time_short& arg__dbr, const int16_t* arg__data);
   EpicsPvTimeShort() {}
   EpicsPvTimeShort(const EpicsPvTimeShort& other) {
     const char* src = reinterpret_cast<const char*>(&other);
@@ -1006,6 +1018,7 @@ private:
 
 class EpicsPvTimeFloat: public EpicsPvTimeHeader {
 public:
+  EpicsPvTimeFloat(int16_t arg__iPvId, int16_t arg__iDbrType, int16_t arg__iNumElements, const Epics::dbr_time_float& arg__dbr, const float* arg__data);
   EpicsPvTimeFloat() {}
   EpicsPvTimeFloat(const EpicsPvTimeFloat& other) {
     const char* src = reinterpret_cast<const char*>(&other);
@@ -1046,6 +1059,7 @@ private:
 
 class EpicsPvTimeEnum: public EpicsPvTimeHeader {
 public:
+  EpicsPvTimeEnum(int16_t arg__iPvId, int16_t arg__iDbrType, int16_t arg__iNumElements, const Epics::dbr_time_enum& arg__dbr, const uint16_t* arg__data);
   EpicsPvTimeEnum() {}
   EpicsPvTimeEnum(const EpicsPvTimeEnum& other) {
     const char* src = reinterpret_cast<const char*>(&other);
@@ -1086,6 +1100,7 @@ private:
 
 class EpicsPvTimeChar: public EpicsPvTimeHeader {
 public:
+  EpicsPvTimeChar(int16_t arg__iPvId, int16_t arg__iDbrType, int16_t arg__iNumElements, const Epics::dbr_time_char& arg__dbr, const uint8_t* arg__data);
   EpicsPvTimeChar() {}
   EpicsPvTimeChar(const EpicsPvTimeChar& other) {
     const char* src = reinterpret_cast<const char*>(&other);
@@ -1126,6 +1141,7 @@ private:
 
 class EpicsPvTimeLong: public EpicsPvTimeHeader {
 public:
+  EpicsPvTimeLong(int16_t arg__iPvId, int16_t arg__iDbrType, int16_t arg__iNumElements, const Epics::dbr_time_long& arg__dbr, const int32_t* arg__data);
   EpicsPvTimeLong() {}
   EpicsPvTimeLong(const EpicsPvTimeLong& other) {
     const char* src = reinterpret_cast<const char*>(&other);
@@ -1166,6 +1182,7 @@ private:
 
 class EpicsPvTimeDouble: public EpicsPvTimeHeader {
 public:
+  EpicsPvTimeDouble(int16_t arg__iPvId, int16_t arg__iDbrType, int16_t arg__iNumElements, const Epics::dbr_time_double& arg__dbr, const double* arg__data);
   EpicsPvTimeDouble() {}
   EpicsPvTimeDouble(const EpicsPvTimeDouble& other) {
     const char* src = reinterpret_cast<const char*>(&other);
@@ -1208,14 +1225,12 @@ private:
 class PvConfigV1 {
 public:
   enum { iMaxPvDescLength = 64 };
-  PvConfigV1()
-  {
-  }
   PvConfigV1(int16_t arg_iPvId, const char* arg_sPvDesc, float arg_fInterval)
     : iPvId(arg_iPvId), fInterval(arg_fInterval)
   {
     if (arg_sPvDesc) std::copy(arg_sPvDesc, arg_sPvDesc+(64), &sPvDesc[0]);
   }
+  PvConfigV1() {}
   int16_t pvId() const { return iPvId; }
   const char* description() const { return sPvDesc; }
   float interval() const { return fInterval; }
@@ -1239,6 +1254,7 @@ class ConfigV1 {
 public:
   enum { TypeId = Pds::TypeId::Id_EpicsConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
+  ConfigV1(int32_t arg__iNumPv, const Epics::PvConfigV1* arg__pvControls);
   ConfigV1() {}
   ConfigV1(const ConfigV1& other) {
     const char* src = reinterpret_cast<const char*>(&other);
