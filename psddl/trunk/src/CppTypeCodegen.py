@@ -491,6 +491,9 @@ class CppTypeCodegen ( object ) :
 
         # initialization list
         initlist = []
+        if self._type.base:
+            init = ", ".join([c.name for c in ctor.args if c.base])
+            initlist.append(T("$base($init)")(base=self._type.base.name, init=init))
         for attr in self._type.attributes():
             arg = attr2arg.get(attr,"")
             if attr.shape or not attr.isfixed():

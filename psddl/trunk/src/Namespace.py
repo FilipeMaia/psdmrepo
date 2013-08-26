@@ -164,7 +164,7 @@ class Namespace ( object ) :
         return self.__objects(Method)
     
     def __objects(self, type):
-        """Get the list of objects oof given type defined in this namespace"""
+        """Get the list of objects of given type defined in this namespace"""
         return [ch for ch in self._ordered if isinstance(ch, type)]
         
 

@@ -72,6 +72,7 @@ class CtorArg(object):
         self.type = type or dest.type
         self.method = method or dest.accessor
         self.expr = expr or name
+        self.base = False   # true means that it is forwarded to base class
 
 #
 # Class describing one constructor initializer
@@ -130,6 +131,16 @@ class Constructor ( object ) :
             self._cargs = []
             
             if 'auto' in self.tags:
+                
+                # if base class exists then get the arguments from it first
+                if self.parent.base:
+                    bctor = [c for c in self.parent.base.ctors if 'auto' in c.tags]
+                    if bctor:
+                        self._cargs = bctor[0].args[:]
+                        # update destination to signify base class
+                        for arg in self._cargs:
+                            arg.base = True
+                
                 # make one argument per attribute or bitfield with accessor
                 for item in self.parent.attributes_and_bitfields():
                     if item.accessor:

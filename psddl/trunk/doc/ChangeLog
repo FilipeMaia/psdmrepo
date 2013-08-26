@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-12
+2013-08-26 Andy Salnikov
+- add support for auto-constructors with inheritance
+
 Tag: V00-08-11
 2013-08-26 Andy Salnikov
 - add support for auto-constructors for complex types
