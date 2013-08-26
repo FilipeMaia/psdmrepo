@@ -321,7 +321,7 @@ public:
   dbr_ctrl_short(int16_t status, int16_t severity, const char* units, int16_t upper_disp_limit, int16_t lower_disp_limit, int16_t upper_alarm_limit, int16_t upper_warning_limit, int16_t lower_warning_limit, int16_t lower_alarm_limit, int16_t upper_ctrl_limit, int16_t lower_ctrl_limit)
     : _status(status), _severity(severity), _upper_disp_limit(upper_disp_limit), _lower_disp_limit(lower_disp_limit), _upper_alarm_limit(upper_alarm_limit), _upper_warning_limit(upper_warning_limit), _lower_warning_limit(lower_warning_limit), _lower_alarm_limit(lower_alarm_limit), _upper_ctrl_limit(upper_ctrl_limit), _lower_ctrl_limit(lower_ctrl_limit)
   {
-    std::copy(units, units+(8), _units);
+    if (units) std::copy(units, units+(8), &_units[0]);
   }
   int16_t status() const { return _status; }
   int16_t severity() const { return _severity; }
@@ -366,7 +366,7 @@ public:
   dbr_ctrl_float(int16_t status, int16_t severity, int16_t precision, const char* units, float upper_disp_limit, float lower_disp_limit, float upper_alarm_limit, float upper_warning_limit, float lower_warning_limit, float lower_alarm_limit, float upper_ctrl_limit, float lower_ctrl_limit)
     : _status(status), _severity(severity), _precision(precision), RISC_pad(0), _upper_disp_limit(upper_disp_limit), _lower_disp_limit(lower_disp_limit), _upper_alarm_limit(upper_alarm_limit), _upper_warning_limit(upper_warning_limit), _lower_warning_limit(lower_warning_limit), _lower_alarm_limit(lower_alarm_limit), _upper_ctrl_limit(upper_ctrl_limit), _lower_ctrl_limit(lower_ctrl_limit)
   {
-    std::copy(units, units+(8), _units);
+    if (units) std::copy(units, units+(8), &_units[0]);
   }
   int16_t status() const { return _status; }
   int16_t severity() const { return _severity; }
@@ -414,7 +414,7 @@ public:
   dbr_ctrl_enum(int16_t status, int16_t severity, int16_t no_str, const char* strings)
     : _status(status), _severity(severity), _no_str(no_str)
   {
-    std::copy(strings, strings+(416), _strs[0]);
+    if (strings) std::copy(strings, strings+(416), &_strs[0][0]);
   }
   int16_t status() const { return _status; }
   int16_t severity() const { return _severity; }
@@ -445,7 +445,7 @@ public:
   dbr_ctrl_char(int16_t status, int16_t severity, const char* units, uint8_t upper_disp_limit, uint8_t lower_disp_limit, uint8_t upper_alarm_limit, uint8_t upper_warning_limit, uint8_t lower_warning_limit, uint8_t lower_alarm_limit, uint8_t upper_ctrl_limit, uint8_t lower_ctrl_limit)
     : _status(status), _severity(severity), _upper_disp_limit(upper_disp_limit), _lower_disp_limit(lower_disp_limit), _upper_alarm_limit(upper_alarm_limit), _upper_warning_limit(upper_warning_limit), _lower_warning_limit(lower_warning_limit), _lower_alarm_limit(lower_alarm_limit), _upper_ctrl_limit(upper_ctrl_limit), _lower_ctrl_limit(lower_ctrl_limit), RISC_pad(0)
   {
-    std::copy(units, units+(8), _units);
+    if (units) std::copy(units, units+(8), &_units[0]);
   }
   int16_t status() const { return _status; }
   int16_t severity() const { return _severity; }
@@ -491,7 +491,7 @@ public:
   dbr_ctrl_long(int16_t status, int16_t severity, const char* units, int32_t upper_disp_limit, int32_t lower_disp_limit, int32_t upper_alarm_limit, int32_t upper_warning_limit, int32_t lower_warning_limit, int32_t lower_alarm_limit, int32_t upper_ctrl_limit, int32_t lower_ctrl_limit)
     : _status(status), _severity(severity), _upper_disp_limit(upper_disp_limit), _lower_disp_limit(lower_disp_limit), _upper_alarm_limit(upper_alarm_limit), _upper_warning_limit(upper_warning_limit), _lower_warning_limit(lower_warning_limit), _lower_alarm_limit(lower_alarm_limit), _upper_ctrl_limit(upper_ctrl_limit), _lower_ctrl_limit(lower_ctrl_limit)
   {
-    std::copy(units, units+(8), _units);
+    if (units) std::copy(units, units+(8), &_units[0]);
   }
   int16_t status() const { return _status; }
   int16_t severity() const { return _severity; }
@@ -536,7 +536,7 @@ public:
   dbr_ctrl_double(int16_t status, int16_t severity, int16_t precision, const char* units, double upper_disp_limit, double lower_disp_limit, double upper_alarm_limit, double upper_warning_limit, double lower_warning_limit, double lower_alarm_limit, double upper_ctrl_limit, double lower_ctrl_limit)
     : _status(status), _severity(severity), _precision(precision), RISC_pad0(0), _upper_disp_limit(upper_disp_limit), _lower_disp_limit(lower_disp_limit), _upper_alarm_limit(upper_alarm_limit), _upper_warning_limit(upper_warning_limit), _lower_warning_limit(lower_warning_limit), _lower_alarm_limit(lower_alarm_limit), _upper_ctrl_limit(upper_ctrl_limit), _lower_ctrl_limit(lower_ctrl_limit)
   {
-    std::copy(units, units+(8), _units);
+    if (units) std::copy(units, units+(8), &_units[0]);
   }
   int16_t status() const { return _status; }
   int16_t severity() const { return _severity; }
@@ -577,6 +577,16 @@ private:
 
 class EpicsPvHeader {
 public:
+  EpicsPvHeader() {}
+  EpicsPvHeader(const EpicsPvHeader& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  EpicsPvHeader& operator=(const EpicsPvHeader& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   /** PV ID number assigned by DAQ. */
   int16_t pvId() const { return _iPvId; }
   /** DBR structure type. */
@@ -606,6 +616,16 @@ private:
 
 class EpicsPvCtrlHeader: public EpicsPvHeader {
 public:
+  EpicsPvCtrlHeader() {}
+  EpicsPvCtrlHeader(const EpicsPvCtrlHeader& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  EpicsPvCtrlHeader& operator=(const EpicsPvCtrlHeader& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   /** PV name. */
   const char* pvName() const { return _sPvName; }
   static uint32_t _sizeof() { return (((((Epics::EpicsPvHeader::_sizeof())+(1*(iMaxPvNameLength)))+1)-1)/1)*1; }
@@ -621,6 +641,16 @@ private:
 
 class EpicsPvTimeHeader: public EpicsPvHeader {
 public:
+  EpicsPvTimeHeader() {}
+  EpicsPvTimeHeader(const EpicsPvTimeHeader& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  EpicsPvTimeHeader& operator=(const EpicsPvTimeHeader& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   /** EPICS timestamp value. */
   Epics::epicsTimeStamp stamp() const;
   static uint32_t _sizeof() { return ((((Epics::EpicsPvHeader::_sizeof())+1)-1)/1)*1; }
@@ -634,6 +664,16 @@ public:
 
 class EpicsPvCtrlString: public EpicsPvCtrlHeader {
 public:
+  EpicsPvCtrlString() {}
+  EpicsPvCtrlString(const EpicsPvCtrlString& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  EpicsPvCtrlString& operator=(const EpicsPvCtrlString& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   const Epics::dbr_sts_string& dbr() const { return _dbr; }
   const char* data(uint32_t i0) const { typedef char atype[ MAX_STRING_SIZE];
   ptrdiff_t offset=74;
@@ -656,6 +696,16 @@ private:
 
 class EpicsPvCtrlShort: public EpicsPvCtrlHeader {
 public:
+  EpicsPvCtrlShort() {}
+  EpicsPvCtrlShort(const EpicsPvCtrlShort& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  EpicsPvCtrlShort& operator=(const EpicsPvCtrlShort& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   const Epics::dbr_ctrl_short& dbr() const { return _dbr; }
   /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
     this instance, the returned ndarray object can be used even after this instance disappears. */
@@ -685,6 +735,16 @@ private:
 
 class EpicsPvCtrlFloat: public EpicsPvCtrlHeader {
 public:
+  EpicsPvCtrlFloat() {}
+  EpicsPvCtrlFloat(const EpicsPvCtrlFloat& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  EpicsPvCtrlFloat& operator=(const EpicsPvCtrlFloat& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   const Epics::dbr_ctrl_float& dbr() const { return _dbr; }
   /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
     this instance, the returned ndarray object can be used even after this instance disappears. */
@@ -715,6 +775,16 @@ private:
 
 class EpicsPvCtrlEnum: public EpicsPvCtrlHeader {
 public:
+  EpicsPvCtrlEnum() {}
+  EpicsPvCtrlEnum(const EpicsPvCtrlEnum& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  EpicsPvCtrlEnum& operator=(const EpicsPvCtrlEnum& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   const Epics::dbr_ctrl_enum& dbr() const { return _dbr; }
   /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
     this instance, the returned ndarray object can be used even after this instance disappears. */
@@ -744,6 +814,16 @@ private:
 
 class EpicsPvCtrlChar: public EpicsPvCtrlHeader {
 public:
+  EpicsPvCtrlChar() {}
+  EpicsPvCtrlChar(const EpicsPvCtrlChar& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  EpicsPvCtrlChar& operator=(const EpicsPvCtrlChar& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   const Epics::dbr_ctrl_char& dbr() const { return _dbr; }
   /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
     this instance, the returned ndarray object can be used even after this instance disappears. */
@@ -773,6 +853,16 @@ private:
 
 class EpicsPvCtrlLong: public EpicsPvCtrlHeader {
 public:
+  EpicsPvCtrlLong() {}
+  EpicsPvCtrlLong(const EpicsPvCtrlLong& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  EpicsPvCtrlLong& operator=(const EpicsPvCtrlLong& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   const Epics::dbr_ctrl_long& dbr() const { return _dbr; }
   /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
     this instance, the returned ndarray object can be used even after this instance disappears. */
@@ -803,6 +893,16 @@ private:
 
 class EpicsPvCtrlDouble: public EpicsPvCtrlHeader {
 public:
+  EpicsPvCtrlDouble() {}
+  EpicsPvCtrlDouble(const EpicsPvCtrlDouble& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  EpicsPvCtrlDouble& operator=(const EpicsPvCtrlDouble& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   const Epics::dbr_ctrl_double& dbr() const { return _dbr; }
   /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
     this instance, the returned ndarray object can be used even after this instance disappears. */
@@ -833,6 +933,16 @@ private:
 
 class EpicsPvTimeString: public EpicsPvTimeHeader {
 public:
+  EpicsPvTimeString() {}
+  EpicsPvTimeString(const EpicsPvTimeString& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  EpicsPvTimeString& operator=(const EpicsPvTimeString& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   const Epics::dbr_time_string& dbr() const { return _dbr; }
   const char* data(uint32_t i0) const { typedef char atype[ MAX_STRING_SIZE];
   ptrdiff_t offset=20;
@@ -856,6 +966,16 @@ private:
 
 class EpicsPvTimeShort: public EpicsPvTimeHeader {
 public:
+  EpicsPvTimeShort() {}
+  EpicsPvTimeShort(const EpicsPvTimeShort& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  EpicsPvTimeShort& operator=(const EpicsPvTimeShort& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   const Epics::dbr_time_short& dbr() const { return _dbr; }
   /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
     this instance, the returned ndarray object can be used even after this instance disappears. */
@@ -886,6 +1006,16 @@ private:
 
 class EpicsPvTimeFloat: public EpicsPvTimeHeader {
 public:
+  EpicsPvTimeFloat() {}
+  EpicsPvTimeFloat(const EpicsPvTimeFloat& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  EpicsPvTimeFloat& operator=(const EpicsPvTimeFloat& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   const Epics::dbr_time_float& dbr() const { return _dbr; }
   /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
     this instance, the returned ndarray object can be used even after this instance disappears. */
@@ -916,6 +1046,16 @@ private:
 
 class EpicsPvTimeEnum: public EpicsPvTimeHeader {
 public:
+  EpicsPvTimeEnum() {}
+  EpicsPvTimeEnum(const EpicsPvTimeEnum& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  EpicsPvTimeEnum& operator=(const EpicsPvTimeEnum& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   const Epics::dbr_time_enum& dbr() const { return _dbr; }
   /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
     this instance, the returned ndarray object can be used even after this instance disappears. */
@@ -946,6 +1086,16 @@ private:
 
 class EpicsPvTimeChar: public EpicsPvTimeHeader {
 public:
+  EpicsPvTimeChar() {}
+  EpicsPvTimeChar(const EpicsPvTimeChar& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  EpicsPvTimeChar& operator=(const EpicsPvTimeChar& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   const Epics::dbr_time_char& dbr() const { return _dbr; }
   /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
     this instance, the returned ndarray object can be used even after this instance disappears. */
@@ -976,6 +1126,16 @@ private:
 
 class EpicsPvTimeLong: public EpicsPvTimeHeader {
 public:
+  EpicsPvTimeLong() {}
+  EpicsPvTimeLong(const EpicsPvTimeLong& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  EpicsPvTimeLong& operator=(const EpicsPvTimeLong& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   const Epics::dbr_time_long& dbr() const { return _dbr; }
   /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
     this instance, the returned ndarray object can be used even after this instance disappears. */
@@ -1006,6 +1166,16 @@ private:
 
 class EpicsPvTimeDouble: public EpicsPvTimeHeader {
 public:
+  EpicsPvTimeDouble() {}
+  EpicsPvTimeDouble(const EpicsPvTimeDouble& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  EpicsPvTimeDouble& operator=(const EpicsPvTimeDouble& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   const Epics::dbr_time_double& dbr() const { return _dbr; }
   /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
     this instance, the returned ndarray object can be used even after this instance disappears. */
@@ -1044,7 +1214,7 @@ public:
   PvConfigV1(int16_t arg_iPvId, const char* arg_sPvDesc, float arg_fInterval)
     : iPvId(arg_iPvId), fInterval(arg_fInterval)
   {
-    std::copy(arg_sPvDesc, arg_sPvDesc+(64), sPvDesc);
+    if (arg_sPvDesc) std::copy(arg_sPvDesc, arg_sPvDesc+(64), &sPvDesc[0]);
   }
   int16_t pvId() const { return iPvId; }
   const char* description() const { return sPvDesc; }
@@ -1069,6 +1239,16 @@ class ConfigV1 {
 public:
   enum { TypeId = Pds::TypeId::Id_EpicsConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
+  ConfigV1() {}
+  ConfigV1(const ConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  ConfigV1& operator=(const ConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   int32_t numPv() const { return _iNumPv; }
   /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
     this instance, the returned ndarray object can be used even after this instance disappears. */

@@ -34,6 +34,16 @@ public:
     X2,
     X4,
   };
+  ConfigV1() {}
+  ConfigV1(const ConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  ConfigV1& operator=(const ConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
     this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
@@ -75,6 +85,16 @@ public:
   enum { Encoder_Inputs = 4 };
   enum { Analog_Inputs = 4 };
   enum { Digital_Inputs = 8 };
+  DataV1() {}
+  DataV1(const DataV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  DataV1& operator=(const DataV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   uint8_t digital_in() const { return _din; }
   uint32_t timestamp() const { return _timestamp; }
   /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing

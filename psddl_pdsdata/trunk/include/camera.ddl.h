@@ -46,6 +46,16 @@ class FrameFccdConfigV1 {
 public:
   enum { TypeId = Pds::TypeId::Id_FrameFccdConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
+  FrameFccdConfigV1() {}
+  FrameFccdConfigV1(const FrameFccdConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  FrameFccdConfigV1& operator=(const FrameFccdConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   static uint32_t _sizeof() { return 0; }
 };
 
@@ -70,6 +80,19 @@ public:
     GssRegionOfInterest,
     GssThreshold,
   };
+  FrameFexConfigV1()
+  {
+  }
+  FrameFexConfigV1(Camera::FrameFexConfigV1::Forwarding arg__forwarding, uint32_t arg__forward_prescale, Camera::FrameFexConfigV1::Processing arg__processing, const Camera::FrameCoord& arg__roiBegin, const Camera::FrameCoord& arg__roiEnd, uint32_t arg__threshold, uint32_t arg__masked_pixel_count, const Camera::FrameCoord* arg__masked_pixel_coordinates);
+  FrameFexConfigV1(const FrameFexConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  FrameFexConfigV1& operator=(const FrameFexConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   /** frame forwarding policy */
   Camera::FrameFexConfigV1::Forwarding forwarding() const { return Camera::FrameFexConfigV1::Forwarding(_forwarding); }
   /** Prescale of events with forwarded frames */
@@ -125,6 +148,19 @@ class FrameV1 {
 public:
   enum { TypeId = Pds::TypeId::Id_Frame /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
+  FrameV1()
+  {
+  }
+  FrameV1(uint32_t arg__width, uint32_t arg__height, uint32_t arg__depth, uint32_t arg__offset, const uint8_t* arg__pixel_data);
+  FrameV1(const FrameV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  FrameV1& operator=(const FrameV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   /** Number of pixels in a row. */
   uint32_t width() const { return _width; }
   /** Number of pixels in a column. */
@@ -179,6 +215,15 @@ public:
   enum { Version = 1 /**< XTC type version number */ };
   TwoDGaussianV1();
   TwoDGaussianV1(uint64_t arg__integral, double arg__xmean, double arg__ymean, double arg__major_axis_width, double arg__minor_axis_width, double arg__major_axis_tilt);
+  TwoDGaussianV1(const TwoDGaussianV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  TwoDGaussianV1& operator=(const TwoDGaussianV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   uint64_t integral() const { return _integral; }
   double xmean() const { return _xmean; }
   double ymean() const { return _ymean; }

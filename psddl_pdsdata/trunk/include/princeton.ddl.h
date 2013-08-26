@@ -22,6 +22,16 @@ class ConfigV1 {
 public:
   enum { TypeId = Pds::TypeId::Id_PrincetonConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
+  ConfigV1() {}
+  ConfigV1(const ConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  ConfigV1& operator=(const ConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   uint32_t width() const { return _uWidth; }
   uint32_t height() const { return _uHeight; }
   uint32_t orgX() const { return _uOrgX; }
@@ -69,6 +79,16 @@ class ConfigV2 {
 public:
   enum { TypeId = Pds::TypeId::Id_PrincetonConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 2 /**< XTC type version number */ };
+  ConfigV2() {}
+  ConfigV2(const ConfigV2& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  ConfigV2& operator=(const ConfigV2& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   uint32_t width() const { return _uWidth; }
   uint32_t height() const { return _uHeight; }
   uint32_t orgX() const { return _uOrgX; }
@@ -118,6 +138,16 @@ class ConfigV3 {
 public:
   enum { TypeId = Pds::TypeId::Id_PrincetonConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 3 /**< XTC type version number */ };
+  ConfigV3() {}
+  ConfigV3(const ConfigV3& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  ConfigV3& operator=(const ConfigV3& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   uint32_t width() const { return _uWidth; }
   uint32_t height() const { return _uHeight; }
   uint32_t orgX() const { return _uOrgX; }
@@ -167,6 +197,16 @@ class ConfigV4 {
 public:
   enum { TypeId = Pds::TypeId::Id_PrincetonConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 4 /**< XTC type version number */ };
+  ConfigV4() {}
+  ConfigV4(const ConfigV4& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  ConfigV4& operator=(const ConfigV4& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   uint32_t width() const { return _uWidth; }
   uint32_t height() const { return _uHeight; }
   uint32_t orgX() const { return _uOrgX; }
@@ -222,6 +262,16 @@ class ConfigV5 {
 public:
   enum { TypeId = Pds::TypeId::Id_PrincetonConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 5 /**< XTC type version number */ };
+  ConfigV5() {}
+  ConfigV5(const ConfigV5& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  ConfigV5& operator=(const ConfigV5& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   uint32_t width() const { return _uWidth; }
   uint32_t height() const { return _uHeight; }
   uint32_t orgX() const { return _uOrgX; }
@@ -284,6 +334,11 @@ class FrameV1 {
 public:
   enum { TypeId = Pds::TypeId::Id_PrincetonFrame /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
+  FrameV1() {}
+private:
+  FrameV1(const FrameV1&);
+  FrameV1& operator=(const FrameV1&);
+public:
   uint32_t shotIdStart() const { return _iShotIdStart; }
   float readoutTime() const { return _fReadoutTime; }
   /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
@@ -379,6 +434,11 @@ class FrameV2 {
 public:
   enum { TypeId = Pds::TypeId::Id_PrincetonFrame /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 2 /**< XTC type version number */ };
+  FrameV2() {}
+private:
+  FrameV2(const FrameV2&);
+  FrameV2& operator=(const FrameV2&);
+public:
   uint32_t shotIdStart() const { return _iShotIdStart; }
   float readoutTime() const { return _fReadoutTime; }
   float temperature() const { return _fTemperature; }
@@ -474,6 +534,7 @@ public:
     : _fTemperature(arg__fTemperature)
   {
   }
+  InfoV1() {}
   float temperature() const { return _fTemperature; }
   static uint32_t _sizeof() { return 4; }
 private:

@@ -45,6 +45,16 @@ public:
     DataFormat_TwosComplement = 0,
     DataFormat_OffsetBinary,
   };
+  ConfigV1() {}
+  ConfigV1(const ConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  ConfigV1& operator=(const ConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   Gsc16ai::ConfigV1::VoltageRange voltageRange() const { return Gsc16ai::ConfigV1::VoltageRange(_voltageRange); }
   uint16_t firstChan() const { return _firstChan; }
   uint16_t lastChan() const { return _lastChan; }
@@ -84,6 +94,11 @@ class DataV1 {
 public:
   enum { TypeId = Pds::TypeId::Id_Gsc16aiData /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
+  DataV1() {}
+private:
+  DataV1(const DataV1&);
+  DataV1& operator=(const DataV1&);
+public:
   /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
     this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>

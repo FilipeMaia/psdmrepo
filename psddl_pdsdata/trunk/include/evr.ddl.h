@@ -187,7 +187,7 @@ public:
   EventCodeV5(uint16_t arg__u16Code, uint8_t arg__bf_isReadout, uint8_t arg__bf_isCommand, uint8_t arg__bf_isLatch, uint32_t arg__u32ReportDelay, uint32_t arg__u32ReportWidth, uint32_t arg__u32MaskTrigger, uint32_t arg__u32MaskSet, uint32_t arg__u32MaskClear, const char* arg__desc)
     : _u16Code(arg__u16Code), _u16MaskEventAttr(((arg__bf_isReadout) & 0x1)|(((arg__bf_isCommand) & 0x1)<<1)|(((arg__bf_isLatch) & 0x1)<<2)), _u32ReportDelay(arg__u32ReportDelay), _u32ReportWidth(arg__u32ReportWidth), _u32MaskTrigger(arg__u32MaskTrigger), _u32MaskSet(arg__u32MaskSet), _u32MaskClear(arg__u32MaskClear)
   {
-    std::copy(arg__desc, arg__desc+(16), _desc);
+    if (arg__desc) std::copy(arg__desc, arg__desc+(16), &_desc[0]);
   }
   uint16_t code() const { return _u16Code; }
   uint8_t isReadout() const { return uint8_t(this->_u16MaskEventAttr & 0x1); }
@@ -232,7 +232,7 @@ public:
   EventCodeV6(uint16_t arg__u16Code, uint8_t arg__bf_isReadout, uint8_t arg__bf_isCommand, uint8_t arg__bf_isLatch, uint32_t arg__u32ReportDelay, uint32_t arg__u32ReportWidth, uint32_t arg__u32MaskTrigger, uint32_t arg__u32MaskSet, uint32_t arg__u32MaskClear, const char* arg__desc, uint16_t arg__u16ReadGroup)
     : _u16Code(arg__u16Code), _u16MaskEventAttr(((arg__bf_isReadout) & 0x1)|(((arg__bf_isCommand) & 0x1)<<1)|(((arg__bf_isLatch) & 0x1)<<2)), _u32ReportDelay(arg__u32ReportDelay), _u32ReportWidth(arg__u32ReportWidth), _u32MaskTrigger(arg__u32MaskTrigger), _u32MaskSet(arg__u32MaskSet), _u32MaskClear(arg__u32MaskClear), _u16ReadGroup(arg__u16ReadGroup)
   {
-    std::copy(arg__desc, arg__desc+(16), _desc);
+    if (arg__desc) std::copy(arg__desc, arg__desc+(16), &_desc[0]);
   }
   uint16_t code() const { return _u16Code; }
   uint8_t isReadout() const { return uint8_t(this->_u16MaskEventAttr & 0x1); }
@@ -349,6 +349,19 @@ class ConfigV1 {
 public:
   enum { TypeId = Pds::TypeId::Id_EvrConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
+  ConfigV1()
+  {
+  }
+  ConfigV1(uint32_t arg__npulses, uint32_t arg__noutputs, const EvrData::PulseConfig* arg__pulses, const EvrData::OutputMap* arg__output_maps);
+  ConfigV1(const ConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  ConfigV1& operator=(const ConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   uint32_t npulses() const { return _npulses; }
   uint32_t noutputs() const { return _noutputs; }
   /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
@@ -413,6 +426,19 @@ public:
     Off,
     On,
   };
+  ConfigV2()
+  {
+  }
+  ConfigV2(uint32_t arg__opcode, uint32_t arg__npulses, uint32_t arg__noutputs, const EvrData::PulseConfig* arg__pulses, const EvrData::OutputMap* arg__output_maps);
+  ConfigV2(const ConfigV2& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  ConfigV2& operator=(const ConfigV2& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   uint32_t opcode() const { return _opcode; }
   uint32_t npulses() const { return _npulses; }
   uint32_t noutputs() const { return _noutputs; }
@@ -466,6 +492,19 @@ class ConfigV3 {
 public:
   enum { TypeId = Pds::TypeId::Id_EvrConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 3 /**< XTC type version number */ };
+  ConfigV3()
+  {
+  }
+  ConfigV3(uint32_t arg__neventcodes, uint32_t arg__npulses, uint32_t arg__noutputs, const EvrData::EventCodeV3* arg__eventcodes, const EvrData::PulseConfigV3* arg__pulses, const EvrData::OutputMap* arg__output_maps);
+  ConfigV3(const ConfigV3& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  ConfigV3& operator=(const ConfigV3& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   uint32_t neventcodes() const { return _neventcodes; }
   uint32_t npulses() const { return _npulses; }
   uint32_t noutputs() const { return _noutputs; }
@@ -530,6 +569,19 @@ class ConfigV4 {
 public:
   enum { TypeId = Pds::TypeId::Id_EvrConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 4 /**< XTC type version number */ };
+  ConfigV4()
+  {
+  }
+  ConfigV4(uint32_t arg__neventcodes, uint32_t arg__npulses, uint32_t arg__noutputs, const EvrData::EventCodeV4* arg__eventcodes, const EvrData::PulseConfigV3* arg__pulses, const EvrData::OutputMap* arg__output_maps);
+  ConfigV4(const ConfigV4& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  ConfigV4& operator=(const ConfigV4& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   uint32_t neventcodes() const { return _neventcodes; }
   uint32_t npulses() const { return _npulses; }
   uint32_t noutputs() const { return _noutputs; }
@@ -623,6 +675,19 @@ public:
     r0_5Hz,
     Disable,
   };
+  SequencerConfigV1()
+  {
+  }
+  SequencerConfigV1(EvrData::SequencerConfigV1::Source arg__bf_sync_source, EvrData::SequencerConfigV1::Source arg__bf_beam_source, uint32_t arg__length, uint32_t arg__cycles, const EvrData::SequencerEntry* arg__entries);
+  SequencerConfigV1(const SequencerConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  SequencerConfigV1& operator=(const SequencerConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   EvrData::SequencerConfigV1::Source sync_source() const { return Source(this->_source & 0xff); }
   EvrData::SequencerConfigV1::Source beam_source() const { return Source((this->_source>>8) & 0xff); }
   uint32_t length() const { return _length; }
@@ -662,6 +727,14 @@ public:
   enum { Version = 5 /**< XTC type version number */ };
   enum { MaxPulses = 32 };
   enum { EvrOutputs = 10 };
+  ConfigV5()
+  {
+  }
+  ConfigV5(uint32_t arg__neventcodes, uint32_t arg__npulses, uint32_t arg__noutputs, const EvrData::EventCodeV5* arg__eventcodes, const EvrData::PulseConfigV3* arg__pulses, const EvrData::OutputMap* arg__output_maps, const EvrData::SequencerConfigV1& arg__seq_config);
+private:
+  ConfigV5(const ConfigV5&);
+  ConfigV5& operator=(const ConfigV5&);
+public:
   uint32_t neventcodes() const { return _neventcodes; }
   uint32_t npulses() const { return _npulses; }
   uint32_t noutputs() const { return _noutputs; }
@@ -730,6 +803,14 @@ public:
   enum { Version = 6 /**< XTC type version number */ };
   enum { MaxPulses = 256 /**< Maximum pulses in the system */ };
   enum { MaxOutputs = 256 /**< Maximum outputs in the system */ };
+  ConfigV6()
+  {
+  }
+  ConfigV6(uint32_t arg__neventcodes, uint32_t arg__npulses, uint32_t arg__noutputs, const EvrData::EventCodeV5* arg__eventcodes, const EvrData::PulseConfigV3* arg__pulses, const EvrData::OutputMapV2* arg__output_maps, const EvrData::SequencerConfigV1& arg__seq_config);
+private:
+  ConfigV6(const ConfigV6&);
+  ConfigV6& operator=(const ConfigV6&);
+public:
   uint32_t neventcodes() const { return _neventcodes; }
   uint32_t npulses() const { return _npulses; }
   uint32_t noutputs() const { return _noutputs; }
@@ -798,6 +879,14 @@ public:
   enum { Version = 7 /**< XTC type version number */ };
   enum { MaxPulses = 256 /**< Maximum pulses in the system */ };
   enum { MaxOutputs = 256 /**< Maximum outputs in the system */ };
+  ConfigV7()
+  {
+  }
+  ConfigV7(uint32_t arg__neventcodes, uint32_t arg__npulses, uint32_t arg__noutputs, const EvrData::EventCodeV6* arg__eventcodes, const EvrData::PulseConfigV3* arg__pulses, const EvrData::OutputMapV2* arg__output_maps, const EvrData::SequencerConfigV1& arg__seq_config);
+private:
+  ConfigV7(const ConfigV7&);
+  ConfigV7& operator=(const ConfigV7&);
+public:
   uint32_t neventcodes() const { return _neventcodes; }
   uint32_t npulses() const { return _npulses; }
   uint32_t noutputs() const { return _noutputs; }
@@ -888,6 +977,16 @@ class DataV3 {
 public:
   enum { TypeId = Pds::TypeId::Id_EvrData /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 3 /**< XTC type version number */ };
+  DataV3() {}
+  DataV3(const DataV3& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  DataV3& operator=(const DataV3& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   uint32_t numFifoEvents() const { return _u32NumFifoEvents; }
   /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
     this instance, the returned ndarray object can be used even after this instance disappears. */
@@ -924,8 +1023,8 @@ public:
   IOChannel(const char* arg__name, uint32_t arg__ninfo, const Pds::DetInfo* arg__info)
     : _ninfo(arg__ninfo)
   {
-    std::copy(arg__name, arg__name+(12), _name);
-    std::copy(arg__info, arg__info+(8), _info);
+    if (arg__name) std::copy(arg__name, arg__name+(12), &_name[0]);
+    if (arg__info) std::copy(arg__info, arg__info+(8), &_info[0]);
   }
   const char* name() const { return _name; }
   uint32_t ninfo() const { return _ninfo; }
@@ -959,6 +1058,16 @@ class IOConfigV1 {
 public:
   enum { TypeId = Pds::TypeId::Id_EvrIOConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
+  IOConfigV1() {}
+  IOConfigV1(const IOConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  IOConfigV1& operator=(const IOConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   uint16_t nchannels() const { return _nchannels; }
   /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
     this instance, the returned ndarray object can be used even after this instance disappears. */

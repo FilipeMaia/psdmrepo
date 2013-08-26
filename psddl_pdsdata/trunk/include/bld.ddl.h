@@ -31,6 +31,7 @@ public:
     : _f_11_ENRC(arg__f_11_ENRC), _f_12_ENRC(arg__f_12_ENRC), _f_21_ENRC(arg__f_21_ENRC), _f_22_ENRC(arg__f_22_ENRC)
   {
   }
+  BldDataFEEGasDetEnergy() {}
   /** Value of GDET:FEE1:11:ENRC, in mJ. */
   double f_11_ENRC() const { return _f_11_ENRC; }
   /** Value of GDET:FEE1:12:ENRC, in mJ. */
@@ -73,6 +74,7 @@ public:
     : _uDamageMask(arg__uDamageMask), _fEbeamCharge(arg__fEbeamCharge), _fEbeamL3Energy(arg__fEbeamL3Energy), _fEbeamLTUPosX(arg__fEbeamLTUPosX), _fEbeamLTUPosY(arg__fEbeamLTUPosY), _fEbeamLTUAngX(arg__fEbeamLTUAngX), _fEbeamLTUAngY(arg__fEbeamLTUAngY)
   {
   }
+  BldDataEBeamV0() {}
   /** Damage mask. */
   uint32_t damageMask() const { return _uDamageMask; }
   /** Beam charge in nC. */
@@ -126,6 +128,7 @@ public:
     : _uDamageMask(arg__uDamageMask), _fEbeamCharge(arg__fEbeamCharge), _fEbeamL3Energy(arg__fEbeamL3Energy), _fEbeamLTUPosX(arg__fEbeamLTUPosX), _fEbeamLTUPosY(arg__fEbeamLTUPosY), _fEbeamLTUAngX(arg__fEbeamLTUAngX), _fEbeamLTUAngY(arg__fEbeamLTUAngY), _fEbeamPkCurrBC2(arg__fEbeamPkCurrBC2)
   {
   }
+  BldDataEBeamV1() {}
   /** Damage mask. */
   uint32_t damageMask() const { return _uDamageMask; }
   /** Beam charge in nC. */
@@ -183,6 +186,7 @@ public:
     : _uDamageMask(arg__uDamageMask), _fEbeamCharge(arg__fEbeamCharge), _fEbeamL3Energy(arg__fEbeamL3Energy), _fEbeamLTUPosX(arg__fEbeamLTUPosX), _fEbeamLTUPosY(arg__fEbeamLTUPosY), _fEbeamLTUAngX(arg__fEbeamLTUAngX), _fEbeamLTUAngY(arg__fEbeamLTUAngY), _fEbeamPkCurrBC2(arg__fEbeamPkCurrBC2), _fEbeamEnergyBC2(arg__fEbeamEnergyBC2)
   {
   }
+  BldDataEBeamV2() {}
   /** Damage mask. */
   uint32_t damageMask() const { return _uDamageMask; }
   /** Beam charge in nC. */
@@ -245,6 +249,7 @@ public:
     : _uDamageMask(arg__uDamageMask), _fEbeamCharge(arg__fEbeamCharge), _fEbeamL3Energy(arg__fEbeamL3Energy), _fEbeamLTUPosX(arg__fEbeamLTUPosX), _fEbeamLTUPosY(arg__fEbeamLTUPosY), _fEbeamLTUAngX(arg__fEbeamLTUAngX), _fEbeamLTUAngY(arg__fEbeamLTUAngY), _fEbeamPkCurrBC2(arg__fEbeamPkCurrBC2), _fEbeamEnergyBC2(arg__fEbeamEnergyBC2), _fEbeamPkCurrBC1(arg__fEbeamPkCurrBC1), _fEbeamEnergyBC1(arg__fEbeamEnergyBC1)
   {
   }
+  BldDataEBeamV3() {}
   /** Damage mask. */
   uint32_t damageMask() const { return _uDamageMask; }
   /** Beam charge in nC. */
@@ -300,6 +305,7 @@ public:
     : _fFitTime1(arg__fFitTime1), _fFitTime2(arg__fFitTime2), _fCharge1(arg__fCharge1), _fCharge2(arg__fCharge2)
   {
   }
+  BldDataPhaseCavity() {}
   /** UND:R02:IOC:16:BAT:FitTime1 value in pico-seconds. */
   double fitTime1() const { return _fFitTime1; }
   /** UND:R02:IOC:16:BAT:FitTime2 value in pico-seconds. */
@@ -329,6 +335,16 @@ class BldDataIpimbV0 {
 public:
   enum { TypeId = Pds::TypeId::Id_SharedIpimb /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 0 /**< XTC type version number */ };
+  BldDataIpimbV0() {}
+  BldDataIpimbV0(const BldDataIpimbV0& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  BldDataIpimbV0& operator=(const BldDataIpimbV0& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   const Ipimb::DataV1& ipimbData() const { return _ipimbData; }
   const Ipimb::ConfigV1& ipimbConfig() const { return _ipimbConfig; }
   const Lusi::IpmFexV1& ipmFexData() const { return _ipmFexData; }
@@ -352,6 +368,16 @@ class BldDataIpimbV1 {
 public:
   enum { TypeId = Pds::TypeId::Id_SharedIpimb /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
+  BldDataIpimbV1() {}
+  BldDataIpimbV1(const BldDataIpimbV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  BldDataIpimbV1& operator=(const BldDataIpimbV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   const Ipimb::DataV2& ipimbData() const { return _ipimbData; }
   const Ipimb::ConfigV2& ipimbConfig() const { return _ipimbConfig; }
   const Lusi::IpmFexV1& ipmFexData() const { return _ipmFexData; }
@@ -375,6 +401,11 @@ class BldDataPimV1 {
 public:
   enum { TypeId = Pds::TypeId::Id_SharedPim /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
+  BldDataPimV1() {}
+private:
+  BldDataPimV1(const BldDataPimV1&);
+  BldDataPimV1& operator=(const BldDataPimV1&);
+public:
   const Pulnix::TM6740ConfigV2& camConfig() const { return _camConfig; }
   const Lusi::PimImageConfigV1& pimConfig() const { return _pimConfig; }
   const Camera::FrameV1& frame() const { return _frame; }
@@ -396,6 +427,16 @@ class BldDataGMDV0 {
 public:
   enum { TypeId = Pds::TypeId::Id_GMD /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 0 /**< XTC type version number */ };
+  BldDataGMDV0() {}
+  BldDataGMDV0(const BldDataGMDV0& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  BldDataGMDV0& operator=(const BldDataGMDV0& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   /** String describing gas type */
   const char* gasType() const { return _strGasType; }
   /** Pressure from Spinning Rotor Gauge */
@@ -458,6 +499,16 @@ class BldDataGMDV1 {
 public:
   enum { TypeId = Pds::TypeId::Id_GMD /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
+  BldDataGMDV1() {}
+  BldDataGMDV1(const BldDataGMDV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  BldDataGMDV1& operator=(const BldDataGMDV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   /** Shot to shot pulse energy (mJ) */
   double milliJoulesPerPulse() const { return _fMilliJoulesPerPulse; }
   /** Average pulse energy from ION cup current (mJ) */

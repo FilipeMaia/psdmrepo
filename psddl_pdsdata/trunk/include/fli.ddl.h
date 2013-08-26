@@ -22,6 +22,16 @@ class ConfigV1 {
 public:
   enum { TypeId = Pds::TypeId::Id_FliConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
+  ConfigV1() {}
+  ConfigV1(const ConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  ConfigV1& operator=(const ConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   uint32_t width() const { return _uWidth; }
   uint32_t height() const { return _uHeight; }
   uint32_t orgX() const { return _uOrgX; }
@@ -71,6 +81,11 @@ class FrameV1 {
 public:
   enum { TypeId = Pds::TypeId::Id_FliFrame /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
+  FrameV1() {}
+private:
+  FrameV1(const FrameV1&);
+  FrameV1& operator=(const FrameV1&);
+public:
   uint32_t shotIdStart() const { return _iShotIdStart; }
   float readoutTime() const { return _fReadoutTime; }
   float temperature() const { return _fTemperature; }

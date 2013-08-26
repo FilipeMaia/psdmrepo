@@ -43,6 +43,16 @@ public:
     VFlip,
     HVFlip,
   };
+  ConfigV1() {}
+  ConfigV1(const ConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  ConfigV1& operator=(const ConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   /** offset/pedestal setting for camera (before gain) */
   uint16_t black_level() const { return uint16_t(this->_offsetAndGain & 0xffff); }
   /** camera gain setting in percentile [100-3200] = [1x-32x] */

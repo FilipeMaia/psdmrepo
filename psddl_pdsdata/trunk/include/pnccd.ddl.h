@@ -21,6 +21,16 @@ class ConfigV1 {
 public:
   enum { TypeId = Pds::TypeId::Id_pnCCDconfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
+  ConfigV1() {}
+  ConfigV1(const ConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  ConfigV1& operator=(const ConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   /** Number of links in the pnCCD. */
   uint32_t numLinks() const { return _numLinks; }
   /** Size of the payload in bytes for single link */
@@ -41,6 +51,16 @@ class ConfigV2 {
 public:
   enum { TypeId = Pds::TypeId::Id_pnCCDconfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 2 /**< XTC type version number */ };
+  ConfigV2() {}
+  ConfigV2(const ConfigV2& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  ConfigV2& operator=(const ConfigV2& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   /** Number of links in the pnCCD. */
   uint32_t numLinks() const { return _numLinks; }
   /** Size of the payload in bytes for single link */
@@ -88,6 +108,11 @@ class ConfigV1;
 class ConfigV2;
 
 class FrameV1 {
+public:
+  FrameV1() {}
+private:
+  FrameV1(const FrameV1&);
+  FrameV1& operator=(const FrameV1&);
 public:
   /** Special values */
   uint32_t specialWord() const { return _specialWord; }
@@ -155,6 +180,16 @@ class FullFrameV1 {
 public:
   enum { TypeId = Pds::TypeId::Id_pnCCDframe /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
+  FullFrameV1() {}
+  FullFrameV1(const FullFrameV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  FullFrameV1& operator=(const FullFrameV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   /** Special values */
   uint32_t specialWord() const { return _specialWord; }
   /** Frame number */
@@ -201,6 +236,11 @@ class FramesV1 {
 public:
   enum { TypeId = Pds::TypeId::Id_pnCCDframe /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
+  FramesV1() {}
+private:
+  FramesV1(const FramesV1&);
+  FramesV1& operator=(const FramesV1&);
+public:
   /** Number of frames is determined by numLinks() method. */
   const PNCCD::FrameV1& frame(const PNCCD::ConfigV1& cfg, uint32_t i0) const { ptrdiff_t offset=0;
   const PNCCD::FrameV1* memptr = (const PNCCD::FrameV1*)(((const char*)this)+offset);

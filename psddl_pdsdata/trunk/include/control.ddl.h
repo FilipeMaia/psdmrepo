@@ -29,7 +29,7 @@ public:
   PVControl(const char* arg__name, uint32_t arg__index, double arg__value)
     : _index(arg__index), _value(arg__value)
   {
-    std::copy(arg__name, arg__name+(32), _name);
+    if (arg__name) std::copy(arg__name, arg__name+(32), &_name[0]);
   }
   /** Name of the control. */
   const char* name() const { return _name; }
@@ -64,7 +64,7 @@ public:
   PVMonitor(const char* arg__name, uint32_t arg__index, double arg__loValue, double arg__hiValue)
     : _index(arg__index), _loValue(arg__loValue), _hiValue(arg__hiValue)
   {
-    std::copy(arg__name, arg__name+(32), _name);
+    if (arg__name) std::copy(arg__name, arg__name+(32), &_name[0]);
   }
   /** Name of the control. */
   const char* name() const { return _name; }
@@ -101,8 +101,8 @@ public:
   }
   PVLabel(const char* arg__name, const char* arg__value)
   {
-    std::copy(arg__name, arg__name+(32), _name);
-    std::copy(arg__value, arg__value+(64), _value);
+    if (arg__name) std::copy(arg__name, arg__name+(32), &_name[0]);
+    if (arg__value) std::copy(arg__value, arg__value+(64), &_value[0]);
   }
   /** PV name. */
   const char* name() const { return _name; }
@@ -125,6 +125,19 @@ class ConfigV1 {
 public:
   enum { TypeId = Pds::TypeId::Id_ControlConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
+  ConfigV1()
+  {
+  }
+  ConfigV1(uint32_t arg__bf_events, uint8_t arg__bf_uses_duration, uint8_t arg__bf_uses_events, const Pds::ClockTime& arg__duration, uint32_t arg__npvControls, uint32_t arg__npvMonitors, const ControlData::PVControl* arg__pvControls, const ControlData::PVMonitor* arg__pvMonitors);
+  ConfigV1(const ConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  ConfigV1& operator=(const ConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   /** Maximum number of events per scan. */
   uint32_t events() const { return uint32_t(this->_control & 0x3fffffff); }
   /** returns true if the configuration uses duration control. */
@@ -192,6 +205,19 @@ class ConfigV2 {
 public:
   enum { TypeId = Pds::TypeId::Id_ControlConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 2 /**< XTC type version number */ };
+  ConfigV2()
+  {
+  }
+  ConfigV2(uint32_t arg__bf_events, uint8_t arg__bf_uses_duration, uint8_t arg__bf_uses_events, const Pds::ClockTime& arg__duration, uint32_t arg__npvControls, uint32_t arg__npvMonitors, uint32_t arg__npvLabels, const ControlData::PVControl* arg__pvControls, const ControlData::PVMonitor* arg__pvMonitors, const ControlData::PVLabel* arg__pvLabels);
+  ConfigV2(const ConfigV2& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  ConfigV2& operator=(const ConfigV2& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   /** Maximum number of events per scan. */
   uint32_t events() const { return uint32_t(this->_control & 0x3fffffff); }
   /** returns true if the configuration uses duration control. */

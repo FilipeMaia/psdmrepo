@@ -28,8 +28,8 @@ public:
   }
   DiodeFexConfigV1(const float* arg__base, const float* arg__scale)
   {
-    std::copy(arg__base, arg__base+(3), _base);
-    std::copy(arg__scale, arg__scale+(3), _scale);
+    if (arg__base) std::copy(arg__base, arg__base+(3), &_base[0]);
+    if (arg__scale) std::copy(arg__scale, arg__scale+(3), &_scale[0]);
   }
   /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
     this instance, the returned ndarray object can be used even after this instance disappears. */
@@ -75,8 +75,8 @@ public:
   }
   DiodeFexConfigV2(const float* arg__base, const float* arg__scale)
   {
-    std::copy(arg__base, arg__base+(16), _base);
-    std::copy(arg__scale, arg__scale+(16), _scale);
+    if (arg__base) std::copy(arg__base, arg__base+(16), &_base[0]);
+    if (arg__scale) std::copy(arg__scale, arg__scale+(16), &_scale[0]);
   }
   /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
     this instance, the returned ndarray object can be used even after this instance disappears. */
@@ -142,6 +142,16 @@ public:
   enum { TypeId = Pds::TypeId::Id_IpmFexConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
   enum { NCHANNELS = 4 };
+  IpmFexConfigV1() {}
+  IpmFexConfigV1(const IpmFexConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  IpmFexConfigV1& operator=(const IpmFexConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
     this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
@@ -174,6 +184,16 @@ public:
   enum { TypeId = Pds::TypeId::Id_IpmFexConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 2 /**< XTC type version number */ };
   enum { NCHANNELS = 4 };
+  IpmFexConfigV2() {}
+  IpmFexConfigV2(const IpmFexConfigV2& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  IpmFexConfigV2& operator=(const IpmFexConfigV2& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
     this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
@@ -212,7 +232,7 @@ public:
   IpmFexV1(const float* arg__channel, float arg__sum, float arg__xpos, float arg__ypos)
     : _sum(arg__sum), _xpos(arg__xpos), _ypos(arg__ypos)
   {
-    std::copy(arg__channel, arg__channel+(4), _channel);
+    if (arg__channel) std::copy(arg__channel, arg__channel+(4), &_channel[0]);
   }
   /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
     this instance, the returned ndarray object can be used even after this instance disappears. */

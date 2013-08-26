@@ -32,6 +32,16 @@ public:
     TriggerMode_ExtNeg = 1,
     TriggerMode_Soft = 2,
   };
+  ConfigV1() {}
+  ConfigV1(const ConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  ConfigV1& operator=(const ConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   Timepix::ConfigV1::ReadoutSpeed readoutSpeed() const { return Timepix::ConfigV1::ReadoutSpeed(_readoutSpeed); }
   Timepix::ConfigV1::TriggerMode triggerMode() const { return Timepix::ConfigV1::TriggerMode(_triggerMode); }
   int32_t shutterTimeout() const { return _shutterTimeout; }
@@ -181,6 +191,16 @@ public:
     TriggerMode_ExtNeg = 1,
     TriggerMode_Soft = 2,
   };
+  ConfigV2() {}
+  ConfigV2(const ConfigV2& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  ConfigV2& operator=(const ConfigV2& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   Timepix::ConfigV2::ReadoutSpeed readoutSpeed() const { return Timepix::ConfigV2::ReadoutSpeed(_readoutSpeed); }
   Timepix::ConfigV2::TriggerMode triggerMode() const { return Timepix::ConfigV2::TriggerMode(_triggerMode); }
   int32_t timepixSpeed() const { return _timepixSpeed; }
@@ -363,6 +383,16 @@ public:
     TimepixMode_Counting = 0,
     TimepixMode_TOT = 1,
   };
+  ConfigV3() {}
+  ConfigV3(const ConfigV3& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  ConfigV3& operator=(const ConfigV3& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   Timepix::ConfigV3::ReadoutSpeed readoutSpeed() const { return Timepix::ConfigV3::ReadoutSpeed(_readoutSpeed); }
   Timepix::ConfigV3::TimepixMode timepixMode() const { return Timepix::ConfigV3::TimepixMode(_timepixMode); }
   int32_t timepixSpeed() const { return _timepixSpeed; }
@@ -543,6 +573,16 @@ public:
   enum { Depth = 14 };
   enum { DepthBytes = 2 };
   enum { MaxPixelValue = 11810 };
+  DataV1() {}
+  DataV1(const DataV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  DataV1& operator=(const DataV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   uint32_t timestamp() const { return _timestamp; }
   uint16_t frameCounter() const { return _frameCounter; }
   uint16_t lostRows() const { return _lostRows; }
@@ -580,6 +620,16 @@ public:
   enum { Version = 2 /**< XTC type version number */ };
   enum { Depth = 14 };
   enum { MaxPixelValue = 11810 };
+  DataV2() {}
+  DataV2(const DataV2& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  DataV2& operator=(const DataV2& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   /** Pixels per row */
   uint16_t width() const { return _width; }
   /** Pixels per column */

@@ -36,6 +36,16 @@ public:
     Gamma,
     Linear,
   };
+  TM6740ConfigV1() {}
+  TM6740ConfigV1(const TM6740ConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  TM6740ConfigV1& operator=(const TM6740ConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   uint16_t gain_a() const { return uint16_t(this->_gain_a_b & 0xffff); }
   uint16_t gain_b() const { return uint16_t((this->_gain_a_b>>16) & 0xffff); }
   uint16_t vref() const { return uint16_t(this->_vref_shutter & 0xffff); }
@@ -82,6 +92,16 @@ public:
     Gamma,
     Linear,
   };
+  TM6740ConfigV2() {}
+  TM6740ConfigV2(const TM6740ConfigV2& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  TM6740ConfigV2& operator=(const TM6740ConfigV2& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   uint16_t gain_a() const { return uint16_t(this->_gain_a_b & 0xffff); }
   uint16_t gain_b() const { return uint16_t((this->_gain_a_b>>16) & 0xffff); }
   uint16_t vref_a() const { return uint16_t(this->_vref_shutter & 0x3ff); }

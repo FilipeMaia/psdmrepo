@@ -35,6 +35,16 @@ public:
     On,
     Max,
   };
+  ConfigV1() {}
+  ConfigV1(const ConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  ConfigV1& operator=(const ConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   Orca::ConfigV1::ReadoutMode mode() const { return ReadoutMode(this->_options & 0x3); }
   Orca::ConfigV1::Cooling cooling() const { return Cooling((this->_options>>2) & 0x3); }
   uint8_t defect_pixel_correction_enabled() const { return uint8_t((this->_options>>4) & 0x1); }

@@ -68,6 +68,16 @@ namespace CsPad {
 
 class CsPadDigitalPotsCfg {
 public:
+  CsPadDigitalPotsCfg() {}
+  CsPadDigitalPotsCfg(const CsPadDigitalPotsCfg& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  CsPadDigitalPotsCfg& operator=(const CsPadDigitalPotsCfg& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
     this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
@@ -137,6 +147,16 @@ private:
 
 class CsPadGainMapCfg {
 public:
+  CsPadGainMapCfg() {}
+  CsPadGainMapCfg(const CsPadGainMapCfg& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  CsPadGainMapCfg& operator=(const CsPadGainMapCfg& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   /** Array with the gain map for single ASIC.
 
     Note: this overloaded method accepts shared pointer argument which must point to an object containing
@@ -164,6 +184,16 @@ private:
 
 class ConfigV1QuadReg {
 public:
+  ConfigV1QuadReg() {}
+  ConfigV1QuadReg(const ConfigV1QuadReg& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  ConfigV1QuadReg& operator=(const ConfigV1QuadReg& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
     this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
@@ -226,6 +256,16 @@ private:
 
 class ConfigV2QuadReg {
 public:
+  ConfigV2QuadReg() {}
+  ConfigV2QuadReg(const ConfigV2QuadReg& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  ConfigV2QuadReg& operator=(const ConfigV2QuadReg& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
     this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
@@ -294,6 +334,16 @@ private:
 
 class ConfigV3QuadReg {
 public:
+  ConfigV3QuadReg() {}
+  ConfigV3QuadReg(const ConfigV3QuadReg& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  ConfigV3QuadReg& operator=(const ConfigV3QuadReg& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
     this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
@@ -368,6 +418,16 @@ class ConfigV1 {
 public:
   enum { TypeId = Pds::TypeId::Id_CspadConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
+  ConfigV1() {}
+  ConfigV1(const ConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  ConfigV1& operator=(const ConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   uint32_t concentratorVersion() const { return _concentratorVersion; }
   uint32_t runDelay() const { return _runDelay; }
   uint32_t eventCode() const { return _eventCode; }
@@ -411,6 +471,16 @@ class ConfigV2 {
 public:
   enum { TypeId = Pds::TypeId::Id_CspadConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 2 /**< XTC type version number */ };
+  ConfigV2() {}
+  ConfigV2(const ConfigV2& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  ConfigV2& operator=(const ConfigV2& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   uint32_t concentratorVersion() const { return _concentratorVersion; }
   uint32_t runDelay() const { return _runDelay; }
   uint32_t eventCode() const { return _eventCode; }
@@ -462,6 +532,16 @@ class ConfigV3 {
 public:
   enum { TypeId = Pds::TypeId::Id_CspadConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 3 /**< XTC type version number */ };
+  ConfigV3() {}
+  ConfigV3(const ConfigV3& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  ConfigV3& operator=(const ConfigV3& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   uint32_t concentratorVersion() const { return _concentratorVersion; }
   uint32_t runDelay() const { return _runDelay; }
   uint32_t eventCode() const { return _eventCode; }
@@ -526,6 +606,16 @@ class ConfigV4 {
 public:
   enum { TypeId = Pds::TypeId::Id_CspadConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 4 /**< XTC type version number */ };
+  ConfigV4() {}
+  ConfigV4(const ConfigV4& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  ConfigV4& operator=(const ConfigV4& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   uint32_t concentratorVersion() const { return _concentratorVersion; }
   uint32_t runDelay() const { return _runDelay; }
   uint32_t eventCode() const { return _eventCode; }
@@ -590,6 +680,16 @@ class ConfigV5 {
 public:
   enum { TypeId = Pds::TypeId::Id_CspadConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 5 /**< XTC type version number */ };
+  ConfigV5() {}
+  ConfigV5(const ConfigV5& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  ConfigV5& operator=(const ConfigV5& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   uint32_t concentratorVersion() const { return _concentratorVersion; }
   uint32_t runDelay() const { return _runDelay; }
   uint32_t eventCode() const { return _eventCode; }
@@ -660,6 +760,11 @@ class ConfigV5;
 class ElementV1 {
 public:
   enum { Nsbtemp = 4 /**< Number of the elements in _sbtemp array. */ };
+  ElementV1() {}
+private:
+  ElementV1(const ElementV1&);
+  ElementV1& operator=(const ElementV1&);
+public:
   /** Virtual channel number. */
   uint32_t virtual_channel() const { return uint32_t(this->_word0 & 0x3); }
   /** Lane number. */
@@ -799,6 +904,11 @@ class DataV1 {
 public:
   enum { TypeId = Pds::TypeId::Id_CspadElement /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
+  DataV1() {}
+private:
+  DataV1(const DataV1&);
+  DataV1& operator=(const DataV1&);
+public:
   /** Data objects, one element per quadrant. The size of the array is determined by 
             the numQuads() method of the configuration object. */
   const CsPad::ElementV1& quads(const CsPad::ConfigV1& cfg, uint32_t i0) const { ptrdiff_t offset=0;
@@ -861,6 +971,11 @@ class ConfigV5;
 class ElementV2 {
 public:
   enum { Nsbtemp = 4 /**< Number of the elements in _sbtemp array. */ };
+  ElementV2() {}
+private:
+  ElementV2(const ElementV2&);
+  ElementV2& operator=(const ElementV2&);
+public:
   /** Virtual channel number. */
   uint32_t virtual_channel() const { return uint32_t(this->_word0 & 0x3); }
   /** Lane number. */
@@ -981,6 +1096,11 @@ class DataV2 {
 public:
   enum { TypeId = Pds::TypeId::Id_CspadElement /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 2 /**< XTC type version number */ };
+  DataV2() {}
+private:
+  DataV2(const DataV2&);
+  DataV2& operator=(const DataV2&);
+public:
   /** Data objects, one element per quadrant. The size of the array is determined by 
             the numQuads() method of the configuration object. */
   const CsPad::ElementV2& quads(const CsPad::ConfigV2& cfg, uint32_t i0) const { const char* memptr = ((const char*)this)+0;

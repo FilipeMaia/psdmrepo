@@ -68,6 +68,16 @@ namespace CsPad2x2 {
 
 class CsPad2x2DigitalPotsCfg {
 public:
+  CsPad2x2DigitalPotsCfg() {}
+  CsPad2x2DigitalPotsCfg(const CsPad2x2DigitalPotsCfg& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  CsPad2x2DigitalPotsCfg& operator=(const CsPad2x2DigitalPotsCfg& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
     this instance, the returned ndarray object can be used even after this instance disappears. */
   template <typename T>
@@ -137,6 +147,16 @@ private:
 
 class CsPad2x2GainMapCfg {
 public:
+  CsPad2x2GainMapCfg() {}
+  CsPad2x2GainMapCfg(const CsPad2x2GainMapCfg& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  CsPad2x2GainMapCfg& operator=(const CsPad2x2GainMapCfg& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   /** Array with the gain map for single ASIC.
 
     Note: this overloaded method accepts shared pointer argument which must point to an object containing
@@ -164,6 +184,16 @@ private:
 
 class ConfigV1QuadReg {
 public:
+  ConfigV1QuadReg() {}
+  ConfigV1QuadReg(const ConfigV1QuadReg& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  ConfigV1QuadReg& operator=(const ConfigV1QuadReg& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   uint32_t shiftSelect() const { return _shiftSelect; }
   uint32_t edgeSelect() const { return _edgeSelect; }
   uint32_t readClkSet() const { return _readClkSet; }
@@ -228,6 +258,16 @@ class ConfigV1 {
 public:
   enum { TypeId = Pds::TypeId::Id_Cspad2x2Config /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
+  ConfigV1() {}
+  ConfigV1(const ConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  ConfigV1& operator=(const ConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   uint32_t concentratorVersion() const { return _concentratorVersion; }
   const CsPad2x2::ProtectionSystemThreshold& protectionThreshold() const { return _protectionThreshold; }
   uint32_t protectionEnable() const { return _protectionEnable; }
@@ -265,6 +305,16 @@ private:
 
 class ConfigV2QuadReg {
 public:
+  ConfigV2QuadReg() {}
+  ConfigV2QuadReg(const ConfigV2QuadReg& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  ConfigV2QuadReg& operator=(const ConfigV2QuadReg& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   uint32_t shiftSelect() const { return _shiftSelect; }
   uint32_t edgeSelect() const { return _edgeSelect; }
   uint32_t readClkSet() const { return _readClkSet; }
@@ -345,6 +395,16 @@ class ConfigV2 {
 public:
   enum { TypeId = Pds::TypeId::Id_Cspad2x2Config /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 2 /**< XTC type version number */ };
+  ConfigV2() {}
+  ConfigV2(const ConfigV2& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  ConfigV2& operator=(const ConfigV2& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   uint32_t concentratorVersion() const { return _concentratorVersion; }
   const CsPad2x2::ProtectionSystemThreshold& protectionThreshold() const { return _protectionThreshold; }
   uint32_t protectionEnable() const { return _protectionEnable; }
@@ -387,6 +447,16 @@ public:
   enum { TypeId = Pds::TypeId::Id_Cspad2x2Element /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
   enum { Nsbtemp = 4 /**< Number of the elements in _sbtemp array. */ };
+  ElementV1() {}
+  ElementV1(const ElementV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  ElementV1& operator=(const ElementV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   /** Virtual channel number. */
   uint32_t virtual_channel() const { return uint32_t(this->_word0 & 0x3); }
   /** Lane number. */

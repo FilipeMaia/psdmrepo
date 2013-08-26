@@ -36,6 +36,16 @@ public:
     Adc_delay,
     NumberOfRegisters,
   };
+  ConfigV1() {}
+  ConfigV1(const ConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  ConfigV1& operator=(const ConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   uint32_t range() const { return _range; }
   uint32_t calRange() const { return _calRange; }
   uint32_t reset() const { return _reset; }
@@ -76,7 +86,7 @@ public:
   }
   Sample(const uint16_t* arg__channels)
   {
-    std::copy(arg__channels, arg__channels+(4), _channels);
+    if (arg__channels) std::copy(arg__channels, arg__channels+(4), &_channels[0]);
   }
   /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
     this instance, the returned ndarray object can be used even after this instance disappears. */
@@ -133,6 +143,11 @@ class ElementV1 {
 public:
   enum { TypeId = Pds::TypeId::Id_ImpData /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
+  ElementV1() {}
+private:
+  ElementV1(const ElementV1&);
+  ElementV1& operator=(const ElementV1&);
+public:
   uint8_t vc() const { return uint8_t(this->_first & 0x3); }
   uint8_t lane() const { return uint8_t((this->_first>>6) & 0x3); }
   uint32_t frameNumber() const { return _frameNumber; }

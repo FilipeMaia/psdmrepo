@@ -27,6 +27,16 @@ public:
     c_100pF,
     c_10nF,
   };
+  ConfigV1() {}
+  ConfigV1(const ConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  ConfigV1& operator=(const ConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   uint64_t triggerCounter() const { return _triggerCounter; }
   uint64_t serialID() const { return _serialID; }
   uint16_t chargeAmpRange() const { return _chargeAmpRange; }
@@ -83,6 +93,16 @@ public:
     c_10nF,
     expert,
   };
+  ConfigV2() {}
+  ConfigV2(const ConfigV2& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  ConfigV2& operator=(const ConfigV2& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   uint64_t triggerCounter() const { return _triggerCounter; }
   uint64_t serialID() const { return _serialID; }
   uint16_t chargeAmpRange() const { return _chargeAmpRange; }
@@ -133,6 +153,16 @@ class DataV1 {
 public:
   enum { TypeId = Pds::TypeId::Id_IpimbData /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
+  DataV1() {}
+  DataV1(const DataV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  DataV1& operator=(const DataV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   uint64_t triggerCounter() const { return _triggerCounter; }
   uint16_t config0() const { return _config0; }
   uint16_t config1() const { return _config1; }
@@ -181,6 +211,16 @@ public:
   enum { Version = 2 /**< XTC type version number */ };
   enum { ipimbAdcRange = 5 };
   enum { ipimbAdcSteps = 65536 };
+  DataV2() {}
+  DataV2(const DataV2& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  DataV2& operator=(const DataV2& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   uint16_t config0() const { return _config0; }
   uint16_t config1() const { return _config1; }
   uint16_t config2() const { return _config2; }

@@ -45,6 +45,19 @@ public:
     VFlip,
     HVFlip,
   };
+  ConfigV1()
+  {
+  }
+  ConfigV1(uint16_t arg__bf_offset, uint16_t arg__bf_gain, Opal1k::ConfigV1::Depth arg__bf_resol, Opal1k::ConfigV1::Binning arg__bf_vbin, Opal1k::ConfigV1::Mirroring arg__bf_mirr, uint8_t arg__bf_vremap, uint8_t arg__bf_corr, uint8_t arg__bf_lookup, uint32_t arg__defectPixelCount, const uint16_t* arg__lookup_table, const Camera::FrameCoord* arg__defectPixels);
+  ConfigV1(const ConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  ConfigV1& operator=(const ConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   /** offset/pedestal setting for camera (before gain) */
   uint16_t black_level() const { return uint16_t(this->_offsetAndGain & 0xffff); }
   /** camera gain setting in percentile [100-3200] = [1x-32x] */

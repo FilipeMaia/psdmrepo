@@ -6,6 +6,15 @@
 #include <iostream>
 namespace PsddlPds {
 namespace Camera {
+FrameFexConfigV1::FrameFexConfigV1(Camera::FrameFexConfigV1::Forwarding arg__forwarding, uint32_t arg__forward_prescale, Camera::FrameFexConfigV1::Processing arg__processing, const Camera::FrameCoord& arg__roiBegin, const Camera::FrameCoord& arg__roiEnd, uint32_t arg__threshold, uint32_t arg__masked_pixel_count, const Camera::FrameCoord* arg__masked_pixel_coordinates)
+    : _forwarding(arg__forwarding), _forward_prescale(arg__forward_prescale), _processing(arg__processing), _roiBegin(arg__roiBegin), _roiEnd(arg__roiEnd), _threshold(arg__threshold), _masked_pixel_count(arg__masked_pixel_count)
+{
+  if (arg__masked_pixel_coordinates and (this->number_of_masked_pixels())) {
+    ptrdiff_t offset = 28;
+    Camera::FrameCoord* data = reinterpret_cast<Camera::FrameCoord*>(((char*)this)+offset);
+    std::copy(arg__masked_pixel_coordinates, arg__masked_pixel_coordinates+(this->number_of_masked_pixels()), data);
+  }
+}
 std::ostream& operator<<(std::ostream& str, Camera::FrameFexConfigV1::Forwarding enval) {
   const char* val;
   switch (enval) {
@@ -42,6 +51,15 @@ std::ostream& operator<<(std::ostream& str, Camera::FrameFexConfigV1::Processing
     return str << "Processing(" << int(enval) << ")";
   }
   return str << val;
+}
+FrameV1::FrameV1(uint32_t arg__width, uint32_t arg__height, uint32_t arg__depth, uint32_t arg__offset, const uint8_t* arg__pixel_data)
+    : _width(arg__width), _height(arg__height), _depth(arg__depth), _offset(arg__offset)
+{
+  if (arg__pixel_data and (this->_width*this->_height*((this->_depth+7)/8))) {
+    ptrdiff_t offset = 16;
+    uint8_t* data = reinterpret_cast<uint8_t*>(((char*)this)+offset);
+    std::copy(arg__pixel_data, arg__pixel_data+(this->_width*this->_height*((this->_depth+7)/8)), data);
+  }
 }
 ndarray<const uint8_t, 2>
 FrameV1::data8() const {

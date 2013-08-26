@@ -171,6 +171,16 @@ public:
   enum { TypeId = Pds::TypeId::Id_AcqConfig /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
   enum { MaxChan = 20 /**< Maximum number of the configured channels. */ };
+  ConfigV1() {}
+  ConfigV1(const ConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  ConfigV1& operator=(const ConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   /** Number of ADCs per channel. */
   uint32_t nbrConvertersPerChannel() const { return _nbrConvertersPerChannel; }
   /** Bit mask for channels. */
@@ -256,6 +266,11 @@ public:
   enum { NumberOfBits = 10 };
   enum { BitShift = 6 };
   enum { _extraSize = 32 };
+  DataDescV1Elem() {}
+private:
+  DataDescV1Elem(const DataDescV1Elem&);
+  DataDescV1Elem& operator=(const DataDescV1Elem&);
+public:
   /** Number of samples in one segment. */
   uint32_t nbrSamplesInSeg() const { return _returnedSamplesPerSeg; }
   uint32_t indexFirstPoint() const { return _indexFirstPoint; }
@@ -332,6 +347,11 @@ class DataDescV1 {
 public:
   enum { TypeId = Pds::TypeId::Id_AcqWaveform /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
+  DataDescV1() {}
+private:
+  DataDescV1(const DataDescV1&);
+  DataDescV1& operator=(const DataDescV1&);
+public:
   /** Waveform data, one object per channel. */
   const Acqiris::DataDescV1Elem& data(const Acqiris::ConfigV1& cfg, uint32_t i0) const { const char* memptr = ((const char*)this)+0;
   for (uint32_t i=0; i != i0; ++ i) {
@@ -501,6 +521,16 @@ public:
   enum { Version = 1 /**< XTC type version number */ };
   enum { NChannels = 8 /**< Total number of channel configurations. */ };
   enum { NAuxIO = 2 /**< Total number of auxiliary IO configurations. */ };
+  TdcConfigV1() {}
+  TdcConfigV1(const TdcConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  TdcConfigV1& operator=(const TdcConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   /** Channel configurations, one object per channel.
 
     Note: this overloaded method accepts shared pointer argument which must point to an object containing
@@ -589,6 +619,7 @@ std::ostream& operator<<(std::ostream& str, Acqiris::TdcDataV1_Item::Source enva
 
 class TdcDataV1Common: public TdcDataV1_Item {
 public:
+  TdcDataV1Common() {}
   /** Returns number of hits. */
   uint32_t nhits() const;
   /** Returns overflow status. */
@@ -604,6 +635,7 @@ public:
 
 class TdcDataV1Channel: public TdcDataV1_Item {
 public:
+  TdcDataV1Channel() {}
   /** Returns number of ticks. */
   uint32_t ticks() const;
   /** Returns overflow status. */
@@ -629,6 +661,7 @@ public:
     MemFullSwitch = 2,
     AuxIOMarker = 16,
   };
+  TdcDataV1Marker() {}
   /** Returns type of the marker. */
   Acqiris::TdcDataV1Marker::Type type() const;
   static uint32_t _sizeof() { return ((((Acqiris::TdcDataV1_Item::_sizeof())+1)-1)/1)*1; }
@@ -646,6 +679,16 @@ class TdcDataV1 {
 public:
   enum { TypeId = Pds::TypeId::Id_AcqTdcData /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
+  TdcDataV1() {}
+  TdcDataV1(const TdcDataV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  TdcDataV1& operator=(const TdcDataV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   /** Access TDC data items. The data_shape() method should be used to 
             obtain the number of elements.
 

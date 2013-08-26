@@ -35,6 +35,16 @@ public:
     X4,
     QUAD_END,
   };
+  ConfigV1() {}
+  ConfigV1(const ConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  ConfigV1& operator=(const ConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   uint32_t chan_num() const { return _chan_num; }
   Encoder::ConfigV1::count_mode_type count_mode() const { return Encoder::ConfigV1::count_mode_type(_count_mode); }
   Encoder::ConfigV1::quad_mode quadrature_mode() const { return Encoder::ConfigV1::quad_mode(_quadrature_mode); }
@@ -77,6 +87,16 @@ public:
     X4,
     QUAD_END,
   };
+  ConfigV2() {}
+  ConfigV2(const ConfigV2& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  ConfigV2& operator=(const ConfigV2& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   uint32_t chan_mask() const { return _chan_mask; }
   Encoder::ConfigV2::count_mode_type count_mode() const { return Encoder::ConfigV2::count_mode_type(_count_mode); }
   Encoder::ConfigV2::quad_mode quadrature_mode() const { return Encoder::ConfigV2::quad_mode(_quadrature_mode); }
@@ -105,6 +125,16 @@ class DataV1 {
 public:
   enum { TypeId = Pds::TypeId::Id_EncoderData /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
+  DataV1() {}
+  DataV1(const DataV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  DataV1& operator=(const DataV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   uint32_t timestamp() const { return _33mhz_timestamp; }
   uint32_t encoder_count() const { return _encoder_count; }
   /** Lower 24 bits of encoder_count as signed integer value. */
@@ -126,6 +156,16 @@ public:
   enum { TypeId = Pds::TypeId::Id_EncoderData /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 2 /**< XTC type version number */ };
   enum { NEncoders = 3 /**< Number of encoders. */ };
+  DataV2() {}
+  DataV2(const DataV2& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  DataV2& operator=(const DataV2& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   uint32_t timestamp() const { return _33mhz_timestamp; }
   /**     Note: this overloaded method accepts shared pointer argument which must point to an object containing
     this instance, the returned ndarray object can be used even after this instance disappears. */

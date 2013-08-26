@@ -32,6 +32,16 @@ public:
     Output_FIFO = 0,
     Output_Pattern4 = 4,
   };
+  FccdConfigV1() {}
+  FccdConfigV1(const FccdConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  FccdConfigV1& operator=(const FccdConfigV1& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   uint16_t outputMode() const { return _u16OutputMode; }
   uint32_t width() const;
   uint32_t height() const;
@@ -72,6 +82,16 @@ public:
     Test_Pattern3 = 3,
     Test_Pattern4 = 4,
   };
+  FccdConfigV2() {}
+  FccdConfigV2(const FccdConfigV2& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  FccdConfigV2& operator=(const FccdConfigV2& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
   uint16_t outputMode() const { return _outputMode; }
   uint8_t ccdEnable() const { return _ccdEnable; }
   uint8_t focusMode() const { return _focusMode; }
