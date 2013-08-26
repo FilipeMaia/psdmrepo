@@ -599,6 +599,11 @@
             <method name="severity" type="uint16_t">
                 Returns severity value for the PV.
             </method>
+
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="auto"/>
+            </ctor>
             
         </pstype>
         
@@ -613,6 +618,11 @@
             PV name.
             </attribute>
 
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="auto"/>
+            </ctor>
+
         </pstype>
         
         <!-- ========================================================================= -->
@@ -624,6 +634,11 @@
             <method name="stamp" type="epicsTimeStamp">
             EPICS timestamp value.
             </method>
+
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="auto"/>
+            </ctor>
 
         </pstype>
         
@@ -638,6 +653,12 @@
                 <arg name="i" type="uint32_t"/>
                 <expr lang="C++" value="data(i)"/>
             </method>
+
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="auto"/>
+            </ctor>
+
         </pstype>
         
         <!-- ========================================================================= -->
@@ -650,6 +671,12 @@
                 <arg name="i" type="uint32_t"/>
                 <expr lang="C++" value="data()[i]"/>
             </method>
+
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="auto"/>
+            </ctor>
+
         </pstype>
         
         <!-- ========================================================================= -->
@@ -663,6 +690,12 @@
                 <arg name="i" type="uint32_t"/>
                 <expr lang="C++" value="data()[i]"/>
             </method>
+
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="auto"/>
+            </ctor>
+
         </pstype>
         
         <!-- ========================================================================= -->
@@ -675,6 +708,12 @@
                 <arg name="i" type="uint32_t"/>
                 <expr lang="C++" value="data()[i]"/>
             </method>
+
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="auto"/>
+            </ctor>
+
         </pstype>
         
         <!-- ========================================================================= -->
@@ -687,6 +726,12 @@
                 <arg name="i" type="uint32_t"/>
                 <expr lang="C++" value="data()[i]"/>
             </method>
+
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="auto"/>
+            </ctor>
+
         </pstype>
         
         <!-- ========================================================================= -->
@@ -700,6 +745,12 @@
                 <arg name="i" type="uint32_t"/>
                 <expr lang="C++" value="data()[i]"/>
             </method>
+
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="auto"/>
+            </ctor>
+
         </pstype>
         
         <!-- ========================================================================= -->
@@ -713,6 +764,12 @@
                 <arg name="i" type="uint32_t"/>
                 <expr lang="C++" value="data()[i]"/>
             </method>
+
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="auto"/>
+            </ctor>
+
         </pstype>
         
         <!-- ========================================================================= -->
@@ -726,6 +783,12 @@
                 <arg name="i" type="uint32_t"/>
                 <expr lang="C++" value="data(i)"/>
             </method>
+
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="auto"/>
+            </ctor>
+
         </pstype>
         
         <!-- ========================================================================= -->
@@ -739,6 +802,12 @@
                 <arg name="i" type="uint32_t"/>
                 <expr lang="C++" value="data()[i]"/>
             </method>
+
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="auto"/>
+            </ctor>
+
         </pstype>
         
         <!-- ========================================================================= -->
@@ -752,6 +821,12 @@
                 <arg name="i" type="uint32_t"/>
                 <expr lang="C++" value="data()[i]"/>
             </method>
+
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="auto"/>
+            </ctor>
+
         </pstype>
         
         <!-- ========================================================================= -->
@@ -765,6 +840,12 @@
                 <arg name="i" type="uint32_t"/>
                 <expr lang="C++" value="data()[i]"/>
             </method>
+
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="auto"/>
+            </ctor>
+
         </pstype>
         
         <!-- ========================================================================= -->
@@ -778,6 +859,12 @@
                 <arg name="i" type="uint32_t"/>
                 <expr lang="C++" value="data()[i]"/>
             </method>
+
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="auto"/>
+            </ctor>
+
         </pstype>
         
         <!-- ========================================================================= -->
@@ -791,6 +878,12 @@
                 <arg name="i" type="uint32_t"/>
                 <expr lang="C++" value="data()[i]"/>
             </method>
+
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="auto"/>
+            </ctor>
+
         </pstype>
         
         <!-- ========================================================================= -->
@@ -804,6 +897,12 @@
                 <arg name="i" type="uint32_t"/>
                 <expr lang="C++" value="data()[i]"/>
             </method>
+
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="auto"/>
+            </ctor>
+
         </pstype>
         
         <!-- ========================================================================= -->
@@ -819,10 +918,6 @@
             <attribute name="_pad0" type="int16_t"/>            
             <attribute name="fInterval" type="float" accessor="interval"/>
 
-            <ctor>
-                Default constructor
-                <tag name="inline"/>
-            </ctor>
             <ctor>
                 Constructor which takes values for every attribute
                 <tag name="inline"/>
@@ -840,6 +935,11 @@
             <attribute name="_iNumPv" type="int32_t" accessor="numPv"/>
 
             <attribute name="_pvControls" type="PvConfigV1" shape="{self}.numPv()" accessor="pvControls"/>
+
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="auto"/>
+            </ctor>
 
         </pstype>
         
