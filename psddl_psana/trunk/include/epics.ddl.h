@@ -828,14 +828,12 @@ public:
 class PvConfigV1 {
 public:
   enum { iMaxPvDescLength = 64 };
-  PvConfigV1()
-  {
-  }
   PvConfigV1(int16_t arg_iPvId, const char* arg_sPvDesc, float arg_fInterval)
     : iPvId(arg_iPvId), fInterval(arg_fInterval)
   {
     if (arg_sPvDesc) std::copy(arg_sPvDesc, arg_sPvDesc+(64), &sPvDesc[0]);
   }
+  PvConfigV1() {}
   int16_t pvId() const { return iPvId; }
   const char* description() const { return sPvDesc; }
   float interval() const { return fInterval; }
