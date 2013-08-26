@@ -101,7 +101,14 @@ class CppTypeCodegen ( object ) :
     #  Constructor --
     #----------------
     def __init__ ( self, inc, cpp, type, abstract=False, pdsdata=False ) :
-
+        '''
+        Parameters:
+        inc    - file object for resulting include file
+        cpp    - file object for resulting source file
+        type   - instance of Type class
+        abstract - set to true for interface types (psana non-value types)
+        pdsdata  - set to true when called from pdsdata backend
+        '''
         # define instance variables
         self._inc = inc
         self._cpp = cpp
@@ -157,10 +164,28 @@ class CppTypeCodegen ( object ) :
             self._genEnum(enum)
 
         if not self._abs:
-            # constructor, all should be declared explicitly
+            # constructors, first all declared explicitly
+            defCtor = None
             for ctor in self._type.ctors :
                 access = self._access(ctor.access, access)
                 self._genCtor(ctor)
+                if not ctor.args: defCtor = ctor
+            if not defCtor:
+                # generate default constructor anyway
+                access = self._access('public', access)
+                print >>self._inc, T("  $name() {}")[self._type]
+            if not self._type.value_type:
+                # non-value types also get copy constructor (possibly disabled), and disabled assignment
+                _sizeof = self._type.lookup('_sizeof', Method)
+                sizestr = str(self._type.size)
+                if _sizeof is None or '{xtc-config}' in sizestr:
+                    access = self._access('private', access)
+                    print >>self._inc, T("  $name(const $name&);")[self._type]
+                    print >>self._inc, T("  $name& operator=(const $name&);")[self._type]
+                else:
+                    access = self._access('public', access)
+                    print >>self._inc, _TEMPL('copy_ctor').render(classname=self._type.name)
+                
 
         if self._abs:
             # need virtual destructor
@@ -463,13 +488,12 @@ class CppTypeCodegen ( object ) :
             elif not arg.dest.type.basic : 
                 tname = "const "+tname+'&'
             arglist.append(tname+' '+arg.name)
-        arglist = ", ".join(arglist)
 
         # initialization list
         initlist = []
         for attr in self._type.attributes():
             arg = attr2arg.get(attr,"")
-            if attr.shape:
+            if attr.shape or not attr.isfixed():
                 init = ''
             elif arg :
                 init = arg.expr
@@ -496,42 +520,34 @@ class CppTypeCodegen ( object ) :
             # generate definition only if all destinations are known
             genDef = None not in [arg.dest for arg in ctor.args]
 
+        classname = self._type.name
         if not genDef:
             
             # simply a declaration
-            print >>self._inc, T("  $name($args);")(name=self._type.name, args=arglist)
-
-        elif 'inline' in ctor.tags:
-            
-            # inline the definition
-            print >>self._inc, T("  $name($args)")(name=self._type.name, args=arglist)
-            if initlist: print >>self._inc, "    :", ', '.join(initlist)
-            print >>self._inc, "  {"
-            for attr in self._type.attributes():
-                arg = attr2arg.get(attr, None)
-                if attr.shape and arg:
-                    arg = arg.name
-                    size = attr.shape.size()
-                    first = '[0]' * (len(attr.shape.dims)-1)
-                    print >>self._inc, T("    std::copy($arg, $arg+($size), $attr$first);")(locals(), attr=attr.name)
-            print >>self._inc, "  }"
+            print >>self._inc, _TEMPL('ctor_decl').render(locals())
 
         else:
             
-            # out-line the definition
-            print >>self._inc, T("  $name($args);")(name=self._type.name, args=arglist)
-
-            print >>self._cpp, T("$name::$name($args)")(name=self._type.name, args=arglist)
-            if initlist: print >>self._cpp, "    :", ', '.join(initlist)
-            print >>self._cpp, "{"
+            # initializers for arrays
+            arrayinit = []
             for attr in self._type.attributes():
                 arg = attr2arg.get(attr, None)
-                if attr.shape and arg:
-                    arg = arg.name
-                    size = attr.shape.size()
-                    first = '[0]' * (len(attr.shape.dims)-1)
-                    print >>self._inc, T("  std::copy($arg, $arg+($size), $attr$first);")(locals(), attr=attr.name)
-            print >>self._cpp, "}"
+                if arg:
+                    if attr.shape:
+                        arrayinit.append((arg.name, str(attr.shape.size()), attr))
+                    elif not attr.isfixed():
+                        arrayinit.append((arg.name, None, attr))
+            
+            if 'inline' in ctor.tags:
+                
+                # inline the definition
+                print >>self._inc, _interpolate(_TEMPL('ctor_decl_inline').render(locals()), self._type)
+
+            else:
+            
+                # out-line the definition
+                print >>self._inc, _TEMPL('ctor_decl').render(locals())
+                print >>self._cpp, _interpolate(_TEMPL('ctor_impl').render(locals()), self._type)
 
 
     def _genAttrShapeDecl(self, attr):

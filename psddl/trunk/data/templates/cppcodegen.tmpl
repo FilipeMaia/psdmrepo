@@ -187,3 +187,108 @@ $ for dim in shape:
   shape.push_back({{dim}});
 $ endfor
   return shape;
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: ctor_decl
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for constructor declaration
+:  
+:  Parameters for this template:
+:    classname    - class name
+:    arglist      - list of arguments
+:
+  {{classname}}({{arglist|join(", ")}});
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: ctor_decl_inline
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for constructor declaration with inline definition
+:  
+:  Parameters for this template:
+:    classname    - class name
+:    arglist      - list of arguments
+:    initlist     - initializers 
+:    arrayinit    - initializes for arrays
+:
+  {{classname}}({{arglist|join(", ")}})
+$ if initlist:
+    : {{initlist|join(", ")}}
+$ endif
+  {
+{% for arg, size, attr in arrayinit %}
+{% if size is none %}
+    {
+      ptrdiff_t offset = {{attr.offset}};
+      {{type}}* data = reinterpret_cast<{{type}}*>(((char*)this)+offset);
+      new (data) {{attr.type.name}}({{arg}});
+    }
+{% else %}
+{% if attr.isfixed() %}
+    if ({{arg}}) std::copy({{arg}}, {{arg}}+({{size}}), &{{attr.name}}{% for i in attr.shape.dims %}[0]{% endfor %});
+{% else %}
+{% set type = attr.type.fullNameCpp() %}
+    if ({{arg}} and ({{size}})) {
+      ptrdiff_t offset = {{attr.offset}};
+      {{type}}* data = reinterpret_cast<{{type}}*>(((char*)this)+offset);
+      std::copy({{arg}}, {{arg}}+({{size}}), data);
+    }
+{% endif %}
+{% endif %}
+{% endfor %}
+  }
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: ctor_impl
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for constructor out-of-inline definition
+:  
+:  Parameters for this template:
+:    classname    - class name
+:    arglist      - list of arguments
+:    initlist     - initializers 
+:    arrayinit    - initializes for arrays
+:
+{{classname}}::{{classname}}({{arglist|join(", ")}})
+$ if initlist:
+    : {{initlist|join(", ")}}
+$ endif
+{
+{% for arg, size, attr in arrayinit %}
+{% if size is none %}
+  {
+    ptrdiff_t offset = {{attr.offset}};
+    {{type}}* data = reinterpret_cast<{{type}}*>(((char*)this)+offset);
+    new (data) {{attr.type.name}}({{arg}});
+  }
+{% else %}
+{% if attr.isfixed() %}
+  if ({{arg}}) std::copy({{arg}}, {{arg}}+({{size}}), &{{attr.name}}{% for i in attr.shape.dims %}[0]{% endfor %});
+{% else %}
+{% set type = attr.type.fullNameCpp() %}
+  if ({{arg}} and ({{size}})) {
+    ptrdiff_t offset = {{attr.offset}};
+    {{type}}* data = reinterpret_cast<{{type}}*>(((char*)this)+offset);
+    std::copy({{arg}}, {{arg}}+({{size}}), data);
+  }
+{% endif %}
+{% endif %}
+{% endfor %}
+}
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: copy_ctor
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for constructor out-of-inline definition
+:  
+:  Parameters for this template:
+:    classname    - class name
+:
+  {{classname}}(const {{classname}}& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  {{classname}}& operator=(const {{classname}}& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }

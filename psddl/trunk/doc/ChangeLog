@@ -11,6 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-11
+2013-08-26 Andy Salnikov
+- add support for auto-constructors for complex types
+- also define copy constructors and assignment op for types which can
+  implement them, disable for others
+
 Tag: V00-08-10
 2013-08-14 Andy Salnikov
 - fix policy for methods returning reference to non-copyable type
