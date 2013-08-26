@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-31
+2013-08-26 Andy Salnikov
+- add auto-constructors for some complex data types
+
 Tag: V00-04-30
 2013-08-14 Andy Salnikov
 - add releaseCode() method to evr.EventCodeV5 and evr.EventCodeV6

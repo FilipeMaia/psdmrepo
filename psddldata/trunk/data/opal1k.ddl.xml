@@ -112,6 +112,15 @@
                 <expr lang="C++" value="{self}.output_resolution()*2+8"/>
             </method>
 
+            <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="auto"/>
+            </ctor>
+
         </pstype>
         
         

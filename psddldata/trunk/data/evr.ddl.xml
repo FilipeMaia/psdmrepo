@@ -425,6 +425,15 @@
                     accessor="output_maps" shape_method="output_maps_shape">
             </attribute>
 
+            <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="auto"/>
+            </ctor>
+
         </pstype>
         
         <!-- ========================================================================= -->
@@ -480,6 +489,15 @@
                 (({self}._opcode &lt; singleShot) ? RateCode({self}._opcode-beamOn-baseRate) : Single)"/>
             </method>
 
+            <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="auto"/>
+            </ctor>
+
         </pstype>
         
         
@@ -507,6 +525,15 @@
             <attribute name="_output_maps" type="OutputMap" shape="{self}._noutputs" accessor="output_maps">
             </attribute>
 
+            <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="auto"/>
+            </ctor>
+
         </pstype>
         
         
@@ -533,6 +560,15 @@
 
             <attribute name="_output_maps" type="OutputMap" shape="{self}._noutputs" accessor="output_maps">
             </attribute>
+
+            <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="auto"/>
+            </ctor>
 
         </pstype>
         
@@ -597,6 +633,14 @@
 
             <attribute name="_entries" type="SequencerEntry" shape="{self}.length()" accessor="entries"/>
 
+            <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="auto"/>
+            </ctor>
 
         </pstype>
 		
@@ -629,6 +673,15 @@
 
             <attribute name="_seq_config" type="SequencerConfigV1" accessor="seq_config">
             </attribute>
+
+            <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="auto"/>
+            </ctor>
 
         </pstype>
         
@@ -666,6 +719,15 @@
 
             <attribute name="_seq_config" type="SequencerConfigV1" accessor="seq_config">
             </attribute>
+            
+            <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="auto"/>
+            </ctor>
 
         </pstype>
         
@@ -703,6 +765,15 @@
 
             <attribute name="_seq_config" type="SequencerConfigV1" accessor="seq_config">
             </attribute>
+
+            <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="auto"/>
+            </ctor>
 
         </pstype>
         

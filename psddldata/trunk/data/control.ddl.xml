@@ -177,6 +177,15 @@
                 PVMonitor configuration objects
             </attribute>
 
+            <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="auto"/>
+            </ctor>
+
         </pstype>
         
         <!-- ========================================================================= -->
@@ -234,6 +243,15 @@
                 shape="{self}.npvLabels()" accessor="pvLabels" shape_method="pvLabels_shape">
                 PVLabel configuration objects
             </attribute>
+
+            <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="auto"/>
+            </ctor>
 
         </pstype>
         
