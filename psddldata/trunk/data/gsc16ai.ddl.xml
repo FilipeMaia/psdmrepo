@@ -68,6 +68,17 @@
             <attribute name="_timeTagEnable" type="uint8_t" accessor="timeTagEnable">
             </attribute>
 
+            <ctor>
+                Default constructor without arguments
+                <tag name="inline"/>
+            </ctor>
+
+            <ctor>
+              Constructor with values for each attribute
+              <tag name="inline"/>
+              <tag name="auto"/>
+            </ctor>
+
             <method name="numChannels" type="uint16_t">
                 <expr lang="C++" value="{self}.lastChan() - {self}.firstChan() + 1" />
                 <tag name="inline"/>

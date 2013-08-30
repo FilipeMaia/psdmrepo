@@ -94,6 +94,12 @@
                 accessor="defect_pixel_coordinates">
             </attribute>
 
+            <ctor>
+                Standard constructor.
+                <tag name="inline"/>
+                <tag name="auto"/>
+            </ctor>
+
             <method name="output_offset" type="uint16_t">
                 offset/pedestal value in pixel counts
                 <expr lang="C++"

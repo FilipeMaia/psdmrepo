@@ -38,6 +38,12 @@
             <attribute name="_rows" type="uint32_t" accessor="rows">
             </attribute>
 
+            <ctor>
+              Constructor with values for each attribute
+              <tag name="inline"/>
+              <tag name="auto"/>
+            </ctor>
+
         </pstype>
         
         <!-- ========================================================================= -->

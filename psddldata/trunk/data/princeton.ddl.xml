@@ -343,6 +343,24 @@
             <attribute name="_u32NumDelayShots" type="uint32_t" accessor="numDelayShots">
             </attribute>
             
+            <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
+
+            <ctor>
+                Constructor which takes values for each attribute
+                <tag name="inline"/>
+                <tag name="auto"/>
+            </ctor>
+
+            <ctor>
+                Constructor which takes values for each attribute
+                <tag name="inline"/>
+                <arg name="width"  dest="_uWidth"/>
+                <arg name="height" dest="_uHeight"/>
+            </ctor>
+
             <method name="frameSize" type="uint32_t">
             Total size in bytes of the Frame object including header and pixel data, 
             this returns the size of FrameV2 object, do not use this config type with FrameV1
@@ -414,6 +432,14 @@
             <attribute name="_data" type="uint16_t" shape="{xtc-config}.numPixelsY(),{xtc-config}.numPixelsX()" accessor="data">
             </attribute>
 
+            <ctor>
+                Constructor which takes values for each attribute
+                <tag name="inline"/>
+                <arg name="shotIdStart"  dest="_iShotIdStart"/>
+                <arg name="fReadoutTime" dest="_fReadoutTime"/>
+                <arg name="fTemperature" dest="_fTemperature"/>
+            </ctor>
+              
         </pstype>
         
         <!-- ========================================================================= -->

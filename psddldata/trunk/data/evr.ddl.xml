@@ -816,6 +816,19 @@
             <attribute name="_fifoEvents" type="FIFOEvent" shape="{self}._u32NumFifoEvents" accessor="fifoEvents">
             </attribute>
 
+            <ctor>
+                Standard constructor
+                <tag name="inline"/>
+                <tag name="auto"/>
+            </ctor>
+
+            <ctor>
+                Constructor writing numFifoEvents only.
+                <tag name="inline"/>
+                <arg name="u32NumFifoEvents" dest="_u32NumFifoEvents"/>
+            </ctor>
+            
+
         </pstype>
         
         <!-- ========================================================================= -->
@@ -866,6 +879,13 @@
             <method name="conn" type="OutputMap.Conn">
                 <expr lang="C++" value="OutputMap::Conn({self}._conn)"/>
             </method>
+
+            <ctor>
+               Standard constructor
+               <tag name="inline"/>
+               <arg name="conn"      dest="_conn"  method="conn"/>
+               <arg name="nchannels" dest="_nchannels"/>
+            </ctor>
 
         </pstype>
         

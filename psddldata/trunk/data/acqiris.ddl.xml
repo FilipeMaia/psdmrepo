@@ -198,6 +198,17 @@
             Configuration for vertical axis (one per channel).
             </attribute>
 
+            <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
+
+            <ctor>
+                Constructor with values for each attribute
+                <tag name="inline"/>
+                <tag name="auto"/>
+            </ctor>
+
             <method name="nbrChannels" type="uint32_t">
                 Number of channels calculated from channel bit mask.
                 <expr lang="C++" value="__builtin_popcount({self}._channelMask)"/>
@@ -513,6 +524,17 @@
 
             <attribute name="_veto" type="TdcVetoIO" accessor="veto">
             </attribute>
+
+            <ctor>
+                Default constructor without arguments
+                <tag name="inline"/>
+            </ctor>
+
+            <ctor>
+                Standard constructor
+                <tag name="inline"/>
+                <tag name="auto"/>
+            </ctor>
 
         </pstype>
 

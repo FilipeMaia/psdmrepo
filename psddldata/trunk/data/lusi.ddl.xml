@@ -105,6 +105,12 @@
             <attribute name="_yscale" type="float" accessor="yscale">
             </attribute>
 
+            <ctor>
+              Constructor with values for each attribute
+              <tag name="inline"/>
+              <tag name="auto"/>
+            </ctor>
+
         </pstype>
         
         
@@ -125,6 +131,17 @@
 
             <attribute name="_yscale" type="float" accessor="yscale">
             </attribute>
+
+            <ctor>
+              Default constructor
+              <tag name="inline"/>
+            </ctor>
+
+            <ctor>
+              Constructor with values for each attribute
+              <tag name="inline"/>
+              <tag name="auto"/>
+            </ctor>
 
         </pstype>
         

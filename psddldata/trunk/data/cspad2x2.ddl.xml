@@ -226,6 +226,17 @@
             Gain map.
             </attribute>
 
+            <ctor>
+              Default constructor
+              <tag name="inline"/>
+            </ctor>
+             
+            <ctor>
+              Constructor with values for each attribute
+              <tag name="inline"/>
+              <tag name="auto"/>
+            </ctor>
+
         </pstype>
         
         <!-- ========================================================================= -->
@@ -268,6 +279,12 @@
 
             <attribute name="_quad" type="ConfigV1QuadReg" accessor="quad">
             </attribute>
+
+            <ctor>
+              Constructor with values for each attribute
+              <tag name="inline"/>
+              <tag name="auto"/>
+            </ctor>
 
             <method name="numAsicsRead" type="uint32_t">
                 <expr lang="C++" value="4"/>
@@ -374,6 +391,17 @@
             Gain map.
             </attribute>
 
+            <ctor>
+              Default constructor
+              <tag name="inline"/>
+            </ctor>
+             
+            <ctor>
+              Constructor with values for each attribute
+              <tag name="inline"/>
+              <tag name="auto"/>
+            </ctor>
+
         </pstype>
         
         <!-- ========================================================================= -->
@@ -419,6 +447,17 @@
 
             <attribute name="_quad" type="ConfigV2QuadReg" accessor="quad">
             </attribute>
+
+            <ctor>
+              Default constructor
+              <tag name="inline"/>
+            </ctor>
+             
+            <ctor>
+              Constructor with values for each attribute
+              <tag name="inline"/>
+              <tag name="auto"/>
+            </ctor>
 
             <method name="numAsicsRead" type="uint32_t">
                 <expr lang="C++" value="4"/>

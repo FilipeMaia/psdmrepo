@@ -22,6 +22,12 @@
                 Size of the payload in bytes for single link
             </attribute>
 
+            <ctor>
+              Constructor with values for each attribute
+              <tag name="inline"/>
+              <tag name="auto"/>
+            </ctor>
+
         </pstype>
 
 
@@ -73,6 +79,12 @@
             <attribute name="_timingFName" type="char" shape="256" accessor="timingFName">
                 Timing file name string
             </attribute>
+
+            <ctor>
+              Construct from values for each attribute
+              <tag name="inline"/>
+              <tag name="auto"/>
+            </ctor>
 
         </pstype>
 

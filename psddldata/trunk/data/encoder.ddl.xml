@@ -47,6 +47,12 @@
             <attribute name="_ticks_per_sec" type="uint32_t" accessor="ticks_per_sec">
             </attribute>
 
+            <ctor>
+              Constructor which takes values for every attribute
+              <tag name="inline"/>
+              <tag name="auto"/>
+            </ctor>
+ 
         </pstype>
         
         <!-- ========================================================================= -->
@@ -89,6 +95,17 @@
             <attribute name="_ticks_per_sec" type="uint32_t" accessor="ticks_per_sec">
             </attribute>
 
+            <ctor>
+              Default constructor
+              <tag name="inline"/>
+            </ctor>
+
+            <ctor>
+              Constructor which takes values for every attribute
+              <tag name="inline"/>
+              <tag name="auto"/>
+            </ctor>
+
         </pstype>
         
         <!-- ========================================================================= -->
@@ -122,6 +139,16 @@
             <attribute name="_encoder_count" type="uint32_t" shape="NEncoders" 
                     accessor="encoder_count" shape_method="encoder_count_shape">
             </attribute>
+
+            <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="inline"/>
+                <tag name="auto"/>
+            </ctor>
 
             <method name="value" type="int32_t">
                 Lower 24 bits of encoder_count as signed integer value.

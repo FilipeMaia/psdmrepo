@@ -49,6 +49,17 @@
             <attribute name="_u32NumDelayShots" type="uint32_t" accessor="numDelayShots">
             </attribute>
 
+            <ctor>
+              Default constructor
+              <tag name="inline"/>
+            </ctor>
+
+            <ctor>
+              Constructor with all attributes
+              <tag name="inline"/>
+              <tag name="auto"/>
+            </ctor>
+
             <method name="frameSize" type="uint32_t">
             Total size in bytes of the Frame object, including image and frame header.
                 <expr lang="C++" value="12 + {self}.numPixels()*2"/>
@@ -92,6 +103,14 @@
 
             <attribute name="_data" type="uint16_t" shape="{xtc-config}.numPixelsY(),{xtc-config}.numPixelsX()" accessor="data">
             </attribute>
+
+            <ctor>
+              Constructor with scalar arguments
+              <tag name="inline"/>
+              <arg name="iShotIdStart"   dest="_iShotIdStart"/>
+              <arg name="fReadoutTime"   dest="_fReadoutTime"/>
+              <arg name="fTemperature"   dest="_fTemperature"/>
+            </ctor>
 
         </pstype>
         

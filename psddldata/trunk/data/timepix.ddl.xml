@@ -146,6 +146,12 @@
             
             <attribute name="_dac3RefLvds" type="int32_t" accessor="dac3RefLvds" />
             
+            <ctor>
+              Constructor with values for each attribute
+              <tag name="inline"/>
+              <tag name="auto"/>
+            </ctor>
+
         </pstype>
         
         
@@ -313,6 +319,12 @@
             <attribute name="_chip2ID" type="int32_t" accessor="chip2ID" />
 
             <attribute name="_chip3ID" type="int32_t" accessor="chip3ID" />
+
+            <ctor>
+              Constructor with values for each attribute
+              <tag name="inline"/>
+              <tag name="auto"/>
+            </ctor>
 
             <method name="chipCount" type="int32_t">
                 <tag name="inline"/>
@@ -492,6 +504,17 @@
 
             <attribute name="_chip3ID" type="int32_t" accessor="chip3ID" />
 
+            <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
+
+            <ctor>
+                Constructor with a value for each argument
+                <tag name="inline"/>
+                <tag name="auto"/>
+            </ctor>
+
             <method name="chipCount" type="int32_t">
                 <tag name="inline"/>
                 <expr lang="C++" value="ChipCount"/>
@@ -521,6 +544,18 @@
 
             <attribute name="_data" type="uint16_t" shape="Height,Width" accessor="data">
             </attribute>
+
+            <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
+                Constructor which takes values for scalar attributes
+                <tag name="inline"/>
+                <arg name="timestamp"    dest="_timestamp"/>
+                <arg name="frameCounter" dest="_frameCounter"/>
+                <arg name="lostRows"     dest="_lostRows"/>
+            </ctor>
             
             <method name="width" type="uint32_t">
                 <tag name="inline"/>
@@ -573,6 +608,16 @@
 
             <attribute name="_data" type="uint16_t" shape="{self}.height(),{self}.width()" accessor="data">
             </attribute>
+
+            <ctor>
+                Constructor with a value for each argument
+                <tag name="inline"/>
+                <arg name="width"        dest="_width"/>
+                <arg name="height"       dest="_height"/>
+                <arg name="timestamp"    dest="_timestamp"/>
+                <arg name="frameCounter" dest="_frameCounter"/>
+                <arg name="lostRows"     dest="_lostRows"/>
+            </ctor>
 
             <method name="depth" type="uint32_t">
                 <tag name="inline"/>

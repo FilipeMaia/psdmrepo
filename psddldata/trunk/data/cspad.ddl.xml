@@ -199,6 +199,17 @@
             Gain map.
             </attribute>
 
+            <ctor>
+              Default constructor
+              <tag name="inline"/>
+            </ctor>
+             
+            <ctor>
+              Constructor with values for each attribute
+              <tag name="inline"/>
+              <tag name="auto"/>
+            </ctor>
+
         </pstype>
         
         <!-- ========================================================================= -->
@@ -263,6 +274,17 @@
             <attribute name="_gainMap" type="CsPadGainMapCfg" accessor="gm">
             Gain map.
             </attribute>
+
+            <ctor>
+              Default constructor
+              <tag name="inline"/>
+            </ctor>
+             
+            <ctor>
+              Constructor with values for each attribute
+              <tag name="inline"/>
+              <tag name="auto"/>
+            </ctor>
 
         </pstype>
         
@@ -335,6 +357,17 @@
             Gain map.
             </attribute>
 
+            <ctor>
+              Default constructor
+              <tag name="inline"/>
+            </ctor>
+             
+            <ctor>
+              Constructor with values for each attribute
+              <tag name="inline"/>
+              <tag name="auto"/>
+            </ctor>
+
         </pstype>
         
         <!-- ========================================================================= -->
@@ -380,6 +413,12 @@
 
             <attribute name="_quads" type="ConfigV1QuadReg" shape="MaxQuadsPerSensor" accessor="quads">
             </attribute>
+
+            <ctor>
+              Constructor with values for scalar attributes
+              <tag name="inline"/>
+              <tag name="auto"/>
+            </ctor>
 
             <method name="numAsicsRead" type="uint32_t">
                 <expr lang="C++" value="({self}.asicMask() &amp; 0xf)==1 ? 4 : 16"/>
@@ -440,6 +479,12 @@
 
             <attribute name="_quads" type="ConfigV1QuadReg" shape="MaxQuadsPerSensor" accessor="quads">
             </attribute>
+
+            <ctor>
+              Constructor with values for each attributes
+              <tag name="inline"/>
+              <tag name="auto"/>
+            </ctor>
 
             <method name="numAsicsRead" type="uint32_t">
                 <expr lang="C++" value="({self}.asicMask() &amp; 0xf)==1 ? 4 : 16"/>
@@ -523,6 +568,12 @@
             <attribute name="_quads" type="ConfigV1QuadReg" shape="MaxQuadsPerSensor" accessor="quads">
             </attribute>
 
+            <ctor>
+              Constructor with values for each attribute
+              <tag name="inline"/>
+              <tag name="auto"/>
+            </ctor>
+
             <method name="numAsicsRead" type="uint32_t">
                 <expr lang="C++" value="({self}.asicMask() &amp; 0xf)==1 ? 4 : 16"/>
             </method>
@@ -604,6 +655,12 @@
 
             <attribute name="_quads" type="ConfigV2QuadReg" shape="MaxQuadsPerSensor" accessor="quads">
             </attribute>
+
+            <ctor>
+              Constructor with values for each attributes
+              <tag name="inline"/>
+              <tag name="auto"/>
+            </ctor>
 
             <method name="numAsicsRead" type="uint32_t">
                 <expr lang="C++" value="({self}.asicMask() &amp; 0xf)==1 ? 4 : 16"/>
@@ -689,6 +746,17 @@
 
             <attribute name="_quads" type="ConfigV3QuadReg" shape="MaxQuadsPerSensor" accessor="quads">
             </attribute>
+
+            <ctor>
+              Default constructor
+              <tag name="inline"/>
+            </ctor>
+
+            <ctor>
+              Constructor with values for each attribute
+              <tag name="inline"/>
+              <tag name="auto"/>
+            </ctor>
 
             <method name="numAsicsRead" type="uint32_t">
                 <expr lang="C++" value="({self}.asicMask() &amp; 0xf)==1 ? 4 : 16"/>

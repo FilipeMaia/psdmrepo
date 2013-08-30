@@ -937,6 +937,12 @@
             <attribute name="_pvControls" type="PvConfigV1" shape="{self}.numPv()" accessor="pvControls"/>
 
             <ctor>
+                Constructor which just takes the number of Pvs contained
+                <tag name="inline"/>
+                <arg name="numPv"  dest="_iNumPv"/>
+            </ctor>
+
+            <ctor>
                 Constructor which takes values for every attribute
                 <tag name="auto"/>
             </ctor>

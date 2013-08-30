@@ -95,6 +95,12 @@
             <attribute name="_waveform" type="uint16_t" shape="NWaveforms" accessor="waveforms">
             </attribute>
 
+            <ctor>
+                Constructor which takes values for each attribute
+                <tag name="inline"/>
+                <tag name="auto"/>
+            </ctor>
+
             <method name="width" type="uint32_t">
                 <expr lang="C++" value="Column_Pixels"/>
             </method>

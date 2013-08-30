@@ -34,6 +34,17 @@
             <attribute name="_quad_mode" type="Quad_Mode" shape="NCHANNELS" accessor="quadrature_mode">
             </attribute>
 
+            <ctor>
+              Default constructor
+              <tag name="inline"/>
+            </ctor>
+
+            <ctor>
+              Constructor with values for each attribute
+              <tag name="inline"/>
+              <tag name="auto"/>
+            </ctor>
+
         </pstype>
         
         <!-- ========================================================================= -->

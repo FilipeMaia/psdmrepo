@@ -50,6 +50,11 @@
                 <bitfield name="_bf_lookuptable_mode" size="1" type="LookupTable" accessor="lookuptable_mode"/>
             </attribute>
 
+            <ctor>
+                Constructor which takes values for each attribute
+                <tag name="inline"/>
+                <tag name="auto"/>
+            </ctor>
 
             <method name="output_resolution_bits" type="uint8_t">
             bit-depth of pixel counts
@@ -104,6 +109,11 @@
                 <bitfield name="_bf_lookuptable_mode" size="1" type="LookupTable" accessor="lookuptable_mode"/>
             </attribute>
 
+            <ctor>
+                Constructor which takes values for each attribute
+                <tag name="inline"/>
+                <tag name="auto"/>
+            </ctor>
 
             <method name="output_resolution_bits" type="uint8_t">
             bit-depth of pixel counts

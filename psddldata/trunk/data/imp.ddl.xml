@@ -39,6 +39,12 @@
             <attribute name="_trigDelay" type="uint32_t" accessor="trigDelay" />
             <attribute name="_adcDelay" type="uint32_t" accessor="adcDelay" />
 
+            <ctor>
+              Constructor with value for each attribute
+              <tag name="inline"/>
+              <tag name="auto"/>
+            </ctor>
+
         </pstype>
         
         

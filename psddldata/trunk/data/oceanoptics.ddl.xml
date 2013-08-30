@@ -25,7 +25,24 @@
             <attribute name="_fStrayLightConstant" type="double" accessor="strayLightConstant">
             </attribute>
 
-        </pstype>
+            <ctor>
+              Default constructor
+              <tag name="inline"/>
+            </ctor>
+
+            <ctor>
+              Construct from exposure time
+              <tag name="inline"/>
+              <arg name="f32ExposureTime" dest="_f32ExposureTime"/>
+            </ctor>
+
+            <ctor>
+              Construct from all attributes
+              <tag name="inline"/>
+              <tag name="auto"/>
+            </ctor>
+
+       </pstype>
         
         <!-- ========================================================================= -->
         

@@ -161,6 +161,15 @@
                 <tag name="auto"/>
             </ctor>
 
+            <ctor>
+                Construct from dimensions only.  Allow data to be appended externally.
+                <tag name="inline"/>
+                <arg name="width" dest="_width"/>
+                <arg name="height" dest="_height"/>
+                <arg name="depth" dest="_depth"/>
+                <arg name="offset" dest="_offset"/>
+            </ctor>
+
         </pstype>
         
         <!-- ========================================================================= -->
