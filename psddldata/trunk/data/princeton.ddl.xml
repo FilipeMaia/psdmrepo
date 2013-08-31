@@ -70,6 +70,12 @@
                 <expr lang="C++" value="(({self}.width() + {self}.binX()-1)/ {self}.binX() )*(({self}.height()+ {self}.binY()-1)/ {self}.binY() )"/>
             </method>
 
+            <ctor>
+               Standard constructor
+               <tag name="auto"/>
+               <tag name="inline"/>
+            </ctor>
+
         </pstype>
         
         <!-- ========================================================================= -->
@@ -139,6 +145,12 @@
                 <expr lang="C++" value="(({self}.width() + {self}.binX()-1)/ {self}.binX() )*(({self}.height()+ {self}.binY()-1)/ {self}.binY() )"/>
             </method>
 
+            <ctor>
+               Standard constructor
+               <tag name="auto"/>
+               <tag name="inline"/>
+            </ctor>
+
         </pstype>
         
         <!-- ========================================================================= -->
@@ -207,6 +219,12 @@
                 <tag name="inline"/>
                 <expr lang="C++" value="(({self}.width() + {self}.binX()-1)/ {self}.binX() )*(({self}.height()+ {self}.binY()-1)/ {self}.binY() )"/>
             </method>
+
+            <ctor>
+               Standard constructor
+               <tag name="auto"/>
+               <tag name="inline"/>
+            </ctor>
 
         </pstype>
         
@@ -285,6 +303,12 @@
                 <tag name="inline"/>
                 <expr lang="C++" value="(({self}.width() + {self}.binX()-1)/ {self}.binX() )*(({self}.height()+ {self}.binY()-1)/ {self}.binY() )"/>
             </method>
+
+            <ctor>
+               Standard constructor
+               <tag name="auto"/>
+               <tag name="inline"/>
+            </ctor>
 
         </pstype>
         

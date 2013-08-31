@@ -76,6 +76,11 @@
             <attribute name="_pots" type="uint8_t" shape="PotsPerQuad" accessor="pots">
             </attribute>
 
+            <ctor>
+               Standard constructore
+               <tag name="auto"/>
+            </ctor>
+
         </pstype>
         
         
@@ -142,6 +147,11 @@
                     accessor="gainMap">
             Array with the gain map for single ASIC.
             </attribute>
+
+            <ctor>
+               Standard constructor
+               <tag name="auto"/>
+            </ctor>
 
         </pstype>
         
