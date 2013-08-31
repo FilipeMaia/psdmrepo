@@ -1,12 +1,12 @@
-#ifndef CSPADPIXCOORDS_PIXCOORDSCSPAD2X2V2_H
-#define CSPADPIXCOORDS_PIXCOORDSCSPAD2X2V2_H
+#ifndef CSPADPIXCOORDS_PIXCOORDSCSPADV2_H
+#define CSPADPIXCOORDS_PIXCOORDSCSPADV2_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class PixCoordsCSPad2x2V2.
+//	Class PixCoordsCSPadV2.
 //
 //------------------------------------------------------------------------
 
@@ -22,7 +22,9 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "CSPadPixCoords/PixCoords2x1V2.h"
-#include "PSCalib/CSPad2x2CalibPars.h"
+#include "CSPadPixCoords/CSPadConfigPars.h"
+#include "PSCalib/CSPadCalibPars.h"
+#include "ndarray/ndarray.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -39,7 +41,7 @@ namespace CSPadPixCoords {
 /**
  *  @ingroup CSPadPixCoords
  *
- *  @brief PixCoordsCSPad2x2V2 class defines the CSPad2x2 pixel coordinates in its local frame.
+ *  @brief PixCoordsCSPadV2 class defines the CSPad pixel coordinates in the detector.
  *
  *  Use the same frame like in optical measurement, but in "matrix style" geometry:
  *  X axis goes along rows (from top to bottom)
@@ -55,29 +57,26 @@ namespace CSPadPixCoords {
  *  @author Mikhail S. Dubrovin
  */
 
-class PixCoordsCSPad2x2V2 : public PixCoords2x1V2 {
+class PixCoordsCSPadV2 : public PixCoords2x1V2 {
 public:
 
-  const static unsigned N2X1_IN_DET = 2;
+  const static unsigned N2X1_IN_DET = 32;
  
   // Default constructor
   /**
-   *  @brief PixCoordsCSPad2x2V2 class fills and provides access to the CSPad2x2 pixel coordinates.
+   *  @brief PixCoordsCSPadV2 class fills and provides access to the CSPad pixel coordinates.
    *  
    *  Fills/holds/provides access to the array of the quad coordinates, indexed by the quad, section, row, and column.
-   *  @param[in] cspad_calibpars - pointer to the store of CSPAD2x2 calibration parameters
+   *  @param[in] cspad_calibpars - pointer to the store of CSPAD calibration parameters
    *  @param[in] tiltIsApplied - boolean key indicating if the tilt angle correction for 2x1 in the detector is applied.
    *  @param[in] use_wide_pix_center - boolean parameter defining coordinate of the wide pixel; true-use wide pixel center as its coordinate, false-use ASIC-uniform pixel coordinate.
    */
-
-  //PixCoordsCSPad2x2V2 ();
-
-  PixCoordsCSPad2x2V2 (PSCalib::CSPad2x2CalibPars *cspad_calibpars = new PSCalib::CSPad2x2CalibPars(), 
-                       bool tiltIsApplied = true, 
-                       bool use_wide_pix_center=false);
+  PixCoordsCSPadV2 ( PSCalib::CSPadCalibPars *cspad_calibpars = new PSCalib::CSPadCalibPars(), 
+                     bool tiltIsApplied = true, 
+                     bool use_wide_pix_center = false );
 
   // Destructor
-  virtual ~PixCoordsCSPad2x2V2 () ;
+  virtual ~PixCoordsCSPadV2 () ;
 
   void fillPixelCoordinateArrays();
   void fillOneSectionInDet(uint32_t sect, double xcenter, double ycenter, double zcenter, double rotation);
@@ -91,33 +90,47 @@ public:
    *  indexes after the quad rotation by n*90 degree.
    *  The pixel coordinates can be returned in um(micrometers) and pix(pixels).
    */
-  double getPixCoor_um (AXIS axis, unsigned sect, unsigned row, unsigned col) ;
-  double getPixCoor_pix(AXIS axis, unsigned sect, unsigned row, unsigned col) ;
-  double get_x_min() { return m_coor_x_min; }; // units: um
-  double get_x_max() { return m_coor_x_max; }; // units: um
-  double get_y_min() { return m_coor_y_min; }; // units: um
-  double get_y_max() { return m_coor_y_max; }; // units: um
+  double getPixCoor_um    (AXIS axis, unsigned sect, unsigned row, unsigned col) ;
+  double getPixCoor_pix   (AXIS axis, unsigned sect, unsigned row, unsigned col) ;
+
+  double* getPixCoorArr_um (AXIS axis) ;
+
+/**
+  *  @param[in] axis - enumerated axis
+  *  @param[in] cspad_configpars - pointer to the store of CSPAD configuration parameters
+  */
+  ndarray<double,3> getPixCoorNDArrShapedAsData_um(AXIS axis, CSPadConfigPars *cspad_configpars = new CSPadConfigPars());
+
+  double get_x_min() { return m_coor_x_min; };
+  double get_x_max() { return m_coor_x_max; };
+  double get_y_min() { return m_coor_y_min; };
+  double get_y_max() { return m_coor_y_max; };
+  double get_z_min() { return m_coor_z_min; };
+  double get_z_max() { return m_coor_z_max; };
 
 protected:
 
 private:
 
-  PSCalib::CSPad2x2CalibPars *m_cspad2x2_calibpars;  
-  bool                        m_tiltIsApplied;
+  PSCalib::CSPadCalibPars *m_cspad_calibpars;
+  bool                     m_tiltIsApplied;
 
-  double m_coor_x[ROWS2X1][COLS2X1][N2X1_IN_DET]; // units: um
-  double m_coor_y[ROWS2X1][COLS2X1][N2X1_IN_DET]; // units: um
+  double m_coor_x[N2X1_IN_DET][ROWS2X1][COLS2X1]; // units: um
+  double m_coor_y[N2X1_IN_DET][ROWS2X1][COLS2X1]; // units: um
+  double m_coor_z[N2X1_IN_DET][ROWS2X1][COLS2X1]; // units: um
 
   double m_coor_x_min; // units: um
   double m_coor_x_max; // units: um
   double m_coor_y_min; // units: um
   double m_coor_y_max; // units: um
+  double m_coor_z_min; // units: um
+  double m_coor_z_max; // units: um
 
   // Copy constructor and assignment are disabled by default
-  PixCoordsCSPad2x2V2 ( const PixCoordsCSPad2x2V2& ) ;
-  PixCoordsCSPad2x2V2& operator = ( const PixCoordsCSPad2x2V2& ) ;
+  PixCoordsCSPadV2 ( const PixCoordsCSPadV2& ) ;
+  PixCoordsCSPadV2& operator = ( const PixCoordsCSPadV2& ) ;
 };
 
 } // namespace CSPadPixCoords
 
-#endif // CSPADPIXCOORDS_PIXCOORDSCSPAD2X2V2_H
+#endif // CSPADPIXCOORDS_PIXCOORDSCSPADV2_H

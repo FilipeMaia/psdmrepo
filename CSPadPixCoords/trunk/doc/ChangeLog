@@ -11,6 +11,12 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-06
+2013-08-30 Mikhail S. Dubrovin
+- add new classes PixCoordsCSPadV2, CSPadConfigPars
+- add new test modulesex_PixCoordsCSPadV2.cpp ex_CSPadConfigPars.cpp
+- work in progress for doxygen documentation
+	
 Tag: V00-03-05
 2013-06-07 Mikhail S. Dubrovin
 - fix problem with "striped" cspad image

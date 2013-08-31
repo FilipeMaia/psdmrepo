@@ -3,7 +3,7 @@
 // 	$Id$
 //
 // Description:
-//	Test class CSPadCalibPars of the PSCalib packadge
+//	Test class PixCoords2x1V2 of the CSPadPixCoords packadge
 //
 // Author List:
 //      Mikhail Dubrovin

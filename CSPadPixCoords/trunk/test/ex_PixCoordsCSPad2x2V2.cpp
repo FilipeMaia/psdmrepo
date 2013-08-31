@@ -3,7 +3,7 @@
 // 	$Id$
 //
 // Description:
-//	Test class CSPadCalibPars of the PSCalib packadge
+//	Test class PixCoordsCSPad2x2V2 of the CSPadPixCoords packadge
 //
 // Author List:
 //      Mikhail Dubrovin
@@ -76,13 +76,13 @@ void test03()
   double img_arr[NY][NX];
   std::fill_n(&img_arr[0][0], int(NX*NY), double(0));
 
-  const std::string calibDir  = "/reg/d/psdm/mec/mec73313/calib";
-  const std::string groupName = "CsPad2x2::CalibV1";
-  const std::string source    = "MecTargetChamber.0:Cspad2x2.3";
-
-  //const std::string calibDir  = "/reg/d/psdm/xpp/xpptut13/calib";
+  //const std::string calibDir  = "/reg/d/psdm/mec/mec73313/calib";
   //const std::string groupName = "CsPad2x2::CalibV1";
-  //const std::string source    = "XppGon.0:Cspad2x2.1";
+  //const std::string source    = "MecTargetChamber.0:Cspad2x2.3";
+
+  const std::string calibDir  = "/reg/d/psdm/xpp/xpptut13/calib";
+  const std::string groupName = "CsPad2x2::CalibV1";
+  const std::string source    = "XppGon.0:Cspad2x2.1";
   unsigned          runNumber = 10;
   CALIB2X2 *calibpars2x2 = new CALIB2X2(calibDir, groupName, source, runNumber);  
   calibpars2x2->printCalibPars();
