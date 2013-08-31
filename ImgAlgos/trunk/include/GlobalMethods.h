@@ -260,7 +260,8 @@ private:
 
     //======================
     if (file_type == TEXT) {
-        std::ofstream out(fname.c_str());
+        std::ofstream out(fname.c_str()); 
+	out << std::setprecision(9); // << std::setw(8) << std::setprecision(0) << std::fixed 
               for (unsigned r = 0; r != rows; ++r) {
                 for (unsigned c = 0; c != cols; ++c) {
                   out << arr[r*cols + c] << ' ';

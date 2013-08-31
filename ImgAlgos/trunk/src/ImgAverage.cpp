@@ -232,6 +232,8 @@ ImgAverage::collectStat(Event& evt)
   if ( collectStatForType<int>     (evt) ) return;
   if ( collectStatForType<float>   (evt) ) return;
   if ( collectStatForType<uint8_t> (evt) ) return;
+  if ( collectStatForType<short>   (evt) ) return;
+  if ( collectStatForType<int16_t> (evt) ) return;
 
   MsgLog(name(), info, "Image is not available in the event(...) for source:" << m_str_src << " key:" << m_key);
 }

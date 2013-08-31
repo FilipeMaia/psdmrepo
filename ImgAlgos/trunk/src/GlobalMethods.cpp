@@ -138,11 +138,13 @@ printSizeOfTypes()
             << "\nsizeof(bool    ) = " << sizeof(bool    ) << " with typeid(bool    ).name(): " << typeid(bool    ).name() 
             << "\nsizeof(uint8_t ) = " << sizeof(uint8_t ) << " with typeid(uint8_t ).name(): " << typeid(uint8_t ).name()  
             << "\nsizeof(uint16_t) = " << sizeof(uint16_t) << " with typeid(uint16_t).name(): " << typeid(uint16_t).name()  
+            << "\nsizeof(int16_t ) = " << sizeof(int16_t ) << " with typeid(int16_t ).name(): " << typeid(int16_t ).name()  
             << "\nsizeof(uint32_t) = " << sizeof(uint32_t) << " with typeid(uint32_t).name(): " << typeid(uint32_t).name()  
             << "\nsizeof(int32_t ) = " << sizeof(int32_t ) << " with typeid(int32_t ).name(): " << typeid(int32_t ).name()  
             << "\nsizeof(int     ) = " << sizeof(int     ) << " with typeid(int     ).name(): " << typeid(int     ).name()  
             << "\nsizeof(float   ) = " << sizeof(float   ) << " with typeid(float   ).name(): " << typeid(float   ).name()  
             << "\nsizeof(double  ) = " << sizeof(double  ) << " with typeid(double  ).name(): " << typeid(double  ).name()  
+            << "\nsizeof(short   ) = " << sizeof(short   ) << " with typeid(short   ).name(): " << typeid(short   ).name()  
             << "\n\n";
 }
 
@@ -158,8 +160,10 @@ defineImageShape(PSEvt::Event& evt, const PSEvt::Source& src, const std::string&
   if ( defineImageShapeForType<uint32_t>(evt, src, key, shape) ) return;
   if ( defineImageShapeForType<uint16_t>(evt, src, key, shape) ) return;
   if ( defineImageShapeForType<uint8_t> (evt, src, key, shape) ) return;
+  if ( defineImageShapeForType<int16_t> (evt, src, key, shape) ) return;
+  if ( defineImageShapeForType<short>   (evt, src, key, shape) ) return;
 
-  const std::string msg = "Image shape is tested for double, uint16_t, int, float, uint8_t and is not defined in the event(...)\nfor source:" 
+  const std::string msg = "Image shape is tested for double, uint16_t, int, float, uint8_t, int16_t, short and is not defined in the event(...)\nfor source:" 
                         + boost::lexical_cast<std::string>(src) + " key:" + key + "\nEXIT psana...";
   MsgLogRoot(error, msg);
   throw std::runtime_error("EXIT psana...");

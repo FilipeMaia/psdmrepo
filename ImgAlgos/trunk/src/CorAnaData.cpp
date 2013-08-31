@@ -208,10 +208,16 @@ CorAnaData::saveCorTau(std::ostream& out)
 {
    m_log << "  ->  CorAnaData::saveCorTau(tau)";
 
+   cor_t gi, gf;
+
+   m_notzero = 1; // !!!!!!!!!!!!!!!! HADRWIRED
+
    for(unsigned pix=0; pix<m_blk_size; pix++) {
        if(m_sum_st[pix]<1) continue;
-       m_cor_gi[pix] = cor_t( m_sum_gi[pix] / m_sum_st[pix] ); 
-       m_cor_gf[pix] = cor_t( m_sum_gf[pix] / m_sum_st[pix] ); 
+       gi = cor_t( m_sum_gi[pix] / m_sum_st[pix] ); 
+       gf = cor_t( m_sum_gf[pix] / m_sum_st[pix] ); 
+       m_cor_gi[pix] = (gi<m_notzero) ? m_notzero : gi; 
+       m_cor_gf[pix] = (gf<m_notzero) ? m_notzero : gf; 
        m_cor_g2[pix] = cor_t( m_sum_g2[pix] / m_sum_st[pix] ); 
    }
 

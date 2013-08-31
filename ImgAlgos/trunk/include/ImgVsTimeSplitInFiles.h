@@ -71,6 +71,7 @@ public:
 
   //typedef unsigned data_split_t;
   //typedef uint16_t data_split_t;
+  //typedef double data_split_t;
   typedef float data_split_t;
 
 

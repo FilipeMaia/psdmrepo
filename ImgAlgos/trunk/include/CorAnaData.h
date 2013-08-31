@@ -85,6 +85,8 @@ private:
   cor_t*      m_cor_gf;
   cor_t*      m_cor_g2;
 
+  cor_t       m_notzero;
+
   TimeInterval* m_timer1;
 
   // Copy constructor and assignment are disabled by default
