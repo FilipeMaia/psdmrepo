@@ -52,7 +52,8 @@ CSPad2x2CalibPars::CSPad2x2CalibPars (bool isTestMode)
     // Test staff:
     m_isTestMode = isTestMode;
     if (m_isTestMode) {
-        m_calibdir      = "/reg/d/psdm/mec/mec73313/calib";
+      //m_calibdir      = "/reg/d/psdm/mec/mec73313/calib";
+        m_calibdir      = "/reg/d/psdm/xpp/xpptut13/calib";
         m_calibfilename = "0-end.data";
     }
 
@@ -63,10 +64,9 @@ CSPad2x2CalibPars::CSPad2x2CalibPars (bool isTestMode)
 
 //----------------
 
-
-CSPad2x2CalibPars::CSPad2x2CalibPars ( const std::string&   calibDir,      //  /reg/d/psdm/cxi/cxi35711/calib
-                                       const std::string&   typeGroupName, //  CsPad::CalibV1
-                                       const std::string&   source,        //  CxiDs1.0:Cspad.0
+CSPad2x2CalibPars::CSPad2x2CalibPars ( const std::string&   calibDir,      //  "/reg/d/psdm/xpp/xpptut13/calib"
+                                       const std::string&   typeGroupName, //  "CsPad2x2::CalibV1"
+                                       const std::string&   source,        //  "XppGon.0:Cspad2x2.1"
                                        const unsigned long& runNumber )    //  10
   : m_calibDir(calibDir)
   , m_typeGroupName(typeGroupName)
@@ -85,8 +85,8 @@ CSPad2x2CalibPars::CSPad2x2CalibPars ( const std::string&   calibDir,      //  /
 
 //----------------
 
-CSPad2x2CalibPars::CSPad2x2CalibPars ( const std::string&   calibDir,      //  /reg/d/psdm/cxi/cxi35711/calib
-                                       const std::string&   typeGroupName, //  CsPad::CalibV1
+CSPad2x2CalibPars::CSPad2x2CalibPars ( const std::string&   calibDir,      //  "/reg/d/psdm/xpp/xpptut13/calib"
+                                       const std::string&   typeGroupName, //  "CsPad2x2::CalibV1"
                                        const Pds::Src&      src,           //  Pds::Src m_src; <- is defined in get(...,&m_src)
                                        const unsigned long& runNumber )    //  10
   : m_calibDir(calibDir)

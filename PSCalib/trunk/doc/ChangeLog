@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-10
+2013-08-30 Mikhail S. Dubrovin
+- in ex_cspad2x2_calib_pars.cpp and src/CSPad2x2CalibPars.cpp switch to /tutXXX directory for examples
+
 Tag: V00-01-09
 2013-06-07 Mikhail S. Dubrovin
 - improve interface for CSPadCalibPars and CSPad2x2CalibPars constructor
