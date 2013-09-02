@@ -187,6 +187,8 @@ O2OHdf5Writer::eventStart ( const Pds::Dgram& dgram )
                 
         // reset content of the special configuration store
         m_configStore0.clear();
+      } else {
+        skip = true;
       }
       break ;
 
@@ -197,6 +199,8 @@ O2OHdf5Writer::eventStart ( const Pds::Dgram& dgram )
         this->closeGroup( dgram, CalibCycle ) ;
         this->closeGroup( dgram, Running ) ;
         this->closeGroup( dgram, Configured ) ;
+      } else {
+        skip = true;
       }
       break ;
 
@@ -215,6 +219,8 @@ O2OHdf5Writer::eventStart ( const Pds::Dgram& dgram )
           m_reopen = false;
         }
         this->openGroup( dgram, Running ) ;
+      } else {
+        skip = true;
       }
       break ;
 
@@ -224,6 +230,8 @@ O2OHdf5Writer::eventStart ( const Pds::Dgram& dgram )
         // close all states up to Configured
         this->closeGroup( dgram, CalibCycle ) ;
         this->closeGroup( dgram, Running ) ;
+      } else {
+        skip = true;
       }
       break ;
 
@@ -243,6 +251,8 @@ O2OHdf5Writer::eventStart ( const Pds::Dgram& dgram )
           m_reopen = false;
         }
         this->openGroup( dgram, CalibCycle ) ;
+      } else {
+        skip = true;
       }
       break ;
 
@@ -253,6 +263,8 @@ O2OHdf5Writer::eventStart ( const Pds::Dgram& dgram )
         this->closeGroup( dgram, CalibCycle ) ;
         m_reopen = m_split == SplitScan;
         ++ m_serialScan;
+      } else {
+        skip = true;
       }
 
       break ;
