@@ -11,6 +11,12 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-28-14
+2013-09-02 Andy Salnikov
+- config object in non-L1Accept transitions are stored as calars even if they 
+  come from BLD
+- bumped schema version to 3
+
 Tag: V00-28-13
 2013-09-01 Andy Salnikov
 - skip duplicated control transitions

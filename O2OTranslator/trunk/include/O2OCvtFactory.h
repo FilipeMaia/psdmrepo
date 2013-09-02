@@ -27,6 +27,7 @@
 //-------------------------------
 #include "O2OTranslator/CvtOptions.h"
 #include "O2OTranslator/DataTypeCvtI.h"
+#include "pdsdata/xtc/TransitionId.hh"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -75,9 +76,9 @@ public:
    *  @brief Return the list of converters for given arguments.
    *
    *  Find or create converters (there may be any number of those) for a given
-   *  combination of group, type, and source.
+   *  combination of group, type, source, and transition type.
    */
-  DataTypeCvtList getConverters(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src src);
+  DataTypeCvtList getConverters(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src src, Pds::TransitionId::Value transition);
 
   /**
    *  @brief Notify factory that the group is about to be closed.
@@ -90,7 +91,7 @@ public:
 private:
 
   // Instantiate all converters for given triplet
-  DataTypeCvtList makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src src);
+  DataTypeCvtList makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src src, Pds::TransitionId::Value transition);
 
   // helper class for ordering (TypeId, Src) combination
   typedef std::pair<Pds::TypeId, Pds::Src> TypeAndSource;

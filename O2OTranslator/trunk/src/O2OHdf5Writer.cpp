@@ -86,7 +86,7 @@ namespace {
 
 
   // schema version number for the file structure
-  int _fileSchemaVersion = 2;
+  int _fileSchemaVersion = 3;
 }
 
 //		----------------------------------------
@@ -464,7 +464,7 @@ O2OHdf5Writer::dataObject(const void* data, size_t size, const Pds::TypeId& type
 
   // find this type in the converter map, there is no converter for EpicsConfig,
   // it is handled internally by regular epics converter
-  const O2OCvtFactory::DataTypeCvtList& cvts = m_cvtFactory.getConverters(m_groups.top(), typeId, src.top());
+  const O2OCvtFactory::DataTypeCvtList& cvts = m_cvtFactory.getConverters(m_groups.top(), typeId, src.top(), m_transition);
   if (cvts.empty() and typeId.id() != Pds::TypeId::Id_EpicsConfig) {
     MsgLog(logger, error, "O2OHdf5Writer::dataObject -- unexpected type or version: "
         << Pds::TypeId::name(typeId.id()) << "/" << typeId.version());
