@@ -52,6 +52,18 @@ namespace CSPadPixCoords {
  *  @li geometry calibration parameters
  *  @li detector configuration parameters
  *  
+ *  
+ *  @li Set of modules for CSPAD
+ *  \n PSCalib/CSPadCalibPars
+ *  \n CSPadPixCoords/CSPadConfigPars
+ *  \n CSPadPixCoords/PixCoordsV2
+ *  \n CSPadPixCoords/PixCoordsCSPadV2
+ *  
+ *  
+ *  @li Set of modules for CSPAD2x2
+ *  \n PSCalib/CSPad2x2CalibPars
+ *  \n CSPadPixCoords/PixCoords2x1V2
+ *  \n CSPadPixCoords/PixCoordsCSPad2x2V2
  */
 
 

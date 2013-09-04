@@ -11,10 +11,18 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-07
+2013-09-03 Mikhail S. Dubrovin
+- work in progress on doxygen documentation of
+       include/PixCoordsCSPad2x2V2.h
+       include/PixCoordsCSPadV2.h
+       include/CSPadConfigPars.h
+       include/PixCoords2x1V2.h
+
 Tag: V00-03-06
 2013-08-30 Mikhail S. Dubrovin
 - add new classes PixCoordsCSPadV2, CSPadConfigPars
-- add new test modulesex_PixCoordsCSPadV2.cpp ex_CSPadConfigPars.cpp
+- add new test modules ex_PixCoordsCSPadV2.cpp ex_CSPadConfigPars.cpp
 - work in progress for doxygen documentation
 	
 Tag: V00-03-05

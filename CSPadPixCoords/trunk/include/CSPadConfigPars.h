@@ -64,34 +64,39 @@ namespace CSPadPixCoords {
  *  @endcode
  *  
  *  @li  Instatiation\n
- *  Default constructor
+ *  Default constructor; may be used if all 32 2x1 are in working condition and are presented in data
  *  @code
  *      CONFIG* config = new CONFIG (); 
  *  @endcode
  *  \n
- *  Constructor from specified data source (DetInfo)
+ *  Constructor from specified data source, defined in psana. Prefered use case of this class objects.
  *  @code
  *      CONFIG* config = new CONFIG ("DetInfo(CxiDs1.0:Cspad.0)");
  *  @endcode
+ *  In this case configuration parameters need to be defined in psana module overloding methods like
+ *  @code
+ *      virtual void beginRun(PSEvt::Event& evt, PSEnv::Env& env); 
+ *      virtual void beginCalibCycle(PSEvt::Event& evt, PSEnv::Env& env); 
+ *      // or
+ *      virtual void event(PSEvt::Event& evt, PSEnv::Env& env); 
+ *  @endcode
+ *  from the PSEvt::Event and PSEnv::Env variables using method
+ *  @code
+ *      config -> setCSPadConfigPars (evt, env); 
+ *      // or its separate sub-methods
+ *      config -> setCSPadConfigParsFromEnv (env); 
+ *      config -> setCSPadConfigParsFromEvent (evt); 
+ *  @endcode
  *  \n
- *  Constructor from explicitly defened configuration parameters
+ *  Constructor from explicitly defined configuration parameters. It is not recommended to use. Can be used for stable non-complete configuration of the detector or for test purpose.
  *  @code
  *      uint32_t numQuads     = 4;                
  *      uint32_t quadNumber[] = {0, 1, 2, 3};      
- *      uint32_t roiMask[]    = {0377, 0377, 0377, 0377}; // or in decimal {255, 255, 255, 255}
+ *      uint32_t roiMask[]    = {0377, 0377, 0377, 0377};
  *      CONFIG* config = new CSPadConfigPars::CSPadConfigPars ( numQuads, quadNumber, roiMask );
  *  @endcode
  *  
  *  
- * @li  Get configuration parameters for event and environment variables and save them in member data:
- *  @code
- *      config -> setCSPadConfigPars (PSEvt::Event& evt, PSEnv::Env& env); 
- *  // or separately 
- *      config -> setCSPadConfigParsFromEnv (env); 
- *      config -> setCSPadConfigParsFromEvent (evt); 
- *  @endcode
- *  
- * 
  * @li  Print current configuration parameters
  *  @code
  *      config -> printCSPadConfigPars();
@@ -111,13 +116,13 @@ namespace CSPadPixCoords {
  * Conversion from (32,185,388) to (N,185,388)
  * @code
  *     ndarray<double,3> nda_det  = make_ndarray (p_pix_arr_det, N2X1_IN_DET, ROWS2X1, COLS2X1);
- *     ndarray<double,3> nda_data = cspad_configpars -> getCSPadPixNDArrShapedAsData <double> ( nda_det );
+ *     ndarray<double,3> nda_data = cspad_configpars -> getCSPadPixNDArrShapedAsData<double> ( nda_det );
  * @endcode
  *  \n 
  * Conversion from (N,185,388) to (32,185,388)
  * @code
  *     ndarray<double,3> nda_data = make_ndarray (p_pix_arr_data, N2X1_IN_DATA, ROWS2X1, COLS2X1); 
- *     ndarray<double,3> nda_det  = cspad_configpars -> getCSPadPixNDArrFromNDArrShapedAsData <double> ( nda_data ); 
+ *     ndarray<double,3> nda_det  = cspad_configpars -> getCSPadPixNDArrFromNDArrShapedAsData<double> ( nda_data ); 
  * @endcode
  * 
  *  @version \$Id:$
