@@ -1,0 +1,99 @@
+/**
+
+@defgroup h5tools h5tools - for working with hdf5 files without psana
+
+h5tools is a lightweight package for users to use outside of LCSL to
+work with LCLS hdf5 files using standard tools such as h5py or Matlab.
+Psana users should find little need for this package as Psana provides
+software specifically to work with the data in the LCLS files (xtc or hdf5).
+
+@section Introduction
+
+We have found issues with two high level tools (Matlab and h5py) used for working with the hdf5 files produced at LCSL. Below we discuss issues users have faced with these tools and how to use code in this package to work around these problems. This is a discussion of the high level interface to these tools. Both Matlab and h5py also provide a low level interface to the Hdf5 library that is very close to the C API provided by the hdf5 group. One can always drop down to this interface for complete access to an hdf5 file.
+
+@section Issues
+
+Our datasets are almost always organized as one dimensional arrays of a compound type. In hdfview (a useful tool for viewing hdf5 files provided by the hdf5 group) they often look like two dimensional arrays, but the columns are really the field names of the compound type. When you read a dataset in with the Matlab function h5read each field is separated into its own 1D array.  For instance, if the dataset looks like
+
+@code
+    fieldA  fieldB
+    101     23.3
+    110     99.1
+    784     13.3
+@endcode
+In hdfview, Matlab, will return a Matlab struct with two attributes:
+@code
+dataset =
+
+      fieldA: [3x1 uint16]
+      fieldB: [3x1 float32]
+@endcode
+In contrast, h5py will return a  numpy array (with extra metadata attached) that is closer to the original hdf5 layout.  It will be a 1D array with a numpy.dtype of [('fieldA',numpy.uint2),('fieldB',numpy.float4)].  It will look like a 2D array when you print it, and you can use the field names to access data in the array.
+
+One deficiency these tools have is working with enums.  We use enumerated types for some of our fields.  These are well defined objects in hdf5 files that map closely to the C data type.  They are efficiently stored as integers, and the symbolic names are in the type information of the dataset. A good high level tool should provide a way to print the symbolic names when users explore the data.  Tools that the hdf5 group provides do this, namely h5ls, h5dump and hdfview.  However hdfview fails to do this for enums that are 'deeply nested', such as one we have in our Ipimb::Config data.
+
+When you are using tools to do calculations with the data, you may want to use the integer representations for efficiency. However in practice with our data, enumerations most always appear in configuration information for the detectors as opposed to the data collected, and do not comprise a large part of the data.
+
+
+
+@section Matlab
+
+When a Matlab user loads a dataset with h5read that is an array of enums, it returns a cell array of strings - so the user can work with the strings. However Matlab (as of version 2013b) fails to do this with our datasets where the enum is a field within a compound type. We have made Matlab aware of this problem and they understand the issue. Users for which enum to string translation is an important feature should feel free to contact Matlab and reference the Service request: 1-O0DQBH, enum field in compound type of hdf5, that we have made.
+
+In the meantime, Matlab has provided some workaround code that we have reworked into a function users can use. Take the following file from this package:
+@code
+h5tools/src/translate_enums.m 
+@endcode
+add it to a directory in your Matlab search path, and call the function translate_enums in order to have the enum field translated into a string field.  One would use this as follows:
+@code
+filename='somefile.h5';
+datasetname='/path/to/dataset';
+ds = h5read(filename,datasetname);
+ds = translate_enums(ds, filename, datasetname);
+@endcode
+
+If ds is a dataset whose base type is a compound type, translate_enums will replace fields that are enums with their string counterparts.  For example, suppose one had
+
+@code
+  ds
+     field1  [3x1 int16]
+     field2  [3x1 float32]
+@endcode
+
+where field1 was for an enum ONE=1, TWO=2, THREE=3 and was the array [2,1,3]. Then the output of translate_enums will be
+@code
+ds
+  field1  {3x1 cell array}
+  field2  [3x1 float32]
+@endcode
+where field1 is now
+@code
+{ 'TWO', 'ONE', 'THREE' }
+@endcode
+
+@section h5py
+
+H5py provides access to a python dictionary that translates enums to strings however it can be awkward to use and manipulate.  This is particularly true for Ipimb::Config data where we use an array of enum as a field.&nbsp; An extra step is required to pull out the dictionary in this case.
+
+The second deficiency that h5py has is working with variable length data (vlen data). Our EvrData includes vlen data.  We have addressed this by adding read access to vlen data to our version of h5py. We have submitted our patch to the h5py team and support for vlen data is something they plan to add in the future. If this is an important feature to you, consider participating in the h5py user forums.
+
+A minor issue is that users may prefer the Matlab style organization of a compound type, where each column of the compound dataset is stored in a separate field.
+
+To address these issues, either import this package, h5tools (if working at LCLC), or put the file
+@code
+h5tools/src/h5pyds.py
+@endcode
+in your Python search path and import it. This code provides the functions
+
+@code
+tablePrint - prints a tabular view of the dataset
+
+flds2attrs - returns an object where each field of the compound type is a
+             separate attribute.
+@endcode
+
+See further documentation and examples in the h5pyds.py file.
+
+
+
+*/
