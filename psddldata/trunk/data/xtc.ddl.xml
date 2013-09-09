@@ -60,6 +60,34 @@
 
         </pstype>
         
+        <!-- ========================================================================= -->
+    
+        <pstype name="SrcAlias">
+
+            <tag name="no-sizeof"/>
+            <tag name="value-type"/>
+        
+            <attribute name="_log" type="uint32_t" accessor="log">
+            </attribute>
+
+            <attribute name="_phy" type="uint32_t" accessor="phy">
+            </attribute>
+
+            <attribute name="_aliasName" type="char" shape="32" accessor="aliasName" shape_method="None">
+            </attribute>
+
+            <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="auto"/>
+                <tag name="inline"/>
+            </ctor>
+
+        </pstype>
+        
                 
     </package>
 </psddl>

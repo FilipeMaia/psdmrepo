@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE psddl SYSTEM "psddl.dtd">
+
+<psddl>
+
+    <use file="psddldata/xtc.ddl.xml" 
+        cpp_headers="pdsdata/xtc/SrcAlias.hh"/>
+
+        <package name="Alias">
+    
+        <pstype name="ConfigV1" version="1" type_id="Id_AliasConfig">
+        
+            <tag name="config-type"/>
+
+            <attribute name="_numSrcAlias" type="uint32_t" accessor="numSrcAlias">
+                Number of alias definitions
+            </attribute>
+            
+            <attribute name="_srcAlias" type="Pds.SrcAlias"
+                shape="{self}.numSrcAlias()" accessor="srcAlias" shape_method="srcAlias_shape">
+                SrcAlias configuration objects
+            </attribute>
+
+            <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="auto"/>
+            </ctor>
+
+        </pstype>
+        
+    </package>
+    
+</psddl>
