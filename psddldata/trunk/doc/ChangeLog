@@ -11,6 +11,15 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-33
+2013-09-13 Matt Weaver
+- add auto-constructors for more config types 
+- add some special constructors for non-config types
+- new alias::ConfigV1 type
+- add xtc/SrcAlias class definition (included by alias definition)
+- new BldEBeamV4 version
+- results installed in pdsdata/psddl V07-00-00	
+	
 Tag: V00-04-32
 2013-08-26 Andy Salnikov
 - add auto-constructors for for EPICS types
