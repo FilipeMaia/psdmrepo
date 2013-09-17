@@ -8,6 +8,7 @@
 
 import os
 import sys
+import types
 from pprint import *
 from os.path import join as pjoin
 
@@ -60,6 +61,9 @@ def standardSConscript( **kw ) :
         CCFLAGS - additional flags passed to C/C++ compilers
         NEED_QT - set to True to enable Qt support
         PHPDIR - either string or dictionary, will link directory to arch/../php/ area
+        DOCGEN   - if this is is a string or list of strings then it should be name(s) of document 
+                   generators, otherwise it is a dict with generator name as key and a list of 
+                   file/directory names as values (may also be a string).
     """
 
     pkg = _getpkg ( kw )
@@ -85,6 +89,23 @@ def standardSConscript( **kw ) :
     standardScripts( env, **ukw )
     standardBins ( env, **ukw )
     standardTests ( env, **ukw )
+
+    docgen = kw.get('DOCGEN', 'doxy-all')
+    if isinstance(docgen, types.StringTypes):
+        # string may contain a list of names
+        docgen = docgen.split()
+    if isinstance(docgen, types.ListType):
+        # make dict out of list, value is package name
+        docgen = dict([(k, pkg) for k in docgen])
+    for gen, dir in docgen.items():
+        if dir:
+            env = DefaultEnvironment()
+            if isinstance(dir, types.StringTypes):
+                # string may contain a list of names
+                dir = dir.split()
+            for d in dir:
+                d = env.subst(d)
+                env['DOC_TARGETS'].setdefault(gen, []).append(d)
 
 #
 # Process include/ directory, run moc on any include file which contains Q_OBJECT

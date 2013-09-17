@@ -118,6 +118,9 @@ def standardExternalPackage(package, **kw) :
         DEPS     - names of other packages that we depend upon
         PKGINFO  - package information, such as RPM package name
         OPTIONAL - If true then missing directories do not cause build errors
+        DOCGEN   - if this is is a string or list of strings then it should be name(s) of document 
+                   generators, otherwise it is a dict with generator name as key and a list of 
+                   file/directory names as values (may also be a string).
     """
 
     pkg = os.path.basename(os.getcwd())
@@ -276,3 +279,25 @@ def standardExternalPackage(package, **kw) :
         env['EXT_PACKAGE_INFO'].setdefault(package, []).append(pkginfo)
         trace("pkginfo: %s" % (pkginfo,), "standardExternalPackage", 4)
         trace("EXT_PACKAGE_INFO: %s" % env['EXT_PACKAGE_INFO'], "standardExternalPackage", 4)
+
+
+    #
+    # update 'DOC_TARGETS' in default environment if DOCGEN is specified
+    #
+    docgen = kw.get('DOCGEN')
+    if docgen:
+        if isinstance(docgen, types.StringTypes):
+            # string may contain a list of names
+            docgen = docgen.split()
+        if isinstance(docgen, types.ListType):
+            # make dict out of list, value is package name
+            docgen = dict([(k, pkg) for k in docgen])
+        for gen, dir in docgen.items():
+            if dir:
+                env = DefaultEnvironment()
+                if isinstance(dir, types.StringTypes):
+                    # string may contain a list of names
+                    dir = dir.split()
+                for d in dir:
+                    d = env.subst(d)
+                    env['DOC_TARGETS'].setdefault(gen, []).append(d)

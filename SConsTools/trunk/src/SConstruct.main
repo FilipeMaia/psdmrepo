@@ -202,19 +202,27 @@ env.AlwaysBuild('package-dependencies-reverse')
 # Additional targets for documentation generation
 #
 docTargets = []
-if 'doctools' in packages:
-    docTargets.append(env.Command('doc/doxy-all/html/index.html', env.Dir('doctools'), "doxy-driver -p 'PSDM Software' doc/doxy-all/ doctools/doc/mainpage.dox-main " +' '.join(packages)))
-if 'psddl' in packages:
-    docTargets.append(env.Command('doc/psddl_psana/index.html', env.Dir('psddl'), "ddl_psanadoc doc/psddl_psana/"))
-if 'psana' in packages:
-    docTargets.append(env.Command('doc/psana-doxy/html/index.html', env.Dir('psana'), "doxy-driver -m psana doc/psana-doxy/"))
-    docTargets.append(env.Command('doc/psana-modules-doxy/html/index.html', env.Dir('psana'), "doxy-driver -m psana-modules doc/psana-modules-doxy/"))
-    docTargets.append(env.Command('doc/psana-ref/html/index.html', env.Dir('psana'), "pydoc-driver -p psana -Q doc/psana-ref/html psana"))
-if 'pyana' in packages:
-    docTargets.append(env.Command('doc/pyana-ref/html/index.html', env.Dir('pyana'), "pydoc-driver -p pyana -Q doc/pyana-ref/html pyana _pdsdata pypdsdata"))
+if 'doxy-all' in env['DOC_TARGETS']:
+    sources = env['DOC_TARGETS']['doxy-all']
+    docTargets.append(env.Command('doc/doxy-all/html/index.html', [], "doxy-driver -p 'PSDM Software' doc/doxy-all/ " + ' '.join(sources)))
+if 'psana-doxy' in env['DOC_TARGETS']:
+    sources = env['DOC_TARGETS']['psana-doxy']
+    docTargets.append(env.Command('doc/psana-doxy/html/index.html', [], "doxy-driver -p 'PSANA classes' doc/psana-doxy/ " + ' '.join(sources)))
+if 'psana-modules-doxy' in env['DOC_TARGETS']:
+    sources = env['DOC_TARGETS']['psana-modules-doxy']
+    docTargets.append(env.Command('doc/psana-modules-doxy/html/index.html', [], "doxy-driver -p 'PSANA modules' doc/psana-modules-doxy/ " + ' '.join(sources)))
+if 'psana-ref' in env['DOC_TARGETS']:
+    sources = env['DOC_TARGETS']['psana-ref']
+    docTargets.append(env.Command('doc/psana-ref/html/index.html', [], "pydoc-driver -p psana -Q doc/psana-ref/html "+ ' '.join(sources)))
+if 'pyana-ref' in env['DOC_TARGETS']:
+    sources = env['DOC_TARGETS']['pyana-ref']
+    docTargets.append(env.Command('doc/pyana-ref/html/index.html', [], "pydoc-driver -p pyana -Q doc/pyana-ref/html "+ ' '.join(sources)))
+if 'psddl_psana' in env['DOC_TARGETS']:
+    # this command does not actually need any input
+    docTargets.append(env.Command('doc/psddl_psana/index.html', [], "ddl_psanadoc doc/psddl_psana/"))
 env.Alias('doc', docTargets)
 
-#trace( "Build env = "+pformat(env.Dictionary()), "<top>", 7 )
+trace( "Build env = "+pformat(env.Dictionary()), "<top>", 7 )
 trace("BUILD_TARGETS is " + pformat(map(str, BUILD_TARGETS)), "<top>", 1)
 trace("DEFAULT_TARGETS is " + pformat(map(str, DEFAULT_TARGETS)), "<top>", 1)
 trace("COMMAND_LINE_TARGETS is " + pformat(map(str, COMMAND_LINE_TARGETS)), "<top>", 1)

@@ -130,7 +130,8 @@ def buildEnv () :
                 ALL_TARGETS={},
                 CXXFILESUFFIX=".cpp",
                 EXT_PACKAGE_INFO = {},
-                SCRIPT_SUBS = {}
+                SCRIPT_SUBS = {},
+                DOC_TARGETS = {}
                 )
 
     # location of the tools

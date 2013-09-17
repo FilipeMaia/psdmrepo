@@ -11,6 +11,19 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-09-12
+2013-09-17 Andy Salnikov
+- change how doc target works, packages now decide for themselves to which
+  document generator they want to be added (through DOCGEN parameter)
+- default env now has 'DOC_TARGETS' key which points to a dictionary
+  mapping generator name to list of files or directories (strings, not
+  targets).
+- standardSConscript and standardExternalPackage are both modified to update
+  env['DOC_TARGETS'] based on the value of DOCGEN passed to them
+- default (when DOCGEN is not specified) is for standardSConscript() to add
+  its package to env['DOC_TARGETS']['doxy-all'] and for 
+  standardExternalPackage() to do nothing
+
 Tag: V00-09-11
 2013-08-13 Andy Salnikov
 - one more place needed default env instead of package env
