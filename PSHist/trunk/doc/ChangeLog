@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-01
+2013-09-17 Andy Salnikov
+- documentation generation changed in SConsTools, updating SConscript
+
 Tag: V00-03-00
 2012-07-24 Andy Salnikov
 - moved trunk to branch version1
