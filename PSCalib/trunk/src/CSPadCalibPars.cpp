@@ -19,6 +19,7 @@
 // C/C++ Headers --
 //-----------------
 #include <iostream>
+#include <iomanip>  // for std::setw
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -78,6 +79,7 @@ CSPadCalibPars::CSPadCalibPars ( const std::string&   calibDir,           //  /r
     fillCalibNameVector ();
     loadCalibPars ();
 
+    MsgLog("CSPadCalibPars", info, "Depricated constructor with string& source");
     printInputPars ();
     //printCalibPars();
 }
@@ -99,6 +101,7 @@ CSPadCalibPars::CSPadCalibPars ( const std::string&   calibDir,           //  /r
     fillCalibNameVector ();
     loadCalibPars ();
 
+    MsgLog("CSPadCalibPars", info, "Regular constructor with Pds::Src& src, hence m_source is empty...");
     printInputPars ();
     //printCalibPars();
 }
@@ -137,6 +140,7 @@ void CSPadCalibPars::loadCalibPars ()
         if (m_fname == std::string()) { 
 	  fillDefaultCalibParsV1 ();
           msgUseDefault ();
+          m_calibtype_status[m_cur_calibname] = 0; 
         } 
         else 
         {
@@ -144,6 +148,7 @@ void CSPadCalibPars::loadCalibPars ()
 	  readCalibPars   ();
 	  closeCalibFile  ();
 	  fillCalibParsV1 ();
+          m_calibtype_status[m_cur_calibname] = 1; 
 	}
       }
 }
@@ -311,6 +316,24 @@ void CSPadCalibPars::printInputPars()
       str << "\n m_typeGroupName = " << m_typeGroupName ;
       str << "\n m_source        = " << m_source ;
       str << "\n m_runNumber     = " << m_runNumber ;
+    }        
+}
+
+//----------------
+
+void CSPadCalibPars::printCalibParsStatus ()
+{
+    WithMsgLog("CSPadCalibPars", info, str) {
+      str << "printCalibParsStatus()" ;
+
+      for( vector<std::string>::const_iterator iterCalibName  = v_calibname.begin();
+                                               iterCalibName != v_calibname.end(); iterCalibName++ )
+      {
+          m_cur_calibname = *iterCalibName;
+
+          str << "\n type: "  << std::left << std::setw(20) << m_cur_calibname
+              << " status = " << m_calibtype_status[m_cur_calibname]; 
+      }
     }        
 }
 

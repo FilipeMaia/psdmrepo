@@ -40,9 +40,10 @@ int main ()
 
   cout << "Test of PSCalib::CSPad2x2CalibPars\n";     
 
-  PSCalib::CSPad2x2CalibPars *cspad_calibpars = new PSCalib::CSPad2x2CalibPars(calibDir, groupName, source, runNumber);  
+  PSCalib::CSPad2x2CalibPars *calibpars = new PSCalib::CSPad2x2CalibPars(calibDir, groupName, source, runNumber);  
 
-  cspad_calibpars->printCalibPars();
+  calibpars->printCalibPars();
+  calibpars->printCalibParsStatus();
 
   return 0;
 }

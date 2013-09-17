@@ -19,6 +19,7 @@
 // C/C++ Headers --
 //-----------------
 #include <iostream>
+#include <iomanip>  // for std::setw
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -127,6 +128,7 @@ void CSPad2x2CalibPars::loadCalibPars ()
         if (m_fname == std::string()) { 
 	  fillDefaultCalibParsV1 ();
           msgUseDefault ();
+          m_calibtype_status[m_cur_calibname] = 0; 
         } 
         else 
         {
@@ -134,6 +136,7 @@ void CSPad2x2CalibPars::loadCalibPars ()
 	  readCalibPars   ();
 	  closeCalibFile  ();
 	  fillCalibParsV1 ();
+          m_calibtype_status[m_cur_calibname] = 1; 
 	}
       }
 }
@@ -268,6 +271,23 @@ void CSPad2x2CalibPars::printInputPars()
       str << "\n m_typeGroupName = " << m_typeGroupName ;
       str << "\n m_source        = " << m_source ;
       str << "\n m_runNumber     = " << m_runNumber ;
+    }        
+}
+
+//----------------
+
+void CSPad2x2CalibPars::printCalibParsStatus ()
+{
+    WithMsgLog("CSPad2x2CalibPars", info, str) {
+      str << "printCalibParsStatus()" ;
+
+      for( vector<std::string>::const_iterator iterCalibName  = v_calibname.begin();
+                                               iterCalibName != v_calibname.end(); iterCalibName++ )
+      {
+          m_cur_calibname = *iterCalibName;
+          str << "\n type: "  << std::left << std::setw(20) << m_cur_calibname
+              << " status = " << m_calibtype_status[m_cur_calibname]; 
+      }
     }        
 }
 

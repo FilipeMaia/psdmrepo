@@ -11,6 +11,12 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-12
+2013-09-17 Mikhail S. Dubrovin
+- improve doxigen documentation, add description of interfaces in CSPadCalibPars and CSPad2x2CalibPars
+- improve test modules test/ex_cspad_calib_pars.cpp and test/ex_cspad2x2_calib_pars.cpp
+- add methods for mapping of the calibration type status
+
 Tag: V00-01-11
 2013-09-17 Andy Salnikov
 - documentation generation changed in SConsTools, updating SConscript
