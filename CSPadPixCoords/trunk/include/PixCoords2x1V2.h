@@ -78,7 +78,7 @@ namespace CSPadPixCoords {
  *  2x1 sensor coordinate frame:
  * 
  *  @code
- *                     ^ Y          (Xmax,Ymax)
+ *    (Xmin,Ymax)      ^ Y          (Xmax,Ymax)
  *    (0,0)            |            (0,387)
  *       ------------------------------
  *       |             |              |
@@ -90,19 +90,18 @@ namespace CSPadPixCoords {
  *       |             |              |
  *       ------------------------------
  *    (184,0)          |           (184,387)
- *    (Xmin,Ymin)
+ *    (Xmin,Ymin)                  (Xmax,Ymin)
  *  @endcode
  *
- *  The (r,c)=(0,0) is in the top left corner of the matrix, has coordinates (Xmin,Ymax)
- *  Here we assume that 2x1 has 195 rows and 388 columns.
+ *  The (r,c)=(0,0) is in the top left corner of the matrix which has coordinates (Xmin,Ymax)
+ *  Here we assume that 2x1 has 185 rows and 388 columns.
  *  This assumption differs from the DAQ map, where rows and cols are interchanged:
  *  /reg/g/psdm/sw/external/lusi-xtc/2.12.0a/x86_64-rhel5-gcc41-opt/pdsdata/cspad/ElementIterator.hh,
  *  Detector.hh
  *   
- *   
- *   
- *  <h1>Interface Description</h1>
- *   
+ *  @anchor interface
+ *  @par<interface> Interface Description
+ * 
  *  @li  Include and typedef
  *  @code
  *  #include "CSPadPixCoords/PixCoords2x1V2.h"

@@ -14,6 +14,7 @@
 // This Class's Header --
 //-----------------------
 #include "CSPadPixCoords/PixCoordsCSPad.h"
+#include "CSPadPixCoords/PixCoordsCSPadV2.h"
 
 //-----------------
 // C/C++ Headers --
@@ -29,6 +30,8 @@
 //-----------------------------------------------------------------------
 
 using namespace std;
+
+typedef CSPadPixCoords::PixCoordsCSPadV2 PCV2;
 
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
@@ -52,9 +55,17 @@ PixCoordsCSPad::PixCoordsCSPad ( PixCoordsQuad *pix_coords_quad,  PSCalib::CSPad
   YCOOR = CSPadPixCoords::PixCoords2x1::Y;
   ZCOOR = CSPadPixCoords::PixCoords2x1::Z;
 
-  fillAllQuadCoordsInCSPad();
-  //setConstXYMinMax();
-  fillArrsOfCSPadPixCoords();
+
+  if (m_cspad_calibpar -> getCalibTypeStatus("center_global") == 1) {
+
+      cout << "PixCoordsCSPad:  CSPAD pixel coordinates are evaluated in PixCoordsCSPadV2 using center_global type of constants." << endl;
+      fillArrsOfCSPadPixCoordsFromCenterGlobal();
+
+  } else {
+
+      fillAllQuadCoordsInCSPad();
+      fillArrsOfCSPadPixCoords();
+  }
 }
 
 //--------------
@@ -199,6 +210,37 @@ void PixCoordsCSPad::fillArrsOfCSPadPixCoords()
 
 	  double coor_x_um = m_coor_x[quad][sect][col][row] - m_coor_x_min;
 	  double coor_y_um = m_coor_y[quad][sect][col][row] - m_coor_y_min;
+
+          m_coor_x     [quad][sect][col][row] = coor_x_um;
+          m_coor_y     [quad][sect][col][row] = coor_y_um;
+
+          m_coor_x_pix [quad][sect][col][row] = coor_x_um * PSCalib::CSPadCalibPars::getRowUmToPix();
+          m_coor_y_pix [quad][sect][col][row] = coor_y_um * PSCalib::CSPadCalibPars::getColUmToPix();
+
+          m_coor_x_int [quad][sect][col][row] = int (m_coor_x_pix [quad][sect][col][row] + 0.25);
+	  m_coor_y_int [quad][sect][col][row] = int (m_coor_y_pix [quad][sect][col][row] + 0.25);
+	}
+      }
+    }
+  }
+}
+
+//--------------
+
+void PixCoordsCSPad::fillArrsOfCSPadPixCoordsFromCenterGlobal()
+{
+  PCV2 *pix_coords_v2 = new PCV2(m_cspad_calibpar);  
+   
+  for (uint32_t quad=0; quad<NQuadsInCSPad; quad++) {
+    for (uint32_t sect=0; sect<N2x1InQuad;  sect++) {
+
+      uint32_t s = quad * N2x1InQuad + sect;
+
+      for (uint32_t row=0; row<NRows2x1;     row++) {
+        for (uint32_t col=0; col<NCols2x1;   col++) {
+
+	  double coor_x_um = pix_coords_v2 -> getPixCoor_um(PCV2::AXIS_X, s, col, row); // for V2: cols <-> rows
+	  double coor_y_um = pix_coords_v2 -> getPixCoor_um(PCV2::AXIS_Y, s, col, row); // for V2: cols <-> rows
 
           m_coor_x     [quad][sect][col][row] = coor_x_um;
           m_coor_y     [quad][sect][col][row] = coor_y_um;

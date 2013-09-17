@@ -40,7 +40,6 @@
 #include "PSEvt/Source.h"
 //#include "psddl_psana/cspad.ddl.h"
 
-
 //		---------------------
 // 		-- Class Interface --
 //		---------------------
@@ -57,10 +56,10 @@ namespace CSPadPixCoords {
  *  @brief CSPadImageProducer produces the CSPad image for each event and add it to the event in psana framework.
  *
  *  CSPadImageProducer works in psana framework. It does a few operation as follows:
- *  1) get the pixel coordinates from PixCoords2x1, PixCoordsQuad, and PixCoordsCSPad classes,
- *  2) get data from the event,
- *  3) produce the Image2D object with CSPad image for each event,
- *  4) add the Image2D object in the event for further modules.
+ *  \n 1) get the pixel coordinates from PixCoords2x1, PixCoordsQuad, and PixCoordsCSPad classes,
+ *  \n 2) get data from the event,
+ *  \n 3) produce the Image2D object with CSPad image for each event,
+ *  \n 4) add the Image2D object in the event for further modules.
  *
  *  Time consumed to fill the CSPad image array (currently [1750][1750]) 
  *  is measured to be about 40 msec/event on psana0105. 
@@ -88,10 +87,10 @@ public:
   enum { NRows2x1     = Psana::CsPad::MaxRowsPerASIC * 2 };  // 388
   enum { SizeOf2x1Arr = NRows2x1 * NCols2x1              };  // 185*388;
 
-  // Default constructor
+  /// Default constructor
   CSPadImageProducer (const std::string& name) ;
 
-  // Destructor
+  /// Destructor
   virtual ~CSPadImageProducer () ;
 
   /// Method which is called once at the beginning of the job
@@ -185,6 +184,8 @@ private:
   template <typename T>
   bool getQuadConfigParsForType(Env& env) {
 
+    //cout  << " Check configuration for source: " << m_source << endl;	     
+
         shared_ptr<T> config = env.configStore().get(m_source, &m_src);
         if (config.get()) {
             for (uint32_t q = 0; q < NQuadsMax; ++ q) {
@@ -229,12 +230,11 @@ private:
    * 
    * @param[in]  data            pointer to the beginning of the data array for quad.
    * @param[in]  quadpars        pointer to the object with configuration parameters for quad.
-   * @param[in]  cspad_calibpar  pointer to the object with geometry calibration parameters for CSPAD.
    * @param[out] img_nda         reference to the ndarray<T,2> with CSPAD image.
    */
   
   template <typename TIN, typename TOUT>
-  void cspadImageFillForType(const TIN* data, CSPadPixCoords::QuadParameters* quadpars, PSCalib::CSPadCalibPars* cspad_calibpar, ndarray<TOUT,2>& img_nda) 
+  void cspadImageFillForType(const TIN* data, CSPadPixCoords::QuadParameters* quadpars, ndarray<TOUT,2>& img_nda) 
   {
         int       quad    = quadpars -> getQuadNumber();
         uint32_t  roiMask = quadpars -> getRoiMask();
@@ -310,7 +310,7 @@ private:
             uint32_t qNum = el.quad() ;
             CSPadPixCoords::QuadParameters *quadpars = new CSPadPixCoords::QuadParameters(qNum, NX_QUAD, NY_QUAD, m_numAsicsStored[qNum], m_roiMask[qNum]);      
 
-            cspadImageFillForType<data_cspad_t, TOUT>(data_nda.data(), quadpars, m_cspad_calibpar, img_nda);
+            cspadImageFillForType<data_cspad_t, TOUT>(data_nda.data(), quadpars, img_nda);
         }
       
         //addImageInEventForType<double>(evt, &m_arr_cspad_image[0][0]);
@@ -351,7 +351,7 @@ private:
               uint32_t qNum = m_quadNumber[q]; 
               CSPadPixCoords::QuadParameters *quadpars = new CSPadPixCoords::QuadParameters(qNum, NX_QUAD, NY_QUAD, m_numAsicsStored[qNum], m_roiMask[qNum]);         
 
-              cspadImageFillForType<T,T>(data_quad, quadpars, m_cspad_calibpar, img_nda);        
+              cspadImageFillForType<T,T>(data_quad, quadpars, img_nda);        
               ind2x1_in_arr += m_num2x1Stored[q];
           }
         

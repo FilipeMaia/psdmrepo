@@ -63,7 +63,6 @@ public:
   enum { NCols2x1      = Psana::CsPad::ColumnsPerASIC     }; // 185
   enum { NRows2x1      = Psana::CsPad::MaxRowsPerASIC * 2 }; // 194*2 = 388
 
-  // Default constructor
   /**
    *  @brief PixCoordsCSPad class fills and provides access to the CSPad pixel coordinates.
    *  
@@ -74,7 +73,7 @@ public:
    */
   PixCoordsCSPad ( PixCoordsQuad *pix_coords_quad,  PSCalib::CSPadCalibPars *cspad_calibpar, bool tiltIsApplied = true ) ;
 
-  // Destructor
+  /// Destructor
   virtual ~PixCoordsCSPad () ;
 
   void fillAllQuadCoordsInCSPad() ;
@@ -83,8 +82,11 @@ public:
   void setConstXYMinMax() ;
   void fillArrsOfCSPadPixCoords() ;
 
+  /// Fill CSPAD pixel coordinate array using center_global type of constants from class PixCoordsCSPadV2
+  void fillArrsOfCSPadPixCoordsFromCenterGlobal() ;
+
   /**
-   *  Access methods return the CSPad pixel coordinate for indicated axis, quad, section, row, and column indexes.
+   *  @brief Access methods return the CSPad pixel coordinate for indicated axis, quad, section, row, and column indexes.
    *  The pixel coordinates can be returned in um(micrometers), pix(pixels), or int(integer pixel index).
    */
   double getPixCoor_um (CSPadPixCoords::PixCoords2x1::COORDINATE icoor, unsigned quad, unsigned sect, unsigned row, unsigned col) ;
@@ -92,12 +94,12 @@ public:
   double getPixCoor_int(CSPadPixCoords::PixCoords2x1::COORDINATE icoor, unsigned quad, unsigned sect, unsigned row, unsigned col) ;
 
   /**
-   *  The group of methods which provide the direct access to coordinate arrays.
+   *  @brief The group of methods which provide the direct access to coordinate arrays.
    */
-  double*    getPixCoorArrX_um (){return &m_coor_x    [0][0][0][0];}
-  double*    getPixCoorArrY_um (){return &m_coor_y    [0][0][0][0];}
-  double*    getPixCoorArrX_pix(){return &m_coor_x_pix[0][0][0][0];}
-  double*    getPixCoorArrY_pix(){return &m_coor_y_pix[0][0][0][0];}
+  double*   getPixCoorArrX_um (){return &m_coor_x    [0][0][0][0];}
+  double*   getPixCoorArrY_um (){return &m_coor_y    [0][0][0][0];}
+  double*   getPixCoorArrX_pix(){return &m_coor_x_pix[0][0][0][0];}
+  double*   getPixCoorArrY_pix(){return &m_coor_y_pix[0][0][0][0];}
   uint32_t* getPixCoorArrX_int(){return &m_coor_x_int[0][0][0][0];}
   uint32_t* getPixCoorArrY_int(){return &m_coor_y_int[0][0][0][0];}
 
@@ -114,23 +116,24 @@ private:
   PSCalib::CSPadCalibPars *m_cspad_calibpar;  
   bool                     m_tiltIsApplied;
 
-  double    m_coor_x    [NQuadsInCSPad][N2x1InQuad][NCols2x1][NRows2x1];
-  double    m_coor_y    [NQuadsInCSPad][N2x1InQuad][NCols2x1][NRows2x1];
-  double    m_coor_x_pix[NQuadsInCSPad][N2x1InQuad][NCols2x1][NRows2x1];
-  double    m_coor_y_pix[NQuadsInCSPad][N2x1InQuad][NCols2x1][NRows2x1];
+  double   m_coor_x    [NQuadsInCSPad][N2x1InQuad][NCols2x1][NRows2x1];
+  double   m_coor_y    [NQuadsInCSPad][N2x1InQuad][NCols2x1][NRows2x1];
+  double   m_coor_x_pix[NQuadsInCSPad][N2x1InQuad][NCols2x1][NRows2x1];
+  double   m_coor_y_pix[NQuadsInCSPad][N2x1InQuad][NCols2x1][NRows2x1];
   uint32_t m_coor_x_int[NQuadsInCSPad][N2x1InQuad][NCols2x1][NRows2x1];
   uint32_t m_coor_y_int[NQuadsInCSPad][N2x1InQuad][NCols2x1][NRows2x1];
 
-  double    m_xmin_quad [NQuadsInCSPad]; 
-  double    m_ymin_quad [NQuadsInCSPad]; 
+  double   m_xmin_quad [NQuadsInCSPad]; 
+  double   m_ymin_quad [NQuadsInCSPad]; 
 
   double m_coor_x_min;
   double m_coor_y_min;
   double m_coor_x_max;
   double m_coor_y_max;
 
-  // Copy constructor and assignment are disabled by default
+  /// Copy constructor is disabled by default
   PixCoordsCSPad ( const PixCoordsCSPad& ) ;
+  /// Assignment constructor is disabled by default
   PixCoordsCSPad& operator = ( const PixCoordsCSPad& ) ;
 
   enum { NX_CSPAD = 1750,   // Image sizes are used to get constant m_coor_y_max and m_coor_y_max 
