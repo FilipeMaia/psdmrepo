@@ -19,4 +19,6 @@ Import('*')
 #
 
 PYEXTMOD = "_pdsdata"
+DOCGEN={"doxy-all": "pypdsdata",
+        "pyana-ref": "pypdsdata _pdsdata"}
 standardSConscript( **locals() )
