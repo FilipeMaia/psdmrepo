@@ -1,0 +1,14 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  README file for package PSHist
+#------------------------------------------------------------------------
+
+Package author: Mikhail S. Dubrovin
+
+Brief description:
+==================
+
+Package which defines interfaces for histogramming services in psana.
