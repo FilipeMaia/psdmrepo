@@ -11,6 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V01-01-06
+2013-09-17 Andy Salnikov
+- ndarray will be installed in external area now, remove SConscript so
+  that package is not built in the nightly even if it is checked out
+- new ndarray_ext package will provide interface for external ndarray
+
 Tag: V01-01-05
 2013-08-15 Andy Salnikov
 - add makefile for building this for DAQ
