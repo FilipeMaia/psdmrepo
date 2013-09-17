@@ -1,0 +1,14 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  README file for package RootHistoManager
+#------------------------------------------------------------------------
+
+Package author: Andy Salnikov
+
+Brief description:
+==================
+
+Histogram manager for psana based on ROOT.
