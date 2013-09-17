@@ -64,7 +64,7 @@ class MaskEditor (QtGui.QWidget) :
     """Mask editor for 2d array"""
 
 
-    def __init__(self, parent=None, arr=None, xyc=None, ifname='', ofname='./fig.png', mfname='./roi-mask', title='Mask editor', lw=1, col='b', picker=8, verb=False):
+    def __init__(self, parent=None, arr=None, xyc=None, ifname='', ofname='./fig.png', mfname='./roi-mask', title='Mask editor', lw=1, col='b', picker=8, verb=False, ccd_rot=None, updown=None):
         """List of input parameters:
         @param parent  parent window is used to open other window moved w.r.t. parent.
         @param arr     2D array for image. If None then image will be taken from file or generated as random.
@@ -73,6 +73,8 @@ class MaskEditor (QtGui.QWidget) :
         @param ofname  default path to save plot of the graphical window.
         @param mfname  default path-prefix for newly created files with mask and shaping objects.
         @param title   Initial title of the window.
+        @param ccd_rot Orientation of the frame in N*90 degrees 0,90,180,270.
+        @param updown  (mirror) flip of the y coordinate True/false. 
         """
  
         #QtGui.QMainWindow.__init__(self, parent)
@@ -91,7 +93,10 @@ class MaskEditor (QtGui.QWidget) :
         self.ifname = ifname
         self.title  = title
         ccd_rot_n90 = int(cp.ccd_orient.value())
+        if ccd_rot != None : ccd_rot_n90 = ccd_rot
+
         y_is_flip   = cp.y_is_flip.value() # True
+        if updown != None : y_is_flip = updown
 
         self.widgimage   = imgwidg.PlotImgSpeWidget(parent, self.arr, ccd_rot_n90, y_is_flip)
         self.widgbuts    = imgbuts.PlotImgSpeButtons(self, self.widgimage, ifname, ofname, help_msg=self.help_message())

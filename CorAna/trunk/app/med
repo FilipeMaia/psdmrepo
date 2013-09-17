@@ -88,7 +88,9 @@ if __name__ == "__main__" :
             'lw'     : opts.lw, 
             'col'    : opts.col,
             'picker' : opts.picker,
-            'verb'   : opts.verb}
+            'verb'   : opts.verb,
+            'ccd_rot': None, 
+            'updown' : None}
 
     print 'Start MaskEditor with input parameters:'
     for k,v in pars.items():

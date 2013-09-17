@@ -11,6 +11,9 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2013-09-16 Mikhail S. Dubrovin
+- add 'ccd_rot' and 'updown' parameters in src/MaskEditor.py
+	
 2013-05-08 Mikhail S. Dubrovin
 Tag: V00-00-14
 - change initialization of matplotlib.use('Qt4Agg')
