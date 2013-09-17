@@ -6,6 +6,10 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V00-01-05
+2013-09-17 Andy Salnikov
+- documentation generation changed in SConsTools, updating SConscript
+
 Tag: V00-01-04
 2013-08-06 Andy Salnikov
 - small fix in pnccd.py, pylint discovered that _pdsdata is unknown
