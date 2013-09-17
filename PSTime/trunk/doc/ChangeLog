@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-08
+2013-09-17 Andy Salnikov
+- documentation generation changed in SConsTools, updating SConscript
+
 Tag: V00-01-07
 2013-03-22 Andy Salnikov
 - use uint32_t for nanoseconds in constructor arguments
