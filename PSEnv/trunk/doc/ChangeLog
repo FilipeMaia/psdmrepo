@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-11-03
+2013-09-17 Andy Salnikov
+- documentation generation changed in SConsTools, updating SConscript
+
 Tag: V00-11-02
 2013-03-27 Andy Salnikov
 - fix for EpicsStore pvnames() method to remove duplicate names
