@@ -2,27 +2,16 @@
 #
 # $Id$
 
-pack_psana="PSEnv PSEvt PSTime PSXtcInput PSShmemInput PSHist RootHistoManager MsgLogger IData ndarray psana psddl_psana psana/doc/mainpage.dox-main"
-pack_psana_mod="CSPadPixCoords PSCalib ImgPixSpectra cspad_mod psana_examples"
-
 usage() {
-  echo "Usage: $(basename $0) [options] output-dir [package ...]"
+  echo "Usage: $(basename $0) [options] output-dir package [...]"
   echo
   echo "Availabale options:"
   echo "    -h        print this message"
   echo "    -d        debug (turn on -x shell option)"
-  echo "    -m mode   use predefined mode"
   echo "    -p name   set project name"
-  echo
-  echo "Predefined modes:"
-  echo "   psana (default)"
-  echo "   psana-modules"
-  echo
-  echo "If the list of packages is provided then mode is ignored"
 }
 
 # default values for options
-mode="psana"
 project=""
 
 # get the options
@@ -30,31 +19,20 @@ while getopts hdm:p: c ; do
   case $c in
     h) usage ; exit 0 ;;
     d) set -x ;;
-    m) mode="$OPTARG" ;;
     p) project="$OPTARG" ;;
     \?) usage ; exit 2 ;;
   esac
 done
 shift `expr $OPTIND - 1`
 
-# get output directory name
-if [ $# -eq 0 ] ; then
+# get output directory name and file/package list
+if [ $# -lt 2 ] ; then
   usage
   exit 2
 fi
 output="$1"
 shift
-
-# optional package names
-if [ $# -ne 0 ] ; then
-  packages="$@"
-else
-  case $mode in
-    psana) packages="$pack_psana"; project="Psana" ;;
-    psana-modules) packages="$pack_psana_mod"; project="Psana modules" ;;
-    \?) usage ; exit 2 ;;
-  esac
-fi
+packages="$@"
 
 # filter non-existing packages/files
 allpackages="$packages"

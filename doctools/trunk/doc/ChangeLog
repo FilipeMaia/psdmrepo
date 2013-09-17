@@ -11,6 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-20
+2013-09-17 Andy Salnikov
+- documentation generation changed in SConsTools, updating SConscript
+- doxy-driver no longer maintains list of packages and modes, everyhting
+  is determined by the packages themselves
+
 Tag: V00-00-19
 2013-05-14 Andy Salnikov
 - doxy-driver: add IData package to psana list
