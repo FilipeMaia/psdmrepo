@@ -254,7 +254,7 @@ class Type ( Namespace ) :
                 expr = ExprVal(self.base.fullName('C++')+"::_sizeof()", self)
             for attr in self.attributes():
                 
-                if attr.stor_type.variable:
+                if attr.stor_type.variable and attr.shape:
                     logging.warning("Cannot generate _sizeof for type "+self.fullName('C++'))
                     return
                 

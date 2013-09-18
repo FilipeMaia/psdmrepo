@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-13
+2013-09-18 Andy Salnikov
+- allow generation of _sizeof() for few additional types
+
 Tag: V00-08-12
 2013-08-26 Andy Salnikov
 - add support for auto-constructors with inheritance
