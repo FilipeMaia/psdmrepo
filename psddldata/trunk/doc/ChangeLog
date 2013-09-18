@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-35
+2013-09-18 Matt Weaver
+- moved pdsdata/xtc/SrcAlias class into alias.ddl.xml (Alias::SrcAlias)
+
 Tag: V00-04-34
 2013-09-17 Andy Salnikov
 - documentation generation changed in SConsTools, updating SConscript

@@ -62,18 +62,14 @@
         
         <!-- ========================================================================= -->
     
-        <pstype name="SrcAlias">
+        <pstype name="Src">
 
-            <tag name="no-sizeof"/>
             <tag name="value-type"/>
         
             <attribute name="_log" type="uint32_t" accessor="log">
             </attribute>
 
             <attribute name="_phy" type="uint32_t" accessor="phy">
-            </attribute>
-
-            <attribute name="_aliasName" type="char" shape="32" accessor="aliasName" shape_method="None">
             </attribute>
 
             <ctor>
