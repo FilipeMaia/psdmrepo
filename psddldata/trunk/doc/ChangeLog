@@ -11,6 +11,13 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-36
+2013-09-18 Andy Salnikov
+- define conversion constructor Timepix::DataV2(Timepix::DataV1), this needs
+  psddl V00-08-14, the constructor itself has to be implemented separately
+- add methods Camer.FrameV1.depth_bytes()
+- add data_size() method to Timepix.DataV* classes
+
 Tag: V00-04-35
 2013-09-18 Matt Weaver
 - moved pdsdata/xtc/SrcAlias class into alias.ddl.xml (Alias::SrcAlias)

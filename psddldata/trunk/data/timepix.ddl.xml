@@ -577,6 +577,12 @@
                 <expr lang="C++" value="DepthBytes" />
             </method>
 
+            <method name="data_size" type="uint32_t">
+                Size of the image data in bytes.
+                <tag name="inline"/>
+                <expr lang="C++" value="{self}.width() * {self}.height() * {self}.depth_bytes()" />
+            </method>
+
         </pstype>
         
         <!-- ========================================================================= -->
@@ -619,6 +625,11 @@
                 <arg name="lostRows"     dest="_lostRows"/>
             </ctor>
 
+            <ctor>
+                Special conversion constructor from DataV1, implementation is defined in a separate file
+                <arg name="datav1" type="DataV1" dest="none"/>
+            </ctor>
+
             <method name="depth" type="uint32_t">
                 <tag name="inline"/>
                 <expr lang="C++" value="Depth" />
@@ -627,6 +638,12 @@
             <method name="depth_bytes" type="uint32_t">
                 <tag name="inline"/>
                 <expr lang="C++" value="(Depth+7)/8" />
+            </method>
+
+            <method name="data_size" type="uint32_t">
+                Size of the image data in bytes.
+                <tag name="inline"/>
+                <expr lang="C++" value="{self}.width() * {self}.height() * {self}.depth_bytes()" />
             </method>
 
         </pstype>
