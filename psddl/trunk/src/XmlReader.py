@@ -544,15 +544,20 @@ class XmlReader ( object ) :
                 # destination must be given
                 dest_name = argel.get('dest')
                 if not dest_name: raise ValueError('argument element missing dest attribute')
-                dest = [d for d in parent.attributes_and_bitfields() if d.name == dest_name]
-                if not dest: raise ValueError('argument element defines unknown destination ' + dest_name)
-                dest = dest[0]
+                if dest_name.lower() == 'none':
+                    dest = None
+                    if not atype: raise ValueError('argument without destination needs type: ' + argname)
+                else:
+                    dest = [d for d in parent.attributes_and_bitfields() if d.name == dest_name]
+                    if not dest: raise ValueError('argument element defines unknown destination ' + dest_name)
+                    dest = dest[0]
                 
                 # optional method
+                meth = None
                 if argel.get('method'):
                     meth = parent.lookup(argel.get('method'), Method)
                     if not meth: raise ValueError('argument element specifies unknown method name ' + argel.get('method'))
-                else:
+                elif dest:
                     meth = dest.accessor
                     if not meth: raise ValueError('argument element needs method as attribute does not have accessor. type = %s, arg = %s' % (parent.name, argname))
                     

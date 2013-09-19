@@ -485,7 +485,7 @@ class CppTypeCodegen ( object ) :
             tname = _typename(arg.type)
             if isinstance(arg.dest, Attribute) and arg.dest.shape:
                 tname = "const "+tname+'*'
-            elif not arg.dest.type.basic : 
+            elif not arg.type.basic : 
                 tname = "const "+tname+'&'
             arglist.append(tname+' '+arg.name)
 

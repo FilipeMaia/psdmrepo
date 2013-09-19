@@ -69,8 +69,8 @@ class CtorArg(object):
         '''
         self.name = name
         self.dest = dest
-        self.type = type or dest.type
-        self.method = method or dest.accessor
+        self.type = type or (dest and dest.type)
+        self.method = method or (dest and dest.accessor)
         self.expr = expr or name
         self.base = False   # true means that it is forwarded to base class
 
