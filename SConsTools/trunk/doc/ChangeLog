@@ -11,6 +11,12 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-09-13
+2013-09-19 Andy Salnikov
+- adding one more doc generator for all python modules/packages (pydoc-all)
+- by default all packages that produce python modules add themselves to
+  this generator, can be changed with DOCGEN in SConscript as usual
+
 Tag: V00-09-12
 2013-09-17 Andy Salnikov
 - change how doc target works, packages now decide for themselves to which

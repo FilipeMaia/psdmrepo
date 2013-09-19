@@ -83,14 +83,16 @@ def standardSConscript( **kw ) :
         standardMoc( env, **ukw )
         
     standardLib( env, **ukw )
-    standardPyLib( env, **ukw )
-    standardPyExt( env, **ukw )
+    pymod = standardPyLib( env, **ukw )
+    pyext = standardPyExt( env, **ukw )
     standardPhpLib( env, **ukw )
     standardScripts( env, **ukw )
     standardBins ( env, **ukw )
     standardTests ( env, **ukw )
 
-    docgen = kw.get('DOCGEN', 'doxy-all')
+    pymods = filter(None, [pymod, pyext])
+    defdoc = {'doxy-all': pkg, 'pydoc-all': pymods}
+    docgen = kw.get('DOCGEN', defdoc)
     if isinstance(docgen, types.StringTypes):
         # string may contain a list of names
         docgen = docgen.split()
@@ -197,6 +199,8 @@ def standardPyLib( env, **kw ) :
             pyc = env.PyCompile ( ini+"c", source=ini )
             DefaultEnvironment()['ALL_TARGETS']['LIBS'].extend ( pyc )
 
+        return pkg
+
 #
 # Process pyext/ directory, build python extension module
 #
@@ -231,6 +235,8 @@ def standardPyExt( env, **kw ) :
         
         # get the list of libraries need for this package
         addPkgLib ( pkg, extmod[0] )
+        
+        return extmodname
 
 #
 # Process content of PHPDIR argument, create directories in $ARCHDIR/php.

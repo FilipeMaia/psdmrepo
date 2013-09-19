@@ -212,11 +212,14 @@ if 'psana-modules-doxy' in env['DOC_TARGETS']:
     sources = env['DOC_TARGETS']['psana-modules-doxy']
     docTargets.append(env.Command('doc/psana-modules-doxy/html/index.html', [], "doxy-driver -p 'PSANA modules' doc/psana-modules-doxy/ " + ' '.join(sources)))
 if 'psana-ref' in env['DOC_TARGETS']:
-    sources = env['DOC_TARGETS']['psana-ref']
-    docTargets.append(env.Command('doc/psana-ref/html/index.html', [], "pydoc-driver -p psana -Q doc/psana-ref/html "+ ' '.join(sources)))
+    modules = env['DOC_TARGETS']['psana-ref']
+    docTargets.append(env.Command('doc/psana-ref/html/index.html', [], "pydoc-driver -p psana -Q -s doc/psana-ref/html "+ ' '.join(modules)))
 if 'pyana-ref' in env['DOC_TARGETS']:
-    sources = env['DOC_TARGETS']['pyana-ref']
-    docTargets.append(env.Command('doc/pyana-ref/html/index.html', [], "pydoc-driver -p pyana -Q doc/pyana-ref/html "+ ' '.join(sources)))
+    modules = env['DOC_TARGETS']['pyana-ref']
+    docTargets.append(env.Command('doc/pyana-ref/html/index.html', [], "pydoc-driver -p pyana -Q -s doc/pyana-ref/html "+ ' '.join(modules)))
+if 'pydoc-all' in env['DOC_TARGETS']:
+    modules = env['DOC_TARGETS']['pydoc-all']
+    docTargets.append(env.Command('doc/pydoc-all/html/index.html', [], "pydoc-driver -p pydoc-all -Q -s -S doc/pydoc-all/html "+ ' '.join(modules)))
 if 'psddl_psana' in env['DOC_TARGETS']:
     # this command does not actually need any input
     docTargets.append(env.Command('doc/psddl_psana/index.html', [], "ddl_psanadoc doc/psddl_psana/"))
