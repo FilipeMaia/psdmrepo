@@ -3,6 +3,7 @@
 
 <psddl>
 
+    <use file="psddldata/acqiris.ddl.xml"/>
     <use file="psddldata/camera.ddl.xml"/>
     <use file="psddldata/ipimb.ddl.xml"/>
     <use file="psddldata/lusi.ddl.xml"/>
@@ -579,7 +580,25 @@
             </attribute>
 
         </pstype>
+
         
+        <!-- ========================================================================= -->
+        
+
+        <pstype name="BldDataAcqADCV1" type_id="Id_SharedAcqADC" version="1" pack="4">
+
+            Combined structure which includes Acqiris.ConfigV1 and 
+            Acqiris.DataDescV1 objects.
+
+            <attribute name="_config" type="Acqiris.ConfigV1" accessor="config">
+            </attribute>
+
+            <attribute name="_data" type="Acqiris.DataDescV1" accessor="data">
+            </attribute>
+
+        </pstype>
+        
+
 
     </package>
 </psddl>

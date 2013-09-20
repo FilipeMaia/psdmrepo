@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-37
+2013-09-20 Andy Salnikov
+- add forgotten Bld.BldDataAcqADCV1 type
+
 Tag: V00-04-36
 2013-09-18 Andy Salnikov
 - define conversion constructor Timepix::DataV2(Timepix::DataV1), this needs
