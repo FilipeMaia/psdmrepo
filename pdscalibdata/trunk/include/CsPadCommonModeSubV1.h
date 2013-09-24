@@ -23,7 +23,6 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "pdsdata/cspad/Detector.hh"
 
 //------------------------------------
 // Collaborating Class Declarations --

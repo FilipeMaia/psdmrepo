@@ -23,7 +23,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "ndarray/ndarray.h"
-#include "pdsdata/cspad/Detector.hh"
+#include "pdsdata/psddl/cspad.ddl.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
