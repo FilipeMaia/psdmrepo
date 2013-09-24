@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-39
+2013-09-24 Matt Weaver
+- Added L3T.ConfigV1,DataV1 for level 3 trigger/filter data
+- output in pdsdata V07-00-04
+	
 Tag: V00-04-38
 2013-09-24 Andy Salnikov
 - Bld.BldDataAcqADCV1 needs xtc config which is Acquiris.ConfigV1
