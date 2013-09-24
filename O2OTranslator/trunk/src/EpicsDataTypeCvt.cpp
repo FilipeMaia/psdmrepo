@@ -28,7 +28,6 @@
 #include "hdf5pp/Exceptions.h"
 #include "O2OTranslator/ConfigObjectStore.h"
 #include "O2OTranslator/CvtOptions.h"
-#include "pdsdata/epics/ConfigV1.hh"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -82,7 +81,7 @@ EpicsDataTypeCvt::EpicsDataTypeCvt ( hdf5pp::Group group,
     hsize_t chunkSizeBytes,
     int deflate,
     int schemaVersion)
-  : DataTypeCvt<Pds::EpicsPvHeader>()
+  : DataTypeCvt<Pds::Epics::EpicsPvHeader>()
   , m_typeGroupName(topGroupName)
   , m_configStore(configStore)
   , m_chunkSizeBytes(chunkSizeBytes)
@@ -132,7 +131,7 @@ EpicsDataTypeCvt::typedConvert ( const XtcType& data,
     const H5DataTypes::XtcClockTimeStamp& time,
     Pds::Damage damage )
 {
-  MsgLog(logger,debug, "EpicsDataTypeCvt -- pv id = " << data.iPvId ) ;
+  MsgLog(logger,debug, "EpicsDataTypeCvt -- pv id = " << data.pvId() ) ;
 
   if (size == 0) {
     // Rare form of data damage
@@ -163,7 +162,7 @@ EpicsDataTypeCvt::typedConvert ( const XtcType& data,
   }
 
   // there may be an alias defined for this PV
-  const std::string& alias = aliasName(data.iPvId, src.top());
+  const std::string& alias = aliasName(data.pvId(), src.top());
   if (alias.empty() or pvname == alias) {
     // fine, means nothing to do
   } else  if (m_subgroups.count(alias) == 0) {
@@ -218,18 +217,18 @@ EpicsDataTypeCvt::typedConvert ( const XtcType& data,
 std::string
 EpicsDataTypeCvt::pvName (const XtcType& data, const Pds::Src& src)
 {
-  PvId pvid(src, data.iPvId);
+  PvId pvid(src, data.pvId());
 
   std::string name = g_pvnames[pvid] ;
   if ( name.empty() ) {
 
-    if ( dbr_type_is_CTRL(data.iDbrType) ) {
+    if ( data.isCtrl() ) {
 
-      name = static_cast<const Pds::EpicsPvCtrlHeader&>(data).sPvName ;
+      name = static_cast<const Pds::Epics::EpicsPvCtrlHeader&>(data).pvName() ;
 
     } else {
 
-      name = "PV:pvId=" + boost::lexical_cast<std::string>(data.iPvId) +
+      name = "PV:pvId=" + boost::lexical_cast<std::string>(data.pvId()) +
           ":src_log=" + boost::lexical_cast<std::string>(src.log()) +
           ":src_phy=" + boost::lexical_cast<std::string>(src.phy());
 
@@ -249,10 +248,13 @@ EpicsDataTypeCvt::aliasName(int pvId, const Pds::Src& src)
 
   Pds::TypeId typeId(Pds::TypeId::Id_EpicsConfig, 1);
   if (const Pds::Epics::ConfigV1* ecfg = m_configStore.find<Pds::Epics::ConfigV1>(typeId, src)) {
-    for (int i = 0; i != ecfg->getNumPv(); ++ i) {
-      const Pds::Epics::PvConfigV1& pvcfg = *ecfg->getPvConfig(i);
-      if (pvcfg.iPvId == pvId) {
-        alias = ::normAliasName(pvcfg.sPvDesc);
+
+    const ndarray<const Pds::Epics::PvConfigV1, 1>& controls = ecfg->pvControls();
+
+    for (unsigned i = 0; i != controls.size(); ++ i) {
+      const Pds::Epics::PvConfigV1& pvcfg = controls[i];
+      if (pvcfg.pvId() == pvId) {
+        alias = ::normAliasName(pvcfg.description());
         break;
       }
     }

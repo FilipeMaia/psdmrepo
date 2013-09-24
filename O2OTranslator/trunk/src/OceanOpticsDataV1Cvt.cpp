@@ -104,7 +104,7 @@ OceanOpticsDataV1Cvt::fillContainers(hdf5pp::Group group,
     m_dataCont = makeCont<DataCont>("spectra", group, true, type) ;
     if (n_miss) m_dataCont->resize(n_miss);
   }
-  m_dataCont->append(*data.data(), type);
+  m_dataCont->append(*data.data().data(), type);
 
   type = H5Type::stored_corrected_data_type() ;
   if (not m_corrDataCont) {

@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-29-00
+2013-09-24 Andy Salnikov
+- pdsdata is now DDL-based, with a lot of changes to interface
+- modify all dependencies in this package
+
 Tag: V00-28-14
 2013-09-02 Andy Salnikov
 - config object in non-L1Accept transitions are stored as calars even if they 

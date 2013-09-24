@@ -83,6 +83,15 @@ protected:
                               const Pds::TypeId& typeId,
                               const O2OXtcSrc& src);
 
+  // typed conversion method templated on Configuration type
+  template <typename Config>
+  void fillContainers(hdf5pp::Group group,
+                      const XtcType& data,
+                      size_t size,
+                      const Pds::TypeId& typeId,
+                      const O2OXtcSrc& src,
+                      const Config& cfg);
+
   // fill containers for missing data
   virtual void fillMissing(hdf5pp::Group group,
                            const Pds::TypeId& typeId,

@@ -52,10 +52,10 @@ class ConfigObjectStore;
  *  @author Andrei Salnikov
  */
 
-class PnCCDFrameV1Cvt : public EvtDataTypeCvt<Pds::PNCCD::FrameV1> {
+class PnCCDFrameV1Cvt : public EvtDataTypeCvt<Pds::PNCCD::FramesV1> {
 public:
 
-  typedef Pds::PNCCD::FrameV1 XtcType ;
+  typedef Pds::PNCCD::FramesV1 XtcType ;
   typedef H5DataTypes::PnCCDFrameV1 H5Type ;
 
   // constructor

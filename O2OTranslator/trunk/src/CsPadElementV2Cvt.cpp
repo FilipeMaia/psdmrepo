@@ -30,10 +30,6 @@
 #include "pdscalibdata/CsPadFilterV1.h"
 #include "pdscalibdata/CsPadPedestalsV1.h"
 #include "pdscalibdata/CsPadPixelStatusV1.h"
-#include "pdsdata/cspad/ConfigV2.hh"
-#include "pdsdata/cspad/ConfigV3.hh"
-#include "pdsdata/cspad/ConfigV4.hh"
-#include "pdsdata/cspad/ConfigV5.hh"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -101,45 +97,31 @@ CsPadElementV2Cvt::fillContainers(hdf5pp::Group group,
     const Pds::TypeId& typeId,
     const O2OXtcSrc& src)
 {
-  // based on cspad/ElementIterator but we cannot use that class directly
-  uint32_t qMask = 0;
-  uint32_t sMask[Pds::CsPad::MaxQuadsPerSensor];
-  unsigned sections = 0;
-  
-  // find corresponding configuration object, it could be ConfigV2 or ConfigV3
-  Pds::TypeId cfgTypeId2(Pds::TypeId::Id_CspadConfig, 2);
-  Pds::TypeId cfgTypeId3(Pds::TypeId::Id_CspadConfig, 3);
-  Pds::TypeId cfgTypeId4(Pds::TypeId::Id_CspadConfig, 4);
-  Pds::TypeId cfgTypeId5(Pds::TypeId::Id_CspadConfig, 5);
-  if ( const Pds::CsPad::ConfigV2* config = m_configStore.find<Pds::CsPad::ConfigV2>(cfgTypeId2, src.top()) ) {
-    qMask = config->quadMask();
-    for (int q = 0 ; q != Pds::CsPad::MaxQuadsPerSensor; ++ q) {
-      sMask[q] = config->roiMask(q);
-      sections += ::bitCount(sMask[q], Pds::CsPad::ASICsPerQuad/2);
-    }
-  } else if ( const Pds::CsPad::ConfigV3* config = m_configStore.find<Pds::CsPad::ConfigV3>(cfgTypeId3, src.top()) ) {
-    qMask = config->quadMask();
-    for (int q = 0 ; q != Pds::CsPad::MaxQuadsPerSensor; ++ q) {
-      sMask[q] = config->roiMask(q);
-      sections += ::bitCount(sMask[q], Pds::CsPad::ASICsPerQuad/2);
-    }
-  } else if ( const Pds::CsPad::ConfigV4* config = m_configStore.find<Pds::CsPad::ConfigV4>(cfgTypeId4, src.top()) ) {
-    qMask = config->quadMask();
-    for (int q = 0 ; q != Pds::CsPad::MaxQuadsPerSensor; ++ q) {
-      sMask[q] = config->roiMask(q);
-      sections += ::bitCount(sMask[q], Pds::CsPad::ASICsPerQuad/2);
-    }
-  } else if ( const Pds::CsPad::ConfigV5* config = m_configStore.find<Pds::CsPad::ConfigV5>(cfgTypeId5, src.top()) ) {
-    qMask = config->quadMask();
-    for (int q = 0 ; q != Pds::CsPad::MaxQuadsPerSensor; ++ q) {
-      sMask[q] = config->roiMask(q);
-      sections += ::bitCount(sMask[q], Pds::CsPad::ASICsPerQuad/2);
-    }
+  // find corresponding configuration object, it could be ConfigV2 to ConfigV5
+  Pds::TypeId::Type tid = Pds::TypeId::Id_CspadConfig;
+  if ( const Pds::CsPad::ConfigV2* config = m_configStore.find<Pds::CsPad::ConfigV2>(Pds::TypeId(tid, 2), src.top()) ) {
+    fillContainers(group, data, size, typeId, src, *config);
+  } else if ( const Pds::CsPad::ConfigV3* config = m_configStore.find<Pds::CsPad::ConfigV3>(Pds::TypeId(tid, 3), src.top()) ) {
+    fillContainers(group, data, size, typeId, src, *config);
+  } else if ( const Pds::CsPad::ConfigV4* config = m_configStore.find<Pds::CsPad::ConfigV4>(Pds::TypeId(tid, 4), src.top()) ) {
+    fillContainers(group, data, size, typeId, src, *config);
+  } else if ( const Pds::CsPad::ConfigV5* config = m_configStore.find<Pds::CsPad::ConfigV5>(Pds::TypeId(tid, 5), src.top()) ) {
+    fillContainers(group, data, size, typeId, src, *config);
   } else {
     MsgLog ( logger, error, "CsPadElementV2Cvt - no configuration object was defined" );
-    return ;
   }
+}
 
+// typed conversion method templated on Configuration type
+template <typename Config>
+void
+CsPadElementV2Cvt::fillContainers(hdf5pp::Group group,
+                                  const XtcType& data,
+                                  size_t size,
+                                  const Pds::TypeId& typeId,
+                                  const O2OXtcSrc& src,
+                                  const Config& cfg)
+{
   // get calibrarion data
   const Pds::DetInfo& address = static_cast<const Pds::DetInfo&>(src.top());
   boost::shared_ptr<pdscalibdata::CsPadPedestalsV1> pedestals =
@@ -152,8 +134,8 @@ CsPadElementV2Cvt::fillContainers(hdf5pp::Group group,
     m_calibStore.get<pdscalibdata::CsPadFilterV1>(address);
 
   // get few constants
-  const unsigned nQuad = ::bitCount(qMask, Pds::CsPad::MaxQuadsPerSensor);
-  const unsigned nSect = sections;
+  const unsigned nQuad = cfg.numQuads();
+  const unsigned nSect = cfg.numSect();
   const unsigned ssize = Pds::CsPad::ColumnsPerASIC*Pds::CsPad::MaxRowsPerASIC*2;
 
   // make data arrays
@@ -164,21 +146,12 @@ CsPadElementV2Cvt::fillContainers(hdf5pp::Group group,
 
   // quadrants may come unordered in XTC container, while clients
   // prefer them to be ordered, do ordering here
-  const XtcType* pdselem = &data ;
-  typedef std::map<unsigned, const XtcType*> ElementMap;
+  typedef std::map<unsigned, const Pds::CsPad::ElementV2*> ElementMap;
   ElementMap elements;
   for ( unsigned iq = 0 ; iq != nQuad ; ++ iq ) {
-
-    unsigned q = pdselem->quad();
-    unsigned nSectPerQuad = ::bitCount(sMask[q], Pds::CsPad::ASICsPerQuad/2);
-    
+    const Pds::CsPad::ElementV2& pdselem = data.quads(cfg, iq);
     // add to map ordered on quad number
-    elements.insert(ElementMap::value_type(q, pdselem));
-
-    // move to next frame
-    const uint16_t* sdata = (const uint16_t*)(pdselem+1);
-    sdata += nSectPerQuad*ssize;
-    pdselem = (const XtcType*)(sdata+2) ;
+    elements.insert(ElementMap::value_type(pdselem.quad(), &pdselem));
   }
   
   
@@ -188,17 +161,18 @@ CsPadElementV2Cvt::fillContainers(hdf5pp::Group group,
   for ( ElementMap::const_iterator ie = elements.begin() ; ie != elements.end() ; ++ ie, ++ quad ) {
         
     unsigned q = ie->first;
-    pdselem = ie->second;
+    const Pds::CsPad::ElementV2& pdselem = *ie->second;
 
     // copy frame info
-    elems[quad] = H5Type(*pdselem) ;
+    elems[quad] = H5Type(pdselem) ;
 
-    // start of pixel data
-    const int16_t* sdata = (const int16_t*)(pdselem+1);
+    // pixel data
+    const ndarray<const int16_t, 3>& pdata = pdselem.data(cfg);
+    const int16_t* sdata = pdata.data();
 
     for ( unsigned is = 0 ; is != Pds::CsPad::ASICsPerQuad/2 ; ++ is ) {
     
-      if ( not (sMask[q] & (1 << is))) continue; 
+      if ( not (cfg.roiMask(q) & (1 << is))) continue;
   
       // output pixel data
       int16_t* output = &pixelData[sect][0][0];

@@ -89,7 +89,7 @@ TimepixDataV2Cvt::fillContainers(hdf5pp::Group group,
     m_imageCont = makeCont<ImageCont>("image", group, true, type);
     if (n_miss) m_imageCont->resize(n_miss);
   }
-  m_imageCont->append(*(uint16_t*)data.data(), type);
+  m_imageCont->append(*data.data().data(), type);
 }
 
 // fill containers for missing data

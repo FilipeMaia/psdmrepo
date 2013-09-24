@@ -25,7 +25,6 @@
 #include "MsgLogger/MsgLogger.h"
 #include "O2OTranslator/ConfigObjectStore.h"
 #include "O2OTranslator/O2OExceptions.h"
-#include "pdsdata/gsc16ai/ConfigV1.hh"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -85,21 +84,28 @@ ImpElementV1Cvt::fillContainers(hdf5pp::Group group,
     const Pds::TypeId& typeId,
     const O2OXtcSrc& src)
 {
-  const int nsmpl = nSamples(src);
-  if (nsmpl < 0) return;
+  // find corresponding configuration object
+  Pds::TypeId cfgTypeId(Pds::TypeId::Id_ImpConfig, 1);
+  const Pds::Imp::ConfigV1* config = m_configStore.find<Pds::Imp::ConfigV1>(cfgTypeId, src.top());
+  MsgLog( logger, debug, "ImpElementV1Cvt: looking for config object "
+      << src.top()
+      << " name=" <<  Pds::TypeId::name(cfgTypeId.id())
+      << " version=" <<  cfgTypeId.version() ) ;
+  if (not config) {
+    MsgLog ( logger, error, "ImpElementV1Cvt - no configuration object was defined" );
+    return;
+  }
 
   // make data objects
   H5Type sData(data);
 
   // have to copy it
-  H5SampleType samples[nsmpl];
-  for (int i = 0; i != nsmpl; ++ i) {
-    samples[i] = H5SampleType(const_cast<XtcType&>(data).getSample(i));
-  }
+  const ndarray<const Pds::Imp::Sample, 1>& in_samples = data.samples(*config);
+  std::vector<H5SampleType> samples(in_samples.begin(), in_samples.end());
   
   // store the data
   m_dataCont->append(sData) ;
-  hdf5pp::Type type = H5Type::stored_data_type(nsmpl);
+  hdf5pp::Type type = H5Type::stored_data_type(samples.size());
   m_samplesCont->append(samples[0], type);
 }
 
@@ -129,7 +135,7 @@ ImpElementV1Cvt::nSamples(const O2OXtcSrc& src)
     return -1;
   }
   
-  return config->get(Pds::Imp::ConfigV1::NumberOfSamples);
+  return config->numberOfSamples();
 }
 
 } // namespace O2OTranslator

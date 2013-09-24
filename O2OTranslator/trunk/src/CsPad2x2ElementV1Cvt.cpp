@@ -104,20 +104,22 @@ CsPad2x2ElementV1Cvt::fillContainers(hdf5pp::Group group,
 
   // get few constants
   const unsigned nSect = 2;
-  const unsigned ssize = Pds::CsPad::ColumnsPerASIC*Pds::CsPad::MaxRowsPerASIC*2;
+  const unsigned ssize = Pds::CsPad2x2::ColumnsPerASIC*Pds::CsPad2x2::MaxRowsPerASIC*2;
 
   // make data arrays
-  int16_t pixelData[Pds::CsPad::ColumnsPerASIC][Pds::CsPad::MaxRowsPerASIC*2][nSect];
+  int16_t pixelData[Pds::CsPad2x2::ColumnsPerASIC][Pds::CsPad2x2::MaxRowsPerASIC*2][nSect];
   float commonMode[nSect];
 
   // move the data
   H5Type elem(data);
 
+  const ndarray<const int16_t, 3>& ndata = data.data();
+
   // loop over sections
   for ( unsigned sect = 0; sect < nSect ; ++ sect ) {
 
     // start of pixel data
-    const int16_t* sdata = (const int16_t*)(&data.pair[0][0]) + sect;
+    const int16_t* sdata = &ndata[0][0][sect];
 
     // output pixel data
     int16_t* output = &pixelData[0][0][sect];
@@ -172,7 +174,7 @@ CsPad2x2ElementV1Cvt::fillContainers(hdf5pp::Group group,
   // may not need it
   bool filter = true;
   if (filterCalib.get()) {
-    ndarray<int16_t, 3> pixArr = make_ndarray(&pixelData[0][0][0], Pds::CsPad::ColumnsPerASIC, Pds::CsPad::MaxRowsPerASIC*2, nSect);
+    ndarray<int16_t, 3> pixArr = make_ndarray(&pixelData[0][0][0], Pds::CsPad2x2::ColumnsPerASIC, Pds::CsPad2x2::MaxRowsPerASIC*2, nSect);
     if (pixStatusCalib) {
       filter = filterCalib->filter(pixArr, pixStatusCalib->status());
     } else {

@@ -25,8 +25,7 @@
 #include "MsgLogger/MsgLogger.h"
 #include "O2OTranslator/ConfigObjectStore.h"
 #include "O2OTranslator/O2OExceptions.h"
-#include "pdsdata/pnCCD/ConfigV1.hh"
-#include "pdsdata/pnCCD/ConfigV2.hh"
+#include "pdsdata/psddl/pnccd.ddl.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -106,25 +105,24 @@ PnCCDFrameV1Cvt::fillContainers(hdf5pp::Group group,
 
   // get few constants
   const uint32_t numLinks = config.numLinks() ;
-  const unsigned sizeofData = data.sizeofData(config) ;
+  const unsigned sizeofData = (config.payloadSizePerLink()-sizeof(Pds::PNCCD::FrameV1))/sizeof(uint16_t);
 
   // make data arrays
   H5Type frame[numLinks] ;
-  uint16_t frameData[numLinks][sizeofData] ;
+  uint16_t frameData[numLinks][sizeofData];
 
   // move the data
-  const XtcType* dd = &data ;
   for ( unsigned link = 0 ; link != numLinks ; ++ link ) {
 
+    const Pds::PNCCD::FrameV1& dd = data.frame(config, link);
+
     // copy frame info
-    frame[link] = H5Type(*dd) ;
+    frame[link] = H5Type(dd) ;
 
     // copy data
-    const uint16_t* ddata = dd->data() ;
-    std::copy( ddata, ddata+sizeofData, (uint16_t*)frameData[link] ) ;
+    const ndarray<const uint16_t, 1>& ddata = dd._data(config);
+    std::copy(ddata.begin(), ddata.end(), frameData[link]);
 
-    // move to next frame
-    dd = dd->next(config) ;
   }
 
   // store the data

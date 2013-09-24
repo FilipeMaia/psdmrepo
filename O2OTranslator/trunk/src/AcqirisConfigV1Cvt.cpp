@@ -85,8 +85,9 @@ AcqirisConfigV1Cvt::fillContainers(hdf5pp::Group group,
   // make array data set for subobject
   const uint32_t nbrChannels = data.nbrChannels() ;
   H5DataTypes::AcqirisVertV1 vdata[nbrChannels] ;
+  const ndarray<const Pds::Acqiris::VertV1, 1>& vert = data.vert();
   for ( uint32_t i = 0 ; i < nbrChannels ; ++ i ) {
-    vdata[i] = H5DataTypes::AcqirisVertV1( data.vert(i) ) ;
+    vdata[i] = H5DataTypes::AcqirisVertV1( vert[i] ) ;
   }
 
   hdf5pp::Type vType = hdf5pp::TypeTraits<H5DataTypes::AcqirisVertV1>::native_type(nbrChannels);

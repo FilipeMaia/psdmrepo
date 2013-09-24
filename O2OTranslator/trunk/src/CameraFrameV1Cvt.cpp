@@ -91,7 +91,7 @@ CameraFrameV1Cvt::fillContainers(hdf5pp::Group group,
     m_imageCont = makeCont<ImageCont>("image", group, true, imgType);
     if (n_miss) m_imageCont->resize(n_miss);
   }
-  m_imageCont->append(*data.data(), imgType);
+  m_imageCont->append(*data._int_pixel_data().data(), imgType);
 }
 
 // fill containers for missing data

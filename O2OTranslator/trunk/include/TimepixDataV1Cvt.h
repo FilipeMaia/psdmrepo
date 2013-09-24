@@ -24,7 +24,6 @@
 //-------------------------------
 #include "H5DataTypes/TimepixDataV2.h"
 #include "O2OTranslator/CvtOptions.h"
-#include "pdsdata/timepix/DataV1.hh"
 
 //------------------------------------
 // Collaborating Class Declarations --

@@ -79,7 +79,7 @@ TimepixDataV1Cvt::fillContainers(hdf5pp::Group group,
 {
   // DataV1 images come with some strange shuffling. To un-shuffle it we transform it
   // into DataV2 which knows how to do it.
-  unsigned objSize = sizeof(Pds::Timepix::DataV2) + data.data_size();
+  unsigned objSize = data._sizeof();
   char* buf = new char[objSize];
   Pds::Timepix::DataV2* data2 = new (buf) Pds::Timepix::DataV2(data);
 
@@ -95,7 +95,7 @@ TimepixDataV1Cvt::fillContainers(hdf5pp::Group group,
     m_imageCont = makeCont<ImageCont>("image", group, true, type);
     if (n_miss) m_imageCont->resize(n_miss);
   }
-  m_imageCont->append(*(uint16_t*)data2->data(), type);
+  m_imageCont->append(*(uint16_t*)data2->data().data(), type);
 
   delete [] buf;
 }

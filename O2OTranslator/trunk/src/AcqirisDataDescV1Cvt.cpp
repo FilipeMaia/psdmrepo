@@ -28,7 +28,6 @@
 #include "ndarray/ndarray.h"
 #include "O2OTranslator/ConfigObjectStore.h"
 #include "O2OTranslator/O2OExceptions.h"
-#include "pdsdata/acqiris/ConfigV1.hh"
 #include "MsgLogger/MsgLogger.h"
 
 //-----------------------------------------------------------------------
@@ -102,8 +101,13 @@ AcqirisDataDescV1Cvt::fillContainers(hdf5pp::Group group,
   const uint32_t nSampl = hconfig.nbrSamples() ;
 
   // check total size
-  if ( data.totalSize(hconfig) * nChan != size ) {
-    throw O2OXTCSizeException ( ERR_LOC, "AcqirisDataDescV1", data.totalSize(hconfig) * nChan, size ) ;
+  size_t totalSize = 0;
+  for ( uint32_t ch = 0 ; ch < nChan ; ++ ch ) {
+    const Pds::Acqiris::DataDescV1Elem& dd = data.data(*config, ch);
+    totalSize += dd._sizeof(*config);
+  }
+  if ( totalSize != size ) {
+    throw O2OXTCSizeException ( ERR_LOC, "AcqirisDataDescV1", totalSize, size ) ;
   }
 
   // allocate data
@@ -113,12 +117,13 @@ AcqirisDataDescV1Cvt::fillContainers(hdf5pp::Group group,
 
   // scan the data and fill arrays
   // FIXME: few methods that we need from DataDescV1 declared as non-const
-  XtcType* dd = const_cast<XtcType*>( &data ) ;
-  for ( uint32_t ch = 0 ; ch < nChan ; ++ ch, dd = dd->nextChannel(hconfig) ) {
+  for ( uint32_t ch = 0 ; ch < nChan ; ++ ch ) {
+
+    const Pds::Acqiris::DataDescV1Elem& dd = data.data(*config, ch);
 
     // first verify that the shape of the data returned corresponds to the config
-    if ( dd->nbrSamplesInSeg() != nSampl ) {
-      if (dd->nbrSamplesInSeg() == 0) {
+    if ( dd.nbrSamplesInSeg() != nSampl ) {
+      if (dd.nbrSamplesInSeg() == 0) {
         if ( warning_count > 0) {
           // means there was no data in this channel, will fill it with some nonsensical stuff
           MsgLog(logger, warning, "AcqirisDataDescV1Cvt - no data samples in data object, will fill with constant data");
@@ -127,13 +132,13 @@ AcqirisDataDescV1Cvt::fillContainers(hdf5pp::Group group,
       } else {
         // if non-zero and not as expected then it is an error
         MsgLog(logger, error, "AcqirisDataDescV1Cvt - number of samples in data object ("
-               << dd->nbrSamplesInSeg() << ") different from config object (" << nSampl << ")");
+               << dd.nbrSamplesInSeg() << ") different from config object (" << nSampl << ")");
         // stop here
         return;
       }
     }
-    if ( dd->nbrSegments() != nSeg ) {
-      if (dd->nbrSegments() == 0) {
+    if ( dd.nbrSegments() != nSeg ) {
+      if (dd.nbrSegments() == 0) {
         if ( warning_count > 0) {
           // means there was no data in this channel, will fill it with some nonsensical stuff
           MsgLog(logger, warning, "AcqirisDataDescV1Cvt - no segments in data object, will fill with constant data");
@@ -141,25 +146,26 @@ AcqirisDataDescV1Cvt::fillContainers(hdf5pp::Group group,
         }
       } else {
         MsgLog(logger, error, "AcqirisDataDescV1Cvt - number of segments in data object ("
-            << dd->nbrSegments() << ") different from config object (" << nSeg << ")");
+            << dd.nbrSegments() << ") different from config object (" << nSeg << ")");
         // stop here
         return;
       }
     }
 
-    datadesc[ch] = H5DataTypes::AcqirisDataDescV1(*dd);
+    datadesc[ch] = H5DataTypes::AcqirisDataDescV1(dd);
 
-    if (dd->nbrSegments() != 0) {
+    if (dd.nbrSegments() != 0) {
+      const ndarray<const Pds::Acqiris::TimestampV1, 1>& ts = dd.timestamp(*config);
       for ( uint32_t seg = 0 ; seg < nSeg ; ++ seg ) {
-        timestamps[ch][seg] = H5DataTypes::AcqirisTimestampV1(dd->timestamp(seg));
+        timestamps[ch][seg] = H5DataTypes::AcqirisTimestampV1(ts[seg]);
       }
     }
 
-    if (dd->nbrSegments() == 0 or dd->nbrSamplesInSeg() == 0) {
+    if (dd.nbrSegments() == 0 or dd.nbrSamplesInSeg() == 0) {
       std::fill_n(waveforms[ch][0], nSampl*nSeg, int16_t(0));
     } else {
-      int16_t* wf = dd->waveform(hconfig) ;
-      wf += dd->indexFirstPoint() ;
+      const int16_t* wf = dd.waveforms(*config).data() ;
+      wf += dd.indexFirstPoint() ;
       std::copy ( wf, wf+nSampl*nSeg, waveforms[ch][0] ) ;
     }
     

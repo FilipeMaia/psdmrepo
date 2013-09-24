@@ -42,7 +42,7 @@ namespace O2OTranslator {
 /**
  *  @ingroup O2OTranslator
  *
- *  Special converter class for Pds::CsPad::ElementV2 XTC class
+ *  Special converter class for Pds::CsPad::DataV2 XTC class
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
@@ -52,10 +52,10 @@ namespace O2OTranslator {
  *  @author Andrei Salnikov
  */
 
-class CsPadElementV2Cvt : public EvtDataTypeCvt<Pds::CsPad::ElementV2> {
+class CsPadElementV2Cvt : public EvtDataTypeCvt<Pds::CsPad::DataV2> {
 public:
 
-  typedef Pds::CsPad::ElementV2 XtcType ;
+  typedef Pds::CsPad::DataV2 XtcType ;
   typedef H5DataTypes::CsPadElementV2 H5Type ;
 
   // constructor
@@ -81,6 +81,15 @@ protected:
                               size_t size,
                               const Pds::TypeId& typeId,
                               const O2OXtcSrc& src);
+
+  // typed conversion method templated on Configuration type
+  template <typename Config>
+  void fillContainers(hdf5pp::Group group,
+                      const XtcType& data,
+                      size_t size,
+                      const Pds::TypeId& typeId,
+                      const O2OXtcSrc& src,
+                      const Config& cfg);
 
   // fill containers for missing data
   virtual void fillMissing(hdf5pp::Group group,

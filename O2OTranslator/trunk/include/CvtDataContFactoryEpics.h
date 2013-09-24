@@ -25,7 +25,7 @@
 #include "H5DataTypes/ObjectContainer.h"
 #include "hdf5pp/Group.h"
 #include "hdf5pp/Type.h"
-#include "pdsdata/epics/EpicsPvData.hh"
+#include "pdsdata/psddl/epics.ddl.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -56,7 +56,7 @@ class CvtDataContFactoryEpics  {
 public:
 
   // container type
-  typedef H5DataTypes::ObjectContainer<Pds::EpicsPvHeader> container_type ;
+  typedef H5DataTypes::ObjectContainer<Pds::Epics::EpicsPvHeader> container_type ;
 
   // constructor
   CvtDataContFactoryEpics (const std::string& name,  hsize_t chunkSize, int deflate, bool shuffle = false)
@@ -71,15 +71,20 @@ public:
   ~CvtDataContFactoryEpics () {}
 
   // main method
-  container_type* container( hdf5pp::Group group, const Pds::EpicsPvHeader& pv ) const ;
+  container_type* container( hdf5pp::Group group, const Pds::Epics::EpicsPvHeader& pv ) const ;
 
   // get the type for given PV
-  static hdf5pp::Type native_type( const Pds::EpicsPvHeader& pv ) { return hdf_type(pv,true) ; }
-  static hdf5pp::Type stored_type( const Pds::EpicsPvHeader& pv ) { return hdf_type(pv,false) ; }
+  static hdf5pp::Type native_type( const Pds::Epics::EpicsPvHeader& pv ) { return hdf_type(pv,true) ; }
+  static hdf5pp::Type stored_type( const Pds::Epics::EpicsPvHeader& pv ) { return hdf_type(pv,false) ; }
 
 protected:
 
-  static hdf5pp::Type hdf_type( const Pds::EpicsPvHeader& pv, bool native ) ;
+  static hdf5pp::Type hdf_type( const Pds::Epics::EpicsPvHeader& pv, bool native ) ;
+
+  template <int iDbrType>
+  static hdf5pp::Type hdf_type_ctrl( const Pds::Epics::EpicsPvHeader& hdr ) ;
+  template <int iDbrType>
+  static hdf5pp::Type hdf_type_time( const Pds::Epics::EpicsPvHeader& hdr ) ;
 
 private:
 

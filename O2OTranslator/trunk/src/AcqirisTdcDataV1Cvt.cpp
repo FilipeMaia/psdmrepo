@@ -79,7 +79,7 @@ AcqirisTdcDataV1Cvt::fillContainers(hdf5pp::Group group,
   size_t count = size / H5Type::xtcSize(data);
   
   // store the data in the containers
-  H5Type h5data(count, &data);
+  H5Type h5data(count, data);
   m_dataCont->append (h5data) ;
 }
 

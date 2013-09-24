@@ -25,7 +25,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "pdsdata/epics/EpicsPvData.hh"
+#include "pdsdata/psddl/epics.ddl.h"
 #include "hdf5pp/Group.h"
 #include "O2OTranslator/CvtDataContFactoryEpics.h"
 
@@ -56,10 +56,10 @@ class ConfigObjectStore;
  *  @author Andrei Salnikov
  */
 
-class EpicsDataTypeCvt : public DataTypeCvt<Pds::EpicsPvHeader> {
+class EpicsDataTypeCvt : public DataTypeCvt<Pds::Epics::EpicsPvHeader> {
 public:
 
-  typedef Pds::EpicsPvHeader XtcType ;
+  typedef Pds::Epics::EpicsPvHeader XtcType ;
 
   // Default constructor
   EpicsDataTypeCvt ( hdf5pp::Group group,
@@ -101,7 +101,7 @@ protected:
 private:
 
   typedef H5DataTypes::ObjectContainer<H5DataTypes::XtcClockTimeStamp> XtcClockTimeCont ;
-  typedef H5DataTypes::ObjectContainer<Pds::EpicsPvHeader> DataCont ;
+  typedef H5DataTypes::ObjectContainer<Pds::Epics::EpicsPvHeader> DataCont ;
 
   struct _pvdata {
     _pvdata() : timeCont(0), dataCont(0) {}

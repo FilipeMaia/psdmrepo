@@ -30,21 +30,25 @@
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
 //-----------------------------------------------------------------------
 
+using namespace Pds::Epics;
+
 namespace {
 
   hdf5pp::Type _timeType()
   {
     // embedded EPICS timestamp type
-    static hdf5pp::CompoundType timeType = hdf5pp::CompoundType::compoundType<Pds::Epics::epicsTimeStamp>() ;
+    static hdf5pp::CompoundType timeType = hdf5pp::CompoundType::compoundType<epicsTimeStamp>() ;
     static bool init = false ;
     if ( not init ) {
-      timeType.insert_native<uint32_t>( "secPastEpoch", offsetof(Pds::Epics::epicsTimeStamp,secPastEpoch) ) ;
-      timeType.insert_native<uint32_t>( "nsec", offsetof(Pds::Epics::epicsTimeStamp,nsec) ) ;
+      timeType.insert_native<uint32_t>( "secPastEpoch", 0 ) ;
+      timeType.insert_native<uint32_t>( "nsec", 4 ) ;
       init = true ;
     }
     return timeType ;
   }
 
+
+  // define few types for strings in DBRs
   hdf5pp::Type _strType( size_t size )
   {
     hdf5pp::Type strType = hdf5pp::Type::Copy(H5T_C_S1);
@@ -55,7 +59,7 @@ namespace {
 
   hdf5pp::Type _pvnameType()
   {
-    static hdf5pp::Type pvnameType = _strType( sizeof( ((Pds::EpicsPvCtrlHeader*)0)->sPvName ) );
+    static hdf5pp::Type pvnameType = _strType( sizeof( iMaxPvNameLength ) );
     return pvnameType ;
   }
 
@@ -78,108 +82,392 @@ namespace {
   }
 
 
-  template <int iDbrType>
-  size_t structSize ( const Pds::EpicsPvHeader& pv )
+
+
+
+  template <typename ValueType>
+  unsigned
+  defineValueField(hdf5pp::CompoundType& type, size_t size, unsigned offset)
   {
-    size_t n = pv.iNumElements ;
-    if ( dbr_type_is_CTRL(pv.iDbrType) ) {
-      typedef Pds::EpicsPvCtrl<iDbrType> Struct ;
-      return sizeof(Struct) + (n-1)*sizeof(typename Struct::TDbrOrg) ;
-    } else if ( dbr_type_is_TIME(pv.iDbrType) ) {
-      typedef Pds::EpicsPvTime<iDbrType> Struct ;
-      return sizeof(Struct) + (n-1)*sizeof(typename Struct::TDbrOrg) ;
+    if ( size > 1 ) {
+      hdf5pp::Type arrayType = hdf5pp::ArrayType::arrayType<ValueType>(size) ;
+      type.insert( "value", offset, arrayType ) ;
+      offset += sizeof(ValueType)*size;
     } else {
-      // suppress warning
-      return 0 ;
+      type.insert_native<ValueType>( "value", offset ) ;
+      offset += sizeof(ValueType);
     }
+    return offset;
   }
 
-
-  template <typename Struct, typename Field>
-  void
-  defineCtrlFields( hdf5pp::CompoundType& type )
+  unsigned
+  defineStringValueField(hdf5pp::CompoundType& type, size_t size, unsigned offset)
   {
-    type.insert( "pvname", offsetof(Struct,sPvName), _pvnameType() ) ;
-
-    type.insert_native<int16_t>( "status", offsetof(Struct,status) ) ;
-    type.insert_native<int16_t>( "severity", offsetof(Struct,severity) ) ;
-
-    type.insert( "units", offsetof(Struct,units), _unitsType() ) ;
-
-    type.insert_native<Field>( "lower_disp_limit", offsetof(Struct,lower_disp_limit) ) ;
-    type.insert_native<Field>( "upper_disp_limit", offsetof(Struct,upper_disp_limit) ) ;
-    type.insert_native<Field>( "lower_alarm_limit", offsetof(Struct,lower_alarm_limit) ) ;
-    type.insert_native<Field>( "upper_alarm_limit", offsetof(Struct,upper_alarm_limit) ) ;
-    type.insert_native<Field>( "lower_warning_limit", offsetof(Struct,lower_warning_limit) ) ;
-    type.insert_native<Field>( "upper_warning_limit", offsetof(Struct,upper_warning_limit) ) ;
-    type.insert_native<Field>( "lower_ctrl_limit", offsetof(Struct,lower_ctrl_limit) ) ;
-    type.insert_native<Field>( "upper_ctrl_limit", offsetof(Struct,upper_ctrl_limit) ) ;
-
+    if ( size > 1 ) {
+      hdf5pp::Type arrayType = hdf5pp::ArrayType::arrayType(_strValueType(), size) ;
+      type.insert( "value", offset, arrayType ) ;
+      offset += MAX_STRING_SIZE*size;
+    } else {
+      type.insert( "value", offset, _strValueType() ) ;
+      offset += MAX_STRING_SIZE;
+    }
+    return offset;
   }
 
-  template <typename Struct, typename Field>
-  void
-  defineStringCtrlFields( hdf5pp::CompoundType& type )
+  // returns offset past the end of defined structure
+  static unsigned defineFieldsTimeDbr(hdf5pp::CompoundType& type, unsigned offset)
   {
-    type.insert( "pvname", offsetof(Struct,sPvName), _pvnameType() ) ;
-
-    type.insert_native<int16_t>( "status", offsetof(Struct,status) ) ;
-    type.insert_native<int16_t>( "severity", offsetof(Struct,severity) ) ;
-
-  }
-
-  template <typename Struct, typename Field>
-  void
-  defineEnumCtrlFields( hdf5pp::CompoundType& type, size_t nStates )
-  {
-    type.insert( "pvname", offsetof(Struct,sPvName), _pvnameType() ) ;
-
-    type.insert_native<int16_t>( "status", offsetof(Struct,status) ) ;
-    type.insert_native<int16_t>( "severity", offsetof(Struct,severity) ) ;
-
-    type.insert_native<int16_t>( "no_str", offsetof(Struct,no_str) ) ;
-    hdf5pp::Type arrayType = hdf5pp::ArrayType::arrayType( _enumStrType(), nStates ) ;
-    type.insert( "strs", offsetof(Struct,strs), arrayType ) ;
-  }
-
-  template <typename Struct>
-  void
-  defineTimeFields( hdf5pp::CompoundType& type )
-  {
-    // embedded EPICS timestamp type
-    hdf5pp::CompoundType timeType = hdf5pp::CompoundType::compoundType<Pds::Epics::epicsTimeStamp>() ;
-    timeType.insert_native<uint32_t>( "secPastEpoch", offsetof(Pds::Epics::epicsTimeStamp,secPastEpoch) ) ;
-    timeType.insert_native<uint32_t>( "nsec", offsetof(Pds::Epics::epicsTimeStamp,nsec) ) ;
-
     // this info must be the same for all time types
-    type.insert_native<int16_t>( "status", offsetof(Struct,status) ) ;
-    type.insert_native<int16_t>( "severity", offsetof(Struct,severity) ) ;
-    type.insert( "stamp", offsetof(Struct,stamp), timeType ) ;
+    type.insert_native<int16_t>( "status", offset ) ;
+    offset += sizeof(int16_t);
+    type.insert_native<int16_t>( "severity", offset ) ;
+    offset += sizeof(int16_t);
+    type.insert( "stamp", offset, _timeType() ) ;
+    offset += sizeof(epicsTimeStamp);
+    return offset;
   }
 
-  template <typename Struct, typename Field>
-  void
-  defineValueField( hdf5pp::CompoundType& type, size_t size )
-  {
-    if ( size > 1 ) {
-      hdf5pp::Type arrayType = hdf5pp::ArrayType::arrayType<Field>(size) ;
-      type.insert( "value", offsetof(Struct,value), arrayType ) ;
-    } else {
-      type.insert_native<Field>( "value", offsetof(Struct,value) ) ;
-    }
-  }
 
-  template <typename Struct>
-  void
-  defineStringValueField( hdf5pp::CompoundType& type, size_t size )
-  {
-    if ( size > 1 ) {
-      hdf5pp::Type arrayType = hdf5pp::ArrayType::arrayType(_strValueType(),size) ;
-      type.insert( "value", offsetof(Struct,value), arrayType ) ;
-    } else {
-      type.insert( "value", offsetof(Struct,value), _strValueType() ) ;
+  // type traits stuff
+  template <int iDbrType> struct DbrId2Type {};
+
+  template <> struct DbrId2Type<DBR_TIME_STRING> {
+    typedef dbr_time_string DbrType;
+    typedef EpicsPvTimeString EpicsType;
+
+    static void defineFields(hdf5pp::CompoundType& type, const EpicsType& pv)
+    {
+      // determine DBR offset from the beginning of the pv object
+      unsigned offset = (const char*)&pv.dbr() - (const char*)&pv;
+      offset = defineFieldsTimeDbr(type, offset);
+      offset = defineStringValueField(type, pv.numElements(), offset);
     }
-  }
+  };
+
+  template <> struct DbrId2Type<DBR_TIME_SHORT> {
+
+    typedef dbr_time_short DbrType;
+    typedef EpicsPvTimeShort EpicsType;
+
+    static void defineFields(hdf5pp::CompoundType& type, const EpicsType& pv)
+    {
+      // determine DBR offset from the beginning of the pv object
+      unsigned offset = (const char*)&pv.dbr() - (const char*)&pv;
+      offset = defineFieldsTimeDbr(type, offset);
+      offset += sizeof(int16_t); // RISC_pad
+      offset = defineValueField<int16_t>(type, pv.numElements(), offset);
+    }
+  };
+
+  template <> struct DbrId2Type<DBR_TIME_FLOAT> {
+    typedef dbr_time_float DbrType;
+    typedef EpicsPvTimeFloat EpicsType;
+
+    static void defineFields(hdf5pp::CompoundType& type, const EpicsType& pv)
+    {
+      // determine DBR offset from the beginning of the pv object
+      unsigned offset = (const char*)&pv.dbr() - (const char*)&pv;
+      offset = defineFieldsTimeDbr(type, offset);
+      offset = defineValueField<float>(type, pv.numElements(), offset);
+    }
+  };
+
+  template <> struct DbrId2Type<DBR_TIME_ENUM> {
+    typedef dbr_time_enum DbrType;
+    typedef EpicsPvTimeEnum EpicsType;
+
+    static void defineFields(hdf5pp::CompoundType& type, const EpicsType& pv)
+    {
+      // determine DBR offset from the beginning of the pv object
+      unsigned offset = (const char*)&pv.dbr() - (const char*)&pv;
+      offset = defineFieldsTimeDbr(type, offset);
+      offset += sizeof(int16_t); // RISC_pad
+      offset = defineValueField<uint16_t>(type, pv.numElements(), offset);
+    }
+  };
+
+  template <> struct DbrId2Type<DBR_TIME_CHAR> {
+    typedef dbr_time_char DbrType;
+    typedef EpicsPvTimeChar EpicsType;
+
+    static void defineFields(hdf5pp::CompoundType& type, const EpicsType& pv)
+    {
+      // determine DBR offset from the beginning of the pv object
+      unsigned offset = (const char*)&pv.dbr() - (const char*)&pv;
+      offset = defineFieldsTimeDbr(type, offset);
+      offset += sizeof(int16_t); // RISC_pad
+      offset += sizeof(int8_t); // RISC_pad
+      offset = defineValueField<uint8_t>(type, pv.numElements(), offset);
+    }
+  };
+
+  template <> struct DbrId2Type<DBR_TIME_LONG> {
+    typedef dbr_time_long DbrType;
+    typedef EpicsPvTimeLong EpicsType;
+
+    static void defineFields(hdf5pp::CompoundType& type, const EpicsType& pv)
+    {
+      // determine DBR offset from the beginning of the pv object
+      unsigned offset = (const char*)&pv.dbr() - (const char*)&pv;
+      offset = defineFieldsTimeDbr(type, offset);
+      offset = defineValueField<int32_t>(type, pv.numElements(), offset);
+    }
+  };
+
+  template <> struct DbrId2Type<DBR_TIME_DOUBLE> {
+    typedef dbr_time_double DbrType;
+    typedef EpicsPvTimeDouble EpicsType;
+
+    static void defineFields(hdf5pp::CompoundType& type, const EpicsType& pv)
+    {
+      // determine DBR offset from the beginning of the pv object
+      unsigned offset = (const char*)&pv.dbr() - (const char*)&pv;
+      offset = defineFieldsTimeDbr(type, offset);
+      offset += sizeof(int32_t); // RISC_pad
+      offset = defineValueField<int32_t>(type, pv.numElements(), offset);
+    }
+  };
+
+
+  template <> struct DbrId2Type<DBR_CTRL_STRING> {
+
+    typedef dbr_sts_string DbrType;
+    typedef EpicsPvCtrlString EpicsType;
+
+    static void defineFields(hdf5pp::CompoundType& type, const EpicsType& pv)
+    {
+      unsigned offset = (const char*)&pv.dbr() - (const char*)&pv;
+
+      type.insert_native<int16_t>( "status", offset ) ;
+      offset += sizeof(int16_t);
+      type.insert_native<int16_t>( "severity", offset ) ;
+      offset += sizeof(int16_t);
+      offset = defineStringValueField(type, pv.numElements(), offset);
+    }
+  };
+
+  template <> struct DbrId2Type<DBR_CTRL_SHORT> {
+
+    typedef dbr_ctrl_short DbrType;
+    typedef EpicsPvCtrlShort EpicsType;
+
+    static void defineFields(hdf5pp::CompoundType& type, const EpicsType& pv)
+    {
+      unsigned offset = (const char*)&pv.dbr() - (const char*)&pv;
+
+      type.insert_native<int16_t>( "status", offset ) ;
+      offset += sizeof(int16_t);
+      type.insert_native<int16_t>( "severity", offset ) ;
+      offset += sizeof(int16_t);
+
+      type.insert( "units", offset, _unitsType() ) ;
+      offset += MAX_UNITS_SIZE;
+
+      typedef int16_t value_type;
+      type.insert_native<value_type>( "upper_disp_limit", offset ) ;
+      offset += sizeof(value_type);
+      type.insert_native<value_type>( "lower_disp_limit", offset ) ;
+      offset += sizeof(value_type);
+      type.insert_native<value_type>( "upper_alarm_limit", offset ) ;
+      offset += sizeof(value_type);
+      type.insert_native<value_type>( "upper_warning_limit", offset ) ;
+      offset += sizeof(value_type);
+      type.insert_native<value_type>( "lower_warning_limit", offset ) ;
+      offset += sizeof(value_type);
+      type.insert_native<value_type>( "lower_alarm_limit", offset ) ;
+      offset += sizeof(value_type);
+      type.insert_native<value_type>( "upper_ctrl_limit", offset ) ;
+      offset += sizeof(value_type);
+      type.insert_native<value_type>( "lower_ctrl_limit", offset ) ;
+      offset += sizeof(value_type);
+
+      offset = defineValueField<value_type>(type, pv.numElements(), offset);
+    }
+  };
+
+  template <> struct DbrId2Type<DBR_CTRL_FLOAT> {
+    typedef dbr_ctrl_float DbrType;
+    typedef EpicsPvCtrlFloat EpicsType;
+
+    static void defineFields(hdf5pp::CompoundType& type, const EpicsType& pv)
+    {
+      unsigned offset = (const char*)&pv.dbr() - (const char*)&pv;
+
+      type.insert_native<int16_t>( "status", offset ) ;
+      offset += sizeof(int16_t);
+      type.insert_native<int16_t>( "severity", offset ) ;
+      offset += sizeof(int16_t);
+      type.insert_native<int16_t>( "precision", offset ) ;
+      offset += sizeof(int16_t);
+      offset += sizeof(int16_t);  // RISC_pad
+
+      type.insert( "units", offset, _unitsType() ) ;
+      offset += MAX_UNITS_SIZE;
+
+      typedef float value_type;
+      type.insert_native<value_type>( "lower_disp_limit", offset ) ;
+      offset += sizeof(value_type);
+      type.insert_native<value_type>( "upper_disp_limit", offset ) ;
+      offset += sizeof(value_type);
+      type.insert_native<value_type>( "lower_alarm_limit", offset ) ;
+      offset += sizeof(value_type);
+      type.insert_native<value_type>( "upper_alarm_limit", offset ) ;
+      offset += sizeof(value_type);
+      type.insert_native<value_type>( "lower_warning_limit", offset ) ;
+      offset += sizeof(value_type);
+      type.insert_native<value_type>( "upper_warning_limit", offset ) ;
+      offset += sizeof(value_type);
+      type.insert_native<value_type>( "lower_ctrl_limit", offset ) ;
+      offset += sizeof(value_type);
+      type.insert_native<value_type>( "upper_ctrl_limit", offset ) ;
+      offset += sizeof(value_type);
+
+      offset = defineValueField<value_type>(type, pv.numElements(), offset);
+    }
+  };
+
+  template <> struct DbrId2Type<DBR_CTRL_ENUM> {
+    typedef dbr_ctrl_enum DbrType;
+    typedef EpicsPvCtrlEnum EpicsType;
+
+    static void defineFields(hdf5pp::CompoundType& type, const EpicsType& pv)
+    {
+      unsigned offset = (const char*)&pv.dbr() - (const char*)&pv;
+
+      type.insert_native<int16_t>( "status", offset ) ;
+      offset += sizeof(int16_t);
+      type.insert_native<int16_t>( "severity", offset ) ;
+      offset += sizeof(int16_t);
+      type.insert_native<int16_t>( "no_str", offset ) ;
+      offset += sizeof(int16_t);
+
+      hdf5pp::Type arrayType = hdf5pp::ArrayType::arrayType( _enumStrType(), pv.dbr().no_str() ) ;
+      type.insert( "strs", offset, arrayType ) ;
+      offset += MAX_ENUM_STATES*MAX_ENUM_STRING_SIZE;
+
+      offset = defineValueField<uint16_t>(type, pv.numElements(), offset);
+    }
+  };
+
+  template <> struct DbrId2Type<DBR_CTRL_CHAR> {
+    typedef dbr_ctrl_char DbrType;
+    typedef EpicsPvCtrlChar EpicsType;
+
+    static void defineFields(hdf5pp::CompoundType& type, const EpicsType& pv)
+    {
+      unsigned offset = (const char*)&pv.dbr() - (const char*)&pv;
+
+      type.insert_native<int16_t>( "status", offset ) ;
+      offset += sizeof(int16_t);
+      type.insert_native<int16_t>( "severity", offset ) ;
+      offset += sizeof(int16_t);
+
+      type.insert( "units", offset, _unitsType() ) ;
+      offset += MAX_UNITS_SIZE;
+
+      typedef uint8_t value_type;
+      type.insert_native<value_type>( "upper_disp_limit", offset ) ;
+      offset += sizeof(value_type);
+      type.insert_native<value_type>( "lower_disp_limit", offset ) ;
+      offset += sizeof(value_type);
+      type.insert_native<value_type>( "upper_alarm_limit", offset ) ;
+      offset += sizeof(value_type);
+      type.insert_native<value_type>( "upper_warning_limit", offset ) ;
+      offset += sizeof(value_type);
+      type.insert_native<value_type>( "lower_warning_limit", offset ) ;
+      offset += sizeof(value_type);
+      type.insert_native<value_type>( "lower_alarm_limit", offset ) ;
+      offset += sizeof(value_type);
+      type.insert_native<value_type>( "upper_ctrl_limit", offset ) ;
+      offset += sizeof(value_type);
+      type.insert_native<value_type>( "lower_ctrl_limit", offset ) ;
+      offset += sizeof(value_type);
+
+      offset += sizeof(uint8_t);    // RISC_pad
+
+      offset = defineValueField<value_type>(type, pv.numElements(), offset);
+    }
+  };
+
+  template <> struct DbrId2Type<DBR_CTRL_LONG> {
+    typedef dbr_ctrl_long DbrType;
+    typedef EpicsPvCtrlLong EpicsType;
+
+    static void defineFields(hdf5pp::CompoundType& type, const EpicsType& pv)
+    {
+      unsigned offset = (const char*)&pv.dbr() - (const char*)&pv;
+
+      type.insert_native<int16_t>( "status", offset ) ;
+      offset += sizeof(int16_t);
+      type.insert_native<int16_t>( "severity", offset ) ;
+      offset += sizeof(int16_t);
+
+      type.insert( "units", offset, _unitsType() ) ;
+      offset += MAX_UNITS_SIZE;
+
+      typedef int32_t value_type;
+      type.insert_native<value_type>( "upper_disp_limit", offset ) ;
+      offset += sizeof(value_type);
+      type.insert_native<value_type>( "lower_disp_limit", offset ) ;
+      offset += sizeof(value_type);
+      type.insert_native<value_type>( "upper_alarm_limit", offset ) ;
+      offset += sizeof(value_type);
+      type.insert_native<value_type>( "upper_warning_limit", offset ) ;
+      offset += sizeof(value_type);
+      type.insert_native<value_type>( "lower_warning_limit", offset ) ;
+      offset += sizeof(value_type);
+      type.insert_native<value_type>( "lower_alarm_limit", offset ) ;
+      offset += sizeof(value_type);
+      type.insert_native<value_type>( "upper_ctrl_limit", offset ) ;
+      offset += sizeof(value_type);
+      type.insert_native<value_type>( "lower_ctrl_limit", offset ) ;
+      offset += sizeof(value_type);
+
+      offset = defineValueField<value_type>(type, pv.numElements(), offset);
+    }
+  };
+  template <> struct DbrId2Type<DBR_CTRL_DOUBLE> {
+    typedef dbr_ctrl_double DbrType;
+    typedef EpicsPvCtrlDouble EpicsType;
+
+    static void defineFields(hdf5pp::CompoundType& type, const EpicsType& pv)
+    {
+      unsigned offset = (const char*)&pv.dbr() - (const char*)&pv;
+
+      type.insert_native<int16_t>( "status", offset ) ;
+      offset += sizeof(int16_t);
+      type.insert_native<int16_t>( "severity", offset ) ;
+      offset += sizeof(int16_t);
+      type.insert_native<int16_t>( "precision", offset ) ;
+      offset += sizeof(int16_t);
+      offset += sizeof(int16_t);  // RISC_pad
+
+      type.insert( "units", offset, _unitsType() ) ;
+      offset += MAX_UNITS_SIZE;
+
+      typedef double value_type;
+      type.insert_native<value_type>( "lower_disp_limit", offset ) ;
+      offset += sizeof(value_type);
+      type.insert_native<value_type>( "upper_disp_limit", offset ) ;
+      offset += sizeof(value_type);
+      type.insert_native<value_type>( "lower_alarm_limit", offset ) ;
+      offset += sizeof(value_type);
+      type.insert_native<value_type>( "upper_alarm_limit", offset ) ;
+      offset += sizeof(value_type);
+      type.insert_native<value_type>( "lower_warning_limit", offset ) ;
+      offset += sizeof(value_type);
+      type.insert_native<value_type>( "upper_warning_limit", offset ) ;
+      offset += sizeof(value_type);
+      type.insert_native<value_type>( "lower_ctrl_limit", offset ) ;
+      offset += sizeof(value_type);
+      type.insert_native<value_type>( "upper_ctrl_limit", offset ) ;
+      offset += sizeof(value_type);
+
+      offset = defineValueField<value_type>(type, pv.numElements(), offset);
+    }
+  };
+
+
 
 }
 
@@ -192,7 +480,7 @@ namespace O2OTranslator {
 
 // main method
 CvtDataContFactoryEpics::container_type*
-CvtDataContFactoryEpics::container( hdf5pp::Group group, const Pds::EpicsPvHeader& pv ) const
+CvtDataContFactoryEpics::container( hdf5pp::Group group, const EpicsPvHeader& pv ) const
 {
   hdf5pp::Type type = native_type(pv) ;
 
@@ -203,120 +491,85 @@ CvtDataContFactoryEpics::container( hdf5pp::Group group, const Pds::EpicsPvHeade
 
 // get the type for given PV
 hdf5pp::Type
-CvtDataContFactoryEpics::hdf_type( const Pds::EpicsPvHeader& pv, bool native )
+CvtDataContFactoryEpics::hdf_type( const EpicsPvHeader& pv, bool native )
 {
-  // rest of it is determined dynamically
-  size_t size = 0 ;
-  switch ( pv.iDbrType ) {
+  // switch based on actual PV type
+  switch ( pv.dbrType() ) {
   case DBR_TIME_STRING:
-  case DBR_CTRL_STRING:
-    size = ::structSize<DBR_STRING>(pv) ;
-    break ;
+    return hdf_type_time<DBR_TIME_STRING>(pv);
   case DBR_TIME_SHORT:
-  case DBR_CTRL_SHORT:
-    size = ::structSize<DBR_SHORT>(pv) ;
-    break ;
+    return hdf_type_time<DBR_TIME_SHORT>(pv);
   case DBR_TIME_FLOAT:
-  case DBR_CTRL_FLOAT:
-    size = ::structSize<DBR_FLOAT>(pv) ;
-    break ;
+    return hdf_type_time<DBR_TIME_FLOAT>(pv);
   case DBR_TIME_ENUM:
-  case DBR_CTRL_ENUM:
-    size = ::structSize<DBR_ENUM>(pv) ;
-    break ;
+    return hdf_type_time<DBR_TIME_ENUM>(pv);
   case DBR_TIME_CHAR:
-  case DBR_CTRL_CHAR:
-    size = ::structSize<DBR_CHAR>(pv) ;
-    break ;
+    return hdf_type_time<DBR_TIME_CHAR>(pv);
   case DBR_TIME_LONG:
-  case DBR_CTRL_LONG:
-    size = ::structSize<DBR_LONG>(pv) ;
-    break ;
+    return hdf_type_time<DBR_TIME_LONG>(pv);
   case DBR_TIME_DOUBLE:
+    return hdf_type_time<DBR_TIME_DOUBLE>(pv);
+  case DBR_CTRL_STRING:
+    return hdf_type_ctrl<DBR_CTRL_STRING>(pv);
+  case DBR_CTRL_SHORT:
+    return hdf_type_ctrl<DBR_CTRL_SHORT>(pv);
+  case DBR_CTRL_FLOAT:
+    return hdf_type_ctrl<DBR_CTRL_FLOAT>(pv);
+  case DBR_CTRL_ENUM:
+    return hdf_type_ctrl<DBR_CTRL_ENUM>(pv);
+  case DBR_CTRL_CHAR:
+    return hdf_type_ctrl<DBR_CTRL_CHAR>(pv);
+  case DBR_CTRL_LONG:
+    return hdf_type_ctrl<DBR_CTRL_LONG>(pv);
   case DBR_CTRL_DOUBLE:
-    size = ::structSize<DBR_DOUBLE>(pv) ;
-    break ;
+    return hdf_type_ctrl<DBR_CTRL_DOUBLE>(pv);
 
   default:
-    MsgLog( "CvtDataContFactoryEpics", error, "CvtDataContFactoryEpics: unexpected PV type = " << pv.iDbrType ) ;
-    break ;
+    MsgLog( "CvtDataContFactoryEpics", error, "CvtDataContFactoryEpics: unexpected PV type = " << pv.dbrType() ) ;
   }
+  return hdf5pp::Type();
+}
+
+template <int iDbrType>
+hdf5pp::Type
+CvtDataContFactoryEpics::hdf_type_ctrl( const Pds::Epics::EpicsPvHeader& hdr )
+{
+  typedef typename DbrId2Type<iDbrType>::EpicsType EpicsType;
+
+  const EpicsType& pv = static_cast<const EpicsType&>(hdr);
+  size_t size = pv._sizeof();
 
   // header is common to all EPICS types
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType(size) ;
-  type.insert_native<int16_t>( "pvId", offsetof(Pds::EpicsPvHeader,iPvId) ) ;
-  type.insert_native<int16_t>( "dbrType", offsetof(Pds::EpicsPvHeader,iDbrType) ) ;
-  type.insert_native<int16_t>( "numElements", offsetof(Pds::EpicsPvHeader,iNumElements) ) ;
+  type.insert_native<int16_t>( "pvId", 0 ) ;
+  type.insert_native<int16_t>( "dbrType", 2 ) ;
+  type.insert_native<int16_t>( "numElements", 4 ) ;
+  type.insert( "pvname", pv.pvName() - (const char*)&pv, _pvnameType() ) ;
 
-
-  // rest of it is determined dynamically
-  switch ( pv.iDbrType ) {
-  case DBR_TIME_STRING:
-    ::defineTimeFields<Pds::EpicsPvTime<DBR_STRING> >( type ) ;
-    ::defineStringValueField<Pds::EpicsPvTime<DBR_STRING> >( type, pv.iNumElements ) ;
-    break ;
-  case DBR_TIME_SHORT:
-    ::defineTimeFields<Pds::EpicsPvTime<DBR_SHORT> >( type ) ;
-    ::defineValueField<Pds::EpicsPvTime<DBR_SHORT>,int16_t>( type, pv.iNumElements ) ;
-    break ;
-  case DBR_TIME_FLOAT:
-    ::defineTimeFields<Pds::EpicsPvTime<DBR_FLOAT> >( type ) ;
-    ::defineValueField<Pds::EpicsPvTime<DBR_FLOAT>,float>( type, pv.iNumElements ) ;
-    break ;
-  case DBR_TIME_ENUM:
-    ::defineTimeFields<Pds::EpicsPvTime<DBR_ENUM> >( type ) ;
-    ::defineValueField<Pds::EpicsPvTime<DBR_ENUM>,uint16_t>( type, pv.iNumElements ) ;
-    break ;
-  case DBR_TIME_CHAR:
-    ::defineTimeFields<Pds::EpicsPvTime<DBR_CHAR> >( type ) ;
-    ::defineValueField<Pds::EpicsPvTime<DBR_CHAR>,uint8_t>( type, pv.iNumElements ) ;
-    break ;
-  case DBR_TIME_LONG:
-    ::defineTimeFields<Pds::EpicsPvTime<DBR_LONG> >( type ) ;
-    ::defineValueField<Pds::EpicsPvTime<DBR_LONG>,int32_t>( type, pv.iNumElements ) ;
-    break ;
-  case DBR_TIME_DOUBLE:
-    ::defineTimeFields<Pds::EpicsPvTime<DBR_DOUBLE> >( type ) ;
-    ::defineValueField<Pds::EpicsPvTime<DBR_DOUBLE>,double>( type, pv.iNumElements ) ;
-    break ;
-
-  case DBR_CTRL_STRING:
-    ::defineStringCtrlFields<Pds::EpicsPvCtrl<DBR_STRING>,int16_t>( type ) ;
-    ::defineStringValueField<Pds::EpicsPvCtrl<DBR_STRING> >( type, pv.iNumElements ) ;
-    break ;
-  case DBR_CTRL_SHORT:
-    ::defineCtrlFields<Pds::EpicsPvCtrl<DBR_SHORT>,int16_t>( type ) ;
-    ::defineValueField<Pds::EpicsPvCtrl<DBR_SHORT>,int16_t>( type, pv.iNumElements ) ;
-    break ;
-  case DBR_CTRL_FLOAT:
-    type.insert_native<int16_t>( "precision", offsetof(Pds::EpicsPvCtrl<DBR_FLOAT>,precision) ) ;
-    ::defineCtrlFields<Pds::EpicsPvCtrl<DBR_FLOAT>,float>( type ) ;
-    ::defineValueField<Pds::EpicsPvCtrl<DBR_FLOAT>,float>( type, pv.iNumElements ) ;
-    break ;
-  case DBR_CTRL_ENUM:
-    ::defineEnumCtrlFields<Pds::EpicsPvCtrl<DBR_ENUM>,int16_t>( type, static_cast<const Pds::EpicsPvCtrl<DBR_ENUM>&>(pv).no_str ) ;
-    ::defineValueField<Pds::EpicsPvCtrl<DBR_ENUM>,uint16_t>( type, pv.iNumElements ) ;
-    break ;
-  case DBR_CTRL_CHAR:
-    ::defineCtrlFields<Pds::EpicsPvCtrl<DBR_CHAR>,uint8_t>( type ) ;
-    ::defineValueField<Pds::EpicsPvCtrl<DBR_CHAR>,uint8_t>( type, pv.iNumElements ) ;
-    break ;
-  case DBR_CTRL_LONG:
-    ::defineCtrlFields<Pds::EpicsPvCtrl<DBR_LONG>,int32_t>( type ) ;
-    ::defineValueField<Pds::EpicsPvCtrl<DBR_LONG>,int32_t>( type, pv.iNumElements ) ;
-    break ;
-  case DBR_CTRL_DOUBLE:
-    type.insert_native<int16_t>( "precision", offsetof(Pds::EpicsPvCtrl<DBR_DOUBLE>,precision) ) ;
-    ::defineCtrlFields<Pds::EpicsPvCtrl<DBR_DOUBLE>,double>( type ) ;
-    ::defineValueField<Pds::EpicsPvCtrl<DBR_DOUBLE>,double>( type, pv.iNumElements ) ;
-    break ;
-
-  default:
-    MsgLog( "CvtDataContFactoryEpics", error, "CvtDataContFactoryEpics: unexpected PV type = " << pv.iDbrType ) ;
-    break ;
-  }
+  DbrId2Type<iDbrType>::defineFields(type, pv);
 
   return type ;
 }
+
+template <int iDbrType>
+hdf5pp::Type
+CvtDataContFactoryEpics::hdf_type_time( const Pds::Epics::EpicsPvHeader& hdr )
+{
+  typedef typename DbrId2Type<iDbrType>::EpicsType EpicsType;
+
+  const EpicsType& pv = static_cast<const EpicsType&>(hdr);
+  size_t size = pv._sizeof();
+
+  // header is common to all EPICS types
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType(size) ;
+  type.insert_native<int16_t>( "pvId", 0 ) ;
+  type.insert_native<int16_t>( "dbrType", 2 ) ;
+  type.insert_native<int16_t>( "numElements", 4 ) ;
+
+  DbrId2Type<iDbrType>::defineFields(type, pv);
+
+  return type ;
+}
+
 
 } // namespace O2OTranslator

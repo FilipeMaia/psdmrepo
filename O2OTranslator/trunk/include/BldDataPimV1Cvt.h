@@ -50,10 +50,10 @@ namespace O2OTranslator {
  *  @author Andrei Salnikov
  */
 
-class BldDataPimV1Cvt : public EvtDataTypeCvt<Pds::BldDataPimV1> {
+class BldDataPimV1Cvt : public EvtDataTypeCvt<Pds::Bld::BldDataPimV1> {
 public:
 
-  typedef Pds::BldDataPimV1 XtcType;
+  typedef Pds::Bld::BldDataPimV1 XtcType;
   typedef H5DataTypes::BldDataPimV1 H5Type;
 
   // constructor takes a location where the data will be stored

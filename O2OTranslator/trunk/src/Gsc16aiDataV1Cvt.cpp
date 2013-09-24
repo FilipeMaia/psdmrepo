@@ -25,7 +25,6 @@
 #include "MsgLogger/MsgLogger.h"
 #include "O2OTranslator/ConfigObjectStore.h"
 #include "O2OTranslator/O2OExceptions.h"
-#include "pdsdata/gsc16ai/ConfigV1.hh"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -93,6 +92,8 @@ Gsc16aiDataV1Cvt::fillContainers(hdf5pp::Group group,
     return ;
   }
 
+  const ndarray<const uint16_t, 1>& channelValue = data.channelValue(*config);
+
   // make data objects
   H5Type timestampsData(data);
 
@@ -103,7 +104,7 @@ Gsc16aiDataV1Cvt::fillContainers(hdf5pp::Group group,
     m_valueCont = makeCont<ValueCont>("channelValue", group, true, type);
     if (n_miss) m_valueCont->resize(n_miss);
   }
-  m_valueCont->append(data._channelValue[0], type);
+  m_valueCont->append(*channelValue.data(), type);
 }
 
 // fill containers for missing data

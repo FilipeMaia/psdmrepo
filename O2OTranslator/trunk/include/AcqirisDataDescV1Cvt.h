@@ -23,7 +23,6 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "H5DataTypes/AcqirisDataDescV1.h"
-#include "pdsdata/acqiris/DataDescV1.hh"
 #include "O2OTranslator/CvtOptions.h"
 
 //------------------------------------

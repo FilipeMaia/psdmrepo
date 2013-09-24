@@ -23,7 +23,6 @@
 #include "MsgLogger/MsgLogger.h"
 #include "O2OTranslator/ConfigObjectStore.h"
 #include "O2OTranslator/O2OExceptions.h"
-#include "pdsdata/fli/ConfigV1.hh"
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -34,7 +33,19 @@
 //-----------------------------------------------------------------------
 
 namespace {
-  const char logger[] = "FliFrameV1Cvt" ;
+  const char logger[] = "Fli/AndorFrameV1Cvt" ;
+
+  template <typename DataType>
+  struct ConfigTypeMap {};
+  template <>
+  struct ConfigTypeMap<H5DataTypes::AndorFrameV1> {
+    typedef Pds::Andor::ConfigV1 value;
+  };
+  template <>
+  struct ConfigTypeMap<H5DataTypes::FliFrameV1> {
+    typedef Pds::Fli::ConfigV1 value;
+  };
+
 }
 
 //    ----------------------------------------
@@ -90,17 +101,19 @@ FliFrameV1Cvt<FrameType>::fillContainers(hdf5pp::Group group,
     const O2OXtcSrc& src)
 {
   // find corresponding configuration object
-  uint32_t height = 0;
-  uint32_t width = 0;
-  if (const Pds::Fli::ConfigV1* config = m_configStore.find<Pds::Fli::ConfigV1>(m_cfgTypeId, src.top())) {
-    uint32_t binX = config->binX();
-    uint32_t binY = config->binY();
-    height = (config->height() + binY - 1) / binY;
-    width = (config->width() + binX - 1) / binX;
-  } else {
-    MsgLog ( logger, error, "FliFrameV1Cvt - no configuration object was defined" );
+  typedef typename ConfigTypeMap<FrameType>::value ConfigType;
+  const ConfigType* config = m_configStore.find<ConfigType>(m_cfgTypeId, src.top());
+  if (not config) {
+    MsgLog ( logger, error, "no configuration object was defined" );
     return ;
   }
+
+  uint32_t binX = config->binX();
+  uint32_t binY = config->binY();
+  uint32_t height = (config->height() + binY - 1) / binY;
+  uint32_t width = (config->width() + binX - 1) / binX;
+
+  const ndarray<const uint16_t, 2>& img = data.data(*config);
 
   // store the data
   H5Type frame(data);
@@ -110,7 +123,7 @@ FliFrameV1Cvt<FrameType>::fillContainers(hdf5pp::Group group,
     m_frameDataCont = Super::template makeCont<FrameDataCont>("data", group, true, type);
     if (n_miss) m_frameDataCont->resize(n_miss);
   }
-  m_frameDataCont->append(*data.data(), type);
+  m_frameDataCont->append(*img.data(), type);
 }
 
 // fill containers for missing data

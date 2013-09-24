@@ -23,11 +23,7 @@
 #include "MsgLogger/MsgLogger.h"
 #include "O2OTranslator/ConfigObjectStore.h"
 #include "O2OTranslator/O2OExceptions.h"
-#include "pdsdata/princeton/ConfigV1.hh"
-#include "pdsdata/princeton/ConfigV2.hh"
-#include "pdsdata/princeton/ConfigV3.hh"
-#include "pdsdata/princeton/ConfigV4.hh"
-#include "pdsdata/princeton/ConfigV5.hh"
+#include "pdsdata/psddl/princeton.ddl.h"
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -92,42 +88,37 @@ PrincetonFrameCvt<H5DataType>::fillContainers(hdf5pp::Group group,
     const O2OXtcSrc& src)
 {
   // find corresponding configuration object
-  uint32_t height = 0;
-  uint32_t width = 0;
-  Pds::TypeId cfgTypeId1(Pds::TypeId::Id_PrincetonConfig, 1);
-  Pds::TypeId cfgTypeId2(Pds::TypeId::Id_PrincetonConfig, 2);
-  Pds::TypeId cfgTypeId3(Pds::TypeId::Id_PrincetonConfig, 3);
-  Pds::TypeId cfgTypeId4(Pds::TypeId::Id_PrincetonConfig, 4);
-  Pds::TypeId cfgTypeId5(Pds::TypeId::Id_PrincetonConfig, 5);
-  if (const Pds::Princeton::ConfigV1* config = m_configStore.find<Pds::Princeton::ConfigV1>(cfgTypeId1, src.top())) {
-    uint32_t binX = config->binX();
-    uint32_t binY = config->binY();
-    height = (config->height() + binY - 1) / binY;
-    width = (config->width() + binX - 1) / binX;
-  } else if (const Pds::Princeton::ConfigV2* config = m_configStore.find<Pds::Princeton::ConfigV2>(cfgTypeId2, src.top())) {
-    uint32_t binX = config->binX();
-    uint32_t binY = config->binY();
-    height = (config->height() + binY - 1) / binY;
-    width = (config->width() + binX - 1) / binX;
-  } else if (const Pds::Princeton::ConfigV3* config = m_configStore.find<Pds::Princeton::ConfigV3>(cfgTypeId3, src.top())) {
-    uint32_t binX = config->binX();
-    uint32_t binY = config->binY();
-    height = (config->height() + binY - 1) / binY;
-    width = (config->width() + binX - 1) / binX;
-  } else if (const Pds::Princeton::ConfigV4* config = m_configStore.find<Pds::Princeton::ConfigV4>(cfgTypeId4, src.top())) {
-    uint32_t binX = config->binX();
-    uint32_t binY = config->binY();
-    height = (config->height() + binY - 1) / binY;
-    width = (config->width() + binX - 1) / binX;
-  } else if (const Pds::Princeton::ConfigV5* config = m_configStore.find<Pds::Princeton::ConfigV5>(cfgTypeId5, src.top())) {
-    uint32_t binX = config->binX();
-    uint32_t binY = config->binY();
-    height = (config->height() + binY - 1) / binY;
-    width = (config->width() + binX - 1) / binX;
+  Pds::TypeId::Type tid = Pds::TypeId::Id_PrincetonConfig;
+  if (const Pds::Princeton::ConfigV1* config = m_configStore.find<Pds::Princeton::ConfigV1>(Pds::TypeId(tid, 1), src.top())) {
+    fillContainers(group, data, size, typeId, src, *config);
+  } else if (const Pds::Princeton::ConfigV2* config = m_configStore.find<Pds::Princeton::ConfigV2>(Pds::TypeId(tid, 2), src.top())) {
+    fillContainers(group, data, size, typeId, src, *config);
+  } else if (const Pds::Princeton::ConfigV3* config = m_configStore.find<Pds::Princeton::ConfigV3>(Pds::TypeId(tid, 3), src.top())) {
+    fillContainers(group, data, size, typeId, src, *config);
+  } else if (const Pds::Princeton::ConfigV4* config = m_configStore.find<Pds::Princeton::ConfigV4>(Pds::TypeId(tid, 4), src.top())) {
+    fillContainers(group, data, size, typeId, src, *config);
+  } else if (const Pds::Princeton::ConfigV5* config = m_configStore.find<Pds::Princeton::ConfigV5>(Pds::TypeId(tid, 5), src.top())) {
+    fillContainers(group, data, size, typeId, src, *config);
   } else {
     MsgLog ( logger, error, "PrincetonFrameCvt - no configuration object was defined" );
-    return ;
   }
+}
+
+// typed conversion method templated on Configuration type
+template <typename H5DataType>
+template <typename Config>
+void
+PrincetonFrameCvt<H5DataType>::fillContainers(hdf5pp::Group group,
+                                  const XtcType& data,
+                                  size_t size,
+                                  const Pds::TypeId& typeId,
+                                  const O2OXtcSrc& src,
+                                  const Config& cfg)
+{
+  uint32_t binX = cfg.binX();
+  uint32_t binY = cfg.binY();
+  uint32_t height = (cfg.height() + binY - 1) / binY;
+  uint32_t width = (cfg.width() + binX - 1) / binX;
 
   // store the data
   H5Type frame(data);
@@ -138,7 +129,7 @@ PrincetonFrameCvt<H5DataType>::fillContainers(hdf5pp::Group group,
     m_frameDataCont = this->template makeCont<FrameDataCont>("data", group, true, type) ;
     if (n_miss) m_frameDataCont->resize(n_miss);
   }
-  m_frameDataCont->append(*data.data(), type);
+  m_frameDataCont->append(*data.data(cfg).data(), type);
 }
 
 // fill containers for missing data

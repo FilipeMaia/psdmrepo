@@ -91,7 +91,7 @@ private:
 
   // finds config object and gets number of samples from it, returns -1 if config object is not there
   int nSamples(const O2OXtcSrc& src);
-  
+
   typedef H5DataTypes::ObjectContainer<H5Type> DataCont ;
   typedef H5DataTypes::ObjectContainer<H5SampleType> SamplesCont ;
 

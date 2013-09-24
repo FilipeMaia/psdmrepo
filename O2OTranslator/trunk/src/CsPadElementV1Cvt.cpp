@@ -29,11 +29,6 @@
 #include "pdscalibdata/CsPadCommonModeSubV1.h"
 #include "pdscalibdata/CsPadPedestalsV1.h"
 #include "pdscalibdata/CsPadPixelStatusV1.h"
-#include "pdsdata/cspad/ConfigV1.hh"
-#include "pdsdata/cspad/ConfigV2.hh"
-#include "pdsdata/cspad/ConfigV3.hh"
-#include "pdsdata/cspad/ConfigV4.hh"
-#include "pdsdata/cspad/ConfigV5.hh"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -101,35 +96,34 @@ CsPadElementV1Cvt::fillContainers(hdf5pp::Group group,
     const Pds::TypeId& typeId,
     const O2OXtcSrc& src)
 {
-  // based on cspad/ElementIterator but we cannot use that class directly
-  uint32_t qMask;
-  uint32_t sMask;
-  
-  // find corresponding configuration object, it could be ConfigV1 or ConfigV2 
-  Pds::TypeId cfgTypeId1(Pds::TypeId::Id_CspadConfig, 1);
-  Pds::TypeId cfgTypeId2(Pds::TypeId::Id_CspadConfig, 2);
-  Pds::TypeId cfgTypeId3(Pds::TypeId::Id_CspadConfig, 3);
-  Pds::TypeId cfgTypeId4(Pds::TypeId::Id_CspadConfig, 4);
-  Pds::TypeId cfgTypeId5(Pds::TypeId::Id_CspadConfig, 5);
-  if ( const Pds::CsPad::ConfigV1* config = m_configStore.find<Pds::CsPad::ConfigV1>(cfgTypeId1, src.top()) ) {
-    qMask = config->quadMask();
-    sMask = config->asicMask()==1 ? 0x3 : 0xff;
-  } else if ( const Pds::CsPad::ConfigV2* config = m_configStore.find<Pds::CsPad::ConfigV2>(cfgTypeId2, src.top()) ) {
-    qMask = config->quadMask();
-    sMask = config->asicMask()==1 ? 0x3 : 0xff;
-  } else if ( const Pds::CsPad::ConfigV3* config = m_configStore.find<Pds::CsPad::ConfigV3>(cfgTypeId3, src.top()) ) {
-    qMask = config->quadMask();
-    sMask = config->asicMask()==1 ? 0x3 : 0xff;
-  } else if ( const Pds::CsPad::ConfigV4* config = m_configStore.find<Pds::CsPad::ConfigV4>(cfgTypeId4, src.top()) ) {
-    qMask = config->quadMask();
-    sMask = config->asicMask()==1 ? 0x3 : 0xff;
-  } else if ( const Pds::CsPad::ConfigV5* config = m_configStore.find<Pds::CsPad::ConfigV5>(cfgTypeId5, src.top()) ) {
-    qMask = config->quadMask();
-    sMask = config->asicMask()==1 ? 0x3 : 0xff;
+  // find corresponding configuration object, it could be ConfigV1 to ConfigV5
+  Pds::TypeId::Type tid = Pds::TypeId::Id_CspadConfig;
+  if ( const Pds::CsPad::ConfigV1* config = m_configStore.find<Pds::CsPad::ConfigV1>(Pds::TypeId(tid, 1), src.top()) ) {
+    fillContainers(group, data, size, typeId, src, *config);
+  } else if ( const Pds::CsPad::ConfigV2* config = m_configStore.find<Pds::CsPad::ConfigV2>(Pds::TypeId(tid, 2), src.top()) ) {
+    fillContainers(group, data, size, typeId, src, *config);
+  } else if ( const Pds::CsPad::ConfigV3* config = m_configStore.find<Pds::CsPad::ConfigV3>(Pds::TypeId(tid, 3), src.top()) ) {
+    fillContainers(group, data, size, typeId, src, *config);
+  } else if ( const Pds::CsPad::ConfigV4* config = m_configStore.find<Pds::CsPad::ConfigV4>(Pds::TypeId(tid, 4), src.top()) ) {
+    fillContainers(group, data, size, typeId, src, *config);
+  } else if ( const Pds::CsPad::ConfigV5* config = m_configStore.find<Pds::CsPad::ConfigV5>(Pds::TypeId(tid, 5), src.top()) ) {
+    fillContainers(group, data, size, typeId, src, *config);
   } else {
     MsgLog ( logger, error, "CsPadElementV1Cvt - no configuration object was defined" );
-    return ;
   }
+}
+
+// typed conversion method templated on Configuration type
+template <typename Config>
+void
+CsPadElementV1Cvt::fillContainers(hdf5pp::Group group,
+                                  const XtcType& data,
+                                  size_t size,
+                                  const Pds::TypeId& typeId,
+                                  const O2OXtcSrc& src,
+                                  const Config& cfg)
+{
+  uint32_t sMask = cfg.asicMask() ==1 ? 0x3 : 0xff;
 
   // get calibrarion data
   const Pds::DetInfo& address = static_cast<const Pds::DetInfo&>(src.top());
@@ -141,10 +135,9 @@ CsPadElementV1Cvt::fillContainers(hdf5pp::Group group,
     m_calibStore.get<pdscalibdata::CsPadCommonModeSubV1>(address);
 
   // get few constants
-  const unsigned nQuad = ::bitCount(qMask, Pds::CsPad::MaxQuadsPerSensor);
-  const unsigned nSect = ::bitCount(sMask, Pds::CsPad::ASICsPerQuad/2);
+  const unsigned nQuad = cfg.numQuads();
+  const unsigned nSect = cfg.numSect();
   const unsigned ssize = Pds::CsPad::ColumnsPerASIC*Pds::CsPad::MaxRowsPerASIC*2;
-  const unsigned qsize = nSect*ssize;
 
   // make data arrays
   H5Type elems[nQuad] ;
@@ -152,13 +145,14 @@ CsPadElementV1Cvt::fillContainers(hdf5pp::Group group,
   float commonMode[nQuad][nSect];
 
   // move the data
-  const XtcType* pdselem = &data ;
   for ( unsigned iq = 0 ; iq != nQuad ; ++ iq ) {
 
-    // copy frame info
-    elems[iq] = H5Type(*pdselem) ;
+    const Pds::CsPad::ElementV1& pdselem = data.quads(cfg, iq);
 
-    const int16_t* qdata = (const int16_t*)pdselem->data();
+    // copy frame info
+    elems[iq] = H5Type(pdselem) ;
+
+    const ndarray<const int16_t, 3>& qdata = pdselem.data(cfg);
 
     int sect = 0;
     for ( int is = 0 ; is < Pds::CsPad::ASICsPerQuad/2 ; ++ is ) {
@@ -166,7 +160,7 @@ CsPadElementV1Cvt::fillContainers(hdf5pp::Group group,
       if ( not (sMask & (1<<is)) ) continue;
       
       // start of the section data
-      const int16_t* sdata = qdata + sect*ssize;
+      const int16_t* sdata = qdata.data() + sect*ssize;
 
       // status codes for pixels
       const uint16_t* pixStatus = 0;
@@ -215,8 +209,6 @@ CsPadElementV1Cvt::fillContainers(hdf5pp::Group group,
     
     }
     
-    // move to next frame
-    pdselem = (const XtcType*)(qdata+qsize+2) ;
   }
 
   // store the data
