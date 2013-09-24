@@ -11,6 +11,7 @@
 #include "psddl_hdf2psana/Exceptions.h"
 #include "psddl_hdf2psana/HdfParameters.h"
 #include "psddl_hdf2psana/bld.h"
+#include "psddl_hdf2psana/bld.h"
 namespace psddl_hdf2psana {
 namespace Bld {
 
@@ -703,6 +704,166 @@ void store(const Psana::Bld::BldDataEBeamV3& obj, hdf5pp::Group group, int versi
 void append(const Psana::Bld::BldDataEBeamV3& obj, hdf5pp::Group group, int version)
 {
   store_BldDataEBeamV3(obj, group, version, true);
+}
+
+
+hdf5pp::Type ns_BldDataEBeamV4_v0_dataset_data_stored_type()
+{
+  typedef ns_BldDataEBeamV4_v0::dataset_data DsType;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
+  type.insert("uDamageMask", offsetof(DsType, uDamageMask), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("fEbeamCharge", offsetof(DsType, fEbeamCharge), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fEbeamL3Energy", offsetof(DsType, fEbeamL3Energy), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fEbeamLTUPosX", offsetof(DsType, fEbeamLTUPosX), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fEbeamLTUPosY", offsetof(DsType, fEbeamLTUPosY), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fEbeamLTUAngX", offsetof(DsType, fEbeamLTUAngX), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fEbeamLTUAngY", offsetof(DsType, fEbeamLTUAngY), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fEbeamPkCurrBC2", offsetof(DsType, fEbeamPkCurrBC2), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fEbeamEnergyBC2", offsetof(DsType, fEbeamEnergyBC2), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fEbeamPkCurrBC1", offsetof(DsType, fEbeamPkCurrBC1), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fEbeamEnergyBC1", offsetof(DsType, fEbeamEnergyBC1), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fEbeamUndPosX", offsetof(DsType, fEbeamUndPosX), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fEbeamUndPosY", offsetof(DsType, fEbeamUndPosY), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fEbeamUndAngX", offsetof(DsType, fEbeamUndAngX), hdf5pp::TypeTraits<double>::stored_type());
+  type.insert("fEbeamUndAngY", offsetof(DsType, fEbeamUndAngY), hdf5pp::TypeTraits<double>::stored_type());
+  return type;
+}
+
+hdf5pp::Type ns_BldDataEBeamV4_v0::dataset_data::stored_type()
+{
+  static hdf5pp::Type type = ns_BldDataEBeamV4_v0_dataset_data_stored_type();
+  return type;
+}
+
+hdf5pp::Type ns_BldDataEBeamV4_v0_dataset_data_native_type()
+{
+  typedef ns_BldDataEBeamV4_v0::dataset_data DsType;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
+  type.insert("uDamageMask", offsetof(DsType, uDamageMask), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("fEbeamCharge", offsetof(DsType, fEbeamCharge), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fEbeamL3Energy", offsetof(DsType, fEbeamL3Energy), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fEbeamLTUPosX", offsetof(DsType, fEbeamLTUPosX), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fEbeamLTUPosY", offsetof(DsType, fEbeamLTUPosY), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fEbeamLTUAngX", offsetof(DsType, fEbeamLTUAngX), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fEbeamLTUAngY", offsetof(DsType, fEbeamLTUAngY), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fEbeamPkCurrBC2", offsetof(DsType, fEbeamPkCurrBC2), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fEbeamEnergyBC2", offsetof(DsType, fEbeamEnergyBC2), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fEbeamPkCurrBC1", offsetof(DsType, fEbeamPkCurrBC1), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fEbeamEnergyBC1", offsetof(DsType, fEbeamEnergyBC1), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fEbeamUndPosX", offsetof(DsType, fEbeamUndPosX), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fEbeamUndPosY", offsetof(DsType, fEbeamUndPosY), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fEbeamUndAngX", offsetof(DsType, fEbeamUndAngX), hdf5pp::TypeTraits<double>::native_type());
+  type.insert("fEbeamUndAngY", offsetof(DsType, fEbeamUndAngY), hdf5pp::TypeTraits<double>::native_type());
+  return type;
+}
+
+hdf5pp::Type ns_BldDataEBeamV4_v0::dataset_data::native_type()
+{
+  static hdf5pp::Type type = ns_BldDataEBeamV4_v0_dataset_data_native_type();
+  return type;
+}
+
+ns_BldDataEBeamV4_v0::dataset_data::dataset_data()
+{
+}
+
+ns_BldDataEBeamV4_v0::dataset_data::dataset_data(const Psana::Bld::BldDataEBeamV4& psanaobj)
+  : uDamageMask(psanaobj.damageMask())
+  , fEbeamCharge(psanaobj.ebeamCharge())
+  , fEbeamL3Energy(psanaobj.ebeamL3Energy())
+  , fEbeamLTUPosX(psanaobj.ebeamLTUPosX())
+  , fEbeamLTUPosY(psanaobj.ebeamLTUPosY())
+  , fEbeamLTUAngX(psanaobj.ebeamLTUAngX())
+  , fEbeamLTUAngY(psanaobj.ebeamLTUAngY())
+  , fEbeamPkCurrBC2(psanaobj.ebeamPkCurrBC2())
+  , fEbeamEnergyBC2(psanaobj.ebeamEnergyBC2())
+  , fEbeamPkCurrBC1(psanaobj.ebeamPkCurrBC1())
+  , fEbeamEnergyBC1(psanaobj.ebeamEnergyBC1())
+  , fEbeamUndPosX(psanaobj.ebeamUndPosX())
+  , fEbeamUndPosY(psanaobj.ebeamUndPosY())
+  , fEbeamUndAngX(psanaobj.ebeamUndAngX())
+  , fEbeamUndAngY(psanaobj.ebeamUndAngY())
+{
+}
+
+ns_BldDataEBeamV4_v0::dataset_data::~dataset_data()
+{
+}
+boost::shared_ptr<Psana::Bld::BldDataEBeamV4>
+Proxy_BldDataEBeamV4_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key)
+{
+  if (not m_data) {
+    boost::shared_ptr<Bld::ns_BldDataEBeamV4_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<Bld::ns_BldDataEBeamV4_v0::dataset_data>(m_group, "data", m_idx);
+    m_data.reset(new PsanaType(ds_data->uDamageMask, ds_data->fEbeamCharge, ds_data->fEbeamL3Energy, ds_data->fEbeamLTUPosX, ds_data->fEbeamLTUPosY, ds_data->fEbeamLTUAngX, ds_data->fEbeamLTUAngY, ds_data->fEbeamPkCurrBC2, ds_data->fEbeamEnergyBC2, ds_data->fEbeamPkCurrBC1, ds_data->fEbeamEnergyBC1, ds_data->fEbeamUndPosX, ds_data->fEbeamUndPosY, ds_data->fEbeamUndAngX, ds_data->fEbeamUndAngY));
+  }
+  return m_data;
+}
+
+
+void make_datasets_BldDataEBeamV4_v0(const Psana::Bld::BldDataEBeamV4& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = Bld::ns_BldDataEBeamV4_v0::dataset_data::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
+void store_BldDataEBeamV4_v0(const Psana::Bld::BldDataEBeamV4& obj, hdf5pp::Group group, bool append)
+{
+  {
+    Bld::ns_BldDataEBeamV4_v0::dataset_data ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "data", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "data", ds_data);
+    }
+  }
+}
+
+boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataEBeamV4> > make_BldDataEBeamV4(int version, hdf5pp::Group group, hsize_t idx) {
+  switch (version) {
+  case 0:
+    return boost::make_shared<Proxy_BldDataEBeamV4_v0>(group, idx);
+  default:
+    return boost::make_shared<PSEvt::DataProxy<Psana::Bld::BldDataEBeamV4> >(boost::shared_ptr<Psana::Bld::BldDataEBeamV4>());
+  }
+}
+
+void make_datasets(const Psana::Bld::BldDataEBeamV4& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_BldDataEBeamV4_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataEBeamV4", version);
+  }
+}
+
+void store_BldDataEBeamV4(const Psana::Bld::BldDataEBeamV4& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    store_BldDataEBeamV4_v0(obj, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataEBeamV4", version);
+  }
+}
+
+void store(const Psana::Bld::BldDataEBeamV4& obj, hdf5pp::Group group, int version) 
+{
+  store_BldDataEBeamV4(obj, group, version, false);
+}
+
+void append(const Psana::Bld::BldDataEBeamV4& obj, hdf5pp::Group group, int version)
+{
+  store_BldDataEBeamV4(obj, group, version, true);
 }
 
 
@@ -1506,6 +1667,50 @@ void store(const Psana::Bld::BldDataGMDV1& obj, hdf5pp::Group group, int version
 void append(const Psana::Bld::BldDataGMDV1& obj, hdf5pp::Group group, int version)
 {
   store_BldDataGMDV1(obj, group, version, true);
+}
+
+boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataAcqADCV1> > make_BldDataAcqADCV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::Acqiris::ConfigV1>& cfg) {
+  switch (version) {
+  case 0:
+    return boost::make_shared<PSEvt::DataProxy<Psana::Bld::BldDataAcqADCV1> >(boost::make_shared<BldDataAcqADCV1_v0<Psana::Acqiris::ConfigV1> >(group, idx, cfg));
+  default:
+    return boost::make_shared<PSEvt::DataProxy<Psana::Bld::BldDataAcqADCV1> >(boost::shared_ptr<Psana::Bld::BldDataAcqADCV1>());
+  }
+}
+
+void make_datasets(const Psana::Bld::BldDataAcqADCV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_BldDataAcqADCV1_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataAcqADCV1", version);
+  }
+}
+
+void store_BldDataAcqADCV1(const Psana::Bld::BldDataAcqADCV1& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    store_BldDataAcqADCV1_v0(obj, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataAcqADCV1", version);
+  }
+}
+
+void store(const Psana::Bld::BldDataAcqADCV1& obj, hdf5pp::Group group, int version) 
+{
+  store_BldDataAcqADCV1(obj, group, version, false);
+}
+
+void append(const Psana::Bld::BldDataAcqADCV1& obj, hdf5pp::Group group, int version)
+{
+  store_BldDataAcqADCV1(obj, group, version, true);
 }
 
 } // namespace Bld

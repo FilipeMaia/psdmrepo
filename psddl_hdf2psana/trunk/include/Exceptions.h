@@ -88,6 +88,14 @@ public:
 
 };
 
+/// Exception thrown when call is made to unimplemented method
+class ExceptionNotImplemented : public Exception {
+public:
+
+  ExceptionNotImplemented( const ErrSvc::Context& ctx, const std::string& msg ) ;
+
+};
+
 
 } // namespace psddl_hdf2psana
 

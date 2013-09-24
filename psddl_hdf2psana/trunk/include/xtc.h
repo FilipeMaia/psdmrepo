@@ -45,6 +45,8 @@ struct dataset_data {
 };
 } // namespace ns_ClockTime_v0
 
+
+
 namespace ns_DetInfo_v0 {
 struct dataset_data {
 
@@ -67,6 +69,25 @@ struct dataset_data {
   operator ::Pds::DetInfo() const ;
 };
 } // namespace ns_DetInfo_v0
+
+
+namespace ns_Src_v0 {
+struct dataset_data {
+
+  dataset_data();
+  dataset_data(const ::Pds::Src& src) : log(src.log()), phy(src.phy()) {}
+
+  static hdf5pp::Type native_type();
+  static hdf5pp::Type stored_type();
+
+  uint32_t log;
+  uint32_t phy;
+
+  operator ::Pds::Src() const ;
+};
+} // namespace ns_DetInfo_v0
+
+
 
 } // namespace Pds
 

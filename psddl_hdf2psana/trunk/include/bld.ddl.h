@@ -7,6 +7,7 @@
 #include "hdf5pp/Group.h"
 #include "hdf5pp/Type.h"
 #include "PSEvt/Proxy.h"
+#include "psddl_hdf2psana/acqiris.ddl.h"
 #include "psddl_hdf2psana/camera.ddl.h"
 #include "psddl_hdf2psana/ipimb.ddl.h"
 #include "psddl_hdf2psana/lusi.ddl.h"
@@ -262,6 +263,63 @@ void make_datasets(const Psana::Bld::BldDataEBeamV3& obj, hdf5pp::Group group, h
                    int deflate, bool shuffle, int version = -1);
 /// Add one more object to the containers created by previous method
 void append(const Psana::Bld::BldDataEBeamV3& obj, hdf5pp::Group group, int version = -1);
+
+
+namespace ns_BldDataEBeamV4_v0 {
+struct dataset_data {
+  static hdf5pp::Type native_type();
+  static hdf5pp::Type stored_type();
+
+  dataset_data();
+  dataset_data(const Psana::Bld::BldDataEBeamV4& psanaobj);
+  ~dataset_data();
+
+  uint32_t uDamageMask;
+  double fEbeamCharge;
+  double fEbeamL3Energy;
+  double fEbeamLTUPosX;
+  double fEbeamLTUPosY;
+  double fEbeamLTUAngX;
+  double fEbeamLTUAngY;
+  double fEbeamPkCurrBC2;
+  double fEbeamEnergyBC2;
+  double fEbeamPkCurrBC1;
+  double fEbeamEnergyBC1;
+  double fEbeamUndPosX;
+  double fEbeamUndPosY;
+  double fEbeamUndAngX;
+  double fEbeamUndAngY;
+
+  operator Psana::Bld::BldDataEBeamV4() const { return Psana::Bld::BldDataEBeamV4(uDamageMask, fEbeamCharge, fEbeamL3Energy, fEbeamLTUPosX, fEbeamLTUPosY, fEbeamLTUAngX, fEbeamLTUAngY, fEbeamPkCurrBC2, fEbeamEnergyBC2, fEbeamPkCurrBC1, fEbeamEnergyBC1, fEbeamUndPosX, fEbeamUndPosY, fEbeamUndAngX, fEbeamUndAngY); }
+
+};
+}
+class Proxy_BldDataEBeamV4_v0 : public PSEvt::Proxy<Psana::Bld::BldDataEBeamV4> {
+public:
+  typedef Psana::Bld::BldDataEBeamV4 PsanaType;
+
+  Proxy_BldDataEBeamV4_v0(hdf5pp::Group group, hsize_t idx) : m_group(group), m_idx(idx) {}
+  virtual ~Proxy_BldDataEBeamV4_v0() {}
+
+protected:
+
+  virtual boost::shared_ptr<PsanaType> getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key);
+
+private:
+
+  mutable hdf5pp::Group m_group;
+  hsize_t m_idx;
+  boost::shared_ptr<PsanaType> m_data;
+};
+boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataEBeamV4> > make_BldDataEBeamV4(int version, hdf5pp::Group group, hsize_t idx);
+
+/// Store object as a single instance (scalar dataset) inside specified group.
+void store(const Psana::Bld::BldDataEBeamV4& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::Bld::BldDataEBeamV4& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method
+void append(const Psana::Bld::BldDataEBeamV4& obj, hdf5pp::Group group, int version = -1);
 
 
 namespace ns_BldDataPhaseCavity_v0 {
@@ -540,6 +598,16 @@ void make_datasets(const Psana::Bld::BldDataGMDV1& obj, hdf5pp::Group group, hsi
                    int deflate, bool shuffle, int version = -1);
 /// Add one more object to the containers created by previous method
 void append(const Psana::Bld::BldDataGMDV1& obj, hdf5pp::Group group, int version = -1);
+
+boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataAcqADCV1> > make_BldDataAcqADCV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::Acqiris::ConfigV1>& cfg);
+
+/// Store object as a single instance (scalar dataset) inside specified group.
+void store(const Psana::Bld::BldDataAcqADCV1& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::Bld::BldDataAcqADCV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method
+void append(const Psana::Bld::BldDataAcqADCV1& obj, hdf5pp::Group group, int version = -1);
 
 } // namespace Bld
 } // namespace psddl_hdf2psana

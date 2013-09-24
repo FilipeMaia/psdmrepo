@@ -25,6 +25,7 @@
 #include "hdf5pp/Utils.h"
 #include "psddl_hdf2psana/lusi.ddl.h"
 #include "psddl_hdf2psana/pulnix.ddl.h"
+#include "psddl_hdf2psana/Exceptions.h"
 #include "psddl_hdf2psana/HdfParameters.h"
 
 //-----------------------------------------------------------------------
@@ -137,6 +138,54 @@ void store_BldDataPimV1_v0(const Psana::Bld::BldDataPimV1& obj, hdf5pp::Group gr
   } else {
     hdf5pp::Utils::storeScalar(group, "data", ns_BldDataPimV1_v0::dataset_data(obj));
   }
+}
+
+
+
+// ==========================
+//     BldDataAcqADCV1
+// ==========================
+
+namespace {
+void BldDataAcqADCV1_unimplemented() 
+{
+  throw ExceptionNotImplemented(ERR_LOC, "Type BldDataAcqADCV1 cannot be stored in HDF5 datasets");
+}
+}
+
+
+
+template <typename Config>
+const Psana::Acqiris::ConfigV1& 
+BldDataAcqADCV1_v0<Config>::config() const
+{
+  const Psana::Acqiris::ConfigV1* ptr = 0;
+  BldDataAcqADCV1_unimplemented();
+  // never comes to this
+  return *ptr;
+}
+
+template <typename Config>
+const Psana::Acqiris::DataDescV1& 
+BldDataAcqADCV1_v0<Config>::data() const
+{
+  const Psana::Acqiris::DataDescV1* ptr = 0;
+  BldDataAcqADCV1_unimplemented();
+  // never comes to this
+  return *ptr;
+}
+
+template class BldDataAcqADCV1_v0<Psana::Acqiris::ConfigV1>;
+
+void make_datasets_BldDataAcqADCV1_v0(const Psana::Bld::BldDataAcqADCV1& obj,
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  BldDataAcqADCV1_unimplemented();
+}
+
+void store_BldDataAcqADCV1_v0(const Psana::Bld::BldDataAcqADCV1& obj, hdf5pp::Group group, bool append)
+{
+  BldDataAcqADCV1_unimplemented();
 }
 
 } // namespace Bld

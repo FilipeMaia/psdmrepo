@@ -1902,6 +1902,7 @@ ndarray<const uint16_t, 2> DataV1_v0::data() const {
 
 
 
+
 void DataV1_v0::read_ds_data() const {
   m_ds_data = hdf5pp::Utils::readGroup<Timepix::ns_DataV1_v0::dataset_data>(m_group, "data", m_idx);
 }
@@ -2066,6 +2067,7 @@ ndarray<const uint16_t, 2> DataV2_v0::data() const {
   if (m_ds_image.empty()) read_ds_image();
   return m_ds_image;
 }
+
 
 
 void DataV2_v0::read_ds_data() const {

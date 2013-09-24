@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE psddl SYSTEM "psddl.dtd">
+
+<psddl>
+
+    <use file="psddldata/alias.ddl.xml" />
+
+    <use file="psddl_hdf2psana/xtc-h5.ddl.xml" cpp_headers="psddl_hdf2psana/xtc.h"/>
+    
+    <package name="Alias">
+    
+        <!-- ========================================================================= -->
+        
+        <h5schema name="SrcAlias" version="0">
+        	<tag name="skip-proxy"/>
+            <dataset name="data">
+                <attribute name="src"/>
+                <attribute name="aliasName" rank="1"/>
+            </dataset>
+        </h5schema>
+
+        <!-- ========================================================================= -->
+    </package>    
+
+</psddl>

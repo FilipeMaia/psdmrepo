@@ -74,6 +74,9 @@ public:
                 If data type is 8-bit then empty array is returned, use data8() method in this case. */
   ndarray<const uint16_t, 2> data16() const;
 
+  /** Number of bytes per pixel. */
+  virtual uint32_t depth_bytes() const;
+
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;

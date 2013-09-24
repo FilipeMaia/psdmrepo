@@ -29,6 +29,18 @@
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
 //-----------------------------------------------------------------------
 
+namespace {
+
+// special class to facilitate construction of Pds::Src
+struct SrcFactory: Pds::Src {
+  SrcFactory(uint32_t log, uint32_t phy) {
+    this->_log = log;
+    this->_phy = phy;
+  }
+};
+
+}
+
 //              ----------------------------------------
 //              -- Public Function Member Definitions --
 //              ----------------------------------------
@@ -64,6 +76,11 @@ hdf5pp::Type ns_ClockTime_v0::dataset_data::native_type()
   static hdf5pp::Type type = ns_ClockTime_v0_dataset_data_native_type();
   return type;
 }
+
+
+
+
+
 
 
 hdf5pp::Type ns_DetInfo_v0_dataset_data_stored_type()
@@ -161,5 +178,44 @@ ns_DetInfo_v0::dataset_data::operator ::Pds::DetInfo() const
 
   return ::Pds::DetInfo(processId, det, detId, dev, devId);
 }
+
+
+
+
+hdf5pp::Type ns_Src_v0_dataset_data_stored_type()
+{
+  typedef ns_Src_v0::dataset_data DsType;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
+  type.insert("log", offsetof(DsType, log), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("phy", offsetof(DsType, phy), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  return type;
+}
+
+hdf5pp::Type ns_Src_v0::dataset_data::stored_type()
+{
+  static hdf5pp::Type type = ns_Src_v0_dataset_data_stored_type();
+  return type;
+}
+
+hdf5pp::Type ns_Src_v0_dataset_data_native_type()
+{
+  typedef ns_Src_v0::dataset_data DsType;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
+  type.insert("log", offsetof(DsType, log), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("phy", offsetof(DsType, phy), hdf5pp::TypeTraits<uint32_t>::native_type());
+  return type;
+}
+
+hdf5pp::Type ns_Src_v0::dataset_data::native_type()
+{
+  static hdf5pp::Type type = ns_Src_v0_dataset_data_native_type();
+  return type;
+}
+
+ns_Src_v0::dataset_data::operator ::Pds::Src() const
+{
+  return ::SrcFactory(log, phy);
+}
+
 
 } // namespace Pds

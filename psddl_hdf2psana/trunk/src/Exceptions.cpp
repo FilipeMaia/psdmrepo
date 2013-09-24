@@ -64,4 +64,9 @@ ExceptionSchemaVersion::ExceptionSchemaVersion( const ErrSvc::Context& ctx, cons
 {
 }
 
+ExceptionNotImplemented::ExceptionNotImplemented( const ErrSvc::Context& ctx, const std::string& msg )
+  : Exception( ctx, "not implemented: " + msg )
+{
+}
+
 } // namespace psddl_hdf2psana

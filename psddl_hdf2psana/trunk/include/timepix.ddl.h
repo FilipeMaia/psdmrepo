@@ -576,6 +576,8 @@ public:
     uint32_t height() const { return Height; }
     uint32_t depth() const { return Depth; }
     uint32_t depth_bytes() const { return DepthBytes; }
+  /** Size of the image data in bytes. */
+  uint32_t data_size() const { return this->width() * this->height() * this->depth_bytes(); }
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
@@ -631,6 +633,8 @@ public:
   virtual ndarray<const uint16_t, 2> data() const;
     uint32_t depth() const { return Depth; }
     uint32_t depth_bytes() const { return (Depth+7)/8; }
+  /** Size of the image data in bytes. */
+  uint32_t data_size() const { return this->width() * this->height() * this->depth_bytes(); }
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;

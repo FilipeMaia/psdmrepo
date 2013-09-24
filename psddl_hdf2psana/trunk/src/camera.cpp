@@ -122,6 +122,14 @@ FrameV1_v0::data16() const
   return make_ndarray(tptr, height(), width());
 }
 
+/** Number of bytes per pixel. */
+uint32_t 
+FrameV1_v0::depth_bytes() const
+{
+  return (depth() + 7) / 8;
+}
+
+
 void FrameV1_v0::read_ds_data() const
 {
   m_ds_data = hdf5pp::Utils::readGroup<Camera::ns_FrameV1_v0::dataset_data>(m_group, "data", m_idx);

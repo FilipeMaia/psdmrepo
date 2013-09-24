@@ -26,6 +26,7 @@
 #include "psddl_hdf2psana/camera.h"
 #include "psddl_hdf2psana/lusi.ddl.h"
 #include "psddl_hdf2psana/pulnix.ddl.h"
+#include "psddl_psana/acqiris.ddl.h"
 #include "psddl_psana/bld.ddl.h"
 
 namespace psddl_hdf2psana {
@@ -79,6 +80,35 @@ private:
 void make_datasets_BldDataPimV1_v0(const Psana::Bld::BldDataPimV1& obj,
       hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle);
 void store_BldDataPimV1_v0(const Psana::Bld::BldDataPimV1& obj, hdf5pp::Group group, bool append);
+
+
+/*
+ *  We do not really want to store BldDataAcqADCV1 stuff in HDF5  but we have to implement the 
+ *  methods that generator expects for this type. Define thme here and provide implementation 
+ *  which throws exception if called.
+ */
+
+template <typename Config>
+class BldDataAcqADCV1_v0 : public Psana::Bld::BldDataAcqADCV1 {
+public:
+  typedef Psana::Bld::BldDataAcqADCV1 PsanaType;
+
+  BldDataAcqADCV1_v0() {}
+  BldDataAcqADCV1_v0(hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Config>& cfg) {}
+
+  virtual ~BldDataAcqADCV1_v0() {}
+
+  virtual const Psana::Acqiris::ConfigV1& config() const;
+  virtual const Psana::Acqiris::DataDescV1& data() const;
+
+private:
+};
+
+void make_datasets_BldDataAcqADCV1_v0(const Psana::Bld::BldDataAcqADCV1& obj,
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle);
+void store_BldDataAcqADCV1_v0(const Psana::Bld::BldDataAcqADCV1& obj, hdf5pp::Group group, bool append);
+
+
 
 } // namespace Bld
 } // namespace psddl_hdf2psana

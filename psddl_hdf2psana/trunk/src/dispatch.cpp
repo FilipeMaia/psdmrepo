@@ -4,9 +4,10 @@
 #include "PSEvt/Exceptions.h"
 
 #include "psddl_hdf2psana/dispatch.h"
+#include "psddl_hdf2psana/alias.ddl.h"
 #include "psddl_hdf2psana/cspad.ddl.h"
 #include "psddl_hdf2psana/evr.ddl.h"
-#include "psddl_hdf2psana/princeton.ddl.h"
+#include "psddl_hdf2psana/encoder.ddl.h"
 #include "psddl_hdf2psana/usdusb.ddl.h"
 #include "psddl_hdf2psana/timepix.ddl.h"
 #include "psddl_hdf2psana/camera.ddl.h"
@@ -20,13 +21,13 @@
 #include "psddl_hdf2psana/pnccd.ddl.h"
 #include "psddl_hdf2psana/epics.ddl.h"
 #include "psddl_hdf2psana/ipimb.ddl.h"
+#include "psddl_hdf2psana/princeton.ddl.h"
 #include "psddl_hdf2psana/control.ddl.h"
 #include "psddl_hdf2psana/cspad2x2.ddl.h"
 #include "psddl_hdf2psana/opal1k.ddl.h"
 #include "psddl_hdf2psana/andor.ddl.h"
 #include "psddl_hdf2psana/fli.ddl.h"
 #include "psddl_hdf2psana/oceanoptics.ddl.h"
-#include "psddl_hdf2psana/encoder.ddl.h"
 #include "psddl_hdf2psana/lusi.ddl.h"
 #include "psddl_hdf2psana/acqiris.ddl.h"
 
@@ -152,6 +153,10 @@ try {
   case 1048460753:
     // Bld::BldDataFEEGasDetEnergy
     evt.putProxy(psddl_hdf2psana::Bld::make_BldDataFEEGasDetEnergy(schema_version, group, idx), src);
+    break;
+  case 1078464761:
+    // Bld::BldDataEBeamV4
+    evt.putProxy(psddl_hdf2psana::Bld::make_BldDataEBeamV4(schema_version, group, idx), src);
     break;
   case 1078464764:
     // Bld::BldDataEBeamV1
@@ -317,6 +322,10 @@ try {
     // Ipimb::ConfigV1
     cfgStore.putProxy(psddl_hdf2psana::Ipimb::make_ConfigV1(schema_version, group, idx), src);
     break;
+  case 1751123230:
+    // Alias::ConfigV1
+    cfgStore.putProxy(psddl_hdf2psana::Alias::make_ConfigV1(schema_version, group, idx), src);
+    break;
   case 1777917796:
     // Lusi::IpmFexConfigV1
     cfgStore.putProxy(psddl_hdf2psana::Lusi::make_IpmFexConfigV1(schema_version, group, idx), src);
@@ -352,6 +361,12 @@ try {
   case 2160030175:
     // ControlData::ConfigV1
     cfgStore.putProxy(psddl_hdf2psana::ControlData::make_ConfigV1(schema_version, group, idx), src);
+    break;
+  case 2263071815:
+    // Bld::BldDataAcqADCV1
+    if (boost::shared_ptr<Psana::Acqiris::ConfigV1> cfgPtr = cfgStore.get(src)) {
+      evt.putProxy(psddl_hdf2psana::Bld::make_BldDataAcqADCV1(schema_version, group, idx, cfgPtr), src);
+    }
     break;
   case 2275609067:
     // Fli::ConfigV1

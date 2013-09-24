@@ -64,6 +64,26 @@
             </dataset>
         </h5schema>
         <!-- ========================================================================= -->
+        <h5schema name="BldDataEBeamV4" version="0">
+            <dataset name="data">
+                <attribute name="uDamageMask" method="damageMask"/>
+                <attribute name="fEbeamCharge" method="ebeamCharge"/>
+                <attribute name="fEbeamL3Energy" method="ebeamL3Energy"/>
+                <attribute name="fEbeamLTUPosX" method="ebeamLTUPosX"/>
+                <attribute name="fEbeamLTUPosY" method="ebeamLTUPosY"/>
+                <attribute name="fEbeamLTUAngX" method="ebeamLTUAngX"/>
+                <attribute name="fEbeamLTUAngY" method="ebeamLTUAngY"/>
+                <attribute name="fEbeamPkCurrBC2" method="ebeamPkCurrBC2"/>
+                <attribute name="fEbeamEnergyBC2" method="ebeamEnergyBC2"/>
+                <attribute name="fEbeamPkCurrBC1" method="ebeamPkCurrBC1"/>
+                <attribute name="fEbeamEnergyBC1" method="ebeamEnergyBC1"/>
+                <attribute name="fEbeamUndPosX" method="ebeamUndPosX"/>
+                <attribute name="fEbeamUndPosY" method="ebeamUndPosY"/>
+                <attribute name="fEbeamUndAngX" method="ebeamUndAngX"/>
+                <attribute name="fEbeamUndAngY" method="ebeamUndAngY"/>
+            </dataset>
+        </h5schema>
+        <!-- ========================================================================= -->
         <h5schema name="BldDataPhaseCavity" version="0">
             <dataset name="data">
                 <attribute name="fFitTime1" method="fitTime1"/>
@@ -136,6 +156,17 @@
                 <attribute name="fBgValuePerSample" method="bgValuePerSample"/>
                 <attribute name="fRelativeEnergyPerPulse" method="relativeEnergyPerPulse"/>
             </dataset>
+        </h5schema>
+
+        <!-- ========================================================================= -->
+    
+        <h5schema name="BldDataAcqADCV1" version="0">
+        
+            <!--  We do not want to store this type in HDF5 so we provide external 
+             implementation which generates exceptions on attempt to use it -->
+
+            <tag name="external" value="psddl_hdf2psana/bld.h"/>
+
         </h5schema>
 
     </package>
