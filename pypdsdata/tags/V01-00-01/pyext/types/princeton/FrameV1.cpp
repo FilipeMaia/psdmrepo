@@ -1,0 +1,131 @@
+//--------------------------------------------------------------------------
+// File and Version Information:
+// 	$Id$
+//
+// Description:
+//	Class FrameV1...
+//
+// Author List:
+//      Andrei Salnikov
+//
+//------------------------------------------------------------------------
+
+//-----------------------
+// This Class's Header --
+//-----------------------
+#include "FrameV1.h"
+
+//-----------------
+// C/C++ Headers --
+//-----------------
+#include <sstream>
+
+//-------------------------------
+// Collaborating Class Headers --
+//-------------------------------
+#include "ConfigV1.h"
+#include "ConfigV2.h"
+#include "ConfigV3.h"
+#include "ConfigV4.h"
+#include "ConfigV5.h"
+#include "../../Exception.h"
+#include "../TypeLib.h"
+#include "../../pdsdata_numpy.h"
+
+//-----------------------------------------------------------------------
+// Local Macros, Typedefs, Structures, Unions and Forward Declarations --
+//-----------------------------------------------------------------------
+namespace {
+
+  // type-specific methods
+  FUN0_WRAPPER(pypdsdata::Princeton::FrameV1, shotIdStart)
+  FUN0_WRAPPER(pypdsdata::Princeton::FrameV1, readoutTime)
+  PyObject* data( PyObject* self, PyObject* args );
+
+  PyMethodDef methods[] = {
+    { "shotIdStart",    shotIdStart,    METH_NOARGS, "self.shotIdStart() -> int\n\nReturns integer number" },
+    { "readoutTime",    readoutTime,    METH_NOARGS, "self.readoutTime() -> float\n\nReturns floating number" },
+    { "data",           data,           METH_VARARGS, "self.data(cfg: ConfigV*) -> numpy.ndarray\n\nReturns 2-dim array of integer numbers" },
+    {0, 0, 0, 0}
+   };
+
+  char typedoc[] = "Python class wrapping C++ Pds::Princeton::FrameV1 class.";
+
+}
+
+//		----------------------------------------
+// 		-- Public Function Member Definitions --
+//		----------------------------------------
+
+void
+pypdsdata::Princeton::FrameV1::initType( PyObject* module )
+{
+  PyTypeObject* type = BaseType::typeObject() ;
+  type->tp_doc = ::typedoc;
+  type->tp_methods = ::methods;
+
+  BaseType::initType( "FrameV1", module );
+}
+
+void
+pypdsdata::Princeton::FrameV1::print(std::ostream& out) const
+{
+  out << "princeton.FrameV1(shotIdStart=" << m_obj->shotIdStart()
+      << ", readoutTime=" << m_obj->readoutTime()
+      << ", ...)";
+}
+
+namespace {
+
+PyObject*
+data( PyObject* self, PyObject* args )
+{
+  Pds::Princeton::FrameV1* obj = pypdsdata::Princeton::FrameV1::pdsObject( self );
+  if ( not obj ) return 0;
+
+  // parse args
+  PyObject* configObj ;
+  if ( not PyArg_ParseTuple( args, "O:Princeton.FrameV1.data", &configObj ) ) return 0;
+
+  ndarray<const uint16_t, 2> data;
+
+  // need one of the config objects to get data
+  if ( pypdsdata::Princeton::ConfigV1::Object_TypeCheck( configObj ) ) {
+    Pds::Princeton::ConfigV1* config = pypdsdata::Princeton::ConfigV1::pdsObject( configObj );
+    data = obj->data(*config);
+  } else if ( pypdsdata::Princeton::ConfigV2::Object_TypeCheck( configObj ) ) {
+    Pds::Princeton::ConfigV2* config = pypdsdata::Princeton::ConfigV2::pdsObject( configObj );
+    data = obj->data(*config);
+  } else if ( pypdsdata::Princeton::ConfigV3::Object_TypeCheck( configObj ) ) {
+    Pds::Princeton::ConfigV3* config = pypdsdata::Princeton::ConfigV3::pdsObject( configObj );
+    data = obj->data(*config);
+  } else if ( pypdsdata::Princeton::ConfigV4::Object_TypeCheck( configObj ) ) {
+    Pds::Princeton::ConfigV4* config = pypdsdata::Princeton::ConfigV4::pdsObject( configObj );
+    data = obj->data(*config);
+  } else if ( pypdsdata::Princeton::ConfigV5::Object_TypeCheck( configObj ) ) {
+    Pds::Princeton::ConfigV5* config = pypdsdata::Princeton::ConfigV5::pdsObject( configObj );
+    data = obj->data(*config);
+  } else {
+    PyErr_SetString(PyExc_TypeError, "Error: parameter is not a Princeton.ConfigV* object");
+    return 0;
+  }
+
+  // dimensions
+  npy_intp dims[2] = { data.shape()[0], data.shape()[0] };
+
+  // NumPy type number
+  int typenum = NPY_USHORT ;
+  int flags = NPY_C_CONTIGUOUS ;
+
+  // make array
+  PyObject* array = PyArray_New(&PyArray_Type, 2, dims, typenum, 0,
+                                (void*)data.data(), 0, flags, 0);
+
+  // array does not own its data, set self as owner
+  Py_INCREF(self);
+  ((PyArrayObject*)array)->base = self ;
+
+  return array;
+}
+
+}
