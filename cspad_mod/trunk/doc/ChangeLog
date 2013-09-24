@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-06-04
+2013-09-24 Andy Salnikov
+- fix for constant namespace
+
 Tag: V00-06-03
 2013-09-17 Andy Salnikov
 - documentation generation changed in SConsTools, updating SConscript

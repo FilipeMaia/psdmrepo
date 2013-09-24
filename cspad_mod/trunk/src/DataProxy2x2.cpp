@@ -82,7 +82,7 @@ DataProxy2x2::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, cons
 
   // get few constants
   const unsigned nSect = 2;
-  const unsigned ssize = Pds::CsPad::ColumnsPerASIC*Pds::CsPad::MaxRowsPerASIC*2;
+  const unsigned ssize = Psana::CsPad2x2::ColumnsPerASIC*Psana::CsPad2x2::MaxRowsPerASIC*2;
 
   // make data arrays
   int16_t* pixelData = new int16_t[ssize*nSect];
