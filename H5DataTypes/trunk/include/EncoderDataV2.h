@@ -23,7 +23,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "hdf5pp/Group.h"
-#include "pdsdata/encoder/DataV2.hh"
+#include "pdsdata/psddl/encoder.ddl.h"
 
 //------------------------------------
 // Collaborating Class Declarations --

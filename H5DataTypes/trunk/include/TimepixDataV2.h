@@ -27,7 +27,7 @@
 // Collaborating Class Declarations --
 //------------------------------------
 #include "hdf5pp/Type.h"
-#include "pdsdata/timepix/DataV2.hh"
+#include "pdsdata/psddl/timepix.ddl.h"
 
 //		---------------------
 // 		-- Class Interface --

@@ -184,15 +184,17 @@ AcqirisTdcConfigV1::store ( const XtcType& config, hdf5pp::Group grp )
 {
   // make array data set for subobject
   AcqirisTdcChannel tdcChan[Pds::Acqiris::TdcConfigV1::NChannels] ;
+  const ndarray<const Pds::Acqiris::TdcChannel, 1>& channels = config.channels();
   for ( int i = 0 ; i < Pds::Acqiris::TdcConfigV1::NChannels ; ++ i ) {
-    tdcChan[i] = AcqirisTdcChannel( config.channel(i) ) ;
+    tdcChan[i] = AcqirisTdcChannel( channels[i] ) ;
   }
   storeDataObjects ( Pds::Acqiris::TdcConfigV1::NChannels, tdcChan, "channel", grp ) ;
 
   // make array data set for subobject
   AcqirisTdcAuxIO auxio[Pds::Acqiris::TdcConfigV1::NAuxIO] ;
+  const ndarray<const Pds::Acqiris::TdcAuxIO, 1>& pauxio = config.auxio();
   for ( int i = 0 ; i < Pds::Acqiris::TdcConfigV1::NAuxIO ; ++ i ) {
-    auxio[i] = AcqirisTdcAuxIO( config.auxio(i) ) ;
+    auxio[i] = AcqirisTdcAuxIO( pauxio[i] ) ;
   }
   storeDataObjects ( Pds::Acqiris::TdcConfigV1::NAuxIO, auxio, "auxio", grp ) ;
 

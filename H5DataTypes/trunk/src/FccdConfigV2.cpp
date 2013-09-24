@@ -45,39 +45,42 @@ FccdConfigV2::FccdConfigV2 ( const Pds::FCCD::FccdConfigV2& data )
   , ccdEnable(data.ccdEnable())
   , focusMode(data.focusMode())
   , exposureTime(data.exposureTime())
-  , dacVoltage1(data.dacVoltage1())
-  , dacVoltage2(data.dacVoltage2())
-  , dacVoltage3(data.dacVoltage3())
-  , dacVoltage4(data.dacVoltage4())
-  , dacVoltage5(data.dacVoltage5())
-  , dacVoltage6(data.dacVoltage6())
-  , dacVoltage7(data.dacVoltage7())
-  , dacVoltage8(data.dacVoltage8())
-  , dacVoltage9(data.dacVoltage9())
-  , dacVoltage10(data.dacVoltage10())
-  , dacVoltage11(data.dacVoltage11())
-  , dacVoltage12(data.dacVoltage12())
-  , dacVoltage13(data.dacVoltage13())
-  , dacVoltage14(data.dacVoltage14())
-  , dacVoltage15(data.dacVoltage15())
-  , dacVoltage16(data.dacVoltage16())
-  , dacVoltage17(data.dacVoltage17())
-  , waveform0(data.waveform0())
-  , waveform1(data.waveform1())
-  , waveform2(data.waveform2())
-  , waveform3(data.waveform3())
-  , waveform4(data.waveform4())
-  , waveform5(data.waveform5())
-  , waveform6(data.waveform6())
-  , waveform7(data.waveform7())
-  , waveform8(data.waveform8())
-  , waveform9(data.waveform9())
-  , waveform10(data.waveform10())
-  , waveform11(data.waveform11())
-  , waveform12(data.waveform12())
-  , waveform13(data.waveform13())
-  , waveform14(data.waveform14())
 {
+  const ndarray<const uint16_t, 1>& waveforms = data.waveforms();
+  waveform0 = waveforms[0];
+  waveform1 = waveforms[1];
+  waveform2 = waveforms[2];
+  waveform3 = waveforms[3];
+  waveform4 = waveforms[4];
+  waveform5 = waveforms[5];
+  waveform6 = waveforms[6];
+  waveform7 = waveforms[7];
+  waveform8 = waveforms[8];
+  waveform9 = waveforms[9];
+  waveform10 = waveforms[10];
+  waveform11 = waveforms[11];
+  waveform12 = waveforms[12];
+  waveform13 = waveforms[13];
+  waveform14 = waveforms[14];
+
+  const ndarray<const float, 1>& dacVoltages = data.dacVoltages();
+  dacVoltage1 = dacVoltages[0];
+  dacVoltage2 = dacVoltages[1];
+  dacVoltage3 = dacVoltages[2];
+  dacVoltage4 = dacVoltages[3];
+  dacVoltage5 = dacVoltages[4];
+  dacVoltage6 = dacVoltages[5];
+  dacVoltage7 = dacVoltages[6];
+  dacVoltage8 = dacVoltages[7];
+  dacVoltage9 = dacVoltages[8];
+  dacVoltage10 = dacVoltages[9];
+  dacVoltage11 = dacVoltages[10];
+  dacVoltage12 = dacVoltages[11];
+  dacVoltage13 = dacVoltages[12];
+  dacVoltage14 = dacVoltages[13];
+  dacVoltage15 = dacVoltages[14];
+  dacVoltage16 = dacVoltages[15];
+  dacVoltage17 = dacVoltages[16];
 }
 
 hdf5pp::Type

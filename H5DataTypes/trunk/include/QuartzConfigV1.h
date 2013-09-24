@@ -23,7 +23,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "hdf5pp/Group.h"
-#include "pdsdata/quartz/ConfigV1.hh"
+#include "pdsdata/psddl/quartz.ddl.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -48,7 +48,7 @@ public:
 
   static void store ( const Pds::Quartz::ConfigV1& config, hdf5pp::Group location ) ;
 
-  static size_t xtcSize( const XtcType& xtc ) { return xtc.size() ; }
+  static size_t xtcSize( const XtcType& xtc ) { return xtc._sizeof() ; }
 
 private:
 

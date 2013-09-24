@@ -23,7 +23,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "hdf5pp/Group.h"
-#include "pdsdata/fccd/FccdConfigV1.hh"
+#include "pdsdata/psddl/fccd.ddl.h"
 
 //------------------------------------
 // Collaborating Class Declarations --

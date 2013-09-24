@@ -56,12 +56,12 @@ CsPadConfigV3QuadReg::CsPadConfigV3QuadReg(const Pds::CsPad::ConfigV3QuadReg& sr
   , pdpmndnmBalance(src.pdpmndnmBalance())
   , readOnly(src.ro())
   , digitalPots(src.dp())
-  , gainMap(*src.gm())
+  , gainMap(src.gm())
 {
-  const uint32_t* p = src.shiftSelect();
-  std::copy(p, p+TwoByTwosPerQuad, this->shiftSelect);
-  p = src.edgeSelect();
-  std::copy(p, p+TwoByTwosPerQuad, this->edgeSelect);
+  const ndarray<const uint32_t, 1>& shiftSelect = src.shiftSelect();
+  std::copy(shiftSelect.begin(), shiftSelect.end(), this->shiftSelect);
+  const ndarray<const uint32_t, 1>& edgeSelect = src.edgeSelect();
+  std::copy(edgeSelect.begin(), edgeSelect.end(), this->edgeSelect);
 }
 
 hdf5pp::Type
@@ -112,12 +112,11 @@ CsPadConfigV5::CsPadConfigV5 ( const XtcType& data )
   }
   
   for ( int q = 0; q < MaxQuadsPerSensor ; ++ q ) {
-    quads[q] = data.quads()[q];
+    quads[q] = data.quads(q);
   }
 
-  for ( int q = 0; q < MaxQuadsPerSensor ; ++ q ) {
-    protectionThresholds[q] = data.protectionThresholds()[q];
-  }
+  const ndarray<const Pds::CsPad::ProtectionSystemThreshold, 1>& thresh = data.protectionThresholds();
+  std::copy(thresh.begin(), thresh.end(), protectionThresholds);
 
   // fill the list of active sections from ROI bits
   int ns = 0 ;

@@ -27,7 +27,6 @@
 #include "hdf5pp/EnumType.h"
 #include "hdf5pp/VlenType.h"
 #include "hdf5pp/TypeTraits.h"
-#include "pdsdata/evr/SequencerEntry.hh"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -465,9 +464,10 @@ EvrIOChannel::EvrIOChannel ( const Pds::EvrData::IOChannel& chan )
   name = new char[len];
   std::copy(p, p+len, name);
   
+  const ndarray<const Pds::DetInfo, 1>& infos = chan.infos();
   info = new EvrIOChannelDetInfo_Data[ninfo];
   for ( size_t i = 0 ; i != ninfo ; ++ i ) {
-    const Pds::DetInfo& detinfo = chan.info(i);
+    const Pds::DetInfo& detinfo = infos[i];
     info[i].processId = detinfo.processId();
     info[i].detector = Pds::DetInfo::name(detinfo.detector());
     info[i].device = Pds::DetInfo::name(detinfo.device());
@@ -491,9 +491,10 @@ EvrIOChannel::operator= ( const Pds::EvrData::IOChannel& chan )
   name = new char[len];
   std::copy(p, p+len, name);
   
+  const ndarray<const Pds::DetInfo, 1>& infos = chan.infos();
   info = new EvrIOChannelDetInfo_Data[ninfo];
   for ( size_t i = 0 ; i != ninfo ; ++ i ) {
-    const Pds::DetInfo& detinfo = chan.info(i);
+    const Pds::DetInfo& detinfo = infos[i];
     info[i].processId = detinfo.processId();
     info[i].detector = Pds::DetInfo::name(detinfo.detector());
     info[i].device = Pds::DetInfo::name(detinfo.device());
@@ -554,10 +555,10 @@ EvrSequencerConfigV1::EvrSequencerConfigV1 ( const Pds::EvrData::SequencerConfig
   , length(data.length())
   , nentries(data.length())
 {
-
+  const ndarray<const Pds::EvrData::SequencerEntry, 1>& in_entries = data.entries();
   entries = new EvrSequencerEntry_Data[nentries];
   for ( size_t i = 0 ; i != nentries ; ++ i ) {
-    const Pds::EvrData::SequencerEntry& entry = data.entry(i);
+    const Pds::EvrData::SequencerEntry& entry = in_entries[i];
     entries[i].eventcode = entry.eventcode();
     entries[i].delay = entry.delay();
   }

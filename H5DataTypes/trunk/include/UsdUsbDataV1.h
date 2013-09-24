@@ -23,7 +23,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "hdf5pp/Group.h"
-#include "pdsdata/usdusb/DataV1.hh"
+#include "pdsdata/psddl/usdusb.ddl.h"
 
 //------------------------------------
 // Collaborating Class Declarations --

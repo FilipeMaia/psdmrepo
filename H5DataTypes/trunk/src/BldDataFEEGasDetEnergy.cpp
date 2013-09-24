@@ -35,10 +35,10 @@
 namespace H5DataTypes {
 
 BldDataFEEGasDetEnergy::BldDataFEEGasDetEnergy ( const XtcType& xtc )
-  : f_11_ENRC(xtc.f_11_ENRC)
-  , f_12_ENRC(xtc.f_12_ENRC)
-  , f_21_ENRC(xtc.f_21_ENRC)
-  , f_22_ENRC(xtc.f_22_ENRC)
+  : f_11_ENRC(xtc.f_11_ENRC())
+  , f_12_ENRC(xtc.f_12_ENRC())
+  , f_21_ENRC(xtc.f_21_ENRC())
+  , f_22_ENRC(xtc.f_22_ENRC())
 {
 }
 

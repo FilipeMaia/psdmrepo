@@ -39,16 +39,16 @@
 namespace H5DataTypes {
 
 ImpConfigV1::ImpConfigV1 ( const XtcType& data )
-  : range(data.get(XtcType::Range))
-  , calRange(data.get(XtcType::Cal_range))
-  , reset(data.get(XtcType::Reset))
-  , biasData(data.get(XtcType::Bias_data))
-  , calData(data.get(XtcType::Cal_data))
-  , biasDacData(data.get(XtcType::BiasDac_data))
-  , calStrobe(data.get(XtcType::Cal_strobe))
-  , numberOfSamples(data.get(XtcType::NumberOfSamples))
-  , trigDelay(data.get(XtcType::TrigDelay))
-  , adcDelay(data.get(XtcType::Adc_delay))
+  : range(data.range())
+  , calRange(data.calRange())
+  , reset(data.reset())
+  , biasData(data.biasData())
+  , calData(data.calData())
+  , biasDacData(data.biasDacData())
+  , calStrobe(data.calStrobe())
+  , numberOfSamples(data.numberOfSamples())
+  , trigDelay(data.trigDelay())
+  , adcDelay(data.adcDelay())
 {
 }
 

@@ -37,11 +37,12 @@
 namespace H5DataTypes {
 
 LusiIpmFexConfigV2::LusiIpmFexConfigV2 ( const XtcType& data )
-  : xscale(data.xscale)
-  , yscale(data.yscale)
+  : xscale(data.xscale())
+  , yscale(data.yscale())
 {
+  const ndarray<const Pds::Lusi::DiodeFexConfigV2, 1>& ndiode = data.diode();
   for ( int i = 0 ; i < XtcType::NCHANNELS ; ++ i ) {
-    diode[i] = LusiDiodeFexConfigV2(data.diode[i]);
+    diode[i] = LusiDiodeFexConfigV2(ndiode[i]);
   }
 }
 

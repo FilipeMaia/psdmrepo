@@ -37,11 +37,12 @@
 namespace H5DataTypes {
 
 LusiIpmFexV1::LusiIpmFexV1 ( const XtcType& data )
-  : sum(data.sum)
-  , xpos(data.xpos)
-  , ypos(data.ypos)
+  : sum(data.sum())
+  , xpos(data.xpos())
+  , ypos(data.ypos())
 {
-  std::copy(data.channel, data.channel+LusiIpmFexV1::CHSIZE, channel);
+  const ndarray<const float, 1>& ndchannel = data.channel();
+  std::copy(ndchannel.begin(), ndchannel.end(), channel);
 }
 
 hdf5pp::Type

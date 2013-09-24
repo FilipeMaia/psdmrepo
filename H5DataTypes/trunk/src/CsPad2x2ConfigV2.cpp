@@ -63,7 +63,7 @@ CsPad2x2ConfigV2QuadReg::CsPad2x2ConfigV2QuadReg(const Pds::CsPad2x2::ConfigV2Qu
   , pdpmndnmBalance(src.pdpmndnmBalance())
   , readOnly(src.ro())
   , digitalPots(src.dp())
-  , gainMap(*src.gm())
+  , gainMap(src.gm())
 {
 }
 
@@ -102,9 +102,9 @@ CsPad2x2ConfigV2QuadReg::native_type()
 
 
 CsPad2x2ConfigV2::CsPad2x2ConfigV2 ( const XtcType& data )
-  : quad(*data.quad())
+  : quad(data.quad())
   , testDataIndex(data.tdi())
-  , protectionThreshold(*data.protectionThreshold())
+  , protectionThreshold(data.protectionThreshold())
   , protectionEnable(data.protectionEnable())
   , inactiveRunMode(data.inactiveRunMode())
   , activeRunMode(data.activeRunMode())

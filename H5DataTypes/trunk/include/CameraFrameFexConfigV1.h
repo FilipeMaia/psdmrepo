@@ -24,7 +24,7 @@
 //-------------------------------
 #include "H5DataTypes/CameraFrameCoordV1.h"
 #include "hdf5pp/Group.h"
-#include "pdsdata/camera/FrameFexConfigV1.hh"
+#include "pdsdata/psddl/camera.ddl.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -52,7 +52,7 @@ public:
 
   static void store ( const Pds::Camera::FrameFexConfigV1& config, hdf5pp::Group location ) ;
 
-  static size_t xtcSize( const XtcType& xtc ) { return xtc.size() ; }
+  static size_t xtcSize( const XtcType& xtc ) { return xtc._sizeof() ; }
 
 private:
   uint32_t   forwarding;

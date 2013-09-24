@@ -23,7 +23,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "hdf5pp/Group.h"
-#include "pdsdata/lusi/IpmFexConfigV1.hh"
+#include "pdsdata/psddl/lusi.ddl.h"
 #include "H5DataTypes/LusiDiodeFexConfigV1.h"
 
 //------------------------------------

@@ -23,7 +23,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "hdf5pp/Type.h"
-#include "pdsdata/acqiris/TdcDataV1.hh"
+#include "pdsdata/psddl/acqiris.ddl.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -45,7 +45,7 @@ public:
   typedef Pds::Acqiris::TdcDataV1 XtcType ;
 
   AcqirisTdcDataV1 () ;
-  AcqirisTdcDataV1 ( size_t size, const XtcType* xtcData ) ;
+  AcqirisTdcDataV1 ( size_t size, const XtcType& xtcData ) ;
 
   ~AcqirisTdcDataV1 () ;
 

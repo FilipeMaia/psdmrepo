@@ -41,7 +41,7 @@ namespace H5DataTypes {
 //----------------
 EvrDataV3::EvrDataV3 ( const XtcType& data )
   : numFifoEvents(data.numFifoEvents())
-  , fifoEvents(&data.fifoEvent(0))
+  , fifoEvents(data.fifoEvents().data())
 {
 }
 
@@ -54,10 +54,10 @@ EvrDataV3::stored_type()
 hdf5pp::Type
 EvrDataV3::native_type()
 {
-  hdf5pp::CompoundType baseType = hdf5pp::CompoundType::compoundType<Pds::EvrData::DataV3::FIFOEvent>() ;
-  baseType.insert_native<uint32_t>( "timestampHigh", offsetof(Pds::EvrData::DataV3::FIFOEvent,TimestampHigh) ) ;
-  baseType.insert_native<uint32_t>( "timestampLow", offsetof(Pds::EvrData::DataV3::FIFOEvent,TimestampLow) ) ;
-  baseType.insert_native<uint32_t>( "eventCode", offsetof(Pds::EvrData::DataV3::FIFOEvent,EventCode) ) ;
+  hdf5pp::CompoundType baseType = hdf5pp::CompoundType::compoundType<Pds::EvrData::FIFOEvent>() ;
+  baseType.insert_native<uint32_t>( "timestampHigh", 0 ) ;
+  baseType.insert_native<uint32_t>( "timestampLow", 4 ) ;
+  baseType.insert_native<uint32_t>( "eventCode", 8 ) ;
   hdf5pp::Type fifoType = hdf5pp::VlenType::vlenType ( baseType );
 
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<EvrDataV3>() ;

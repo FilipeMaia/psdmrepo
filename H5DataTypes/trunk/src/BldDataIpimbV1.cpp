@@ -36,9 +36,9 @@
 namespace H5DataTypes {
 
 BldDataIpimbV1::BldDataIpimbV1 ( const XtcType& data )
-  : ipimbData(data.ipimbData)
-  , ipimbConfig(data.ipimbConfig)
-  , ipmFexData(data.ipmFexData)
+  : ipimbData(data.ipimbData())
+  , ipimbConfig(data.ipimbConfig())
+  , ipmFexData(data.ipmFexData())
 {
 }
 

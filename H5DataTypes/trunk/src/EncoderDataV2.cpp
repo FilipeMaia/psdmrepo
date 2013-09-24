@@ -39,11 +39,12 @@ namespace H5DataTypes {
 // Constructors --
 //----------------
 EncoderDataV2::EncoderDataV2 ( const XtcType& data )
-  : _33mhz_timestamp(data._33mhz_timestamp)
+  : _33mhz_timestamp(data.timestamp())
 {
-  encoder_count[0] = data._encoder_count[0] ;
-  encoder_count[1] = data._encoder_count[1] ;
-  encoder_count[2] = data._encoder_count[2] ;
+  const ndarray<const uint32_t, 1>& in_encoder_count = data.encoder_count();
+  encoder_count[0] = in_encoder_count[0] ;
+  encoder_count[1] = in_encoder_count[1] ;
+  encoder_count[2] = in_encoder_count[2] ;
 }
 
 hdf5pp::Type

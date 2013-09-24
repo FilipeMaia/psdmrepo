@@ -54,23 +54,23 @@ namespace {
 namespace H5DataTypes {
 
 BldDataGMDV0::BldDataGMDV0 ( const XtcType& xtc )
-  : fPressure(xtc.fPressure)
-  , fTemperature(xtc.fTemperature)
-  , fCurrent(xtc.fCurrent)
-  , fHvMeshElectron(xtc.fHvMeshElectron)
-  , fHvMeshIon(xtc.fHvMeshIon)
-  , fHvMultIon(xtc.fHvMultIon)
-  , fChargeQ(xtc.fChargeQ)
-  , fPhotonEnergy(xtc.fPhotonEnergy)
-  , fMultPulseIntensity(xtc.fMultPulseIntensity)
-  , fKeithleyPulseIntensity(xtc.fKeithleyPulseIntensity)
-  , fPulseEnergy(xtc.fPulseEnergy)
-  , fPulseEnergyFEE(xtc.fPulseEnergyFEE)
-  , fTransmission(xtc.fTransmission)
-  , fTransmissionFEE(xtc.fTransmissionFEE)
-  , fSpare6(xtc.fSpare6)
+  : fPressure(xtc.pressure())
+  , fTemperature(xtc.temperature())
+  , fCurrent(xtc.current())
+  , fHvMeshElectron(xtc.hvMeshElectron())
+  , fHvMeshIon(xtc.hvMeshIon())
+  , fHvMultIon(xtc.hvMultIon())
+  , fChargeQ(xtc.chargeQ())
+  , fPhotonEnergy(xtc.photonEnergy())
+  , fMultPulseIntensity(xtc.multPulseIntensity())
+  , fKeithleyPulseIntensity(xtc.keithleyPulseIntensity())
+  , fPulseEnergy(xtc.pulseEnergy())
+  , fPulseEnergyFEE(xtc.pulseEnergyFEE())
+  , fTransmission(xtc.transmission())
+  , fTransmissionFEE(xtc.transmissionFEE())
+  , fSpare6(0)
 {
-  std::copy(xtc.strGasType+0, xtc.strGasType+32, strGasType);
+  std::copy(xtc.gasType()+0, xtc.gasType()+32, strGasType);
 }
 
 BldDataGMDV0::~BldDataGMDV0 ()

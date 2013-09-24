@@ -22,7 +22,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "hdf5pp/Group.h"
-#include "pdsdata/evr/IOConfigV1.hh"
+#include "pdsdata/psddl/evr.ddl.h"
 #include "H5DataTypes/EvrConfigData.h"
 
 //------------------------------------
@@ -49,7 +49,7 @@ public:
   // store single config object at specified location
   static void store( const XtcType& config, hdf5pp::Group location ) ;
 
-  static size_t xtcSize( const XtcType& xtc ) { return xtc.size() ; }
+  static size_t xtcSize( const XtcType& xtc ) { return xtc._sizeof() ; }
 
 private:
 

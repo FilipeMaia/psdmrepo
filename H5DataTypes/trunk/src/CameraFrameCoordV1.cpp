@@ -37,8 +37,8 @@
 namespace H5DataTypes {
 
 CameraFrameCoordV1::CameraFrameCoordV1( const Pds::Camera::FrameCoord& coord )
-  : column(coord.column)
-  , row(coord.row)
+  : column(coord.column())
+  , row(coord.row())
 {
 }
 

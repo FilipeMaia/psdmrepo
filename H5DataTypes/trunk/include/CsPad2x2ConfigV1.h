@@ -24,7 +24,7 @@
 //-------------------------------
 #include "hdf5pp/Group.h"
 #include "hdf5pp/Type.h"
-#include "pdsdata/cspad2x2/ConfigV1.hh"
+#include "pdsdata/psddl/cspad2x2.ddl.h"
 
 //------------------------------------
 // Collaborating Class Declarations --

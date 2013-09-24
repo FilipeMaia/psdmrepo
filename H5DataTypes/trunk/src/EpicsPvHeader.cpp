@@ -38,9 +38,9 @@ namespace H5DataTypes {
 // Constructors --
 //----------------
 EpicsPvHeader::EpicsPvHeader ( const XtcType& xtc )
-  : pvId(xtc.iPvId)
-  , dbrType(xtc.iDbrType)
-  , numElements(xtc.iNumElements)
+  : pvId(xtc.pvId())
+  , dbrType(xtc.dbrType())
+  , numElements(xtc.numElements())
 {
 }
 

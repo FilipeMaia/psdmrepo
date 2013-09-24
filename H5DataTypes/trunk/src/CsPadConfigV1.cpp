@@ -40,7 +40,8 @@ namespace H5DataTypes {
 
 CsPadDigitalPotsCfg::CsPadDigitalPotsCfg(const Pds::CsPad::CsPadDigitalPotsCfg& o)
 {
-  std::copy(o.pots, o.pots+PotsPerQuad, this->pots);
+  const ndarray<const uint8_t, 1>& pots = o.pots();
+  std::copy(pots.begin(), pots.end(), this->pots);
 }
 
 hdf5pp::Type
@@ -53,8 +54,8 @@ CsPadDigitalPotsCfg::native_type()
 
 
 CsPadReadOnlyCfg::CsPadReadOnlyCfg(const Pds::CsPad::CsPadReadOnlyCfg& o)
-  : shiftTest(o.shiftTest)
-  , version(o.version)
+  : shiftTest(o.shiftTest())
+  , version(o.version())
 {
 }
 
@@ -70,9 +71,8 @@ CsPadReadOnlyCfg::native_type()
 
 CsPadGainMapCfg::CsPadGainMapCfg(const Pds::CsPad::CsPadGainMapCfg& src)
 {
-  size_t size = ColumnsPerASIC * MaxRowsPerASIC;
-  const uint16_t* srcmap = &src._gainMap[0][0];
-  std::copy(srcmap, srcmap+size, &gainMap[0][0]);
+  const ndarray<const uint16_t, 2>& gainMap = src.gainMap();
+  std::copy(gainMap.begin(), gainMap.end(), this->gainMap[0]);
 }
 
 hdf5pp::Type
@@ -100,12 +100,12 @@ CsPadConfigV1QuadReg::CsPadConfigV1QuadReg(const Pds::CsPad::ConfigV1QuadReg& sr
   , rowColShiftPer(src.rowColShiftPer())
   , readOnly(src.ro())
   , digitalPots(src.dp())
-  , gainMap(*src.gm())
+  , gainMap(src.gm())
 {
-  const uint32_t* p = src.shiftSelect();
-  std::copy(p, p+TwoByTwosPerQuad, this->shiftSelect);
-  p = src.edgeSelect();
-  std::copy(p, p+TwoByTwosPerQuad, this->edgeSelect);
+  const ndarray<const uint32_t, 1>& shiftSelect = src.shiftSelect();
+  std::copy(shiftSelect.begin(), shiftSelect.end(), this->shiftSelect);
+  const ndarray<const uint32_t, 1>& edgeSelect = src.edgeSelect();
+  std::copy(edgeSelect.begin(), edgeSelect.end(), this->edgeSelect);
 }
 
 hdf5pp::Type
@@ -145,7 +145,7 @@ CsPadConfigV1::CsPadConfigV1 ( const XtcType& data )
   , quadMask(data.quadMask())
 {
   for ( int q = 0; q < MaxQuadsPerSensor ; ++ q ) {
-    quads[q] = data.quads()[q];
+    quads[q] = data.quads(q);
   }
 }
 

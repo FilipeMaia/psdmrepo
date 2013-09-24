@@ -27,7 +27,7 @@
 // Collaborating Class Declarations --
 //------------------------------------
 #include "hdf5pp/Group.h"
-#include "pdsdata/princeton/InfoV1.hh"
+#include "pdsdata/psddl/princeton.ddl.h"
 
 //		---------------------
 // 		-- Class Interface --

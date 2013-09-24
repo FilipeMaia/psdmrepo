@@ -23,7 +23,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "hdf5pp/Group.h"
-#include "pdsdata/camera/FrameCoord.hh"
+#include "pdsdata/psddl/camera.ddl.h"
 
 //------------------------------------
 // Collaborating Class Declarations --

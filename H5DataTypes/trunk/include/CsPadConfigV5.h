@@ -25,7 +25,7 @@
 #include "H5DataTypes/CsPadConfigV3.h"
 #include "hdf5pp/Group.h"
 #include "hdf5pp/Type.h"
-#include "pdsdata/cspad/ConfigV5.hh"
+#include "pdsdata/psddl/cspad.ddl.h"
 
 //------------------------------------
 // Collaborating Class Declarations --

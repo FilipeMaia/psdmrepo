@@ -39,8 +39,8 @@
 namespace H5DataTypes {
 
 CsPadProtectionSystemThreshold::CsPadProtectionSystemThreshold(const Pds::CsPad::ProtectionSystemThreshold& o)
-  : adcThreshold(o.adcThreshold)
-  , pixelCountThreshold(o.pixelCountThreshold)
+  : adcThreshold(o.adcThreshold())
+  , pixelCountThreshold(o.pixelCountThreshold())
 {
 }
 
@@ -73,12 +73,11 @@ CsPadConfigV3::CsPadConfigV3 ( const XtcType& data )
   }
   
   for ( int q = 0; q < MaxQuadsPerSensor ; ++ q ) {
-    quads[q] = data.quads()[q];
+    quads[q] = data.quads(q);
   }
 
-  for ( int q = 0; q < MaxQuadsPerSensor ; ++ q ) {
-    protectionThresholds[q] = data.protectionThresholds()[q];
-  }
+  const ndarray<const Pds::CsPad::ProtectionSystemThreshold, 1>& thresh = data.protectionThresholds();
+  std::copy(thresh.begin(), thresh.end(), protectionThresholds);
 
   // fill the list of active sections from ROI bits
   int ns = 0 ;

@@ -112,8 +112,8 @@ TimepixConfigV3::TimepixConfigV3 ( const Pds::Timepix::ConfigV3& data )
   , chip2ID(data.chip2ID())
   , chip3ID(data.chip3ID())
 {
-  const uint8_t* pixelThresh = data.pixelThresh();
-  std::copy(pixelThresh, pixelThresh+XtcType::PixelThreshMax, this->pixelThresh);
+  const ndarray<const uint8_t, 1>& pixelThresh = data.pixelThresh();
+  std::copy(pixelThresh.begin(), pixelThresh.end(), this->pixelThresh);
 
   const char* name = data.chip0Name();
   int len = strlen(name)+1;

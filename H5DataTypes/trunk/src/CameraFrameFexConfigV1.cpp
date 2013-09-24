@@ -91,8 +91,8 @@ CameraFrameFexConfigV1::store( const Pds::Camera::FrameFexConfigV1& config, hdf5
   storeDataObject ( data, "config", grp ) ;
 
   // make array data set for masked pixels
-  const uint32_t maskedSize = config.number_of_masked_pixels() ;
-  storeCameraFrameCoordV1 ( maskedSize, &config.masked_pixel_coordinates(), grp, "masked_pixel_coordinates" ) ;
+  const ndarray<const Pds::Camera::FrameCoord, 1>& masked_pixel_coordinates = config.masked_pixel_coordinates();
+  storeCameraFrameCoordV1 ( masked_pixel_coordinates.size(), masked_pixel_coordinates.data(), grp, "masked_pixel_coordinates" ) ;
 }
 
 } // namespace H5DataTypes

@@ -163,8 +163,9 @@ AcqirisConfigV1::store ( const Pds::Acqiris::ConfigV1& config, hdf5pp::Group grp
   // make array data set for subobject
   const uint32_t nbrChannels = config.nbrChannels() ;
   AcqirisVertV1 vdata[nbrChannels] ;
+  const ndarray<const Pds::Acqiris::VertV1, 1>& pdsdata = config.vert();
   for ( uint32_t i = 0 ; i < nbrChannels ; ++ i ) {
-    vdata[i] = AcqirisVertV1( config.vert(i) ) ;
+    vdata[i] = AcqirisVertV1(pdsdata[i]);
   }
   storeDataObjects ( nbrChannels, vdata, "vert", grp ) ;
 

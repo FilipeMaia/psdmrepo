@@ -40,7 +40,8 @@ namespace H5DataTypes {
 
 CsPad2x2DigitalPotsCfg::CsPad2x2DigitalPotsCfg(const Pds::CsPad2x2::CsPad2x2DigitalPotsCfg& o)
 {
-  std::copy(o.pots, o.pots+PotsPerQuad, this->pots);
+  const ndarray<const uint8_t, 1>& pots = o.pots();
+  std::copy(pots.begin(), pots.end(), this->pots);
 }
 
 hdf5pp::Type
@@ -53,8 +54,8 @@ CsPad2x2DigitalPotsCfg::native_type()
 
 
 CsPad2x2ReadOnlyCfg::CsPad2x2ReadOnlyCfg(const Pds::CsPad2x2::CsPad2x2ReadOnlyCfg& o)
-  : shiftTest(o.shiftTest)
-  , version(o.version)
+  : shiftTest(o.shiftTest())
+  , version(o.version())
 {
 }
 
@@ -70,9 +71,8 @@ CsPad2x2ReadOnlyCfg::native_type()
 
 CsPad2x2GainMapCfg::CsPad2x2GainMapCfg(const Pds::CsPad2x2::CsPad2x2GainMapCfg& src)
 {
-  size_t size = ColumnsPerASIC * MaxRowsPerASIC;
-  const uint16_t* srcmap = &src._gainMap[0][0];
-  std::copy(srcmap, srcmap+size, &gainMap[0][0]);
+  const ndarray<const uint16_t, 2>& gainMap = src.gainMap();
+  std::copy(gainMap.begin(), gainMap.end(), this->gainMap[0]);
 }
 
 hdf5pp::Type
@@ -88,8 +88,8 @@ CsPad2x2GainMapCfg::native_type()
 
 
 CsPad2x2ConfigV1QuadReg::CsPad2x2ConfigV1QuadReg(const Pds::CsPad2x2::ConfigV1QuadReg& src)
-  : shiftSelect(src.shiftSelect()[0])
-  , edgeSelect(src.edgeSelect()[0])
+  : shiftSelect(src.shiftSelect())
+  , edgeSelect(src.edgeSelect())
   , readClkSet(src.readClkSet())
   , readClkHold(src.readClkHold())
   , dataMode(src.dataMode())
@@ -111,7 +111,7 @@ CsPad2x2ConfigV1QuadReg::CsPad2x2ConfigV1QuadReg(const Pds::CsPad2x2::ConfigV1Qu
   , setPoint(src.setPoint())
   , readOnly(src.ro())
   , digitalPots(src.dp())
-  , gainMap(*src.gm())
+  , gainMap(src.gm())
 {
 }
 
@@ -148,8 +148,8 @@ CsPad2x2ConfigV1QuadReg::native_type()
 
 
 CsPad2x2ProtectionSystemThreshold::CsPad2x2ProtectionSystemThreshold(const Pds::CsPad2x2::ProtectionSystemThreshold& o)
-  : adcThreshold(o.adcThreshold)
-  , pixelCountThreshold(o.pixelCountThreshold)
+  : adcThreshold(o.adcThreshold())
+  , pixelCountThreshold(o.pixelCountThreshold())
 {
 }
 
@@ -163,9 +163,9 @@ CsPad2x2ProtectionSystemThreshold::native_type()
 }
 
 CsPad2x2ConfigV1::CsPad2x2ConfigV1 ( const XtcType& data )
-  : quad(*data.quad())
+  : quad(data.quad())
   , testDataIndex(data.tdi())
-  , protectionThreshold(*data.protectionThreshold())
+  , protectionThreshold(data.protectionThreshold())
   , protectionEnable(data.protectionEnable())
   , inactiveRunMode(data.inactiveRunMode())
   , activeRunMode(data.activeRunMode())

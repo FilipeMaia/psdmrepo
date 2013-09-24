@@ -28,7 +28,7 @@
 //------------------------------------
 #include "H5DataTypes/XtcClockTime.h"
 #include "hdf5pp/Type.h"
-#include "pdsdata/oceanoptics/DataV1.hh"
+#include "pdsdata/psddl/oceanoptics.ddl.h"
 
 //		---------------------
 // 		-- Class Interface --

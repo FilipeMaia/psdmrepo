@@ -27,16 +27,7 @@
 // Collaborating Class Declarations --
 //------------------------------------
 #include "hdf5pp/Type.h"
-#include "pdsdata/evr/PulseConfig.hh"
-#include "pdsdata/evr/PulseConfigV3.hh"
-#include "pdsdata/evr/EventCodeV3.hh"
-#include "pdsdata/evr/EventCodeV4.hh"
-#include "pdsdata/evr/EventCodeV5.hh"
-#include "pdsdata/evr/EventCodeV6.hh"
-#include "pdsdata/evr/IOChannel.hh"
-#include "pdsdata/evr/OutputMap.hh"
-#include "pdsdata/evr/OutputMapV2.hh"
-#include "pdsdata/evr/SequencerConfigV1.hh"
+#include "pdsdata/psddl/evr.ddl.h"
 
 //		---------------------
 // 		-- Class Interface --

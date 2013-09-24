@@ -38,9 +38,8 @@ namespace H5DataTypes {
 
 ImpSample::ImpSample ( const XtcType& data )
 {
-  for (unsigned i = 0; i != 4; ++ i) {
-    channels[i] = data.channel(i);
-  }
+  const ndarray<const uint16_t, 1>& channels = data.channels();
+  std::copy(channels.begin(), channels.end(), this->channels);
 }
 
 hdf5pp::Type
@@ -64,15 +63,15 @@ ImpSample::native_type()
 
 
 ImpLaneStatus::ImpLaneStatus ( const XtcType& data )
+  : linkErrCount(data.linkErrCount())
+  , linkDownCount(data.linkDownCount())
+  , cellErrCount(data.cellErrCount())
+  , rxCount(data.rxCount())
+  , locLinked(data.locLinked())
+  , remLinked(data.remLinked())
+  , zeros(data.zeros())
+  , powersOkay(data.powersOkay())
 {
-  linkErrCount = data & 0xf;
-  linkDownCount = (data >> 4) & 0xf;
-  cellErrCount = (data >> 8) & 0xf;
-  rxCount = (data >> 12) & 0xf;
-  locLinked = (data >> 16) & 0x1;
-  remLinked = (data >> 17) & 0x1;
-  zeros = (data >> 18) & 0x3ff;
-  powersOkay = (data >> 28) & 0xf;
 }
 
 hdf5pp::Type

@@ -68,18 +68,20 @@ EvrConfigV1::store( const Pds::EvrData::ConfigV1& config, hdf5pp::Group grp )
   storeDataObject ( data, "config", grp ) ;
 
   // pulses data
+  const ndarray<const Pds::EvrData::PulseConfig, 1>& in_pulses = config.pulses();
   const uint32_t npulses = config.npulses() ;
   EvrPulseConfig pdata[npulses] ;
   for ( uint32_t i = 0 ; i < npulses ; ++ i ) {
-    pdata[i] = EvrPulseConfig( config.pulse(i) ) ;
+    pdata[i] = EvrPulseConfig( in_pulses[i] ) ;
   }
   storeDataObjects ( npulses, pdata, "pulses", grp ) ;
 
   // output map data
+  const ndarray<const Pds::EvrData::OutputMap, 1>& in_output_maps = config.output_maps();
   const uint32_t noutputs = config.noutputs() ;
   EvrOutputMap mdata[noutputs] ;
   for ( uint32_t i = 0 ; i < noutputs ; ++ i ) {
-    mdata[i] = EvrOutputMap( config.output_map(i) ) ;
+    mdata[i] = EvrOutputMap( in_output_maps[i] ) ;
   }
   storeDataObjects ( noutputs, mdata, "output_maps", grp ) ;
 

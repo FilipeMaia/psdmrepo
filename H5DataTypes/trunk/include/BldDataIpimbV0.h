@@ -22,7 +22,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "hdf5pp/Type.h"
-#include "pdsdata/bld/bldData.hh"
+#include "pdsdata/psddl/bld.ddl.h"
 #include "H5DataTypes/IpimbConfigV1.h"
 #include "H5DataTypes/IpimbDataV1.h"
 #include "H5DataTypes/LusiIpmFexV1.h"
@@ -43,7 +43,7 @@ namespace H5DataTypes {
 class BldDataIpimbV0  {
 public:
 
-  typedef Pds::BldDataIpimbV0 XtcType ;
+  typedef Pds::Bld::BldDataIpimbV0 XtcType ;
 
   BldDataIpimbV0 () {}
   BldDataIpimbV0 ( const XtcType& xtc ) ;

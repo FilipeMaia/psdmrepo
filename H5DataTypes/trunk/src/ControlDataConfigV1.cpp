@@ -153,18 +153,20 @@ ControlDataConfigV1::store( const XtcType& config, hdf5pp::Group grp )
   storeDataObject ( data, "config", grp ) ;
 
   // pvcontrols data
+  const ndarray<const Pds::ControlData::PVControl, 1>& in_pvControls = config.pvControls();
   const uint32_t npvControls = config.npvControls() ;
   ControlDataPVControlV1 pvControls[npvControls] ;
   for ( uint32_t i = 0 ; i < npvControls ; ++ i ) {
-    pvControls[i] = ControlDataPVControlV1( config.pvControl(i) ) ;
+    pvControls[i] = ControlDataPVControlV1( in_pvControls[i] ) ;
   }
   storeDataObjects ( npvControls, pvControls, "pvControls", grp ) ;
 
   // pvmonitors data
+  const ndarray<const Pds::ControlData::PVMonitor, 1>& in_pvMonitors = config.pvMonitors();
   const uint32_t npvMonitors = config.npvMonitors() ;
   ControlDataPVMonitorV1 pvMonitors[npvMonitors] ;
   for ( uint32_t i = 0 ; i < npvMonitors ; ++ i ) {
-    pvMonitors[i] = ControlDataPVMonitorV1( config.pvMonitor(i) ) ;
+    pvMonitors[i] = ControlDataPVMonitorV1( in_pvMonitors[i] ) ;
   }
   storeDataObjects ( npvMonitors, pvMonitors, "pvMonitors", grp ) ;
 

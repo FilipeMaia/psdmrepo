@@ -42,10 +42,11 @@ namespace H5DataTypes {
 //----------------
 UsdUsbConfigV1::UsdUsbConfigV1 ( const XtcType& data )
 {
-  for (int i = 0; i != NCHANNELS; ++ i) {
-    counting_mode[i] = data.counting_mode(i);
-    quadrature_mode[i] = data.quadrature_mode(i);
-  }
+  const ndarray<const uint32_t, 1>& in_counting_mode = data.counting_mode();
+  std::copy(in_counting_mode.begin(), in_counting_mode.end(), counting_mode);
+
+  const ndarray<const uint32_t, 1>& in_quadrature_mode = data.quadrature_mode();
+  std::copy(in_quadrature_mode.begin(), in_quadrature_mode.end(), quadrature_mode);
 }
 
 hdf5pp::Type

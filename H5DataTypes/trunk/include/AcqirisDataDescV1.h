@@ -23,8 +23,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "hdf5pp/Group.h"
-#include "pdsdata/acqiris/ConfigV1.hh"
-#include "pdsdata/acqiris/DataDescV1.hh"
+#include "pdsdata/psddl/acqiris.ddl.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -64,7 +63,7 @@ private:
 class AcqirisDataDescV1  {
 public:
 
-  typedef Pds::Acqiris::DataDescV1 XtcType ;
+  typedef Pds::Acqiris::DataDescV1Elem XtcType ;
 
   AcqirisDataDescV1 () : nbrSamplesInSeg(0), nbrSegments(0), indexFirstPoint(0) {}
   AcqirisDataDescV1 ( const XtcType& xtcData ) ;

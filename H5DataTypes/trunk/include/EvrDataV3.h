@@ -27,7 +27,7 @@
 // Collaborating Class Declarations --
 //------------------------------------
 #include "hdf5pp/Group.h"
-#include "pdsdata/evr/DataV3.hh"
+#include "pdsdata/psddl/evr.ddl.h"
 
 //		---------------------
 // 		-- Class Interface --
@@ -49,12 +49,12 @@ public:
   static hdf5pp::Type stored_type() ;
   static hdf5pp::Type native_type() ;
 
-  static size_t xtcSize( const XtcType& xtc ) { return xtc.size(); }
+  static size_t xtcSize( const XtcType& xtc ) { return xtc._sizeof(); }
 
 private:
 
   size_t numFifoEvents;
-  const Pds::EvrData::DataV3::FIFOEvent* fifoEvents;
+  const Pds::EvrData::FIFOEvent* fifoEvents;
 };
 
 } // namespace H5DataTypes

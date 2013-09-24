@@ -27,7 +27,7 @@
 // Collaborating Class Declarations --
 //------------------------------------
 #include "hdf5pp/Group.h"
-#include "pdsdata/andor/FrameV1.hh"
+#include "pdsdata/psddl/andor.ddl.h"
 
 //		---------------------
 // 		-- Class Interface --

@@ -22,9 +22,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "hdf5pp/Group.h"
-#include "pdsdata/pnCCD/ConfigV1.hh"
-#include "pdsdata/pnCCD/ConfigV2.hh"
-#include "pdsdata/pnCCD/FrameV1.hh"
+#include "pdsdata/psddl/pnccd.ddl.h"
 
 //------------------------------------
 // Collaborating Class Declarations --

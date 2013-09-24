@@ -37,7 +37,7 @@
 namespace H5DataTypes {
 
 LusiDiodeFexV1::LusiDiodeFexV1 ( const XtcType& data )
-  : value(data.value)
+  : value(data.value())
 {
 }
 

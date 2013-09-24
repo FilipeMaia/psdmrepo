@@ -57,7 +57,7 @@ CsPadConfigV2::CsPadConfigV2 ( const XtcType& data )
   }
   
   for ( int q = 0; q < MaxQuadsPerSensor ; ++ q ) {
-    quads[q] = data.quads()[q];
+    quads[q] = data.quads(q);
   }
 
   // fill the list of active sections from ROI bits

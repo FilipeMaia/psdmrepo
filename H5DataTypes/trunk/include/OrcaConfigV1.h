@@ -27,7 +27,7 @@
 // Collaborating Class Declarations --
 //------------------------------------
 #include "hdf5pp/Group.h"
-#include "pdsdata/orca/ConfigV1.hh"
+#include "pdsdata/psddl/orca.ddl.h"
 
 //		---------------------
 // 		-- Class Interface --

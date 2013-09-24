@@ -23,7 +23,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "hdf5pp/Type.h"
-#include "pdsdata/camera/FrameV1.hh"
+#include "pdsdata/psddl/camera.ddl.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -51,7 +51,10 @@ public:
   static hdf5pp::Type stored_type() ;
   static hdf5pp::Type native_type() ;
 
-  static size_t xtcSize( const XtcType& frame ) { return ((sizeof frame + frame.data_size() + 3) / 4) * 4 ; }
+  static size_t xtcSize( const XtcType& frame ) {
+    size_t size = sizeof frame + frame.width()*frame.height()*((frame.depth()+7)/8);
+    return ((size + 3) / 4) * 4 ;
+  }
 
   static hdf5pp::Type imageType( const XtcType& frame ) ;
 

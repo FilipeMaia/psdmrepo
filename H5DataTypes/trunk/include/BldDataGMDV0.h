@@ -22,7 +22,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "hdf5pp/Type.h"
-#include "pdsdata/bld/bldData.hh"
+#include "pdsdata/psddl/bld.ddl.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -40,7 +40,7 @@ namespace H5DataTypes {
 class BldDataGMDV0  {
 public:
 
-  typedef Pds::BldDataGMDV0 XtcType ;
+  typedef Pds::Bld::BldDataGMDV0 XtcType ;
 
   BldDataGMDV0 () {}
   BldDataGMDV0 ( const XtcType& xtc ) ;

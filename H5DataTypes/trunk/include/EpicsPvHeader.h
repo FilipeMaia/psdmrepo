@@ -23,7 +23,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "hdf5pp/Type.h"
-#include "pdsdata/epics/EpicsPvData.hh"
+#include "pdsdata/psddl/epics.ddl.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -38,7 +38,7 @@ namespace H5DataTypes {
 class EpicsPvHeader  {
 public:
 
-  typedef Pds::EpicsPvHeader XtcType ;
+  typedef Pds::Epics::EpicsPvHeader XtcType ;
 
   EpicsPvHeader () {}
   EpicsPvHeader ( const XtcType& xtc ) ;

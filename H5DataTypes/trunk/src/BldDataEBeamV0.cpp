@@ -35,13 +35,13 @@
 namespace H5DataTypes {
 
 BldDataEBeamV0::BldDataEBeamV0 ( const XtcType& xtc )
-  : uDamageMask(xtc.uDamageMask)
-  , fEbeamCharge(xtc.fEbeamCharge)
-  , fEbeamL3Energy(xtc.fEbeamL3Energy)
-  , fEbeamLTUPosX(xtc.fEbeamLTUPosX)
-  , fEbeamLTUPosY(xtc.fEbeamLTUPosY)
-  , fEbeamLTUAngX(xtc.fEbeamLTUAngX)
-  , fEbeamLTUAngY(xtc.fEbeamLTUAngY)
+  : uDamageMask(xtc.damageMask())
+  , fEbeamCharge(xtc.ebeamCharge())
+  , fEbeamL3Energy(xtc.ebeamL3Energy())
+  , fEbeamLTUPosX(xtc.ebeamLTUPosX())
+  , fEbeamLTUPosY(xtc.ebeamLTUPosY())
+  , fEbeamLTUAngX(xtc.ebeamLTUAngX())
+  , fEbeamLTUAngY(xtc.ebeamLTUAngY())
 {
 }
 

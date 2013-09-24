@@ -35,17 +35,17 @@
 namespace H5DataTypes {
 
 BldDataEBeamV3::BldDataEBeamV3 ( const XtcType& xtc )
-  : uDamageMask(xtc.uDamageMask)
-  , fEbeamCharge(xtc.fEbeamCharge)
-  , fEbeamL3Energy(xtc.fEbeamL3Energy)
-  , fEbeamLTUPosX(xtc.fEbeamLTUPosX)
-  , fEbeamLTUPosY(xtc.fEbeamLTUPosY)
-  , fEbeamLTUAngX(xtc.fEbeamLTUAngX)
-  , fEbeamLTUAngY(xtc.fEbeamLTUAngY)
-  , fEbeamPkCurrBC2(xtc.fEbeamPkCurrBC2)
-  , fEbeamEnergyBC2(xtc.fEbeamEnergyBC2)
-  , fEbeamPkCurrBC1(xtc.fEbeamPkCurrBC1)
-  , fEbeamEnergyBC1(xtc.fEbeamEnergyBC1)
+  : uDamageMask(xtc.damageMask())
+  , fEbeamCharge(xtc.ebeamCharge())
+  , fEbeamL3Energy(xtc.ebeamL3Energy())
+  , fEbeamLTUPosX(xtc.ebeamLTUPosX())
+  , fEbeamLTUPosY(xtc.ebeamLTUPosY())
+  , fEbeamLTUAngX(xtc.ebeamLTUAngX())
+  , fEbeamLTUAngY(xtc.ebeamLTUAngY())
+  , fEbeamPkCurrBC2(xtc.ebeamPkCurrBC2())
+  , fEbeamEnergyBC2(xtc.ebeamEnergyBC2())
+  , fEbeamPkCurrBC1(xtc.ebeamPkCurrBC1())
+  , fEbeamEnergyBC1(xtc.ebeamEnergyBC1())
 {
 }
 

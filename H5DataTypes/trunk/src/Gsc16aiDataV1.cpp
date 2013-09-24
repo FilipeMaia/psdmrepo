@@ -42,7 +42,8 @@ namespace H5DataTypes {
 //----------------
 Gsc16aiDataV1::Gsc16aiDataV1(const XtcType& data)
 {
-  std::copy(data._timestamp, data._timestamp+NTimestamps, _timestamp);
+  const ndarray<const uint16_t, 1>& timestamp = data.timestamp();
+  std::copy(timestamp.begin(), timestamp.end(), this->_timestamp);
 }
 
 hdf5pp::Type

@@ -36,12 +36,12 @@
 namespace H5DataTypes {
 
 BldDataGMDV1::BldDataGMDV1 ( const XtcType& xtc )
-  : fMilliJoulesPerPulse(xtc.fMilliJoulesPerPulse)
-  , fMilliJoulesAverage(xtc.fMilliJoulesAverage)
-  , fCorrectedSumPerPulse(xtc.fCorrectedSumPerPulse)
-  , fBgValuePerSample(xtc.fBgValuePerSample)
-  , fRelativeEnergyPerPulse(xtc.fRelativeEnergyPerPulse)
-  , fSpare1(xtc.fSpare1)
+  : fMilliJoulesPerPulse(xtc.milliJoulesPerPulse())
+  , fMilliJoulesAverage(xtc.milliJoulesAverage())
+  , fCorrectedSumPerPulse(xtc.correctedSumPerPulse())
+  , fBgValuePerSample(xtc.bgValuePerSample())
+  , fRelativeEnergyPerPulse(xtc.relativeEnergyPerPulse())
+  , fSpare1(0)
 {
 }
 

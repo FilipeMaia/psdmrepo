@@ -27,7 +27,7 @@
 // Collaborating Class Declarations --
 //------------------------------------
 #include "hdf5pp/Type.h"
-#include "pdsdata/bld/bldData.hh"
+#include "pdsdata/psddl/bld.ddl.h"
 #include "H5DataTypes/PulnixTM6740ConfigV2.h"
 #include "H5DataTypes/LusiPimImageConfigV1.h"
 #include "H5DataTypes/CameraFrameV1.h"
@@ -44,7 +44,7 @@ namespace H5DataTypes {
 class BldDataPimV1  {
 public:
 
-  typedef Pds::BldDataPimV1 XtcType ;
+  typedef Pds::Bld::BldDataPimV1 XtcType ;
 
   BldDataPimV1 () {}
   BldDataPimV1 ( const XtcType& xtc ) ;
@@ -54,7 +54,12 @@ public:
   static hdf5pp::Type stored_type() ;
   static hdf5pp::Type native_type() ;
 
-  static size_t xtcSize( const XtcType& data ) { return sizeof data + data.frame.data_size() ; }
+  static size_t xtcSize( const XtcType& data ) {
+    const Pds::Camera::FrameV1& frame = data.frame();
+    size_t size = frame.width()*frame.height()*((frame.depth()+7)/8);
+    size = ((size + 3) / 4) * 4 ;
+    return sizeof data + size;
+  }
 
   static hdf5pp::Type imageType( const XtcType& data ) ;
 

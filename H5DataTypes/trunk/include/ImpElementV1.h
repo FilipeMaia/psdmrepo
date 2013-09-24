@@ -27,7 +27,7 @@
 // Collaborating Class Declarations --
 //------------------------------------
 #include "hdf5pp/Group.h"
-#include "pdsdata/imp/ElementV1.hh"
+#include "pdsdata/psddl/imp.ddl.h"
 
 //		---------------------
 // 		-- Class Interface --
@@ -61,7 +61,7 @@ private:
 class ImpLaneStatus  {
 public:
 
-  typedef uint32_t XtcType ;
+  typedef Pds::Imp::LaneStatus XtcType ;
 
   ImpLaneStatus () {}
   ImpLaneStatus ( const XtcType& data ) ;

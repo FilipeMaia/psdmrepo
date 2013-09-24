@@ -69,26 +69,29 @@ EvrConfigV4::store( const Pds::EvrData::ConfigV4& config, hdf5pp::Group grp )
   storeDataObject ( data, "config", grp ) ;
 
   // event codes
+  const ndarray<const Pds::EvrData::EventCodeV4, 1>& in_eventcodes = config.eventcodes();
   const uint32_t neventcodes = config.neventcodes() ;
   EvrEventCodeV4 ecodes[neventcodes] ;
   for ( uint32_t i = 0 ; i < neventcodes ; ++ i ) {
-    ecodes[i] = EvrEventCodeV4( config.eventcode(i) ) ;
+    ecodes[i] = EvrEventCodeV4( in_eventcodes[i] ) ;
   }
   storeDataObjects ( neventcodes, ecodes, "eventcodes", grp ) ;
 
   // pulses data
+  const ndarray<const Pds::EvrData::PulseConfigV3, 1>& in_pulses = config.pulses();
   const uint32_t npulses = config.npulses() ;
   EvrPulseConfigV3 pdata[npulses] ;
   for ( uint32_t i = 0 ; i < npulses ; ++ i ) {
-    pdata[i] = EvrPulseConfigV3( config.pulse(i) ) ;
+    pdata[i] = EvrPulseConfigV3( in_pulses[i] ) ;
   }
   storeDataObjects ( npulses, pdata, "pulses", grp ) ;
 
   // output map data
+  const ndarray<const Pds::EvrData::OutputMap, 1>& in_output_maps = config.output_maps();
   const uint32_t noutputs = config.noutputs() ;
   EvrOutputMap mdata[noutputs] ;
   for ( uint32_t i = 0 ; i < noutputs ; ++ i ) {
-    mdata[i] = EvrOutputMap( config.output_map(i) ) ;
+    mdata[i] = EvrOutputMap( in_output_maps[i] ) ;
   }
   storeDataObjects ( noutputs, mdata, "output_maps", grp ) ;
 

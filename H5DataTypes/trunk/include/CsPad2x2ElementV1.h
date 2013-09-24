@@ -21,9 +21,8 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "H5DataTypes/CsPad2x2ElementHeader.h"
 #include "hdf5pp/Type.h"
-#include "pdsdata/cspad2x2/ElementV1.hh"
+#include "pdsdata/psddl/cspad2x2.ddl.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -54,7 +53,19 @@ public:
 
 private:
 
-  CsPad2x2ElementHeader m_data ;
+  enum { SbTempSize = 4 };
+
+  uint32_t tid;
+  uint32_t seq_count;
+  uint32_t ticks;
+  uint32_t fiducials;
+  uint16_t acq_count;
+  uint16_t sb_temp[SbTempSize];
+  uint8_t virtual_channel;
+  uint8_t lane;
+  uint8_t op_code;
+  uint8_t quad;
+  uint8_t frame_type;
 
 };
 

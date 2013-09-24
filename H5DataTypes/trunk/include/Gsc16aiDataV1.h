@@ -22,8 +22,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "hdf5pp/Group.h"
-#include "pdsdata/gsc16ai/ConfigV1.hh"
-#include "pdsdata/gsc16ai/DataV1.hh"
+#include "pdsdata/psddl/gsc16ai.ddl.h"
 
 //------------------------------------
 // Collaborating Class Declarations --

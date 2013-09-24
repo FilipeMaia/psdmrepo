@@ -27,7 +27,7 @@
 // Collaborating Class Declarations --
 //------------------------------------
 #include "hdf5pp/Group.h"
-#include "pdsdata/ipimb/DataV1.hh"
+#include "pdsdata/psddl/ipimb.ddl.h"
 
 //		---------------------
 // 		-- Class Interface --

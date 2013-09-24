@@ -38,12 +38,12 @@
 namespace H5DataTypes {
 
 EncoderConfigV1::EncoderConfigV1 ( const Pds::Encoder::ConfigV1& data )
-  : chan_num(data._chan_num)
-  , count_mode(data._count_mode)
-  , quadrature_mode(data._quadrature_mode)
-  , input_num(data._input_num)
-  , input_rising(data._input_rising)
-  , ticks_per_sec(data._ticks_per_sec)
+  : chan_num(data.chan_num())
+  , count_mode(data.count_mode())
+  , quadrature_mode(data.quadrature_mode())
+  , input_num(data.input_num())
+  , input_rising(data.input_rising())
+  , ticks_per_sec(data.ticks_per_sec())
 {
 }
 
@@ -57,18 +57,18 @@ hdf5pp::Type
 EncoderConfigV1::native_type()
 {
   hdf5pp::EnumType<uint32_t> countModeEnumType = hdf5pp::EnumType<uint32_t>::enumType() ;
-  countModeEnumType.insert ( "WRAP_FULL", Pds::Encoder::ConfigV1::count_mode::WRAP_FULL ) ;
-  countModeEnumType.insert ( "LIMIT", Pds::Encoder::ConfigV1::count_mode::LIMIT ) ;
-  countModeEnumType.insert ( "HALT", Pds::Encoder::ConfigV1::count_mode::HALT ) ;
-  countModeEnumType.insert ( "WRAP_PRESET", Pds::Encoder::ConfigV1::count_mode::WRAP_PRESET ) ;
-  countModeEnumType.insert ( "END", Pds::Encoder::ConfigV1::count_mode::END ) ;
+  countModeEnumType.insert ( "WRAP_FULL", Pds::Encoder::ConfigV1::WRAP_FULL ) ;
+  countModeEnumType.insert ( "LIMIT", Pds::Encoder::ConfigV1::LIMIT ) ;
+  countModeEnumType.insert ( "HALT", Pds::Encoder::ConfigV1::HALT ) ;
+  countModeEnumType.insert ( "WRAP_PRESET", Pds::Encoder::ConfigV1::WRAP_PRESET ) ;
+  countModeEnumType.insert ( "END", Pds::Encoder::ConfigV1::COUNT_END ) ;
 
   hdf5pp::EnumType<uint32_t> quadModeEnumType = hdf5pp::EnumType<uint32_t>::enumType() ;
-  quadModeEnumType.insert ( "CLOCK_DIR", Pds::Encoder::ConfigV1::quad_mode::CLOCK_DIR ) ;
-  quadModeEnumType.insert ( "X1", Pds::Encoder::ConfigV1::quad_mode::X1 ) ;
-  quadModeEnumType.insert ( "X2", Pds::Encoder::ConfigV1::quad_mode::X2 ) ;
-  quadModeEnumType.insert ( "X4", Pds::Encoder::ConfigV1::quad_mode::X4 ) ;
-  quadModeEnumType.insert ( "END", Pds::Encoder::ConfigV1::quad_mode::END ) ;
+  quadModeEnumType.insert ( "CLOCK_DIR", Pds::Encoder::ConfigV1::CLOCK_DIR ) ;
+  quadModeEnumType.insert ( "X1", Pds::Encoder::ConfigV1::X1 ) ;
+  quadModeEnumType.insert ( "X2", Pds::Encoder::ConfigV1::X2 ) ;
+  quadModeEnumType.insert ( "X4", Pds::Encoder::ConfigV1::X4 ) ;
+  quadModeEnumType.insert ( "END", Pds::Encoder::ConfigV1::QUAD_END ) ;
 
   hdf5pp::CompoundType confType = hdf5pp::CompoundType::compoundType<EncoderConfigV1>() ;
   confType.insert_native<uint32_t>( "chan_num", offsetof(EncoderConfigV1, chan_num) ) ;

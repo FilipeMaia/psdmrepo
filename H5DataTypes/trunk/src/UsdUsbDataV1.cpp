@@ -44,16 +44,14 @@ UsdUsbDataV1::UsdUsbDataV1 ( const XtcType& data )
   : timestamp(data.timestamp())
   , digital_in(data.digital_in())
 {
-  for (int i = 0; i != Encoder_Inputs; ++ i) {
-    encoder_count[i] = data.encoder_count(i);
-  }
-  for (int i = 0; i != Analog_Inputs; ++ i) {
-    analog_in[i] = data.analog_in(i);
-  }
+  const ndarray<const int32_t, 1>& nd_encoder_count = data.encoder_count();
+  std::copy(nd_encoder_count.begin(), nd_encoder_count.end(), encoder_count);
 
-  // Dirty hack, pdsdata does not provide method to access status data
-  const uint8_t* pstat = (const uint8_t*)(&data) + 28;
-  std::copy(pstat, pstat+4, status);
+  const ndarray<const uint16_t, 1>& nd_analog_in = data.analog_in();
+  std::copy(nd_analog_in.begin(), nd_analog_in.end(), analog_in);
+
+  const ndarray<const uint8_t, 1>& ndstatus = data.status();
+  std::copy(ndstatus.begin(), ndstatus.end(), status);
 }
 
 hdf5pp::Type

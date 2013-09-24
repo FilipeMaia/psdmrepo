@@ -66,7 +66,7 @@ AcqirisTimestampV1::native_type()
 AcqirisDataDescV1::AcqirisDataDescV1 (const AcqirisDataDescV1::XtcType& xtcData)
   : nbrSamplesInSeg(xtcData.nbrSamplesInSeg())
   , nbrSegments(xtcData.nbrSegments())
-  , indexFirstPoint(const_cast<AcqirisDataDescV1::XtcType&>(xtcData).indexFirstPoint())
+  , indexFirstPoint(xtcData.indexFirstPoint())
 {
 }
 

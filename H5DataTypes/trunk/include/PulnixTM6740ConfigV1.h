@@ -22,7 +22,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "hdf5pp/Group.h"
-#include "pdsdata/pulnix/TM6740ConfigV1.hh"
+#include "pdsdata/psddl/pulnix.ddl.h"
 
 //------------------------------------
 // Collaborating Class Declarations --

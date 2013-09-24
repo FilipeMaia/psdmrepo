@@ -44,12 +44,10 @@ OceanOpticsConfigV1::OceanOpticsConfigV1 ( const Pds::OceanOptics::ConfigV1& dat
   : exposureTime(data.exposureTime())
   , strayLightConstant(data.strayLightConstant())
 {
-  for (int i = 0; i != 4; ++ i) {
-    waveLenCalib[i] = data.waveLenCalib(i);
-  }
-  for (int i = 0; i != 8; ++ i) {
-    nonlinCorrect[i] = data.nonlinCorrect(i);
-  }
+  const ndarray<const double, 1>& waveLenCalib = data.waveLenCalib();
+  std::copy(waveLenCalib.begin(), waveLenCalib.end(), this->waveLenCalib);
+  const ndarray<const double, 1>& nonlinCorrect = data.nonlinCorrect();
+  std::copy(nonlinCorrect.begin(), nonlinCorrect.end(), this->nonlinCorrect);
 }
 
 OceanOpticsConfigV1::~OceanOpticsConfigV1()

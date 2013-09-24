@@ -37,8 +37,8 @@
 namespace H5DataTypes {
 
 LusiPimImageConfigV1::LusiPimImageConfigV1 ( const XtcType& data )
-  : xscale(data.xscale)
-  , yscale(data.yscale)
+  : xscale(data.xscale())
+  , yscale(data.yscale())
 {
 }
 

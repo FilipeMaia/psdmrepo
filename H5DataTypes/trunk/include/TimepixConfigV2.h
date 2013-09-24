@@ -22,7 +22,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "hdf5pp/Group.h"
-#include "pdsdata/timepix/ConfigV2.hh"
+#include "pdsdata/psddl/timepix.ddl.h"
 
 //------------------------------------
 // Collaborating Class Declarations --

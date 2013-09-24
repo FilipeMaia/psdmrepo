@@ -35,10 +35,10 @@
 namespace H5DataTypes {
 
 BldDataPhaseCavity::BldDataPhaseCavity ( const XtcType& xtc )
-  : fFitTime1(xtc.fFitTime1)
-  , fFitTime2(xtc.fFitTime2)
-  , fCharge1(xtc.fCharge1)
-  , fCharge2(xtc.fCharge2)
+  : fFitTime1(xtc.fitTime1())
+  , fFitTime2(xtc.fitTime2())
+  , fCharge1(xtc.charge1())
+  , fCharge2(xtc.charge2())
 {
 }
 

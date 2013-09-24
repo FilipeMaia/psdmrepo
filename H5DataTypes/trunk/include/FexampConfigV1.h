@@ -22,7 +22,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "hdf5pp/Group.h"
-#include "pdsdata/fexamp/ConfigV1.hh"
+#include "pdsdata/psddl/fexamp.ddl.h"
 
 //------------------------------------
 // Collaborating Class Declarations --

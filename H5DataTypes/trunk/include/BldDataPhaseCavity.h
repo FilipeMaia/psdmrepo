@@ -22,7 +22,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "hdf5pp/Type.h"
-#include "pdsdata/bld/bldData.hh"
+#include "pdsdata/psddl/bld.ddl.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -40,7 +40,7 @@ namespace H5DataTypes {
 class BldDataPhaseCavity  {
 public:
 
-  typedef Pds::BldDataPhaseCavity XtcType ;
+  typedef Pds::Bld::BldDataPhaseCavity XtcType ;
 
   BldDataPhaseCavity () {}
   BldDataPhaseCavity ( const XtcType& xtc ) ;

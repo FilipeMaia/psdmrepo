@@ -67,10 +67,11 @@ EvrIOConfigV1::store( const XtcType& config, hdf5pp::Group grp )
   storeDataObject ( data, "config", grp ) ;
 
   // channels
+  const ndarray<const Pds::EvrData::IOChannel, 1>& in_channels = config.channels();
   const uint32_t nchannels = config.nchannels() ;
   EvrIOChannel channels[nchannels] ;
   for ( uint32_t i = 0 ; i < nchannels ; ++ i ) {
-    channels[i] = config.channel(i);
+    channels[i] = in_channels[i];
   }
   storeDataObjects ( nchannels, channels, "channels", grp ) ;
 }

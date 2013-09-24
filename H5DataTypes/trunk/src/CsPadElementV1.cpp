@@ -26,7 +26,6 @@
 #include "hdf5pp/CompoundType.h"
 #include "hdf5pp/TypeTraits.h"
 #include "H5DataTypes/H5DataUtils.h"
-#include "pdsdata/cspad/Detector.hh"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -40,8 +39,19 @@ namespace H5DataTypes {
 
 
 CsPadElementV1::CsPadElementV1 ( const XtcType& data )
-  : m_data(data)
+  : tid(data.tid())
+  , seq_count(data.seq_count())
+  , ticks(data.ticks())
+  , fiducials(data.fiducials())
+  , acq_count(data.acq_count())
+  , virtual_channel(data.virtual_channel())
+  , lane(data.lane())
+  , op_code(data.op_code())
+  , quad(data.quad())
+  , frame_type(data.frame_type())
 {
+  const ndarray<const uint16_t, 1>& sb_temp = data.sb_temp();
+  std::copy(sb_temp.begin(), sb_temp.end(), this->sb_temp);
 }
 
 hdf5pp::Type
@@ -53,7 +63,20 @@ CsPadElementV1::stored_type(unsigned nQuad)
 hdf5pp::Type
 CsPadElementV1::native_type(unsigned nQuad)
 {
-  return hdf5pp::TypeTraits<CsPadElementHeader>::native_type(nQuad);
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<CsPadElementV1>() ;
+  type.insert_native<uint32_t>( "tid", offsetof(CsPadElementV1, tid) );
+  type.insert_native<uint32_t>( "seq_count", offsetof(CsPadElementV1, seq_count) );
+  type.insert_native<uint32_t>( "ticks", offsetof(CsPadElementV1, ticks) );
+  type.insert_native<uint32_t>( "fiducials", offsetof(CsPadElementV1, fiducials) );
+  type.insert_native<uint16_t>( "acq_count", offsetof(CsPadElementV1, acq_count) );
+  type.insert_native<uint16_t>( "sb_temp", offsetof(CsPadElementV1, sb_temp), SbTempSize );
+  type.insert_native<uint8_t>( "virtual_channel", offsetof(CsPadElementV1, virtual_channel) );
+  type.insert_native<uint8_t>( "lane", offsetof(CsPadElementV1, lane) );
+  type.insert_native<uint8_t>( "op_code", offsetof(CsPadElementV1, op_code) );
+  type.insert_native<uint8_t>( "quad", offsetof(CsPadElementV1, quad) );
+  type.insert_native<uint8_t>( "frame_type", offsetof(CsPadElementV1, frame_type) );
+
+  return hdf5pp::ArrayType::arrayType(type, nQuad);
 }
 
 hdf5pp::Type

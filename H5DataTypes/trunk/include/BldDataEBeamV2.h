@@ -22,7 +22,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "hdf5pp/Type.h"
-#include "pdsdata/bld/bldData.hh"
+#include "pdsdata/psddl/bld.ddl.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -40,7 +40,7 @@ namespace H5DataTypes {
 class BldDataEBeamV2  {
 public:
 
-  typedef Pds::BldDataEBeamV2 XtcType ;
+  typedef Pds::Bld::BldDataEBeamV2 XtcType ;
 
   BldDataEBeamV2 () {}
   BldDataEBeamV2 ( const XtcType& xtc ) ;

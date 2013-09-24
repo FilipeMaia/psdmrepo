@@ -104,12 +104,12 @@ Opal1kConfigV1::store( const Pds::Opal1k::ConfigV1& config, hdf5pp::Group grp )
   // make array data set for LUT
   if (config.output_lookup_table_enabled()) {
     const uint32_t lutSize = Pds::Opal1k::ConfigV1::LUT_Size ;
-    storeDataObjects ( lutSize, config.output_lookup_table(), "output_lookup_table", grp ) ;
+    storeDataObjects ( lutSize, config.output_lookup_table().data(), "output_lookup_table", grp ) ;
   }
   
   // make array data set for defect pixels
   const uint32_t defectSize = config.number_of_defect_pixels() ;
-  storeCameraFrameCoordV1 ( defectSize, config.defect_pixel_coordinates(), grp, "defect_pixel_coordinates" ) ;
+  storeCameraFrameCoordV1 ( defectSize, config.defect_pixel_coordinates().data(), grp, "defect_pixel_coordinates" ) ;
 }
 
 } // namespace H5DataTypes

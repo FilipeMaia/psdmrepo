@@ -43,14 +43,14 @@ AcqirisTdcDataV1::AcqirisTdcDataV1 ()
 {
 }
 
-AcqirisTdcDataV1::AcqirisTdcDataV1 (size_t size, const XtcType* xtcData)
+AcqirisTdcDataV1::AcqirisTdcDataV1 (size_t size, const XtcType& xtcData)
   : m_size(size)
   , m_data(new AcqirisTdcDataV1_Data[size])
 {
-
+  const ndarray<const Pds::Acqiris::TdcDataV1_Item, 1>& items = xtcData.data();
   for (size_t i = 0 ; i != size ; ++ i ) {
-    m_data[i].source = xtcData[i].source();
-    const class XtcType::Common& com = static_cast<const class XtcType::Common&>(xtcData[i]);
+    const Pds::Acqiris::TdcDataV1Common& com = static_cast<const Pds::Acqiris::TdcDataV1Common&>(items[i]);
+    m_data[i].source = com.source();
     m_data[i].overflow = com.overflow();
     m_data[i].value = com.nhits();
   }
@@ -71,14 +71,14 @@ hdf5pp::Type
 AcqirisTdcDataV1::native_type()
 {
   hdf5pp::EnumType<uint8_t> srcType = hdf5pp::EnumType<uint8_t>::enumType();
-  srcType.insert("Comm", XtcType::Comm);
-  srcType.insert("Chan1", XtcType::Chan1);
-  srcType.insert("Chan2", XtcType::Chan2);
-  srcType.insert("Chan3", XtcType::Chan3);
-  srcType.insert("Chan4", XtcType::Chan4);
-  srcType.insert("Chan5", XtcType::Chan5);
-  srcType.insert("Chan6", XtcType::Chan6);
-  srcType.insert("AuxIO", XtcType::AuxIO);
+  srcType.insert("Comm", Pds::Acqiris::TdcDataV1_Item::Comm);
+  srcType.insert("Chan1", Pds::Acqiris::TdcDataV1_Item::Chan1);
+  srcType.insert("Chan2", Pds::Acqiris::TdcDataV1_Item::Chan2);
+  srcType.insert("Chan3", Pds::Acqiris::TdcDataV1_Item::Chan3);
+  srcType.insert("Chan4", Pds::Acqiris::TdcDataV1_Item::Chan4);
+  srcType.insert("Chan5", Pds::Acqiris::TdcDataV1_Item::Chan5);
+  srcType.insert("Chan6", Pds::Acqiris::TdcDataV1_Item::Chan6);
+  srcType.insert("AuxIO", Pds::Acqiris::TdcDataV1_Item::AuxIO);
 
   hdf5pp::CompoundType baseType = hdf5pp::CompoundType::compoundType<AcqirisTdcDataV1_Data>() ;
   baseType.insert( "source", offsetof(AcqirisTdcDataV1_Data, source), srcType ) ;

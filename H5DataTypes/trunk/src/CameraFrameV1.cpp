@@ -73,9 +73,9 @@ hdf5pp::Type
 CameraFrameV1::imageType( const Pds::Camera::FrameV1& frame )
 {
   hdf5pp::Type baseType ;
-  if ( frame.depth_bytes() == 1 ) {
+  if ( frame.depth() <= 8 ) {
     baseType = hdf5pp::TypeTraits<uint8_t>::native_type() ;
-  } else if ( frame.depth_bytes() == 2 ) {
+  } else if ( frame.depth() <= 16 ) {
     baseType = hdf5pp::TypeTraits<uint16_t>::native_type() ;
   }
 

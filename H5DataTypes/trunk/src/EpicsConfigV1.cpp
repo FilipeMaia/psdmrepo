@@ -18,6 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <algorithm>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -58,10 +59,11 @@ namespace H5DataTypes {
 // Constructors --
 //----------------
 EpicsPvConfigV1::EpicsPvConfigV1(const Pds::Epics::PvConfigV1& pvConfig)
-  : pvId(pvConfig.iPvId)
-  , interval(pvConfig.fInterval)
+  : pvId(pvConfig.pvId())
+  , interval(pvConfig.interval())
 {
-  std::copy(pvConfig.sPvDesc, pvConfig.sPvDesc+iMaxPvDescLength, description);
+  std::fill_n(description, sizeof description, '\0');
+  strncpy(description, pvConfig.description(), sizeof description-1);
 }
 
 hdf5pp::Type
@@ -83,7 +85,7 @@ EpicsPvConfigV1::native_type()
 
 
 EpicsConfigV1::EpicsConfigV1(const XtcType& data)
-  : numPv(data.getNumPv())
+  : numPv(data.numPv())
 {
 }
 
@@ -110,10 +112,11 @@ EpicsConfigV1::store(const XtcType& config, hdf5pp::Group grp)
   storeDataObject(data, "config", grp);
 
   // pvconfig data
-  const uint32_t numPv = config.getNumPv();
+  const ndarray<const Pds::Epics::PvConfigV1, 1>& in_pvControls = config.pvControls();
+  const uint32_t numPv = config.numPv();
   EpicsPvConfigV1 pvConfigs[numPv];
   for (uint32_t i = 0; i < numPv; ++ i) {
-    pvConfigs[i] = EpicsPvConfigV1(*config.getPvConfig(i));
+    pvConfigs[i] = EpicsPvConfigV1(in_pvControls[i]);
   }
   storeDataObjects(numPv, pvConfigs, "pvConfig", grp);
 }

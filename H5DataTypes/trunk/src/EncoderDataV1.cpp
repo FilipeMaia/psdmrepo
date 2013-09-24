@@ -39,8 +39,8 @@ namespace H5DataTypes {
 // Constructors --
 //----------------
 EncoderDataV1::EncoderDataV1 ( const XtcType& data )
-  : _33mhz_timestamp(data._33mhz_timestamp)
-  , encoder_count(data._encoder_count)
+  : _33mhz_timestamp(data.timestamp())
+  , encoder_count(data.encoder_count())
 {
 }
 

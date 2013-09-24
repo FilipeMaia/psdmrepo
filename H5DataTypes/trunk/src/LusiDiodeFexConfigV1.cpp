@@ -40,8 +40,10 @@ namespace H5DataTypes {
 
 LusiDiodeFexConfigV1::LusiDiodeFexConfigV1 ( const XtcType& data )
 {
-  std::copy( data.base, data.base+XtcType::NRANGES, base);
-  std::copy( data.scale, data.scale+XtcType::NRANGES, scale);
+  const ndarray<const float, 1>& ndbase = data.base();
+  std::copy( ndbase.begin(), ndbase.end(), base);
+  const ndarray<const float, 1>& ndscale = data.scale();
+  std::copy( ndscale.begin(), ndscale.end(), scale);
 }
 
 hdf5pp::Type

@@ -22,7 +22,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "hdf5pp/Group.h"
-#include "pdsdata/acqiris/TdcConfigV1.hh"
+#include "pdsdata/psddl/acqiris.ddl.h"
 
 //------------------------------------
 // Collaborating Class Declarations --

@@ -37,9 +37,9 @@
 namespace H5DataTypes {
 
 BldDataPimV1::BldDataPimV1 ( const XtcType& data )
-  : camConfig(data.camConfig)
-  , pimConfig(data.pimConfig)
-  , frame(data.frame)
+  : camConfig(data.camConfig())
+  , pimConfig(data.pimConfig())
+  , frame(data.frame())
 {
 }
 
@@ -68,11 +68,11 @@ BldDataPimV1::native_type()
 hdf5pp::Type
 BldDataPimV1::imageType( const XtcType& data )
 {
-  const Pds::Camera::FrameV1& frame = data.frame;
+  const Pds::Camera::FrameV1& frame = data.frame();
   hdf5pp::Type baseType ;
-  if ( frame.depth_bytes() == 1 ) {
+  if ( frame.depth() <= 8 ) {
     baseType = hdf5pp::TypeTraits<uint8_t>::native_type() ;
-  } else if ( frame.depth_bytes() == 2 ) {
+  } else if ( frame.depth() <= 16 ) {
     baseType = hdf5pp::TypeTraits<uint16_t>::native_type() ;
   }
 
