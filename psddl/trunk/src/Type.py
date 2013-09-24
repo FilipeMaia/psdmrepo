@@ -88,6 +88,12 @@ class Type ( Namespace ) :
 
     @property
     def basic(self):
+        '''
+        "basic" tag is used to specify types as basic. Basic type has no 
+        attributes and has all other good properties - pre-defined size and
+        alignment. Typically only standard types (uint32_t and friends) are
+        defined as basic, user-defined types should not be defined as basic.
+        '''
         return 'basic' in self.tags
 
     @property
@@ -103,12 +109,26 @@ class Type ( Namespace ) :
 
     @property
     def external(self):
+        '''
+        "external" tag is used to specify external types for which there 
+        is no code generated at all and they are expected to be implemented 
+        by some external means (providing C++ implementation in a separate
+        file for example). Type is external either if it is marked external 
+        or it lives in a package which is marked external.
+        '''
         if 'external' in self.tags : return True
         if self.parent: return self.parent.external
         return False
 
     @property
     def value_type(self):
+        ''' 
+        "value-type" tag is used to specify value types. Value type is a 
+        type which is a good C++ type (i.e. can be expressed in pure C++), 
+        can be copied and is relatively cheap to copy. For value type we 
+        will not generate abstract types with virtual methods but concrete 
+        C++ classes with data member and no virtual methods.  
+        '''  
         return 'value-type' in self.tags
 
     def fullName(self, lang=None, topNs=None):

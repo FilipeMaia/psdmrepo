@@ -129,7 +129,10 @@ class CppTypeCodegen ( object ) :
 
         # declare config classes if needed
         for cfg in self._type.xtcConfig:
-            print >>self._inc, T("class $name;")[cfg]
+            # only add declaration for the types from the same namespace, declaring 
+            # classes from other namespaces cannot be done at this point
+            if cfg.parent is self._type.parent:
+                print >>self._inc, T("class $name;")[cfg]
 
         # for non-abstract types C++ may need pack pragma
         needPragmaPack = self._pdsdata and self._type.pack

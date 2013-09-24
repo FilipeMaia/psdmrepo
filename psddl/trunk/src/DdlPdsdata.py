@@ -100,6 +100,7 @@ class DdlPdsdata ( object ) :
         print >>self.inc, "#include <vector>"
         print >>self.inc, "#include <iosfwd>"
         print >>self.inc, "#include <cstddef>"
+        print >>self.inc, "#include <cstring>"
         print >>self.inc, "#include \"pdsdata/xtc/TypeId.hh\""
         print >>self.inc, "#include \"ndarray/ndarray.h\""
 

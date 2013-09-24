@@ -543,6 +543,9 @@ class DdlPds2Psana ( object ) :
         elif attr.type.value_type:
             ns = attr.type.parent.fullName('C++', self.top_pkg)
             return [T("$name($ns::pds_to_psana($expr))")(locals())]
+        elif attr.type.xtcConfig :
+            xtc_type = attr.type.fullName('C++', self.pdsdata_ns)
+            return [T("$name(boost::shared_ptr<const $xtc_type>(xtcPtr, &$expr), cfgPtr)")(locals())]
         else :
             xtc_type = attr.type.fullName('C++', self.pdsdata_ns)
             return [T("$name(boost::shared_ptr<const $xtc_type>(xtcPtr, &$expr))")(locals())]

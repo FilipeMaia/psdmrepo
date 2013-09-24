@@ -67,7 +67,6 @@ _ignored_types = [
         'Id_FexampElement',
         'Id_PhasicsConfig',
         'Id_CspadCompressedElement',
-        'Id_SharedAcqADC',
         ]
 
 # Extra headers needed for special proxy classes of similar stuff
