@@ -74,7 +74,7 @@ struct dataset_data {
 namespace ns_Src_v0 {
 struct dataset_data {
 
-  dataset_data();
+  dataset_data() {}
   dataset_data(const ::Pds::Src& src) : log(src.log()), phy(src.phy()) {}
 
   static hdf5pp::Type native_type();

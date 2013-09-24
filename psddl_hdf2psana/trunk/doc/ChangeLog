@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-01
+2013-09-24 Andy Salnikov
+- fix missing constructor definition
+
 Tag: V00-03-00
 2013-09-24 Andy Salnikov
 - regenerate whole thing from psddldata V00-04-38 with psddl V00-08-15
