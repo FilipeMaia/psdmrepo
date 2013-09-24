@@ -934,7 +934,7 @@
 
             <attribute name="_iNumPv" type="int32_t" accessor="numPv"/>
 
-            <attribute name="_pvControls" type="PvConfigV1" shape="{self}.numPv()" accessor="pvControls"/>
+            <attribute name="_pvConfig" type="PvConfigV1" shape="{self}.numPv()" accessor="getPvConfig"/>
 
             <ctor>
                 Constructor which just takes the number of Pvs contained
