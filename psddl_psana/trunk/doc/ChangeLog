@@ -11,6 +11,13 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-00
+2013-09-24 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-38 with psddl V00-08-15
+- new Alias stuff
+- new BldDataEBeamV4 and BldDataAcqADCV1 types
+- couple of new methods in old classes
+
 Tag: V00-04-31
 2013-09-17 Andy Salnikov
 - documentation generation changed in SConsTools, updating SConscript

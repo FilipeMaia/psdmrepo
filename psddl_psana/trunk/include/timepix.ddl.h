@@ -317,6 +317,8 @@ public:
   virtual uint32_t height() const = 0;
   virtual uint32_t depth() const = 0;
   virtual uint32_t depth_bytes() const = 0;
+  /** Size of the image data in bytes. */
+  virtual uint32_t data_size() const = 0;
 };
 
 /** @class DataV2
@@ -345,6 +347,8 @@ public:
   virtual ndarray<const uint16_t, 2> data() const = 0;
   virtual uint32_t depth() const = 0;
   virtual uint32_t depth_bytes() const = 0;
+  /** Size of the image data in bytes. */
+  virtual uint32_t data_size() const = 0;
 };
 } // namespace Timepix
 } // namespace Psana

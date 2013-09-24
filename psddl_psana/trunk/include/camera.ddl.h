@@ -118,6 +118,8 @@ public:
   /** Returns pixel data array when stored data type is 16-bit (depth() is greater than 8).
                 If data type is 8-bit then empty array is returned, use data8() method in this case. */
   virtual ndarray<const uint16_t, 2> data16() const = 0;
+  /** Number of bytes per pixel. */
+  virtual uint32_t depth_bytes() const = 0;
 };
 
 /** @class TwoDGaussianV1

@@ -7,6 +7,7 @@
 #include <iosfwd>
 #include "ndarray/ndarray.h"
 #include "pdsdata/xtc/TypeId.hh"
+#include "psddl_psana/acqiris.ddl.h"
 #include "psddl_psana/camera.ddl.h"
 #include "psddl_psana/ipimb.ddl.h"
 #include "psddl_psana/lusi.ddl.h"
@@ -278,6 +279,89 @@ private:
 };
 std::ostream& operator<<(std::ostream& str, Bld::BldDataEBeamV3::DamageMask enval);
 
+/** @class BldDataEBeamV4
+
+  
+*/
+
+
+class BldDataEBeamV4 {
+public:
+  enum { TypeId = Pds::TypeId::Id_EBeam /**< XTC type ID value (from Pds::TypeId class) */ };
+  enum { Version = 4 /**< XTC type version number */ };
+
+  /** Constants defining bit mask for individual damage bits in value returned from damageMask() */
+  enum DamageMask {
+    EbeamChargeDamage = 0x001,
+    EbeamL3EnergyDamage = 0x002,
+    EbeamLTUPosXDamage = 0x004,
+    EbeamLTUPosYDamage = 0x008,
+    EbeamLTUAngXDamage = 0x010,
+    EbeamLTUAngYDamage = 0x020,
+    EbeamPkCurrBC2Damage = 0x040,
+    EbeamEnergyBC2Damage = 0x080,
+    EbeamPkCurrBC1Damage = 0x100,
+    EbeamEnergyBC1Damage = 0x200,
+    EbeamUndPosXDamage = 0x400,
+    EbeamUndPosYDamage = 0x800,
+    EbeamUndAngXDamage = 0x1000,
+    EbeamUndAngYDamage = 0x2000,
+  };
+  BldDataEBeamV4(uint32_t arg__uDamageMask, double arg__fEbeamCharge, double arg__fEbeamL3Energy, double arg__fEbeamLTUPosX, double arg__fEbeamLTUPosY, double arg__fEbeamLTUAngX, double arg__fEbeamLTUAngY, double arg__fEbeamPkCurrBC2, double arg__fEbeamEnergyBC2, double arg__fEbeamPkCurrBC1, double arg__fEbeamEnergyBC1, double arg__fEbeamUndPosX, double arg__fEbeamUndPosY, double arg__fEbeamUndAngX, double arg__fEbeamUndAngY)
+    : _uDamageMask(arg__uDamageMask), _fEbeamCharge(arg__fEbeamCharge), _fEbeamL3Energy(arg__fEbeamL3Energy), _fEbeamLTUPosX(arg__fEbeamLTUPosX), _fEbeamLTUPosY(arg__fEbeamLTUPosY), _fEbeamLTUAngX(arg__fEbeamLTUAngX), _fEbeamLTUAngY(arg__fEbeamLTUAngY), _fEbeamPkCurrBC2(arg__fEbeamPkCurrBC2), _fEbeamEnergyBC2(arg__fEbeamEnergyBC2), _fEbeamPkCurrBC1(arg__fEbeamPkCurrBC1), _fEbeamEnergyBC1(arg__fEbeamEnergyBC1), _fEbeamUndPosX(arg__fEbeamUndPosX), _fEbeamUndPosY(arg__fEbeamUndPosY), _fEbeamUndAngX(arg__fEbeamUndAngX), _fEbeamUndAngY(arg__fEbeamUndAngY)
+  {
+  }
+  BldDataEBeamV4() {}
+  /** Damage mask. */
+  uint32_t damageMask() const { return _uDamageMask; }
+  /** Beam charge in nC. */
+  double ebeamCharge() const { return _fEbeamCharge; }
+  /** Beam energy in MeV. */
+  double ebeamL3Energy() const { return _fEbeamL3Energy; }
+  /** LTU beam position in mm. */
+  double ebeamLTUPosX() const { return _fEbeamLTUPosX; }
+  /** LTU beam position in mm. */
+  double ebeamLTUPosY() const { return _fEbeamLTUPosY; }
+  /** LTU beam angle in mrad. */
+  double ebeamLTUAngX() const { return _fEbeamLTUAngX; }
+  /** LTU beam angle in mrad. */
+  double ebeamLTUAngY() const { return _fEbeamLTUAngY; }
+  /** Beam current in Amps. */
+  double ebeamPkCurrBC2() const { return _fEbeamPkCurrBC2; }
+  /** Beam position in mm (related to beam energy). */
+  double ebeamEnergyBC2() const { return _fEbeamEnergyBC2; }
+  /** Beam current in Amps. */
+  double ebeamPkCurrBC1() const { return _fEbeamPkCurrBC1; }
+  /** Beam position in mm (related to beam energy). */
+  double ebeamEnergyBC1() const { return _fEbeamEnergyBC1; }
+  /** Und beam x-position in mm. */
+  double ebeamUndPosX() const { return _fEbeamUndPosX; }
+  /** Und beam y-position in mm. */
+  double ebeamUndPosY() const { return _fEbeamUndPosY; }
+  /** Und beam x-angle in mrad. */
+  double ebeamUndAngX() const { return _fEbeamUndAngX; }
+  /** Und beam y-angle in mrad. */
+  double ebeamUndAngY() const { return _fEbeamUndAngY; }
+  static uint32_t _sizeof() { return 116; }
+private:
+  uint32_t	_uDamageMask;	/**< Damage mask. */
+  double	_fEbeamCharge;	/**< Beam charge in nC. */
+  double	_fEbeamL3Energy;	/**< Beam energy in MeV. */
+  double	_fEbeamLTUPosX;	/**< LTU beam position in mm. */
+  double	_fEbeamLTUPosY;	/**< LTU beam position in mm. */
+  double	_fEbeamLTUAngX;	/**< LTU beam angle in mrad. */
+  double	_fEbeamLTUAngY;	/**< LTU beam angle in mrad. */
+  double	_fEbeamPkCurrBC2;	/**< Beam current in Amps. */
+  double	_fEbeamEnergyBC2;	/**< Beam position in mm (related to beam energy). */
+  double	_fEbeamPkCurrBC1;	/**< Beam current in Amps. */
+  double	_fEbeamEnergyBC1;	/**< Beam position in mm (related to beam energy). */
+  double	_fEbeamUndPosX;	/**< Und beam x-position in mm. */
+  double	_fEbeamUndPosY;	/**< Und beam y-position in mm. */
+  double	_fEbeamUndAngX;	/**< Und beam x-angle in mrad. */
+  double	_fEbeamUndAngY;	/**< Und beam y-angle in mrad. */
+};
+std::ostream& operator<<(std::ostream& str, Bld::BldDataEBeamV4::DamageMask enval);
+
 /** @class BldDataPhaseCavity
 
   PV names: UND:R02:IOC:16:BAT:FitTime1, UND:R02:IOC:16:BAT:FitTime2, 
@@ -425,6 +509,22 @@ public:
   virtual double bgValuePerSample() const = 0;
   /** Shot by shot pulse energy in arbitrary units */
   virtual double relativeEnergyPerPulse() const = 0;
+};
+
+/** @class BldDataAcqADCV1
+
+  Combined structure which includes Acqiris.ConfigV1 and 
+            Acqiris.DataDescV1 objects.
+*/
+
+
+class BldDataAcqADCV1 {
+public:
+  enum { TypeId = Pds::TypeId::Id_SharedAcqADC /**< XTC type ID value (from Pds::TypeId class) */ };
+  enum { Version = 1 /**< XTC type version number */ };
+  virtual ~BldDataAcqADCV1();
+  virtual const Acqiris::ConfigV1& config() const = 0;
+  virtual const Acqiris::DataDescV1& data() const = 0;
 };
 } // namespace Bld
 } // namespace Psana
