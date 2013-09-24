@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-38
+2013-09-24 Andy Salnikov
+- Bld.BldDataAcqADCV1 needs xtc config which is Acquiris.ConfigV1
+
 Tag: V00-04-37
 2013-09-20 Andy Salnikov
 - add forgotten Bld.BldDataAcqADCV1 type

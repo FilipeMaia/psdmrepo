@@ -590,6 +590,8 @@
             Combined structure which includes Acqiris.ConfigV1 and 
             Acqiris.DataDescV1 objects.
 
+            <xtc-config name="Acqiris.ConfigV1" />
+
             <attribute name="_config" type="Acqiris.ConfigV1" accessor="config">
             </attribute>
 
