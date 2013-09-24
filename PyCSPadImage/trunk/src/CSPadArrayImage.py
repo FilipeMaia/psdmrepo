@@ -67,6 +67,7 @@ def getCSPadArrayAs2DImage(arr, gap=3, hspace=5, vspace=5) :
     return np.vstack((arr_h[0,:], arr_vsp,\
                       arr_h[1,:], arr_vsp,\
                       arr_h[2,:], arr_vsp,\
+                      arr_h[3,:], arr_vsp,\
                       arr_h[4,:], arr_vsp,\
                       arr_h[5,:], arr_vsp,\
                       arr_h[6,:], arr_vsp,\
