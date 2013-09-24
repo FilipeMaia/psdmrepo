@@ -20,7 +20,7 @@ from SConsTools.standardExternalPackage import standardExternalPackage
 #
 
 
-pdsdata_ver = '6.10.1'
+pdsdata_ver = '7.0.3'
 PREFIX = pjoin('$SIT_EXTERNAL_SW', 'pdsdata', pdsdata_ver)
 
 # pdsdata package will link all the stuff, but only includes one
@@ -37,37 +37,10 @@ del BINDIR
 
 # map package names to libraries
 packages = {
-    'acqiris'       : 'acqdata',
-    'andor'         : 'andordata',
     'app'           : 'appdata',
-    'bld'           : 'bld',
-    'camera'        : 'camdata',
     'compress'      : 'compressdata',
-    'control'       : 'controldata',
-    'cspad'         : 'cspaddata',
-    'cspad2x2'      : 'cspad2x2data',
-    'encoder'       : 'encoderdata',
-    'epics'         : 'epics',
-    'evr'           : 'evrdata',
-    'fccd'          : 'fccddata',
-    'fexamp'        : 'fexampdata',
-    'fli'           : 'flidata',
-    'gsc16ai'       : 'gsc16aidata',
     'index'         : 'indexdata',
-    'imp'           : 'impdata',
-    'ipimb'         : 'ipimbdata',
-    'lusi'          : 'lusidata',
-    'oceanoptics'   : 'oceanopticsdata',
-    'opal1k'        : 'opal1kdata',
-    'orca'          : 'orcadata',
-    'phasics'       : 'phasicsdata',
-    'pnCCD'         : 'pnccddata',
-    'princeton'     : 'princetondata',
-    'pulnix'        : 'pulnixdata',
-    'quartz'        : 'quartzdata',
-    'timepix'       : 'timepixdata',
-    'usdusb'        : 'usdusbdata',
-    'xamps'         : 'xampsdata',
+    'psddl'         : 'psddl_pdsdata',
 }
 
 for pkg, lib in packages.items():
