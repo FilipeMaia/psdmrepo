@@ -6,6 +6,11 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V01-00-00
+2013-09-24 Andy Salnikov
+- pdsdata is now DDL-based, with a lot of changes to interface
+- modify all dependencies in this package
+
 Tag: V00-01-05
 2013-09-17 Andy Salnikov
 - documentation generation changed in SConsTools, updating SConscript

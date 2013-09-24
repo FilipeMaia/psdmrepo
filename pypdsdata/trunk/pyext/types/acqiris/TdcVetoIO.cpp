@@ -56,9 +56,9 @@ namespace {
   pypdsdata::EnumType termEnum ( "Termination", termEnumValues );
 
   // methods
-  ENUM_FUN0_WRAPPER(pypdsdata::Acqiris::TdcVetoIO, channel, chanEnum)
-  ENUM_FUN0_WRAPPER(pypdsdata::Acqiris::TdcVetoIO, mode, modeEnum)
-  ENUM_FUN0_WRAPPER(pypdsdata::Acqiris::TdcVetoIO, term, termEnum)
+  ENUM_FUN0_WRAPPER_EMBEDDED(pypdsdata::Acqiris::TdcVetoIO, channel, chanEnum)
+  ENUM_FUN0_WRAPPER_EMBEDDED(pypdsdata::Acqiris::TdcVetoIO, mode, modeEnum)
+  ENUM_FUN0_WRAPPER_EMBEDDED(pypdsdata::Acqiris::TdcVetoIO, term, termEnum)
 
   PyMethodDef methods[] = {
     {"channel",   channel,  METH_NOARGS,  "self.channel() -> Channel enum\n\nReturns :py:class:`TdcVetoIO.Channel` enum value" },
@@ -94,12 +94,8 @@ pypdsdata::Acqiris::TdcVetoIO::initType( PyObject* module )
 void 
 pypdsdata::Acqiris::TdcVetoIO::print(std::ostream& out) const
 {
-  if(not m_obj) {
-    out << "acqiris.TdcVetoIO(None)";
-  } else {  
-    out << "acqiris.TdcVetoIO(channel=" << m_obj->channel()
-        << ", mode=" << m_obj->mode()
-        << ", term=" << m_obj->term()
-        << ")" ;
-  }
+  out << "acqiris.TdcVetoIO(channel=" << m_obj.channel()
+      << ", mode=" << m_obj.mode()
+      << ", term=" << m_obj.term()
+      << ")" ;
 }

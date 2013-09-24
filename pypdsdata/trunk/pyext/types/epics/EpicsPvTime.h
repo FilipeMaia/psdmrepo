@@ -26,29 +26,32 @@
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
-#include "pdsdata/epics/EpicsPvData.hh"
+#include "pdsdata/psddl/epics.ddl.h"
 
 //    ---------------------
 //    -- Class Interface --
 //    ---------------------
 
 namespace pypdsdata {
+namespace Epics {
+
+/// @addtogroup pypdsdata
 
 /**
+ *  @ingroup pypdsdata
+ *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
  *
  *  @version $Id$
  *
  *  @author Andrei Salnikov
  */
 
-class EpicsPvTime : public PdsDataType<EpicsPvTime,Pds::EpicsPvHeader> {
+class EpicsPvTime : public PdsDataType<EpicsPvTime,Pds::Epics::EpicsPvTimeHeader> {
 public:
 
-  typedef PdsDataType<EpicsPvTime,Pds::EpicsPvHeader> BaseType;
+  typedef PdsDataType<EpicsPvTime,Pds::Epics::EpicsPvTimeHeader> BaseType;
 
   /// Initialize Python type and register it in a module
   static void initType( PyObject* module );
@@ -58,6 +61,7 @@ public:
 
 };
 
+} // namespace Epics
 } // namespace pypdsdata
 
 #endif // PYPDSDATA_EPICSPVTIME_H

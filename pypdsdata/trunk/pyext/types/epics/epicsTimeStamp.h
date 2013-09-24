@@ -26,7 +26,7 @@
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
-#include "pdsdata/epics/EpicsDbrTools.hh"
+#include "pdsdata/psddl/epics.ddl.h"
 
 //    ---------------------
 //    -- Class Interface --
@@ -35,11 +35,13 @@
 namespace pypdsdata {
 namespace Epics {
 
+/// @addtogroup pypdsdata
+
 /**
+ *  @ingroup pypdsdata
+ *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
  *
  *  @version $Id$
  *
@@ -61,5 +63,11 @@ public:
 
 } // namespace Epics
 } // namespace pypdsdata
+
+namespace Pds {
+namespace Epics {
+inline PyObject* toPython(const Pds::Epics::epicsTimeStamp& v) { return pypdsdata::Epics::epicsTimeStamp::PyObject_FromPds(v); }
+}
+}
 
 #endif // PYPDSDATA_EPICSTIMESTAMP_H

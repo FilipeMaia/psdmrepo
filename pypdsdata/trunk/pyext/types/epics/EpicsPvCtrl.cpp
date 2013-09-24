@@ -33,31 +33,33 @@
 
 namespace {
 
-  template <int DBR_TYPE>
+  template <typename EpicsType>
   struct LimitUnitGetter {
 
-    static PyObject* get( Pds::EpicsPvCtrlHeader* header, void* closure ) {
+    static PyObject* get( const Pds::Epics::EpicsPvCtrlHeader& header, void* closure ) {
 
-      Pds::EpicsPvCtrl<DBR_TYPE>* ctrl = (Pds::EpicsPvCtrl<DBR_TYPE>*)header ;
+      using pypdsdata::TypeLib::toPython;
+      
+      const EpicsType& ctrl = static_cast<const EpicsType&>(header);
       switch( *(char*)closure ) {
       case 'u' :
-        return pypdsdata::TypeLib::toPython( ctrl->units );
+        return toPython( ctrl.dbr().units() );
       case 'd' :
-        return pypdsdata::TypeLib::toPython( ctrl->lower_disp_limit );
+        return toPython( ctrl.dbr().lower_disp_limit() );
       case 'D' :
-        return pypdsdata::TypeLib::toPython( ctrl->upper_disp_limit );
+        return toPython( ctrl.dbr().upper_disp_limit() );
       case 'a' :
-        return pypdsdata::TypeLib::toPython( ctrl->lower_alarm_limit );
+        return toPython( ctrl.dbr().lower_alarm_limit() );
       case 'A' :
-        return pypdsdata::TypeLib::toPython( ctrl->upper_alarm_limit );
+        return toPython( ctrl.dbr().upper_alarm_limit() );
       case 'w' :
-        return pypdsdata::TypeLib::toPython( ctrl->lower_warning_limit );
+        return toPython( ctrl.dbr().lower_warning_limit() );
       case 'W' :
-        return pypdsdata::TypeLib::toPython( ctrl->upper_warning_limit );
+        return toPython( ctrl.dbr().upper_warning_limit() );
       case 'c' :
-        return pypdsdata::TypeLib::toPython( ctrl->lower_ctrl_limit );
+        return toPython( ctrl.dbr().lower_ctrl_limit() );
       case 'C' :
-        return pypdsdata::TypeLib::toPython( ctrl->upper_ctrl_limit );
+        return toPython( ctrl.dbr().upper_ctrl_limit() );
       default:
         return 0;
       }
@@ -66,26 +68,26 @@ namespace {
 
   };
 
-  template <int iDbrType>
+  template <typename EpicsType>
   inline
   void
-  print(std::ostream& out, const Pds::EpicsPvCtrlHeader& header)
+  print(std::ostream& out, const Pds::Epics::EpicsPvCtrlHeader& header)
   {
-    typedef Pds::EpicsPvCtrl<iDbrType> PVType;
-    const PVType& obj = static_cast<const PVType&>(header);
-    out << "id=" << obj.iPvId
-        << ", name=" << obj.sPvName
-        << ", type=" << Pds::Epics::dbr_text[obj.iDbrType]
-        << ", status=" << obj.status
-        << ", severity=" << obj.severity
-        << ", value=" << obj.value;
+    const EpicsType& obj = static_cast<const EpicsType&>(header);
+    out << "id=" << obj.pvId()
+        << ", name=" << obj.pvName()
+        << ", type=" << obj.dbrType()
+        << ", status=" << obj.status()
+        << ", severity=" << obj.severity()
+        << ", value=" << obj.value(0);
   }
 
   // methods
-  MEMBER_WRAPPER(pypdsdata::EpicsPvCtrl, iPvId)
-  MEMBER_WRAPPER(pypdsdata::EpicsPvCtrl, iDbrType)
-  MEMBER_WRAPPER(pypdsdata::EpicsPvCtrl, iNumElements)
-  MEMBER_WRAPPER(pypdsdata::EpicsPvCtrl, sPvName)
+  namespace gs {
+  MEMBER_WRAPPER_FROM_METHOD(pypdsdata::Epics::EpicsPvCtrl, pvId)
+  MEMBER_WRAPPER_FROM_METHOD(pypdsdata::Epics::EpicsPvCtrl, dbrType)
+  MEMBER_WRAPPER_FROM_METHOD(pypdsdata::Epics::EpicsPvCtrl, numElements)
+  MEMBER_WRAPPER_FROM_METHOD(pypdsdata::Epics::EpicsPvCtrl, pvName)
   PyObject* EpicsPvCtrl_status( PyObject* self, void* );
   PyObject* EpicsPvCtrl_severity( PyObject* self, void* );
   PyObject* EpicsPvCtrl_precision( PyObject* self, void* );
@@ -94,39 +96,44 @@ namespace {
   PyObject* EpicsPvCtrl_strs( PyObject* self, void* );
   PyObject* EpicsPvCtrl_value( PyObject* self, void* );
   PyObject* EpicsPvCtrl_values( PyObject* self, void* );
-  PyObject* EpicsPvCtrl_getnewargs( PyObject* self, PyObject* );
+  }
+
 
   // disable warnings for non-const strings, this is a temporary measure
   // newer Python versions should get constness correctly
 #pragma GCC diagnostic ignored "-Wwrite-strings"
   PyGetSetDef getset[] = {
-    {"iPvId",        iPvId,                0, "Integer number, Pv Id", 0},
-    {"iDbrType",     iDbrType,             0, "Integer number, Epics Data Type", 0},
-    {"iNumElements", iNumElements,         0, "Integer number, Size of Pv Array", 0},
-    {"sPvName",      sPvName,              0, "String, PV name", 0},
-    {"status",       EpicsPvCtrl_status,   0, "Integer number, Status value", 0},
-    {"severity",     EpicsPvCtrl_severity, 0, "Integer number, Severity value", 0},
-    {"precision",    EpicsPvCtrl_precision, 0, "Integer number, Precision Digits, for non-floating types is None", 0},
-    {"units",        EpicsPvCtrl_units_limits,    0, "String, None for ENUM and STRING PV types", (void*)"u"},
-    {"upper_disp_limit",  EpicsPvCtrl_units_limits,  0, "Number, None for ENUM and STRING PV types", (void*)"D"},
-    {"lower_disp_limit",  EpicsPvCtrl_units_limits,  0, "Number, None for ENUM and STRING PV types", (void*)"d"},
-    {"upper_alarm_limit",  EpicsPvCtrl_units_limits,  0, "Number, None for ENUM and STRING PV types", (void*)"A"},
-    {"upper_warning_limit",  EpicsPvCtrl_units_limits,  0, "Number, None for ENUM and STRING PV types", (void*)"W"},
-    {"lower_warning_limit",  EpicsPvCtrl_units_limits,  0, "Number, None for ENUM and STRING PV types", (void*)"w"},
-    {"lower_alarm_limit",  EpicsPvCtrl_units_limits,  0, "Number, None for ENUM and STRING PV types", (void*)"a"},
-    {"upper_ctrl_limit",  EpicsPvCtrl_units_limits,  0, "Number, None for ENUM and STRING PV types", (void*)"C"},
-    {"lower_ctrl_limit",  EpicsPvCtrl_units_limits,  0, "Number, None for ENUM and STRING PV types", (void*)"c"},
-    {"no_str",       EpicsPvCtrl_no_str,   0, "Number of ENUM states, None for non-enum PV types", 0},
-    {"strs",         EpicsPvCtrl_strs,     0, "List of ENUM states, None for non-enum PV types", 0},
-    {"value",        EpicsPvCtrl_value,    0, "PV value (number or string), always a single value, for arrays it is first element", 0},
-    {"values",       EpicsPvCtrl_values,   0, "List of PV values of size [iNumElements]", 0},
+    {"iPvId",                   gs::pvId,                       0, "Integer number, Pv Id", 0},
+    {"iDbrType",                gs::dbrType,                    0, "Integer number, Epics Data Type", 0},
+    {"iNumElements",            gs::numElements,                0, "Integer number, Size of Pv Array", 0},
+    {"sPvName",                 gs::pvName,                     0, "String, PV name", 0},
+    {"status",                  gs::EpicsPvCtrl_status,         0, "Integer number, Status value", 0},
+    {"severity",                gs::EpicsPvCtrl_severity,       0, "Integer number, Severity value", 0},
+    {"precision",               gs::EpicsPvCtrl_precision,      0, "Integer number, Precision Digits, for non-floating types is None", 0},
+    {"units",                   gs::EpicsPvCtrl_units_limits,   0, "String, None for ENUM and STRING PV types", (void*)"u"},
+    {"upper_disp_limit",        gs::EpicsPvCtrl_units_limits,   0, "Number, None for ENUM and STRING PV types", (void*)"D"},
+    {"lower_disp_limit",        gs::EpicsPvCtrl_units_limits,   0, "Number, None for ENUM and STRING PV types", (void*)"d"},
+    {"upper_alarm_limit",       gs::EpicsPvCtrl_units_limits,   0, "Number, None for ENUM and STRING PV types", (void*)"A"},
+    {"upper_warning_limit",     gs::EpicsPvCtrl_units_limits,   0, "Number, None for ENUM and STRING PV types", (void*)"W"},
+    {"lower_warning_limit",     gs::EpicsPvCtrl_units_limits,   0, "Number, None for ENUM and STRING PV types", (void*)"w"},
+    {"lower_alarm_limit",       gs::EpicsPvCtrl_units_limits,   0, "Number, None for ENUM and STRING PV types", (void*)"a"},
+    {"upper_ctrl_limit",        gs::EpicsPvCtrl_units_limits,   0, "Number, None for ENUM and STRING PV types", (void*)"C"},
+    {"lower_ctrl_limit",        gs::EpicsPvCtrl_units_limits,   0, "Number, None for ENUM and STRING PV types", (void*)"c"},
+    {"no_str",                  gs::EpicsPvCtrl_no_str,         0, "Number of ENUM states, None for non-enum PV types", 0},
+    {"strs",                    gs::EpicsPvCtrl_strs,           0, "List of ENUM states, None for non-enum PV types", 0},
+    {"value",                   gs::EpicsPvCtrl_value,          0, "PV value (number or string), always a single value, for arrays it is first element", 0},
+    {"values",                  gs::EpicsPvCtrl_values,         0, "List of PV values of size [iNumElements]", 0},
     {0, 0, 0, 0, 0}
   };
 
+  namespace mm {
+  PyObject* EpicsPvCtrl_getnewargs( PyObject* self, PyObject* );
+  }
+  
   PyMethodDef methods[] = {
-    { "__getnewargs__",    EpicsPvCtrl_getnewargs, METH_NOARGS, "Pickle support" },
+    { "__getnewargs__",    mm::EpicsPvCtrl_getnewargs, METH_NOARGS, "Pickle support" },
     {0, 0, 0, 0}
-   };
+  };
 
   char typedoc[] = "Python class wrapping C++ Pds::EpicsPvCtrl class.";
 }
@@ -136,7 +143,7 @@ namespace {
 //              ----------------------------------------
 
 void
-pypdsdata::EpicsPvCtrl::initType( PyObject* module )
+pypdsdata::Epics::EpicsPvCtrl::initType( PyObject* module )
 {
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
@@ -147,42 +154,42 @@ pypdsdata::EpicsPvCtrl::initType( PyObject* module )
 }
 
 void
-pypdsdata::EpicsPvCtrl::print(std::ostream& str) const
+pypdsdata::Epics::EpicsPvCtrl::print(std::ostream& str) const
 {
   str << "EpicsPvCtrl(";
   
-  switch ( m_obj->iDbrType ) {
+  switch ( m_obj->dbrType() ) {
 
-  case DBR_CTRL_STRING:
-    ::print<DBR_STRING>(str, *m_obj);
+  case Pds::Epics::DBR_CTRL_STRING:
+    ::print<Pds::Epics::EpicsPvCtrlString>(str, *m_obj);
     break;
 
-  case DBR_CTRL_SHORT:
-    ::print<DBR_SHORT>(str, *m_obj);
+  case Pds::Epics::DBR_CTRL_SHORT:
+    ::print<Pds::Epics::EpicsPvCtrlShort>(str, *m_obj);
     break;
 
-  case DBR_CTRL_FLOAT:
-    ::print<DBR_FLOAT>(str, *m_obj);
+  case Pds::Epics::DBR_CTRL_FLOAT:
+    ::print<Pds::Epics::EpicsPvCtrlFloat>(str, *m_obj);
     break;
 
-  case DBR_CTRL_ENUM:
-    ::print<DBR_ENUM>(str, *m_obj);
+  case Pds::Epics::DBR_CTRL_ENUM:
+    ::print<Pds::Epics::EpicsPvCtrlEnum>(str, *m_obj);
     break;
 
-  case DBR_CTRL_CHAR:
-    ::print<DBR_CHAR>(str, *m_obj);
+  case Pds::Epics::DBR_CTRL_CHAR:
+    ::print<Pds::Epics::EpicsPvCtrlChar>(str, *m_obj);
     break;
 
-  case DBR_CTRL_LONG:
-    ::print<DBR_LONG>(str, *m_obj);
+  case Pds::Epics::DBR_CTRL_LONG:
+    ::print<Pds::Epics::EpicsPvCtrlLong>(str, *m_obj);
     break;
 
-  case DBR_CTRL_DOUBLE:
-    ::print<DBR_DOUBLE>(str, *m_obj);
+  case Pds::Epics::DBR_CTRL_DOUBLE:
+    ::print<Pds::Epics::EpicsPvCtrlDouble>(str, *m_obj);
     break;
 
   default:
-    str << "id=" << m_obj->iPvId;
+    str << "id=" << m_obj->pvId();
   }
 
   str << ")";
@@ -193,52 +200,45 @@ namespace {
 PyObject*
 EpicsPvCtrl_status( PyObject* self, void* )
 {
-  pypdsdata::EpicsPvCtrl* py_this = (pypdsdata::EpicsPvCtrl*) self;
-  if( ! py_this->m_obj ){
-    PyErr_SetString(pypdsdata::exceptionType(), "Error: No Valid C++ Object");
-    return 0;
-  }
+  const Pds::Epics::EpicsPvCtrlHeader* obj = pypdsdata::Epics::EpicsPvCtrl::pdsObject( self );
+  if ( not obj ) return 0;
 
   // all DBR_CTRL_* types share the same layout for this field, cast to arbitrary type
-  typedef Pds::EpicsPvCtrl<DBR_SHORT> CtrlType ;
-  CtrlType* pvCtrl = (CtrlType*)py_this->m_obj;
+  typedef Pds::Epics::EpicsPvCtrlShort CtrlType ;
+  const CtrlType& pvCtrl = static_cast<const CtrlType&>(*obj);
 
-  return pypdsdata::TypeLib::toPython( pvCtrl->status );
+  using pypdsdata::TypeLib::toPython;
+  return toPython( pvCtrl.status() );
 }
 
 PyObject*
 EpicsPvCtrl_severity( PyObject* self, void* )
 {
-  pypdsdata::EpicsPvCtrl* py_this = static_cast<pypdsdata::EpicsPvCtrl*>(self);
-  if( ! py_this->m_obj ){
-    PyErr_SetString(pypdsdata::exceptionType(), "Error: No Valid C++ Object");
-    return 0;
-  }
+  const Pds::Epics::EpicsPvCtrlHeader* obj = pypdsdata::Epics::EpicsPvCtrl::pdsObject( self );
+  if ( not obj ) return 0;
 
   // all DBR_CTRL_* types share the same layout for this field, cast to arbitrary type
-  typedef Pds::EpicsPvCtrl<DBR_SHORT> CtrlType ;
-  CtrlType* pvCtrl = (CtrlType*)py_this->m_obj;
+  typedef Pds::Epics::EpicsPvCtrlShort CtrlType ;
+  const CtrlType& pvCtrl = static_cast<const CtrlType&>(*obj);
 
-  return pypdsdata::TypeLib::toPython( pvCtrl->severity );
+  using pypdsdata::TypeLib::toPython;
+  return toPython( pvCtrl.severity() );
 }
 
 PyObject*
 EpicsPvCtrl_precision( PyObject* self, void* )
 {
-  pypdsdata::EpicsPvCtrl* py_this = static_cast<pypdsdata::EpicsPvCtrl*>(self);
-  if( ! py_this->m_obj ){
-    PyErr_SetString(pypdsdata::exceptionType(), "Error: No Valid C++ Object");
-    return 0;
-  }
+  const Pds::Epics::EpicsPvCtrlHeader* obj = pypdsdata::Epics::EpicsPvCtrl::pdsObject( self );
+  if ( not obj ) return 0;
 
   int precision = 0;
-  switch ( py_this->m_obj->iDbrType ) {
-  case DBR_CTRL_DOUBLE:
-    precision = ((Pds::EpicsPvCtrl<DBR_DOUBLE>*)py_this->m_obj)->precision;
+  switch ( obj->dbrType() ) {
+  case Pds::Epics::DBR_CTRL_DOUBLE:
+    precision = static_cast<const Pds::Epics::EpicsPvCtrlDouble&>(*obj).dbr().precision();
     break;
 
-  case DBR_CTRL_FLOAT:
-    precision = ((Pds::EpicsPvCtrl<DBR_FLOAT>*)py_this->m_obj)->precision;
+  case Pds::Epics::DBR_CTRL_FLOAT:
+    precision = static_cast<const Pds::Epics::EpicsPvCtrlFloat&>(*obj).dbr().precision();
     break;
 
   default:
@@ -246,44 +246,42 @@ EpicsPvCtrl_precision( PyObject* self, void* )
     break;
   }
 
-  return pypdsdata::TypeLib::toPython( precision );
+  using pypdsdata::TypeLib::toPython;
+  return toPython( precision );
 }
 
 PyObject*
 EpicsPvCtrl_units_limits( PyObject* self, void* closure )
 {
-  pypdsdata::EpicsPvCtrl* py_this = static_cast<pypdsdata::EpicsPvCtrl*>(self);
-  if( ! py_this->m_obj ){
-    PyErr_SetString(pypdsdata::exceptionType(), "Error: No Valid C++ Object");
-    return 0;
-  }
+  const Pds::Epics::EpicsPvCtrlHeader* obj = pypdsdata::Epics::EpicsPvCtrl::pdsObject( self );
+  if ( not obj ) return 0;
 
-  PyObject* obj = 0;
-  switch ( py_this->m_obj->iDbrType ) {
-  case DBR_CTRL_SHORT:
-    obj = LimitUnitGetter<DBR_SHORT>::get( py_this->m_obj, closure );
+  PyObject* pyobj = 0;
+  switch ( obj->dbrType() ) {
+  case Pds::Epics::DBR_CTRL_SHORT:
+    pyobj = LimitUnitGetter<Pds::Epics::EpicsPvCtrlShort>::get( *obj, closure );
     break;
 
-  case DBR_CTRL_CHAR:
-    obj = LimitUnitGetter<DBR_CHAR>::get( py_this->m_obj, closure );
+  case Pds::Epics::DBR_CTRL_CHAR:
+    pyobj = LimitUnitGetter<Pds::Epics::EpicsPvCtrlChar>::get( *obj, closure );
     break;
 
-  case DBR_CTRL_LONG:
-    obj = LimitUnitGetter<DBR_LONG>::get( py_this->m_obj, closure );
+  case Pds::Epics::DBR_CTRL_LONG:
+    pyobj = LimitUnitGetter<Pds::Epics::EpicsPvCtrlLong>::get( *obj, closure );
     break;
 
-  case DBR_CTRL_DOUBLE:
-    obj = LimitUnitGetter<DBR_DOUBLE>::get( py_this->m_obj, closure );
+  case Pds::Epics::DBR_CTRL_DOUBLE:
+    pyobj = LimitUnitGetter<Pds::Epics::EpicsPvCtrlDouble>::get( *obj, closure );
     break;
 
-  case DBR_CTRL_FLOAT:
-    obj = LimitUnitGetter<DBR_FLOAT>::get( py_this->m_obj, closure );
+  case Pds::Epics::DBR_CTRL_FLOAT:
+    pyobj = LimitUnitGetter<Pds::Epics::EpicsPvCtrlFloat>::get( *obj, closure );
     break;
 
   }
 
-  if ( obj ) {
-    return obj;
+  if ( pyobj ) {
+    return pyobj;
   } else {
     Py_RETURN_NONE;
   }
@@ -293,14 +291,11 @@ EpicsPvCtrl_units_limits( PyObject* self, void* closure )
 PyObject*
 EpicsPvCtrl_no_str( PyObject* self, void* )
 {
-  pypdsdata::EpicsPvCtrl* py_this = static_cast<pypdsdata::EpicsPvCtrl*>(self);
-  if( ! py_this->m_obj ){
-    PyErr_SetString(pypdsdata::exceptionType(), "Error: No Valid C++ Object");
-    return 0;
-  }
+  const Pds::Epics::EpicsPvCtrlHeader* obj = pypdsdata::Epics::EpicsPvCtrl::pdsObject( self );
+  if ( not obj ) return 0;
 
-  if ( py_this->m_obj->iDbrType == DBR_CTRL_ENUM ) {
-    int no_str = ((Pds::EpicsPvCtrl<DBR_ENUM>*)py_this->m_obj)->no_str;
+  if ( obj->dbrType() == Pds::Epics::DBR_CTRL_ENUM ) {
+    int no_str = static_cast<const Pds::Epics::EpicsPvCtrlEnum*>(obj)->dbr().no_str();
     return pypdsdata::TypeLib::toPython( no_str );
   } else {
     Py_RETURN_NONE;
@@ -310,20 +305,17 @@ EpicsPvCtrl_no_str( PyObject* self, void* )
 PyObject*
 EpicsPvCtrl_strs( PyObject* self, void* )
 {
-  pypdsdata::EpicsPvCtrl* py_this = static_cast<pypdsdata::EpicsPvCtrl*>(self);
-  if( ! py_this->m_obj ){
-    PyErr_SetString(pypdsdata::exceptionType(), "Error: No Valid C++ Object");
-    return 0;
-  }
+  const Pds::Epics::EpicsPvCtrlHeader* obj = pypdsdata::Epics::EpicsPvCtrl::pdsObject( self );
+  if ( not obj ) return 0;
 
-  if ( py_this->m_obj->iDbrType == DBR_CTRL_ENUM ) {
+  if ( obj->dbrType() == Pds::Epics::DBR_CTRL_ENUM ) {
 
-    Pds::EpicsPvCtrl<DBR_ENUM>* enumCtrl = (Pds::EpicsPvCtrl<DBR_ENUM>*)py_this->m_obj ;
-    int size = enumCtrl->no_str;
+    const Pds::Epics::EpicsPvCtrlEnum* enumCtrl = static_cast<const Pds::Epics::EpicsPvCtrlEnum*>(obj);
+    int size = enumCtrl->dbr().no_str();
     PyObject* list = PyList_New( size );
 
     for ( int i = 0 ; i < size ; ++ i ) {
-      PyList_SET_ITEM( list, i, PyString_FromString( enumCtrl->strs[i] ) );
+      PyList_SET_ITEM( list, i, PyString_FromString( enumCtrl->dbr().strings(i) ) );
     }
 
     return list;
@@ -336,125 +328,119 @@ EpicsPvCtrl_strs( PyObject* self, void* )
 }
 
 /// return one item from the value array as Python object
-template <int iDbrType>
+template <typename EpicsType>
 PyObject*
-getValue( Pds::EpicsPvCtrlHeader* header, int index = 0 )
+getValue(const Pds::Epics::EpicsPvCtrlHeader& header, int index = 0)
 {
-  typedef Pds::EpicsPvCtrl<iDbrType> CtrlType ;
-  CtrlType* obj = static_cast<CtrlType*>(header);
-  return pypdsdata::TypeLib::toPython( (&obj->value)[index] );
+  const EpicsType& ctrl = static_cast<const EpicsType&>(header);
+  using pypdsdata::TypeLib::toPython;
+  return toPython(ctrl.value(index));
 }
 
 /// Get the first item from the value array
 PyObject*
 EpicsPvCtrl_value( PyObject* self, void* )
 {
-  pypdsdata::EpicsPvCtrl* py_this = (pypdsdata::EpicsPvCtrl*) self;
-  if( ! py_this->m_obj ){
-    PyErr_SetString(pypdsdata::exceptionType(), "Error: No Valid C++ Object");
-    return 0;
-  }
+  const Pds::Epics::EpicsPvCtrlHeader* obj = pypdsdata::Epics::EpicsPvCtrl::pdsObject( self );
+  if ( not obj ) return 0;
 
-  if ( py_this->m_obj->iNumElements <= 0 ) {
+  if ( obj->numElements() <= 0 ) {
     PyErr_SetString(PyExc_TypeError, "Non-positive PV array size");
     return 0;
   }
 
-  PyObject* obj = 0;
-  switch ( py_this->m_obj->iDbrType ) {
+  PyObject* pyobj = 0;
+  switch ( obj->dbrType() ) {
 
-  case DBR_CTRL_STRING:
-    obj = getValue<DBR_STRING>( py_this->m_obj );
+  case Pds::Epics::DBR_CTRL_STRING:
+    pyobj = getValue<Pds::Epics::EpicsPvCtrlString>( *obj );
     break;
 
-  case DBR_CTRL_SHORT:
-    obj = getValue<DBR_SHORT>( py_this->m_obj );
+  case Pds::Epics::DBR_CTRL_SHORT:
+    pyobj = getValue<Pds::Epics::EpicsPvCtrlShort>( *obj );
     break;
 
-  case DBR_CTRL_FLOAT:
-    obj = getValue<DBR_FLOAT>( py_this->m_obj );
+  case Pds::Epics::DBR_CTRL_FLOAT:
+    pyobj = getValue<Pds::Epics::EpicsPvCtrlFloat>( *obj );
     break;
 
-  case DBR_CTRL_ENUM:
-    obj = getValue<DBR_ENUM>( py_this->m_obj );
+  case Pds::Epics::DBR_CTRL_ENUM:
+    pyobj = getValue<Pds::Epics::EpicsPvCtrlEnum>( *obj );
     break;
 
-  case DBR_CTRL_CHAR:
-    obj = getValue<DBR_CHAR>( py_this->m_obj );
+  case Pds::Epics::DBR_CTRL_CHAR:
+    pyobj = getValue<Pds::Epics::EpicsPvCtrlChar>( *obj );
     break;
 
-  case DBR_CTRL_LONG:
-    obj = getValue<DBR_LONG>( py_this->m_obj );
+  case Pds::Epics::DBR_CTRL_LONG:
+    pyobj = getValue<Pds::Epics::EpicsPvCtrlLong>( *obj );
     break;
 
-  case DBR_CTRL_DOUBLE:
-    obj = getValue<DBR_DOUBLE>( py_this->m_obj );
+  case Pds::Epics::DBR_CTRL_DOUBLE:
+    pyobj = getValue<Pds::Epics::EpicsPvCtrlDouble>( *obj );
     break;
 
   default:
     PyErr_SetString(PyExc_TypeError, "Unexpected PV type");
   }
-  return obj;
+  return pyobj;
 }
 
 /// get the whole value array
 PyObject*
 EpicsPvCtrl_values( PyObject* self, void* )
 {
-  pypdsdata::EpicsPvCtrl* py_this = static_cast<pypdsdata::EpicsPvCtrl*>(self);
-  if( ! py_this->m_obj ){
-    PyErr_SetString(pypdsdata::exceptionType(), "Error: No Valid C++ Object");
-    return 0;
-  }
+  const Pds::Epics::EpicsPvCtrlHeader* obj = pypdsdata::Epics::EpicsPvCtrl::pdsObject( self );
+  if ( not obj ) return 0;
 
-  int size = py_this->m_obj->iNumElements;
+  int size = obj->numElements();
   if ( size < 0 ) {
     PyErr_SetString(PyExc_TypeError, "Negative PV array size");
     return 0;
   }
 
   PyObject* list = PyList_New( size );
-  switch ( py_this->m_obj->iDbrType ) {
+  switch ( obj->dbrType() ) {
 
-  case DBR_CTRL_STRING:
+  case Pds::Epics::DBR_CTRL_STRING:
     for ( int i = 0 ; i < size ; ++ i ) {
-      PyList_SET_ITEM( list, i, getValue<DBR_STRING>( py_this->m_obj ) );
+      PyList_SET_ITEM( list, i, getValue<Pds::Epics::EpicsPvCtrlString>( *obj ) );
     }
     break;
 
-  case DBR_CTRL_SHORT:
+  case Pds::Epics::DBR_CTRL_SHORT:
     for ( int i = 0 ; i < size ; ++ i ) {
-      PyList_SET_ITEM( list, i, getValue<DBR_SHORT>( py_this->m_obj ) );
+      PyList_SET_ITEM( list, i, getValue<Pds::Epics::EpicsPvCtrlShort>( *obj ) );
     }
     break;
 
-  case DBR_CTRL_FLOAT:
+  case Pds::Epics::DBR_CTRL_FLOAT:
     for ( int i = 0 ; i < size ; ++ i ) {
-      PyList_SET_ITEM( list, i, getValue<DBR_FLOAT>( py_this->m_obj ) );
+      PyList_SET_ITEM( list, i, getValue<Pds::Epics::EpicsPvCtrlFloat>( *obj ) );
     }
     break;
 
-  case DBR_CTRL_ENUM:
+  case Pds::Epics::DBR_CTRL_ENUM:
     for ( int i = 0 ; i < size ; ++ i ) {
-      PyList_SET_ITEM( list, i, getValue<DBR_ENUM>( py_this->m_obj ) );
+      PyList_SET_ITEM( list, i, getValue<Pds::Epics::EpicsPvCtrlEnum>( *obj ) );
     }
     break;
 
-  case DBR_CTRL_CHAR:
+  case Pds::Epics::DBR_CTRL_CHAR:
     for ( int i = 0 ; i < size ; ++ i ) {
-      PyList_SET_ITEM( list, i, getValue<DBR_CHAR>( py_this->m_obj ) );
+      PyList_SET_ITEM( list, i, getValue<Pds::Epics::EpicsPvCtrlChar>( *obj ) );
     }
     break;
 
-  case DBR_CTRL_LONG:
+  case Pds::Epics::DBR_CTRL_LONG:
     for ( int i = 0 ; i < size ; ++ i ) {
-      PyList_SET_ITEM( list, i, getValue<DBR_LONG>( py_this->m_obj ) );
+      PyList_SET_ITEM( list, i, getValue<Pds::Epics::EpicsPvCtrlLong>( *obj ) );
     }
     break;
 
-  case DBR_CTRL_DOUBLE:
+  case Pds::Epics::DBR_CTRL_DOUBLE:
     for ( int i = 0 ; i < size ; ++ i ) {
-      PyList_SET_ITEM( list, i, getValue<DBR_DOUBLE>( py_this->m_obj ) );
+      PyList_SET_ITEM( list, i, getValue<Pds::Epics::EpicsPvCtrlDouble>( *obj ) );
     }
     break;
 
@@ -467,7 +453,7 @@ EpicsPvCtrl_values( PyObject* self, void* )
 PyObject*
 EpicsPvCtrl_getnewargs( PyObject* self, PyObject* )
 {
-  pypdsdata::EpicsPvCtrl* py_this = static_cast<pypdsdata::EpicsPvCtrl*>(self);
+  pypdsdata::Epics::EpicsPvCtrl* py_this = static_cast<pypdsdata::Epics::EpicsPvCtrl*>(self);
   if( ! py_this->m_obj ){
     PyErr_SetString(pypdsdata::exceptionType(), "Error: No Valid C++ Object");
     return 0;

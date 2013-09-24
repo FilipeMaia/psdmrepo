@@ -26,7 +26,7 @@
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
-#include "pdsdata/usdusb/DataV1.hh"
+#include "pdsdata/psddl/usdusb.ddl.h"
 
 //    ---------------------
 //    -- Class Interface --
@@ -35,7 +35,11 @@
 namespace pypdsdata {
 namespace UsdUsb {
 
+/// @addtogroup pypdsdata
+
 /**
+ *  @ingroup pypdsdata
+ *
  *  This software was developed for the LCLS project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
  *

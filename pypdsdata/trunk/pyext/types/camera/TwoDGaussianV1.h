@@ -26,7 +26,7 @@
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
-#include "pdsdata/camera/TwoDGaussianV1.hh"
+#include "pdsdata/psddl/camera.ddl.h"
 
 //    ---------------------
 //    -- Class Interface --
@@ -35,11 +35,13 @@
 namespace pypdsdata {
 namespace Camera {
 
+/// @addtogroup pypdsdata
+
 /**
+ *  @ingroup pypdsdata
+ *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
  *
  *  @version $Id$
  *

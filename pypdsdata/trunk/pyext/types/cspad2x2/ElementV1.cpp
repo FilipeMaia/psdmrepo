@@ -43,7 +43,7 @@ namespace {
   FUN0_WRAPPER(pypdsdata::CsPad2x2::ElementV1, ticks)
   FUN0_WRAPPER(pypdsdata::CsPad2x2::ElementV1, fiducials)
   FUN0_WRAPPER(pypdsdata::CsPad2x2::ElementV1, frame_type)
-  PyObject* sb_temp( PyObject* self, PyObject* args );
+  FUN0_WRAPPER(pypdsdata::CsPad2x2::ElementV1, sb_temp)
   PyObject* data( PyObject* self, PyObject* );
 
   PyMethodDef methods[] = {
@@ -57,7 +57,7 @@ namespace {
     {"ticks",           ticks,          METH_NOARGS,  "self.ticks() -> int\n\nReturns integer number" },
     {"fiducials",       fiducials,      METH_NOARGS,  "self.fiducials() -> int\n\nReturns integer number" },
     {"frame_type",      frame_type,     METH_NOARGS,  "self.frame_type() -> int\n\nReturns integer number" },
-    {"sb_temp",         sb_temp,        METH_VARARGS, "self.sb_temp(i: int) -> int\n\nRetuns integer number, index i in the range (0..3)" },
+    {"sb_temp",         sb_temp,        METH_NOARGS,  "self.sb_temp() -> list\n\nRetuns list of integers" },
     {"data",            data,           METH_NOARGS,  "self.data() -> numpy.ndarray\n\nReturns data array" },
     {0, 0, 0, 0}
    };
@@ -107,25 +107,6 @@ pypdsdata::CsPad2x2::ElementV1::print(std::ostream& str) const
 namespace {
   
 PyObject*
-sb_temp( PyObject* self, PyObject* args )
-{
-  const Pds::CsPad2x2::ElementV1* obj = pypdsdata::CsPad2x2::ElementV1::pdsObject( self );
-  if ( not obj ) return 0;
-
-  // parse args
-  unsigned index ;
-  if ( not PyArg_ParseTuple( args, "I:ElementV1.sb_temp", &index ) ) return 0;
-
-  if ( index >= 4 ) {
-    PyErr_SetString(PyExc_IndexError, "index outside of range [0..3] in ElementV1.sb_temp()");
-    return 0;
-  }
-  
-  return PyInt_FromLong( obj->sb_temp(index) );
-}
-
-
-PyObject*
 data( PyObject* self, PyObject* )
 {
   Pds::CsPad2x2::ElementV1* obj = pypdsdata::CsPad2x2::ElementV1::pdsObject( self );
@@ -142,11 +123,11 @@ data( PyObject* self, PyObject* )
   npy_intp dims[3] = { Pds::CsPad2x2::ColumnsPerASIC, Pds::CsPad2x2::MaxRowsPerASIC*2, nSect };
 
   // start of pixel data
-  uint16_t* qdata = &obj->pair[0][0].s0;
+  const int16_t* qdata = obj->data().data();
 
   // make array
   PyObject* array = PyArray_New(&PyArray_Type, 3, dims, typenum, 0,
-                                qdata, 0, flags, 0);
+                                (void*)qdata, 0, flags, 0);
 
   // array does not own its data, set self as owner
   Py_INCREF(self);

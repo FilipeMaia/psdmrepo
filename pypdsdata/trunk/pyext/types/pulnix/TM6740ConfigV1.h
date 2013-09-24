@@ -26,7 +26,7 @@
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
-#include "pdsdata/pulnix/TM6740ConfigV1.hh"
+#include "pdsdata/psddl/pulnix.ddl.h"
 
 //    ---------------------
 //    -- Class Interface --
@@ -35,11 +35,13 @@
 namespace pypdsdata {
 namespace Pulnix {
 
+/// @addtogroup pypdsdata
+
 /**
+ *  @ingroup pypdsdata
+ *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
  *
  *  @version $Id$
  *

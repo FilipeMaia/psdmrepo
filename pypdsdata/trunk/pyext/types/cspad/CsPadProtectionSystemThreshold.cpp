@@ -32,8 +32,8 @@
 namespace {
 
   // methods
-  MEMBER_WRAPPER(pypdsdata::CsPad::CsPadProtectionSystemThreshold, adcThreshold)
-  MEMBER_WRAPPER(pypdsdata::CsPad::CsPadProtectionSystemThreshold, pixelCountThreshold)
+  MEMBER_WRAPPER_EMBEDDED_FROM_METHOD(pypdsdata::CsPad::CsPadProtectionSystemThreshold, adcThreshold)
+  MEMBER_WRAPPER_EMBEDDED_FROM_METHOD(pypdsdata::CsPad::CsPadProtectionSystemThreshold, pixelCountThreshold)
   
   // disable warnings for non-const strings, this is a temporary measure
   // newer Python versions should get constness correctly
@@ -60,4 +60,3 @@ pypdsdata::CsPad::CsPadProtectionSystemThreshold::initType( PyObject* module )
 
   BaseType::initType( "CsPadProtectionSystemThreshold", module );
 }
-

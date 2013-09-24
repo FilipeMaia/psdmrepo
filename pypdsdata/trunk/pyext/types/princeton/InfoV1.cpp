@@ -33,7 +33,7 @@
 namespace {
 
   // type-specific methods
-  FUN0_WRAPPER(pypdsdata::Princeton::InfoV1, temperature)
+  FUN0_WRAPPER_EMBEDDED(pypdsdata::Princeton::InfoV1, temperature)
 
   PyMethodDef methods[] = {
     { "temperature",    temperature,    METH_NOARGS, "self.temperature() -> float\n\nReturns temperature value" },
@@ -61,5 +61,5 @@ pypdsdata::Princeton::InfoV1::initType( PyObject* module )
 void
 pypdsdata::Princeton::InfoV1::print(std::ostream& out) const
 {
-  out << "princeton.InfoV1(temperature=" << m_obj->temperature() << ")";
+  out << "princeton.InfoV1(temperature=" << m_obj.temperature() << ")";
 }

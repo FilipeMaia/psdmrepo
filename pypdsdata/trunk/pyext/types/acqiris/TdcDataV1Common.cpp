@@ -35,9 +35,9 @@
 namespace {
 
   // methods
-  ENUM_FUN0_WRAPPER(pypdsdata::Acqiris::TdcDataV1Common, source, pypdsdata::Acqiris::TdcDataV1::sourceEnum())
-  FUN0_WRAPPER(pypdsdata::Acqiris::TdcDataV1Common, overflow)
-  FUN0_WRAPPER(pypdsdata::Acqiris::TdcDataV1Common, nhits)
+  ENUM_FUN0_WRAPPER_EMBEDDED(pypdsdata::Acqiris::TdcDataV1Common, source, pypdsdata::Acqiris::TdcDataV1::sourceEnum())
+  FUN0_WRAPPER_EMBEDDED(pypdsdata::Acqiris::TdcDataV1Common, overflow)
+  FUN0_WRAPPER_EMBEDDED(pypdsdata::Acqiris::TdcDataV1Common, nhits)
 
   PyMethodDef methods[] = {
     {"source",   source,   METH_NOARGS,  "self.source() -> Source enum\n\nReturns :py:class:`TdcDataV1.Source` enum value" },
@@ -46,7 +46,7 @@ namespace {
     {0, 0, 0, 0}
    };
 
-  char typedoc[] = "Python class wrapping C++ Pds::Acqiris::TdcDataV1::Common class.";
+  char typedoc[] = "Python class wrapping C++ Pds::Acqiris::TdcDataV1Common class.";
 }
 
 //              ----------------------------------------
@@ -70,12 +70,8 @@ pypdsdata::Acqiris::TdcDataV1Common::initType( PyObject* module )
 void 
 pypdsdata::Acqiris::TdcDataV1Common::print(std::ostream& out) const
 {
-  if(not m_obj) {
-    out << "acqiris.TdcDataV1Common(None)";
-  } else {  
-    out << "acqiris.TdcDataV1Common(source=" << m_obj->source()
-        << ", overflow=" << (m_obj->overflow() ? "True" : "False")
-        << ", nhits=" << m_obj->nhits()
-        << ")" ;
-  }
+  out << "acqiris.TdcDataV1Common(source=" << m_obj.source()
+      << ", overflow=" << (m_obj.overflow() ? "True" : "False")
+      << ", nhits=" << m_obj.nhits()
+      << ")" ;
 }

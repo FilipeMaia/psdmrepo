@@ -17,12 +17,12 @@
 //----------------------
 // Base Class Headers --
 //----------------------
-#include "../PdsDataType.h"
+#include "../PdsDataTypeEmbedded.h"
 
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "pdsdata/cspad/ConfigV1.hh"
+#include "pdsdata/psddl/cspad.ddl.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -35,21 +35,23 @@
 namespace pypdsdata {
 namespace CsPad {
 
+/// @addtogroup pypdsdata
+
 /**
+ *  @ingroup pypdsdata
+ *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
  *
  *  @version $Id$
  *
  *  @author Andrei Salnikov
  */
 
-class CsPadReadOnlyCfg : public PdsDataType<CsPadReadOnlyCfg, Pds::CsPad::CsPadReadOnlyCfg> {
+class CsPadReadOnlyCfg : public PdsDataTypeEmbedded<CsPadReadOnlyCfg, Pds::CsPad::CsPadReadOnlyCfg> {
 public:
 
-  typedef PdsDataType<CsPadReadOnlyCfg, Pds::CsPad::CsPadReadOnlyCfg> BaseType;
+  typedef PdsDataTypeEmbedded<CsPadReadOnlyCfg, Pds::CsPad::CsPadReadOnlyCfg> BaseType;
 
   /// Initialize Python type and register it in a module
   static void initType( PyObject* module );
@@ -58,5 +60,11 @@ public:
 
 } // namespace CsPad
 } // namespace pypdsdata
+
+namespace Pds {
+namespace CsPad {
+inline PyObject* toPython(const Pds::CsPad::CsPadReadOnlyCfg& v) { return pypdsdata::CsPad::CsPadReadOnlyCfg::PyObject_FromPds(v); }
+}
+}
 
 #endif // PYPDSDATA_CSPAD_CSPADREADONLYCFG_H

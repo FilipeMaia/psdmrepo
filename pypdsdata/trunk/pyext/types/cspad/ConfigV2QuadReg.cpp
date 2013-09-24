@@ -45,8 +45,8 @@ namespace {
   pypdsdata::EnumType dataModesEnum ( "DataModes", dataModesEnumValues );
 
   // methods
-  PyObject* shiftSelect( PyObject* self, PyObject* );
-  PyObject* edgeSelect( PyObject* self, PyObject* );
+  FUN0_WRAPPER(pypdsdata::CsPad::ConfigV2QuadReg, shiftSelect)
+  FUN0_WRAPPER(pypdsdata::CsPad::ConfigV2QuadReg, edgeSelect)
   FUN0_WRAPPER(pypdsdata::CsPad::ConfigV2QuadReg, readClkSet)
   FUN0_WRAPPER(pypdsdata::CsPad::ConfigV2QuadReg, readClkHold)
   ENUM_FUN0_WRAPPER(pypdsdata::CsPad::ConfigV2QuadReg, dataMode, dataModesEnum)
@@ -60,7 +60,7 @@ namespace {
   FUN0_WRAPPER(pypdsdata::CsPad::ConfigV2QuadReg, ampReset)
   FUN0_WRAPPER(pypdsdata::CsPad::ConfigV2QuadReg, digCount)
   FUN0_WRAPPER(pypdsdata::CsPad::ConfigV2QuadReg, digPeriod)
-  PyObject* readOnly( PyObject* self, PyObject* );
+  FUN0_WRAPPER(pypdsdata::CsPad::ConfigV2QuadReg, ro)
   PyObject* digitalPots( PyObject* self, PyObject* );
   PyObject* gainMap( PyObject* self, PyObject* );
 
@@ -82,10 +82,10 @@ namespace {
     {"ampReset",        ampReset,       METH_NOARGS, "self.ampReset() -> int\n\nReturns integer number" },
     {"digCount",        digCount,       METH_NOARGS, "self.digCount() -> int\n\nReturns integer number" },
     {"digPeriod",       digPeriod,      METH_NOARGS, "self.digPeriod() -> int\n\nReturns integer number" },
-    {"ro",              readOnly,       METH_NOARGS, "self.ro() -> CsPadReadOnlyCfg\n\nReturns :py:class:`CsPadReadOnlyCfg` object" },
+    {"ro",              ro,             METH_NOARGS, "self.ro() -> CsPadReadOnlyCfg\n\nReturns :py:class:`CsPadReadOnlyCfg` object" },
     {"dp",              digitalPots,    METH_NOARGS, "self.dp() -> CsPadDigitalPotsCfg\n\nReturns :py:class:`CsPadDigitalPotsCfg` object" },
     {"gm",              gainMap,        METH_NOARGS, "self.gm() -> CsPadGainMapCfg\n\nReturns :py:class:`CsPadGainMapCfg` object" },
-    {"readOnly",        readOnly,       METH_NOARGS, "self.readOnly() -> CsPadReadOnlyCfg\n\nReturns :py:class:`CsPadReadOnlyCfg` object, same as ro()" },
+    {"readOnly",        ro,             METH_NOARGS, "self.readOnly() -> CsPadReadOnlyCfg\n\nReturns :py:class:`CsPadReadOnlyCfg` object, same as ro()" },
     {0, 0, 0, 0}
    };
 
@@ -116,53 +116,13 @@ pypdsdata::CsPad::ConfigV2QuadReg::initType( PyObject* module )
 namespace {
 
 PyObject*
-shiftSelect( PyObject* self, PyObject* )
-{
-  const Pds::CsPad::ConfigV2QuadReg* obj = pypdsdata::CsPad::ConfigV2QuadReg::pdsObject( self );
-  if ( not obj ) return 0;
-
-  PyObject* list = PyList_New( Pds::CsPad::TwoByTwosPerQuad );
-  const uint32_t* data = obj->shiftSelect();
-  for ( unsigned i = 0 ; i < Pds::CsPad::TwoByTwosPerQuad ; ++ i ) {
-    PyList_SET_ITEM( list, i, PyInt_FromLong(data[i]) );
-  }
-
-  return list;
-}
-
-PyObject*
-edgeSelect( PyObject* self, PyObject* )
-{
-  const Pds::CsPad::ConfigV2QuadReg* obj = pypdsdata::CsPad::ConfigV2QuadReg::pdsObject( self );
-  if ( not obj ) return 0;
-
-  PyObject* list = PyList_New( Pds::CsPad::TwoByTwosPerQuad );
-  const uint32_t* data = obj->edgeSelect();
-  for ( unsigned i = 0 ; i < Pds::CsPad::TwoByTwosPerQuad ; ++ i ) {
-    PyList_SET_ITEM( list, i, PyInt_FromLong(data[i]) );
-  }
-
-  return list;
-}
-
-PyObject*
-readOnly( PyObject* self, PyObject* )
-{
-  Pds::CsPad::ConfigV2QuadReg* obj = pypdsdata::CsPad::ConfigV2QuadReg::pdsObject( self );
-  if ( not obj ) return 0;
-
-  return pypdsdata::CsPad::CsPadReadOnlyCfg::PyObject_FromPds( 
-      obj->readOnly(), self, sizeof(Pds::CsPad::CsPadReadOnlyCfg) );
-}
-
-PyObject*
 digitalPots( PyObject* self, PyObject* )
 {
   Pds::CsPad::ConfigV2QuadReg* obj = pypdsdata::CsPad::ConfigV2QuadReg::pdsObject( self );
   if ( not obj ) return 0;
 
   return pypdsdata::CsPad::CsPadDigitalPotsCfg::PyObject_FromPds( 
-      &obj->dp(), self, sizeof(Pds::CsPad::CsPadDigitalPotsCfg) );
+      const_cast<Pds::CsPad::CsPadDigitalPotsCfg*>(&obj->dp()), self, sizeof(Pds::CsPad::CsPadDigitalPotsCfg) );
 }
 
 PyObject*
@@ -172,7 +132,7 @@ gainMap( PyObject* self, PyObject* )
   if ( not obj ) return 0;
 
   return pypdsdata::CsPad::CsPadGainMapCfg::PyObject_FromPds( 
-      obj->gm(), self, sizeof(Pds::CsPad::CsPadGainMapCfg) );
+      const_cast<Pds::CsPad::CsPadGainMapCfg*>(&obj->gm()), self, sizeof(Pds::CsPad::CsPadGainMapCfg) );
 }
 
 }

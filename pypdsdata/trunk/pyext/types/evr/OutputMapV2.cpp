@@ -54,7 +54,7 @@ namespace {
   ENUM_FUN0_WRAPPER_EMBEDDED(pypdsdata::EvrData::OutputMapV2, conn, connEnum)
   FUN0_WRAPPER_EMBEDDED(pypdsdata::EvrData::OutputMapV2, conn_id)
   FUN0_WRAPPER_EMBEDDED(pypdsdata::EvrData::OutputMapV2, module)
-  FUN0_WRAPPER_EMBEDDED(pypdsdata::EvrData::OutputMapV2, map)
+//  FUN0_WRAPPER_EMBEDDED(pypdsdata::EvrData::OutputMapV2, map)
 
   PyMethodDef methods[] = {
     { "source",    source,     METH_NOARGS, "self.source() -> Source enum\n\nReturns source (generated pulse) of output generation (:py:class:`Source`)" },
@@ -62,7 +62,7 @@ namespace {
     { "conn",      conn,       METH_NOARGS, "self.conn() -> Conn enum\n\nReturns connector for output destination (:py:class:`Conn`)" },
     { "conn_id",   conn_id,    METH_NOARGS, "self.conn_id() -> int\n\nReturns connector for output destination" },
     { "module",    module,     METH_NOARGS, "self.module() -> int\n\nReturns module number" },
-    { "map",       map,        METH_NOARGS, "self.map() -> int\n\nReturns encoded source value" },
+//    { "map",       map,        METH_NOARGS, "self.map() -> int\n\nReturns encoded source value" },
     {0, 0, 0, 0}
    };
 

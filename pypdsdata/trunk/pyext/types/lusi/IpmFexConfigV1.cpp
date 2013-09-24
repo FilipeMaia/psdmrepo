@@ -33,8 +33,8 @@
 namespace {
 
   // methods
-  MEMBER_WRAPPER(pypdsdata::Lusi::IpmFexConfigV1, xscale)
-  MEMBER_WRAPPER(pypdsdata::Lusi::IpmFexConfigV1, yscale)
+  MEMBER_WRAPPER_FROM_METHOD(pypdsdata::Lusi::IpmFexConfigV1, xscale)
+  MEMBER_WRAPPER_FROM_METHOD(pypdsdata::Lusi::IpmFexConfigV1, yscale)
   PyObject* IpmFexConfigV1_diode( PyObject* self, void* );
 
   // disable warnings for non-const strings, this is a temporary measure
@@ -73,7 +73,7 @@ pypdsdata::Lusi::IpmFexConfigV1::initType( PyObject* module )
 void
 pypdsdata::Lusi::IpmFexConfigV1::print(std::ostream& str) const
 {
-  str << "lusi.IpmFexConfigV1(xscale=" << m_obj->xscale << ", yscale=" << m_obj->yscale << ", ...)";
+  str << "lusi.IpmFexConfigV1(xscale=" << m_obj->xscale() << ", yscale=" << m_obj->yscale() << ", ...)";
 }
 
 
@@ -88,7 +88,7 @@ IpmFexConfigV1_diode( PyObject* self, void* )
   const int size = Pds::Lusi::IpmFexConfigV1::NCHANNELS;
   PyObject* list = PyList_New( size );
   for ( int i = 0 ; i < size ; ++ i ) {
-    Pds::Lusi::DiodeFexConfigV1& dconf = obj->diode[i];
+    Pds::Lusi::DiodeFexConfigV1& dconf = const_cast<Pds::Lusi::DiodeFexConfigV1&>(obj->diode()[i]);
     PyObject* obj = pypdsdata::Lusi::DiodeFexConfigV1::PyObject_FromPds(&dconf, self, sizeof(Pds::Lusi::DiodeFexConfigV1));
     PyList_SET_ITEM( list, i, obj );
   }

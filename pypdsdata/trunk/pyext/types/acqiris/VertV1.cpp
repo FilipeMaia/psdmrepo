@@ -55,11 +55,11 @@ namespace {
   pypdsdata::EnumType bandwidthEnum ( "Bandwidth", bandwidthEnumValues );
 
   // methods
-  FUN0_WRAPPER(pypdsdata::Acqiris::VertV1, fullScale)
-  FUN0_WRAPPER(pypdsdata::Acqiris::VertV1, offset)
-  ENUM_FUN0_WRAPPER(pypdsdata::Acqiris::VertV1, bandwidth, bandwidthEnum)
-  ENUM_FUN0_WRAPPER(pypdsdata::Acqiris::VertV1, coupling, couplingEnum)
-  FUN0_WRAPPER(pypdsdata::Acqiris::VertV1, slope)
+  FUN0_WRAPPER_EMBEDDED(pypdsdata::Acqiris::VertV1, fullScale)
+  FUN0_WRAPPER_EMBEDDED(pypdsdata::Acqiris::VertV1, offset)
+  ENUM_FUN0_WRAPPER_EMBEDDED(pypdsdata::Acqiris::VertV1, bandwidth, bandwidthEnum)
+  ENUM_FUN0_WRAPPER_EMBEDDED(pypdsdata::Acqiris::VertV1, coupling, couplingEnum)
+  FUN0_WRAPPER_EMBEDDED(pypdsdata::Acqiris::VertV1, slope)
 
   PyMethodDef methods[] = {
     {"fullScale",    fullScale,   METH_NOARGS,  "self.fullScale() -> float\n\nReturns floating number" },
@@ -96,13 +96,9 @@ pypdsdata::Acqiris::VertV1::initType( PyObject* module )
 void 
 pypdsdata::Acqiris::VertV1::print(std::ostream& out) const
 {
-  if(not m_obj) {
-    out << "acqiris.VertV1(None)";
-  } else {  
-    out << "acqiris.VertV1(fullScale=" << m_obj->fullScale()
-        << ", offset=" << m_obj->offset()
-        << ", coupling=" << m_obj->coupling()
-        << ", bandwidth=" << m_obj->bandwidth()
-        << ")" ;
-  }
+  out << "acqiris.VertV1(fullScale=" << m_obj.fullScale()
+      << ", offset=" << m_obj.offset()
+      << ", coupling=" << m_obj.coupling()
+      << ", bandwidth=" << m_obj.bandwidth()
+      << ")" ;
 }

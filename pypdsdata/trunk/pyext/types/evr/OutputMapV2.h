@@ -22,11 +22,11 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "pdsdata/psddl/evr.ddl.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
-#include "pdsdata/evr/OutputMapV2.hh"
 
 //    ---------------------
 //    -- Class Interface --
@@ -38,11 +38,13 @@ class EnumType;
 
 namespace EvrData {
 
+/// @addtogroup pypdsdata
+
 /**
+ *  @ingroup pypdsdata
+ *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
  *
  *  @version $Id$
  *
@@ -64,5 +66,11 @@ public:
 
 } // namespace EvrData
 } // namespace pypdsdata
+
+namespace Pds {
+namespace EvrData {
+inline PyObject* toPython(const Pds::EvrData::OutputMapV2& v) { return pypdsdata::EvrData::OutputMapV2::PyObject_FromPds(v); }
+}
+}
 
 #endif // PYPDSDATA_EVRDATA_OUTPUTMAPV2_H

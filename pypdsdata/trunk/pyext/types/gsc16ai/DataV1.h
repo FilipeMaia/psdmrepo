@@ -22,7 +22,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "pdsdata/gsc16ai/DataV1.hh"
+#include "pdsdata/psddl/gsc16ai.ddl.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -35,11 +35,13 @@
 namespace pypdsdata {
 namespace Gsc16ai {
 
+/// @addtogroup pypdsdata
+
 /**
+ *  @ingroup pypdsdata
+ *
  *  This software was developed for the LCLS project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
  *
  *  @version $Id$
  *

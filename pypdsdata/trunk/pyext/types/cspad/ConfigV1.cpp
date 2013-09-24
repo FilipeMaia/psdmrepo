@@ -48,7 +48,6 @@ namespace {
 
   // methods
   PyObject* quads( PyObject* self, PyObject* );
-  PyObject* numQuads( PyObject* self, PyObject* );
   PyObject* sections( PyObject* self, PyObject* args);
   FUN0_WRAPPER(pypdsdata::CsPad::ConfigV1, tdi)
   FUN0_WRAPPER(pypdsdata::CsPad::ConfigV1, quadMask)
@@ -61,11 +60,12 @@ namespace {
   FUN0_WRAPPER(pypdsdata::CsPad::ConfigV1, badAsicMask1)
   FUN0_WRAPPER(pypdsdata::CsPad::ConfigV1, asicMask)
   FUN0_WRAPPER(pypdsdata::CsPad::ConfigV1, numAsicsRead)
+  FUN0_WRAPPER(pypdsdata::CsPad::ConfigV1, numQuads)
+  FUN0_WRAPPER(pypdsdata::CsPad::ConfigV1, numSect)
   FUN0_WRAPPER(pypdsdata::CsPad::ConfigV1, concentratorVersion)
 
   PyMethodDef methods[] = {
     {"quads",               quads,               METH_NOARGS, "self.quads() -> list\n\nReturns list of :py:class:`ConfigV1QuadReg` objects" },
-    {"numQuads",            numQuads,            METH_NOARGS, "self.numQuads() -> int\n\nReturns number of quadrants" },
     {"tdi",                 tdi,                 METH_NOARGS, "self.tdi() -> int\n\nReturns test data index" },
     {"quadMask",            quadMask,            METH_NOARGS, "self.quadMask() -> int\n\nReturns quadrant bit mask" },
     {"runDelay",            runDelay,            METH_NOARGS, "self.runDelay() -> int\n\nReturns integer number" },
@@ -77,6 +77,8 @@ namespace {
     {"badAsicMask1",        badAsicMask1,        METH_NOARGS, "self.badAsicMask1() -> int\n\nRetuns bit mask" },
     {"asicMask",            asicMask,            METH_NOARGS, "self.asicMask() -> int\n\nRetuns bit mask" },
     {"numAsicsRead",        numAsicsRead,        METH_NOARGS, "self.numAsicsRead() -> int\n\nRetuns number of ASICs in readout" },
+    {"numQuads",            numQuads,            METH_NOARGS, "self.numQuads() -> int\n\nReturns number of quadrants" },
+    {"numSect",             numSect,             METH_NOARGS, "self.numSect() -> int\n\nReturns total number of sections (2x1) in all quadrants" },
     {"concentratorVersion", concentratorVersion, METH_NOARGS, "self.concentratorVersion() -> int\n\nReturns concentrator version" },
     {"sections",            sections,            METH_VARARGS,
         "self.sections(q: int) -> list of int\n\nlist of section indices read for a given quadrant number" },
@@ -127,30 +129,13 @@ quads( PyObject* self, PyObject* )
   if ( not obj ) return 0;
 
   PyObject* list = PyList_New( Pds::CsPad::MaxQuadsPerSensor );
-  Pds::CsPad::ConfigV1QuadReg* quads = obj->quads();
   for ( unsigned i = 0 ; i < Pds::CsPad::MaxQuadsPerSensor ; ++ i ) {
     PyObject* q = pypdsdata::CsPad::ConfigV1QuadReg::PyObject_FromPds(
-        &quads[i], self, sizeof(Pds::CsPad::ConfigV1QuadReg) );
+        const_cast<Pds::CsPad::ConfigV1QuadReg*>(&obj->quads(i)), self, sizeof(Pds::CsPad::ConfigV1QuadReg) );
     PyList_SET_ITEM( list, i, q );
   }
 
   return list;
-}
-
-PyObject*
-numQuads( PyObject* self, PyObject* )
-{
-  const Pds::CsPad::ConfigV1* obj = pypdsdata::CsPad::ConfigV1::pdsObject( self );
-  if ( not obj ) return 0;
-
-  unsigned count = 0 ;
-  unsigned mask = obj->quadMask();
-  for ( unsigned i = Pds::CsPad::MaxQuadsPerSensor ; i ; -- i ) {
-    if ( mask & 1 ) ++ count ;
-    mask >>= 1 ;
-  }
-  
-  return PyInt_FromLong(count);
 }
 
 PyObject*
@@ -169,7 +154,7 @@ sections( PyObject* self, PyObject* args )
   }
 
   // fill list with 0, 1... upt to the number of sections read
-  unsigned count = obj->numAsicsRead()/2;
+  const unsigned count = obj->numAsicsRead()/2;
   PyObject* list = PyList_New( count );
   for ( unsigned i = 0 ; i < count ; ++ i ) {
     PyList_SET_ITEM( list, i, pypdsdata::TypeLib::toPython(i) );

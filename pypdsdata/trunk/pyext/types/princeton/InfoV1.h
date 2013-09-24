@@ -17,12 +17,12 @@
 //----------------------
 // Base Class Headers --
 //----------------------
-#include "../PdsDataType.h"
+#include "../PdsDataTypeEmbedded.h"
 
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "pdsdata/princeton/InfoV1.hh"
+#include "pdsdata/psddl/princeton.ddl.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -35,21 +35,23 @@
 namespace pypdsdata {
 namespace Princeton {
 
+/// @addtogroup pypdsdata
+
 /**
+ *  @ingroup pypdsdata
+ *
  *  This software was developed for the LCLS project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
  *
  *  @version $Id$
  *
  *  @author Andrei Salnikov
  */
 
-class InfoV1 : public PdsDataType<InfoV1,Pds::Princeton::InfoV1> {
+class InfoV1 : public PdsDataTypeEmbedded<InfoV1,Pds::Princeton::InfoV1> {
 public:
 
-  typedef PdsDataType<InfoV1,Pds::Princeton::InfoV1> BaseType;
+  typedef PdsDataTypeEmbedded<InfoV1,Pds::Princeton::InfoV1> BaseType;
 
   /// Initialize Python type and register it in a module
   static void initType( PyObject* module );
@@ -61,5 +63,11 @@ public:
 
 } // namespace Princeton
 } // namespace pypdsdata
+
+namespace Pds {
+namespace Princeton {
+inline PyObject* toPython(const Pds::Princeton::InfoV1& v) { return pypdsdata::Princeton::InfoV1::PyObject_FromPds(v); }
+}
+}
 
 #endif // PYPDSDATA_PRINCETON_INFOV1_H

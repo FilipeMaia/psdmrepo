@@ -32,21 +32,19 @@
 namespace {
 
   // standard Python stuff
+  MEMBER_WRAPPER_EMBEDDED_FROM_METHOD(pypdsdata::Camera::FrameCoord, column)
+  MEMBER_WRAPPER_EMBEDDED_FROM_METHOD(pypdsdata::Camera::FrameCoord, row)
   long FrameCoord_hash( PyObject* self );
   int FrameCoord_compare( PyObject *self, PyObject *other);
 
   // disable warnings for non-const strings, this is a temporary measure
   // newer Python versions should get constness correctly
 #pragma GCC diagnostic ignored "-Wwrite-strings"
-  PyMemberDef members[] = {
-    {"x",      T_USHORT, offsetof(pypdsdata::Camera::FrameCoord,m_obj.column),
-       0, "column index" },
-    {"column", T_USHORT, offsetof(pypdsdata::Camera::FrameCoord,m_obj.column),
-       0, "column index, same value as 'x'" },
-    {"y",      T_USHORT, offsetof(pypdsdata::Camera::FrameCoord,m_obj.row),
-      0, "row index" },
-    {"row",    T_USHORT, offsetof(pypdsdata::Camera::FrameCoord,m_obj.row),
-      0, "row index, same value as 'y'" },
+  PyGetSetDef getset[] = {
+    {"x",       column,   0, "column index", 0},
+    {"column",  column,   0, "column index, same value as 'x'", 0},
+    {"y",       row,      0, "row index", 0},
+    {"row",     row,      0, "row index, same value as 'y'", 0},
     {0, 0, 0, 0, 0}
   };
 
@@ -66,7 +64,7 @@ pypdsdata::Camera::FrameCoord::initType( PyObject* module )
 {
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
-  type->tp_members = ::members;
+  type->tp_getset = ::getset;
   type->tp_hash = FrameCoord_hash;
   type->tp_compare = FrameCoord_compare;
 
@@ -76,7 +74,7 @@ pypdsdata::Camera::FrameCoord::initType( PyObject* module )
 void
 pypdsdata::Camera::FrameCoord::print(std::ostream& out) const
 {
-  out << "camera.FrameCoord(" << m_obj.column << ", " << m_obj.row << ")";
+  out << "camera.FrameCoord(" << m_obj.column() << ", " << m_obj.row() << ")";
 }
 
 namespace {
@@ -85,9 +83,9 @@ long
 FrameCoord_hash( PyObject* self )
 {
   pypdsdata::Camera::FrameCoord* py_this = (pypdsdata::Camera::FrameCoord*) self;
-  int64_t x = py_this->m_obj.column ;
-  int64_t y = py_this->m_obj.row ;
-  long hash = x | ( y << 32 ) ;
+  uint32_t x = py_this->m_obj.column() ;
+  uint32_t y = py_this->m_obj.row() ;
+  long hash = x | ( y << 16 ) ;
   return hash;
 }
 
@@ -96,10 +94,10 @@ FrameCoord_compare( PyObject* self, PyObject* other )
 {
   pypdsdata::Camera::FrameCoord* py_this = (pypdsdata::Camera::FrameCoord*) self;
   pypdsdata::Camera::FrameCoord* py_other = (pypdsdata::Camera::FrameCoord*) other;
-  if ( py_this->m_obj.column > py_other->m_obj.column ) return 1 ;
-  if ( py_this->m_obj.column < py_other->m_obj.column ) return -1 ;
-  if ( py_this->m_obj.row > py_other->m_obj.row ) return 1 ;
-  if ( py_this->m_obj.row < py_other->m_obj.row ) return -1 ;
+  if ( py_this->m_obj.column() > py_other->m_obj.column() ) return 1 ;
+  if ( py_this->m_obj.column() < py_other->m_obj.column() ) return -1 ;
+  if ( py_this->m_obj.row() > py_other->m_obj.row() ) return 1 ;
+  if ( py_this->m_obj.row() < py_other->m_obj.row() ) return -1 ;
   return 0 ;
 }
 

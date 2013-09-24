@@ -34,12 +34,13 @@
 
 namespace pypdsdata {
 
+/// @addtogroup pypdsdata
+
 /**
+ *  @ingroup pypdsdata
  *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
  *
  *  @version $Id$
  *
@@ -57,5 +58,9 @@ public:
 };
 
 } // namespace pypdsdata
+
+namespace Pds {
+inline PyObject* toPython(const Pds::ClockTime& v) { return pypdsdata::ClockTime::PyObject_FromPds(v); }
+}
 
 #endif // PYPDSDATA_CLOCKTIME_H

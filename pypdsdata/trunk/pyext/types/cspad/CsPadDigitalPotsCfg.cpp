@@ -32,8 +32,8 @@
 namespace {
 
   // methods
+MEMBER_WRAPPER_FROM_METHOD(pypdsdata::CsPad::CsPadDigitalPotsCfg, pots)
   PyObject* value( PyObject* self, PyObject* args );
-  PyObject* pots( PyObject* self, void* );
 
   PyMethodDef methods[] = {
     {"value",     value,      METH_VARARGS, "self.value(i: int) -> int\n\nReturns pot value for a given index." },
@@ -89,23 +89,8 @@ value( PyObject* self, PyObject* args )
     return 0;
   }
   
-  return PyInt_FromLong( obj->value(index) );
+  return PyInt_FromLong( obj->pots()[index] );
 }
-
-PyObject*
-pots( PyObject* self, void*)
-{
-  const Pds::CsPad::CsPadDigitalPotsCfg* obj = pypdsdata::CsPad::CsPadDigitalPotsCfg::pdsObject( self );
-  if ( not obj ) return 0;
-
-  PyObject* list = PyList_New( Pds::CsPad::PotsPerQuad );
-  for ( unsigned i = 0 ; i < Pds::CsPad::PotsPerQuad ; ++ i ) {
-    PyList_SET_ITEM( list, i, PyInt_FromLong(obj->pots[i]) );
-  }
-
-  return list;
-}
-
 
 }
 

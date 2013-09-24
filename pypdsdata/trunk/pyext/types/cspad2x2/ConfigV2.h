@@ -22,7 +22,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "pdsdata/cspad2x2/ConfigV2.hh"
+#include "pdsdata/psddl/cspad2x2.ddl.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -35,11 +35,13 @@
 namespace pypdsdata {
 namespace CsPad2x2 {
 
+/// @addtogroup pypdsdata
+
 /**
+ *  @ingroup pypdsdata
+ *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
  *
  *  @version $Id$
  *

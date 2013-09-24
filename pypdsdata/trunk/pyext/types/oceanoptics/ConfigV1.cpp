@@ -33,7 +33,9 @@ namespace {
 
   // methods
   FUN0_WRAPPER(pypdsdata::OceanOptics::ConfigV1, exposureTime)
+  FUN0_WRAPPER(pypdsdata::OceanOptics::ConfigV1, waveLenCalib)
   FUN0_WRAPPER(pypdsdata::OceanOptics::ConfigV1, strayLightConstant)
+  FUN0_WRAPPER(pypdsdata::OceanOptics::ConfigV1, nonlinCorrect)
   PyObject* waveLenCalib( PyObject* self, PyObject* );
   PyObject* nonlinCorrect( PyObject* self, PyObject* );
 
@@ -68,55 +70,8 @@ void
 pypdsdata::OceanOptics::ConfigV1::print(std::ostream& str) const
 {
   str << "oceanoptics.ConfigV1(exposureTime=" << m_obj->exposureTime()
-      << ", waveLenCalib=[";
-  for ( unsigned i = 0; i < 4; ++ i ) {
-    if (i) str << ",";
-    str << m_obj->waveLenCalib(i);
-  }
-  str << "], strayLightConstant=" << m_obj->strayLightConstant()
-      << ", nonlinCorrect=[";
-  for ( unsigned i = 0; i < 8; ++ i ) {
-    if (i) str << ",";
-    str << m_obj->nonlinCorrect(i);
-  }
-  str << "])";
-}
-
-
-namespace {
-
-PyObject*
-waveLenCalib( PyObject* self, PyObject* )
-{
-  Pds::OceanOptics::ConfigV1* obj = pypdsdata::OceanOptics::ConfigV1::pdsObject(self);
-  if(not obj) return 0;
-
-  const unsigned size = 4;
-  PyObject* list = PyList_New(size);
-
-  // copy PvConfig objects to the list
-  for ( unsigned i = 0; i < size; ++ i ) {
-    PyList_SET_ITEM(list, i, PyFloat_FromDouble(obj->waveLenCalib(i)));
-  }
-
-  return list;
-}
-
-PyObject*
-nonlinCorrect( PyObject* self, PyObject* )
-{
-  Pds::OceanOptics::ConfigV1* obj = pypdsdata::OceanOptics::ConfigV1::pdsObject(self);
-  if(not obj) return 0;
-
-  const unsigned size = 8;
-  PyObject* list = PyList_New(size);
-
-  // copy PvConfig objects to the list
-  for ( unsigned i = 0; i < size; ++ i ) {
-    PyList_SET_ITEM(list, i, PyFloat_FromDouble(obj->nonlinCorrect(i)));
-  }
-
-  return list;
-}
-
+      << ", waveLenCalib=" << m_obj->waveLenCalib()
+      << ", strayLightConstant=" << m_obj->strayLightConstant()
+      << ", nonlinCorrect=" << m_obj->nonlinCorrect()
+      << ")";
 }

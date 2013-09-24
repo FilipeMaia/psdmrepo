@@ -32,8 +32,8 @@
 namespace {
 
   // methods
-  MEMBER_WRAPPER(pypdsdata::CsPad::CsPadReadOnlyCfg, shiftTest)
-  MEMBER_WRAPPER(pypdsdata::CsPad::CsPadReadOnlyCfg, version)
+  MEMBER_WRAPPER_EMBEDDED_FROM_METHOD(pypdsdata::CsPad::CsPadReadOnlyCfg, shiftTest)
+  MEMBER_WRAPPER_EMBEDDED_FROM_METHOD(pypdsdata::CsPad::CsPadReadOnlyCfg, version)
   
   // disable warnings for non-const strings, this is a temporary measure
   // newer Python versions should get constness correctly

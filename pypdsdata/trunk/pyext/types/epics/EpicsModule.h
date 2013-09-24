@@ -26,7 +26,7 @@
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
-#include "pdsdata/epics/EpicsPvData.hh"
+#include "pdsdata/psddl/epics.ddl.h"
 #include "pdsdata/xtc/Xtc.hh"
 
 //		---------------------
@@ -34,13 +34,15 @@
 //		---------------------
 
 namespace pypdsdata {
+namespace Epics {
+
+/// @addtogroup pypdsdata
 
 /**
+ *  @ingroup pypdsdata
  *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
  *
  *  @version $Id$
  *
@@ -54,11 +56,11 @@ public:
   static PyObject* getModule() ;
 
   // make Python object from Pds type
-  static PyObject* PyObject_FromPds( Pds::EpicsPvHeader* pvHeader, PyObject* parent, size_t size );
+  static PyObject* PyObject_FromPds( Pds::Epics::EpicsPvHeader* pvHeader, PyObject* parent, size_t size );
 
   // helper method to avoid casting on client side
   static PyObject* PyObject_FromXtc( const Pds::Xtc& xtc, PyObject* parent ) {
-    return PyObject_FromPds( static_cast<Pds::EpicsPvHeader*>((void*)xtc.payload()), parent, xtc.sizeofPayload() );
+    return PyObject_FromPds( static_cast<Pds::Epics::EpicsPvHeader*>((void*)xtc.payload()), parent, xtc.sizeofPayload() );
   }
 
 protected:
@@ -74,13 +76,13 @@ private:
   // Data members
   static PyObject* s_module;
 
-
   // Copy constructor and assignment are disabled by default
   EpicsModule ( const EpicsModule& ) ;
   EpicsModule& operator = ( const EpicsModule& ) ;
 
 };
 
+} // namespace Epics
 } // namespace pypdsdata
 
 #endif // PYPDSDATA_EPICSMODULE_H

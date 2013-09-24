@@ -43,7 +43,6 @@ namespace {
   FUN0_WRAPPER(pypdsdata::PNCCD::ConfigV2, camexMagic)
   FUN0_WRAPPER(pypdsdata::PNCCD::ConfigV2, info)
   FUN0_WRAPPER(pypdsdata::PNCCD::ConfigV2, timingFName)
-  FUN0_WRAPPER(pypdsdata::PNCCD::ConfigV2, size)
 
   PyMethodDef methods[] = {
     {"numLinks",                numLinks,               METH_NOARGS,  "self.numLinks() -> int\n\nReturns number of links." },
@@ -56,7 +55,6 @@ namespace {
     {"camexMagic",              camexMagic,             METH_NOARGS,  "self.camexMagic() -> int\n\nReturns integer number" },
     {"info",                    info,                   METH_NOARGS,  "self.info() -> string\n\nReturns informational string" },
     {"timingFName",             timingFName,            METH_NOARGS,  "self.timingFName() -> string\n\nReturns timing file name" },
-    {"size",                    size,                   METH_NOARGS,  "self.size() -> int\n\nReturns total size of the object" },
     {0, 0, 0, 0}
    };
 

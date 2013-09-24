@@ -74,6 +74,7 @@ map( PyObject* self, PyObject* )
 {
   return gainMap(self, 0);
 }
+
 PyObject*
 gainMap( PyObject* self, void* )
 {
@@ -91,7 +92,7 @@ gainMap( PyObject* self, void* )
 
   // make array
   PyObject* array = PyArray_New(&PyArray_Type, 2, dims, typenum, 0,
-                                (void*)obj->_gainMap, 0, flags, 0);
+                                (void*)obj->gainMap().data(), 0, flags, 0);
 
   // array does not own its data, set self as owner
   Py_INCREF(self);

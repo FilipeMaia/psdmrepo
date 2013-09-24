@@ -36,14 +36,20 @@
 namespace {
 
   // methods
-  PyObject* channel( PyObject* self, PyObject* args );
+  FUN0_WRAPPER(pypdsdata::Acqiris::TdcConfigV1, veto)
+  PyObject* channels( PyObject* self, PyObject* args );
   PyObject* auxio( PyObject* self, PyObject* args );
-  PyObject* veto( PyObject* self, PyObject* );
 
   PyMethodDef methods[] = {
-    {"channel", channel, METH_VARARGS, "self.channel(idx: int) -> TdcChannel object\n\nReturns :py:class:`TdcChannel` object for a given index" },
-    {"auxio",   auxio,   METH_VARARGS, "self.auxio(idx: int) -> TdcAuxIO object\n\nReturns :py:class:`TdcAuxIO` object for a given index" },
-    {"veto",    veto,    METH_NOARGS,  "self.veto() -> TdcVetoIO object\n\nReturns :py:class:`TdcVetoIO` object" },
+    {"channel",  channels, METH_VARARGS,
+        "self.channel([idx: int]) -> TdcChannel object(s)\n\nThis method is an alias for channels() method." },
+    {"channels", channels, METH_VARARGS,
+        "self.channels([idx: int]) -> TdcChannel object(s)\n\nWithout argument returns the list of "
+        ":py:class:`TdcChannel` objects,  if argument is given then returns single object for a given index." },
+    {"auxio",    auxio,   METH_VARARGS,
+        "self.auxio([idx: int]) -> TdcAuxIO object(s)\n\nWithout argument returns the list of "
+        ":py:class:`TdcAuxIO` objects,  if argument is given then returns single object for a given index." },
+    {"veto",     veto,    METH_NOARGS,  "self.veto() -> TdcVetoIO object\n\nReturns :py:class:`TdcVetoIO` object" },
     {0, 0, 0, 0}
    };
 
@@ -83,16 +89,23 @@ pypdsdata::Acqiris::TdcConfigV1::print(std::ostream& out) const
 namespace {
 
 PyObject*
-channel( PyObject* self, PyObject* args )
+channels( PyObject* self, PyObject* args )
 {
   const Pds::Acqiris::TdcConfigV1* obj = pypdsdata::Acqiris::TdcConfigV1::pdsObject( self );
   if ( not obj ) return 0;
 
-  unsigned channel;
-  if ( not PyArg_ParseTuple( args, "I:Acqiris.TdcConfigV1.channel", &channel ) ) return 0;
+  unsigned channel = unsigned(-1);
+  if ( not PyArg_ParseTuple( args, "|I:Acqiris.TdcConfigV1.channels", &channel ) ) return 0;
 
-  return pypdsdata::Acqiris::TdcChannel::PyObject_FromPds( 
-      (Pds::Acqiris::TdcChannel*)&obj->channel(channel), self, sizeof(Pds::Acqiris::TdcChannel) );
+  const ndarray<const Pds::Acqiris::TdcChannel, 1>& channels = obj->channels();
+
+  // if argument is missing the return list of objects, otherwise return single object
+  using pypdsdata::TypeLib::toPython;
+  if (channel == unsigned(-1)) {
+    return toPython(channels);
+  } else {
+    return toPython(channels[channel]);
+  }
 }
 
 PyObject*
@@ -101,22 +114,18 @@ auxio( PyObject* self, PyObject* args )
   const Pds::Acqiris::TdcConfigV1* obj = pypdsdata::Acqiris::TdcConfigV1::pdsObject( self );
   if ( not obj ) return 0;
 
-  unsigned auxio;
-  if ( not PyArg_ParseTuple( args, "I:Acqiris.TdcConfigV1.auxio", &auxio ) ) return 0;
+  unsigned index = unsigned(-1);
+  if ( not PyArg_ParseTuple( args, "I:Acqiris.TdcConfigV1.auxio", &index ) ) return 0;
 
-  return pypdsdata::Acqiris::TdcAuxIO::PyObject_FromPds( 
-      (Pds::Acqiris::TdcAuxIO*)&obj->auxio(auxio), self, sizeof(Pds::Acqiris::TdcAuxIO) );
-}
+  const ndarray<const Pds::Acqiris::TdcAuxIO, 1>& auxio = obj->auxio();
 
-
-PyObject*
-veto( PyObject* self, PyObject* )
-{
-  const Pds::Acqiris::TdcConfigV1* obj = pypdsdata::Acqiris::TdcConfigV1::pdsObject( self );
-  if ( not obj ) return 0;
-
-  return pypdsdata::Acqiris::TdcVetoIO::PyObject_FromPds( 
-      (Pds::Acqiris::TdcVetoIO*)&obj->veto(), self, sizeof(Pds::Acqiris::TdcVetoIO) );
+  // if argument is missing the return list of objects, otherwise return single object
+  using pypdsdata::TypeLib::toPython;
+  if (index == unsigned(-1)) {
+    return toPython(auxio);
+  } else {
+    return toPython(auxio[index]);
+  }
 }
 
 }

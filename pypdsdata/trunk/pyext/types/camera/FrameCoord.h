@@ -26,7 +26,7 @@
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
-#include "pdsdata/camera/FrameCoord.hh"
+#include "pdsdata/psddl/camera.ddl.h"
 
 //    ---------------------
 //    -- Class Interface --
@@ -35,11 +35,13 @@
 namespace pypdsdata {
 namespace Camera {
 
+/// @addtogroup pypdsdata
+
 /**
+ *  @ingroup pypdsdata
+ *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
  *
  *  @version $Id$
  *
@@ -61,5 +63,11 @@ public:
 
 } // namespace Camera
 } // namespace pypdsdata
+
+namespace Pds {
+namespace Camera {
+inline PyObject* toPython(const Pds::Camera::FrameCoord& v) { return pypdsdata::Camera::FrameCoord::PyObject_FromPds(v); }
+}
+}
 
 #endif // PYPDSDATA_CAMERA_FRAMECOORD_H

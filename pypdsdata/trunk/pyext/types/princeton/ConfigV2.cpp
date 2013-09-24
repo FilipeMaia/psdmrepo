@@ -44,7 +44,6 @@ namespace {
   FUN0_WRAPPER(pypdsdata::Princeton::ConfigV2, readoutSpeedIndex)
   FUN0_WRAPPER(pypdsdata::Princeton::ConfigV2, readoutEventCode)
   FUN0_WRAPPER(pypdsdata::Princeton::ConfigV2, delayMode)
-  FUN0_WRAPPER(pypdsdata::Princeton::ConfigV2, size)
   FUN0_WRAPPER(pypdsdata::Princeton::ConfigV2, frameSize)
 
   PyMethodDef methods[] = {
@@ -60,7 +59,6 @@ namespace {
     { "readoutSpeedIndex", readoutSpeedIndex, METH_NOARGS, "self.readoutSpeedIndex() -> int\n\nReturns integer number" },
     { "readoutEventCode",  readoutEventCode,  METH_NOARGS, "self.readoutEventCode() -> int\n\nReturns integer number" },
     { "delayMode",         delayMode,         METH_NOARGS, "self.delayMode() -> int\n\nReturns integer number" },
-    { "size",              size,              METH_NOARGS, "self.size() -> int\n\nReturns size of this object" },
     { "frameSize",         frameSize,         METH_NOARGS, "self.frameSize() -> int\n\nCalculate the frame size based on the current ROI and binning settings" },
     {0, 0, 0, 0}
    };

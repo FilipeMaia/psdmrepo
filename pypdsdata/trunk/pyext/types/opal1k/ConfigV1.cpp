@@ -85,9 +85,8 @@ namespace {
   FUN0_WRAPPER(pypdsdata::Opal1k::ConfigV1, defect_pixel_correction_enabled)
   FUN0_WRAPPER(pypdsdata::Opal1k::ConfigV1, output_lookup_table_enabled)
   FUN0_WRAPPER(pypdsdata::Opal1k::ConfigV1, number_of_defect_pixels)
-  FUN0_WRAPPER(pypdsdata::Opal1k::ConfigV1, size)
+  FUN0_WRAPPER(pypdsdata::Opal1k::ConfigV1, defect_pixel_coordinates)
   PyObject* output_lookup_table( PyObject* self, PyObject* );
-  PyObject* defect_pixel_coordinates( PyObject* self, PyObject* );
 
   PyMethodDef methods[] = {
     {"black_level",       black_level,       METH_NOARGS,  
@@ -116,7 +115,6 @@ namespace {
         "self.number_of_defect_pixels() -> int\n\nReturns defective pixel count." },
     {"defect_pixel_coordinates", defect_pixel_coordinates, METH_NOARGS, 
         "self.defect_pixel_coordinates() -> list of camera.FrameCoord\n\nReturns list of defective pixel coordinates (:py:class:`_pdsdata.camera.FrameCoord` objects)." },
-    {"size",              size,              METH_NOARGS,  "self.size() -> int\n\nReturns total size of this structure." },
     {0, 0, 0, 0}
    };
 
@@ -172,34 +170,17 @@ output_lookup_table( PyObject* self, PyObject* )
   // dimensions
   npy_intp dims[1] = { obj->output_lookup_table_enabled() ? Pds::Opal1k::ConfigV1::LUT_Size : 0 };
 
+  const ndarray<const uint16_t, 1>& lut = obj->output_lookup_table();
+
   // make array
   PyObject* array = PyArray_New(&PyArray_Type, 1, dims, typenum, 0,
-                                (void*)obj->output_lookup_table(), 0, flags, 0);
+                                (void*)lut.data(), 0, flags, 0);
 
   // array does not own its data, set self as owner
   Py_INCREF(self);
   ((PyArrayObject*)array)->base = self ;
 
   return array;
-}
-
-PyObject*
-defect_pixel_coordinates( PyObject* self, PyObject* )
-{
-  const Pds::Opal1k::ConfigV1* obj = pypdsdata::Opal1k::ConfigV1::pdsObject( self );
-  if ( not obj ) return 0;
-
-  unsigned size = obj->number_of_defect_pixels() ;
-  PyObject* list = PyList_New(size);
-
-  // copy coordinates to the list
-  const Pds::Camera::FrameCoord* coords = obj->defect_pixel_coordinates();
-  for ( unsigned i = 0; i < size; ++ i ) {
-    PyObject* obj = pypdsdata::Camera::FrameCoord::PyObject_FromPds(coords[i]) ;
-    PyList_SET_ITEM( list, i, obj );
-  }
-
-  return list;
 }
 
 }

@@ -32,10 +32,10 @@
 namespace {
 
   // methods
-  MEMBER_WRAPPER(pypdsdata::BldDataFEEGasDetEnergy, f_11_ENRC)
-  MEMBER_WRAPPER(pypdsdata::BldDataFEEGasDetEnergy, f_12_ENRC)
-  MEMBER_WRAPPER(pypdsdata::BldDataFEEGasDetEnergy, f_21_ENRC)
-  MEMBER_WRAPPER(pypdsdata::BldDataFEEGasDetEnergy, f_22_ENRC)
+  MEMBER_WRAPPER_FROM_METHOD(pypdsdata::Bld::BldDataFEEGasDetEnergy, f_11_ENRC)
+  MEMBER_WRAPPER_FROM_METHOD(pypdsdata::Bld::BldDataFEEGasDetEnergy, f_12_ENRC)
+  MEMBER_WRAPPER_FROM_METHOD(pypdsdata::Bld::BldDataFEEGasDetEnergy, f_21_ENRC)
+  MEMBER_WRAPPER_FROM_METHOD(pypdsdata::Bld::BldDataFEEGasDetEnergy, f_22_ENRC)
 
   // disable warnings for non-const strings, this is a temporary measure
   // newer Python versions should get constness correctly
@@ -48,7 +48,7 @@ namespace {
     {0, 0, 0, 0, 0}
   };
 
-  char typedoc[] = "Python class wrapping C++ Pds::BldDataFEEGasDetEnergy class.";
+  char typedoc[] = "Python class wrapping C++ Pds::Bld::BldDataFEEGasDetEnergy class.";
 }
 
 //              ----------------------------------------
@@ -56,7 +56,7 @@ namespace {
 //              ----------------------------------------
 
 void
-pypdsdata::BldDataFEEGasDetEnergy::initType( PyObject* module )
+pypdsdata::Bld::BldDataFEEGasDetEnergy::initType( PyObject* module )
 {
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
@@ -66,15 +66,15 @@ pypdsdata::BldDataFEEGasDetEnergy::initType( PyObject* module )
 }
 
 void
-pypdsdata::BldDataFEEGasDetEnergy::print(std::ostream& out) const
+pypdsdata::Bld::BldDataFEEGasDetEnergy::print(std::ostream& out) const
 {
   if(not m_obj) {
     out << typeName() << "(None)";
   } else {
-    out << typeName() << "(11=" << m_obj->f_11_ENRC
-        << ", 12=" << m_obj->f_12_ENRC
-        << ", 21=" << m_obj->f_21_ENRC
-        << ", 22=" << m_obj->f_22_ENRC
+    out << typeName() << "(11=" << m_obj->f_11_ENRC()
+        << ", 12=" << m_obj->f_12_ENRC()
+        << ", 21=" << m_obj->f_21_ENRC()
+        << ", 22=" << m_obj->f_22_ENRC()
         << ")";
   }
 }

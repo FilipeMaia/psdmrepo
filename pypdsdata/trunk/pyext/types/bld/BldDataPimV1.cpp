@@ -50,7 +50,7 @@ namespace {
     {0, 0, 0, 0, 0}
   };
 
-  char typedoc[] = "Python class wrapping C++ Pds::BldDataPimV1 class.";
+  char typedoc[] = "Python class wrapping C++ Pds::Bld::BldDataPimV1 class.";
 }
 
 //              ----------------------------------------
@@ -58,7 +58,7 @@ namespace {
 //              ----------------------------------------
 
 void
-pypdsdata::BldDataPimV1::initType( PyObject* module )
+pypdsdata::Bld::BldDataPimV1::initType( PyObject* module )
 {
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
@@ -72,32 +72,31 @@ namespace {
 PyObject* 
 camConfig( PyObject* self, void* )
 {
-  Pds::BldDataPimV1* pdsObj = pypdsdata::BldDataPimV1::pdsObject(self);
+  Pds::Bld::BldDataPimV1* pdsObj = pypdsdata::Bld::BldDataPimV1::pdsObject(self);
   if(not pdsObj) return 0;
 
-  return pypdsdata::Pulnix::TM6740ConfigV2::PyObject_FromPds(&pdsObj->camConfig,
-      self, sizeof(pdsObj->camConfig));
+  return pypdsdata::Pulnix::TM6740ConfigV2::PyObject_FromPds(const_cast<Pds::Pulnix::TM6740ConfigV2*>(&pdsObj->camConfig()),
+      self, sizeof(Pds::Pulnix::TM6740ConfigV2));
 }
 
 PyObject* 
 pimConfig( PyObject* self, void* )
 {
-  Pds::BldDataPimV1* pdsObj = pypdsdata::BldDataPimV1::pdsObject(self);
+  Pds::Bld::BldDataPimV1* pdsObj = pypdsdata::Bld::BldDataPimV1::pdsObject(self);
   if(not pdsObj) return 0;
 
-  return pypdsdata::Lusi::PimImageConfigV1::PyObject_FromPds(&pdsObj->pimConfig,
-      self, sizeof(pdsObj->pimConfig));
+  return pypdsdata::Lusi::PimImageConfigV1::PyObject_FromPds(const_cast<Pds::Lusi::PimImageConfigV1*>(&pdsObj->pimConfig()),
+      self, sizeof(Pds::Lusi::PimImageConfigV1));
 }
 
 PyObject* 
 frame( PyObject* self, void* )
 {
-  Pds::BldDataPimV1* pdsObj = pypdsdata::BldDataPimV1::pdsObject(self);
+  Pds::Bld::BldDataPimV1* pdsObj = pypdsdata::Bld::BldDataPimV1::pdsObject(self);
   if(not pdsObj) return 0;
 
-  pypdsdata::BldDataPimV1* pyobj = static_cast<pypdsdata::BldDataPimV1*>(self);
-  size_t size = pyobj->m_size - offsetof(Pds::BldDataPimV1, frame);
-  return pypdsdata::Camera::FrameV1::PyObject_FromPds(&pdsObj->frame, self, size);
+  return pypdsdata::Camera::FrameV1::PyObject_FromPds(const_cast<Pds::Camera::FrameV1*>(&pdsObj->frame()),
+      self, pdsObj->frame()._sizeof());
 }
 
 }

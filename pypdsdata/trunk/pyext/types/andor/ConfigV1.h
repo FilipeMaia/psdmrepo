@@ -22,7 +22,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "pdsdata/andor/ConfigV1.hh"
+#include "pdsdata/psddl/andor.ddl.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -35,11 +35,13 @@
 namespace pypdsdata {
 namespace Andor {
 
+/// @addtogroup pypdsdata
+
 /**
+ *  @ingroup pypdsdata
+ *
  *  This software was developed for the LCLS project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
  *
  *  @version $Id$
  *

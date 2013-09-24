@@ -35,17 +35,19 @@ namespace {
 
   // type-specific methods
   FUN0_WRAPPER(pypdsdata::EvrData::ConfigV1, npulses)
+  FUN0_WRAPPER(pypdsdata::EvrData::ConfigV1, pulses)
   FUN0_WRAPPER(pypdsdata::EvrData::ConfigV1, noutputs)
-  FUN0_WRAPPER(pypdsdata::EvrData::ConfigV1, size)
+  FUN0_WRAPPER(pypdsdata::EvrData::ConfigV1, output_maps)
   PyObject* pulse( PyObject* self, PyObject* args );
   PyObject* output_map( PyObject* self, PyObject* args );
 
   PyMethodDef methods[] = {
     { "npulses",    npulses,     METH_NOARGS,  "self.npulses() -> int\n\nReturns number of pulse configurations" },
+    { "pulses",     pulses,      METH_NOARGS,  "self.pulses() -> list\n\nReturns list of :py:class:`PulseConfig` objects" },
     { "pulse",      pulse,       METH_VARARGS, "self.pulse(i: int) -> PulseConfig\n\nReturns pulse configuration (:py:class:`PulseConfig`)" },
     { "noutputs",   noutputs,    METH_NOARGS,  "self.noutputs() -> int\n\nReturns number of output configurations" },
+    { "output_maps",output_maps, METH_NOARGS,  "self.output_maps() -> list\n\nReturns list of :py:class:`OutputMap` objects" },
     { "output_map", output_map,  METH_VARARGS, "self.output_map(i: int) -> OutputMap\n\nReturns output configuration (:py:class:`OutputMap`)" },
-    { "size",       size,        METH_NOARGS,  "self.size() -> int\n\nRetuns structure size" },
     {0, 0, 0, 0}
    };
 
@@ -73,16 +75,18 @@ pypdsdata::EvrData::ConfigV1::print(std::ostream& str) const
   str << "evr.ConfigV1(";
 
   str << "pulses=[";
-  for (unsigned i = 0; i != m_obj->npulses(); ++ i ) {
+  const ndarray<const Pds::EvrData::PulseConfig, 1>& pulses = m_obj->pulses();
+  for (unsigned i = 0; i != pulses.size(); ++ i ) {
     if (i != 0) str << ", ";
-    str << m_obj->pulse(i).pulse();
+    str << pulses[i].pulse();
   }
   str << "]";
 
   str << ", outputs=[";
-  for (unsigned i = 0; i != m_obj->noutputs(); ++ i ) {
+  const ndarray<const Pds::EvrData::OutputMap, 1>& output_maps = m_obj->output_maps();
+  for (unsigned i = 0; i != output_maps.size(); ++ i ) {
     if (i != 0) str << ", ";
-    str << m_obj->output_map(i).map();
+    str << output_maps[i].value();
   }
   str << "]";
 
@@ -101,7 +105,7 @@ pulse( PyObject* self, PyObject* args )
   unsigned idx;
   if ( not PyArg_ParseTuple( args, "I:EvrData.ConfigV1.pulse", &idx ) ) return 0;
 
-  return pypdsdata::EvrData::PulseConfig::PyObject_FromPds( obj->pulse(idx) );
+  return pypdsdata::EvrData::PulseConfig::PyObject_FromPds( obj->pulses()[idx] );
 }
 
 PyObject*
@@ -114,7 +118,7 @@ output_map( PyObject* self, PyObject* args )
   unsigned idx;
   if ( not PyArg_ParseTuple( args, "I:EvrData.ConfigV1.output_map", &idx ) ) return 0;
 
-  return pypdsdata::EvrData::OutputMap::PyObject_FromPds( obj->output_map(idx) );
+  return pypdsdata::EvrData::OutputMap::PyObject_FromPds( obj->output_maps()[idx] );
 }
 
 }

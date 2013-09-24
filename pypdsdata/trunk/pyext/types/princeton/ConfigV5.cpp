@@ -48,7 +48,6 @@ namespace {
   FUN0_WRAPPER(pypdsdata::Princeton::ConfigV5, infoReportInterval)
   FUN0_WRAPPER(pypdsdata::Princeton::ConfigV5, exposureEventCode)
   FUN0_WRAPPER(pypdsdata::Princeton::ConfigV5, numDelayShots)
-  FUN0_WRAPPER(pypdsdata::Princeton::ConfigV5, size)
   FUN0_WRAPPER(pypdsdata::Princeton::ConfigV5, frameSize)
 
   PyMethodDef methods[] = {
@@ -68,7 +67,6 @@ namespace {
     { "infoReportInterval",infoReportInterval,METH_NOARGS, "self.infoReportInterval() -> int\n\nReturns integer number" },
     { "exposureEventCode", exposureEventCode, METH_NOARGS, "self.exposureEventCode() -> int\n\nReturns integer number" },
     { "numDelayShots",     numDelayShots,     METH_NOARGS, "self.numDelayShots() -> int\n\nReturns integer number" },
-    { "size",              size,              METH_NOARGS, "self.size() -> int\n\nReturns size of this object" },
     { "frameSize",         frameSize,         METH_NOARGS, "self.frameSize() -> int\n\nCalculate the frame size based on the current ROI and binning settings" },
     {0, 0, 0, 0}
    };

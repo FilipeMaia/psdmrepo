@@ -22,11 +22,11 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "pdsdata/psddl/evr.ddl.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
-#include "pdsdata/evr/ConfigV1.hh"
 
 //    ---------------------
 //    -- Class Interface --
@@ -35,11 +35,13 @@
 namespace pypdsdata {
 namespace EvrData {
 
+/// @addtogroup pypdsdata
+
 /**
+ *  @ingroup pypdsdata
+ *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
  *
  *  @version $Id$
  *

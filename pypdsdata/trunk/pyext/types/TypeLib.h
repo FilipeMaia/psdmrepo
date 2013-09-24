@@ -23,6 +23,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "PdsDataType.h"
+#include "ndarray/ndarray.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -34,13 +35,15 @@
 
 namespace pypdsdata {
 
+/// @addtogroup pypdsdata
+
 /**
+ *  @ingroup pypdsdata
+ *
  *  Type traits library to simplify conversion between Pds types and Python types.
  *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
  *
  *  @version $Id$
  *
@@ -59,6 +62,16 @@ inline PyObject* toPython(float v) { return PyFloat_FromDouble( v ); }
 inline PyObject* toPython(double v) { return PyFloat_FromDouble( v ); }
 inline PyObject* toPython(const char* v) { return PyString_FromString( v ); }
 inline PyObject* toPython(const std::string& v) { return PyString_FromStringAndSize(v.data(), v.size()); }
+template <typename T>
+inline PyObject* toPython(const ndarray<T, 1>& arr) {
+  const unsigned size = arr.size();
+  PyObject* list = PyList_New(size);
+  for ( unsigned i = 0; i < size; ++ i ) {
+    using pypdsdata::TypeLib::toPython;
+    PyList_SET_ITEM(list, i, toPython(arr[i]));
+  }
+  return list;
+}
 
 // traits
 template <typename T>
@@ -93,13 +106,15 @@ struct TypeCvt<double> {
       PyErr_SetString(pypdsdata::exceptionType(), "Error: No Valid C++ Object"); \
       return 0; \
     } \
-    return pypdsdata::TypeLib::toPython( py_this->m_obj->FUN0() ); \
+    using pypdsdata::TypeLib::toPython;\
+    return toPython( py_this->m_obj->FUN0() ); \
   }
 
 #define FUN0_WRAPPER_EMBEDDED(PYTYPE,FUN0) \
   PyObject* FUN0( PyObject* self, PyObject* ) { \
     PYTYPE* py_this = (PYTYPE*) self; \
-    return pypdsdata::TypeLib::toPython( py_this->m_obj.FUN0() ); \
+    using pypdsdata::TypeLib::toPython;\
+    return toPython( py_this->m_obj.FUN0() ); \
   }
 
 #define ENUM_FUN0_WRAPPER(PYTYPE,FUN0,ENUM) \
@@ -125,7 +140,19 @@ struct TypeCvt<double> {
       PyErr_SetString(pypdsdata::exceptionType(), "Error: No Valid C++ Object"); \
       return 0; \
     } \
-    return pypdsdata::TypeLib::toPython( py_this->m_obj->MEMBER ); \
+    using pypdsdata::TypeLib::toPython;\
+    return toPython( py_this->m_obj->MEMBER ); \
+  }
+
+#define MEMBER_WRAPPER_FROM_METHOD(PYTYPE,MEMBER) \
+  PyObject* MEMBER( PyObject* self, void* ) { \
+    PYTYPE* py_this = (PYTYPE*) self; \
+    if( ! py_this->m_obj ){ \
+      PyErr_SetString(pypdsdata::exceptionType(), "Error: No Valid C++ Object"); \
+      return 0; \
+    } \
+    using pypdsdata::TypeLib::toPython;\
+    return toPython( py_this->m_obj->MEMBER() ); \
   }
 
 #define ENUM_MEMBER_WRAPPER(PYTYPE,MEMBER,ENUM) \
@@ -138,16 +165,40 @@ struct TypeCvt<double> {
     return ENUM.Enum_FromLong( py_this->m_obj->MEMBER ); \
   }
 
+#define ENUM_MEMBER_WRAPPER_FROM_METHOD(PYTYPE,MEMBER,ENUM) \
+  PyObject* MEMBER( PyObject* self, void* ) { \
+    PYTYPE* py_this = (PYTYPE*) self; \
+    if( ! py_this->m_obj ){ \
+      PyErr_SetString(pypdsdata::exceptionType(), "Error: No Valid C++ Object"); \
+      return 0; \
+    } \
+    return ENUM.Enum_FromLong( py_this->m_obj->MEMBER() ); \
+  }
+
 #define MEMBER_WRAPPER_EMBEDDED(PYTYPE,MEMBER) \
   PyObject* MEMBER( PyObject* self, void* ) { \
     PYTYPE* py_this = (PYTYPE*) self; \
-    return pypdsdata::TypeLib::toPython( py_this->m_obj.MEMBER ); \
+    using pypdsdata::TypeLib::toPython;\
+    return toPython( py_this->m_obj.MEMBER ); \
+  }
+
+#define MEMBER_WRAPPER_EMBEDDED_FROM_METHOD(PYTYPE,MEMBER) \
+  PyObject* MEMBER( PyObject* self, void* ) { \
+    PYTYPE* py_this = (PYTYPE*) self; \
+    using pypdsdata::TypeLib::toPython;\
+    return toPython( py_this->m_obj.MEMBER() ); \
   }
 
 #define ENUM_MEMBER_WRAPPER_EMBEDDED(PYTYPE,MEMBER,ENUM) \
   PyObject* MEMBER( PyObject* self, void* ) { \
     PYTYPE* py_this = (PYTYPE*) self; \
     return ENUM.Enum_FromLong( py_this->m_obj.MEMBER ); \
+  }
+
+#define ENUM_MEMBER_WRAPPER_EMBEDDED_FROM_METHOD(PYTYPE,MEMBER,ENUM) \
+  PyObject* MEMBER( PyObject* self, void* ) { \
+    PYTYPE* py_this = (PYTYPE*) self; \
+    return ENUM.Enum_FromLong( py_this->m_obj.MEMBER() ); \
   }
 
 

@@ -35,11 +35,13 @@
 
 namespace pypdsdata {
 
+/// @addtogroup pypdsdata
+
 /**
+ *  @ingroup pypdsdata
+ *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
  *
  *  @version $Id: XtcEmbedded.h 774 2010-02-14 08:38:18Z salnikov $
  *

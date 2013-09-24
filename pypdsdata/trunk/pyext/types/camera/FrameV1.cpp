@@ -36,23 +36,18 @@ namespace {
   FUN0_WRAPPER(pypdsdata::Camera::FrameV1, width)
   FUN0_WRAPPER(pypdsdata::Camera::FrameV1, height)
   FUN0_WRAPPER(pypdsdata::Camera::FrameV1, depth)
-  FUN0_WRAPPER(pypdsdata::Camera::FrameV1, depth_bytes)
+//  FUN0_WRAPPER(pypdsdata::Camera::FrameV1, depth_bytes)
   FUN0_WRAPPER(pypdsdata::Camera::FrameV1, offset)
-  FUN0_WRAPPER(pypdsdata::Camera::FrameV1, data_size)
   PyObject* FrameV1_data( PyObject* self, PyObject* );
-  PyObject* FrameV1_pixel( PyObject* self, PyObject* args );
 
   PyMethodDef methods[] = {
     {"width",       width,         METH_NOARGS,  "self.width() -> int\n\nReturns number of pixels in a row." },
     {"height",      height,        METH_NOARGS,  "self.height() -> int\n\nReturns number of pixels in a column." },
     {"depth",       depth,         METH_NOARGS,  "self.depth() -> int\n\nReturns number of bits per pixel." },
-    {"depth_bytes", depth_bytes,   METH_NOARGS,  "self.depth_bytes() -> int\n\nReturns number of bytes per pixel." },
+//    {"depth_bytes", depth_bytes,   METH_NOARGS,  "self.depth_bytes() -> int\n\nReturns number of bytes per pixel." },
     {"offset",      offset,        METH_NOARGS,  "self.offset() -> int\n\nReturns fixed offset/pedestal value of pixel data." },
-    {"data_size",   data_size,     METH_NOARGS,  "self.data_size() -> int\n\nReturns size of pixel data." },
     {"data",        FrameV1_data,  METH_VARARGS,
         "self.data(writable = False) -> numpy.ndarray\n\nReturns pixel data as NumPy array, if optional argument is True then array is writable." },
-    {"pixel",       FrameV1_pixel, METH_VARARGS,
-        "self.pixel(x: int, y: int) -> int\n\nReturns individual pixel datum given coordinates (x, y)." },
     {0, 0, 0, 0}
    };
 
@@ -93,16 +88,12 @@ FrameV1_data( PyObject* self, PyObject* args)
 
   // NumPy type number
   int typenum = 0 ;
-  switch ( obj->depth_bytes() ) {
-  case 1:
+  if ( obj->depth() <= 8 ) {
     typenum = NPY_UBYTE;
-    break;
-  case 2:
+  } else if ( obj->depth() <= 16 ) {
     typenum = NPY_USHORT;
-    break;
-  case 4:
+  } else {
     typenum = NPY_UINT;
-    break;
   }
 
   // allow it to be writable on user's request
@@ -114,37 +105,13 @@ FrameV1_data( PyObject* self, PyObject* args)
 
   // make array
   PyObject* array = PyArray_New(&PyArray_Type, 2, dims, typenum, 0,
-                                (void*)obj->data(), 0, flags, 0);
+                                (void*)obj->_int_pixel_data().data(), 0, flags, 0);
 
   // array does not own its data, set self as owner
   Py_INCREF(self);
   ((PyArrayObject*)array)->base = self ;
 
   return array;
-}
-
-PyObject*
-FrameV1_pixel( PyObject* self, PyObject* args )
-{
-  const Pds::Camera::FrameV1* obj = pypdsdata::Camera::FrameV1::pdsObject( self );
-  if ( not obj ) return 0;
-
-  // parse args
-  unsigned x, y ;
-  if ( not PyArg_ParseTuple( args, "II:FrameV1_pixel", &x, &y ) ) return 0;
-
-  const void* data = obj->pixel(x, y);
-  switch ( obj->depth_bytes() ) {
-  case 1:
-    return PyInt_FromLong(*(uint8_t*)data);
-  case 2:
-    return PyInt_FromLong(*(uint16_t*)data);
-  case 4:
-    return PyInt_FromLong(*(uint32_t*)data);
-  }
-
-  PyErr_SetString(PyExc_TypeError, "Unexpected pixel depth");
-  return 0;
 }
 
 }

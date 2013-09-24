@@ -34,14 +34,16 @@
 
 namespace pypdsdata {
 
+/// @addtogroup pypdsdata
+
 /**
+ *  @ingroup pypdsdata
+ *
  *  Utility class which implements a factory method for building
  *  Python object corresponding to data classes from XTC.
  *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
  *
  *  @version $Id$
  *

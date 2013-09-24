@@ -49,7 +49,7 @@ namespace {
     {0, 0, 0, 0, 0}
   };
 
-  char typedoc[] = "Python class wrapping C++ Pds::BldDataIpimbV0 class.";
+  char typedoc[] = "Python class wrapping C++ Pds::Bld::BldDataIpimbV0 class.";
 }
 
 //              ----------------------------------------
@@ -57,7 +57,7 @@ namespace {
 //              ----------------------------------------
 
 void
-pypdsdata::BldDataIpimbV0::initType( PyObject* module )
+pypdsdata::Bld::BldDataIpimbV0::initType( PyObject* module )
 {
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
@@ -71,31 +71,31 @@ namespace {
 PyObject* 
 ipimbData( PyObject* self, void* )
 {
-  Pds::BldDataIpimbV0* pdsObj = pypdsdata::BldDataIpimbV0::pdsObject(self);
+  Pds::Bld::BldDataIpimbV0* pdsObj = pypdsdata::Bld::BldDataIpimbV0::pdsObject(self);
   if(not pdsObj) return 0;
 
-  return pypdsdata::Ipimb::DataV1::PyObject_FromPds(&pdsObj->ipimbData, 
-      self, sizeof(pdsObj->ipimbData));
+  return pypdsdata::Ipimb::DataV1::PyObject_FromPds(const_cast<Pds::Ipimb::DataV1*>(&pdsObj->ipimbData()),
+      self, sizeof(Pds::Ipimb::DataV1));
 }
 
 PyObject* 
 ipimbConfig( PyObject* self, void* )
 {
-  Pds::BldDataIpimbV0* pdsObj = pypdsdata::BldDataIpimbV0::pdsObject(self);
+  Pds::Bld::BldDataIpimbV0* pdsObj = pypdsdata::Bld::BldDataIpimbV0::pdsObject(self);
   if(not pdsObj) return 0;
 
-  return pypdsdata::Ipimb::ConfigV1::PyObject_FromPds(&pdsObj->ipimbConfig, 
-      self, sizeof(pdsObj->ipimbConfig));  
+  return pypdsdata::Ipimb::ConfigV1::PyObject_FromPds(const_cast<Pds::Ipimb::ConfigV1*>(&pdsObj->ipimbConfig()),
+      self, sizeof(Pds::Ipimb::ConfigV1));
 }
 
 PyObject* 
 ipmFexData( PyObject* self, void* )
 {
-  Pds::BldDataIpimbV0* pdsObj = pypdsdata::BldDataIpimbV0::pdsObject(self);
+  Pds::Bld::BldDataIpimbV0* pdsObj = pypdsdata::Bld::BldDataIpimbV0::pdsObject(self);
   if(not pdsObj) return 0;
 
-  return pypdsdata::Lusi::IpmFexV1::PyObject_FromPds(&pdsObj->ipmFexData, 
-      self, sizeof(pdsObj->ipmFexData));  
+  return pypdsdata::Lusi::IpmFexV1::PyObject_FromPds(const_cast<Pds::Lusi::IpmFexV1*>(&pdsObj->ipmFexData()),
+      self, sizeof(Pds::Lusi::IpmFexV1));
 }
 
 }

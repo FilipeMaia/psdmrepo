@@ -132,7 +132,7 @@ data( PyObject* self, PyObject* )
 
   // make array
   PyObject* array = PyArray_New(&PyArray_Type, 1, dims, typenum, 0,
-                                (void*)obj->data(), 0, flags, 0);
+                                (void*)obj->data().data(), 0, flags, 0);
 
   // array does not own its data, set self as owner
   Py_INCREF(self);
@@ -149,8 +149,8 @@ timeFrameStart( PyObject* self, PyObject* )
 
   const Pds::OceanOptics::timespec64& ts = obj->timeFrameStart();
   PyObject* tuple = PyTuple_New(2);
-  PyTuple_SET_ITEM(tuple, 0, PyLong_FromLongLong(ts.tv_sec));
-  PyTuple_SET_ITEM(tuple, 1, PyInt_FromLong(ts.tv_nsec));
+  PyTuple_SET_ITEM(tuple, 0, PyLong_FromLongLong(ts.tv_sec()));
+  PyTuple_SET_ITEM(tuple, 1, PyInt_FromLong(ts.tv_nsec()));
 
   return tuple;
 }
@@ -163,8 +163,8 @@ timeFrameFirstData( PyObject* self, PyObject* )
 
   const Pds::OceanOptics::timespec64& ts = obj->timeFrameStart();
   PyObject* tuple = PyTuple_New(2);
-  PyTuple_SET_ITEM(tuple, 0, PyLong_FromLongLong(ts.tv_sec));
-  PyTuple_SET_ITEM(tuple, 1, PyInt_FromLong(ts.tv_nsec));
+  PyTuple_SET_ITEM(tuple, 0, PyLong_FromLongLong(ts.tv_sec()));
+  PyTuple_SET_ITEM(tuple, 1, PyInt_FromLong(ts.tv_nsec()));
 
   return tuple;
 }
@@ -177,8 +177,8 @@ timeFrameEnd( PyObject* self, PyObject* )
 
   const Pds::OceanOptics::timespec64& ts = obj->timeFrameStart();
   PyObject* tuple = PyTuple_New(2);
-  PyTuple_SET_ITEM(tuple, 0, PyLong_FromLongLong(ts.tv_sec));
-  PyTuple_SET_ITEM(tuple, 1, PyInt_FromLong(ts.tv_nsec));
+  PyTuple_SET_ITEM(tuple, 0, PyLong_FromLongLong(ts.tv_sec()));
+  PyTuple_SET_ITEM(tuple, 1, PyInt_FromLong(ts.tv_nsec()));
 
   return tuple;
 }

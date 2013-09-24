@@ -32,7 +32,7 @@
 namespace {
 
   // methods
-  MEMBER_WRAPPER(pypdsdata::Lusi::DiodeFexV1, value)
+  MEMBER_WRAPPER_FROM_METHOD(pypdsdata::Lusi::DiodeFexV1, value)
 
   // disable warnings for non-const strings, this is a temporary measure
   // newer Python versions should get constness correctly
@@ -62,5 +62,5 @@ pypdsdata::Lusi::DiodeFexV1::initType( PyObject* module )
 void
 pypdsdata::Lusi::DiodeFexV1::print(std::ostream& str) const
 {
-  str << "lusi.DiodeFexV1(value=" << m_obj->value << ")";
+  str << "lusi.DiodeFexV1(value=" << m_obj->value() << ")";
 }

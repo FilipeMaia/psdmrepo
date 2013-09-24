@@ -35,17 +35,17 @@
 namespace {
 
   pypdsdata::EnumType::Enum typeEnumValues[] = {
-      { "AuxIOSwitch",    Pds::Acqiris::TdcDataV1::Marker::AuxIOSwitch },
-      { "EventCntSwitch", Pds::Acqiris::TdcDataV1::Marker::EventCntSwitch },
-      { "MemFullSwitch",  Pds::Acqiris::TdcDataV1::Marker::MemFullSwitch },
-      { "AuxIOMarker",    Pds::Acqiris::TdcDataV1::Marker::AuxIOMarker },
+      { "AuxIOSwitch",    Pds::Acqiris::TdcDataV1Marker::AuxIOSwitch },
+      { "EventCntSwitch", Pds::Acqiris::TdcDataV1Marker::EventCntSwitch },
+      { "MemFullSwitch",  Pds::Acqiris::TdcDataV1Marker::MemFullSwitch },
+      { "AuxIOMarker",    Pds::Acqiris::TdcDataV1Marker::AuxIOMarker },
       { 0, 0 }
   };
   pypdsdata::EnumType typeEnum ( "Type", typeEnumValues );
 
   // methods
-  ENUM_FUN0_WRAPPER(pypdsdata::Acqiris::TdcDataV1Marker, source, pypdsdata::Acqiris::TdcDataV1::sourceEnum())
-  ENUM_FUN0_WRAPPER(pypdsdata::Acqiris::TdcDataV1Marker, type, typeEnum)
+  ENUM_FUN0_WRAPPER_EMBEDDED(pypdsdata::Acqiris::TdcDataV1Marker, source, pypdsdata::Acqiris::TdcDataV1::sourceEnum())
+  ENUM_FUN0_WRAPPER_EMBEDDED(pypdsdata::Acqiris::TdcDataV1Marker, type, typeEnum)
 
   PyMethodDef methods[] = {
     {"source",   source, METH_NOARGS,  "self.source() -> Source enum\n\nReturns :py:class:`TdcDataV1.Source` enum value" },
@@ -53,7 +53,7 @@ namespace {
     {0, 0, 0, 0}
    };
 
-  char typedoc[] = "Python class wrapping C++ Pds::Acqiris::TdcDataV1::Marker class.";
+  char typedoc[] = "Python class wrapping C++ Pds::Acqiris::TdcDataV1Marker class.";
 }
 
 //              ----------------------------------------
@@ -78,11 +78,7 @@ pypdsdata::Acqiris::TdcDataV1Marker::initType( PyObject* module )
 void 
 pypdsdata::Acqiris::TdcDataV1Marker::print(std::ostream& out) const
 {
-  if(not m_obj) {
-    out << "acqiris.TdcDataV1Marker(None)";
-  } else {  
-    out << "acqiris.TdcDataV1Marker(source=" << m_obj->source()
-        << ", type=" << m_obj->type()
-        << ")" ;
-  }
+  out << "acqiris.TdcDataV1Marker(source=" << m_obj.source()
+      << ", type=" << m_obj.type()
+      << ")" ;
 }

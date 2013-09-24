@@ -34,12 +34,12 @@ namespace {
 
   // list of enums
   pypdsdata::TypeLib::EnumEntry enums[] = {
-        { "channelsPerDevice",      Pds::Imp::channelsPerDevice },
+        { "channelsPerDevice",      Pds::Imp::Sample::channelsPerDevice },
         { 0, 0 }
   };
 
   // type-specific methods
-  PyObject* channels( PyObject* self, PyObject* args );
+  FUN0_WRAPPER_EMBEDDED(pypdsdata::Imp::Sample, channels)
 
   PyMethodDef methods[] = {
     { "channels",       channels,       METH_NOARGS,
@@ -72,29 +72,5 @@ pypdsdata::Imp::Sample::initType( PyObject* module )
 void
 pypdsdata::Imp::Sample::print(std::ostream& out) const
 {
-  out << "imp.Sample([";
-  for (unsigned i = 0; i != Pds::Imp::channelsPerDevice; ++ i) {
-    if (i > 0) out << ", ";
-    out << m_obj.channel(i);
-  }
-  out << "])";
-}
-
-namespace {
-
-PyObject*
-channels( PyObject* self, PyObject* args )
-{
-  Pds::Imp::Sample& obj = pypdsdata::Imp::Sample::pdsObject( self );
-
-  unsigned size = Pds::Imp::channelsPerDevice;
-  PyObject* list = PyList_New(size);
-  // copy values to the list
-  for ( unsigned i = 0; i < size; ++ i ) {
-    PyList_SET_ITEM(list, i, PyInt_FromLong(obj.channel(i)));
-  }
-
-  return list;
-}
-
+  out << "imp.Sample(" << m_obj.channels() << ")";
 }

@@ -34,11 +34,11 @@
 namespace {
 
   // type-specific methods
-  PyObject* timestamps( PyObject* self, PyObject* );
+  PyObject* timestamp( PyObject* self, PyObject* );
   PyObject* channelValues( PyObject* self, PyObject* args );
 
   PyMethodDef methods[] = {
-    { "timestamps",    timestamps,    METH_NOARGS,  "self.timestamps() -> ndarray\n\nReturns array of integers" },
+    { "timestamp",     timestamp,     METH_NOARGS,  "self.timestamp() -> ndarray\n\nReturns array of integers" },
     { "channelValues", channelValues, METH_VARARGS, "self.channelValues(cfg: ConfigV1) -> ndarray\n\nReturns array of integers" },
     {0, 0, 0, 0}
    };
@@ -64,11 +64,8 @@ pypdsdata::Gsc16ai::DataV1::initType( PyObject* module )
 void
 pypdsdata::Gsc16ai::DataV1::print(std::ostream& str) const
 {
-  str << "Gsc16ai.DataV1(timestamps=[" << m_obj->_timestamp[0]
-      << ", " << m_obj->_timestamp[1]
-      << ", " << m_obj->_timestamp[2]
-      << "], channelValues=[" << m_obj->_channelValue[0]
-      << ", ...])";
+  str << "Gsc16ai.DataV1(timestamp=" << m_obj->timestamp()
+      << ", ...)";
 }
 
 namespace {
@@ -87,9 +84,10 @@ channelValues( PyObject* self, PyObject* args )
   npy_intp dims[1] = { 0 };
 
   // get dimensions from config object
+  Pds::Gsc16ai::ConfigV1* config = 0;
   if ( pypdsdata::Gsc16ai::ConfigV1::Object_TypeCheck( configObj ) ) {
-    Pds::Gsc16ai::ConfigV1* config = pypdsdata::Gsc16ai::ConfigV1::pdsObject( configObj );
-    dims[0] = config->lastChan() - config->firstChan() + 1;
+    config = pypdsdata::Gsc16ai::ConfigV1::pdsObject( configObj );
+    dims[0] = config->numChannels();
   } else {
     PyErr_SetString(PyExc_TypeError, "Error: parameter is not a Gsc16ai.ConfigV1 object");
     return 0;
@@ -101,7 +99,7 @@ channelValues( PyObject* self, PyObject* args )
 
   // make array
   PyObject* array = PyArray_New(&PyArray_Type, 1, dims, typenum, 0,
-                                (void*)obj->_channelValue, 0, flags, 0);
+                                (void*)obj->channelValue(*config).data(), 0, flags, 0);
 
   // array does not own its data, set self as owner
   Py_INCREF(self);
@@ -111,7 +109,7 @@ channelValues( PyObject* self, PyObject* args )
 }
 
 PyObject*
-timestamps( PyObject* self, PyObject* )
+timestamp( PyObject* self, PyObject* )
 {
   Pds::Gsc16ai::DataV1* obj = pypdsdata::Gsc16ai::DataV1::pdsObject( self );
   if ( not obj ) return 0;
@@ -125,7 +123,7 @@ timestamps( PyObject* self, PyObject* )
 
   // make array
   PyObject* array = PyArray_New(&PyArray_Type, 1, dims, typenum, 0,
-                                (void*)obj->_timestamp, 0, flags, 0);
+                                (void*)obj->timestamp().data(), 0, flags, 0);
 
   // array does not own its data, set self as owner
   Py_INCREF(self);

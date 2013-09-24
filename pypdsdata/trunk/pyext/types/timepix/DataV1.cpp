@@ -86,12 +86,6 @@ pypdsdata::Timepix::DataV1::initType( PyObject* module )
   val = PyInt_FromLong(Pds::Timepix::DataV1::DepthBytes);
   PyDict_SetItemString( type->tp_dict, "DepthBytes", val );
   Py_XDECREF(val);
-  val = PyInt_FromLong(Pds::Timepix::DataV1::RawDataBytes);
-  PyDict_SetItemString( type->tp_dict, "RawDataBytes", val );
-  Py_XDECREF(val);
-  val = PyInt_FromLong(Pds::Timepix::DataV1::DecodedDataBytes);
-  PyDict_SetItemString( type->tp_dict, "DecodedDataBytes", val );
-  Py_XDECREF(val);
   val = PyInt_FromLong(Pds::Timepix::DataV1::MaxPixelValue);
   PyDict_SetItemString( type->tp_dict, "MaxPixelValue", val );
   Py_XDECREF(val);
@@ -127,7 +121,7 @@ data( PyObject* self, PyObject* args )
 
   // make array
   PyObject* array = PyArray_New(&PyArray_Type, 2, dims, typenum, 0,
-                                (void*)obj->data(), 0, flags, 0);
+                                (void*)obj->data().data(), 0, flags, 0);
 
   // array does not own its data, set self as owner
   Py_INCREF(self);

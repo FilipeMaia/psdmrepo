@@ -62,10 +62,10 @@ namespace {
   pypdsdata::EnumType slopeEnum ( "Slope", slopeEnumValues );
 
   // methods
-  ENUM_FUN0_WRAPPER(pypdsdata::Acqiris::TrigV1, coupling, couplingEnum)
-  ENUM_FUN0_WRAPPER(pypdsdata::Acqiris::TrigV1, input, sourceEnum)
-  ENUM_FUN0_WRAPPER(pypdsdata::Acqiris::TrigV1, slope, slopeEnum)
-  FUN0_WRAPPER(pypdsdata::Acqiris::TrigV1, level)
+  ENUM_FUN0_WRAPPER_EMBEDDED(pypdsdata::Acqiris::TrigV1, coupling, couplingEnum)
+  ENUM_FUN0_WRAPPER_EMBEDDED(pypdsdata::Acqiris::TrigV1, input, sourceEnum)
+  ENUM_FUN0_WRAPPER_EMBEDDED(pypdsdata::Acqiris::TrigV1, slope, slopeEnum)
+  FUN0_WRAPPER_EMBEDDED(pypdsdata::Acqiris::TrigV1, level)
 
   PyMethodDef methods[] = {
     {"coupling",     coupling,    METH_NOARGS,  "self.coupling() -> Coupling enum\n\nReturns integer number, one of :py:class:`TrigV1.Coupling` enums" },
@@ -102,13 +102,9 @@ pypdsdata::Acqiris::TrigV1::initType( PyObject* module )
 void 
 pypdsdata::Acqiris::TrigV1::print(std::ostream& out) const
 {
-  if(not m_obj) {
-    out << "acqiris.TrigV1(None)";
-  } else {  
-    out << "acqiris.TrigV1(coupling=" << m_obj->coupling()
-        << ", input=" << m_obj->input()
-        << ", slope=" << m_obj->slope()
-        << ", level=" << m_obj->level()
-        << ")" ;
-  }
+  out << "acqiris.TrigV1(coupling=" << m_obj.coupling()
+      << ", input=" << m_obj.input()
+      << ", slope=" << m_obj.slope()
+      << ", level=" << m_obj.level()
+      << ")" ;
 }

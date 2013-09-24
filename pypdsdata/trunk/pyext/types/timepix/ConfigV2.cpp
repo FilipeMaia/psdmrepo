@@ -259,7 +259,7 @@ pixelThresh(PyObject *self, PyObject*)
 
   // make array
   PyObject* array = PyArray_New(&PyArray_Type, 1, dims, typenum, 0,
-                                (void*)obj->pixelThresh(), 0, flags, 0);
+                                (void*)obj->pixelThresh().data(), 0, flags, 0);
 
   // array does not own its data, set self as owner
   Py_INCREF(self);

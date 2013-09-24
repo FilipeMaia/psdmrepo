@@ -32,8 +32,8 @@
 namespace {
 
   // methods
-  MEMBER_WRAPPER(pypdsdata::CsPad2x2::CsPad2x2ReadOnlyCfg, shiftTest)
-  MEMBER_WRAPPER(pypdsdata::CsPad2x2::CsPad2x2ReadOnlyCfg, version)
+  MEMBER_WRAPPER_EMBEDDED_FROM_METHOD(pypdsdata::CsPad2x2::CsPad2x2ReadOnlyCfg, shiftTest)
+  MEMBER_WRAPPER_EMBEDDED_FROM_METHOD(pypdsdata::CsPad2x2::CsPad2x2ReadOnlyCfg, version)
 
   // disable warnings for non-const strings, this is a temporary measure
   // newer Python versions should get constness correctly
@@ -64,7 +64,7 @@ pypdsdata::CsPad2x2::CsPad2x2ReadOnlyCfg::initType( PyObject* module )
 void
 pypdsdata::CsPad2x2::CsPad2x2ReadOnlyCfg::print(std::ostream& str) const
 {
-  str << "cspad2x2.CsPad2x2ReadOnlyCfg(shiftTest=" << m_obj->shiftTest
-      << ", version=" << m_obj->version
+  str << "cspad2x2.CsPad2x2ReadOnlyCfg(shiftTest=" << m_obj.shiftTest()
+      << ", version=" << m_obj.version()
       << ")";
 }

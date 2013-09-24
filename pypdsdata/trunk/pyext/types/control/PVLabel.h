@@ -17,16 +17,16 @@
 //----------------------
 // Base Class Headers --
 //----------------------
-#include "../PdsDataType.h"
+#include "../PdsDataTypeEmbedded.h"
 
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "pdsdata/psddl/control.ddl.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
-#include "pdsdata/control/PVLabel.hh"
 
 //    ---------------------
 //    -- Class Interface --
@@ -35,21 +35,23 @@
 namespace pypdsdata {
 namespace ControlData {
 
+/// @addtogroup pypdsdata
+
 /**
+ *  @ingroup pypdsdata
+ *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
  *
  *  @version $Id$
  *
  *  @author Andrei Salnikov
  */
 
-class PVLabel : public PdsDataType<PVLabel,Pds::ControlData::PVLabel> {
+class PVLabel : public PdsDataTypeEmbedded<PVLabel,Pds::ControlData::PVLabel> {
 public:
 
-  typedef PdsDataType<PVLabel,Pds::ControlData::PVLabel> BaseType;
+  typedef PdsDataTypeEmbedded<PVLabel,Pds::ControlData::PVLabel> BaseType;
 
   /// Initialize Python type and register it in a module
   static void initType( PyObject* module );
@@ -61,5 +63,11 @@ public:
 
 } // namespace ControlData
 } // namespace pypdsdata
+
+namespace Pds {
+namespace ControlData {
+inline PyObject* toPython(const Pds::ControlData::PVLabel& v) { return pypdsdata::ControlData::PVLabel::PyObject_FromPds(v); }
+}
+}
 
 #endif // PYPDSDATA_CONTROLDATA_PVLABEL_H

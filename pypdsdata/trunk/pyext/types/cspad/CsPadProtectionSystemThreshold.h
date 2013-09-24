@@ -17,12 +17,12 @@
 //----------------------
 // Base Class Headers --
 //----------------------
-#include "../PdsDataType.h"
+#include "../PdsDataTypeEmbedded.h"
 
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "pdsdata/cspad/ConfigV3.hh"
+#include "pdsdata/psddl/cspad.ddl.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -35,21 +35,23 @@
 namespace pypdsdata {
 namespace CsPad {
 
+/// @addtogroup pypdsdata
+
 /**
+ *  @ingroup pypdsdata
+ *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
  *
  *  @version $Id$
  *
  *  @author Andrei Salnikov
  */
 
-class CsPadProtectionSystemThreshold : public PdsDataType<CsPadProtectionSystemThreshold, Pds::CsPad::ProtectionSystemThreshold> {
+class CsPadProtectionSystemThreshold : public PdsDataTypeEmbedded<CsPadProtectionSystemThreshold, Pds::CsPad::ProtectionSystemThreshold> {
 public:
 
-  typedef PdsDataType<CsPadProtectionSystemThreshold, Pds::CsPad::ProtectionSystemThreshold> BaseType;
+  typedef PdsDataTypeEmbedded<CsPadProtectionSystemThreshold, Pds::CsPad::ProtectionSystemThreshold> BaseType;
 
   /// Initialize Python type and register it in a module
   static void initType( PyObject* module );
@@ -58,5 +60,11 @@ public:
 
 } // namespace CsPad
 } // namespace pypdsdata
+
+namespace Pds {
+namespace CsPad {
+inline PyObject* toPython(const Pds::CsPad::ProtectionSystemThreshold& v) { return pypdsdata::CsPad::CsPadProtectionSystemThreshold::PyObject_FromPds(v); }
+}
+}
 
 #endif // PYPDSDATA_CSPAD_CSPADPROTECTIONSYSTEMTHRESHOLD_H

@@ -38,11 +38,13 @@ namespace {
   // type-specific methods
   ENUM_FUN0_WRAPPER(pypdsdata::EvrData::IOConfigV1, conn, pypdsdata::EvrData::OutputMap::connEnum())
   FUN0_WRAPPER(pypdsdata::EvrData::IOConfigV1, nchannels)
+  FUN0_WRAPPER(pypdsdata::EvrData::IOConfigV1, channels)
   PyObject* channel( PyObject* self, PyObject* args );
 
   PyMethodDef methods[] = {
     { "conn",      conn,       METH_NOARGS,  "self.conn() -> OutputMap.Conn enum\n\nReturns :py:class:`OutputMap.Conn` enum" },
     { "nchannels", nchannels,  METH_NOARGS,  "self.nchannels() -> int\n\nReturns number of channels" },
+    { "channels",  channels,   METH_NOARGS,  "self.channels() -> list\n\nReturns list of :py:class:`IOChannel` objects" },
     { "channel",   channel,    METH_VARARGS, "self.channel(i: int) -> IOChannel\n\nReturns :py:class:`IOChannel` object" },
     {0, 0, 0, 0}
    };
@@ -77,8 +79,7 @@ channel( PyObject* self, PyObject* args )
   unsigned idx;
   if ( not PyArg_ParseTuple( args, "I:EvrData.IOConfigV1.channel", &idx ) ) return 0;
 
-  Pds::EvrData::IOChannel& chan = const_cast<Pds::EvrData::IOChannel&>(obj->channel(idx));
-  return pypdsdata::EvrData::IOChannel::PyObject_FromPds( &chan, self, chan.size() );
+  return pypdsdata::EvrData::IOChannel::PyObject_FromPds(obj->channels()[idx]);
 }
 
 }

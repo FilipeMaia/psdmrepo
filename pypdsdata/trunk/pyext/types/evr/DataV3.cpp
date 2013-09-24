@@ -34,13 +34,13 @@ namespace {
 
   // type-specific methods
   FUN0_WRAPPER(pypdsdata::EvrData::DataV3, numFifoEvents)
-  FUN0_WRAPPER(pypdsdata::EvrData::DataV3, size)
+  FUN0_WRAPPER(pypdsdata::EvrData::DataV3, fifoEvents)
   PyObject* fifoEvent( PyObject* self, PyObject* args );
 
   PyMethodDef methods[] = {
     { "numFifoEvents", numFifoEvents, METH_NOARGS,  "self.numFifoEvents() -> int\n\nReturns number of :py:class:`DataV3_FIFOEvent` objects" },
+    { "fifoEvents",    fifoEvents,    METH_NOARGS,  "self.fifoEvents() -> list\n\nReturns list of :py:class:`DataV3_FIFOEvent` objects" },
     { "fifoEvent",     fifoEvent,     METH_VARARGS, "self.fifoEvent(i: int) -> DataV3_FIFOEvent\n\nReturns :py:class:`DataV3_FIFOEvent` object" },
-    { "size",          size,          METH_NOARGS,  "self.size() ->int\n\nReturns full size of the data object" },
     {0, 0, 0, 0}
    };
 
@@ -68,10 +68,11 @@ pypdsdata::EvrData::DataV3::print(std::ostream& str) const
   str << "evr.DataV3(";
 
   str << "fifoEvents=[";
-  for (unsigned i = 0; i != m_obj->numFifoEvents(); ++ i ) {
+  const ndarray<const Pds::EvrData::FIFOEvent, 1>& fifoEvents = m_obj->fifoEvents();
+  for (unsigned i = 0; i != fifoEvents.size(); ++ i ) {
     if (i != 0) str << ", ";
-    const Pds::EvrData::DataV3::FIFOEvent& ev = m_obj->fifoEvent(i);
-    str << ev.EventCode << ':' << ev.TimestampHigh << '.' << ev.TimestampLow;
+    const Pds::EvrData::FIFOEvent& ev = fifoEvents[i];
+    str << ev.eventCode() << ':' << ev.timestampHigh() << '.' << ev.timestampLow();
   }
   str << "]";
 
@@ -90,7 +91,7 @@ fifoEvent( PyObject* self, PyObject* args )
   unsigned idx;
   if ( not PyArg_ParseTuple( args, "I:EvrData.DataV3.eventcode", &idx ) ) return 0;
 
-  return pypdsdata::EvrData::DataV3_FIFOEvent::PyObject_FromPds( obj->fifoEvent(idx) );
+  return pypdsdata::EvrData::DataV3_FIFOEvent::PyObject_FromPds( obj->fifoEvents()[idx] );
 }
 
 }

@@ -87,44 +87,31 @@ data( PyObject* self, PyObject* args )
   PyObject* configObj ;
   if ( not PyArg_ParseTuple( args, "O:Princeton.FrameV1.data", &configObj ) ) return 0;
 
-  // dimensions
-  npy_intp dims[2] = { 0, 0 };
+  ndarray<const uint16_t, 2> data;
 
-  // get dimensions from config object
+  // need one of the config objects to get data
   if ( pypdsdata::Princeton::ConfigV1::Object_TypeCheck( configObj ) ) {
     Pds::Princeton::ConfigV1* config = pypdsdata::Princeton::ConfigV1::pdsObject( configObj );
-    uint32_t binX = config->binX();
-    uint32_t binY = config->binY();
-    dims[0] = (config->height() + binY - 1) / binY;
-    dims[1] = (config->width() + binX - 1) / binX;
+    data = obj->data(*config);
   } else if ( pypdsdata::Princeton::ConfigV2::Object_TypeCheck( configObj ) ) {
     Pds::Princeton::ConfigV2* config = pypdsdata::Princeton::ConfigV2::pdsObject( configObj );
-    uint32_t binX = config->binX();
-    uint32_t binY = config->binY();
-    dims[0] = (config->height() + binY - 1) / binY;
-    dims[1] = (config->width() + binX - 1) / binX;
+    data = obj->data(*config);
   } else if ( pypdsdata::Princeton::ConfigV3::Object_TypeCheck( configObj ) ) {
     Pds::Princeton::ConfigV3* config = pypdsdata::Princeton::ConfigV3::pdsObject( configObj );
-    uint32_t binX = config->binX();
-    uint32_t binY = config->binY();
-    dims[0] = (config->height() + binY - 1) / binY;
-    dims[1] = (config->width() + binX - 1) / binX;
+    data = obj->data(*config);
   } else if ( pypdsdata::Princeton::ConfigV4::Object_TypeCheck( configObj ) ) {
     Pds::Princeton::ConfigV4* config = pypdsdata::Princeton::ConfigV4::pdsObject( configObj );
-    uint32_t binX = config->binX();
-    uint32_t binY = config->binY();
-    dims[0] = (config->height() + binY - 1) / binY;
-    dims[1] = (config->width() + binX - 1) / binX;
+    data = obj->data(*config);
   } else if ( pypdsdata::Princeton::ConfigV5::Object_TypeCheck( configObj ) ) {
     Pds::Princeton::ConfigV5* config = pypdsdata::Princeton::ConfigV5::pdsObject( configObj );
-    uint32_t binX = config->binX();
-    uint32_t binY = config->binY();
-    dims[0] = (config->height() + binY - 1) / binY;
-    dims[1] = (config->width() + binX - 1) / binX;
+    data = obj->data(*config);
   } else {
     PyErr_SetString(PyExc_TypeError, "Error: parameter is not a Princeton.ConfigV* object");
     return 0;
   }
+
+  // dimensions
+  npy_intp dims[2] = { data.shape()[0], data.shape()[0] };
 
   // NumPy type number
   int typenum = NPY_USHORT ;
@@ -132,7 +119,7 @@ data( PyObject* self, PyObject* args )
 
   // make array
   PyObject* array = PyArray_New(&PyArray_Type, 2, dims, typenum, 0,
-                                (void*)obj->data(), 0, flags, 0);
+                                (void*)data.data(), 0, flags, 0);
 
   // array does not own its data, set self as owner
   Py_INCREF(self);

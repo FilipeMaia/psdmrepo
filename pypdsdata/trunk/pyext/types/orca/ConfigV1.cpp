@@ -61,7 +61,6 @@ namespace {
   FUN0_WRAPPER(pypdsdata::Orca::ConfigV1, rows)
   FUN0_WRAPPER(pypdsdata::Orca::ConfigV1, cooling)
   FUN0_WRAPPER(pypdsdata::Orca::ConfigV1, defect_pixel_correction_enabled)
-  FUN0_WRAPPER(pypdsdata::Orca::ConfigV1, size)
   
   PyMethodDef methods[] = {
     { "mode",             mode,             METH_NOARGS, "self.mode() -> ReadoutMode\n\nReturns readout mode" },
@@ -69,7 +68,6 @@ namespace {
     { "cooling",          cooling,          METH_NOARGS, "self.cooling() -> Cooling\n\nReturns cooling mode" },
     { "defect_pixel_correction_enabled",  defect_pixel_correction_enabled, METH_NOARGS, 
                             "self.defect_pixel_correction_enabled() -> bool\n\nReturns True if correction is enabled" },
-    { "size",              size,            METH_NOARGS, "self.size() -> int\n\nReturns size of this object" },
     {0, 0, 0, 0}
    };
 

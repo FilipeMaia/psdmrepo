@@ -57,9 +57,9 @@ namespace {
   pypdsdata::EnumType termEnum ( "Termination", termEnumValues );
 
   // methods
-  ENUM_FUN0_WRAPPER(pypdsdata::Acqiris::TdcAuxIO, channel, chanEnum)
-  ENUM_FUN0_WRAPPER(pypdsdata::Acqiris::TdcAuxIO, mode, modeEnum)
-  ENUM_FUN0_WRAPPER(pypdsdata::Acqiris::TdcAuxIO, term, termEnum)
+  ENUM_FUN0_WRAPPER_EMBEDDED(pypdsdata::Acqiris::TdcAuxIO, channel, chanEnum)
+  ENUM_FUN0_WRAPPER_EMBEDDED(pypdsdata::Acqiris::TdcAuxIO, mode, modeEnum)
+  ENUM_FUN0_WRAPPER_EMBEDDED(pypdsdata::Acqiris::TdcAuxIO, term, termEnum)
 
   PyMethodDef methods[] = {
     {"channel",   channel,  METH_NOARGS,  "self.channel() -> Channel enum\n\nReturns :py:class:`TdcAuxIO.Channel` enum value" },
@@ -95,12 +95,8 @@ pypdsdata::Acqiris::TdcAuxIO::initType( PyObject* module )
 void 
 pypdsdata::Acqiris::TdcAuxIO::print(std::ostream& out) const
 {
-  if(not m_obj) {
-    out << "acqiris.TdcAuxIO(None)";
-  } else {  
-    out << "acqiris.TdcAuxIO(channel=" << m_obj->channel()
-        << ", mode=" << m_obj->mode()
-        << ", term=" << m_obj->term()
-        << ")" ;
-  }
+  out << "acqiris.TdcAuxIO(channel=" << m_obj.channel()
+      << ", mode=" << m_obj.mode()
+      << ", term=" << m_obj.term()
+      << ")" ;
 }

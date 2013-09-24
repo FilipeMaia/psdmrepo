@@ -57,8 +57,8 @@
 #include "types/cspad/ConfigV3.h"
 #include "types/cspad/ConfigV4.h"
 #include "types/cspad/ConfigV5.h"
-#include "types/cspad/ElementV1.h"
-#include "types/cspad/ElementV2.h"
+#include "types/cspad/DataV1.h"
+#include "types/cspad/DataV2.h"
 
 #include "types/cspad2x2/ConfigV1.h"
 #include "types/cspad2x2/ConfigV2.h"
@@ -173,6 +173,15 @@ namespace {
     return 0;
   }
 
+  template <typename T, int Version>
+  inline
+  PyObject* xtc2obj(const Pds::Xtc& xtc) {
+    if( Version < 0 or xtc.contains.version() == unsigned(Version) ) {
+      return T::PyObject_FromPds(*static_cast<typename T::PdsType*>((void*)xtc.payload()));
+    }
+    return 0;
+  }
+
 }
 
 //		----------------------------------------
@@ -260,7 +269,7 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
       Py_RETURN_NONE;
     } else {
       if (Xtc* clone = ::cloneXtc(xtc)) {
-        obj = EpicsModule::PyObject_FromXtc(*clone->m_obj, clone);
+        obj = Epics::EpicsModule::PyObject_FromXtc(*clone->m_obj, clone);
         Py_CLEAR(clone);
       } else {
         PyErr_Format(PyExc_MemoryError, "Error: failed to allocate buffer memory for XTC clone");
@@ -270,19 +279,19 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
 
   case Pds::TypeId::Id_FEEGasDetEnergy :
     // NOTE: does not seem to care about versions
-    if ( not obj ) obj = xtc2obj<BldDataFEEGasDetEnergy, -1>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<Bld::BldDataFEEGasDetEnergy, -1>(xtc, parent);
     break ;
 
   case Pds::TypeId::Id_EBeam :
-    if ( not obj ) obj = xtc2obj<BldDataEBeamV0, 0>(xtc, parent);
-    if ( not obj ) obj = xtc2obj<BldDataEBeamV1, 1>(xtc, parent);
-    if ( not obj ) obj = xtc2obj<BldDataEBeamV2, 2>(xtc, parent);
-    if ( not obj ) obj = xtc2obj<BldDataEBeamV3, 3>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<Bld::BldDataEBeamV0, 0>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<Bld::BldDataEBeamV1, 1>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<Bld::BldDataEBeamV2, 2>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<Bld::BldDataEBeamV3, 3>(xtc, parent);
     break ;
 
   case Pds::TypeId::Id_PhaseCavity :
     // NOTE: does not seem to care about versions
-    if ( not obj ) obj = xtc2obj<BldDataPhaseCavity, -1>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<Bld::BldDataPhaseCavity, -1>(xtc, parent);
     break ;
 
   case Pds::TypeId::Id_PrincetonFrame :
@@ -336,12 +345,12 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
     break ;
 
   case Pds::TypeId::Id_PrincetonInfo :
-    if ( not obj ) obj = xtc2obj<Princeton::InfoV1, 1>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<Princeton::InfoV1, 1>(xtc);
     break ;
 
   case Pds::TypeId::Id_CspadElement :
-    if ( not obj ) obj = xtc2obj<CsPad::ElementV1, 1>(xtc, parent);
-    if ( not obj ) obj = xtc2obj<CsPad::ElementV2, 2>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<CsPad::DataV1, 1>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<CsPad::DataV2, 2>(xtc, parent);
     break ;
 
   case Pds::TypeId::Id_CspadConfig :
@@ -375,8 +384,8 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
     break ;
 
   case Pds::TypeId::Id_SharedIpimb :
-    if ( not obj ) obj = xtc2obj<BldDataIpimbV0, 0>(xtc, parent);
-    if ( not obj ) obj = xtc2obj<BldDataIpimbV1, 1>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<Bld::BldDataIpimbV0, 0>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<Bld::BldDataIpimbV1, 1>(xtc, parent);
     break ;
 
   case Pds::TypeId::Id_AcqTdcConfig :
@@ -401,7 +410,7 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
     break;
 
   case Pds::TypeId::Id_SharedPim :
-    if ( not obj ) obj = xtc2obj<BldDataPimV1, 1>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<Bld::BldDataPimV1, 1>(xtc, parent);
     break ;
 
   case Pds::TypeId::Id_Cspad2x2Config :
@@ -489,12 +498,12 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
     break;
 
   case Pds::TypeId::Id_GMD :
-    if ( not obj ) obj = xtc2obj<BldDataGMDV0, 0>(xtc, parent);
-    if ( not obj ) obj = xtc2obj<BldDataGMDV1, 1>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<Bld::BldDataGMDV0, 0>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<Bld::BldDataGMDV1, 1>(xtc, parent);
     break;
 
   case Pds::TypeId::Id_SharedAcqADC :
-    if ( not obj ) obj = xtc2obj<BldDataAcqADCV1, 1>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<Bld::BldDataAcqADCV1, 1>(xtc, parent);
     break;
 
   case Pds::TypeId::Id_OrcaConfig :

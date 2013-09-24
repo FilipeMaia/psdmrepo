@@ -44,6 +44,7 @@
 
 #include "types/acqiris/ConfigV1.h"
 #include "types/acqiris/DataDescV1.h"
+#include "types/acqiris/DataDescV1Elem.h"
 #include "types/acqiris/HorizV1.h"
 #include "types/acqiris/TdcAuxIO.h"
 #include "types/acqiris/TdcChannel.h"
@@ -96,6 +97,8 @@
 #include "types/cspad/CsPadGainMapCfg.h"
 #include "types/cspad/CsPadProtectionSystemThreshold.h"
 #include "types/cspad/CsPadReadOnlyCfg.h"
+#include "types/cspad/DataV1.h"
+#include "types/cspad/DataV2.h"
 #include "types/cspad/ElementV1.h"
 #include "types/cspad/ElementV2.h"
 
@@ -149,6 +152,7 @@
 
 #include "types/imp/ConfigV1.h"
 #include "types/imp/ElementV1.h"
+#include "types/imp/LaneStatus.h"
 #include "types/imp/Sample.h"
 
 #include "types/ipimb/ConfigV1.h"
@@ -257,6 +261,7 @@ PyMODINIT_FUNC init_pdsdata()
   module = Py_InitModule3( "_pdsdata.acqiris", 0, "The Python wrapper module for pdsdata/acqiris" );
   pypdsdata::Acqiris::ConfigV1::initType( module );
   pypdsdata::Acqiris::DataDescV1::initType( module );
+  pypdsdata::Acqiris::DataDescV1Elem::initType( module );
   pypdsdata::Acqiris::HorizV1::initType( module );
   pypdsdata::Acqiris::TdcAuxIO::initType( module );
   pypdsdata::Acqiris::TdcChannel::initType( module );
@@ -279,18 +284,18 @@ PyMODINIT_FUNC init_pdsdata()
   PyModule_AddObject( this_module, "andor", module );
 
   module = Py_InitModule3( "_pdsdata.bld", 0, "The Python wrapper module for pdsdata/bld" );
-  pypdsdata::BldDataAcqADCV1::initType( module );
-  pypdsdata::BldDataEBeamV0::initType( module );
-  pypdsdata::BldDataEBeamV1::initType( module );
-  pypdsdata::BldDataEBeamV2::initType( module );
-  pypdsdata::BldDataEBeamV3::initType( module );
-  pypdsdata::BldDataFEEGasDetEnergy::initType( module );
-  pypdsdata::BldDataGMDV0::initType( module );
-  pypdsdata::BldDataGMDV1::initType( module );
-  pypdsdata::BldDataIpimbV0::initType( module );
-  pypdsdata::BldDataIpimbV1::initType( module );
-  pypdsdata::BldDataPhaseCavity::initType( module );
-  pypdsdata::BldDataPimV1::initType( module );
+  pypdsdata::Bld::BldDataAcqADCV1::initType( module );
+  pypdsdata::Bld::BldDataEBeamV0::initType( module );
+  pypdsdata::Bld::BldDataEBeamV1::initType( module );
+  pypdsdata::Bld::BldDataEBeamV2::initType( module );
+  pypdsdata::Bld::BldDataEBeamV3::initType( module );
+  pypdsdata::Bld::BldDataFEEGasDetEnergy::initType( module );
+  pypdsdata::Bld::BldDataGMDV0::initType( module );
+  pypdsdata::Bld::BldDataGMDV1::initType( module );
+  pypdsdata::Bld::BldDataIpimbV0::initType( module );
+  pypdsdata::Bld::BldDataIpimbV1::initType( module );
+  pypdsdata::Bld::BldDataPhaseCavity::initType( module );
+  pypdsdata::Bld::BldDataPimV1::initType( module );
   Py_INCREF( module );
   PyModule_AddObject( this_module, "bld", module );
 
@@ -324,6 +329,8 @@ PyMODINIT_FUNC init_pdsdata()
   pypdsdata::CsPad::CsPadGainMapCfg::initType( module );
   pypdsdata::CsPad::CsPadProtectionSystemThreshold::initType( module );
   pypdsdata::CsPad::CsPadReadOnlyCfg::initType( module );
+  pypdsdata::CsPad::DataV1::initType( module );
+  pypdsdata::CsPad::DataV2::initType( module );
   pypdsdata::CsPad::ElementV1::initType( module );
   pypdsdata::CsPad::ElementV2::initType( module );
   Py_INCREF( module );
@@ -351,7 +358,7 @@ PyMODINIT_FUNC init_pdsdata()
   PyModule_AddObject( this_module, "encoder", module );
 
   // very special epics module
-  module = pypdsdata::EpicsModule::getModule();
+  module = pypdsdata::Epics::EpicsModule::getModule();
   Py_INCREF( module );
   PyModule_AddObject( this_module, "epics", module );
 
@@ -401,6 +408,7 @@ PyMODINIT_FUNC init_pdsdata()
   module = Py_InitModule3( "_pdsdata.imp", 0, "The Python wrapper module for pdsdata/imp" );
   pypdsdata::Imp::ConfigV1::initType( module );
   pypdsdata::Imp::ElementV1::initType( module );
+  pypdsdata::Imp::LaneStatus::initType( module );
   pypdsdata::Imp::Sample::initType( module );
   Py_INCREF( module );
   PyModule_AddObject( this_module, "imp", module );

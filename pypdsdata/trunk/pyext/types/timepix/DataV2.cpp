@@ -159,7 +159,7 @@ data( PyObject* self, PyObject* args )
 
   // make array
   PyObject* array = PyArray_New(&PyArray_Type, 2, dims, typenum, 0,
-                                (void*)obj->data(), 0, flags, 0);
+                                (void*)obj->data().data(), 0, flags, 0);
 
   // array does not own its data, set self as owner
   Py_INCREF(self);

@@ -49,8 +49,8 @@ namespace {
   ENUM_FUN0_WRAPPER(pypdsdata::EvrData::SequencerConfigV1, beam_source, sourceEnum)
   FUN0_WRAPPER(pypdsdata::EvrData::SequencerConfigV1, length)
   FUN0_WRAPPER(pypdsdata::EvrData::SequencerConfigV1, cycles)
+  FUN0_WRAPPER(pypdsdata::EvrData::SequencerConfigV1, entries)
   PyObject* entry( PyObject* self, PyObject* args );
-  PyObject* entries( PyObject* self, PyObject* args );
 
   PyMethodDef methods[] = {
     { "sync_source",   sync_source,  METH_NOARGS, "self.sync_source() -> Source enum\n\nReturns :py:class:`Source` enum" },
@@ -92,24 +92,7 @@ entry( PyObject* self, PyObject* args )
   unsigned idx;
   if ( not PyArg_ParseTuple( args, "I:evr.SequencerConfigV1.entry", &idx ) ) return 0;
 
-  return pypdsdata::EvrData::SequencerEntry::PyObject_FromPds( obj->entry(idx) );
-}
-
-PyObject*
-entries( PyObject* self, PyObject* )
-{
-  const Pds::EvrData::SequencerConfigV1* obj = pypdsdata::EvrData::SequencerConfigV1::pdsObject( self );
-  if ( not obj ) return 0;
-
-  // copy all entries to the Python list
-  unsigned len = obj->length();
-  PyObject* list = PyList_New( len );
-  for (unsigned i = 0 ; i != len ; ++ i ) {
-    PyObject* q = pypdsdata::EvrData::SequencerEntry::PyObject_FromPds( obj->entry(i) );
-    PyList_SET_ITEM( list, i, q );
-  }
-
-  return list;
+  return pypdsdata::EvrData::SequencerEntry::PyObject_FromPds( obj->entries()[idx] );
 }
 
 }

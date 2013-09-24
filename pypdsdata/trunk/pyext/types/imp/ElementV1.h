@@ -22,7 +22,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "pdsdata/imp/ElementV1.hh"
+#include "pdsdata/psddl/imp.ddl.h"
 
 //------------------------------------
 // Collaborating Class Declarations --

@@ -51,7 +51,6 @@ namespace {
   FUN0_WRAPPER(pypdsdata::FCCD::FccdConfigV1, trimmedWidth)
   FUN0_WRAPPER(pypdsdata::FCCD::FccdConfigV1, trimmedHeight)
   FUN0_WRAPPER(pypdsdata::FCCD::FccdConfigV1, outputMode)
-  FUN0_WRAPPER(pypdsdata::FCCD::FccdConfigV1, size)
 
   PyMethodDef methods[] = {
     { "width",         width,         METH_NOARGS, "self.width() -> int\n\nReturns image width" },
@@ -59,7 +58,6 @@ namespace {
     { "trimmedWidth",  trimmedWidth,  METH_NOARGS, "self.trimmedWidth() -> int\n\nReturns trimmed image width" },
     { "trimmedHeight", trimmedHeight, METH_NOARGS, "self.trimmedHeight() -> int\n\nReturns trimmed image height" },
     { "outputMode",    outputMode,    METH_NOARGS, "self.outputMode() -> int\n\nReturns integer number" },
-    { "size",          size,          METH_NOARGS, "self.size() -> int\n\nReturns size of this config object" },
     {0, 0, 0, 0}
    };
 

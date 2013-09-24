@@ -49,7 +49,6 @@ namespace {
 
   // methods
   PyObject* quad( PyObject* self, PyObject* );
-  PyObject* protectionThreshold( PyObject* self, PyObject*);
   PyObject* sections( PyObject* self, PyObject* args);
   FUN0_WRAPPER(pypdsdata::CsPad2x2::ConfigV2, tdi)
   FUN0_WRAPPER(pypdsdata::CsPad2x2::ConfigV2, protectionEnable)
@@ -63,6 +62,7 @@ namespace {
   FUN0_WRAPPER(pypdsdata::CsPad2x2::ConfigV2, numAsicsRead)
   FUN0_WRAPPER(pypdsdata::CsPad2x2::ConfigV2, numAsicsStored)
   FUN0_WRAPPER(pypdsdata::CsPad2x2::ConfigV2, concentratorVersion)
+  FUN0_WRAPPER(pypdsdata::CsPad2x2::ConfigV2, protectionThreshold)
 
   PyMethodDef methods[] = {
     {"quad",                quad,                METH_NOARGS, "self.quad() -> ConfigV2QuadReg\n\nReturns :py:class:`ConfigV2QuadReg` object" },
@@ -116,8 +116,8 @@ pypdsdata::CsPad2x2::ConfigV2::print(std::ostream& str) const
       << ", activeRunMode=" << m_obj->activeRunMode()
       << ", payloadSize=" << m_obj->payloadSize()
       << ", asicMask=" << m_obj->asicMask()
-      << ", numAsicsStored=" << m_obj->numAsicsStored(0)
-      << ", roiMask=" << m_obj->roiMask(0)
+      << ", numAsicsStored=" << m_obj->numAsicsStored()
+      << ", roiMask=" << m_obj->roiMask()
       << ")";
 }
 
@@ -130,17 +130,7 @@ quad( PyObject* self, PyObject* )
   if ( not obj ) return 0;
 
   return pypdsdata::CsPad2x2::ConfigV2QuadReg::PyObject_FromPds(
-      obj->quad(), self, sizeof(Pds::CsPad2x2::ConfigV2QuadReg) );
-}
-
-PyObject*
-protectionThreshold( PyObject* self, PyObject* )
-{
-  Pds::CsPad2x2::ConfigV2* obj = pypdsdata::CsPad2x2::ConfigV2::pdsObject( self );
-  if ( not obj ) return 0;
-
-  return pypdsdata::CsPad2x2::CsPadProtectionSystemThreshold::PyObject_FromPds(
-      obj->protectionThreshold(), self, sizeof(Pds::CsPad2x2::ProtectionSystemThreshold) );
+      const_cast<Pds::CsPad2x2::ConfigV2QuadReg*>(&obj->quad()), self, sizeof(Pds::CsPad2x2::ConfigV2QuadReg) );
 }
 
 PyObject*

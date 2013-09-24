@@ -33,23 +33,31 @@
 namespace {
 
   // methods
-  MEMBER_WRAPPER(pypdsdata::Encoder::DataV1, _33mhz_timestamp)
-  MEMBER_WRAPPER(pypdsdata::Encoder::DataV1, _encoder_count)
+  namespace int_getset {
+  MEMBER_WRAPPER_FROM_METHOD(pypdsdata::Encoder::DataV1, timestamp)
+  MEMBER_WRAPPER_FROM_METHOD(pypdsdata::Encoder::DataV1, encoder_count)
+  }
 
   // disable warnings for non-const strings, this is a temporary measure
   // newer Python versions should get constness correctly
 #pragma GCC diagnostic ignored "-Wwrite-strings"
   PyGetSetDef getset[] = {
-    {"_33mhz_timestamp", _33mhz_timestamp,  0, "Integer number", 0},
-    {"_encoder_count",   _encoder_count,    0, "Integer number", 0},
+    {"_33mhz_timestamp", int_getset::timestamp,  0, "Integer number", 0},
+    {"_encoder_count",   int_getset::encoder_count,    0, "Integer number", 0},
     {0, 0, 0, 0, 0}
   };
 
   // methods
+  namespace int_methods {
   FUN0_WRAPPER(pypdsdata::Encoder::DataV1, value)
+  FUN0_WRAPPER(pypdsdata::Encoder::DataV1, timestamp)
+  FUN0_WRAPPER(pypdsdata::Encoder::DataV1, encoder_count)
+  }
 
   PyMethodDef methods[] = {
-    {"value",       value,    METH_NOARGS,  "self.value() -> int\n\nReturns integer number" },
+    {"timestamp",      int_methods::timestamp,      METH_NOARGS,  "self.timestamp() -> int\n\nReturns integer number" },
+    {"encoder_count",  int_methods::encoder_count,  METH_NOARGS,  "self.encoder_count() -> int\n\nReturns integer number" },
+    {"value",          int_methods::value,          METH_NOARGS,  "self.value() -> int\n\nReturns integer number" },
     {0, 0, 0, 0}
    };
 
@@ -75,7 +83,7 @@ pypdsdata::Encoder::DataV1::initType( PyObject* module )
 void
 pypdsdata::Encoder::DataV1::print(std::ostream& str) const
 {
-  str << "encoder.DataV1(33mhz_timestamp=" << m_obj->_33mhz_timestamp
-      << ", encoder_count=" << m_obj->_encoder_count
+  str << "encoder.DataV1(33mhz_timestamp=" << m_obj->timestamp()
+      << ", encoder_count=" << m_obj->encoder_count()
       << ")";
 }

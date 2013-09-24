@@ -26,29 +26,32 @@
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
-#include "pdsdata/bld/bldData.hh"
+#include "pdsdata/psddl/bld.ddl.h"
 
 //    ---------------------
 //    -- Class Interface --
 //    ---------------------
 
 namespace pypdsdata {
+namespace Bld {
+
+/// @addtogroup pypdsdata
 
 /**
+ *  @ingroup pypdsdata
+ *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
  *
  *  @version $Id$
  *
  *  @author Andrei Salnikov
  */
 
-class BldDataGMDV0 : public PdsDataType<BldDataGMDV0,Pds::BldDataGMDV0> {
+class BldDataGMDV0 : public PdsDataType<BldDataGMDV0,Pds::Bld::BldDataGMDV0> {
 public:
 
-  typedef PdsDataType<BldDataGMDV0,Pds::BldDataGMDV0> BaseType;
+  typedef PdsDataType<BldDataGMDV0,Pds::Bld::BldDataGMDV0> BaseType;
 
   /// Initialize Python type and register it in a module
   static void initType( PyObject* module );
@@ -57,6 +60,7 @@ public:
   void print(std::ostream& out) const;
 };
 
+} // namespace Bld
 } // namespace pypdsdata
 
 #endif // PYPDSDATA_BLD_BLDDATAGMDV0_H

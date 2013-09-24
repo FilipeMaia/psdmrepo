@@ -32,8 +32,8 @@
 namespace {
 
   // methods
+  MEMBER_WRAPPER_FROM_METHOD(pypdsdata::CsPad2x2::CsPad2x2DigitalPotsCfg, pots)
   PyObject* value( PyObject* self, PyObject* args );
-  PyObject* pots( PyObject* self, void* );
 
   PyMethodDef methods[] = {
     {"value",     value,      METH_VARARGS, "self.value(i: int) -> int\n\nReturns pot value for a given index." },
@@ -75,10 +75,11 @@ pypdsdata::CsPad2x2::CsPad2x2DigitalPotsCfg::initType( PyObject* module )
 void
 pypdsdata::CsPad2x2::CsPad2x2DigitalPotsCfg::print(std::ostream& str) const
 {
-  str << "cspad2x2.CsPad2x2DigitalPotsCfg([" << int(m_obj->pots[0])
-      << ", " << int(m_obj->pots[1])
-      << ", " << int(m_obj->pots[2])
-      << ", " << int(m_obj->pots[3])
+  const ndarray<const uint8_t, 1>& pots = m_obj->pots();
+  str << "cspad2x2.CsPad2x2DigitalPotsCfg([" << int(pots[0])
+      << ", " << int(pots[1])
+      << ", " << int(pots[2])
+      << ", " << int(pots[3])
       << ", ...])";
 }
 
@@ -99,21 +100,7 @@ value( PyObject* self, PyObject* args )
     return 0;
   }
   
-  return PyInt_FromLong( obj->value(index) );
-}
-
-PyObject*
-pots( PyObject* self, void*)
-{
-  const Pds::CsPad2x2::CsPad2x2DigitalPotsCfg* obj = pypdsdata::CsPad2x2::CsPad2x2DigitalPotsCfg::pdsObject( self );
-  if ( not obj ) return 0;
-
-  PyObject* list = PyList_New( Pds::CsPad2x2::PotsPerQuad );
-  for ( unsigned i = 0 ; i < Pds::CsPad2x2::PotsPerQuad ; ++ i ) {
-    PyList_SET_ITEM( list, i, PyInt_FromLong(obj->pots[i]) );
-  }
-
-  return list;
+  return PyInt_FromLong( obj->pots()[index] );
 }
 
 }

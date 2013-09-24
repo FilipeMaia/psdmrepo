@@ -33,15 +33,15 @@
 namespace {
 
   // methods
-  PyObject* DiodeFexConfigV2_base( PyObject* self, void* );
-  PyObject* DiodeFexConfigV2_scale( PyObject* self, void* );
+MEMBER_WRAPPER_FROM_METHOD(pypdsdata::Lusi::DiodeFexConfigV2, base)
+MEMBER_WRAPPER_FROM_METHOD(pypdsdata::Lusi::DiodeFexConfigV2, scale)
 
   // disable warnings for non-const strings, this is a temporary measure
   // newer Python versions should get constness correctly
 #pragma GCC diagnostic ignored "-Wwrite-strings"
   PyGetSetDef getset[] = {
-    {"base",       DiodeFexConfigV2_base,   0, "List of NRANGES floating numbers", 0},
-    {"scale",      DiodeFexConfigV2_scale,  0, "List of NRANGES floating numbers", 0},
+    {"base",       base,   0, "List of NRANGES floating numbers", 0},
+    {"scale",      scale,  0, "List of NRANGES floating numbers", 0},
     {0, 0, 0, 0, 0}
   };
 
@@ -71,50 +71,7 @@ pypdsdata::Lusi::DiodeFexConfigV2::initType( PyObject* module )
 void
 pypdsdata::Lusi::DiodeFexConfigV2::print(std::ostream& str) const
 {
-  str << "lusi.DiodeFexConfigV2(base=[" ;
-
-  const int size = Pds::Lusi::DiodeFexConfigV2::NRANGES;
-  for ( int i = 0 ; i < size ; ++ i ) {
-    if ( i ) str << ", " ;
-    str << m_obj->base[i];
-  }
-  str << "], scale=[" ;
-  for ( int i = 0 ; i < size ; ++ i ) {
-    if ( i ) str << ", " ;
-    str << m_obj->scale[i];
-  }
-  str << "])" ;
-}
-
-
-namespace {
-
-PyObject*
-DiodeFexConfigV2_base( PyObject* self, void* )
-{
-  Pds::Lusi::DiodeFexConfigV2* obj = pypdsdata::Lusi::DiodeFexConfigV2::pdsObject(self);
-  if (not obj) return 0;
-
-  const int size = Pds::Lusi::DiodeFexConfigV2::NRANGES;
-  PyObject* list = PyList_New( size );
-  for ( int i = 0 ; i < size ; ++ i ) {
-    PyList_SET_ITEM( list, i, pypdsdata::TypeLib::toPython(obj->base[i]) );
-  }
-  return list;
-}
-
-PyObject*
-DiodeFexConfigV2_scale( PyObject* self, void* )
-{
-  Pds::Lusi::DiodeFexConfigV2* obj = pypdsdata::Lusi::DiodeFexConfigV2::pdsObject(self);
-  if (not obj) return 0;
-
-  const int size = Pds::Lusi::DiodeFexConfigV2::NRANGES;
-  PyObject* list = PyList_New( size );
-  for ( int i = 0 ; i < size ; ++ i ) {
-    PyList_SET_ITEM( list, i, pypdsdata::TypeLib::toPython(obj->scale[i]) );
-  }
-  return list;
-}
-
+  str << "lusi.DiodeFexConfigV2(base=" << m_obj->base()
+      << ", scale=" << m_obj->scale()
+      << ")" ;
 }

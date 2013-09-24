@@ -70,11 +70,9 @@ pypdsdata::CsPad2x2::CsPad2x2GainMapCfg::initType( PyObject* module )
 void
 pypdsdata::CsPad2x2::CsPad2x2GainMapCfg::print(std::ostream& str) const
 {
-  str << "cspad2x2.CsPad2x2GainMapCfg([" << m_obj->_gainMap[0][0]
-      << ", " << m_obj->_gainMap[0][1]
-      << ", " << m_obj->_gainMap[0][2]
-      << ", " << m_obj->_gainMap[0][3]
-      << ", ...])";
+  
+  str << "cspad2x2.CsPad2x2GainMapCfg(" << m_obj->gainMap()
+      << ")";
 }
 
 namespace {
@@ -101,7 +99,7 @@ gainMap( PyObject* self, void* )
 
   // make array
   PyObject* array = PyArray_New(&PyArray_Type, 2, dims, typenum, 0,
-                                (void*)obj->_gainMap, 0, flags, 0);
+                                (void*)obj->gainMap().data(), 0, flags, 0);
 
   // array does not own its data, set self as owner
   Py_INCREF(self);

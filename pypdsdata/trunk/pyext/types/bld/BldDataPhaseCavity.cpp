@@ -32,23 +32,23 @@
 namespace {
 
   // methods
-  MEMBER_WRAPPER(pypdsdata::BldDataPhaseCavity, fFitTime1)
-  MEMBER_WRAPPER(pypdsdata::BldDataPhaseCavity, fFitTime2)
-  MEMBER_WRAPPER(pypdsdata::BldDataPhaseCavity, fCharge1)
-  MEMBER_WRAPPER(pypdsdata::BldDataPhaseCavity, fCharge2)
+  MEMBER_WRAPPER_FROM_METHOD(pypdsdata::Bld::BldDataPhaseCavity, fitTime1)
+  MEMBER_WRAPPER_FROM_METHOD(pypdsdata::Bld::BldDataPhaseCavity, fitTime2)
+  MEMBER_WRAPPER_FROM_METHOD(pypdsdata::Bld::BldDataPhaseCavity, charge1)
+  MEMBER_WRAPPER_FROM_METHOD(pypdsdata::Bld::BldDataPhaseCavity, charge2)
 
   // disable warnings for non-const strings, this is a temporary measure
   // newer Python versions should get constness correctly
 #pragma GCC diagnostic ignored "-Wwrite-strings"
   PyGetSetDef getset[] = {
-    {"fFitTime1", fFitTime1, 0, "floating number, PV name: UND:R02:IOC:16:BAT:FitTime1, in pico-seconds", 0},
-    {"fFitTime2", fFitTime2, 0, "floating number, PV name: UND:R02:IOC:16:BAT:FitTime2, in pico-seconds", 0},
-    {"fCharge1",  fCharge1,  0, "floating number, PV name: UND:R02:IOC:16:BAT:Charge1, in pico-columbs", 0},
-    {"fCharge2",  fCharge2,  0, "floating number, PV name: UND:R02:IOC:16:BAT:Charge2, in pico-columbs", 0},
+    {"fFitTime1", fitTime1, 0, "floating number, PV name: UND:R02:IOC:16:BAT:FitTime1, in pico-seconds", 0},
+    {"fFitTime2", fitTime2, 0, "floating number, PV name: UND:R02:IOC:16:BAT:FitTime2, in pico-seconds", 0},
+    {"fCharge1",  charge1,  0, "floating number, PV name: UND:R02:IOC:16:BAT:Charge1, in pico-columbs", 0},
+    {"fCharge2",  charge2,  0, "floating number, PV name: UND:R02:IOC:16:BAT:Charge2, in pico-columbs", 0},
     {0, 0, 0, 0, 0}
   };
 
-  char typedoc[] = "Python class wrapping C++ Pds::BldDataPhaseCavity class.";
+  char typedoc[] = "Python class wrapping C++ Pds::Bld::BldDataPhaseCavity class.";
 }
 
 //              ----------------------------------------
@@ -56,7 +56,7 @@ namespace {
 //              ----------------------------------------
 
 void
-pypdsdata::BldDataPhaseCavity::initType( PyObject* module )
+pypdsdata::Bld::BldDataPhaseCavity::initType( PyObject* module )
 {
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
@@ -66,15 +66,15 @@ pypdsdata::BldDataPhaseCavity::initType( PyObject* module )
 }
 
 void
-pypdsdata::BldDataPhaseCavity::print(std::ostream& out) const
+pypdsdata::Bld::BldDataPhaseCavity::print(std::ostream& out) const
 {
   if(not m_obj) {
     out << typeName() << "(None)";
   } else {
-    out << typeName() << "(ft1=" << m_obj->fFitTime1
-        << ", ft2=" << m_obj->fFitTime2
-        << ", ch1=" << m_obj->fCharge1
-        << ", ch2=" << m_obj->fCharge2
+    out << typeName() << "(ft1=" << m_obj->fitTime1()
+        << ", ft2=" << m_obj->fitTime2()
+        << ", ch1=" << m_obj->charge1()
+        << ", ch2=" << m_obj->charge2()
         << ")";
   }
 }

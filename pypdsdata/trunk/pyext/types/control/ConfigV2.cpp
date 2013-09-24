@@ -40,11 +40,13 @@ namespace {
   FUN0_WRAPPER(pypdsdata::ControlData::ConfigV2, uses_duration)
   FUN0_WRAPPER(pypdsdata::ControlData::ConfigV2, uses_events)
   FUN0_WRAPPER(pypdsdata::ControlData::ConfigV2, events)
+  FUN0_WRAPPER(pypdsdata::ControlData::ConfigV2, duration)
   FUN0_WRAPPER(pypdsdata::ControlData::ConfigV2, npvControls)
   FUN0_WRAPPER(pypdsdata::ControlData::ConfigV2, npvMonitors)
   FUN0_WRAPPER(pypdsdata::ControlData::ConfigV2, npvLabels)
-  FUN0_WRAPPER(pypdsdata::ControlData::ConfigV2, size)
-  PyObject* duration( PyObject* self, PyObject* );
+  FUN0_WRAPPER(pypdsdata::ControlData::ConfigV2, pvControls)
+  FUN0_WRAPPER(pypdsdata::ControlData::ConfigV2, pvMonitors)
+  FUN0_WRAPPER(pypdsdata::ControlData::ConfigV2, pvLabels)
   PyObject* pvControl( PyObject* self, PyObject* args );
   PyObject* pvMonitor( PyObject* self, PyObject* args );
   PyObject* pvLabel( PyObject* self, PyObject* args );
@@ -57,7 +59,9 @@ namespace {
     {"npvControls",   npvControls,    METH_NOARGS,  "self.npvControls() -> int\n\nReturns number of PVControls." },
     {"npvMonitors",   npvMonitors,    METH_NOARGS,  "self.npvMonitors() -> int\n\nReturns number of PVMonitors." },
     {"npvLabels",     npvLabels,      METH_NOARGS,  "self.npvLabels() -> int\n\nReturns number of PVLables." },
-    {"size",          size,           METH_NOARGS,  "self.size() -> int\n\nReturns total data size." },
+    {"pvControls",    pvControls,     METH_NOARGS,  "self.pvControls() -> list\n\nReturns list of :py:class:`PVControl` objects." },
+    {"pvMonitors",    pvMonitors,     METH_NOARGS,  "self.pvMonitors() -> list\n\nReturns list of :py:class:`PVMonitor` objects." },
+    {"pvLabels",      pvLabels,       METH_NOARGS,  "self.pvLabels() -> list\n\nReturns list of :py:class:`PVLabel` objects." },
     {"pvControl",     pvControl,      METH_VARARGS, "self.pvControl(idx: int) -> control.PVControl\n\nReturns :py:class:`PVControl` for a given index." },
     {"pvMonitor",     pvMonitor,      METH_VARARGS, "self.pvMonitor(idx: int) -> control.PVMonitor\n\nReturns :py:class:`PVMonitor` for a given index." },
     {"pvLabel",       pvLabel,        METH_VARARGS, "self.pvLabel(idx: int) -> control.PVLabel\n\nReturns :py:class:`PVLabel` for a given index." },
@@ -98,27 +102,33 @@ pypdsdata::ControlData::ConfigV2::print(std::ostream& str) const
   }
   if (m_obj->npvControls()) {
     str << comma << "controls=[";
-    for (unsigned i = 0; i != m_obj->npvControls(); ++ i ) {
+    const ndarray<const Pds::ControlData::PVControl, 1>& pvControls = m_obj->pvControls();
+    for (unsigned i = 0; i != pvControls.size(); ++ i ) {
       if (i != 0) str << ", ";
-      str << m_obj->pvControl(i).name();
+      const Pds::ControlData::PVControl& control = pvControls[i];
+      str << control.name() << "=" << control.value();
     }
     str << "]";
     comma = ", ";
   }
   if (m_obj->npvMonitors()) {
     str << comma << "monitors=[";
-    for (unsigned i = 0; i != m_obj->npvMonitors(); ++ i ) {
+    const ndarray<const Pds::ControlData::PVMonitor, 1>& pvMonitors = m_obj->pvMonitors();
+    for (unsigned i = 0; i != pvMonitors.size(); ++ i ) {
       if (i != 0) str << ", ";
-      str << m_obj->pvMonitor(i).name();
+      const Pds::ControlData::PVMonitor& mon = pvMonitors[i];
+      str << mon.name() << "=" << mon.loValue() << ":" << mon.hiValue();
     }
     str << "]";
     comma = ", ";
   }
   if (m_obj->npvLabels()) {
     str << comma << "labels=[";
-    for (unsigned i = 0; i != m_obj->npvLabels(); ++ i ) {
+    const ndarray<const Pds::ControlData::PVLabel, 1>& pvLabels = m_obj->pvLabels();
+    for (unsigned i = 0; i != pvLabels.size(); ++ i ) {
       if (i != 0) str << ", ";
-      str << m_obj->pvLabel(i).name() << ": " << m_obj->pvLabel(i).value();
+      const Pds::ControlData::PVLabel& lbl = pvLabels[i];
+      str << lbl.name() << ": " << lbl.value();
     }
     str << "]";
     comma = ", ";
@@ -127,15 +137,6 @@ pypdsdata::ControlData::ConfigV2::print(std::ostream& str) const
 }
 
 namespace {
-
-PyObject*
-duration( PyObject* self, PyObject* args)
-{
-  const Pds::ControlData::ConfigV2* obj = pypdsdata::ControlData::ConfigV2::pdsObject( self );
-  if ( not obj ) return 0;
-
-  return pypdsdata::ClockTime::PyObject_FromPds( obj->duration() );
-}
 
 PyObject*
 pvControl( PyObject* self, PyObject* args )
@@ -147,8 +148,7 @@ pvControl( PyObject* self, PyObject* args )
   unsigned index ;
   if ( not PyArg_ParseTuple( args, "I:ConfigV2_pvControl", &index ) ) return 0;
 
-  return pypdsdata::ControlData::PVControl::PyObject_FromPds( (Pds::ControlData::PVControl*)(&obj->pvControl(index)),
-      self, sizeof(Pds::ControlData::PVControl) );
+  return toPython(obj->pvControls()[index]);
 }
 
 PyObject*
@@ -161,8 +161,7 @@ pvMonitor( PyObject* self, PyObject* args )
   unsigned index ;
   if ( not PyArg_ParseTuple( args, "I:ConfigV2_pvMonitor", &index ) ) return 0;
 
-  return pypdsdata::ControlData::PVMonitor::PyObject_FromPds( (Pds::ControlData::PVMonitor*)(&obj->pvMonitor(index)),
-      self, sizeof(Pds::ControlData::PVMonitor) );
+  return toPython(obj->pvMonitors()[index]);
 }
 
 PyObject*
@@ -175,8 +174,7 @@ pvLabel( PyObject* self, PyObject* args )
   unsigned index ;
   if ( not PyArg_ParseTuple( args, "I:ConfigV2_pvLabel", &index ) ) return 0;
 
-  return pypdsdata::ControlData::PVLabel::PyObject_FromPds( (Pds::ControlData::PVLabel*)(&obj->pvLabel(index)),
-      self, sizeof(Pds::ControlData::PVLabel) );
+  return toPython(obj->pvLabels()[index]);
 }
 
 }

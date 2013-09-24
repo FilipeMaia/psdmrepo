@@ -22,11 +22,11 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "pdsdata/psddl/evr.ddl.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
-#include "pdsdata/evr/PulseConfigV3.hh"
 
 //    ---------------------
 //    -- Class Interface --
@@ -35,11 +35,13 @@
 namespace pypdsdata {
 namespace EvrData {
 
+/// @addtogroup pypdsdata
+
 /**
+ *  @ingroup pypdsdata
+ *
  *  This software was developed for the LUSI project.  If you use all or
  *  part of it, please give an appropriate acknowledgment.
- *
- *  @see AdditionalClass
  *
  *  @version $Id$
  *
@@ -58,5 +60,11 @@ public:
 
 } // namespace EvrData
 } // namespace pypdsdata
+
+namespace Pds {
+namespace EvrData {
+inline PyObject* toPython(const Pds::EvrData::PulseConfigV3& v) { return pypdsdata::EvrData::PulseConfigV3::PyObject_FromPds(v); }
+}
+}
 
 #endif // PYPDSDATA_EVRDATA_PULSECONFIGV3_H

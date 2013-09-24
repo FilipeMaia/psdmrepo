@@ -47,7 +47,7 @@ namespace {
     {0, 0, 0, 0, 0}
   };
 
-  char typedoc[] = "Python class wrapping C++ Pds::BldDataAcqADCV1 class.";
+  char typedoc[] = "Python class wrapping C++ Pds::Bld::BldDataAcqADCV1 class.";
 }
 
 //              ----------------------------------------
@@ -55,7 +55,7 @@ namespace {
 //              ----------------------------------------
 
 void
-pypdsdata::BldDataAcqADCV1::initType( PyObject* module )
+pypdsdata::Bld::BldDataAcqADCV1::initType( PyObject* module )
 {
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
@@ -69,22 +69,23 @@ namespace {
 PyObject* 
 config( PyObject* self, void* )
 {
-  Pds::BldDataAcqADCV1* pdsObj = pypdsdata::BldDataAcqADCV1::pdsObject(self);
+  Pds::Bld::BldDataAcqADCV1* pdsObj = pypdsdata::Bld::BldDataAcqADCV1::pdsObject(self);
   if(not pdsObj) return 0;
 
-  return pypdsdata::Acqiris::ConfigV1::PyObject_FromPds(&pdsObj->config,
-      self, sizeof(pdsObj->config));
+  return pypdsdata::Acqiris::ConfigV1::PyObject_FromPds(const_cast<Pds::Acqiris::ConfigV1*>(&pdsObj->config()),
+      self, sizeof(Pds::Acqiris::ConfigV1));
 }
 
 PyObject* 
 data( PyObject* self, void* )
 {
-  Pds::BldDataAcqADCV1* pdsObj = pypdsdata::BldDataAcqADCV1::pdsObject(self);
+  Pds::Bld::BldDataAcqADCV1* pdsObj = pypdsdata::Bld::BldDataAcqADCV1::pdsObject(self);
   if(not pdsObj) return 0;
 
-  pypdsdata::BldDataAcqADCV1* pyobj = static_cast<pypdsdata::BldDataAcqADCV1*>(self);
-  size_t size = pyobj->m_size - offsetof(Pds::BldDataAcqADCV1, data);
-  return pypdsdata::Acqiris::DataDescV1::PyObject_FromPds(&pdsObj->data, self, size);
+  pypdsdata::Bld::BldDataAcqADCV1* pyobj = static_cast<pypdsdata::Bld::BldDataAcqADCV1*>(self);
+  size_t size = pyobj->m_size - ((const char*)&pdsObj->data() - (const char*)pdsObj);
+  return pypdsdata::Acqiris::DataDescV1::PyObject_FromPds(const_cast<Pds::Acqiris::DataDescV1*>(&pdsObj->data()),
+      self, size);
 }
 
 }

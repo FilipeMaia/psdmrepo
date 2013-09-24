@@ -32,8 +32,8 @@
 namespace {
 
   // methods
-  MEMBER_WRAPPER(pypdsdata::Lusi::PimImageConfigV1, xscale)
-  MEMBER_WRAPPER(pypdsdata::Lusi::PimImageConfigV1, yscale)
+  MEMBER_WRAPPER_FROM_METHOD(pypdsdata::Lusi::PimImageConfigV1, xscale)
+  MEMBER_WRAPPER_FROM_METHOD(pypdsdata::Lusi::PimImageConfigV1, yscale)
 
   // disable warnings for non-const strings, this is a temporary measure
   // newer Python versions should get constness correctly
@@ -64,5 +64,5 @@ pypdsdata::Lusi::PimImageConfigV1::initType( PyObject* module )
 void
 pypdsdata::Lusi::PimImageConfigV1::print(std::ostream& str) const
 {
-  str << "lusi.PimImageConfigV1(xscale=" << m_obj->xscale << ", yscale=" << m_obj->yscale << ")";
+  str << "lusi.PimImageConfigV1(xscale=" << m_obj->xscale() << ", yscale=" << m_obj->yscale() << ")";
 }

@@ -45,8 +45,8 @@ namespace {
   pypdsdata::EnumType dataModesEnum ( "DataModes", dataModesEnumValues );
 
   // methods
-  PyObject* shiftSelect( PyObject* self, PyObject* );
-  PyObject* edgeSelect( PyObject* self, PyObject* );
+  FUN0_WRAPPER(pypdsdata::CsPad2x2::ConfigV1QuadReg, shiftSelect)
+  FUN0_WRAPPER(pypdsdata::CsPad2x2::ConfigV1QuadReg, edgeSelect)
   FUN0_WRAPPER(pypdsdata::CsPad2x2::ConfigV1QuadReg, readClkSet)
   FUN0_WRAPPER(pypdsdata::CsPad2x2::ConfigV1QuadReg, readClkHold)
   ENUM_FUN0_WRAPPER(pypdsdata::CsPad2x2::ConfigV1QuadReg, dataMode, dataModesEnum)
@@ -66,7 +66,7 @@ namespace {
   FUN0_WRAPPER(pypdsdata::CsPad2x2::ConfigV1QuadReg, kdConstant)
   FUN0_WRAPPER(pypdsdata::CsPad2x2::ConfigV1QuadReg, humidThold)
   FUN0_WRAPPER(pypdsdata::CsPad2x2::ConfigV1QuadReg, setPoint)
-  PyObject* readOnly( PyObject* self, PyObject* );
+  FUN0_WRAPPER(pypdsdata::CsPad2x2::ConfigV1QuadReg, ro)
   PyObject* digitalPots( PyObject* self, PyObject* );
   PyObject* gainMap( PyObject* self, PyObject* );
 
@@ -92,10 +92,10 @@ namespace {
     {"kdConstant",      kdConstant,     METH_NOARGS, "self.kdConstant() -> int\n\nReturns integer number" },
     {"humidThold",      humidThold,     METH_NOARGS, "self.humidThold() -> int\n\nReturns integer number" },
     {"setPoint",        setPoint,       METH_NOARGS, "self.setPoint() -> int\n\nReturns integer number" },
-    {"ro",              readOnly,       METH_NOARGS, "self.ro() -> CsPadReadOnlyCfg\n\nReturns :py:class:`CsPadReadOnlyCfg` object" },
+    {"ro",              ro,             METH_NOARGS, "self.ro() -> CsPadReadOnlyCfg\n\nReturns :py:class:`CsPadReadOnlyCfg` object" },
     {"dp",              digitalPots,    METH_NOARGS, "self.dp() -> CsPadDigitalPotsCfg\n\nReturns :py:class:`CsPadDigitalPotsCfg` object" },
     {"gm",              gainMap,        METH_NOARGS, "self.gm() -> CsPadGainMapCfg\n\nReturns :py:class:`CsPadGainMapCfg` object" },
-    {"readOnly",        readOnly,       METH_NOARGS, "self.readOnly() -> CsPadReadOnlyCfg\n\nReturns :py:class:`CsPadReadOnlyCfg` object, same as ro()" },
+    {"readOnly",        ro,             METH_NOARGS, "self.readOnly() -> CsPadReadOnlyCfg\n\nReturns :py:class:`CsPadReadOnlyCfg` object, same as ro()" },
     {0, 0, 0, 0}
    };
 
@@ -126,8 +126,8 @@ pypdsdata::CsPad2x2::ConfigV1QuadReg::initType( PyObject* module )
 void
 pypdsdata::CsPad2x2::ConfigV1QuadReg::print(std::ostream& str) const
 {
-  str << "cspad2x2.ConfigV1QuadReg(shiftSelect=" << m_obj->shiftSelect()[0]
-      << ", edgeSelect=" << m_obj->edgeSelect()[0]
+  str << "cspad2x2.ConfigV1QuadReg(shiftSelect=" << m_obj->shiftSelect()
+      << ", edgeSelect=" << m_obj->edgeSelect()
       << ", readClkSet=" << m_obj->readClkSet()
       << ", readClkHold=" << m_obj->readClkHold()
       << ", dataMode=" << m_obj->dataMode()
@@ -137,43 +137,13 @@ pypdsdata::CsPad2x2::ConfigV1QuadReg::print(std::ostream& str) const
 namespace {
 
 PyObject*
-shiftSelect( PyObject* self, PyObject* )
-{
-  const Pds::CsPad2x2::ConfigV1QuadReg* obj = pypdsdata::CsPad2x2::ConfigV1QuadReg::pdsObject( self );
-  if ( not obj ) return 0;
-
-  const uint32_t* data = obj->shiftSelect();
-  return PyInt_FromLong(data[0]);
-}
-
-PyObject*
-edgeSelect( PyObject* self, PyObject* )
-{
-  const Pds::CsPad2x2::ConfigV1QuadReg* obj = pypdsdata::CsPad2x2::ConfigV1QuadReg::pdsObject( self );
-  if ( not obj ) return 0;
-
-  const uint32_t* data = obj->edgeSelect();
-  return PyInt_FromLong(data[0]);
-}
-
-PyObject*
-readOnly( PyObject* self, PyObject* )
-{
-  Pds::CsPad2x2::ConfigV1QuadReg* obj = pypdsdata::CsPad2x2::ConfigV1QuadReg::pdsObject( self );
-  if ( not obj ) return 0;
-
-  return pypdsdata::CsPad2x2::CsPad2x2ReadOnlyCfg::PyObject_FromPds(
-      obj->readOnly(), self, sizeof(Pds::CsPad2x2::CsPad2x2ReadOnlyCfg) );
-}
-
-PyObject*
 digitalPots( PyObject* self, PyObject* )
 {
   Pds::CsPad2x2::ConfigV1QuadReg* obj = pypdsdata::CsPad2x2::ConfigV1QuadReg::pdsObject( self );
   if ( not obj ) return 0;
 
   return pypdsdata::CsPad2x2::CsPad2x2DigitalPotsCfg::PyObject_FromPds(
-      &obj->dp(), self, sizeof(Pds::CsPad2x2::CsPad2x2DigitalPotsCfg) );
+      const_cast<Pds::CsPad2x2::CsPad2x2DigitalPotsCfg*>(&obj->dp()), self, sizeof(Pds::CsPad2x2::CsPad2x2DigitalPotsCfg) );
 }
 
 PyObject*
@@ -183,7 +153,7 @@ gainMap( PyObject* self, PyObject* )
   if ( not obj ) return 0;
 
   return pypdsdata::CsPad2x2::CsPad2x2GainMapCfg::PyObject_FromPds(
-      obj->gm(), self, sizeof(Pds::CsPad2x2::CsPad2x2GainMapCfg) );
+      const_cast<Pds::CsPad2x2::CsPad2x2GainMapCfg*>(&obj->gm()), self, sizeof(Pds::CsPad2x2::CsPad2x2GainMapCfg) );
 }
 
 }

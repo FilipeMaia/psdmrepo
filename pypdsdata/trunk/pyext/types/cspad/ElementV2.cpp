@@ -47,8 +47,7 @@ namespace {
   FUN0_WRAPPER(pypdsdata::CsPad::ElementV2, ticks)
   FUN0_WRAPPER(pypdsdata::CsPad::ElementV2, fiducials)
   FUN0_WRAPPER(pypdsdata::CsPad::ElementV2, frame_type)
-  PyObject* sb_temp( PyObject* self, PyObject* args );
-  PyObject* next( PyObject* self, PyObject* args );
+  FUN0_WRAPPER(pypdsdata::CsPad::ElementV2, sb_temp)
   PyObject* data( PyObject* self, PyObject* args );
 
   PyMethodDef methods[] = {
@@ -62,8 +61,7 @@ namespace {
     {"ticks",           ticks,          METH_NOARGS,  "self.ticks() -> int\n\nReturns integer number" },
     {"fiducials",       fiducials,      METH_NOARGS,  "self.fiducials() -> int\n\nReturns integer number" },
     {"frame_type",      frame_type,     METH_NOARGS,  "self.frame_type() -> int\n\nReturns integer number" },
-    {"sb_temp",         sb_temp,        METH_VARARGS,  "self.sb_temp(i: int) -> int\n\nRetuns integer number, index i in the range (0..3)" },
-    {"next",            next,           METH_VARARGS,  "self.next(cfg: ConfigV*) -> ElementV2\n\nReturns next quadrant element" },
+    {"sb_temp",         sb_temp,        METH_NOARGS,  "self.sb_temp() -> list\n\nRetuns list of integers" },
     {"data",            data,           METH_VARARGS,  "self.data(cfg: ConfigV*) -> numpy.ndarray\n\nReturns data array for this quadrant" },
     {0, 0, 0, 0}
    };
@@ -97,80 +95,6 @@ pypdsdata::CsPad::ElementV2::initType( PyObject* module )
 namespace {
   
 PyObject*
-sb_temp( PyObject* self, PyObject* args )
-{
-  const Pds::CsPad::ElementV2* obj = pypdsdata::CsPad::ElementV2::pdsObject( self );
-  if ( not obj ) return 0;
-
-  // parse args
-  unsigned index ;
-  if ( not PyArg_ParseTuple( args, "I:ElementV2.sb_temp", &index ) ) return 0;
-
-  if ( index >= 4 ) {
-    PyErr_SetString(PyExc_IndexError, "index outside of range [0..3] in ElementV2.sb_temp()");
-    return 0;
-  }
-  
-  return PyInt_FromLong( obj->sb_temp(index) );
-}
-
-
-// slow bit count
-unsigned bitCount(uint32_t mask, unsigned maxBits) {
-  unsigned res = 0;
-  for (  ; maxBits ; -- maxBits ) {
-    if ( mask & 1 ) ++ res ;
-    mask >>= 1 ;
-  }
-  return res ;
-}
-
-
-PyObject*
-next( PyObject* self, PyObject* args )
-{
-  Pds::CsPad::ElementV2* obj = pypdsdata::CsPad::ElementV2::pdsObject( self );
-  if ( not obj ) return 0;
-
-  // parse args
-  PyObject* configObj ;
-  if ( not PyArg_ParseTuple( args, "O:cspad.ElementV2.next", &configObj ) ) return 0;
-
-  // get segment mask from config object
-  uint32_t sMask;
-  if ( pypdsdata::CsPad::ConfigV2::Object_TypeCheck( configObj ) ) {
-    const Pds::CsPad::ConfigV2* config = pypdsdata::CsPad::ConfigV2::pdsObject( configObj );
-    sMask = config->roiMask(obj->quad());
-  } else if ( pypdsdata::CsPad::ConfigV3::Object_TypeCheck( configObj ) ) {
-    const Pds::CsPad::ConfigV3* config = pypdsdata::CsPad::ConfigV3::pdsObject( configObj );
-    sMask = config->roiMask(obj->quad());
-  } else if ( pypdsdata::CsPad::ConfigV4::Object_TypeCheck( configObj ) ) {
-    const Pds::CsPad::ConfigV4* config = pypdsdata::CsPad::ConfigV4::pdsObject( configObj );
-    sMask = config->roiMask(obj->quad());
-  } else if ( pypdsdata::CsPad::ConfigV5::Object_TypeCheck( configObj ) ) {
-    const Pds::CsPad::ConfigV5* config = pypdsdata::CsPad::ConfigV5::pdsObject( configObj );
-    sMask = config->roiMask(obj->quad());
-  } else {
-    PyErr_SetString(PyExc_TypeError, "Error: parameter is not a cspad.ConfigV[2-4] object");
-    return 0;
-  }
-
-  const unsigned nSect = ::bitCount(sMask, Pds::CsPad::ASICsPerQuad/2);
-  const unsigned qsize = nSect*Pds::CsPad::ColumnsPerASIC*Pds::CsPad::MaxRowsPerASIC*2;
-  const unsigned payloadSize = sizeof(*obj) + sizeof(uint16_t)*(qsize+2);
-
-  // start of pixel data
-  const uint16_t* qdata = (const uint16_t*)(obj+1);
-
-  // move to next frame
-  Pds::CsPad::ElementV2* next = (Pds::CsPad::ElementV2*)(qdata+qsize+2) ;
-
-  // make Python object, parent will be our parent
-  pypdsdata::CsPad::ElementV2* py_this = static_cast<pypdsdata::CsPad::ElementV2*>(self);
-  return pypdsdata::CsPad::ElementV2::PyObject_FromPds( next, py_this->m_parent, payloadSize, py_this->m_dtor );
-}
-
-PyObject*
 data( PyObject* self, PyObject* args )
 {
   Pds::CsPad::ElementV2* obj = pypdsdata::CsPad::ElementV2::pdsObject( self );
@@ -180,22 +104,22 @@ data( PyObject* self, PyObject* args )
   PyObject* configObj ;
   if ( not PyArg_ParseTuple( args, "O:cspad.ElementV2.data", &configObj ) ) return 0;
 
-  // get segment mask from config object
-  uint32_t sMask;
+  // get image data
+  ndarray<const int16_t, 3> data;
   if ( pypdsdata::CsPad::ConfigV2::Object_TypeCheck( configObj ) ) {
     const Pds::CsPad::ConfigV2* config = pypdsdata::CsPad::ConfigV2::pdsObject( configObj );
-    sMask = config->roiMask(obj->quad());
+    data = obj->data(*config);
   } else if ( pypdsdata::CsPad::ConfigV3::Object_TypeCheck( configObj ) ) {
     const Pds::CsPad::ConfigV3* config = pypdsdata::CsPad::ConfigV3::pdsObject( configObj );
-    sMask = config->roiMask(obj->quad());
+    data = obj->data(*config);
   } else if ( pypdsdata::CsPad::ConfigV4::Object_TypeCheck( configObj ) ) {
     const Pds::CsPad::ConfigV4* config = pypdsdata::CsPad::ConfigV4::pdsObject( configObj );
-    sMask = config->roiMask(obj->quad());
+    data = obj->data(*config);
   } else if ( pypdsdata::CsPad::ConfigV5::Object_TypeCheck( configObj ) ) {
     const Pds::CsPad::ConfigV5* config = pypdsdata::CsPad::ConfigV5::pdsObject( configObj );
-    sMask = config->roiMask(obj->quad());
+    data = obj->data(*config);
   } else {
-    PyErr_SetString(PyExc_TypeError, "Error: parameter is not a cspad.ConfigV[2-4] object");
+    PyErr_SetString(PyExc_TypeError, "Error: parameter is not a cspad.ConfigV* object");
     return 0;
   }
   
@@ -206,15 +130,11 @@ data( PyObject* self, PyObject* args )
   int flags = NPY_C_CONTIGUOUS ;
 
   // dimensions
-  const unsigned nSect = ::bitCount(sMask, Pds::CsPad::ASICsPerQuad/2);
-  npy_intp dims[3] = { nSect, Pds::CsPad::ColumnsPerASIC, Pds::CsPad::MaxRowsPerASIC*2 };
-
-  // start of pixel data
-  uint16_t* qdata = (uint16_t*)(obj+1);
+  npy_intp dims[3] = { data.shape()[0], data.shape()[1], data.shape()[2] };
 
   // make array
   PyObject* array = PyArray_New(&PyArray_Type, 3, dims, typenum, 0,
-                                qdata, 0, flags, 0);
+                                (void*)data.data(), 0, flags, 0);
 
   // array does not own its data, set self as owner
   Py_INCREF(self);

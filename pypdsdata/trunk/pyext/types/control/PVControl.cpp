@@ -33,10 +33,10 @@
 namespace {
 
   // methods
-  FUN0_WRAPPER(pypdsdata::ControlData::PVControl, name)
-  FUN0_WRAPPER(pypdsdata::ControlData::PVControl, array)
-  FUN0_WRAPPER(pypdsdata::ControlData::PVControl, index)
-  FUN0_WRAPPER(pypdsdata::ControlData::PVControl, value)
+  FUN0_WRAPPER_EMBEDDED(pypdsdata::ControlData::PVControl, name)
+  FUN0_WRAPPER_EMBEDDED(pypdsdata::ControlData::PVControl, array)
+  FUN0_WRAPPER_EMBEDDED(pypdsdata::ControlData::PVControl, index)
+  FUN0_WRAPPER_EMBEDDED(pypdsdata::ControlData::PVControl, value)
 
   PyMethodDef methods[] = {
     {"name",       name,       METH_NOARGS,  "self.name() -> string\n\nReturns name of the monitoring channel" },
@@ -66,13 +66,13 @@ pypdsdata::ControlData::PVControl::initType( PyObject* module )
 void
 pypdsdata::ControlData::PVControl::print(std::ostream& str) const
 {
-  str << "control.PVControl(name=" << m_obj->name();
+  str << "control.PVControl(name=" << m_obj.name();
   
-  if (m_obj->array()) {
-    str << ", index=" << m_obj->index();
+  if (m_obj.array()) {
+    str << ", index=" << m_obj.index();
   }
 
-  str << ", value=" << m_obj->value();
+  str << ", value=" << m_obj.value();
 
   str << ")";
 }

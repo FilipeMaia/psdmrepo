@@ -90,8 +90,9 @@ data( PyObject* self, PyObject* args )
   npy_intp dims[2] = { 0, 0 };
 
   // get dimensions from config object
+  Pds::Andor::ConfigV1* config = 0;
   if ( pypdsdata::Andor::ConfigV1::Object_TypeCheck( configObj ) ) {
-    Pds::Andor::ConfigV1* config = pypdsdata::Andor::ConfigV1::pdsObject( configObj );
+    config = pypdsdata::Andor::ConfigV1::pdsObject( configObj );
     uint32_t binX = config->binX();
     uint32_t binY = config->binY();
     dims[0] = (config->height() + binY - 1) / binY;
@@ -107,7 +108,7 @@ data( PyObject* self, PyObject* args )
 
   // make array
   PyObject* array = PyArray_New(&PyArray_Type, 2, dims, typenum, 0,
-                                (void*)obj->data(), 0, flags, 0);
+                                (void*)obj->data(*config).data(), 0, flags, 0);
 
   // array does not own its data, set self as owner
   Py_INCREF(self);

@@ -33,47 +33,53 @@
 
 namespace {
 
-  template <int iDbrType>
+  template <typename EpicsType>
   inline
   void
-  print(std::ostream& out, const Pds::EpicsPvHeader& header)
+  print(std::ostream& out, const Pds::Epics::EpicsPvHeader& header)
   {
-    typedef Pds::EpicsPvTime<iDbrType> PVType;
-    const PVType& obj = static_cast<const PVType&>(header);
-    out << "id=" << obj.iPvId
-        << ", status=" << obj.status
-        << ", severity=" << obj.severity
-        << ", value=" << obj.value;
+    const EpicsType& obj = static_cast<const EpicsType&>(header);
+    out << "id=" << obj.pvId()
+        << ", status=" << obj.status()
+        << ", severity=" << obj.severity()
+        << ", value=" << obj.value(0);
   }
 
-  // methods
-  MEMBER_WRAPPER(pypdsdata::EpicsPvTime, iPvId)
-  MEMBER_WRAPPER(pypdsdata::EpicsPvTime, iDbrType)
-  MEMBER_WRAPPER(pypdsdata::EpicsPvTime, iNumElements)
-  PyObject* EpicsPvTime_status( PyObject* self, void* );
-  PyObject* EpicsPvTime_severity( PyObject* self, void* );
-  PyObject* EpicsPvTime_stamp( PyObject* self, void* );
-  PyObject* EpicsPvTime_value( PyObject* self, void* );
-  PyObject* EpicsPvTime_values( PyObject* self, void* );
-  PyObject* EpicsPvTime_getnewargs( PyObject* self, PyObject* );
+  namespace gs {
+  MEMBER_WRAPPER_FROM_METHOD(pypdsdata::Epics::EpicsPvTime, pvId)
+  MEMBER_WRAPPER_FROM_METHOD(pypdsdata::Epics::EpicsPvTime, dbrType)
+  MEMBER_WRAPPER_FROM_METHOD(pypdsdata::Epics::EpicsPvTime, numElements)
+  }
 
   // disable warnings for non-const strings, this is a temporary measure
   // newer Python versions should get constness correctly
 #pragma GCC diagnostic ignored "-Wwrite-strings"
   PyGetSetDef getset[] = {
-    {"iPvId",        iPvId,                0, "Integer number, Pv Id", 0},
-    {"iDbrType",     iDbrType,             0, "Integer number, Epics Data Type", 0},
-    {"iNumElements", iNumElements,         0, "Integer number, Size of Pv Array", 0},
-    {"status",       EpicsPvTime_status,   0, "Integer number, Status value", 0},
-    {"severity",     EpicsPvTime_severity, 0, "Integer number, Severity value", 0},
-    {"stamp",        EpicsPvTime_stamp,    0, "EPICS timestamp value of type epicsTimeStamp", 0},
-    {"value",        EpicsPvTime_value,    0, "PV value (number or string), always a single value, for arrays it is first element", 0},
-    {"values",       EpicsPvTime_values,   0, "List of PV values of size [iNumElements]", 0},
+    {"iPvId",        gs::pvId,                 0, "Integer number, Pv Id", 0},
+    {"iDbrType",     gs::dbrType,              0, "Integer number, Epics Data Type", 0},
+    {"iNumElements", gs::numElements,          0, "Integer number, Size of Pv Array", 0},
     {0, 0, 0, 0, 0}
   };
 
+  namespace mm {
+  FUN0_WRAPPER(pypdsdata::Epics::EpicsPvTime, pvId)
+  FUN0_WRAPPER(pypdsdata::Epics::EpicsPvTime, dbrType)
+  FUN0_WRAPPER(pypdsdata::Epics::EpicsPvTime, numElements)
+  PyObject* EpicsPvTime_status( PyObject* self, PyObject* );
+  PyObject* EpicsPvTime_severity( PyObject* self, PyObject* );
+  PyObject* EpicsPvTime_stamp( PyObject* self, PyObject* );
+  PyObject* EpicsPvTime_value( PyObject* self, PyObject* );
+  PyObject* EpicsPvTime_values( PyObject* self, PyObject* );
+  PyObject* EpicsPvTime_getnewargs( PyObject* self, PyObject* );
+  }
+  
   PyMethodDef methods[] = {
-    { "__getnewargs__",    EpicsPvTime_getnewargs, METH_NOARGS, "Pickle support" },
+    {"status",          mm::EpicsPvTime_status,         METH_NOARGS, "Integer number, Status value"},
+    {"severity",        mm::EpicsPvTime_severity,       METH_NOARGS, "Integer number, Severity value"},
+    {"stamp",           mm::EpicsPvTime_stamp,          METH_NOARGS, "EPICS timestamp value of type epicsTimeStamp"},
+    {"value",           mm::EpicsPvTime_value,          METH_NOARGS, "PV value (number or string), always a single value, for arrays it is first element"},
+    {"values",          mm::EpicsPvTime_values,         METH_NOARGS, "List of PV values of size [iNumElements]"},
+    { "__getnewargs__", mm::EpicsPvTime_getnewargs,     METH_NOARGS, "Pickle support" },
     {0, 0, 0, 0}
    };
 
@@ -85,7 +91,7 @@ namespace {
 //              ----------------------------------------
 
 void
-pypdsdata::EpicsPvTime::initType( PyObject* module )
+pypdsdata::Epics::EpicsPvTime::initType( PyObject* module )
 {
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
@@ -96,42 +102,42 @@ pypdsdata::EpicsPvTime::initType( PyObject* module )
 }
 
 void
-pypdsdata::EpicsPvTime::print(std::ostream& str) const
+pypdsdata::Epics::EpicsPvTime::print(std::ostream& str) const
 {
   str << "EpicsPvTime(";
 
-  switch ( m_obj->iDbrType ) {
+  switch ( m_obj->dbrType() ) {
 
-  case DBR_TIME_STRING:
-    ::print<DBR_STRING>(str, *m_obj);
+  case Pds::Epics::DBR_TIME_STRING:
+    ::print<Pds::Epics::EpicsPvTimeString>(str, *m_obj);
     break;
 
-  case DBR_TIME_SHORT:
-    ::print<DBR_SHORT>(str, *m_obj);
+  case Pds::Epics::DBR_TIME_SHORT:
+    ::print<Pds::Epics::EpicsPvTimeShort>(str, *m_obj);
     break;
 
-  case DBR_TIME_FLOAT:
-    ::print<DBR_FLOAT>(str, *m_obj);
+  case Pds::Epics::DBR_TIME_FLOAT:
+    ::print<Pds::Epics::EpicsPvTimeFloat>(str, *m_obj);
     break;
 
-  case DBR_TIME_ENUM:
-    ::print<DBR_ENUM>(str, *m_obj);
+  case Pds::Epics::DBR_TIME_ENUM:
+    ::print<Pds::Epics::EpicsPvTimeEnum>(str, *m_obj);
     break;
 
-  case DBR_TIME_CHAR:
-    ::print<DBR_CHAR>(str, *m_obj);
+  case Pds::Epics::DBR_TIME_CHAR:
+    ::print<Pds::Epics::EpicsPvTimeChar>(str, *m_obj);
     break;
 
-  case DBR_TIME_LONG:
-    ::print<DBR_LONG>(str, *m_obj);
+  case Pds::Epics::DBR_TIME_LONG:
+    ::print<Pds::Epics::EpicsPvTimeLong>(str, *m_obj);
     break;
 
-  case DBR_TIME_DOUBLE:
-    ::print<DBR_DOUBLE>(str, *m_obj);
+  case Pds::Epics::DBR_TIME_DOUBLE:
+    ::print<Pds::Epics::EpicsPvTimeDouble>(str, *m_obj);
     break;
 
   default:
-    str << "id=" << m_obj->iPvId;
+    str << "id=" << m_obj->pvId();
   }
 
   str << ")";
@@ -142,170 +148,152 @@ namespace {
 PyObject*
 EpicsPvTime_status( PyObject* self, void* )
 {
-  pypdsdata::EpicsPvTime* py_this = static_cast<pypdsdata::EpicsPvTime*>(self);
-  if( ! py_this->m_obj ){
-    PyErr_SetString(pypdsdata::exceptionType(), "Error: No Valid C++ Object");
-    return 0;
-  }
+  const Pds::Epics::EpicsPvTimeHeader* obj = pypdsdata::Epics::EpicsPvTime::pdsObject( self );
+  if ( not obj ) return 0;
 
   // all DBR_TIME_* types share the same layout, cast to arbitrary type
-  typedef Pds::EpicsPvTime<DBR_SHORT> TimeType ;
-  TimeType* pvTime = (TimeType*)py_this->m_obj;
+  typedef Pds::Epics::EpicsPvTimeShort TimeType ;
+  const TimeType* pvTime = static_cast<const TimeType*>(obj);
 
-  return pypdsdata::TypeLib::toPython( pvTime->status );
+  return pypdsdata::TypeLib::toPython( pvTime->status() );
 }
 
 PyObject*
 EpicsPvTime_severity( PyObject* self, void* )
 {
-  pypdsdata::EpicsPvTime* py_this = static_cast<pypdsdata::EpicsPvTime*>(self);
-  if( ! py_this->m_obj ){
-    PyErr_SetString(pypdsdata::exceptionType(), "Error: No Valid C++ Object");
-    return 0;
-  }
+  const Pds::Epics::EpicsPvTimeHeader* obj = pypdsdata::Epics::EpicsPvTime::pdsObject( self );
+  if ( not obj ) return 0;
 
   // all DBR_TIME_* types share the same layout, cast to arbitrary type
-  typedef Pds::EpicsPvTime<DBR_SHORT> TimeType ;
-  TimeType* pvTime = (TimeType*)py_this->m_obj;
+  typedef Pds::Epics::EpicsPvTimeShort TimeType ;
+  const TimeType* pvTime = static_cast<const TimeType*>(obj);
 
-  return pypdsdata::TypeLib::toPython( pvTime->severity );
+  return pypdsdata::TypeLib::toPython( pvTime->severity() );
 }
 
 PyObject*
 EpicsPvTime_stamp( PyObject* self, void* )
 {
-  pypdsdata::EpicsPvTime* py_this = static_cast<pypdsdata::EpicsPvTime*>(self);
-  if( ! py_this->m_obj ){
-    PyErr_SetString(pypdsdata::exceptionType(), "Error: No Valid C++ Object");
-    return 0;
-  }
+  const Pds::Epics::EpicsPvTimeHeader* obj = pypdsdata::Epics::EpicsPvTime::pdsObject( self );
+  if ( not obj ) return 0;
 
   // all DBR_TIME_* types share the same layout, cast to arbitrary type
-  typedef Pds::EpicsPvTime<DBR_SHORT> TimeType ;
-  TimeType* pvTime = (TimeType*)py_this->m_obj;
+  typedef Pds::Epics::EpicsPvTimeShort TimeType ;
+  const TimeType* pvTime = static_cast<const TimeType*>(obj);
 
-  return pypdsdata::Epics::epicsTimeStamp::PyObject_FromPds( pvTime->stamp );
+  return pypdsdata::Epics::epicsTimeStamp::PyObject_FromPds( pvTime->stamp() );
 }
 
-template <int iDbrType>
+// return PV data, if index is -1 the return an array, if index >= 0 return one element
+template <typename EpicsType>
 inline
 PyObject*
-getValue( Pds::EpicsPvHeader* header, int index = 0 )
+getValue( const Pds::Epics::EpicsPvTimeHeader& header, int index = -1 )
 {
-  typedef Pds::EpicsPvTime<iDbrType> TimeType ;
-  TimeType* obj = static_cast<TimeType*>(header);
-  return pypdsdata::TypeLib::toPython( (&obj->value)[index] );
+  const EpicsType& obj = static_cast<const EpicsType&>(header);
+  using pypdsdata::TypeLib::toPython;
+  if (index < 0) {
+    const unsigned size = obj.numElements();
+    PyObject* list = PyList_New(size);
+    for ( unsigned i = 0; i < size; ++ i ) {
+      using pypdsdata::TypeLib::toPython;
+      PyList_SET_ITEM(list, i, toPython(obj.value(i)));
+    }
+    return list;
+  } else {
+    return toPython(obj.value(index));
+  }
 }
 
 PyObject*
 EpicsPvTime_value( PyObject* self, void* )
 {
-  pypdsdata::EpicsPvTime* py_this = static_cast<pypdsdata::EpicsPvTime*>(self);
-  if( ! py_this->m_obj ){
-    PyErr_SetString(pypdsdata::exceptionType(), "Error: No Valid C++ Object");
-    return 0;
-  }
+  const Pds::Epics::EpicsPvTimeHeader* obj = pypdsdata::Epics::EpicsPvTime::pdsObject( self );
+  if ( not obj ) return 0;
 
-  if ( py_this->m_obj->iNumElements <= 0 ) {
+  if ( obj->numElements() <= 0 ) {
     PyErr_SetString(PyExc_TypeError, "Non-positive PV array size");
     return 0;
   }
 
-  PyObject* obj = 0;
-  switch ( py_this->m_obj->iDbrType ) {
+  PyObject* pyobj = 0;
+  switch ( obj->dbrType() ) {
 
-  case DBR_TIME_STRING:
-    obj = getValue<DBR_STRING>( py_this->m_obj );
+  case Pds::Epics::DBR_TIME_STRING:
+    pyobj = getValue<Pds::Epics::EpicsPvTimeString>( *obj, 0 );
     break;
 
-  case DBR_TIME_SHORT:
-    obj = getValue<DBR_SHORT>( py_this->m_obj );
+  case Pds::Epics::DBR_TIME_SHORT:
+    pyobj = getValue<Pds::Epics::EpicsPvTimeShort>( *obj, 0 );
     break;
 
-  case DBR_TIME_FLOAT:
-    obj = getValue<DBR_FLOAT>( py_this->m_obj );
+  case Pds::Epics::DBR_TIME_FLOAT:
+    pyobj = getValue<Pds::Epics::EpicsPvTimeFloat>( *obj, 0 );
     break;
 
-  case DBR_TIME_ENUM:
-    obj = getValue<DBR_ENUM>( py_this->m_obj );
+  case Pds::Epics::DBR_TIME_ENUM:
+    pyobj = getValue<Pds::Epics::EpicsPvTimeEnum>( *obj, 0 );
     break;
 
-  case DBR_TIME_CHAR:
-    obj = getValue<DBR_CHAR>( py_this->m_obj );
+  case Pds::Epics::DBR_TIME_CHAR:
+    pyobj = getValue<Pds::Epics::EpicsPvTimeChar>( *obj, 0 );
     break;
 
-  case DBR_TIME_LONG:
-    obj = getValue<DBR_LONG>( py_this->m_obj );
+  case Pds::Epics::DBR_TIME_LONG:
+    pyobj = getValue<Pds::Epics::EpicsPvTimeLong>( *obj, 0 );
     break;
 
-  case DBR_TIME_DOUBLE:
-    obj = getValue<DBR_DOUBLE>( py_this->m_obj );
+  case Pds::Epics::DBR_TIME_DOUBLE:
+    pyobj = getValue<Pds::Epics::EpicsPvTimeDouble>( *obj, 0 );
     break;
 
   default:
     PyErr_SetString(PyExc_TypeError, "Unexpected PV type");
   }
-  return obj;
+  return pyobj;
 }
 
 PyObject*
 EpicsPvTime_values( PyObject* self, void* )
 {
-  pypdsdata::EpicsPvTime* py_this = static_cast<pypdsdata::EpicsPvTime*>(self);
-  if( ! py_this->m_obj ){
-    PyErr_SetString(pypdsdata::exceptionType(), "Error: No Valid C++ Object");
-    return 0;
-  }
+  const Pds::Epics::EpicsPvTimeHeader* obj = pypdsdata::Epics::EpicsPvTime::pdsObject( self );
+  if ( not obj ) return 0;
 
-  int size = py_this->m_obj->iNumElements;
+  int size = obj->numElements();
   if ( size < 0 ) {
     PyErr_SetString(PyExc_TypeError, "Negative PV array size");
     return 0;
   }
 
-  PyObject* list = PyList_New( size );
-  switch ( py_this->m_obj->iDbrType ) {
+  PyObject* list = 0;
+  switch ( obj->dbrType() ) {
 
-  case DBR_TIME_STRING:
-    for ( int i = 0 ; i < size ; ++ i ) {
-      PyList_SET_ITEM( list, i, getValue<DBR_STRING>( py_this->m_obj ) );
-    }
+  case Pds::Epics::DBR_TIME_STRING:
+    list = getValue<Pds::Epics::EpicsPvTimeString>( *obj );
     break;
 
-  case DBR_TIME_SHORT:
-    for ( int i = 0 ; i < size ; ++ i ) {
-      PyList_SET_ITEM( list, i, getValue<DBR_SHORT>( py_this->m_obj ) );
-    }
+  case Pds::Epics::DBR_TIME_SHORT:
+    list = getValue<Pds::Epics::EpicsPvTimeShort>( *obj );
     break;
 
-  case DBR_TIME_FLOAT:
-    for ( int i = 0 ; i < size ; ++ i ) {
-      PyList_SET_ITEM( list, i, getValue<DBR_FLOAT>( py_this->m_obj ) );
-    }
+  case Pds::Epics::DBR_TIME_FLOAT:
+    list = getValue<Pds::Epics::EpicsPvTimeFloat>( *obj );
     break;
 
-  case DBR_TIME_ENUM:
-    for ( int i = 0 ; i < size ; ++ i ) {
-      PyList_SET_ITEM( list, i, getValue<DBR_ENUM>( py_this->m_obj ) );
-    }
+  case Pds::Epics::DBR_TIME_ENUM:
+    list = getValue<Pds::Epics::EpicsPvTimeEnum>( *obj );
     break;
 
-  case DBR_TIME_CHAR:
-    for ( int i = 0 ; i < size ; ++ i ) {
-      PyList_SET_ITEM( list, i, getValue<DBR_CHAR>( py_this->m_obj ) );
-    }
+  case Pds::Epics::DBR_TIME_CHAR:
+    list = getValue<Pds::Epics::EpicsPvTimeChar>( *obj );
     break;
 
-  case DBR_TIME_LONG:
-    for ( int i = 0 ; i < size ; ++ i ) {
-      PyList_SET_ITEM( list, i, getValue<DBR_LONG>( py_this->m_obj ) );
-    }
+  case Pds::Epics::DBR_TIME_LONG:
+    list = getValue<Pds::Epics::EpicsPvTimeLong>( *obj );
     break;
 
-  case DBR_TIME_DOUBLE:
-    for ( int i = 0 ; i < size ; ++ i ) {
-      PyList_SET_ITEM( list, i, getValue<DBR_DOUBLE>( py_this->m_obj ) );
-    }
+  case Pds::Epics::DBR_TIME_DOUBLE:
+    list = getValue<Pds::Epics::EpicsPvTimeDouble>( *obj );
     break;
 
   default:
@@ -317,7 +305,7 @@ EpicsPvTime_values( PyObject* self, void* )
 PyObject*
 EpicsPvTime_getnewargs( PyObject* self, PyObject* )
 {
-  pypdsdata::EpicsPvTime* py_this = static_cast<pypdsdata::EpicsPvTime*>(self);
+  pypdsdata::Epics::EpicsPvTime* py_this = static_cast<pypdsdata::Epics::EpicsPvTime*>(self);
   if( ! py_this->m_obj ){
     PyErr_SetString(pypdsdata::exceptionType(), "Error: No Valid C++ Object");
     return 0;

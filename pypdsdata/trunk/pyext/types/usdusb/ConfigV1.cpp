@@ -58,8 +58,8 @@ namespace {
   };
 
   // methods
-  PyObject* counting_mode( PyObject *self, PyObject* );
-  PyObject* quadrature_mode( PyObject *self, PyObject* );
+  FUN0_WRAPPER(pypdsdata::UsdUsb::ConfigV1, counting_mode)
+  FUN0_WRAPPER(pypdsdata::UsdUsb::ConfigV1, quadrature_mode)
 
   PyMethodDef methods[] = {
     {"counting_mode",   counting_mode,   METH_NOARGS,
@@ -96,53 +96,7 @@ pypdsdata::UsdUsb::ConfigV1::initType( PyObject* module )
 void
 pypdsdata::UsdUsb::ConfigV1::print(std::ostream& str) const
 {
-  str << "usdusb.ConfigV1(counting_modes=[";
-  for (int i = 0; i != Pds::UsdUsb::ConfigV1::NCHANNELS; ++ i) {
-    if (i != 0) str << ", ";
-    str << Pds::UsdUsb::ConfigV1::count_mode_labels()[m_obj->counting_mode(i)];
-  }
-  str << "], quadrature_modes=[";
-  for (int i = 0; i != Pds::UsdUsb::ConfigV1::NCHANNELS; ++ i) {
-    if (i != 0) str << ", ";
-    str << Pds::UsdUsb::ConfigV1::quad_mode_labels()[m_obj->quadrature_mode(i)];
-  }
-  str << "])" ;
-}
-
-namespace {
-
-PyObject*
-counting_mode( PyObject* self, PyObject* )
-{
-  Pds::UsdUsb::ConfigV1* obj = pypdsdata::UsdUsb::ConfigV1::pdsObject(self);
-  if(not obj) return 0;
-
-  PyObject* list = PyList_New(Pds::UsdUsb::ConfigV1::NCHANNELS);
-
-  // copy coordinates to the list
-  for ( unsigned i = 0; i < Pds::UsdUsb::ConfigV1::NCHANNELS; ++ i ) {
-    PyObject* eobj = countModeEnum.Enum_FromLong(obj->counting_mode(i));
-    PyList_SET_ITEM( list, i, eobj );
-  }
-
-  return list;
-}
-
-PyObject*
-quadrature_mode( PyObject* self, PyObject* )
-{
-  Pds::UsdUsb::ConfigV1* obj = pypdsdata::UsdUsb::ConfigV1::pdsObject(self);
-  if(not obj) return 0;
-
-  PyObject* list = PyList_New(Pds::UsdUsb::ConfigV1::NCHANNELS);
-
-  // copy coordinates to the list
-  for ( unsigned i = 0; i < Pds::UsdUsb::ConfigV1::NCHANNELS; ++ i ) {
-    PyObject* eobj = quadModeEnum.Enum_FromLong(obj->quadrature_mode(i));
-    PyList_SET_ITEM( list, i, eobj );
-  }
-
-  return list;
-}
-
+  str << "usdusb.ConfigV1(counting_modes=" << m_obj->counting_mode()
+      << ", quadrature_modes=" << m_obj->quadrature_mode()
+      << ")";
 }

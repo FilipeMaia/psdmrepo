@@ -61,10 +61,10 @@ namespace {
   pypdsdata::EnumType slopeEnum ( "Slope", slopeEnumValues );
 
   // methods
-  ENUM_FUN0_WRAPPER(pypdsdata::Acqiris::TdcChannel, channel, chanEnum)
-  ENUM_FUN0_WRAPPER(pypdsdata::Acqiris::TdcChannel, mode, modeEnum)
-  ENUM_FUN0_WRAPPER(pypdsdata::Acqiris::TdcChannel, slope, slopeEnum)
-  FUN0_WRAPPER(pypdsdata::Acqiris::TdcChannel, level)
+  ENUM_FUN0_WRAPPER_EMBEDDED(pypdsdata::Acqiris::TdcChannel, channel, chanEnum)
+  ENUM_FUN0_WRAPPER_EMBEDDED(pypdsdata::Acqiris::TdcChannel, mode, modeEnum)
+  ENUM_FUN0_WRAPPER_EMBEDDED(pypdsdata::Acqiris::TdcChannel, slope, slopeEnum)
+  FUN0_WRAPPER_EMBEDDED(pypdsdata::Acqiris::TdcChannel, level)
 
   PyMethodDef methods[] = {
     {"channel",   channel,  METH_NOARGS,  "self.channel() -> Channel enum\n\nReturns :py:class:`TdcChannel.Channel` enum value" },
@@ -101,13 +101,9 @@ pypdsdata::Acqiris::TdcChannel::initType( PyObject* module )
 void 
 pypdsdata::Acqiris::TdcChannel::print(std::ostream& out) const
 {
-  if(not m_obj) {
-    out << "acqiris.TdcChannel(None)";
-  } else {  
-    out << "acqiris.TdcChannel(channel=" << m_obj->channel()
-        << ", mode=" << m_obj->mode()
-        << ", slope=" << m_obj->slope()
-        << ", level=" << m_obj->level()
-        << ")" ;
-  }
+  out << "acqiris.TdcChannel(channel=" << m_obj.channel()
+      << ", mode=" << m_obj.mode()
+      << ", slope=" << m_obj.slope()
+      << ", level=" << m_obj.level()
+      << ")" ;
 }

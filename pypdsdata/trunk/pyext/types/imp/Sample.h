@@ -22,7 +22,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "pdsdata/imp/ElementV1.hh"
+#include "pdsdata/psddl/imp.ddl.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -63,5 +63,11 @@ public:
 
 } // namespace Imp
 } // namespace pypdsdata
+
+namespace Pds {
+namespace Imp {
+inline PyObject* toPython(const Pds::Imp::Sample& v) { return pypdsdata::Imp::Sample::PyObject_FromPds(v); }
+}
+}
 
 #endif // PYPDSDATA_IMP_SAMPLE_H
