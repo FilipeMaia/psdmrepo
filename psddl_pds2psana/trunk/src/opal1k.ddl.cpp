@@ -9,17 +9,17 @@
 
 namespace psddl_pds2psana {
 namespace Opal1k {
-Psana::Opal1k::ConfigV1::Depth pds_to_psana(PsddlPds::Opal1k::ConfigV1::Depth e)
+Psana::Opal1k::ConfigV1::Depth pds_to_psana(Pds::Opal1k::ConfigV1::Depth e)
 {
   return Psana::Opal1k::ConfigV1::Depth(e);
 }
 
-Psana::Opal1k::ConfigV1::Binning pds_to_psana(PsddlPds::Opal1k::ConfigV1::Binning e)
+Psana::Opal1k::ConfigV1::Binning pds_to_psana(Pds::Opal1k::ConfigV1::Binning e)
 {
   return Psana::Opal1k::ConfigV1::Binning(e);
 }
 
-Psana::Opal1k::ConfigV1::Mirroring pds_to_psana(PsddlPds::Opal1k::ConfigV1::Mirroring e)
+Psana::Opal1k::ConfigV1::Mirroring pds_to_psana(Pds::Opal1k::ConfigV1::Mirroring e)
 {
   return Psana::Opal1k::ConfigV1::Mirroring(e);
 }
@@ -30,7 +30,7 @@ ConfigV1::ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr)
 {
   {
     typedef ndarray<Psana::Camera::FrameCoord, 1> NDArray;
-    typedef ndarray<const PsddlPds::Camera::FrameCoord, 1> XtcNDArray;
+    typedef ndarray<const Pds::Camera::FrameCoord, 1> XtcNDArray;
     const XtcNDArray& xtc_ndarr = xtcPtr->defect_pixel_coordinates();
     _defectPixels_ndarray_storage_ = NDArray(xtc_ndarr.shape());
     NDArray::iterator out = _defectPixels_ndarray_storage_.begin();

@@ -6,13 +6,13 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include "psddl_psana/fccd.ddl.h"
-#include "psddl_pdsdata/fccd.ddl.h"
+#include "pdsdata/psddl/fccd.ddl.h"
 namespace psddl_pds2psana {
 namespace FCCD {
 
 class FccdConfigV1 : public Psana::FCCD::FccdConfigV1 {
 public:
-  typedef PsddlPds::FCCD::FccdConfigV1 XtcType;
+  typedef Pds::FCCD::FccdConfigV1 XtcType;
   typedef Psana::FCCD::FccdConfigV1 PsanaType;
   FccdConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~FccdConfigV1();
@@ -29,7 +29,7 @@ private:
 
 class FccdConfigV2 : public Psana::FCCD::FccdConfigV2 {
 public:
-  typedef PsddlPds::FCCD::FccdConfigV2 XtcType;
+  typedef Pds::FCCD::FccdConfigV2 XtcType;
   typedef Psana::FCCD::FccdConfigV2 PsanaType;
   FccdConfigV2(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~FccdConfigV2();

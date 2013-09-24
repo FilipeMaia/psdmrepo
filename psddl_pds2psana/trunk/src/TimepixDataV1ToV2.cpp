@@ -145,4 +145,10 @@ TimepixDataV1ToV2::depth_bytes() const
   return m_xtcObj->depth_bytes();
 }
 
+uint32_t
+TimepixDataV1ToV2::data_size() const
+{
+  return m_xtcObj->data_size();
+}
+
 } // namespace psddl_pds2psana

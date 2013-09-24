@@ -6,15 +6,15 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include "psddl_psana/camera.ddl.h"
-#include "psddl_pdsdata/camera.ddl.h"
+#include "pdsdata/psddl/camera.ddl.h"
 namespace psddl_pds2psana {
 namespace Camera {
-Psana::Camera::FrameCoord pds_to_psana(PsddlPds::Camera::FrameCoord pds);
+Psana::Camera::FrameCoord pds_to_psana(Pds::Camera::FrameCoord pds);
 
 
 class FrameFccdConfigV1 : public Psana::Camera::FrameFccdConfigV1 {
 public:
-  typedef PsddlPds::Camera::FrameFccdConfigV1 XtcType;
+  typedef Pds::Camera::FrameFccdConfigV1 XtcType;
   typedef Psana::Camera::FrameFccdConfigV1 PsanaType;
   FrameFccdConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~FrameFccdConfigV1();
@@ -26,7 +26,7 @@ private:
 
 class FrameFexConfigV1 : public Psana::Camera::FrameFexConfigV1 {
 public:
-  typedef PsddlPds::Camera::FrameFexConfigV1 XtcType;
+  typedef Pds::Camera::FrameFexConfigV1 XtcType;
   typedef Psana::Camera::FrameFexConfigV1 PsanaType;
   FrameFexConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~FrameFexConfigV1();
@@ -49,7 +49,7 @@ private:
 
 class FrameV1 : public Psana::Camera::FrameV1 {
 public:
-  typedef PsddlPds::Camera::FrameV1 XtcType;
+  typedef Pds::Camera::FrameV1 XtcType;
   typedef Psana::Camera::FrameV1 PsanaType;
   FrameV1(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~FrameV1();
@@ -60,6 +60,7 @@ public:
   virtual ndarray<const uint8_t, 1> _int_pixel_data() const;
   virtual ndarray<const uint8_t, 2> data8() const;
   virtual ndarray<const uint16_t, 2> data16() const;
+  virtual uint32_t depth_bytes() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
@@ -68,7 +69,7 @@ private:
 
 class TwoDGaussianV1 : public Psana::Camera::TwoDGaussianV1 {
 public:
-  typedef PsddlPds::Camera::TwoDGaussianV1 XtcType;
+  typedef Pds::Camera::TwoDGaussianV1 XtcType;
   typedef Psana::Camera::TwoDGaussianV1 PsanaType;
   TwoDGaussianV1(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~TwoDGaussianV1();

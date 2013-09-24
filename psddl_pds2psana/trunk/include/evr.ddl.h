@@ -6,30 +6,30 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include "psddl_psana/evr.ddl.h"
-#include "psddl_pdsdata/evr.ddl.h"
+#include "pdsdata/psddl/evr.ddl.h"
 #include "pdsdata/xtc/DetInfo.hh"
 namespace psddl_pds2psana {
 namespace EvrData {
-Psana::EvrData::PulseConfig pds_to_psana(PsddlPds::EvrData::PulseConfig pds);
+Psana::EvrData::PulseConfig pds_to_psana(Pds::EvrData::PulseConfig pds);
 
-Psana::EvrData::PulseConfigV3 pds_to_psana(PsddlPds::EvrData::PulseConfigV3 pds);
+Psana::EvrData::PulseConfigV3 pds_to_psana(Pds::EvrData::PulseConfigV3 pds);
 
-Psana::EvrData::EventCodeV3 pds_to_psana(PsddlPds::EvrData::EventCodeV3 pds);
+Psana::EvrData::EventCodeV3 pds_to_psana(Pds::EvrData::EventCodeV3 pds);
 
-Psana::EvrData::EventCodeV4 pds_to_psana(PsddlPds::EvrData::EventCodeV4 pds);
+Psana::EvrData::EventCodeV4 pds_to_psana(Pds::EvrData::EventCodeV4 pds);
 
-Psana::EvrData::EventCodeV5 pds_to_psana(PsddlPds::EvrData::EventCodeV5 pds);
+Psana::EvrData::EventCodeV5 pds_to_psana(Pds::EvrData::EventCodeV5 pds);
 
-Psana::EvrData::EventCodeV6 pds_to_psana(PsddlPds::EvrData::EventCodeV6 pds);
+Psana::EvrData::EventCodeV6 pds_to_psana(Pds::EvrData::EventCodeV6 pds);
 
-Psana::EvrData::OutputMap pds_to_psana(PsddlPds::EvrData::OutputMap pds);
+Psana::EvrData::OutputMap pds_to_psana(Pds::EvrData::OutputMap pds);
 
-Psana::EvrData::OutputMapV2 pds_to_psana(PsddlPds::EvrData::OutputMapV2 pds);
+Psana::EvrData::OutputMapV2 pds_to_psana(Pds::EvrData::OutputMapV2 pds);
 
 
 class ConfigV1 : public Psana::EvrData::ConfigV1 {
 public:
-  typedef PsddlPds::EvrData::ConfigV1 XtcType;
+  typedef Pds::EvrData::ConfigV1 XtcType;
   typedef Psana::EvrData::ConfigV1 PsanaType;
   ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~ConfigV1();
@@ -47,7 +47,7 @@ private:
 
 class ConfigV2 : public Psana::EvrData::ConfigV2 {
 public:
-  typedef PsddlPds::EvrData::ConfigV2 XtcType;
+  typedef Pds::EvrData::ConfigV2 XtcType;
   typedef Psana::EvrData::ConfigV2 PsanaType;
   ConfigV2(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~ConfigV2();
@@ -68,7 +68,7 @@ private:
 
 class ConfigV3 : public Psana::EvrData::ConfigV3 {
 public:
-  typedef PsddlPds::EvrData::ConfigV3 XtcType;
+  typedef Pds::EvrData::ConfigV3 XtcType;
   typedef Psana::EvrData::ConfigV3 PsanaType;
   ConfigV3(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~ConfigV3();
@@ -89,7 +89,7 @@ private:
 
 class ConfigV4 : public Psana::EvrData::ConfigV4 {
 public:
-  typedef PsddlPds::EvrData::ConfigV4 XtcType;
+  typedef Pds::EvrData::ConfigV4 XtcType;
   typedef Psana::EvrData::ConfigV4 PsanaType;
   ConfigV4(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~ConfigV4();
@@ -107,12 +107,12 @@ private:
   ndarray<Psana::EvrData::OutputMap, 1> _output_maps_ndarray_storage_;
 };
 
-Psana::EvrData::SequencerEntry pds_to_psana(PsddlPds::EvrData::SequencerEntry pds);
+Psana::EvrData::SequencerEntry pds_to_psana(Pds::EvrData::SequencerEntry pds);
 
 
 class SequencerConfigV1 : public Psana::EvrData::SequencerConfigV1 {
 public:
-  typedef PsddlPds::EvrData::SequencerConfigV1 XtcType;
+  typedef Pds::EvrData::SequencerConfigV1 XtcType;
   typedef Psana::EvrData::SequencerConfigV1 PsanaType;
   SequencerConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~SequencerConfigV1();
@@ -130,7 +130,7 @@ private:
 
 class ConfigV5 : public Psana::EvrData::ConfigV5 {
 public:
-  typedef PsddlPds::EvrData::ConfigV5 XtcType;
+  typedef Pds::EvrData::ConfigV5 XtcType;
   typedef Psana::EvrData::ConfigV5 PsanaType;
   ConfigV5(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~ConfigV5();
@@ -153,7 +153,7 @@ private:
 
 class ConfigV6 : public Psana::EvrData::ConfigV6 {
 public:
-  typedef PsddlPds::EvrData::ConfigV6 XtcType;
+  typedef Pds::EvrData::ConfigV6 XtcType;
   typedef Psana::EvrData::ConfigV6 PsanaType;
   ConfigV6(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~ConfigV6();
@@ -176,7 +176,7 @@ private:
 
 class ConfigV7 : public Psana::EvrData::ConfigV7 {
 public:
-  typedef PsddlPds::EvrData::ConfigV7 XtcType;
+  typedef Pds::EvrData::ConfigV7 XtcType;
   typedef Psana::EvrData::ConfigV7 PsanaType;
   ConfigV7(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~ConfigV7();
@@ -196,12 +196,12 @@ private:
   psddl_pds2psana::EvrData::SequencerConfigV1 _seq_config;
 };
 
-Psana::EvrData::FIFOEvent pds_to_psana(PsddlPds::EvrData::FIFOEvent pds);
+Psana::EvrData::FIFOEvent pds_to_psana(Pds::EvrData::FIFOEvent pds);
 
 
 class DataV3 : public Psana::EvrData::DataV3 {
 public:
-  typedef PsddlPds::EvrData::DataV3 XtcType;
+  typedef Pds::EvrData::DataV3 XtcType;
   typedef Psana::EvrData::DataV3 PsanaType;
   DataV3(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~DataV3();
@@ -213,12 +213,12 @@ private:
   ndarray<Psana::EvrData::FIFOEvent, 1> _fifoEvents_ndarray_storage_;
 };
 
-Psana::EvrData::IOChannel pds_to_psana(PsddlPds::EvrData::IOChannel pds);
+Psana::EvrData::IOChannel pds_to_psana(Pds::EvrData::IOChannel pds);
 
 
 class IOConfigV1 : public Psana::EvrData::IOConfigV1 {
 public:
-  typedef PsddlPds::EvrData::IOConfigV1 XtcType;
+  typedef Pds::EvrData::IOConfigV1 XtcType;
   typedef Psana::EvrData::IOConfigV1 PsanaType;
   IOConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~IOConfigV1();

@@ -23,7 +23,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "psddl_pdsdata/timepix.ddl.h"
+#include "pdsdata/psddl/timepix.ddl.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -41,7 +41,7 @@ namespace psddl_pds2psana {
  *  @ingroup psddl_pds2psana
  *
  *  @brief Special implementation of Psana::Timepix::DataV2 interface
- *  which can be constructed from PsddlPds::Timepix::DataV1 class.
+ *  which can be constructed from Pds::Timepix::DataV1 class.
  *
  *  This special implementation is needed to re-shuffle data inside
  *  DataV1 class which is not usable directly without re-shuffling.
@@ -60,7 +60,7 @@ namespace psddl_pds2psana {
 class TimepixDataV1ToV2 : public Psana::Timepix::DataV2 {
 public:
 
-  typedef PsddlPds::Timepix::DataV1 XtcType;
+  typedef Pds::Timepix::DataV1 XtcType;
   typedef Psana::Timepix::DataV2 PsanaType;
 
   // Default constructor
@@ -77,11 +77,12 @@ public:
   virtual ndarray<const uint16_t, 2> data() const;
   virtual uint32_t depth() const;
   virtual uint32_t depth_bytes() const;
+  virtual uint32_t data_size() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 
 private:
 
-  boost::shared_ptr<const PsddlPds::Timepix::DataV1> m_xtcObj;
+  boost::shared_ptr<const Pds::Timepix::DataV1> m_xtcObj;
   mutable uint16_t* m_data;
 
 };

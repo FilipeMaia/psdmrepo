@@ -9,17 +9,17 @@
 
 namespace psddl_pds2psana {
 namespace ControlData {
-Psana::ControlData::PVControl pds_to_psana(PsddlPds::ControlData::PVControl pds)
+Psana::ControlData::PVControl pds_to_psana(Pds::ControlData::PVControl pds)
 {
   return Psana::ControlData::PVControl(pds.name(), pds.index(), pds.value());
 }
 
-Psana::ControlData::PVMonitor pds_to_psana(PsddlPds::ControlData::PVMonitor pds)
+Psana::ControlData::PVMonitor pds_to_psana(Pds::ControlData::PVMonitor pds)
 {
   return Psana::ControlData::PVMonitor(pds.name(), pds.index(), pds.loValue(), pds.hiValue());
 }
 
-Psana::ControlData::PVLabel pds_to_psana(PsddlPds::ControlData::PVLabel pds)
+Psana::ControlData::PVLabel pds_to_psana(Pds::ControlData::PVLabel pds)
 {
   return Psana::ControlData::PVLabel(pds.name(), pds.value());
 }
@@ -31,7 +31,7 @@ ConfigV1::ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr)
 {
   {
     typedef ndarray<Psana::ControlData::PVControl, 1> NDArray;
-    typedef ndarray<const PsddlPds::ControlData::PVControl, 1> XtcNDArray;
+    typedef ndarray<const Pds::ControlData::PVControl, 1> XtcNDArray;
     const XtcNDArray& xtc_ndarr = xtcPtr->pvControls();
     _pvControls_ndarray_storage_ = NDArray(xtc_ndarr.shape());
     NDArray::iterator out = _pvControls_ndarray_storage_.begin();
@@ -41,7 +41,7 @@ ConfigV1::ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr)
   }
   {
     typedef ndarray<Psana::ControlData::PVMonitor, 1> NDArray;
-    typedef ndarray<const PsddlPds::ControlData::PVMonitor, 1> XtcNDArray;
+    typedef ndarray<const Pds::ControlData::PVMonitor, 1> XtcNDArray;
     const XtcNDArray& xtc_ndarr = xtcPtr->pvMonitors();
     _pvMonitors_ndarray_storage_ = NDArray(xtc_ndarr.shape());
     NDArray::iterator out = _pvMonitors_ndarray_storage_.begin();
@@ -89,7 +89,7 @@ ConfigV2::ConfigV2(const boost::shared_ptr<const XtcType>& xtcPtr)
 {
   {
     typedef ndarray<Psana::ControlData::PVControl, 1> NDArray;
-    typedef ndarray<const PsddlPds::ControlData::PVControl, 1> XtcNDArray;
+    typedef ndarray<const Pds::ControlData::PVControl, 1> XtcNDArray;
     const XtcNDArray& xtc_ndarr = xtcPtr->pvControls();
     _pvControls_ndarray_storage_ = NDArray(xtc_ndarr.shape());
     NDArray::iterator out = _pvControls_ndarray_storage_.begin();
@@ -99,7 +99,7 @@ ConfigV2::ConfigV2(const boost::shared_ptr<const XtcType>& xtcPtr)
   }
   {
     typedef ndarray<Psana::ControlData::PVMonitor, 1> NDArray;
-    typedef ndarray<const PsddlPds::ControlData::PVMonitor, 1> XtcNDArray;
+    typedef ndarray<const Pds::ControlData::PVMonitor, 1> XtcNDArray;
     const XtcNDArray& xtc_ndarr = xtcPtr->pvMonitors();
     _pvMonitors_ndarray_storage_ = NDArray(xtc_ndarr.shape());
     NDArray::iterator out = _pvMonitors_ndarray_storage_.begin();
@@ -109,7 +109,7 @@ ConfigV2::ConfigV2(const boost::shared_ptr<const XtcType>& xtcPtr)
   }
   {
     typedef ndarray<Psana::ControlData::PVLabel, 1> NDArray;
-    typedef ndarray<const PsddlPds::ControlData::PVLabel, 1> XtcNDArray;
+    typedef ndarray<const Pds::ControlData::PVLabel, 1> XtcNDArray;
     const XtcNDArray& xtc_ndarr = xtcPtr->pvLabels();
     _pvLabels_ndarray_storage_ = NDArray(xtc_ndarr.shape());
     NDArray::iterator out = _pvLabels_ndarray_storage_.begin();

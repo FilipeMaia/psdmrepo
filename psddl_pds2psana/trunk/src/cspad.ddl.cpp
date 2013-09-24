@@ -9,12 +9,12 @@
 
 namespace psddl_pds2psana {
 namespace CsPad {
-Psana::CsPad::RunModes pds_to_psana(PsddlPds::CsPad::RunModes e)
+Psana::CsPad::RunModes pds_to_psana(Pds::CsPad::RunModes e)
 {
   return Psana::CsPad::RunModes(e);
 }
 
-Psana::CsPad::DataModes pds_to_psana(PsddlPds::CsPad::DataModes e)
+Psana::CsPad::DataModes pds_to_psana(Pds::CsPad::DataModes e)
 {
   return Psana::CsPad::DataModes(e);
 }
@@ -33,12 +33,12 @@ ndarray<const uint8_t, 1> CsPadDigitalPotsCfg::pots() const {
   return m_xtcObj->pots(m_xtcObj);
 }
 
-Psana::CsPad::CsPadReadOnlyCfg pds_to_psana(PsddlPds::CsPad::CsPadReadOnlyCfg pds)
+Psana::CsPad::CsPadReadOnlyCfg pds_to_psana(Pds::CsPad::CsPadReadOnlyCfg pds)
 {
   return Psana::CsPad::CsPadReadOnlyCfg(pds.shiftTest(), pds.version());
 }
 
-Psana::CsPad::ProtectionSystemThreshold pds_to_psana(PsddlPds::CsPad::ProtectionSystemThreshold pds)
+Psana::CsPad::ProtectionSystemThreshold pds_to_psana(Pds::CsPad::ProtectionSystemThreshold pds)
 {
   return Psana::CsPad::ProtectionSystemThreshold(pds.adcThreshold(), pds.pixelCountThreshold());
 }
@@ -61,8 +61,8 @@ ConfigV1QuadReg::ConfigV1QuadReg(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::CsPad::ConfigV1QuadReg()
   , m_xtcObj(xtcPtr)
   , _readOnly(psddl_pds2psana::CsPad::pds_to_psana(xtcPtr->ro()))
-  , _digitalPots(boost::shared_ptr<const PsddlPds::CsPad::CsPadDigitalPotsCfg>(xtcPtr, &xtcPtr->dp()))
-  , _gainMap(boost::shared_ptr<const PsddlPds::CsPad::CsPadGainMapCfg>(xtcPtr, &xtcPtr->gm()))
+  , _digitalPots(boost::shared_ptr<const Pds::CsPad::CsPadDigitalPotsCfg>(xtcPtr, &xtcPtr->dp()))
+  , _gainMap(boost::shared_ptr<const Pds::CsPad::CsPadGainMapCfg>(xtcPtr, &xtcPtr->gm()))
 {
 }
 ConfigV1QuadReg::~ConfigV1QuadReg()
@@ -136,8 +136,8 @@ ConfigV2QuadReg::ConfigV2QuadReg(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::CsPad::ConfigV2QuadReg()
   , m_xtcObj(xtcPtr)
   , _readOnly(psddl_pds2psana::CsPad::pds_to_psana(xtcPtr->ro()))
-  , _digitalPots(boost::shared_ptr<const PsddlPds::CsPad::CsPadDigitalPotsCfg>(xtcPtr, &xtcPtr->dp()))
-  , _gainMap(boost::shared_ptr<const PsddlPds::CsPad::CsPadGainMapCfg>(xtcPtr, &xtcPtr->gm()))
+  , _digitalPots(boost::shared_ptr<const Pds::CsPad::CsPadDigitalPotsCfg>(xtcPtr, &xtcPtr->dp()))
+  , _gainMap(boost::shared_ptr<const Pds::CsPad::CsPadGainMapCfg>(xtcPtr, &xtcPtr->gm()))
 {
 }
 ConfigV2QuadReg::~ConfigV2QuadReg()
@@ -226,8 +226,8 @@ ConfigV3QuadReg::ConfigV3QuadReg(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::CsPad::ConfigV3QuadReg()
   , m_xtcObj(xtcPtr)
   , _readOnly(psddl_pds2psana::CsPad::pds_to_psana(xtcPtr->ro()))
-  , _digitalPots(boost::shared_ptr<const PsddlPds::CsPad::CsPadDigitalPotsCfg>(xtcPtr, &xtcPtr->dp()))
-  , _gainMap(boost::shared_ptr<const PsddlPds::CsPad::CsPadGainMapCfg>(xtcPtr, &xtcPtr->gm()))
+  , _digitalPots(boost::shared_ptr<const Pds::CsPad::CsPadDigitalPotsCfg>(xtcPtr, &xtcPtr->dp()))
+  , _gainMap(boost::shared_ptr<const Pds::CsPad::CsPadGainMapCfg>(xtcPtr, &xtcPtr->gm()))
 {
 }
 ConfigV3QuadReg::~ConfigV3QuadReg()
@@ -330,8 +330,8 @@ ConfigV1::ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr)
     const std::vector<int>& dims = xtcPtr->quads_shape();
     _quads.reserve(dims[0]);
     for (int i0=0; i0 != dims[0]; ++i0) {
-      const PsddlPds::CsPad::ConfigV1QuadReg& d = xtcPtr->quads(i0);
-      boost::shared_ptr<const PsddlPds::CsPad::ConfigV1QuadReg> dPtr(m_xtcObj, &d);
+      const Pds::CsPad::ConfigV1QuadReg& d = xtcPtr->quads(i0);
+      boost::shared_ptr<const Pds::CsPad::ConfigV1QuadReg> dPtr(m_xtcObj, &d);
       _quads.push_back(psddl_pds2psana::CsPad::ConfigV1QuadReg(dPtr));
     }
   }
@@ -427,8 +427,8 @@ ConfigV2::ConfigV2(const boost::shared_ptr<const XtcType>& xtcPtr)
     const std::vector<int>& dims = xtcPtr->quads_shape();
     _quads.reserve(dims[0]);
     for (int i0=0; i0 != dims[0]; ++i0) {
-      const PsddlPds::CsPad::ConfigV1QuadReg& d = xtcPtr->quads(i0);
-      boost::shared_ptr<const PsddlPds::CsPad::ConfigV1QuadReg> dPtr(m_xtcObj, &d);
+      const Pds::CsPad::ConfigV1QuadReg& d = xtcPtr->quads(i0);
+      boost::shared_ptr<const Pds::CsPad::ConfigV1QuadReg> dPtr(m_xtcObj, &d);
       _quads.push_back(psddl_pds2psana::CsPad::ConfigV1QuadReg(dPtr));
     }
   }
@@ -537,7 +537,7 @@ ConfigV3::ConfigV3(const boost::shared_ptr<const XtcType>& xtcPtr)
 {
   {
     typedef ndarray<Psana::CsPad::ProtectionSystemThreshold, 1> NDArray;
-    typedef ndarray<const PsddlPds::CsPad::ProtectionSystemThreshold, 1> XtcNDArray;
+    typedef ndarray<const Pds::CsPad::ProtectionSystemThreshold, 1> XtcNDArray;
     const XtcNDArray& xtc_ndarr = xtcPtr->protectionThresholds();
     _protectionThresholds_ndarray_storage_ = NDArray(xtc_ndarr.shape());
     NDArray::iterator out = _protectionThresholds_ndarray_storage_.begin();
@@ -549,8 +549,8 @@ ConfigV3::ConfigV3(const boost::shared_ptr<const XtcType>& xtcPtr)
     const std::vector<int>& dims = xtcPtr->quads_shape();
     _quads.reserve(dims[0]);
     for (int i0=0; i0 != dims[0]; ++i0) {
-      const PsddlPds::CsPad::ConfigV1QuadReg& d = xtcPtr->quads(i0);
-      boost::shared_ptr<const PsddlPds::CsPad::ConfigV1QuadReg> dPtr(m_xtcObj, &d);
+      const Pds::CsPad::ConfigV1QuadReg& d = xtcPtr->quads(i0);
+      boost::shared_ptr<const Pds::CsPad::ConfigV1QuadReg> dPtr(m_xtcObj, &d);
       _quads.push_back(psddl_pds2psana::CsPad::ConfigV1QuadReg(dPtr));
     }
   }
@@ -665,7 +665,7 @@ ConfigV4::ConfigV4(const boost::shared_ptr<const XtcType>& xtcPtr)
 {
   {
     typedef ndarray<Psana::CsPad::ProtectionSystemThreshold, 1> NDArray;
-    typedef ndarray<const PsddlPds::CsPad::ProtectionSystemThreshold, 1> XtcNDArray;
+    typedef ndarray<const Pds::CsPad::ProtectionSystemThreshold, 1> XtcNDArray;
     const XtcNDArray& xtc_ndarr = xtcPtr->protectionThresholds();
     _protectionThresholds_ndarray_storage_ = NDArray(xtc_ndarr.shape());
     NDArray::iterator out = _protectionThresholds_ndarray_storage_.begin();
@@ -677,8 +677,8 @@ ConfigV4::ConfigV4(const boost::shared_ptr<const XtcType>& xtcPtr)
     const std::vector<int>& dims = xtcPtr->quads_shape();
     _quads.reserve(dims[0]);
     for (int i0=0; i0 != dims[0]; ++i0) {
-      const PsddlPds::CsPad::ConfigV2QuadReg& d = xtcPtr->quads(i0);
-      boost::shared_ptr<const PsddlPds::CsPad::ConfigV2QuadReg> dPtr(m_xtcObj, &d);
+      const Pds::CsPad::ConfigV2QuadReg& d = xtcPtr->quads(i0);
+      boost::shared_ptr<const Pds::CsPad::ConfigV2QuadReg> dPtr(m_xtcObj, &d);
       _quads.push_back(psddl_pds2psana::CsPad::ConfigV2QuadReg(dPtr));
     }
   }
@@ -793,7 +793,7 @@ ConfigV5::ConfigV5(const boost::shared_ptr<const XtcType>& xtcPtr)
 {
   {
     typedef ndarray<Psana::CsPad::ProtectionSystemThreshold, 1> NDArray;
-    typedef ndarray<const PsddlPds::CsPad::ProtectionSystemThreshold, 1> XtcNDArray;
+    typedef ndarray<const Pds::CsPad::ProtectionSystemThreshold, 1> XtcNDArray;
     const XtcNDArray& xtc_ndarr = xtcPtr->protectionThresholds();
     _protectionThresholds_ndarray_storage_ = NDArray(xtc_ndarr.shape());
     NDArray::iterator out = _protectionThresholds_ndarray_storage_.begin();
@@ -805,8 +805,8 @@ ConfigV5::ConfigV5(const boost::shared_ptr<const XtcType>& xtcPtr)
     const std::vector<int>& dims = xtcPtr->quads_shape();
     _quads.reserve(dims[0]);
     for (int i0=0; i0 != dims[0]; ++i0) {
-      const PsddlPds::CsPad::ConfigV3QuadReg& d = xtcPtr->quads(i0);
-      boost::shared_ptr<const PsddlPds::CsPad::ConfigV3QuadReg> dPtr(m_xtcObj, &d);
+      const Pds::CsPad::ConfigV3QuadReg& d = xtcPtr->quads(i0);
+      boost::shared_ptr<const Pds::CsPad::ConfigV3QuadReg> dPtr(m_xtcObj, &d);
       _quads.push_back(psddl_pds2psana::CsPad::ConfigV3QuadReg(dPtr));
     }
   }
@@ -1016,11 +1016,11 @@ float ElementV1<Config>::common_mode(uint32_t section) const {
   return m_xtcObj->common_mode(section);
 }
 
-template class ElementV1<PsddlPds::CsPad::ConfigV1>;
-template class ElementV1<PsddlPds::CsPad::ConfigV2>;
-template class ElementV1<PsddlPds::CsPad::ConfigV3>;
-template class ElementV1<PsddlPds::CsPad::ConfigV4>;
-template class ElementV1<PsddlPds::CsPad::ConfigV5>;
+template class ElementV1<Pds::CsPad::ConfigV1>;
+template class ElementV1<Pds::CsPad::ConfigV2>;
+template class ElementV1<Pds::CsPad::ConfigV3>;
+template class ElementV1<Pds::CsPad::ConfigV4>;
+template class ElementV1<Pds::CsPad::ConfigV5>;
 template <typename Config>
 DataV1<Config>::DataV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const Config>& cfgPtr)
   : Psana::CsPad::DataV1()
@@ -1031,8 +1031,8 @@ DataV1<Config>::DataV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boo
     const std::vector<int>& dims = xtcPtr->quads_shape(*cfgPtr);
     _quads.reserve(dims[0]);
     for (int i0=0; i0 != dims[0]; ++i0) {
-      const PsddlPds::CsPad::ElementV1& d = xtcPtr->quads(*cfgPtr, i0);
-      boost::shared_ptr<const PsddlPds::CsPad::ElementV1> dPtr(m_xtcObj, &d);
+      const Pds::CsPad::ElementV1& d = xtcPtr->quads(*cfgPtr, i0);
+      boost::shared_ptr<const Pds::CsPad::ElementV1> dPtr(m_xtcObj, &d);
       _quads.push_back(psddl_pds2psana::CsPad::ElementV1<Config>(dPtr, cfgPtr));
     }
   }
@@ -1053,11 +1053,11 @@ std::vector<int> DataV1<Config>::quads_shape() const
   return shape;
 }
 
-template class DataV1<PsddlPds::CsPad::ConfigV1>;
-template class DataV1<PsddlPds::CsPad::ConfigV2>;
-template class DataV1<PsddlPds::CsPad::ConfigV3>;
-template class DataV1<PsddlPds::CsPad::ConfigV4>;
-template class DataV1<PsddlPds::CsPad::ConfigV5>;
+template class DataV1<Pds::CsPad::ConfigV1>;
+template class DataV1<Pds::CsPad::ConfigV2>;
+template class DataV1<Pds::CsPad::ConfigV3>;
+template class DataV1<Pds::CsPad::ConfigV4>;
+template class DataV1<Pds::CsPad::ConfigV5>;
 template <typename Config>
 ElementV2<Config>::ElementV2(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const Config>& cfgPtr)
   : Psana::CsPad::ElementV2()
@@ -1154,10 +1154,10 @@ float ElementV2<Config>::common_mode(uint32_t section) const {
   return m_xtcObj->common_mode(section);
 }
 
-template class ElementV2<PsddlPds::CsPad::ConfigV2>;
-template class ElementV2<PsddlPds::CsPad::ConfigV3>;
-template class ElementV2<PsddlPds::CsPad::ConfigV4>;
-template class ElementV2<PsddlPds::CsPad::ConfigV5>;
+template class ElementV2<Pds::CsPad::ConfigV2>;
+template class ElementV2<Pds::CsPad::ConfigV3>;
+template class ElementV2<Pds::CsPad::ConfigV4>;
+template class ElementV2<Pds::CsPad::ConfigV5>;
 template <typename Config>
 DataV2<Config>::DataV2(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const Config>& cfgPtr)
   : Psana::CsPad::DataV2()
@@ -1168,8 +1168,8 @@ DataV2<Config>::DataV2(const boost::shared_ptr<const XtcType>& xtcPtr, const boo
     const std::vector<int>& dims = xtcPtr->quads_shape(*cfgPtr);
     _quads.reserve(dims[0]);
     for (int i0=0; i0 != dims[0]; ++i0) {
-      const PsddlPds::CsPad::ElementV2& d = xtcPtr->quads(*cfgPtr, i0);
-      boost::shared_ptr<const PsddlPds::CsPad::ElementV2> dPtr(m_xtcObj, &d);
+      const Pds::CsPad::ElementV2& d = xtcPtr->quads(*cfgPtr, i0);
+      boost::shared_ptr<const Pds::CsPad::ElementV2> dPtr(m_xtcObj, &d);
       _quads.push_back(psddl_pds2psana::CsPad::ElementV2<Config>(dPtr, cfgPtr));
     }
   }
@@ -1190,9 +1190,9 @@ std::vector<int> DataV2<Config>::quads_shape() const
   return shape;
 }
 
-template class DataV2<PsddlPds::CsPad::ConfigV2>;
-template class DataV2<PsddlPds::CsPad::ConfigV3>;
-template class DataV2<PsddlPds::CsPad::ConfigV4>;
-template class DataV2<PsddlPds::CsPad::ConfigV5>;
+template class DataV2<Pds::CsPad::ConfigV2>;
+template class DataV2<Pds::CsPad::ConfigV3>;
+template class DataV2<Pds::CsPad::ConfigV4>;
+template class DataV2<Pds::CsPad::ConfigV5>;
 } // namespace CsPad
 } // namespace psddl_pds2psana

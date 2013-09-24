@@ -6,13 +6,13 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include "psddl_psana/oceanoptics.ddl.h"
-#include "psddl_pdsdata/oceanoptics.ddl.h"
+#include "pdsdata/psddl/oceanoptics.ddl.h"
 namespace psddl_pds2psana {
 namespace OceanOptics {
 
 class ConfigV1 : public Psana::OceanOptics::ConfigV1 {
 public:
-  typedef PsddlPds::OceanOptics::ConfigV1 XtcType;
+  typedef Pds::OceanOptics::ConfigV1 XtcType;
   typedef Psana::OceanOptics::ConfigV1 PsanaType;
   ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~ConfigV1();
@@ -25,13 +25,13 @@ private:
   boost::shared_ptr<const XtcType> m_xtcObj;
 };
 
-Psana::OceanOptics::timespec64 pds_to_psana(PsddlPds::OceanOptics::timespec64 pds);
+Psana::OceanOptics::timespec64 pds_to_psana(Pds::OceanOptics::timespec64 pds);
 
 
 template <typename Config>
 class DataV1 : public Psana::OceanOptics::DataV1 {
 public:
-  typedef PsddlPds::OceanOptics::DataV1 XtcType;
+  typedef Pds::OceanOptics::DataV1 XtcType;
   typedef Psana::OceanOptics::DataV1 PsanaType;
   DataV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const Config>& cfgPtr);
   virtual ~DataV1();

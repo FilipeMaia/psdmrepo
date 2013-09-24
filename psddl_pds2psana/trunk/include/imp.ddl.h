@@ -6,13 +6,13 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include "psddl_psana/imp.ddl.h"
-#include "psddl_pdsdata/imp.ddl.h"
+#include "pdsdata/psddl/imp.ddl.h"
 namespace psddl_pds2psana {
 namespace Imp {
 
 class ConfigV1 : public Psana::Imp::ConfigV1 {
 public:
-  typedef PsddlPds::Imp::ConfigV1 XtcType;
+  typedef Pds::Imp::ConfigV1 XtcType;
   typedef Psana::Imp::ConfigV1 PsanaType;
   ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~ConfigV1();
@@ -31,15 +31,15 @@ private:
   boost::shared_ptr<const XtcType> m_xtcObj;
 };
 
-Psana::Imp::Sample pds_to_psana(PsddlPds::Imp::Sample pds);
+Psana::Imp::Sample pds_to_psana(Pds::Imp::Sample pds);
 
-Psana::Imp::LaneStatus pds_to_psana(PsddlPds::Imp::LaneStatus pds);
+Psana::Imp::LaneStatus pds_to_psana(Pds::Imp::LaneStatus pds);
 
 
 template <typename Config>
 class ElementV1 : public Psana::Imp::ElementV1 {
 public:
-  typedef PsddlPds::Imp::ElementV1 XtcType;
+  typedef Pds::Imp::ElementV1 XtcType;
   typedef Psana::Imp::ElementV1 PsanaType;
   ElementV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const Config>& cfgPtr);
   virtual ~ElementV1();

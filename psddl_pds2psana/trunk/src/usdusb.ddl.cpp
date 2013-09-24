@@ -9,12 +9,12 @@
 
 namespace psddl_pds2psana {
 namespace UsdUsb {
-Psana::UsdUsb::ConfigV1::Count_Mode pds_to_psana(PsddlPds::UsdUsb::ConfigV1::Count_Mode e)
+Psana::UsdUsb::ConfigV1::Count_Mode pds_to_psana(Pds::UsdUsb::ConfigV1::Count_Mode e)
 {
   return Psana::UsdUsb::ConfigV1::Count_Mode(e);
 }
 
-Psana::UsdUsb::ConfigV1::Quad_Mode pds_to_psana(PsddlPds::UsdUsb::ConfigV1::Quad_Mode e)
+Psana::UsdUsb::ConfigV1::Quad_Mode pds_to_psana(Pds::UsdUsb::ConfigV1::Quad_Mode e)
 {
   return Psana::UsdUsb::ConfigV1::Quad_Mode(e);
 }

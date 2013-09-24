@@ -145,8 +145,8 @@ ndarray<const uint16_t, 2> FrameV1<Config>::data() const {
   return m_xtcObj->data(*m_cfgPtr);
 }
 
-template class FrameV1<PsddlPds::PNCCD::ConfigV1>;
-template class FrameV1<PsddlPds::PNCCD::ConfigV2>;
+template class FrameV1<Pds::PNCCD::ConfigV1>;
+template class FrameV1<Pds::PNCCD::ConfigV2>;
 FullFrameV1::FullFrameV1(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::PNCCD::FullFrameV1()
   , m_xtcObj(xtcPtr)
@@ -191,8 +191,8 @@ FramesV1<Config>::FramesV1(const boost::shared_ptr<const XtcType>& xtcPtr, const
     const std::vector<int>& dims = xtcPtr->frame_shape(*cfgPtr);
     _frames.reserve(dims[0]);
     for (int i0=0; i0 != dims[0]; ++i0) {
-      const PsddlPds::PNCCD::FrameV1& d = xtcPtr->frame(*cfgPtr, i0);
-      boost::shared_ptr<const PsddlPds::PNCCD::FrameV1> dPtr(m_xtcObj, &d);
+      const Pds::PNCCD::FrameV1& d = xtcPtr->frame(*cfgPtr, i0);
+      boost::shared_ptr<const Pds::PNCCD::FrameV1> dPtr(m_xtcObj, &d);
       _frames.push_back(psddl_pds2psana::PNCCD::FrameV1<Config>(dPtr, cfgPtr));
     }
   }
@@ -219,7 +219,7 @@ std::vector<int> FramesV1<Config>::frame_shape() const
   return shape;
 }
 
-template class FramesV1<PsddlPds::PNCCD::ConfigV1>;
-template class FramesV1<PsddlPds::PNCCD::ConfigV2>;
+template class FramesV1<Pds::PNCCD::ConfigV1>;
+template class FramesV1<Pds::PNCCD::ConfigV2>;
 } // namespace PNCCD
 } // namespace psddl_pds2psana

@@ -7,8 +7,8 @@ files="psddldata/data/[a-w]*.ddl.xml"
 
 for f in $files ; do 
     psddlc -b pds2psana -I data -E psddl_pds2psana/include -O psddl_pds2psana/src -i psddl_pds2psana -t psddl_pds2psana \
-        -B psana-inc:psddl_psana -B pdsdata-inc:psddl_pdsdata -B psana-ns:Psana -B pdsdata-ns:PsddlPds $f
+        -B psana-inc:psddl_psana -B pdsdata-inc:pdsdata/psddl -B psana-ns:Psana -B pdsdata-ns:Pds $f
 done
 
 psddlc -b pds2psana-dispatch -I data -e psddl_pds2psana/include/dispatch.h -o psddl_pds2psana/src/dispatch.cpp \
-        -i psddl_pds2psana -t psddl_pds2psana -B psana-ns:Psana -B pdsdata-ns:PsddlPds $files
+        -i psddl_pds2psana -t psddl_pds2psana -B psana-ns:Psana -B pdsdata-ns:Pds $files

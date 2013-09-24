@@ -6,13 +6,13 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include "psddl_psana/orca.ddl.h"
-#include "psddl_pdsdata/orca.ddl.h"
+#include "pdsdata/psddl/orca.ddl.h"
 namespace psddl_pds2psana {
 namespace Orca {
 
 class ConfigV1 : public Psana::Orca::ConfigV1 {
 public:
-  typedef PsddlPds::Orca::ConfigV1 XtcType;
+  typedef Pds::Orca::ConfigV1 XtcType;
   typedef Psana::Orca::ConfigV1 PsanaType;
   ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~ConfigV1();

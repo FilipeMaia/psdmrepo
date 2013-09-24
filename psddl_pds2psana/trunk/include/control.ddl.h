@@ -6,20 +6,20 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include "psddl_psana/control.ddl.h"
-#include "psddl_pdsdata/control.ddl.h"
+#include "pdsdata/psddl/control.ddl.h"
 #include "pdsdata/xtc/ClockTime.hh"
 namespace psddl_pds2psana {
 namespace ControlData {
-Psana::ControlData::PVControl pds_to_psana(PsddlPds::ControlData::PVControl pds);
+Psana::ControlData::PVControl pds_to_psana(Pds::ControlData::PVControl pds);
 
-Psana::ControlData::PVMonitor pds_to_psana(PsddlPds::ControlData::PVMonitor pds);
+Psana::ControlData::PVMonitor pds_to_psana(Pds::ControlData::PVMonitor pds);
 
-Psana::ControlData::PVLabel pds_to_psana(PsddlPds::ControlData::PVLabel pds);
+Psana::ControlData::PVLabel pds_to_psana(Pds::ControlData::PVLabel pds);
 
 
 class ConfigV1 : public Psana::ControlData::ConfigV1 {
 public:
-  typedef PsddlPds::ControlData::ConfigV1 XtcType;
+  typedef Pds::ControlData::ConfigV1 XtcType;
   typedef Psana::ControlData::ConfigV1 PsanaType;
   ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~ConfigV1();
@@ -42,7 +42,7 @@ private:
 
 class ConfigV2 : public Psana::ControlData::ConfigV2 {
 public:
-  typedef PsddlPds::ControlData::ConfigV2 XtcType;
+  typedef Pds::ControlData::ConfigV2 XtcType;
   typedef Psana::ControlData::ConfigV2 PsanaType;
   ConfigV2(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~ConfigV2();

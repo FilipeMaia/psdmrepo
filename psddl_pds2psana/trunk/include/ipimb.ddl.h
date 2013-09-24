@@ -6,13 +6,13 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include "psddl_psana/ipimb.ddl.h"
-#include "psddl_pdsdata/ipimb.ddl.h"
+#include "pdsdata/psddl/ipimb.ddl.h"
 namespace psddl_pds2psana {
 namespace Ipimb {
 
 class ConfigV1 : public Psana::Ipimb::ConfigV1 {
 public:
-  typedef PsddlPds::Ipimb::ConfigV1 XtcType;
+  typedef Pds::Ipimb::ConfigV1 XtcType;
   typedef Psana::Ipimb::ConfigV1 PsanaType;
   ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~ConfigV1();
@@ -38,7 +38,7 @@ private:
 
 class ConfigV2 : public Psana::Ipimb::ConfigV2 {
 public:
-  typedef PsddlPds::Ipimb::ConfigV2 XtcType;
+  typedef Pds::Ipimb::ConfigV2 XtcType;
   typedef Psana::Ipimb::ConfigV2 PsanaType;
   ConfigV2(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~ConfigV2();
@@ -66,7 +66,7 @@ private:
 
 class DataV1 : public Psana::Ipimb::DataV1 {
 public:
-  typedef PsddlPds::Ipimb::DataV1 XtcType;
+  typedef Pds::Ipimb::DataV1 XtcType;
   typedef Psana::Ipimb::DataV1 PsanaType;
   DataV1(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~DataV1();
@@ -91,7 +91,7 @@ private:
 
 class DataV2 : public Psana::Ipimb::DataV2 {
 public:
-  typedef PsddlPds::Ipimb::DataV2 XtcType;
+  typedef Pds::Ipimb::DataV2 XtcType;
   typedef Psana::Ipimb::DataV2 PsanaType;
   DataV2(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~DataV2();

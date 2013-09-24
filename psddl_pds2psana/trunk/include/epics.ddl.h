@@ -6,43 +6,43 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include "psddl_psana/epics.ddl.h"
-#include "psddl_pdsdata/epics.ddl.h"
+#include "pdsdata/psddl/epics.ddl.h"
 namespace psddl_pds2psana {
 namespace Epics {
-Psana::Epics::epicsTimeStamp pds_to_psana(PsddlPds::Epics::epicsTimeStamp pds);
+Psana::Epics::epicsTimeStamp pds_to_psana(Pds::Epics::epicsTimeStamp pds);
 
-Psana::Epics::dbr_time_string pds_to_psana(PsddlPds::Epics::dbr_time_string pds);
+Psana::Epics::dbr_time_string pds_to_psana(Pds::Epics::dbr_time_string pds);
 
-Psana::Epics::dbr_time_short pds_to_psana(PsddlPds::Epics::dbr_time_short pds);
+Psana::Epics::dbr_time_short pds_to_psana(Pds::Epics::dbr_time_short pds);
 
-Psana::Epics::dbr_time_float pds_to_psana(PsddlPds::Epics::dbr_time_float pds);
+Psana::Epics::dbr_time_float pds_to_psana(Pds::Epics::dbr_time_float pds);
 
-Psana::Epics::dbr_time_enum pds_to_psana(PsddlPds::Epics::dbr_time_enum pds);
+Psana::Epics::dbr_time_enum pds_to_psana(Pds::Epics::dbr_time_enum pds);
 
-Psana::Epics::dbr_time_char pds_to_psana(PsddlPds::Epics::dbr_time_char pds);
+Psana::Epics::dbr_time_char pds_to_psana(Pds::Epics::dbr_time_char pds);
 
-Psana::Epics::dbr_time_long pds_to_psana(PsddlPds::Epics::dbr_time_long pds);
+Psana::Epics::dbr_time_long pds_to_psana(Pds::Epics::dbr_time_long pds);
 
-Psana::Epics::dbr_time_double pds_to_psana(PsddlPds::Epics::dbr_time_double pds);
+Psana::Epics::dbr_time_double pds_to_psana(Pds::Epics::dbr_time_double pds);
 
-Psana::Epics::dbr_sts_string pds_to_psana(PsddlPds::Epics::dbr_sts_string pds);
+Psana::Epics::dbr_sts_string pds_to_psana(Pds::Epics::dbr_sts_string pds);
 
-Psana::Epics::dbr_ctrl_short pds_to_psana(PsddlPds::Epics::dbr_ctrl_short pds);
+Psana::Epics::dbr_ctrl_short pds_to_psana(Pds::Epics::dbr_ctrl_short pds);
 
-Psana::Epics::dbr_ctrl_float pds_to_psana(PsddlPds::Epics::dbr_ctrl_float pds);
+Psana::Epics::dbr_ctrl_float pds_to_psana(Pds::Epics::dbr_ctrl_float pds);
 
-Psana::Epics::dbr_ctrl_enum pds_to_psana(PsddlPds::Epics::dbr_ctrl_enum pds);
+Psana::Epics::dbr_ctrl_enum pds_to_psana(Pds::Epics::dbr_ctrl_enum pds);
 
-Psana::Epics::dbr_ctrl_char pds_to_psana(PsddlPds::Epics::dbr_ctrl_char pds);
+Psana::Epics::dbr_ctrl_char pds_to_psana(Pds::Epics::dbr_ctrl_char pds);
 
-Psana::Epics::dbr_ctrl_long pds_to_psana(PsddlPds::Epics::dbr_ctrl_long pds);
+Psana::Epics::dbr_ctrl_long pds_to_psana(Pds::Epics::dbr_ctrl_long pds);
 
-Psana::Epics::dbr_ctrl_double pds_to_psana(PsddlPds::Epics::dbr_ctrl_double pds);
+Psana::Epics::dbr_ctrl_double pds_to_psana(Pds::Epics::dbr_ctrl_double pds);
 
 
 class EpicsPvHeader : public Psana::Epics::EpicsPvHeader {
 public:
-  typedef PsddlPds::Epics::EpicsPvHeader XtcType;
+  typedef Pds::Epics::EpicsPvHeader XtcType;
   typedef Psana::Epics::EpicsPvHeader PsanaType;
   EpicsPvHeader(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~EpicsPvHeader();
@@ -61,7 +61,7 @@ private:
 
 class EpicsPvCtrlHeader : public Psana::Epics::EpicsPvCtrlHeader {
 public:
-  typedef PsddlPds::Epics::EpicsPvCtrlHeader XtcType;
+  typedef Pds::Epics::EpicsPvCtrlHeader XtcType;
   typedef Psana::Epics::EpicsPvCtrlHeader PsanaType;
   EpicsPvCtrlHeader(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~EpicsPvCtrlHeader();
@@ -81,7 +81,7 @@ private:
 
 class EpicsPvTimeHeader : public Psana::Epics::EpicsPvTimeHeader {
 public:
-  typedef PsddlPds::Epics::EpicsPvTimeHeader XtcType;
+  typedef Pds::Epics::EpicsPvTimeHeader XtcType;
   typedef Psana::Epics::EpicsPvTimeHeader PsanaType;
   EpicsPvTimeHeader(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~EpicsPvTimeHeader();
@@ -101,7 +101,7 @@ private:
 
 class EpicsPvCtrlString : public Psana::Epics::EpicsPvCtrlString {
 public:
-  typedef PsddlPds::Epics::EpicsPvCtrlString XtcType;
+  typedef Pds::Epics::EpicsPvCtrlString XtcType;
   typedef Psana::Epics::EpicsPvCtrlString PsanaType;
   EpicsPvCtrlString(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~EpicsPvCtrlString();
@@ -126,7 +126,7 @@ private:
 
 class EpicsPvCtrlShort : public Psana::Epics::EpicsPvCtrlShort {
 public:
-  typedef PsddlPds::Epics::EpicsPvCtrlShort XtcType;
+  typedef Pds::Epics::EpicsPvCtrlShort XtcType;
   typedef Psana::Epics::EpicsPvCtrlShort PsanaType;
   EpicsPvCtrlShort(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~EpicsPvCtrlShort();
@@ -150,7 +150,7 @@ private:
 
 class EpicsPvCtrlFloat : public Psana::Epics::EpicsPvCtrlFloat {
 public:
-  typedef PsddlPds::Epics::EpicsPvCtrlFloat XtcType;
+  typedef Pds::Epics::EpicsPvCtrlFloat XtcType;
   typedef Psana::Epics::EpicsPvCtrlFloat PsanaType;
   EpicsPvCtrlFloat(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~EpicsPvCtrlFloat();
@@ -174,7 +174,7 @@ private:
 
 class EpicsPvCtrlEnum : public Psana::Epics::EpicsPvCtrlEnum {
 public:
-  typedef PsddlPds::Epics::EpicsPvCtrlEnum XtcType;
+  typedef Pds::Epics::EpicsPvCtrlEnum XtcType;
   typedef Psana::Epics::EpicsPvCtrlEnum PsanaType;
   EpicsPvCtrlEnum(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~EpicsPvCtrlEnum();
@@ -198,7 +198,7 @@ private:
 
 class EpicsPvCtrlChar : public Psana::Epics::EpicsPvCtrlChar {
 public:
-  typedef PsddlPds::Epics::EpicsPvCtrlChar XtcType;
+  typedef Pds::Epics::EpicsPvCtrlChar XtcType;
   typedef Psana::Epics::EpicsPvCtrlChar PsanaType;
   EpicsPvCtrlChar(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~EpicsPvCtrlChar();
@@ -222,7 +222,7 @@ private:
 
 class EpicsPvCtrlLong : public Psana::Epics::EpicsPvCtrlLong {
 public:
-  typedef PsddlPds::Epics::EpicsPvCtrlLong XtcType;
+  typedef Pds::Epics::EpicsPvCtrlLong XtcType;
   typedef Psana::Epics::EpicsPvCtrlLong PsanaType;
   EpicsPvCtrlLong(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~EpicsPvCtrlLong();
@@ -246,7 +246,7 @@ private:
 
 class EpicsPvCtrlDouble : public Psana::Epics::EpicsPvCtrlDouble {
 public:
-  typedef PsddlPds::Epics::EpicsPvCtrlDouble XtcType;
+  typedef Pds::Epics::EpicsPvCtrlDouble XtcType;
   typedef Psana::Epics::EpicsPvCtrlDouble PsanaType;
   EpicsPvCtrlDouble(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~EpicsPvCtrlDouble();
@@ -270,7 +270,7 @@ private:
 
 class EpicsPvTimeString : public Psana::Epics::EpicsPvTimeString {
 public:
-  typedef PsddlPds::Epics::EpicsPvTimeString XtcType;
+  typedef Pds::Epics::EpicsPvTimeString XtcType;
   typedef Psana::Epics::EpicsPvTimeString PsanaType;
   EpicsPvTimeString(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~EpicsPvTimeString();
@@ -295,7 +295,7 @@ private:
 
 class EpicsPvTimeShort : public Psana::Epics::EpicsPvTimeShort {
 public:
-  typedef PsddlPds::Epics::EpicsPvTimeShort XtcType;
+  typedef Pds::Epics::EpicsPvTimeShort XtcType;
   typedef Psana::Epics::EpicsPvTimeShort PsanaType;
   EpicsPvTimeShort(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~EpicsPvTimeShort();
@@ -319,7 +319,7 @@ private:
 
 class EpicsPvTimeFloat : public Psana::Epics::EpicsPvTimeFloat {
 public:
-  typedef PsddlPds::Epics::EpicsPvTimeFloat XtcType;
+  typedef Pds::Epics::EpicsPvTimeFloat XtcType;
   typedef Psana::Epics::EpicsPvTimeFloat PsanaType;
   EpicsPvTimeFloat(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~EpicsPvTimeFloat();
@@ -343,7 +343,7 @@ private:
 
 class EpicsPvTimeEnum : public Psana::Epics::EpicsPvTimeEnum {
 public:
-  typedef PsddlPds::Epics::EpicsPvTimeEnum XtcType;
+  typedef Pds::Epics::EpicsPvTimeEnum XtcType;
   typedef Psana::Epics::EpicsPvTimeEnum PsanaType;
   EpicsPvTimeEnum(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~EpicsPvTimeEnum();
@@ -367,7 +367,7 @@ private:
 
 class EpicsPvTimeChar : public Psana::Epics::EpicsPvTimeChar {
 public:
-  typedef PsddlPds::Epics::EpicsPvTimeChar XtcType;
+  typedef Pds::Epics::EpicsPvTimeChar XtcType;
   typedef Psana::Epics::EpicsPvTimeChar PsanaType;
   EpicsPvTimeChar(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~EpicsPvTimeChar();
@@ -391,7 +391,7 @@ private:
 
 class EpicsPvTimeLong : public Psana::Epics::EpicsPvTimeLong {
 public:
-  typedef PsddlPds::Epics::EpicsPvTimeLong XtcType;
+  typedef Pds::Epics::EpicsPvTimeLong XtcType;
   typedef Psana::Epics::EpicsPvTimeLong PsanaType;
   EpicsPvTimeLong(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~EpicsPvTimeLong();
@@ -415,7 +415,7 @@ private:
 
 class EpicsPvTimeDouble : public Psana::Epics::EpicsPvTimeDouble {
 public:
-  typedef PsddlPds::Epics::EpicsPvTimeDouble XtcType;
+  typedef Pds::Epics::EpicsPvTimeDouble XtcType;
   typedef Psana::Epics::EpicsPvTimeDouble PsanaType;
   EpicsPvTimeDouble(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~EpicsPvTimeDouble();
@@ -436,12 +436,12 @@ private:
   Psana::Epics::dbr_time_double _dbr;
 };
 
-Psana::Epics::PvConfigV1 pds_to_psana(PsddlPds::Epics::PvConfigV1 pds);
+Psana::Epics::PvConfigV1 pds_to_psana(Pds::Epics::PvConfigV1 pds);
 
 
 class ConfigV1 : public Psana::Epics::ConfigV1 {
 public:
-  typedef PsddlPds::Epics::ConfigV1 XtcType;
+  typedef Pds::Epics::ConfigV1 XtcType;
   typedef Psana::Epics::ConfigV1 PsanaType;
   ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~ConfigV1();

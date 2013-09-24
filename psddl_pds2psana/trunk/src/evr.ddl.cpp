@@ -9,62 +9,62 @@
 
 namespace psddl_pds2psana {
 namespace EvrData {
-Psana::EvrData::PulseConfig pds_to_psana(PsddlPds::EvrData::PulseConfig pds)
+Psana::EvrData::PulseConfig pds_to_psana(Pds::EvrData::PulseConfig pds)
 {
   return Psana::EvrData::PulseConfig(pds.pulse(), pds.trigger(), pds.set(), pds.clear(), pds.polarity(), pds.map_set_enable(), pds.map_reset_enable(), pds.map_trigger_enable(), pds.prescale(), pds.delay(), pds.width());
 }
 
-Psana::EvrData::PulseConfigV3 pds_to_psana(PsddlPds::EvrData::PulseConfigV3 pds)
+Psana::EvrData::PulseConfigV3 pds_to_psana(Pds::EvrData::PulseConfigV3 pds)
 {
   return Psana::EvrData::PulseConfigV3(pds.pulseId(), pds.polarity(), pds.prescale(), pds.delay(), pds.width());
 }
 
-Psana::EvrData::EventCodeV3 pds_to_psana(PsddlPds::EvrData::EventCodeV3 pds)
+Psana::EvrData::EventCodeV3 pds_to_psana(Pds::EvrData::EventCodeV3 pds)
 {
   return Psana::EvrData::EventCodeV3(pds.code(), pds.isReadout(), pds.isTerminator(), pds.maskTrigger(), pds.maskSet(), pds.maskClear());
 }
 
-Psana::EvrData::EventCodeV4 pds_to_psana(PsddlPds::EvrData::EventCodeV4 pds)
+Psana::EvrData::EventCodeV4 pds_to_psana(Pds::EvrData::EventCodeV4 pds)
 {
   return Psana::EvrData::EventCodeV4(pds.code(), pds.isReadout(), pds.isTerminator(), pds.reportDelay(), pds.reportWidth(), pds.maskTrigger(), pds.maskSet(), pds.maskClear());
 }
 
-Psana::EvrData::EventCodeV5 pds_to_psana(PsddlPds::EvrData::EventCodeV5 pds)
+Psana::EvrData::EventCodeV5 pds_to_psana(Pds::EvrData::EventCodeV5 pds)
 {
   return Psana::EvrData::EventCodeV5(pds.code(), pds.isReadout(), pds.isCommand(), pds.isLatch(), pds.reportDelay(), pds.reportWidth(), pds.maskTrigger(), pds.maskSet(), pds.maskClear(), pds.desc());
 }
 
-Psana::EvrData::EventCodeV6 pds_to_psana(PsddlPds::EvrData::EventCodeV6 pds)
+Psana::EvrData::EventCodeV6 pds_to_psana(Pds::EvrData::EventCodeV6 pds)
 {
   return Psana::EvrData::EventCodeV6(pds.code(), pds.isReadout(), pds.isCommand(), pds.isLatch(), pds.reportDelay(), pds.reportWidth(), pds.maskTrigger(), pds.maskSet(), pds.maskClear(), pds.desc(), pds.readoutGroup());
 }
 
-Psana::EvrData::OutputMap::Source pds_to_psana(PsddlPds::EvrData::OutputMap::Source e)
+Psana::EvrData::OutputMap::Source pds_to_psana(Pds::EvrData::OutputMap::Source e)
 {
   return Psana::EvrData::OutputMap::Source(e);
 }
 
-Psana::EvrData::OutputMap::Conn pds_to_psana(PsddlPds::EvrData::OutputMap::Conn e)
+Psana::EvrData::OutputMap::Conn pds_to_psana(Pds::EvrData::OutputMap::Conn e)
 {
   return Psana::EvrData::OutputMap::Conn(e);
 }
 
-Psana::EvrData::OutputMap pds_to_psana(PsddlPds::EvrData::OutputMap pds)
+Psana::EvrData::OutputMap pds_to_psana(Pds::EvrData::OutputMap pds)
 {
   return Psana::EvrData::OutputMap(pds_to_psana(pds.source()), pds.source_id(), pds_to_psana(pds.conn()), pds.conn_id());
 }
 
-Psana::EvrData::OutputMapV2::Source pds_to_psana(PsddlPds::EvrData::OutputMapV2::Source e)
+Psana::EvrData::OutputMapV2::Source pds_to_psana(Pds::EvrData::OutputMapV2::Source e)
 {
   return Psana::EvrData::OutputMapV2::Source(e);
 }
 
-Psana::EvrData::OutputMapV2::Conn pds_to_psana(PsddlPds::EvrData::OutputMapV2::Conn e)
+Psana::EvrData::OutputMapV2::Conn pds_to_psana(Pds::EvrData::OutputMapV2::Conn e)
 {
   return Psana::EvrData::OutputMapV2::Conn(e);
 }
 
-Psana::EvrData::OutputMapV2 pds_to_psana(PsddlPds::EvrData::OutputMapV2 pds)
+Psana::EvrData::OutputMapV2 pds_to_psana(Pds::EvrData::OutputMapV2 pds)
 {
   return Psana::EvrData::OutputMapV2(pds_to_psana(pds.source()), pds.source_id(), pds_to_psana(pds.conn()), pds.conn_id(), pds.module());
 }
@@ -75,7 +75,7 @@ ConfigV1::ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr)
 {
   {
     typedef ndarray<Psana::EvrData::PulseConfig, 1> NDArray;
-    typedef ndarray<const PsddlPds::EvrData::PulseConfig, 1> XtcNDArray;
+    typedef ndarray<const Pds::EvrData::PulseConfig, 1> XtcNDArray;
     const XtcNDArray& xtc_ndarr = xtcPtr->pulses();
     _pulses_ndarray_storage_ = NDArray(xtc_ndarr.shape());
     NDArray::iterator out = _pulses_ndarray_storage_.begin();
@@ -85,7 +85,7 @@ ConfigV1::ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr)
   }
   {
     typedef ndarray<Psana::EvrData::OutputMap, 1> NDArray;
-    typedef ndarray<const PsddlPds::EvrData::OutputMap, 1> XtcNDArray;
+    typedef ndarray<const Pds::EvrData::OutputMap, 1> XtcNDArray;
     const XtcNDArray& xtc_ndarr = xtcPtr->output_maps();
     _output_maps_ndarray_storage_ = NDArray(xtc_ndarr.shape());
     NDArray::iterator out = _output_maps_ndarray_storage_.begin();
@@ -110,12 +110,12 @@ uint32_t ConfigV1::noutputs() const {
 
 ndarray<const Psana::EvrData::PulseConfig, 1> ConfigV1::pulses() const { return _pulses_ndarray_storage_; }
 ndarray<const Psana::EvrData::OutputMap, 1> ConfigV1::output_maps() const { return _output_maps_ndarray_storage_; }
-Psana::EvrData::ConfigV2::RateCode pds_to_psana(PsddlPds::EvrData::ConfigV2::RateCode e)
+Psana::EvrData::ConfigV2::RateCode pds_to_psana(Pds::EvrData::ConfigV2::RateCode e)
 {
   return Psana::EvrData::ConfigV2::RateCode(e);
 }
 
-Psana::EvrData::ConfigV2::BeamCode pds_to_psana(PsddlPds::EvrData::ConfigV2::BeamCode e)
+Psana::EvrData::ConfigV2::BeamCode pds_to_psana(Pds::EvrData::ConfigV2::BeamCode e)
 {
   return Psana::EvrData::ConfigV2::BeamCode(e);
 }
@@ -126,7 +126,7 @@ ConfigV2::ConfigV2(const boost::shared_ptr<const XtcType>& xtcPtr)
 {
   {
     typedef ndarray<Psana::EvrData::PulseConfig, 1> NDArray;
-    typedef ndarray<const PsddlPds::EvrData::PulseConfig, 1> XtcNDArray;
+    typedef ndarray<const Pds::EvrData::PulseConfig, 1> XtcNDArray;
     const XtcNDArray& xtc_ndarr = xtcPtr->pulses();
     _pulses_ndarray_storage_ = NDArray(xtc_ndarr.shape());
     NDArray::iterator out = _pulses_ndarray_storage_.begin();
@@ -136,7 +136,7 @@ ConfigV2::ConfigV2(const boost::shared_ptr<const XtcType>& xtcPtr)
   }
   {
     typedef ndarray<Psana::EvrData::OutputMap, 1> NDArray;
-    typedef ndarray<const PsddlPds::EvrData::OutputMap, 1> XtcNDArray;
+    typedef ndarray<const Pds::EvrData::OutputMap, 1> XtcNDArray;
     const XtcNDArray& xtc_ndarr = xtcPtr->output_maps();
     _output_maps_ndarray_storage_ = NDArray(xtc_ndarr.shape());
     NDArray::iterator out = _output_maps_ndarray_storage_.begin();
@@ -182,7 +182,7 @@ ConfigV3::ConfigV3(const boost::shared_ptr<const XtcType>& xtcPtr)
 {
   {
     typedef ndarray<Psana::EvrData::EventCodeV3, 1> NDArray;
-    typedef ndarray<const PsddlPds::EvrData::EventCodeV3, 1> XtcNDArray;
+    typedef ndarray<const Pds::EvrData::EventCodeV3, 1> XtcNDArray;
     const XtcNDArray& xtc_ndarr = xtcPtr->eventcodes();
     _eventcodes_ndarray_storage_ = NDArray(xtc_ndarr.shape());
     NDArray::iterator out = _eventcodes_ndarray_storage_.begin();
@@ -192,7 +192,7 @@ ConfigV3::ConfigV3(const boost::shared_ptr<const XtcType>& xtcPtr)
   }
   {
     typedef ndarray<Psana::EvrData::PulseConfigV3, 1> NDArray;
-    typedef ndarray<const PsddlPds::EvrData::PulseConfigV3, 1> XtcNDArray;
+    typedef ndarray<const Pds::EvrData::PulseConfigV3, 1> XtcNDArray;
     const XtcNDArray& xtc_ndarr = xtcPtr->pulses();
     _pulses_ndarray_storage_ = NDArray(xtc_ndarr.shape());
     NDArray::iterator out = _pulses_ndarray_storage_.begin();
@@ -202,7 +202,7 @@ ConfigV3::ConfigV3(const boost::shared_ptr<const XtcType>& xtcPtr)
   }
   {
     typedef ndarray<Psana::EvrData::OutputMap, 1> NDArray;
-    typedef ndarray<const PsddlPds::EvrData::OutputMap, 1> XtcNDArray;
+    typedef ndarray<const Pds::EvrData::OutputMap, 1> XtcNDArray;
     const XtcNDArray& xtc_ndarr = xtcPtr->output_maps();
     _output_maps_ndarray_storage_ = NDArray(xtc_ndarr.shape());
     NDArray::iterator out = _output_maps_ndarray_storage_.begin();
@@ -239,7 +239,7 @@ ConfigV4::ConfigV4(const boost::shared_ptr<const XtcType>& xtcPtr)
 {
   {
     typedef ndarray<Psana::EvrData::EventCodeV4, 1> NDArray;
-    typedef ndarray<const PsddlPds::EvrData::EventCodeV4, 1> XtcNDArray;
+    typedef ndarray<const Pds::EvrData::EventCodeV4, 1> XtcNDArray;
     const XtcNDArray& xtc_ndarr = xtcPtr->eventcodes();
     _eventcodes_ndarray_storage_ = NDArray(xtc_ndarr.shape());
     NDArray::iterator out = _eventcodes_ndarray_storage_.begin();
@@ -249,7 +249,7 @@ ConfigV4::ConfigV4(const boost::shared_ptr<const XtcType>& xtcPtr)
   }
   {
     typedef ndarray<Psana::EvrData::PulseConfigV3, 1> NDArray;
-    typedef ndarray<const PsddlPds::EvrData::PulseConfigV3, 1> XtcNDArray;
+    typedef ndarray<const Pds::EvrData::PulseConfigV3, 1> XtcNDArray;
     const XtcNDArray& xtc_ndarr = xtcPtr->pulses();
     _pulses_ndarray_storage_ = NDArray(xtc_ndarr.shape());
     NDArray::iterator out = _pulses_ndarray_storage_.begin();
@@ -259,7 +259,7 @@ ConfigV4::ConfigV4(const boost::shared_ptr<const XtcType>& xtcPtr)
   }
   {
     typedef ndarray<Psana::EvrData::OutputMap, 1> NDArray;
-    typedef ndarray<const PsddlPds::EvrData::OutputMap, 1> XtcNDArray;
+    typedef ndarray<const Pds::EvrData::OutputMap, 1> XtcNDArray;
     const XtcNDArray& xtc_ndarr = xtcPtr->output_maps();
     _output_maps_ndarray_storage_ = NDArray(xtc_ndarr.shape());
     NDArray::iterator out = _output_maps_ndarray_storage_.begin();
@@ -290,12 +290,12 @@ uint32_t ConfigV4::noutputs() const {
 ndarray<const Psana::EvrData::EventCodeV4, 1> ConfigV4::eventcodes() const { return _eventcodes_ndarray_storage_; }
 ndarray<const Psana::EvrData::PulseConfigV3, 1> ConfigV4::pulses() const { return _pulses_ndarray_storage_; }
 ndarray<const Psana::EvrData::OutputMap, 1> ConfigV4::output_maps() const { return _output_maps_ndarray_storage_; }
-Psana::EvrData::SequencerEntry pds_to_psana(PsddlPds::EvrData::SequencerEntry pds)
+Psana::EvrData::SequencerEntry pds_to_psana(Pds::EvrData::SequencerEntry pds)
 {
   return Psana::EvrData::SequencerEntry(pds.eventcode(), pds.delay());
 }
 
-Psana::EvrData::SequencerConfigV1::Source pds_to_psana(PsddlPds::EvrData::SequencerConfigV1::Source e)
+Psana::EvrData::SequencerConfigV1::Source pds_to_psana(Pds::EvrData::SequencerConfigV1::Source e)
 {
   return Psana::EvrData::SequencerConfigV1::Source(e);
 }
@@ -306,7 +306,7 @@ SequencerConfigV1::SequencerConfigV1(const boost::shared_ptr<const XtcType>& xtc
 {
   {
     typedef ndarray<Psana::EvrData::SequencerEntry, 1> NDArray;
-    typedef ndarray<const PsddlPds::EvrData::SequencerEntry, 1> XtcNDArray;
+    typedef ndarray<const Pds::EvrData::SequencerEntry, 1> XtcNDArray;
     const XtcNDArray& xtc_ndarr = xtcPtr->entries();
     _entries_ndarray_storage_ = NDArray(xtc_ndarr.shape());
     NDArray::iterator out = _entries_ndarray_storage_.begin();
@@ -343,11 +343,11 @@ ndarray<const Psana::EvrData::SequencerEntry, 1> SequencerConfigV1::entries() co
 ConfigV5::ConfigV5(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::EvrData::ConfigV5()
   , m_xtcObj(xtcPtr)
-  , _seq_config(boost::shared_ptr<const PsddlPds::EvrData::SequencerConfigV1>(xtcPtr, &xtcPtr->seq_config()))
+  , _seq_config(boost::shared_ptr<const Pds::EvrData::SequencerConfigV1>(xtcPtr, &xtcPtr->seq_config()))
 {
   {
     typedef ndarray<Psana::EvrData::EventCodeV5, 1> NDArray;
-    typedef ndarray<const PsddlPds::EvrData::EventCodeV5, 1> XtcNDArray;
+    typedef ndarray<const Pds::EvrData::EventCodeV5, 1> XtcNDArray;
     const XtcNDArray& xtc_ndarr = xtcPtr->eventcodes();
     _eventcodes_ndarray_storage_ = NDArray(xtc_ndarr.shape());
     NDArray::iterator out = _eventcodes_ndarray_storage_.begin();
@@ -357,7 +357,7 @@ ConfigV5::ConfigV5(const boost::shared_ptr<const XtcType>& xtcPtr)
   }
   {
     typedef ndarray<Psana::EvrData::PulseConfigV3, 1> NDArray;
-    typedef ndarray<const PsddlPds::EvrData::PulseConfigV3, 1> XtcNDArray;
+    typedef ndarray<const Pds::EvrData::PulseConfigV3, 1> XtcNDArray;
     const XtcNDArray& xtc_ndarr = xtcPtr->pulses();
     _pulses_ndarray_storage_ = NDArray(xtc_ndarr.shape());
     NDArray::iterator out = _pulses_ndarray_storage_.begin();
@@ -367,7 +367,7 @@ ConfigV5::ConfigV5(const boost::shared_ptr<const XtcType>& xtcPtr)
   }
   {
     typedef ndarray<Psana::EvrData::OutputMap, 1> NDArray;
-    typedef ndarray<const PsddlPds::EvrData::OutputMap, 1> XtcNDArray;
+    typedef ndarray<const Pds::EvrData::OutputMap, 1> XtcNDArray;
     const XtcNDArray& xtc_ndarr = xtcPtr->output_maps();
     _output_maps_ndarray_storage_ = NDArray(xtc_ndarr.shape());
     NDArray::iterator out = _output_maps_ndarray_storage_.begin();
@@ -402,11 +402,11 @@ const Psana::EvrData::SequencerConfigV1& ConfigV5::seq_config() const { return _
 ConfigV6::ConfigV6(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::EvrData::ConfigV6()
   , m_xtcObj(xtcPtr)
-  , _seq_config(boost::shared_ptr<const PsddlPds::EvrData::SequencerConfigV1>(xtcPtr, &xtcPtr->seq_config()))
+  , _seq_config(boost::shared_ptr<const Pds::EvrData::SequencerConfigV1>(xtcPtr, &xtcPtr->seq_config()))
 {
   {
     typedef ndarray<Psana::EvrData::EventCodeV5, 1> NDArray;
-    typedef ndarray<const PsddlPds::EvrData::EventCodeV5, 1> XtcNDArray;
+    typedef ndarray<const Pds::EvrData::EventCodeV5, 1> XtcNDArray;
     const XtcNDArray& xtc_ndarr = xtcPtr->eventcodes();
     _eventcodes_ndarray_storage_ = NDArray(xtc_ndarr.shape());
     NDArray::iterator out = _eventcodes_ndarray_storage_.begin();
@@ -416,7 +416,7 @@ ConfigV6::ConfigV6(const boost::shared_ptr<const XtcType>& xtcPtr)
   }
   {
     typedef ndarray<Psana::EvrData::PulseConfigV3, 1> NDArray;
-    typedef ndarray<const PsddlPds::EvrData::PulseConfigV3, 1> XtcNDArray;
+    typedef ndarray<const Pds::EvrData::PulseConfigV3, 1> XtcNDArray;
     const XtcNDArray& xtc_ndarr = xtcPtr->pulses();
     _pulses_ndarray_storage_ = NDArray(xtc_ndarr.shape());
     NDArray::iterator out = _pulses_ndarray_storage_.begin();
@@ -426,7 +426,7 @@ ConfigV6::ConfigV6(const boost::shared_ptr<const XtcType>& xtcPtr)
   }
   {
     typedef ndarray<Psana::EvrData::OutputMapV2, 1> NDArray;
-    typedef ndarray<const PsddlPds::EvrData::OutputMapV2, 1> XtcNDArray;
+    typedef ndarray<const Pds::EvrData::OutputMapV2, 1> XtcNDArray;
     const XtcNDArray& xtc_ndarr = xtcPtr->output_maps();
     _output_maps_ndarray_storage_ = NDArray(xtc_ndarr.shape());
     NDArray::iterator out = _output_maps_ndarray_storage_.begin();
@@ -461,11 +461,11 @@ const Psana::EvrData::SequencerConfigV1& ConfigV6::seq_config() const { return _
 ConfigV7::ConfigV7(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::EvrData::ConfigV7()
   , m_xtcObj(xtcPtr)
-  , _seq_config(boost::shared_ptr<const PsddlPds::EvrData::SequencerConfigV1>(xtcPtr, &xtcPtr->seq_config()))
+  , _seq_config(boost::shared_ptr<const Pds::EvrData::SequencerConfigV1>(xtcPtr, &xtcPtr->seq_config()))
 {
   {
     typedef ndarray<Psana::EvrData::EventCodeV6, 1> NDArray;
-    typedef ndarray<const PsddlPds::EvrData::EventCodeV6, 1> XtcNDArray;
+    typedef ndarray<const Pds::EvrData::EventCodeV6, 1> XtcNDArray;
     const XtcNDArray& xtc_ndarr = xtcPtr->eventcodes();
     _eventcodes_ndarray_storage_ = NDArray(xtc_ndarr.shape());
     NDArray::iterator out = _eventcodes_ndarray_storage_.begin();
@@ -475,7 +475,7 @@ ConfigV7::ConfigV7(const boost::shared_ptr<const XtcType>& xtcPtr)
   }
   {
     typedef ndarray<Psana::EvrData::PulseConfigV3, 1> NDArray;
-    typedef ndarray<const PsddlPds::EvrData::PulseConfigV3, 1> XtcNDArray;
+    typedef ndarray<const Pds::EvrData::PulseConfigV3, 1> XtcNDArray;
     const XtcNDArray& xtc_ndarr = xtcPtr->pulses();
     _pulses_ndarray_storage_ = NDArray(xtc_ndarr.shape());
     NDArray::iterator out = _pulses_ndarray_storage_.begin();
@@ -485,7 +485,7 @@ ConfigV7::ConfigV7(const boost::shared_ptr<const XtcType>& xtcPtr)
   }
   {
     typedef ndarray<Psana::EvrData::OutputMapV2, 1> NDArray;
-    typedef ndarray<const PsddlPds::EvrData::OutputMapV2, 1> XtcNDArray;
+    typedef ndarray<const Pds::EvrData::OutputMapV2, 1> XtcNDArray;
     const XtcNDArray& xtc_ndarr = xtcPtr->output_maps();
     _output_maps_ndarray_storage_ = NDArray(xtc_ndarr.shape());
     NDArray::iterator out = _output_maps_ndarray_storage_.begin();
@@ -517,7 +517,7 @@ ndarray<const Psana::EvrData::EventCodeV6, 1> ConfigV7::eventcodes() const { ret
 ndarray<const Psana::EvrData::PulseConfigV3, 1> ConfigV7::pulses() const { return _pulses_ndarray_storage_; }
 ndarray<const Psana::EvrData::OutputMapV2, 1> ConfigV7::output_maps() const { return _output_maps_ndarray_storage_; }
 const Psana::EvrData::SequencerConfigV1& ConfigV7::seq_config() const { return _seq_config; }
-Psana::EvrData::FIFOEvent pds_to_psana(PsddlPds::EvrData::FIFOEvent pds)
+Psana::EvrData::FIFOEvent pds_to_psana(Pds::EvrData::FIFOEvent pds)
 {
   return Psana::EvrData::FIFOEvent(pds.timestampHigh(), pds.timestampLow(), pds.eventCode());
 }
@@ -528,7 +528,7 @@ DataV3::DataV3(const boost::shared_ptr<const XtcType>& xtcPtr)
 {
   {
     typedef ndarray<Psana::EvrData::FIFOEvent, 1> NDArray;
-    typedef ndarray<const PsddlPds::EvrData::FIFOEvent, 1> XtcNDArray;
+    typedef ndarray<const Pds::EvrData::FIFOEvent, 1> XtcNDArray;
     const XtcNDArray& xtc_ndarr = xtcPtr->fifoEvents();
     _fifoEvents_ndarray_storage_ = NDArray(xtc_ndarr.shape());
     NDArray::iterator out = _fifoEvents_ndarray_storage_.begin();
@@ -547,7 +547,7 @@ uint32_t DataV3::numFifoEvents() const {
 }
 
 ndarray<const Psana::EvrData::FIFOEvent, 1> DataV3::fifoEvents() const { return _fifoEvents_ndarray_storage_; }
-Psana::EvrData::IOChannel pds_to_psana(PsddlPds::EvrData::IOChannel pds)
+Psana::EvrData::IOChannel pds_to_psana(Pds::EvrData::IOChannel pds)
 {
   return Psana::EvrData::IOChannel(pds.name(), pds.ninfo(), pds.infos().data());
 }
@@ -558,7 +558,7 @@ IOConfigV1::IOConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr)
 {
   {
     typedef ndarray<Psana::EvrData::IOChannel, 1> NDArray;
-    typedef ndarray<const PsddlPds::EvrData::IOChannel, 1> XtcNDArray;
+    typedef ndarray<const Pds::EvrData::IOChannel, 1> XtcNDArray;
     const XtcNDArray& xtc_ndarr = xtcPtr->channels();
     _channels_ndarray_storage_ = NDArray(xtc_ndarr.shape());
     NDArray::iterator out = _channels_ndarray_storage_.begin();

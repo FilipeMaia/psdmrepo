@@ -9,17 +9,17 @@
 
 namespace psddl_pds2psana {
 namespace Pulnix {
-Psana::Pulnix::TM6740ConfigV1::Depth pds_to_psana(PsddlPds::Pulnix::TM6740ConfigV1::Depth e)
+Psana::Pulnix::TM6740ConfigV1::Depth pds_to_psana(Pds::Pulnix::TM6740ConfigV1::Depth e)
 {
   return Psana::Pulnix::TM6740ConfigV1::Depth(e);
 }
 
-Psana::Pulnix::TM6740ConfigV1::Binning pds_to_psana(PsddlPds::Pulnix::TM6740ConfigV1::Binning e)
+Psana::Pulnix::TM6740ConfigV1::Binning pds_to_psana(Pds::Pulnix::TM6740ConfigV1::Binning e)
 {
   return Psana::Pulnix::TM6740ConfigV1::Binning(e);
 }
 
-Psana::Pulnix::TM6740ConfigV1::LookupTable pds_to_psana(PsddlPds::Pulnix::TM6740ConfigV1::LookupTable e)
+Psana::Pulnix::TM6740ConfigV1::LookupTable pds_to_psana(Pds::Pulnix::TM6740ConfigV1::LookupTable e)
 {
   return Psana::Pulnix::TM6740ConfigV1::LookupTable(e);
 }
@@ -83,17 +83,17 @@ uint8_t TM6740ConfigV1::output_resolution_bits() const {
   return m_xtcObj->output_resolution_bits();
 }
 
-Psana::Pulnix::TM6740ConfigV2::Depth pds_to_psana(PsddlPds::Pulnix::TM6740ConfigV2::Depth e)
+Psana::Pulnix::TM6740ConfigV2::Depth pds_to_psana(Pds::Pulnix::TM6740ConfigV2::Depth e)
 {
   return Psana::Pulnix::TM6740ConfigV2::Depth(e);
 }
 
-Psana::Pulnix::TM6740ConfigV2::Binning pds_to_psana(PsddlPds::Pulnix::TM6740ConfigV2::Binning e)
+Psana::Pulnix::TM6740ConfigV2::Binning pds_to_psana(Pds::Pulnix::TM6740ConfigV2::Binning e)
 {
   return Psana::Pulnix::TM6740ConfigV2::Binning(e);
 }
 
-Psana::Pulnix::TM6740ConfigV2::LookupTable pds_to_psana(PsddlPds::Pulnix::TM6740ConfigV2::LookupTable e)
+Psana::Pulnix::TM6740ConfigV2::LookupTable pds_to_psana(Pds::Pulnix::TM6740ConfigV2::LookupTable e)
 {
   return Psana::Pulnix::TM6740ConfigV2::LookupTable(e);
 }

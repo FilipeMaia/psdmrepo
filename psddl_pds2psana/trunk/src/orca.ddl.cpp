@@ -9,12 +9,12 @@
 
 namespace psddl_pds2psana {
 namespace Orca {
-Psana::Orca::ConfigV1::ReadoutMode pds_to_psana(PsddlPds::Orca::ConfigV1::ReadoutMode e)
+Psana::Orca::ConfigV1::ReadoutMode pds_to_psana(Pds::Orca::ConfigV1::ReadoutMode e)
 {
   return Psana::Orca::ConfigV1::ReadoutMode(e);
 }
 
-Psana::Orca::ConfigV1::Cooling pds_to_psana(PsddlPds::Orca::ConfigV1::Cooling e)
+Psana::Orca::ConfigV1::Cooling pds_to_psana(Pds::Orca::ConfigV1::Cooling e)
 {
   return Psana::Orca::ConfigV1::Cooling(e);
 }

@@ -6,13 +6,13 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include "psddl_psana/usdusb.ddl.h"
-#include "psddl_pdsdata/usdusb.ddl.h"
+#include "pdsdata/psddl/usdusb.ddl.h"
 namespace psddl_pds2psana {
 namespace UsdUsb {
 
 class ConfigV1 : public Psana::UsdUsb::ConfigV1 {
 public:
-  typedef PsddlPds::UsdUsb::ConfigV1 XtcType;
+  typedef Pds::UsdUsb::ConfigV1 XtcType;
   typedef Psana::UsdUsb::ConfigV1 PsanaType;
   ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~ConfigV1();
@@ -26,7 +26,7 @@ private:
 
 class DataV1 : public Psana::UsdUsb::DataV1 {
 public:
-  typedef PsddlPds::UsdUsb::DataV1 XtcType;
+  typedef Pds::UsdUsb::DataV1 XtcType;
   typedef Psana::UsdUsb::DataV1 PsanaType;
   DataV1(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~DataV1();

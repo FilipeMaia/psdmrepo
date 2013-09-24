@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-00
+2013-09-24 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-38 with psddl V00-08-15
+- switching to DDL-based pdsdata, psddl_pdsdata is not used anymore
+
 Tag: V00-07-01
 2013-07-10 Andy Salnikov
 - regenerated with psddl V00-08-01

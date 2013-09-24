@@ -38,7 +38,7 @@ double ConfigV1::strayLightConstant() const {
   return m_xtcObj->strayLightConstant();
 }
 
-Psana::OceanOptics::timespec64 pds_to_psana(PsddlPds::OceanOptics::timespec64 pds)
+Psana::OceanOptics::timespec64 pds_to_psana(Pds::OceanOptics::timespec64 pds)
 {
   return Psana::OceanOptics::timespec64(pds.tv_sec(), pds.tv_nsec());
 }
@@ -118,6 +118,6 @@ double DataV1<Config>::nonlinerCorrected(uint32_t iPixel) const {
   return m_xtcObj->nonlinerCorrected(*m_cfgPtr, iPixel);
 }
 
-template class DataV1<PsddlPds::OceanOptics::ConfigV1>;
+template class DataV1<Pds::OceanOptics::ConfigV1>;
 } // namespace OceanOptics
 } // namespace psddl_pds2psana

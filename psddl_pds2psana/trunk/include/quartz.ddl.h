@@ -6,14 +6,14 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include "psddl_psana/quartz.ddl.h"
-#include "psddl_pdsdata/quartz.ddl.h"
+#include "pdsdata/psddl/quartz.ddl.h"
 #include "psddl_pds2psana/camera.ddl.h"
 namespace psddl_pds2psana {
 namespace Quartz {
 
 class ConfigV1 : public Psana::Quartz::ConfigV1 {
 public:
-  typedef PsddlPds::Quartz::ConfigV1 XtcType;
+  typedef Pds::Quartz::ConfigV1 XtcType;
   typedef Psana::Quartz::ConfigV1 PsanaType;
   ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~ConfigV1();

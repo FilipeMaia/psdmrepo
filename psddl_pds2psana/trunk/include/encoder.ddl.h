@@ -6,13 +6,13 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include "psddl_psana/encoder.ddl.h"
-#include "psddl_pdsdata/encoder.ddl.h"
+#include "pdsdata/psddl/encoder.ddl.h"
 namespace psddl_pds2psana {
 namespace Encoder {
 
 class ConfigV1 : public Psana::Encoder::ConfigV1 {
 public:
-  typedef PsddlPds::Encoder::ConfigV1 XtcType;
+  typedef Pds::Encoder::ConfigV1 XtcType;
   typedef Psana::Encoder::ConfigV1 PsanaType;
   ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~ConfigV1();
@@ -30,7 +30,7 @@ private:
 
 class ConfigV2 : public Psana::Encoder::ConfigV2 {
 public:
-  typedef PsddlPds::Encoder::ConfigV2 XtcType;
+  typedef Pds::Encoder::ConfigV2 XtcType;
   typedef Psana::Encoder::ConfigV2 PsanaType;
   ConfigV2(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~ConfigV2();
@@ -48,7 +48,7 @@ private:
 
 class DataV1 : public Psana::Encoder::DataV1 {
 public:
-  typedef PsddlPds::Encoder::DataV1 XtcType;
+  typedef Pds::Encoder::DataV1 XtcType;
   typedef Psana::Encoder::DataV1 PsanaType;
   DataV1(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~DataV1();
@@ -63,7 +63,7 @@ private:
 
 class DataV2 : public Psana::Encoder::DataV2 {
 public:
-  typedef PsddlPds::Encoder::DataV2 XtcType;
+  typedef Pds::Encoder::DataV2 XtcType;
   typedef Psana::Encoder::DataV2 PsanaType;
   DataV2(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~DataV2();

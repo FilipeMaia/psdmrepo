@@ -6,13 +6,13 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include "psddl_psana/pulnix.ddl.h"
-#include "psddl_pdsdata/pulnix.ddl.h"
+#include "pdsdata/psddl/pulnix.ddl.h"
 namespace psddl_pds2psana {
 namespace Pulnix {
 
 class TM6740ConfigV1 : public Psana::Pulnix::TM6740ConfigV1 {
 public:
-  typedef PsddlPds::Pulnix::TM6740ConfigV1 XtcType;
+  typedef Pds::Pulnix::TM6740ConfigV1 XtcType;
   typedef Psana::Pulnix::TM6740ConfigV1 PsanaType;
   TM6740ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~TM6740ConfigV1();
@@ -34,7 +34,7 @@ private:
 
 class TM6740ConfigV2 : public Psana::Pulnix::TM6740ConfigV2 {
 public:
-  typedef PsddlPds::Pulnix::TM6740ConfigV2 XtcType;
+  typedef Pds::Pulnix::TM6740ConfigV2 XtcType;
   typedef Psana::Pulnix::TM6740ConfigV2 PsanaType;
   TM6740ConfigV2(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~TM6740ConfigV2();

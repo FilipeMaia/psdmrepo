@@ -9,52 +9,62 @@
 
 namespace psddl_pds2psana {
 namespace Bld {
-Psana::Bld::BldDataFEEGasDetEnergy pds_to_psana(PsddlPds::Bld::BldDataFEEGasDetEnergy pds)
+Psana::Bld::BldDataFEEGasDetEnergy pds_to_psana(Pds::Bld::BldDataFEEGasDetEnergy pds)
 {
   return Psana::Bld::BldDataFEEGasDetEnergy(pds.f_11_ENRC(), pds.f_12_ENRC(), pds.f_21_ENRC(), pds.f_22_ENRC());
 }
 
-Psana::Bld::BldDataEBeamV0::DamageMask pds_to_psana(PsddlPds::Bld::BldDataEBeamV0::DamageMask e)
+Psana::Bld::BldDataEBeamV0::DamageMask pds_to_psana(Pds::Bld::BldDataEBeamV0::DamageMask e)
 {
   return Psana::Bld::BldDataEBeamV0::DamageMask(e);
 }
 
-Psana::Bld::BldDataEBeamV0 pds_to_psana(PsddlPds::Bld::BldDataEBeamV0 pds)
+Psana::Bld::BldDataEBeamV0 pds_to_psana(Pds::Bld::BldDataEBeamV0 pds)
 {
   return Psana::Bld::BldDataEBeamV0(pds.damageMask(), pds.ebeamCharge(), pds.ebeamL3Energy(), pds.ebeamLTUPosX(), pds.ebeamLTUPosY(), pds.ebeamLTUAngX(), pds.ebeamLTUAngY());
 }
 
-Psana::Bld::BldDataEBeamV1::DamageMask pds_to_psana(PsddlPds::Bld::BldDataEBeamV1::DamageMask e)
+Psana::Bld::BldDataEBeamV1::DamageMask pds_to_psana(Pds::Bld::BldDataEBeamV1::DamageMask e)
 {
   return Psana::Bld::BldDataEBeamV1::DamageMask(e);
 }
 
-Psana::Bld::BldDataEBeamV1 pds_to_psana(PsddlPds::Bld::BldDataEBeamV1 pds)
+Psana::Bld::BldDataEBeamV1 pds_to_psana(Pds::Bld::BldDataEBeamV1 pds)
 {
   return Psana::Bld::BldDataEBeamV1(pds.damageMask(), pds.ebeamCharge(), pds.ebeamL3Energy(), pds.ebeamLTUPosX(), pds.ebeamLTUPosY(), pds.ebeamLTUAngX(), pds.ebeamLTUAngY(), pds.ebeamPkCurrBC2());
 }
 
-Psana::Bld::BldDataEBeamV2::DamageMask pds_to_psana(PsddlPds::Bld::BldDataEBeamV2::DamageMask e)
+Psana::Bld::BldDataEBeamV2::DamageMask pds_to_psana(Pds::Bld::BldDataEBeamV2::DamageMask e)
 {
   return Psana::Bld::BldDataEBeamV2::DamageMask(e);
 }
 
-Psana::Bld::BldDataEBeamV2 pds_to_psana(PsddlPds::Bld::BldDataEBeamV2 pds)
+Psana::Bld::BldDataEBeamV2 pds_to_psana(Pds::Bld::BldDataEBeamV2 pds)
 {
   return Psana::Bld::BldDataEBeamV2(pds.damageMask(), pds.ebeamCharge(), pds.ebeamL3Energy(), pds.ebeamLTUPosX(), pds.ebeamLTUPosY(), pds.ebeamLTUAngX(), pds.ebeamLTUAngY(), pds.ebeamPkCurrBC2(), pds.ebeamEnergyBC2());
 }
 
-Psana::Bld::BldDataEBeamV3::DamageMask pds_to_psana(PsddlPds::Bld::BldDataEBeamV3::DamageMask e)
+Psana::Bld::BldDataEBeamV3::DamageMask pds_to_psana(Pds::Bld::BldDataEBeamV3::DamageMask e)
 {
   return Psana::Bld::BldDataEBeamV3::DamageMask(e);
 }
 
-Psana::Bld::BldDataEBeamV3 pds_to_psana(PsddlPds::Bld::BldDataEBeamV3 pds)
+Psana::Bld::BldDataEBeamV3 pds_to_psana(Pds::Bld::BldDataEBeamV3 pds)
 {
   return Psana::Bld::BldDataEBeamV3(pds.damageMask(), pds.ebeamCharge(), pds.ebeamL3Energy(), pds.ebeamLTUPosX(), pds.ebeamLTUPosY(), pds.ebeamLTUAngX(), pds.ebeamLTUAngY(), pds.ebeamPkCurrBC2(), pds.ebeamEnergyBC2(), pds.ebeamPkCurrBC1(), pds.ebeamEnergyBC1());
 }
 
-Psana::Bld::BldDataPhaseCavity pds_to_psana(PsddlPds::Bld::BldDataPhaseCavity pds)
+Psana::Bld::BldDataEBeamV4::DamageMask pds_to_psana(Pds::Bld::BldDataEBeamV4::DamageMask e)
+{
+  return Psana::Bld::BldDataEBeamV4::DamageMask(e);
+}
+
+Psana::Bld::BldDataEBeamV4 pds_to_psana(Pds::Bld::BldDataEBeamV4 pds)
+{
+  return Psana::Bld::BldDataEBeamV4(pds.damageMask(), pds.ebeamCharge(), pds.ebeamL3Energy(), pds.ebeamLTUPosX(), pds.ebeamLTUPosY(), pds.ebeamLTUAngX(), pds.ebeamLTUAngY(), pds.ebeamPkCurrBC2(), pds.ebeamEnergyBC2(), pds.ebeamPkCurrBC1(), pds.ebeamEnergyBC1(), pds.ebeamUndPosX(), pds.ebeamUndPosY(), pds.ebeamUndAngX(), pds.ebeamUndAngY());
+}
+
+Psana::Bld::BldDataPhaseCavity pds_to_psana(Pds::Bld::BldDataPhaseCavity pds)
 {
   return Psana::Bld::BldDataPhaseCavity(pds.fitTime1(), pds.fitTime2(), pds.charge1(), pds.charge2());
 }
@@ -62,8 +72,8 @@ Psana::Bld::BldDataPhaseCavity pds_to_psana(PsddlPds::Bld::BldDataPhaseCavity pd
 BldDataIpimbV0::BldDataIpimbV0(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::Bld::BldDataIpimbV0()
   , m_xtcObj(xtcPtr)
-  , _ipimbData(boost::shared_ptr<const PsddlPds::Ipimb::DataV1>(xtcPtr, &xtcPtr->ipimbData()))
-  , _ipimbConfig(boost::shared_ptr<const PsddlPds::Ipimb::ConfigV1>(xtcPtr, &xtcPtr->ipimbConfig()))
+  , _ipimbData(boost::shared_ptr<const Pds::Ipimb::DataV1>(xtcPtr, &xtcPtr->ipimbData()))
+  , _ipimbConfig(boost::shared_ptr<const Pds::Ipimb::ConfigV1>(xtcPtr, &xtcPtr->ipimbConfig()))
   , _ipmFexData(psddl_pds2psana::Lusi::pds_to_psana(xtcPtr->ipmFexData()))
 {
 }
@@ -77,8 +87,8 @@ const Psana::Lusi::IpmFexV1& BldDataIpimbV0::ipmFexData() const { return _ipmFex
 BldDataIpimbV1::BldDataIpimbV1(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::Bld::BldDataIpimbV1()
   , m_xtcObj(xtcPtr)
-  , _ipimbData(boost::shared_ptr<const PsddlPds::Ipimb::DataV2>(xtcPtr, &xtcPtr->ipimbData()))
-  , _ipimbConfig(boost::shared_ptr<const PsddlPds::Ipimb::ConfigV2>(xtcPtr, &xtcPtr->ipimbConfig()))
+  , _ipimbData(boost::shared_ptr<const Pds::Ipimb::DataV2>(xtcPtr, &xtcPtr->ipimbData()))
+  , _ipimbConfig(boost::shared_ptr<const Pds::Ipimb::ConfigV2>(xtcPtr, &xtcPtr->ipimbConfig()))
   , _ipmFexData(psddl_pds2psana::Lusi::pds_to_psana(xtcPtr->ipmFexData()))
 {
 }
@@ -92,9 +102,9 @@ const Psana::Lusi::IpmFexV1& BldDataIpimbV1::ipmFexData() const { return _ipmFex
 BldDataPimV1::BldDataPimV1(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::Bld::BldDataPimV1()
   , m_xtcObj(xtcPtr)
-  , _camConfig(boost::shared_ptr<const PsddlPds::Pulnix::TM6740ConfigV2>(xtcPtr, &xtcPtr->camConfig()))
+  , _camConfig(boost::shared_ptr<const Pds::Pulnix::TM6740ConfigV2>(xtcPtr, &xtcPtr->camConfig()))
   , _pimConfig(psddl_pds2psana::Lusi::pds_to_psana(xtcPtr->pimConfig()))
-  , _frame(boost::shared_ptr<const PsddlPds::Camera::FrameV1>(xtcPtr, &xtcPtr->frame()))
+  , _frame(boost::shared_ptr<const Pds::Camera::FrameV1>(xtcPtr, &xtcPtr->frame()))
 {
 }
 BldDataPimV1::~BldDataPimV1()
@@ -222,5 +232,24 @@ double BldDataGMDV1::relativeEnergyPerPulse() const {
   return m_xtcObj->relativeEnergyPerPulse();
 }
 
+template <typename Config>
+BldDataAcqADCV1<Config>::BldDataAcqADCV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const Config>& cfgPtr)
+  : Psana::Bld::BldDataAcqADCV1()
+  , m_xtcObj(xtcPtr)
+  , m_cfgPtr(cfgPtr)
+  , _config(boost::shared_ptr<const Pds::Acqiris::ConfigV1>(xtcPtr, &xtcPtr->config()))
+  , _data(boost::shared_ptr<const Pds::Acqiris::DataDescV1>(xtcPtr, &xtcPtr->data()), cfgPtr)
+{
+}
+template <typename Config>
+BldDataAcqADCV1<Config>::~BldDataAcqADCV1()
+{
+}
+
+template <typename Config>
+const Psana::Acqiris::ConfigV1& BldDataAcqADCV1<Config>::config() const { return _config; }
+template <typename Config>
+const Psana::Acqiris::DataDescV1& BldDataAcqADCV1<Config>::data() const { return _data; }
+template class BldDataAcqADCV1<Pds::Acqiris::ConfigV1>;
 } // namespace Bld
 } // namespace psddl_pds2psana

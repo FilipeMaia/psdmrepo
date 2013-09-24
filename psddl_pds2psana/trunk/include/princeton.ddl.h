@@ -6,13 +6,13 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include "psddl_psana/princeton.ddl.h"
-#include "psddl_pdsdata/princeton.ddl.h"
+#include "pdsdata/psddl/princeton.ddl.h"
 namespace psddl_pds2psana {
 namespace Princeton {
 
 class ConfigV1 : public Psana::Princeton::ConfigV1 {
 public:
-  typedef PsddlPds::Princeton::ConfigV1 XtcType;
+  typedef Pds::Princeton::ConfigV1 XtcType;
   typedef Psana::Princeton::ConfigV1 PsanaType;
   ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~ConfigV1();
@@ -39,7 +39,7 @@ private:
 
 class ConfigV2 : public Psana::Princeton::ConfigV2 {
 public:
-  typedef PsddlPds::Princeton::ConfigV2 XtcType;
+  typedef Pds::Princeton::ConfigV2 XtcType;
   typedef Psana::Princeton::ConfigV2 PsanaType;
   ConfigV2(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~ConfigV2();
@@ -67,7 +67,7 @@ private:
 
 class ConfigV3 : public Psana::Princeton::ConfigV3 {
 public:
-  typedef PsddlPds::Princeton::ConfigV3 XtcType;
+  typedef Pds::Princeton::ConfigV3 XtcType;
   typedef Psana::Princeton::ConfigV3 PsanaType;
   ConfigV3(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~ConfigV3();
@@ -95,7 +95,7 @@ private:
 
 class ConfigV4 : public Psana::Princeton::ConfigV4 {
 public:
-  typedef PsddlPds::Princeton::ConfigV4 XtcType;
+  typedef Pds::Princeton::ConfigV4 XtcType;
   typedef Psana::Princeton::ConfigV4 PsanaType;
   ConfigV4(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~ConfigV4();
@@ -126,7 +126,7 @@ private:
 
 class ConfigV5 : public Psana::Princeton::ConfigV5 {
 public:
-  typedef PsddlPds::Princeton::ConfigV5 XtcType;
+  typedef Pds::Princeton::ConfigV5 XtcType;
   typedef Psana::Princeton::ConfigV5 PsanaType;
   ConfigV5(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~ConfigV5();
@@ -159,7 +159,7 @@ private:
 template <typename Config>
 class FrameV1 : public Psana::Princeton::FrameV1 {
 public:
-  typedef PsddlPds::Princeton::FrameV1 XtcType;
+  typedef Pds::Princeton::FrameV1 XtcType;
   typedef Psana::Princeton::FrameV1 PsanaType;
   FrameV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const Config>& cfgPtr);
   virtual ~FrameV1();
@@ -176,7 +176,7 @@ private:
 template <typename Config>
 class FrameV2 : public Psana::Princeton::FrameV2 {
 public:
-  typedef PsddlPds::Princeton::FrameV2 XtcType;
+  typedef Pds::Princeton::FrameV2 XtcType;
   typedef Psana::Princeton::FrameV2 PsanaType;
   FrameV2(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const Config>& cfgPtr);
   virtual ~FrameV2();
@@ -190,7 +190,7 @@ private:
   boost::shared_ptr<const Config> m_cfgPtr;
 };
 
-Psana::Princeton::InfoV1 pds_to_psana(PsddlPds::Princeton::InfoV1 pds);
+Psana::Princeton::InfoV1 pds_to_psana(Pds::Princeton::InfoV1 pds);
 
 } // namespace Princeton
 } // namespace psddl_pds2psana

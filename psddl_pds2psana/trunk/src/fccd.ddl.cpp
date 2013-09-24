@@ -9,12 +9,12 @@
 
 namespace psddl_pds2psana {
 namespace FCCD {
-Psana::FCCD::FccdConfigV1::Depth pds_to_psana(PsddlPds::FCCD::FccdConfigV1::Depth e)
+Psana::FCCD::FccdConfigV1::Depth pds_to_psana(Pds::FCCD::FccdConfigV1::Depth e)
 {
   return Psana::FCCD::FccdConfigV1::Depth(e);
 }
 
-Psana::FCCD::FccdConfigV1::Output_Source pds_to_psana(PsddlPds::FCCD::FccdConfigV1::Output_Source e)
+Psana::FCCD::FccdConfigV1::Output_Source pds_to_psana(Pds::FCCD::FccdConfigV1::Output_Source e)
 {
   return Psana::FCCD::FccdConfigV1::Output_Source(e);
 }
@@ -53,12 +53,12 @@ uint32_t FccdConfigV1::trimmedHeight() const {
   return m_xtcObj->trimmedHeight();
 }
 
-Psana::FCCD::FccdConfigV2::Depth pds_to_psana(PsddlPds::FCCD::FccdConfigV2::Depth e)
+Psana::FCCD::FccdConfigV2::Depth pds_to_psana(Pds::FCCD::FccdConfigV2::Depth e)
 {
   return Psana::FCCD::FccdConfigV2::Depth(e);
 }
 
-Psana::FCCD::FccdConfigV2::Output_Source pds_to_psana(PsddlPds::FCCD::FccdConfigV2::Output_Source e)
+Psana::FCCD::FccdConfigV2::Output_Source pds_to_psana(Pds::FCCD::FccdConfigV2::Output_Source e)
 {
   return Psana::FCCD::FccdConfigV2::Output_Source(e);
 }

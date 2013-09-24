@@ -9,17 +9,17 @@
 
 namespace psddl_pds2psana {
 namespace Lusi {
-Psana::Lusi::DiodeFexConfigV1 pds_to_psana(PsddlPds::Lusi::DiodeFexConfigV1 pds)
+Psana::Lusi::DiodeFexConfigV1 pds_to_psana(Pds::Lusi::DiodeFexConfigV1 pds)
 {
   return Psana::Lusi::DiodeFexConfigV1(pds.base().data(), pds.scale().data());
 }
 
-Psana::Lusi::DiodeFexConfigV2 pds_to_psana(PsddlPds::Lusi::DiodeFexConfigV2 pds)
+Psana::Lusi::DiodeFexConfigV2 pds_to_psana(Pds::Lusi::DiodeFexConfigV2 pds)
 {
   return Psana::Lusi::DiodeFexConfigV2(pds.base().data(), pds.scale().data());
 }
 
-Psana::Lusi::DiodeFexV1 pds_to_psana(PsddlPds::Lusi::DiodeFexV1 pds)
+Psana::Lusi::DiodeFexV1 pds_to_psana(Pds::Lusi::DiodeFexV1 pds)
 {
   return Psana::Lusi::DiodeFexV1(pds.value());
 }
@@ -30,7 +30,7 @@ IpmFexConfigV1::IpmFexConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr)
 {
   {
     typedef ndarray<Psana::Lusi::DiodeFexConfigV1, 1> NDArray;
-    typedef ndarray<const PsddlPds::Lusi::DiodeFexConfigV1, 1> XtcNDArray;
+    typedef ndarray<const Pds::Lusi::DiodeFexConfigV1, 1> XtcNDArray;
     const XtcNDArray& xtc_ndarr = xtcPtr->diode();
     _diode_ndarray_storage_ = NDArray(xtc_ndarr.shape());
     NDArray::iterator out = _diode_ndarray_storage_.begin();
@@ -60,7 +60,7 @@ IpmFexConfigV2::IpmFexConfigV2(const boost::shared_ptr<const XtcType>& xtcPtr)
 {
   {
     typedef ndarray<Psana::Lusi::DiodeFexConfigV2, 1> NDArray;
-    typedef ndarray<const PsddlPds::Lusi::DiodeFexConfigV2, 1> XtcNDArray;
+    typedef ndarray<const Pds::Lusi::DiodeFexConfigV2, 1> XtcNDArray;
     const XtcNDArray& xtc_ndarr = xtcPtr->diode();
     _diode_ndarray_storage_ = NDArray(xtc_ndarr.shape());
     NDArray::iterator out = _diode_ndarray_storage_.begin();
@@ -84,12 +84,12 @@ float IpmFexConfigV2::yscale() const {
   return m_xtcObj->yscale();
 }
 
-Psana::Lusi::IpmFexV1 pds_to_psana(PsddlPds::Lusi::IpmFexV1 pds)
+Psana::Lusi::IpmFexV1 pds_to_psana(Pds::Lusi::IpmFexV1 pds)
 {
   return Psana::Lusi::IpmFexV1(pds.channel().data(), pds.sum(), pds.xpos(), pds.ypos());
 }
 
-Psana::Lusi::PimImageConfigV1 pds_to_psana(PsddlPds::Lusi::PimImageConfigV1 pds)
+Psana::Lusi::PimImageConfigV1 pds_to_psana(Pds::Lusi::PimImageConfigV1 pds)
 {
   return Psana::Lusi::PimImageConfigV1(pds.xscale(), pds.yscale());
 }

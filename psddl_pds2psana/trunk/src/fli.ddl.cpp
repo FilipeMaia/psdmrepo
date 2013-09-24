@@ -134,6 +134,6 @@ ndarray<const uint16_t, 2> FrameV1<Config>::data() const {
   return m_xtcObj->data(*m_cfgPtr, m_xtcObj);
 }
 
-template class FrameV1<PsddlPds::Fli::ConfigV1>;
+template class FrameV1<Pds::Fli::ConfigV1>;
 } // namespace Fli
 } // namespace psddl_pds2psana

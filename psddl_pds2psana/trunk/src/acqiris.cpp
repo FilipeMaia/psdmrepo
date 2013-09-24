@@ -40,10 +40,10 @@ TdcDataV1::TdcDataV1(const boost::shared_ptr<const XtcType>& xtcPtr, size_t xtcS
 {
   // special constructor for TdcDataV1
   // the size of the data array is unknown and needs to be determined from XTC size
-  size_t nItems = xtcSize / PsddlPds::Acqiris::TdcDataV1_Item::_sizeof();
+  size_t nItems = xtcSize / Pds::Acqiris::TdcDataV1_Item::_sizeof();
 
   typedef ndarray<Psana::Acqiris::TdcDataV1_Item, 1> NDArray;
-  typedef ndarray<const PsddlPds::Acqiris::TdcDataV1_Item, 1> XtcNDArray;
+  typedef ndarray<const Pds::Acqiris::TdcDataV1_Item, 1> XtcNDArray;
   const XtcNDArray& xtc_ndarr = xtcPtr->data();
   _data_ndarray_storage_ = NDArray(xtc_ndarr.shape());
   NDArray::iterator out = _data_ndarray_storage_.begin();

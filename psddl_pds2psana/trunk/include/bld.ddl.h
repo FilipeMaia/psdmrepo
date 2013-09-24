@@ -6,29 +6,32 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include "psddl_psana/bld.ddl.h"
-#include "psddl_pdsdata/bld.ddl.h"
+#include "pdsdata/psddl/bld.ddl.h"
+#include "psddl_pds2psana/acqiris.ddl.h"
 #include "psddl_pds2psana/camera.ddl.h"
 #include "psddl_pds2psana/ipimb.ddl.h"
 #include "psddl_pds2psana/lusi.ddl.h"
 #include "psddl_pds2psana/pulnix.ddl.h"
 namespace psddl_pds2psana {
 namespace Bld {
-Psana::Bld::BldDataFEEGasDetEnergy pds_to_psana(PsddlPds::Bld::BldDataFEEGasDetEnergy pds);
+Psana::Bld::BldDataFEEGasDetEnergy pds_to_psana(Pds::Bld::BldDataFEEGasDetEnergy pds);
 
-Psana::Bld::BldDataEBeamV0 pds_to_psana(PsddlPds::Bld::BldDataEBeamV0 pds);
+Psana::Bld::BldDataEBeamV0 pds_to_psana(Pds::Bld::BldDataEBeamV0 pds);
 
-Psana::Bld::BldDataEBeamV1 pds_to_psana(PsddlPds::Bld::BldDataEBeamV1 pds);
+Psana::Bld::BldDataEBeamV1 pds_to_psana(Pds::Bld::BldDataEBeamV1 pds);
 
-Psana::Bld::BldDataEBeamV2 pds_to_psana(PsddlPds::Bld::BldDataEBeamV2 pds);
+Psana::Bld::BldDataEBeamV2 pds_to_psana(Pds::Bld::BldDataEBeamV2 pds);
 
-Psana::Bld::BldDataEBeamV3 pds_to_psana(PsddlPds::Bld::BldDataEBeamV3 pds);
+Psana::Bld::BldDataEBeamV3 pds_to_psana(Pds::Bld::BldDataEBeamV3 pds);
 
-Psana::Bld::BldDataPhaseCavity pds_to_psana(PsddlPds::Bld::BldDataPhaseCavity pds);
+Psana::Bld::BldDataEBeamV4 pds_to_psana(Pds::Bld::BldDataEBeamV4 pds);
+
+Psana::Bld::BldDataPhaseCavity pds_to_psana(Pds::Bld::BldDataPhaseCavity pds);
 
 
 class BldDataIpimbV0 : public Psana::Bld::BldDataIpimbV0 {
 public:
-  typedef PsddlPds::Bld::BldDataIpimbV0 XtcType;
+  typedef Pds::Bld::BldDataIpimbV0 XtcType;
   typedef Psana::Bld::BldDataIpimbV0 PsanaType;
   BldDataIpimbV0(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~BldDataIpimbV0();
@@ -46,7 +49,7 @@ private:
 
 class BldDataIpimbV1 : public Psana::Bld::BldDataIpimbV1 {
 public:
-  typedef PsddlPds::Bld::BldDataIpimbV1 XtcType;
+  typedef Pds::Bld::BldDataIpimbV1 XtcType;
   typedef Psana::Bld::BldDataIpimbV1 PsanaType;
   BldDataIpimbV1(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~BldDataIpimbV1();
@@ -64,7 +67,7 @@ private:
 
 class BldDataPimV1 : public Psana::Bld::BldDataPimV1 {
 public:
-  typedef PsddlPds::Bld::BldDataPimV1 XtcType;
+  typedef Pds::Bld::BldDataPimV1 XtcType;
   typedef Psana::Bld::BldDataPimV1 PsanaType;
   BldDataPimV1(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~BldDataPimV1();
@@ -82,7 +85,7 @@ private:
 
 class BldDataGMDV0 : public Psana::Bld::BldDataGMDV0 {
 public:
-  typedef PsddlPds::Bld::BldDataGMDV0 XtcType;
+  typedef Pds::Bld::BldDataGMDV0 XtcType;
   typedef Psana::Bld::BldDataGMDV0 PsanaType;
   BldDataGMDV0(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~BldDataGMDV0();
@@ -109,7 +112,7 @@ private:
 
 class BldDataGMDV1 : public Psana::Bld::BldDataGMDV1 {
 public:
-  typedef PsddlPds::Bld::BldDataGMDV1 XtcType;
+  typedef Pds::Bld::BldDataGMDV1 XtcType;
   typedef Psana::Bld::BldDataGMDV1 PsanaType;
   BldDataGMDV1(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~BldDataGMDV1();
@@ -121,6 +124,24 @@ public:
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
+};
+
+
+template <typename Config>
+class BldDataAcqADCV1 : public Psana::Bld::BldDataAcqADCV1 {
+public:
+  typedef Pds::Bld::BldDataAcqADCV1 XtcType;
+  typedef Psana::Bld::BldDataAcqADCV1 PsanaType;
+  BldDataAcqADCV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const Config>& cfgPtr);
+  virtual ~BldDataAcqADCV1();
+  virtual const Psana::Acqiris::ConfigV1& config() const;
+  virtual const Psana::Acqiris::DataDescV1& data() const;
+  const XtcType& _xtcObj() const { return *m_xtcObj; }
+private:
+  boost::shared_ptr<const XtcType> m_xtcObj;
+  boost::shared_ptr<const Config> m_cfgPtr;
+  psddl_pds2psana::Acqiris::ConfigV1 _config;
+  psddl_pds2psana::Acqiris::DataDescV1<Config> _data;
 };
 
 } // namespace Bld

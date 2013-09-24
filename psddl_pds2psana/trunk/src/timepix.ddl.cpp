@@ -9,12 +9,12 @@
 
 namespace psddl_pds2psana {
 namespace Timepix {
-Psana::Timepix::ConfigV1::ReadoutSpeed pds_to_psana(PsddlPds::Timepix::ConfigV1::ReadoutSpeed e)
+Psana::Timepix::ConfigV1::ReadoutSpeed pds_to_psana(Pds::Timepix::ConfigV1::ReadoutSpeed e)
 {
   return Psana::Timepix::ConfigV1::ReadoutSpeed(e);
 }
 
-Psana::Timepix::ConfigV1::TriggerMode pds_to_psana(PsddlPds::Timepix::ConfigV1::TriggerMode e)
+Psana::Timepix::ConfigV1::TriggerMode pds_to_psana(Pds::Timepix::ConfigV1::TriggerMode e)
 {
   return Psana::Timepix::ConfigV1::TriggerMode(e);
 }
@@ -323,12 +323,12 @@ int32_t ConfigV1::dac3RefLvds() const {
   return m_xtcObj->dac3RefLvds();
 }
 
-Psana::Timepix::ConfigV2::ReadoutSpeed pds_to_psana(PsddlPds::Timepix::ConfigV2::ReadoutSpeed e)
+Psana::Timepix::ConfigV2::ReadoutSpeed pds_to_psana(Pds::Timepix::ConfigV2::ReadoutSpeed e)
 {
   return Psana::Timepix::ConfigV2::ReadoutSpeed(e);
 }
 
-Psana::Timepix::ConfigV2::TriggerMode pds_to_psana(PsddlPds::Timepix::ConfigV2::TriggerMode e)
+Psana::Timepix::ConfigV2::TriggerMode pds_to_psana(Pds::Timepix::ConfigV2::TriggerMode e)
 {
   return Psana::Timepix::ConfigV2::TriggerMode(e);
 }
@@ -702,12 +702,12 @@ int32_t ConfigV2::chipCount() const {
   return m_xtcObj->chipCount();
 }
 
-Psana::Timepix::ConfigV3::ReadoutSpeed pds_to_psana(PsddlPds::Timepix::ConfigV3::ReadoutSpeed e)
+Psana::Timepix::ConfigV3::ReadoutSpeed pds_to_psana(Pds::Timepix::ConfigV3::ReadoutSpeed e)
 {
   return Psana::Timepix::ConfigV3::ReadoutSpeed(e);
 }
 
-Psana::Timepix::ConfigV3::TimepixMode pds_to_psana(PsddlPds::Timepix::ConfigV3::TimepixMode e)
+Psana::Timepix::ConfigV3::TimepixMode pds_to_psana(Pds::Timepix::ConfigV3::TimepixMode e)
 {
   return Psana::Timepix::ConfigV3::TimepixMode(e);
 }
@@ -1140,6 +1140,11 @@ uint32_t DataV1::depth_bytes() const {
   return m_xtcObj->depth_bytes();
 }
 
+
+uint32_t DataV1::data_size() const {
+  return m_xtcObj->data_size();
+}
+
 DataV2::DataV2(const boost::shared_ptr<const XtcType>& xtcPtr)
   : Psana::Timepix::DataV2()
   , m_xtcObj(xtcPtr)
@@ -1187,6 +1192,11 @@ uint32_t DataV2::depth() const {
 
 uint32_t DataV2::depth_bytes() const {
   return m_xtcObj->depth_bytes();
+}
+
+
+uint32_t DataV2::data_size() const {
+  return m_xtcObj->data_size();
 }
 
 } // namespace Timepix

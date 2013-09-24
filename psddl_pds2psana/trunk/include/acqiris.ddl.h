@@ -6,19 +6,19 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include "psddl_psana/acqiris.ddl.h"
-#include "psddl_pdsdata/acqiris.ddl.h"
+#include "pdsdata/psddl/acqiris.ddl.h"
 namespace psddl_pds2psana {
 namespace Acqiris {
-Psana::Acqiris::VertV1 pds_to_psana(PsddlPds::Acqiris::VertV1 pds);
+Psana::Acqiris::VertV1 pds_to_psana(Pds::Acqiris::VertV1 pds);
 
-Psana::Acqiris::HorizV1 pds_to_psana(PsddlPds::Acqiris::HorizV1 pds);
+Psana::Acqiris::HorizV1 pds_to_psana(Pds::Acqiris::HorizV1 pds);
 
-Psana::Acqiris::TrigV1 pds_to_psana(PsddlPds::Acqiris::TrigV1 pds);
+Psana::Acqiris::TrigV1 pds_to_psana(Pds::Acqiris::TrigV1 pds);
 
 
 class ConfigV1 : public Psana::Acqiris::ConfigV1 {
 public:
-  typedef PsddlPds::Acqiris::ConfigV1 XtcType;
+  typedef Pds::Acqiris::ConfigV1 XtcType;
   typedef Psana::Acqiris::ConfigV1 PsanaType;
   ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~ConfigV1();
@@ -37,13 +37,13 @@ private:
   ndarray<Psana::Acqiris::VertV1, 1> _vert_ndarray_storage_;
 };
 
-Psana::Acqiris::TimestampV1 pds_to_psana(PsddlPds::Acqiris::TimestampV1 pds);
+Psana::Acqiris::TimestampV1 pds_to_psana(Pds::Acqiris::TimestampV1 pds);
 
 
 template <typename Config>
 class DataDescV1Elem : public Psana::Acqiris::DataDescV1Elem {
 public:
-  typedef PsddlPds::Acqiris::DataDescV1Elem XtcType;
+  typedef Pds::Acqiris::DataDescV1Elem XtcType;
   typedef Psana::Acqiris::DataDescV1Elem PsanaType;
   DataDescV1Elem(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const Config>& cfgPtr);
   virtual ~DataDescV1Elem();
@@ -63,7 +63,7 @@ private:
 template <typename Config>
 class DataDescV1 : public Psana::Acqiris::DataDescV1 {
 public:
-  typedef PsddlPds::Acqiris::DataDescV1 XtcType;
+  typedef Pds::Acqiris::DataDescV1 XtcType;
   typedef Psana::Acqiris::DataDescV1 PsanaType;
   DataDescV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const Config>& cfgPtr);
   virtual ~DataDescV1();
@@ -76,16 +76,16 @@ private:
   std::vector< psddl_pds2psana::Acqiris::DataDescV1Elem<Config> > _data;
 };
 
-Psana::Acqiris::TdcChannel pds_to_psana(PsddlPds::Acqiris::TdcChannel pds);
+Psana::Acqiris::TdcChannel pds_to_psana(Pds::Acqiris::TdcChannel pds);
 
-Psana::Acqiris::TdcAuxIO pds_to_psana(PsddlPds::Acqiris::TdcAuxIO pds);
+Psana::Acqiris::TdcAuxIO pds_to_psana(Pds::Acqiris::TdcAuxIO pds);
 
-Psana::Acqiris::TdcVetoIO pds_to_psana(PsddlPds::Acqiris::TdcVetoIO pds);
+Psana::Acqiris::TdcVetoIO pds_to_psana(Pds::Acqiris::TdcVetoIO pds);
 
 
 class TdcConfigV1 : public Psana::Acqiris::TdcConfigV1 {
 public:
-  typedef PsddlPds::Acqiris::TdcConfigV1 XtcType;
+  typedef Pds::Acqiris::TdcConfigV1 XtcType;
   typedef Psana::Acqiris::TdcConfigV1 PsanaType;
   TdcConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~TdcConfigV1();
@@ -100,12 +100,12 @@ private:
   Psana::Acqiris::TdcVetoIO _veto;
 };
 
-Psana::Acqiris::TdcDataV1_Item pds_to_psana(PsddlPds::Acqiris::TdcDataV1_Item pds);
+Psana::Acqiris::TdcDataV1_Item pds_to_psana(Pds::Acqiris::TdcDataV1_Item pds);
 
 
 class TdcDataV1 : public Psana::Acqiris::TdcDataV1 {
 public:
-  typedef PsddlPds::Acqiris::TdcDataV1 XtcType;
+  typedef Pds::Acqiris::TdcDataV1 XtcType;
   typedef Psana::Acqiris::TdcDataV1 PsanaType;
   TdcDataV1(const boost::shared_ptr<const XtcType>& xtcPtr, size_t xtcSize);
   virtual ~TdcDataV1();

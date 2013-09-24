@@ -6,13 +6,13 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include "psddl_psana/pnccd.ddl.h"
-#include "psddl_pdsdata/pnccd.ddl.h"
+#include "pdsdata/psddl/pnccd.ddl.h"
 namespace psddl_pds2psana {
 namespace PNCCD {
 
 class ConfigV1 : public Psana::PNCCD::ConfigV1 {
 public:
-  typedef PsddlPds::PNCCD::ConfigV1 XtcType;
+  typedef Pds::PNCCD::ConfigV1 XtcType;
   typedef Psana::PNCCD::ConfigV1 PsanaType;
   ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~ConfigV1();
@@ -26,7 +26,7 @@ private:
 
 class ConfigV2 : public Psana::PNCCD::ConfigV2 {
 public:
-  typedef PsddlPds::PNCCD::ConfigV2 XtcType;
+  typedef Pds::PNCCD::ConfigV2 XtcType;
   typedef Psana::PNCCD::ConfigV2 PsanaType;
   ConfigV2(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~ConfigV2();
@@ -51,7 +51,7 @@ private:
 template <typename Config>
 class FrameV1 : public Psana::PNCCD::FrameV1 {
 public:
-  typedef PsddlPds::PNCCD::FrameV1 XtcType;
+  typedef Pds::PNCCD::FrameV1 XtcType;
   typedef Psana::PNCCD::FrameV1 PsanaType;
   FrameV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const Config>& cfgPtr);
   virtual ~FrameV1();
@@ -70,7 +70,7 @@ private:
 
 class FullFrameV1 : public Psana::PNCCD::FullFrameV1 {
 public:
-  typedef PsddlPds::PNCCD::FullFrameV1 XtcType;
+  typedef Pds::PNCCD::FullFrameV1 XtcType;
   typedef Psana::PNCCD::FullFrameV1 PsanaType;
   FullFrameV1(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~FullFrameV1();
@@ -88,7 +88,7 @@ private:
 template <typename Config>
 class FramesV1 : public Psana::PNCCD::FramesV1 {
 public:
-  typedef PsddlPds::PNCCD::FramesV1 XtcType;
+  typedef Pds::PNCCD::FramesV1 XtcType;
   typedef Psana::PNCCD::FramesV1 PsanaType;
   FramesV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const Config>& cfgPtr);
   virtual ~FramesV1();

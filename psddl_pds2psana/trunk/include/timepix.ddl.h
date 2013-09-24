@@ -6,13 +6,13 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include "psddl_psana/timepix.ddl.h"
-#include "psddl_pdsdata/timepix.ddl.h"
+#include "pdsdata/psddl/timepix.ddl.h"
 namespace psddl_pds2psana {
 namespace Timepix {
 
 class ConfigV1 : public Psana::Timepix::ConfigV1 {
 public:
-  typedef PsddlPds::Timepix::ConfigV1 XtcType;
+  typedef Pds::Timepix::ConfigV1 XtcType;
   typedef Psana::Timepix::ConfigV1 PsanaType;
   ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~ConfigV1();
@@ -83,7 +83,7 @@ private:
 
 class ConfigV2 : public Psana::Timepix::ConfigV2 {
 public:
-  typedef PsddlPds::Timepix::ConfigV2 XtcType;
+  typedef Pds::Timepix::ConfigV2 XtcType;
   typedef Psana::Timepix::ConfigV2 PsanaType;
   ConfigV2(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~ConfigV2();
@@ -167,7 +167,7 @@ private:
 
 class ConfigV3 : public Psana::Timepix::ConfigV3 {
 public:
-  typedef PsddlPds::Timepix::ConfigV3 XtcType;
+  typedef Pds::Timepix::ConfigV3 XtcType;
   typedef Psana::Timepix::ConfigV3 PsanaType;
   ConfigV3(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~ConfigV3();
@@ -253,7 +253,7 @@ private:
 
 class DataV1 : public Psana::Timepix::DataV1 {
 public:
-  typedef PsddlPds::Timepix::DataV1 XtcType;
+  typedef Pds::Timepix::DataV1 XtcType;
   typedef Psana::Timepix::DataV1 PsanaType;
   DataV1(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~DataV1();
@@ -265,6 +265,7 @@ public:
   virtual uint32_t height() const;
   virtual uint32_t depth() const;
   virtual uint32_t depth_bytes() const;
+  virtual uint32_t data_size() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
@@ -273,7 +274,7 @@ private:
 
 class DataV2 : public Psana::Timepix::DataV2 {
 public:
-  typedef PsddlPds::Timepix::DataV2 XtcType;
+  typedef Pds::Timepix::DataV2 XtcType;
   typedef Psana::Timepix::DataV2 PsanaType;
   DataV2(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~DataV2();
@@ -285,6 +286,7 @@ public:
   virtual ndarray<const uint16_t, 2> data() const;
   virtual uint32_t depth() const;
   virtual uint32_t depth_bytes() const;
+  virtual uint32_t data_size() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;

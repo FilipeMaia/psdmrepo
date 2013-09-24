@@ -6,13 +6,13 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include "psddl_psana/fli.ddl.h"
-#include "psddl_pdsdata/fli.ddl.h"
+#include "pdsdata/psddl/fli.ddl.h"
 namespace psddl_pds2psana {
 namespace Fli {
 
 class ConfigV1 : public Psana::Fli::ConfigV1 {
 public:
-  typedef PsddlPds::Fli::ConfigV1 XtcType;
+  typedef Pds::Fli::ConfigV1 XtcType;
   typedef Psana::Fli::ConfigV1 PsanaType;
   ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~ConfigV1();
@@ -41,7 +41,7 @@ private:
 template <typename Config>
 class FrameV1 : public Psana::Fli::FrameV1 {
 public:
-  typedef PsddlPds::Fli::FrameV1 XtcType;
+  typedef Pds::Fli::FrameV1 XtcType;
   typedef Psana::Fli::FrameV1 PsanaType;
   FrameV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const Config>& cfgPtr);
   virtual ~FrameV1();

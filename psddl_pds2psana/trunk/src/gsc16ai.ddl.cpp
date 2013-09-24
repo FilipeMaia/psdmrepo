@@ -9,22 +9,22 @@
 
 namespace psddl_pds2psana {
 namespace Gsc16ai {
-Psana::Gsc16ai::ConfigV1::InputMode pds_to_psana(PsddlPds::Gsc16ai::ConfigV1::InputMode e)
+Psana::Gsc16ai::ConfigV1::InputMode pds_to_psana(Pds::Gsc16ai::ConfigV1::InputMode e)
 {
   return Psana::Gsc16ai::ConfigV1::InputMode(e);
 }
 
-Psana::Gsc16ai::ConfigV1::VoltageRange pds_to_psana(PsddlPds::Gsc16ai::ConfigV1::VoltageRange e)
+Psana::Gsc16ai::ConfigV1::VoltageRange pds_to_psana(Pds::Gsc16ai::ConfigV1::VoltageRange e)
 {
   return Psana::Gsc16ai::ConfigV1::VoltageRange(e);
 }
 
-Psana::Gsc16ai::ConfigV1::TriggerMode pds_to_psana(PsddlPds::Gsc16ai::ConfigV1::TriggerMode e)
+Psana::Gsc16ai::ConfigV1::TriggerMode pds_to_psana(Pds::Gsc16ai::ConfigV1::TriggerMode e)
 {
   return Psana::Gsc16ai::ConfigV1::TriggerMode(e);
 }
 
-Psana::Gsc16ai::ConfigV1::DataFormat pds_to_psana(PsddlPds::Gsc16ai::ConfigV1::DataFormat e)
+Psana::Gsc16ai::ConfigV1::DataFormat pds_to_psana(Pds::Gsc16ai::ConfigV1::DataFormat e)
 {
   return Psana::Gsc16ai::ConfigV1::DataFormat(e);
 }
@@ -112,6 +112,6 @@ ndarray<const uint16_t, 1> DataV1<Config>::channelValue() const {
   return m_xtcObj->channelValue(*m_cfgPtr, m_xtcObj);
 }
 
-template class DataV1<PsddlPds::Gsc16ai::ConfigV1>;
+template class DataV1<Pds::Gsc16ai::ConfigV1>;
 } // namespace Gsc16ai
 } // namespace psddl_pds2psana

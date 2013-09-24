@@ -9,82 +9,82 @@
 
 namespace psddl_pds2psana {
 namespace Epics {
-Psana::Epics::DbrTypes pds_to_psana(PsddlPds::Epics::DbrTypes e)
+Psana::Epics::DbrTypes pds_to_psana(Pds::Epics::DbrTypes e)
 {
   return Psana::Epics::DbrTypes(e);
 }
 
-Psana::Epics::epicsTimeStamp pds_to_psana(PsddlPds::Epics::epicsTimeStamp pds)
+Psana::Epics::epicsTimeStamp pds_to_psana(Pds::Epics::epicsTimeStamp pds)
 {
   return Psana::Epics::epicsTimeStamp(pds.sec(), pds.nsec());
 }
 
-Psana::Epics::dbr_time_string pds_to_psana(PsddlPds::Epics::dbr_time_string pds)
+Psana::Epics::dbr_time_string pds_to_psana(Pds::Epics::dbr_time_string pds)
 {
   return Psana::Epics::dbr_time_string(pds.status(), pds.severity(), pds_to_psana(pds.stamp()));
 }
 
-Psana::Epics::dbr_time_short pds_to_psana(PsddlPds::Epics::dbr_time_short pds)
+Psana::Epics::dbr_time_short pds_to_psana(Pds::Epics::dbr_time_short pds)
 {
   return Psana::Epics::dbr_time_short(pds.status(), pds.severity(), pds_to_psana(pds.stamp()));
 }
 
-Psana::Epics::dbr_time_float pds_to_psana(PsddlPds::Epics::dbr_time_float pds)
+Psana::Epics::dbr_time_float pds_to_psana(Pds::Epics::dbr_time_float pds)
 {
   return Psana::Epics::dbr_time_float(pds.status(), pds.severity(), pds_to_psana(pds.stamp()));
 }
 
-Psana::Epics::dbr_time_enum pds_to_psana(PsddlPds::Epics::dbr_time_enum pds)
+Psana::Epics::dbr_time_enum pds_to_psana(Pds::Epics::dbr_time_enum pds)
 {
   return Psana::Epics::dbr_time_enum(pds.status(), pds.severity(), pds_to_psana(pds.stamp()));
 }
 
-Psana::Epics::dbr_time_char pds_to_psana(PsddlPds::Epics::dbr_time_char pds)
+Psana::Epics::dbr_time_char pds_to_psana(Pds::Epics::dbr_time_char pds)
 {
   return Psana::Epics::dbr_time_char(pds.status(), pds.severity(), pds_to_psana(pds.stamp()));
 }
 
-Psana::Epics::dbr_time_long pds_to_psana(PsddlPds::Epics::dbr_time_long pds)
+Psana::Epics::dbr_time_long pds_to_psana(Pds::Epics::dbr_time_long pds)
 {
   return Psana::Epics::dbr_time_long(pds.status(), pds.severity(), pds_to_psana(pds.stamp()));
 }
 
-Psana::Epics::dbr_time_double pds_to_psana(PsddlPds::Epics::dbr_time_double pds)
+Psana::Epics::dbr_time_double pds_to_psana(Pds::Epics::dbr_time_double pds)
 {
   return Psana::Epics::dbr_time_double(pds.status(), pds.severity(), pds_to_psana(pds.stamp()));
 }
 
-Psana::Epics::dbr_sts_string pds_to_psana(PsddlPds::Epics::dbr_sts_string pds)
+Psana::Epics::dbr_sts_string pds_to_psana(Pds::Epics::dbr_sts_string pds)
 {
   return Psana::Epics::dbr_sts_string(pds.status(), pds.severity());
 }
 
-Psana::Epics::dbr_ctrl_short pds_to_psana(PsddlPds::Epics::dbr_ctrl_short pds)
+Psana::Epics::dbr_ctrl_short pds_to_psana(Pds::Epics::dbr_ctrl_short pds)
 {
   return Psana::Epics::dbr_ctrl_short(pds.status(), pds.severity(), pds.units(), pds.upper_disp_limit(), pds.lower_disp_limit(), pds.upper_alarm_limit(), pds.upper_warning_limit(), pds.lower_warning_limit(), pds.lower_alarm_limit(), pds.upper_ctrl_limit(), pds.lower_ctrl_limit());
 }
 
-Psana::Epics::dbr_ctrl_float pds_to_psana(PsddlPds::Epics::dbr_ctrl_float pds)
+Psana::Epics::dbr_ctrl_float pds_to_psana(Pds::Epics::dbr_ctrl_float pds)
 {
   return Psana::Epics::dbr_ctrl_float(pds.status(), pds.severity(), pds.precision(), pds.units(), pds.upper_disp_limit(), pds.lower_disp_limit(), pds.upper_alarm_limit(), pds.upper_warning_limit(), pds.lower_warning_limit(), pds.lower_alarm_limit(), pds.upper_ctrl_limit(), pds.lower_ctrl_limit());
 }
 
-Psana::Epics::dbr_ctrl_enum pds_to_psana(PsddlPds::Epics::dbr_ctrl_enum pds)
+Psana::Epics::dbr_ctrl_enum pds_to_psana(Pds::Epics::dbr_ctrl_enum pds)
 {
   return Psana::Epics::dbr_ctrl_enum(pds.status(), pds.severity(), pds.no_str(), pds.strings(0));
 }
 
-Psana::Epics::dbr_ctrl_char pds_to_psana(PsddlPds::Epics::dbr_ctrl_char pds)
+Psana::Epics::dbr_ctrl_char pds_to_psana(Pds::Epics::dbr_ctrl_char pds)
 {
   return Psana::Epics::dbr_ctrl_char(pds.status(), pds.severity(), pds.units(), pds.upper_disp_limit(), pds.lower_disp_limit(), pds.upper_alarm_limit(), pds.upper_warning_limit(), pds.lower_warning_limit(), pds.lower_alarm_limit(), pds.upper_ctrl_limit(), pds.lower_ctrl_limit());
 }
 
-Psana::Epics::dbr_ctrl_long pds_to_psana(PsddlPds::Epics::dbr_ctrl_long pds)
+Psana::Epics::dbr_ctrl_long pds_to_psana(Pds::Epics::dbr_ctrl_long pds)
 {
   return Psana::Epics::dbr_ctrl_long(pds.status(), pds.severity(), pds.units(), pds.upper_disp_limit(), pds.lower_disp_limit(), pds.upper_alarm_limit(), pds.upper_warning_limit(), pds.lower_warning_limit(), pds.lower_alarm_limit(), pds.upper_ctrl_limit(), pds.lower_ctrl_limit());
 }
 
-Psana::Epics::dbr_ctrl_double pds_to_psana(PsddlPds::Epics::dbr_ctrl_double pds)
+Psana::Epics::dbr_ctrl_double pds_to_psana(Pds::Epics::dbr_ctrl_double pds)
 {
   return Psana::Epics::dbr_ctrl_double(pds.status(), pds.severity(), pds.precision(), pds.units(), pds.upper_disp_limit(), pds.lower_disp_limit(), pds.upper_alarm_limit(), pds.upper_warning_limit(), pds.lower_warning_limit(), pds.lower_alarm_limit(), pds.upper_ctrl_limit(), pds.lower_ctrl_limit());
 }
@@ -1095,7 +1095,7 @@ double EpicsPvTimeDouble::value(uint32_t i) const {
   return m_xtcObj->value(i);
 }
 
-Psana::Epics::PvConfigV1 pds_to_psana(PsddlPds::Epics::PvConfigV1 pds)
+Psana::Epics::PvConfigV1 pds_to_psana(Pds::Epics::PvConfigV1 pds)
 {
   return Psana::Epics::PvConfigV1(pds.pvId(), pds.description(), pds.interval());
 }
@@ -1106,7 +1106,7 @@ ConfigV1::ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr)
 {
   {
     typedef ndarray<Psana::Epics::PvConfigV1, 1> NDArray;
-    typedef ndarray<const PsddlPds::Epics::PvConfigV1, 1> XtcNDArray;
+    typedef ndarray<const Pds::Epics::PvConfigV1, 1> XtcNDArray;
     const XtcNDArray& xtc_ndarr = xtcPtr->pvControls();
     _pvControls_ndarray_storage_ = NDArray(xtc_ndarr.shape());
     NDArray::iterator out = _pvControls_ndarray_storage_.begin();

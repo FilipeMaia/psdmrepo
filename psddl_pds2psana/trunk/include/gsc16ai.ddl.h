@@ -6,13 +6,13 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include "psddl_psana/gsc16ai.ddl.h"
-#include "psddl_pdsdata/gsc16ai.ddl.h"
+#include "pdsdata/psddl/gsc16ai.ddl.h"
 namespace psddl_pds2psana {
 namespace Gsc16ai {
 
 class ConfigV1 : public Psana::Gsc16ai::ConfigV1 {
 public:
-  typedef PsddlPds::Gsc16ai::ConfigV1 XtcType;
+  typedef Pds::Gsc16ai::ConfigV1 XtcType;
   typedef Psana::Gsc16ai::ConfigV1 PsanaType;
   ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~ConfigV1();
@@ -35,7 +35,7 @@ private:
 template <typename Config>
 class DataV1 : public Psana::Gsc16ai::DataV1 {
 public:
-  typedef PsddlPds::Gsc16ai::DataV1 XtcType;
+  typedef Pds::Gsc16ai::DataV1 XtcType;
   typedef Psana::Gsc16ai::DataV1 PsanaType;
   DataV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const Config>& cfgPtr);
   virtual ~DataV1();

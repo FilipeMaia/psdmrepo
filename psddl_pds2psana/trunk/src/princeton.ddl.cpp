@@ -514,11 +514,11 @@ ndarray<const uint16_t, 2> FrameV1<Config>::data() const {
   return m_xtcObj->data(*m_cfgPtr, m_xtcObj);
 }
 
-template class FrameV1<PsddlPds::Princeton::ConfigV1>;
-template class FrameV1<PsddlPds::Princeton::ConfigV2>;
-template class FrameV1<PsddlPds::Princeton::ConfigV3>;
-template class FrameV1<PsddlPds::Princeton::ConfigV4>;
-template class FrameV1<PsddlPds::Princeton::ConfigV5>;
+template class FrameV1<Pds::Princeton::ConfigV1>;
+template class FrameV1<Pds::Princeton::ConfigV2>;
+template class FrameV1<Pds::Princeton::ConfigV3>;
+template class FrameV1<Pds::Princeton::ConfigV4>;
+template class FrameV1<Pds::Princeton::ConfigV5>;
 template <typename Config>
 FrameV2<Config>::FrameV2(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const Config>& cfgPtr)
   : Psana::Princeton::FrameV2()
@@ -555,12 +555,12 @@ ndarray<const uint16_t, 2> FrameV2<Config>::data() const {
   return m_xtcObj->data(*m_cfgPtr, m_xtcObj);
 }
 
-template class FrameV2<PsddlPds::Princeton::ConfigV1>;
-template class FrameV2<PsddlPds::Princeton::ConfigV2>;
-template class FrameV2<PsddlPds::Princeton::ConfigV3>;
-template class FrameV2<PsddlPds::Princeton::ConfigV4>;
-template class FrameV2<PsddlPds::Princeton::ConfigV5>;
-Psana::Princeton::InfoV1 pds_to_psana(PsddlPds::Princeton::InfoV1 pds)
+template class FrameV2<Pds::Princeton::ConfigV1>;
+template class FrameV2<Pds::Princeton::ConfigV2>;
+template class FrameV2<Pds::Princeton::ConfigV3>;
+template class FrameV2<Pds::Princeton::ConfigV4>;
+template class FrameV2<Pds::Princeton::ConfigV5>;
+Psana::Princeton::InfoV1 pds_to_psana(Pds::Princeton::InfoV1 pds)
 {
   return Psana::Princeton::InfoV1(pds.temperature());
 }

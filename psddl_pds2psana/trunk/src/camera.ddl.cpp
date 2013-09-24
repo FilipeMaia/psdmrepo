@@ -9,7 +9,7 @@
 
 namespace psddl_pds2psana {
 namespace Camera {
-Psana::Camera::FrameCoord pds_to_psana(PsddlPds::Camera::FrameCoord pds)
+Psana::Camera::FrameCoord pds_to_psana(Pds::Camera::FrameCoord pds)
 {
   return Psana::Camera::FrameCoord(pds.column(), pds.row());
 }
@@ -23,12 +23,12 @@ FrameFccdConfigV1::~FrameFccdConfigV1()
 {
 }
 
-Psana::Camera::FrameFexConfigV1::Forwarding pds_to_psana(PsddlPds::Camera::FrameFexConfigV1::Forwarding e)
+Psana::Camera::FrameFexConfigV1::Forwarding pds_to_psana(Pds::Camera::FrameFexConfigV1::Forwarding e)
 {
   return Psana::Camera::FrameFexConfigV1::Forwarding(e);
 }
 
-Psana::Camera::FrameFexConfigV1::Processing pds_to_psana(PsddlPds::Camera::FrameFexConfigV1::Processing e)
+Psana::Camera::FrameFexConfigV1::Processing pds_to_psana(Pds::Camera::FrameFexConfigV1::Processing e)
 {
   return Psana::Camera::FrameFexConfigV1::Processing(e);
 }
@@ -41,7 +41,7 @@ FrameFexConfigV1::FrameFexConfigV1(const boost::shared_ptr<const XtcType>& xtcPt
 {
   {
     typedef ndarray<Psana::Camera::FrameCoord, 1> NDArray;
-    typedef ndarray<const PsddlPds::Camera::FrameCoord, 1> XtcNDArray;
+    typedef ndarray<const Pds::Camera::FrameCoord, 1> XtcNDArray;
     const XtcNDArray& xtc_ndarr = xtcPtr->masked_pixel_coordinates();
     _masked_pixel_coordinates_ndarray_storage_ = NDArray(xtc_ndarr.shape());
     NDArray::iterator out = _masked_pixel_coordinates_ndarray_storage_.begin();
@@ -124,6 +124,11 @@ ndarray<const uint8_t, 2> FrameV1::data8() const {
 
 ndarray<const uint16_t, 2> FrameV1::data16() const {
   return m_xtcObj->data16();
+}
+
+
+uint32_t FrameV1::depth_bytes() const {
+  return m_xtcObj->depth_bytes();
 }
 
 TwoDGaussianV1::TwoDGaussianV1(const boost::shared_ptr<const XtcType>& xtcPtr)

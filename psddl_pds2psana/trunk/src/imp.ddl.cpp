@@ -9,7 +9,7 @@
 
 namespace psddl_pds2psana {
 namespace Imp {
-Psana::Imp::ConfigV1::Registers pds_to_psana(PsddlPds::Imp::ConfigV1::Registers e)
+Psana::Imp::ConfigV1::Registers pds_to_psana(Pds::Imp::ConfigV1::Registers e)
 {
   return Psana::Imp::ConfigV1::Registers(e);
 }
@@ -73,12 +73,12 @@ uint32_t ConfigV1::adcDelay() const {
   return m_xtcObj->adcDelay();
 }
 
-Psana::Imp::Sample pds_to_psana(PsddlPds::Imp::Sample pds)
+Psana::Imp::Sample pds_to_psana(Pds::Imp::Sample pds)
 {
   return Psana::Imp::Sample(pds.channels().data());
 }
 
-Psana::Imp::LaneStatus pds_to_psana(PsddlPds::Imp::LaneStatus pds)
+Psana::Imp::LaneStatus pds_to_psana(Pds::Imp::LaneStatus pds)
 {
   return Psana::Imp::LaneStatus(pds.linkErrCount(), pds.linkDownCount(), pds.cellErrCount(), pds.rxCount(), pds.locLinked(), pds.remLinked(), pds.zeros(), pds.powersOkay());
 }
@@ -92,7 +92,7 @@ ElementV1<Config>::ElementV1(const boost::shared_ptr<const XtcType>& xtcPtr, con
 {
   {
     typedef ndarray<Psana::Imp::Sample, 1> NDArray;
-    typedef ndarray<const PsddlPds::Imp::Sample, 1> XtcNDArray;
+    typedef ndarray<const Pds::Imp::Sample, 1> XtcNDArray;
     const XtcNDArray& xtc_ndarr = xtcPtr->samples(*cfgPtr);
     _samples_ndarray_storage_ = NDArray(xtc_ndarr.shape());
     NDArray::iterator out = _samples_ndarray_storage_.begin();
@@ -134,6 +134,6 @@ template <typename Config>
 const Psana::Imp::LaneStatus& ElementV1<Config>::laneStatus() const { return _laneStatus; }
 template <typename Config>
 ndarray<const Psana::Imp::Sample, 1> ElementV1<Config>::samples() const { return _samples_ndarray_storage_; }
-template class ElementV1<PsddlPds::Imp::ConfigV1>;
+template class ElementV1<Pds::Imp::ConfigV1>;
 } // namespace Imp
 } // namespace psddl_pds2psana

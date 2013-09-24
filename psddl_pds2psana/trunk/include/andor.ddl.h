@@ -6,13 +6,13 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include "psddl_psana/andor.ddl.h"
-#include "psddl_pdsdata/andor.ddl.h"
+#include "pdsdata/psddl/andor.ddl.h"
 namespace psddl_pds2psana {
 namespace Andor {
 
 class ConfigV1 : public Psana::Andor::ConfigV1 {
 public:
-  typedef PsddlPds::Andor::ConfigV1 XtcType;
+  typedef Pds::Andor::ConfigV1 XtcType;
   typedef Psana::Andor::ConfigV1 PsanaType;
   ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~ConfigV1();
@@ -44,7 +44,7 @@ private:
 template <typename Config>
 class FrameV1 : public Psana::Andor::FrameV1 {
 public:
-  typedef PsddlPds::Andor::FrameV1 XtcType;
+  typedef Pds::Andor::FrameV1 XtcType;
   typedef Psana::Andor::FrameV1 PsanaType;
   FrameV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const Config>& cfgPtr);
   virtual ~FrameV1();

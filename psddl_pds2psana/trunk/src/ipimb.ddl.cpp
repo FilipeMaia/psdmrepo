@@ -9,7 +9,7 @@
 
 namespace psddl_pds2psana {
 namespace Ipimb {
-Psana::Ipimb::ConfigV1::CapacitorValue pds_to_psana(PsddlPds::Ipimb::ConfigV1::CapacitorValue e)
+Psana::Ipimb::ConfigV1::CapacitorValue pds_to_psana(Pds::Ipimb::ConfigV1::CapacitorValue e)
 {
   return Psana::Ipimb::ConfigV1::CapacitorValue(e);
 }
@@ -93,7 +93,7 @@ Psana::Ipimb::ConfigV1::CapacitorValue ConfigV1::capacitorValue(uint32_t ch) con
   return pds_to_psana(m_xtcObj->capacitorValue(ch));
 }
 
-Psana::Ipimb::ConfigV2::CapacitorValue pds_to_psana(PsddlPds::Ipimb::ConfigV2::CapacitorValue e)
+Psana::Ipimb::ConfigV2::CapacitorValue pds_to_psana(Pds::Ipimb::ConfigV2::CapacitorValue e)
 {
   return Psana::Ipimb::ConfigV2::CapacitorValue(e);
 }

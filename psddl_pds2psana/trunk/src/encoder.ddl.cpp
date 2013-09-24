@@ -9,12 +9,12 @@
 
 namespace psddl_pds2psana {
 namespace Encoder {
-Psana::Encoder::ConfigV1::count_mode_type pds_to_psana(PsddlPds::Encoder::ConfigV1::count_mode_type e)
+Psana::Encoder::ConfigV1::count_mode_type pds_to_psana(Pds::Encoder::ConfigV1::count_mode_type e)
 {
   return Psana::Encoder::ConfigV1::count_mode_type(e);
 }
 
-Psana::Encoder::ConfigV1::quad_mode pds_to_psana(PsddlPds::Encoder::ConfigV1::quad_mode e)
+Psana::Encoder::ConfigV1::quad_mode pds_to_psana(Pds::Encoder::ConfigV1::quad_mode e)
 {
   return Psana::Encoder::ConfigV1::quad_mode(e);
 }
@@ -58,12 +58,12 @@ uint32_t ConfigV1::ticks_per_sec() const {
   return m_xtcObj->ticks_per_sec();
 }
 
-Psana::Encoder::ConfigV2::count_mode_type pds_to_psana(PsddlPds::Encoder::ConfigV2::count_mode_type e)
+Psana::Encoder::ConfigV2::count_mode_type pds_to_psana(Pds::Encoder::ConfigV2::count_mode_type e)
 {
   return Psana::Encoder::ConfigV2::count_mode_type(e);
 }
 
-Psana::Encoder::ConfigV2::quad_mode pds_to_psana(PsddlPds::Encoder::ConfigV2::quad_mode e)
+Psana::Encoder::ConfigV2::quad_mode pds_to_psana(Pds::Encoder::ConfigV2::quad_mode e)
 {
   return Psana::Encoder::ConfigV2::quad_mode(e);
 }

@@ -6,14 +6,14 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include "psddl_psana/opal1k.ddl.h"
-#include "psddl_pdsdata/opal1k.ddl.h"
+#include "pdsdata/psddl/opal1k.ddl.h"
 #include "psddl_pds2psana/camera.ddl.h"
 namespace psddl_pds2psana {
 namespace Opal1k {
 
 class ConfigV1 : public Psana::Opal1k::ConfigV1 {
 public:
-  typedef PsddlPds::Opal1k::ConfigV1 XtcType;
+  typedef Pds::Opal1k::ConfigV1 XtcType;
   typedef Psana::Opal1k::ConfigV1 PsanaType;
   ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~ConfigV1();

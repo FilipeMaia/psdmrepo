@@ -9,7 +9,7 @@
 
 namespace psddl_pds2psana {
 namespace Andor {
-Psana::Andor::ConfigV1::EnumFanMode pds_to_psana(PsddlPds::Andor::ConfigV1::EnumFanMode e)
+Psana::Andor::ConfigV1::EnumFanMode pds_to_psana(Pds::Andor::ConfigV1::EnumFanMode e)
 {
   return Psana::Andor::ConfigV1::EnumFanMode(e);
 }
@@ -154,6 +154,6 @@ ndarray<const uint16_t, 2> FrameV1<Config>::data() const {
   return m_xtcObj->data(*m_cfgPtr, m_xtcObj);
 }
 
-template class FrameV1<PsddlPds::Andor::ConfigV1>;
+template class FrameV1<Pds::Andor::ConfigV1>;
 } // namespace Andor
 } // namespace psddl_pds2psana

@@ -6,13 +6,13 @@
 #include <vector>
 #include <boost/shared_ptr.hpp>
 #include "psddl_psana/cspad2x2.ddl.h"
-#include "psddl_pdsdata/cspad2x2.ddl.h"
+#include "pdsdata/psddl/cspad2x2.ddl.h"
 namespace psddl_pds2psana {
 namespace CsPad2x2 {
 
 class CsPad2x2DigitalPotsCfg : public Psana::CsPad2x2::CsPad2x2DigitalPotsCfg {
 public:
-  typedef PsddlPds::CsPad2x2::CsPad2x2DigitalPotsCfg XtcType;
+  typedef Pds::CsPad2x2::CsPad2x2DigitalPotsCfg XtcType;
   typedef Psana::CsPad2x2::CsPad2x2DigitalPotsCfg PsanaType;
   CsPad2x2DigitalPotsCfg(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~CsPad2x2DigitalPotsCfg();
@@ -22,14 +22,14 @@ private:
   boost::shared_ptr<const XtcType> m_xtcObj;
 };
 
-Psana::CsPad2x2::CsPad2x2ReadOnlyCfg pds_to_psana(PsddlPds::CsPad2x2::CsPad2x2ReadOnlyCfg pds);
+Psana::CsPad2x2::CsPad2x2ReadOnlyCfg pds_to_psana(Pds::CsPad2x2::CsPad2x2ReadOnlyCfg pds);
 
-Psana::CsPad2x2::ProtectionSystemThreshold pds_to_psana(PsddlPds::CsPad2x2::ProtectionSystemThreshold pds);
+Psana::CsPad2x2::ProtectionSystemThreshold pds_to_psana(Pds::CsPad2x2::ProtectionSystemThreshold pds);
 
 
 class CsPad2x2GainMapCfg : public Psana::CsPad2x2::CsPad2x2GainMapCfg {
 public:
-  typedef PsddlPds::CsPad2x2::CsPad2x2GainMapCfg XtcType;
+  typedef Pds::CsPad2x2::CsPad2x2GainMapCfg XtcType;
   typedef Psana::CsPad2x2::CsPad2x2GainMapCfg PsanaType;
   CsPad2x2GainMapCfg(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~CsPad2x2GainMapCfg();
@@ -42,7 +42,7 @@ private:
 
 class ConfigV1QuadReg : public Psana::CsPad2x2::ConfigV1QuadReg {
 public:
-  typedef PsddlPds::CsPad2x2::ConfigV1QuadReg XtcType;
+  typedef Pds::CsPad2x2::ConfigV1QuadReg XtcType;
   typedef Psana::CsPad2x2::ConfigV1QuadReg PsanaType;
   ConfigV1QuadReg(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~ConfigV1QuadReg();
@@ -81,7 +81,7 @@ private:
 
 class ConfigV1 : public Psana::CsPad2x2::ConfigV1 {
 public:
-  typedef PsddlPds::CsPad2x2::ConfigV1 XtcType;
+  typedef Pds::CsPad2x2::ConfigV1 XtcType;
   typedef Psana::CsPad2x2::ConfigV1 PsanaType;
   ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~ConfigV1();
@@ -108,7 +108,7 @@ private:
 
 class ConfigV2QuadReg : public Psana::CsPad2x2::ConfigV2QuadReg {
 public:
-  typedef PsddlPds::CsPad2x2::ConfigV2QuadReg XtcType;
+  typedef Pds::CsPad2x2::ConfigV2QuadReg XtcType;
   typedef Psana::CsPad2x2::ConfigV2QuadReg PsanaType;
   ConfigV2QuadReg(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~ConfigV2QuadReg();
@@ -149,7 +149,7 @@ private:
 
 class ConfigV2 : public Psana::CsPad2x2::ConfigV2 {
 public:
-  typedef PsddlPds::CsPad2x2::ConfigV2 XtcType;
+  typedef Pds::CsPad2x2::ConfigV2 XtcType;
   typedef Psana::CsPad2x2::ConfigV2 PsanaType;
   ConfigV2(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~ConfigV2();
@@ -177,7 +177,7 @@ private:
 
 class ElementV1 : public Psana::CsPad2x2::ElementV1 {
 public:
-  typedef PsddlPds::CsPad2x2::ElementV1 XtcType;
+  typedef Pds::CsPad2x2::ElementV1 XtcType;
   typedef Psana::CsPad2x2::ElementV1 PsanaType;
   ElementV1(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~ElementV1();
