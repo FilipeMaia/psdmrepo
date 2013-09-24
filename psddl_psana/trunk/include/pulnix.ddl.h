@@ -5,6 +5,7 @@
 
 #include <vector>
 #include <iosfwd>
+#include <cstring>
 #include "ndarray/ndarray.h"
 #include "pdsdata/xtc/TypeId.hh"
 namespace Psana {

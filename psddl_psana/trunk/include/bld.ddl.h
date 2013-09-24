@@ -5,6 +5,7 @@
 
 #include <vector>
 #include <iosfwd>
+#include <cstring>
 #include "ndarray/ndarray.h"
 #include "pdsdata/xtc/TypeId.hh"
 #include "psddl_psana/acqiris.ddl.h"
