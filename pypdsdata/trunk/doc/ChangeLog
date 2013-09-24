@@ -6,6 +6,10 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V01-00-01
+2013-09-24 Andy Salnikov
+- bug fixes for my last commit
+
 Tag: V01-00-00
 2013-09-24 Andy Salnikov
 - pdsdata is now DDL-based, with a lot of changes to interface

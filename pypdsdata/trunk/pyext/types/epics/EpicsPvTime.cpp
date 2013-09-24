@@ -49,6 +49,11 @@ namespace {
   MEMBER_WRAPPER_FROM_METHOD(pypdsdata::Epics::EpicsPvTime, pvId)
   MEMBER_WRAPPER_FROM_METHOD(pypdsdata::Epics::EpicsPvTime, dbrType)
   MEMBER_WRAPPER_FROM_METHOD(pypdsdata::Epics::EpicsPvTime, numElements)
+  PyObject* EpicsPvTime_status( PyObject* self, void* );
+  PyObject* EpicsPvTime_severity( PyObject* self, void* );
+  PyObject* EpicsPvTime_stamp( PyObject* self, void* );
+  PyObject* EpicsPvTime_value( PyObject* self, void* );
+  PyObject* EpicsPvTime_values( PyObject* self, void* );
   }
 
   // disable warnings for non-const strings, this is a temporary measure
@@ -58,27 +63,19 @@ namespace {
     {"iPvId",        gs::pvId,                 0, "Integer number, Pv Id", 0},
     {"iDbrType",     gs::dbrType,              0, "Integer number, Epics Data Type", 0},
     {"iNumElements", gs::numElements,          0, "Integer number, Size of Pv Array", 0},
+    {"status",       gs::EpicsPvTime_status,   0, "Integer number, Status value", 0},
+    {"severity",     gs::EpicsPvTime_severity, 0, "Integer number, Severity value", 0},
+    {"stamp",        gs::EpicsPvTime_stamp,    0, "EPICS timestamp value of type epicsTimeStamp", 0},
+    {"value",        gs::EpicsPvTime_value,    0, "PV value (number or string), always a single value, for arrays it is first element", 0},
+    {"values",       gs::EpicsPvTime_values,   0, "List of PV values of size [iNumElements]", 0},
     {0, 0, 0, 0, 0}
   };
 
   namespace mm {
-  FUN0_WRAPPER(pypdsdata::Epics::EpicsPvTime, pvId)
-  FUN0_WRAPPER(pypdsdata::Epics::EpicsPvTime, dbrType)
-  FUN0_WRAPPER(pypdsdata::Epics::EpicsPvTime, numElements)
-  PyObject* EpicsPvTime_status( PyObject* self, PyObject* );
-  PyObject* EpicsPvTime_severity( PyObject* self, PyObject* );
-  PyObject* EpicsPvTime_stamp( PyObject* self, PyObject* );
-  PyObject* EpicsPvTime_value( PyObject* self, PyObject* );
-  PyObject* EpicsPvTime_values( PyObject* self, PyObject* );
   PyObject* EpicsPvTime_getnewargs( PyObject* self, PyObject* );
   }
   
   PyMethodDef methods[] = {
-    {"status",          mm::EpicsPvTime_status,         METH_NOARGS, "Integer number, Status value"},
-    {"severity",        mm::EpicsPvTime_severity,       METH_NOARGS, "Integer number, Severity value"},
-    {"stamp",           mm::EpicsPvTime_stamp,          METH_NOARGS, "EPICS timestamp value of type epicsTimeStamp"},
-    {"value",           mm::EpicsPvTime_value,          METH_NOARGS, "PV value (number or string), always a single value, for arrays it is first element"},
-    {"values",          mm::EpicsPvTime_values,         METH_NOARGS, "List of PV values of size [iNumElements]"},
     { "__getnewargs__", mm::EpicsPvTime_getnewargs,     METH_NOARGS, "Pickle support" },
     {0, 0, 0, 0}
    };
@@ -146,7 +143,7 @@ pypdsdata::Epics::EpicsPvTime::print(std::ostream& str) const
 namespace {
 
 PyObject*
-EpicsPvTime_status( PyObject* self, void* )
+gs::EpicsPvTime_status( PyObject* self, void* )
 {
   const Pds::Epics::EpicsPvTimeHeader* obj = pypdsdata::Epics::EpicsPvTime::pdsObject( self );
   if ( not obj ) return 0;
@@ -159,7 +156,7 @@ EpicsPvTime_status( PyObject* self, void* )
 }
 
 PyObject*
-EpicsPvTime_severity( PyObject* self, void* )
+gs::EpicsPvTime_severity( PyObject* self, void* )
 {
   const Pds::Epics::EpicsPvTimeHeader* obj = pypdsdata::Epics::EpicsPvTime::pdsObject( self );
   if ( not obj ) return 0;
@@ -172,7 +169,7 @@ EpicsPvTime_severity( PyObject* self, void* )
 }
 
 PyObject*
-EpicsPvTime_stamp( PyObject* self, void* )
+gs::EpicsPvTime_stamp( PyObject* self, void* )
 {
   const Pds::Epics::EpicsPvTimeHeader* obj = pypdsdata::Epics::EpicsPvTime::pdsObject( self );
   if ( not obj ) return 0;
@@ -206,7 +203,7 @@ getValue( const Pds::Epics::EpicsPvTimeHeader& header, int index = -1 )
 }
 
 PyObject*
-EpicsPvTime_value( PyObject* self, void* )
+gs::EpicsPvTime_value( PyObject* self, void* )
 {
   const Pds::Epics::EpicsPvTimeHeader* obj = pypdsdata::Epics::EpicsPvTime::pdsObject( self );
   if ( not obj ) return 0;
@@ -254,7 +251,7 @@ EpicsPvTime_value( PyObject* self, void* )
 }
 
 PyObject*
-EpicsPvTime_values( PyObject* self, void* )
+gs::EpicsPvTime_values( PyObject* self, void* )
 {
   const Pds::Epics::EpicsPvTimeHeader* obj = pypdsdata::Epics::EpicsPvTime::pdsObject( self );
   if ( not obj ) return 0;
@@ -303,7 +300,7 @@ EpicsPvTime_values( PyObject* self, void* )
 }
 
 PyObject*
-EpicsPvTime_getnewargs( PyObject* self, PyObject* )
+mm::EpicsPvTime_getnewargs( PyObject* self, PyObject* )
 {
   pypdsdata::Epics::EpicsPvTime* py_this = static_cast<pypdsdata::Epics::EpicsPvTime*>(self);
   if( ! py_this->m_obj ){

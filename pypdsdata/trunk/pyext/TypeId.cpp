@@ -102,6 +102,7 @@ namespace {
       { "Id_OrcaConfig",      Pds::TypeId::Id_OrcaConfig },
       { "Id_ImpData",         Pds::TypeId::Id_ImpData },
       { "Id_ImpConfig",       Pds::TypeId::Id_ImpConfig },
+      { "Id_AliasConfig",     Pds::TypeId::Id_AliasConfig },
       { "NumberOf",           Pds::TypeId::NumberOf },
       { 0, 0 }
   };

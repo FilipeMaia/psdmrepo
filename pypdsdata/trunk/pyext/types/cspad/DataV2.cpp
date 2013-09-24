@@ -67,7 +67,7 @@ pypdsdata::CsPad::DataV2::initType( PyObject* module )
 namespace {
 
 PyObject*
-data( PyObject* self, PyObject* args )
+quads( PyObject* self, PyObject* args )
 {
   // parse args
   PyObject* configObj ;

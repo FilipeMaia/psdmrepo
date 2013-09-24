@@ -198,7 +198,7 @@ pypdsdata::Epics::EpicsPvCtrl::print(std::ostream& str) const
 namespace {
 
 PyObject*
-EpicsPvCtrl_status( PyObject* self, void* )
+gs::EpicsPvCtrl_status( PyObject* self, void* )
 {
   const Pds::Epics::EpicsPvCtrlHeader* obj = pypdsdata::Epics::EpicsPvCtrl::pdsObject( self );
   if ( not obj ) return 0;
@@ -212,7 +212,7 @@ EpicsPvCtrl_status( PyObject* self, void* )
 }
 
 PyObject*
-EpicsPvCtrl_severity( PyObject* self, void* )
+gs::EpicsPvCtrl_severity( PyObject* self, void* )
 {
   const Pds::Epics::EpicsPvCtrlHeader* obj = pypdsdata::Epics::EpicsPvCtrl::pdsObject( self );
   if ( not obj ) return 0;
@@ -226,7 +226,7 @@ EpicsPvCtrl_severity( PyObject* self, void* )
 }
 
 PyObject*
-EpicsPvCtrl_precision( PyObject* self, void* )
+gs::EpicsPvCtrl_precision( PyObject* self, void* )
 {
   const Pds::Epics::EpicsPvCtrlHeader* obj = pypdsdata::Epics::EpicsPvCtrl::pdsObject( self );
   if ( not obj ) return 0;
@@ -251,7 +251,7 @@ EpicsPvCtrl_precision( PyObject* self, void* )
 }
 
 PyObject*
-EpicsPvCtrl_units_limits( PyObject* self, void* closure )
+gs::EpicsPvCtrl_units_limits( PyObject* self, void* closure )
 {
   const Pds::Epics::EpicsPvCtrlHeader* obj = pypdsdata::Epics::EpicsPvCtrl::pdsObject( self );
   if ( not obj ) return 0;
@@ -289,7 +289,7 @@ EpicsPvCtrl_units_limits( PyObject* self, void* closure )
 
 /// return the list of enums
 PyObject*
-EpicsPvCtrl_no_str( PyObject* self, void* )
+gs::EpicsPvCtrl_no_str( PyObject* self, void* )
 {
   const Pds::Epics::EpicsPvCtrlHeader* obj = pypdsdata::Epics::EpicsPvCtrl::pdsObject( self );
   if ( not obj ) return 0;
@@ -303,7 +303,7 @@ EpicsPvCtrl_no_str( PyObject* self, void* )
 }
 
 PyObject*
-EpicsPvCtrl_strs( PyObject* self, void* )
+gs::EpicsPvCtrl_strs( PyObject* self, void* )
 {
   const Pds::Epics::EpicsPvCtrlHeader* obj = pypdsdata::Epics::EpicsPvCtrl::pdsObject( self );
   if ( not obj ) return 0;
@@ -339,7 +339,7 @@ getValue(const Pds::Epics::EpicsPvCtrlHeader& header, int index = 0)
 
 /// Get the first item from the value array
 PyObject*
-EpicsPvCtrl_value( PyObject* self, void* )
+gs::EpicsPvCtrl_value( PyObject* self, void* )
 {
   const Pds::Epics::EpicsPvCtrlHeader* obj = pypdsdata::Epics::EpicsPvCtrl::pdsObject( self );
   if ( not obj ) return 0;
@@ -388,7 +388,7 @@ EpicsPvCtrl_value( PyObject* self, void* )
 
 /// get the whole value array
 PyObject*
-EpicsPvCtrl_values( PyObject* self, void* )
+gs::EpicsPvCtrl_values( PyObject* self, void* )
 {
   const Pds::Epics::EpicsPvCtrlHeader* obj = pypdsdata::Epics::EpicsPvCtrl::pdsObject( self );
   if ( not obj ) return 0;
@@ -451,7 +451,7 @@ EpicsPvCtrl_values( PyObject* self, void* )
 }
 
 PyObject*
-EpicsPvCtrl_getnewargs( PyObject* self, PyObject* )
+mm::EpicsPvCtrl_getnewargs( PyObject* self, PyObject* )
 {
   pypdsdata::Epics::EpicsPvCtrl* py_this = static_cast<pypdsdata::Epics::EpicsPvCtrl*>(self);
   if( ! py_this->m_obj ){
