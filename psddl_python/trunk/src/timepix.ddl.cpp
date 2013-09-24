@@ -313,6 +313,7 @@ void createWrappers(PyObject* module) {
     .def("height", &Psana::Timepix::DataV1::height)
     .def("depth", &Psana::Timepix::DataV1::depth)
     .def("depth_bytes", &Psana::Timepix::DataV1::depth_bytes)
+    .def("data_size", &Psana::Timepix::DataV1::data_size,"Size of the image data in bytes.")
   ;
   scope().attr("Version")=1;
   scope().attr("TypeId")=int(Pds::TypeId::Id_TimepixData);
@@ -335,6 +336,7 @@ void createWrappers(PyObject* module) {
     .def("data", &Psana::Timepix::DataV2::data)
     .def("depth", &Psana::Timepix::DataV2::depth)
     .def("depth_bytes", &Psana::Timepix::DataV2::depth_bytes)
+    .def("data_size", &Psana::Timepix::DataV2::data_size,"Size of the image data in bytes.")
   ;
   scope().attr("Version")=2;
   scope().attr("TypeId")=int(Pds::TypeId::Id_TimepixData);

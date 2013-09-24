@@ -86,6 +86,7 @@ void createWrappers(PyObject* module) {
     .def("_int_pixel_data", &Psana::Camera::FrameV1::_int_pixel_data,"Pixel data as array of bytes, method is for internal use only, use data8() or \n            data16() for access to the data.")
     .def("data8", &Psana::Camera::FrameV1::data8,"Returns pixel data array when stored data type is 8-bit (depth() is less than 9).\n                If data type is 16-bit then empty array is returned, use data16() method in this case.")
     .def("data16", &Psana::Camera::FrameV1::data16,"Returns pixel data array when stored data type is 16-bit (depth() is greater than 8).\n                If data type is 8-bit then empty array is returned, use data8() method in this case.")
+    .def("depth_bytes", &Psana::Camera::FrameV1::depth_bytes,"Number of bytes per pixel.")
   ;
   scope().attr("Version")=1;
   scope().attr("TypeId")=int(Pds::TypeId::Id_Frame);

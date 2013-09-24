@@ -160,6 +160,47 @@ void createWrappers(PyObject* module) {
 
   {
   scope outer = 
+  class_<Psana::Bld::BldDataEBeamV4 >("BldDataEBeamV4", no_init)
+    .def("damageMask", &Psana::Bld::BldDataEBeamV4::damageMask,"Damage mask.")
+    .def("ebeamCharge", &Psana::Bld::BldDataEBeamV4::ebeamCharge,"Beam charge in nC.")
+    .def("ebeamL3Energy", &Psana::Bld::BldDataEBeamV4::ebeamL3Energy,"Beam energy in MeV.")
+    .def("ebeamLTUPosX", &Psana::Bld::BldDataEBeamV4::ebeamLTUPosX,"LTU beam position in mm.")
+    .def("ebeamLTUPosY", &Psana::Bld::BldDataEBeamV4::ebeamLTUPosY,"LTU beam position in mm.")
+    .def("ebeamLTUAngX", &Psana::Bld::BldDataEBeamV4::ebeamLTUAngX,"LTU beam angle in mrad.")
+    .def("ebeamLTUAngY", &Psana::Bld::BldDataEBeamV4::ebeamLTUAngY,"LTU beam angle in mrad.")
+    .def("ebeamPkCurrBC2", &Psana::Bld::BldDataEBeamV4::ebeamPkCurrBC2,"Beam current in Amps.")
+    .def("ebeamEnergyBC2", &Psana::Bld::BldDataEBeamV4::ebeamEnergyBC2,"Beam position in mm (related to beam energy).")
+    .def("ebeamPkCurrBC1", &Psana::Bld::BldDataEBeamV4::ebeamPkCurrBC1,"Beam current in Amps.")
+    .def("ebeamEnergyBC1", &Psana::Bld::BldDataEBeamV4::ebeamEnergyBC1,"Beam position in mm (related to beam energy).")
+    .def("ebeamUndPosX", &Psana::Bld::BldDataEBeamV4::ebeamUndPosX,"Und beam x-position in mm.")
+    .def("ebeamUndPosY", &Psana::Bld::BldDataEBeamV4::ebeamUndPosY,"Und beam y-position in mm.")
+    .def("ebeamUndAngX", &Psana::Bld::BldDataEBeamV4::ebeamUndAngX,"Und beam x-angle in mrad.")
+    .def("ebeamUndAngY", &Psana::Bld::BldDataEBeamV4::ebeamUndAngY,"Und beam y-angle in mrad.")
+  ;
+
+  enum_<Psana::Bld::BldDataEBeamV4::DamageMask>("DamageMask")
+    .value("EbeamChargeDamage",Psana::Bld::BldDataEBeamV4::EbeamChargeDamage)
+    .value("EbeamL3EnergyDamage",Psana::Bld::BldDataEBeamV4::EbeamL3EnergyDamage)
+    .value("EbeamLTUPosXDamage",Psana::Bld::BldDataEBeamV4::EbeamLTUPosXDamage)
+    .value("EbeamLTUPosYDamage",Psana::Bld::BldDataEBeamV4::EbeamLTUPosYDamage)
+    .value("EbeamLTUAngXDamage",Psana::Bld::BldDataEBeamV4::EbeamLTUAngXDamage)
+    .value("EbeamLTUAngYDamage",Psana::Bld::BldDataEBeamV4::EbeamLTUAngYDamage)
+    .value("EbeamPkCurrBC2Damage",Psana::Bld::BldDataEBeamV4::EbeamPkCurrBC2Damage)
+    .value("EbeamEnergyBC2Damage",Psana::Bld::BldDataEBeamV4::EbeamEnergyBC2Damage)
+    .value("EbeamPkCurrBC1Damage",Psana::Bld::BldDataEBeamV4::EbeamPkCurrBC1Damage)
+    .value("EbeamEnergyBC1Damage",Psana::Bld::BldDataEBeamV4::EbeamEnergyBC1Damage)
+    .value("EbeamUndPosXDamage",Psana::Bld::BldDataEBeamV4::EbeamUndPosXDamage)
+    .value("EbeamUndPosYDamage",Psana::Bld::BldDataEBeamV4::EbeamUndPosYDamage)
+    .value("EbeamUndAngXDamage",Psana::Bld::BldDataEBeamV4::EbeamUndAngXDamage)
+    .value("EbeamUndAngYDamage",Psana::Bld::BldDataEBeamV4::EbeamUndAngYDamage)
+  ;
+  scope().attr("Version")=4;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_EBeam);
+  }
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Bld::BldDataEBeamV4> >(Pds::TypeId::Id_EBeam));
+
+  {
+  scope outer = 
   class_<Psana::Bld::BldDataPhaseCavity >("BldDataPhaseCavity", "PV names: UND:R02:IOC:16:BAT:FitTime1, UND:R02:IOC:16:BAT:FitTime2, \n                UND:R02:IOC:16:BAT:Charge1,  UND:R02:IOC:16:BAT:Charge2", no_init)
     .def("fitTime1", &Psana::Bld::BldDataPhaseCavity::fitTime1,"UND:R02:IOC:16:BAT:FitTime1 value in pico-seconds.")
     .def("fitTime2", &Psana::Bld::BldDataPhaseCavity::fitTime2,"UND:R02:IOC:16:BAT:FitTime2 value in pico-seconds.")
@@ -246,6 +287,23 @@ void createWrappers(PyObject* module) {
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Bld::BldDataGMDV1> >(Pds::TypeId::Id_GMD));
 
   {
+  scope outer = 
+  class_<Psana::Bld::BldDataAcqADCV1, boost::shared_ptr<Psana::Bld::BldDataAcqADCV1>, boost::noncopyable >("BldDataAcqADCV1", "Combined structure which includes Acqiris.ConfigV1 and \n            Acqiris.DataDescV1 objects.", no_init)
+    .def("config", &Psana::Bld::BldDataAcqADCV1::config, return_internal_reference<1>())
+    .def("data", &Psana::Bld::BldDataAcqADCV1::data, return_internal_reference<1>())
+  ;
+  scope().attr("Version")=1;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_SharedAcqADC);
+  }
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Bld::BldDataAcqADCV1> >(Pds::TypeId::Id_SharedAcqADC));
+
+  {
+    PyObject* unvlist = PyList_New(1);
+    PyList_SET_ITEM(unvlist, 0, PyObject_GetAttrString(submodule, "BldDataAcqADCV1"));
+    PyObject_SetAttrString(submodule, "BldDataAcqADC", unvlist);
+    Py_CLEAR(unvlist);
+  }
+  {
     PyObject* unvlist = PyList_New(2);
     PyList_SET_ITEM(unvlist, 0, PyObject_GetAttrString(submodule, "BldDataIpimbV0"));
     PyList_SET_ITEM(unvlist, 1, PyObject_GetAttrString(submodule, "BldDataIpimbV1"));
@@ -266,11 +324,12 @@ void createWrappers(PyObject* module) {
     Py_CLEAR(unvlist);
   }
   {
-    PyObject* unvlist = PyList_New(4);
+    PyObject* unvlist = PyList_New(5);
     PyList_SET_ITEM(unvlist, 0, PyObject_GetAttrString(submodule, "BldDataEBeamV0"));
     PyList_SET_ITEM(unvlist, 1, PyObject_GetAttrString(submodule, "BldDataEBeamV1"));
     PyList_SET_ITEM(unvlist, 2, PyObject_GetAttrString(submodule, "BldDataEBeamV2"));
     PyList_SET_ITEM(unvlist, 3, PyObject_GetAttrString(submodule, "BldDataEBeamV3"));
+    PyList_SET_ITEM(unvlist, 4, PyObject_GetAttrString(submodule, "BldDataEBeamV4"));
     PyObject_SetAttrString(submodule, "BldDataEBeam", unvlist);
     Py_CLEAR(unvlist);
   }
