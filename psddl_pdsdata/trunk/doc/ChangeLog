@@ -11,6 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V01-00-00
+2013-09-24 Andy Salnikov
+- this package should not be used anynore, pdsdata is now based on DDL and
+  provides replacement for this package
+- removed SConscript to avoid compilation even when it appears in release
+
 Tag: V00-05-06
 2013-08-26 Andy Salnikov
 - regenerate whole thing from psddldata V00-04-32 with psddl V00-08-12
