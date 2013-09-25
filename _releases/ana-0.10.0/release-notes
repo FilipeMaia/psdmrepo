@@ -1,0 +1,6 @@
+- main feature is switching to DDL-generated pdsdata 
+- psddl_pdsdata is abandoned (replaced by pdsdata)
+- ndarray is now an external package
+- things that depend on pdsdata are likely to be broken, will be fixed in
+  future releases
+- lots of other changes
