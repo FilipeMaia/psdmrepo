@@ -124,7 +124,7 @@
 
         <!-- ========================================================================= -->
 
-        <pstype name="dbr_time_short">
+        <pstype name="dbr_time_short" pack="2">
         
             <tag name="value-type"/>
         
@@ -178,7 +178,7 @@
 
         <!-- ========================================================================= -->
         
-        <pstype name="dbr_time_enum">
+        <pstype name="dbr_time_enum" pack="2">
         
             <tag name="value-type"/>
         
@@ -206,7 +206,7 @@
 
         <!-- ========================================================================= -->
 
-        <pstype name="dbr_time_char">
+        <pstype name="dbr_time_char" pack="1">
         
             <tag name="value-type"/>
         
@@ -430,7 +430,7 @@
 
         <!-- ========================================================================= -->
 
-        <pstype name="dbr_ctrl_char">
+        <pstype name="dbr_ctrl_char" pack="1">
         
             <tag name="value-type"/>
         
