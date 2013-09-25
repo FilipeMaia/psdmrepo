@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-40
+2013-09-24 Andy Salnikov
+- add map() method to evr.OuputMap and OutputMapV2
+
 Tag: V00-04-39
 2013-09-24 Matt Weaver
 - Added L3T.ConfigV1,DataV1 for level 3 trigger/filter data

@@ -346,6 +346,21 @@
                 </bitfield>
             </attribute>
 
+            <method name="map" type="uint32_t">
+                Returns encoded source value.
+                <code lang="C++" body="
+  enum { Pulse_Offset=0, DBus_Offset=32, Prescaler_Offset=40 }; 
+  unsigned src_id = source_id();
+  switch(source()) {
+  case Pulse     : return src_id + Pulse_Offset;
+  case DBus      : return src_id + DBus_Offset;
+  case Prescaler : return src_id + Prescaler_Offset;
+  case Force_High: return 62;
+  case Force_Low : return 63;
+  }
+  return 0;"/>
+            </method>
+
 
             <ctor>
                 Default constructor
@@ -392,6 +407,20 @@
                 </bitfield>
             </attribute>
 
+            <method name="map" type="uint32_t">
+                Returns encoded source value.
+                <code lang="C++" body="
+  enum { Pulse_Offset=0, DBus_Offset=32, Prescaler_Offset=40 }; 
+  unsigned src_id = source_id();
+  switch(source()) {
+  case Pulse     : return src_id + Pulse_Offset;
+  case DBus      : return src_id + DBus_Offset;
+  case Prescaler : return src_id + Prescaler_Offset;
+  case Force_High: return 62;
+  case Force_Low : return 63;
+  }
+  return 0;"/>
+            </method>
 
             <ctor>
                 Default constructor
