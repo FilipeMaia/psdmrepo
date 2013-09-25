@@ -40,13 +40,22 @@ import types
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
+import jinja2 as ji
 from psddl.CppTypeCodegen import CppTypeCodegen
 from psddl.Package import Package
 from psddl.Type import Type
+from psddl.TemplateLoader import TemplateLoader
 
 #----------------------------------
 # Local non-exported definitions --
 #----------------------------------
+
+# jinja environment
+_jenv = ji.Environment(loader=TemplateLoader(), trim_blocks=True,
+                       line_statement_prefix='$', line_comment_prefix='$$')
+
+def _TEMPL(template):
+    return _jenv.get_template('cppcodegen.tmpl?'+template)
 
 #------------------------
 # Exported definitions --
@@ -199,6 +208,11 @@ class DdlPdsdata ( object ) :
             if const.comment: doc = ' /**< %s */' % const.comment
             print >>self.inc, "    %s%s,%s" % (const.name, val, doc)
         print >>self.inc, "  };"
+        
+        if enum.name:
+            print >>self.inc, _TEMPL('enum_print_decl').render(locals())
+            print >>self.cpp, _TEMPL('enum_print_impl').render(locals())
+
 
 #
 #  In case someone decides to run this module

@@ -83,6 +83,21 @@ class Enum ( Namespace ) :
         res = "<Enum(" + self.name + ")>"
         return res
 
+    def unique_constants(self):
+        '''
+        This method returns the list of enum constants which have unique values.
+        '''
+        
+        values = set()
+        res = []
+        for const in self.constants():
+            if not const.value: 
+                res.append(const)
+            elif const.value not in values:
+                values.add(const.value)
+                res.append(const)
+
+        return res
 
 #
 #  In case someone decides to run this module

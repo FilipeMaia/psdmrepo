@@ -102,7 +102,7 @@ std::ostream& operator<<(std::ostream& str, {{enum.fullNameCpp()}} enval);
 std::ostream& operator<<(std::ostream& str, {{enum.fullNameCpp()}} enval) {
   const char* val;
   switch (enval) {
-$ for const in enum.constants():
+$ for const in enum.unique_constants():
   case {{enum.parent.fullNameCpp()}}::{{const.name}}:
     val = "{{const.name}}";
     break;

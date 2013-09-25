@@ -40,14 +40,23 @@ import types
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
+import jinja2 as ji
 from psddl.CppTypeCodegen import CppTypeCodegen
 from psddl.Package import Package
 from psddl.Type import Type
 from psddl.Template import Template as T
+from psddl.TemplateLoader import TemplateLoader
 
 #----------------------------------
 # Local non-exported definitions --
 #----------------------------------
+
+# jinja environment
+_jenv = ji.Environment(loader=TemplateLoader(), trim_blocks=True,
+                       line_statement_prefix='$', line_comment_prefix='$$')
+
+def _TEMPL(template):
+    return _jenv.get_template('cppcodegen.tmpl?'+template)
 
 #------------------------
 # Exported definitions --
@@ -200,6 +209,10 @@ class DdlPsanaInterfaces ( object ) :
             if const.comment: doc = T(' /**< $comment */')[const]
             print >>self.inc, T("    $name$value,$doc")(name=const.name, value=val, doc=doc)
         print >>self.inc, "  };"
+
+        if enum.name:
+            print >>self.inc, _TEMPL('enum_print_decl').render(locals())
+            print >>self.cpp, _TEMPL('enum_print_impl').render(locals())
 
 
 #

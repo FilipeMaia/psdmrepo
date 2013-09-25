@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-17
+2013-09-24 Andy Salnikov
+- add stream insertion operator for enums defined outside classes
+
 Tag: V00-08-16
 2013-09-24 Andy Salnikov
 - add #include <cstring> to psana headers
