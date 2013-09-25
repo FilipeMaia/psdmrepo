@@ -280,7 +280,12 @@ class Type ( Namespace ) :
                 
                 meth = attr.stor_type.lookup('_sizeof', Method)
                 if not meth:
+                    
                     size = ExprVal(attr.stor_type.size, self)
+                    if not size.isconst():
+                        # attribute of complex type without _sizeof?
+                        logging.warning("Cannot generate _sizeof for type "+self.fullName('C++'))
+                        return
                 else:
                     cfg = ''
                     if meth.expr.get('C++',"").find("{xtc-config}") >= 0: cfg = 'cfg'
