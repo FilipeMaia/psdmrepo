@@ -328,7 +328,7 @@
             </attribute>
 
             <attribute name="_fEbeamLTUPosX" type="double" accessor="ebeamLTUPosX">
-            LTU beam position in mm.
+            LTU beam position (BPMS:LTU1:720 through 750) in mm.
             </attribute>
 
             <attribute name="_fEbeamLTUPosY" type="double" accessor="ebeamLTUPosY">
@@ -360,19 +360,19 @@
             </attribute>
 
             <attribute name="_fEbeamUndPosX" type="double" accessor="ebeamUndPosX">
-            Und beam x-position in mm.
+            Undulator launch feedback (BPMs U4 through U10) beam x-position in mm.
             </attribute>
 
             <attribute name="_fEbeamUndPosY" type="double" accessor="ebeamUndPosY">
-            Und beam y-position in mm.
+            Undulator launch feedback beam y-position in mm.
             </attribute>
 
             <attribute name="_fEbeamUndAngX" type="double" accessor="ebeamUndAngX">
-            Und beam x-angle in mrad.
+            Undulator launch feedback beam x-angle in mrad.
             </attribute>
 
             <attribute name="_fEbeamUndAngY" type="double" accessor="ebeamUndAngY">
-            Und beam y-angle in mrad.
+            Undulator launch feedback beam y-angle in mrad.
             </attribute>
 
             <ctor>

@@ -11,6 +11,12 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-42
+2013-09-26 Matt Weaver
+- documented new Bld.BldDataEBeamV4 fields
+- added Control.ConfigV3 with L3T accepted events field
+- output in pdsdata V07-01-00
+	
 Tag: V00-04-41
 2013-09-25 Andy Salnikov
 - fix for incorrect offsets of data arrays in epics

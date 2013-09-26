@@ -255,6 +255,77 @@
 
         </pstype>
         
+        <!-- ========================================================================= -->
+        
+        <pstype name="ConfigV3" version="3" type_id="Id_ControlConfig">
+
+            <tag name="config-type"/>
+        
+            <attribute name="_control" type="uint32_t" accessor="">
+            
+            <bitfield name="_bf_events" size="29" type="uint32_t" accessor="events">
+            Maximum number of events per scan.
+            </bitfield>
+        
+            <bitfield name="_bf_uses_l3t_events" size="1" type="uint8_t" accessor="uses_l3t_events">
+            returns true if the configuration uses l3trigger events limit.
+            </bitfield>
+            
+            <bitfield name="_bf_uses_duration" size="1" type="uint8_t" accessor="uses_duration">
+            returns true if the configuration uses duration control.
+            </bitfield>
+        
+            <bitfield name="_bf_uses_events" size="1" type="uint8_t" accessor="uses_events">
+            returns true if the configuration uses events limit.
+            </bitfield>
+            
+            </attribute>
+
+            <attribute name="_reserved" type="uint32_t" accessor="">
+            </attribute>
+
+            <attribute name="_duration" type="Pds.ClockTime" accessor="duration">
+            Maximum duration of the scan.
+            </attribute>
+
+            <attribute name="_npvControls" type="uint32_t" accessor="npvControls">
+            Number of PVControl objects in this configuration.
+            </attribute>
+
+            <attribute name="_npvMonitors" type="uint32_t" accessor="npvMonitors">
+            Number of PVMonitor objects in this configuration.
+            </attribute>
+
+            <attribute name="_npvLabels" type="uint32_t" accessor="npvLabels">
+            Number of PVLabel objects in this configuration.
+            </attribute>
+
+            <attribute name="_pvControls" type="PVControl"
+                shape="{self}.npvControls()" accessor="pvControls" shape_method="pvControls_shape">
+                PVControl configuration objects
+            </attribute>
+
+            <attribute name="_pvMonitors" type="PVMonitor"
+                shape="{self}.npvMonitors()" accessor="pvMonitors" shape_method="pvMonitors_shape">
+                PVMonitor configuration objects
+            </attribute>
+
+            <attribute name="_pvLabels" type="PVLabel"
+                shape="{self}.npvLabels()" accessor="pvLabels" shape_method="pvLabels_shape">
+                PVLabel configuration objects
+            </attribute>
+
+            <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="auto"/>
+            </ctor>
+
+        </pstype>
+        
     </package>
     
 </psddl>
