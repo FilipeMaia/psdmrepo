@@ -80,12 +80,12 @@
                       (left->right, bottom->top) pixel by pixel
                 </bitfield>
                 
-                <bitfield name="_bf_corr" size="1" type="uint8_t" accessor="defect_pixel_correction_enabled">
-                correct defective pixels internally
-                </bitfield>
-                
                 <bitfield name="_bf_lookup" size="1" type="uint8_t" accessor="output_lookup_table_enabled">
                 apply output lookup table corrections
+                </bitfield>
+                
+                <bitfield name="_bf_corr" size="1" type="uint8_t" accessor="defect_pixel_correction_enabled">
+                correct defective pixels internally
                 </bitfield>
                 
             </attribute>

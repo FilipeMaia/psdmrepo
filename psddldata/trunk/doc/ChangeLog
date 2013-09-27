@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-43
+2013-09-26 Andy Salnikov
+- fix bitfield order in opal1k.ConfigV1
+
 Tag: V00-04-42
 2013-09-26 Matt Weaver
 - documented new Bld.BldDataEBeamV4 fields
