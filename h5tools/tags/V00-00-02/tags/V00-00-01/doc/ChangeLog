@@ -1,0 +1,19 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package h5tools
+#------------------------------------------------------------------------
+
+Package author: David Schneider
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-01
+- first commit to repository
+- wrapper code for h5py datasets, prints a table view, translated enums to strings, puts compound
+  fields in object attributes, breaks out vlen data, breaks out python strings
+- wrapper code for matlab, translates enums to strings for compound data
+
