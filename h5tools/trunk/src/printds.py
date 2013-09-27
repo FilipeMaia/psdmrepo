@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------
 # File and Version Information:
-# $Id: h5pyds.py 6734 2013-09-05 20:34:55Z davidsch@SLAC.STANFORD.EDU $
+# $Id$
 #
 # Description:
 #  Provides print function to interactively explore LCLS datasets
@@ -13,7 +13,7 @@ This module provides the function printds to print a h5py dataset.
 This function is designed to work with a datasets of a compound type 
 - a type like a C struct with several fields.
   
-@version $Id: h5pyds.py 6734 2013-09-05 20:34:55Z davidsch@SLAC.STANFORD.EDU $
+@version $Id$
 
 @author David Schneider
 '''
