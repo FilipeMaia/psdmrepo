@@ -17,6 +17,6 @@ part of it, please give an appropriate acknowledgment.
 @author $Author$
 """
 
-from h5pyds import tablePrint, flds2attrs
+from printds import printds
 
 

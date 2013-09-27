@@ -11,6 +11,10 @@ Package author: David Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-02
+2013-09-27 David Schneider
+- changed h5py code to just provide a function to print datasets.  The wrapper object is removed.
+
 Tag: V00-00-01
 - first commit to repository
 - wrapper code for h5py datasets, prints a table view, translated enums to strings, puts compound
