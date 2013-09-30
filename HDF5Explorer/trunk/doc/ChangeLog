@@ -12,6 +12,12 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 ------------------------------
+Tag: V00-00-17
+2013-09-30 Mikhail S. Dubrovin
+M       app/hdf5explorer - correct comment when starts with parameter
+M       src/ConfigCSpad.py - add initialization of default config pars
+M       src/ConfigParameters.py - change default dir and run to xpptut13
+
 Tag: V00-00-16
 2013-09-29 Mikhail S. Dubrovin
 - in src/ConfigCSpad.py switch to new interface for PyCSPadImage.CalibPars

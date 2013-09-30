@@ -45,9 +45,20 @@ class ConfigCSpad ( object ) :
         """Constructor"""
 
         self.calibpars = calp.CalibPars() # Sets default calibration parameters.
-
+        self.setConfigParsDefault()
 
 #==========================================
+
+    def setConfigParsDefault( self ) :
+        # Later we get this array dynamically from /Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV*/CxiDs1.0:Cspad.0/element
+        self.quad_nums_in_event = [0, 1, 2, 3] # <- default values
+
+        # Later we get this array dynamically from /Configure:0000/CsPad::ConfigV2/CxiDs1.0:Cspad.0/config
+        self.indPairsInQuads = [[ 0,   1,   2,   3,   4,   5,   6,   7],
+                                [ 8,   9,  10,  11,  12,  13,  14,  15],
+                                [16,  17,  18,  19,  20,  21,  22,  23],
+                                [24,  25,  26,  27,  28,  29,  30,  31]]
+
 #==========================================
 
     def setCSpadParameters( self ) :
@@ -55,7 +66,6 @@ class ConfigCSpad ( object ) :
         print 'setCSpadParameters():Set parameters from calib dir',
         self.setCSpadParametersFromCalibDir() 
 
-#==========================================
 #==========================================
 
     def setCSpadParametersFromCalibDir ( self ) :
@@ -124,18 +134,9 @@ class ConfigCSpad ( object ) :
         self.quadXOffset += dq[0] 
         self.quadYOffset += dq[1] 
 
-        # We get this array dynamically from /Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV*/CxiDs1.0:Cspad.0/element
-        self.quad_nums_in_event = [0, 1, 2, 3] # <- default values
-
         # Quad rotation angles
         self.quadInDetOrient = [ 180,   90,    0,  270]
         self.quadInDetOriInd = [   2,    1,    0,    3]
-
-        # We get this array dynamically from /Configure:0000/CsPad::ConfigV2/CxiDs1.0:Cspad.0/config
-        self.indPairsInQuads = [[ 0,   1,   2,   3,   4,   5,   6,   7],
-                                [ 8,   9,  10,  11,  12,  13,  14,  15],
-                                [16,  17,  18,  19,  20,  21,  22,  23],
-                                [24,  25,  26,  27,  28,  29,  30,  31]]
 
         # 2x1 section rotation angles
         self.pairInQaudOrient = [ [ 270, 270, 180, 180,  90,  90, 180, 180],

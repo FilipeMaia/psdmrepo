@@ -66,9 +66,9 @@ class HDF5Explorer :
         msg = """HDF5Explorer:
          To run this program use command "hdf5explorer" without parameters. 
          All necessary parameters will be set through the GUIs of this program. 
-         By default all configuration parameters are taken from the file "evtdispconfig". 
+         By default all configuration parameters are taken from the file "hdf5expconfig". 
          If this file is missing, the default values of parameters will be used at start, 
-         untill the "evtdispconfig" is not created.
+         untill the "hdf5expconfig" is not created.
         """
 	if len(sys.argv) > 1 : 
             print 90*'-','\n',msg,'\n',90*'-'

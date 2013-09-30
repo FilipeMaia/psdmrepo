@@ -103,8 +103,11 @@ class ConfigParameters ( object ) :
         #self.dirName              = '/reg/d/psdm/XPP/xppcom10/hdf5'
         #self.fileName             = 'xppcom10-r0546.h5'
 
-        self.dirName              = '/reg/d/psdm/CXI/cxi80410/hdf5'
-        self.fileName             = 'cxi80410-r0730.h5'
+        #self.dirName              = '/reg/d/psdm/CXI/cxi80410/hdf5'
+        #self.fileName             = 'cxi80410-r0730.h5'
+
+        self.dirName              = '/reg/d/psdm/XPP/xpptut13/hdf5'
+        self.fileName             = 'xpptut13-r0178.h5'
 
         self.eventCurrent         = 0
         self.span                 = 1
