@@ -12,6 +12,11 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 ------------------------------
+Tag: V00-00-16
+2013-09-29 Mikhail S. Dubrovin
+- in src/ConfigCSpad.py switch to new interface for PyCSPadImage.CalibPars
+	this inconsistency was there sinse release ana-0.9.8
+
 Tag: V00-00-15
 2012-11-12 Mikhail S. Dubrovin
 - try to resolve multiple problems with persistence:	
