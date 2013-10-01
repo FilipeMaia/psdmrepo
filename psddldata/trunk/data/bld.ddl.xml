@@ -606,10 +606,14 @@
 
             Structure which contains image projections for spectrometers.
 
-            <tag name="value-type"/>
-
             <attribute name="_hproj" type="uint32_t" shape="1024" accessor="hproj"/>
             <attribute name="_vproj" type="uint32_t" shape="256"  accessor="vproj"/>
+
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="inline"/>
+                <tag name="auto"/>
+            </ctor>
 
         </pstype>
     </package>
