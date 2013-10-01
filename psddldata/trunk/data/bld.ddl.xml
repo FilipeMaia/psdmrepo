@@ -600,7 +600,17 @@
 
         </pstype>
         
+        <!-- ========================================================================= -->
+        
+        <pstype name="BldDataSpectrometerV0" type_id="Id_Spectrometer" version="0" pack="4">
 
+            Structure which contains image projections for spectrometers.
 
+            <tag name="value-type"/>
+
+            <attribute name="_hproj" type="uint32_t" shape="1024" accessor="hproj"/>
+            <attribute name="_vproj" type="uint32_t" shape="256"  accessor="vproj"/>
+
+        </pstype>
     </package>
 </psddl>
