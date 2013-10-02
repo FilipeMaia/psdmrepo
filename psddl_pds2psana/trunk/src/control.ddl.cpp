@@ -156,5 +156,84 @@ uint32_t ConfigV2::npvLabels() const {
 ndarray<const Psana::ControlData::PVControl, 1> ConfigV2::pvControls() const { return _pvControls_ndarray_storage_; }
 ndarray<const Psana::ControlData::PVMonitor, 1> ConfigV2::pvMonitors() const { return _pvMonitors_ndarray_storage_; }
 ndarray<const Psana::ControlData::PVLabel, 1> ConfigV2::pvLabels() const { return _pvLabels_ndarray_storage_; }
+ConfigV3::ConfigV3(const boost::shared_ptr<const XtcType>& xtcPtr)
+  : Psana::ControlData::ConfigV3()
+  , m_xtcObj(xtcPtr)
+  , _duration(xtcPtr->duration())
+{
+  {
+    typedef ndarray<Psana::ControlData::PVControl, 1> NDArray;
+    typedef ndarray<const Pds::ControlData::PVControl, 1> XtcNDArray;
+    const XtcNDArray& xtc_ndarr = xtcPtr->pvControls();
+    _pvControls_ndarray_storage_ = NDArray(xtc_ndarr.shape());
+    NDArray::iterator out = _pvControls_ndarray_storage_.begin();
+    for (XtcNDArray::iterator it = xtc_ndarr.begin(); it != xtc_ndarr.end(); ++ it, ++ out) {
+      *out = psddl_pds2psana::ControlData::pds_to_psana(*it);
+    }
+  }
+  {
+    typedef ndarray<Psana::ControlData::PVMonitor, 1> NDArray;
+    typedef ndarray<const Pds::ControlData::PVMonitor, 1> XtcNDArray;
+    const XtcNDArray& xtc_ndarr = xtcPtr->pvMonitors();
+    _pvMonitors_ndarray_storage_ = NDArray(xtc_ndarr.shape());
+    NDArray::iterator out = _pvMonitors_ndarray_storage_.begin();
+    for (XtcNDArray::iterator it = xtc_ndarr.begin(); it != xtc_ndarr.end(); ++ it, ++ out) {
+      *out = psddl_pds2psana::ControlData::pds_to_psana(*it);
+    }
+  }
+  {
+    typedef ndarray<Psana::ControlData::PVLabel, 1> NDArray;
+    typedef ndarray<const Pds::ControlData::PVLabel, 1> XtcNDArray;
+    const XtcNDArray& xtc_ndarr = xtcPtr->pvLabels();
+    _pvLabels_ndarray_storage_ = NDArray(xtc_ndarr.shape());
+    NDArray::iterator out = _pvLabels_ndarray_storage_.begin();
+    for (XtcNDArray::iterator it = xtc_ndarr.begin(); it != xtc_ndarr.end(); ++ it, ++ out) {
+      *out = psddl_pds2psana::ControlData::pds_to_psana(*it);
+    }
+  }
+}
+ConfigV3::~ConfigV3()
+{
+}
+
+
+uint32_t ConfigV3::events() const {
+  return m_xtcObj->events();
+}
+
+
+uint8_t ConfigV3::uses_l3t_events() const {
+  return m_xtcObj->uses_l3t_events();
+}
+
+
+uint8_t ConfigV3::uses_duration() const {
+  return m_xtcObj->uses_duration();
+}
+
+
+uint8_t ConfigV3::uses_events() const {
+  return m_xtcObj->uses_events();
+}
+
+const Pds::ClockTime& ConfigV3::duration() const { return _duration; }
+
+uint32_t ConfigV3::npvControls() const {
+  return m_xtcObj->npvControls();
+}
+
+
+uint32_t ConfigV3::npvMonitors() const {
+  return m_xtcObj->npvMonitors();
+}
+
+
+uint32_t ConfigV3::npvLabels() const {
+  return m_xtcObj->npvLabels();
+}
+
+ndarray<const Psana::ControlData::PVControl, 1> ConfigV3::pvControls() const { return _pvControls_ndarray_storage_; }
+ndarray<const Psana::ControlData::PVMonitor, 1> ConfigV3::pvMonitors() const { return _pvMonitors_ndarray_storage_; }
+ndarray<const Psana::ControlData::PVLabel, 1> ConfigV3::pvLabels() const { return _pvLabels_ndarray_storage_; }
 } // namespace ControlData
 } // namespace psddl_pds2psana

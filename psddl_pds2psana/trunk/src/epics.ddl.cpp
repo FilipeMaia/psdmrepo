@@ -1107,9 +1107,9 @@ ConfigV1::ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr)
   {
     typedef ndarray<Psana::Epics::PvConfigV1, 1> NDArray;
     typedef ndarray<const Pds::Epics::PvConfigV1, 1> XtcNDArray;
-    const XtcNDArray& xtc_ndarr = xtcPtr->pvControls();
-    _pvControls_ndarray_storage_ = NDArray(xtc_ndarr.shape());
-    NDArray::iterator out = _pvControls_ndarray_storage_.begin();
+    const XtcNDArray& xtc_ndarr = xtcPtr->getPvConfig();
+    _pvConfig_ndarray_storage_ = NDArray(xtc_ndarr.shape());
+    NDArray::iterator out = _pvConfig_ndarray_storage_.begin();
     for (XtcNDArray::iterator it = xtc_ndarr.begin(); it != xtc_ndarr.end(); ++ it, ++ out) {
       *out = psddl_pds2psana::Epics::pds_to_psana(*it);
     }
@@ -1124,6 +1124,6 @@ int32_t ConfigV1::numPv() const {
   return m_xtcObj->numPv();
 }
 
-ndarray<const Psana::Epics::PvConfigV1, 1> ConfigV1::pvControls() const { return _pvControls_ndarray_storage_; }
+ndarray<const Psana::Epics::PvConfigV1, 1> ConfigV1::getPvConfig() const { return _pvConfig_ndarray_storage_; }
 } // namespace Epics
 } // namespace psddl_pds2psana

@@ -16,6 +16,7 @@
 #include "psddl_pds2psana/cspad.ddl.h"
 #include "psddl_pds2psana/orca.ddl.h"
 #include "psddl_pds2psana/control.ddl.h"
+#include "psddl_pds2psana/l3t.ddl.h"
 #include "psddl_pds2psana/andor.ddl.h"
 #include "psddl_pds2psana/fccd.ddl.h"
 #include "psddl_pds2psana/evr.ddl.h"
@@ -207,6 +208,16 @@ try {
           cfgStore.put(xptr, xtc->src);
           // create and store psana object in config store
           boost::shared_ptr<Psana::ControlData::ConfigV2> obj = boost::make_shared<psddl_pds2psana::ControlData::ConfigV2>(xptr);
+          cfgStore.put(obj, xtc->src);
+        }
+        break;
+      case 3:
+        {
+          // store XTC object in config store
+          boost::shared_ptr<Pds::ControlData::ConfigV3> xptr(xtc, (Pds::ControlData::ConfigV3*)(xtc->payload()));
+          cfgStore.put(xptr, xtc->src);
+          // create and store psana object in config store
+          boost::shared_ptr<Psana::ControlData::ConfigV3> obj = boost::make_shared<psddl_pds2psana::ControlData::ConfigV3>(xptr);
           cfgStore.put(obj, xtc->src);
         }
         break;
@@ -1135,6 +1146,42 @@ try {
       } // end switch (version)
     }
     break;
+  case Pds::TypeId::Id_L3TConfig:
+    {
+      switch (version) {
+      case 1:
+        {
+          // store XTC object in config store
+          boost::shared_ptr<Pds::L3T::ConfigV1> xptr(xtc, (Pds::L3T::ConfigV1*)(xtc->payload()));
+          cfgStore.put(xptr, xtc->src);
+          // create and store psana object in config store
+          boost::shared_ptr<Psana::L3T::ConfigV1> obj = boost::make_shared<psddl_pds2psana::L3T::ConfigV1>(xptr);
+          cfgStore.put(obj, xtc->src);
+        }
+        break;
+      } // end switch (version)
+    }
+    break;
+  case Pds::TypeId::Id_L3TData:
+    {
+      switch (version) {
+      case 1:
+        {
+          // store proxy
+          typedef EvtProxy<Psana::L3T::DataV1, psddl_pds2psana::L3T::DataV1, Pds::L3T::DataV1> ProxyType;
+          if (evt) evt->putProxy<Psana::L3T::DataV1>(boost::make_shared<ProxyType>(xtc), xtc->src);
+        }
+        break;
+      case 32769:
+        {
+          // store proxy
+          typedef EvtProxy<Psana::L3T::DataV1, psddl_pds2psana::L3T::DataV1, Pds::L3T::DataV1> ProxyType;
+          if (evt) evt->putProxy<Psana::L3T::DataV1>(boost::make_shared<ProxyType>(xtc), xtc->src);
+        }
+        break;
+      } // end switch (version)
+    }
+    break;
   case Pds::TypeId::Id_OceanOpticsConfig:
     {
       switch (version) {
@@ -1593,6 +1640,26 @@ try {
           // store proxy
           typedef EvtProxy<Psana::Bld::BldDataPimV1, psddl_pds2psana::Bld::BldDataPimV1, Pds::Bld::BldDataPimV1> ProxyType;
           if (evt) evt->putProxy<Psana::Bld::BldDataPimV1>(boost::make_shared<ProxyType>(xtc), xtc->src);
+        }
+        break;
+      } // end switch (version)
+    }
+    break;
+  case Pds::TypeId::Id_Spectrometer:
+    {
+      switch (version) {
+      case 0:
+        {
+          // store proxy
+          typedef EvtProxy<Psana::Bld::BldDataSpectrometerV0, psddl_pds2psana::Bld::BldDataSpectrometerV0, Pds::Bld::BldDataSpectrometerV0> ProxyType;
+          if (evt) evt->putProxy<Psana::Bld::BldDataSpectrometerV0>(boost::make_shared<ProxyType>(xtc), xtc->src);
+        }
+        break;
+      case 32768:
+        {
+          // store proxy
+          typedef EvtProxy<Psana::Bld::BldDataSpectrometerV0, psddl_pds2psana::Bld::BldDataSpectrometerV0, Pds::Bld::BldDataSpectrometerV0> ProxyType;
+          if (evt) evt->putProxy<Psana::Bld::BldDataSpectrometerV0>(boost::make_shared<ProxyType>(xtc), xtc->src);
         }
         break;
       } // end switch (version)

@@ -144,6 +144,20 @@ private:
   psddl_pds2psana::Acqiris::DataDescV1<Config> _data;
 };
 
+
+class BldDataSpectrometerV0 : public Psana::Bld::BldDataSpectrometerV0 {
+public:
+  typedef Pds::Bld::BldDataSpectrometerV0 XtcType;
+  typedef Psana::Bld::BldDataSpectrometerV0 PsanaType;
+  BldDataSpectrometerV0(const boost::shared_ptr<const XtcType>& xtcPtr);
+  virtual ~BldDataSpectrometerV0();
+  virtual ndarray<const uint32_t, 1> hproj() const;
+  virtual ndarray<const uint32_t, 1> vproj() const;
+  const XtcType& _xtcObj() const { return *m_xtcObj; }
+private:
+  boost::shared_ptr<const XtcType> m_xtcObj;
+};
+
 } // namespace Bld
 } // namespace psddl_pds2psana
 #endif // PSDDL_PDS2PSANA_BLD_DDL_H

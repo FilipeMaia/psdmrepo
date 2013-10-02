@@ -446,11 +446,11 @@ public:
   ConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr);
   virtual ~ConfigV1();
   virtual int32_t numPv() const;
-  virtual ndarray<const Psana::Epics::PvConfigV1, 1> pvControls() const;
+  virtual ndarray<const Psana::Epics::PvConfigV1, 1> getPvConfig() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
-  ndarray<Psana::Epics::PvConfigV1, 1> _pvControls_ndarray_storage_;
+  ndarray<Psana::Epics::PvConfigV1, 1> _pvConfig_ndarray_storage_;
 };
 
 } // namespace Epics

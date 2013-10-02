@@ -251,5 +251,24 @@ const Psana::Acqiris::ConfigV1& BldDataAcqADCV1<Config>::config() const { return
 template <typename Config>
 const Psana::Acqiris::DataDescV1& BldDataAcqADCV1<Config>::data() const { return _data; }
 template class BldDataAcqADCV1<Pds::Acqiris::ConfigV1>;
+BldDataSpectrometerV0::BldDataSpectrometerV0(const boost::shared_ptr<const XtcType>& xtcPtr)
+  : Psana::Bld::BldDataSpectrometerV0()
+  , m_xtcObj(xtcPtr)
+{
+}
+BldDataSpectrometerV0::~BldDataSpectrometerV0()
+{
+}
+
+
+ndarray<const uint32_t, 1> BldDataSpectrometerV0::hproj() const {
+  return m_xtcObj->hproj(m_xtcObj);
+}
+
+
+ndarray<const uint32_t, 1> BldDataSpectrometerV0::vproj() const {
+  return m_xtcObj->vproj(m_xtcObj);
+}
+
 } // namespace Bld
 } // namespace psddl_pds2psana

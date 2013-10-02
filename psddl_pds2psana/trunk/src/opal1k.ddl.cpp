@@ -74,13 +74,13 @@ uint8_t ConfigV1::vertical_remapping() const {
 }
 
 
-uint8_t ConfigV1::defect_pixel_correction_enabled() const {
-  return m_xtcObj->defect_pixel_correction_enabled();
+uint8_t ConfigV1::output_lookup_table_enabled() const {
+  return m_xtcObj->output_lookup_table_enabled();
 }
 
 
-uint8_t ConfigV1::output_lookup_table_enabled() const {
-  return m_xtcObj->output_lookup_table_enabled();
+uint8_t ConfigV1::defect_pixel_correction_enabled() const {
+  return m_xtcObj->defect_pixel_correction_enabled();
 }
 
 
