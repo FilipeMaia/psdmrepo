@@ -82,7 +82,7 @@ class myana_opal ( object ) :
             return
         
         # dumpt complete configuration
-        print "Opal1k config: size=%d" % config.size()
+        print "Opal1k config:"
         print "  black_level:", config.black_level()
         print "  gain_percent:", config.gain_percent()
         print "  output_offset:", config.output_offset()
@@ -104,7 +104,8 @@ class myana_opal ( object ) :
         # that produce Frame type so one has to use address to 
         # chose one specific device. Use config file to change it.
         logging.debug("Get Opal1k frame from address %s", self.source)
-        opal = evt.getOpal1kValue(self.source)
+        # opal camera produces regular Frame data
+        opal = evt.get(TypeId.Type.Id_Frame, self.source)
         if not opal:
             print '*** opal information is missing ***'
             return
