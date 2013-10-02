@@ -11,6 +11,9 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2013-Oct-02 salnikov V00-04-00
+	- upgrade to DDL-based pdsdata, need small change in acqiris data access
+
 2013-Mar-14 salnikov V00-03-00
 	- replaced use of env.assert_psana() with env.fwkName()
 

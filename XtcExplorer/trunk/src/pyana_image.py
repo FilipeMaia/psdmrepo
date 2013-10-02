@@ -344,8 +344,6 @@ class  pyana_image ( object ) :
                 continue
             frame = evt.get( self.datatypes[device], addr )
             if frame is None:
-                if env.fwkName() == "pyana":
-                    print "No frame from ", addr
                 continue
             
             if addr.find("Cspad2x2")>0 :

@@ -106,7 +106,6 @@ class pyana_waveform (object) :
 
         # containers to store data from this job
         self.ctr = {} # source-specific event counter 
-        self.ts = {} # time waveform
         self.wf = {} # voltage waveform (single event)
         self.wf_accum = {} # voltage waveform (accumulated)
         self.wf2_accum = {} # waveform squared (for computation of RMS) (accumulated)
@@ -153,7 +152,6 @@ class pyana_waveform (object) :
             nsmp = cfg.horiz().nbrSamples()
             unit = cfg.horiz().sampInterval() * 1.0e9 # nano-seconds
             span = nsmp * unit
-            self.span = span
 
             if self.wf_window is None:
                 self.wf_window = [ 0, nsmp ]
@@ -168,9 +166,10 @@ class pyana_waveform (object) :
 
                 self.data[label] = WaveformData( label )
 
+                self.data[label].ts = np.arange(0, span, unit, dtype=float)[self.wf_window[0]:self.wf_window[1]]
+
                 width = self.wf_window[1] - self.wf_window[0]
                 self.ctr[label] = 0
-                self.ts[label] = None
                 self.wf[label] = np.empty( width, dtype='float64')
                 self.wf_accum[label] = np.empty( width, dtype='float64')
                 self.wf2_accum[label] = np.empty( width, dtype='float64')
@@ -225,37 +224,15 @@ class pyana_waveform (object) :
             source = parts[0]       # e.g. 'AmoGasdet-0|Acqiris-0' or 'Camp-0|Acqiris-0'
             channel = int(parts[1]) # e.g. 0 or 19
 
-            if env.fwkName() == 'psana':
-                acqData = evt.get(xtc.TypeId.Type.Id_AcqWaveform, source)
-            else:
-                acqData = evt.getAcqValue( source, channel, env) # pypdsdata.acqiris.DataDescV1
-
+            acqData = evt.get(xtc.TypeId.Type.Id_AcqWaveform, source)
             if acqData :
-                if self.ts[label] is None:
-                    if env.fwkName() == 'psana':
-                        num_timestamps = self.wf_window[1] - self.wf_window[0]
-                        """
-                        for i, d in  enumerate(acqData.data_list()):
-                            print "    ", i, d.timestamp()[0].pos()
-                            print "    ", i, d.timestamp()[0].timeStampLo()
-                            print "    ", i, d.timestamp()[0].timeStampHi()
-                            print "    ", i, d.timestamp()[0].value()
-                        """
-                        # XXX this step size does not always agree with pyana
-                        step = self.span / 1.0e5
-                        timestamps = [ i * step for i in range(num_timestamps) ]
-                        self.ts[label] = np.array(timestamps)
-                    else:
-                        self.ts[label] = acqData.timestamps()[self.wf_window[0]:self.wf_window[1]] * 1.0e9
-                        # nano-seconds
-                    #print self.ts[label]
 
                 # a waveform
                 if env.fwkName() == 'psana':
                     elem = acqData.data(channel) # this is a DataDescElem
-                    awf = elem.waveforms()[0][self.wf_window[0]:self.wf_window[1]]
                 else:
-                    awf = acqData.waveform()[self.wf_window[0]:self.wf_window[1]]
+                    elem = acqData[channel]
+                awf = elem.waveforms()[0][self.wf_window[0]:self.wf_window[1]]
                 
                 self.ctr[label]+=1
                 
@@ -357,7 +334,6 @@ class pyana_waveform (object) :
         # convert dict to a list:
         data_wf = []
         for label in self.src_ch :
-            self.data[label].ts = self.ts[label]
 
             #self.data[label].wf = None
             #self.data[label].average = None
