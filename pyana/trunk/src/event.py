@@ -305,19 +305,10 @@ class Event(object):
         cfg = self.m_env.getAcqConfig(address=src)
         if not cfg : raise Error("cannot find Acqiris config for address %s" % src )
 
-        data = []        
-        hcfg = cfg.horiz()
-        channel = 0
-        while True:
+        data = []
+        for channel, elem in enumerate(obj.data(cfg)):
+            data.append(acqiris.DataDescV1Elem(elem, cfg, cfg.vert(channel)))
             
-            vcfg = cfg.vert(channel)
-            data.append(acqiris.DataDescV1(obj, hcfg, vcfg))
-            
-            channel += 1
-            if channel >= cfg.nbrChannels(): break
-            
-            obj = obj.nextChannel(hcfg)
-
         return data
 
     def _wrapPnCcdData(self, obj, typeId, typeVersion, src):
@@ -326,15 +317,7 @@ class Event(object):
         cfg = self.m_env.getPnCCDConfig(address=src)
         if not cfg : raise Error("cannot find PnCCD config for address %s" % src )
 
-        # get all frames
-        frames = []
-        numLinks = cfg.numLinks()
-        while True:
-            frames.append(obj)
-            if len(frames) >= numLinks : break
-            obj = obj.next(cfg)
-        
-        return pnccd.FrameV1( frames, cfg )
+        return pnccd.FrameV1( obj, cfg )
 
     def _wrapPrincetonData(self, obj, typeId, typeVersion, src):
         """ Wrapper method for Princeton data"""
@@ -371,12 +354,8 @@ class Event(object):
         if not cfg : raise Error("cannot find CsPad config for address %s" % src )
 
         # get all elements
-        quads = []
         numQuads = cfg.numQuads()
-        while True:
-            quads.append(cspad.wrapElement(obj, cfg))
-            if len(quads) >= numQuads : break
-            obj = obj.next(cfg)
+        quads = [cspad.wrapElement(obj.quads(cfg, i), cfg) for i in range(numQuads)]
         
         # quads may be unordered in XTC, clients prefer them ordered
         quads.sort(cmp = lambda x, y: cmp(x.quad(), y.quad()))
@@ -410,15 +389,10 @@ class Event(object):
         # check channel number
         if channel < 0 or channel >= cfg.nbrChannels() :
             raise Error("invalid channel number: %d" % channel )
-
-        hcfg = cfg.horiz()
-        vcfg = cfg.vert(channel)
         
-        # move to specific channel
-        for i in range(channel) :
-            obj = obj.nextChannel(hcfg)
+        obj = obj.data(cfg)[channel]
         
-        return acqiris.DataDescV1( obj, hcfg, vcfg )
+        return acqiris.DataDescV1Elem(obj, cfg, vcfg = cfg.vert(channel))
     
     def getEBeam(self):
         """self.getEBeam() -> object
@@ -751,10 +725,10 @@ class EpicsStore(object):
             else:
 
                 # loop over aliases definitions
-                for pvConfig in config.getPvConfigs():
+                for pvConfig in config.getPvConfig():
 
-                    alias = pvConfig.sPvDesc
-                    id = (src.log(), src.phy(), pvConfig.iPvId)
+                    alias = pvConfig.description()
+                    id = (src.log(), src.phy(), pvConfig.pvId())
 
                     # get PV name
                     name = self.m_id2name.get(id, None)
