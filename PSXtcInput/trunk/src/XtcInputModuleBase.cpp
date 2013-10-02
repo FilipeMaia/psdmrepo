@@ -394,7 +394,7 @@ XtcInputModuleBase::fillEnv(const XtcInput::Dgram& dg, Env& env)
         // need to tell Epics store about aliases
         boost::shared_ptr<Psana::Epics::ConfigV1> cfgV1 = env.configStore().get(xtc->src);
         if (cfgV1) {
-          const ndarray<const Psana::Epics::PvConfigV1, 1>& pvs = cfgV1->pvControls();
+          const ndarray<const Psana::Epics::PvConfigV1, 1>& pvs = cfgV1->getPvConfig();
           for (unsigned i = 0; i != pvs.shape()[0]; ++ i) {
             const Psana::Epics::PvConfigV1& pvcfg = pvs[i];
             env.epicsStore().storeAlias(xtc->src, pvcfg.pvId(), pvcfg.description());

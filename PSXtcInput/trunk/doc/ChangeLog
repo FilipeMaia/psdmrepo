@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-09-03
+2013-10-02 Andy Salnikov
+- one method name changed in Epics::ConfigV1 class
+
 Tag: V00-09-02
 2013-09-17 Andy Salnikov
 - documentation generation changed in SConsTools, updating SConscript
