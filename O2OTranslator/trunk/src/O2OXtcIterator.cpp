@@ -108,6 +108,7 @@ O2OXtcIterator::process(Xtc* xtc)
 
   } else if ( xtc->src.level() == Pds::Level::Source
       or xtc->src.level() == Pds::Level::Reporter
+      or xtc->src.level() == Pds::Level::Event
       or xtc->src.level() == Pds::Level::Control ) {
 
     if (m_config) {

@@ -25,12 +25,14 @@
 //-------------------------------
 #include "H5DataTypes/AcqirisConfigV1.h"
 #include "H5DataTypes/AcqirisTdcConfigV1.h"
+#include "H5DataTypes/AliasConfigV1.h"
 #include "H5DataTypes/AndorConfigV1.h"
 #include "H5DataTypes/AndorFrameV1.h"
 #include "H5DataTypes/BldDataEBeamV0.h"
 #include "H5DataTypes/BldDataEBeamV1.h"
 #include "H5DataTypes/BldDataEBeamV2.h"
 #include "H5DataTypes/BldDataEBeamV3.h"
+#include "H5DataTypes/BldDataEBeamV4.h"
 #include "H5DataTypes/BldDataFEEGasDetEnergy.h"
 #include "H5DataTypes/BldDataGMDV0.h"
 #include "H5DataTypes/BldDataGMDV1.h"
@@ -38,11 +40,13 @@
 #include "H5DataTypes/BldDataIpimbV1.h"
 #include "H5DataTypes/BldDataPhaseCavity.h"
 #include "H5DataTypes/BldDataPimV1.h"
+#include "H5DataTypes/BldDataSpectrometerV0.h"
 #include "H5DataTypes/CameraFrameFexConfigV1.h"
 #include "H5DataTypes/CameraFrameV1.h"
 #include "H5DataTypes/CameraTwoDGaussianV1.h"
 #include "H5DataTypes/ControlDataConfigV1.h"
 #include "H5DataTypes/ControlDataConfigV2.h"
+#include "H5DataTypes/ControlDataConfigV3.h"
 #include "H5DataTypes/CsPad2x2ConfigV1.h"
 #include "H5DataTypes/CsPad2x2ConfigV2.h"
 #include "H5DataTypes/CsPadConfigV1.h"
@@ -74,6 +78,8 @@
 #include "H5DataTypes/IpimbConfigV2.h"
 #include "H5DataTypes/IpimbDataV1.h"
 #include "H5DataTypes/IpimbDataV2.h"
+#include "H5DataTypes/L3TConfigV1.h"
+#include "H5DataTypes/L3TDataV1.h"
 #include "H5DataTypes/LusiDiodeFexConfigV1.h"
 #include "H5DataTypes/LusiDiodeFexConfigV2.h"
 #include "H5DataTypes/LusiDiodeFexV1.h"
@@ -297,6 +303,9 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
     case 2:
       ::makeConfigCvt<ControlDataConfigV2>(cvts, group, "ControlData::ConfigV2", src, transition, m_cvtOptions, 0);
       break;
+    case 3:
+      ::makeConfigCvt<ControlDataConfigV2>(cvts, group, "ControlData::ConfigV3", src, transition, m_cvtOptions, 0);
+      break;
     }
     break;
 
@@ -351,6 +360,9 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
       break;
     case 3:
       cvts.push_back(make_shared<EvtDataTypeCvtDef<BldDataEBeamV3> >(group, "Bld::BldDataEBeamV3", src, m_cvtOptions, 0));
+      break;
+    case 4:
+      cvts.push_back(make_shared<EvtDataTypeCvtDef<BldDataEBeamV4> >(group, "Bld::BldDataEBeamV4", src, m_cvtOptions, 0));
       break;
     }
     break;
@@ -813,14 +825,46 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
     }
     break;
 
-    case Pds::TypeId::Id_ImpData:
-      switch (version) {
-      case 1:
-        // very special converter for Imp::ElementV1, it needs two types of data
-        cvts.push_back(make_shared<ImpElementV1Cvt>(group, "Imp::ElementV1", src, m_configStore, m_cvtOptions, 0));
-        break;
-      }
+  case Pds::TypeId::Id_ImpData:
+    switch (version) {
+    case 1:
+      // very special converter for Imp::ElementV1, it needs two types of data
+      cvts.push_back(make_shared<ImpElementV1Cvt>(group, "Imp::ElementV1", src, m_configStore, m_cvtOptions, 0));
       break;
+    }
+    break;
+
+  case Pds::TypeId::Id_AliasConfig:
+    switch (version) {
+    case 1:
+      ::makeConfigCvt<AliasConfigV1>(cvts, group, "Alias::ConfigV1", src, transition, m_cvtOptions, 0);
+      break;
+    }
+    break;
+
+  case Pds::TypeId::Id_L3TConfig:
+    switch (version) {
+    case 1:
+      ::makeConfigCvt<L3TConfigV1>(cvts, group, "L3T::ConfigV1", src, transition, m_cvtOptions, 0);
+      break;
+    }
+    break;
+
+  case Pds::TypeId::Id_L3TData:
+    switch (version) {
+    case 1:
+      cvts.push_back(make_shared<EvtDataTypeCvtDef<L3TDataV1> >(group, "L3T::DataV1", src, m_cvtOptions, 0));
+      break;
+    }
+    break;
+
+  case Pds::TypeId::Id_Spectrometer:
+    switch (version) {
+    case 0:
+      cvts.push_back(make_shared<EvtDataTypeCvtDef<BldDataSpectrometerV0> >(group, "Bld::BldDataSpectrometerV0", src, m_cvtOptions, 0));
+      break;
+    }
+    break;
 
   case Pds::TypeId::NumberOf:
     break;

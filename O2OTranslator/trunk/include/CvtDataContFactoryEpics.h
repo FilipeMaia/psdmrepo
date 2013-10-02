@@ -82,9 +82,7 @@ protected:
   static hdf5pp::Type hdf_type( const Pds::Epics::EpicsPvHeader& pv, bool native ) ;
 
   template <int iDbrType>
-  static hdf5pp::Type hdf_type_ctrl( const Pds::Epics::EpicsPvHeader& hdr ) ;
-  template <int iDbrType>
-  static hdf5pp::Type hdf_type_time( const Pds::Epics::EpicsPvHeader& hdr ) ;
+  static hdf5pp::Type hdf_type_tmpl( const Pds::Epics::EpicsPvHeader& hdr ) ;
 
 private:
 

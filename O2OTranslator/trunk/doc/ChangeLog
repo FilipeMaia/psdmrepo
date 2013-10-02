@@ -11,6 +11,15 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-29-01
+2013-10-02 Andy Salnikov
+- upgrade to pdsdata V07-02-00
+- improvement to Epics sector
+- bunch of new data types: AliasConfigV1, BldDataSpectrometerV0, 
+  ControlDataConfigV3, L3TConfigV1, L3TDataV1, BldDataEBeamV4
+- not decided yet what to do with aliases, for now just store 
+  them as regular config object
+
 Tag: V00-29-00
 2013-09-24 Andy Salnikov
 - pdsdata is now DDL-based, with a lot of changes to interface

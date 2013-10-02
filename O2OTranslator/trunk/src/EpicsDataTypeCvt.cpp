@@ -249,7 +249,7 @@ EpicsDataTypeCvt::aliasName(int pvId, const Pds::Src& src)
   Pds::TypeId typeId(Pds::TypeId::Id_EpicsConfig, 1);
   if (const Pds::Epics::ConfigV1* ecfg = m_configStore.find<Pds::Epics::ConfigV1>(typeId, src)) {
 
-    const ndarray<const Pds::Epics::PvConfigV1, 1>& controls = ecfg->pvControls();
+    const ndarray<const Pds::Epics::PvConfigV1, 1>& controls = ecfg->getPvConfig();
 
     for (unsigned i = 0; i != controls.size(); ++ i) {
       const Pds::Epics::PvConfigV1& pvcfg = controls[i];

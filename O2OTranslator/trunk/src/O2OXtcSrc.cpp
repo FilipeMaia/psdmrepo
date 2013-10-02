@@ -70,6 +70,9 @@ namespace {
     } else if ( src.level() == Pds::Level::Control ) {
       // special case for control data
       return "Control";
+    } else if ( src.level() == Pds::Level::Event ) {
+      // special case for L3T data
+      return "Event";
     } else {
       const Pds::ProcInfo& info = static_cast<const Pds::ProcInfo&>( src ) ;
       return toName( info ) ;

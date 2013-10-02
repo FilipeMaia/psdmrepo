@@ -165,7 +165,7 @@ AcqirisDataDescV1Cvt::fillContainers(hdf5pp::Group group,
       std::fill_n(waveforms[ch][0], nSampl*nSeg, int16_t(0));
     } else {
       const int16_t* wf = dd.waveforms(*config).data() ;
-      wf += dd.indexFirstPoint() ;
+      // wf += dd.indexFirstPoint() ;  already corrected in new DDL-based pdsdata
       std::copy ( wf, wf+nSampl*nSeg, waveforms[ch][0] ) ;
     }
     
