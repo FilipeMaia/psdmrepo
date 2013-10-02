@@ -144,6 +144,7 @@ void createWrappers(PyObject* module) {
     .def("source_id", &Psana::EvrData::OutputMap::source_id)
     .def("conn", &Psana::EvrData::OutputMap::conn)
     .def("conn_id", &Psana::EvrData::OutputMap::conn_id)
+    .def("map", &Psana::EvrData::OutputMap::map,"Returns encoded source value.")
   ;
 
   enum_<Psana::EvrData::OutputMap::Source>("Source")
@@ -170,6 +171,7 @@ void createWrappers(PyObject* module) {
     .def("conn", &Psana::EvrData::OutputMapV2::conn)
     .def("conn_id", &Psana::EvrData::OutputMapV2::conn_id)
     .def("module", &Psana::EvrData::OutputMapV2::module)
+    .def("map", &Psana::EvrData::OutputMapV2::map,"Returns encoded source value.")
   ;
 
   enum_<Psana::EvrData::OutputMapV2::Source>("Source")

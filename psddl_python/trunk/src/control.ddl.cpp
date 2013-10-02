@@ -106,9 +106,30 @@ void createWrappers(PyObject* module) {
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::ControlData::ConfigV2> >(Pds::TypeId::Id_ControlConfig));
 
   {
-    PyObject* unvlist = PyList_New(2);
+  scope outer = 
+  class_<Psana::ControlData::ConfigV3, boost::shared_ptr<Psana::ControlData::ConfigV3>, boost::noncopyable >("ConfigV3", no_init)
+    .def("events", &Psana::ControlData::ConfigV3::events,"Maximum number of events per scan.")
+    .def("uses_l3t_events", &Psana::ControlData::ConfigV3::uses_l3t_events,"returns true if the configuration uses l3trigger events limit.")
+    .def("uses_duration", &Psana::ControlData::ConfigV3::uses_duration,"returns true if the configuration uses duration control.")
+    .def("uses_events", &Psana::ControlData::ConfigV3::uses_events,"returns true if the configuration uses events limit.")
+    .def("duration", &Psana::ControlData::ConfigV3::duration, return_value_policy<copy_const_reference>(),"Maximum duration of the scan.")
+    .def("npvControls", &Psana::ControlData::ConfigV3::npvControls,"Number of PVControl objects in this configuration.")
+    .def("npvMonitors", &Psana::ControlData::ConfigV3::npvMonitors,"Number of PVMonitor objects in this configuration.")
+    .def("npvLabels", &Psana::ControlData::ConfigV3::npvLabels,"Number of PVLabel objects in this configuration.")
+    .def("pvControls", &Psana::ControlData::ConfigV3::pvControls,"PVControl configuration objects")
+    .def("pvMonitors", &Psana::ControlData::ConfigV3::pvMonitors,"PVMonitor configuration objects")
+    .def("pvLabels", &Psana::ControlData::ConfigV3::pvLabels,"PVLabel configuration objects")
+  ;
+  scope().attr("Version")=3;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_ControlConfig);
+  }
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::ControlData::ConfigV3> >(Pds::TypeId::Id_ControlConfig));
+
+  {
+    PyObject* unvlist = PyList_New(3);
     PyList_SET_ITEM(unvlist, 0, PyObject_GetAttrString(submodule, "ConfigV1"));
     PyList_SET_ITEM(unvlist, 1, PyObject_GetAttrString(submodule, "ConfigV2"));
+    PyList_SET_ITEM(unvlist, 2, PyObject_GetAttrString(submodule, "ConfigV3"));
     PyObject_SetAttrString(submodule, "Config", unvlist);
     Py_CLEAR(unvlist);
   }

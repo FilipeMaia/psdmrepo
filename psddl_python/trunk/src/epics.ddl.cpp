@@ -421,7 +421,7 @@ void createWrappers(PyObject* module) {
   scope outer = 
   class_<Psana::Epics::ConfigV1, boost::shared_ptr<Psana::Epics::ConfigV1>, boost::noncopyable >("ConfigV1", no_init)
     .def("numPv", &Psana::Epics::ConfigV1::numPv)
-    .def("pvControls", &Psana::Epics::ConfigV1::pvControls)
+    .def("getPvConfig", &Psana::Epics::ConfigV1::getPvConfig)
   ;
   scope().attr("Version")=1;
   scope().attr("TypeId")=int(Pds::TypeId::Id_EpicsConfig);

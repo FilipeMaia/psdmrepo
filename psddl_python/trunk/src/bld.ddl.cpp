@@ -164,7 +164,7 @@ void createWrappers(PyObject* module) {
     .def("damageMask", &Psana::Bld::BldDataEBeamV4::damageMask,"Damage mask.")
     .def("ebeamCharge", &Psana::Bld::BldDataEBeamV4::ebeamCharge,"Beam charge in nC.")
     .def("ebeamL3Energy", &Psana::Bld::BldDataEBeamV4::ebeamL3Energy,"Beam energy in MeV.")
-    .def("ebeamLTUPosX", &Psana::Bld::BldDataEBeamV4::ebeamLTUPosX,"LTU beam position in mm.")
+    .def("ebeamLTUPosX", &Psana::Bld::BldDataEBeamV4::ebeamLTUPosX,"LTU beam position (BPMS:LTU1:720 through 750) in mm.")
     .def("ebeamLTUPosY", &Psana::Bld::BldDataEBeamV4::ebeamLTUPosY,"LTU beam position in mm.")
     .def("ebeamLTUAngX", &Psana::Bld::BldDataEBeamV4::ebeamLTUAngX,"LTU beam angle in mrad.")
     .def("ebeamLTUAngY", &Psana::Bld::BldDataEBeamV4::ebeamLTUAngY,"LTU beam angle in mrad.")
@@ -172,10 +172,10 @@ void createWrappers(PyObject* module) {
     .def("ebeamEnergyBC2", &Psana::Bld::BldDataEBeamV4::ebeamEnergyBC2,"Beam position in mm (related to beam energy).")
     .def("ebeamPkCurrBC1", &Psana::Bld::BldDataEBeamV4::ebeamPkCurrBC1,"Beam current in Amps.")
     .def("ebeamEnergyBC1", &Psana::Bld::BldDataEBeamV4::ebeamEnergyBC1,"Beam position in mm (related to beam energy).")
-    .def("ebeamUndPosX", &Psana::Bld::BldDataEBeamV4::ebeamUndPosX,"Und beam x-position in mm.")
-    .def("ebeamUndPosY", &Psana::Bld::BldDataEBeamV4::ebeamUndPosY,"Und beam y-position in mm.")
-    .def("ebeamUndAngX", &Psana::Bld::BldDataEBeamV4::ebeamUndAngX,"Und beam x-angle in mrad.")
-    .def("ebeamUndAngY", &Psana::Bld::BldDataEBeamV4::ebeamUndAngY,"Und beam y-angle in mrad.")
+    .def("ebeamUndPosX", &Psana::Bld::BldDataEBeamV4::ebeamUndPosX,"Undulator launch feedback (BPMs U4 through U10) beam x-position in mm.")
+    .def("ebeamUndPosY", &Psana::Bld::BldDataEBeamV4::ebeamUndPosY,"Undulator launch feedback beam y-position in mm.")
+    .def("ebeamUndAngX", &Psana::Bld::BldDataEBeamV4::ebeamUndAngX,"Undulator launch feedback beam x-angle in mrad.")
+    .def("ebeamUndAngY", &Psana::Bld::BldDataEBeamV4::ebeamUndAngY,"Undulator launch feedback beam y-angle in mrad.")
   ;
 
   enum_<Psana::Bld::BldDataEBeamV4::DamageMask>("DamageMask")
@@ -298,6 +298,40 @@ void createWrappers(PyObject* module) {
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Bld::BldDataAcqADCV1> >(Pds::TypeId::Id_SharedAcqADC));
 
   {
+  scope outer = 
+  class_<Psana::Bld::BldDataSpectrometerV0, boost::shared_ptr<Psana::Bld::BldDataSpectrometerV0>, boost::noncopyable >("BldDataSpectrometerV0", "Structure which contains image projections for spectrometers.", no_init)
+    .def("hproj", &Psana::Bld::BldDataSpectrometerV0::hproj)
+    .def("vproj", &Psana::Bld::BldDataSpectrometerV0::vproj)
+  ;
+  scope().attr("Version")=0;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_Spectrometer);
+  }
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Bld::BldDataSpectrometerV0> >(Pds::TypeId::Id_Spectrometer));
+
+  {
+    PyObject* unvlist = PyList_New(1);
+    PyList_SET_ITEM(unvlist, 0, PyObject_GetAttrString(submodule, "BldDataSpectrometerV0"));
+    PyObject_SetAttrString(submodule, "BldDataSpectrometer", unvlist);
+    Py_CLEAR(unvlist);
+  }
+  {
+    PyObject* unvlist = PyList_New(2);
+    PyList_SET_ITEM(unvlist, 0, PyObject_GetAttrString(submodule, "BldDataGMDV0"));
+    PyList_SET_ITEM(unvlist, 1, PyObject_GetAttrString(submodule, "BldDataGMDV1"));
+    PyObject_SetAttrString(submodule, "BldDataGMD", unvlist);
+    Py_CLEAR(unvlist);
+  }
+  {
+    PyObject* unvlist = PyList_New(5);
+    PyList_SET_ITEM(unvlist, 0, PyObject_GetAttrString(submodule, "BldDataEBeamV0"));
+    PyList_SET_ITEM(unvlist, 1, PyObject_GetAttrString(submodule, "BldDataEBeamV1"));
+    PyList_SET_ITEM(unvlist, 2, PyObject_GetAttrString(submodule, "BldDataEBeamV2"));
+    PyList_SET_ITEM(unvlist, 3, PyObject_GetAttrString(submodule, "BldDataEBeamV3"));
+    PyList_SET_ITEM(unvlist, 4, PyObject_GetAttrString(submodule, "BldDataEBeamV4"));
+    PyObject_SetAttrString(submodule, "BldDataEBeam", unvlist);
+    Py_CLEAR(unvlist);
+  }
+  {
     PyObject* unvlist = PyList_New(1);
     PyList_SET_ITEM(unvlist, 0, PyObject_GetAttrString(submodule, "BldDataAcqADCV1"));
     PyObject_SetAttrString(submodule, "BldDataAcqADC", unvlist);
@@ -311,28 +345,12 @@ void createWrappers(PyObject* module) {
     Py_CLEAR(unvlist);
   }
   {
-    PyObject* unvlist = PyList_New(2);
-    PyList_SET_ITEM(unvlist, 0, PyObject_GetAttrString(submodule, "BldDataGMDV0"));
-    PyList_SET_ITEM(unvlist, 1, PyObject_GetAttrString(submodule, "BldDataGMDV1"));
-    PyObject_SetAttrString(submodule, "BldDataGMD", unvlist);
-    Py_CLEAR(unvlist);
-  }
-  {
     PyObject* unvlist = PyList_New(1);
     PyList_SET_ITEM(unvlist, 0, PyObject_GetAttrString(submodule, "BldDataPimV1"));
     PyObject_SetAttrString(submodule, "BldDataPim", unvlist);
     Py_CLEAR(unvlist);
   }
-  {
-    PyObject* unvlist = PyList_New(5);
-    PyList_SET_ITEM(unvlist, 0, PyObject_GetAttrString(submodule, "BldDataEBeamV0"));
-    PyList_SET_ITEM(unvlist, 1, PyObject_GetAttrString(submodule, "BldDataEBeamV1"));
-    PyList_SET_ITEM(unvlist, 2, PyObject_GetAttrString(submodule, "BldDataEBeamV2"));
-    PyList_SET_ITEM(unvlist, 3, PyObject_GetAttrString(submodule, "BldDataEBeamV3"));
-    PyList_SET_ITEM(unvlist, 4, PyObject_GetAttrString(submodule, "BldDataEBeamV4"));
-    PyObject_SetAttrString(submodule, "BldDataEBeam", unvlist);
-    Py_CLEAR(unvlist);
-  }
+  detail::register_ndarray_to_numpy_cvt<const uint32_t, 1>();
 
 } // createWrappers()
 } // namespace Bld
