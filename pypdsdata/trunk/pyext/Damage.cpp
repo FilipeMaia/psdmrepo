@@ -56,8 +56,6 @@ namespace {
 
   // standard Python stuff
   int Damage_init( PyObject* self, PyObject* args, PyObject* kwds );
-  PyObject* Damage_str( PyObject* self );
-  PyObject* Damage_repr( PyObject* self );
 
   // type-specific methods
   FUN0_WRAPPER_EMBEDDED(pypdsdata::Damage, value);
@@ -91,8 +89,6 @@ pypdsdata::Damage::initType( PyObject* module )
   type->tp_doc = ::typedoc;
   type->tp_methods = ::methods;
   type->tp_init = Damage_init;
-  type->tp_str = Damage_str;
-  type->tp_repr = Damage_repr;
 
   // define class attributes for enums
   PyObject* tp_dict = PyDict_New();
@@ -101,6 +97,12 @@ pypdsdata::Damage::initType( PyObject* module )
   type->tp_dict = tp_dict;
 
   BaseType::initType( "Damage", module );
+}
+
+void 
+pypdsdata::Damage::print(std::ostream& out) const
+{
+  out << "<Damage(" << m_obj.value() << ")>";
 }
 
 namespace {
@@ -121,19 +123,6 @@ Damage_init(PyObject* self, PyObject* args, PyObject* kwds)
   new(&py_this->m_obj) Pds::Damage(val);
 
   return 0;
-}
-
-PyObject*
-Damage_str( PyObject* self )
-{
-  return Damage_repr(self);
-}
-
-PyObject*
-Damage_repr( PyObject* self )
-{
-  pypdsdata::Damage* py_this = (pypdsdata::Damage*) self;
-  return PyString_FromFormat("<Damage(%d)>", int(py_this->m_obj.value()) );
 }
 
 PyObject*

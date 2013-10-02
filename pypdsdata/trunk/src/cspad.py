@@ -76,7 +76,7 @@ class ElementV1(object) :
         self.__ticks = quad.ticks()
         self.__fiducials = quad.fiducials()
         self.__frame_type = quad.frame_type()
-        self.__sb_temp = map(quad.sb_temp, range(4))
+        self.__sb_temp = quad.sb_temp()
         self.__data = quad.data(cfg)
 
     def virtual_channel(self):
@@ -190,7 +190,7 @@ class ElementV2(object) :
         self.__ticks = quad.ticks()
         self.__fiducials = quad.fiducials()
         self.__frame_type = quad.frame_type()
-        self.__sb_temp = map(quad.sb_temp, range(4))
+        self.__sb_temp = quad.sb_temp()
         self.__data = quad.data(cfg)
 
     def virtual_channel(self):

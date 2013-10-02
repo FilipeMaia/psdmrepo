@@ -1,12 +1,12 @@
-#ifndef PYPDSDATA_DETINFO_H
-#define PYPDSDATA_DETINFO_H
+#ifndef PYPDSDATA_BLD_BLDDATASPECTROMETERV0_H
+#define PYPDSDATA_BLD_BLDDATASPECTROMETERV0_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class DetInfo.
+//	Class BldDataSpectrometerV0.
 //
 //------------------------------------------------------------------------
 
@@ -17,7 +17,7 @@
 //----------------------
 // Base Class Headers --
 //----------------------
-#include "types/PdsDataTypeEmbedded.h"
+#include "../PdsDataType.h"
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -26,13 +26,14 @@
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
-#include "pdsdata/xtc/DetInfo.hh"
+#include "pdsdata/psddl/bld.ddl.h"
 
-//		---------------------
-// 		-- Class Interface --
-//		---------------------
+//    ---------------------
+//    -- Class Interface --
+//    ---------------------
 
 namespace pypdsdata {
+namespace Bld {
 
 /// @addtogroup pypdsdata
 
@@ -47,22 +48,19 @@ namespace pypdsdata {
  *  @author Andrei Salnikov
  */
 
-class DetInfo : public PdsDataTypeEmbedded<DetInfo,Pds::DetInfo> {
+class BldDataSpectrometerV0 : public PdsDataType<BldDataSpectrometerV0,Pds::Bld::BldDataSpectrometerV0> {
 public:
 
-  typedef PdsDataTypeEmbedded<DetInfo,Pds::DetInfo> BaseType;
+  typedef PdsDataType<BldDataSpectrometerV0,Pds::Bld::BldDataSpectrometerV0> BaseType;
 
   /// Initialize Python type and register it in a module
   static void initType( PyObject* module );
 
-  // Dump object info to a stream
+  // dump to a stream
   void print(std::ostream& out) const;
 };
 
+} // namespace Bld
 } // namespace pypdsdata
 
-namespace Pds {
-inline PyObject* toPython(const Pds::DetInfo& v) { return pypdsdata::DetInfo::PyObject_FromPds(v); }
-}
-
-#endif // PYPDSDATA_DETINFO_H
+#endif // PYPDSDATA_BLD_BLDDATASPECTROMETERV0_H

@@ -1,12 +1,12 @@
-#ifndef PYPDSDATA_DETINFO_H
-#define PYPDSDATA_DETINFO_H
+#ifndef PYPDSDATA_PNCCD_FRAMESV1_H
+#define PYPDSDATA_PNCCD_FRAMESV1_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class DetInfo.
+//	Class FramesV1.
 //
 //------------------------------------------------------------------------
 
@@ -17,22 +17,23 @@
 //----------------------
 // Base Class Headers --
 //----------------------
-#include "types/PdsDataTypeEmbedded.h"
+#include "../PdsDataType.h"
 
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "pdsdata/psddl/pnccd.ddl.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
-#include "pdsdata/xtc/DetInfo.hh"
 
-//		---------------------
-// 		-- Class Interface --
-//		---------------------
+//    ---------------------
+//    -- Class Interface --
+//    ---------------------
 
 namespace pypdsdata {
+namespace PNCCD {
 
 /// @addtogroup pypdsdata
 
@@ -47,22 +48,20 @@ namespace pypdsdata {
  *  @author Andrei Salnikov
  */
 
-class DetInfo : public PdsDataTypeEmbedded<DetInfo,Pds::DetInfo> {
+class FramesV1 : public PdsDataType<FramesV1,Pds::PNCCD::FramesV1> {
 public:
 
-  typedef PdsDataTypeEmbedded<DetInfo,Pds::DetInfo> BaseType;
+  typedef PdsDataType<FramesV1,Pds::PNCCD::FramesV1> BaseType;
 
   /// Initialize Python type and register it in a module
   static void initType( PyObject* module );
 
-  // Dump object info to a stream
-  void print(std::ostream& out) const;
+  // dump to a stream
+  void print(std::ostream& str) const;
+
 };
 
+} // namespace PNCCD
 } // namespace pypdsdata
 
-namespace Pds {
-inline PyObject* toPython(const Pds::DetInfo& v) { return pypdsdata::DetInfo::PyObject_FromPds(v); }
-}
-
-#endif // PYPDSDATA_DETINFO_H
+#endif // PYPDSDATA_PNCCD_FRAMESV1_H

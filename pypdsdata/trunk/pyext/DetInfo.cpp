@@ -157,7 +157,6 @@ namespace {
   int DetInfo_init( PyObject* self, PyObject* args, PyObject* kwds );
   long DetInfo_hash( PyObject* self );
   int DetInfo_compare( PyObject *self, PyObject *other);
-  PyObject* DetInfo_str( PyObject *self );
   PyObject* DetInfo_repr( PyObject *self );
 
   // type-specific methods
@@ -202,7 +201,6 @@ pypdsdata::DetInfo::initType( PyObject* module )
   type->tp_init = DetInfo_init;
   type->tp_hash = DetInfo_hash;
   type->tp_compare = DetInfo_compare;
-  type->tp_str = DetInfo_str;
   type->tp_repr = DetInfo_repr;
 
   // define class attributes for enums
@@ -212,6 +210,13 @@ pypdsdata::DetInfo::initType( PyObject* module )
   type->tp_dict = tp_dict;
 
   BaseType::initType( "DetInfo", module );
+}
+
+void 
+pypdsdata::DetInfo::print(std::ostream& out) const
+{
+  out << "DetInfo(" << ::det_name(m_obj.detector()) << "-" << m_obj.detId() 
+      << "|" << ::dev_name(m_obj.device()) << "-" << m_obj.devId() << ")";
 }
 
 namespace {
@@ -273,18 +278,6 @@ DetInfo_compare( PyObject* self, PyObject* other )
   if ( py_this->m_obj.phy() > py_other->m_obj.phy() ) return 1 ;
   if ( py_this->m_obj.phy() < py_other->m_obj.phy() ) return -1 ;
   return 0 ;
-}
-
-PyObject*
-DetInfo_str( PyObject *self )
-{
-  pypdsdata::DetInfo* py_this = (pypdsdata::DetInfo*) self;
-  char buf[48];
-  snprintf( buf, sizeof buf, "DetInfo(%s-%d|%s-%d)", ::det_name(py_this->m_obj.detector()),
-      py_this->m_obj.detId(),
-      ::dev_name(py_this->m_obj.device()),
-      py_this->m_obj.devId() );
-  return PyString_FromString( buf );
 }
 
 PyObject*

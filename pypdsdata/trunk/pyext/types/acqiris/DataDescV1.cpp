@@ -76,7 +76,7 @@ data( PyObject* self, PyObject* args )
 
   // parse args
   PyObject* pyconfig ;
-  if ( not PyArg_ParseTuple( args, "O:Acqiris.DataDescV1.waveform", &pyconfig ) ) return 0;
+  if ( not PyArg_ParseTuple( args, "O:Acqiris.DataDescV1.data", &pyconfig ) ) return 0;
 
   // check type
   if ( not pypdsdata::Acqiris::ConfigV1::Object_TypeCheck( pyconfig ) ) {

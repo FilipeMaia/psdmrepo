@@ -86,7 +86,7 @@ pypdsdata::EvrData::ConfigV1::print(std::ostream& str) const
   const ndarray<const Pds::EvrData::OutputMap, 1>& output_maps = m_obj->output_maps();
   for (unsigned i = 0; i != output_maps.size(); ++ i ) {
     if (i != 0) str << ", ";
-    str << output_maps[i].value();
+    str << output_maps[i].map();
   }
   str << "]";
 

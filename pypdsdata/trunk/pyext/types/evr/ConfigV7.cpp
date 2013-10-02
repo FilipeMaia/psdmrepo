@@ -92,7 +92,7 @@ pypdsdata::EvrData::ConfigV7::print(std::ostream& str) const
   }
   str << "]";
 
-  str << "pulses=[";
+  str << ", pulses=[";
   const ndarray<const Pds::EvrData::PulseConfigV3, 1>& pulses = m_obj->pulses();
   for (unsigned i = 0; i != pulses.size(); ++ i ) {
     if (i != 0) str << ", ";
@@ -104,7 +104,7 @@ pypdsdata::EvrData::ConfigV7::print(std::ostream& str) const
   const ndarray<const Pds::EvrData::OutputMapV2, 1>& output_maps = m_obj->output_maps();
   for (unsigned i = 0; i != output_maps.size(); ++ i ) {
     if (i != 0) str << ", ";
-    str << output_maps[i].value();
+    str << output_maps[i].map();
   }
   str << "]";
 

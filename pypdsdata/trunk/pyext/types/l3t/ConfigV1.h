@@ -1,12 +1,12 @@
-#ifndef PYPDSDATA_DETINFO_H
-#define PYPDSDATA_DETINFO_H
+#ifndef PYPDSDATA_L3T_CONFIGV1_H
+#define PYPDSDATA_L3T_CONFIGV1_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
-// 	$Id$
+//      $Id$
 //
 // Description:
-//	Class DetInfo.
+//      Class ConfigV1.
 //
 //------------------------------------------------------------------------
 
@@ -17,7 +17,7 @@
 //----------------------
 // Base Class Headers --
 //----------------------
-#include "types/PdsDataTypeEmbedded.h"
+#include "../PdsDataType.h"
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -26,13 +26,14 @@
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
-#include "pdsdata/xtc/DetInfo.hh"
+#include "pdsdata/psddl/l3t.ddl.h"
 
-//		---------------------
-// 		-- Class Interface --
-//		---------------------
+//    ---------------------
+//    -- Class Interface --
+//    ---------------------
 
 namespace pypdsdata {
+namespace L3T {
 
 /// @addtogroup pypdsdata
 
@@ -47,22 +48,20 @@ namespace pypdsdata {
  *  @author Andrei Salnikov
  */
 
-class DetInfo : public PdsDataTypeEmbedded<DetInfo,Pds::DetInfo> {
+class ConfigV1 : public PdsDataType<ConfigV1, Pds::L3T::ConfigV1> {
 public:
 
-  typedef PdsDataTypeEmbedded<DetInfo,Pds::DetInfo> BaseType;
+  typedef PdsDataType<ConfigV1, Pds::L3T::ConfigV1> BaseType;
 
   /// Initialize Python type and register it in a module
   static void initType( PyObject* module );
 
-  // Dump object info to a stream
-  void print(std::ostream& out) const;
+  // dump to a stream
+  void print(std::ostream& str) const;
+
 };
 
+} // namespace L3T
 } // namespace pypdsdata
 
-namespace Pds {
-inline PyObject* toPython(const Pds::DetInfo& v) { return pypdsdata::DetInfo::PyObject_FromPds(v); }
-}
-
-#endif // PYPDSDATA_DETINFO_H
+#endif // PYPDSDATA_L3T_CONFIGV1_H

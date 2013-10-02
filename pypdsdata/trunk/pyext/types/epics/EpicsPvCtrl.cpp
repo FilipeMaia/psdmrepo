@@ -76,7 +76,7 @@ namespace {
     const EpicsType& obj = static_cast<const EpicsType&>(header);
     out << "id=" << obj.pvId()
         << ", name=" << obj.pvName()
-        << ", type=" << obj.dbrType()
+        << ", type=" << Pds::Epics::DbrTypes(obj.dbrType())
         << ", status=" << obj.status()
         << ", severity=" << obj.severity()
         << ", value=" << obj.value(0);
@@ -127,11 +127,21 @@ namespace {
   };
 
   namespace mm {
+  FUN0_WRAPPER(pypdsdata::Epics::EpicsPvCtrl, pvId)
+  FUN0_WRAPPER(pypdsdata::Epics::EpicsPvCtrl, dbrType)
+  FUN0_WRAPPER(pypdsdata::Epics::EpicsPvCtrl, numElements)
+  FUN0_WRAPPER(pypdsdata::Epics::EpicsPvCtrl, isTime)
+  FUN0_WRAPPER(pypdsdata::Epics::EpicsPvCtrl, isCtrl)
   PyObject* EpicsPvCtrl_getnewargs( PyObject* self, PyObject* );
   }
   
   PyMethodDef methods[] = {
-    { "__getnewargs__",    mm::EpicsPvCtrl_getnewargs, METH_NOARGS, "Pickle support" },
+    { "pvId",           mm::pvId,                   METH_NOARGS, "self.pvId() -> int\n\nReturns PV ID number assigned by DAQ" },
+    { "dbrType",        mm::dbrType,                METH_NOARGS, "self.dbrType() -> int\n\nReturns DBR structure type number" },
+    { "numElements",    mm::numElements,            METH_NOARGS, "self.numElements() -> int\n\nReturns number of elements in EPICS DBR structure" },
+    { "isTime",         mm::isTime,                 METH_NOARGS, "self.isTime() -> int\n\nReturns 1 if PV is one of TIME types, 0 otherwise" },
+    { "isCtrl",         mm::isCtrl,                 METH_NOARGS, "self.isCtrl() -> int\n\nReturns 1 if PV is one of CTRL types, 0 otherwise" },
+    { "__getnewargs__", mm::EpicsPvCtrl_getnewargs, METH_NOARGS, "Pickle support" },
     {0, 0, 0, 0}
   };
 

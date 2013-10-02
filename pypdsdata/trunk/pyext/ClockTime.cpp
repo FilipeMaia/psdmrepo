@@ -19,6 +19,7 @@
 // C/C++ Headers --
 //-----------------
 #include <new>
+#include <iomanip>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -35,7 +36,6 @@ namespace {
   int ClockTime_init( PyObject* self, PyObject* args, PyObject* kwds );
   long ClockTime_hash( PyObject* self );
   int ClockTime_compare( PyObject *self, PyObject *other);
-  PyObject* ClockTime_str( PyObject *self );
   PyObject* ClockTime_repr( PyObject *self );
 
   // type-specific methods
@@ -69,10 +69,15 @@ pypdsdata::ClockTime::initType( PyObject* module )
   type->tp_init = ClockTime_init;
   type->tp_hash = ClockTime_hash;
   type->tp_compare = ClockTime_compare;
-  type->tp_str = ClockTime_str;
   type->tp_repr = ClockTime_repr;
 
   BaseType::initType( "ClockTime", module );
+}
+
+void 
+pypdsdata::ClockTime::print(std::ostream& out) const
+{
+  out << "<T:" << m_obj.seconds() << "." << std::setw(9) << std::setfill('0') << m_obj.nanoseconds() << ">";
 }
 
 namespace {
@@ -116,16 +121,6 @@ ClockTime_compare( PyObject* self, PyObject* other )
   if ( py_this->m_obj > py_other->m_obj ) return 1 ;
   if ( py_this->m_obj == py_other->m_obj ) return 0 ;
   return -1 ;
-}
-
-PyObject*
-ClockTime_str( PyObject *self )
-{
-  pypdsdata::ClockTime* py_this = (pypdsdata::ClockTime*) self;
-  char buf[32];
-  snprintf( buf, sizeof buf, "<T:%d.%09d>", py_this->m_obj.seconds(),
-      py_this->m_obj.nanoseconds() );
-  return PyString_FromString( buf );
 }
 
 PyObject*

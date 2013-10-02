@@ -52,17 +52,19 @@ from _pdsdata.pnccd import *
 # extend FrameV1
 class FrameV1(object) :
     """
-    This is a wrapper for :py:class:`_pdsdata.pnccd.FrameV1` which makes a larger frame
+    This is a wrapper for :py:class:`_pdsdata.pnccd.FramesV1` which makes a larger frame
     image out of four smaller frames. 
     """
 
     def __init__ (self, frames, cfg):
-        """ Constructor takes list of :py:class:`_pdsdata.pnccd.FrameV1` and 
-        one `_pdsdata.acqiris.ConfigV1` object """
+        """ Constructor takes :py:class:`_pdsdata.pnccd.FramesV1` and 
+        `_pdsdata.acqiris.ConfigV1` objects """
 
         # at this moment can only work with 4 frames
-        if len(frames) != 4 : 
+        if frames.numLinks(cfg) != 4 : 
             raise _pdsdata.Error("pnccd.FrameV1: Odd number of frames: %d" % len(frames))
+
+        frames = [frames.frame(cfg, i) for i in range(4)]
 
         # these numbers area supposed to be the same for all frames
         self.__specialWord = frames[0].specialWord()

@@ -49,7 +49,7 @@ namespace {
     { "frameNumber",    frameNumber,    METH_NOARGS,  "self.frameNumber() -> int\n\nReturns frame number." },
     { "range",          range,          METH_NOARGS,  "self.range() -> int\n\nReturns integer number." },
     { "laneStatus",     laneStatus,     METH_NOARGS,  "self.laneStatus() -> int\n\nReturns integer number." },
-    { "samples",        samples,        METH_NOARGS,
+    { "samples",        samples,        METH_VARARGS,
         "self.samples() -> list\n\nReturns list of :py:class:`Sample` objects." },
     {0, 0, 0, 0}
    };
@@ -75,11 +75,17 @@ pypdsdata::Imp::ElementV1::initType( PyObject* module )
 void
 pypdsdata::Imp::ElementV1::print(std::ostream& out) const
 {
-  out << "imp.ElementV1(frameNumber=" << m_obj->frameNumber()
-      << ", range=" << m_obj->range()
-      << ", vc=" << int(m_obj->vc())
-      << ", lane=" << int(m_obj->lane())
-      << ", ...)";
+  // make fake config with 1 sample
+  Pds::Imp::ConfigV1 cfg(0, 0, 0, 0, 0, 0, 0, 1, 0, 0);
+
+  out << "imp.ElementV1(frameNumber=" << m_obj->frameNumber() << ", samples=[[";
+  Pds::Imp::Sample s = m_obj->samples(cfg)[0];
+  const ndarray<const uint16_t, 1>& channels = s.channels();
+  for (unsigned i = 0; i != Pds::Imp::Sample::channelsPerDevice; ++ i) {
+    if (i > 0) out << ", ";
+    out << channels[i];
+  }
+  out << "], ...])";
 }
 
 namespace {
@@ -94,16 +100,17 @@ samples( PyObject* self, PyObject* args )
   PyObject* configObj ;
   if ( not PyArg_ParseTuple( args, "O:Imp.ElementV1.data", &configObj ) ) return 0;
 
-  // get config object
-  Pds::Imp::ConfigV1* config = 0;
+  // get samples, need a config
+  ndarray<const Pds::Imp::Sample, 1> samples;
   if ( pypdsdata::Imp::ConfigV1::Object_TypeCheck( configObj ) ) {
-    config = pypdsdata::Imp::ConfigV1::pdsObject( configObj );
+    Pds::Imp::ConfigV1* config = pypdsdata::Imp::ConfigV1::pdsObject( configObj );
+    samples = obj->samples(*config);
   } else {
     PyErr_SetString(PyExc_TypeError, "Error: parameter is not a Imp.ConfigV* object");
     return 0;
   }
 
-  return pypdsdata::TypeLib::toPython(obj->samples(*config));
+  return pypdsdata::TypeLib::toPython(samples);
 }
 
 }

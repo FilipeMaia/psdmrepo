@@ -80,6 +80,9 @@ namespace {
         { "MecXt2Pim03",     Pds::BldInfo::MecXt2Pim03 },
         { "CxiDg3Spec",      Pds::BldInfo::CxiDg3Spec },
         { "Nh2Sb1Ipm02",     Pds::BldInfo::Nh2Sb1Ipm02 },
+        { "FeeSpec0",        Pds::BldInfo::FeeSpec0 },
+        { "SxrSpec0",        Pds::BldInfo::SxrSpec0 },
+        { "XppSpec0",        Pds::BldInfo::XppSpec0 },
         { "NumberOf",        Pds::BldInfo::NumberOf },
         { 0, 0 }
     };
@@ -90,7 +93,6 @@ namespace {
   int BldInfo_init(PyObject* self, PyObject* args, PyObject* kwds);
   long BldInfo_hash( PyObject* self );
   int BldInfo_compare( PyObject *self, PyObject *other);
-  PyObject* BldInfo_str( PyObject *self );
   PyObject* BldInfo_repr( PyObject *self );
 
   // type-specific methods
@@ -129,7 +131,6 @@ pypdsdata::BldInfo::initType( PyObject* module )
   type->tp_init = BldInfo_init;
   type->tp_hash = BldInfo_hash;
   type->tp_compare = BldInfo_compare;
-  type->tp_str = BldInfo_str;
   type->tp_repr = BldInfo_repr;
 
   // define class attributes for enums
@@ -138,6 +139,16 @@ pypdsdata::BldInfo::initType( PyObject* module )
   type->tp_dict = tp_dict;
 
   BaseType::initType( "BldInfo", module );
+}
+
+void 
+pypdsdata::BldInfo::print(std::ostream& out) const
+{
+  if (m_obj.type() < Pds::BldInfo::NumberOf) {
+    out << "BldInfo(" << Pds::BldInfo::name(m_obj) << ")";
+  } else {
+    out << "BldInfo(" << int(m_obj.type()) << ")";
+  }
 }
 
 namespace {
@@ -217,17 +228,6 @@ BldInfo_compare( PyObject* self, PyObject* other )
   if ( py_this->m_obj.type() > py_other->m_obj.type() ) return 1 ;
   if ( py_this->m_obj.type() < py_other->m_obj.type() ) return -1 ;
   return 0 ;
-}
-
-PyObject*
-BldInfo_str( PyObject *self )
-{
-  pypdsdata::BldInfo* py_this = (pypdsdata::BldInfo*) self;
-  if (py_this->m_obj.type() < Pds::BldInfo::NumberOf) {
-    return PyString_FromFormat( "BldInfo(%s)", Pds::BldInfo::name(py_this->m_obj) );
-  } else {
-    return PyString_FromFormat( "BldInfo(%d)", int(py_this->m_obj.type()) );
-  }
 }
 
 PyObject*

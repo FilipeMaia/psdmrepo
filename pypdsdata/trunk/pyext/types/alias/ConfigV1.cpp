@@ -23,8 +23,9 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "PvConfigV1.h"
+#include "SrcAlias.h"
 #include "../TypeLib.h"
+#include "../../Src.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -33,16 +34,16 @@
 namespace {
 
   // methods
-  FUN0_WRAPPER(pypdsdata::Epics::ConfigV1, numPv)
-  FUN0_WRAPPER(pypdsdata::Epics::ConfigV1, getPvConfig)
+  FUN0_WRAPPER(pypdsdata::Alias::ConfigV1, numSrcAlias)
+  FUN0_WRAPPER(pypdsdata::Alias::ConfigV1, srcAlias)
 
   PyMethodDef methods[] = {
-    {"numPv",       numPv,        METH_NOARGS,  "self.numPv() -> int\n\nReturns number of :py:class:`PvConfigV1` object." },
-    {"getPvConfig", getPvConfig,  METH_NOARGS,  "self.getPvConfig() -> list of PvConfigV1\n\nReturns list of :py:class:`PvConfigV1` objects." },
+    {"numSrcAlias",     numSrcAlias,       METH_NOARGS,  "self.numSrcAlias() -> int\n\nReturns number of alias definitions." },
+    {"srcAlias",        srcAlias,          METH_NOARGS,  "self.srcAlias() -> list\n\nReturns list of :py:class:`SrcAlias` objects." },
     {0, 0, 0, 0}
    };
 
-  char typedoc[] = "Python class wrapping C++ Pds::Epics::ConfigV1 class.";
+  char typedoc[] = "Python class wrapping C++ Pds::Alias::ConfigV1 class.";
 }
 
 //              ----------------------------------------
@@ -50,7 +51,7 @@ namespace {
 //              ----------------------------------------
 
 void
-pypdsdata::Epics::ConfigV1::initType( PyObject* module )
+pypdsdata::Alias::ConfigV1::initType( PyObject* module )
 {
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
@@ -60,16 +61,17 @@ pypdsdata::Epics::ConfigV1::initType( PyObject* module )
 }
 
 void
-pypdsdata::Epics::ConfigV1::print(std::ostream& str) const
+pypdsdata::Alias::ConfigV1::print(std::ostream& str) const
 {
-  const ndarray<const Pds::Epics::PvConfigV1, 1>& pvConfigs = m_obj->getPvConfig();
-  str << "epics.ConfigV1(numPv=" << pvConfigs.size() << ", PvConfigs=[";
-  for ( unsigned i = 0; i < pvConfigs.size() and i < 256; ++ i ) {
-    const Pds::Epics::PvConfigV1& pv = pvConfigs[i];
-    if (i) str << ", ";
-    str << "(pvId=" << pv.pvId() << ", desc=\"" << pv.description()
-        << "\", interval=" << pv.interval() << ")";
+  str << "Alias.ConfigV1(numSrcAlias=" << m_obj->numSrcAlias()
+      << ", aliases=[";
+  const ndarray<const Pds::Alias::SrcAlias, 1>& aliases = m_obj->srcAlias();
+  for (unsigned i = 0; i != aliases.size(); ++ i) {
+    const Pds::Alias::SrcAlias& alias = aliases[i];
+    if (i != 0) str << ", ";
+    Src::print(str, alias.src());
+    str << ": \"" << alias.aliasName() << '"';
+    
   }
-  if (pvConfigs.size() > 256) str << ", ...";
   str << "])";
 }

@@ -25,9 +25,8 @@
 #include "BldInfo.h"
 #include "Damage.h"
 #include "DataObjectFactory.h"
-#include "DetInfo.h"
 #include "Exception.h"
-#include "ProcInfo.h"
+#include "Src.h"
 #include "TypeId.h"
 #include "XtcIterator.h"
 #include "XtcEmbedded.h"
@@ -162,17 +161,7 @@ Xtc_src( PyObject* self, void* )
     return 0;
   }
 
-  const Pds::Src& src = py_this->m_obj->src;
-  if ( src.level() == Level::Reporter ) {
-    const Pds::BldInfo& info = static_cast<const Pds::BldInfo&>(src);
-    return pypdsdata::BldInfo::PyObject_FromPds(info);
-  } else if ( src.level() == Level::Source ) {
-    const Pds::DetInfo& info = static_cast<const Pds::DetInfo&>(src);
-    return pypdsdata::DetInfo::PyObject_FromPds(info);
-  } else {
-    const Pds::ProcInfo& info = static_cast<const Pds::ProcInfo&>(src);
-    return pypdsdata::ProcInfo::PyObject_FromPds(info);
-  }
+  return toPython(py_this->m_obj->src);
 }
 
 /**

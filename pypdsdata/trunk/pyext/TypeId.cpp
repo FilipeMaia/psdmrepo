@@ -103,6 +103,9 @@ namespace {
       { "Id_ImpData",         Pds::TypeId::Id_ImpData },
       { "Id_ImpConfig",       Pds::TypeId::Id_ImpConfig },
       { "Id_AliasConfig",     Pds::TypeId::Id_AliasConfig },
+      { "Id_L3TConfig",       Pds::TypeId::Id_L3TConfig },
+      { "Id_L3TData",         Pds::TypeId::Id_L3TData },
+      { "Id_Spectrometer",    Pds::TypeId::Id_Spectrometer },
       { "NumberOf",           Pds::TypeId::NumberOf },
       { 0, 0 }
   };
@@ -110,7 +113,6 @@ namespace {
 
   // standard Python stuff
   int TypeId_init( PyObject* self, PyObject* args, PyObject* kwds );
-  PyObject* TypeId_str( PyObject* self );
   PyObject* TypeId_repr( PyObject* self );
   long TypeId_hash( PyObject* self );
   int TypeId_compare( PyObject *self, PyObject *other);
@@ -155,7 +157,6 @@ pypdsdata::TypeId::initType( PyObject* module )
   type->tp_init = TypeId_init;
   type->tp_hash = TypeId_hash;
   type->tp_compare = TypeId_compare;
-  type->tp_str = TypeId_str;
   type->tp_repr = TypeId_repr;
 
   // define class attributes for enums
@@ -168,6 +169,17 @@ pypdsdata::TypeId::initType( PyObject* module )
   BaseType::initType( "TypeId", module );
 }
 
+void 
+pypdsdata::TypeId::print(std::ostream& out) const
+{
+  if ( m_obj.compressed() ) {
+    out << Pds::TypeId::name(m_obj.id()) << "_V" << m_obj.compressed_version() << "/compressed";
+  } else if ( m_obj.version() ) {
+    out << Pds::TypeId::name(m_obj.id()) << "_V" << m_obj.compressed_version();
+  } else {
+    out << Pds::TypeId::name(m_obj.id());
+  }
+}
 
 namespace {
 
@@ -215,21 +227,6 @@ TypeId_compare( PyObject* self, PyObject* other )
   if ( py_this->m_obj.value() > py_other->m_obj.value() ) return 1 ;
   if ( py_this->m_obj.value() == py_other->m_obj.value() ) return 0 ;
   return -1 ;
-}
-
-PyObject*
-TypeId_str( PyObject* self )
-{
-  pypdsdata::TypeId* py_this = (pypdsdata::TypeId*) self;
-  if ( py_this->m_obj.compressed() ) {
-    return PyString_FromFormat("%s_V%d/compressed", Pds::TypeId::name(py_this->m_obj.id()),
-        py_this->m_obj.compressed_version() );
-  } else if ( py_this->m_obj.version() ) {
-    return PyString_FromFormat("%s_V%d", Pds::TypeId::name(py_this->m_obj.id()),
-        py_this->m_obj.version() );
-  } else {
-    return PyString_FromString( Pds::TypeId::name(py_this->m_obj.id()) );
-  }
 }
 
 PyObject*

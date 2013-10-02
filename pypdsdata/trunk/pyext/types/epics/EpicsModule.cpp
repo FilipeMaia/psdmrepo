@@ -34,9 +34,13 @@
 
 namespace {
 
+  PyObject* Epics_dbr_type_is_TIME( PyObject*, PyObject* args );
+  PyObject* Epics_dbr_type_is_CTRL( PyObject*, PyObject* args );
   PyObject* Epics_from_buffer( PyObject*, PyObject* args );
 
   PyMethodDef methods[] = {
+    {"dbr_type_is_TIME", Epics_dbr_type_is_TIME,  METH_VARARGS,  "dbr_type_is_TIME(typeid: int) -> bool\n\nReturns true for DBR_TIME type IDs." },
+    {"dbr_type_is_CTRL", Epics_dbr_type_is_CTRL,  METH_VARARGS,  "dbr_type_is_CTRL(typeid: int) -> bool\n\nReturns true for DBR_CTRL type IDs." },
     {"from_buffer", Epics_from_buffer,  METH_VARARGS,  "from_buffer(buffer) -> object\n\nBuild EPICS object from memory buffer." },
     {0, 0, 0, 0}
    };
@@ -156,6 +160,24 @@ EpicsModule::PyObject_FromPds( Pds::Epics::EpicsPvHeader* pvHeader, PyObject* pa
 
 
 namespace {
+
+PyObject*
+Epics_dbr_type_is_TIME( PyObject*, PyObject* args )
+{
+  int id = 0;
+  if ( not PyArg_ParseTuple( args, "I:epics.dbr_type_is_TIME", &id ) ) return 0;
+
+  return PyBool_FromLong( id >= Pds::Epics::DBR_TIME_STRING and id <= Pds::Epics::DBR_TIME_DOUBLE );
+}
+
+PyObject*
+Epics_dbr_type_is_CTRL( PyObject*, PyObject* args )
+{
+  int id = 0;
+  if ( not PyArg_ParseTuple( args, "I:epics.dbr_type_is_CTRL", &id ) ) return 0;
+
+  return PyBool_FromLong( id >= Pds::Epics::DBR_CTRL_STRING and id <= Pds::Epics::DBR_CTRL_DOUBLE );
+}
 
 PyObject*
 Epics_from_buffer( PyObject*, PyObject* args )

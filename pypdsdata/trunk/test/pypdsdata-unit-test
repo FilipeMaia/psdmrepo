@@ -296,7 +296,10 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual ( TypeId.Type.Id_ImpData, 67 )
         self.assertEqual ( TypeId.Type.Id_ImpConfig, 68 )
         self.assertEqual ( TypeId.Type.Id_AliasConfig, 69 )
-        self.assertEqual ( TypeId.Type.NumberOf, 70 )
+        self.assertEqual ( TypeId.Type.Id_L3TConfig, 70 )
+        self.assertEqual ( TypeId.Type.Id_L3TData, 71 )
+        self.assertEqual ( TypeId.Type.Id_Spectrometer, 72 )
+        self.assertEqual ( TypeId.Type.NumberOf, 73 )
 
         # chec compressed bitmask
         self.assertEqual ( TypeId.VCompressed, 0x8000 )
@@ -647,7 +650,10 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual ( BldInfo.Type.MecXt2Pim03, 43 )
         self.assertEqual ( BldInfo.Type.CxiDg3Spec, 44 )
         self.assertEqual ( BldInfo.Type.Nh2Sb1Ipm02, 45 )
-        self.assertEqual ( BldInfo.Type.NumberOf, 46 )
+        self.assertEqual ( BldInfo.Type.FeeSpec0, 46 )
+        self.assertEqual ( BldInfo.Type.SxrSpec0, 47 )
+        self.assertEqual ( BldInfo.Type.XppSpec0, 48 )
+        self.assertEqual ( BldInfo.Type.NumberOf, 49 )
 
         o1 = BldInfo(0,0)
         

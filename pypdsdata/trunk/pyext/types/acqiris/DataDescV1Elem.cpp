@@ -146,23 +146,21 @@ waveforms( PyObject* self, PyObject* args )
   // convert to Pds config object
   const Pds::Acqiris::ConfigV1* config = pypdsdata::Acqiris::ConfigV1::pdsObject( pyconfig );
 
-  // get data size
-  unsigned size = config->horiz().nbrSamples();
-
   // NumPy type number
   int typenum = NPY_SHORT;
 
   // not writable
   int flags = NPY_C_CONTIGUOUS ;
 
+  ndarray<const int16_t, 2> waveforms = obj->waveforms(*config);
+
   // dimensions
-  npy_intp dims[1] = { size };
+  npy_intp dims[2] = { waveforms.shape()[0], waveforms.shape()[1] };
 
   // make array
-  ndarray<const int16_t, 2> waveforms = obj->waveforms(*config);
   const int16_t* data = waveforms.data();
-  data += obj->indexFirstPoint();
-  PyObject* array = PyArray_New(&PyArray_Type, 1, dims, typenum, 0,
+  //data += obj->indexFirstPoint(); -- not needed, already corrected
+  PyObject* array = PyArray_New(&PyArray_Type, 2, dims, typenum, 0,
                                 (void*)data, 0, flags, 0);
 
   // array does not own its data, set self as owner

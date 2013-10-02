@@ -111,7 +111,7 @@ data( PyObject* self, PyObject* args )
   }
 
   // dimensions
-  npy_intp dims[2] = { data.shape()[0], data.shape()[0] };
+  npy_intp dims[2] = { data.shape()[0], data.shape()[1] };
 
   // NumPy type number
   int typenum = NPY_USHORT ;

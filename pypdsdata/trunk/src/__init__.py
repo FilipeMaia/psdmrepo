@@ -19,6 +19,7 @@ of the datagrams from multiple input XTC files.
 # import stuff from extension module
 from _pdsdata import Error
 
-__all__ = ['Error', 'acqiris', 'andor', 'bld', 'camera', 'control',  'cspad', 'cspad2x2', 'encoder', 
-           'epics', 'evr', 'fccd', 'fli', 'gsc16ai', 'io', 'ipimb', 'lusi', 'oceanoptics', 'opal1k', 
-           'pnccd', 'pulnix', 'princeton', 'timepix', 'usdusb', 'xtc']
+__all__ = ['Error', 'acqiris', 'alias', 'andor', 'bld', 'camera', 'control',  'cspad', 'cspad2x2', 
+           'encoder', 'epics', 'evr', 'fccd', 'fli', 'gsc16ai', 'io', 'ipimb', 'l3t', 'lusi', 
+           'oceanoptics', 'opal1k', 'pnccd', 'pulnix', 'princeton', 'quartz', 'timepix', 'usdusb',
+           'xtc']

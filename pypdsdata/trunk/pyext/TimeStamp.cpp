@@ -35,7 +35,6 @@ namespace {
   int TimeStamp_init( PyObject* self, PyObject* args, PyObject* kwds );
   long TimeStamp_hash( PyObject* self );
   int TimeStamp_compare( PyObject *self, PyObject *other);
-  PyObject* TimeStamp_str( PyObject *self );
   PyObject* TimeStamp_repr( PyObject *self );
 
   // type-specific methods
@@ -70,12 +69,16 @@ pypdsdata::TimeStamp::initType( PyObject* module )
   type->tp_init = TimeStamp_init;
   type->tp_hash = TimeStamp_hash;
   type->tp_compare = TimeStamp_compare;
-  type->tp_str = TimeStamp_str;
   type->tp_repr = TimeStamp_repr;
 
   BaseType::initType( "TimeStamp", module );
 }
 
+void 
+pypdsdata::TimeStamp::print(std::ostream& out) const
+{
+  out << "<" << m_obj.ticks() << ":" << m_obj.fiducials() << ">";
+}
 
 namespace {
 

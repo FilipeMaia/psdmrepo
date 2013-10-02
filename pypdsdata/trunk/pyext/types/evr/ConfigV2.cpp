@@ -109,7 +109,7 @@ pypdsdata::EvrData::ConfigV2::print(std::ostream& str) const
   str << "evr.ConfigV2(beam=" << m_obj->beam()
       << ", rate=" << m_obj->rate();
 
-  str << "pulses=[";
+  str << ", pulses=[";
   const ndarray<const Pds::EvrData::PulseConfig, 1>& pulses = m_obj->pulses();
   for (unsigned i = 0; i != pulses.size(); ++ i ) {
     if (i != 0) str << ", ";
@@ -121,7 +121,7 @@ pypdsdata::EvrData::ConfigV2::print(std::ostream& str) const
   const ndarray<const Pds::EvrData::OutputMap, 1>& output_maps = m_obj->output_maps();
   for (unsigned i = 0; i != output_maps.size(); ++ i ) {
     if (i != 0) str << ", ";
-    str << output_maps[i].value();
+    str << output_maps[i].map();
   }
   str << "]";
 

@@ -1,32 +1,33 @@
-#ifndef PYPDSDATA_DETINFO_H
-#define PYPDSDATA_DETINFO_H
+#ifndef PYPDSDATA_SRC_H
+#define PYPDSDATA_SRC_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class DetInfo.
+//	Class Src.
 //
 //------------------------------------------------------------------------
 
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include "python/Python.h"
+#include <iosfwd>
 
 //----------------------
 // Base Class Headers --
 //----------------------
-#include "types/PdsDataTypeEmbedded.h"
 
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "pdsdata/xtc/Src.hh"
 
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
-#include "pdsdata/xtc/DetInfo.hh"
 
 //		---------------------
 // 		-- Class Interface --
@@ -39,30 +40,34 @@ namespace pypdsdata {
 /**
  *  @ingroup pypdsdata
  *
- *  This software was developed for the LUSI project.  If you use all or
+ *  @brief This is just an utility class with few helper methods.
+ *
+ *
+ *  @note This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
  *  @version $Id$
  *
- *  @author Andrei Salnikov
+ *  @author Andy Salnikov
  */
 
-class DetInfo : public PdsDataTypeEmbedded<DetInfo,Pds::DetInfo> {
+class Src  {
 public:
 
-  typedef PdsDataTypeEmbedded<DetInfo,Pds::DetInfo> BaseType;
+  /**
+   *  Method that knows how to print the content of Src.
+   */
+  static void print(std::ostream& out, const Pds::Src& src);
 
-  /// Initialize Python type and register it in a module
-  static void initType( PyObject* module );
-
-  // Dump object info to a stream
-  void print(std::ostream& out) const;
+  /// convert src to python object
+  static PyObject* PyObject_FromPds(const Pds::Src& src);
+  
 };
 
 } // namespace pypdsdata
 
 namespace Pds {
-inline PyObject* toPython(const Pds::DetInfo& v) { return pypdsdata::DetInfo::PyObject_FromPds(v); }
+inline PyObject* toPython(const Pds::Src& v) { return pypdsdata::Src::PyObject_FromPds(v); }
 }
 
-#endif // PYPDSDATA_DETINFO_H
+#endif // PYPDSDATA_SRC_H

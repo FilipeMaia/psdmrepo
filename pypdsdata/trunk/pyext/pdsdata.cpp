@@ -58,6 +58,9 @@
 #include "types/acqiris/TrigV1.h"
 #include "types/acqiris/VertV1.h"
 
+#include "types/alias/ConfigV1.h"
+#include "types/alias/SrcAlias.h"
+
 #include "types/andor/ConfigV1.h"
 #include "types/andor/FrameV1.h"
 
@@ -66,6 +69,7 @@
 #include "types/bld/BldDataEBeamV1.h"
 #include "types/bld/BldDataEBeamV2.h"
 #include "types/bld/BldDataEBeamV3.h"
+#include "types/bld/BldDataEBeamV4.h"
 #include "types/bld/BldDataFEEGasDetEnergy.h"
 #include "types/bld/BldDataGMDV0.h"
 #include "types/bld/BldDataGMDV1.h"
@@ -73,6 +77,7 @@
 #include "types/bld/BldDataIpimbV1.h"
 #include "types/bld/BldDataPhaseCavity.h"
 #include "types/bld/BldDataPimV1.h"
+#include "types/bld/BldDataSpectrometerV0.h"
 
 #include "types/camera/FrameCoord.h"
 #include "types/camera/FrameFexConfigV1.h"
@@ -81,6 +86,7 @@
 
 #include "types/control/ConfigV1.h"
 #include "types/control/ConfigV2.h"
+#include "types/control/ConfigV3.h"
 #include "types/control/PVControl.h"
 #include "types/control/PVLabel.h"
 #include "types/control/PVMonitor.h"
@@ -160,6 +166,9 @@
 #include "types/ipimb/DataV1.h"
 #include "types/ipimb/DataV2.h"
 
+#include "types/l3t/ConfigV1.h"
+#include "types/l3t/DataV1.h"
+
 #include "types/lusi/DiodeFexConfigV1.h"
 #include "types/lusi/DiodeFexConfigV2.h"
 #include "types/lusi/DiodeFexV1.h"
@@ -178,6 +187,7 @@
 #include "types/pnCCD/ConfigV1.h"
 #include "types/pnCCD/ConfigV2.h"
 #include "types/pnCCD/FrameV1.h"
+#include "types/pnCCD/FramesV1.h"
 
 #include "types/princeton/ConfigV1.h"
 #include "types/princeton/ConfigV2.h"
@@ -277,6 +287,12 @@ PyMODINIT_FUNC init_pdsdata()
   Py_INCREF( module );
   PyModule_AddObject( this_module, "acqiris", module );
 
+  module = Py_InitModule3( "_pdsdata.alias", 0, "The Python wrapper module for pdsdata/alias" );
+  pypdsdata::Alias::ConfigV1::initType( module );
+  pypdsdata::Alias::SrcAlias::initType( module );
+  Py_INCREF( module );
+  PyModule_AddObject( this_module, "alias", module );
+
   module = Py_InitModule3( "_pdsdata.andor", 0, "The Python wrapper module for pdsdata/andor" );
   pypdsdata::Andor::ConfigV1::initType( module );
   pypdsdata::Andor::FrameV1::initType( module );
@@ -289,6 +305,7 @@ PyMODINIT_FUNC init_pdsdata()
   pypdsdata::Bld::BldDataEBeamV1::initType( module );
   pypdsdata::Bld::BldDataEBeamV2::initType( module );
   pypdsdata::Bld::BldDataEBeamV3::initType( module );
+  pypdsdata::Bld::BldDataEBeamV4::initType( module );
   pypdsdata::Bld::BldDataFEEGasDetEnergy::initType( module );
   pypdsdata::Bld::BldDataGMDV0::initType( module );
   pypdsdata::Bld::BldDataGMDV1::initType( module );
@@ -296,6 +313,7 @@ PyMODINIT_FUNC init_pdsdata()
   pypdsdata::Bld::BldDataIpimbV1::initType( module );
   pypdsdata::Bld::BldDataPhaseCavity::initType( module );
   pypdsdata::Bld::BldDataPimV1::initType( module );
+  pypdsdata::Bld::BldDataSpectrometerV0::initType( module );
   Py_INCREF( module );
   PyModule_AddObject( this_module, "bld", module );
 
@@ -310,6 +328,7 @@ PyMODINIT_FUNC init_pdsdata()
   module = Py_InitModule3( "_pdsdata.control", 0, "The Python wrapper module for pdsdata/control" );
   pypdsdata::ControlData::ConfigV1::initType( module );
   pypdsdata::ControlData::ConfigV2::initType( module );
+  pypdsdata::ControlData::ConfigV3::initType( module );
   pypdsdata::ControlData::PVControl::initType( module );
   pypdsdata::ControlData::PVLabel::initType( module );
   pypdsdata::ControlData::PVMonitor::initType( module );
@@ -421,6 +440,12 @@ PyMODINIT_FUNC init_pdsdata()
   Py_INCREF( module );
   PyModule_AddObject( this_module, "ipimb", module );
 
+  module = Py_InitModule3( "_pdsdata.l3t", 0, "The Python wrapper module for pdsdata/l3t" );
+  pypdsdata::L3T::ConfigV1::initType( module );
+  pypdsdata::L3T::DataV1::initType( module );
+  Py_INCREF( module );
+  PyModule_AddObject( this_module, "l3t", module );
+
   module = Py_InitModule3( "_pdsdata.lusi", 0, "The Python wrapper module for pdsdata/lusi" );
   pypdsdata::Lusi::DiodeFexConfigV1::initType( module );
   pypdsdata::Lusi::DiodeFexConfigV2::initType( module );
@@ -452,6 +477,7 @@ PyMODINIT_FUNC init_pdsdata()
   pypdsdata::PNCCD::ConfigV1::initType( module );
   pypdsdata::PNCCD::ConfigV2::initType( module );
   pypdsdata::PNCCD::FrameV1::initType( module );
+  pypdsdata::PNCCD::FramesV1::initType( module );
   Py_INCREF( module );
   PyModule_AddObject( this_module, "pnccd", module );
 

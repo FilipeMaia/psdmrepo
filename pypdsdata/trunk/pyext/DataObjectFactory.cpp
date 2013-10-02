@@ -29,6 +29,8 @@
 #include "types/acqiris/TdcConfigV1.h"
 #include "types/acqiris/TdcDataV1.h"
 
+#include "types/alias/ConfigV1.h"
+
 #include "types/andor/ConfigV1.h"
 #include "types/andor/FrameV1.h"
 
@@ -37,6 +39,7 @@
 #include "types/bld/BldDataEBeamV1.h"
 #include "types/bld/BldDataEBeamV2.h"
 #include "types/bld/BldDataEBeamV3.h"
+#include "types/bld/BldDataEBeamV4.h"
 #include "types/bld/BldDataFEEGasDetEnergy.h"
 #include "types/bld/BldDataGMDV0.h"
 #include "types/bld/BldDataGMDV1.h"
@@ -44,6 +47,7 @@
 #include "types/bld/BldDataIpimbV1.h"
 #include "types/bld/BldDataPhaseCavity.h"
 #include "types/bld/BldDataPimV1.h"
+#include "types/bld/BldDataSpectrometerV0.h"
 
 #include "types/camera/FrameFexConfigV1.h"
 #include "types/camera/FrameV1.h"
@@ -51,6 +55,7 @@
 
 #include "types/control/ConfigV1.h"
 #include "types/control/ConfigV2.h"
+#include "types/control/ConfigV3.h"
 
 #include "types/cspad/ConfigV1.h"
 #include "types/cspad/ConfigV2.h"
@@ -99,6 +104,9 @@
 #include "types/ipimb/DataV1.h"
 #include "types/ipimb/DataV2.h"
 
+#include "types/l3t/ConfigV1.h"
+#include "types/l3t/DataV1.h"
+
 #include "types/lusi/DiodeFexConfigV1.h"
 #include "types/lusi/DiodeFexConfigV2.h"
 #include "types/lusi/DiodeFexV1.h"
@@ -116,7 +124,7 @@
 
 #include "types/pnCCD/ConfigV1.h"
 #include "types/pnCCD/ConfigV2.h"
-#include "types/pnCCD/FrameV1.h"
+#include "types/pnCCD/FramesV1.h"
 
 #include "types/princeton/ConfigV1.h"
 #include "types/princeton/ConfigV2.h"
@@ -252,10 +260,11 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
   case Pds::TypeId::Id_ControlConfig :
     if ( not obj ) obj = xtc2obj<ControlData::ConfigV1, 1>(xtc, parent);
     if ( not obj ) obj = xtc2obj<ControlData::ConfigV2, 2>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<ControlData::ConfigV3, 3>(xtc, parent);
     break ;
 
   case Pds::TypeId::Id_pnCCDframe :
-    if ( not obj ) obj = xtc2obj<PNCCD::FrameV1, 1>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<PNCCD::FramesV1, 1>(xtc, parent);
     break ;
 
   case Pds::TypeId::Id_pnCCDconfig :
@@ -287,6 +296,7 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
     if ( not obj ) obj = xtc2obj<Bld::BldDataEBeamV1, 1>(xtc, parent);
     if ( not obj ) obj = xtc2obj<Bld::BldDataEBeamV2, 2>(xtc, parent);
     if ( not obj ) obj = xtc2obj<Bld::BldDataEBeamV3, 3>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<Bld::BldDataEBeamV4, 4>(xtc, parent);
     break ;
 
   case Pds::TypeId::Id_PhaseCavity :
@@ -516,6 +526,22 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
 
   case Pds::TypeId::Id_ImpConfig :
     if ( not obj ) obj = xtc2obj<Imp::ConfigV1, 1>(xtc, parent);
+    break;
+
+  case Pds::TypeId::Id_AliasConfig :
+    if ( not obj ) obj = xtc2obj<Alias::ConfigV1, 1>(xtc, parent);
+    break;
+
+  case Pds::TypeId::Id_L3TConfig :
+    if ( not obj ) obj = xtc2obj<L3T::ConfigV1, 1>(xtc, parent);
+    break;
+
+  case Pds::TypeId::Id_L3TData :
+    if ( not obj ) obj = xtc2obj<L3T::DataV1, 1>(xtc);
+    break;
+
+  case Pds::TypeId::Id_Spectrometer :
+    if ( not obj ) obj = xtc2obj<Bld::BldDataSpectrometerV0, 0>(xtc, parent);
     break;
 
   case Pds::TypeId::NumberOf :

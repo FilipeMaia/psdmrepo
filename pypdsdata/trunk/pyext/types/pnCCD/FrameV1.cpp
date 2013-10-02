@@ -92,21 +92,22 @@ data( PyObject* self, PyObject* args )
   if ( not PyArg_ParseTuple( args, "O:PNCCD.FrameV1.data", &configObj ) ) return 0;
 
   // get Pds::PNCCD::ConfigV1 from argument which could also be of Config2 type
-  Pds::PNCCD::ConfigV1 config;
+  ndarray<const uint16_t, 2> data;;
   if ( pypdsdata::PNCCD::ConfigV1::Object_TypeCheck( configObj ) ) {
-    config = *pypdsdata::PNCCD::ConfigV1::pdsObject( configObj );
+    Pds::PNCCD::ConfigV1* config = pypdsdata::PNCCD::ConfigV1::pdsObject( configObj );
+    data = obj->data(*config);
   } else if ( pypdsdata::PNCCD::ConfigV2::Object_TypeCheck( configObj ) ) {
-    const Pds::PNCCD::ConfigV2* config2 = pypdsdata::PNCCD::ConfigV2::pdsObject( configObj );
-    config = Pds::PNCCD::ConfigV1(config2->numLinks(), config2->payloadSizePerLink());
+    Pds::PNCCD::ConfigV2* config = pypdsdata::PNCCD::ConfigV2::pdsObject( configObj );
+    data = obj->data(*config);
   } else {
     PyErr_SetString(PyExc_TypeError, "Error: parameter is not a PNCCD.ConfigV* object");
     return 0;
   }
 
   // assume that single frame is 512x512 image
-  unsigned size = config.payloadSizePerLink() - sizeof(Pds::PNCCD::FrameV1);
-  if ( size != 512*512 ) {
-    PyErr_Format(pypdsdata::exceptionType(), "Error: odd size of frame data, expect 512x512, received %d", size);
+  const unsigned* shape = data.shape();
+  if ( shape[0] != 512 or shape[1] != 512 ) {
+    PyErr_Format(pypdsdata::exceptionType(), "Error: odd size of frame data, expect 512x512, received %dx%d", shape[0], shape[1]);
     return 0;
   }
 
@@ -117,11 +118,11 @@ data( PyObject* self, PyObject* args )
   int flags = NPY_C_CONTIGUOUS ;
 
   // dimensions
-  npy_intp dims[2] = { 512, 512 };
+  npy_intp dims[2] = { shape[0], shape[1] };
 
   // make array
   PyObject* array = PyArray_New(&PyArray_Type, 2, dims, typenum, 0,
-                                (void*)obj->data(config).data(), 0, flags, 0);
+                                (void*)data.data(), 0, flags, 0);
 
   // array does not own its data, set self as owner
   Py_INCREF(self);

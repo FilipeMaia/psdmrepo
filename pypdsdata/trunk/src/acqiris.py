@@ -49,19 +49,19 @@ import numpy
 from _pdsdata.acqiris import *
 
 # extend DataDescV1
-class DataDescV1(object) :
+class DataDescV1Elem(object) :
     """
-    This is a wrapper for :py:class:`_pdsdata.acqiris.DataDescV1` which removes the need
+    This is a wrapper for :py:class:`_pdsdata.acqiris.DataDescV1Elem` which removes the need
     to pass configuration objects to several methods.
     """
     
-    def __init__(self, ddesc, hcfg, vcfg ):
-        """ Constructor takes :py:class:`_pdsdata.acqiris.DataDescV1`,
-        :py:class:`_pdsdata.acqiris.HorizV1` and :py:class:`_pdsdata.acqiris.VertV1` objects
+    def __init__(self, ddesc, cfg, vcfg):
+        """ Constructor takes :py:class:`_pdsdata.acqiris.DataDescV1Elem`,
+        :py:class:`_pdsdata.acqiris.ConfigV1` and :py:class:`_pdsdata.acqiris.VertV1` objects
         """
         
         self.__ddesc = ddesc
-        self.__hcfg = hcfg
+        self.__cfg = cfg
         self.__vcfg = vcfg
     
     def nbrSamplesInSeg(self) :
@@ -83,25 +83,28 @@ class DataDescV1(object) :
         
         Returns TimestampV1 object for a given segment
         """
-        return self.__ddesc.timestamp(segment)
+        return self.__ddesc.timestamp(self.__cfg)[segment]
  
-    def waveform(self) :
-        """self.waveform() -> numpy.ndarray
+    def waveforms(self) :
+        """self.waveforms() -> numpy.ndarray
         
         Returns waveform array
         """
-        wf = self.__ddesc.waveform( self.__hcfg )
+        wf = self.__ddesc.waveforms( self.__cfg )
         slope = self.__vcfg.slope()
         offset = self.__vcfg.offset()
         wf = wf * slope - offset
         return wf
+
+    waveform = waveforms
 
     def timestamps(self) :
         """self.timestamps() -> numpy.ndarray
         
         Returns array of timestamps
         """
-        sampInterval = self.__hcfg.sampInterval()
-        nbrSamples = self.__hcfg.nbrSamples()
+        hcfg = self.__cfg.horiz()
+        sampInterval = hcfg.sampInterval()
+        nbrSamples = hcfg.nbrSamples()
         return numpy.arange( 0, nbrSamples*sampInterval, sampInterval, dtype=float )
 

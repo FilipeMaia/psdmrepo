@@ -23,7 +23,6 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "PvConfigV1.h"
 #include "../TypeLib.h"
 
 //-----------------------------------------------------------------------
@@ -33,16 +32,16 @@
 namespace {
 
   // methods
-  FUN0_WRAPPER(pypdsdata::Epics::ConfigV1, numPv)
-  FUN0_WRAPPER(pypdsdata::Epics::ConfigV1, getPvConfig)
+  FUN0_WRAPPER(pypdsdata::L3T::ConfigV1, module_id)
+  FUN0_WRAPPER(pypdsdata::L3T::ConfigV1, desc)
 
   PyMethodDef methods[] = {
-    {"numPv",       numPv,        METH_NOARGS,  "self.numPv() -> int\n\nReturns number of :py:class:`PvConfigV1` object." },
-    {"getPvConfig", getPvConfig,  METH_NOARGS,  "self.getPvConfig() -> list of PvConfigV1\n\nReturns list of :py:class:`PvConfigV1` objects." },
+    {"module_id",        module_id,       METH_NOARGS,  "self.module_id() -> string\n\nReturns module identification string." },
+    {"desc",             desc,            METH_NOARGS,  "self.desc() -> string\n\nReturns description string." },
     {0, 0, 0, 0}
    };
 
-  char typedoc[] = "Python class wrapping C++ Pds::Epics::ConfigV1 class.";
+  char typedoc[] = "Python class wrapping C++ Pds::L3T::ConfigV1 class.";
 }
 
 //              ----------------------------------------
@@ -50,7 +49,7 @@ namespace {
 //              ----------------------------------------
 
 void
-pypdsdata::Epics::ConfigV1::initType( PyObject* module )
+pypdsdata::L3T::ConfigV1::initType( PyObject* module )
 {
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
@@ -60,16 +59,9 @@ pypdsdata::Epics::ConfigV1::initType( PyObject* module )
 }
 
 void
-pypdsdata::Epics::ConfigV1::print(std::ostream& str) const
+pypdsdata::L3T::ConfigV1::print(std::ostream& str) const
 {
-  const ndarray<const Pds::Epics::PvConfigV1, 1>& pvConfigs = m_obj->getPvConfig();
-  str << "epics.ConfigV1(numPv=" << pvConfigs.size() << ", PvConfigs=[";
-  for ( unsigned i = 0; i < pvConfigs.size() and i < 256; ++ i ) {
-    const Pds::Epics::PvConfigV1& pv = pvConfigs[i];
-    if (i) str << ", ";
-    str << "(pvId=" << pv.pvId() << ", desc=\"" << pv.description()
-        << "\", interval=" << pv.interval() << ")";
-  }
-  if (pvConfigs.size() > 256) str << ", ...";
-  str << "])";
+  str << "L3T.ConfigV1(module_id=\"" << m_obj->module_id()
+      << "\", desc=\"" << m_obj->desc()
+      << "\")";
 }

@@ -36,7 +36,6 @@ namespace {
   int ProcInfo_init( PyObject* self, PyObject* args, PyObject* kwds );
   long ProcInfo_hash( PyObject* self );
   int ProcInfo_compare( PyObject *self, PyObject *other);
-  PyObject* ProcInfo_str( PyObject *self );
   PyObject* ProcInfo_repr( PyObject *self );
 
   // type-specific methods
@@ -75,10 +74,17 @@ pypdsdata::ProcInfo::initType( PyObject* module )
   type->tp_init = ProcInfo_init;
   type->tp_hash = ProcInfo_hash;
   type->tp_compare = ProcInfo_compare;
-  type->tp_str = ProcInfo_str;
   type->tp_repr = ProcInfo_repr;
 
   BaseType::initType( "ProcInfo", module );
+}
+
+void 
+pypdsdata::ProcInfo::print(std::ostream& out) const
+{
+  unsigned ip = m_obj.ipAddr() ;
+  out << "ProcInfo(" << Pds::Level::name(m_obj.level()) << ", " << m_obj.processId()  << ", " 
+      << ((ip>>24)&0xff) << '.' << ((ip>>16)&0xff) << '.' << ((ip>>8)&0xff)  << '.' << (ip&0xff) << ")";
 }
 
 namespace {
@@ -126,20 +132,6 @@ ProcInfo_compare( PyObject* self, PyObject* other )
   if ( py_this->m_obj.phy() > py_other->m_obj.phy() ) return 1 ;
   if ( py_this->m_obj.phy() < py_other->m_obj.phy() ) return -1 ;
   return 0 ;
-}
-
-PyObject*
-ProcInfo_str( PyObject *self )
-{
-  pypdsdata::ProcInfo* py_this = (pypdsdata::ProcInfo*) self;
-  char buf[64];
-  unsigned ip = py_this->m_obj.ipAddr() ;
-
-  snprintf( buf, sizeof buf, "ProcInfo(%s, %d, %d.%d.%d.%d)",
-      Pds::Level::name(py_this->m_obj.level()),
-      py_this->m_obj.processId(),
-      ((ip>>24)&0xff), ((ip>>16)&0xff), ((ip>>8)&0xff), (ip&0xff) );
-  return PyString_FromString( buf );
 }
 
 PyObject*

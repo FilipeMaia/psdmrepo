@@ -1,12 +1,12 @@
-#ifndef PYPDSDATA_DETINFO_H
-#define PYPDSDATA_DETINFO_H
+#ifndef PYPDSDATA_CONTROLDATA_CONFIGV3_H
+#define PYPDSDATA_CONTROLDATA_CONFIGV3_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class DetInfo.
+//	Class ControlData_ConfigV3.
 //
 //------------------------------------------------------------------------
 
@@ -17,22 +17,23 @@
 //----------------------
 // Base Class Headers --
 //----------------------
-#include "types/PdsDataTypeEmbedded.h"
+#include "../PdsDataType.h"
 
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "pdsdata/psddl/control.ddl.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
-#include "pdsdata/xtc/DetInfo.hh"
 
-//		---------------------
-// 		-- Class Interface --
-//		---------------------
+//    ---------------------
+//    -- Class Interface --
+//    ---------------------
 
 namespace pypdsdata {
+namespace ControlData {
 
 /// @addtogroup pypdsdata
 
@@ -47,22 +48,20 @@ namespace pypdsdata {
  *  @author Andrei Salnikov
  */
 
-class DetInfo : public PdsDataTypeEmbedded<DetInfo,Pds::DetInfo> {
+class ConfigV3 : public PdsDataType<ConfigV3,Pds::ControlData::ConfigV3> {
 public:
 
-  typedef PdsDataTypeEmbedded<DetInfo,Pds::DetInfo> BaseType;
+  typedef PdsDataType<ConfigV3,Pds::ControlData::ConfigV3> BaseType;
 
   /// Initialize Python type and register it in a module
   static void initType( PyObject* module );
 
-  // Dump object info to a stream
-  void print(std::ostream& out) const;
+  // dump to a stream
+  void print(std::ostream& str) const;
+
 };
 
+} // namespace ControlData
 } // namespace pypdsdata
 
-namespace Pds {
-inline PyObject* toPython(const Pds::DetInfo& v) { return pypdsdata::DetInfo::PyObject_FromPds(v); }
-}
-
-#endif // PYPDSDATA_DETINFO_H
+#endif // PYPDSDATA_CONTROLDATA_CONFIGV3_H
