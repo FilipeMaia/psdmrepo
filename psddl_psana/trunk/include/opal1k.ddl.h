@@ -62,10 +62,10 @@ public:
                       (left->right, top->bottom) alternated with
                       (left->right, bottom->top) pixel by pixel */
   virtual uint8_t vertical_remapping() const = 0;
-  /** correct defective pixels internally */
-  virtual uint8_t defect_pixel_correction_enabled() const = 0;
   /** apply output lookup table corrections */
   virtual uint8_t output_lookup_table_enabled() const = 0;
+  /** correct defective pixels internally */
+  virtual uint8_t defect_pixel_correction_enabled() const = 0;
   virtual uint32_t number_of_defect_pixels() const = 0;
   virtual ndarray<const uint16_t, 1> output_lookup_table() const = 0;
   virtual ndarray<const Camera::FrameCoord, 1> defect_pixel_coordinates() const = 0;

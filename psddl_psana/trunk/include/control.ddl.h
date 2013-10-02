@@ -170,6 +170,41 @@ public:
   /** PVLabel configuration objects */
   virtual ndarray<const ControlData::PVLabel, 1> pvLabels() const = 0;
 };
+
+/** @class ConfigV3
+
+  
+*/
+
+
+class ConfigV3 {
+public:
+  enum { TypeId = Pds::TypeId::Id_ControlConfig /**< XTC type ID value (from Pds::TypeId class) */ };
+  enum { Version = 3 /**< XTC type version number */ };
+  virtual ~ConfigV3();
+  /** Maximum number of events per scan. */
+  virtual uint32_t events() const = 0;
+  /** returns true if the configuration uses l3trigger events limit. */
+  virtual uint8_t uses_l3t_events() const = 0;
+  /** returns true if the configuration uses duration control. */
+  virtual uint8_t uses_duration() const = 0;
+  /** returns true if the configuration uses events limit. */
+  virtual uint8_t uses_events() const = 0;
+  /** Maximum duration of the scan. */
+  virtual const Pds::ClockTime& duration() const = 0;
+  /** Number of PVControl objects in this configuration. */
+  virtual uint32_t npvControls() const = 0;
+  /** Number of PVMonitor objects in this configuration. */
+  virtual uint32_t npvMonitors() const = 0;
+  /** Number of PVLabel objects in this configuration. */
+  virtual uint32_t npvLabels() const = 0;
+  /** PVControl configuration objects */
+  virtual ndarray<const ControlData::PVControl, 1> pvControls() const = 0;
+  /** PVMonitor configuration objects */
+  virtual ndarray<const ControlData::PVMonitor, 1> pvMonitors() const = 0;
+  /** PVLabel configuration objects */
+  virtual ndarray<const ControlData::PVLabel, 1> pvLabels() const = 0;
+};
 } // namespace ControlData
 } // namespace Psana
 #endif // PSANA_CONTROL_DDL_H

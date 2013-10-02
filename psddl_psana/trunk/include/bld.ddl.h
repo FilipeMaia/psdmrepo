@@ -319,7 +319,7 @@ public:
   double ebeamCharge() const { return _fEbeamCharge; }
   /** Beam energy in MeV. */
   double ebeamL3Energy() const { return _fEbeamL3Energy; }
-  /** LTU beam position in mm. */
+  /** LTU beam position (BPMS:LTU1:720 through 750) in mm. */
   double ebeamLTUPosX() const { return _fEbeamLTUPosX; }
   /** LTU beam position in mm. */
   double ebeamLTUPosY() const { return _fEbeamLTUPosY; }
@@ -335,20 +335,20 @@ public:
   double ebeamPkCurrBC1() const { return _fEbeamPkCurrBC1; }
   /** Beam position in mm (related to beam energy). */
   double ebeamEnergyBC1() const { return _fEbeamEnergyBC1; }
-  /** Und beam x-position in mm. */
+  /** Undulator launch feedback (BPMs U4 through U10) beam x-position in mm. */
   double ebeamUndPosX() const { return _fEbeamUndPosX; }
-  /** Und beam y-position in mm. */
+  /** Undulator launch feedback beam y-position in mm. */
   double ebeamUndPosY() const { return _fEbeamUndPosY; }
-  /** Und beam x-angle in mrad. */
+  /** Undulator launch feedback beam x-angle in mrad. */
   double ebeamUndAngX() const { return _fEbeamUndAngX; }
-  /** Und beam y-angle in mrad. */
+  /** Undulator launch feedback beam y-angle in mrad. */
   double ebeamUndAngY() const { return _fEbeamUndAngY; }
   static uint32_t _sizeof() { return 116; }
 private:
   uint32_t	_uDamageMask;	/**< Damage mask. */
   double	_fEbeamCharge;	/**< Beam charge in nC. */
   double	_fEbeamL3Energy;	/**< Beam energy in MeV. */
-  double	_fEbeamLTUPosX;	/**< LTU beam position in mm. */
+  double	_fEbeamLTUPosX;	/**< LTU beam position (BPMS:LTU1:720 through 750) in mm. */
   double	_fEbeamLTUPosY;	/**< LTU beam position in mm. */
   double	_fEbeamLTUAngX;	/**< LTU beam angle in mrad. */
   double	_fEbeamLTUAngY;	/**< LTU beam angle in mrad. */
@@ -356,10 +356,10 @@ private:
   double	_fEbeamEnergyBC2;	/**< Beam position in mm (related to beam energy). */
   double	_fEbeamPkCurrBC1;	/**< Beam current in Amps. */
   double	_fEbeamEnergyBC1;	/**< Beam position in mm (related to beam energy). */
-  double	_fEbeamUndPosX;	/**< Und beam x-position in mm. */
-  double	_fEbeamUndPosY;	/**< Und beam y-position in mm. */
-  double	_fEbeamUndAngX;	/**< Und beam x-angle in mrad. */
-  double	_fEbeamUndAngY;	/**< Und beam y-angle in mrad. */
+  double	_fEbeamUndPosX;	/**< Undulator launch feedback (BPMs U4 through U10) beam x-position in mm. */
+  double	_fEbeamUndPosY;	/**< Undulator launch feedback beam y-position in mm. */
+  double	_fEbeamUndAngX;	/**< Undulator launch feedback beam x-angle in mrad. */
+  double	_fEbeamUndAngY;	/**< Undulator launch feedback beam y-angle in mrad. */
 };
 std::ostream& operator<<(std::ostream& str, Bld::BldDataEBeamV4::DamageMask enval);
 
@@ -526,6 +526,21 @@ public:
   virtual ~BldDataAcqADCV1();
   virtual const Acqiris::ConfigV1& config() const = 0;
   virtual const Acqiris::DataDescV1& data() const = 0;
+};
+
+/** @class BldDataSpectrometerV0
+
+  Structure which contains image projections for spectrometers.
+*/
+
+
+class BldDataSpectrometerV0 {
+public:
+  enum { TypeId = Pds::TypeId::Id_Spectrometer /**< XTC type ID value (from Pds::TypeId class) */ };
+  enum { Version = 0 /**< XTC type version number */ };
+  virtual ~BldDataSpectrometerV0();
+  virtual ndarray<const uint32_t, 1> hproj() const = 0;
+  virtual ndarray<const uint32_t, 1> vproj() const = 0;
 };
 } // namespace Bld
 } // namespace Psana

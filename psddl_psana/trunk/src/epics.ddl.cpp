@@ -6,6 +6,119 @@
 #include <iostream>
 namespace Psana {
 namespace Epics {
+std::ostream& operator<<(std::ostream& str, Epics::DbrTypes enval) {
+  const char* val;
+  switch (enval) {
+  case Epics::DBR_STRING:
+    val = "DBR_STRING";
+    break;
+  case Epics::DBR_SHORT:
+    val = "DBR_SHORT";
+    break;
+  case Epics::DBR_FLOAT:
+    val = "DBR_FLOAT";
+    break;
+  case Epics::DBR_ENUM:
+    val = "DBR_ENUM";
+    break;
+  case Epics::DBR_CHAR:
+    val = "DBR_CHAR";
+    break;
+  case Epics::DBR_LONG:
+    val = "DBR_LONG";
+    break;
+  case Epics::DBR_DOUBLE:
+    val = "DBR_DOUBLE";
+    break;
+  case Epics::DBR_STS_STRING:
+    val = "DBR_STS_STRING";
+    break;
+  case Epics::DBR_STS_SHORT:
+    val = "DBR_STS_SHORT";
+    break;
+  case Epics::DBR_STS_FLOAT:
+    val = "DBR_STS_FLOAT";
+    break;
+  case Epics::DBR_STS_ENUM:
+    val = "DBR_STS_ENUM";
+    break;
+  case Epics::DBR_STS_CHAR:
+    val = "DBR_STS_CHAR";
+    break;
+  case Epics::DBR_STS_LONG:
+    val = "DBR_STS_LONG";
+    break;
+  case Epics::DBR_STS_DOUBLE:
+    val = "DBR_STS_DOUBLE";
+    break;
+  case Epics::DBR_TIME_STRING:
+    val = "DBR_TIME_STRING";
+    break;
+  case Epics::DBR_TIME_INT:
+    val = "DBR_TIME_INT";
+    break;
+  case Epics::DBR_TIME_FLOAT:
+    val = "DBR_TIME_FLOAT";
+    break;
+  case Epics::DBR_TIME_ENUM:
+    val = "DBR_TIME_ENUM";
+    break;
+  case Epics::DBR_TIME_CHAR:
+    val = "DBR_TIME_CHAR";
+    break;
+  case Epics::DBR_TIME_LONG:
+    val = "DBR_TIME_LONG";
+    break;
+  case Epics::DBR_TIME_DOUBLE:
+    val = "DBR_TIME_DOUBLE";
+    break;
+  case Epics::DBR_GR_STRING:
+    val = "DBR_GR_STRING";
+    break;
+  case Epics::DBR_GR_SHORT:
+    val = "DBR_GR_SHORT";
+    break;
+  case Epics::DBR_GR_FLOAT:
+    val = "DBR_GR_FLOAT";
+    break;
+  case Epics::DBR_GR_ENUM:
+    val = "DBR_GR_ENUM";
+    break;
+  case Epics::DBR_GR_CHAR:
+    val = "DBR_GR_CHAR";
+    break;
+  case Epics::DBR_GR_LONG:
+    val = "DBR_GR_LONG";
+    break;
+  case Epics::DBR_GR_DOUBLE:
+    val = "DBR_GR_DOUBLE";
+    break;
+  case Epics::DBR_CTRL_STRING:
+    val = "DBR_CTRL_STRING";
+    break;
+  case Epics::DBR_CTRL_SHORT:
+    val = "DBR_CTRL_SHORT";
+    break;
+  case Epics::DBR_CTRL_FLOAT:
+    val = "DBR_CTRL_FLOAT";
+    break;
+  case Epics::DBR_CTRL_ENUM:
+    val = "DBR_CTRL_ENUM";
+    break;
+  case Epics::DBR_CTRL_CHAR:
+    val = "DBR_CTRL_CHAR";
+    break;
+  case Epics::DBR_CTRL_LONG:
+    val = "DBR_CTRL_LONG";
+    break;
+  case Epics::DBR_CTRL_DOUBLE:
+    val = "DBR_CTRL_DOUBLE";
+    break;
+  default:
+    return str << "DbrTypes(" << int(enval) << ")";
+  }
+  return str << val;
+}
 std::vector<int>
 dbr_ctrl_short::units_shape() const {
   std::vector<int> shape;

@@ -283,6 +283,8 @@ public:
   uint8_t source_id() const { return uint8_t((this->_v>>8) & 0xff); }
   EvrData::OutputMap::Conn conn() const { return Conn((this->_v>>16) & 0xff); }
   uint8_t conn_id() const { return uint8_t((this->_v>>24) & 0xff); }
+  /** Returns encoded source value. */
+  uint32_t map() const;
   static uint32_t _sizeof() { return 4; }
 private:
   uint32_t	_v;
@@ -322,6 +324,8 @@ public:
   EvrData::OutputMapV2::Conn conn() const { return Conn((this->_v>>12) & 0xf); }
   uint8_t conn_id() const { return uint8_t((this->_v>>16) & 0xff); }
   uint8_t module() const { return uint8_t((this->_v>>24) & 0xff); }
+  /** Returns encoded source value. */
+  uint32_t map() const;
   static uint32_t _sizeof() { return 4; }
 private:
   uint32_t	_v;

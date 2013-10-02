@@ -68,6 +68,7 @@ namespace Epics {
     DBR_CTRL_LONG = 33,
     DBR_CTRL_DOUBLE = 34,
   };
+std::ostream& operator<<(std::ostream& str, Epics::DbrTypes enval);
 
 /** @class epicsTimeStamp
 
@@ -140,7 +141,7 @@ public:
   int16_t status() const { return _status; }
   int16_t severity() const { return _severity; }
   const Epics::epicsTimeStamp& stamp() const { return _stamp; }
-  static uint32_t _sizeof() { return (((((4+(Epics::epicsTimeStamp::_sizeof()))+2)+4)-1)/4)*4; }
+  static uint32_t _sizeof() { return (((((4+(Epics::epicsTimeStamp::_sizeof()))+2)+2)-1)/2)*2; }
 private:
   int16_t	_status;
   int16_t	_severity;
@@ -193,7 +194,7 @@ public:
   int16_t status() const { return _status; }
   int16_t severity() const { return _severity; }
   const Epics::epicsTimeStamp& stamp() const { return _stamp; }
-  static uint32_t _sizeof() { return (((((4+(Epics::epicsTimeStamp::_sizeof()))+2)+4)-1)/4)*4; }
+  static uint32_t _sizeof() { return (((((4+(Epics::epicsTimeStamp::_sizeof()))+2)+2)-1)/2)*2; }
 private:
   int16_t	_status;
   int16_t	_severity;
@@ -220,7 +221,7 @@ public:
   int16_t status() const { return _status; }
   int16_t severity() const { return _severity; }
   const Epics::epicsTimeStamp& stamp() const { return _stamp; }
-  static uint32_t _sizeof() { return ((((((4+(Epics::epicsTimeStamp::_sizeof()))+2)+1)+4)-1)/4)*4; }
+  static uint32_t _sizeof() { return ((((((4+(Epics::epicsTimeStamp::_sizeof()))+2)+1)+1)-1)/1)*1; }
 private:
   int16_t	_status;
   int16_t	_severity;
@@ -458,7 +459,7 @@ public:
   uint8_t lower_alarm_limit() const { return _lower_alarm_limit; }
   uint8_t upper_ctrl_limit() const { return _upper_ctrl_limit; }
   uint8_t lower_ctrl_limit() const { return _lower_ctrl_limit; }
-  static uint32_t _sizeof() { return (((((((((((((4+(1*(MAX_UNITS_SIZE)))+1)+1)+1)+1)+1)+1)+1)+1)+1)+2)-1)/2)*2; }
+  static uint32_t _sizeof() { return (((((((((((((4+(1*(MAX_UNITS_SIZE)))+1)+1)+1)+1)+1)+1)+1)+1)+1)+1)-1)/1)*1; }
   /** Method which returns the shape (dimensions) of the data returned by units() method. */
   std::vector<int> units_shape() const;
 private:
@@ -858,7 +859,7 @@ public:
   enum { Version = 1 /**< XTC type version number */ };
   virtual ~ConfigV1();
   virtual int32_t numPv() const = 0;
-  virtual ndarray<const Epics::PvConfigV1, 1> pvControls() const = 0;
+  virtual ndarray<const Epics::PvConfigV1, 1> getPvConfig() const = 0;
 };
 } // namespace Epics
 } // namespace Psana

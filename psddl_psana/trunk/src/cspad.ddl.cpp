@@ -6,6 +6,55 @@
 #include <iostream>
 namespace Psana {
 namespace CsPad {
+std::ostream& operator<<(std::ostream& str, CsPad::RunModes enval) {
+  const char* val;
+  switch (enval) {
+  case CsPad::NoRunning:
+    val = "NoRunning";
+    break;
+  case CsPad::RunButDrop:
+    val = "RunButDrop";
+    break;
+  case CsPad::RunAndSendToRCE:
+    val = "RunAndSendToRCE";
+    break;
+  case CsPad::RunAndSendTriggeredByTTL:
+    val = "RunAndSendTriggeredByTTL";
+    break;
+  case CsPad::ExternalTriggerSendToRCE:
+    val = "ExternalTriggerSendToRCE";
+    break;
+  case CsPad::ExternalTriggerDrop:
+    val = "ExternalTriggerDrop";
+    break;
+  case CsPad::NumberOfRunModes:
+    val = "NumberOfRunModes";
+    break;
+  default:
+    return str << "RunModes(" << int(enval) << ")";
+  }
+  return str << val;
+}
+std::ostream& operator<<(std::ostream& str, CsPad::DataModes enval) {
+  const char* val;
+  switch (enval) {
+  case CsPad::normal:
+    val = "normal";
+    break;
+  case CsPad::shiftTest:
+    val = "shiftTest";
+    break;
+  case CsPad::testData:
+    val = "testData";
+    break;
+  case CsPad::reserved:
+    val = "reserved";
+    break;
+  default:
+    return str << "DataModes(" << int(enval) << ")";
+  }
+  return str << val;
+}
 
 CsPadDigitalPotsCfg::~CsPadDigitalPotsCfg() {}
 

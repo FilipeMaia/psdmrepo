@@ -199,5 +199,8 @@ BldDataGMDV1::~BldDataGMDV1() {}
 
 BldDataAcqADCV1::~BldDataAcqADCV1() {}
 
+
+BldDataSpectrometerV0::~BldDataSpectrometerV0() {}
+
 } // namespace Bld
 } // namespace Psana
