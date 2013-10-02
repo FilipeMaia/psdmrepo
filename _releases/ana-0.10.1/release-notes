@@ -1,0 +1,5 @@
+- further progress with DDL-based pdsdata, new pdsdata tag
+  with some improvements and bug fixes
+- bunch of new ppdsdata types added
+- added translator support, pypdsdata types
+- no complete support for aliases yet, or for L3T skipping in psana
