@@ -25,8 +25,6 @@
 #include "H5DataTypes/H5DataUtils.h"
 #include "hdf5pp/CompoundType.h"
 #include "hdf5pp/TypeTraits.h"
-#include "hdf5pp/DataSet.h"
-#include "hdf5pp/DataSpace.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --

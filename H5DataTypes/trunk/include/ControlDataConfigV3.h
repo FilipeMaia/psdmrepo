@@ -1,12 +1,12 @@
-#ifndef H5DATATYPES_EVRCONFIGV5_H
-#define H5DATATYPES_EVRCONFIGV5_H
+#ifndef H5DATATYPES_CONTROLDATACONFIGV3_H
+#define H5DATATYPES_CONTROLDATACONFIGV3_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class EvrConfigV5.
+//	Class ControlDataConfigV3.
 //
 //------------------------------------------------------------------------
 
@@ -18,12 +18,12 @@
 // Base Class Headers --
 //----------------------
 
-
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "H5DataTypes/XtcClockTime.h"
 #include "hdf5pp/Group.h"
-#include "pdsdata/psddl/evr.ddl.h"
+#include "pdsdata/psddl/control.ddl.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -36,15 +36,15 @@
 namespace H5DataTypes {
 
 //
-// Helper type for Pds::EvrData::ConfigV5
+// Helper type for Pds::ControlData::ConfigV3
 //
-class EvrConfigV5  {
+class ControlDataConfigV3  {
 public:
 
-  typedef Pds::EvrData::ConfigV5 XtcType ;
+  typedef Pds::ControlData::ConfigV3 XtcType ;
 
-  EvrConfigV5 () {}
-  EvrConfigV5 ( const XtcType& data ) ;
+  ControlDataConfigV3 () {}
+  ControlDataConfigV3 ( const XtcType& data ) ;
 
   static hdf5pp::Type stored_type() ;
   static hdf5pp::Type native_type() ;
@@ -52,16 +52,22 @@ public:
   // store single config object at specified location
   static void store( const XtcType& config, hdf5pp::Group location ) ;
 
-  static size_t xtcSize( const XtcType& xtc ) { return xtc._sizeof(); }
+  static size_t xtcSize( const XtcType& xtc ) { return xtc._sizeof() ; }
 
 private:
 
-  uint32_t neventcodes;
-  uint32_t npulses;
-  uint32_t noutputs;
+  uint8_t   uses_l3t_events;
+  uint8_t   uses_duration;
+  uint8_t   uses_events;
+  XtcClockTime duration;
+  uint32_t  events;
+  uint32_t  npvControls;
+  uint32_t  npvMonitors;
+  uint32_t  npvLabels;
 
 };
 
+
 } // namespace H5DataTypes
 
-#endif // H5DATATYPES_EVRCONFIGV5_H
+#endif // H5DATATYPES_CONTROLDATACONFIGV3_H

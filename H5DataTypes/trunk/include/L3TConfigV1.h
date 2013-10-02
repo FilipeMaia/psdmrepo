@@ -1,12 +1,12 @@
-#ifndef H5DATATYPES_EVRCONFIGV5_H
-#define H5DATATYPES_EVRCONFIGV5_H
+#ifndef H5DATATYPES_L3TCONFIGV1_H
+#define H5DATATYPES_L3TCONFIGV1_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class EvrConfigV5.
+//	Class L3TConfigV1.
 //
 //------------------------------------------------------------------------
 
@@ -18,12 +18,11 @@
 // Base Class Headers --
 //----------------------
 
-
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
 #include "hdf5pp/Group.h"
-#include "pdsdata/psddl/evr.ddl.h"
+#include "pdsdata/psddl/l3t.ddl.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -36,15 +35,17 @@
 namespace H5DataTypes {
 
 //
-// Helper type for Pds::EvrData::ConfigV5
+// Helper type for Pds::L3T::ConfigV1
 //
-class EvrConfigV5  {
+class L3TConfigV1  {
 public:
 
-  typedef Pds::EvrData::ConfigV5 XtcType ;
+  typedef Pds::L3T::ConfigV1 XtcType ;
 
-  EvrConfigV5 () {}
-  EvrConfigV5 ( const XtcType& data ) ;
+  L3TConfigV1 () : module_id(0), description(0) {}
+  L3TConfigV1 ( const XtcType& data ) ;
+
+  ~L3TConfigV1 ();
 
   static hdf5pp::Type stored_type() ;
   static hdf5pp::Type native_type() ;
@@ -52,16 +53,18 @@ public:
   // store single config object at specified location
   static void store( const XtcType& config, hdf5pp::Group location ) ;
 
-  static size_t xtcSize( const XtcType& xtc ) { return xtc._sizeof(); }
+  static size_t xtcSize( const XtcType& xtc ) { return xtc._sizeof() ; }
+
+protected:
 
 private:
 
-  uint32_t neventcodes;
-  uint32_t npulses;
-  uint32_t noutputs;
-
+  uint32_t module_id_len;  // Not needed for HDF5, but will make it easier to read data back
+  uint32_t desc_len;       // Not needed for HDF5, but will make it easier to read data back
+  char* module_id;
+  char* description;
 };
 
 } // namespace H5DataTypes
 
-#endif // H5DATATYPES_EVRCONFIGV5_H
+#endif // H5DATATYPES_L3TCONFIGV1_H

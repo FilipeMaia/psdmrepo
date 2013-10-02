@@ -112,7 +112,7 @@ EpicsConfigV1::store(const XtcType& config, hdf5pp::Group grp)
   storeDataObject(data, "config", grp);
 
   // pvconfig data
-  const ndarray<const Pds::Epics::PvConfigV1, 1>& in_pvControls = config.pvControls();
+  const ndarray<const Pds::Epics::PvConfigV1, 1>& in_pvControls = config.getPvConfig();
   const uint32_t numPv = config.numPv();
   EpicsPvConfigV1 pvConfigs[numPv];
   for (uint32_t i = 0; i < numPv; ++ i) {

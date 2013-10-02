@@ -1,12 +1,12 @@
-#ifndef H5DATATYPES_EVRCONFIGV5_H
-#define H5DATATYPES_EVRCONFIGV5_H
+#ifndef H5DATATYPES_BLDDATASPECTROMETERV0_H
+#define H5DATATYPES_BLDDATASPECTROMETERV0_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class EvrConfigV5.
+//	Class BldDataSpectrometerV0.
 //
 //------------------------------------------------------------------------
 
@@ -18,12 +18,11 @@
 // Base Class Headers --
 //----------------------
 
-
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "hdf5pp/Group.h"
-#include "pdsdata/psddl/evr.ddl.h"
+#include "hdf5pp/Type.h"
+#include "pdsdata/psddl/bld.ddl.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -36,32 +35,30 @@
 namespace H5DataTypes {
 
 //
-// Helper type for Pds::EvrData::ConfigV5
+// Helper type for Pds::Bld::BldDataSpectrometerV0
 //
-class EvrConfigV5  {
+class BldDataSpectrometerV0  {
 public:
 
-  typedef Pds::EvrData::ConfigV5 XtcType ;
+  typedef Pds::Bld::BldDataSpectrometerV0 XtcType ;
 
-  EvrConfigV5 () {}
-  EvrConfigV5 ( const XtcType& data ) ;
+  BldDataSpectrometerV0 () {}
+  BldDataSpectrometerV0 ( const XtcType& xtc ) ;
 
   static hdf5pp::Type stored_type() ;
   static hdf5pp::Type native_type() ;
 
-  // store single config object at specified location
-  static void store( const XtcType& config, hdf5pp::Group location ) ;
+  static size_t xtcSize( const XtcType& xtc ) { return sizeof xtc ; }
 
-  static size_t xtcSize( const XtcType& xtc ) { return xtc._sizeof(); }
+protected:
 
 private:
 
-  uint32_t neventcodes;
-  uint32_t npulses;
-  uint32_t noutputs;
+  uint32_t  hproj[1024];
+  uint32_t  vproj[256];
 
 };
 
 } // namespace H5DataTypes
 
-#endif // H5DATATYPES_EVRCONFIGV5_H
+#endif // H5DATATYPES_BLDDATASPECTROMETERV0_H

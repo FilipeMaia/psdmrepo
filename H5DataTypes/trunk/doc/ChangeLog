@@ -11,6 +11,12 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-01
+2013-10-02 Andy Salnikov
+- upgrade to pdsdata V07-02-00
+- bunch of new data types: AliasConfigV1, BldDataSpectrometerV0, 
+  ControlDataConfigV3, L3TConfigV1, L3TDataV1
+
 Tag: V00-05-00
 2013-09-24 Andy Salnikov
 - pdsdata is now DDL-based, with a lot of changes to interface
