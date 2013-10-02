@@ -329,7 +329,6 @@ struct dataset_data {
   dataset_data(const Psana::EvrData::OutputMap& psanaobj);
   ~dataset_data();
 
-  uint32_t value;
   int16_t source;
   uint8_t source_id;
   int16_t conn;
@@ -339,33 +338,6 @@ struct dataset_data {
 
 };
 }
-class Proxy_OutputMap_v0 : public PSEvt::Proxy<Psana::EvrData::OutputMap> {
-public:
-  typedef Psana::EvrData::OutputMap PsanaType;
-
-  Proxy_OutputMap_v0(hdf5pp::Group group, hsize_t idx) : m_group(group), m_idx(idx) {}
-  virtual ~Proxy_OutputMap_v0() {}
-
-protected:
-
-  virtual boost::shared_ptr<PsanaType> getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key);
-
-private:
-
-  mutable hdf5pp::Group m_group;
-  hsize_t m_idx;
-  boost::shared_ptr<PsanaType> m_data;
-};
-boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::OutputMap> > make_OutputMap(int version, hdf5pp::Group group, hsize_t idx);
-
-/// Store object as a single instance (scalar dataset) inside specified group.
-void store(const Psana::EvrData::OutputMap& obj, hdf5pp::Group group, int version = -1);
-/// Create container (rank=1) datasets for storing objects of specified type.
-void make_datasets(const Psana::EvrData::OutputMap& obj, hdf5pp::Group group, hsize_t chunk_size,
-                   int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const Psana::EvrData::OutputMap& obj, hdf5pp::Group group, int version = -1);
-
 
 namespace ns_OutputMapV2_v0 {
 struct dataset_data {
@@ -376,7 +348,6 @@ struct dataset_data {
   dataset_data(const Psana::EvrData::OutputMapV2& psanaobj);
   ~dataset_data();
 
-  uint32_t value;
   int16_t source;
   uint8_t source_id;
   int16_t conn;
@@ -387,33 +358,6 @@ struct dataset_data {
 
 };
 }
-class Proxy_OutputMapV2_v0 : public PSEvt::Proxy<Psana::EvrData::OutputMapV2> {
-public:
-  typedef Psana::EvrData::OutputMapV2 PsanaType;
-
-  Proxy_OutputMapV2_v0(hdf5pp::Group group, hsize_t idx) : m_group(group), m_idx(idx) {}
-  virtual ~Proxy_OutputMapV2_v0() {}
-
-protected:
-
-  virtual boost::shared_ptr<PsanaType> getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key);
-
-private:
-
-  mutable hdf5pp::Group m_group;
-  hsize_t m_idx;
-  boost::shared_ptr<PsanaType> m_data;
-};
-boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::OutputMapV2> > make_OutputMapV2(int version, hdf5pp::Group group, hsize_t idx);
-
-/// Store object as a single instance (scalar dataset) inside specified group.
-void store(const Psana::EvrData::OutputMapV2& obj, hdf5pp::Group group, int version = -1);
-/// Create container (rank=1) datasets for storing objects of specified type.
-void make_datasets(const Psana::EvrData::OutputMapV2& obj, hdf5pp::Group group, hsize_t chunk_size,
-                   int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const Psana::EvrData::OutputMapV2& obj, hdf5pp::Group group, int version = -1);
-
 
 namespace ns_ConfigV1_v0 {
 struct dataset_config {

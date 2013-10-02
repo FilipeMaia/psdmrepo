@@ -9,6 +9,37 @@
 
         <!-- ========================================================================= -->
     
+        <h5schema name="OutputMap" version="0">
+
+            <tag name="skip-proxy"/>
+
+            <dataset name="data">
+                <attribute name="source"/>
+                <attribute name="source_id"/>
+                <attribute name="conn"/>
+                <attribute name="conn_id"/>
+            </dataset>
+            
+        </h5schema>
+    
+        <!-- ========================================================================= -->
+    
+        <h5schema name="OutputMapV2" version="0">
+
+            <tag name="skip-proxy"/>
+
+            <dataset name="data">
+                <attribute name="source"/>
+                <attribute name="source_id"/>
+                <attribute name="conn"/>
+                <attribute name="conn_id"/>
+                <attribute name="module"/>
+            </dataset>
+            
+        </h5schema>
+    
+        <!-- ========================================================================= -->
+    
         <h5schema name="SequencerConfigV1" version="0">
 
             <tag name="skip-proxy"/>

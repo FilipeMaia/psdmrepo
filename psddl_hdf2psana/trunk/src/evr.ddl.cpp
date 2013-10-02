@@ -883,7 +883,6 @@ hdf5pp::Type ns_OutputMap_v0_dataset_data_stored_type()
 {
   typedef ns_OutputMap_v0::dataset_data DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("value", offsetof(DsType, value), hdf5pp::TypeTraits<uint32_t>::stored_type());
   hdf5pp::EnumType<int16_t> _enum_type_source = hdf5pp::EnumType<int16_t>::enumType();
   _enum_type_source.insert("Pulse", Psana::EvrData::OutputMap::Pulse);
   _enum_type_source.insert("DBus", Psana::EvrData::OutputMap::DBus);
@@ -910,7 +909,6 @@ hdf5pp::Type ns_OutputMap_v0_dataset_data_native_type()
 {
   typedef ns_OutputMap_v0::dataset_data DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("value", offsetof(DsType, value), hdf5pp::TypeTraits<uint32_t>::native_type());
   hdf5pp::EnumType<int16_t> _enum_type_source = hdf5pp::EnumType<int16_t>::enumType();
   _enum_type_source.insert("Pulse", Psana::EvrData::OutputMap::Pulse);
   _enum_type_source.insert("DBus", Psana::EvrData::OutputMap::DBus);
@@ -938,8 +936,7 @@ ns_OutputMap_v0::dataset_data::dataset_data()
 }
 
 ns_OutputMap_v0::dataset_data::dataset_data(const Psana::EvrData::OutputMap& psanaobj)
-  : value(psanaobj.value())
-  , source(psanaobj.source())
+  : source(psanaobj.source())
   , source_id(psanaobj.source_id())
   , conn(psanaobj.conn())
   , conn_id(psanaobj.conn_id())
@@ -949,89 +946,11 @@ ns_OutputMap_v0::dataset_data::dataset_data(const Psana::EvrData::OutputMap& psa
 ns_OutputMap_v0::dataset_data::~dataset_data()
 {
 }
-boost::shared_ptr<Psana::EvrData::OutputMap>
-Proxy_OutputMap_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key)
-{
-  if (not m_data) {
-    boost::shared_ptr<EvrData::ns_OutputMap_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<EvrData::ns_OutputMap_v0::dataset_data>(m_group, "data", m_idx);
-    m_data.reset(new PsanaType(Psana::EvrData::OutputMap::Source(ds_data->source), ds_data->source_id, Psana::EvrData::OutputMap::Conn(ds_data->conn), ds_data->conn_id));
-  }
-  return m_data;
-}
-
-
-void make_datasets_OutputMap_v0(const Psana::EvrData::OutputMap& obj, 
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
-{
-  {
-    hdf5pp::Type dstype = EvrData::ns_OutputMap_v0::dataset_data::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
-  }
-}
-
-void store_OutputMap_v0(const Psana::EvrData::OutputMap& obj, hdf5pp::Group group, bool append)
-{
-  {
-    EvrData::ns_OutputMap_v0::dataset_data ds_data(obj);
-    if (append) {
-      hdf5pp::Utils::append(group, "data", ds_data);
-    } else {
-      hdf5pp::Utils::storeScalar(group, "data", ds_data);
-    }
-  }
-}
-
-boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::OutputMap> > make_OutputMap(int version, hdf5pp::Group group, hsize_t idx) {
-  switch (version) {
-  case 0:
-    return boost::make_shared<Proxy_OutputMap_v0>(group, idx);
-  default:
-    return boost::make_shared<PSEvt::DataProxy<Psana::EvrData::OutputMap> >(boost::shared_ptr<Psana::EvrData::OutputMap>());
-  }
-}
-
-void make_datasets(const Psana::EvrData::OutputMap& obj, hdf5pp::Group group, hsize_t chunk_size,
-                   int deflate, bool shuffle, int version)
-{
-  if (version < 0) version = 0;
-  switch (version) {
-  case 0:
-    make_datasets_OutputMap_v0(obj, group, chunk_size, deflate, shuffle);
-    break;
-  default:
-    throw ExceptionSchemaVersion(ERR_LOC, "EvrData.OutputMap", version);
-  }
-}
-
-void store_OutputMap(const Psana::EvrData::OutputMap& obj, hdf5pp::Group group, int version, bool append)
-{
-  if (version < 0) version = 0;
-  switch (version) {
-  case 0:
-    store_OutputMap_v0(obj, group, append);
-    break;
-  default:
-    throw ExceptionSchemaVersion(ERR_LOC, "EvrData.OutputMap", version);
-  }
-}
-
-void store(const Psana::EvrData::OutputMap& obj, hdf5pp::Group group, int version) 
-{
-  store_OutputMap(obj, group, version, false);
-}
-
-void append(const Psana::EvrData::OutputMap& obj, hdf5pp::Group group, int version)
-{
-  store_OutputMap(obj, group, version, true);
-}
-
 
 hdf5pp::Type ns_OutputMapV2_v0_dataset_data_stored_type()
 {
   typedef ns_OutputMapV2_v0::dataset_data DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("value", offsetof(DsType, value), hdf5pp::TypeTraits<uint32_t>::stored_type());
   hdf5pp::EnumType<int16_t> _enum_type_source = hdf5pp::EnumType<int16_t>::enumType();
   _enum_type_source.insert("Pulse", Psana::EvrData::OutputMapV2::Pulse);
   _enum_type_source.insert("DBus", Psana::EvrData::OutputMapV2::DBus);
@@ -1059,7 +978,6 @@ hdf5pp::Type ns_OutputMapV2_v0_dataset_data_native_type()
 {
   typedef ns_OutputMapV2_v0::dataset_data DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  type.insert("value", offsetof(DsType, value), hdf5pp::TypeTraits<uint32_t>::native_type());
   hdf5pp::EnumType<int16_t> _enum_type_source = hdf5pp::EnumType<int16_t>::enumType();
   _enum_type_source.insert("Pulse", Psana::EvrData::OutputMapV2::Pulse);
   _enum_type_source.insert("DBus", Psana::EvrData::OutputMapV2::DBus);
@@ -1088,8 +1006,7 @@ ns_OutputMapV2_v0::dataset_data::dataset_data()
 }
 
 ns_OutputMapV2_v0::dataset_data::dataset_data(const Psana::EvrData::OutputMapV2& psanaobj)
-  : value(psanaobj.value())
-  , source(psanaobj.source())
+  : source(psanaobj.source())
   , source_id(psanaobj.source_id())
   , conn(psanaobj.conn())
   , conn_id(psanaobj.conn_id())
@@ -1100,83 +1017,6 @@ ns_OutputMapV2_v0::dataset_data::dataset_data(const Psana::EvrData::OutputMapV2&
 ns_OutputMapV2_v0::dataset_data::~dataset_data()
 {
 }
-boost::shared_ptr<Psana::EvrData::OutputMapV2>
-Proxy_OutputMapV2_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key)
-{
-  if (not m_data) {
-    boost::shared_ptr<EvrData::ns_OutputMapV2_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<EvrData::ns_OutputMapV2_v0::dataset_data>(m_group, "data", m_idx);
-    m_data.reset(new PsanaType(Psana::EvrData::OutputMapV2::Source(ds_data->source), ds_data->source_id, Psana::EvrData::OutputMapV2::Conn(ds_data->conn), ds_data->conn_id, ds_data->module));
-  }
-  return m_data;
-}
-
-
-void make_datasets_OutputMapV2_v0(const Psana::EvrData::OutputMapV2& obj, 
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
-{
-  {
-    hdf5pp::Type dstype = EvrData::ns_OutputMapV2_v0::dataset_data::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
-  }
-}
-
-void store_OutputMapV2_v0(const Psana::EvrData::OutputMapV2& obj, hdf5pp::Group group, bool append)
-{
-  {
-    EvrData::ns_OutputMapV2_v0::dataset_data ds_data(obj);
-    if (append) {
-      hdf5pp::Utils::append(group, "data", ds_data);
-    } else {
-      hdf5pp::Utils::storeScalar(group, "data", ds_data);
-    }
-  }
-}
-
-boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::OutputMapV2> > make_OutputMapV2(int version, hdf5pp::Group group, hsize_t idx) {
-  switch (version) {
-  case 0:
-    return boost::make_shared<Proxy_OutputMapV2_v0>(group, idx);
-  default:
-    return boost::make_shared<PSEvt::DataProxy<Psana::EvrData::OutputMapV2> >(boost::shared_ptr<Psana::EvrData::OutputMapV2>());
-  }
-}
-
-void make_datasets(const Psana::EvrData::OutputMapV2& obj, hdf5pp::Group group, hsize_t chunk_size,
-                   int deflate, bool shuffle, int version)
-{
-  if (version < 0) version = 0;
-  switch (version) {
-  case 0:
-    make_datasets_OutputMapV2_v0(obj, group, chunk_size, deflate, shuffle);
-    break;
-  default:
-    throw ExceptionSchemaVersion(ERR_LOC, "EvrData.OutputMapV2", version);
-  }
-}
-
-void store_OutputMapV2(const Psana::EvrData::OutputMapV2& obj, hdf5pp::Group group, int version, bool append)
-{
-  if (version < 0) version = 0;
-  switch (version) {
-  case 0:
-    store_OutputMapV2_v0(obj, group, append);
-    break;
-  default:
-    throw ExceptionSchemaVersion(ERR_LOC, "EvrData.OutputMapV2", version);
-  }
-}
-
-void store(const Psana::EvrData::OutputMapV2& obj, hdf5pp::Group group, int version) 
-{
-  store_OutputMapV2(obj, group, version, false);
-}
-
-void append(const Psana::EvrData::OutputMapV2& obj, hdf5pp::Group group, int version)
-{
-  store_OutputMapV2(obj, group, version, true);
-}
-
 
 hdf5pp::Type ns_ConfigV1_v0_dataset_config_stored_type()
 {

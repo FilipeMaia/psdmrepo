@@ -26,8 +26,8 @@ struct dataset_config {
   uint8_t vertical_binning;
   uint8_t output_mirroring;
   uint8_t vertical_remapping;
-  uint8_t defect_pixel_correction_enabled;
   uint8_t output_lookup_table_enabled;
+  uint8_t defect_pixel_correction_enabled;
   uint32_t number_of_defect_pixels;
   uint16_t output_offset;
   uint32_t output_resolution_bits;
@@ -50,8 +50,8 @@ public:
   virtual Psana::Opal1k::ConfigV1::Binning vertical_binning() const;
   virtual Psana::Opal1k::ConfigV1::Mirroring output_mirroring() const;
   virtual uint8_t vertical_remapping() const;
-  virtual uint8_t defect_pixel_correction_enabled() const;
   virtual uint8_t output_lookup_table_enabled() const;
+  virtual uint8_t defect_pixel_correction_enabled() const;
   virtual uint32_t number_of_defect_pixels() const;
   virtual ndarray<const uint16_t, 1> output_lookup_table() const;
   virtual ndarray<const Psana::Camera::FrameCoord, 1> defect_pixel_coordinates() const;

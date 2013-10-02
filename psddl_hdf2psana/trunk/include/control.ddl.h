@@ -188,6 +188,72 @@ void make_datasets(const Psana::ControlData::ConfigV2& obj, hdf5pp::Group group,
 /// Add one more object to the containers created by previous method
 void append(const Psana::ControlData::ConfigV2& obj, hdf5pp::Group group, int version = -1);
 
+
+namespace ns_ConfigV3_v0 {
+struct dataset_config {
+  static hdf5pp::Type native_type();
+  static hdf5pp::Type stored_type();
+
+  dataset_config();
+  dataset_config(const Psana::ControlData::ConfigV3& psanaobj);
+  ~dataset_config();
+
+  uint32_t events;
+  uint8_t uses_l3t_events;
+  uint8_t uses_duration;
+  uint8_t uses_events;
+  Pds::ns_ClockTime_v0::dataset_data duration;
+  uint32_t npvControls;
+  uint32_t npvMonitors;
+  uint32_t npvLabels;
+
+
+};
+}
+
+
+class ConfigV3_v0 : public Psana::ControlData::ConfigV3 {
+public:
+  typedef Psana::ControlData::ConfigV3 PsanaType;
+  ConfigV3_v0() {}
+  ConfigV3_v0(hdf5pp::Group group, hsize_t idx)
+    : m_group(group), m_idx(idx) {}
+  virtual ~ConfigV3_v0() {}
+  virtual uint32_t events() const;
+  virtual uint8_t uses_l3t_events() const;
+  virtual uint8_t uses_duration() const;
+  virtual uint8_t uses_events() const;
+  virtual const Pds::ClockTime& duration() const;
+  virtual uint32_t npvControls() const;
+  virtual uint32_t npvMonitors() const;
+  virtual uint32_t npvLabels() const;
+  virtual ndarray<const Psana::ControlData::PVControl, 1> pvControls() const;
+  virtual ndarray<const Psana::ControlData::PVMonitor, 1> pvMonitors() const;
+  virtual ndarray<const Psana::ControlData::PVLabel, 1> pvLabels() const;
+private:
+  mutable hdf5pp::Group m_group;
+  hsize_t m_idx;
+  mutable boost::shared_ptr<ControlData::ns_ConfigV3_v0::dataset_config> m_ds_config;
+  void read_ds_config() const;
+  mutable Pds::ClockTime m_ds_storage_config_duration;
+  mutable ndarray<const Psana::ControlData::PVControl, 1> m_ds_pvControls;
+  void read_ds_pvControls() const;
+  mutable ndarray<const Psana::ControlData::PVMonitor, 1> m_ds_pvMonitors;
+  void read_ds_pvMonitors() const;
+  mutable ndarray<const Psana::ControlData::PVLabel, 1> m_ds_pvLabels;
+  void read_ds_pvLabels() const;
+};
+
+boost::shared_ptr<PSEvt::Proxy<Psana::ControlData::ConfigV3> > make_ConfigV3(int version, hdf5pp::Group group, hsize_t idx);
+
+/// Store object as a single instance (scalar dataset) inside specified group.
+void store(const Psana::ControlData::ConfigV3& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::ControlData::ConfigV3& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method
+void append(const Psana::ControlData::ConfigV3& obj, hdf5pp::Group group, int version = -1);
+
 } // namespace ControlData
 } // namespace psddl_hdf2psana
 #endif // PSDDL_HDF2PSANA_CONTROL_DDL_H

@@ -176,7 +176,7 @@ public:
     : m_group(group), m_idx(idx) {}
   virtual ~ConfigV1_v0() {}
   virtual int32_t numPv() const;
-  virtual ndarray<const Psana::Epics::PvConfigV1, 1> pvControls() const;
+  virtual ndarray<const Psana::Epics::PvConfigV1, 1> getPvConfig() const;
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;

@@ -622,5 +622,266 @@ void append(const Psana::ControlData::ConfigV2& obj, hdf5pp::Group group, int ve
   store_ConfigV2(obj, group, version, true);
 }
 
+
+hdf5pp::Type ns_ConfigV3_v0_dataset_config_stored_type()
+{
+  typedef ns_ConfigV3_v0::dataset_config DsType;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
+  type.insert("events", offsetof(DsType, events), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("uses_l3t_events", offsetof(DsType, uses_l3t_events), hdf5pp::TypeTraits<uint8_t>::stored_type());
+  type.insert("uses_duration", offsetof(DsType, uses_duration), hdf5pp::TypeTraits<uint8_t>::stored_type());
+  type.insert("uses_events", offsetof(DsType, uses_events), hdf5pp::TypeTraits<uint8_t>::stored_type());
+  type.insert("duration", offsetof(DsType, duration), hdf5pp::TypeTraits<Pds::ns_ClockTime_v0::dataset_data>::stored_type());
+  type.insert("npvControls", offsetof(DsType, npvControls), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("npvMonitors", offsetof(DsType, npvMonitors), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  type.insert("npvLabels", offsetof(DsType, npvLabels), hdf5pp::TypeTraits<uint32_t>::stored_type());
+  return type;
+}
+
+hdf5pp::Type ns_ConfigV3_v0::dataset_config::stored_type()
+{
+  static hdf5pp::Type type = ns_ConfigV3_v0_dataset_config_stored_type();
+  return type;
+}
+
+hdf5pp::Type ns_ConfigV3_v0_dataset_config_native_type()
+{
+  typedef ns_ConfigV3_v0::dataset_config DsType;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
+  type.insert("events", offsetof(DsType, events), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("uses_l3t_events", offsetof(DsType, uses_l3t_events), hdf5pp::TypeTraits<uint8_t>::native_type());
+  type.insert("uses_duration", offsetof(DsType, uses_duration), hdf5pp::TypeTraits<uint8_t>::native_type());
+  type.insert("uses_events", offsetof(DsType, uses_events), hdf5pp::TypeTraits<uint8_t>::native_type());
+  type.insert("duration", offsetof(DsType, duration), hdf5pp::TypeTraits<Pds::ns_ClockTime_v0::dataset_data>::native_type());
+  type.insert("npvControls", offsetof(DsType, npvControls), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("npvMonitors", offsetof(DsType, npvMonitors), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("npvLabels", offsetof(DsType, npvLabels), hdf5pp::TypeTraits<uint32_t>::native_type());
+  return type;
+}
+
+hdf5pp::Type ns_ConfigV3_v0::dataset_config::native_type()
+{
+  static hdf5pp::Type type = ns_ConfigV3_v0_dataset_config_native_type();
+  return type;
+}
+
+ns_ConfigV3_v0::dataset_config::dataset_config()
+{
+}
+
+ns_ConfigV3_v0::dataset_config::dataset_config(const Psana::ControlData::ConfigV3& psanaobj)
+  : events(psanaobj.events())
+  , uses_l3t_events(psanaobj.uses_l3t_events())
+  , uses_duration(psanaobj.uses_duration())
+  , uses_events(psanaobj.uses_events())
+  , duration(psanaobj.duration())
+  , npvControls(psanaobj.npvControls())
+  , npvMonitors(psanaobj.npvMonitors())
+  , npvLabels(psanaobj.npvLabels())
+{
+}
+
+ns_ConfigV3_v0::dataset_config::~dataset_config()
+{
+}
+uint32_t ConfigV3_v0::events() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->events);
+}
+uint8_t ConfigV3_v0::uses_l3t_events() const {
+  if (not m_ds_config) read_ds_config();
+  return uint8_t(m_ds_config->uses_l3t_events);
+}
+uint8_t ConfigV3_v0::uses_duration() const {
+  if (not m_ds_config) read_ds_config();
+  return uint8_t(m_ds_config->uses_duration);
+}
+uint8_t ConfigV3_v0::uses_events() const {
+  if (not m_ds_config) read_ds_config();
+  return uint8_t(m_ds_config->uses_events);
+}
+const Pds::ClockTime& ConfigV3_v0::duration() const {
+  if (not m_ds_config) read_ds_config();
+  m_ds_storage_config_duration = Pds::ClockTime(m_ds_config->duration);
+  return m_ds_storage_config_duration;
+}
+uint32_t ConfigV3_v0::npvControls() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->npvControls);
+}
+uint32_t ConfigV3_v0::npvMonitors() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->npvMonitors);
+}
+uint32_t ConfigV3_v0::npvLabels() const {
+  if (not m_ds_config) read_ds_config();
+  return uint32_t(m_ds_config->npvLabels);
+}
+ndarray<const Psana::ControlData::PVControl, 1> ConfigV3_v0::pvControls() const {
+  if (m_ds_pvControls.empty()) read_ds_pvControls();
+  return m_ds_pvControls;
+}
+ndarray<const Psana::ControlData::PVMonitor, 1> ConfigV3_v0::pvMonitors() const {
+  if (m_ds_pvMonitors.empty()) read_ds_pvMonitors();
+  return m_ds_pvMonitors;
+}
+ndarray<const Psana::ControlData::PVLabel, 1> ConfigV3_v0::pvLabels() const {
+  if (m_ds_pvLabels.empty()) read_ds_pvLabels();
+  return m_ds_pvLabels;
+}
+void ConfigV3_v0::read_ds_config() const {
+  m_ds_config = hdf5pp::Utils::readGroup<ControlData::ns_ConfigV3_v0::dataset_config>(m_group, "config", m_idx);
+}
+void ConfigV3_v0::read_ds_pvControls() const {
+  ndarray<ControlData::ns_PVControl_v0::dataset_data, 1> arr = hdf5pp::Utils::readNdarray<ControlData::ns_PVControl_v0::dataset_data, 1>(m_group, "pvControls", m_idx);
+  ndarray<Psana::ControlData::PVControl, 1> tmp(arr.shape());
+  std::copy(arr.begin(), arr.end(), tmp.begin());
+  m_ds_pvControls = tmp;
+}
+void ConfigV3_v0::read_ds_pvMonitors() const {
+  ndarray<ControlData::ns_PVMonitor_v0::dataset_data, 1> arr = hdf5pp::Utils::readNdarray<ControlData::ns_PVMonitor_v0::dataset_data, 1>(m_group, "pvMonitors", m_idx);
+  ndarray<Psana::ControlData::PVMonitor, 1> tmp(arr.shape());
+  std::copy(arr.begin(), arr.end(), tmp.begin());
+  m_ds_pvMonitors = tmp;
+}
+void ConfigV3_v0::read_ds_pvLabels() const {
+  ndarray<ControlData::ns_PVLabel_v0::dataset_data, 1> arr = hdf5pp::Utils::readNdarray<ControlData::ns_PVLabel_v0::dataset_data, 1>(m_group, "pvLabels", m_idx);
+  ndarray<Psana::ControlData::PVLabel, 1> tmp(arr.shape());
+  std::copy(arr.begin(), arr.end(), tmp.begin());
+  m_ds_pvLabels = tmp;
+}
+
+void make_datasets_ConfigV3_v0(const Psana::ControlData::ConfigV3& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = ControlData::ns_ConfigV3_v0::dataset_config::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "config", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+  {
+    typedef __typeof__(obj.pvControls()) PsanaArray;
+    const PsanaArray& psana_array = obj.pvControls();
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<ControlData::ns_PVControl_v0::dataset_data>::stored_type(), psana_array.shape()[0]);
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "pvControls", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+  {
+    typedef __typeof__(obj.pvMonitors()) PsanaArray;
+    const PsanaArray& psana_array = obj.pvMonitors();
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<ControlData::ns_PVMonitor_v0::dataset_data>::stored_type(), psana_array.shape()[0]);
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "pvMonitors", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+  {
+    typedef __typeof__(obj.pvLabels()) PsanaArray;
+    const PsanaArray& psana_array = obj.pvLabels();
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<ControlData::ns_PVLabel_v0::dataset_data>::stored_type(), psana_array.shape()[0]);
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "pvLabels", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
+void store_ConfigV3_v0(const Psana::ControlData::ConfigV3& obj, hdf5pp::Group group, bool append)
+{
+  {
+    ControlData::ns_ConfigV3_v0::dataset_config ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "config", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "config", ds_data);
+    }
+  }
+  {
+    typedef __typeof__(obj.pvControls()) PsanaArray;
+    typedef ndarray<ControlData::ns_PVControl_v0::dataset_data, 1> HdfArray;
+    PsanaArray psana_array = obj.pvControls();
+    HdfArray hdf_array(psana_array.shape());
+    HdfArray::iterator out = hdf_array.begin();
+    for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
+      *out = ControlData::ns_PVControl_v0::dataset_data(*it);
+    }
+    if (append) {
+      hdf5pp::Utils::appendNDArray(group, "pvControls", hdf_array);
+    } else {
+      hdf5pp::Utils::storeNDArray(group, "pvControls", hdf_array);
+    }
+  }
+  {
+    typedef __typeof__(obj.pvMonitors()) PsanaArray;
+    typedef ndarray<ControlData::ns_PVMonitor_v0::dataset_data, 1> HdfArray;
+    PsanaArray psana_array = obj.pvMonitors();
+    HdfArray hdf_array(psana_array.shape());
+    HdfArray::iterator out = hdf_array.begin();
+    for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
+      *out = ControlData::ns_PVMonitor_v0::dataset_data(*it);
+    }
+    if (append) {
+      hdf5pp::Utils::appendNDArray(group, "pvMonitors", hdf_array);
+    } else {
+      hdf5pp::Utils::storeNDArray(group, "pvMonitors", hdf_array);
+    }
+  }
+  {
+    typedef __typeof__(obj.pvLabels()) PsanaArray;
+    typedef ndarray<ControlData::ns_PVLabel_v0::dataset_data, 1> HdfArray;
+    PsanaArray psana_array = obj.pvLabels();
+    HdfArray hdf_array(psana_array.shape());
+    HdfArray::iterator out = hdf_array.begin();
+    for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
+      *out = ControlData::ns_PVLabel_v0::dataset_data(*it);
+    }
+    if (append) {
+      hdf5pp::Utils::appendNDArray(group, "pvLabels", hdf_array);
+    } else {
+      hdf5pp::Utils::storeNDArray(group, "pvLabels", hdf_array);
+    }
+  }
+}
+
+boost::shared_ptr<PSEvt::Proxy<Psana::ControlData::ConfigV3> > make_ConfigV3(int version, hdf5pp::Group group, hsize_t idx) {
+  switch (version) {
+  case 0:
+    return boost::make_shared<PSEvt::DataProxy<Psana::ControlData::ConfigV3> >(boost::make_shared<ConfigV3_v0>(group, idx));
+  default:
+    return boost::make_shared<PSEvt::DataProxy<Psana::ControlData::ConfigV3> >(boost::shared_ptr<Psana::ControlData::ConfigV3>());
+  }
+}
+
+void make_datasets(const Psana::ControlData::ConfigV3& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_ConfigV3_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "ControlData.ConfigV3", version);
+  }
+}
+
+void store_ConfigV3(const Psana::ControlData::ConfigV3& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    store_ConfigV3_v0(obj, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "ControlData.ConfigV3", version);
+  }
+}
+
+void store(const Psana::ControlData::ConfigV3& obj, hdf5pp::Group group, int version) 
+{
+  store_ConfigV3(obj, group, version, false);
+}
+
+void append(const Psana::ControlData::ConfigV3& obj, hdf5pp::Group group, int version)
+{
+  store_ConfigV3(obj, group, version, true);
+}
+
 } // namespace ControlData
 } // namespace psddl_hdf2psana

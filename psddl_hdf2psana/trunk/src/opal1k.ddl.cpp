@@ -37,8 +37,8 @@ hdf5pp::Type ns_ConfigV1_v0_dataset_config_stored_type()
   _enum_type_output_mirroring.insert("HVFlip", Psana::Opal1k::ConfigV1::HVFlip);
   type.insert("output_mirroring", offsetof(DsType, output_mirroring), _enum_type_output_mirroring);
   type.insert("vertical_remapping", offsetof(DsType, vertical_remapping), hdf5pp::TypeTraits<uint8_t>::stored_type());
-  type.insert("defect_pixel_correction_enabled", offsetof(DsType, defect_pixel_correction_enabled), hdf5pp::TypeTraits<uint8_t>::stored_type());
   type.insert("output_lookup_table_enabled", offsetof(DsType, output_lookup_table_enabled), hdf5pp::TypeTraits<uint8_t>::stored_type());
+  type.insert("defect_pixel_correction_enabled", offsetof(DsType, defect_pixel_correction_enabled), hdf5pp::TypeTraits<uint8_t>::stored_type());
   type.insert("number_of_defect_pixels", offsetof(DsType, number_of_defect_pixels), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("output_offset", offsetof(DsType, output_offset), hdf5pp::TypeTraits<uint16_t>::stored_type());
   type.insert("output_resolution_bits", offsetof(DsType, output_resolution_bits), hdf5pp::TypeTraits<uint32_t>::stored_type());
@@ -75,8 +75,8 @@ hdf5pp::Type ns_ConfigV1_v0_dataset_config_native_type()
   _enum_type_output_mirroring.insert("HVFlip", Psana::Opal1k::ConfigV1::HVFlip);
   type.insert("output_mirroring", offsetof(DsType, output_mirroring), _enum_type_output_mirroring);
   type.insert("vertical_remapping", offsetof(DsType, vertical_remapping), hdf5pp::TypeTraits<uint8_t>::native_type());
-  type.insert("defect_pixel_correction_enabled", offsetof(DsType, defect_pixel_correction_enabled), hdf5pp::TypeTraits<uint8_t>::native_type());
   type.insert("output_lookup_table_enabled", offsetof(DsType, output_lookup_table_enabled), hdf5pp::TypeTraits<uint8_t>::native_type());
+  type.insert("defect_pixel_correction_enabled", offsetof(DsType, defect_pixel_correction_enabled), hdf5pp::TypeTraits<uint8_t>::native_type());
   type.insert("number_of_defect_pixels", offsetof(DsType, number_of_defect_pixels), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("output_offset", offsetof(DsType, output_offset), hdf5pp::TypeTraits<uint16_t>::native_type());
   type.insert("output_resolution_bits", offsetof(DsType, output_resolution_bits), hdf5pp::TypeTraits<uint32_t>::native_type());
@@ -100,8 +100,8 @@ ns_ConfigV1_v0::dataset_config::dataset_config(const Psana::Opal1k::ConfigV1& ps
   , vertical_binning(psanaobj.vertical_binning())
   , output_mirroring(psanaobj.output_mirroring())
   , vertical_remapping(psanaobj.vertical_remapping())
-  , defect_pixel_correction_enabled(psanaobj.defect_pixel_correction_enabled())
   , output_lookup_table_enabled(psanaobj.output_lookup_table_enabled())
+  , defect_pixel_correction_enabled(psanaobj.defect_pixel_correction_enabled())
   , number_of_defect_pixels(psanaobj.number_of_defect_pixels())
   , output_offset(psanaobj.output_offset())
   , output_resolution_bits(psanaobj.output_resolution_bits())
@@ -135,13 +135,13 @@ uint8_t ConfigV1_v0::vertical_remapping() const {
   if (not m_ds_config) read_ds_config();
   return uint8_t(m_ds_config->vertical_remapping);
 }
-uint8_t ConfigV1_v0::defect_pixel_correction_enabled() const {
-  if (not m_ds_config) read_ds_config();
-  return uint8_t(m_ds_config->defect_pixel_correction_enabled);
-}
 uint8_t ConfigV1_v0::output_lookup_table_enabled() const {
   if (not m_ds_config) read_ds_config();
   return uint8_t(m_ds_config->output_lookup_table_enabled);
+}
+uint8_t ConfigV1_v0::defect_pixel_correction_enabled() const {
+  if (not m_ds_config) read_ds_config();
+  return uint8_t(m_ds_config->defect_pixel_correction_enabled);
 }
 uint32_t ConfigV1_v0::number_of_defect_pixels() const {
   if (not m_ds_config) read_ds_config();

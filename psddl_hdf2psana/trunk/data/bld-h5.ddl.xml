@@ -169,6 +169,14 @@
 
         </h5schema>
 
+        <!-- ========================================================================= -->
+        <h5schema name="BldDataSpectrometerV0" version="0">
+            <dataset name="data">
+                <attribute name="hproj" rank="1"/>
+                <attribute name="vproj" rank="1"/>
+            </dataset>
+        </h5schema>
+
     </package>
 
 </psddl>

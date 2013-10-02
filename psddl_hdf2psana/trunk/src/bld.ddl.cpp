@@ -1713,5 +1713,143 @@ void append(const Psana::Bld::BldDataAcqADCV1& obj, hdf5pp::Group group, int ver
   store_BldDataAcqADCV1(obj, group, version, true);
 }
 
+
+hdf5pp::Type ns_BldDataSpectrometerV0_v0_dataset_data_stored_type()
+{
+  typedef ns_BldDataSpectrometerV0_v0::dataset_data DsType;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
+  hsize_t _array_type_hproj_shape[] = { 1024 };
+  hdf5pp::ArrayType _array_type_hproj = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint32_t>::stored_type(), 1, _array_type_hproj_shape);
+  type.insert("hproj", offsetof(DsType, hproj), _array_type_hproj);
+  hsize_t _array_type_vproj_shape[] = { 256 };
+  hdf5pp::ArrayType _array_type_vproj = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint32_t>::stored_type(), 1, _array_type_vproj_shape);
+  type.insert("vproj", offsetof(DsType, vproj), _array_type_vproj);
+  return type;
+}
+
+hdf5pp::Type ns_BldDataSpectrometerV0_v0::dataset_data::stored_type()
+{
+  static hdf5pp::Type type = ns_BldDataSpectrometerV0_v0_dataset_data_stored_type();
+  return type;
+}
+
+hdf5pp::Type ns_BldDataSpectrometerV0_v0_dataset_data_native_type()
+{
+  typedef ns_BldDataSpectrometerV0_v0::dataset_data DsType;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
+  hsize_t _array_type_hproj_shape[] = { 1024 };
+  hdf5pp::ArrayType _array_type_hproj = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint32_t>::native_type(), 1, _array_type_hproj_shape);
+  type.insert("hproj", offsetof(DsType, hproj), _array_type_hproj);
+  hsize_t _array_type_vproj_shape[] = { 256 };
+  hdf5pp::ArrayType _array_type_vproj = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint32_t>::native_type(), 1, _array_type_vproj_shape);
+  type.insert("vproj", offsetof(DsType, vproj), _array_type_vproj);
+  return type;
+}
+
+hdf5pp::Type ns_BldDataSpectrometerV0_v0::dataset_data::native_type()
+{
+  static hdf5pp::Type type = ns_BldDataSpectrometerV0_v0_dataset_data_native_type();
+  return type;
+}
+
+ns_BldDataSpectrometerV0_v0::dataset_data::dataset_data()
+{
+}
+
+ns_BldDataSpectrometerV0_v0::dataset_data::dataset_data(const Psana::Bld::BldDataSpectrometerV0& psanaobj)
+{
+  {
+    const __typeof__(psanaobj.hproj())& arr = psanaobj.hproj();
+    std::copy(arr.begin(), arr.begin()+1024, hproj);
+  }
+  {
+    const __typeof__(psanaobj.vproj())& arr = psanaobj.vproj();
+    std::copy(arr.begin(), arr.begin()+256, vproj);
+  }
+}
+
+ns_BldDataSpectrometerV0_v0::dataset_data::~dataset_data()
+{
+}
+ndarray<const uint32_t, 1> BldDataSpectrometerV0_v0::hproj() const {
+  if (not m_ds_data) read_ds_data();
+  boost::shared_ptr<uint32_t> ptr(m_ds_data, m_ds_data->hproj);
+  return make_ndarray(ptr, 1024);
+}
+ndarray<const uint32_t, 1> BldDataSpectrometerV0_v0::vproj() const {
+  if (not m_ds_data) read_ds_data();
+  boost::shared_ptr<uint32_t> ptr(m_ds_data, m_ds_data->vproj);
+  return make_ndarray(ptr, 256);
+}
+void BldDataSpectrometerV0_v0::read_ds_data() const {
+  m_ds_data = hdf5pp::Utils::readGroup<Bld::ns_BldDataSpectrometerV0_v0::dataset_data>(m_group, "data", m_idx);
+}
+
+void make_datasets_BldDataSpectrometerV0_v0(const Psana::Bld::BldDataSpectrometerV0& obj, 
+      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+{
+  {
+    hdf5pp::Type dstype = Bld::ns_BldDataSpectrometerV0_v0::dataset_data::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+  }
+}
+
+void store_BldDataSpectrometerV0_v0(const Psana::Bld::BldDataSpectrometerV0& obj, hdf5pp::Group group, bool append)
+{
+  {
+    Bld::ns_BldDataSpectrometerV0_v0::dataset_data ds_data(obj);
+    if (append) {
+      hdf5pp::Utils::append(group, "data", ds_data);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "data", ds_data);
+    }
+  }
+}
+
+boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataSpectrometerV0> > make_BldDataSpectrometerV0(int version, hdf5pp::Group group, hsize_t idx) {
+  switch (version) {
+  case 0:
+    return boost::make_shared<PSEvt::DataProxy<Psana::Bld::BldDataSpectrometerV0> >(boost::make_shared<BldDataSpectrometerV0_v0>(group, idx));
+  default:
+    return boost::make_shared<PSEvt::DataProxy<Psana::Bld::BldDataSpectrometerV0> >(boost::shared_ptr<Psana::Bld::BldDataSpectrometerV0>());
+  }
+}
+
+void make_datasets(const Psana::Bld::BldDataSpectrometerV0& obj, hdf5pp::Group group, hsize_t chunk_size,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    make_datasets_BldDataSpectrometerV0_v0(obj, group, chunk_size, deflate, shuffle);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataSpectrometerV0", version);
+  }
+}
+
+void store_BldDataSpectrometerV0(const Psana::Bld::BldDataSpectrometerV0& obj, hdf5pp::Group group, int version, bool append)
+{
+  if (version < 0) version = 0;
+  switch (version) {
+  case 0:
+    store_BldDataSpectrometerV0_v0(obj, group, append);
+    break;
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataSpectrometerV0", version);
+  }
+}
+
+void store(const Psana::Bld::BldDataSpectrometerV0& obj, hdf5pp::Group group, int version) 
+{
+  store_BldDataSpectrometerV0(obj, group, version, false);
+}
+
+void append(const Psana::Bld::BldDataSpectrometerV0& obj, hdf5pp::Group group, int version)
+{
+  store_BldDataSpectrometerV0(obj, group, version, true);
+}
+
 } // namespace Bld
 } // namespace psddl_hdf2psana

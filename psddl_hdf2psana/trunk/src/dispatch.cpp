@@ -6,6 +6,7 @@
 #include "psddl_hdf2psana/dispatch.h"
 #include "psddl_hdf2psana/alias.ddl.h"
 #include "psddl_hdf2psana/cspad.ddl.h"
+#include "psddl_hdf2psana/l3t.ddl.h"
 #include "psddl_hdf2psana/evr.ddl.h"
 #include "psddl_hdf2psana/encoder.ddl.h"
 #include "psddl_hdf2psana/usdusb.ddl.h"
@@ -114,6 +115,10 @@ try {
     // CsPad2x2::ProtectionSystemThreshold
     evt.putProxy(psddl_hdf2psana::CsPad2x2::make_ProtectionSystemThreshold(schema_version, group, idx), src);
     break;
+  case 738044564:
+    // Bld::BldDataSpectrometerV0
+    evt.putProxy(psddl_hdf2psana::Bld::make_BldDataSpectrometerV0(schema_version, group, idx), src);
+    break;
   case 756401870:
     // Lusi::IpmFexV1
     evt.putProxy(psddl_hdf2psana::Lusi::make_IpmFexV1(schema_version, group, idx), src);
@@ -181,10 +186,6 @@ try {
   case 1083296678:
     // Encoder::DataV1
     evt.putProxy(psddl_hdf2psana::Encoder::make_DataV1(schema_version, group, idx), src);
-    break;
-  case 1103255571:
-    // EvrData::OutputMapV2
-    evt.putProxy(psddl_hdf2psana::EvrData::make_OutputMapV2(schema_version, group, idx), src);
     break;
   case 1133035550:
     // EvrData::FIFOEvent
@@ -358,6 +359,10 @@ try {
     // ControlData::ConfigV2
     cfgStore.putProxy(psddl_hdf2psana::ControlData::make_ConfigV2(schema_version, group, idx), src);
     break;
+  case 2160030173:
+    // ControlData::ConfigV3
+    cfgStore.putProxy(psddl_hdf2psana::ControlData::make_ConfigV3(schema_version, group, idx), src);
+    break;
   case 2160030175:
     // ControlData::ConfigV1
     cfgStore.putProxy(psddl_hdf2psana::ControlData::make_ConfigV1(schema_version, group, idx), src);
@@ -498,6 +503,10 @@ try {
     // Acqiris::TrigV1
     evt.putProxy(psddl_hdf2psana::Acqiris::make_TrigV1(schema_version, group, idx), src);
     break;
+  case 3346701347:
+    // L3T::ConfigV1
+    cfgStore.putProxy(psddl_hdf2psana::L3T::make_ConfigV1(schema_version, group, idx), src);
+    break;
   case 3467424660:
     // CsPad::DataV2
     if (boost::shared_ptr<Psana::CsPad::ConfigV2> cfgPtr = cfgStore.get(src)) {
@@ -540,10 +549,6 @@ try {
     // Acqiris::ConfigV1
     cfgStore.putProxy(psddl_hdf2psana::Acqiris::make_ConfigV1(schema_version, group, idx), src);
     break;
-  case 3566348663:
-    // EvrData::OutputMap
-    evt.putProxy(psddl_hdf2psana::EvrData::make_OutputMap(schema_version, group, idx), src);
-    break;
   case 3580200696:
     // Lusi::PimImageConfigV1
     cfgStore.putProxy(psddl_hdf2psana::Lusi::make_PimImageConfigV1(schema_version, group, idx), src);
@@ -568,6 +573,10 @@ try {
   case 3801204302:
     // UsdUsb::ConfigV1
     cfgStore.putProxy(psddl_hdf2psana::UsdUsb::make_ConfigV1(schema_version, group, idx), src);
+    break;
+  case 3930091641:
+    // L3T::DataV1
+    evt.putProxy(psddl_hdf2psana::L3T::make_DataV1(schema_version, group, idx), src);
     break;
   case 3985960297:
     // Andor::FrameV1

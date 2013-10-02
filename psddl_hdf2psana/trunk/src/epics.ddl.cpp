@@ -257,7 +257,7 @@ int32_t ConfigV1_v0::numPv() const {
   if (not m_ds_config) read_ds_config();
   return int32_t(m_ds_config->numPv);
 }
-ndarray<const Psana::Epics::PvConfigV1, 1> ConfigV1_v0::pvControls() const {
+ndarray<const Psana::Epics::PvConfigV1, 1> ConfigV1_v0::getPvConfig() const {
   if (m_ds_pvConfig.empty()) read_ds_pvConfig();
   return m_ds_pvConfig;
 }
@@ -280,8 +280,8 @@ void make_datasets_ConfigV1_v0(const Psana::Epics::ConfigV1& obj,
     hdf5pp::Utils::createDataset(group, "config", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
   }
   {
-    typedef __typeof__(obj.pvControls()) PsanaArray;
-    const PsanaArray& psana_array = obj.pvControls();
+    typedef __typeof__(obj.getPvConfig()) PsanaArray;
+    const PsanaArray& psana_array = obj.getPvConfig();
     hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<Epics::ns_PvConfigV1_v0::dataset_data>::stored_type(), psana_array.shape()[0]);
     unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
     hdf5pp::Utils::createDataset(group, "pvConfig", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
@@ -299,9 +299,9 @@ void store_ConfigV1_v0(const Psana::Epics::ConfigV1& obj, hdf5pp::Group group, b
     }
   }
   {
-    typedef __typeof__(obj.pvControls()) PsanaArray;
+    typedef __typeof__(obj.getPvConfig()) PsanaArray;
     typedef ndarray<Epics::ns_PvConfigV1_v0::dataset_data, 1> HdfArray;
-    PsanaArray psana_array = obj.pvControls();
+    PsanaArray psana_array = obj.getPvConfig();
     HdfArray hdf_array(psana_array.shape());
     HdfArray::iterator out = hdf_array.begin();
     for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
