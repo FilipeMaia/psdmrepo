@@ -20,6 +20,15 @@
         </h5schema>
 
         <!-- ========================================================================= -->
+
+        <h5schema name="ConfigV1" version="0">
+            <dataset name="config">
+                <attribute name="numSrcAlias"/>
+            </dataset>
+            <dataset name="aliases" method="srcAlias"/>
+        </h5schema>
+
+        <!-- ========================================================================= -->
     </package>    
 
 </psddl>

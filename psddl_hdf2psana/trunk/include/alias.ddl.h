@@ -59,8 +59,8 @@ private:
   hsize_t m_idx;
   mutable boost::shared_ptr<Alias::ns_ConfigV1_v0::dataset_config> m_ds_config;
   void read_ds_config() const;
-  mutable ndarray<const Psana::Alias::SrcAlias, 1> m_ds_srcAlias;
-  void read_ds_srcAlias() const;
+  mutable ndarray<const Psana::Alias::SrcAlias, 1> m_ds_aliases;
+  void read_ds_aliases() const;
 };
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Alias::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx);

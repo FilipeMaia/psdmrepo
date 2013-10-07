@@ -102,17 +102,17 @@ uint32_t ConfigV1_v0::numSrcAlias() const {
   return uint32_t(m_ds_config->numSrcAlias);
 }
 ndarray<const Psana::Alias::SrcAlias, 1> ConfigV1_v0::srcAlias() const {
-  if (m_ds_srcAlias.empty()) read_ds_srcAlias();
-  return m_ds_srcAlias;
+  if (m_ds_aliases.empty()) read_ds_aliases();
+  return m_ds_aliases;
 }
 void ConfigV1_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<Alias::ns_ConfigV1_v0::dataset_config>(m_group, "config", m_idx);
 }
-void ConfigV1_v0::read_ds_srcAlias() const {
-  ndarray<Alias::ns_SrcAlias_v0::dataset_data, 1> arr = hdf5pp::Utils::readNdarray<Alias::ns_SrcAlias_v0::dataset_data, 1>(m_group, "srcAlias", m_idx);
+void ConfigV1_v0::read_ds_aliases() const {
+  ndarray<Alias::ns_SrcAlias_v0::dataset_data, 1> arr = hdf5pp::Utils::readNdarray<Alias::ns_SrcAlias_v0::dataset_data, 1>(m_group, "aliases", m_idx);
   ndarray<Psana::Alias::SrcAlias, 1> tmp(arr.shape());
   std::copy(arr.begin(), arr.end(), tmp.begin());
-  m_ds_srcAlias = tmp;
+  m_ds_aliases = tmp;
 }
 
 void make_datasets_ConfigV1_v0(const Psana::Alias::ConfigV1& obj, 
@@ -128,7 +128,7 @@ void make_datasets_ConfigV1_v0(const Psana::Alias::ConfigV1& obj,
     const PsanaArray& psana_array = obj.srcAlias();
     hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<Alias::ns_SrcAlias_v0::dataset_data>::stored_type(), psana_array.shape()[0]);
     unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "srcAlias", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "aliases", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
   }
 }
 
@@ -152,9 +152,9 @@ void store_ConfigV1_v0(const Psana::Alias::ConfigV1& obj, hdf5pp::Group group, b
       *out = Alias::ns_SrcAlias_v0::dataset_data(*it);
     }
     if (append) {
-      hdf5pp::Utils::appendNDArray(group, "srcAlias", hdf_array);
+      hdf5pp::Utils::appendNDArray(group, "aliases", hdf_array);
     } else {
-      hdf5pp::Utils::storeNDArray(group, "srcAlias", hdf_array);
+      hdf5pp::Utils::storeNDArray(group, "aliases", hdf_array);
     }
   }
 }
