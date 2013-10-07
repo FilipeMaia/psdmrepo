@@ -46,6 +46,27 @@ namespace {
     }
     str << "sec";
   }
+
+
+  void printPVControl(std::ostream& str, const Psana::ControlData::PVControl& ctrl)
+  {
+    str << "\n    " << ctrl.name() << " index=" << ctrl.index()
+        << " value=" << ctrl.value() << " array=" << int(ctrl.array());
+  }
+
+  void printPVMonitor(std::ostream& str, const Psana::ControlData::PVMonitor& mon)
+  {
+    str << "\n    " << mon.name() << " index=" << mon.index()
+        << " low value=" << mon.loValue()
+        << " high value=" << mon.hiValue()
+        << " array=" << int(mon.array());
+  }
+
+  void printPVLabel(std::ostream& str, const Psana::ControlData::PVLabel& lbl)
+  {
+    str << "\n    " << lbl.name() << " value=" << lbl.value();
+  }
+
 }
 
 //		----------------------------------------
@@ -77,9 +98,7 @@ DumpControl::beginCalibCycle(Event& evt, Env& env)
   MsgLog(name(), trace, "in beginCalibCycle()");
 
   shared_ptr<Psana::ControlData::ConfigV1> config = env.configStore().get(m_src);
-  if (not config) {
-    MsgLog(name(), info, "ControlData::ConfigV1 not found");    
-  } else {
+  if (config) {
     
     WithMsgLog(name(), info, str) {
       
@@ -93,21 +112,13 @@ DumpControl::beginCalibCycle(Event& evt, Env& env)
       const ndarray<const Psana::ControlData::PVControl, 1>& pvControls = config->pvControls();
       for (unsigned i = 0; i < pvControls.size(); ++ i) {
         if (i == 0) str << "\n  PV Controls:";
-        const Psana::ControlData::PVControl& ctrl = pvControls[i];
-        str << "\n    " << ctrl.name() << " index=" << ctrl.index()
-            << " value=" << ctrl.value() << " array=" << int(ctrl.array());
-        
+        printPVControl(str, pvControls[i]);
       }
 
       const ndarray<const Psana::ControlData::PVMonitor, 1>& pvMonitors = config->pvMonitors();
       for (unsigned i = 0; i < pvMonitors.size(); ++ i) {
         if (i == 0) str << "\n  PV Monitors:";
-        const Psana::ControlData::PVMonitor& mon = pvMonitors[i];
-        str << "\n    " << mon.name() << " index=" << mon.index()
-            << " low value=" << mon.loValue() 
-            << " high value=" << mon.hiValue() 
-            << " array=" << int(mon.array());
-        
+        printPVMonitor(str, pvMonitors[i]);
       }
     }
     
@@ -115,9 +126,7 @@ DumpControl::beginCalibCycle(Event& evt, Env& env)
 
 
   shared_ptr<Psana::ControlData::ConfigV2> config2 = env.configStore().get(m_src);
-  if (not config2) {
-    MsgLog(name(), info, "ControlData::ConfigV2 not found");
-  } else {
+  if (config2) {
 
     WithMsgLog(name(), info, str) {
 
@@ -131,28 +140,54 @@ DumpControl::beginCalibCycle(Event& evt, Env& env)
       const ndarray<const Psana::ControlData::PVControl, 1>& pvControls = config2->pvControls();
       for (unsigned i = 0; i < pvControls.size(); ++ i) {
         if (i == 0) str << "\n  PV Controls:";
-        const Psana::ControlData::PVControl& ctrl = pvControls[i];
-        str << "\n    " << ctrl.name() << " index=" << ctrl.index()
-            << " value=" << ctrl.value() << " array=" << int(ctrl.array());
-
+        printPVControl(str, pvControls[i]);
       }
 
       const ndarray<const Psana::ControlData::PVMonitor, 1>& pvMonitors = config2->pvMonitors();
       for (unsigned i = 0; i < pvMonitors.size(); ++ i) {
         if (i == 0) str << "\n  PV Monitors:";
-        const Psana::ControlData::PVMonitor& mon = pvMonitors[i];
-        str << "\n    " << mon.name() << " index=" << mon.index()
-            << " low value=" << mon.loValue()
-            << " high value=" << mon.hiValue()
-            << " array=" << int(mon.array());
-
+        printPVMonitor(str, pvMonitors[i]);
       }
 
       const ndarray<const Psana::ControlData::PVLabel, 1>& pvLabels = config2->pvLabels();
       for (unsigned i = 0; i < pvLabels.size(); ++ i) {
         if (i == 0) str << "\n  PV Labels:";
-        const Psana::ControlData::PVLabel& lbl = pvLabels[i];
-        str << "\n    " << lbl.name() << " value=" << lbl.value();
+        printPVLabel(str, pvLabels[i]);
+      }
+    }
+
+  }
+
+
+  shared_ptr<Psana::ControlData::ConfigV3> config3 = env.configStore().get(m_src);
+  if (config3) {
+
+    WithMsgLog(name(), info, str) {
+
+      str << "ControlData::ConfigV3:"
+          <<  "\n  uses_duration = " << (config3->uses_duration() ? "yes" : "no")
+          <<  "\n  duration = ";
+      printClockTime(str, config3->duration());
+      str <<  "\n  uses_events = " << (config3->uses_events() ? "yes" : "no")
+          <<  "\n  uses_l3t_events = " << (config3->uses_l3t_events() ? "yes" : "no")
+          << "\n  events = " << config3->events();
+
+      const ndarray<const Psana::ControlData::PVControl, 1>& pvControls = config3->pvControls();
+      for (unsigned i = 0; i < pvControls.size(); ++ i) {
+        if (i == 0) str << "\n  PV Controls:";
+        printPVControl(str, pvControls[i]);
+      }
+
+      const ndarray<const Psana::ControlData::PVMonitor, 1>& pvMonitors = config3->pvMonitors();
+      for (unsigned i = 0; i < pvMonitors.size(); ++ i) {
+        if (i == 0) str << "\n  PV Monitors:";
+        printPVMonitor(str, pvMonitors[i]);
+      }
+
+      const ndarray<const Psana::ControlData::PVLabel, 1>& pvLabels = config3->pvLabels();
+      for (unsigned i = 0; i < pvLabels.size(); ++ i) {
+        if (i == 0) str << "\n  PV Labels:";
+        printPVLabel(str, pvLabels[i]);
       }
     }
 

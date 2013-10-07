@@ -52,7 +52,8 @@ namespace {
         << ": source=" << ocfg.source()
         << " source_id=" << int(ocfg.source_id())
         << " conn=" << ocfg.conn()
-        << " conn_id=" << int(ocfg.conn_id());
+        << " conn_id=" << int(ocfg.conn_id())
+        << " map=" << ocfg.map();
   }
 
   void print(std::ostream& str, unsigned i, const Psana::EvrData::OutputMapV2& ocfg)
@@ -62,7 +63,8 @@ namespace {
         << " source_id=" << int(ocfg.source_id())
         << " conn=" << ocfg.conn()
         << " conn_id=" << int(ocfg.conn_id())
-        << " module=" << int(ocfg.module());
+        << " module=" << int(ocfg.module())
+        << " map=" << ocfg.map();
   }
 
   void print(std::ostream& str, unsigned i, const Psana::EvrData::PulseConfigV3& pcfg)
@@ -355,7 +357,7 @@ DumpEvr::event(Event& evt, Env& env)
   if (data3) {
     
     WithMsgLog(name(), info, str) {
-      str << "Encoder::DataV3: numFifoEvents=" << data3->numFifoEvents();
+      str << "EvrData::DataV3: numFifoEvents=" << data3->numFifoEvents();
       ::print_array(str, data3->fifoEvents());
     }
   }

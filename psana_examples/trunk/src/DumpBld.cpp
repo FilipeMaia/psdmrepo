@@ -133,6 +133,28 @@ DumpBld::event(Event& evt, Env& env)
     }
   }
 
+  shared_ptr<Psana::Bld::BldDataEBeamV4> ebeam4 = evt.get(m_ebeamSrc);
+  if (ebeam4) {
+    WithMsgLog(name(), info, str) {
+      str << "Bld::BldDataEBeamV4:"
+          << "\n  damageMask=" << std::showbase << std::hex << ebeam4->damageMask() << std::dec
+          << "\n  ebeamCharge=" << ebeam4->ebeamCharge()
+          << "\n  ebeamL3Energy=" << ebeam4->ebeamL3Energy()
+          << "\n  ebeamLTUPosX=" << ebeam4->ebeamLTUPosX()
+          << "\n  ebeamLTUPosY=" << ebeam4->ebeamLTUPosY()
+          << "\n  ebeamLTUAngX=" << ebeam4->ebeamLTUAngX()
+          << "\n  ebeamLTUAngY=" << ebeam4->ebeamLTUAngY()
+          << "\n  ebeamPkCurrBC2=" << ebeam4->ebeamPkCurrBC2()
+          << "\n  ebeamEnergyBC2=" << ebeam4->ebeamEnergyBC2()
+          << "\n  ebeamPkCurrBC1=" << ebeam4->ebeamPkCurrBC1()
+          << "\n  ebeamEnergyBC1=" << ebeam4->ebeamEnergyBC1()
+          << "\n  ebeamUndPosX=" << ebeam4->ebeamUndPosX()
+          << "\n  ebeamUndPosY=" << ebeam4->ebeamUndPosY()
+          << "\n  ebeamUndAngX=" << ebeam4->ebeamUndAngX()
+          << "\n  ebeamUndAngY=" << ebeam4->ebeamUndAngY();
+    }
+  }
+
   shared_ptr<Psana::Bld::BldDataPhaseCavity> cav = evt.get(m_cavSrc);
   if (cav) {
     WithMsgLog(name(), info, str) {
@@ -330,6 +352,16 @@ DumpBld::event(Event& evt, Env& env)
           << "\n  correctedSumPerPulse = " << gmd1->correctedSumPerPulse()
           << "\n  bgValuePerSample = " << gmd1->bgValuePerSample()
           << "\n  relativeEnergyPerPulse = " << gmd1->relativeEnergyPerPulse();
+    }
+  }
+
+  // dump BldDataSpectrometerV0
+  shared_ptr<Psana::Bld::BldDataSpectrometerV0> spec0 = evt.get(m_gmdSrc);
+  if (spec0) {
+    WithMsgLog(name(), info, str) {
+      str << "Bld::BldDataSpectrometerV0:"
+          << "\n  hproj = " << spec0->hproj()
+          << "\n  vproj = " << spec0->vproj();
     }
   }
 

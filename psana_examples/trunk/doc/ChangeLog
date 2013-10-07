@@ -11,6 +11,14 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-05
+2013-10-07 Andy Salnikov
+- add C++ modules for Alias and L3T
+- add control.ConfigV3 class to C++ DumpControl module
+- add bld.BldDataEBeamV4 class to C++ DumpBld module
+- add bld.BldDataSpectrometerV0 class to C++ DumpBld module
+- add python modules for Alias, L3T, and Evr
+
 Tag: V00-04-04
 2013-09-17 Andy Salnikov
 - documentation generation changed in SConsTools, updating SConscript
