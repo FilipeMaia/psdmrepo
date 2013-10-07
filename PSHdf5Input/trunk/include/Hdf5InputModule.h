@@ -98,6 +98,7 @@ private:
   psddl_hdf2psana::HdfConverter m_cvt;
   unsigned long m_skipEvents;                         ///< Number of events to skip
   unsigned long m_maxEvents;                          ///< Number of events to process
+  bool m_l3tAcceptOnly;                               ///< If true then pass only events accepted by L3T
   unsigned long m_l1Count;                            ///< Number of events seen so far
   int m_simulateEOR;                                  ///< if non-zero then simulate endRun/stop
   boost::shared_ptr<PSEvt::EventId> m_evtId;          ///< remembered EventId for simulated EOR

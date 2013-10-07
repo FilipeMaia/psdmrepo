@@ -11,6 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-00
+2013-10-07 Andy Salnikov
+- adding support for filtering rejected L3T events
+- rejected events are rejected by default, option psana.l3t-accept-only=0
+  can be used to get back to pass-all mode
+
 Tag: V00-01-07
 2013-07-29 Andy Salnikov
 - bug fix in Hdf5InputModule constructor - config service was instantiated 

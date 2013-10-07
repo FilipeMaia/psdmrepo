@@ -33,9 +33,42 @@
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
 //-----------------------------------------------------------------------
 
-
 using namespace PSHdf5Input;
 PSANA_INPUT_MODULE_FACTORY(Hdf5InputModule)
+
+namespace {
+
+  // test if the group is inside EPICS group (has a parent named Epics::EpicsPv)
+  bool isEpics(const std::string& group)
+  {
+    return group.find("/Epics::EpicsPv/") != std::string::npos;
+  }
+
+  // test if the group is inside L3T data group (has a parent named L3T::DataV*)
+  bool isL3TData(const std::string& group)
+  {
+    return group.find("/L3T::DataV") != std::string::npos;
+  }
+
+  // return true if event passed L3 selection (of there was no L3 defined)
+  bool l3accept(const Hdf5IterData& data)
+  {
+    // Correct way to determine L3T decision is to find L3T data and check the value
+    // of 'accept' field. This would involve reading of the data from file and may be
+    // also unstable w.r.t. the group name changes. I try to avoid these problems by
+    // guessing L3T decision based on the contributions to the event. Assumption is
+    // that if event contain only L3T data and Epics data then it is a rejected event.
+    // To make it even more general in case we decide no to store or not to merge
+    // L3T data group I assume that event is rejected as well if it only contains Epics.
+    const Hdf5IterData::seq_type& seq = data.data();
+    for (Hdf5IterData::seq_type::const_iterator it = seq.begin(); it != seq.end(); ++ it) {
+      const std::string& grpname = it->group.name();
+      if (not isEpics(grpname) and not isL3TData(grpname)) return true;
+    }
+    return false;
+  }
+
+}
 
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
@@ -53,6 +86,7 @@ Hdf5InputModule::Hdf5InputModule (const std::string& name)
   , m_cvt()
   , m_skipEvents(0)
   , m_maxEvents(0)
+  , m_l3tAcceptOnly(true)
   , m_l1Count(0)
   , m_simulateEOR(0)
   , m_evtId()
@@ -65,6 +99,7 @@ Hdf5InputModule::Hdf5InputModule (const std::string& name)
   if ( m_datasets.empty() ) {
     throw EmptyFileList(ERR_LOC);
   }
+  m_l3tAcceptOnly = cfg.get("psana", "l3t-accept-only", true);
   
   WithMsgLog(this->name(), debug, str) {
     str << "Input datasets: ";
@@ -166,7 +201,13 @@ Hdf5InputModule::event(Event& evt, Env& env)
     ret = InputModule::BeginCalibCycle;
     break;
   case Hdf5IterData::Event:
-    if (m_maxEvents and m_l1Count >= m_skipEvents+m_maxEvents) {
+    if (m_l3tAcceptOnly and not ::l3accept(data)) {
+      // did not pass L3, there may be other data in rejected events,
+      // try to store anything that may be there but skip this event
+      fillEventEnv(data, evt, env);
+      fillEpics(data, env);
+      ret = InputModule::Skip;
+    } else if (m_maxEvents and m_l1Count >= m_skipEvents+m_maxEvents) {
       m_evtId = data.eventId();
       evt.put(m_evtId);
       ret = InputModule::EndCalibCycle;
