@@ -18,7 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
-#include <string.h>
+#include <algorithm>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -42,15 +42,22 @@ namespace H5DataTypes {
 L3TConfigV1::L3TConfigV1 (const XtcType& data)
   : module_id_len(data.module_id_len())
   , desc_len(data.desc_len())
-  , module_id(strdup(data.module_id()))
-  , description(strdup(data.desc()))
+  , module_id()
+  , description()
 {
+  module_id = new char[data.module_id_len()+1];
+  std::copy(data.module_id(), data.module_id()+data.module_id_len(), module_id);
+  module_id[data.module_id_len()] = '\0';
+
+  description = new char[data.desc_len()+1];
+  std::copy(data.desc(), data.desc()+data.desc_len(), description);
+  description[data.desc_len()] = '\0';
 }
 
 L3TConfigV1::~L3TConfigV1()
 {
-  free(module_id);
-  free(description);
+  delete [] module_id;
+  delete [] description;
 }
 
 hdf5pp::Type
@@ -66,7 +73,7 @@ L3TConfigV1::native_type()
   type.insert_native<int32_t>("module_id_len", offsetof(L3TConfigV1, module_id_len));
   type.insert_native<int32_t>("desc_len", offsetof(L3TConfigV1, desc_len));
   type.insert_native<const char*>("module_id", offsetof(L3TConfigV1, module_id));
-  type.insert_native<const char*>("description", offsetof(L3TConfigV1, description));
+  type.insert_native<const char*>("desc", offsetof(L3TConfigV1, description));
 
   return type ;
 }
