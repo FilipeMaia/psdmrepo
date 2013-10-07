@@ -26,6 +26,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "MsgLogger/MsgLogger.h"
+#include "pdsdata/psddl/l3t.ddl.h"
 #include "psddl_psana/epics.ddl.h"
 #include "PSTime/Time.h"
 #include "PSXtcInput/Exceptions.h"
@@ -61,6 +62,22 @@ namespace {
     return true;
   }
 
+  // return true if event passed L3 selection (of there was no L3 defined)
+  bool l3accept(Pds::Xtc* xtc)
+  {
+    XtcInput::XtcIterator iter(xtc);
+    while (Pds::Xtc* x = iter.next()) {
+      if (x->damage.value() == 0 and x->contains.id() == Pds::TypeId::Id_L3TData) {
+        if (x->contains.version() == 1) {
+          const Pds::L3T::DataV1* l3t = (Pds::L3T::DataV1*)x->payload();
+          return l3t->accept();
+        }
+      }
+    }
+    // No L3T info means passed
+    return true;
+  }
+
 }
 
 
@@ -81,6 +98,7 @@ XtcInputModuleBase::XtcInputModuleBase (const std::string& name)
   , m_skipEvents(0)
   , m_maxEvents(0)
   , m_skipEpics(false)
+  , m_l3tAcceptOnly(true)
   , m_l1Count(0)
   , m_simulateEOR(0)
 {
@@ -91,6 +109,7 @@ XtcInputModuleBase::XtcInputModuleBase (const std::string& name)
   m_skipEvents = cfg.get("psana", "skip-events", 0UL);
   m_maxEvents = cfg.get("psana", "events", 0UL);
   m_skipEpics = cfg.get("psana", "skip-epics", true);
+  m_l3tAcceptOnly = cfg.get("psana", "l3t-accept-only", true);
 }
 
 //--------------
@@ -249,7 +268,13 @@ XtcInputModuleBase::event(Event& evt, Env& env)
     case Pds::TransitionId::L1Accept:
       // regular event
 
-      if (m_skipEpics and ::epicsOnly(&(dg.dg()->xtc))) {
+      if (m_l3tAcceptOnly and not ::l3accept(&(dg.dg()->xtc))) {
+
+        // did not pass L3, its payload is usually empty but if there is Epics
+        // data in the event it may be preserved, so try to save it
+        fillEnv(dg, env);
+
+      } else if (m_skipEpics and ::epicsOnly(&(dg.dg()->xtc))) {
 
         // datagram is likely filtered, has only epics data and users do not need to
         // see it. Do not count it as an event too, just save EPICS data and move on.

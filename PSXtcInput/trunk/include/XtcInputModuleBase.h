@@ -105,6 +105,7 @@ private:
   unsigned long m_skipEvents;                         ///< Number of events (L1Accept transitions) to skip
   unsigned long m_maxEvents;                          ///< Number of events (L1Accept transitions) to process
   bool m_skipEpics;                                   ///< If true then skip EPICS-only events
+  bool m_l3tAcceptOnly;                               ///< If true then pass only events accepted by L3T
   unsigned long m_l1Count;                            ///< Number of events (L1Accept transitions) seen so far
   int m_simulateEOR;                                  ///< if non-zero then simulate endRun/stop
 };
