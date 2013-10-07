@@ -47,6 +47,7 @@ from Logger               import logger
 from FileNameManager      import fnm
 from GUIConfig            import * 
 from GUIDark              import * 
+from GUIMaskEditor        import * 
 
 
 #from GUIDark              import * 
@@ -247,7 +248,7 @@ class GUITabs ( QtGui.QWidget ) :
             self.gui_win = QtGui.QTextEdit() # GUIDark(self)
 
         elif cp.current_tab.value() == self.list_of_tabs[2] :
-            self.gui_win = QtGui.QTextEdit()
+            self.gui_win = GUIMaskEditor(self)
 
         elif cp.current_tab.value() == self.list_of_tabs[3] :
             self.gui_win = QtGui.QTextEdit()
