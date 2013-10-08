@@ -412,6 +412,11 @@ O2OHdf5Writer::configObject(const void* data, size_t size, const Pds::TypeId& ty
       if (cfg.uses_events()) events = cfg.events();
       break;
     }
+    case 3: {
+      const Pds::ControlData::ConfigV3& cfg = *static_cast<const Pds::ControlData::ConfigV3*>(data);
+      if (cfg.uses_events() or cfg.uses_l3t_events()) events = cfg.events();
+      break;
+    }
     default:
       MsgLog(logger, warning, "Unexpected version of ControlData::Config object, chunk size estimate will not work");
       break;
