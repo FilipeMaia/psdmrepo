@@ -91,12 +91,12 @@ void make_datasets_DiodeFexConfigV1_v0(const Psana::Lusi::DiodeFexConfigV1& obj,
   }
 }
 
-void store_DiodeFexConfigV1_v0(const Psana::Lusi::DiodeFexConfigV1& obj, hdf5pp::Group group, bool append)
+void store_DiodeFexConfigV1_v0(const Psana::Lusi::DiodeFexConfigV1& obj, hdf5pp::Group group, long index, bool append)
 {
   {
     Lusi::ns_DiodeFexConfigV1_v0::dataset_config ds_data(obj);
     if (append) {
-      hdf5pp::Utils::append(group, "config", ds_data);
+      hdf5pp::Utils::storeAt(group, "config", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "config", ds_data);
     }
@@ -125,12 +125,12 @@ void make_datasets(const Psana::Lusi::DiodeFexConfigV1& obj, hdf5pp::Group group
   }
 }
 
-void store_DiodeFexConfigV1(const Psana::Lusi::DiodeFexConfigV1& obj, hdf5pp::Group group, int version, bool append)
+void store_DiodeFexConfigV1(const Psana::Lusi::DiodeFexConfigV1& obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    store_DiodeFexConfigV1_v0(obj, group, append);
+    store_DiodeFexConfigV1_v0(obj, group, index, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Lusi.DiodeFexConfigV1", version);
@@ -139,12 +139,12 @@ void store_DiodeFexConfigV1(const Psana::Lusi::DiodeFexConfigV1& obj, hdf5pp::Gr
 
 void store(const Psana::Lusi::DiodeFexConfigV1& obj, hdf5pp::Group group, int version) 
 {
-  store_DiodeFexConfigV1(obj, group, version, false);
+  store_DiodeFexConfigV1(obj, group, 0, version, false);
 }
 
-void append(const Psana::Lusi::DiodeFexConfigV1& obj, hdf5pp::Group group, int version)
+void store_at(const Psana::Lusi::DiodeFexConfigV1& obj, hdf5pp::Group group, long index, int version)
 {
-  store_DiodeFexConfigV1(obj, group, version, true);
+  store_DiodeFexConfigV1(obj, group, index, version, true);
 }
 
 
@@ -226,12 +226,12 @@ void make_datasets_DiodeFexConfigV2_v0(const Psana::Lusi::DiodeFexConfigV2& obj,
   }
 }
 
-void store_DiodeFexConfigV2_v0(const Psana::Lusi::DiodeFexConfigV2& obj, hdf5pp::Group group, bool append)
+void store_DiodeFexConfigV2_v0(const Psana::Lusi::DiodeFexConfigV2& obj, hdf5pp::Group group, long index, bool append)
 {
   {
     Lusi::ns_DiodeFexConfigV2_v0::dataset_config ds_data(obj);
     if (append) {
-      hdf5pp::Utils::append(group, "config", ds_data);
+      hdf5pp::Utils::storeAt(group, "config", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "config", ds_data);
     }
@@ -260,12 +260,12 @@ void make_datasets(const Psana::Lusi::DiodeFexConfigV2& obj, hdf5pp::Group group
   }
 }
 
-void store_DiodeFexConfigV2(const Psana::Lusi::DiodeFexConfigV2& obj, hdf5pp::Group group, int version, bool append)
+void store_DiodeFexConfigV2(const Psana::Lusi::DiodeFexConfigV2& obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    store_DiodeFexConfigV2_v0(obj, group, append);
+    store_DiodeFexConfigV2_v0(obj, group, index, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Lusi.DiodeFexConfigV2", version);
@@ -274,12 +274,12 @@ void store_DiodeFexConfigV2(const Psana::Lusi::DiodeFexConfigV2& obj, hdf5pp::Gr
 
 void store(const Psana::Lusi::DiodeFexConfigV2& obj, hdf5pp::Group group, int version) 
 {
-  store_DiodeFexConfigV2(obj, group, version, false);
+  store_DiodeFexConfigV2(obj, group, 0, version, false);
 }
 
-void append(const Psana::Lusi::DiodeFexConfigV2& obj, hdf5pp::Group group, int version)
+void store_at(const Psana::Lusi::DiodeFexConfigV2& obj, hdf5pp::Group group, long index, int version)
 {
-  store_DiodeFexConfigV2(obj, group, version, true);
+  store_DiodeFexConfigV2(obj, group, index, version, true);
 }
 
 
@@ -344,12 +344,12 @@ void make_datasets_DiodeFexV1_v0(const Psana::Lusi::DiodeFexV1& obj,
   }
 }
 
-void store_DiodeFexV1_v0(const Psana::Lusi::DiodeFexV1& obj, hdf5pp::Group group, bool append)
+void store_DiodeFexV1_v0(const Psana::Lusi::DiodeFexV1& obj, hdf5pp::Group group, long index, bool append)
 {
   {
     Lusi::ns_DiodeFexV1_v0::dataset_data ds_data(obj);
     if (append) {
-      hdf5pp::Utils::append(group, "data", ds_data);
+      hdf5pp::Utils::storeAt(group, "data", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "data", ds_data);
     }
@@ -378,12 +378,12 @@ void make_datasets(const Psana::Lusi::DiodeFexV1& obj, hdf5pp::Group group, hsiz
   }
 }
 
-void store_DiodeFexV1(const Psana::Lusi::DiodeFexV1& obj, hdf5pp::Group group, int version, bool append)
+void store_DiodeFexV1(const Psana::Lusi::DiodeFexV1& obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    store_DiodeFexV1_v0(obj, group, append);
+    store_DiodeFexV1_v0(obj, group, index, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Lusi.DiodeFexV1", version);
@@ -392,12 +392,12 @@ void store_DiodeFexV1(const Psana::Lusi::DiodeFexV1& obj, hdf5pp::Group group, i
 
 void store(const Psana::Lusi::DiodeFexV1& obj, hdf5pp::Group group, int version) 
 {
-  store_DiodeFexV1(obj, group, version, false);
+  store_DiodeFexV1(obj, group, 0, version, false);
 }
 
-void append(const Psana::Lusi::DiodeFexV1& obj, hdf5pp::Group group, int version)
+void store_at(const Psana::Lusi::DiodeFexV1& obj, hdf5pp::Group group, long index, int version)
 {
-  store_DiodeFexV1(obj, group, version, true);
+  store_DiodeFexV1(obj, group, index, version, true);
 }
 
 
@@ -490,12 +490,12 @@ void make_datasets_IpmFexConfigV1_v0(const Psana::Lusi::IpmFexConfigV1& obj,
   }
 }
 
-void store_IpmFexConfigV1_v0(const Psana::Lusi::IpmFexConfigV1& obj, hdf5pp::Group group, bool append)
+void store_IpmFexConfigV1_v0(const Psana::Lusi::IpmFexConfigV1& obj, hdf5pp::Group group, long index, bool append)
 {
   {
     Lusi::ns_IpmFexConfigV1_v0::dataset_config ds_data(obj);
     if (append) {
-      hdf5pp::Utils::append(group, "config", ds_data);
+      hdf5pp::Utils::storeAt(group, "config", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "config", ds_data);
     }
@@ -524,12 +524,12 @@ void make_datasets(const Psana::Lusi::IpmFexConfigV1& obj, hdf5pp::Group group, 
   }
 }
 
-void store_IpmFexConfigV1(const Psana::Lusi::IpmFexConfigV1& obj, hdf5pp::Group group, int version, bool append)
+void store_IpmFexConfigV1(const Psana::Lusi::IpmFexConfigV1& obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    store_IpmFexConfigV1_v0(obj, group, append);
+    store_IpmFexConfigV1_v0(obj, group, index, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Lusi.IpmFexConfigV1", version);
@@ -538,12 +538,12 @@ void store_IpmFexConfigV1(const Psana::Lusi::IpmFexConfigV1& obj, hdf5pp::Group 
 
 void store(const Psana::Lusi::IpmFexConfigV1& obj, hdf5pp::Group group, int version) 
 {
-  store_IpmFexConfigV1(obj, group, version, false);
+  store_IpmFexConfigV1(obj, group, 0, version, false);
 }
 
-void append(const Psana::Lusi::IpmFexConfigV1& obj, hdf5pp::Group group, int version)
+void store_at(const Psana::Lusi::IpmFexConfigV1& obj, hdf5pp::Group group, long index, int version)
 {
-  store_IpmFexConfigV1(obj, group, version, true);
+  store_IpmFexConfigV1(obj, group, index, version, true);
 }
 
 
@@ -636,12 +636,12 @@ void make_datasets_IpmFexConfigV2_v0(const Psana::Lusi::IpmFexConfigV2& obj,
   }
 }
 
-void store_IpmFexConfigV2_v0(const Psana::Lusi::IpmFexConfigV2& obj, hdf5pp::Group group, bool append)
+void store_IpmFexConfigV2_v0(const Psana::Lusi::IpmFexConfigV2& obj, hdf5pp::Group group, long index, bool append)
 {
   {
     Lusi::ns_IpmFexConfigV2_v0::dataset_config ds_data(obj);
     if (append) {
-      hdf5pp::Utils::append(group, "config", ds_data);
+      hdf5pp::Utils::storeAt(group, "config", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "config", ds_data);
     }
@@ -670,12 +670,12 @@ void make_datasets(const Psana::Lusi::IpmFexConfigV2& obj, hdf5pp::Group group, 
   }
 }
 
-void store_IpmFexConfigV2(const Psana::Lusi::IpmFexConfigV2& obj, hdf5pp::Group group, int version, bool append)
+void store_IpmFexConfigV2(const Psana::Lusi::IpmFexConfigV2& obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    store_IpmFexConfigV2_v0(obj, group, append);
+    store_IpmFexConfigV2_v0(obj, group, index, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Lusi.IpmFexConfigV2", version);
@@ -684,12 +684,12 @@ void store_IpmFexConfigV2(const Psana::Lusi::IpmFexConfigV2& obj, hdf5pp::Group 
 
 void store(const Psana::Lusi::IpmFexConfigV2& obj, hdf5pp::Group group, int version) 
 {
-  store_IpmFexConfigV2(obj, group, version, false);
+  store_IpmFexConfigV2(obj, group, 0, version, false);
 }
 
-void append(const Psana::Lusi::IpmFexConfigV2& obj, hdf5pp::Group group, int version)
+void store_at(const Psana::Lusi::IpmFexConfigV2& obj, hdf5pp::Group group, long index, int version)
 {
-  store_IpmFexConfigV2(obj, group, version, true);
+  store_IpmFexConfigV2(obj, group, index, version, true);
 }
 
 
@@ -770,12 +770,12 @@ void make_datasets_IpmFexV1_v0(const Psana::Lusi::IpmFexV1& obj,
   }
 }
 
-void store_IpmFexV1_v0(const Psana::Lusi::IpmFexV1& obj, hdf5pp::Group group, bool append)
+void store_IpmFexV1_v0(const Psana::Lusi::IpmFexV1& obj, hdf5pp::Group group, long index, bool append)
 {
   {
     Lusi::ns_IpmFexV1_v0::dataset_data ds_data(obj);
     if (append) {
-      hdf5pp::Utils::append(group, "data", ds_data);
+      hdf5pp::Utils::storeAt(group, "data", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "data", ds_data);
     }
@@ -804,12 +804,12 @@ void make_datasets(const Psana::Lusi::IpmFexV1& obj, hdf5pp::Group group, hsize_
   }
 }
 
-void store_IpmFexV1(const Psana::Lusi::IpmFexV1& obj, hdf5pp::Group group, int version, bool append)
+void store_IpmFexV1(const Psana::Lusi::IpmFexV1& obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    store_IpmFexV1_v0(obj, group, append);
+    store_IpmFexV1_v0(obj, group, index, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Lusi.IpmFexV1", version);
@@ -818,12 +818,12 @@ void store_IpmFexV1(const Psana::Lusi::IpmFexV1& obj, hdf5pp::Group group, int v
 
 void store(const Psana::Lusi::IpmFexV1& obj, hdf5pp::Group group, int version) 
 {
-  store_IpmFexV1(obj, group, version, false);
+  store_IpmFexV1(obj, group, 0, version, false);
 }
 
-void append(const Psana::Lusi::IpmFexV1& obj, hdf5pp::Group group, int version)
+void store_at(const Psana::Lusi::IpmFexV1& obj, hdf5pp::Group group, long index, int version)
 {
-  store_IpmFexV1(obj, group, version, true);
+  store_IpmFexV1(obj, group, index, version, true);
 }
 
 
@@ -891,12 +891,12 @@ void make_datasets_PimImageConfigV1_v0(const Psana::Lusi::PimImageConfigV1& obj,
   }
 }
 
-void store_PimImageConfigV1_v0(const Psana::Lusi::PimImageConfigV1& obj, hdf5pp::Group group, bool append)
+void store_PimImageConfigV1_v0(const Psana::Lusi::PimImageConfigV1& obj, hdf5pp::Group group, long index, bool append)
 {
   {
     Lusi::ns_PimImageConfigV1_v0::dataset_config ds_data(obj);
     if (append) {
-      hdf5pp::Utils::append(group, "config", ds_data);
+      hdf5pp::Utils::storeAt(group, "config", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "config", ds_data);
     }
@@ -925,12 +925,12 @@ void make_datasets(const Psana::Lusi::PimImageConfigV1& obj, hdf5pp::Group group
   }
 }
 
-void store_PimImageConfigV1(const Psana::Lusi::PimImageConfigV1& obj, hdf5pp::Group group, int version, bool append)
+void store_PimImageConfigV1(const Psana::Lusi::PimImageConfigV1& obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    store_PimImageConfigV1_v0(obj, group, append);
+    store_PimImageConfigV1_v0(obj, group, index, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Lusi.PimImageConfigV1", version);
@@ -939,12 +939,12 @@ void store_PimImageConfigV1(const Psana::Lusi::PimImageConfigV1& obj, hdf5pp::Gr
 
 void store(const Psana::Lusi::PimImageConfigV1& obj, hdf5pp::Group group, int version) 
 {
-  store_PimImageConfigV1(obj, group, version, false);
+  store_PimImageConfigV1(obj, group, 0, version, false);
 }
 
-void append(const Psana::Lusi::PimImageConfigV1& obj, hdf5pp::Group group, int version)
+void store_at(const Psana::Lusi::PimImageConfigV1& obj, hdf5pp::Group group, long index, int version)
 {
-  store_PimImageConfigV1(obj, group, version, true);
+  store_PimImageConfigV1(obj, group, index, version, true);
 }
 
 } // namespace Lusi

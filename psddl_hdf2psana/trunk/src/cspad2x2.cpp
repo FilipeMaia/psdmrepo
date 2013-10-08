@@ -98,8 +98,20 @@ ns_ElementV1_v0::dataset_element::dataset_element()
 {
 }
 
-ns_ElementV1_v0::dataset_element::~dataset_element()
+ns_ElementV1_v0::dataset_element::dataset_element(const Psana::CsPad2x2::ElementV1& psanaobj)
+  : virtual_channel(psanaobj.virtual_channel())
+  , lane(psanaobj.lane())
+  , tid(psanaobj.tid())
+  , acq_count(psanaobj.acq_count())
+  , op_code(psanaobj.op_code())
+  , quad(psanaobj.quad())
+  , seq_count(psanaobj.seq_count())
+  , ticks(psanaobj.ticks())
+  , fiducials(psanaobj.fiducials())
+  , frame_type(psanaobj.frame_type())
 {
+  ndarray<const uint16_t, 1> sb_temp = psanaobj.sb_temp();
+  std::copy(sb_temp.begin(), sb_temp.end(), this->sb_temp);
 }
 
 uint32_t
@@ -205,12 +217,51 @@ ElementV1_v0::read_ds_cm() const {
 void make_datasets_ElementV1_v0(const Psana::CsPad2x2::ElementV1& obj,
       hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
 {
-
+  {
+    hdf5pp::Type dstype = hdf5pp::TypeTraits<ns_ElementV1_v0::dataset_element>::stored_type();
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "element", dstype, chunk_size, chunk_cache_size, deflate, shuffle);
+  }
+  {
+    hsize_t dims[3] = {Psana::CsPad2x2::ColumnsPerASIC, Psana::CsPad2x2::MaxRowsPerASIC*2, 2};
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<int16_t>::stored_type(), 3, dims);
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);
+  }
+  {
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<float>::stored_type(), 2);
+    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
+    hdf5pp::Utils::createDataset(group, "common_mode", dstype, chunk_size, chunk_cache_size, deflate, shuffle);
+  }
 }
 
-void store_ElementV1_v0(const Psana::CsPad2x2::ElementV1& obj, hdf5pp::Group group, bool append)
+void store_ElementV1_v0(const Psana::CsPad2x2::ElementV1& obj, hdf5pp::Group group, long index, bool append)
 {
-    
+  {
+    ns_ElementV1_v0::dataset_element data(obj);
+    if (append) {
+      hdf5pp::Utils::storeAt(group, "element", data, index);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "element", data);
+    }
+  }
+  {
+    if (append) {
+      hdf5pp::Utils::storeNDArrayAt(group, "data", obj.data(), index);
+    } else {
+      hdf5pp::Utils::storeNDArray(group, "data", obj.data());
+    }
+  }
+  {
+    ndarray<float, 1> data = make_ndarray<float>(2);
+    data[0] = obj.common_mode(0);
+    data[1] = obj.common_mode(1);
+    if (append) {
+      hdf5pp::Utils::storeNDArrayAt(group, "common_mode", data, index);
+    } else {
+      hdf5pp::Utils::storeNDArray(group, "common_mode", data);
+    }
+  }
 }
 
 } // namespace CsPad2x2

@@ -38,33 +38,6 @@ struct dataset_data {
 
 };
 }
-class Proxy_PulseConfig_v0 : public PSEvt::Proxy<Psana::EvrData::PulseConfig> {
-public:
-  typedef Psana::EvrData::PulseConfig PsanaType;
-
-  Proxy_PulseConfig_v0(hdf5pp::Group group, hsize_t idx) : m_group(group), m_idx(idx) {}
-  virtual ~Proxy_PulseConfig_v0() {}
-
-protected:
-
-  virtual boost::shared_ptr<PsanaType> getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key);
-
-private:
-
-  mutable hdf5pp::Group m_group;
-  hsize_t m_idx;
-  boost::shared_ptr<PsanaType> m_data;
-};
-boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::PulseConfig> > make_PulseConfig(int version, hdf5pp::Group group, hsize_t idx);
-
-/// Store object as a single instance (scalar dataset) inside specified group.
-void store(const Psana::EvrData::PulseConfig& obj, hdf5pp::Group group, int version = -1);
-/// Create container (rank=1) datasets for storing objects of specified type.
-void make_datasets(const Psana::EvrData::PulseConfig& obj, hdf5pp::Group group, hsize_t chunk_size,
-                   int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const Psana::EvrData::PulseConfig& obj, hdf5pp::Group group, int version = -1);
-
 
 namespace ns_PulseConfigV3_v0 {
 struct dataset_data {
@@ -85,33 +58,6 @@ struct dataset_data {
 
 };
 }
-class Proxy_PulseConfigV3_v0 : public PSEvt::Proxy<Psana::EvrData::PulseConfigV3> {
-public:
-  typedef Psana::EvrData::PulseConfigV3 PsanaType;
-
-  Proxy_PulseConfigV3_v0(hdf5pp::Group group, hsize_t idx) : m_group(group), m_idx(idx) {}
-  virtual ~Proxy_PulseConfigV3_v0() {}
-
-protected:
-
-  virtual boost::shared_ptr<PsanaType> getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key);
-
-private:
-
-  mutable hdf5pp::Group m_group;
-  hsize_t m_idx;
-  boost::shared_ptr<PsanaType> m_data;
-};
-boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::PulseConfigV3> > make_PulseConfigV3(int version, hdf5pp::Group group, hsize_t idx);
-
-/// Store object as a single instance (scalar dataset) inside specified group.
-void store(const Psana::EvrData::PulseConfigV3& obj, hdf5pp::Group group, int version = -1);
-/// Create container (rank=1) datasets for storing objects of specified type.
-void make_datasets(const Psana::EvrData::PulseConfigV3& obj, hdf5pp::Group group, hsize_t chunk_size,
-                   int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const Psana::EvrData::PulseConfigV3& obj, hdf5pp::Group group, int version = -1);
-
 
 namespace ns_EventCodeV3_v0 {
 struct dataset_data {
@@ -134,33 +80,6 @@ struct dataset_data {
 
 };
 }
-class Proxy_EventCodeV3_v0 : public PSEvt::Proxy<Psana::EvrData::EventCodeV3> {
-public:
-  typedef Psana::EvrData::EventCodeV3 PsanaType;
-
-  Proxy_EventCodeV3_v0(hdf5pp::Group group, hsize_t idx) : m_group(group), m_idx(idx) {}
-  virtual ~Proxy_EventCodeV3_v0() {}
-
-protected:
-
-  virtual boost::shared_ptr<PsanaType> getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key);
-
-private:
-
-  mutable hdf5pp::Group m_group;
-  hsize_t m_idx;
-  boost::shared_ptr<PsanaType> m_data;
-};
-boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::EventCodeV3> > make_EventCodeV3(int version, hdf5pp::Group group, hsize_t idx);
-
-/// Store object as a single instance (scalar dataset) inside specified group.
-void store(const Psana::EvrData::EventCodeV3& obj, hdf5pp::Group group, int version = -1);
-/// Create container (rank=1) datasets for storing objects of specified type.
-void make_datasets(const Psana::EvrData::EventCodeV3& obj, hdf5pp::Group group, hsize_t chunk_size,
-                   int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const Psana::EvrData::EventCodeV3& obj, hdf5pp::Group group, int version = -1);
-
 
 namespace ns_EventCodeV4_v0 {
 struct dataset_data {
@@ -185,33 +104,6 @@ struct dataset_data {
 
 };
 }
-class Proxy_EventCodeV4_v0 : public PSEvt::Proxy<Psana::EvrData::EventCodeV4> {
-public:
-  typedef Psana::EvrData::EventCodeV4 PsanaType;
-
-  Proxy_EventCodeV4_v0(hdf5pp::Group group, hsize_t idx) : m_group(group), m_idx(idx) {}
-  virtual ~Proxy_EventCodeV4_v0() {}
-
-protected:
-
-  virtual boost::shared_ptr<PsanaType> getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key);
-
-private:
-
-  mutable hdf5pp::Group m_group;
-  hsize_t m_idx;
-  boost::shared_ptr<PsanaType> m_data;
-};
-boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::EventCodeV4> > make_EventCodeV4(int version, hdf5pp::Group group, hsize_t idx);
-
-/// Store object as a single instance (scalar dataset) inside specified group.
-void store(const Psana::EvrData::EventCodeV4& obj, hdf5pp::Group group, int version = -1);
-/// Create container (rank=1) datasets for storing objects of specified type.
-void make_datasets(const Psana::EvrData::EventCodeV4& obj, hdf5pp::Group group, hsize_t chunk_size,
-                   int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const Psana::EvrData::EventCodeV4& obj, hdf5pp::Group group, int version = -1);
-
 
 namespace ns_EventCodeV5_v0 {
 struct dataset_data {
@@ -238,33 +130,6 @@ struct dataset_data {
 
 };
 }
-class Proxy_EventCodeV5_v0 : public PSEvt::Proxy<Psana::EvrData::EventCodeV5> {
-public:
-  typedef Psana::EvrData::EventCodeV5 PsanaType;
-
-  Proxy_EventCodeV5_v0(hdf5pp::Group group, hsize_t idx) : m_group(group), m_idx(idx) {}
-  virtual ~Proxy_EventCodeV5_v0() {}
-
-protected:
-
-  virtual boost::shared_ptr<PsanaType> getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key);
-
-private:
-
-  mutable hdf5pp::Group m_group;
-  hsize_t m_idx;
-  boost::shared_ptr<PsanaType> m_data;
-};
-boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::EventCodeV5> > make_EventCodeV5(int version, hdf5pp::Group group, hsize_t idx);
-
-/// Store object as a single instance (scalar dataset) inside specified group.
-void store(const Psana::EvrData::EventCodeV5& obj, hdf5pp::Group group, int version = -1);
-/// Create container (rank=1) datasets for storing objects of specified type.
-void make_datasets(const Psana::EvrData::EventCodeV5& obj, hdf5pp::Group group, hsize_t chunk_size,
-                   int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const Psana::EvrData::EventCodeV5& obj, hdf5pp::Group group, int version = -1);
-
 
 namespace ns_EventCodeV6_v0 {
 struct dataset_data {
@@ -292,33 +157,6 @@ struct dataset_data {
 
 };
 }
-class Proxy_EventCodeV6_v0 : public PSEvt::Proxy<Psana::EvrData::EventCodeV6> {
-public:
-  typedef Psana::EvrData::EventCodeV6 PsanaType;
-
-  Proxy_EventCodeV6_v0(hdf5pp::Group group, hsize_t idx) : m_group(group), m_idx(idx) {}
-  virtual ~Proxy_EventCodeV6_v0() {}
-
-protected:
-
-  virtual boost::shared_ptr<PsanaType> getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key);
-
-private:
-
-  mutable hdf5pp::Group m_group;
-  hsize_t m_idx;
-  boost::shared_ptr<PsanaType> m_data;
-};
-boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::EventCodeV6> > make_EventCodeV6(int version, hdf5pp::Group group, hsize_t idx);
-
-/// Store object as a single instance (scalar dataset) inside specified group.
-void store(const Psana::EvrData::EventCodeV6& obj, hdf5pp::Group group, int version = -1);
-/// Create container (rank=1) datasets for storing objects of specified type.
-void make_datasets(const Psana::EvrData::EventCodeV6& obj, hdf5pp::Group group, hsize_t chunk_size,
-                   int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const Psana::EvrData::EventCodeV6& obj, hdf5pp::Group group, int version = -1);
-
 
 namespace ns_OutputMap_v0 {
 struct dataset_data {
@@ -405,8 +243,9 @@ void store(const Psana::EvrData::ConfigV1& obj, hdf5pp::Group group, int version
 /// Create container (rank=1) datasets for storing objects of specified type.
 void make_datasets(const Psana::EvrData::ConfigV1& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const Psana::EvrData::ConfigV1& obj, hdf5pp::Group group, int version = -1);
+/// Add one more object to the containers created by previous method at the specified index,
+/// negative index means append to the end of dataset.
+void store_at(const Psana::EvrData::ConfigV1& obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 
 namespace ns_ConfigV2_v0 {
@@ -461,8 +300,9 @@ void store(const Psana::EvrData::ConfigV2& obj, hdf5pp::Group group, int version
 /// Create container (rank=1) datasets for storing objects of specified type.
 void make_datasets(const Psana::EvrData::ConfigV2& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const Psana::EvrData::ConfigV2& obj, hdf5pp::Group group, int version = -1);
+/// Add one more object to the containers created by previous method at the specified index,
+/// negative index means append to the end of dataset.
+void store_at(const Psana::EvrData::ConfigV2& obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 
 namespace ns_ConfigV3_v0 {
@@ -516,8 +356,9 @@ void store(const Psana::EvrData::ConfigV3& obj, hdf5pp::Group group, int version
 /// Create container (rank=1) datasets for storing objects of specified type.
 void make_datasets(const Psana::EvrData::ConfigV3& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const Psana::EvrData::ConfigV3& obj, hdf5pp::Group group, int version = -1);
+/// Add one more object to the containers created by previous method at the specified index,
+/// negative index means append to the end of dataset.
+void store_at(const Psana::EvrData::ConfigV3& obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 
 namespace ns_ConfigV4_v0 {
@@ -571,8 +412,9 @@ void store(const Psana::EvrData::ConfigV4& obj, hdf5pp::Group group, int version
 /// Create container (rank=1) datasets for storing objects of specified type.
 void make_datasets(const Psana::EvrData::ConfigV4& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const Psana::EvrData::ConfigV4& obj, hdf5pp::Group group, int version = -1);
+/// Add one more object to the containers created by previous method at the specified index,
+/// negative index means append to the end of dataset.
+void store_at(const Psana::EvrData::ConfigV4& obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 
 namespace ns_SequencerEntry_v0 {
@@ -591,33 +433,6 @@ struct dataset_data {
 
 };
 }
-class Proxy_SequencerEntry_v0 : public PSEvt::Proxy<Psana::EvrData::SequencerEntry> {
-public:
-  typedef Psana::EvrData::SequencerEntry PsanaType;
-
-  Proxy_SequencerEntry_v0(hdf5pp::Group group, hsize_t idx) : m_group(group), m_idx(idx) {}
-  virtual ~Proxy_SequencerEntry_v0() {}
-
-protected:
-
-  virtual boost::shared_ptr<PsanaType> getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key);
-
-private:
-
-  mutable hdf5pp::Group m_group;
-  hsize_t m_idx;
-  boost::shared_ptr<PsanaType> m_data;
-};
-boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::SequencerEntry> > make_SequencerEntry(int version, hdf5pp::Group group, hsize_t idx);
-
-/// Store object as a single instance (scalar dataset) inside specified group.
-void store(const Psana::EvrData::SequencerEntry& obj, hdf5pp::Group group, int version = -1);
-/// Create container (rank=1) datasets for storing objects of specified type.
-void make_datasets(const Psana::EvrData::SequencerEntry& obj, hdf5pp::Group group, hsize_t chunk_size,
-                   int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const Psana::EvrData::SequencerEntry& obj, hdf5pp::Group group, int version = -1);
-
 
 namespace ns_SequencerConfigV1_v0 {
 struct dataset_config {
@@ -720,8 +535,9 @@ void store(const Psana::EvrData::ConfigV5& obj, hdf5pp::Group group, int version
 /// Create container (rank=1) datasets for storing objects of specified type.
 void make_datasets(const Psana::EvrData::ConfigV5& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const Psana::EvrData::ConfigV5& obj, hdf5pp::Group group, int version = -1);
+/// Add one more object to the containers created by previous method at the specified index,
+/// negative index means append to the end of dataset.
+void store_at(const Psana::EvrData::ConfigV5& obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 
 namespace ns_ConfigV6_v0 {
@@ -779,8 +595,9 @@ void store(const Psana::EvrData::ConfigV6& obj, hdf5pp::Group group, int version
 /// Create container (rank=1) datasets for storing objects of specified type.
 void make_datasets(const Psana::EvrData::ConfigV6& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const Psana::EvrData::ConfigV6& obj, hdf5pp::Group group, int version = -1);
+/// Add one more object to the containers created by previous method at the specified index,
+/// negative index means append to the end of dataset.
+void store_at(const Psana::EvrData::ConfigV6& obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 
 namespace ns_ConfigV7_v0 {
@@ -838,8 +655,9 @@ void store(const Psana::EvrData::ConfigV7& obj, hdf5pp::Group group, int version
 /// Create container (rank=1) datasets for storing objects of specified type.
 void make_datasets(const Psana::EvrData::ConfigV7& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const Psana::EvrData::ConfigV7& obj, hdf5pp::Group group, int version = -1);
+/// Add one more object to the containers created by previous method at the specified index,
+/// negative index means append to the end of dataset.
+void store_at(const Psana::EvrData::ConfigV7& obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 
 namespace ns_FIFOEvent_v0 {
@@ -859,33 +677,6 @@ struct dataset_data {
 
 };
 }
-class Proxy_FIFOEvent_v0 : public PSEvt::Proxy<Psana::EvrData::FIFOEvent> {
-public:
-  typedef Psana::EvrData::FIFOEvent PsanaType;
-
-  Proxy_FIFOEvent_v0(hdf5pp::Group group, hsize_t idx) : m_group(group), m_idx(idx) {}
-  virtual ~Proxy_FIFOEvent_v0() {}
-
-protected:
-
-  virtual boost::shared_ptr<PsanaType> getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key);
-
-private:
-
-  mutable hdf5pp::Group m_group;
-  hsize_t m_idx;
-  boost::shared_ptr<PsanaType> m_data;
-};
-boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::FIFOEvent> > make_FIFOEvent(int version, hdf5pp::Group group, hsize_t idx);
-
-/// Store object as a single instance (scalar dataset) inside specified group.
-void store(const Psana::EvrData::FIFOEvent& obj, hdf5pp::Group group, int version = -1);
-/// Create container (rank=1) datasets for storing objects of specified type.
-void make_datasets(const Psana::EvrData::FIFOEvent& obj, hdf5pp::Group group, hsize_t chunk_size,
-                   int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const Psana::EvrData::FIFOEvent& obj, hdf5pp::Group group, int version = -1);
-
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::DataV3> > make_DataV3(int version, hdf5pp::Group group, hsize_t idx);
 
 /// Store object as a single instance (scalar dataset) inside specified group.
@@ -893,8 +684,9 @@ void store(const Psana::EvrData::DataV3& obj, hdf5pp::Group group, int version =
 /// Create container (rank=1) datasets for storing objects of specified type.
 void make_datasets(const Psana::EvrData::DataV3& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const Psana::EvrData::DataV3& obj, hdf5pp::Group group, int version = -1);
+/// Add one more object to the containers created by previous method at the specified index,
+/// negative index means append to the end of dataset.
+void store_at(const Psana::EvrData::DataV3& obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::IOConfigV1> > make_IOConfigV1(int version, hdf5pp::Group group, hsize_t idx);
 
@@ -903,8 +695,9 @@ void store(const Psana::EvrData::IOConfigV1& obj, hdf5pp::Group group, int versi
 /// Create container (rank=1) datasets for storing objects of specified type.
 void make_datasets(const Psana::EvrData::IOConfigV1& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const Psana::EvrData::IOConfigV1& obj, hdf5pp::Group group, int version = -1);
+/// Add one more object to the containers created by previous method at the specified index,
+/// negative index means append to the end of dataset.
+void store_at(const Psana::EvrData::IOConfigV1& obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 } // namespace EvrData
 } // namespace psddl_hdf2psana

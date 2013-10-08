@@ -87,7 +87,7 @@ private:
 
 void make_datasets_DataDescV1_v0(const Psana::Acqiris::DataDescV1& obj,
       hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle);
-void store_DataDescV1_v0(const Psana::Acqiris::DataDescV1& obj, hdf5pp::Group group, bool append);
+void store_DataDescV1_v0(const Psana::Acqiris::DataDescV1& obj, hdf5pp::Group group, long index, bool append);
 
 
 namespace ns_DataDescV1Elem_v1 {
@@ -164,7 +164,7 @@ private:
 
 void make_datasets_DataDescV1_v1(const Psana::Acqiris::DataDescV1& obj,
       hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle);
-void store_DataDescV1_v1(const Psana::Acqiris::DataDescV1& obj, hdf5pp::Group group, bool append);
+void store_DataDescV1_v1(const Psana::Acqiris::DataDescV1& obj, hdf5pp::Group group, long index, bool append);
 
 
 } // namespace Acqiris

@@ -42,7 +42,7 @@ struct dataset_element {
   static hdf5pp::Type stored_type();
 
   dataset_element();
-  ~dataset_element();
+  dataset_element(const Psana::CsPad2x2::ElementV1& psanaobj);
 
   uint32_t virtual_channel;
   uint32_t lane;
@@ -104,7 +104,7 @@ private:
 
 void make_datasets_ElementV1_v0(const Psana::CsPad2x2::ElementV1& obj,
       hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle);
-void store_ElementV1_v0(const Psana::CsPad2x2::ElementV1& obj, hdf5pp::Group group, bool append);
+void store_ElementV1_v0(const Psana::CsPad2x2::ElementV1& obj, hdf5pp::Group group, long index, bool append);
 
 } // namespace CsPad2x2
 } // namespace psddl_hdf2psana

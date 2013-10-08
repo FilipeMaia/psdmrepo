@@ -111,7 +111,7 @@ void make_datasets_DataV1_v0(const Psana::CsPad::DataV1& obj,
   }
 }
 
-void store_DataV1_v0(const Psana::CsPad::DataV1& obj, hdf5pp::Group group, bool append)
+void store_DataV1_v0(const Psana::CsPad::DataV1& obj, hdf5pp::Group group, long index, bool append)
 {
   const unsigned nquads = obj.quads_shape()[0];
   const unsigned nsect = obj.quads(0).data().shape()[0];
@@ -122,7 +122,7 @@ void store_DataV1_v0(const Psana::CsPad::DataV1& obj, hdf5pp::Group group, bool 
       data[i] = ns_ElementV1_v0::dataset_element(obj.quads(i));
     }
     if (append) {
-      hdf5pp::Utils::appendNDArray(group, "element", data);
+      hdf5pp::Utils::storeNDArrayAt(group, "element", data, index);
     } else {
       hdf5pp::Utils::storeNDArray(group, "element", data);
     }
@@ -134,7 +134,7 @@ void store_DataV1_v0(const Psana::CsPad::DataV1& obj, hdf5pp::Group group, bool 
       std::copy(small.begin(), small.end(), &data[i][0][0][0]);
     }
     if (append) {
-      hdf5pp::Utils::appendNDArray(group, "data", data);
+      hdf5pp::Utils::storeNDArrayAt(group, "data", data, index);
     } else {
       hdf5pp::Utils::storeNDArray(group, "data", data);
     }
@@ -148,7 +148,7 @@ void store_DataV1_v0(const Psana::CsPad::DataV1& obj, hdf5pp::Group group, bool 
       }
     }
     if (append) {
-      hdf5pp::Utils::appendNDArray(group, "common_mode", data);
+      hdf5pp::Utils::storeNDArrayAt(group, "common_mode", data, index);
     } else {
       hdf5pp::Utils::storeNDArray(group, "common_mode", data);
     }
@@ -250,7 +250,7 @@ void make_datasets_DataV2_v0(const Psana::CsPad::DataV2& obj,
   }
 }
 
-void store_DataV2_v0(const Psana::CsPad::DataV2& obj, hdf5pp::Group group, bool append)
+void store_DataV2_v0(const Psana::CsPad::DataV2& obj, hdf5pp::Group group, long index, bool append)
 {
   const unsigned nquads = obj.quads_shape()[0];
   unsigned nsect = 0;
@@ -264,7 +264,7 @@ void store_DataV2_v0(const Psana::CsPad::DataV2& obj, hdf5pp::Group group, bool 
       data[i] = ns_ElementV2_v0::dataset_element(obj.quads(i));
     }
     if (append) {
-      hdf5pp::Utils::appendNDArray(group, "element", data);
+      hdf5pp::Utils::storeNDArrayAt(group, "element", data, index);
     } else {
       hdf5pp::Utils::storeNDArray(group, "element", data);
     }
@@ -278,7 +278,7 @@ void store_DataV2_v0(const Psana::CsPad::DataV2& obj, hdf5pp::Group group, bool 
       s += small.shape()[0];
     }
     if (append) {
-      hdf5pp::Utils::appendNDArray(group, "data", data);
+      hdf5pp::Utils::storeNDArrayAt(group, "data", data, index);
     } else {
       hdf5pp::Utils::storeNDArray(group, "data", data);
     }
@@ -294,7 +294,7 @@ void store_DataV2_v0(const Psana::CsPad::DataV2& obj, hdf5pp::Group group, bool 
       }
     }
     if (append) {
-      hdf5pp::Utils::appendNDArray(group, "common_mode", data);
+      hdf5pp::Utils::storeNDArrayAt(group, "common_mode", data, index);
     } else {
       hdf5pp::Utils::storeNDArray(group, "common_mode", data);
     }

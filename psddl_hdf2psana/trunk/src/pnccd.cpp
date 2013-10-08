@@ -183,7 +183,7 @@ void make_datasets_FramesV1_v0(const Psana::PNCCD::FramesV1& obj,
   }
 }
 
-void store_FramesV1_v0(const Psana::PNCCD::FramesV1& obj, hdf5pp::Group group, bool append)
+void store_FramesV1_v0(const Psana::PNCCD::FramesV1& obj, hdf5pp::Group group, long index, bool append)
 {
   unsigned nLinks = obj.numLinks();
   ndarray<ns_FrameV1_v0::dataset_data, 1> frames_ds = make_ndarray<ns_FrameV1_v0::dataset_data>(nLinks);
@@ -204,8 +204,8 @@ void store_FramesV1_v0(const Psana::PNCCD::FramesV1& obj, hdf5pp::Group group, b
   }
 
   if (append) {
-    hdf5pp::Utils::appendNDArray(group, "frame", frames_ds);
-    hdf5pp::Utils::appendNDArray(group, "data", data);
+    hdf5pp::Utils::storeNDArrayAt(group, "frame", frames_ds, index);
+    hdf5pp::Utils::storeNDArrayAt(group, "data", data, index);
   } else {
     hdf5pp::Utils::storeNDArray(group, "frame", frames_ds);
     hdf5pp::Utils::storeNDArray(group, "data", data);
@@ -301,7 +301,7 @@ void make_datasets_FullFrameV1_v0(const Psana::PNCCD::FullFrameV1& obj,
   MsgLog("PNCCD::make_datasets_FullFrameV1_v0", error, "type is not supported");
 }
 
-void store_FullFrameV1_v0(const Psana::PNCCD::FullFrameV1& obj, hdf5pp::Group group, bool append)
+void store_FullFrameV1_v0(const Psana::PNCCD::FullFrameV1& obj, hdf5pp::Group group, long index, bool append)
 {
   // we do not want to save FullFrame in HDF5
   MsgLog("PNCCD::store_FullFrameV1_v0", error, "type is not supported");

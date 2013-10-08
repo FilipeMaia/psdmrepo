@@ -24,6 +24,16 @@
             </dataset>
         </h5schema>
         
+        <h5schema name="CsPadReadOnlyCfg" version="0">
+            <tag name="skip-proxy"/>
+            <tag name="default"/>
+        </h5schema>
+        
+        <h5schema name="ProtectionSystemThreshold" version="0">
+            <tag name="skip-proxy"/>
+            <tag name="default"/>
+        </h5schema>
+        
         <h5schema name="ConfigV1QuadReg" version="0">
             <tag name="skip-proxy"/>
             <dataset name="data">

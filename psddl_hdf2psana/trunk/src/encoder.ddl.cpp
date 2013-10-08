@@ -130,12 +130,12 @@ void make_datasets_ConfigV1_v0(const Psana::Encoder::ConfigV1& obj,
   }
 }
 
-void store_ConfigV1_v0(const Psana::Encoder::ConfigV1& obj, hdf5pp::Group group, bool append)
+void store_ConfigV1_v0(const Psana::Encoder::ConfigV1& obj, hdf5pp::Group group, long index, bool append)
 {
   {
     Encoder::ns_ConfigV1_v0::dataset_config ds_data(obj);
     if (append) {
-      hdf5pp::Utils::append(group, "config", ds_data);
+      hdf5pp::Utils::storeAt(group, "config", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "config", ds_data);
     }
@@ -164,12 +164,12 @@ void make_datasets(const Psana::Encoder::ConfigV1& obj, hdf5pp::Group group, hsi
   }
 }
 
-void store_ConfigV1(const Psana::Encoder::ConfigV1& obj, hdf5pp::Group group, int version, bool append)
+void store_ConfigV1(const Psana::Encoder::ConfigV1& obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    store_ConfigV1_v0(obj, group, append);
+    store_ConfigV1_v0(obj, group, index, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Encoder.ConfigV1", version);
@@ -178,12 +178,12 @@ void store_ConfigV1(const Psana::Encoder::ConfigV1& obj, hdf5pp::Group group, in
 
 void store(const Psana::Encoder::ConfigV1& obj, hdf5pp::Group group, int version) 
 {
-  store_ConfigV1(obj, group, version, false);
+  store_ConfigV1(obj, group, 0, version, false);
 }
 
-void append(const Psana::Encoder::ConfigV1& obj, hdf5pp::Group group, int version)
+void store_at(const Psana::Encoder::ConfigV1& obj, hdf5pp::Group group, long index, int version)
 {
-  store_ConfigV1(obj, group, version, true);
+  store_ConfigV1(obj, group, index, version, true);
 }
 
 
@@ -304,12 +304,12 @@ void make_datasets_ConfigV2_v0(const Psana::Encoder::ConfigV2& obj,
   }
 }
 
-void store_ConfigV2_v0(const Psana::Encoder::ConfigV2& obj, hdf5pp::Group group, bool append)
+void store_ConfigV2_v0(const Psana::Encoder::ConfigV2& obj, hdf5pp::Group group, long index, bool append)
 {
   {
     Encoder::ns_ConfigV2_v0::dataset_config ds_data(obj);
     if (append) {
-      hdf5pp::Utils::append(group, "config", ds_data);
+      hdf5pp::Utils::storeAt(group, "config", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "config", ds_data);
     }
@@ -338,12 +338,12 @@ void make_datasets(const Psana::Encoder::ConfigV2& obj, hdf5pp::Group group, hsi
   }
 }
 
-void store_ConfigV2(const Psana::Encoder::ConfigV2& obj, hdf5pp::Group group, int version, bool append)
+void store_ConfigV2(const Psana::Encoder::ConfigV2& obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    store_ConfigV2_v0(obj, group, append);
+    store_ConfigV2_v0(obj, group, index, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Encoder.ConfigV2", version);
@@ -352,12 +352,12 @@ void store_ConfigV2(const Psana::Encoder::ConfigV2& obj, hdf5pp::Group group, in
 
 void store(const Psana::Encoder::ConfigV2& obj, hdf5pp::Group group, int version) 
 {
-  store_ConfigV2(obj, group, version, false);
+  store_ConfigV2(obj, group, 0, version, false);
 }
 
-void append(const Psana::Encoder::ConfigV2& obj, hdf5pp::Group group, int version)
+void store_at(const Psana::Encoder::ConfigV2& obj, hdf5pp::Group group, long index, int version)
 {
-  store_ConfigV2(obj, group, version, true);
+  store_ConfigV2(obj, group, index, version, true);
 }
 
 
@@ -430,12 +430,12 @@ void make_datasets_DataV1_v0(const Psana::Encoder::DataV1& obj,
   }
 }
 
-void store_DataV1_v0(const Psana::Encoder::DataV1& obj, hdf5pp::Group group, bool append)
+void store_DataV1_v0(const Psana::Encoder::DataV1& obj, hdf5pp::Group group, long index, bool append)
 {
   {
     Encoder::ns_DataV1_v0::dataset_data ds_data(obj);
     if (append) {
-      hdf5pp::Utils::append(group, "data", ds_data);
+      hdf5pp::Utils::storeAt(group, "data", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "data", ds_data);
     }
@@ -464,12 +464,12 @@ void make_datasets(const Psana::Encoder::DataV1& obj, hdf5pp::Group group, hsize
   }
 }
 
-void store_DataV1(const Psana::Encoder::DataV1& obj, hdf5pp::Group group, int version, bool append)
+void store_DataV1(const Psana::Encoder::DataV1& obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    store_DataV1_v0(obj, group, append);
+    store_DataV1_v0(obj, group, index, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Encoder.DataV1", version);
@@ -478,12 +478,12 @@ void store_DataV1(const Psana::Encoder::DataV1& obj, hdf5pp::Group group, int ve
 
 void store(const Psana::Encoder::DataV1& obj, hdf5pp::Group group, int version) 
 {
-  store_DataV1(obj, group, version, false);
+  store_DataV1(obj, group, 0, version, false);
 }
 
-void append(const Psana::Encoder::DataV1& obj, hdf5pp::Group group, int version)
+void store_at(const Psana::Encoder::DataV1& obj, hdf5pp::Group group, long index, int version)
 {
-  store_DataV1(obj, group, version, true);
+  store_DataV1(obj, group, index, version, true);
 }
 
 
@@ -564,12 +564,12 @@ void make_datasets_DataV2_v0(const Psana::Encoder::DataV2& obj,
   }
 }
 
-void store_DataV2_v0(const Psana::Encoder::DataV2& obj, hdf5pp::Group group, bool append)
+void store_DataV2_v0(const Psana::Encoder::DataV2& obj, hdf5pp::Group group, long index, bool append)
 {
   {
     Encoder::ns_DataV2_v0::dataset_data ds_data(obj);
     if (append) {
-      hdf5pp::Utils::append(group, "data", ds_data);
+      hdf5pp::Utils::storeAt(group, "data", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "data", ds_data);
     }
@@ -598,12 +598,12 @@ void make_datasets(const Psana::Encoder::DataV2& obj, hdf5pp::Group group, hsize
   }
 }
 
-void store_DataV2(const Psana::Encoder::DataV2& obj, hdf5pp::Group group, int version, bool append)
+void store_DataV2(const Psana::Encoder::DataV2& obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    store_DataV2_v0(obj, group, append);
+    store_DataV2_v0(obj, group, index, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Encoder.DataV2", version);
@@ -612,12 +612,12 @@ void store_DataV2(const Psana::Encoder::DataV2& obj, hdf5pp::Group group, int ve
 
 void store(const Psana::Encoder::DataV2& obj, hdf5pp::Group group, int version) 
 {
-  store_DataV2(obj, group, version, false);
+  store_DataV2(obj, group, 0, version, false);
 }
 
-void append(const Psana::Encoder::DataV2& obj, hdf5pp::Group group, int version)
+void store_at(const Psana::Encoder::DataV2& obj, hdf5pp::Group group, long index, int version)
 {
-  store_DataV2(obj, group, version, true);
+  store_DataV2(obj, group, index, version, true);
 }
 
 } // namespace Encoder

@@ -209,12 +209,12 @@ void make_datasets_ConfigV1_v0(const Psana::Andor::ConfigV1& obj,
   }
 }
 
-void store_ConfigV1_v0(const Psana::Andor::ConfigV1& obj, hdf5pp::Group group, bool append)
+void store_ConfigV1_v0(const Psana::Andor::ConfigV1& obj, hdf5pp::Group group, long index, bool append)
 {
   {
     Andor::ns_ConfigV1_v0::dataset_config ds_data(obj);
     if (append) {
-      hdf5pp::Utils::append(group, "config", ds_data);
+      hdf5pp::Utils::storeAt(group, "config", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "config", ds_data);
     }
@@ -243,12 +243,12 @@ void make_datasets(const Psana::Andor::ConfigV1& obj, hdf5pp::Group group, hsize
   }
 }
 
-void store_ConfigV1(const Psana::Andor::ConfigV1& obj, hdf5pp::Group group, int version, bool append)
+void store_ConfigV1(const Psana::Andor::ConfigV1& obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    store_ConfigV1_v0(obj, group, append);
+    store_ConfigV1_v0(obj, group, index, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Andor.ConfigV1", version);
@@ -257,12 +257,12 @@ void store_ConfigV1(const Psana::Andor::ConfigV1& obj, hdf5pp::Group group, int 
 
 void store(const Psana::Andor::ConfigV1& obj, hdf5pp::Group group, int version) 
 {
-  store_ConfigV1(obj, group, version, false);
+  store_ConfigV1(obj, group, 0, version, false);
 }
 
-void append(const Psana::Andor::ConfigV1& obj, hdf5pp::Group group, int version)
+void store_at(const Psana::Andor::ConfigV1& obj, hdf5pp::Group group, long index, int version)
 {
-  store_ConfigV1(obj, group, version, true);
+  store_ConfigV1(obj, group, index, version, true);
 }
 
 
@@ -361,18 +361,18 @@ void make_datasets_FrameV1_v0(const Psana::Andor::FrameV1& obj,
   }
 }
 
-void store_FrameV1_v0(const Psana::Andor::FrameV1& obj, hdf5pp::Group group, bool append)
+void store_FrameV1_v0(const Psana::Andor::FrameV1& obj, hdf5pp::Group group, long index, bool append)
 {
   {
     Andor::ns_FrameV1_v0::dataset_frame ds_data(obj);
     if (append) {
-      hdf5pp::Utils::append(group, "frame", ds_data);
+      hdf5pp::Utils::storeAt(group, "frame", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "frame", ds_data);
     }
   }
   if (append) {
-    hdf5pp::Utils::appendNDArray(group, "data", obj.data());
+    hdf5pp::Utils::storeNDArrayAt(group, "data", obj.data(), index);
   } else {
     hdf5pp::Utils::storeNDArray(group, "data", obj.data());
   }
@@ -400,12 +400,12 @@ void make_datasets(const Psana::Andor::FrameV1& obj, hdf5pp::Group group, hsize_
   }
 }
 
-void store_FrameV1(const Psana::Andor::FrameV1& obj, hdf5pp::Group group, int version, bool append)
+void store_FrameV1(const Psana::Andor::FrameV1& obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    store_FrameV1_v0(obj, group, append);
+    store_FrameV1_v0(obj, group, index, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Andor.FrameV1", version);
@@ -414,12 +414,12 @@ void store_FrameV1(const Psana::Andor::FrameV1& obj, hdf5pp::Group group, int ve
 
 void store(const Psana::Andor::FrameV1& obj, hdf5pp::Group group, int version) 
 {
-  store_FrameV1(obj, group, version, false);
+  store_FrameV1(obj, group, 0, version, false);
 }
 
-void append(const Psana::Andor::FrameV1& obj, hdf5pp::Group group, int version)
+void store_at(const Psana::Andor::FrameV1& obj, hdf5pp::Group group, long index, int version)
 {
-  store_FrameV1(obj, group, version, true);
+  store_FrameV1(obj, group, index, version, true);
 }
 
 } // namespace Andor

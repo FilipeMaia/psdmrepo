@@ -108,33 +108,6 @@ struct dataset_data {
 
 };
 }
-class Proxy_CsPadReadOnlyCfg_v0 : public PSEvt::Proxy<Psana::CsPad::CsPadReadOnlyCfg> {
-public:
-  typedef Psana::CsPad::CsPadReadOnlyCfg PsanaType;
-
-  Proxy_CsPadReadOnlyCfg_v0(hdf5pp::Group group, hsize_t idx) : m_group(group), m_idx(idx) {}
-  virtual ~Proxy_CsPadReadOnlyCfg_v0() {}
-
-protected:
-
-  virtual boost::shared_ptr<PsanaType> getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key);
-
-private:
-
-  mutable hdf5pp::Group m_group;
-  hsize_t m_idx;
-  boost::shared_ptr<PsanaType> m_data;
-};
-boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::CsPadReadOnlyCfg> > make_CsPadReadOnlyCfg(int version, hdf5pp::Group group, hsize_t idx);
-
-/// Store object as a single instance (scalar dataset) inside specified group.
-void store(const Psana::CsPad::CsPadReadOnlyCfg& obj, hdf5pp::Group group, int version = -1);
-/// Create container (rank=1) datasets for storing objects of specified type.
-void make_datasets(const Psana::CsPad::CsPadReadOnlyCfg& obj, hdf5pp::Group group, hsize_t chunk_size,
-                   int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const Psana::CsPad::CsPadReadOnlyCfg& obj, hdf5pp::Group group, int version = -1);
-
 
 namespace ns_ProtectionSystemThreshold_v0 {
 struct dataset_data {
@@ -152,33 +125,6 @@ struct dataset_data {
 
 };
 }
-class Proxy_ProtectionSystemThreshold_v0 : public PSEvt::Proxy<Psana::CsPad::ProtectionSystemThreshold> {
-public:
-  typedef Psana::CsPad::ProtectionSystemThreshold PsanaType;
-
-  Proxy_ProtectionSystemThreshold_v0(hdf5pp::Group group, hsize_t idx) : m_group(group), m_idx(idx) {}
-  virtual ~Proxy_ProtectionSystemThreshold_v0() {}
-
-protected:
-
-  virtual boost::shared_ptr<PsanaType> getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key);
-
-private:
-
-  mutable hdf5pp::Group m_group;
-  hsize_t m_idx;
-  boost::shared_ptr<PsanaType> m_data;
-};
-boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::ProtectionSystemThreshold> > make_ProtectionSystemThreshold(int version, hdf5pp::Group group, hsize_t idx);
-
-/// Store object as a single instance (scalar dataset) inside specified group.
-void store(const Psana::CsPad::ProtectionSystemThreshold& obj, hdf5pp::Group group, int version = -1);
-/// Create container (rank=1) datasets for storing objects of specified type.
-void make_datasets(const Psana::CsPad::ProtectionSystemThreshold& obj, hdf5pp::Group group, hsize_t chunk_size,
-                   int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const Psana::CsPad::ProtectionSystemThreshold& obj, hdf5pp::Group group, int version = -1);
-
 
 namespace ns_CsPadGainMapCfg_v0 {
 struct dataset_data {
@@ -492,8 +438,9 @@ void store(const Psana::CsPad::ConfigV1& obj, hdf5pp::Group group, int version =
 /// Create container (rank=1) datasets for storing objects of specified type.
 void make_datasets(const Psana::CsPad::ConfigV1& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const Psana::CsPad::ConfigV1& obj, hdf5pp::Group group, int version = -1);
+/// Add one more object to the containers created by previous method at the specified index,
+/// negative index means append to the end of dataset.
+void store_at(const Psana::CsPad::ConfigV1& obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 
 namespace ns_ConfigV2_v0 {
@@ -577,8 +524,9 @@ void store(const Psana::CsPad::ConfigV2& obj, hdf5pp::Group group, int version =
 /// Create container (rank=1) datasets for storing objects of specified type.
 void make_datasets(const Psana::CsPad::ConfigV2& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const Psana::CsPad::ConfigV2& obj, hdf5pp::Group group, int version = -1);
+/// Add one more object to the containers created by previous method at the specified index,
+/// negative index means append to the end of dataset.
+void store_at(const Psana::CsPad::ConfigV2& obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 
 namespace ns_ConfigV3_v0 {
@@ -667,8 +615,9 @@ void store(const Psana::CsPad::ConfigV3& obj, hdf5pp::Group group, int version =
 /// Create container (rank=1) datasets for storing objects of specified type.
 void make_datasets(const Psana::CsPad::ConfigV3& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const Psana::CsPad::ConfigV3& obj, hdf5pp::Group group, int version = -1);
+/// Add one more object to the containers created by previous method at the specified index,
+/// negative index means append to the end of dataset.
+void store_at(const Psana::CsPad::ConfigV3& obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 
 namespace ns_ConfigV4_v0 {
@@ -757,8 +706,9 @@ void store(const Psana::CsPad::ConfigV4& obj, hdf5pp::Group group, int version =
 /// Create container (rank=1) datasets for storing objects of specified type.
 void make_datasets(const Psana::CsPad::ConfigV4& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const Psana::CsPad::ConfigV4& obj, hdf5pp::Group group, int version = -1);
+/// Add one more object to the containers created by previous method at the specified index,
+/// negative index means append to the end of dataset.
+void store_at(const Psana::CsPad::ConfigV4& obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 
 namespace ns_ConfigV5_v0 {
@@ -849,8 +799,9 @@ void store(const Psana::CsPad::ConfigV5& obj, hdf5pp::Group group, int version =
 /// Create container (rank=1) datasets for storing objects of specified type.
 void make_datasets(const Psana::CsPad::ConfigV5& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const Psana::CsPad::ConfigV5& obj, hdf5pp::Group group, int version = -1);
+/// Add one more object to the containers created by previous method at the specified index,
+/// negative index means append to the end of dataset.
+void store_at(const Psana::CsPad::ConfigV5& obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 
 namespace ns_ElementV1_v0 {
@@ -926,8 +877,9 @@ void store(const Psana::CsPad::DataV1& obj, hdf5pp::Group group, int version = -
 /// Create container (rank=1) datasets for storing objects of specified type.
 void make_datasets(const Psana::CsPad::DataV1& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const Psana::CsPad::DataV1& obj, hdf5pp::Group group, int version = -1);
+/// Add one more object to the containers created by previous method at the specified index,
+/// negative index means append to the end of dataset.
+void store_at(const Psana::CsPad::DataV1& obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 
 namespace ns_ElementV2_v0 {
@@ -1002,8 +954,9 @@ void store(const Psana::CsPad::DataV2& obj, hdf5pp::Group group, int version = -
 /// Create container (rank=1) datasets for storing objects of specified type.
 void make_datasets(const Psana::CsPad::DataV2& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const Psana::CsPad::DataV2& obj, hdf5pp::Group group, int version = -1);
+/// Add one more object to the containers created by previous method at the specified index,
+/// negative index means append to the end of dataset.
+void store_at(const Psana::CsPad::DataV2& obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 } // namespace CsPad
 } // namespace psddl_hdf2psana

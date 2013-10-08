@@ -11,6 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-00
+2013-10-08 Andy Salnikov
+- regenerated with psddl V00-09-00
+- replaced append() method with store_at()
+- disable proxy generation for few internal classes
+
 Tag: V00-03-03
 2013-10-07 Andy Salnikov
 - fix the name of the dataset for Alias.ConfigV1

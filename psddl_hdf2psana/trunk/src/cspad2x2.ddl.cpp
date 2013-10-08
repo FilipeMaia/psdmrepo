@@ -80,12 +80,12 @@ void make_datasets_CsPad2x2DigitalPotsCfg_v0(const Psana::CsPad2x2::CsPad2x2Digi
   }
 }
 
-void store_CsPad2x2DigitalPotsCfg_v0(const Psana::CsPad2x2::CsPad2x2DigitalPotsCfg& obj, hdf5pp::Group group, bool append)
+void store_CsPad2x2DigitalPotsCfg_v0(const Psana::CsPad2x2::CsPad2x2DigitalPotsCfg& obj, hdf5pp::Group group, long index, bool append)
 {
   {
     CsPad2x2::ns_CsPad2x2DigitalPotsCfg_v0::dataset_data ds_data(obj);
     if (append) {
-      hdf5pp::Utils::append(group, "data", ds_data);
+      hdf5pp::Utils::storeAt(group, "data", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "data", ds_data);
     }
@@ -136,83 +136,6 @@ ns_CsPad2x2ReadOnlyCfg_v0::dataset_data::dataset_data(const Psana::CsPad2x2::CsP
 ns_CsPad2x2ReadOnlyCfg_v0::dataset_data::~dataset_data()
 {
 }
-boost::shared_ptr<Psana::CsPad2x2::CsPad2x2ReadOnlyCfg>
-Proxy_CsPad2x2ReadOnlyCfg_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key)
-{
-  if (not m_data) {
-    boost::shared_ptr<CsPad2x2::ns_CsPad2x2ReadOnlyCfg_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<CsPad2x2::ns_CsPad2x2ReadOnlyCfg_v0::dataset_data>(m_group, "data", m_idx);
-    m_data.reset(new PsanaType(ds_data->shiftTest, ds_data->version));
-  }
-  return m_data;
-}
-
-
-void make_datasets_CsPad2x2ReadOnlyCfg_v0(const Psana::CsPad2x2::CsPad2x2ReadOnlyCfg& obj, 
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
-{
-  {
-    hdf5pp::Type dstype = CsPad2x2::ns_CsPad2x2ReadOnlyCfg_v0::dataset_data::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
-  }
-}
-
-void store_CsPad2x2ReadOnlyCfg_v0(const Psana::CsPad2x2::CsPad2x2ReadOnlyCfg& obj, hdf5pp::Group group, bool append)
-{
-  {
-    CsPad2x2::ns_CsPad2x2ReadOnlyCfg_v0::dataset_data ds_data(obj);
-    if (append) {
-      hdf5pp::Utils::append(group, "data", ds_data);
-    } else {
-      hdf5pp::Utils::storeScalar(group, "data", ds_data);
-    }
-  }
-}
-
-boost::shared_ptr<PSEvt::Proxy<Psana::CsPad2x2::CsPad2x2ReadOnlyCfg> > make_CsPad2x2ReadOnlyCfg(int version, hdf5pp::Group group, hsize_t idx) {
-  switch (version) {
-  case 0:
-    return boost::make_shared<Proxy_CsPad2x2ReadOnlyCfg_v0>(group, idx);
-  default:
-    return boost::make_shared<PSEvt::DataProxy<Psana::CsPad2x2::CsPad2x2ReadOnlyCfg> >(boost::shared_ptr<Psana::CsPad2x2::CsPad2x2ReadOnlyCfg>());
-  }
-}
-
-void make_datasets(const Psana::CsPad2x2::CsPad2x2ReadOnlyCfg& obj, hdf5pp::Group group, hsize_t chunk_size,
-                   int deflate, bool shuffle, int version)
-{
-  if (version < 0) version = 0;
-  switch (version) {
-  case 0:
-    make_datasets_CsPad2x2ReadOnlyCfg_v0(obj, group, chunk_size, deflate, shuffle);
-    break;
-  default:
-    throw ExceptionSchemaVersion(ERR_LOC, "CsPad2x2.CsPad2x2ReadOnlyCfg", version);
-  }
-}
-
-void store_CsPad2x2ReadOnlyCfg(const Psana::CsPad2x2::CsPad2x2ReadOnlyCfg& obj, hdf5pp::Group group, int version, bool append)
-{
-  if (version < 0) version = 0;
-  switch (version) {
-  case 0:
-    store_CsPad2x2ReadOnlyCfg_v0(obj, group, append);
-    break;
-  default:
-    throw ExceptionSchemaVersion(ERR_LOC, "CsPad2x2.CsPad2x2ReadOnlyCfg", version);
-  }
-}
-
-void store(const Psana::CsPad2x2::CsPad2x2ReadOnlyCfg& obj, hdf5pp::Group group, int version) 
-{
-  store_CsPad2x2ReadOnlyCfg(obj, group, version, false);
-}
-
-void append(const Psana::CsPad2x2::CsPad2x2ReadOnlyCfg& obj, hdf5pp::Group group, int version)
-{
-  store_CsPad2x2ReadOnlyCfg(obj, group, version, true);
-}
-
 
 hdf5pp::Type ns_ProtectionSystemThreshold_v0_dataset_data_stored_type()
 {
@@ -257,83 +180,6 @@ ns_ProtectionSystemThreshold_v0::dataset_data::dataset_data(const Psana::CsPad2x
 ns_ProtectionSystemThreshold_v0::dataset_data::~dataset_data()
 {
 }
-boost::shared_ptr<Psana::CsPad2x2::ProtectionSystemThreshold>
-Proxy_ProtectionSystemThreshold_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key)
-{
-  if (not m_data) {
-    boost::shared_ptr<CsPad2x2::ns_ProtectionSystemThreshold_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<CsPad2x2::ns_ProtectionSystemThreshold_v0::dataset_data>(m_group, "data", m_idx);
-    m_data.reset(new PsanaType(ds_data->adcThreshold, ds_data->pixelCountThreshold));
-  }
-  return m_data;
-}
-
-
-void make_datasets_ProtectionSystemThreshold_v0(const Psana::CsPad2x2::ProtectionSystemThreshold& obj, 
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
-{
-  {
-    hdf5pp::Type dstype = CsPad2x2::ns_ProtectionSystemThreshold_v0::dataset_data::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
-  }
-}
-
-void store_ProtectionSystemThreshold_v0(const Psana::CsPad2x2::ProtectionSystemThreshold& obj, hdf5pp::Group group, bool append)
-{
-  {
-    CsPad2x2::ns_ProtectionSystemThreshold_v0::dataset_data ds_data(obj);
-    if (append) {
-      hdf5pp::Utils::append(group, "data", ds_data);
-    } else {
-      hdf5pp::Utils::storeScalar(group, "data", ds_data);
-    }
-  }
-}
-
-boost::shared_ptr<PSEvt::Proxy<Psana::CsPad2x2::ProtectionSystemThreshold> > make_ProtectionSystemThreshold(int version, hdf5pp::Group group, hsize_t idx) {
-  switch (version) {
-  case 0:
-    return boost::make_shared<Proxy_ProtectionSystemThreshold_v0>(group, idx);
-  default:
-    return boost::make_shared<PSEvt::DataProxy<Psana::CsPad2x2::ProtectionSystemThreshold> >(boost::shared_ptr<Psana::CsPad2x2::ProtectionSystemThreshold>());
-  }
-}
-
-void make_datasets(const Psana::CsPad2x2::ProtectionSystemThreshold& obj, hdf5pp::Group group, hsize_t chunk_size,
-                   int deflate, bool shuffle, int version)
-{
-  if (version < 0) version = 0;
-  switch (version) {
-  case 0:
-    make_datasets_ProtectionSystemThreshold_v0(obj, group, chunk_size, deflate, shuffle);
-    break;
-  default:
-    throw ExceptionSchemaVersion(ERR_LOC, "CsPad2x2.ProtectionSystemThreshold", version);
-  }
-}
-
-void store_ProtectionSystemThreshold(const Psana::CsPad2x2::ProtectionSystemThreshold& obj, hdf5pp::Group group, int version, bool append)
-{
-  if (version < 0) version = 0;
-  switch (version) {
-  case 0:
-    store_ProtectionSystemThreshold_v0(obj, group, append);
-    break;
-  default:
-    throw ExceptionSchemaVersion(ERR_LOC, "CsPad2x2.ProtectionSystemThreshold", version);
-  }
-}
-
-void store(const Psana::CsPad2x2::ProtectionSystemThreshold& obj, hdf5pp::Group group, int version) 
-{
-  store_ProtectionSystemThreshold(obj, group, version, false);
-}
-
-void append(const Psana::CsPad2x2::ProtectionSystemThreshold& obj, hdf5pp::Group group, int version)
-{
-  store_ProtectionSystemThreshold(obj, group, version, true);
-}
-
 
 hdf5pp::Type ns_CsPad2x2GainMapCfg_v0_dataset_data_stored_type()
 {
@@ -401,12 +247,12 @@ void make_datasets_CsPad2x2GainMapCfg_v0(const Psana::CsPad2x2::CsPad2x2GainMapC
   }
 }
 
-void store_CsPad2x2GainMapCfg_v0(const Psana::CsPad2x2::CsPad2x2GainMapCfg& obj, hdf5pp::Group group, bool append)
+void store_CsPad2x2GainMapCfg_v0(const Psana::CsPad2x2::CsPad2x2GainMapCfg& obj, hdf5pp::Group group, long index, bool append)
 {
   {
     CsPad2x2::ns_CsPad2x2GainMapCfg_v0::dataset_data ds_data(obj);
     if (append) {
-      hdf5pp::Utils::append(group, "data", ds_data);
+      hdf5pp::Utils::storeAt(group, "data", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "data", ds_data);
     }
@@ -642,12 +488,12 @@ void make_datasets_ConfigV1QuadReg_v0(const Psana::CsPad2x2::ConfigV1QuadReg& ob
   }
 }
 
-void store_ConfigV1QuadReg_v0(const Psana::CsPad2x2::ConfigV1QuadReg& obj, hdf5pp::Group group, bool append)
+void store_ConfigV1QuadReg_v0(const Psana::CsPad2x2::ConfigV1QuadReg& obj, hdf5pp::Group group, long index, bool append)
 {
   {
     CsPad2x2::ns_ConfigV1QuadReg_v0::dataset_data ds_data(obj);
     if (append) {
-      hdf5pp::Utils::append(group, "data", ds_data);
+      hdf5pp::Utils::storeAt(group, "data", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "data", ds_data);
     }
@@ -802,12 +648,12 @@ void make_datasets_ConfigV1_v0(const Psana::CsPad2x2::ConfigV1& obj,
   }
 }
 
-void store_ConfigV1_v0(const Psana::CsPad2x2::ConfigV1& obj, hdf5pp::Group group, bool append)
+void store_ConfigV1_v0(const Psana::CsPad2x2::ConfigV1& obj, hdf5pp::Group group, long index, bool append)
 {
   {
     CsPad2x2::ns_ConfigV1_v0::dataset_config ds_data(obj);
     if (append) {
-      hdf5pp::Utils::append(group, "config", ds_data);
+      hdf5pp::Utils::storeAt(group, "config", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "config", ds_data);
     }
@@ -836,12 +682,12 @@ void make_datasets(const Psana::CsPad2x2::ConfigV1& obj, hdf5pp::Group group, hs
   }
 }
 
-void store_ConfigV1(const Psana::CsPad2x2::ConfigV1& obj, hdf5pp::Group group, int version, bool append)
+void store_ConfigV1(const Psana::CsPad2x2::ConfigV1& obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    store_ConfigV1_v0(obj, group, append);
+    store_ConfigV1_v0(obj, group, index, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "CsPad2x2.ConfigV1", version);
@@ -850,12 +696,12 @@ void store_ConfigV1(const Psana::CsPad2x2::ConfigV1& obj, hdf5pp::Group group, i
 
 void store(const Psana::CsPad2x2::ConfigV1& obj, hdf5pp::Group group, int version) 
 {
-  store_ConfigV1(obj, group, version, false);
+  store_ConfigV1(obj, group, 0, version, false);
 }
 
-void append(const Psana::CsPad2x2::ConfigV1& obj, hdf5pp::Group group, int version)
+void store_at(const Psana::CsPad2x2::ConfigV1& obj, hdf5pp::Group group, long index, int version)
 {
-  store_ConfigV1(obj, group, version, true);
+  store_ConfigV1(obj, group, index, version, true);
 }
 
 
@@ -1101,12 +947,12 @@ void make_datasets_ConfigV2QuadReg_v0(const Psana::CsPad2x2::ConfigV2QuadReg& ob
   }
 }
 
-void store_ConfigV2QuadReg_v0(const Psana::CsPad2x2::ConfigV2QuadReg& obj, hdf5pp::Group group, bool append)
+void store_ConfigV2QuadReg_v0(const Psana::CsPad2x2::ConfigV2QuadReg& obj, hdf5pp::Group group, long index, bool append)
 {
   {
     CsPad2x2::ns_ConfigV2QuadReg_v0::dataset_data ds_data(obj);
     if (append) {
-      hdf5pp::Utils::append(group, "data", ds_data);
+      hdf5pp::Utils::storeAt(group, "data", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "data", ds_data);
     }
@@ -1268,12 +1114,12 @@ void make_datasets_ConfigV2_v0(const Psana::CsPad2x2::ConfigV2& obj,
   }
 }
 
-void store_ConfigV2_v0(const Psana::CsPad2x2::ConfigV2& obj, hdf5pp::Group group, bool append)
+void store_ConfigV2_v0(const Psana::CsPad2x2::ConfigV2& obj, hdf5pp::Group group, long index, bool append)
 {
   {
     CsPad2x2::ns_ConfigV2_v0::dataset_config ds_data(obj);
     if (append) {
-      hdf5pp::Utils::append(group, "config", ds_data);
+      hdf5pp::Utils::storeAt(group, "config", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "config", ds_data);
     }
@@ -1302,12 +1148,12 @@ void make_datasets(const Psana::CsPad2x2::ConfigV2& obj, hdf5pp::Group group, hs
   }
 }
 
-void store_ConfigV2(const Psana::CsPad2x2::ConfigV2& obj, hdf5pp::Group group, int version, bool append)
+void store_ConfigV2(const Psana::CsPad2x2::ConfigV2& obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    store_ConfigV2_v0(obj, group, append);
+    store_ConfigV2_v0(obj, group, index, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "CsPad2x2.ConfigV2", version);
@@ -1316,12 +1162,12 @@ void store_ConfigV2(const Psana::CsPad2x2::ConfigV2& obj, hdf5pp::Group group, i
 
 void store(const Psana::CsPad2x2::ConfigV2& obj, hdf5pp::Group group, int version) 
 {
-  store_ConfigV2(obj, group, version, false);
+  store_ConfigV2(obj, group, 0, version, false);
 }
 
-void append(const Psana::CsPad2x2::ConfigV2& obj, hdf5pp::Group group, int version)
+void store_at(const Psana::CsPad2x2::ConfigV2& obj, hdf5pp::Group group, long index, int version)
 {
-  store_ConfigV2(obj, group, version, true);
+  store_ConfigV2(obj, group, index, version, true);
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::CsPad2x2::ElementV1> > make_ElementV1(int version, hdf5pp::Group group, hsize_t idx) {
@@ -1346,12 +1192,12 @@ void make_datasets(const Psana::CsPad2x2::ElementV1& obj, hdf5pp::Group group, h
   }
 }
 
-void store_ElementV1(const Psana::CsPad2x2::ElementV1& obj, hdf5pp::Group group, int version, bool append)
+void store_ElementV1(const Psana::CsPad2x2::ElementV1& obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    store_ElementV1_v0(obj, group, append);
+    store_ElementV1_v0(obj, group, index, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "CsPad2x2.ElementV1", version);
@@ -1360,12 +1206,12 @@ void store_ElementV1(const Psana::CsPad2x2::ElementV1& obj, hdf5pp::Group group,
 
 void store(const Psana::CsPad2x2::ElementV1& obj, hdf5pp::Group group, int version) 
 {
-  store_ElementV1(obj, group, version, false);
+  store_ElementV1(obj, group, 0, version, false);
 }
 
-void append(const Psana::CsPad2x2::ElementV1& obj, hdf5pp::Group group, int version)
+void store_at(const Psana::CsPad2x2::ElementV1& obj, hdf5pp::Group group, long index, int version)
 {
-  store_ElementV1(obj, group, version, true);
+  store_ElementV1(obj, group, index, version, true);
 }
 
 } // namespace CsPad2x2

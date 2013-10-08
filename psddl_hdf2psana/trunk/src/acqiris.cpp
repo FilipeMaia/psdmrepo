@@ -86,7 +86,7 @@ void make_datasets_DataDescV1_v0(const Psana::Acqiris::DataDescV1& obj,
   MsgLog("Acqiris::make_datasets_DataDescV1_v0", error, "schema is not supported");
 }
 
-void store_DataDescV1_v0(const Psana::Acqiris::DataDescV1& obj, hdf5pp::Group group, bool append)
+void store_DataDescV1_v0(const Psana::Acqiris::DataDescV1& obj, hdf5pp::Group group, long index, bool append)
 {
   // this schema is too old, we'll not be writing this stuff anymore
   MsgLog("Acqiris::store_DataDescV1_v0", error, "schema is not supported");
@@ -207,7 +207,7 @@ void make_datasets_DataDescV1_v1(const Psana::Acqiris::DataDescV1& obj,
   }
 }
 
-void store_DataDescV1_v1(const Psana::Acqiris::DataDescV1& obj, hdf5pp::Group group, bool append)
+void store_DataDescV1_v1(const Psana::Acqiris::DataDescV1& obj, hdf5pp::Group group, long index, bool append)
 {
   const unsigned nch = obj.data_shape()[0];
   const Psana::Acqiris::DataDescV1Elem& elem = obj.data(0);
@@ -221,7 +221,7 @@ void store_DataDescV1_v1(const Psana::Acqiris::DataDescV1& obj, hdf5pp::Group gr
       data[i] = ns_DataDescV1Elem_v1::dataset_data(obj.data(i));
     }
     if (append) {
-      hdf5pp::Utils::appendNDArray(group, "data", data);
+      hdf5pp::Utils::storeNDArrayAt(group, "data", data, index);
     } else {
       hdf5pp::Utils::storeNDArray(group, "data", data);
     }
@@ -233,7 +233,7 @@ void store_DataDescV1_v1(const Psana::Acqiris::DataDescV1& obj, hdf5pp::Group gr
       std::copy(small.begin(), small.end(), &data[i][0]);
     }
     if (append) {
-      hdf5pp::Utils::appendNDArray(group, "timestamps", data);
+      hdf5pp::Utils::storeNDArrayAt(group, "timestamps", data, index);
     } else {
       hdf5pp::Utils::storeNDArray(group, "timestamps", data);
     }
@@ -245,7 +245,7 @@ void store_DataDescV1_v1(const Psana::Acqiris::DataDescV1& obj, hdf5pp::Group gr
       std::copy(small.begin(), small.end(), &data[i][0][0]);
     }
     if (append) {
-      hdf5pp::Utils::appendNDArray(group, "waveforms", data);
+      hdf5pp::Utils::storeNDArrayAt(group, "waveforms", data, index);
     } else {
       hdf5pp::Utils::storeNDArray(group, "waveforms", data);
     }

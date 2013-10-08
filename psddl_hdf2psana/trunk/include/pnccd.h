@@ -107,7 +107,7 @@ private:
 
 void make_datasets_FramesV1_v0(const Psana::PNCCD::FramesV1& obj,
       hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle);
-void store_FramesV1_v0(const Psana::PNCCD::FramesV1& obj, hdf5pp::Group group, bool append);
+void store_FramesV1_v0(const Psana::PNCCD::FramesV1& obj, hdf5pp::Group group, long index, bool append);
 
 
 class FullFrameV1_v0 : public Psana::PNCCD::FullFrameV1 {
@@ -147,7 +147,7 @@ private:
 
 void make_datasets_FullFrameV1_v0(const Psana::PNCCD::FullFrameV1& obj,
       hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle);
-void store_FullFrameV1_v0(const Psana::PNCCD::FullFrameV1& obj, hdf5pp::Group group, bool append);
+void store_FullFrameV1_v0(const Psana::PNCCD::FullFrameV1& obj, hdf5pp::Group group, long index, bool append);
 
 } // namespace PNCCD
 } // namespace psddl_hdf2psana

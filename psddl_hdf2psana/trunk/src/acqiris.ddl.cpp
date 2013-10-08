@@ -119,83 +119,6 @@ ns_HorizV1_v0::dataset_data::dataset_data(const Psana::Acqiris::HorizV1& psanaob
 ns_HorizV1_v0::dataset_data::~dataset_data()
 {
 }
-boost::shared_ptr<Psana::Acqiris::HorizV1>
-Proxy_HorizV1_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key)
-{
-  if (not m_data) {
-    boost::shared_ptr<Acqiris::ns_HorizV1_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<Acqiris::ns_HorizV1_v0::dataset_data>(m_group, "data", m_idx);
-    m_data.reset(new PsanaType(ds_data->sampInterval, ds_data->delayTime, ds_data->nbrSamples, ds_data->nbrSegments));
-  }
-  return m_data;
-}
-
-
-void make_datasets_HorizV1_v0(const Psana::Acqiris::HorizV1& obj, 
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
-{
-  {
-    hdf5pp::Type dstype = Acqiris::ns_HorizV1_v0::dataset_data::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
-  }
-}
-
-void store_HorizV1_v0(const Psana::Acqiris::HorizV1& obj, hdf5pp::Group group, bool append)
-{
-  {
-    Acqiris::ns_HorizV1_v0::dataset_data ds_data(obj);
-    if (append) {
-      hdf5pp::Utils::append(group, "data", ds_data);
-    } else {
-      hdf5pp::Utils::storeScalar(group, "data", ds_data);
-    }
-  }
-}
-
-boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::HorizV1> > make_HorizV1(int version, hdf5pp::Group group, hsize_t idx) {
-  switch (version) {
-  case 0:
-    return boost::make_shared<Proxy_HorizV1_v0>(group, idx);
-  default:
-    return boost::make_shared<PSEvt::DataProxy<Psana::Acqiris::HorizV1> >(boost::shared_ptr<Psana::Acqiris::HorizV1>());
-  }
-}
-
-void make_datasets(const Psana::Acqiris::HorizV1& obj, hdf5pp::Group group, hsize_t chunk_size,
-                   int deflate, bool shuffle, int version)
-{
-  if (version < 0) version = 0;
-  switch (version) {
-  case 0:
-    make_datasets_HorizV1_v0(obj, group, chunk_size, deflate, shuffle);
-    break;
-  default:
-    throw ExceptionSchemaVersion(ERR_LOC, "Acqiris.HorizV1", version);
-  }
-}
-
-void store_HorizV1(const Psana::Acqiris::HorizV1& obj, hdf5pp::Group group, int version, bool append)
-{
-  if (version < 0) version = 0;
-  switch (version) {
-  case 0:
-    store_HorizV1_v0(obj, group, append);
-    break;
-  default:
-    throw ExceptionSchemaVersion(ERR_LOC, "Acqiris.HorizV1", version);
-  }
-}
-
-void store(const Psana::Acqiris::HorizV1& obj, hdf5pp::Group group, int version) 
-{
-  store_HorizV1(obj, group, version, false);
-}
-
-void append(const Psana::Acqiris::HorizV1& obj, hdf5pp::Group group, int version)
-{
-  store_HorizV1(obj, group, version, true);
-}
-
 
 hdf5pp::Type ns_TrigV1_v0_dataset_data_stored_type()
 {
@@ -246,83 +169,6 @@ ns_TrigV1_v0::dataset_data::dataset_data(const Psana::Acqiris::TrigV1& psanaobj)
 ns_TrigV1_v0::dataset_data::~dataset_data()
 {
 }
-boost::shared_ptr<Psana::Acqiris::TrigV1>
-Proxy_TrigV1_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key)
-{
-  if (not m_data) {
-    boost::shared_ptr<Acqiris::ns_TrigV1_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<Acqiris::ns_TrigV1_v0::dataset_data>(m_group, "data", m_idx);
-    m_data.reset(new PsanaType(ds_data->coupling, ds_data->input, ds_data->slope, ds_data->level));
-  }
-  return m_data;
-}
-
-
-void make_datasets_TrigV1_v0(const Psana::Acqiris::TrigV1& obj, 
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
-{
-  {
-    hdf5pp::Type dstype = Acqiris::ns_TrigV1_v0::dataset_data::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
-  }
-}
-
-void store_TrigV1_v0(const Psana::Acqiris::TrigV1& obj, hdf5pp::Group group, bool append)
-{
-  {
-    Acqiris::ns_TrigV1_v0::dataset_data ds_data(obj);
-    if (append) {
-      hdf5pp::Utils::append(group, "data", ds_data);
-    } else {
-      hdf5pp::Utils::storeScalar(group, "data", ds_data);
-    }
-  }
-}
-
-boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::TrigV1> > make_TrigV1(int version, hdf5pp::Group group, hsize_t idx) {
-  switch (version) {
-  case 0:
-    return boost::make_shared<Proxy_TrigV1_v0>(group, idx);
-  default:
-    return boost::make_shared<PSEvt::DataProxy<Psana::Acqiris::TrigV1> >(boost::shared_ptr<Psana::Acqiris::TrigV1>());
-  }
-}
-
-void make_datasets(const Psana::Acqiris::TrigV1& obj, hdf5pp::Group group, hsize_t chunk_size,
-                   int deflate, bool shuffle, int version)
-{
-  if (version < 0) version = 0;
-  switch (version) {
-  case 0:
-    make_datasets_TrigV1_v0(obj, group, chunk_size, deflate, shuffle);
-    break;
-  default:
-    throw ExceptionSchemaVersion(ERR_LOC, "Acqiris.TrigV1", version);
-  }
-}
-
-void store_TrigV1(const Psana::Acqiris::TrigV1& obj, hdf5pp::Group group, int version, bool append)
-{
-  if (version < 0) version = 0;
-  switch (version) {
-  case 0:
-    store_TrigV1_v0(obj, group, append);
-    break;
-  default:
-    throw ExceptionSchemaVersion(ERR_LOC, "Acqiris.TrigV1", version);
-  }
-}
-
-void store(const Psana::Acqiris::TrigV1& obj, hdf5pp::Group group, int version) 
-{
-  store_TrigV1(obj, group, version, false);
-}
-
-void append(const Psana::Acqiris::TrigV1& obj, hdf5pp::Group group, int version)
-{
-  store_TrigV1(obj, group, version, true);
-}
-
 
 hdf5pp::Type ns_ConfigV1_v0_dataset_config_stored_type()
 {
@@ -448,12 +294,12 @@ void make_datasets_ConfigV1_v0(const Psana::Acqiris::ConfigV1& obj,
   }
 }
 
-void store_ConfigV1_v0(const Psana::Acqiris::ConfigV1& obj, hdf5pp::Group group, bool append)
+void store_ConfigV1_v0(const Psana::Acqiris::ConfigV1& obj, hdf5pp::Group group, long index, bool append)
 {
   {
     Acqiris::ns_ConfigV1_v0::dataset_config ds_data(obj);
     if (append) {
-      hdf5pp::Utils::append(group, "config", ds_data);
+      hdf5pp::Utils::storeAt(group, "config", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "config", ds_data);
     }
@@ -461,7 +307,7 @@ void store_ConfigV1_v0(const Psana::Acqiris::ConfigV1& obj, hdf5pp::Group group,
   {
     Acqiris::ns_HorizV1_v0::dataset_data ds_data(obj.horiz());
     if (append) {
-      hdf5pp::Utils::append(group, "horiz", ds_data);
+      hdf5pp::Utils::storeAt(group, "horiz", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "horiz", ds_data);
     }
@@ -469,7 +315,7 @@ void store_ConfigV1_v0(const Psana::Acqiris::ConfigV1& obj, hdf5pp::Group group,
   {
     Acqiris::ns_TrigV1_v0::dataset_data ds_data(obj.trig());
     if (append) {
-      hdf5pp::Utils::append(group, "trig", ds_data);
+      hdf5pp::Utils::storeAt(group, "trig", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "trig", ds_data);
     }
@@ -484,7 +330,7 @@ void store_ConfigV1_v0(const Psana::Acqiris::ConfigV1& obj, hdf5pp::Group group,
       *out = Acqiris::ns_VertV1_v0::dataset_data(*it);
     }
     if (append) {
-      hdf5pp::Utils::appendNDArray(group, "vert", hdf_array);
+      hdf5pp::Utils::storeNDArrayAt(group, "vert", hdf_array, index);
     } else {
       hdf5pp::Utils::storeNDArray(group, "vert", hdf_array);
     }
@@ -513,12 +359,12 @@ void make_datasets(const Psana::Acqiris::ConfigV1& obj, hdf5pp::Group group, hsi
   }
 }
 
-void store_ConfigV1(const Psana::Acqiris::ConfigV1& obj, hdf5pp::Group group, int version, bool append)
+void store_ConfigV1(const Psana::Acqiris::ConfigV1& obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    store_ConfigV1_v0(obj, group, append);
+    store_ConfigV1_v0(obj, group, index, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Acqiris.ConfigV1", version);
@@ -527,12 +373,12 @@ void store_ConfigV1(const Psana::Acqiris::ConfigV1& obj, hdf5pp::Group group, in
 
 void store(const Psana::Acqiris::ConfigV1& obj, hdf5pp::Group group, int version) 
 {
-  store_ConfigV1(obj, group, version, false);
+  store_ConfigV1(obj, group, 0, version, false);
 }
 
-void append(const Psana::Acqiris::ConfigV1& obj, hdf5pp::Group group, int version)
+void store_at(const Psana::Acqiris::ConfigV1& obj, hdf5pp::Group group, long index, int version)
 {
-  store_ConfigV1(obj, group, version, true);
+  store_ConfigV1(obj, group, index, version, true);
 }
 
 
@@ -606,15 +452,15 @@ void make_datasets(const Psana::Acqiris::DataDescV1& obj, hdf5pp::Group group, h
   }
 }
 
-void store_DataDescV1(const Psana::Acqiris::DataDescV1& obj, hdf5pp::Group group, int version, bool append)
+void store_DataDescV1(const Psana::Acqiris::DataDescV1& obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 1;
   switch (version) {
   case 0:
-    store_DataDescV1_v0(obj, group, append);
+    store_DataDescV1_v0(obj, group, index, append);
     break;
   case 1:
-    store_DataDescV1_v1(obj, group, append);
+    store_DataDescV1_v1(obj, group, index, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Acqiris.DataDescV1", version);
@@ -623,12 +469,12 @@ void store_DataDescV1(const Psana::Acqiris::DataDescV1& obj, hdf5pp::Group group
 
 void store(const Psana::Acqiris::DataDescV1& obj, hdf5pp::Group group, int version) 
 {
-  store_DataDescV1(obj, group, version, false);
+  store_DataDescV1(obj, group, 0, version, false);
 }
 
-void append(const Psana::Acqiris::DataDescV1& obj, hdf5pp::Group group, int version)
+void store_at(const Psana::Acqiris::DataDescV1& obj, hdf5pp::Group group, long index, int version)
 {
-  store_DataDescV1(obj, group, version, true);
+  store_DataDescV1(obj, group, index, version, true);
 }
 
 
@@ -714,83 +560,6 @@ ns_TdcChannel_v0::dataset_data::dataset_data(const Psana::Acqiris::TdcChannel& p
 ns_TdcChannel_v0::dataset_data::~dataset_data()
 {
 }
-boost::shared_ptr<Psana::Acqiris::TdcChannel>
-Proxy_TdcChannel_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key)
-{
-  if (not m_data) {
-    boost::shared_ptr<Acqiris::ns_TdcChannel_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<Acqiris::ns_TdcChannel_v0::dataset_data>(m_group, "data", m_idx);
-    m_data.reset(new PsanaType(Psana::Acqiris::TdcChannel::Channel(ds_data->channel), Psana::Acqiris::TdcChannel::Slope(ds_data->slope), Psana::Acqiris::TdcChannel::Mode(ds_data->mode), ds_data->level));
-  }
-  return m_data;
-}
-
-
-void make_datasets_TdcChannel_v0(const Psana::Acqiris::TdcChannel& obj, 
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
-{
-  {
-    hdf5pp::Type dstype = Acqiris::ns_TdcChannel_v0::dataset_data::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
-  }
-}
-
-void store_TdcChannel_v0(const Psana::Acqiris::TdcChannel& obj, hdf5pp::Group group, bool append)
-{
-  {
-    Acqiris::ns_TdcChannel_v0::dataset_data ds_data(obj);
-    if (append) {
-      hdf5pp::Utils::append(group, "data", ds_data);
-    } else {
-      hdf5pp::Utils::storeScalar(group, "data", ds_data);
-    }
-  }
-}
-
-boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::TdcChannel> > make_TdcChannel(int version, hdf5pp::Group group, hsize_t idx) {
-  switch (version) {
-  case 0:
-    return boost::make_shared<Proxy_TdcChannel_v0>(group, idx);
-  default:
-    return boost::make_shared<PSEvt::DataProxy<Psana::Acqiris::TdcChannel> >(boost::shared_ptr<Psana::Acqiris::TdcChannel>());
-  }
-}
-
-void make_datasets(const Psana::Acqiris::TdcChannel& obj, hdf5pp::Group group, hsize_t chunk_size,
-                   int deflate, bool shuffle, int version)
-{
-  if (version < 0) version = 0;
-  switch (version) {
-  case 0:
-    make_datasets_TdcChannel_v0(obj, group, chunk_size, deflate, shuffle);
-    break;
-  default:
-    throw ExceptionSchemaVersion(ERR_LOC, "Acqiris.TdcChannel", version);
-  }
-}
-
-void store_TdcChannel(const Psana::Acqiris::TdcChannel& obj, hdf5pp::Group group, int version, bool append)
-{
-  if (version < 0) version = 0;
-  switch (version) {
-  case 0:
-    store_TdcChannel_v0(obj, group, append);
-    break;
-  default:
-    throw ExceptionSchemaVersion(ERR_LOC, "Acqiris.TdcChannel", version);
-  }
-}
-
-void store(const Psana::Acqiris::TdcChannel& obj, hdf5pp::Group group, int version) 
-{
-  store_TdcChannel(obj, group, version, false);
-}
-
-void append(const Psana::Acqiris::TdcChannel& obj, hdf5pp::Group group, int version)
-{
-  store_TdcChannel(obj, group, version, true);
-}
-
 
 hdf5pp::Type ns_TdcAuxIO_v0_dataset_data_stored_type()
 {
@@ -860,83 +629,6 @@ ns_TdcAuxIO_v0::dataset_data::dataset_data(const Psana::Acqiris::TdcAuxIO& psana
 ns_TdcAuxIO_v0::dataset_data::~dataset_data()
 {
 }
-boost::shared_ptr<Psana::Acqiris::TdcAuxIO>
-Proxy_TdcAuxIO_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key)
-{
-  if (not m_data) {
-    boost::shared_ptr<Acqiris::ns_TdcAuxIO_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<Acqiris::ns_TdcAuxIO_v0::dataset_data>(m_group, "data", m_idx);
-    m_data.reset(new PsanaType(Psana::Acqiris::TdcAuxIO::Channel(ds_data->channel), Psana::Acqiris::TdcAuxIO::Mode(ds_data->mode), Psana::Acqiris::TdcAuxIO::Termination(ds_data->term)));
-  }
-  return m_data;
-}
-
-
-void make_datasets_TdcAuxIO_v0(const Psana::Acqiris::TdcAuxIO& obj, 
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
-{
-  {
-    hdf5pp::Type dstype = Acqiris::ns_TdcAuxIO_v0::dataset_data::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
-  }
-}
-
-void store_TdcAuxIO_v0(const Psana::Acqiris::TdcAuxIO& obj, hdf5pp::Group group, bool append)
-{
-  {
-    Acqiris::ns_TdcAuxIO_v0::dataset_data ds_data(obj);
-    if (append) {
-      hdf5pp::Utils::append(group, "data", ds_data);
-    } else {
-      hdf5pp::Utils::storeScalar(group, "data", ds_data);
-    }
-  }
-}
-
-boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::TdcAuxIO> > make_TdcAuxIO(int version, hdf5pp::Group group, hsize_t idx) {
-  switch (version) {
-  case 0:
-    return boost::make_shared<Proxy_TdcAuxIO_v0>(group, idx);
-  default:
-    return boost::make_shared<PSEvt::DataProxy<Psana::Acqiris::TdcAuxIO> >(boost::shared_ptr<Psana::Acqiris::TdcAuxIO>());
-  }
-}
-
-void make_datasets(const Psana::Acqiris::TdcAuxIO& obj, hdf5pp::Group group, hsize_t chunk_size,
-                   int deflate, bool shuffle, int version)
-{
-  if (version < 0) version = 0;
-  switch (version) {
-  case 0:
-    make_datasets_TdcAuxIO_v0(obj, group, chunk_size, deflate, shuffle);
-    break;
-  default:
-    throw ExceptionSchemaVersion(ERR_LOC, "Acqiris.TdcAuxIO", version);
-  }
-}
-
-void store_TdcAuxIO(const Psana::Acqiris::TdcAuxIO& obj, hdf5pp::Group group, int version, bool append)
-{
-  if (version < 0) version = 0;
-  switch (version) {
-  case 0:
-    store_TdcAuxIO_v0(obj, group, append);
-    break;
-  default:
-    throw ExceptionSchemaVersion(ERR_LOC, "Acqiris.TdcAuxIO", version);
-  }
-}
-
-void store(const Psana::Acqiris::TdcAuxIO& obj, hdf5pp::Group group, int version) 
-{
-  store_TdcAuxIO(obj, group, version, false);
-}
-
-void append(const Psana::Acqiris::TdcAuxIO& obj, hdf5pp::Group group, int version)
-{
-  store_TdcAuxIO(obj, group, version, true);
-}
-
 
 hdf5pp::Type ns_TdcVetoIO_v0_dataset_data_stored_type()
 {
@@ -1004,83 +696,6 @@ ns_TdcVetoIO_v0::dataset_data::dataset_data(const Psana::Acqiris::TdcVetoIO& psa
 ns_TdcVetoIO_v0::dataset_data::~dataset_data()
 {
 }
-boost::shared_ptr<Psana::Acqiris::TdcVetoIO>
-Proxy_TdcVetoIO_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key)
-{
-  if (not m_data) {
-    boost::shared_ptr<Acqiris::ns_TdcVetoIO_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<Acqiris::ns_TdcVetoIO_v0::dataset_data>(m_group, "data", m_idx);
-    m_data.reset(new PsanaType(Psana::Acqiris::TdcVetoIO::Mode(ds_data->mode), Psana::Acqiris::TdcVetoIO::Termination(ds_data->term)));
-  }
-  return m_data;
-}
-
-
-void make_datasets_TdcVetoIO_v0(const Psana::Acqiris::TdcVetoIO& obj, 
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
-{
-  {
-    hdf5pp::Type dstype = Acqiris::ns_TdcVetoIO_v0::dataset_data::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
-  }
-}
-
-void store_TdcVetoIO_v0(const Psana::Acqiris::TdcVetoIO& obj, hdf5pp::Group group, bool append)
-{
-  {
-    Acqiris::ns_TdcVetoIO_v0::dataset_data ds_data(obj);
-    if (append) {
-      hdf5pp::Utils::append(group, "data", ds_data);
-    } else {
-      hdf5pp::Utils::storeScalar(group, "data", ds_data);
-    }
-  }
-}
-
-boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::TdcVetoIO> > make_TdcVetoIO(int version, hdf5pp::Group group, hsize_t idx) {
-  switch (version) {
-  case 0:
-    return boost::make_shared<Proxy_TdcVetoIO_v0>(group, idx);
-  default:
-    return boost::make_shared<PSEvt::DataProxy<Psana::Acqiris::TdcVetoIO> >(boost::shared_ptr<Psana::Acqiris::TdcVetoIO>());
-  }
-}
-
-void make_datasets(const Psana::Acqiris::TdcVetoIO& obj, hdf5pp::Group group, hsize_t chunk_size,
-                   int deflate, bool shuffle, int version)
-{
-  if (version < 0) version = 0;
-  switch (version) {
-  case 0:
-    make_datasets_TdcVetoIO_v0(obj, group, chunk_size, deflate, shuffle);
-    break;
-  default:
-    throw ExceptionSchemaVersion(ERR_LOC, "Acqiris.TdcVetoIO", version);
-  }
-}
-
-void store_TdcVetoIO(const Psana::Acqiris::TdcVetoIO& obj, hdf5pp::Group group, int version, bool append)
-{
-  if (version < 0) version = 0;
-  switch (version) {
-  case 0:
-    store_TdcVetoIO_v0(obj, group, append);
-    break;
-  default:
-    throw ExceptionSchemaVersion(ERR_LOC, "Acqiris.TdcVetoIO", version);
-  }
-}
-
-void store(const Psana::Acqiris::TdcVetoIO& obj, hdf5pp::Group group, int version) 
-{
-  store_TdcVetoIO(obj, group, version, false);
-}
-
-void append(const Psana::Acqiris::TdcVetoIO& obj, hdf5pp::Group group, int version)
-{
-  store_TdcVetoIO(obj, group, version, true);
-}
-
 ndarray<const Psana::Acqiris::TdcChannel, 1> TdcConfigV1_v0::channels() const {
   if (m_ds_channel.empty()) read_ds_channel();
   return m_ds_channel;
@@ -1135,12 +750,12 @@ void make_datasets_TdcConfigV1_v0(const Psana::Acqiris::TdcConfigV1& obj,
   }
 }
 
-void store_TdcConfigV1_v0(const Psana::Acqiris::TdcConfigV1& obj, hdf5pp::Group group, bool append)
+void store_TdcConfigV1_v0(const Psana::Acqiris::TdcConfigV1& obj, hdf5pp::Group group, long index, bool append)
 {
   {
     Acqiris::ns_TdcVetoIO_v0::dataset_data ds_data(obj.veto());
     if (append) {
-      hdf5pp::Utils::append(group, "veto", ds_data);
+      hdf5pp::Utils::storeAt(group, "veto", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "veto", ds_data);
     }
@@ -1155,7 +770,7 @@ void store_TdcConfigV1_v0(const Psana::Acqiris::TdcConfigV1& obj, hdf5pp::Group 
       *out = Acqiris::ns_TdcChannel_v0::dataset_data(*it);
     }
     if (append) {
-      hdf5pp::Utils::appendNDArray(group, "channel", hdf_array);
+      hdf5pp::Utils::storeNDArrayAt(group, "channel", hdf_array, index);
     } else {
       hdf5pp::Utils::storeNDArray(group, "channel", hdf_array);
     }
@@ -1170,7 +785,7 @@ void store_TdcConfigV1_v0(const Psana::Acqiris::TdcConfigV1& obj, hdf5pp::Group 
       *out = Acqiris::ns_TdcAuxIO_v0::dataset_data(*it);
     }
     if (append) {
-      hdf5pp::Utils::appendNDArray(group, "auxio", hdf_array);
+      hdf5pp::Utils::storeNDArrayAt(group, "auxio", hdf_array, index);
     } else {
       hdf5pp::Utils::storeNDArray(group, "auxio", hdf_array);
     }
@@ -1199,12 +814,12 @@ void make_datasets(const Psana::Acqiris::TdcConfigV1& obj, hdf5pp::Group group, 
   }
 }
 
-void store_TdcConfigV1(const Psana::Acqiris::TdcConfigV1& obj, hdf5pp::Group group, int version, bool append)
+void store_TdcConfigV1(const Psana::Acqiris::TdcConfigV1& obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    store_TdcConfigV1_v0(obj, group, append);
+    store_TdcConfigV1_v0(obj, group, index, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Acqiris.TdcConfigV1", version);
@@ -1213,12 +828,12 @@ void store_TdcConfigV1(const Psana::Acqiris::TdcConfigV1& obj, hdf5pp::Group gro
 
 void store(const Psana::Acqiris::TdcConfigV1& obj, hdf5pp::Group group, int version) 
 {
-  store_TdcConfigV1(obj, group, version, false);
+  store_TdcConfigV1(obj, group, 0, version, false);
 }
 
-void append(const Psana::Acqiris::TdcConfigV1& obj, hdf5pp::Group group, int version)
+void store_at(const Psana::Acqiris::TdcConfigV1& obj, hdf5pp::Group group, long index, int version)
 {
-  store_TdcConfigV1(obj, group, version, true);
+  store_TdcConfigV1(obj, group, index, version, true);
 }
 
 
@@ -1286,83 +901,6 @@ ns_TdcDataV1_Item_v0::dataset_data::dataset_data(const Psana::Acqiris::TdcDataV1
 ns_TdcDataV1_Item_v0::dataset_data::~dataset_data()
 {
 }
-boost::shared_ptr<Psana::Acqiris::TdcDataV1_Item>
-Proxy_TdcDataV1_Item_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key)
-{
-  if (not m_data) {
-    boost::shared_ptr<Acqiris::ns_TdcDataV1_Item_v0::dataset_data> ds_data = hdf5pp::Utils::readGroup<Acqiris::ns_TdcDataV1_Item_v0::dataset_data>(m_group, "data", m_idx);
-    m_data.reset(new PsanaType(ds_data->value, Psana::Acqiris::TdcDataV1_Item::Source(ds_data->source), ds_data->overflow));
-  }
-  return m_data;
-}
-
-
-void make_datasets_TdcDataV1_Item_v0(const Psana::Acqiris::TdcDataV1_Item& obj, 
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
-{
-  {
-    hdf5pp::Type dstype = Acqiris::ns_TdcDataV1_Item_v0::dataset_data::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
-  }
-}
-
-void store_TdcDataV1_Item_v0(const Psana::Acqiris::TdcDataV1_Item& obj, hdf5pp::Group group, bool append)
-{
-  {
-    Acqiris::ns_TdcDataV1_Item_v0::dataset_data ds_data(obj);
-    if (append) {
-      hdf5pp::Utils::append(group, "data", ds_data);
-    } else {
-      hdf5pp::Utils::storeScalar(group, "data", ds_data);
-    }
-  }
-}
-
-boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::TdcDataV1_Item> > make_TdcDataV1_Item(int version, hdf5pp::Group group, hsize_t idx) {
-  switch (version) {
-  case 0:
-    return boost::make_shared<Proxy_TdcDataV1_Item_v0>(group, idx);
-  default:
-    return boost::make_shared<PSEvt::DataProxy<Psana::Acqiris::TdcDataV1_Item> >(boost::shared_ptr<Psana::Acqiris::TdcDataV1_Item>());
-  }
-}
-
-void make_datasets(const Psana::Acqiris::TdcDataV1_Item& obj, hdf5pp::Group group, hsize_t chunk_size,
-                   int deflate, bool shuffle, int version)
-{
-  if (version < 0) version = 0;
-  switch (version) {
-  case 0:
-    make_datasets_TdcDataV1_Item_v0(obj, group, chunk_size, deflate, shuffle);
-    break;
-  default:
-    throw ExceptionSchemaVersion(ERR_LOC, "Acqiris.TdcDataV1_Item", version);
-  }
-}
-
-void store_TdcDataV1_Item(const Psana::Acqiris::TdcDataV1_Item& obj, hdf5pp::Group group, int version, bool append)
-{
-  if (version < 0) version = 0;
-  switch (version) {
-  case 0:
-    store_TdcDataV1_Item_v0(obj, group, append);
-    break;
-  default:
-    throw ExceptionSchemaVersion(ERR_LOC, "Acqiris.TdcDataV1_Item", version);
-  }
-}
-
-void store(const Psana::Acqiris::TdcDataV1_Item& obj, hdf5pp::Group group, int version) 
-{
-  store_TdcDataV1_Item(obj, group, version, false);
-}
-
-void append(const Psana::Acqiris::TdcDataV1_Item& obj, hdf5pp::Group group, int version)
-{
-  store_TdcDataV1_Item(obj, group, version, true);
-}
-
 ndarray<const Psana::Acqiris::TdcDataV1_Item, 1> TdcDataV1_v0::data() const {
   if (m_ds_data.empty()) read_ds_data();
   return m_ds_data;
@@ -1386,7 +924,7 @@ void make_datasets_TdcDataV1_v0(const Psana::Acqiris::TdcDataV1& obj,
   }
 }
 
-void store_TdcDataV1_v0(const Psana::Acqiris::TdcDataV1& obj, hdf5pp::Group group, bool append)
+void store_TdcDataV1_v0(const Psana::Acqiris::TdcDataV1& obj, hdf5pp::Group group, long index, bool append)
 {
   {
     typedef __typeof__(obj.data()) PsanaArray;
@@ -1398,7 +936,7 @@ void store_TdcDataV1_v0(const Psana::Acqiris::TdcDataV1& obj, hdf5pp::Group grou
       *out = Acqiris::ns_TdcDataV1_Item_v0::dataset_data(*it);
     }
     if (append) {
-      hdf5pp::Utils::appendNDArray(group, "data", hdf_array);
+      hdf5pp::Utils::storeNDArrayAt(group, "data", hdf_array, index);
     } else {
       hdf5pp::Utils::storeNDArray(group, "data", hdf_array);
     }
@@ -1427,12 +965,12 @@ void make_datasets(const Psana::Acqiris::TdcDataV1& obj, hdf5pp::Group group, hs
   }
 }
 
-void store_TdcDataV1(const Psana::Acqiris::TdcDataV1& obj, hdf5pp::Group group, int version, bool append)
+void store_TdcDataV1(const Psana::Acqiris::TdcDataV1& obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    store_TdcDataV1_v0(obj, group, append);
+    store_TdcDataV1_v0(obj, group, index, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Acqiris.TdcDataV1", version);
@@ -1441,12 +979,12 @@ void store_TdcDataV1(const Psana::Acqiris::TdcDataV1& obj, hdf5pp::Group group, 
 
 void store(const Psana::Acqiris::TdcDataV1& obj, hdf5pp::Group group, int version) 
 {
-  store_TdcDataV1(obj, group, version, false);
+  store_TdcDataV1(obj, group, 0, version, false);
 }
 
-void append(const Psana::Acqiris::TdcDataV1& obj, hdf5pp::Group group, int version)
+void store_at(const Psana::Acqiris::TdcDataV1& obj, hdf5pp::Group group, long index, int version)
 {
-  store_TdcDataV1(obj, group, version, true);
+  store_TdcDataV1(obj, group, index, version, true);
 }
 
 } // namespace Acqiris

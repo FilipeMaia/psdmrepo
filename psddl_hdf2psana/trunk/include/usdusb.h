@@ -75,7 +75,7 @@ private:
 
 void make_datasets_DataV1_v0(const Psana::UsdUsb::DataV1& obj,
       hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle);
-void store_DataV1_v0(const Psana::UsdUsb::DataV1& obj, hdf5pp::Group group, bool append);
+void store_DataV1_v0(const Psana::UsdUsb::DataV1& obj, hdf5pp::Group group, long index, bool append);
 
 } // namespace UsdUsb
 } // namespace psddl_hdf2psana

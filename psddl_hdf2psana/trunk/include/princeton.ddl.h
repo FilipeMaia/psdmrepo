@@ -79,8 +79,9 @@ void store(const Psana::Princeton::ConfigV1& obj, hdf5pp::Group group, int versi
 /// Create container (rank=1) datasets for storing objects of specified type.
 void make_datasets(const Psana::Princeton::ConfigV1& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const Psana::Princeton::ConfigV1& obj, hdf5pp::Group group, int version = -1);
+/// Add one more object to the containers created by previous method at the specified index,
+/// negative index means append to the end of dataset.
+void store_at(const Psana::Princeton::ConfigV1& obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 
 namespace ns_ConfigV2_v0 {
@@ -154,8 +155,9 @@ void store(const Psana::Princeton::ConfigV2& obj, hdf5pp::Group group, int versi
 /// Create container (rank=1) datasets for storing objects of specified type.
 void make_datasets(const Psana::Princeton::ConfigV2& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const Psana::Princeton::ConfigV2& obj, hdf5pp::Group group, int version = -1);
+/// Add one more object to the containers created by previous method at the specified index,
+/// negative index means append to the end of dataset.
+void store_at(const Psana::Princeton::ConfigV2& obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 
 namespace ns_ConfigV3_v0 {
@@ -229,8 +231,9 @@ void store(const Psana::Princeton::ConfigV3& obj, hdf5pp::Group group, int versi
 /// Create container (rank=1) datasets for storing objects of specified type.
 void make_datasets(const Psana::Princeton::ConfigV3& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const Psana::Princeton::ConfigV3& obj, hdf5pp::Group group, int version = -1);
+/// Add one more object to the containers created by previous method at the specified index,
+/// negative index means append to the end of dataset.
+void store_at(const Psana::Princeton::ConfigV3& obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 
 namespace ns_ConfigV4_v0 {
@@ -310,8 +313,9 @@ void store(const Psana::Princeton::ConfigV4& obj, hdf5pp::Group group, int versi
 /// Create container (rank=1) datasets for storing objects of specified type.
 void make_datasets(const Psana::Princeton::ConfigV4& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const Psana::Princeton::ConfigV4& obj, hdf5pp::Group group, int version = -1);
+/// Add one more object to the containers created by previous method at the specified index,
+/// negative index means append to the end of dataset.
+void store_at(const Psana::Princeton::ConfigV4& obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 
 namespace ns_ConfigV5_v0 {
@@ -393,8 +397,9 @@ void store(const Psana::Princeton::ConfigV5& obj, hdf5pp::Group group, int versi
 /// Create container (rank=1) datasets for storing objects of specified type.
 void make_datasets(const Psana::Princeton::ConfigV5& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const Psana::Princeton::ConfigV5& obj, hdf5pp::Group group, int version = -1);
+/// Add one more object to the containers created by previous method at the specified index,
+/// negative index means append to the end of dataset.
+void store_at(const Psana::Princeton::ConfigV5& obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 
 namespace ns_FrameV1_v0 {
@@ -446,8 +451,9 @@ void store(const Psana::Princeton::FrameV1& obj, hdf5pp::Group group, int versio
 /// Create container (rank=1) datasets for storing objects of specified type.
 void make_datasets(const Psana::Princeton::FrameV1& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const Psana::Princeton::FrameV1& obj, hdf5pp::Group group, int version = -1);
+/// Add one more object to the containers created by previous method at the specified index,
+/// negative index means append to the end of dataset.
+void store_at(const Psana::Princeton::FrameV1& obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 
 namespace ns_FrameV2_v0 {
@@ -501,8 +507,9 @@ void store(const Psana::Princeton::FrameV2& obj, hdf5pp::Group group, int versio
 /// Create container (rank=1) datasets for storing objects of specified type.
 void make_datasets(const Psana::Princeton::FrameV2& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const Psana::Princeton::FrameV2& obj, hdf5pp::Group group, int version = -1);
+/// Add one more object to the containers created by previous method at the specified index,
+/// negative index means append to the end of dataset.
+void store_at(const Psana::Princeton::FrameV2& obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 
 namespace ns_InfoV1_v0 {
@@ -544,8 +551,9 @@ void store(const Psana::Princeton::InfoV1& obj, hdf5pp::Group group, int version
 /// Create container (rank=1) datasets for storing objects of specified type.
 void make_datasets(const Psana::Princeton::InfoV1& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const Psana::Princeton::InfoV1& obj, hdf5pp::Group group, int version = -1);
+/// Add one more object to the containers created by previous method at the specified index,
+/// negative index means append to the end of dataset.
+void store_at(const Psana::Princeton::InfoV1& obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 } // namespace Princeton
 } // namespace psddl_hdf2psana

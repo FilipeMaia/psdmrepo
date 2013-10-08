@@ -193,8 +193,9 @@ void store(const Psana::Epics::ConfigV1& obj, hdf5pp::Group group, int version =
 /// Create container (rank=1) datasets for storing objects of specified type.
 void make_datasets(const Psana::Epics::ConfigV1& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const Psana::Epics::ConfigV1& obj, hdf5pp::Group group, int version = -1);
+/// Add one more object to the containers created by previous method at the specified index,
+/// negative index means append to the end of dataset.
+void store_at(const Psana::Epics::ConfigV1& obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 } // namespace Epics
 } // namespace psddl_hdf2psana

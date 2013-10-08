@@ -282,12 +282,12 @@ void make_datasets_ConfigV1_v0(const Psana::ControlData::ConfigV1& obj,
   }
 }
 
-void store_ConfigV1_v0(const Psana::ControlData::ConfigV1& obj, hdf5pp::Group group, bool append)
+void store_ConfigV1_v0(const Psana::ControlData::ConfigV1& obj, hdf5pp::Group group, long index, bool append)
 {
   {
     ControlData::ns_ConfigV1_v0::dataset_config ds_data(obj);
     if (append) {
-      hdf5pp::Utils::append(group, "config", ds_data);
+      hdf5pp::Utils::storeAt(group, "config", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "config", ds_data);
     }
@@ -302,7 +302,7 @@ void store_ConfigV1_v0(const Psana::ControlData::ConfigV1& obj, hdf5pp::Group gr
       *out = ControlData::ns_PVControl_v0::dataset_data(*it);
     }
     if (append) {
-      hdf5pp::Utils::appendNDArray(group, "pvControls", hdf_array);
+      hdf5pp::Utils::storeNDArrayAt(group, "pvControls", hdf_array, index);
     } else {
       hdf5pp::Utils::storeNDArray(group, "pvControls", hdf_array);
     }
@@ -317,7 +317,7 @@ void store_ConfigV1_v0(const Psana::ControlData::ConfigV1& obj, hdf5pp::Group gr
       *out = ControlData::ns_PVMonitor_v0::dataset_data(*it);
     }
     if (append) {
-      hdf5pp::Utils::appendNDArray(group, "pvMonitors", hdf_array);
+      hdf5pp::Utils::storeNDArrayAt(group, "pvMonitors", hdf_array, index);
     } else {
       hdf5pp::Utils::storeNDArray(group, "pvMonitors", hdf_array);
     }
@@ -346,12 +346,12 @@ void make_datasets(const Psana::ControlData::ConfigV1& obj, hdf5pp::Group group,
   }
 }
 
-void store_ConfigV1(const Psana::ControlData::ConfigV1& obj, hdf5pp::Group group, int version, bool append)
+void store_ConfigV1(const Psana::ControlData::ConfigV1& obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    store_ConfigV1_v0(obj, group, append);
+    store_ConfigV1_v0(obj, group, index, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "ControlData.ConfigV1", version);
@@ -360,12 +360,12 @@ void store_ConfigV1(const Psana::ControlData::ConfigV1& obj, hdf5pp::Group group
 
 void store(const Psana::ControlData::ConfigV1& obj, hdf5pp::Group group, int version) 
 {
-  store_ConfigV1(obj, group, version, false);
+  store_ConfigV1(obj, group, 0, version, false);
 }
 
-void append(const Psana::ControlData::ConfigV1& obj, hdf5pp::Group group, int version)
+void store_at(const Psana::ControlData::ConfigV1& obj, hdf5pp::Group group, long index, int version)
 {
-  store_ConfigV1(obj, group, version, true);
+  store_ConfigV1(obj, group, index, version, true);
 }
 
 
@@ -521,12 +521,12 @@ void make_datasets_ConfigV2_v0(const Psana::ControlData::ConfigV2& obj,
   }
 }
 
-void store_ConfigV2_v0(const Psana::ControlData::ConfigV2& obj, hdf5pp::Group group, bool append)
+void store_ConfigV2_v0(const Psana::ControlData::ConfigV2& obj, hdf5pp::Group group, long index, bool append)
 {
   {
     ControlData::ns_ConfigV2_v0::dataset_config ds_data(obj);
     if (append) {
-      hdf5pp::Utils::append(group, "config", ds_data);
+      hdf5pp::Utils::storeAt(group, "config", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "config", ds_data);
     }
@@ -541,7 +541,7 @@ void store_ConfigV2_v0(const Psana::ControlData::ConfigV2& obj, hdf5pp::Group gr
       *out = ControlData::ns_PVControl_v0::dataset_data(*it);
     }
     if (append) {
-      hdf5pp::Utils::appendNDArray(group, "pvControls", hdf_array);
+      hdf5pp::Utils::storeNDArrayAt(group, "pvControls", hdf_array, index);
     } else {
       hdf5pp::Utils::storeNDArray(group, "pvControls", hdf_array);
     }
@@ -556,7 +556,7 @@ void store_ConfigV2_v0(const Psana::ControlData::ConfigV2& obj, hdf5pp::Group gr
       *out = ControlData::ns_PVMonitor_v0::dataset_data(*it);
     }
     if (append) {
-      hdf5pp::Utils::appendNDArray(group, "pvMonitors", hdf_array);
+      hdf5pp::Utils::storeNDArrayAt(group, "pvMonitors", hdf_array, index);
     } else {
       hdf5pp::Utils::storeNDArray(group, "pvMonitors", hdf_array);
     }
@@ -571,7 +571,7 @@ void store_ConfigV2_v0(const Psana::ControlData::ConfigV2& obj, hdf5pp::Group gr
       *out = ControlData::ns_PVLabel_v0::dataset_data(*it);
     }
     if (append) {
-      hdf5pp::Utils::appendNDArray(group, "pvLabels", hdf_array);
+      hdf5pp::Utils::storeNDArrayAt(group, "pvLabels", hdf_array, index);
     } else {
       hdf5pp::Utils::storeNDArray(group, "pvLabels", hdf_array);
     }
@@ -600,12 +600,12 @@ void make_datasets(const Psana::ControlData::ConfigV2& obj, hdf5pp::Group group,
   }
 }
 
-void store_ConfigV2(const Psana::ControlData::ConfigV2& obj, hdf5pp::Group group, int version, bool append)
+void store_ConfigV2(const Psana::ControlData::ConfigV2& obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    store_ConfigV2_v0(obj, group, append);
+    store_ConfigV2_v0(obj, group, index, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "ControlData.ConfigV2", version);
@@ -614,12 +614,12 @@ void store_ConfigV2(const Psana::ControlData::ConfigV2& obj, hdf5pp::Group group
 
 void store(const Psana::ControlData::ConfigV2& obj, hdf5pp::Group group, int version) 
 {
-  store_ConfigV2(obj, group, version, false);
+  store_ConfigV2(obj, group, 0, version, false);
 }
 
-void append(const Psana::ControlData::ConfigV2& obj, hdf5pp::Group group, int version)
+void store_at(const Psana::ControlData::ConfigV2& obj, hdf5pp::Group group, long index, int version)
 {
-  store_ConfigV2(obj, group, version, true);
+  store_ConfigV2(obj, group, index, version, true);
 }
 
 
@@ -782,12 +782,12 @@ void make_datasets_ConfigV3_v0(const Psana::ControlData::ConfigV3& obj,
   }
 }
 
-void store_ConfigV3_v0(const Psana::ControlData::ConfigV3& obj, hdf5pp::Group group, bool append)
+void store_ConfigV3_v0(const Psana::ControlData::ConfigV3& obj, hdf5pp::Group group, long index, bool append)
 {
   {
     ControlData::ns_ConfigV3_v0::dataset_config ds_data(obj);
     if (append) {
-      hdf5pp::Utils::append(group, "config", ds_data);
+      hdf5pp::Utils::storeAt(group, "config", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "config", ds_data);
     }
@@ -802,7 +802,7 @@ void store_ConfigV3_v0(const Psana::ControlData::ConfigV3& obj, hdf5pp::Group gr
       *out = ControlData::ns_PVControl_v0::dataset_data(*it);
     }
     if (append) {
-      hdf5pp::Utils::appendNDArray(group, "pvControls", hdf_array);
+      hdf5pp::Utils::storeNDArrayAt(group, "pvControls", hdf_array, index);
     } else {
       hdf5pp::Utils::storeNDArray(group, "pvControls", hdf_array);
     }
@@ -817,7 +817,7 @@ void store_ConfigV3_v0(const Psana::ControlData::ConfigV3& obj, hdf5pp::Group gr
       *out = ControlData::ns_PVMonitor_v0::dataset_data(*it);
     }
     if (append) {
-      hdf5pp::Utils::appendNDArray(group, "pvMonitors", hdf_array);
+      hdf5pp::Utils::storeNDArrayAt(group, "pvMonitors", hdf_array, index);
     } else {
       hdf5pp::Utils::storeNDArray(group, "pvMonitors", hdf_array);
     }
@@ -832,7 +832,7 @@ void store_ConfigV3_v0(const Psana::ControlData::ConfigV3& obj, hdf5pp::Group gr
       *out = ControlData::ns_PVLabel_v0::dataset_data(*it);
     }
     if (append) {
-      hdf5pp::Utils::appendNDArray(group, "pvLabels", hdf_array);
+      hdf5pp::Utils::storeNDArrayAt(group, "pvLabels", hdf_array, index);
     } else {
       hdf5pp::Utils::storeNDArray(group, "pvLabels", hdf_array);
     }
@@ -861,12 +861,12 @@ void make_datasets(const Psana::ControlData::ConfigV3& obj, hdf5pp::Group group,
   }
 }
 
-void store_ConfigV3(const Psana::ControlData::ConfigV3& obj, hdf5pp::Group group, int version, bool append)
+void store_ConfigV3(const Psana::ControlData::ConfigV3& obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    store_ConfigV3_v0(obj, group, append);
+    store_ConfigV3_v0(obj, group, index, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "ControlData.ConfigV3", version);
@@ -875,12 +875,12 @@ void store_ConfigV3(const Psana::ControlData::ConfigV3& obj, hdf5pp::Group group
 
 void store(const Psana::ControlData::ConfigV3& obj, hdf5pp::Group group, int version) 
 {
-  store_ConfigV3(obj, group, version, false);
+  store_ConfigV3(obj, group, 0, version, false);
 }
 
-void append(const Psana::ControlData::ConfigV3& obj, hdf5pp::Group group, int version)
+void store_at(const Psana::ControlData::ConfigV3& obj, hdf5pp::Group group, long index, int version)
 {
-  store_ConfigV3(obj, group, version, true);
+  store_ConfigV3(obj, group, index, version, true);
 }
 
 } // namespace ControlData

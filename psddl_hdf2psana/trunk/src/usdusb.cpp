@@ -157,10 +157,10 @@ void make_datasets_DataV1_v0(const Psana::UsdUsb::DataV1& obj,
   }
 }
 
-void store_DataV1_v0(const Psana::UsdUsb::DataV1& obj, hdf5pp::Group group, bool append)
+void store_DataV1_v0(const Psana::UsdUsb::DataV1& obj, hdf5pp::Group group, long index, bool append)
 {
   if (append) {
-    hdf5pp::Utils::append(group, "data", ns_DataV1_v0::dataset_data(obj));
+    hdf5pp::Utils::storeAt(group, "data", ns_DataV1_v0::dataset_data(obj), index);
   } else {
     hdf5pp::Utils::storeScalar(group, "data", ns_DataV1_v0::dataset_data(obj));
   }

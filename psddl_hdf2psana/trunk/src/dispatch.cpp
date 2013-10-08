@@ -83,10 +83,6 @@ try {
     // Bld::BldDataPhaseCavity
     evt.putProxy(psddl_hdf2psana::Bld::make_BldDataPhaseCavity(schema_version, group, idx), src);
     break;
-  case 150950753:
-    // CsPad2x2::CsPad2x2ReadOnlyCfg
-    evt.putProxy(psddl_hdf2psana::CsPad2x2::make_CsPad2x2ReadOnlyCfg(schema_version, group, idx), src);
-    break;
   case 169144489:
     // Acqiris::TdcConfigV1
     cfgStore.putProxy(psddl_hdf2psana::Acqiris::make_TdcConfigV1(schema_version, group, idx), src);
@@ -110,10 +106,6 @@ try {
   case 670963505:
     // Quartz::ConfigV1
     cfgStore.putProxy(psddl_hdf2psana::Quartz::make_ConfigV1(schema_version, group, idx), src);
-    break;
-  case 705383241:
-    // CsPad2x2::ProtectionSystemThreshold
-    evt.putProxy(psddl_hdf2psana::CsPad2x2::make_ProtectionSystemThreshold(schema_version, group, idx), src);
     break;
   case 738044564:
     // Bld::BldDataSpectrometerV0
@@ -146,10 +138,6 @@ try {
   case 913738686:
     // Princeton::ConfigV1
     cfgStore.putProxy(psddl_hdf2psana::Princeton::make_ConfigV1(schema_version, group, idx), src);
-    break;
-  case 1005088878:
-    // Acqiris::TdcAuxIO
-    evt.putProxy(psddl_hdf2psana::Acqiris::make_TdcAuxIO(schema_version, group, idx), src);
     break;
   case 1022640350:
     // Andor::ConfigV1
@@ -186,10 +174,6 @@ try {
   case 1083296678:
     // Encoder::DataV1
     evt.putProxy(psddl_hdf2psana::Encoder::make_DataV1(schema_version, group, idx), src);
-    break;
-  case 1133035550:
-    // EvrData::FIFOEvent
-    evt.putProxy(psddl_hdf2psana::EvrData::make_FIFOEvent(schema_version, group, idx), src);
     break;
   case 1151720060:
     // Fli::FrameV1
@@ -287,10 +271,6 @@ try {
       evt.putProxy(psddl_hdf2psana::CsPad::make_DataV2(schema_version, group, idx, cfgPtr), src);
     }
     break;
-  case 1543725316:
-    // EvrData::PulseConfigV3
-    evt.putProxy(psddl_hdf2psana::EvrData::make_PulseConfigV3(schema_version, group, idx), src);
-    break;
   case 1551708791:
     // Orca::ConfigV1
     cfgStore.putProxy(psddl_hdf2psana::Orca::make_ConfigV1(schema_version, group, idx), src);
@@ -310,10 +290,6 @@ try {
   case 1624433407:
     // Encoder::ConfigV2
     cfgStore.putProxy(psddl_hdf2psana::Encoder::make_ConfigV2(schema_version, group, idx), src);
-    break;
-  case 1656086870:
-    // Acqiris::HorizV1
-    evt.putProxy(psddl_hdf2psana::Acqiris::make_HorizV1(schema_version, group, idx), src);
     break;
   case 1705456020:
     // Ipimb::ConfigV2
@@ -389,35 +365,15 @@ try {
     // Camera::FrameFexConfigV1
     cfgStore.putProxy(psddl_hdf2psana::Camera::make_FrameFexConfigV1(schema_version, group, idx), src);
     break;
-  case 2436058311:
-    // Acqiris::TdcChannel
-    evt.putProxy(psddl_hdf2psana::Acqiris::make_TdcChannel(schema_version, group, idx), src);
-    break;
-  case 2478618317:
-    // EvrData::SequencerEntry
-    evt.putProxy(psddl_hdf2psana::EvrData::make_SequencerEntry(schema_version, group, idx), src);
-    break;
-  case 2533780153:
-    // Acqiris::TdcDataV1_Item
-    evt.putProxy(psddl_hdf2psana::Acqiris::make_TdcDataV1_Item(schema_version, group, idx), src);
-    break;
   case 2708910361:
     // Lusi::DiodeFexV1
     evt.putProxy(psddl_hdf2psana::Lusi::make_DiodeFexV1(schema_version, group, idx), src);
-    break;
-  case 2780844529:
-    // CsPad::ProtectionSystemThreshold
-    evt.putProxy(psddl_hdf2psana::CsPad::make_ProtectionSystemThreshold(schema_version, group, idx), src);
     break;
   case 2869143498:
     // Gsc16ai::DataV1
     if (boost::shared_ptr<Psana::Gsc16ai::ConfigV1> cfgPtr = cfgStore.get(src)) {
       evt.putProxy(psddl_hdf2psana::Gsc16ai::make_DataV1(schema_version, group, idx, cfgPtr), src);
     }
-    break;
-  case 2899606017:
-    // CsPad::CsPadReadOnlyCfg
-    evt.putProxy(psddl_hdf2psana::CsPad::make_CsPadReadOnlyCfg(schema_version, group, idx), src);
     break;
   case 2901814733:
     // Ipimb::DataV1
@@ -432,22 +388,6 @@ try {
     if (boost::shared_ptr<Psana::OceanOptics::ConfigV1> cfgPtr = cfgStore.get(src)) {
       evt.putProxy(psddl_hdf2psana::OceanOptics::make_DataV1(schema_version, group, idx, cfgPtr), src);
     }
-    break;
-  case 2931478704:
-    // EvrData::EventCodeV3
-    evt.putProxy(psddl_hdf2psana::EvrData::make_EventCodeV3(schema_version, group, idx), src);
-    break;
-  case 2931478709:
-    // EvrData::EventCodeV6
-    evt.putProxy(psddl_hdf2psana::EvrData::make_EventCodeV6(schema_version, group, idx), src);
-    break;
-  case 2931478710:
-    // EvrData::EventCodeV5
-    evt.putProxy(psddl_hdf2psana::EvrData::make_EventCodeV5(schema_version, group, idx), src);
-    break;
-  case 2931478711:
-    // EvrData::EventCodeV4
-    evt.putProxy(psddl_hdf2psana::EvrData::make_EventCodeV4(schema_version, group, idx), src);
     break;
   case 2940448584:
     // CsPad::ConfigV4
@@ -499,10 +439,6 @@ try {
     // Bld::BldDataIpimb
     evt.putProxy(psddl_hdf2psana::Bld::make_BldDataIpimbV0(schema_version, group, idx), src);
     break;
-  case 3151987128:
-    // Acqiris::TrigV1
-    evt.putProxy(psddl_hdf2psana::Acqiris::make_TrigV1(schema_version, group, idx), src);
-    break;
   case 3346701347:
     // L3T::ConfigV1
     cfgStore.putProxy(psddl_hdf2psana::L3T::make_ConfigV1(schema_version, group, idx), src);
@@ -540,10 +476,6 @@ try {
   case 3486939574:
     // CsPad2x2::ConfigV2
     cfgStore.putProxy(psddl_hdf2psana::CsPad2x2::make_ConfigV2(schema_version, group, idx), src);
-    break;
-  case 3523858218:
-    // Acqiris::TdcVetoIO
-    evt.putProxy(psddl_hdf2psana::Acqiris::make_TdcVetoIO(schema_version, group, idx), src);
     break;
   case 3565044250:
     // Acqiris::ConfigV1
@@ -603,10 +535,6 @@ try {
   case 4103916011:
     // FCCD::FccdConfigV2
     cfgStore.putProxy(psddl_hdf2psana::FCCD::make_FccdConfigV2(schema_version, group, idx), src);
-    break;
-  case 4114962913:
-    // EvrData::PulseConfig
-    evt.putProxy(psddl_hdf2psana::EvrData::make_PulseConfig(schema_version, group, idx), src);
     break;
   case 4130246568:
     // Imp::ElementV1

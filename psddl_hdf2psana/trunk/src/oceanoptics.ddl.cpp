@@ -108,12 +108,12 @@ void make_datasets_ConfigV1_v0(const Psana::OceanOptics::ConfigV1& obj,
   }
 }
 
-void store_ConfigV1_v0(const Psana::OceanOptics::ConfigV1& obj, hdf5pp::Group group, bool append)
+void store_ConfigV1_v0(const Psana::OceanOptics::ConfigV1& obj, hdf5pp::Group group, long index, bool append)
 {
   {
     OceanOptics::ns_ConfigV1_v0::dataset_config ds_data(obj);
     if (append) {
-      hdf5pp::Utils::append(group, "config", ds_data);
+      hdf5pp::Utils::storeAt(group, "config", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "config", ds_data);
     }
@@ -142,12 +142,12 @@ void make_datasets(const Psana::OceanOptics::ConfigV1& obj, hdf5pp::Group group,
   }
 }
 
-void store_ConfigV1(const Psana::OceanOptics::ConfigV1& obj, hdf5pp::Group group, int version, bool append)
+void store_ConfigV1(const Psana::OceanOptics::ConfigV1& obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    store_ConfigV1_v0(obj, group, append);
+    store_ConfigV1_v0(obj, group, index, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "OceanOptics.ConfigV1", version);
@@ -156,12 +156,12 @@ void store_ConfigV1(const Psana::OceanOptics::ConfigV1& obj, hdf5pp::Group group
 
 void store(const Psana::OceanOptics::ConfigV1& obj, hdf5pp::Group group, int version) 
 {
-  store_ConfigV1(obj, group, version, false);
+  store_ConfigV1(obj, group, 0, version, false);
 }
 
-void append(const Psana::OceanOptics::ConfigV1& obj, hdf5pp::Group group, int version)
+void store_at(const Psana::OceanOptics::ConfigV1& obj, hdf5pp::Group group, long index, int version)
 {
-  store_ConfigV1(obj, group, version, true);
+  store_ConfigV1(obj, group, index, version, true);
 }
 
 
@@ -366,17 +366,17 @@ void make_datasets_DataV1_v0(const Psana::OceanOptics::DataV1& obj,
   }
 }
 
-void store_DataV1_v0(const Psana::OceanOptics::DataV1& obj, hdf5pp::Group group, bool append)
+void store_DataV1_v0(const Psana::OceanOptics::DataV1& obj, hdf5pp::Group group, long index, bool append)
 {
   if (append) {
-    hdf5pp::Utils::appendNDArray(group, "spectra", obj.data());
+    hdf5pp::Utils::storeNDArrayAt(group, "spectra", obj.data(), index);
   } else {
     hdf5pp::Utils::storeNDArray(group, "spectra", obj.data());
   }
   {
     OceanOptics::ns_DataV1_v0::dataset_data ds_data(obj);
     if (append) {
-      hdf5pp::Utils::append(group, "data", ds_data);
+      hdf5pp::Utils::storeAt(group, "data", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "data", ds_data);
     }
@@ -405,12 +405,12 @@ void make_datasets(const Psana::OceanOptics::DataV1& obj, hdf5pp::Group group, h
   }
 }
 
-void store_DataV1(const Psana::OceanOptics::DataV1& obj, hdf5pp::Group group, int version, bool append)
+void store_DataV1(const Psana::OceanOptics::DataV1& obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    store_DataV1_v0(obj, group, append);
+    store_DataV1_v0(obj, group, index, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "OceanOptics.DataV1", version);
@@ -419,12 +419,12 @@ void store_DataV1(const Psana::OceanOptics::DataV1& obj, hdf5pp::Group group, in
 
 void store(const Psana::OceanOptics::DataV1& obj, hdf5pp::Group group, int version) 
 {
-  store_DataV1(obj, group, version, false);
+  store_DataV1(obj, group, 0, version, false);
 }
 
-void append(const Psana::OceanOptics::DataV1& obj, hdf5pp::Group group, int version)
+void store_at(const Psana::OceanOptics::DataV1& obj, hdf5pp::Group group, long index, int version)
 {
-  store_DataV1(obj, group, version, true);
+  store_DataV1(obj, group, index, version, true);
 }
 
 } // namespace OceanOptics

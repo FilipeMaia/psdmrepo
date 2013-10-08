@@ -491,12 +491,12 @@ void make_datasets_ConfigV1_v0(const Psana::Timepix::ConfigV1& obj,
   }
 }
 
-void store_ConfigV1_v0(const Psana::Timepix::ConfigV1& obj, hdf5pp::Group group, bool append)
+void store_ConfigV1_v0(const Psana::Timepix::ConfigV1& obj, hdf5pp::Group group, long index, bool append)
 {
   {
     Timepix::ns_ConfigV1_v0::dataset_config ds_data(obj);
     if (append) {
-      hdf5pp::Utils::append(group, "config", ds_data);
+      hdf5pp::Utils::storeAt(group, "config", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "config", ds_data);
     }
@@ -525,12 +525,12 @@ void make_datasets(const Psana::Timepix::ConfigV1& obj, hdf5pp::Group group, hsi
   }
 }
 
-void store_ConfigV1(const Psana::Timepix::ConfigV1& obj, hdf5pp::Group group, int version, bool append)
+void store_ConfigV1(const Psana::Timepix::ConfigV1& obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    store_ConfigV1_v0(obj, group, append);
+    store_ConfigV1_v0(obj, group, index, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Timepix.ConfigV1", version);
@@ -539,12 +539,12 @@ void store_ConfigV1(const Psana::Timepix::ConfigV1& obj, hdf5pp::Group group, in
 
 void store(const Psana::Timepix::ConfigV1& obj, hdf5pp::Group group, int version) 
 {
-  store_ConfigV1(obj, group, version, false);
+  store_ConfigV1(obj, group, 0, version, false);
 }
 
-void append(const Psana::Timepix::ConfigV1& obj, hdf5pp::Group group, int version)
+void store_at(const Psana::Timepix::ConfigV1& obj, hdf5pp::Group group, long index, int version)
 {
-  store_ConfigV1(obj, group, version, true);
+  store_ConfigV1(obj, group, index, version, true);
 }
 
 
@@ -1129,12 +1129,12 @@ void make_datasets_ConfigV2_v0(const Psana::Timepix::ConfigV2& obj,
   }
 }
 
-void store_ConfigV2_v0(const Psana::Timepix::ConfigV2& obj, hdf5pp::Group group, bool append)
+void store_ConfigV2_v0(const Psana::Timepix::ConfigV2& obj, hdf5pp::Group group, long index, bool append)
 {
   {
     Timepix::ns_ConfigV2_v0::dataset_config ds_data(obj);
     if (append) {
-      hdf5pp::Utils::append(group, "config", ds_data);
+      hdf5pp::Utils::storeAt(group, "config", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "config", ds_data);
     }
@@ -1163,12 +1163,12 @@ void make_datasets(const Psana::Timepix::ConfigV2& obj, hdf5pp::Group group, hsi
   }
 }
 
-void store_ConfigV2(const Psana::Timepix::ConfigV2& obj, hdf5pp::Group group, int version, bool append)
+void store_ConfigV2(const Psana::Timepix::ConfigV2& obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    store_ConfigV2_v0(obj, group, append);
+    store_ConfigV2_v0(obj, group, index, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Timepix.ConfigV2", version);
@@ -1177,12 +1177,12 @@ void store_ConfigV2(const Psana::Timepix::ConfigV2& obj, hdf5pp::Group group, in
 
 void store(const Psana::Timepix::ConfigV2& obj, hdf5pp::Group group, int version) 
 {
-  store_ConfigV2(obj, group, version, false);
+  store_ConfigV2(obj, group, 0, version, false);
 }
 
-void append(const Psana::Timepix::ConfigV2& obj, hdf5pp::Group group, int version)
+void store_at(const Psana::Timepix::ConfigV2& obj, hdf5pp::Group group, long index, int version)
 {
-  store_ConfigV2(obj, group, version, true);
+  store_ConfigV2(obj, group, index, version, true);
 }
 
 
@@ -1779,12 +1779,12 @@ void make_datasets_ConfigV3_v0(const Psana::Timepix::ConfigV3& obj,
   }
 }
 
-void store_ConfigV3_v0(const Psana::Timepix::ConfigV3& obj, hdf5pp::Group group, bool append)
+void store_ConfigV3_v0(const Psana::Timepix::ConfigV3& obj, hdf5pp::Group group, long index, bool append)
 {
   {
     Timepix::ns_ConfigV3_v0::dataset_config ds_data(obj);
     if (append) {
-      hdf5pp::Utils::append(group, "config", ds_data);
+      hdf5pp::Utils::storeAt(group, "config", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "config", ds_data);
     }
@@ -1813,12 +1813,12 @@ void make_datasets(const Psana::Timepix::ConfigV3& obj, hdf5pp::Group group, hsi
   }
 }
 
-void store_ConfigV3(const Psana::Timepix::ConfigV3& obj, hdf5pp::Group group, int version, bool append)
+void store_ConfigV3(const Psana::Timepix::ConfigV3& obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    store_ConfigV3_v0(obj, group, append);
+    store_ConfigV3_v0(obj, group, index, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Timepix.ConfigV3", version);
@@ -1827,12 +1827,12 @@ void store_ConfigV3(const Psana::Timepix::ConfigV3& obj, hdf5pp::Group group, in
 
 void store(const Psana::Timepix::ConfigV3& obj, hdf5pp::Group group, int version) 
 {
-  store_ConfigV3(obj, group, version, false);
+  store_ConfigV3(obj, group, 0, version, false);
 }
 
-void append(const Psana::Timepix::ConfigV3& obj, hdf5pp::Group group, int version)
+void store_at(const Psana::Timepix::ConfigV3& obj, hdf5pp::Group group, long index, int version)
 {
-  store_ConfigV3(obj, group, version, true);
+  store_ConfigV3(obj, group, index, version, true);
 }
 
 
@@ -1929,18 +1929,18 @@ void make_datasets_DataV1_v0(const Psana::Timepix::DataV1& obj,
   }
 }
 
-void store_DataV1_v0(const Psana::Timepix::DataV1& obj, hdf5pp::Group group, bool append)
+void store_DataV1_v0(const Psana::Timepix::DataV1& obj, hdf5pp::Group group, long index, bool append)
 {
   {
     Timepix::ns_DataV1_v0::dataset_data ds_data(obj);
     if (append) {
-      hdf5pp::Utils::append(group, "data", ds_data);
+      hdf5pp::Utils::storeAt(group, "data", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "data", ds_data);
     }
   }
   if (append) {
-    hdf5pp::Utils::appendNDArray(group, "image", obj.data());
+    hdf5pp::Utils::storeNDArrayAt(group, "image", obj.data(), index);
   } else {
     hdf5pp::Utils::storeNDArray(group, "image", obj.data());
   }
@@ -1968,12 +1968,12 @@ void make_datasets(const Psana::Timepix::DataV1& obj, hdf5pp::Group group, hsize
   }
 }
 
-void store_DataV1(const Psana::Timepix::DataV1& obj, hdf5pp::Group group, int version, bool append)
+void store_DataV1(const Psana::Timepix::DataV1& obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    store_DataV1_v0(obj, group, append);
+    store_DataV1_v0(obj, group, index, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Timepix.DataV1", version);
@@ -1982,12 +1982,12 @@ void store_DataV1(const Psana::Timepix::DataV1& obj, hdf5pp::Group group, int ve
 
 void store(const Psana::Timepix::DataV1& obj, hdf5pp::Group group, int version) 
 {
-  store_DataV1(obj, group, version, false);
+  store_DataV1(obj, group, 0, version, false);
 }
 
-void append(const Psana::Timepix::DataV1& obj, hdf5pp::Group group, int version)
+void store_at(const Psana::Timepix::DataV1& obj, hdf5pp::Group group, long index, int version)
 {
-  store_DataV1(obj, group, version, true);
+  store_DataV1(obj, group, index, version, true);
 }
 
 
@@ -2096,18 +2096,18 @@ void make_datasets_DataV2_v0(const Psana::Timepix::DataV2& obj,
   }
 }
 
-void store_DataV2_v0(const Psana::Timepix::DataV2& obj, hdf5pp::Group group, bool append)
+void store_DataV2_v0(const Psana::Timepix::DataV2& obj, hdf5pp::Group group, long index, bool append)
 {
   {
     Timepix::ns_DataV2_v0::dataset_data ds_data(obj);
     if (append) {
-      hdf5pp::Utils::append(group, "data", ds_data);
+      hdf5pp::Utils::storeAt(group, "data", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "data", ds_data);
     }
   }
   if (append) {
-    hdf5pp::Utils::appendNDArray(group, "image", obj.data());
+    hdf5pp::Utils::storeNDArrayAt(group, "image", obj.data(), index);
   } else {
     hdf5pp::Utils::storeNDArray(group, "image", obj.data());
   }
@@ -2135,12 +2135,12 @@ void make_datasets(const Psana::Timepix::DataV2& obj, hdf5pp::Group group, hsize
   }
 }
 
-void store_DataV2(const Psana::Timepix::DataV2& obj, hdf5pp::Group group, int version, bool append)
+void store_DataV2(const Psana::Timepix::DataV2& obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    store_DataV2_v0(obj, group, append);
+    store_DataV2_v0(obj, group, index, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Timepix.DataV2", version);
@@ -2149,12 +2149,12 @@ void store_DataV2(const Psana::Timepix::DataV2& obj, hdf5pp::Group group, int ve
 
 void store(const Psana::Timepix::DataV2& obj, hdf5pp::Group group, int version) 
 {
-  store_DataV2(obj, group, version, false);
+  store_DataV2(obj, group, 0, version, false);
 }
 
-void append(const Psana::Timepix::DataV2& obj, hdf5pp::Group group, int version)
+void store_at(const Psana::Timepix::DataV2& obj, hdf5pp::Group group, long index, int version)
 {
-  store_DataV2(obj, group, version, true);
+  store_DataV2(obj, group, index, version, true);
 }
 
 } // namespace Timepix

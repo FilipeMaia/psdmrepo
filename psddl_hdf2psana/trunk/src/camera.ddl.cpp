@@ -78,12 +78,12 @@ void make_datasets_FrameCoord_v0(const Psana::Camera::FrameCoord& obj,
   }
 }
 
-void store_FrameCoord_v0(const Psana::Camera::FrameCoord& obj, hdf5pp::Group group, bool append)
+void store_FrameCoord_v0(const Psana::Camera::FrameCoord& obj, hdf5pp::Group group, long index, bool append)
 {
   {
     Camera::ns_FrameCoord_v0::dataset_data ds_data(obj);
     if (append) {
-      hdf5pp::Utils::append(group, "data", ds_data);
+      hdf5pp::Utils::storeAt(group, "data", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "data", ds_data);
     }
@@ -112,12 +112,12 @@ void make_datasets(const Psana::Camera::FrameCoord& obj, hdf5pp::Group group, hs
   }
 }
 
-void store_FrameCoord(const Psana::Camera::FrameCoord& obj, hdf5pp::Group group, int version, bool append)
+void store_FrameCoord(const Psana::Camera::FrameCoord& obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    store_FrameCoord_v0(obj, group, append);
+    store_FrameCoord_v0(obj, group, index, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Camera.FrameCoord", version);
@@ -126,12 +126,12 @@ void store_FrameCoord(const Psana::Camera::FrameCoord& obj, hdf5pp::Group group,
 
 void store(const Psana::Camera::FrameCoord& obj, hdf5pp::Group group, int version) 
 {
-  store_FrameCoord(obj, group, version, false);
+  store_FrameCoord(obj, group, 0, version, false);
 }
 
-void append(const Psana::Camera::FrameCoord& obj, hdf5pp::Group group, int version)
+void store_at(const Psana::Camera::FrameCoord& obj, hdf5pp::Group group, long index, int version)
 {
-  store_FrameCoord(obj, group, version, true);
+  store_FrameCoord(obj, group, index, version, true);
 }
 
 
@@ -140,7 +140,7 @@ void make_datasets_FrameFccdConfigV1_v0(const Psana::Camera::FrameFccdConfigV1& 
 {
 }
 
-void store_FrameFccdConfigV1_v0(const Psana::Camera::FrameFccdConfigV1& obj, hdf5pp::Group group, bool append)
+void store_FrameFccdConfigV1_v0(const Psana::Camera::FrameFccdConfigV1& obj, hdf5pp::Group group, long index, bool append)
 {
 }
 
@@ -166,12 +166,12 @@ void make_datasets(const Psana::Camera::FrameFccdConfigV1& obj, hdf5pp::Group gr
   }
 }
 
-void store_FrameFccdConfigV1(const Psana::Camera::FrameFccdConfigV1& obj, hdf5pp::Group group, int version, bool append)
+void store_FrameFccdConfigV1(const Psana::Camera::FrameFccdConfigV1& obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    store_FrameFccdConfigV1_v0(obj, group, append);
+    store_FrameFccdConfigV1_v0(obj, group, index, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Camera.FrameFccdConfigV1", version);
@@ -180,12 +180,12 @@ void store_FrameFccdConfigV1(const Psana::Camera::FrameFccdConfigV1& obj, hdf5pp
 
 void store(const Psana::Camera::FrameFccdConfigV1& obj, hdf5pp::Group group, int version) 
 {
-  store_FrameFccdConfigV1(obj, group, version, false);
+  store_FrameFccdConfigV1(obj, group, 0, version, false);
 }
 
-void append(const Psana::Camera::FrameFccdConfigV1& obj, hdf5pp::Group group, int version)
+void store_at(const Psana::Camera::FrameFccdConfigV1& obj, hdf5pp::Group group, long index, int version)
 {
-  store_FrameFccdConfigV1(obj, group, version, true);
+  store_FrameFccdConfigV1(obj, group, index, version, true);
 }
 
 
@@ -326,12 +326,12 @@ void make_datasets_FrameFexConfigV1_v0(const Psana::Camera::FrameFexConfigV1& ob
   }
 }
 
-void store_FrameFexConfigV1_v0(const Psana::Camera::FrameFexConfigV1& obj, hdf5pp::Group group, bool append)
+void store_FrameFexConfigV1_v0(const Psana::Camera::FrameFexConfigV1& obj, hdf5pp::Group group, long index, bool append)
 {
   {
     Camera::ns_FrameFexConfigV1_v0::dataset_config ds_data(obj);
     if (append) {
-      hdf5pp::Utils::append(group, "config", ds_data);
+      hdf5pp::Utils::storeAt(group, "config", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "config", ds_data);
     }
@@ -346,7 +346,7 @@ void store_FrameFexConfigV1_v0(const Psana::Camera::FrameFexConfigV1& obj, hdf5p
       *out = Camera::ns_FrameCoord_v0::dataset_data(*it);
     }
     if (append) {
-      hdf5pp::Utils::appendNDArray(group, "masked_pixel_coordinates", hdf_array);
+      hdf5pp::Utils::storeNDArrayAt(group, "masked_pixel_coordinates", hdf_array, index);
     } else {
       hdf5pp::Utils::storeNDArray(group, "masked_pixel_coordinates", hdf_array);
     }
@@ -375,12 +375,12 @@ void make_datasets(const Psana::Camera::FrameFexConfigV1& obj, hdf5pp::Group gro
   }
 }
 
-void store_FrameFexConfigV1(const Psana::Camera::FrameFexConfigV1& obj, hdf5pp::Group group, int version, bool append)
+void store_FrameFexConfigV1(const Psana::Camera::FrameFexConfigV1& obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    store_FrameFexConfigV1_v0(obj, group, append);
+    store_FrameFexConfigV1_v0(obj, group, index, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Camera.FrameFexConfigV1", version);
@@ -389,12 +389,12 @@ void store_FrameFexConfigV1(const Psana::Camera::FrameFexConfigV1& obj, hdf5pp::
 
 void store(const Psana::Camera::FrameFexConfigV1& obj, hdf5pp::Group group, int version) 
 {
-  store_FrameFexConfigV1(obj, group, version, false);
+  store_FrameFexConfigV1(obj, group, 0, version, false);
 }
 
-void append(const Psana::Camera::FrameFexConfigV1& obj, hdf5pp::Group group, int version)
+void store_at(const Psana::Camera::FrameFexConfigV1& obj, hdf5pp::Group group, long index, int version)
 {
-  store_FrameFexConfigV1(obj, group, version, true);
+  store_FrameFexConfigV1(obj, group, index, version, true);
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Camera::FrameV1> > make_FrameV1(int version, hdf5pp::Group group, hsize_t idx) {
@@ -419,12 +419,12 @@ void make_datasets(const Psana::Camera::FrameV1& obj, hdf5pp::Group group, hsize
   }
 }
 
-void store_FrameV1(const Psana::Camera::FrameV1& obj, hdf5pp::Group group, int version, bool append)
+void store_FrameV1(const Psana::Camera::FrameV1& obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    store_FrameV1_v0(obj, group, append);
+    store_FrameV1_v0(obj, group, index, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Camera.FrameV1", version);
@@ -433,12 +433,12 @@ void store_FrameV1(const Psana::Camera::FrameV1& obj, hdf5pp::Group group, int v
 
 void store(const Psana::Camera::FrameV1& obj, hdf5pp::Group group, int version) 
 {
-  store_FrameV1(obj, group, version, false);
+  store_FrameV1(obj, group, 0, version, false);
 }
 
-void append(const Psana::Camera::FrameV1& obj, hdf5pp::Group group, int version)
+void store_at(const Psana::Camera::FrameV1& obj, hdf5pp::Group group, long index, int version)
 {
-  store_FrameV1(obj, group, version, true);
+  store_FrameV1(obj, group, index, version, true);
 }
 
 
@@ -535,12 +535,12 @@ void make_datasets_TwoDGaussianV1_v0(const Psana::Camera::TwoDGaussianV1& obj,
   }
 }
 
-void store_TwoDGaussianV1_v0(const Psana::Camera::TwoDGaussianV1& obj, hdf5pp::Group group, bool append)
+void store_TwoDGaussianV1_v0(const Psana::Camera::TwoDGaussianV1& obj, hdf5pp::Group group, long index, bool append)
 {
   {
     Camera::ns_TwoDGaussianV1_v0::dataset_data ds_data(obj);
     if (append) {
-      hdf5pp::Utils::append(group, "data", ds_data);
+      hdf5pp::Utils::storeAt(group, "data", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "data", ds_data);
     }
@@ -569,12 +569,12 @@ void make_datasets(const Psana::Camera::TwoDGaussianV1& obj, hdf5pp::Group group
   }
 }
 
-void store_TwoDGaussianV1(const Psana::Camera::TwoDGaussianV1& obj, hdf5pp::Group group, int version, bool append)
+void store_TwoDGaussianV1(const Psana::Camera::TwoDGaussianV1& obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    store_TwoDGaussianV1_v0(obj, group, append);
+    store_TwoDGaussianV1_v0(obj, group, index, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Camera.TwoDGaussianV1", version);
@@ -583,12 +583,12 @@ void store_TwoDGaussianV1(const Psana::Camera::TwoDGaussianV1& obj, hdf5pp::Grou
 
 void store(const Psana::Camera::TwoDGaussianV1& obj, hdf5pp::Group group, int version) 
 {
-  store_TwoDGaussianV1(obj, group, version, false);
+  store_TwoDGaussianV1(obj, group, 0, version, false);
 }
 
-void append(const Psana::Camera::TwoDGaussianV1& obj, hdf5pp::Group group, int version)
+void store_at(const Psana::Camera::TwoDGaussianV1& obj, hdf5pp::Group group, long index, int version)
 {
-  store_TwoDGaussianV1(obj, group, version, true);
+  store_TwoDGaussianV1(obj, group, index, version, true);
 }
 
 } // namespace Camera

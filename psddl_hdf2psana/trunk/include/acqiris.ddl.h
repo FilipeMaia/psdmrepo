@@ -47,33 +47,6 @@ struct dataset_data {
 
 };
 }
-class Proxy_HorizV1_v0 : public PSEvt::Proxy<Psana::Acqiris::HorizV1> {
-public:
-  typedef Psana::Acqiris::HorizV1 PsanaType;
-
-  Proxy_HorizV1_v0(hdf5pp::Group group, hsize_t idx) : m_group(group), m_idx(idx) {}
-  virtual ~Proxy_HorizV1_v0() {}
-
-protected:
-
-  virtual boost::shared_ptr<PsanaType> getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key);
-
-private:
-
-  mutable hdf5pp::Group m_group;
-  hsize_t m_idx;
-  boost::shared_ptr<PsanaType> m_data;
-};
-boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::HorizV1> > make_HorizV1(int version, hdf5pp::Group group, hsize_t idx);
-
-/// Store object as a single instance (scalar dataset) inside specified group.
-void store(const Psana::Acqiris::HorizV1& obj, hdf5pp::Group group, int version = -1);
-/// Create container (rank=1) datasets for storing objects of specified type.
-void make_datasets(const Psana::Acqiris::HorizV1& obj, hdf5pp::Group group, hsize_t chunk_size,
-                   int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const Psana::Acqiris::HorizV1& obj, hdf5pp::Group group, int version = -1);
-
 
 namespace ns_TrigV1_v0 {
 struct dataset_data {
@@ -93,33 +66,6 @@ struct dataset_data {
 
 };
 }
-class Proxy_TrigV1_v0 : public PSEvt::Proxy<Psana::Acqiris::TrigV1> {
-public:
-  typedef Psana::Acqiris::TrigV1 PsanaType;
-
-  Proxy_TrigV1_v0(hdf5pp::Group group, hsize_t idx) : m_group(group), m_idx(idx) {}
-  virtual ~Proxy_TrigV1_v0() {}
-
-protected:
-
-  virtual boost::shared_ptr<PsanaType> getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key);
-
-private:
-
-  mutable hdf5pp::Group m_group;
-  hsize_t m_idx;
-  boost::shared_ptr<PsanaType> m_data;
-};
-boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::TrigV1> > make_TrigV1(int version, hdf5pp::Group group, hsize_t idx);
-
-/// Store object as a single instance (scalar dataset) inside specified group.
-void store(const Psana::Acqiris::TrigV1& obj, hdf5pp::Group group, int version = -1);
-/// Create container (rank=1) datasets for storing objects of specified type.
-void make_datasets(const Psana::Acqiris::TrigV1& obj, hdf5pp::Group group, hsize_t chunk_size,
-                   int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const Psana::Acqiris::TrigV1& obj, hdf5pp::Group group, int version = -1);
-
 
 namespace ns_ConfigV1_v0 {
 struct dataset_config {
@@ -176,8 +122,9 @@ void store(const Psana::Acqiris::ConfigV1& obj, hdf5pp::Group group, int version
 /// Create container (rank=1) datasets for storing objects of specified type.
 void make_datasets(const Psana::Acqiris::ConfigV1& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const Psana::Acqiris::ConfigV1& obj, hdf5pp::Group group, int version = -1);
+/// Add one more object to the containers created by previous method at the specified index,
+/// negative index means append to the end of dataset.
+void store_at(const Psana::Acqiris::ConfigV1& obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 
 namespace ns_TimestampV1_v0 {
@@ -202,8 +149,9 @@ void store(const Psana::Acqiris::DataDescV1& obj, hdf5pp::Group group, int versi
 /// Create container (rank=1) datasets for storing objects of specified type.
 void make_datasets(const Psana::Acqiris::DataDescV1& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const Psana::Acqiris::DataDescV1& obj, hdf5pp::Group group, int version = -1);
+/// Add one more object to the containers created by previous method at the specified index,
+/// negative index means append to the end of dataset.
+void store_at(const Psana::Acqiris::DataDescV1& obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 
 namespace ns_TdcChannel_v0 {
@@ -225,33 +173,6 @@ struct dataset_data {
 
 };
 }
-class Proxy_TdcChannel_v0 : public PSEvt::Proxy<Psana::Acqiris::TdcChannel> {
-public:
-  typedef Psana::Acqiris::TdcChannel PsanaType;
-
-  Proxy_TdcChannel_v0(hdf5pp::Group group, hsize_t idx) : m_group(group), m_idx(idx) {}
-  virtual ~Proxy_TdcChannel_v0() {}
-
-protected:
-
-  virtual boost::shared_ptr<PsanaType> getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key);
-
-private:
-
-  mutable hdf5pp::Group m_group;
-  hsize_t m_idx;
-  boost::shared_ptr<PsanaType> m_data;
-};
-boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::TdcChannel> > make_TdcChannel(int version, hdf5pp::Group group, hsize_t idx);
-
-/// Store object as a single instance (scalar dataset) inside specified group.
-void store(const Psana::Acqiris::TdcChannel& obj, hdf5pp::Group group, int version = -1);
-/// Create container (rank=1) datasets for storing objects of specified type.
-void make_datasets(const Psana::Acqiris::TdcChannel& obj, hdf5pp::Group group, hsize_t chunk_size,
-                   int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const Psana::Acqiris::TdcChannel& obj, hdf5pp::Group group, int version = -1);
-
 
 namespace ns_TdcAuxIO_v0 {
 struct dataset_data {
@@ -270,33 +191,6 @@ struct dataset_data {
 
 };
 }
-class Proxy_TdcAuxIO_v0 : public PSEvt::Proxy<Psana::Acqiris::TdcAuxIO> {
-public:
-  typedef Psana::Acqiris::TdcAuxIO PsanaType;
-
-  Proxy_TdcAuxIO_v0(hdf5pp::Group group, hsize_t idx) : m_group(group), m_idx(idx) {}
-  virtual ~Proxy_TdcAuxIO_v0() {}
-
-protected:
-
-  virtual boost::shared_ptr<PsanaType> getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key);
-
-private:
-
-  mutable hdf5pp::Group m_group;
-  hsize_t m_idx;
-  boost::shared_ptr<PsanaType> m_data;
-};
-boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::TdcAuxIO> > make_TdcAuxIO(int version, hdf5pp::Group group, hsize_t idx);
-
-/// Store object as a single instance (scalar dataset) inside specified group.
-void store(const Psana::Acqiris::TdcAuxIO& obj, hdf5pp::Group group, int version = -1);
-/// Create container (rank=1) datasets for storing objects of specified type.
-void make_datasets(const Psana::Acqiris::TdcAuxIO& obj, hdf5pp::Group group, hsize_t chunk_size,
-                   int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const Psana::Acqiris::TdcAuxIO& obj, hdf5pp::Group group, int version = -1);
-
 
 namespace ns_TdcVetoIO_v0 {
 struct dataset_data {
@@ -315,33 +209,6 @@ struct dataset_data {
 
 };
 }
-class Proxy_TdcVetoIO_v0 : public PSEvt::Proxy<Psana::Acqiris::TdcVetoIO> {
-public:
-  typedef Psana::Acqiris::TdcVetoIO PsanaType;
-
-  Proxy_TdcVetoIO_v0(hdf5pp::Group group, hsize_t idx) : m_group(group), m_idx(idx) {}
-  virtual ~Proxy_TdcVetoIO_v0() {}
-
-protected:
-
-  virtual boost::shared_ptr<PsanaType> getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key);
-
-private:
-
-  mutable hdf5pp::Group m_group;
-  hsize_t m_idx;
-  boost::shared_ptr<PsanaType> m_data;
-};
-boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::TdcVetoIO> > make_TdcVetoIO(int version, hdf5pp::Group group, hsize_t idx);
-
-/// Store object as a single instance (scalar dataset) inside specified group.
-void store(const Psana::Acqiris::TdcVetoIO& obj, hdf5pp::Group group, int version = -1);
-/// Create container (rank=1) datasets for storing objects of specified type.
-void make_datasets(const Psana::Acqiris::TdcVetoIO& obj, hdf5pp::Group group, hsize_t chunk_size,
-                   int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const Psana::Acqiris::TdcVetoIO& obj, hdf5pp::Group group, int version = -1);
-
 
 
 class TdcConfigV1_v0 : public Psana::Acqiris::TdcConfigV1 {
@@ -373,8 +240,9 @@ void store(const Psana::Acqiris::TdcConfigV1& obj, hdf5pp::Group group, int vers
 /// Create container (rank=1) datasets for storing objects of specified type.
 void make_datasets(const Psana::Acqiris::TdcConfigV1& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const Psana::Acqiris::TdcConfigV1& obj, hdf5pp::Group group, int version = -1);
+/// Add one more object to the containers created by previous method at the specified index,
+/// negative index means append to the end of dataset.
+void store_at(const Psana::Acqiris::TdcConfigV1& obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 
 namespace ns_TdcDataV1_Item_v0 {
@@ -394,33 +262,6 @@ struct dataset_data {
 
 };
 }
-class Proxy_TdcDataV1_Item_v0 : public PSEvt::Proxy<Psana::Acqiris::TdcDataV1_Item> {
-public:
-  typedef Psana::Acqiris::TdcDataV1_Item PsanaType;
-
-  Proxy_TdcDataV1_Item_v0(hdf5pp::Group group, hsize_t idx) : m_group(group), m_idx(idx) {}
-  virtual ~Proxy_TdcDataV1_Item_v0() {}
-
-protected:
-
-  virtual boost::shared_ptr<PsanaType> getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key);
-
-private:
-
-  mutable hdf5pp::Group m_group;
-  hsize_t m_idx;
-  boost::shared_ptr<PsanaType> m_data;
-};
-boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::TdcDataV1_Item> > make_TdcDataV1_Item(int version, hdf5pp::Group group, hsize_t idx);
-
-/// Store object as a single instance (scalar dataset) inside specified group.
-void store(const Psana::Acqiris::TdcDataV1_Item& obj, hdf5pp::Group group, int version = -1);
-/// Create container (rank=1) datasets for storing objects of specified type.
-void make_datasets(const Psana::Acqiris::TdcDataV1_Item& obj, hdf5pp::Group group, hsize_t chunk_size,
-                   int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const Psana::Acqiris::TdcDataV1_Item& obj, hdf5pp::Group group, int version = -1);
-
 
 
 class TdcDataV1_v0 : public Psana::Acqiris::TdcDataV1 {
@@ -446,8 +287,9 @@ void store(const Psana::Acqiris::TdcDataV1& obj, hdf5pp::Group group, int versio
 /// Create container (rank=1) datasets for storing objects of specified type.
 void make_datasets(const Psana::Acqiris::TdcDataV1& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const Psana::Acqiris::TdcDataV1& obj, hdf5pp::Group group, int version = -1);
+/// Add one more object to the containers created by previous method at the specified index,
+/// negative index means append to the end of dataset.
+void store_at(const Psana::Acqiris::TdcDataV1& obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 } // namespace Acqiris
 } // namespace psddl_hdf2psana

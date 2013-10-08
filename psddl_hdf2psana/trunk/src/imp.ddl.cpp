@@ -134,12 +134,12 @@ void make_datasets_ConfigV1_v0(const Psana::Imp::ConfigV1& obj,
   }
 }
 
-void store_ConfigV1_v0(const Psana::Imp::ConfigV1& obj, hdf5pp::Group group, bool append)
+void store_ConfigV1_v0(const Psana::Imp::ConfigV1& obj, hdf5pp::Group group, long index, bool append)
 {
   {
     Imp::ns_ConfigV1_v0::dataset_config ds_data(obj);
     if (append) {
-      hdf5pp::Utils::append(group, "config", ds_data);
+      hdf5pp::Utils::storeAt(group, "config", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "config", ds_data);
     }
@@ -168,12 +168,12 @@ void make_datasets(const Psana::Imp::ConfigV1& obj, hdf5pp::Group group, hsize_t
   }
 }
 
-void store_ConfigV1(const Psana::Imp::ConfigV1& obj, hdf5pp::Group group, int version, bool append)
+void store_ConfigV1(const Psana::Imp::ConfigV1& obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    store_ConfigV1_v0(obj, group, append);
+    store_ConfigV1_v0(obj, group, index, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Imp.ConfigV1", version);
@@ -182,12 +182,12 @@ void store_ConfigV1(const Psana::Imp::ConfigV1& obj, hdf5pp::Group group, int ve
 
 void store(const Psana::Imp::ConfigV1& obj, hdf5pp::Group group, int version) 
 {
-  store_ConfigV1(obj, group, version, false);
+  store_ConfigV1(obj, group, 0, version, false);
 }
 
-void append(const Psana::Imp::ConfigV1& obj, hdf5pp::Group group, int version)
+void store_at(const Psana::Imp::ConfigV1& obj, hdf5pp::Group group, long index, int version)
 {
-  store_ConfigV1(obj, group, version, true);
+  store_ConfigV1(obj, group, index, version, true);
 }
 
 
@@ -414,12 +414,12 @@ void make_datasets_ElementV1_v0(const Psana::Imp::ElementV1& obj,
   }
 }
 
-void store_ElementV1_v0(const Psana::Imp::ElementV1& obj, hdf5pp::Group group, bool append)
+void store_ElementV1_v0(const Psana::Imp::ElementV1& obj, hdf5pp::Group group, long index, bool append)
 {
   {
     Imp::ns_ElementV1_v0::dataset_data ds_data(obj);
     if (append) {
-      hdf5pp::Utils::append(group, "data", ds_data);
+      hdf5pp::Utils::storeAt(group, "data", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "data", ds_data);
     }
@@ -434,7 +434,7 @@ void store_ElementV1_v0(const Psana::Imp::ElementV1& obj, hdf5pp::Group group, b
       *out = Imp::ns_Sample_v0::dataset_data(*it);
     }
     if (append) {
-      hdf5pp::Utils::appendNDArray(group, "samples", hdf_array);
+      hdf5pp::Utils::storeNDArrayAt(group, "samples", hdf_array, index);
     } else {
       hdf5pp::Utils::storeNDArray(group, "samples", hdf_array);
     }
@@ -463,12 +463,12 @@ void make_datasets(const Psana::Imp::ElementV1& obj, hdf5pp::Group group, hsize_
   }
 }
 
-void store_ElementV1(const Psana::Imp::ElementV1& obj, hdf5pp::Group group, int version, bool append)
+void store_ElementV1(const Psana::Imp::ElementV1& obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    store_ElementV1_v0(obj, group, append);
+    store_ElementV1_v0(obj, group, index, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Imp.ElementV1", version);
@@ -477,12 +477,12 @@ void store_ElementV1(const Psana::Imp::ElementV1& obj, hdf5pp::Group group, int 
 
 void store(const Psana::Imp::ElementV1& obj, hdf5pp::Group group, int version) 
 {
-  store_ElementV1(obj, group, version, false);
+  store_ElementV1(obj, group, 0, version, false);
 }
 
-void append(const Psana::Imp::ElementV1& obj, hdf5pp::Group group, int version)
+void store_at(const Psana::Imp::ElementV1& obj, hdf5pp::Group group, long index, int version)
 {
-  store_ElementV1(obj, group, version, true);
+  store_ElementV1(obj, group, index, version, true);
 }
 
 } // namespace Imp

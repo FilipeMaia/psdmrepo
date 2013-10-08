@@ -100,12 +100,12 @@ void make_datasets_FccdConfigV1_v0(const Psana::FCCD::FccdConfigV1& obj,
   }
 }
 
-void store_FccdConfigV1_v0(const Psana::FCCD::FccdConfigV1& obj, hdf5pp::Group group, bool append)
+void store_FccdConfigV1_v0(const Psana::FCCD::FccdConfigV1& obj, hdf5pp::Group group, long index, bool append)
 {
   {
     FCCD::ns_FccdConfigV1_v0::dataset_config ds_data(obj);
     if (append) {
-      hdf5pp::Utils::append(group, "config", ds_data);
+      hdf5pp::Utils::storeAt(group, "config", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "config", ds_data);
     }
@@ -134,12 +134,12 @@ void make_datasets(const Psana::FCCD::FccdConfigV1& obj, hdf5pp::Group group, hs
   }
 }
 
-void store_FccdConfigV1(const Psana::FCCD::FccdConfigV1& obj, hdf5pp::Group group, int version, bool append)
+void store_FccdConfigV1(const Psana::FCCD::FccdConfigV1& obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    store_FccdConfigV1_v0(obj, group, append);
+    store_FccdConfigV1_v0(obj, group, index, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "FCCD.FccdConfigV1", version);
@@ -148,12 +148,12 @@ void store_FccdConfigV1(const Psana::FCCD::FccdConfigV1& obj, hdf5pp::Group grou
 
 void store(const Psana::FCCD::FccdConfigV1& obj, hdf5pp::Group group, int version) 
 {
-  store_FccdConfigV1(obj, group, version, false);
+  store_FccdConfigV1(obj, group, 0, version, false);
 }
 
-void append(const Psana::FCCD::FccdConfigV1& obj, hdf5pp::Group group, int version)
+void store_at(const Psana::FCCD::FccdConfigV1& obj, hdf5pp::Group group, long index, int version)
 {
-  store_FccdConfigV1(obj, group, version, true);
+  store_FccdConfigV1(obj, group, index, version, true);
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::FCCD::FccdConfigV2> > make_FccdConfigV2(int version, hdf5pp::Group group, hsize_t idx) {
@@ -178,12 +178,12 @@ void make_datasets(const Psana::FCCD::FccdConfigV2& obj, hdf5pp::Group group, hs
   }
 }
 
-void store_FccdConfigV2(const Psana::FCCD::FccdConfigV2& obj, hdf5pp::Group group, int version, bool append)
+void store_FccdConfigV2(const Psana::FCCD::FccdConfigV2& obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    store_FccdConfigV2_v0(obj, group, append);
+    store_FccdConfigV2_v0(obj, group, index, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "FCCD.FccdConfigV2", version);
@@ -192,12 +192,12 @@ void store_FccdConfigV2(const Psana::FCCD::FccdConfigV2& obj, hdf5pp::Group grou
 
 void store(const Psana::FCCD::FccdConfigV2& obj, hdf5pp::Group group, int version) 
 {
-  store_FccdConfigV2(obj, group, version, false);
+  store_FccdConfigV2(obj, group, 0, version, false);
 }
 
-void append(const Psana::FCCD::FccdConfigV2& obj, hdf5pp::Group group, int version)
+void store_at(const Psana::FCCD::FccdConfigV2& obj, hdf5pp::Group group, long index, int version)
 {
-  store_FccdConfigV2(obj, group, version, true);
+  store_FccdConfigV2(obj, group, index, version, true);
 }
 
 } // namespace FCCD

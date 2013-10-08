@@ -79,7 +79,7 @@ private:
 
 void make_datasets_BldDataPimV1_v0(const Psana::Bld::BldDataPimV1& obj,
       hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle);
-void store_BldDataPimV1_v0(const Psana::Bld::BldDataPimV1& obj, hdf5pp::Group group, bool append);
+void store_BldDataPimV1_v0(const Psana::Bld::BldDataPimV1& obj, hdf5pp::Group group, long index, bool append);
 
 
 /*
@@ -106,7 +106,7 @@ private:
 
 void make_datasets_BldDataAcqADCV1_v0(const Psana::Bld::BldDataAcqADCV1& obj,
       hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle);
-void store_BldDataAcqADCV1_v0(const Psana::Bld::BldDataAcqADCV1& obj, hdf5pp::Group group, bool append);
+void store_BldDataAcqADCV1_v0(const Psana::Bld::BldDataAcqADCV1& obj, hdf5pp::Group group, long index, bool append);
 
 
 

@@ -148,12 +148,12 @@ void make_datasets_ConfigV1_v0(const Psana::Princeton::ConfigV1& obj,
   }
 }
 
-void store_ConfigV1_v0(const Psana::Princeton::ConfigV1& obj, hdf5pp::Group group, bool append)
+void store_ConfigV1_v0(const Psana::Princeton::ConfigV1& obj, hdf5pp::Group group, long index, bool append)
 {
   {
     Princeton::ns_ConfigV1_v0::dataset_config ds_data(obj);
     if (append) {
-      hdf5pp::Utils::append(group, "config", ds_data);
+      hdf5pp::Utils::storeAt(group, "config", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "config", ds_data);
     }
@@ -182,12 +182,12 @@ void make_datasets(const Psana::Princeton::ConfigV1& obj, hdf5pp::Group group, h
   }
 }
 
-void store_ConfigV1(const Psana::Princeton::ConfigV1& obj, hdf5pp::Group group, int version, bool append)
+void store_ConfigV1(const Psana::Princeton::ConfigV1& obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    store_ConfigV1_v0(obj, group, append);
+    store_ConfigV1_v0(obj, group, index, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Princeton.ConfigV1", version);
@@ -196,12 +196,12 @@ void store_ConfigV1(const Psana::Princeton::ConfigV1& obj, hdf5pp::Group group, 
 
 void store(const Psana::Princeton::ConfigV1& obj, hdf5pp::Group group, int version) 
 {
-  store_ConfigV1(obj, group, version, false);
+  store_ConfigV1(obj, group, 0, version, false);
 }
 
-void append(const Psana::Princeton::ConfigV1& obj, hdf5pp::Group group, int version)
+void store_at(const Psana::Princeton::ConfigV1& obj, hdf5pp::Group group, long index, int version)
 {
-  store_ConfigV1(obj, group, version, true);
+  store_ConfigV1(obj, group, index, version, true);
 }
 
 
@@ -347,12 +347,12 @@ void make_datasets_ConfigV2_v0(const Psana::Princeton::ConfigV2& obj,
   }
 }
 
-void store_ConfigV2_v0(const Psana::Princeton::ConfigV2& obj, hdf5pp::Group group, bool append)
+void store_ConfigV2_v0(const Psana::Princeton::ConfigV2& obj, hdf5pp::Group group, long index, bool append)
 {
   {
     Princeton::ns_ConfigV2_v0::dataset_config ds_data(obj);
     if (append) {
-      hdf5pp::Utils::append(group, "config", ds_data);
+      hdf5pp::Utils::storeAt(group, "config", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "config", ds_data);
     }
@@ -381,12 +381,12 @@ void make_datasets(const Psana::Princeton::ConfigV2& obj, hdf5pp::Group group, h
   }
 }
 
-void store_ConfigV2(const Psana::Princeton::ConfigV2& obj, hdf5pp::Group group, int version, bool append)
+void store_ConfigV2(const Psana::Princeton::ConfigV2& obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    store_ConfigV2_v0(obj, group, append);
+    store_ConfigV2_v0(obj, group, index, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Princeton.ConfigV2", version);
@@ -395,12 +395,12 @@ void store_ConfigV2(const Psana::Princeton::ConfigV2& obj, hdf5pp::Group group, 
 
 void store(const Psana::Princeton::ConfigV2& obj, hdf5pp::Group group, int version) 
 {
-  store_ConfigV2(obj, group, version, false);
+  store_ConfigV2(obj, group, 0, version, false);
 }
 
-void append(const Psana::Princeton::ConfigV2& obj, hdf5pp::Group group, int version)
+void store_at(const Psana::Princeton::ConfigV2& obj, hdf5pp::Group group, long index, int version)
 {
-  store_ConfigV2(obj, group, version, true);
+  store_ConfigV2(obj, group, index, version, true);
 }
 
 
@@ -546,12 +546,12 @@ void make_datasets_ConfigV3_v0(const Psana::Princeton::ConfigV3& obj,
   }
 }
 
-void store_ConfigV3_v0(const Psana::Princeton::ConfigV3& obj, hdf5pp::Group group, bool append)
+void store_ConfigV3_v0(const Psana::Princeton::ConfigV3& obj, hdf5pp::Group group, long index, bool append)
 {
   {
     Princeton::ns_ConfigV3_v0::dataset_config ds_data(obj);
     if (append) {
-      hdf5pp::Utils::append(group, "config", ds_data);
+      hdf5pp::Utils::storeAt(group, "config", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "config", ds_data);
     }
@@ -580,12 +580,12 @@ void make_datasets(const Psana::Princeton::ConfigV3& obj, hdf5pp::Group group, h
   }
 }
 
-void store_ConfigV3(const Psana::Princeton::ConfigV3& obj, hdf5pp::Group group, int version, bool append)
+void store_ConfigV3(const Psana::Princeton::ConfigV3& obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    store_ConfigV3_v0(obj, group, append);
+    store_ConfigV3_v0(obj, group, index, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Princeton.ConfigV3", version);
@@ -594,12 +594,12 @@ void store_ConfigV3(const Psana::Princeton::ConfigV3& obj, hdf5pp::Group group, 
 
 void store(const Psana::Princeton::ConfigV3& obj, hdf5pp::Group group, int version) 
 {
-  store_ConfigV3(obj, group, version, false);
+  store_ConfigV3(obj, group, 0, version, false);
 }
 
-void append(const Psana::Princeton::ConfigV3& obj, hdf5pp::Group group, int version)
+void store_at(const Psana::Princeton::ConfigV3& obj, hdf5pp::Group group, long index, int version)
 {
-  store_ConfigV3(obj, group, version, true);
+  store_ConfigV3(obj, group, index, version, true);
 }
 
 
@@ -766,12 +766,12 @@ void make_datasets_ConfigV4_v0(const Psana::Princeton::ConfigV4& obj,
   }
 }
 
-void store_ConfigV4_v0(const Psana::Princeton::ConfigV4& obj, hdf5pp::Group group, bool append)
+void store_ConfigV4_v0(const Psana::Princeton::ConfigV4& obj, hdf5pp::Group group, long index, bool append)
 {
   {
     Princeton::ns_ConfigV4_v0::dataset_config ds_data(obj);
     if (append) {
-      hdf5pp::Utils::append(group, "config", ds_data);
+      hdf5pp::Utils::storeAt(group, "config", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "config", ds_data);
     }
@@ -800,12 +800,12 @@ void make_datasets(const Psana::Princeton::ConfigV4& obj, hdf5pp::Group group, h
   }
 }
 
-void store_ConfigV4(const Psana::Princeton::ConfigV4& obj, hdf5pp::Group group, int version, bool append)
+void store_ConfigV4(const Psana::Princeton::ConfigV4& obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    store_ConfigV4_v0(obj, group, append);
+    store_ConfigV4_v0(obj, group, index, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Princeton.ConfigV4", version);
@@ -814,12 +814,12 @@ void store_ConfigV4(const Psana::Princeton::ConfigV4& obj, hdf5pp::Group group, 
 
 void store(const Psana::Princeton::ConfigV4& obj, hdf5pp::Group group, int version) 
 {
-  store_ConfigV4(obj, group, version, false);
+  store_ConfigV4(obj, group, 0, version, false);
 }
 
-void append(const Psana::Princeton::ConfigV4& obj, hdf5pp::Group group, int version)
+void store_at(const Psana::Princeton::ConfigV4& obj, hdf5pp::Group group, long index, int version)
 {
-  store_ConfigV4(obj, group, version, true);
+  store_ConfigV4(obj, group, index, version, true);
 }
 
 
@@ -993,12 +993,12 @@ void make_datasets_ConfigV5_v0(const Psana::Princeton::ConfigV5& obj,
   }
 }
 
-void store_ConfigV5_v0(const Psana::Princeton::ConfigV5& obj, hdf5pp::Group group, bool append)
+void store_ConfigV5_v0(const Psana::Princeton::ConfigV5& obj, hdf5pp::Group group, long index, bool append)
 {
   {
     Princeton::ns_ConfigV5_v0::dataset_config ds_data(obj);
     if (append) {
-      hdf5pp::Utils::append(group, "config", ds_data);
+      hdf5pp::Utils::storeAt(group, "config", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "config", ds_data);
     }
@@ -1027,12 +1027,12 @@ void make_datasets(const Psana::Princeton::ConfigV5& obj, hdf5pp::Group group, h
   }
 }
 
-void store_ConfigV5(const Psana::Princeton::ConfigV5& obj, hdf5pp::Group group, int version, bool append)
+void store_ConfigV5(const Psana::Princeton::ConfigV5& obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    store_ConfigV5_v0(obj, group, append);
+    store_ConfigV5_v0(obj, group, index, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Princeton.ConfigV5", version);
@@ -1041,12 +1041,12 @@ void store_ConfigV5(const Psana::Princeton::ConfigV5& obj, hdf5pp::Group group, 
 
 void store(const Psana::Princeton::ConfigV5& obj, hdf5pp::Group group, int version) 
 {
-  store_ConfigV5(obj, group, version, false);
+  store_ConfigV5(obj, group, 0, version, false);
 }
 
-void append(const Psana::Princeton::ConfigV5& obj, hdf5pp::Group group, int version)
+void store_at(const Psana::Princeton::ConfigV5& obj, hdf5pp::Group group, long index, int version)
 {
-  store_ConfigV5(obj, group, version, true);
+  store_ConfigV5(obj, group, index, version, true);
 }
 
 
@@ -1141,18 +1141,18 @@ void make_datasets_FrameV1_v0(const Psana::Princeton::FrameV1& obj,
   }
 }
 
-void store_FrameV1_v0(const Psana::Princeton::FrameV1& obj, hdf5pp::Group group, bool append)
+void store_FrameV1_v0(const Psana::Princeton::FrameV1& obj, hdf5pp::Group group, long index, bool append)
 {
   {
     Princeton::ns_FrameV1_v0::dataset_frame ds_data(obj);
     if (append) {
-      hdf5pp::Utils::append(group, "frame", ds_data);
+      hdf5pp::Utils::storeAt(group, "frame", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "frame", ds_data);
     }
   }
   if (append) {
-    hdf5pp::Utils::appendNDArray(group, "data", obj.data());
+    hdf5pp::Utils::storeNDArrayAt(group, "data", obj.data(), index);
   } else {
     hdf5pp::Utils::storeNDArray(group, "data", obj.data());
   }
@@ -1212,12 +1212,12 @@ void make_datasets(const Psana::Princeton::FrameV1& obj, hdf5pp::Group group, hs
   }
 }
 
-void store_FrameV1(const Psana::Princeton::FrameV1& obj, hdf5pp::Group group, int version, bool append)
+void store_FrameV1(const Psana::Princeton::FrameV1& obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    store_FrameV1_v0(obj, group, append);
+    store_FrameV1_v0(obj, group, index, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Princeton.FrameV1", version);
@@ -1226,12 +1226,12 @@ void store_FrameV1(const Psana::Princeton::FrameV1& obj, hdf5pp::Group group, in
 
 void store(const Psana::Princeton::FrameV1& obj, hdf5pp::Group group, int version) 
 {
-  store_FrameV1(obj, group, version, false);
+  store_FrameV1(obj, group, 0, version, false);
 }
 
-void append(const Psana::Princeton::FrameV1& obj, hdf5pp::Group group, int version)
+void store_at(const Psana::Princeton::FrameV1& obj, hdf5pp::Group group, long index, int version)
 {
-  store_FrameV1(obj, group, version, true);
+  store_FrameV1(obj, group, index, version, true);
 }
 
 
@@ -1334,18 +1334,18 @@ void make_datasets_FrameV2_v0(const Psana::Princeton::FrameV2& obj,
   }
 }
 
-void store_FrameV2_v0(const Psana::Princeton::FrameV2& obj, hdf5pp::Group group, bool append)
+void store_FrameV2_v0(const Psana::Princeton::FrameV2& obj, hdf5pp::Group group, long index, bool append)
 {
   {
     Princeton::ns_FrameV2_v0::dataset_frame ds_data(obj);
     if (append) {
-      hdf5pp::Utils::append(group, "frame", ds_data);
+      hdf5pp::Utils::storeAt(group, "frame", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "frame", ds_data);
     }
   }
   if (append) {
-    hdf5pp::Utils::appendNDArray(group, "data", obj.data());
+    hdf5pp::Utils::storeNDArrayAt(group, "data", obj.data(), index);
   } else {
     hdf5pp::Utils::storeNDArray(group, "data", obj.data());
   }
@@ -1405,12 +1405,12 @@ void make_datasets(const Psana::Princeton::FrameV2& obj, hdf5pp::Group group, hs
   }
 }
 
-void store_FrameV2(const Psana::Princeton::FrameV2& obj, hdf5pp::Group group, int version, bool append)
+void store_FrameV2(const Psana::Princeton::FrameV2& obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    store_FrameV2_v0(obj, group, append);
+    store_FrameV2_v0(obj, group, index, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Princeton.FrameV2", version);
@@ -1419,12 +1419,12 @@ void store_FrameV2(const Psana::Princeton::FrameV2& obj, hdf5pp::Group group, in
 
 void store(const Psana::Princeton::FrameV2& obj, hdf5pp::Group group, int version) 
 {
-  store_FrameV2(obj, group, version, false);
+  store_FrameV2(obj, group, 0, version, false);
 }
 
-void append(const Psana::Princeton::FrameV2& obj, hdf5pp::Group group, int version)
+void store_at(const Psana::Princeton::FrameV2& obj, hdf5pp::Group group, long index, int version)
 {
-  store_FrameV2(obj, group, version, true);
+  store_FrameV2(obj, group, index, version, true);
 }
 
 
@@ -1489,12 +1489,12 @@ void make_datasets_InfoV1_v0(const Psana::Princeton::InfoV1& obj,
   }
 }
 
-void store_InfoV1_v0(const Psana::Princeton::InfoV1& obj, hdf5pp::Group group, bool append)
+void store_InfoV1_v0(const Psana::Princeton::InfoV1& obj, hdf5pp::Group group, long index, bool append)
 {
   {
     Princeton::ns_InfoV1_v0::dataset_data ds_data(obj);
     if (append) {
-      hdf5pp::Utils::append(group, "data", ds_data);
+      hdf5pp::Utils::storeAt(group, "data", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "data", ds_data);
     }
@@ -1523,12 +1523,12 @@ void make_datasets(const Psana::Princeton::InfoV1& obj, hdf5pp::Group group, hsi
   }
 }
 
-void store_InfoV1(const Psana::Princeton::InfoV1& obj, hdf5pp::Group group, int version, bool append)
+void store_InfoV1(const Psana::Princeton::InfoV1& obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
   case 0:
-    store_InfoV1_v0(obj, group, append);
+    store_InfoV1_v0(obj, group, index, append);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Princeton.InfoV1", version);
@@ -1537,12 +1537,12 @@ void store_InfoV1(const Psana::Princeton::InfoV1& obj, hdf5pp::Group group, int 
 
 void store(const Psana::Princeton::InfoV1& obj, hdf5pp::Group group, int version) 
 {
-  store_InfoV1(obj, group, version, false);
+  store_InfoV1(obj, group, 0, version, false);
 }
 
-void append(const Psana::Princeton::InfoV1& obj, hdf5pp::Group group, int version)
+void store_at(const Psana::Princeton::InfoV1& obj, hdf5pp::Group group, long index, int version)
 {
-  store_InfoV1(obj, group, version, true);
+  store_InfoV1(obj, group, index, version, true);
 }
 
 } // namespace Princeton

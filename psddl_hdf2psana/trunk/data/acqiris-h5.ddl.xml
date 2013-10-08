@@ -18,6 +18,16 @@
                 <attribute name="bandwidth"/>
             </dataset>
         </h5schema>
+        
+        <h5schema name="HorizV1" version="0">
+            <tag name="skip-proxy"/>
+            <tag name="default"/>
+        </h5schema>
+
+        <h5schema name="TrigV1" version="0">
+            <tag name="skip-proxy"/>
+            <tag name="default"/>
+        </h5schema>
 
         <h5schema name="ConfigV1" version="0">
             <dataset name="config">
@@ -58,6 +68,23 @@
         </h5schema>
 
 
+
+
+        <h5schema name="TdcChannel" version="0">
+            <tag name="skip-proxy"/>
+            <tag name="default"/>
+        </h5schema>
+
+        <h5schema name="TdcAuxIO" version="0">
+            <tag name="skip-proxy"/>
+            <tag name="default"/>
+        </h5schema>
+
+        <h5schema name="TdcVetoIO" version="0">
+            <tag name="skip-proxy"/>
+            <tag name="default"/>
+        </h5schema>
+
         <h5schema name="TdcConfigV1" version="0">
             <dataset name="veto"/>
             <dataset name="channel" method="channels"/>
@@ -65,7 +92,10 @@
         </h5schema>
 
 
+
+
         <h5schema name="TdcDataV1_Item" version="0">
+            <tag name="skip-proxy"/>
             <dataset name="data">
                 <attribute name="source" method="source"/>
                 <attribute name="overflow" method="bf_ofv_"/>

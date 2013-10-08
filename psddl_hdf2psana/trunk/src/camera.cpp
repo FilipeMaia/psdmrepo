@@ -181,11 +181,11 @@ void make_datasets_FrameV1_v0(const Psana::Camera::FrameV1& obj,
   }
 }
 
-void store_FrameV1_v0(const Psana::Camera::FrameV1& obj, hdf5pp::Group group, bool append)
+void store_FrameV1_v0(const Psana::Camera::FrameV1& obj, hdf5pp::Group group, long index, bool append)
 {
   // store metadata dataset
   if (append) {
-    hdf5pp::Utils::append(group, "data", ns_FrameV1_v0::dataset_data::dataset_data(obj));
+    hdf5pp::Utils::storeAt(group, "data", ns_FrameV1_v0::dataset_data::dataset_data(obj), index);
   } else {
     hdf5pp::Utils::storeScalar(group, "data", ns_FrameV1_v0::dataset_data::dataset_data(obj));
   }
@@ -195,7 +195,7 @@ void store_FrameV1_v0(const Psana::Camera::FrameV1& obj, hdf5pp::Group group, bo
 
     ndarray<const uint16_t, 2> img = obj.data16();
     if (append) {
-      hdf5pp::Utils::appendNDArray(group, "image", img);
+      hdf5pp::Utils::storeNDArrayAt(group, "image", img, index);
     } else {
       hdf5pp::Utils::storeNDArray(group, "image", img);
     }
@@ -204,7 +204,7 @@ void store_FrameV1_v0(const Psana::Camera::FrameV1& obj, hdf5pp::Group group, bo
 
     ndarray<const uint8_t, 2> img = obj.data8();
     if (append) {
-      hdf5pp::Utils::appendNDArray(group, "image", img);
+      hdf5pp::Utils::storeNDArrayAt(group, "image", img, index);
     } else {
       hdf5pp::Utils::storeNDArray(group, "image", img);
     }

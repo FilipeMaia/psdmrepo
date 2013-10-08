@@ -90,7 +90,7 @@ private:
 
 void make_datasets_FrameV1_v0(const Psana::Camera::FrameV1& obj,
       hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle);
-void store_FrameV1_v0(const Psana::Camera::FrameV1& obj, hdf5pp::Group group, bool append);
+void store_FrameV1_v0(const Psana::Camera::FrameV1& obj, hdf5pp::Group group, long index, bool append);
 
 } // namespace Camera
 } // namespace psddl_hdf2psana

@@ -59,8 +59,9 @@ void store(const Psana::Encoder::ConfigV1& obj, hdf5pp::Group group, int version
 /// Create container (rank=1) datasets for storing objects of specified type.
 void make_datasets(const Psana::Encoder::ConfigV1& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const Psana::Encoder::ConfigV1& obj, hdf5pp::Group group, int version = -1);
+/// Add one more object to the containers created by previous method at the specified index,
+/// negative index means append to the end of dataset.
+void store_at(const Psana::Encoder::ConfigV1& obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 
 namespace ns_ConfigV2_v0 {
@@ -112,8 +113,9 @@ void store(const Psana::Encoder::ConfigV2& obj, hdf5pp::Group group, int version
 /// Create container (rank=1) datasets for storing objects of specified type.
 void make_datasets(const Psana::Encoder::ConfigV2& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const Psana::Encoder::ConfigV2& obj, hdf5pp::Group group, int version = -1);
+/// Add one more object to the containers created by previous method at the specified index,
+/// negative index means append to the end of dataset.
+void store_at(const Psana::Encoder::ConfigV2& obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 
 namespace ns_DataV1_v0 {
@@ -160,8 +162,9 @@ void store(const Psana::Encoder::DataV1& obj, hdf5pp::Group group, int version =
 /// Create container (rank=1) datasets for storing objects of specified type.
 void make_datasets(const Psana::Encoder::DataV1& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const Psana::Encoder::DataV1& obj, hdf5pp::Group group, int version = -1);
+/// Add one more object to the containers created by previous method at the specified index,
+/// negative index means append to the end of dataset.
+void store_at(const Psana::Encoder::DataV1& obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 
 namespace ns_DataV2_v0 {
@@ -208,8 +211,9 @@ void store(const Psana::Encoder::DataV2& obj, hdf5pp::Group group, int version =
 /// Create container (rank=1) datasets for storing objects of specified type.
 void make_datasets(const Psana::Encoder::DataV2& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const Psana::Encoder::DataV2& obj, hdf5pp::Group group, int version = -1);
+/// Add one more object to the containers created by previous method at the specified index,
+/// negative index means append to the end of dataset.
+void store_at(const Psana::Encoder::DataV2& obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 } // namespace Encoder
 } // namespace psddl_hdf2psana
