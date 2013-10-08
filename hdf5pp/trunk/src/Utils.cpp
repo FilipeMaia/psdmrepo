@@ -62,8 +62,8 @@ Utils::createDataset(hdf5pp::Group group, const std::string& dataset, const Type
 
 // template-free implementation of append()
 void
-Utils::_append(hdf5pp::Group group, const std::string& dataset, const void* data,
-    const Type& native_type, const Type& stored_type)
+Utils::_storeAt(hdf5pp::Group group, const std::string& dataset, const void* data,
+    long index, const Type& native_type, const Type& stored_type)
 {
   // open or create rank-1 dataset
   DataSet ds = group.openDataSet(dataset);
@@ -72,14 +72,17 @@ Utils::_append(hdf5pp::Group group, const std::string& dataset, const void* data
   DataSpace dsp = ds.dataSpace();
   hsize_t size = dsp.size();
 
-  // extend dataset
-  ds.set_extent(size+1);
+  // extend dataset if needed
+  if (index < 0) index = size;
+  if (index >= long(size)) {
+    ds.set_extent(index+1);
+  }
 
   // get updated dataspace
   dsp = ds.dataSpace();
 
   // store the data in dataset
-  ds.store(DataSpace::makeScalar(), dsp.select_single(size), data, native_type);
+  ds.store(DataSpace::makeScalar(), dsp.select_single(index), data, native_type);
 }
 
 // template-free implementation of storeScalar()

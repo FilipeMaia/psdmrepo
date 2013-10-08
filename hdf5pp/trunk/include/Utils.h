@@ -253,25 +253,29 @@ public:
   }
 
   /**
-   *  @brief Store an object in a dataset in a group.
+   *  @brief Store an object at specified index in a dataset in a group.
    *
-   *  Appends data object to a dataset which has to be rank-1 dataset. If dataset
-   *  does not exist yet it will be created first.
+   *  Appends data object to a dataset which has to be rank-1 dataset. The dataset
+   *  has to be created first with createDataset() method. If index is negative then
+   *  new object is appended to a dataset (dataset size is extended by 1). Otherwise
+   *  if index exceeds current dataset size then dataset size is extended to index+1
+   *  and all new entries are zero-filled. New object is then stored at specified index.
    *
    *  @param[in] group   Group object, parent of the dataset.
    *  @param[in] dataset Dataset name
    *  @param[in] data    Object to store
+   *  @param[in] index   Position in the dataset.
    *  @param[in] native_type    In-memory type of the data
    *  @param[in] stored_type    Type of the data as stored in file
    *
    *  @throw hdf5pp::Exception
    */
   template <typename Data>
-  static void append(hdf5pp::Group group, const std::string& dataset, const Data& data,
-      const Type& native_type = TypeTraits<Data>::native_type(),
+  static void storeAt(hdf5pp::Group group, const std::string& dataset, const Data& data,
+      long index, const Type& native_type = TypeTraits<Data>::native_type(),
       const Type& stored_type = TypeTraits<Data>::stored_type())
   {
-    _append(group, dataset, static_cast<const void*>(&data), native_type, stored_type);
+    _storeAt(group, dataset, static_cast<const void*>(&data), index, native_type, stored_type);
   }
 
   /**
@@ -297,28 +301,32 @@ public:
   }
 
   /**
-   *  @brief Store ndarray in a dataset in a group.
+   *  @brief Store ndarray at specified index in a dataset in a group.
    *
-   *  Appends data object to a dataset which has to be rank-1 dataset. If dataset
-   *  does not exist yet it will be created first.
+   *  Appends data object to a dataset which has to be rank-1 dataset. The dataset
+   *  has to be created first with createDataset() method. If index is negative then
+   *  new object is appended to a dataset (dataset size is extended by 1). Otherwise
+   *  if index exceeds current dataset size then dataset size is extended to index+1
+   *  and all new entries are zero-filled. New object is then stored at specified index.
    *
    *  @param[in] group   Group object, parent of the dataset.
    *  @param[in] dataset Dataset name
    *  @param[in] data    Object to store
+   *  @param[in] index   Position in the dataset.
    *  @param[in] native_type    In-memory type of the data
    *  @param[in] stored_type    Type of the data as stored in dataset
    *
    *  @throw hdf5pp::Exception
    */
   template <typename ElemType, unsigned NDim>
-  static void appendNDArray(hdf5pp::Group group, const std::string& dataset, const ndarray<ElemType, NDim>& array,
-      const Type& native_type = TypeTraits<ElemType>::native_type(),
+  static void storeNDArrayAt(hdf5pp::Group group, const std::string& dataset, const ndarray<ElemType, NDim>& array,
+      long index, const Type& native_type = TypeTraits<ElemType>::native_type(),
       const Type& stored_type = TypeTraits<ElemType>::stored_type())
   {
     std::vector<hsize_t> dims(array.shape(), array.shape()+NDim);
     ArrayType array_native = ArrayType::arrayType(native_type, NDim, &dims.front());
     ArrayType array_stored = ArrayType::arrayType(stored_type, NDim, &dims.front());
-    _append(group, dataset, static_cast<const void*>(array.data()), array_native, array_stored);
+    _storeAt(group, dataset, static_cast<const void*>(array.data()), index, array_native, array_stored);
   }
 
   /**
@@ -341,7 +349,7 @@ public:
 private:
 
   /// template-free implementation of append()
-  static void _append(hdf5pp::Group group, const std::string& dataset, const void* data,
+  static void _storeAt(hdf5pp::Group group, const std::string& dataset, const void* data, long index,
       const Type& native_type, const Type& stored_type);
 
   /// template-free implementation of storeScalar()
