@@ -115,9 +115,12 @@ private:
   Pds::Src       m_src;             // source address of the data object
   Source         m_str_src;         // string with source name
   std::string    m_key;             // string with key name
+  std::string    m_sumFile;
   std::string    m_aveFile;
   std::string    m_rmsFile;
   std::string    m_hotFile;
+
+  std::string    m_fname_ext;       // file name extension, for example for run 123: "-r0123.dat" 
 
   double         m_hot_thr;
   unsigned       m_print_bits;   
@@ -129,6 +132,9 @@ private:
 
   double         m_gate_width;
 
+  bool           m_do_sum;
+  bool           m_do_ave;
+  bool           m_do_rms;
   bool           m_do_mask;
 
   unsigned       m_shape[2]; // image shape

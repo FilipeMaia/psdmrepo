@@ -11,6 +11,12 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-15
+2013-10-08 Mikhail S. Dubrovin
+- add module ImgHitFinder by request of Brendan Murphy, amo74213
+- add but not use global methods GlobalHitFinder
+- modify ImgAverage to have an output image with sum of amplitudes over all events
+	
 Tag: V00-03-14
 2013-08-30 Mikhail S. Dubrovin
 - modified modules:

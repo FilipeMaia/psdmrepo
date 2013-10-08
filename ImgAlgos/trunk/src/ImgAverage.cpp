@@ -53,6 +53,7 @@ ImgAverage::ImgAverage (const std::string& name)
   : Module(name)
   , m_str_src()
   , m_key()
+  , m_sumFile()
   , m_aveFile()
   , m_rmsFile()
   , m_hotFile()
@@ -67,8 +68,9 @@ ImgAverage::ImgAverage (const std::string& name)
   // get the values from configuration or use defaults
   m_str_src =  configSrc("source",      "DetInfo(:Cspad)");
   m_key     =  configStr("key",         "");
-  m_aveFile =  configStr("avefile",     "img-ave.dat");
-  m_rmsFile =  configStr("rmsfile",     "img-rms.dat");
+  m_sumFile =  configStr("sumfile",     "");
+  m_aveFile =  configStr("avefile",     "");
+  m_rmsFile =  configStr("rmsfile",     "");
   m_hotFile =  configStr("hotpix_mask", "");
   m_hot_thr     = config("hotpix_thr_adu", 10000.);
   m_nev_stage1  = config("evts_stage1",  1000000);
@@ -77,7 +79,22 @@ ImgAverage::ImgAverage (const std::string& name)
   m_gate_width2 = config("gate_width2",        0); 
   m_print_bits  = config("print_bits",         0);
  
+  m_do_sum  = (m_sumFile.empty()) ? false : true;
+  m_do_ave  = (m_aveFile.empty()) ? false : true;
+  m_do_rms  = (m_rmsFile.empty()) ? false : true;
   m_do_mask = (m_hotFile.empty()) ? false : true;
+
+  // If all file names are empty - save average and rms with default names
+  if (    !m_do_mask 
+       && !m_do_sum 
+       && !m_do_ave
+       && !m_do_rms ) {
+
+    m_aveFile = "img-ave";
+    m_rmsFile = "img-rms";
+    m_do_ave  = true;
+    m_do_rms  = true;
+  }
  }
 
 //--------------------
@@ -90,10 +107,14 @@ ImgAverage::printInputParameters()
     log << "\n Input parameters:"
         << "\n source     : " << m_str_src
         << "\n key        : " << m_key      
+        << "\n m_sumFile  : " << m_sumFile    
         << "\n m_aveFile  : " << m_aveFile    
         << "\n m_rmsFile  : " << m_rmsFile    
         << "\n m_hotFile  : " << m_hotFile    
         << "\n m_hot_thr  : " << m_hot_thr    
+        << "\n m_do_sum   : " << m_do_sum
+        << "\n m_do_ave   : " << m_do_ave
+        << "\n m_do_rms   : " << m_do_rms
         << "\n m_do_mask  : " << m_do_mask
         << "\n print_bits : " << m_print_bits
         << "\n evts_stage1: " << m_nev_stage1   
@@ -126,6 +147,7 @@ ImgAverage::beginJob(Event& evt, Env& env)
 void 
 ImgAverage::beginRun(Event& evt, Env& env)
 {
+  m_fname_ext = "-r" + stringRunNumber(evt) + ".dat";
 }
 
 /// Method which is called at the beginning of the calibration cycle
@@ -162,9 +184,10 @@ void
 ImgAverage::endJob(Event& evt, Env& env)
 {
   procStatArrays();
-  save2DArrayInFile<double> ( m_aveFile, m_ave, m_rows, m_cols, m_print_bits & 16 );
-  save2DArrayInFile<double> ( m_rmsFile, m_rms, m_rows, m_cols, m_print_bits & 16 );
-  if (m_do_mask) save2DArrayInFile<int> ( m_hotFile, m_hot, m_rows, m_cols, m_print_bits & 16 );
+  if (m_do_sum)  save2DArrayInFile<double> ( m_sumFile+m_fname_ext, m_sum, m_rows, m_cols, m_print_bits & 16 );
+  if (m_do_ave)  save2DArrayInFile<double> ( m_aveFile+m_fname_ext, m_ave, m_rows, m_cols, m_print_bits & 16 );
+  if (m_do_rms)  save2DArrayInFile<double> ( m_rmsFile+m_fname_ext, m_rms, m_rows, m_cols, m_print_bits & 16 );
+  if (m_do_mask) save2DArrayInFile<int>    ( m_hotFile+m_fname_ext, m_hot, m_rows, m_cols, m_print_bits & 16 );
   if( m_print_bits & 16 ) printSummaryForParser(evt);
 }
 
@@ -234,6 +257,7 @@ ImgAverage::collectStat(Event& evt)
   if ( collectStatForType<uint8_t> (evt) ) return;
   if ( collectStatForType<short>   (evt) ) return;
   if ( collectStatForType<int16_t> (evt) ) return;
+  if ( collectStatForType<unsigned>(evt) ) return;
 
   MsgLog(name(), info, "Image is not available in the event(...) for source:" << m_str_src << " key:" << m_key);
 }
