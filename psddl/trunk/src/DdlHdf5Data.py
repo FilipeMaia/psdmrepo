@@ -250,9 +250,8 @@ class DdlHdf5Data ( object ) :
         # skip included types
         if type.included : return
 
-        if not type.h5schemas:
-            type.h5schemas = [H5Type.defaultSchema(type)]
-            self._log.debug("_parseType: type.h5schemas=%s", repr(type.h5schemas))
+        self._schemaFixup(type);
+        self._log.debug("_parseType: type.h5schemas=%s", repr(type.h5schemas))
 
         for schema in type.h5schemas:
             self._genSchema(type, schema)
@@ -320,10 +319,9 @@ class DdlHdf5Data ( object ) :
 
     def _dumpTypeSchema(self, type, offset=1):
 
-        if not type.h5schemas:
-            type.h5schemas = [H5Type.defaultSchema(type)]
-            
         if type.included: return
+
+        self._schemaFixup(type);
             
         for schema in type.h5schemas:
             
@@ -357,6 +355,26 @@ class DdlHdf5Data ( object ) :
             
             print '{}</h5schema>'.format("    "*(offset))
             
+
+    def _schemaFixup(self, type):
+        '''
+        Make few adjustments to type schemas if necessary 
+        ''' 
+
+        # if no schemas defined at all generate default schema
+        if not type.h5schemas:
+            type.h5schemas = [H5Type.defaultSchema(type)]
+
+        # fixup for individual schema
+        for i, schema in enumerate(type.h5schemas):
+            
+            # if schema has no datasets but has 'default' tag then 
+            # use default schema but merge their tags
+            if not schema.datasets and 'default' in schema.tags:
+                defschema = H5Type.defaultSchema(type)
+                defschema.tags.update(schema.tags)
+                schema = defschema
+                type.h5schemas[i] = schema
 
     #--------------------
     #  Private methods --

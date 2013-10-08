@@ -635,7 +635,7 @@ boost::shared_ptr<PSEvt::Proxy<{{psanatypename}}> > make_{{type.name}}(int versi
 ::::template:::: store_decl
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 :
-:  Template for declaration of the store() and append() methods. 
+:  Template for declaration of the store() and store_at() methods. 
 :
 :  Parameters for this template:
 :  psanatypename - name of C++ psana interface type 
@@ -646,14 +646,15 @@ void store(const {{psanatypename}}& obj, hdf5pp::Group group, int version = -1);
 /// Create container (rank=1) datasets for storing objects of specified type.
 void make_datasets(const {{psanatypename}}& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
-/// Add one more object to the containers created by previous method
-void append(const {{psanatypename}}& obj, hdf5pp::Group group, int version = -1);
+/// Add one more object to the containers created by previous method at the specified index,
+/// negative index means append to the end of dataset.
+void store_at(const {{psanatypename}}& obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ::::template:::: store_impl
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 :
-:  Template for implementation of the store() and append() methods. 
+:  Template for implementation of the store() and store_at() methods. 
 :
 :  Parameters for this template:
 :    type          - instance of Type class
@@ -676,13 +677,13 @@ void make_datasets(const {{psanatypename}}& obj, hdf5pp::Group group, hsize_t ch
   }
 }
 
-void store_{{type.name}}(const {{psanatypename}}& obj, hdf5pp::Group group, int version, bool append)
+void store_{{type.name}}(const {{psanatypename}}& obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = {{max_version}};
   switch (version) {
 {% for v in versions %}
   case {{v}}:
-    store_{{type.name}}_v{{v}}(obj, group, append);
+    store_{{type.name}}_v{{v}}(obj, group, index, append);
     break;
 {% endfor %}
   default:
@@ -692,19 +693,19 @@ void store_{{type.name}}(const {{psanatypename}}& obj, hdf5pp::Group group, int 
 
 void store(const {{psanatypename}}& obj, hdf5pp::Group group, int version) 
 {
-  store_{{type.name}}(obj, group, version, false);
+  store_{{type.name}}(obj, group, 0, version, false);
 }
 
-void append(const {{psanatypename}}& obj, hdf5pp::Group group, int version)
+void store_at(const {{psanatypename}}& obj, hdf5pp::Group group, long index, int version)
 {
-  store_{{type.name}}(obj, group, version, true);
+  store_{{type.name}}(obj, group, index, version, true);
 }
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ::::template:::: schema_store_impl
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 :
-:  Template for implementation of the store() and append() methods. 
+:  Template for implementation of the store() and store_at() methods. 
 :
 :  Parameters for this template:
 :    hschema    - instance of SchemaType class
@@ -718,7 +719,7 @@ void make_datasets_{{hschema.pstype.name}}_v{{hschema.schema.version}}(const {{h
 {% endfor %}
 }
 
-void store_{{hschema.pstype.name}}_v{{hschema.schema.version}}(const {{hschema.pstypename}}& obj, hdf5pp::Group group, bool append)
+void store_{{hschema.pstype.name}}_v{{hschema.schema.version}}(const {{hschema.pstypename}}& obj, hdf5pp::Group group, long index, bool append)
 {
 {% for ds in hschema.datasets %}
 {{ds.ds_write_impl()}}
@@ -751,7 +752,7 @@ void store_{{hschema.pstype.name}}_v{{hschema.schema.version}}(const {{hschema.p
   {
     {{ds.classNameNs()}} ds_data(obj);
     if (append) {
-      hdf5pp::Utils::append(group, "{{ds.name}}", ds_data);
+      hdf5pp::Utils::storeAt(group, "{{ds.name}}", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "{{ds.name}}", ds_data);
     }
@@ -788,7 +789,7 @@ void store_{{hschema.pstype.name}}_v{{hschema.schema.version}}(const {{hschema.p
 :      ds  - instance of DatasetRegular type
 :
   if (append) {
-    hdf5pp::Utils::appendNDArray(group, "{{ds.name}}", obj.{{ds.method}}());
+    hdf5pp::Utils::storeNDArrayAt(group, "{{ds.name}}", obj.{{ds.method}}(), index);
   } else {
     hdf5pp::Utils::storeNDArray(group, "{{ds.name}}", obj.{{ds.method}}());
   }
@@ -835,7 +836,7 @@ void store_{{hschema.pstype.name}}_v{{hschema.schema.version}}(const {{hschema.p
       *out = {{ds_struct}}(*it);
     }
     if (append) {
-      hdf5pp::Utils::appendNDArray(group, "{{ds.name}}", hdf_array);
+      hdf5pp::Utils::storeNDArrayAt(group, "{{ds.name}}", hdf_array, index);
     } else {
       hdf5pp::Utils::storeNDArray(group, "{{ds.name}}", hdf_array);
     }
@@ -868,7 +869,7 @@ void store_{{hschema.pstype.name}}_v{{hschema.schema.version}}(const {{hschema.p
   {
     {{ds_struct}} ds_data(obj.{{ds.method}}());
     if (append) {
-      hdf5pp::Utils::append(group, "{{ds.name}}", ds_data);
+      hdf5pp::Utils::storeAt(group, "{{ds.name}}", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "{{ds.name}}", ds_data);
     }
