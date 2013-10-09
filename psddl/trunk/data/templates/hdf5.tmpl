@@ -647,8 +647,9 @@ void store(const {{psanatypename}}& obj, hdf5pp::Group group, int version = -1);
 void make_datasets(const {{psanatypename}}& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
 /// Add one more object to the containers created by previous method at the specified index,
-/// negative index means append to the end of dataset.
-void store_at(const {{psanatypename}}& obj, hdf5pp::Group group, long index = -1, int version = -1);
+/// negative index means append to the end of dataset. If pointer to object is zero then
+/// datsets are extended with zero-filled of default-initialized data.
+void store_at(const {{psanatypename}}* obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ::::template:::: store_impl
@@ -677,7 +678,7 @@ void make_datasets(const {{psanatypename}}& obj, hdf5pp::Group group, hsize_t ch
   }
 }
 
-void store_{{type.name}}(const {{psanatypename}}& obj, hdf5pp::Group group, long index, int version, bool append)
+void store_{{type.name}}(const {{psanatypename}}* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = {{max_version}};
   switch (version) {
@@ -693,10 +694,10 @@ void store_{{type.name}}(const {{psanatypename}}& obj, hdf5pp::Group group, long
 
 void store(const {{psanatypename}}& obj, hdf5pp::Group group, int version) 
 {
-  store_{{type.name}}(obj, group, 0, version, false);
+  store_{{type.name}}(&obj, group, 0, version, false);
 }
 
-void store_at(const {{psanatypename}}& obj, hdf5pp::Group group, long index, int version)
+void store_at(const {{psanatypename}}* obj, hdf5pp::Group group, long index, int version)
 {
   store_{{type.name}}(obj, group, index, version, true);
 }
@@ -719,7 +720,7 @@ void make_datasets_{{hschema.pstype.name}}_v{{hschema.schema.version}}(const {{h
 {% endfor %}
 }
 
-void store_{{hschema.pstype.name}}_v{{hschema.schema.version}}(const {{hschema.pstypename}}& obj, hdf5pp::Group group, long index, bool append)
+void store_{{hschema.pstype.name}}_v{{hschema.schema.version}}(const {{hschema.pstypename}}* obj, hdf5pp::Group group, long index, bool append)
 {
 {% for ds in hschema.datasets %}
 {{ds.ds_write_impl()}}
@@ -749,13 +750,15 @@ void store_{{hschema.pstype.name}}_v{{hschema.schema.version}}(const {{hschema.p
 :  Parameters for this template:
 :      ds  - instance of DatasetCompund type
 :
-  {
-    {{ds.classNameNs()}} ds_data(obj);
+  if (obj) {
+    {{ds.classNameNs()}} ds_data(*obj);
     if (append) {
       hdf5pp::Utils::storeAt(group, "{{ds.name}}", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "{{ds.name}}", ds_data);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "{{ds.name}}", index < 0 ? index : index + 1);
   }
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ::::template:::: make_array_ds_basic
@@ -789,9 +792,13 @@ void store_{{hschema.pstype.name}}_v{{hschema.schema.version}}(const {{hschema.p
 :      ds  - instance of DatasetRegular type
 :
   if (append) {
-    hdf5pp::Utils::storeNDArrayAt(group, "{{ds.name}}", obj.{{ds.method}}(), index);
+    if (obj) {
+      hdf5pp::Utils::storeNDArrayAt(group, "{{ds.name}}", obj->{{ds.method}}(), index);
+    } else {
+      hdf5pp::Utils::resizeDataset(group, "{{ds.name}}", index < 0 ? index : index + 1);
+    }
   } else {
-    hdf5pp::Utils::storeNDArray(group, "{{ds.name}}", obj.{{ds.method}}());
+    hdf5pp::Utils::storeNDArray(group, "{{ds.name}}", obj->{{ds.method}}());
   }
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ::::template:::: make_array_ds_udt
@@ -826,10 +833,10 @@ void store_{{hschema.pstype.name}}_v{{hschema.schema.version}}(const {{hschema.p
 :      ds         - instance of DatasetRegular type
 :      ds_struct  - name of dataset structure for element type
 :
-  {
-    typedef __typeof__(obj.{{ds.method}}()) PsanaArray;
+  if (obj) {
+    typedef __typeof__(obj->{{ds.method}}()) PsanaArray;
     typedef ndarray<{{ds_struct}}, {{ds.rank}}> HdfArray;
-    PsanaArray psana_array = obj.{{ds.method}}();
+    PsanaArray psana_array = obj->{{ds.method}}();
     HdfArray hdf_array(psana_array.shape());
     HdfArray::iterator out = hdf_array.begin();
     for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
@@ -840,6 +847,8 @@ void store_{{hschema.pstype.name}}_v{{hschema.schema.version}}(const {{hschema.p
     } else {
       hdf5pp::Utils::storeNDArray(group, "{{ds.name}}", hdf_array);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "{{ds.name}}", index < 0 ? index : index + 1);
   }
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ::::template:::: make_regular_ds
@@ -866,13 +875,15 @@ void store_{{hschema.pstype.name}}_v{{hschema.schema.version}}(const {{hschema.p
 :      ds         - instance of DatasetRegular type
 :      ds_struct  - name of dataset structure for element type
 :
-  {
-    {{ds_struct}} ds_data(obj.{{ds.method}}());
+  if (obj) {
+    {{ds_struct}} ds_data(obj->{{ds.method}}());
     if (append) {
       hdf5pp::Utils::storeAt(group, "{{ds.name}}", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "{{ds.name}}", ds_data);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "{{ds.name}}", index < 0 ? index : index + 1);
   }
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ::::template:::: enum_decl
