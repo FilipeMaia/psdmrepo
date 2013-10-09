@@ -60,12 +60,29 @@ Utils::createDataset(hdf5pp::Group group, const std::string& dataset, const Type
   return group.createDataSet(dataset, stored_type, dsp, plDScreate, plDSaccess);
 }
 
+// Resize rank-1 dataset.
+void
+Utils::resizeDataset(hdf5pp::Group group, const std::string& dataset, long size)
+{
+  // open dataset
+  DataSet ds = group.openDataSet(dataset);
+
+  if (size < 0) {
+    // get current size and increase by one
+    DataSpace dsp = ds.dataSpace();
+    size = dsp.size() + 1;
+  }
+
+  // change extent to new value
+  ds.set_extent(size);
+}
+
 // template-free implementation of append()
 void
 Utils::_storeAt(hdf5pp::Group group, const std::string& dataset, const void* data,
-    long index, const Type& native_type, const Type& stored_type)
+    long index, const Type& native_type)
 {
-  // open or create rank-1 dataset
+  // open dataset
   DataSet ds = group.openDataSet(dataset);
 
   // get current size
@@ -111,5 +128,6 @@ Utils::_storeArray(hdf5pp::Group group, const std::string& dataset, const void* 
   // store the data in dataset
   ds.store(dsp, dsp, data, native_type);
 }
+
 
 } // namespace hdf5pp

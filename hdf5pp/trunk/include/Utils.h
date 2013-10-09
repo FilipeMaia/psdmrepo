@@ -266,16 +266,14 @@ public:
    *  @param[in] data    Object to store
    *  @param[in] index   Position in the dataset.
    *  @param[in] native_type    In-memory type of the data
-   *  @param[in] stored_type    Type of the data as stored in file
    *
    *  @throw hdf5pp::Exception
    */
   template <typename Data>
   static void storeAt(hdf5pp::Group group, const std::string& dataset, const Data& data,
-      long index, const Type& native_type = TypeTraits<Data>::native_type(),
-      const Type& stored_type = TypeTraits<Data>::stored_type())
+      long index, const Type& native_type = TypeTraits<Data>::native_type())
   {
-    _storeAt(group, dataset, static_cast<const void*>(&data), index, native_type, stored_type);
+    _storeAt(group, dataset, static_cast<const void*>(&data), index, native_type);
   }
 
   /**
@@ -313,20 +311,17 @@ public:
    *  @param[in] dataset Dataset name
    *  @param[in] data    Object to store
    *  @param[in] index   Position in the dataset.
-   *  @param[in] native_type    In-memory type of the data
-   *  @param[in] stored_type    Type of the data as stored in dataset
+   *  @param[in] native_type    In-memory type of the array elements
    *
    *  @throw hdf5pp::Exception
    */
   template <typename ElemType, unsigned NDim>
   static void storeNDArrayAt(hdf5pp::Group group, const std::string& dataset, const ndarray<ElemType, NDim>& array,
-      long index, const Type& native_type = TypeTraits<ElemType>::native_type(),
-      const Type& stored_type = TypeTraits<ElemType>::stored_type())
+      long index, const Type& native_type = TypeTraits<ElemType>::native_type())
   {
     std::vector<hsize_t> dims(array.shape(), array.shape()+NDim);
     ArrayType array_native = ArrayType::arrayType(native_type, NDim, &dims.front());
-    ArrayType array_stored = ArrayType::arrayType(stored_type, NDim, &dims.front());
-    _storeAt(group, dataset, static_cast<const void*>(array.data()), index, array_native, array_stored);
+    _storeAt(group, dataset, static_cast<const void*>(array.data()), index, array_native);
   }
 
   /**
@@ -345,12 +340,26 @@ public:
   static DataSet createDataset(hdf5pp::Group group, const std::string& dataset, const Type& stored_type,
       hsize_t chunk_size, hsize_t chunk_cache_size, int deflate, bool shuffle);
 
+  /**
+   *  @brief Resize rank-1 dataset.
+   *
+   *  Extends dataset to a new size (has to be a rank-1 dataset). If size given as argument
+   *  is negative this is equivalent to extending the size by one element. New added elements
+   *  will be default-initialized (zero-filled unless dataset type defines special default values).
+   *  This method can also be used to shrink dataset size.
+   *
+   *  @param[in] group         Group object, parent of the dataset.
+   *  @param[in] dataset       Dataset name
+   *  @param[in] size          New dataset size, negative means append one element.
+   *  @throw hdf5pp::Exception
+   */
+  static void resizeDataset(hdf5pp::Group group, const std::string& dataset, long size);
 
 private:
 
-  /// template-free implementation of append()
+  /// template-free implementation of storeAt()
   static void _storeAt(hdf5pp::Group group, const std::string& dataset, const void* data, long index,
-      const Type& native_type, const Type& stored_type);
+      const Type& native_type);
 
   /// template-free implementation of storeScalar()
   static void _storeScalar(hdf5pp::Group group, const std::string& dataset, const void* data,

@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-07-00
+2013-10-08 Andy Salnikov
+- add Utils::resizeDataset() method
+- removed extraneous parameters from Utils::storeAt and Utils::storeNDArrayAt()
+
 Tag: V00-06-00
 2013-10-08 Andy Salnikov
 - hdf5pp::Utils class: remove append() and appendNDArray() methods and 
