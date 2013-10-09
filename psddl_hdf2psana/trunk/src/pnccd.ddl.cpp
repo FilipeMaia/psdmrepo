@@ -81,15 +81,17 @@ void make_datasets_ConfigV1_v0(const Psana::PNCCD::ConfigV1& obj,
   }
 }
 
-void store_ConfigV1_v0(const Psana::PNCCD::ConfigV1& obj, hdf5pp::Group group, long index, bool append)
+void store_ConfigV1_v0(const Psana::PNCCD::ConfigV1* obj, hdf5pp::Group group, long index, bool append)
 {
-  {
-    PNCCD::ns_ConfigV1_v0::dataset_config ds_data(obj);
+  if (obj) {
+    PNCCD::ns_ConfigV1_v0::dataset_config ds_data(*obj);
     if (append) {
       hdf5pp::Utils::storeAt(group, "config", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "config", ds_data);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "config", index < 0 ? index : index + 1);
   }
 }
 
@@ -115,7 +117,7 @@ void make_datasets(const Psana::PNCCD::ConfigV1& obj, hdf5pp::Group group, hsize
   }
 }
 
-void store_ConfigV1(const Psana::PNCCD::ConfigV1& obj, hdf5pp::Group group, long index, int version, bool append)
+void store_ConfigV1(const Psana::PNCCD::ConfigV1* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
@@ -129,10 +131,10 @@ void store_ConfigV1(const Psana::PNCCD::ConfigV1& obj, hdf5pp::Group group, long
 
 void store(const Psana::PNCCD::ConfigV1& obj, hdf5pp::Group group, int version) 
 {
-  store_ConfigV1(obj, group, 0, version, false);
+  store_ConfigV1(&obj, group, 0, version, false);
 }
 
-void store_at(const Psana::PNCCD::ConfigV1& obj, hdf5pp::Group group, long index, int version)
+void store_at(const Psana::PNCCD::ConfigV1* obj, hdf5pp::Group group, long index, int version)
 {
   store_ConfigV1(obj, group, index, version, true);
 }
@@ -271,15 +273,17 @@ void make_datasets_ConfigV2_v0(const Psana::PNCCD::ConfigV2& obj,
   }
 }
 
-void store_ConfigV2_v0(const Psana::PNCCD::ConfigV2& obj, hdf5pp::Group group, long index, bool append)
+void store_ConfigV2_v0(const Psana::PNCCD::ConfigV2* obj, hdf5pp::Group group, long index, bool append)
 {
-  {
-    PNCCD::ns_ConfigV2_v0::dataset_config ds_data(obj);
+  if (obj) {
+    PNCCD::ns_ConfigV2_v0::dataset_config ds_data(*obj);
     if (append) {
       hdf5pp::Utils::storeAt(group, "config", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "config", ds_data);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "config", index < 0 ? index : index + 1);
   }
 }
 
@@ -305,7 +309,7 @@ void make_datasets(const Psana::PNCCD::ConfigV2& obj, hdf5pp::Group group, hsize
   }
 }
 
-void store_ConfigV2(const Psana::PNCCD::ConfigV2& obj, hdf5pp::Group group, long index, int version, bool append)
+void store_ConfigV2(const Psana::PNCCD::ConfigV2* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
@@ -319,10 +323,10 @@ void store_ConfigV2(const Psana::PNCCD::ConfigV2& obj, hdf5pp::Group group, long
 
 void store(const Psana::PNCCD::ConfigV2& obj, hdf5pp::Group group, int version) 
 {
-  store_ConfigV2(obj, group, 0, version, false);
+  store_ConfigV2(&obj, group, 0, version, false);
 }
 
-void store_at(const Psana::PNCCD::ConfigV2& obj, hdf5pp::Group group, long index, int version)
+void store_at(const Psana::PNCCD::ConfigV2* obj, hdf5pp::Group group, long index, int version)
 {
   store_ConfigV2(obj, group, index, version, true);
 }
@@ -349,7 +353,7 @@ void make_datasets(const Psana::PNCCD::FullFrameV1& obj, hdf5pp::Group group, hs
   }
 }
 
-void store_FullFrameV1(const Psana::PNCCD::FullFrameV1& obj, hdf5pp::Group group, long index, int version, bool append)
+void store_FullFrameV1(const Psana::PNCCD::FullFrameV1* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
@@ -363,10 +367,10 @@ void store_FullFrameV1(const Psana::PNCCD::FullFrameV1& obj, hdf5pp::Group group
 
 void store(const Psana::PNCCD::FullFrameV1& obj, hdf5pp::Group group, int version) 
 {
-  store_FullFrameV1(obj, group, 0, version, false);
+  store_FullFrameV1(&obj, group, 0, version, false);
 }
 
-void store_at(const Psana::PNCCD::FullFrameV1& obj, hdf5pp::Group group, long index, int version)
+void store_at(const Psana::PNCCD::FullFrameV1* obj, hdf5pp::Group group, long index, int version)
 {
   store_FullFrameV1(obj, group, index, version, true);
 }
@@ -401,7 +405,7 @@ void make_datasets(const Psana::PNCCD::FramesV1& obj, hdf5pp::Group group, hsize
   }
 }
 
-void store_FramesV1(const Psana::PNCCD::FramesV1& obj, hdf5pp::Group group, long index, int version, bool append)
+void store_FramesV1(const Psana::PNCCD::FramesV1* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
@@ -415,10 +419,10 @@ void store_FramesV1(const Psana::PNCCD::FramesV1& obj, hdf5pp::Group group, long
 
 void store(const Psana::PNCCD::FramesV1& obj, hdf5pp::Group group, int version) 
 {
-  store_FramesV1(obj, group, 0, version, false);
+  store_FramesV1(&obj, group, 0, version, false);
 }
 
-void store_at(const Psana::PNCCD::FramesV1& obj, hdf5pp::Group group, long index, int version)
+void store_at(const Psana::PNCCD::FramesV1* obj, hdf5pp::Group group, long index, int version)
 {
   store_FramesV1(obj, group, index, version, true);
 }

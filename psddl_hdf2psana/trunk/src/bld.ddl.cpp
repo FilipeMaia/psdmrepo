@@ -85,15 +85,17 @@ void make_datasets_BldDataFEEGasDetEnergy_v0(const Psana::Bld::BldDataFEEGasDetE
   }
 }
 
-void store_BldDataFEEGasDetEnergy_v0(const Psana::Bld::BldDataFEEGasDetEnergy& obj, hdf5pp::Group group, long index, bool append)
+void store_BldDataFEEGasDetEnergy_v0(const Psana::Bld::BldDataFEEGasDetEnergy* obj, hdf5pp::Group group, long index, bool append)
 {
-  {
-    Bld::ns_BldDataFEEGasDetEnergy_v0::dataset_data ds_data(obj);
+  if (obj) {
+    Bld::ns_BldDataFEEGasDetEnergy_v0::dataset_data ds_data(*obj);
     if (append) {
       hdf5pp::Utils::storeAt(group, "data", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "data", ds_data);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "data", index < 0 ? index : index + 1);
   }
 }
 
@@ -119,7 +121,7 @@ void make_datasets(const Psana::Bld::BldDataFEEGasDetEnergy& obj, hdf5pp::Group 
   }
 }
 
-void store_BldDataFEEGasDetEnergy(const Psana::Bld::BldDataFEEGasDetEnergy& obj, hdf5pp::Group group, long index, int version, bool append)
+void store_BldDataFEEGasDetEnergy(const Psana::Bld::BldDataFEEGasDetEnergy* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
@@ -133,10 +135,10 @@ void store_BldDataFEEGasDetEnergy(const Psana::Bld::BldDataFEEGasDetEnergy& obj,
 
 void store(const Psana::Bld::BldDataFEEGasDetEnergy& obj, hdf5pp::Group group, int version) 
 {
-  store_BldDataFEEGasDetEnergy(obj, group, 0, version, false);
+  store_BldDataFEEGasDetEnergy(&obj, group, 0, version, false);
 }
 
-void store_at(const Psana::Bld::BldDataFEEGasDetEnergy& obj, hdf5pp::Group group, long index, int version)
+void store_at(const Psana::Bld::BldDataFEEGasDetEnergy* obj, hdf5pp::Group group, long index, int version)
 {
   store_BldDataFEEGasDetEnergy(obj, group, index, version, true);
 }
@@ -221,15 +223,17 @@ void make_datasets_BldDataEBeamV0_v0(const Psana::Bld::BldDataEBeamV0& obj,
   }
 }
 
-void store_BldDataEBeamV0_v0(const Psana::Bld::BldDataEBeamV0& obj, hdf5pp::Group group, long index, bool append)
+void store_BldDataEBeamV0_v0(const Psana::Bld::BldDataEBeamV0* obj, hdf5pp::Group group, long index, bool append)
 {
-  {
-    Bld::ns_BldDataEBeamV0_v0::dataset_data ds_data(obj);
+  if (obj) {
+    Bld::ns_BldDataEBeamV0_v0::dataset_data ds_data(*obj);
     if (append) {
       hdf5pp::Utils::storeAt(group, "data", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "data", ds_data);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "data", index < 0 ? index : index + 1);
   }
 }
 
@@ -255,7 +259,7 @@ void make_datasets(const Psana::Bld::BldDataEBeamV0& obj, hdf5pp::Group group, h
   }
 }
 
-void store_BldDataEBeamV0(const Psana::Bld::BldDataEBeamV0& obj, hdf5pp::Group group, long index, int version, bool append)
+void store_BldDataEBeamV0(const Psana::Bld::BldDataEBeamV0* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
@@ -269,10 +273,10 @@ void store_BldDataEBeamV0(const Psana::Bld::BldDataEBeamV0& obj, hdf5pp::Group g
 
 void store(const Psana::Bld::BldDataEBeamV0& obj, hdf5pp::Group group, int version) 
 {
-  store_BldDataEBeamV0(obj, group, 0, version, false);
+  store_BldDataEBeamV0(&obj, group, 0, version, false);
 }
 
-void store_at(const Psana::Bld::BldDataEBeamV0& obj, hdf5pp::Group group, long index, int version)
+void store_at(const Psana::Bld::BldDataEBeamV0* obj, hdf5pp::Group group, long index, int version)
 {
   store_BldDataEBeamV0(obj, group, index, version, true);
 }
@@ -360,15 +364,17 @@ void make_datasets_BldDataEBeamV1_v0(const Psana::Bld::BldDataEBeamV1& obj,
   }
 }
 
-void store_BldDataEBeamV1_v0(const Psana::Bld::BldDataEBeamV1& obj, hdf5pp::Group group, long index, bool append)
+void store_BldDataEBeamV1_v0(const Psana::Bld::BldDataEBeamV1* obj, hdf5pp::Group group, long index, bool append)
 {
-  {
-    Bld::ns_BldDataEBeamV1_v0::dataset_data ds_data(obj);
+  if (obj) {
+    Bld::ns_BldDataEBeamV1_v0::dataset_data ds_data(*obj);
     if (append) {
       hdf5pp::Utils::storeAt(group, "data", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "data", ds_data);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "data", index < 0 ? index : index + 1);
   }
 }
 
@@ -394,7 +400,7 @@ void make_datasets(const Psana::Bld::BldDataEBeamV1& obj, hdf5pp::Group group, h
   }
 }
 
-void store_BldDataEBeamV1(const Psana::Bld::BldDataEBeamV1& obj, hdf5pp::Group group, long index, int version, bool append)
+void store_BldDataEBeamV1(const Psana::Bld::BldDataEBeamV1* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
@@ -408,10 +414,10 @@ void store_BldDataEBeamV1(const Psana::Bld::BldDataEBeamV1& obj, hdf5pp::Group g
 
 void store(const Psana::Bld::BldDataEBeamV1& obj, hdf5pp::Group group, int version) 
 {
-  store_BldDataEBeamV1(obj, group, 0, version, false);
+  store_BldDataEBeamV1(&obj, group, 0, version, false);
 }
 
-void store_at(const Psana::Bld::BldDataEBeamV1& obj, hdf5pp::Group group, long index, int version)
+void store_at(const Psana::Bld::BldDataEBeamV1* obj, hdf5pp::Group group, long index, int version)
 {
   store_BldDataEBeamV1(obj, group, index, version, true);
 }
@@ -502,15 +508,17 @@ void make_datasets_BldDataEBeamV2_v0(const Psana::Bld::BldDataEBeamV2& obj,
   }
 }
 
-void store_BldDataEBeamV2_v0(const Psana::Bld::BldDataEBeamV2& obj, hdf5pp::Group group, long index, bool append)
+void store_BldDataEBeamV2_v0(const Psana::Bld::BldDataEBeamV2* obj, hdf5pp::Group group, long index, bool append)
 {
-  {
-    Bld::ns_BldDataEBeamV2_v0::dataset_data ds_data(obj);
+  if (obj) {
+    Bld::ns_BldDataEBeamV2_v0::dataset_data ds_data(*obj);
     if (append) {
       hdf5pp::Utils::storeAt(group, "data", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "data", ds_data);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "data", index < 0 ? index : index + 1);
   }
 }
 
@@ -536,7 +544,7 @@ void make_datasets(const Psana::Bld::BldDataEBeamV2& obj, hdf5pp::Group group, h
   }
 }
 
-void store_BldDataEBeamV2(const Psana::Bld::BldDataEBeamV2& obj, hdf5pp::Group group, long index, int version, bool append)
+void store_BldDataEBeamV2(const Psana::Bld::BldDataEBeamV2* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
@@ -550,10 +558,10 @@ void store_BldDataEBeamV2(const Psana::Bld::BldDataEBeamV2& obj, hdf5pp::Group g
 
 void store(const Psana::Bld::BldDataEBeamV2& obj, hdf5pp::Group group, int version) 
 {
-  store_BldDataEBeamV2(obj, group, 0, version, false);
+  store_BldDataEBeamV2(&obj, group, 0, version, false);
 }
 
-void store_at(const Psana::Bld::BldDataEBeamV2& obj, hdf5pp::Group group, long index, int version)
+void store_at(const Psana::Bld::BldDataEBeamV2* obj, hdf5pp::Group group, long index, int version)
 {
   store_BldDataEBeamV2(obj, group, index, version, true);
 }
@@ -650,15 +658,17 @@ void make_datasets_BldDataEBeamV3_v0(const Psana::Bld::BldDataEBeamV3& obj,
   }
 }
 
-void store_BldDataEBeamV3_v0(const Psana::Bld::BldDataEBeamV3& obj, hdf5pp::Group group, long index, bool append)
+void store_BldDataEBeamV3_v0(const Psana::Bld::BldDataEBeamV3* obj, hdf5pp::Group group, long index, bool append)
 {
-  {
-    Bld::ns_BldDataEBeamV3_v0::dataset_data ds_data(obj);
+  if (obj) {
+    Bld::ns_BldDataEBeamV3_v0::dataset_data ds_data(*obj);
     if (append) {
       hdf5pp::Utils::storeAt(group, "data", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "data", ds_data);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "data", index < 0 ? index : index + 1);
   }
 }
 
@@ -684,7 +694,7 @@ void make_datasets(const Psana::Bld::BldDataEBeamV3& obj, hdf5pp::Group group, h
   }
 }
 
-void store_BldDataEBeamV3(const Psana::Bld::BldDataEBeamV3& obj, hdf5pp::Group group, long index, int version, bool append)
+void store_BldDataEBeamV3(const Psana::Bld::BldDataEBeamV3* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
@@ -698,10 +708,10 @@ void store_BldDataEBeamV3(const Psana::Bld::BldDataEBeamV3& obj, hdf5pp::Group g
 
 void store(const Psana::Bld::BldDataEBeamV3& obj, hdf5pp::Group group, int version) 
 {
-  store_BldDataEBeamV3(obj, group, 0, version, false);
+  store_BldDataEBeamV3(&obj, group, 0, version, false);
 }
 
-void store_at(const Psana::Bld::BldDataEBeamV3& obj, hdf5pp::Group group, long index, int version)
+void store_at(const Psana::Bld::BldDataEBeamV3* obj, hdf5pp::Group group, long index, int version)
 {
   store_BldDataEBeamV3(obj, group, index, version, true);
 }
@@ -810,15 +820,17 @@ void make_datasets_BldDataEBeamV4_v0(const Psana::Bld::BldDataEBeamV4& obj,
   }
 }
 
-void store_BldDataEBeamV4_v0(const Psana::Bld::BldDataEBeamV4& obj, hdf5pp::Group group, long index, bool append)
+void store_BldDataEBeamV4_v0(const Psana::Bld::BldDataEBeamV4* obj, hdf5pp::Group group, long index, bool append)
 {
-  {
-    Bld::ns_BldDataEBeamV4_v0::dataset_data ds_data(obj);
+  if (obj) {
+    Bld::ns_BldDataEBeamV4_v0::dataset_data ds_data(*obj);
     if (append) {
       hdf5pp::Utils::storeAt(group, "data", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "data", ds_data);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "data", index < 0 ? index : index + 1);
   }
 }
 
@@ -844,7 +856,7 @@ void make_datasets(const Psana::Bld::BldDataEBeamV4& obj, hdf5pp::Group group, h
   }
 }
 
-void store_BldDataEBeamV4(const Psana::Bld::BldDataEBeamV4& obj, hdf5pp::Group group, long index, int version, bool append)
+void store_BldDataEBeamV4(const Psana::Bld::BldDataEBeamV4* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
@@ -858,10 +870,10 @@ void store_BldDataEBeamV4(const Psana::Bld::BldDataEBeamV4& obj, hdf5pp::Group g
 
 void store(const Psana::Bld::BldDataEBeamV4& obj, hdf5pp::Group group, int version) 
 {
-  store_BldDataEBeamV4(obj, group, 0, version, false);
+  store_BldDataEBeamV4(&obj, group, 0, version, false);
 }
 
-void store_at(const Psana::Bld::BldDataEBeamV4& obj, hdf5pp::Group group, long index, int version)
+void store_at(const Psana::Bld::BldDataEBeamV4* obj, hdf5pp::Group group, long index, int version)
 {
   store_BldDataEBeamV4(obj, group, index, version, true);
 }
@@ -937,15 +949,17 @@ void make_datasets_BldDataPhaseCavity_v0(const Psana::Bld::BldDataPhaseCavity& o
   }
 }
 
-void store_BldDataPhaseCavity_v0(const Psana::Bld::BldDataPhaseCavity& obj, hdf5pp::Group group, long index, bool append)
+void store_BldDataPhaseCavity_v0(const Psana::Bld::BldDataPhaseCavity* obj, hdf5pp::Group group, long index, bool append)
 {
-  {
-    Bld::ns_BldDataPhaseCavity_v0::dataset_data ds_data(obj);
+  if (obj) {
+    Bld::ns_BldDataPhaseCavity_v0::dataset_data ds_data(*obj);
     if (append) {
       hdf5pp::Utils::storeAt(group, "data", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "data", ds_data);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "data", index < 0 ? index : index + 1);
   }
 }
 
@@ -971,7 +985,7 @@ void make_datasets(const Psana::Bld::BldDataPhaseCavity& obj, hdf5pp::Group grou
   }
 }
 
-void store_BldDataPhaseCavity(const Psana::Bld::BldDataPhaseCavity& obj, hdf5pp::Group group, long index, int version, bool append)
+void store_BldDataPhaseCavity(const Psana::Bld::BldDataPhaseCavity* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
@@ -985,10 +999,10 @@ void store_BldDataPhaseCavity(const Psana::Bld::BldDataPhaseCavity& obj, hdf5pp:
 
 void store(const Psana::Bld::BldDataPhaseCavity& obj, hdf5pp::Group group, int version) 
 {
-  store_BldDataPhaseCavity(obj, group, 0, version, false);
+  store_BldDataPhaseCavity(&obj, group, 0, version, false);
 }
 
-void store_at(const Psana::Bld::BldDataPhaseCavity& obj, hdf5pp::Group group, long index, int version)
+void store_at(const Psana::Bld::BldDataPhaseCavity* obj, hdf5pp::Group group, long index, int version)
 {
   store_BldDataPhaseCavity(obj, group, index, version, true);
 }
@@ -1075,15 +1089,17 @@ void make_datasets_BldDataIpimbV0_v0(const Psana::Bld::BldDataIpimbV0& obj,
   }
 }
 
-void store_BldDataIpimbV0_v0(const Psana::Bld::BldDataIpimbV0& obj, hdf5pp::Group group, long index, bool append)
+void store_BldDataIpimbV0_v0(const Psana::Bld::BldDataIpimbV0* obj, hdf5pp::Group group, long index, bool append)
 {
-  {
-    Bld::ns_BldDataIpimbV0_v0::dataset_data ds_data(obj);
+  if (obj) {
+    Bld::ns_BldDataIpimbV0_v0::dataset_data ds_data(*obj);
     if (append) {
       hdf5pp::Utils::storeAt(group, "data", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "data", ds_data);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "data", index < 0 ? index : index + 1);
   }
 }
 
@@ -1109,7 +1125,7 @@ void make_datasets(const Psana::Bld::BldDataIpimbV0& obj, hdf5pp::Group group, h
   }
 }
 
-void store_BldDataIpimbV0(const Psana::Bld::BldDataIpimbV0& obj, hdf5pp::Group group, long index, int version, bool append)
+void store_BldDataIpimbV0(const Psana::Bld::BldDataIpimbV0* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
@@ -1123,10 +1139,10 @@ void store_BldDataIpimbV0(const Psana::Bld::BldDataIpimbV0& obj, hdf5pp::Group g
 
 void store(const Psana::Bld::BldDataIpimbV0& obj, hdf5pp::Group group, int version) 
 {
-  store_BldDataIpimbV0(obj, group, 0, version, false);
+  store_BldDataIpimbV0(&obj, group, 0, version, false);
 }
 
-void store_at(const Psana::Bld::BldDataIpimbV0& obj, hdf5pp::Group group, long index, int version)
+void store_at(const Psana::Bld::BldDataIpimbV0* obj, hdf5pp::Group group, long index, int version)
 {
   store_BldDataIpimbV0(obj, group, index, version, true);
 }
@@ -1213,15 +1229,17 @@ void make_datasets_BldDataIpimbV1_v0(const Psana::Bld::BldDataIpimbV1& obj,
   }
 }
 
-void store_BldDataIpimbV1_v0(const Psana::Bld::BldDataIpimbV1& obj, hdf5pp::Group group, long index, bool append)
+void store_BldDataIpimbV1_v0(const Psana::Bld::BldDataIpimbV1* obj, hdf5pp::Group group, long index, bool append)
 {
-  {
-    Bld::ns_BldDataIpimbV1_v0::dataset_data ds_data(obj);
+  if (obj) {
+    Bld::ns_BldDataIpimbV1_v0::dataset_data ds_data(*obj);
     if (append) {
       hdf5pp::Utils::storeAt(group, "data", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "data", ds_data);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "data", index < 0 ? index : index + 1);
   }
 }
 
@@ -1247,7 +1265,7 @@ void make_datasets(const Psana::Bld::BldDataIpimbV1& obj, hdf5pp::Group group, h
   }
 }
 
-void store_BldDataIpimbV1(const Psana::Bld::BldDataIpimbV1& obj, hdf5pp::Group group, long index, int version, bool append)
+void store_BldDataIpimbV1(const Psana::Bld::BldDataIpimbV1* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
@@ -1261,10 +1279,10 @@ void store_BldDataIpimbV1(const Psana::Bld::BldDataIpimbV1& obj, hdf5pp::Group g
 
 void store(const Psana::Bld::BldDataIpimbV1& obj, hdf5pp::Group group, int version) 
 {
-  store_BldDataIpimbV1(obj, group, 0, version, false);
+  store_BldDataIpimbV1(&obj, group, 0, version, false);
 }
 
-void store_at(const Psana::Bld::BldDataIpimbV1& obj, hdf5pp::Group group, long index, int version)
+void store_at(const Psana::Bld::BldDataIpimbV1* obj, hdf5pp::Group group, long index, int version)
 {
   store_BldDataIpimbV1(obj, group, index, version, true);
 }
@@ -1291,7 +1309,7 @@ void make_datasets(const Psana::Bld::BldDataPimV1& obj, hdf5pp::Group group, hsi
   }
 }
 
-void store_BldDataPimV1(const Psana::Bld::BldDataPimV1& obj, hdf5pp::Group group, long index, int version, bool append)
+void store_BldDataPimV1(const Psana::Bld::BldDataPimV1* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
@@ -1305,10 +1323,10 @@ void store_BldDataPimV1(const Psana::Bld::BldDataPimV1& obj, hdf5pp::Group group
 
 void store(const Psana::Bld::BldDataPimV1& obj, hdf5pp::Group group, int version) 
 {
-  store_BldDataPimV1(obj, group, 0, version, false);
+  store_BldDataPimV1(&obj, group, 0, version, false);
 }
 
-void store_at(const Psana::Bld::BldDataPimV1& obj, hdf5pp::Group group, long index, int version)
+void store_at(const Psana::Bld::BldDataPimV1* obj, hdf5pp::Group group, long index, int version)
 {
   store_BldDataPimV1(obj, group, index, version, true);
 }
@@ -1470,15 +1488,17 @@ void make_datasets_BldDataGMDV0_v0(const Psana::Bld::BldDataGMDV0& obj,
   }
 }
 
-void store_BldDataGMDV0_v0(const Psana::Bld::BldDataGMDV0& obj, hdf5pp::Group group, long index, bool append)
+void store_BldDataGMDV0_v0(const Psana::Bld::BldDataGMDV0* obj, hdf5pp::Group group, long index, bool append)
 {
-  {
-    Bld::ns_BldDataGMDV0_v0::dataset_data ds_data(obj);
+  if (obj) {
+    Bld::ns_BldDataGMDV0_v0::dataset_data ds_data(*obj);
     if (append) {
       hdf5pp::Utils::storeAt(group, "data", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "data", ds_data);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "data", index < 0 ? index : index + 1);
   }
 }
 
@@ -1504,7 +1524,7 @@ void make_datasets(const Psana::Bld::BldDataGMDV0& obj, hdf5pp::Group group, hsi
   }
 }
 
-void store_BldDataGMDV0(const Psana::Bld::BldDataGMDV0& obj, hdf5pp::Group group, long index, int version, bool append)
+void store_BldDataGMDV0(const Psana::Bld::BldDataGMDV0* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
@@ -1518,10 +1538,10 @@ void store_BldDataGMDV0(const Psana::Bld::BldDataGMDV0& obj, hdf5pp::Group group
 
 void store(const Psana::Bld::BldDataGMDV0& obj, hdf5pp::Group group, int version) 
 {
-  store_BldDataGMDV0(obj, group, 0, version, false);
+  store_BldDataGMDV0(&obj, group, 0, version, false);
 }
 
-void store_at(const Psana::Bld::BldDataGMDV0& obj, hdf5pp::Group group, long index, int version)
+void store_at(const Psana::Bld::BldDataGMDV0* obj, hdf5pp::Group group, long index, int version)
 {
   store_BldDataGMDV0(obj, group, index, version, true);
 }
@@ -1613,15 +1633,17 @@ void make_datasets_BldDataGMDV1_v0(const Psana::Bld::BldDataGMDV1& obj,
   }
 }
 
-void store_BldDataGMDV1_v0(const Psana::Bld::BldDataGMDV1& obj, hdf5pp::Group group, long index, bool append)
+void store_BldDataGMDV1_v0(const Psana::Bld::BldDataGMDV1* obj, hdf5pp::Group group, long index, bool append)
 {
-  {
-    Bld::ns_BldDataGMDV1_v0::dataset_data ds_data(obj);
+  if (obj) {
+    Bld::ns_BldDataGMDV1_v0::dataset_data ds_data(*obj);
     if (append) {
       hdf5pp::Utils::storeAt(group, "data", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "data", ds_data);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "data", index < 0 ? index : index + 1);
   }
 }
 
@@ -1647,7 +1669,7 @@ void make_datasets(const Psana::Bld::BldDataGMDV1& obj, hdf5pp::Group group, hsi
   }
 }
 
-void store_BldDataGMDV1(const Psana::Bld::BldDataGMDV1& obj, hdf5pp::Group group, long index, int version, bool append)
+void store_BldDataGMDV1(const Psana::Bld::BldDataGMDV1* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
@@ -1661,10 +1683,10 @@ void store_BldDataGMDV1(const Psana::Bld::BldDataGMDV1& obj, hdf5pp::Group group
 
 void store(const Psana::Bld::BldDataGMDV1& obj, hdf5pp::Group group, int version) 
 {
-  store_BldDataGMDV1(obj, group, 0, version, false);
+  store_BldDataGMDV1(&obj, group, 0, version, false);
 }
 
-void store_at(const Psana::Bld::BldDataGMDV1& obj, hdf5pp::Group group, long index, int version)
+void store_at(const Psana::Bld::BldDataGMDV1* obj, hdf5pp::Group group, long index, int version)
 {
   store_BldDataGMDV1(obj, group, index, version, true);
 }
@@ -1691,7 +1713,7 @@ void make_datasets(const Psana::Bld::BldDataAcqADCV1& obj, hdf5pp::Group group, 
   }
 }
 
-void store_BldDataAcqADCV1(const Psana::Bld::BldDataAcqADCV1& obj, hdf5pp::Group group, long index, int version, bool append)
+void store_BldDataAcqADCV1(const Psana::Bld::BldDataAcqADCV1* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
@@ -1705,10 +1727,10 @@ void store_BldDataAcqADCV1(const Psana::Bld::BldDataAcqADCV1& obj, hdf5pp::Group
 
 void store(const Psana::Bld::BldDataAcqADCV1& obj, hdf5pp::Group group, int version) 
 {
-  store_BldDataAcqADCV1(obj, group, 0, version, false);
+  store_BldDataAcqADCV1(&obj, group, 0, version, false);
 }
 
-void store_at(const Psana::Bld::BldDataAcqADCV1& obj, hdf5pp::Group group, long index, int version)
+void store_at(const Psana::Bld::BldDataAcqADCV1* obj, hdf5pp::Group group, long index, int version)
 {
   store_BldDataAcqADCV1(obj, group, index, version, true);
 }
@@ -1795,15 +1817,17 @@ void make_datasets_BldDataSpectrometerV0_v0(const Psana::Bld::BldDataSpectromete
   }
 }
 
-void store_BldDataSpectrometerV0_v0(const Psana::Bld::BldDataSpectrometerV0& obj, hdf5pp::Group group, long index, bool append)
+void store_BldDataSpectrometerV0_v0(const Psana::Bld::BldDataSpectrometerV0* obj, hdf5pp::Group group, long index, bool append)
 {
-  {
-    Bld::ns_BldDataSpectrometerV0_v0::dataset_data ds_data(obj);
+  if (obj) {
+    Bld::ns_BldDataSpectrometerV0_v0::dataset_data ds_data(*obj);
     if (append) {
       hdf5pp::Utils::storeAt(group, "data", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "data", ds_data);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "data", index < 0 ? index : index + 1);
   }
 }
 
@@ -1829,7 +1853,7 @@ void make_datasets(const Psana::Bld::BldDataSpectrometerV0& obj, hdf5pp::Group g
   }
 }
 
-void store_BldDataSpectrometerV0(const Psana::Bld::BldDataSpectrometerV0& obj, hdf5pp::Group group, long index, int version, bool append)
+void store_BldDataSpectrometerV0(const Psana::Bld::BldDataSpectrometerV0* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
@@ -1843,10 +1867,10 @@ void store_BldDataSpectrometerV0(const Psana::Bld::BldDataSpectrometerV0& obj, h
 
 void store(const Psana::Bld::BldDataSpectrometerV0& obj, hdf5pp::Group group, int version) 
 {
-  store_BldDataSpectrometerV0(obj, group, 0, version, false);
+  store_BldDataSpectrometerV0(&obj, group, 0, version, false);
 }
 
-void store_at(const Psana::Bld::BldDataSpectrometerV0& obj, hdf5pp::Group group, long index, int version)
+void store_at(const Psana::Bld::BldDataSpectrometerV0* obj, hdf5pp::Group group, long index, int version)
 {
   store_BldDataSpectrometerV0(obj, group, index, version, true);
 }

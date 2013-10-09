@@ -131,12 +131,16 @@ void make_datasets_BldDataPimV1_v0(const Psana::Bld::BldDataPimV1& obj,
   }
 }
 
-void store_BldDataPimV1_v0(const Psana::Bld::BldDataPimV1& obj, hdf5pp::Group group, long index, bool append)
+void store_BldDataPimV1_v0(const Psana::Bld::BldDataPimV1* obj, hdf5pp::Group group, long index, bool append)
 {
   if (append) {
-    hdf5pp::Utils::storeAt(group, "data", ns_BldDataPimV1_v0::dataset_data(obj), index);
+    if (obj) {
+      hdf5pp::Utils::storeAt(group, "data", ns_BldDataPimV1_v0::dataset_data(*obj), index);
+    } else {
+      hdf5pp::Utils::resizeDataset(group, "data", index < 0 ? index : index + 1);
+    }
   } else {
-    hdf5pp::Utils::storeScalar(group, "data", ns_BldDataPimV1_v0::dataset_data(obj));
+    hdf5pp::Utils::storeScalar(group, "data", ns_BldDataPimV1_v0::dataset_data(*obj));
   }
 }
 
@@ -183,7 +187,7 @@ void make_datasets_BldDataAcqADCV1_v0(const Psana::Bld::BldDataAcqADCV1& obj,
   BldDataAcqADCV1_unimplemented();
 }
 
-void store_BldDataAcqADCV1_v0(const Psana::Bld::BldDataAcqADCV1& obj, hdf5pp::Group group, bool append)
+void store_BldDataAcqADCV1_v0(const Psana::Bld::BldDataAcqADCV1* obj, hdf5pp::Group group, bool append)
 {
   BldDataAcqADCV1_unimplemented();
 }

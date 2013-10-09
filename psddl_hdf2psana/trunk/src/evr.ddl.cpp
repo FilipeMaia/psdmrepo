@@ -655,20 +655,22 @@ void make_datasets_ConfigV1_v0(const Psana::EvrData::ConfigV1& obj,
   }
 }
 
-void store_ConfigV1_v0(const Psana::EvrData::ConfigV1& obj, hdf5pp::Group group, long index, bool append)
+void store_ConfigV1_v0(const Psana::EvrData::ConfigV1* obj, hdf5pp::Group group, long index, bool append)
 {
-  {
-    EvrData::ns_ConfigV1_v0::dataset_config ds_data(obj);
+  if (obj) {
+    EvrData::ns_ConfigV1_v0::dataset_config ds_data(*obj);
     if (append) {
       hdf5pp::Utils::storeAt(group, "config", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "config", ds_data);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "config", index < 0 ? index : index + 1);
   }
-  {
-    typedef __typeof__(obj.pulses()) PsanaArray;
+  if (obj) {
+    typedef __typeof__(obj->pulses()) PsanaArray;
     typedef ndarray<EvrData::ns_PulseConfig_v0::dataset_data, 1> HdfArray;
-    PsanaArray psana_array = obj.pulses();
+    PsanaArray psana_array = obj->pulses();
     HdfArray hdf_array(psana_array.shape());
     HdfArray::iterator out = hdf_array.begin();
     for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
@@ -679,11 +681,13 @@ void store_ConfigV1_v0(const Psana::EvrData::ConfigV1& obj, hdf5pp::Group group,
     } else {
       hdf5pp::Utils::storeNDArray(group, "pulses", hdf_array);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "pulses", index < 0 ? index : index + 1);
   }
-  {
-    typedef __typeof__(obj.output_maps()) PsanaArray;
+  if (obj) {
+    typedef __typeof__(obj->output_maps()) PsanaArray;
     typedef ndarray<EvrData::ns_OutputMap_v0::dataset_data, 1> HdfArray;
-    PsanaArray psana_array = obj.output_maps();
+    PsanaArray psana_array = obj->output_maps();
     HdfArray hdf_array(psana_array.shape());
     HdfArray::iterator out = hdf_array.begin();
     for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
@@ -694,6 +698,8 @@ void store_ConfigV1_v0(const Psana::EvrData::ConfigV1& obj, hdf5pp::Group group,
     } else {
       hdf5pp::Utils::storeNDArray(group, "output_maps", hdf_array);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "output_maps", index < 0 ? index : index + 1);
   }
 }
 
@@ -719,7 +725,7 @@ void make_datasets(const Psana::EvrData::ConfigV1& obj, hdf5pp::Group group, hsi
   }
 }
 
-void store_ConfigV1(const Psana::EvrData::ConfigV1& obj, hdf5pp::Group group, long index, int version, bool append)
+void store_ConfigV1(const Psana::EvrData::ConfigV1* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
@@ -733,10 +739,10 @@ void store_ConfigV1(const Psana::EvrData::ConfigV1& obj, hdf5pp::Group group, lo
 
 void store(const Psana::EvrData::ConfigV1& obj, hdf5pp::Group group, int version) 
 {
-  store_ConfigV1(obj, group, 0, version, false);
+  store_ConfigV1(&obj, group, 0, version, false);
 }
 
-void store_at(const Psana::EvrData::ConfigV1& obj, hdf5pp::Group group, long index, int version)
+void store_at(const Psana::EvrData::ConfigV1* obj, hdf5pp::Group group, long index, int version)
 {
   store_ConfigV1(obj, group, index, version, true);
 }
@@ -888,20 +894,22 @@ void make_datasets_ConfigV2_v0(const Psana::EvrData::ConfigV2& obj,
   }
 }
 
-void store_ConfigV2_v0(const Psana::EvrData::ConfigV2& obj, hdf5pp::Group group, long index, bool append)
+void store_ConfigV2_v0(const Psana::EvrData::ConfigV2* obj, hdf5pp::Group group, long index, bool append)
 {
-  {
-    EvrData::ns_ConfigV2_v0::dataset_config ds_data(obj);
+  if (obj) {
+    EvrData::ns_ConfigV2_v0::dataset_config ds_data(*obj);
     if (append) {
       hdf5pp::Utils::storeAt(group, "config", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "config", ds_data);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "config", index < 0 ? index : index + 1);
   }
-  {
-    typedef __typeof__(obj.pulses()) PsanaArray;
+  if (obj) {
+    typedef __typeof__(obj->pulses()) PsanaArray;
     typedef ndarray<EvrData::ns_PulseConfig_v0::dataset_data, 1> HdfArray;
-    PsanaArray psana_array = obj.pulses();
+    PsanaArray psana_array = obj->pulses();
     HdfArray hdf_array(psana_array.shape());
     HdfArray::iterator out = hdf_array.begin();
     for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
@@ -912,11 +920,13 @@ void store_ConfigV2_v0(const Psana::EvrData::ConfigV2& obj, hdf5pp::Group group,
     } else {
       hdf5pp::Utils::storeNDArray(group, "pulses", hdf_array);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "pulses", index < 0 ? index : index + 1);
   }
-  {
-    typedef __typeof__(obj.output_maps()) PsanaArray;
+  if (obj) {
+    typedef __typeof__(obj->output_maps()) PsanaArray;
     typedef ndarray<EvrData::ns_OutputMap_v0::dataset_data, 1> HdfArray;
-    PsanaArray psana_array = obj.output_maps();
+    PsanaArray psana_array = obj->output_maps();
     HdfArray hdf_array(psana_array.shape());
     HdfArray::iterator out = hdf_array.begin();
     for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
@@ -927,6 +937,8 @@ void store_ConfigV2_v0(const Psana::EvrData::ConfigV2& obj, hdf5pp::Group group,
     } else {
       hdf5pp::Utils::storeNDArray(group, "output_maps", hdf_array);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "output_maps", index < 0 ? index : index + 1);
   }
 }
 
@@ -952,7 +964,7 @@ void make_datasets(const Psana::EvrData::ConfigV2& obj, hdf5pp::Group group, hsi
   }
 }
 
-void store_ConfigV2(const Psana::EvrData::ConfigV2& obj, hdf5pp::Group group, long index, int version, bool append)
+void store_ConfigV2(const Psana::EvrData::ConfigV2* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
@@ -966,10 +978,10 @@ void store_ConfigV2(const Psana::EvrData::ConfigV2& obj, hdf5pp::Group group, lo
 
 void store(const Psana::EvrData::ConfigV2& obj, hdf5pp::Group group, int version) 
 {
-  store_ConfigV2(obj, group, 0, version, false);
+  store_ConfigV2(&obj, group, 0, version, false);
 }
 
-void store_at(const Psana::EvrData::ConfigV2& obj, hdf5pp::Group group, long index, int version)
+void store_at(const Psana::EvrData::ConfigV2* obj, hdf5pp::Group group, long index, int version)
 {
   store_ConfigV2(obj, group, index, version, true);
 }
@@ -1098,20 +1110,22 @@ void make_datasets_ConfigV3_v0(const Psana::EvrData::ConfigV3& obj,
   }
 }
 
-void store_ConfigV3_v0(const Psana::EvrData::ConfigV3& obj, hdf5pp::Group group, long index, bool append)
+void store_ConfigV3_v0(const Psana::EvrData::ConfigV3* obj, hdf5pp::Group group, long index, bool append)
 {
-  {
-    EvrData::ns_ConfigV3_v0::dataset_config ds_data(obj);
+  if (obj) {
+    EvrData::ns_ConfigV3_v0::dataset_config ds_data(*obj);
     if (append) {
       hdf5pp::Utils::storeAt(group, "config", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "config", ds_data);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "config", index < 0 ? index : index + 1);
   }
-  {
-    typedef __typeof__(obj.eventcodes()) PsanaArray;
+  if (obj) {
+    typedef __typeof__(obj->eventcodes()) PsanaArray;
     typedef ndarray<EvrData::ns_EventCodeV3_v0::dataset_data, 1> HdfArray;
-    PsanaArray psana_array = obj.eventcodes();
+    PsanaArray psana_array = obj->eventcodes();
     HdfArray hdf_array(psana_array.shape());
     HdfArray::iterator out = hdf_array.begin();
     for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
@@ -1122,11 +1136,13 @@ void store_ConfigV3_v0(const Psana::EvrData::ConfigV3& obj, hdf5pp::Group group,
     } else {
       hdf5pp::Utils::storeNDArray(group, "eventcodes", hdf_array);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "eventcodes", index < 0 ? index : index + 1);
   }
-  {
-    typedef __typeof__(obj.pulses()) PsanaArray;
+  if (obj) {
+    typedef __typeof__(obj->pulses()) PsanaArray;
     typedef ndarray<EvrData::ns_PulseConfigV3_v0::dataset_data, 1> HdfArray;
-    PsanaArray psana_array = obj.pulses();
+    PsanaArray psana_array = obj->pulses();
     HdfArray hdf_array(psana_array.shape());
     HdfArray::iterator out = hdf_array.begin();
     for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
@@ -1137,11 +1153,13 @@ void store_ConfigV3_v0(const Psana::EvrData::ConfigV3& obj, hdf5pp::Group group,
     } else {
       hdf5pp::Utils::storeNDArray(group, "pulses", hdf_array);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "pulses", index < 0 ? index : index + 1);
   }
-  {
-    typedef __typeof__(obj.output_maps()) PsanaArray;
+  if (obj) {
+    typedef __typeof__(obj->output_maps()) PsanaArray;
     typedef ndarray<EvrData::ns_OutputMap_v0::dataset_data, 1> HdfArray;
-    PsanaArray psana_array = obj.output_maps();
+    PsanaArray psana_array = obj->output_maps();
     HdfArray hdf_array(psana_array.shape());
     HdfArray::iterator out = hdf_array.begin();
     for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
@@ -1152,6 +1170,8 @@ void store_ConfigV3_v0(const Psana::EvrData::ConfigV3& obj, hdf5pp::Group group,
     } else {
       hdf5pp::Utils::storeNDArray(group, "output_maps", hdf_array);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "output_maps", index < 0 ? index : index + 1);
   }
 }
 
@@ -1177,7 +1197,7 @@ void make_datasets(const Psana::EvrData::ConfigV3& obj, hdf5pp::Group group, hsi
   }
 }
 
-void store_ConfigV3(const Psana::EvrData::ConfigV3& obj, hdf5pp::Group group, long index, int version, bool append)
+void store_ConfigV3(const Psana::EvrData::ConfigV3* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
@@ -1191,10 +1211,10 @@ void store_ConfigV3(const Psana::EvrData::ConfigV3& obj, hdf5pp::Group group, lo
 
 void store(const Psana::EvrData::ConfigV3& obj, hdf5pp::Group group, int version) 
 {
-  store_ConfigV3(obj, group, 0, version, false);
+  store_ConfigV3(&obj, group, 0, version, false);
 }
 
-void store_at(const Psana::EvrData::ConfigV3& obj, hdf5pp::Group group, long index, int version)
+void store_at(const Psana::EvrData::ConfigV3* obj, hdf5pp::Group group, long index, int version)
 {
   store_ConfigV3(obj, group, index, version, true);
 }
@@ -1323,20 +1343,22 @@ void make_datasets_ConfigV4_v0(const Psana::EvrData::ConfigV4& obj,
   }
 }
 
-void store_ConfigV4_v0(const Psana::EvrData::ConfigV4& obj, hdf5pp::Group group, long index, bool append)
+void store_ConfigV4_v0(const Psana::EvrData::ConfigV4* obj, hdf5pp::Group group, long index, bool append)
 {
-  {
-    EvrData::ns_ConfigV4_v0::dataset_config ds_data(obj);
+  if (obj) {
+    EvrData::ns_ConfigV4_v0::dataset_config ds_data(*obj);
     if (append) {
       hdf5pp::Utils::storeAt(group, "config", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "config", ds_data);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "config", index < 0 ? index : index + 1);
   }
-  {
-    typedef __typeof__(obj.eventcodes()) PsanaArray;
+  if (obj) {
+    typedef __typeof__(obj->eventcodes()) PsanaArray;
     typedef ndarray<EvrData::ns_EventCodeV4_v0::dataset_data, 1> HdfArray;
-    PsanaArray psana_array = obj.eventcodes();
+    PsanaArray psana_array = obj->eventcodes();
     HdfArray hdf_array(psana_array.shape());
     HdfArray::iterator out = hdf_array.begin();
     for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
@@ -1347,11 +1369,13 @@ void store_ConfigV4_v0(const Psana::EvrData::ConfigV4& obj, hdf5pp::Group group,
     } else {
       hdf5pp::Utils::storeNDArray(group, "eventcodes", hdf_array);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "eventcodes", index < 0 ? index : index + 1);
   }
-  {
-    typedef __typeof__(obj.pulses()) PsanaArray;
+  if (obj) {
+    typedef __typeof__(obj->pulses()) PsanaArray;
     typedef ndarray<EvrData::ns_PulseConfigV3_v0::dataset_data, 1> HdfArray;
-    PsanaArray psana_array = obj.pulses();
+    PsanaArray psana_array = obj->pulses();
     HdfArray hdf_array(psana_array.shape());
     HdfArray::iterator out = hdf_array.begin();
     for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
@@ -1362,11 +1386,13 @@ void store_ConfigV4_v0(const Psana::EvrData::ConfigV4& obj, hdf5pp::Group group,
     } else {
       hdf5pp::Utils::storeNDArray(group, "pulses", hdf_array);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "pulses", index < 0 ? index : index + 1);
   }
-  {
-    typedef __typeof__(obj.output_maps()) PsanaArray;
+  if (obj) {
+    typedef __typeof__(obj->output_maps()) PsanaArray;
     typedef ndarray<EvrData::ns_OutputMap_v0::dataset_data, 1> HdfArray;
-    PsanaArray psana_array = obj.output_maps();
+    PsanaArray psana_array = obj->output_maps();
     HdfArray hdf_array(psana_array.shape());
     HdfArray::iterator out = hdf_array.begin();
     for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
@@ -1377,6 +1403,8 @@ void store_ConfigV4_v0(const Psana::EvrData::ConfigV4& obj, hdf5pp::Group group,
     } else {
       hdf5pp::Utils::storeNDArray(group, "output_maps", hdf_array);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "output_maps", index < 0 ? index : index + 1);
   }
 }
 
@@ -1402,7 +1430,7 @@ void make_datasets(const Psana::EvrData::ConfigV4& obj, hdf5pp::Group group, hsi
   }
 }
 
-void store_ConfigV4(const Psana::EvrData::ConfigV4& obj, hdf5pp::Group group, long index, int version, bool append)
+void store_ConfigV4(const Psana::EvrData::ConfigV4* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
@@ -1416,10 +1444,10 @@ void store_ConfigV4(const Psana::EvrData::ConfigV4& obj, hdf5pp::Group group, lo
 
 void store(const Psana::EvrData::ConfigV4& obj, hdf5pp::Group group, int version) 
 {
-  store_ConfigV4(obj, group, 0, version, false);
+  store_ConfigV4(&obj, group, 0, version, false);
 }
 
-void store_at(const Psana::EvrData::ConfigV4& obj, hdf5pp::Group group, long index, int version)
+void store_at(const Psana::EvrData::ConfigV4* obj, hdf5pp::Group group, long index, int version)
 {
   store_ConfigV4(obj, group, index, version, true);
 }
@@ -1613,15 +1641,17 @@ void make_datasets_SequencerConfigV1_v0(const Psana::EvrData::SequencerConfigV1&
   }
 }
 
-void store_SequencerConfigV1_v0(const Psana::EvrData::SequencerConfigV1& obj, hdf5pp::Group group, long index, bool append)
+void store_SequencerConfigV1_v0(const Psana::EvrData::SequencerConfigV1* obj, hdf5pp::Group group, long index, bool append)
 {
-  {
-    EvrData::ns_SequencerConfigV1_v0::dataset_config ds_data(obj);
+  if (obj) {
+    EvrData::ns_SequencerConfigV1_v0::dataset_config ds_data(*obj);
     if (append) {
       hdf5pp::Utils::storeAt(group, "config", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "config", ds_data);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "config", index < 0 ? index : index + 1);
   }
 }
 
@@ -1765,20 +1795,22 @@ void make_datasets_ConfigV5_v0(const Psana::EvrData::ConfigV5& obj,
   }
 }
 
-void store_ConfigV5_v0(const Psana::EvrData::ConfigV5& obj, hdf5pp::Group group, long index, bool append)
+void store_ConfigV5_v0(const Psana::EvrData::ConfigV5* obj, hdf5pp::Group group, long index, bool append)
 {
-  {
-    EvrData::ns_ConfigV5_v0::dataset_config ds_data(obj);
+  if (obj) {
+    EvrData::ns_ConfigV5_v0::dataset_config ds_data(*obj);
     if (append) {
       hdf5pp::Utils::storeAt(group, "config", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "config", ds_data);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "config", index < 0 ? index : index + 1);
   }
-  {
-    typedef __typeof__(obj.eventcodes()) PsanaArray;
+  if (obj) {
+    typedef __typeof__(obj->eventcodes()) PsanaArray;
     typedef ndarray<EvrData::ns_EventCodeV5_v0::dataset_data, 1> HdfArray;
-    PsanaArray psana_array = obj.eventcodes();
+    PsanaArray psana_array = obj->eventcodes();
     HdfArray hdf_array(psana_array.shape());
     HdfArray::iterator out = hdf_array.begin();
     for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
@@ -1789,11 +1821,13 @@ void store_ConfigV5_v0(const Psana::EvrData::ConfigV5& obj, hdf5pp::Group group,
     } else {
       hdf5pp::Utils::storeNDArray(group, "eventcodes", hdf_array);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "eventcodes", index < 0 ? index : index + 1);
   }
-  {
-    typedef __typeof__(obj.pulses()) PsanaArray;
+  if (obj) {
+    typedef __typeof__(obj->pulses()) PsanaArray;
     typedef ndarray<EvrData::ns_PulseConfigV3_v0::dataset_data, 1> HdfArray;
-    PsanaArray psana_array = obj.pulses();
+    PsanaArray psana_array = obj->pulses();
     HdfArray hdf_array(psana_array.shape());
     HdfArray::iterator out = hdf_array.begin();
     for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
@@ -1804,11 +1838,13 @@ void store_ConfigV5_v0(const Psana::EvrData::ConfigV5& obj, hdf5pp::Group group,
     } else {
       hdf5pp::Utils::storeNDArray(group, "pulses", hdf_array);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "pulses", index < 0 ? index : index + 1);
   }
-  {
-    typedef __typeof__(obj.output_maps()) PsanaArray;
+  if (obj) {
+    typedef __typeof__(obj->output_maps()) PsanaArray;
     typedef ndarray<EvrData::ns_OutputMap_v0::dataset_data, 1> HdfArray;
-    PsanaArray psana_array = obj.output_maps();
+    PsanaArray psana_array = obj->output_maps();
     HdfArray hdf_array(psana_array.shape());
     HdfArray::iterator out = hdf_array.begin();
     for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
@@ -1819,14 +1855,18 @@ void store_ConfigV5_v0(const Psana::EvrData::ConfigV5& obj, hdf5pp::Group group,
     } else {
       hdf5pp::Utils::storeNDArray(group, "output_maps", hdf_array);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "output_maps", index < 0 ? index : index + 1);
   }
-  {
-    EvrData::ns_SequencerConfigV1_v0::dataset_config ds_data(obj.seq_config());
+  if (obj) {
+    EvrData::ns_SequencerConfigV1_v0::dataset_config ds_data(obj->seq_config());
     if (append) {
       hdf5pp::Utils::storeAt(group, "seq_config", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "seq_config", ds_data);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "seq_config", index < 0 ? index : index + 1);
   }
 }
 
@@ -1852,7 +1892,7 @@ void make_datasets(const Psana::EvrData::ConfigV5& obj, hdf5pp::Group group, hsi
   }
 }
 
-void store_ConfigV5(const Psana::EvrData::ConfigV5& obj, hdf5pp::Group group, long index, int version, bool append)
+void store_ConfigV5(const Psana::EvrData::ConfigV5* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
@@ -1866,10 +1906,10 @@ void store_ConfigV5(const Psana::EvrData::ConfigV5& obj, hdf5pp::Group group, lo
 
 void store(const Psana::EvrData::ConfigV5& obj, hdf5pp::Group group, int version) 
 {
-  store_ConfigV5(obj, group, 0, version, false);
+  store_ConfigV5(&obj, group, 0, version, false);
 }
 
-void store_at(const Psana::EvrData::ConfigV5& obj, hdf5pp::Group group, long index, int version)
+void store_at(const Psana::EvrData::ConfigV5* obj, hdf5pp::Group group, long index, int version)
 {
   store_ConfigV5(obj, group, index, version, true);
 }
@@ -2014,20 +2054,22 @@ void make_datasets_ConfigV6_v0(const Psana::EvrData::ConfigV6& obj,
   }
 }
 
-void store_ConfigV6_v0(const Psana::EvrData::ConfigV6& obj, hdf5pp::Group group, long index, bool append)
+void store_ConfigV6_v0(const Psana::EvrData::ConfigV6* obj, hdf5pp::Group group, long index, bool append)
 {
-  {
-    EvrData::ns_ConfigV6_v0::dataset_config ds_data(obj);
+  if (obj) {
+    EvrData::ns_ConfigV6_v0::dataset_config ds_data(*obj);
     if (append) {
       hdf5pp::Utils::storeAt(group, "config", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "config", ds_data);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "config", index < 0 ? index : index + 1);
   }
-  {
-    typedef __typeof__(obj.eventcodes()) PsanaArray;
+  if (obj) {
+    typedef __typeof__(obj->eventcodes()) PsanaArray;
     typedef ndarray<EvrData::ns_EventCodeV5_v0::dataset_data, 1> HdfArray;
-    PsanaArray psana_array = obj.eventcodes();
+    PsanaArray psana_array = obj->eventcodes();
     HdfArray hdf_array(psana_array.shape());
     HdfArray::iterator out = hdf_array.begin();
     for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
@@ -2038,11 +2080,13 @@ void store_ConfigV6_v0(const Psana::EvrData::ConfigV6& obj, hdf5pp::Group group,
     } else {
       hdf5pp::Utils::storeNDArray(group, "eventcodes", hdf_array);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "eventcodes", index < 0 ? index : index + 1);
   }
-  {
-    typedef __typeof__(obj.pulses()) PsanaArray;
+  if (obj) {
+    typedef __typeof__(obj->pulses()) PsanaArray;
     typedef ndarray<EvrData::ns_PulseConfigV3_v0::dataset_data, 1> HdfArray;
-    PsanaArray psana_array = obj.pulses();
+    PsanaArray psana_array = obj->pulses();
     HdfArray hdf_array(psana_array.shape());
     HdfArray::iterator out = hdf_array.begin();
     for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
@@ -2053,11 +2097,13 @@ void store_ConfigV6_v0(const Psana::EvrData::ConfigV6& obj, hdf5pp::Group group,
     } else {
       hdf5pp::Utils::storeNDArray(group, "pulses", hdf_array);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "pulses", index < 0 ? index : index + 1);
   }
-  {
-    typedef __typeof__(obj.output_maps()) PsanaArray;
+  if (obj) {
+    typedef __typeof__(obj->output_maps()) PsanaArray;
     typedef ndarray<EvrData::ns_OutputMapV2_v0::dataset_data, 1> HdfArray;
-    PsanaArray psana_array = obj.output_maps();
+    PsanaArray psana_array = obj->output_maps();
     HdfArray hdf_array(psana_array.shape());
     HdfArray::iterator out = hdf_array.begin();
     for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
@@ -2068,14 +2114,18 @@ void store_ConfigV6_v0(const Psana::EvrData::ConfigV6& obj, hdf5pp::Group group,
     } else {
       hdf5pp::Utils::storeNDArray(group, "output_maps", hdf_array);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "output_maps", index < 0 ? index : index + 1);
   }
-  {
-    EvrData::ns_SequencerConfigV1_v0::dataset_config ds_data(obj.seq_config());
+  if (obj) {
+    EvrData::ns_SequencerConfigV1_v0::dataset_config ds_data(obj->seq_config());
     if (append) {
       hdf5pp::Utils::storeAt(group, "seq_config", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "seq_config", ds_data);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "seq_config", index < 0 ? index : index + 1);
   }
 }
 
@@ -2101,7 +2151,7 @@ void make_datasets(const Psana::EvrData::ConfigV6& obj, hdf5pp::Group group, hsi
   }
 }
 
-void store_ConfigV6(const Psana::EvrData::ConfigV6& obj, hdf5pp::Group group, long index, int version, bool append)
+void store_ConfigV6(const Psana::EvrData::ConfigV6* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
@@ -2115,10 +2165,10 @@ void store_ConfigV6(const Psana::EvrData::ConfigV6& obj, hdf5pp::Group group, lo
 
 void store(const Psana::EvrData::ConfigV6& obj, hdf5pp::Group group, int version) 
 {
-  store_ConfigV6(obj, group, 0, version, false);
+  store_ConfigV6(&obj, group, 0, version, false);
 }
 
-void store_at(const Psana::EvrData::ConfigV6& obj, hdf5pp::Group group, long index, int version)
+void store_at(const Psana::EvrData::ConfigV6* obj, hdf5pp::Group group, long index, int version)
 {
   store_ConfigV6(obj, group, index, version, true);
 }
@@ -2263,20 +2313,22 @@ void make_datasets_ConfigV7_v0(const Psana::EvrData::ConfigV7& obj,
   }
 }
 
-void store_ConfigV7_v0(const Psana::EvrData::ConfigV7& obj, hdf5pp::Group group, long index, bool append)
+void store_ConfigV7_v0(const Psana::EvrData::ConfigV7* obj, hdf5pp::Group group, long index, bool append)
 {
-  {
-    EvrData::ns_ConfigV7_v0::dataset_config ds_data(obj);
+  if (obj) {
+    EvrData::ns_ConfigV7_v0::dataset_config ds_data(*obj);
     if (append) {
       hdf5pp::Utils::storeAt(group, "config", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "config", ds_data);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "config", index < 0 ? index : index + 1);
   }
-  {
-    typedef __typeof__(obj.eventcodes()) PsanaArray;
+  if (obj) {
+    typedef __typeof__(obj->eventcodes()) PsanaArray;
     typedef ndarray<EvrData::ns_EventCodeV6_v0::dataset_data, 1> HdfArray;
-    PsanaArray psana_array = obj.eventcodes();
+    PsanaArray psana_array = obj->eventcodes();
     HdfArray hdf_array(psana_array.shape());
     HdfArray::iterator out = hdf_array.begin();
     for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
@@ -2287,11 +2339,13 @@ void store_ConfigV7_v0(const Psana::EvrData::ConfigV7& obj, hdf5pp::Group group,
     } else {
       hdf5pp::Utils::storeNDArray(group, "eventcodes", hdf_array);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "eventcodes", index < 0 ? index : index + 1);
   }
-  {
-    typedef __typeof__(obj.pulses()) PsanaArray;
+  if (obj) {
+    typedef __typeof__(obj->pulses()) PsanaArray;
     typedef ndarray<EvrData::ns_PulseConfigV3_v0::dataset_data, 1> HdfArray;
-    PsanaArray psana_array = obj.pulses();
+    PsanaArray psana_array = obj->pulses();
     HdfArray hdf_array(psana_array.shape());
     HdfArray::iterator out = hdf_array.begin();
     for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
@@ -2302,11 +2356,13 @@ void store_ConfigV7_v0(const Psana::EvrData::ConfigV7& obj, hdf5pp::Group group,
     } else {
       hdf5pp::Utils::storeNDArray(group, "pulses", hdf_array);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "pulses", index < 0 ? index : index + 1);
   }
-  {
-    typedef __typeof__(obj.output_maps()) PsanaArray;
+  if (obj) {
+    typedef __typeof__(obj->output_maps()) PsanaArray;
     typedef ndarray<EvrData::ns_OutputMapV2_v0::dataset_data, 1> HdfArray;
-    PsanaArray psana_array = obj.output_maps();
+    PsanaArray psana_array = obj->output_maps();
     HdfArray hdf_array(psana_array.shape());
     HdfArray::iterator out = hdf_array.begin();
     for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
@@ -2317,14 +2373,18 @@ void store_ConfigV7_v0(const Psana::EvrData::ConfigV7& obj, hdf5pp::Group group,
     } else {
       hdf5pp::Utils::storeNDArray(group, "output_maps", hdf_array);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "output_maps", index < 0 ? index : index + 1);
   }
-  {
-    EvrData::ns_SequencerConfigV1_v0::dataset_config ds_data(obj.seq_config());
+  if (obj) {
+    EvrData::ns_SequencerConfigV1_v0::dataset_config ds_data(obj->seq_config());
     if (append) {
       hdf5pp::Utils::storeAt(group, "seq_config", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "seq_config", ds_data);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "seq_config", index < 0 ? index : index + 1);
   }
 }
 
@@ -2350,7 +2410,7 @@ void make_datasets(const Psana::EvrData::ConfigV7& obj, hdf5pp::Group group, hsi
   }
 }
 
-void store_ConfigV7(const Psana::EvrData::ConfigV7& obj, hdf5pp::Group group, long index, int version, bool append)
+void store_ConfigV7(const Psana::EvrData::ConfigV7* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
@@ -2364,10 +2424,10 @@ void store_ConfigV7(const Psana::EvrData::ConfigV7& obj, hdf5pp::Group group, lo
 
 void store(const Psana::EvrData::ConfigV7& obj, hdf5pp::Group group, int version) 
 {
-  store_ConfigV7(obj, group, 0, version, false);
+  store_ConfigV7(&obj, group, 0, version, false);
 }
 
-void store_at(const Psana::EvrData::ConfigV7& obj, hdf5pp::Group group, long index, int version)
+void store_at(const Psana::EvrData::ConfigV7* obj, hdf5pp::Group group, long index, int version)
 {
   store_ConfigV7(obj, group, index, version, true);
 }
@@ -2441,7 +2501,7 @@ void make_datasets(const Psana::EvrData::DataV3& obj, hdf5pp::Group group, hsize
   }
 }
 
-void store_DataV3(const Psana::EvrData::DataV3& obj, hdf5pp::Group group, long index, int version, bool append)
+void store_DataV3(const Psana::EvrData::DataV3* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
@@ -2455,10 +2515,10 @@ void store_DataV3(const Psana::EvrData::DataV3& obj, hdf5pp::Group group, long i
 
 void store(const Psana::EvrData::DataV3& obj, hdf5pp::Group group, int version) 
 {
-  store_DataV3(obj, group, 0, version, false);
+  store_DataV3(&obj, group, 0, version, false);
 }
 
-void store_at(const Psana::EvrData::DataV3& obj, hdf5pp::Group group, long index, int version)
+void store_at(const Psana::EvrData::DataV3* obj, hdf5pp::Group group, long index, int version)
 {
   store_DataV3(obj, group, index, version, true);
 }
@@ -2485,7 +2545,7 @@ void make_datasets(const Psana::EvrData::IOConfigV1& obj, hdf5pp::Group group, h
   }
 }
 
-void store_IOConfigV1(const Psana::EvrData::IOConfigV1& obj, hdf5pp::Group group, long index, int version, bool append)
+void store_IOConfigV1(const Psana::EvrData::IOConfigV1* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
@@ -2499,10 +2559,10 @@ void store_IOConfigV1(const Psana::EvrData::IOConfigV1& obj, hdf5pp::Group group
 
 void store(const Psana::EvrData::IOConfigV1& obj, hdf5pp::Group group, int version) 
 {
-  store_IOConfigV1(obj, group, 0, version, false);
+  store_IOConfigV1(&obj, group, 0, version, false);
 }
 
-void store_at(const Psana::EvrData::IOConfigV1& obj, hdf5pp::Group group, long index, int version)
+void store_at(const Psana::EvrData::IOConfigV1* obj, hdf5pp::Group group, long index, int version)
 {
   store_IOConfigV1(obj, group, index, version, true);
 }

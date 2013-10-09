@@ -282,20 +282,22 @@ void make_datasets_ConfigV1_v0(const Psana::ControlData::ConfigV1& obj,
   }
 }
 
-void store_ConfigV1_v0(const Psana::ControlData::ConfigV1& obj, hdf5pp::Group group, long index, bool append)
+void store_ConfigV1_v0(const Psana::ControlData::ConfigV1* obj, hdf5pp::Group group, long index, bool append)
 {
-  {
-    ControlData::ns_ConfigV1_v0::dataset_config ds_data(obj);
+  if (obj) {
+    ControlData::ns_ConfigV1_v0::dataset_config ds_data(*obj);
     if (append) {
       hdf5pp::Utils::storeAt(group, "config", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "config", ds_data);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "config", index < 0 ? index : index + 1);
   }
-  {
-    typedef __typeof__(obj.pvControls()) PsanaArray;
+  if (obj) {
+    typedef __typeof__(obj->pvControls()) PsanaArray;
     typedef ndarray<ControlData::ns_PVControl_v0::dataset_data, 1> HdfArray;
-    PsanaArray psana_array = obj.pvControls();
+    PsanaArray psana_array = obj->pvControls();
     HdfArray hdf_array(psana_array.shape());
     HdfArray::iterator out = hdf_array.begin();
     for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
@@ -306,11 +308,13 @@ void store_ConfigV1_v0(const Psana::ControlData::ConfigV1& obj, hdf5pp::Group gr
     } else {
       hdf5pp::Utils::storeNDArray(group, "pvControls", hdf_array);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "pvControls", index < 0 ? index : index + 1);
   }
-  {
-    typedef __typeof__(obj.pvMonitors()) PsanaArray;
+  if (obj) {
+    typedef __typeof__(obj->pvMonitors()) PsanaArray;
     typedef ndarray<ControlData::ns_PVMonitor_v0::dataset_data, 1> HdfArray;
-    PsanaArray psana_array = obj.pvMonitors();
+    PsanaArray psana_array = obj->pvMonitors();
     HdfArray hdf_array(psana_array.shape());
     HdfArray::iterator out = hdf_array.begin();
     for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
@@ -321,6 +325,8 @@ void store_ConfigV1_v0(const Psana::ControlData::ConfigV1& obj, hdf5pp::Group gr
     } else {
       hdf5pp::Utils::storeNDArray(group, "pvMonitors", hdf_array);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "pvMonitors", index < 0 ? index : index + 1);
   }
 }
 
@@ -346,7 +352,7 @@ void make_datasets(const Psana::ControlData::ConfigV1& obj, hdf5pp::Group group,
   }
 }
 
-void store_ConfigV1(const Psana::ControlData::ConfigV1& obj, hdf5pp::Group group, long index, int version, bool append)
+void store_ConfigV1(const Psana::ControlData::ConfigV1* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
@@ -360,10 +366,10 @@ void store_ConfigV1(const Psana::ControlData::ConfigV1& obj, hdf5pp::Group group
 
 void store(const Psana::ControlData::ConfigV1& obj, hdf5pp::Group group, int version) 
 {
-  store_ConfigV1(obj, group, 0, version, false);
+  store_ConfigV1(&obj, group, 0, version, false);
 }
 
-void store_at(const Psana::ControlData::ConfigV1& obj, hdf5pp::Group group, long index, int version)
+void store_at(const Psana::ControlData::ConfigV1* obj, hdf5pp::Group group, long index, int version)
 {
   store_ConfigV1(obj, group, index, version, true);
 }
@@ -521,20 +527,22 @@ void make_datasets_ConfigV2_v0(const Psana::ControlData::ConfigV2& obj,
   }
 }
 
-void store_ConfigV2_v0(const Psana::ControlData::ConfigV2& obj, hdf5pp::Group group, long index, bool append)
+void store_ConfigV2_v0(const Psana::ControlData::ConfigV2* obj, hdf5pp::Group group, long index, bool append)
 {
-  {
-    ControlData::ns_ConfigV2_v0::dataset_config ds_data(obj);
+  if (obj) {
+    ControlData::ns_ConfigV2_v0::dataset_config ds_data(*obj);
     if (append) {
       hdf5pp::Utils::storeAt(group, "config", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "config", ds_data);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "config", index < 0 ? index : index + 1);
   }
-  {
-    typedef __typeof__(obj.pvControls()) PsanaArray;
+  if (obj) {
+    typedef __typeof__(obj->pvControls()) PsanaArray;
     typedef ndarray<ControlData::ns_PVControl_v0::dataset_data, 1> HdfArray;
-    PsanaArray psana_array = obj.pvControls();
+    PsanaArray psana_array = obj->pvControls();
     HdfArray hdf_array(psana_array.shape());
     HdfArray::iterator out = hdf_array.begin();
     for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
@@ -545,11 +553,13 @@ void store_ConfigV2_v0(const Psana::ControlData::ConfigV2& obj, hdf5pp::Group gr
     } else {
       hdf5pp::Utils::storeNDArray(group, "pvControls", hdf_array);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "pvControls", index < 0 ? index : index + 1);
   }
-  {
-    typedef __typeof__(obj.pvMonitors()) PsanaArray;
+  if (obj) {
+    typedef __typeof__(obj->pvMonitors()) PsanaArray;
     typedef ndarray<ControlData::ns_PVMonitor_v0::dataset_data, 1> HdfArray;
-    PsanaArray psana_array = obj.pvMonitors();
+    PsanaArray psana_array = obj->pvMonitors();
     HdfArray hdf_array(psana_array.shape());
     HdfArray::iterator out = hdf_array.begin();
     for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
@@ -560,11 +570,13 @@ void store_ConfigV2_v0(const Psana::ControlData::ConfigV2& obj, hdf5pp::Group gr
     } else {
       hdf5pp::Utils::storeNDArray(group, "pvMonitors", hdf_array);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "pvMonitors", index < 0 ? index : index + 1);
   }
-  {
-    typedef __typeof__(obj.pvLabels()) PsanaArray;
+  if (obj) {
+    typedef __typeof__(obj->pvLabels()) PsanaArray;
     typedef ndarray<ControlData::ns_PVLabel_v0::dataset_data, 1> HdfArray;
-    PsanaArray psana_array = obj.pvLabels();
+    PsanaArray psana_array = obj->pvLabels();
     HdfArray hdf_array(psana_array.shape());
     HdfArray::iterator out = hdf_array.begin();
     for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
@@ -575,6 +587,8 @@ void store_ConfigV2_v0(const Psana::ControlData::ConfigV2& obj, hdf5pp::Group gr
     } else {
       hdf5pp::Utils::storeNDArray(group, "pvLabels", hdf_array);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "pvLabels", index < 0 ? index : index + 1);
   }
 }
 
@@ -600,7 +614,7 @@ void make_datasets(const Psana::ControlData::ConfigV2& obj, hdf5pp::Group group,
   }
 }
 
-void store_ConfigV2(const Psana::ControlData::ConfigV2& obj, hdf5pp::Group group, long index, int version, bool append)
+void store_ConfigV2(const Psana::ControlData::ConfigV2* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
@@ -614,10 +628,10 @@ void store_ConfigV2(const Psana::ControlData::ConfigV2& obj, hdf5pp::Group group
 
 void store(const Psana::ControlData::ConfigV2& obj, hdf5pp::Group group, int version) 
 {
-  store_ConfigV2(obj, group, 0, version, false);
+  store_ConfigV2(&obj, group, 0, version, false);
 }
 
-void store_at(const Psana::ControlData::ConfigV2& obj, hdf5pp::Group group, long index, int version)
+void store_at(const Psana::ControlData::ConfigV2* obj, hdf5pp::Group group, long index, int version)
 {
   store_ConfigV2(obj, group, index, version, true);
 }
@@ -782,20 +796,22 @@ void make_datasets_ConfigV3_v0(const Psana::ControlData::ConfigV3& obj,
   }
 }
 
-void store_ConfigV3_v0(const Psana::ControlData::ConfigV3& obj, hdf5pp::Group group, long index, bool append)
+void store_ConfigV3_v0(const Psana::ControlData::ConfigV3* obj, hdf5pp::Group group, long index, bool append)
 {
-  {
-    ControlData::ns_ConfigV3_v0::dataset_config ds_data(obj);
+  if (obj) {
+    ControlData::ns_ConfigV3_v0::dataset_config ds_data(*obj);
     if (append) {
       hdf5pp::Utils::storeAt(group, "config", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "config", ds_data);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "config", index < 0 ? index : index + 1);
   }
-  {
-    typedef __typeof__(obj.pvControls()) PsanaArray;
+  if (obj) {
+    typedef __typeof__(obj->pvControls()) PsanaArray;
     typedef ndarray<ControlData::ns_PVControl_v0::dataset_data, 1> HdfArray;
-    PsanaArray psana_array = obj.pvControls();
+    PsanaArray psana_array = obj->pvControls();
     HdfArray hdf_array(psana_array.shape());
     HdfArray::iterator out = hdf_array.begin();
     for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
@@ -806,11 +822,13 @@ void store_ConfigV3_v0(const Psana::ControlData::ConfigV3& obj, hdf5pp::Group gr
     } else {
       hdf5pp::Utils::storeNDArray(group, "pvControls", hdf_array);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "pvControls", index < 0 ? index : index + 1);
   }
-  {
-    typedef __typeof__(obj.pvMonitors()) PsanaArray;
+  if (obj) {
+    typedef __typeof__(obj->pvMonitors()) PsanaArray;
     typedef ndarray<ControlData::ns_PVMonitor_v0::dataset_data, 1> HdfArray;
-    PsanaArray psana_array = obj.pvMonitors();
+    PsanaArray psana_array = obj->pvMonitors();
     HdfArray hdf_array(psana_array.shape());
     HdfArray::iterator out = hdf_array.begin();
     for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
@@ -821,11 +839,13 @@ void store_ConfigV3_v0(const Psana::ControlData::ConfigV3& obj, hdf5pp::Group gr
     } else {
       hdf5pp::Utils::storeNDArray(group, "pvMonitors", hdf_array);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "pvMonitors", index < 0 ? index : index + 1);
   }
-  {
-    typedef __typeof__(obj.pvLabels()) PsanaArray;
+  if (obj) {
+    typedef __typeof__(obj->pvLabels()) PsanaArray;
     typedef ndarray<ControlData::ns_PVLabel_v0::dataset_data, 1> HdfArray;
-    PsanaArray psana_array = obj.pvLabels();
+    PsanaArray psana_array = obj->pvLabels();
     HdfArray hdf_array(psana_array.shape());
     HdfArray::iterator out = hdf_array.begin();
     for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
@@ -836,6 +856,8 @@ void store_ConfigV3_v0(const Psana::ControlData::ConfigV3& obj, hdf5pp::Group gr
     } else {
       hdf5pp::Utils::storeNDArray(group, "pvLabels", hdf_array);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "pvLabels", index < 0 ? index : index + 1);
   }
 }
 
@@ -861,7 +883,7 @@ void make_datasets(const Psana::ControlData::ConfigV3& obj, hdf5pp::Group group,
   }
 }
 
-void store_ConfigV3(const Psana::ControlData::ConfigV3& obj, hdf5pp::Group group, long index, int version, bool append)
+void store_ConfigV3(const Psana::ControlData::ConfigV3* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
@@ -875,10 +897,10 @@ void store_ConfigV3(const Psana::ControlData::ConfigV3& obj, hdf5pp::Group group
 
 void store(const Psana::ControlData::ConfigV3& obj, hdf5pp::Group group, int version) 
 {
-  store_ConfigV3(obj, group, 0, version, false);
+  store_ConfigV3(&obj, group, 0, version, false);
 }
 
-void store_at(const Psana::ControlData::ConfigV3& obj, hdf5pp::Group group, long index, int version)
+void store_at(const Psana::ControlData::ConfigV3* obj, hdf5pp::Group group, long index, int version)
 {
   store_ConfigV3(obj, group, index, version, true);
 }

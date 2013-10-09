@@ -86,7 +86,7 @@ void make_datasets_DataDescV1_v0(const Psana::Acqiris::DataDescV1& obj,
   MsgLog("Acqiris::make_datasets_DataDescV1_v0", error, "schema is not supported");
 }
 
-void store_DataDescV1_v0(const Psana::Acqiris::DataDescV1& obj, hdf5pp::Group group, long index, bool append)
+void store_DataDescV1_v0(const Psana::Acqiris::DataDescV1* obj, hdf5pp::Group group, long index, bool append)
 {
   // this schema is too old, we'll not be writing this stuff anymore
   MsgLog("Acqiris::store_DataDescV1_v0", error, "schema is not supported");
@@ -207,10 +207,19 @@ void make_datasets_DataDescV1_v1(const Psana::Acqiris::DataDescV1& obj,
   }
 }
 
-void store_DataDescV1_v1(const Psana::Acqiris::DataDescV1& obj, hdf5pp::Group group, long index, bool append)
+void store_DataDescV1_v1(const Psana::Acqiris::DataDescV1* obj, hdf5pp::Group group, long index, bool append)
 {
-  const unsigned nch = obj.data_shape()[0];
-  const Psana::Acqiris::DataDescV1Elem& elem = obj.data(0);
+  if (not obj) {
+    if (append) {
+      hdf5pp::Utils::resizeDataset(group, "data", index < 0 ? index : index + 1);
+      hdf5pp::Utils::resizeDataset(group, "timestamps", index < 0 ? index : index + 1);
+      hdf5pp::Utils::resizeDataset(group, "waveforms", index < 0 ? index : index + 1);
+    }
+    return;
+  }
+
+  const unsigned nch = obj->data_shape()[0];
+  const Psana::Acqiris::DataDescV1Elem& elem = obj->data(0);
   const ndarray<const int16_t, 2>& wf = elem.waveforms();
   const unsigned nseg = wf.shape()[0];
   const unsigned nsampl = wf.shape()[1];
@@ -218,7 +227,7 @@ void store_DataDescV1_v1(const Psana::Acqiris::DataDescV1& obj, hdf5pp::Group gr
   {
     ndarray<ns_DataDescV1Elem_v1::dataset_data, 1> data = make_ndarray<ns_DataDescV1Elem_v1::dataset_data>(nch);
     for (unsigned i = 0; i != nch; ++ i) {
-      data[i] = ns_DataDescV1Elem_v1::dataset_data(obj.data(i));
+      data[i] = ns_DataDescV1Elem_v1::dataset_data(obj->data(i));
     }
     if (append) {
       hdf5pp::Utils::storeNDArrayAt(group, "data", data, index);
@@ -229,7 +238,7 @@ void store_DataDescV1_v1(const Psana::Acqiris::DataDescV1& obj, hdf5pp::Group gr
   {
     ndarray<ns_TimestampV1_v0::dataset_data, 2> data = make_ndarray<ns_TimestampV1_v0::dataset_data>(nch, nseg);
     for (unsigned i = 0; i != nch; ++ i) {
-      const ndarray<const Psana::Acqiris::TimestampV1, 1>& small = obj.data(i).timestamp();
+      const ndarray<const Psana::Acqiris::TimestampV1, 1>& small = obj->data(i).timestamp();
       std::copy(small.begin(), small.end(), &data[i][0]);
     }
     if (append) {
@@ -241,7 +250,7 @@ void store_DataDescV1_v1(const Psana::Acqiris::DataDescV1& obj, hdf5pp::Group gr
   {
     ndarray<int16_t, 3> data = make_ndarray<int16_t>(nch, nseg, nsampl);
     for (unsigned i = 0; i != nch; ++ i) {
-      const ndarray<const int16_t, 2>& small = obj.data(i).waveforms();
+      const ndarray<const int16_t, 2>& small = obj->data(i).waveforms();
       std::copy(small.begin(), small.end(), &data[i][0][0]);
     }
     if (append) {

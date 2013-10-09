@@ -162,15 +162,17 @@ void make_datasets_TM6740ConfigV1_v0(const Psana::Pulnix::TM6740ConfigV1& obj,
   }
 }
 
-void store_TM6740ConfigV1_v0(const Psana::Pulnix::TM6740ConfigV1& obj, hdf5pp::Group group, long index, bool append)
+void store_TM6740ConfigV1_v0(const Psana::Pulnix::TM6740ConfigV1* obj, hdf5pp::Group group, long index, bool append)
 {
-  {
-    Pulnix::ns_TM6740ConfigV1_v0::dataset_config ds_data(obj);
+  if (obj) {
+    Pulnix::ns_TM6740ConfigV1_v0::dataset_config ds_data(*obj);
     if (append) {
       hdf5pp::Utils::storeAt(group, "config", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "config", ds_data);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "config", index < 0 ? index : index + 1);
   }
 }
 
@@ -196,7 +198,7 @@ void make_datasets(const Psana::Pulnix::TM6740ConfigV1& obj, hdf5pp::Group group
   }
 }
 
-void store_TM6740ConfigV1(const Psana::Pulnix::TM6740ConfigV1& obj, hdf5pp::Group group, long index, int version, bool append)
+void store_TM6740ConfigV1(const Psana::Pulnix::TM6740ConfigV1* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
@@ -210,10 +212,10 @@ void store_TM6740ConfigV1(const Psana::Pulnix::TM6740ConfigV1& obj, hdf5pp::Grou
 
 void store(const Psana::Pulnix::TM6740ConfigV1& obj, hdf5pp::Group group, int version) 
 {
-  store_TM6740ConfigV1(obj, group, 0, version, false);
+  store_TM6740ConfigV1(&obj, group, 0, version, false);
 }
 
-void store_at(const Psana::Pulnix::TM6740ConfigV1& obj, hdf5pp::Group group, long index, int version)
+void store_at(const Psana::Pulnix::TM6740ConfigV1* obj, hdf5pp::Group group, long index, int version)
 {
   store_TM6740ConfigV1(obj, group, index, version, true);
 }
@@ -368,15 +370,17 @@ void make_datasets_TM6740ConfigV2_v0(const Psana::Pulnix::TM6740ConfigV2& obj,
   }
 }
 
-void store_TM6740ConfigV2_v0(const Psana::Pulnix::TM6740ConfigV2& obj, hdf5pp::Group group, long index, bool append)
+void store_TM6740ConfigV2_v0(const Psana::Pulnix::TM6740ConfigV2* obj, hdf5pp::Group group, long index, bool append)
 {
-  {
-    Pulnix::ns_TM6740ConfigV2_v0::dataset_config ds_data(obj);
+  if (obj) {
+    Pulnix::ns_TM6740ConfigV2_v0::dataset_config ds_data(*obj);
     if (append) {
       hdf5pp::Utils::storeAt(group, "config", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "config", ds_data);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "config", index < 0 ? index : index + 1);
   }
 }
 
@@ -402,7 +406,7 @@ void make_datasets(const Psana::Pulnix::TM6740ConfigV2& obj, hdf5pp::Group group
   }
 }
 
-void store_TM6740ConfigV2(const Psana::Pulnix::TM6740ConfigV2& obj, hdf5pp::Group group, long index, int version, bool append)
+void store_TM6740ConfigV2(const Psana::Pulnix::TM6740ConfigV2* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
@@ -416,10 +420,10 @@ void store_TM6740ConfigV2(const Psana::Pulnix::TM6740ConfigV2& obj, hdf5pp::Grou
 
 void store(const Psana::Pulnix::TM6740ConfigV2& obj, hdf5pp::Group group, int version) 
 {
-  store_TM6740ConfigV2(obj, group, 0, version, false);
+  store_TM6740ConfigV2(&obj, group, 0, version, false);
 }
 
-void store_at(const Psana::Pulnix::TM6740ConfigV2& obj, hdf5pp::Group group, long index, int version)
+void store_at(const Psana::Pulnix::TM6740ConfigV2* obj, hdf5pp::Group group, long index, int version)
 {
   store_TM6740ConfigV2(obj, group, index, version, true);
 }

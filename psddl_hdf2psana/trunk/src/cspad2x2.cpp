@@ -235,10 +235,19 @@ void make_datasets_ElementV1_v0(const Psana::CsPad2x2::ElementV1& obj,
   }
 }
 
-void store_ElementV1_v0(const Psana::CsPad2x2::ElementV1& obj, hdf5pp::Group group, long index, bool append)
+void store_ElementV1_v0(const Psana::CsPad2x2::ElementV1* obj, hdf5pp::Group group, long index, bool append)
 {
+  if (not obj) {
+    if (append) {
+      hdf5pp::Utils::resizeDataset(group, "element", index < 0 ? index : index + 1);
+      hdf5pp::Utils::resizeDataset(group, "data", index < 0 ? index : index + 1);
+      hdf5pp::Utils::resizeDataset(group, "common_mode", index < 0 ? index : index + 1);
+    }
+    return;
+  }
+
   {
-    ns_ElementV1_v0::dataset_element data(obj);
+    ns_ElementV1_v0::dataset_element data(*obj);
     if (append) {
       hdf5pp::Utils::storeAt(group, "element", data, index);
     } else {
@@ -247,15 +256,15 @@ void store_ElementV1_v0(const Psana::CsPad2x2::ElementV1& obj, hdf5pp::Group gro
   }
   {
     if (append) {
-      hdf5pp::Utils::storeNDArrayAt(group, "data", obj.data(), index);
+      hdf5pp::Utils::storeNDArrayAt(group, "data", obj->data(), index);
     } else {
-      hdf5pp::Utils::storeNDArray(group, "data", obj.data());
+      hdf5pp::Utils::storeNDArray(group, "data", obj->data());
     }
   }
   {
     ndarray<float, 1> data = make_ndarray<float>(2);
-    data[0] = obj.common_mode(0);
-    data[1] = obj.common_mode(1);
+    data[0] = obj->common_mode(0);
+    data[1] = obj->common_mode(1);
     if (append) {
       hdf5pp::Utils::storeNDArrayAt(group, "common_mode", data, index);
     } else {

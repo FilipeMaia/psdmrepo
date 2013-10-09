@@ -52,8 +52,9 @@ void store(const Psana::PNCCD::ConfigV1& obj, hdf5pp::Group group, int version =
 void make_datasets(const Psana::PNCCD::ConfigV1& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
 /// Add one more object to the containers created by previous method at the specified index,
-/// negative index means append to the end of dataset.
-void store_at(const Psana::PNCCD::ConfigV1& obj, hdf5pp::Group group, long index = -1, int version = -1);
+/// negative index means append to the end of dataset. If pointer to object is zero then
+/// datsets are extended with zero-filled of default-initialized data.
+void store_at(const Psana::PNCCD::ConfigV1* obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 
 namespace ns_ConfigV2_v0 {
@@ -120,8 +121,9 @@ void store(const Psana::PNCCD::ConfigV2& obj, hdf5pp::Group group, int version =
 void make_datasets(const Psana::PNCCD::ConfigV2& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
 /// Add one more object to the containers created by previous method at the specified index,
-/// negative index means append to the end of dataset.
-void store_at(const Psana::PNCCD::ConfigV2& obj, hdf5pp::Group group, long index = -1, int version = -1);
+/// negative index means append to the end of dataset. If pointer to object is zero then
+/// datsets are extended with zero-filled of default-initialized data.
+void store_at(const Psana::PNCCD::ConfigV2* obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 boost::shared_ptr<PSEvt::Proxy<Psana::PNCCD::FullFrameV1> > make_FullFrameV1(int version, hdf5pp::Group group, hsize_t idx);
 
@@ -131,8 +133,9 @@ void store(const Psana::PNCCD::FullFrameV1& obj, hdf5pp::Group group, int versio
 void make_datasets(const Psana::PNCCD::FullFrameV1& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
 /// Add one more object to the containers created by previous method at the specified index,
-/// negative index means append to the end of dataset.
-void store_at(const Psana::PNCCD::FullFrameV1& obj, hdf5pp::Group group, long index = -1, int version = -1);
+/// negative index means append to the end of dataset. If pointer to object is zero then
+/// datsets are extended with zero-filled of default-initialized data.
+void store_at(const Psana::PNCCD::FullFrameV1* obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 boost::shared_ptr<PSEvt::Proxy<Psana::PNCCD::FramesV1> > make_FramesV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::PNCCD::ConfigV1>& cfg);
 boost::shared_ptr<PSEvt::Proxy<Psana::PNCCD::FramesV1> > make_FramesV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::PNCCD::ConfigV2>& cfg);
@@ -143,8 +146,9 @@ void store(const Psana::PNCCD::FramesV1& obj, hdf5pp::Group group, int version =
 void make_datasets(const Psana::PNCCD::FramesV1& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
 /// Add one more object to the containers created by previous method at the specified index,
-/// negative index means append to the end of dataset.
-void store_at(const Psana::PNCCD::FramesV1& obj, hdf5pp::Group group, long index = -1, int version = -1);
+/// negative index means append to the end of dataset. If pointer to object is zero then
+/// datsets are extended with zero-filled of default-initialized data.
+void store_at(const Psana::PNCCD::FramesV1* obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 } // namespace PNCCD
 } // namespace psddl_hdf2psana

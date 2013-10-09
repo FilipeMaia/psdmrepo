@@ -11,6 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-00
+2013-10-08 Andy Salnikov
+- regenerated with psddl V00-09-01
+- store_at() method now accepts pointer instead of ref, stores blank if 
+  pointer is zero
+
 Tag: V00-04-00
 2013-10-08 Andy Salnikov
 - regenerated with psddl V00-09-00

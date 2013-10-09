@@ -439,8 +439,9 @@ void store(const Psana::CsPad::ConfigV1& obj, hdf5pp::Group group, int version =
 void make_datasets(const Psana::CsPad::ConfigV1& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
 /// Add one more object to the containers created by previous method at the specified index,
-/// negative index means append to the end of dataset.
-void store_at(const Psana::CsPad::ConfigV1& obj, hdf5pp::Group group, long index = -1, int version = -1);
+/// negative index means append to the end of dataset. If pointer to object is zero then
+/// datsets are extended with zero-filled of default-initialized data.
+void store_at(const Psana::CsPad::ConfigV1* obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 
 namespace ns_ConfigV2_v0 {
@@ -525,8 +526,9 @@ void store(const Psana::CsPad::ConfigV2& obj, hdf5pp::Group group, int version =
 void make_datasets(const Psana::CsPad::ConfigV2& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
 /// Add one more object to the containers created by previous method at the specified index,
-/// negative index means append to the end of dataset.
-void store_at(const Psana::CsPad::ConfigV2& obj, hdf5pp::Group group, long index = -1, int version = -1);
+/// negative index means append to the end of dataset. If pointer to object is zero then
+/// datsets are extended with zero-filled of default-initialized data.
+void store_at(const Psana::CsPad::ConfigV2* obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 
 namespace ns_ConfigV3_v0 {
@@ -616,8 +618,9 @@ void store(const Psana::CsPad::ConfigV3& obj, hdf5pp::Group group, int version =
 void make_datasets(const Psana::CsPad::ConfigV3& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
 /// Add one more object to the containers created by previous method at the specified index,
-/// negative index means append to the end of dataset.
-void store_at(const Psana::CsPad::ConfigV3& obj, hdf5pp::Group group, long index = -1, int version = -1);
+/// negative index means append to the end of dataset. If pointer to object is zero then
+/// datsets are extended with zero-filled of default-initialized data.
+void store_at(const Psana::CsPad::ConfigV3* obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 
 namespace ns_ConfigV4_v0 {
@@ -707,8 +710,9 @@ void store(const Psana::CsPad::ConfigV4& obj, hdf5pp::Group group, int version =
 void make_datasets(const Psana::CsPad::ConfigV4& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
 /// Add one more object to the containers created by previous method at the specified index,
-/// negative index means append to the end of dataset.
-void store_at(const Psana::CsPad::ConfigV4& obj, hdf5pp::Group group, long index = -1, int version = -1);
+/// negative index means append to the end of dataset. If pointer to object is zero then
+/// datsets are extended with zero-filled of default-initialized data.
+void store_at(const Psana::CsPad::ConfigV4* obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 
 namespace ns_ConfigV5_v0 {
@@ -800,8 +804,9 @@ void store(const Psana::CsPad::ConfigV5& obj, hdf5pp::Group group, int version =
 void make_datasets(const Psana::CsPad::ConfigV5& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
 /// Add one more object to the containers created by previous method at the specified index,
-/// negative index means append to the end of dataset.
-void store_at(const Psana::CsPad::ConfigV5& obj, hdf5pp::Group group, long index = -1, int version = -1);
+/// negative index means append to the end of dataset. If pointer to object is zero then
+/// datsets are extended with zero-filled of default-initialized data.
+void store_at(const Psana::CsPad::ConfigV5* obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 
 namespace ns_ElementV1_v0 {
@@ -878,8 +883,9 @@ void store(const Psana::CsPad::DataV1& obj, hdf5pp::Group group, int version = -
 void make_datasets(const Psana::CsPad::DataV1& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
 /// Add one more object to the containers created by previous method at the specified index,
-/// negative index means append to the end of dataset.
-void store_at(const Psana::CsPad::DataV1& obj, hdf5pp::Group group, long index = -1, int version = -1);
+/// negative index means append to the end of dataset. If pointer to object is zero then
+/// datsets are extended with zero-filled of default-initialized data.
+void store_at(const Psana::CsPad::DataV1* obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 
 namespace ns_ElementV2_v0 {
@@ -955,8 +961,9 @@ void store(const Psana::CsPad::DataV2& obj, hdf5pp::Group group, int version = -
 void make_datasets(const Psana::CsPad::DataV2& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
 /// Add one more object to the containers created by previous method at the specified index,
-/// negative index means append to the end of dataset.
-void store_at(const Psana::CsPad::DataV2& obj, hdf5pp::Group group, long index = -1, int version = -1);
+/// negative index means append to the end of dataset. If pointer to object is zero then
+/// datsets are extended with zero-filled of default-initialized data.
+void store_at(const Psana::CsPad::DataV2* obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 } // namespace CsPad
 } // namespace psddl_hdf2psana

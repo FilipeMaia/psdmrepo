@@ -51,8 +51,9 @@ void store(const Psana::Camera::FrameCoord& obj, hdf5pp::Group group, int versio
 void make_datasets(const Psana::Camera::FrameCoord& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
 /// Add one more object to the containers created by previous method at the specified index,
-/// negative index means append to the end of dataset.
-void store_at(const Psana::Camera::FrameCoord& obj, hdf5pp::Group group, long index = -1, int version = -1);
+/// negative index means append to the end of dataset. If pointer to object is zero then
+/// datsets are extended with zero-filled of default-initialized data.
+void store_at(const Psana::Camera::FrameCoord* obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 
 
@@ -76,8 +77,9 @@ void store(const Psana::Camera::FrameFccdConfigV1& obj, hdf5pp::Group group, int
 void make_datasets(const Psana::Camera::FrameFccdConfigV1& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
 /// Add one more object to the containers created by previous method at the specified index,
-/// negative index means append to the end of dataset.
-void store_at(const Psana::Camera::FrameFccdConfigV1& obj, hdf5pp::Group group, long index = -1, int version = -1);
+/// negative index means append to the end of dataset. If pointer to object is zero then
+/// datsets are extended with zero-filled of default-initialized data.
+void store_at(const Psana::Camera::FrameFccdConfigV1* obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 
 namespace ns_FrameFexConfigV1_v0 {
@@ -136,8 +138,9 @@ void store(const Psana::Camera::FrameFexConfigV1& obj, hdf5pp::Group group, int 
 void make_datasets(const Psana::Camera::FrameFexConfigV1& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
 /// Add one more object to the containers created by previous method at the specified index,
-/// negative index means append to the end of dataset.
-void store_at(const Psana::Camera::FrameFexConfigV1& obj, hdf5pp::Group group, long index = -1, int version = -1);
+/// negative index means append to the end of dataset. If pointer to object is zero then
+/// datsets are extended with zero-filled of default-initialized data.
+void store_at(const Psana::Camera::FrameFexConfigV1* obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Camera::FrameV1> > make_FrameV1(int version, hdf5pp::Group group, hsize_t idx);
 
@@ -147,8 +150,9 @@ void store(const Psana::Camera::FrameV1& obj, hdf5pp::Group group, int version =
 void make_datasets(const Psana::Camera::FrameV1& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
 /// Add one more object to the containers created by previous method at the specified index,
-/// negative index means append to the end of dataset.
-void store_at(const Psana::Camera::FrameV1& obj, hdf5pp::Group group, long index = -1, int version = -1);
+/// negative index means append to the end of dataset. If pointer to object is zero then
+/// datsets are extended with zero-filled of default-initialized data.
+void store_at(const Psana::Camera::FrameV1* obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 
 namespace ns_TwoDGaussianV1_v0 {
@@ -201,8 +205,9 @@ void store(const Psana::Camera::TwoDGaussianV1& obj, hdf5pp::Group group, int ve
 void make_datasets(const Psana::Camera::TwoDGaussianV1& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
 /// Add one more object to the containers created by previous method at the specified index,
-/// negative index means append to the end of dataset.
-void store_at(const Psana::Camera::TwoDGaussianV1& obj, hdf5pp::Group group, long index = -1, int version = -1);
+/// negative index means append to the end of dataset. If pointer to object is zero then
+/// datsets are extended with zero-filled of default-initialized data.
+void store_at(const Psana::Camera::TwoDGaussianV1* obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 } // namespace Camera
 } // namespace psddl_hdf2psana

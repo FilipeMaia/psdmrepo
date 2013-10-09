@@ -80,15 +80,17 @@ void make_datasets_CsPad2x2DigitalPotsCfg_v0(const Psana::CsPad2x2::CsPad2x2Digi
   }
 }
 
-void store_CsPad2x2DigitalPotsCfg_v0(const Psana::CsPad2x2::CsPad2x2DigitalPotsCfg& obj, hdf5pp::Group group, long index, bool append)
+void store_CsPad2x2DigitalPotsCfg_v0(const Psana::CsPad2x2::CsPad2x2DigitalPotsCfg* obj, hdf5pp::Group group, long index, bool append)
 {
-  {
-    CsPad2x2::ns_CsPad2x2DigitalPotsCfg_v0::dataset_data ds_data(obj);
+  if (obj) {
+    CsPad2x2::ns_CsPad2x2DigitalPotsCfg_v0::dataset_data ds_data(*obj);
     if (append) {
       hdf5pp::Utils::storeAt(group, "data", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "data", ds_data);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "data", index < 0 ? index : index + 1);
   }
 }
 
@@ -247,15 +249,17 @@ void make_datasets_CsPad2x2GainMapCfg_v0(const Psana::CsPad2x2::CsPad2x2GainMapC
   }
 }
 
-void store_CsPad2x2GainMapCfg_v0(const Psana::CsPad2x2::CsPad2x2GainMapCfg& obj, hdf5pp::Group group, long index, bool append)
+void store_CsPad2x2GainMapCfg_v0(const Psana::CsPad2x2::CsPad2x2GainMapCfg* obj, hdf5pp::Group group, long index, bool append)
 {
-  {
-    CsPad2x2::ns_CsPad2x2GainMapCfg_v0::dataset_data ds_data(obj);
+  if (obj) {
+    CsPad2x2::ns_CsPad2x2GainMapCfg_v0::dataset_data ds_data(*obj);
     if (append) {
       hdf5pp::Utils::storeAt(group, "data", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "data", ds_data);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "data", index < 0 ? index : index + 1);
   }
 }
 
@@ -488,15 +492,17 @@ void make_datasets_ConfigV1QuadReg_v0(const Psana::CsPad2x2::ConfigV1QuadReg& ob
   }
 }
 
-void store_ConfigV1QuadReg_v0(const Psana::CsPad2x2::ConfigV1QuadReg& obj, hdf5pp::Group group, long index, bool append)
+void store_ConfigV1QuadReg_v0(const Psana::CsPad2x2::ConfigV1QuadReg* obj, hdf5pp::Group group, long index, bool append)
 {
-  {
-    CsPad2x2::ns_ConfigV1QuadReg_v0::dataset_data ds_data(obj);
+  if (obj) {
+    CsPad2x2::ns_ConfigV1QuadReg_v0::dataset_data ds_data(*obj);
     if (append) {
       hdf5pp::Utils::storeAt(group, "data", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "data", ds_data);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "data", index < 0 ? index : index + 1);
   }
 }
 
@@ -648,15 +654,17 @@ void make_datasets_ConfigV1_v0(const Psana::CsPad2x2::ConfigV1& obj,
   }
 }
 
-void store_ConfigV1_v0(const Psana::CsPad2x2::ConfigV1& obj, hdf5pp::Group group, long index, bool append)
+void store_ConfigV1_v0(const Psana::CsPad2x2::ConfigV1* obj, hdf5pp::Group group, long index, bool append)
 {
-  {
-    CsPad2x2::ns_ConfigV1_v0::dataset_config ds_data(obj);
+  if (obj) {
+    CsPad2x2::ns_ConfigV1_v0::dataset_config ds_data(*obj);
     if (append) {
       hdf5pp::Utils::storeAt(group, "config", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "config", ds_data);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "config", index < 0 ? index : index + 1);
   }
 }
 
@@ -682,7 +690,7 @@ void make_datasets(const Psana::CsPad2x2::ConfigV1& obj, hdf5pp::Group group, hs
   }
 }
 
-void store_ConfigV1(const Psana::CsPad2x2::ConfigV1& obj, hdf5pp::Group group, long index, int version, bool append)
+void store_ConfigV1(const Psana::CsPad2x2::ConfigV1* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
@@ -696,10 +704,10 @@ void store_ConfigV1(const Psana::CsPad2x2::ConfigV1& obj, hdf5pp::Group group, l
 
 void store(const Psana::CsPad2x2::ConfigV1& obj, hdf5pp::Group group, int version) 
 {
-  store_ConfigV1(obj, group, 0, version, false);
+  store_ConfigV1(&obj, group, 0, version, false);
 }
 
-void store_at(const Psana::CsPad2x2::ConfigV1& obj, hdf5pp::Group group, long index, int version)
+void store_at(const Psana::CsPad2x2::ConfigV1* obj, hdf5pp::Group group, long index, int version)
 {
   store_ConfigV1(obj, group, index, version, true);
 }
@@ -947,15 +955,17 @@ void make_datasets_ConfigV2QuadReg_v0(const Psana::CsPad2x2::ConfigV2QuadReg& ob
   }
 }
 
-void store_ConfigV2QuadReg_v0(const Psana::CsPad2x2::ConfigV2QuadReg& obj, hdf5pp::Group group, long index, bool append)
+void store_ConfigV2QuadReg_v0(const Psana::CsPad2x2::ConfigV2QuadReg* obj, hdf5pp::Group group, long index, bool append)
 {
-  {
-    CsPad2x2::ns_ConfigV2QuadReg_v0::dataset_data ds_data(obj);
+  if (obj) {
+    CsPad2x2::ns_ConfigV2QuadReg_v0::dataset_data ds_data(*obj);
     if (append) {
       hdf5pp::Utils::storeAt(group, "data", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "data", ds_data);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "data", index < 0 ? index : index + 1);
   }
 }
 
@@ -1114,15 +1124,17 @@ void make_datasets_ConfigV2_v0(const Psana::CsPad2x2::ConfigV2& obj,
   }
 }
 
-void store_ConfigV2_v0(const Psana::CsPad2x2::ConfigV2& obj, hdf5pp::Group group, long index, bool append)
+void store_ConfigV2_v0(const Psana::CsPad2x2::ConfigV2* obj, hdf5pp::Group group, long index, bool append)
 {
-  {
-    CsPad2x2::ns_ConfigV2_v0::dataset_config ds_data(obj);
+  if (obj) {
+    CsPad2x2::ns_ConfigV2_v0::dataset_config ds_data(*obj);
     if (append) {
       hdf5pp::Utils::storeAt(group, "config", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "config", ds_data);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "config", index < 0 ? index : index + 1);
   }
 }
 
@@ -1148,7 +1160,7 @@ void make_datasets(const Psana::CsPad2x2::ConfigV2& obj, hdf5pp::Group group, hs
   }
 }
 
-void store_ConfigV2(const Psana::CsPad2x2::ConfigV2& obj, hdf5pp::Group group, long index, int version, bool append)
+void store_ConfigV2(const Psana::CsPad2x2::ConfigV2* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
@@ -1162,10 +1174,10 @@ void store_ConfigV2(const Psana::CsPad2x2::ConfigV2& obj, hdf5pp::Group group, l
 
 void store(const Psana::CsPad2x2::ConfigV2& obj, hdf5pp::Group group, int version) 
 {
-  store_ConfigV2(obj, group, 0, version, false);
+  store_ConfigV2(&obj, group, 0, version, false);
 }
 
-void store_at(const Psana::CsPad2x2::ConfigV2& obj, hdf5pp::Group group, long index, int version)
+void store_at(const Psana::CsPad2x2::ConfigV2* obj, hdf5pp::Group group, long index, int version)
 {
   store_ConfigV2(obj, group, index, version, true);
 }
@@ -1192,7 +1204,7 @@ void make_datasets(const Psana::CsPad2x2::ElementV1& obj, hdf5pp::Group group, h
   }
 }
 
-void store_ElementV1(const Psana::CsPad2x2::ElementV1& obj, hdf5pp::Group group, long index, int version, bool append)
+void store_ElementV1(const Psana::CsPad2x2::ElementV1* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
@@ -1206,10 +1218,10 @@ void store_ElementV1(const Psana::CsPad2x2::ElementV1& obj, hdf5pp::Group group,
 
 void store(const Psana::CsPad2x2::ElementV1& obj, hdf5pp::Group group, int version) 
 {
-  store_ElementV1(obj, group, 0, version, false);
+  store_ElementV1(&obj, group, 0, version, false);
 }
 
-void store_at(const Psana::CsPad2x2::ElementV1& obj, hdf5pp::Group group, long index, int version)
+void store_at(const Psana::CsPad2x2::ElementV1* obj, hdf5pp::Group group, long index, int version)
 {
   store_ElementV1(obj, group, index, version, true);
 }

@@ -183,23 +183,31 @@ void make_datasets_FramesV1_v0(const Psana::PNCCD::FramesV1& obj,
   }
 }
 
-void store_FramesV1_v0(const Psana::PNCCD::FramesV1& obj, hdf5pp::Group group, long index, bool append)
+void store_FramesV1_v0(const Psana::PNCCD::FramesV1* obj, hdf5pp::Group group, long index, bool append)
 {
-  unsigned nLinks = obj.numLinks();
+  if (not obj) {
+    if (append) {
+      hdf5pp::Utils::resizeDataset(group, "frame", index < 0 ? index : index + 1);
+      hdf5pp::Utils::resizeDataset(group, "data", index < 0 ? index : index + 1);
+    }
+    return;
+  }
+
+  unsigned nLinks = obj->numLinks();
   ndarray<ns_FrameV1_v0::dataset_data, 1> frames_ds = make_ndarray<ns_FrameV1_v0::dataset_data>(nLinks);
   for (unsigned i = 0; i != nLinks; ++ i) {
-    frames_ds[i] = ns_FrameV1_v0::dataset_data(obj.frame(i));
+    frames_ds[i] = ns_FrameV1_v0::dataset_data(obj->frame(i));
   }
 
   // need to make 2-d array, high dimension is the number of links,
   // low dimension is the size of data. We do not store images as images,
   // but as 1-d data
-  unsigned data_size = obj.frame(0)._data().shape()[0];
+  unsigned data_size = obj->frame(0)._data().shape()[0];
   ndarray<uint16_t, 2> data = make_ndarray<uint16_t>(nLinks, data_size);
 
   // copy the data
   for (unsigned i = 0; i != nLinks; ++ i) {
-    ndarray<const uint16_t, 1> small = obj.frame(i)._data();
+    ndarray<const uint16_t, 1> small = obj->frame(i)._data();
     std::copy(small.begin(), small.end(), &data[i][0]);
   }
 
@@ -301,7 +309,7 @@ void make_datasets_FullFrameV1_v0(const Psana::PNCCD::FullFrameV1& obj,
   MsgLog("PNCCD::make_datasets_FullFrameV1_v0", error, "type is not supported");
 }
 
-void store_FullFrameV1_v0(const Psana::PNCCD::FullFrameV1& obj, hdf5pp::Group group, long index, bool append)
+void store_FullFrameV1_v0(const Psana::PNCCD::FullFrameV1* obj, hdf5pp::Group group, long index, bool append)
 {
   // we do not want to save FullFrame in HDF5
   MsgLog("PNCCD::store_FullFrameV1_v0", error, "type is not supported");

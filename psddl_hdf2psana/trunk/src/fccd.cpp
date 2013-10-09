@@ -185,12 +185,16 @@ void make_datasets_FccdConfigV2_v0(const Psana::FCCD::FccdConfigV2& obj,
   }
 }
 
-void store_FccdConfigV2_v0(const Psana::FCCD::FccdConfigV2& obj, hdf5pp::Group group, long index, bool append)
+void store_FccdConfigV2_v0(const Psana::FCCD::FccdConfigV2* obj, hdf5pp::Group group, long index, bool append)
 {
   if (append) {
-    hdf5pp::Utils::storeAt(group, "config", ns_FccdConfigV2_v0::dataset_config(obj), index);
+    if (obj) {
+      hdf5pp::Utils::storeAt(group, "config", ns_FccdConfigV2_v0::dataset_config(*obj), index);
+    } else {
+      hdf5pp::Utils::resizeDataset(group, "config", index < 0 ? index : index + 1);
+    }
   } else {
-    hdf5pp::Utils::storeScalar(group, "config", ns_FccdConfigV2_v0::dataset_config(obj));
+    hdf5pp::Utils::storeScalar(group, "config", ns_FccdConfigV2_v0::dataset_config(*obj));
   }
 }
 

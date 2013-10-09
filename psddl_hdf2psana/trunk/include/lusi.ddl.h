@@ -51,8 +51,9 @@ void store(const Psana::Lusi::DiodeFexConfigV1& obj, hdf5pp::Group group, int ve
 void make_datasets(const Psana::Lusi::DiodeFexConfigV1& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
 /// Add one more object to the containers created by previous method at the specified index,
-/// negative index means append to the end of dataset.
-void store_at(const Psana::Lusi::DiodeFexConfigV1& obj, hdf5pp::Group group, long index = -1, int version = -1);
+/// negative index means append to the end of dataset. If pointer to object is zero then
+/// datsets are extended with zero-filled of default-initialized data.
+void store_at(const Psana::Lusi::DiodeFexConfigV1* obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 
 namespace ns_DiodeFexConfigV2_v0 {
@@ -96,8 +97,9 @@ void store(const Psana::Lusi::DiodeFexConfigV2& obj, hdf5pp::Group group, int ve
 void make_datasets(const Psana::Lusi::DiodeFexConfigV2& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
 /// Add one more object to the containers created by previous method at the specified index,
-/// negative index means append to the end of dataset.
-void store_at(const Psana::Lusi::DiodeFexConfigV2& obj, hdf5pp::Group group, long index = -1, int version = -1);
+/// negative index means append to the end of dataset. If pointer to object is zero then
+/// datsets are extended with zero-filled of default-initialized data.
+void store_at(const Psana::Lusi::DiodeFexConfigV2* obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 
 namespace ns_DiodeFexV1_v0 {
@@ -140,8 +142,9 @@ void store(const Psana::Lusi::DiodeFexV1& obj, hdf5pp::Group group, int version 
 void make_datasets(const Psana::Lusi::DiodeFexV1& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
 /// Add one more object to the containers created by previous method at the specified index,
-/// negative index means append to the end of dataset.
-void store_at(const Psana::Lusi::DiodeFexV1& obj, hdf5pp::Group group, long index = -1, int version = -1);
+/// negative index means append to the end of dataset. If pointer to object is zero then
+/// datsets are extended with zero-filled of default-initialized data.
+void store_at(const Psana::Lusi::DiodeFexV1* obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 
 namespace ns_IpmFexConfigV1_v0 {
@@ -189,8 +192,9 @@ void store(const Psana::Lusi::IpmFexConfigV1& obj, hdf5pp::Group group, int vers
 void make_datasets(const Psana::Lusi::IpmFexConfigV1& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
 /// Add one more object to the containers created by previous method at the specified index,
-/// negative index means append to the end of dataset.
-void store_at(const Psana::Lusi::IpmFexConfigV1& obj, hdf5pp::Group group, long index = -1, int version = -1);
+/// negative index means append to the end of dataset. If pointer to object is zero then
+/// datsets are extended with zero-filled of default-initialized data.
+void store_at(const Psana::Lusi::IpmFexConfigV1* obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 
 namespace ns_IpmFexConfigV2_v0 {
@@ -238,8 +242,9 @@ void store(const Psana::Lusi::IpmFexConfigV2& obj, hdf5pp::Group group, int vers
 void make_datasets(const Psana::Lusi::IpmFexConfigV2& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
 /// Add one more object to the containers created by previous method at the specified index,
-/// negative index means append to the end of dataset.
-void store_at(const Psana::Lusi::IpmFexConfigV2& obj, hdf5pp::Group group, long index = -1, int version = -1);
+/// negative index means append to the end of dataset. If pointer to object is zero then
+/// datsets are extended with zero-filled of default-initialized data.
+void store_at(const Psana::Lusi::IpmFexConfigV2* obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 
 namespace ns_IpmFexV1_v0 {
@@ -285,8 +290,9 @@ void store(const Psana::Lusi::IpmFexV1& obj, hdf5pp::Group group, int version = 
 void make_datasets(const Psana::Lusi::IpmFexV1& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
 /// Add one more object to the containers created by previous method at the specified index,
-/// negative index means append to the end of dataset.
-void store_at(const Psana::Lusi::IpmFexV1& obj, hdf5pp::Group group, long index = -1, int version = -1);
+/// negative index means append to the end of dataset. If pointer to object is zero then
+/// datsets are extended with zero-filled of default-initialized data.
+void store_at(const Psana::Lusi::IpmFexV1* obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 
 namespace ns_PimImageConfigV1_v0 {
@@ -330,8 +336,9 @@ void store(const Psana::Lusi::PimImageConfigV1& obj, hdf5pp::Group group, int ve
 void make_datasets(const Psana::Lusi::PimImageConfigV1& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
 /// Add one more object to the containers created by previous method at the specified index,
-/// negative index means append to the end of dataset.
-void store_at(const Psana::Lusi::PimImageConfigV1& obj, hdf5pp::Group group, long index = -1, int version = -1);
+/// negative index means append to the end of dataset. If pointer to object is zero then
+/// datsets are extended with zero-filled of default-initialized data.
+void store_at(const Psana::Lusi::PimImageConfigV1* obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 } // namespace Lusi
 } // namespace psddl_hdf2psana

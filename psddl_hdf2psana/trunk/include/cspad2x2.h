@@ -104,7 +104,7 @@ private:
 
 void make_datasets_ElementV1_v0(const Psana::CsPad2x2::ElementV1& obj,
       hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle);
-void store_ElementV1_v0(const Psana::CsPad2x2::ElementV1& obj, hdf5pp::Group group, long index, bool append);
+void store_ElementV1_v0(const Psana::CsPad2x2::ElementV1* obj, hdf5pp::Group group, long index, bool append);
 
 } // namespace CsPad2x2
 } // namespace psddl_hdf2psana

@@ -125,13 +125,17 @@ void make_datasets_DataV3_v0(const Psana::EvrData::DataV3& obj,
   }
 }
 
-void store_DataV3_v0(const Psana::EvrData::DataV3& obj, hdf5pp::Group group, long index, bool append)
+void store_DataV3_v0(const Psana::EvrData::DataV3* obj, hdf5pp::Group group, long index, bool append)
 {
-  ns_DataV3_v0::dataset_data ds_data(obj);
-  if (append) {
-    hdf5pp::Utils::storeAt(group, "data", ds_data, index);
-  } else {
-    hdf5pp::Utils::storeScalar(group, "data", ds_data);
+  if (obj) {
+    ns_DataV3_v0::dataset_data ds_data(*obj);
+    if (append) {
+      hdf5pp::Utils::storeAt(group, "data", ds_data, index);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "data", ds_data);
+    }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "data", index < 0 ? index : index + 1);
   }
 }
 
@@ -337,20 +341,28 @@ void make_datasets_IOConfigV1_v0(const Psana::EvrData::IOConfigV1& obj,
   }
 }
 
-void store_IOConfigV1_v0(const Psana::EvrData::IOConfigV1& obj, hdf5pp::Group group, long index, bool append)
+void store_IOConfigV1_v0(const Psana::EvrData::IOConfigV1* obj, hdf5pp::Group group, long index, bool append)
 {
+  if (not obj) {
+    if (append) {
+      hdf5pp::Utils::resizeDataset(group, "config", index < 0 ? index : index + 1);
+      hdf5pp::Utils::resizeDataset(group, "channels", index < 0 ? index : index + 1);
+    }
+    return;
+  }
+
   // convert IOChannel data
-  ndarray<const Psana::EvrData::IOChannel, 1> channels = obj.channels();
+  ndarray<const Psana::EvrData::IOChannel, 1> channels = obj->channels();
   ndarray<ns_IOChannel_v0::dataset_data, 1> xchannels(channels.shape());
   for (unsigned i = 0; i != channels.shape()[0]; ++ i) {
     xchannels[i] = ns_IOChannel_v0::dataset_data(channels[i]);
   }
 
   if (append) {
-    hdf5pp::Utils::storeAt(group, "config", ns_IOConfigV1_v0::dataset_config(obj), index);
+    hdf5pp::Utils::storeAt(group, "config", ns_IOConfigV1_v0::dataset_config(*obj), index);
     hdf5pp::Utils::storeNDArrayAt(group, "channels", xchannels, index);
   } else {
-    hdf5pp::Utils::storeScalar(group, "config", ns_IOConfigV1_v0::dataset_config(obj));
+    hdf5pp::Utils::storeScalar(group, "config", ns_IOConfigV1_v0::dataset_config(*obj));
     hdf5pp::Utils::storeNDArray(group, "channels", xchannels);
   }
 

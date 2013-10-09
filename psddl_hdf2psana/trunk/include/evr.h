@@ -74,7 +74,7 @@ private:
 
 void make_datasets_DataV3_v0(const Psana::EvrData::DataV3& obj,
       hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle);
-void store_DataV3_v0(const Psana::EvrData::DataV3& obj, hdf5pp::Group group, long index, bool append);
+void store_DataV3_v0(const Psana::EvrData::DataV3* obj, hdf5pp::Group group, long index, bool append);
 
 
 namespace ns_IOChannel_v0 {
@@ -159,7 +159,7 @@ private:
 
 void make_datasets_IOConfigV1_v0(const Psana::EvrData::IOConfigV1& obj,
       hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle);
-void store_IOConfigV1_v0(const Psana::EvrData::IOConfigV1& obj, hdf5pp::Group group, long index, bool append);
+void store_IOConfigV1_v0(const Psana::EvrData::IOConfigV1* obj, hdf5pp::Group group, long index, bool append);
 
 } // namespace EvrData
 } // namespace psddl_hdf2psana

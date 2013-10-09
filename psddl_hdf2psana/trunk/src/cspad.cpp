@@ -111,15 +111,24 @@ void make_datasets_DataV1_v0(const Psana::CsPad::DataV1& obj,
   }
 }
 
-void store_DataV1_v0(const Psana::CsPad::DataV1& obj, hdf5pp::Group group, long index, bool append)
+void store_DataV1_v0(const Psana::CsPad::DataV1* obj, hdf5pp::Group group, long index, bool append)
 {
-  const unsigned nquads = obj.quads_shape()[0];
-  const unsigned nsect = obj.quads(0).data().shape()[0];
+  if (not obj) {
+    if (append) {
+      hdf5pp::Utils::resizeDataset(group, "element", index < 0 ? index : index + 1);
+      hdf5pp::Utils::resizeDataset(group, "data", index < 0 ? index : index + 1);
+      hdf5pp::Utils::resizeDataset(group, "common_mode", index < 0 ? index : index + 1);
+    }
+    return;
+  }
+
+  const unsigned nquads = obj->quads_shape()[0];
+  const unsigned nsect = obj->quads(0).data().shape()[0];
 
   {
     ndarray<ns_ElementV1_v0::dataset_element, 1> data = make_ndarray<ns_ElementV1_v0::dataset_element>(nquads);
     for (unsigned i = 0; i != nquads; ++ i) {
-      data[i] = ns_ElementV1_v0::dataset_element(obj.quads(i));
+      data[i] = ns_ElementV1_v0::dataset_element(obj->quads(i));
     }
     if (append) {
       hdf5pp::Utils::storeNDArrayAt(group, "element", data, index);
@@ -130,7 +139,7 @@ void store_DataV1_v0(const Psana::CsPad::DataV1& obj, hdf5pp::Group group, long 
   {
     ndarray<int16_t, 4> data = make_ndarray<int16_t>(nquads, nsect, Psana::CsPad::ColumnsPerASIC, Psana::CsPad::MaxRowsPerASIC*2);
     for (unsigned i = 0; i != nquads; ++ i) {
-      const ndarray<const int16_t, 3>& small = obj.quads(i).data();
+      const ndarray<const int16_t, 3>& small = obj->quads(i).data();
       std::copy(small.begin(), small.end(), &data[i][0][0][0]);
     }
     if (append) {
@@ -142,7 +151,7 @@ void store_DataV1_v0(const Psana::CsPad::DataV1& obj, hdf5pp::Group group, long 
   {
     ndarray<float, 2> data = make_ndarray<float>(nquads, nsect);
     for (unsigned i = 0; i != nquads; ++ i) {
-      const Psana::CsPad::ElementV1& quad = obj.quads(i);
+      const Psana::CsPad::ElementV1& quad = obj->quads(i);
       for (unsigned s = 0; s != nsect; ++ s) {
         data[i][s] = quad.common_mode(i);
       }
@@ -250,18 +259,27 @@ void make_datasets_DataV2_v0(const Psana::CsPad::DataV2& obj,
   }
 }
 
-void store_DataV2_v0(const Psana::CsPad::DataV2& obj, hdf5pp::Group group, long index, bool append)
+void store_DataV2_v0(const Psana::CsPad::DataV2* obj, hdf5pp::Group group, long index, bool append)
 {
-  const unsigned nquads = obj.quads_shape()[0];
+  if (not obj) {
+    if (append) {
+      hdf5pp::Utils::resizeDataset(group, "element", index < 0 ? index : index + 1);
+      hdf5pp::Utils::resizeDataset(group, "data", index < 0 ? index : index + 1);
+      hdf5pp::Utils::resizeDataset(group, "common_mode", index < 0 ? index : index + 1);
+    }
+    return;
+  }
+
+  const unsigned nquads = obj->quads_shape()[0];
   unsigned nsect = 0;
   for (unsigned q = 0; q != nquads; ++ q) {
-    nsect += obj.quads(q).data().shape()[0];
+    nsect += obj->quads(q).data().shape()[0];
   }
 
   {
     ndarray<ns_ElementV2_v0::dataset_element, 1> data = make_ndarray<ns_ElementV2_v0::dataset_element>(nquads);
     for (unsigned i = 0; i != nquads; ++ i) {
-      data[i] = ns_ElementV2_v0::dataset_element(obj.quads(i));
+      data[i] = ns_ElementV2_v0::dataset_element(obj->quads(i));
     }
     if (append) {
       hdf5pp::Utils::storeNDArrayAt(group, "element", data, index);
@@ -273,7 +291,7 @@ void store_DataV2_v0(const Psana::CsPad::DataV2& obj, hdf5pp::Group group, long 
     ndarray<int16_t, 3> data = make_ndarray<int16_t>(nsect, Psana::CsPad::ColumnsPerASIC, Psana::CsPad::MaxRowsPerASIC*2);
     unsigned s = 0;
     for (unsigned i = 0; i != nquads; ++ i) {
-      const ndarray<const int16_t, 3>& small = obj.quads(i).data();
+      const ndarray<const int16_t, 3>& small = obj->quads(i).data();
       std::copy(small.begin(), small.end(), &data[s][0][0]);
       s += small.shape()[0];
     }
@@ -287,8 +305,8 @@ void store_DataV2_v0(const Psana::CsPad::DataV2& obj, hdf5pp::Group group, long 
     ndarray<float, 1> data = make_ndarray<float>(nsect);
     unsigned s = 0;
     for (unsigned i = 0; i != nquads; ++ i) {
-      const Psana::CsPad::ElementV2& quad = obj.quads(i);
-      const unsigned ns = obj.quads(i).data().shape()[0];
+      const Psana::CsPad::ElementV2& quad = obj->quads(i);
+      const unsigned ns = obj->quads(i).data().shape()[0];
       for (unsigned is = 0; is != ns; ++ is) {
         data[s++] = quad.common_mode(is);
       }

@@ -78,15 +78,17 @@ void make_datasets_FrameCoord_v0(const Psana::Camera::FrameCoord& obj,
   }
 }
 
-void store_FrameCoord_v0(const Psana::Camera::FrameCoord& obj, hdf5pp::Group group, long index, bool append)
+void store_FrameCoord_v0(const Psana::Camera::FrameCoord* obj, hdf5pp::Group group, long index, bool append)
 {
-  {
-    Camera::ns_FrameCoord_v0::dataset_data ds_data(obj);
+  if (obj) {
+    Camera::ns_FrameCoord_v0::dataset_data ds_data(*obj);
     if (append) {
       hdf5pp::Utils::storeAt(group, "data", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "data", ds_data);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "data", index < 0 ? index : index + 1);
   }
 }
 
@@ -112,7 +114,7 @@ void make_datasets(const Psana::Camera::FrameCoord& obj, hdf5pp::Group group, hs
   }
 }
 
-void store_FrameCoord(const Psana::Camera::FrameCoord& obj, hdf5pp::Group group, long index, int version, bool append)
+void store_FrameCoord(const Psana::Camera::FrameCoord* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
@@ -126,10 +128,10 @@ void store_FrameCoord(const Psana::Camera::FrameCoord& obj, hdf5pp::Group group,
 
 void store(const Psana::Camera::FrameCoord& obj, hdf5pp::Group group, int version) 
 {
-  store_FrameCoord(obj, group, 0, version, false);
+  store_FrameCoord(&obj, group, 0, version, false);
 }
 
-void store_at(const Psana::Camera::FrameCoord& obj, hdf5pp::Group group, long index, int version)
+void store_at(const Psana::Camera::FrameCoord* obj, hdf5pp::Group group, long index, int version)
 {
   store_FrameCoord(obj, group, index, version, true);
 }
@@ -140,7 +142,7 @@ void make_datasets_FrameFccdConfigV1_v0(const Psana::Camera::FrameFccdConfigV1& 
 {
 }
 
-void store_FrameFccdConfigV1_v0(const Psana::Camera::FrameFccdConfigV1& obj, hdf5pp::Group group, long index, bool append)
+void store_FrameFccdConfigV1_v0(const Psana::Camera::FrameFccdConfigV1* obj, hdf5pp::Group group, long index, bool append)
 {
 }
 
@@ -166,7 +168,7 @@ void make_datasets(const Psana::Camera::FrameFccdConfigV1& obj, hdf5pp::Group gr
   }
 }
 
-void store_FrameFccdConfigV1(const Psana::Camera::FrameFccdConfigV1& obj, hdf5pp::Group group, long index, int version, bool append)
+void store_FrameFccdConfigV1(const Psana::Camera::FrameFccdConfigV1* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
@@ -180,10 +182,10 @@ void store_FrameFccdConfigV1(const Psana::Camera::FrameFccdConfigV1& obj, hdf5pp
 
 void store(const Psana::Camera::FrameFccdConfigV1& obj, hdf5pp::Group group, int version) 
 {
-  store_FrameFccdConfigV1(obj, group, 0, version, false);
+  store_FrameFccdConfigV1(&obj, group, 0, version, false);
 }
 
-void store_at(const Psana::Camera::FrameFccdConfigV1& obj, hdf5pp::Group group, long index, int version)
+void store_at(const Psana::Camera::FrameFccdConfigV1* obj, hdf5pp::Group group, long index, int version)
 {
   store_FrameFccdConfigV1(obj, group, index, version, true);
 }
@@ -326,20 +328,22 @@ void make_datasets_FrameFexConfigV1_v0(const Psana::Camera::FrameFexConfigV1& ob
   }
 }
 
-void store_FrameFexConfigV1_v0(const Psana::Camera::FrameFexConfigV1& obj, hdf5pp::Group group, long index, bool append)
+void store_FrameFexConfigV1_v0(const Psana::Camera::FrameFexConfigV1* obj, hdf5pp::Group group, long index, bool append)
 {
-  {
-    Camera::ns_FrameFexConfigV1_v0::dataset_config ds_data(obj);
+  if (obj) {
+    Camera::ns_FrameFexConfigV1_v0::dataset_config ds_data(*obj);
     if (append) {
       hdf5pp::Utils::storeAt(group, "config", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "config", ds_data);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "config", index < 0 ? index : index + 1);
   }
-  {
-    typedef __typeof__(obj.masked_pixel_coordinates()) PsanaArray;
+  if (obj) {
+    typedef __typeof__(obj->masked_pixel_coordinates()) PsanaArray;
     typedef ndarray<Camera::ns_FrameCoord_v0::dataset_data, 1> HdfArray;
-    PsanaArray psana_array = obj.masked_pixel_coordinates();
+    PsanaArray psana_array = obj->masked_pixel_coordinates();
     HdfArray hdf_array(psana_array.shape());
     HdfArray::iterator out = hdf_array.begin();
     for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
@@ -350,6 +354,8 @@ void store_FrameFexConfigV1_v0(const Psana::Camera::FrameFexConfigV1& obj, hdf5p
     } else {
       hdf5pp::Utils::storeNDArray(group, "masked_pixel_coordinates", hdf_array);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "masked_pixel_coordinates", index < 0 ? index : index + 1);
   }
 }
 
@@ -375,7 +381,7 @@ void make_datasets(const Psana::Camera::FrameFexConfigV1& obj, hdf5pp::Group gro
   }
 }
 
-void store_FrameFexConfigV1(const Psana::Camera::FrameFexConfigV1& obj, hdf5pp::Group group, long index, int version, bool append)
+void store_FrameFexConfigV1(const Psana::Camera::FrameFexConfigV1* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
@@ -389,10 +395,10 @@ void store_FrameFexConfigV1(const Psana::Camera::FrameFexConfigV1& obj, hdf5pp::
 
 void store(const Psana::Camera::FrameFexConfigV1& obj, hdf5pp::Group group, int version) 
 {
-  store_FrameFexConfigV1(obj, group, 0, version, false);
+  store_FrameFexConfigV1(&obj, group, 0, version, false);
 }
 
-void store_at(const Psana::Camera::FrameFexConfigV1& obj, hdf5pp::Group group, long index, int version)
+void store_at(const Psana::Camera::FrameFexConfigV1* obj, hdf5pp::Group group, long index, int version)
 {
   store_FrameFexConfigV1(obj, group, index, version, true);
 }
@@ -419,7 +425,7 @@ void make_datasets(const Psana::Camera::FrameV1& obj, hdf5pp::Group group, hsize
   }
 }
 
-void store_FrameV1(const Psana::Camera::FrameV1& obj, hdf5pp::Group group, long index, int version, bool append)
+void store_FrameV1(const Psana::Camera::FrameV1* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
@@ -433,10 +439,10 @@ void store_FrameV1(const Psana::Camera::FrameV1& obj, hdf5pp::Group group, long 
 
 void store(const Psana::Camera::FrameV1& obj, hdf5pp::Group group, int version) 
 {
-  store_FrameV1(obj, group, 0, version, false);
+  store_FrameV1(&obj, group, 0, version, false);
 }
 
-void store_at(const Psana::Camera::FrameV1& obj, hdf5pp::Group group, long index, int version)
+void store_at(const Psana::Camera::FrameV1* obj, hdf5pp::Group group, long index, int version)
 {
   store_FrameV1(obj, group, index, version, true);
 }
@@ -535,15 +541,17 @@ void make_datasets_TwoDGaussianV1_v0(const Psana::Camera::TwoDGaussianV1& obj,
   }
 }
 
-void store_TwoDGaussianV1_v0(const Psana::Camera::TwoDGaussianV1& obj, hdf5pp::Group group, long index, bool append)
+void store_TwoDGaussianV1_v0(const Psana::Camera::TwoDGaussianV1* obj, hdf5pp::Group group, long index, bool append)
 {
-  {
-    Camera::ns_TwoDGaussianV1_v0::dataset_data ds_data(obj);
+  if (obj) {
+    Camera::ns_TwoDGaussianV1_v0::dataset_data ds_data(*obj);
     if (append) {
       hdf5pp::Utils::storeAt(group, "data", ds_data, index);
     } else {
       hdf5pp::Utils::storeScalar(group, "data", ds_data);
     }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "data", index < 0 ? index : index + 1);
   }
 }
 
@@ -569,7 +577,7 @@ void make_datasets(const Psana::Camera::TwoDGaussianV1& obj, hdf5pp::Group group
   }
 }
 
-void store_TwoDGaussianV1(const Psana::Camera::TwoDGaussianV1& obj, hdf5pp::Group group, long index, int version, bool append)
+void store_TwoDGaussianV1(const Psana::Camera::TwoDGaussianV1* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
   switch (version) {
@@ -583,10 +591,10 @@ void store_TwoDGaussianV1(const Psana::Camera::TwoDGaussianV1& obj, hdf5pp::Grou
 
 void store(const Psana::Camera::TwoDGaussianV1& obj, hdf5pp::Group group, int version) 
 {
-  store_TwoDGaussianV1(obj, group, 0, version, false);
+  store_TwoDGaussianV1(&obj, group, 0, version, false);
 }
 
-void store_at(const Psana::Camera::TwoDGaussianV1& obj, hdf5pp::Group group, long index, int version)
+void store_at(const Psana::Camera::TwoDGaussianV1* obj, hdf5pp::Group group, long index, int version)
 {
   store_TwoDGaussianV1(obj, group, index, version, true);
 }

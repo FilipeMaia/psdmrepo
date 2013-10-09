@@ -71,8 +71,9 @@ void store(const Psana::Alias::ConfigV1& obj, hdf5pp::Group group, int version =
 void make_datasets(const Psana::Alias::ConfigV1& obj, hdf5pp::Group group, hsize_t chunk_size,
                    int deflate, bool shuffle, int version = -1);
 /// Add one more object to the containers created by previous method at the specified index,
-/// negative index means append to the end of dataset.
-void store_at(const Psana::Alias::ConfigV1& obj, hdf5pp::Group group, long index = -1, int version = -1);
+/// negative index means append to the end of dataset. If pointer to object is zero then
+/// datsets are extended with zero-filled of default-initialized data.
+void store_at(const Psana::Alias::ConfigV1* obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 } // namespace Alias
 } // namespace psddl_hdf2psana
