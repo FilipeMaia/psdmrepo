@@ -187,7 +187,7 @@ void make_datasets_BldDataAcqADCV1_v0(const Psana::Bld::BldDataAcqADCV1& obj,
   BldDataAcqADCV1_unimplemented();
 }
 
-void store_BldDataAcqADCV1_v0(const Psana::Bld::BldDataAcqADCV1* obj, hdf5pp::Group group, bool append)
+void store_BldDataAcqADCV1_v0(const Psana::Bld::BldDataAcqADCV1* obj, hdf5pp::Group group, long index, bool append)
 {
   BldDataAcqADCV1_unimplemented();
 }
