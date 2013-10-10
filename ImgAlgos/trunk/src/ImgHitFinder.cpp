@@ -65,6 +65,9 @@ ImgHitFinder::ImgHitFinder (const std::string& name)
   , m_print_bits()
   , m_count(0)
 {
+  k_val_def_u = 12345;
+  k_val_def_d = 12345;
+
   m_str_src           = configSrc("source",         "DetInfo(:Camera)");
   m_key_in            = configStr("key_in",                         "");
   m_key_out           = configStr("key_out",                "img-hits");

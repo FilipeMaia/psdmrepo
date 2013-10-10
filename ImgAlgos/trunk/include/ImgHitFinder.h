@@ -97,11 +97,11 @@ protected:
 
 private:
 
-  const static double   k_val_def_d = 12345.; // default value for input parameter. If not changed - not applied
-  const static unsigned k_val_def_u = 12345; // default value for input parameter. If not changed - not applied
+  static unsigned k_val_def_u;  // default value for input parameter. If not changed - not applied
+  static double   k_val_def_d;  // default value for input parameter. If not changed - not applied
 
   Pds::Src        m_src;              // source address of the data object
-  Source          m_str_src;           // source 
+  Source          m_str_src;          // source 
   std::string     m_key_in;           // string with key for input data
   std::string     m_key_out;          // string with key for output image
   std::string     m_fname_peds;       // string file name for pedestals 
