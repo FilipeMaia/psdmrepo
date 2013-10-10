@@ -97,8 +97,8 @@ protected:
 
 private:
 
-  static unsigned k_val_def_u;  // default value for input parameter. If not changed - not applied
-  static double   k_val_def_d;  // default value for input parameter. If not changed - not applied
+  unsigned        k_val_def_u;        // default value for input parameter. If not changed - not applied
+  double          k_val_def_d;        // default value for input parameter. If not changed - not applied
 
   Pds::Src        m_src;              // source address of the data object
   Source          m_str_src;          // source 
