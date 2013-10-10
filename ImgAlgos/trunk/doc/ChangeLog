@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-16
+2013-10-09 Mikhail S. Dubrovin
+- in ImgHitFinder k_val_def_u/d - remove const static - to make happy builder in dbg mode
+
 Tag: V00-03-15
 2013-10-08 Mikhail S. Dubrovin
 - add module ImgHitFinder by request of Brendan Murphy, amo74213
