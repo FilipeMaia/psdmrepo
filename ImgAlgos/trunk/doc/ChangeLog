@@ -11,6 +11,9 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2013-10-10 Mikhail S. Dubrovin
+- in ImgHitFinder k_val_def_u/d move from class to namespace with const: const double k_val_def_d = ...; 
+	
 Tag: V00-03-16
 2013-10-09 Mikhail S. Dubrovin
 - in ImgHitFinder k_val_def_u/d - remove const static - to make happy builder in dbg mode

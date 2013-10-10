@@ -53,6 +53,10 @@ namespace ImgAlgos {
  *  @author Mikhail S. Dubrovin
  */
 
+const unsigned k_val_def_u = 12345;
+const double   k_val_def_d = 12345;
+
+
 class ImgHitFinder : public Module {
 public:
 
@@ -96,9 +100,6 @@ protected:
   void saveImageInEvent(Event& evt);
 
 private:
-
-  unsigned        k_val_def_u;        // default value for input parameter. If not changed - not applied
-  double          k_val_def_d;        // default value for input parameter. If not changed - not applied
 
   Pds::Src        m_src;              // source address of the data object
   Source          m_str_src;          // source 
