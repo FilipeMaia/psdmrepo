@@ -18,6 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <algorithm>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -119,14 +120,33 @@ void
 Utils::_storeArray(hdf5pp::Group group, const std::string& dataset, const void* data,
     unsigned rank, const unsigned* shape, const Type& native_type, const Type& stored_type)
 {
-  std::vector<hsize_t> dims(shape, shape+rank);
+  hsize_t size = std::accumulate(shape, shape+rank, hsize_t(1), std::multiplies<hsize_t>());
+  if (size > 0) {
+    // store it in simple dataset
 
-  // create new dataspace
-  DataSpace dsp = DataSpace::makeSimple(rank, &dims.front(), &dims.front());
-  DataSet ds = group.createDataSet(dataset, stored_type, dsp);
+    DataSpace dsp;
+    if (rank <= 8) {
+      hsize_t dims[8];
+      std::copy(shape, shape+rank, dims);
+      dsp = DataSpace::makeSimple(rank, dims, dims+rank);
+    } else {
+      std::vector<hsize_t> dims(shape, shape+rank);
+      dsp = DataSpace::makeSimple(rank, &dims.front(), &dims.front());
+    }
 
-  // store the data in dataset
-  ds.store(dsp, dsp, data, native_type);
+    // create new dataspace
+    DataSet ds = group.createDataSet(dataset, stored_type, dsp);
+
+    // store the data in dataset
+    ds.store(dsp, dsp, data, native_type);
+
+  } else {
+
+    // for empty data set make null dataspace
+    DataSpace dsp = DataSpace::makeNull() ;
+    DataSet ds = group.createDataSet(dataset, stored_type, dsp);
+
+  }
 }
 
 
