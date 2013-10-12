@@ -38,6 +38,94 @@
         </h5schema>
         <!-- ========================================================================= -->
 
+        <!--
+          schema v.0 for ConfigV2 (defined by "old" translator) missed npvLabels attribute, 
+          note that definition of npvLabels() will not be generated and has to be defined separately. 
+         -->
+        <h5schema name="ConfigV2" version="0">
+            <dataset name="config">
+                <attribute name="events"/>
+                <attribute name="uses_duration"/>
+                <attribute name="uses_events"/>
+                <attribute name="duration"/>
+                <attribute name="npvControls"/>
+                <attribute name="npvMonitors"/>
+            </dataset>
+            <dataset name="pvControls">
+            </dataset>
+            <dataset name="pvMonitors">
+            </dataset>
+            <dataset name="pvLabels">
+            </dataset>
+        </h5schema>
+
+        <!-- ========================================================================= -->
+
+        <!--  schema v.1 for ConfigV2 adds npvLabels attribute -->
+        <h5schema name="ConfigV2" version="1">
+            <dataset name="config">
+                <attribute name="events"/>
+                <attribute name="uses_duration"/>
+                <attribute name="uses_events"/>
+                <attribute name="duration"/>
+                <attribute name="npvControls"/>
+                <attribute name="npvMonitors"/>
+                <attribute name="npvLabels"/>
+            </dataset>
+            <dataset name="pvControls">
+            </dataset>
+            <dataset name="pvMonitors">
+            </dataset>
+            <dataset name="pvLabels">
+            </dataset>
+        </h5schema>
+
+        <!-- ========================================================================= -->
+
+        <!--
+          schema v.0 for ConfigV3 (defined by "old" translator) missed npvLabels attribute, 
+          note that definition of npvLabels() will not be generated and has to be defined separately. 
+         -->
+        <h5schema name="ConfigV3" version="0">
+            <dataset name="config">
+                <attribute name="events"/>
+                <attribute name="uses_l3t_events"/>
+                <attribute name="uses_duration"/>
+                <attribute name="uses_events"/>
+                <attribute name="duration"/>
+                <attribute name="npvControls"/>
+                <attribute name="npvMonitors"/>
+            </dataset>
+            <dataset name="pvControls">
+            </dataset>
+            <dataset name="pvMonitors">
+            </dataset>
+            <dataset name="pvLabels">
+            </dataset>
+        </h5schema>
+
+        <!-- ========================================================================= -->
+
+        <!--  schema v.1 for ConfigV3 adds npvLabels attribute -->
+        <h5schema name="ConfigV3" version="1">
+            <dataset name="config">
+                <attribute name="events"/>
+                <attribute name="uses_l3t_events"/>
+                <attribute name="uses_duration"/>
+                <attribute name="uses_events"/>
+                <attribute name="duration"/>
+                <attribute name="npvControls"/>
+                <attribute name="npvMonitors"/>
+                <attribute name="npvLabels"/>
+            </dataset>
+            <dataset name="pvControls">
+            </dataset>
+            <dataset name="pvMonitors">
+            </dataset>
+            <dataset name="pvLabels">
+            </dataset>
+        </h5schema>
+
 
 	</package>    
 
