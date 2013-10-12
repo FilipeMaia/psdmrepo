@@ -11,6 +11,17 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-00
+2013-10-11 Igor Gaponenko
+- added the new tab 'Run Tables' and table 'Calibrations'
+- minor improvements to the JavaScript class Table
+- move tests of the new JS Fwk class into the corresponding package webfwk
+- added support for shiftmgr database in the PHP Web Services framework
+- reinforced the implementation of the DeleteExpiredFiles web service to make two consequitive
+attempts when deleting expired files. The first attempt may fail if the file isn't
+physically present on the file system
+- implemented the navigation between various contexts of the Portal for runs and messages
+
 Tag: V00-04-13
 2013-08-08 Igor Gaponenko
 - changed visual style for buttons in the Web Portal

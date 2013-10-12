@@ -139,33 +139,41 @@ try {
     //
     foreach ($all_files as $irods_filepath => $f) {
 
-        // Delete selected files by their full path and a replica. Also make sure
-        // no old entries remain in the file restore queue. Otherwise it would
-        // (falsefully) appear as if the deleted file is being restored.
-        //
-        Config::instance()->delete_file_restore_request(
-            array(
-                'exper_id'  => $exper_id,
-                'runnum'    => $f['run'],
-                'file_type' => $f['type'],
-                'irods_filepath'     => $irods_filepath,
-                'irods_src_resource' => 'hpss-resc',
-                'irods_dst_resource' => 'lustre-resc'
-            )
-        );
+        for ($tries = 2; $tries > 0 ; $tries--) {
 
-        $replica = $f['file']->replica;
-        $request = new RestRequest(
-            "/replica{$irods_filepath}/{$replica}",
-            'DELETE'
-        );
-        $request->execute();
-        $responseInfo = $request->getResponseInfo();
-        $http_code = intval($responseInfo['http_code']);
-        switch($http_code) {
-            case 200: break;
-            case 404: report_error("file '{$irods_filepath}' doesn't exist");
-            default : report_error("failed to delete file '{$irods_filepath}' because of HTTP error {$http_code}");
+            // Delete selected files by their full path and a replica. Also make sure
+            // no old entries remain in the file restore queue. Otherwise it would
+            // (falsefully) appear as if the deleted file is being restored.
+            //
+            Config::instance()->delete_file_restore_request(
+                array(
+                    'exper_id'  => $exper_id,
+                    'runnum'    => $f['run'],
+                    'file_type' => $f['type'],
+                    'irods_filepath'     => $irods_filepath,
+                    'irods_src_resource' => 'hpss-resc',
+                    'irods_dst_resource' => 'lustre-resc'
+                )
+            );
+
+            $replica = $f['file']->replica;
+            $request = new RestRequest(
+                "/replica{$irods_filepath}/{$replica}",
+                'DELETE'
+            );
+            $request->execute();
+            $responseInfo = $request->getResponseInfo();
+            $http_code = intval($responseInfo['http_code']);
+            switch($http_code) {
+                case 200:
+                    $tries = 0 ;
+                    break;
+                case 404:
+                    report_error("file '{$irods_filepath}' doesn't exist");
+                default :
+                    if (!$tries) report_error("failed to delete file '{$irods_filepath}' because of HTTP error {$http_code}");
+                    break;
+            }
         }
     }
     FileMgrIrodsDb::instance()->commit();

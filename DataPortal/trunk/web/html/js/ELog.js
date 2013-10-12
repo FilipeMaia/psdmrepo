@@ -96,13 +96,17 @@ function elog_create() {
             //
             if( just_initialized || (prev_context1 != this.context1 )) {
                 if ('run' in global_extra_params) {
-                    var runnum = global_extra_params['run'];
-                    $('#elog-form-search input[name="runs"]').val(runnum);
-                    this.search();
+                    var runnum = parseInt(global_extra_params['run']);
+                    if (runnum) {
+                        var show_in_vicinity = true ;
+                        global_elog_search_run_by_num(runnum, show_in_vicinity);
+                    }
                 } else if ('message' in global_extra_params) {
-                    var message_id = global_extra_params['message'];
-                    $('#elog-form-search input[name="message"]').val(message_id);
-                    this.search();
+                    var message_id = parseInt(global_extra_params['message']);
+                    if (message_id) {
+                        var show_in_vicinity = true ;
+                        global_elog_search_message_by_id(message_id, show_in_vicinity);
+                    }
                 }
             }
         }
@@ -462,6 +466,7 @@ function elog_create() {
             author               = '',
             range_of_runs        = '',
             message_id           = '',
+            run_num              = '',
             show_in_vicinity     = 0;
         this.search_message_viewer.search(
             text2search,
@@ -479,6 +484,7 @@ function elog_create() {
             author,
             range_of_runs,
             message_id,
+            run_num,
             show_in_vicinity
         );
     };
@@ -499,6 +505,7 @@ function elog_create() {
             author               = '',
             range_of_runs        = '',
             message_id           = id,
+            run_num              = '',
             show_in_vicinity     = show_in_vicinity ? 1 : 0;
         this.search_message_viewer.search(
             text2search,
@@ -516,6 +523,46 @@ function elog_create() {
             author,
             range_of_runs,
             message_id,
+            run_num,
+            show_in_vicinity
+        );
+    };
+    this.search_run_by_num = function(num, show_in_vicinity) {
+        this.search_reset();
+        var text2search          = '',
+            search_in_messages   = 1,
+            search_in_tags       = 0,
+            search_in_values     = 0,
+            search_in_deleted    = 1,
+            posted_at_instrument = 0,
+            posted_at_experiment = 1,
+            posted_at_shifts     = 1,
+            posted_at_runs       = 1,
+            begin                = '',
+            end                  = '',
+            tag                  = '',
+            author               = '',
+            range_of_runs        = '',
+            message_id           = '',
+            run_num              = num,
+            show_in_vicinity     = show_in_vicinity ? 1 : 0;
+        this.search_message_viewer.search(
+            text2search,
+            search_in_messages,
+            search_in_tags,
+            search_in_values,
+            search_in_deleted,
+            posted_at_instrument,
+            posted_at_experiment,
+            posted_at_shifts,
+            posted_at_runs,
+            begin,
+            end,
+            tag,
+            author,
+            range_of_runs,
+            message_id,
+            run_num,
             show_in_vicinity
         );
     };
@@ -539,6 +586,7 @@ function elog_create() {
             $('#elog-form-search select[name="author"]').val(),
             $('#elog-form-search input[name="runs"]').val(),
             $('#elog-form-search input[name="message"]').val(),
+            '',
             0
         );
     };
@@ -814,10 +862,10 @@ function elog_create() {
     this.attachments_last_request = null;
     this.sort_attachments = function() {
         function compare_elements_by_posted(a, b) { return b.time64 - a.time64; }
-        function compare_elements_by_author(a, b) { if( a.type != 'a' ) return -1; if( b.type != 'a' ) return 1; return ( a.e_author  < b.e_author ? -1 : (a.e_author > b.e_author ? 1 : 0 )); }
-        function compare_elements_by_name  (a, b) { if( a.type != 'a' ) return -1; if( b.type != 'a' ) return 1; return ( a.a_name    < b.a_name   ? -1 : (a.a_name   > b.a_name   ? 1 : 0 )); }
-        function compare_elements_by_type  (a, b) { if( a.type != 'a' ) return -1; if( b.type != 'a' ) return 1; return ( a.a_type    < b.a_type   ? -1 : (a.a_type   > b.a_type   ? 1 : 0 )); }
-        function compare_elements_by_size  (a, b) { if( a.type != 'a' ) return -1; if( b.type != 'a' ) return 1; return   b.a_size    - a.a_size; }
+        function compare_elements_by_author(a, b) { if( a.type !== 'a' ) return -1; if( b.type !== 'a' ) return 1; return ( a.e_author  < b.e_author ? -1 : (a.e_author > b.e_author ? 1 : 0 )); }
+        function compare_elements_by_name  (a, b) { if( a.type !== 'a' ) return -1; if( b.type !== 'a' ) return 1; return ( a.a_name    < b.a_name   ? -1 : (a.a_name   > b.a_name   ? 1 : 0 )); }
+        function compare_elements_by_type  (a, b) { if( a.type !== 'a' ) return -1; if( b.type !== 'a' ) return 1; return ( a.a_type    < b.a_type   ? -1 : (a.a_type   > b.a_type   ? 1 : 0 )); }
+        function compare_elements_by_size  (a, b) { if( a.type !== 'a' ) return -1; if( b.type !== 'a' ) return 1; return   b.a_size    - a.a_size; }
         var sort_function = null;
         switch( $('#el-at-wa' ).find('select[name="sort"]').val()) {
         case 'posted': sort_function = compare_elements_by_posted; break;
@@ -832,12 +880,12 @@ function elog_create() {
         var html =
 '<table><tbody>'+
 '  <tr>'+
-'    <td class="table_hdr">Host Message</td>'+
-'    <td class="table_hdr">Posted</td>'+
-'    <td class="table_hdr">Author</td>'+
-'    <td class="table_hdr">Attachment Name</td>'+
-'    <td class="table_hdr">Type</td>'+
-'    <td class="table_hdr">Size</td>'+
+'    <td class="table_hdr" align="right" >Message ID</td>'+
+'    <td class="table_hdr" align="center" >Posted</td>'+
+'    <td class="table_hdr" align="right" >Author</td>'+
+'    <td class="table_hdr" align="right" >Attachment Name</td>'+
+'    <td class="table_hdr" align="right" >Type</td>'+
+'    <td class="table_hdr" align="right" >Size</td>'+
 '  </tr>';
         var attachments = this.attachments_last_request;
         for(var i=0; i < attachments.length; i++) {
@@ -846,12 +894,12 @@ function elog_create() {
             if( a.type != 'a' ) continue;
             html +=
 '  <tr>'+
-'    <td class="table_cell '+extra_class+' table_cell_left">' +a.e_url   +'</td>'+
-'    <td class="table_cell '+extra_class+'">'                 +a.e_time  +'</td>'+
-'    <td class="table_cell '+extra_class+'">'                 +a.e_author+'</td>'+
-'    <td class="table_cell '+extra_class+'">'                 +a.a_url   +'</td>'+
-'    <td class="table_cell '+extra_class+'">'                 +a.a_type  +'</td>'+
-'    <td class="table_cell '+extra_class+' table_cell_right">'+a.a_size  +'</td>'+
+'    <td class="table_cell '+extra_class+' table_cell_left"><div style="float:left;">'+a.e_link_url+'</div><div style="float:left; padding-left:8px; padding-top:8px;">'+a.e_id+'</div><div style="clear:both;"></div></td>'+
+'    <td class="table_cell '+extra_class+'">'+a.e_time  +'</td>'+
+'    <td class="table_cell '+extra_class+'" align="right" >'+a.e_author+'</td>'+
+'    <td class="table_cell '+extra_class+'" align="right" >'+a.a_url+'</td>'+
+'    <td class="table_cell '+extra_class+'" align="right" >'+a.a_type+'</td>'+
+'    <td class="table_cell '+extra_class+' table_cell_right" align="right" >'+a.a_size+'</td>'+
 '  </tr>';
         }
         html +=
@@ -862,14 +910,14 @@ function elog_create() {
         var html =
 '<table><tbody>'+
 '  <tr>'+
-'    <td class="table_hdr">Run</td>'+
-'    <td class="table_hdr">Started</td>'+
-'    <td class="table_hdr">Message</td>'+
-'    <td class="table_hdr">Posted</td>'+
-'    <td class="table_hdr">Author</td>'+
-'    <td class="table_hdr">Attachment Name</td>'+
-'    <td class="table_hdr">Type</td>'+
-'    <td class="table_hdr">Size</td>'+
+'    <td class="table_hdr" align="right"  >Run</td>'+
+'    <td class="table_hdr" align="center" >Started</td>'+
+'    <td class="table_hdr" align="right"  >Message</td>'+
+'    <td class="table_hdr" align="center" >Posted</td>'+
+'    <td class="table_hdr" align="right"  >Author</td>'+
+'    <td class="table_hdr" align="right"  >Attachment Name</td>'+
+'    <td class="table_hdr" align="right"  >Type</td>'+
+'    <td class="table_hdr" align="right"  >Size</td>'+
 '  </tr>';
         var run_specific_style = 'style="background-color:#f0f0f0;"';
         var attachments = this.attachments_last_request;
@@ -879,26 +927,26 @@ function elog_create() {
             if( a.type == 'a' ) {
                 html +=
 '  <tr>'+
-'    <td class="table_cell '+extra_class+' table_cell_left">'            +'</td>'+
-'    <td class="table_cell '+extra_class+'">'                            +'</td>'+
-'    <td class="table_cell '+extra_class+'">'                 +a.e_url   +'</td>'+
-'    <td class="table_cell '+extra_class+'">'                 +a.e_time  +'</td>'+
-'    <td class="table_cell '+extra_class+'">'                 +a.e_author+'</td>'+
-'    <td class="table_cell '+extra_class+'">'                 +a.a_url   +'</td>'+
-'    <td class="table_cell '+extra_class+'">'                 +a.a_type  +'</td>'+
-'    <td class="table_cell '+extra_class+' table_cell_right">'+a.a_size  +'</td>'+
+'    <td class="table_cell '+extra_class+' table_cell_left">'+'</td>'+
+'    <td class="table_cell '+extra_class+' ">'+'</td>'+
+'    <td class="table_cell '+extra_class+' "><div style="float:left;">'+a.e_link_url+'</div><div style="float:left; padding-left:8px; padding-top:8px;">'+a.e_id+'</div><div style="clear:both;"></div></td>'+
+'    <td class="table_cell '+extra_class+' ">'+a.e_time+'</td>'+
+'    <td class="table_cell '+extra_class+' " align="right" >'+a.e_author+'</td>'+
+'    <td class="table_cell '+extra_class+' " align="right" >'+a.a_url+'</td>'+
+'    <td class="table_cell '+extra_class+' " align="right" >'+a.a_type+'</td>'+
+'    <td class="table_cell '+extra_class+' table_cell_right" align="right" >'+a.a_size+'</td>'+
 '  </tr>';
             } else {
                 html +=
 '  <tr>'+
-'    <td class="table_cell '+extra_class+' table_cell_left" ' +run_specific_style+'>'+a.r_url  +'</td>'+
-'    <td class="table_cell '+extra_class+'" '                 +run_specific_style+'>'+a.r_begin+'</td>'+
-'    <td class="table_cell '+extra_class+'" '                 +run_specific_style+'>'          +'</td>'+
-'    <td class="table_cell '+extra_class+'" '                 +run_specific_style+'>'          +'</td>'+
-'    <td class="table_cell '+extra_class+'" '                 +run_specific_style+'>'          +'</td>'+
-'    <td class="table_cell '+extra_class+'" '                 +run_specific_style+'>'          +'</td>'+
-'    <td class="table_cell '+extra_class+'" '                 +run_specific_style+'>'          +'</td>'+
-'    <td class="table_cell '+extra_class+' table_cell_right" '+run_specific_style+'>'          +'</td>'+
+'    <td class="table_cell '+extra_class+' table_cell_left" '+run_specific_style+'><div style="float:left;">'+a.r_url+'</div><div style="float:left; padding-left:8px; padding-top:8px;">'+a.r_num+'</div><div style="clear:both;"></div></td>'+
+'    <td class="table_cell '+extra_class+'" '+run_specific_style+'>'+a.r_begin+'</td>'+
+'    <td class="table_cell '+extra_class+'" '+run_specific_style+'>'+'</td>'+
+'    <td class="table_cell '+extra_class+'" '+run_specific_style+'>'+'</td>'+
+'    <td class="table_cell '+extra_class+'" '+run_specific_style+'>'+'</td>'+
+'    <td class="table_cell '+extra_class+'" '+run_specific_style+'>'+'</td>'+
+'    <td class="table_cell '+extra_class+'" '+run_specific_style+'>'+'</td>'+
+'    <td class="table_cell '+extra_class+' table_cell_right" '+run_specific_style+'>'+'</td>'+
 '  </tr>';
             }
         }
@@ -910,7 +958,6 @@ function elog_create() {
         var html = '';
         var attachments = this.attachments_last_request;
         for(var i=0; i < attachments.length; i++) {
-            var extra_class = (i == attachments.length-1 ? 'table_cell_bottom' : '');
             var a = attachments[i];
             if( a.type != 'a' ) continue;
             var title =
@@ -932,7 +979,6 @@ function elog_create() {
         var html = '';
         var attachments = this.attachments_last_request;
         for(var i=0; i < attachments.length; i++) {
-            var extra_class = (i == attachments.length-1 ? 'table_cell_bottom' : '');
             var a = attachments[i];
             if( a.type == 'a' ) {
                 var title =
@@ -943,19 +989,17 @@ function elog_create() {
                     'author: '+a.e_author;
                 html +=
 '<div style="float:left; border-top:solid 1px #d0d0d0;">'+
-'  <div style="float:left; margin-left:10">'+a.e_link_url+'</div>'+
+'  <div style="float:left; margin-left:10px; margin-top:10px;">'+a.e_link_url+'</div>'+
 '  <div style="float:left;" title="'+title+'"><a href="../logbook/attachments/'+a.a_id+'/'+a.a_name+'" target="_blank"><img style="height:160px; padding:8px;" src="../logbook/attachments/preview/'+a.a_id+'" /></a></div>'+
 '  <div style="clear:both;"></div>'+
 '</div>';
-//'<div style="float:left; margin-left:10px;">'+a.e_link_url+'</div>'+
-//'<div style="float:left;" title="'+title+'"><a href="../logbook/attachments/'+a.a_id+'/'+a.a_name+'" target="_blank"><img style="height:160px;  border-top:solid 1px #d0d0d0; padding:8px; padding-left:0px;" src="../logbook/attachments/preview/'+a.a_id+'" /></a></div>';
             } else {
                 var title =
                     'run #: '+a.r_num+'\n'+
                     'begin: '+a.r_begin+'\n'+
                     'end: '+a.r_end;
                 html +=
-'<div style="float:left; height:160px; padding:8px; border-left:solid 1px #d0d0d0; border-top:solid 1px #d0d0d0; font-weight:bold;" title="'+title+'">'+a.r_num+' . .</div>';
+'<div style="float:left; height:160px; padding:8px; border-left:solid 1px #d0d0d0; border-top:solid 1px #d0d0d0; font-weight:bold;" title="'+title+'"><div style="padding-top:3px;">'+a.r_url_1+'</div><div style="padding-top:40px; font-size:20px; font-weight:bold;">'+a.r_num+'</div></div>';
             }
         }
         return html;
@@ -964,7 +1008,7 @@ function elog_create() {
         var html =
 '<table><tbody>'+
 '  <tr>'+
-'    <td class="table_hdr">Info</td>'+
+'    <td class="table_hdr" align="center" >Info</td>'+
 '    <td class="table_hdr">Attachment</td>'+
 '  </tr>';
         var title = 'open the attachment in a separate tab';
@@ -982,27 +1026,27 @@ function elog_create() {
             var info =
 '<table><tbody>'+
 '  <tr>'+
-'    <td class="table_cell table_cell_top table_cell_left">Host Message</td>'+
-'    <td class="table_cell table_cell_top table_cell_right">'+a.e_url+'</td>'+
+'    <td class="table_cell table_cell_bottom table_cell_left" align="right" >Host Message</td>'+
+'    <td class="table_cell table_cell_bottom table_cell_right"><div style="float:left;">'+a.e_link_url+'</div><div style="float:left; padding-left:8px; padding-top:8px;">'+a.e_id+'</div><div style="clear:both;"></div></td>'+
 '  </tr>'+
 '  <tr>'+
-'    <td class="table_cell table_cell_left">Posted</td>'+
-'    <td class="table_cell table_cell_right">'+a.e_time+'</td>'+
+'    <td class="table_cell table_cell_bottom table_cell_left" align="right" >Posted</td>'+
+'    <td class="table_cell table_cell_bottom table_cell_right">'+a.e_time+'</td>'+
 '  </tr>'+
 '  <tr>'+
-'    <td class="table_cell table_cell_left">Author</td>'+
-'    <td class="table_cell table_cell_right">'+a.e_author+'</td>'+
+'    <td class="table_cell table_cell_bottom table_cell_left" align="right" >Author</td>'+
+'    <td class="table_cell table_cell_bottom table_cell_right">'+a.e_author+'</td>'+
 '  </tr>'+
 '  <tr>'+
-'    <td class="table_cell table_cell_left">Attachment Name</td>'+
-'    <td class="table_cell table_cell_right">'+a.a_url+'</td>'+
+'    <td class="table_cell table_cell_bottom table_cell_left" align="right" >Attachment Name</td>'+
+'    <td class="table_cell table_cell_bottom table_cell_right">'+a.a_url+'</td>'+
 '  </tr>'+
 '  <tr>'+
-'    <td class="table_cell table_cell_left">Type</td>'+
-'    <td class="table_cell table_cell_right">'+a.a_type+'</td>'+
+'    <td class="table_cell table_cell_bottom table_cell_left" align="right" >Type</td>'+
+'    <td class="table_cell table_cell_bottom table_cell_right">'+a.a_type+'</td>'+
 '  </tr>'+
 '  <tr>'+
-'    <td class="table_cell table_cell_bottom table_cell_left">Size</td>'+
+'    <td class="table_cell table_cell_bottom table_cell_left" align="right" >Size</td>'+
 '    <td class="table_cell table_cell_bottom table_cell_right">'+a.a_size+'</td>'+
 '  </tr>'+
 '</tbody></table>';
@@ -1021,9 +1065,9 @@ function elog_create() {
         var html =
 '<table><tbody>'+
 '  <tr>'+
-'    <td class="table_hdr">Run</td>'+
-'    <td class="table_hdr">Started</td>'+
-'    <td class="table_hdr">Info</td>'+
+'    <td class="table_hdr" align="right" >Run</td>'+
+'    <td class="table_hdr" align="center" >Start of Run</td>'+
+'    <td class="table_hdr" align="center" >Context</td>'+
 '    <td class="table_hdr">Attachment</td>'+
 '  </tr>';
         var title = 'open the attachment in a separate tab';
@@ -1041,27 +1085,27 @@ function elog_create() {
                 var info =
 '<table><tbody>'+
 '  <tr>'+
-'    <td class="table_cell table_cell_top table_cell_left">Host Message</td>'+
-'    <td class="table_cell table_cell_top table_cell_right">'+a.e_url+'</td>'+
+'    <td class="table_cell table_cell_bottom table_cell_left" align="right" >Message ID</td>'+
+'    <td class="table_cell table_cell_bottom table_cell_right"><div style="float:left;">'+a.e_link_url+'</div><div style="float:left; padding-left:8px; padding-top:8px;">'+a.e_id+'</div><div style="clear:both;"></div></td>'+
 '  </tr>'+
 '  <tr>'+
-'    <td class="table_cell table_cell_left">Posted</td>'+
-'    <td class="table_cell table_cell_right">'+a.e_time+'</td>'+
+'    <td class="table_cell table_cell_bottom table_cell_left" align="right" >Posted</td>'+
+'    <td class="table_cell table_cell_bottom table_cell_right">'+a.e_time+'</td>'+
 '  </tr>'+
 '  <tr>'+
-'    <td class="table_cell table_cell_left">Author</td>'+
-'    <td class="table_cell table_cell_right">'+a.e_author+'</td>'+
+'    <td class="table_cell table_cell_bottom table_cell_left" align="right" >Author</td>'+
+'    <td class="table_cell table_cell_bottom table_cell_right">'+a.e_author+'</td>'+
 '  </tr>'+
 '  <tr>'+
-'    <td class="table_cell table_cell_left">Attachment Name</td>'+
-'    <td class="table_cell table_cell_right">'+a.a_url+'</td>'+
+'    <td class="table_cell table_cell_bottom table_cell_left" align="right" >Attachment Name</td>'+
+'    <td class="table_cell table_cell_bottom table_cell_right" >'+a.a_url+'</td>'+
 '  </tr>'+
 '  <tr>'+
-'    <td class="table_cell table_cell_left">Type</td>'+
-'    <td class="table_cell table_cell_right">'+a.a_type+'</td>'+
+'    <td class="table_cell table_cell_bottom table_cell_left" align="right" >Type</td>'+
+'    <td class="table_cell table_cell_bottom table_cell_right">'+a.a_type+'</td>'+
 '  </tr>'+
 '  <tr>'+
-'    <td class="table_cell table_cell_bottom table_cell_left">Size</td>'+
+'    <td class="table_cell table_cell_bottom table_cell_left" align="right" >Size</td>'+
 '    <td class="table_cell table_cell_bottom table_cell_right">'+a.a_size+'</td>'+
 '  </tr>'+
 '</tbody></table>';
@@ -1075,7 +1119,7 @@ function elog_create() {
             } else {
                 html +=
 '  <tr>'+
-'    <td class="table_cell '+extra_class+' table_cell_left" ' +run_specific_style+'>'+a.r_url  +'</td>'+
+'    <td class="table_cell '+extra_class+' table_cell_left" '+run_specific_style+'><div style="float:left;">'+a.r_url+'</div><div style="float:left; padding-left:8px; padding-top:8px;">'+a.r_num+'</div><div style="clear:both;"></div></td>'+
 '    <td class="table_cell '+extra_class+'" '                 +run_specific_style+'>'+a.r_begin+'</td>'+
 '    <td class="table_cell '+extra_class+'" '                 +run_specific_style+'>'          +'</td>'+
 '    <td class="table_cell '+extra_class+' table_cell_right" '+run_specific_style+'>'          +'</td>'+
@@ -1090,7 +1134,7 @@ function elog_create() {
         var html='';
         var display_name =
             $('#el-at-wa' ).find('select[name="view"]').val()+
-            ($('#el-at-wa' ).find('select[name="runs"]').val() == 'yes' ? 'runs' : '');
+            ($('#el-at-wa' ).find('input[name="runs"]').attr('checked') ? 'runs' : '');
         switch(display_name) {
         case 'table'         : html = this.display_attachments_as_table              (); break;
         case 'tableruns'     : html = this.display_attachments_as_table_with_runs    (); break;
@@ -1132,7 +1176,7 @@ function elog_create() {
         $('#el-at-wa').find('select[name="view"]').change(function(){
             that.display_attachments();
         });
-        $('#el-at-wa').find('select[name="runs"]').change(function(){
+        $('#el-at-wa').find('input[name="runs"]').change(function(){
             that.display_attachments();
         });
         $('#el-at-reverse').button().click(function() {
@@ -1190,6 +1234,23 @@ html+
         $('#el-subscribe'  ).button().click(function() { that.subscription('SUBSCRIBE',   null); });
         $('#el-unsubscribe').button().click(function() { that.subscription('UNSUBSCRIBE', null); });
         this.subscription('CHECK', null);
+    };
+
+    /* ---------------------------------------
+     *  Persistent links to messages and runs
+     * ---------------------------------------
+     */
+    this.message_url = function(entry_id) {
+        var idx = window.location.href.indexOf( '?' );
+        var url = ( idx < 0 ? window.location.href : window.location.href.substr( 0, idx ))+'?exper_id='+this.exp_id+'&app=elog:search&params=message:'+entry_id;
+        var html = '<a href="'+url+'" target="_blank" title="Click to open in a separate tab, or cut and paste to incorporate into another document as a link."><img src="../portal/img/link.png"></img></a>';
+        return html;
+    };
+    this.run_url = function(runnum) {
+        var idx = window.location.href.indexOf( '?' );
+        var url = ( idx < 0 ? window.location.href : window.location.href.substr( 0, idx ))+'?exper_id='+this.exp_id+'&app=elog:search&params=run:'+runnum;
+        var html = '<a href="'+url+'" target="_blank" title="Click to open in a separate tab, or cut and paste to incorporate into another document as a link."><img src="../portal/img/link.png"></img></a>';
+        return html;
     };
 
     /* ----------------------------------
@@ -1328,7 +1389,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
             entry.thread_idx = idx;
             var html =
 '    <div class="el-l-m-body">'+
-'      <div style="float:right; margin-left:15px; margin-top:2px;" class="s-b-con">'+this.message_url(entry.id)+'</div>';
+'      <div style="float:right; margin-left:15px; margin-top:2px;" class="s-b-con">'+this.parent.message_url(entry.id)+'</div>';
             if(entry.deleted) {
                 html +=
 '      <div style="float:right; margin-left:5px;" class="s-b-con"><button class="control-button el-l-m-ud" id="'+this.base+'-m-ud-'+entry.id+'" onclick="'+this.address+'.live_message_undelete('+idx+');" title="undelete this message">undelete</button></div>'+
@@ -1539,6 +1600,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
             $('#'+this.base+'-r-con-'+entry.id).html('Loading...');
             $.get('../logbook/ws/DisplayRunParams.php',{id:entry.run_id},function(data) {
                 var html =
+'<div style="float:right; margin-left:15px; margin-top:2px;" class="s-b-con">'+that.parent.run_url(entry.run_num)+'</div>'+
 '<div style="float:right;" class="s-b-con"><button class="control-button el-l-r-re" id="'+that.base+'-r-re-'+entry.id+'" onclick="'+that.address+'.live_run_reply('+idx+');">reply</button></div>'+
 '<div style="clear:both;"></div>'+
 '<div id="'+that.base+'-r-dlgs-'+entry.id+'"></div>'+
@@ -1762,16 +1824,28 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
         author,
         range_of_runs,
         message_id,
+        run_num,
         show_in_vicinity) {
 
-        var id = parseInt(message_id);
-        if(id) {
+        if(message_id) {
+
             var params = {
-                id               : id,
+                id               : parseInt(message_id),
                 show_in_vicinity : show_in_vicinity
             };
             this.do_reload('../logbook/ws/SearchOne.php', params);
+
+        } else if(run_num) {
+
+            var params = {
+                run_num          : parseInt(run_num),
+                exper_id         : this.parent.exp_id,
+                show_in_vicinity : show_in_vicinity
+            };
+            this.do_reload('../logbook/ws/SearchOne.php', params);
+
         } else {
+
             var params = {
                 id                  : this.parent.exp_id,
                 format              : 'detailed',
@@ -1842,7 +1916,8 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
                 for(var day_idx = that.days2threads.length-1; day_idx >= 0; day_idx--)
                     that.days2threads[day_idx].threads.reverse();
             }
-            that.redisplay(params.show_in_vicinity ? params.id : 0);
+            if( params.show_in_vicinity ) that.redisplay(params.id, params.run_num);
+            else                          that.redisplay();
 
         },'json');
     };
@@ -1857,7 +1932,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
      * @param Number entry_id
      * @returns {undefined}
      */
-    this.redisplay = function(entry_id) {
+    this.redisplay = function(entry_id, run_num) {
 
         // Reset variables which are going to be recalculated when rebuilding
         // DOM in the below called functions.
@@ -1877,8 +1952,9 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
         $('.el-d-collapse').button();
 
         if(this.days2threads.length) {
-            if (entry_id) this.scroll_to_message(entry_id);
-            else          this.expand_group_day(this.days2threads.length-1, true);
+            if (entry_id)     this.scroll_to_message(entry_id);
+            else if (run_num) this.scroll_to_run(run_num);
+            else              this.expand_group_day(this.days2threads.length-1, true);
         }
         this.live_update_info();
     };
@@ -1933,6 +2009,38 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
                             $('#p-center').animate({scrollTop: container_offset_top}, 'slow');
                             return;
                         }
+                    }
+                }
+            }
+        }
+    };
+   this.scroll_to_run = function(run_num) {
+
+        if(!run_num) return;
+
+          
+        // Find the entry and a day group to which the message belongs to
+        // If the one exists then expand both and scroll to that entry.
+
+        for(var day_idx = this.days2threads.length-1; day_idx >= 0; day_idx--) {
+            var day = that.days2threads[day_idx];
+            for(var i = day.threads.length-1; i >= 0; i--) {
+                var thread_idx = day.threads[i];
+                var entry = this.threads[thread_idx];
+
+                if(entry.is_run) {
+
+                    // Check if the main thread entry is the one we'rte looking at.
+
+                    if(entry.run_num == run_num) {
+
+                        this.expand_group_day(day_idx, true);
+                        this.toggle_run(thread_idx);
+                        var container = $('#'+this.base+'-r-con-'+entry.id);
+                        var container_offset_top = $('#p-center').scrollTop() + container.position().top -32;
+                        $('#p-center').animate({scrollTop: container_offset_top}, 'slow');
+
+                        return;
                     }
                 }
             }
@@ -2215,12 +2323,6 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
             },
             title: 'Information Deletion Warning'
         });
-    };
-    this.message_url = function(entry_id) {
-        var idx = window.location.href.indexOf( '?' );
-        var url = ( idx < 0 ? window.location.href : window.location.href.substr( 0, idx ))+'?exper_id='+this.parent.exp_id+'&app=elog:search&params=message:'+entry_id;
-        var html = '<a href="'+url+'" target="_blank" title="Click to open in a separate tab, or cut and paste to incorporate into another document as a link."><img src="../portal/img/link.png"></img></a>';
-        return html;
     };
     this.live_message_undelete = function(idx) {
         var entry = that.threads[idx];
@@ -2804,7 +2906,7 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
 '</div>'+
 '<div class="el-l-c-con el-l-c-hdn" id="'+this.base+'-c-con-'+entry.id+'">'+
 '  <div class="el-l-c-body">'+
-'    <div style="float:right; margin-left:15px; margin-top:2px;" class="s-b-con">'+this.message_url(entry.id)+'</div>';
+'    <div style="float:right; margin-left:15px; margin-top:2px;" class="s-b-con">'+this.parent.message_url(entry.id)+'</div>';
         if( !parent_is_deleted ) {
             if( entry.deleted ) {
                 html +=
@@ -2928,7 +3030,7 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
             entry.thread_idx = idx;
             var html =
 '    <div class="el-l-m-body">'+
-'      <div style="float:right; margin-left:15px; margin-top:2px;" class="s-b-con">'+this.message_url(entry.id)+'</div>';
+'      <div style="float:right; margin-left:15px; margin-top:2px;" class="s-b-con">'+this.parent.message_url(entry.id)+'</div>';
             if(this.parent.editor) {
                 if( entry.run_id) {
                     html +=
@@ -3014,13 +3116,6 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
         }
     };
 
-    this.message_url = function(entry_id) {
-        var idx = window.location.href.indexOf( '?' );
-        var url = ( idx < 0 ? window.location.href : window.location.href.substr( 0, idx ))+'?exper_id='+this.parent.exp_id+'&app=elog:search&params=message:'+entry_id;
-        var html = '<a href="'+url+'" target="_blank" title="Click to open in a separate tab, or cut and paste to incorporate into another document as a link."><img src="../portal/img/link.png"></img></a>';
-        return html;
-    };
-
     this.expand_all_messages = function() {
         for(var i = that.threads.length-1; i >= 0; i--)
             this.expand_message(i, true);
@@ -3091,6 +3186,7 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
             $('#'+this.base+'-r-con-'+entry.id).html('Loading...');
             $.get('../logbook/ws/DisplayRunParams.php',{id:entry.run_id},function(data) {
                 var html =
+'<div style="float:right; margin-left:15px; margin-top:2px;" class="s-b-con">'+that.parent.run_url(entry.run_num)+'</div>'+
 '<div style="float:right;" class="s-b-con"><button class="control-button el-l-r-re" id="'+that.base+'-r-re-'+entry.id+'" onclick="'+that.address+'.live_run_reply('+idx+');">reply</button></div>'+
 '<div style="clear:both;"></div>'+
 '<div id="'+that.base+'-r-dlgs-'+entry.id+'"></div>'+
@@ -3138,9 +3234,16 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
             that.attachments = new Array();
             that.attachments_loader = new Array();
 
-            var html = '';
+            var html =
+'<div style="float:right;"><a href="javascript:global_elog_search_run_by_num('+that.run_num+',true);" title="show the run in the e-Log Search panel within the current Portal" class="lb_link"><img src="../portal/img/link2run_32x32.png"/></a></div>'+
+'<div style="clear:both;"></div>'+
+'<div style="margin-top:5px;">';
+
             for(var i=that.threads.length-1; i >= 0 ; --i)
                 html += that.live_thread2html(i);
+            html +=
+'</div>';
+
             $('#'+that.base).html(html);
 
         },'json');
@@ -3661,7 +3764,6 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
         if(dlgs.html() != '') return;
         var html =
 '<div id="'+this.base+'-r-rdlg-'+id+'" class="el-l-r-rdlg el-l-r-dlg-hdn">'+
-//'  <div style="font-size:90%; text-decoration:underline; position:relative; left:-10px; top:-15px;">C o m p o s e &nbsp; m e s s a g e</div>'+
 '  <div id="'+this.base+'-r-rdlg-'+id+'-info" style="color:maroon; position:relative; left:-10px; top:-15px;">Compose message. Note the total limit of <b>25 MB</b> for attachments.</div>'+
 '  <div style="float:left;">'+
 '    <form id="elog-form-post-'+id+'" enctype="multipart/form-data" action="../logbook/ws/NewFFEntry4portalJSON.php" method="post">'+

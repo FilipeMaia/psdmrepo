@@ -41,6 +41,7 @@ if( $exper_id == '' ) die( 'no valid experiment identifier provided to the scrip
 $known_apps = array(
     'experiment' => True,
     'elog'       => True,
+    'runtables'  => True,
     'datafiles'  => True,
     'hdf'        => True );
 
@@ -94,6 +95,10 @@ try {
         (!$experiment->is_facility() && RegDB::instance()->is_member_of_posix_group( 'ps-'.strtolower( $instrument->name()), $auth_svc->authName()));
 
     $has_elog_access = LogBookAuth::instance()->canRead( $logbook_experiment->id());
+
+    $has_calib_access = 
+        RegDB::instance()->is_member_of_posix_group( 'ps-data', $auth_svc->authName()) ||
+        (!$experiment->is_facility() && RegDB::instance()->is_member_of_posix_group( 'ps-'.strtolower( $instrument->name()), $auth_svc->authName()));
 
     $num_runs = $logbook_experiment->num_runs();
     $min_run  = $logbook_experiment->find_first_run();
@@ -629,10 +634,7 @@ HERE;
             </select></td>
         <td><div style="width:20px;"></div></td>
         <td><b>Mix-in runs:</b></td>
-        <td><select name="runs" style="padding:1px;">
-              <option>no</option>
-              <option>yes</option>
-              </select></td>
+        <td><input name="runs" type="checkbox" /></td>
         <td><div style="width:20px;"></div></td>
         <td><button class="control-button" id="el-at-reverse">Show in Reverse Order</button></td>
       </tr>
@@ -716,6 +718,52 @@ HERE;
         $elog_attachments_workarea = $no_elog_access_message;
         $elog_subscribe_workarea   = $no_elog_access_message;
 
+    }
+    if( $has_calib_access ) {
+        $runtables_calib_workarea =<<<HERE
+<div class="runtables-ctrl">
+  <table><tbody>
+    <tr style="font-size:12px;">
+      <td valign="center">
+        <span style="font-weight:bold;">Select runs from</span></td>
+      <td valign="center">
+        <input type="text" name="from" size="2" title="The first run of the interval. If no input is provided then the very first known run will be assumed." /></td>
+      <td valign="center">
+        <span style="font-weight:bold; margin-left:0px;">through</span></td>
+      <td valign="center">
+        <input name="through" type="text" size="2" title="The last run of the interval. If no input is provided then the very last known run will be assumed"/ ></td>
+      <td valign="center">
+        <button class="control-button" style="margin-left:20px;" name="reset" title="reset the form">Reset Form</button></td>
+      <td valign="center">
+        <button class="control-button" name="refresh" title="check if there were any updates on this page">Refresh</button></td>
+    </tr>
+  </tbody></table>
+</div>
+<div class="runtables-wa">
+  <div class="runtables-info" id="info"    style="float:left;" >&nbsp;</div>
+  <div class="runtables-info" id="updated" style="float:right;">&nbsp;</div>
+  <div style="clear:both;"></div> 
+  <div class="runtables-body">
+    <div id="table"></div>
+  </div>
+</div>
+HERE;
+    } else {
+        $no_calib_access_message =<<<HERE
+<br><br>
+<center>
+  <span style="color: red; font-size: 175%; font-weight: bold; font-family: Times, sans-serif;">
+    A c c e s s &nbsp; E r r o r
+  </span>
+</center>
+<div style="margin: 10px 10% 10px 10%; padding: 10px; font-size: 125%; font-family: Times, sans-serif; border-top: 1px solid #b0b0b0;">
+  We're sorry! Your SLAC UNIX account <b>{$auth_svc->authName()}</b> has no proper permissions to access
+  this page. The page access is reserved to LCLS detector calibration experts.
+  To learn more details on this subject please contact the Point Of Contact personell of your instrument.
+  You may also contact LCLS software and computer infrastructure support team by sending an e-mail request to <b>pcds-help</b> (at SLAC).
+</div>
+HERE;
+        $runtables_calib_workarea = $no_calib_access_message;
     }
     if( $has_data_access ) {
 
@@ -957,6 +1005,7 @@ HERE;
 
 <link type="text/css" href="css/ELog.css" rel="Stylesheet" />
 <link type="text/css" href="css/Exper.css" rel="Stylesheet" />
+<link type="text/css" href="css/RunTables.css" rel="Stylesheet" />
 <link type="text/css" href="css/Data.css" rel="Stylesheet" />
 <link type="text/css" href="css/Hdf.css" rel="Stylesheet" />
 
@@ -971,8 +1020,10 @@ HERE;
 <script type="text/javascript" src="js/Utilities.js"></script>
 <script type="text/javascript" src="js/ELog.js"></script>
 <script type="text/javascript" src="js/Exper.js"></script>
+<script type="text/javascript" src="js/RunTables.js"></script>
 <script type="text/javascript" src="js/Data.js"></script>
 <script type="text/javascript" src="js/Hdf.js"></script>
+<script type="text/javascript" src="js/ws.js"></script>
 
 <script type="text/javascript" src="../portal/js/config.js"></script>
 <script type="text/javascript" src="../portal/js/Table.js"></script>
@@ -1434,6 +1485,8 @@ elog.post_onsuccess = function() {
 
 exper.posix_group = '<?=$experiment->POSIX_gid()?>';
 
+runtables.exp_id = <?=$exper_id?>;
+
 datafiles.exp_id = <?=$exper_id?>;
 datafiles.uid = '<?=$auth_svc->authName()?>';
 datafiles.is_data_administrator = <? echo $is_data_administrator ? 1 : 0; ?>;
@@ -1566,6 +1619,7 @@ function report_error(msg) {
 var applications = {
     'p-appl-experiment' : exper,
     'p-appl-elog'       : elog,
+    'p-appl-runtables'  : runtables,
     'p-appl-datafiles'  : datafiles,
     'p-appl-hdf'        : hdf,
     'p-appl-help'       : new p_appl_help()            // TODO: implement it the same wa as for e-Log
@@ -1769,6 +1823,11 @@ function global_elog_search_message_by_id(id, show_in_vicinity) {
     if(application) application.search_message_by_id(id, show_in_vicinity);
 }
 
+function global_elog_search_run_by_num(num, show_in_vicinity) {
+    var application = global_switch_application('elog', 'search');
+    if(application) application.search_run_by_num(num, show_in_vicinity);
+}
+
 </script>
 
 </head>
@@ -1812,6 +1871,7 @@ function global_elog_search_message_by_id(id, show_in_vicinity) {
     <div class="m-item m-item-first m-select" id="p-appl-experiment">Experiment</div>
     <div class="m-item m-item-next" id="p-appl-elog">e-Log</div>
 <?php   if (!$experiment->is_facility()) { ?>
+    <div class="m-item m-item-next" id="p-appl-runtables">Run Tables</div>
     <div class="m-item m-item-next" id="p-appl-datafiles">File Manager</div>
     <div class="m-item m-item-next" id="p-appl-hdf">HDF5 Translation</div>
 <?php   } ?>
@@ -1911,6 +1971,14 @@ function global_elog_search_message_by_id(id, show_in_vicinity) {
       </div>
     </div>
 
+    <div id="runtables" class="hidden">
+      <div class="v-item" id="calib">
+        <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
+        <div style="float:left;" >Calibrations</div>
+        <div style="clear:both;"></div>
+      </div>
+    </div>
+
     <div id="datafiles" class="hidden">
       <div class="v-item" id="summary">
         <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
@@ -1969,6 +2037,7 @@ function global_elog_search_message_by_id(id, show_in_vicinity) {
     <div id="elog-runs"          class="application-workarea hidden"><?php echo $elog_runs_workarea ?></div>
     <div id="elog-attachments"   class="application-workarea hidden"><?php echo $elog_attachments_workarea ?></div>
     <div id="elog-subscribe"     class="application-workarea hidden"><?php echo $elog_subscribe_workarea ?></div>
+    <div id="runtables-calib"    class="application-workarea hidden"><?php echo $runtables_calib_workarea ?></div>
     <div id="datafiles-summary"  class="application-workarea hidden"><?php echo $datafiles_summary_workarea ?></div>
     <div id="datafiles-files"    class="application-workarea hidden"><?php echo $datafiles_files_workarea ?></div>
     <div id="hdf-manage"         class="application-workarea hidden"><?php echo $hdf_manage_workarea ?></div>

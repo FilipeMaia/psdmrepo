@@ -97,6 +97,7 @@ class Service {
     private $irep        = null ;
     private $exptimemon  = null ;
     private $sysmon      = null ;
+    private $shiftmgr    = null ;
 
     public function __construct ($method) {
         switch (strtoupper(trim($method))) {
@@ -304,6 +305,14 @@ class Service {
         }
         return $this->sysmon ;
     }
+    public function shiftmgr () {
+        if (is_null($this->shiftmgr)) {
+            require_once 'shiftmgr/shiftmgr.inc.php' ;
+            $this->shiftmgr = \ShiftMgr\ShiftMgr::instance() ;
+            $this->shiftmgr->begin() ;
+        }
+        return $this->shiftmgr ;
+    }
 
     // -------------
     //  Finalizers
@@ -327,6 +336,7 @@ class Service {
         if (!is_null($this->irep       )) $this->irep      ->commit() ;
         if (!is_null($this->exptimemon )) $this->exptimemon->commit() ;
         if (!is_null($this->sysmon     )) $this->sysmon    ->commit() ;
+        if (!is_null($this->shiftmgr   )) $this->shiftmgr  ->commit() ;
     }
     // -------------------
     //   Rests reporting

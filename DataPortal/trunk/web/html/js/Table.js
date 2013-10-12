@@ -203,6 +203,12 @@ define_class( TableCellType_NumberURL, TableCellType, {}, {
     to_string     : function(a)   { return '<a class="table_link" href="'+a.url+'"; target="_blank";>'+a.number+'</a>'; }}
 );
 
+function TableCellType_NumberHTML() { TableCellType.call(this); }
+define_class( TableCellType_NumberHTML, TableCellType, {}, {
+    compare_values: function(a,b) { return this.compare_numbers(a.number,b.number); },
+    to_string     : function(a)   { return a.html; }}
+);
+
 function TableCellType_Text() { TableCellType.call(this); }
 define_class( TableCellType_Text, TableCellType, {}, {});
 
@@ -309,10 +315,11 @@ define_class( Table, null, {
  ******************/
 
     Types: {
-        Number:     new TableCellType_Number(),
-        Number_URL: new TableCellType_NumberURL(),
-        Text:       new TableCellType_Text(),
-        Text_URL:   new TableCellType_TextURL()},
+        Number:      new TableCellType_Number(),
+        Number_URL:  new TableCellType_NumberURL(),
+        Number_HTML: new TableCellType_NumberHTML(),
+        Text:        new TableCellType_Text(),
+        Text_URL:    new TableCellType_TextURL()},
 
     Status: {
         Empty  : '&lt;&nbsp;'+'empty'+'&nbsp;&gt;',
