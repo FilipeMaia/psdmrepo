@@ -11,9 +11,16 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-29-03
+2013-10-11 Andy Salnikov
+- bumping schema version for ControlDataConfigV2 and ControlDataConfigV3
+  (schema numbers should be in schema classes, but I hope we get new
+  DDL-based translator sooner that I have time fixing this)
+- ControlDataConfigV3 was actually stored as ControlDataConfigV2
+
 Tag: V00-29-02
 2013-10-08 Andy Salnikov
-- DAQ has new varsion of ControlDava::Config class which we use to 
+- DAQ has new version of ControlDava::Config class which we use to 
   estimate events per calib cycle, need to update code for this new type
 
 Tag: V00-29-01
