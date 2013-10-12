@@ -177,7 +177,6 @@ function FwkApplicationProxy (name, full_name) {
             return this.application ;
         return null ;
     } ;
-
     this.init = function () {
         if (this.is_initialized) return ;
         this.is_initialized = true ;
@@ -226,6 +225,32 @@ function FwkApplicationProxy (name, full_name) {
         var container = $('#fwk-applications > #'+this.get_wa_id()+' > div') ;
         var application = this.get_application() ;
         if (application) application.activate(container) ;
+        
+        var fwk_tools_container = $('#fwk-tools') ;
+        var tools = application.tools ? application.tools() : null ;
+        if (tools) {
+            var html = '' ;
+            for (var i in tools) {
+                var tool = tools[i] ;
+                html +=
+'<div class="fwk-tool" id="'+i+'">' +
+'  <a title="'+tool.title()+'"><img style="height:24px;" src="'+tool.icon()+'" /></a>' +
+'</div>' ;
+            }
+            html += '<div class="fwk-tool-end" ></div>' ;
+            fwk_tools_container.html(html) ;
+            for (var i in tools) {
+                this.activate_tool(fwk_tools_container, tools[i], i) ;
+            }
+        } else {
+            fwk_tools_container.html('') ;
+        }
+    } ;
+    this.activate_tool = function(fwk_tools_container, tool, i) {
+        var tool_container_activator = fwk_tools_container.find('.fwk-tool#'+i+' a') ;
+        tool_container_activator.click(function () {
+            tool.on_click() ;
+        }) ;
     } ;
     this.deactivate = function () {
         this.init() ;
@@ -424,7 +449,7 @@ function FwkCreator () {
         var    top_height = 132 ;
         var bottom_height = 0 ;
         var center_height = $(window).height() - top_height - bottom_height ;
-        $('#fwk-left'    ).height(center_height + 2);
+        $('#fwk-left'    ).height(center_height);
         $('#fwk-splitter').height(center_height);
         $('#fwk-center'  ).height(center_height);
     } ;
@@ -921,8 +946,8 @@ function FwkCreator () {
      * item(S).
      * 
      * @param {string} application_name - the tab name
-     * @param {string} context1_name - the vertical menu name from teh left
-     * @returns {undefined
+     * @param {string} context1_name - the vertical menu name from the left
+     * @returns {object} an application object
      */
     this.activate = function (application_name, context1_name) {
 	for (var id in this.app_proxies) {
@@ -951,6 +976,7 @@ function FwkCreator () {
     }
 
     this.init_html = function () {
+        var that = this ;
         var html =
 '<div id="fwk-top">' +
 '  <div id="fwk-top-header">' +
@@ -962,18 +988,12 @@ function FwkCreator () {
 '      <div style="float:right;" id="fwk-login" class="not4print">' +
 '        <table><tbody>' +
 '          <tr>' +
-'            <td rowspan="4" valign="bottom"><a href="javascript:Fwk.printer_friendly()" title="Printer friendly version of this page"><img src="../webfwk/img/PRINTER_icon.gif" style="border-radius: 5px;" /></a></td>' +
-'          </tr>' +
-'          <tr>' +
-'            <td>&nbsp;</td>' +
-'            <td>[<a href="javascript:Fwk.logout()" title="close the current WebAuth session">logout</a>]</td>' +
-'          </tr>' +
-'          <tr>' +
-'            <td>Logged as:&nbsp;</td>' +
+'            <td>Logged as</td>' +
 '            <td><b>'+this.auth.user+'</b></td>' +
+'            <td><button id="fwk-session-logout" title="close the current WebAuth session">LOGOUT</button></td>' +
 '          </tr>' +
 '          <tr>' +
-'            <td>Session expires in:&nbsp;</td>' +
+'            <td>Session expires in : </td>' +
 '            <td><span id="auth_expiration_info"><b>00:00.00</b></span></td>' +
 '          </tr>' +
 '        </tbody></table>' +
@@ -997,10 +1017,14 @@ function FwkCreator () {
 '      <div id="fwk-search" style="float:right">' ;
         if (this.on_quick_search) {
             html +=
-'        <b>quick search:</b> <input type="text" id="fwk-search-text" value="" size=16 title="enter text to search in the application, then press ENTER to proceed" />' ;
+//'        <b>quick search:</b> <input type="text" id="fwk-search-text" value="" size=16 title="enter text to search in the application, then press ENTER to proceed" />' ;
+'         <div style="float:left;" ><input type="text" id="fwk-search-text" value="" size=16 title="enter text to search in the application, then press ENTER to proceed" /></div>' +
+'         <div style="float:left; margin-left:5px; padding-top:4px;" ><img style="height:24px;" src="../webfwk/img/View.png" /></div>' +
+'         <div style="clear:both;" ></div>' ;
         }
         html +=
 '      </div>' +
+'      <div id="fwk-tools" style="float:right"></div>' +
 '      <div style="clear:both;"></div>' +
 '    </div>' +
 '  </div>' +
@@ -1095,6 +1119,7 @@ function FwkCreator () {
 '  <div id="fwk-editdialogs" style="display:none;"></div>' +
 '</div>';
         $('body').html(html);
+        $('#fwk-session-logout').button().click(function () { that.logout(); }) ;
     } ;
 
     /*

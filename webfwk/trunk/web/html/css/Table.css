@@ -67,11 +67,14 @@ td.table_cell_bottom {
 td.table_cell_within_group {
   border-bottom: none;
 }
-/*
-tr.table_row:hover {
-  background-color:#f8f8f8;
+
+tr.table_row_selectable {
+  cursor: pointer;
 }
-*/
+tr.table_row_selectable:hover {
+  background-color:#f0f0f0;
+}
+
 td.table_cell_selectable {
   cursor: pointer;
   font-weight: bold;

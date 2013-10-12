@@ -33,6 +33,17 @@
 
 // This is a sample application class
 
+function Export2Excel () {
+    this.icon     = function () { return 'img/MS_Excel_1.png' ; } ;
+    this.title    = function () { return 'Export into Microsoft Excel 2007 File' ; } ;
+    this.on_click = function () { alert('Exporting to Excel 2007...') ; } ;
+}
+
+function Print () {
+    this.icon     = function () { return 'img/Printer.png' ; } ;
+    this.title    = function () { return 'Print the documente' ; } ;
+    this.on_click = function () { alert('Printing...') ; } ;
+}
 function Shifts (name) {
 
     // Make sure the base class constructor is called
@@ -63,6 +74,14 @@ function Shifts (name) {
             this.init() ;
             this.shift_service('../shiftmgr/ws/shift_get.php', {instr: this.name});
         }
+    } ;
+
+    this.tools = function () {
+        if (!this.my_tools)
+            this.my_tools = [
+                new Export2Excel() ,
+                new Print()] ;
+        return this.my_tools ;
     } ;
 
     this.shift_service = function (url, params, when_done) {
@@ -136,7 +155,6 @@ function Shifts (name) {
     } ;
 }
 define_class (Shifts, FwkApplication, {}, {}) ;
-
 
 $(function() {
 

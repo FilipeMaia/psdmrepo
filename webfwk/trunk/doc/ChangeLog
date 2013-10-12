@@ -11,6 +11,11 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-02
+2013-10-11 Igor Gaponenko
+- added support for configurable toolbar
+- minor improvements in the Table widget
+
 Tag: V00-00-01
 2013-08-21 Igor Gaponenko
 - added a hierarchy of JavaScript base classes and widgets

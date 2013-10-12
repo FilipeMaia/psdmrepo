@@ -52,7 +52,7 @@ function define_class(constructor, base, statics, methods ) {
 /**
  * The Table class:
  * 
- *   Table(id, coldef, data, options, config_handler)
+ *   Table(id, coldef, rows, options, config_handler)
  * 
  * The class is designed to simplify creating dynamic tables
  * at a location specified by HTML container 'id'. Table configuration
@@ -164,16 +164,21 @@ function define_class(constructor, base, statics, methods ) {
  * 
  *      style: ' white-space: nowrap;'
  *
- * The 'data' parameter may contain static data for table cells
+ * The 'rows' parameter may contain static row data for table cells
  * in case if this information is available at a time when the table
  * object is built. Otherwise use dynamic loading.
  *
  * Options are specified via the 'options' object (dictionary). The following
  * options are supported in this implementation of teh class:
  *
- *   'text_when_empty'      - HTML text to show when no data are loaded
+ *   'text_when_empty'      - HTML text to show when no row data are loaded
  *   'default_sort_column'  - an optional column number by which to sort (default: 0)
  *   'default_sort_forward' - the direction of the sort (default: true)
+ *   'row_select_action'    - a function which will be fired when a row is selected.
+ *                            the only parameter of the function will be an array
+ *                            representing the corresponding row. The rows will be the same
+ *                            which are passed into the table either at a time when the table
+ *                            is created or dynamically loaded with the row data.
  *   
  * The 'config_handler' parameter (if provided) will be used to maintain a persistent
  * state of table configuration on teh server side.
@@ -203,6 +208,12 @@ define_class( TableCellType_NumberURL, TableCellType, {}, {
     to_string     : function(a)   { return '<a class="table_link" href="'+a.url+'"; target="_blank";>'+a.number+'</a>'; }}
 );
 
+function TableCellType_NumberHTML() { TableCellType.call(this); }
+define_class( TableCellType_NumberHTML, TableCellType, {}, {
+    compare_values: function(a,b) { return this.compare_numbers(a.number,b.number); },
+    to_string     : function(a)   { return a.html; }}
+);
+
 function TableCellType_Text() { TableCellType.call(this); }
 define_class( TableCellType_Text, TableCellType, {}, {});
 
@@ -219,7 +230,7 @@ function TableError(message) {
 
 TableError.prototype = new Error();
 
-function Table(container, coldef, data, options, config_handler) {
+function Table(container, coldef, rows, options, config_handler) {
 
     var that = this;
 
@@ -240,7 +251,7 @@ function Table(container, coldef, data, options, config_handler) {
 
     // Optional parameters
 
-    this.data            = data ? data : [];
+    this.rows            = rows ? rows : [];
     this.options         = options ? options : {};
     this.text_when_empty = this.options.text_when_empty !== undefined ? this.options.text_when_empty : Table.Status.Empty;
 
@@ -252,7 +263,7 @@ function Table(container, coldef, data, options, config_handler) {
         forward: this.options.default_sort_forward !== undefined ? this.options.default_sort_forward : true // sort direction
     };
     this.selected_col = this.options.selected_col !== undefined ? this.options.selected_col : 0;
-    this.selected_row = data ? data[0] : null;
+    this.selected_row = rows ? rows[0] : null;
 
     this.header = {
         size: {cols: 0, rows: 0},
@@ -284,6 +295,12 @@ function Table(container, coldef, data, options, config_handler) {
     this.header.align    = bottom_columns.align;
     this.header.style    = bottom_columns.style;
 
+    if (this.options.row_select_action) {
+        if (typeof this.options.row_select_action !== 'function')
+            throw new TableError("Table: wrong type of the 'row_select_action option', must be a function") ;
+        this.row_select_action = this.options.row_select_action ;
+    }
+
     // Override table configuration parameters from the persistent store.
     // Note that if the store already has a cached value then we're going to use
     // the one immediatelly. Otherwise the delayed loader will kick in
@@ -309,10 +326,11 @@ define_class( Table, null, {
  ******************/
 
     Types: {
-        Number:     new TableCellType_Number(),
-        Number_URL: new TableCellType_NumberURL(),
-        Text:       new TableCellType_Text(),
-        Text_URL:   new TableCellType_TextURL()},
+        Number:      new TableCellType_Number(),
+        Number_URL:  new TableCellType_NumberURL(),
+        Number_HTML: new TableCellType_NumberHTML(),
+        Text:        new TableCellType_Text(),
+        Text_URL:    new TableCellType_TextURL()},
 
     Status: {
         Empty  : '&lt;&nbsp;'+'empty'+'&nbsp;&gt;',
@@ -349,25 +367,25 @@ define_class( Table, null, {
         return this.selected_row ? this.selected_row[this.selected_col] : null;
     },
 
-    sort_data: function() {
+    sort_rows: function() {
         var column = this.sorted.column;
         if( !this.header.sorted[column] ) return;
         var bound_sort_func = new Table.sort_func(this.header.types[column], column);
-        this.data.sort( bound_sort_func.compare );
-        if( !this.sorted.forward ) this.data.reverse();
+        this.rows.sort( bound_sort_func.compare );
+        if( !this.sorted.forward ) this.rows.reverse();
     },
 
-    load: function(data) {
-        this.data = data ? data : [];
-        this.selected_row = data ? data[0] : null;
+    load: function(rows) {
+        this.rows = rows ? rows : [];
+        this.selected_row = rows ? rows[0] : null;
         this.display();
     },
 
     select: function(col, obj) {
         if(( col < 0 ) || ( col >= this.cols()) || ( col != this.selected_col )) return;
         var bound_sort_func4cells = new Table.sort_func4cells(this.header.types[col]);
-        for( var i in this.data ) {
-            var row = this.data[i];
+        for( var i in this.rows ) {
+            var row = this.rows[i];
             if( !bound_sort_func4cells.compare(row[col], obj)) {
                 this.selected_row = row;
                 this.display();
@@ -403,13 +421,13 @@ define_class( Table, null, {
         }
         html += '</thead><tbody>';
 
-        // Draw data rows (if available)
+        // Draw rows (if available)
 
-        if( this.data.length ) {
-            this.sort_data();
-            for( var i in this.data ) {
-                html += '<tr>';
-                var row = this.data[i];
+        if( this.rows.length ) {
+            this.sort_rows();
+            for( var i in this.rows ) {
+                html += '<tr '+(this.row_select_action ? 'class="table_row_selectable" id="'+i+'" ' : '')+'>';
+                var row = this.rows[i];
                 for( var j=0; j < row.length; ++j ) {
                     var classes = ' table_cell table_bottom';
                     if( j == 0 ) classes += ' table_cell_left';
@@ -445,7 +463,7 @@ define_class( Table, null, {
             var column = parseInt($(this).find('.table_sort_sign').attr('name'));
             that.sorted.forward = !that.sorted.forward;
             that.sorted.column  = column;
-            that.sort_data();
+            that.sort_rows();
             that.display();
             that.save_state();
         });
@@ -456,8 +474,8 @@ define_class( Table, null, {
             var addr = this.id.split(' ');
             var col_idx = addr[0];
             var row_idx = addr[1];
-            that.selected_row  = that.data[row_idx];
-            that.header.types[col_idx].select_action(that.data[row_idx][col_idx]);
+            that.selected_row  = that.rows[row_idx];
+            that.header.types[col_idx].select_action(that.rows[row_idx][col_idx]);
             that.container.find('.table_cell_selectable_selected').removeClass('table_cell_selectable_selected');
             $(this).addClass('table_cell_selectable_selected');
         });
@@ -466,6 +484,11 @@ define_class( Table, null, {
             that.header.hidden[col_idx] = !this.checked;
             that.display();
             that.save_state();
+        });
+        this.container.find('.table_row_selectable').click(function() {
+            var i = parseInt($(this).attr('id'));
+            var row = that.rows[i];
+            that.row_select_action(row);
         });
     },
 
