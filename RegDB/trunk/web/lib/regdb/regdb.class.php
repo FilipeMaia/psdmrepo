@@ -649,10 +649,17 @@ HERE;
             $groups['xcscom12'] = True;
         }
 
-        /* In-house commissionning, in-house, etc.
+        /* MObile rack experiments
          */
         if( is_null( $instr ) || ( $instr == 'MOB' )) {
             $groups['ps-mob'] = True;
+        }
+        
+        /* External (user) experiments
+         */
+        if( is_null( $instr ) || ( $instr == 'USR' )) {
+            $groups['ps-usr'] = True;
+            $groups['ps-usr-sci'] = True;
         }
 
         /* Add groups which aren't really experiment or instrument specific.
