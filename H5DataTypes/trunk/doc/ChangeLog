@@ -11,6 +11,13 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-03
+2013-10-11 Andy Salnikov
+- schema for ControlDataConfigV2 and ControlDataConfigV3 were missing 
+  'npvLabels' attribute, adding it finally
+- schema version number needs to be bumped for these types in 
+  translator and also in DDL schema
+
 Tag: V00-05-02
 2013-10-07 Andy Salnikov
 - change attribute name in L3TConfigV1 to make life easier for DDL

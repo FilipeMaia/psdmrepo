@@ -92,6 +92,7 @@ ControlDataConfigV3::native_type()
   confType.insert_native<uint32_t>( "events", offsetof(ControlDataConfigV3,events) ) ;
   confType.insert_native<uint32_t>( "npvControls", offsetof(ControlDataConfigV3,npvControls) ) ;
   confType.insert_native<uint32_t>( "npvMonitors", offsetof(ControlDataConfigV3,npvMonitors) ) ;
+  confType.insert_native<uint32_t>( "npvLabels", offsetof(ControlDataConfigV3,npvLabels) ) ;
 
   return confType ;
 }

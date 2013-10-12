@@ -114,7 +114,7 @@ ControlDataConfigV2::native_type()
   confType.insert_native<XtcClockTime>( "duration", offsetof(ControlDataConfigV2,duration) ) ;
   confType.insert_native<uint32_t>( "events", offsetof(ControlDataConfigV2,events) ) ;
   confType.insert_native<uint32_t>( "npvControls", offsetof(ControlDataConfigV2,npvControls) ) ;
-  confType.insert_native<uint32_t>( "npvMonitors", offsetof(ControlDataConfigV2,npvMonitors) ) ;
+  confType.insert_native<uint32_t>( "npvLabels", offsetof(ControlDataConfigV2,npvLabels) ) ;
 
   return confType ;
 }
