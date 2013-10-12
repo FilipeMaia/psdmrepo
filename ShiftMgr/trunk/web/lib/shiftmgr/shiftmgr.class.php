@@ -29,7 +29,7 @@ class ShiftMgr extends DbConnection {
     private static $instance = null ;
 
     public static $area_names       = array('FEL', 'BMLN', 'CTRL', 'DAQ', 'LASR', 'TIME', 'HALL', 'OTHR') ;
-    public static $allocation_names = array('tuning', 'alignment', 'daq', 'access', 'other') ;
+    public static $allocation_names = array('tuning', 'alignment', 'daq', 'access', 'machine', 'other') ;
 
     private static $min_begin_time = null ;
     public static function min_begin_time () {
@@ -84,6 +84,30 @@ class ShiftMgr extends DbConnection {
                 "no such hutch found in the Experiment Registry Database: '{$name}'") ;
     }
 
+    /**
+     * Check if the specified string represents a valid shift type
+     *
+     * @param string $type
+     * @return boolean
+     */
+    public static function is_valid_shift_type ($type) {
+        $type = strtoupper($type) ;
+        return in_array($type, array('USER', 'MD', 'IN-HOUSE'), true) ;
+    }
+
+    /**
+     * Throw an exception if the specified name doesn't correspond to any known shift type.
+     * 
+     * @param string $type
+     * @throws ShiftMgrException
+     */
+    public function assert_shift_type ($type) {
+        if (!ShiftMgr::is_valid_shift_type($type))
+            throw new ShiftMgrException (
+                __class__.'::'.__METHOD__ ,
+                "no such shift type supported by the application: '{$type}'") ;
+    }
+    
     public function current_user () {
         AuthDb::instance()->begin() ;
         return AuthDB::instance()->authName() ;
@@ -147,6 +171,16 @@ class ShiftMgr extends DbConnection {
         }
         return $shifts ;
     }
+    public function find_last_shift ($instr_name) {
+        $instr_name_escaped = $this->escape_string(strtoupper(trim($instr_name))) ;
+        $result = $this->query("SELECT * FROM {$this->database}.shift WHERE instr_name='{$instr_name_escaped}' ORDER BY begin_time DESC LIMIT 1") ;
+        $nrows = mysql_numrows($result) ;
+        if ($nrows == 0) return null ;
+        if ($nrows == 1) return new Shift($this, mysql_fetch_array($result, MYSQL_ASSOC)) ;
+        throw new ShiftMgrException (
+              __class__.'::'.__METHOD__ ,
+              "Invalid number of entries returned when looking for the last shift at {$instr_name}") ;
+    }
     public function find_shift_area_by_id ($id) {
         $id = intval($id) ;
         $result = $this->query("SELECT * FROM {$this->database}.shift_area_evaluation WHERE id={$id}") ;
@@ -182,22 +216,26 @@ class ShiftMgr extends DbConnection {
 
         $this->assert_hutch($instr_name) ;
 
-        // Never go before that date
+        // Never go before that "very first" date of this database, or before the end time
+        // of the last known shift of the instrument.
 
         $min_begin_time = ShiftMgr::min_begin_time() ;
         $begin_time = $begin_time ? ($begin_time->less($min_begin_time) ? $min_begin_time : $begin_time) : $min_begin_time ;
+
+        $last_shift = $this->find_last_shift($instr_name) ;
+        if ($last_shift) {
+            $last_shift_end_time = $last_shift->end_time() ;
+            $begin_time = $begin_time->less($last_shift_end_time) ? $last_shift_end_time : $begin_time ;
+        }
         $begin_time = LusiTime::parse("{$begin_time->toStringDay()} 00:00:00") ;
-              
+
         // Never go beyond the comming midnight of the present day.
 
         $now = LusiTime::now() ;
         $max_end_time = LusiTime::parse("{$now->in24hours()->toStringDay()} 00:00:00") ;
-        //$end_time = $end_time ? ($max_end_time->less($end_time) ? $max_end_time : LusiTime::parse("{$end_time->in24hours()->toStringDay()} 00:00:00")) : $max_end_time ;
         $end_time = $end_time ? ($max_end_time->less($end_time) ? $max_end_time : $end_time) : $max_end_time ;
 
-//       throw new ShiftMgrException (
-//            __class__.'::'.__METHOD__ ,
-//            "begin_time: {$begin_time->toStringShort()}, end_time: {$end_time->toStringShort()}") ;
+        if (!($begin_time->less($end_time))) return ;   // no room for new shifts
 
         // Create up to 2 shifts per each day, one before 12:00, and another one after.
         // Don't create the first shift if before 9:00, and don't create the second one if before 21:00.
@@ -253,12 +291,28 @@ INSERT INTO shiftmgr.shift_time_allocation (shift_id,name,duration_min,comments)
 INSERT INTO shiftmgr.shift_time_allocation (shift_id,name,duration_min,comments) VALUES (1,'other',    200,'');
 
 */
-    public function create_shift ($instr_name, $begin_time, $end_time) {
+    public function create_shift ($instr_name, $begin_time, $end_time, $type=null) {
 
         $this->assert_hutch($instr_name) ;
         $instr_name_escaped = $this->escape_string(strtoupper(trim($instr_name))) ;
 
-        $sql = "INSERT INTO {$this->database}.shift (instr_name,begin_time,end_time,notes) VALUES('{$instr_name_escaped}',{$begin_time->to64()},{$end_time->to64()},'')" ;
+        // If no type provided then deduce it based on the day of week
+        // of the begin shift timestamp.
+
+        if (is_null($type)) {
+            switch ($begin_time->day_of_week()) {
+                case 2:
+                case 3:
+                    $type = 'MD' ; break ;
+                default:
+                    $type = 'USER' ; break ;
+            }
+        } else {
+            $this->assert_shift_type($type) ;
+        }
+        $type_escaped = $this->escape_string(strtoupper(trim($type))) ;
+
+        $sql = "INSERT INTO {$this->database}.shift (instr_name,type,begin_time,end_time,notes) VALUES('{$instr_name_escaped}','{$type_escaped}',{$begin_time->to64()},{$end_time->to64()},'')" ;
         $this->query($sql) ;
 
         $shifts = $this->find_shifts_by_('id=LAST_INSERT_ID()') ;
@@ -282,7 +336,7 @@ INSERT INTO shiftmgr.shift_time_allocation (shift_id,name,duration_min,comments)
         return $shift ;
     }
 
-    public function update_shift ($id, $begin_time=null, $end_time=null, $notes=null, $areas=null, $allocations=null) {
+    public function update_shift ($id, $begin_time=null, $end_time=null, $type=null, $notes=null, $areas=null, $allocations=null) {
 
         // The shift object before applying first modfs
 
@@ -297,6 +351,8 @@ INSERT INTO shiftmgr.shift_time_allocation (shift_id,name,duration_min,comments)
                 __class__.'::'.__METHOD__ ,
                 "the begin time of the interval must be strictly less than the end one") ;
 
+        $this->assert_shift_type($type) ;
+
         $modified_time = LusiTime::now() ;
 
         $opt = " modified_uid='{$this->current_user()}', modified_time={$modified_time->to64()}" ;
@@ -304,12 +360,14 @@ INSERT INTO shiftmgr.shift_time_allocation (shift_id,name,duration_min,comments)
         if ($begin_time)      $opt .= ", begin_time={$begin_time->to64()}" ;
         if ($end_time)        $opt .= ", end_time={$end_time->to64()}" ;
         if (!is_null($notes)) $opt .= ", notes='".$this->escape_string($notes)."'" ;
+        if (!is_null($type))  $opt .= ", type='".$this->escape_string(strtoupper(trim($type)))."'" ;
 
         $sql = "UPDATE {$this->database}.shift SET {$opt} WHERE id={$shift->id()}" ;
         $this->query($sql) ;
 
         if ($begin_time      && !$begin_time->equal($shift->begin_time())) $this->add_modify_shift_event ($shift->id(), $modified_time, 'begin_time', $shift->begin_time()->toStringShort(), $begin_time->toStringShort()) ;
         if ($end_time        && !$end_time  ->equal($shift->end_time()))   $this->add_modify_shift_event ($shift->id(), $modified_time, 'end_time',   $shift->end_time()  ->toStringShort(), $end_time->toStringShort()) ;
+        if (!is_null($type)  && $type            != $shift->type())        $this->add_modify_shift_event ($shift->id(), $modified_time, 'type',       $shift->type(),                        $type) ;
         if (!is_null($notes) && $notes           != $shift->notes())       $this->add_modify_shift_event ($shift->id(), $modified_time, 'notes',      $shift->notes(),                       $notes) ;
 
         // The updated version of the shift

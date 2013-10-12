@@ -3,13 +3,19 @@
  *
  * @returns {Notifications}
  */
-function Notifications () {
+function Notifications (instr_name) {
 
     // -----------------------------------------
     // Allways call the base class's constructor
     // -----------------------------------------
 
     FwkApplication.call(this) ;
+
+    // ------------------------
+    // Parameters of the object
+    // ------------------------
+
+    this.instr_name = instr_name || '' ;
 
     // ------------------------------------------------
     // Override event handler defined in the base class

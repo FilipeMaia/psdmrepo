@@ -58,10 +58,9 @@ div.shift-history-reports {
 <script type="text/javascript" src="../webfwk/js/Fwk.js"></script>
 <script type="text/javascript" src="../webfwk/js/Table.js"></script>
 
+<script type="text/javascript" src="../shiftmgr/js/Definitions.js"></script>
 <script type="text/javascript" src="../shiftmgr/js/Reports.js"></script>
 <script type="text/javascript" src="../shiftmgr/js/Reports4all.js"></script>
-<script type="text/javascript" src="../shiftmgr/js/Analytics.js"></script>
-<script type="text/javascript" src="../shiftmgr/js/Analytics4all.js"></script>
 <script type="text/javascript" src="../shiftmgr/js/Access.js"></script>
 <script type="text/javascript" src="../shiftmgr/js/Notifications.js"></script>
 <script type="text/javascript" src="../shiftmgr/js/Rules.js"></script>
@@ -83,13 +82,13 @@ $(function() {
                     application: new Reports(instr_name, instr2editor[instr_name]) ,
                     html_container: 'shift-reports-'+instr_name
                 } ,
-                {   name: 'Analytics' ,
-                    application: new Analytics(instr_name) ,
-                    html_container: 'shift-analytics-'+instr_name
-                } ,
                 {   name: 'History' ,
                     application: new History(instr_name) ,
                     html_container: 'shift-history-'+instr_name
+                } ,
+                {   name: 'E-mail Notifications' ,
+                    application: new Notifications(instr_name) ,
+                    html: 'View and manage push notifications: who will get an event and what kind of events (new shift created, data updated, etc.)'
                 }
             ]
         }) ;
@@ -100,10 +99,6 @@ $(function() {
             {   name: 'Reports' ,
                 application: new Reports4all() ,
                 html_container: 'shift-reports-all'
-            } ,
-            {   name: 'Analytics' ,
-                application: new Analytics4all() ,
-                html_container: 'shift-analytics-all'
             } ,
             {   name: 'History' ,
                 application: new History() ,
@@ -117,10 +112,6 @@ $(function() {
             {   name: 'Access Control' ,
                 application: new Access() ,
                 html: 'Access control management to assign priviles to individual users, groups, etc.'
-            } ,
-            {   name: 'E-mail Notifications' ,
-                application: new Notifications() ,
-                html: 'View and manage push notifications: who will get an event and what kind of events (new shift created, data updated, etc.)'
             } ,
             {   name: 'Rules' ,
                 application: new Rules() ,
@@ -161,38 +152,98 @@ $(function() {
           <!-- Controls for selecting shifts for display and updating the list of
             -- the selected shifts. -->
 
-          <div id="shifts-search-controls" style="float:left;" >
-            <div>
-              <table><tbody>
-                <tr>
-                  <td><b>Range:</b></td>
-                  <td><select name="range" style="padding:1px;">
-                        <option value="week"  >Last 7 days</option>
-                        <option value="month" >Last month</option>
-                        <option value="range" >Specific range</option>
-                      </select></td>
-                  <td><div style="width:20px;"></div>&nbsp;</td>
-                  <td><input type="text" size=6 name="begin" disabled="disabled" title="specify the first day of the range (optional)" />
-                      <b>&mdash;</b>
-                      <input type="text" size=6 name="end"  disabled="disabled" title="specify the last day of the range (optional)" /></td>
-                  <td><div style="width:20px;">&nbsp;</div></td>
-                  <td><button name="reset"  title="reset the search form to the default state">Reset</button></td>
-                </tr>
-              </tbody></table>
+          <div id="shifts-search-controls"  style="float:left;" >
+
+            <div class="shifts-search-filters" >
+
+              <div class="shifts-search-filter-group" >
+                <div class="header" >Time range</div>
+                <div class="cell-1" >
+                  <select class="filter" name="range" style="padding:1px;">
+                    <option value="week"  >Last 7 days</option>
+                    <option value="month" >Last month</option>
+                    <option value="range" >Specific range</option>
+                  </select>
+                </div>
+                <div class="cell-2" >
+                  <input class="filter" type="text" size=6 name="begin" disabled="disabled" title="specify the first day of the range (optional)" />
+                  <input class="filter" type="text" size=6 name="end"  disabled="disabled" title="specify the last day of the range (optional)" />
+                </div>
+                <div class="terminator" ></div>
+              </div>
+
+              <div class="shifts-search-filter-group" >
+                <div class="header" >Stopper out</div>
+                <div class="cell-2">
+                  <select class="filter" name="stopper" style="padding:1px;">
+                    <option value=""  ></option>
+                    <option value="0" >&gt; 0 %</option>
+                    <option value="1" >&gt; 1 %</option>
+                    <option value="2" >&gt; 2 %</option>
+                    <option value="3" >&gt; 3 %</option>
+                    <option value="4" >&gt; 4 %</option>
+                    <option value="5" >&gt; 5 %</option>
+                  </select>
+                </div>
+                <div class="header-1">Door open</div>
+                <div class="cell-2" >
+                  <select class="filter" name="door" style="padding:1px;">
+                    <option value="" ></option>
+                    <option value="100" >&lt; 100 %</option>
+                    <option value="99"  >&lt; 99 %</option>
+                    <option value="98"  >&lt; 98 %</option>
+                    <option value="97"  >&lt; 97 %</option>
+                    <option value="96"  >&lt; 96 %</option>
+                    <option value="95"  >&lt; 95 %</option>
+                  </select>
+                </div>
+                <div class="header-1" >LCLS beam</div>
+                <div class="cell-2">
+                  <select class="filter"t name="lcls" style="padding:1px;">
+                    <option value=""  ></option>
+                    <option value="0" >&gt; 0 %</option>
+                    <option value="1" >&gt; 1 %</option>
+                    <option value="2" >&gt; 2 %</option>
+                    <option value="3" >&gt; 3 %</option>
+                    <option value="4" >&gt; 4 %</option>
+                    <option value="5" >&gt; 5 %</option>
+                  </select>
+                </div>
+                <div class="header-1">Data taking</div>
+                <div class="cell-2" >
+                  <select class="filter" name="daq" style="padding:1px;">
+                    <option value=""  ></option>
+                    <option value="0" >&gt; 0 %</option>
+                    <option value="1" >&gt; 1 %</option>
+                    <option value="2" >&gt; 2 %</option>
+                    <option value="3" >&gt; 3 %</option>
+                    <option value="4" >&gt; 4 %</option>
+                    <option value="5" >&gt; 5 %</option>
+                  </select>
+                </div>
+                <div class="terminator" ></div>
+              </div>
+
+              <div class="shifts-search-filter-group" >
+                <div class="header" >Shift types</div>
+                <div class="cell-2">
+                  <div class="cell-3" ><input class="filter type" type="checkbox" checked="checked" name="USER"     title="if enabled it will include shifts of this type" /></div><div class="cell-4">USER</div>
+                  <div class="cell-3" ><input class="filter type" type="checkbox" checked="checked" name="MD"       title="if enabled it will include shifts of this type" /></div><div class="cell-4">MD</div>
+                  <div class="cell-3" ><input class="filter type" type="checkbox" checked="checked" name="IN-HOUSE" title="if enabled it will include shifts of this type" /></div><div class="cell-4">IN-HOUSE</div>
+                </div>
+                <div class="terminator" ></div>
+              </div>
+
             </div>
-            <div>
-              <table><tbody>
-                <tr>
-                  <td><b>Display all shifts:</b></td>
-                  <td><div style="width:20px;"></div>&nbsp;</td>
-                  <td><input type="checkbox" name="display-all" title="if enabled it will also reveal empty shifts for periods when no beam or users activities detected in the hutch " /></td>
-                </tr>
-              </tbody></table>
+            <div class="shifts-search-buttons" >
+              <button name="reset"  title="reset the search form to the default state">RESET</button>
             </div>
+            <div class="shifts-search-filter-terminator" ></div>
           </div>
+
 <?php if ($instr2editor[$instr_name]) { ?>
-          <div id="new-shift-controls" style="float:left; margin-left:60px; padding-top:5px;">
-            <button name="new-shift" style="font-weight:bold;" title="open a dialog for creating a new shift" >Create New Shift</button>
+          <div id="new-shift-controls" style="float:left; margin-left:10px;">
+            <button name="new-shift" title="open a dialog for creating a new shift" >CREATE NEW SHIFT</button>
             <div id="new-shift-con" class="new-shift-hdn" style="background-color:#f0f0f0; margin-top:5px; padding:1px 10px 5px 10px; border-radius:5px;" >
               <div style="max-width:460px;">
                 <p>Note that shifts are usually created automatically based on rules defined
@@ -204,6 +255,15 @@ $(function() {
               </div>
               <div style="float:left;">
                 <table style="font-size:90%;"><tbody>
+                  <tr>
+                    <td class="shift-grid-hdr " valign="center" >Type:</td>
+                    <td class="shift-grid-val " valign="center" >
+                      <select name="type" >
+                        <option value="USER"     >USER</option>
+                        <option value="MD"       >MD</option>
+                        <option value="IN-HOUSE" >IN-HOUSE</option>
+                      </select></td>
+                  </tr>
                   <tr>
                     <td class="shift-grid-hdr " valign="center" >Begin:</td>
                     <td class="shift-grid-val " valign="center" >
@@ -221,8 +281,8 @@ $(function() {
                 </tbody></table>
               </div>
               <div style="float:left; margin-left:20px; margin-top:40px; padding-top:5px;">
-                <button name="save"   title="submit modifications and open the editing dialog for the new shift">Save</button>
-                <button name="cancel" title="discard modifications and close this dialog">Cancel</button>
+                <button name="save"   title="submit modifications and open the editing dialog for the new shift">SAVE</button>
+                <button name="cancel" title="discard modifications and close this dialog">CANCEL</button>
               </div>
               <div style="clear:both;"></div>
             </div>
@@ -234,45 +294,9 @@ $(function() {
 
           <!-- The shifts display -->
 
-          <div id="shifts-search-display">
+          <div id="shifts-search-display"> </div>
 
-            <!-- Table header -->
-            <!--
-            <div id="shifts-search-header">
-              <div style="float:left; margin-left: 0px;                                 width: 20px;" ><div  class="shift-toggler"  >&nbsp;  </div></div>
-              <div style="float:left; margin-left:10px; text-align: right;              width: 80px;" ><span class="shift-table-hdr">Shift   </span></div>
-              <div style="float:left; margin-left:20px;                                 width: 40px;" ><span class="shift-table-hdr">begin   </span></div>
-              <div style="float:left; margin-left:10px;                                 width: 40px;" ><span class="shift-table-hdr">end     </span></div>
-              <div style="float:left; margin-left:20px; border-right:1px solid #000000; width: 50px;" ><span class="shift-table-hdr">&Delta;t</span></div>
-              <div style="float:left; margin-left:10px;                                 width: 50px;" ><span class="shift-table-hdr">Stopper </span></div>
-              <div style="float:left; margin-left:10px; border-right:1px solid #000000; width: 40px;" ><span class="shift-table-hdr">Door    </span></div>
-              <div style="float:left; margin-left:15px;                                 width: 40px;" ><span class="shift-table-hdr">FEL     </span></div>
-              <div style="float:left; margin-left: 5px;                                 width: 40px;" ><span class="shift-table-hdr">BMLN    </span></div>
-              <div style="float:left; margin-left: 5px;                                 width: 40px;" ><span class="shift-table-hdr">CTRL    </span></div>
-              <div style="float:left; margin-left: 5px;                                 width: 40px;" ><span class="shift-table-hdr">DAQ     </span></div>
-              <div style="float:left; margin-left: 5px;                                 width: 40px;" ><span class="shift-table-hdr">LASR    </span></div>
-              <div style="float:left; margin-left: 5px;                                 width: 40px;" ><span class="shift-table-hdr">TIME    </span></div>
-              <div style="float:left; margin-left: 5px;                                 width: 40px;" ><span class="shift-table-hdr">HALL    </span></div>
-              <div style="float:left; margin-left: 5px;                                 width: 50px;" ><span class="shift-table-hdr">OTHR    </span></div>
-              <div style="float:left; margin-left: 5px; padding-left: 20px; border-left:1px solid #000000;  width: 50px;" ><span class="shift-table-hdr">Editor  </span></div>
-              <div style="float:left; margin-left:10px;                                 width:140px;" ><span class="shift-table-hdr">Modified</span></div>
-              <div style="clear:both;"></div>
-            </div>
-            -->
-            <!-- Table body is loaded dynamically by the application -->
-            <!--
-            <div id="shifts-search-list">
-              <div style="color:maroon; margin-top:10px;">
-                Use the search form to find shifts...
-              </div>
-            </div>
-            -->
-          </div>
         </div>
-      </div>
-
-      <div id="shift-analytics-<?php echo $instr_name ; ?>" style="display:none">
-        Shift analytics for <?php echo $instr_name ; ?>
       </div>
 
       <div id="shift-history-<?php echo $instr_name ; ?>" style="display:none">
@@ -356,80 +380,118 @@ $(function() {
           <!-- Controls for selecting shifts for display and updating the list of
             -- the selected shifts. -->
 
-          <div id="shifts-search-controls" style="float:left;" >
-            <div>
-              <table><tbody>
-                <tr>
-                  <td><b>Range:</b></td>
-                  <td><select name="range" style="padding:1px;">
-                        <option value="week"  >Last 7 days</option>
-                        <option value="month" >Last month</option>
-                        <option value="range" >Specific range</option>
-                      </select></td>
-                  <td><div style="width:20px;"></div>&nbsp;</td>
-                  <td><input type="text" size=6 name="begin" disabled="disabled" title="specify the first day of the range (optional)" />
-                      <b>&mdash;</b>
-                      <input type="text" size=6 name="end"  disabled="disabled" title="specify the last day of the range (optional)" /></td>
-                  <td><div style="width:20px;">&nbsp;</div></td>
-                  <td><button name="reset"  title="reset the search form to the default state">Reset</button></td>
-                </tr>
-              </tbody></table>
+          <div id="shifts-search-controls" >
+
+            <div class="shifts-search-filters" >
+
+              <div class="shifts-search-filter-group" >
+                <div class="header" >Time range</div>
+                <div class="cell-1" >
+                  <select class="filter" name="range" style="padding:1px;">
+                    <option value="week"  >Last 7 days</option>
+                    <option value="month" >Last month</option>
+                    <option value="range" >Specific range</option>
+                  </select>
+                </div>
+                <div class="cell-2" >
+                  <input class="filter" type="text" size=6 name="begin" disabled="disabled" title="specify the first day of the range (optional)" />
+                  <input class="filter" type="text" size=6 name="end"  disabled="disabled" title="specify the last day of the range (optional)" />
+                </div>
+                <div class="terminator" ></div>
+              </div>
+
+              <div class="shifts-search-filter-group" >
+                <div class="header" >Stopper out</div>
+                <div class="cell-2">
+                  <select class="filter" name="stopper" style="padding:1px;">
+                    <option value=""  ></option>
+                    <option value="0" >&gt; 0 %</option>
+                    <option value="1" >&gt; 1 %</option>
+                    <option value="2" >&gt; 2 %</option>
+                    <option value="3" >&gt; 3 %</option>
+                    <option value="4" >&gt; 4 %</option>
+                    <option value="5" >&gt; 5 %</option>
+                  </select>
+                </div>
+                <div class="header-1">Door open</div>
+                <div class="cell-2" >
+                  <select class="filter" name="door" style="padding:1px;">
+                    <option value="" ></option>
+                    <option value="100" >&lt; 100 %</option>
+                    <option value="99"  >&lt; 99 %</option>
+                    <option value="98"  >&lt; 98 %</option>
+                    <option value="97"  >&lt; 97 %</option>
+                    <option value="96"  >&lt; 96 %</option>
+                    <option value="95"  >&lt; 95 %</option>
+                  </select>
+                </div>
+                <div class="header-1" >LCLS beam</div>
+                <div class="cell-2">
+                  <select class="filter"t name="lcls" style="padding:1px;">
+                    <option value=""  ></option>
+                    <option value="0" >&gt; 0 %</option>
+                    <option value="1" >&gt; 1 %</option>
+                    <option value="2" >&gt; 2 %</option>
+                    <option value="3" >&gt; 3 %</option>
+                    <option value="4" >&gt; 4 %</option>
+                    <option value="5" >&gt; 5 %</option>
+                  </select>
+                </div>
+                <div class="header-1">Data taking</div>
+                <div class="cell-2" >
+                  <select class="filter" name="daq" style="padding:1px;">
+                    <option value=""  ></option>
+                    <option value="0" >&gt; 0 %</option>
+                    <option value="1" >&gt; 1 %</option>
+                    <option value="2" >&gt; 2 %</option>
+                    <option value="3" >&gt; 3 %</option>
+                    <option value="4" >&gt; 4 %</option>
+                    <option value="5" >&gt; 5 %</option>
+                  </select>
+                </div>
+                <div class="terminator" ></div>
+              </div>
+
+              <div class="shifts-search-filter-group" >
+                <div class="header" >Instruments</div>
+                <div class="cell-2">
+                  <div class="cell-3" ><input class="filter instrument" type="checkbox" checked="checked" name="AMO" title="if enabled it will include shifts from the instrument " /></div><div class="cell-4">AMO</div>
+                  <div class="cell-3" ><input class="filter instrument" type="checkbox" checked="checked" name="SXR" title="if enabled it will include shifts from the instrument " /></div><div class="cell-4">SXR</div>
+                  <div class="cell-3" ><input class="filter instrument" type="checkbox" checked="checked" name="XPP" title="if enabled it will include shifts from the instrument " /></div><div class="cell-4">XPP</div>
+                  <div class="cell-3" ><input class="filter instrument" type="checkbox" checked="checked" name="XCS" title="if enabled it will include shifts from the instrument " /></div><div class="cell-4">XCS</div>
+                  <div class="cell-3" ><input class="filter instrument" type="checkbox" checked="checked" name="CXI" title="if enabled it will include shifts from the instrument " /></div><div class="cell-4">CXI</div>
+                  <div class="cell-3" ><input class="filter instrument" type="checkbox" checked="checked" name="MEC" title="if enabled it will include shifts from the instrument " /></div><div class="cell-4">MEC</div>
+                  <div class="terminator" ></div>
+                </div>
+                <div class="terminator" ></div>
+              </div>
+
+              <div class="shifts-search-filter-group" >
+                <div class="header" >Shift types</div>
+                <div class="cell-2">
+                  <div class="cell-3" ><input class="filter type" type="checkbox" checked="checked" name="USER"     title="if enabled it will include shifts of this type" /></div><div class="cell-4">USER</div>
+                  <div class="cell-3" ><input class="filter type" type="checkbox" checked="checked" name="MD"       title="if enabled it will include shifts of this type" /></div><div class="cell-4">MD</div>
+                  <div class="cell-3" ><input class="filter type" type="checkbox" checked="checked" name="IN-HOUSE" title="if enabled it will include shifts of this type" /></div><div class="cell-4">IN-HOUSE</div>
+                </div>
+                <div class="terminator" ></div>
+              </div>
+
             </div>
-            <div>
-              <table><tbody>
-                <tr>
-                  <td><b>Display all shifts:</b></td>
-                  <td><div style="width:20px;"></div>&nbsp;</td>
-                  <td><input type="checkbox" name="display-all" title="if enabled it will also reveal empty shifts for periods when no beam or users activities detected in the hutch " /></td>
-                </tr>
-              </tbody></table>
+            <div class="shifts-search-buttons" >
+              <button name="reset"  title="reset the search form to the default state">RESET</button>
+              <button name="search" title="search again">SEARCH AGAIN</button>
             </div>
+            <div class="shifts-search-filter-terminator" ></div>
           </div>
-          <div style="clear:both;"></div>
+
           <div style="float:right;" id="shifts-search-info">Searching...</div>
           <div style="clear:both;"></div>
 
           <!-- The shifts display -->
 
-          <div id="shifts-search-display">
+          <div id="shifts-search-display"></div>
 
-            <!-- Table header -->
-
-            <div id="shifts-search-header">
-              <div style="float:left; margin-left: 0px;                                 width: 20px;" ><div  class="shift-toggler"  >&nbsp;  </div></div>
-              <div style="float:left; margin-left:10px; text-align: right;              width: 80px;" ><span class="shift-table-hdr">Shift   </span></div>
-              <div style="float:left; margin-left:20px;                                 width: 40px;" ><span class="shift-table-hdr">begin   </span></div>
-              <div style="float:left; margin-left:10px;                                 width: 40px;" ><span class="shift-table-hdr">end     </span></div>
-              <div style="float:left; margin-left:20px; border-right:1px solid #000000; width: 50px;" ><span class="shift-table-hdr">&Delta;t</span></div>
-              <div style="float:left; margin-left:10px;                                 width: 70px;" ><span class="shift-table-hdr">Stopper </span></div>
-              <div style="float:left; margin-left:10px; border-right:1px solid #000000; width: 50px;" ><span class="shift-table-hdr">Door    </span></div>
-              <div style="float:left; margin-left:15px;                                 width: 40px;" ><span class="shift-table-hdr">FEL     </span></div>
-              <div style="float:left; margin-left: 5px;                                 width: 40px;" ><span class="shift-table-hdr">BMLN    </span></div>
-              <div style="float:left; margin-left: 5px;                                 width: 40px;" ><span class="shift-table-hdr">CTRL    </span></div>
-              <div style="float:left; margin-left: 5px;                                 width: 40px;" ><span class="shift-table-hdr">DAQ     </span></div>
-              <div style="float:left; margin-left: 5px;                                 width: 40px;" ><span class="shift-table-hdr">LASR    </span></div>
-              <div style="float:left; margin-left: 5px;                                 width: 40px;" ><span class="shift-table-hdr">TIME    </span></div>
-              <div style="float:left; margin-left: 5px;                                 width: 40px;" ><span class="shift-table-hdr">HALL    </span></div>
-              <div style="float:left; margin-left: 5px;                                 width: 50px;" ><span class="shift-table-hdr">OTHR    </span></div>
-              <div style="float:left; margin-left: 5px; padding-left: 20px; border-left:1px solid #000000;  width: 50px;" ><span class="shift-table-hdr">Editor  </span></div>
-              <div style="float:left; margin-left:10px;                                 width:140px;" ><span class="shift-table-hdr">Modified</span></div>
-              <div style="clear:both;"></div>
-            </div>
-
-            <!-- Table body is loaded dynamically by the application -->
-
-            <div id="shifts-search-list">
-              <div style="color:maroon; margin-top:10px;">
-                Use the search form to find shifts...
-              </div>
-            </div>
-
-          </div>
         </div>
-      </div>
-
-      <div id="shift-analytics-all" style="display:none">
-        Shift analytics across all instruments
       </div>
 
       <div id="shift-history-all" style="display:none">

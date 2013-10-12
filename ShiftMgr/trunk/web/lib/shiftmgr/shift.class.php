@@ -35,6 +35,7 @@ class Shift {
     public function instr_name () { return  strtoupper(trim($this->attr['instr_name'])) ; }
     public function begin_time () { return LusiTime::from64($this->attr['begin_time']) ; }
     public function end_time   () { return LusiTime::from64($this->attr['end_time']) ; }
+    public function type       () { return  strtoupper(trim($this->attr['type'])) ; }
     public function notes      () { return                  $this->attr['notes'] ; }
 
     public function modified_time () {
@@ -47,6 +48,15 @@ class Shift {
         $str = $this->attr['modified_uid'] ;
         if ($str) return strtolower(trim($str)) ;
         return null ;
+    }
+
+    /**
+     * Return the shift duration expressed in minutes
+     *
+     * @return int
+     */
+    public function duration () {
+        return intval(($this->end_time()->sec - $this->begin_time()->sec) / 60) ;
     }
 
     /**
@@ -72,7 +82,7 @@ class Shift {
     /**
      * The number of minutes the hutch door was "secured" during the shift
      * 
-     * TODO: This information is fetched from teh corresponding EPICS PV based
+     * TODO: This information is fetched from the corresponding EPICS PV based
      *       on the shift interval.
      *
      * @return int
@@ -88,6 +98,16 @@ class Shift {
             }
         }
         return $door ;
+    }
+
+    /**
+     * The number of minutes the hutch door was open during the shift
+     *
+     * @return int
+     */
+    public function door_open () {
+        $minutes = $this->duration() - $this->door() ;
+        return $minutes < 0 ? 0 : $minutes ;
     }
 
     // Area evaluations

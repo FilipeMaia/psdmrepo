@@ -4,10 +4,11 @@ require_once 'dataportal/dataportal.inc.php' ;
 require_once 'shiftmgr/shiftmgr.inc.php' ;
 require_once 'lusitime/lusitime.inc.php' ;
 
-use LusiTime\LusiTime ;
+use ShiftMgr\ShiftMgr ;
+use ShiftMgr\Utils ;
 
 /**
- * The Web Service to find shifts based on teh specified criteria:
+ * The Web Service to find shifts based on the specified criteria:
  * 
  * 1. Exact search
  * 
@@ -15,8 +16,11 @@ use LusiTime\LusiTime ;
  * 
  * 2. Range search:
  * 
- *    <instr_name> <range> [<all>] [<begin>] [<end>]
+ *    <range> [<begin>] [<end>] [<stopper>] [<door>] [<lcls>] [<daq>] [<instruments>] [<types>] [<group_by_day>]
  *
+ * Note that if the <group_by_day> flag is found among the parameters
+ * of the request then the service will return a different object groupping
+ * shifts by days (when they start).
  */
 \DataPortal\ServiceJSON::run_handler('GET', function($SVC) {
 
@@ -28,48 +32,66 @@ use LusiTime\LusiTime ;
     if ($shift_id) {
         $shift = $SVC->shiftmgr()->find_shift_by_id($shift_id) ;
         if (!$shift) $SVC->abort("no shift found for ID {$shift_id}") ;
-        $SVC->finish(array('shifts' => \ShiftMgr\Utils::shifts2array(array($shift)))) ;
+        $SVC->finish(array('shifts' => Utils::shifts2array(array($shift)))) ;
     }
     
     // ----------------------------
     //   Now try the range search
     // ----------------------------
 
-    $instr_name = $SVC->required_str ('instr_name') ;
-    $range      = $SVC->required_str ('range') ;
-    $all        = $SVC->optional_bool('all', true) ;
-    $begin_time = $SVC->optional_time('begin', LusiTime::parse('2013-07-01 00:00:00')) ;
-    $end_time   = $SVC->optional_time('end',   null) ;
+    $group_by_day = $SVC->optional_flag('group_by_day') ;
 
-    switch ($range) {
-        case 'week' :
-            $begin_time = LusiTime::minus_week() ;
-            $end_time   = null ;
-            break ;
-        case 'month' :
-            $begin_time = LusiTime::minus_month() ;
-            $end_time   = null ;
-            break ;
-        case 'range' :
-            if (!is_null($end_time) && !$begin_time->less($end_time))
-                $end_time = LusiTime::parse($begin_time->in24hours()->toStringDay().' 00:00:00') ;
-            break ;
-        default :
-            $SVC->abort('unknown range type requested from the shifts service') ;
+    $shifts = Utils::query_shifts($SVC) ;
+
+    if ($group_by_day) {
+
+        // Shifts groupped by day across all requsted instruments (if any)
+
+        $days2shifts = array() ;
+        foreach ($shifts as $shift) {
+
+            $begin_day = $shift->begin_time()->toStringDay() ;
+
+            if (!array_key_exists($begin_day, $days2shifts)) {
+
+                $area_problems = array() ;
+                foreach (ShiftMgr::$area_names as $name)
+                    $area_problems[$name] = 0 ;
+
+                $days2shifts[$begin_day] = array (
+                    'begin'  => array (
+                        'day' => $begin_day ) ,
+                    'num'    => 0 ,
+                    'area_problems' => $area_problems ,
+                    'shifts' => array()
+                ) ;
+            }
+
+            $days2shifts[$begin_day]['num'] = $days2shifts[$begin_day]['num'] + 1 ;
+            foreach ($shift->areas() as $area)
+                if ($area->problems())
+                    $days2shifts[$begin_day]['area_problems'][$area->name()] += 1 ;
+            array_push (
+                $days2shifts[$begin_day]['shifts'] ,
+                Utils::shift2array($shift)
+            ) ;
+        }
+        $days_keys = array_keys($days2shifts) ;
+        sort($days_keys) ;
+        rsort($days_keys) ;
+
+        $days = array() ;
+        foreach ($days_keys as $key)
+            array_push ($days, $days2shifts[$key]) ;
+
+        $SVC->finish(array('days' => Utils::days2array($days))) ;
+
+    } else {
+        
+        // Shifts sorted by the begin time
+
+        $SVC->finish(array('shifts' => Utils::shifts2array($shifts))) ;
     }
-
-    $SVC->shiftmgr()->precreate_shifts_if_needed($instr_name, $begin_time, $end_time) ;
-
-    $all_shifts = $SVC->shiftmgr()->shifts($instr_name, $begin_time, $end_time) ;
-    $shifts = array() ;
-    if ($all)
-        $shifts = $all_shifts ;
-    else
-        foreach ($all_shifts as $shift)
-            if ($shift->stopper() || $shift->door())
-                array_push ($shifts, $shift) ;
-
-    $SVC->finish(array('shifts' => \ShiftMgr\Utils::shifts2array($shifts))) ;
 });
 
 ?>

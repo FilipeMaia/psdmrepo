@@ -31,6 +31,7 @@
   font-weight:bold;
 }
 
+.shift-type     { font-weight: bold; }
 .shift-day      {}
 .shift-begin    { font-weight: bold; }
 .shift-end      { font-weight: bold; }
@@ -40,6 +41,8 @@
 .shift-area     {}
 .shift-editor   {}
 .shift-modified {}
+
+.all-shifts-day { font-weight: bold; }
 
 div.status-red {
   margin-top: 3px;
@@ -94,6 +97,15 @@ td.shift-table-tot {
   padding-left: 8px;
   background-color: #e0e0e0;
   font-size: 12px;
+  border-bottom: 1px solid #a0a0a0;
+  border-right: 1px solid #a0a0a0;
+}
+td.shift-table-hdr-nodecor,
+td.shift-table-tot-nodecor {
+  font-weight: bold;
+  padding: 4px;
+  padding-left: 8px;
+  font-size: 12px;
 }
 td.shift-table-val-first  {
   padding: 4px;
@@ -111,6 +123,11 @@ td.shift-table-val-hdr  {
   border-right: solid 1px #e0e0e0;
   font-weight: bold;
   font-size: 11px;
+}
+td.shift-table-val-nodecor  {
+  padding: 4px;
+  padding-left: 8px;
+  font-size: 12px;
 }
 div.notes {
   width: 520px;
@@ -182,8 +199,51 @@ textarea.annotated[data]:hover:after {
 #shifts-history-display {
   margin-top: 10px;
 }
-/*
-.shift-history-con {
-  padding: 10px 5px 5px 5px;
+.shifts-search-filters {
+  float: left;
+  margin-right: 20px;
 }
-*/
+.shifts-search-buttons {
+  float: left;
+  margin-top: 0px;
+}
+.shifts-search-filter-terminator {
+  clear: both;
+}
+.shifts-search-filter-group {
+  height: 32px;
+}
+.shifts-search-filter-group > .header  {
+  float: left;
+  width: 90px;
+  padding-top: 6px;
+  font-size: 12px;
+  font-weight: bold;
+}
+.shifts-search-filter-group > .header-1  {
+  float: left;
+  margin-right: 10px;
+  padding-top: 6px;
+  font-size: 12px;
+  font-weight: bold;
+}
+.shifts-search-filter-group > .cell-1 {
+  float: left;
+  margin-right: 20px;
+}
+.shifts-search-filter-group > .cell-2 {
+  float: left;
+  margin-right: 20px;
+}
+.shifts-search-filter-group > .cell-2 > .cell-3 {
+  float: left;
+  padding-top: 4px;
+}
+.shifts-search-filter-group > .cell-2 > .cell-4 {
+  float: left;
+  margin-right: 30px;
+  padding-top: 6px;
+}
+.shifts-search-filter-group > .terminator {
+  clear: both;
+}

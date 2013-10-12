@@ -12,6 +12,7 @@ function ShiftTitle(data) {
     this.html = function (id) {
         var html = '' ;
         switch(id) {
+            case 'type'     : html = '<div class="shift-type">'     + this.data.type      + '</div>' ; break ;
             case 'shift'    : html = '<div class="shift-day">'      + this.data.begin.day + '</div>' ; break ;
             case 'begin'    : html = '<div class="shift-begin">'    + this.data.begin.hm  + '</div>' ; break ;
             case 'end'      : html = '<div class="shift-end">'      + this.data.end.hm    + '</div>' ; break ;
@@ -33,10 +34,25 @@ function ShiftTitle(data) {
             case 'LASR'     :
             case 'TIME'     :
             case 'HALL'     :
-            case 'OTHR'     : html = '<div class="shift-area'+id+'" ><div class="status-'+(this.data.area[id].problems ?'red':'neutral')+'"></div></div>' ; break ;
+            case 'OTHR'     : html = '<div class="shift-area" ><div class="status-'+(this.data.area[id].problems ?'red':'neutral')+'"></div></div>' ; break ;
 
             case 'editor'   : html = '<div class="shift-editor"   >&nbsp;' + this.data.editor   + '</div>' ; break ;
             case 'modified' : html = '<div class="shift-modified" >&nbsp;' + this.data.modified + '</div>' ; break ;
+
+            case 'alerts'   :
+                var alerts = '';
+                if (!this.data.editor) alerts = (alerts ? ', ' : '') + 'no input' ;
+                for (var i in Definitions.AreaNames) {
+                    var area_name = Definitions.AreaNames[i].key ;
+                    var area = this.data.area[area_name] ;
+                    if (area.downtime_min && !area.comments) alerts += (alerts ? ', ' : '') + 'areas' ;
+                }
+                if ((this.data.allocation['other'].duration_min > Definitions.MinOther2Comment) && !this.data.allocation['other'].comments) alerts += (alerts ? ', ' : '') + 'allocations' ;
+                if (alerts) html =
+'<div style="float:left;"><span class="ui-icon ui-icon-alert"></span></div>' +
+'<div style="float:left;"><span style="color:maroon;">'+alerts+'</span></div>' +
+'<div style="clear:both;"></div>' ;
+                break ;
         }
         return html ;
     } ;
@@ -73,25 +89,6 @@ function ShiftBody (parent, data, can_edit) {
     // Static variables & functions
     // ----------------------------
 
-    var area_names = [
-        {key: 'FEL' , name: 'FEL',        description: 'To report problems with the machine, operations, FEE, etc.'} ,
-        {key: 'BMLN', name: 'Beamline',   description: 'To report problems with the photon beamline instrument\n including HPS and PPS problems'} ,
-        {key: 'CTRL', name: 'Controls',   description: 'To report problems specific to controls like motors, cameras,\n MPS, laser controls, etc. '} ,
-        {key: 'DAQ' , name: 'DAQ',        description: 'To report DAQ computer, data transfer and device problems'} ,
-        {key: 'LASR', name: 'Laser',      description: 'To report problems with the laser, (not laser controls)'} ,
-        {key: 'TIME', name: 'Timing',     description: 'To report problems with the timing system including: EVR triggers,\n RF, LBL Timing System, fstiming interface (laser related problems\n should be reported under laser)'} ,
-        {key: 'HALL', name: 'Hutch/Hall', description: 'To report problem with the hutch like: PCW, temperature, setup space,\n common stock, etc.  Note that this could be confused with the overall\n name of this section of the form.'} ,
-        {key: 'OTHR', name: 'Other',      description: 'Any other areas that might have problems can be addressed'}
-    ] ;
-
-    var allocation_names = [
-        {key: 'tuning'   , name: 'Tuning',       description: 'This is machine tuning time'} ,
-        {key: 'alignment', name: 'Alignment',    description: 'This is time spent aligning, calibrating,  turning the photon\n instrumentation'} ,
-        {key: 'daq',       name: 'Data Taking',  description: 'This is time spent taking data that can be used in publication'} ,
-        {key: 'access',    name: 'Hutch Access', description: 'This is time spent in the hutch for sample changes, laser tuning,\n trouble shooting and the like'} ,
-        {key: 'other',     name: 'Other',        description: 'This is any other circumstance: machine downtime, extended\n specific activities, etc. This will be atomatically calculated\n to absorb the remaining time left of the shift.'}
-    ] ;
-
     // ------------------------------------------------
     // Override event handler defined in thw base class
     // ------------------------------------------------
@@ -123,6 +120,20 @@ function ShiftBody (parent, data, can_edit) {
 
 '  <div style="float:left;">' +
 '    <table style="font-size:90%;"><tbody>' +
+'      <tr class="shift-active-row" >' +
+'        <td class="annotated shift-grid-hdr " valign="center" data="This is the type of the shift" >Type:</td>' +
+'        <td class="shift-grid-val " valign="center" >' +
+'          <div class="viewer" >' +
+'            <span name="type" style="font-weight: bold;" ></span>' +
+'          </div>' +
+'          <div class="editor" >' +
+'            <select name="type" >' +
+'              <option value="USER"     >USER</option>' +
+'              <option value="MD"       >MD</option>' +
+'              <option value="IN-HOUSE" >IN-HOUSE</option>' +
+'            </select>' +
+'          </div></td>' +
+'      </tr>' +
 '      <tr class="shift-active-row" >' +
 '        <td class="annotated shift-grid-hdr " valign="center" data="This is the nominal start data & time of the shift" >Begin:</td>' +
 '        <td class="shift-grid-val " valign="center" >' +
@@ -211,13 +222,13 @@ function ShiftBody (parent, data, can_edit) {
 '            <td class="shift-table-hdr " >Comments</td>' +
 '          </tr>' ;
         var first = true ;
-        for (var i in area_names) {
+        for (var i in Definitions.AreaNames) {
             var classes = 'annotated shift-table-val'+(first?'-first':'') ;
             first = false ;
-            var area_name = area_names[i].key ;
+            var area_name = Definitions.AreaNames[i].key ;
             html +=
 '          <tr class="shift-active-row" >' +
-'            <td class="'+classes+' shift-table-val-hdr " valign="top" data="'+area_names[i].description+'" >'+area_names[i].name+'</td>' +
+'            <td class="'+classes+' shift-table-val-hdr " valign="top" data="'+Definitions.AreaNames[i].description+'" >'+Definitions.AreaNames[i].name+'</td>' +
 '            <td class="'+classes+' " valign="top">' +
 '              <div   class="viewer flag" name="'+area_name+'" /></div>' +
 '              <input class="editor flag" name="'+area_name+'" type="checkbox" /></td>' +
@@ -232,6 +243,8 @@ function ShiftBody (parent, data, can_edit) {
 '            <td class="'+classes+' ">' +
 '              <div      class="viewer comment" name="'+area_name+'" ></div>' +
 '              <textarea class="annotated editor comment" name="'+area_name+'" rows="2" cols=48 data="explain the problem" ></textarea></td>' +
+'            <td class="shift-table-val-nodecor" >' +
+'              <div class="alerts" name="'+area_name+'" ></div>' +
 '          </tr>' ;
         }
         var time_allocation_title =
@@ -257,13 +270,13 @@ function ShiftBody (parent, data, can_edit) {
 '            <td class="shift-table-hdr " >Comments</td>' +
 '          </tr>' ;
         first = true ;
-        for (var i in this.allocation_names) {
+        for (var i in Definitions.AllocationNames) {
             var classes = 'annotated shift-table-val'+(first?'-first':'') ;
             first = false ;
-            var allocation_name = this.allocation_names[i].key ;
+            var allocation_name = Definitions.AllocationNames[i].key ;
             html +=
 '          <tr class="shift-active-row" >' +
-'            <td class="'+classes+' shift-table-val-hdr " valign="top" data="'+this.allocation_names[i].description+'" >'+this.allocation_names[i].name+'</td>' +
+'            <td class="'+classes+' shift-table-val-hdr " valign="top" data="'+Definitions.AllocationNames[i].description+'" >'+Definitions.AllocationNames[i].name+'</td>' +
 '            <td class="'+classes+' " valign="top">' ;
             if (allocation_name === 'other') {
                 html +=
@@ -285,6 +298,8 @@ function ShiftBody (parent, data, can_edit) {
 '            <td class="'+classes+' ">' +
 '              <div      class="viewer comment" name="'+allocation_name+'" ></div>' +
 '              <textarea class="annotated editor comment" name="'+allocation_name+'" rows="3" cols=48 data="explain the time allocation" ></textarea></td>' +
+'            <td class="shift-table-val-nodecor" >' +
+'              <div class="alerts" name="'+allocation_name+'" ></div>' +
 '          </tr>' ;
         }
         html +=
@@ -315,6 +330,10 @@ function ShiftBody (parent, data, can_edit) {
         this.shift_register_handlers() ;
         this.shift_view() ;
     } ;
+    this.alert_explain = function () {
+        var html = '<div style="float:left;"><span class="ui-icon ui-icon-alert"></span></div><div style="float:left;"><span style="color:maroon;">Please, explain</span></div><div style="clear:both;"></div>' ;
+        return html ;
+    } ;
 
     // --------------------
     // Own data and methods
@@ -325,7 +344,9 @@ function ShiftBody (parent, data, can_edit) {
         var shift = this.data ;
         var con = this.container ;
 
-        var begin_day_elem = con.find('input[name="begin-ay"]').datepicker() ;
+        var type_elem = con.find('select[name="type"]') ;
+
+        var begin_day_elem = con.find('input[name="begin-day"]').datepicker() ;
         var begin_h_elem   = con.find('input[name="begin-h"]') ;
         var begin_m_elem   = con.find('input[name="begin-m"]') ;
 
@@ -383,12 +404,10 @@ function ShiftBody (parent, data, can_edit) {
             end_changed() ;
         }) ;
 
-        for (var i in area_names) {
-            var area_name = area_names[i].key ;
+        for (var i in Definitions.AreaNames) {
+            var area_name = Definitions.AreaNames[i].key ;
             con.find('input.flag[name="'+area_name+'"]').change(function () {
-                var area_name = this.name ; // Get area name directly from the element because the one
-                                            // defined in the upper scope is wrong (it will always be
-                                            // from the last iteration of the loop).
+                var area_name = this.name ;
                 var h_elem = con.find('input.hour[name="'+area_name+'"]') ;
                 var m_elem = con.find('input.minute[name="'+area_name+'"]') ;
                 var h = '' ;
@@ -399,31 +418,52 @@ function ShiftBody (parent, data, can_edit) {
                     m = Fwk.zeroPad(downtime_min % 60, 2) ;
                     h_elem.removeAttr('disabled') ;
                     m_elem.removeAttr('disabled') ;
+                    var comment = con.find('textarea.comment[name="'+area_name+'"]').val() ;
+                    con.find('div.alerts[name="'+area_name+'"]').html(downtime_min && !comment ? that.alert_explain() : '') ;
                 } else {
                     h_elem.attr('disabled', 'disabled') ;
                     m_elem.attr('disabled', 'disabled') ;
+                    con.find('div.alerts[name="'+area_name+'"]').html('') ;
                 }
                 h_elem.val(h) ;
                 m_elem.val(m) ;
                 con.find('textarea.comment[name="'+area_name+'"]').val(shift.area[area_name].comments) ;
             }) ;
             con.find('input.hour[name="'+area_name+'"]').change(function () {
+                var area_name = this.name ;
                 var h = parseInt($(this).val()) || 0;
                 if (h <  0) h = 0 ;
                 if (!that.shift_area_total_update(that.shift_duration_min())) h = 0;
                 $(this).val(Fwk.zeroPad(h, 2)) ;
+                var m = parseInt(con.find('input.minute[name="'+area_name+'"]').val()) || 0 ;
+                var downtime_min = 60 * h + m ;
+                var comment = con.find('textarea.comment[name="'+area_name+'"]').val() ;
+                con.find('div.alerts[name="'+area_name+'"]').html(downtime_min && !comment ? that.alert_explain() : '') ;
             }) ;
             con.find('input.minute[name="'+area_name+'"]').change(function () {
+                var area_name = this.name ;
                 var m = parseInt($(this).val()) || 0;
                 if (m > 59) m = 59 ;
                 if (m <  0) m = 0 ;
                 $(this).val(m) ;
                 if (!that.shift_area_total_update(that.shift_duration_min())) m = 0;
                 $(this).val(Fwk.zeroPad(m, 2)) ;
+                var h = parseInt(con.find('input.hour[name="'+area_name+'"]').val()) || 0 ;
+                var downtime_min = 60 * h + m ;
+                var comment = con.find('textarea.comment[name="'+area_name+'"]').val() ;
+                con.find('div.alerts[name="'+area_name+'"]').html(downtime_min && !comment ? that.alert_explain() : '') ;
+            }) ;
+            con.find('textarea.comment[name="'+area_name+'"]').change(function () {
+                var area_name = this.name ;
+                var comment = $(this).val() ;
+                var h = parseInt(con.find('input.hour[name="'+area_name+'"]').val()) || 0 ;
+                var m = parseInt(con.find('input.minute[name="'+area_name+'"]').val()) || 0 ;
+                var downtime_min = 60 * h + m ;
+                con.find('div.alerts[name="'+area_name+'"]').html(downtime_min && !comment ? that.alert_explain() : '') ;
             }) ;
         }
-        for (var i in this.allocation_names) {
-            var allocation_name = this.allocation_names[i].key ;
+        for (var i in Definitions.AllocationNames) {
+            var allocation_name = Definitions.AllocationNames[i].key ;
             if (allocation_name !== 'other') {
                 con.find('input.hour[name="'+allocation_name+'"]').change(function () {
                     var h = parseInt($(this).val()) || 0;
@@ -438,6 +478,14 @@ function ShiftBody (parent, data, can_edit) {
                     if (m <  0) m = 0 ;
                     if (!that.shift_allocation_total_update(that.shift_duration_min())) m = 0 ;
                     $(this).val(Fwk.zeroPad(m, 2)) ;
+                }) ;
+            } else {
+                con.find('textarea.comment[name="'+allocation_name+'"]').change(function () {
+                    var allocation_name = this.name ;
+                    var comment = $(this).val() ;
+                    var hm = con.find('span.hour-minute[name="'+allocation_name+'"]').text().split(':') ;
+                    var m = 60 * parseInt(hm[0]) + parseInt(hm[1]) ;
+                    con.find('div.alerts[name="'+allocation_name+'"]').html((m > Definitions.MinOther2Comment) && !comment ? that.alert_explain() : '') ;
                 }) ;
             }
         }
@@ -464,8 +512,8 @@ function ShiftBody (parent, data, can_edit) {
     this.shift_area_total_update = function(shift_duration_min) {
         var con = this.container ;
         var total_min = 0 ;
-        for (var i in area_names) {
-            var area_name = area_names[i].key ;
+        for (var i in Definitions.AreaNames) {
+            var area_name = Definitions.AreaNames[i].key ;
             var h = parseInt(con.find('input.hour[name="'+area_name+'"]').val() || 0);
             if (h <  0) h = 0 ;
             total_min += h * 60 ;
@@ -485,8 +533,8 @@ function ShiftBody (parent, data, can_edit) {
     this.shift_allocation_total_update = function(shift_duration_min) {
         var con = this.container ;
         var total_min = 0 ;
-        for (var i in this.allocation_names) {
-            var allocation_name = this.allocation_names[i].key ;
+        for (var i in Definitions.AllocationNames) {
+            var allocation_name = Definitions.AllocationNames[i].key ;
             if (allocation_name !== 'other') {
                 var h = parseInt(con.find('input.hour[name="'+allocation_name+'"]').val() || 0);
                 if (h <  0) h = 0 ;
@@ -508,6 +556,7 @@ function ShiftBody (parent, data, can_edit) {
         var other_percent = 100 - percent;
         con.find('span.hour-minute[name="other"]').text(Fwk.zeroPad(Math.floor(other_min / 60), 2)+':'+Fwk.zeroPad(other_min % 60, 2)) ;
         con.find('span.percent[name="other"]').text(other_percent) ;
+        con.find('div.alerts[name="other"]').html((other_min > Definitions.MinOther2Comment) && !con.find('textarea.comment[name="other"]').val() ? this.alert_explain() : '') ;
         return true ;
     } ;
 
@@ -539,6 +588,7 @@ function ShiftBody (parent, data, can_edit) {
         shift.editing = true ;
         var con = this.container ;
 
+        con.find('select[name="type"]').val(shift.type) ;
         con.find('input[name="begin-day"]').datepicker().datepicker('option', 'dateFormat', 'yy-mm-dd').val(shift.begin.day) ;
         con.find('input[name="begin-h"]').val(shift.begin.hour) ;
         con.find('input[name="begin-m"]').val(shift.begin.minute) ;
@@ -547,12 +597,13 @@ function ShiftBody (parent, data, can_edit) {
         con.find('input[name="end-m"]').val(shift.end.minute) ;
         con.find('textarea[name="notes"]').val(shift.notes) ;
 
-        for (var i in area_names) {
-            var area_name = area_names[i].key ;
+        for (var i in Definitions.AreaNames) {
+            var area_name = Definitions.AreaNames[i].key ;
             var h_elem = con.find('input.hour[name="'+area_name+'"]') ;
             var m_elem = con.find('input.minute[name="'+area_name+'"]') ;
             var h = '' ;
             var m = '' ;
+            var comment = shift.area[area_name].comments ;
             if (shift.area[area_name].problems) {
                 con.find('input.flag[name="'+area_name+'"]').attr('checked','checked') ;
                 var downtime_min = shift.area[area_name].downtime_min;
@@ -560,27 +611,33 @@ function ShiftBody (parent, data, can_edit) {
                 m = Fwk.zeroPad(downtime_min % 60, 2) ;
                 h_elem.removeAttr('disabled') ;
                 m_elem.removeAttr('disabled') ;
+                con.find('div.alerts[name="'+area_name+'"]').html(downtime_min && !comment ? this.alert_explain() : '') ;
             } else {
                 con.find('input.flag[name="'+area_name+'"]').removeAttr('checked') ;
                 h_elem.attr('disabled', 'disabled') ;
                 m_elem.attr('disabled', 'disabled') ;
+                con.find('div.alerts[name="'+area_name+'"]').html('') ;
             }
             con.find('input.hour[name="'+area_name+'"]').val(h) ;
             con.find('input.minute[name="'+area_name+'"]').val(m) ;
-            con.find('textarea.comment[name="'+area_name+'"]').val(shift.area[area_name].comments) ;
+            con.find('textarea.comment[name="'+area_name+'"]').val(comment) ;
         }
-        for (var i in this.allocation_names) {
-            var allocation_name = this.allocation_names[i].key ;
+        for (var i in Definitions.AllocationNames) {
+            var allocation_name = Definitions.AllocationNames[i].key ;
             var duration_min = shift.allocation[allocation_name].duration_min ;
             var h = Math.floor(duration_min / 60) ;
             var m = duration_min % 60 ;
             var percent = shift.duration_min ? Math.floor(100 * duration_min / shift.duration_min) : 0;
+            var comment = shift.allocation[allocation_name].comments ;
             if (allocation_name !== 'other') {
                 con.find('input.hour[name="'+allocation_name+'"]').val(Fwk.zeroPad(h, 2)) ;
                 con.find('input.minute[name="'+allocation_name+'"]').val(Fwk.zeroPad(m, 2)) ;
             }
             con.find('span.percent[name="'+allocation_name+'"]').text(percent) ;
-            con.find('textarea.comment[name="'+allocation_name+'"]').val(shift.allocation[allocation_name].comments) ;
+            con.find('textarea.comment[name="'+allocation_name+'"]').val(comment) ;
+            if (allocation_name === 'other') {
+                con.find('div.alerts[name="'+allocation_name+'"]').html((duration_min > Definitions.MinOther2Comment) && !comment ? this.alert_explain() : '') ;
+            }
         }
 
         con.find('button[name="edit"]')  .button('disable') ;
@@ -599,6 +656,7 @@ function ShiftBody (parent, data, can_edit) {
         
         var params = {
             shift_id : shift.id ,
+            type     : con.find('select[name="type"]').val() ,
             notes    : con.find('textarea[name="notes"]').val() 
         } ;
 
@@ -613,8 +671,8 @@ function ShiftBody (parent, data, can_edit) {
         params.end = end_day_elem.val() + ' ' + Fwk.zeroPad(parseInt(end_h_elem.val()), 2) + ':' + Fwk.zeroPad(parseInt(end_m_elem.val()), 2) + ':00' ;
 
         var area = {} ;
-        for (var i in area_names) {
-            var area_name = area_names[i].key ;
+        for (var i in Definitions.AreaNames) {
+            var area_name = Definitions.AreaNames[i].key ;
             var h         = parseInt(con.find('input.hour[name="'+area_name+'"]')  .val()) || 0 ;
             var m         = parseInt(con.find('input.minute[name="'+area_name+'"]').val()) || 0 ;
             area[area_name] = {
@@ -631,8 +689,8 @@ function ShiftBody (parent, data, can_edit) {
                 comments     : con.find('textarea.comment[name="other"]').val()
             }
         } ;
-        for (var i in this.allocation_names) {
-            var allocation_name = this.allocation_names[i].key ;
+        for (var i in Definitions.AllocationNames) {
+            var allocation_name = Definitions.AllocationNames[i].key ;
             var h             = parseInt(con.find('input.hour[name="'+allocation_name+'"]')  .val()) || 0 ;
             var m             = parseInt(con.find('input.minute[name="'+allocation_name+'"]').val()) || 0 ;
             if (allocation_name !== 'other') {
@@ -661,6 +719,7 @@ function ShiftBody (parent, data, can_edit) {
         shift.editing = false ;
         var con = this.container ;
 
+        con.find('span[name="type"]').html(shift.type) ;
         con.find('span[name="begin-day"]').text(shift.begin.day) ;
         con.find('span[name="begin-hm"]').text(Fwk.zeroPad(shift.begin.hour, 2)+':'+Fwk.zeroPad(shift.begin.minute, 2)) ;
         con.find('span[name="end-day"]').text(shift.end.day) ;
@@ -668,30 +727,39 @@ function ShiftBody (parent, data, can_edit) {
         con.find('div[name="notes"]').html('<pre>'+shift.notes+'</pre>') ;
 
         var area_total_min = 0 ;
-        for (var i in area_names) {
-            var area_name = area_names[i].key ;
+        for (var i in Definitions.AreaNames) {
+            var area_name = Definitions.AreaNames[i].key ;
             con.find('div.flag[name="'+area_name+'"]').addClass(shift.area[area_name].problems?'status-red':'status-neutral') ;
             var hm = '' ;
+            var comment = shift.area[area_name].comments ;
             if (shift.area[area_name].problems) {
                 var downtime_min = shift.area[area_name].downtime_min;
                 hm = Fwk.zeroPad(Math.floor(downtime_min / 60), 2) + ':' + Fwk.zeroPad(downtime_min % 60, 2) ;
                 area_total_min += downtime_min ;
+                con.find('div.alerts[name="'+area_name+'"]').html(downtime_min && !comment ? this.alert_explain() : '') ;
+            } else {
+                con.find('div.alerts[name="'+area_name+'"]').html('') ;
             }
             con.find('span.hour-minute[name="' +area_name+'"]').text(hm) ;
-            con.find('div.comment[name="'+area_name+'"]').html('<pre>'+shift.area[area_name].comments+'</pre>') ;
+            con.find('div.comment[name="'+area_name+'"]').html('<pre>'+comment+'</pre>') ;
         }
         con.find('span.hour-minute[name="area"]').text(Fwk.zeroPad(Math.floor(area_total_min / 60), 2)+':'+Fwk.zeroPad(area_total_min % 60, 2)) ;
 
         var allocation_total_min = 0 ;
-        for (var i in this.allocation_names) {
-            var allocation_name = this.allocation_names[i].key ;
+        for (var i in Definitions.AllocationNames) {
+            var allocation_name = Definitions.AllocationNames[i].key ;
+            if (typeof(shift.allocation[allocation_name]) === 'undefined' ) alert('allocation_name: '+allocation_name) ;
             var duration_min = shift.allocation[allocation_name].duration_min ;
             var hm = Fwk.zeroPad(Math.floor(duration_min / 60), 2) + ':' + Fwk.zeroPad(duration_min % 60, 2) ;
             var percent = shift.duration_min ? Math.floor(100 * duration_min / shift.duration_min) : 0;
+            var comment = shift.allocation[allocation_name].comments ;
             allocation_total_min += duration_min ;
             con.find('span.hour-minute[name="' +allocation_name+'"]').text(hm) ;
             con.find('span.percent[name="'+allocation_name+'"]').text(percent) ;
-            con.find('div.comment[name="'+allocation_name+'"]').html('<pre>'+shift.allocation[allocation_name].comments+'</pre>') ;
+            con.find('div.comment[name="'+allocation_name+'"]').html('<pre>'+comment+'</pre>') ;
+            if (allocation_name === 'other') {
+                con.find('div.alerts[name="'+allocation_name+'"]').html((duration_min > Definitions.MinOther2Comment) && !comment ? this.alert_explain() : '') ;
+            }
         }
 
         con.find('button[name="edit"]')  .button('enable') ;
@@ -796,6 +864,21 @@ function ShiftRow (parent, data, can_edit) {
 }
 define_class(ShiftRow, StackRowData, {}, {}) ;
 
+
+function Reports_Export2Excel (parent) {
+    this.parent   = parent ;
+    this.icon     = function () { return '../webfwk/img/MS_Excel_1.png' ; } ;
+    this.title    = function () { return 'Export into Microsoft Excel 2007 File' ; } ;
+    this.on_click = function () { this.parent.export('excel') ; } ;
+}
+
+function Reports_Print (parent) {
+    this.parent   = parent ;
+    this.icon     = function () { return '../webfwk/img/Printer.png' ; } ;
+    this.title    = function () { return 'Print the document' ; } ;
+    this.on_click = function () { alert('Printing...') ; } ;
+}
+
 /**
  * The main class representing instrument-level reports.
  *
@@ -839,6 +922,14 @@ function Reports (instr_name, can_edit) {
         }
     } ;
 
+    this.tools = function () {
+        if (!this.my_tools)
+            this.my_tools = [
+                new Reports_Export2Excel(this) ,
+                new Reports_Print(this)] ;
+        return this.my_tools ;
+    } ;
+
     // --------------------
     // Own data and methods
     // --------------------
@@ -846,9 +937,17 @@ function Reports (instr_name, can_edit) {
     this.shifts = [] ;
     this.shifts_stack = null ;
 
+    this.seconds_since_last_check = 0 ;
+
     this.update_allowed = function () {
-        if (this.shifts_stack) return !this.shifts_stack.is_locked() ;
-        return true ;
+        var not_allowed =
+            (this.seconds_since_last_check) ||
+            this.web_service_is_loading ||
+            (this.shifts_stack && this.shifts_stack.is_locked());
+        this.seconds_since_last_check++ ;
+        if (this.seconds_since_last_check > 5) this.seconds_since_last_check = 0 ;
+
+        return !not_allowed ;
     } ;
 
     this.is_initialized = false ;
@@ -860,24 +959,21 @@ function Reports (instr_name, can_edit) {
         if (this.is_initialized) return ;
         this.is_initialized = true ;
 
-        var ctrl_elem = this.container.find('#shifts-search-controls') ;
+        this.ctrl_elem = this.container.find('#shifts-search-controls') ;
 
-        this.ctrl_range_elem       = ctrl_elem.find('select[name="range"]') ;
-        this.ctrl_begin_elem       = ctrl_elem.find('input[name="begin"]') ;
-        this.ctrl_end_elem         = ctrl_elem.find('input[name="end"]') ;
-        this.ctrl_display_all_elem = ctrl_elem.find('input[name="display-all"]') ;
+        this.ctrl_range_elem       = this.ctrl_elem.find('select[name="range"]') ;
+        this.ctrl_begin_elem       = this.ctrl_elem.find('input[name="begin"]') ;
+        this.ctrl_end_elem         = this.ctrl_elem.find('input[name="end"]') ;
+        this.ctrl_stopper_elem     = this.ctrl_elem.find('select[name="stopper"]') ;
+        this.ctrl_door_elem        = this.ctrl_elem.find('select[name="door"]') ;
+        this.ctrl_lcls_elem        = this.ctrl_elem.find('select[name="lcls"]') ;
+        this.ctrl_daq_elem         = this.ctrl_elem.find('select[name="daq"]') ;
 
         this.ctrl_begin_elem.datepicker().datepicker('option', 'dateFormat', 'yy-mm-dd') ;
         this.ctrl_end_elem.datepicker().datepicker('option', 'dateFormat', 'yy-mm-dd') ;
 
-        ctrl_elem.find('button[name="reset"]').button().click(function () {
-            var range = 'week' ;
-            that.ctrl_range_elem.val(range) ;
-            that.ctrl_begin_elem.val('') ;
-            that.ctrl_end_elem.val('') ;
-            that.ctrl_begin_elem.attr('disabled', 'disabled') ;
-            that.ctrl_end_elem  .attr('disabled', 'disabled') ;
-            that.search(range) ;
+        this.ctrl_elem.find('button[name="reset"]').button().click(function () {
+            that.reset_and_search() ;
         }) ;
         this.ctrl_range_elem.change(function () {
             var range = that.ctrl_range_elem.val() ;
@@ -901,7 +997,7 @@ function Reports (instr_name, can_edit) {
         this.ctrl_end_elem.change(function () {
             if (that.ctrl_begin_elem.val() || that.ctrl_end_elem.val()) that.search() ;
         }) ;
-        this.ctrl_display_all_elem.change(function () {
+        this.ctrl_elem.find('.filter').change(function () {
             that.search() ;
         }) ;
 
@@ -909,13 +1005,14 @@ function Reports (instr_name, can_edit) {
         this.shifts_search_display = this.container.find('#shifts-search-display') ;
 
         this.shifts_stack = new StackOfRows ([
+            {id: 'type',     title: 'Type',     width:  80} ,
             {id: 'shift',    title: 'Shift',    width: 100} ,
             {id: 'begin',    title: 'begin',    width:  50} ,
             {id: 'end',      title: 'end',      width:  50} ,
             {id: 'duration', title: '&Delta;t', width:  50} ,
             {id: '|' } ,
-            {id: 'stopper',  title: 'Stopper',  width:  60} ,
-            {id: 'door',     title: 'Door',     width:  40} ,
+            {id: 'stopper',  title: 'Stopper',  width:  70} ,
+            {id: 'door',     title: 'Door open',width:  80} ,
             {id: '|' } ,
             {id: 'FEL',      title: 'FEL',      width:  50} ,
             {id: 'BMLN',     title: 'BMLN',     width:  50} ,
@@ -927,7 +1024,8 @@ function Reports (instr_name, can_edit) {
             {id: 'OTHR',     title: 'OTHR',     width:  50} ,
             {id: '|' } ,
             {id: 'editor',   title: 'Editor',   width:  80} ,
-            {id: 'modified', title: 'Modified', width: 240}
+            {id: 'modified', title: 'Modified', width: 180} ,
+            {id: 'alerts',   title: 'Alerts',   width: 240}
         ] , null, {
             theme: 'stack-theme-large14 stack-theme-mustard'
         }) ;
@@ -971,6 +1069,7 @@ function Reports (instr_name, can_edit) {
         }) ;
 
         new_shift_save.click(function () {
+            var type       = new_shift_con.find('select[name="type"]').val() ;
             var begin_day  = new_shift_begin_day_elem.val() ;
             var begin_time = begin_day + ' ' + Fwk.zeroPad(parseInt(new_shift_begin_h_elem.val()), 2) + ':' + Fwk.zeroPad(parseInt(new_shift_begin_m_elem.val()), 2) + ':00' ;
             var end_day    = new_shift_end_day_elem.val() ;
@@ -981,6 +1080,7 @@ function Reports (instr_name, can_edit) {
                 '../shiftmgr/ws/shift_create.php' ,
                 'GET' ,
                 {   instr_name : that.instr_name ,
+                    type       : type ,
                     begin_time : begin_time ,
                     end_time   : end_time ,
                 } ,
@@ -1012,32 +1112,70 @@ function Reports (instr_name, can_edit) {
         }) ;
     } ;
 
-    this.search = function () {
+    this.reset_and_search = function (range, begin_time, end_time) {
+        var range = range ? range : 'week' ;
+        this.ctrl_range_elem.val(range) ;
+        if (range === 'range') {
+            this.ctrl_begin_elem.removeAttr('disabled') ;
+            this.ctrl_end_elem  .removeAttr('disabled') ;
+            this.ctrl_begin_elem.val(begin_time ? begin_time : '') ;
+            this.ctrl_end_elem.val  (end_time   ? end_time   : '') ;
+        } else {
+            this.ctrl_begin_elem.attr('disabled', 'disabled') ;
+            this.ctrl_end_elem  .attr('disabled', 'disabled') ;
+            this.ctrl_begin_elem.val('') ;
+            this.ctrl_end_elem.val  ('') ;
+        }
+        this.ctrl_stopper_elem.val('') ;
+        this.ctrl_door_elem.val('') ;
+        this.ctrl_lcls_elem.val('') ;
+        this.ctrl_daq_elem.val('') ;
+        this.ctrl_elem.find('input.type').attr('checked', 'checked') ;
+        this.search() ;
+    } ;
+
+    this.search = function (export_format) {
 
         this.init() ;
 
         var that = this ;
+
         var range = this.ctrl_range_elem.val() ;
+        var types = '' ;
+        that.ctrl_elem.find('input.type:checked').each(function () {
+            if (types) types += ':' ;
+            types += this.name ;
+        }) ;
         var params = {
-            instr_name : this.instr_name ,
-            all        : that.ctrl_display_all_elem.attr('checked') ? 1 : 0 ,
-            range      : range
+            range       : range ,
+            stopper     : this.ctrl_stopper_elem.val() ,
+            door        : this.ctrl_door_elem.val() ,
+            lcls        : this.ctrl_lcls_elem.val() ,
+            daq         : this.ctrl_daq_elem.val() ,
+            instruments : this.instr_name ,
+            types       : types
         } ;
         if (range === 'range') {
             params.begin = that.ctrl_begin_elem.val() ;
             params.end   = that.ctrl_end_elem.val() ;
         }
-        this.shifts_service (
-            '../shiftmgr/ws/shifts_get.php', 'GET', params ,
-            function (shifts_data) {
-                that.shifts = [] ;
-                for (var i in shifts_data) {
-                    var data = shifts_data[i] ;
-                    that.shifts.push(new ShiftRow(that, data, that.can_edit)) ;
+        if (export_format) {
+            params.export = export_format
+            var url = '../shiftmgr/ws/shifts_export.php?'+$.param(params, true) ;
+            window.open(url) ;
+        } else {
+            this.shifts_service (
+                '../shiftmgr/ws/shifts_get.php', 'GET', params ,
+                function (shifts_data) {
+                    that.shifts = [] ;
+                    for (var i in shifts_data) {
+                        var data = shifts_data[i] ;
+                        that.shifts.push(new ShiftRow(that, data, that.can_edit)) ;
+                    }
+                    that.display() ;
                 }
-                that.display() ;
-            }
-        ) ;
+            ) ;
+        }
     } ;
 
     this.search_shift_by_id = function(id) {
@@ -1050,23 +1188,12 @@ function Reports (instr_name, can_edit) {
             'GET' ,
             { shift_id : id } ,
             function (shifts_data) {
-                that.shifts = [] ;
-                for (var i in shifts_data) {
-                    var data = shifts_data[i] ;
-                    that.shifts.push(new ShiftRow(that, data, that.can_edit)) ;
 
-                    // Re-adjust visible search criteria to be compatible with the found
-                    // shift.
+                // Re-adjust visible search criteria to be compatible with the found
+                // shift.
 
-                    var begin_day = data.begin.day ;
-                    var end_day   = data.end.day ;
-
-                    that.ctrl_range_elem.val('range') ;
-                    that.ctrl_begin_elem.removeAttr('disabled').val(begin_day) ;
-                    that.ctrl_end_elem  .removeAttr('disabled').val(end_day) ;
-                    that.ctrl_display_all_elem.attr('checked', 'checked') ;
-                }
-                that.display() ;
+                var data = shifts_data[0] ;
+                that.reset_and_search('range', data.begin.day, data.end.day) ;
             } ,
             function () {
                 alert('Shift search failed for shift ID '+id) ;
@@ -1074,15 +1201,20 @@ function Reports (instr_name, can_edit) {
         ) ;
     } ;
 
+    this.web_service_is_loading = false ;
+
     this.shifts_service = function (url, type, params, when_done, on_error) {
 
         var that = this ;
+
+        this.web_service_is_loading = true ;
 
         $.ajax ({
             type: type ,
             url:  url ,
             data: params ,
             success: function (result) {
+                that.web_service_is_loading = false ;
                 if(result.status !== 'success') {
                     Fwk.report_error(result.message) ;
                     if (on_error) on_error() ;
@@ -1094,6 +1226,7 @@ function Reports (instr_name, can_edit) {
                 }
             } ,
             error: function () {
+                that.web_service_is_loading = false ;
                 Fwk.report_error('shift service is not available for instrument: '+that.inst_name) ;
                 if (on_error) on_error() ;
             } ,
@@ -1132,6 +1265,10 @@ function Reports (instr_name, can_edit) {
                 that.display() ;
             }
         ) ;
+    } ;
+
+    this.export = function(format) {
+        this.search(format) ;
     } ;
 }
 define_class (Reports, FwkApplication, {}, {});

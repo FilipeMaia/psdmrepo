@@ -11,9 +11,13 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-04
+2013-10-11 Igor Gaponenko
+- the first stable version of the application
+
 Tag: V00-01-03
 2013-08-21 Igor Gaponenko
-- migrated to thw latest version of webwfk
+- migrated to the latest version of webwfk
 - fixed a bug in History.ps
 
 Tag: V00-01-02
