@@ -181,9 +181,19 @@ class LusiTime {
      */
     public function month() { return (int)date("m", $this->sec); }
 
-    /* Return 2-digit hour number of the timestamp.
+    /* Return 2-digit day number of the timestamp.
      */
     public function day() { return (int)date("d", $this->sec); }
+
+    /* Return 1-digit day of week number of the timestamp.
+     *
+     * Returns:
+     *   1 : Monday
+     *   2 : Tuesday
+     *   ...
+     *   7 : Sunday
+     */
+    public function day_of_week() { return (int)date("N", $this->sec); }
 
     /* Return 2-digit hour number of the timestamp.
      */
