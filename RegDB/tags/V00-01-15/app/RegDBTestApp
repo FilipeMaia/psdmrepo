@@ -1,0 +1,56 @@
+#!@PYTHON@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id: $
+#
+# Description:
+#  Script RegDBTestApp
+#
+#------------------------------------------------------------------------
+
+"""Script that exercises the simplified ONLINE interface to RegDB.
+
+This software was developed for the LUSI project.  If you use all or
+part of it, please give an appropriate acknowledgement.
+
+@see RegDB
+
+@version $Id: $
+
+@author Igor Gaponenko
+"""
+
+#------------------------------
+#  Module's version from SVN --
+#------------------------------
+__version__ = "$Revision: $"
+# $Source$
+
+#--------------------------------
+#  Imports of standard modules --
+#--------------------------------
+import sys
+
+#---------------------------------
+#  Imports of base class module --
+#---------------------------------
+
+#-----------------------------
+# Imports for other modules --
+#-----------------------------
+
+from RegDB.online_iface import id2experiment
+
+#-----------------------------------------------
+# Here is the start point for the application --
+#-----------------------------------------------
+
+if __name__ == "__main__" :
+
+    exper = id2experiment(53)
+    print exper
+
+    exper = id2experiment(100)
+    print exper
+
+    sys.exit(0)
