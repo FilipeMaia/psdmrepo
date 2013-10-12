@@ -80,9 +80,12 @@ class SysMon extends DbConnection {
      *   File Systems
      * ----------------
      */
-    public function file_systems ($latest_snapshot=true) {
+    public function file_systems ($class=null, $latest_snapshot=true) {
         $list = array () ;
-        $result = $this->query("SELECT * FROM {$this->database}.file_system ORDER BY base_path, scan_time DESC") ;
+        $class_opt = '' ;
+        if (!is_null($class)) $class_opt = "WHERE base_path LIKE '%/".$this->escape_string(strtolower(trim($class)))."'" ;
+        $sql = "SELECT * FROM {$this->database}.file_system {$class_opt} ORDER BY base_path, scan_time DESC" ;
+        $result = $this->query($sql) ;
         for ($i = 0, $nrows = mysql_numrows($result) ; $i < $nrows ; $i++) {
             $attr = mysql_fetch_array ($result, MYSQL_ASSOC) ;
             $base_path = $attr['base_path'] ;
@@ -111,9 +114,9 @@ class SysMon extends DbConnection {
             'scan_time' => new LusiTime (intval($attr['scan_time']))
         )) ;
     }
-    public function file_system_summary ($id=null) {
-        $entry_types = $this->file_entry_types($id) ;
-        $total_size  = $this->file_total_size ($id) ;
+    public function file_system_summary ($class=null, $id=null) {
+        $entry_types = $this->file_entry_types($class, $id) ;
+        $total_size  = $this->file_total_size ($class, $id) ;
         $summary = array (
             'file_systems' => array () ,
             'files'       => array_key_exists('FILE',  $entry_types) ? $entry_types['FILE']  : 0 ,
@@ -123,7 +126,7 @@ class SysMon extends DbConnection {
             'size'        => $total_size ? SysMon::autoformat_size( $total_size ) : ''
         ) ;
         if (is_null($id)) {
-            $summary['file_systems'] = $this->file_systems() ;
+            $summary['file_systems'] = $this->file_systems($class) ;
         } else {
             $fs = $this->find_file_system_by_id($id) ;
             if (is_null($fs))
@@ -133,19 +136,32 @@ class SysMon extends DbConnection {
         }
         return $summary ;
     }
-    private function file_entry_types ($id=null) {
+    private function file_entry_types ($class=null, $id=null) {
         $list = array() ;
-        $id_opt = $id ? "WHERE file_system_id={$id}" : '' ;
-        $result = $this->query("SELECT entry_type, COUNT(*) AS `num_files` FROM {$this->database}.file_catalog {$id_opt} GROUP BY entry_type") ;
+        $sql = "SELECT entry_type, COUNT(*) AS `num_files` FROM {$this->database}.file_catalog GROUP BY entry_type" ;
+        if ($id) {
+            $sql = "SELECT entry_type, COUNT(*) AS `num_files` FROM {$this->database}.file_catalog WHERE file_system_id={$id} GROUP BY entry_type" ;
+        } elseif ($class) {
+            $class_opt = "WHERE base_path LIKE '%/".$this->escape_string(strtolower(trim($class)))."'" ;
+            $sql_class_subquery = "SELECT id FROM {$this->database}.file_system {$class_opt}" ;
+            $sql = "SELECT entry_type, COUNT(*) AS `num_files` FROM {$this->database}.file_catalog WHERE file_system_id IN ({$sql_class_subquery}) GROUP BY entry_type" ;
+        }
+        $result = $this->query($sql) ;
         for ($i = 0, $nrows = mysql_numrows($result) ; $i < $nrows ; $i++) {
             $attr = mysql_fetch_array ($result, MYSQL_ASSOC) ;
             $list[$attr['entry_type']] = intval($attr['num_files']) ;
         }
         return $list ;
     }
-    private function file_total_size ($id=null) {
-        $id_opt = $id ? "AND file_system_id={$id}" : '' ;
-        $result = $this->query("SELECT SUM(size_bytes) AS `size_bytes` FROM {$this->database}.file_catalog WHERE entry_type='FILE' {$id_opt}") ;
+    private function file_total_size ($class=null, $id=null) {
+        if ($id) {
+            $sql = "SELECT SUM(size_bytes) AS `size_bytes` FROM {$this->database}.file_catalog WHERE entry_type='FILE' AND file_system_id={$id}" ;
+        } elseif ($class) {
+            $class_opt = "WHERE base_path LIKE '%/".$this->escape_string(strtolower(trim($class)))."'" ;
+            $sql_class_subquery = "SELECT id FROM {$this->database}.file_system {$class_opt}" ;
+            $sql = "SELECT SUM(size_bytes) AS `size_bytes` FROM {$this->database}.file_catalog WHERE entry_type='FILE' AND file_system_id IN ({$sql_class_subquery})" ;
+        }
+        $result = $this->query($sql) ;
         $nrows = mysql_numrows($result) ;
         if ($nrows == 0) return null ;
         if ($nrows != 1) throw new SysMonException (
@@ -154,7 +170,7 @@ class SysMon extends DbConnection {
         $attr = mysql_fetch_array ($result, MYSQL_ASSOC) ;
         return intval($attr['size_bytes']) ;
     }
-    public function file_sizes ($id=null) {
+    public function file_sizes ($class=null, $id=null) {
         $list_sizes = array (
             array('max_size' =>   '1 KB', 'max_size_bytes' =>   1 * BYTES_IN_KB, 'num_files' => 0, 'size_bytes' => 0, 'size' => '') ,
             array('max_size' =>  '10 KB', 'max_size_bytes' =>  10 * BYTES_IN_KB, 'num_files' => 0, 'size_bytes' => 0, 'size' => '') ,
@@ -168,8 +184,14 @@ class SysMon extends DbConnection {
             array('max_size' =>   '1 TB', 'max_size_bytes' =>   1 * BYTES_IN_TB, 'num_files' => 0, 'size_bytes' => 0, 'size' => '') ,
             array('max_size' =>  '10 TB', 'max_size_bytes' =>  10 * BYTES_IN_TB, 'num_files' => 0, 'size_bytes' => 0, 'size' => '')
         ) ;                    
-        $id_opt = $id ? "AND file_system_id={$id}" : '' ;
-        $result = $this->query("SELECT size_bytes,ctime FROM {$this->database}.file_catalog WHERE entry_type='FILE' {$id_opt}") ;
+        if ($id) {
+            $sql = "SELECT size_bytes,ctime FROM {$this->database}.file_catalog WHERE entry_type='FILE' AND file_system_id={$id}" ;
+        } elseif ($class) {
+            $class_opt = "WHERE base_path LIKE '%/".$this->escape_string(strtolower(trim($class)))."'" ;
+            $sql_class_subquery = "SELECT id FROM {$this->database}.file_system {$class_opt}" ;
+            $sql = "SELECT size_bytes,ctime FROM {$this->database}.file_catalog WHERE entry_type='FILE' AND file_system_id IN ({$sql_class_subquery})" ;
+        }
+        $result = $this->query($sql) ;
         for ($i = 0, $nrows = mysql_numrows($result) ; $i < $nrows ; $i++) {
 
             $row = mysql_fetch_row ($result) ;
@@ -191,7 +213,7 @@ class SysMon extends DbConnection {
 
         return $list_sizes ;
     }
-    public function file_ctime ($id=null) {
+    public function file_ctime ($class=null, $id=null) {
         $now_sec = LusiTime::now()->sec ;
         $list_ctime = array (
             array('ctime_age' =>  '1 month', 'ctime_age_sec' => $now_sec -  1 * SECONDS_IN_MONTH, 'num_files' => 0, 'size_bytes' => 0, 'size' => '') ,
@@ -209,9 +231,14 @@ class SysMon extends DbConnection {
             array('ctime_age' => '24 month', 'ctime_age_sec' => $now_sec - 24 * SECONDS_IN_MONTH, 'num_files' => 0, 'size_bytes' => 0, 'size' => '') ,
             array('ctime_age' =>    'older', 'ctime_age_sec' => 0,                            'num_files' => 0, 'size_bytes' => 0, 'size' => '')
         ) ;
-                    
-        $id_opt = $id ? "AND file_system_id={$id}" : '' ;
-        $result = $this->query("SELECT size_bytes,ctime FROM {$this->database}.file_catalog WHERE entry_type='FILE' {$id_opt}") ;
+        if ($id) {
+            $sql = "SELECT size_bytes,ctime FROM {$this->database}.file_catalog WHERE entry_type='FILE' AND file_system_id={$id}" ;
+        } elseif ($class) {
+            $class_opt = "WHERE base_path LIKE '%/".$this->escape_string(strtolower(trim($class)))."'" ;
+            $sql_class_subquery = "SELECT id FROM {$this->database}.file_system {$class_opt}" ;
+            $sql = "SELECT size_bytes,ctime FROM {$this->database}.file_catalog WHERE entry_type='FILE' AND file_system_id IN ({$sql_class_subquery})" ;
+        }
+        $result = $this->query($sql) ;
         for ($i = 0, $nrows = mysql_numrows($result) ; $i < $nrows ; $i++) {
 
             $row = mysql_fetch_row ($result) ;
@@ -234,10 +261,16 @@ class SysMon extends DbConnection {
 
         return $list_ctime ;
     }
-    public function file_extensions ($id=null) {
+    public function file_extensions ($class=null, $id=null) {
         $list = array() ;
-        $id_opt = $id ? "AND file_system_id={$id}" : '' ;
-        $result = $this->query("SELECT extension, COUNT(*) AS `num_files`, SUM(size_bytes) AS `size_bytes` FROM {$this->database}.file_catalog WHERE entry_type='FILE' {$id_opt} GROUP BY extension") ;
+        if ($id) {
+            $sql = "SELECT extension, COUNT(*) AS `num_files`, SUM(size_bytes) AS `size_bytes` FROM {$this->database}.file_catalog WHERE entry_type='FILE' AND file_system_id={$id} GROUP BY extension" ;
+        } elseif ($class) {
+            $class_opt = "WHERE base_path LIKE '%/".$this->escape_string(strtolower(trim($class)))."'" ;
+            $sql_class_subquery = "SELECT id FROM {$this->database}.file_system {$class_opt}" ;
+            $sql = "SELECT extension, COUNT(*) AS `num_files`, SUM(size_bytes) AS `size_bytes` FROM {$this->database}.file_catalog WHERE entry_type='FILE' AND file_system_id IN ({$sql_class_subquery}) GROUP BY extension" ;
+        }
+        $result = $this->query($sql) ;
         for ($i = 0, $nrows = mysql_numrows($result) ; $i < $nrows ; $i++) {
             $attr = mysql_fetch_array ($result, MYSQL_ASSOC) ;
             $extension = $attr['extension'] ;
@@ -255,10 +288,16 @@ class SysMon extends DbConnection {
 
         return $list ;
     }
-    public function file_types ($id=null) {
+    public function file_types ($class=null, $id=null) {
         $list = array() ;
-        $id_opt = $id ? "AND c.file_system_id={$id}" : '' ;
-        $result = $this->query("SELECT t.name as `name`, COUNT(*) AS 'num_files', SUM(c.size_bytes) AS 'size_bytes' FROM {$this->database}.file_type AS `t`, {$this->database}.file_catalog AS `c` WHERE c.entry_type='FILE' {$id_opt} AND t.file_system_id=c.file_system_id AND t.id=c.file_type_id GROUP BY t.name ORDER BY t.name") ;
+        if ($id) {
+            $sql = "SELECT t.name as `name`, COUNT(*) AS 'num_files', SUM(c.size_bytes) AS 'size_bytes' FROM {$this->database}.file_type AS `t`, {$this->database}.file_catalog AS `c` WHERE c.entry_type='FILE' AND c.file_system_id={$id} AND t.file_system_id=c.file_system_id AND t.id=c.file_type_id GROUP BY t.name ORDER BY t.name" ;
+        } elseif ($class) {
+            $class_opt = "WHERE base_path LIKE '%/".$this->escape_string(strtolower(trim($class)))."'" ;
+            $sql_class_subquery = "SELECT id FROM {$this->database}.file_system {$class_opt}" ;
+            $sql = "SELECT t.name as `name`, COUNT(*) AS 'num_files', SUM(c.size_bytes) AS 'size_bytes' FROM {$this->database}.file_type AS `t`, {$this->database}.file_catalog AS `c` WHERE c.entry_type='FILE' AND c.file_system_id IN ({$sql_class_subquery}) AND t.file_system_id=c.file_system_id AND t.id=c.file_type_id GROUP BY t.name ORDER BY t.name" ;
+        }
+        $result = $this->query($sql) ;
         for ($i = 0, $nrows = mysql_numrows($result) ; $i < $nrows ; $i++) {
             $attr = mysql_fetch_array ($result, MYSQL_ASSOC) ;
             $name = $attr['name'] ;

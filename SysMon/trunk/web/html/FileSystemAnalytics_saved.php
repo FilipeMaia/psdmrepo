@@ -9,15 +9,13 @@ function report_error ($msg) {
     exit;
 }
 
-$file_system_class = isset($_GET['file_system_class']) ? $_GET['file_system_class'] : null;
-
 $state2show_no_selection = '<span style="color:maroon;">No file system selection has been made</span>' ;
 $state2show_loading      = '<span style="color:maroon;">Loading...</span>' ;
 $state2show_failed       = '<span style="color:maroon;">Loading operation failed.</span>' ;
 
 try {
     SysMon::instance()->begin() ;
-    $filesystems = SysMon::instance()->file_systems($file_system_class) ;
+    $filesystems = SysMon::instance()->file_systems() ;
 ?>
 
 <!DOCTYPE html">
@@ -121,7 +119,6 @@ function web_service_GET (url, params, on_success, on_error) {
     }) ;
 } ;
 
-var file_system_class = '<?php echo is_null($file_system_class) ? '' : $file_system_class ; ?>' ;
 var file_system_id = 0 ;
 var num_loadings_in_progress = 0 ;
 
@@ -308,7 +305,7 @@ function load_summary () {
 
     web_service_GET (
         '../sysmon/ws/filesystem_info.php' ,
-        {file_system_class: file_system_class, id: file_system_id, scope: 'summary'} ,
+        {id: file_system_id, scope: 'summary'} ,
         function (data) { load_summary_finished(data.summary) ; } ,
         function ()     { load_summary_finished() ; }
     ) ;
@@ -323,7 +320,7 @@ function load_extensions () {
 
     web_service_GET (
         '../sysmon/ws/filesystem_info.php' ,
-        {file_system_class: file_system_class, id: file_system_id, scope: 'extensions'} ,
+        {id: file_system_id, scope: 'extensions'} ,
         function (data) { load_extensions_finished(data.extensions) ; } ,
         function ()     { load_extensions_finished() ; }
     ) ;
@@ -338,7 +335,7 @@ function load_types () {
 
     web_service_GET (
         '../sysmon/ws/filesystem_info.php' ,
-        {file_system_class: file_system_class, id: file_system_id, scope: 'types'} ,
+        {id: file_system_id, scope: 'types'} ,
         function (data) { load_types_finished(data.types) ; } ,
         function ()     { load_types_finished() ; }
     ) ;
@@ -352,7 +349,7 @@ function load_sizes () {
 
     web_service_GET (
         '../sysmon/ws/filesystem_info.php' ,
-        {file_system_class: file_system_class, id: file_system_id, scope: 'sizes'} ,
+        {id: file_system_id, scope: 'sizes'} ,
         function (data) { load_sizes_finished(data.sizes) ; } ,
         function ()     { load_sizes_finished() ; }
     ) ;
@@ -366,7 +363,7 @@ function load_ctime () {
 
     web_service_GET (
         '../sysmon/ws/filesystem_info.php' ,
-        {file_system_class: file_system_class, id: file_system_id, scope: 'ctime'} ,
+        {id: file_system_id, scope: 'ctime'} ,
         function (data) { load_ctime_finished(data.ctime) ; } ,
         function ()     { load_ctime_finished() ; }
     ) ;

@@ -35,7 +35,13 @@ CREATE  TABLE IF NOT EXISTS `SYSMON`.`FILE_TYPE` (
 
   PRIMARY KEY (`id`) ,
 
-  UNIQUE KEY `name` (`file_system_id`,`name`)
+  UNIQUE KEY `name` (`file_system_id`,`name`) ,
+
+  CONSTRAINT `FILE_TYPE_FK_1`
+    FOREIGN KEY (`file_system_id` )
+    REFERENCES `SYSMON`.`FILE_SYSTEM` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE
 )
 
 ENGINE = InnoDB ;
@@ -66,8 +72,25 @@ CREATE  TABLE IF NOT EXISTS `SYSMON`.`FILE_CATALOG` (
 
   PRIMARY KEY (`id`) ,
 
-  UNIQUE KEY `name` (parent_id,file_system_id,`name`)
-)
+  UNIQUE KEY `name` (parent_id,file_system_id,`name`) ,
+
+  CONSTRAINT `FILE_CATALOG_FK_1`
+    FOREIGN KEY (`parent_id` )
+    REFERENCES `SYSMON`.`FILE_CATALOG` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE ,
+
+  CONSTRAINT `FILE_CATALOG_FK_2`
+    FOREIGN KEY (`file_system_id` )
+    REFERENCES `SYSMON`.`FILE_SYSTEM` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE ,
+
+  CONSTRAINT `FILE_CATALOG_FK_3`
+    FOREIGN KEY (`file_type_id` )
+    REFERENCES `SYSMON`.`FILE_TYPE` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE )
 
 ENGINE = InnoDB;
 
@@ -82,8 +105,13 @@ CREATE  TABLE IF NOT EXISTS `SYSMON`.`FILE_ACTION` (
   `file_id`      INT     NULL ,
 
   `action_time`  INT UNSIGNED NULL ,
-  `result_type`  ENUM('DELETED','ERROR','FILE_IS_CURRENT','NO_FILE_FOUND') NOT NULL
-)
+  `result_type`  ENUM('DELETED','ERROR','FILE_IS_CURRENT','NO_FILE_FOUND') NOT NULL ,
+
+  CONSTRAINT `FILE_ACTION_FK_1`
+    FOREIGN KEY (`file_id` )
+    REFERENCES `SYSMON`.`FILE_CATALOG` (`id` )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE )
 
 ENGINE = InnoDB;
 

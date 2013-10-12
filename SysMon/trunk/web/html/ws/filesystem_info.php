@@ -26,16 +26,17 @@ set_time_limit( 300 );
 
 \DataPortal\ServiceJSON::run_handler ('GET', function ($SVC) {
 
+    $class = strtolower($SVC->required_str('file_system_class')) ;
     $id    = $SVC->required_int('id') ;
     $scope = strtolower($SVC->required_str('scope')) ;
 
     $result = null ;
     switch ($scope) {
-        case 'summary'    : $result = $SVC->sysmon()->file_system_summary($id ? $id : null) ; break ;
-        case 'extensions' : $result = $SVC->sysmon()->file_extensions    ($id ? $id : null) ; break ;
-        case 'types'      : $result = $SVC->sysmon()->file_types         ($id ? $id : null) ; break ;
-        case 'sizes'      : $result = $SVC->sysmon()->file_sizes         ($id ? $id : null) ; break ;
-        case 'ctime'      : $result = $SVC->sysmon()->file_ctime         ($id ? $id : null) ; break ;
+        case 'summary'    : $result = $SVC->sysmon()->file_system_summary($class ? $class : null, $id ? $id : null) ; break ;
+        case 'extensions' : $result = $SVC->sysmon()->file_extensions    ($class ? $class : null, $id ? $id : null) ; break ;
+        case 'types'      : $result = $SVC->sysmon()->file_types         ($class ? $class : null, $id ? $id : null) ; break ;
+        case 'sizes'      : $result = $SVC->sysmon()->file_sizes         ($class ? $class : null, $id ? $id : null) ; break ;
+        case 'ctime'      : $result = $SVC->sysmon()->file_ctime         ($class ? $class : null, $id ? $id : null) ; break ;
         default :
             $SVC->abort("unsupported scope: '{$scope}'") ;
     }
