@@ -269,6 +269,34 @@ class LogBookRun {
         $attr = mysql_fetch_array( $result, MYSQL_ASSOC );
         return $attr['val'];
     }
+    private function attr_id ($type, $class, $name) {
+        $class_escaped = $this->logbook->escape_string($class) ;
+        $name_escaped  = $this->logbook->escape_string($name) ;
+        $result = $this->logbook->query("SELECT id FROM {$this->logbook->database}.run_attr WHERE run_id={$this->id()} AND class='{$class_escaped}' AND name='{$name_escaped}' AND type='{$type}'");
+        if (mysql_numrows($result) > 0) {
+            $attr = mysql_fetch_array( $result, MYSQL_ASSOC );
+            return intval($attr['id']) ;
+        }
+        return null ;
+    }
+
+    public function set_attr_val_INT    ($class, $name, $val=0,  $descr='') { $this->set_attr_val_('INT',    $class, $name, $val, $descr) ; }
+    public function set_attr_val_DOUBLE ($class, $name, $val=0., $descr='') { $this->set_attr_val_('DOUBLE', $class, $name, $val, $descr) ; }
+    public function set_attr_val_TEXT   ($class, $name, $val='', $descr='') { $this->set_attr_val_('TEXT',   $class, $name, $val, $descr) ; }
+
+    private function set_attr_val_ ($type, $class, $name, $val, $descr) {
+        $class_escaped = $this->logbook->escape_string($class) ;
+        $name_escaped  = $this->logbook->escape_string($name) ;
+        $descr_escaped = $this->logbook->escape_string($descr) ;
+        $val_escaped_quoted_if_needed = $type === 'TEXT' ? "'".$this->logbook->escape_string($val)."'" : $val ;
+        $id = $this->attr_id($type, $class, $name) ;
+        if ($id) {
+            $this->logbook->query("UPDATE {$this->logbook->database}.run_attr_{$type} SET val={$val_escaped_quoted_if_needed} WHERE attr_id={$id}") ;
+        } else {
+            $this->logbook->query("INSERT INTO {$this->logbook->database}.run_attr VALUES(NULL,{$this->id()},'{$class_escaped}','{$name_escaped}','{$type}','{$descr_escaped}')") ;
+            $this->logbook->query("INSERT INTO {$this->logbook->database}.run_attr_{$type} VALUES((SELECT LAST_INSERT_ID()),{$val_escaped_quoted_if_needed})") ;
+        }
+    }
 
     /* =================
      *   MANAGING RUNS

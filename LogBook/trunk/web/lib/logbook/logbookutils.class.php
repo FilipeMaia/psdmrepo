@@ -269,16 +269,21 @@ class LogBookUtils {
      * @param number $sec
      * @return unknown_type
      */
-    private static function format_seconds( $sec ) {
+    private static function format_seconds ($sec) {
         if( $sec < 60 ) return $sec.' sec';
         return floor( $sec / 60 ).' min '.( $sec % 60 ).' sec ';
     }
-        
+  
+    public static function search_around_message ($message_id, $report_error) {
+        $entry = LogBook::instance()->find_entry_by_id($message_id) or $report_error("no such message entry") ;
+        return LogBookUtils::search_around($entry->exper_id(), $report_error) ;
+    }
+    public static function search_around_run ($run_id, $report_error) {
+        $run = LogBook::instance()->find_run_by_id($run_id) or $report_error("no such run entry") ;
+        return LogBookUtils::search_around($run->exper_id(), $report_error) ;
+    }
+    public static function search_around ($exper_id, $report_error) {
 
-    public static function search_around($message_id, $report_error) {
-
-        $entry = LogBook::instance()->find_entry_by_id( $message_id ) or $report_error( "no such message entry" );
-        $id = $entry->exper_id();
         $shift_id = null;
         $run_id = null;
         if( !is_null( $shift_id ) && !is_null( $run_id )) $report_error( "conflicting parameters found in the request: <b>shift_id</b> and <b>run_id</b>" );
@@ -403,7 +408,7 @@ class LogBookUtils {
 
         /* Make adjustments relative to the primary experiment of the search.
          */
-        $experiment = LogBook::instance()->find_experiment_by_id( $id );
+        $experiment = LogBook::instance()->find_experiment_by_id( $exper_id );
         if( is_null( $experiment)) $report_error( "no such experiment" );
 
         /* Mix entries and run records in the right order. Results will be merged
@@ -431,7 +436,7 @@ class LogBookUtils {
                  * The only exception would be the main experient from which we started
                  * things.
                  */
-                if( $posted_at_instrument && ( $e->id() != $id )) continue;
+                if( $posted_at_instrument && ( $e->id() != $exper_id )) continue;
 
                 $report_error( 'not authorized to read messages for the experiment' );
             }
@@ -449,8 +454,8 @@ class LogBookUtils {
             $entries = array();
             foreach(
                 $e->search(
-                    $e->id() == $id ? $shift_id : null,    // the parameter makes sense for the main experiment only
-                    $e->id() == $id ? $run_id   : null,    // ditto
+                    $e->id() == $exper_id ? $shift_id : null,    // the parameter makes sense for the main experiment only
+                    $e->id() == $exper_id ? $run_id   : null,    // ditto
                     $text2search,
                     $search_in_messages,
                     $search_in_tags,

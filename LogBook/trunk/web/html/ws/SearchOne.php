@@ -35,9 +35,21 @@ header( "Content-type: application/json" );
 header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
 header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
 
-if( !isset( $_GET['id'] )) report_error( "no valid message id parameter" );
-$id = trim( $_GET['id'] );
-if( $id == '' ) report_error( "message id can't be empty" );
+$id = null ;
+if (isset($_GET['id'])) {
+    $id = intval(trim($_GET['id'])) ;
+    if (!$id) report_error("the value of <id> is either empty or invalid") ;
+}
+$run_num = null ;
+$exper_id = null ;
+if (isset( $_GET['run_num'])) {
+    $run_num = intval(trim($_GET['run_num'])) ;
+    if (!$run_num) report_error("the value of <run_num> is either empty or invalid") ;
+    if (!isset( $_GET['exper_id'])) report_error("the <exper_id> paameter is required along with <run_num>") ;
+    $exper_id = intval(trim($_GET['exper_id'])) ;
+    if (!$exper_id) report_error("the value of <exper_id> is either empty or invalid") ;
+}
+if (is_null($id) && is_null($run_num)) report_error( "no valid <id> or <run_num> parameter provided") ;
 
 $show_in_vicinity = false;
 if( isset($_GET['show_in_vicinity'])) {
@@ -64,33 +76,62 @@ HERE;
 /* Proceed with the operation
  */
 try {
-    LogBook::instance()->begin();
+    LogBook::instance()->begin() ;
 
-    $entry = LogBook::instance()->find_entry_by_id( $id ) or report_error( "no such message entry" );
-    $experiment = $entry->parent();
-    if( !LogBookAuth::instance()->canRead( $experiment->id()))
-        report_error( 'not authorized to read messages for the experiment' );
+    if ($id) {
 
-    if($show_in_vicinity) {
-        print LogBookUtils::search_around($entry->id(), 'report_error') ;
-    } else {
-        $now_encoded = json_encode(LusiTime::now()->toStringShort());
-        $status_encoded = json_encode( "success" );
-        $result =<<< HERE
+        $entry = LogBook::instance()->find_entry_by_id($id) or report_error("no such message entry") ;
+        $experiment = $entry->parent() ;
+        if (!LogBookAuth::instance()->canRead($experiment->id()))
+            report_error('not authorized to read messages for the experiment') ;
+
+        if ($show_in_vicinity) {
+            print LogBookUtils::search_around_message($entry->id(), 'report_error') ;
+        } else {
+            $now_encoded = json_encode(LusiTime::now()->toStringShort()) ;
+            $status_encoded = json_encode("success") ;
+            $result =<<< HERE
 {
-  "ResultSet": {
-    "Status": {$status_encoded},
-    "Updated": {$now_encoded},
-    "Result": [
+    "ResultSet": {
+      "Status": {$status_encoded},
+      "Updated": {$now_encoded},
+      "Result": [
 HERE;
-        $result .= "\n".LogBookUtils::entry2json( $entry );
-        $result .=<<< HERE
- ] } }
+          $result .= "\n".LogBookUtils::entry2json($entry) ;
+          $result .=<<< HERE
+   ] } }
 HERE;
-        print $result;
-    }
-    LogBook::instance()->commit();
+            print $result ;
+        }
 
-} catch( LogBookException $e ) { report_error( $e->toHtml()); }
+    } elseif ($run_num) {
+
+        $experiment = LogBook::instance()->find_experiment_by_id($exper_id) or report_error("no such experiment") ;
+        $run = $experiment->find_run_by_num($run_num) or report_error("no such run entry") ;
+        if (!LogBookAuth::instance()->canRead($experiment->id()))
+            report_error('not authorized to read messages for the experiment') ;
+
+        if ($show_in_vicinity) {
+            print LogBookUtils::search_around_run($run->id(), 'report_error') ;
+        } else {
+            $now_encoded = json_encode(LusiTime::now()->toStringShort()) ;
+            $status_encoded = json_encode("success") ;
+            $result =<<< HERE
+{
+    "ResultSet": {
+      "Status": {$status_encoded},
+      "Updated": {$now_encoded},
+      "Result": [
+HERE;
+          $result .= "\n".LogBookUtils::run2json($run, 'run') ;
+          $result .=<<< HERE
+   ] } }
+HERE;
+            print $result ;
+        }
+    }
+    LogBook::instance()->commit() ;
+
+} catch (LogBookException $e) { report_error($e->toHtml()) ; }
 
 ?>

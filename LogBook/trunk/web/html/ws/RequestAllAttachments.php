@@ -36,17 +36,22 @@ if( $exper_id == '' ) report_error( 'experiment identifier found in the request 
 
 function sort_by_time_and_merge( $runs, $attachments ) {
     $result = array();
-    $title = "open the run in a separate browser tab";
+    $title4run = "show the run in the e-Log Search panel within the current Portal";
     foreach( $runs as $r ) {
         $run_url = <<<HERE
-<a href="../logbook/?action=select_run_by_id&id={$r->id()}" target="_blank" title="{$title}" class="lb_link">{$r->num()}</a>
+<a href="javascript:global_elog_search_run_by_num({$r->num()},true);" title="{$title4run}" class="lb_link"><img src="../portal/img/link2run_f0f0f0_32x32.png" /></a>
 HERE;
+        $run_url_1 = <<<HERE
+<a href="javascript:global_elog_search_run_by_num({$r->num()},true);" title="{$title4run}" class="lb_link"><img src="../portal/img/link2run_32x32.png" /></a>
+HERE;
+
         array_push(
             $result,
             array(
                 'time64'  => $r->begin_time()->to64(),
                 'type'    => 'r',
                 'r_url'   => $run_url,
+                'r_url_1' => $run_url_1,
                 'r_id'    => $r->id(),
                 'r_num'   => $r->num(),
                 'r_begin' => $r->begin_time()->toStringShort(),
@@ -60,20 +65,20 @@ HERE;
         $attachment_url = <<<HERE
 <a href="../logbook/attachments/{$a->id()}/{$a->description()}" target="_blank" title="{$title}" class="lb_link">{$a->description()}</a>
 HERE;
-
         $entry_url = <<<HERE
 <a href="javascript:global_elog_search_message_by_id({$a->parent()->id()},true);" title="{$title}" class="lb_link">{$a->parent()->id()}</a>
 HERE;
         $entry_link_url = <<<HERE
-<a href="javascript:global_elog_search_message_by_id({$a->parent()->id()},true);" title="{$title}" class="lb_link"><img src="../portal/img/link.png"></img></a>
+<a href="javascript:global_elog_search_message_by_id({$a->parent()->id()},true);" title="{$title}" class="lb_link"><img src="../portal/img/link2message_32by32.png" /></a>
 HERE;
-            array_push(
+        array_push(
             $result,
             array(
                 'time64'    => $a->parent()->insert_time()->to64(),
                 'type'      => 'a',
+                'e_id'      => $a->parent()->id(),
                 'e_url'     => $entry_url,
-                'e_link_url'     => $entry_link_url,
+                'e_link_url'=> $entry_link_url,
                 'e_time'    => $a->parent()->insert_time()->toStringShort(),
                 'e_time_64' => $a->parent()->insert_time()->to64(),
                 'e_author'  => $a->parent()->author(),
@@ -82,7 +87,7 @@ HERE;
                 'a_url'     => $attachment_url,
                 'a_size'    => $a->document_size(),
                 'a_type'    => $a->document_type(),
-                            'entry_id' => $a->parent()->id()
+                'entry_id'  => $a->parent()->id()
             )
         );
     }

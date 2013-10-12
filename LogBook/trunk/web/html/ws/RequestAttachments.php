@@ -17,12 +17,6 @@ if( isset( $_GET['id'] )) {
     die( "no valid free-form entry identifier" );
 
 function attachment2json( $a ) {
-    /*
-    $attachment_url =
-        '<a href="javascript:show_attachment('.$a->id().
-        ')" title="download and see in a separate browser window" class="lb_link">'.
-        $a->description().'</a>';
-     */
     $title = "download and see in a separate browser window";
     $attachment_url = <<<HERE
 <a href="attachments/{$a->id()}/{$a->descripton()}" target="_blank" title="{$title}" class="lb_link">{$a->description()}</a>
