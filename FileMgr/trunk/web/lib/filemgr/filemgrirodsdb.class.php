@@ -73,13 +73,13 @@ class FileMgrIrodsDb extends DbConnection {
      
         if (!is_null($first_run)) {
             $first_run = intval($first_run);
-            if ($first_run == 0)
-                throw new FileMgrException(__METHOD__, 'illegal parameter for the first run');
+//            if ($first_run == 0)
+//                throw new FileMgrException(__METHOD__, 'illegal parameter for the first run');
         }
         if (!is_null($last_run)) {
             $last_run = intval($last_run);
-            if ($last_run == 0)
-                throw new FileMgrException(__METHOD__, 'illegal parameter for the last run');
+//            if ($last_run == 0)
+//                throw new FileMgrException(__METHOD__, 'illegal parameter for the last run');
         }
         if (($first_run && $last_run) && ($first_run > $last_run))
             throw new FileMgrException(__METHOD__, 'illegal parameters: the first run must be equal or strictly less than the last run');
