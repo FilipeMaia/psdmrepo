@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-07-02
+2013-10-14 Andy Salnikov
+- fix for my last modifications
+
 Tag: V00-07-01
 2013-10-11 Andy Salnikov
 - Utils::_storeArray: add special case for zero-size arrays, they are 

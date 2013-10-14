@@ -128,7 +128,7 @@ Utils::_storeArray(hdf5pp::Group group, const std::string& dataset, const void* 
     if (rank <= 8) {
       hsize_t dims[8];
       std::copy(shape, shape+rank, dims);
-      dsp = DataSpace::makeSimple(rank, dims, dims+rank);
+      dsp = DataSpace::makeSimple(rank, dims, dims);
     } else {
       std::vector<hsize_t> dims(shape, shape+rank);
       dsp = DataSpace::makeSimple(rank, &dims.front(), &dims.front());
