@@ -319,6 +319,56 @@ def detectors(instr, exper, run):
     return [row['name'] for row in __do_select_many(query)]
 
 
+def run_attributes(instr, exper, run, attr_class=None):
+
+    """
+    Return a list of attrubutes of the specified run of an experiment.
+    The result set may be (optionally) narrowed to a class.
+    Each entry in the result list will be represented by a dictionary of
+    the following keys:
+
+      'class' : the class of the attribute
+      'name'  : the name of the attribute within a scope of its class
+      'descr' : the descrption of the attribute (can be empty)
+      'type'  : the type of the attribute's value ('INT','DOUBLE' or 'TEXT')
+      'val'   : the value of the attribute (None if no value was set)
+
+    PARAMETERS:
+
+      @param instr: the name of the instrument
+      @param exper: the name of the experiment
+      @param run: the run number
+      @param attr_class: the name of the attribute's class (optional)
+      @return: the list of dictinaries representing attributes
+
+    """
+
+    exper_id = name2id(exper)
+    run = int(run)
+
+    attr_class_opt = ''
+    if attr_class is not None: attr_class_opt = " AND class='%s' " % __escape_string(attr_class)
+    sql = "SELECT * FROM logbook.run_attr WHERE run_id IN (SELECT id from logbook.run WHERE exper_id=%d AND num=%d) %s ORDER BY class,name" % (exper_id,run,attr_class_opt,)
+
+    result = []
+    for attr in __do_select_many(sql):
+
+        attr_type =     attr['type']
+        attr_id   = int(attr['id'])
+
+        sql4val = "SELECT val FROM logbook.run_attr_%s WHERE attr_id=%d" % (attr_type,attr_id,)
+        row4val = __do_select(sql4val)
+
+        attr_val = None
+        if row4val is not None:
+            if   attr_type == 'INT'   : val = int  (row4val['val'])
+            elif attr_type == 'DOUBLE': val = float(row4val['val'])
+            elif attr_type == 'TEXT'  : val =       row4val['val']
+
+        result.append({'class': attr['class'],'name':attr['name'],'descr':attr['descr'],'type':attr_type,'val':attr_val})
+
+    return result
+
 # -------------------------------
 # Here folow a couple of examples
 # -------------------------------
@@ -390,10 +440,28 @@ if __name__ == "__main__" :
     run  |  detectors
  --------+---------------------------------------------------------------------------------------------------------""" % (instr_name, exper_name,)
 
+            hidden_code = """
             for run in experiment_runs(instr_name, exper_name):
                 runnum = run['num']
-                print "   %4d  |  %s" % (runnum, '  '.join(detectors(instr_name, exper_name, runnum,)),)
+                print "   %4d  |  %s" % (runnum, '  '.join(detectors(instr_name, exper_name, runnum,)),)"""
 
+        instr_name = 'CXI'
+        exper_name = 'cxic0213'
+        runnum     = 215
+
+        print """
+
+ Attributes for run %d of experiment %s/%s :
+
+ -------------------+--------------------------------+------------+-------------+------------------------------------------------------------------------
+              class |                           name |       type |       descr | value
+ -------------------+--------------------------------+------------+-------------+------------------------------------------------------------------------""" % (runnum,instr_name,exper_name,)
+
+
+        for attr in run_attributes(instr_name, exper_name, runnum):
+            attr_val = attr['val']
+            if attr_val is None: attr_val = ''
+            print "  %17s | %30s | %10s | %11s | %s" % (attr['class'],attr['name'],attr['type'],attr['descr'][:11],str(attr_val),)
 
     except db.Error, e:
          print 'MySQL operation failed because of:', e

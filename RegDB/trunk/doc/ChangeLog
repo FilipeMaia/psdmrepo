@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-16
+2013-10-14 Igor Gaponenko
+- extended Python interface to allow retrieving run attributes
+
 Tag: V00-01-15
 2013-10-11 Igor Gaponenko
 - added support for external (user) experiments
