@@ -60,15 +60,20 @@ __db     = 'regdb'
 #
 # ------------------------------------------------------------------------------
 
+__connection = None
+
+def __get_connection():
+    global __connection
+    if __connection is None: __connection = db.connect(host=__host, user=__user, passwd=__passwd, db=__db)
+    return __connection
+
 def __escape_string(str):
 
-    conn = db.connect(host=__host, user=__user, passwd=__passwd, db=__db)
-    return conn.escape_string(str)
+    return __get_connection().escape_string(str)
 
 def __do_select_many(statement):
 
-    conn = db.connect(host=__host, user=__user, passwd=__passwd, db=__db)
-    cursor = conn.cursor(db.cursors.SSDictCursor)
+    cursor = __get_connection().cursor(db.cursors.SSDictCursor)
     cursor.execute("SET SESSION SQL_MODE='ANSI'")
     cursor.execute(statement)
     return cursor.fetchall()
@@ -90,8 +95,7 @@ def __do_select(statement):
 
 def __do_sql(statement):
 
-    conn = db.connect(host=__host, user=__user, passwd=__passwd, db=__db)
-    cursor = conn.cursor(db.cursors.SSDictCursor)
+    cursor = __get_connection().cursor(db.cursors.SSDictCursor)
     cursor.execute("SET SESSION SQL_MODE='ANSI'")
     cursor.execute("BEGIN")
     cursor.execute(statement)
@@ -134,11 +138,44 @@ def getexp(id):
 # Return None if no such experiment exists in the database.
 # ------------------------------------------------------------------------------
 
+__name2id = dict()
+
 def name2id(name):
 
-    row = __do_select("SELECT id FROM experiment WHERE name='%s'" % name)
-    if not row : return None
-    return int(row['id'])
+    global __name2id
+
+    if name not in __name2id:
+        row = __do_select("SELECT id FROM experiment WHERE name='%s'" % name)
+        if not row : return None
+        __name2id[name] = int(row['id'])
+
+    return __name2id[name]
+
+
+# ---------------------------------------------------------------
+# Return a numeric identifier of the experiment's run. If none is
+# found the function will return None
+# ---------------------------------------------------------------
+
+__run2id = dict()
+
+def run2id(exper_name, runnum):
+
+    exper_id = name2id(exper_name)
+    if exper_id is None: return None
+
+    global __run2id
+
+    if exper_id not in __run2id:
+        __run2id[exper_id] = dict()
+
+    if runnum not in __run2id[exper_id]:
+        row = __do_select("SELECT id from logbook.run WHERE exper_id=%d AND num=%d" % (exper_id,runnum,))
+        if not row : return None
+        __run2id[exper_id][runnum] = int(row['id'])
+
+    return __run2id[exper_id][runnum]
+
 
 # --------------------------------------------------------------------
 # Get data path for an experiment. Use a numeric identifier to specify
@@ -262,6 +299,7 @@ def experiment_runs(instr, exper=None, station=0):
     Each run will be represented with a dictionary with the following keys:
 
       'exper_id'        : a numeric identifier of the experiment
+      'id'              : a numeric identifier of a run
       'num'             : a run number
       'begin_time_unix' : a UNIX timestamp (32-bits since Epoch) for the start of the run
       'end_time_unix'   : a UNIX timestamp (32-bits since Epoch) for the start of the run.
@@ -313,9 +351,10 @@ def detectors(instr, exper, run):
 
     """
 
-    exper_id = name2id(exper)
-    run = int(run)
-    query = "SELECT name FROM logbook.run_attr WHERE run_id IN (SELECT id from logbook.run WHERE exper_id=%d AND num=%d) AND class='DAQ_Detectors' ORDER BY name" % (exper_id,run,)
+    run_id = run2id(exper,run)
+    if run_id is None: return []
+
+    query = "SELECT name FROM logbook.run_attr WHERE run_id=%d AND class='DAQ_Detectors' ORDER BY name" % run_id
     return [row['name'] for row in __do_select_many(query)]
 
 
@@ -343,12 +382,13 @@ def run_attributes(instr, exper, run, attr_class=None):
 
     """
 
-    exper_id = name2id(exper)
-    run = int(run)
+    run_id = run2id(exper,run)
+    if run_id is None: return []
 
     attr_class_opt = ''
     if attr_class is not None: attr_class_opt = " AND class='%s' " % __escape_string(attr_class)
-    sql = "SELECT * FROM logbook.run_attr WHERE run_id IN (SELECT id from logbook.run WHERE exper_id=%d AND num=%d) %s ORDER BY class,name" % (exper_id,run,attr_class_opt,)
+
+    sql = "SELECT * FROM logbook.run_attr WHERE run_id=%d %s ORDER BY class,name" % (run_id,attr_class_opt,)
 
     result = []
     for attr in __do_select_many(sql):
@@ -361,11 +401,56 @@ def run_attributes(instr, exper, run, attr_class=None):
 
         attr_val = None
         if row4val is not None:
-            if   attr_type == 'INT'   : val = int  (row4val['val'])
-            elif attr_type == 'DOUBLE': val = float(row4val['val'])
-            elif attr_type == 'TEXT'  : val =       row4val['val']
+            if   attr_type == 'INT'   : attr_val = int  (row4val['val'])
+            elif attr_type == 'DOUBLE': attr_val = float(row4val['val'])
+            elif attr_type == 'TEXT'  : attr_val =       row4val['val']
 
         result.append({'class': attr['class'],'name':attr['name'],'descr':attr['descr'],'type':attr_type,'val':attr_val})
+
+    return result
+
+def calibration_runs(instr, exper, runnum=None):
+
+    """
+    Return the information about calibrations associated with the specified run
+    (or all runs of the experiment if no specific run number is provided).
+
+    The result will be packaged into a dictionary of the following type:
+
+      <runnum> : { 'calibrations' : { <calibtype> : <value> } ,
+                   'comment'      :   <text>
+                 }
+
+    Where:
+
+      <runnum>    : the run number
+      <calibtype> : the name of the calibration ('dark', etc.)
+      <value>     : an optional value for the calibration type
+      <text>      : an optional comment for the run
+
+    PARAMETERS:
+
+      @param instr: the name of the instrument
+      @param exper: the name of the experiment
+      @param run: the run number (optional)
+
+    """
+
+    run_numbers = []
+    if runnum is None:
+        run_numbers = [run['num'] for run in experiment_runs(instr, exper)]
+    else:
+        run_numbers = [runnum]
+
+
+    result = {}
+
+    for runnum in run_numbers:
+        run_info = {'calibrations': {}, 'comment':''}
+        for attr in run_attributes(instr, exper, runnum, 'Calibrations'):
+            if attr['name'] == 'comment': run_info['comment'] = attr['val']
+            else                        : run_info['calibrations'][attr['name']] = attr['val']
+        result[runnum] = run_info
 
     return result
 
@@ -378,10 +463,15 @@ if __name__ == "__main__" :
     import datetime
 
     try:
+
         print 'experiment id 47 translates into %s' % id2name(47)
         print 'experiment sxrcom10 translates into id %d' % name2id('sxrcom10')
         print 'data path for experiment id 116 set to %s' % getexp_datapath(116)
         print 'current time is %d nanoseconds' % __now_64()
+
+
+
+
 
         print """
  -------+------------+------+------------------------------------------------+----------
@@ -411,6 +501,11 @@ if __name__ == "__main__" :
         for file in get_open_files(9999999):
             print file
 
+
+
+
+
+
         print """
 
  Runs for the current experiment at XPP:
@@ -427,12 +522,16 @@ if __name__ == "__main__" :
             print "  %6d | %5d | %19s | %19s" % (run['exper_id'],run['num'],begin_time,end_time,)
 
 
-        instr_name = 'XPP'
-        experiment = active_experiment(instr_name)
-        if experiment is not None:
-            exper_name = experiment[1]
+        instr_name = 'SXR'
+        exper_name = 'sxr39612'
 
-            print """
+
+
+
+
+
+
+        print """
 
  Detector names for all runs for experiment %s/%s :
 
@@ -440,10 +539,14 @@ if __name__ == "__main__" :
     run  |  detectors
  --------+---------------------------------------------------------------------------------------------------------""" % (instr_name, exper_name,)
 
-            hidden_code = """
-            for run in experiment_runs(instr_name, exper_name):
-                runnum = run['num']
-                print "   %4d  |  %s" % (runnum, '  '.join(detectors(instr_name, exper_name, runnum,)),)"""
+        for run in experiment_runs(instr_name, exper_name):
+            runnum = run['num']
+            print "   %4d  |  %s" % (runnum, '  '.join(detectors(instr_name, exper_name, runnum,)),)
+
+
+
+
+
 
         instr_name = 'CXI'
         exper_name = 'cxic0213'
@@ -463,10 +566,38 @@ if __name__ == "__main__" :
             if attr_val is None: attr_val = ''
             print "  %17s | %30s | %10s | %11s | %s" % (attr['class'],attr['name'],attr['type'],attr['descr'][:11],str(attr_val),)
 
+
+
+
+
+
+        print """
+
+ Calibration runs of experiment %s/%s :
+
+ --------+--------------------------------------------+-----------------------------------------
+    run  |  type=value [ type=value ... ]             |  Comment
+ --------+--------------------------------------------+-----------------------------------------""" % (instr_name, exper_name,)
+
+
+        entries = calibration_runs(instr_name, exper_name)
+        for run in sorted(entries.keys()):
+
+            run_info = entries[run]
+            run_comment = run_info['comment']
+            run_calibtypes = [(calibtype,value) for calibtype, value in run_info['calibrations'].items()]
+            run_calibtypes2str =  '  '.join(["%s=%s" % (e[0],str(e[1]),) for e in run_calibtypes])
+
+            # report runs which have at least one calibratin type
+            if run_calibtypes2str:
+                print "   %4d  |  %40s  |  %s"  % (run, run_calibtypes2str, run_comment,)
+
+
+
+
     except db.Error, e:
          print 'MySQL operation failed because of:', e
          sys.exit(1)
-
 
     sys.exit(0)
 
