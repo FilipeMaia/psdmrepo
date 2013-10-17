@@ -11,6 +11,11 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-04
+2013-10-17 Igor Gaponenko
+- extended the FileMgrException class to carry errno() as the third property where this applies
+- modified the DbConnection class to return errno() of MySQL errors
+
 Tag: V00-01-03
 2013-06-18 Igor Gaponenko
 - extended the file status report to return the file size (if known) from iRODS File Catalog

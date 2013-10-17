@@ -99,7 +99,8 @@ class DbConnection {
         if (!mysql_query($transition, $this->link))
             throw new FileMgrException (
                 __METHOD__,
-                "MySQL error: ".mysql_error($this->link).', in query: '.$transition);
+                "MySQL error: ".mysql_error($this->link).', in query: '.$transition,
+                $this->errno());
     }
 
     /* =================
@@ -118,7 +119,8 @@ class DbConnection {
         if (!$result)
             throw new FileMgrException (
                 __METHOD__,
-                "MySQL error: ".mysql_error($this->link).', in query: '.$sql);
+                "MySQL error: ".mysql_error($this->link).', in query: '.$sql,
+                $this->errno());
         return $result;
     }
 
@@ -129,7 +131,9 @@ class DbConnection {
     public function escape_string ($text) {
         $this->connect();
         return mysql_real_escape_string($text, $this->link);  }
- 
+
+    public function errno() { return mysql_errno( $this->link ); }
+
     /**
      * Make a connection if this hasn't been done yet.
      */
@@ -150,24 +154,28 @@ class DbConnection {
             if (!$this->link)
                 throw new FileMgrException (
                     __METHOD__,
-                    "MySQL error: ".mysql_error($this->link).", in function: mysql_connect");
+                    "MySQL error: ".mysql_error($this->link).", in function: mysql_connect",
+                    $this->errno());
 
             if (!mysql_select_db($this->database, $this->link))
                 throw new FileMgrException (
                     __METHOD__,
-                    "MySQL error: ".mysql_error($this->link).", in function: mysql_select_db");
+                    "MySQL error: ".mysql_error($this->link).", in function: mysql_select_db",
+                    $this->errno());
 
             $sql = "SET SESSION SQL_MODE='ANSI'";
             if (!mysql_query($sql, $this->link))
                 throw new FileMgrException (
                     __METHOD__,
-                    "MySQL error: ".mysql_error($this->link).', in query: '.$sql);
+                    "MySQL error: ".mysql_error($this->link).', in query: '.$sql,
+                    $this->errno());
 
             $sql = "SET SESSION AUTOCOMMIT=0";
             if (!mysql_query($sql, $this->link))
                 throw new FileMgrException (
                     __METHOD__,
-                    "MySQL error: ".mysql_error($this->link).', in query: '.$sql);
+                    "MySQL error: ".mysql_error($this->link).', in query: '.$sql,
+                    $this->errno());
 
             register_shutdown_function(array($this, "rollback"));
         }

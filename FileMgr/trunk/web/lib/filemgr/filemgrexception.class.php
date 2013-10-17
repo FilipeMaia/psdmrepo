@@ -25,6 +25,7 @@ class FileMgrException extends \Exception {
      * Data members
      */
     protected $method;
+    public    $errno = null;
 
     /**
      * Constructor
@@ -32,9 +33,10 @@ class FileMgrException extends \Exception {
      * @param string $message
      * @param int $code
      */
-    public function __construct( $method, $message) {
+    public function __construct( $method, $message, $errno=null) {
         parent::__construct( $message );
         $this->method = $method;
+        $this->errno = $errno;
     }
 
     /**
