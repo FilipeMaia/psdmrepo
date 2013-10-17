@@ -159,6 +159,8 @@ function History (instr_name) {
         if (this.updated && !end && !force)
             params.since = this.updated ;
 
+        this.history_info_elem.html('Loading...') ;
+
         var jqXHR = $.get('../shiftmgr/ws/history_get.php', params, function (data) {
             if (data.status !== 'success') {
                 Fwk.report_error(data.message, null) ;

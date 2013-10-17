@@ -945,7 +945,7 @@ function Reports (instr_name, can_edit) {
             this.web_service_is_loading ||
             (this.shifts_stack && this.shifts_stack.is_locked());
         this.seconds_since_last_check++ ;
-        if (this.seconds_since_last_check > 5) this.seconds_since_last_check = 0 ;
+        if (this.seconds_since_last_check > Definitions.ShiftsUpdateInterval_Sec) this.seconds_since_last_check = 0 ;
 
         return !not_allowed ;
     } ;
@@ -1208,6 +1208,8 @@ function Reports (instr_name, can_edit) {
         var that = this ;
 
         this.web_service_is_loading = true ;
+
+        this.search_info_elem.html('Loading...') ;
 
         $.ajax ({
             type: type ,

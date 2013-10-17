@@ -355,6 +355,8 @@ function Reports4all () {
 
         var that = this ;
 
+        this.search_info_elem.html('Loading...') ;
+
         $.ajax ({
             type: type ,
             url:  url ,

@@ -32,7 +32,8 @@ CREATE TABLE IF NOT EXISTS `SHIFTMGR`.`SHIFT` (
   `modified_uid`  VARCHAR(32)     DEFAULT NULL ,
   `modified_time` BIGINT UNSIGNED DEFAULT NULL ,
 
-   PRIMARY KEY(`id`)
+   PRIMARY KEY(`id`) ,
+   UNIQUE INDEX `SHIFT_IDX_1` (`instr_name`,`begin_time`)
 );
 
 -- -----------------------------------------------------

@@ -60,5 +60,7 @@ var Definitions = {
                                                                   'Therefore, any time greater than 30 min in other must be commented.'}
     ] ,
             
-    MinOther2Comment : 30
+    MinOther2Comment : 30 ,             /* the minimal number of minutes required to comment in time allocations */
+
+    ShiftsUpdateInterval_Sec : 30       /* how frequently to update shift information */
 } ;

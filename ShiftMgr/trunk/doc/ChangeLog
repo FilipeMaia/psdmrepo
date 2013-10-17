@@ -11,6 +11,12 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-05
+2013-10-17 Igor Gaponenko
+- reinforced the automated procedure for creating shifts to avoid duplicates
+- increased the auto-refresh interval for shifts to 30 seconds
+- moniro code refactoring in JavaScript classes
+
 Tag: V00-01-04
 2013-10-11 Igor Gaponenko
 - the first stable version of the application

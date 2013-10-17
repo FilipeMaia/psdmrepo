@@ -10,6 +10,7 @@ require_once 'lusitime/lusitime.inc.php' ;
 
 use \AuthDB\AuthDB ;
 use \FileMgr\DbConnection ;
+use \FileMgr\FileMgrException ;
 use \LusiTime\LusiTime ;
 use \LusiTime\LusiInterval ;
 
@@ -252,45 +253,42 @@ class ShiftMgr extends DbConnection {
             if ($day->begin->less($end_time)) {
                 if (is_null($shift_before_noon)) {
                     if (!(($day->begin->toStringDay() == $now->toStringDay()) && $now->hour() < 9)) {
-                        $shift = $this->create_shift (
-                            $instr_name ,
-                            LusiTime::parse("{$day->begin->toStringDay()} 09:00:00") ,
-                            LusiTime::parse("{$day->begin->toStringDay()} 21:00:00")
-                        ) ;
+                        try {
+                            $this->create_shift (
+                                $instr_name ,
+                                LusiTime::parse("{$day->begin->toStringDay()} 09:00:00") ,
+                                LusiTime::parse("{$day->begin->toStringDay()} 21:00:00")
+                            ) ;
+                        } catch (FileMgrException $e) {
+
+                            // To deal with race conditions in case if another user created
+                            // the same shift after the current transaction began.
+
+                            if (is_null($e->errno) || ($e->errno != DbConnection::$ER_DUP_ENTRY)) throw $e;
+                        }
                     }
                 }
                 if (is_null($shift_after_noon)) {
                     if (!(($day->begin->toStringDay() == $now->toStringDay()) && ($now->hour() < 21))) {
-                        $shift = $this->create_shift (
-                            $instr_name ,
-                            LusiTime::parse("{$day->begin->toStringDay()} 21:00:00") ,
-                            LusiTime::parse("{$day->begin->in24hours()->toStringDay()}  09:00:00")
-                        ) ;
+                        try {
+                            $this->create_shift (
+                                $instr_name ,
+                                LusiTime::parse("{$day->begin->toStringDay()} 21:00:00") ,
+                                LusiTime::parse("{$day->begin->in24hours()->toStringDay()}  09:00:00")
+                            ) ;
+                        } catch (FileMgrException $e) {
+
+                            // To deal with race conditions in case if another user created
+                            // the same shift after the current transaction began.
+
+                            if (is_null($e->errno) || ($e->errno != DbConnection::$ER_DUP_ENTRY)) throw $e;
+                        }
                     }
                 }
             }
         }
     }
 
-/*
-
-INSERT INTO shiftmgr.shift (id,instr_name,begin_time,end_time,notes) VALUES(1,'AMO', (SELECT UNIX_TIMESTAMP('2013-07-19 21:00:00')*1000000000), (SELECT UNIX_TIMESTAMP('2013-07-20 09:00:00')*1000000000),'');
-
-INSERT INTO shiftmgr.shift_area_evaluation (shift_id,name,problems,downtime_min,comments) VALUES (1,'FEL', 1, 15,'');
-INSERT INTO shiftmgr.shift_area_evaluation (shift_id,name,problems,downtime_min,comments) VALUES (1,'BMLN',0,  0,'');
-INSERT INTO shiftmgr.shift_area_evaluation (shift_id,name,problems,downtime_min,comments) VALUES (1,'CTRL',0,  0,'');
-INSERT INTO shiftmgr.shift_area_evaluation (shift_id,name,problems,downtime_min,comments) VALUES (1,'DAQ', 1,125,'Something went wrong with the DAQ');
-INSERT INTO shiftmgr.shift_area_evaluation (shift_id,name,problems,downtime_min,comments) VALUES (1,'LASR',0,  0,'');
-INSERT INTO shiftmgr.shift_area_evaluation (shift_id,name,problems,downtime_min,comments) VALUES (1,'HALL',1, 12,'');
-INSERT INTO shiftmgr.shift_area_evaluation (shift_id,name,problems,downtime_min,comments) VALUES (1,'OTHR',0,  0,'');
-
-INSERT INTO shiftmgr.shift_time_allocation (shift_id,name,duration_min,comments) VALUES (1,'tuning',   120,'');
-INSERT INTO shiftmgr.shift_time_allocation (shift_id,name,duration_min,comments) VALUES (1,'alignment', 55,'');
-INSERT INTO shiftmgr.shift_time_allocation (shift_id,name,duration_min,comments) VALUES (1,'daq',      345,'');
-INSERT INTO shiftmgr.shift_time_allocation (shift_id,name,duration_min,comments) VALUES (1,'access',     0,'');
-INSERT INTO shiftmgr.shift_time_allocation (shift_id,name,duration_min,comments) VALUES (1,'other',    200,'');
-
-*/
     public function create_shift ($instr_name, $begin_time, $end_time, $type=null) {
 
         $this->assert_hutch($instr_name) ;
