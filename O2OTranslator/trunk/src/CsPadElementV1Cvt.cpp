@@ -136,12 +136,12 @@ CsPadElementV1Cvt::fillContainers(hdf5pp::Group group,
 
   // get few constants
   const unsigned nQuad = cfg.numQuads();
-  const unsigned nSect = cfg.numSect();
+  const unsigned nSect = __builtin_popcount(sMask);
   const unsigned ssize = Pds::CsPad::ColumnsPerASIC*Pds::CsPad::MaxRowsPerASIC*2;
 
   // make data arrays
   H5Type elems[nQuad] ;
-  int16_t pixelData[nQuad][nSect][Pds::CsPad::ColumnsPerASIC][Pds::CsPad::MaxRowsPerASIC*2];
+  ndarray<int16_t, 4> pixelData = make_ndarray<int16_t>(nQuad, nSect, Pds::CsPad::ColumnsPerASIC, Pds::CsPad::MaxRowsPerASIC*2);
   float commonMode[nQuad][nSect];
 
   // move the data
@@ -224,7 +224,7 @@ CsPadElementV1Cvt::fillContainers(hdf5pp::Group group,
     m_pixelDataCont = makeCont<PixelDataCont>("data", group, true, type);
     if (n_miss) m_pixelDataCont->resize(n_miss);
   }
-  m_pixelDataCont->append ( pixelData[0][0][0][0], type ) ;
+  m_pixelDataCont->append ( *pixelData.data(), type ) ;
 
   if (cModeCalib) {
     type = H5Type::cmode_data_type(nQuad, nSect) ;
@@ -245,7 +245,7 @@ CsPadElementV1Cvt::fillMissing(hdf5pp::Group group,
   if (m_elementCont) {
     m_elementCont->resize(m_elementCont->size() + 1);
     m_pixelDataCont->resize(m_pixelDataCont->size() + 1);
-    m_cmodeDataCont->resize(m_cmodeDataCont->size() + 1);
+    if (m_cmodeDataCont) m_cmodeDataCont->resize(m_cmodeDataCont->size() + 1);
   } else {
     ++ n_miss;
   }

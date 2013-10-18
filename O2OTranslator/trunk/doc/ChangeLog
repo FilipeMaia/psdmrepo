@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-29-04
+2013-10-18 Andy Salnikov
+- couple of fixes for crashes in CsPadElementV1Cvt
+
 Tag: V00-29-03
 2013-10-11 Andy Salnikov
 - bumping schema version for ControlDataConfigV2 and ControlDataConfigV3
