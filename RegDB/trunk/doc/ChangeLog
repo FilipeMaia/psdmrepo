@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-18
+2013-10-17 Igor Gaponenko
+- simplified interface to the calibration runs in Python module experiment_info
+
 Tag: V00-01-17
 2013-10-17 Igor Gaponenko
 - performance improvements in Python module experiment_info

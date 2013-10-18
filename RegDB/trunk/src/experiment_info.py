@@ -417,16 +417,15 @@ def calibration_runs(instr, exper, runnum=None):
 
     The result will be packaged into a dictionary of the following type:
 
-      <runnum> : { 'calibrations' : { <calibtype> : <value> } ,
-                   'comment'      :   <text>
+      <runnum> : { 'calibrations' : [<calibtype1>, <calibtype2>, ... ] ,
+                   'comment'      :  <text>
                  }
 
     Where:
 
-      <runnum>    : the run number
-      <calibtype> : the name of the calibration ('dark', etc.)
-      <value>     : an optional value for the calibration type
-      <text>      : an optional comment for the run
+      <runnum>     : the run number
+      <calibtype*> : the name of the calibration ('dark', 'flat', 'geometry', etc.)
+      <text>       : an optional comment for the run
 
     PARAMETERS:
 
@@ -446,10 +445,10 @@ def calibration_runs(instr, exper, runnum=None):
     result = {}
 
     for runnum in run_numbers:
-        run_info = {'calibrations': {}, 'comment':''}
+        run_info = {'calibrations': [], 'comment':''}
         for attr in run_attributes(instr, exper, runnum, 'Calibrations'):
-            if attr['name'] == 'comment': run_info['comment'] = attr['val']
-            else                        : run_info['calibrations'][attr['name']] = attr['val']
+            if   attr['name'] == 'comment': run_info['comment'] = attr['val']
+            elif attr['val']              : run_info['calibrations'].append(attr['name'])
         result[runnum] = run_info
 
     return result
@@ -576,21 +575,20 @@ if __name__ == "__main__" :
  Calibration runs of experiment %s/%s :
 
  --------+--------------------------------------------+-----------------------------------------
-    run  |  type=value [ type=value ... ]             |  Comment
+    run  |  Calibrations                              |  Comment
  --------+--------------------------------------------+-----------------------------------------""" % (instr_name, exper_name,)
 
 
         entries = calibration_runs(instr_name, exper_name)
         for run in sorted(entries.keys()):
 
-            run_info = entries[run]
-            run_comment = run_info['comment']
-            run_calibtypes = [(calibtype,value) for calibtype, value in run_info['calibrations'].items()]
-            run_calibtypes2str =  '  '.join(["%s=%s" % (e[0],str(e[1]),) for e in run_calibtypes])
+            info = entries[run]
+            comment = info['comment']
+            calibtypes =  ' '.join([calibtype for calibtype in info['calibrations']])
 
             # report runs which have at least one calibratin type
-            if run_calibtypes2str:
-                print "   %4d  |  %40s  |  %s"  % (run, run_calibtypes2str, run_comment,)
+            if calibtypes:
+                print "   %4d  |  %-40s  |  %s"  % (run, calibtypes, comment,)
 
 
 
