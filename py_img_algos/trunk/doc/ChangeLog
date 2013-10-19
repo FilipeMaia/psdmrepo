@@ -1,0 +1,28 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package py_img_algos
+#------------------------------------------------------------------------
+
+Package author: Mikhail S. Dubrovin
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-01
+2013-10-18 Mikhail S. Dubrovin
+
+This package is created by Marcin's request for pyana
+
+A         src/cspad_arr_producer.py
+A         src/cspad_image_producer.py
+A         src/image_save_in_file.py
+	
+- just created this template file, this entry is an example of the change log
+  entry
+- keep it brief and easy to read
+- always include author name and date of the change, provide CVS tag when 
+  appropriate
+
