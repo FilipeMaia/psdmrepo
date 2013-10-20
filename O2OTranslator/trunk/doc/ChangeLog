@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-29-05
+2013-10-19 Andy Salnikov
+- fix for crash in CsPadElementV2Cvt, I though it was fixed yesterday
+
 Tag: V00-29-04
 2013-10-18 Andy Salnikov
 - couple of fixes for crashes in CsPadElementV1Cvt

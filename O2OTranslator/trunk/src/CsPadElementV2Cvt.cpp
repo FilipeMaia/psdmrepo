@@ -285,7 +285,7 @@ CsPadElementV2Cvt::fillMissing(hdf5pp::Group group,
   if (m_elementCont) {
     m_elementCont->resize(m_elementCont->size() + 1);
     m_pixelDataCont->resize(m_pixelDataCont->size() + 1);
-    m_cmodeDataCont->resize(m_cmodeDataCont->size() + 1);
+    if (m_cmodeDataCont) m_cmodeDataCont->resize(m_cmodeDataCont->size() + 1);
   } else {
     ++ n_miss;
   }
