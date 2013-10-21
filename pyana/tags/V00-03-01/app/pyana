@@ -1,0 +1,57 @@
+#!@PYTHON@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  Script pyxtcreader...
+#
+#------------------------------------------------------------------------
+
+"""Analysis job.
+
+This software was developed for the LUSI project.  If you use all or 
+part of it, please give an appropriate acknowledgement.
+
+@see RelatedModule
+
+@version $Id$ 
+
+@author Andrei Salnikov
+"""
+
+#------------------------------
+#  Module's version from CVS --
+#------------------------------
+__version__ = "$Revision$"
+# $Source$
+
+#--------------------------------
+#  Imports of standard modules --
+#--------------------------------
+import sys
+
+#-----------------------------
+# Imports for other modules --
+#-----------------------------
+from pyana import pyanamod
+
+#---------------------
+# Local definitions --
+#---------------------
+
+
+#---------------------------------
+#  Application class definition --
+#---------------------------------
+
+def main( argv ) :
+    # forward to pyana
+    pyanamod.pyana(argv=argv)
+    
+#
+#  run application when imported as a main module
+#
+if __name__ == "__main__" :
+    sys.path.insert(0, ".")
+    sys.exit( main(sys.argv) )
