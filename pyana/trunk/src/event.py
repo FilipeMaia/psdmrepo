@@ -107,12 +107,14 @@ class Event(object):
     Terminate = 3
     
 
-    def __init__( self, dg, run = None, expNum = None, env = None ):
+    def __init__( self, dg, run = None, expNum = None, env = None, stream = None, chunk = None ):
         
         self.m_dg = dg
         self.m_run = run
         self.m_expNum = expNum
         self.m_env = env
+        self.m_stream = stream
+        self.m_chunk = chunk
         self.m_userData = {}
         self.m_status = Event.Normal
         
@@ -163,6 +165,21 @@ class Event(object):
         """
         return self.m_dg.seq.clock()
 
+    def stream(self):
+        """ self.stream() -> int
+        
+        Returns stream number or None if stream number is not known. Note that stream number is determined from
+        the input XTC file name, if file name has non-standard format then stream number cannot be deduced.
+        """
+        return self.m_sream
+
+    def chunk(self):
+        """ self.chunk() -> int
+        
+        Returns chunk number or None if chunk number is not known. Note that chunk number is determined from
+        the input XTC file name, if file name has non-standard format then chunk number cannot be deduced.
+        """
+        return self.m_chunk
 
     def keys(self):
         """self.keys() -> list of tuples

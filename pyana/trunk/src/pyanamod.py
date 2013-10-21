@@ -141,9 +141,9 @@ def _proc(jobname, id, pipes, userObjects, jobConfig, expNameProvider, idQueue):
         # request is a tuple with first element being opcode
         if req[0] == OP_EVENT :
 
-            epics_data, dg, run, expNum = req[1:]
+            epics_data, dg, run, expNum, stream, chunk = req[1:]
 
-            evt = event.Event(dg, run=run, expNum=expNum, env=env)
+            evt = event.Event(dg, run=run, expNum=expNum, env=env, stream=stream, chunk=chunk)
             
             # update configuration objects
             env.updateConfig(evt)
@@ -299,7 +299,9 @@ def _pyana ( argv ) :
         
             expNum = fileName.expNum()
             run = fileName.run()
-            evt = event.Event(dg, run=run, expNum=expNum, env=env)
+            stream = fileName.stream()
+            chunk = fileName.chunk()
+            evt = event.Event(dg, run=run, expNum=expNum, env=env, stream=stream, chunk=chunk)
             
             # update environment
             env.update ( evt )
@@ -338,10 +340,10 @@ def _pyana ( argv ) :
                     logging.debug("sending event data to process %d", next)
                     p = pipes[next]
                     next = (next+1) % len(pipes)
-                    p.sendEventData(dg, fileName, fpos, run, expNum, env)
+                    p.sendEventData(dg, fileName, fpos, run, expNum, env, stream, chunk)
                 else :
                     # each transitions goes to each child
-                    for p in pipes : p.sendEventData(dg, fileName, fpos, run, expNum, env)
+                    for p in pipes : p.sendEventData(dg, fileName, fpos, run, expNum, env, stream, chunk)
 
             else :
                 

@@ -94,7 +94,7 @@ class mp_proto ( object ) :
         """ Send arbitrary data using the underlying connection's send() method """
         self._conn.send(data)
 
-    def sendEventData ( self, dg, fileName, fpos, run, expNum, env ) :
+    def sendEventData ( self, dg, fileName, fpos, run, expNum, env, stream, chunk ) :
         """ Send event data """
 
         self.sendCode(OP_EVENT)
@@ -108,6 +108,8 @@ class mp_proto ( object ) :
             self._conn.send_bytes(dg)
         self._conn.send(run)
         self._conn.send(expNum)
+        self._conn.send(stream)
+        self._conn.send(chunk)
 
     def getRequest(self):
         """ Generator function that returns all requests """
@@ -158,8 +160,10 @@ class mp_proto ( object ) :
 
                     run = self._conn.recv()
                     expNum = self._conn.recv()
+                    stream = self._conn.recv()
+                    chunk = self._conn.recv()
 
-                    yield (opcode, epics_data, dg, run, expNum)
+                    yield (opcode, epics_data, dg, run, expNum, stream, chunk)
                     
                 except EOFError, ex:
                     
