@@ -264,7 +264,7 @@ class CSPadConfigPars(object) :
                 if ind_sect_in_data == -1 : continue
                 arr_out[ind_sect_in_data][:] = arr_in[quad][sect][:]
 
-        print 'getCSPadPixArrayShapedAsData(): Created arr_out.shape=', arr_out.shape
+        #print 'getCSPadPixArrayShapedAsData(): Created arr_out.shape=', arr_out.shape
         return np.array(arr_out) # creates a copy of the pixel array
  
 #---------------------
@@ -285,7 +285,7 @@ class CSPadConfigPars(object) :
 
                 arr_out[quad][sect][:] = arr_in[ind_sect_in_data][:]
 
-        print 'getCSPadPixArrayFromArrayShapedAsData(): Created arr_out.shape=', arr_out.shape
+        #print 'getCSPadPixArrayFromArrayShapedAsData(): Created arr_out.shape=', arr_out.shape
         return np.array(arr_out) # creates a copy of the pixel array
  
 #---------------------

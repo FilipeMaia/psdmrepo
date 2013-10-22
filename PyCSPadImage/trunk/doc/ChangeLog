@@ -10,7 +10,12 @@ Package author: Mikhail S. Dubrovin
 
 Please describe any modifications that you made to the package in the
 reverse time order.
-	
+
+#---------------------
+2012-10-22 Mikhail S. Dubrovin
+Tag: V00-00-17
+- in CSPadConfigPars.py comment test print statements
+
 #---------------------
 2012-09-24 Mikhail S. Dubrovin
 Tag: V00-00-16
