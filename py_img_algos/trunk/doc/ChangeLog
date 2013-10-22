@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-03
+2013-10-22 Mikhail S. Dubrovin
+- fix a few minor things in order to make it consistent with description at confluence
+	
 Tag: V00-00-02
 2013-10-21 Mikhail S. Dubrovin
 - All modules work in pyana and psana frameworks

@@ -48,7 +48,7 @@ class image_save_in_file (object) :
         Parameters are passed from pyana.cfg configuration file.
 
         @param key_in      string, keyword for input image array of variable shape
-        @param ofname      string, output file name (type is selected by extention) supported formats: txt,  tiff, gif, pdf, eps, png, jpg, jpeg, npy (default), npz
+        @param ofname      string, output file name (type is selected by extention) supported formats: txt, tiff, gif, pdf, eps, png, jpg, jpeg, npy (default), npz
         @param print_bits  int, bit-word for verbosity control 
         """
 
@@ -97,7 +97,7 @@ class image_save_in_file (object) :
         if self.m_print_bits & 8 : self.print_part_of_image_array()
 
         name_pref, name_ext = os.path.splitext(self.m_ofname)
-        fname = '%s-%04d-%06d%s' % (name_pref, self.run, self.evnum, name_ext)
+        fname = '%s-r%04d-ev%06d%s' % (name_pref, self.run, self.evnum, name_ext)
         if self.m_print_bits & 8 :
             msg = 'Save image in file = %s' % fname
             print msg

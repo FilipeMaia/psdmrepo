@@ -47,8 +47,8 @@ class cspad_arr_producer (object) :
         All parameters are passed as strings
 
         @param source      string, address of Detector-Id|Device-ID
-        @param dtype_str   string, output array data type
-        @param key_out     string, unique keyword for output array
+        @param dtype_type  string, output array data type
+        @param key_out     string, unique keyword for output array identification
         @param val_miss    float,  intensity value substituted for missing in data 2x1s
         @param print_bits  int, bit-word for verbosity control 
         """
