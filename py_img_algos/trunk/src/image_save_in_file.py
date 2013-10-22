@@ -3,7 +3,7 @@
 #  $Id$
 #
 # Description:
-#  Pyana user analysis module image_save_in_file...
+#  Pyana/psana user analysis module image_save_in_file...
 #
 #------------------------------------------------------------------------
 
@@ -26,6 +26,7 @@ __version__ = "$Revision: 2987 $"
 #--------------------------------
 #  Imports of standard modules --
 #--------------------------------
+import os
 import sys
 import logging
 
@@ -34,9 +35,10 @@ import logging
 #-----------------------------
 #from pypdsdata import xtc
 
-from pypdsdata.xtc import *
-from psana import *
+#from pypdsdata.xtc import *
+#from psana import *
 import numpy as np
+import scipy.misc as scim
 
 class image_save_in_file (object) :
     """Saves image array in file with specified in the name type."""
@@ -44,39 +46,24 @@ class image_save_in_file (object) :
     def __init__ ( self ) :
         """Class constructor.
         Parameters are passed from pyana.cfg configuration file.
-        All parameters are passed as strings
 
-        @param key_in      string, keyword for input amge array of variable shape
-        @param ofname      string, output file name (type is selected by extention)
+        @param key_in      string, keyword for input image array of variable shape
+        @param ofname      string, output file name (type is selected by extention) supported formats: txt,  tiff, gif, pdf, eps, png, jpg, jpeg, npy (default), npz
         @param print_bits  int, bit-word for verbosity control 
         """
 
         self.m_key_in     = self.configStr  ('key_in',    'image')
-        self.m_ofname     = self.configStr  ('ofname',    'img-cspad')
+        self.m_ofname     = self.configStr  ('ofname',    'img.npy')
         self.m_print_bits = self.configInt  ('print_bits', 1)
 
         if self.m_print_bits & 1 : self.print_input_pars()
 
 
-    def beginjob( self, evt, env ) :
-        """This method is called once at the beginning of the job. It should
-        do a one-time initialization possible extracting values from event
-        data (which is a Configure object) or environment.
-
-        @param evt    event data object
-        @param env    environment object
-        """
-        logging.info( "image_save_in_file.beginjob() called" )
+    def beginjob( self, evt, env ) : pass
 
  
     def beginrun( self, evt, env ) :
-        """This optional method is called if present at the beginning 
-        of the new run.
-
-        @param evt    event data object
-        @param env    environment object
-        """
-        logging.info( "image_save_in_file.beginrun() called" )
+        #logging.info( "image_save_in_file.beginrun() called" )
 
         self.run   = evt.run()
         self.evnum = 0
@@ -88,43 +75,63 @@ class image_save_in_file (object) :
         @param evt    event data object
         @param env    environment object
         """
-        try :
-            self.image = evt.get(self.m_key_in)
+        if env.fwkName() == "psana":
+            self.image = evt.get(np.ndarray, self.m_key_in)
+        else : 
+            self.image = evt.get(self.m_key_in)       
 
-        except :
+        if self.image is None :
+            #if self.m_print_bits & 32 :
+            msg = '%s: WARNING! CSPAD image np.ndarray %s is not found in evt' % ( __name__, self.m_key_in )
+            #logging.info( msg )
+            print msg
+            return
+
+        #self.image = evt.get(self.m_key_in)
+
+        if self.image is None :
             return
 
         self.evnum += 1
 
         if self.m_print_bits & 8 : self.print_part_of_image_array()
 
-        fname = '%s-%04d-%06d.txt' % (self.m_ofname, self.run, self.evnum)
-        if self.m_print_bits & 8 : print 'Save image in file =', fname
+        name_pref, name_ext = os.path.splitext(self.m_ofname)
+        fname = '%s-%04d-%06d%s' % (name_pref, self.run, self.evnum, name_ext)
+        if self.m_print_bits & 8 :
+            msg = 'Save image in file = %s' % fname
+            print msg
 
-        np.savetxt(fname, self.image, fmt='%f')
+        if name_ext == '.txt' :
+            np.savetxt(fname, self.image) # , fmt='%f')
 
+        elif name_ext in ['.tiff', '.gif', '.pdf', '.eps', '.png', '.jpg', '.jpeg'] : 
+            scim.imsave(fname, self.image)
+ 
+        elif name_ext == '.npz' : 
+            np.savez(fname, self.image)
 
-    def endjob( self, evt, env ) :
-        """This method is called at the end of the job. It should do 
-        final cleanup, e.g. close all open files.
-        
-        @param evt    event data object
-        @param env    environment object
-        """        
-        logging.info( "image_save_in_file.endjob() called" )
+        else : 
+            np.save(fname, self.image)
+ 
+
+    def endjob( self, evt, env ) : pass
 
 
     def print_input_pars( self ) :
-        msg = '\nList of input parameters\n  key_in %s\n  ofname %s\n  print_bits: %4d' % \
-              (self.m_key_in, self.m_ofname, self.m_print_bits)
+        msg = '\n%s: List of input parameters\n  key_in %s\n  ofname %s\n  print_bits: %4d' % \
+              ( __name__, self.m_key_in, self.m_ofname, self.m_print_bits)
         #logging.info( msg )
         print msg
 
 
     def print_part_of_image_array( self, r1=50, r2=60, c1=100, c2=110 ) :
-        print 'image[%d:%d,%d:%d]:\n' % (r1, r2, c1, c2)
-        print self.image[r1:r2,c1:c2]
-        print 'image.shape =', self.image.shape
+        msg =  '%s: Part of the image: image[%d:%d,%d:%d]:' % (__name__, r1, r2, c1, c2)
+        msg += '\n%s' % str(self.image[r1:r2,c1:c2])
+        msg += '\n image.shape = %s' % str(self.image.shape)
+        #logging.info( msg )
+        print msg
+
 
 #-----------------------------
 #-----------------------------

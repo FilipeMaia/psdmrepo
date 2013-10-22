@@ -3,7 +3,7 @@
 #  $Id$
 #
 # Description:
-#  Pyana user analysis module cspad_arr_producer...
+#  Pyana/psana user analysis module cspad_arr_producer...
 #
 #------------------------------------------------------------------------
 
@@ -63,6 +63,9 @@ class cspad_arr_producer (object) :
 
         if self.m_print_bits & 1 : self.print_input_pars()
 
+        self.is_cspad     = False
+        self.is_cspad2x2  = False
+
 
     def set_dtype( self ) :
         if   self.m_dtype_str == 'int'    : self.m_dtype = np.int
@@ -86,30 +89,25 @@ class cspad_arr_producer (object) :
         @param env    environment object
         """
 
-        # Preferred way to log information is via logging package
-        logging.info( "cspad_arr_producer.beginjob() called" )
-
-        config = env.getConfig(TypeId.Type.Id_CspadConfig, self.m_src)
-        if not config:
+        self.config = env.getConfig(TypeId.Type.Id_CspadConfig, self.m_src)
+        if self.config :
+            self.is_cspad    = True
+            self.is_cspad2x2 = False
+            if self.m_print_bits & 2 : self.print_config_pars_for_cspad(env)
             return
 
-        print "cspad_arr_producer: %s: %s" % (config.__class__.__name__, self.m_src)
-        print "  numQuads =",     config.numQuads();
-        print "  asicMask =",     config.asicMask();
-        print "  quadMask =",     config.quadMask();
-        print "  numAsicsRead =", config.numAsicsRead();
+        self.config = env.getConfig(TypeId.Type.Id_Cspad2x2Config, self.m_src)
+        #self.config = env.getConfig(CsPad2x2.Config, self.m_src)
+        if self.config :
+            self.is_cspad    = False
+            self.is_cspad2x2 = True
+            if self.m_print_bits & 2 : self.print_config_pars_for_cspad2x2(env)
+            return
 
-        try:
-            # older versions may not have all methods
-            print "  roiMask       : [%s]" % ', '.join([hex(config.roiMask(q)) for q in range(4)])
-            print "  numAsicsStored: %s" % str(map(config.numAsicsStored, range(4)))
-        except:
-            pass
-        if env.fwkName() == "pyana":
-            self.list_of_sections = map(config.sections, range(4)) 
-            print "  sections      : %s" % str(self.list_of_sections)
+        msg = __name__ + ' WARNING: CSPAD or CSPAD2x2 configuration is NOT found!'
+        print msg
 
- 
+
     def beginrun( self, evt, env ) :
         """This optional method is called if present at the beginning 
         of the new run.
@@ -117,17 +115,11 @@ class cspad_arr_producer (object) :
         @param evt    event data object
         @param env    environment object
         """
-        logging.info( "cspad_arr_producer.beginrun() called" )
+        #logging.info( "cspad_arr_producer.beginrun() called" )
+        pass
 
 
-    def begincalibcycle( self, evt, env ) :
-        """This optional method is called if present at the beginning 
-        of the new calibration cycle.
-
-        @param evt    event data object
-        @param env    environment object
-        """
-        logging.info( "cspad_arr_producer.begincalibcycle() called" )
+    def begincalibcycle( self, evt, env ) : pass
 
 
     def event( self, evt, env ) :
@@ -137,69 +129,124 @@ class cspad_arr_producer (object) :
         @param env    environment object
         """
 
-        if env.fwkName() == "psana":
-            data = evt.get(CsPad.Data, self.m_src).quads_list()
-            #quads = evt.get("Psana::CsPad::Data", self.m_src).quads_list()
-        else:
-            data = evt.get(TypeId.Type.Id_CspadElement, self.m_src)
-        if not data :
-            return
-
-
-        #nQuads = data.quads_shape()[0]
-        if self.m_val_miss == 0 : self.arr = np.zeros((4, 8, 185, 388), dtype=self.m_dtype)
-        else                    : self.arr = np.ones ((4, 8, 185, 388), dtype=self.m_dtype) * self.m_dtype(self.m_val_miss)
-
-        for i, q in enumerate(data): # where quad is an object of pypdsdata.cspad.ElementV2
-            #print "  Quadrant #%d" % q.quad()
-            #print "    data shape = {}".format(q.data().shape)
-            #print "    data = %s" % q.data()
-            self.arr[i,:] = q.data()
+        if   self.is_cspad    : self.proc_event_for_cspad    (evt, env)
+        elif self.is_cspad2x2 : self.proc_event_for_cspad2x2 (evt, env)
+            
 
         if self.m_print_bits & 8 : self.print_part_of_output_array()
 
+        #print 'self.arr.dtype =', self.arr.dtype
         evt.put( self.arr, self.m_key_out )
 
+        #print '\ncspad_arr_producer: evt.keys():', evt.keys()
 
-    def endcalibcycle( self, evt, env ) :
-        """This optional method is called if present at the end of the 
-        calibration cycle.
         
-        @param evt    event data object
-        @param env    environment object
-        """        
-        logging.info( "cspad_arr_producer.endcalibcycle() called" )
+    def proc_event_for_cspad( self, evt, env ) :
+
+        # 1. Get data
+        if env.fwkName() == "psana":
+            data_tot = evt.get(CsPad.Data, self.m_src) # returns psana.CsPad.DataV2 object
+            if not data_tot :
+                return
+
+            nQuads = data_tot.quads_shape()[0]
+            data = map(data_tot.quads, range(nQuads)) # makes list of <psana.CsPad.ElementV2 objects
+
+        else:
+            data = evt.get(TypeId.Type.Id_CspadElement, self.m_src)
+
+        if not data :
+            return
+
+        # 2. Fill output array accounting for dtype and configuration
+        if self.m_val_miss == 0 : self.arr = np.zeros((4, 8, 185, 388), dtype=self.m_dtype)
+        else                    : self.arr = np.ones ((4, 8, 185, 388), dtype=self.m_dtype) * self.m_dtype(self.m_val_miss)
+
+        for q in data : # where q is an object of pypdsdata.cspad.ElementV2
+            quad_num = q.quad()
+            roi_mask = self.config.roiMask(quad_num)
+
+            quad_data = q.data()        # shape=(8, 185, 388)
+            nsects = quad_data.shape[0]
+            if self.m_print_bits & 32 : print 'quad_num=%d  roi_mask(oct)=%o   nsects=%d   data.shape=%s' % (quad_num, roi_mask,  nsects, str(quad_data.shape)) 
+
+            # Copy quad data (N<8, 185, 388) -> to CSPAD arr (4, 8, 185, 388) - changing data type
+            ind=0
+            for sect in range(8) :
+                if roi_mask & (1<<sect) :
+                    self.arr[quad_num,sect,:] = quad_data[ind,:] # - copy changing data type
+                    ind += 1
 
 
-    def endrun( self, evt, env ) :
-        """This optional method is called if present at the end of the run.
+    def proc_event_for_cspad2x2( self, evt, env ) :
+
+        if env.fwkName() == "psana":
+            elem = evt.get(CsPad2x2.Element, self.m_src) # returns psana.CsPad2x2.ElementV1 object
+            if not elem :
+                return
+        else:
+            elem = evt.get(TypeId.Type.Id_Cspad2x2Element, self.m_src) # returns CsPad2x2.ElementV1 object
+            if not elem :
+                return
+
+        if self.m_val_miss == 0 : self.arr = np.zeros((185, 388, 2), dtype=self.m_dtype)
+        else                    : self.arr = np.ones ((185, 388, 2), dtype=self.m_dtype) * self.m_dtype(self.m_val_miss)
+
+        self.arr[:] = elem.data()[:] # shape= (185, 388, 2) - copy changing data type
+
         
-        @param evt    event data object
-        @param env    environment object
-        """        
-        logging.info( "cspad_arr_producer.endrun() called" )
+    def endcalibcycle( self, evt, env ) : pass
 
+    def endrun( self, evt, env ) : pass
 
-    def endjob( self, evt, env ) :
-        """This method is called at the end of the job. It should do 
-        final cleanup, e.g. close all open files.
-        
-        @param evt    event data object
-        @param env    environment object
-        """        
-        logging.info( "cspad_arr_producer.endjob() called" )
+    def endjob( self, evt, env ) : pass
 
 
     def print_input_pars( self ) :
-        msg = '\nList of input parameters\n  source: %s\n  print_bits: %4d\n  dtype_str: %s\n  dtype_str: %s\n  key_out %s\n  m_val_miss: %s' % \
-              (self.m_src, self.m_print_bits, self.m_dtype_str, str(self.m_dtype), self.m_key_out, self.m_val_miss)
+        msg = '\n%s: List of input parameters\n  source: %s\n  print_bits: %4d\n  dtype_str: %s\n  dtype_str: %s\n  key_out %s\n  m_val_miss: %s' % \
+              (__name__, self.m_src, self.m_print_bits, self.m_dtype_str, str(self.m_dtype), self.m_key_out, self.m_val_miss)
         #logging.info( msg )
         print msg
 
 
     def print_part_of_output_array( self ) :
-        print 'arr[2,4,:] =', self.arr[2,4,:]
-        print 'arr.shape =', self.arr.shape
+        msg = __name__ + ': arr[2,4,:] :\n' + str(self.arr[2,4,:]) \
+            + '\n  arr.shape = %s    arr.dtype = %s' % (str(self.arr.shape), str(self.arr.dtype))
+        #logging.info( msg )
+        print msg
+
+
+    def print_config_pars_for_cspad2x2( self, env ) :
+        msg  = '%s: List of configuration parameters for CSPAD2x2' % (__name__)
+        print msg
+        print "  payloadSize    =", self.config.payloadSize()
+        print "  asicMask       =", self.config.asicMask()
+        print "  roiMask        =", self.config.roiMask()
+        print "  numAsicsRead   =", self.config.numAsicsRead()
+        print "  numAsicsStored =", self.config.numAsicsStored()
+ 
+
+    def print_config_pars_for_cspad( self, env ) :
+        msg  = '%s: List of configuration parameters for CSPAD' % (__name__)
+        msg += '\n%s: %s' % (self.config.__class__.__name__, self.m_src)
+        msg += '\n  numQuads = %d'     % (self.config.numQuads())
+        msg += '\n  asicMask = %d'     % (self.config.asicMask())
+        msg += '\n  quadMask = %d'     % (self.config.quadMask())
+        msg += '\n  numAsicsRead = %d' % (self.config.numAsicsRead())
+
+        try:
+            # older versions may not have all methods
+            msg +=  '\n  roiMask       : [%s]' % ', '.join([hex(self.config.roiMask(q)) for q in range(4)])
+            msg +=  '\n  numAsicsStored: %s' % str(map(self.config.numAsicsStored, range(4)))
+        except:
+            pass
+
+        #if env.fwkName() == 'pyana':
+        self.list_of_sections = map(self.config.sections, range(4)) 
+        msg +=  '\n  sections      : %s' % str(self.list_of_sections)
+
+        #logging.info( msg )
+        print msg
 
 #-----------------------------
 #-----------------------------
