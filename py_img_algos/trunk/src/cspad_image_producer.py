@@ -183,7 +183,7 @@ class cspad_image_producer (object) :
         #logging.info( msg )
         print msg
         if   self.is_cspad    : self.coord.print_cspad_geometry_pars()
-        elif self.is_cspad2x2 : self.calibprintCalibPars()
+        elif self.is_cspad2x2 : self.calib.printCalibPars()
 
 
     def print_configuration_parameters( self ) :
