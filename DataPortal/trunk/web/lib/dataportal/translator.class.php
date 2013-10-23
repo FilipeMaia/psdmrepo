@@ -110,7 +110,7 @@ class Translator {
 	        	$files_irodsws = $run_irodsws['xtc'];
     	    	if( !is_null( $files_irodsws ))
         			foreach( $files_irodsws as $f )
-        				if( $f->replica == 0 ) $files_irodsws_num++;
+        				if( $f->resource == 'lustre-resc' ) $files_irodsws_num++;
 
        				if( $files_irodsws_num != count( $files_open_by_DAQ )) {
 	           			$actions = '';
@@ -196,7 +196,7 @@ class Translator {
 	           			/* TODO: For now consider disk resident files only! Implement a smarter
     	       		 	 * logic for files which only exist on HPSS. Probably show their status.
         	   			 */
-           				if( $f->replica != 0 ) continue;
+           				if( $f->resource != 'lustre-resc' ) continue;
 
 	               		array_push( $request[$type], array( 'name' => $f->name, 'size' => number_format( $f->size )));
     	       		}

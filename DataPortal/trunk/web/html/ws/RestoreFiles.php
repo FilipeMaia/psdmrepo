@@ -137,29 +137,29 @@ try {
     //
     foreach( $files as $file ) {
         $irods_filepath = "{$file->collName}/{$file->name}";
-        $request = new RestRequest(
-            "/files{$irods_filepath}",
-            'POST',
-            array(
-                'src_resource' => 'hpss-resc',
-                'dst_resource' => 'lustre-resc'
-            ),
-            true  /* to package parameters into the POST body */
-        );
-        $request->execute();
-        $responseInfo = $request->getResponseInfo();
-        $http_code = intval($responseInfo['http_code']);
-        switch($http_code) {
-            case 200: break;
-            case 404:
-                report_error(
-                    "file '{$file->name}' doesn't exist",
-                    array( 'medium_quota_used_gb' => Config::instance()->calculate_medium_quota($exper_id)));
-            default:
-                report_error(
-                    "failed to restore file '{$file->name}' because of HTTP error {$http_code}",
-                    array( 'medium_quota_used_gb' => Config::instance()->calculate_medium_quota($exper_id)));
-        }
+//        $request = new RestRequest(
+//            "/files{$irods_filepath}",
+//            'POST',
+//            array(
+//                'src_resource' => 'hpss-resc',
+//                'dst_resource' => 'lustre-resc'
+//            ),
+//            true  /* to package parameters into the POST body */
+//        );
+//        $request->execute();
+//        $responseInfo = $request->getResponseInfo();
+//        $http_code = intval($responseInfo['http_code']);
+//        switch($http_code) {
+//            case 200: break;
+//            case 404:
+//                report_error(
+//                    "file '{$file->name}' doesn't exist",
+//                    array( 'medium_quota_used_gb' => Config::instance()->calculate_medium_quota($exper_id)));
+//            default:
+//                report_error(
+//                    "failed to restore file '{$file->name}' because of HTTP error {$http_code}",
+//                    array( 'medium_quota_used_gb' => Config::instance()->calculate_medium_quota($exper_id)));
+//        }
         Config::instance()->add_file_restore_request(
             array(
                 'exper_id'  => $exper_id,

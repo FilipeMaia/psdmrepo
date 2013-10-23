@@ -513,7 +513,7 @@ define_class( Table, null, {
             html += '<td class="'+classes+'" rowspan='+rowspan+' colspan='+colspan+' '+align+' >';
             if(( rowspan + level == this.header.size.rows ) && this.header.hideable[col.number] ) {
                 if( this.header.hidden[col.number] ) {
-                    html += '<div style="float:left;"><input type="checkbox" name="'+col.number+'" title="check to expand the column: '+col.name+'"/></div>';
+                    html += '<div style="float:left;"><input type="checkbox" name="'+col.number+'" title="'+col.name+'"/></div>';
                 } else {
                     html += '<div style="float:left;"><input type="checkbox" name="'+col.number+'" checked="checked" title="uncheck to hide the column"/></div>';
                     html += col_html;

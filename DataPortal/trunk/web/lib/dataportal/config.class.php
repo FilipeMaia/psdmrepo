@@ -216,7 +216,7 @@ HERE
         $irods_dst_resource = $this->escape_string(trim($request['irods_dst_resource']));
         $requested_time = LusiTime::now();
         $requested_uid = $this->escape_string(trim(AuthDB::instance()->authName()));
-        $sql = "INSERT INTO {$this->database}.file_restore_requests VALUES ({$exper_id},{$runnum},'{$file_type}','{$irods_filepath}','{$irods_src_resource}','{$irods_dst_resource}',{$requested_time->to64()},'{$requested_uid}')";
+        $sql = "INSERT INTO {$this->database}.file_restore_requests VALUES ({$exper_id},{$runnum},'{$file_type}','{$irods_filepath}','{$irods_src_resource}','{$irods_dst_resource}',{$requested_time->to64()},'{$requested_uid}','RECEIVED')";
         $this->query($sql);
         return $this->find_file_restore_request($request);
     }
@@ -262,6 +262,7 @@ HERE
         $row = mysql_fetch_array($result, MYSQL_ASSOC);
         $request['requested_time'] = LusiTime::from64($row['requested_time']);
         $request['requested_uid' ] = trim($row['requested_uid']);
+        $request['status'        ] = trim($row['status']);
 
         return $request;
     }
@@ -284,6 +285,7 @@ HERE
             $row['irods_filepath'] = trim($row['irods_filepath']);
             $row['requested_time'] = LusiTime::from64($row['requested_time']);
             $row['requested_uid' ] = trim($row['requested_uid']);
+            $row['status'        ] = trim($row['status']);
             array_push($list, $row);
         }
         return $list;

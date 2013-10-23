@@ -10,6 +10,8 @@ DataPortal\ServiceJSON::run_handler ('POST', function ($SVC) {
     $exper_id = $SVC->required_int('exper_id') ;
     $runnum   = $SVC->required_int('run') ;
     $dark     = $SVC->required_int('dark') ;
+    $flat     = $SVC->required_int('flat') ;
+    $geom     = $SVC->required_int('geom') ;
     $comment  = $SVC->optional_str('comment', '') ;
 
     $experiment = $SVC->logbook()->find_experiment_by_id($exper_id) ;
@@ -19,11 +21,17 @@ DataPortal\ServiceJSON::run_handler ('POST', function ($SVC) {
     if (!$run) $SVC->abort("no run {$runnum} found within experiment with id={$xper_id}") ;
 
     $run->set_attr_val_INT ('Calibrations', 'dark',    $dark) ;
+    $run->set_attr_val_INT ('Calibrations', 'flat',    $flat) ;
+    $run->set_attr_val_INT ('Calibrations', 'geom',    $geom) ;
     $run->set_attr_val_TEXT('Calibrations', 'comment', $comment) ;
 
     $runs = array() ;
-    $runs[$runnum] = array('dark' => $dark, 'comment' => $comment) ;
-
+    $runs[$runnum] = array(
+        'dark'    => $dark ? '1' : '' ,
+        'flat'    => $flat ? '1' : '',
+        'geom'    => $geom ? '1' : '',
+        'comment' => $comment
+    ) ;
     $SVC->finish (array('runs' => $runs)) ;
 }) ;
 

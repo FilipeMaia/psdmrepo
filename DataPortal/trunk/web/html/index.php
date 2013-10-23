@@ -717,7 +717,6 @@ HERE;
         $elog_runs_workarea        = $no_elog_access_message;
         $elog_attachments_workarea = $no_elog_access_message;
         $elog_subscribe_workarea   = $no_elog_access_message;
-
     }
     if( $has_calib_access ) {
         $runtables_calib_workarea =<<<HERE
@@ -765,7 +764,50 @@ HERE;
 HERE;
         $runtables_calib_workarea = $no_calib_access_message;
     }
+
+
     if( $has_data_access ) {
+
+        $runtables_detectors_workarea =<<<HERE
+<div class="runtables-ctrl">
+  <table><tbody>
+    <tr style="font-size:12px;">
+      <td valign="center">
+        <span style="font-weight:bold;">Select runs from</span></td>
+      <td valign="center">
+        <input type="text" name="from" size="2" title="The first run of the interval. If no input is provided then the very first known run will be assumed." /></td>
+      <td valign="center">
+        <span style="font-weight:bold; margin-left:0px;">through</span></td>
+      <td valign="center">
+        <input name="through" type="text" size="2" title="The last run of the interval. If no input is provided then the very last known run will be assumed"/ ></td>
+      <td valign="center">
+        <button class="control-button" style="margin-left:20px;" name="reset" title="reset the form">Reset Form</button></td>
+      <td valign="center">
+        <button class="control-button" name="refresh" title="check if there were any updates on this page">Refresh</button></td>
+    </tr>
+  </tbody></table>
+</div>
+<div class="runtables-wa">
+  <div class="runtables-info" id="info"    style="float:left;" >&nbsp;</div>
+  <div class="runtables-info" id="updated" style="float:right;">&nbsp;</div>
+  <div style="clear:both;"></div> 
+  <div class="runtables-body">
+    <div id="table-controls" style="margin-bottom:10px;">
+      <table><tbody>
+        <tr style="font-size:12px;">
+          <td valign="center">
+            <button class="control-button" name="show_all" title="show all columns">Show all</button></td>
+          <td valign="center">
+            <button class="control-button" name="hide_all" title="hide all columns">Hide all</button></td>
+          <td valign="center">
+            <button class="control-button" name="advanced" title="open a dialog to select which columns to show/hide">Selective...</td>
+        </tr>
+      </tbody></table>
+    </div>
+    <div id="table"></div>
+  </div>
+</div>
+HERE;
 
         $datafiles_summary_workarea =<<<HERE
 <div id="datafiles-summary-ctrl">
@@ -982,6 +1024,8 @@ HERE;
 </div>
 HERE;
 
+        $runtables_detectors_workarea = $no_data_access_message ;
+
         $datafiles_summary_workarea = $no_data_access_message;
         $datafiles_files_workarea   = $no_data_access_message;
         $hdf_manage_workarea        = $no_data_access_message;
@@ -1009,7 +1053,7 @@ HERE;
 <link type="text/css" href="css/Data.css" rel="Stylesheet" />
 <link type="text/css" href="css/Hdf.css" rel="Stylesheet" />
 
-<link type="text/css" href="../portal/css/Table.css" rel="Stylesheet" />
+<link type="text/css" href="../webfwk/css/Table.css" rel="Stylesheet" />
 
 <script type="text/javascript" src="/jquery/js/jquery.min.js"></script>
 <script type="text/javascript" src="/jquery/js/jquery-ui.custom.min.js"></script>
@@ -1026,7 +1070,7 @@ HERE;
 <script type="text/javascript" src="js/ws.js"></script>
 
 <script type="text/javascript" src="../portal/js/config.js"></script>
-<script type="text/javascript" src="../portal/js/Table.js"></script>
+<script type="text/javascript" src="../webfwk/js/Table.js"></script>
 
 <!----------- Window layout styles and supppot actions ----------->
 
@@ -1977,6 +2021,11 @@ function global_elog_search_run_by_num(num, show_in_vicinity) {
         <div style="float:left;" >Calibrations</div>
         <div style="clear:both;"></div>
       </div>
+      <div class="v-item" id="detectors">
+        <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
+        <div style="float:left;" >DAQ Detectors</div>
+        <div style="clear:both;"></div>
+      </div>
     </div>
 
     <div id="datafiles" class="hidden">
@@ -2028,24 +2077,26 @@ function global_elog_search_run_by_num(num, show_in_vicinity) {
 -->
 <div id="p-center">
   <div id="application-workarea">
-    <div id="experiment-summary" class="application-workarea hidden"><?php echo $experiment_summary_workarea ?></div>
-    <div id="experiment-manage"  class="application-workarea hidden"><?php echo $experiment_manage_group_workarea ?></div>
-    <div id="elog-recent"        class="application-workarea hidden"><?php echo $elog_recent_workarea ?></div>
-    <div id="elog-post"          class="application-workarea hidden"><?php echo $elog_post_workarea ?></div>
-    <div id="elog-search"        class="application-workarea hidden"><?php echo $elog_search_workarea ?></div>
-    <div id="elog-shifts"        class="application-workarea hidden"><?php echo $elog_shifts_workarea ?></div>
-    <div id="elog-runs"          class="application-workarea hidden"><?php echo $elog_runs_workarea ?></div>
-    <div id="elog-attachments"   class="application-workarea hidden"><?php echo $elog_attachments_workarea ?></div>
-    <div id="elog-subscribe"     class="application-workarea hidden"><?php echo $elog_subscribe_workarea ?></div>
-    <div id="runtables-calib"    class="application-workarea hidden"><?php echo $runtables_calib_workarea ?></div>
-    <div id="datafiles-summary"  class="application-workarea hidden"><?php echo $datafiles_summary_workarea ?></div>
-    <div id="datafiles-files"    class="application-workarea hidden"><?php echo $datafiles_files_workarea ?></div>
-    <div id="hdf-manage"         class="application-workarea hidden"><?php echo $hdf_manage_workarea ?></div>
-    <div id="hdf-history"        class="application-workarea hidden"><?php echo $hdf_history_workarea ?></div>
-    <div id="hdf-translators"    class="application-workarea hidden"><?php echo $hdf_translators_workarea ?></div>
-    <div id="help"               class="application-workarea hidden"></div>
+    <div id="experiment-summary"  class="application-workarea hidden"><?php echo $experiment_summary_workarea ?></div>
+    <div id="experiment-manage"   class="application-workarea hidden"><?php echo $experiment_manage_group_workarea ?></div>
+    <div id="elog-recent"         class="application-workarea hidden"><?php echo $elog_recent_workarea ?></div>
+    <div id="elog-post"           class="application-workarea hidden"><?php echo $elog_post_workarea ?></div>
+    <div id="elog-search"         class="application-workarea hidden"><?php echo $elog_search_workarea ?></div>
+    <div id="elog-shifts"         class="application-workarea hidden"><?php echo $elog_shifts_workarea ?></div>
+    <div id="elog-runs"           class="application-workarea hidden"><?php echo $elog_runs_workarea ?></div>
+    <div id="elog-attachments"    class="application-workarea hidden"><?php echo $elog_attachments_workarea ?></div>
+    <div id="elog-subscribe"      class="application-workarea hidden"><?php echo $elog_subscribe_workarea ?></div>
+    <div id="runtables-calib"     class="application-workarea hidden"><?php echo $runtables_calib_workarea ?></div>
+    <div id="runtables-detectors" class="application-workarea hidden"><?php echo $runtables_detectors_workarea ?></div>
+    <div id="datafiles-summary"   class="application-workarea hidden"><?php echo $datafiles_summary_workarea ?></div>
+    <div id="datafiles-files"     class="application-workarea hidden"><?php echo $datafiles_files_workarea ?></div>
+    <div id="hdf-manage"          class="application-workarea hidden"><?php echo $hdf_manage_workarea ?></div>
+    <div id="hdf-history"         class="application-workarea hidden"><?php echo $hdf_history_workarea ?></div>
+    <div id="hdf-translators"     class="application-workarea hidden"><?php echo $hdf_translators_workarea ?></div>
+    <div id="help"                class="application-workarea hidden"></div>
   </div>
   <div id="popupdialogs" style="display:none;"></div>
+  <div id="largedialogs" style="display:none;"></div>
 </div>
 </body>
 

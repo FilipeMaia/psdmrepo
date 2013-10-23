@@ -173,7 +173,7 @@ try {
             'irods_filepath'     => $irods_filepath,
             'irods_src_resource' => 'hpss-resc',
             'irods_dst_resource' => 'lustre-resc'
-       );
+        );
         $file_restore_request = Config::instance()->find_file_restore_request($request_spec);
         
         // The rest of the operation depends on the requested action.
@@ -196,31 +196,31 @@ try {
                         array('medium_quota_used_gb' => $medium_quota_used_gb));
             }
 
-            // Restore the file by its full path and a source resource
-            //
-            $request = new RestRequest(
-                "/files{$irods_filepath}",
-                'POST',
-                array(
-                    'src_resource' => 'hpss-resc',
-                    'dst_resource' => 'lustre-resc'
-               ),
-                true  /* to package parameters into the POST body */
-           );
-            $request->execute();
-            $responseInfo = $request->getResponseInfo();
-            $http_code = intval($responseInfo['http_code']);
-            switch($http_code) {
-                case 200: break;
-                case 404:
-                    report_error(
-                        "file '{$file->name}' doesn't exist",
-                        array('medium_quota_used_gb' => $medium_quota_used_gb));
-                default:
-                    report_error(
-                        "failed to restore file '{$file->name}' because of HTTP error {$http_code}",
-                        array('medium_quota_used_gb' => $medium_quota_used_gb));
-            }
+//            // Restore the file by its full path and a source resource
+//            //
+//            $request = new RestRequest(
+//                "/files{$irods_filepath}",
+//                'POST',
+//                array(
+//                    'src_resource' => 'hpss-resc',
+//                    'dst_resource' => 'lustre-resc'
+//               ),
+//                true  /* to package parameters into the POST body */
+//            );
+//            $request->execute();
+//            $responseInfo = $request->getResponseInfo();
+//            $http_code = intval($responseInfo['http_code']);
+//            switch($http_code) {
+//                case 200: break;
+//                case 404:
+//                    report_error(
+//                        "file '{$file->name}' doesn't exist",
+//                        array('medium_quota_used_gb' => $medium_quota_used_gb));
+//                default:
+//                    report_error(
+//                        "failed to restore file '{$file->name}' because of HTTP error {$http_code}",
+//                        array('medium_quota_used_gb' => $medium_quota_used_gb));
+//            }
             Config::instance()->add_file_restore_request(
                 array(
                     'exper_id'  => $exper_id,
