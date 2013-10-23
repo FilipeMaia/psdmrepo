@@ -95,8 +95,6 @@ function file_action(action, exper_id, runnum, file_type, irods_filepath) {
 
 $(function() {
     $('#tabs').tabs();
-    $('button.resubmit').button();
-    $('button.cancel').button();
 });
 
 </script>
@@ -107,11 +105,36 @@ $(function() {
 
     <h2>File Restore Requests</h2>
 
-    <div id="tabs" style="padding-left:10px; font-size:12px;">
+    <div id="tabs" style="margin-top:10px; padding-left:10px; font-size:12px;">
+ 
       <ul>
-        <li><a href="#history">History</a></li>
+        <li><a href="#summary">Summary</a></li>
+        <li><a href="#requests">Requests</a></li>
       </ul>
-      <div id="default" >
+
+      <div id="summary" >
+        <div style="padding:20px; border:solid 1px #b0b0b0; font-size:12px; " >
+          <table><tbody>
+            <tr>
+              <td class="table_hdr" >Status</td>
+              <td class="table_hdr" >Files</td>
+              <td class="table_hdr" >Total Size</td>
+            </tr>
+            <tr>
+              <td class="table_cell table_cell_left"                      ><span style="color:red;">pending</span></td>
+              <td class="table_cell "                  id="pending_files" >Loading...</td>
+              <td class="table_cell table_cell_right " id="pending_size"  >Loading...</td>
+            </tr>
+            <tr>
+              <td class="table_cell table_cell_left  table_cell_bottom"                      ><span style="color:green;">completed</span></td>
+              <td class="table_cell                  table_cell_bottom" id="completed_files" >Loading...</td>
+              <td class="table_cell table_cell_right table_cell_bottom" id="completed_size"  >Loading...</td>
+            </tr>
+          </tbody></table>
+        </div>
+      </div>
+
+      <div id="requests" >
         <div style="padding:20px; border:solid 1px #b0b0b0; font-size:12px; " >
 
           <table><tbody>
@@ -151,11 +174,23 @@ use RegDB\RegDB;
 
 define( 'BYTES_IN_MB', 1024 * 1024 );
 define( 'BYTES_IN_GB', 1024 * BYTES_IN_MB );
+define( 'BYTES_IN_TB', 1024 * BYTES_IN_GB );
 
 function report_error ($msg) {
     print "<div style=\"color:red;\">Error: {$msg}</div>";
     exit;
 }
+
+function size2str($size) {
+    $str = '';
+    if      ($size < BYTES_IN_GB) { $str = intval($size / BYTES_IN_MB).' MB'; }
+    else if ($size < BYTES_IN_TB) { $str = intval($size / BYTES_IN_GB).' GB'; }
+    else                          { $str = sprintf( "%0.1f", $size / BYTES_IN_TB).' TB'; }
+    return $str;
+}
+$pending_size_str = '';
+$completed_size_str = '';
+                
 try {
     AuthDB::instance()->begin();
     RegDB::instance()->begin();
@@ -170,6 +205,11 @@ try {
     $can_edit = AuthDB::instance()->hasPrivilege(AuthDB::instance()->authName(), null, 'StoragePolicyMgr', 'edit');
 
     $now = LusiTime::now();
+
+    $pending_files   = 0;
+    $pending_size    = 0;
+    $completed_files = 0;
+    $completed_size  = 0;
 
     foreach (Config::instance()->file_restore_requests() as $request) {
 
@@ -214,10 +254,14 @@ try {
         if (is_null($disk_ctime)) {
             $status = '<span style="color:red;">pending...</span>';
             $service_delay_sec = $now->sec - $requested_time->sec;
+            $pending_files++;
+            if ($size_bytes) $pending_size = $pending_size + $size_bytes;
         } else {
             $status = '<span style="color:green;">completed</span>';
             $ctime_time = new LusiTime(intval($disk_ctime));
             $service_delay_sec = $ctime_time->sec - $requested_time->sec;
+            $completed_files++;
+            if ($size_bytes) $completed_size = $completed_size + $size_bytes;
         }
         $days    = 0;
         $hours   = 0;
@@ -270,6 +314,8 @@ try {
               </td>
             </tr>
 <?php
+        $pending_size_str = size2str($pending_size);
+        $completed_size_str = size2str($completed_size);
     }
     AuthDB::instance()->commit();
     RegDB::instance()->commit();
@@ -285,5 +331,17 @@ try {
       </div>
     </div>
   </div>
+<script type="text/javascript">
+
+$(function() {
+    $('#pending_files')  .html('<?php echo $pending_files; ?>');
+    $('#pending_size')   .html('<?php echo $pending_size_str; ?>');
+    $('#completed_files').html('<?php echo $completed_files; ?>');
+    $('#completed_size') .html('<?php echo $completed_size_str; ?>');
+    $('button.resubmit').button();
+    $('button.cancel').button();
+});
+
+</script>
 </body>
 </html>

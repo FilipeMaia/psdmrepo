@@ -352,7 +352,7 @@ def detectors(instr, exper, run):
     """
 
     run_id = run2id(exper,run)
-    if run_id is None: return []
+    if run_id is None: raise ValueError('wrong experiment name or run number')
 
     query = "SELECT name FROM logbook.run_attr WHERE run_id=%d AND class='DAQ_Detectors' ORDER BY name" % run_id
     return [row['name'] for row in __do_select_many(query)]
@@ -383,7 +383,7 @@ def run_attributes(instr, exper, run, attr_class=None):
     """
 
     run_id = run2id(exper,run)
-    if run_id is None: return []
+    if run_id is None: raise ValueError('wrong experiment name or run number')
 
     attr_class_opt = ''
     if attr_class is not None: attr_class_opt = " AND class='%s' " % __escape_string(attr_class)

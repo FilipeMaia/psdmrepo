@@ -11,6 +11,13 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-19
+2013-10-23 Igor Gaponenko
+- reinforced Python module experiment_info to throw an exception
+for wrong user parameters
+- minor changes in the SimpleTapeMOnitor Web application to display a summary table for
+file restore requests
+
 Tag: V00-01-18
 2013-10-17 Igor Gaponenko
 - simplified interface to the calibration runs in Python module experiment_info
