@@ -171,7 +171,7 @@ class Event(object):
         Returns stream number or None if stream number is not known. Note that stream number is determined from
         the input XTC file name, if file name has non-standard format then stream number cannot be deduced.
         """
-        return self.m_sream
+        return self.m_stream
 
     def chunk(self):
         """ self.chunk() -> int
