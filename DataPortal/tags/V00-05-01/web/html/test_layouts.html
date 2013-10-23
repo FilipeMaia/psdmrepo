@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
+<title>Insert title here</title>
+
+<style type="text/css">
+
+  body {
+    margin: 0;
+    padding: 0;
+  }
+  #p-top {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 129px;
+    background-color: #e0e0e0;
+  }
+  #p-top-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 92px;
+    background-color: #ffffff;
+  }
+  #p-top-title {
+    width: 100%;
+    height: 61px;
+  }
+  #p-context-header {
+    width: 100%;
+    height: 36px;
+    background-color: #E0E0E0;
+    border-bottom: 1px solid #0b0b0b;
+  }
+  #p-left {
+    position: absolute;
+    left: 0;
+    top: 130px;
+    width: 200px;
+    overflow: auto;
+  }
+  #p-splitter {
+    position: absolute;
+    left: 200px;
+    top: 130px;
+    width: 1px;
+    overflow: none;
+    cursor: e-resize;
+    border-left: 1px solid #a0a0a0;
+    border-right: 1px solid #a0a0a0;
+  }
+  #p-bottom {
+    z-index: 100;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    height: 20px;
+    width: 100%;
+    background-color: #a0a0a0;
+    border-top: 1px solid #c0c0c0;
+  }
+  #p-status {
+    padding: 2px;
+    font-family: Lucida Grande, Lucida Sans, Arial, sans-serif;
+    font-size: 75%;
+  }
+  #p-center {
+    position: relative;
+    top:130px;
+    margin: 0px 0px 20px 203px;
+    overflow: auto;
+    background-color: #ffffff;
+    border-left: 1px solid #a0a0a0;
+  }
+  
+  
+  canvas {
+    border: medium double black; margin: 4px
+  }
+
+</style>
+
+<script type="text/javascript" src="/jquery/js/jquery.min.js"></script>
+<script type="text/javascript">
+
+
+function resize() {
+	$('#p-left').height($(window).height()-125-20);
+	$('#p-splitter').height($(window).height()-125-20);
+	$('#p-center').height($(window).height()-125-20);
+}
+
+/* Get mouse position relative to the document.
+ */
+function getMousePosition(e) {
+
+	var posx = 0;
+	var posy = 0;
+	if (!e) var e = window.event;
+	if (e.pageX || e.pageY) 	{
+		posx = e.pageX;
+		posy = e.pageY;
+	}
+	else if (e.clientX || e.clientY) 	{
+		posx = e.clientX + document.body.scrollLeft
+			+ document.documentElement.scrollLeft;
+		posy = e.clientY + document.body.scrollTop
+			+ document.documentElement.scrollTop;
+	}
+	return {'x': posx, 'y': posy };
+}
+
+function move_split(e) {
+	var pos = getMousePosition(e);
+	$('#p-left').css('width', pos['x']);
+	$('#p-splitter').css('left', pos['x']);
+	$('#p-center').css('margin-left', pos['x']+3);
+}
+
+$(function() {
+
+	resize();
+
+	var mouse_down = false;
+
+	$('#p-splitter').mousedown (function(e) { mouse_down = true; return false; });
+
+	$('#p-left'    ).mousemove(function(e) { if(mouse_down) move_split(e); });
+	$('#p-center'  ).mousemove(function(e) { if(mouse_down) move_split(e); });
+
+	$('#p-left'    ).mouseup   (function(e) { mouse_down = false; });
+	$('#p-splitter').mouseup   (function(e) { mouse_down = false; });
+	$('#p-center'  ).mouseup   (function(e) { mouse_down = false; });
+});
+
+</script>
+
+</head>
+<body onresize="resize()">
+
+<div id="p-top">top</div>
+
+<div id="p-left">left</div>
+
+<div id="p-splitter"></div>
+
+<div id="p-bottom">
+  <div id="p-status">
+    <center>- status bar to be here at some point -</center>
+  </div>
+</div>
+
+<div id="p-center">
+  <div id="application-workarea">
+    <h2>On the Origin of The Origin</h2>
+    <p>Darwin's father was dead set on his son becoming a cleric but even though the young rapscallion started to study theology he found worms much more interesting.</p>
+    <p>When a lonely man with a moustache asked Darwin to ride with him on his boat named after a dog, Darwin agreed and set off around the world fiddling with wildlife.</p>
+    <p>It is said that it was a load of birds from the Ecuadorean Galapagos archipelago that inspired his now widely accepted explanation of the mechanism of evolution. "Why does that bird on that island have a beak like that while that finch on that island has a beak like that? AHA! I've got it! Natural Selection!" he thought.</p>
+    <h3>The Origin</h3>
+    <p>After getting back from his jaunt, Charles started work on his theory of evolution. Distracted by games of Reversi, Freecell and Solitaire on his computer, he took quite a while but then he heard that some Australian bloke named Wallace had come up with a similar idea so he got a move on to prevent his thunder being stolen.</p>
+    <p>In 1858 Darwin and Wallance presented a joint paper to the Linnean Society of London that sent rumbles across the establishment and really quite upset a lot of people. The next year saw the publication of Darwin's 500-page 'abstract' - 'On The Origin of Species by Means of Natural Selection or the Preservation of Favoured Races In The Struggle For Life' (or OTOOSBMONSOTPOFRITSFL for short).</p>
+    <p>Darwin was propelled into superstardom, but even with his bling-bling lifestyle on a Caribbean island surrounded by scantly clad young ladies he didn't rest.</p>
+    <h3>After The Origin</h3>
+    <p>In between movie roles and enjoying chart-topping success with singles such as 'I Like Big Ducks' and 'Darwin's Got A Brand New Bat' Chuck D managed to revise the Origin five times, each one a bit more toned down than the one before it, partly to appease his religious wife. Who also happened to be his cousin. But after a few more years he'd had enough of trying to disguise the logical conclusion that humans are descended from the same common ancestor as all other animals he published 'The Descent of Man' to really piss off the religious establishment.</p>
+    <p>Darwin lived out his final days as a celebrity wrestler with a traveling circus.</p>
+    <p>His body can now be found encased in granite in the food hall of London's Natural History Museum. Near the toilets.</p>
+    <div>
+      <canvas id="canvas" width="640" height="480">
+        Your browser doesn't support the <code>canvas</code> element
+      </canvas>
+      <script>
+        var ctx = document.getElementById("canvas").getContext("2d");
+                         
+        ctx.fillStyle = "lightgrey";
+        ctx.strokeStyle = "black";
+        ctx.lineWidth = 3;
+
+        ctx.clearRect(0, 0, 300, 120);
+        ctx.globalAlpha = 1.0;
+        ctx.font = "100px sans-serif";
+        ctx.fillText("Hello", 10, 100);
+        ctx.strokeText("Hello", 10, 100);       
+
+        ctx.scale(1.3, 1.3);
+        ctx.translate(100, -50);
+        ctx.rotate(0.5);
+
+        ctx.fillStyle = "red";
+        ctx.globalAlpha = 0.5;
+        ctx.fillRect(100, 10, 150, 100);
+
+        ctx.strokeRect(0, 0, 300, 200);
+      </script>
+    </div>
+  </div>
+  <div id="popupdialogs" style="display:none;"></div>
+</div>
+
+</body>
+</html>
