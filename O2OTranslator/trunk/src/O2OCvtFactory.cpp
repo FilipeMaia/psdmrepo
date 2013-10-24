@@ -301,7 +301,7 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
       ::makeConfigCvt<ControlDataConfigV1>(cvts, group, "ControlData::ConfigV1", src, transition, m_cvtOptions, 0);
       break;
     case 2:
-      ::makeConfigCvt<ControlDataConfigV2>(cvts, group, "ControlData::ConfigV2", src, transition, m_cvtOptions, 1);
+      ::makeConfigCvt<ControlDataConfigV2>(cvts, group, "ControlData::ConfigV2", src, transition, m_cvtOptions, 2);
       break;
     case 3:
       ::makeConfigCvt<ControlDataConfigV3>(cvts, group, "ControlData::ConfigV3", src, transition, m_cvtOptions, 1);
