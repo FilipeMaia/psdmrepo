@@ -118,6 +118,7 @@ void make_datasets(const Psana::Lusi::DiodeFexConfigV1& obj, hdf5pp::Group group
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     make_datasets_DiodeFexConfigV1_v0(obj, group, chunk_size, deflate, shuffle);
@@ -130,6 +131,7 @@ void make_datasets(const Psana::Lusi::DiodeFexConfigV1& obj, hdf5pp::Group group
 void store_DiodeFexConfigV1(const Psana::Lusi::DiodeFexConfigV1* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     store_DiodeFexConfigV1_v0(obj, group, index, append);
@@ -255,6 +257,7 @@ void make_datasets(const Psana::Lusi::DiodeFexConfigV2& obj, hdf5pp::Group group
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     make_datasets_DiodeFexConfigV2_v0(obj, group, chunk_size, deflate, shuffle);
@@ -267,6 +270,7 @@ void make_datasets(const Psana::Lusi::DiodeFexConfigV2& obj, hdf5pp::Group group
 void store_DiodeFexConfigV2(const Psana::Lusi::DiodeFexConfigV2* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     store_DiodeFexConfigV2_v0(obj, group, index, append);
@@ -375,6 +379,7 @@ void make_datasets(const Psana::Lusi::DiodeFexV1& obj, hdf5pp::Group group, hsiz
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     make_datasets_DiodeFexV1_v0(obj, group, chunk_size, deflate, shuffle);
@@ -387,6 +392,7 @@ void make_datasets(const Psana::Lusi::DiodeFexV1& obj, hdf5pp::Group group, hsiz
 void store_DiodeFexV1(const Psana::Lusi::DiodeFexV1* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     store_DiodeFexV1_v0(obj, group, index, append);
@@ -523,6 +529,7 @@ void make_datasets(const Psana::Lusi::IpmFexConfigV1& obj, hdf5pp::Group group, 
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     make_datasets_IpmFexConfigV1_v0(obj, group, chunk_size, deflate, shuffle);
@@ -535,6 +542,7 @@ void make_datasets(const Psana::Lusi::IpmFexConfigV1& obj, hdf5pp::Group group, 
 void store_IpmFexConfigV1(const Psana::Lusi::IpmFexConfigV1* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     store_IpmFexConfigV1_v0(obj, group, index, append);
@@ -671,6 +679,7 @@ void make_datasets(const Psana::Lusi::IpmFexConfigV2& obj, hdf5pp::Group group, 
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     make_datasets_IpmFexConfigV2_v0(obj, group, chunk_size, deflate, shuffle);
@@ -683,6 +692,7 @@ void make_datasets(const Psana::Lusi::IpmFexConfigV2& obj, hdf5pp::Group group, 
 void store_IpmFexConfigV2(const Psana::Lusi::IpmFexConfigV2* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     store_IpmFexConfigV2_v0(obj, group, index, append);
@@ -807,6 +817,7 @@ void make_datasets(const Psana::Lusi::IpmFexV1& obj, hdf5pp::Group group, hsize_
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     make_datasets_IpmFexV1_v0(obj, group, chunk_size, deflate, shuffle);
@@ -819,6 +830,7 @@ void make_datasets(const Psana::Lusi::IpmFexV1& obj, hdf5pp::Group group, hsize_
 void store_IpmFexV1(const Psana::Lusi::IpmFexV1* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     store_IpmFexV1_v0(obj, group, index, append);
@@ -930,6 +942,7 @@ void make_datasets(const Psana::Lusi::PimImageConfigV1& obj, hdf5pp::Group group
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     make_datasets_PimImageConfigV1_v0(obj, group, chunk_size, deflate, shuffle);
@@ -942,6 +955,7 @@ void make_datasets(const Psana::Lusi::PimImageConfigV1& obj, hdf5pp::Group group
 void store_PimImageConfigV1(const Psana::Lusi::PimImageConfigV1* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     store_PimImageConfigV1_v0(obj, group, index, append);

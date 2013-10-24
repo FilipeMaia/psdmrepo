@@ -358,6 +358,7 @@ void make_datasets(const Psana::Acqiris::ConfigV1& obj, hdf5pp::Group group, hsi
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     make_datasets_ConfigV1_v0(obj, group, chunk_size, deflate, shuffle);
@@ -370,6 +371,7 @@ void make_datasets(const Psana::Acqiris::ConfigV1& obj, hdf5pp::Group group, hsi
 void store_ConfigV1(const Psana::Acqiris::ConfigV1* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     store_ConfigV1_v0(obj, group, index, append);
@@ -448,6 +450,7 @@ void make_datasets(const Psana::Acqiris::DataDescV1& obj, hdf5pp::Group group, h
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 1;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     make_datasets_DataDescV1_v0(obj, group, chunk_size, deflate, shuffle);
@@ -463,6 +466,7 @@ void make_datasets(const Psana::Acqiris::DataDescV1& obj, hdf5pp::Group group, h
 void store_DataDescV1(const Psana::Acqiris::DataDescV1* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 1;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     store_DataDescV1_v0(obj, group, index, append);
@@ -819,6 +823,7 @@ void make_datasets(const Psana::Acqiris::TdcConfigV1& obj, hdf5pp::Group group, 
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     make_datasets_TdcConfigV1_v0(obj, group, chunk_size, deflate, shuffle);
@@ -831,6 +836,7 @@ void make_datasets(const Psana::Acqiris::TdcConfigV1& obj, hdf5pp::Group group, 
 void store_TdcConfigV1(const Psana::Acqiris::TdcConfigV1* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     store_TdcConfigV1_v0(obj, group, index, append);
@@ -972,6 +978,7 @@ void make_datasets(const Psana::Acqiris::TdcDataV1& obj, hdf5pp::Group group, hs
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     make_datasets_TdcDataV1_v0(obj, group, chunk_size, deflate, shuffle);
@@ -984,6 +991,7 @@ void make_datasets(const Psana::Acqiris::TdcDataV1& obj, hdf5pp::Group group, hs
 void store_TdcDataV1(const Psana::Acqiris::TdcDataV1* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     store_TdcDataV1_v0(obj, group, index, append);

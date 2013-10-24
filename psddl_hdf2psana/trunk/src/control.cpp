@@ -14,6 +14,12 @@ ConfigV2_v0::npvLabels() const
 }
 
 uint32_t
+ConfigV2_v1::npvMonitors() const
+{
+  return pvMonitors().size();
+}
+
+uint32_t
 ConfigV3_v0::npvLabels() const
 {
   return pvLabels().size();

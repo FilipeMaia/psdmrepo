@@ -196,7 +196,6 @@ struct dataset_config {
   uint8_t uses_events;
   Pds::ns_ClockTime_v0::dataset_data duration;
   uint32_t npvControls;
-  uint32_t npvMonitors;
   uint32_t npvLabels;
 
 
@@ -216,7 +215,9 @@ public:
   virtual uint8_t uses_events() const;
   virtual const Pds::ClockTime& duration() const;
   virtual uint32_t npvControls() const;
-  virtual uint32_t npvMonitors() const;
+  /** Number of PVMonitor objects in this configuration. */
+  uint32_t npvMonitors() const;
+
   virtual uint32_t npvLabels() const;
   virtual ndarray<const Psana::ControlData::PVControl, 1> pvControls() const;
   virtual ndarray<const Psana::ControlData::PVMonitor, 1> pvMonitors() const;
@@ -225,6 +226,60 @@ private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
   mutable boost::shared_ptr<ControlData::ns_ConfigV2_v1::dataset_config> m_ds_config;
+  void read_ds_config() const;
+  mutable Pds::ClockTime m_ds_storage_config_duration;
+  mutable ndarray<const Psana::ControlData::PVControl, 1> m_ds_pvControls;
+  void read_ds_pvControls() const;
+  mutable ndarray<const Psana::ControlData::PVMonitor, 1> m_ds_pvMonitors;
+  void read_ds_pvMonitors() const;
+  mutable ndarray<const Psana::ControlData::PVLabel, 1> m_ds_pvLabels;
+  void read_ds_pvLabels() const;
+};
+
+
+namespace ns_ConfigV2_v2 {
+struct dataset_config {
+  static hdf5pp::Type native_type();
+  static hdf5pp::Type stored_type();
+
+  dataset_config();
+  dataset_config(const Psana::ControlData::ConfigV2& psanaobj);
+  ~dataset_config();
+
+  uint32_t events;
+  uint8_t uses_duration;
+  uint8_t uses_events;
+  Pds::ns_ClockTime_v0::dataset_data duration;
+  uint32_t npvControls;
+  uint32_t npvMonitors;
+  uint32_t npvLabels;
+
+
+};
+}
+
+
+class ConfigV2_v2 : public Psana::ControlData::ConfigV2 {
+public:
+  typedef Psana::ControlData::ConfigV2 PsanaType;
+  ConfigV2_v2() {}
+  ConfigV2_v2(hdf5pp::Group group, hsize_t idx)
+    : m_group(group), m_idx(idx) {}
+  virtual ~ConfigV2_v2() {}
+  virtual uint32_t events() const;
+  virtual uint8_t uses_duration() const;
+  virtual uint8_t uses_events() const;
+  virtual const Pds::ClockTime& duration() const;
+  virtual uint32_t npvControls() const;
+  virtual uint32_t npvMonitors() const;
+  virtual uint32_t npvLabels() const;
+  virtual ndarray<const Psana::ControlData::PVControl, 1> pvControls() const;
+  virtual ndarray<const Psana::ControlData::PVMonitor, 1> pvMonitors() const;
+  virtual ndarray<const Psana::ControlData::PVLabel, 1> pvLabels() const;
+private:
+  mutable hdf5pp::Group m_group;
+  hsize_t m_idx;
+  mutable boost::shared_ptr<ControlData::ns_ConfigV2_v2::dataset_config> m_ds_config;
   void read_ds_config() const;
   mutable Pds::ClockTime m_ds_storage_config_duration;
   mutable ndarray<const Psana::ControlData::PVControl, 1> m_ds_pvControls;

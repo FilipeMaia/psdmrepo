@@ -127,6 +127,7 @@ void make_datasets(const Psana::FCCD::FccdConfigV1& obj, hdf5pp::Group group, hs
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     make_datasets_FccdConfigV1_v0(obj, group, chunk_size, deflate, shuffle);
@@ -139,6 +140,7 @@ void make_datasets(const Psana::FCCD::FccdConfigV1& obj, hdf5pp::Group group, hs
 void store_FccdConfigV1(const Psana::FCCD::FccdConfigV1* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     store_FccdConfigV1_v0(obj, group, index, append);
@@ -171,6 +173,7 @@ void make_datasets(const Psana::FCCD::FccdConfigV2& obj, hdf5pp::Group group, hs
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     make_datasets_FccdConfigV2_v0(obj, group, chunk_size, deflate, shuffle);
@@ -183,6 +186,7 @@ void make_datasets(const Psana::FCCD::FccdConfigV2& obj, hdf5pp::Group group, hs
 void store_FccdConfigV2(const Psana::FCCD::FccdConfigV2* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     store_FccdConfigV2_v0(obj, group, index, append);

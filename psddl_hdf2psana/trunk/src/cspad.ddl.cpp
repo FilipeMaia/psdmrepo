@@ -1103,6 +1103,7 @@ void make_datasets(const Psana::CsPad::ConfigV1& obj, hdf5pp::Group group, hsize
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     make_datasets_ConfigV1_v0(obj, group, chunk_size, deflate, shuffle);
@@ -1115,6 +1116,7 @@ void make_datasets(const Psana::CsPad::ConfigV1& obj, hdf5pp::Group group, hsize
 void store_ConfigV1(const Psana::CsPad::ConfigV1* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     store_ConfigV1_v0(obj, group, index, append);
@@ -1344,6 +1346,7 @@ void make_datasets(const Psana::CsPad::ConfigV2& obj, hdf5pp::Group group, hsize
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     make_datasets_ConfigV2_v0(obj, group, chunk_size, deflate, shuffle);
@@ -1356,6 +1359,7 @@ void make_datasets(const Psana::CsPad::ConfigV2& obj, hdf5pp::Group group, hsize
 void store_ConfigV2(const Psana::CsPad::ConfigV2* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     store_ConfigV2_v0(obj, group, index, append);
@@ -1616,6 +1620,7 @@ void make_datasets(const Psana::CsPad::ConfigV3& obj, hdf5pp::Group group, hsize
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     make_datasets_ConfigV3_v0(obj, group, chunk_size, deflate, shuffle);
@@ -1628,6 +1633,7 @@ void make_datasets(const Psana::CsPad::ConfigV3& obj, hdf5pp::Group group, hsize
 void store_ConfigV3(const Psana::CsPad::ConfigV3* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     store_ConfigV3_v0(obj, group, index, append);
@@ -1888,6 +1894,7 @@ void make_datasets(const Psana::CsPad::ConfigV4& obj, hdf5pp::Group group, hsize
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     make_datasets_ConfigV4_v0(obj, group, chunk_size, deflate, shuffle);
@@ -1900,6 +1907,7 @@ void make_datasets(const Psana::CsPad::ConfigV4& obj, hdf5pp::Group group, hsize
 void store_ConfigV4(const Psana::CsPad::ConfigV4* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     store_ConfigV4_v0(obj, group, index, append);
@@ -2167,6 +2175,7 @@ void make_datasets(const Psana::CsPad::ConfigV5& obj, hdf5pp::Group group, hsize
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     make_datasets_ConfigV5_v0(obj, group, chunk_size, deflate, shuffle);
@@ -2179,6 +2188,7 @@ void make_datasets(const Psana::CsPad::ConfigV5& obj, hdf5pp::Group group, hsize
 void store_ConfigV5(const Psana::CsPad::ConfigV5* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     store_ConfigV5_v0(obj, group, index, append);
@@ -2451,6 +2461,7 @@ void make_datasets(const Psana::CsPad::DataV1& obj, hdf5pp::Group group, hsize_t
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     make_datasets_DataV1_v0(obj, group, chunk_size, deflate, shuffle);
@@ -2463,6 +2474,7 @@ void make_datasets(const Psana::CsPad::DataV1& obj, hdf5pp::Group group, hsize_t
 void store_DataV1(const Psana::CsPad::DataV1* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     store_DataV1_v0(obj, group, index, append);
@@ -2726,6 +2738,7 @@ void make_datasets(const Psana::CsPad::DataV2& obj, hdf5pp::Group group, hsize_t
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     make_datasets_DataV2_v0(obj, group, chunk_size, deflate, shuffle);
@@ -2738,6 +2751,7 @@ void make_datasets(const Psana::CsPad::DataV2& obj, hdf5pp::Group group, hsize_t
 void store_DataV2(const Psana::CsPad::DataV2* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     store_DataV2_v0(obj, group, index, append);

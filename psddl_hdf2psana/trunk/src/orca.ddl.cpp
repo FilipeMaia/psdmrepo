@@ -137,6 +137,7 @@ void make_datasets(const Psana::Orca::ConfigV1& obj, hdf5pp::Group group, hsize_
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     make_datasets_ConfigV1_v0(obj, group, chunk_size, deflate, shuffle);
@@ -149,6 +150,7 @@ void make_datasets(const Psana::Orca::ConfigV1& obj, hdf5pp::Group group, hsize_
 void store_ConfigV1(const Psana::Orca::ConfigV1* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     store_ConfigV1_v0(obj, group, index, append);

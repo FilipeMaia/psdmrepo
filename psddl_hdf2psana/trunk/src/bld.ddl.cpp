@@ -112,6 +112,7 @@ void make_datasets(const Psana::Bld::BldDataFEEGasDetEnergy& obj, hdf5pp::Group 
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     make_datasets_BldDataFEEGasDetEnergy_v0(obj, group, chunk_size, deflate, shuffle);
@@ -124,6 +125,7 @@ void make_datasets(const Psana::Bld::BldDataFEEGasDetEnergy& obj, hdf5pp::Group 
 void store_BldDataFEEGasDetEnergy(const Psana::Bld::BldDataFEEGasDetEnergy* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     store_BldDataFEEGasDetEnergy_v0(obj, group, index, append);
@@ -250,6 +252,7 @@ void make_datasets(const Psana::Bld::BldDataEBeamV0& obj, hdf5pp::Group group, h
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     make_datasets_BldDataEBeamV0_v0(obj, group, chunk_size, deflate, shuffle);
@@ -262,6 +265,7 @@ void make_datasets(const Psana::Bld::BldDataEBeamV0& obj, hdf5pp::Group group, h
 void store_BldDataEBeamV0(const Psana::Bld::BldDataEBeamV0* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     store_BldDataEBeamV0_v0(obj, group, index, append);
@@ -391,6 +395,7 @@ void make_datasets(const Psana::Bld::BldDataEBeamV1& obj, hdf5pp::Group group, h
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     make_datasets_BldDataEBeamV1_v0(obj, group, chunk_size, deflate, shuffle);
@@ -403,6 +408,7 @@ void make_datasets(const Psana::Bld::BldDataEBeamV1& obj, hdf5pp::Group group, h
 void store_BldDataEBeamV1(const Psana::Bld::BldDataEBeamV1* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     store_BldDataEBeamV1_v0(obj, group, index, append);
@@ -535,6 +541,7 @@ void make_datasets(const Psana::Bld::BldDataEBeamV2& obj, hdf5pp::Group group, h
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     make_datasets_BldDataEBeamV2_v0(obj, group, chunk_size, deflate, shuffle);
@@ -547,6 +554,7 @@ void make_datasets(const Psana::Bld::BldDataEBeamV2& obj, hdf5pp::Group group, h
 void store_BldDataEBeamV2(const Psana::Bld::BldDataEBeamV2* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     store_BldDataEBeamV2_v0(obj, group, index, append);
@@ -685,6 +693,7 @@ void make_datasets(const Psana::Bld::BldDataEBeamV3& obj, hdf5pp::Group group, h
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     make_datasets_BldDataEBeamV3_v0(obj, group, chunk_size, deflate, shuffle);
@@ -697,6 +706,7 @@ void make_datasets(const Psana::Bld::BldDataEBeamV3& obj, hdf5pp::Group group, h
 void store_BldDataEBeamV3(const Psana::Bld::BldDataEBeamV3* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     store_BldDataEBeamV3_v0(obj, group, index, append);
@@ -847,6 +857,7 @@ void make_datasets(const Psana::Bld::BldDataEBeamV4& obj, hdf5pp::Group group, h
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     make_datasets_BldDataEBeamV4_v0(obj, group, chunk_size, deflate, shuffle);
@@ -859,6 +870,7 @@ void make_datasets(const Psana::Bld::BldDataEBeamV4& obj, hdf5pp::Group group, h
 void store_BldDataEBeamV4(const Psana::Bld::BldDataEBeamV4* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     store_BldDataEBeamV4_v0(obj, group, index, append);
@@ -976,6 +988,7 @@ void make_datasets(const Psana::Bld::BldDataPhaseCavity& obj, hdf5pp::Group grou
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     make_datasets_BldDataPhaseCavity_v0(obj, group, chunk_size, deflate, shuffle);
@@ -988,6 +1001,7 @@ void make_datasets(const Psana::Bld::BldDataPhaseCavity& obj, hdf5pp::Group grou
 void store_BldDataPhaseCavity(const Psana::Bld::BldDataPhaseCavity* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     store_BldDataPhaseCavity_v0(obj, group, index, append);
@@ -1116,6 +1130,7 @@ void make_datasets(const Psana::Bld::BldDataIpimbV0& obj, hdf5pp::Group group, h
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     make_datasets_BldDataIpimbV0_v0(obj, group, chunk_size, deflate, shuffle);
@@ -1128,6 +1143,7 @@ void make_datasets(const Psana::Bld::BldDataIpimbV0& obj, hdf5pp::Group group, h
 void store_BldDataIpimbV0(const Psana::Bld::BldDataIpimbV0* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     store_BldDataIpimbV0_v0(obj, group, index, append);
@@ -1256,6 +1272,7 @@ void make_datasets(const Psana::Bld::BldDataIpimbV1& obj, hdf5pp::Group group, h
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     make_datasets_BldDataIpimbV1_v0(obj, group, chunk_size, deflate, shuffle);
@@ -1268,6 +1285,7 @@ void make_datasets(const Psana::Bld::BldDataIpimbV1& obj, hdf5pp::Group group, h
 void store_BldDataIpimbV1(const Psana::Bld::BldDataIpimbV1* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     store_BldDataIpimbV1_v0(obj, group, index, append);
@@ -1300,6 +1318,7 @@ void make_datasets(const Psana::Bld::BldDataPimV1& obj, hdf5pp::Group group, hsi
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     make_datasets_BldDataPimV1_v0(obj, group, chunk_size, deflate, shuffle);
@@ -1312,6 +1331,7 @@ void make_datasets(const Psana::Bld::BldDataPimV1& obj, hdf5pp::Group group, hsi
 void store_BldDataPimV1(const Psana::Bld::BldDataPimV1* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     store_BldDataPimV1_v0(obj, group, index, append);
@@ -1515,6 +1535,7 @@ void make_datasets(const Psana::Bld::BldDataGMDV0& obj, hdf5pp::Group group, hsi
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     make_datasets_BldDataGMDV0_v0(obj, group, chunk_size, deflate, shuffle);
@@ -1527,6 +1548,7 @@ void make_datasets(const Psana::Bld::BldDataGMDV0& obj, hdf5pp::Group group, hsi
 void store_BldDataGMDV0(const Psana::Bld::BldDataGMDV0* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     store_BldDataGMDV0_v0(obj, group, index, append);
@@ -1660,6 +1682,7 @@ void make_datasets(const Psana::Bld::BldDataGMDV1& obj, hdf5pp::Group group, hsi
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     make_datasets_BldDataGMDV1_v0(obj, group, chunk_size, deflate, shuffle);
@@ -1672,6 +1695,7 @@ void make_datasets(const Psana::Bld::BldDataGMDV1& obj, hdf5pp::Group group, hsi
 void store_BldDataGMDV1(const Psana::Bld::BldDataGMDV1* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     store_BldDataGMDV1_v0(obj, group, index, append);
@@ -1704,6 +1728,7 @@ void make_datasets(const Psana::Bld::BldDataAcqADCV1& obj, hdf5pp::Group group, 
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     make_datasets_BldDataAcqADCV1_v0(obj, group, chunk_size, deflate, shuffle);
@@ -1716,6 +1741,7 @@ void make_datasets(const Psana::Bld::BldDataAcqADCV1& obj, hdf5pp::Group group, 
 void store_BldDataAcqADCV1(const Psana::Bld::BldDataAcqADCV1* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     store_BldDataAcqADCV1_v0(obj, group, index, append);
@@ -1844,6 +1870,7 @@ void make_datasets(const Psana::Bld::BldDataSpectrometerV0& obj, hdf5pp::Group g
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     make_datasets_BldDataSpectrometerV0_v0(obj, group, chunk_size, deflate, shuffle);
@@ -1856,6 +1883,7 @@ void make_datasets(const Psana::Bld::BldDataSpectrometerV0& obj, hdf5pp::Group g
 void store_BldDataSpectrometerV0(const Psana::Bld::BldDataSpectrometerV0* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     store_BldDataSpectrometerV0_v0(obj, group, index, append);

@@ -105,6 +105,7 @@ void make_datasets(const Psana::Camera::FrameCoord& obj, hdf5pp::Group group, hs
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     make_datasets_FrameCoord_v0(obj, group, chunk_size, deflate, shuffle);
@@ -117,6 +118,7 @@ void make_datasets(const Psana::Camera::FrameCoord& obj, hdf5pp::Group group, hs
 void store_FrameCoord(const Psana::Camera::FrameCoord* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     store_FrameCoord_v0(obj, group, index, append);
@@ -159,6 +161,7 @@ void make_datasets(const Psana::Camera::FrameFccdConfigV1& obj, hdf5pp::Group gr
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     make_datasets_FrameFccdConfigV1_v0(obj, group, chunk_size, deflate, shuffle);
@@ -171,6 +174,7 @@ void make_datasets(const Psana::Camera::FrameFccdConfigV1& obj, hdf5pp::Group gr
 void store_FrameFccdConfigV1(const Psana::Camera::FrameFccdConfigV1* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     store_FrameFccdConfigV1_v0(obj, group, index, append);
@@ -372,6 +376,7 @@ void make_datasets(const Psana::Camera::FrameFexConfigV1& obj, hdf5pp::Group gro
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     make_datasets_FrameFexConfigV1_v0(obj, group, chunk_size, deflate, shuffle);
@@ -384,6 +389,7 @@ void make_datasets(const Psana::Camera::FrameFexConfigV1& obj, hdf5pp::Group gro
 void store_FrameFexConfigV1(const Psana::Camera::FrameFexConfigV1* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     store_FrameFexConfigV1_v0(obj, group, index, append);
@@ -416,6 +422,7 @@ void make_datasets(const Psana::Camera::FrameV1& obj, hdf5pp::Group group, hsize
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     make_datasets_FrameV1_v0(obj, group, chunk_size, deflate, shuffle);
@@ -428,6 +435,7 @@ void make_datasets(const Psana::Camera::FrameV1& obj, hdf5pp::Group group, hsize
 void store_FrameV1(const Psana::Camera::FrameV1* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     store_FrameV1_v0(obj, group, index, append);
@@ -568,6 +576,7 @@ void make_datasets(const Psana::Camera::TwoDGaussianV1& obj, hdf5pp::Group group
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     make_datasets_TwoDGaussianV1_v0(obj, group, chunk_size, deflate, shuffle);
@@ -580,6 +589,7 @@ void make_datasets(const Psana::Camera::TwoDGaussianV1& obj, hdf5pp::Group group
 void store_TwoDGaussianV1(const Psana::Camera::TwoDGaussianV1* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     store_TwoDGaussianV1_v0(obj, group, index, append);

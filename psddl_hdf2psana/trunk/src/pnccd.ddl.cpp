@@ -108,6 +108,7 @@ void make_datasets(const Psana::PNCCD::ConfigV1& obj, hdf5pp::Group group, hsize
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     make_datasets_ConfigV1_v0(obj, group, chunk_size, deflate, shuffle);
@@ -120,6 +121,7 @@ void make_datasets(const Psana::PNCCD::ConfigV1& obj, hdf5pp::Group group, hsize
 void store_ConfigV1(const Psana::PNCCD::ConfigV1* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     store_ConfigV1_v0(obj, group, index, append);
@@ -300,6 +302,7 @@ void make_datasets(const Psana::PNCCD::ConfigV2& obj, hdf5pp::Group group, hsize
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     make_datasets_ConfigV2_v0(obj, group, chunk_size, deflate, shuffle);
@@ -312,6 +315,7 @@ void make_datasets(const Psana::PNCCD::ConfigV2& obj, hdf5pp::Group group, hsize
 void store_ConfigV2(const Psana::PNCCD::ConfigV2* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     store_ConfigV2_v0(obj, group, index, append);
@@ -344,6 +348,7 @@ void make_datasets(const Psana::PNCCD::FullFrameV1& obj, hdf5pp::Group group, hs
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     make_datasets_FullFrameV1_v0(obj, group, chunk_size, deflate, shuffle);
@@ -356,6 +361,7 @@ void make_datasets(const Psana::PNCCD::FullFrameV1& obj, hdf5pp::Group group, hs
 void store_FullFrameV1(const Psana::PNCCD::FullFrameV1* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     store_FullFrameV1_v0(obj, group, index, append);
@@ -396,6 +402,7 @@ void make_datasets(const Psana::PNCCD::FramesV1& obj, hdf5pp::Group group, hsize
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     make_datasets_FramesV1_v0(obj, group, chunk_size, deflate, shuffle);
@@ -408,6 +415,7 @@ void make_datasets(const Psana::PNCCD::FramesV1& obj, hdf5pp::Group group, hsize
 void store_FramesV1(const Psana::PNCCD::FramesV1* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     store_FramesV1_v0(obj, group, index, append);

@@ -61,8 +61,30 @@
 
         <!-- ========================================================================= -->
 
-        <!--  schema v.1 for ConfigV2 adds npvLabels attribute -->
+        <!--  schema v.1 for ConfigV2 adds npvLabels attribute but accidentally removes 
+             npvMonitors attribute. note that definition of npvMonitors() will not be generated 
+             and has to be defined separately
+        -->
         <h5schema name="ConfigV2" version="1">
+            <dataset name="config">
+                <attribute name="events"/>
+                <attribute name="uses_duration"/>
+                <attribute name="uses_events"/>
+                <attribute name="duration"/>
+                <attribute name="npvControls"/>
+                <attribute name="npvLabels"/>
+            </dataset>
+            <dataset name="pvControls">
+            </dataset>
+            <dataset name="pvMonitors">
+            </dataset>
+            <dataset name="pvLabels">
+            </dataset>
+        </h5schema>
+
+        <!-- ========================================================================= -->
+        <!--  schema v.2 for ConfigV2 adds npvMonitors attribute -->
+        <h5schema name="ConfigV2" version="2">
             <dataset name="config">
                 <attribute name="events"/>
                 <attribute name="uses_duration"/>

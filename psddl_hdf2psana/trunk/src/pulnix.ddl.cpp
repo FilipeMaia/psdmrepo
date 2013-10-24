@@ -189,6 +189,7 @@ void make_datasets(const Psana::Pulnix::TM6740ConfigV1& obj, hdf5pp::Group group
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     make_datasets_TM6740ConfigV1_v0(obj, group, chunk_size, deflate, shuffle);
@@ -201,6 +202,7 @@ void make_datasets(const Psana::Pulnix::TM6740ConfigV1& obj, hdf5pp::Group group
 void store_TM6740ConfigV1(const Psana::Pulnix::TM6740ConfigV1* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     store_TM6740ConfigV1_v0(obj, group, index, append);
@@ -397,6 +399,7 @@ void make_datasets(const Psana::Pulnix::TM6740ConfigV2& obj, hdf5pp::Group group
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     make_datasets_TM6740ConfigV2_v0(obj, group, chunk_size, deflate, shuffle);
@@ -409,6 +412,7 @@ void make_datasets(const Psana::Pulnix::TM6740ConfigV2& obj, hdf5pp::Group group
 void store_TM6740ConfigV2(const Psana::Pulnix::TM6740ConfigV2* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = 0;
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
     store_TM6740ConfigV2_v0(obj, group, index, append);
