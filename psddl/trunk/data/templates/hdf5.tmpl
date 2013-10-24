@@ -667,6 +667,7 @@ void make_datasets(const {{psanatypename}}& obj, hdf5pp::Group group, hsize_t ch
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = {{max_version}};
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
 {% for v in versions %}
   case {{v}}:
@@ -681,6 +682,7 @@ void make_datasets(const {{psanatypename}}& obj, hdf5pp::Group group, hsize_t ch
 void store_{{type.name}}(const {{psanatypename}}* obj, hdf5pp::Group group, long index, int version, bool append)
 {
   if (version < 0) version = {{max_version}};
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
 {% for v in versions %}
   case {{v}}:

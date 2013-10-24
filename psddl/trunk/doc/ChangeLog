@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-09-02
+2013-10-24 Andy Salnikov
+- hdf5 generator: add code to create _schemaVersion attribute
+
 Tag: V00-09-01
 2013-10-08 Andy Salnikov
 - hdf5 generator: store_at() method accepts pointer instead of reference
