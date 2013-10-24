@@ -26,7 +26,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "MsgLogger/MsgLogger.h"
-#include "pdsdata/psddl/l3t.ddl.h"
+#include "pdsdata/xtc/L1AcceptEnv.hh"
 #include "psddl_psana/epics.ddl.h"
 #include "PSTime/Time.h"
 #include "PSXtcInput/Exceptions.h"
@@ -63,19 +63,9 @@ namespace {
   }
 
   // return true if event passed L3 selection (of there was no L3 defined)
-  bool l3accept(Pds::Xtc* xtc)
+  bool l3accept(const Pds::Dgram& dg)
   {
-    XtcInput::XtcIterator iter(xtc);
-    while (Pds::Xtc* x = iter.next()) {
-      if (x->damage.value() == 0 and x->contains.id() == Pds::TypeId::Id_L3TData) {
-        if (x->contains.version() == 1) {
-          const Pds::L3T::DataV1* l3t = (Pds::L3T::DataV1*)x->payload();
-          return l3t->accept();
-        }
-      }
-    }
-    // No L3T info means passed
-    return true;
+    return not static_cast<const Pds::L1AcceptEnv&>(dg.env).trimmed();
   }
 
 }
@@ -268,7 +258,7 @@ XtcInputModuleBase::event(Event& evt, Env& env)
     case Pds::TransitionId::L1Accept:
       // regular event
 
-      if (m_l3tAcceptOnly and not ::l3accept(&(dg.dg()->xtc))) {
+      if (m_l3tAcceptOnly and not ::l3accept(*dg.dg())) {
 
         // did not pass L3, its payload is usually empty but if there is Epics
         // data in the event it may be preserved, so try to save it
