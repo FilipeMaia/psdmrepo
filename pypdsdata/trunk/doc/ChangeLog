@@ -6,6 +6,11 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V01-01-00
+2013-10-24 Andy Salnikov
+- upgrade to pdsdata V07-02-04
+- add new classes to interpret datagram's env field
+
 Tag: V01-00-02
 2013-10-02 Andy Salnikov
 - upgrade to pdsdata V07-02-00

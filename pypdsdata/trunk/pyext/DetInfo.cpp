@@ -94,6 +94,7 @@ namespace {
       { "MecTimeTool", Pds::DetInfo::MecTimeTool },
       { "MecTargetChamber", Pds::DetInfo::MecTargetChamber },
       { "FeeHxSpectrometer", Pds::DetInfo::FeeHxSpectrometer },
+      { "XrayTransportDiagnostic", Pds::DetInfo::XrayTransportDiagnostic },
       { "NumDetector", Pds::DetInfo::NumDetector },
       { 0, 0 }
   };
@@ -101,20 +102,7 @@ namespace {
   inline const char* det_name(Pds::DetInfo::Detector det) {
     return enum_name(detectorEnumValues, int(det), Pds::DetInfo::NumDetector);
   }
-  
-  const char* det_name(int det) 
-  {
-    // try optimization first based on the order of enums in the list above
-    if ( det <= Pds::DetInfo::NumDetector and detectorEnumValues[det].value == det ) {
-      return detectorEnumValues[det].name;
-    }
-    // otherwise try linear search
-    for( unsigned i = 0 ; detectorEnumValues[i].name ; ++ i ) {
-      if (detectorEnumValues[i].value == det) return detectorEnumValues[i].name;
-    }
-    return "<Invalid>";
-  }
-  
+
   pypdsdata::EnumType::Enum deviceEnumValues[] = {
       { "NoDevice",  Pds::DetInfo::NoDevice },
       { "Evr",       Pds::DetInfo::Evr },

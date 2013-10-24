@@ -27,8 +27,10 @@
 #include "Damage.h"
 #include "Dgram.h"
 #include "DetInfo.h"
+#include "Env.h"
 #include "Exception.h"
 #include "Level.h"
+#include "L1AcceptEnv.h"
 #include "ProcInfo.h"
 #include "Sequence.h"
 #include "TimeStamp.h"
@@ -254,7 +256,9 @@ PyMODINIT_FUNC init_pdsdata()
   pypdsdata::Damage::initType( module );
   pypdsdata::DetInfo::initType( module );
   pypdsdata::Dgram::initType( module );
+  pypdsdata::Env::initType( module );
   ::registerType( module, "Level", pypdsdata::Level::typeObject() );
+  pypdsdata::L1AcceptEnv::initType( module );
   pypdsdata::ProcInfo::initType( module );
   pypdsdata::Sequence::initType( module );
   pypdsdata::TimeStamp::initType( module );

@@ -22,7 +22,9 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "Env.h"
 #include "Exception.h"
+#include "L1AcceptEnv.h"
 #include "Sequence.h"
 #include "Xtc.h"
 #include "ClockTime.h"
@@ -117,7 +119,11 @@ Dgram_env( PyObject* self, void* )
     return 0;
   }
 
-  return PyInt_FromLong( py_this->m_obj->env.value() );
+  if (py_this->m_obj->seq.service() == Pds::TransitionId::L1Accept) {
+    return toPython(static_cast<const Pds::L1AcceptEnv&>(py_this->m_obj->env));
+  } else {
+    return toPython(py_this->m_obj->env);
+  }
 }
 
 PyObject*
