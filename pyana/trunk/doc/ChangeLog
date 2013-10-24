@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-03
+2013-10-24 Andy Salnikov
+- use flag stored in datagram header for filtering instead of looking 
+  for L3T data object
+
 Tag: V00-03-02
 2013-10-23 Andy Salnikov
 - fix for a typo in my last commit

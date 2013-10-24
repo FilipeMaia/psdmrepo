@@ -78,16 +78,6 @@ def _rusage(msg, ru1, ru2):
     
     print "%s: %.1f user %.1f sys" % ( msg, ru2.ru_utime-ru1.ru_utime, ru2.ru_stime-ru1.ru_stime )
 
-# generator for xtc objects which are not XTC containers
-def _xtcIter(xtcObj):
-    """ Returns true if container has EPICS data only """
-    for x in xtcObj:
-        if x.contains.id() == xtc.TypeId.Type.Id_Xtc:
-            for y in _xtcIter(x):
-                return y
-        else: 
-            return x
-
 def _epicsOnly(xtcObj):
     """ Returns true if container has EPICS data only """
     for x in xtcObj:
@@ -98,12 +88,9 @@ def _epicsOnly(xtcObj):
             return False
     return True
 
-def _l3accept(xtcObj):
-    """ Returns true if container has EPICS data only """
-    for x in (xtcObj):
-        if x.damage.value() == 0 and x.contains.id() == xtc.TypeId.Type.Id_L3TData:
-            return x.payload().accept()
-    return True
+def _l3accept(dg):
+    """ Returns true datagram passed L3T filter (or there was no filtering) """
+    return not dg.env.trimmed()
 
 def _proc(jobname, id, pipes, userObjects, jobConfig, expNameProvider, idQueue):
     """ method which is running in child process when we do multi-processing """
@@ -308,7 +295,7 @@ def _pyana ( argv ) :
 
             if svc == xtc.TransitionId.L1Accept :
 
-                if not _l3accept(dg.xtc):
+                if not _l3accept(dg):
                     # event was filtered out by L3, it should be empty (except maybe for for Epics)
                     # and useless, skip it here
                     continue
