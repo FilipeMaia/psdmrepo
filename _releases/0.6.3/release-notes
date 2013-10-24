@@ -1,0 +1,2 @@
+- upgrade to pdsdata-7.2.4
+- bug fix in ControlData.ConfigV2 HDF5 output
