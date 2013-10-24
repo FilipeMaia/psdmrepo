@@ -1,0 +1,4 @@
+- upgrade to pdsdata-7.2.4
+- use datagram header flag for event filtering instead of L3T data object
+- add stream() and chunk() methods to pyana event
+- fixes for translation of ControlData.ConfigV2/3 types
