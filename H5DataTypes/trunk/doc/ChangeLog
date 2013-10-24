@@ -11,6 +11,12 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-04
+2013-10-24 Andy Salnikov
+- my last fix for ControlDataConfigV2 schema accidentally removed 
+  npvMonitors attribute, adding it back
+- should need another bumping of schema number for this type
+
 Tag: V00-05-03
 2013-10-11 Andy Salnikov
 - schema for ControlDataConfigV2 and ControlDataConfigV3 were missing 
