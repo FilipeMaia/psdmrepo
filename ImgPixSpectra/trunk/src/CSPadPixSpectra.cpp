@@ -245,21 +245,12 @@ CSPadPixSpectra::ampToIndex(double amp)
 void 
 CSPadPixSpectra::getQuadConfigPars(Env& env)
 {
-  shared_ptr<Psana::CsPad::ConfigV3> config = env.configStore().get(m_src);
-  if (config.get()) {
-      for (uint32_t q = 0; q < config->numQuads(); ++ q) {
-        m_roiMask[q]         = config->roiMask(q);
-        m_numAsicsStored[q]  = config->numAsicsStored(q);
-      }
-  }
+  if ( getQuadConfigParsForType<Psana::CsPad::ConfigV2>(env) ) return;
+  if ( getQuadConfigParsForType<Psana::CsPad::ConfigV3>(env) ) return;
+  if ( getQuadConfigParsForType<Psana::CsPad::ConfigV4>(env) ) return;
+  if ( getQuadConfigParsForType<Psana::CsPad::ConfigV5>(env) ) return;
 
-  m_nquads         = config->numQuads();               // this may be less than 4
-  m_n2x1           = Psana::CsPad::SectorsPerQuad;     // v_image_shape[0]; // 8
-  m_ncols2x1       = Psana::CsPad::ColumnsPerASIC;     // v_image_shape[1]; // 185
-  m_nrows2x1       = Psana::CsPad::MaxRowsPerASIC * 2; // v_image_shape[2]; // 388
-  m_sizeOf2x1Arr   = m_nrows2x1      * m_ncols2x1;                          // 185*388;
-  m_sizeOfQuadArr  = m_sizeOf2x1Arr  * m_n2x1;                              // 185*388*8;
-  m_sizeOfCSPadArr = m_sizeOfQuadArr * 4;                                   // 185*388*8*4;
+  MsgLog(name(), warning, "CsPad::ConfigV2 - V5 is not available in this run.");
 }
 
 //--------------------
