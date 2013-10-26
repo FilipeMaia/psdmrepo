@@ -125,6 +125,11 @@ private:
   void printSizeOfTypes();
   /// Define the shape or throw message that can not do that.
   void defineImageShape(PSEvt::Event& evt, const PSEvt::Source& m_str_src, const std::string& m_key, unsigned* shape);
+  void saveTextInFile(const std::string& fname, const std::string& text, bool print_msg);
+  std::string stringInstrument(PSEnv::Env& env);
+  std::string stringExperiment(PSEnv::Env& env);
+  unsigned expNum(PSEnv::Env& env);
+  std::string stringExpNum(PSEnv::Env& env, unsigned width=4);
 
 //--------------------
 //--------------------

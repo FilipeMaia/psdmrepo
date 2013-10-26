@@ -170,5 +170,51 @@ defineImageShape(PSEvt::Event& evt, const PSEvt::Source& src, const std::string&
 }
 
 //--------------------
+
+void 
+saveTextInFile(const std::string& fname, const std::string& text, bool print_msg)
+{
+  std::ofstream out(fname.c_str()); 
+  out << text;
+  out.close();
+  //std::setprecision(9); // << std::setw(8) << std::setprecision(0) << std::fixed 
+
+  if( print_msg ) MsgLog("GlobalMethods", info, "Save text in file " << fname.c_str());
+}
+
+//--------------------
+
+std::string  
+stringInstrument(PSEnv::Env& env)
+{
+  return env.instrument();
+}
+
+//--------------------
+
+std::string  
+stringExperiment(PSEnv::Env& env)
+{
+  return env.experiment();
+}
+
+//--------------------
+
+unsigned 
+expNum(PSEnv::Env& env)
+{
+  return env.expNum();
+}
+
+//--------------------
+
+std::string
+stringExpNum(PSEnv::Env& env, unsigned width)
+{
+  return stringFromUint(env.expNum(), width);
+}
+
+//--------------------
+//--------------------
 //--------------------
 } // namespace ImgAlgos
