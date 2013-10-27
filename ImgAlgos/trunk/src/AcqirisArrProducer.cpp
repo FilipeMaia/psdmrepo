@@ -126,7 +126,7 @@ AcqirisArrProducer::event(Event& evt, Env& env)
     if( m_do_save_config ) saveTextInFile(m_fname_common + ".txt", txt_config, m_print_bits & 4);
   }
 
-  if( m_print_bits & 4 ) print_wf_in_event(evt, env);
+  if( m_print_bits & 8 ) print_wf_in_event(evt, env);
   proc_and_put_wf_in_event(evt, env);
 }
 
