@@ -9,7 +9,6 @@
 #include "hdf5pp/Utils.h"
 #include "PSEvt/DataProxy.h"
 #include "psddl_hdf2psana/Exceptions.h"
-#include "psddl_hdf2psana/HdfParameters.h"
 #include "psddl_hdf2psana/bld.h"
 #include "psddl_hdf2psana/bld.h"
 namespace psddl_hdf2psana {
@@ -76,12 +75,11 @@ Proxy_BldDataFEEGasDetEnergy_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds
 
 
 void make_datasets_BldDataFEEGasDetEnergy_v0(const Psana::Bld::BldDataFEEGasDetEnergy& obj, 
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
 {
   {
     hdf5pp::Type dstype = Bld::ns_BldDataFEEGasDetEnergy_v0::dataset_data::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
 }
 
@@ -108,14 +106,14 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataFEEGasDetEnergy> > make_BldDat
   }
 }
 
-void make_datasets(const Psana::Bld::BldDataFEEGasDetEnergy& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::Bld::BldDataFEEGasDetEnergy& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
   group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
-    make_datasets_BldDataFEEGasDetEnergy_v0(obj, group, chunk_size, deflate, shuffle);
+    make_datasets_BldDataFEEGasDetEnergy_v0(obj, group, chunkPolicy, deflate, shuffle);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataFEEGasDetEnergy", version);
@@ -216,12 +214,11 @@ Proxy_BldDataEBeamV0_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& s
 
 
 void make_datasets_BldDataEBeamV0_v0(const Psana::Bld::BldDataEBeamV0& obj, 
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
 {
   {
     hdf5pp::Type dstype = Bld::ns_BldDataEBeamV0_v0::dataset_data::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
 }
 
@@ -248,14 +245,14 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataEBeamV0> > make_BldDataEBeamV0
   }
 }
 
-void make_datasets(const Psana::Bld::BldDataEBeamV0& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::Bld::BldDataEBeamV0& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
   group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
-    make_datasets_BldDataEBeamV0_v0(obj, group, chunk_size, deflate, shuffle);
+    make_datasets_BldDataEBeamV0_v0(obj, group, chunkPolicy, deflate, shuffle);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataEBeamV0", version);
@@ -359,12 +356,11 @@ Proxy_BldDataEBeamV1_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& s
 
 
 void make_datasets_BldDataEBeamV1_v0(const Psana::Bld::BldDataEBeamV1& obj, 
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
 {
   {
     hdf5pp::Type dstype = Bld::ns_BldDataEBeamV1_v0::dataset_data::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
 }
 
@@ -391,14 +387,14 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataEBeamV1> > make_BldDataEBeamV1
   }
 }
 
-void make_datasets(const Psana::Bld::BldDataEBeamV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::Bld::BldDataEBeamV1& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
   group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
-    make_datasets_BldDataEBeamV1_v0(obj, group, chunk_size, deflate, shuffle);
+    make_datasets_BldDataEBeamV1_v0(obj, group, chunkPolicy, deflate, shuffle);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataEBeamV1", version);
@@ -505,12 +501,11 @@ Proxy_BldDataEBeamV2_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& s
 
 
 void make_datasets_BldDataEBeamV2_v0(const Psana::Bld::BldDataEBeamV2& obj, 
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
 {
   {
     hdf5pp::Type dstype = Bld::ns_BldDataEBeamV2_v0::dataset_data::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
 }
 
@@ -537,14 +532,14 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataEBeamV2> > make_BldDataEBeamV2
   }
 }
 
-void make_datasets(const Psana::Bld::BldDataEBeamV2& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::Bld::BldDataEBeamV2& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
   group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
-    make_datasets_BldDataEBeamV2_v0(obj, group, chunk_size, deflate, shuffle);
+    make_datasets_BldDataEBeamV2_v0(obj, group, chunkPolicy, deflate, shuffle);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataEBeamV2", version);
@@ -657,12 +652,11 @@ Proxy_BldDataEBeamV3_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& s
 
 
 void make_datasets_BldDataEBeamV3_v0(const Psana::Bld::BldDataEBeamV3& obj, 
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
 {
   {
     hdf5pp::Type dstype = Bld::ns_BldDataEBeamV3_v0::dataset_data::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
 }
 
@@ -689,14 +683,14 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataEBeamV3> > make_BldDataEBeamV3
   }
 }
 
-void make_datasets(const Psana::Bld::BldDataEBeamV3& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::Bld::BldDataEBeamV3& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
   group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
-    make_datasets_BldDataEBeamV3_v0(obj, group, chunk_size, deflate, shuffle);
+    make_datasets_BldDataEBeamV3_v0(obj, group, chunkPolicy, deflate, shuffle);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataEBeamV3", version);
@@ -821,12 +815,11 @@ Proxy_BldDataEBeamV4_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& s
 
 
 void make_datasets_BldDataEBeamV4_v0(const Psana::Bld::BldDataEBeamV4& obj, 
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
 {
   {
     hdf5pp::Type dstype = Bld::ns_BldDataEBeamV4_v0::dataset_data::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
 }
 
@@ -853,14 +846,14 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataEBeamV4> > make_BldDataEBeamV4
   }
 }
 
-void make_datasets(const Psana::Bld::BldDataEBeamV4& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::Bld::BldDataEBeamV4& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
   group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
-    make_datasets_BldDataEBeamV4_v0(obj, group, chunk_size, deflate, shuffle);
+    make_datasets_BldDataEBeamV4_v0(obj, group, chunkPolicy, deflate, shuffle);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataEBeamV4", version);
@@ -952,12 +945,11 @@ Proxy_BldDataPhaseCavity_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Sr
 
 
 void make_datasets_BldDataPhaseCavity_v0(const Psana::Bld::BldDataPhaseCavity& obj, 
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
 {
   {
     hdf5pp::Type dstype = Bld::ns_BldDataPhaseCavity_v0::dataset_data::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
 }
 
@@ -984,14 +976,14 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataPhaseCavity> > make_BldDataPha
   }
 }
 
-void make_datasets(const Psana::Bld::BldDataPhaseCavity& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::Bld::BldDataPhaseCavity& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
   group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
-    make_datasets_BldDataPhaseCavity_v0(obj, group, chunk_size, deflate, shuffle);
+    make_datasets_BldDataPhaseCavity_v0(obj, group, chunkPolicy, deflate, shuffle);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataPhaseCavity", version);
@@ -1094,12 +1086,11 @@ void BldDataIpimbV0_v0::read_ds_data() const {
 }
 
 void make_datasets_BldDataIpimbV0_v0(const Psana::Bld::BldDataIpimbV0& obj, 
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
 {
   {
     hdf5pp::Type dstype = Bld::ns_BldDataIpimbV0_v0::dataset_data::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
 }
 
@@ -1126,14 +1117,14 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataIpimbV0> > make_BldDataIpimbV0
   }
 }
 
-void make_datasets(const Psana::Bld::BldDataIpimbV0& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::Bld::BldDataIpimbV0& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
   group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
-    make_datasets_BldDataIpimbV0_v0(obj, group, chunk_size, deflate, shuffle);
+    make_datasets_BldDataIpimbV0_v0(obj, group, chunkPolicy, deflate, shuffle);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataIpimbV0", version);
@@ -1236,12 +1227,11 @@ void BldDataIpimbV1_v0::read_ds_data() const {
 }
 
 void make_datasets_BldDataIpimbV1_v0(const Psana::Bld::BldDataIpimbV1& obj, 
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
 {
   {
     hdf5pp::Type dstype = Bld::ns_BldDataIpimbV1_v0::dataset_data::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
 }
 
@@ -1268,14 +1258,14 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataIpimbV1> > make_BldDataIpimbV1
   }
 }
 
-void make_datasets(const Psana::Bld::BldDataIpimbV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::Bld::BldDataIpimbV1& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
   group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
-    make_datasets_BldDataIpimbV1_v0(obj, group, chunk_size, deflate, shuffle);
+    make_datasets_BldDataIpimbV1_v0(obj, group, chunkPolicy, deflate, shuffle);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataIpimbV1", version);
@@ -1314,14 +1304,14 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataPimV1> > make_BldDataPimV1(int
   }
 }
 
-void make_datasets(const Psana::Bld::BldDataPimV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::Bld::BldDataPimV1& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
   group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
-    make_datasets_BldDataPimV1_v0(obj, group, chunk_size, deflate, shuffle);
+    make_datasets_BldDataPimV1_v0(obj, group, chunkPolicy, deflate, shuffle);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataPimV1", version);
@@ -1499,12 +1489,11 @@ void BldDataGMDV0_v0::read_ds_data() const {
 }
 
 void make_datasets_BldDataGMDV0_v0(const Psana::Bld::BldDataGMDV0& obj, 
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
 {
   {
     hdf5pp::Type dstype = Bld::ns_BldDataGMDV0_v0::dataset_data::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
 }
 
@@ -1531,14 +1520,14 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataGMDV0> > make_BldDataGMDV0(int
   }
 }
 
-void make_datasets(const Psana::Bld::BldDataGMDV0& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::Bld::BldDataGMDV0& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
   group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
-    make_datasets_BldDataGMDV0_v0(obj, group, chunk_size, deflate, shuffle);
+    make_datasets_BldDataGMDV0_v0(obj, group, chunkPolicy, deflate, shuffle);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataGMDV0", version);
@@ -1646,12 +1635,11 @@ void BldDataGMDV1_v0::read_ds_data() const {
 }
 
 void make_datasets_BldDataGMDV1_v0(const Psana::Bld::BldDataGMDV1& obj, 
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
 {
   {
     hdf5pp::Type dstype = Bld::ns_BldDataGMDV1_v0::dataset_data::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
 }
 
@@ -1678,14 +1666,14 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataGMDV1> > make_BldDataGMDV1(int
   }
 }
 
-void make_datasets(const Psana::Bld::BldDataGMDV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::Bld::BldDataGMDV1& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
   group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
-    make_datasets_BldDataGMDV1_v0(obj, group, chunk_size, deflate, shuffle);
+    make_datasets_BldDataGMDV1_v0(obj, group, chunkPolicy, deflate, shuffle);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataGMDV1", version);
@@ -1724,14 +1712,14 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataAcqADCV1> > make_BldDataAcqADC
   }
 }
 
-void make_datasets(const Psana::Bld::BldDataAcqADCV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::Bld::BldDataAcqADCV1& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
   group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
-    make_datasets_BldDataAcqADCV1_v0(obj, group, chunk_size, deflate, shuffle);
+    make_datasets_BldDataAcqADCV1_v0(obj, group, chunkPolicy, deflate, shuffle);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataAcqADCV1", version);
@@ -1834,12 +1822,11 @@ void BldDataSpectrometerV0_v0::read_ds_data() const {
 }
 
 void make_datasets_BldDataSpectrometerV0_v0(const Psana::Bld::BldDataSpectrometerV0& obj, 
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
 {
   {
     hdf5pp::Type dstype = Bld::ns_BldDataSpectrometerV0_v0::dataset_data::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
 }
 
@@ -1866,14 +1853,14 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataSpectrometerV0> > make_BldData
   }
 }
 
-void make_datasets(const Psana::Bld::BldDataSpectrometerV0& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::Bld::BldDataSpectrometerV0& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
   group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
-    make_datasets_BldDataSpectrometerV0_v0(obj, group, chunk_size, deflate, shuffle);
+    make_datasets_BldDataSpectrometerV0_v0(obj, group, chunkPolicy, deflate, shuffle);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Bld.BldDataSpectrometerV0", version);

@@ -24,6 +24,7 @@
 //-------------------------------
 #include "hdf5pp/Group.h"
 #include "hdf5pp/Type.h"
+#include "psddl_hdf2psana/ChunkPolicy.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -103,7 +104,7 @@ private:
 };
 
 void make_datasets_ElementV1_v0(const Psana::CsPad2x2::ElementV1& obj,
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle);
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle);
 void store_ElementV1_v0(const Psana::CsPad2x2::ElementV1* obj, hdf5pp::Group group, long index, bool append);
 
 } // namespace CsPad2x2

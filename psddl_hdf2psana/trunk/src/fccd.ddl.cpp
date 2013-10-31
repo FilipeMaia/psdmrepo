@@ -9,7 +9,6 @@
 #include "hdf5pp/Utils.h"
 #include "PSEvt/DataProxy.h"
 #include "psddl_hdf2psana/Exceptions.h"
-#include "psddl_hdf2psana/HdfParameters.h"
 #include "psddl_hdf2psana/fccd.h"
 namespace psddl_hdf2psana {
 namespace FCCD {
@@ -91,12 +90,11 @@ void FccdConfigV1_v0::read_ds_config() const {
 }
 
 void make_datasets_FccdConfigV1_v0(const Psana::FCCD::FccdConfigV1& obj, 
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
 {
   {
     hdf5pp::Type dstype = FCCD::ns_FccdConfigV1_v0::dataset_config::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "config", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "config", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
 }
 
@@ -123,14 +121,14 @@ boost::shared_ptr<PSEvt::Proxy<Psana::FCCD::FccdConfigV1> > make_FccdConfigV1(in
   }
 }
 
-void make_datasets(const Psana::FCCD::FccdConfigV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::FCCD::FccdConfigV1& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
   group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
-    make_datasets_FccdConfigV1_v0(obj, group, chunk_size, deflate, shuffle);
+    make_datasets_FccdConfigV1_v0(obj, group, chunkPolicy, deflate, shuffle);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "FCCD.FccdConfigV1", version);
@@ -169,14 +167,14 @@ boost::shared_ptr<PSEvt::Proxy<Psana::FCCD::FccdConfigV2> > make_FccdConfigV2(in
   }
 }
 
-void make_datasets(const Psana::FCCD::FccdConfigV2& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::FCCD::FccdConfigV2& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
   group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
-    make_datasets_FccdConfigV2_v0(obj, group, chunk_size, deflate, shuffle);
+    make_datasets_FccdConfigV2_v0(obj, group, chunkPolicy, deflate, shuffle);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "FCCD.FccdConfigV2", version);

@@ -9,7 +9,6 @@
 #include "hdf5pp/Utils.h"
 #include "PSEvt/DataProxy.h"
 #include "psddl_hdf2psana/Exceptions.h"
-#include "psddl_hdf2psana/HdfParameters.h"
 #include "psddl_hdf2psana/evr.h"
 #include "psddl_hdf2psana/evr.h"
 #include "psddl_hdf2psana/evr.h"
@@ -632,26 +631,23 @@ void ConfigV1_v0::read_ds_output_maps() const {
 }
 
 void make_datasets_ConfigV1_v0(const Psana::EvrData::ConfigV1& obj, 
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
 {
   {
     hdf5pp::Type dstype = EvrData::ns_ConfigV1_v0::dataset_config::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "config", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "config", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
   {
     typedef __typeof__(obj.pulses()) PsanaArray;
     const PsanaArray& psana_array = obj.pulses();
     hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<EvrData::ns_PulseConfig_v0::dataset_data>::stored_type(), psana_array.shape()[0]);
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "pulses", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "pulses", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
   {
     typedef __typeof__(obj.output_maps()) PsanaArray;
     const PsanaArray& psana_array = obj.output_maps();
     hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<EvrData::ns_OutputMap_v0::dataset_data>::stored_type(), psana_array.shape()[0]);
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "output_maps", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "output_maps", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
 }
 
@@ -712,14 +708,14 @@ boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::ConfigV1> > make_ConfigV1(int ver
   }
 }
 
-void make_datasets(const Psana::EvrData::ConfigV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::EvrData::ConfigV1& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
   group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
-    make_datasets_ConfigV1_v0(obj, group, chunk_size, deflate, shuffle);
+    make_datasets_ConfigV1_v0(obj, group, chunkPolicy, deflate, shuffle);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "EvrData.ConfigV1", version);
@@ -873,26 +869,23 @@ void ConfigV2_v0::read_ds_output_maps() const {
 }
 
 void make_datasets_ConfigV2_v0(const Psana::EvrData::ConfigV2& obj, 
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
 {
   {
     hdf5pp::Type dstype = EvrData::ns_ConfigV2_v0::dataset_config::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "config", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "config", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
   {
     typedef __typeof__(obj.pulses()) PsanaArray;
     const PsanaArray& psana_array = obj.pulses();
     hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<EvrData::ns_PulseConfig_v0::dataset_data>::stored_type(), psana_array.shape()[0]);
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "pulses", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "pulses", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
   {
     typedef __typeof__(obj.output_maps()) PsanaArray;
     const PsanaArray& psana_array = obj.output_maps();
     hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<EvrData::ns_OutputMap_v0::dataset_data>::stored_type(), psana_array.shape()[0]);
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "output_maps", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "output_maps", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
 }
 
@@ -953,14 +946,14 @@ boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::ConfigV2> > make_ConfigV2(int ver
   }
 }
 
-void make_datasets(const Psana::EvrData::ConfigV2& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::EvrData::ConfigV2& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
   group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
-    make_datasets_ConfigV2_v0(obj, group, chunk_size, deflate, shuffle);
+    make_datasets_ConfigV2_v0(obj, group, chunkPolicy, deflate, shuffle);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "EvrData.ConfigV2", version);
@@ -1084,33 +1077,29 @@ void ConfigV3_v0::read_ds_output_maps() const {
 }
 
 void make_datasets_ConfigV3_v0(const Psana::EvrData::ConfigV3& obj, 
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
 {
   {
     hdf5pp::Type dstype = EvrData::ns_ConfigV3_v0::dataset_config::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "config", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "config", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
   {
     typedef __typeof__(obj.eventcodes()) PsanaArray;
     const PsanaArray& psana_array = obj.eventcodes();
     hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<EvrData::ns_EventCodeV3_v0::dataset_data>::stored_type(), psana_array.shape()[0]);
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "eventcodes", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "eventcodes", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
   {
     typedef __typeof__(obj.pulses()) PsanaArray;
     const PsanaArray& psana_array = obj.pulses();
     hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<EvrData::ns_PulseConfigV3_v0::dataset_data>::stored_type(), psana_array.shape()[0]);
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "pulses", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "pulses", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
   {
     typedef __typeof__(obj.output_maps()) PsanaArray;
     const PsanaArray& psana_array = obj.output_maps();
     hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<EvrData::ns_OutputMap_v0::dataset_data>::stored_type(), psana_array.shape()[0]);
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "output_maps", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "output_maps", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
 }
 
@@ -1188,14 +1177,14 @@ boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::ConfigV3> > make_ConfigV3(int ver
   }
 }
 
-void make_datasets(const Psana::EvrData::ConfigV3& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::EvrData::ConfigV3& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
   group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
-    make_datasets_ConfigV3_v0(obj, group, chunk_size, deflate, shuffle);
+    make_datasets_ConfigV3_v0(obj, group, chunkPolicy, deflate, shuffle);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "EvrData.ConfigV3", version);
@@ -1319,33 +1308,29 @@ void ConfigV4_v0::read_ds_output_maps() const {
 }
 
 void make_datasets_ConfigV4_v0(const Psana::EvrData::ConfigV4& obj, 
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
 {
   {
     hdf5pp::Type dstype = EvrData::ns_ConfigV4_v0::dataset_config::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "config", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "config", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
   {
     typedef __typeof__(obj.eventcodes()) PsanaArray;
     const PsanaArray& psana_array = obj.eventcodes();
     hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<EvrData::ns_EventCodeV4_v0::dataset_data>::stored_type(), psana_array.shape()[0]);
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "eventcodes", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "eventcodes", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
   {
     typedef __typeof__(obj.pulses()) PsanaArray;
     const PsanaArray& psana_array = obj.pulses();
     hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<EvrData::ns_PulseConfigV3_v0::dataset_data>::stored_type(), psana_array.shape()[0]);
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "pulses", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "pulses", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
   {
     typedef __typeof__(obj.output_maps()) PsanaArray;
     const PsanaArray& psana_array = obj.output_maps();
     hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<EvrData::ns_OutputMap_v0::dataset_data>::stored_type(), psana_array.shape()[0]);
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "output_maps", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "output_maps", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
 }
 
@@ -1423,14 +1408,14 @@ boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::ConfigV4> > make_ConfigV4(int ver
   }
 }
 
-void make_datasets(const Psana::EvrData::ConfigV4& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::EvrData::ConfigV4& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
   group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
-    make_datasets_ConfigV4_v0(obj, group, chunk_size, deflate, shuffle);
+    make_datasets_ConfigV4_v0(obj, group, chunkPolicy, deflate, shuffle);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "EvrData.ConfigV4", version);
@@ -1640,12 +1625,11 @@ void SequencerConfigV1_v0::read_ds_config() const {
 }
 
 void make_datasets_SequencerConfigV1_v0(const Psana::EvrData::SequencerConfigV1& obj, 
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
 {
   {
     hdf5pp::Type dstype = EvrData::ns_SequencerConfigV1_v0::dataset_config::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "config", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "config", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
 }
 
@@ -1768,38 +1752,33 @@ void ConfigV5_v0::read_ds_seq_config() const {
 }
 
 void make_datasets_ConfigV5_v0(const Psana::EvrData::ConfigV5& obj, 
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
 {
   {
     hdf5pp::Type dstype = EvrData::ns_ConfigV5_v0::dataset_config::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "config", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "config", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
   {
     typedef __typeof__(obj.eventcodes()) PsanaArray;
     const PsanaArray& psana_array = obj.eventcodes();
     hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<EvrData::ns_EventCodeV5_v0::dataset_data>::stored_type(), psana_array.shape()[0]);
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "eventcodes", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "eventcodes", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
   {
     typedef __typeof__(obj.pulses()) PsanaArray;
     const PsanaArray& psana_array = obj.pulses();
     hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<EvrData::ns_PulseConfigV3_v0::dataset_data>::stored_type(), psana_array.shape()[0]);
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "pulses", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "pulses", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
   {
     typedef __typeof__(obj.output_maps()) PsanaArray;
     const PsanaArray& psana_array = obj.output_maps();
     hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<EvrData::ns_OutputMap_v0::dataset_data>::stored_type(), psana_array.shape()[0]);
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "output_maps", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "output_maps", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
   {
     hdf5pp::Type dstype = EvrData::ns_SequencerConfigV1_v0::dataset_config::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "seq_config", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "seq_config", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
 }
 
@@ -1887,14 +1866,14 @@ boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::ConfigV5> > make_ConfigV5(int ver
   }
 }
 
-void make_datasets(const Psana::EvrData::ConfigV5& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::EvrData::ConfigV5& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
   group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
-    make_datasets_ConfigV5_v0(obj, group, chunk_size, deflate, shuffle);
+    make_datasets_ConfigV5_v0(obj, group, chunkPolicy, deflate, shuffle);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "EvrData.ConfigV5", version);
@@ -2029,38 +2008,33 @@ void ConfigV6_v0::read_ds_seq_config() const {
 }
 
 void make_datasets_ConfigV6_v0(const Psana::EvrData::ConfigV6& obj, 
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
 {
   {
     hdf5pp::Type dstype = EvrData::ns_ConfigV6_v0::dataset_config::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "config", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "config", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
   {
     typedef __typeof__(obj.eventcodes()) PsanaArray;
     const PsanaArray& psana_array = obj.eventcodes();
     hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<EvrData::ns_EventCodeV5_v0::dataset_data>::stored_type(), psana_array.shape()[0]);
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "eventcodes", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "eventcodes", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
   {
     typedef __typeof__(obj.pulses()) PsanaArray;
     const PsanaArray& psana_array = obj.pulses();
     hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<EvrData::ns_PulseConfigV3_v0::dataset_data>::stored_type(), psana_array.shape()[0]);
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "pulses", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "pulses", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
   {
     typedef __typeof__(obj.output_maps()) PsanaArray;
     const PsanaArray& psana_array = obj.output_maps();
     hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<EvrData::ns_OutputMapV2_v0::dataset_data>::stored_type(), psana_array.shape()[0]);
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "output_maps", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "output_maps", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
   {
     hdf5pp::Type dstype = EvrData::ns_SequencerConfigV1_v0::dataset_config::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "seq_config", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "seq_config", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
 }
 
@@ -2148,14 +2122,14 @@ boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::ConfigV6> > make_ConfigV6(int ver
   }
 }
 
-void make_datasets(const Psana::EvrData::ConfigV6& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::EvrData::ConfigV6& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
   group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
-    make_datasets_ConfigV6_v0(obj, group, chunk_size, deflate, shuffle);
+    make_datasets_ConfigV6_v0(obj, group, chunkPolicy, deflate, shuffle);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "EvrData.ConfigV6", version);
@@ -2290,38 +2264,33 @@ void ConfigV7_v0::read_ds_seq_config() const {
 }
 
 void make_datasets_ConfigV7_v0(const Psana::EvrData::ConfigV7& obj, 
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
 {
   {
     hdf5pp::Type dstype = EvrData::ns_ConfigV7_v0::dataset_config::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "config", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "config", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
   {
     typedef __typeof__(obj.eventcodes()) PsanaArray;
     const PsanaArray& psana_array = obj.eventcodes();
     hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<EvrData::ns_EventCodeV6_v0::dataset_data>::stored_type(), psana_array.shape()[0]);
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "eventcodes", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "eventcodes", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
   {
     typedef __typeof__(obj.pulses()) PsanaArray;
     const PsanaArray& psana_array = obj.pulses();
     hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<EvrData::ns_PulseConfigV3_v0::dataset_data>::stored_type(), psana_array.shape()[0]);
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "pulses", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "pulses", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
   {
     typedef __typeof__(obj.output_maps()) PsanaArray;
     const PsanaArray& psana_array = obj.output_maps();
     hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<EvrData::ns_OutputMapV2_v0::dataset_data>::stored_type(), psana_array.shape()[0]);
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "output_maps", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "output_maps", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
   {
     hdf5pp::Type dstype = EvrData::ns_SequencerConfigV1_v0::dataset_config::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "seq_config", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "seq_config", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
 }
 
@@ -2409,14 +2378,14 @@ boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::ConfigV7> > make_ConfigV7(int ver
   }
 }
 
-void make_datasets(const Psana::EvrData::ConfigV7& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::EvrData::ConfigV7& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
   group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
-    make_datasets_ConfigV7_v0(obj, group, chunk_size, deflate, shuffle);
+    make_datasets_ConfigV7_v0(obj, group, chunkPolicy, deflate, shuffle);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "EvrData.ConfigV7", version);
@@ -2502,14 +2471,14 @@ boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::DataV3> > make_DataV3(int version
   }
 }
 
-void make_datasets(const Psana::EvrData::DataV3& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::EvrData::DataV3& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
   group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
-    make_datasets_DataV3_v0(obj, group, chunk_size, deflate, shuffle);
+    make_datasets_DataV3_v0(obj, group, chunkPolicy, deflate, shuffle);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "EvrData.DataV3", version);
@@ -2548,14 +2517,14 @@ boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::IOConfigV1> > make_IOConfigV1(int
   }
 }
 
-void make_datasets(const Psana::EvrData::IOConfigV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::EvrData::IOConfigV1& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
   group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
-    make_datasets_IOConfigV1_v0(obj, group, chunk_size, deflate, shuffle);
+    make_datasets_IOConfigV1_v0(obj, group, chunkPolicy, deflate, shuffle);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "EvrData.IOConfigV1", version);

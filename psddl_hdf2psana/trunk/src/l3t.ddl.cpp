@@ -9,7 +9,6 @@
 #include "hdf5pp/Utils.h"
 #include "PSEvt/DataProxy.h"
 #include "psddl_hdf2psana/Exceptions.h"
-#include "psddl_hdf2psana/HdfParameters.h"
 namespace psddl_hdf2psana {
 namespace L3T {
 
@@ -99,12 +98,11 @@ void ConfigV1_v0::read_ds_config() const {
 }
 
 void make_datasets_ConfigV1_v0(const Psana::L3T::ConfigV1& obj, 
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
 {
   {
     hdf5pp::Type dstype = L3T::ns_ConfigV1_v0::dataset_config::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "config", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "config", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
 }
 
@@ -131,14 +129,14 @@ boost::shared_ptr<PSEvt::Proxy<Psana::L3T::ConfigV1> > make_ConfigV1(int version
   }
 }
 
-void make_datasets(const Psana::L3T::ConfigV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::L3T::ConfigV1& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
   group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
-    make_datasets_ConfigV1_v0(obj, group, chunk_size, deflate, shuffle);
+    make_datasets_ConfigV1_v0(obj, group, chunkPolicy, deflate, shuffle);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "L3T.ConfigV1", version);
@@ -218,12 +216,11 @@ void DataV1_v0::read_ds_data() const {
 }
 
 void make_datasets_DataV1_v0(const Psana::L3T::DataV1& obj, 
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
 {
   {
     hdf5pp::Type dstype = L3T::ns_DataV1_v0::dataset_data::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
 }
 
@@ -250,14 +247,14 @@ boost::shared_ptr<PSEvt::Proxy<Psana::L3T::DataV1> > make_DataV1(int version, hd
   }
 }
 
-void make_datasets(const Psana::L3T::DataV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::L3T::DataV1& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
   group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
-    make_datasets_DataV1_v0(obj, group, chunk_size, deflate, shuffle);
+    make_datasets_DataV1_v0(obj, group, chunkPolicy, deflate, shuffle);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "L3T.DataV1", version);

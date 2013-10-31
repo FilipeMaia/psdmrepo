@@ -9,7 +9,6 @@
 #include "hdf5pp/Utils.h"
 #include "PSEvt/DataProxy.h"
 #include "psddl_hdf2psana/Exceptions.h"
-#include "psddl_hdf2psana/HdfParameters.h"
 #include "psddl_hdf2psana/pnccd.h"
 #include "psddl_hdf2psana/pnccd.h"
 #include "psddl_hdf2psana/pnccd.h"
@@ -72,12 +71,11 @@ void ConfigV1_v0::read_ds_config() const {
 }
 
 void make_datasets_ConfigV1_v0(const Psana::PNCCD::ConfigV1& obj, 
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
 {
   {
     hdf5pp::Type dstype = PNCCD::ns_ConfigV1_v0::dataset_config::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "config", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "config", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
 }
 
@@ -104,14 +102,14 @@ boost::shared_ptr<PSEvt::Proxy<Psana::PNCCD::ConfigV1> > make_ConfigV1(int versi
   }
 }
 
-void make_datasets(const Psana::PNCCD::ConfigV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::PNCCD::ConfigV1& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
   group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
-    make_datasets_ConfigV1_v0(obj, group, chunk_size, deflate, shuffle);
+    make_datasets_ConfigV1_v0(obj, group, chunkPolicy, deflate, shuffle);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "PNCCD.ConfigV1", version);
@@ -266,12 +264,11 @@ void ConfigV2_v0::read_ds_config() const {
 }
 
 void make_datasets_ConfigV2_v0(const Psana::PNCCD::ConfigV2& obj, 
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
 {
   {
     hdf5pp::Type dstype = PNCCD::ns_ConfigV2_v0::dataset_config::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "config", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "config", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
 }
 
@@ -298,14 +295,14 @@ boost::shared_ptr<PSEvt::Proxy<Psana::PNCCD::ConfigV2> > make_ConfigV2(int versi
   }
 }
 
-void make_datasets(const Psana::PNCCD::ConfigV2& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::PNCCD::ConfigV2& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
   group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
-    make_datasets_ConfigV2_v0(obj, group, chunk_size, deflate, shuffle);
+    make_datasets_ConfigV2_v0(obj, group, chunkPolicy, deflate, shuffle);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "PNCCD.ConfigV2", version);
@@ -344,14 +341,14 @@ boost::shared_ptr<PSEvt::Proxy<Psana::PNCCD::FullFrameV1> > make_FullFrameV1(int
   }
 }
 
-void make_datasets(const Psana::PNCCD::FullFrameV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::PNCCD::FullFrameV1& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
   group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
-    make_datasets_FullFrameV1_v0(obj, group, chunk_size, deflate, shuffle);
+    make_datasets_FullFrameV1_v0(obj, group, chunkPolicy, deflate, shuffle);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "PNCCD.FullFrameV1", version);
@@ -398,14 +395,14 @@ boost::shared_ptr<PSEvt::Proxy<Psana::PNCCD::FramesV1> > make_FramesV1(int versi
   }
 }
 
-void make_datasets(const Psana::PNCCD::FramesV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::PNCCD::FramesV1& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
   group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
-    make_datasets_FramesV1_v0(obj, group, chunk_size, deflate, shuffle);
+    make_datasets_FramesV1_v0(obj, group, chunkPolicy, deflate, shuffle);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "PNCCD.FramesV1", version);

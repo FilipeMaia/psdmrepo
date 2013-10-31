@@ -25,7 +25,6 @@
 #include "hdf5pp/ArrayType.h"
 #include "hdf5pp/CompoundType.h"
 #include "hdf5pp/Utils.h"
-#include "psddl_hdf2psana/HdfParameters.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -215,23 +214,20 @@ ElementV1_v0::read_ds_cm() const {
 }
 
 void make_datasets_ElementV1_v0(const Psana::CsPad2x2::ElementV1& obj,
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
 {
   {
     hdf5pp::Type dstype = hdf5pp::TypeTraits<ns_ElementV1_v0::dataset_element>::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "element", dstype, chunk_size, chunk_cache_size, deflate, shuffle);
+    hdf5pp::Utils::createDataset(group, "element", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);
   }
   {
     hsize_t dims[3] = {Psana::CsPad2x2::ColumnsPerASIC, Psana::CsPad2x2::MaxRowsPerASIC*2, 2};
     hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<int16_t>::stored_type(), 3, dims);
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);
   }
   {
     hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<float>::stored_type(), 2);
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "common_mode", dstype, chunk_size, chunk_cache_size, deflate, shuffle);
+    hdf5pp::Utils::createDataset(group, "common_mode", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);
   }
 }
 

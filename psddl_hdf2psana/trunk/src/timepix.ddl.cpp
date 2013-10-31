@@ -9,7 +9,6 @@
 #include "hdf5pp/Utils.h"
 #include "PSEvt/DataProxy.h"
 #include "psddl_hdf2psana/Exceptions.h"
-#include "psddl_hdf2psana/HdfParameters.h"
 namespace psddl_hdf2psana {
 namespace Timepix {
 
@@ -482,12 +481,11 @@ void ConfigV1_v0::read_ds_config() const {
 }
 
 void make_datasets_ConfigV1_v0(const Psana::Timepix::ConfigV1& obj, 
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
 {
   {
     hdf5pp::Type dstype = Timepix::ns_ConfigV1_v0::dataset_config::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "config", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "config", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
 }
 
@@ -514,14 +512,14 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Timepix::ConfigV1> > make_ConfigV1(int ver
   }
 }
 
-void make_datasets(const Psana::Timepix::ConfigV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::Timepix::ConfigV1& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
   group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
-    make_datasets_ConfigV1_v0(obj, group, chunk_size, deflate, shuffle);
+    make_datasets_ConfigV1_v0(obj, group, chunkPolicy, deflate, shuffle);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Timepix.ConfigV1", version);
@@ -1124,12 +1122,11 @@ void ConfigV2_v0::read_ds_config() const {
 }
 
 void make_datasets_ConfigV2_v0(const Psana::Timepix::ConfigV2& obj, 
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
 {
   {
     hdf5pp::Type dstype = Timepix::ns_ConfigV2_v0::dataset_config::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "config", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "config", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
 }
 
@@ -1156,14 +1153,14 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Timepix::ConfigV2> > make_ConfigV2(int ver
   }
 }
 
-void make_datasets(const Psana::Timepix::ConfigV2& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::Timepix::ConfigV2& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
   group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
-    make_datasets_ConfigV2_v0(obj, group, chunk_size, deflate, shuffle);
+    make_datasets_ConfigV2_v0(obj, group, chunkPolicy, deflate, shuffle);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Timepix.ConfigV2", version);
@@ -1778,12 +1775,11 @@ void ConfigV3_v0::read_ds_config() const {
 }
 
 void make_datasets_ConfigV3_v0(const Psana::Timepix::ConfigV3& obj, 
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
 {
   {
     hdf5pp::Type dstype = Timepix::ns_ConfigV3_v0::dataset_config::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "config", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "config", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
 }
 
@@ -1810,14 +1806,14 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Timepix::ConfigV3> > make_ConfigV3(int ver
   }
 }
 
-void make_datasets(const Psana::Timepix::ConfigV3& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::Timepix::ConfigV3& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
   group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
-    make_datasets_ConfigV3_v0(obj, group, chunk_size, deflate, shuffle);
+    make_datasets_ConfigV3_v0(obj, group, chunkPolicy, deflate, shuffle);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Timepix.ConfigV3", version);
@@ -1923,12 +1919,11 @@ void DataV1_v0::read_ds_image() const {
 }
 
 void make_datasets_DataV1_v0(const Psana::Timepix::DataV1& obj, 
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
 {
   {
     hdf5pp::Type dstype = Timepix::ns_DataV1_v0::dataset_data::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
   {
     typedef __typeof__(obj.data()) PsanaArray;
@@ -1936,8 +1931,7 @@ void make_datasets_DataV1_v0(const Psana::Timepix::DataV1& obj,
     hsize_t dims[2];
     std::copy(psana_array.shape(), psana_array.shape()+2, dims);
     hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint16_t>::stored_type(), 2, dims);
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "image", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "image", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
 }
 
@@ -1973,14 +1967,14 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Timepix::DataV1> > make_DataV1(int version
   }
 }
 
-void make_datasets(const Psana::Timepix::DataV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::Timepix::DataV1& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
   group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
-    make_datasets_DataV1_v0(obj, group, chunk_size, deflate, shuffle);
+    make_datasets_DataV1_v0(obj, group, chunkPolicy, deflate, shuffle);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Timepix.DataV1", version);
@@ -2098,12 +2092,11 @@ void DataV2_v0::read_ds_image() const {
 }
 
 void make_datasets_DataV2_v0(const Psana::Timepix::DataV2& obj, 
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
 {
   {
     hdf5pp::Type dstype = Timepix::ns_DataV2_v0::dataset_data::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
   {
     typedef __typeof__(obj.data()) PsanaArray;
@@ -2111,8 +2104,7 @@ void make_datasets_DataV2_v0(const Psana::Timepix::DataV2& obj,
     hsize_t dims[2];
     std::copy(psana_array.shape(), psana_array.shape()+2, dims);
     hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint16_t>::stored_type(), 2, dims);
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "image", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "image", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
 }
 
@@ -2148,14 +2140,14 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Timepix::DataV2> > make_DataV2(int version
   }
 }
 
-void make_datasets(const Psana::Timepix::DataV2& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::Timepix::DataV2& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
   group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
-    make_datasets_DataV2_v0(obj, group, chunk_size, deflate, shuffle);
+    make_datasets_DataV2_v0(obj, group, chunkPolicy, deflate, shuffle);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Timepix.DataV2", version);

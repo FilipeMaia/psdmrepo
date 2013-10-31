@@ -26,7 +26,6 @@
 #include "psddl_hdf2psana/lusi.ddl.h"
 #include "psddl_hdf2psana/pulnix.ddl.h"
 #include "psddl_hdf2psana/Exceptions.h"
-#include "psddl_hdf2psana/HdfParameters.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -122,12 +121,11 @@ BldDataPimV1_v0::read_ds_data() const
 }
 
 void make_datasets_BldDataPimV1_v0(const Psana::Bld::BldDataPimV1& obj,
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
 {
   {
     hdf5pp::Type dstype = ns_BldDataPimV1_v0::dataset_data::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);
   }
 }
 
@@ -182,7 +180,7 @@ BldDataAcqADCV1_v0<Config>::data() const
 template class BldDataAcqADCV1_v0<Psana::Acqiris::ConfigV1>;
 
 void make_datasets_BldDataAcqADCV1_v0(const Psana::Bld::BldDataAcqADCV1& obj,
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
 {
   BldDataAcqADCV1_unimplemented();
 }

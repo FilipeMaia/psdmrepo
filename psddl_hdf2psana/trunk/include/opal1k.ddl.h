@@ -7,6 +7,7 @@
 #include "hdf5pp/Group.h"
 #include "hdf5pp/Type.h"
 #include "PSEvt/Proxy.h"
+#include "psddl_hdf2psana/ChunkPolicy.h"
 #include "psddl_hdf2psana/camera.ddl.h"
 namespace psddl_hdf2psana {
 namespace Opal1k {
@@ -73,7 +74,7 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Opal1k::ConfigV1> > make_ConfigV1(int vers
 /// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::Opal1k::ConfigV1& obj, hdf5pp::Group group, int version = -1);
 /// Create container (rank=1) datasets for storing objects of specified type.
-void make_datasets(const Psana::Opal1k::ConfigV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::Opal1k::ConfigV1& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version = -1);
 /// Add one more object to the containers created by previous method at the specified index,
 /// negative index means append to the end of dataset. If pointer to object is zero then

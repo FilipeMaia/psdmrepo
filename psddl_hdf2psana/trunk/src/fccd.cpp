@@ -25,7 +25,6 @@
 #include "hdf5pp/EnumType.h"
 #include "hdf5pp/VlenType.h"
 #include "hdf5pp/Utils.h"
-#include "psddl_hdf2psana/HdfParameters.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -176,12 +175,11 @@ void FccdConfigV2_v0::read_ds_config() const {
 }
 
 void make_datasets_FccdConfigV2_v0(const Psana::FCCD::FccdConfigV2& obj,
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
 {
   {
     hdf5pp::Type dstype = ns_FccdConfigV2_v0::dataset_config::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "config", dstype, chunk_size, chunk_cache_size, deflate, shuffle);
+    hdf5pp::Utils::createDataset(group, "config", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);
   }
 }
 

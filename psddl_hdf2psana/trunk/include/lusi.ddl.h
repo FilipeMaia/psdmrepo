@@ -7,6 +7,7 @@
 #include "hdf5pp/Group.h"
 #include "hdf5pp/Type.h"
 #include "PSEvt/Proxy.h"
+#include "psddl_hdf2psana/ChunkPolicy.h"
 namespace psddl_hdf2psana {
 namespace Lusi {
 
@@ -48,7 +49,7 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Lusi::DiodeFexConfigV1> > make_DiodeFexCon
 /// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::Lusi::DiodeFexConfigV1& obj, hdf5pp::Group group, int version = -1);
 /// Create container (rank=1) datasets for storing objects of specified type.
-void make_datasets(const Psana::Lusi::DiodeFexConfigV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::Lusi::DiodeFexConfigV1& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version = -1);
 /// Add one more object to the containers created by previous method at the specified index,
 /// negative index means append to the end of dataset. If pointer to object is zero then
@@ -94,7 +95,7 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Lusi::DiodeFexConfigV2> > make_DiodeFexCon
 /// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::Lusi::DiodeFexConfigV2& obj, hdf5pp::Group group, int version = -1);
 /// Create container (rank=1) datasets for storing objects of specified type.
-void make_datasets(const Psana::Lusi::DiodeFexConfigV2& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::Lusi::DiodeFexConfigV2& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version = -1);
 /// Add one more object to the containers created by previous method at the specified index,
 /// negative index means append to the end of dataset. If pointer to object is zero then
@@ -139,7 +140,7 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Lusi::DiodeFexV1> > make_DiodeFexV1(int ve
 /// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::Lusi::DiodeFexV1& obj, hdf5pp::Group group, int version = -1);
 /// Create container (rank=1) datasets for storing objects of specified type.
-void make_datasets(const Psana::Lusi::DiodeFexV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::Lusi::DiodeFexV1& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version = -1);
 /// Add one more object to the containers created by previous method at the specified index,
 /// negative index means append to the end of dataset. If pointer to object is zero then
@@ -189,7 +190,7 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Lusi::IpmFexConfigV1> > make_IpmFexConfigV
 /// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::Lusi::IpmFexConfigV1& obj, hdf5pp::Group group, int version = -1);
 /// Create container (rank=1) datasets for storing objects of specified type.
-void make_datasets(const Psana::Lusi::IpmFexConfigV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::Lusi::IpmFexConfigV1& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version = -1);
 /// Add one more object to the containers created by previous method at the specified index,
 /// negative index means append to the end of dataset. If pointer to object is zero then
@@ -239,7 +240,7 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Lusi::IpmFexConfigV2> > make_IpmFexConfigV
 /// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::Lusi::IpmFexConfigV2& obj, hdf5pp::Group group, int version = -1);
 /// Create container (rank=1) datasets for storing objects of specified type.
-void make_datasets(const Psana::Lusi::IpmFexConfigV2& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::Lusi::IpmFexConfigV2& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version = -1);
 /// Add one more object to the containers created by previous method at the specified index,
 /// negative index means append to the end of dataset. If pointer to object is zero then
@@ -287,7 +288,7 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Lusi::IpmFexV1> > make_IpmFexV1(int versio
 /// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::Lusi::IpmFexV1& obj, hdf5pp::Group group, int version = -1);
 /// Create container (rank=1) datasets for storing objects of specified type.
-void make_datasets(const Psana::Lusi::IpmFexV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::Lusi::IpmFexV1& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version = -1);
 /// Add one more object to the containers created by previous method at the specified index,
 /// negative index means append to the end of dataset. If pointer to object is zero then
@@ -333,7 +334,7 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Lusi::PimImageConfigV1> > make_PimImageCon
 /// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::Lusi::PimImageConfigV1& obj, hdf5pp::Group group, int version = -1);
 /// Create container (rank=1) datasets for storing objects of specified type.
-void make_datasets(const Psana::Lusi::PimImageConfigV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::Lusi::PimImageConfigV1& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version = -1);
 /// Add one more object to the containers created by previous method at the specified index,
 /// negative index means append to the end of dataset. If pointer to object is zero then

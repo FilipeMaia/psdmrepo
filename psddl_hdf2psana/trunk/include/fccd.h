@@ -24,6 +24,7 @@
 #include "hdf5pp/Group.h"
 #include "hdf5pp/Type.h"
 #include "PSEvt/Proxy.h"
+#include "psddl_hdf2psana/ChunkPolicy.h"
 #include "psddl_psana/fccd.ddl.h"
 
 namespace psddl_hdf2psana {
@@ -78,7 +79,7 @@ private:
 };
 
 void make_datasets_FccdConfigV2_v0(const Psana::FCCD::FccdConfigV2& obj,
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle);
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle);
 void store_FccdConfigV2_v0(const Psana::FCCD::FccdConfigV2* obj, hdf5pp::Group group, long index, bool append);
 
 } // namespace FCCD

@@ -9,7 +9,6 @@
 #include "hdf5pp/Utils.h"
 #include "PSEvt/DataProxy.h"
 #include "psddl_hdf2psana/Exceptions.h"
-#include "psddl_hdf2psana/HdfParameters.h"
 #include "psddl_hdf2psana/camera.h"
 namespace psddl_hdf2psana {
 namespace Camera {
@@ -69,12 +68,11 @@ Proxy_FrameCoord_v0::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& sourc
 
 
 void make_datasets_FrameCoord_v0(const Psana::Camera::FrameCoord& obj, 
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
 {
   {
     hdf5pp::Type dstype = Camera::ns_FrameCoord_v0::dataset_data::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
 }
 
@@ -101,14 +99,14 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Camera::FrameCoord> > make_FrameCoord(int 
   }
 }
 
-void make_datasets(const Psana::Camera::FrameCoord& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::Camera::FrameCoord& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
   group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
-    make_datasets_FrameCoord_v0(obj, group, chunk_size, deflate, shuffle);
+    make_datasets_FrameCoord_v0(obj, group, chunkPolicy, deflate, shuffle);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Camera.FrameCoord", version);
@@ -140,7 +138,7 @@ void store_at(const Psana::Camera::FrameCoord* obj, hdf5pp::Group group, long in
 
 
 void make_datasets_FrameFccdConfigV1_v0(const Psana::Camera::FrameFccdConfigV1& obj, 
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
 {
 }
 
@@ -157,14 +155,14 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Camera::FrameFccdConfigV1> > make_FrameFcc
   }
 }
 
-void make_datasets(const Psana::Camera::FrameFccdConfigV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::Camera::FrameFccdConfigV1& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
   group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
-    make_datasets_FrameFccdConfigV1_v0(obj, group, chunk_size, deflate, shuffle);
+    make_datasets_FrameFccdConfigV1_v0(obj, group, chunkPolicy, deflate, shuffle);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Camera.FrameFccdConfigV1", version);
@@ -316,19 +314,17 @@ void FrameFexConfigV1_v0::read_ds_masked_pixel_coordinates() const {
 }
 
 void make_datasets_FrameFexConfigV1_v0(const Psana::Camera::FrameFexConfigV1& obj, 
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
 {
   {
     hdf5pp::Type dstype = Camera::ns_FrameFexConfigV1_v0::dataset_config::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "config", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "config", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
   {
     typedef __typeof__(obj.masked_pixel_coordinates()) PsanaArray;
     const PsanaArray& psana_array = obj.masked_pixel_coordinates();
     hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<Camera::ns_FrameCoord_v0::dataset_data>::stored_type(), psana_array.shape()[0]);
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "masked_pixel_coordinates", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "masked_pixel_coordinates", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
 }
 
@@ -372,14 +368,14 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Camera::FrameFexConfigV1> > make_FrameFexC
   }
 }
 
-void make_datasets(const Psana::Camera::FrameFexConfigV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::Camera::FrameFexConfigV1& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
   group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
-    make_datasets_FrameFexConfigV1_v0(obj, group, chunk_size, deflate, shuffle);
+    make_datasets_FrameFexConfigV1_v0(obj, group, chunkPolicy, deflate, shuffle);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Camera.FrameFexConfigV1", version);
@@ -418,14 +414,14 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Camera::FrameV1> > make_FrameV1(int versio
   }
 }
 
-void make_datasets(const Psana::Camera::FrameV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::Camera::FrameV1& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
   group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
-    make_datasets_FrameV1_v0(obj, group, chunk_size, deflate, shuffle);
+    make_datasets_FrameV1_v0(obj, group, chunkPolicy, deflate, shuffle);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Camera.FrameV1", version);
@@ -540,12 +536,11 @@ void TwoDGaussianV1_v0::read_ds_data() const {
 }
 
 void make_datasets_TwoDGaussianV1_v0(const Psana::Camera::TwoDGaussianV1& obj, 
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
 {
   {
     hdf5pp::Type dstype = Camera::ns_TwoDGaussianV1_v0::dataset_data::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
 }
 
@@ -572,14 +567,14 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Camera::TwoDGaussianV1> > make_TwoDGaussia
   }
 }
 
-void make_datasets(const Psana::Camera::TwoDGaussianV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::Camera::TwoDGaussianV1& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = 0;
   group.createAttr<uint32_t>("_schemaVersion").store(version);
   switch (version) {
   case 0:
-    make_datasets_TwoDGaussianV1_v0(obj, group, chunk_size, deflate, shuffle);
+    make_datasets_TwoDGaussianV1_v0(obj, group, chunkPolicy, deflate, shuffle);
     break;
   default:
     throw ExceptionSchemaVersion(ERR_LOC, "Camera.TwoDGaussianV1", version);

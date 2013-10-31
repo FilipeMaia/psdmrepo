@@ -21,7 +21,6 @@
 //-------------------------------
 #include "hdf5pp/CompoundType.h"
 #include "hdf5pp/Utils.h"
-#include "psddl_hdf2psana/HdfParameters.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -154,12 +153,11 @@ void FrameV1_v0::read_ds_image() const
 }
 
 void make_datasets_FrameV1_v0(const Psana::Camera::FrameV1& obj,
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
 {
   {
     hdf5pp::Type dstype = ns_FrameV1_v0::dataset_data::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);
   }
 
   {
@@ -176,8 +174,7 @@ void make_datasets_FrameV1_v0(const Psana::Camera::FrameV1& obj,
       basetype = hdf5pp::TypeTraits<uint8_t>::stored_type();
     }
     hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(basetype, 2, dims);
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "image", dstype, chunk_size, chunk_cache_size, deflate, shuffle);
+    hdf5pp::Utils::createDataset(group, "image", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);
   }
 }
 

@@ -26,7 +26,6 @@
 #include "hdf5pp/VlenType.h"
 #include "hdf5pp/Utils.h"
 #include "MsgLogger/MsgLogger.h"
-#include "psddl_hdf2psana/HdfParameters.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -166,20 +165,18 @@ template class FramesV1_v0<Psana::PNCCD::ConfigV1>;
 template class FramesV1_v0<Psana::PNCCD::ConfigV2>;
 
 void make_datasets_FramesV1_v0(const Psana::PNCCD::FramesV1& obj,
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
 {
   const unsigned nLinks = obj.numLinks();
   const unsigned data_size = obj.frame(0)._data().shape()[0];
   {
     hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<ns_FrameV1_v0::dataset_data>::stored_type(), nLinks);
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "frame", dstype, chunk_size, chunk_cache_size, deflate, shuffle);
+    hdf5pp::Utils::createDataset(group, "frame", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);
   }
   {
     hsize_t dims[2] = {nLinks, data_size};
     hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<uint16_t>::stored_type(), 2, dims);
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);
   }
 }
 
@@ -303,7 +300,7 @@ FullFrameV1_v0::read_frame() const
 }
 
 void make_datasets_FullFrameV1_v0(const Psana::PNCCD::FullFrameV1& obj,
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
 {
   // we do not want to save FullFrame in HDF5
   MsgLog("PNCCD::make_datasets_FullFrameV1_v0", error, "type is not supported");

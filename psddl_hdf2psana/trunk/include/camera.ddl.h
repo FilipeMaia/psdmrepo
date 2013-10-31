@@ -7,6 +7,7 @@
 #include "hdf5pp/Group.h"
 #include "hdf5pp/Type.h"
 #include "PSEvt/Proxy.h"
+#include "psddl_hdf2psana/ChunkPolicy.h"
 namespace psddl_hdf2psana {
 namespace Camera {
 
@@ -48,7 +49,7 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Camera::FrameCoord> > make_FrameCoord(int 
 /// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::Camera::FrameCoord& obj, hdf5pp::Group group, int version = -1);
 /// Create container (rank=1) datasets for storing objects of specified type.
-void make_datasets(const Psana::Camera::FrameCoord& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::Camera::FrameCoord& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version = -1);
 /// Add one more object to the containers created by previous method at the specified index,
 /// negative index means append to the end of dataset. If pointer to object is zero then
@@ -74,7 +75,7 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Camera::FrameFccdConfigV1> > make_FrameFcc
 /// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::Camera::FrameFccdConfigV1& obj, hdf5pp::Group group, int version = -1);
 /// Create container (rank=1) datasets for storing objects of specified type.
-void make_datasets(const Psana::Camera::FrameFccdConfigV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::Camera::FrameFccdConfigV1& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version = -1);
 /// Add one more object to the containers created by previous method at the specified index,
 /// negative index means append to the end of dataset. If pointer to object is zero then
@@ -135,7 +136,7 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Camera::FrameFexConfigV1> > make_FrameFexC
 /// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::Camera::FrameFexConfigV1& obj, hdf5pp::Group group, int version = -1);
 /// Create container (rank=1) datasets for storing objects of specified type.
-void make_datasets(const Psana::Camera::FrameFexConfigV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::Camera::FrameFexConfigV1& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version = -1);
 /// Add one more object to the containers created by previous method at the specified index,
 /// negative index means append to the end of dataset. If pointer to object is zero then
@@ -147,7 +148,7 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Camera::FrameV1> > make_FrameV1(int versio
 /// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::Camera::FrameV1& obj, hdf5pp::Group group, int version = -1);
 /// Create container (rank=1) datasets for storing objects of specified type.
-void make_datasets(const Psana::Camera::FrameV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::Camera::FrameV1& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version = -1);
 /// Add one more object to the containers created by previous method at the specified index,
 /// negative index means append to the end of dataset. If pointer to object is zero then
@@ -202,7 +203,7 @@ boost::shared_ptr<PSEvt::Proxy<Psana::Camera::TwoDGaussianV1> > make_TwoDGaussia
 /// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::Camera::TwoDGaussianV1& obj, hdf5pp::Group group, int version = -1);
 /// Create container (rank=1) datasets for storing objects of specified type.
-void make_datasets(const Psana::Camera::TwoDGaussianV1& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const Psana::Camera::TwoDGaussianV1& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version = -1);
 /// Add one more object to the containers created by previous method at the specified index,
 /// negative index means append to the end of dataset. If pointer to object is zero then

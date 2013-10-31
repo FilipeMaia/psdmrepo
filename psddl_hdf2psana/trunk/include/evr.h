@@ -24,6 +24,7 @@
 //-------------------------------
 #include "hdf5pp/Group.h"
 #include "PSEvt/Proxy.h"
+#include "psddl_hdf2psana/ChunkPolicy.h"
 #include "psddl_hdf2psana/evr.ddl.h"
 #include "psddl_hdf2psana/xtc.h"
 #include "psddl_psana/evr.ddl.h"
@@ -73,7 +74,7 @@ private:
 
 
 void make_datasets_DataV3_v0(const Psana::EvrData::DataV3& obj,
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle);
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle);
 void store_DataV3_v0(const Psana::EvrData::DataV3* obj, hdf5pp::Group group, long index, bool append);
 
 
@@ -158,7 +159,7 @@ private:
 };
 
 void make_datasets_IOConfigV1_v0(const Psana::EvrData::IOConfigV1& obj,
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle);
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle);
 void store_IOConfigV1_v0(const Psana::EvrData::IOConfigV1* obj, hdf5pp::Group group, long index, bool append);
 
 } // namespace EvrData

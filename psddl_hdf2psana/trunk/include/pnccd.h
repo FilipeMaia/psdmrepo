@@ -23,6 +23,7 @@
 //-------------------------------
 #include "hdf5pp/Group.h"
 #include "hdf5pp/Type.h"
+#include "psddl_hdf2psana/ChunkPolicy.h"
 #include "psddl_psana/pnccd.ddl.h"
 
 namespace psddl_hdf2psana {
@@ -106,7 +107,7 @@ private:
 
 
 void make_datasets_FramesV1_v0(const Psana::PNCCD::FramesV1& obj,
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle);
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle);
 void store_FramesV1_v0(const Psana::PNCCD::FramesV1* obj, hdf5pp::Group group, long index, bool append);
 
 
@@ -146,7 +147,7 @@ private:
 };
 
 void make_datasets_FullFrameV1_v0(const Psana::PNCCD::FullFrameV1& obj,
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle);
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle);
 void store_FullFrameV1_v0(const Psana::PNCCD::FullFrameV1* obj, hdf5pp::Group group, long index, bool append);
 
 } // namespace PNCCD

@@ -28,6 +28,7 @@
 #include "psddl_hdf2psana/pulnix.ddl.h"
 #include "psddl_psana/acqiris.ddl.h"
 #include "psddl_psana/bld.ddl.h"
+#include "psddl_hdf2psana/ChunkPolicy.h"
 
 namespace psddl_hdf2psana {
 namespace Bld {
@@ -78,7 +79,7 @@ private:
 };
 
 void make_datasets_BldDataPimV1_v0(const Psana::Bld::BldDataPimV1& obj,
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle);
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle);
 void store_BldDataPimV1_v0(const Psana::Bld::BldDataPimV1* obj, hdf5pp::Group group, long index, bool append);
 
 
@@ -105,7 +106,7 @@ private:
 };
 
 void make_datasets_BldDataAcqADCV1_v0(const Psana::Bld::BldDataAcqADCV1& obj,
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle);
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle);
 void store_BldDataAcqADCV1_v0(const Psana::Bld::BldDataAcqADCV1* obj, hdf5pp::Group group, long index, bool append);
 
 

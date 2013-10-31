@@ -22,7 +22,6 @@
 #include "hdf5pp/CompoundType.h"
 #include "hdf5pp/Utils.h"
 #include "MsgLogger/MsgLogger.h"
-#include "psddl_hdf2psana/HdfParameters.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -80,7 +79,7 @@ DataDescV1_v0<Config>::read_ds_data() const
 }
 
 void make_datasets_DataDescV1_v0(const Psana::Acqiris::DataDescV1& obj,
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
 {
   // this schema is too old, we'll not be writing this stuff anymore
   MsgLog("Acqiris::make_datasets_DataDescV1_v0", error, "schema is not supported");
@@ -181,7 +180,7 @@ DataDescV1_v1<Config>::read_ds_data() const
 }
 
 void make_datasets_DataDescV1_v1(const Psana::Acqiris::DataDescV1& obj,
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
 {
   const unsigned nch = obj.data_shape()[0];
   const Psana::Acqiris::DataDescV1Elem& elem = obj.data(0);
@@ -190,20 +189,17 @@ void make_datasets_DataDescV1_v1(const Psana::Acqiris::DataDescV1& obj,
   const unsigned nsampl = wf.shape()[1];
   {
     hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<ns_DataDescV1Elem_v1::dataset_data>::stored_type(), nch);
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "data", dstype, chunk_size, chunk_cache_size, deflate, shuffle);
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);
   }
   {
     hsize_t dim[2] = {nch, nseg};
     hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<ns_TimestampV1_v0::dataset_data>::stored_type(), 2, dim);
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "timestamps", dstype, chunk_size, chunk_cache_size, deflate, shuffle);
+    hdf5pp::Utils::createDataset(group, "timestamps", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);
   }
   {
     hsize_t dim[3] = {nch, nseg, nsampl};
     hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<int16_t>::stored_type(), 3, dim);
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "waveforms", dstype, chunk_size, chunk_cache_size, deflate, shuffle);
+    hdf5pp::Utils::createDataset(group, "waveforms", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);
   }
 }
 

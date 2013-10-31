@@ -25,6 +25,7 @@
 #include "hdf5pp/Type.h"
 #include "psddl_psana/acqiris.ddl.h"
 #include "psddl_hdf2psana/acqiris.ddl.h"
+#include "psddl_hdf2psana/ChunkPolicy.h"
 
 namespace psddl_hdf2psana {
 namespace Acqiris {
@@ -86,7 +87,7 @@ private:
 };
 
 void make_datasets_DataDescV1_v0(const Psana::Acqiris::DataDescV1& obj,
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle);
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle);
 void store_DataDescV1_v0(const Psana::Acqiris::DataDescV1* obj, hdf5pp::Group group, long index, bool append);
 
 
@@ -163,7 +164,7 @@ private:
 };
 
 void make_datasets_DataDescV1_v1(const Psana::Acqiris::DataDescV1& obj,
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle);
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle);
 void store_DataDescV1_v1(const Psana::Acqiris::DataDescV1* obj, hdf5pp::Group group, long index, bool append);
 
 
