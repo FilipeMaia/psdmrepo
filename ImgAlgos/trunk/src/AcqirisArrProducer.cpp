@@ -123,7 +123,7 @@ AcqirisArrProducer::event(Event& evt, Env& env)
   if (m_count_event == 1) {
     std::string txt_config = "\n" + getAcqirisConfig(evt, env);
     if( m_print_bits & 2 ) MsgLog(name(), info, txt_config);
-    if( m_do_save_config ) saveTextInFile(m_fname_common + ".txt", txt_config, m_print_bits & 4);
+    if( m_do_save_config ) saveTextInFile(m_fname_common + "-config.txt", txt_config, m_print_bits & 4);
   }
 
   if( m_print_bits & 8 ) print_wf_in_event(evt, env);

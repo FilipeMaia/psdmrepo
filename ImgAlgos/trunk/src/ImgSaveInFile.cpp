@@ -190,6 +190,7 @@ ImgSaveInFile::saveImageInFile(Event& evt)
   // Define the file name
   string fname = m_fname
         + "-r"    + stringRunNumber(evt) 
+        + "-e"    + stringFromUint(m_count,8,'0')
         + "-"     + stringTimeStamp(evt) 
         + "."     + m_file_type;
       //+ "-ev"   + stringFromUint(m_count)

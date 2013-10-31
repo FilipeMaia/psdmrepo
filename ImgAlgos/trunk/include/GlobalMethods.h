@@ -130,6 +130,7 @@ private:
   std::string stringExperiment(PSEnv::Env& env);
   unsigned expNum(PSEnv::Env& env);
   std::string stringExpNum(PSEnv::Env& env, unsigned width=4);
+  void parse_string(std::string& s);
 
 //--------------------
 //--------------------
@@ -337,7 +338,15 @@ private:
 
 
 //--------------------
-// Save 2-D array in file
+// Save ndarray<T,2> in file
+  template <typename T>
+  void save2DArrayInFile(const std::string& fname, const ndarray<T,2>& p_ndarr, bool print_msg, FILE_MODE file_type=TEXT)
+  {  
+    save2DArrayInFile<T> (fname, p_ndarr.data(), p_ndarr.shape()[0], p_ndarr.shape()[1], print_msg, file_type);
+  }
+
+//--------------------
+// Save shared_ptr< ndarray<T,2> > in file
   template <typename T>
   void save2DArrayInFile(const std::string& fname, const boost::shared_ptr< ndarray<T,2> >& p_ndarr, bool print_msg, FILE_MODE file_type=TEXT)
   {  
@@ -394,6 +403,20 @@ private:
   }
 
 //--------------------
+/// String parameter s, consisting of values separated by space, is used as a stringstream to fill the output vector v. 
+  template <typename T>
+    void parse_string(std::string& s, std::vector<T>& v)
+  {  
+    std::stringstream ss(s);
+    // cout << "parsing string: " << s << endl;
+    T val;
+    do { 
+        ss >> val;
+	v.push_back(val);
+        //cout << val << endl;
+    } while( ss.good() ); 
+  }
+
 //--------------------
 //--------------------
 //--------------------

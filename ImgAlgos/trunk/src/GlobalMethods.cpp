@@ -215,6 +215,9 @@ stringExpNum(PSEnv::Env& env, unsigned width)
 }
 
 //--------------------
+
+
+//--------------------
 //--------------------
 //--------------------
 } // namespace ImgAlgos
