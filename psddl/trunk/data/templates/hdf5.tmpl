@@ -644,7 +644,7 @@ boost::shared_ptr<PSEvt::Proxy<{{psanatypename}}> > make_{{type.name}}(int versi
 /// Store object as a single instance (scalar dataset) inside specified group.
 void store(const {{psanatypename}}& obj, hdf5pp::Group group, int version = -1);
 /// Create container (rank=1) datasets for storing objects of specified type.
-void make_datasets(const {{psanatypename}}& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const {{psanatypename}}& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version = -1);
 /// Add one more object to the containers created by previous method at the specified index,
 /// negative index means append to the end of dataset. If pointer to object is zero then
@@ -663,7 +663,7 @@ void store_at(const {{psanatypename}}* obj, hdf5pp::Group group, long index = -1
 :    max_version   - latest schema version number
 :
 
-void make_datasets(const {{psanatypename}}& obj, hdf5pp::Group group, hsize_t chunk_size,
+void make_datasets(const {{psanatypename}}& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
                    int deflate, bool shuffle, int version)
 {
   if (version < 0) version = {{max_version}};
@@ -671,7 +671,7 @@ void make_datasets(const {{psanatypename}}& obj, hdf5pp::Group group, hsize_t ch
   switch (version) {
 {% for v in versions %}
   case {{v}}:
-    make_datasets_{{type.name}}_v{{v}}(obj, group, chunk_size, deflate, shuffle);
+    make_datasets_{{type.name}}_v{{v}}(obj, group, chunkPolicy, deflate, shuffle);
     break;
 {% endfor %}
   default:
@@ -715,7 +715,7 @@ void store_at(const {{psanatypename}}* obj, hdf5pp::Group group, long index, int
 :
 
 void make_datasets_{{hschema.pstype.name}}_v{{hschema.schema.version}}(const {{hschema.pstypename}}& obj, 
-      hdf5pp::Group group, hsize_t chunk_size, int deflate, bool shuffle)
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
 {
 {% for ds in hschema.datasets %}
 {{ds.make_ds_impl()}}
@@ -740,8 +740,7 @@ void store_{{hschema.pstype.name}}_v{{hschema.schema.version}}(const {{hschema.p
 :
   {
     hdf5pp::Type dstype = {{ds.classNameNs()}}::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "{{ds.name}}", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "{{ds.name}}", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ::::template:::: write_compound_ds
@@ -781,8 +780,7 @@ void store_{{hschema.pstype.name}}_v{{hschema.schema.version}}(const {{hschema.p
     std::copy(psana_array.shape(), psana_array.shape()+{{ds.rank}}, dims);
     hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<{{ds.type.name}}>::stored_type(), {{ds.rank}}, dims);
 {% endif %}
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "{{ds.name}}", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "{{ds.name}}", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ::::template:::: write_array_ds_basic
@@ -822,8 +820,7 @@ void store_{{hschema.pstype.name}}_v{{hschema.schema.version}}(const {{hschema.p
     std::copy(psana_array.shape(), psana_array.shape()+{{ds.rank}}, dims);
     hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<{{ds_struct}}>::stored_type(), {{ds.rank}}, dims);
 {% endif %}
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "{{ds.name}}", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "{{ds.name}}", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ::::template:::: write_array_ds_udt
@@ -864,8 +861,7 @@ void store_{{hschema.pstype.name}}_v{{hschema.schema.version}}(const {{hschema.p
 :
   {
     hdf5pp::Type dstype = {{ds_struct}}::stored_type();
-    unsigned chunk_cache_size = HdfParameters::chunkCacheSize(dstype, chunk_size);
-    hdf5pp::Utils::createDataset(group, "{{ds.name}}", dstype, chunk_size, chunk_cache_size, deflate, shuffle);    
+    hdf5pp::Utils::createDataset(group, "{{ds.name}}", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
   }
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ::::template:::: write_regular_ds
