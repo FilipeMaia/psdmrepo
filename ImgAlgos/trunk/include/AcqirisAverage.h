@@ -26,7 +26,7 @@
 namespace ImgAlgos {
 
 /**
- *  @brief Gets Acqiris waveforms from data apply time corrections and put them in the evt store as ndarray<double, 2> for waveforms and timestamps.
+ *  @brief Gets Acqiris waveforms from the evt store as ndarray<double, 2> average them with threshold selection and save averaged waveform in file.
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.

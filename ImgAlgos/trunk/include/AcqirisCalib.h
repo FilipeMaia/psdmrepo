@@ -26,7 +26,7 @@
 namespace ImgAlgos {
 
 /**
- *  @brief Gets Acqiris waveforms from data apply time corrections and put them in the evt store as ndarray<double, 2> for waveforms and timestamps.
+ *  @brief Gets Acqiris waveforms from the evt store as ndarray<double, 2> subtracts baseline and put it back in the event. 
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
@@ -72,15 +72,12 @@ public:
 
 protected:
 
-  /// Gets Acqiris configuration parameters and returns configuration in text format
-  //std::string getAcqirisConfig(Event& evt, Env& env);
-
-  /// Gets the waveforms from data apply time corrections and put them in current event store
-  //void proc_and_put_wf_in_event(Event& evt, Env& env);
-
   bool procEvent(Event& evt, Env& env);
   bool isApprovedByCounters();
   void initInFirstEvent(Event& evt, Env& env);
+  void loadBaseLine2DArrayFromFile();
+  void printPartOfInputWaveform2DArray();
+  void printPartOfBaseLine2DArray();
 
 private:
 
@@ -98,6 +95,9 @@ private:
 
   /// String input file name for baseline subtraction
   std::string     m_fname_bline;
+
+  /// String input file name with extension for experiment and run number for baseline subtraction
+  std::string     m_fname_bline_ex;
 
   /// Number of events to skip in this module before start processing
   unsigned        m_skip_events;

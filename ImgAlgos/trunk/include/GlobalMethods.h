@@ -131,6 +131,7 @@ private:
   unsigned expNum(PSEnv::Env& env);
   std::string stringExpNum(PSEnv::Env& env, unsigned width=4);
   void parse_string(std::string& s);
+  bool file_exists(std::string& fname);
 
 //--------------------
 //--------------------
@@ -138,7 +139,7 @@ private:
 //--------------------
 
 //--------------------
-// For type=T returns the string with symbolic data type and its size, i.e. "d of size 8"
+/// For type=T returns the string with symbolic data type and its size, i.e. "d of size 8"
   template <typename T>
   std::string strOfDataTypeAndSize()
   {
@@ -160,7 +161,7 @@ private:
     }
 
 //--------------------
-// Define inage shape in the event for specified type, str_src, and str_key 
+/// Define inage shape in the event for specified type, str_src, and str_key 
   template <typename T>
   bool defineImageShapeForType(PSEvt::Event& evt, const PSEvt::Source& str_src, const std::string& str_key, unsigned* shape)
   {
@@ -174,7 +175,7 @@ private:
   }
 
 //--------------------
-// Save 2-D array in file
+/// Save 2-D array in file
   template <typename T>
     bool save2DArrayInPNGForType(const std::string& fname, const T* arr, const unsigned& rows, const unsigned& cols)
     {
@@ -201,7 +202,7 @@ private:
 
 
 //--------------------
-// Save 2-D array in file
+/// Save 2-D array in TIFF file
   template <typename T>
     bool save2DArrayInTIFFForType(const std::string& fname, const T* arr, const unsigned& rows, const unsigned& cols)
     {
@@ -253,7 +254,7 @@ private:
     }
 
 //--------------------
-// Save 2-D array in file
+/// Save 2-D array in file
   template <typename T>
   void save2DArrayInFile(const std::string& fname, const T* arr, const unsigned& rows, const unsigned& cols, bool print_msg, FILE_MODE file_type=TEXT)
   {  
@@ -338,7 +339,7 @@ private:
 
 
 //--------------------
-// Save ndarray<T,2> in file
+/// Save ndarray<T,2> in TEXT file
   template <typename T>
   void save2DArrayInFile(const std::string& fname, const ndarray<T,2>& p_ndarr, bool print_msg, FILE_MODE file_type=TEXT)
   {  
@@ -346,7 +347,7 @@ private:
   }
 
 //--------------------
-// Save shared_ptr< ndarray<T,2> > in file
+/// Save shared_ptr< ndarray<T,2> > in TEXT file
   template <typename T>
   void save2DArrayInFile(const std::string& fname, const boost::shared_ptr< ndarray<T,2> >& p_ndarr, bool print_msg, FILE_MODE file_type=TEXT)
   {  
@@ -354,7 +355,7 @@ private:
   }
 
 //--------------------
-// Save 2-D array in event for type
+/// Save 2-D array in file
   template <typename T>
   bool save2DArrayInFileForType(PSEvt::Event& evt, const PSEvt::Source& src, const std::string& key, const std::string& fname, bool print_msg, FILE_MODE file_type=TEXT)
   {
@@ -365,7 +366,7 @@ private:
   }
 
 //--------------------
-// Save 2-D array in event for type in case if key == "Image2D" 
+/// Save 2-D array in event for type in case if key == "Image2D" 
   template <typename T>
   bool saveImage2DInFileForType(PSEvt::Event& evt, const PSEvt::Source& src, const std::string& key, const std::string& fname, bool print_msg)
   {
@@ -377,7 +378,7 @@ private:
   }
 
 //--------------------
-// Save 2-D array in event
+/// Save 2-D array in event
   template <typename T>
   void save2DArrayInEvent(PSEvt::Event& evt, const Pds::Src& src, const std::string& key, const ndarray<T,2>& data)
   {
@@ -387,7 +388,7 @@ private:
   }
 
 //--------------------
-// Get string of the 2-D array partial data for test print purpose
+/// Get string of the 2-D array partial data for test print purpose
   template <typename T>
     std::string stringOf2DArrayData(const ndarray<T,2>& data, std::string comment="",
                                   unsigned row_min=0, unsigned row_max=1, 
@@ -417,6 +418,52 @@ private:
     } while( ss.good() ); 
   }
 
+//--------------------
+
+// Load ndarray<T,2> from file TEXT fname
+  template <typename T>
+  void load2DArrayFromFile(const std::string& fname, const ndarray<T,2>& ndarr, bool print_msg=false, FILE_MODE file_type=TEXT)
+  {  
+    // std::ios_base::openmode mode = std::ios_base::out | std::ios_base::binary;
+    // open file
+
+    std::ifstream in(fname.c_str());   // or: (fname.c_str(), mode), where mode = std::ios::binary; 
+      if (not in.good()) {
+        const std::string msg = "Failed to open file: "+fname;
+        MsgLogRoot(error, msg);
+        throw std::runtime_error(msg);
+      }
+
+      if (print_msg) MsgLog("GlobalMethods", info, " load2DArrayFromFile: " << fname);
+      
+      // read all numbers
+      T* it = ndarr.data();
+      size_t count = 0;
+      size_t size = ndarr.size();
+      while(in and count != size) {
+        in >> *it++;
+        ++ count;
+      }
+      
+      // check that we read whole array
+      if (count != size) {
+        const std::string msg = "File "+fname+" does not have enough data: ";
+        MsgLogRoot(error, msg);
+        throw std::runtime_error(msg);
+      }
+      
+      // and no data left after we finished reading
+      T tmp ;
+      if ( in >> tmp ) {
+        const std::string msg = "File "+fname
+                              + " has extra data; read:" + stringFromUint(count,10,' ') 
+                              + " expecting:"           + stringFromUint(size,10,' ');
+        MsgLogRoot(error, msg);
+        throw std::runtime_error(msg);
+      }
+      
+      in.close();
+  }
 //--------------------
 //--------------------
 //--------------------

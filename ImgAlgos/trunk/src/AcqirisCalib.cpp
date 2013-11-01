@@ -19,13 +19,12 @@
 // C/C++ Headers --
 //-----------------
 #include <algorithm>
+#include <map>
 
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
 #include "MsgLogger/MsgLogger.h"
-//#include "pdsdata/xtc/DetInfo.hh"
-//#include "psddl_psana/acqiris.ddl.h"
 #include "ImgAlgos/GlobalMethods.h"
 
 //-----------------------------------------------------------------------
@@ -60,7 +59,7 @@ AcqirisCalib::AcqirisCalib (const std::string& name)
   m_str_src           = configSrc("source",      "DetInfo(:Acqiris)");
   m_key_in            = configStr("key_in",              "acq_wform");
   m_key_out           = configStr("key_out",         "wf-calibrated");
-  m_fname_bline       = configStr("fname_base_line",     "acq-bline");
+  m_fname_bline       = configStr("fname_base_line",       "acq-ave");
   m_skip_events       = config   ("skip_events",                   0);
   m_proc_events       = config   ("proc_events",            10000000);
   m_print_bits        = config   ("print_bits",                    0);
@@ -111,7 +110,7 @@ AcqirisCalib::beginRun(Event& evt, Env& env)
 {
   m_str_runnum     = stringRunNumber(evt);
   m_str_experiment = stringExperiment(env);
-  //m_fname_bline = m_fname_ave_prefix + "-" + m_str_experiment + "-r" + m_str_runnum + "-ave-wfs.txt";
+  m_fname_bline_ex = m_fname_bline + "-" + m_str_experiment + "-r" + m_str_runnum + "-ave-wfs.txt";
 }
 
 void 
@@ -132,11 +131,7 @@ AcqirisCalib::event(Event& evt, Env& env)
 
   if ( m_count_event == m_last_event and m_print_bits & 4 ) MsgLog( name(), info, "Do not subtract baseline since local event = " << m_count_event );  
 
-  if( m_print_bits & 32 ) {
-    std::string msg = (sp_wf) ? 
-      stringOf2DArrayData<wform_t>(*sp_wf.get(), std::string("Part of the waveforms:\n"), 0, m_nbrChannels, 10, 20) : "Waveforms is N/A" ; 
-    MsgLog( name(), info, msg);
-  }
+  if( m_print_bits & 16 ) printPartOfInputWaveform2DArray();
 }
 
 //-------------------------------
@@ -168,6 +163,9 @@ AcqirisCalib::procEvent(Event& evt, Env& env)
         //------------------------
 
 	if ( m_do_subtr_baseline ) {	 
+
+	  //cout << "    Subtract baseline...\n"; 
+
 	  for(unsigned c=0; c<m_nbrChannels; c++)
 	    for(unsigned s=0; s<m_nbrSamples; s++)
 	      m_wf[c][s] = m_wf_data[c][s] - m_wf_bline[c][s];
@@ -204,9 +202,50 @@ AcqirisCalib::initInFirstEvent(Event& evt, Env& env)
 		 )
 
       m_wf_bline = make_ndarray<wform_t>(m_nbrChannels, m_nbrSamples);
-      std::fill_n(m_wf_bline.data(), int(m_size), wform_t(1)); 
+      if ( m_do_subtr_baseline ) loadBaseLine2DArrayFromFile();
+      else std::fill_n(m_wf_bline.data(), int(m_size), wform_t(0));
+      if( m_print_bits & 32 ) printPartOfBaseLine2DArray();
+      if( m_print_bits &  4 ) MsgLog( name(), info, "Begin subtract baseline since local event = " << m_count_event );  
+}
 
-      if( m_print_bits & 4 ) MsgLog( name(), info, "Begin subtract baseline since local event = " << m_count_event );  
+
+//-------------------------------
+
+void 
+AcqirisCalib::loadBaseLine2DArrayFromFile()
+{
+  std::map <bool, std::string> msg_ext; msg_ext[false]=" does not exist.";  msg_ext[true]= " exists.";
+  if ( m_print_bits & 8 ) MsgLog( name(), info, "Expected base-line file: " << m_fname_bline    << msg_ext[file_exists(m_fname_bline)] );
+  if ( m_print_bits & 8 ) MsgLog( name(), info, "Expected base-line file: " << m_fname_bline_ex << msg_ext[file_exists(m_fname_bline_ex)] );
+
+  std::string fname_bline = "";
+  if      ( file_exists(m_fname_bline_ex) ) fname_bline = m_fname_bline_ex;
+  else if ( file_exists(m_fname_bline) )    fname_bline = m_fname_bline;
+  else { MsgLog( name(), warning, "Requested base line file " << m_fname_bline 
+                                  << " or its extension "     << m_fname_bline_ex 
+                                  << "do not exist... Will use 0 for baseline subtraction...");
+         return;
+  }
+
+  load2DArrayFromFile<wform_t>(fname_bline, m_wf_bline, m_print_bits & 8);
+}
+
+//-------------------------------
+
+void 
+AcqirisCalib::printPartOfInputWaveform2DArray()
+{
+  std::string msg = (sp_wf) ? stringOf2DArrayData<wform_t>(*sp_wf.get(), std::string("Part of the waveforms:\n"), 0, m_nbrChannels, 0, 10) : "Waveforms is N/A"; 
+  MsgLog( name(), info, msg);
+}
+
+//-------------------------------
+
+void 
+AcqirisCalib::printPartOfBaseLine2DArray()
+{
+  std::string msg = stringOf2DArrayData<wform_t>(m_wf_bline, std::string("Part of the base line array:\n"), 0, m_nbrChannels, 0, 10);
+  MsgLog( name(), info, msg );
 }
 
 //-------------------------------

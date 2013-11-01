@@ -24,8 +24,6 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "MsgLogger/MsgLogger.h"
-//#include "pdsdata/xtc/DetInfo.hh"
-//#include "psddl_psana/acqiris.ddl.h"
 #include "ImgAlgos/GlobalMethods.h"
 
 //-----------------------------------------------------------------------
