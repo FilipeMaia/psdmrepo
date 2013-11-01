@@ -19,6 +19,9 @@
 // C/C++ Headers --
 //-----------------
 #include <algorithm>
+#include <map>
+#include <iomanip> // for setw, setfill
+#include <sstream> // for stringstream
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -58,16 +61,16 @@ AcqirisAverage::AcqirisAverage (const std::string& name)
   , m_count_event(0)
   , m_count_get(0)
 {
-  m_str_src              = configSrc("source",      "DetInfo(:Acqiris)");
-  m_key_in               = configStr("key_in",              "acq-wform");
-  m_key_ave              = configStr("key_average",           "acq-ave");
-  m_fname_ave_prefix     = configStr("fname_ave_prefix",      "acq-ave");
-  m_thresholds           = configStr("thresholds",                   "");
-  m_is_postive_signal    = config   ("is_postive_signal",          true);
-  m_do_inverse_selection = config   ("do_inverse_selection",      false);
-  m_skip_events          = config   ("skip_events",                   0);
-  m_proc_events          = config   ("proc_events",            10000000);
-  m_print_bits           = config   ("print_bits",                    0);
+  m_str_src              = configSrc("source",  "DetInfo(:Acqiris)");
+  m_key_in               = configStr("key_in",          "acq-wform");
+  m_key_ave              = configStr("key_average",       "acq-ave");
+  m_fname_ave_prefix     = configStr("fname_ave_prefix",  "acq-ave");
+  m_thresholds           = configStr("thresholds",               "");
+  m_is_postive_signal    = config   ("is_positive_signal",    false);
+  m_do_inverse_selection = config   ("do_inverse_selection",  false);
+  m_skip_events          = config   ("skip_events",               0);
+  m_proc_events          = config   ("proc_events",        10000000);
+  m_print_bits           = config   ("print_bits",                0);
 
   m_do_threshold      = (m_thresholds.empty())       ? false : true;
   m_do_save_ave_file  = (m_fname_ave_prefix.empty()) ? false : true;
@@ -102,6 +105,7 @@ AcqirisAverage::printInputParameters()
         << "\n do_save_ave_evt     : " << m_do_save_ave_evt
         << "\n";     
        }
+  printVectorOfThresholds();
 }
 
 
@@ -147,7 +151,13 @@ AcqirisAverage::event(Event& evt, Env& env)
 
   if ( ! procEvent(evt, env) ) return;
 
-  if ( m_count_event == m_last_event ) evaluateAverage(evt);
+  if ( m_count_event == m_last_event ) {
+    if( m_print_bits & 16 ) { 
+       printVectorOfThresholds();
+       printSelectionStatistics();
+    }
+    evaluateAverage(evt);
+  }
 
   if( m_print_bits & 32 ) {
     std::string msg = (sp_wf) ? 
@@ -190,6 +200,7 @@ AcqirisAverage::procEvent(Event& evt, Env& env)
 
 	        wform_t* wf = &m_wf[c][0];
 	        wform_t  threshold = v_thresholds[c]; 
+                //cout << "  threshold: " << threshold << "\n";
 
                 if (m_is_postive_signal) {
 	            for(unsigned s=0; s<m_nbrSamples; s++)
@@ -273,8 +284,6 @@ AcqirisAverage::evaluateAverage(Event& evt)
 
   for(unsigned c=0; c<m_nbrChannels; c++) {
 
-    if( m_print_bits & 16 ) MsgLog( name(), info, "# of waveforms selected for averaging for channel [" << c << "]: " << m_channel_stat[c]);
-
     if ( m_channel_stat[c] > 0 ) {
       for(unsigned s=0; s<m_nbrSamples; s++)
 	m_wf_ave[c][s] = m_wf_sum[c][s] / m_channel_stat[c];
@@ -289,7 +298,50 @@ AcqirisAverage::evaluateAverage(Event& evt)
   if( m_print_bits & 4 ) MsgLog( name(), info, "Save average after local event = " << m_count_event );  
   m_average_is_done = true;
 }
+//-------------------------------
 
+void 
+AcqirisAverage::printSelectionStatistics() 
+{
+    std::map<bool, std::string> msg_add; 
+    msg_add[false]="no";
+    msg_add[true]="yes";
+
+    stringstream ss;
+
+    ss << "\n  Selection settings:"
+       << "\n    is_postive_signal    : " << msg_add[m_is_postive_signal]
+       << "\n    do_inverse_selection : " << msg_add[m_do_inverse_selection]
+       << "\n    m_nbrChannels        : " << m_nbrChannels
+       << "\n  Statistics of selected waveforms:\n";
+
+    for(unsigned c=0; c<m_nbrChannels; c++) {
+       ss << "    Channel: " << setw(2) << c 
+          << "  # of selected waveforms: " << setw(6) << m_channel_stat[c];  
+
+       if ( m_do_threshold ) 
+            ss << "  threshold: " << v_thresholds[c] << "\n";
+       else ss << "  threshold selection is not applied.\n";
+    }
+    MsgLog(name(), info, ss.str());
+}
+
+//-------------------------------
+
+void 
+AcqirisAverage::printVectorOfThresholds() 
+{
+  WithMsgLog(name(), info, msg) {
+    msg << "Vector of channel thresholds:";
+    for( std::vector<wform_t>::iterator itv  = v_thresholds.begin();
+                                        itv != v_thresholds.end(); itv++ ) {      
+      msg << "  " << *itv ;
+    }
+  }
+}
+
+//-------------------------------
+//-------------------------------
 //-------------------------------
 } // namespace ImgAlgos
 //-------------------------------

@@ -82,7 +82,9 @@ protected:
   bool isApprovedByCounters();
   void initInFirstEvent(Event& evt, Env& env);
   void evaluateAverage(Event& evt);
-
+  void printSelectionStatistics();
+  void printVectorOfThresholds();
+  
 private:
 
   /// Source address of the data object

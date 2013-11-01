@@ -130,7 +130,6 @@ private:
   std::string stringExperiment(PSEnv::Env& env);
   unsigned expNum(PSEnv::Env& env);
   std::string stringExpNum(PSEnv::Env& env, unsigned width=4);
-  void parse_string(std::string& s);
   bool file_exists(std::string& fname);
 
 //--------------------
@@ -409,7 +408,7 @@ private:
     void parse_string(std::string& s, std::vector<T>& v)
   {  
     std::stringstream ss(s);
-    // cout << "parsing string: " << s << endl;
+    //cout << "parsing string: " << s << endl;
     T val;
     do { 
         ss >> val;

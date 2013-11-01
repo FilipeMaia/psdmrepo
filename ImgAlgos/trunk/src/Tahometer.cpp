@@ -83,6 +83,7 @@ void
 Tahometer::beginRun(Event& evt, Env& env)
 {
   if( m_print_bits & 1 ) printInputParameters();
+  m_str_runnum = stringRunNumber(evt);
 }
 
 /// Method which is called at the beginning of the calibration cycle
@@ -168,7 +169,7 @@ Tahometer::printInputParameters()
 void 
 Tahometer::printTimeIntervalSummary(Event& evt, double dt_sec, long counter)
 {
-  MsgLog( name(), info,  "Run="             << stringRunNumber(evt) 
+  MsgLog( name(), info,  "Run="             << m_str_runnum 
                      << " Evt="             << stringFromUint(m_count) 
                      << " Time to process " << stringFromUint(counter) 
                      << " events is "       << dt_sec 
@@ -177,7 +178,6 @@ Tahometer::printTimeIntervalSummary(Event& evt, double dt_sec, long counter)
 	           //<< comment.c_str() 
   );
 }
-
 
 //--------------------
 

@@ -11,6 +11,11 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-17
+2013-11-01 Mikhail S. Dubrovin
+- the 1st version of the 3-module project for Acqiris is ready: AcqirisArrProducer, AcqirisAverage, and AcqirisCalib
+- in Tahometer - define m_str_runnum in the beginRun, because the run number is not defined in engJob...
+	
 2013-10-30 Mikhail S. Dubrovin
 - add AcqirisAverage and AcqirisCalib
 

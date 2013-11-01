@@ -96,6 +96,8 @@ private:
   long        m_count_dn;
   long        m_count;
 
+  std::string m_str_runnum;
+
   TimeInterval *m_time;
   TimeInterval *m_time_dn;
 };
