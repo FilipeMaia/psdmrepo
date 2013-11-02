@@ -56,9 +56,9 @@ class LogBookRun {
         $params = $this->experiment->run_params();
         foreach( $params as $p ) {
 
-            $param_id = $p->attr['id'];
-            $param    = $p->attr['param'];
-            $type     = $p->attr['type'];
+            $param_id = $p->id();
+            $param    = $p->name();
+            $type     = $p->type_name();
 
             $extra_condition = $condition == '' ? '' : ' AND '.$condition;
             $result = $this->logbook->query (
