@@ -97,6 +97,7 @@ try {
 
     print <<< HERE
 {
+  "status": "success",
   "ResultSet": {
     "Result": [
 HERE;

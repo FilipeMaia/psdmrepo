@@ -11,6 +11,12 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-20
+2013-11-01 Igor Gaponenko
+- added indexes for the data migration tables
+- extended error reporting in two Web services to support new version of the Portal
+- moved forward in time (for the next 6 months) with the StoragePolicyManager
+
 Tag: V00-01-19
 2013-10-23 Igor Gaponenko
 - reinforced Python module experiment_info to throw an exception
