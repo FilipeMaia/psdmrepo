@@ -136,7 +136,8 @@ class NeoCaptarConnection {
             if( !$this->link )
                 throw new NeoCaptarException (
                     __METHOD__,
-                    "MySQL error: ".mysql_error( $this->link ).", in function: mysql_connect" );
+                    "MySQL error: ".mysql_error( $this->link ).", in function: mysql_connect",
+                    $this->errno());
 
             if( !mysql_select_db( $this->database, $this->link ))
                 throw new NeoCaptarException (

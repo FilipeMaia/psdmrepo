@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-04
+2013-11-01 Igor Gaponenko
+- reporting errno in the MySQL connecton class
+
 Tag: V00-02-03
 2013-08-23 Igor Gaponenko
 - allowed prefixes of 3 symbols
