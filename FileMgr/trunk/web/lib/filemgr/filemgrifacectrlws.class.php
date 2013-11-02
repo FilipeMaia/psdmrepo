@@ -92,8 +92,8 @@ class FileMgrIfaceCtrlWs {
 		}
 
 		function latest_timestamp( $req ) {
-			if( $req->end   != '' ) return $req->end;
-			if( $req->begin != '' ) return $req->begin;
+			if( $req->stopped != '' ) return $req->stopped;
+			if( $req->started != '' ) return $req->started;
 			return $req->created;
 		}
 		$out = array();
