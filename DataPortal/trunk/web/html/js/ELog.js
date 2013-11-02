@@ -63,7 +63,8 @@ function elog_create() {
             // Do nothing if nothing has changed since the previous call to the function,
             // such as: fresh initialization, change in the selected context, subcontext, etc.
             //
-            if( just_initialized || (prev_context1 != this.context1 )) {
+            if( just_initialized ) {
+            //if( just_initialized || (prev_context1 != this.context1 )) {
                 this.live_message_viewer.reload(this.live_selected_deleted(), this.live_selected_runs(), this.live_selected_range());
             }
         } else if(this.context1 == 'post') {
@@ -1590,30 +1591,66 @@ function elog_message_viewer_create(object_address, parent_object, element_base)
     };
 
     this.toggle_run = function(idx) {
-        var entry=this.threads[idx];
-        var toggler='#'+this.base+'-r-tgl-'+entry.id;
-        var container='#'+this.base+'-r-con-'+entry.id;
-        if( $(container).hasClass('el-l-r-hdn')) {
-            $(toggler).removeClass('ui-icon-triangle-1-e').addClass('ui-icon-triangle-1-s');
-            $(container).removeClass('el-l-r-hdn').addClass('el-l-r-vis');
+
+        var entry     = this.threads[idx];
+        var toggler   = $('#'+this.base+'-r-tgl-'+entry.id);
+        var container = $('#'+this.base+'-r-con-'+entry.id);
+
+        if( container.hasClass('el-l-r-hdn')) {
+
+            toggler.removeClass('ui-icon-triangle-1-e').addClass('ui-icon-triangle-1-s');
+            container.removeClass('el-l-r-hdn').addClass('el-l-r-vis');
+
             if(entry.loaded) return;
-            $('#'+this.base+'-r-con-'+entry.id).html('Loading...');
-            $.get('../logbook/ws/DisplayRunParams.php',{id:entry.run_id},function(data) {
+            container.html('Loading...');
+
+            $.get('../logbook/ws/RequestRunParams.php',{run_id:entry.run_id},function(data) {
+
+                if( data.status !== 'success') {
+                    container.html(data.message) ;
+                    return;
+                }
+                entry.loaded = true;
+
                 var html =
 '<div style="float:right; margin-left:15px; margin-top:2px;" class="s-b-con">'+that.parent.run_url(entry.run_num)+'</div>'+
-'<div style="float:right;" class="s-b-con"><button class="control-button el-l-r-re" id="'+that.base+'-r-re-'+entry.id+'" onclick="'+that.address+'.live_run_reply('+idx+');">reply</button></div>'+
+'<div style="float:right;" class="s-b-con"><button class="control-button el-l-r-re" id="'+that.base+'-r-re-'+entry.id+'" onclick="'+that.address+'.live_run_reply('+idx+');" title="post a new message associated with this run" >reply</button></div>'+
 '<div style="clear:both;"></div>'+
 '<div id="'+that.base+'-r-dlgs-'+entry.id+'"></div>'+
-'<div style="width:800px; height:300px; overflow:auto; background-color:#ffffff; ">'+data+'</div>';
-                $('#'+that.base+'-r-con-'+entry.id).html(html);
+'<div id="'+that.base+'-r-body-'+entry.id+'"></div>';
+                container.html(html);
+
                 $('#'+that.base+'-r-re-'+entry.id).button();
-                entry.loaded = true;
+
+                var stack = new StackOfRows() ;
+                for (var i in data.params) {
+                    var section = data.params[i] ;
+                    var section_body_html =
+'<table><thead>' ;
+                    for (var num = section.params.length, j = 0; j < num; j++) {
+                        var extra_class = j === num - 1 ? 'table_cell_bottom' : '' ;
+                        var param = section.params[j];
+                        section_body_html +=
+'  <tr>' +
+'    <td class="table_cell table_cell_left  '+extra_class+'" style="font-weight:normal; font-style:italic;" >'+param.descr+'</td>' +
+'    <td class="table_cell                  '+extra_class+'" style="color:maroon"                           >'+param.value+'</td>' +
+'    <td class="table_cell table_cell_right '+extra_class+'"                                                >'+param.name +'</td>' +
+'  </tr>' ;
+                    }
+                    section_body_html +=
+'</thead></table>' ;
+                    stack.add_row({
+                        title: '<b>'+section.title+'</b>' ,
+                        body:  section_body_html}) ;
+                }
+                stack.display($('#'+that.base+'-r-body-'+entry.id)) ;
             });
         } else {
-            $(toggler).removeClass('ui-icon-triangle-1-s').addClass('ui-icon-triangle-1-e');
-            $(container).removeClass('el-l-r-vis').addClass('el-l-r-hdn');
+            toggler.removeClass('ui-icon-triangle-1-s').addClass('ui-icon-triangle-1-e');
+            container.removeClass('el-l-r-vis').addClass('el-l-r-hdn');
         }
     };
+
     this.collapse_run = function(idx) {
            var entry=this.threads[idx];
         var toggler='#'+this.base+'-r-tgl-'+entry.id;
@@ -3175,31 +3212,93 @@ function elog_message_viewer4run_create(object_address, parent_object, element_b
         this.expand_attachment(id, $(container).hasClass('el-l-a-hdn'));
     };
 
+//    this.toggle_run = function(idx) {
+//        var entry=this.threads[idx];
+//        var toggler='#'+this.base+'-r-tgl-'+entry.id;
+//        var container='#'+this.base+'-r-con-'+entry.id;
+//        if( $(container).hasClass('el-l-r-hdn')) {
+//            $(toggler).removeClass('ui-icon-triangle-1-e').addClass('ui-icon-triangle-1-s');
+//            $(container).removeClass('el-l-r-hdn').addClass('el-l-r-vis');
+//            if(entry.loaded) return;
+//            $('#'+this.base+'-r-con-'+entry.id).html('Loading...');
+//            $.get('../logbook/ws/DisplayRunParams.php',{id:entry.run_id},function(data) {
+//                var html =
+//'<div style="float:right; margin-left:15px; margin-top:2px;" class="s-b-con">'+that.parent.run_url(entry.run_num)+'</div>'+
+//'<div style="float:right;" class="s-b-con"><button class="control-button el-l-r-re" id="'+that.base+'-r-re-'+entry.id+'" onclick="'+that.address+'.live_run_reply('+idx+');">reply</button></div>'+
+//'<div style="clear:both;"></div>'+
+//'<div id="'+that.base+'-r-dlgs-'+entry.id+'"></div>'+
+//'<div style="width:800px; height:300px; overflow:auto; background-color:#ffffff; ">'+data+'</div>';
+//                $('#'+that.base+'-r-con-'+entry.id).html(html);
+//                $('#'+that.base+'-r-re-'+entry.id).button();
+//                entry.loaded = true;
+//            });
+//        } else {
+//            $(toggler).removeClass('ui-icon-triangle-1-s').addClass('ui-icon-triangle-1-e');
+//            $(container).removeClass('el-l-r-vis').addClass('el-l-r-hdn');
+//        }
+//    };
+
     this.toggle_run = function(idx) {
-        var entry=this.threads[idx];
-        var toggler='#'+this.base+'-r-tgl-'+entry.id;
-        var container='#'+this.base+'-r-con-'+entry.id;
-        if( $(container).hasClass('el-l-r-hdn')) {
-            $(toggler).removeClass('ui-icon-triangle-1-e').addClass('ui-icon-triangle-1-s');
-            $(container).removeClass('el-l-r-hdn').addClass('el-l-r-vis');
+
+        var entry     = this.threads[idx];
+        var toggler   = $('#'+this.base+'-r-tgl-'+entry.id);
+        var container = $('#'+this.base+'-r-con-'+entry.id);
+
+        if( container.hasClass('el-l-r-hdn')) {
+
+            toggler.removeClass('ui-icon-triangle-1-e').addClass('ui-icon-triangle-1-s');
+            container.removeClass('el-l-r-hdn').addClass('el-l-r-vis');
+
             if(entry.loaded) return;
-            $('#'+this.base+'-r-con-'+entry.id).html('Loading...');
-            $.get('../logbook/ws/DisplayRunParams.php',{id:entry.run_id},function(data) {
+            container.html('Loading...');
+
+            $.get('../logbook/ws/RequestRunParams.php',{run_id:entry.run_id},function(data) {
+
+                if( data.status !== 'success') {
+                    container.html(data.message) ;
+                    return;
+                }
+                entry.loaded = true;
+
                 var html =
 '<div style="float:right; margin-left:15px; margin-top:2px;" class="s-b-con">'+that.parent.run_url(entry.run_num)+'</div>'+
-'<div style="float:right;" class="s-b-con"><button class="control-button el-l-r-re" id="'+that.base+'-r-re-'+entry.id+'" onclick="'+that.address+'.live_run_reply('+idx+');">reply</button></div>'+
+'<div style="float:right;" class="s-b-con"><button class="control-button el-l-r-re" id="'+that.base+'-r-re-'+entry.id+'" onclick="'+that.address+'.live_run_reply('+idx+');" title="post a new message associated with this run" >reply</button></div>'+
 '<div style="clear:both;"></div>'+
 '<div id="'+that.base+'-r-dlgs-'+entry.id+'"></div>'+
-'<div style="width:800px; height:300px; overflow:auto; background-color:#ffffff; ">'+data+'</div>';
-                $('#'+that.base+'-r-con-'+entry.id).html(html);
+'<div id="'+that.base+'-r-body-'+entry.id+'"></div>';
+                container.html(html);
+
                 $('#'+that.base+'-r-re-'+entry.id).button();
-                entry.loaded = true;
+
+                var stack = new StackOfRows() ;
+                for (var i in data.params) {
+                    var section = data.params[i] ;
+                    var section_body_html =
+'<table><thead>' ;
+                    for (var num = section.params.length, j = 0; j < num; j++) {
+                        var extra_class = j === num - 1 ? 'table_cell_bottom' : '' ;
+                        var param = section.params[j];
+                        section_body_html +=
+'  <tr>' +
+'    <td class="table_cell table_cell_left  '+extra_class+'" style="font-weight:normal; font-style:italic;" >'+param.descr+'</td>' +
+'    <td class="table_cell                  '+extra_class+'" style="color:maroon"                           >'+param.value+'</td>' +
+'    <td class="table_cell table_cell_right '+extra_class+'"                                                >'+param.name +'</td>' +
+'  </tr>' ;
+                    }
+                    section_body_html +=
+'</thead></table>' ;
+                    stack.add_row({
+                        title: '<b>'+section.title+'</b>' ,
+                        body:  section_body_html}) ;
+                }
+                stack.display($('#'+that.base+'-r-body-'+entry.id)) ;
             });
         } else {
-            $(toggler).removeClass('ui-icon-triangle-1-s').addClass('ui-icon-triangle-1-e');
-            $(container).removeClass('el-l-r-vis').addClass('el-l-r-hdn');
+            toggler.removeClass('ui-icon-triangle-1-s').addClass('ui-icon-triangle-1-e');
+            container.removeClass('el-l-r-vis').addClass('el-l-r-hdn');
         }
     };
+
     this.collapse_run = function(idx) {
            var entry=this.threads[idx];
         var toggler='#'+this.base+'-r-tgl-'+entry.id;

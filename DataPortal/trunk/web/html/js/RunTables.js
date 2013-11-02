@@ -17,12 +17,14 @@ function runtables_create () {
      * NOTE: These variables should be initialized externally.
      */
     this.exp_id  = null ;
+    this.is_calib_editor = false ;
 
     /* The context for v-menu items
      */
     var context2_default = {
-        'calib' : '' ,
-        'detectors' : ''
+        'calib'     : '' ,
+        'detectors' : '' ,
+        'epics'     : ''
     } ;
     this.name = 'runtables' ;
     this.full_name = 'Run Tables' ;
@@ -34,14 +36,15 @@ function runtables_create () {
         this.context1 = ctx1 ;
         this.context2 = ctx2 == null ? context2_default[ctx1] : ctx2 ;
         switch (this.context1) {
-            case 'calib':     this.calib_update() ; break ;
+            case 'calib':     this.calib_update() ;     break ;
             case 'detectors': this.detectors_update() ; break ;
+            case 'epic':      this.epics_update() ;     break ;
         }
     } ;
 
-    /* ---------------------------------------
-     *  Menu item: Calibration control table
-     * ---------------------------------------
+    /* ------------------------------
+     *  Menu item: Calibration table
+     * ------------------------------
      */
     this.calib_runs = null ;
 
@@ -53,8 +56,6 @@ function runtables_create () {
     this.calib_table = null ;
 
     this.calib_init = function () {
-
-        var that = this ;
 
         this.calib_refresh_button = $('#runtables-calib').find('button[name="refresh"]').button() ;
         this.calib_reset_button   = $('#runtables-calib').find('button[name="reset"]')  .button() ;
@@ -83,13 +84,14 @@ function runtables_create () {
                             var calib = that.calib_runs[run] ;
                             elem.html('<span style="font-size:150%;">'+(calib.dark ? '&diams;' : '&nbsp;')+'</span>') ;
                         }) ;
-                        table_cont.find('input.runtables-calib-dark').each(function () {
-                            var elem = $(this) ;
-                            var run = elem.attr('id') ;
-                            var calib = that.calib_runs[run] ;
-                            if (calib.dark) elem.attr('checked', 'checked') ;
-                            else            elem.removeAttr('checked') ;
-                        }) ;
+                        if (that.is_calib_editor)
+                            table_cont.find('input.runtables-calib-dark').each(function () {
+                                var elem = $(this) ;
+                                var run = elem.attr('id') ;
+                                var calib = that.calib_runs[run] ;
+                                if (calib.dark) elem.attr('checked', 'checked') ;
+                                else            elem.removeAttr('checked') ;
+                            }) ;
                     }
                 }
             } ,
@@ -102,13 +104,14 @@ function runtables_create () {
                             var calib = that.calib_runs[run] ;
                             elem.html('<span style="font-size:150%;">'+(calib.flat ? '&diams;' : '&nbsp;')+'</span>') ;
                         }) ;
-                        table_cont.find('input.runtables-calib-flat').each(function () {
-                            var elem = $(this) ;
-                            var run = elem.attr('id') ;
-                            var calib = that.calib_runs[run] ;
-                            if (calib.flat) elem.attr('checked', 'checked') ;
-                            else            elem.removeAttr('checked') ;
-                        }) ;
+                        if (that.is_calib_editor)
+                            table_cont.find('input.runtables-calib-flat').each(function () {
+                                var elem = $(this) ;
+                                var run = elem.attr('id') ;
+                                var calib = that.calib_runs[run] ;
+                                if (calib.flat) elem.attr('checked', 'checked') ;
+                                else            elem.removeAttr('checked') ;
+                            }) ;
                     }
                 }
             } ,
@@ -121,13 +124,14 @@ function runtables_create () {
                             var calib = that.calib_runs[run] ;
                             elem.html('<span style="font-size:150%;">'+(calib.geom ? '&diams;' : '&nbsp;')+'</span>') ;
                         }) ;
-                        table_cont.find('input.runtables-calib-geom').each(function () {
-                            var elem = $(this) ;
-                            var run = elem.attr('id') ;
-                            var calib = that.calib_runs[run] ;
-                            if (calib.geom) elem.attr('checked', 'checked') ;
-                            else            elem.removeAttr('checked') ;
-                        }) ;
+                        if (that.is_calib_editor)
+                            table_cont.find('input.runtables-calib-geom').each(function () {
+                                var elem = $(this) ;
+                                var run = elem.attr('id') ;
+                                var calib = that.calib_runs[run] ;
+                                if (calib.geom) elem.attr('checked', 'checked') ;
+                                else            elem.removeAttr('checked') ;
+                            }) ;
                     }
                 }
             } ,
@@ -140,50 +144,21 @@ function runtables_create () {
                             var calib = that.calib_runs[run] ;
                             elem.html('<pre>'+calib.comment+'</pre>') ;
                         }) ;
-                        table_cont.find('textarea.runtables-calib-comment').each(function () {
-                            var elem = $(this) ;
-                            var run = elem.attr('id') ;
-                            var calib = that.calib_runs[run] ;
-                            elem.text(calib.comment) ;
-                        }) ;
+                        if (that.is_calib_editor)
+                            table_cont.find('textarea.runtables-calib-comment').each(function () {
+                                var elem = $(this) ;
+                                var run = elem.attr('id') ;
+                                var calib = that.calib_runs[run] ;
+                                elem.text(calib.comment) ;
+                            }) ;
                     }
                 }
-            } ,
+            }
+        ] ;
+        if (this.is_calib_editor) hdr.push (
             {   name: 'ACTIONS', sorted: false , hideable: true ,
                 type: {
                     after_sort: function () {
-                        table_cont.find('button.edit_run').
-                            button().
-                            click(function () {
-
-                                var elem = $(this) ;
-                                var run = elem.attr('id') ;
-                                elem.button('disable') ;
-
-                                table_cont.find('button.cancel_run#'+run).button('enable') ;
-                                table_cont.find('button.save_run#'+run).button('enable') ;
-
-
-                                table_cont.find('.view#'+run).addClass('runtables-calib-hdn').removeClass('runtables-calib-vis') ;
-                                table_cont.find('.edit#'+run).addClass('runtables-calib-vis').removeClass('runtables-calib-hdn') ;
-                            }
-                        ) ;
-                        table_cont.find('button.cancel_run').
-                            button().
-                            button('disable').
-                            click(function () {
-
-                                var elem = $(this) ;
-                                var run = elem.attr('id') ;
-                                elem.button('disable') ;
-
-                                table_cont.find('button.edit_run#'+run).button('enable') ;
-                                table_cont.find('button.save_run#'+run).button('disable') ;
-
-                                table_cont.find('.view#'+run).addClass('runtables-calib-vis').removeClass('runtables-calib-hdn') ;
-                                table_cont.find('.edit#'+run).addClass('runtables-calib-hdn').removeClass('runtables-calib-vis') ;
-                            }
-                        ) ;
                         table_cont.find('button.save_run').
                             button().
                             button('disable').
@@ -193,24 +168,27 @@ function runtables_create () {
                                 var run = elem.attr('id') ;
                                 elem.button('disable') ;
 
-                                table_cont.find('button.edit_run#'+run).button('enable') ;
-                                table_cont.find('button.cancel_run#'+run).button('disable') ;
-
-                                table_cont.find('.view#'+run).addClass('runtables-calib-vis').removeClass('runtables-calib-hdn') ;
-                                table_cont.find('.edit#'+run).addClass('runtables-calib-hdn').removeClass('runtables-calib-vis') ;
-
                                 var dark = table_cont.find('input.runtables-calib-dark#'+run).attr('checked') ? 1 : 0 ;
                                 var flat = table_cont.find('input.runtables-calib-flat#'+run).attr('checked') ? 1 : 0 ;
                                 var geom = table_cont.find('input.runtables-calib-geom#'+run).attr('checked') ? 1 : 0 ;
                                 var comment = table_cont.find('textarea#'+run).val() ;
 
-                                that.calib_save(run, dark, flat, geom, comment) ;
+                                that.calib_save(run, dark, flat, geom, comment, function () {
+                                    table_cont.find('button#'+run+'.save_run').button('disable') ;
+                                    table_cont.find('.edit#'+run).parent().parent().parent().css('background-color', '') ;
+                                }) ;
                             }
                         ) ;
+                        table_cont.find('.edit').change(function () {
+                            var elem = $(this) ;
+                            var run = elem.attr('id') ;
+                            table_cont.find('button#'+run+'.save_run').button('enable') ;
+                            $(this).parent().parent().parent().css('background-color', 'rgb(255, 220, 220)') ;
+                        }) ;
                     }
                  }
              }
-        ] ;
+       ) ;
         this.calib_table = new Table (
             table_cont ,
             hdr ,
@@ -224,32 +202,20 @@ function runtables_create () {
     this.calib_display = function () {
         var title = 'show the run in the e-Log Search panel within the current Portal' ;
         var rows = [] ;
-        for (var run in this.calib_runs) {
-            rows.push([
-                {   number: run ,
-                    html:   '<a href="javascript:global_elog_search_run_by_num('+run+',true);" title="'+title+'" class="lb_link">'+run+'</a>'
-                } ,
-                '<div class="runtables-calib-dark-cont" >' +
-                '  <div      class="runtables-calib-dark view runtables-calib-vis" id="'+run+'" ></div>' +
-                '  <input    class="runtables-calib-dark edit runtables-calib-hdn" id="'+run+'" type="checkbox" />' +
-                '</div>',
-                '<div class="runtables-calib-flat-cont" >' +
-                '  <div      class="runtables-calib-flat view runtables-calib-vis" id="'+run+'" ></div>' +
-                '  <input    class="runtables-calib-flat edit runtables-calib-hdn" id="'+run+'" type="checkbox" />' +
-                '</div>',
-                '<div class="runtables-calib-geom-cont" >' +
-                '  <div      class="runtables-calib-geom view runtables-calib-vis" id="'+run+'" ></div>' +
-                '  <input    class="runtables-calib-geom edit runtables-calib-hdn" id="'+run+'" type="checkbox" />' +
-                '</div>',
-                '<div class="runtables-calib-comment-cont" >' +
-                '  <div      class="runtables-calib-comment view runtables-calib-vis" id="'+run+'" ></div>' +
-                '  <textarea class="runtables-calib-comment edit runtables-calib-hdn" id="'+run+'" rows="2" cols="56" ></textarea>' +
-                '</div>',
-                '<button class="edit_run"   id="'+run+'" title="edit calibration properties of this run"  >Edit</>' +
-                '<button class="cancel_run" id="'+run+'" title="discard modifications (if any were made)" >Cancel</>' +
-                '<button class="save_run"   id="'+run+'" title="save modifications to the database"       >Save</>'
-            ]) ;
-        }
+        for (var run in this.calib_runs)
+            rows.push(this.is_calib_editor ?
+                [   {number: run, html:   '<a href="javascript:global_elog_search_run_by_num('+run+',true);" title="'+title+'" class="lb_link">'+run+'</a>'} ,
+                    '<div class="runtables-calib-dark-cont"    ><input    class="runtables-calib-dark edit"    id="'+run+'" type="checkbox" /></div>' ,
+                    '<div class="runtables-calib-flat-cont"    ><input    class="runtables-calib-flat edit"    id="'+run+'" type="checkbox" /></div>' ,
+                    '<div class="runtables-calib-geom-cont"    ><input    class="runtables-calib-geom edit"    id="'+run+'" type="checkbox" /></div>' ,
+                    '<div class="runtables-calib-comment-cont" ><textarea class="runtables-calib-comment edit" id="'+run+'" rows="2" cols="56" ></textarea></div>' ,
+                    '<button class="save_run"   id="'+run+'" title="save modifications to the database" >Save</>'] :
+                [   {number: run, html:   '<a href="javascript:global_elog_search_run_by_num('+run+',true);" title="'+title+'" class="lb_link">'+run+'</a>'} ,
+                    '<div class="runtables-calib-dark-cont"    ><div      class="runtables-calib-dark"    id="'+run+'" ></div></div>' ,
+                    '<div class="runtables-calib-flat-cont"    ><div      class="runtables-calib-flat"    id="'+run+'" ></div></div>' ,
+                    '<div class="runtables-calib-geom-cont"    ><div      class="runtables-calib-geom"    id="'+run+'" ></div></div>' ,
+                    '<div class="runtables-calib-comment-cont" ><div      class="runtables-calib-comment" id="'+run+'" ></div></div>' ]) ;
+
         this.calib_table.load(rows) ;
         this.calib_table.display() ;
     } ;
@@ -270,7 +236,7 @@ function runtables_create () {
         ) ;
     } ;
 
-    this.calib_save = function (run, dark, flat, geom, comment) {
+    this.calib_save = function (run, dark, flat, geom, comment, on_success) {
         $('#runtables-calib').find('.runtables-info#updated').html('Saving...') ;
         web_service_POST (
             '../portal/ws/runtable_calib_save.php' , {
@@ -282,16 +248,19 @@ function runtables_create () {
                 comment: comment
             } ,
             function (data) {
-                that.calib_runs[run] = data.runs[run] ;
-                that.calib_display() ;
+                if (on_success) on_success() ;
+                else {
+                    that.calib_runs[run] = data.runs[run] ;
+                    that.calib_display() ;
+                }
                 $('#runtables-calib').find('.runtables-info#updated').html('[ Last update on: <b>'+data.updated+'</b> ]') ;
             }
         ) ;
     } ;
 
-    /* ----------------------------------------
-     *  Menu item: DAQ Detectors control table
-     * ----------------------------------------
+    /* --------------------------------
+     *  Menu item: DAQ Detectors table
+     * --------------------------------
      */
     this.detectors_runs = null ;
 
@@ -303,8 +272,6 @@ function runtables_create () {
     this.detectors_table = null ;
 
     this.detectors_init = function () {
-
-        var that = this ;
 
         this.detectors_refresh_button = $('#runtables-detectors').find('button[name="refresh"]').button() ;
         this.detectors_reset_button   = $('#runtables-detectors').find('button[name="reset"]')  .button() ;
@@ -331,6 +298,7 @@ function runtables_create () {
 
         this.detectors_update() ;
     } ;
+
     this.detectors_advanced = function () {
 
         var detectors_selector = $('#largedialogs') ;
@@ -451,6 +419,179 @@ function runtables_create () {
         ) ;
     } ;
 
+    /* -------------------------
+     *  Menu item: EPICS tables
+     * -------------------------
+     */
+
+    this.epics_sections       = null ;
+    this.epics_parameters     = null ;
+    this.epics_runs           = null ;
+    this.epics_refresh_button = null ;
+    this.epics_reset_button   = null ;
+    this.epics_from_run       = null ;
+    this.epics_through_run    = null ;
+
+    this.epics_init = function () {
+
+        this.epics_refresh_button = $('#runtables-epics').find('button[name="refresh"]').button() ;
+        this.epics_reset_button   = $('#runtables-epics').find('button[name="reset"]')  .button() ;
+        this.epics_from_run       = $('#runtables-epics').find('input[name="from"]') ;
+        this.epics_through_run    = $('#runtables-epics').find('input[name="through"]') ;
+
+        this.epics_refresh_button.click (function () { that.epics_update() ;  }) ;
+        this.epics_from_run      .change(function () { that.epics_update() ;  }) ;
+        this.epics_through_run   .change(function () { that.epics_update() ;  }) ;
+
+        this.epics_reset_button.click (function () {
+            that.epics_from_run.val('') ;
+            that.epics_through_run.val('') ;
+            that.epics_update() ;
+        }) ;
+
+        this.epics_update() ;
+    } ;
+
+    this.epics_tabs = null ,
+    this.epics_tables = {} ,
+
+    this.epics_display = function () {
+
+        if (!this.epics_tabs) {
+            this.epics_tabs = $('#runtables-epics').find('.runtables-body') ;
+            var html =
+'<div id="tabs">' +
+'  <ul>' ;
+            var html_body = '' ;
+            for (var i in this.epics_sections) {
+                var section = this.epics_sections[i] ;
+                html +=
+'    <li><a href="#tab_'+section.name+'">'+section.title+'</a></li>' ;
+                html_body +=
+'  <div id="tab_'+section.name+'">' +
+'    <div class="runtables-body-tab-cont">' +
+'      <div id="table-controls" style="margin-bottom:10px;">' +
+'        <table><tbody>' +
+'          <tr style="font-size:12px;">' +
+'            <td valign="center">' +
+'              <button id="'+section.name+'" class="control-button" name="show_all" title="show all columns">Show all</button></td>' +
+'            <td valign="center">' +
+'              <button id="'+section.name+'" class="control-button" name="hide_all" title="hide all columns">Hide all</button></td>' +
+'            <td valign="center">' +
+'              <button id="'+section.name+'" class="control-button" name="advanced" title="open a dialog to select which columns to show/hide">Select columns</td>' +
+'          </tr>' +
+'        </tbody></table>' +
+'      </div>' +
+'      <div id="table"></div>' +
+'    </div>' +
+'  </div>' ;
+            }
+            html +=
+'  </ul>' +
+html_body +
+'</div>' ;
+            this.epics_tabs.html(html) ;
+            this.epics_tabs.tabs() ;
+
+            for (var i in this.epics_sections)
+                this.epics_create_table(this.epics_sections[i]) ;
+
+        }
+        var title = 'show the run in the e-Log Search panel within the current Portal' ;
+        for (var i in this.epics_sections) {
+
+            var section      = this.epics_sections[i] ;
+            var section_name = section.name ;
+            var table        = this.epics_tables[section_name] ;
+
+            var rows = [] ;
+            for (var run in this.epics_runs) {
+                var row = [] ;
+                row.push(
+                    {   number: run ,
+                        html:   '<a href="javascript:global_elog_search_run_by_num('+run+',true);" title="'+title+'" class="lb_link">'+run+'</a>'
+                    }
+                ) ;
+                var param2value = this.epics_runs[run] ;
+                for (var i in section.parameters) {
+                    var name  = section.parameters[i] ;
+                    var value = name in param2value ? param2value[name] : '' ;
+                    row.push(value === '' ? '&nbsp;' : value)  ;
+                }
+                rows.push(row) ;
+            }
+            table.load(rows) ;
+        }
+        this.epics_tabs.find('button[name="show_all"]').button('enable') ;
+        this.epics_tabs.find('button[name="hide_all"]').button('enable') ;
+        this.epics_tabs.find('button[name="advanced"]').button('enable') ;
+    } ;
+
+    this.epics_advanced = function (section_name) {
+        alert('epics_advanced: '+section_name) ;
+    } ;
+
+    this.epics_create_table = function (section)  {
+
+        var section_name = section.name ;
+
+        var tab_body   = this.epics_tabs.find('#tab_'+section_name) ;
+        var table_cont = tab_body.find('div#table') ;
+
+        var hdr = [
+            {name: 'RUN', type: Table.Types.Number_HTML}
+        ] ;
+        for (var i in section.parameters) {
+
+            var name = section.parameters[i] ;
+//            var html_name = name ;
+            var html_name = '' ;
+            var name_split = name.split(':') ;
+            for (var j in name_split)
+                html_name += '<div>'+name_split[j]+'</div>' ;
+
+            hdr.push({
+                name:     '<div>'+html_name+'</div>' ,
+                hideable: true ,
+                align:    'center' ,
+                style:    ' white-space: nowrap;'
+            }) ;
+        }
+        var table = new Table (
+            table_cont ,
+            hdr ,
+            null ,
+            { default_sort_forward: false } ,
+            config.handler('runtables', section_name)
+        ) ;
+        table.display() ;
+
+        this.epics_tables[section_name] = table ;
+
+        tab_body.find('button[name="show_all"]').button().button('disable').click(function() { that.epics_tables[section_name].display('show_all') ; }) ;
+        tab_body.find('button[name="hide_all"]').button().button('disable').click(function() { that.epics_tables[section_name].display('hide_all') ; }) ;
+        tab_body.find('button[name="advanced"]').button().button('disable').click(function() { that.epics_advanced(section_name) ; }) ;
+    } ;
+
+    this.epics_update = function () {
+        $('#runtables-epics').find('.runtables-info#updated').html('Loading...') ;
+
+        web_service_GET (
+            '../portal/ws/runtable_epics_get.php' ,
+            {   exper_id:    this.exp_id ,
+                from_run:    parseInt(this.epics_from_run.val()) ,
+                through_run: parseInt(this.epics_through_run.val())
+            } ,
+            function (data) {
+                that.epics_sections   = data.sections ;
+                that.epics_parameters = data.parameters ;
+                that.epics_runs       = data.runs ;
+                that.epics_display() ;
+                $('#runtables-epics').find('.runtables-info#updated').html('[ Last update on: <b>'+data.updated+'</b> ]') ;
+            }
+        ) ;
+    } ;
+
     /* ----------------------------------
      *  Application initialization point
      * ----------------------------------
@@ -464,6 +605,7 @@ function runtables_create () {
         this.is_initialized = true ;
         this.calib_init() ;
         this.detectors_init() ;
+        this.epics_init() ;
         return true ;
     } ;
 

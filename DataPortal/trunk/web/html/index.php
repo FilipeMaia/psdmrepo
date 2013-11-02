@@ -96,7 +96,7 @@ try {
 
     $has_elog_access = LogBookAuth::instance()->canRead( $logbook_experiment->id());
 
-    $has_calib_access = 
+    $is_calib_editor = 
         RegDB::instance()->is_member_of_posix_group( 'ps-data', $auth_svc->authName()) ||
         (!$experiment->is_facility() && RegDB::instance()->is_member_of_posix_group( 'ps-'.strtolower( $instrument->name()), $auth_svc->authName()));
 
@@ -718,7 +718,9 @@ HERE;
         $elog_attachments_workarea = $no_elog_access_message;
         $elog_subscribe_workarea   = $no_elog_access_message;
     }
-    if( $has_calib_access ) {
+
+    if( $has_data_access ) {
+
         $runtables_calib_workarea =<<<HERE
 <div class="runtables-ctrl">
   <table><tbody>
@@ -747,27 +749,7 @@ HERE;
   </div>
 </div>
 HERE;
-    } else {
-        $no_calib_access_message =<<<HERE
-<br><br>
-<center>
-  <span style="color: red; font-size: 175%; font-weight: bold; font-family: Times, sans-serif;">
-    A c c e s s &nbsp; E r r o r
-  </span>
-</center>
-<div style="margin: 10px 10% 10px 10%; padding: 10px; font-size: 125%; font-family: Times, sans-serif; border-top: 1px solid #b0b0b0;">
-  We're sorry! Your SLAC UNIX account <b>{$auth_svc->authName()}</b> has no proper permissions to access
-  this page. The page access is reserved to LCLS detector calibration experts.
-  To learn more details on this subject please contact the Point Of Contact personell of your instrument.
-  You may also contact LCLS software and computer infrastructure support team by sending an e-mail request to <b>pcds-help</b> (at SLAC).
-</div>
-HERE;
-        $runtables_calib_workarea = $no_calib_access_message;
-    }
-
-
-    if( $has_data_access ) {
-
+        
         $runtables_detectors_workarea =<<<HERE
 <div class="runtables-ctrl">
   <table><tbody>
@@ -800,7 +782,7 @@ HERE;
           <td valign="center">
             <button class="control-button" name="hide_all" title="hide all columns">Hide all</button></td>
           <td valign="center">
-            <button class="control-button" name="advanced" title="open a dialog to select which columns to show/hide">Selective...</td>
+            <button class="control-button" name="advanced" title="open a dialog to select which columns to show/hide">Select detectors</td>
         </tr>
       </tbody></table>
     </div>
@@ -809,6 +791,33 @@ HERE;
 </div>
 HERE;
 
+        $runtables_epics_workarea =<<<HERE
+<div class="runtables-ctrl">
+  <table><tbody>
+    <tr style="font-size:12px;">
+      <td valign="center">
+        <span style="font-weight:bold;">Select runs from</span></td>
+      <td valign="center">
+        <input type="text" name="from" size="2" title="The first run of the interval. If no input is provided then the very first known run will be assumed." /></td>
+      <td valign="center">
+        <span style="font-weight:bold; margin-left:0px;">through</span></td>
+      <td valign="center">
+        <input name="through" type="text" size="2" title="The last run of the interval. If no input is provided then the very last known run will be assumed"/ ></td>
+      <td valign="center">
+        <button class="control-button" style="margin-left:20px;" name="reset" title="reset the form">Reset Form</button></td>
+      <td valign="center">
+        <button class="control-button" name="refresh" title="check if there were any updates on this page">Refresh</button></td>
+    </tr>
+  </tbody></table>
+</div>
+<div class="runtables-wa">
+  <div class="runtables-info" id="info"    style="float:left;" >&nbsp;</div>
+  <div class="runtables-info" id="updated" style="float:right;">&nbsp;</div>
+  <div style="clear:both;"></div> 
+  <div class="runtables-body"></div>
+</div>
+HERE;
+        
         $datafiles_summary_workarea =<<<HERE
 <div id="datafiles-summary-ctrl">
   <div style="float:right;"><button class="control-button" id="datafiles-summary-refresh" title="click to refresh the summary information">Refresh</button></div>
@@ -955,7 +964,7 @@ HERE;
         </tr>
       </tbody></table>
     </div>
-    <div id="quota-usage">
+    <div class="overlay-element" id="quota-usage">
       <span style="color:maroon; font-size:24px;"></span>
     </div>
   </div>
@@ -1024,7 +1033,9 @@ HERE;
 </div>
 HERE;
 
+        $runtables_calib_workarea     = $no_data_access_message;
         $runtables_detectors_workarea = $no_data_access_message ;
+        $runtables_epics_workarea     = $no_data_access_message ;
 
         $datafiles_summary_workarea = $no_data_access_message;
         $datafiles_files_workarea   = $no_data_access_message;
@@ -1054,6 +1065,7 @@ HERE;
 <link type="text/css" href="css/Hdf.css" rel="Stylesheet" />
 
 <link type="text/css" href="../webfwk/css/Table.css" rel="Stylesheet" />
+<link type="text/css" href="../webfwk/css/Stack.css" rel="Stylesheet" />
 
 <script type="text/javascript" src="/jquery/js/jquery.min.js"></script>
 <script type="text/javascript" src="/jquery/js/jquery-ui.custom.min.js"></script>
@@ -1070,6 +1082,11 @@ HERE;
 <script type="text/javascript" src="js/ws.js"></script>
 
 <script type="text/javascript" src="../portal/js/config.js"></script>
+
+<script type="text/javascript" src="../webfwk/js/Class.js" ></script>
+<script type="text/javascript" src="../webfwk/js/Widget.js" ></script>
+<script type="text/javascript" src="../webfwk/js/StackOfRows.js" ></script>
+
 <script type="text/javascript" src="../webfwk/js/Table.js"></script>
 
 <!----------- Window layout styles and supppot actions ----------->
@@ -1388,6 +1405,18 @@ div.v-item:hover {
 .hidden  { display: none; }
 .visible { display: block; }
 
+.overlay-element {
+  opacity: 0.4;
+  filter: alpha(opacity=40); /* For IE8 and earlier */
+}
+.overlay-element:hover {
+  opacity: 1.0;
+  filter: alpha(opacity=100); /* For IE8 and earlier */
+}
+#quota-usage {
+  border-radius: 5 0 0 5;
+  -moz-border-radius: 5 0 0 5;
+}
 </style>
 
 <script type="text/javascript">
@@ -1530,6 +1559,7 @@ elog.post_onsuccess = function() {
 exper.posix_group = '<?=$experiment->POSIX_gid()?>';
 
 runtables.exp_id = <?=$exper_id?>;
+runtables.is_calib_editor = <? echo $is_calib_editor ? 1 : 0; ?>;
 
 datafiles.exp_id = <?=$exper_id?>;
 datafiles.uid = '<?=$auth_svc->authName()?>';
@@ -2026,6 +2056,11 @@ function global_elog_search_run_by_num(num, show_in_vicinity) {
         <div style="float:left;" >DAQ Detectors</div>
         <div style="clear:both;"></div>
       </div>
+      <div class="v-item" id="epics">
+        <div class="ui-icon ui-icon-triangle-1-e" style="float:left;"></div>
+        <div style="float:left;" >EPICS</div>
+        <div style="clear:both;"></div>
+      </div>
     </div>
 
     <div id="datafiles" class="hidden">
@@ -2088,6 +2123,7 @@ function global_elog_search_run_by_num(num, show_in_vicinity) {
     <div id="elog-subscribe"      class="application-workarea hidden"><?php echo $elog_subscribe_workarea ?></div>
     <div id="runtables-calib"     class="application-workarea hidden"><?php echo $runtables_calib_workarea ?></div>
     <div id="runtables-detectors" class="application-workarea hidden"><?php echo $runtables_detectors_workarea ?></div>
+    <div id="runtables-epics"     class="application-workarea hidden"><?php echo $runtables_epics_workarea ?></div>
     <div id="datafiles-summary"   class="application-workarea hidden"><?php echo $datafiles_summary_workarea ?></div>
     <div id="datafiles-files"     class="application-workarea hidden"><?php echo $datafiles_files_workarea ?></div>
     <div id="hdf-manage"          class="application-workarea hidden"><?php echo $hdf_manage_workarea ?></div>
