@@ -139,11 +139,11 @@ render : function () {
 '<div class="stack-row-body stack-row-hidden"></div>' ;
     this.container.html(html) ;
 
-    var header = this.container.children('.stack-row-header') ;
-    header.click(function () { that.toggle() ; }) ;
+    this.header = this.container.children('.stack-row-header') ;
+    this.header.click(function () { that.toggle() ; }) ;
  
-    this.toggler = header.children('div').children('span.stack-row-toggler') ;
-    this.title   = header.children('.stack-row-title') ;
+    this.toggler = this.header.children('div').children('span.stack-row-toggler') ;
+    this.title   = this.header.children('.stack-row-title') ;
     this.body    = this.container.children('.stack-row-body') ;
 
     if (this.hdr) {
@@ -179,9 +179,11 @@ toggle : function () {
  */
 expand_or_collapse : function (expand) {
     if (expand) {
+        this.header.addClass('stack-row-header-open') ;
         this.toggler.removeClass('ui-icon-triangle-1-e').addClass('ui-icon-triangle-1-s') ;
         this.body.removeClass('stack-row-hidden').addClass('stack-row-visible') ;
     } else {
+        this.header.removeClass('stack-row-header-open') ;
         this.toggler.removeClass('ui-icon-triangle-1-s').addClass('ui-icon-triangle-1-e') ;
         this.body.removeClass('stack-row-visible').addClass('stack-row-hidden') ;
     }

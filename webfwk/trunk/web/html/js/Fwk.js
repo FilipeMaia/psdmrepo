@@ -325,7 +325,7 @@ function FwkCreator () {
      * @param {function} on_quick_search
      * @returns {unresolved}
      */
-    this.build = function (title, subtitle, ui_config, on_quick_search) {
+    this.build = function (title, subtitle, ui_config, on_quick_search, on_build) {
 
         if (this.is_built) return ;
 
@@ -390,9 +390,9 @@ function FwkCreator () {
             }
             this.app_proxies[''+i] = app_proxy ;
         }
-        if (on_quick_search) {            
-            this.on_quick_search = on_quick_search ? on_quick_search : null ;
-        }
+        this.on_quick_search = on_quick_search ? on_quick_search : null ;
+        this.on_build        = on_build        ? on_build        : null ;
+
         this.on_update = function () {            
             for (var id in this.app_proxies) {
                 var app_proxy = this.app_proxies[id] ;
@@ -420,6 +420,8 @@ function FwkCreator () {
                 that.auth_timer_restart() ;
                 that.init_tabs_menus () ;
                 that.update_timer_restart() ;
+                
+                if (that.on_build) that.on_build() ;
             }
         ) ;
     } ;
@@ -950,15 +952,25 @@ function FwkCreator () {
      * @returns {object} an application object
      */
     this.activate = function (application_name, context1_name) {
+        if (!this.is_built) {
+            console.log('Fwk.activate(\''+application_name+'\',\''+context1_name+'\'): framework isn\'t built yet. Come back later.') ;
+            return ;
+        }
 	for (var id in this.app_proxies) {
             var app_proxy = this.app_proxies[id] ;
             if (app_proxy.full_name === application_name) {
                 $('#fwk-tabs').children('#'+app_proxy.name).each(function() { that.m_item_selected(this) ; }) ;
                 if (context1_name) {
-                    this.v_item_selected($('#fwk-menu > #'+app_proxy.name+' > #'+app_proxy.name_to_context1(context1_name))) ;
-                    this.set_context(app_proxy, app_proxy.name_to_context1(context1_name)) ;
+                    var context1 = app_proxy.name_to_context1(context1_name) ;
+                    if (!context1) {
+                        console.log('Fwk.activate(): implementation error, code: 1') ;
+                        return undefined ;
+                    }
+                    this.v_item_selected($('#fwk-menu > #'+app_proxy.name+' > #'+context1)) ;
+                    this.set_context(app_proxy, context1) ;
                 } else {
-                    alert('Fwk.activate(): implementation error, code: 1') ;
+                    console.log('Fwk.activate(): implementation error, code: 2') ;
+                    return undefined ;
                 }
                 return app_proxy.get_application() ;
             }
@@ -1113,10 +1125,11 @@ function FwkCreator () {
         html +=
 '  </div>' +
 '' +
-'  <div id="fwk-popupdialogs" style="display:none;"></div>' +
+'  <div id="fwk-popupdialogs"              style="display:none;"></div>' +
 '  <div id="fwk-popupdialogs-varable-size" style="display:none;"></div>' +
-'  <div id="fwk-infodialogs" style="display:none;"></div>' +
-'  <div id="fwk-editdialogs" style="display:none;"></div>' +
+'  <div id="fwk-infodialogs"               style="display:none;"></div>' +
+'  <div id="fwk-editdialogs"               style="display:none;"></div>' +
+'  <div id="fwk-largedialogs"              style="display:none;"></div>' +
 '</div>';
         $('body').html(html);
         $('#fwk-session-logout').button().click(function () { that.logout(); }) ;

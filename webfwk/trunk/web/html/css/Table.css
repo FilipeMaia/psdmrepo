@@ -67,7 +67,9 @@ td.table_cell_bottom {
 td.table_cell_within_group {
   border-bottom: none;
 }
-
+td.table_cell_borderless {
+  border: 0;
+}
 tr.table_row_selectable {
   cursor: pointer;
 }

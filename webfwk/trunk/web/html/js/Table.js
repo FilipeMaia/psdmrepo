@@ -288,12 +288,13 @@ function Table(container, coldef, rows, options, config_handler) {
         this.header.style,
         0
     );
-    this.header.types    = bottom_columns.types;
-    this.header.sorted   = bottom_columns.sorted;
-    this.header.hideable = bottom_columns.hideable;
-    this.header.hidden   = bottom_columns.hidden;
-    this.header.align    = bottom_columns.align;
-    this.header.style    = bottom_columns.style;
+    this.header.types      = bottom_columns.types;
+    this.header.sorted     = bottom_columns.sorted;
+    this.header.hideable   = bottom_columns.hideable;
+    this.header.hidden     = bottom_columns.hidden;
+    this.header.selectable = bottom_columns.selectable;
+    this.header.align      = bottom_columns.align;
+    this.header.style      = bottom_columns.style;
 
     if (this.options.row_select_action) {
         if (typeof this.options.row_select_action !== 'function')
@@ -393,7 +394,79 @@ define_class( Table, null, {
             }
         }
     },
-    display: function() {
+
+    header_info: function() {
+
+        /**
+         * Return an array of entries, each representing a bottom column of
+         * the header:
+         * 
+         *   [ { number:   0,
+         *       name:     'First' ,
+         *       hideable: true ,
+         *       hidden:   false
+         *     } ,
+         *     ..
+         *   ]
+         */
+        var info = [] ;
+        for (var i in this.coldef) {
+            var col = this.coldef[i] ;
+            if (col.number !== undefined) {
+                var col_idx = col.number ;
+                info.push ({
+                    number:   col_idx ,
+                    name:     col.name ,
+                    hideable: this.header.hideable[col_idx] ,
+                    hidden:   this.header.hidden  [col_idx]
+                }) ;
+            }
+        }
+        return info ;
+    },
+
+    display: function(commands, arg1) {
+
+        var that = this;
+
+        /**
+         * Process optional commands wich can be:
+         * 
+         * 'show_all'
+         * 'hide_all'
+         * 'hide' <col_num>
+         * 
+         */
+        if( typeof(commands) === 'string') {
+            if (commands === 'show_all') {
+                for (var col_idx in this.header.hidden) {
+                    if (this.header.hideable[col_idx]) {
+                        this.header.hidden[col_idx] = false ;
+                    }
+                }
+            } else if (commands === 'hide_all') {
+                for (var col_idx in this.header.hidden) {
+                    if (this.header.hideable[col_idx]) {
+                        this.header.hidden[col_idx] = true ;
+                    }
+                }
+            } else if (commands === 'show') {
+                if (typeof(arg1) === 'number') {
+                    var col_idx = arg1 ;
+                    if ((this.header.hideable[col_idx] !== undefined) && this.header.hideable[col_idx]) {
+                        this.header.hidden[col_idx] = false ;
+                    }
+                }
+            } else if (commands === 'hide') {
+                if (typeof(arg1) === 'number') {
+                    var col_idx = arg1 ;
+                    if ((this.header.hideable[col_idx] !== undefined) && this.header.hideable[col_idx]) {
+                        this.header.hidden[col_idx] = true ;
+                    }
+                }
+            }
+            this.save_state() ;
+        }
 
         /**
          * Render the table within a container provided as a parameter
@@ -406,7 +479,6 @@ define_class( Table, null, {
          * rows then we only drow header cells at the requested level.
          */
 
-        var that = this;
         var html = '<table><thead>';
 
         // Draw header

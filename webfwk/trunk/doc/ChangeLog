@@ -11,6 +11,14 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-03
+2013-11-01 Igor Gaponenko
+- fixed bugs in Fwk
+- extended Table.display() to allow hiding/showing columns
+- style improvements for Stack and Table
+- hosted jquery.resize.js plugin
+- experiments with decorated_table (plans for adding "smart" header to Table)
+
 Tag: V00-00-02
 2013-10-11 Igor Gaponenko
 - added support for configurable toolbar
