@@ -142,20 +142,31 @@ def _TEMPL(template):
 #---------------------
 class DdlPds2PsanaDispatch ( object ) :
 
+    @staticmethod
+    def backendOptions():
+        """ Returns the list of options supported by this backend, returned value is 
+        either None or a list of triplets (name, type, description)"""
+        return [
+            ('psana-ns', 'STRING', "namespace for Psana types, default: Psana"),
+            ('pdsdata-ns', 'STRING', "namespace for pdsdata types, default: Pds"),
+            ]
+
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self, incname, cppname, backend_options, log ) :
-        """Constructor
+    def __init__ ( self, backend_options, log ) :
+        '''Constructor
         
-            @param incname  include file name
-        """
-        self.incname = incname
-        self.cppname = cppname
-        self.incdirname = backend_options.get('gen-incdir', "")
-        self.top_pkg = backend_options.get('top-package')
+           @param backend_options  dictionary of options passed to backend
+           @param log              message logger instance
+        '''
+        self.incname = backend_options['global:header']
+        self.cppname = backend_options['global:source']
+        self.incdirname = backend_options.get('global:gen-incdir', "")
+        self.top_pkg = backend_options.get('global:top-package')
+        
         self.psana_ns = backend_options.get('psana-ns', "Psana")
-        self.pdsdata_ns = backend_options.get('pdsdata-ns', "PsddlPds")
+        self.pdsdata_ns = backend_options.get('pdsdata-ns', "Pds")
 
         self._types = {}
 

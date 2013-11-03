@@ -84,21 +84,31 @@ def _schemas(pkg):
 #---------------------
 class DdlHdf5Data ( object ) :
 
+    @staticmethod
+    def backendOptions():
+        """ Returns the list of options supported by this backend, returned value is 
+        either None or a list of triplets (name, type, description)"""
+        return [
+            ('psana-inc', 'PATH', "directory for Psana includes, default: psddl_psana"),
+            ('psana-ns', 'STRING', "namespace for Psana types, default: Psana"),
+            ('dump-schema', '', "if specified then only dump schema in XML format, including default schema"),
+            ]
+
+
     #----------------
     #  Constructor --
     #----------------
-    def __init__(self, incname, cppname, backend_options, log):
-        """Constructor
+    def __init__(self, backend_options, log):
+        '''Constructor
         
-            @param incname  file name for generated header file
-            @param cppname  file name for generated source file
-            @param backend_options  dictionary with backend options
-            @param log      logger instance
-        """
-        self.incname = incname
-        self.cppname = cppname
-        self.incdirname = backend_options.get('gen-incdir', "")
-        self.top_pkg = backend_options.get('top-package')
+           @param backend_options  dictionary of options passed to backend
+           @param log              message logger instance
+        '''
+        self.incname = backend_options['global:header']
+        self.cppname = backend_options['global:source']
+        self.incdirname = backend_options.get('global:gen-incdir', "")
+        self.top_pkg = backend_options.get('global:top-package')
+        
         self.psana_inc = backend_options.get('psana-inc', "psddl_psana")
         self.psana_ns = backend_options.get('psana-ns', "Psana")
         self.dump_schema = 'dump-schema' in backend_options

@@ -78,36 +78,39 @@ class psddlc ( AppBase ) :
                                   list_backends = False)
         
         self._parser.add_option("-b", "--backend", metavar="NAME", 
-                                help="use specified backend (pdsdata, psana, etc.)")
+                                help="use specified backend (pdsdata, psana, etc.), use -l option to produce list of know backends")
         self._parser.add_option("-I", "--include-dir",  action="append",
-                                help="directory to search for included files", metavar="PATH")
+                                help="directory to search for included files, can be specified multiple times", metavar="PATH")
         self._parser.add_option("-e", "--header",
-                                help="output file name for header/declarations", metavar="PATH")
+                                help="output file name for header/declarations, default is to use name of the first input file and extension .h", 
+                                metavar="PATH")
         self._parser.add_option("-E", "--header-dir",
-                                help="output directory for header/declarations", metavar="PATH")
+                                help="output directory for header/declarations, default is current working directory", metavar="PATH")
         self._parser.add_option("-o", "--output",
-                                help="output file name for source", metavar="PATH")
+                                help="output file name for source, default is to use name of the first input file and extension .cpp", 
+                                metavar="PATH")
         self._parser.add_option("-O", "--output-dir",
-                                help="output directory for source", metavar="PATH")
+                                help="output directory for source, default is current working directory", metavar="PATH")
         self._parser.add_option("-i", "--gen-incdir",
                                 help="include directory for headers in generated code", metavar="PATH")
         self._parser.add_option("-t", "--top-package",
-                                help="top-level package/namespace for generated code", metavar="NAME")
+                                help="top-level package/namespace for generated code, default is not to use top-level namespace", metavar="NAME")
         self._parser.add_option("-B", "--backend-options", action="append",
-                                help="options for backend, form key:value or key", metavar="OPTION")
+                                help="options for backend, form key:value or key, can be specified multiple times, say -B help for list of supported backend options",
+                                metavar="OPTION")
         self._parser.add_option("-l", "--list-backends", action="store_true",
                                 help="print list of available backends and exit")
 
-
+        # map backend name to class 
         self.backends = {
-            "pdsdata": self.pdsdataGen,
-            "psana": self.psanaGen,
-            "python": self.pythonGen,
-            "psana-doc": self.psanaDocGen,
-            "pds2psana": self.pds2psanaGen,
-            "pds2psana-dispatch": self.pds2psanaDispatchGen,
-            "hdf5": self.hdf5Gen,
-            "hdf5-dispatch": self.hdf5DispatchGen,
+            "pdsdata": DdlPdsdata,
+            "psana": DdlPsanaInterfaces,
+            "python": DdlPythonInterfaces,
+            "psana-doc": DdlPsanaDoc,
+            "pds2psana": DdlPds2Psana,
+            "pds2psana-dispatch": DdlPds2PsanaDispatch,
+            "hdf5": DdlHdf5Data,
+            "hdf5-dispatch": DdlHdf5DataDispatch,
         }
         
 
@@ -122,30 +125,50 @@ class psddlc ( AppBase ) :
             print "Available backends: " + " ".join(self.backends.keys())
             return 0
 
-        # check the arguments
-        if not self._args:
-            self._parser.error("one or more arguments required")
-            return 2
-        
         # build dict with backend options
         backend_options = dict()
         for opt in self._options.backend_options:
             words = opt.split(':',1) + [None]
             backend_options[words[0]] = words[1]
         
-        # add few standard options
-        backend_options['top-package'] = self._options.top_package
-        backend_options['gen-incdir'] = self._options.gen_incdir
+        # maybe all we need is a help with backend options
+        if 'help' in backend_options:
+            print 'Options defined by backends, if backend name is not in the list then it does not have options:'
+            for be in sorted(self.backends.keys()):
+                factory = self.backends[be]
+                be_options = factory.backendOptions()
+                if be_options:
+                    print "\n  '{0}' backend:".format(be)
+                    lenopt = max([len(option) for option, typ, descr in be_options])
+                    lentyp = max([len(typ) for option, typ, descr in be_options])
+                    fmt = "    {{0:{0}s}}  {{1:{1}s}}  {{2}}".format(lenopt, lentyp)
+                    for option, typ, descr in be_options:
+                        print fmt.format(option, typ, descr)
+            return 0
+
+        # rest of the code needs an input data
+        if not self._args:
+            self._parser.error("one or more arguments required")
+            return 2
+
+        header, source = self._getHeaderAndSource()
         
-        # instantiate generator
+        # add few standard options
+        backend_options['global:header'] = header
+        backend_options['global:source'] = source
+        backend_options['global:header-dir'] = self._options.header_dir
+        backend_options['global:output-dir'] = self._options.output_dir
+        backend_options['global:top-package'] = self._options.top_package
+        backend_options['global:gen-incdir'] = self._options.gen_incdir
+        
+        # get backend factory
         try:
-            genMethod = self.backends[self._options.backend]
+            factory = self.backends[self._options.backend]
         except:
             print >>sys.stderr, "incorrect back-end name:", self._options.backend
             return 2
-        generator = genMethod(backend_options)
-            
-
+        generator = factory(backend_options, self)
+        
         try :
             reader = XmlReader(self._args, self._options.include_dir)
             model = reader.read()
@@ -178,52 +201,6 @@ class psddlc ( AppBase ) :
 
         return (header, source)
     
-    def pdsdataGen(self, backend_options):
-        
-        header, source = self._getHeaderAndSource()
-        
-        return DdlPdsdata(header, source, backend_options, log=self)
-    
-    def psanaGen(self, backend_options):
-
-        header, source = self._getHeaderAndSource()
-        
-        return DdlPsanaInterfaces(header, source, backend_options, log=self)
-    
-    def pythonGen(self, backend_options):
-
-        header, source = self._getHeaderAndSource()
-        
-        return DdlPythonInterfaces(header, source, backend_options, log=self)
-    
-    def psanaDocGen(self, backend_options):
-        
-        return DdlPsanaDoc(self._options.output_dir, backend_options, log=self)
-        
-    def pds2psanaGen(self, backend_options):
-
-        header, source = self._getHeaderAndSource()
-        
-        return DdlPds2Psana(header, source, backend_options, log=self)
-
-    def pds2psanaDispatchGen(self, backend_options):
-
-        header, source = self._getHeaderAndSource()
-        
-        return DdlPds2PsanaDispatch(header, source, backend_options, log=self)
-
-    def hdf5Gen(self, backend_options):
-
-        header, source = self._getHeaderAndSource()
-        
-        return DdlHdf5Data(header, source, backend_options, log=self)
-
-    def hdf5DispatchGen(self, backend_options):
-
-        header, source = self._getHeaderAndSource()
-        
-        return DdlHdf5DataDispatch(header, source, backend_options, log=self)
-
 #
 #  run application when imported as a main module
 #

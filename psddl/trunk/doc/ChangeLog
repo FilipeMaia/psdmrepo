@@ -11,6 +11,15 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-11-00
+2013-11-02 Andy Salnikov
+- small scale refactoring of backends:
+- all constructors now take the same set of arguments, so there is no 
+  need for specialized factories
+- all backends define static methods backendOptions() which returns the 
+  list of backend-specific options
+- 'psddlc -B help' will print the list of options for each backend
+
 Tag: V00-10-00
 2013-10-31 Andy Salnikov
 - hdf5 generator: replace explicit chunk size argument with chunk

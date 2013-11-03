@@ -139,15 +139,29 @@ def _esc(s):
 #---------------------
 class DdlPsanaDoc ( object ) :
 
+    @staticmethod
+    def backendOptions():
+        """ Returns the list of options supported by this backend, returned value is 
+        either None or a list of triplets (name, type, description)"""
+        return [
+            ('psana-inc', 'PATH', "directory for Psana includes, default: psddl_psana"),
+            ]
+
+
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self, output_dir, backend_options, log ) :
+    def __init__ ( self, backend_options, log ) :
+        '''Constructor
+        
+           @param backend_options  dictionary of options passed to backend
+           @param log              message logger instance
+        '''
 
-        self.dir = output_dir
-        self.top_pkg = backend_options.get('top-package')
+        self.dir = backend_options['global:output-dir']
+        self.top_pkg = backend_options.get('global:top-package')
 
-        self.psana_inc = backend_options.get('psana-inc', "")
+        self.psana_inc = backend_options.get('psana-inc', "psddl_psana")
 
         self._log = log
 
