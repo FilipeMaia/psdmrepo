@@ -11,6 +11,9 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2013-11-03 Andy Salnikov
+- first version of dump-hddl backend
+
 Tag: V00-11-00
 2013-11-02 Andy Salnikov
 - small scale refactoring of backends:

@@ -49,6 +49,7 @@ from psddl.DdlPythonInterfaces import DdlPythonInterfaces
 from psddl.DdlPdsdata import DdlPdsdata
 from psddl.DdlHdf5Data import DdlHdf5Data
 from psddl.DdlHdf5DataDispatch import DdlHdf5DataDispatch
+from psddl.DdlDumpHddl import DdlDumpHddl
 
 #---------------------
 # Local definitions --
@@ -111,6 +112,7 @@ class psddlc ( AppBase ) :
             "pds2psana-dispatch": DdlPds2PsanaDispatch,
             "hdf5": DdlHdf5Data,
             "hdf5-dispatch": DdlHdf5DataDispatch,
+            "dump-hddl": DdlDumpHddl,
         }
         
 
