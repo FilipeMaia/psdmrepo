@@ -548,7 +548,7 @@ class SchemaValueType(SchemaType):
     def genSchema(self, inc, cpp):
         """Generate code for value types"""
 
-        if 'skip-proxy' in self.schema.tags: return
+        if 'embedded' in self.schema.tags: return
         
         hschema = self
         _log.debug("_genValueType: type=%r", self.pstype)

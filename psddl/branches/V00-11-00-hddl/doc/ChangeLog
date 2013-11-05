@@ -11,7 +11,18 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
-2013-11-03 Andy Salnikov
+2013-11-05 Andy Salnikov  (on branch V00-11-00-hddl)
+- first version of lexer and parser
+
+Tag: V00-12-00
+2013-11-05 Andy Salnikov
+- preparation for new DDL parser: few tags renamed:
+  - no-proxy to embedded (in h5 schema)
+  - c++-definition to force_definiton (in constructor)
+  - no-c++-definition to external (in constructor)
+- last two tags are not used anywhere
+
+2013-11-03 Andy Salnikov (on branch V00-11-00-hddl)
 - first version of dump-hddl backend
 
 Tag: V00-11-00

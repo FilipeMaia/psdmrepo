@@ -39,6 +39,7 @@ import sys
 #-----------------------------
 from psddl.Package import Package
 from psddl.Type import Type
+from psddl.H5Type import H5Type
 from psddl.Template import Template as T
 
 #----------------------------------
@@ -53,7 +54,7 @@ def _fmttags1(tags):
     return ''
 
 def _dims(dims):
-    return "[{0}]".format(', '.join([str('*' if d is None else d) for d in dims]))
+    return ''.join(["[{0}]".format(str('*' if d is None else d)) for d in dims])
 
 def _codesubs(expr):
     expr = expr.replace('{xtc-config}', '@config')
@@ -104,11 +105,11 @@ class DdlDumpHddl ( object ) :
         for use in model.use:
             headers = use['cpp_headers']
             if not headers:
-                print >>self.out, 'use "{0}";'.format(use['file'])
+                print >>self.out, '@include "{0}";'.format(use['file'])
             else:
                 names = ', '.join(['"{0}"'.format(header) for header in headers])
                 names = _fmttags(['headers({0})'.format(names)])
-                print >>self.out, 'use "{0}" {1};'.format(use['file'], names)
+                print >>self.out, '@include "{0}" {1};'.format(use['file'], names)
 
         # loop over packages in the model
         for pkg in model.packages() :
@@ -122,6 +123,7 @@ class DdlDumpHddl ( object ) :
 
     def _genPackage(self, pkg):
 
+        self._log.debug("_genPackage: pkg=%s", repr(pkg))
 
         tags = []
         if pkg.external: tags.append('external')
@@ -129,7 +131,9 @@ class DdlDumpHddl ( object ) :
         tags = _fmttags(tags)
 
         # open package
-        print >>self.out, T("package $name $tags {")(name=pkg.name, tags=tags)
+        if pkg.comment: 
+            print >>self.out, T('""" $comment """')[pkg]
+        print >>self.out, T("@package $name $tags {")(name=pkg.name, tags=tags)
 
         # constants
         for const in pkg.constants():
@@ -151,16 +155,18 @@ class DdlDumpHddl ( object ) :
             elif isinstance(ns, Type) :
     
                 self._genType(type = ns)
+                
+                for schema in ns.h5schemas:
+                    self._genH5Schema(schema)
 
         # close package
-        print >>self.out, T("} //- package $name")[pkg]
+        print >>self.out, T("} // @package $name")[pkg]
 
     def _genConst(self, const):
         
         if const.comment:
-            print >>self.out, T("  /* $comment */\n  const int $name = $value;")[const]
-        else:
-            print >>self.out, T("  const int $name = $value;")[const]
+            print >>self.out, T('  """ $comment """')[const]
+        print >>self.out, T("  @const int $name = $value;")[const]
 
 
     def _genEnum(self, enum):
@@ -168,16 +174,15 @@ class DdlDumpHddl ( object ) :
         if not enum.name: return
 
         base = enum.base.name
-        if enum.comment:
-            print >>self.out, T("  /* $comment */\n  enum $name ($base) {")(name=enum.name, base=base, comment=enum.comment)
-        else:
-            print >>self.out, T("  enum $name ($base) {")(name=enum.name, base=base)
+        if enum.comment: 
+            print >>self.out, T(('  """ $comment """'))[enum]
+        print >>self.out, T("  @enum $name ($base) {")(name=enum.name, base=base)
         
         for const in enum.constants() :
             val = ""
             if const.value is not None : val = " = " + const.value
             doc = ""
-            if const.comment: doc = T(' /* $comment */')[const]
+            if const.comment: doc = T(('  """ $comment """'))[const]
             print >>self.out, T("    $name$value,$doc")(name=const.name, value=val, doc=doc)
         print >>self.out, "  }"
 
@@ -195,7 +200,7 @@ class DdlDumpHddl ( object ) :
         if type.external: tags.append('external')
         if type.value_type: tags.append('value_type')
         if 'config-type' in type.tags: tags.append('config_type')
-        if 'c++-name' in type.tags: tags.append('cpp_name("{0}")'.format(pkg.tags['c++-name']))
+        if 'c++-name' in type.tags: tags.append('cpp_name({0})'.format(pkg.tags['c++-name']))
         if 'no-sizeof' in type.tags: tags.append('no_sizeof')
         if type.pack: tags.append('pack({0})'.format(type.pack))
         if type.xtcConfig:
@@ -208,8 +213,8 @@ class DdlDumpHddl ( object ) :
         if type.base : base = T("($name)")[type.base]
 
         # start class decl
-        if type.comment: print >>self.out, T("/* $comment */")[type]
-        print >>self.out, T("class $name$base")(name=type.name, base=base)
+        if type.comment: print >>self.out, T('""" $comment """')[type]
+        print >>self.out, T("@type $name$base")(name=type.name, base=base)
         if tags: print >>self.out, "  " + tags
         print >>self.out, "{"
 
@@ -223,11 +228,6 @@ class DdlDumpHddl ( object ) :
             self._genEnum(enum)
         if type.enums(): print >>self.out
 
-        # constructors
-        for ctor in type.ctors:
-            self._genCtor(ctor)
-        if type.ctors: print >>self.out
-
         # attributes
         for attrib in type.attributes():
             self._genAttrib(attrib)
@@ -236,6 +236,12 @@ class DdlDumpHddl ( object ) :
         for meth in type.methods():
             self._genMethod(meth)
         
+        # constructors
+        for ctor in type.ctors:
+            if ctor.args or ctor.attr_init or 'auto' in ctor.tags:
+                # skip default non-auto constructors, they are always defined
+                self._genCtor(ctor)
+        if type.ctors: print >>self.out
 
         print >>self.out, "}"
 
@@ -248,11 +254,11 @@ class DdlDumpHddl ( object ) :
         else:
             typename = attr.type.name
             
-        comment = T("\t/* $comment */")[attr] if attr.comment else ''
+        comment = T('\t""" $comment """')[attr] if attr.comment else ''
         method = T(" -> $name")[attr.accessor] if attr.accessor else ''
         
         tags = []
-        if attr.shape_method: tags.append('shape_method("{0}")'.format(attr.shape_method))
+        if attr.shape_method: tags.append('shape_method({0})'.format(attr.shape_method))
         tags = _fmttags(tags)
         if tags: tags = '  '+tags
         
@@ -272,7 +278,7 @@ class DdlDumpHddl ( object ) :
                 typename = bf.type.name
                 name = bf.name
                 method = T(" -> $name")[bf.accessor] if bf.accessor else ''
-                comment = T("\t/* $comment */")[bf] if bf.comment else ''
+                comment = T('\t""" $comment """')[bf] if bf.comment else ''
                 size = bf.size
 
                 print >>self.out, T("    $typename $name:$size$method;$comment")(locals())
@@ -308,23 +314,29 @@ class DdlDumpHddl ( object ) :
         args = ', '.join(args)
         
         print >>self.out, ""
-        if meth.comment: print >>self.out, T("  /* $comment */")[meth]
+        if meth.comment: print >>self.out, T('  """ $comment """')[meth]
         name = meth.name
 
         if meth.code:
             print >>self.out, T("  $typename $name($args)$tags")(locals())
+            count = 0
             for lang, code in meth.code.items():
                 tags = _fmttags(['language("{0}")'.format(lang)])
-                print >>self.out, T("  %{ $tags")(locals())
+                print >>self.out, T("  $tags @{")(locals())
                 print >>self.out, _codesubs(code)
-                print >>self.out, "  %}"
+                sep = '' if count == (len(meth.code)-1) else ','
+                print >>self.out, "  @}"+sep
+                count += 1
         elif meth.expr:
             print >>self.out, T("  $typename $name($args)$tags")(locals())
+            count = 0
             for lang, code in meth.expr.items():
                 tags = _fmttags(['language("{0}")'.format(lang)])
-                print >>self.out, T("  %{ $tags")(locals())
+                print >>self.out, T("  $tags @{")(locals())
                 print >>self.out, "    return " + _codesubs(code) + ';'
-                print >>self.out, "  %}"
+                sep = '' if count == (len(meth.expr)-1) else ','
+                print >>self.out, "  @}"+sep
+                count += 1
         else:
             print >>self.out, T("  $typename $name($args) [[external]]$tags;")(locals())
 
@@ -376,14 +388,84 @@ class DdlDumpHddl ( object ) :
         arginits = ', '.join(arginits)
         
         print >>self.out, ""
-        if ctor.comment: print >>self.out, T("  /* $comment */")[ctor]
+        if ctor.comment: print >>self.out, T(('  """ $comment """'))[ctor]
 
         if 'auto' in ctor.tags:
-            print >>self.out, T("  init()$tags;")(locals())
+            print >>self.out, T("  @init()$tags;")(locals())
         elif arginits:
-            print >>self.out, T("  init($args)$tags\n    $arginits;")(locals())
+            print >>self.out, T("  @init($args)$tags\n    $arginits;")(locals())
         else:
-            print >>self.out, T("  init($args)$tags;")(locals())
+            print >>self.out, T("  @init($args)$tags;")(locals())
+
+
+
+    def _genH5Schema(self, schema):
+        
+        self._log.debug("_genH5Schema: schema=%s", repr(schema))
+        
+        # skip included types
+        if schema.included : return
+
+        print >>self.out, T("\n\n//------------------ $name ------------------")[schema]
+
+        tags = []
+        tags.append('version({0})'.format(schema.version))
+        if 'external' in schema.tags: tags.append('external')
+        if 'skip-proxy' in schema.tags: tags.append('embedded')
+        if 'default' in schema.tags: tags.append('default')
+        tags = _fmttags1(tags)
+
+        # start decl
+        print >>self.out, T("@h5schema $name")[schema]
+        if tags: print >>self.out, "  " + tags
+        print >>self.out, "{"
+
+        for ds in schema.datasets:
+
+            tags = []
+            if 'external' in ds.tags:
+                if ds.tags['external']:
+                    tags.append('external("{0}")'.format(ds.tags['external']))
+                else:
+                    tags.append('external')
+            if 'vlen' in ds.tags: tags.append('vlen')
+            
+            if ds.method:
+                
+                if ds.method != ds.name: tags.append('method({0})'.format(ds.method))
+                tags = _fmttags1(tags)
+                if tags: tags = ' '+tags
+
+                type = ""
+                if ds._type and ds._method().type != ds._type: 
+                    type = ds._type.name+' '
+
+                print >>self.out, T("  @dataset $type$name$tags;")(type=type, name=ds.name, tags=tags)
+                
+            else:
+                
+                tags = _fmttags1(tags)
+                if tags: tags = ' '+tags
+                print >>self.out, T("  @dataset $name {")(name=ds.name)
+                for attr in ds.attributes:
+
+                    tags = []
+                    if 'vlen' in attr.tags: tags.append('vlen')
+                    if attr.method != attr.name: tags.append('method({0})'.format(attr.method))
+                    if attr._rank > 0: tags.append('rank({0})'.format(attr._rank))
+                    tags = _fmttags1(tags)
+                    if tags: tags = ' '+tags
+
+                    type = ""
+                    if attr._type and attr._method().type != attr._type: 
+                        type = attr._type.name+' '
+
+                    print >>self.out, T("    @attribute $type$name$tags;")(type=type, name=attr.name, tags=tags)
+                    
+                print >>self.out, "  }"
+
+        print >>self.out, "}"
+
 
 
 #

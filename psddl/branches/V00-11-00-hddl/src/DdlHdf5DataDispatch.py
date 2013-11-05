@@ -262,8 +262,8 @@ class DdlHdf5DataDispatch ( object ) :
             if not type.h5schemas:
                 type.h5schemas = [H5Type.defaultSchema(type)]
 
-            # if all schemas have skip-proxy tag stop here
-            if all('skip-proxy' in schema.tags for schema in type.h5schemas): continue
+            # if all schemas have embedded tag stop here
+            if all('embedded' in schema.tags for schema in type.h5schemas): continue
             
             code, header = self._typecode(type)
             headers.add(header)
