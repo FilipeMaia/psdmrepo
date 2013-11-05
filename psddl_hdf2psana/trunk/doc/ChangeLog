@@ -11,6 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-07-00
+2013-11-05 Andy Salnikov
+- preparation for new DDL parser: tags renamed:
+  - no-proxy to embedded (in h5 schema)
+  - need psddl V00-12-00 for this change
+  
 Tag: V00-06-00
 2013-10-31 Andy Salnikov
 - replace chunk size argument for make_datasets with chunk slzie policy 

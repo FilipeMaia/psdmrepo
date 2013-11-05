@@ -10,7 +10,7 @@
         <!-- ========================================================================= -->
         
         <h5schema name="Sample" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <dataset name="data">
                 <attribute name="channels"/>
             </dataset>
@@ -19,7 +19,7 @@
         <!-- ========================================================================= -->
         
         <h5schema name="LaneStatus" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <dataset name="data">
                 <attribute name="linkErrCount" />
                 <attribute name="linkDownCount" />

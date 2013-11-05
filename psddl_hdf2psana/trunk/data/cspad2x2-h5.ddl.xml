@@ -10,31 +10,31 @@
         <!-- ========================================================================= -->
 
         <h5schema name="CsPad2x2DigitalPotsCfg" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <dataset name="data">
                 <attribute name="pots"/>
             </dataset>
         </h5schema>
         
         <h5schema name="CsPad2x2GainMapCfg" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <dataset name="data">
                 <attribute name="gainMap"/>
             </dataset>
         </h5schema>
 
         <h5schema name="CsPad2x2ReadOnlyCfg" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="default"/>
         </h5schema>
         
         <h5schema name="ProtectionSystemThreshold" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="default"/>
         </h5schema>
         
         <h5schema name="ConfigV1QuadReg" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <dataset name="data">
                 <attribute name="shiftSelect"/>
                 <attribute name="edgeSelect"/>
@@ -65,7 +65,7 @@
         
         
 	<h5schema name="ConfigV2QuadReg" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <dataset name="data">
                 <attribute name="shiftSelect"/>
                 <attribute name="edgeSelect"/>

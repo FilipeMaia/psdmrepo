@@ -3,7 +3,7 @@
 
 <psddl>
 
-    <use file="psddldata/oceanoptics.ddl.xml" />
+    <use file="psddldata/gsc16ai.ddl.xml" />
 
     <package name="Gsc16ai">
 

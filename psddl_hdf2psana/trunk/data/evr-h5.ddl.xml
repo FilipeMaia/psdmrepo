@@ -9,39 +9,39 @@
 
         <!-- ========================================================================= -->
         <h5schema name="PulseConfig" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="default"/>
         </h5schema>
         <!-- ========================================================================= -->
         <h5schema name="PulseConfigV3" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="default"/>
         </h5schema>
         <!-- ========================================================================= -->
         <h5schema name="EventCodeV3" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="default"/>
         </h5schema>
         <!-- ========================================================================= -->
         <h5schema name="EventCodeV4" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="default"/>
         </h5schema>
         <!-- ========================================================================= -->
         <h5schema name="EventCodeV5" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="default"/>
         </h5schema>
         <!-- ========================================================================= -->
         <h5schema name="EventCodeV6" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="default"/>
         </h5schema>
         <!-- ========================================================================= -->
     
         <h5schema name="OutputMap" version="0">
 
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
 
             <dataset name="data">
                 <attribute name="source"/>
@@ -56,7 +56,7 @@
     
         <h5schema name="OutputMapV2" version="0">
 
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
 
             <dataset name="data">
                 <attribute name="source"/>
@@ -71,7 +71,7 @@
         <!-- ========================================================================= -->
 
         <h5schema name="SequencerEntry" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="default"/>
         </h5schema>
 
@@ -79,7 +79,7 @@
     
         <h5schema name="SequencerConfigV1" version="0">
 
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
 
             <dataset name="config">
 
@@ -98,7 +98,7 @@
         <!-- ========================================================================= -->
 
         <h5schema name="FIFOEvent" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="default"/>
         </h5schema>
 
@@ -174,7 +174,7 @@
     
         <h5schema name="IOChannel" version="0">
 
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="external" value="psddl_hdf2psana/evr.h"/>
             
         </h5schema>

@@ -11,7 +11,7 @@
     
         <!-- ========================================================================= -->
         <h5schema name="PVControl" version="0">
-        	<tag name="skip-proxy"/>
+        	<tag name="embedded"/>
             <dataset name="data">
                 <attribute name="name" rank="1"/>
                 <attribute name="index" type="int32_t"/>
@@ -20,7 +20,7 @@
         </h5schema>
         <!-- ========================================================================= -->
         <h5schema name="PVMonitor" version="0">
-        	<tag name="skip-proxy"/>
+        	<tag name="embedded"/>
             <dataset name="data">
                 <attribute name="name" rank="1"/>
                 <attribute name="index" type="int32_t"/>
@@ -30,7 +30,7 @@
         </h5schema>
         <!-- ========================================================================= -->
         <h5schema name="PVLabel" version="0">
-        	<tag name="skip-proxy"/>
+        	<tag name="embedded"/>
             <dataset name="data">
                 <attribute name="name" rank="1"/>
                 <attribute name="value" rank="1"/>

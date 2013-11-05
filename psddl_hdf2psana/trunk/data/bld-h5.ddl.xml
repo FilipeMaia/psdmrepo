@@ -3,6 +3,8 @@
 
 <psddl>
 
+    <use file="psddldata/bld.ddl.xml" />
+
     <use file="psddl_hdf2psana/lusi-h5.ddl.xml" cpp_headers="psddl_hdf2psana/lusi.ddl.h"/>
     
     <package name="Bld">

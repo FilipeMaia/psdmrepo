@@ -12,7 +12,7 @@
         <!-- ========================================================================= -->
         
         <h5schema name="SrcAlias" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <dataset name="data">
                 <attribute name="src"/>
                 <attribute name="aliasName" rank="1"/>

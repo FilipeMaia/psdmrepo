@@ -10,7 +10,7 @@
         <!-- ========================================================================= -->
         
         <h5schema name="epicsTimeStamp" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
 
             <dataset name="data">
                 <attribute name="secPastEpoch" method="sec"/>
@@ -22,98 +22,98 @@
         <!-- ========================================================================= -->
         
         <h5schema name="dbr_time_string" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="external"/>
         </h5schema>
         
         <!-- ========================================================================= -->
         
         <h5schema name="dbr_time_short" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="external"/>
         </h5schema>
         
         <!-- ========================================================================= -->
         
         <h5schema name="dbr_time_float" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="external"/>
         </h5schema>
         
         <!-- ========================================================================= -->
         
         <h5schema name="dbr_time_enum" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="external"/>
         </h5schema>
         
         <!-- ========================================================================= -->
         
         <h5schema name="dbr_time_char" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="external"/>
         </h5schema>
         
         <!-- ========================================================================= -->
         
         <h5schema name="dbr_time_long" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="external"/>
         </h5schema>
         
         <!-- ========================================================================= -->
         
         <h5schema name="dbr_time_double" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="external"/>
         </h5schema>
         
         <!-- ========================================================================= -->
         
         <h5schema name="dbr_sts_string" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="external"/>
         </h5schema>
         
         <!-- ========================================================================= -->
         
         <h5schema name="dbr_ctrl_short" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="external"/>
         </h5schema>
         
         <!-- ========================================================================= -->
         
         <h5schema name="dbr_ctrl_float" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="external"/>
         </h5schema>
         
         <!-- ========================================================================= -->
         
         <h5schema name="dbr_ctrl_enum" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="external"/>
         </h5schema>
         
         <!-- ========================================================================= -->
         
         <h5schema name="dbr_ctrl_char" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="external"/>
         </h5schema>
         
         <!-- ========================================================================= -->
         
         <h5schema name="dbr_ctrl_long" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="external"/>
         </h5schema>
         
         <!-- ========================================================================= -->
         
         <h5schema name="dbr_ctrl_double" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="external"/>
         </h5schema>
         
@@ -121,7 +121,7 @@
         
         <h5schema name="EpicsPvHeader" version="0">
 
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <dataset name="data">
                 <attribute name="pvId"/>
                 <attribute name="dbrType"/>
@@ -133,119 +133,119 @@
         <!-- ========================================================================= -->
         
         <h5schema name="EpicsPvCtrlHeader" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="external"/>
         </h5schema>
         
         <!-- ========================================================================= -->
         
         <h5schema name="EpicsPvTimeHeader" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="external"/>
         </h5schema>
         
         <!-- ========================================================================= -->
         
         <h5schema name="EpicsPvCtrlString" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="external" value="psddl_hdf2psana/epics.h"/>
         </h5schema>
         
         <!-- ========================================================================= -->
         
         <h5schema name="EpicsPvCtrlShort" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="external" value="psddl_hdf2psana/epics.h"/>
         </h5schema>
         
         <!-- ========================================================================= -->
         
         <h5schema name="EpicsPvCtrlFloat" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="external" value="psddl_hdf2psana/epics.h"/>
         </h5schema>
         
         <!-- ========================================================================= -->
         
         <h5schema name="EpicsPvCtrlEnum" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="external" value="psddl_hdf2psana/epics.h"/>
         </h5schema>
         
         <!-- ========================================================================= -->
         
         <h5schema name="EpicsPvCtrlChar" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="external" value="psddl_hdf2psana/epics.h"/>
         </h5schema>
         
         <!-- ========================================================================= -->
         
         <h5schema name="EpicsPvCtrlLong" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="external" value="psddl_hdf2psana/epics.h"/>
         </h5schema>
         
         <!-- ========================================================================= -->
         
         <h5schema name="EpicsPvCtrlDouble" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="external" value="psddl_hdf2psana/epics.h"/>
         </h5schema>
         
         <!-- ========================================================================= -->
         
         <h5schema name="EpicsPvTimeString" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="external" value="psddl_hdf2psana/epics.h"/>
         </h5schema>
         
         <!-- ========================================================================= -->
         
         <h5schema name="EpicsPvTimeShort" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="external" value="psddl_hdf2psana/epics.h"/>
         </h5schema>
         
         <!-- ========================================================================= -->
         
         <h5schema name="EpicsPvTimeFloat" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="external" value="psddl_hdf2psana/epics.h"/>
         </h5schema>
         
         <!-- ========================================================================= -->
         
         <h5schema name="EpicsPvTimeEnum" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="external" value="psddl_hdf2psana/epics.h"/>
         </h5schema>
         
         <!-- ========================================================================= -->
         
         <h5schema name="EpicsPvTimeChar" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="external" value="psddl_hdf2psana/epics.h"/>
         </h5schema>
         
         <!-- ========================================================================= -->
         
         <h5schema name="EpicsPvTimeLong" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="external" value="psddl_hdf2psana/epics.h"/>
         </h5schema>
         
         <!-- ========================================================================= -->
         
         <h5schema name="EpicsPvTimeDouble" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="external" value="psddl_hdf2psana/epics.h"/>
         </h5schema>
         
         <!-- ========================================================================= -->
         
         <h5schema name="PvConfigV1" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <dataset name="data">
                 <attribute name="pvId"/>
                 <attribute name="description"/>

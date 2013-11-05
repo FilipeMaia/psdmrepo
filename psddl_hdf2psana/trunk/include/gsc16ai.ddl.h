@@ -8,7 +8,6 @@
 #include "hdf5pp/Type.h"
 #include "PSEvt/Proxy.h"
 #include "psddl_hdf2psana/ChunkPolicy.h"
-#include "psddl_hdf2psana/oceanoptics.ddl.h"
 namespace psddl_hdf2psana {
 namespace Gsc16ai {
 

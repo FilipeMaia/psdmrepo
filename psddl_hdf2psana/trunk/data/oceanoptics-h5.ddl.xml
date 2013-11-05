@@ -23,7 +23,7 @@
         <!-- ========================================================================= -->
     
         <h5schema name="timespec64" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <dataset name="data">
                 <attribute name="seconds" type="uint32_t" method="tv_sec"/>
                 <attribute name="nanoseconds" type="uint32_t" method="tv_nsec"/>

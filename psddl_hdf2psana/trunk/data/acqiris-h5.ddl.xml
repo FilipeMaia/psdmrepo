@@ -10,7 +10,7 @@
         <!-- ========================================================================= -->
 
         <h5schema name="VertV1" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <dataset name="data">
                 <attribute name="fullScale"/>
                 <attribute name="offset"/>
@@ -20,12 +20,12 @@
         </h5schema>
         
         <h5schema name="HorizV1" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="default"/>
         </h5schema>
 
         <h5schema name="TrigV1" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="default"/>
         </h5schema>
 
@@ -42,7 +42,7 @@
         </h5schema>
         
         <h5schema name="TimestampV1" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <dataset name="data">
                 <attribute name="pos"/>
                 <attribute name="value"/>
@@ -50,12 +50,12 @@
         </h5schema>
         
         <h5schema name="DataDescV1Elem" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="external" value="psddl_hdf2psana/acqiris.h"/>
         </h5schema>
 
         <h5schema name="DataDescV1Elem" version="1">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="external" value="psddl_hdf2psana/acqiris.h"/>
         </h5schema>
 
@@ -71,17 +71,17 @@
 
 
         <h5schema name="TdcChannel" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="default"/>
         </h5schema>
 
         <h5schema name="TdcAuxIO" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="default"/>
         </h5schema>
 
         <h5schema name="TdcVetoIO" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="default"/>
         </h5schema>
 
@@ -95,7 +95,7 @@
 
 
         <h5schema name="TdcDataV1_Item" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <dataset name="data">
                 <attribute name="source" method="source"/>
                 <attribute name="overflow" method="bf_ofv_"/>
@@ -104,15 +104,15 @@
         </h5schema>
         
         <h5schema name="TdcDataV1Common" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="external" value="psddl_hdf2psana/acqiris.h"/>
         </h5schema>
         <h5schema name="TdcDataV1Channel" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="external" value="psddl_hdf2psana/acqiris.h"/>
         </h5schema>
         <h5schema name="TdcDataV1Marker" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="external" value="psddl_hdf2psana/acqiris.h"/>
         </h5schema>
 

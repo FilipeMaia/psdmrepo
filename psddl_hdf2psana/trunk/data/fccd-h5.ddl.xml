@@ -3,7 +3,7 @@
 
 <psddl>
 
-    <use file="psddldata/fli.ddl.xml" />
+    <use file="psddldata/fccd.ddl.xml" />
 
     <package name="FCCD">
 

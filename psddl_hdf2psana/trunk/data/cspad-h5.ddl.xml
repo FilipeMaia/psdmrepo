@@ -11,31 +11,31 @@
 
 
         <h5schema name="CsPadDigitalPotsCfg" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <dataset name="data">
                 <attribute name="pots"/>
             </dataset>
         </h5schema>
         
         <h5schema name="CsPadGainMapCfg" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <dataset name="data">
                 <attribute name="gainMap"/>
             </dataset>
         </h5schema>
         
         <h5schema name="CsPadReadOnlyCfg" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="default"/>
         </h5schema>
         
         <h5schema name="ProtectionSystemThreshold" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <tag name="default"/>
         </h5schema>
         
         <h5schema name="ConfigV1QuadReg" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <dataset name="data">
                 <attribute name="readClkSet"/>
                 <attribute name="readClkHold"/>
@@ -56,7 +56,7 @@
         </h5schema>
         
         <h5schema name="ConfigV2QuadReg" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <dataset name="data">
                 <attribute name="readClkSet"/>
                 <attribute name="readClkHold"/>
@@ -80,7 +80,7 @@
         </h5schema>
         
         <h5schema name="ConfigV3QuadReg" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <dataset name="data">
                 <attribute name="readClkSet"/>
                 <attribute name="readClkHold"/>
@@ -202,7 +202,7 @@
         </h5schema>
         
         <h5schema name="ElementV1" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <dataset name="element">
                 <attribute name="virtual_channel"/>
                 <attribute name="lane"/>
@@ -225,7 +225,7 @@
         </h5schema>
 
         <h5schema name="ElementV2" version="0">
-            <tag name="skip-proxy"/>
+            <tag name="embedded"/>
             <dataset name="element">
                 <attribute name="virtual_channel"/>
                 <attribute name="lane"/>
