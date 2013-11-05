@@ -30,6 +30,7 @@ from Logger                 import logger
 from GUIStatus              import *
 from GUIDarkList            import *
 from GUIDarkMoreOpts        import *
+from GUIDarkControlBar      import *
 
 #-----------------------------
 
@@ -44,13 +45,20 @@ class GUIDark ( QtGui.QWidget ) :
 
         self.guistatus        = GUIStatus(self)
         self.guidarklist      = GUIDarkList(self)
+        self.guidarkcbar      = GUIDarkControlBar(self)
         #self.guidarkmoreopts  = GUIDarkMoreOpts(self)
+
+        self.vbox = QtGui.QVBoxLayout() 
+        self.vbox.addWidget(self.guidarkcbar)
+        self.vbox.addWidget(self.guidarklist)
+        self.vwidg = QtGui.QWidget(self)
+        self.vwidg.setLayout(self.vbox) 
 
         self.vsplit = QtGui.QSplitter(QtCore.Qt.Vertical)
         self.vsplit.addWidget(self.guistatus)
-        self.vsplit.addWidget(self.guidarklist)
+        self.vsplit.addWidget(self.vwidg)
         
-        self.hbox = QtGui.QVBoxLayout() 
+        self.hbox = QtGui.QHBoxLayout() 
         self.hbox.addWidget(self.vsplit)
         #self.hbox.addWidget(self.guistatus)
         #self.hbox.addStretch(1)
@@ -124,6 +132,9 @@ class GUIDark ( QtGui.QWidget ) :
         except : pass
 
         try    : self.guidarklist.close()        
+        except : pass
+
+        try    : self.guidarkcbar.close()        
         except : pass
 
         #try    : self.guidarkmoreopts.close()        

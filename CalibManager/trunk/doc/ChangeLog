@@ -11,10 +11,15 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2013-11-05 Mikhail S. Dubrovin
+- add access to DB on data files 
+A       src/RegDBUtils.py
+A       src/GUIPopupChecklist.py
+A       src/GUIDarkControlBar.py
+	
 Tag: V00-00-01
 2013-10-06 Mikhail S. Dubrovin
 - works for pedestals and mask editor
-
 
 2013-07-15 Mikhail S. Dubrovin
 - create this package on dubrovin@psdev106:

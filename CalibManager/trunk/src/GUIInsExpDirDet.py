@@ -95,7 +95,8 @@ class GUIInsExpDirDet ( QtGui.QWidget ) :
         self.showToolTips()
         self.setStyle()
 
-        self.setStatusMessage()
+        #self.setStatusMessage()
+        cp.guistatus.updateStatusInfo()
 
         cp.guiinsexpdirdet = self
 
@@ -293,7 +294,8 @@ class GUIInsExpDirDet ( QtGui.QWidget ) :
         self.butDet.setText( txt + self.char_expand)
         #if txt == 'Select' : self.list_of_exp = None        
         logger.info('Selected detector: ' + str(txt), __name__)
-        self.setStatusMessage()
+
+        if cp.guistatus is not None : cp.guistatus.updateStatusInfo()
 
         if cp.guidarklist is not None :
 
@@ -302,14 +304,6 @@ class GUIInsExpDirDet ( QtGui.QWidget ) :
             #if txt=='Select' or txt != self.det_name.value() : cp.guidarklist.setRun('Select')            
             if txt=='Select' : cp.guidarklist.setFieldsEnabled(False)
             else             : cp.guidarklist.setFieldsEnabled(True)
-
-
-
-    def setStatusMessage(self):
-        if cp.guistatus is None : return
-        #msg = 'From %s to %s use dark run %s' % (self.str_run_from.value(), self.str_run_to.value(), self.str_run_number.value())
-        msg = gu.get_text_content_of_calib_dir_for_detector(path=self.calib_dir.value(), det=self.det_name.value(), calib_type='pedestals')
-        cp.guistatus.setStatusMessage(msg)
 
 #-----------------------------
 

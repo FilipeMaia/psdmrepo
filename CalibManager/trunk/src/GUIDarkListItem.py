@@ -46,7 +46,7 @@ class GUIDarkListItem ( QtGui.QWidget ) :
     #char_expand    = u'\u25BD' # open down-head triangle
     #char_shrink    = u'\u25B7' # open right-head triangle
 
-    def __init__ ( self, parent=None, run_number='0000') :
+    def __init__ ( self, parent=None, run_number='0000', run_type='Type N/A', comment='') :
 
         QtGui.QWidget.__init__(self, parent)
 
@@ -62,14 +62,14 @@ class GUIDarkListItem ( QtGui.QWidget ) :
 
         self.run_number = run_number # cp.str_run_number
 
-        self.str_run_number = cp.str_run_number # cp.str_run_number
+        #self.str_run_number = cp.str_run_number # cp.str_run_number
         #self.calib_dir      = cp.calib_dir
         #self.det_name       = cp.det_name
         
         self.but_expand_shrink = QtGui.QPushButton(self.char_expand)
 
         self.gui_add = None
-        self.gui_run = GUIDarkListItemRun(self, self.run_number)
+        self.gui_run = GUIDarkListItemRun(self, run_number, run_type, comment)
         self.hboxTT = QtGui.QHBoxLayout()
         self.hboxTT.addSpacing(5)     
         self.hboxTT.addWidget(self.but_expand_shrink)

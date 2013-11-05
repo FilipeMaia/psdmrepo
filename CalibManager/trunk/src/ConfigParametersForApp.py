@@ -48,6 +48,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
                       'Psana::Camera::Frame',
                       'Psana::Princeton::Frame',
                       'Psana::PNCCD::FullFrame']
+    list_of_show_dark = ['all', 'dark']
     
     dict_of_det_types = dict( zip(list_of_dets,list_of_types) )
 
@@ -75,7 +76,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
         self.guiinsexpdirdet = None
         self.guifilebrowser  = None 
         self.blsp            = None 
-
+        self.guidarkcontrolbar = None 
         #self.autoRunStatus = 0            
         #self.procDarkStatus  = 0 # 0=inactive, 1=scan, 2=averaging, 3=both
   
@@ -224,6 +225,9 @@ class ConfigParametersForApp ( ConfigParameters ) :
         self.str_run_from      = self.declareParameter( name='STRING_RUN_FROM',       val_def='0000',         type='str' )
         self.str_run_to        = self.declareParameter( name='STRING_RUN_TO',         val_def='end',          type='str' )
 
+        # GUIDarkControlBar.py
+        self.dark_list_show_type  = self.declareParameter( name='DARK_LIST_SHOW_TYPE', val_def=self.list_of_show_dark[0], type='str' )
+
         # GUIGrabSubmitELog.py
         #self.cbx_more_options    = self.declareParameter( name='CBX_SHOW_MORE_OPTIONS',   val_def=False,             type='bool' )
         #self.img_infname         = self.declareParameter( name='IMG_INPUT_FNAME',  val_def='./img-1.ppm',            type='str' )
@@ -261,7 +265,10 @@ class ConfigParametersForApp ( ConfigParameters ) :
         # For batch jobs
         self.bat_queue               = self.declareParameter( name='BATCH_QUEUE',                val_def='psnehq', type='str' )
         self.bat_submit_interval_sec = self.declareParameter( name='BATCH_SUBMIT_INTERVAL_SEC',  val_def=100,      type='int' )
- 
+
+        # GUIMaskEditor.py
+        self.path_mask_img      = self.declareParameter( name='PATH_TO_MASK_IMAGE',        val_def='./work/*.txt',       type='str' )
+
 #-----------------------------
 
     def defineStyles( self ) :

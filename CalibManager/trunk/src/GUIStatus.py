@@ -28,7 +28,7 @@ from PyQt4 import QtGui, QtCore
 
 from ConfigParametersForApp import cp
 from Logger                 import logger
-#import GlobalUtils          as     gu
+import GlobalUtils          as     gu
 #from GUIStatusTable         import *
 
 #---------------------
@@ -42,12 +42,18 @@ class GUIStatus ( QtGui.QGroupBox ) :
 
         QtGui.QGroupBox.__init__(self, 'State', parent)
         #QtGui.QWidget.__init__(self, parent)
-
         self.setGeometry(100, 100, 730, 50)
         self.setWindowTitle('GUI Status')
         #try : self.setWindowIcon(cp.icon_help)
         #except : pass
         self.setFrame()
+
+        #self.instr_dir      = cp.instr_dir
+        #self.instr_name     = cp.instr_name
+        #self.exp_name       = cp.exp_name
+        self.det_name       = cp.det_name
+        self.calib_dir      = cp.calib_dir
+        self.current_tab    = cp.current_tab
 
         self.box_txt        = QtGui.QTextEdit(self)
         #self.tit_status     = QtGui.QLabel(' State ', self)
@@ -138,10 +144,21 @@ class GUIStatus ( QtGui.QGroupBox ) :
         self.close()
 
 
-    def setStatusMessage(self, msg) :
-        logger.debug('Set help message',__name__)
+    def setStatusMessage(self, msg='msg is empty...') :
+        logger.debug('Set status message',__name__)
         self.box_txt.setText(msg)
         #self.setStatus(0, 'Status: unknown')
+
+
+    def updateStatusInfo(self) :
+
+        ctype='pedestals'
+        if self.current_tab.value() == 'Dark' : ctype='pedestals'
+        #if self.current_tab.value() == cp.guitabs.list_of_tabs[0] : ctype='pedestals'
+        
+        #msg = 'From %s to %s use dark run %s' % (self.str_run_from.value(), self.str_run_to.value(), self.str_run_number.value())
+        msg = gu.get_text_content_of_calib_dir_for_detector(path=self.calib_dir.value(), det=self.det_name.value(), calib_type=ctype)
+        self.setStatusMessage(msg)
 
 
 #    def setStatus(self, status_index=0, msg=''):

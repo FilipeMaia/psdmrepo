@@ -41,7 +41,7 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
 
     #char_expand    = u' \u25BE' # down-head triangle
 
-    def __init__ ( self, parent=None, str_run_number='0000') :
+    def __init__ ( self, parent=None, str_run_number='0000', str_run_type='Type N/A', comment='') :
 
         QtGui.QWidget.__init__(self, parent)
 
@@ -55,8 +55,10 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
         self.parent = parent
         
         self.str_run_number = str_run_number # cp.str_run_number
+        self.str_run_type   = str_run_type   # cp.str_run_number
         self.str_run_from   = str_run_number # cp.str_run_from
         self.str_run_to     = 'end'          # cp.str_run_to
+        self.comment        = comment
         self.calib_dir      = cp.calib_dir
         self.det_name       = cp.det_name
 
@@ -68,6 +70,7 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
 
         #self.lab_rnum = QtGui.QPushButton( self.str_run_number )
         self.lab_rnum = QtGui.QLabel( self.str_run_number )
+        self.lab_type = QtGui.QLabel( self.str_run_type + ': ' + comment)
         self.but_go   = QtGui.QPushButton( 'Go' )
         self.but_depl = QtGui.QPushButton( 'Deploy' )
         self.edi_from = QtGui.QLineEdit  ( self.str_run_from )
@@ -85,10 +88,12 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
         self.hbox.addWidget(self.edi_from)
         self.hbox.addWidget(self.lab_to)
         self.hbox.addWidget(self.edi_to)
-        self.hbox.addSpacing(150)     
+        #self.hbox.addSpacing(150)     
+        self.hbox.addStretch(1)     
         self.hbox.addWidget(self.but_go)
         self.hbox.addWidget(self.but_depl)
         self.hbox.addStretch(1)     
+        self.hbox.addWidget(self.lab_type)
         #self.hbox.addWidget(self.but_stop)
 
         self.setLayout(self.hbox)
@@ -108,6 +113,7 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
 
     def showToolTips(self):
         self.lab_rnum.setToolTip('Data run for calibration.')
+        self.lab_type.setToolTip('Type of file (data, dark, etc)')
         self.but_go  .setToolTip('Begin data processing for calibration.')
         self.edi_from.setToolTip('Type in the run number \nas a lower limit of the validity range.')
         self.edi_to  .setToolTip('Type in the run number or "end"\nas an upper limit of the validity range.')
@@ -152,7 +158,8 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
         self.lab_run .setStyleSheet(cp.styleLabel)
         self.but_depl.setStyleSheet(cp.styleButtonGood)
 
-        self.lab_rnum .setFixedWidth(80)        
+        #self.lab_rnum .setFixedWidth(60)        
+        self.lab_type .setFixedWidth(150)        
         self.edi_from .setFixedWidth(40)
         self.edi_to   .setFixedWidth(40)
         self.but_go   .setFixedWidth(60)        
@@ -296,6 +303,8 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
 
         for cmd in list_of_deploy_commands :
             fd.procDeployCommand(cmd)
+
+        if cp.guistatus is not None : cp.guistatus.updateStatusInfo()
 
 
     def get_list_of_deploy_commands(self):

@@ -168,6 +168,8 @@ class FileNameManager :
 
 
     def get_list_of_xtc_runs(self):
+        """Returns the list of xtc runs as string, for example:  ['0001', '0202', '0203', '0204',...]
+        """
         list_of_xtc_files = self.get_list_of_xtc_files()
         list_of_xtc_runs = []
         for fname in list_of_xtc_files :
@@ -175,6 +177,16 @@ class FileNameManager :
             if run in list_of_xtc_runs : continue
             list_of_xtc_runs.append(run)
         return list_of_xtc_runs
+
+
+    def get_list_of_xtc_run_nums(self):
+        """Returns the list of xtc integer run numbers:  [1, 202, 203, 204,...]
+        """
+        list_of_xtc_runs = self.get_list_of_xtc_runs()
+        list_of_xtc_run_nums = []
+        for run in list_of_xtc_runs :
+            list_of_xtc_run_nums.append(int(run))
+        return list_of_xtc_run_nums
 
 
     def path_to_xtc_files_for_run(self):

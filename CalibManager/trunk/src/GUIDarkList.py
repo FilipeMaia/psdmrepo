@@ -29,8 +29,9 @@ from PyQt4 import QtGui, QtCore
 from ConfigParametersForApp import cp
 from Logger                 import logger
 from FileNameManager        import fnm
-from GUIDarkListItem         import *
-#import GlobalUtils          as     gu
+from GUIDarkListItem        import *
+import GlobalUtils          as     gu
+import RegDBUtils           as     ru
 
 #---------------------
 #  Class definition --
@@ -42,6 +43,7 @@ class GUIDarkList ( QtGui.QWidget ) :
     def __init__ ( self, parent=None ) :
 
         self.parent = parent
+        self.dark_list_show_type = cp.dark_list_show_type
 
         #self.calib_dir      = cp.calib_dir
         #self.det_name       = cp.det_name
@@ -90,11 +92,39 @@ class GUIDarkList ( QtGui.QWidget ) :
         self.list.clear()
 
         self.list_of_records = []
-        self.list_of_runs = fnm.get_list_of_xtc_runs()
+        self.list_of_runs = fnm.get_list_of_xtc_runs()   # ['0001', '0202', '0203',...]
+        #self.list_of_run_nums = gu.list_of_int_from_list_of_str(self.list_of_runs) # [1, 202, 203, 204,...]
 
-        for run in self.list_of_runs :
-            #print run
-            widg = GUIDarkListItem ( self, str(run) ) # QtGui.QLabel(str(run), self)
+        #self.dict_run_isdark = ru.dict_runnum_dark (cp.instr_name.value(), cp.exp_name.value(), self.list_of_run_nums)
+        #print 'self.dict_run_isdark = ', self.dict_run_isdark
+
+        self.dict_run_recs = ru.calibration_runs (cp.instr_name.value(), cp.exp_name.value())
+        #print 'self.dict_run_recs = ', self.dict_run_recs
+
+        selection_is_on = False
+        if self.dark_list_show_type.value() == 'dark' : selection_is_on = True
+
+        for str_run_num in self.list_of_runs :
+            #print 'str_run_num = ', str_run_num
+
+            run_num = int(str_run_num)
+
+            comment = ''
+            is_dark = False
+
+            if self.dict_run_recs != {} :
+                run_rec = self.dict_run_recs[run_num]
+                list_of_calibs = run_rec['calibrations']
+                comment        = run_rec['comment']
+                is_dark = 'dark' in list_of_calibs
+                #print run_num, is_dark, list_of_calibs, comment
+
+            if selection_is_on and not is_dark : continue
+
+            self.type = ''
+            if is_dark : self.type = 'dark'
+
+            widg = GUIDarkListItem ( self, str_run_num, self.type, comment)
             item = QtGui.QListWidgetItem('', self.list)
             #self.list.addItem(item)
             #item.setFlags (  QtCore.Qt.ItemIsEnabled ) #| QtCore.Qt.ItemIsSelectable  | QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsTristate)
@@ -107,7 +137,7 @@ class GUIDarkList ( QtGui.QWidget ) :
             self.list.setItemWidget(item, widg)
             #self.list.setItemSelected(item, True)
 
-            record = run, item, widg
+            record = str_run_num, item, widg
             self.list_of_records.append(record)
 
 

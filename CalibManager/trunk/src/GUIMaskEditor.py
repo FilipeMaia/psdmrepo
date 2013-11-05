@@ -50,6 +50,9 @@ from Logger               import logger
 from FileNameManager      import fnm
 
 from CorAna.MaskEditor import MaskEditor
+import GlobalUtils     as     gu
+import CSPAD2x2Image   as     cspad2x2img
+import CSPADImage      as     cspadimg
 
 #---------------------
 #  Class definition --
@@ -66,6 +69,10 @@ class GUIMaskEditor ( QtGui.QWidget ) :
         self.myapp = app
         QtGui.QWidget.__init__(self, parent)
 
+        self.fname_prefix  = cp.fname_prefix
+        self.path_mask_img = cp.path_mask_img
+        self.img_arr = None
+
         cp.setIcons()
 
         self.setGeometry(10, 25, 650, 30)
@@ -76,23 +83,39 @@ class GUIMaskEditor ( QtGui.QWidget ) :
 
         self.setFrame()
  
+        self.titFile = QtGui.QLabel('File:')
+
+        self.ediFile = QtGui.QLineEdit ( self.path_mask_img.value() )
+        self.ediFile.setReadOnly(True)
+ 
         self.butMaskEditor  = QtGui.QPushButton('Open Mask Editor')
         self.butMaskEditor  .setIcon(cp.icon_monitor)
 
+        self.butBrowse = QtGui.QPushButton( 'Browse' )
+
         self.hboxB = QtGui.QHBoxLayout() 
         self.hboxB.addStretch(1)     
-        self.hboxB.addWidget(self.butMaskEditor     )
+        self.hboxB.addWidget( self.titFile )
+        self.hboxB.addWidget( self.ediFile )
+        self.hboxB.addWidget( self.butBrowse )
         self.hboxB.addStretch(1)     
 
-        self.vboxW = QtGui.QHBoxLayout() 
+        self.hboxE = QtGui.QHBoxLayout() 
+        self.hboxE.addStretch(1)     
+        self.hboxE.addWidget( self.butMaskEditor )
+        self.hboxE.addStretch(1)     
+
+        self.vboxW = QtGui.QVBoxLayout() 
         self.vboxW.addStretch(1)
-        self.vboxW.addLayout(self.hboxB) 
+        self.vboxW.addLayout( self.hboxB ) 
+        self.vboxW.addLayout( self.hboxE ) 
         self.vboxW.addStretch(1)
         
         self.setLayout(self.vboxW)
 
         self.connect( self.butMaskEditor, QtCore.SIGNAL('clicked()'), self.onButMaskEditor )
-
+        self.connect( self.butBrowse,     QtCore.SIGNAL('clicked()'), self.onButBrowse     ) 
+ 
         self.showToolTips()
         self.setStyle()
 
@@ -106,9 +129,10 @@ class GUIMaskEditor ( QtGui.QWidget ) :
     #-------------------
 
     def showToolTips(self):
-        pass
-        #self.butSave.setToolTip('Save all current settings in the \nfile with configuration parameters') 
-
+        #pass
+        self.ediFile.setToolTip('Path to the file with image data') 
+        self.butBrowse.setToolTip('Open file browser dialog window \nand select the file with image data') 
+        self.butMaskEditor.setToolTip('Open/Close Mask Editor window')
 
     def setFrame(self):
         self.frame = QtGui.QFrame(self)
@@ -122,8 +146,15 @@ class GUIMaskEditor ( QtGui.QWidget ) :
     def setStyle(self):
         self.              setStyleSheet(cp.styleBkgd)
         self.butMaskEditor.setStyleSheet(cp.styleButton)
-        self.butMaskEditor.setMinimumHeight(60)
+        #self.butMaskEditor.setFixedWidth(200)
+        #self.butMaskEditor.setMinimumHeight(60)
+        self.butMaskEditor.setMinimumSize(180,60)
 
+        self.ediFile.setFixedWidth(400)
+        self.ediFile.setStyleSheet(cp.styleEditInfo) 
+        self.ediFile.setEnabled(False)            
+
+ 
         #self.butFBrowser.setVisible(False)
         #self.butSave.setText('')
         #self.butExit.setText('')
@@ -158,23 +189,52 @@ class GUIMaskEditor ( QtGui.QWidget ) :
         logger.debug('onExit', self.name)
         self.close()
 
-        
-    def onFile(self):
-        logger.debug('onFile', self.name)
-        path  = fnm.path_gui_image()
-        #dir, fname = os.path.split(path)
-        path  = str( QtGui.QFileDialog.getSaveFileName(self,
-                                                       caption='Select file to save the GUI',
-                                                       directory = path,
-                                                       filter = '*.png'
-                                                       ) )
-        if path == '' :
-            logger.debug('Saving is cancelled.', self.name)
+
+    def onButBrowse(self):
+        logger.debug('oonButBrowse', __name__)
+        self.path = str( self.ediFile.displayText() )
+        self.dname, self.fname = os.path.split(self.path)
+        msg = 'dir : %s   file : %s' % (self.dname, self.fname)
+        logger.info(msg, __name__)
+        prefix = self.fname_prefix.value()
+        file_filter = 'Text files (' + prefix + '*.txt ' + prefix + '*.dat)\nAll files (*)'
+        self.path = str( QtGui.QFileDialog.getOpenFileName(self, 'Open file', self.dname, filter=file_filter) )
+        self.dname, self.fname = os.path.split(self.path)
+
+        if self.dname == '' or self.fname == '' :
+            logger.info('Input directiry name or file name is empty... use default values', __name__)
             return
-        logger.info('Save GUI image in file: ' + path, self.name)
-        pixmap = QtGui.QPixmap.grabWidget(self)
-        status = pixmap.save(path, 'PNG')
-        #logger.info('Save status: '+str(status), self.name)
+        else :
+            self.ediFile.setText(self.path)
+            self.path_mask_img.setValue(self.path)
+            logger.info('Selected file for mask editor:\n' + self.path, __name__)
+
+
+    def openFileWithImageArray(self) :
+         #self.path = str( self.ediFile.displayText() )
+         self.path = self.path_mask_img.value()
+         self.arr = gu.get_array_from_file(self.path) # , dtype=np.float32)
+         logger.info('self.arr.shape:' + str(self.arr.shape), __name__)
+
+         if self.arr.shape == (5920,388) :
+             logger.info('Treat it as CSPAD', __name__)             
+             self.img_arr = cspadimg.get_cspad_raw_data_array_image(self.arr)
+
+         elif self.arr.shape == (185,388,2) or self.arr.shape == (185*388*2,):
+             logger.info('Treat it as CSPAD2x2', __name__)
+             self.img_arr = cspad2x2img.get_cspad2x2_non_corrected_image_for_raw_data_array(self.arr)
+
+         elif self.arr.shape == (1300,1340) :
+             logger.info('Treat it as Princeton camera', __name__)
+             self.img_arr = self.arr
+
+         elif self.arr.shape == (1024,1024) :
+             logger.info('Treat it as Opal camera', __name__)
+             self.img_arr = self.arr
+
+         else :
+             logger.info('Array of unknown shape', __name__)
+             self.img_arr = None
 
 
 #    def onELog(self):
@@ -191,7 +251,7 @@ class GUIMaskEditor ( QtGui.QWidget ) :
 
     def dictOfMaskEditorPars (self):       
         pars = {'parent' : None, 
-                'arr'    : None, 
+                'arr'    : self.img_arr, 
                 'xyc'    : None, # xyc=(opts.xc,opts.yc)
                 'ifname' : 'ifname', 
                 'ofname' : 'ofname', 
@@ -221,6 +281,8 @@ class GUIMaskEditor ( QtGui.QWidget ) :
         except :
             self.butMaskEditor.setStyleSheet(cp.styleButtonGood)
             self.butMaskEditor.setText('Close Mask Editor')
+
+            self.openFileWithImageArray()
 
             pars = self.dictOfMaskEditorPars ()
             cp.maskeditor = MaskEditor(**pars)

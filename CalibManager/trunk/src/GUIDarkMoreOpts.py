@@ -34,6 +34,7 @@ from GUIFileBrowser         import *
 from PlotImgSpe             import *
 import CSPAD2x2Image        as     cspad2x2img
 import CSPADImage           as     cspadimg
+import RegDBUtils           as     ru
 
 #---------------------
 #  Class definition --
@@ -54,6 +55,8 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
 
         self.parent     = parent
         self.run_number = run_number
+        self.instr_name = cp.instr_name
+        self.exp_name   = cp.exp_name
         self.det_name   = cp.det_name
         self.calib_dir  = cp.calib_dir
 
@@ -203,8 +206,11 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         self.exportLocalPars()
 
         #cp.blsp.parse_batch_log_peds_scan()
-        cp.blsp.print_list_of_types_and_sources()
+        #cp.blsp.print_list_of_types_and_sources()
 
+        txt = ru.txt_of_detectors(self.instr_name.value(), self.exp_name.value(), int(self.run_number))
+
+        logger.info(txt, __name__)
 
 
     def on_but_flst(self):

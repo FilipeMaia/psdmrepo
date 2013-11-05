@@ -73,6 +73,16 @@ def intOrNone(value):
 
 #-----------------------------
 
+def list_of_int_from_list_of_str(list_in):
+    """Converts  ['0001', '0202', '0203', '0204',...] to [1, 202, 203, 204,...]
+    """
+    list_out = []
+    for item in list_in :
+        list_out.append(int(item))
+    return list_out
+
+#-----------------------------
+
 
 def create_directory(dir) : 
     if os.path.exists(dir) :

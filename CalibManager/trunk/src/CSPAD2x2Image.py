@@ -31,10 +31,12 @@ def test_plot_for_cspad2x2_coords(calib_path='.', run_num=0) :
 #------------------------------
 
 def get_cspad2x2_non_corrected_image_for_raw_data_array(arr) :
-    if arr.shape != (185,388,2) :
+    if not (arr.shape == (185,388,2) or arr.shape == (185*388*2,)) :
         msg = 'Non-expected array shape for cspad2x2: %s' % arr.shape
         print msg
         return None
+
+    arr.shape = (185,388,2)
     
     coord = CSPAD2x2PixCoords()
     iX,iY = coord.get_cspad2x2_pix_coordinate_arrays_shapeed_as_data_pix ()
