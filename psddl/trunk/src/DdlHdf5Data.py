@@ -266,8 +266,8 @@ class DdlHdf5Data ( object ) :
         for schema in type.h5schemas:
             self._genSchema(type, schema)
 
-        # if all schemas have skip-proxy tag stop here
-        if all('skip-proxy' in schema.tags for schema in type.h5schemas): return
+        # if all schemas have embedded tag stop here
+        if all('embedded' in schema.tags for schema in type.h5schemas): return
 
         psanatypename = type.fullName('C++', self.psana_ns)
 

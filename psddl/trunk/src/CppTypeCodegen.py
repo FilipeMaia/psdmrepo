@@ -518,9 +518,9 @@ class CppTypeCodegen ( object ) :
             if init: initlist.append(T("$attr($init)")(attr=attr.name, init=init))
 
         # do we need generate definition too?
-        if 'c++-definition' in ctor.tags:
+        if 'force_definition' in ctor.tags:
             genDef = True
-        elif 'no-c++-definition' in ctor.tags:
+        elif 'external' in ctor.tags:
             genDef = False
         else:
             # generate definition only if all destinations are known
