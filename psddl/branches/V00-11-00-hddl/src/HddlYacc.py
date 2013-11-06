@@ -661,7 +661,7 @@ class HddlYacc ( object ) :
         ''' attribute : tags H5ATTR IDENTIFIER tags ';'
                       | tags H5ATTR qidentifier IDENTIFIER tags ';'
         '''
-        if len(p) == 5:
+        if len(p) == 6:
             tags = p[1] + p[4]
             p[0] = dict(decl='h5attr', name=p[3], type=None, tags=tags, pos=self._makepos(p))
         else:

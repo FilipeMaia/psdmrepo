@@ -12,6 +12,9 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 2013-11-06 Andy Salnikov  (on branch V00-11-00-hddl)
+- add simple unit test for scanner/parser
+
+2013-11-06 Andy Salnikov  (on branch V00-11-00-hddl)
 - add hdf5 definitoions to parser
 - few fixes everywhere
 
