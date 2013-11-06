@@ -42,15 +42,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
 
     list_of_queues = ['psnehq', 'psfehq', 'psanacsq']
     list_of_instr  = ['AMO', 'SXR', 'XPP', 'XCS', 'CXI', 'MEC']
-    list_of_dets   = ['CSPAD', 'CSPAD2x2', 'Camera', 'Princeton', 'pnCCD'] #, 'Opal1k'
-    list_of_types  = ['Psana::CsPad::Data',
-                      'Psana::CsPad2x2::Element',
-                      'Psana::Camera::Frame',
-                      'Psana::Princeton::Frame',
-                      'Psana::PNCCD::FullFrame']
     list_of_show_dark = ['all', 'dark']
-    
-    dict_of_det_types = dict( zip(list_of_dets,list_of_types) )
 
     def __init__ ( self, fname=None ) :
         """Constructor.
@@ -268,6 +260,29 @@ class ConfigParametersForApp ( ConfigParameters ) :
 
         # GUIMaskEditor.py
         self.path_mask_img      = self.declareParameter( name='PATH_TO_MASK_IMAGE',        val_def='./work/*.txt',       type='str' )
+
+#-----------------------------
+    
+        self.list_of_dets   = ['CSPAD', 'CSPAD2x2', 'Camera', 'Princeton', 'pnCCD'] #, 'Opal1k'
+        self.list_of_types  = ['Psana::CsPad::Data',
+                               'Psana::CsPad2x2::Element',
+                               'Psana::Camera::Frame',
+                               'Psana::Princeton::Frame',
+                               'Psana::PNCCD::FullFrame']
+        self.dict_of_det_types = dict( zip(self.list_of_dets, self.list_of_types) )
+        
+#-----------------------------
+
+        det_cbx_states = [ (False, False ,'bool'), \
+                           (False, False ,'bool'), \
+                           (False, False ,'bool'), \
+                           (False, False ,'bool'), \
+                           (False, False ,'bool') ]
+        self.det_cbx_states_list = self.declareListOfPars( 'DETECTOR_CBX_STATE', det_cbx_states )
+
+#-----------------------------
+
+        self.list_of_det_pars = zip(self.list_of_dets, self.list_of_types, self.det_cbx_states_list)
 
 #-----------------------------
 

@@ -43,6 +43,7 @@ import subprocess # for subprocess.Popen
 from Logger import logger
 from PyQt4 import QtGui, QtCore
 from LogBook import message_poster
+from GUIPopupCheckList import *
 
 #-----------------------------
 # Imports for other modules --
@@ -641,6 +642,21 @@ def selectFromListInPopupMenu(list):
 
     if item_selected is None : return None
     else                     : return str(item_selected.text()) # QString -> str
+
+#----------------------------------
+
+def changeCheckBoxListInPopupMenu(list, win_title='Set check boxes'):
+    """Shows the list of check-boxes as a dialog pop-up menu and returns the (un)changed list"""
+    popupMenu = GUIPopupCheckList(None, list, win_title)
+    #popupMenu.move(QtCore.QPoint(50,50))
+    popupMenu.move(QtGui.QCursor.pos())
+    response = popupMenu.exec_()
+
+    if   response == QtGui.QDialog.Accepted : logger.info('New checkbox list is accepted', __name__)         
+    elif response == QtGui.QDialog.Rejected : logger.info('Will use old checkbox list', __name__)
+    else                                    : logger.error('Unknown response...', __name__)
+
+    #return list
 
 #----------------------------------
 

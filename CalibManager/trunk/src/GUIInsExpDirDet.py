@@ -65,7 +65,7 @@ class GUIInsExpDirDet ( QtGui.QWidget ) :
 
         self.butIns  = QtGui.QPushButton( self.instr_name.value() + self.char_expand )
         self.butExp  = QtGui.QPushButton( self.exp_name.value()   + self.char_expand )
-        self.butDet  = QtGui.QPushButton( self.det_name.value()   + self.char_expand )
+        self.butDet  = QtGui.QPushButton( 'Select' + self.char_expand )
         self.butBro  = QtGui.QPushButton( 'Browse' )
 
         self.ediDir = QtGui.QLineEdit  ( self.calib_dir.value() )
@@ -257,17 +257,40 @@ class GUIInsExpDirDet ( QtGui.QWidget ) :
         if path1 == path0 : return # is selected the same directory
         self.setDir(path1)
 
+
     def onButDet(self):
         #print 'onButDet'
-        item_selected = gu.selectFromListInPopupMenu(cp.list_of_dets)
-        if item_selected is None : return            # selection is cancelled
-        if item_selected == self.instr_name.value() : return # selected the same item  
+        #item_selected = gu.selectFromListInPopupMenu(cp.list_of_dets)
+        #if item_selected is None : return            # selection is cancelled
+        #if item_selected == self.instr_name.value() : return # selected the same item  
+        #self.setDet(item_selected)
+        
+        list_of_cbox = []
+        #for det in cp.list_of_dets :
+        for det_name, det_data_type, det_cbx_state in cp.list_of_det_pars :
+            #print 'Detector list:', det_name, det_data_type, det_cbx_state.value()    
+            list_of_cbox.append([det_name, det_cbx_state.value()])
 
-        self.setDet(item_selected)
-        self.setStyleButtons()
+        #list_of_cbox_out = gu.changeCheckBoxListInPopupMenu(list_of_cbox, win_title='Select Detectors')
+        gu.changeCheckBoxListInPopupMenu(list_of_cbox, win_title='Select Detectors')
+
+        str_of_detectors = ''
+
+        for [name,state],state_par in zip(list_of_cbox, cp.det_cbx_states_list) :
+            #print  '%s checkbox is in state %s' % (name.ljust(10), state)
+            state_par.setValue(state)
+            if state : str_of_detectors += name + ' '
+
+        self.det_name.setValue(str_of_detectors.rstrip(' '))
+
+        self.setDet()
+        #self.setStyleButtons()
+
+
 
     def onEdiDir(self):
         pass
+
 
     def setIns(self, txt='Select'):
         self.instr_name.setValue( txt )
@@ -290,20 +313,21 @@ class GUIInsExpDirDet ( QtGui.QWidget ) :
 
     def setDet(self, txt='Select'):
         
-        self.det_name.setValue(txt)
-        self.butDet.setText( txt + self.char_expand)
-        #if txt == 'Select' : self.list_of_exp = None        
-        logger.info('Selected detector: ' + str(txt), __name__)
+        #self.butDet.setText( 'Select' + self.char_expand )
+        #self.det_name.setValue(txt)
+        #self.butDet.setText( txt + self.char_expand)
 
-        if cp.guistatus is not None : cp.guistatus.updateStatusInfo()
+        #if txt == 'Select' : self.list_of_exp = None        
+        logger.info('Selected detector(s): ' + self.det_name.value(), __name__)
+
+        if cp.guistatus is not None :
+            cp.guistatus.updateStatusInfo()
 
         if cp.guidarklist is not None :
-
             cp.guidarklist.updateList()
 
-            #if txt=='Select' or txt != self.det_name.value() : cp.guidarklist.setRun('Select')            
-            if txt=='Select' : cp.guidarklist.setFieldsEnabled(False)
-            else             : cp.guidarklist.setFieldsEnabled(True)
+            #if txt=='Select' : cp.guidarklist.setFieldsEnabled(False)
+            #else             : cp.guidarklist.setFieldsEnabled(True)
 
 #-----------------------------
 

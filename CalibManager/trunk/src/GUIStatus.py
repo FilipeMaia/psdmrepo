@@ -157,47 +157,14 @@ class GUIStatus ( QtGui.QGroupBox ) :
         #if self.current_tab.value() == cp.guitabs.list_of_tabs[0] : ctype='pedestals'
         
         #msg = 'From %s to %s use dark run %s' % (self.str_run_from.value(), self.str_run_to.value(), self.str_run_number.value())
-        msg = gu.get_text_content_of_calib_dir_for_detector(path=self.calib_dir.value(), det=self.det_name.value(), calib_type=ctype)
+
+        msg = 'Selected detector(s): %s' % self.det_name.value()
+        for det_name in self.det_name.value().split(' ') :
+            msg += '\n' + gu.get_text_content_of_calib_dir_for_detector(path=self.calib_dir.value(), det=det_name, calib_type=ctype)
+
         self.setStatusMessage(msg)
 
 
-#    def setStatus(self, status_index=0, msg=''):
-#        list_of_states = ['Good','Warning','Alarm']
-#        if status_index == 0 : self.tit_status.setStyleSheet(cp.styleStatusGood)
-#        if status_index == 1 : self.tit_status.setStyleSheet(cp.styleStatusWarning)
-#        if status_index == 2 : self.tit_status.setStyleSheet(cp.styleStatusAlarm)
-
-#        #self.tit_status.setText('Status: ' + list_of_states[status_index] + msg)
-#        self.tit_status.setText(msg)
-
-
-#    def statusOfDir(self, dir, list_expected=None) :
-#        msg = '%s' % dir
-#        if not os.path.exists(dir) :
-#            msg += ' DOES NOT EXIST'
-#            self.setStatus(2,msg)
-#            self.setStatusMessage('DOES NOT EXIST !!!')
-#            self.guistatustable.clearTable()
-#        else :
-#            msg += ' IS AVAILABLE'
-#            self.setStatus(0,msg)
-#
-#            list = sorted(os.listdir(dir))
-#            list_of_files = []
-#            for name in list :
-#                path = os.path.join(dir,name)
-#                #print path
-#                list_of_files.append(path)
-                
-#            #print list_dir
-
-#            msgw = '# of entries %i:\n' % len(list)
-#            #for name in list :
-#            #    msgw += '\n   %s' % name
-
-#            self.setStatusMessage(msgw)
-#            self.guistatustable.makeTable(list_of_files, list_expected)
-#            #self.guistatustable.setTableItems()
 
 #-----------------------------
 

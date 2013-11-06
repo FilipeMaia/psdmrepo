@@ -3,7 +3,7 @@
 #  $Id$
 #
 # Description:
-#  Module GUIPopupChecklist...
+#  Module GUIPopupCheckList...
 #
 #------------------------------------------------------------------------
 
@@ -34,32 +34,23 @@ from ConfigParametersForApp import cp
 #  Class definition --
 #---------------------
 
+class GUIPopupCheckList(QtGui.QDialog) :
+    """Gets list of item for checkbox GUI in format [['name1',false], ['name2',true], ..., ['nameN',false]], 
+    and modify this list in popup dialog gui.
+    """
 
-class GUIPopupChecklist(QtGui.QDialog) :
-
-    def __init__(self, parent=None, list_of_items_in=[]):
+    def __init__(self, parent=None, list_in_out=[], win_title='Set check boxes'):
         QtGui.QDialog.__init__(self,parent)
         #self.setGeometry(20, 40, 500, 200)
-        self.setWindowTitle('Send message to ELog')
+        self.setWindowTitle(win_title)
         self.setFrame()
  
         #self.setModal(True)
+        self.list_in_out = list_in_out
 
         self.vbox = QtGui.QVBoxLayout()
 
-
-        self.list_of_items = []
-
-        for k,v in list_of_items_in :
-        
-            cbx = QtGui.QCheckBox(k) 
-            if v : cbx.setCheckState(QtCore.Qt.Checked)
-            self.connect( cbx, QtCore.SIGNAL('stateChanged(int)'), self.onCBox)
-
-            self.list_of_items.append([cbx, k, v]) 
-
-            self.vbox.addWidget(cbx)
-
+        self.make_gui_checkbox()
 
         self.but_cancel = QtGui.QPushButton('&Cancel') 
         self.but_apply  = QtGui.QPushButton('&Apply') 
@@ -71,28 +62,36 @@ class GUIPopupChecklist(QtGui.QDialog) :
         self.connect( self.but_apply,  QtCore.SIGNAL('clicked()'), self.onApply )
 
         self.hbox = QtGui.QHBoxLayout()
-        #self.hbox.addStretch(1)
         self.hbox.addWidget(self.but_cancel)
         self.hbox.addWidget(self.but_apply)
         self.hbox.addStretch(1)
 
-        #self.vbox.addWidget(self.widg_pars)
         self.vbox.addLayout(self.hbox)
         self.setLayout(self.vbox)
 
         self.but_cancel.setFocusPolicy(QtCore.Qt.NoFocus)
-        #self.but_apply.setFocusPolicy(QtCore.Qt.NoFocus)
-        #self.but_apply.setFocus()
 
         self.setStyle()
         self.showToolTips()
 
 #-----------------------------  
 
+    def make_gui_checkbox(self) :
+        self.dict_of_items = {}
+        for k,[name,state] in enumerate(self.list_in_out) :        
+            cbx = QtGui.QCheckBox(name) 
+            if state : cbx.setCheckState(QtCore.Qt.Checked)
+            else     : cbx.setCheckState(QtCore.Qt.Unchecked)
+            self.connect(cbx, QtCore.SIGNAL('stateChanged(int)'), self.onCBox)
+            self.vbox.addWidget(cbx)
+
+            self.dict_of_items[cbx] = [k,name,state] 
+
+#-----------------------------  
+
     def showToolTips(self):
         self.but_apply.setToolTip('Mouse click on this button or Alt-S \nor "Enter" submits message to ELog')
         self.but_cancel.setToolTip('Mouse click on this button \nor Alt-C cancels submission...')
-        #self.cbx_cntl.setToolTip('Lock/unlock top row \nof control buttons')
         
     def setFrame(self):
         self.frame = QtGui.QFrame(self)
@@ -103,7 +102,7 @@ class GUIPopupChecklist(QtGui.QDialog) :
         #self.frame.setVisible(False)
 
     def setStyle(self):
-        self.setFixedWidth(500)
+        self.setFixedWidth(200)
         self.setStyleSheet(cp.styleBkgd)
         self.but_cancel.setStyleSheet(cp.styleButton)
         self.but_apply.setStyleSheet(cp.styleButton)
@@ -121,42 +120,56 @@ class GUIPopupChecklist(QtGui.QDialog) :
         #try    : self.widg_pars.close()
         #except : pass
 
-    def onCBox(self, state):
+    #def event(self, event):
+    #    print 'Event happens...:', event
 
-        for cbx,k,v in self.list_of_items :
+    
+    def onCBox(self, tristate):
+        for cbx in self.dict_of_items.keys() :
             if cbx.hasFocus() :
-                msg = 'onCBox: k:%s, hasFocus: %s, isChecked: %s, state %s'%( k, cbx.hasFocus(), cbx.isChecked(), state)
-                lstate = cbx.isChecked()
-                print msg
-                #logger.info(msg, __name__)
-        
-        # str(self.cbx_cntl.checkState())
-        # cbx_cntl.isChecked()
-        #logger.info('onCBox: control lock state: ', __name__)
+                k,name,state = self.dict_of_items[cbx]
+                state_new = cbx.isChecked()
+                msg = 'onCBox: Checkbox #%d:%s - state is changed to %s, tristate=%s'%(k, name, state_new, tristate)
+                #print msg
+                logger.debug(msg, __name__)
+                self.dict_of_items[cbx] = [k,name,state_new]
+
 
     def onCancel(self):
         logger.debug('onCancel', __name__)
         self.reject()
-        #self.close()
+
 
     def onApply(self):
-        logger.info('onApply', __name__)  
+        logger.debug('onApply', __name__)  
+        self.fill_output_list()
         self.accept()
- 
+
+
+    def fill_output_list(self):
+        """Fills output list"""
+        for cbx,[k,name,state] in self.dict_of_items.iteritems() :
+            self.list_in_out[k] = [name,state]
+
 #-----------------------------
 
 if __name__ == "__main__" :
 
     app = QtGui.QApplication(sys.argv)
 
-    list_of_items = [['A',True], ['B', False], ['C', True], ['D', False]]
+    list_in = [['CSPAD1',True], ['CSPAD2x21', False], ['pNCCD1', True], ['Opal1', False], \
+               ['CSPAD2',True], ['CSPAD2x22', False], ['pNCCD2', True], ['Opal2', False]]
+
+    for name,state in list_in : print  '%s checkbox is in state %s' % (name.ljust(10), state) 
     
-    w = GUIPopupChecklist (None, list_of_items)
+    w = GUIPopupCheckList (None, list_in)
     #w.show()
     resp=w.exec_()
     print 'resp=',resp
     print 'QtGui.QDialog.Rejected: ', QtGui.QDialog.Rejected
     print 'QtGui.QDialog.Accepted: ', QtGui.QDialog.Accepted
+
+    for name,state in list_in : print  '%s checkbox is in state %s' % (name.ljust(10), state) 
 
     #app.exec_()
 

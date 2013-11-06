@@ -64,15 +64,21 @@ class BatchLogScanParser :
 
         if self.is_parsed and self.path == fnm.path_peds_scan_batch_log() : return
 
-        if self.det_name.value() == 'Select' : return
+        if self.det_name.value() == self.det_name.value_def() : return
+
+        self.list_of_sources = []
+        self.list_of_types   = []
 
         self.path = fnm.path_peds_scan_batch_log()
-        self.pattern = self.dict_of_det_types[self.det_name.value()]
 
-        #print 'Parse file: %s for pattern: %s' % (self.path, self.pattern)
+        for det_name in self.det_name.value().split(' ') :
 
-        #self.print_dict_of_det_types()
-        self.parse_scan_log()
+            self.pattern = self.dict_of_det_types[det_name]
+
+            #print 'Parse file: %s for pattern: %s' % (self.path, self.pattern)
+
+            #self.print_dict_of_det_types()
+            self.parse_scan_log()
         #self.print_list_of_types_and_sources()
         self.is_parsed = True
         
@@ -81,13 +87,10 @@ class BatchLogScanParser :
     def parse_scan_log (self) :
 
         list_of_found_lines  = []
-        self.list_of_sources = []
-        self.list_of_types   = []
 
         if not os.path.lexists(self.path) :
             logger.debug('The requested scan log file: ' + self.path + ' is not available.', __name__)         
             return
-
 
         fin = open(self.path, 'r')
         for line in fin :

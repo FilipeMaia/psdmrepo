@@ -97,6 +97,10 @@ class GUIDarkList ( QtGui.QWidget ) :
 
         #self.dict_run_isdark = ru.dict_runnum_dark (cp.instr_name.value(), cp.exp_name.value(), self.list_of_run_nums)
         #print 'self.dict_run_isdark = ', self.dict_run_isdark
+        #print 'Request calibration runs for inst: %s  experiment: %s' % (cp.instr_name.value(), cp.exp_name.value()) 
+
+        if cp.instr_name.value() == cp.instr_name.value_def() : return
+        if cp.exp_name  .value() == cp.exp_name  .value_def() : return
 
         self.dict_run_recs = ru.calibration_runs (cp.instr_name.value(), cp.exp_name.value())
         #print 'self.dict_run_recs = ', self.dict_run_recs
