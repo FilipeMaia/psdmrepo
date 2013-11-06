@@ -131,8 +131,6 @@ class DdlDumpHddl ( object ) :
         tags = _fmttags(tags)
 
         # open package
-        if pkg.comment: 
-            print >>self.out, T('""" $comment """')[pkg]
         print >>self.out, T("@package $name $tags {")(name=pkg.name, tags=tags)
 
         # constants
@@ -160,13 +158,13 @@ class DdlDumpHddl ( object ) :
                     self._genH5Schema(schema)
 
         # close package
-        print >>self.out, T("} // @package $name")[pkg]
+        print >>self.out, T("} //- @package $name")[pkg]
 
     def _genConst(self, const):
         
         if const.comment:
-            print >>self.out, T('  """ $comment """')[const]
-        print >>self.out, T("  @const int $name = $value;")[const]
+            print >>self.out, T("  /* $comment */")[const]
+        print >>self.out, T("  @const int32_t $name = $value;")[const]
 
 
     def _genEnum(self, enum):
@@ -174,15 +172,15 @@ class DdlDumpHddl ( object ) :
         if not enum.name: return
 
         base = enum.base.name
-        if enum.comment: 
-            print >>self.out, T(('  """ $comment """'))[enum]
+        if enum.comment:
+            print >>self.out, T("  /* $comment */")[enum]
         print >>self.out, T("  @enum $name ($base) {")(name=enum.name, base=base)
         
         for const in enum.constants() :
             val = ""
             if const.value is not None : val = " = " + const.value
             doc = ""
-            if const.comment: doc = T(('  """ $comment """'))[const]
+            if const.comment: doc = T(' /* $comment */')[const]
             print >>self.out, T("    $name$value,$doc")(name=const.name, value=val, doc=doc)
         print >>self.out, "  }"
 
@@ -200,7 +198,7 @@ class DdlDumpHddl ( object ) :
         if type.external: tags.append('external')
         if type.value_type: tags.append('value_type')
         if 'config-type' in type.tags: tags.append('config_type')
-        if 'c++-name' in type.tags: tags.append('cpp_name({0})'.format(pkg.tags['c++-name']))
+        if 'c++-name' in type.tags: tags.append('cpp_name("{0}")'.format(pkg.tags['c++-name']))
         if 'no-sizeof' in type.tags: tags.append('no_sizeof')
         if type.pack: tags.append('pack({0})'.format(type.pack))
         if type.xtcConfig:
@@ -213,7 +211,7 @@ class DdlDumpHddl ( object ) :
         if type.base : base = T("($name)")[type.base]
 
         # start class decl
-        if type.comment: print >>self.out, T('""" $comment """')[type]
+        if type.comment: print >>self.out, T("/* $comment */")[type]
         print >>self.out, T("@type $name$base")(name=type.name, base=base)
         if tags: print >>self.out, "  " + tags
         print >>self.out, "{"
@@ -254,7 +252,7 @@ class DdlDumpHddl ( object ) :
         else:
             typename = attr.type.name
             
-        comment = T('\t""" $comment """')[attr] if attr.comment else ''
+        comment = T("\t/* $comment */")[attr] if attr.comment else ''
         method = T(" -> $name")[attr.accessor] if attr.accessor else ''
         
         tags = []
@@ -278,7 +276,7 @@ class DdlDumpHddl ( object ) :
                 typename = bf.type.name
                 name = bf.name
                 method = T(" -> $name")[bf.accessor] if bf.accessor else ''
-                comment = T('\t""" $comment """')[bf] if bf.comment else ''
+                comment = T("\t/* $comment */")[bf] if bf.comment else ''
                 size = bf.size
 
                 print >>self.out, T("    $typename $name:$size$method;$comment")(locals())
@@ -314,7 +312,7 @@ class DdlDumpHddl ( object ) :
         args = ', '.join(args)
         
         print >>self.out, ""
-        if meth.comment: print >>self.out, T('  """ $comment """')[meth]
+        if meth.comment: print >>self.out, T("  /* $comment */")[meth]
         name = meth.name
 
         if meth.code:
@@ -388,12 +386,12 @@ class DdlDumpHddl ( object ) :
         arginits = ', '.join(arginits)
         
         print >>self.out, ""
-        if ctor.comment: print >>self.out, T(('  """ $comment """'))[ctor]
+        if ctor.comment: print >>self.out, T("  /* $comment */")[ctor]
 
         if 'auto' in ctor.tags:
             print >>self.out, T("  @init()$tags;")(locals())
         elif arginits:
-            print >>self.out, T("  @init($args)$tags\n    $arginits;")(locals())
+            print >>self.out, T("  @init($args)\n    $arginits$tags;")(locals())
         else:
             print >>self.out, T("  @init($args)$tags;")(locals())
 

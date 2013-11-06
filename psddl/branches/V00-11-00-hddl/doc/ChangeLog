@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2013-11-06 Andy Salnikov  (on branch V00-11-00-hddl)
+- add hdf5 definitoions to parser
+- few fixes everywhere
+
 2013-11-05 Andy Salnikov  (on branch V00-11-00-hddl)
 - first version of lexer and parser
 

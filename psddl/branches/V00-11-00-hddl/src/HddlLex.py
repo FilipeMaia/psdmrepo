@@ -57,6 +57,8 @@ class HddlLex(object):
         else:
             kw['reflags'] = kw['reflags'] | re.DOTALL
         self.lexer = lex.lex(module=self, **kw)
+        
+        self.comments = []  # list of (lexpos, lineno, comment) tuple
 
     literals = ".,;{}[]()-+=*/:<>?&%!~|"
 
@@ -71,6 +73,7 @@ class HddlLex(object):
         '@h5schema' : 'H5SCHEMA',
         '@dataset'  : 'H5DS',
         '@attribute': 'H5ATTR',
+        'operator'  : 'OPERATOR',
     }
 
     # List of token names.
@@ -84,46 +87,51 @@ class HddlLex(object):
         'H5SCHEMA',
         'H5DS',
         'H5ATTR',
+        'OPERATOR',
         'STRING',
         'L2BRACKET', 'R2BRACKET',
         'LRBRACKET',
         'RARROW',
         'LSHIFT', 'RSHIFT',
+        'EQ', 'LE', 'GE',
         'NUMBER',
         'IDENTIFIER',
         'CODEBLOCK',
         'SIZE_EXPR',
         'COMMENT',
         'COMMENTCPP',
-        'DOCSTRING1', 'DOCSTRING2'
+        'DOCSTRING',
     )
 
     # Regular expression rules for simple tokens
     t_RARROW = r'->'
     t_LSHIFT = r'<<'
     t_RSHIFT = r'>>'
+    t_EQ = r'=='
+    t_LE = r'<='
+    t_GE = r'>='
     
     # normal comments are returned after stripping delimiters 
     def t_COMMENTCPP(self, t):
-        r'//([^\n]*)'
-        pass
+        r'///*([^\n]*)'
+        t.value = t.value.lstrip('/')
+        # remember comment position for later matching
+        self.comments.append((t.lexpos, t.lexer.lineno, t.value))
+        return None
 
     # normal comments are returned after stripping delimiters 
     def t_COMMENT(self, t):
         r'/\*(.*?)\*/'
         t.lexer.lineno += t.value.count("\n")
-        pass
+        t.value = t.value.strip('/')
+        t.value = t.value.strip('*')
+        # remember comment position for later matching
+        self.comments.append((t.lexpos, t.lexer.lineno, t.value))
+        return None
 
     # doc string 
-    def t_DOCSTRING1(self, t):
-        r"'''.*?'''"
-        t.lexer.lineno += t.value.count("\n")
-        t.value = t.value[3:-3]
-        return t
-
-    # doc string 
-    def t_DOCSTRING2(self, t):
-        r'""".*?"""'
+    def t_DOCSTRING(self, t):
+        r'\#.*?\#'
         t.lexer.lineno += t.value.count("\n")
         t.value = t.value[3:-3]
         return t
@@ -138,8 +146,8 @@ class HddlLex(object):
 
     # numbers are converted to integers 
     def t_NUMBER(self, t):
-        r'\d+'
-        t.value = int(t.value)
+        r'[-]?[ \t]*(0x[0-9a-fA-F]+|\d+)'
+        t.value = int(t.value, 0)
         return t
 
     # quoted string 
