@@ -66,6 +66,7 @@ class image_save_in_file (object) :
         #logging.info( "image_save_in_file.beginrun() called" )
 
         self.run   = evt.run()
+        self.exp   = env.experiment()
         self.evnum = 0
 
 
@@ -97,7 +98,7 @@ class image_save_in_file (object) :
         if self.m_print_bits & 8 : self.print_part_of_image_array()
 
         name_pref, name_ext = os.path.splitext(self.m_ofname)
-        fname = '%s-r%04d-ev%06d%s' % (name_pref, self.run, self.evnum, name_ext)
+        fname = '%s-%s-r%04d-ev%06d%s' % (name_pref, self.exp, self.run, self.evnum, name_ext)
         if self.m_print_bits & 8 :
             msg = 'Save image in file = %s' % fname
             print msg

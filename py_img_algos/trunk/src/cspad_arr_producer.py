@@ -242,8 +242,8 @@ class cspad_arr_producer (object) :
             pass
 
         #if env.fwkName() == 'pyana':
-        self.list_of_sections = map(self.config.sections, range(4)) 
-        msg +=  '\n  sections      : %s' % str(self.list_of_sections)
+        #self.list_of_sections = map(self.config.sections, range(4)) 
+        #msg +=  '\n  sections      : %s' % str(self.list_of_sections)
 
         #logging.info( msg )
         print msg
