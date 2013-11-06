@@ -592,6 +592,8 @@
 
             <xtc-config name="Acqiris.ConfigV1" />
 
+            <tag name="no-sizeof"/>
+
             <attribute name="_config" type="Acqiris.ConfigV1" accessor="config">
             </attribute>
 

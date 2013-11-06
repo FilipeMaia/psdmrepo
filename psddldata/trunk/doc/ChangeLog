@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-46
+2013-10-06 Andy
+- add "no-sizeof" tag to few classes to suppress warnings
+
 Tag: V00-04-45
 2013-10-01 Andy
 - BldDataSpectrometerV0: make it non-value-type and add auto constructor

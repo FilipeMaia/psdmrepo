@@ -998,6 +998,8 @@
 
             CsPad data from whole detector.
 
+            <tag name="no-sizeof"/>
+
             <xtc-config name="ConfigV2" />
             <xtc-config name="ConfigV3" />
             <xtc-config name="ConfigV4" />

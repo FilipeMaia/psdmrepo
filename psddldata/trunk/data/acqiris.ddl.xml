@@ -331,6 +331,8 @@
             Class containing waveform data (DataDescV1Elem) for all channels.
 
             <xtc-config name="ConfigV1" />
+            
+            <tag name="no-sizeof"/>
 
             <attribute name="_data" type="DataDescV1Elem" shape="{xtc-config}.nbrChannels()" 
                 accessor="data" shape_method="data_shape">
