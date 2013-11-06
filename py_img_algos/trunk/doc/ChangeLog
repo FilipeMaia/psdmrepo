@@ -11,6 +11,12 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-04
+2013-11-06 Mikhail S. Dubrovin
+- cspad_arr_producer.py - commented sections in print 
+	(which are not available in Cspad.ConfigV5)
+- image_save_in_file.py - add experiment in the output file name
+
 Tag: V00-00-03
 2013-10-22 Mikhail S. Dubrovin
 - fix a few minor things in order to make it consistent with description at confluence
