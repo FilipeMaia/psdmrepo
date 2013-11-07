@@ -30,6 +30,8 @@
 #include "psddl_pds2psana/XtcConverter.h"
 #include "pdsdata/xtc/TransitionId.hh"
 #include "pdsdata/xtc/ClockTime.hh"
+#include "pdsdata/xtc/Damage.hh"
+#include "pdsdata/xtc/TypeId.hh"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -89,6 +91,12 @@ protected:
 
   /// Fill environment with datagram contents
   void fillEnv(const XtcInput::Dgram& dg, Env& env);
+  
+  /// determines if an xtc type should be stored in the event
+  bool eventDamagePolicy(Pds::Damage damage, enum Pds::TypeId::Type typeId);
+
+  /// determines if an xtc type should be stored in the config
+  bool configDamagePolicy(Pds::Damage damage);
 
 private:
 
@@ -108,6 +116,9 @@ private:
   bool m_l3tAcceptOnly;                               ///< If true then pass only events accepted by L3T
   unsigned long m_l1Count;                            ///< Number of events (L1Accept transitions) seen so far
   int m_simulateEOR;                                  ///< if non-zero then simulate endRun/stop
+  bool m_storeOutOfOrderDamage;                       ///< if false, do not parse Xtc Type, just report damage
+  bool m_storeUserEbeamDamage;                        ///< if true, make exception for user damage if for Ebeam
+  bool m_storeDamagedConfig;                          ///< if true, store damaged config
 };
 
 } // namespace PSXtcInput

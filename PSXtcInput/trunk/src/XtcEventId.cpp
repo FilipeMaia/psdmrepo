@@ -36,13 +36,14 @@ namespace PSXtcInput {
 //----------------
 // Constructors --
 //----------------
-XtcEventId::XtcEventId (int run, const PSTime::Time& time, unsigned fiducials, unsigned ticks, unsigned vector)
+XtcEventId::XtcEventId (int run, const PSTime::Time& time, unsigned fiducials, unsigned ticks, unsigned vector, unsigned control)
   : PSEvt::EventId()
   , m_run(run)
   , m_time(time)
   , m_fiducials(fiducials)
   , m_ticks(ticks)
   , m_vector(vector)
+  , m_control(control)
 {
 }
 
@@ -100,6 +101,15 @@ XtcEventId::vector() const
   return m_vector;
 }
 
+/**
+ *  @brief Returns control - alternate representation of Xtc header.
+ */
+unsigned
+XtcEventId::control() const
+{
+  return m_control;
+}
+
 /// check if two event IDs refer to the same event
 bool 
 XtcEventId::operator==(const EventId& other) const
@@ -119,7 +129,7 @@ void
 XtcEventId::print(std::ostream& os) const
 {
   os << "XtcEventId(run=" << m_run << ", time=" << m_time << ", fiducials=" << m_fiducials
-      << ", ticks=" << m_ticks << ", vector=" << m_vector << ")";
+     << ", ticks=" << m_ticks << ", vector=" << m_vector << ", control=" << m_control << ")";
 }
 
 } // namespace PSXtcInput

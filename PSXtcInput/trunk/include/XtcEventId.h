@@ -51,7 +51,7 @@ class XtcEventId : public PSEvt::EventId {
 public:
 
   // Default constructor
-  XtcEventId (int run, const PSTime::Time& time, unsigned fiducials, unsigned ticks, unsigned vector) ;
+  XtcEventId (int run, const PSTime::Time& time, unsigned fiducials, unsigned ticks, unsigned vector, unsigned control) ;
 
   // Destructor
   ~XtcEventId () ;
@@ -97,6 +97,8 @@ public:
    */
   virtual unsigned vector() const;
 
+  virtual unsigned control() const;
+
   /// check if two event IDs refer to the same event
   virtual bool operator==(const EventId& other) const;
   
@@ -116,6 +118,7 @@ private:
   unsigned m_fiducials;
   unsigned m_ticks;
   unsigned m_vector;
+  unsigned m_control;
 };
 
 } // namespace PSXtcInput

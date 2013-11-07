@@ -20,6 +20,7 @@
 //-----------------
 #include <algorithm>
 #include <iterator>
+#include <vector>
 #include <boost/make_shared.hpp>
 
 //-------------------------------
@@ -36,6 +37,8 @@
 #include "XtcInput/XtcFileName.h"
 #include "XtcInput/XtcIterator.h"
 #include "XtcInput/MergeMode.h"
+
+#include "PSEvt/DamageMap.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -99,7 +102,48 @@ XtcInputModuleBase::XtcInputModuleBase (const std::string& name)
   m_skipEvents = cfg.get("psana", "skip-events", 0UL);
   m_maxEvents = cfg.get("psana", "events", 0UL);
   m_skipEpics = cfg.get("psana", "skip-epics", true);
+  m_storeOutOfOrderDamage = cfg.get("psana", "store-out-of-order-damage", false); 
+  m_storeUserEbeamDamage = cfg.get("psana", "store-user-ebeam-damage", true); 
+  m_storeDamagedConfig = cfg.get("psana", "store-damaged-config", false); 
   m_l3tAcceptOnly = cfg.get("psana", "l3t-accept-only", true);
+}
+
+// return true if damage/type combo is good to store, false if we don't want it going in event.
+// note - always returns True for undamaged types, but we do not store all undamaged types (such as Xtc).
+bool XtcInputModuleBase::eventDamagePolicy(Pds::Damage damage, enum Pds::TypeId::Type typeId) {
+  if (damage.value() == 0) return true;
+
+  MsgLog(name(),debug,"eventDamagePolicy: nonzero damage=" << std::hex << damage.value() 
+         << " typeId=" << std::dec <<  typeId << " " << Pds::TypeId::name(typeId));
+
+  bool userDamageBitSet = (damage.value() & (1<<Pds::Damage::UserDefined));
+  uint32_t otherDamageBits = (damage.bits() & (~(1<<Pds::Damage::UserDefined)));
+  bool userDamageByteSet = damage.userBits();
+
+  if (not userDamageBitSet and userDamageByteSet) {
+    MsgLog(name(),warning,"UserDefined damage bit is *not* set but user bits are present: damage=" 
+           << std::hex << damage.value() << " typeId=" << typeId << Pds::TypeId::name(typeId));
+    return false;
+  }
+
+  bool userDamageOk = ((not userDamageBitSet and not userDamageByteSet) or 
+                       (userDamageBitSet and (typeId==Pds::TypeId::Id_EBeam) and m_storeUserEbeamDamage));
+  
+  bool onlyOutOfOrderInOtherBits = otherDamageBits == (1<<Pds::Damage::OutOfOrder);
+  if (userDamageOk) {
+    if (otherDamageBits == 0) return true;
+    if ((onlyOutOfOrderInOtherBits) and m_storeOutOfOrderDamage) return true;
+  }
+  MsgLog(name(),debug,"eventDamagePolicy: do not store, userDamageOk=" << userDamageOk 
+         << " only OutOfOrder in other bits=" << onlyOutOfOrderInOtherBits
+         << " store out of order=" <<m_storeOutOfOrderDamage);
+
+  return false;
+}
+
+bool XtcInputModuleBase::configDamagePolicy(Pds::Damage damage) {
+  if (damage.value() == 0 or m_storeDamagedConfig) return true;
+  return false;
 }
 
 //--------------
@@ -335,12 +379,33 @@ XtcInputModuleBase::fillEvent(const XtcInput::Dgram& dg, Event& evt, Env& env)
 
   Dgram::ptr dgptr = dg.dg();
   
+  boost::shared_ptr<PSEvt::DamageMap> damageMap = boost::make_shared<PSEvt::DamageMap>();
+  evt.put(damageMap);
   // Loop over all XTC contained in the datagram
   XtcInput::XtcIterator iter(&dgptr->xtc);
   while (Pds::Xtc* xtc = iter.next()) {
-      
-    boost::shared_ptr<Pds::Xtc> xptr(dgptr, xtc);
-    // call the converter which will fill event with data
+    const Pds::TypeId& typeId = xtc->contains;
+    const Pds::Damage damage = xtc->damage;
+    if (typeId.id() == Pds::TypeId::Any) {
+      if (damage.value()) {
+        damageMap->addSrcDamage(xtc->src,damage);
+      } else {
+        MsgLog(name(), warning, name() << ": unexpected - xtc type id is 'Any' but its damage=0");
+      }
+      continue;
+    }
+    std::vector<const std::type_info *> convertTypeInfoPtrs = m_cvt.getConvertTypeInfoPtrs(typeId);
+    for (unsigned idx=0; idx < convertTypeInfoPtrs.size(); ++idx) {
+      (*damageMap)[PSEvt::EventKey( convertTypeInfoPtrs[idx], xtc->src, "") ] = damage;
+    }
+    bool storeObject = eventDamagePolicy(damage, typeId.id());
+    if (not storeObject) {
+      MsgLog(name(),debug,name() << "damage = " << damage.value() << " typeId=" 
+             << typeId.id() << " src=" << xtc->src << " not storing in Event");
+      continue;
+    }
+
+    boost::shared_ptr<Pds::Xtc> xptr(dgptr, xtc);   
     m_cvt.convert(xptr, evt, env.configStore());
     
   }
@@ -363,7 +428,8 @@ XtcInputModuleBase::fillEventId(const XtcInput::Dgram& dg, Event& evt)
   unsigned fiducials = seq.stamp().fiducials();
   unsigned ticks = seq.stamp().ticks();
   unsigned vect = seq.stamp().vector();
-  boost::shared_ptr<PSEvt::EventId> eventId = boost::make_shared<XtcEventId>(run, evtTime, fiducials, ticks, vect);
+  unsigned control = seq.stamp().control();
+  boost::shared_ptr<PSEvt::EventId> eventId = boost::make_shared<XtcEventId>(run, evtTime, fiducials, ticks, vect, control);
   evt.put(eventId);
 }
 

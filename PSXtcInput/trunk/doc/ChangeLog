@@ -11,6 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-10-02
+2013-11-07 David Schneider
+- update XtcEventId to work with PSEvt V00-07-03
+- add DamageMap to Event, populate with xtc damage
+- add configurable DamagePolicy to decide when to store damaged xtc
+
 Tag: V00-10-01
 2013-10-24 Andy Salnikov
 - use datagram header data (env) to filter L3T events
