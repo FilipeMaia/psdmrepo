@@ -81,6 +81,13 @@ Hdf5EventId::vector() const
   return m_vector;
 }
 
+// Returns event control
+unsigned
+Hdf5EventId::control() const
+{
+  return m_control;
+}
+
 /// check if two event IDs refer to the same event
 bool
 Hdf5EventId::operator==(const EventId& other) const
@@ -100,7 +107,7 @@ void
 Hdf5EventId::print(std::ostream& os) const
 {
   os << "Hdf5EventId(run=" << m_run << ", time=" << m_time << ", fiducials=" << m_fiducials
-      << ", ticks=" << m_ticks << ", vector=" << m_vector << ")";
+     << ", ticks=" << m_ticks << ", vector=" << m_vector << ", control=" << m_control << ")";
 }
 
 } // namespace PSHdf5Input

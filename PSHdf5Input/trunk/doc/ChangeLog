@@ -12,6 +12,10 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 Tag: V00-02-00
+2013-11-06 Andy Salnikov
+- implemented control() in Hdf5EventId to work with V00-07-03 of PSEvt
+
+Tag: V00-02-00
 2013-10-07 Andy Salnikov
 - adding support for filtering rejected L3T events
 - rejected events are rejected by default, option psana.l3t-accept-only=0

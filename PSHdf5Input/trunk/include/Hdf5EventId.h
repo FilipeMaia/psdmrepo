@@ -52,8 +52,8 @@ namespace PSHdf5Input {
 class Hdf5EventId : public PSEvt::EventId {
 public:
 
-  Hdf5EventId (int run, const PSTime::Time& time, unsigned fiducials, unsigned ticks, unsigned vector)
-    : m_run(run), m_time(time), m_fiducials(fiducials), m_ticks(ticks), m_vector(vector) {}
+  Hdf5EventId (int run, const PSTime::Time& time, unsigned fiducials, unsigned ticks, unsigned vector, unsigned control)
+    : m_run(run), m_time(time), m_fiducials(fiducials), m_ticks(ticks), m_vector(vector), m_control(control) {}
 
   // Destructor
   virtual ~Hdf5EventId () ;
@@ -99,6 +99,13 @@ public:
    */
   virtual unsigned vector() const;
 
+  /**
+   *  @brief Returns alternative bit representation for Xtc headers
+   *
+   *  Is 0 if unknown
+   */
+  virtual unsigned control() const;
+
   /// check if two event IDs refer to the same event
   virtual bool operator==(const EventId& other) const;
 
@@ -118,7 +125,7 @@ private:
   unsigned m_fiducials;
   unsigned m_ticks;
   unsigned m_vector;
-
+  unsigned m_control;
 };
 
 } // namespace PSHdf5Input

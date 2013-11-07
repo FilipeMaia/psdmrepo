@@ -112,7 +112,7 @@ Hdf5CalibCycleIter::next()
       // make EventId out first item
       const Hdf5DatasetIterData& d = data.front();
       PSTime::Time time(d.sec, d.nsec);
-      eid = boost::make_shared<Hdf5EventId>(m_runNumber, time, d.fiducials, d.ticks, d.vector);
+      eid = boost::make_shared<Hdf5EventId>(m_runNumber, time, d.fiducials, d.ticks, d.vector, d.control);
     }
 
     res = Hdf5IterData(value_type::Event, eid);
