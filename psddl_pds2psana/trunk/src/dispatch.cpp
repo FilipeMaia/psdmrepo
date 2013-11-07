@@ -1822,5 +1822,692 @@ try {
 } catch (const PSEvt::ExceptionDuplicateKey& ex) {
   // catch exception for duplicated objects, ignore it
 } // end xtcConvert(...)
+
+
+std::vector<const std::type_info *> getXtcConvertTypeInfoPtrs(const Pds::TypeId &typeId) {
+  std::vector<const std::type_info *> typeIdPtrs;
+  switch (typeId.id()) {
+  case Pds::TypeId::Any:
+  case Pds::TypeId::Id_Xtc:
+  case Pds::TypeId::NumberOf:
+  case Pds::TypeId::Id_Epics:
+  case Pds::TypeId::Reserved1:
+  case Pds::TypeId::Reserved2:
+  case Pds::TypeId::Id_Index:
+  case Pds::TypeId::Id_XampsConfig:
+  case Pds::TypeId::Id_XampsElement:
+  case Pds::TypeId::Id_FexampConfig:
+  case Pds::TypeId::Id_FexampElement:
+  case Pds::TypeId::Id_PhasicsConfig:
+  case Pds::TypeId::Id_CspadCompressedElement:
+    break;
+  case Pds::TypeId::Id_AcqConfig:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::Acqiris::ConfigV1) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_AcqTdcConfig:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::Acqiris::TdcConfigV1) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_AcqTdcData:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::Acqiris::TdcDataV1) );
+      break;
+    case 32769:
+      typeIdPtrs.push_back( &typeid(Psana::Acqiris::TdcDataV1) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_AcqWaveform:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::Acqiris::DataDescV1) );
+      break;
+    case 32769:
+      typeIdPtrs.push_back( &typeid(Psana::Acqiris::DataDescV1) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_AliasConfig:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::Alias::ConfigV1) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_AndorConfig:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::Andor::ConfigV1) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_AndorFrame:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::Andor::FrameV1) );
+      break;
+    case 32769:
+      typeIdPtrs.push_back( &typeid(Psana::Andor::FrameV1) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_ControlConfig:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::ControlData::ConfigV1) );
+      break;
+    case 2:
+      typeIdPtrs.push_back( &typeid(Psana::ControlData::ConfigV2) );
+      break;
+    case 3:
+      typeIdPtrs.push_back( &typeid(Psana::ControlData::ConfigV3) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_Cspad2x2Config:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::CsPad2x2::ConfigV1) );
+      break;
+    case 2:
+      typeIdPtrs.push_back( &typeid(Psana::CsPad2x2::ConfigV2) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_Cspad2x2Element:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::CsPad2x2::ElementV1) );
+      break;
+    case 32769:
+      typeIdPtrs.push_back( &typeid(Psana::CsPad2x2::ElementV1) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_CspadConfig:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::CsPad::ConfigV1) );
+      break;
+    case 2:
+      typeIdPtrs.push_back( &typeid(Psana::CsPad::ConfigV2) );
+      break;
+    case 3:
+      typeIdPtrs.push_back( &typeid(Psana::CsPad::ConfigV3) );
+      break;
+    case 4:
+      typeIdPtrs.push_back( &typeid(Psana::CsPad::ConfigV4) );
+      break;
+    case 5:
+      typeIdPtrs.push_back( &typeid(Psana::CsPad::ConfigV5) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_CspadElement:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::CsPad::DataV1) );
+      break;
+    case 2:
+      typeIdPtrs.push_back( &typeid(Psana::CsPad::DataV2) );
+      break;
+    case 32769:
+      typeIdPtrs.push_back( &typeid(Psana::CsPad::DataV1) );
+      break;
+    case 32770:
+      typeIdPtrs.push_back( &typeid(Psana::CsPad::DataV2) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_DiodeFex:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::Lusi::DiodeFexV1) );
+      break;
+    case 32769:
+      typeIdPtrs.push_back( &typeid(Psana::Lusi::DiodeFexV1) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_DiodeFexConfig:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::Lusi::DiodeFexConfigV1) );
+      break;
+    case 2:
+      typeIdPtrs.push_back( &typeid(Psana::Lusi::DiodeFexConfigV2) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_EBeam:
+    switch(typeId.version()) {
+    case 0:
+      typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataEBeamV0) );
+      break;
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataEBeamV1) );
+      break;
+    case 2:
+      typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataEBeamV2) );
+      break;
+    case 3:
+      typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataEBeamV3) );
+      break;
+    case 4:
+      typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataEBeamV4) );
+      break;
+    case 32768:
+      typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataEBeamV0) );
+      break;
+    case 32769:
+      typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataEBeamV1) );
+      break;
+    case 32770:
+      typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataEBeamV2) );
+      break;
+    case 32771:
+      typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataEBeamV3) );
+      break;
+    case 32772:
+      typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataEBeamV4) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_EncoderConfig:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::Encoder::ConfigV1) );
+      break;
+    case 2:
+      typeIdPtrs.push_back( &typeid(Psana::Encoder::ConfigV2) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_EncoderData:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::Encoder::DataV1) );
+      break;
+    case 2:
+      typeIdPtrs.push_back( &typeid(Psana::Encoder::DataV2) );
+      break;
+    case 32769:
+      typeIdPtrs.push_back( &typeid(Psana::Encoder::DataV1) );
+      break;
+    case 32770:
+      typeIdPtrs.push_back( &typeid(Psana::Encoder::DataV2) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_EpicsConfig:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::Epics::ConfigV1) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_EvrConfig:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::EvrData::ConfigV1) );
+      break;
+    case 2:
+      typeIdPtrs.push_back( &typeid(Psana::EvrData::ConfigV2) );
+      break;
+    case 3:
+      typeIdPtrs.push_back( &typeid(Psana::EvrData::ConfigV3) );
+      break;
+    case 4:
+      typeIdPtrs.push_back( &typeid(Psana::EvrData::ConfigV4) );
+      break;
+    case 5:
+      typeIdPtrs.push_back( &typeid(Psana::EvrData::ConfigV5) );
+      break;
+    case 6:
+      typeIdPtrs.push_back( &typeid(Psana::EvrData::ConfigV6) );
+      break;
+    case 7:
+      typeIdPtrs.push_back( &typeid(Psana::EvrData::ConfigV7) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_EvrData:
+    switch(typeId.version()) {
+    case 3:
+      typeIdPtrs.push_back( &typeid(Psana::EvrData::DataV3) );
+      break;
+    case 32771:
+      typeIdPtrs.push_back( &typeid(Psana::EvrData::DataV3) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_EvrIOConfig:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::EvrData::IOConfigV1) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_FccdConfig:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::FCCD::FccdConfigV1) );
+      break;
+    case 2:
+      typeIdPtrs.push_back( &typeid(Psana::FCCD::FccdConfigV2) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_FEEGasDetEnergy:
+    switch(typeId.version()) {
+    case 0:
+      typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataFEEGasDetEnergy) );
+      break;
+    case 32768:
+      typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataFEEGasDetEnergy) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_FliConfig:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::Fli::ConfigV1) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_FliFrame:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::Fli::FrameV1) );
+      break;
+    case 32769:
+      typeIdPtrs.push_back( &typeid(Psana::Fli::FrameV1) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_Frame:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::Camera::FrameV1) );
+      break;
+    case 32769:
+      typeIdPtrs.push_back( &typeid(Psana::Camera::FrameV1) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_FrameFccdConfig:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::Camera::FrameFccdConfigV1) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_FrameFexConfig:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::Camera::FrameFexConfigV1) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_GMD:
+    switch(typeId.version()) {
+    case 0:
+      typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataGMDV0) );
+      break;
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataGMDV1) );
+      break;
+    case 32768:
+      typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataGMDV0) );
+      break;
+    case 32769:
+      typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataGMDV1) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_Gsc16aiConfig:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::Gsc16ai::ConfigV1) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_Gsc16aiData:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::Gsc16ai::DataV1) );
+      break;
+    case 32769:
+      typeIdPtrs.push_back( &typeid(Psana::Gsc16ai::DataV1) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_ImpConfig:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::Imp::ConfigV1) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_ImpData:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::Imp::ElementV1) );
+      break;
+    case 32769:
+      typeIdPtrs.push_back( &typeid(Psana::Imp::ElementV1) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_IpimbConfig:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::Ipimb::ConfigV1) );
+      break;
+    case 2:
+      typeIdPtrs.push_back( &typeid(Psana::Ipimb::ConfigV2) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_IpimbData:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::Ipimb::DataV1) );
+      break;
+    case 2:
+      typeIdPtrs.push_back( &typeid(Psana::Ipimb::DataV2) );
+      break;
+    case 32769:
+      typeIdPtrs.push_back( &typeid(Psana::Ipimb::DataV1) );
+      break;
+    case 32770:
+      typeIdPtrs.push_back( &typeid(Psana::Ipimb::DataV2) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_IpmFex:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::Lusi::IpmFexV1) );
+      break;
+    case 32769:
+      typeIdPtrs.push_back( &typeid(Psana::Lusi::IpmFexV1) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_IpmFexConfig:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::Lusi::IpmFexConfigV1) );
+      break;
+    case 2:
+      typeIdPtrs.push_back( &typeid(Psana::Lusi::IpmFexConfigV2) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_L3TConfig:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::L3T::ConfigV1) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_L3TData:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::L3T::DataV1) );
+      break;
+    case 32769:
+      typeIdPtrs.push_back( &typeid(Psana::L3T::DataV1) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_OceanOpticsConfig:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::OceanOptics::ConfigV1) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_OceanOpticsData:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::OceanOptics::DataV1) );
+      break;
+    case 32769:
+      typeIdPtrs.push_back( &typeid(Psana::OceanOptics::DataV1) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_Opal1kConfig:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::Opal1k::ConfigV1) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_OrcaConfig:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::Orca::ConfigV1) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_PhaseCavity:
+    switch(typeId.version()) {
+    case 0:
+      typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataPhaseCavity) );
+      break;
+    case 32768:
+      typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataPhaseCavity) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_PimImageConfig:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::Lusi::PimImageConfigV1) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_pnCCDconfig:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::PNCCD::ConfigV1) );
+      break;
+    case 2:
+      typeIdPtrs.push_back( &typeid(Psana::PNCCD::ConfigV2) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_pnCCDframe:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::PNCCD::FullFrameV1) );
+      typeIdPtrs.push_back( &typeid(Psana::PNCCD::FramesV1) );
+      break;
+    case 32769:
+      typeIdPtrs.push_back( &typeid(Psana::PNCCD::FullFrameV1) );
+      typeIdPtrs.push_back( &typeid(Psana::PNCCD::FramesV1) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_PrincetonConfig:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::Princeton::ConfigV1) );
+      break;
+    case 2:
+      typeIdPtrs.push_back( &typeid(Psana::Princeton::ConfigV2) );
+      break;
+    case 3:
+      typeIdPtrs.push_back( &typeid(Psana::Princeton::ConfigV3) );
+      break;
+    case 4:
+      typeIdPtrs.push_back( &typeid(Psana::Princeton::ConfigV4) );
+      break;
+    case 5:
+      typeIdPtrs.push_back( &typeid(Psana::Princeton::ConfigV5) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_PrincetonFrame:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::Princeton::FrameV1) );
+      break;
+    case 2:
+      typeIdPtrs.push_back( &typeid(Psana::Princeton::FrameV2) );
+      break;
+    case 32769:
+      typeIdPtrs.push_back( &typeid(Psana::Princeton::FrameV1) );
+      break;
+    case 32770:
+      typeIdPtrs.push_back( &typeid(Psana::Princeton::FrameV2) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_PrincetonInfo:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::Princeton::InfoV1) );
+      break;
+    case 32769:
+      typeIdPtrs.push_back( &typeid(Psana::Princeton::InfoV1) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_QuartzConfig:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::Quartz::ConfigV1) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_SharedAcqADC:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataAcqADCV1) );
+      break;
+    case 32769:
+      typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataAcqADCV1) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_SharedIpimb:
+    switch(typeId.version()) {
+    case 0:
+      typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataIpimbV0) );
+      break;
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataIpimbV1) );
+      break;
+    case 32768:
+      typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataIpimbV0) );
+      break;
+    case 32769:
+      typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataIpimbV1) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_SharedPim:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataPimV1) );
+      break;
+    case 32769:
+      typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataPimV1) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_Spectrometer:
+    switch(typeId.version()) {
+    case 0:
+      typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataSpectrometerV0) );
+      break;
+    case 32768:
+      typeIdPtrs.push_back( &typeid(Psana::Bld::BldDataSpectrometerV0) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_TimepixConfig:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::Timepix::ConfigV1) );
+      break;
+    case 2:
+      typeIdPtrs.push_back( &typeid(Psana::Timepix::ConfigV2) );
+      break;
+    case 3:
+      typeIdPtrs.push_back( &typeid(Psana::Timepix::ConfigV3) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_TimepixData:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::Timepix::DataV2) );
+      break;
+    case 2:
+      typeIdPtrs.push_back( &typeid(Psana::Timepix::DataV2) );
+      break;
+    case 32769:
+      typeIdPtrs.push_back( &typeid(Psana::Timepix::DataV2) );
+      break;
+    case 32770:
+      typeIdPtrs.push_back( &typeid(Psana::Timepix::DataV2) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_TM6740Config:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::Pulnix::TM6740ConfigV1) );
+      break;
+    case 2:
+      typeIdPtrs.push_back( &typeid(Psana::Pulnix::TM6740ConfigV2) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_TwoDGaussian:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::Camera::TwoDGaussianV1) );
+      break;
+    case 32769:
+      typeIdPtrs.push_back( &typeid(Psana::Camera::TwoDGaussianV1) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_UsdUsbConfig:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::UsdUsb::ConfigV1) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_UsdUsbData:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::UsdUsb::DataV1) );
+      break;
+    case 32769:
+      typeIdPtrs.push_back( &typeid(Psana::UsdUsb::DataV1) );
+      break;
+    } // end version switch
+    break;
+  }  // typeId.id() switch statement
+  return typeIdPtrs;
+}
+
+
 } // namespace psddl_pds2psana
 
