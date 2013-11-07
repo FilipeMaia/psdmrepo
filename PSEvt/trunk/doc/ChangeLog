@@ -11,6 +11,15 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-07-03
+20113-11-06 David Schneider
+- Features to support a Psana module based hdf5 Translator: export functionality
+  in from EventKey to print and compare C++ type_info, add DamageMap, add optional
+  history mechanism to object stores. Added missing control() field to abstract
+  base class EventId.  Latter breaks present versions of packages that derive
+  from EventId, these packages (PSXtcInput and PSHdf5Input) will be updated soon.
+  
+	
 Tag: V00-07-02
 2013-09-17 Andy Salnikov
 - documentation generation changed in SConsTools, updating SConscript

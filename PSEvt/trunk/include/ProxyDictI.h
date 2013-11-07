@@ -29,6 +29,7 @@
 #include "pdsdata/xtc/Src.hh"
 #include "PSEvt/EventKey.h"
 #include "PSEvt/ProxyI.h"
+#include "PSEvt/HistI.h"
 #include "PSEvt/Source.h"
 
 //------------------------------------
@@ -140,6 +141,17 @@ public:
   {
     this->keysImpl(keys, source);
   }
+
+  /**
+   *  @brief return pointer to history interface object, if implemented
+   *
+   * If a derived class implements the HistI interface, it can return a
+   * pointer to the history object here. The implementation of totalUpdates()
+   * should be all updates, put's and remove's, made to the ProxyDict during 
+   * its existance. The implementation of updates(EventKey&) should be the 
+   * sum of all puts and removes for the given EventKey.
+   */
+  virtual const HistI * hist() const { return NULL; }
 
 protected:
 

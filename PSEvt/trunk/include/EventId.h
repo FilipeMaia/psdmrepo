@@ -106,6 +106,12 @@ public:
    */
   virtual unsigned vector() const = 0;
 
+  /**
+   *  @brief internal bits for alternate intepratation of XTC header fields
+   *
+   */
+  virtual unsigned control() const = 0;
+
   /// check if two event IDs refer to the same event
   virtual bool operator==(const EventId& other) const = 0;
   

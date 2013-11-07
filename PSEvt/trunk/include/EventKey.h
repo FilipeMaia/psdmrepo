@@ -69,6 +69,9 @@ public:
     : m_typeinfo(typeinfo), m_src(src), m_key(key) 
   {}
 
+  /// default constructor
+  EventKey() {};
+
   // Destructor
   ~EventKey () {}
 
@@ -82,7 +85,7 @@ public:
   /// Compare two keys
   bool operator<(const EventKey& other) const;
 
-  /// Rormat the key
+  /// Format the key
   void print(std::ostream& str) const;
 
   /// Returns pointer to typeinfo object
@@ -114,6 +117,19 @@ operator<<(std::ostream& out, const EventKey& key) {
   key.print(out);
   return out;
 }
+
+// compare two Src objects
+int cmp(const Pds::Src& lhs, const Pds::Src& rhs);
+
+// less for type_info *, can use for std::map 
+class lessTypeInfoPtr {
+ public:
+  bool operator()(const std::type_info *a, const std::type_info *b) {
+    return a->before( *b);
+  }
+};
+
+std::string typeInfoRealName(const std::type_info *);
 
 } // namespace PSEvt
 

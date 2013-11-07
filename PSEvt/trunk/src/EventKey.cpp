@@ -35,14 +35,6 @@
 
 namespace {
 
-  // compare two Src objects
-  int cmp(const Pds::Src& lhs, const Pds::Src& rhs)
-  {
-    // ignore PID in comparison
-    int diff = int(lhs.level()) - int(rhs.level());
-    if (diff != 0) return diff;
-    return int(lhs.phy()) - int(rhs.phy());
-  }
 
   void printDetInfo(std::ostream& str, const Pds::DetInfo& src)
   {
@@ -107,10 +99,7 @@ namespace {
   
   void print(std::ostream& str, const std::type_info* typeinfo)
   {
-    int status;
-    char* realname = abi::__cxa_demangle(typeinfo->name(), 0, 0, &status);
-    str << realname;
-    free(realname);
+    str << PSEvt::typeInfoRealName(typeinfo);
   }
 
 }
@@ -122,14 +111,30 @@ namespace {
 
 namespace PSEvt {
 
+int cmp(const Pds::Src& lhs, const Pds::Src& rhs)
+{
+  // ignore PID in comparison
+  int diff = int(lhs.level()) - int(rhs.level());
+  if (diff != 0) return diff;
+  return int(lhs.phy()) - int(rhs.phy());
+}
+
+std::string typeInfoRealName(const std::type_info *typeInfoPtr) {
+    int status;
+    char* realname = abi::__cxa_demangle(typeInfoPtr->name(), 0, 0, &status);
+    std::string realNameStr(realname);
+    free(realname);
+    return realNameStr;
+}
+
 bool 
 EventKey::operator<(const EventKey& other) const 
 {
-  int src_diff = ::cmp(this->m_src, other.m_src);
+  int src_diff = cmp(this->m_src, other.m_src);
   if (src_diff<0) return true;
   if (src_diff>0) return false;
-  if( m_typeinfo->before(*other.m_typeinfo) ) return true;
-  if( other.m_typeinfo->before(*m_typeinfo) ) return false;
+  if( lessTypeInfoPtr()(m_typeinfo, other.m_typeinfo) ) return true;
+  if( lessTypeInfoPtr()(other.m_typeinfo, m_typeinfo) ) return false;
   if (m_key < other.m_key) return true;
   return false;
 }
