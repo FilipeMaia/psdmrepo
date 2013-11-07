@@ -43,7 +43,13 @@ class GUIDarkList ( QtGui.QWidget ) :
     def __init__ ( self, parent=None ) :
 
         self.parent = parent
-        self.dark_list_show_type = cp.dark_list_show_type
+        self.dark_list_show_runs   = cp.dark_list_show_runs
+        self.dark_list_show_dets   = cp.dark_list_show_dets
+        self.instr_name            = cp.instr_name
+        self.exp_name              = cp.exp_name
+        self.det_name              = cp.det_name
+        self.list_of_det_pars      = cp.list_of_det_pars
+        self.list_of_dets_selected = cp.list_of_dets_selected
 
         #self.calib_dir      = cp.calib_dir
         #self.det_name       = cp.det_name
@@ -91,22 +97,25 @@ class GUIDarkList ( QtGui.QWidget ) :
 
         self.list.clear()
 
+        if self.instr_name.value() == self.instr_name.value_def() : return
+        if self.exp_name  .value() == self.exp_name  .value_def() : return
+
+        # Get run records from RegDB
+        self.dict_run_recs = ru.calibration_runs (self.instr_name.value(), self.exp_name.value())
+        #print 'self.dict_run_recs = ', self.dict_run_recs
+
+
         self.list_of_records = []
         self.list_of_runs = fnm.get_list_of_xtc_runs()   # ['0001', '0202', '0203',...]
         #self.list_of_run_nums = gu.list_of_int_from_list_of_str(self.list_of_runs) # [1, 202, 203, 204,...]
 
-        #self.dict_run_isdark = ru.dict_runnum_dark (cp.instr_name.value(), cp.exp_name.value(), self.list_of_run_nums)
+        #self.dict_run_isdark = ru.dict_runnum_dark (self.instr_name.value(), self.exp_name.value(), self.list_of_run_nums)
         #print 'self.dict_run_isdark = ', self.dict_run_isdark
-        #print 'Request calibration runs for inst: %s  experiment: %s' % (cp.instr_name.value(), cp.exp_name.value()) 
+        #print 'Request calibration runs for inst: %s  experiment: %s' % (self.instr_name.value(), self.exp_name.value()) 
 
-        if cp.instr_name.value() == cp.instr_name.value_def() : return
-        if cp.exp_name  .value() == cp.exp_name  .value_def() : return
-
-        self.dict_run_recs = ru.calibration_runs (cp.instr_name.value(), cp.exp_name.value())
-        #print 'self.dict_run_recs = ', self.dict_run_recs
 
         selection_is_on = False
-        if self.dark_list_show_type.value() == 'dark' : selection_is_on = True
+        if self.dark_list_show_runs.value() == 'dark' : selection_is_on = True
 
         for str_run_num in self.list_of_runs :
             #print 'str_run_num = ', str_run_num
@@ -116,6 +125,7 @@ class GUIDarkList ( QtGui.QWidget ) :
             comment = ''
             is_dark = False
 
+            # Unpack RegDB info
             if self.dict_run_recs != {} :
                 run_rec = self.dict_run_recs[run_num]
                 list_of_calibs = run_rec['calibrations']
@@ -124,6 +134,8 @@ class GUIDarkList ( QtGui.QWidget ) :
                 #print run_num, is_dark, list_of_calibs, comment
 
             if selection_is_on and not is_dark : continue
+
+            if not self.hasSelectedDetectorInRun(run_num) : continue
 
             self.type = ''
             if is_dark : self.type = 'dark'
@@ -143,6 +155,34 @@ class GUIDarkList ( QtGui.QWidget ) :
 
             record = str_run_num, item, widg
             self.list_of_records.append(record)
+
+
+    #def isSelectedDarkRun(self, run_num) :
+
+
+
+
+
+
+    def hasSelectedDetectorInRun(self, run_num) :
+
+        if self.det_name.value() == '' : # If detector(s) were not selected
+            logger.warning('Detector is not selected !!!', __name__)
+            return False
+
+        if self.dark_list_show_dets.value() == self.dark_list_show_dets.value_def() : # 'all' - For all detectors
+            return True
+
+        else :
+            list_of_detectors = ru.detectors_for_psana (self.instr_name.value(), self.exp_name.value(), run_num)
+            for det_name_in_data in list_of_detectors :
+                for det_name_selected in self.list_of_dets_selected()  :
+                    pattern = det_name_selected.lower() + '.'
+                    if det_name_in_data.lower().find(pattern) != -1 :
+                         #txt = 'Det: %s is found in the sources: %s in run: %d' % (det_name_selected,det_name_in_data,run_num)
+                         #print txt
+                         return True
+            return False
 
 
     def setFieldsEnabled(self, is_enabled=False):

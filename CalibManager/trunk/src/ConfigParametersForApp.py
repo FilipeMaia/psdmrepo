@@ -13,7 +13,7 @@ This software was developed for the SIT project.  If you use all or
 part of it, please give an appropriate acknowledgment.
 
 @see RelatedModule
-
+ 
 @version $Id:$
 
 @author Mikhail S. Dubrovin
@@ -42,7 +42,8 @@ class ConfigParametersForApp ( ConfigParameters ) :
 
     list_of_queues = ['psnehq', 'psfehq', 'psanacsq']
     list_of_instr  = ['AMO', 'SXR', 'XPP', 'XCS', 'CXI', 'MEC']
-    list_of_show_dark = ['all', 'dark']
+    list_of_show_runs = ['all', 'dark']
+    list_of_show_dets = ['all', 'selected']
 
     def __init__ ( self, fname=None ) :
         """Constructor.
@@ -218,7 +219,8 @@ class ConfigParametersForApp ( ConfigParameters ) :
         self.str_run_to        = self.declareParameter( name='STRING_RUN_TO',         val_def='end',          type='str' )
 
         # GUIDarkControlBar.py
-        self.dark_list_show_type  = self.declareParameter( name='DARK_LIST_SHOW_TYPE', val_def=self.list_of_show_dark[0], type='str' )
+        self.dark_list_show_runs  = self.declareParameter( name='DARK_LIST_SHOW_RUNS', val_def=self.list_of_show_runs[0], type='str' )
+        self.dark_list_show_dets  = self.declareParameter( name='DARK_LIST_SHOW_DETS', val_def=self.list_of_show_dets[0], type='str' )
 
         # GUIGrabSubmitELog.py
         #self.cbx_more_options    = self.declareParameter( name='CBX_SHOW_MORE_OPTIONS',   val_def=False,             type='bool' )
@@ -283,6 +285,18 @@ class ConfigParametersForApp ( ConfigParameters ) :
 #-----------------------------
 
         self.list_of_det_pars = zip(self.list_of_dets, self.list_of_types, self.det_cbx_states_list)
+
+#-----------------------------
+
+    def list_of_dets_selected( self ) :
+        #lds = []
+        #for det in self.det_name.value().split(' ') : lds.append(det)
+        #for det,state in zip(self.list_of_dets,self.det_cbx_states_list) :
+        #    if state.value() : lds.append(det)
+        #return lds
+        #return [det for det in self.det_name.value().split(' ')]
+        return [det for det,state in zip(self.list_of_dets,self.det_cbx_states_list) if state.value()]
+
 
 #-----------------------------
 

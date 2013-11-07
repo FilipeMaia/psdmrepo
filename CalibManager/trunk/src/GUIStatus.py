@@ -152,15 +152,25 @@ class GUIStatus ( QtGui.QGroupBox ) :
 
     def updateStatusInfo(self) :
 
-        ctype='pedestals'
-        if self.current_tab.value() == 'Dark' : ctype='pedestals'
-        #if self.current_tab.value() == cp.guitabs.list_of_tabs[0] : ctype='pedestals'
-        
-        #msg = 'From %s to %s use dark run %s' % (self.str_run_from.value(), self.str_run_to.value(), self.str_run_number.value())
-
         msg = 'Selected detector(s): %s' % self.det_name.value()
-        for det_name in self.det_name.value().split(' ') :
-            msg += '\n' + gu.get_text_content_of_calib_dir_for_detector(path=self.calib_dir.value(), det=det_name, calib_type=ctype)
+
+        if self.det_name.value() == '' : 
+            msg += '!!! Detector is not selected !!!'
+
+            #try : cp.guiinsexpdirdet.butDet.setStyleSheet(cp.styleButtonBad)
+            #except : pass
+
+        else :
+            ctype='pedestals'
+            if self.current_tab.value() == 'Dark' : ctype='pedestals'
+            #if self.current_tab.value() == cp.guitabs.list_of_tabs[0] : ctype='pedestals'
+            
+            #msg = 'From %s to %s use dark run %s' % (self.str_run_from.value(), self.str_run_to.value(), self.str_run_number.value())
+            
+            
+            #for det_name in self.det_name.value().split(' ') :
+            for det_name in cp.list_of_dets_selected() :
+                msg += '\n' + gu.get_text_content_of_calib_dir_for_detector(path=self.calib_dir.value(), det=det_name, calib_type=ctype)
 
         self.setStatusMessage(msg)
 

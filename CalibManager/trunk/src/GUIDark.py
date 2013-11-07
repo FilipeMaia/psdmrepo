@@ -72,7 +72,8 @@ class GUIDark ( QtGui.QWidget ) :
         self.setStyle()
 
         cp.guidark = self
- 
+        self.guistatus.updateStatusInfo()
+
     def showToolTips(self):
         pass
         #self           .setToolTip('Use this GUI to work with xtc file.')

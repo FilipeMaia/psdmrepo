@@ -461,7 +461,7 @@ def get_text_content_of_calib_dir_for_detector(path, det='cspad', level=0, calib
     #logger.debug( 'get_txt_content_of_calib_dir_for_detector(...): ' + path, __name__)
     det_lower = det.lower()
     txt = '    '
-    if level == 0 : txt = 'Content of: %s for detector: %s' % (path, det)
+    if level == 0 : txt = 85*'-' + '\nContent of: %s for detector: %s' % (path, det)
 
     if not os.path.exists(path) :
         txt = 'Path %s DOES NOT EXIST' % path
@@ -472,7 +472,7 @@ def get_text_content_of_calib_dir_for_detector(path, det='cspad', level=0, calib
         txt +='\n\nDirectory IS EMPTY!'        
         return txt
 
-    for file in list_of_fnames :
+    for i,file in enumerate(list_of_fnames) :
         fname_lower = file.lower()
         cond0 = level==0 and det.lower()+'::' in fname_lower
         cond1 = level==1 and det.lower()+'.'  in fname_lower
@@ -481,7 +481,8 @@ def get_text_content_of_calib_dir_for_detector(path, det='cspad', level=0, calib
 
         if not ( cond0 or cond1 or cond2 or cond3 ) : continue
         
-        txt +='\n' + (level+1)*'    ' + file
+        if cond3 and i>0 : txt +='  ' + file # keep the list of files on the same line
+        else             : txt +='\n' + (level+1)*'    ' + file
 
         path_to_child = os.path.join(path, file)
 

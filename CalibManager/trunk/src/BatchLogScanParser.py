@@ -44,10 +44,11 @@ class BatchLogScanParser :
         @param path   path to the input log file
         @param dict   dictionary of searched items and associated parameters
         """
-        self.path              = None 
-        self.is_parsed         = False 
-        self.det_name          = cp.det_name
-        self.dict_of_det_types = cp.dict_of_det_types
+        self.path                  = None 
+        self.is_parsed             = False 
+        self.det_name              = cp.det_name
+        self.dict_of_det_types     = cp.dict_of_det_types
+        self.list_of_dets_selected = cp.list_of_dets_selected # reference to method
         self.list_of_sources   = []
         self.list_of_types     = []
 
@@ -71,7 +72,7 @@ class BatchLogScanParser :
 
         self.path = fnm.path_peds_scan_batch_log()
 
-        for det_name in self.det_name.value().split(' ') :
+        for det_name in self.list_of_dets_selected() :
 
             self.pattern = self.dict_of_det_types[det_name]
 

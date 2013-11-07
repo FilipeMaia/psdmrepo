@@ -46,28 +46,37 @@ class GUIDarkControlBar ( QtGui.QWidget ) :
         QtGui.QWidget.__init__(self, parent)
 
         self.parent = parent
-        self.dark_list_show_type = cp.dark_list_show_type
-        self.list_of_show_dark   = cp.list_of_show_dark
+        self.dark_list_show_runs = cp.dark_list_show_runs
+        self.list_of_show_runs   = cp.list_of_show_runs
+
+        self.dark_list_show_dets = cp.dark_list_show_dets
+        self.list_of_show_dets   = cp.list_of_show_dets
 
         self.setGeometry(100, 50, 600, 30)
         self.setWindowTitle('Instrument Experiment Run')
         self.setFrame()
  
 
-        self.labSelect = QtGui.QLabel('Show runs:')
+        self.labRuns = QtGui.QLabel('Show runs:')
+        self.labDets   = QtGui.QLabel('for detectors:')
 
-        self.butSelect = QtGui.QPushButton( self.dark_list_show_type.value() + self.char_expand )
-        self.butSelect.setMaximumWidth(90)
+        self.butRuns = QtGui.QPushButton( self.dark_list_show_runs.value() + self.char_expand )
+        self.butRuns.setMaximumWidth(90)
+        self.butDets = QtGui.QPushButton( self.dark_list_show_dets.value() + self.char_expand )
+        self.butDets.setMaximumWidth(90)
         
         self.hbox = QtGui.QHBoxLayout() 
-        self.hbox.addWidget(self.labSelect)
-        self.hbox.addWidget(self.butSelect)
+        self.hbox.addWidget(self.labRuns)
+        self.hbox.addWidget(self.butRuns)
+        self.hbox.addWidget(self.labDets)
+        self.hbox.addWidget(self.butDets)
         self.hbox.addStretch(1)
     
         self.setLayout(self.hbox)
 
         #self.connect( self.ediExp,     QtCore.SIGNAL('editingFinished ()'), self.processEdiExp )
-        self.connect( self.butSelect,     QtCore.SIGNAL('clicked()'),          self.onButSelect  )
+        self.connect( self.butRuns,     QtCore.SIGNAL('clicked()'),          self.onButRuns  )
+        self.connect( self.butDets,     QtCore.SIGNAL('clicked()'),          self.onButDets  )
 
         self.showToolTips()
         self.setStyle()
@@ -81,7 +90,8 @@ class GUIDarkControlBar ( QtGui.QWidget ) :
     def showToolTips(self):
         # Tips for buttons and fields:
         #self           .setToolTip('This GUI deals with the configuration parameters.')
-        self.butSelect  .setToolTip('Select the type of files to list from the pop-up menu.')
+        self.butRuns  .setToolTip('Select the type of runs to list')
+        self.butDets  .setToolTip('Select the type of dets to list')
 
 
     def setFrame(self):
@@ -95,13 +105,14 @@ class GUIDarkControlBar ( QtGui.QWidget ) :
 
     def setStyle(self):
         #self.setStyleSheet(cp.styleYellow)
-        self.labSelect  .setStyleSheet (cp.styleLabel)
+        self.labRuns.setStyleSheet (cp.styleLabel)
+        self.labDets.setStyleSheet (cp.styleLabel)
         self.setStyleButtons()
         self.setContentsMargins (QtCore.QMargins(-9,-9,-9,-9))
          
 
     def setStyleButtons(self):
-        self.butSelect.setStyleSheet(cp.styleButton)
+        self.butRuns.setStyleSheet(cp.styleButton)
 
  
     def setParent(self,parent) :
@@ -133,27 +144,40 @@ class GUIDarkControlBar ( QtGui.QWidget ) :
 #        cp.posGUIMain = (self.pos().x(),self.pos().y())
 
 
-    def onButSelect(self):
-        #print 'onButSelect'
-
-        item_selected = gu.selectFromListInPopupMenu(self.list_of_show_dark)
-        if item_selected is None : return            # selection is cancelled
-
-        type = item_selected
-
-        self.setType(type)
+    def onButRuns(self):
+        #print 'onButRuns'
+        item_selected = gu.selectFromListInPopupMenu(self.list_of_show_runs)
+        if item_selected is None : return # selection is cancelled
+        self.setRuns(item_selected)
         #self.setStyleButtons()
 
 
-    def setType(self, txt='None'):
+    def onButDets(self):
+        #print 'onButDets'
+        item_selected = gu.selectFromListInPopupMenu(self.list_of_show_dets)
+        if item_selected is None : return # selection is cancelled
+        self.setDets(item_selected)
+        #self.setStyleButtons()
+
+
+    def setRuns(self, txt='None'):
         #print 'setType', txt
-        self.dark_list_show_type.setValue(txt)
-        self.butSelect.setText(txt + self.char_expand)        
+        self.dark_list_show_runs.setValue(txt)
+        self.butRuns.setText(txt + self.char_expand)        
         #if txt == 'None' : self.list_of_run = None
         #self.setFile()
         if cp.guidarklist != None :
             cp.guidarklist.updateList()
 
+
+    def setDets(self, txt='None'):
+        #print 'setType', txt
+        self.dark_list_show_dets.setValue(txt)
+        self.butDets.setText(txt + self.char_expand)        
+        #if txt == 'None' : self.list_of_run = None
+        #self.setFile()
+        if cp.guidarklist != None :
+            cp.guidarklist.updateList()
 
 #-----------------------------
 

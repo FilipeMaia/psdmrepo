@@ -272,7 +272,7 @@ class GUIInsExpDirDet ( QtGui.QWidget ) :
             list_of_cbox.append([det_name, det_cbx_state.value()])
 
         #list_of_cbox_out = gu.changeCheckBoxListInPopupMenu(list_of_cbox, win_title='Select Detectors')
-        gu.changeCheckBoxListInPopupMenu(list_of_cbox, win_title='Select Detectors')
+        gu.changeCheckBoxListInPopupMenu(list_of_cbox, win_title='Select detector(s)')
 
         str_of_detectors = ''
 
