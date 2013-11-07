@@ -172,7 +172,7 @@ class DdlHdf5Translator ( object ) :
     #----------------
     #  Constructor --
     #----------------
-    def __init__ ( self, backend_options, xmlfiles, log ) :
+    def __init__ ( self, backend_options, appBaseArg ):
         """Constructor
         
             @param incname  include file name
@@ -180,7 +180,9 @@ class DdlHdf5Translator ( object ) :
         assert 'package_dir' in backend_options, "backend options must include the " + \
                " Translator package directory. For example: package_dir:Translator"
             
-        self.log = log
+        self.log = appBaseArg
+        xmlfiles = [arg for arg in appBaseArg._args if arg.endswith('.xml')]
+
         self.xmlfiles = xmlfiles
         self.packageDir = backend_options['package_dir']
         self.jiEnv = ji.Environment(loader=TemplateLoader(), trim_blocks=True,

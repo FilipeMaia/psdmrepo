@@ -112,7 +112,7 @@ class psddlc ( AppBase ) :
             "pds2psana-dispatch": DdlPds2PsanaDispatch,
             "hdf5": DdlHdf5Data,
             "hdf5-dispatch": DdlHdf5DataDispatch,
-            "hdf5Translator": self.hdf5TranslatorGen,
+            "hdf5Translator": DdlHdf5Translator,
         }
         
 
@@ -203,9 +203,6 @@ class psddlc ( AppBase ) :
 
         return (header, source)
     
-    def hdf5TranslatorGen(self, backend_options):
-        xmlfiles = [arg for arg in self._args if arg.endswith('.xml')]
-        return DdlHdf5Translator(backend_options, xmlfiles=xmlfiles, log=self)
 
 #
 #  run application when imported as a main module

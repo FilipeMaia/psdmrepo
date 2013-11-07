@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-12-02
+2013-11-07 David Schneider
+- adapt Translator to PSEvt tag V00-07-04
+- fix bug, adapt Translator Ddl backend to psddl tag V00-11-00
+
 Tag: V00-12-01
 2013-11-06 David Schneider
 - add back end for Psana Hdf5 Translator module

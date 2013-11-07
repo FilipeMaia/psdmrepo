@@ -138,6 +138,7 @@ psddl/data/templates/hdf5Translator.tmpl?hdfwritermap_cpp
 */
 
 #include "PSEvt/EventKey.h"
+#include "PSEvt/TypeInfoUtils.h"
 #include "Translator/HdfWriterMap.h"
 #include "MsgLogger/MsgLogger.h"
 {% for header in base_headers %}
@@ -162,7 +163,7 @@ void checkType(const PSEvt::EventKey &eventKey, const char *logger) {
   const std::type_info & templateType = typeid(T);
   if (templateType != *eventKey.typeinfo()) {
     MsgLog(logger, error, "eventKey: " << eventKey << " type mismatch with template type: " 
-           << PSEvt::typeInfoRealName(&templateType));
+           << PSEvt::TypeInfoUtils::typeInfoRealName(&templateType));
   }
 }
 
