@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2013-11-07 Andy Salnikov  (on branch V00-11-00-hddl)
+- more or less complete reader implementation, not well tested yet
+- sill need to do something about comments
+
 2013-11-06 Andy Salnikov  (on branch V00-11-00-hddl)
 - add simple unit test for scanner/parser
 

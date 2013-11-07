@@ -54,11 +54,6 @@ class QID(object):
     def __repr__(self):
         return '.'.join(self.id)
 
-# list of integer types    
-_intTypes = ["int8_t", "uint8_t",  "int16_t", "uint16_t", 
-             "int32_t", "uint32_t", "int64_t", "uint64_t",
-             ]
-
 
 #------------------------
 # Exported definitions --
@@ -83,7 +78,7 @@ class HddlYacc ( object ) :
         self.name = name
 
         # make lexer
-        lexer = HddlLex()
+        lexer = HddlLex(name=name)
 
         lexer.lexer.lineno = 1
         tree = self.parser.parse(input=input, lexer=lexer.lexer, tracking=1)
@@ -112,11 +107,11 @@ class HddlYacc ( object ) :
         ('right', 'UPLUS', 'UMINUS', 'UCOMPL'),  # unary plus minus and complement
     )
 
-    # this is starting rule
+    # this is the starting rule
     def p_input(self, p):
         ''' input : includes declaration_seq
         '''
-        p[0] = dict(includes=p[1], declarations=p[2])
+        p[0] = dict(includes=p[1], declarations=p[2], name=self.name, tags=[])
    
     # quilaified identifier: set of identifiers separated by dots, makes QID object
     def p_qidentifier(self, p):
@@ -221,9 +216,10 @@ class HddlYacc ( object ) :
     #    value:  expression 
     #    pos:    declaration location 
     def p_const(self, p):
-        ''' constdecl : CONST IDENTIFIER IDENTIFIER '=' const_expr ';'
+        ''' constdecl : tags CONST IDENTIFIER IDENTIFIER '=' const_expr tags ';'
         '''
-        p[0] = dict(decl="const", name=p[3], type=p[2], value=p[5], pos=self._makepos(p))
+        tags = p[1] + p[7]
+        p[0] = dict(decl="const", name=p[4], type=p[3], value=p[6], tags=tags, pos=self._makepos(p))
 
     # constant expression, which is basically a simple math with numbers and identifiers and does 
     # not involve function calls
@@ -260,7 +256,7 @@ class HddlYacc ( object ) :
     def p_const_expr_group(self, p):
         ''' const_expr : '(' const_expr ')'
         '''
-        p[0] = dict(decl="const_expr", left=None, right=p[1], op='(', pos=self._makepos(p))
+        p[0] = dict(decl="const_expr", left=None, right=p[2], op='(', pos=self._makepos(p))
 
     # enum declaration, returns dict with keys:
     #    decl:   "enum"
@@ -269,15 +265,17 @@ class HddlYacc ( object ) :
     #    constants:  list of enum constant definitions
     #    pos:    declaration location 
     def p_enum(self, p):
-        ''' enum : ENUM IDENTIFIER '{' enum_constants '}'
-                 | ENUM IDENTIFIER '{' enum_constants ',' '}'
-                 | ENUM IDENTIFIER '(' IDENTIFIER ')' '{' enum_constants '}'
-                 | ENUM IDENTIFIER '(' IDENTIFIER ')' '{' enum_constants ',' '}'
+        ''' enum : tags ENUM IDENTIFIER tags '{' enum_constants '}'
+                 | tags ENUM IDENTIFIER tags '{' enum_constants ',' '}'
+                 | tags ENUM IDENTIFIER '(' IDENTIFIER ')' tags '{' enum_constants '}'
+                 | tags ENUM IDENTIFIER '(' IDENTIFIER ')' tags '{' enum_constants ',' '}'
         '''
-        if len(p) <= 7:
-            p[0] = dict(decl="enum", name=p[2], type=None, constants=p[4], pos=self._makepos(p))
+        if len(p) <= 9:
+            tags = p[1] + p[4]
+            p[0] = dict(decl="enum", name=p[3], type=None, constants=p[6], tags=tags, pos=self._makepos(p))
         else:
-            p[0] = dict(decl="enum", name=p[2], type=p[4], constants=p[7], pos=self._makepos(p))
+            tags = p[1] + p[7]
+            p[0] = dict(decl="enum", name=p[3], type=p[5], constants=p[9], tags=tags, pos=self._makepos(p))
 
     def p_enum_constants(self, p):
         ''' enum_constants : enum_constants ',' enum_const
@@ -290,13 +288,15 @@ class HddlYacc ( object ) :
 
     # one enum constant, returns dict(name=..., value=..., pos), value may be None
     def p_enum_const(self, p):
-        ''' enum_const : IDENTIFIER '=' NUMBER
-                       | IDENTIFIER
+        ''' enum_const : tags IDENTIFIER '=' NUMBER tags
+                       | tags IDENTIFIER tags
         '''
-        if len(p) == 2:
-            p[0] = dict(name=p[1], value=None, pos=self._makepos(p))
+        if len(p) == 4:
+            tags = p[1] + p[3]
+            p[0] = dict(name=p[2], value=None, tags=tags, pos=self._makepos(p))
         else:
-            p[0] = dict(name=p[1], value=p[3], pos=self._makepos(p))
+            tags = p[1] + p[5]
+            p[0] = dict(name=p[2], value=p[4], tags=tags, pos=self._makepos(p))
 
 
     # package declaration will make a dict with the keys:
@@ -526,18 +526,18 @@ class HddlYacc ( object ) :
         else:
             p[0] = 1
             
-    # list of method bodies, tags that preceed first cODEBLOCK are consumed by method
-    # makes a list of tuples, with two elements:
-    #    1. list of tags
-    #    2. code block
+    # list of method bodies, tags that preceed first CODEBLOCK are consumed by method
+    # makes a list of dicts, each dict has keys:
+    #    tags:  list of tags
+    #    code:  string
     def p_codeblocks(self, p):
         ''' codeblocks : codeblocks ',' tags CODEBLOCK
                        | CODEBLOCK
         '''
         if len(p) == 2:
-            p[0] = ([], p[1])
+            p[0] = [dict(tags=[], code=p[1])]
         else:
-            p[0] = p[1] + (p[3], p[4])
+            p[0] = p[1] + [dict(tags=p[3], code=p[4])]
 
     # constructor declaration
     #
@@ -580,7 +580,7 @@ class HddlYacc ( object ) :
             p[0]['dest'] = p[3]
             p[0]['tags'] = p[4]
         else:
-            p[0] = dict(name=p[1], type=None, rank=None, dest=p[3], tags=p[4])
+            p[0] = dict(name=p[1], type=None, rank=0, dest=p[3], tags=p[4])
 
     # makes a list of constructor initializers
     def p_ctor_inits(self, p):
@@ -606,18 +606,18 @@ class HddlYacc ( object ) :
 
     # hdf5 schema declaration, makes a dict with the keys:
     #    name:     schema (type) name
-    #    datasets: list of datasets
+    #    declarations: list of declarations
     #    tags:     list of tags
     def p_h5schema(self, p):
-        '''  h5schema : tags H5SCHEMA IDENTIFIER tags '{' datasets '}'
+        '''  h5schema : tags H5SCHEMA IDENTIFIER tags '{' schema_items '}'
         '''
         tags = p[1] + p[4]
-        p[0] = dict(decl='h5schema', name=p[3], datasets=p[6], tags=tags, pos=self._makepos(p))
+        p[0] = dict(decl='h5schema', name=p[3], declarations=p[6], tags=tags, pos=self._makepos(p))
 
-
-    def p_datasets(self, p):
-        ''' datasets : datasets dataset
-                     | empty
+    def p_schema_items(self, p):
+        ''' schema_items : schema_items dataset
+                         | schema_items enum_remap
+                         | empty
         '''
         if len(p) == 3:
             p[0] = p[1] + [p[2]]
@@ -630,19 +630,33 @@ class HddlYacc ( object ) :
     #    attributes:   list of attributes or None
     #    tags:         list of tags
     def p_dataset(self, p):
-        ''' dataset : tags H5DS IDENTIFIER tags ';'
-                    | tags H5DS qidentifier IDENTIFIER tags ';'
-                    | tags H5DS IDENTIFIER tags '{' attributes '}'
+        ''' dataset : tags H5DS IDENTIFIER ds_shape tags ';'
+                    | tags H5DS qidentifier IDENTIFIER ds_shape tags ';'
         '''
-        if len(p) == 6:
-            tags = p[1] + p[4]
-            p[0] = dict(decl='h5ds', name=p[3], type=None, tags=tags, attributes=None, pos=self._makepos(p))
-        elif len(p) == 7:
+        if len(p) == 7:
             tags = p[1] + p[5]
-            p[0] = dict(decl='h5ds', name=p[4], type=p[3], tags=tags, attributes=None, pos=self._makepos(p))
+            p[0] = dict(decl='h5ds', name=p[3], type=None, tags=tags, shape=p[4], attributes=None, pos=self._makepos(p))
+        elif len(p) == 8:
+            tags = p[1] + p[6]
+            p[0] = dict(decl='h5ds', name=p[4], type=p[3], tags=tags, shape=p[5], attributes=None, pos=self._makepos(p))
+
+    def p_dataset_a(self, p):
+        ''' dataset : tags H5DS IDENTIFIER tags '{' attributes '}'
+        '''
+        tags = p[1] + p[4]
+        p[0] = dict(decl='h5ds', name=p[3], type=None, tags=tags, shape=None, attributes=p[6], pos=self._makepos(p))
+
+    # dataset shape, can return
+    #    1. None if there is nothing specified
+    #    2. Number if rank specified ([][][] -> 3)
+    def p_ds_shape(self, p):
+        ''' ds_shape :
+                     | rank
+        '''
+        if len(p) == 1:
+            p[0] = None
         else:
-            tags = p[1] + p[4]
-            p[0] = dict(decl='h5ds', name=p[3], type=None, tags=tags, attributes=p[6], pos=self._makepos(p))
+            p[0] = p[1]
 
     def p_attributes(self, p):
         ''' attributes : attributes attribute
@@ -658,24 +672,65 @@ class HddlYacc ( object ) :
     #    type:   type (QID) or None
     #    tags:   list of tags
     def p_attribute(self, p):
-        ''' attribute : tags H5ATTR IDENTIFIER tags ';'
-                      | tags H5ATTR qidentifier IDENTIFIER tags ';'
+        ''' attribute : tags H5ATTR IDENTIFIER attr_shape tags ';'
+                      | tags H5ATTR qidentifier IDENTIFIER attr_shape tags ';'
         '''
-        if len(p) == 6:
-            tags = p[1] + p[4]
-            p[0] = dict(decl='h5attr', name=p[3], type=None, tags=tags, pos=self._makepos(p))
-        else:
+        if len(p) == 7:
             tags = p[1] + p[5]
-            p[0] = dict(decl='h5attr', name=p[4], type=p[3], tags=tags, pos=self._makepos(p))
+            p[0] = dict(decl='h5attr', name=p[3], type=None, shape=p[4], tags=tags, pos=self._makepos(p))
+        else:
+            tags = p[1] + p[6]
+            p[0] = dict(decl='h5attr', name=p[4], type=p[3], shape=p[5], tags=tags, pos=self._makepos(p))
+
+    # attribute shape, can return
+    #    1. None if there is nothing specified
+    #    2. Number if rank specified ([][][] -> 3)
+    #    3. List of dimension expression strings ([10][10] -> ['10', '10'])
+    def p_attr_shape(self, p):
+        ''' attr_shape :
+                       | rank
+                       | arr_shape
+        '''
+        if len(p) == 1:
+            p[0] = None
+        else:
+            p[0] = p[1]
+
+
+    # enum remapping declaration returns dict with keys:
+    #    name:   enum name
+    #    remaps: list of remappings
+    def p_enum_remap(self, p):
+        ''' enum_remap : tags ENUM IDENTIFIER tags '{' enum_remaps '}'
+                       | tags ENUM IDENTIFIER tags '{' enum_remaps ',' '}'
+        '''
+        tags = p[1] + p[4]
+        p[0] = dict(decl='enum_remap', name=p[3], remaps=p[6], tags=tags, pos=self._makepos(p))
+
+    def p_enum_remaps(self, p):
+        ''' enum_remaps : enum_remaps ',' enum_map
+                        | enum_map
+        '''
+        if len(p) == 2:
+            p[0] = [p[1]]
+        else:
+            p[0] = p[1] + [p[3]]
+
+    # one enum remapping, returns dict(from=..., to=..., pos)
+    def p_enum_map(self, p):
+        ''' enum_map : IDENTIFIER RARROW IDENTIFIER
+        '''
+        p[0] = {'from': p[1], 'to': p[3], 'pos': self._makepos(p)}
+
 
     # ---------- end of all grammar rules ----------
 
     # Error rule for syntax errors
     def p_error(self, p):
         if p is None:
-            print "{0}: EOF reached while expecting further input".format(self.name)
+            raise SyntaxError("{0}: EOF reached while expecting further input".format(self.name))
         else:
-            print "{0}:{1}: Syntax error near or at '{2}'".format(self.name, p.lineno, p.value)
+            raise SyntaxError("{0}:{1}: Syntax error near or at '{2}'".format(self.name, p.lineno, p.value))
 
 
 #

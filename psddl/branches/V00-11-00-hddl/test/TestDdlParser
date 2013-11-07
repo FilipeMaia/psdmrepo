@@ -107,6 +107,18 @@ ddl2 = """\
 }  
 """
 
+ddl3 = """\
+@h5schema Schema {
+  @dataset ds0;
+  @dataset ds1[][];
+  @dataset ds2 {
+    @attribute attr0;
+    @attribute attr1[][][][][];
+    @attribute Type attr2[100];
+  }
+}  
+"""
+
 
 #-------------------------------
 #  Unit test class definition --
@@ -232,13 +244,13 @@ class TestDdlParser ( unittest.TestCase ) :
 
         schema = declarations[0]
         
-        for key in ('decl', 'name', 'tags', 'pos', 'datasets'): self.assertIn(key, schema)
+        for key in ('decl', 'name', 'tags', 'pos', 'declarations'): self.assertIn(key, schema)
         self.assertEqual(schema['decl'], 'h5schema')
         self.assertEqual(schema['name'], 'Schema')
         self.assertEqual(schema['tags'], [])
         self.assertTupleEqual(schema['pos'][0], (1, 7))
 
-        datasets = schema['datasets']
+        datasets = schema['declarations']
         self.assertEqual(len(datasets), 2)
         
         ds = datasets[0]
@@ -275,6 +287,41 @@ class TestDdlParser ( unittest.TestCase ) :
         self.assertEqual(attr['tags'], [])
         self.assertIsNotNone(attr['type'])
         self.assertTupleEqual(attr['pos'][0], (5, 5))
+
+    def test_parser3(self):
+        '''
+        Test of parser on HDF5 schema with shape specification
+        '''
+
+        parser = HddlYacc.HddlYacc(debug=0)
+        tree = parser.parse(ddl3, 'string')
+
+        declarations = tree['declarations']
+        self.assertEqual(len(declarations), 1)
+
+        schema = declarations[0]
+        datasets = schema['declarations']
+        self.assertEqual(len(datasets), 3)
+        
+        ds = datasets[0]
+        self.assertIsNone(ds['shape'])
+
+        ds = datasets[1]
+        self.assertEqual(ds['shape'], 2)
+
+        ds = datasets[2]
+        self.assertIsNone(ds['shape'])
+        attributes = ds['attributes']
+        self.assertEqual(len(attributes), 3)
+        
+        attr = attributes[0]
+        self.assertIsNone(attr['shape'])
+
+        attr = attributes[1]
+        self.assertEqual(attr['shape'], 5)
+
+        attr = attributes[2]
+        self.assertEqual(attr['shape'], ['100'])
 
 #
 #  run unit tests when imported as a main module

@@ -203,7 +203,7 @@ class DdlDumpHddl ( object ) :
         if type.pack: tags.append('pack({0})'.format(type.pack))
         if type.xtcConfig:
             types = ', '.join([T("$name")[cfg] for cfg in type.xtcConfig])
-            tags.append('xtc_config({0})'.format(types))
+            tags.append('config({0})'.format(types))
         
         tags = _fmttags(tags)
 
@@ -409,7 +409,7 @@ class DdlDumpHddl ( object ) :
         tags = []
         tags.append('version({0})'.format(schema.version))
         if 'external' in schema.tags: tags.append('external')
-        if 'skip-proxy' in schema.tags: tags.append('embedded')
+        if 'skip-proxy' in schema.tags or 'embedded' in schema.tags: tags.append('embedded')
         if 'default' in schema.tags: tags.append('default')
         tags = _fmttags1(tags)
 
@@ -417,6 +417,13 @@ class DdlDumpHddl ( object ) :
         print >>self.out, T("@h5schema $name")[schema]
         if tags: print >>self.out, "  " + tags
         print >>self.out, "{"
+
+        for enum_name, maps in schema.enum_map.items():
+            # mappings for enum values
+            print >>self.out, T("  @enum $name {")(name=enum_name)
+            for psname, h5name in maps.items():
+                print >>self.out, T("    $psname -> $h5name,")(locals())
+            print >>self.out, T("  }")(name=enum_name)
 
         for ds in schema.datasets:
 

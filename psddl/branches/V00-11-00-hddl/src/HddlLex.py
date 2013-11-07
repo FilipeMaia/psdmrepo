@@ -56,6 +56,10 @@ class HddlLex(object):
             kw['reflags'] = re.DOTALL
         else:
             kw['reflags'] = kw['reflags'] | re.DOTALL
+
+        self.name = kw.get('name', '')
+        if 'name' in kw: del kw['name']
+        
         self.lexer = lex.lex(module=self, **kw)
         
         self.comments = []  # list of (lexpos, lineno, comment) tuple
@@ -189,8 +193,7 @@ class HddlLex(object):
 
     # Error handling rule
     def t_error(self, t):
-        print "Illegal character '%s'" % t.value[0]
-        t.lexer.skip(1)
+        raise SyntaxError("{0}:{1}: Unexpected character '{2}'".format(self.name, t.lexer.lineno, t.value[0]))
 
     # Test it output
     def test(self, data):
