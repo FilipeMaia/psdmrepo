@@ -74,7 +74,7 @@ public:
    *  @param[in]  key EventKey to get updates for
    *  @param[out] number of updates
    */
-  virtual long updates(const EventKey &) const = 0;
+  virtual long updates(const EventKey & key) const = 0;
 };
 
 } // namespace PSEvt

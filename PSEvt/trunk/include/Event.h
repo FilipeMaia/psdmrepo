@@ -272,16 +272,6 @@ public:
   }
   
   /**
-   *  @brief Check if eventKey is in the event
-   *  
-   *  @param[in] EventKey
-   *  @return true if object or proxy exists
-   */
-  bool exists(const PSEvt::EventKey & evKey)
-  {
-    return m_dict->exists(evKey);
-  }
-  /**
    *  @brief Remove object of given type from the event
    *  
    *  @param[in] key     Optional key to distinguish different objects of the same type.

@@ -121,16 +121,6 @@ operator<<(std::ostream& out, const EventKey& key) {
 // compare two Src objects
 int cmp(const Pds::Src& lhs, const Pds::Src& rhs);
 
-// less for type_info *, can use for std::map 
-class lessTypeInfoPtr {
- public:
-  bool operator()(const std::type_info *a, const std::type_info *b) {
-    return a->before( *b);
-  }
-};
-
-std::string typeInfoRealName(const std::type_info *);
-
 } // namespace PSEvt
 
 namespace Pds {

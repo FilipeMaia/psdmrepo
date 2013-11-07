@@ -11,6 +11,13 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-07-04
+20113-11-07 David Schneider
+- Remove exists(EventKey&) from Event interface (EventKey interface is lower
+  level for ProxyDict).
+- Put C++ type_info utilities in separate namespace.
+- Put comparison for Pds::Src in separate namespace.
+
 Tag: V00-07-03
 20113-11-06 David Schneider
 - Features to support a Psana module based hdf5 Translator: export functionality

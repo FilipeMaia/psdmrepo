@@ -14,6 +14,8 @@
 // This Class's Header --
 //-----------------------
 #include "PSEvt/EventKey.h"
+#include "PSEvt/TypeInfoUtils.h"
+#include "PSEvt/SrcCmp.h"
 
 //-----------------
 // C/C++ Headers --
@@ -99,7 +101,7 @@ namespace {
   
   void print(std::ostream& str, const std::type_info* typeinfo)
   {
-    str << PSEvt::typeInfoRealName(typeinfo);
+    str << PSEvt::TypeInfoUtils::typeInfoRealName(typeinfo);
   }
 
 }
@@ -111,30 +113,14 @@ namespace {
 
 namespace PSEvt {
 
-int cmp(const Pds::Src& lhs, const Pds::Src& rhs)
-{
-  // ignore PID in comparison
-  int diff = int(lhs.level()) - int(rhs.level());
-  if (diff != 0) return diff;
-  return int(lhs.phy()) - int(rhs.phy());
-}
-
-std::string typeInfoRealName(const std::type_info *typeInfoPtr) {
-    int status;
-    char* realname = abi::__cxa_demangle(typeInfoPtr->name(), 0, 0, &status);
-    std::string realNameStr(realname);
-    free(realname);
-    return realNameStr;
-}
-
 bool 
 EventKey::operator<(const EventKey& other) const 
 {
-  int src_diff = cmp(this->m_src, other.m_src);
+  int src_diff = SrcCmp::cmp(this->m_src, other.m_src);
   if (src_diff<0) return true;
   if (src_diff>0) return false;
-  if( lessTypeInfoPtr()(m_typeinfo, other.m_typeinfo) ) return true;
-  if( lessTypeInfoPtr()(other.m_typeinfo, m_typeinfo) ) return false;
+  if( TypeInfoUtils::lessTypeInfoPtr()(m_typeinfo, other.m_typeinfo) ) return true;
+  if( TypeInfoUtils::lessTypeInfoPtr()(other.m_typeinfo, m_typeinfo) ) return false;
   if (m_key < other.m_key) return true;
   return false;
 }
