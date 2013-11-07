@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-11-04
+2013-11-06 David Schneider
+- use new ProxyDictHist from PSEvt in the configStore and calibStore
+
 Tag: V00-11-03
 2013-09-17 Andy Salnikov
 - documentation generation changed in SConsTools, updating SConscript
