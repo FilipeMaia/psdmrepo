@@ -86,6 +86,8 @@ public:
   /// Get file name for this header
   const XtcFileName& path() const { return m_file.path(); }
 
+  /// Get the offset of this dgram in the file
+  const off_t offset() const { return m_off; }
 protected:
 
 private:
