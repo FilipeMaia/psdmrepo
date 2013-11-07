@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-12-01
+2013-11-06 David Schneider
+- add back end for Psana Hdf5 Translator module
+  - update DdlPds2PsanaDisatch to generate a dispatch for C++ type_id's
+
 Tag: V00-12-00
 2013-11-02 Andy Salnikov
 - preparation for new DDL parser: few tags renamed:

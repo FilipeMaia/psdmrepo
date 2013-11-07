@@ -32,6 +32,7 @@ __version__ = "$Revision$"
 import sys
 import os
 import types
+import collections
 
 #---------------------------------
 #  Imports of base class module --
@@ -54,7 +55,7 @@ from psddl.TemplateLoader import TemplateLoader
 # we add these to the switch to suppress warnings. If one of these
 # types gets implemented it should be removed from the list.
 _ignored_types = [
-        'Any', 
+        'Any',
         'Id_Xtc', 
         'NumberOf', 
         'Id_Epics', 
@@ -194,18 +195,23 @@ class DdlPds2PsanaDispatch ( object ) :
                 self._parsePackage(pkg)
 
         # generate code for all collected types
-        types, headers = self._codegen()
+        types, headers, psana_types = self._codegen()
 
         # add own header to the list
         headers = [os.path.join(self.incdirname, os.path.basename(self.incname))] + list(headers) + _extra_headers
 
+        # write the dispatch function
         inc_guard = self.guard
         namespace = self.top_pkg
         ignored_types = _ignored_types
+
+        # generate code for typeInfoPtrs function
+        typeInfoPtrsCode = _TEMPL('typeinfoptrs').render(locals())
+
         print >>self.inc, _TEMPL('header_template').render(locals())
         print >>self.cpp, _TEMPL('impl_template').render(locals())
         
-        # close all files
+        # close dispatch function files
         self.inc.close()
         self.cpp.close()
 
@@ -235,31 +241,40 @@ class DdlPds2PsanaDispatch ( object ) :
 
     def _codegen(self):
         ''' 
-        Retuns tuple containing two elements:
+        Retuns tuple containing three elements:
         1. Dictinary mappig TypeId type name (like 'Id_AcqConfig') to the corresponding piece of code
         2. List of heder names to be included 
+        3. 2d dictionary mapping TypeId/version to a list of Psana types that the dispatch code 
+           returned in 1. will put in the event and config store
         ''' 
         codes = {}
         headers = set()
-        
+
+        # make a 2D dictionary with appropriate default values
+        def callableDefaultDictList():
+            return collections.defaultdict(list)
+        psana_types = collections.defaultdict(callableDefaultDictList)
+
         for type_id, types in self._types.items():
-            
+
             versions = {}
             for type in types:
                 
-                code, header = self._typecode(type)
+                code, header, psana_type = self._typecode(type)
                 headers.add(header)
                 
                 v = int(type.version)
                 versions.setdefault(v, []).append(code)
+                psana_types[type_id][v].append(psana_type)
                 # for event-type data add compressed version as well
                 if 'config-type' not in type.tags:
                     v = int(type.version) | 0x8000
                     versions.setdefault(v, []).append(code)
+                    psana_types[type_id][v].append(psana_type)
                 
             codes[type_id] = _TEMPL('version_switch_template').render(locals())
 
-        return codes, headers
+        return codes, headers, psana_types
 
 
     def _typecode(self, type):
@@ -267,6 +282,7 @@ class DdlPds2PsanaDispatch ( object ) :
         For a given type returns tuple of two elements:
         1. Piece of code which produces final objects
         2. Name of the include file
+        3. psana type put into event or config store
         '''
         header = os.path.basename(type.location)
         header = os.path.splitext(header)[0] + '.h'
@@ -274,7 +290,7 @@ class DdlPds2PsanaDispatch ( object ) :
         
         xtc_type = type.fullName('C++', self.pdsdata_ns)
         psana_type = _psanaClass(type, self.psana_ns)
-
+ 
         code = ""
         
         if 'config-type' in type.tags:
@@ -303,8 +319,8 @@ class DdlPds2PsanaDispatch ( object ) :
                     config_types[cfg_type] = _proxyClass(type, psana_type, final_type, xtc_type, cfg_type)
                 code = _TEMPL('event_cfg_store_template').render(locals())
 
-        return code, header
-    
+        return code, header, psana_type
+
 #
 #  In case someone decides to run this module
 #
