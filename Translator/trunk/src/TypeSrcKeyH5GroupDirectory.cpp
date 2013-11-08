@@ -1,6 +1,8 @@
 #include <set>
 #include <string>
+#include <sstream>
 
+#include "ErrSvc/Issue.h"
 #include "MsgLogger/MsgLogger.h"
 #include "Translator/TypeSrcKeyH5GroupDirectory.h"
 #include "Translator/H5GroupNames.h"
@@ -71,8 +73,13 @@ void SrcKeyGroup::storeData(const PSEvt::EventKey & eventKey, DataTypeLoc dataTy
     m_datasetsCreated = ScalarForType;
     m_totalEntries = 1;
   } else {
-    MsgLog(logger,fatal, "Cannot make a scalar dataset, datasetsCreated is: " <<
-           datasetsCreatedStr());
+    ostringstream msg;
+    const Pds::Src & src = eventKey.src();
+    msg << "Cannot make a scalar dataset, datasetsCreated is: " 
+        << datasetsCreatedStr() << " eventKey = " << eventKey
+        << " full Src: " << std::hex << " log=0x" << src.log()
+        << " phy=0x" << src.phy();
+    throw ErrSvc::Issue(ERR_LOC, msg.str());
   }
 }
 
@@ -258,8 +265,8 @@ SrcKeyGroup & TypeSrcKeyH5GroupDirectory::addSrcKeyGroup(const PSEvt::EventKey &
                                                 m_hdfWriterDamage));
 }
 
-void TypeSrcKeyH5GroupDirectory::getNotWrittenSrcPartition(const set<Pds::Src, LessSrc> & srcs, 
-                                                           map<Pds::Src, vector<PSEvt::EventKey>, LessSrc > & outputSrcMap, 
+void TypeSrcKeyH5GroupDirectory::getNotWrittenSrcPartition(const set<Pds::Src> & srcs, 
+                                                           map<Pds::Src, vector<PSEvt::EventKey> > & outputSrcMap, 
                                                            vector<PSEvt::EventKey> & outputOtherNotWritten,                          
                                                            vector<PSEvt::EventKey> & outputWrittenKeys)
 {
@@ -277,7 +284,7 @@ void TypeSrcKeyH5GroupDirectory::getNotWrittenSrcPartition(const set<Pds::Src, L
       const SrcKeyPair & srcKeyPair = srcKeyPos->first;
       const Pds::Src & src = srcKeyPair.first;
       // we don't care about the key here, just the src
-      set<Pds::Src, LessSrc>::iterator partPos = srcs.find(src);
+      set<Pds::Src>::iterator partPos = srcs.find(src);
       bool srcInPartition = partPos != srcs.end();
       if (not srcInPartition) {
         outputOtherNotWritten.push_back(srcKeyGroup.eventKey());
@@ -289,4 +296,24 @@ void TypeSrcKeyH5GroupDirectory::getNotWrittenSrcPartition(const set<Pds::Src, L
   }
 }
 
-
+void TypeSrcKeyH5GroupDirectory::dump() {
+  ostringstream msg;
+  msg << " ** TypeSrcKeyH5GroupDirectory::dump ** " << endl;
+  TypeMapContainer::iterator typePos;
+  for (typePos = m_map.begin(); typePos != m_map.end(); ++typePos) {
+    const type_info * typeInfoPtr = typePos->first;
+    TypeGroup & typeGroup = typePos->second;
+    msg << PSEvt::TypeInfoUtils::typeInfoRealName(typeInfoPtr) << " : " << endl;
+    SrcKeyMap & srcKeyMap = typeGroup.srcKeyMap();
+    SrcKeyMap::iterator srcPos;
+    for (srcPos = srcKeyMap.begin(); srcPos != srcKeyMap.end(); ++srcPos) {
+      const SrcKeyPair & srcKeyPair = srcPos->first;
+      const Pds::Src & src = srcKeyPair.first;
+      const string & key = srcKeyPair.second;
+      msg << "  src = " <<   getH5GroupNameForSrc(src)
+          << " log=0x" << std::hex << src.log() << " phy=0x" << src.phy()
+          << " key='" << key << "'" << endl;
+    }
+  }
+  MsgLog(logger,info,msg.str());
+}

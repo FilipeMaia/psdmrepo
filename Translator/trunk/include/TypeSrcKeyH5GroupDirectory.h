@@ -13,7 +13,6 @@
 #include "pdsdata/xtc/Src.hh"
 
 #include "PSEvt/EventKey.h"
-#include "PSEvt/SrcCmp.h"
 #include "PSEvt/TypeInfoUtils.h"
 #include "PSEvt/Event.h"
 #include "PSEnv/Env.h"
@@ -26,12 +25,6 @@
 #include "Translator/DataSetCreationProperties.h"
 
 namespace Translator {
-
-class LessSrc {
- public:
-  bool operator()(const Pds::Src& lhs, const Pds::Src& rhs) const { return PSEvt::SrcCmp::cmp(lhs,rhs); }
-};
-
 
 class SrcKeyGroup {
  public:
@@ -123,9 +116,8 @@ class LessSrcKeyPair {
   bool operator()(const SrcKeyPair &a, const SrcKeyPair &b) {
     const Pds::Src & aSrc = a.first;
     const Pds::Src & bSrc = b.first;
-    int src_diff = PSEvt::SrcCmp::cmp(aSrc, bSrc);
-    if (src_diff<0) return true;
-    if (src_diff>0) return false;
+    if (aSrc < bSrc) return true;
+    if (bSrc < aSrc) return false;
     const std::string & aStr = a.second;
     const std::string & bStr = b.second;
       return (aStr < bStr);
@@ -177,10 +169,11 @@ class TypeSrcKeyH5GroupDirectory {
   SrcKeyMap::iterator endSrcKey(const std::type_info *);
   SrcKeyGroup & addSrcKeyGroup(const PSEvt::EventKey &eventKey, 
                                boost::shared_ptr<Translator::HdfWriterBase> hdfWriter);
-  void getNotWrittenSrcPartition(const std::set<Pds::Src, LessSrc> & srcs, 
-                                 std::map<Pds::Src, std::vector<PSEvt::EventKey>, LessSrc > & outputSrcMap, 
+  void getNotWrittenSrcPartition(const std::set<Pds::Src> & srcs, 
+                                 std::map<Pds::Src, std::vector<PSEvt::EventKey> > & outputSrcMap, 
                                  std::vector<PSEvt::EventKey> & outputOtherNotWritten,
                                  std::vector<PSEvt::EventKey> & outputWrittenKeys);
+  void dump();
  private:
   TypeMapContainer m_map;
   boost::shared_ptr<Translator::HdfWriterEventId> m_hdfWriterEventId;

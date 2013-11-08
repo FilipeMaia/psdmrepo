@@ -8,6 +8,7 @@
 
 #include "hdf5/hdf5.h"
 #include "hdf5pp/Exceptions.h"
+#include "ErrSvc/Issue.h"
 
 #include "boost/make_shared.hpp"
 
@@ -755,25 +756,25 @@ void H5Output::eventImpl()
     // from the same Src will have the same damage - the DroppedContribution bit.
 
     BlankNonBlanks blankNonBlanks;
-    set<Pds::Src, LessSrc> droppedSrcs;
-    map<Pds::Src,Pds::Damage, LessSrc> src2damage;
+    set<Pds::Src> droppedSrcs;
+    map<Pds::Src,Pds::Damage> src2damage;
     for (size_t idx = 0; idx < droppedContribs.size(); ++idx) {
       Pds::Src src = droppedContribs[idx].first;
       Pds::Damage damage = droppedContribs[idx].second;
       droppedSrcs.insert(src);
       src2damage[src]=damage;
     }
-    map<Pds::Src, vector<PSEvt::EventKey>, LessSrc > droppedSrcsNotWritten;
+    map<Pds::Src, vector<PSEvt::EventKey> > droppedSrcsNotWritten;
     vector<PSEvt::EventKey> otherNotWritten;
     vector<PSEvt::EventKey> writtenKeys;
     m_calibCycleEventGroupDir.getNotWrittenSrcPartition(droppedSrcs,
                                                  droppedSrcsNotWritten,
                                                  otherNotWritten,
                                                  writtenKeys);
-    set<Pds::Src, LessSrc>::iterator droppedSrc;
+    set<Pds::Src>::iterator droppedSrc;
     for (droppedSrc = droppedSrcs.begin(); droppedSrc != droppedSrcs.end(); ++droppedSrc) {
       const Pds::Src & src = *droppedSrc;
-      map<Pds::Src, vector<PSEvt::EventKey>, LessSrc >::iterator notWrittenIter;
+      map<Pds::Src, vector<PSEvt::EventKey> >::iterator notWrittenIter;
       notWrittenIter= droppedSrcsNotWritten.find(src);
       if (notWrittenIter == droppedSrcsNotWritten.end()) {
         MsgLog(logger(eventImpl),warning, 
@@ -848,7 +849,12 @@ void H5Output::addConfigTypes(TypeSrcKeyH5GroupDirectory &configGroupDirectory,
       }
       SrcKeyGroup & srcKeyGroup = srcKeyPos->second;
       if (dataLoc == inConfigStore) {
-        srcKeyGroup.storeData(eventKey, inConfigStore, *m_event, *m_env);
+        try {
+          srcKeyGroup.storeData(eventKey, inConfigStore, *m_event, *m_env);
+        } catch (ErrSvc::Issue &issue) {
+          configGroupDirectory.dump();
+          throw issue;
+        }
       } else if (dataLoc == inEvent) {
         srcKeyGroup.make_datasets(inEvent, *m_event, *m_env, m_defaultCreateDsetProp);
         Pds::Damage damage = getDamageForEventKey(eventKey);
