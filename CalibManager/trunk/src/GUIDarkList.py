@@ -104,43 +104,30 @@ class GUIDarkList ( QtGui.QWidget ) :
         self.dict_run_recs = ru.calibration_runs (self.instr_name.value(), self.exp_name.value())
         #print 'self.dict_run_recs = ', self.dict_run_recs
 
-
         self.list_of_records = []
-        self.list_of_runs = fnm.get_list_of_xtc_runs()   # ['0001', '0202', '0203',...]
-        #self.list_of_run_nums = gu.list_of_int_from_list_of_str(self.list_of_runs) # [1, 202, 203, 204,...]
+        self.list_of_run_strs_in_dir = fnm.get_list_of_xtc_runs()   # ['0001', '0202', '0203',...]
+        self.list_of_run_nums_in_dir = gu.list_of_int_from_list_of_str(self.list_of_run_strs_in_dir) # [1, 202, 203, 204,...]
+        self.list_of_run_nums_in_regdb = ru.list_of_runnums(self.instr_name.value(), self.exp_name.value())
 
-        #self.dict_run_isdark = ru.dict_runnum_dark (self.instr_name.value(), self.exp_name.value(), self.list_of_run_nums)
-        #print 'self.dict_run_isdark = ', self.dict_run_isdark
-        #print 'Request calibration runs for inst: %s  experiment: %s' % (self.instr_name.value(), self.exp_name.value()) 
+        print 'list_of_run_nums_in_dir:\n',   self.list_of_run_nums_in_dir
+        print 'list_of_run_nums_in_regdb:\n', self.list_of_run_nums_in_regdb
+        
+        if self.list_of_run_nums_in_regdb == [] : self.list_of_runs = self.list_of_run_nums_in_dir
+        else                                    : self.list_of_runs = self.list_of_run_nums_in_regdb
+
+        for run_num in self.list_of_runs :
+
+            if not self.isSelectedRun            (run_num) : continue
+            if not self.hasSelectedDetectorInRun (run_num) : continue
+
+            str_run_num = '%04d' % run_num
+
+            if not run_num in self.list_of_run_nums_in_dir :
+                self.comment = 'NOT FOUND xtc file!'
+                #self.type    = 'N/A'
 
 
-        selection_is_on = False
-        if self.dark_list_show_runs.value() == 'dark' : selection_is_on = True
-
-        for str_run_num in self.list_of_runs :
-            #print 'str_run_num = ', str_run_num
-
-            run_num = int(str_run_num)
-
-            comment = ''
-            is_dark = False
-
-            # Unpack RegDB info
-            if self.dict_run_recs != {} :
-                run_rec = self.dict_run_recs[run_num]
-                list_of_calibs = run_rec['calibrations']
-                comment        = run_rec['comment']
-                is_dark = 'dark' in list_of_calibs
-                #print run_num, is_dark, list_of_calibs, comment
-
-            if selection_is_on and not is_dark : continue
-
-            if not self.hasSelectedDetectorInRun(run_num) : continue
-
-            self.type = ''
-            if is_dark : self.type = 'dark'
-
-            widg = GUIDarkListItem ( self, str_run_num, self.type, comment)
+            widg = GUIDarkListItem ( self, str_run_num, self.type, self.comment)
             item = QtGui.QListWidgetItem('', self.list)
             #self.list.addItem(item)
             #item.setFlags (  QtCore.Qt.ItemIsEnabled ) #| QtCore.Qt.ItemIsSelectable  | QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsTristate)
@@ -157,11 +144,28 @@ class GUIDarkList ( QtGui.QWidget ) :
             self.list_of_records.append(record)
 
 
-    #def isSelectedDarkRun(self, run_num) :
+    def isSelectedRun(self, run_num, type_to_select = 'dark') :
 
+        # Unpack RegDB info
+        if self.dict_run_recs != {} :
+            run_rec = self.dict_run_recs[run_num]
+            list_of_calibs = run_rec['calibrations']
+            self.comment   = run_rec['comment']
+            self.is_found_type = type_to_select in list_of_calibs
+            #print run_num, is_found_type, list_of_calibs, self.comment
+        else :
+            self.is_found_type = False
+            self.comment   = ''
 
+        if self.is_found_type :
+            self.type = type_to_select
+            return True
 
+        if self.dark_list_show_runs.value() == self.dark_list_show_runs.value_def() : # 'all' - For all runs
+            self.type = ''
+            return True
 
+        return False
 
 
     def hasSelectedDetectorInRun(self, run_num) :

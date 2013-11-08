@@ -84,6 +84,16 @@ def list_of_int_from_list_of_str(list_in):
 
 #-----------------------------
 
+def list_of_str_from_list_of_int(list_in, fmt='%04d'):
+    """Converts [1, 202, 203, 204,...] to ['0001', '0202', '0203', '0204',...]
+    """
+    list_out = []
+    for item in list_in :
+        list_out.append( fmt % item )
+    return list_out
+
+#-----------------------------
+
 
 def create_directory(dir) : 
     if os.path.exists(dir) :
@@ -389,6 +399,8 @@ def parse_xtc_path(path='.') :
     experiment = 'expt'
     run_str    = 'r0000'
     run_num    = 0
+
+    if path is None : return instrument, experiment, run_str, run_num
 
     bname   = os.path.basename(path)                # i.e. e167-r0015-s00-c00.xtc
     try:

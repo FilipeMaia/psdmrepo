@@ -90,10 +90,21 @@ def list_of_runnums (ins, exp) :
     """Returns the list of run numbers for specified experiment.
     """
     runs = experiment_info.experiment_runs(ins, exp)
-    list_of_run_nums = []
+    lst = []
     for rec in runs :
-        list_of_run_nums.append( int(rec['num']) )
-    return list_of_run_nums
+        lst.append( int(rec['num']) )
+    return lst
+
+#------------------------------
+
+def list_of_runstrings (ins, exp) :
+    """Returns the list of run numbers for specified experiment.
+    """
+    runs = experiment_info.experiment_runs(ins, exp)
+    lst = []
+    for rec in runs :
+        lst.append( '%04d'%rec['num'] )
+    return lst
 
 #------------------------------
 
