@@ -1,0 +1,292 @@
+#include <set>
+#include <string>
+
+#include "MsgLogger/MsgLogger.h"
+#include "Translator/TypeSrcKeyH5GroupDirectory.h"
+#include "Translator/H5GroupNames.h"
+
+using namespace std;
+using namespace PSEvt;
+using namespace PSEnv;
+using namespace Translator;
+
+namespace {
+const char* logger = "TypeSrcKeyH5GroupDirectory"; 
+
+}; // end the local namespace
+
+
+/////////////////////////////////////////////////////////
+void SrcKeyGroup::make_timeDamageDatasets()
+{
+  m_hdfWriterEventId->make_dataset(group());
+  m_hdfWriterDamage->make_datasets(group());
+  m_datasetsCreated = ArrayForOnlyTimeDamage;
+}
+
+void SrcKeyGroup::make_typeDatasets(DataTypeLoc dataTypeLoc,
+                                    Event &evt, Env &env, 
+                                    const DataSetCreationProperties & dsetCreateProp) {
+  if (m_datasetsCreated != ArrayForOnlyTimeDamage) {
+    MsgLog(logger,fatal,"make_typeDatasets called but datasetCreated is not arrayForOnlyTimeDamage, call make_timeDamageDatasets first");
+  }
+
+  m_hdfWriter->make_datasets(dataTypeLoc, m_group, m_eventKey, evt, env, 
+                             dsetCreateProp.shuffle(), 
+                             dsetCreateProp.deflate(),
+                             dsetCreateProp.chunkPolicy());
+
+
+  m_datasetsCreated = ArrayForTypeTimeDamage;
+
+  while (m_initialBlanks > 0) {
+    m_hdfWriter->addBlank(m_group);
+    --m_initialBlanks;
+  }
+}
+
+void SrcKeyGroup::make_datasets(DataTypeLoc dataTypeLoc,
+                                Event &evt, Env &env, 
+                                const DataSetCreationProperties & dsetCreateProp) {
+  if (m_datasetsCreated != None) {
+    MsgLog(logger,fatal,"make_datasets called but datasetCreated is not None");
+  }
+  m_hdfWriter->make_datasets(dataTypeLoc, m_group, m_eventKey, evt, env, 
+                             dsetCreateProp.shuffle(), 
+                             dsetCreateProp.deflate(),
+                             dsetCreateProp.chunkPolicy());  
+
+  m_hdfWriterEventId->make_dataset(m_group);
+  m_hdfWriterDamage->make_datasets(m_group);
+
+  m_datasetsCreated = ArrayForTypeTimeDamage;
+
+  if (m_initialBlanks > 0) MsgLog(logger, fatal, "make_datasets called but there are initial blanks.");
+}
+
+void SrcKeyGroup::storeData(const PSEvt::EventKey & eventKey, DataTypeLoc dataTypeLoc,
+                            PSEvt::Event &evt, PSEnv::Env &env) {
+  if (m_datasetsCreated == None) {
+    m_hdfWriter->store(dataTypeLoc, group(), eventKey, evt, env);
+    m_datasetsCreated = ScalarForType;
+    m_totalEntries = 1;
+  } else {
+    MsgLog(logger,fatal, "Cannot make a scalar dataset, datasetsCreated is: " <<
+           datasetsCreatedStr());
+  }
+}
+
+long SrcKeyGroup::appendDataTimeAndDamage(const PSEvt::EventKey & eventKey, 
+                                          DataTypeLoc dataTypeLoc,
+                                          PSEvt::Event &evt, 
+                                          PSEnv::Env &env, 
+                                          boost::shared_ptr<PSEvt::EventId> eventId,
+                                          Pds::Damage damage) {
+  if (m_datasetsCreated != ArrayForTypeTimeDamage) {
+    MsgLog(logger,fatal,"appending data but type dataset not created");
+  }
+  m_hdfWriter->append(dataTypeLoc, group(), eventKey, evt, env);
+  m_hdfWriterEventId->append(group(), *eventId);
+  m_hdfWriterDamage->append(group(), damage, HdfWriterDamage::ValidEntry);
+  ++m_totalEntries;
+  return m_totalEntries-1;
+}
+
+long SrcKeyGroup::appendBlankTimeAndDamage(const PSEvt::EventKey & eventKey, 
+                                           boost::shared_ptr<PSEvt::EventId> eventId,
+                                           Pds::Damage damage) {
+  if (m_datasetsCreated == None or m_datasetsCreated == ScalarForType) {
+    MsgLog(logger,fatal,"cannot append blank, datasetsCreated is " << datasetsCreatedStr());
+  }
+  if (m_datasetsCreated == ArrayForTypeTimeDamage) {
+    m_hdfWriter->addBlank(group());
+  } else {
+    ++m_initialBlanks;
+    MsgLog(logger,trace,"set initial blank count to " << m_initialBlanks);
+  }
+  m_hdfWriterEventId->append(group(), *eventId);
+  m_hdfWriterDamage->append(group(), damage, HdfWriterDamage::BlankEntry);
+  ++m_totalEntries;
+  MsgLog(logger,trace,"appended time, damage of " << damage.value() << " total entries=" << m_totalEntries);
+  return m_totalEntries-1;
+}
+
+void SrcKeyGroup::overwriteDataAndDamage(long index, 
+                                         const PSEvt::EventKey &eventKey, 
+                                         DataTypeLoc dataTypeLoc,
+                                         PSEvt::Event & evt, 
+                                         PSEnv::Env & env, 
+                                         Pds::Damage damage) {
+  MsgLog(logger,trace,"overwriteDataAndDamage: index=" << index );
+  m_hdfWriter->store_at(dataTypeLoc, index, group(), eventKey, evt, env);
+  m_hdfWriterDamage->store_at(index, group(), damage, HdfWriterDamage::ValidEntry);
+}
+
+void SrcKeyGroup::overwriteDamage(long index, 
+                                  const PSEvt::EventKey &eventKey, 
+                                  boost::shared_ptr<PSEvt::EventId> eventId, 
+                                  Pds::Damage damage) {
+  MsgLog(logger,trace,"overwriteDamage: index=" << index );
+  m_hdfWriterDamage->store_at(index, group(), damage, HdfWriterDamage::BlankEntry);
+}
+
+
+void SrcKeyGroup::close()  {
+  if (m_datasetsCreated == ArrayForTypeTimeDamage or 
+      m_datasetsCreated == ArrayForOnlyTimeDamage) {
+    m_hdfWriterEventId->closeDataset(m_group);
+    m_hdfWriterDamage->closeDatasets(m_group);
+  }
+  m_group.close(); 
+};
+
+string SrcKeyGroup::datasetsCreatedStr() {
+  switch (m_datasetsCreated) {
+  case None:
+    return "None";
+  case ScalarForType:
+    return "ScalarForType";
+  case ArrayForTypeTimeDamage:
+    return "ArrayForTypeTimeDamage";
+  case ArrayForOnlyTimeDamage:
+    return "ArrayForOnlyTimeDamage";
+  }
+  return "*undefined*";
+}
+
+/////////////////////////////////////////////////
+void TypeSrcKeyH5GroupDirectory::closeGroups() { 
+  TypeMapContainer::iterator typeIter;
+  for (typeIter= m_map.begin(); typeIter != m_map.end(); ++typeIter) {
+    TypeGroup & typeGroup = typeIter->second;
+    SrcKeyMap & srcKeyMap = typeGroup.srcKeyMap();
+    SrcKeyMap::iterator srcIter;
+    for (srcIter = srcKeyMap.begin(); srcIter != srcKeyMap.end(); ++srcIter) {
+      SrcKeyGroup & srcKeyGroup = srcIter->second;
+      srcKeyGroup.close();
+    }
+    typeGroup.group().close();
+  }
+}
+
+void TypeSrcKeyH5GroupDirectory::clearMaps() {
+  TypeMapContainer::iterator typeIter;
+  for (typeIter= m_map.begin(); typeIter != m_map.end(); ++typeIter) {
+    TypeGroup & typeGroup = typeIter->second;
+    SrcKeyMap & srcKeyMap = typeGroup.srcKeyMap();
+    srcKeyMap.clear();
+  }
+  m_map.clear();
+}
+
+
+void TypeSrcKeyH5GroupDirectory::markAllSrcKeyGroupsNotWrittenForEvent() {
+  TypeMapContainer::iterator typeIter;
+  for (typeIter= m_map.begin(); typeIter != m_map.end(); ++typeIter) {
+    TypeGroup & typeGroup = typeIter->second;
+    SrcKeyMap & srcKeyMap = typeGroup.srcKeyMap();
+    SrcKeyMap::iterator srcIter;
+    for (srcIter = srcKeyMap.begin(); srcIter != srcKeyMap.end(); ++srcIter) {
+      SrcKeyGroup & srcKeyGroup = srcIter->second;
+      srcKeyGroup.written(false);
+    }
+  }
+}
+
+
+TypeMapContainer::iterator TypeSrcKeyH5GroupDirectory::findType(const std::type_info *typeInfoPtr) {
+  return m_map.find(typeInfoPtr);
+}
+
+TypeMapContainer::iterator TypeSrcKeyH5GroupDirectory::endType() {
+  return m_map.end();
+}
+
+TypeGroup & TypeSrcKeyH5GroupDirectory::addTypeGroup(const std::type_info *typeInfoPtr, hdf5pp::Group & parentGroup, bool short_bld_name) {
+  string groupName = getH5GroupNameForType(typeInfoPtr, short_bld_name);
+  hdf5pp::Group group = parentGroup.createGroup(groupName);
+  return (m_map[ typeInfoPtr ] = TypeGroup(group,
+                                           m_hdfWriterEventId,
+                                           m_hdfWriterDamage));
+}
+
+SrcKeyMap::iterator TypeSrcKeyH5GroupDirectory::findSrcKey(const PSEvt::EventKey &eventKey) {
+  const type_info * typeInfoPtr = eventKey.typeinfo();
+  TypeMapContainer::iterator typePos = m_map.find(typeInfoPtr);
+  if (typePos == m_map.end()) MsgLog(logger,fatal,"findSrc - type_info " << PSEvt::TypeInfoUtils::typeInfoRealName(typeInfoPtr) << " not stored");
+  TypeGroup & typeGroup = typePos->second;
+  SrcKeyMap & srcKeyMap = typeGroup.srcKeyMap();
+  const Pds::Src & src = eventKey.src();
+  const string & key = eventKey.key();
+  SrcKeyPair srcStrPair = make_pair(src,key);
+  SrcKeyMap::iterator srcPos = srcKeyMap.find(srcStrPair);
+  return srcPos;
+}
+
+SrcKeyMap::iterator TypeSrcKeyH5GroupDirectory::endSrcKey(const std::type_info *typeInfoPtr) {
+  TypeMapContainer::iterator typePos = m_map.find(typeInfoPtr);
+  if (typePos == m_map.end()) MsgLog(logger,fatal,"endSrc - typeInfo " << PSEvt::TypeInfoUtils::typeInfoRealName(typeInfoPtr) << " not stored");
+  TypeGroup & typeGroup = typePos->second;
+  SrcKeyMap &srcKeyMap = typeGroup.srcKeyMap();
+  return srcKeyMap.end();
+}
+
+SrcKeyGroup & TypeSrcKeyH5GroupDirectory::addSrcKeyGroup(const PSEvt::EventKey &eventKey, 
+                                                         boost::shared_ptr<HdfWriterBase> hdfWriter) {
+  const type_info * typeInfoPtr = eventKey.typeinfo();
+  TypeMapContainer::iterator typePos = m_map.find(typeInfoPtr);
+  if (typePos == m_map.end()) MsgLog(logger,fatal,"addSrcKeyGroup - typeInfo " << PSEvt::TypeInfoUtils::typeInfoRealName(typeInfoPtr) << " not stored");
+  TypeGroup & typeGroup = typePos->second;
+  SrcKeyMap &srcKeyMap = typeGroup.srcKeyMap();
+  const Pds::Src &src = eventKey.src();
+  const string &key = eventKey.key();
+  SrcKeyPair srcStrPair = make_pair(src,key);
+  string srcKeyGroupName = getH5GroupNameForSrc(src);
+  if (eventKey.key().size()) {
+    srcKeyGroupName += "_";
+    srcKeyGroupName += eventKey.key();
+  }
+  hdf5pp::Group typeH5Group = typeGroup.group();
+  hdf5pp::Group srcH5Group = typeH5Group.createGroup(srcKeyGroupName);
+  uint64_t srcVal = (uint64_t(src.phy()) << 32) + src.log();
+  srcH5Group.createAttr<uint64_t>("_xtcSrc").store(srcVal);
+  MsgLog(logger,trace,"addSrcKeyGroup " << srcKeyGroupName);
+  return (srcKeyMap[ srcStrPair ] = SrcKeyGroup(srcH5Group,
+                                                eventKey,
+                                                hdfWriter,
+                                                m_hdfWriterEventId,
+                                                m_hdfWriterDamage));
+}
+
+void TypeSrcKeyH5GroupDirectory::getNotWrittenSrcPartition(const set<Pds::Src, LessSrc> & srcs, 
+                                                           map<Pds::Src, vector<PSEvt::EventKey>, LessSrc > & outputSrcMap, 
+                                                           vector<PSEvt::EventKey> & outputOtherNotWritten,                          
+                                                           vector<PSEvt::EventKey> & outputWrittenKeys)
+{
+  TypeMapContainer::iterator typePos;
+  for (typePos = m_map.begin(); typePos != m_map.end(); ++typePos) {
+    TypeGroup & typeGroup = typePos->second;
+    SrcKeyMap & srcKeyMap = typeGroup.srcKeyMap();
+    SrcKeyMap::iterator srcKeyPos;
+    for (srcKeyPos = srcKeyMap.begin(); srcKeyPos != srcKeyMap.end(); ++srcKeyPos) {
+      SrcKeyGroup & srcKeyGroup = srcKeyPos->second;
+      if (srcKeyGroup.written()) {
+        outputWrittenKeys.push_back(srcKeyGroup.eventKey());
+        continue;
+      }
+      const SrcKeyPair & srcKeyPair = srcKeyPos->first;
+      const Pds::Src & src = srcKeyPair.first;
+      // we don't care about the key here, just the src
+      set<Pds::Src, LessSrc>::iterator partPos = srcs.find(src);
+      bool srcInPartition = partPos != srcs.end();
+      if (not srcInPartition) {
+        outputOtherNotWritten.push_back(srcKeyGroup.eventKey());
+        continue;
+      } 
+      vector<PSEvt::EventKey> & srcNotWrittenList = outputSrcMap[src];
+      srcNotWrittenList.push_back(srcKeyGroup.eventKey());
+    }
+  }
+}
+
+
