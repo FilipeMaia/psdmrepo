@@ -45,15 +45,10 @@ short_bld_name = false
 ####################################################################
 # Type filtering
 # one can include or exclude a class of Psana types with the following 
-# options.  The default is to include all Psana types except one. Only the strings
-# include or exclude are valid for these type filtering options.  Comments
-# and blanks will be stripped from the line by the Translator module.
-#
-# The one psana type that is not stored is a part of epics that is not needed.
-# By excudling "Epics" below  which maps to Psana::Epics::ConfigV1, we do not
-# store the alias mapping in a separate dataset.  We still do store all the epics
-# variables using the alias names for convenience, but we do not store the table
-# that lists these links.  The links will still be present in the hdf5 for use.
+# options. Only the the strings include or exclude are valid for these 
+# type filtering options.  Comments and blanks will be stripped from the 
+# line by the Translator module.
+
 
 {{type_filter_options}}
 

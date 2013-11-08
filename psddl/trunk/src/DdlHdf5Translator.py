@@ -181,9 +181,6 @@ class DdlHdf5Translator ( object ) :
                " Translator package directory. For example: package_dir:Translator"
             
         self.log = appBaseArg
-        xmlfiles = [arg for arg in appBaseArg._args if arg.endswith('.xml')]
-
-        self.xmlfiles = xmlfiles
         self.packageDir = backend_options['package_dir']
         self.jiEnv = ji.Environment(loader=TemplateLoader(), trim_blocks=True,
                                     line_statement_prefix='$',
@@ -193,14 +190,17 @@ class DdlHdf5Translator ( object ) :
     #-------------------
 
     def parseTree ( self, model ) :
-        base_headers = []
-        for xmlfile in self.xmlfiles:
-            basename = os.path.basename(xmlfile)
-            if basename == 'xtc.ddl.xml':
-                continue
-            base_headers.append(basename.replace('.xml','.h'))
-        base_headers = base_headers
-
+        base_headers = set()
+        for package in model.packages():
+          for type in package.types():
+            ddlfile = type.location
+            basename = os.path.basename(ddlfile)
+            baseheader = os.path.splitext(basename)[0] + '.h'
+            if baseheader == 'xtc.ddl.h':
+              continue
+            base_headers.add(baseheader)
+        base_headers = list(base_headers)
+        base_headers.sort()
         # typeAliasMap: keys will be aliases used to refer to a collection of
         #   types, such as CsPad.  Values will be all the actual C++ types the
         #   alias refers to, such as [CsPadDataV1, CsPadConfigV1]
