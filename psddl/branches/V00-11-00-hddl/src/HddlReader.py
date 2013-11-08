@@ -70,6 +70,13 @@ class _error(SyntaxError):
 #         self.filename = filename
 #         self.lineno = lineno
 
+# mapping of the HDDL tag names to internal tag names
+_tagmap = {
+    'no_sizeof':    'no-sizeof',
+    'cpp_name':     'c++-name',
+    'value_type':   'value-type',
+    'config_type':  'config-type',
+}
 
 def _tags(decl):
     ''' 

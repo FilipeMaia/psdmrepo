@@ -48,6 +48,9 @@ from psddl.Method import Method
 # Local non-exported definitions --
 #----------------------------------
 
+def _hasconfig(str):
+    return '{xtc-config}' in str or '@config' in str
+
 #------------------------
 # Exported definitions --
 #------------------------
@@ -104,7 +107,8 @@ class Type ( Namespace ) :
             if attr.stor_type.variable: return True
             if attr.shape: 
                 for dim in attr.shape.dims:
-                    if str(dim).find('{self}') >= 0: return True
+                    if '{self}' in str(dim): return True
+                    if '@self' in str(dim): return True
         return False
 
     @property
@@ -288,12 +292,13 @@ class Type ( Namespace ) :
                         return
                 else:
                     cfg = ''
-                    if meth.expr.get('C++',"").find("{xtc-config}") >= 0: cfg = 'cfg'
-                    if meth.expr.get('C++',"").find("{self}") >= 0:
+                    code = meth.expr.get('C++',"")
+                    if _hasconfig(code): cfg = 'cfg'
+                    if '{self}' in code or '@self' in code:
                         if attr.isfixed():
-                            size = ExprVal("{self}."+attr.name+"._sizeof(%s)"%cfg, self)
+                            size = ExprVal("@self."+attr.name+"._sizeof(%s)"%cfg, self)
                         else:
-                            size = ExprVal("{self}."+attr.accessor.name+"()._sizeof(%s)"%cfg, self)
+                            size = ExprVal("@self."+attr.accessor.name+"()._sizeof(%s)"%cfg, self)
                     else:
                         size = ExprVal(attr.stor_type.fullName('C++')+"::_sizeof(%s)"%cfg, self)
 
@@ -311,8 +316,8 @@ class Type ( Namespace ) :
             expr = str(expr)
             logging.debug("_genSizeof: expr=%s", expr)
 
-            needCfg = expr.find('{xtc-config}') >= 0
-            static = expr.find('{self}') < 0
+            needCfg = _hasconfig(expr)
+            static = '{self}' not in expr and '@self' not in expr
 
         type = self.lookup('uint32_t', Type)
         tags = dict(inline=None)

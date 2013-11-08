@@ -28,6 +28,7 @@ __version__ = "$Revision$"
 #  Imports of standard modules --
 #--------------------------------
 import sys
+import os
 
 #---------------------------------
 #  Imports of base class module --
@@ -104,12 +105,15 @@ class DdlDumpHddl ( object ) :
         # headers for other included packages
         for use in model.use:
             headers = use['cpp_headers']
+            fname = use['file']
+            base, ext = os.path.splitext(fname)
+            if ext == '.xml': fname = base
             if not headers:
-                print >>self.out, '@include "{0}";'.format(use['file'])
+                print >>self.out, '@include "{0}";'.format(fname)
             else:
                 names = ', '.join(['"{0}"'.format(header) for header in headers])
                 names = _fmttags(['headers({0})'.format(names)])
-                print >>self.out, '@include "{0}" {1};'.format(use['file'], names)
+                print >>self.out, '@include "{0}" {1};'.format(fname, names)
 
         # loop over packages in the model
         for pkg in model.packages() :
@@ -330,10 +334,9 @@ class DdlDumpHddl ( object ) :
             count = 0
             for lang, code in meth.expr.items():
                 tags = _fmttags(['language("{0}")'.format(lang)])
-                print >>self.out, T("  $tags @{")(locals())
-                print >>self.out, "    return " + _codesubs(code) + ';'
                 sep = '' if count == (len(meth.expr)-1) else ','
-                print >>self.out, "  @}"+sep
+                code = _codesubs(code)
+                print >>self.out, T("  $tags @{ return $code; @}$sep")(locals())
                 count += 1
         else:
             print >>self.out, T("  $typename $name($args) [[external]]$tags;")(locals())
@@ -445,6 +448,10 @@ class DdlDumpHddl ( object ) :
                 if ds._type and ds._method().type != ds._type: 
                     type = ds._type.name+' '
 
+                shape = ''
+                if ds._rank is not None and ds._rank > 0 and ds._method().rank != ds._rank:
+                    shape = '[]'*ds._rank
+
                 print >>self.out, T("  @dataset $type$name$tags;")(type=type, name=ds.name, tags=tags)
                 
             else:
@@ -457,7 +464,6 @@ class DdlDumpHddl ( object ) :
                     tags = []
                     if 'vlen' in attr.tags: tags.append('vlen')
                     if attr.method != attr.name: tags.append('method({0})'.format(attr.method))
-                    if attr._rank > 0: tags.append('rank({0})'.format(attr._rank))
                     tags = _fmttags1(tags)
                     if tags: tags = ' '+tags
 
@@ -465,7 +471,13 @@ class DdlDumpHddl ( object ) :
                     if attr._type and attr._method().type != attr._type: 
                         type = attr._type.name+' '
 
-                    print >>self.out, T("    @attribute $type$name$tags;")(type=type, name=attr.name, tags=tags)
+                    shape = ''
+                    if attr._shape and (not attr._method().attribute or attr._method().attribute.shape != attr.shape):
+                        shape = _dims(attr._shape.dims)
+                    elif attr._rank is not None and attr._rank > 0 and attr._method().rank != attr._rank:
+                        shape = '[]'*attr._rank
+
+                    print >>self.out, T("    @attribute $type$name$shape$tags;")(type=type, name=attr.name, tags=tags, shape=shape)
                     
                 print >>self.out, "  }"
 

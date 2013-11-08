@@ -64,8 +64,11 @@ def _dsFactory(schema, ds, psana_ns):
 def _interpolate(expr, typeobj):
     
     expr = expr.replace('{xtc-config}.', 'm_cfg->')
+    expr = expr.replace('@config.', 'm_cfg->')
     expr = expr.replace('{type}.', typeobj.name+"::")
+    expr = expr.replace('@type.', typeobj.name+"::")
     expr = expr.replace('{self}.', "this->")
+    expr = expr.replace('@self.', "this->")
     return expr
 
 def _typedecl(type):

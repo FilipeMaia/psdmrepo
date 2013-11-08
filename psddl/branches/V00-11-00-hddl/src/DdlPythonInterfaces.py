@@ -56,8 +56,11 @@ from psddl.Type import Type
 
 def _interpolate(expr, typeobj):
     expr = expr.replace('{xtc-config}', 'cfg')
+    expr = expr.replace('@config', 'cfg')
     expr = expr.replace('{type}.', typeobj.name+"::")
+    expr = expr.replace('@type.', typeobj.name+"::")
     expr = expr.replace('{self}.', "this->")
+    expr = expr.replace('@self.', "this->")
     return expr
 
 def _typename(type, top_ns=None):
