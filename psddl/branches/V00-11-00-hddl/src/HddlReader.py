@@ -63,12 +63,12 @@ _intTypes = ["int8_t", "uint8_t",  "int16_t", "uint16_t",
              "int32_t", "uint32_t", "int64_t", "uint64_t",
              ]
 
-class _error(Exception):
+class _error(SyntaxError):
     def __init__(self, filename, lineno, message):
         msg = "{0}:{1}: {2}".format(filename, lineno, message)
-        Exception.__init__(self, msg)
-        self.filename = filename
-        self.lineno = lineno
+        SyntaxError.__init__(self, msg)
+#         self.filename = filename
+#         self.lineno = lineno
 
 
 def _tags(decl):
@@ -127,10 +127,10 @@ def _constExprToString(decl):
         return str(rhs)
     elif lhs is None:
         if op == '(':
-            return '(' + self._constExprToString(rhs) + ')'
+            return '(' + _constExprToString(rhs) + ')'
         else:
             # unary op
-            return op + self._constExprToString(rhs)
+            return op + _constExprToString(rhs)
     else:
         # binary op
         if op == 'LSHIFT': 
@@ -237,7 +237,9 @@ class HddlReader ( object ) :
             parent = None
             self._parsePackage(tree, model, parent, included)
                 
-        except Exception, ex:
+        except EOFError, ex:
+            raise
+        except SyntaxError, ex:
             print >>sys.stderr, ex
             for loc in reversed(self.location[:-1]):
                 print >>sys.stderr, "    included from:", loc
@@ -252,6 +254,9 @@ class HddlReader ( object ) :
         '''
         process include statement
         '''
+
+        # check tag names
+        self._checktags(indict, ['headers'])
 
         file = indict['name']
         headers = _tagval(indict, 'headers', [])
@@ -295,6 +300,9 @@ class HddlReader ( object ) :
         
         pkgname = pkgdict['name']  # QID instance, not a string
 
+        # check tag names
+        self._checktags(pkgdict, ['external', 'cpp_name', 'doc'])
+
         # make package object if it does not exist yet
         if parent:
             obj = parent.localName(pkgname)
@@ -305,7 +313,7 @@ class HddlReader ( object ) :
             else:
                 # make sure that existing name is a package
                 if not isinstance(obj, Package):
-                    msg = "while defining new package - package '{0}' already contains name '{1}' which is not a package".format(pkg.name, name)
+                    msg = "while defining new package - package '{0}' already contains name '{1}' which is not a package".format(pkg.name, pkgname)
                     raise _error(self.location[-1], _lineno(pkgdict), msg)
                 pkg = obj
         else:
@@ -343,6 +351,9 @@ class HddlReader ( object ) :
 
 
     def _parseType(self, typedict, pkg, included):
+
+        # check tag names
+        self._checktags(typedict, ['value_type', 'config_type', 'config', 'pack', 'no_sizeof', 'external', 'type_id', 'cpp_name', 'doc'])
 
         # every type must have a name
         typename = typedict['name']
@@ -413,6 +424,9 @@ class HddlReader ( object ) :
     def _parseH5Type(self, schemadict, pkg, included):
         """Method which parses definition of h5schema"""
 
+        # check tag names
+        self._checktags(schemadict, ['version', 'embedded', 'default', 'external', 'doc'])
+
         # every type must have a name
         schemaname = schemadict['name']
 
@@ -450,6 +464,9 @@ class HddlReader ( object ) :
     def _parseH5EnumMap(self, edecl, h5type, pstype):
         '''Method which parses enum remapping'''
         
+        # check tag names
+        self._checktags(edecl, ['doc'])
+
         enum_name = edecl['name']
         
         # find enum type
@@ -477,6 +494,9 @@ class HddlReader ( object ) :
         
     def _parseH5Dataset(self, dsdecl, h5type, pstype):
         """Method which parses definition of h5 dataset"""
+
+        # check tag names
+        self._checktags(dsdecl, ['method', 'vlen', 'external', 'doc'])
 
         dsname = dsdecl['name']
 
@@ -517,13 +537,16 @@ class HddlReader ( object ) :
     def _parseH5Attribute(self, adecl, ds, pstype):
         """Method which parses definition of h5 attribute"""
 
+        # check tag names
+        self._checktags(adecl, ['method', 'vlen', 'doc'])
+
         # attribute must have a name
         aname = adecl['name']
 
         logging.debug("HddlReader._parseH5Attribute: new attribute: %s", aname)
 
         atype = adecl['type']
-        if dstype:
+        if atype:
             atype = pstype.lookup(atype, (Type, Enum))
             if not atype: 
                 msg = "Failed to resolve attribute type name '{0}'".format(adecl['type'])
@@ -565,6 +588,9 @@ class HddlReader ( object ) :
     def _parseAttr(self, adecl, type):
         ''' Parse defintion of a single data member '''
         
+        # check tag names
+        self._checktags(adecl, ['shape_method', 'doc'])
+
         # every attribute must have a name
         attrname = adecl['name']
         
@@ -613,6 +639,9 @@ class HddlReader ( object ) :
         bfoff = 0
         for bfdecl in (adecl['bitfields'] or []):
         
+            # check tag names
+            self._checktags(bfdecl, ['doc'])
+
             size = bfdecl['size']
             bftypename = str(bfdecl['type'])
             bftype = type.lookup(bftypename, (Type, Enum))
@@ -620,7 +649,6 @@ class HddlReader ( object ) :
                 msg = "Failed to resolve bitfield type name '{0}'".format(bftypename)
                 raise _error(self.location[-1], _lineno(bfdecl), msg)
 
-            
             bf = Bitfield(bfdecl['name'], 
                           offset = bfoff, 
                           size = size,
@@ -641,6 +669,10 @@ class HddlReader ( object ) :
                 logging.debug("HddlReader._parseAttr: new method: %s", method)
 
     def _parseCtor(self, ctordecl, parent):
+
+        # check tag names
+        self._checktags(ctordecl, ['auto', 'inline', 'force_definition', 'external', 'doc'])
+
     
         # can specify initialization values for some attributes
         attr_init = []
@@ -667,6 +699,9 @@ class HddlReader ( object ) :
         # collect arguments
         args = []
         for argdecl in ctordecl['args']:
+
+            # check tag names
+            self._checktags(argdecl, ['method', 'doc'])
 
             # name and optional type
             argname = argdecl['name']
@@ -722,6 +757,9 @@ class HddlReader ( object ) :
                         
     def _parseMeth(self, methdecl, type):
     
+        # check tag names
+        self._checktags(methdecl, ['inline', 'external', 'language', 'doc'])
+
         # every method must have a name
         name = methdecl['name']
         
@@ -741,13 +779,17 @@ class HddlReader ( object ) :
             atype = type.lookup(typename, (Type, Enum))
             if not atype: 
                 msg = "Failed to resolve argument type name '{0}' for method argument '{1}'".format(typename, argname)
-                raise _error(self.location[-1], _lineno(ctordecl), msg)
+                raise _error(self.location[-1], _lineno(methdecl), msg)
             arank = argdecl['rank']
             args.append((argname, atype))
 
         codes = {}
         if methdecl['bodies']:
             for i, codeblock in enumerate(methdecl['bodies']):
+
+                # check tag names
+                self._checktags(codeblock, ['language', 'doc'])
+                
                 lang = _tagval(codeblock, 'language')
                 if lang is None and i == 0:
                     # for first code block tags are merged with method tags
@@ -770,7 +812,10 @@ class HddlReader ( object ) :
                         
     def _parseConstant(self, decl, parent, included):
         ''' Parse constant declaration '''
-        
+
+        # check tag names
+        self._checktags(decl, ['doc'])
+
         cname = decl['name']  # IDENTIFIER
         ctype = decl['type']  # IDENTIFIER
         cval = decl['value']  # const_expr
@@ -787,6 +832,9 @@ class HddlReader ( object ) :
     def _parseEnum(self, decl, parent, included):
         ''' Parse enum declaration '''
         
+        # check tag names
+        self._checktags(decl, ['doc'])
+
         enum = Enum(decl['name'],
                     parent, 
                     base=decl.get('type', 'int32_t'), 
@@ -834,17 +882,18 @@ class HddlReader ( object ) :
             msg = "More than one type_id tags defined for type '{0}'".format(typedict['name'])
             raise _error(self.location[-1], _lineno(typedict), msg)
         if tags:
-            args = tags[0]['args']
+            tag = tags[0]
+            args = tag['args']
             if args is None or len(args) != 2:
                 msg = "type_id tag requires exactly two arguments"
-                raise _error(self.location[-1], _lineno(tag[0]), msg)
+                raise _error(self.location[-1], _lineno(tag), msg)
             
             if not isinstance(args[0], QID):
                 msg = "first argument to type_id() must be an identifier"
-                raise _error(self.location[-1], _lineno(tag[0]), msg)
+                raise _error(self.location[-1], _lineno(tag), msg)
             if not isinstance(args[1], int):
                 msg = "second argument to type_id() must be a number"
-                raise _error(self.location[-1], _lineno(tag[0]), msg)
+                raise _error(self.location[-1], _lineno(tag), msg)
             
             return str(args[0]), args[1]
             
@@ -859,19 +908,31 @@ class HddlReader ( object ) :
             msg = "More than one '{0}' tags defined in declaration of '{1}'".format(tagname, decl['name'])
             raise _error(self.location[-1], _lineno(decl), msg)
         if tags:
-            args = tags[0]['args']
+            tag = tags[0]
+            args = tag['args']
             if args is None or len(args) != 1:
                 msg = "{0}() tag requires exactly one argument".format(tagname)
-                raise _error(self.location[-1], _lineno(tag[0]), msg)
+                raise _error(self.location[-1], _lineno(tag), msg)
             
             if not isinstance(args[0], int):
                 msg = "argument to {0}() must be a number".format(tagname)
-                raise _error(self.location[-1], _lineno(tag[0]), msg)
+                raise _error(self.location[-1], _lineno(tag), msg)
 
             return args[0]
             
         return default
 
+
+    def _checktags(self, decl, allowed):
+        ''' 
+        check all tags against the list of allowed tags
+        '''
+        for tag in decl['tags']:
+            if tag['name'] not in allowed:
+                msg = "Unexpected tag name: {0}".format(tag['name'])
+                raise _error(self.location[-1], _lineno(tag), msg)
+
+    
     def _getConfigTypes(self, typedict, pkg):
         ''' Get values of config() tags as a list of config type objects '''
 

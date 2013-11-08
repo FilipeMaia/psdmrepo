@@ -198,7 +198,7 @@ class DdlDumpHddl ( object ) :
         if type.external: tags.append('external')
         if type.value_type: tags.append('value_type')
         if 'config-type' in type.tags: tags.append('config_type')
-        if 'c++-name' in type.tags: tags.append('cpp_name("{0}")'.format(pkg.tags['c++-name']))
+        if 'c++-name' in type.tags: tags.append('cpp_name("{0}")'.format(type.tags['c++-name']))
         if 'no-sizeof' in type.tags: tags.append('no_sizeof')
         if type.pack: tags.append('pack({0})'.format(type.pack))
         if type.xtcConfig:
