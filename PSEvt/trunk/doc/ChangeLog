@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-07-06
+20113-11-08 David Schneider
+- Add const correctness and documentation to DamageMap
+
 Tag: V00-07-05
 20113-11-08 David Schneider
 - Remove our own cmp for Pds::Src and use the operator < in pdsdata for Pds::Src.
