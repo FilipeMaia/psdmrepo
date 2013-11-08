@@ -62,7 +62,7 @@ class HddlLex(object):
         
         self.lexer = lex.lex(module=self, **kw)
         
-        self.comments = []  # list of (lexpos, lineno, comment) tuple
+        self.comments = []  # list of (lexpos, lineno, comment) tuples
 
     literals = ".,;{}[]()-+=*/:<>?&%!~|"
 

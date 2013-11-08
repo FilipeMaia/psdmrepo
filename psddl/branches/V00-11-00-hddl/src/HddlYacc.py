@@ -27,6 +27,7 @@ __version__ = "$Revision$"
 #  Imports of standard modules --
 #--------------------------------
 import sys
+import warnings
 
 #---------------------------------
 #  Imports of base class module --
@@ -83,6 +84,9 @@ class HddlYacc ( object ) :
         lexer.lexer.lineno = 1
         tree = self.parser.parse(input=input, lexer=lexer.lexer, tracking=1)
         
+        # now tri to attach comments collected by lexer to the declarations
+        self._commentFixup(tree, lexer.comments, input, name)
+        
         return tree
 
     def _makepos(self, p, n=0, m=-1):
@@ -111,7 +115,7 @@ class HddlYacc ( object ) :
     def p_input(self, p):
         ''' input : includes declaration_seq
         '''
-        p[0] = dict(includes=p[1], declarations=p[2], name=self.name, tags=[])
+        p[0] = dict(decl='package', includes=p[1], declarations=p[2], name=self.name, tags=[])
    
     # quilaified identifier: set of identifiers separated by dots, makes QID object
     def p_qidentifier(self, p):
@@ -293,10 +297,10 @@ class HddlYacc ( object ) :
         '''
         if len(p) == 4:
             tags = p[1] + p[3]
-            p[0] = dict(name=p[2], value=None, tags=tags, pos=self._makepos(p))
+            p[0] = dict(decl='enum_const', name=p[2], value=None, tags=tags, pos=self._makepos(p))
         else:
             tags = p[1] + p[5]
-            p[0] = dict(name=p[2], value=p[4], tags=tags, pos=self._makepos(p))
+            p[0] = dict(decl='enum_const', name=p[2], value=p[4], tags=tags, pos=self._makepos(p))
 
 
     # package declaration will make a dict with the keys:
@@ -731,6 +735,83 @@ class HddlYacc ( object ) :
             raise SyntaxError("{0}: EOF reached while expecting further input".format(self.name))
         else:
             raise SyntaxError("{0}:{1}: Syntax error near or at '{2}'".format(self.name, p.lineno, p.value))
+
+    
+    def _commentFixup(self, tree, comments, input, name):
+        '''
+        Updated parsed tree with the comments collected by lexer.
+        
+        @param tree      representation of the parsed document
+        @param comments  list of (lexpos, lineno, comment) tuples
+        @param input     original document
+        '''
+        
+        def decl_children(decl):
+            dt = decl.get('decl')
+            if dt in ['package', 'type']:
+                return decl['declarations']
+            if dt == 'enum':
+                return decl['constants']
+            if dt == 'member':
+                return decl['bitfields'] or []
+            return []
+        
+        def isFirstOnLine(lexpos, input):
+            ''' Returns true if there are only spaces/tabs between lexpos and preceeding newline '''
+            while lexpos > 0:
+                lexpos -= 1
+                if input[lexpos] == '\n': return True
+                if input[lexpos] not in " \t": return False
+            return True
+
+        def findDeclAfter(tree, lineno):
+            '''Find a declaration which starts at or after given line'''
+            # assume that inner declarations are all ordered by their appearence
+            for decl in decl_children(tree):
+                # (start, end) line number
+                extent = decl['pos'][0]
+                if extent[0] < lineno and extent[1] >= lineno:
+                    # if it encloses comment line then go inside
+                    return findDeclAfter(decl, lineno)
+                if extent[0] >= lineno:
+                    # happens after me, OK
+                    return decl
+            return None
+
+        def findDeclSame(tree, lineno):
+            '''Find a declaration which is on the same line'''
+            # assume that inner declarations are all ordered by their appearence
+            for decl in decl_children(tree):
+                # (start, end) line number
+                extent = decl['pos'][0]
+                if extent[0] <= lineno and extent[1] >= lineno:
+                    # if it encloses comment line then go inside
+                    child = findDeclAfter(decl, lineno)
+                    return child or decl 
+            return None
+
+        for lexpos, lineno, comment in comments:
+
+#             print 'Checking comment at line', lineno, 'lexpos', lexpos, 'text', input[lexpos:lexpos+10]
+
+            # skip empty comments and comments starting with minus (dash)
+            if not comment or comment[0] == '-': continue
+            
+            decl = None
+            if isFirstOnLine(lexpos, input):
+#                 print 'first on line'
+                # find first declaration starting on or after this line and attach comment to it
+                decl = findDeclAfter(tree, lineno)
+            else:
+#                 print 'not first on line'
+                # find declaration on the same line 
+                decl = findDeclSame(tree, lineno)
+
+            if decl: 
+#                 print "decl:", decl.get('decl', '?'), 'name:', decl.get('name', '-')
+                decl['tags'].append(dict(name='doc', args=(comment,)))
+            else:
+                warnings.warn("{0}:{1}: Failed to match comment to a declaration, consider moving comment".format(name, lineno))
 
 
 #
