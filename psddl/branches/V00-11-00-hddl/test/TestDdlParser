@@ -199,7 +199,7 @@ class TestDdlParser ( unittest.TestCase ) :
         self.assertTupleEqual(type['pos'][0], (6, 11))
 
         tags = type['tags']
-        self.assertEqual(len(tags), 2)
+        self.assertEqual(len(tags), 3)  # comment adds as a tag
 
         tag = tags[0]
         for key in ('name', 'args', 'pos'): self.assertIn(key, tag)
