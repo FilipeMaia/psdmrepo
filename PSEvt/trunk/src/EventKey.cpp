@@ -15,8 +15,7 @@
 //-----------------------
 #include "PSEvt/EventKey.h"
 #include "PSEvt/TypeInfoUtils.h"
-#include "PSEvt/SrcCmp.h"
-
+ 
 //-----------------
 // C/C++ Headers --
 //-----------------
@@ -116,9 +115,8 @@ namespace PSEvt {
 bool 
 EventKey::operator<(const EventKey& other) const 
 {
-  int src_diff = SrcCmp::cmp(this->m_src, other.m_src);
-  if (src_diff<0) return true;
-  if (src_diff>0) return false;
+  if (this->m_src < other.m_src) return true;
+  if (other.m_src < this->m_src) return false;
   if( TypeInfoUtils::lessTypeInfoPtr()(m_typeinfo, other.m_typeinfo) ) return true;
   if( TypeInfoUtils::lessTypeInfoPtr()(other.m_typeinfo, m_typeinfo) ) return false;
   if (m_key < other.m_key) return true;

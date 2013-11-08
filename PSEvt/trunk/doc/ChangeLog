@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-07-05
+20113-11-08 David Schneider
+- Remove our own cmp for Pds::Src and use the operator < in pdsdata for Pds::Src.
+  Note: src proc id's will now distinguish eventKey's.
+
 Tag: V00-07-04
 20113-11-07 David Schneider
 - Remove exists(EventKey&) from Event interface (EventKey interface is lower
