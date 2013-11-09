@@ -126,12 +126,13 @@ class HddlLex(object):
     # normal comments are returned after stripping delimiters 
     def t_COMMENT(self, t):
         r'/\*(.*?)\*/'
+        lineno = t.lexer.lineno
+        t.lexer.lineno += t.value.count("\n")
         t.value = t.value.strip('/')
         t.value = t.value.strip('*')
         t.value = t.value.strip()
         # remember comment position for later matching
-        self.comments.append((t.lexpos, t.lexer.lineno, t.value))
-        t.lexer.lineno += t.value.count("\n")
+        self.comments.append((t.lexpos, lineno, t.value))
         return None
 
     # doc string 

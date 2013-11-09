@@ -79,7 +79,7 @@ ddl1_tokens = [
     ("(",           "(",            7),
     ("IDENTIFIER",  "Id_Type",      7),
     (",",           ",",            7),
-    ("NUMBER",      0,              7),
+    ("NUMBER",      (0, '0'),       7),
     (")",           ")",            7),
     ("R2BRACKET",   "]]",           7),
     ("L2BRACKET",   "[[",           8),
