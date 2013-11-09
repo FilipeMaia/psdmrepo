@@ -338,7 +338,7 @@ class DdlPythonInterfaces ( object ) :
 
         # generate methods (for public methods and abstract class methods only)
         for method in type.methods(): 
-            if type.value_type or method.access == "public": self._genMethod(type, method, wrapped, ndconverters)
+            if method.access == "public": self._genMethod(type, method, wrapped, ndconverters)
 
         # generate _shape() methods for array attributes
         for attr in type.attributes() :
@@ -351,7 +351,7 @@ class DdlPythonInterfaces ( object ) :
         for enum in type.enums():
             self._parseEnum(enum)
 
-        if type.version:
+        if type.version is not None:
             print >>self.cpp, T('  scope().attr("Version")=$version;')(version=type.version)
         if type.type_id:
             print >>self.cpp, T('  scope().attr("TypeId")=int(Pds::TypeId::$typeid);')(typeid=type.type_id)

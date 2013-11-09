@@ -53,7 +53,7 @@ class QID(object):
     def __str__(self):
         return '.'.join(self.id)
     def __repr__(self):
-        return '.'.join(self.id)
+        return 'QUID({0})'.format('.'.join(self.id))
 
 def _makepos(p, n=0, m=-1):
     ''' capture position as 2-tuple ((fromline, toline), (fromlexpos, tolexpos)) '''
@@ -78,19 +78,22 @@ class HddlYacc ( object ) :
     #  Constructor --
     #----------------
     def __init__(self, model=None, **kwargs):
+
+        kw = dict(write_tables=0)
+        kw.update(kwargs)
         
-        self.model = model or Package('')        
-        self.parser = yacc.yacc(module=self, **kwargs)
+        self.parser = yacc.yacc(module=self, **kw)
 
     def parse(self, input, name):
 
         self.name = name
+        self.input = input
 
         # make lexer
         lexer = HddlLex(name=name)
 
         lexer.lexer.lineno = 1
-        tree = self.parser.parse(input=input, lexer=lexer.lexer, tracking=1)
+        tree = self.parser.parse(input=input, lexer=lexer.lexer, debug=0, tracking=1)
         
         # now tri to attach comments collected by lexer to the declarations
         self._commentFixup(tree, lexer.comments, input, name)
@@ -137,9 +140,9 @@ class HddlYacc ( object ) :
     #   3. pos: (file, lineno) of the statement
     def p_includes(self, p):
         ''' includes : includes INCLUDE STRING tags ';'
-                     | empty
+                     | 
         '''
-        if len(p) == 2:
+        if len(p) == 1:
             p[0] = []
         else:
             p[0] = p[1] + [dict(name=p[3], tags=p[4], pos=_makepos(p, 2, 5))]
@@ -147,10 +150,9 @@ class HddlYacc ( object ) :
     # makes list of tags (tag is a 2-tuple)
     def p_tags(self, p):
         ''' tags : tags L2BRACKET taglist R2BRACKET
-                 | tags DOCSTRING
-                 | empty
+                 | 
         '''
-        if len(p) == 2:
+        if len(p) == 1:
             p[0] = []
         elif len(p) == 3:
             p[0] = p[1] + [dict(name="doc", args=(p[2],), pos=_makepos(p, 2))]
@@ -173,6 +175,7 @@ class HddlYacc ( object ) :
     #    pos: (file, lineno) of the statement
     def p_tag(self, p):
         ''' tag : IDENTIFIER '(' tagargs ')'
+                | DOCSTRING
                 | IDENTIFIER
         '''
         if len(p) == 2:
@@ -191,10 +194,15 @@ class HddlYacc ( object ) :
             p[0] = p[1] + (p[3],)
 
     # just return whatever object it is (number, string or QID)
-    def p_tagarg(self, p):
+    def p_tagarg_num(self, p):
         ''' tagarg : NUMBER
-                | qidentifier
-                | STRING
+        '''
+        p[0] = p[1][0]
+
+    # just return whatever object it is (number, string or QID)
+    def p_tagarg(self, p):
+        ''' tagarg : qidentifier
+                   | STRING
         '''
         p[0] = p[1]
 
@@ -205,9 +213,9 @@ class HddlYacc ( object ) :
                             | declaration_seq enum
                             | declaration_seq constdecl
                             | declaration_seq h5schema
-                            | empty
+                            | 
         '''
-        if len(p) == 2:
+        if len(p) == 1:
             p[0] = []
         else:
             p[0] = p[1] + [p[2]]
@@ -222,7 +230,8 @@ class HddlYacc ( object ) :
         ''' constdecl : tags CONST IDENTIFIER IDENTIFIER '=' const_expr tags ';'
         '''
         tags = p[1] + p[7]
-        p[0] = dict(decl="const", name=p[4], type=p[3], value=p[6], tags=tags, pos=_makepos(p))
+        valstr = self.input[p.lexpos(6):min(p.lexpos(7), p.lexpos(8))]
+        p[0] = dict(decl="const", name=p[4], type=p[3], value=p[6], value_str=valstr, tags=tags, pos=_makepos(p))
 
     # constant expression, which is basically a simple math with numbers and identifiers and does 
     # not involve function calls
@@ -249,9 +258,13 @@ class HddlYacc ( object ) :
         p[0] = dict(decl="const_expr", left=None, right=p[2], op=p[1], pos=_makepos(p))
         
     # simple expression is a number of qualified identifier (identifier is supposed to be a constant)
+    def p_const_expr_num(self, p):
+        ''' const_expr : NUMBER
+        '''
+        p[0] = dict(decl="const_expr", left=None, right=p[1][0], op=None, pos=_makepos(p))
+
     def p_const_expr_simple(self, p):
         ''' const_expr : qidentifier
-                       | NUMBER
         '''
         p[0] = dict(decl="const_expr", left=None, right=p[1], op=None, pos=_makepos(p))
 
@@ -296,10 +309,10 @@ class HddlYacc ( object ) :
         '''
         if len(p) == 4:
             tags = p[1] + p[3]
-            p[0] = dict(decl='enum_const', name=p[2], value=None, tags=tags, pos=_makepos(p))
+            p[0] = dict(decl='enum_const', name=p[2], value=None, value_str=None, tags=tags, pos=_makepos(p))
         else:
             tags = p[1] + p[5]
-            p[0] = dict(decl='enum_const', name=p[2], value=p[4], tags=tags, pos=_makepos(p))
+            p[0] = dict(decl='enum_const', name=p[2], value=p[4][0], value_str=p[4][1], tags=tags, pos=_makepos(p))
 
 
     # package declaration will make a dict with the keys:
@@ -340,9 +353,9 @@ class HddlYacc ( object ) :
                                    | member_declaration_seq member
                                    | member_declaration_seq method
                                    | member_declaration_seq ctor
-                                   | empty
+                                   | 
         '''
-        if len(p) == 2:
+        if len(p) == 1:
             p[0] = []
         else:
             p[0] = p[1] + [p[2]]
@@ -414,13 +427,13 @@ class HddlYacc ( object ) :
         ''' bitfield : tags qidentifier IDENTIFIER ':' NUMBER tags ';'
         '''
         tags = p[1] + p[6]
-        p[0] = dict(decl='bitfield', name=p[3], type=p[2], size=p[5], method=None, tags=tags, pos=_makepos(p))
+        p[0] = dict(decl='bitfield', name=p[3], type=p[2], size=p[5][0], method=None, tags=tags, pos=_makepos(p))
         
     def p_bitfield_meth(self, p):
         ''' bitfield : tags qidentifier IDENTIFIER ':' NUMBER RARROW IDENTIFIER tags ';'
         '''
         tags = p[1] + p[8]
-        p[0] = dict(decl='bitfield', name=p[3], type=p[2], size=p[5], method=p[7], tags=tags, pos=_makepos(p))
+        p[0] = dict(decl='bitfield', name=p[3], type=p[2], size=p[5][0], method=p[7], tags=tags, pos=_makepos(p))
         
     # array shape, returns the list of expressions (strings)
     def p_arr_shape(self, p):
@@ -432,11 +445,6 @@ class HddlYacc ( object ) :
         else:
             p[0] = [p[1]]
     
-    # convenience terminal stuff, returns None
-    def p_empty(self, p):
-        'empty :'
-        pass
-
     # declaration of a method returns a dict with keys:
     #    decl:       "method"
     #    name:       method name
@@ -620,7 +628,7 @@ class HddlYacc ( object ) :
     def p_schema_items(self, p):
         ''' schema_items : schema_items dataset
                          | schema_items enum_remap
-                         | empty
+                         | 
         '''
         if len(p) == 3:
             p[0] = p[1] + [p[2]]
@@ -633,13 +641,24 @@ class HddlYacc ( object ) :
     #    attributes:   list of attributes or None
     #    tags:         list of tags
     def p_dataset(self, p):
-        ''' dataset : tags H5DS IDENTIFIER ds_shape tags ';'
-                    | tags H5DS qidentifier IDENTIFIER ds_shape tags ';'
+        ''' dataset : tags H5DS IDENTIFIER tags ';'
+                    | tags H5DS qidentifier IDENTIFIER tags ';'
+        '''
+        if len(p) == 6:
+            tags = p[1] + p[4]
+            p[0] = dict(decl='h5ds', name=p[3], type=None, tags=tags, shape=None, attributes=None, pos=_makepos(p))
+        else:
+            tags = p[1] + p[5]
+            p[0] = dict(decl='h5ds', name=p[4], type=p[3], tags=tags, shape=None, attributes=None, pos=_makepos(p))
+
+    def p_dataset_shape(self, p):
+        ''' dataset : tags H5DS IDENTIFIER rank tags ';'
+                    | tags H5DS qidentifier IDENTIFIER rank tags ';'
         '''
         if len(p) == 7:
             tags = p[1] + p[5]
             p[0] = dict(decl='h5ds', name=p[3], type=None, tags=tags, shape=p[4], attributes=None, pos=_makepos(p))
-        elif len(p) == 8:
+        else:
             tags = p[1] + p[6]
             p[0] = dict(decl='h5ds', name=p[4], type=p[3], tags=tags, shape=p[5], attributes=None, pos=_makepos(p))
 
@@ -649,21 +668,10 @@ class HddlYacc ( object ) :
         tags = p[1] + p[4]
         p[0] = dict(decl='h5ds', name=p[3], type=None, tags=tags, shape=None, attributes=p[6], pos=_makepos(p))
 
-    # dataset shape, can return
-    #    1. None if there is nothing specified
-    #    2. Number if rank specified ([][][] -> 3)
-    def p_ds_shape(self, p):
-        ''' ds_shape :
-                     | rank
-        '''
-        if len(p) == 1:
-            p[0] = None
-        else:
-            p[0] = p[1]
-
+    # list of attributes
     def p_attributes(self, p):
         ''' attributes : attributes attribute
-                     | empty
+                     | 
         '''
         if len(p) == 3:
             p[0] = p[1] + [p[2]]
@@ -791,7 +799,7 @@ class HddlYacc ( object ) :
 
         for lexpos, lineno, comment in comments:
 
-#             print 'Checking comment at line', lineno, 'lexpos', lexpos, 'text', input[lexpos:lexpos+10]
+#             print 'Checking comment at line', lineno, 'lexpos', lexpos, 'text', input[lexpos:lexpos+20]
 
             # skip empty comments and comments starting with minus (dash)
             if not comment or comment[0] == '-': continue

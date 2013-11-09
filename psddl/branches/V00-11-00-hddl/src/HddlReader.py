@@ -87,6 +87,7 @@ def _tags(decl):
     tags = {}
     for tag in decl['tags']:
         name = tag['name']
+        name = _tagmap.get(name, name)
         args = tag['args']
         if name == 'doc': continue
         if args is None: 
@@ -155,6 +156,13 @@ def _cmpFiles(f1, f2):
 def _lineno(decl):
     ''' Return line number for a declaration '''
     return decl['pos'][0][0]
+
+def _access(decl):
+    ''' Return line number for a declaration '''
+    for tag in decl['tags']:
+        tagname = tag['name']
+        if tagname in ['public', 'protected', 'private']: return tagname
+    return 'public'
 
 #------------------------
 # Exported definitions --
@@ -516,8 +524,9 @@ class HddlReader ( object ) :
                 msg = "Failed to resolve dataset type name '{0}'".format(dsdecl['type'])
                 raise _error(self.location[-1], _lineno(dsdecl), msg)
 
-        # it may specify method via tags
+        # it may specify method name via tags, argument may be QID, we need string
         method = _tagval(dsdecl, 'method', [None])[0]
+        if method: method = str(method)
 
         # shape can be specified as a rank only (number or None)
         rank = dsdecl['shape']
@@ -538,8 +547,9 @@ class HddlReader ( object ) :
         h5type.datasets.append(ds)
 
         # loop over sub-elements
-        for adecl in dsdecl['attributes']:
-            self._parseH5Attribute(adecl, ds, pstype)
+        if dsdecl['attributes'] is not None:
+            for adecl in dsdecl['attributes']:
+                self._parseH5Attribute(adecl, ds, pstype)
 
     def _parseH5Attribute(self, adecl, ds, pstype):
         """Method which parses definition of h5 attribute"""
@@ -554,19 +564,23 @@ class HddlReader ( object ) :
 
         atype = adecl['type']
         if atype:
-            atype = pstype.lookup(atype, (Type, Enum))
+            atype = pstype.lookup(str(atype), (Type, Enum))
             if not atype: 
                 msg = "Failed to resolve attribute type name '{0}'".format(adecl['type'])
                 raise _error(self.location[-1], _lineno(adecl), msg)
 
-        # it may specify method name via tags
+        # it may specify method name via tags, argument may be QID, we need string
         method = _tagval(adecl, 'method', [None])[0]
+        if method: method = str(method)
 
         # shape can be specified as a rank only or as list of dimensions expressions (strings for now)
         rank = -1
         shape = None
         shapedecl = adecl['shape']
-        if isinstance(shapedecl, int):
+        if shapedecl is None:
+            # nothing
+            pass
+        elif isinstance(shapedecl, int):
             # just a rank
             rank = shapedecl
         elif isinstance(shapedecl, list):
@@ -596,7 +610,7 @@ class HddlReader ( object ) :
         ''' Parse defintion of a single data member '''
         
         # check tag names
-        self._checktags(adecl, ['shape_method', 'doc'])
+        self._checktags(adecl, ['public', 'private', 'protected', 'shape_method', 'doc'])
 
         # every attribute must have a name
         attrname = adecl['name']
@@ -613,8 +627,9 @@ class HddlReader ( object ) :
         if adecl['shape'] is not None:
             shape = ','.join(adecl['shape'])
 
-        # it may specify shape_method via tags
+        # it may specify shape_method via tags, argument may be QID, we need string
         shape_method = _tagval(adecl, 'shape_method', [None])[0]
+        if shape_method: shape_method = str(shape_method)
 
         accessor = adecl['method']
 
@@ -638,6 +653,7 @@ class HddlReader ( object ) :
                             parent = type, 
                             type = atype,
                             rank = rank,
+                            access = _access(adecl),
                             comment = attr.comment)
             attr.accessor = method
             logging.debug("HddlReader._parseAttr: new method: %s", method)
@@ -647,7 +663,7 @@ class HddlReader ( object ) :
         for bfdecl in (adecl['bitfields'] or []):
         
             # check tag names
-            self._checktags(bfdecl, ['doc'])
+            self._checktags(bfdecl, ['public', 'private', 'protected', 'doc'])
 
             size = bfdecl['size']
             bftypename = str(bfdecl['type'])
@@ -671,6 +687,7 @@ class HddlReader ( object ) :
                                 bitfield = bf, 
                                 parent = type, 
                                 type = bftype,
+                                access = _access(bfdecl),
                                 comment = bf.comment)
                 bf.accessor = method
                 logging.debug("HddlReader._parseAttr: new method: %s", method)
@@ -833,7 +850,7 @@ class HddlReader ( object ) :
             raise _error(self.location[-1], _lineno(decl), msg)
         
         # convert it back to string
-        cval = _constExprToString(cval) 
+        cval = decl['value_str']
         Constant(cname, cval, parent, included=included, comment = _doc(decl))
             
     def _parseEnum(self, decl, parent, included):
@@ -849,7 +866,7 @@ class HddlReader ( object ) :
                     comment = _doc(decl))
 
         for cdecl in decl['constants']:
-            Constant(cdecl['name'], str(cdecl['value']), enum, comment = _doc(cdecl))
+            Constant(cdecl['name'], cdecl['value_str'], enum, comment = _doc(cdecl))
 
     def _findInclude(self, inc):
         

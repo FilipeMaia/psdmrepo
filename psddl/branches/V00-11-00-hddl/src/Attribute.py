@@ -77,11 +77,12 @@ class Attribute ( object ) :
         self.offset = kw.get('offset')
         self.access = kw.get('access')
         self.accessor = kw.get('accessor')
-        self.shape_method = None
+        self._shape_method = kw.get('shape_method')  # as defined in DDL
+        self.shape_method = None                     # constructed
         if self.shape:
-            if kw.get('shape_method') :
-                if kw.get('shape_method') != "None" :
-                    self.shape_method = kw.get('shape_method')
+            if self._shape_method:
+                if self._shape_method != "None" :
+                    self.shape_method = self._shape_method
             elif kw.get('accessor_name') :
                 self.shape_method = kw.get('accessor_name') + '_shape'
             else:

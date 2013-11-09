@@ -163,7 +163,9 @@ class DdlPds2Psana ( object ) :
             path = use['file']
             headers = use['cpp_headers']
             if not headers:
-                header = os.path.splitext(path)[0] + '.h'
+                header = os.path.splitext(path)[0]
+                if not header.endswith('.ddl'): header += '.ddl'
+                header = header + '.h'
                 header = os.path.join(self.incdirname, os.path.basename(header))
                 headers = [header]
             for header in headers:
@@ -275,7 +277,7 @@ class DdlPds2Psana ( object ) :
 
             atype = arg.type
 
-            if not arg.dest.accessor:
+            if not arg.method:
                 raise ValueError('attribute %s has no access method' % arg.dest.name)
 
             expr = "pds."+arg.method.name+"()"

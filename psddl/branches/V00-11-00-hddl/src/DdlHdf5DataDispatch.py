@@ -275,7 +275,9 @@ class DdlHdf5DataDispatch ( object ) :
     def _typecode(self, type):
 
         header = os.path.basename(type.location)
-        header = os.path.splitext(header)[0] + '.h'
+        header = os.path.splitext(header)[0]
+        if not header.endswith('.ddl'): header += '.ddl'
+        header = header + '.h'
         header = os.path.join(self.incdirname, header)
         
         psana_type = type.fullName('C++', self.psana_ns)

@@ -205,9 +205,14 @@ class psddlc ( AppBase ) :
 
         header = self._options.header
         source = self._options.output
-        
-        if not header : header = os.path.splitext(base)[0] + '.h'
-        if not source : source = os.path.splitext(base)[0] + '.cpp'
+
+        # to keep our old convention when we transformed 'file.ddl.xml' into 'file.ddl.cpp'
+        # with the new DDL naming we want to transform 'file.ddl' into 'file.ddl.cpp'
+        # (or more generally 'file.ext' into 'file.ddl.cpp')
+        base = os.path.splitext(base)[0]
+        if not base.endswith('.ddl'): base += '.ddl'
+        if not header : header = base + '.h'
+        if not source : source = base + '.cpp'
         if self._options.header_dir: header = os.path.join(self._options.header_dir, header)
         if self._options.output_dir: source = os.path.join(self._options.output_dir, source)
 

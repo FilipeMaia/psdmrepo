@@ -83,7 +83,7 @@ class Type ( Namespace ) :
         self.base = kw.get('base')
         self.tags = kw.get('tags', {}).copy()
 
-        self.xtcConfig = []
+        self.xtcConfig = kw.get('xtcConfig', [])
 
         self.ctors = []   # constructors
 

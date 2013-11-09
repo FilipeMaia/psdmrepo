@@ -166,7 +166,9 @@ class DdlHdf5Data ( object ) :
             path = use['file']
             headers = use['cpp_headers']
             if not headers:
-                header = os.path.splitext(path)[0] + '.h'
+                header = os.path.splitext(path)[0]
+                if not header.endswith('.ddl'): header += '.ddl'
+                header = header + '.h'
                 header = os.path.join(self.incdirname, os.path.basename(header))
                 headers = [header]
             for header in headers:

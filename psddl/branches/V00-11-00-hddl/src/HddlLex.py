@@ -51,11 +51,10 @@ class HddlLex(object):
 
     # instantiate lexer
     def __init__(self, **kwargs):
-        kw = kwargs.copy()
-        if 'reflags' not in kw: 
-            kw['reflags'] = re.DOTALL
-        else:
-            kw['reflags'] = kw['reflags'] | re.DOTALL
+        
+        kw = dict(reflags=re.DOTALL)
+        kw.update(kwargs)
+        kw['reflags'] = kw['reflags'] | re.DOTALL
 
         self.name = kw.get('name', '')
         if 'name' in kw: del kw['name']
@@ -119,6 +118,7 @@ class HddlLex(object):
     def t_COMMENTCPP(self, t):
         r'///*([^\n]*)'
         t.value = t.value.lstrip('/')
+        t.value = t.value.strip()
         # remember comment position for later matching
         self.comments.append((t.lexpos, t.lexer.lineno, t.value))
         return None
@@ -126,11 +126,12 @@ class HddlLex(object):
     # normal comments are returned after stripping delimiters 
     def t_COMMENT(self, t):
         r'/\*(.*?)\*/'
-        t.lexer.lineno += t.value.count("\n")
         t.value = t.value.strip('/')
         t.value = t.value.strip('*')
+        t.value = t.value.strip()
         # remember comment position for later matching
         self.comments.append((t.lexpos, t.lexer.lineno, t.value))
+        t.lexer.lineno += t.value.count("\n")
         return None
 
     # doc string 
@@ -146,12 +147,14 @@ class HddlLex(object):
         t.lexer.lineno += t.value.count("\n")
         # strip delimiters
         t.value = t.value[2:-2]
+        t.value = t.value.strip(' ')
         return t
 
     # numbers are converted to integers 
     def t_NUMBER(self, t):
         r'[-]?[ \t]*(0x[0-9a-fA-F]+|\d+)'
-        t.value = int(t.value, 0)
+        # return pair (int, string)
+        t.value = (int(t.value, 0), t.value)
         return t
 
     # quoted string 

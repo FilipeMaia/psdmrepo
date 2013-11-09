@@ -206,8 +206,13 @@ class DdlDumpHddl ( object ) :
         if 'no-sizeof' in type.tags: tags.append('no_sizeof')
         if type.pack: tags.append('pack({0})'.format(type.pack))
         if type.xtcConfig:
-            types = ', '.join([T("$name")[cfg] for cfg in type.xtcConfig])
-            tags.append('config({0})'.format(types))
+            types = []
+            for cfg in type.xtcConfig:
+                if cfg.parent is not type.parent:
+                    types.append(cfg.fullName())
+                else:
+                    types.append(cfg.name)
+            tags.append('config({0})'.format(', '.join(types)))
         
         tags = _fmttags(tags)
 
@@ -260,7 +265,8 @@ class DdlDumpHddl ( object ) :
         method = T(" -> $name")[attr.accessor] if attr.accessor else ''
         
         tags = []
-        if attr.shape_method: tags.append('shape_method({0})'.format(attr.shape_method))
+        if attr._shape_method: tags.append('shape_method({0})'.format(attr._shape_method))
+        if attr.accessor and attr.accessor.access is not None and attr.accessor.access  != 'public': tags.append(attr.accessor.access)
         tags = _fmttags(tags)
         if tags: tags = '  '+tags
         
@@ -276,6 +282,11 @@ class DdlDumpHddl ( object ) :
             print >>self.out, T("  $typename $name$method$tags {$comment")(locals())
             
             for bf in attr.bitfields:
+
+                tags = []
+                if bf.accessor and bf.accessor.access is not None and bf.accessor.access != 'public': tags.append(bf.accessor.access)
+                tags = _fmttags(tags)
+                if tags: tags = '  '+tags
                 
                 typename = bf.type.name
                 name = bf.name
@@ -283,7 +294,7 @@ class DdlDumpHddl ( object ) :
                 comment = T("\t/* $comment */")[bf] if bf.comment else ''
                 size = bf.size
 
-                print >>self.out, T("    $typename $name:$size$method;$comment")(locals())
+                print >>self.out, T("    $typename $name:$size$method$tags;$comment")(locals())
             
             print >>self.out, "  }"
 
@@ -384,6 +395,7 @@ class DdlDumpHddl ( object ) :
             
         for arginit in ctor.attr_init:
             ainit = '{0}({1})'.format(arginit.dest.name, arginit.expr)
+            arginits.append(ainit)
                 
         args = ', '.join(args)
         arginits = ', '.join(arginits)
@@ -391,9 +403,8 @@ class DdlDumpHddl ( object ) :
         print >>self.out, ""
         if ctor.comment: print >>self.out, T("  /* $comment */")[ctor]
 
-        if 'auto' in ctor.tags:
-            print >>self.out, T("  @init()$tags;")(locals())
-        elif arginits:
+        if 'auto' in ctor.tags: args = ''
+        if arginits:
             print >>self.out, T("  @init($args)\n    $arginits$tags;")(locals())
         else:
             print >>self.out, T("  @init($args)$tags;")(locals())
@@ -411,7 +422,11 @@ class DdlDumpHddl ( object ) :
 
         tags = []
         tags.append('version({0})'.format(schema.version))
-        if 'external' in schema.tags: tags.append('external')
+        if 'external' in schema.tags: 
+            if schema.tags['external']:
+                tags.append('external("{0}")'.format(schema.tags['external']))
+            else:
+                tags.append('external')
         if 'skip-proxy' in schema.tags or 'embedded' in schema.tags: tags.append('embedded')
         if 'default' in schema.tags: tags.append('default')
         tags = _fmttags1(tags)

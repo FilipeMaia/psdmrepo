@@ -204,8 +204,9 @@ class CppTypeCodegen ( object ) :
 
         # generate methods (for interfaces public methods only)
         for meth in self._type.methods(): 
-            access = self._access("public", access)
-            if not self._abs or meth.access == "public": self._genMethod(meth)
+            if not self._abs or meth.access == "public": 
+                access = self._access(meth.access, access)
+                self._genMethod(meth)
 
         # generate _shape() methods for array attributes
         for attr in self._type.attributes() :
@@ -510,23 +511,22 @@ class CppTypeCodegen ( object ) :
                 bfinit = []
                 for bf in attr.bitfields:
                     bfarg = attr2arg.get(bf)
-                    if bfarg: bfinit.append(bf.assignExpr(bfarg.expr))
+                    if bfarg: 
+                        bfinit.append(bf.assignExpr(bfarg.expr))
+                    else:
+                        for ctorInit in ctor.attr_init:
+                            if ctorInit.dest.name == bf.name:
+                                bfinit.append(bf.assignExpr(ctorInit.expr))
                 init = '|'.join(bfinit)
             else:
-                init = ""
+                init = ''
                 for ctorInit in ctor.attr_init:
                     if ctorInit.dest.name == attr.name:
                         init = ctorInit.expr
             if init: initlist.append(T("$attr($init)")(attr=attr.name, init=init))
 
         # do we need generate definition too?
-        if 'force_definition' in ctor.tags:
-            genDef = True
-        elif 'external' in ctor.tags:
-            genDef = False
-        else:
-            # generate definition only if all destinations are known
-            genDef = None not in [arg.dest for arg in ctor.args]
+        genDef = 'external' not in ctor.tags
 
         classname = self._type.name
         if not genDef:
