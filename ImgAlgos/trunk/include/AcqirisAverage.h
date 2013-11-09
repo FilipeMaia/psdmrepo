@@ -105,11 +105,11 @@ private:
   /// String for channel thresholds
   std::string     m_thresholds;
 
-  /// Flag: positive/negative signal true/false (leading positive edge or trailing negative edge/trailing positive edge or leading negative edge)
-  bool            m_is_postive_signal;
+  /// List of flags, in string form: positive/negative signal true/false (leading positive edge or trailing negative edge/trailing positive edge or leading negative edge)
+  std::string     m_is_positive_signal_list;
 
-  /// Flag controlling selection algorithm
-  bool            m_do_inverse_selection;
+  /// List of flags, in string form, controlling selection algorithm
+  std::string     m_do_inverse_selection_list;
 
   /// Number of events to skip in this module before start processing
   unsigned        m_skip_events;
@@ -167,6 +167,12 @@ private:
 
   /// Vector of threshod values for all channels is filled from the string input parameter "thresholds"
   std::vector<wform_t> v_thresholds;
+
+  /// Vector of bool for all channels is filled from the string input parameter "is_positive_signal_list"
+  std::vector<bool> v_is_positive_signal;
+
+  /// Vector of bool for all channels is filled from the string input parameter "do_inverse selection"
+  std::vector<bool> v_do_inverse_selection;
 
   /// Shared pointer to the waveform ndarray     
   shared_ptr< ndarray<wform_t,2> > sp_wf; 

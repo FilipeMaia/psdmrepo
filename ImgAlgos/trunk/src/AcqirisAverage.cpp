@@ -53,24 +53,24 @@ AcqirisAverage::AcqirisAverage (const std::string& name)
   , m_key_ave()
   , m_fname_ave_prefix()  
   , m_thresholds()
-  , m_is_postive_signal()
-  , m_do_inverse_selection()
+  , m_is_positive_signal_list()
+  , m_do_inverse_selection_list()
   , m_skip_events()
   , m_proc_events()
   , m_print_bits()
   , m_count_event(0)
   , m_count_get(0)
 {
-  m_str_src              = configSrc("source",  "DetInfo(:Acqiris)");
-  m_key_in               = configStr("key_in",          "acq-wform");
-  m_key_ave              = configStr("key_average",       "acq-ave");
-  m_fname_ave_prefix     = configStr("fname_ave_prefix",  "acq-ave");
-  m_thresholds           = configStr("thresholds",               "");
-  m_is_postive_signal    = config   ("is_positive_signal",    false);
-  m_do_inverse_selection = config   ("do_inverse_selection",  false);
-  m_skip_events          = config   ("skip_events",               0);
-  m_proc_events          = config   ("proc_events",        10000000);
-  m_print_bits           = config   ("print_bits",                0);
+  m_str_src                   = configSrc("source",  "DetInfo(:Acqiris)");
+  m_key_in                    = configStr("key_in",          "acq-wform");
+  m_key_ave                   = configStr("key_average",       "acq-ave");
+  m_fname_ave_prefix          = configStr("fname_ave_prefix",  "acq-ave");
+  m_thresholds                = configStr("thresholds",               "");
+  m_is_positive_signal_list   = configStr("is_positive_signal",       "");
+  m_do_inverse_selection_list = configStr("do_inverse_selection",     "");
+  m_skip_events               = config   ("skip_events",               0);
+  m_proc_events               = config   ("proc_events",        10000000);
+  m_print_bits                = config   ("print_bits",                0);
 
   m_do_threshold      = (m_thresholds.empty())       ? false : true;
   m_do_save_ave_file  = (m_fname_ave_prefix.empty()) ? false : true;
@@ -78,7 +78,11 @@ AcqirisAverage::AcqirisAverage (const std::string& name)
   m_last_event        = m_skip_events + m_proc_events;
   m_average_is_done   = false;
 
-  if ( m_do_threshold ) parse_string<wform_t>(m_thresholds, v_thresholds);
+  if ( m_do_threshold ) {
+    parse_string<wform_t>(m_thresholds, v_thresholds);
+    parse_string<bool>(m_is_positive_signal_list, v_is_positive_signal);
+    parse_string<bool>(m_do_inverse_selection_list, v_do_inverse_selection);
+  }
 
   if( m_print_bits & 1 ) printInputParameters();
 }
@@ -94,8 +98,8 @@ AcqirisAverage::printInputParameters()
         << "\n key_in              : " << m_key_in      
         << "\n key_ave             : " << m_key_ave
         << "\n thresholds          : " << m_thresholds
-        << "\n is_postive_signal   : " << m_is_postive_signal
-        << "\n do_inverse_selection: " << m_do_inverse_selection
+        << "\n is_positive_signal  : " << m_is_positive_signal_list
+        << "\n do_inverse_selection: " << m_do_inverse_selection_list
         << "\n skip_events         : " << m_skip_events
         << "\n proc_events         : " << m_proc_events
         << "\n fname_ave_prefix    : " << m_fname_ave_prefix
@@ -202,7 +206,7 @@ AcqirisAverage::procEvent(Event& evt, Env& env)
 	        wform_t  threshold = v_thresholds[c]; 
                 //cout << "  threshold: " << threshold << "\n";
 
-                if (m_is_postive_signal) {
+                if (v_is_positive_signal[c]) {
 	            for(unsigned s=0; s<m_nbrSamples; s++)
 		      if (wf[s] > threshold) { threshold_is_crossed = true; break; }
 	        }
@@ -211,8 +215,8 @@ AcqirisAverage::procEvent(Event& evt, Env& env)
 		      if (wf[s] < threshold) { threshold_is_crossed = true; break; }
 		}
 
-		if(     threshold_is_crossed &&  m_do_inverse_selection 
-		    or !threshold_is_crossed && !m_do_inverse_selection ) {
+		if(     threshold_is_crossed &&  v_do_inverse_selection[c]
+		    or !threshold_is_crossed && !v_do_inverse_selection[c] ) {
 
 		    // discard waveform - fill it with 0
                     std::fill_n(&m_wf[c][0], int(m_nbrSamples), wform_t(0));
@@ -310,8 +314,8 @@ AcqirisAverage::printSelectionStatistics()
     stringstream ss;
 
     ss << "\n  Selection settings:"
-       << "\n    is_postive_signal    : " << msg_add[m_is_postive_signal]
-       << "\n    do_inverse_selection : " << msg_add[m_do_inverse_selection]
+       << "\n    is_positive_signal   : " << m_is_positive_signal_list
+       << "\n    do_inverse_selection : " << m_do_inverse_selection_list
        << "\n    m_nbrChannels        : " << m_nbrChannels
        << "\n  Statistics of selected waveforms:\n";
 
