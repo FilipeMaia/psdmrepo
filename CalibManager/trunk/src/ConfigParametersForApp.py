@@ -70,8 +70,6 @@ class ConfigParametersForApp ( ConfigParameters ) :
         self.guifilebrowser  = None 
         self.blsp            = None 
         self.guidarkcontrolbar = None 
-        #self.autoRunStatus = 0            
-        #self.procDarkStatus  = 0 # 0=inactive, 1=scan, 2=averaging, 3=both
   
 #-----------------------------
 

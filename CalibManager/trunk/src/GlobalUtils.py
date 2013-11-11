@@ -347,11 +347,18 @@ def remove_file(path) :
 
 #----------------------------------
 
-def get_text_file_content(path) :
+def load_textfile(path) :
     f=open(path,'r')
     text = f.read()
     f.close() 
     return text
+
+#----------------------------------
+
+def save_textfile(text, path) :
+    f=open(path,'w')
+    f.write(text)
+    f.close() 
 
 #----------------------------------
 

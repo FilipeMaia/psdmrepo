@@ -208,7 +208,7 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         #cp.blsp.parse_batch_log_peds_scan()
         #cp.blsp.print_list_of_types_and_sources()
 
-        txt = ru.txt_of_detectors(self.instr_name.value(), self.exp_name.value(), int(self.run_number))
+        txt = ru.txt_of_detectors_in_run(self.instr_name.value(), self.exp_name.value(), int(self.run_number))
 
         logger.info(txt, __name__)
 

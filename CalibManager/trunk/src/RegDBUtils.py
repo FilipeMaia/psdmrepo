@@ -36,12 +36,12 @@ def detectors (ins, exp, run, style='psana') :
     """Returns the list of detectors, for example: ['BldEb-0|NoDevice-0', 'CxiDg1-0|Tm6740-0', 'CxiDg2-0|Tm6740-0', 'CxiDs1-0|Cspad-0', ...].
     """
 
-    if style == 'psana' : return detectors_for_psana(ins, exp, run)
+    if style == 'psana' : return list_of_detectors_in_run(ins, exp, run)
     else :                return experiment_info.detectors(ins, exp, run)
 
 #------------------------------
 
-def detectors_for_psana (ins, exp, run) :
+def list_of_detectors_in_run (ins, exp, run) :
     """Returns the list of detectors in style of psana, for example 'CxiDs1.0:Cspad.0'
     """
     list_of_detectors = experiment_info.detectors (ins, exp, run)
@@ -53,7 +53,7 @@ def detectors_for_psana (ins, exp, run) :
 
 #------------------------------
 
-def txt_of_detectors (ins, exp, run) :
+def txt_of_detectors_in_run (ins, exp, run) :
     """Returns the list of detectors as formatted text with heading line
     """
     list_of_detectors = detectors(ins, exp, run)
@@ -61,6 +61,27 @@ def txt_of_detectors (ins, exp, run) :
     for det in list_of_detectors :
         txt += '\n'+det
     return txt
+
+#------------------------------
+
+def list_of_detectors_in_run_for_selected (ins, exp, run, det_selected) :
+    """Returns the list of detectors in run for selected detector. For example, for CSPAD returns ['CxiDs1.0:Cspad.0', 'CxiDsd.0:Cspad.0']
+    """
+    lst = []
+    pattern = det_selected.lower() + '.'
+
+    for det_name in list_of_detectors_in_run(ins, exp, run) :
+        if det_name.lower().find(pattern) != -1 :
+            lst.append(det_name)
+    return lst
+
+#------------------------------
+
+
+
+
+
+
 
 #------------------------------
 

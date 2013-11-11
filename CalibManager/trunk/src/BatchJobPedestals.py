@@ -119,29 +119,16 @@ class BatchJobPedestals (BatchJob) :
 
 #-----------------------------
 
-    def check_batch_job_for_peds_aver(self) :
-        self.check_batch_job(self.job_id_peds_str, 'peds')
-
-    def check_batch_job_for_peds_scan(self) :
-        self.check_batch_job(self.job_id_scan_str, 'scan')
-
-#-----------------------------
-
     def kill_batch_job_for_peds_scan(self) :
         self.kill_batch_job(self.job_id_scan_str, 'for peds scan')
 
     def kill_batch_job_for_peds_aver(self) :
         self.kill_batch_job(self.job_id_peds_str, 'for peds aver')
 
-#-----------------------------
-
-    def print_work_files_for_pedestals(self) :
-        self.print_files_for_list(self.get_list_of_files_peds(), 'of dark run / pedestals:')
-
-#-----------------------------
-
-    def check_work_files_for_pedestals(self) :
-        self.check_files_for_list(self.get_list_of_files_peds(), 'of dark run / pedestals:')
+    def kill_all_batch_jobs(self):
+        logger.debug('kill_all_batch_jobs', __name__)
+        self.kill_batch_job_for_peds_scan()
+        self.kill_batch_job_for_peds_aver()
 
 #-----------------------------
 
@@ -183,25 +170,6 @@ class BatchJobPedestals (BatchJob) :
 
 #-----------------------------
 
-    def status_for_pedestal_file(self) :
-        self.exportLocalPars() # export run_number to cp.str_run_number        
-        fname  = fnm.path_peds_ave()
-        status = os.path.lexists(fname)
-        logger.info('Status: pedestal file ' + fname + ' ' + self.dict_status[status], __name__) 
-        return status
-
-    def status_for_peds_aver_files(self) :
-        stat = self.status_for_files(self.get_list_of_files_peds_aver(), comment='of peds average: ')
-        if stat and self.procDarkStatus & 1 : self.procDarkStatus ^= 1 # set bit to 0
-        return stat
-
-    def status_for_peds_scan_files(self) :
-        stat = self.status_for_files(self.get_list_of_files_peds_scan(), comment='of peds scan: ')
-        if stat and self.procDarkStatus & 2 : self.procDarkStatus ^= 2 # set bit to 0
-        return stat
-
-#-----------------------------
-
     def status_for_peds_scan_files(self, comment='') :
         stat, msg = self.status_and_string_for_files(self.get_list_of_files_peds_scan(), comment)
         if stat and self.procDarkStatus & 1 : self.procDarkStatus ^= 1 # set bit to 0
@@ -226,8 +194,8 @@ class BatchJobPedestals (BatchJob) :
 
     def on_auto_processing_start(self):
         logger.info('on_auto_processing_start()', __name__)
-        #self.remove_files_peds_all()
-        self.onRunScan()
+        #self.onRunScan() # scan is not needed if info is available form RegDB
+        self.onRunAver()
         pass
 
 
@@ -243,44 +211,15 @@ class BatchJobPedestals (BatchJob) :
 
 #-----------------------------
 
-    def on_auto_processing_status_v1(self):
-        self.exportLocalPars() # export run_number to cp.str_run_number        
-        logger.info('Auto run stage '+str(self.autoRunStatus), __name__)
-
-        self.status_scan, fstatus_str_scan = self.status_for_peds_scan_files(comment='')
-        self.status_aver, fstatus_str_aver = self.status_for_peds_aver_files(comment='')
-
-        #print 'self.status_scan, fstatus_str_scan = ', self.status_scan, fstatus_str_scan
-        #print 'self.status_aver, fstatus_str_aver = ', self.status_aver, fstatus_str_aver
-
-        if   self.autoRunStatus == 1 and self.status_scan :            
-            logger.info('on_auto_processing_status: Scan is completed, begin averaging', __name__)
-
-            blsp.parse_batch_log_peds_scan() # defines the blsp.list_of_sources
-            blsp.print_list_of_types_and_sources()
-            
-            if blsp.list_of_sources == [] :
-                self.stop_auto_processing( is_stop_on_button_click=False )
-                logger.warning('on_auto_processing_status: Scan did not find data in xtc file for this detector. PROCESSING IS STOPPED!!!', __name__)
-                return
-
-            self.onRunAver()
-
-        elif self.autoRunStatus == 2 and self.status_aver : 
-            logger.info('on_auto_processing_status: Averaging is completed, stop processing.', __name__)
-            self.stop_auto_processing( is_stop_on_button_click=False )
-
-#-----------------------------
-
     def on_auto_processing_status(self):
 
         self.exportLocalPars() # export run_number to cp.str_run_number        
 
-        if self.autoRunStatus == 1 :
+        if self.autoRunStage == 1 :
 
             self.status_bj_scan, str_bj_scan = self.status_batch_job_for_peds_scan()
             #print 'self.status_bj_scan, str_bj_scan =', str(self.status_bj_scan), str_bj_scan
-            msg = 'Stage %s, %s' % (self.autoRunStatus, str_bj_scan)
+            msg = 'Stage %s, %s' % (self.autoRunStage, str_bj_scan)
             logger.info(msg, __name__)
 
             if self.status_bj_scan == 'EXIT' :
@@ -303,10 +242,10 @@ class BatchJobPedestals (BatchJob) :
                 
                 self.onRunAver()
 
-        elif self.autoRunStatus == 2 :
+        elif self.autoRunStage == 2 :
 
             self.status_bj_aver, str_bj_aver = self.status_batch_job_for_peds_aver()
-            msg = 'Stage %s, %s' % (self.autoRunStatus, str_bj_aver)
+            msg = 'Stage %s, %s' % (self.autoRunStage, str_bj_aver)
             logger.info(msg, __name__)
 
             if self.status_bj_aver == 'EXIT' :
@@ -321,31 +260,23 @@ class BatchJobPedestals (BatchJob) :
                 self.stop_auto_processing( is_stop_on_button_click=False )
 
         else :
-            msg = 'NONRECOGNIZED PROCESSING STAGE %s !!!' % self.autoRunStatus
+            msg = 'NONRECOGNIZED PROCESSING STAGE %s !!!' % self.autoRunStage
             logger.warning(msg, __name__)
             
-
-#-----------------------------
-
-
-    def kill_all_batch_jobs(self):
-        logger.debug('kill_all_batch_jobs', __name__)
-        self.kill_batch_job_for_peds_scan()
-        self.kill_batch_job_for_peds_aver()
 
 #-----------------------------
 
     def onRunScan(self):
         logger.debug('onRunScan', __name__)
         self.submit_batch_for_peds_scan()
-        self.autoRunStatus = 1
+        self.autoRunStage = 1
 
 #-----------------------------
 
     def onRunAver(self):
         logger.debug('onRunAver', __name__)
         self.submit_batch_for_peds_aver()
-        self.autoRunStatus = 2
+        self.autoRunStage = 2
 
 #-----------------------------
 
@@ -363,7 +294,7 @@ if __name__ == "__main__" :
 
     #bjpeds.submit_batch_for_peds_scan_on_dark_xtc()
     #bjpeds.print_work_files_for_pedestals()
-    bjpeds.check_work_files_for_pedestals()
+    #bjpeds.check_work_files_for_pedestals()
 
     sys.exit ( 'End of test for BatchJobPedestals' )
 

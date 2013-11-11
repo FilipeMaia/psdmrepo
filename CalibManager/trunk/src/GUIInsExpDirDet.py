@@ -96,7 +96,7 @@ class GUIInsExpDirDet ( QtGui.QWidget ) :
         self.setStyle()
 
         #self.setStatusMessage()
-        cp.guistatus.updateStatusInfo()
+        if cp.guistatus is not None : cp.guistatus.updateStatusInfo()
 
         cp.guiinsexpdirdet = self
 

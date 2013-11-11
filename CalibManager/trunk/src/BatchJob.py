@@ -53,7 +53,7 @@ class BatchJob (QtCore.QObject ) : # need in QtCore.QObject in order to connect 
         self.time_interval_sec = cp.bat_submit_interval_sec.value() # 100
         self.queue             = cp.bat_queue.value()
 
-        self.autoRunStatus = 0
+        self.autoRunStage = 0
         
 #-----------------------------
 
@@ -212,20 +212,20 @@ class BatchJob (QtCore.QObject ) : # need in QtCore.QObject in order to connect 
 
     def updateStatus(self, text):
         #print 'BatchJob: Signal is recieved ' + str(text)
-        if self.autoRunStatus : self.on_auto_processing_status()
+        if self.autoRunStage : self.on_auto_processing_status()
 
 #-----------------------------
 
     def start_auto_processing(self) :
-        if self.autoRunStatus != 0 :            
-            logger.warning('Auto-processing procedure is already active in stage '+str(self.autoRunStatus), __name__)
+        if self.autoRunStage != 0 :            
+            logger.warning('Auto-processing procedure is already active in stage '+str(self.autoRunStage), __name__)
         else :
             self.connectToThread1()
             self.on_auto_processing_start()
 
     def stop_auto_processing(self, is_stop_on_button_click=True) :
         logger.info('Auto-processing IS STOPPED', __name__)
-        self.autoRunStatus = 0            
+        self.autoRunStage = 0            
         self.disconnectFromThread1()
 
         self.switch_stop_go_button()

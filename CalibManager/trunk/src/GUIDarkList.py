@@ -109,8 +109,8 @@ class GUIDarkList ( QtGui.QWidget ) :
         self.list_of_run_nums_in_dir = gu.list_of_int_from_list_of_str(self.list_of_run_strs_in_dir) # [1, 202, 203, 204,...]
         self.list_of_run_nums_in_regdb = ru.list_of_runnums(self.instr_name.value(), self.exp_name.value())
 
-        print 'list_of_run_nums_in_dir:\n',   self.list_of_run_nums_in_dir
-        print 'list_of_run_nums_in_regdb:\n', self.list_of_run_nums_in_regdb
+        #print 'list_of_run_nums_in_dir:\n',   self.list_of_run_nums_in_dir
+        #print 'list_of_run_nums_in_regdb:\n', self.list_of_run_nums_in_regdb
         
         if self.list_of_run_nums_in_regdb == [] : self.list_of_runs = self.list_of_run_nums_in_dir
         else                                    : self.list_of_runs = self.list_of_run_nums_in_regdb
@@ -178,8 +178,8 @@ class GUIDarkList ( QtGui.QWidget ) :
             return True
 
         else :
-            list_of_detectors = ru.detectors_for_psana (self.instr_name.value(), self.exp_name.value(), run_num)
-            for det_name_in_data in list_of_detectors :
+            list_of_dets_in_run = ru.list_of_detectors_in_run(self.instr_name.value(), self.exp_name.value(), run_num)
+            for det_name_in_data in list_of_dets_in_run :
                 for det_name_selected in self.list_of_dets_selected()  :
                     pattern = det_name_selected.lower() + '.'
                     if det_name_in_data.lower().find(pattern) != -1 :

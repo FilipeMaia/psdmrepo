@@ -138,6 +138,8 @@ class GUIStatus ( QtGui.QGroupBox ) :
         try    : del cp.guistatus # GUIStatus
         except : pass
 
+        cp.guistatus = None
+
 
     def onClose(self):
         logger.debug('onClose', __name__)

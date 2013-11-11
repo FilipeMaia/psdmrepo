@@ -198,7 +198,7 @@ class GUIFileBrowser ( QtGui.QWidget ) :
 
         if not path in self.list_of_files :
             self.list_of_files.append(path)
-            self.box_txt.setText(gu.get_text_file_content(path))
+            self.box_txt.setText(gu.load_textfile(path))
 
             self.setListOfFiles(self.list_of_files[1:])
             self.box_file.setCurrentIndex( len(self.list_of_files)-1 )
@@ -226,7 +226,7 @@ class GUIFileBrowser ( QtGui.QWidget ) :
             ext = os.path.splitext(self.fname)[1].lstrip('.')
 
             if ext in self.list_of_supported :
-                self.box_txt.setText(gu.get_text_file_content(self.fname))
+                self.box_txt.setText(gu.load_textfile(self.fname))
                 self.setStatus(0, 'Status: enjoy browsing the selected file...')
 
             else :
