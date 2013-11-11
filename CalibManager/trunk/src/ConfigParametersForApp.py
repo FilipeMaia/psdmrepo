@@ -263,17 +263,21 @@ class ConfigParametersForApp ( ConfigParameters ) :
 
 #-----------------------------
     
-        self.list_of_dets   = ['CSPAD', 'CSPAD2x2', 'Camera', 'Princeton', 'pnCCD'] #, 'Opal1k'
+        self.list_of_dets   = ['CSPAD', 'CSPAD2x2', 'Princeton', 'pnCCD', 'Tm6740', 'Opal2000', 'Opal4000']
         self.list_of_types  = ['Psana::CsPad::Data',
                                'Psana::CsPad2x2::Element',
-                               'Psana::Camera::Frame',
                                'Psana::Princeton::Frame',
-                               'Psana::PNCCD::FullFrame']
+                               'Psana::PNCCD::FullFrame',
+                               'Psana::Camera::Frame',
+                               'Psana::Camera::Frame',
+                               'Psana::Camera::Frame']
         self.dict_of_det_types = dict( zip(self.list_of_dets, self.list_of_types) )
         
 #-----------------------------
 
         det_cbx_states = [ (False, False ,'bool'), \
+                           (False, False ,'bool'), \
+                           (False, False ,'bool'), \
                            (False, False ,'bool'), \
                            (False, False ,'bool'), \
                            (False, False ,'bool'), \
