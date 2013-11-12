@@ -142,7 +142,7 @@ void
 CSPad2x2ImageProducer::event(Event& evt, Env& env)
 {
   ++m_count; //cout << "Event: " << m_count;
-  if( m_print_bits & 2 ) printTimeStamp(evt, m_count);
+  if( m_print_bits & 4 ) printTimeStamp(evt, m_count);
 
   processEvent(evt, env);
 }
@@ -194,7 +194,7 @@ CSPad2x2ImageProducer::getCalibPars(Event& evt, Env& env)
 
   m_pix_coords_cspad2x2 = new PC2X2 (m_cspad2x2_calibpars, m_tiltIsApplied, m_useWidePixCenter);
 
-  if( m_print_bits & 1 ) {
+  if( m_print_bits & 2 ) {
     m_cspad2x2_calibpars  -> printInputPars();
     m_cspad2x2_calibpars  -> printCalibPars();
     //m_pix_coords_cspad2x2 -> printCoordArray(); 
