@@ -165,15 +165,29 @@ def get_path_owner(path) :
 def get_path_mode(path) :
     return os.stat(path).st_mode
 
+
 #----------------------------------
 
-def subproc(command_seq, env=None) : # for example, command_seq=['bsub', '-q', cp.batch_queue, '-o', 'log-ls.txt', 'ls -l']
-    p = subprocess.Popen(command_seq, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env) #, stdin=subprocess.STDIN
+def call(command_seq, shell=False) :
+    subprocess.call(command_seq, shell=shell) # , stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=False)
+
+#----------------------------------
+
+def subproc_in_log(command_seq, logname, env=None, shell=False) : # for example, command_seq=['bsub', '-q', cp.batch_queue, '-o', 'log-ls.txt', 'ls -l']
+    log = open(logname, 'w')
+    p = subprocess.Popen(command_seq, stdout=log, stderr=subprocess.PIPE, env=env, shell=shell) #, stdin=subprocess.STDIN
+    p.wait()
+    err = p.stderr.read() # reads entire file
+    return err
+
+#----------------------------------
+
+def subproc(command_seq, env=None, shell=False) : # for example, command_seq=['bsub', '-q', cp.batch_queue, '-o', 'log-ls.txt', 'ls -l']
+    p = subprocess.Popen(command_seq, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env, shell=shell) #, stdin=subprocess.STDIN
     p.wait()
     out = p.stdout.read() # reads entire file
     err = p.stderr.read() # reads entire file
     return out, err
-
 
 #----------------------------------
 

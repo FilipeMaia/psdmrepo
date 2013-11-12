@@ -98,11 +98,35 @@ class BatchJobPedestals (BatchJob) :
 
 #-----------------------------
 
+    def command_for_peds_scan(self) :
+
+        self.make_psana_cfg_file_for_peds_scan()
+
+        #command = 'env'
+        command = 'psana -c ' + fnm.path_peds_scan_psana_cfg()
+        command_seq = command.split(' ')
+
+        msg = 'Scan xtc file(s) using command:\n%s' % command \
+            + '\nand save results in the log-file: %s' % fnm.path_peds_scan_batch_log()
+        logger.info(msg, __name__)
+        
+        err = gu.subproc_in_log(command_seq, fnm.path_peds_scan_batch_log()) # , shell=True)
+        if err != '' :
+            logger.error('\nerr: %s' % (err), __name__)
+            self.stop_auto_processing(is_stop_on_button_click=False)
+            logger.warning('Autoprocessing is stopped due to error at execution of the scan command', __name__)
+        else :
+            logger.info('Scan is completed', __name__)
+
+#-----------------------------
+
     def submit_batch_for_peds_aver(self) :
         self.exportLocalPars() # export run_number to cp.str_run_number
 
         if not self.job_can_be_submitted(self.job_id_peds_str, self.time_peds_job_submitted, 'peds') : return        
         self.time_peds_job_submitted = gu.get_time_sec()
+
+        self.command_for_peds_scan()
 
         self.make_psana_cfg_file_for_peds_aver()
 
