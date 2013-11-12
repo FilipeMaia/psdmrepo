@@ -1,0 +1,16 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  README file for package psddl_pds2psana
+#------------------------------------------------------------------------
+
+Package author: Andrei Salnikov
+
+Brief description:
+==================
+
+Package contains files (mostly generated from psddldata) implementing 
+psana interfaces for LCLS data types. Implementation is based on
+psddl_pdsdata data classes.
