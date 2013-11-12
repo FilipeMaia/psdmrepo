@@ -89,15 +89,16 @@ class cspad_arr_producer (object) :
         @param env    environment object
         """
 
-        self.config = env.getConfig(TypeId.Type.Id_CspadConfig, self.m_src)
+        if env.fwkName() == "psana": self.config = env.getConfig(CsPad.Config, self.m_src)
+        else                       : self.config = env.getConfig(TypeId.Type.Id_CspadConfig, self.m_src)
         if self.config :
             self.is_cspad    = True
             self.is_cspad2x2 = False
             if self.m_print_bits & 2 : self.print_config_pars_for_cspad(env)
             return
 
-        self.config = env.getConfig(TypeId.Type.Id_Cspad2x2Config, self.m_src)
-        #self.config = env.getConfig(CsPad2x2.Config, self.m_src)
+        if env.fwkName() == "psana": self.config = env.getConfig(CsPad2x2.Config, self.m_src)
+        else                       : self.config = env.getConfig(TypeId.Type.Id_Cspad2x2Config, self.m_src)
         if self.config :
             self.is_cspad    = False
             self.is_cspad2x2 = True
@@ -130,8 +131,7 @@ class cspad_arr_producer (object) :
         """
 
         if   self.is_cspad    : self.proc_event_for_cspad    (evt, env)
-        elif self.is_cspad2x2 : self.proc_event_for_cspad2x2 (evt, env)
-            
+        elif self.is_cspad2x2 : self.proc_event_for_cspad2x2 (evt, env)            
 
         if self.m_print_bits & 8 : self.print_part_of_output_array()
 
@@ -156,6 +156,8 @@ class cspad_arr_producer (object) :
             data = evt.get(TypeId.Type.Id_CspadElement, self.m_src)
 
         if not data :
+            msg = __name__ + 'proc_event_for_cspad: DATA IS NOT FOUND'
+            print msg
             return
 
         # 2. Fill output array accounting for dtype and configuration
@@ -183,6 +185,7 @@ class cspad_arr_producer (object) :
         if env.fwkName() == "psana":
             elem = evt.get(CsPad2x2.Element, self.m_src) # returns psana.CsPad2x2.ElementV1 object
             if not elem :
+                print 'CsPad2x2.Element is not found!'
                 return
         else:
             elem = evt.get(TypeId.Type.Id_Cspad2x2Element, self.m_src) # returns CsPad2x2.ElementV1 object
@@ -212,7 +215,7 @@ class cspad_arr_producer (object) :
     def print_part_of_output_array( self ) :
         msg = __name__ + ': arr[2,4,:] :\n' + str(self.arr[2,4,:]) \
             + '\n  arr.shape = %s    arr.dtype = %s' % (str(self.arr.shape), str(self.arr.dtype))
-        #logging.info( msg )
+        ##logging.info( msg )
         print msg
 
 

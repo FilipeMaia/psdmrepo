@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-06
+2013-11-11 Mikhail S. Dubrovin
+- in cspad_arr_producer.py use pyana/psana dependent env.getConfig(...) method
+
 Tag: V00-00-05
 2013-11-09 Mikhail S. Dubrovin
 - rename package py_img_algos to pyimgalgos
