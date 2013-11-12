@@ -44,6 +44,7 @@ import jinja2 as ji
 from psddl.Attribute import Attribute
 from psddl.ExprVal import ExprVal
 from psddl.Method import Method
+from psddl.Enum import Enum
 from psddl.Type import Type
 from psddl.Template import Template as T
 from psddl.TemplateLoader import TemplateLoader
@@ -345,6 +346,8 @@ class CppTypeCodegen ( object ) :
             else:
                 type = _typename(type)
                 if meth.rank > 0:
+                    # for arrays of enum types we actually return array of integers
+                    if isinstance(meth.type, Enum): type = _typename(meth.type.base)
                     type = "ndarray<const %s, %d>" % (type, meth.rank)
 
             # make method body

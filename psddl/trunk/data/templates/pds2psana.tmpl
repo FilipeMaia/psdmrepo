@@ -170,3 +170,15 @@ $ endfor
   return shape;
 }
 
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: enum_pds_to_psana
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Implementation declaration of enum conversion method.
+:  
+:
+{{psanatype}} pds_to_psana({{pdstype}} e)
+{
+  return {{psanatype}}(e);
+}
+

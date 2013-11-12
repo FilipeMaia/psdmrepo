@@ -353,6 +353,8 @@ class DatasetCompound(object):
                     baseType = type
                     type = '_array_type_' + attr.name
                     rank = -1 if attr.sizeIsVlen() else attr.rank
+                    if attr.shape is None:
+                        raise ValueError('attribute %s is missing shape definition' % attr.name)
                     shape = attr.shape.cs_dims()
                     type_decl += _TEMPL('h5type_definition_array').render(locals())
                 return dict(name=attr_name, member=attr_member, type=type, type_decl=type_decl)
@@ -376,6 +378,8 @@ class DatasetCompound(object):
                     baseType = type
                     type = '_array_type_' + attr.name
                     rank = -1 if attr.sizeIsVlen() else attr.rank
+                    if attr.shape is None:
+                        raise ValueError('attribute %s is missing shape definition' % attr.name)
                     shape = attr.shape.cs_dims()
                     type_decl = _TEMPL('h5type_definition_array').render(locals())
                 return dict(name=attr_name, member=attr_member, type_decl=type_decl, type=type)

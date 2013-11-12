@@ -221,7 +221,7 @@ class DdlPds2Psana ( object ) :
         pdstype = enum.fullName('C++', self.pdsdata_ns)
         psanatype = enum.fullName('C++', self.psana_ns)
         
-        print >>self.cpp, T("$psanatype pds_to_psana($pdstype e)\n{\n  return $psanatype(e);\n}\n")(locals())
+        print >>self.cpp, _TEMPL('enum_pds_to_psana').render(locals())
 
 
     def _parseType(self, type):
@@ -452,13 +452,23 @@ class DdlPds2Psana ( object ) :
             cvt = False
             if rettype is None:
                 rettype = "void"
+            elif isinstance(rettype, Enum):
+                if meth.rank > 0:
+                    # use base integer type for returning arrays of enums
+                    rettype = rettype.base.fullName('C++', self.psana_ns)
+                    rettype = T("ndarray<const $type, $rank>")(type=rettype, rank=meth.rank)
+                else:
+                    cvt = True
+                    rettype = rettype.fullName('C++', self.psana_ns)
             elif rettype.basic and not isinstance(rettype, Enum):
-                rettype = rettype.fullName('C++')
+                rettype = rettype.fullName('C++', self.psana_ns)
                 if meth.rank > 0:
                     rettype = T("ndarray<const $type, $rank>")(type=rettype, rank=meth.rank)
             else:
                 cvt = True
                 rettype = rettype.fullName('C++', self.psana_ns)
+                if meth.rank > 0:
+                    rettype = T("ndarray<const $type, $rank>")(type=rettype, rank=meth.rank)
 
             return self._genFwdMeth(meth.name, rettype, type, cfgNeeded, cvt, meth.args)
 
