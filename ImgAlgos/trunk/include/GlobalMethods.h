@@ -241,6 +241,13 @@ private:
 	  return true;
 	}
 
+	else if ( *typeid(T).name() == *typeid(int16_t).name() ) {
+	  int16_t* p_arr = (int16_t*)&arr[0];
+          gray16c_view_t image = interleaved_view(cols, rows, (const gray16_pixel_t*)p_arr, cols*sizeof(T));
+          tiff_write_view(fname, image);
+	  return true;
+	}
+
 	else if ( *typeid(T).name() == *typeid(uint8_t).name() ) {
 	  uint8_t* p_arr = (uint8_t*)&arr[0];
           gray8c_view_t image = interleaved_view(cols, rows, (const gray8_pixel_t*)p_arr, cols*sizeof(T));
