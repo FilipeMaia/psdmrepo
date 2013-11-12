@@ -5,12 +5,13 @@
 #include "psddl_pds2psana/EvtProxy.h"
 #include "psddl_pds2psana/EvtProxyCfg.h"
 #include "psddl_pds2psana/dispatch.h"
-#include "psddl_pds2psana/acqiris.ddl.h"
+#include "psddl_pds2psana/rayonix.ddl.h"
 #include "psddl_pds2psana/fli.ddl.h"
 #include "psddl_pds2psana/epics.ddl.h"
 #include "psddl_pds2psana/pnccd.ddl.h"
 #include "psddl_pds2psana/oceanoptics.ddl.h"
 #include "psddl_pds2psana/gsc16ai.ddl.h"
+#include "psddl_pds2psana/acqiris.ddl.h"
 #include "psddl_pds2psana/lusi.ddl.h"
 #include "psddl_pds2psana/timepix.ddl.h"
 #include "psddl_pds2psana/cspad.ddl.h"
@@ -1567,6 +1568,22 @@ try {
       } // end switch (version)
     }
     break;
+  case Pds::TypeId::Id_RayonixConfig:
+    {
+      switch (version) {
+      case 1:
+        {
+          // store XTC object in config store
+          boost::shared_ptr<Pds::Rayonix::ConfigV1> xptr(xtc, (Pds::Rayonix::ConfigV1*)(xtc->payload()));
+          cfgStore.put(xptr, xtc->src);
+          // create and store psana object in config store
+          boost::shared_ptr<Psana::Rayonix::ConfigV1> obj = boost::make_shared<psddl_pds2psana::Rayonix::ConfigV1>(xptr);
+          cfgStore.put(obj, xtc->src);
+        }
+        break;
+      } // end switch (version)
+    }
+    break;
   case Pds::TypeId::Id_SharedAcqADC:
     {
       switch (version) {
@@ -2389,6 +2406,13 @@ std::vector<const std::type_info *> getXtcConvertTypeInfoPtrs(const Pds::TypeId 
     switch(typeId.version()) {
     case 1:
       typeIdPtrs.push_back( &typeid(Psana::Quartz::ConfigV1) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_RayonixConfig:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::Rayonix::ConfigV1) );
       break;
     } // end version switch
     break;

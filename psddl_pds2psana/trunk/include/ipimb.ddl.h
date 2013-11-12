@@ -30,6 +30,7 @@ public:
   virtual uint16_t calStrobeLength() const;
   virtual uint32_t trigDelay() const;
   virtual Psana::Ipimb::ConfigV1::CapacitorValue capacitorValue(uint32_t ch) const;
+  virtual ndarray<const uint8_t, 1> capacitorValues() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
@@ -58,6 +59,7 @@ public:
   virtual uint32_t trigPsDelay() const;
   virtual uint32_t adcDelay() const;
   virtual Psana::Ipimb::ConfigV2::CapacitorValue capacitorValue(uint32_t ch) const;
+  virtual ndarray<const uint8_t, 1> capacitorValues() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;

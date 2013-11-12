@@ -93,6 +93,11 @@ Psana::Ipimb::ConfigV1::CapacitorValue ConfigV1::capacitorValue(uint32_t ch) con
   return pds_to_psana(m_xtcObj->capacitorValue(ch));
 }
 
+
+ndarray<const uint8_t, 1> ConfigV1::capacitorValues() const {
+  return m_xtcObj->capacitorValues();
+}
+
 Psana::Ipimb::ConfigV2::CapacitorValue pds_to_psana(Pds::Ipimb::ConfigV2::CapacitorValue e)
 {
   return Psana::Ipimb::ConfigV2::CapacitorValue(e);
@@ -185,6 +190,11 @@ uint32_t ConfigV2::adcDelay() const {
 
 Psana::Ipimb::ConfigV2::CapacitorValue ConfigV2::capacitorValue(uint32_t ch) const {
   return pds_to_psana(m_xtcObj->capacitorValue(ch));
+}
+
+
+ndarray<const uint8_t, 1> ConfigV2::capacitorValues() const {
+  return m_xtcObj->capacitorValues();
 }
 
 DataV1::DataV1(const boost::shared_ptr<const XtcType>& xtcPtr)
