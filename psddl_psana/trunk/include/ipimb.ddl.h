@@ -42,6 +42,8 @@ public:
   virtual uint32_t trigDelay() const = 0;
   /** Returns CapacitorValue enum for given channel number (0..3). */
   virtual Ipimb::ConfigV1::CapacitorValue capacitorValue(uint32_t ch) const = 0;
+  /** Returns array of CapacitorValue enums. */
+  virtual ndarray<const uint8_t, 1> capacitorValues() const = 0;
 };
 std::ostream& operator<<(std::ostream& str, Ipimb::ConfigV1::CapacitorValue enval);
 
@@ -83,6 +85,8 @@ public:
   virtual uint32_t adcDelay() const = 0;
   /** Returns CapacitorValue enum for given channel number (0..3). */
   virtual Ipimb::ConfigV2::CapacitorValue capacitorValue(uint32_t ch) const = 0;
+  /** Returns array of CapacitorValue enums. */
+  virtual ndarray<const uint8_t, 1> capacitorValues() const = 0;
 };
 std::ostream& operator<<(std::ostream& str, Ipimb::ConfigV2::CapacitorValue enval);
 

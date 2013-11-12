@@ -11,6 +11,12 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-03
+2013-11-12 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-47 with psddl V00-12-04
+- new rayonix package
+- ipimb.Config types have new method
+
 Tag: V00-05-02
 2013-10-02 Andy Salnikov
 - regenerate whole thing from psddldata V00-04-45 with psddl V00-08-18
