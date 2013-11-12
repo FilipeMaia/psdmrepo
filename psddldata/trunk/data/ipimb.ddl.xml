@@ -25,7 +25,7 @@
         
             <tag name="config-type"/>
         
-            <enum name="CapacitorValue">
+            <enum name="CapacitorValue" base="uint8_t">
                 <enum-const name="c_1pF" />
                 <enum-const name="c_100pF" />
                 <enum-const name="c_10nF" />
@@ -90,6 +90,17 @@
                 <expr lang="C++" value="CapacitorValue(({self}.chargeAmpRange() &gt;&gt; (ch*2)) &amp; 0x3)" />
             </method>
 
+            <method name="capacitorValues" type="CapacitorValue" rank="1">
+                Returns array of CapacitorValue enums.
+                <code lang="C++" body="
+                /* return type is actually ndarray&lt;uint8_t, 1&gt; (at least for now) */
+                ndarray&lt;uint8_t, 1&gt; cap = make_ndarray&lt;uint8_t&gt;(4);
+                for (int ch = 0; ch != 4; ++ ch) {
+                  cap[ch] = uint8_t(({self}.chargeAmpRange() &gt;&gt; (ch*4)) &amp; 0xf);
+                }
+                return cap;" />
+            </method>
+
         </pstype>
         
         <!-- ========================================================================= -->
@@ -100,7 +111,7 @@
             <tag name="config-type"/>
         
         
-            <enum name="CapacitorValue">
+            <enum name="CapacitorValue" base="uint8_t">
                 <enum-const name="c_1pF" />
                 <enum-const name="c_4p7pF" />
                 <enum-const name="c_24pF" />
@@ -164,6 +175,17 @@
                 <tag name="inline"/>
                 <arg name="ch" type="uint32_t"/>
                 <expr lang="C++" value="CapacitorValue(({self}.chargeAmpRange() &gt;&gt; (ch*4)) &amp; 0xf)" />
+            </method>
+
+            <method name="capacitorValues" type="CapacitorValue" rank="1">
+                Returns array of CapacitorValue enums.
+                <code lang="C++" body="
+                /* return type is actually ndarray&lt;uint8_t, 1&gt; (at least for now) */
+                ndarray&lt;uint8_t, 1&gt; cap = make_ndarray&lt;uint8_t&gt;(4);
+                for (int ch = 0; ch != 4; ++ ch) {
+                  cap[ch] = uint8_t(({self}.chargeAmpRange() &gt;&gt; (ch*4)) &amp; 0xf);
+                }
+                return cap;" />
             </method>
 
             <ctor>

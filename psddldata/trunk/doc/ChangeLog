@@ -11,8 +11,15 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-47
+2013-11-12 Andy
+- ipimb.Config classes define capacitorValues() method which return
+  array of CapacitorValue enums (note tat in our current implementation
+  arrays of enums are returned as arrays of ints).
+
 Tag: V00-04-46
-2013-10-06 Andy
+2013-11-06 Andy
+- this tag also includes new rayonix package
 - add "no-sizeof" tag to few classes to suppress warnings
 
 Tag: V00-04-45
