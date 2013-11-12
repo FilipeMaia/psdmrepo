@@ -14,6 +14,9 @@ reverse time order.
 Tag: V00-03-18
 2013-11-12 Mikhail S. Dubrovin
 - in include/GlobalMethods.h add int16 to save in tiff
+
+2013-11-10 Christopher O'Grady
+- in AcqirisAverage - add lists of parameters for signal polarity and type of selection acqiris chanels
 	
 Tag: V00-03-17
 2013-11-01 Mikhail S. Dubrovin
