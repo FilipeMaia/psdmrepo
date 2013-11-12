@@ -48,6 +48,7 @@ void createWrappers(PyObject* module) {
     .def("calStrobeLength", &Psana::Ipimb::ConfigV1::calStrobeLength)
     .def("trigDelay", &Psana::Ipimb::ConfigV1::trigDelay)
     .def("capacitorValue", &Psana::Ipimb::ConfigV1::capacitorValue,"Returns CapacitorValue enum for given channel number (0..3).")
+    .def("capacitorValues", &Psana::Ipimb::ConfigV1::capacitorValues,"Returns array of CapacitorValue enums.")
   ;
 
   enum_<Psana::Ipimb::ConfigV1::CapacitorValue>("CapacitorValue")
@@ -79,6 +80,7 @@ void createWrappers(PyObject* module) {
     .def("trigPsDelay", &Psana::Ipimb::ConfigV2::trigPsDelay)
     .def("adcDelay", &Psana::Ipimb::ConfigV2::adcDelay)
     .def("capacitorValue", &Psana::Ipimb::ConfigV2::capacitorValue,"Returns CapacitorValue enum for given channel number (0..3).")
+    .def("capacitorValues", &Psana::Ipimb::ConfigV2::capacitorValues,"Returns array of CapacitorValue enums.")
   ;
 
   enum_<Psana::Ipimb::ConfigV2::CapacitorValue>("CapacitorValue")
@@ -164,6 +166,7 @@ void createWrappers(PyObject* module) {
     PyObject_SetAttrString(submodule, "Config", unvlist);
     Py_CLEAR(unvlist);
   }
+  detail::register_ndarray_to_numpy_cvt<const uint8_t, 1>();
 
 } // createWrappers()
 } // namespace Ipimb
