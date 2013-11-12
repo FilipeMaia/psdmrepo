@@ -39,6 +39,11 @@ import logging
 #from psana import *
 import numpy as np
 import scipy.misc as scim
+#import tifffile as tiff
+#from PythonMagick import Image
+#from PIL import Image
+import Image
+from cspad_arr_producer import *
 
 class image_save_in_file (object) :
     """Saves image array in file with specified in the name type."""
@@ -106,8 +111,16 @@ class image_save_in_file (object) :
         if name_ext == '.txt' :
             np.savetxt(fname, self.image) # , fmt='%f')
 
+        elif name_ext in ['.tiff', '.jpg', '.jpeg'] :
+            """Saves 16-bit tiff etc...
+            """
+            img = Image.fromarray(self.image.astype(np.int16))  # or int32
+            img.save(fname)
+ 
         elif name_ext in ['.tiff', '.gif', '.pdf', '.eps', '.png', '.jpg', '.jpeg'] : 
-            scim.imsave(fname, self.image)
+            """Saves 8-bit tiff only...
+            """
+            scim.imsave(fname, self.image) 
  
         elif name_ext == '.npz' : 
             np.savez(fname, self.image)
@@ -117,6 +130,7 @@ class image_save_in_file (object) :
  
 
     def endjob( self, evt, env ) : pass
+
 
 
     def print_input_pars( self ) :

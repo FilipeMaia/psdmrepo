@@ -11,6 +11,11 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-07
+2013-11-12 Mikhail S. Dubrovin
+- in cspad_arr_producer.py - add/use dictionary of dtypes
+- in src/image_save_in_file.py - save 16-bit tiff file
+	
 Tag: V00-00-06
 2013-11-11 Mikhail S. Dubrovin
 - in cspad_arr_producer.py use pyana/psana dependent env.getConfig(...) method

@@ -41,6 +41,20 @@ import numpy as np
 class cspad_arr_producer (object) :
     """Produces from CSPAD data numpy array of shape=(4, 8, 185, 388) and specified data type."""
 
+    dic_dtypes = { 'int'    : np.int, \
+                   'int8'   : np.int8, \
+                   'int16'  : np.int16, \
+                   'int32'  : np.int32, \
+                   'uint'   : np.uint, \
+                   'uint8'  : np.uint8, \
+                   'uint16' : np.uint16, \
+                   'uint32' : np.uint32, \
+                   'float'  : np.float, \
+                   'float32': np.float32, \
+                   'double' : np.double \
+                  }
+   
+
     def __init__ ( self ) :
         """Class constructor.
         Parameters are passed from pyana.cfg configuration file.
@@ -62,23 +76,34 @@ class cspad_arr_producer (object) :
         self.set_dtype()
 
         if self.m_print_bits & 1 : self.print_input_pars()
+        if self.m_print_bits & 1 : self.print_dtypes()
 
         self.is_cspad     = False
         self.is_cspad2x2  = False
 
 
     def set_dtype( self ) :
-        if   self.m_dtype_str == 'int'    : self.m_dtype = np.int
-        elif self.m_dtype_str == 'int8'   : self.m_dtype = np.int8
-        elif self.m_dtype_str == 'int16'  : self.m_dtype = np.int16
-        elif self.m_dtype_str == 'int32'  : self.m_dtype = np.int32
-        elif self.m_dtype_str == 'uint8'  : self.m_dtype = np.uint8
-        elif self.m_dtype_str == 'uint16' : self.m_dtype = np.uint16
-        elif self.m_dtype_str == 'uint32' : self.m_dtype = np.uint32
-        elif self.m_dtype_str == 'float'  : self.m_dtype = np.float
-        elif self.m_dtype_str == 'double' : self.m_dtype = np.double
-        else                              : self.m_dtype = np.int16
+        try    : self.m_dtype = self.dic_dtypes[self.m_dtype_str]
+        except : self.m_dtype = np.int16 
 
+        #if   self.m_dtype_str == 'int'    : self.m_dtype = np.int
+        #elif self.m_dtype_str == 'int8'   : self.m_dtype = np.int8
+        #elif self.m_dtype_str == 'int16'  : self.m_dtype = np.int16
+        #elif self.m_dtype_str == 'int32'  : self.m_dtype = np.int32
+        #elif self.m_dtype_str == 'uint8'  : self.m_dtype = np.uint8
+        #elif self.m_dtype_str == 'uint16' : self.m_dtype = np.uint16
+        #elif self.m_dtype_str == 'uint32' : self.m_dtype = np.uint32
+        #elif self.m_dtype_str == 'float'  : self.m_dtype = np.float
+        #elif self.m_dtype_str == 'double' : self.m_dtype = np.double
+        #else                              : self.m_dtype = np.int16
+
+
+    def print_dtypes( self ) :
+        msg = '\nImplemented data types:'
+        for k,v in cspad_arr_producer.dic_dtypes.iteritems() :
+            msg += '\n%10s : %10s' % (k,v)
+        print msg
+        
 
     def beginjob( self, evt, env ) :
         """This method is called once at the beginning of the job. It should
