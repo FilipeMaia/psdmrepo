@@ -103,6 +103,7 @@
 #include "H5DataTypes/PulnixTM6740ConfigV1.h"
 #include "H5DataTypes/PulnixTM6740ConfigV2.h"
 #include "H5DataTypes/QuartzConfigV1.h"
+#include "H5DataTypes/RayonixConfigV1.h"
 #include "H5DataTypes/TimepixConfigV1.h"
 #include "H5DataTypes/TimepixConfigV2.h"
 #include "H5DataTypes/TimepixConfigV3.h"
@@ -862,6 +863,14 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
     switch (version) {
     case 0:
       cvts.push_back(make_shared<EvtDataTypeCvtDef<BldDataSpectrometerV0> >(group, "Bld::BldDataSpectrometerV0", src, m_cvtOptions, 0));
+      break;
+    }
+    break;
+
+  case Pds::TypeId::Id_RayonixConfig:
+    switch (version) {
+    case 1:
+      ::makeConfigCvt<RayonixConfigV1>(cvts, group, "Rayonix::ConfigV1", src, transition, m_cvtOptions, 0);
       break;
     }
     break;
