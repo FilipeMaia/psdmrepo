@@ -11,6 +11,9 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2013-11-12 Mikhail S. Dubrovin
+- add src/image_crop.py
+
 Tag: V00-00-07
 2013-11-12 Mikhail S. Dubrovin
 - in cspad_arr_producer.py - add/use dictionary of dtypes
