@@ -89,8 +89,8 @@ class image_crop (object) :
         #print '\nimage_crop: evt.keys():', evt.keys()
 
         if env.fwkName() == "psana":
-            self.arr = evt.get(np.ndarray, self.m_key_in)
-            #self.arr = evt.get(np.ndarray, self.m_src, self.m_key_in)
+            #self.arr = evt.get(np.ndarray, self.m_key_in)
+            self.arr = evt.get(np.ndarray, self.m_src, self.m_key_in)
         else : 
             self.arr = evt.get(self.m_key_in)
 
@@ -106,9 +106,11 @@ class image_crop (object) :
         if self.m_print_bits & 2 and self.counter == 1 :
             self.print_image_parameters()
 
-        self.img2d = self.arr[self.rowmin:self.rowmax, self.colmin:self.colmax]
+        self.img2d = np.array(self.arr[self.rowmin:self.rowmax, self.colmin:self.colmax])
+        #self.img2d = self.arr
 
-        evt.put( self.img2d, self.m_key_out ) # save image in event as 2d numpy array
+        #evt.put( self.img2d, self.m_key_out ) # save image in event as 2d numpy array
+        evt.put( self.img2d, self.m_src, self.m_key_out ) # save image in event as 2d numpy array
 
     def endcalibcycle( self, evt, env ) : pass
 
