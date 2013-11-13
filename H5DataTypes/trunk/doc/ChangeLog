@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-05
+2013-11-12 Andy Salnikov
+- upgrade to pdsdata V07-02-07
+
 Tag: V00-05-04
 2013-10-24 Andy Salnikov
 - my last fix for ControlDataConfigV2 schema accidentally removed 
