@@ -31,6 +31,7 @@
 #include "psddl_hdf2psana/oceanoptics.ddl.h"
 #include "psddl_hdf2psana/lusi.ddl.h"
 #include "psddl_hdf2psana/acqiris.ddl.h"
+#include "psddl_hdf2psana/rayonix.ddl.h"
 
 
 namespace {
@@ -290,6 +291,10 @@ try {
   case 1624433407:
     // Encoder::ConfigV2
     cfgStore.putProxy(psddl_hdf2psana::Encoder::make_ConfigV2(schema_version, group, idx), src);
+    break;
+  case 1698299090:
+    // Rayonix::ConfigV1
+    cfgStore.putProxy(psddl_hdf2psana::Rayonix::make_ConfigV1(schema_version, group, idx), src);
     break;
   case 1705456020:
     // Ipimb::ConfigV2

@@ -19,6 +19,13 @@ hdf5pp::Type ns_ConfigV1_v0_dataset_config_stored_type()
   type.insert("triggerCounter", offsetof(DsType, triggerCounter), hdf5pp::TypeTraits<uint64_t>::stored_type());
   type.insert("serialID", offsetof(DsType, serialID), hdf5pp::TypeTraits<uint64_t>::stored_type());
   type.insert("chargeAmpRange", offsetof(DsType, chargeAmpRange), hdf5pp::TypeTraits<uint16_t>::stored_type());
+  hdf5pp::EnumType<uint8_t> _enum_type_capacitorValue = hdf5pp::EnumType<uint8_t>::enumType();
+  _enum_type_capacitorValue.insert("c_1pF", Psana::Ipimb::ConfigV1::c_1pF);
+  _enum_type_capacitorValue.insert("c_100pF", Psana::Ipimb::ConfigV1::c_100pF);
+  _enum_type_capacitorValue.insert("c_10nF", Psana::Ipimb::ConfigV1::c_10nF);
+  hsize_t _array_type_capacitorValue_shape[] = { 4 };
+  hdf5pp::ArrayType _array_type_capacitorValue = hdf5pp::ArrayType::arrayType(_enum_type_capacitorValue, 1, _array_type_capacitorValue_shape);
+  type.insert("capacitorValue", offsetof(DsType, capacitorValue), _array_type_capacitorValue);
   type.insert("calibrationRange", offsetof(DsType, calibrationRange), hdf5pp::TypeTraits<uint16_t>::stored_type());
   type.insert("resetLength", offsetof(DsType, resetLength), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("resetDelay", offsetof(DsType, resetDelay), hdf5pp::TypeTraits<uint32_t>::stored_type());
@@ -45,6 +52,13 @@ hdf5pp::Type ns_ConfigV1_v0_dataset_config_native_type()
   type.insert("triggerCounter", offsetof(DsType, triggerCounter), hdf5pp::TypeTraits<uint64_t>::native_type());
   type.insert("serialID", offsetof(DsType, serialID), hdf5pp::TypeTraits<uint64_t>::native_type());
   type.insert("chargeAmpRange", offsetof(DsType, chargeAmpRange), hdf5pp::TypeTraits<uint16_t>::native_type());
+  hdf5pp::EnumType<uint8_t> _enum_type_capacitorValue = hdf5pp::EnumType<uint8_t>::enumType();
+  _enum_type_capacitorValue.insert("c_1pF", Psana::Ipimb::ConfigV1::c_1pF);
+  _enum_type_capacitorValue.insert("c_100pF", Psana::Ipimb::ConfigV1::c_100pF);
+  _enum_type_capacitorValue.insert("c_10nF", Psana::Ipimb::ConfigV1::c_10nF);
+  hsize_t _array_type_capacitorValue_shape[] = { 4 };
+  hdf5pp::ArrayType _array_type_capacitorValue = hdf5pp::ArrayType::arrayType(_enum_type_capacitorValue, 1, _array_type_capacitorValue_shape);
+  type.insert("capacitorValue", offsetof(DsType, capacitorValue), _array_type_capacitorValue);
   type.insert("calibrationRange", offsetof(DsType, calibrationRange), hdf5pp::TypeTraits<uint16_t>::native_type());
   type.insert("resetLength", offsetof(DsType, resetLength), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("resetDelay", offsetof(DsType, resetDelay), hdf5pp::TypeTraits<uint32_t>::native_type());
@@ -83,6 +97,10 @@ ns_ConfigV1_v0::dataset_config::dataset_config(const Psana::Ipimb::ConfigV1& psa
   , calStrobeLength(psanaobj.calStrobeLength())
   , trigDelay(psanaobj.trigDelay())
 {
+  {
+    const __typeof__(psanaobj.capacitorValues())& arr = psanaobj.capacitorValues();
+    std::copy(arr.begin(), arr.begin()+4, capacitorValue);
+  }
 }
 
 ns_ConfigV1_v0::dataset_config::~dataset_config()
@@ -141,6 +159,11 @@ uint32_t ConfigV1_v0::trigDelay() const {
   return uint32_t(m_ds_config->trigDelay);
 }
 
+ndarray<const uint8_t, 1> ConfigV1_v0::capacitorValues() const {
+  if (not m_ds_config) read_ds_config();
+  boost::shared_ptr<uint8_t> ptr(m_ds_config, m_ds_config->capacitorValue);
+  return make_ndarray(ptr, 4);
+}
 void ConfigV1_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<Ipimb::ns_ConfigV1_v0::dataset_config>(m_group, "config", m_idx);
 }
@@ -222,6 +245,18 @@ hdf5pp::Type ns_ConfigV2_v0_dataset_config_stored_type()
   type.insert("triggerCounter", offsetof(DsType, triggerCounter), hdf5pp::TypeTraits<uint64_t>::stored_type());
   type.insert("serialID", offsetof(DsType, serialID), hdf5pp::TypeTraits<uint64_t>::stored_type());
   type.insert("chargeAmpRange", offsetof(DsType, chargeAmpRange), hdf5pp::TypeTraits<uint16_t>::stored_type());
+  hdf5pp::EnumType<uint8_t> _enum_type_capacitorValue = hdf5pp::EnumType<uint8_t>::enumType();
+  _enum_type_capacitorValue.insert("c_1pF", Psana::Ipimb::ConfigV2::c_1pF);
+  _enum_type_capacitorValue.insert("c_4p7pF", Psana::Ipimb::ConfigV2::c_4p7pF);
+  _enum_type_capacitorValue.insert("c_24pF", Psana::Ipimb::ConfigV2::c_24pF);
+  _enum_type_capacitorValue.insert("c_120pF", Psana::Ipimb::ConfigV2::c_120pF);
+  _enum_type_capacitorValue.insert("c_620pF", Psana::Ipimb::ConfigV2::c_620pF);
+  _enum_type_capacitorValue.insert("c_3p3nF", Psana::Ipimb::ConfigV2::c_3p3nF);
+  _enum_type_capacitorValue.insert("c_10nF", Psana::Ipimb::ConfigV2::c_10nF);
+  _enum_type_capacitorValue.insert("expert", Psana::Ipimb::ConfigV2::expert);
+  hsize_t _array_type_capacitorValue_shape[] = { 4 };
+  hdf5pp::ArrayType _array_type_capacitorValue = hdf5pp::ArrayType::arrayType(_enum_type_capacitorValue, 1, _array_type_capacitorValue_shape);
+  type.insert("capacitorValue", offsetof(DsType, capacitorValue), _array_type_capacitorValue);
   type.insert("calibrationRange", offsetof(DsType, calibrationRange), hdf5pp::TypeTraits<uint16_t>::stored_type());
   type.insert("resetLength", offsetof(DsType, resetLength), hdf5pp::TypeTraits<uint32_t>::stored_type());
   type.insert("resetDelay", offsetof(DsType, resetDelay), hdf5pp::TypeTraits<uint32_t>::stored_type());
@@ -250,6 +285,18 @@ hdf5pp::Type ns_ConfigV2_v0_dataset_config_native_type()
   type.insert("triggerCounter", offsetof(DsType, triggerCounter), hdf5pp::TypeTraits<uint64_t>::native_type());
   type.insert("serialID", offsetof(DsType, serialID), hdf5pp::TypeTraits<uint64_t>::native_type());
   type.insert("chargeAmpRange", offsetof(DsType, chargeAmpRange), hdf5pp::TypeTraits<uint16_t>::native_type());
+  hdf5pp::EnumType<uint8_t> _enum_type_capacitorValue = hdf5pp::EnumType<uint8_t>::enumType();
+  _enum_type_capacitorValue.insert("c_1pF", Psana::Ipimb::ConfigV2::c_1pF);
+  _enum_type_capacitorValue.insert("c_4p7pF", Psana::Ipimb::ConfigV2::c_4p7pF);
+  _enum_type_capacitorValue.insert("c_24pF", Psana::Ipimb::ConfigV2::c_24pF);
+  _enum_type_capacitorValue.insert("c_120pF", Psana::Ipimb::ConfigV2::c_120pF);
+  _enum_type_capacitorValue.insert("c_620pF", Psana::Ipimb::ConfigV2::c_620pF);
+  _enum_type_capacitorValue.insert("c_3p3nF", Psana::Ipimb::ConfigV2::c_3p3nF);
+  _enum_type_capacitorValue.insert("c_10nF", Psana::Ipimb::ConfigV2::c_10nF);
+  _enum_type_capacitorValue.insert("expert", Psana::Ipimb::ConfigV2::expert);
+  hsize_t _array_type_capacitorValue_shape[] = { 4 };
+  hdf5pp::ArrayType _array_type_capacitorValue = hdf5pp::ArrayType::arrayType(_enum_type_capacitorValue, 1, _array_type_capacitorValue_shape);
+  type.insert("capacitorValue", offsetof(DsType, capacitorValue), _array_type_capacitorValue);
   type.insert("calibrationRange", offsetof(DsType, calibrationRange), hdf5pp::TypeTraits<uint16_t>::native_type());
   type.insert("resetLength", offsetof(DsType, resetLength), hdf5pp::TypeTraits<uint32_t>::native_type());
   type.insert("resetDelay", offsetof(DsType, resetDelay), hdf5pp::TypeTraits<uint32_t>::native_type());
@@ -292,6 +339,10 @@ ns_ConfigV2_v0::dataset_config::dataset_config(const Psana::Ipimb::ConfigV2& psa
   , trigPsDelay(psanaobj.trigPsDelay())
   , adcDelay(psanaobj.adcDelay())
 {
+  {
+    const __typeof__(psanaobj.capacitorValues())& arr = psanaobj.capacitorValues();
+    std::copy(arr.begin(), arr.begin()+4, capacitorValue);
+  }
 }
 
 ns_ConfigV2_v0::dataset_config::~dataset_config()
@@ -358,6 +409,11 @@ uint32_t ConfigV2_v0::adcDelay() const {
   return uint32_t(m_ds_config->adcDelay);
 }
 
+ndarray<const uint8_t, 1> ConfigV2_v0::capacitorValues() const {
+  if (not m_ds_config) read_ds_config();
+  boost::shared_ptr<uint8_t> ptr(m_ds_config, m_ds_config->capacitorValue);
+  return make_ndarray(ptr, 4);
+}
 void ConfigV2_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<Ipimb::ns_ConfigV2_v0::dataset_config>(m_group, "config", m_idx);
 }

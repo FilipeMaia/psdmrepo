@@ -2,8 +2,7 @@
 
 set -e
 
-packages="acqiris alias andor bld camera control cspad cspad2x2 encoder epics evr fccd fli gsc16ai imp ipimb l3t \
-        lusi oceanoptics opal1k orca pnccd princeton pulnix quartz timepix usdusb"
+packages=`ls -1 psddldata/data | cut -d. -f1 | grep -v xtc`
 
 for pkg in $packages; do 
     f="psddldata/data/$pkg.ddl.xml" 

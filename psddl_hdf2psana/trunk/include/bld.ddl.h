@@ -14,6 +14,7 @@
 #include "psddl_hdf2psana/lusi.ddl.h"
 #include "psddl_hdf2psana/pulnix.ddl.h"
 #include "psddl_hdf2psana/lusi.ddl.h"
+#include "psddl_hdf2psana/ipimb.ddl.h"
 namespace psddl_hdf2psana {
 namespace Bld {
 

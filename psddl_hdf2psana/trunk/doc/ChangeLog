@@ -11,6 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-07-01
+2013-11-12 Andy Salnikov
+- upgrade to pdsdata V07-02-07
+- ipimb config types finally got array of capacitor values
+- new rayonix package
+
 Tag: V00-07-00
 2013-11-05 Andy Salnikov
 - preparation for new DDL parser: tags renamed:

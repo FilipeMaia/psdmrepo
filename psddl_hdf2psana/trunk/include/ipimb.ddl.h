@@ -23,6 +23,7 @@ struct dataset_config {
   uint64_t triggerCounter;
   uint64_t serialID;
   uint16_t chargeAmpRange;
+  uint8_t capacitorValue[4];
   uint16_t calibrationRange;
   uint32_t resetLength;
   uint32_t resetDelay;
@@ -62,6 +63,7 @@ public:
   virtual uint32_t trigDelay() const;
   /** Returns CapacitorValue enum for given channel number (0..3). */
   Psana::Ipimb::ConfigV1::CapacitorValue capacitorValue(uint32_t ch) const { return CapacitorValue((this->chargeAmpRange() >> (ch*2)) & 0x3); }
+  virtual ndarray<const uint8_t, 1> capacitorValues() const;
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
@@ -94,6 +96,7 @@ struct dataset_config {
   uint64_t triggerCounter;
   uint64_t serialID;
   uint16_t chargeAmpRange;
+  uint8_t capacitorValue[4];
   uint16_t calibrationRange;
   uint32_t resetLength;
   uint32_t resetDelay;
@@ -137,6 +140,7 @@ public:
   virtual uint32_t adcDelay() const;
   /** Returns CapacitorValue enum for given channel number (0..3). */
   Psana::Ipimb::ConfigV2::CapacitorValue capacitorValue(uint32_t ch) const { return CapacitorValue((this->chargeAmpRange() >> (ch*4)) & 0xf); }
+  virtual ndarray<const uint8_t, 1> capacitorValues() const;
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
