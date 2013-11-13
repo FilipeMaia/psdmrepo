@@ -2,7 +2,12 @@
 
 set -e
 
-packages=`ls -1 psddldata/data | cut -d. -f1 | grep -v xtc`
+if [ ! -d psddldata/data/ ]; then
+    echo "The psddldata/data directory was not found. Try doing 'addpkg psddldata' first."
+    exit 1
+fi
+
+packages=`(cd psddldata/data; ls -1 *.ddl.xml | cut -d. -f1 | grep -v xtc)`
 
 for pkg in $packages; do 
     f="psddldata/data/$pkg.ddl.xml" 
