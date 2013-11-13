@@ -11,6 +11,10 @@ Package author: Ingrid Ofte
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2013-Nov-12 dubrovin V00-04-01
+        - src/pyana_image.py - add saving 16-bit tiff files
+	  fix problem with file naming in case of multiply (cspad) sources
+
 2013-Oct-02 salnikov V00-04-00
 	- upgrade to DDL-based pdsdata, need small change in acqiris data access
 

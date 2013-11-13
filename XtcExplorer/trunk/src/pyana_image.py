@@ -15,6 +15,7 @@ import time
 import logging
 
 import numpy as np
+import Image
 
 #-----------------------------
 # Imports for other modules --
@@ -614,30 +615,31 @@ class  pyana_image ( object ) :
         # First, make a list
         images_for_saving = []
         for addr in self.sources:
-
+            
             if label is None: 
-                label = '%s ev%d'%(addr,self.n_shots)
+                self._label = '%s ev%d'%(addr,self.n_shots)
             else :
-                label = "%s %s"%(addr,label)
+                self._label = "%s %s"%(addr,label)
                 
             if 'image' in self.quantities:
-                images_for_saving.append( ('image', label, self.data[addr].image ))    
+                images_for_saving.append( ('image', self._label, self.data[addr].image ))    
             if 'roi' in self.quantities:
-                images_for_saving.append( ('roi', label, self.data[addr].roi ))
-
+                images_for_saving.append( ('roi', self._label, self.data[addr].roi ))
             if 'average' in self.quantities:
-                images_for_saving.append( ('average', label, self.data[addr].average ))
+                images_for_saving.append( ('average', self._label, self.data[addr].average ))
             if 'darks' in self.quantities:
-                images_for_saving.append( ('avgdark', label, self.data[addr].avgdark ))
+                images_for_saving.append( ('avgdark', self._label, self.data[addr].avgdark ))
             if 'maximum' in self.quantities:
-                images_for_saving.append( ('maximum', label, self.data[addr].maximum ))
+                images_for_saving.append( ('maximum', self._label, self.data[addr].maximum ))
                 
 
         # For each item in the files, print to output
         for name,title,array in images_for_saving:
-            
+
             fname = filenameproto.split('.')
-            device, lbl = label.split()
+
+            device, lbl = title.split()
+
             identifier = "%s_%s_r%04d_%s"%(name,
                                            device.replace('|',':').replace('-','.'),
                                            self.run, lbl) 
@@ -673,7 +675,15 @@ class  pyana_image ( object ) :
                     import scipy.io
                     scipy.io.savemat(thename,{title:array})
 
-                else :  # Some image format... JPG, tiff, etc... 
+                elif fname[-1] in ['tiff', 'jpeg'] :
+                    """Saves 16-bit tiff etc...
+                    """
+                    img = Image.fromarray(array.astype(np.int16))  # or int32
+                    img.save(thename)
+
+                else :  # Some image format... tif, jpg, png, eps, pdf, etc... 
+                    """Saves 8-bit tif etc...
+                    """
                     import scipy.misc 
                     scipy.misc.imsave(thename, array)
                     
