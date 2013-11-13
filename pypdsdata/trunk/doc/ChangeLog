@@ -6,6 +6,11 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V01-01-01
+2013-11-12 Andy Salnikov
+- upgrade to pdsdata V07-02-07
+- new rayonix package
+
 Tag: V01-01-00
 2013-10-24 Andy Salnikov
 - upgrade to pdsdata V07-02-04

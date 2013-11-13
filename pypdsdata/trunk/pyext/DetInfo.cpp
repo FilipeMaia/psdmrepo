@@ -95,6 +95,7 @@ namespace {
       { "MecTargetChamber", Pds::DetInfo::MecTargetChamber },
       { "FeeHxSpectrometer", Pds::DetInfo::FeeHxSpectrometer },
       { "XrayTransportDiagnostic", Pds::DetInfo::XrayTransportDiagnostic },
+      { "Lamp",        Pds::DetInfo::Lamp },
       { "NumDetector", Pds::DetInfo::NumDetector },
       { 0, 0 }
   };
@@ -133,6 +134,8 @@ namespace {
       { "USDUSB",    Pds::DetInfo::USDUSB },
       { "OrcaFl40",  Pds::DetInfo::OrcaFl40 },
       { "Imp",       Pds::DetInfo::Imp },
+      { "Epix",      Pds::DetInfo::Epix },
+      { "Rayonix",   Pds::DetInfo::Rayonix },
       { "NumDevice", Pds::DetInfo::NumDevice },
       { 0, 0 }
   };

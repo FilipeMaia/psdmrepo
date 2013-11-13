@@ -106,6 +106,7 @@ namespace {
       { "Id_L3TConfig",       Pds::TypeId::Id_L3TConfig },
       { "Id_L3TData",         Pds::TypeId::Id_L3TData },
       { "Id_Spectrometer",    Pds::TypeId::Id_Spectrometer },
+      { "Id_RayonixConfig",   Pds::TypeId::Id_RayonixConfig },
       { "NumberOf",           Pds::TypeId::NumberOf },
       { 0, 0 }
   };

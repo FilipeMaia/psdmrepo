@@ -32,20 +32,10 @@
 //-----------------------------------------------------------------------
 namespace {
 
-  // Ipimb::ConfigV1 does not defie this enum, this come from communication
-  // with Matt:
-  //  IpimbConfigV1
-  //  
-  //     { 1pF, 100pF, 10nF }
-  //  
-  //     gain of channel0 = (chargeAmpRange()>>0)&0x3
-  //     gain of channel1 = (chargeAmpRange()>>2)&0x3
-  //     ..
-  //     (only 8 bits are used)
   pypdsdata::EnumType::Enum capacitorValueEnumValues[] = {
-      { "c_1pF",       0 },
-      { "c_100pF",     1 },
-      { "c_10nF",      2 },
+      { "c_1pF",       Pds::Ipimb::ConfigV1::c_1pF },
+      { "c_100pF",     Pds::Ipimb::ConfigV1::c_100pF },
+      { "c_10nF",      Pds::Ipimb::ConfigV1::c_10nF },
       { 0, 0 }
   };
   pypdsdata::EnumType capacitorValueEnum ( "CapacitorValue", capacitorValueEnumValues );
@@ -64,6 +54,7 @@ namespace {
   FUN0_WRAPPER(pypdsdata::Ipimb::ConfigV1, errors)
   FUN0_WRAPPER(pypdsdata::Ipimb::ConfigV1, calStrobeLength)
   FUN0_WRAPPER(pypdsdata::Ipimb::ConfigV1, trigDelay)
+  PyObject* capacitorValues(PyObject* self, PyObject* );
   PyObject* capacitorValue(PyObject* self, PyObject* args);
 
   PyMethodDef methods[] = {
@@ -80,6 +71,8 @@ namespace {
     { "errors",              errors,              METH_NOARGS, "self.errors() -> int\n\nReturns integer number" },
     { "calStrobeLength",     calStrobeLength,     METH_NOARGS, "self.calStrobeLength() -> int\n\nReturns integer number" },
     { "trigDelay",           trigDelay,           METH_NOARGS, "self.trigDelay() -> int\n\nReturns integer number" },
+    { "capacitorValues",     capacitorValues,     METH_NOARGS,
+        "self.capacitorValues() -> list\n\nReturns list of :py:class:`CapacitorValue` enums, on item per channel." },
     { "capacitorValue",      capacitorValue,      METH_VARARGS,
         "self.capacitorValue(ch: int) -> CapacitorValue enum\n\nReturns :py:class:`CapacitorValue` enum for given channel number (0..3)" },
     { "diodeGain",           capacitorValue,      METH_VARARGS,
@@ -120,7 +113,23 @@ pypdsdata::Ipimb::ConfigV1::print(std::ostream& str) const
 }
 
 namespace {
-  
+
+PyObject*
+capacitorValues( PyObject* self, PyObject* )
+{
+  const Pds::Ipimb::ConfigV1* obj = pypdsdata::Ipimb::ConfigV1::pdsObject(self);
+  if ( not obj ) return 0;
+
+  const ndarray<const uint8_t, 1>& arr = obj->capacitorValues();
+  const unsigned size = arr.size();
+  PyObject* list = PyList_New(size);
+  for ( unsigned i = 0; i < size; ++ i ) {
+    using pypdsdata::TypeLib::toPython;
+    PyList_SET_ITEM(list, i, capacitorValueEnum.Enum_FromLong(arr[i]));
+  }
+  return list;
+}
+
 PyObject*
 capacitorValue( PyObject* self, PyObject* args )
 {

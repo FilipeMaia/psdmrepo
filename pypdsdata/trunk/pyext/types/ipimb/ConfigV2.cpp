@@ -61,6 +61,7 @@ namespace {
   FUN0_WRAPPER(pypdsdata::Ipimb::ConfigV2, trigDelay)
   FUN0_WRAPPER(pypdsdata::Ipimb::ConfigV2, trigPsDelay)
   FUN0_WRAPPER(pypdsdata::Ipimb::ConfigV2, adcDelay)
+  PyObject* capacitorValues(PyObject* self, PyObject* );
   PyObject* capacitorValue(PyObject* self, PyObject* args);
 
   PyMethodDef methods[] = {
@@ -79,6 +80,8 @@ namespace {
     { "trigDelay",           trigDelay,           METH_NOARGS, "self.trigDelay() -> int\n\nReturns integer number" },
     { "trigPsDelay",         trigPsDelay,         METH_NOARGS, "self.trigPsDelay() -> int\n\nReturns integer number" },
     { "adcDelay",            adcDelay,            METH_NOARGS, "self.adcDelay() -> int\n\nReturns integer number" },
+    { "capacitorValues",     capacitorValues,     METH_NOARGS,
+        "self.capacitorValues() -> list\n\nReturns list of :py:class:`CapacitorValue` enums, on item per channel." },
     { "capacitorValue",      capacitorValue,      METH_VARARGS,
         "self.capacitorValue(ch: int) -> CapacitorValue enum\n\nReturns :py:class:`CapacitorValue` enum for given channel number (0..3)" },
     { "diodeGain",           capacitorValue,      METH_VARARGS,
@@ -119,6 +122,22 @@ pypdsdata::Ipimb::ConfigV2::print(std::ostream& str) const
 }
 
 namespace {
+
+PyObject*
+capacitorValues( PyObject* self, PyObject* )
+{
+  const Pds::Ipimb::ConfigV2* obj = pypdsdata::Ipimb::ConfigV2::pdsObject(self);
+  if ( not obj ) return 0;
+
+  const ndarray<const uint8_t, 1>& arr = obj->capacitorValues();
+  const unsigned size = arr.size();
+  PyObject* list = PyList_New(size);
+  for ( unsigned i = 0; i < size; ++ i ) {
+    using pypdsdata::TypeLib::toPython;
+    PyList_SET_ITEM(list, i, capacitorValueEnum.Enum_FromLong(arr[i]));
+  }
+  return list;
+}
 
 PyObject*
 capacitorValue( PyObject* self, PyObject* args )
