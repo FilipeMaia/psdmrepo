@@ -14,7 +14,6 @@
 // This Class's Header --
 //-----------------------
 #include "CSPadPixCoords/CSPad2x2ImageProducer.h"
-#include "CSPadPixCoords/GlobalMethods.h"
 
 //-----------------
 // C/C++ Headers --
@@ -58,6 +57,7 @@ CSPad2x2ImageProducer::CSPad2x2ImageProducer (const std::string& name)
   , m_source()
   , m_inkey()
   , m_outimgkey()
+  , m_outtype()
   , m_tiltIsApplied()
   , m_useWidePixCenter()
   , m_print_bits()
@@ -69,12 +69,15 @@ CSPad2x2ImageProducer::CSPad2x2ImageProducer (const std::string& name)
   m_source           = configSrc("source",        "DetInfo(:Cspad2x2.1)");
   m_inkey            = configStr("inkey",         "");
   m_outimgkey        = configStr("outimgkey",     "image");
+  m_outtype          = configStr("outtype",       "int16");
   m_tiltIsApplied    = config   ("tiltIsApplied",    true);
   m_useWidePixCenter = config   ("useWidePixCenter",false);
   m_print_bits       = config   ("print_bits",          0);
   //m_source = Source(m_str_src);
   //stringstream ssrc; ssrc << m_source;
   //m_str_src = ssrc.str();
+
+  checkTypeImplementation();
 }
 
 //--------------
@@ -252,16 +255,40 @@ CSPad2x2ImageProducer::cspad_image_fill(const ndarray<const int16_t,3>& data)
 void
 CSPad2x2ImageProducer::cspad_image_add_in_event(Event& evt)
 {
+  // Compatability stuff
+  /*
     if(m_outimgkey == "Image2D") {
       shared_ptr< CSPadPixCoords::Image2D<double> > img2d( new CSPadPixCoords::Image2D<double>(&m_arr_cspad2x2_image[0][0], NY_CSPAD2X2, NX_CSPAD2X2) );
       evt.put(img2d, m_src, m_outimgkey);
       return;
     }
+  */
 
-    const unsigned shape[] = {NX_CSPAD2X2, NY_CSPAD2X2};
-    ndarray<double,2> img_nda (&m_arr_cspad2x2_image[0][0],shape);
-    save2DArrayInEvent<double>(evt, m_src, m_outimgkey, img_nda);
+  // Save image in the event for one of the supported data types
+  if      ( m_outtype == "float"   ) save2DArrayInEventForType<float>   (evt); 
+  else if ( m_outtype == "double"  ) save2DArrayInEventForType<double>  (evt); 
+  else if ( m_outtype == "int"     ) save2DArrayInEventForType<int>     (evt); 
+  else if ( m_outtype == "int16"   ) save2DArrayInEventForType<int16_t> (evt); 
+  else if ( m_outtype == "int16_t" ) save2DArrayInEventForType<int16_t> (evt); 
 }
+
+//--------------------
+
+void 
+CSPad2x2ImageProducer::checkTypeImplementation()
+{  
+  if      ( m_outtype == "float"   ) return; 
+  else if ( m_outtype == "double"  ) return; 
+  else if ( m_outtype == "int"     ) return; 
+  else if ( m_outtype == "int16"   ) return; 
+  else if ( m_outtype == "int16_t" ) return; 
+  else {
+         const std::string msg = "The requested data type: " + m_outtype + " is not implemented";
+         MsgLog(name(), warning, msg );
+         throw std::runtime_error(msg);
+  }
+}
+
 
 //--------------------
 

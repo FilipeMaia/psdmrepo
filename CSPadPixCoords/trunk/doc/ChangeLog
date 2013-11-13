@@ -11,6 +11,11 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-11
+2013-11-13 Mikhail S. Dubrovin
+- in CSPad2x2ImageProducer add parameter m_outtype() and produce image for this data type, set defauly int16
+- in CSPadNDArrProducer add type int16
+	
 Tag: V00-03-10
 2013-11-12 Mikhail S. Dubrovin
 - in src/CSPad2x2ImageProducer.cpp changed print_bits

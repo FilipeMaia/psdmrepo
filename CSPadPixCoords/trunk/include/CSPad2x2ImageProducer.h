@@ -25,6 +25,7 @@
 //-------------------------------
 #include "PSCalib/CSPad2x2CalibPars.h"
 #include "CSPadPixCoords/PixCoordsCSPad2x2V2.h"
+#include "CSPadPixCoords/GlobalMethods.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -116,6 +117,7 @@ protected:
   //void cspad_image_fill(const int16_t* data, CSPadPixCoords::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar);
   void cspad_image_fill(const ndarray<const int16_t,3>& data);
   void cspad_image_add_in_event(Event& evt);
+  void checkTypeImplementation();
 
 private:
 
@@ -127,7 +129,8 @@ private:
   Source      m_source;         // i.e. Detinfo(MecTargetChamber.0:Cspad2x2.1)
   Pds::Src    m_src;
   std::string m_inkey; 
-  std::string m_outimgkey;   // i.e. "CSPad:Image"
+  std::string m_outimgkey;      // i.e. "CSPad:Image"
+  std::string m_outtype;
   bool        m_tiltIsApplied;
   bool        m_useWidePixCenter; 
   unsigned    m_print_bits;
@@ -157,6 +160,9 @@ public:
    * @brief Get configuration info from Env, return true if configuration is found, othervise false.
    * 
    */
+
+//--------------------
+
   template <typename T>
   bool getConfigParsForType(Env& env)
   {
@@ -173,6 +179,29 @@ public:
 	return true;
       }
       return false;
+  }
+//--------------------
+
+  template <typename TOUT>
+  void save2DArrayInEventForType (Event& evt) {
+
+      const unsigned shape[] = {NX_CSPAD2X2, NY_CSPAD2X2};
+      ndarray<double,2> img_nda (&m_arr_cspad2x2_image[0][0],shape);
+      
+      if (typeid(TOUT) == typeid(double)) { // typeid(double).name()
+        save2DArrayInEvent<double>(evt, m_src, m_outimgkey, img_nda);
+        return;
+      }
+      
+      ndarray<TOUT,2> img_out (shape);
+      
+      //Copy array with type changing
+      typename ndarray<TOUT,2>::iterator it_out = img_out.begin(); 
+      for ( ndarray<const double,2>::iterator it=img_nda.begin(); it!=img_nda.end(); ++it, ++it_out ) {
+        *it_out = (TOUT)*it;
+      }
+
+      save2DArrayInEvent<TOUT>(evt, m_src, m_outimgkey, img_out);
   }
 
 }; // class CSPad2x2ImageProducer

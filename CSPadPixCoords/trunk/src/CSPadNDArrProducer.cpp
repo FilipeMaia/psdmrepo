@@ -193,13 +193,12 @@ CSPadNDArrProducer::procEvent(Event& evt, Env& env)
 {  
   getCSPadConfigFromData(evt);
 
-  // proc event for available types Psana::CsPad::DataV1, or V2
+  // proc event  for one of the supported data types
   if ( m_outtype == "float"   and procEventForOutputType<float>   (evt) ) return; 
   if ( m_outtype == "double"  and procEventForOutputType<double>  (evt) ) return; 
   if ( m_outtype == "int"     and procEventForOutputType<int>     (evt) ) return; 
+  if ( m_outtype == "int16"   and procEventForOutputType<int16_t> (evt) ) return; 
   if ( m_outtype == "int16_t" and procEventForOutputType<int16_t> (evt) ) return; 
-
-  MsgLog(name(), warning, "procEvent(...): Psana::CsPad::DataV# / ElementV# for #=[2-5] is not available in this event.");
 }
 
 //--------------------
@@ -210,6 +209,7 @@ CSPadNDArrProducer::checkTypeImplementation()
   if ( m_outtype == "float"   ) return; 
   if ( m_outtype == "double"  ) return; 
   if ( m_outtype == "int"     ) return; 
+  if ( m_outtype == "int16"   ) return; 
   if ( m_outtype == "int16_t" ) return; 
 
   const std::string msg = "The requested data type: " + m_outtype + " is not implemented";
