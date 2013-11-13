@@ -1,0 +1,67 @@
+#ifndef PYPDSDATA_EVRDATA_CONFIGV6_H
+#define PYPDSDATA_EVRDATA_CONFIGV6_H
+
+//--------------------------------------------------------------------------
+// File and Version Information:
+// 	$Id$
+//
+// Description:
+//	Class EvrData_ConfigV6.
+//
+//------------------------------------------------------------------------
+
+//-----------------
+// C/C++ Headers --
+//-----------------
+
+//----------------------
+// Base Class Headers --
+//----------------------
+#include "../PdsDataType.h"
+
+//-------------------------------
+// Collaborating Class Headers --
+//-------------------------------
+#include "pdsdata/psddl/evr.ddl.h"
+
+//------------------------------------
+// Collaborating Class Declarations --
+//------------------------------------
+
+//    ---------------------
+//    -- Class Interface --
+//    ---------------------
+
+namespace pypdsdata {
+namespace EvrData {
+
+/// @addtogroup pypdsdata
+
+/**
+ *  @ingroup pypdsdata
+ *
+ *  This software was developed for the LUSI project.  If you use all or
+ *  part of it, please give an appropriate acknowledgment.
+ *
+ *  @version $Id$
+ *
+ *  @author Andrei Salnikov
+ */
+
+class ConfigV6 : public PdsDataType<ConfigV6,Pds::EvrData::ConfigV6> {
+public:
+
+  typedef PdsDataType<ConfigV6,Pds::EvrData::ConfigV6> BaseType;
+
+  /// Initialize Python type and register it in a module
+  static void initType( PyObject* module );
+
+  // dump to a stream
+  void print(std::ostream& str) const;
+
+};
+
+} // namespace EvrData
+} // namespace pypdsdata
+
+#endif // PYPDSDATA_EVRDATA_CONFIGV6_H
