@@ -207,7 +207,7 @@ AcqirisArrProducer::print_wf_in_event(Event& evt, Env& env)
           ndarray<const int16_t, 1> raw(waveforms[seg]);
           ndarray<float, 1> wf = make_ndarray<float>(size);
           for (unsigned i = 0; i < size; ++ i) {
-            wf[i] = raw[i]*slope + offset;
+            wf[i] = raw[i]*slope - offset;
           }
           
           str << "\n  Segment #" << seg
@@ -228,7 +228,6 @@ AcqirisArrProducer::proc_and_put_wf_in_event(Event& evt, Env& env)
 {
   shared_ptr<Psana::Acqiris::DataDescV1> acqData = evt.get(m_src);
   if (acqData) {
-    
     // find matching config object
     shared_ptr<Psana::Acqiris::ConfigV1> acqConfig = env.configStore().get(m_src);
     // int nbrChannels = acqData->data_shape()[0];
@@ -283,7 +282,7 @@ AcqirisArrProducer::proc_and_put_wf_in_event(Event& evt, Env& env)
 	    //     << "  iterator size = " << size << endl;  
 
             for (int32_t  i = 0; i < size; ++ i) {
-	      wf[chan][i0_seg + i] = raw[indexFirstPoint + i]*slope + offset;
+	      wf[chan][i0_seg + i] = raw[indexFirstPoint + i]*slope - offset;
               wt[chan][i0_seg + i] = i*sampInterval + pos;		
             }          
         }
