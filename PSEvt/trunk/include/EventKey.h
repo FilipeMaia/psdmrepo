@@ -118,8 +118,16 @@ operator<<(std::ostream& out, const EventKey& key) {
   return out;
 }
 
-// compare two Src objects
-int cmp(const Pds::Src& lhs, const Pds::Src& rhs);
+/**
+ *   @brief Compare two Src objects, ignores process ID.
+ *   
+ *   When we specify source in psana we do not know or care about process ID,
+ *   this is why we have to ignore it when we search for matching source.
+ *   
+ *   @return Negative number if lhs is lower than rhs, 0 if they are the same,
+ *           positive number otherwise.
+ */
+int cmpPdsSrc(const Pds::Src& lhs, const Pds::Src& rhs);
 
 } // namespace PSEvt
 

@@ -115,8 +115,9 @@ namespace PSEvt {
 bool 
 EventKey::operator<(const EventKey& other) const 
 {
-  if (this->m_src < other.m_src) return true;
-  if (other.m_src < this->m_src) return false;
+  int src_diff = PSEvt::cmpPdsSrc(this->m_src, other.m_src);
+  if (src_diff<0) return true;
+  if (src_diff>0) return false;
   if( TypeInfoUtils::lessTypeInfoPtr()(m_typeinfo, other.m_typeinfo) ) return true;
   if( TypeInfoUtils::lessTypeInfoPtr()(other.m_typeinfo, m_typeinfo) ) return false;
   if (m_key < other.m_key) return true;
@@ -141,6 +142,16 @@ EventKey::print(std::ostream& str) const
   }
   str << ')';
 }
+
+/// Compare two Src objects, ignores process ID.
+int cmpPdsSrc(const Pds::Src& lhs, const Pds::Src& rhs)
+{
+  // ignore PID in comparison
+  int diff = int(lhs.level()) - int(rhs.level());
+  if (diff != 0) return diff;
+  return int(lhs.phy()) - int(rhs.phy());
+}
+
 
 } // namespace PSEvt
 
