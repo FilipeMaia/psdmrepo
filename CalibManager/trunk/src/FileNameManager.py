@@ -285,21 +285,16 @@ class FileNameManager :
 #-----------------------------
 
     def  get_list_of_files_peds_scan(self) :
-        self.list_of_files_peds_scan = []
-        #self.list_of_files_peds_scan.append(self.path_dark_xtc())
-        self.list_of_files_peds_scan.append(self.path_peds_scan_psana_cfg())
-        self.list_of_files_peds_scan.append(self.path_peds_scan_batch_log())
-        return self.list_of_files_peds_scan
+        return [self.path_peds_scan_psana_cfg(),
+                self.path_peds_scan_batch_log()]
 
 
     def  get_list_of_files_peds_aver(self) :
-        self.list_of_files_peds_aver = []
-        self.list_of_files_peds_aver.append(self.path_peds_aver_psana_cfg())
-        self.list_of_files_peds_aver.append(self.path_peds_aver_batch_log())
         #self.list_of_files_peds_aver.append(self.path_peds_ave())
         #self.list_of_files_peds_aver.append(self.path_peds_rms())
         #self.list_of_files_peds_aver.append(self.path_hotpix_mask())
-        return self.list_of_files_peds_aver
+        return [self.path_peds_aver_psana_cfg(),
+                self.path_peds_aver_batch_log()]
 
 
     def  get_list_of_files_peds(self) :
@@ -324,12 +319,24 @@ class FileNameManager :
         name, ext = os.path.splitext(path1)
         return ['%s-%s%s' % (name, src, ext) for src in list_of_insets]
 
+#-----------------------------
 
-    def get_list_of_files_for_detector(self, path1='work/file.dat', det_name='') :
+    def get_list_of_files_for_detector(self, path1='file.dat', det_name='') :
         """From pattern of the path it makes a list of files with names for all sources."""
         if det_name == '' : return path1
-        lst = ru.list_of_detectors_in_run_for_selected(cp.instr_name.value(), cp.exp_name.value(), int(cp.str_run_number.value()), det_name)
+        ins, exp, run_number = cp.instr_name.value(), cp.exp_name.value(), int(cp.str_run_number.value())
+        lst = ru.list_of_sources_in_run_for_selected_detector(ins, exp, run_number, det_name)
         return self.get_list_of_files_for_all_sources(path1, lst)
+
+
+    def get_list_of_files_for_all_detectors_and_sources(self, path1='file.dat') :
+        ins, exp, run_number = cp.instr_name.value(), cp.exp_name.value(), int(cp.str_run_number.value())
+
+        list_of_files = []
+        for det_name in cp.list_of_dets_selected() :
+            lst_src = ru.list_of_sources_in_run_for_selected_detector(ins, exp, run_number, det_name)
+            list_of_files += fnm.get_list_of_files_for_all_sources(path1, lst_src)
+        return list_of_files
 
 #-----------------------------
 

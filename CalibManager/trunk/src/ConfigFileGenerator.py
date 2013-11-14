@@ -121,7 +121,7 @@ class ConfigFileGenerator :
         #print ins, exp, run_number
 
         for det_name in cp.list_of_dets_selected() :
-            lst = ru.list_of_detectors_in_run_for_selected(ins, exp, run_number, det_name)
+            lst = ru.list_of_sources_in_run_for_selected_detector(ins, exp, run_number, det_name)
             list_path_peds_ave    = fnm.get_list_of_files_for_all_sources(fnm.path_peds_ave(), lst)
             list_path_peds_rms    = fnm.get_list_of_files_for_all_sources(fnm.path_peds_rms(), lst)
             list_path_hotpix_mask = fnm.get_list_of_files_for_all_sources(fnm.path_hotpix_mask(), lst)

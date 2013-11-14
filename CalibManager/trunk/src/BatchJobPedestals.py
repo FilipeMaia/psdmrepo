@@ -62,23 +62,13 @@ class BatchJobPedestals (BatchJob) :
 
 #-----------------------------
 
-    def     make_psana_cfg_file_for_peds_scan(self) :
-        cfg.make_psana_cfg_file_for_peds_scan()
-
-#-----------------------------
-
-    def     make_psana_cfg_file_for_peds_aver(self) :
-        cfg.make_psana_cfg_file_for_peds_aver()
-
-#-----------------------------
-
     def submit_batch_for_peds_scan(self) :
         self.exportLocalPars()
 
         if not self.job_can_be_submitted(self.job_id_scan_str, self.time_scan_job_submitted, 'scan') : return
         self.time_scan_job_submitted = gu.get_time_sec()
 
-        self.make_psana_cfg_file_for_peds_scan()
+        cfg.make_psana_cfg_file_for_peds_scan()
 
         command      = 'psana -c ' + fnm.path_peds_scan_psana_cfg() + ' ' + fnm.path_to_xtc_files_for_run() # fnm.path_dark_xtc_cond()
         queue        = self.queue
@@ -100,7 +90,7 @@ class BatchJobPedestals (BatchJob) :
 
     def command_for_peds_scan(self) :
 
-        self.make_psana_cfg_file_for_peds_scan()
+        cfg.make_psana_cfg_file_for_peds_scan()
 
         #command = 'env'
         command = 'psana -c ' + fnm.path_peds_scan_psana_cfg()
@@ -128,7 +118,7 @@ class BatchJobPedestals (BatchJob) :
 
         self.command_for_peds_scan()
 
-        self.make_psana_cfg_file_for_peds_aver()
+        cfg.make_psana_cfg_file_for_peds_aver()
 
         command      = 'psana -c ' + fnm.path_peds_aver_psana_cfg() + ' ' + fnm.path_to_xtc_files_for_run() # fnm.path_dark_xtc_cond()
         queue        = self.queue
@@ -176,16 +166,18 @@ class BatchJobPedestals (BatchJob) :
     def get_list_of_files_peds_aver(self) :
         self.exportLocalPars() # export run_number to cp.str_run_number        
         list_of_fnames = fnm.get_list_of_files_peds_aver() \
-             + blsp.get_list_of_files_for_all_sources(fnm.path_peds_ave()) \
-             + blsp.get_list_of_files_for_all_sources(fnm.path_peds_rms())
+             + fnm.get_list_of_files_for_all_detectors_and_sources(fnm.path_peds_ave()) \
+             + fnm.get_list_of_files_for_all_detectors_and_sources(fnm.path_peds_rms())
+             #+ blsp.get_list_of_files_for_all_sources(fnm.path_peds_ave()) \
+             #+ blsp.get_list_of_files_for_all_sources(fnm.path_peds_rms())
         return list_of_fnames
 
 #-----------------------------
 
     def get_list_of_files_peds_essential(self) :
         self.exportLocalPars() # export run_number to cp.str_run_number
-        return  self.get_list_of_files_peds_scan() \
-               +self.get_list_of_files_peds_aver()
+        return   self.get_list_of_files_peds_scan() \
+               + self.get_list_of_files_peds_aver()
 
 #-----------------------------
 

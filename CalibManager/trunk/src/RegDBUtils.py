@@ -64,7 +64,7 @@ def txt_of_detectors_in_run (ins, exp, run) :
 
 #------------------------------
 
-def list_of_detectors_in_run_for_selected (ins, exp, run, det_selected) :
+def list_of_sources_in_run_for_selected_detector (ins, exp, run, det_selected) :
     """Returns the list of detectors in run for selected detector. For example, for CSPAD returns ['CxiDs1.0:Cspad.0', 'CxiDsd.0:Cspad.0']
     """
     lst = []
