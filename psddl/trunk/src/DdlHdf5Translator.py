@@ -169,6 +169,14 @@ def getAttrsAndValueForCodeGen(attrList, pvname, specialTypes):
 #---------------------
 class DdlHdf5Translator ( object ) :
 
+    @staticmethod
+    def backendOptions():
+        """ Returns the list of options supported by this backend, returned value is 
+        either None or a list of triplets (name, type, description)"""
+        return [
+            ('package_dir', 'PATH', "package directory for output files"),
+            ]
+
     #----------------
     #  Constructor --
     #----------------

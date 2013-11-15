@@ -124,7 +124,7 @@ class psddlc ( AppBase ) :
     def _run ( self ) :
 
         if self._options.list_backends:
-            print "Available backends: " + " ".join(self.backends.keys())
+            print "Available backends: " + " ".join(sorted(self.backends.keys()))
             return 0
 
         # build dict with backend options
