@@ -738,15 +738,18 @@ def get_list_of_enumerated_file_names(path1='file.dat', len_of_list=0) :
     For example, for path1='file.dat', it returns [file-00.dat, file-01.dat, ..., file-<N-1>.dat], where N = len_of_list
     """
     if len_of_list < 2 : return [path1]
-
-    list_of_files = []
     name, ext = os.path.splitext(path1)
-    for i in range(len_of_list) :
-        name_i = '%s-%02i%s' % (name, i, ext)
-        list_of_files.append(name_i)
-    return list_of_files
+    return ['%s-%02i%s' % (name, i, ext) for i in range(len_of_list) ]
 
 #----------------------------------
+
+def get_list_of_files_for_list_of_insets(path1='file.dat', list_of_insets=[]) :
+    """Returns the list of file names, where the file name is a combination of path1 and inset from list
+    """
+    if list_of_insets == [] : return [] # [path1]
+    name, ext = os.path.splitext(path1)
+    return ['%s-%s%s' % (name, src, ext) for src in list_of_insets]
+
 #----------------------------------
 #----------------------------------
 #----------------------------------

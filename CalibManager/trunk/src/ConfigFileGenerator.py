@@ -122,9 +122,9 @@ class ConfigFileGenerator :
 
         for det_name in cp.list_of_dets_selected() :
             lst = ru.list_of_sources_in_run_for_selected_detector(ins, exp, run_number, det_name)
-            list_path_peds_ave    = fnm.get_list_of_files_for_all_sources(fnm.path_peds_ave(), lst)
-            list_path_peds_rms    = fnm.get_list_of_files_for_all_sources(fnm.path_peds_rms(), lst)
-            list_path_hotpix_mask = fnm.get_list_of_files_for_all_sources(fnm.path_hotpix_mask(), lst)
+            list_path_peds_ave    = gu.get_list_of_files_for_list_of_insets(fnm.path_peds_ave(),    lst)
+            list_path_peds_rms    = gu.get_list_of_files_for_list_of_insets(fnm.path_peds_rms(),    lst)
+            list_path_hotpix_mask = gu.get_list_of_files_for_list_of_insets(fnm.path_hotpix_mask(), lst)
 
             if self.do_test_print : print 'Detector selected: %10s' % (det_name), '  sources:', lst
 

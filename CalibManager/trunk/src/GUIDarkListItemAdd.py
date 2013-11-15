@@ -94,7 +94,7 @@ class GUIDarkListItemAdd ( QtGui.QWidget ) :
         #self.gui_table.setMinimumHeight(100)
 
         self.setContentsMargins (QtCore.QMargins(-9,-9,-9,-9))
-        self.setStyleSheet(cp.styleGreenish)
+        self.setStyleSheet(cp.styleBkgd)
         #self.gui_more.cbx_dark_more.setStyleSheet (cp.styleBkgd)
 
 

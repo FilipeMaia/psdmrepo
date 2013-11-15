@@ -32,6 +32,7 @@ import os
 from ConfigParametersForApp import cp
 from Logger                 import logger
 from FileNameManager        import fnm
+import GlobalUtils          as     gu
 
 #-----------------------------
 
@@ -72,8 +73,9 @@ class BatchLogScanParser :
 
         if self.det_name.value == self.det_name.value_def() : return
 
-        self.list_of_sources = []
-        self.list_of_types   = []
+        self.list_of_detinfo_sources = []
+        self.list_of_sources         = []
+        self.list_of_types           = []
 
         self.path = fnm.path_peds_scan_batch_log()
 
@@ -81,7 +83,7 @@ class BatchLogScanParser :
 
             self.pattern = self.dict_of_det_data_types[det_name]
 
-            #print 'Parse file: %s for pattern: %s' % (self.path, self.pattern)
+            print 'Parse file: %s for detector: %s and pattern: %s' % (self.path, det_name, self.pattern)
 
             #self.print_dict_of_det_data_types()
             self.parse_scan_log()
@@ -119,9 +121,17 @@ class BatchLogScanParser :
             pos2 = line[pen1:].find('src=') + pen1 + 4
             wid2 = line[pos2:].find(')')
             pen2 = pos2+wid2+1
-            src  = line[pos2:pen2]
+            detinfo_src = line[pos2:pen2]
+            self.list_of_detinfo_sources.append(detinfo_src)
+            #print 'pos2, wid2, detinfo_src:', pos2, wid2, detinfo_src
+
+            pos3 = line[pos2:].find('(') + pos2 + 1
+            wid3 = line[pos3:].find(')')
+            pen3 = pos3+wid3
+            src  = line[pos3:pen3]
             self.list_of_sources.append(src)
-            #print 'pos2, wid2, src :', pos2, wid2, src
+            #print 'pos3, wid3, pen3, src:', pos3, wid3, pen3, src
+            
 
 #-----------------------------
 
@@ -134,7 +144,7 @@ class BatchLogScanParser :
 
     def txt_list_of_types_and_sources (self) :        
         self.parse_batch_log_peds_scan()
-        msg   = 'In log file: %s\nsearch pattern: %s for detector: %s' % (self.path, self.pattern, self.det_name.value())
+        msg   = 'In log file: %s\nsearch pattern: %s for detector(s): %s' % (self.path, self.pattern, self.det_name.value())
         state = 'Sources found in scan:' 
         if self.list_of_sources == [] :
             msg += '\nLIST OF SOURCES IS EMPTY !!!'
@@ -148,9 +158,14 @@ class BatchLogScanParser :
 
 #-----------------------------
 
+    def get_list_of_detinfo_sources (self) :
+        #if self.list_of_sources == [] : return None
+        self.parse_batch_log_peds_scan()        
+        return self.list_of_detinfo_sources
+
     def get_list_of_sources (self) :
         #if self.list_of_sources == [] : return None
-        self.parse_batch_log_peds_scan()
+        self.parse_batch_log_peds_scan()        
         return self.list_of_sources
 
     def get_list_of_types (self) :
@@ -162,10 +177,12 @@ class BatchLogScanParser :
 
     def get_list_of_files_for_all_sources(self, path1='work/file.dat') :
         """From pattern of the path it makes a list of files with indexes for all sources."""
-        self.parse_batch_log_peds_scan()
-        len_of_list = len(self.list_of_sources)
-        #print 'len_of_list =', len_of_list
-        return fnm.get_list_of_enumerated_file_names(path1, len_of_list)
+        self.print_list_of_types_and_sources()
+        return gu.get_list_of_files_for_list_of_insets( path1, self.get_list_of_sources() )
+
+        #len_of_list = len(self.list_of_sources)
+        ##print 'len_of_list =', len_of_list
+        #return gu.get_list_of_enumerated_file_names(path1, len_of_list)
 
 #-----------------------------
 #-----------------------------

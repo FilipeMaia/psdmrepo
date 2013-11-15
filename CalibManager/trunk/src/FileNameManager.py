@@ -304,21 +304,6 @@ class FileNameManager :
         #self.list_of_files_peds.append(self.path_dark_xtc())
         return self.list_of_files_peds
 
-
-#-----------------------------
-
-    def get_list_of_enumerated_file_names(self, path1='file.dat', len_of_list=0) :
-        return gu.get_list_of_enumerated_file_names(path1, len_of_list)
-
-#-----------------------------
-
-    def get_list_of_files_for_all_sources(self, path1='file.dat', list_of_insets=[]) :
-        """Returns the list of file names, where the file name is a combination of path1 and inset from list
-        """
-        if list_of_insets == [] : return [] # [path1]
-        name, ext = os.path.splitext(path1)
-        return ['%s-%s%s' % (name, src, ext) for src in list_of_insets]
-
 #-----------------------------
 
     def get_list_of_files_for_detector(self, path1='file.dat', det_name='') :
@@ -326,7 +311,7 @@ class FileNameManager :
         if det_name == '' : return path1
         ins, exp, run_number = cp.instr_name.value(), cp.exp_name.value(), int(cp.str_run_number.value())
         lst = ru.list_of_sources_in_run_for_selected_detector(ins, exp, run_number, det_name)
-        return self.get_list_of_files_for_all_sources(path1, lst)
+        return gu.get_list_of_files_for_list_of_insets(path1, lst)
 
 
     def get_list_of_files_for_all_detectors_and_sources(self, path1='file.dat') :
@@ -335,7 +320,7 @@ class FileNameManager :
         list_of_files = []
         for det_name in cp.list_of_dets_selected() :
             lst_src = ru.list_of_sources_in_run_for_selected_detector(ins, exp, run_number, det_name)
-            list_of_files += fnm.get_list_of_files_for_all_sources(path1, lst_src)
+            list_of_files += gu.get_list_of_files_for_list_of_insets(path1, lst_src)
         return list_of_files
 
 #-----------------------------

@@ -35,6 +35,7 @@ from PlotImgSpe             import *
 import CSPAD2x2Image        as     cspad2x2img
 import CSPADImage           as     cspadimg
 import RegDBUtils           as     ru
+from BatchLogScanParser     import blsp
 
 #---------------------
 #  Class definition --
@@ -212,7 +213,7 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
 
 
     def onClose(self):
-        logger.info('onClose', __name__)
+        logger.debug('onClose', __name__)
         self.close()
 
 
@@ -220,8 +221,10 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
     def on_but_srcs(self) :
         self.exportLocalPars()
 
-        #txt = blsp.txt_list_of_types_and_sources()
-        txt = ru.txt_of_sources_in_run(self.instr_name.value(), self.exp_name.value(), int(self.run_number))
+        txt = '\nData types and Sources from xtc scan:\n' + 50*'-' + '\n' \
+            + blsp.txt_list_of_types_and_sources() \
+            + '\nSources from RegDB:\n' + 50*'-' \
+            + ru.txt_of_sources_in_run(self.instr_name.value(), self.exp_name.value(), int(self.run_number))
 
         logger.info(txt, __name__)
 
@@ -229,13 +232,13 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
     def on_but_flst(self):
         self.exportLocalPars()
 
-        logger.info('on_but_flst', __name__)
+        logger.debug('on_but_flst', __name__)
         msg = '\nFile status in %s for run %s:\n' % (fnm.path_dir_work(), self.run_number)
         list_of_files = self.get_list_of_files_peds()
         for fname in list_of_files :
 
             exists     = os.path.exists(fname)
-            msg += '%s  %s' % (os.path.basename(fname).ljust(55), self.dict_status[exists].ljust(5))
+            msg += '%s  %s' % (os.path.basename(fname).ljust(75), self.dict_status[exists].ljust(5))
 
             if exists :
                 ctime_sec  = os.path.getctime(fname)
@@ -252,7 +255,7 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
     def on_but_fxtc(self):
         self.exportLocalPars()
 
-        logger.info('on_but_fxtc', __name__)
+        logger.debug('on_but_fxtc', __name__)
         #list_of_files = self.get_list_of_files_peds()
         dir_xtc = fnm.path_to_xtc_dir()
         list_of_files = gu.get_list_of_files_in_dir_for_part_fname(dir_xtc, pattern='-r'+self.run_number)
@@ -289,7 +292,7 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
     def on_but_fbro(self):
         self.exportLocalPars()
 
-        logger.info('on_but_fbro', __name__)
+        logger.debug('on_but_fbro', __name__)
         try    :
             cp.guifilebrowser.close()
             #self.but_fbro.setStyleSheet(cp.styleButtonBad)
