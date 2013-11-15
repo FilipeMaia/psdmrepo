@@ -53,7 +53,7 @@ def list_of_detectors_in_run (ins, exp, run) :
 
 #------------------------------
 
-def txt_of_detectors_in_run (ins, exp, run) :
+def txt_of_sources_in_run (ins, exp, run) :
     """Returns the list of detectors as formatted text with heading line
     """
     list_of_detectors = detectors(ins, exp, run)

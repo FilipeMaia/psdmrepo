@@ -250,8 +250,8 @@ class ConfigParametersForApp ( ConfigParameters ) :
         self.bat_dark_end      = self.declareParameter( name='BATCH_DARK_END'  ,      val_def=1000,     type='int' )
         self.bat_det_info      = self.declareParameter( name='BATCH_DET_INFO',        val_def='DetInfo(:Princeton)',  type='str' )
         self.bat_img_rec_mod   = self.declareParameter( name='BATCH_IMG_REC_MODULE',  val_def='ImgAlgos.PrincetonImageProducer',  type='str' )
-        self.mask_hot_thr            = self.declareParameter( name='MASK_HOT_PIX_ADU_THR_ON_RMS',  val_def=10.0,  type='float' )
-        self.mask_hot_is_used        = self.declareParameter( name='MASK_HOT_PIX_IS_USED',         val_def=True,  type='bool' )
+        self.mask_hot_thr      = self.declareParameter( name='MASK_HOT_PIX_ADU_THR_ON_RMS',  val_def=10.0,  type='float' )
+        self.mask_hot_is_used  = self.declareParameter( name='MASK_HOT_PIX_IS_USED',         val_def=True,  type='bool' )
 
 
         # For batch jobs
@@ -272,7 +272,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
                                'Psana::Camera::Frame',
                                'Psana::Camera::Frame',
                                'Psana::Acqiris::DataDesc']
-        self.dict_of_det_types = dict( zip(self.list_of_dets, self.list_of_types) )
+        self.dict_of_det_data_types = dict( zip(self.list_of_dets, self.list_of_types) )
         
 #-----------------------------
 
@@ -293,14 +293,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
 #-----------------------------
 
     def list_of_dets_selected( self ) :
-        #lds = []
-        #for det in self.det_name.value().split(' ') : lds.append(det)
-        #for det,state in zip(self.list_of_dets,self.det_cbx_states_list) :
-        #    if state.value() : lds.append(det)
-        #return lds
-        #return [det for det in self.det_name.value().split(' ')]
         return [det for det,state in zip(self.list_of_dets,self.det_cbx_states_list) if state.value()]
-
 
 #-----------------------------
 

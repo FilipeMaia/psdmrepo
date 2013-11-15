@@ -310,7 +310,7 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
     def get_list_of_deploy_commands(self):
         """Get list of deploy commands for all detectors of the same type"""
         self.exportLocalPars()
-        cp.blsp.parse_batch_log_peds_scan()
+
         #cp.blsp.print_list_of_types_and_sources()
 
         list_of_sources = cp.blsp.get_list_of_sources()

@@ -31,7 +31,7 @@ from Logger                 import logger
 import GlobalUtils          as     gu
 from FileNameManager        import fnm
 
-from GUIAnyFilesStatusTable import *
+#from GUIAnyFilesStatusTable import *
 from GUIDarkMoreOpts        import *
 
 #---------------------
@@ -52,17 +52,17 @@ class GUIDarkListItemAdd ( QtGui.QWidget ) :
         self.setFrame()
 
         dir_xtc = fnm.path_to_xtc_dir()
-        list_of_files = gu.get_list_of_files_in_dir_for_part_fname(dir_xtc, pattern='-r'+self.run_number)
+        #list_of_files = gu.get_list_of_files_in_dir_for_part_fname(dir_xtc, pattern='-r'+self.run_number)
         #print 'list_of_files =', list_of_files
 
         #self.lab_dir = QtGui.QLabel('xtc dir: %s' % dir_xtc)
-        self.gui_table = GUIAnyFilesStatusTable(self, list_of_files)
+        #self.gui_table = GUIAnyFilesStatusTable(self, list_of_files)
         self.gui_more  = GUIDarkMoreOpts(self, self.run_number)
         
         self.vbox = QtGui.QVBoxLayout()
         #self.vbox.addWidget(self.lab_dir)
-        self.vbox.addWidget(self.gui_table)
         self.vbox.addWidget(self.gui_more)
+        #self.vbox.addWidget(self.gui_table)
         #self.vbox.addStretch(1)     
 
         self.setLayout(self.vbox)
@@ -94,6 +94,8 @@ class GUIDarkListItemAdd ( QtGui.QWidget ) :
         #self.gui_table.setMinimumHeight(100)
 
         self.setContentsMargins (QtCore.QMargins(-9,-9,-9,-9))
+        self.setStyleSheet(cp.styleGreenish)
+        #self.gui_more.cbx_dark_more.setStyleSheet (cp.styleBkgd)
 
 
     def resizeEvent(self, e):
@@ -118,10 +120,10 @@ class GUIDarkListItemAdd ( QtGui.QWidget ) :
         try    : self.gui_more.close()
         except : pass
 
-        self.gui_table = None
+        #self.gui_table = None
 
-        try    : del self.gui_table
-        except : pass
+        #try    : del self.gui_table
+        #except : pass
 
 
     def onClose(self):
@@ -139,10 +141,9 @@ class GUIDarkListItemAdd ( QtGui.QWidget ) :
     def getHeight(self):
         logger.debug('getHeight', __name__)
         h=0
-        #h += 30 # self.lab_dir.height()
-        if self.gui_table is not None :
-            h += self.gui_table.height()
-        h += 50 # for self.gui_more
+        #if self.gui_table is not None :
+        #    h += self.gui_table.height()
+        h += 40 # for self.gui_more
         return h 
         
 #-----------------------------

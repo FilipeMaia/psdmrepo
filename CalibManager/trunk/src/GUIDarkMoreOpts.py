@@ -73,24 +73,35 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
  
         self.but_srcs = QtGui.QPushButton( 'Sources' )
         self.but_flst = QtGui.QPushButton( 'O/Files' )
-        self.but_fbro = QtGui.QPushButton( 'Show files' )
+        self.but_fxtc = QtGui.QPushButton( 'xtc Files' )
+        self.but_fbro = QtGui.QPushButton( 'File Browser' )
         self.but_plot = QtGui.QPushButton( 'Plot' )
         self.but_show = QtGui.QPushButton( 'Show cmd' )
 
         self.hbox = QtGui.QHBoxLayout()
-        self.hbox.addWidget(self.cbx_dark_more)
+        self.hbox.addWidget(self.but_fxtc)
         self.hbox.addWidget(self.but_srcs)
         self.hbox.addWidget(self.but_flst)
+        self.hbox.addWidget(self.but_show)
+        self.hbox.addWidget(self.cbx_dark_more)
         self.hbox.addWidget(self.but_fbro)
         self.hbox.addWidget(self.but_plot)
-        self.hbox.addWidget(self.but_show)
         self.hbox.addStretch(1)     
+
+        #self.wbox = QtGui.QWidget()
+        #self.wbox.setContentsMargins (QtCore.QMargins(-9,-9,-9,-9))
+        #self.wbox.setFixedWidth(650)
+        #self.wbox.setLayout(self.hbox)
+        
+        #self.obox = QtGui.QHBoxLayout()
+        #self.obox.addWidget(self.hbox)
+        #self.obox.addStretch(1)     
 
         #self.cbx_dark_more.move(50,0)
         #self.hbox.move(50,30)
 
         self.vbox = QtGui.QVBoxLayout()
-        #self.vbox.addWidget(self.cbx_dark_more)
+        #self.vbox.addWidget(self.wbox)
         self.vbox.addLayout(self.hbox)
         self.vbox.addStretch(1)     
         self.setLayout(self.vbox)
@@ -98,6 +109,7 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         self.connect(self.cbx_dark_more  , QtCore.SIGNAL('stateChanged(int)'), self.on_cbx ) 
         self.connect( self.but_srcs, QtCore.SIGNAL('clicked()'), self.on_but_srcs )
         self.connect( self.but_flst, QtCore.SIGNAL('clicked()'), self.on_but_flst )
+        self.connect( self.but_fxtc, QtCore.SIGNAL('clicked()'), self.on_but_fxtc )
         self.connect( self.but_fbro, QtCore.SIGNAL('clicked()'), self.on_but_fbro )
         self.connect( self.but_plot, QtCore.SIGNAL('clicked()'), self.on_but_plot )
         self.connect( self.but_show, QtCore.SIGNAL('clicked()'), self.on_but_show )
@@ -144,11 +156,12 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         self.setFixedHeight(40)
         self.setStyleSheet (cp.styleBkgd)
         self.cbx_dark_more.setFixedHeight(30)
-        
+
         width = 80
 
         self.but_srcs.setFixedWidth(width)
         self.but_flst.setFixedWidth(width)
+        self.but_fxtc.setFixedWidth(width)
         self.but_fbro.setFixedWidth(width)
         self.but_plot.setFixedWidth(width)
         self.but_show.setFixedWidth(width)
@@ -158,11 +171,13 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         #self.setContentsMargins (QtCore.QMargins(10,10,10,10))
         #self.setContentsMargins (QtCore.QMargins(0,5,0,0))
 
-        self.but_srcs.setVisible( self.cbx_dark_more.isChecked() )
-        self.but_flst.setVisible( self.cbx_dark_more.isChecked() )
+        #self.but_srcs.setVisible( self.cbx_dark_more.isChecked() )
+        #self.but_flst.setVisible( self.cbx_dark_more.isChecked() )
+        #self.but_fxtc.setVisible( self.cbx_dark_more.isChecked() )
+        #self.but_show.setVisible( self.cbx_dark_more.isChecked() )
         self.but_fbro.setVisible( self.cbx_dark_more.isChecked() )
         self.but_plot.setVisible( self.cbx_dark_more.isChecked() )
-        self.but_show.setVisible( self.cbx_dark_more.isChecked() )
+
 
 
     def resizeEvent(self, e):
@@ -205,10 +220,8 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
     def on_but_srcs(self) :
         self.exportLocalPars()
 
-        #cp.blsp.parse_batch_log_peds_scan()
-        #cp.blsp.print_list_of_types_and_sources()
-
-        txt = ru.txt_of_detectors_in_run(self.instr_name.value(), self.exp_name.value(), int(self.run_number))
+        #txt = blsp.txt_list_of_types_and_sources()
+        txt = ru.txt_of_sources_in_run(self.instr_name.value(), self.exp_name.value(), int(self.run_number))
 
         logger.info(txt, __name__)
 
@@ -217,20 +230,45 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         self.exportLocalPars()
 
         logger.info('on_but_flst', __name__)
+        msg = '\nFile status in %s for run %s:\n' % (fnm.path_dir_work(), self.run_number)
         list_of_files = self.get_list_of_files_peds()
-        msg = 'File status for run %s:\n' % self.run_number
         for fname in list_of_files :
 
             exists     = os.path.exists(fname)
-            msg += '%s  %s' % (fname.ljust(55), self.dict_status[exists].ljust(5))
+            msg += '%s  %s' % (os.path.basename(fname).ljust(55), self.dict_status[exists].ljust(5))
 
             if exists :
                 ctime_sec  = os.path.getctime(fname)
                 ctime_str  = gu.get_local_time_str(ctime_sec, fmt='%Y-%m-%d %H:%M:%S')
                 size_byte  = os.path.getsize(fname)
                 file_owner = gu.get_path_owner(fname)
-                #file_mode  = gu.get_path_mode(fname)
-                msg += '  %s  %12d(Byte) %s\n' % (ctime_str, size_byte, file_owner)
+                file_mode  = gu.get_path_mode(fname)
+                msg += '  %s  %12d(Byte) %s  %s\n' % (ctime_str, size_byte, file_owner, str(oct(file_mode)) )
+            else :
+                msg += '\n'
+        logger.info(msg, __name__ )
+
+
+    def on_but_fxtc(self):
+        self.exportLocalPars()
+
+        logger.info('on_but_fxtc', __name__)
+        #list_of_files = self.get_list_of_files_peds()
+        dir_xtc = fnm.path_to_xtc_dir()
+        list_of_files = gu.get_list_of_files_in_dir_for_part_fname(dir_xtc, pattern='-r'+self.run_number)
+        msg = '\nXTC files in %s for run %s:\n' % (dir_xtc, self.run_number)
+        for fname in list_of_files :
+
+            exists     = os.path.exists(fname)
+            msg += '%s  %s' % (os.path.basename(fname).ljust(22), self.dict_status[exists].ljust(5))
+
+            if exists :
+                ctime_sec  = os.path.getctime(fname)
+                ctime_str  = gu.get_local_time_str(ctime_sec, fmt='%Y-%m-%d %H:%M:%S')
+                size_byte  = os.path.getsize(fname)
+                file_owner = gu.get_path_owner(fname)
+                file_mode  = gu.get_path_mode(fname)
+                msg += '  %s  %12d(Byte)  %s  %s\n' % (ctime_str, size_byte, file_owner, str(oct(file_mode)) )
             else :
                 msg += '\n'
         logger.info(msg, __name__ )
@@ -238,12 +276,14 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
 
 
     def get_list_of_files_peds(self) :
-        list_of_fnames = fnm.get_list_of_files_peds() \
-             + cp.blsp.get_list_of_files_for_all_sources(fnm.path_peds_ave()) \
-             + cp.blsp.get_list_of_files_for_all_sources(fnm.path_peds_rms())
-        list_of_fnames.append(fnm.path_hotpix_mask())
-        return list_of_fnames
+        return fnm.get_list_of_files_peds() \
+             + self.get_list_of_files_peds_for_plot()
 
+
+    def get_list_of_files_peds_for_plot(self) :
+        return fnm.get_list_of_files_for_all_detectors_and_sources(fnm.path_peds_ave()) \
+             + fnm.get_list_of_files_for_all_detectors_and_sources(fnm.path_peds_rms()) \
+             + fnm.get_list_of_files_for_all_detectors_and_sources(fnm.path_hotpix_mask())
 
 
     def on_but_fbro(self):
@@ -277,8 +317,7 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
             msg = 'Plot image for %s' % self.det_name.value()
             logger.info(msg, __name__)
 
-            list_of_fnames = cp.blsp.get_list_of_files_for_all_sources(fnm.path_peds_ave()) \
-                           + cp.blsp.get_list_of_files_for_all_sources(fnm.path_peds_rms())
+            list_of_fnames = self.get_list_of_files_peds_for_plot()
 
             #print 'list_of_fnames = ', list_of_fnames
 

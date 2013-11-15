@@ -248,10 +248,9 @@ class BatchJobPedestals (BatchJob) :
             if self.status_scan :            
                 logger.info('on_auto_processing_status: Scan is completed, begin averaging', __name__)
                 
-                blsp.parse_batch_log_peds_scan() # defines the blsp.list_of_sources
                 blsp.print_list_of_types_and_sources()
                 
-                if blsp.list_of_sources == [] :
+                if blsp.get_list_of_sources() == [] :
                     self.stop_auto_processing( is_stop_on_button_click=False )
                     logger.warning('on_auto_processing_status: Scan did not find data in xtc file for this detector. PROCESSING IS STOPPED!!!', __name__)
                     return

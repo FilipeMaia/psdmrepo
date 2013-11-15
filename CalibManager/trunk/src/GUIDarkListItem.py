@@ -31,8 +31,8 @@ from Logger                 import logger
 import GlobalUtils          as     gu
 from FileNameManager        import fnm
 
-from GUIDarkListItemRun        import *
-from GUIDarkListItemAdd import *
+from GUIDarkListItemRun     import *
+from GUIDarkListItemAdd     import *
 #from GUIAnyFilesStatusTable import *
 
 #---------------------
@@ -78,7 +78,8 @@ class GUIDarkListItem ( QtGui.QWidget ) :
 
         self.hboxW = QtGui.QHBoxLayout()
         self.hboxWW = QtGui.QHBoxLayout()
-        self.hboxWW.addStretch(1)     
+        #self.hboxWW.addStretch(1)     
+        self.hboxWW.addSpacing(35)     
         self.hboxWW.addLayout(self.hboxW)
         self.hboxWW.addStretch(1)     
 
@@ -119,8 +120,9 @@ class GUIDarkListItem ( QtGui.QWidget ) :
 
     def setStyle(self):
         self.setMinimumSize(600,30)
-        self.           setStyleSheet (cp.styleBkgd)
-        #self.           setStyleSheet (cp.styleYellowish)
+        self.setStyleSheet (cp.styleBkgd)
+        #self.setStyleSheet(cp.styleGreenish)
+        #self.setStyleSheet (cp.styleYellowish)
 
         self.but_expand_shrink.setFixedSize(20,22)
         #self.but_expand_shrink.setStyleSheet(cp.styleButtonGood)
@@ -197,6 +199,7 @@ class GUIDarkListItem ( QtGui.QWidget ) :
 
         self.gui_add = GUIDarkListItemAdd(self, self.run_number) 
         self.hboxW.addWidget(self.gui_add)
+        #self.hboxW.addStretch(1)     
 
         #self.gui_add.setStyleSheet(cp.styleYellowish)
         #self.gui_run.setStyleSheet(cp.styleYellowish)

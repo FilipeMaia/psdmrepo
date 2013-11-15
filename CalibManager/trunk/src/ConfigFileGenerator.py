@@ -331,11 +331,6 @@ cfg = ConfigFileGenerator ()
 #
 if __name__ == "__main__" :
 
-    #cfg.make_psana_cfg_file_for_peds_scan()
-
-
-    #cp.blsp.parse_batch_log_peds_scan() # defines the cp.blsp.list_of_sources    
-
     cp.instr_name    .setValue('CXI')
     cp.exp_name      .setValue('cxib2313')
     cp.str_run_number.setValue('0002')

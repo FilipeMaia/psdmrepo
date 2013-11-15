@@ -44,28 +44,33 @@ class BatchLogScanParser :
         @param path   path to the input log file
         @param dict   dictionary of searched items and associated parameters
         """
-        self.path                  = None 
-        self.is_parsed             = False 
-        self.det_name              = cp.det_name
-        self.dict_of_det_types     = cp.dict_of_det_types
-        self.list_of_dets_selected = cp.list_of_dets_selected # reference to method
-        self.list_of_sources   = []
-        self.list_of_types     = []
+        self.det_name               = cp.det_name
+        self.dict_of_det_data_types = cp.dict_of_det_data_types
+        self.list_of_dets_selected  = cp.list_of_dets_selected # reference to method
+        self.list_of_sources        = []
+        self.list_of_types          = []
+
+        self.det_names_parsed       = None 
+        self.path                   = None 
+        self.is_parsed              = False 
+
 
 #-----------------------------
 
-    def print_dict_of_det_types (self) :
+    def print_dict_of_det_data_types (self) :
         print 'List of detector names and associated types:'
-        for det, type in self.dict_of_det_types.items():
+        for det, type in self.dict_of_det_data_types.items():
             print '%10s : %s' % (det, type)
 
 #-----------------------------
 
     def parse_batch_log_peds_scan (self) :
 
-        if self.is_parsed and self.path == fnm.path_peds_scan_batch_log() : return
+        if  self.is_parsed \
+        and self.path == fnm.path_peds_scan_batch_log() \
+        and self.det_names_parsed == self.det_name.value(): return
 
-        if self.det_name.value() == self.det_name.value_def() : return
+        if self.det_name.value == self.det_name.value_def() : return
 
         self.list_of_sources = []
         self.list_of_types   = []
@@ -74,14 +79,15 @@ class BatchLogScanParser :
 
         for det_name in self.list_of_dets_selected() :
 
-            self.pattern = self.dict_of_det_types[det_name]
+            self.pattern = self.dict_of_det_data_types[det_name]
 
             #print 'Parse file: %s for pattern: %s' % (self.path, self.pattern)
 
-            #self.print_dict_of_det_types()
+            #self.print_dict_of_det_data_types()
             self.parse_scan_log()
         #self.print_list_of_types_and_sources()
         self.is_parsed = True
+        self.det_names_parsed = self.det_name.value()
         
 #-----------------------------
 
@@ -120,31 +126,36 @@ class BatchLogScanParser :
 #-----------------------------
 
     def print_list_of_types_and_sources (self) :
-        self.parse_batch_log_peds_scan ()
+        txt = self.txt_list_of_types_and_sources()
+        logger.info(txt, __name__)         
+        #print txt
+
+#-----------------------------
+
+    def txt_list_of_types_and_sources (self) :        
+        self.parse_batch_log_peds_scan()
         msg   = 'In log file: %s\nsearch pattern: %s for detector: %s' % (self.path, self.pattern, self.det_name.value())
         state = 'Sources found in scan:' 
         if self.list_of_sources == [] :
-            logger.warning(msg + '\nLIST OF SOURCES IS EMPTY !!!', __name__)         
-            #cp.guistatus.setStatusMessage(state)
-            return
+            msg += '\nLIST OF SOURCES IS EMPTY !!!'
+            return msg
 
         for type, src in zip(self.list_of_types, self.list_of_sources) :
             line  = '\n    %30s : %s' % (type, src)
             msg   += line
             state += line
-
-        #print msg
-        logger.info(msg, __name__)         
-        #cp.guistatus.setStatusMessage(state)
+        return msg
 
 #-----------------------------
 
     def get_list_of_sources (self) :
         #if self.list_of_sources == [] : return None
+        self.parse_batch_log_peds_scan()
         return self.list_of_sources
 
     def get_list_of_types (self) :
         #if self.list_of_types == [] : return None
+        self.parse_batch_log_peds_scan()
         return self.list_of_types
 
 #-----------------------------
@@ -170,7 +181,9 @@ cp.blsp = blsp
 #
 if __name__ == "__main__" :
 
-    blsp.parse_batch_log_peds_scan()
+    #blsp.parse_batch_log_peds_scan()
+
+    blsp.print_list_of_types_and_sources ()
 
     sys.exit ( 'End of test for BatchLogScanParser' )
 
