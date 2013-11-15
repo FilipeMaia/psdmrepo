@@ -877,7 +877,7 @@ void H5Output::endCalibCycle(Event& evt, Env& env) {
     if (err<0) MsgLog(logger(),fatal,"Failed to close current filtered group: " << m_currentFilteredGroup);
   }
   m_currentFilteredGroup = -1;
-  m_epicsGroupDir.processEndCalibCycle();
+  if (m_storeEpics) m_epicsGroupDir.processEndCalibCycle();
   m_calibCycleEventGroupDir.closeGroups();
   m_calibCycleConfigureGroupDir.closeGroups();
   if (m_eventId) ::storeClock ( m_currentCalibCycleGroup, m_eventId->time(), "end" ) ;
@@ -899,7 +899,7 @@ void H5Output::endJob(Event& evt, Env& env)
 {
   setEventVariables(evt,env);
   m_configureGroupDir.closeGroups();
-  m_epicsGroupDir.processEndJob();
+  if (m_storeEpics) m_epicsGroupDir.processEndJob();
   if (m_eventId) ::storeClock ( m_currentConfigureGroup, m_eventId->time(), "end" ) ;
   m_currentConfigureGroup.close();
   ++m_currentConfigureCounter;

@@ -33,6 +33,7 @@ psddl/data/templates/hdf5Translator.tmpl?hdfwritermap_cpp
 #include "psddl_hdf2psana/princeton.ddl.h"
 #include "psddl_hdf2psana/pulnix.ddl.h"
 #include "psddl_hdf2psana/quartz.ddl.h"
+#include "psddl_hdf2psana/rayonix.ddl.h"
 #include "psddl_hdf2psana/timepix.ddl.h"
 #include "psddl_hdf2psana/usdusb.ddl.h"
 
@@ -46,6 +47,7 @@ const int latestTypeSchema = -1;
 using namespace Translator;
 using namespace psddl_hdf2psana;
 using namespace psddl_hdf2psana::UsdUsb;
+using namespace psddl_hdf2psana::Rayonix;
 using namespace psddl_hdf2psana::CsPad2x2;
 using namespace psddl_hdf2psana::Pulnix;
 using namespace psddl_hdf2psana::Imp;
@@ -260,6 +262,7 @@ void initializeHdfWriterMap( HdfWriterMap & mapping) {
   mapping[ & typeid(Psana::Pulnix::TM6740ConfigV1) ] = boost::make_shared<HdfWriter<Psana::Pulnix::TM6740ConfigV1> >();
   mapping[ & typeid(Psana::Pulnix::TM6740ConfigV2) ] = boost::make_shared<HdfWriter<Psana::Pulnix::TM6740ConfigV2> >();
   mapping[ & typeid(Psana::Quartz::ConfigV1) ] = boost::make_shared<HdfWriter<Psana::Quartz::ConfigV1> >();
+  mapping[ & typeid(Psana::Rayonix::ConfigV1) ] = boost::make_shared<HdfWriter<Psana::Rayonix::ConfigV1> >();
   mapping[ & typeid(Psana::Timepix::ConfigV1) ] = boost::make_shared<HdfWriter<Psana::Timepix::ConfigV1> >();
   mapping[ & typeid(Psana::Timepix::ConfigV2) ] = boost::make_shared<HdfWriter<Psana::Timepix::ConfigV2> >();
   mapping[ & typeid(Psana::Timepix::ConfigV3) ] = boost::make_shared<HdfWriter<Psana::Timepix::ConfigV3> >();

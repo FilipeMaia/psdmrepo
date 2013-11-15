@@ -27,6 +27,7 @@
 #include "psddl_psana/princeton.ddl.h"
 #include "psddl_psana/pulnix.ddl.h"
 #include "psddl_psana/quartz.ddl.h"
+#include "psddl_psana/rayonix.ddl.h"
 #include "psddl_psana/timepix.ddl.h"
 #include "psddl_psana/usdusb.ddl.h"
 
@@ -212,6 +213,10 @@ TypeAliases::TypeAliases() {
   set<const type_info *> Quartz;
   Quartz.insert( & typeid(Psana::Quartz::ConfigV1));
   m_alias2TypesMap["Quartz"] = Quartz;
+
+  set<const type_info *> Rayonix;
+  Rayonix.insert( & typeid(Psana::Rayonix::ConfigV1));
+  m_alias2TypesMap["Rayonix"] = Rayonix;
 
   set<const type_info *> SharedAcqADC;
   SharedAcqADC.insert( & typeid(Psana::Bld::BldDataAcqADCV1));
