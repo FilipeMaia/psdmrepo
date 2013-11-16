@@ -188,11 +188,14 @@ class DdlPds2PsanaDispatch ( object ) :
         self.inc = file(self.incname, 'w')
         self.cpp = file(self.cppname, 'w')
 
-        # loop over packages in the model
-        for pkg in model.packages() :
-            if not pkg.included :
-                self._log.debug("parseTree: package=%s", repr(pkg))
-                self._parsePackage(pkg)
+        # loop over packages and types in the model
+        for ns in model.namespaces() :
+            if isinstance(ns, Package) :
+                if not ns.included :
+                    self._parsePackage(ns)
+            elif isinstance(ns, Type) :
+                if not ns.external:
+                    self._parseType(type = ns)
 
         # generate code for all collected types
         types, headers, psana_types = self._codegen()

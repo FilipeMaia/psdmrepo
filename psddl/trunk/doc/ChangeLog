@@ -11,8 +11,14 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-12-06
+2013-11-15 Andy Salnikov
+- modify backends to allow types/consts/enums at the global namespace
+- python backend needs more work if we do need full support
+- this feature mostly targets xtc external types
+
 Tag: V00-12-05
-2013-11-13 Andy Salnikov
+2013-11-15 Andy Salnikov
 - define DdlHdf5Translator.backendOptions() method
 
 Tag: V00-12-04

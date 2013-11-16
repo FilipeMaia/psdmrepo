@@ -265,6 +265,12 @@ class DdlPsanaDoc ( object ) :
         
         self.printPackages(model, out)
 
+        self.printConstants(model, out)
+
+        self.printEnums(model, out)
+        
+        self.printTypes(model, out)
+
         # loop over packages in the model
         for pkg in self.packages(model) :
             self._log.debug("parseTree: package=%s", repr(pkg))

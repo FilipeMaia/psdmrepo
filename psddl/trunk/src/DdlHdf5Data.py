@@ -188,10 +188,23 @@ class DdlHdf5Data ( object ) :
             print >>self.inc, ns
             print >>self.cpp, ns
 
-        # loop over packages in the model
-        for pkg in model.packages() :
-            self._log.debug("parseTree: package=%s", repr(pkg))
-            self._parsePackage(pkg)
+        # enums for constants
+        for const in model.constants() :
+            if not const.included :
+                print >>self.inc, _TEMPL('const_decl').render(const=const)
+
+        # regular enums
+        for enum in model.enums() :
+            if not enum.included :
+                print >>self.inc, _TEMPL('enum_decl').render(enum=enum)
+
+        # loop over packages and types
+        for ns in model.namespaces() :
+            if isinstance(ns, Package) :
+                self._parsePackage(ns)
+            elif isinstance(ns, Type) :
+                if not ns.external:
+                    self._parseType(type = ns)
 
         if self.top_pkg : 
             ns = "} // namespace %s" % self.top_pkg

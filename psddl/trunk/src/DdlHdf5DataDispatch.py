@@ -180,10 +180,13 @@ class DdlHdf5DataDispatch ( object ) :
 
         # loop over packages in the model
         types = []
-        for pkg in model.packages() :
-            if not pkg.included :
-                self._log.debug("parseTree: package=%s", repr(pkg))
-                types += self._parsePackage(pkg)
+        for ns in model.namespaces() :
+            if isinstance(ns, Package) :
+                if not ns.included :
+                    types += self._parsePackage(ns)
+            elif isinstance(ns, Type) :
+                if not ns.external:
+                    types.append(ns)
 
         typenames = [type.fullName('C++') for type in types] + _aliases.keys()
 

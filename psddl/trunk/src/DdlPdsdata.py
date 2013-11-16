@@ -138,10 +138,23 @@ class DdlPdsdata ( object ) :
             print >>self.inc, "namespace %s {" % self.top_pkg
             print >>self.cpp, "namespace %s {" % self.top_pkg
 
-        # loop over packages in the model
-        for pkg in model.packages() :
-            self._log.debug("parseTree: package=%s", repr(pkg))
-            self._parsePackage(pkg)
+        # enums for constants
+        for const in model.constants() :
+            if not const.included :
+                self._genConst(const)
+
+        # regular enums
+        for enum in model.enums() :
+            if not enum.included :
+                self._genEnum(enum)
+
+        # loop over packages and types in the model
+        for ns in model.namespaces() :
+            if isinstance(ns, Package) :
+                self._parsePackage(ns)
+            elif isinstance(ns, Type) :
+                if not ns.external:
+                    self._parseType(type = ns)
 
         if self.top_pkg : 
             print >>self.inc, "} // namespace %s" % self.top_pkg
