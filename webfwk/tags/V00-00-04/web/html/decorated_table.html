@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html>
+<head>
+<script type="text/javascript" src="/jquery/js/jquery.min.js"></script>
+<script type="text/javascript" src="/jquery/js/jquery.resize.js"></script>
+<style>
+
+div.container {
+  margin: 10px;
+  /*width: 100%;*/
+}
+
+div.table_header {
+  width: 100%;
+  padding: 0;
+  margin: 0;
+}
+div.table_container {
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  overflow: auto;
+}
+div.table_container > table {
+  width: 100%;
+}
+div.table_container > table td {
+  font-size: 12px;
+  padding: 2px;
+  border-left: solid 1px;
+  border-bottom: solid 1px;
+}
+
+div.table_container > table td:last-child {
+  border-right: solid 1px;
+}
+
+</style>
+
+<script>
+
+function create_fancy_table (container, hdr, rows) {
+    var that = this ;
+    switch (typeof container) {
+        case 'string': this.container = $('#'+container) ; break ;
+        case 'object': this.container = container ; break ;
+        default: throw 'create_fancy_table: wrong type of the container parameter' ;
+    }
+    var html =
+'<div class="table_header"></div>' +
+'<div class="table_container">' +
+'  <table><tbody>' ;
+    for (var i in rows) {
+        var row = rows[i] ;
+        html +=
+'    <tr>' ;
+        for (var j in row) {
+            var cell = row[j] ;
+            html +=
+'      <td>' +
+cell +
+'      </td>' ;
+        }
+        html +=
+'    </tr>' ;
+    }
+    html +=
+'  </tbody></table>' +
+'</div>' ;
+    this.container.html(html) ;
+    this.table_header    = this.container.find('.table_header') ;
+    this.table_container = this.container.find('.table_container') ;
+    this.table           = this.table_container.find('table') ;
+    this.container.resize(function () { that.render_header() ; }) ;
+    this.render_header = function () {
+        var column_width = [] ;
+        that.table.find('tr:first-child td').each(function () {
+            var borderLeft   = parseInt($(this).css('borderLeft')) ;
+            var paddingLeft  = parseInt($(this).css('paddingLeft')) ;
+            var paddingRight = parseInt($(this).css('paddingRight')) ;
+            var borderRight  = parseInt($(this).css('borderRight')) ;
+            column_width.push(borderLeft + paddingLeft + $(this).width() + paddingRight + borderRight) ;
+        }) ;
+        console.log(column_width) ;
+        //console.log('width='+that.table.width()+', height='+that.table.height()) ;
+        console.log([this.container.height(), this.table_header.height(), this.table_container.height()]) ;
+        this.table_container.height(this.container.height() - this.table_header.height()) ;
+    } ;
+    this.render_header() ;
+    return this ;
+}
+
+$(function () {
+    var rows = [] ;
+    for (var i=0; i < 40; i++) {
+        var row = [] ;
+        for (var j=0; j < 4; j++) {
+            row.push(j) ;
+        }
+        rows.push(row) ;
+    }
+    var table = create_fancy_table (
+        $('#container') ,
+        ['First', 'Second', 'And the third one', 'etc.'] ,
+        rows
+    ) ;
+}) ;
+
+</script>
+
+</head>
+<body>
+<div id="container" class="container"></div>
+</body>
+</html>
