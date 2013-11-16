@@ -264,6 +264,8 @@ class ConfigParametersForApp ( ConfigParameters ) :
 #-----------------------------
     
         self.list_of_dets   = ['CSPAD', 'CSPAD2x2', 'Princeton', 'pnCCD', 'Tm6740', 'Opal2000', 'Opal4000', 'Acqiris']
+        self.list_of_dets_lower = [det.lower() for det in self.list_of_dets]
+
         self.list_of_types  = ['Psana::CsPad::DataV',
                                'Psana::CsPad2x2::ElementV',
                                'Psana::Princeton::FrameV',

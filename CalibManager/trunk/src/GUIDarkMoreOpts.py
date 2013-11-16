@@ -34,7 +34,6 @@ from GUIFileBrowser         import *
 from PlotImgSpe             import *
 import CSPAD2x2Image        as     cspad2x2img
 import CSPADImage           as     cspadimg
-import RegDBUtils           as     ru
 from BatchLogScanParser     import blsp
 
 #---------------------
@@ -163,7 +162,7 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         self.but_srcs.setFixedWidth(width)
         self.but_flst.setFixedWidth(width)
         self.but_fxtc.setFixedWidth(width)
-        self.but_fbro.setFixedWidth(width)
+        self.but_fbro.setFixedWidth(100)
         self.but_plot.setFixedWidth(width)
         self.but_show.setFixedWidth(width)
 
@@ -221,10 +220,10 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
     def on_but_srcs(self) :
         self.exportLocalPars()
 
-        txt = '\nData types and Sources from xtc scan:\n' + 50*'-' + '\n' \
+        txt = '\n' + 50*'-' + '\nData Types and Sources from xtc scan of the\n' \
             + blsp.txt_list_of_types_and_sources() \
-            + '\nSources from RegDB:\n' + 50*'-' \
-            + ru.txt_of_sources_in_run(self.instr_name.value(), self.exp_name.value(), int(self.run_number))
+            + '\n' + 50*'-' + '\nSources from DB:\n' \
+            + fnm.txt_of_sources_in_run(int(self.run_number))
 
         logger.info(txt, __name__)
 
@@ -233,7 +232,7 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         self.exportLocalPars()
 
         logger.debug('on_but_flst', __name__)
-        msg = '\nFile status in %s for run %s:\n' % (fnm.path_dir_work(), self.run_number)
+        msg = '\n' + 50*'-' + '\nFile status in %s for run %s:\n' % (fnm.path_dir_work(), self.run_number)
         list_of_files = self.get_list_of_files_peds()
         for fname in list_of_files :
 
@@ -259,7 +258,7 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         #list_of_files = self.get_list_of_files_peds()
         dir_xtc = fnm.path_to_xtc_dir()
         list_of_files = gu.get_list_of_files_in_dir_for_part_fname(dir_xtc, pattern='-r'+self.run_number)
-        msg = '\nXTC files in %s for run %s:\n' % (dir_xtc, self.run_number)
+        msg = '\n' + 50*'-' + '\nXTC files in %s for run %s:\n' % (dir_xtc, self.run_number)
         for fname in list_of_files :
 
             exists     = os.path.exists(fname)
@@ -334,24 +333,46 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
                 logger.info(msg, __name__)
 
                 self.arr = gu.get_array_from_file( fname )
-                #print self.arr.shape,'\n', self.arr.shape
+                print 'self.arr:\n', self.arr
+                print 'self.arr.shape: ', self.arr.shape
 
-            if self.det_name.value() == cp.list_of_dets[0] : # CSAPD, shape = (5920,388) 
+            fname_lower = fname.lower()
+
+            #print 'fname_lower =', fname_lower
+            #print 'list_of_dets_lower =', cp.list_of_dets_lower
+
+            #self.list_of_dets   = ['CSPAD', 'CSPAD2x2', 'Princeton', 'pnCCD', 'Tm6740', 'Opal2000', 'Opal4000', 'Acqiris']
+
+            if fname_lower.find(cp.list_of_dets_lower[0]+'.')  != -1 : # CSAPD, shape = (5920,388) 
                 self.arr.shape = (32*185,388) 
                 self.img_arr = cspadimg.get_cspad_raw_data_array_image(self.arr)
 
-            elif self.det_name.value() == cp.list_of_dets[1] : # CSAPD2x2
+            elif fname_lower.find(cp.list_of_dets_lower[1]) != -1 : # CSAPD2x2
                 self.arr.shape = (185,388,2) 
                 self.img_arr = cspad2x2img.get_cspad2x2_non_corrected_image_for_raw_data_array(self.arr)
 
-            elif self.det_name.value() == cp.list_of_dets[2] : # Camera
-                pass
-
-            elif self.det_name.value() == cp.list_of_dets[3] : # Princeton
+            elif fname_lower.find(cp.list_of_dets_lower[2]) != -1 : # Princeton
                 self.img_arr = self.arr
 
-            elif self.det_name.value() == cp.list_of_dets[4] : # pnCCD
-                pass
+            elif fname_lower.find(cp.list_of_dets_lower[3]) != -1 : # pnCCD
+                self.img_arr = self.arr
+
+            elif fname_lower.find(cp.list_of_dets_lower[4]) != -1 : # Camera
+                self.img_arr = self.arr
+
+            elif fname_lower.find(cp.list_of_dets_lower[5]) != -1 : # Camera
+                self.img_arr = self.arr
+
+            elif fname_lower.find(cp.list_of_dets_lower[6]) != -1 : # Camera
+                self.img_arr = self.arr
+
+            elif fname_lower.find(cp.list_of_dets_lower[7]) != -1 : # Acqiris
+                self.img_arr = self.arr
+
+            else :
+                msg = 'Detector is not recognized in the file name: %s' %  fname
+                logger.warning(msg, __name__)
+                return
 
 
             if self.img_arr == None :
@@ -378,7 +399,7 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
     def on_but_show(self):
         """Prints the list of commands for deployment of calibration file(s)"""
         list_of_deploy_commands = self.get_gui_run().get_list_of_deploy_commands()
-        msg = 'Deploy command(s):'
+        msg = '\n' + 50*'-' + '\nTentative deploy command(s):'
         for cmd in list_of_deploy_commands :
             msg += '\n' + cmd
         logger.info(msg, __name__)

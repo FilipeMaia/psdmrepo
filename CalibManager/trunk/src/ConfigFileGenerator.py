@@ -33,7 +33,6 @@ from ConfigParametersForApp import cp
 from Logger                 import logger
 from FileNameManager        import fnm
 import GlobalUtils          as     gu
-import RegDBUtils           as     ru
 
 #import AppUtils.AppDataPath as apputils
 import           AppDataPath as apputils # My version, added in path the '../../data:'
@@ -117,11 +116,8 @@ class ConfigFileGenerator :
 
         txt_cfg_body   = '#Module parameters'
 
-        ins, exp, run_number = cp.instr_name.value(), cp.exp_name.value(), int(cp.str_run_number.value())
-        #print ins, exp, run_number
-
         for det_name in cp.list_of_dets_selected() :
-            lst = ru.list_of_sources_in_run_for_selected_detector(ins, exp, run_number, det_name)
+            lst = fnm.list_of_sources_in_run_for_selected_detector(det_name)
             list_path_peds_ave    = gu.get_list_of_files_for_list_of_insets(fnm.path_peds_ave(),    lst)
             list_path_peds_rms    = gu.get_list_of_files_for_list_of_insets(fnm.path_peds_rms(),    lst)
             list_path_hotpix_mask = gu.get_list_of_files_for_list_of_insets(fnm.path_hotpix_mask(), lst)

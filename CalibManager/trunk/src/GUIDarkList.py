@@ -178,12 +178,12 @@ class GUIDarkList ( QtGui.QWidget ) :
             return True
 
         else :
-            list_of_dets_in_run = ru.list_of_detectors_in_run(self.instr_name.value(), self.exp_name.value(), run_num)
-            for det_name_in_data in list_of_dets_in_run :
+            list_of_srcs_in_run = fnm.list_of_sources_in_run(run_num)
+            for src_name_in_data in list_of_srcs_in_run :
                 for det_name_selected in self.list_of_dets_selected()  :
                     pattern = det_name_selected.lower() + '.'
-                    if det_name_in_data.lower().find(pattern) != -1 :
-                         #txt = 'Det: %s is found in the sources: %s in run: %d' % (det_name_selected,det_name_in_data,run_num)
+                    if src_name_in_data.lower().find(pattern) != -1 :
+                         #txt = 'Det: %s is found in the sources: %s in run: %d' % (det_name_selected,src_name_in_data,run_num)
                          #print txt
                          return True
             return False

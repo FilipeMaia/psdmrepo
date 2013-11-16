@@ -36,12 +36,12 @@ def detectors (ins, exp, run, style='psana') :
     """Returns the list of detectors, for example: ['BldEb-0|NoDevice-0', 'CxiDg1-0|Tm6740-0', 'CxiDg2-0|Tm6740-0', 'CxiDs1-0|Cspad-0', ...].
     """
 
-    if style == 'psana' : return list_of_detectors_in_run(ins, exp, run)
+    if style == 'psana' : return list_of_sources_in_run(ins, exp, run)
     else :                return experiment_info.detectors(ins, exp, run)
 
 #------------------------------
 
-def list_of_detectors_in_run (ins, exp, run) :
+def list_of_sources_in_run (ins, exp, run) :
     """Returns the list of detectors in style of psana, for example 'CxiDs1.0:Cspad.0'
     """
     list_of_detectors = experiment_info.detectors (ins, exp, run)
@@ -70,9 +70,9 @@ def list_of_sources_in_run_for_selected_detector (ins, exp, run, det_selected) :
     lst = []
     pattern = det_selected.lower() + '.'
 
-    for det_name in list_of_detectors_in_run(ins, exp, run) :
-        if det_name.lower().find(pattern) != -1 :
-            lst.append(det_name)
+    for src_name in list_of_sources_in_run(ins, exp, run) :
+        if src_name.lower().find(pattern) != -1 :
+            lst.append(src_name)
     return lst
 
 #------------------------------

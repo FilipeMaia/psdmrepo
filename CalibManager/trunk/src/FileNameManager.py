@@ -39,18 +39,9 @@ class FileNameManager :
 
 #-----------------------------
 
-#    def log_file(self) :
-#        return cp.dir_work.value() + '/' + logger.getLogFileName()
-
-#    def log_file_total(self) :
-#        return cp.dir_work.value() + '/' + logger.getLogTotalFileName()
-
-#-----------------------------
-
     def path_dir_work(self) :
-        #return "%s/work/" % os.path.dirname(sys.argv[0])
-        path = "%s/work/" % os.path.dirname(sys.argv[0])
-        print 'path_dir_work:', path
+        path = cp.dir_work.value()
+        #print 'path_dir_work:', path
         return path
 
 
@@ -67,14 +58,6 @@ class FileNameManager :
 
 #-----------------------------
 
-#    def str_exp_run_data(self) :
-#        return self.str_exp_run_for_xtc_path(self.path_data_xtc())
-
-#-----------------------------
-
-#    def path_prefix(self) :
-#        return self.path_dir_work() + '/' + cp.fname_prefix.value() 
-
     def path_prefix_data(self) :
         #return self.path_prefix() + self.str_exp_run_data()
         return './'
@@ -84,53 +67,25 @@ class FileNameManager :
     def path_gui_image(self) :
         return self.path_prefix_data() + 'gui-image.png'
 
-#    def path_config_pars(self) :
-#        return cp.fname_cp.value()
-
 #-----------------------------
 
     def path_dark_xtc(self) :
-        #return cp.in_dir_dark.value() + '/' + cp.in_file_dark.value()
         return self.path_to_xtc_files_for_run()
 
     def path_dark_xtc_all_chunks(self) :
-        #return cp.in_dir_dark.value() + '/' + gu.xtc_fname_for_all_chunks(cp.in_file_dark.value())
         return self.path_to_xtc_files_for_run()
 
     def path_dark_xtc_cond(self) :
         if cp.use_dark_xtc_all.value() : return self.path_dark_xtc_all_chunks()
         else                           : return self.path_dark_xtc()
 
-
-#    def path_data_xtc(self) :
-#        return cp.in_dir_data.value() + '/' + cp.in_file_data.value()
-
-
-#    def path_data_xtc_all_chunks(self) :
-#        return cp.in_dir_data.value() + '/' + gu.xtc_fname_for_all_chunks(cp.in_file_data.value())
-
-#    def path_data_xtc_cond(self) :
-#        if cp.use_data_xtc_all.value() : return self.path_data_xtc_all_chunks()
-#        else                           : return self.path_data_xtc()
-
     def str_exp_run_dark(self) :
         return self.str_exp_run_for_xtc_path(self.path_dark_xtc())
   
-#    def str_exp_run_data(self) :
-#        return self.str_exp_run_for_xtc_path(self.path_data_xtc())
-
-#    def str_run_data(self) :
-#        return self.str_run_for_xtc_path(self.path_data_xtc())
-
     def str_exp_run_for_xtc_path(self, path) :
         instrument, experiment, run_str, run_num = gu.parse_xtc_path(path)
         if experiment == None : return 'exp-run-'
         else                  : return experiment + '-' + run_str + '-'
-
-#    def str_run_for_xtc_path(self, path) :
-#        instrument, experiment, run_str, run_num = gu.parse_xtc_path(path)
-#        if run_str == None : return 'run-'
-#        else               : return run_str + '-'
 
 #-----------------------------
 
@@ -212,35 +167,6 @@ class FileNameManager :
     def path_prefix_dark(self) :
         return self.path_prefix() + self.str_exp_run_dark()
 
-#    def path_prefix_data(self) :
-#        return self.path_prefix() + self.str_exp_run_data()
-
-#    def path_prefix_cora(self) :
-#        return cp.dir_work.value() + '/' + cp.fname_prefix.value() + 'cora'
-
-
-#-----------------------------
-
-#-----------------------------
-
-#    def path_data_scan_psana_cfg(self) :
-#        return self.path_prefix_data()  + 'data-scan.cfg'
-
-#    def path_data_scan_batch_log(self) :
-#        return self.path_prefix_data() + 'data-scan-batch-log.txt'
-
-#    def path_data_scan_monitors_data(self) :
-#        return self.path_prefix_data() + 'data-scan-mons-data.txt'
-
-#    def path_data_scan_monitors_commments(self) :
-#        return self.path_prefix_data() + 'data-scan-mons-comments.txt'
-
-#    def path_data_scan_tstamp_list(self) :
-#        return self.path_prefix_data() + 'data-scan-tstamp-list.txt'
-
-#    def path_data_scan_tstamp_list_tmp(self) :
-#        return  self.path_data_scan_tstamp_list() + '-tmp'
-
 #-----------------------------
 
     def log_file(self) :
@@ -290,9 +216,6 @@ class FileNameManager :
 
 
     def  get_list_of_files_peds_aver(self) :
-        #self.list_of_files_peds_aver.append(self.path_peds_ave())
-        #self.list_of_files_peds_aver.append(self.path_peds_rms())
-        #self.list_of_files_peds_aver.append(self.path_hotpix_mask())
         return [self.path_peds_aver_psana_cfg(),
                 self.path_peds_aver_batch_log()]
 
@@ -305,21 +228,36 @@ class FileNameManager :
         return self.list_of_files_peds
 
 #-----------------------------
+# Interaction with RegDB
+
+    def txt_of_sources_in_run(self, run_number) :
+        return ru.txt_of_sources_in_run(cp.instr_name.value(), cp.exp_name.value(), run_number)
+
+
+    def list_of_sources_in_run(self, run_number) :
+        return ru.list_of_sources_in_run(cp.instr_name.value(), cp.exp_name.value(), run_number)
+
+
+    def  list_of_sources_in_run_for_selected_detector(self, det_name) :
+        ins, exp, run_number = cp.instr_name.value(), cp.exp_name.value(), int(cp.str_run_number.value())
+        return ru.list_of_sources_in_run_for_selected_detector(ins, exp, run_number, det_name)
+
+#-----------------------------
 
     def get_list_of_files_for_detector(self, path1='file.dat', det_name='') :
-        """From pattern of the path it makes a list of files with names for all sources."""
+        """For specified file name pattern and detector returns the list of files for all sources.
+        """
         if det_name == '' : return path1
-        ins, exp, run_number = cp.instr_name.value(), cp.exp_name.value(), int(cp.str_run_number.value())
-        lst = ru.list_of_sources_in_run_for_selected_detector(ins, exp, run_number, det_name)
+        lst = self.list_of_sources_in_run_for_selected_detector(det_name)
         return gu.get_list_of_files_for_list_of_insets(path1, lst)
 
 
     def get_list_of_files_for_all_detectors_and_sources(self, path1='file.dat') :
-        ins, exp, run_number = cp.instr_name.value(), cp.exp_name.value(), int(cp.str_run_number.value())
-
+        """For specified file name pattern returns the list of file names for all current detectors and all their sources
+        """
         list_of_files = []
         for det_name in cp.list_of_dets_selected() :
-            lst_src = ru.list_of_sources_in_run_for_selected_detector(ins, exp, run_number, det_name)
+            lst_src = self.list_of_sources_in_run_for_selected_detector(det_name)
             list_of_files += gu.get_list_of_files_for_list_of_insets(path1, lst_src)
         return list_of_files
 
