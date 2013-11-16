@@ -18,16 +18,16 @@ use LogBook\LogBookException;
  */
 function report_error_and_exit( $msg ) {
 
-	header( "Content-type: application/json" );
-	header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
-	header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
+    header( "Content-type: application/json" );
+    header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
+    header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
 
-	$status_encoded = json_encode( "error" );
+    $status_encoded = json_encode( "error" );
     $msg_encoded = json_encode( $msg );
     print <<< HERE
 {
-  "Status": {$status_encoded},
-  "Message": {$msg_encoded}
+  "Status": {$status_encoded}, "Message": {$msg_encoded},
+  "status": {$status_encoded}, "message": {$msg_encoded}
 }
 HERE;
     exit;
@@ -53,15 +53,16 @@ try {
 
     /* Return a JSON object describing extended attachments and tags back to the caller.
      */
-	header( "Content-type: application/json" );
-	header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
-	header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
+    header( "Content-type: application/json" );
+    header( "Cache-Control: no-cache, must-revalidate" ); // HTTP/1.1
+    header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
 
-	$status_encoded  = json_encode( "success" );
-    
-	print <<< HERE
+    $status_encoded  = json_encode( "success" );
+
+    print <<< HERE
 {
-  "Status": {$status_encoded}
+  "Status": {$status_encoded},
+  "status": {$status_encoded}
 }
 HERE;
 

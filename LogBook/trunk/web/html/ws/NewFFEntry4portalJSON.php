@@ -176,6 +176,11 @@ foreach( array_keys( $_FILES ) as $file_key ) {
     }
 }
 
+// If set this will tell the script to return the updated parent object
+// instead of the new one (the reply).
+
+$return_parent = isset( $_POST['return_parent'] ) && $_POST['return_parent'] ;
+
 try {
 
     LogBook::instance()->begin();
@@ -208,7 +213,7 @@ try {
      *
      * NOTE: Remember that child entries have no tags, but they
      *       are allowed to have attachments.
-	 */
+     */
     if( $scope == 'message' ) {
         $parent = $experiment->find_entry_by_id( $message_id ) or report_error_and_exit( "no such parent message exists" );
         $entry = $parent->create_child( $author, $content_type, $message );
@@ -222,10 +227,13 @@ try {
 
     $experiment->notify_subscribers( $entry );
 
-    /* Return a JSON object describing the newly created entry back to the caller.
+    /* Return a JSON object describing the newly created entry unless
+     * the caller explicitly asked to return the parent object instead.
      */
     $status_encoded = json_encode( "success" );
-    $entry_encoded  = $scope == 'message' ? LogBookUtils::child2json( $entry, false ) : LogBookUtils::entry2json( $entry, false );
+    $entry_encoded  = $scope == 'message' ?
+        LogBookUtils::child2json( $return_parent ? $parent : $entry, false ) :
+        LogBookUtils::entry2json( $entry, false );
 
 	print <<< HERE
 <textarea>

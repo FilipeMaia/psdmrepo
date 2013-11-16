@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-13
+2013-11-15 Igor Gaponenko
+- extensions required for the new Web Portal
+
 Tag: V00-03-12
 2013-11-01 Igor Gaponenko
 - fixed a few minor bugs

@@ -62,10 +62,13 @@ class LogBookUtils {
     
         $timestamp = $entry->insert_time();
     
-        $tag_ids = array();
+        $tags_num = 0;
+        $tag_ids  = array();
     
-        $attachment_ids = array();
-        foreach( $entry->attachments() as $attachment )
+        $attachments_num = 0 ;
+        $attachment_ids  = array();
+        foreach( $entry->attachments() as $attachment ) {
+            $attachments_num++;
             array_push(
                 $attachment_ids,
                 array(
@@ -76,10 +79,12 @@ class LogBookUtils {
                     "url"         => '<a href="attachments/'.$attachment->id().'/'.$attachment->description().'" target="_blank" class="lb_link">'.$attachment->description().'</a>'
                 )
             );
-    
+        }
+        $children_num = 0;
         $children_ids = array();
         foreach( $entry->children() as $child ) {
             if( $child->deleted() && !$inject_deleted_messages ) continue;
+            $children_num++;
             array_push( $children_ids, LogBookUtils::child2json( $child, $posted_at_instrument, $inject_deleted_messages ));
         }
         $content = wordwrap( $entry->content(), 128 );
@@ -92,21 +97,25 @@ class LogBookUtils {
                 "shift"           => '',
                 "author"          => ( $posted_at_instrument ? $entry->parent()->name().'&nbsp;-&nbsp;' : '' ).$entry->author(),
                 "id"              => $entry->id(),
+                "parent_id"       => $entry->parent_entry_id() ,
                 "subject"         => htmlspecialchars( substr( $entry->content(), 0, 72).(strlen( $entry->content()) > 72 ? '...' : '' )),
                 "html"            => "<pre style=\"padding:4px; padding-left:8px; font-size:14px; border: solid 2px #efefef;\">".htmlspecialchars($content)."</pre>",
                 "html1"           => "<pre>".htmlspecialchars($content)."</pre>",
                 "content"         => htmlspecialchars( $entry->content()),
+                "attachments_num" => $attachments_num,
                 "attachments"     => $attachment_ids,
+                "tags_num"        => $tags_num,
                 "tags"            => $tag_ids,
+                "children_num"    => $children_num,
                 "children"        => $children_ids,
                 "is_run"          => 0,
                 "run_id"          => 0,
                 "run_num"         => 0,
                 "ymd"             => $timestamp->toStringDay(),
                 "hms"             => $timestamp->toStringHMS(),
-                "deleted"          => $entry->deleted() ? 1 : 0,
+                "deleted"         => $entry->deleted() ? 1 : 0,
                 "deleted_by"      => $entry->deleted() ? $entry->deleted_by() : '',
-                "deleted_time"      => $entry->deleted() ? $entry->deleted_time()->toStringShort() : ''
+                "deleted_time"    => $entry->deleted() ? $entry->deleted_time()->toStringShort() : ''
             )
         );
     }
@@ -124,8 +133,10 @@ class LogBookUtils {
         $shift     = is_null( $entry->shift_id()) ? null : $entry->shift();
         $run       = is_null( $entry->run_id())   ? null : $entry->run();
     
-        $tag_ids = array();
-        foreach( $entry->tags() as $tag )
+        $tags_num = 0;
+        $tag_ids  = array();
+        foreach( $entry->tags() as $tag ) {
+            $tags_num++;
             array_push(
                 $tag_ids,
                 array(
@@ -133,9 +144,12 @@ class LogBookUtils {
                     "value" => $tag->value()
                 )
             );
+        }
     
-        $attachment_ids = array();
-        foreach( $entry->attachments() as $attachment )
+        $attachments_num = 0 ;
+        $attachment_ids  = array();
+        foreach( $entry->attachments() as $attachment ) {
+            $attachments_num++;
             array_push(
                 $attachment_ids,
                 array(
@@ -146,10 +160,12 @@ class LogBookUtils {
                     "url"         => '<a href="attachments/'.$attachment->id().'/'.$attachment->description().'" target="_blank" class="lb_link">'.$attachment->description().'</a>'
                 )
             );
-    
+        }
+        $children_num = 0;
         $children_ids = array();
         foreach( $entry->children() as $child ) {
             if( $child->deleted() && !$inject_deleted_messages ) continue;
+            $children_num++;
             array_push( $children_ids, LogBookUtils::child2json( $child, $posted_at_instrument, $inject_deleted_messages ));
         }
     
@@ -163,21 +179,25 @@ class LogBookUtils {
                 "shift"           => is_null( $shift ) ? '' : "<a href=\"javascript:select_shift(".$shift->id().")\" class=\"lb_link\">".$shift->begin_time()->toStringShort().'</a>',
                 "author"          => ( $posted_at_instrument ? $entry->parent()->name().'&nbsp;-&nbsp;' : '' ).$entry->author(),
                 "id"              => $entry->id(),
+                "parent_id"       => 0 ,
                 "subject"         => htmlspecialchars( substr( $entry->content(), 0, 72).(strlen( $entry->content()) > 72 ? '...' : '' )),
                 "html"            => "<pre style=\"padding:4px; padding-left:8px; font-size:14px; border: solid 2px #efefef;\">".htmlspecialchars($content)."</pre>",
                 "html1"           => "<pre>".htmlspecialchars($content)."</pre>",
                 "content"         => htmlspecialchars( $entry->content()),
+                "attachments_num" => $attachments_num,
                 "attachments"     => $attachment_ids,
+                "tags_num"        => $tags_num,
                 "tags"            => $tag_ids,
+                "children_num"    => $children_num,
                 "children"        => $children_ids,
                 "is_run"          => 0,
                 "run_id"          => is_null( $run ) ? 0 : $run->id(),
                 "run_num"         => is_null( $run ) ? 0 : $run->num(),
                 "ymd"             => $timestamp->toStringDay(),
                 "hms"             => $timestamp->toStringHMS(),
-                "deleted"          => $entry->deleted() ? 1 : 0,
+                "deleted"         => $entry->deleted() ? 1 : 0,
                 "deleted_by"      => $entry->deleted() ? $entry->deleted_by() : '',
-                "deleted_time"      => $entry->deleted() ? $entry->deleted_time()->toStringShort() : ''
+                "deleted_time"    => $entry->deleted() ? $entry->deleted_time()->toStringShort() : ''
             )
         );
     }
@@ -196,6 +216,7 @@ class LogBookUtils {
          * for runs. an assumption is that normal message entries will
          * outnumber 512 million records.
          */
+        $duration  = $type === 'begin_run' ? '' : LogBookUtils::format_seconds( $run->end_time()->sec - $run->begin_time()->sec );
         $timestamp = '';
         $msg       = '';
         $id        = '';
@@ -203,17 +224,17 @@ class LogBookUtils {
         switch( $type ) {
         case 'begin_run':
             $timestamp = $run->begin_time();
-            $msg       = '<b>begin run '.$run->num().'</b>';
+            $msg       = "<b>begin run {$run->num()}</b>";
             $id        = 512*1024*1024 + $run->id();
             break;
         case 'end_run':
             $timestamp = $run->end_time();
-            $msg       = '<b>end run '.$run->num().'</b> ( '.LogBookUtils::format_seconds( $run->end_time()->sec - $run->begin_time()->sec ).' )';
+            $msg       = "<b>end run {$run->num()}</b> ( {$duration} )";
             $id        = 2*512*1024*1024 + $run->id();
             break;
         case 'run':
             $timestamp = $run->end_time();
-            $msg       = '<b>run '.$run->num().'</b> ( '.LogBookUtils::format_seconds( $run->end_time()->sec - $run->begin_time()->sec ).' )';
+            $msg       = "<b>run {$run->num()}</b> ( {$duration} )";
             $id        = 3*512*1024*1024 + $run->id();
             break;
         }
@@ -232,26 +253,29 @@ class LogBookUtils {
         return json_encode(
             array (
                 "event_timestamp" => $timestamp->to64(),
-                "event_time" => $event_time_url, //$entry->insert_time()->toStringShort(),
-                "relevance_time" => $relevance_time_str,
-                "run" => $run_number_str,
-                "shift" => $shift_begin_time_str,
-                "author" => ( $posted_at_instrument ? $entry->parent()->name().'&nbsp;-&nbsp;' : '' ).'DAQ/RC',
-                "id" => $id,
-                "subject" => substr( $msg, 0, 72).(strlen( $msg ) > 72 ? '...' : '' ),
-                "html" => "<pre style=\"padding:4px; padding-left:8px; font-size:14px; border: solid 2px #efefef;\">".$content."</pre>",
-                "html1" => $content,
-                "content" => $msg,
-                "attachments" => $attachment_ids,
-                "tags" => $tag_ids,
-                "children" => $children_ids,
-                "is_run" => 1,
-                "run_id" => $run->id(),
-                "begin_run" => $run->begin_time()->toStringShort(),
-                "end_run" => is_null($run->end_time()) ? '' : $run->end_time()->toStringShort(),
-                "run_num" => $run->num(),
-                "ymd" => $timestamp->toStringDay(),
-                "hms" => $timestamp->toStringHMS()
+                "event_time"      => $event_time_url, //$entry->insert_time()->toStringShort(),
+                "relevance_time"  => $relevance_time_str,
+                "run"             => $run_number_str,
+                "shift"           => $shift_begin_time_str,
+                "author"          => ( $posted_at_instrument ? $entry->parent()->name().'&nbsp;-&nbsp;' : '' ).'DAQ/RC',
+                "id"              => $id,
+                "parent_id"       => 0 ,
+                "subject"         => substr( $msg, 0, 72).(strlen( $msg ) > 72 ? '...' : '' ),
+                "html"            => "<pre style=\"padding:4px; padding-left:8px; font-size:14px; border: solid 2px #efefef;\">".$content."</pre>",
+                "html1"           => $content,
+                "content"         => $msg,
+                "attachments"     => $attachment_ids,
+                "tags"            => $tag_ids,
+                "children"        => $children_ids,
+                "is_run"          => 1,
+                "run_id"          => $run->id(),
+                "type"            => $type,
+                "begin_run"       => $run->begin_time()->toStringShort(),
+                "end_run"         => is_null($run->end_time()) ? '' : $run->end_time()->toStringShort(),
+                "run_num"         => $run->num(),
+                "duration"        => $duration,
+                "ymd"             => $timestamp->toStringDay(),
+                "hms"             => $timestamp->toStringHMS()
             )
         );
     }

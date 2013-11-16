@@ -37,7 +37,11 @@ header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );   // Date in the past
  */
 
 function report_error( $msg ) {
-    echo '{"Status":"error","Message":'.json_encode( $msg ).'}';
+    echo <<<HERE
+{ "Status": "error", "Message": "{$msg}",
+  "status": "error", "message": "{$msg}"
+}
+HERE;
     exit;
 }
 
@@ -66,10 +70,16 @@ if( isset($_GET['id'])) {
  *
  * @param $is_subscribed - True if subscribed
  */	
-function return_result( $is_subscribed, $all_subscriptions ) {
-    echo
-        '{"Status":"success","Subscribed":'.json_encode( $is_subscribed ? 1 : 0 ).
-        ', "AllSubscriptions": '.json_encode($all_subscriptions).'}';
+function return_result ($is_subscribed, $all_subscriptions) {
+    $is_subscribed_json = $is_subscribed ? 1 : 0 ;
+    $all_subscriptions_json  = json_encode($all_subscriptions) ;
+    echo <<<HERE
+{ "Status"          : "success",
+  "status"          : "success",
+  "Subscribed"      : {$is_subscribed_json},
+  "AllSubscriptions": {$all_subscriptions_json}
+}
+HERE;
 }
 
 try {

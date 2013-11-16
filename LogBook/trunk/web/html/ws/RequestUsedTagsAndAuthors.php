@@ -15,8 +15,8 @@ function report_error( $msg ) {
     $msg_encoded = json_encode( '<b><em style="color:red;" >Error:</em></b>&nbsp;'.$msg );
     print <<< HERE
 {
-  "Status": {$status_encoded},
-  "Message": {$msg_encoded}
+  "Status": {$status_encoded}, "Message": {$msg_encoded} ,
+  "status": {$status_encoded}, "message": {$msg_encoded}
 }
 HERE;
     exit;
@@ -83,6 +83,7 @@ try {
     $success_encoded = json_encode("success");
     print <<< HERE
 { "Status": {$success_encoded},
+  "status": {$success_encoded},
   "Tags": [
 HERE;
     $first = true;
