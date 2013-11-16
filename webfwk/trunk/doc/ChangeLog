@@ -11,6 +11,11 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-04
+2013-11-15 Igor Gaponenko
+- fixed bugs in StackOfRows
+- extended implementation of StackOfRows (many improvements)
+
 Tag: V00-00-03
 2013-11-01 Igor Gaponenko
 - fixed bugs in Fwk

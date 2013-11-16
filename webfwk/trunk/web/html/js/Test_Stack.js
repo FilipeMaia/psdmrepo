@@ -159,7 +159,7 @@ $(function () {
         {id: 'comment', title: 'Comment', width: 320}
     ], null, {
         expand_buttons: true ,
-        theme: 'stack-theme-large16 + stack-theme-aliceblue'
+        theme: 'stack-theme-large16 stack-theme-aliceblue'
     }) ;
     for (var i = 0; i < 4; i++)
         stack7.add_row({
@@ -255,4 +255,24 @@ $(function () {
             } ,
             body:  'Here be the body of this row'}) ;
     stack11.display($('#stack11')) ;
+
+    /* Applying different color themes to different rows of the same table */
+
+    var hdr = [
+        {id: 'id',      title: 'Id',      width: 20} ,
+        {id: 'comment', title: 'Comment', width: 320}
+    ] ;
+    var stack12 = new StackOfRows(hdr, null, {
+        expand_buttons: true
+    }) ;
+    for (var i = 0; i < 20; i++)
+        stack12.add_row({
+            title: {
+                id:      '<b>'+i+'</b>' ,
+                comment: 'Here be my comment...'
+            } ,
+            body:        'Here be the body of this row' ,
+            color_theme: !(i % 4) ? 'stack-theme-green' : null}) ;
+    stack12.display($('#stack12')) ;
+
 }) ;

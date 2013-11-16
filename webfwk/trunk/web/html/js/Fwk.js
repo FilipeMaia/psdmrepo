@@ -679,6 +679,30 @@ function FwkCreator () {
             title: title
         }) ;
     } ;
+    this.form_dialog = function (title, form_html, on_ok, on_cancel) {
+        var container = $('#fwk-editdialogs') ;
+        container.html(form_html) ;
+        container.dialog ({
+            resizable: true ,
+            modal: true ,
+            width:  470 ,
+            height: 300 ,
+            buttons: {
+                "Ok": function () {
+                    if (on_ok) {
+                        if (on_ok(container)) $(this).dialog('close') ;
+                        else return ;
+                    }
+                    $(this).dialog('close') ;
+                },
+                Cancel: function () {
+                    $(this).dialog('close') ;
+                    if (on_cancel) on_cancel() ;
+                }
+            } ,
+            title: title
+        }) ;
+    } ;
     this.report_error = function (msg) {
         var container = $('#fwk-popupdialogs') ;
         container.html('<p><span class="ui-icon ui-icon-alert" style="float:left;"></span>'+msg+'</p>') ;

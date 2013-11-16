@@ -35,7 +35,7 @@ display : function (container) {
 } ,
 
 /**
- * Render the widget. Thsi method MUST be implemented by a subclasse
+ * Render the widget. This method MUST be implemented by a subclasse
  */
 render : function() {
     throw new WidgetError('Widget: no rendering provided by the derived class') ;

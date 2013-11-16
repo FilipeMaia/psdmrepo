@@ -24,41 +24,19 @@ function RowTitle_Factory (title, hdr) {
 }
 
 /*
- * One wrapper class and a factory for producing an appropriate
- * StackRowBody object from the specified input.
+ * One wrapper classe and a factory for producing an appropriate
+ * RowBody object from the specified input.
  */
-function StackRowBody (parent_stack, row_id) {
-    this.parent_stack = parent_stack ;
-    this.row_id = row_id ;
-}
-define_class(StackRowBody, Widget, {}, {}) ;
-
-function StackRowBody_FromString (parent_stack, row_id, text) {
-    this.parent_stack = parent_stack ;
-    this.row_id = row_id ;
+function RowBody_FromString (text) {
     this.text = text ;
-    this.render = function () {
-        this.container.html(this.text) ;
-    } ;
+    this.display = function (container) { container.html(this.text) ; } ;
 }
-define_class(StackRowBody_FromString, StackRowBody, {}, {}) ;
-
-function StackRowBody_Factory (parent_stack, row_id, body) {
-    if (body instanceof StackRowBody) {
-        body.parent_stack = parent_stack ;
-        body.row_id = row_id ;
-        return body ;
-    }
+function RowBody_Factory (body) {
     switch (typeof(body)) {
-        case 'string' : return new StackRowBody_FromString(parent_stack, row_id, body) ;
-        case 'object' :
-            if (typeof(body.display) === 'function') {
-                body.parent_stack = parent_stack ;
-                body.row_id = row_id ;
-                return body ;
-            }
+        case 'string' : return new RowBody_FromString(body) ;
+        case 'object' : if (typeof(body.display) === 'function') return body ;
     }
-    throw new WidgetError('StackRowBody_Factory: missing or unsupported row body') ;
+    throw new WidgetError('RowBody_Factory: missing or unsupported row body') ;
 }
 
 /**
@@ -96,32 +74,27 @@ define_class(SimpleStackRowData, StackRowData, {}, {}) ;
  * @param boolean expand_propagate
  * @returns {StackRow}
  */
-function StackRowData_Factory (parent, id, row, hdr, opt, effect_on_insert_required) {
-    var effect_on_insert = effect_on_insert_required && opt.effect_on_insert ? opt.effect_on_insert : null ;
+function StackRowData_Factory (id, row, hdr, expand_propagate) {
     if (row instanceof StackRowData) {
         return new StackRow (
-            parent ,
             id ,
             row ,
             hdr ,
-            opt.expand_propagate ,
+            expand_propagate ,
             row.color_theme ,
-            row.block_common_expand ,
-            effect_on_insert
+            row.block_common_expand
         ) ;
     } else if ((typeof row === 'object') && !row.isArray) {
         return new StackRow (
-            parent ,
             id ,
             new SimpleStackRowData (
                 RowTitle_Factory(row.title, hdr) ,
-                StackRowBody_Factory(parent, id, row.body)
+                RowBody_Factory(row.body)
             ) ,
             hdr ,
-            opt.expand_propagate ,
+            expand_propagate ,
             row.color_theme ,
-            row.block_common_expand ,
-            effect_on_insert
+            row.block_common_expand
         ) ;
     }
     throw new WidgetError('StackRowData_Factory: unsupported type of the row') ;
@@ -148,15 +121,13 @@ function StackRowData_Factory (parent, id, row, hdr, opt, effect_on_insert_requi
  * @param Array data_object - the data object descriibing the title and the body of the row
  * @returns {StackRow}
  */
-function StackRow (parent, id, data_object, hdr, expand_propagate, color_theme, block_common_expand, effect_on_insert) {
-    this.parent = parent ;
+function StackRow (id, data_object, hdr, expand_propagate, color_theme, block_common_expand) {
     this.id = id ;
     this.data_object = data_object ;
     this.hdr = hdr ;
     this.expand_propagate = expand_propagate ? (this.data_object.body.expand_or_collapse ? true : false) : false ;
     this.color_theme = color_theme ? color_theme : '' ;
     this.block_common_expand = block_common_expand ? true : false ;
-    this.effect_on_insert = effect_on_insert ;
 }
 define_class (StackRow, Widget, {}, {
 
@@ -204,12 +175,6 @@ render : function () {
         $('<div class="stack-row-column"></div>').insertAfter(this.first) ;
         this.first.next().html(this.data_object.title.html()) ;
     }
-    
-    // Enfore the header effect if requested and if the effect has been provided
-    
-    if (this.effect_on_insert) {
-        this.effect_on_insert(this.header) ;
-    }
 } ,
 
 /**
@@ -223,18 +188,11 @@ toggle : function () {
 /**
  * Expand or collapse the row container
  * 
- * NOTES:
- * - this method will also do lazy rendering of the body first time the expansion operation is called on a row.
- * - the group expand operations may be blocked by the 'block_common_expand' parameter of the row
- * - the 'focus_relative_to' parameter only applies to the row expansion operation
- * - the 'focus_relative_to' is ignored if this is a part of the group expand operation
- *
- * @param boolean expand            - expand if 'true', collapse otherwise
- * @param boolean common_expand     - the flag indicating is if this is group operation
- * @param Object  focus_relative_to - (if specified) focus relative to the specified JQuery element
+ * NOTE: This method will also do lazy rendering of the body first time
+ * the expansion operation is called on a row.
  */
 body_is_rendered : false ,
-expand_or_collapse : function (expand, common_expand, focus_relative_to) {
+expand_or_collapse : function (expand, common_expand) {
     if (expand && !(common_expand && this.block_common_expand)) {
         if (!this.body_is_rendered) {
             this.body_is_rendered = true ;
@@ -243,10 +201,6 @@ expand_or_collapse : function (expand, common_expand, focus_relative_to) {
         this.header.addClass('stack-row-header-open') ;
         this.toggler.removeClass('ui-icon-triangle-1-e').addClass('ui-icon-triangle-1-s') ;
         this.body.removeClass('stack-row-hidden').addClass('stack-row-visible') ;
-        if (focus_relative_to && !common_expand) {
-            var offset_top = focus_relative_to.scrollTop() + this.body.position().top - 24;
-            focus_relative_to.animate({scrollTop: offset_top}, 'slow') ;
-        }
     } else {
         this.header.removeClass('stack-row-header-open') ;
         this.toggler.removeClass('ui-icon-triangle-1-s').addClass('ui-icon-triangle-1-e') ;
@@ -293,11 +247,10 @@ function StackOfRows (hdr, rows, options) {
             this.add_row(rows[i]) ;
 
     this.options = {
-        expand_buttons   : false ,
+        expand_buttons : false ,
         expand_propagate : false ,
-        theme            : null ,
-        hidden_header    : false ,
-        effect_on_insert : null
+        theme : null ,
+        hidden_header : false
     } ;
     if (options)
         for(var key in this.options)
@@ -317,41 +270,23 @@ define_class (StackOfRows, Widget, {
  * Methods *
  ***********/
 
-
-num_rows: function () {
-    return this.rows.length ;
-} ,
-
-/*
- * The generator of unique identifiers for the rows.
- */
-last_id: null ,
-
-next_id: function () {
-    if (this.last_id === null) this.last_id = 0 ;
-    else this.last_id++ ;
-    return this.last_id ;
-} ,
-
-
 add_row : function (row_data) {
 
     // The identifier is needed by the Stack only in order
     // to keep a track of a container into which a particular
     // row Widget is paced.
 
-    var id = this.next_id() ;
+    var id = this.rows.length ;
 
     // The Data Object can be either directly prepared by a user or be
     // "syntechnised" from a simple form of an input.
 
     this.rows.push (
         StackRowData_Factory (
-            this ,
             id ,
             row_data ,
             this.hdr ,
-            this.options
+            this.options.expand_propagate
         )
     ) ;
 } ,
@@ -496,6 +431,10 @@ first_row: function () {
     return null ;
 } ,
 
+next_id: function () {
+    return this.rows.length ;
+} ,
+
 /* ==========================================================================
  * These operations can be called only after rendering/displaying the widget.
  * Otherwise the method will throw an exception.
@@ -517,21 +456,16 @@ expand_or_collapse : function (expand) {
 } ,
 
 /**
- * Expand or collapse one row, and optionally focus on to the row after expanding
+ * Expand or collapse one row
  *
- * NOTES:
- * - the 'focus_relative_to' parameter only applies to the row expansion operation
- * - the 'focus_relative_to' is ignored if this is a part of the group expand operation
- * 
- * @param Number  id                - a number of the row
- * @param Boolean expand            - a flag indicating a desired operation (true for expanding)
- * @param Object  focus_relative_to - (if specified) focus relative to the specified JQuery element
+ * @param Number id - a number of the row
+ * @param Boolean expand - a flag indicating a desired operation (true for expanding)
  */
-expand_or_collapse_row : function (id, expand, focus_relative_to) {
+expand_or_collapse_row : function (id, expand) {
     this.assert_initialized() ;
     var row = this.get_row_by_id(id) ;
     var common_expand = false ;
-    row.expand_or_collapse(expand, common_expand, focus_relative_to) ;
+    row.expand_or_collapse(expand, common_expand) ;
 } ,
 
 /**
@@ -544,21 +478,6 @@ is_expanded : function (id) {
     this.assert_initialized() ;
     var row = this.get_row_by_id(id) ;
     return row.is_expanded() ;
-} ,
-
-/**
- * Delete the specified row
- * 
- * @param Number id - an identifier of the row
- */
-delete_row : function (id) {
-
-    this.assert_initialized() ;
-
-    var i = this.get_row_location_by_id(id) ;
-
-    this.rows.splice(i, 1) ;
-    this.body.children('.stack-row#'+id).remove() ;
 } ,
 
 /**
@@ -580,11 +499,10 @@ update_row : function (id, row_data) {
     var common_expand = false ;
 
     var new_row = StackRowData_Factory (
-        this ,
         id ,
         row_data ,
         this.hdr ,
-        this.options
+        this.options.expand_propagate
     ) ;
     this.rows[i] = new_row ;
 
@@ -604,19 +522,15 @@ insert_front : function (row_data) {
 
     this.assert_initialized() ;
 
-    var effect_on_insert_required = true ;
     var new_row_obj = StackRowData_Factory (
-        this ,
         this.next_id() ,
         row_data ,
         this.hdr ,
-        this.options ,
-        effect_on_insert_required
+        this.options.expand_propagate
     ) ;
-
     var html =
 '<div class="stack-row" id="'+new_row_obj.id+'"></div>' ;
-
+    
     var first_row_obj = this.first_row() ;
     if (first_row_obj) {
         this.rows.splice(0, 0, new_row_obj) ;
@@ -639,16 +553,12 @@ append : function (row_data) {
 
     this.assert_initialized() ;
 
-    var effect_on_insert_required = true ;
     var new_row_obj = StackRowData_Factory (
-        this ,
         this.next_id() ,
         row_data ,
         this.hdr ,
-        this.options ,
-        effect_on_insert_required
+        this.options.expand_propagate
     ) ;
-
     var html =
 '<div class="stack-row" id="'+new_row_obj.id+'"></div>' ;
 
