@@ -44,12 +44,14 @@ def detectors (ins, exp, run, style='psana') :
 def list_of_sources_in_run (ins, exp, run) :
     """Returns the list of detectors in style of psana, for example 'CxiDs1.0:Cspad.0'
     """
-    list_of_detectors = experiment_info.detectors (ins, exp, run)
-    list_of_dets_for_psana = []
-    for det in list_of_detectors :
-        det_in_psana = det.replace("|",":").replace("-",".")
-        list_of_dets_for_psana.append(det_in_psana)
-    return list_of_dets_for_psana
+    #list_of_detectors = experiment_info.detectors (ins, exp, run)
+    #list_of_dets_for_psana = []
+    #for det in list_of_detectors :
+    #    det_in_psana = det.replace("|",":").replace("-",".")
+    #    list_of_dets_for_psana.append(det_in_psana)
+    #return list_of_dets_for_psana
+
+    return [det.replace("|",":").replace("-",".") for det in experiment_info.detectors (ins, exp, run)]
 
 #------------------------------
 
@@ -67,13 +69,15 @@ def txt_of_sources_in_run (ins, exp, run) :
 def list_of_sources_in_run_for_selected_detector (ins, exp, run, det_selected) :
     """Returns the list of detectors in run for selected detector. For example, for CSPAD returns ['CxiDs1.0:Cspad.0', 'CxiDsd.0:Cspad.0']
     """
-    lst = []
     pattern = det_selected.lower() + '.'
 
-    for src_name in list_of_sources_in_run(ins, exp, run) :
-        if src_name.lower().find(pattern) != -1 :
-            lst.append(src_name)
-    return lst
+    #lst = []
+    #for src_name in list_of_sources_in_run(ins, exp, run) :
+    #    if src_name.lower().find(pattern) != -1 :
+    #        lst.append(src_name)
+    #return lst
+
+    return [src for src in list_of_sources_in_run(ins, exp, run) if src.lower().find(pattern) != -1]
 
 #------------------------------
 

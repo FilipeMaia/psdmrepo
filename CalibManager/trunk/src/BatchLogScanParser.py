@@ -164,15 +164,45 @@ class BatchLogScanParser :
         self.parse_batch_log_peds_scan()        
         return self.list_of_detinfo_sources
 
+
     def get_list_of_sources (self) :
         #if self.list_of_sources == [] : return None
         self.parse_batch_log_peds_scan()        
         return self.list_of_sources
 
+
     def get_list_of_types (self) :
         #if self.list_of_types == [] : return None
         self.parse_batch_log_peds_scan()
         return self.list_of_types
+
+
+    def list_of_sources_for_detector (self, det_selected) :
+        """Returns the list of detectors in run for selected detector. For example, for CSPAD returns ['CxiDs1.0:Cspad.0', 'CxiDsd.0:Cspad.0']
+        """
+        pattern = det_selected.lower() + '.'
+        return [src for src in self.get_list_of_sources() if src.lower().find(pattern) != -1]
+
+
+    def list_of_types_for_detector (self, det_selected) :
+        """Returns the list of detectors in run for selected detector. For example, for CSPAD returns ['CxiDs1.0:Cspad.0', 'CxiDsd.0:Cspad.0']
+        """
+        pattern = det_selected.lower() + '.'
+        return [type for type,src in (self.get_list_of_types(), self.get_list_of_sources()) if src.lower().find(pattern) != -1]
+
+
+    def list_of_sources_for_selected_detectors (self) :
+        lst_src = []
+        for det_name in cp.list_of_dets_selected() :
+            lst_src += self.list_of_sources_for_detector(det_name)
+        return lst_src
+
+
+    def list_of_types_for_selected_detectors (self) :
+        lst_types = []
+        for det_name in cp.list_of_dets_selected() :
+            lst_types += self.list_of_types_for_detector(det_name)
+        return lst_types
 
 #-----------------------------
 
