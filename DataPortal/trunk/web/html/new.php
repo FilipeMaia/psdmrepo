@@ -212,6 +212,8 @@ label.control-label {
 
 <script type="text/javascript" src="../portal/js/Experiment_Info.js"></script>
 <script type="text/javascript" src="../portal/js/Experiment_Group.js"></script>
+<script type="text/javascript" src="../portal/js/ELog_Utils.js"></script>
+<script type="text/javascript" src="../portal/js/ELog_MessageViewer.js"></script>
 <script type="text/javascript" src="../portal/js/ELog_Live.js"></script>
 <script type="text/javascript" src="../portal/js/ELog_Post.js"></script>
 <script type="text/javascript" src="../portal/js/ELog_Search.js"></script>

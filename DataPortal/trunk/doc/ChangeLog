@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-03
+2013-11-15 Igor Gaponenko
+- finished implementing eLog Live in the new Portal
+
 Tag: V00-05-02
 2013-11-01 Igor Gaponenko
 - added two run tables: 'EPICS'

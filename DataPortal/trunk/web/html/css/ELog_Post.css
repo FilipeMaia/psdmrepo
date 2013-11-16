@@ -1,3 +1,7 @@
 #elog-post {
-  padding: 0;
+  padding: 20px;
+}
+
+#elog-post .info {
+  color: maroon;
 }
