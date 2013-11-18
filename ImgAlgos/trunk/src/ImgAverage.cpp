@@ -61,6 +61,7 @@ ImgAverage::ImgAverage (const std::string& name)
   , m_hot_thr()
   , m_print_bits()
   , m_count(0)
+  , m_count_ev(0)
   , m_nev_stage1()
   , m_nev_stage2()
   , m_gate_width1()
@@ -164,10 +165,10 @@ ImgAverage::beginCalibCycle(Event& evt, Env& env)
 void 
 ImgAverage::event(Event& evt, Env& env)
 {
-  ++ m_count;
-  if( m_print_bits & 2 ) printEventRecord(evt);
-  setCollectionMode(evt);
-  collectStat(evt);
+  ++ m_count_ev;
+  if ( m_print_bits & 2 ) printEventRecord(evt);
+  if (! setCollectionMode(evt)) return;
+  if (collectStat(evt)) ++ m_count;
 }
   
 /// Method which is called at the end of the calibration cycle
@@ -197,12 +198,14 @@ ImgAverage::endJob(Event& evt, Env& env)
 //--------------------
 
 /// Check the event counter and deside what to do next accumulate/change mode/etc.
-void 
+bool 
 ImgAverage::setCollectionMode(Event& evt)
 {
   // Set the statistics collection mode without gate
-  if (m_count == 1 ) {
-    defineImageShape(evt, m_str_src, m_key, m_shape); // shape is not available in beginJob and beginRun
+  if (m_count == 0) {
+    // shape is not available in beginJob and beginRun
+    if ( ! defineImageShape(evt, m_str_src, m_key, m_shape) ) return false;
+
     m_rows = m_shape[0];
     m_cols = m_shape[1];
     m_size = m_rows*m_cols;
@@ -216,7 +219,8 @@ ImgAverage::setCollectionMode(Event& evt)
     m_hot  = new int     [m_size]; 
     resetStatArrays();
     m_gate_width = 0;
-    if( m_print_bits & 4 ) MsgLog(name(), info, "Stage 0: Event = " << m_count << " Begin to collect statistics without gate.");
+    if( m_print_bits & 4 ) MsgLog(name(), info, "Stage 0: Image = " << m_count << " Begin to collect statistics without gate.");
+    return true;
   }
 
   // Change the statistics collection mode for gated stage 1
@@ -224,7 +228,8 @@ ImgAverage::setCollectionMode(Event& evt)
     procStatArrays();
     resetStatArrays();
     m_gate_width = m_gate_width1;
-    if( m_print_bits & 4 ) MsgLog(name(), info, "Stage 1: Event = " << m_count << " Begin to collect statistics with gate =" << m_gate_width);
+    if( m_print_bits & 4 ) MsgLog(name(), info, "Stage 1: Image = " << m_count << " Begin to collect statistics with gate =" << m_gate_width);
+    return true;
   } 
 
   // Change the statistics collection mode for gated stage 2
@@ -232,8 +237,10 @@ ImgAverage::setCollectionMode(Event& evt)
     procStatArrays();
     resetStatArrays();
     m_gate_width = m_gate_width2;
-    if( m_print_bits & 4 ) MsgLog(name(), info, "Stage 2: Event = " << m_count << " Begin to collect statistics with gate =" << m_gate_width);
+    if( m_print_bits & 4 ) MsgLog(name(), info, "Stage 2: Image = " << m_count << " Begin to collect statistics with gate =" << m_gate_width);
+    return true;
   }
+  return true;
 }
 
 //--------------------
@@ -250,19 +257,20 @@ ImgAverage::resetStatArrays()
 //--------------------
 
 /// Collect statistics
-void 
+bool 
 ImgAverage::collectStat(Event& evt)
 {
-  if ( collectStatForType<double>  (evt) ) return;
-  if ( collectStatForType<uint16_t>(evt) ) return;
-  if ( collectStatForType<int>     (evt) ) return;
-  if ( collectStatForType<float>   (evt) ) return;
-  if ( collectStatForType<uint8_t> (evt) ) return;
-  if ( collectStatForType<short>   (evt) ) return;
-  if ( collectStatForType<int16_t> (evt) ) return;
-  if ( collectStatForType<unsigned>(evt) ) return;
+  if ( collectStatForType<double>  (evt) ) return true;
+  if ( collectStatForType<uint16_t>(evt) ) return true;
+  if ( collectStatForType<int>     (evt) ) return true;
+  if ( collectStatForType<float>   (evt) ) return true;
+  if ( collectStatForType<uint8_t> (evt) ) return true;
+  if ( collectStatForType<short>   (evt) ) return true;
+  if ( collectStatForType<int16_t> (evt) ) return true;
+  if ( collectStatForType<unsigned>(evt) ) return true;
 
   MsgLog(name(), info, "Image is not available in the event(...) for source:" << m_str_src << " key:" << m_key);
+  return false;
 }
 
 //--------------------
@@ -271,7 +279,8 @@ ImgAverage::collectStat(Event& evt)
 void 
 ImgAverage::procStatArrays()
 {
-  if( m_print_bits & 8 ) MsgLog(name(), info, "Process statistics for collected total " << m_count << " events");
+  if( m_print_bits & 8 ) MsgLog(name(), info, "Process statistics for collected total " << m_count 
+                                              << " images found in " << m_count_ev << " evetts");
   
     for (unsigned i=0; i!=m_size; ++i) {
 
@@ -300,7 +309,8 @@ void
 ImgAverage::printEventRecord(Event& evt)
 {
   MsgLog( name(), info,  "Run="    << stringRunNumber(evt) 
-                     << " Evt="    << stringFromUint(m_count) 
+                     << " Evt="    << stringFromUint(m_count_ev) 
+                     << " Img="    << stringFromUint(m_count) 
                      << " Time="   << stringTimeStamp(evt) 
   );
 }
@@ -311,10 +321,11 @@ void
 ImgAverage::printSummaryForParser(Event& evt)
 {
   cout << "ImgAverage: Summary for parser" << endl;
-  cout << "BATCH_NUMBER_OF_EVENTS " << m_count << endl;
-  cout << "BATCH_IMG_ROWS         " << m_rows  << endl;
-  cout << "BATCH_IMG_COLS         " << m_cols  << endl;
-  cout << "BATCH_IMG_SIZE         " << m_size  << endl;
+  cout << "BATCH_NUMBER_OF_EVENTS " << m_count_ev << endl;
+  cout << "BATCH_NUMBER_OF_IMAGES " << m_count    << endl;
+  cout << "BATCH_IMG_ROWS         " << m_rows     << endl;
+  cout << "BATCH_IMG_COLS         " << m_cols     << endl;
+  cout << "BATCH_IMG_SIZE         " << m_size     << endl;
 }
 
 //--------------------

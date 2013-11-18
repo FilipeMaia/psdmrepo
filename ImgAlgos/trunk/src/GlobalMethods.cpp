@@ -150,23 +150,24 @@ printSizeOfTypes()
 
 //--------------------
 // Define the shape or throw message that can not do that.
-void 
+bool
 defineImageShape(PSEvt::Event& evt, const PSEvt::Source& src, const std::string& key, unsigned* shape)
 {
-  if ( defineImageShapeForType<double>  (evt, src, key, shape) ) return;
-  if ( defineImageShapeForType<float>   (evt, src, key, shape) ) return;
-  if ( defineImageShapeForType<int>     (evt, src, key, shape) ) return;
-  if ( defineImageShapeForType<int32_t> (evt, src, key, shape) ) return;
-  if ( defineImageShapeForType<uint32_t>(evt, src, key, shape) ) return;
-  if ( defineImageShapeForType<uint16_t>(evt, src, key, shape) ) return;
-  if ( defineImageShapeForType<uint8_t> (evt, src, key, shape) ) return;
-  if ( defineImageShapeForType<int16_t> (evt, src, key, shape) ) return;
-  if ( defineImageShapeForType<short>   (evt, src, key, shape) ) return;
+  if ( defineImageShapeForType<double>  (evt, src, key, shape) ) return true;
+  if ( defineImageShapeForType<float>   (evt, src, key, shape) ) return true;
+  if ( defineImageShapeForType<int>     (evt, src, key, shape) ) return true;
+  if ( defineImageShapeForType<int32_t> (evt, src, key, shape) ) return true;
+  if ( defineImageShapeForType<uint32_t>(evt, src, key, shape) ) return true;
+  if ( defineImageShapeForType<uint16_t>(evt, src, key, shape) ) return true;
+  if ( defineImageShapeForType<uint8_t> (evt, src, key, shape) ) return true;
+  if ( defineImageShapeForType<int16_t> (evt, src, key, shape) ) return true;
+  if ( defineImageShapeForType<short>   (evt, src, key, shape) ) return true;
 
   const std::string msg = "Image shape is tested for double, uint16_t, int, float, uint8_t, int16_t, short and is not defined in the event(...)\nfor source:" 
                         + boost::lexical_cast<std::string>(src) + " key:" + key + "\nEXIT psana...";
   MsgLogRoot(error, msg);
-  throw std::runtime_error("EXIT psana...");
+  //throw std::runtime_error("EXIT psana...");
+  return false;
 }
 
 //--------------------

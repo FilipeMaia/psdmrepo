@@ -102,8 +102,8 @@ public:
 protected:
 
   void printInputParameters();
-  void setCollectionMode(Event& evt);
-  void collectStat(Event& evt);
+  bool setCollectionMode(Event& evt);
+  bool collectStat(Event& evt);
   void resetStatArrays();
   void procStatArrays();
   void saveArrInFile(std::string& fname, double* arr);
@@ -124,7 +124,8 @@ private:
 
   double         m_hot_thr;
   unsigned       m_print_bits;   
-  unsigned long  m_count;  // number of events from the beginning of job
+  unsigned long  m_count;     // number of found images
+  unsigned long  m_count_ev;  // number of events from the beginning of job
   unsigned long  m_nev_stage1;
   unsigned long  m_nev_stage2;
   double         m_gate_width1;

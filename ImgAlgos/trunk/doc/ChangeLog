@@ -11,9 +11,12 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-19
 2013-11-18 Mikhail S. Dubrovin
 - in src/ImgAverage.cpp - do not add the run number for file name extention ".txt"
-
+- in ImgAverage and GlobalMethods - do correct initialization and image counting 
+       if images are not presented in all events. 
+	
 Tag: V00-03-18
 2013-11-12 Mikhail S. Dubrovin
 - in include/GlobalMethods.h add int16 to save in tiff

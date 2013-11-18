@@ -124,7 +124,7 @@ private:
   unsigned eventCounterSinceConfigure(PSEvt::Event& evt); // returns 15-bits (32767)  integer value: event counter since Configure.
   void printSizeOfTypes();
   /// Define the shape or throw message that can not do that.
-  void defineImageShape(PSEvt::Event& evt, const PSEvt::Source& m_str_src, const std::string& m_key, unsigned* shape);
+  bool defineImageShape(PSEvt::Event& evt, const PSEvt::Source& m_str_src, const std::string& m_key, unsigned* shape);
   void saveTextInFile(const std::string& fname, const std::string& text, bool print_msg);
   std::string stringInstrument(PSEnv::Env& env);
   std::string stringExperiment(PSEnv::Env& env);
