@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-29-08
+2013-11-13 Andy Salnikov
+- order cspad ElementV1 quadrants
+
 Tag: V00-29-07
 2013-11-12 Andy Salnikov
 - upgrade to pdsdata V07-02-07

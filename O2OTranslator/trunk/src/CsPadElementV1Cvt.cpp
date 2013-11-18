@@ -145,9 +145,11 @@ CsPadElementV1Cvt::fillContainers(hdf5pp::Group group,
   float commonMode[nQuad][nSect];
 
   // move the data
-  for ( unsigned iq = 0 ; iq != nQuad ; ++ iq ) {
+  for ( unsigned xq = 0 ; xq != nQuad ; ++ xq ) {
 
-    const Pds::CsPad::ElementV1& pdselem = data.quads(cfg, iq);
+    const Pds::CsPad::ElementV1& pdselem = data.quads(cfg, xq);
+    
+    int iq = pdselem.quad();
 
     // copy frame info
     elems[iq] = H5Type(pdselem) ;
