@@ -71,7 +71,8 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         self.cbx_dark_more = QtGui.QCheckBox('More options')
         self.cbx_dark_more.setChecked( cp.dark_more_opts.value() )
  
-        self.but_srcs = QtGui.QPushButton( 'Sources' )
+        self.but_srcs = QtGui.QPushButton( 'Sources DB' )
+        self.but_sxtc = QtGui.QPushButton( 'Sources XTC' )
         self.but_flst = QtGui.QPushButton( 'O/Files' )
         self.but_fxtc = QtGui.QPushButton( 'xtc Files' )
         self.but_fbro = QtGui.QPushButton( 'File Browser' )
@@ -81,6 +82,7 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         self.hbox = QtGui.QHBoxLayout()
         self.hbox.addWidget(self.but_fxtc)
         self.hbox.addWidget(self.but_srcs)
+        self.hbox.addWidget(self.but_sxtc)
         self.hbox.addWidget(self.but_flst)
         self.hbox.addWidget(self.but_show)
         self.hbox.addWidget(self.cbx_dark_more)
@@ -108,6 +110,7 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
 
         self.connect(self.cbx_dark_more  , QtCore.SIGNAL('stateChanged(int)'), self.on_cbx ) 
         self.connect( self.but_srcs, QtCore.SIGNAL('clicked()'), self.on_but_srcs )
+        self.connect( self.but_sxtc, QtCore.SIGNAL('clicked()'), self.on_but_sxtc )
         self.connect( self.but_flst, QtCore.SIGNAL('clicked()'), self.on_but_flst )
         self.connect( self.but_fxtc, QtCore.SIGNAL('clicked()'), self.on_but_fxtc )
         self.connect( self.but_fbro, QtCore.SIGNAL('clicked()'), self.on_but_fbro )
@@ -123,12 +126,15 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
 
     def showToolTips(self):
         pass
-        #self.but_run .setToolTip('Select the run for calibration.')
-        #self.but_go  .setToolTip('Begin data processing for calibration.')
-        #self.but_stop.setToolTip('Emergency stop data processing.')
-        #self.edi_from.setToolTip('Type in the run number \nas a lower limit of the validity range.')
-        #self.edi_to  .setToolTip('Type in the run number or "end"\nas an upper limit of the validity range.')
-
+        self.but_srcs.setToolTip('Show data sources from DB')
+        self.but_sxtc.setToolTip('Show data types and sources from xtc file scan')
+        self.but_flst.setToolTip('Show status list of output files')
+        self.but_fxtc.setToolTip('Show input xtc files for run %s' % self.run_number)
+        self.but_fbro.setToolTip('Start text file browser in separate window')
+        self.but_plot.setToolTip('Start image plot browser in separate window')
+        self.but_show.setToolTip('Show commands for file deployment')
+        self.cbx_dark_more.setToolTip('Add more buttons with other options')
+        #self..setToolTip('')
 
     def setFrame(self):
         self.frame = QtGui.QFrame(self)
@@ -160,9 +166,10 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         width = 80
 
         self.but_srcs.setFixedWidth(width)
+        self.but_sxtc.setFixedWidth(90)
         self.but_flst.setFixedWidth(width)
         self.but_fxtc.setFixedWidth(width)
-        self.but_fbro.setFixedWidth(100)
+        self.but_fbro.setFixedWidth(90)
         self.but_plot.setFixedWidth(width)
         self.but_show.setFixedWidth(width)
 
@@ -172,6 +179,7 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         #self.setContentsMargins (QtCore.QMargins(0,5,0,0))
 
         #self.but_srcs.setVisible( self.cbx_dark_more.isChecked() )
+        #self.but_sxtc.setVisible( self.cbx_dark_more.isChecked() )
         #self.but_flst.setVisible( self.cbx_dark_more.isChecked() )
         #self.but_fxtc.setVisible( self.cbx_dark_more.isChecked() )
         #self.but_show.setVisible( self.cbx_dark_more.isChecked() )
@@ -216,15 +224,21 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         self.close()
 
 
-
     def on_but_srcs(self) :
+        """Print sources from RegDB
+        """
         self.exportLocalPars()
-
-        txt = '\n' + 50*'-' + '\nData Types and Sources from xtc scan of the\n' \
-            + blsp.txt_list_of_types_and_sources() \
-            + '\n' + 50*'-' + '\nSources from DB:\n' \
+        txt = '\n' + 50*'-' + '\nSources from DB:\n' \
             + fnm.txt_of_sources_in_run(int(self.run_number))
+        logger.info(txt, __name__)
 
+
+    def on_but_sxtc(self) :
+        """Print sources from XTC scan log
+        """
+        self.exportLocalPars()
+        txt = '\n' + 50*'-' + '\nData Types and Sources from xtc scan of the\n' \
+            + blsp.txt_list_of_types_and_sources()
         logger.info(txt, __name__)
 
 
@@ -333,9 +347,14 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
                 logger.info(msg, __name__)
 
                 self.arr = gu.get_array_from_file( fname )
-                print 'self.arr:\n', self.arr
-                print 'self.arr.shape: ', self.arr.shape
+                if self.arr is None :
+                    logger.info('Array from file is None', __name__)
+                    return
 
+                #print 'self.arr:\n', self.arr
+                msg = 'self.arr.shape: %s' % str(self.arr.shape)
+                logger.info(msg, __name__)
+ 
             fname_lower = fname.lower()
 
             #print 'fname_lower =', fname_lower

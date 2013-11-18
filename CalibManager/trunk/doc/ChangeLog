@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2013-11-18 Mikhail S. Dubrovin
+- code of many modules is significantly changed in order to
+	have dark image averaging for any set of detectors simultaneously.
+
 2013-11-05 Mikhail S. Dubrovin
 - add access to DB on data files 
 A       src/RegDBUtils.py

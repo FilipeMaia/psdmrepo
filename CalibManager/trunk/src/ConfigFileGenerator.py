@@ -73,8 +73,8 @@ class ConfigFileGenerator :
     def make_psana_cfg_file_for_peds_scan (self) :
         self.path_in  = apputils.AppDataPath('CalibManager/scripts/psana-scan.cfg').path()
         self.d_subs   = {'FNAME_XTC' : self.path_to_data_files(),
-                         'SKIP'      : 'IS_NOT_USED',
-                         'EVENTS'    : 'FOR_ALL_EVENTS',
+                         'SKIP'      : '0',
+                         'EVENTS'    : '10',
                          }
 
         txt_cfg = self.text_for_section ()
@@ -115,6 +115,7 @@ class ConfigFileGenerator :
     def cfg_file_body_for_peds_aver(self) :
 
         txt_cfg_body   = '#Module parameters'
+        self.ind = 0
 
         for det_name in cp.list_of_dets_selected() :
             lst = fnm.list_of_sources_in_run_for_selected_detector(det_name)
@@ -124,7 +125,8 @@ class ConfigFileGenerator :
 
             if self.do_test_print : print 'Detector selected: %10s' % (det_name), '  sources:', lst
 
-            for self.ind, (self.source, self.fname_ave, self.fname_rms, self.fname_mask) in enumerate(zip(lst, list_path_peds_ave, list_path_peds_rms, list_path_hotpix_mask)) :
+            for (self.source, self.fname_ave, self.fname_rms, self.fname_mask) in zip(lst, list_path_peds_ave, list_path_peds_rms, list_path_hotpix_mask) :
+                self.ind += 1 
                 #print self.ind, self.source, self.fname_ave, self.fname_rms
 
                 # list_of_dets   = ['CSPAD', 'CSPAD2x2', 'Princeton', 'pnCCD', 'Tm6740', 'Opal2000', 'Opal4000', 'Acqiris'] 
