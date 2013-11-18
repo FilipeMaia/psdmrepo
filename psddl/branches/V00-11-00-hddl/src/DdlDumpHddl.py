@@ -478,16 +478,21 @@ class DdlDumpHddl ( object ) :
 
                     tags = []
                     if 'vlen' in attr.tags: tags.append('vlen')
+                    if 'external' in attr.tags: tags.append('external')
                     if attr.method != attr.name: tags.append('method({0})'.format(attr.method))
                     tags = _fmttags1(tags)
                     if tags: tags = ' '+tags
 
                     type = ""
-                    if attr._type and attr._method().type != attr._type: 
+                    if 'external' in attr.tags:
+                        type = attr._type.name+' '
+                    elif attr._type and attr._method().type != attr._type:
                         type = attr._type.name+' '
 
                     shape = ''
-                    if attr._shape and (not attr._method().attribute or attr._method().attribute.shape != attr.shape):
+                    if 'external' in attr.tags:
+                        shape = _dims(attr._shape.dims)
+                    elif attr._shape and (not attr._method().attribute or attr._method().attribute.shape != attr.shape):
                         shape = _dims(attr._shape.dims)
                     elif attr._rank is not None and attr._rank > 0 and attr._method().rank != attr._rank:
                         shape = '[]'*attr._rank

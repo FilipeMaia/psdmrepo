@@ -11,6 +11,9 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2013-11-18 Andy Salnikov  (on branch V00-11-00-hddl)
+- DdlDumpHddl: add support for external tag in HDF5 attributes
+
 2013-11-08 Andy Salnikov  (on branch V00-11-00-hddl)
 - fix unit test
 
