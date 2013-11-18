@@ -266,14 +266,14 @@ class ConfigParametersForApp ( ConfigParameters ) :
         self.list_of_dets   = ['CSPAD', 'CSPAD2x2', 'Princeton', 'pnCCD', 'Tm6740', 'Opal2000', 'Opal4000', 'Acqiris']
         self.list_of_dets_lower = [det.lower() for det in self.list_of_dets]
 
-        self.list_of_types  = ['Psana::CsPad::DataV',
-                               'Psana::CsPad2x2::ElementV',
-                               'Psana::Princeton::FrameV',
-                               'Psana::PNCCD::FullFrameV',
-                               'Psana::Camera::FrameV',
-                               'Psana::Camera::FrameV',
-                               'Psana::Camera::FrameV',
-                               'Psana::Acqiris::DataDesc']
+        self.list_of_types  = ['CsPad::DataV',
+                               'CsPad2x2::ElementV',
+                               'Princeton::FrameV',
+                               'PNCCD::FullFrameV',
+                               'Camera::FrameV',
+                               'Camera::FrameV',
+                               'Camera::FrameV',
+                               'Acqiris::DataDesc']
         self.dict_of_det_data_types = dict( zip(self.list_of_dets, self.list_of_types) )
         
 #-----------------------------
@@ -296,6 +296,13 @@ class ConfigParametersForApp ( ConfigParameters ) :
 
     def list_of_dets_selected( self ) :
         return [det for det,state in zip(self.list_of_dets,self.det_cbx_states_list) if state.value()]
+
+#-----------------------------
+
+    def print_dict_of_det_data_types ( self ) :
+        print 'List of detector names and associated types:'
+        for det, type in self.dict_of_det_data_types.items():
+            print '%10s : %s' % (det, type)
 
 #-----------------------------
 

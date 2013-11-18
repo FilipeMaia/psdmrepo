@@ -168,8 +168,6 @@ class BatchJobPedestals (BatchJob) :
         list_of_fnames = fnm.get_list_of_files_peds_aver() \
              + fnm.get_list_of_files_for_all_detectors_and_sources(fnm.path_peds_ave()) \
              + fnm.get_list_of_files_for_all_detectors_and_sources(fnm.path_peds_rms())
-             #+ blsp.get_list_of_files_for_all_sources(fnm.path_peds_ave()) \
-             #+ blsp.get_list_of_files_for_all_sources(fnm.path_peds_rms())
         return list_of_fnames
 
 #-----------------------------

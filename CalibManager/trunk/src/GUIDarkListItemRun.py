@@ -313,16 +313,14 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
 
         #cp.blsp.print_list_of_types_and_sources()
 
-        list_of_sources = cp.blsp.get_list_of_sources()
-        list_of_types   = cp.blsp.get_list_of_types()
-        list_of_files   = cp.blsp.get_list_of_files_for_all_sources(fnm.path_peds_ave())
+        list_of_types, list_of_sources = cp.blsp.list_of_types_and_sources_for_selected_detectors()
+        list_of_files = gu.get_list_of_files_for_list_of_insets( fnm.path_peds_ave(), list_of_sources )
 
         list_of_deploy_commands = []
 
         for file, type, source in zip(list_of_files, list_of_types, list_of_sources) :
 
-            pos1 = source.find('DetInfo(') + 8
-            src  = source[pos1:-1]
+            src  = source
 
             pos1 = type.find('::')
             typ  = type[:pos1] + '::CalibV1'

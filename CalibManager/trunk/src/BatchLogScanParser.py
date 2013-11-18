@@ -28,6 +28,7 @@ __version__ = "$Revision: 4 $"
 #--------------------------------
 import sys
 import os
+from time import sleep
 
 from ConfigParametersForApp import cp
 from Logger                 import logger
@@ -54,63 +55,71 @@ class BatchLogScanParser :
         self.pattern                = 'N/A'
         self.det_names_parsed       = None 
         self.path                   = None 
-        self.is_parsed              = False 
-
-
-#-----------------------------
-
-    def print_dict_of_det_data_types (self) :
-        print 'List of detector names and associated types:'
-        for det, type in self.dict_of_det_data_types.items():
-            print '%10s : %s' % (det, type)
 
 #-----------------------------
 
     def parse_batch_log_peds_scan (self) :
+        """Psrses log file for dark run scan and makes lists:
+           self.list_of_types and self.list_of_sources for all psana data types in file.
+        """
 
-        if  self.is_parsed \
-        and self.path == fnm.path_peds_scan_batch_log() \
-        and self.det_names_parsed == self.det_name.value(): return
+        if  self.path == fnm.path_peds_scan_batch_log() : return
+        #and self.det_names_parsed == self.det_name.value(): return
+        #self.det_names_parsed = self.det_name.value()
+
 
         #if self.det_name.value == self.det_name.value_def() : return
-
-        self.path = fnm.path_peds_scan_batch_log()
-
-        if not os.path.lexists(self.path) :
-            logger.info('\nThe requested scan log file: ' + self.path + '\nIS NOT AVAILABLE!', __name__)         
-            return
 
         self.list_of_detinfo_sources = []
         self.list_of_sources         = []
         self.list_of_types           = []
 
-        for det_name in self.list_of_dets_selected() :
+        if not self.make_set_of_lines_from_file_for_pattern() : return
+        self.make_list_of_types_and_sources()
 
-            self.pattern = self.dict_of_det_data_types[det_name]
+        #print 'List of types and sources:'
+        #for type, src in zip(self.list_of_types, self.list_of_sources) :
+        #    msg = '    %30s : %s' % (type, src)
+        #    print msg
+    
 
+        #for det_name in self.list_of_dets_selected() :
+            #self.pattern = self.dict_of_det_data_types[det_name]
             # print 'Parse file: %s for detector: %s and pattern: %s' % (self.path, det_name, self.pattern)
+            #cp.print_dict_of_det_data_types()
+            #self.parse_list_of_lines()
 
-            #self.print_dict_of_det_data_types()
-            self.parse_scan_log()
-        #self.print_list_of_types_and_sources()
-        self.is_parsed = True
-        self.det_names_parsed = self.det_name.value()
-        
 #-----------------------------
 
-    def parse_scan_log (self) :
+    def make_set_of_lines_from_file_for_pattern(self, pattern = 'EventKey(type=Psana' ) :
+        """Makse self.list_of_found_lines - a set of lines from file specified containing pattern
+        """
 
-        list_of_found_lines  = []
+        self.path = fnm.path_peds_scan_batch_log()
+
+        if not os.path.lexists(self.path) :
+            logger.info('\nThe requested file: ' + self.path + '\nIS NOT AVAILABLE!', __name__)
+            return False
+
+        self.list_of_found_lines  = []
 
         fin = open(self.path, 'r')
         for line in fin :
-            if self.pattern in line :
-                if line in list_of_found_lines : continue # if the line is already in the list                
-                list_of_found_lines.append(line)
+            if pattern in line :
+                line_st = line.rstrip('\n').strip(' ')               
+                if line_st in self.list_of_found_lines : continue # if the line is already in the list
+                self.list_of_found_lines.append(line_st)
+                #print 'found line:', line_st
 
         fin.close() 
 
-        for line in list_of_found_lines : 
+        return True
+
+#-----------------------------
+
+    def make_list_of_types_and_sources (self) :
+
+        for line in self.list_of_found_lines : 
 
             pos1 = line.find('type=Psana::') + 12
             wid1 = line[pos1:].find(',')
@@ -133,7 +142,6 @@ class BatchLogScanParser :
             self.list_of_sources.append(src)
             #print 'pos3, wid3, pen3, src:', pos3, wid3, pen3, src
             
-
 #-----------------------------
 
     def print_list_of_types_and_sources (self) :
@@ -159,39 +167,56 @@ class BatchLogScanParser :
 
 #-----------------------------
 
-    def get_list_of_detinfo_sources (self) :
-        #if self.list_of_sources == [] : return None
-        self.parse_batch_log_peds_scan()        
-        return self.list_of_detinfo_sources
-
-
     def get_list_of_sources (self) :
-        #if self.list_of_sources == [] : return None
         self.parse_batch_log_peds_scan()        
         return self.list_of_sources
 
 
     def get_list_of_types (self) :
-        #if self.list_of_types == [] : return None
         self.parse_batch_log_peds_scan()
         return self.list_of_types
 
 
-    def list_of_sources_for_detector (self, det_selected) :
-        """Returns the list of detectors in run for selected detector. For example, for CSPAD returns ['CxiDs1.0:Cspad.0', 'CxiDsd.0:Cspad.0']
-        """
-        pattern = det_selected.lower() + '.'
-        return [src for src in self.get_list_of_sources() if src.lower().find(pattern) != -1]
+    def get_list_of_type_sources (self) :
+        self.parse_batch_log_peds_scan()
+        return zip(self.list_of_types, self.list_of_sources)
 
 
-    def list_of_types_for_detector (self, det_selected) :
-        """Returns the list of detectors in run for selected detector. For example, for CSPAD returns ['CxiDs1.0:Cspad.0', 'CxiDsd.0:Cspad.0']
+    def list_of_types_and_sources_for_detector (self, det_name) :
+        pattern_det = det_name.lower() + '.'
+        pattern_type = self.dict_of_det_data_types[det_name]
+        #print 'pattern_det, pattern_type', pattern_det, pattern_type
+
+        list_of_types_for_det=[]
+        list_of_srcs_for_det=[]
+        for type,src in self.get_list_of_type_sources() :
+            #print '  type, src: %24s  %s' % (type,src)
+            if type.find(pattern_type) == -1 : continue
+            if src.lower().find(pattern_det) == -1 : continue
+            list_of_types_for_det.append(type)
+            list_of_srcs_for_det.append(src)
+        #print 'list of types and sources for detector %s:\n  %s\n  %s' \
+        #      % (det_name, str(list_of_types_for_det), str(list_of_srcs_for_det))  
+        return list_of_types_for_det, list_of_srcs_for_det
+
+
+    def list_of_sources_for_detector (self, det_name) :
+        """Returns the list of sources in run for specified detector.
         """
-        pattern = det_selected.lower() + '.'
-        return [type for type,src in (self.get_list_of_types(), self.get_list_of_sources()) if src.lower().find(pattern) != -1]
+        lst_types, lst_srcs = self.list_of_types_and_sources_for_detector(det_name)
+        return lst_srcs 
+
+
+    def list_of_types_for_detector (self, det_name) :
+        """Returns the list of types in run for specified detector.
+        """
+        lst_types, lst_srcs = self.list_of_types_and_sources_for_detector(det_name)
+        return lst_types 
 
 
     def list_of_sources_for_selected_detectors (self) :
+        """Returns the list of sources in run for all selected detectors.
+        """
         lst_src = []
         for det_name in cp.list_of_dets_selected() :
             lst_src += self.list_of_sources_for_detector(det_name)
@@ -199,21 +224,28 @@ class BatchLogScanParser :
 
 
     def list_of_types_for_selected_detectors (self) :
+        """Returns the list of types in run for all selected detectors.
+        """
         lst_types = []
         for det_name in cp.list_of_dets_selected() :
             lst_types += self.list_of_types_for_detector(det_name)
         return lst_types
 
-#-----------------------------
 
-    def get_list_of_files_for_all_sources(self, path1='work/file.dat') :
-        """From pattern of the path it makes a list of files with indexes for all sources."""
-        #self.print_list_of_types_and_sources()
-        return gu.get_list_of_files_for_list_of_insets( path1, self.get_list_of_sources() )
+    def list_of_types_and_sources_for_selected_detectors (self) :
+        """Returns the list of types and sources in run for selected detector.
+        For example, for CSPAD returns
+        ['Psana::CsPad::DataV2', 'Psana::CsPad::DataV2'],
+        ['CxiDs1.0:Cspad.0',     'CxiDsd.0:Cspad.0']
+        """
+        lst_types = []
+        lst_srcs  = []
 
-        #len_of_list = len(self.list_of_sources)
-        ##print 'len_of_list =', len_of_list
-        #return gu.get_list_of_enumerated_file_names(path1, len_of_list)
+        for det_name in cp.list_of_dets_selected() :
+            lst_t, lst_s = self.list_of_types_and_sources_for_detector(det_name)
+            lst_types += lst_t
+            lst_srcs += lst_s
+        return lst_types, lst_srcs
 
 #-----------------------------
 #-----------------------------
