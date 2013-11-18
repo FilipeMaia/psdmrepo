@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-12-07
+2013-11-18 Andy Salnikov
+- add support for external HDF5 attributes
+
 Tag: V00-12-06
 2013-11-15 Andy Salnikov
 - modify backends to allow types/consts/enums at the global namespace

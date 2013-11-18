@@ -1026,7 +1026,7 @@ template <typename Config>
 {% extends "hdf5.tmpl?attr_access_method_super" %}
 {% block body %}
   if (not m_ds_{{ds.name}}) read_ds_{{ds.name}}();
-  boost::shared_ptr<{{attr_type}}> ptr(m_ds_{{ds.name}}, m_ds_{{ds.name}}->{{attr.name}});
+  boost::shared_ptr<{{attr_type}}> ptr(m_ds_{{ds.name}}, m_ds_{{ds.name}}->{{attr.name}}{{attr_index}});
   return make_ndarray(ptr, {{shape}});
 {% endblock %}
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::

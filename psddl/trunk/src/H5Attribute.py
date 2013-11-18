@@ -85,6 +85,8 @@ class H5Attribute ( object ) :
     def _method(self):
         '''find corresponding method object and return it'''
         
+        if 'external' in self.tags: return None
+        
         if not self.parent: raise ValueError('attribute has no parent dataset, attr=%s' % self.name)
 
         # find pstype
@@ -98,11 +100,18 @@ class H5Attribute ( object ) :
         return method
 
     @property
+    def external(self):
+        '''External attribute means that it has no corresponding method and 
+        will be initialized separately'''
+        return 'external' in self.tags
+
+    @property
     def type(self):
         """Get attribute type"""
         
         if self._type is None :
-            self._type = self._method().type
+            meth = self._method()
+            if meth: self._type = meth.type
         return self._type
 
     @property
@@ -117,7 +126,8 @@ class H5Attribute ( object ) :
         """Get attribute rank"""
 
         if self._rank < 0:
-            self._rank = self._method().rank
+            meth = self._method()
+            if meth: self._rank = self._method().rank
         return self._rank
 
     @property
@@ -125,8 +135,10 @@ class H5Attribute ( object ) :
         """Get attribute shape"""
 
         if self._shape is None:
-            attr = self._method().attribute
-            if attr: self._shape = attr.shape
+            meth = self._method()
+            if meth: 
+                attr = meth.attribute
+                if attr: self._shape = attr.shape
         return self._shape
 
     def sizeIsConst(self):

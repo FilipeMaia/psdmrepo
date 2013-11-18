@@ -134,23 +134,30 @@ class DSAttribute(object):
         else:
             atype = attr.stor_type.name
 
+        decls = []
         if attr.rank == 0:
-            return [T('$atype $aname;')(locals())]
+            decls += [T('$atype $aname;')(locals())]
         else:
             if atype == 'char':
                 if attr.sizeIsVlen():
-                    return [T('$atype* $aname;')(locals())]
+                    decls += [T('$atype* $aname;')(locals())]
                 else:
                     size = attr.shape.size()
-                    return [T('$atype $aname[$size];')(locals())]
+                    decls += [T('$atype $aname[$size];')(locals())]
             else:
                 if attr.sizeIsVlen(): 
-                    return [T('size_t vlen_$aname;')(locals()), T('$atype* $aname;')(locals())]
+                    decls += [T('size_t vlen_$aname;')(locals()), T('$atype* $aname;')(locals())]
                 elif attr.sizeIsConst():
-                    size = attr.shape.size()
-                    return [T('$atype $aname[$size];')(locals())]
+                    dims = attr.shape.decl()
+                    decls += [T('$atype $aname$dims;')(locals())]
                 else:
-                    return [T('$atype* $aname;')(locals())]
+                    decls += [T('$atype* $aname;')(locals())]
+                    
+        if attr.external:
+            # need to declare special initializer method for these
+            decls += [T('void init_attr_$name();')[attr]]
+            
+        return decls
 
 
     def ds_attr_init(self):
@@ -165,32 +172,37 @@ class DSAttribute(object):
 
         # initializer
         dst = attr.name
-        if attr.rank == 0:
-            src = 'psanaobj.' + attr.method + '()'
-            return [T('$dst($src)')(locals())]
-        else:
-            if atype == 'char':
-                if attr.sizeIsVlen():
-                    return [T('$dst(0)')(locals())]
+        if not attr.external:
+            if attr.rank == 0:
+                src = 'psanaobj.' + attr.method + '()'
+                return [T('$dst($src)')(locals())]
             else:
-                if attr.sizeIsVlen():
-                    return [T('vlen_$dst(0)')(locals()), T('$dst(0)')(locals())]
-                elif not attr.sizeIsConst():
-                    return [T('$dst(0)')(locals())]
+                if atype == 'char':
+                    if attr.sizeIsVlen():
+                        return [T('$dst(0)')(locals())]
+                else:
+                    if attr.sizeIsVlen():
+                        return [T('vlen_$dst(0)')(locals()), T('$dst(0)')(locals())]
+                    elif not attr.sizeIsConst():
+                        return [T('$dst(0)')(locals())]
         return []
                         
     def ds_attr_initcode(self):
         '''Returns list of statements to initialize attribute in dataset constructor'''
 
-        # base type
         attr = self.attr
+
+        if attr.external:
+            return [T("  init_attr_$name();")[attr]]
+
+        # base type
         if not attr.stor_type.basic:
             atype = _h5ds_typename(attr)
         else:
             atype = attr.stor_type.name
 
         # initializer
-        src_method = attr.method;
+        src_method = attr.method
         dst = attr.name
         dst_type = atype
         if attr.rank > 0:
@@ -205,6 +217,7 @@ class DSAttribute(object):
                 if attr.sizeIsVlen():
                     return [_TEMPL('copy_vlen_data').render(locals())]
                 elif attr.sizeIsConst():
+                    dst = dst + '[0]' * (len(attr.shape.dims)-1)
                     return [_TEMPL('copy_data').render(locals())]
                 else:
                     return [_TEMPL('malloc_copy_data').render(locals())]
@@ -757,6 +770,7 @@ class SchemaAbstractType(SchemaType):
                         shape = T("m_ds_$dsName->vlen_$attrName")(dsName=ds.name, attrName=attr.name)
                     else:
                         shape = _interpolate(str(attr.shape), type)
+                        attr_index = '[0]' * (len(attr.shape.dims)-1)
                     impl = _TEMPL('attr_access_method_array_basic').render(locals())
                     
                 elif attr.type.value_type:

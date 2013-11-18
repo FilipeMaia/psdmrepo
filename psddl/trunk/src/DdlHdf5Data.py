@@ -175,13 +175,19 @@ class DdlHdf5Data ( object ) :
         # headers for externally implemented schemas or datasets, headers for datasets are included
         # into cpp file (they are likely to be needed in inplementation of make_Class functions),
         # headers for external datasets are included into header.
+        cpp_headers = set()
+        inc_headers = set()
         for pkg in model.packages():
             for schema in _schemas(pkg):
-                if 'external' in schema.tags:
-                    if schema.tags['external']: print >>self.cpp, "#include \"%s\"" % schema.tags['external']
+                cpp_headers.add(schema.tags.get('external'))
                 for ds in schema.datasets:
-                    if 'external' in ds.tags:
-                        if ds.tags['external']: print >>self.inc, "#include \"%s\"" % ds.tags['external']
+                    inc_headers.add(ds.tags.get('external'))
+                    for attr in ds.attributes:
+                        cpp_headers.add(attr.tags.get('external'))
+        for header in inc_headers:
+            if header: print >>self.inc, T('#include "$header"')(locals())
+        for header in cpp_headers:
+            if header: print >>self.cpp, T('#include "$header"')(locals())
 
         if self.top_pkg : 
             ns = "namespace %s {" % self.top_pkg
