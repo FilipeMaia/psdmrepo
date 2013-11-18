@@ -20,6 +20,7 @@
 //-----------------
 #include <fstream>
 #include <cmath>
+#include <boost/filesystem.hpp>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -147,7 +148,9 @@ ImgAverage::beginJob(Event& evt, Env& env)
 void 
 ImgAverage::beginRun(Event& evt, Env& env)
 {
-  m_fname_ext = "-r" + stringRunNumber(evt) + ".dat";
+  boost::filesystem::path path = m_aveFile;
+  if ( path.extension().string() == string(".txt") ) m_fname_ext = "";
+  else                                               m_fname_ext = "-r" + stringRunNumber(evt) + ".dat";
 }
 
 /// Method which is called at the beginning of the calibration cycle
