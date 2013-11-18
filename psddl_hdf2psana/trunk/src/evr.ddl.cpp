@@ -10,8 +10,6 @@
 #include "PSEvt/DataProxy.h"
 #include "psddl_hdf2psana/Exceptions.h"
 #include "psddl_hdf2psana/evr.h"
-#include "psddl_hdf2psana/evr.h"
-#include "psddl_hdf2psana/evr.h"
 namespace psddl_hdf2psana {
 namespace EvrData {
 

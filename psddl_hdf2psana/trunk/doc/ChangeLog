@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-07-03
+2013-11-18 Andy Salnikov
+- add sections attribute to cspad config types
+- this needs latest tag of psddl (V00-12-07 or better)
+
 Tag: V00-07-02
 2013-11-12 Andy Salnikov
 - small improvement to ddl_* script

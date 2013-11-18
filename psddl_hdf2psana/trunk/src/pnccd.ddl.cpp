@@ -10,8 +10,6 @@
 #include "PSEvt/DataProxy.h"
 #include "psddl_hdf2psana/Exceptions.h"
 #include "psddl_hdf2psana/pnccd.h"
-#include "psddl_hdf2psana/pnccd.h"
-#include "psddl_hdf2psana/pnccd.h"
 namespace psddl_hdf2psana {
 namespace PNCCD {
 

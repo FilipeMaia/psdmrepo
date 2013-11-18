@@ -10,7 +10,6 @@
 #include "PSEvt/DataProxy.h"
 #include "psddl_hdf2psana/Exceptions.h"
 #include "psddl_hdf2psana/cspad.h"
-#include "psddl_hdf2psana/cspad.h"
 namespace psddl_hdf2psana {
 namespace CsPad {
 
@@ -222,7 +221,7 @@ ns_CsPadGainMapCfg_v0::dataset_data::dataset_data(const Psana::CsPad::CsPadGainM
 {
   {
     const __typeof__(psanaobj.gainMap())& arr = psanaobj.gainMap();
-    std::copy(arr.begin(), arr.begin()+35890, gainMap);
+    std::copy(arr.begin(), arr.begin()+35890, gainMap[0]);
   }
 }
 
@@ -231,7 +230,7 @@ ns_CsPadGainMapCfg_v0::dataset_data::~dataset_data()
 }
 ndarray<const uint16_t, 2> CsPadGainMapCfg_v0::gainMap() const {
   if (not m_ds_data) read_ds_data();
-  boost::shared_ptr<uint16_t> ptr(m_ds_data, m_ds_data->gainMap);
+  boost::shared_ptr<uint16_t> ptr(m_ds_data, m_ds_data->gainMap[0]);
   return make_ndarray(ptr, ColumnsPerASIC,MaxRowsPerASIC);
 }
 void CsPadGainMapCfg_v0::read_ds_data() const {
@@ -1149,6 +1148,9 @@ hdf5pp::Type ns_ConfigV2_v0_dataset_config_stored_type()
   hsize_t _array_type_quads_shape[] = { 4 };
   hdf5pp::ArrayType _array_type_quads = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<CsPad::ns_ConfigV1QuadReg_v0::dataset_data>::stored_type(), 1, _array_type_quads_shape);
   type.insert("quads", offsetof(DsType, quads), _array_type_quads);
+  hsize_t _array_type_sections_shape[] = { 4, 8 };
+  hdf5pp::ArrayType _array_type_sections = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<int8_t>::stored_type(), 2, _array_type_sections_shape);
+  type.insert("sections", offsetof(DsType, sections), _array_type_sections);
   return type;
 }
 
@@ -1177,6 +1179,9 @@ hdf5pp::Type ns_ConfigV2_v0_dataset_config_native_type()
   hsize_t _array_type_quads_shape[] = { 4 };
   hdf5pp::ArrayType _array_type_quads = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<CsPad::ns_ConfigV1QuadReg_v0::dataset_data>::native_type(), 1, _array_type_quads_shape);
   type.insert("quads", offsetof(DsType, quads), _array_type_quads);
+  hsize_t _array_type_sections_shape[] = { 4, 8 };
+  hdf5pp::ArrayType _array_type_sections = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<int8_t>::native_type(), 2, _array_type_sections_shape);
+  type.insert("sections", offsetof(DsType, sections), _array_type_sections);
   return type;
 }
 
@@ -1207,6 +1212,7 @@ ns_ConfigV2_v0::dataset_config::dataset_config(const Psana::CsPad::ConfigV2& psa
   for (size_t i = 0, len = 4; i != len; ++ i) {
     quads[i] = CsPad::ns_ConfigV1QuadReg_v0::dataset_data(psanaobj.quads(i));
   }
+  init_attr_sections();
 }
 
 ns_ConfigV2_v0::dataset_config::~dataset_config()
@@ -1395,6 +1401,9 @@ hdf5pp::Type ns_ConfigV3_v0_dataset_config_stored_type()
   hsize_t _array_type_quads_shape[] = { 4 };
   hdf5pp::ArrayType _array_type_quads = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<CsPad::ns_ConfigV1QuadReg_v0::dataset_data>::stored_type(), 1, _array_type_quads_shape);
   type.insert("quads", offsetof(DsType, quads), _array_type_quads);
+  hsize_t _array_type_sections_shape[] = { 4, 8 };
+  hdf5pp::ArrayType _array_type_sections = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<int8_t>::stored_type(), 2, _array_type_sections_shape);
+  type.insert("sections", offsetof(DsType, sections), _array_type_sections);
   return type;
 }
 
@@ -1427,6 +1436,9 @@ hdf5pp::Type ns_ConfigV3_v0_dataset_config_native_type()
   hsize_t _array_type_quads_shape[] = { 4 };
   hdf5pp::ArrayType _array_type_quads = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<CsPad::ns_ConfigV1QuadReg_v0::dataset_data>::native_type(), 1, _array_type_quads_shape);
   type.insert("quads", offsetof(DsType, quads), _array_type_quads);
+  hsize_t _array_type_sections_shape[] = { 4, 8 };
+  hdf5pp::ArrayType _array_type_sections = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<int8_t>::native_type(), 2, _array_type_sections_shape);
+  type.insert("sections", offsetof(DsType, sections), _array_type_sections);
   return type;
 }
 
@@ -1462,6 +1474,7 @@ ns_ConfigV3_v0::dataset_config::dataset_config(const Psana::CsPad::ConfigV3& psa
   for (size_t i = 0, len = 4; i != len; ++ i) {
     quads[i] = CsPad::ns_ConfigV1QuadReg_v0::dataset_data(psanaobj.quads(i));
   }
+  init_attr_sections();
 }
 
 ns_ConfigV3_v0::dataset_config::~dataset_config()
@@ -1668,6 +1681,9 @@ hdf5pp::Type ns_ConfigV4_v0_dataset_config_stored_type()
   hsize_t _array_type_quads_shape[] = { 4 };
   hdf5pp::ArrayType _array_type_quads = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<CsPad::ns_ConfigV2QuadReg_v0::dataset_data>::stored_type(), 1, _array_type_quads_shape);
   type.insert("quads", offsetof(DsType, quads), _array_type_quads);
+  hsize_t _array_type_sections_shape[] = { 4, 8 };
+  hdf5pp::ArrayType _array_type_sections = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<int8_t>::stored_type(), 2, _array_type_sections_shape);
+  type.insert("sections", offsetof(DsType, sections), _array_type_sections);
   return type;
 }
 
@@ -1700,6 +1716,9 @@ hdf5pp::Type ns_ConfigV4_v0_dataset_config_native_type()
   hsize_t _array_type_quads_shape[] = { 4 };
   hdf5pp::ArrayType _array_type_quads = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<CsPad::ns_ConfigV2QuadReg_v0::dataset_data>::native_type(), 1, _array_type_quads_shape);
   type.insert("quads", offsetof(DsType, quads), _array_type_quads);
+  hsize_t _array_type_sections_shape[] = { 4, 8 };
+  hdf5pp::ArrayType _array_type_sections = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<int8_t>::native_type(), 2, _array_type_sections_shape);
+  type.insert("sections", offsetof(DsType, sections), _array_type_sections);
   return type;
 }
 
@@ -1735,6 +1754,7 @@ ns_ConfigV4_v0::dataset_config::dataset_config(const Psana::CsPad::ConfigV4& psa
   for (size_t i = 0, len = 4; i != len; ++ i) {
     quads[i] = CsPad::ns_ConfigV2QuadReg_v0::dataset_data(psanaobj.quads(i));
   }
+  init_attr_sections();
 }
 
 ns_ConfigV4_v0::dataset_config::~dataset_config()
@@ -1942,6 +1962,9 @@ hdf5pp::Type ns_ConfigV5_v0_dataset_config_stored_type()
   hsize_t _array_type_quads_shape[] = { 4 };
   hdf5pp::ArrayType _array_type_quads = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<CsPad::ns_ConfigV3QuadReg_v0::dataset_data>::stored_type(), 1, _array_type_quads_shape);
   type.insert("quads", offsetof(DsType, quads), _array_type_quads);
+  hsize_t _array_type_sections_shape[] = { 4, 8 };
+  hdf5pp::ArrayType _array_type_sections = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<int8_t>::stored_type(), 2, _array_type_sections_shape);
+  type.insert("sections", offsetof(DsType, sections), _array_type_sections);
   return type;
 }
 
@@ -1975,6 +1998,9 @@ hdf5pp::Type ns_ConfigV5_v0_dataset_config_native_type()
   hsize_t _array_type_quads_shape[] = { 4 };
   hdf5pp::ArrayType _array_type_quads = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<CsPad::ns_ConfigV3QuadReg_v0::dataset_data>::native_type(), 1, _array_type_quads_shape);
   type.insert("quads", offsetof(DsType, quads), _array_type_quads);
+  hsize_t _array_type_sections_shape[] = { 4, 8 };
+  hdf5pp::ArrayType _array_type_sections = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<int8_t>::native_type(), 2, _array_type_sections_shape);
+  type.insert("sections", offsetof(DsType, sections), _array_type_sections);
   return type;
 }
 
@@ -2011,6 +2037,7 @@ ns_ConfigV5_v0::dataset_config::dataset_config(const Psana::CsPad::ConfigV5& psa
   for (size_t i = 0, len = 4; i != len; ++ i) {
     quads[i] = CsPad::ns_ConfigV3QuadReg_v0::dataset_data(psanaobj.quads(i));
   }
+  init_attr_sections();
 }
 
 ns_ConfigV5_v0::dataset_config::~dataset_config()

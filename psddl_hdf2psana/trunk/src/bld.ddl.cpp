@@ -10,7 +10,6 @@
 #include "PSEvt/DataProxy.h"
 #include "psddl_hdf2psana/Exceptions.h"
 #include "psddl_hdf2psana/bld.h"
-#include "psddl_hdf2psana/bld.h"
 namespace psddl_hdf2psana {
 namespace Bld {
 

@@ -137,6 +137,9 @@
                 <attribute name="quadMask"/>
                 <attribute name="roiMask" method="roiMasks"/>
                 <attribute name="quads" rank="1"/>
+                <attribute name="sections" type="int8_t" rank="2" shape="MaxQuadsPerSensor,SectorsPerQuad">
+                    <tag name="external" value="psddl_hdf2psana/cspad.h"/>
+                </attribute>
             </dataset>
         </h5schema>
         
@@ -157,6 +160,9 @@
                 <attribute name="roiMask" method="roiMasks"/>
                 <attribute name="protectionThresholds" rank="1"/>
                 <attribute name="quads" rank="1"/>
+                <attribute name="sections" type="int8_t" rank="2" shape="MaxQuadsPerSensor,SectorsPerQuad">
+                    <tag name="external" value="psddl_hdf2psana/cspad.h"/>
+                </attribute>
             </dataset>
         </h5schema>
         
@@ -177,6 +183,9 @@
                 <attribute name="roiMask" method="roiMasks"/>
                 <attribute name="protectionThresholds" rank="1"/>
                 <attribute name="quads" rank="1"/>
+                <attribute name="sections" type="int8_t" rank="2" shape="MaxQuadsPerSensor,SectorsPerQuad">
+                    <tag name="external" value="psddl_hdf2psana/cspad.h"/>
+                </attribute>
             </dataset>
         </h5schema>
         
@@ -198,6 +207,9 @@
                 <attribute name="roiMask" method="roiMasks"/>
                 <attribute name="protectionThresholds" rank="1"/>
                 <attribute name="quads" rank="1"/>
+                <attribute name="sections" type="int8_t" rank="2" shape="MaxQuadsPerSensor,SectorsPerQuad">
+                    <tag name="external" value="psddl_hdf2psana/cspad.h"/>
+                </attribute>
             </dataset>
         </h5schema>
         

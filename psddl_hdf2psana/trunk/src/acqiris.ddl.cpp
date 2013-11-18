@@ -10,12 +10,6 @@
 #include "PSEvt/DataProxy.h"
 #include "psddl_hdf2psana/Exceptions.h"
 #include "psddl_hdf2psana/acqiris.h"
-#include "psddl_hdf2psana/acqiris.h"
-#include "psddl_hdf2psana/acqiris.h"
-#include "psddl_hdf2psana/acqiris.h"
-#include "psddl_hdf2psana/acqiris.h"
-#include "psddl_hdf2psana/acqiris.h"
-#include "psddl_hdf2psana/acqiris.h"
 namespace psddl_hdf2psana {
 namespace Acqiris {
 

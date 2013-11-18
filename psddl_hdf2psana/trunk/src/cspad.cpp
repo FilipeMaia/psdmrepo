@@ -43,6 +43,63 @@ namespace {
 namespace psddl_hdf2psana {
 namespace CsPad {
 
+void
+ns_ConfigV2_v0::dataset_config::init_attr_sections()
+{
+  // fill the list of active sections from ROI bits
+  int ns = 0 ;
+  for ( int q = 0; q < Psana::CsPad::MaxQuadsPerSensor ; ++ q ) {
+    unsigned mask = (this->roiMask >> (8*q)) & 0xff;
+    for ( int s = 0; s < Psana::CsPad::SectorsPerQuad ; ++ s ) {
+      sections[q][s] = -1;
+      if ( mask & (1<<s) ) sections[q][s] = ns++;
+    }
+  }
+}
+
+void
+ns_ConfigV3_v0::dataset_config::init_attr_sections()
+{
+  // fill the list of active sections from ROI bits
+  int ns = 0 ;
+  for ( int q = 0; q < Psana::CsPad::MaxQuadsPerSensor ; ++ q ) {
+    unsigned mask = (this->roiMask >> (8*q)) & 0xff;
+    for ( int s = 0; s < Psana::CsPad::SectorsPerQuad ; ++ s ) {
+      sections[q][s] = -1;
+      if ( mask & (1<<s) ) sections[q][s] = ns++;
+    }
+  }
+}
+
+void
+ns_ConfigV4_v0::dataset_config::init_attr_sections()
+{
+  // fill the list of active sections from ROI bits
+  int ns = 0 ;
+  for ( int q = 0; q < Psana::CsPad::MaxQuadsPerSensor ; ++ q ) {
+    unsigned mask = (this->roiMask >> (8*q)) & 0xff;
+    for ( int s = 0; s < Psana::CsPad::SectorsPerQuad ; ++ s ) {
+      sections[q][s] = -1;
+      if ( mask & (1<<s) ) sections[q][s] = ns++;
+    }
+  }
+}
+
+void
+ns_ConfigV5_v0::dataset_config::init_attr_sections()
+{
+  // fill the list of active sections from ROI bits
+  int ns = 0 ;
+  for ( int q = 0; q < Psana::CsPad::MaxQuadsPerSensor ; ++ q ) {
+    unsigned mask = (this->roiMask >> (8*q)) & 0xff;
+    for ( int s = 0; s < Psana::CsPad::SectorsPerQuad ; ++ s ) {
+      sections[q][s] = -1;
+      if ( mask & (1<<s) ) sections[q][s] = ns++;
+    }
+  }
+}
+
+
 template <typename Config>
 const Psana::CsPad::ElementV1&
 DataV1_v0<Config>::quads(uint32_t i0) const

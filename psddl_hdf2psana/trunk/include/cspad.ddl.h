@@ -136,7 +136,7 @@ struct dataset_data {
   dataset_data(const Psana::CsPad::CsPadGainMapCfg& psanaobj);
   ~dataset_data();
 
-  uint16_t gainMap[35890];
+  uint16_t gainMap[185][194];
 
 
 };
@@ -467,6 +467,8 @@ struct dataset_config {
   uint32_t quadMask;
   uint32_t roiMask;
   CsPad::ns_ConfigV1QuadReg_v0::dataset_data quads[4];
+  int8_t sections[4][8];
+  void init_attr_sections();
 
 
 };
@@ -556,6 +558,8 @@ struct dataset_config {
   uint32_t roiMask;
   CsPad::ns_ProtectionSystemThreshold_v0::dataset_data protectionThresholds[4];
   CsPad::ns_ConfigV1QuadReg_v0::dataset_data quads[4];
+  int8_t sections[4][8];
+  void init_attr_sections();
 
 
 };
@@ -648,6 +652,8 @@ struct dataset_config {
   uint32_t roiMask;
   CsPad::ns_ProtectionSystemThreshold_v0::dataset_data protectionThresholds[4];
   CsPad::ns_ConfigV2QuadReg_v0::dataset_data quads[4];
+  int8_t sections[4][8];
+  void init_attr_sections();
 
 
 };
@@ -741,6 +747,8 @@ struct dataset_config {
   uint32_t roiMask;
   CsPad::ns_ProtectionSystemThreshold_v0::dataset_data protectionThresholds[4];
   CsPad::ns_ConfigV3QuadReg_v0::dataset_data quads[4];
+  int8_t sections[4][8];
+  void init_attr_sections();
 
 
 };

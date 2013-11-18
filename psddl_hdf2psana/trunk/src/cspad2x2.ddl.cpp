@@ -221,7 +221,7 @@ ns_CsPad2x2GainMapCfg_v0::dataset_data::dataset_data(const Psana::CsPad2x2::CsPa
 {
   {
     const __typeof__(psanaobj.gainMap())& arr = psanaobj.gainMap();
-    std::copy(arr.begin(), arr.begin()+35890, gainMap);
+    std::copy(arr.begin(), arr.begin()+35890, gainMap[0]);
   }
 }
 
@@ -230,7 +230,7 @@ ns_CsPad2x2GainMapCfg_v0::dataset_data::~dataset_data()
 }
 ndarray<const uint16_t, 2> CsPad2x2GainMapCfg_v0::gainMap() const {
   if (not m_ds_data) read_ds_data();
-  boost::shared_ptr<uint16_t> ptr(m_ds_data, m_ds_data->gainMap);
+  boost::shared_ptr<uint16_t> ptr(m_ds_data, m_ds_data->gainMap[0]);
   return make_ndarray(ptr, ColumnsPerASIC,MaxRowsPerASIC);
 }
 void CsPad2x2GainMapCfg_v0::read_ds_data() const {

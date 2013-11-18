@@ -136,7 +136,7 @@ struct dataset_data {
   dataset_data(const Psana::CsPad2x2::CsPad2x2GainMapCfg& psanaobj);
   ~dataset_data();
 
-  uint16_t gainMap[35890];
+  uint16_t gainMap[185][194];
 
 
 };
