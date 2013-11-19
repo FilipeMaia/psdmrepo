@@ -94,7 +94,7 @@ namespace {
 
 namespace Translator {
 
-  string getH5GroupNameForType(const std::type_info *typeInfoPtr, bool short_bld_name) {
+string getH5GroupNameForType(const std::type_info *typeInfoPtr, bool short_bld_name) {
   string realName = PSEvt::TypeInfoUtils::typeInfoRealName(typeInfoPtr);
   string::size_type leftParenIdx = realName.find("(");
   if (leftParenIdx != string::npos) {
@@ -112,6 +112,12 @@ namespace Translator {
     if (realName.size() > BldBld.size() and realName.substr(0,BldBld.size()) == BldBld) {
       realName = realName.substr(Bld.size());
     }
+  }
+
+  static const string csPadDataV("CsPad::DataV");
+  static const string csPadElementV("CsPad::ElementV");
+  if ((realName.size()>csPadDataV.size()) and (realName.substr(0,csPadDataV.size()) == csPadDataV)) {
+      realName = csPadElementV + realName.substr(csPadDataV.size());
   }
   return realName;
 }

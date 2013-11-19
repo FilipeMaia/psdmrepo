@@ -74,6 +74,7 @@ class HdfWriterEpicsPv {
   hid_t m_unitsType;   // char[Psana::Epics::MAX_UNITS_SIZE]
   hid_t m_enumStrType; // char[Psana::Epics::MAX_ENUM_STRING_SIZE]
   hid_t m_allEnumStrsType; // array of [Psana::Epics::MAX_ENUM_STATES] m_enumStrType
+  hid_t m_stampType;
 
   template <class U>
   void doDispatchAction(int16_t dbrType,

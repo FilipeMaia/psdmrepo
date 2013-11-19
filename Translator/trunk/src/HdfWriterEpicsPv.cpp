@@ -55,7 +55,10 @@ void HdfWriterEpicsPv::makeSharedTypes() {
   m_enumStrType = H5Tcopy(H5T_C_S1);
   status = H5Tset_size(m_enumStrType, Psana::Epics::MAX_ENUM_STRING_SIZE);
   if (m_enumStrType<0 or status<0) MsgLog(logger(),fatal, "failed to create enum type for one symbol");
-  
+
+  m_stampType = createH5TypeId_epicsTimeStamp();
+  if (m_stampType<0) MsgLog(logger(),fatal, "failed to create enum time stamp hdf5 type id");
+
   const unsigned rank = 1;
   const hsize_t dims[] = {Psana::Epics::MAX_ENUM_STATES};
   m_allEnumStrsType = H5Tarray_create2( m_enumStrType, rank,dims );
@@ -68,6 +71,7 @@ void HdfWriterEpicsPv::closeSharedTypes() {
   status = std::min(status, H5Tclose(m_unitsType));
   status = std::min(status, H5Tclose(m_allEnumStrsType));
   status = std::min(status, H5Tclose(m_enumStrType));
+  status = std::min(status, H5Tclose(m_stampType));
   if (status<0) MsgLog(logger(), fatal, "failed to close one of the shared epics pv datatypes");
 }
 
@@ -88,25 +92,25 @@ hid_t HdfWriterEpicsPv::getTypeId(int16_t dbrType) {
   hid_t typeId = -1;
   switch (dbrType) {
   case Psana::Epics::DBR_TIME_STRING:
-    typeId = createH5TypeId_EpicsPvTimeString(m_stringType);
+    typeId = createH5TypeId_EpicsPvTimeString(m_stringType, m_stampType);
     break;
   case Psana::Epics::DBR_TIME_SHORT: // DBR_TIME_INT is the same as DBR_TIME_SHORT
-    typeId = createH5TypeId_EpicsPvTimeShort();
+    typeId = createH5TypeId_EpicsPvTimeShort(m_stampType);
     break;
   case Psana::Epics::DBR_TIME_FLOAT:
-    typeId = createH5TypeId_EpicsPvTimeFloat();
+    typeId = createH5TypeId_EpicsPvTimeFloat(m_stampType);
     break;
   case Psana::Epics::DBR_TIME_ENUM:
-    typeId = createH5TypeId_EpicsPvTimeEnum();
+    typeId = createH5TypeId_EpicsPvTimeEnum(m_stampType);
     break;
   case Psana::Epics::DBR_TIME_CHAR:
-    typeId = createH5TypeId_EpicsPvTimeChar();
+    typeId = createH5TypeId_EpicsPvTimeChar(m_stampType);
     break;
   case Psana::Epics::DBR_TIME_LONG:
-    typeId = createH5TypeId_EpicsPvTimeLong();
+    typeId = createH5TypeId_EpicsPvTimeLong(m_stampType);
     break;
   case Psana::Epics::DBR_TIME_DOUBLE:
-    typeId = createH5TypeId_EpicsPvTimeDouble();
+    typeId = createH5TypeId_EpicsPvTimeDouble(m_stampType);
     break;
   case Psana::Epics::DBR_CTRL_STRING:
     typeId = createH5TypeId_EpicsPvCtrlString(m_pvNameType, m_stringType);

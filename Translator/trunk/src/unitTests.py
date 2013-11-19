@@ -50,7 +50,7 @@ def makeH5OutputNameFromXtc(xtcfile):
     assert h5out != xtcfile, "xtcfile ends with .h5, it is %s" % xtcfile
     return h5out
 
-def testDatasetsAgainstExpectedOutput(tester,h5,testList,cmpPlaces=4):
+def testDatasetsAgainstExpectedOutput(tester,h5,testList,cmpPlaces=4,verbose=False):
     '''asserts that the specified datasets within the h5 object have the specified values.
     ARGS:
     tester - an instance of unittest.testcase
@@ -59,6 +59,7 @@ def testDatasetsAgainstExpectedOutput(tester,h5,testList,cmpPlaces=4):
                (dataset_path, datset_values, message_if_test_fails)
     cmpPlaces - all comparisons are done with almostEquals, pass the number of decimal places
                 to compare.
+    verbose - set to True to get output for debugging purposes
 
     for example, if testList is [('/group/datasetA', [(0.1,0),(1.3,2)], 'first dataset'),
                                  ('/group/datasetB',[(0,1,2.1,3),(5,4,5.1,4)], 'second dataset')]
@@ -68,14 +69,31 @@ def testDatasetsAgainstExpectedOutput(tester,h5,testList,cmpPlaces=4):
     '''
     for dsname,dsCmpTo,msg in testList:
         ds = h5[dsname]
+        if (verbose):
+            print "ds: %s" % dsname
         tester.assertEqual(len(ds),len(dsCmpTo), \
                          msg = "h5 dataset is wrong size.  ds.name=%s, len(ds)=%d len(dsCmpTo)=%d. %s" % (ds.name, len(ds), len(dsCmpTo), msg))
         for row in range(len(dsCmpTo)):
+            if verbose:
+                print "ds      row=%d: %r" % (row, ds[row])
+                print "dsCmpTo row=%d: %r" % (row, dsCmpTo[row])
             if ds.dtype and ds.dtype.names:
                 for i,fld in enumerate(ds.dtype.names):
-                    tester.assertAlmostEqual(dsCmpTo[row][i],ds[row][fld],places=cmpPlaces, \
-                                           msg="%s, dsname=%s" % (msg,ds.name))
+                    if (verbose):
+                        print "tester.assertAlmostEqual, dsCmpTo[%d][%d]=%r ds[%d][%s]=%r, places=%d" % \
+                            (row,i,dsCmpTo[row][i],row,fld,ds[row][fld],cmpPlaces)
+                    if fld == 'stamp':
+                        tester.assertAlmostEqual(dsCmpTo[row][i][0],ds[row][fld][0],places=cmpPlaces, \
+                                           msg="%s, dsname=%s, field is stamp.secsPastEpoch" % (msg,ds.name))
+                        tester.assertAlmostEqual(dsCmpTo[row][i][1],ds[row][fld][1],places=cmpPlaces, \
+                                           msg="%s, dsname=%s, field is stamp.nsec" % (msg,ds.name))
+                    else:
+                        tester.assertAlmostEqual(dsCmpTo[row][i],ds[row][fld],places=cmpPlaces, \
+                                                 msg="%s, dsname=%s" % (msg,ds.name))
             else:
+                if (verbose):
+                    print "tester.assertAlmostEqual, dsCmpTo[%d]=%r ds[%d]=%r, places=%d" % \
+                            (row,dsCmpTo[row],row,ds[row],cmpPlaces)
                 tester.assertAlmostEqual(dsCmpTo[row],ds[row],places=cmpPlaces, \
                                        msg = "%s, dsname=%s" % (msg,ds.name))
 
@@ -413,7 +431,7 @@ class H5Output( unittest.TestCase ) :
                      [ (44, 34, 1, 'AMO:R14:IOC:10:VHS0:CH0:VoltageMeasure', 5, 2, 3, 'V', 5000.0, 0.0, 5000.0, 5000.0, 0.0, 0.0, 5000.0, 0.0, 0.0)],
                      'config epics amo:r14:0c:10:vhs0:ch0:voltage measure'),
                     ('/Configure:0000/Run:0000/CalibCycle:0000/Epics::EpicsPv/EpicsArch.0:NoDevice.0/AMO:R14:IOC:10:VHS0:CH0:VoltageMeasure/data',
-                     [(44, 20, 1, 5, 2, 728768506L, 940000000L, 0.0)],
+                     [(44, 20, 1, 5, 2, (728768506L, 940000000L), 0.0)],
                      'config epics amo:r14:0c:10:vhs0:ch0:voltage measure')]
 
         testDatasetsAgainstExpectedOutput(self,f,testList)

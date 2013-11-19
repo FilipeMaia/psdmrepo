@@ -9,7 +9,9 @@ The code is generated from psddl/src/DdlHdf5Translator.py
 
 We use the DDL description of the Epics Pv to 'unroll' the 14 epicsPv
 types that we will write into simple 'flat' structures that make it easier
-to generate the hdf5 types.  These 14 types are EpicsPvCtrl* and EpicsPvTime*
+to generate the hdf5 types.  Flat except for stamp, so as not to deviate from
+the previous schema, we do not unroll the stamp field into seconds past the epoch
+and nanoseconds. These 14 types are EpicsPvCtrl* and EpicsPvTime*
 where * is one of String, Short, Float, Enum, Char, Long or Double.
 
 The DDL defines these classes via a C++ class hierarchy, and there are some
@@ -20,7 +22,7 @@ EpicsPvTimeDouble  -> EpicsPvTimeHeader -> EpicsPvHeader
 moreover, classes can have compound types, for instance EpicsPvTimeHeader includes an
 instance of epicsTimeStamp as an attribute.
 
-For each of the 14 classes, we define an flat structure that we can fill for Hdf5
+For each of the 14 classes, we define a flat structure (except for stamp) that we can fill for Hdf5
 translation, a function to produce the hdf5 type, and a function to fill the structure from
 the appropriate Psana object that we will obtain from the epics store.
 
@@ -44,6 +46,11 @@ namespace Unroll {
 struct epicsTimeStamp {
   uint32_t secPastEpoch;
   uint32_t nsec;
+  epicsTimeStamp & operator=(const Psana::Epics::epicsTimeStamp & rhs) {
+    secPastEpoch = rhs.sec();
+    nsec = rhs.nsec();
+    return *this;
+ };
 };
 
 struct EpicsPvCtrlString {
@@ -186,8 +193,7 @@ struct EpicsPvTimeString {
   int16_t iNumElements;
   int16_t status;
   int16_t severity;
-  uint32_t secPastEpoch;
-  uint32_t nsec;
+  epicsTimeStamp stamp;
  
   char value[Psana::Epics:: MAX_STRING_SIZE];
 };
@@ -199,8 +205,7 @@ struct EpicsPvTimeShort {
   int16_t iNumElements;
   int16_t status;
   int16_t severity;
-  uint32_t secPastEpoch;
-  uint32_t nsec;
+  epicsTimeStamp stamp;
  
   int16_t value;
 };
@@ -212,8 +217,7 @@ struct EpicsPvTimeFloat {
   int16_t iNumElements;
   int16_t status;
   int16_t severity;
-  uint32_t secPastEpoch;
-  uint32_t nsec;
+  epicsTimeStamp stamp;
  
   float value;
 };
@@ -225,8 +229,7 @@ struct EpicsPvTimeEnum {
   int16_t iNumElements;
   int16_t status;
   int16_t severity;
-  uint32_t secPastEpoch;
-  uint32_t nsec;
+  epicsTimeStamp stamp;
  
   uint16_t value;
 };
@@ -238,8 +241,7 @@ struct EpicsPvTimeChar {
   int16_t iNumElements;
   int16_t status;
   int16_t severity;
-  uint32_t secPastEpoch;
-  uint32_t nsec;
+  epicsTimeStamp stamp;
  
   uint8_t value;
 };
@@ -251,8 +253,7 @@ struct EpicsPvTimeLong {
   int16_t iNumElements;
   int16_t status;
   int16_t severity;
-  uint32_t secPastEpoch;
-  uint32_t nsec;
+  epicsTimeStamp stamp;
  
   int32_t value;
 };
@@ -264,8 +265,7 @@ struct EpicsPvTimeDouble {
   int16_t iNumElements;
   int16_t status;
   int16_t severity;
-  uint32_t secPastEpoch;
-  uint32_t nsec;
+  epicsTimeStamp stamp;
  
   double value;
 };
@@ -303,20 +303,22 @@ void copyValueFldToUnrolled < Unroll::EpicsPvCtrlString >
        (const Unroll::EpicsPvCtrlString::PsanaSrc &psanaVar, int16_t el, 
         Unroll::EpicsPvCtrlString & unrollBuffer);
 
-hid_t createH5TypeId_EpicsPvCtrlString(hid_t pvNameType, hid_t stringType);
+hid_t createH5TypeId_epicsTimeStamp();
+
+ hid_t createH5TypeId_EpicsPvCtrlString(hid_t pvNameType, hid_t stringType);
 hid_t createH5TypeId_EpicsPvCtrlShort(hid_t pvNameType, hid_t unitsType);
 hid_t createH5TypeId_EpicsPvCtrlFloat(hid_t pvNameType, hid_t unitsType);
 hid_t createH5TypeId_EpicsPvCtrlEnum(hid_t pvNameType, hid_t allEnumStrsType);
 hid_t createH5TypeId_EpicsPvCtrlChar(hid_t pvNameType, hid_t unitsType);
 hid_t createH5TypeId_EpicsPvCtrlLong(hid_t pvNameType, hid_t unitsType);
 hid_t createH5TypeId_EpicsPvCtrlDouble(hid_t pvNameType, hid_t unitsType);
-hid_t createH5TypeId_EpicsPvTimeString(hid_t stringType);
-hid_t createH5TypeId_EpicsPvTimeShort();
-hid_t createH5TypeId_EpicsPvTimeFloat();
-hid_t createH5TypeId_EpicsPvTimeEnum();
-hid_t createH5TypeId_EpicsPvTimeChar();
-hid_t createH5TypeId_EpicsPvTimeLong();
-hid_t createH5TypeId_EpicsPvTimeDouble();
+hid_t createH5TypeId_EpicsPvTimeString(hid_t stringType, hid_t stampType);
+hid_t createH5TypeId_EpicsPvTimeShort(hid_t stampType);
+hid_t createH5TypeId_EpicsPvTimeFloat(hid_t stampType);
+hid_t createH5TypeId_EpicsPvTimeEnum(hid_t stampType);
+hid_t createH5TypeId_EpicsPvTimeChar(hid_t stampType);
+hid_t createH5TypeId_EpicsPvTimeLong(hid_t stampType);
+hid_t createH5TypeId_EpicsPvTimeDouble(hid_t stampType);
  
 
 } // namespace Translator
