@@ -11,6 +11,10 @@ Package author: David Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-03
+2013-11-19 David Schneider
+- fixing bug with how tag V00-00-02 was checked in.
+
 Tag: V00-00-02
 2013-09-27 David Schneider
 - changed h5py code to just provide a function to print datasets.  The wrapper object is removed.
