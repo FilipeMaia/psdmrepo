@@ -1,0 +1,14 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  README file for package h5tools
+#------------------------------------------------------------------------
+
+Package author: David Schneider
+
+Brief description:
+==================
+
+h5tools wrapper code for working with LCLS hdf5 files without psana
