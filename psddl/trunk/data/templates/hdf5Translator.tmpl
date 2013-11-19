@@ -144,7 +144,6 @@ using namespace std;
 
 namespace {
 
-// const char *logger = "Translator.HdfWriterMap";
 const int latestTypeSchema = -1;
 
 using namespace Translator;
@@ -390,7 +389,7 @@ hid_t createH5TypeId_{{epicsPv['name']}}({{epicsPv['type_create_args']}});
 
 namespace {
 
-char * logger = "epics.dll";
+const char * logger = "epics.dll";
 
 void copyEpicsPvCtrlEnumStrings(const Psana::Epics::EpicsPvCtrlEnum & sourceObject, 
                                 Translator::Unroll::EpicsPvCtrlEnum & destObject)
