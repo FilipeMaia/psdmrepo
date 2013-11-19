@@ -33,27 +33,63 @@ import sys
 import collections
 import os
 import copy
-#---------------------------------
-#  Imports of base class module --
-#---------------------------------
 
-#-----------------------------
-# Imports for other modules --
-#-----------------------------
+#--------------------------------
+#  Imports of other modules --
+#--------------------------------
 import jinja2 as ji
 from psddl.TemplateLoader import TemplateLoader
 
-#------------------------
-# Exported definitions --
-#------------------------
-
 def getAliasAndGroupingTerm(s,endStrings):
+  '''used to group together similar xtc type names
+  IN: s           - string (C++ type name for xtc data) to produce alias and grouping term for
+      endStrings  - list of possible grouping terms at the end of the string
+  Example:
+    getAliasAndGroupingTerm('CsPadData',['Config','Data'])  returns
+    'CsPad', 'Data'
+    getAliasAndGroupingTerm('CsPadUnknownEnd',['Config','Data'])  returns
+    'CsPadUnknownEnd', ''
+  '''
   for endstr in endStrings:
     if s.endswith(endstr) and len(s)>len(endstr):
       return s[0:-len(endstr)],endstr
   return s,''
 
 def appendUnrolledAttrs(curType, attrList):
+  '''Takes a package type (from the Ddl parser) and recursively goes through
+  attributes until hitting basic types. Adds attributes to attrList.
+
+  Example:
+  
+  import psddl.XmlReader
+  EpicsPvTimeDouble = psddl.XmlReader(['psddldata/data/epics.ddl.xml'],inc_dir='.').read().packages()[0].types()[-3]
+  attrList = []
+  appendUnrolledAttrs(EpicsPvTimeDouble,attrList)
+
+  Then attrList will contain one entry for each basic type in EpicsPvTimeDouble.  Each entry
+  is a dictionary with 
+
+    'offset'   the basic attribute offset within EpicsPvTimeDouble
+    'accessor' list of accessors used to drill down to this basic attribute.  Start with the last 
+               attribute in the list, work down two the first.
+    'attr'     the basic attribute, this is either an attribute of EpicsPvTimeDouble or an attribute that
+               was found by drilling down into the non-basic attributes of EpicsPvTimeDouble.
+
+  If one takes a look at attrList for this example, one will see:
+
+  [(x['offset'],x['accessor'],x['attr'].name) for x in attrList]
+
+  [( 6, ['pad0'],                       'pad0'),
+   ( 8, ['status()', 'dbr()'],          '_status'),
+   (10, ['severity()', 'dbr()'],        '_severity'),
+   (12, ['sec()', 'stamp()', 'dbr()'],  '_secPastEpoch'),
+   (16, ['nsec()', 'stamp()', 'dbr()'], '_nsec'),
+   (20, ['RISC_pad', 'dbr()'],          'RISC_pad'),
+   (24, ['data()'],                     '_data'),
+   ( 0, ['pvId()'],                     '_iPvId'),
+   ( 2, ['dbrType()'],                  '_iDbrType'),
+   ( 4, ['numElements()'],              '_iNumElements')]
+  '''
   for attr in curType.attributes():
     assert attr.offset.isconst(), "not a constant offset: %s" % attr.name
     attrType = attr.type
@@ -77,20 +113,76 @@ def appendUnrolledAttrs(curType, attrList):
   if curType.base:
       appendUnrolledAttrs(curType.base,attrList)
 
-def unrollAttr2str(uattr):
-  attr = uattr['attr']
-  res = '%4d %20s fixed=%s' % (uattr['offset'], 
-                               attr.name, 
-                               int(attr.isfixed()))
-  typestr = attr.type.name
-  if attr.shape:
-    typestr += '[' + ','.join(attr.shape.dims) + ']'
-  res += ' %20s' % typestr
-  
-  res += ' %s' % uattr['accessor']
-  return res
+def rollUpStamp(pvType,attrList):
+  '''If attrList has secPastEpoch and Nsec, remove them and replace with the stamp 
+  attribute.  Roll them back up for backward compatibility with old translator.
+  '''
+  hasSecPastEpoch = False
+  hasNsec = False
+  offset = -1
+  attrListStamp = []
+  for attr in attrList:
+    if attr['attr'].name == '_secPastEpoch':
+      assert attr['accessor'] == ['sec()', 'stamp()', 'dbr()'], "unexpected accessor for secPastEpoch"
+      hasSecPastEpoch = True
+      offset = attr['offset']
+      dbrType = ([x for x in pvType.attributes() if x.name == '_dbr'][0]).type
+      try:
+        stampAttribute = [x for x in dbrType.attributes() if x.name == '_stamp'][0]
+        attrListStamp.append({'offset':offset,'attr':stampAttribute,'accessor':['stamp()','dbr()']})
+      except:
+        import pdb
+        pdb.set_trace()
+      continue
+    elif attr['attr'].name == '_nsec':
+      hasNsec = True
+      continue
+    attrListStamp.append(attr)  
+  assert (hasSecPastEpoch and hasNsec) or ((not hasSecPastEpoch) and (not hasNsec)), \
+    "unrolled should have both secsPastEpoch and nsec, or neither"
+  return attrListStamp
 
 def getAttrsAndValueForCodeGen(attrList, pvname, specialTypes):    
+  '''After an epics pv type has been unrolled (and perhaps had the stamp fixed up)
+  The attrList, sorted by offset in the type (which gives the order that we 
+  want the attributes to appear in the hdf5 type) is passed to this function.
+  This function returns elements for the code generation of the hdf5 types to 
+  hold the epics pvs.
+  IN:
+  attrList - a list as returned by appendUnrolledAttrs and rollUpStamp, sorted by offset
+             (or how the fields should appear in the h5types)
+  pvname   - the epics pv type name
+  specialTypes - some of the fields in the epics compound types will not be basic NATIVE types,
+                 they may be strings of a certain size, or an array of strings, or the stamp.
+                 These types will be passed in to the functions that create the epics types.
+                 specialTypes is a dictionary of these types. keys are names for the fields, 
+                 values are the variables that will hold these more complex h5 types.
+  Output will be
+  attrsForHeader  a list of dictionaries, each will have an entry like:
+      {'accessor': 'dbr().severity()',
+       'array_print_info': '',
+       'assignment': 'normal',
+       'basetype': 'int16_t',
+       'h5name': 'severity',
+       'h5type': 'H5T_NATIVE_INT16',
+       'name': 'severity',
+       'strncpy_max': None},
+         or
+      {'accessor': 'dbr().stamp()',
+       'array_print_info': '',
+       'assignment': 'normal',
+       'basetype': 'epicsTimeStamp',
+       'h5name': 'stamp',
+       'h5type': 'stampType',  # assumming 'stamp:'stampType' was in the specialTypes dict
+       'name': 'stamp'}
+ 
+   value_basetype           - base type for the value of the pv (for instance 'double')
+   value_array_print_info   - if an array, what to print after the variable, like '[10]'
+   value_assignment         - this can be 'normal', 'strncpy' or 'enumstr', how to assign the variable
+   value_strncpy_max        - if strncpy, the max bytes to copy
+  value_h5type              - the h5type to use
+  '''
+  ### helper functions
   def type2h5type(tp):
     if tp.lower().endswith('_t'):
       return tp[0:-2]
@@ -104,6 +196,7 @@ def getAttrsAndValueForCodeGen(attrList, pvname, specialTypes):
       return 'pvname'
     return fldname
 
+  ### end helper functions, start code
   attrsToWrite = [x for x in attrList if x['attr'].name.lower().find('pad')<0]
   attrsForHeader = []
   for uattr in attrsToWrite:
@@ -114,12 +207,8 @@ def getAttrsAndValueForCodeGen(attrList, pvname, specialTypes):
     basetype = attr.type.name
     if name.lower().endswith('pvname'):
       h5type = specialTypes['pvname']
-    elif name == 'units':
-      h5type = specialTypes['units']
-    elif name == 'strs':
-      h5type = specialTypes['enumstrs']
     else:
-      h5type = 'H5T_NATIVE_' + type2h5type(basetype.upper())
+      h5type = specialTypes.get(name, 'H5T_NATIVE_' + type2h5type(basetype.upper()))
     h5name = attr2h5FldName(name)
     assignment = 'normal'
     strncpy_max = None
@@ -318,14 +407,17 @@ class DdlHdf5Translator ( object ) :
       epicsPvs = []
       specialTypes = {'units':'unitsType',
                       'pvname':'pvNameType',
-                      'enumstrs':'allEnumStrsType',
-                      'string':'stringType'}
+                      'strs':'allEnumStrsType',
+                      'string':'stringType',
+                      'stamp':'stampType'}
+
       for pvType in epicsPackage.types():
         typename = pvType.name
         if not inUnrollSet(typename):
           continue
         attrList = []
         appendUnrolledAttrs(pvType, attrList)
+        attrList = rollUpStamp(pvType,attrList)
         toSort = [(x['offset'],x) for x in attrList]
         toSort.sort()
         attrList = [x[1] for x in toSort]
@@ -337,15 +429,19 @@ class DdlHdf5Translator ( object ) :
         if typename.find('Ctrl')>0:
           if typename.find('Enum')>0:
             type_create_args = 'hid_t %s, hid_t %s' % (specialTypes['pvname'],
-                                                       specialTypes['enumstrs'])
+                                                       specialTypes['strs'])
           elif typename.find('String')>0:
             type_create_args = 'hid_t %s, hid_t %s' % (specialTypes['pvname'],
                                                        specialTypes['string'])
           else:
             type_create_args = 'hid_t %s, hid_t %s' % (specialTypes['pvname'],
                                                        specialTypes['units'])
-        elif typename.find('Time')>0 and typename.find('String')>0:
-          type_create_args = 'hid_t %s' % specialTypes['string']
+        elif typename.find('Time')>0:
+          if typename.find('String')>0:
+            type_create_args = 'hid_t %s, hid_t %s' % (specialTypes['string'], specialTypes['stamp'])
+          else:
+            type_create_args = 'hid_t %s' % specialTypes['stamp']
+            
             
         epicsPvs.append({'name':typename, 
                          'attrs':attrsForCodeGen, 

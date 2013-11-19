@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-12-08
+2013-11-19 David Schneider
+- hdf5 Translator backend, use compound stamp in epics for backward compatibility.
+
 Tag: V00-12-07
 2013-11-18 Andy Salnikov
 - add support for external HDF5 attributes
