@@ -292,7 +292,8 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
 
     def onStop(self):
         self.but_go.setText('Go')
-        self.setStatusStyleOfButtons()
+        self.but_go.setEnabled(True)
+        self.setStatusStyleOfButtons() # self.but_go.setVisible(True)
 
 
     def setStatusMessage(self):
