@@ -11,6 +11,12 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-02
+2013-11-19 Mikhail S. Dubrovin
+- It was found that RegDB returns sources which are missing in xtc...
+- combined access to scanned xtc with RegDB, RegDB is used only when 
+	scan log is not yet available.
+
 2013-11-18 Mikhail S. Dubrovin
 - code of many modules is significantly changed in order to
 	have dark image averaging for any set of detectors simultaneously.

@@ -32,6 +32,7 @@ from FileNameManager        import fnm
 from GUIDarkListItem        import *
 import GlobalUtils          as     gu
 import RegDBUtils           as     ru
+from BatchLogScanParser     import blsp
 
 #---------------------
 #  Class definition --
@@ -48,6 +49,7 @@ class GUIDarkList ( QtGui.QWidget ) :
         self.instr_name            = cp.instr_name
         self.exp_name              = cp.exp_name
         self.det_name              = cp.det_name
+        self.str_run_number        = cp.str_run_number
         self.list_of_det_pars      = cp.list_of_det_pars
         self.list_of_dets_selected = cp.list_of_dets_selected
 
@@ -117,11 +119,12 @@ class GUIDarkList ( QtGui.QWidget ) :
 
         for run_num in self.list_of_runs :
 
-            if not self.isSelectedRun            (run_num) : continue
-            if not self.hasSelectedDetectorInRun (run_num) : continue
-
             str_run_num = '%04d' % run_num
+            self.str_run_number.setValue(str_run_num)
 
+            if not self.isSelectedRun            (run_num) : continue
+            if not self.hasSelectedDetectorsInRun(run_num) : continue
+        
             if not run_num in self.list_of_run_nums_in_dir :
                 self.comment = 'NOT FOUND xtc file!'
                 #self.type    = 'N/A'
@@ -142,6 +145,7 @@ class GUIDarkList ( QtGui.QWidget ) :
 
             record = str_run_num, item, widg
             self.list_of_records.append(record)
+
 
 
     def isSelectedRun(self, run_num, type_to_select = 'dark') :
@@ -168,25 +172,38 @@ class GUIDarkList ( QtGui.QWidget ) :
         return False
 
 
-    def hasSelectedDetectorInRun(self, run_num) :
+
+    def det_is_in_list_of_sources(self, det_name, list_of_srcs) :
+
+        pattern = det_name.lower() + '.'
+        for src in list_of_srcs :
+            if src.lower().find(pattern) != -1 :
+                return True
+        return False
+
+
+
+    def hasSelectedDetectorsInRun(self, run_num) :
+
+        if self.dark_list_show_dets.value() == self.dark_list_show_dets.value_def() : # 'all' - For all detectors
+            return True
 
         if self.det_name.value() == '' : # If detector(s) were not selected
             logger.warning('Detector is not selected !!!', __name__)
             return False
 
-        if self.dark_list_show_dets.value() == self.dark_list_show_dets.value_def() : # 'all' - For all detectors
-            return True
+        list_of_srcs = blsp.get_list_of_sources()
 
-        else :
-            list_of_srcs_in_run = fnm.list_of_sources_in_run(run_num)
-            for src_name_in_data in list_of_srcs_in_run :
-                for det_name_selected in self.list_of_dets_selected()  :
-                    pattern = det_name_selected.lower() + '.'
-                    if src_name_in_data.lower().find(pattern) != -1 :
-                         #txt = 'Det: %s is found in the sources: %s in run: %d' % (det_name_selected,src_name_in_data,run_num)
-                         #print txt
-                         return True
-            return False
+        # For all detectors in run
+        for det in self.list_of_dets_selected() :
+            if not self.det_is_in_list_of_sources(det, list_of_srcs) : return False
+        return True
+
+        # For any detector in run
+        #for det in self.list_of_dets_selected() :
+        #    if self.det_is_in_list_of_sources(det, list_of_srcs) : return True
+        #return False
+
 
 
     def setFieldsEnabled(self, is_enabled=False):

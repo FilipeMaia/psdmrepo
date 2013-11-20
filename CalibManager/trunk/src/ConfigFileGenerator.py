@@ -118,14 +118,14 @@ class ConfigFileGenerator :
         self.ind = 0
 
         for det_name in cp.list_of_dets_selected() :
-            lst = fnm.list_of_sources_in_run_for_selected_detector(det_name)
-            list_path_peds_ave    = gu.get_list_of_files_for_list_of_insets(fnm.path_peds_ave(),    lst)
-            list_path_peds_rms    = gu.get_list_of_files_for_list_of_insets(fnm.path_peds_rms(),    lst)
-            list_path_hotpix_mask = gu.get_list_of_files_for_list_of_insets(fnm.path_hotpix_mask(), lst)
+            lst_tepes, lst_srcs = cp.blsp.list_of_types_and_sources_for_detector(det_name)
+            list_path_peds_ave    = gu.get_list_of_files_for_list_of_insets(fnm.path_peds_ave(),    lst_srcs)
+            list_path_peds_rms    = gu.get_list_of_files_for_list_of_insets(fnm.path_peds_rms(),    lst_srcs)
+            list_path_hotpix_mask = gu.get_list_of_files_for_list_of_insets(fnm.path_hotpix_mask(), lst_srcs)
 
-            if self.do_test_print : print 'Detector selected: %10s' % (det_name), '  sources:', lst
+            if self.do_test_print : print 'Detector selected: %10s' % (det_name), '  sources:', lst_srcs
 
-            for (self.source, self.fname_ave, self.fname_rms, self.fname_mask) in zip(lst, list_path_peds_ave, list_path_peds_rms, list_path_hotpix_mask) :
+            for (self.source, self.fname_ave, self.fname_rms, self.fname_mask) in zip(lst_srcs, list_path_peds_ave, list_path_peds_rms, list_path_hotpix_mask) :
                 self.ind += 1 
                 #print self.ind, self.source, self.fname_ave, self.fname_rms
 

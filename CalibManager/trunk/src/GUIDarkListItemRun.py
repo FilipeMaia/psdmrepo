@@ -32,6 +32,7 @@ import GlobalUtils          as     gu
 from FileNameManager        import fnm
 from BatchJobPedestals      import *
 from FileDeployer           import fd
+from BatchLogScanParser     import blsp # Just in order to instatiate it
 
 #---------------------
 #  Class definition --

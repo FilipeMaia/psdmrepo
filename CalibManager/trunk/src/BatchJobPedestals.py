@@ -29,8 +29,8 @@ __version__ = "$Revision: 4 $"
 
 from BatchJob import *
 from FileNameManager          import fnm
-from BatchLogScanParser       import blsp
 from ConfigFileGenerator      import cfg
+from ConfigParametersForApp   import cp
 
 #-----------------------------
 
@@ -165,9 +165,11 @@ class BatchJobPedestals (BatchJob) :
 
     def get_list_of_files_peds_aver(self) :
         self.exportLocalPars() # export run_number to cp.str_run_number        
+        lst_of_srcs = cp.blsp.list_of_sources_for_selected_detectors ()
         list_of_fnames = fnm.get_list_of_files_peds_aver() \
-             + fnm.get_list_of_files_for_all_detectors_and_sources(fnm.path_peds_ave()) \
-             + fnm.get_list_of_files_for_all_detectors_and_sources(fnm.path_peds_rms())
+             + gu.get_list_of_files_for_list_of_insets(fnm.path_peds_ave(), lst_of_srcs) \
+             + gu.get_list_of_files_for_list_of_insets(fnm.path_peds_rms(), lst_of_srcs)
+
         return list_of_fnames
 
 #-----------------------------
@@ -246,9 +248,9 @@ class BatchJobPedestals (BatchJob) :
             if self.status_scan :            
                 logger.info('on_auto_processing_status: Scan is completed, begin averaging', __name__)
                 
-                blsp.print_list_of_types_and_sources()
+                cp.blsp.print_list_of_types_and_sources()
                 
-                if blsp.get_list_of_sources() == [] :
+                if cp.blsp.get_list_of_sources() == [] :
                     self.stop_auto_processing( is_stop_on_button_click=False )
                     logger.warning('on_auto_processing_status: Scan did not find data in xtc file for this detector. PROCESSING IS STOPPED!!!', __name__)
                     return

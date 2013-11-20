@@ -275,7 +275,19 @@ class ConfigParametersForApp ( ConfigParameters ) :
                                'Camera::FrameV',
                                'Acqiris::DataDesc']
         self.dict_of_det_data_types = dict( zip(self.list_of_dets, self.list_of_types) )
+        #self.print_dict_of_det_data_types()
         
+        self.list_of_calib_types = ['CsPad::CalibV1',
+                                    'CsPad2x2::CalibV1',
+                                    'Princeton::CalibV1',
+                                    'PNCCD::CalibV1',
+                                    'Camera::CalibV1',
+                                    'Camera::CalibV1',
+                                    'Camera::CalibV1',
+                                    'Acqiris::CalibV1']
+        self.dict_of_det_calib_types = dict( zip(self.list_of_dets, self.list_of_calib_types) )
+        #self.print_dict_of_det_calib_types()
+
 #-----------------------------
 
         det_cbx_states = [ (False, False ,'bool'), \
@@ -302,6 +314,11 @@ class ConfigParametersForApp ( ConfigParameters ) :
     def print_dict_of_det_data_types ( self ) :
         print 'List of detector names and associated types:'
         for det, type in self.dict_of_det_data_types.items():
+            print '%10s : %s' % (det, type)
+
+    def print_dict_of_det_calib_types ( self ) :
+        print 'List of detector names and associated calibration types:'
+        for det, type in self.dict_of_det_calib_types.items():
             print '%10s : %s' % (det, type)
 
 #-----------------------------

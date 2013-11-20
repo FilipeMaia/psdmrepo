@@ -24,7 +24,6 @@ import os
 from   ConfigParametersForApp import cp
 from   Logger                 import logger
 import GlobalUtils            as     gu
-import RegDBUtils             as     ru
 
 #-----------------------------
 
@@ -226,40 +225,6 @@ class FileNameManager :
         self.list_of_files_peds.append(self.path_peds_aver_plot())
         #self.list_of_files_peds.append(self.path_dark_xtc())
         return self.list_of_files_peds
-
-#-----------------------------
-# Interaction with RegDB
-
-    def txt_of_sources_in_run(self, run_number) :
-        return ru.txt_of_sources_in_run(cp.instr_name.value(), cp.exp_name.value(), run_number)
-
-
-    def list_of_sources_in_run(self, run_number) :
-        return ru.list_of_sources_in_run(cp.instr_name.value(), cp.exp_name.value(), run_number)
-
-
-    def  list_of_sources_in_run_for_selected_detector(self, det_name) :
-        ins, exp, run_number = cp.instr_name.value(), cp.exp_name.value(), int(cp.str_run_number.value())
-        return ru.list_of_sources_in_run_for_selected_detector(ins, exp, run_number, det_name)
-
-#-----------------------------
-
-    def get_list_of_files_for_detector(self, path1='file.dat', det_name='') :
-        """For specified file name pattern and detector returns the list of files for all sources.
-        """
-        if det_name == '' : return path1
-        lst = self.list_of_sources_in_run_for_selected_detector(det_name)
-        return gu.get_list_of_files_for_list_of_insets(path1, lst)
-
-
-    def get_list_of_files_for_all_detectors_and_sources(self, path1='file.dat') :
-        """For specified file name pattern returns the list of file names for all current detectors and all their sources
-        """
-        list_of_files = []
-        for det_name in cp.list_of_dets_selected() :
-            lst_src = self.list_of_sources_in_run_for_selected_detector(det_name)
-            list_of_files += gu.get_list_of_files_for_list_of_insets(path1, lst_src)
-        return list_of_files
 
 #-----------------------------
 

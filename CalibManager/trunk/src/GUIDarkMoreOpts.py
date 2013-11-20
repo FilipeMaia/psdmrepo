@@ -34,7 +34,6 @@ from GUIFileBrowser         import *
 from PlotImgSpe             import *
 import CSPAD2x2Image        as     cspad2x2img
 import CSPADImage           as     cspadimg
-from BatchLogScanParser     import blsp
 
 #---------------------
 #  Class definition --
@@ -229,7 +228,7 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         """
         self.exportLocalPars()
         txt = '\n' + 50*'-' + '\nSources from DB:\n' \
-            + fnm.txt_of_sources_in_run(int(self.run_number))
+            + cp.blsp.txt_of_sources_in_run()
         logger.info(txt, __name__)
 
 
@@ -238,7 +237,7 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         """
         self.exportLocalPars()
         txt = '\n' + 50*'-' + '\nData Types and Sources from xtc scan of the\n' \
-            + blsp.txt_list_of_types_and_sources()
+            + cp.blsp.txt_list_of_types_and_sources()
         logger.info(txt, __name__)
 
 
@@ -290,16 +289,16 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         logger.info(msg, __name__ )
 
 
-
     def get_list_of_files_peds(self) :
         return fnm.get_list_of_files_peds() \
              + self.get_list_of_files_peds_for_plot()
 
 
     def get_list_of_files_peds_for_plot(self) :
-        return fnm.get_list_of_files_for_all_detectors_and_sources(fnm.path_peds_ave()) \
-             + fnm.get_list_of_files_for_all_detectors_and_sources(fnm.path_peds_rms()) \
-             + fnm.get_list_of_files_for_all_detectors_and_sources(fnm.path_hotpix_mask())
+        lst_of_srcs = cp.blsp.list_of_sources_for_selected_detectors()
+        return gu.get_list_of_files_for_list_of_insets(fnm.path_peds_ave(),    lst_of_srcs) \
+             + gu.get_list_of_files_for_list_of_insets(fnm.path_peds_rms(),    lst_of_srcs) \
+             + gu.get_list_of_files_for_list_of_insets(fnm.path_hotpix_mask(), lst_of_srcs)
 
 
     def on_but_fbro(self):
@@ -398,7 +397,8 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
                 msg = 'self.img_arr == None'
                 return
             #print arr.shape,'\n', arr.shape
-            cp.plotimgspe = PlotImgSpe(None, self.img_arr, ofname=fnm.path_peds_aver_plot())
+            tit = 'Plot for %s' % os.path.basename(fname)
+            cp.plotimgspe = PlotImgSpe(None, self.img_arr, ofname=fnm.path_peds_aver_plot(), title=tit)
             #cp.plotimgspe = PlotImgSpe(None, self.img_arr, ifname=fnm.path_peds_ave(), ofname=fnm.path_peds_aver_plot())
             #cp.plotimgspe.setParent(self)
             cp.plotimgspe.move(cp.guimain.pos().__add__(QtCore.QPoint(720,120)))
