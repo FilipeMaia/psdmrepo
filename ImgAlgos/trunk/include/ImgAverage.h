@@ -126,6 +126,7 @@ private:
   unsigned       m_print_bits;   
   unsigned long  m_count;     // number of found images
   unsigned long  m_count_ev;  // number of events from the beginning of job
+  unsigned long  m_count_msg; // number of messages counter
   unsigned long  m_nev_stage1;
   unsigned long  m_nev_stage2;
   double         m_gate_width1;

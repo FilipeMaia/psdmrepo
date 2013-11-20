@@ -97,6 +97,7 @@ private:
   bool           m_subtract_offset;  // true - subtryct, false - do not subtract
   unsigned       m_print_bits;       // control print bits
   long           m_count;            // local event counter
+  unsigned long  m_count_msg;        // number of messages counter
 
   ndarray<double,2> m_data;
 };

@@ -55,6 +55,7 @@ CameraImageProducer::CameraImageProducer (const std::string& name)
   , m_subtract_offset()
   , m_print_bits()
   , m_count(0)
+  , m_count_msg(0)
 {
   // get the values from configuration or use defaults
   m_str_src           = configSrc("source", "DetInfo(:Camera)");
@@ -174,7 +175,11 @@ CameraImageProducer::procEvent(Event& evt, Env& env)
     }
   else
     {
-      MsgLog(name(), info, "Camera::FrameV1 object is not available in the event(...) for source:" << m_str_src << " key:" << m_key_in);
+      m_count_msg ++;
+      if (m_count_msg < 100)
+      MsgLog(name(), warning, "Camera::FrameV1 object is not available in the event(...) for source:" << m_str_src << " key:" << m_key_in);
+      if (m_count_msg == 100)
+      MsgLog(name(), warning, "STOP PRINTING WARNINGS for source:" << m_str_src << " key:" << m_key_in);
     }
 }
 

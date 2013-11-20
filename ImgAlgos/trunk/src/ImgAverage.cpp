@@ -62,6 +62,7 @@ ImgAverage::ImgAverage (const std::string& name)
   , m_print_bits()
   , m_count(0)
   , m_count_ev(0)
+  , m_count_msg(0)
   , m_nev_stage1()
   , m_nev_stage2()
   , m_gate_width1()
@@ -187,6 +188,12 @@ ImgAverage::endRun(Event& evt, Env& env)
 void 
 ImgAverage::endJob(Event& evt, Env& env)
 {
+  if (m_count == 0) {
+    MsgLog(name(), warning, "Images for src: " << m_str_src << " and key: " << m_key 
+                            << " WERE NOT FOUND in " << m_count_ev << " events.\nFiles are NOT SAVED!!!");
+    return;
+  }
+
   procStatArrays();
   if (m_do_sum)  save2DArrayInFile<double> ( m_sumFile+m_fname_ext, m_sum, m_rows, m_cols, m_print_bits & 16 );
   if (m_do_ave)  save2DArrayInFile<double> ( m_aveFile+m_fname_ext, m_ave, m_rows, m_cols, m_print_bits & 16 );
@@ -269,7 +276,11 @@ ImgAverage::collectStat(Event& evt)
   if ( collectStatForType<int16_t> (evt) ) return true;
   if ( collectStatForType<unsigned>(evt) ) return true;
 
-  MsgLog(name(), info, "Image is not available in the event(...) for source:" << m_str_src << " key:" << m_key);
+  m_count_msg ++;
+  if (m_count_msg < 100)
+     MsgLog(name(), warning, "Image is not available in the event(...) for source:" << m_str_src << " key:" << m_key);
+  if (m_count_msg == 100)
+     MsgLog(name(), warning, "STOP PRINTING WARNINGS for source:" << m_str_src << " key:" << m_key);
   return false;
 }
 
