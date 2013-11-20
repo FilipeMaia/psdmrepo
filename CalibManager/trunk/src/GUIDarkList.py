@@ -195,15 +195,15 @@ class GUIDarkList ( QtGui.QWidget ) :
 
         list_of_srcs = blsp.get_list_of_sources()
 
-        if self.dark_list_show_dets.value() == self.list_of_show_dets[1] : # 'selected all' - For all selected detectors in run
-            for det in self.list_of_dets_selected() :
-                if not self.det_is_in_list_of_sources(det, list_of_srcs) : return False
-            return True
-
-        if self.dark_list_show_dets.value() == self.list_of_show_dets[2] : # 'selected any' - For any of selected detectors in run
+        if self.dark_list_show_dets.value() == self.list_of_show_dets[1] : # 'selected any' - For any of selected detectors in run
             for det in self.list_of_dets_selected() :
                 if self.det_is_in_list_of_sources(det, list_of_srcs) : return True
             return False
+
+        if self.dark_list_show_dets.value() == self.list_of_show_dets[2] : # 'selected all' - For all selected detectors in run
+            for det in self.list_of_dets_selected() :
+                if not self.det_is_in_list_of_sources(det, list_of_srcs) : return False
+            return True
 
         return True
 

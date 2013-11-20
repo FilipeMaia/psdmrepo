@@ -43,7 +43,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
     list_of_queues = ['psnehq', 'psfehq', 'psanacsq']
     list_of_instr  = ['AMO', 'SXR', 'XPP', 'XCS', 'CXI', 'MEC']
     list_of_show_runs = ['all', 'dark']
-    list_of_show_dets = ['any', 'selected all', 'selected any']
+    list_of_show_dets = ['any', 'selected any', 'selected all']
 
     dict_bjpeds = {} # dictionary of BatchJobPedestals objects
 
