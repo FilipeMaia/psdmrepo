@@ -62,8 +62,9 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
         self.comment        = comment
         self.calib_dir      = cp.calib_dir
         self.det_name       = cp.det_name
+        self.dict_bjpeds    = cp.dict_bjpeds
 
-        self.bjpeds = BatchJobPedestals(parent=self) 
+        self.create_or_use_butch_object()
 
         self.lab_run  = QtGui.QLabel('Run')
         self.lab_from = QtGui.QLabel('valid from')
@@ -112,6 +113,19 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
         #cp.guidarkrunitem = self
 
 
+    def create_or_use_butch_object(self) :
+        """Creates BatchJobPedestals object for the 1st time or use existing in the dictionary
+        """
+        if not self.str_run_number in self.dict_bjpeds.keys() : # create new object and add it to the dictionsry
+            #print 'Create new BatchJobPedestals object for run %s' % self.str_run_number
+            self.dict_bjpeds[self.str_run_number] = BatchJobPedestals(parent=self) 
+        else :
+            #print 'Use existing BatchJobPedestals object for run %s' % self.str_run_number
+            pass
+
+        self.bjpeds = self.dict_bjpeds[self.str_run_number]
+
+
     def showToolTips(self):
         self.lab_rnum.setToolTip('Data run for calibration.')
         self.lab_type.setToolTip('Type of file (data, dark, etc)')
@@ -146,7 +160,6 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
         #if self.str_run_number == 'None' : ...
 
         self.setStyle()
-
 
 
     def setStyle(self):
@@ -264,12 +277,14 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
 
         if   but.text() == 'Go' : 
             logger.info('onButGo for run %s' % self.str_run_number, __name__ )
+            self.but_go.setEnabled(False)
             self.bjpeds.start_auto_processing()
             but.setText('Stop')
             
         elif but.text() == 'Stop' : 
             logger.info('onButStop for run %s' % self.str_run_number, __name__ )
             self.bjpeds.stop_auto_processing()
+            self.but_go.setEnabled(True)
             but.setText('Go')
 
         but.setStyleSheet(cp.styleButtonBad)

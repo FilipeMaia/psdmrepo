@@ -43,7 +43,9 @@ class ConfigParametersForApp ( ConfigParameters ) :
     list_of_queues = ['psnehq', 'psfehq', 'psanacsq']
     list_of_instr  = ['AMO', 'SXR', 'XPP', 'XCS', 'CXI', 'MEC']
     list_of_show_runs = ['all', 'dark']
-    list_of_show_dets = ['all', 'selected']
+    list_of_show_dets = ['any', 'selected all', 'selected any']
+
+    dict_bjpeds = {} # dictionary of BatchJobPedestals objects
 
     def __init__ ( self, fname=None ) :
         """Constructor.

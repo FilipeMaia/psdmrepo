@@ -42,6 +42,10 @@ class BatchLogScanParser :
     """Extracts EventKeys from batch log scan files
     """
 
+    dict_exists = {True  : 'is available', 
+                   False : 'is NOT available'}
+
+
     def __init__ (self) :
         """
         @param path   path to the input log file
@@ -159,10 +163,12 @@ class BatchLogScanParser :
         #    return msg
 
         self.parse_batch_log_peds_scan()
-        msg   = 'log file: %s \nfor detector(s): %s' % (self.path, self.det_name.value())
+        msg   = 'log file: %s \nExpecting data for detector(s): %s' % (self.path, self.det_name.value())
         state = 'Sources found in scan:' 
         if self.list_of_sources == [] :
+            msg += '\nLog file %s' % self.dict_exists[self.scan_log_exists()] # is available or not
             msg += '\nLIST OF SOURCES IS EMPTY !!!'
+
             return msg
 
         for type, src in zip(self.list_of_types, self.list_of_sources) :

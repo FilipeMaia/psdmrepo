@@ -61,9 +61,11 @@ class GUIDarkControlBar ( QtGui.QWidget ) :
         self.labDets   = QtGui.QLabel('for detectors:')
 
         self.butRuns = QtGui.QPushButton( self.dark_list_show_runs.value() + self.char_expand )
-        self.butRuns.setMaximumWidth(90)
+        self.butRuns.setFixedWidth(90)
         self.butDets = QtGui.QPushButton( self.dark_list_show_dets.value() + self.char_expand )
-        self.butDets.setMaximumWidth(90)
+        self.butDets.setFixedWidth(110)
+        #self.butRuns.setMaximumWidth(90)
+
         
         self.hbox = QtGui.QHBoxLayout() 
         self.hbox.addWidget(self.labRuns)
@@ -109,10 +111,11 @@ class GUIDarkControlBar ( QtGui.QWidget ) :
         self.labDets.setStyleSheet (cp.styleLabel)
         self.setStyleButtons()
         self.setContentsMargins (QtCore.QMargins(-9,-9,-9,-9))
-         
+
 
     def setStyleButtons(self):
         self.butRuns.setStyleSheet(cp.styleButton)
+        self.butDets.setStyleSheet(cp.styleButton)
 
  
     def setParent(self,parent) :

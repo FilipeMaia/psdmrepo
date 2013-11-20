@@ -44,8 +44,7 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
 
     char_expand    = u' \u25BE' # down-head triangle
     dict_status = {True  : 'Created:', 
-                   False : 'N/A     ' }
-
+                   False : 'N/A     '}
                
     def __init__ ( self, parent=None, run_number='0000' ) :
 
@@ -238,6 +237,7 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         self.exportLocalPars()
         txt = '\n' + 50*'-' + '\nData Types and Sources from xtc scan of the\n' \
             + cp.blsp.txt_list_of_types_and_sources()
+        
         logger.info(txt, __name__)
 
 

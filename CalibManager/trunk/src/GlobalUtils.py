@@ -287,7 +287,10 @@ def batch_job_submit(command, queue='psnehq', log_file='batch-log.txt') :
     else :
         job_id_str = line_fields[1].strip('<').rstrip('>')
 
-    if err != '' : logger.warning( err, __name__) 
+    if err != '' :
+        msg =  '\n' + 80*'!' + '\n' + err + 80*'!' + '\n'
+        logger.warning( msg, __name__) 
+
     logger.info(out, __name__) 
 
     return job_id_str, out, err

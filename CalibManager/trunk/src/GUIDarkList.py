@@ -46,6 +46,7 @@ class GUIDarkList ( QtGui.QWidget ) :
         self.parent = parent
         self.dark_list_show_runs   = cp.dark_list_show_runs
         self.dark_list_show_dets   = cp.dark_list_show_dets
+        self.list_of_show_dets     = cp.list_of_show_dets
         self.instr_name            = cp.instr_name
         self.exp_name              = cp.exp_name
         self.det_name              = cp.det_name
@@ -194,16 +195,17 @@ class GUIDarkList ( QtGui.QWidget ) :
 
         list_of_srcs = blsp.get_list_of_sources()
 
-        # For all detectors in run
-        for det in self.list_of_dets_selected() :
-            if not self.det_is_in_list_of_sources(det, list_of_srcs) : return False
+        if self.dark_list_show_dets.value() == self.list_of_show_dets[1] : # 'selected all' - For all selected detectors in run
+            for det in self.list_of_dets_selected() :
+                if not self.det_is_in_list_of_sources(det, list_of_srcs) : return False
+            return True
+
+        if self.dark_list_show_dets.value() == self.list_of_show_dets[2] : # 'selected any' - For any of selected detectors in run
+            for det in self.list_of_dets_selected() :
+                if self.det_is_in_list_of_sources(det, list_of_srcs) : return True
+            return False
+
         return True
-
-        # For any detector in run
-        #for det in self.list_of_dets_selected() :
-        #    if self.det_is_in_list_of_sources(det, list_of_srcs) : return True
-        #return False
-
 
 
     def setFieldsEnabled(self, is_enabled=False):
