@@ -69,6 +69,7 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         self.cbx_dark_more = QtGui.QCheckBox('More options')
         self.cbx_dark_more.setChecked( cp.dark_more_opts.value() )
  
+        self.lab_show = QtGui.QLabel('Show:')
         self.but_srcs = QtGui.QPushButton( 'Sources DB' )
         self.but_sxtc = QtGui.QPushButton( 'Sources XTC' )
         self.but_flst = QtGui.QPushButton( 'O/Files' )
@@ -78,6 +79,7 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         self.but_show = QtGui.QPushButton( 'Show cmd' )
 
         self.hbox = QtGui.QHBoxLayout()
+        self.hbox.addWidget(self.lab_show)
         self.hbox.addWidget(self.but_fxtc)
         self.hbox.addWidget(self.but_srcs)
         self.hbox.addWidget(self.but_sxtc)
@@ -106,7 +108,7 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         self.vbox.addStretch(1)     
         self.setLayout(self.vbox)
 
-        self.connect(self.cbx_dark_more  , QtCore.SIGNAL('stateChanged(int)'), self.on_cbx ) 
+        self.connect( self.cbx_dark_more  , QtCore.SIGNAL('stateChanged(int)'), self.on_cbx ) 
         self.connect( self.but_srcs, QtCore.SIGNAL('clicked()'), self.on_but_srcs )
         self.connect( self.but_sxtc, QtCore.SIGNAL('clicked()'), self.on_but_sxtc )
         self.connect( self.but_flst, QtCore.SIGNAL('clicked()'), self.on_but_flst )
@@ -160,16 +162,17 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         self.setFixedHeight(40)
         self.setStyleSheet (cp.styleBkgd)
         self.cbx_dark_more.setFixedHeight(30)
+        self.lab_show.setStyleSheet(cp.styleLabel)
 
         width = 80
 
-        self.but_srcs.setFixedWidth(width)
+        self.but_fxtc.setFixedWidth(60)
+        self.but_srcs.setFixedWidth(90)
         self.but_sxtc.setFixedWidth(90)
-        self.but_flst.setFixedWidth(width)
-        self.but_fxtc.setFixedWidth(width)
+        self.but_flst.setFixedWidth(60)
+        self.but_show.setFixedWidth(80)
         self.but_fbro.setFixedWidth(90)
-        self.but_plot.setFixedWidth(width)
-        self.but_show.setFixedWidth(width)
+        self.but_plot.setFixedWidth(60)
 
         #self.setContentsMargins (QtCore.QMargins(-9,-9,-9,-9))
         self.setContentsMargins (QtCore.QMargins(-5,-5,-5,-5))
@@ -437,7 +440,7 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
 
         par.setValue( cbx.isChecked() )
         msg = 'check box ' + tit  + ' is set to: ' + str( par.value())
-        logger.info(msg, __name__ )
+        logger.debug(msg, __name__ )
 
         self.setStyle()
 

@@ -79,7 +79,7 @@ class GUIDarkListItem ( QtGui.QWidget ) :
         self.hboxW = QtGui.QHBoxLayout()
         self.hboxWW = QtGui.QHBoxLayout()
         #self.hboxWW.addStretch(1)     
-        self.hboxWW.addSpacing(35)     
+        self.hboxWW.addSpacing(5)     
         self.hboxWW.addLayout(self.hboxW)
         self.hboxWW.addStretch(1)     
 
