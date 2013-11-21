@@ -306,7 +306,7 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
 
     def onButDeploy(self):
         """Deploys the calibration file(s)"""
-        list_of_deploy_commands = self.get_list_of_deploy_commands()
+        list_of_deploy_commands, list_of_sources = self.get_list_of_deploy_commands_and_sources()
         msg = 'Deploy calibration file(s):'
 
         if list_of_deploy_commands == [] :
@@ -314,17 +314,23 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
             logger.info(msg, __name__)
             return
 
-        #for cmd in list_of_deploy_commands :
-        #    msg += '\n' + cmd            
-        #logger.info(msg, __name__)
 
-        for cmd in list_of_deploy_commands :
-            fd.procDeployCommand(cmd)
+        list_src_cbx = [[src,True] for src in list_of_sources]
+        resp = gu.changeCheckBoxListInPopupMenu(list_src_cbx, win_title='Confirm Deployment')
+
+        if resp != 1 :
+            logger.info('Deployment is cancelled!', __name__)
+            return
+
+        for cmd,[src,cbx] in zip(list_of_deploy_commands, list_src_cbx) :
+            #print cbx, src, '\n', cmd, '\n'
+            if cbx : fd.procDeployCommand(cmd)
 
         if cp.guistatus is not None : cp.guistatus.updateStatusInfo()
 
 
-    def get_list_of_deploy_commands(self):
+
+    def get_list_of_deploy_commands_and_sources(self):
         """Get list of deploy commands for all detectors of the same type"""
         self.exportLocalPars()
 
@@ -350,7 +356,7 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
 
             list_of_deploy_commands.append(cmd)
 
-        return list_of_deploy_commands
+        return list_of_deploy_commands, list_of_sources
    
 
 #-----------------------------

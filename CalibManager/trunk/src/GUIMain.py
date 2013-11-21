@@ -78,20 +78,11 @@ class GUIMain ( QtGui.QWidget ) :
         self.guilogger = GUILogger(show_buttons=False)
         self.guiinsexpdirdet = GUIInsExpDirDet(self)
 
-        #self.hboxB = QtGui.QHBoxLayout() 
-        #self.hboxB.addWidget(self.guitree)
-        #self.hboxB.addWidget(self.guitabs)
-
-        #self.splitterV = QtGui.QSplitter(QtCore.Qt.Vertical)
-
         self.vsplit = QtGui.QSplitter(QtCore.Qt.Vertical)
         self.vsplit.addWidget(self.guitabs)
         self.vsplit.addWidget(self.guilogger)
         #self.vsplit.moveSplitter(0,200)
         
-        #self.hsplit = QtGui.QSplitter(QtCore.Qt.Horizontal)
-        #self.hsplit.addWidget(self.guitree)
-        #self.hsplit.addWidget(self.vsplit)
 
         self.vbox = QtGui.QVBoxLayout() 
         #self.vbox.addWidget(self.guibuttonbar)
@@ -138,7 +129,7 @@ class GUIMain ( QtGui.QWidget ) :
 
     def setStyle(self):
         pass
-        self.setMinimumSize(800,900)
+        self.setMinimumSize(800,700)
         self.setContentsMargins (QtCore.QMargins(-9,-9,-9,-9))
         #self.vsplit.setMinimumHeight(700)
         

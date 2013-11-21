@@ -43,7 +43,7 @@ class GUILogger ( QtGui.QWidget ) :
 
         self.show_buttons = show_buttons
         
-        self.setGeometry(200, 400, 900, 50)
+        self.setGeometry(200, 400, 500, 400)
         self.setWindowTitle('GUI Logger')
         #self.setWindowIcon(cp.icon_logger)
 
@@ -135,7 +135,8 @@ class GUILogger ( QtGui.QWidget ) :
 
         if not self.show_buttons : self.setContentsMargins (QtCore.QMargins(-9,-9,-9,-9))
         self.setMinimumHeight(50)
-        self.setBaseSize(600,50)
+        self.setMinimumSize(300,50)
+        #self.setBaseSize(500,200)
 
 
     def setParent(self,parent) :

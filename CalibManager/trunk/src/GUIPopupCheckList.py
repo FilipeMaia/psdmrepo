@@ -90,8 +90,8 @@ class GUIPopupCheckList(QtGui.QDialog) :
 #-----------------------------  
 
     def showToolTips(self):
-        self.but_apply.setToolTip('Mouse click on this button or Alt-S \nor "Enter" submits message to ELog')
-        self.but_cancel.setToolTip('Mouse click on this button \nor Alt-C cancels submission...')
+        self.but_apply.setToolTip('Apply changes to the list')
+        self.but_cancel.setToolTip('Use default list')
         
     def setFrame(self):
         self.frame = QtGui.QFrame(self)
@@ -102,7 +102,8 @@ class GUIPopupCheckList(QtGui.QDialog) :
         #self.frame.setVisible(False)
 
     def setStyle(self):
-        self.setFixedWidth(200)
+        #self.setFixedWidth(200)
+        self.setMinimumWidth(200)
         self.setStyleSheet(cp.styleBkgd)
         self.but_cancel.setStyleSheet(cp.styleButton)
         self.but_apply.setStyleSheet(cp.styleButton)

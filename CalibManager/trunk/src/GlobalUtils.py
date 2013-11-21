@@ -689,11 +689,15 @@ def changeCheckBoxListInPopupMenu(list, win_title='Set check boxes'):
     popupMenu.move(QtGui.QCursor.pos())
     response = popupMenu.exec_()
 
-    if   response == QtGui.QDialog.Accepted : logger.info('New checkbox list is accepted', __name__)         
-    elif response == QtGui.QDialog.Rejected : logger.info('Will use old checkbox list', __name__)
-    else                                    : logger.error('Unknown response...', __name__)
-
-    #return list
+    if   response == QtGui.QDialog.Accepted :
+        logger.info('New checkbox list is accepted', __name__)         
+        return 1
+    elif response == QtGui.QDialog.Rejected :
+        logger.info('Will use old checkbox list', __name__)
+        return 0
+    else                                    :
+        logger.error('Unknown response...', __name__)
+        return 2
 
 #----------------------------------
 

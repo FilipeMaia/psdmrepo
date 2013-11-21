@@ -39,7 +39,7 @@ class GUIDark ( QtGui.QWidget ) :
 
     def __init__ ( self, parent=None ) :
         QtGui.QWidget.__init__(self, parent)
-        self.setGeometry(200, 400, 800, 600)
+        self.setGeometry(200, 400, 800, 300)
         self.setWindowTitle('Dark run processing')
         self.setFrame()
 
@@ -80,7 +80,8 @@ class GUIDark ( QtGui.QWidget ) :
         #self.edi_path   .setToolTip('The path to the xtc file for processing in this GUI')
 
     def setStyle(self):
-        pass
+
+        self.setContentsMargins (QtCore.QMargins(-5,-5,-5,2))
 
         #self.vsplit.setMinimumHeight(200)
         self.vsplit.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Ignored)

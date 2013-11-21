@@ -123,7 +123,8 @@ class GUIConfig ( QtGui.QWidget ) :
         #self.setFixedHeight(330)
         #self.setFixedSize(550,350)
         #self.setFixedSize(600,360)
-        self.setMinimumSize(750,760)
+        self.setMinimumSize(600,360)
+        #self.setMinimumSize(750,760)
 
         #self.lab_status.setVisible(False)
         self.but_close .setVisible(False)
@@ -193,8 +194,10 @@ class GUIConfig ( QtGui.QWidget ) :
         self.parent = parent
 
     def resizeEvent(self, e):
-        #logger.debug('resizeEvent', __name__) 
+        logger.debug('resizeEvent', __name__) 
         self.frame.setGeometry(self.rect())
+        #print __name__ + ' config: self.size():', self.size()
+        #self.setMinimumSize( self.size().width(), self.size().height()-40 )
 
     def moveEvent(self, e):
         #logger.debug('moveEvent', __name__) 

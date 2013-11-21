@@ -420,7 +420,7 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
 
     def on_but_show(self):
         """Prints the list of commands for deployment of calibration file(s)"""
-        list_of_deploy_commands = self.get_gui_run().get_list_of_deploy_commands()
+        list_of_deploy_commands, list_of_sources = self.get_gui_run().get_list_of_deploy_commands_and_sources()
         msg = '\n' + 50*'-' + '\nTentative deploy command(s):'
         for cmd in list_of_deploy_commands :
             msg += '\n' + cmd
