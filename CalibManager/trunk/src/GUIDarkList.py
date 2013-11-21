@@ -53,6 +53,7 @@ class GUIDarkList ( QtGui.QWidget ) :
         self.str_run_number        = cp.str_run_number
         self.list_of_det_pars      = cp.list_of_det_pars
         self.list_of_dets_selected = cp.list_of_dets_selected
+        self.list_of_records       = []
 
         #self.calib_dir      = cp.calib_dir
         #self.det_name       = cp.det_name
