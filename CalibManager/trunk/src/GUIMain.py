@@ -65,7 +65,16 @@ class GUIMain ( QtGui.QWidget ) :
 
         cp.setIcons()
 
-        self.setGeometry(10, 25, 800, 700)
+        self.main_win_width  = cp.main_win_width 
+        self.main_win_height = cp.main_win_height
+        self.main_win_pos_x  = cp.main_win_pos_x 
+        self.main_win_pos_y  = cp.main_win_pos_y   
+
+        self.setGeometry(self.main_win_pos_x .value(), \
+                         self.main_win_pos_y .value(), \
+                         self.main_win_width .value(), \
+                         self.main_win_height.value())
+
         self.setWindowTitle('Calibration Manager')
         self.setWindowIcon(cp.icon_monitor)
         self.palette = QtGui.QPalette()
@@ -96,9 +105,10 @@ class GUIMain ( QtGui.QWidget ) :
         self.showToolTips()
         self.setStyle()
 
-        self.move(10,25)
+        #self.move(10,25)
+        self.move(self.main_win_pos_x.value(), self.main_win_pos_y.value())
         cp.guimain = self
-        
+
         #print 'End of init'
         
     #-------------------
@@ -151,14 +161,22 @@ class GUIMain ( QtGui.QWidget ) :
 
     def resizeEvent(self, e):
         #logger.debug('resizeEvent', self.name) 
-        self.frame.setGeometry(self.rect())
+        #self.frame.setGeometry(self.rect())
+        #point, size = self.mapToGlobal(QtCore.QPoint(0,0)), self.size()
+        #x,y,w,h = point.x(), point.y(), size.width(), size.height()
+        #msg = 'x,y,w,h : %d, %d, %d, %d, ' % (x,y,w,h)
+        #logger.info(msg, self.name)
+        #print msg
+        pass
 
     def moveEvent(self, e):
         #logger.debug('moveEvent', self.name) 
         #self.position = self.mapToGlobal(self.pos())
         #self.position = self.pos()
         #logger.debug('moveEvent - pos:' + str(self.position), __name__)       
+        #print 'Move window to x,y: ', str(self.mapToGlobal(QtCore.QPoint(0,0)))
         pass
+
 
     def closeEvent(self, event):
         logger.info('closeEvent', self.name)
@@ -176,7 +194,21 @@ class GUIMain ( QtGui.QWidget ) :
 
 
     def onSave(self):
+
+        point, size = self.mapToGlobal(QtCore.QPoint(0,0)), self.size()
+        x,y,w,h = point.x(), point.y(), size.width(), size.height()
+        msg = 'Save main window x,y,w,h : %d, %d, %d, %d, ' % (x,y,w,h)
+        logger.info(msg, self.name)
+        print msg
+
+        #Save main window position and size
+        self.main_win_pos_x .setValue(x)
+        self.main_win_pos_y .setValue(y)
+        self.main_win_width .setValue(w)
+        self.main_win_height.setValue(h)
+        
         cp.close()
+
         if cp.save_log_at_exit.value() : logger.saveLogInFile(fnm.log_file())
         #logger.saveLogTotalInFile( fnm.log_file_total() )
 

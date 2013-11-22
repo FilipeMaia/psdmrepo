@@ -187,6 +187,13 @@ class ConfigParametersForApp ( ConfigParameters ) :
         #self.log_file_total  = self.declareParameter( name='LOG_FILE_TOTAL',     val_def='./log_total.txt',           type='str' )
         self.save_log_at_exit = self.declareParameter( name='SAVE_LOG_AT_EXIT',   val_def=True,           type='bool')
 
+
+        # GUIMain.py (10, 25, 800, 700)
+        self.main_win_width  = self.declareParameter( name='MAIN_WIN_WIDTH',  val_def=800, type='int' )
+        self.main_win_height = self.declareParameter( name='MAIN_WIN_HEIGHT', val_def=700, type='int' )
+        self.main_win_pos_x  = self.declareParameter( name='MAIN_WIN_POS_X',  val_def=5,   type='int' )
+        self.main_win_pos_y  = self.declareParameter( name='MAIN_WIN_POS_Y',  val_def=5,   type='int' )
+
         # GUIInsExpDirDet.py
         self.instr_dir          = self.declareParameter( name='INSTRUMENT_DIR',    val_def='/reg/d/psdm',  type='str' ) 
         self.instr_name         = self.declareParameter( name='INSTRUMENT_NAME',   val_def='Select',       type='str' ) # 'CXI'
