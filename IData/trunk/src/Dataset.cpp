@@ -288,8 +288,6 @@ Dataset::files() const
   std::map<unsigned, unsigned> filesPerRun;
   for (fs::directory_iterator fiter(dir); fiter != fs::directory_iterator(); ++ fiter) {
 
-    if (fiter->status().type() != fs::regular_file) continue;
-    
     const fs::path& path = fiter->path();
     const fs::path& basename = path.filename();
     
@@ -305,7 +303,8 @@ Dataset::files() const
         }
         boost::regex re(reStr);
 
-        if (boost::regex_match(basename.string(), re)) {
+        // name should match and we only take regular files
+        if (boost::regex_match(basename.string(), re) and fiter->status().type() == fs::regular_file) {
           MsgLog(logger, debug, "found matching file: " << path);
           m_files.push_back(path.string());
           ++ filesPerRun[run];
