@@ -199,7 +199,7 @@ class GUIMain ( QtGui.QWidget ) :
         x,y,w,h = point.x(), point.y(), size.width(), size.height()
         msg = 'Save main window x,y,w,h : %d, %d, %d, %d, ' % (x,y,w,h)
         logger.info(msg, self.name)
-        print msg
+        #print msg
 
         #Save main window position and size
         self.main_win_pos_x .setValue(x)
