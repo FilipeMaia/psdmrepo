@@ -350,7 +350,7 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
                                      self.str_run_to  .lstrip('0') )
 
             calib_path = os.path.join(self.calib_dir.value(), typ, src, 'pedestals', fname)
-            cmd = 'cp %s  %s' % (file, calib_path)
+            cmd = 'cp %s %s' % (file, calib_path)
 
             list_of_deploy_commands.append(cmd)
 

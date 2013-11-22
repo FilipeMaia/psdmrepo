@@ -201,6 +201,9 @@ class ConfigParametersForApp ( ConfigParameters ) :
         self.det_name           = self.declareParameter( name='DETECTOR_NAME',     val_def='Select',       type='str' ) # 'CSPAD'
         self.calib_dir          = self.declareParameter( name='CALIB_DIRECTORY',   val_def='Select',       type='str' ) # '/reg/d/psdm/CXI/cxitut13/calib'
 
+        # FileDeployer.py
+        self.fname_history      = self.declareParameter( name='HISTORY_FILE_NAME', val_def='HISTORY',      type='str' )
+
         # GUITabs.py
         self.current_tab    = self.declareParameter( name='CURRENT_TAB'      , val_def='Status',        type='str' )
 

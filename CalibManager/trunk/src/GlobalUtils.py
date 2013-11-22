@@ -153,6 +153,12 @@ def print_list_of_files_in_dir(dirname, path_or_fname) :
     print '\n'
 
 
+def get_enviroment(env='USER') :
+    """Returns the value of specified by string name environment variable
+    """
+    return os.environ[env]
+
+
 def get_path_owner(path) :
     stat = os.stat(path)
     #print ' stat =', stat
@@ -372,8 +378,10 @@ def load_textfile(path) :
 
 #----------------------------------
 
-def save_textfile(text, path) :
-    f=open(path,'w')
+def save_textfile(text, path, mode='w') :
+    """Saves text in file specified by path. mode: 'w'-write, 'a'-append 
+    """
+    f=open(path,mode)
     f.write(text)
     f.close() 
 

@@ -105,6 +105,8 @@ class GUIMain ( QtGui.QWidget ) :
         self.showToolTips()
         self.setStyle()
 
+        gu.create_directory(cp.dir_work.value())
+
         #self.move(10,25)
         self.move(self.main_win_pos_x.value(), self.main_win_pos_y.value())
         cp.guimain = self
@@ -195,9 +197,9 @@ class GUIMain ( QtGui.QWidget ) :
 
     def onSave(self):
 
-        point, size = self.mapToGlobal(QtCore.QPoint(0,0)), self.size()
+        point, size = self.mapToGlobal(QtCore.QPoint(-5,-22)), self.size() # Offset (-5,-22) for frame size.
         x,y,w,h = point.x(), point.y(), size.width(), size.height()
-        msg = 'Save main window x,y,w,h : %d, %d, %d, %d, ' % (x,y,w,h)
+        msg = 'Save main window x,y,w,h : %d, %d, %d, %d' % (x,y,w,h)
         logger.info(msg, self.name)
         #print msg
 
