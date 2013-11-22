@@ -156,7 +156,7 @@ class GUIConfig ( QtGui.QWidget ) :
             cp.current_config_tab.setValue(self.list_file_types[tab_index])
         self.tab_bar.setCurrentIndex(tab_index)
 
-        logger.info(' make_tab_bar - set mode: ' + cp.current_config_tab.value(), __name__)
+        logger.debug(' make_tab_bar - set mode: ' + cp.current_config_tab.value(), __name__)
 
         self.connect(self.tab_bar, QtCore.SIGNAL('currentChanged(int)'), self.onTabBar)
 

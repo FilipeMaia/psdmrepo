@@ -174,7 +174,7 @@ class BatchJob (QtCore.QObject ) : # need in QtCore.QObject in order to connect 
                 break
         if comment != '' :
             msg = 'Check file existence and size for the list %s: %s' % (comment, self.dict_status[status])
-            logger.info(msg, __name__)         
+            logger.debug(msg, __name__)         
         return status
 
 #-----------------------------

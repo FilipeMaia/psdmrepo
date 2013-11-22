@@ -166,8 +166,6 @@ class GUIDarkListItem ( QtGui.QWidget ) :
 
     def setStatusMessage(self):
         if cp.guistatus is None : return
-        #msg = 'From %s to %s use dark run %s' % (self.str_run_from.value(), self.str_run_to.value(), self.str_run_number.value())
-        #msg = gu.get_text_content_of_calib_dir_for_detector(path=self.calib_dir.value(), det=self.det_name.value(), calib_type='pedestals')
         #cp.guistatus.setStatusMessage(msg)
 
 
@@ -190,13 +188,7 @@ class GUIDarkListItem ( QtGui.QWidget ) :
 
     def onClickExpand(self):
         logger.debug('onClickExpand', __name__)
-
-        #self.gui_add = QtGui.QLabel('Additional information')
-  
-        #dir_xtc = fnm.path_to_xtc_dir()
-        #list_of_files = gu.get_list_of_files_in_dir_for_part_fname(dir_xtc, pattern='-r'+self.run_number)
-        #self.gui_add = GUIAnyFilesStatusTable(self, list_of_files)
-
+        #self.gui_add = QtGui.QLabel('Additional information')  
         self.gui_add = GUIDarkListItemAdd(self, self.run_number) 
         self.hboxW.addWidget(self.gui_add)
         #self.hboxW.addStretch(1)     

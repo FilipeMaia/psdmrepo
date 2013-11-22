@@ -492,7 +492,7 @@ def xtc_fname_for_all_chunks(path='e167-r0015-s00-c00.xtc') :
 # for example        /reg/d/psdm/CXI/cxitut13/calib
 # or                 /reg/d/psdm/XPP/xpptut13/calib
 
-def get_text_content_of_calib_dir_for_detector(path, det='cspad', level=0, calib_type='pedestals') :
+def get_text_content_of_calib_dir_for_detector(path, det='cspad', subdir='CsPad::CalibV1', level=0, calib_type='pedestals') :
 
     #logger.debug( 'get_txt_content_of_calib_dir_for_detector(...): ' + path, __name__)
     det_lower = det.lower()
@@ -510,7 +510,8 @@ def get_text_content_of_calib_dir_for_detector(path, det='cspad', level=0, calib
 
     for i,file in enumerate(list_of_fnames) :
         fname_lower = file.lower()
-        cond0 = level==0 and det.lower()+'::' in fname_lower
+        #cond0 = level==0 and det.lower()+'::' in fname_lower
+        cond0 = level==0 and subdir in file
         cond1 = level==1 and det.lower()+'.'  in fname_lower
         cond2 = level==2 and file == calib_type
         cond3 = level==3
@@ -522,7 +523,7 @@ def get_text_content_of_calib_dir_for_detector(path, det='cspad', level=0, calib
 
         path_to_child = os.path.join(path, file)
 
-        if os.path.isdir(path_to_child) : txt += get_text_content_of_calib_dir_for_detector(path_to_child, det, level=level+1, calib_type=calib_type)
+        if os.path.isdir(path_to_child) : txt += get_text_content_of_calib_dir_for_detector(path_to_child, det, subdir, level=level+1, calib_type=calib_type)
              
     return txt
 
@@ -690,10 +691,10 @@ def changeCheckBoxListInPopupMenu(list, win_title='Set check boxes'):
     response = popupMenu.exec_()
 
     if   response == QtGui.QDialog.Accepted :
-        logger.info('New checkbox list is accepted', __name__)         
+        logger.debug('New checkbox list is accepted', __name__)         
         return 1
     elif response == QtGui.QDialog.Rejected :
-        logger.info('Will use old checkbox list', __name__)
+        logger.debug('Will use old checkbox list', __name__)
         return 0
     else                                    :
         logger.error('Unknown response...', __name__)
@@ -906,9 +907,9 @@ if __name__ == "__main__" :
     #print 'xtc_fname_for_all_chunks(...): ', xtc_fname_for_all_chunks('e308-r0178-s02-c00.xtc')
     #print 'xtc_fname_for_all_chunks(...): ', xtc_fname_for_all_chunks('/reg/d/psdm/XPP/xpptut13/xtc/e308-r0178-s02-c00.xtc')
 
-    #print 'Test 1:\n' + get_text_content_of_calib_dir_for_detector(path='/reg/d/psdm/XPP/xpptut13/calibXXX', det='CSPAD')
-    #print 'Test 2:\n' + get_text_content_of_calib_dir_for_detector(path='/reg/d/psdm/XPP/xpptut13/calib/', det='CSPAD2x2')
-    print 'Test 3:\n' + get_text_content_of_calib_dir_for_detector(path='/reg/d/psdm/XPP/xpptut13/calib', det='CSPAD', calib_type='tilt')
+    #print 'Test 1:\n' + get_text_content_of_calib_dir_for_detector(path='/reg/d/psdm/XPP/xpptut13/calibXXX', subdir='CsPad::CalibV1', det='CSPAD')
+    #print 'Test 2:\n' + get_text_content_of_calib_dir_for_detector(path='/reg/d/psdm/XPP/xpptut13/calib/', subdir='CsPad2x2::CalibV1', det='CSPAD2x2')
+    print 'Test 3:\n' + get_text_content_of_calib_dir_for_detector(path='/reg/d/psdm/XPP/xpptut13/calib', subdir='CsPad::CalibV1', det='CSPAD', calib_type='tilt')
 
     sys.exit ( "End of test" )
 

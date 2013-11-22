@@ -133,8 +133,6 @@ class GUIDarkListItemAdd ( QtGui.QWidget ) :
 
     def setStatusMessage(self):
         if cp.guistatus is None : return
-        #msg = 'From %s to %s use dark run %s' % (self.str_run_from.value(), self.str_run_to.value(), self.str_run_number.value())
-        #msg = gu.get_text_content_of_calib_dir_for_detector(path=self.calib_dir.value(), det=self.det_name.value(), calib_type='pedestals')
         #cp.guistatus.setStatusMessage(msg)
 
 

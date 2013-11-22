@@ -128,7 +128,7 @@ class GUIDark ( QtGui.QWidget ) :
         pass
 
     def closeEvent(self, event):
-        logger.info('closeEvent', __name__)
+        logger.debug('closeEvent', __name__)
 
         try    : self.guistatus.close()
         except : pass

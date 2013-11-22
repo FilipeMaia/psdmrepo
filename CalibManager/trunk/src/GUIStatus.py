@@ -172,7 +172,9 @@ class GUIStatus ( QtGui.QGroupBox ) :
             
             #for det_name in self.det_name.value().split(' ') :
             for det_name in cp.list_of_dets_selected() :
-                msg += '\n' + gu.get_text_content_of_calib_dir_for_detector(path=self.calib_dir.value(), det=det_name, calib_type=ctype)
+                calib_subdir = cp.dict_of_det_calib_types[det_name]
+                #print 'calib_subdir =', calib_subdir
+                msg += '\n' + gu.get_text_content_of_calib_dir_for_detector(path=self.calib_dir.value(), subdir=calib_subdir, det=det_name, calib_type=ctype)
 
         self.setStatusMessage(msg)
 
