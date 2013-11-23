@@ -294,20 +294,19 @@ class GUIDarkList ( QtGui.QWidget ) :
         
     def onItemExpand(self, widg):
         run, item = self.getRunAndItemForWidget(widg)
-        logger.info('Expand widget for run %s' % run, __name__)
+        logger.debug('Expand widget for run %s' % run, __name__)
         self.size_ext = QtCore.QSize(self.widg_width, widg.getHeight())
         item.setSizeHint(self.size_ext)
 
 
     def onItemShrink(self, widg):
-        logger.info('onItemExpand', __name__)
         run, item = self.getRunAndItemForWidget(widg)
-        logger.info('Shrink widget for run %s' % run, __name__)
+        logger.debug('Shrink widget for run %s' % run, __name__)
         item.setSizeHint(self.size)
 
 
     def onItemClick(self, item):
-        logger.info('onItemClick - do nothing...', __name__)
+        logger.debug('onItemClick - do nothing...', __name__)
         #print 'onItemClick' # , isChecked: ', str(item.checkState())
 
         widg = self.list.itemWidget(item)
@@ -327,7 +326,7 @@ class GUIDarkList ( QtGui.QWidget ) :
 
 
     def onItemDoubleClick(self, item):
-        logger.info('onItemDoubleClick', __name__)
+        logger.debug('onItemDoubleClick', __name__)
         #print 'onItemDoubleClick' #, isChecked: ', str(item.checkState())
 
     

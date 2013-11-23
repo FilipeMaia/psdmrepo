@@ -327,78 +327,27 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
             cp.plotimgspe.close()
             try    : del cp.plotimgspe
             except : pass
+
         except :
-
-            self.arr     = None
-            self.img_arr = None
-
-            msg = 'Plot image for %s' % self.det_name.value()
-            logger.info(msg, __name__)
-
             list_of_fnames = self.get_list_of_files_peds_for_plot()
-
             #print 'list_of_fnames = ', list_of_fnames
 
-            if list_of_fnames != [] :
-
-                fname = list_of_fnames[0]
-                if len(list_of_fnames) > 1 :
-                    fname = gu.selectFromListInPopupMenu(list_of_fnames)
-
-                msg = 'Selected file to plot: %s' % fname
-                logger.info(msg, __name__)
-
-                self.arr = gu.get_array_from_file( fname )
-                if self.arr is None :
-                    logger.info('Array from file is None', __name__)
-                    return
-
-                #print 'self.arr:\n', self.arr
-                msg = 'self.arr.shape: %s' % str(self.arr.shape)
-                logger.info(msg, __name__)
- 
-            fname_lower = fname.lower()
-
-            #print 'fname_lower =', fname_lower
-            #print 'list_of_dets_lower =', cp.list_of_dets_lower
-
-            #self.list_of_dets   = ['CSPAD', 'CSPAD2x2', 'Princeton', 'pnCCD', 'Tm6740', 'Opal2000', 'Opal4000', 'Acqiris']
-
-            if fname_lower.find(cp.list_of_dets_lower[0]+'.')  != -1 : # CSAPD, shape = (5920,388) 
-                self.arr.shape = (32*185,388) 
-                self.img_arr = cspadimg.get_cspad_raw_data_array_image(self.arr)
-
-            elif fname_lower.find(cp.list_of_dets_lower[1]) != -1 : # CSAPD2x2
-                self.arr.shape = (185,388,2) 
-                self.img_arr = cspad2x2img.get_cspad2x2_non_corrected_image_for_raw_data_array(self.arr)
-
-            elif fname_lower.find(cp.list_of_dets_lower[2]) != -1 : # Princeton
-                self.img_arr = self.arr
-
-            elif fname_lower.find(cp.list_of_dets_lower[3]) != -1 : # pnCCD
-                self.img_arr = self.arr
-
-            elif fname_lower.find(cp.list_of_dets_lower[4]) != -1 : # Camera
-                self.img_arr = self.arr
-
-            elif fname_lower.find(cp.list_of_dets_lower[5]) != -1 : # Camera
-                self.img_arr = self.arr
-
-            elif fname_lower.find(cp.list_of_dets_lower[6]) != -1 : # Camera
-                self.img_arr = self.arr
-
-            elif fname_lower.find(cp.list_of_dets_lower[7]) != -1 : # Acqiris
-                self.img_arr = self.arr
-
-            else :
-                msg = 'Detector is not recognized in the file name: %s' %  fname
-                logger.warning(msg, __name__)
+            if list_of_fnames == [] :
+                logger.warning('List of files is empty... There is nothing to plot...', __name__)
                 return
 
+            fname = list_of_fnames[0]
+            if len(list_of_fnames) > 1 :
+                fname = gu.selectFromListInPopupMenu(list_of_fnames)
+
+            msg = 'Selected file to plot: %s' % fname
+            logger.info(msg, __name__)
+
+            self.img_arr = self.get_image_array_from_file(fname)
 
             if self.img_arr == None :
-                msg = 'self.img_arr == None'
                 return
+
             #print arr.shape,'\n', arr.shape
             tit = 'Plot for %s' % os.path.basename(fname)
             cp.plotimgspe = PlotImgSpe(None, self.img_arr, ofname=fnm.path_peds_aver_plot(), title=tit)
@@ -407,6 +356,65 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
             cp.plotimgspe.move(cp.guimain.pos().__add__(QtCore.QPoint(720,120)))
             cp.plotimgspe.show()
             #but.setStyleSheet(cp.styleButtonGood)
+
+
+
+
+    def get_image_array_from_file(self, fname) :
+        """Returns image array for recognized detector from the list or None"""
+
+        arr     = None
+        img_arr = None
+
+        arr = gu.get_array_from_file( fname )
+        if arr is None :
+            logger.warning('Array is not retreaved from file...', __name__)
+            return None
+
+        #print 'arr:\n', arr
+        msg = 'arr.shape: %s' % str(arr.shape)
+        logger.info(msg, __name__)
+ 
+        fname_lower = fname.lower()
+
+        #print 'fname_lower =', fname_lower
+        #print 'list_of_dets_lower =', cp.list_of_dets_lower
+
+        #self.list_of_dets   = ['CSPAD', 'CSPAD2x2', 'Princeton', 'pnCCD', 'Tm6740', 'Opal2000', 'Opal4000', 'Acqiris']
+
+        if cp.list_of_dets_lower[0]+'.' in fname_lower : # CSAPD, shape = (5920,388) 
+            arr.shape = (32*185,388) 
+            img_arr = cspadimg.get_cspad_raw_data_array_image(arr)
+
+        elif cp.list_of_dets_lower[1] in fname_lower : # CSAPD2x2
+            arr.shape = (185,388,2) 
+            img_arr = cspad2x2img.get_cspad2x2_non_corrected_image_for_raw_data_array(arr)
+
+        elif cp.list_of_dets_lower[2] in fname_lower : # Princeton
+            img_arr = arr
+
+        elif cp.list_of_dets_lower[3] in fname_lower : # pnCCD
+            img_arr = arr
+
+        elif cp.list_of_dets_lower[4] in fname_lower : # Camera
+            img_arr = arr
+
+        elif cp.list_of_dets_lower[5] in fname_lower : # Camera
+            img_arr = arr
+
+        elif cp.list_of_dets_lower[6] in fname_lower : # Camera
+            img_arr = arr
+
+        elif cp.list_of_dets_lower[7] in fname_lower : # Acqiris
+            img_arr = arr
+
+        else :
+            msg = 'Detector is not recognized in the file name: %s' %  fname
+            logger.warning(msg, __name__)
+            return None
+
+        return img_arr
+
 
 
     def get_gui_run(self):
