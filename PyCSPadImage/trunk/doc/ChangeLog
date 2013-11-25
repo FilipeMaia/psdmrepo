@@ -12,6 +12,11 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 #---------------------
+2012-11-25 Mikhail S. Dubrovin
+Tag: V00-00-18
+- in GlobalGraphics.py add protected setting for matplotlib.use('Qt4Agg')
+
+#---------------------
 2012-10-22 Mikhail S. Dubrovin
 Tag: V00-00-17
 - in CSPadConfigPars.py comment test print statements

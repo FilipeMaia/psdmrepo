@@ -30,6 +30,9 @@ __version__ = "$Revision: 4 $"
 import sys
 import numpy as np
 
+import matplotlib
+if matplotlib.get_backend() != 'Qt4Agg' : matplotlib.use('Qt4Agg')
+
 import matplotlib.pyplot as plt
 
 #---------------------
