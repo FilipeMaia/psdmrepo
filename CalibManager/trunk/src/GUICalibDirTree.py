@@ -95,6 +95,8 @@ class GUICalibDirTree (QtGui.QWidget):
         self.setWindowTitle('Item selection tree')
 
         self.setFrame()
+
+        cp.setIcons()
  
         #self.icon_folder_open   = QtGui.QIcon("icons/folder_open.gif")
         #self.icon_folder_closed = QtGui.QIcon("icons/folder_closed.gif")

@@ -39,6 +39,9 @@ if __name__ == "__main__" :
     import matplotlib
     matplotlib.use('Qt4Agg') # forse Agg rendering to a Qt4 canvas (backend)
 
+#import matplotlib
+#if matplotlib.get_backend() != 'Qt4Agg' : matplotlib.use('Qt4Agg')
+
 #from   matplotlib.figure import Figure
 import matplotlib.pyplot as plt
 import matplotlib.gridspec as gridspec
@@ -347,6 +350,9 @@ class PlotImgSpeWidget (QtGui.QWidget) :
         #self.axhi = self.fig.add_axes([0.15, 0.06, 0.78, 0.21])
         #self.axim = self.fig.add_axes([0.15, 0.32, 0.78, 0.67])
         #self.axcb = self.fig.add_axes([0.15, 0.03, 0.78, 0.028])
+
+        #msg = 'self.nbins: %s  self.range_his: %s' % (self.nbins, self.range_his)
+        #print 'plots_in_linear_scale: ' + msg
 
         self.axhi.hist(self.arrwin.flatten(), bins=self.nbins, range=self.range_his)
         self.set_hist_yticks()

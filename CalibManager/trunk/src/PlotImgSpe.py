@@ -54,6 +54,7 @@ import PlotImgSpeWidget         as imgwidg
 import PlotImgSpeButtons        as imgbuts
 
 from ConfigParametersForApp import cp
+import GlobalUtils          as     gu
 
 #---------------------
 #  Class definition --
@@ -72,12 +73,12 @@ class PlotImgSpe (QtGui.QWidget) :
         self.setFrame()
 
         if      arr != None : self.arr = arr
-        elif ifname != ''   : self.arr = gu.get_array_from_file(ifname)
+        elif ifname != ''   : self.arr = gu.get_image_array_from_file(ifname)
         else                : self.arr = get_array2d_for_test()
 
         self.ext_ref = None
 
-        self.widgimage   = imgwidg.PlotImgSpeWidget(parent, arr, orient, y_is_flip)
+        self.widgimage   = imgwidg.PlotImgSpeWidget(parent, self.arr, orient, y_is_flip)
         self.widgbuts    = imgbuts.PlotImgSpeButtons(self, self.widgimage, ifname, ofname, None, load_is_visible)
         #self.mpl_toolbar = imgtb.ImgSpeNavToolBar(self.widgimage, self)
  

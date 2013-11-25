@@ -45,6 +45,9 @@ from PyQt4 import QtGui, QtCore
 from LogBook import message_poster
 from GUIPopupCheckList import *
 
+import CSPAD2x2Image        as     cspad2x2img
+import CSPADImage           as     cspadimg
+
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
@@ -729,6 +732,36 @@ def get_array_from_file(fname, dtype=np.float32) :
     else :
         logger.warning(fname + ' is not available', __name__)         
         return None
+
+#----------------------------------
+
+def get_image_array_from_file(fname, dtype=np.float32) :
+
+    arr = get_array_from_file(fname, dtype)
+    if arr is None :
+        return None
+
+    img_arr = None
+        
+    if   arr.size == 32*185*388 : # CSPAD
+        arr.shape = (32*185,388) 
+        img_arr = cspadimg.get_cspad_raw_data_array_image(arr)
+
+    elif arr.size == 185*388*2 : # CSPAD2x2
+        arr.shape = (185,388,2) 
+        img_arr = cspad2x2img.get_cspad2x2_non_corrected_image_for_raw_data_array(arr)
+
+    elif arr.ndim == 2 : # Use it as any camera 2d image
+        img_arr = arr
+
+    else :
+        msg = 'Array loaded from file: %s\n has shape: %s, size: %s, ndim: %s' % \
+              (fname, str(arr.shape), str(arr.size), str(arr.ndim))
+        msg += '\nIs not recognized as image'
+        logger.warning(msg, __name__)         
+        return None
+
+    return img_arr
 
 #----------------------------------
 

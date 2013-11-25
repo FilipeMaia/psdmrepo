@@ -343,14 +343,14 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
             msg = 'Selected file to plot: %s' % fname
             logger.info(msg, __name__)
 
-            self.img_arr = self.get_image_array_from_file(fname)
-
-            if self.img_arr == None :
-                return
+            #self.img_arr = self.get_image_array_from_file(fname)
+            #if self.img_arr == None :
+            #    return
 
             #print arr.shape,'\n', arr.shape
             tit = 'Plot for %s' % os.path.basename(fname)
-            cp.plotimgspe = PlotImgSpe(None, self.img_arr, ofname=fnm.path_peds_aver_plot(), title=tit)
+            cp.plotimgspe = PlotImgSpe(None, ifname=fname, ofname=fnm.path_peds_aver_plot(), title=tit, load_is_visible=True)
+            #cp.plotimgspe = PlotImgSpe(None, self.img_arr, ofname=fnm.path_peds_aver_plot(), title=tit)
             #cp.plotimgspe = PlotImgSpe(None, self.img_arr, ifname=fnm.path_peds_ave(), ofname=fnm.path_peds_aver_plot())
             #cp.plotimgspe.setParent(self)
             cp.plotimgspe.move(cp.guimain.pos().__add__(QtCore.QPoint(720,120)))
@@ -361,7 +361,8 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
 
 
     def get_image_array_from_file(self, fname) :
-        """Returns image array for recognized detector from the list or None"""
+        """DEPRICATED: Recognizes detector by file name and returns image array or None
+        """
 
         arr     = None
         img_arr = None
