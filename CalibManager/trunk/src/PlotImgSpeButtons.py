@@ -36,6 +36,7 @@ from GUIHelp                import *
 #from GUIELogPostingDialog   import *
 import GlobalUtils          as     gu
 
+from FileNameManager        import fnm
 from ConfigParametersForApp import cp
 
 #---------------------
@@ -70,6 +71,7 @@ class PlotImgSpeButtons (QtGui.QWidget) :
         self.but_reset = QtGui.QPushButton('&Reset')
         self.but_help  = QtGui.QPushButton('&Help')
         self.but_load  = QtGui.QPushButton('Load')
+        self.but_diff  = QtGui.QPushButton('Diff')
         self.but_save  = QtGui.QPushButton('&Save')
         self.but_elog  = QtGui.QPushButton('&ELog') #u'\u2192 &ELog'
         self.but_quit  = QtGui.QPushButton('&Close')
@@ -93,12 +95,14 @@ class PlotImgSpeButtons (QtGui.QWidget) :
         self.but_help .setStyleSheet (cp.styleButtonGood) 
         self.but_reset.setStyleSheet (cp.styleButton) 
         self.but_load .setStyleSheet (cp.styleButton) 
+        self.but_diff .setStyleSheet (cp.styleButton) 
         self.but_save .setStyleSheet (cp.styleButton) 
         self.but_quit .setStyleSheet (cp.styleButtonBad) 
 
         self.connect(self.but_help,  QtCore.SIGNAL('clicked()'),          self.on_but_help)
         self.connect(self.but_reset, QtCore.SIGNAL('clicked()'),          self.on_but_reset)
         self.connect(self.but_load,  QtCore.SIGNAL('clicked()'),          self.on_but_load)
+        self.connect(self.but_diff,  QtCore.SIGNAL('clicked()'),          self.on_but_diff)
         self.connect(self.but_save,  QtCore.SIGNAL('clicked()'),          self.on_but_save)
         self.connect(self.but_elog,  QtCore.SIGNAL('clicked()'),          self.on_but_elog)
         self.connect(self.but_quit,  QtCore.SIGNAL('clicked()'),          self.on_but_quit)
@@ -116,6 +120,7 @@ class PlotImgSpeButtons (QtGui.QWidget) :
         cp.setIcons()
         self.but_elog .setIcon(cp.icon_mail_forward)
         self.but_load .setIcon(cp.icon_browser) # icon_contents)
+        self.but_diff .setIcon(cp.icon_minus) # icon_contents)
         self.but_save .setIcon(cp.icon_save)
         self.but_quit .setIcon(cp.icon_exit)
         self.but_help .setIcon(cp.icon_help)
@@ -132,14 +137,17 @@ class PlotImgSpeButtons (QtGui.QWidget) :
         self.hbox.addWidget(self.but_reset)
         self.hbox.addStretch(1)
         self.hbox.addWidget(self.but_load)
+        self.hbox.addWidget(self.but_diff)
         self.hbox.addWidget(self.but_save)
         self.hbox.addWidget(self.but_elog)
         self.hbox.addWidget(self.but_quit)
         self.setLayout(self.hbox)
 
+        self.but_quit.setVisible(False)
         self.but_elog.setVisible(False)
         #self.but_help.setVisible(False)
         self.but_load.setVisible(self.load_is_visible)
+        self.but_diff.setVisible(self.load_is_visible)
 
 
     def setGridLayout(self):
@@ -151,8 +159,9 @@ class PlotImgSpeButtons (QtGui.QWidget) :
         self.grid.addWidget(self.cbox_log,  0, 4)
         self.grid.addWidget(self.but_reset, 0, 6)
         self.grid.addWidget(self.but_load,  0, 7)
-        self.grid.addWidget(self.but_save,  0, 8)
-        self.grid.addWidget(self.but_quit,  0, 9)
+        self.grid.addWidget(self.but_diff,  0, 8)
+        self.grid.addWidget(self.but_save,  0, 9)
+        self.grid.addWidget(self.but_quit,  0, 10)
         self.setLayout(self.grid)
 
 
@@ -160,6 +169,7 @@ class PlotImgSpeButtons (QtGui.QWidget) :
         self.but_reset.setToolTip('Reset original view') 
         self.but_quit .setToolTip('Quit this GUI') 
         self.but_load .setToolTip('Load image from file') 
+        self.but_load .setToolTip('Load subtracting image from file') 
         self.but_save .setToolTip('Save the figure in file') 
         self.but_elog .setToolTip('Send figure to ELog') 
         self.but_help .setToolTip('Click on this button\nand get help') 
@@ -226,21 +236,64 @@ class PlotImgSpeButtons (QtGui.QWidget) :
 
     def on_but_load(self):
         logger.debug('on_but_load', __name__ )
+
         path = gu.get_open_fname_through_dialog_box(self, self.ifname, 'Select file with image', filter='*.txt *.npy')
         if path == None or path == '' :
-            logger.debug('Loading is cancelled...', __name__ )
+            logger.info('Loading is cancelled...', __name__ )
             return
 
         self.ifname = path
+
 
         arr = gu.get_image_array_from_file(path) # dtype=np.float32)
         if arr is None : return
 
         #arr = gu.get_array_from_file(path) # dtype=np.float32)
         #print 'arr:\n', arr
-        self.widgimage.set_image_array_new(arr, \
+        self.widgimage.set_image_array_new(arr,
                                            rot_ang_n90 = self.widgimage.rot_ang_n90,
                                            y_is_flip   = self.widgimage.y_is_flip)
+
+
+
+    def on_but_diff(self):
+        logger.info('on_but_diff', __name__ )
+
+        list_of_opts = ['Load from WORK directory',
+                        'Load from CALIB directory',
+                        'Load initial image',
+                        'Cancel'
+                        ]
+
+        selected = gu.selectFromListInPopupMenu(list_of_opts)
+        logger.debug('selected option: %s' % selected, __name__ )
+
+        path0 = self.ifname
+        if selected is None              : return
+        elif selected == list_of_opts[0] : path0 = fnm.path_dir_work()
+        elif selected == list_of_opts[1] : path0 = fnm.path_to_calib_dir()
+        elif selected == list_of_opts[2] : path0 = self.ifname
+        elif selected == list_of_opts[3] : return
+        else                             : return
+
+        file_filter = 'Files (*.txt *.data *.npy)\nAll files (*)'
+        path = gu.get_open_fname_through_dialog_box(self, path0, 'Select file to subtract', filter=file_filter)
+        if path == None or path == '' :
+            logger.info('Loading is cancelled...', __name__ )
+            return
+
+        arr_sub = gu.get_image_array_from_file(path) # dtype=np.float32)
+        if arr_sub is None : return
+
+        if arr_sub.size != self.widgimage.arr.size :
+            msg = 'Subtracted array size: %d is different from current image size: %d. Diff plotting is cancelled.' % \
+                  (arr_sub.size, self.widgimage.arr.size)
+            logger.warning(msg, __name__ )
+            #print msg
+            return
+
+        self.widgimage.subtract_from_image_array(arr_sub)
+
 
 
     def on_but_save(self):

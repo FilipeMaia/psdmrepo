@@ -180,6 +180,10 @@ class PlotImgSpeWidget (QtGui.QWidget) :
         self.arr = arr_rot_n90(arr, self.rot_ang_n90)
         self.on_draw()
 
+    def subtract_from_image_array(self, arr_sub):
+        arr_sub_rot = arr_rot_n90(arr_sub, self.rot_ang_n90)
+        self.arr -= arr_sub_rot
+        self.on_draw()
 
     def processDraw(self) :
         #fig = event.canvas.figure

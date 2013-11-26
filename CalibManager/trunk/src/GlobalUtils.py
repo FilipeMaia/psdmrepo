@@ -44,6 +44,7 @@ from Logger import logger
 from PyQt4 import QtGui, QtCore
 from LogBook import message_poster
 from GUIPopupCheckList import *
+from GUIPopupRadioList import *
 
 import CSPAD2x2Image        as     cspad2x2img
 import CSPADImage           as     cspadimg
@@ -710,6 +711,17 @@ def changeCheckBoxListInPopupMenu(list, win_title='Set check boxes'):
     else                                    :
         logger.error('Unknown response...', __name__)
         return 2
+
+
+#----------------------------------
+
+def selectRadioButtonInPopupMenu(dict_of_pars, win_title='Select option', do_confirm=False):
+    """Popup GUI to select radio button from the list:  dict_of_pars = {'checked':'radio1', 'list':['radio0', 'radio1', 'radio2']}
+    """
+    popupMenu = GUIPopupRadioList(None, dict_of_pars, win_title, do_confirm)
+    #popupMenu.move(QtCore.QPoint(50,50))
+    popupMenu.move(QtGui.QCursor.pos()-QtCore.QPoint(100,100))
+    return popupMenu.exec_() # QtGui.QDialog.Accepted or QtGui.QDialog.Rejected
 
 #----------------------------------
 

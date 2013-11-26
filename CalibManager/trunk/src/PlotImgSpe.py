@@ -162,7 +162,7 @@ def main():
     app = QtGui.QApplication(sys.argv)
 
     #w  = PlotImgSpe(None, get_array2d_for_test())
-    w  = PlotImgSpe(None)
+    w  = PlotImgSpe(None, load_is_visible=True)
     w.set_image_array( get_array2d_for_test() )
     w.move(QtCore.QPoint(50,50))
     w.show()

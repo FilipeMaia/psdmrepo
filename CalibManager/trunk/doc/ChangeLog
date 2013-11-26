@@ -11,6 +11,14 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-04
+2013-11-26 Mikhail S. Dubrovin
+- add more icons in data/icons/
+- add app/plims for "standalone" plotting procedure
+- in PlotImgSpe add buttons
+	Load - to load any array and 
+	Diff - to see diffetence between current and image array from file
+
 Tag: V00-00-03
 2013-11-22 Mikhail S. Dubrovin
 - add popup window for confirmation of sources before deployment
