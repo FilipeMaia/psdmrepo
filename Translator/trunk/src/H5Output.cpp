@@ -20,7 +20,6 @@
 
 #include "psddl_pds2psana/cspad.ddl.h" // TODO: change pds2psana to psana, and all other places
 
-#include "psddl_hdf2psana/DefaultChunkPolicy.h"
 
 #include "Translator/H5Output.h"
 #include "Translator/H5GroupNames.h"
@@ -178,6 +177,7 @@ void H5Output::readConfigParameters() {
     m_typeInclude[*alias] = excludeIncludeToBool(*alias,configStr(*alias,"include"));
   }
   m_storeEpics = config("store_epics",true);
+  if (not m_storeEpics) MsgLog(logger(),trace,"not storing epics");
   m_short_bld_name = config("short_bld_name",false);
   // src filter parameters
   std::list<std::string> include_all, empty_list;
@@ -189,96 +189,37 @@ void H5Output::readConfigParameters() {
   m_include_uncalibrated_data = config("include_uncalibrated_data",false);
   m_calibration_key = configStr("calibration_key","calibrated");
 
-  // chunk parameters
-  m_chunkSizeInBytes = config("chunkSizeInBytes",16*1024*1024);  // default - 16 MB chunks
-  m_chunkSizeInElements = config("chunkSizeInElements", 0);
-  m_maxChunkSizeInBytes = config("maxChunkSizeInBytes",100*1024*1024);
-  m_minObjectsPerChunk = config("minObjectsPerChunk",50);
-  m_maxObjectsPerChunk = config("maxObjectsPerChunk",2048);
-  m_minChunkCacheSize = config("minChunkCacheSize",1024*1024);
-  m_maxChunkCacheSize = config("maxChunkCacheSize",10*1024*1024);
-
-  m_eventIdChunkSizeInBytes = config("eventIdChunkSizeInBytes",m_chunkSizeInBytes);
-  m_eventIdChunkSizeInElements = config("eventIdChunkSizeInElements", m_chunkSizeInElements);
-
-  m_damageChunkSizeInBytes = config("damageChunkSizeInBytes",m_chunkSizeInBytes);
-  m_damageChunkSizeInElements = config("damageChunkSizeInElements",m_chunkSizeInBytes);
-
-  m_filterMsgChunkSizeInBytes = config("filterMsgChunkSizeInBytes",m_chunkSizeInBytes);
-  m_filterMsgChunkSizeInElements = config("filterMsgChunkSizeInElements",m_chunkSizeInElements);
-
-  m_epicsPvChunkSizeInBytes = config("epicsPvChunkSizeBytes",m_chunkSizeInBytes);
-  m_epicsPvChunkSizeInElements = config("epicsPvChunkSizeBytes",m_chunkSizeInElements);
-
-  m_defaultChunkPolicy = boost::make_shared<psddl_hdf2psana::DefaultChunkPolicy>(
-                                                             m_chunkSizeInBytes,
-                                                             m_chunkSizeInElements,
-                                                             m_maxChunkSizeInBytes,
-                                                             m_minObjectsPerChunk,
-                                                             m_maxObjectsPerChunk,
-                                                             m_minChunkCacheSize,
-                                                             m_maxChunkCacheSize);
-  m_eventIdChunkPolicy   = boost::make_shared<psddl_hdf2psana::DefaultChunkPolicy>(
-                                                             m_eventIdChunkSizeInBytes,
-                                                             m_eventIdChunkSizeInElements,
-                                                             m_maxChunkSizeInBytes,
-                                                             m_minObjectsPerChunk,
-                                                             m_maxObjectsPerChunk,
-                                                             m_minChunkCacheSize,
-                                                             m_maxChunkCacheSize);
-  m_damageChunkPolicy    = boost::make_shared<psddl_hdf2psana::DefaultChunkPolicy>(
-                                                             m_damageChunkSizeInBytes,
-                                                             m_damageChunkSizeInElements,
-                                                             m_maxChunkSizeInBytes,
-                                                             m_minObjectsPerChunk,
-                                                             m_maxObjectsPerChunk,
-                                                             m_minChunkCacheSize,
-                                                             m_maxChunkCacheSize);
-  m_filterMsgChunkPolicy = boost::make_shared<psddl_hdf2psana::DefaultChunkPolicy>(
-                                                             m_filterMsgChunkSizeInBytes,
-                                                             m_filterMsgChunkSizeInElements,
-                                                             m_maxChunkSizeInBytes,
-                                                             m_minObjectsPerChunk,
-                                                             m_maxObjectsPerChunk,
-                                                             m_minChunkCacheSize,
-                                                             m_maxChunkCacheSize);
-  m_epicsPvChunkPolicy   = boost::make_shared<psddl_hdf2psana::DefaultChunkPolicy>(
-                                                             m_epicsPvChunkSizeInBytes,
-                                                             m_epicsPvChunkSizeInElements,
-                                                             m_maxChunkSizeInBytes,
-                                                             m_minObjectsPerChunk,
-                                                             m_maxObjectsPerChunk,
-                                                             m_minChunkCacheSize,
-                                                             m_maxChunkCacheSize);
+  m_chunkManager.readConfigParameters(*this);
 
   m_defaultShuffle = config("shuffle",true);
-  m_defaultDeflate = config("deflate",3);
+  m_defaultDeflate = config("deflate",1);
 
   bool eventIdShuffle = config("eventIdShuffle",m_defaultShuffle);
   int eventIdDeflate = config("eventIdDeflate",m_defaultDeflate);
 
-  bool damageShuffle = config("damageShuffle",m_defaultShuffle);
+  bool damageShuffle = config("damageShuffle",false);
   int damageDeflate = config("damageDeflate",m_defaultDeflate);
 
   bool filterMsgShuffle = config("filterMsgShuffle",m_defaultShuffle);  
   int filterMsgDeflate = config("filterMsgDeflate",m_defaultDeflate);
 
-  bool epicsPvShuffle = config("epicsPvShuffle",m_defaultShuffle); 
+  bool epicsPvShuffle = config("epicsPvShuffle",false);
   int epicsPvDeflate = config("epicsPvDeflate",m_defaultDeflate);
 
-  m_eventIdCreateDsetProp = DataSetCreationProperties(m_eventIdChunkPolicy,
+  
+  m_eventIdCreateDsetProp = DataSetCreationProperties(m_chunkManager.eventIdChunkPolicy(),
                                                       eventIdShuffle,
                                                       eventIdDeflate);
-  m_damageCreateDsetProp = DataSetCreationProperties(m_damageChunkPolicy,
+  m_damageCreateDsetProp = DataSetCreationProperties(m_chunkManager.damageChunkPolicy(),
                                                      damageShuffle,
                                                      damageDeflate);
-  m_filterMsgCreateDsetProp = DataSetCreationProperties(m_filterMsgChunkPolicy,
+  m_filterMsgCreateDsetProp = DataSetCreationProperties(m_chunkManager.filterMsgChunkPolicy(),
                                                         filterMsgShuffle,
                                                         filterMsgDeflate);
-  m_epicsPvCreateDsetProp = DataSetCreationProperties(m_epicsPvChunkPolicy,
+  m_epicsPvCreateDsetProp = DataSetCreationProperties(m_chunkManager.epicsPvChunkPolicy(),
                                                       epicsPvShuffle,
                                                       epicsPvDeflate);
-  m_defaultCreateDsetProp = DataSetCreationProperties(m_defaultChunkPolicy,
+  m_defaultCreateDsetProp = DataSetCreationProperties(m_chunkManager.defaultChunkPolicy(),
                                                       m_defaultShuffle,
                                                       m_defaultDeflate);
 
@@ -407,6 +348,7 @@ void H5Output::beginJob(Event& evt, Env& env)
   m_currentRunCounter = 0;
   createNextConfigureGroup();
   m_configureGroupDir.clearMaps();
+  m_chunkManager.beginJob(env);
   addConfigTypes(m_configureGroupDir, m_currentConfigureGroup);
   if (m_storeEpics) {
     m_epicsGroupDir.processBeginJob(m_currentConfigureGroup.id(), 
@@ -431,6 +373,7 @@ void H5Output::beginCalibCycle(Event& evt, Env& env)
   m_calibCycleConfigureGroupDir.clearMaps();
   m_currentEventCounter = 0;
   m_filteredEventsThisCalibCycle = 0;
+  m_chunkManager.beginCalibCycle(env);
   addConfigTypes(m_calibCycleConfigureGroupDir, m_currentCalibCycleGroup);
   if (m_storeEpics) {
     m_epicsGroupDir.processBeginCalibCycle(m_currentCalibCycleGroup.id(), env.epicsStore());
@@ -882,6 +825,7 @@ void H5Output::endCalibCycle(Event& evt, Env& env) {
   m_calibCycleConfigureGroupDir.closeGroups();
   if (m_eventId) ::storeClock ( m_currentCalibCycleGroup, m_eventId->time(), "end" ) ;
   m_currentCalibCycleGroup.close();
+  m_chunkManager.endCalibCycle(m_currentEventCounter);
   ++m_currentCalibCycleCounter;
 }
 
@@ -902,6 +846,7 @@ void H5Output::endJob(Event& evt, Env& env)
   if (m_storeEpics) m_epicsGroupDir.processEndJob();
   if (m_eventId) ::storeClock ( m_currentConfigureGroup, m_eventId->time(), "end" ) ;
   m_currentConfigureGroup.close();
+  m_chunkManager.endJob();
   ++m_currentConfigureCounter;
 
   MsgLog(logger(),trace,name() << ": endJob()");

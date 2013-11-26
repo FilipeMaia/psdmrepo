@@ -7,6 +7,8 @@ psddl/data/templates/hdf5Translator.tmpl?hdfwritermap_cpp
 #include "PSEvt/EventKey.h"
 #include "PSEvt/TypeInfoUtils.h"
 #include "Translator/HdfWriterMap.h"
+#include "Translator/DataSetCreationProperties.h"
+#include "Translator/HdfWriterGeneric.h"
 #include "MsgLogger/MsgLogger.h"
 #include "psddl_hdf2psana/acqiris.ddl.h"
 #include "psddl_hdf2psana/alias.ddl.h"
@@ -41,7 +43,7 @@ using namespace std;
 
 namespace {
 
-// const char *logger = "Translator.HdfWriterMap";
+const char *logger = "Translator.HdfWriterMap";
 const int latestTypeSchema = -1;
 
 using namespace Translator;
@@ -91,13 +93,15 @@ public:
                      const PSEvt::EventKey & eventKey, 
                      PSEvt::Event & evt, PSEnv::Env & env,
                      bool shuffle, int deflate,
-                     boost::shared_ptr<psddl_hdf2psana::ChunkPolicy> chunkPolicy)
+                     boost::shared_ptr<Translator::ChunkPolicy> chunkPolicy)
   {
     checkType<T>(eventKey, "HdfWriter");
     boost::shared_ptr<T> ptr;
     if (dataTypeLoc == inEvent) ptr = evt.get(eventKey.src(), eventKey.key()); 
     else if (dataTypeLoc == inConfigStore) ptr = env.configStore().get(eventKey.src());
+    MsgLog(logger, info, "HdfWriter::make_datasets begin" << srcGroup.name());
     ::make_datasets(*ptr,srcGroup,*chunkPolicy,deflate,shuffle,latestTypeSchema);
+    MsgLog(logger, info, "HdfWriter::make_datasets end");
   }
 
   void store(DataTypeLoc dataTypeLoc, 
@@ -144,6 +148,7 @@ public:
   static const long indexForAppend = -1;
 };  // class HdfWriter<T>
 
+#include "hdfwriterCsPad.inc"
 
 } // local namespace 
 

@@ -2,7 +2,7 @@
 #define TRANSLATOR_DATASETCREATIONPROPERTIES_H
 
 #include "hdf5/hdf5.h"
-#include "psddl_hdf2psana/ChunkPolicy.h"
+#include "Translator/ChunkPolicy.h"
 
 namespace Translator {
 
@@ -24,7 +24,7 @@ class DataSetCreationProperties {
   DataSetCreationProperties() 
     : m_shuffle(false), m_deflate(0) {};
 
-  DataSetCreationProperties(boost::shared_ptr<psddl_hdf2psana::ChunkPolicy> chunkPolicy,
+  DataSetCreationProperties(boost::shared_ptr<Translator::ChunkPolicy> chunkPolicy,
                             bool shuffle, int deflate) 
     : m_chunkPolicy(chunkPolicy), m_shuffle(shuffle), m_deflate(deflate) {};
 
@@ -41,12 +41,12 @@ class DataSetCreationProperties {
   }  
 
   // accessors
-  boost::shared_ptr<psddl_hdf2psana::ChunkPolicy> chunkPolicy() const { return m_chunkPolicy; }
+  boost::shared_ptr<Translator::ChunkPolicy> chunkPolicy() const { return m_chunkPolicy; }
   bool shuffle() const { return m_shuffle; }
   int deflate() const { return m_deflate; }
 
  private:
-  boost::shared_ptr<psddl_hdf2psana::ChunkPolicy> m_chunkPolicy;
+  boost::shared_ptr<Translator::ChunkPolicy> m_chunkPolicy;
   bool m_shuffle;
   int m_deflate;
 };

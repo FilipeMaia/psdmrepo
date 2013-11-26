@@ -9,7 +9,7 @@
 using namespace Translator;
 
 namespace {
-  char * mainlogger = "doNoTranslate";
+  const char * mainlogger = "doNoTranslate";
 }
 
 void Translator::doNotTranslateEvent(PSEvt::Event &evt, const std::string & filterMsg) {
@@ -39,7 +39,7 @@ void Translator::doNotTranslateEvent(PSEvt::Event &evt, const std::string & filt
 #include "psana/Module.h"
 
 namespace {
-  char * testlogger = "doNoTranslate";
+  const char * testlogger = "doNoTranslate";
 }
 
 namespace Translator {

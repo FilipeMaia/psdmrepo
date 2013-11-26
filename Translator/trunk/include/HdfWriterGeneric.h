@@ -97,11 +97,11 @@ class HdfWriterGeneric {
                                 hid_t h5type,
                                 hsize_t fixedSize);
   
-  void append(hid_t groupId, size_t idx, void * data) { store_at(groupId,-1,idx,data); };
-  void append(hid_t groupId, const std::string & dsetName, void * data);
+  void append(hid_t groupId, size_t idx, const void * data) { store_at(groupId,-1,idx,data); };
+  void append(hid_t groupId, const std::string & dsetName, const void * data);
 
-  void store_at(hid_t groupId, long storeIndex, size_t dsetIndex, void * data);
-  void store_at(hid_t groupId, long storeIndex, const std::string & dsetName, void * data);
+  void store_at(hid_t groupId, long storeIndex, size_t dsetIndex, const void * data);
+  void store_at(hid_t groupId, long storeIndex, const std::string & dsetName, const void * data);
 
   void closeDatasets(hid_t groupId);
 

@@ -11,7 +11,7 @@
 #include "PSEvt/EventId.h"
 #include "PSEnv/EpicsStore.h"
 #include "psddl_psana/epics.ddl.h"
-
+#include "MsgLogger/MsgLogger.h"
 #include "Translator/epics.ddl.h"
 #include "Translator/DataSetCreationProperties.h"
 #include "Translator/HdfWriterGeneric.h"

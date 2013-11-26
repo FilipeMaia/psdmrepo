@@ -207,7 +207,7 @@ def compareTranslation(tester,o2o, psana, diffs, cmpDsetValues=True, recurse=Tru
                            msg="o2o and psana nonlinks differ %s" % o2o.name)
         tester.assertEqual(o2o_links,psana_links, 
                            msg="o2o and psana links differ %s" % o2o.name)
-
+        
         # recursively check all non link items.
         common_notLinks = list(set(o2o_notLinks).intersection(set(psana_notLinks)))
         for name in common_notLinks:
@@ -225,9 +225,11 @@ def compareTranslation(tester,o2o, psana, diffs, cmpDsetValues=True, recurse=Tru
         print "chunk= %s,%s  shuffle= %s,%s  compr= %s,%s  comp_opts= %s,%s  %s" % \
             (o2o.chunks,psana.chunks, o2o.shuffle,psana.shuffle, o2o.compression, psana.compression,
              o2o.compression_opts, psana.compression_opts, o2o.name)
-#        tester.assertEqual(o2o.chunks, psana.chunks, "chunk differs in %s" % o2o.name)
-#        tester.assertEqual(o2o.shuffle, psana.shuffle, "shuffle differs in %s" % o2o.name)
-#        test.assertEqual(o2o.compression,psana.compression, "compression differs in %s" % o2o.name)
+        if not o2o.name.startswith('/Configure:0000/Epics::EpicsPv/EpicsArch.0:NoDevice.0') and not \
+           o2o.name.startswith('/Configure:0000/Run:0000/CalibCycle:0000/Epics::EpicsPv/EpicsArch.0'):
+            tester.assertEqual(o2o.chunks, psana.chunks, "chunk differs in %s" % o2o.name)
+            tester.assertEqual(o2o.shuffle, psana.shuffle, "shuffle differs in %s" % o2o.name)
+            tester.assertEqual(o2o.compression,psana.compression, "compression differs in %s" % o2o.name)
         if cmpDsetValues:
             if o2o.name.find('Epics::EpicsPv')>=0:
                 compareEpicsDataset(tester,o2o,psana,diffs)

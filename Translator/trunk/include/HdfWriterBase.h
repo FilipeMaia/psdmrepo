@@ -6,7 +6,7 @@
 #include "PSEvt/EventKey.h"
 #include "PSEvt/Event.h"
 #include "PSEnv/Env.h"
-#include "psddl_hdf2psana/ChunkPolicy.h"
+#include "Translator/ChunkPolicy.h"
 
 namespace Translator {
 
@@ -21,7 +21,7 @@ class HdfWriterBase {
                              PSEnv::Env & env,
                              bool shuffle,
                              int deflate,
-                             boost::shared_ptr<psddl_hdf2psana::ChunkPolicy> chunkPolicy) = 0;
+                             boost::shared_ptr<Translator::ChunkPolicy> chunkPolicy) = 0;
 
   virtual void store(DataTypeLoc dataTypeLoc,
                      hdf5pp::Group & srcGroup, 

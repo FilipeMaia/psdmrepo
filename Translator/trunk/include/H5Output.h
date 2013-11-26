@@ -12,7 +12,6 @@
 #include "psana/Module.h"
 #include "hdf5pp/File.h"
 #include "hdf5pp/Group.h"
-#include "psddl_hdf2psana/ChunkPolicy.h"
 
 #include "PSEvt/TypeInfoUtils.h"
 
@@ -26,6 +25,8 @@
 #include "Translator/EpicsH5GroupDirectory.h"
 #include "Translator/EventKeyTranslation.h"
 #include "Translator/LessEventIdPtrs.h"
+#include "Translator/ChunkManager.h"
+
 /**
    Defines the H5Output module.
    This is a Psana module that will write Psana events to a
@@ -55,6 +56,8 @@ public:
   virtual void endCalibCycle(Event& evt, Env& env);
   virtual void endRun(Event& evt, Env& env);
   virtual void endJob(Event& evt, Env& env);
+
+  friend class Translator::ChunkManager;
 
 protected:  
   void readConfigParameters();
@@ -86,7 +89,7 @@ protected:
 private:
   hdf5pp::File m_h5file;
   static const int m_h5schema = 3;
-
+  ChunkManager m_chunkManager;
   size_t m_currentConfigureCounter;
   size_t m_currentRunCounter;
   size_t m_currentCalibCycleCounter;
@@ -151,39 +154,12 @@ private:
   std::string m_calibration_key;
   bool m_include_uncalibrated_data;
 
-  // default chunk parameters
-  hsize_t m_chunkSizeInBytes;
-  int m_chunkSizeInElements;
-  hsize_t m_maxChunkSizeInBytes;
-  int m_minObjectsPerChunk;
-  int m_maxObjectsPerChunk;
-  hsize_t m_minChunkCacheSize;
-  hsize_t m_maxChunkCacheSize;
-
-  // chunk parameters for specific datasets
-  hsize_t m_eventIdChunkSizeInBytes;
-  int m_eventIdChunkSizeInElements;
-
-  hsize_t m_damageChunkSizeInBytes;
-  int m_damageChunkSizeInElements;
-
-  hsize_t m_filterMsgChunkSizeInBytes;
-  int m_filterMsgChunkSizeInElements;
-  
-  hsize_t m_epicsPvChunkSizeInBytes;
-  int m_epicsPvChunkSizeInElements;
 
   bool m_defaultShuffle, m_eventIdShuffle, m_damageShuffle, 
     m_filterMsgShuffle, m_epicsPvShuffle;
 
   int m_defaultDeflate, m_eventIdDeflate, m_damageDeflate, 
     m_filterMsgDeflate, m_epicsPvDeflate;
-
-  boost::shared_ptr<psddl_hdf2psana::ChunkPolicy> m_defaultChunkPolicy;
-  boost::shared_ptr<psddl_hdf2psana::ChunkPolicy> m_eventIdChunkPolicy;
-  boost::shared_ptr<psddl_hdf2psana::ChunkPolicy> m_damageChunkPolicy;
-  boost::shared_ptr<psddl_hdf2psana::ChunkPolicy> m_filterMsgChunkPolicy;
-  boost::shared_ptr<psddl_hdf2psana::ChunkPolicy> m_epicsPvChunkPolicy;
 
   DataSetCreationProperties m_eventIdCreateDsetProp;
   DataSetCreationProperties m_damageCreateDsetProp;

@@ -1,5 +1,6 @@
 #include <string>
 #include <sstream>
+#include <cmath>
 
 #include "MsgLogger/MsgLogger.h"
 #include "Translator/hdf5util.h"
