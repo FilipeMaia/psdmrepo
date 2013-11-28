@@ -36,6 +36,23 @@ using namespace Psana;
 using namespace cspad_mod;
 PSANA_MODULE_FACTORY(CsPadPedestals)
 
+namespace {
+  
+  // returns squared standard deviation calculated from sum and sum of squares
+  double stddev2(unsigned count, int64_t sum, int64_t sum2) 
+  {
+    // if we just convert numbers to doubles then precision may not be 
+    // enough in case of large mean values, so we offset all values first 
+    // to bring them closer to mean values
+    int64_t offset = sum / count;
+    int64_t sum2o = sum2 - 2*offset*sum + count*offset*offset;
+    int64_t sumo = sum - offset*count;
+    double avg = double(sumo) / count;
+    return double(sum2o) / count - avg*avg;
+  }
+  
+}
+
 //		----------------------------------------
 // 		-- Public Function Member Definitions --
 //		----------------------------------------
@@ -51,7 +68,6 @@ CsPadPedestals::CsPadPedestals (const std::string& name)
   , m_noiseFile()
   , m_src()
   , m_segMask()
-  , m_count(0)
   , m_sum()
   , m_sum2()
 {
@@ -59,9 +75,10 @@ CsPadPedestals::CsPadPedestals (const std::string& name)
   m_noiseFile = configStr("noise", "cspad-noise.dat");
   
   // initialize arrays
+  std::fill_n(&m_count[0], int(MaxQuads), 0UL);
   std::fill_n(&m_segMask[0], int(MaxQuads), 0U);
-  std::fill_n(&m_sum[0][0][0][0], MaxQuads*MaxSectors*NumColumns*NumRows, 0.);
-  std::fill_n(&m_sum2[0][0][0][0], MaxQuads*MaxSectors*NumColumns*NumRows, 0.);
+  std::fill_n(&m_sum[0][0][0][0], MaxQuads*MaxSectors*NumColumns*NumRows, int64_t(0));
+  std::fill_n(&m_sum2[0][0][0][0], MaxQuads*MaxSectors*NumColumns*NumRows, int64_t(0));
 }
 
 //--------------
@@ -163,8 +180,6 @@ CsPadPedestals::event(Event& evt, Env& env)
   shared_ptr<Psana::CsPad::DataV1> data1 = evt.get(m_src);
   if (data1.get()) {
 
-    ++ m_count;
-    
     int nQuads = data1->quads_shape()[0];
     for (int iq = 0; iq != nQuads; ++ iq) {
       
@@ -174,15 +189,15 @@ CsPadPedestals::event(Event& evt, Env& env)
       // process statistics for this quad
       const ndarray<const int16_t, 3>& data = quad.data();
       collectStat(quad.quad(), data.data());
+
+      ++ m_count[quad.quad()];
     }
-    
+
   }
   
   shared_ptr<Psana::CsPad::DataV2> data2 = evt.get(m_src);
   if (data2.get()) {
 
-    ++ m_count;
-    
     int nQuads = data2->quads_shape()[0];
     for (int iq = 0; iq != nQuads; ++ iq) {
       
@@ -192,6 +207,8 @@ CsPadPedestals::event(Event& evt, Env& env)
       // process statistics for this quad
       const ndarray<const int16_t, 3>& data = quad.data();
       collectStat(quad.quad(), data.data());
+
+      ++ m_count[quad.quad()];
     }
     
   }
@@ -205,7 +222,7 @@ void
 CsPadPedestals::endJob(Event& evt, Env& env)
 {
 
-  MsgLog(name(), info, "collected total " << m_count << " events");
+  MsgLog(name(), info, "collected total " << m_count[0] << " events");
   
   if (not m_pedFile.empty()) {
 
@@ -215,7 +232,7 @@ CsPadPedestals::endJob(Event& evt, Env& env)
       for (int is = 0; is != MaxSectors; ++ is) {
         for (int ic = 0; ic != NumColumns; ++ ic) {
           for (int ir = 0; ir != NumRows; ++ ir) {
-            double avg = m_count ? m_sum[iq][is][ic][ir] / m_count : 0;
+            double avg = m_count[iq] ? double(m_sum[iq][is][ic][ir]) / m_count[iq] : 0;
             out << avg << ' ';
           }
           out << '\n';
@@ -236,9 +253,8 @@ CsPadPedestals::endJob(Event& evt, Env& env)
         for (int ic = 0; ic != NumColumns; ++ ic) {
           for (int ir = 0; ir != NumRows; ++ ir) {
             double stdev = 0;
-            if (m_count > 1) {
-              double avg = m_sum[iq][is][ic][ir] / m_count;
-              stdev = std::sqrt(m_sum2[iq][is][ic][ir] / m_count - avg*avg);
+            if (m_count[iq] > 1) {
+              stdev = std::sqrt(::stddev2(m_count[iq], m_sum[iq][is][ic][ir], m_sum2[iq][is][ic][ir]));
             }
             out << stdev << ' ';
           }
@@ -250,6 +266,7 @@ CsPadPedestals::endJob(Event& evt, Env& env)
     out.close();
 
   }
+
 }
 
 
@@ -264,15 +281,15 @@ CsPadPedestals::collectStat(unsigned qNum, const int16_t* data)
     if (m_segMask[qNum] & (1 << is)) {
      
       // beginning of the segment data
-      double* sum = &m_sum[qNum][is][0][0];
-      double* sum2 = &m_sum2[qNum][is][0][0];
+      int64_t* sum = &m_sum[qNum][is][0][0];
+      int64_t* sum2 = &m_sum2[qNum][is][0][0];
 
       const int16_t* segData = data + seg*NumColumns*NumRows;
 
       // sum
       for (int i = 0; i < NumColumns*NumRows ; ++ i) {            
-        sum[i] += double(segData[i]);
-        sum2[i] += double(segData[i])*double(segData[i]);
+        sum[i] += segData[i];
+        sum2[i] += segData[i]*segData[i];
       }          
       
       ++seg;

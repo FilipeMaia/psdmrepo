@@ -83,9 +83,9 @@ private:
   
   unsigned m_segMask[MaxQuads];  // segment masks per quadrant
   
-  unsigned long m_count;  // number of events seen
-  double m_sum[MaxQuads][MaxSectors][NumColumns][NumRows];   // sum per pixel
-  double m_sum2[MaxQuads][MaxSectors][NumColumns][NumRows];  // sum of squares per pixel
+  unsigned long m_count[MaxQuads];  // number of events seen
+  int64_t m_sum[MaxQuads][MaxSectors][NumColumns][NumRows];   // sum per pixel
+  int64_t m_sum2[MaxQuads][MaxSectors][NumColumns][NumRows];  // sum of squares per pixel
 
 };
 

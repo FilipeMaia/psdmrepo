@@ -11,6 +11,14 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-07-00
+2013-11-27 Andy Salnikov
+- problematic cspad data break pedestal calculation, it appears that in some 
+  cases cspad data can have incorrect quad numbers (repeating like 1,1,2,3 
+  instead of 0,1,2,3) which messes up normalization in pedestal module.
+  Adding a workaround for that, data is still broken so no guarantee in 
+  results for that kind of data.
+
 Tag: V00-06-04
 2013-09-24 Andy Salnikov
 - fix for constant namespace
