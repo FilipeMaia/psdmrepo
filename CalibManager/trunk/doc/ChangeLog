@@ -11,6 +11,12 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-05
+2013-11-27 Mikhail S. Dubrovin
+- refactoring DarkList... classes for correct widget resizing.
+- enable/disable "Go" button for scan at submission
+- check that Go/Stop/Deploy button status is updated properly.
+
 Tag: V00-00-04
 2013-11-26 Mikhail S. Dubrovin
 - add more icons in data/icons/
