@@ -83,7 +83,7 @@ class BatchJobPedestals (BatchJob) :
 
         if err != '' :
             self.stop_auto_processing(is_stop_on_button_click=False)        
-            logger.warning('Autoprocessing is stopped due to batch submission error!!!', __name__)
+            logger.warning('Autoprocessing for run %s is stopped due to batch submission error!!!' % self.str_run_number, __name__)
         #print 'self.procDarkStatus: ', self.procDarkStatus
 
 #-----------------------------
@@ -104,9 +104,9 @@ class BatchJobPedestals (BatchJob) :
         if err != '' :
             logger.error('\nerr: %s' % (err), __name__)
             self.stop_auto_processing(is_stop_on_button_click=False)
-            logger.warning('Autoprocessing is stopped due to error at execution of the scan command', __name__)
+            logger.warning('Autoprocessing for run %s is stopped due to error at execution of the scan command' % self.str_run_number, __name__)
         else :
-            logger.info('Scan is completed', __name__)
+            logger.info('Scan for run %s is completed' % self.str_run_number, __name__)
 
 #-----------------------------
 
@@ -129,7 +129,7 @@ class BatchJobPedestals (BatchJob) :
 
         if err != '' :
             self.stop_auto_processing(is_stop_on_button_click=False)
-            logger.warning('Autoprocessing is stopped due to batch submission error!!!', __name__)
+            logger.warning('Autoprocessing for run %s is stopped due to batch submission error!!!' % self.str_run_number, __name__)
 
 #-----------------------------
 
@@ -235,12 +235,12 @@ class BatchJobPedestals (BatchJob) :
 
             self.status_bj_scan, str_bj_scan = self.status_batch_job_for_peds_scan()
             #print 'self.status_bj_scan, str_bj_scan =', str(self.status_bj_scan), str_bj_scan
-            msg = 'Stage %s, %s' % (self.autoRunStage, str_bj_scan)
+            msg = 'Stage %s for run %s, %s' % (self.autoRunStage, self.str_run_number, str_bj_scan)
             logger.info(msg, __name__)
 
             if self.status_bj_scan == 'EXIT' :
                 self.stop_auto_processing( is_stop_on_button_click=False )
-                logger.warning('PROCESSING IS STOPPED due to status: %s - CHECK LSF!!!' % self.status_bj_scan, __name__)
+                logger.warning('PROCESSING IS STOPPED for run %s due to status: %s - CHECK LSF!!!' % (self.str_run_number, self.status_bj_scan), __name__)
 
             self.status_scan, fstatus_str_scan = self.status_for_peds_scan_files(comment='')
             #print 'self.status_scan, fstatus_str_scan = ', self.status_scan, fstatus_str_scan
@@ -252,7 +252,7 @@ class BatchJobPedestals (BatchJob) :
                 
                 if cp.blsp.get_list_of_sources() == [] :
                     self.stop_auto_processing( is_stop_on_button_click=False )
-                    logger.warning('on_auto_processing_status: Scan did not find data in xtc file for this detector. PROCESSING IS STOPPED!!!', __name__)
+                    logger.warning('on_auto_processing_status: Scan for run %s did not find data in xtc file for this detector. PROCESSING IS STOPPED!!!' % self.str_run_number, __name__)
                     return
                 
                 self.onRunAver()
@@ -260,22 +260,22 @@ class BatchJobPedestals (BatchJob) :
         elif self.autoRunStage == 2 :
 
             self.status_bj_aver, str_bj_aver = self.status_batch_job_for_peds_aver()
-            msg = 'Stage %s, %s' % (self.autoRunStage, str_bj_aver)
+            msg = 'Stage %s for run %s, %s' % (self.autoRunStage, self.str_run_number, str_bj_aver)
             logger.info(msg, __name__)
 
             if self.status_bj_aver == 'EXIT' :
                 self.stop_auto_processing( is_stop_on_button_click=False )
-                logger.warning('PROCESSING IS STOPPED due to status: %s - CHECK LSF!!!' % self.status_bj_aver, __name__)
+                logger.warning('PROCESSING IS STOPPED for run %s due to status: %s - CHECK LSF!!!' % (self.str_run_number,self.status_bj_aver), __name__)
 
             self.status_aver, fstatus_str_aver = self.status_for_peds_aver_files(comment='')
             #print 'self.status_aver, fstatus_str_aver = ', self.status_aver, fstatus_str_aver
 
             if self.status_aver : 
-                logger.info('on_auto_processing_status: Averaging is completed, stop processing.', __name__)
+                logger.info('on_auto_processing_status: Averaging is completed, stop processing for run %s.' % self.str_run_number, __name__)
                 self.stop_auto_processing( is_stop_on_button_click=False )
 
         else :
-            msg = 'NONRECOGNIZED PROCESSING STAGE %s !!!' % self.autoRunStage
+            msg = 'NONRECOGNIZED PROCESSING STAGE %s for run %s !!!' % (self.autoRunStage,self.str_run_number)
             logger.warning(msg, __name__)
             
 

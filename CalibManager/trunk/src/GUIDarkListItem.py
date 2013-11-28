@@ -52,7 +52,8 @@ class GUIDarkListItem ( QtGui.QWidget ) :
 
         self.parent = parent
 
-        self.setGeometry(100, 100, 600, 70)
+        #self.setGeometry(100, 100, 740, 77)
+        self.setGeometry(100, 100, 740, 35)
         self.setWindowTitle('GUI Dark List Item')
         #try : self.setWindowIcon(cp.icon_help)
         #except : pass
@@ -77,16 +78,16 @@ class GUIDarkListItem ( QtGui.QWidget ) :
         self.hboxTT.addStretch(1)     
 
         self.hboxW = QtGui.QHBoxLayout()
-        self.hboxWW = QtGui.QHBoxLayout()
+        #self.hboxWW = QtGui.QHBoxLayout()
+        ##self.hboxWW.addStretch(1)     
+        #self.hboxWW.addSpacing(5)     
+        #self.hboxWW.addLayout(self.hboxW)
         #self.hboxWW.addStretch(1)     
-        self.hboxWW.addSpacing(5)     
-        self.hboxWW.addLayout(self.hboxW)
-        self.hboxWW.addStretch(1)     
 
         self.vbox = QtGui.QVBoxLayout()
         #self.vbox.addWidget(self.gui_run)
         self.vbox.addLayout(self.hboxTT)
-        self.vbox.addLayout(self.hboxWW)
+        self.vbox.addLayout(self.hboxW)
         self.vbox.addStretch(1)     
 
         self.setLayout(self.vbox)
@@ -119,7 +120,7 @@ class GUIDarkListItem ( QtGui.QWidget ) :
         
 
     def setStyle(self):
-        self.setMinimumSize(600,30)
+        self.setMinimumSize(740,35)
         self.setStyleSheet (cp.styleBkgd)
         #self.setStyleSheet(cp.styleGreenish)
         #self.setStyleSheet (cp.styleYellowish)
@@ -140,6 +141,7 @@ class GUIDarkListItem ( QtGui.QWidget ) :
         #logger.debug('resizeEvent', __name__) 
         self.frame.setGeometry(self.rect())
         #self.box_txt.setGeometry(self.contentsRect())
+        #print 'GUIDarkListItem resizeEvent: %s' % str(self.size())
 
         
     def moveEvent(self, e):
@@ -191,11 +193,13 @@ class GUIDarkListItem ( QtGui.QWidget ) :
         #self.gui_add = QtGui.QLabel('Additional information')  
         self.gui_add = GUIDarkListItemAdd(self, self.run_number) 
         self.hboxW.addWidget(self.gui_add)
-        #self.hboxW.addStretch(1)     
 
+        self.setFixedHeight( self.height() + self.gui_add.height() )
+
+        #self.gui_add.setMinimumHeight( self.height() + self.gui_add.height() )
+        #self.hboxW.addStretch(1)     
         #self.gui_add.setStyleSheet(cp.styleYellowish)
         #self.gui_run.setStyleSheet(cp.styleYellowish)
-        #self.gui_add.setMinimumHeight(100)
 
 
 
@@ -203,6 +207,7 @@ class GUIDarkListItem ( QtGui.QWidget ) :
         logger.debug('onClickShrink', __name__)
 
         #self.gui_add.setVisible(False)
+        self.hboxW.removeWidget(self.gui_add)
 
         try    : self.gui_add.close()
         except : pass
@@ -213,7 +218,9 @@ class GUIDarkListItem ( QtGui.QWidget ) :
         self.gui_add = None
 
         self.gui_run.setStyleSheet(cp.styleBkgd)
-
+        self.setFixedHeight(35)
+        #self.resize(740,35)
+        #self.updateGeometry()
 
 
     def getHeight(self):
@@ -228,7 +235,7 @@ class GUIDarkListItem ( QtGui.QWidget ) :
 if __name__ == "__main__" :
 
     app = QtGui.QApplication(sys.argv)
-    w = GUIDarkListItem(parent=None, run_number='0024')
+    w = GUIDarkListItem(parent=None, run_number='0016')
     w.setFieldsEnabled(True)
     w.show()
     app.exec_()

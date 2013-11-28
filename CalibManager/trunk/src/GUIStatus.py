@@ -42,7 +42,7 @@ class GUIStatus ( QtGui.QGroupBox ) :
 
         QtGui.QGroupBox.__init__(self, 'State', parent)
         #QtGui.QWidget.__init__(self, parent)
-        self.setGeometry(100, 100, 730, 50)
+        self.setGeometry(100, 100, 300, 60)
         self.setWindowTitle('GUI Status')
         #try : self.setWindowIcon(cp.icon_help)
         #except : pass
@@ -97,18 +97,12 @@ class GUIStatus ( QtGui.QGroupBox ) :
         #self.tit_status.setStyleSheet (cp.styleDefault)
         #self.tit_status.setStyleSheet (cp.styleTitleInFrame)
         self.box_txt   .setReadOnly   (True)
-        #self.box_txt   .setStyleSheet (cp.styleWhiteFixed) 
         self.box_txt   .setStyleSheet (cp.styleBkgd)
         
-        #self.setContentsMargins (QtCore.QMargins(-9,-9,-9,-9))
-        #self.setContentsMargins (QtCore.QMargins(10,10,10,10))
         self.setContentsMargins (QtCore.QMargins(10,20,10,10))
 
-        #self.setMinimumWidth(300)
-        #self.setFixedHeight(200)
-
-        self.setMinimumHeight(100)
-        self.setBaseSize(600, 100)
+        #self.setMinimumHeight(60)
+        self.setMinimumSize(300,60)
 
 
     def setParent(self,parent) :

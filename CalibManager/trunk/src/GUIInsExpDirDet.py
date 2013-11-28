@@ -232,8 +232,6 @@ class GUIInsExpDirDet ( QtGui.QWidget ) :
         self.setDet('Select')
         self.setStyleButtons()
 
-        #if cp.guidarklist is not None : cp.guidarklist.updateList()
-
         path_to_xtc_dir = fnm.path_to_xtc_dir()
         if os.path.lexists(path_to_xtc_dir) : return
         
@@ -274,6 +272,8 @@ class GUIInsExpDirDet ( QtGui.QWidget ) :
         #list_of_cbox_out = gu.changeCheckBoxListInPopupMenu(list_of_cbox, win_title='Select Detectors')
         resp = gu.changeCheckBoxListInPopupMenu(list_of_cbox, win_title='Select detector(s)')
 
+        if resp != 1 : return # at cancel
+
         str_of_detectors = ''
 
         for [name,state],state_par in zip(list_of_cbox, cp.det_cbx_states_list) :
@@ -285,7 +285,6 @@ class GUIInsExpDirDet ( QtGui.QWidget ) :
 
         self.setDet()
         #self.setStyleButtons()
-
 
 
     def onEdiDir(self):

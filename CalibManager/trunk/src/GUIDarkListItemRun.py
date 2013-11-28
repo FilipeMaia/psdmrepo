@@ -46,7 +46,7 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
 
         QtGui.QWidget.__init__(self, parent)
 
-        self.setGeometry(100, 100, 600, 70)
+        self.setGeometry(100, 100, 600, 35)
         self.setWindowTitle('GUI Dark Run Item')
         #try : self.setWindowIcon(cp.icon_help)
         #except : pass
@@ -116,14 +116,12 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
     def create_or_use_butch_object(self) :
         """Creates BatchJobPedestals object for the 1st time or use existing in the dictionary
         """
-        if not self.str_run_number in self.dict_bjpeds.keys() : # create new object and add it to the dictionsry
-            #print 'Create new BatchJobPedestals object for run %s' % self.str_run_number
-            self.dict_bjpeds[self.str_run_number] = BatchJobPedestals(parent=self) 
-        else :
+        if self.str_run_number in self.dict_bjpeds.keys() :
             #print 'Use existing BatchJobPedestals object for run %s' % self.str_run_number
-            pass
-
-        self.bjpeds = self.dict_bjpeds[self.str_run_number]
+            self.bjpeds = self.dict_bjpeds[self.str_run_number]
+        else :
+            #print 'Create new BatchJobPedestals object for run %s' % self.str_run_number
+            self.bjpeds = self.dict_bjpeds[self.str_run_number] = BatchJobPedestals(parent=self) 
 
 
     def showToolTips(self):
@@ -163,7 +161,7 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
 
 
     def setStyle(self):
-        self.setMinimumSize(600,34)
+        self.setMinimumSize(600,35)
         self.           setStyleSheet (cp.styleBkgd)
         #self.           setStyleSheet (cp.styleYellowish)
 
@@ -191,7 +189,7 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
 
 
     def setStatusStyleOfButtons(self):
-        logger.debug('setStyleOfButtons', __name__)
+        #logger.debug('setStyleOfButtons - update buttons status for %s' % self.str_run_number, __name__)
 
         files_are_available = self.bjpeds.status_for_peds_files_essential()
 
@@ -277,20 +275,22 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
 
         if   but.text() == 'Go' : 
             logger.info('onButGo for run %s' % self.str_run_number, __name__ )
-            self.but_go.setEnabled(False)
+            but.setEnabled(False)
             self.bjpeds.start_auto_processing()
             but.setText('Stop')
-            
+            but.setEnabled(True)
+
         elif but.text() == 'Stop' : 
             logger.info('onButStop for run %s' % self.str_run_number, __name__ )
             self.bjpeds.stop_auto_processing()
-            self.but_go.setEnabled(True)
+            but.setEnabled(True)
             but.setText('Go')
 
         but.setStyleSheet(cp.styleButtonBad)
 
 
     def onStop(self):
+        logger.info('onStop - buttons status should (if you did not leave Dark tab...) be updated now for %s' % self.str_run_number, __name__ )
         self.but_go.setText('Go')
         self.but_go.setEnabled(True)
         self.setStatusStyleOfButtons() # self.but_go.setVisible(True)
@@ -362,7 +362,7 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
 if __name__ == "__main__" :
 
     app = QtGui.QApplication(sys.argv)
-    w = GUIDarkListItemRun(parent=None, str_run_number='0024')
+    w = GUIDarkListItemRun(parent=None, str_run_number='0016')
     w.setFieldsEnabled(True)
     w.show()
     app.exec_()

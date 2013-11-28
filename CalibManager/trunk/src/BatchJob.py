@@ -52,7 +52,7 @@ class BatchJob (QtCore.QObject ) : # need in QtCore.QObject in order to connect 
 
         self.time_interval_sec = cp.bat_submit_interval_sec.value() # 100
         self.queue             = cp.bat_queue.value()
-
+        self.str_run_number    = cp.str_run_number.value()
         self.autoRunStage = 0
         
 #-----------------------------
@@ -224,7 +224,7 @@ class BatchJob (QtCore.QObject ) : # need in QtCore.QObject in order to connect 
             self.on_auto_processing_start()
 
     def stop_auto_processing(self, is_stop_on_button_click=True) :
-        logger.info('Auto-processing IS STOPPED', __name__)
+        logger.info('Auto-processing for run %s IS STOPPED' % self.str_run_number, __name__)
         self.autoRunStage = 0            
         self.disconnectFromThread1()
 

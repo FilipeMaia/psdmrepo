@@ -58,7 +58,7 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         self.det_name   = cp.det_name
         self.calib_dir  = cp.calib_dir
 
-        self.setGeometry(100, 100, 600, 50)
+        self.setGeometry(100, 100, 600, 35)
         self.setWindowTitle('GUI Dark Run Go')
         #try : self.setWindowIcon(cp.icon_help)
         #except : pass
@@ -159,9 +159,9 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
     def setStyle(self):
         #self.setMinimumSize(600,70)
         #self.setMinimumSize(600,70)
-        self.setFixedHeight(40)
+        self.setFixedHeight(35)
         self.setStyleSheet (cp.styleBkgd)
-        self.cbx_dark_more.setFixedHeight(30)
+        #self.cbx_dark_more.setFixedHeight(30)
         self.lab_show.setStyleSheet(cp.styleLabel)
 
         width = 80

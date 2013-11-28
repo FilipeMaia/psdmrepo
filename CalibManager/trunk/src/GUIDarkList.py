@@ -61,7 +61,7 @@ class GUIDarkList ( QtGui.QWidget ) :
         #QtGui.QGroupBox.__init__(self, 'Runs', parent)
         QtGui.QWidget.__init__(self, parent)
 
-        self.setGeometry(100, 100, 700, 200)
+        self.setGeometry(100, 100, 800, 300)
         self.setWindowTitle('List of dark runs')
         #self.setTitle('My status')
         #try : self.setWindowIcon(cp.icon_help)
@@ -69,11 +69,6 @@ class GUIDarkList ( QtGui.QWidget ) :
         self.setFrame()
 
         self.list = QtGui.QListWidget(parent=self)
-
-        self.widg_width = 500
-
-        self.size     = QtCore.QSize(self.widg_width,35)
-        self.size_ext = QtCore.QSize(self.widg_width,200)
 
         self.updateList()
 
@@ -141,7 +136,7 @@ class GUIDarkList ( QtGui.QWidget ) :
             item.setFlags (  QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable  | QtCore.Qt.ItemIsUserCheckable )
             #item.setFlags ( QtCore.Qt.ItemIsEnabled )
 
-            item.setSizeHint(self.size)
+            item.setSizeHint(widg.size())
             self.list.setItemWidget(item, widg)
             #self.list.setItemSelected(item, True)
 
@@ -237,14 +232,13 @@ class GUIDarkList ( QtGui.QWidget ) :
 
 
     def setStyle(self):
-        self.setMinimumWidth(self.widg_width)
-        #self.setFixedHeight(400)
-        self.setMinimumHeight(150)
-        #self.setBaseSize(600, 400)
+        self.setMinimumSize(760,80)
         self.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
-        #self.setAlignment(QtCore.Qt.AlignTop | QtCore.Qt.AlignLeft)
         self.           setStyleSheet (cp.styleBkgd)
+        self.setContentsMargins (QtCore.QMargins(-9,-9,-9,-9))
 
+
+        #self.setAlignment(QtCore.Qt.AlignTop | QtCore.Qt.AlignLeft)
         #self.list.adjustSize()
         #print 'self.list.size():',  self.list.size()
         #self.setMinimumSize(self.list.size())
@@ -256,14 +250,13 @@ class GUIDarkList ( QtGui.QWidget ) :
         #self.lab_txt   .setStyleSheet (cp.styleWhiteFixed) 
         #self.lab_txt   .setStyleSheet (cp.styleBkgd)
         
-        self.setContentsMargins (QtCore.QMargins(-9,-9,-9,-9))
-        #self.setContentsMargins (QtCore.QMargins(1,10,1,1))
-
 
     def resizeEvent(self, e):
         #logger.debug('resizeEvent', __name__) 
         self.frame.setGeometry(self.rect())
         #self.lab_txt.setGeometry(self.contentsRect())
+        #print 'self.rect():', str(self.rect())
+
         
     def moveEvent(self, e):
         #logger.debug('moveEvent', __name__) 
@@ -295,14 +288,13 @@ class GUIDarkList ( QtGui.QWidget ) :
     def onItemExpand(self, widg):
         run, item = self.getRunAndItemForWidget(widg)
         logger.debug('Expand widget for run %s' % run, __name__)
-        self.size_ext = QtCore.QSize(self.widg_width, widg.getHeight())
-        item.setSizeHint(self.size_ext)
+        item.setSizeHint(widg.size())
 
 
     def onItemShrink(self, widg):
         run, item = self.getRunAndItemForWidget(widg)
         logger.debug('Shrink widget for run %s' % run, __name__)
-        item.setSizeHint(self.size)
+        item.setSizeHint(widg.size())
 
 
     def onItemClick(self, item):
@@ -311,17 +303,16 @@ class GUIDarkList ( QtGui.QWidget ) :
 
         widg = self.list.itemWidget(item)
 
-        if item.sizeHint() == self.size_ext :
-            pass
+        #if item.sizeHint() == self.size_ext :
+        #    pass
             #widg.onClickShrink()
             #print 'widg.size:', widg.size()
             #item.setSizeHint(self.size)
-        else :
-            pass
+        #else :
+        #    pass
             #widg.onClickExpand()
             #print 'widg.size:', widg.size()
 
-            #self.size_ext = QtCore.QSize(self.widg_width, widg.getHeight())
             #item.setSizeHint(self.size_ext)
 
 

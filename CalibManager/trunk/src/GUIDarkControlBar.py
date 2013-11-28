@@ -52,7 +52,7 @@ class GUIDarkControlBar ( QtGui.QWidget ) :
         self.dark_list_show_dets = cp.dark_list_show_dets
         self.list_of_show_dets   = cp.list_of_show_dets
 
-        self.setGeometry(100, 50, 600, 30)
+        self.setGeometry(100, 50, 390, 30)
         self.setWindowTitle('Instrument Experiment Run')
         self.setFrame()
  
@@ -111,6 +111,7 @@ class GUIDarkControlBar ( QtGui.QWidget ) :
         self.labDets.setStyleSheet (cp.styleLabel)
         self.setStyleButtons()
         self.setContentsMargins (QtCore.QMargins(-9,-9,-9,-9))
+        self.setMinimumSize(390,28)
 
 
     def setStyleButtons(self):
@@ -139,6 +140,7 @@ class GUIDarkControlBar ( QtGui.QWidget ) :
     def resizeEvent(self, e):
         #print 'resizeEvent' 
         self.frame.setGeometry(self.rect())
+        #print 'self.rect():', str(self.rect())
 
 
     def moveEvent(self, e):

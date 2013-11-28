@@ -28,9 +28,8 @@ from ConfigParametersForApp import cp
 from Logger                 import logger
 
 from GUIStatus              import *
-from GUIDarkList            import *
-from GUIDarkMoreOpts        import *
 from GUIDarkControlBar      import *
+from GUIDarkList            import *
 
 #-----------------------------
 
@@ -43,10 +42,9 @@ class GUIDark ( QtGui.QWidget ) :
         self.setWindowTitle('Dark run processing')
         self.setFrame()
 
-        self.guistatus        = GUIStatus(self)
-        self.guidarklist      = GUIDarkList(self)
-        self.guidarkcbar      = GUIDarkControlBar(self)
-        #self.guidarkmoreopts  = GUIDarkMoreOpts(self)
+        self.guistatus   = GUIStatus(self)
+        self.guidarkcbar = GUIDarkControlBar(self)
+        self.guidarklist = GUIDarkList(self)
 
         self.vbox = QtGui.QVBoxLayout() 
         self.vbox.addWidget(self.guidarkcbar)
@@ -57,14 +55,10 @@ class GUIDark ( QtGui.QWidget ) :
         self.vsplit = QtGui.QSplitter(QtCore.Qt.Vertical)
         self.vsplit.addWidget(self.guistatus)
         self.vsplit.addWidget(self.vwidg)
-        
-        self.hbox = QtGui.QHBoxLayout() 
+
+        self.hbox = QtGui.QHBoxLayout(self) 
         self.hbox.addWidget(self.vsplit)
-        #self.hbox.addWidget(self.guistatus)
         #self.hbox.addStretch(1)
-        #self.vbox.addWidget(self.guidarklist)
-        #self.vbox.addStretch(1)
-        #self.vbox.addWidget(self.guidarkmoreopts)
 
         self.setLayout(self.hbox)
 
@@ -74,33 +68,25 @@ class GUIDark ( QtGui.QWidget ) :
         cp.guidark = self
         self.guistatus.updateStatusInfo()
 
+
     def showToolTips(self):
+        self.setToolTip('Dark run GUI')
         pass
-        #self           .setToolTip('Use this GUI to work with xtc file.')
-        #self.edi_path   .setToolTip('The path to the xtc file for processing in this GUI')
+
 
     def setStyle(self):
 
         self.setContentsMargins (QtCore.QMargins(-5,-5,-5,2))
-
+        self.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+        #self.vsplit.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Ignored)
+        #self.setMinimumSize(790,210)
+        #self.setMinimumHeight(320)
         #self.vsplit.setMinimumHeight(200)
-        self.vsplit.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Ignored)
         #self.vsplit.setHandleWidth(150)
-
-        #self.vsplit.moveSplitter(200, self.vsplit.indexOf(self.guidarklist))
-
-        #self.setMinimumHeight(500)
+        #self.vsplit.moveSplitter(10, self.vsplit.indexOf(self.guistatus))
+        #self.vsplit.moveSplitter(300, self.vsplit.indexOf(self.vwidg))
         #self.setBaseSize(750,700)
-
-        #width = 60
-        #self.setMinimumWidth(700)
         #self.setStyleSheet(cp.styleBkgd)
-        #tit0   .setStyleSheet (cp.styleTitle)
-        #self.guidarkmoreopts.setFixedHeight(100)
-
-        #self.cbx_all_chunks.setStyleSheet (cp.styleLabel)
-        #self.lab_status    .setStyleSheet (cp.styleLabel)
-        #self.lab_batch     .setStyleSheet (cp.styleLabel)
 
   
     def setFrame(self):
@@ -111,13 +97,11 @@ class GUIDark ( QtGui.QWidget ) :
         self.frame.setGeometry(self.rect())
         self.frame.setVisible(False)
 
+
     def resizeEvent(self, e):
         #logger.debug('resizeEvent', self.name)
         self.frame.setGeometry(self.rect())
-        #self.setGeometry(self.contentsRect())
-        #w, h = self.size().width(), self.size().height()
-        #self.guistatus  .setMinimumHeight(0.3*h)
-        #self.guidarklist.setMinimumHeight(0.5*h)
+        #print 'GUIDark resizeEvent: %s' % str(self.size())
 
 
     def moveEvent(self, e):
@@ -126,6 +110,7 @@ class GUIDark ( QtGui.QWidget ) :
         #self.position = self.pos()
         #logger.debug('moveEvent - pos:' + str(self.position), __name__)       
         pass
+
 
     def closeEvent(self, event):
         logger.debug('closeEvent', __name__)
@@ -138,19 +123,6 @@ class GUIDark ( QtGui.QWidget ) :
 
         try    : self.guidarkcbar.close()        
         except : pass
-
-        #try    : self.guidarkmoreopts.close()        
-        #except : pass
-
-        #if cp.res_save_log : 
-        #    logger.saveLogInFile     ( fnm.log_file() )
-        #    logger.saveLogTotalInFile( fnm.log_file_total() )
-
-        #try    : self.gui_win.close()
-        #except : pass
-
-        #try    : del cp.guimain
-        #except : pass
 
 #-----------------------------
 
