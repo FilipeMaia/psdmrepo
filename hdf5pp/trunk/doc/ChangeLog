@@ -11,6 +11,12 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-07-03
+2013-11-28 Andy Salnikov
+- Group::createDataSet did not cached created dataset and it was closed if nobody 
+  cared about returned dataset. MAke this method to store dataset in cache just as 
+  openDataSet() does
+
 Tag: V00-07-02
 2013-10-14 Andy Salnikov
 - fix for my last modifications

@@ -110,7 +110,9 @@ public:
                           const PListDataSetCreate& plistDScreate = PListDataSetCreate(),
                           const PListDataSetAccess& plistDSaccess = PListDataSetAccess())
   {
-    return DataSet::createDataSet ( *m_id, name, TypeTraits<T>::stored_type(), dspc, plistDScreate, plistDSaccess ) ;
+    DataSet ds = DataSet::createDataSet ( *m_id, name, TypeTraits<T>::stored_type(), dspc, plistDScreate, plistDSaccess ) ;
+    m_dsCache->insert(std::make_pair(name, ds));
+    return ds;
   }
 
   // create new data set, type is determined by explicit parameter
@@ -120,7 +122,9 @@ public:
                           const PListDataSetCreate& plistDScreate = PListDataSetCreate(),
                           const PListDataSetAccess& plistDSaccess = PListDataSetAccess())
   {
-    return DataSet::createDataSet ( *m_id, name, type, dspc, plistDScreate, plistDSaccess ) ;
+    DataSet ds = DataSet::createDataSet ( *m_id, name, type, dspc, plistDScreate, plistDSaccess ) ;
+    m_dsCache->insert(std::make_pair(name, ds));
+    return ds;
   }
 
   // open existing data set
