@@ -11,6 +11,14 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-49
+2013-12-02 Matt
+- add Rayonix ConfigV2
+	
+Tag: V00-04-48
+2013-12-02 Matt
+- add EpixSampler data types
+	
 Tag: V00-04-47
 2013-11-12 Andy
 - ipimb.Config classes define capacitorValues() method which return
