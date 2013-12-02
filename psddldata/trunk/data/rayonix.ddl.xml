@@ -14,10 +14,11 @@
             <tag name="config-type"/>
         
             <enum name="ReadoutMode" base="uint32_t">
-                <enum-const name="Standard" value="0" />
-                <enum-const name="HighGain" value="1" />
-                <enum-const name="LowNoise" value="2" />
-                <enum-const name="EDR"      value="3" />
+                <enum-const name="Unknown" value="0" />
+                <enum-const name="Standard" value="1" />
+                <enum-const name="HighGain" value="2" />
+                <enum-const name="LowNoise" value="3" />
+                <enum-const name="HDR" value="4" />
             </enum>
 
             <const name="DeviceIDMax" value="40"/>
@@ -26,7 +27,7 @@
 
             <attribute name="_binning_s" type="uint8_t" accessor="binning_s"/>
 
-            <attribute name="_pad" type="int16_t" />
+            <attribute name="_testPattern" type="int16_t" accessor="testPattern"/>
 
             <attribute name="_exposure" type="uint32_t" accessor="exposure"/>
             
