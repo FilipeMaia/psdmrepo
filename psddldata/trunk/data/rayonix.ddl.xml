@@ -27,7 +27,7 @@
 
             <attribute name="_binning_s" type="uint8_t" accessor="binning_s"/>
 
-            <attribute name="_pad" type="int16_t" \/>
+            <attribute name="_pad" type="int16_t"/>
 
             <attribute name="_exposure" type="uint32_t" accessor="exposure"/>
             
