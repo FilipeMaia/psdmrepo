@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE psddl SYSTEM "psddl.dtd">
+
+<psddl>
+    <package name="L3T">
+
+        Package containing definitions for Level3 Trigger data types.
+
+        <!-- ========================================================================= -->
+        
+        <pstype name="ConfigV1" version="1" type_id="Id_L3TConfig" pack="4">
+        
+            <tag name="config-type"/>
+            
+
+            <attribute name="_module_id_len" type="uint32_t" accessor="module_id_len">
+                Length of the module identification string
+            </attribute>
+
+            <attribute name="_desc_len" type="uint32_t" accessor="desc_len">
+                Length of the description string
+            </attribute>
+
+            <attribute name="_module_id" type="char" shape="{self}.module_id_len()" accessor="module_id">
+                The module identification string
+            </attribute>
+
+            <attribute name="_desc" type="char" shape="{self}.desc_len()" accessor="desc">
+                The description string
+            </attribute>
+
+            <ctor>
+              Default constructor
+              <tag name="inline"/>
+            </ctor>
+
+            <ctor>
+              Constructor with values for each attribute
+              <tag name="auto"/>
+            </ctor>
+
+        </pstype>
+        
+        <!-- ========================================================================= -->
+        
+        <pstype name="DataV1" version="1" type_id="Id_L3TData" pack="4">
+        
+            <attribute name="_accept" type="uint32_t" accessor="accept">
+               Module trigger decision
+            </attribute>
+
+            <ctor>
+              Default constructor
+              <tag name="inline"/>
+            </ctor>
+
+            <ctor>
+              Constructor with values for each attribute
+              <tag name="inline"/>
+              <tag name="auto"/>
+            </ctor>
+
+        </pstype>
+        
+
+
+    </package>
+</psddl>
