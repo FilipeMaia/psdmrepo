@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE psddl SYSTEM "psddl.dtd">
+
+<psddl>
+    <package name="EpixSampler">
+
+
+        <!-- ========================================================================= -->
+        <pstype name="ConfigV1" version="1" type_id="Id_EpixSamplerConfig" pack="4">
+        
+            <attribute name="_version"          type="uint32_t" accessor="version" />
+            <attribute name="_runTrigDelay"       type="uint32_t" accessor="runTrigDelay" />
+            <attribute name="_daqTrigDelay"      type="uint32_t" accessor="daqTrigDelay" />
+            <attribute name="_daqSetting"        type="uint32_t" accessor="daqSetting" />
+            <attribute name="_adcClkHalfT"       type="uint32_t" accessor="adcClkHalfT" />
+            <attribute name="_adcPipelineDelay"  type="uint32_t" accessor="adcPipelineDelay" />
+            <attribute name="_digitalCardId0"    type="uint32_t" accessor="digitalCardId0" />
+            <attribute name="_digitalCardId1"    type="uint32_t" accessor="digitalCardId1" />
+            <attribute name="_analogCardId0"     type="uint32_t" accessor="analogCardId0" />
+            <attribute name="_analogCardId1"     type="uint32_t" accessor="analogCardId1" />
+            <attribute name="_numberOfChannels"  type="uint32_t" accessor="numberOfChannels" />
+            <attribute name="_samplesPerChannel" type="uint32_t" accessor="samplesPerChannel" />
+            <attribute name="_baseClockFrequency" type="uint32_t" accessor="baseClockFrequency" />
+            <attribute name="_bitControls" type="uint32_t">
+                <bitfield name="_z1" size="8" type="uint8_t" />
+                <bitfield name="_testPatternEnable" size="1" type="uint8_t" accessor="testPatternEnable" />
+                <bitfield name="_z2" size="23" type="uint32_t" />
+           </attribute>
+
+            <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="auto"/>
+            </ctor>
+
+
+        </pstype>
+        
+        <!-- ========================================================================= -->
+        
+        <pstype name="ElementV1" version="1" type_id="Id_EpixSamplerElement" pack="2">
+        
+            <xtc-config name="ConfigV1" />
+
+            <attribute name="_first" type="uint32_t">
+                <bitfield name="_vc" size="2" type="uint8_t" accessor="vc" />
+                <bitfield name="_z" size="4" type="uint8_t" />
+                <bitfield name="_lane" size="2" type="uint8_t" accessor="lane" />
+                <bitfield name="_tid" size="24" type="uint32_t" />
+            </attribute>
+
+            <attribute name="_second" type="uint32_t">
+		        <bitfield name="_acqCount" size="16" type="uint16_t"  accessor="acqCount" />
+		        <bitfiled name="_z"	       size="16" type="uint16_t" />
+           </attribute>
+ 
+            <attribute name="_frameNumber" type="uint32_t" accessor="frameNumber" />
+            <attribute name="_ticks" type="uint32_t" accessor="ticks" />
+            <attribute name="_fiducials" type="uint32_t" accessor="fiducials" />
+            <attribute name="_z0" type="uint32_t" />
+            <attribute name="_z1" type="uint32_t" />
+            <attribute name="_z2" type="uint32_t" />
+            <attribute name="_frame" type="uint16_t" shape="{xtc-config}.numberOfChannels(),{xtc-config}.samplesPerChannel()" accessor="frame" />
+            <attribute name="_temperatures" type="uint16_t" shape="{xtc-config}.numberOfChannels()" accessor="temperatures" />
+            <attribute name="_lastWord" type="uint32_t" accessor="lastWord" />
+
+        </pstype>        
+        
+    </package>
+</psddl>
