@@ -9,7 +9,7 @@
 
         <!-- ========================================================================= -->
         
-        <pstype name="ConfigV1" version="1" type_id="Id_RayonixConfig" pack="4">
+        <pstype name="ConfigV1" version="2" type_id="Id_RayonixConfig" pack="4">
                 
             <tag name="config-type"/>
         
