@@ -14,11 +14,10 @@
             <tag name="config-type"/>
         
             <enum name="ReadoutMode" base="uint32_t">
-                <enum-const name="Unknown" value="0" />
-                <enum-const name="Standard" value="1" />
-                <enum-const name="HighGain" value="2" />
-                <enum-const name="LowNoise" value="3" />
-                <enum-const name="HDR" value="4" />
+                <enum-const name="Standard" value="0" />                    
+                <enum-const name="HighGain" value="1" />                    
+                <enum-const name="LowNoise" value="2" />                    
+                <enum-const name="EDR"      value="3" />                    
             </enum>
 
             <const name="DeviceIDMax" value="40"/>
