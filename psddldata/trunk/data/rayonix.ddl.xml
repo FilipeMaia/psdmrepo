@@ -9,7 +9,52 @@
 
         <!-- ========================================================================= -->
         
-        <pstype name="ConfigV1" version="2" type_id="Id_RayonixConfig" pack="4">
+        <pstype name="ConfigV1" version="1" type_id="Id_RayonixConfig" pack="4">
+                
+            <tag name="config-type"/>
+        
+            <enum name="ReadoutMode" base="uint32_t">
+                <enum-const name="Unknown" value="0" />
+                <enum-const name="Standard" value="1" />
+                <enum-const name="HighGain" value="2" />
+                <enum-const name="LowNoise" value="3" />
+                <enum-const name="HDR" value="4" />
+            </enum>
+
+            <const name="DeviceIDMax" value="40"/>
+
+            <attribute name="_binning_f" type="uint8_t" accessor="binning_f"/>
+
+            <attribute name="_binning_s" type="uint8_t" accessor="binning_s"/>
+
+            <attribute name="_pad" type="int16_t" \/>
+
+            <attribute name="_exposure" type="uint32_t" accessor="exposure"/>
+            
+            <attribute name="_trigger" type="uint32_t" accessor="trigger"/>
+
+            <attribute name="_rawMode" type="uint16_t" accessor="rawMode"/>
+
+            <attribute name="_darkFlag" type="uint16_t" accessor="darkFlag"/>
+
+            <attribute name="_readoutMode" type="ReadoutMode" accessor="readoutMode"/>
+
+            <attribute name="_deviceID" type="char" shape="DeviceIDMax" accessor="deviceID" shape_method="None"/>
+
+            
+            <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
+
+            <ctor>
+                Constructor with a value for each argument
+                <tag name="inline"/>
+                <tag name="auto"/>
+            </ctor>
+
+        </pstype>
+        <pstype name="ConfigV2" version="2" type_id="Id_RayonixConfig" pack="4">
                 
             <tag name="config-type"/>
         
