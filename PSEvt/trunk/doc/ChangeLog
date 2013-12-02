@@ -11,7 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
-Tag: V00-07-07
+Tag: V00-07-08 David Schneider
+- Adding const correctness to TypeInfoUtils
+
+Tag: V00-07-07 Andy Salnikov
 - removing cmp(Src, Src) was a mistake, resoring this method with new 
   name cmpPdsSrc()
 

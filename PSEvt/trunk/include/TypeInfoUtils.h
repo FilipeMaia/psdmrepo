@@ -51,7 +51,7 @@ namespace TypeInfoUtils {
 // less for type_info *, can use for std::map  
 class lessTypeInfoPtr { 
  public: 
-  bool operator()(const std::type_info *a, const std::type_info *b) { 
+  bool operator()(const std::type_info *a, const std::type_info *b) const { 
     return a->before( *b); 
   } 
 }; 
