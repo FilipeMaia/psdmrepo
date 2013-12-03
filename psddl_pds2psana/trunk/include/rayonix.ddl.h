@@ -29,6 +29,27 @@ private:
   boost::shared_ptr<const XtcType> m_xtcObj;
 };
 
+
+class ConfigV2 : public Psana::Rayonix::ConfigV2 {
+public:
+  typedef Pds::Rayonix::ConfigV2 XtcType;
+  typedef Psana::Rayonix::ConfigV2 PsanaType;
+  ConfigV2(const boost::shared_ptr<const XtcType>& xtcPtr);
+  virtual ~ConfigV2();
+  virtual uint8_t binning_f() const;
+  virtual uint8_t binning_s() const;
+  virtual int16_t testPattern() const;
+  virtual uint32_t exposure() const;
+  virtual uint32_t trigger() const;
+  virtual uint16_t rawMode() const;
+  virtual uint16_t darkFlag() const;
+  virtual Psana::Rayonix::ConfigV2::ReadoutMode readoutMode() const;
+  virtual const char* deviceID() const;
+  const XtcType& _xtcObj() const { return *m_xtcObj; }
+private:
+  boost::shared_ptr<const XtcType> m_xtcObj;
+};
+
 } // namespace Rayonix
 } // namespace psddl_pds2psana
 #endif // PSDDL_PDS2PSANA_RAYONIX_DDL_H

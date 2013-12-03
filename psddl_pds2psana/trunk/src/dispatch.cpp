@@ -33,6 +33,7 @@
 #include "psddl_pds2psana/opal1k.ddl.h"
 #include "psddl_pds2psana/cspad2x2.ddl.h"
 #include "psddl_pds2psana/imp.ddl.h"
+#include "psddl_pds2psana/epixsampler.ddl.h"
 #include "psddl_pds2psana/CsPadDataOrdered.h"
 #include "psddl_pds2psana/PnccdFullFrameV1Proxy.h"
 #include "psddl_pds2psana/TimepixDataV1ToV2.h"
@@ -660,6 +661,46 @@ try {
           // create and store psana object in config store
           boost::shared_ptr<Psana::Epics::ConfigV1> obj = boost::make_shared<psddl_pds2psana::Epics::ConfigV1>(xptr);
           cfgStore.put(obj, xtc->src);
+        }
+        break;
+      } // end switch (version)
+    }
+    break;
+  case Pds::TypeId::Id_EpixSamplerConfig:
+    {
+      switch (version) {
+      case 1:
+        {
+          // store XTC object in config store
+          boost::shared_ptr<Pds::EpixSampler::ConfigV1> xptr(xtc, (Pds::EpixSampler::ConfigV1*)(xtc->payload()));
+          cfgStore.put(xptr, xtc->src);
+          // create and store psana object in config store
+          boost::shared_ptr<Psana::EpixSampler::ConfigV1> obj = boost::make_shared<psddl_pds2psana::EpixSampler::ConfigV1>(xptr);
+          cfgStore.put(obj, xtc->src);
+        }
+        break;
+      } // end switch (version)
+    }
+    break;
+  case Pds::TypeId::Id_EpixSamplerElement:
+    {
+      switch (version) {
+      case 1:
+        {
+          if (boost::shared_ptr<Pds::EpixSampler::ConfigV1> cfgPtr = cfgStore.get(xtc->src)) {
+            // store proxy
+            typedef EvtProxyCfg<Psana::EpixSampler::ElementV1, psddl_pds2psana::EpixSampler::ElementV1<Pds::EpixSampler::ConfigV1>, Pds::EpixSampler::ElementV1, Pds::EpixSampler::ConfigV1> ProxyType;
+            if (evt) evt->putProxy<Psana::EpixSampler::ElementV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
+          }
+        }
+        break;
+      case 32769:
+        {
+          if (boost::shared_ptr<Pds::EpixSampler::ConfigV1> cfgPtr = cfgStore.get(xtc->src)) {
+            // store proxy
+            typedef EvtProxyCfg<Psana::EpixSampler::ElementV1, psddl_pds2psana::EpixSampler::ElementV1<Pds::EpixSampler::ConfigV1>, Pds::EpixSampler::ElementV1, Pds::EpixSampler::ConfigV1> ProxyType;
+            if (evt) evt->putProxy<Psana::EpixSampler::ElementV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
+          }
         }
         break;
       } // end switch (version)
@@ -1581,6 +1622,16 @@ try {
           cfgStore.put(obj, xtc->src);
         }
         break;
+      case 2:
+        {
+          // store XTC object in config store
+          boost::shared_ptr<Pds::Rayonix::ConfigV2> xptr(xtc, (Pds::Rayonix::ConfigV2*)(xtc->payload()));
+          cfgStore.put(xptr, xtc->src);
+          // create and store psana object in config store
+          boost::shared_ptr<Psana::Rayonix::ConfigV2> obj = boost::make_shared<psddl_pds2psana::Rayonix::ConfigV2>(xptr);
+          cfgStore.put(obj, xtc->src);
+        }
+        break;
       } // end switch (version)
     }
     break;
@@ -2071,6 +2122,23 @@ std::vector<const std::type_info *> getXtcConvertTypeInfoPtrs(const Pds::TypeId 
       break;
     } // end version switch
     break;
+  case Pds::TypeId::Id_EpixSamplerConfig:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::EpixSampler::ConfigV1) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_EpixSamplerElement:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::EpixSampler::ElementV1) );
+      break;
+    case 32769:
+      typeIdPtrs.push_back( &typeid(Psana::EpixSampler::ElementV1) );
+      break;
+    } // end version switch
+    break;
   case Pds::TypeId::Id_EvrConfig:
     switch(typeId.version()) {
     case 1:
@@ -2413,6 +2481,9 @@ std::vector<const std::type_info *> getXtcConvertTypeInfoPtrs(const Pds::TypeId 
     switch(typeId.version()) {
     case 1:
       typeIdPtrs.push_back( &typeid(Psana::Rayonix::ConfigV1) );
+      break;
+    case 2:
+      typeIdPtrs.push_back( &typeid(Psana::Rayonix::ConfigV2) );
       break;
     } // end version switch
     break;
