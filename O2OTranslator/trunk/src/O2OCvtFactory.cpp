@@ -59,6 +59,7 @@
 #include "H5DataTypes/EncoderDataV1.h"
 #include "H5DataTypes/EncoderDataV2.h"
 #include "H5DataTypes/EpicsPvHeader.h"
+#include "H5DataTypes/EpixSamplerConfigV1.h"
 #include "H5DataTypes/EvrConfigV1.h"
 #include "H5DataTypes/EvrConfigV2.h"
 #include "H5DataTypes/EvrConfigV3.h"
@@ -104,6 +105,7 @@
 #include "H5DataTypes/PulnixTM6740ConfigV2.h"
 #include "H5DataTypes/QuartzConfigV1.h"
 #include "H5DataTypes/RayonixConfigV1.h"
+#include "H5DataTypes/RayonixConfigV2.h"
 #include "H5DataTypes/TimepixConfigV1.h"
 #include "H5DataTypes/TimepixConfigV2.h"
 #include "H5DataTypes/TimepixConfigV3.h"
@@ -119,8 +121,9 @@
 #include "O2OTranslator/CsPadCalibV1Cvt.h"
 #include "O2OTranslator/CsPad2x2CalibV1Cvt.h"
 #include "O2OTranslator/CsPad2x2ElementV1Cvt.h"
-#include "O2OTranslator/EvtDataTypeCvtDef.h"
 #include "O2OTranslator/EpicsDataTypeCvt.h"
+#include "O2OTranslator/EpixSamplerElementV1Cvt.h"
+#include "O2OTranslator/EvtDataTypeCvtDef.h"
 #include "O2OTranslator/FliFrameV1Cvt.h"
 #include "O2OTranslator/Gsc16aiDataV1Cvt.h"
 #include "O2OTranslator/ImpElementV1Cvt.h"
@@ -871,6 +874,25 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
     switch (version) {
     case 1:
       ::makeConfigCvt<RayonixConfigV1>(cvts, group, "Rayonix::ConfigV1", src, transition, m_cvtOptions, 0);
+      break;
+    case 2:
+      ::makeConfigCvt<RayonixConfigV2>(cvts, group, "Rayonix::ConfigV2", src, transition, m_cvtOptions, 0);
+      break;
+    }
+    break;
+
+  case Pds::TypeId::Id_EpixSamplerConfig:
+    switch (version) {
+    case 1:
+      ::makeConfigCvt<EpixSamplerConfigV1>(cvts, group, "EpixSampler::ConfigV1", src, transition, m_cvtOptions, 0);
+      break;
+    }
+    break;
+
+  case Pds::TypeId::Id_EpixSamplerElement:
+    switch (version) {
+    case 1:
+      cvts.push_back(make_shared<EpixSamplerElementV1Cvt>(group, "EpixSampler::ElementV1", src, m_configStore, m_cvtOptions, 0));
       break;
     }
     break;
