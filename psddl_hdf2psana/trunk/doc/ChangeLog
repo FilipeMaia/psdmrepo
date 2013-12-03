@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-07-04
+2013-12-02 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-50
+- new epixsampler package
+
 Tag: V00-07-03
 2013-11-18 Andy Salnikov
 - add sections attribute to cspad config types

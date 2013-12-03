@@ -11,6 +11,7 @@
 #include "psddl_hdf2psana/encoder.ddl.h"
 #include "psddl_hdf2psana/usdusb.ddl.h"
 #include "psddl_hdf2psana/timepix.ddl.h"
+#include "psddl_hdf2psana/epixsampler.ddl.h"
 #include "psddl_hdf2psana/camera.ddl.h"
 #include "psddl_hdf2psana/orca.ddl.h"
 #include "psddl_hdf2psana/quartz.ddl.h"
@@ -292,6 +293,10 @@ try {
     // Encoder::ConfigV2
     cfgStore.putProxy(psddl_hdf2psana::Encoder::make_ConfigV2(schema_version, group, idx), src);
     break;
+  case 1698299089:
+    // Rayonix::ConfigV2
+    cfgStore.putProxy(psddl_hdf2psana::Rayonix::make_ConfigV2(schema_version, group, idx), src);
+    break;
   case 1698299090:
     // Rayonix::ConfigV1
     cfgStore.putProxy(psddl_hdf2psana::Rayonix::make_ConfigV1(schema_version, group, idx), src);
@@ -336,6 +341,12 @@ try {
     // Gsc16ai::ConfigV1
     cfgStore.putProxy(psddl_hdf2psana::Gsc16ai::make_ConfigV1(schema_version, group, idx), src);
     break;
+  case 2125326828:
+    // EpixSampler::ElementV1
+    if (boost::shared_ptr<Psana::EpixSampler::ConfigV1> cfgPtr = cfgStore.get(src)) {
+      evt.putProxy(psddl_hdf2psana::EpixSampler::make_ElementV1(schema_version, group, idx, cfgPtr), src);
+    }
+    break;
   case 2160030172:
     // ControlData::ConfigV2
     cfgStore.putProxy(psddl_hdf2psana::ControlData::make_ConfigV2(schema_version, group, idx), src);
@@ -347,6 +358,10 @@ try {
   case 2160030175:
     // ControlData::ConfigV1
     cfgStore.putProxy(psddl_hdf2psana::ControlData::make_ConfigV1(schema_version, group, idx), src);
+    break;
+  case 2196756248:
+    // EpixSampler::ConfigV1
+    cfgStore.putProxy(psddl_hdf2psana::EpixSampler::make_ConfigV1(schema_version, group, idx), src);
     break;
   case 2263071815:
     // Bld::BldDataAcqADCV1
