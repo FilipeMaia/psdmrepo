@@ -243,6 +243,12 @@ class FileNameManager :
     def path_data_aver_batch_log(self) :
         return self.path_prefix_data() + 'data-aver-batch-log.txt'
 
+    def path_data_raw_ave(self) :
+        return self.path_prefix_data() + 'data-raw-ave.txt'
+
+    def path_data_raw_rms(self) :
+        return self.path_prefix_data() + 'data-raw-rms.txt'
+
     def path_data_ave(self) :
         return self.path_prefix_data() + 'data-ave.txt'
 
@@ -336,6 +342,8 @@ class FileNameManager :
         self.list_of_files_cora_split.append(fnm.path_cora_split_med())
         self.list_of_files_cora_split.append(fnm.path_cora_split_time())
         self.list_of_files_cora_split.append(fnm.path_cora_split_time_ind())
+        self.list_of_files_cora_split.append(fnm.path_data_ave())
+        self.list_of_files_cora_split.append(fnm.path_data_rms())
         #self.list_of_files_cora_split.append(fnm.path_cora_split_files())
         #self.list_of_files_cora_split.append(fnm.)
         return self.list_of_files_cora_split
@@ -410,8 +418,8 @@ class FileNameManager :
         self.list_of_files_data_aver_short = []
         self.list_of_files_data_aver_short.append(fnm.path_data_aver_psana_cfg())
         self.list_of_files_data_aver_short.append(fnm.path_data_aver_batch_log())
-        self.list_of_files_data_aver_short.append(fnm.path_data_ave())
-        self.list_of_files_data_aver_short.append(fnm.path_data_rms())
+        self.list_of_files_data_aver_short.append(fnm.path_data_raw_ave())
+        self.list_of_files_data_aver_short.append(fnm.path_data_raw_rms())
         return self.list_of_files_data_aver_short
 
 

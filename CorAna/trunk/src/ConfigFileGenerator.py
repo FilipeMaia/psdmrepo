@@ -127,8 +127,8 @@ class ConfigFileGenerator :
                          'EVENTS'         : str( cp.bat_data_end.value() - cp.bat_data_start.value() + 1 ),
                          'IMG_REC_MODULE' : str( cp.bat_img_rec_mod.value() ),
                          'DETINFO'        : str( cp.bat_det_info.value() ),
-                         'FNAME_DATA_AVE' : fnm.path_data_ave(),
-                         'FNAME_DATA_RMS' : fnm.path_data_rms(),
+                         'FNAME_DATA_AVE' : fnm.path_data_raw_ave(),
+                         'FNAME_DATA_RMS' : fnm.path_data_raw_rms(),
                          'SAT_THR_ADU'    : str( cp.ccdset_adcsatu.value() ),
                          'SATPIX_MASK'    : fnm.path_satpix_mask(),
                          'SATPIX_FRAC'    : fnm.path_satpix_frac(),
@@ -158,6 +158,8 @@ class ConfigFileGenerator :
                          'PATH_PREFIX_CORA': str( fnm.path_prefix_cora() ),
                          'IMG_NPARTS'      : str( cp.bat_img_nparts.value() ),
                          'FNAME_PEDS_AVE'  : fnm.path_pedestals_ave(),
+                         'FNAME_DATA_AVE'  : fnm.path_data_ave(),
+                         'FNAME_DATA_RMS'  : fnm.path_data_rms()
                          }
 
         fname_imon_cfg = fnm.path_cora_split_imon_cfg()

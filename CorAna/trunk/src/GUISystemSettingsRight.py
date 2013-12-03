@@ -62,7 +62,7 @@ class GUISystemSettingsRight ( QtGui.QWidget ) :
 
         self.char_expand         = u' \u25BE' # down-head triangle
         self.tit_bat_queue  = QtGui.QLabel('Queue:')
-        self.list_of_queues = ['psnehq','psfehq'] 
+        self.list_of_queues = ['psnehq','psfehq','psanacsq'] 
         self.box_bat_queue  = QtGui.QComboBox( self ) 
         self.box_bat_queue.addItems(self.list_of_queues)
         self.box_bat_queue.setCurrentIndex( self.list_of_queues.index(cp.bat_queue.value()) )

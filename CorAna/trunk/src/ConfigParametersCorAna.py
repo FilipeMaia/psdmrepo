@@ -334,7 +334,7 @@ class ConfigParametersCorAna ( ConfigParameters ) :
 
         # GUICCDSettings.py
         self.ccdset_pixsize          = self.declareParameter( name='CCD_SETTINGS_PIXEL_SIZE',      val_def=0.02,  type='float' )
-        self.ccdset_adcsatu          = self.declareParameter( name='CCD_SETTINGS_ADC_SATTURATION', val_def=65000, type='int' )
+        self.ccdset_adcsatu          = self.declareParameter( name='CCD_SETTINGS_ADC_SATTURATION', val_def=65535, type='int' )
         self.ccdset_aduphot          = self.declareParameter( name='CCD_SETTINGS_ADU_PER_PHOTON',  val_def=10,    type='float' )
         self.ccdset_ccdeff           = self.declareParameter( name='CCD_SETTINGS_EFFICIENCY',      val_def=0.5,   type='float' )
         self.ccdset_ccdgain          = self.declareParameter( name='CCD_SETTINGS_GAIN',            val_def=1.0,   type='float' )
