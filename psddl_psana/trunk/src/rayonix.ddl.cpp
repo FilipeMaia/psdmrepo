@@ -29,5 +29,31 @@ std::ostream& operator<<(std::ostream& str, Rayonix::ConfigV1::ReadoutMode enval
   }
   return str << val;
 }
+
+ConfigV2::~ConfigV2() {}
+
+std::ostream& operator<<(std::ostream& str, Rayonix::ConfigV2::ReadoutMode enval) {
+  const char* val;
+  switch (enval) {
+  case Rayonix::ConfigV2::Unknown:
+    val = "Unknown";
+    break;
+  case Rayonix::ConfigV2::Standard:
+    val = "Standard";
+    break;
+  case Rayonix::ConfigV2::HighGain:
+    val = "HighGain";
+    break;
+  case Rayonix::ConfigV2::LowNoise:
+    val = "LowNoise";
+    break;
+  case Rayonix::ConfigV2::HDR:
+    val = "HDR";
+    break;
+  default:
+    return str << "ReadoutMode(" << int(enval) << ")";
+  }
+  return str << val;
+}
 } // namespace Rayonix
 } // namespace Psana

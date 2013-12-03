@@ -39,6 +39,37 @@ public:
   virtual const char* deviceID() const = 0;
 };
 std::ostream& operator<<(std::ostream& str, Rayonix::ConfigV1::ReadoutMode enval);
+
+/** @class ConfigV2
+
+  
+*/
+
+
+class ConfigV2 {
+public:
+  enum { TypeId = Pds::TypeId::Id_RayonixConfig /**< XTC type ID value (from Pds::TypeId class) */ };
+  enum { Version = 2 /**< XTC type version number */ };
+  enum { DeviceIDMax = 40 };
+  enum ReadoutMode {
+    Unknown = 0,
+    Standard = 1,
+    HighGain = 2,
+    LowNoise = 3,
+    HDR = 4,
+  };
+  virtual ~ConfigV2();
+  virtual uint8_t binning_f() const = 0;
+  virtual uint8_t binning_s() const = 0;
+  virtual int16_t testPattern() const = 0;
+  virtual uint32_t exposure() const = 0;
+  virtual uint32_t trigger() const = 0;
+  virtual uint16_t rawMode() const = 0;
+  virtual uint16_t darkFlag() const = 0;
+  virtual Rayonix::ConfigV2::ReadoutMode readoutMode() const = 0;
+  virtual const char* deviceID() const = 0;
+};
+std::ostream& operator<<(std::ostream& str, Rayonix::ConfigV2::ReadoutMode enval);
 } // namespace Rayonix
 } // namespace Psana
 #endif // PSANA_RAYONIX_DDL_H
