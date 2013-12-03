@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-06
+2013-12-02 Andy Salnikov
+- add C++ modules DumpEpixSampler and DumpRayonix
+- add Python module dump_epixsampler
+
 Tag: V00-04-05
 2013-10-07 Andy Salnikov
 - add C++ modules for Alias and L3T
