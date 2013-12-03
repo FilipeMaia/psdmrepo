@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-50
+2013-12-02 Andy
+- add "config-type" tag to EpixSampler.ConfigV1
+
 Tag: V00-04-49
 2013-12-02 Matt
 - add Rayonix ConfigV2
