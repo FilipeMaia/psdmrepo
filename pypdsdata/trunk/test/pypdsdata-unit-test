@@ -300,7 +300,11 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual ( TypeId.Type.Id_L3TData, 71 )
         self.assertEqual ( TypeId.Type.Id_Spectrometer, 72 )
         self.assertEqual ( TypeId.Type.Id_RayonixConfig, 73 )
-        self.assertEqual ( TypeId.Type.NumberOf, 74 )
+        self.assertEqual ( TypeId.Type.Id_EpixConfig, 74 )
+        self.assertEqual ( TypeId.Type.Id_EpixElement, 75 )
+        self.assertEqual ( TypeId.Type.Id_EpixSamplerConfig, 76 )
+        self.assertEqual ( TypeId.Type.Id_EpixSamplerElement, 77 )
+        self.assertEqual ( TypeId.Type.NumberOf, 78 )
 
         # chec compressed bitmask
         self.assertEqual ( TypeId.VCompressed, 0x8000 )
@@ -506,7 +510,8 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual ( DetInfo.Device.Imp, 28 )
         self.assertEqual ( DetInfo.Device.Epix, 29 )
         self.assertEqual ( DetInfo.Device.Rayonix, 30 )
-        self.assertEqual ( DetInfo.Device.NumDevice, 31 )
+        self.assertEqual ( DetInfo.Device.EpixSampler, 31 )
+        self.assertEqual ( DetInfo.Device.NumDevice, 32 )
 
         
         o1 = DetInfo(0,0,0,0)

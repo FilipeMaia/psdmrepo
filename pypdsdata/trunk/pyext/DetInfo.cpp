@@ -136,6 +136,7 @@ namespace {
       { "Imp",       Pds::DetInfo::Imp },
       { "Epix",      Pds::DetInfo::Epix },
       { "Rayonix",   Pds::DetInfo::Rayonix },
+      { "EpixSampler", Pds::DetInfo::EpixSampler },
       { "NumDevice", Pds::DetInfo::NumDevice },
       { 0, 0 }
   };

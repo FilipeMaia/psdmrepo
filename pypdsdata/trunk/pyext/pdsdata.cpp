@@ -127,6 +127,9 @@
 
 #include "types/epics/EpicsModule.h"
 
+#include "types/epixsampler/ConfigV1.h"
+#include "types/epixsampler/ElementV1.h"
+
 #include "types/evr/ConfigV1.h"
 #include "types/evr/ConfigV2.h"
 #include "types/evr/ConfigV3.h"
@@ -206,6 +209,7 @@
 #include "types/quartz/ConfigV1.h"
 
 #include "types/rayonix/ConfigV1.h"
+#include "types/rayonix/ConfigV2.h"
 
 #include "types/timepix/ConfigV1.h"
 #include "types/timepix/ConfigV2.h"
@@ -387,6 +391,12 @@ PyMODINIT_FUNC init_pdsdata()
   Py_INCREF( module );
   PyModule_AddObject( this_module, "epics", module );
 
+  module = Py_InitModule3( "_pdsdata.epixsampler", 0, "The Python wrapper module for pdsdata/epixsampler" );
+  pypdsdata::EpixSampler::ConfigV1::initType( module );
+  pypdsdata::EpixSampler::ElementV1::initType( module );
+  Py_INCREF( module );
+  PyModule_AddObject( this_module, "epixsampler", module );
+
   module = Py_InitModule3( "_pdsdata.evr", 0, "The Python wrapper module for pdsdata/evr" );
   pypdsdata::EvrData::ConfigV1::initType( module );
   pypdsdata::EvrData::ConfigV2::initType( module );
@@ -512,6 +522,7 @@ PyMODINIT_FUNC init_pdsdata()
 
   module = Py_InitModule3( "_pdsdata.rayonix", 0, "The Python wrapper module for pdsdata/rayonix" );
   pypdsdata::Rayonix::ConfigV1::initType( module );
+  pypdsdata::Rayonix::ConfigV2::initType( module );
   Py_INCREF( module );
   PyModule_AddObject( this_module, "rayonix", module );
 

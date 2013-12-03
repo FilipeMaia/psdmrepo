@@ -77,6 +77,9 @@
 #include "types/epics/EpicsModule.h"
 #include "types/epics/ConfigV1.h"
 
+#include "types/epixsampler/ConfigV1.h"
+#include "types/epixsampler/ElementV1.h"
+
 #include "types/evr/ConfigV1.h"
 #include "types/evr/ConfigV2.h"
 #include "types/evr/ConfigV3.h"
@@ -141,6 +144,7 @@
 #include "types/quartz/ConfigV1.h"
 
 #include "types/rayonix/ConfigV1.h"
+#include "types/rayonix/ConfigV2.h"
 
 #include "types/timepix/ConfigV1.h"
 #include "types/timepix/ConfigV2.h"
@@ -548,6 +552,15 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
 
   case Pds::TypeId::Id_RayonixConfig :
     if ( not obj ) obj = xtc2obj<Rayonix::ConfigV1, 1>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<Rayonix::ConfigV2, 2>(xtc, parent);
+    break;
+
+  case Pds::TypeId::Id_EpixSamplerConfig :
+    if ( not obj ) obj = xtc2obj<EpixSampler::ConfigV1, 1>(xtc, parent);
+    break;
+
+  case Pds::TypeId::Id_EpixSamplerElement :
+    if ( not obj ) obj = xtc2obj<EpixSampler::ElementV1, 1>(xtc, parent);
     break;
 
   case Pds::TypeId::NumberOf :

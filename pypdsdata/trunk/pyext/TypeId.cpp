@@ -107,6 +107,10 @@ namespace {
       { "Id_L3TData",         Pds::TypeId::Id_L3TData },
       { "Id_Spectrometer",    Pds::TypeId::Id_Spectrometer },
       { "Id_RayonixConfig",   Pds::TypeId::Id_RayonixConfig },
+      { "Id_EpixConfig",      Pds::TypeId::Id_EpixConfig },
+      { "Id_EpixElement",     Pds::TypeId::Id_EpixElement },
+      { "Id_EpixSamplerConfig", Pds::TypeId::Id_EpixSamplerConfig },
+      { "Id_EpixSamplerElement", Pds::TypeId::Id_EpixSamplerElement },
       { "NumberOf",           Pds::TypeId::NumberOf },
       { 0, 0 }
   };

@@ -3,7 +3,7 @@
 // 	$Id$
 //
 // Description:
-//	Class ConfigV1...
+//	Class ConfigV2...
 //
 // Author List:
 //      Andrei Salnikov
@@ -13,7 +13,7 @@
 //-----------------------
 // This Class's Header --
 //-----------------------
-#include "ConfigV1.h"
+#include "ConfigV2.h"
 
 //-----------------
 // C/C++ Headers --
@@ -33,27 +33,30 @@
 namespace {
 
   pypdsdata::EnumType::Enum readoutModeEnumValues[] = {
-      { "Standard",     Pds::Rayonix::ConfigV1::Standard },
-      { "HighGain",     Pds::Rayonix::ConfigV1::HighGain },
-      { "LowNoise",     Pds::Rayonix::ConfigV1::LowNoise },
-      { "EDR",          Pds::Rayonix::ConfigV1::EDR },
+      { "Unknown",      Pds::Rayonix::ConfigV2::Unknown },
+      { "Standard",     Pds::Rayonix::ConfigV2::Standard },
+      { "HighGain",     Pds::Rayonix::ConfigV2::HighGain },
+      { "LowNoise",     Pds::Rayonix::ConfigV2::LowNoise },
+      { "HDR",          Pds::Rayonix::ConfigV2::HDR },
       { 0, 0 }
   };
   pypdsdata::EnumType readoutModeEnum ( "ReadoutMode", readoutModeEnumValues );
 
   // type-specific methods
-  FUN0_WRAPPER(pypdsdata::Rayonix::ConfigV1, binning_f)
-  FUN0_WRAPPER(pypdsdata::Rayonix::ConfigV1, binning_s)
-  FUN0_WRAPPER(pypdsdata::Rayonix::ConfigV1, exposure)
-  FUN0_WRAPPER(pypdsdata::Rayonix::ConfigV1, trigger)
-  FUN0_WRAPPER(pypdsdata::Rayonix::ConfigV1, rawMode)
-  FUN0_WRAPPER(pypdsdata::Rayonix::ConfigV1, darkFlag)
-  ENUM_FUN0_WRAPPER(pypdsdata::Rayonix::ConfigV1, readoutMode, readoutModeEnum)
-  FUN0_WRAPPER(pypdsdata::Rayonix::ConfigV1, deviceID)
+  FUN0_WRAPPER(pypdsdata::Rayonix::ConfigV2, binning_f)
+  FUN0_WRAPPER(pypdsdata::Rayonix::ConfigV2, binning_s)
+  FUN0_WRAPPER(pypdsdata::Rayonix::ConfigV2, testPattern)
+  FUN0_WRAPPER(pypdsdata::Rayonix::ConfigV2, exposure)
+  FUN0_WRAPPER(pypdsdata::Rayonix::ConfigV2, trigger)
+  FUN0_WRAPPER(pypdsdata::Rayonix::ConfigV2, rawMode)
+  FUN0_WRAPPER(pypdsdata::Rayonix::ConfigV2, darkFlag)
+  ENUM_FUN0_WRAPPER(pypdsdata::Rayonix::ConfigV2, readoutMode, readoutModeEnum)
+  FUN0_WRAPPER(pypdsdata::Rayonix::ConfigV2, deviceID)
 
   PyMethodDef methods[] = {
     { "binning_f",     binning_f,     METH_NOARGS, "self.binning_f() -> int\n\nReturns integer number" },
     { "binning_s",     binning_s,     METH_NOARGS, "self.binning_s() -> int\n\nReturns integer number" },
+    { "testPattern",   testPattern,   METH_NOARGS, "self.testPattern() -> int\n\nReturns integer number" },
     { "exposure",      exposure,      METH_NOARGS, "self.exposure() -> int\n\nReturns integer number" },
     { "trigger",       trigger,       METH_NOARGS, "self.trigger() -> int\n\nReturns integer number" },
     { "rawMode",       rawMode,       METH_NOARGS, "self.rawMode() -> int\n\nReturns integer number" },
@@ -63,7 +66,7 @@ namespace {
     {0, 0, 0, 0}
    };
 
-  char typedoc[] = "Python class wrapping C++ Pds::Rayonix::ConfigV1 class.";
+  char typedoc[] = "Python class wrapping C++ Pds::Rayonix::ConfigV2 class.";
 
 }
 
@@ -72,7 +75,7 @@ namespace {
 //		----------------------------------------
 
 void
-pypdsdata::Rayonix::ConfigV1::initType( PyObject* module )
+pypdsdata::Rayonix::ConfigV2::initType( PyObject* module )
 {
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
@@ -82,13 +85,13 @@ pypdsdata::Rayonix::ConfigV1::initType( PyObject* module )
   type->tp_dict = PyDict_New();
   PyDict_SetItemString( type->tp_dict, "ReadoutMode", readoutModeEnum.type() );
 
-  BaseType::initType( "ConfigV1", module );
+  BaseType::initType( "ConfigV2", module );
 }
 
 void
-pypdsdata::Rayonix::ConfigV1::print(std::ostream& str) const
+pypdsdata::Rayonix::ConfigV2::print(std::ostream& str) const
 {
-  str << "Rayonix.ConfigV1(binning_f=" << int(m_obj->binning_f())
+  str << "Rayonix.ConfigV2(binning_f=" << int(m_obj->binning_f())
       << ", binning_s=" << int(m_obj->binning_s())
       << ", exposure=" << m_obj->exposure()
       << ", trigger=" << m_obj->trigger()
