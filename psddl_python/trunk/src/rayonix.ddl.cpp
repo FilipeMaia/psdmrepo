@@ -57,8 +57,36 @@ void createWrappers(PyObject* module) {
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Rayonix::ConfigV1> >(Pds::TypeId::Id_RayonixConfig));
 
   {
-    PyObject* unvlist = PyList_New(1);
+  scope outer = 
+  class_<Psana::Rayonix::ConfigV2, boost::shared_ptr<Psana::Rayonix::ConfigV2>, boost::noncopyable >("ConfigV2", no_init)
+    .def("binning_f", &Psana::Rayonix::ConfigV2::binning_f)
+    .def("binning_s", &Psana::Rayonix::ConfigV2::binning_s)
+    .def("testPattern", &Psana::Rayonix::ConfigV2::testPattern)
+    .def("exposure", &Psana::Rayonix::ConfigV2::exposure)
+    .def("trigger", &Psana::Rayonix::ConfigV2::trigger)
+    .def("rawMode", &Psana::Rayonix::ConfigV2::rawMode)
+    .def("darkFlag", &Psana::Rayonix::ConfigV2::darkFlag)
+    .def("readoutMode", &Psana::Rayonix::ConfigV2::readoutMode)
+    .def("deviceID", &Psana::Rayonix::ConfigV2::deviceID)
+  ;
+
+  enum_<Psana::Rayonix::ConfigV2::ReadoutMode>("ReadoutMode")
+    .value("Unknown",Psana::Rayonix::ConfigV2::Unknown)
+    .value("Standard",Psana::Rayonix::ConfigV2::Standard)
+    .value("HighGain",Psana::Rayonix::ConfigV2::HighGain)
+    .value("LowNoise",Psana::Rayonix::ConfigV2::LowNoise)
+    .value("HDR",Psana::Rayonix::ConfigV2::HDR)
+  ;
+  scope().attr("Version")=2;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_RayonixConfig);
+  scope().attr("DeviceIDMax")=40;
+  }
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Rayonix::ConfigV2> >(Pds::TypeId::Id_RayonixConfig));
+
+  {
+    PyObject* unvlist = PyList_New(2);
     PyList_SET_ITEM(unvlist, 0, PyObject_GetAttrString(submodule, "ConfigV1"));
+    PyList_SET_ITEM(unvlist, 1, PyObject_GetAttrString(submodule, "ConfigV2"));
     PyObject_SetAttrString(submodule, "Config", unvlist);
     Py_CLEAR(unvlist);
   }
