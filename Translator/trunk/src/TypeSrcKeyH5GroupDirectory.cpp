@@ -164,7 +164,7 @@ string SrcKeyGroup::datasetsCreatedStr() {
 /////////////////////////////////////////////////
 void TypeSrcKeyH5GroupDirectory::closeGroups() { 
   TypeMapContainer::iterator typeIter;
-  for (typeIter= m_map.begin(); typeIter != m_map.end(); ++typeIter) {
+  for (typeIter= beginType(); typeIter != endType(); ++typeIter) {
     TypeGroup & typeGroup = typeIter->second;
     SrcKeyMap & srcKeyMap = typeGroup.srcKeyMap();
     SrcKeyMap::iterator srcIter;
@@ -178,7 +178,7 @@ void TypeSrcKeyH5GroupDirectory::closeGroups() {
 
 void TypeSrcKeyH5GroupDirectory::clearMaps() {
   TypeMapContainer::iterator typeIter;
-  for (typeIter= m_map.begin(); typeIter != m_map.end(); ++typeIter) {
+  for (typeIter= beginType(); typeIter != endType(); ++typeIter) {
     TypeGroup & typeGroup = typeIter->second;
     SrcKeyMap & srcKeyMap = typeGroup.srcKeyMap();
     srcKeyMap.clear();
@@ -189,7 +189,7 @@ void TypeSrcKeyH5GroupDirectory::clearMaps() {
 
 void TypeSrcKeyH5GroupDirectory::markAllSrcKeyGroupsNotWrittenForEvent() {
   TypeMapContainer::iterator typeIter;
-  for (typeIter= m_map.begin(); typeIter != m_map.end(); ++typeIter) {
+  for (typeIter= beginType(); typeIter != endType(); ++typeIter) {
     TypeGroup & typeGroup = typeIter->second;
     SrcKeyMap & srcKeyMap = typeGroup.srcKeyMap();
     SrcKeyMap::iterator srcIter;
@@ -202,25 +202,30 @@ void TypeSrcKeyH5GroupDirectory::markAllSrcKeyGroupsNotWrittenForEvent() {
 
 
 TypeMapContainer::iterator TypeSrcKeyH5GroupDirectory::findType(const std::type_info *typeInfoPtr) {
-  return m_map.find(typeInfoPtr);
+  std::string h5GroupName = m_h5GroupNames->nameForType(typeInfoPtr);
+  return m_map.find(h5GroupName);
+}
+
+TypeMapContainer::iterator TypeSrcKeyH5GroupDirectory::beginType() {
+  return m_map.begin();
 }
 
 TypeMapContainer::iterator TypeSrcKeyH5GroupDirectory::endType() {
   return m_map.end();
 }
 
-TypeGroup & TypeSrcKeyH5GroupDirectory::addTypeGroup(const std::type_info *typeInfoPtr, hdf5pp::Group & parentGroup, bool short_bld_name) {
-  string groupName = getH5GroupNameForType(typeInfoPtr, short_bld_name);
+TypeGroup & TypeSrcKeyH5GroupDirectory::addTypeGroup(const std::type_info *typeInfoPtr, hdf5pp::Group & parentGroup) {
+  string groupName = m_h5GroupNames->nameForType(typeInfoPtr);
   hdf5pp::Group group = parentGroup.createGroup(groupName);
-  return (m_map[ typeInfoPtr ] = TypeGroup(group,
-                                           m_hdfWriterEventId,
-                                           m_hdfWriterDamage));
+  return (m_map[ groupName ] = TypeGroup(group,
+                                         m_hdfWriterEventId,
+                                         m_hdfWriterDamage));
 }
 
 SrcKeyMap::iterator TypeSrcKeyH5GroupDirectory::findSrcKey(const PSEvt::EventKey &eventKey) {
   const type_info * typeInfoPtr = eventKey.typeinfo();
-  TypeMapContainer::iterator typePos = m_map.find(typeInfoPtr);
-  if (typePos == m_map.end()) MsgLog(logger,fatal,"findSrc - type_info " << PSEvt::TypeInfoUtils::typeInfoRealName(typeInfoPtr) << " not stored");
+  TypeMapContainer::iterator typePos = findType(typeInfoPtr);
+  if (typePos == endType()) MsgLog(logger,fatal,"findSrc - type_info " << PSEvt::TypeInfoUtils::typeInfoRealName(typeInfoPtr) << " not stored");
   TypeGroup & typeGroup = typePos->second;
   SrcKeyMap & srcKeyMap = typeGroup.srcKeyMap();
   const Pds::Src & src = eventKey.src();
@@ -231,28 +236,29 @@ SrcKeyMap::iterator TypeSrcKeyH5GroupDirectory::findSrcKey(const PSEvt::EventKey
 }
 
 SrcKeyMap::iterator TypeSrcKeyH5GroupDirectory::endSrcKey(const std::type_info *typeInfoPtr) {
-  TypeMapContainer::iterator typePos = m_map.find(typeInfoPtr);
-  if (typePos == m_map.end()) MsgLog(logger,fatal,"endSrc - typeInfo " << PSEvt::TypeInfoUtils::typeInfoRealName(typeInfoPtr) << " not stored");
+  TypeMapContainer::iterator typePos = findType(typeInfoPtr);
+  if (typePos == endType()) MsgLog(logger,fatal,"endSrc - typeInfo " << PSEvt::TypeInfoUtils::typeInfoRealName(typeInfoPtr) << " not stored");
   TypeGroup & typeGroup = typePos->second;
   SrcKeyMap &srcKeyMap = typeGroup.srcKeyMap();
   return srcKeyMap.end();
 }
 
 SrcKeyGroup & TypeSrcKeyH5GroupDirectory::addSrcKeyGroup(const PSEvt::EventKey &eventKey, 
-                                                         boost::shared_ptr<HdfWriterBase> hdfWriter) {
+                                                         boost::shared_ptr<HdfWriterFromEvent> hdfWriter) {
   const type_info * typeInfoPtr = eventKey.typeinfo();
-  TypeMapContainer::iterator typePos = m_map.find(typeInfoPtr);
-  if (typePos == m_map.end()) MsgLog(logger,fatal,"addSrcKeyGroup - typeInfo " << PSEvt::TypeInfoUtils::typeInfoRealName(typeInfoPtr) << " not stored");
+  TypeMapContainer::iterator typePos = findType(typeInfoPtr);
+  if (typePos == endType()) MsgLog(logger,fatal,"addSrcKeyGroup - typeInfo " << PSEvt::TypeInfoUtils::typeInfoRealName(typeInfoPtr) << " not stored");
   TypeGroup & typeGroup = typePos->second;
   SrcKeyMap &srcKeyMap = typeGroup.srcKeyMap();
   const Pds::Src &src = eventKey.src();
   const string &key = eventKey.key();
   SrcKeyPair srcStrPair = make_pair(src,key);
-  string srcKeyGroupName = getH5GroupNameForSrc(src);
+  string srcKeyGroupName = m_h5GroupNames->nameForSrc(src);
   if (eventKey.key().size()) {
-    srcKeyGroupName += "_";
+    if (srcKeyGroupName.size()>0) srcKeyGroupName += "_";
     srcKeyGroupName += eventKey.key();
   }
+  if (srcKeyGroupName.size()==0) MsgLog(logger,fatal,"addSrcKeyGroup: EventKey= " << eventKey << " group name is blank.  Cannot create group.");
   hdf5pp::Group typeH5Group = typeGroup.group();
   hdf5pp::Group srcH5Group = typeH5Group.createGroup(srcKeyGroupName);
   uint64_t srcVal = (uint64_t(src.phy()) << 32) + src.log();
@@ -271,7 +277,7 @@ void TypeSrcKeyH5GroupDirectory::getNotWrittenSrcPartition(const set<Pds::Src> &
                                                            vector<PSEvt::EventKey> & outputWrittenKeys)
 {
   TypeMapContainer::iterator typePos;
-  for (typePos = m_map.begin(); typePos != m_map.end(); ++typePos) {
+  for (typePos = beginType(); typePos != endType(); ++typePos) {
     TypeGroup & typeGroup = typePos->second;
     SrcKeyMap & srcKeyMap = typeGroup.srcKeyMap();
     SrcKeyMap::iterator srcKeyPos;
@@ -300,17 +306,17 @@ void TypeSrcKeyH5GroupDirectory::dump() {
   ostringstream msg;
   msg << " ** TypeSrcKeyH5GroupDirectory::dump ** " << endl;
   TypeMapContainer::iterator typePos;
-  for (typePos = m_map.begin(); typePos != m_map.end(); ++typePos) {
-    const type_info * typeInfoPtr = typePos->first;
+  for (typePos = beginType(); typePos != endType(); ++typePos) {
+    const std::string typeGroupName = typePos->first;
     TypeGroup & typeGroup = typePos->second;
-    msg << PSEvt::TypeInfoUtils::typeInfoRealName(typeInfoPtr) << " : " << endl;
+    msg << typeGroupName << " : " << endl;
     SrcKeyMap & srcKeyMap = typeGroup.srcKeyMap();
     SrcKeyMap::iterator srcPos;
     for (srcPos = srcKeyMap.begin(); srcPos != srcKeyMap.end(); ++srcPos) {
       const SrcKeyPair & srcKeyPair = srcPos->first;
       const Pds::Src & src = srcKeyPair.first;
       const string & key = srcKeyPair.second;
-      msg << "  src = " <<   getH5GroupNameForSrc(src)
+      msg << "  src = " <<   m_h5GroupNames->nameForSrc(src)
           << " log=0x" << std::hex << src.log() << " phy=0x" << src.phy()
           << " key='" << key << "'" << endl;
     }

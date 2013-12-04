@@ -29,13 +29,13 @@ HdfWriterEventId::HdfWriterEventId() {
   status = std::min(status,H5Tinsert(m_h5typeId, "control", offsetof(EventIdStruct,control), H5T_NATIVE_UINT32));
   status = std::min(status,H5Tinsert(m_h5typeId, "vector", offsetof(EventIdStruct,vector), H5T_NATIVE_UINT32));
   if ((m_h5typeId < 0) or (status < 0)) MsgLog(logger,fatal,"unable to create eventId compound type");
-  MsgLog(logger,trace,"Created EventId h5typeId " << m_h5typeId);
+  MsgLog(logger,trace,"Created hdf5 type for EventId  " << m_h5typeId);
 }
 
 HdfWriterEventId::~HdfWriterEventId() {
   herr_t status = H5Tclose(m_h5typeId);
   if (status<0) MsgLog(logger,error,"error closing type");
-  MsgLog(logger,trace,"Closed EventId h5typeId " << m_h5typeId);
+  MsgLog(logger,trace,"Closed hdf5 type for EventId " << m_h5typeId);
 }
 
 void HdfWriterEventId::make_dataset(hdf5pp::Group & group)

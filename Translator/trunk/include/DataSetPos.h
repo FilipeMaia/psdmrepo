@@ -17,11 +17,11 @@ public:
   typedef enum {Unlimited, Fixed} MaxSize;
   DataSetPos() {};
  DataSetPos(hid_t dsetId, MaxSize maxSize=Unlimited) : m_dsetId(dsetId), m_currentSize(0), m_maxSize(maxSize) {};
-  hid_t dsetId() { return m_dsetId; }               /// the hdf5 dataset id
-  hsize_t currentSize() { return m_currentSize; }   /// the current size of the dataset, based on accumulated 
+  hid_t dsetId() const { return m_dsetId; }               /// the hdf5 dataset id
+  hsize_t currentSize() const { return m_currentSize; }   /// the current size of the dataset, based on accumulated 
                                                     /// calls to increaseSizeByOne()
   void increaseSizeByOne() { ++m_currentSize; }     /// increases recorded size for dataset
-  MaxSize maxSize() { return m_maxSize; }           /// wether or not this is Unlimited size, or Fixed
+  MaxSize maxSize() const { return m_maxSize; }           /// wether or not this is Unlimited size, or Fixed
  private:
   hid_t m_dsetId;
   hsize_t m_currentSize;

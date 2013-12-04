@@ -338,7 +338,7 @@ hid_t createH5TypeId_EpicsPvCtrlFloat(hid_t pvNameType, hid_t unitsType) {
   return typeId;
 }
 
-hid_t createH5TypeId_EpicsPvCtrlEnum(hid_t pvNameType, hid_t allEnumStrsType) {
+hid_t createH5TypeId_EpicsPvCtrlEnum(hid_t pvNameType, hid_t strsArrayType, int numberOfStrings) {
   hid_t typeId = H5Tcreate(H5T_COMPOUND, sizeof(Unroll::EpicsPvCtrlEnum));
   if (typeId < 0) MsgLog(logger, fatal, "Failed to create h5 type id for EpicsPvCtrlEnum");
   herr_t status = 0;
@@ -349,9 +349,9 @@ hid_t createH5TypeId_EpicsPvCtrlEnum(hid_t pvNameType, hid_t allEnumStrsType) {
   status = std::min(status, H5Tinsert(typeId, "status", offsetof(Unroll::EpicsPvCtrlEnum, status), H5T_NATIVE_INT16));
   status = std::min(status, H5Tinsert(typeId, "severity", offsetof(Unroll::EpicsPvCtrlEnum, severity), H5T_NATIVE_INT16));
   status = std::min(status, H5Tinsert(typeId, "no_str", offsetof(Unroll::EpicsPvCtrlEnum, no_str), H5T_NATIVE_INT16));
-  status = std::min(status, H5Tinsert(typeId, "strs", offsetof(Unroll::EpicsPvCtrlEnum, strs), allEnumStrsType));
- 
-  status = std::min(status, H5Tinsert(typeId, "value", offsetof(Unroll::EpicsPvCtrlEnum, value), H5T_NATIVE_UINT16));
+  status = std::min(status, H5Tinsert(typeId, "strs", offsetof(Unroll::EpicsPvCtrlEnum, strs), strsArrayType));
+  size_t offsetForValue = offsetof(Unroll::EpicsPvCtrlEnum, strs) +  numberOfStrings * Psana::Epics::MAX_ENUM_STRING_SIZE;
+  status = std::min(status, H5Tinsert(typeId, "value", offsetForValue, H5T_NATIVE_UINT16));
 
   if (status < 0) MsgLog(logger, fatal, "error inserting field into h5 typeId for EpicsPvCtrlEnum"); 
 
@@ -566,6 +566,23 @@ hid_t createH5TypeId_EpicsPvTimeDouble(hid_t stampType) {
   return typeId;
 }
 
+template <>
+void copyValueFldToUnrolled < Unroll::EpicsPvCtrlEnum >
+       (const Unroll::EpicsPvCtrlEnum::PsanaSrc &psanaVar, int16_t el, 
+        Unroll::EpicsPvCtrlEnum & unrollBuffer) {
+  int numberOfStrs = psanaVar.dbr().no_str();
+  void * valueAddress = &unrollBuffer.strs[numberOfStrs];
+  uint16_t * valuePtr = static_cast<uint16_t*>(valueAddress);
+  MsgLog(logger,info,"copyValueFldToUnRolled EpicsPvCtrlEnum el=" << el);
+  *valuePtr = psanaVar.value(el);  
+}
  
+template <>
+int getNumberStringsForCtrlEnum<Unroll::EpicsPvCtrlEnum>(boost::shared_ptr<Unroll::EpicsPvCtrlEnum::PsanaSrc> ptr) 
+{ 
+  return ptr->dbr().no_str(); 
+}
+
+
 
 } // Translator

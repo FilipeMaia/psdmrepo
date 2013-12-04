@@ -222,14 +222,14 @@ def compareTranslation(tester,o2o, psana, diffs, cmpDsetValues=True, recurse=Tru
 # currently we are not trying to get the same chunk size, shuffle and compression as o2o-translate
 # uncomment to compare these things:
 #
-        print "chunk= %s,%s  shuffle= %s,%s  compr= %s,%s  comp_opts= %s,%s  %s" % \
-            (o2o.chunks,psana.chunks, o2o.shuffle,psana.shuffle, o2o.compression, psana.compression,
-             o2o.compression_opts, psana.compression_opts, o2o.name)
-        if not o2o.name.startswith('/Configure:0000/Epics::EpicsPv/EpicsArch.0:NoDevice.0') and not \
-           o2o.name.startswith('/Configure:0000/Run:0000/CalibCycle:0000/Epics::EpicsPv/EpicsArch.0'):
-            tester.assertEqual(o2o.chunks, psana.chunks, "chunk differs in %s" % o2o.name)
-            tester.assertEqual(o2o.shuffle, psana.shuffle, "shuffle differs in %s" % o2o.name)
-            tester.assertEqual(o2o.compression,psana.compression, "compression differs in %s" % o2o.name)
+#        print "chunk= %s,%s  shuffle= %s,%s  compr= %s,%s  comp_opts= %s,%s  %s" % \
+#            (o2o.chunks,psana.chunks, o2o.shuffle,psana.shuffle, o2o.compression, psana.compression,
+#             o2o.compression_opts, psana.compression_opts, o2o.name)
+#        if not o2o.name.startswith('/Configure:0000/Epics::EpicsPv/EpicsArch.0:NoDevice.0') and not \
+#           o2o.name.startswith('/Configure:0000/Run:0000/CalibCycle:0000/Epics::EpicsPv/EpicsArch.0'):
+#            tester.assertEqual(o2o.chunks, psana.chunks, "chunk differs in %s" % o2o.name)
+#            tester.assertEqual(o2o.shuffle, psana.shuffle, "shuffle differs in %s" % o2o.name)
+#            tester.assertEqual(o2o.compression,psana.compression, "compression differs in %s" % o2o.name)
         if cmpDsetValues:
             if o2o.name.find('Epics::EpicsPv')>=0:
                 compareEpicsDataset(tester,o2o,psana,diffs)

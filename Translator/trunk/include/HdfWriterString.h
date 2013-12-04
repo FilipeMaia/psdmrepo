@@ -1,5 +1,5 @@
-#ifndef TRANSLATOR_HDFWRITERFILTERMSG_H
-#define TRANSLATOR_HDFWRITERFILTERMSG_H
+#ifndef TRANSLATOR_HDFWRITERSTRING_H
+#define TRANSLATOR_HDFWRITERSTRING_H
 
 #include <string>
 #include <map>
@@ -15,10 +15,10 @@
 
 namespace Translator {
 
-class HdfWriterFilterMsg {
+class HdfWriterString {
  public:
-  HdfWriterFilterMsg();
-  ~HdfWriterFilterMsg();
+  HdfWriterString();
+  ~HdfWriterString();
 
   void make_dataset(hdf5pp::Group & group) { make_dataset(group.id()); }
   void make_dataset(hid_t groupId);
@@ -39,6 +39,7 @@ class HdfWriterFilterMsg {
   hid_t m_h5typeId;
   HdfWriterGeneric m_writer;
   size_t m_dsetPos;
+  static const std::string datasetName;
 };
 
 } // namespace

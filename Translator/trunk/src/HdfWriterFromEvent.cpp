@@ -1,4 +1,4 @@
-#include "Translator/HdfWriterBase.h"
+#include "Translator/HdfWriterFromEvent.h"
 
 namespace Translator {
 

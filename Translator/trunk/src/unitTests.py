@@ -42,6 +42,45 @@ TESTDATA_XCSCOM12_r52_s0 = os.path.join(DATADIR,"xcscom12-r52-s0-dupTimes-splitE
 TESTDATA_T1_DROPPED_SRC = os.path.join(DATADIR,"t1_dropped_src.xtc")
 TESTDATA_T1_DROPPED = os.path.join(DATADIR,"t1_dropped.xtc")
 
+## ----------------
+# this string is for the test_ndarrays_allWritenToFile test - a fragile 
+# shortcut to testing that all the data looks Ok
+
+NDARRAY_2EVENTS='''double3D:
+array([[[[ 1.,  2.],
+         [ 3.,  4.]],
+
+        [[ 5.,  6.],
+         [ 7.,  8.]]],
+
+
+       [[[ 2.,  3.],
+         [ 4.,  5.]],
+
+        [[ 6.,  7.],
+         [ 8.,  9.]]]])
+float2Da:
+array([[[ 1.,  2.],
+        [ 3.,  4.]],
+
+       [[ 2.,  3.],
+        [ 4.,  5.]]], dtype=float32)
+float2Db:
+array([[[ 1.,  2.],
+        [ 3.,  4.]],
+
+       [[ 2.,  3.],
+        [ 4.,  5.]]], dtype=float32)
+int1D:
+array([[1, 2],
+       [2, 3]], dtype=int32)
+str1:
+array([This is event number: 1, This is event number: 2], dtype=object)
+str2:
+array([This is a second string.  10 * event number is 10,
+       This is a second string.  10 * event number is 20], dtype=object)
+'''
+
 #------------------
 # Utility functions 
 #------------------
@@ -100,7 +139,8 @@ def testDatasetsAgainstExpectedOutput(tester,h5,testList,cmpPlaces=4,verbose=Fal
                 
 def writeCfgFile(input_file, output_h5, moduleList="Translator.H5Output"):
     '''Starts to write a psana cfg file.  This is a temporary file.
-    Returns the file like object so the user may add more options.
+    Returns the file like object so the user may add more options. This starts to 
+    fill out the H5Output module options.
     '''
     cfgfile = tempfile.NamedTemporaryFile(suffix='.cfg',prefix='translator-unit-test')
     cfgfile.write("[psana]\n")
@@ -108,7 +148,8 @@ def writeCfgFile(input_file, output_h5, moduleList="Translator.H5Output"):
     cfgfile.write("files = %s\n" % input_file)
     cfgfile.write("[Translator.H5Output]\n")
     cfgfile.write("output_file = %s\n" % output_h5)
-    cfgfile.write("Epics=exclude\n")
+    cfgfile.write("Epics=exclude\n")  # to exclude the epics::ConfigV1, to get things to look 
+                                      # more like o2o-translate
     cfgfile.file.flush();
     return cfgfile
 
@@ -143,13 +184,16 @@ class H5Output( unittest.TestCase ) :
         """
         pass
 
-    def runPsanaOnCfg(self,cfgfile,output_h5,extraOpts='',printPsanaOutput=False):
+    def runPsanaOnCfg(self,cfgfile,output_h5,extraOpts='',printPsanaOutput=False, errorCheck=True):
         '''Runs psana on the given cfgfile, to produce the given h5output file.
         extraOpts are passed to psana on the command line.
         
         tests that output_h5 is created.
-        tests that psana output does not include: fatal, error,
+
+        If errorCheck is True it tests that psana output does not include: fatal, error,
                         segmentation fault, seg falut, traceback
+
+        returns the output of psana
         '''
         if os.path.exists(output_h5):
             os.unlink(output_h5)
@@ -158,6 +202,12 @@ class H5Output( unittest.TestCase ) :
         psana_cmd = "psana %s -c %s" % (extraOpts,cfgfile.name)
         p = sb.Popen(psana_cmd,shell=True,stdout=sb.PIPE, stderr=sb.PIPE)
         o,e = p.communicate()
+        if not os.path.exists(output_h5):
+            print "### h5 file was not created. cfg file: ###"
+            print file(cfgfile.name).read()
+            print "### psana output: ###"
+            print o
+            print e
         self.assertEqual(os.path.exists(output_h5),True)
         allOutPut = o+'\n'+e
         if printPsanaOutput:
@@ -165,12 +215,14 @@ class H5Output( unittest.TestCase ) :
             sys.stdout.flush()
             print "*** Running h5ls -r on output_h5 (%s)"% output_h5
             os.system('h5ls -r %s | grep -v -i epics' % output_h5)
+        if not errorCheck:
+            return allOutPut
         lowerOutput = allOutPut.lower()
-        self.assertEqual(lowerOutput.find('fatal'),-1,msg="'fatal' found in psana output")
-        self.assertEqual(lowerOutput.find('error'),-1,msg="'error' found in psana output")
-        self.assertEqual(lowerOutput.find('segmentation fault'),-1,msg="'segmentation fault' found in psana output")
-        self.assertEqual(lowerOutput.find('seg fault'),-1,msg="'seg fault' found in psana output")
-        self.assertEqual(lowerOutput.find('traceback'),-1,msg="'traceback' found in psana output")
+        self.assertEqual(lowerOutput.find('fatal'),-1,msg="'fatal' found in psana output: ... %s ..." % lowerOutput[lowerOutput.find('fatal')-100:lowerOutput.find('fatal')+100])
+        self.assertEqual(lowerOutput.find('error'),-1,msg="'error' found in psana output: ... %s ..."  % lowerOutput[lowerOutput.find('error')-100:lowerOutput.find('error')+100])
+        self.assertEqual(lowerOutput.find('segmentation fault'),-1,msg="'segmentation fault' found in psana output: ... %s ..." % lowerOutput[lowerOutput.find('segmentation fault')-100:lowerOutput.find('segmentation fault')+100])
+        self.assertEqual(lowerOutput.find('seg fault'),-1,msg="'seg fault' found in psana output: ... %s ..." % lowerOutput[lowerOutput.find('seg fault')-100:lowerOutput.find('seg fault')+100])
+        self.assertEqual(lowerOutput.find('traceback'),-1,msg="'traceback' found in psana output: ... %s ..." % lowerOutput[lowerOutput.find('traceback')-100:lowerOutput.find('traceback')+100])
 
     def test_t1(self):
         '''checks that test data t1 was translated correctly.
@@ -565,27 +617,188 @@ class H5Output( unittest.TestCase ) :
         '''
         '''
         output_h5 = os.path.join(DATADIR,"unit-test-donottranslate.h5")
-        cfgfile = writeCfgFile(TESTDATA_T1,output_h5,"Translator.TestDoNotTranslate Translator.H5Output")
-        cfgfile.write("[Translator.TestDoNotTranslate]\n")
+        cfgfile = writeCfgFile(TESTDATA_T1,output_h5,"Translator.TestModuleDoNotTranslate Translator.H5Output")
+        cfgfile.write("[Translator.TestModuleDoNotTranslate]\n")
         cfgfile.write("skip=0 1\n")
         msg0='message0'
         msg1='message1thisIsALongerMessage'
         cfgfile.write("messages=%s %s\n"% (msg0, msg1))
         cfgfile.file.flush()
         try:
-            self.runPsanaOnCfg(cfgfile,output_h5,'-v')
+            self.runPsanaOnCfg(cfgfile,output_h5,extraOpts='-v')
         except:
             cfgfile.close()
             if os.path.exists(output_h5):
                 os.unlink(output_h5)
             raise
         f=h5py.File(output_h5,'r')
-        filteredMsgs = map(str,f['/Configure:0000/Run:0000/CalibCycle:0000/filtered/message'])
+        filteredMsgs = map(str,f['/Configure:0000/Run:0000/CalibCycle:0000/filtered/data'])
         self.assertEqual(filteredMsgs[0],msg0)
         self.assertEqual(filteredMsgs[1],msg1)
         if self.cleanUp:
             os.unlink(output_h5)
         
+    def test_ndarrays_allWrittenToFile(self):
+        '''check that all ndarrays and strings written to the file
+        '''
+        output_h5 = os.path.join(DATADIR,"unit-test-ndarrays.h5")
+        cfgfile = writeCfgFile(TESTDATA_T1,output_h5,"Translator.TestModuleNDArrayString Translator.H5Output")
+        cfgfile.file.flush()
+        self.runPsanaOnCfg(cfgfile,output_h5)
+        f=h5py.File(output_h5,'r')
+
+        double3D = f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/my_double3D/data'][...]
+        float2Da = f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/my_float2Da/data'][...]
+        float2Db = f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/my_float2Db/data'][...]
+        int1D = f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/my_int1D/data'][...]
+        str1=f['/Configure:0000/Run:0000/CalibCycle:0000/std::string/my_string1/data'][...]
+        str2=f['/Configure:0000/Run:0000/CalibCycle:0000/std::string/my_string2/data'][...]
+
+        output="double3D:\n%r\nfloat2Da:\n%r\nfloat2Db:\n%r\nint1D:\n%r\nstr1:\n%r\nstr2:\n%r\n" % (double3D, float2Da, float2Db, int1D, str1, str2)
+        self.assertEqual(output,NDARRAY_2EVENTS, "output of all nd arrays wrong,\n *** expected: ***\n%s\n*** produced: ***\n%s\n" % (NDARRAY_2EVENTS, output))
+        if self.cleanUp:
+            os.unlink(output_h5)
+
+    def test_filter_all_ndarray(self):
+        '''check that we can filter out all ndarrays and strings
+        '''
+        output_h5 = os.path.join(DATADIR,"unit-test-filter_all_ndarray.h5")
+        cfgfile = writeCfgFile(TESTDATA_T1,output_h5,"Translator.TestModuleNDArrayString Translator.H5Output")
+        # first add any options to H5Output, then other modules
+        cfgfile.write("ndarray_types = exclude\n")
+        cfgfile.write("std_string = exclude\n")
+        cfgfile.file.flush()
+        self.runPsanaOnCfg(cfgfile,output_h5)
+        f=h5py.File(output_h5,'r')
+
+        # none of the ndarrays or strings should be in here:
+        with self.assertRaises(KeyError):
+            f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/my_double3D']
+        with self.assertRaises(KeyError):
+            f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/my_float2Da']
+        with self.assertRaises(KeyError):
+            f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/my_float2Db']
+        with self.assertRaises(KeyError):
+            f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/my_int1D']
+        with self.assertRaises(KeyError):
+            f['/Configure:0000/Run:0000/CalibCycle:0000/std::string/my_string1']
+        with self.assertRaises(KeyError):
+            f['/Configure:0000/Run:0000/CalibCycle:0000/std::string/my_string2']
+
+        if self.cleanUp:
+            os.unlink(output_h5)
+
+    def test_filter_some_ndarray_exclude(self):
+        '''check that we can filter some ndarrays by excluding them
+        '''
+        output_h5 = os.path.join(DATADIR,"unit-test-filter_some_ndarray_exclude.h5")
+        cfgfile = writeCfgFile(TESTDATA_T1,output_h5,"Translator.TestModuleNDArrayString Translator.H5Output")
+        # first add any options to H5Output, then other modules
+        cfgfile.write("ndarray_key_filter = exclude my_int1D my_float2Da\n")
+        cfgfile.write("std_string_key_filter = exclude my_string1\n")
+        cfgfile.file.flush()
+        self.runPsanaOnCfg(cfgfile,output_h5,extraOpts='',printPsanaOutput=False)
+        f=h5py.File(output_h5,'r')
+
+        # now these should not be here
+        with self.assertRaises(KeyError):
+            f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/my_int1D']
+        with self.assertRaises(KeyError):
+            f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/my_float2Da']
+        with self.assertRaises(KeyError):
+            f['/Configure:0000/Run:0000/CalibCycle:0000/std::string/my_string1']
+        # but these should
+        self.assertEqual(len(f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/my_double3D/data']),2)
+        self.assertEqual(len(f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/my_float2Db/data']),2)
+        self.assertEqual(len(f['/Configure:0000/Run:0000/CalibCycle:0000/std::string/my_string2/data']),2)
+
+        if self.cleanUp:
+            os.unlink(output_h5)
+
+    def test_filter_some_ndarray_include(self):
+        '''check that we can filter some ndarrays by including them
+        '''
+        output_h5 = os.path.join(DATADIR,"unit-test-filter_some_ndarray_include.h5")
+        cfgfile = writeCfgFile(TESTDATA_T1,output_h5,"Translator.TestModuleNDArrayString Translator.H5Output")
+        # first add any options to H5Output, then other modules
+        cfgfile.write("ndarray_key_filter = include my_int1D my_float2Da\n")
+        cfgfile.write("std_string_key_filter = include my_string1\n")
+        cfgfile.file.flush()
+        self.runPsanaOnCfg(cfgfile,output_h5)
+        f=h5py.File(output_h5,'r')
+
+        # now these should not be here
+        with self.assertRaises(KeyError):
+            f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/my_double3D']
+        with self.assertRaises(KeyError):
+            f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/my_float2Db']
+        with self.assertRaises(KeyError):
+            f['/Configure:0000/Run:0000/CalibCycle:0000/std::string/my_string2']
+
+        # but these should
+        self.assertEqual(len(f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/my_int1D/data']),2)
+        self.assertEqual(len(f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/my_float2Da/data']),2)
+        self.assertEqual(len(f['/Configure:0000/Run:0000/CalibCycle:0000/std::string/my_string1/data']),2)
+
+        if self.cleanUp:
+            os.unlink(output_h5)
+
+    def test_src_filter_include(self):
+        '''check src filtering
+        '''
+        grpSrcList = [('EvrData::DataV3', 'NoDetector.0:Evr.0'),
+                        ('Bld::BldDataEBeamV3','EBeam'),
+                        ('Bld::BldDataPhaseCavity','PhaseCavity'),
+                        ('Bld::BldDataFEEGasDetEnergy','FEEGasDetEnergy'),
+                        ('Ipimb::DataV2/XppSb2_Ipm','XppSb2_Ipm'),
+                        ('Ipimb::DataV2/XppSb3_Ipm','XppSb3_Ipm')]
+        for group,src in grpSrcList:
+            output_h5 = os.path.join(DATADIR,"unit-test_src_filter_include.h5")
+            cfgfile = writeCfgFile(TESTDATA_T1,output_h5)
+            cfgfile.write("src_filter = include %s\n" % src)
+            cfgfile.file.flush()
+            self.runPsanaOnCfg(cfgfile,output_h5)
+            f=h5py.File(output_h5,'r')
+            
+            fullGroup = '/Configure:0000/Run:0000/CalibCycle:0000/%s' % group
+            h5group = f[fullGroup]  # should not throw exception
+
+            filteredGroups = [grpSrc[0] for grpSrc in grpSrcList if grpSrc[1] != src]
+            for filteredGroup in filteredGroups:
+                with self.assertRaises(KeyError):
+                    f['/Configure:0000/Run:0000/CalibCycle:0000/%s' % filteredGroup]
+
+        if self.cleanUp:
+            os.unlink(output_h5)
+        
+    def test_src_filter_exclude(self):
+        '''check src filtering
+        '''
+        grpSrcList = [('EvrData::DataV3', 'NoDetector.0:Evr.0'),
+                        ('Bld::BldDataEBeamV3','EBeam'),
+                        ('Bld::BldDataPhaseCavity','PhaseCavity'),
+                        ('Bld::BldDataFEEGasDetEnergy','FEEGasDetEnergy'),
+                        ('Ipimb::DataV2/XppSb2_Ipm','XppSb2_Ipm'),
+                        ('Ipimb::DataV2/XppSb3_Ipm','XppSb3_Ipm')]
+        for group,src in grpSrcList:
+            output_h5 = os.path.join(DATADIR,"unit-test_src_filter_include.h5")
+            cfgfile = writeCfgFile(TESTDATA_T1,output_h5)
+            cfgfile.write("src_filter = exclude %s\n" % src)
+            cfgfile.file.flush()
+            self.runPsanaOnCfg(cfgfile,output_h5)
+            f=h5py.File(output_h5,'r')
+            
+            fullGroup = '/Configure:0000/Run:0000/CalibCycle:0000/%s' % group
+            with self.assertRaises(KeyError):
+                h5group = f[fullGroup] 
+
+            includedGroups = [grpSrc[0] for grpSrc in grpSrcList if grpSrc[1] != src]
+            for includedGroup in includedGroups:
+                grp = f['/Configure:0000/Run:0000/CalibCycle:0000/%s' % includedGroup]
+
+        if self.cleanUp:
+            os.unlink(output_h5)
+
 #  run unit tests when imported as a main module
 #
 #  To run an individual test, do something like (from the release directory)

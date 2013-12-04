@@ -9,6 +9,7 @@
 #include <map>
 #include <set>
 #include <typeinfo>
+#include "PSEvt/TypeInfoUtils.h"
 
 namespace Translator {
 
@@ -70,9 +71,9 @@ namespace Translator {
 class TypeAliases {
 public:
   TypeAliases();
-  typedef std::set<const std::type_info *> TypeInfoSet;
+  typedef std::set<const std::type_info *, PSEvt::TypeInfoUtils::lessTypeInfoPtr> TypeInfoSet;
   typedef std::map<std::string, TypeInfoSet > Alias2TypesMap;
-  typedef std::map<const std::type_info *, std::string > Type2AliasMap;
+  typedef std::map<const std::type_info *, std::string,  PSEvt::TypeInfoUtils::lessTypeInfoPtr > Type2AliasMap;
 
   const std::set<std::string> & aliases() { return m_aliasKeys; }
   const Alias2TypesMap & alias2TypesMap(){ return m_alias2TypesMap; }

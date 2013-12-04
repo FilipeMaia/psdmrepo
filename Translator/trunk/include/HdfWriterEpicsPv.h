@@ -54,7 +54,8 @@ class HdfWriterEpicsPv {
  protected:
   void makeSharedTypes();
   void closeSharedTypes();
-  hid_t getTypeId(int16_t dbrType);
+  hid_t getTypeId(int16_t dbrType, int ctrlEnumNumberOfStrs);
+  hid_t getCtrlEnumTypeId(int numberOfStrs);
   void dispatch(hid_t groupId, int16_t dbrType, 
                 PSEnv::EpicsStore & epicsStore, 
                 const std::string & pvName, 
@@ -66,6 +67,8 @@ class HdfWriterEpicsPv {
 
   boost::shared_ptr<HdfWriterGeneric> m_hdfWriterGeneric;
   boost::shared_ptr<HdfWriterEventId> m_hdfWriterEventId;
+  std::vector<hid_t> m_enumStrsArrayTypes;
+  std::vector<hid_t> m_numberStringsToH5TypeForCtrlEnum;   
   std::map<uint16_t, hid_t>  m_dbr2h5TypeId;   
   
   // base h5 types that are used in the Epics Pv types
@@ -73,7 +76,6 @@ class HdfWriterEpicsPv {
   hid_t m_stringType;  // char[Psana::Epics:: MAX_STRING_SIZE]
   hid_t m_unitsType;   // char[Psana::Epics::MAX_UNITS_SIZE]
   hid_t m_enumStrType; // char[Psana::Epics::MAX_ENUM_STRING_SIZE]
-  hid_t m_allEnumStrsType; // array of [Psana::Epics::MAX_ENUM_STATES] m_enumStrType
   hid_t m_stampType;
 
   template <class U>
@@ -98,8 +100,9 @@ class HdfWriterEpicsPv {
            << " epicsPvName=" << epicsPvName << " dispatchAction=" << dispatchAction);
     
     U unrollBuffer;
-    
+
     try {
+      int numberStringsForCtrlEnum = getNumberStringsForCtrlEnum<U>(psanaVar);
       hid_t typeId = -1;
       size_t dsetIdx = -1;
       int16_t el = -1;
@@ -107,7 +110,7 @@ class HdfWriterEpicsPv {
       case CreateWriteClose:
         if (psanaVar->numElements()>1) MsgLog("Translator.HdfWriterEpicsPv",trace,"pv with " << 
                                               psanaVar->numElements() << " elements");
-        typeId = getTypeId(dbrType);
+        typeId = getTypeId(dbrType,numberStringsForCtrlEnum);
         dsetIdx = m_hdfWriterGeneric->createFixedSizeDataset(groupId, "data", 
                                                              typeId,
                                                              psanaVar->numElements());
@@ -124,7 +127,7 @@ class HdfWriterEpicsPv {
         break;
 
       case CreateAppend:
-        typeId = getTypeId(dbrType);
+        typeId = getTypeId(dbrType,numberStringsForCtrlEnum);
         dsetIdx = m_hdfWriterGeneric->createUnlimitedSizeDataset(groupId, "data", 
                                                                  typeId,
                                                                  dataSetCreationProperties());

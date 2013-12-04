@@ -9,16 +9,16 @@
 
 #include "PSEvt/TypeInfoUtils.h"
 
-#include "Translator/HdfWriterBase.h"
+#include "Translator/HdfWriterFromEvent.h"
 
 
 namespace Translator {
 
-  typedef std::map<const std::type_info *, boost::shared_ptr<HdfWriterBase> , PSEvt::TypeInfoUtils::lessTypeInfoPtr >  HdfWriterMap;
+typedef std::map<const std::type_info *, boost::shared_ptr<HdfWriterFromEvent> , PSEvt::TypeInfoUtils::lessTypeInfoPtr >  HdfWriterMap;
 
-void initializeHdfWriterMap( HdfWriterMap & );
+void initializeHdfWriterMap( HdfWriterMap & mapping);
 
-boost::shared_ptr<HdfWriterBase> 
+boost::shared_ptr<HdfWriterFromEvent> 
 getHdfWriter(HdfWriterMap &, const std::type_info *);
 
 } // namespace

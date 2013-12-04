@@ -19,10 +19,12 @@
 
 #include "hdf5pp/Group.h"
 
-#include "Translator/HdfWriterBase.h"
+#include "Translator/HdfWriterFromEvent.h"
 #include "Translator/HdfWriterEventId.h"
 #include "Translator/HdfWriterDamage.h"
 #include "Translator/DataSetCreationProperties.h"
+#include "Translator/TypeAliases.h"
+#include "Translator/H5GroupNames.h"
 
 namespace Translator {
 
@@ -36,7 +38,7 @@ class SrcKeyGroup {
 
   SrcKeyGroup(hdf5pp::Group group, 
               const PSEvt::EventKey &eventKey,
-              boost::shared_ptr<Translator::HdfWriterBase> hdfWriter, 
+              boost::shared_ptr<Translator::HdfWriterFromEvent> hdfWriter, 
               boost::shared_ptr<Translator::HdfWriterEventId> hdfWriterEventId,
               boost::shared_ptr<Translator::HdfWriterDamage> hdfWriterDamage) :     
     m_eventKey(eventKey),
@@ -79,7 +81,7 @@ class SrcKeyGroup {
                        boost::shared_ptr<PSEvt::EventId> eventId, 
                        Pds::Damage damage);
   void close();
-  boost::shared_ptr<Translator::HdfWriterBase> hdfWriter() { return m_hdfWriter; };
+  boost::shared_ptr<Translator::HdfWriterFromEvent> hdfWriter() { return m_hdfWriter; };
   const PSEvt::EventKey & eventKey() { return m_eventKey; }
   bool arrayTypeDatasetsCreated() { return m_datasetsCreated == ArrayForTypeTimeDamage; }
 
@@ -87,7 +89,7 @@ class SrcKeyGroup {
   PSEvt::EventKey m_eventKey;
   hdf5pp::Group m_group;
 
-  boost::shared_ptr<Translator::HdfWriterBase> m_hdfWriter;
+  boost::shared_ptr<Translator::HdfWriterFromEvent> m_hdfWriter;
   boost::shared_ptr<Translator::HdfWriterEventId> m_hdfWriterEventId;
   boost::shared_ptr<Translator::HdfWriterDamage> m_hdfWriterDamage;
 
@@ -145,11 +147,14 @@ class TypeGroup {
   boost::shared_ptr<Translator::HdfWriterDamage> m_hdfWriterDamage;
 };
 
- typedef std::map<const std::type_info *, TypeGroup, PSEvt::TypeInfoUtils::lessTypeInfoPtr> TypeMapContainer;
+ typedef std::map<const std::string, TypeGroup> TypeMapContainer;
 
 class TypeSrcKeyH5GroupDirectory {
  public:
-  TypeSrcKeyH5GroupDirectory() {};
+  TypeSrcKeyH5GroupDirectory() {}
+  void setH5GroupNames(boost::shared_ptr<Translator::H5GroupNames> h5GroupNames) {
+    m_h5GroupNames = h5GroupNames;
+  }
   void setEventIdAndDamageWriters(boost::shared_ptr<Translator::HdfWriterEventId> hdfWriterEventId,
                                   boost::shared_ptr<Translator::HdfWriterDamage> hdfWriterDamage) 
   {
@@ -161,14 +166,14 @@ class TypeSrcKeyH5GroupDirectory {
   void clearMaps();
   void markAllSrcKeyGroupsNotWrittenForEvent();
   TypeMapContainer::iterator findType(const std::type_info *);
+  TypeMapContainer::iterator beginType();
   TypeMapContainer::iterator endType();
   TypeGroup & addTypeGroup(const std::type_info *, 
-                           hdf5pp::Group & parentGroup,
-                           bool short_bld_name);
+                           hdf5pp::Group & parentGroup);
   SrcKeyMap::iterator findSrcKey(const PSEvt::EventKey &);
   SrcKeyMap::iterator endSrcKey(const std::type_info *);
   SrcKeyGroup & addSrcKeyGroup(const PSEvt::EventKey &eventKey, 
-                               boost::shared_ptr<Translator::HdfWriterBase> hdfWriter);
+                               boost::shared_ptr<Translator::HdfWriterFromEvent> hdfWriter);
   void getNotWrittenSrcPartition(const std::set<Pds::Src> & srcs, 
                                  std::map<Pds::Src, std::vector<PSEvt::EventKey> > & outputSrcMap, 
                                  std::vector<PSEvt::EventKey> & outputOtherNotWritten,
@@ -178,6 +183,7 @@ class TypeSrcKeyH5GroupDirectory {
   TypeMapContainer m_map;
   boost::shared_ptr<Translator::HdfWriterEventId> m_hdfWriterEventId;
   boost::shared_ptr<Translator::HdfWriterDamage> m_hdfWriterDamage;
+  boost::shared_ptr<Translator::H5GroupNames> m_h5GroupNames;
 };
 
 } // namespace Translator

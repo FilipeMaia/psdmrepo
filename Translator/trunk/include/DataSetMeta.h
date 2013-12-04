@@ -17,8 +17,8 @@ public:
   DataSetMeta() {};
  DataSetMeta(const std::string & name, hid_t dsetId, MaxSize maxSize, hid_t typeId) : 
   DataSetPos(dsetId, maxSize), m_name(name), m_typeId(typeId) {}
-  hid_t typeId() { return m_typeId; }
-  std::string name() { return m_name; }
+  hid_t typeId() const { return m_typeId; }
+  std::string name() const { return m_name; }
   
  private:
   std::string m_name;

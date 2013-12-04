@@ -30,37 +30,38 @@
 #include "psddl_psana/rayonix.ddl.h"
 #include "psddl_psana/timepix.ddl.h"
 #include "psddl_psana/usdusb.ddl.h"
+#include "ndarray/ndarray.h"
 
 using namespace Translator;
 using namespace std;
 
 TypeAliases::TypeAliases() {
-  set<const type_info *> AcqTdc;
+  TypeInfoSet AcqTdc;
   AcqTdc.insert( & typeid(Psana::Acqiris::TdcConfigV1));
   AcqTdc.insert( & typeid(Psana::Acqiris::TdcDataV1));
   m_alias2TypesMap["AcqTdc"] = AcqTdc;
 
-  set<const type_info *> AcqWaveform;
+  TypeInfoSet AcqWaveform;
   AcqWaveform.insert( & typeid(Psana::Acqiris::ConfigV1));
   AcqWaveform.insert( & typeid(Psana::Acqiris::DataDescV1));
   m_alias2TypesMap["AcqWaveform"] = AcqWaveform;
 
-  set<const type_info *> Alias;
+  TypeInfoSet Alias;
   Alias.insert( & typeid(Psana::Alias::ConfigV1));
   m_alias2TypesMap["Alias"] = Alias;
 
-  set<const type_info *> Andor;
+  TypeInfoSet Andor;
   Andor.insert( & typeid(Psana::Andor::ConfigV1));
   Andor.insert( & typeid(Psana::Andor::FrameV1));
   m_alias2TypesMap["Andor"] = Andor;
 
-  set<const type_info *> Control;
+  TypeInfoSet Control;
   Control.insert( & typeid(Psana::ControlData::ConfigV1));
   Control.insert( & typeid(Psana::ControlData::ConfigV2));
   Control.insert( & typeid(Psana::ControlData::ConfigV3));
   m_alias2TypesMap["Control"] = Control;
 
-  set<const type_info *> Cspad;
+  TypeInfoSet Cspad;
   Cspad.insert( & typeid(Psana::CsPad::ConfigV1));
   Cspad.insert( & typeid(Psana::CsPad::ConfigV2));
   Cspad.insert( & typeid(Psana::CsPad::ConfigV3));
@@ -70,19 +71,19 @@ TypeAliases::TypeAliases() {
   Cspad.insert( & typeid(Psana::CsPad::DataV2));
   m_alias2TypesMap["Cspad"] = Cspad;
 
-  set<const type_info *> Cspad2x2;
+  TypeInfoSet Cspad2x2;
   Cspad2x2.insert( & typeid(Psana::CsPad2x2::ConfigV1));
   Cspad2x2.insert( & typeid(Psana::CsPad2x2::ConfigV2));
   Cspad2x2.insert( & typeid(Psana::CsPad2x2::ElementV1));
   m_alias2TypesMap["Cspad2x2"] = Cspad2x2;
 
-  set<const type_info *> DiodeFex;
+  TypeInfoSet DiodeFex;
   DiodeFex.insert( & typeid(Psana::Lusi::DiodeFexConfigV1));
   DiodeFex.insert( & typeid(Psana::Lusi::DiodeFexConfigV2));
   DiodeFex.insert( & typeid(Psana::Lusi::DiodeFexV1));
   m_alias2TypesMap["DiodeFex"] = DiodeFex;
 
-  set<const type_info *> EBeam;
+  TypeInfoSet EBeam;
   EBeam.insert( & typeid(Psana::Bld::BldDataEBeamV0));
   EBeam.insert( & typeid(Psana::Bld::BldDataEBeamV1));
   EBeam.insert( & typeid(Psana::Bld::BldDataEBeamV2));
@@ -90,18 +91,18 @@ TypeAliases::TypeAliases() {
   EBeam.insert( & typeid(Psana::Bld::BldDataEBeamV4));
   m_alias2TypesMap["EBeam"] = EBeam;
 
-  set<const type_info *> Encoder;
+  TypeInfoSet Encoder;
   Encoder.insert( & typeid(Psana::Encoder::ConfigV1));
   Encoder.insert( & typeid(Psana::Encoder::ConfigV2));
   Encoder.insert( & typeid(Psana::Encoder::DataV1));
   Encoder.insert( & typeid(Psana::Encoder::DataV2));
   m_alias2TypesMap["Encoder"] = Encoder;
 
-  set<const type_info *> Epics;
+  TypeInfoSet Epics;
   Epics.insert( & typeid(Psana::Epics::ConfigV1));
   m_alias2TypesMap["Epics"] = Epics;
 
-  set<const type_info *> Evr;
+  TypeInfoSet Evr;
   Evr.insert( & typeid(Psana::EvrData::ConfigV1));
   Evr.insert( & typeid(Psana::EvrData::ConfigV2));
   Evr.insert( & typeid(Psana::EvrData::ConfigV3));
@@ -112,91 +113,91 @@ TypeAliases::TypeAliases() {
   Evr.insert( & typeid(Psana::EvrData::DataV3));
   m_alias2TypesMap["Evr"] = Evr;
 
-  set<const type_info *> EvrIO;
+  TypeInfoSet EvrIO;
   EvrIO.insert( & typeid(Psana::EvrData::IOConfigV1));
   m_alias2TypesMap["EvrIO"] = EvrIO;
 
-  set<const type_info *> FEEGasDetEnergy;
+  TypeInfoSet FEEGasDetEnergy;
   FEEGasDetEnergy.insert( & typeid(Psana::Bld::BldDataFEEGasDetEnergy));
   m_alias2TypesMap["FEEGasDetEnergy"] = FEEGasDetEnergy;
 
-  set<const type_info *> Fccd;
+  TypeInfoSet Fccd;
   Fccd.insert( & typeid(Psana::FCCD::FccdConfigV1));
   Fccd.insert( & typeid(Psana::FCCD::FccdConfigV2));
   m_alias2TypesMap["Fccd"] = Fccd;
 
-  set<const type_info *> Fli;
+  TypeInfoSet Fli;
   Fli.insert( & typeid(Psana::Fli::ConfigV1));
   Fli.insert( & typeid(Psana::Fli::FrameV1));
   m_alias2TypesMap["Fli"] = Fli;
 
-  set<const type_info *> Frame;
+  TypeInfoSet Frame;
   Frame.insert( & typeid(Psana::Camera::FrameV1));
   m_alias2TypesMap["Frame"] = Frame;
 
-  set<const type_info *> FrameFccd;
+  TypeInfoSet FrameFccd;
   FrameFccd.insert( & typeid(Psana::Camera::FrameFccdConfigV1));
   m_alias2TypesMap["FrameFccd"] = FrameFccd;
 
-  set<const type_info *> FrameFex;
+  TypeInfoSet FrameFex;
   FrameFex.insert( & typeid(Psana::Camera::FrameFexConfigV1));
   m_alias2TypesMap["FrameFex"] = FrameFex;
 
-  set<const type_info *> GMD;
+  TypeInfoSet GMD;
   GMD.insert( & typeid(Psana::Bld::BldDataGMDV0));
   GMD.insert( & typeid(Psana::Bld::BldDataGMDV1));
   m_alias2TypesMap["GMD"] = GMD;
 
-  set<const type_info *> Gsc16ai;
+  TypeInfoSet Gsc16ai;
   Gsc16ai.insert( & typeid(Psana::Gsc16ai::ConfigV1));
   Gsc16ai.insert( & typeid(Psana::Gsc16ai::DataV1));
   m_alias2TypesMap["Gsc16ai"] = Gsc16ai;
 
-  set<const type_info *> Imp;
+  TypeInfoSet Imp;
   Imp.insert( & typeid(Psana::Imp::ConfigV1));
   Imp.insert( & typeid(Psana::Imp::ElementV1));
   m_alias2TypesMap["Imp"] = Imp;
 
-  set<const type_info *> Ipimb;
+  TypeInfoSet Ipimb;
   Ipimb.insert( & typeid(Psana::Ipimb::ConfigV1));
   Ipimb.insert( & typeid(Psana::Ipimb::ConfigV2));
   Ipimb.insert( & typeid(Psana::Ipimb::DataV1));
   Ipimb.insert( & typeid(Psana::Ipimb::DataV2));
   m_alias2TypesMap["Ipimb"] = Ipimb;
 
-  set<const type_info *> IpmFex;
+  TypeInfoSet IpmFex;
   IpmFex.insert( & typeid(Psana::Lusi::IpmFexConfigV1));
   IpmFex.insert( & typeid(Psana::Lusi::IpmFexConfigV2));
   IpmFex.insert( & typeid(Psana::Lusi::IpmFexV1));
   m_alias2TypesMap["IpmFex"] = IpmFex;
 
-  set<const type_info *> L3T;
+  TypeInfoSet L3T;
   L3T.insert( & typeid(Psana::L3T::ConfigV1));
   L3T.insert( & typeid(Psana::L3T::DataV1));
   m_alias2TypesMap["L3T"] = L3T;
 
-  set<const type_info *> OceanOptics;
+  TypeInfoSet OceanOptics;
   OceanOptics.insert( & typeid(Psana::OceanOptics::ConfigV1));
   OceanOptics.insert( & typeid(Psana::OceanOptics::DataV1));
   m_alias2TypesMap["OceanOptics"] = OceanOptics;
 
-  set<const type_info *> Opal1k;
+  TypeInfoSet Opal1k;
   Opal1k.insert( & typeid(Psana::Opal1k::ConfigV1));
   m_alias2TypesMap["Opal1k"] = Opal1k;
 
-  set<const type_info *> Orca;
+  TypeInfoSet Orca;
   Orca.insert( & typeid(Psana::Orca::ConfigV1));
   m_alias2TypesMap["Orca"] = Orca;
 
-  set<const type_info *> PhaseCavity;
+  TypeInfoSet PhaseCavity;
   PhaseCavity.insert( & typeid(Psana::Bld::BldDataPhaseCavity));
   m_alias2TypesMap["PhaseCavity"] = PhaseCavity;
 
-  set<const type_info *> PimImage;
+  TypeInfoSet PimImage;
   PimImage.insert( & typeid(Psana::Lusi::PimImageConfigV1));
   m_alias2TypesMap["PimImage"] = PimImage;
 
-  set<const type_info *> Princeton;
+  TypeInfoSet Princeton;
   Princeton.insert( & typeid(Psana::Princeton::ConfigV1));
   Princeton.insert( & typeid(Psana::Princeton::ConfigV2));
   Princeton.insert( & typeid(Psana::Princeton::ConfigV3));
@@ -206,41 +207,41 @@ TypeAliases::TypeAliases() {
   Princeton.insert( & typeid(Psana::Princeton::FrameV2));
   m_alias2TypesMap["Princeton"] = Princeton;
 
-  set<const type_info *> PrincetonInfo;
+  TypeInfoSet PrincetonInfo;
   PrincetonInfo.insert( & typeid(Psana::Princeton::InfoV1));
   m_alias2TypesMap["PrincetonInfo"] = PrincetonInfo;
 
-  set<const type_info *> Quartz;
+  TypeInfoSet Quartz;
   Quartz.insert( & typeid(Psana::Quartz::ConfigV1));
   m_alias2TypesMap["Quartz"] = Quartz;
 
-  set<const type_info *> Rayonix;
+  TypeInfoSet Rayonix;
   Rayonix.insert( & typeid(Psana::Rayonix::ConfigV1));
   m_alias2TypesMap["Rayonix"] = Rayonix;
 
-  set<const type_info *> SharedAcqADC;
+  TypeInfoSet SharedAcqADC;
   SharedAcqADC.insert( & typeid(Psana::Bld::BldDataAcqADCV1));
   m_alias2TypesMap["SharedAcqADC"] = SharedAcqADC;
 
-  set<const type_info *> SharedIpimb;
+  TypeInfoSet SharedIpimb;
   SharedIpimb.insert( & typeid(Psana::Bld::BldDataIpimbV0));
   SharedIpimb.insert( & typeid(Psana::Bld::BldDataIpimbV1));
   m_alias2TypesMap["SharedIpimb"] = SharedIpimb;
 
-  set<const type_info *> SharedPim;
+  TypeInfoSet SharedPim;
   SharedPim.insert( & typeid(Psana::Bld::BldDataPimV1));
   m_alias2TypesMap["SharedPim"] = SharedPim;
 
-  set<const type_info *> Spectrometer;
+  TypeInfoSet Spectrometer;
   Spectrometer.insert( & typeid(Psana::Bld::BldDataSpectrometerV0));
   m_alias2TypesMap["Spectrometer"] = Spectrometer;
 
-  set<const type_info *> TM6740;
+  TypeInfoSet TM6740;
   TM6740.insert( & typeid(Psana::Pulnix::TM6740ConfigV1));
   TM6740.insert( & typeid(Psana::Pulnix::TM6740ConfigV2));
   m_alias2TypesMap["TM6740"] = TM6740;
 
-  set<const type_info *> Timepix;
+  TypeInfoSet Timepix;
   Timepix.insert( & typeid(Psana::Timepix::ConfigV1));
   Timepix.insert( & typeid(Psana::Timepix::ConfigV2));
   Timepix.insert( & typeid(Psana::Timepix::ConfigV3));
@@ -248,21 +249,69 @@ TypeAliases::TypeAliases() {
   Timepix.insert( & typeid(Psana::Timepix::DataV2));
   m_alias2TypesMap["Timepix"] = Timepix;
 
-  set<const type_info *> TwoDGaussian;
+  TypeInfoSet TwoDGaussian;
   TwoDGaussian.insert( & typeid(Psana::Camera::TwoDGaussianV1));
   m_alias2TypesMap["TwoDGaussian"] = TwoDGaussian;
 
-  set<const type_info *> UsdUsb;
+  TypeInfoSet UsdUsb;
   UsdUsb.insert( & typeid(Psana::UsdUsb::ConfigV1));
   UsdUsb.insert( & typeid(Psana::UsdUsb::DataV1));
   m_alias2TypesMap["UsdUsb"] = UsdUsb;
 
-  set<const type_info *> pnCCD;
+  TypeInfoSet pnCCD;
   pnCCD.insert( & typeid(Psana::PNCCD::ConfigV1));
   pnCCD.insert( & typeid(Psana::PNCCD::ConfigV2));
   pnCCD.insert( & typeid(Psana::PNCCD::FramesV1));
   pnCCD.insert( & typeid(Psana::PNCCD::FullFrameV1));
   m_alias2TypesMap["pnCCD"] = pnCCD;
+
+  TypeInfoSet ndarray_types;
+  ndarray_types.insert( & typeid(ndarray<int8_t,1>));
+  ndarray_types.insert( & typeid(ndarray<int8_t,2>));
+  ndarray_types.insert( & typeid(ndarray<int8_t,3>));
+  ndarray_types.insert( & typeid(ndarray<int8_t,4>));
+  ndarray_types.insert( & typeid(ndarray<int16_t,1>));
+  ndarray_types.insert( & typeid(ndarray<int16_t,2>));
+  ndarray_types.insert( & typeid(ndarray<int16_t,3>));
+  ndarray_types.insert( & typeid(ndarray<int16_t,4>));
+  ndarray_types.insert( & typeid(ndarray<int32_t,1>));
+  ndarray_types.insert( & typeid(ndarray<int32_t,2>));
+  ndarray_types.insert( & typeid(ndarray<int32_t,3>));
+  ndarray_types.insert( & typeid(ndarray<int32_t,4>));
+  ndarray_types.insert( & typeid(ndarray<int64_t,1>));
+  ndarray_types.insert( & typeid(ndarray<int64_t,2>));
+  ndarray_types.insert( & typeid(ndarray<int64_t,3>));
+  ndarray_types.insert( & typeid(ndarray<int64_t,4>));
+  ndarray_types.insert( & typeid(ndarray<uint8_t,1>));
+  ndarray_types.insert( & typeid(ndarray<uint8_t,2>));
+  ndarray_types.insert( & typeid(ndarray<uint8_t,3>));
+  ndarray_types.insert( & typeid(ndarray<uint8_t,4>));
+  ndarray_types.insert( & typeid(ndarray<uint16_t,1>));
+  ndarray_types.insert( & typeid(ndarray<uint16_t,2>));
+  ndarray_types.insert( & typeid(ndarray<uint16_t,3>));
+  ndarray_types.insert( & typeid(ndarray<uint16_t,4>));
+  ndarray_types.insert( & typeid(ndarray<uint32_t,1>));
+  ndarray_types.insert( & typeid(ndarray<uint32_t,2>));
+  ndarray_types.insert( & typeid(ndarray<uint32_t,3>));
+  ndarray_types.insert( & typeid(ndarray<uint32_t,4>));
+  ndarray_types.insert( & typeid(ndarray<uint64_t,1>));
+  ndarray_types.insert( & typeid(ndarray<uint64_t,2>));
+  ndarray_types.insert( & typeid(ndarray<uint64_t,3>));
+  ndarray_types.insert( & typeid(ndarray<uint64_t,4>));
+  ndarray_types.insert( & typeid(ndarray<float,1>));
+  ndarray_types.insert( & typeid(ndarray<float,2>));
+  ndarray_types.insert( & typeid(ndarray<float,3>));
+  ndarray_types.insert( & typeid(ndarray<float,4>));
+  ndarray_types.insert( & typeid(ndarray<double,1>));
+  ndarray_types.insert( & typeid(ndarray<double,2>));
+  ndarray_types.insert( & typeid(ndarray<double,3>));
+  ndarray_types.insert( & typeid(ndarray<double,4>));
+  m_alias2TypesMap["ndarray_types"] = ndarray_types;
+
+  TypeInfoSet std_string;
+  std_string.insert( & typeid(std::string));
+  m_alias2TypesMap["std_string"] = std_string;
+
 
   Alias2TypesMap::iterator pos;
   for (pos = m_alias2TypesMap.begin(); pos != m_alias2TypesMap.end(); ++pos) {

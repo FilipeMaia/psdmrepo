@@ -20,13 +20,13 @@
 #include "Translator/HdfWriterMap.h"
 #include "Translator/HdfWriterEventId.h"
 #include "Translator/HdfWriterDamage.h"
-#include "Translator/HdfWriterFilterMsg.h"
+#include "Translator/HdfWriterString.h"
 #include "Translator/TypeSrcKeyH5GroupDirectory.h"
 #include "Translator/EpicsH5GroupDirectory.h"
 #include "Translator/EventKeyTranslation.h"
 #include "Translator/LessEventIdPtrs.h"
 #include "Translator/ChunkManager.h"
-
+#include "Translator/H5GroupNames.h"
 /**
    Defines the H5Output module.
    This is a Psana module that will write Psana events to a
@@ -73,7 +73,7 @@ protected:
   void setDamageMapFromEvent();
   Pds::Damage getDamageForEventKey(const EventKey &eventKey);
 
-  boost::shared_ptr<HdfWriterBase> checkTranslationFilters(const EventKey &eventKey, 
+  boost::shared_ptr<HdfWriterFromEvent> checkTranslationFilters(const EventKey &eventKey, 
                                                            bool checkForCalibratedKey);
   std::list<PSEvt::EventKey> getUpdatedConfigKeys();
   std::list<EventKeyTranslation> setEventKeysToTranslate(bool checkForCalibratedKey);
@@ -81,14 +81,18 @@ protected:
   void addToFilteredEventDataset(const PSEvt::EventId &eventId, const std::string &msg);
   void closeH5File();
   bool checkForAndProcessExcludeEvent();
-  bool doNotTranslate(const Pds::Src &);
-  bool doTranslate(const Pds::Src &src) { return not doNotTranslate(src); }
+
+  bool srcIsFiltered(const Pds::Src &);
+  bool stringKeyIsFiltered(const std::string &key);
+  bool ndarrayKeyIsFiltered(const std::string &key);
+
   void filterHdfWriterMap();
-  void initializeSrcFilter();
+  void initializeSrcAndKeyFilters();
   std::string eventPosition();
+  bool isNDArray(const type_info *typeInfoPtr);
+
 private:
   hdf5pp::File m_h5file;
-  static const int m_h5schema = 3;
   ChunkManager m_chunkManager;
   size_t m_currentConfigureCounter;
   size_t m_currentRunCounter;
@@ -108,7 +112,7 @@ private:
 
   boost::shared_ptr<HdfWriterEventId> m_hdfWriterEventId;
   boost::shared_ptr<HdfWriterDamage> m_hdfWriterDamage;
-  boost::shared_ptr<HdfWriterFilterMsg> m_hdfWriterFilterMsg;
+  boost::shared_ptr<HdfWriterString> m_hdfWriterFilterMsg;
 
   boost::shared_ptr<PSEvt::DamageMap> m_damageMap;
   Event *m_event;
@@ -132,9 +136,19 @@ private:
 
   TypeAliases m_typeAliases;
   std::set<const std::type_info *, PSEvt::TypeInfoUtils::lessTypeInfoPtr> m_calibratedTypes;
+
   bool m_includeAllSrc;
+  bool m_includeAllNdarrayKey;
+  bool m_includeAllStdStringKey;
+
   bool m_srcFilterIsExclude;
+  bool m_ndarrayKeyIsExclude;
+  bool m_stdStringKeyIsExclude;
+
   std::set<std::string> m_srcNameFilterSet;
+  std::set<std::string> m_ndarrayKeyFilterSet;
+  std::set<std::string> m_stdStringKeyFilterSet;
+
   bool m_storeEpics;
 
   /////////////////////////////////
@@ -149,23 +163,27 @@ private:
   // translation parameters
   std::map<std::string, bool> m_typeInclude;  // each type alias will be read in and true if we convert that type
   std::list<std::string> m_src_filter;
-  std::list<std::string> m_ndarray_eventid_keys_to_translate;  // do I need this?
+  std::list<std::string> m_ndarray_key_filter; 
+  std::list<std::string> m_std_string_key_filter;  
 
   std::string m_calibration_key;
   bool m_include_uncalibrated_data;
 
 
   bool m_defaultShuffle, m_eventIdShuffle, m_damageShuffle, 
-    m_filterMsgShuffle, m_epicsPvShuffle;
+    m_stringShuffle, m_epicsPvShuffle;
 
   int m_defaultDeflate, m_eventIdDeflate, m_damageDeflate, 
-    m_filterMsgDeflate, m_epicsPvDeflate;
+    m_stringDeflate, m_epicsPvDeflate;
 
   DataSetCreationProperties m_eventIdCreateDsetProp;
   DataSetCreationProperties m_damageCreateDsetProp;
-  DataSetCreationProperties m_filterMsgCreateDsetProp;
+  DataSetCreationProperties m_stringCreateDsetProp;
   DataSetCreationProperties m_epicsPvCreateDsetProp;
   DataSetCreationProperties m_defaultCreateDsetProp;
+  DataSetCreationProperties m_ndarrayCreateDsetProp;
+
+  boost::shared_ptr<H5GroupNames> m_h5groupNames;
 }; // class H5Output
 
 } // namespace

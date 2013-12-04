@@ -5,20 +5,20 @@
 
 #include "pdsdata/xtc/Damage.hh"
 #include "PSEvt/EventKey.h"
-#include "Translator/HdfWriterBase.h"
+#include "Translator/HdfWriterFromEvent.h"
 
 namespace Translator {
 
 struct EventKeyTranslation {
   const PSEvt::EventKey eventKey;
   Pds::Damage damage;
-  boost::shared_ptr<Translator::HdfWriterBase> hdfWriter;
+  boost::shared_ptr<Translator::HdfWriterFromEvent> hdfWriter;
   typedef enum {NonBlank, Blank} EntryType;
   EntryType entryType;
   DataTypeLoc dataTypeLoc;
   EventKeyTranslation() {};
   EventKeyTranslation(const PSEvt::EventKey _eventKey, Pds::Damage _damage, 
-                      boost::shared_ptr<HdfWriterBase> _hdfWriter, 
+                      boost::shared_ptr<HdfWriterFromEvent> _hdfWriter, 
                       EntryType _entryType, DataTypeLoc _dataTypeLoc) :
   eventKey(_eventKey), damage(_damage), hdfWriter(_hdfWriter), 
     entryType(_entryType), dataTypeLoc(_dataTypeLoc) {}

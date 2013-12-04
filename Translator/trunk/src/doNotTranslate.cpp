@@ -27,14 +27,17 @@ void Translator::doNotTranslateEvent(PSEvt::Event &evt, const std::string & filt
 ////////////////////
 // below is for testing - we 
 // make a module that will filter out events.
-// The module - TestDoNotTranslate 
+// The module - TestModuleDoNotTranslate 
 //  takes the two configuration parameters:
 //    skip = 0 1 2
 //    messages = message0  message1  message2
 //  It uses 0-up counter for the events, the conter indexes all events over
 //  all calib cycles.  
 //  The number of entries (space separated) in skip must equal the number of entries in messages.
-
+//  For each of the events listed in skip, the module will call the
+//  
+//    doNotTranslate() function, which will tell the Translator.H5Output module to 
+//    skip this event.
 #include <vector>
 #include "psana/Module.h"
 
@@ -44,9 +47,9 @@ namespace {
 
 namespace Translator {
   
-class TestDoNotTranslate : public Module {
+class TestModuleDoNotTranslate : public Module {
 public:
-  TestDoNotTranslate(std::string moduleName) : Module(moduleName) {
+  TestModuleDoNotTranslate(std::string moduleName) : Module(moduleName) {
     m_eventsToSkip = configList("skip");
     m_messages = configList("messages");
     if (m_eventsToSkip.size() != m_messages.size()) {
@@ -66,7 +69,6 @@ public:
     for (size_t idx=0; idx < m_eventsToSkip.size(); ++idx) {
       if (m_eventsToSkip.at(idx) == m_eventCounter) {
         doNotTranslateEvent(evt, m_messages.at(idx));
-        doNotTranslateEvent(evt, m_messages.at(idx));
       }
     }
     ++m_eventCounter;
@@ -77,6 +79,6 @@ public:
   size_t m_eventCounter;
 };
 
-PSANA_MODULE_FACTORY(TestDoNotTranslate);
+PSANA_MODULE_FACTORY(TestModuleDoNotTranslate);
 
 }

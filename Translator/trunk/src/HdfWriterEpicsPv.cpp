@@ -33,9 +33,15 @@ std::ostream & Translator::operator<<(std::ostream & o, HdfWriterEpicsPv::Dispat
 HdfWriterEpicsPv::HdfWriterEpicsPv(const DataSetCreationProperties & dataSetCreationProperties,
                                    boost::shared_ptr<HdfWriterEventId> hdfWriterEventId) 
   : m_dataSetCreationProperties(dataSetCreationProperties),
-    m_hdfWriterEventId(hdfWriterEventId)
+    m_hdfWriterEventId(hdfWriterEventId),
+    m_enumStrsArrayTypes(Psana::Epics::MAX_ENUM_STATES+1),
+    m_numberStringsToH5TypeForCtrlEnum(Psana::Epics::MAX_ENUM_STATES+1)
 {
   m_hdfWriterGeneric = boost::make_shared<HdfWriterGeneric>();
+  for (unsigned idx=0; idx < m_enumStrsArrayTypes.size(); ++idx) {
+    m_enumStrsArrayTypes.at(idx) = -1;
+    m_numberStringsToH5TypeForCtrlEnum.at(idx) = -1;
+  }
   makeSharedTypes();
 }
 
@@ -58,37 +64,80 @@ void HdfWriterEpicsPv::makeSharedTypes() {
 
   m_stampType = createH5TypeId_epicsTimeStamp();
   if (m_stampType<0) MsgLog(logger(),fatal, "failed to create enum time stamp hdf5 type id");
-
-  const unsigned rank = 1;
-  const hsize_t dims[] = {Psana::Epics::MAX_ENUM_STATES};
-  m_allEnumStrsType = H5Tarray_create2( m_enumStrType, rank,dims );
-  if (m_allEnumStrsType<0) MsgLog(logger(), fatal, "failed to create array type for all enum strings");
 }
 
 void HdfWriterEpicsPv::closeSharedTypes() {
   herr_t status = H5Tclose(m_pvNameType);
   status = std::min(status, H5Tclose(m_stringType));
   status = std::min(status, H5Tclose(m_unitsType));
-  status = std::min(status, H5Tclose(m_allEnumStrsType));
+  //  status = std::min(status, H5Tclose(m_allEnumStrsType));
   status = std::min(status, H5Tclose(m_enumStrType));
   status = std::min(status, H5Tclose(m_stampType));
-  if (status<0) MsgLog(logger(), fatal, "failed to close one of the shared epics pv datatypes");
-}
 
-HdfWriterEpicsPv::~HdfWriterEpicsPv() {
+  for (unsigned idx=0; idx < m_enumStrsArrayTypes.size(); ++idx) {
+    if (m_enumStrsArrayTypes.at(idx) !=-1) {
+      status = std::min(status, H5Tclose(m_enumStrsArrayTypes.at(idx)));
+      m_enumStrsArrayTypes.at(idx) = -1;
+    }
+    if (m_numberStringsToH5TypeForCtrlEnum.at(idx) !=-1) {
+      status = std::min(status, H5Tclose(m_numberStringsToH5TypeForCtrlEnum.at(idx)));
+      m_numberStringsToH5TypeForCtrlEnum.at(idx)=-1;
+    }
+  }
+  if (status<0) MsgLog(logger(), fatal, "failed to close one of the shared epics pv datatypes");
+
   map<uint16_t, hid_t>::iterator pos;
   for (pos = m_dbr2h5TypeId.begin(); pos != m_dbr2h5TypeId.end(); ++pos) {
     herr_t status = H5Tclose(pos->second);
     if (status<0) MsgLog(logger(), fatal, "failed to close epics pv for dbr " << pos->first);
   }
+  m_dbr2h5TypeId.clear();
+}
+
+HdfWriterEpicsPv::~HdfWriterEpicsPv() {
   closeSharedTypes();
 }
 
-hid_t HdfWriterEpicsPv::getTypeId(int16_t dbrType) {  
+hid_t HdfWriterEpicsPv::getCtrlEnumTypeId(int numberOfStrs) {  
+  if (numberOfStrs<0) MsgLog(logger(),fatal,"getCtrlEnumTypeId called with -1 for strs");
+  if (numberOfStrs > Psana::Epics::MAX_ENUM_STATES) {
+    MsgLog(logger(),warning,"The no_str requested for a epics ctrl enum 'strs' field is " << numberOfStrs
+           << " which is outside the range [" << 1 << ", " << Psana::Epics::MAX_ENUM_STATES
+           << "] " << " h5 type will be created with " << Psana::Epics::MAX_ENUM_STATES 
+           << " entries in 'strs'");
+    numberOfStrs = Psana::Epics::MAX_ENUM_STATES;
+  }
+  hid_t ctrlEnumType = m_numberStringsToH5TypeForCtrlEnum.at(numberOfStrs);
+  if (ctrlEnumType == -1) {
+    hid_t strsType = m_enumStrsArrayTypes.at(numberOfStrs);
+    if (strsType == -1) {
+      const unsigned rank = 1;
+      hsize_t dims[rank];
+      dims[0] = numberOfStrs;
+      strsType = H5Tarray_create2(m_enumStrType, rank, dims);
+      if (strsType<0) {
+        MsgLog(logger(), fatal, 
+               "failed to create array type for enum strings 'strs' field with" << numberOfStrs << " items");
+      }
+      m_enumStrsArrayTypes.at(numberOfStrs) = strsType;
+      MsgLog(logger(),debug,"created ctrl enum array string for " << numberOfStrs << " strings, hid=" << strsType);
+    }
+    ctrlEnumType = createH5TypeId_EpicsPvCtrlEnum(m_pvNameType, strsType, numberOfStrs);
+    m_numberStringsToH5TypeForCtrlEnum.at(numberOfStrs) = ctrlEnumType;
+    MsgLog(logger(),debug,"created ctrlenum type for " << numberOfStrs << " strings, hid=" << ctrlEnumType);
+  }
+  return ctrlEnumType;
+}
+
+hid_t HdfWriterEpicsPv::getTypeId(int16_t dbrType, int ctrlEnumNumberOfStrs) {  
+  if (dbrType == Psana::Epics::DBR_CTRL_ENUM) return getCtrlEnumTypeId(ctrlEnumNumberOfStrs);
+
   map<uint16_t, hid_t>::iterator typeIdPos = m_dbr2h5TypeId.find(dbrType);
   if (typeIdPos != m_dbr2h5TypeId.end()) {
     return typeIdPos->second;
   }
+
+  // it is not cached, build it
   hid_t typeId = -1;
   switch (dbrType) {
   case Psana::Epics::DBR_TIME_STRING:
@@ -122,7 +171,7 @@ hid_t HdfWriterEpicsPv::getTypeId(int16_t dbrType) {
     typeId = createH5TypeId_EpicsPvCtrlFloat(m_pvNameType, m_unitsType);
     break;
   case Psana::Epics::DBR_CTRL_ENUM:
-    typeId = createH5TypeId_EpicsPvCtrlEnum(m_pvNameType, m_allEnumStrsType);
+    // this case is handled above
     break;
   case Psana::Epics::DBR_CTRL_CHAR:
     typeId = createH5TypeId_EpicsPvCtrlChar(m_pvNameType, m_unitsType);
@@ -136,6 +185,7 @@ hid_t HdfWriterEpicsPv::getTypeId(int16_t dbrType) {
   default:
     MsgLog(logger(), fatal, "h5 type id for DBR type " << dbrType << " is not implemented");
   }
+  
   m_dbr2h5TypeId[dbrType] = typeId;
   return typeId;
 }

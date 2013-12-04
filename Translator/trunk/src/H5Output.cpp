@@ -18,8 +18,7 @@
 #include "PSEvt/DamageMap.h"
 #include "PSEvt/TypeInfoUtils.h"
 
-#include "psddl_pds2psana/cspad.ddl.h" // TODO: change pds2psana to psana, and all other places
-
+#include "psddl_psana/cspad.ddl.h"   // for specifying calibrated types
 
 #include "Translator/H5Output.h"
 #include "Translator/H5GroupNames.h"
@@ -37,8 +36,12 @@ namespace {
     const static string baseLogger = "Translator.H5Output"; 
     return ( endLogger.size()==0 ? baseLogger : baseLogger + string(".") + endLogger);
   }
-    
   
+  bool isString( const std::type_info *typeInfoPtr) {
+    if (*typeInfoPtr == typeid(std::string)) return true;
+    return false;
+  }
+      
   ///////////////////////////////////////////
   // initialization/config store functions
 
@@ -79,7 +82,7 @@ namespace {
         MsgLog(logger(),fatal,"removeTypes: trying to remove " << PSEvt::TypeInfoUtils::typeInfoRealName(typeInfoPtr) 
                << " but type is not in converter list");
       }
-      converterPos->second = boost::shared_ptr<HdfWriterBase>();
+      converterPos->second = boost::shared_ptr<HdfWriterFromEvent>();
     }
   }
 
@@ -144,16 +147,23 @@ H5Output::H5Output(string moduleName) : Module(moduleName),
   initializeCalibratedTypes();
   m_hdfWriterEventId = boost::make_shared<HdfWriterEventId>();
   m_hdfWriterDamage = boost::make_shared<HdfWriterDamage>();
-  m_hdfWriterFilterMsg = boost::make_shared<HdfWriterFilterMsg>();
+  m_hdfWriterFilterMsg = boost::make_shared<HdfWriterString>();
   m_hdfWriterEventId->setDatasetCreationProperties(m_eventIdCreateDsetProp);
   m_hdfWriterDamage->setDatasetCreationProperties(m_damageCreateDsetProp);
-  m_hdfWriterFilterMsg->setDatasetCreationProperties(m_filterMsgCreateDsetProp);
+  m_hdfWriterFilterMsg->setDatasetCreationProperties(m_stringCreateDsetProp);
   m_epicsGroupDir.initialize(m_hdfWriterEventId,
                              m_epicsPvCreateDsetProp);
   m_configureGroupDir.setEventIdAndDamageWriters(m_hdfWriterEventId,m_hdfWriterDamage);
   m_calibCycleConfigureGroupDir.setEventIdAndDamageWriters(m_hdfWriterEventId,m_hdfWriterDamage);
   m_calibCycleEventGroupDir.setEventIdAndDamageWriters(m_hdfWriterEventId,m_hdfWriterDamage);
-  initializeSrcFilter();
+  TypeAliases::Alias2TypesMap::const_iterator pos = m_typeAliases.alias2TypesMap().find("ndarray_types");
+  if (pos == m_typeAliases.alias2TypesMap().end()) MsgLog(logger(), fatal, "The TypeAliases map does not include ndarray_types as a key");
+  if ((pos->second).size() == 0) MsgLog(logger(), fatal, "There are no types assigned to the  'ndarray_types' alias in the TypeAliases map");
+  m_h5groupNames = boost::make_shared<H5GroupNames>(m_short_bld_name, pos->second);
+  m_configureGroupDir.setH5GroupNames(m_h5groupNames);
+  m_calibCycleConfigureGroupDir.setH5GroupNames(m_h5groupNames);
+  m_calibCycleEventGroupDir.setH5GroupNames(m_h5groupNames);
+  initializeSrcAndKeyFilters();
   openH5OutputFile();
 
   MsgLog(logger(),debug,name() << " constructor()");
@@ -179,13 +189,18 @@ void H5Output::readConfigParameters() {
   m_storeEpics = config("store_epics",true);
   if (not m_storeEpics) MsgLog(logger(),trace,"not storing epics");
   m_short_bld_name = config("short_bld_name",false);
+
   // src filter parameters
   std::list<std::string> include_all, empty_list;
   include_all.push_back("include");
   include_all.push_back("all");
   m_src_filter = configList("src_filter", include_all);
 
-  // other translation parameters, ndarrays, calibration, metadata
+  // key filter parameters
+  m_ndarray_key_filter = configList("ndarray_key_filter", include_all);
+  m_std_string_key_filter = configList("std_string_key_filter", include_all);
+
+  // other translation parameters, calibration, metadata
   m_include_uncalibrated_data = config("include_uncalibrated_data",false);
   m_calibration_key = configStr("calibration_key","calibrated");
 
@@ -200,28 +215,33 @@ void H5Output::readConfigParameters() {
   bool damageShuffle = config("damageShuffle",false);
   int damageDeflate = config("damageDeflate",m_defaultDeflate);
 
-  bool filterMsgShuffle = config("filterMsgShuffle",m_defaultShuffle);  
-  int filterMsgDeflate = config("filterMsgDeflate",m_defaultDeflate);
+  bool stringShuffle = config("stringShuffle",false);
+  int stringDeflate = config("stringDeflate",-1);
 
   bool epicsPvShuffle = config("epicsPvShuffle",false);
   int epicsPvDeflate = config("epicsPvDeflate",m_defaultDeflate);
 
-  
+  bool ndarrayShuffle = config("ndarrayShuffle",m_defaultShuffle);
+  int ndarrayDeflate = config("ndarrayDeflate",m_defaultDeflate);
+
   m_eventIdCreateDsetProp = DataSetCreationProperties(m_chunkManager.eventIdChunkPolicy(),
                                                       eventIdShuffle,
                                                       eventIdDeflate);
   m_damageCreateDsetProp = DataSetCreationProperties(m_chunkManager.damageChunkPolicy(),
                                                      damageShuffle,
                                                      damageDeflate);
-  m_filterMsgCreateDsetProp = DataSetCreationProperties(m_chunkManager.filterMsgChunkPolicy(),
-                                                        filterMsgShuffle,
-                                                        filterMsgDeflate);
+  m_stringCreateDsetProp = DataSetCreationProperties(m_chunkManager.stringChunkPolicy(),
+                                                     stringShuffle,
+                                                     stringDeflate);
   m_epicsPvCreateDsetProp = DataSetCreationProperties(m_chunkManager.epicsPvChunkPolicy(),
                                                       epicsPvShuffle,
                                                       epicsPvDeflate);
   m_defaultCreateDsetProp = DataSetCreationProperties(m_chunkManager.defaultChunkPolicy(),
                                                       m_defaultShuffle,
                                                       m_defaultDeflate);
+  m_ndarrayCreateDsetProp = DataSetCreationProperties(m_chunkManager.ndarrayChunkPolicy(),
+                                                      ndarrayShuffle,
+                                                      ndarrayDeflate);
 
   m_maxSavedPreviousSplitEvents = config("max_saved_split_events", 3000);
 }
@@ -238,46 +258,65 @@ void H5Output::filterHdfWriterMap() {
   }
 }
 
-void H5Output::initializeSrcFilter() {
-  if (m_src_filter.size() < 2) MsgLog(logger(),fatal,"src_filter must start with either\n 'include' or 'exclude' and be followed by at least one src (which can be 'all' for include)");
-  list<string>::iterator pos = m_src_filter.begin();
-  string srcFilter0 = *pos;
-  ++pos;
-  string srcFilter1 = *pos;
-  string include = "include";
-  string exclude = "exclude";
-  string all = "all";
-  if (srcFilter0 != include and srcFilter0 != exclude) MsgLog(logger(), fatal, "src_filter first entry must be either 'include' or 'exclude'");
-  m_srcFilterIsExclude = srcFilter0 == exclude;
-  if (m_srcFilterIsExclude) {
-    if (srcFilter1 == all) MsgLog(logger(), fatal, "src_filter = cannot be 'exclude all' this does no processing");
-  } else {
-    if (srcFilter1 == all) {
-      m_includeAllSrc = true;
-      MsgLog(logger(),debug,"initializeSrcFilter: include all");
-      return;
+namespace {
+  void parseFilterConfigString(const string &configParamKey, 
+                               const list<string> & configParamValues,
+                               bool & isExclude,
+                               bool & includeAll,
+                               set<string> & filterSet) 
+  {
+    if (configParamValues.size() < 2) {
+      MsgLog(logger(),fatal, configParamKey 
+             << " must start with either\n 'include' or 'exclude' and be followed by at least one src (which can be 'all' for include)");
     }
-  }
-  m_includeAllSrc = false;
-  m_srcNameFilterSet.clear();
-  while (pos != m_src_filter.end()) {
-    m_srcNameFilterSet.insert(*pos);
+    list<string>::const_iterator pos = configParamValues.begin();
+    string filter0 = *pos;
     ++pos;
-  }  
-  WithMsgLog(logger(),debug,str) {
-    str << "initializeSrcFilter: is_exclude=" 
-        <<  m_srcFilterIsExclude << " filterSet: ";
-    copy(m_srcNameFilterSet.begin(), m_srcNameFilterSet.end(),
-         ostream_iterator<string>(str,", "));
-  }
+    string filter1 = *pos;
+    string include = "include";
+    string exclude = "exclude";
+    string all = "all";
+    if (filter0 != include and filter0 != exclude) {
+      MsgLog(logger(), fatal, configParamKey << " first entry must be either 'include' or 'exclude'");
+    }
+    isExclude = filter0 == exclude;
+    if (isExclude) {
+      if (filter1 == all) MsgLog(logger(), fatal, "src_filter = cannot be 'exclude all' this does no processing");
+    } else {
+      if (filter1 == all) {
+        includeAll = true;
+        MsgLog(logger(),debug, configParamKey << ": include all");
+        return;
+      }
+    }
+    includeAll = false;
+    filterSet.clear();
+    while (pos != configParamValues.end()) {
+      filterSet.insert(*pos);
+      ++pos;
+    }  
+    WithMsgLog(logger(), debug, str) {
+      str << configParamKey << ": is_exclude=" 
+          << isExclude << " filterSet: ";
+      copy(filterSet.begin(), filterSet.end(),
+           ostream_iterator<string>(str,", "));
+    }
+   }
+
+} // local namespace
+
+void H5Output::initializeSrcAndKeyFilters() {
+  parseFilterConfigString("src_filter",         m_src_filter,         m_srcFilterIsExclude,    m_includeAllSrc,          m_srcNameFilterSet);
+  parseFilterConfigString("ndarray_key_filter", m_ndarray_key_filter, m_ndarrayKeyIsExclude,   m_includeAllNdarrayKey,   m_ndarrayKeyFilterSet);
+  parseFilterConfigString("std_string_key_filter",  m_std_string_key_filter,  m_stdStringKeyIsExclude, m_includeAllStdStringKey, m_stdStringKeyFilterSet);
 }
 
-/// we need to update this set when new types come in that will
-/// be replaced with calibrated data
+// when updating the calibration set below, update the 
+// calibration filtering section of default_psana.cfg with the
+// complete, updated type list.
 void H5Output::initializeCalibratedTypes() {
   m_calibratedTypes.insert( & typeid(Psana::CsPad::DataV1) );
   m_calibratedTypes.insert( & typeid(Psana::CsPad::DataV2) );
-  // TODO: make complete list of types that we look for calibrated data
 }
 
 void H5Output::openH5OutputFile() {
@@ -294,9 +333,8 @@ void H5Output::openH5OutputFile() {
   
   // we want to create new file
   hdf5pp::PListFileAccess fapl ;
-  if ( m_split == Family ) {
-    // use FAMILY driver
-    fapl.set_family_driver ( m_splitSize, hdf5pp::PListFileAccess() ) ;
+  if ( m_split != NoSplit ) {
+    MsgLog(logger(), fatal, "hdf5 splitting is not implemented.  Only NoSplit is presently supported");
   }
   
   m_h5file = hdf5pp::File::create(m_h5fileName, mode, fcpl, fapl);
@@ -407,6 +445,10 @@ void H5Output::setDamageMapFromEvent() {
   }
 }
 
+bool H5Output::isNDArray( const std::type_info *typeInfoPtr) {
+  return m_h5groupNames->isNDArray(typeInfoPtr);
+}
+
 Pds::Damage H5Output::getDamageForEventKey(const EventKey &eventKey) {
   Pds::Damage damage(0);
   PSEvt::DamageMap::iterator damagePos = m_damageMap->find(eventKey);
@@ -414,27 +456,32 @@ Pds::Damage H5Output::getDamageForEventKey(const EventKey &eventKey) {
   return damage;
 }
 
-/// see's if eventKey has been filtered through the source or type filters.
+/// see's if eventKey has been filtered through the type, source, or key filters.
 /// optionally checks if it should be skipped in lieu of a calibrated key.
-//  The calibration check should be done for event data, but probably not for config
+//  The calibration check should be done for event data, but not for config
 //  data.  If checkForCalibratedKey is true, a calibrated key is looked for in m_event.
 //  Returns a null HdfWriter if:
 //             there is no writer for this type
 //             the src for the eventKey is filtered
 //             the type for the eventKey is filtered
-//             a calibrated version of the key exists (and we are not storing uncalibrated data)
+//             the key is for std::string or ndarray and the key for this EventKey is filtered
+//             the type is one of the special calibrated types, a calibrated version 
+//               of the key exists, and we are not storing uncalibrated data
 
-boost::shared_ptr<HdfWriterBase> H5Output::checkTranslationFilters(const EventKey &eventKey, 
+boost::shared_ptr<HdfWriterFromEvent> H5Output::checkTranslationFilters(const EventKey &eventKey, 
                                                                    bool checkForCalibratedKey) {
   const type_info * typeInfoPtr = eventKey.typeinfo();
   const Pds::Src & src = eventKey.src();
   const string & strKey = eventKey.key();
-  boost::shared_ptr<HdfWriterBase> nullHdfWriter;
-  if (doNotTranslate(src)) {
-    MsgLog(logger(),debug,"doNotTranslate(src)==True for " << eventKey << " filtering");
+  boost::shared_ptr<HdfWriterFromEvent> nullHdfWriter;
+  if (srcIsFiltered(src)) {
+    MsgLog(logger(),debug,"srcIsFiltered(src)==True for " << eventKey << " filtering");
     return nullHdfWriter;
   }
-  boost::shared_ptr<HdfWriterBase> hdfWriter = getHdfWriter(m_hdfWriters, typeInfoPtr);
+  if (isString(typeInfoPtr) and stringKeyIsFiltered(strKey)) return nullHdfWriter;
+  if (isNDArray(typeInfoPtr) and ndarrayKeyIsFiltered(strKey)) return nullHdfWriter;
+
+  boost::shared_ptr<HdfWriterFromEvent> hdfWriter = getHdfWriter(m_hdfWriters, typeInfoPtr);
   if (not hdfWriter) {
     MsgLog(logger(),debug,"No hdfwriter found for type: " << PSEvt::TypeInfoUtils::typeInfoRealName(typeInfoPtr));
     return nullHdfWriter;
@@ -513,7 +560,7 @@ list<EventKeyTranslation> H5Output::setEventKeysToTranslate(bool checkForCalibra
     list<EventKey>::iterator keyIter;
     for (keyIter = eventKeys.begin(); keyIter != eventKeys.end(); ++keyIter) {
 
-      boost::shared_ptr<HdfWriterBase> hdfWriter = checkTranslationFilters(*keyIter, 
+      boost::shared_ptr<HdfWriterFromEvent> hdfWriter = checkTranslationFilters(*keyIter, 
                                                                         checkForCalibratedKey);
       if (not hdfWriter) continue;
       Pds::Damage damage = getDamageForEventKey(*keyIter);
@@ -532,7 +579,7 @@ list<EventKeyTranslation> H5Output::setEventKeysToTranslate(bool checkForCalibra
     bool alreadyAddedAsNonBlank = nonBlanks.find(eventKey) != nonBlanks.end();
     if (alreadyAddedAsNonBlank) continue;
 
-    boost::shared_ptr<HdfWriterBase> hdfWriter = checkTranslationFilters(eventKey, 
+    boost::shared_ptr<HdfWriterFromEvent> hdfWriter = checkTranslationFilters(eventKey, 
                                                                          checkForCalibratedKey);
     if (not hdfWriter) continue;
     toTranslate.push_back(EventKeyTranslation(eventKey,damage,hdfWriter,
@@ -610,16 +657,17 @@ void H5Output::eventImpl()
     bool writeBlank = keyIter->entryType == EventKeyTranslation::Blank;
     DataTypeLoc dataTypeLoc = keyIter->dataTypeLoc;
     Pds::Damage damage = keyIter->damage;
-    boost::shared_ptr<HdfWriterBase> hdfWriter = keyIter->hdfWriter;
+    boost::shared_ptr<HdfWriterFromEvent> hdfWriter = keyIter->hdfWriter;
     const std::type_info * typeInfoPtr = eventKey.typeinfo();
     const Pds::Src & src = eventKey.src();
     MsgLog(logger(),debug,eventImpl << " eventKey=" << eventKey << "damage= " << damage.value() << 
            " writeBlank=" << writeBlank << " loc=" << dataTypeLoc << " hdfwriter=" << hdfWriter);
     TypeMapContainer::iterator typePos = m_calibCycleEventGroupDir.findType(typeInfoPtr);
     if (typePos == m_calibCycleEventGroupDir.endType()) {
-      m_calibCycleEventGroupDir.addTypeGroup(typeInfoPtr, m_currentCalibCycleGroup, m_short_bld_name);
-      MsgLog(logger(eventImpl),trace,
-             PSEvt::TypeInfoUtils::typeInfoRealName(typeInfoPtr) <<" not in groups.  Added type to groups");
+      m_calibCycleEventGroupDir.addTypeGroup(typeInfoPtr, m_currentCalibCycleGroup);
+      MsgLog(logger(eventImpl),trace, "type: " << PSEvt::TypeInfoUtils::typeInfoRealName(typeInfoPtr) 
+             << " with group name " << m_h5groupNames->nameForType(typeInfoPtr)
+             << " not in calibCycleEventGroupDir.  Added type to groups");
     }
     SrcKeyMap::iterator srcKeyPos = m_calibCycleEventGroupDir.findSrcKey(eventKey);
     if (srcKeyPos == m_calibCycleEventGroupDir.endSrcKey(typeInfoPtr)) {
@@ -751,7 +799,7 @@ void H5Output::eventImpl()
 
 void H5Output::addConfigTypes(TypeSrcKeyH5GroupDirectory &configGroupDirectory,
                               hdf5pp::Group & parentGroup) {
-  const string addTo("addConfigureTypes");
+  const string addTo("addConfigTypes");
   list<EventKey> envEventKeys = getUpdatedConfigKeys();
   list<EventKey> evtEventKeys = m_event->keys();
   int newTypes=0;
@@ -771,14 +819,17 @@ void H5Output::addConfigTypes(TypeSrcKeyH5GroupDirectory &configGroupDirectory,
     for (iter = eventKeys.begin(); iter != eventKeys.end(); ++iter) {
       EventKey &eventKey = *iter;
       MsgLog(logger(addTo),debug,"addConfigureTypes eventKey: " << *iter << " loc: " << dataLoc);
-      boost::shared_ptr<HdfWriterBase> hdfWriter = checkTranslationFilters(eventKey,checkForCalib);
+      boost::shared_ptr<HdfWriterFromEvent> hdfWriter = checkTranslationFilters(eventKey,checkForCalib);
       if (not hdfWriter) continue;
       const std::type_info * typeInfoPtr = eventKey.typeinfo();
       const Pds::Src & src = eventKey.src();
       TypeMapContainer::iterator typePos = configGroupDirectory.findType(typeInfoPtr);
       if (typePos == configGroupDirectory.endType()) {
         ++newTypes;
-        configGroupDirectory.addTypeGroup(typeInfoPtr, parentGroup, m_short_bld_name);
+        configGroupDirectory.addTypeGroup(typeInfoPtr, parentGroup);
+        MsgLog(logger(addTo),trace, "type: " << PSEvt::TypeInfoUtils::typeInfoRealName(typeInfoPtr) 
+               << " with group name " << m_h5groupNames->nameForType(typeInfoPtr)
+               << " not in configGroupDir.  Added type to groups");
         MsgLog(logger(addTo),trace, 
                PSEvt::TypeInfoUtils::typeInfoRealName(typeInfoPtr) <<" not in groups.  Added type to groups");
       }
@@ -898,20 +949,44 @@ void H5Output::closeH5File() {
   m_h5file.close();
 }
 
-// doNotTranslate logs a trace message when it filters a source, or returns true
-bool H5Output::doNotTranslate(const Pds::Src &src) {
-  if (m_includeAllSrc) return false;
-  string srcName = getH5GroupNameForSrc(src);
-  bool srcInFilterList = m_srcNameFilterSet.find(srcName) != m_srcNameFilterSet.end();
-  if (m_srcFilterIsExclude) {
-    bool srcListedInExcludeList = srcInFilterList;
-    if (srcListedInExcludeList) MsgLog(logger(),trace,"doNotTranslate: src= " << src << " is in exclude list - no translation");
-    return srcListedInExcludeList;
-  } 
-  // it is an include set
-  bool srcNotListedInIncludeSet = not srcInFilterList;
-  if (srcNotListedInIncludeSet) MsgLog(logger(),trace,"doNotTranslate: src=" << src << " is not listed in include list - no translation");
-  return (srcNotListedInIncludeSet);
+namespace {
+
+  bool keyIsFiltered(const string & key, const bool includeAll, const bool isExclude, const set<string> & filterSet) {
+    if (includeAll) return false;
+    bool keyInFilterList = filterSet.find(key) != filterSet.end();
+    if (isExclude) {
+      bool inExcludeList = keyInFilterList;
+      if (inExcludeList) {
+        MsgLog(logger(),trace,"keyIsFiltered: key= " << key << " is in exclude list - no translation");
+        return true;
+      } else {
+        return false;
+      }
+    } 
+    // it is an include set
+    bool keyNotInIncludeSet = not keyInFilterList;
+    if (keyNotInIncludeSet) {
+      MsgLog(logger(),trace,"keyIsFiltered: key=" << key << " is not listed in include list - no translation");
+      return true;
+    }
+    return false;
+  }
+
+} // local namespace
+
+bool H5Output::stringKeyIsFiltered(const string &key) {
+  bool retVal = keyIsFiltered(key, m_includeAllStdStringKey, m_stdStringKeyIsExclude, m_stdStringKeyFilterSet);
+  return retVal;
+}
+
+bool H5Output::ndarrayKeyIsFiltered(const string &key) {
+  bool retVal = keyIsFiltered(key, m_includeAllNdarrayKey, m_ndarrayKeyIsExclude, m_ndarrayKeyFilterSet);
+  return retVal;
+}
+
+bool H5Output::srcIsFiltered(const Pds::Src &src) {
+  string srcName = m_h5groupNames->nameForSrc(src);
+  return keyIsFiltered(srcName, m_includeAllSrc, m_srcFilterIsExclude, m_srcNameFilterSet);
 }
 
 string H5Output::eventPosition() {

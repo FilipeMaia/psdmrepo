@@ -303,12 +303,17 @@ void copyValueFldToUnrolled < Unroll::EpicsPvCtrlString >
        (const Unroll::EpicsPvCtrlString::PsanaSrc &psanaVar, int16_t el, 
         Unroll::EpicsPvCtrlString & unrollBuffer);
 
+template <>
+void copyValueFldToUnrolled < Unroll::EpicsPvCtrlEnum >
+       (const Unroll::EpicsPvCtrlEnum::PsanaSrc &psanaVar, int16_t el, 
+        Unroll::EpicsPvCtrlEnum & unrollBuffer);
+
 hid_t createH5TypeId_epicsTimeStamp();
 
- hid_t createH5TypeId_EpicsPvCtrlString(hid_t pvNameType, hid_t stringType);
+hid_t createH5TypeId_EpicsPvCtrlString(hid_t pvNameType, hid_t stringType);
 hid_t createH5TypeId_EpicsPvCtrlShort(hid_t pvNameType, hid_t unitsType);
 hid_t createH5TypeId_EpicsPvCtrlFloat(hid_t pvNameType, hid_t unitsType);
-hid_t createH5TypeId_EpicsPvCtrlEnum(hid_t pvNameType, hid_t allEnumStrsType);
+hid_t createH5TypeId_EpicsPvCtrlEnum(hid_t pvNameType, hid_t strsArrayType, int numberOfStrings);
 hid_t createH5TypeId_EpicsPvCtrlChar(hid_t pvNameType, hid_t unitsType);
 hid_t createH5TypeId_EpicsPvCtrlLong(hid_t pvNameType, hid_t unitsType);
 hid_t createH5TypeId_EpicsPvCtrlDouble(hid_t pvNameType, hid_t unitsType);
@@ -320,6 +325,12 @@ hid_t createH5TypeId_EpicsPvTimeChar(hid_t stampType);
 hid_t createH5TypeId_EpicsPvTimeLong(hid_t stampType);
 hid_t createH5TypeId_EpicsPvTimeDouble(hid_t stampType);
  
+template <class U>
+int getNumberStringsForCtrlEnum(boost::shared_ptr<typename U::PsanaSrc> ptr) { return -1; }
+
+template <>
+int getNumberStringsForCtrlEnum<Unroll::EpicsPvCtrlEnum>(boost::shared_ptr<Unroll::EpicsPvCtrlEnum::PsanaSrc> ptr);
+
 
 } // namespace Translator
 

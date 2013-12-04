@@ -8,10 +8,11 @@ using namespace Translator;
 
 namespace {
 
-std::vector<int> nullVectorInt;
-std::vector<size_t> nullVectorSize;
-
 const char *logger = "ChunkManager";
+
+const hsize_t _16MB = 16*1024*1024;
+const hsize_t _100MB = 100*1024*1024;
+const hsize_t _16KB = 16*1024;
 
 // this templatized function is meant to be called with one of the 
 // Psana::ControlData::ConfigV* classes, where * is the version.
@@ -36,17 +37,16 @@ unsigned setEventsFromControlCfg<Psana::ControlData::ConfigV3>(PSEnv::Env &env) 
   return 0;
 }
 
-void msgLogStats(const char *dtype, const std::vector<int> &returnedChunkCacheSizes, const std::vector<int> &returnedChunkSizes, const std::vector<size_t> &objSizesDuringChunkCacheCalls) {
+void msgLogStats(const char *dtype, const std::vector<int> &returnedChunkCacheSizesInChunks, const std::vector<int> &returnedChunkSizesInObjects, const std::vector<size_t> &objSizesInBytesDuringChunkCacheCalls) {
   WithMsgLog(logger,debug,str) {
-    str << " chunkCache: " << (void *)(&returnedChunkCacheSizes) << " chunks: " << (void *)(&returnedChunkSizes) << " objs: " << (void *)(&objSizesDuringChunkCacheCalls) << std::endl;
-    str << dtype << " objsizes:       ";
-    for (size_t idx = 0; idx < objSizesDuringChunkCacheCalls.size(); ++idx) str << " " << objSizesDuringChunkCacheCalls[idx];
+    str << dtype << " objsizes (in bytes):      ";
+    for (size_t idx = 0; idx < objSizesInBytesDuringChunkCacheCalls.size(); ++idx) str << " " << objSizesInBytesDuringChunkCacheCalls[idx];
     str << std::endl;
-    str << dtype << " chunkSizes:     ";
-    for (size_t idx = 0; idx < returnedChunkSizes.size(); ++idx) str << " " << returnedChunkSizes[idx];
+    str << dtype << " chunkSizes (in objects):  ";
+    for (size_t idx = 0; idx < returnedChunkSizesInObjects.size(); ++idx) str << " " << returnedChunkSizesInObjects[idx];
     str << std::endl;
-    str << dtype << " chunkCacheSizes:";
-    for (size_t idx = 0; idx < returnedChunkCacheSizes.size(); ++idx) str << " " << returnedChunkCacheSizes[idx];
+    str << dtype << " chunkCacheSizes: (chunks) ";
+    for (size_t idx = 0; idx < returnedChunkCacheSizesInChunks.size(); ++idx) str << " " << returnedChunkCacheSizesInChunks[idx];
     str << std::endl;
   }
 }
@@ -64,79 +64,92 @@ ChunkManager::~ChunkManager()
 
 void ChunkManager::readConfigParameters(const Translator::H5Output &h5Output) {
   // chunk parameters
-  m_chunkSizeInBytes = h5Output.config("chunkSizeInBytes",16*1024*1024);  // default - 16 MB chunks
-  m_chunkSizeInElements = h5Output.config("chunkSizeInElements", 0);      // a non-zero value overrides 
-  m_chunkSizeInElementsOrig = m_chunkSizeInElements;
+  m_chunkSizeTargetInBytes = h5Output.config("chunkSizeTargetInBytes",_16MB);  // default - 16 MB chunks
+  m_chunkSizeTargetObjects = h5Output.config("chunkSizeTargetObjects", 0);      // a non-zero value overrides 
+  m_chunkSizeTargetObjectsOrig = m_chunkSizeTargetObjects;
   
                                                                  // default chunk size calculation
-  m_maxChunkSizeInBytes = h5Output.config("maxChunkSizeInBytes",100*1024*1024); // max chunk size is 100 MB
+  m_maxChunkSizeInBytes = h5Output.config("maxChunkSizeInBytes",_100MB); // max chunk size is 100 MB
   m_minObjectsPerChunk = h5Output.config("minObjectsPerChunk",50);              
   m_maxObjectsPerChunk = h5Output.config("maxObjectsPerChunk",2048);
 
   // the chunk cache needs to be big enough for at least one chunk, otherwise the chunk gets
   // brought back and forth from disk when writting each element.  Ideally the chunk cache holds
   // all the chunks that we are working with for a dataset.
-  m_minChunkCacheSize = h5Output.config("minChunkCacheSize",1024*1024);    
-  m_maxChunkCacheSize = h5Output.config("maxChunkCacheSize",3*m_maxChunkSizeInBytes);
+  m_chunkCacheSizeTargetInChunks = h5Output.config("chunkCacheSizeTargetInChunks",3);
+  m_maxChunkCacheSizeInBytes = h5Output.config("maxChunkCacheSizeInBytes",_100MB);
 
-  m_eventIdChunkSizeInBytes = h5Output.config("eventIdChunkSizeInBytes",16*1024); 
-  m_eventIdChunkSizeInElements = h5Output.config("eventIdChunkSizeInElements", m_chunkSizeInElements);
-  m_eventIdChunkSizeInElementsOrig = m_eventIdChunkSizeInElements;
+  m_eventIdChunkSizeTargetInBytes = h5Output.config("eventIdChunkSizeTargetInBytes",_16KB); // 16 KB
+  m_eventIdChunkSizeTargetObjects = h5Output.config("eventIdChunkSizeTargetObjects", m_chunkSizeTargetObjects);
+  m_eventIdChunkSizeTargetObjectsOrig = m_eventIdChunkSizeTargetObjects;
 
-  m_damageChunkSizeInBytes = h5Output.config("damageChunkSizeInBytes",m_chunkSizeInBytes);
-  m_damageChunkSizeInElements = h5Output.config("damageChunkSizeInElements",m_chunkSizeInElements);
-  m_damageChunkSizeInElementsOrig = m_damageChunkSizeInElements;
+  m_damageChunkSizeTargetInBytes = h5Output.config("damageChunkSizeTargetInBytes",m_chunkSizeTargetInBytes);
+  m_damageChunkSizeTargetObjects = h5Output.config("damageChunkSizeTargetObjects",m_chunkSizeTargetObjects);
+  m_damageChunkSizeTargetObjectsOrig = m_damageChunkSizeTargetObjects;
 
-  m_filterMsgChunkSizeInBytes = h5Output.config("filterMsgChunkSizeInBytes",m_chunkSizeInBytes);
-  m_filterMsgChunkSizeInElements = h5Output.config("filterMsgChunkSizeInElements",m_chunkSizeInElements);
-  m_filterMsgChunkSizeInElementsOrig = m_filterMsgChunkSizeInElements;
+  m_stringChunkSizeTargetInBytes = h5Output.config("stringChunkSizeTargetInBytes",m_chunkSizeTargetInBytes);
+  m_stringChunkSizeTargetObjects = h5Output.config("stringChunkSizeTargetObjects",m_chunkSizeTargetObjects);
+  m_stringChunkSizeTargetObjectsOrig = m_stringChunkSizeTargetObjects;
+
+  m_ndarrayChunkSizeTargetInBytes = h5Output.config("ndarrayChunkSizeTargetInBytes",m_chunkSizeTargetInBytes);
+  m_ndarrayChunkSizeTargetObjects = h5Output.config("ndarrayChunkSizeTargetObjects",m_chunkSizeTargetObjects);
+  m_ndarrayChunkSizeTargetObjectsOrig = m_ndarrayChunkSizeTargetObjects;
 
   // there will be a lot of epics datasets, and an epics entry tends to be only 30 bytes or so.
   // If we used 16 Mb chunks, and we had 200 epics pv, we'd have at least 3.2 Gb of chunks that we'd 
   // be writing, and each chunk would hold an hours worth of data.  
   // We set the epics pv chunk size in bytes to 16 kilobytes.
-  m_epicsPvChunkSizeInBytes = h5Output.config("epicsPvChunkSizeBytes",16*1024); 
-  m_epicsPvChunkSizeInElements = h5Output.config("epicsPvChunkSizeBytes",m_chunkSizeInElements);
-  m_epicsPvChunkSizeInElementsOrig = m_epicsPvChunkSizeInElements;
+  m_epicsPvChunkSizeTargetInBytes = h5Output.config("epicsPvChunkSizeTargetInBytes",_16KB); 
+  m_epicsPvChunkSizeTargetObjects = h5Output.config("epicsPvChunkSizeTargetObjects",m_chunkSizeTargetObjects);
+  m_epicsPvChunkSizeTargetObjectsOrig = m_epicsPvChunkSizeTargetObjects;
 
-  m_defaultChunkPolicy = boost::make_shared<Translator::ChunkPolicy>(m_chunkSizeInBytes,
-                                                                     m_chunkSizeInElements,
+  m_defaultChunkPolicy = boost::make_shared<Translator::ChunkPolicy>(m_chunkSizeTargetInBytes,
+                                                                     m_chunkSizeTargetObjects,
                                                                      m_maxChunkSizeInBytes,
                                                                      m_minObjectsPerChunk,
                                                                      m_maxObjectsPerChunk,
-                                                                     m_minChunkCacheSize,
-                                                                     m_maxChunkCacheSize);
+                                                                     m_chunkCacheSizeTargetInChunks,
+                                                                     m_maxChunkCacheSizeInBytes);
 
-  m_eventIdChunkPolicy = boost::make_shared<Translator::ChunkPolicy>(m_eventIdChunkSizeInBytes,
-                                                                     m_eventIdChunkSizeInElements,
+  m_eventIdChunkPolicy = boost::make_shared<Translator::ChunkPolicy>(m_eventIdChunkSizeTargetInBytes,
+                                                                     m_eventIdChunkSizeTargetObjects,
                                                                      m_maxChunkSizeInBytes,
                                                                      m_minObjectsPerChunk,
                                                                      m_maxObjectsPerChunk,
-                                                                     m_minChunkCacheSize,
-                                                                     m_maxChunkCacheSize);
+                                                                     m_chunkCacheSizeTargetInChunks,
+                                                                     m_maxChunkCacheSizeInBytes);
 
-  m_damageChunkPolicy = boost::make_shared<Translator::ChunkPolicy>(m_damageChunkSizeInBytes,
-                                                                    m_damageChunkSizeInElements,
+  m_damageChunkPolicy = boost::make_shared<Translator::ChunkPolicy>(m_damageChunkSizeTargetInBytes,
+                                                                    m_damageChunkSizeTargetObjects,
                                                                     m_maxChunkSizeInBytes,
                                                                     m_minObjectsPerChunk,
                                                                     m_maxObjectsPerChunk,
-                                                                    m_minChunkCacheSize,
-                                                                    m_maxChunkCacheSize);
+                                                                    m_chunkCacheSizeTargetInChunks,
+                                                                    m_maxChunkCacheSizeInBytes);
 
-  m_filterMsgChunkPolicy = boost::make_shared<Translator::ChunkPolicy>(m_filterMsgChunkSizeInBytes,
-                                                                       m_filterMsgChunkSizeInElements,
+  m_stringChunkPolicy = boost::make_shared<Translator::ChunkPolicy>(m_stringChunkSizeTargetInBytes,
+                                                                       m_stringChunkSizeTargetObjects,
                                                                        m_maxChunkSizeInBytes,
                                                                        m_minObjectsPerChunk,
                                                                        m_maxObjectsPerChunk,
-                                                                       m_minChunkCacheSize,
-                                                                       m_maxChunkCacheSize);
-  m_epicsPvChunkPolicy = boost::make_shared<Translator::ChunkPolicy>(m_epicsPvChunkSizeInBytes,
-                                                                     m_epicsPvChunkSizeInElements,
+                                                                       m_chunkCacheSizeTargetInChunks,
+                                                                       m_maxChunkCacheSizeInBytes);
+
+  m_ndarrayChunkPolicy = boost::make_shared<Translator::ChunkPolicy>(m_ndarrayChunkSizeTargetInBytes,
+                                                                       m_ndarrayChunkSizeTargetObjects,
+                                                                       m_maxChunkSizeInBytes,
+                                                                       m_minObjectsPerChunk,
+                                                                       m_maxObjectsPerChunk,
+                                                                       m_chunkCacheSizeTargetInChunks,
+                                                                       m_maxChunkCacheSizeInBytes);
+
+  m_epicsPvChunkPolicy = boost::make_shared<Translator::ChunkPolicy>(m_epicsPvChunkSizeTargetInBytes,
+                                                                     m_epicsPvChunkSizeTargetObjects,
                                                                      m_maxChunkSizeInBytes,
                                                                      m_minObjectsPerChunk,
                                                                      m_maxObjectsPerChunk,
-                                                                     m_minChunkCacheSize,
-                                                                     m_maxChunkCacheSize);
+                                                                     m_chunkCacheSizeTargetInChunks,
+                                                                     m_maxChunkCacheSizeInBytes);
 }
 
 void ChunkManager::beginJob(PSEnv::Env &env) {
@@ -157,8 +170,9 @@ void ChunkManager::endCalibCycle(size_t ) { // numberEventsInCalibCycle) {
 void ChunkManager::clearStats() {
   eventIdChunkPolicy()->clearStats();
   damageChunkPolicy()->clearStats();
-  filterMsgChunkPolicy()->clearStats();
+  stringChunkPolicy()->clearStats();
   epicsPvChunkPolicy()->clearStats();
+  ndarrayChunkPolicy()->clearStats();
   defaultChunkPolicy()->clearStats();
 }
 
@@ -178,6 +192,12 @@ void ChunkManager::reportStats() {
 
   defaultChunkPolicy()->getStats(returnedChunkCacheSizes, returnedChunkSizes, objSizesDuringChunkCacheCalls);
   msgLogStats("default",*returnedChunkCacheSizes, *returnedChunkSizes, *objSizesDuringChunkCacheCalls);
+
+  stringChunkPolicy()->getStats(returnedChunkCacheSizes, returnedChunkSizes, objSizesDuringChunkCacheCalls);
+  msgLogStats("std_string",*returnedChunkCacheSizes, *returnedChunkSizes, *objSizesDuringChunkCacheCalls);
+
+  ndarrayChunkPolicy()->getStats(returnedChunkCacheSizes, returnedChunkSizes, objSizesDuringChunkCacheCalls);
+  msgLogStats("ndarray",*returnedChunkCacheSizes, *returnedChunkSizes, *objSizesDuringChunkCacheCalls);
 }
 
 void ChunkManager::checkForControlDataToSetChunkSize(PSEnv::Env &env) {
@@ -190,30 +210,31 @@ void ChunkManager::checkForControlDataToSetChunkSize(PSEnv::Env &env) {
   }
   if (not events) {
     MsgLog(logger, trace, "Did not find controlData containing number of events");
-    setChunkSizeInElements(0);
+    setChunkSizeTargetObjects(0);
   }
   if (events) {
-    int chunkSizeInElements = events + events/20 + 10;
-    MsgLog(logger, trace, "Found controlData with event number, setting chunkSizeInElements to " 
-           << m_chunkSizeInElements);
-    setChunkSizeInElements(chunkSizeInElements);
+    int chunkSizeTargetObjects = events + events/20 + 10;
+    MsgLog(logger, trace, "Found controlData with event number, setting chunkSizeTargetObjects to " 
+           << chunkSizeTargetObjects);
+    setChunkSizeTargetObjects(chunkSizeTargetObjects);
   }
 }
 
-void ChunkManager::setChunkSizeInElements(int chunkSizeInElements) {
-  if (chunkSizeInElements==0) {
-    m_defaultChunkPolicy->chunkSizeInElements(m_chunkSizeInElementsOrig);
-    m_eventIdChunkPolicy->chunkSizeInElements(m_eventIdChunkSizeInElementsOrig);
-    m_damageChunkPolicy->chunkSizeInElements(m_damageChunkSizeInElementsOrig);
-    m_filterMsgChunkPolicy->chunkSizeInElements(m_filterMsgChunkSizeInElementsOrig);
-    m_epicsPvChunkPolicy->chunkSizeInElements(m_epicsPvChunkSizeInElementsOrig);
+void ChunkManager::setChunkSizeTargetObjects(int chunkSizeTargetObjects) {
+  if (chunkSizeTargetObjects==0) {
+    m_defaultChunkPolicy->chunkSizeTargetObjects(m_chunkSizeTargetObjectsOrig);
+    m_eventIdChunkPolicy->chunkSizeTargetObjects(m_eventIdChunkSizeTargetObjectsOrig);
+    m_damageChunkPolicy->chunkSizeTargetObjects(m_damageChunkSizeTargetObjectsOrig);
+    m_stringChunkPolicy->chunkSizeTargetObjects(m_stringChunkSizeTargetObjectsOrig);
+    m_ndarrayChunkPolicy->chunkSizeTargetObjects(m_ndarrayChunkSizeTargetObjectsOrig);
+    m_epicsPvChunkPolicy->chunkSizeTargetObjects(m_epicsPvChunkSizeTargetObjectsOrig);
   } else {
-    m_defaultChunkPolicy->chunkSizeInElements(m_chunkSizeInElements = chunkSizeInElements);
-    m_eventIdChunkPolicy->chunkSizeInElements(m_eventIdChunkSizeInElements = chunkSizeInElements);
-    m_damageChunkPolicy->chunkSizeInElements(m_damageChunkSizeInElements = chunkSizeInElements);
-    MsgLog(logger,info,"set damage to " << chunkSizeInElements);
-    m_filterMsgChunkPolicy->chunkSizeInElements(m_filterMsgChunkSizeInElements = chunkSizeInElements);
-    m_epicsPvChunkPolicy->chunkSizeInElements(m_epicsPvChunkSizeInElements = chunkSizeInElements);
+    m_defaultChunkPolicy->chunkSizeTargetObjects(m_chunkSizeTargetObjects = chunkSizeTargetObjects);
+    m_eventIdChunkPolicy->chunkSizeTargetObjects(m_eventIdChunkSizeTargetObjects = chunkSizeTargetObjects);
+    m_damageChunkPolicy->chunkSizeTargetObjects(m_damageChunkSizeTargetObjects = chunkSizeTargetObjects);
+    m_stringChunkPolicy->chunkSizeTargetObjects(m_stringChunkSizeTargetObjects = chunkSizeTargetObjects);
+    m_ndarrayChunkPolicy->chunkSizeTargetObjects(m_ndarrayChunkSizeTargetObjects = chunkSizeTargetObjects);
+    m_epicsPvChunkPolicy->chunkSizeTargetObjects(m_epicsPvChunkSizeTargetObjects = chunkSizeTargetObjects);
   }
 }
 

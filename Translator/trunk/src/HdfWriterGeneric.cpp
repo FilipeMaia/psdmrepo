@@ -122,7 +122,7 @@ size_t HdfWriterGeneric::createUnlimitedSizeDataset(hid_t groupId,
     throw DataSetException(ERR_LOC, msg.str());
   }
   m_datasetMap[groupId].at(dsetIndex) = DataSetMeta(dsetName,dataset,DataSetMeta::Unlimited,h5type);
-  MsgLog(logger(),info,"added " << groupId << " to datasetmap, for type " << h5type << " return " << dsetIndex);
+  MsgLog(logger(),debug,"added groupId=" << groupId << " to datasetmap, for h5type= " << h5type << " returning datasetIndex= " << dsetIndex);
   return dsetIndex;
 }
 
@@ -288,6 +288,45 @@ void HdfWriterGeneric::closeDatasets(hid_t groupId)
   }
   dsetList.clear();
   m_datasetMap.erase(pos);
+}
+
+hid_t HdfWriterGeneric::getDatasetId(hid_t groupId, size_t dsetIndex) {
+  map<hid_t, vector<DataSetMeta> >::iterator pos = m_datasetMap.find(groupId);
+  ostringstream msg;
+  if (pos == m_datasetMap.end()) {
+    msg << "getDatasetID: groupId= " << groupId 
+        << " not in the map";
+    throw GroupMapException(ERR_LOC, msg.str());
+  }
+  const vector<DataSetMeta> dataSetsMeta = pos->second;
+  if (dsetIndex > dataSetsMeta.size()) {
+    msg << "getDataSetId: groupId= " << groupId << " dsetIndex= " << dsetIndex
+        << " is greater than number of datasets for this group which is "
+        << dataSetsMeta.size();
+    throw GroupMapException(ERR_LOC, msg.str());
+  }
+  const DataSetMeta & dataSetMeta = dataSetsMeta.at(dsetIndex);
+  return dataSetMeta.dsetId();
+}
+
+hid_t HdfWriterGeneric::getDatasetId(hid_t groupId, const std::string &dsetName) {
+  map<hid_t, vector<DataSetMeta> >::iterator pos = m_datasetMap.find(groupId);
+  ostringstream msg;
+  if (pos == m_datasetMap.end()) {
+    msg << "getDatasetID: groupId= " << groupId 
+        << " not in the map";
+    throw GroupMapException(ERR_LOC, msg.str());
+  }
+  const vector<DataSetMeta> dataSetsMeta = pos->second;
+  for (size_t idx= 0; idx < dataSetsMeta.size(); ++idx) {
+    const DataSetMeta & dataSetMeta = dataSetsMeta.at(idx);
+    if (dataSetMeta.name() == dsetName) {
+      return dataSetMeta.dsetId();
+    }
+  }
+  msg << "getDataSetId: groupId= " << groupId << " dsetName= " << dsetName
+      << " was not found in datasets for group.";
+  throw GroupMapException(ERR_LOC, msg.str());
 }
 
 // returns the positional index for a new dataset for the given group.

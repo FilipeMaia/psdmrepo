@@ -7,18 +7,15 @@
 #include "PSEvt/ProxyDict.h"
 #include "hdf5pp/File.h"
 #include "hdf5pp/Group.h"
+#include "Translator/HdfWriterNDArray.h"
+#include "MsgLogger/MsgLogger.h"
 
 using namespace std;
 
 const string arrayKeyString = "myarray";
 
-struct A {
-  int i;
-  float x;
-};
-
-void foo() {
-  ndarray<A,1> data = make_ndarray<A>(3);
+namespace {
+  const char * logger = "write-ndarray-to-h5-example";
 }
 
 void loadEvent(boost::shared_ptr<PSEvt::Event> evt) {
@@ -26,11 +23,6 @@ void loadEvent(boost::shared_ptr<PSEvt::Event> evt) {
   const unsigned DIM2 = 12;
   unsigned int shape[2] = {DIM1,DIM2};
   boost::shared_ptr< ndarray<int,2> > myarray = boost::make_shared<ndarray<int,2> >(shape);
-  ndarray<A,1> data = make_ndarray<A>(10);
-  data[0].i=3;
-  data[0].x=3234.3;
-  data[19].i=3;
-  data[19].x=34.0;
   int k = 0;
   for (unsigned i = 0; i < DIM1; ++i) {
     for (unsigned j = 0; j < DIM2; ++j) {
@@ -55,17 +47,27 @@ void printArray(ostream & o, const ndarray<int,2> &array) {
 int main() {
   boost::shared_ptr<PSEvt::ProxyDictI> proxyDict = boost::make_shared<PSEvt::ProxyDict>();
   boost::shared_ptr<PSEvt::Event> evt = boost::make_shared<PSEvt::Event>(proxyDict);
+  boost::shared_ptr<PSEnv::IExpNameProvider> expNameProvider;
+  boost::shared_ptr<PSEnv::Env> env = boost::make_shared<PSEnv::Env>("", expNameProvider, "");
+  MsgLog(logger, info, "loading event with ndarray");
   loadEvent(evt);
   boost::shared_ptr< ndarray<int,2> > myarray = evt->get(arrayKeyString);
-  cout << "myarray.get(): " << myarray.get() << endl; 
-  printArray(cout,*myarray);
+  WithMsgLog(logger, info, str) {
+    str << "Extracted array from event store, pointer is:  " << myarray.get() << endl; 
+    printArray(str,*myarray);
+  }
   hdf5pp::File::CreateMode mode = hdf5pp::File::Truncate;
-  hdf5pp::File h5file = hdf5pp::File::create(m_h5fileName, mode);
+  const char * h5outputFile = "write-ndarray-to-h5-example.h5";
+  hdf5pp::File h5file = hdf5pp::File::create(h5outputFile, mode);
   hdf5pp::Group group = h5file.createGroup("group");
-  
-    
-  
-
-  
+  Translator::HdfWriterNDArray<int,2> writer;
+  PSEvt::EventKey eventKey(&typeid(ndarray<int,2>),PSEvt::EventKey::anySource(),arrayKeyString);
+  boost::shared_ptr<Translator::ChunkPolicy> chunkPolicy = boost::make_shared<Translator::ChunkPolicy>();
+  writer.make_datasets(Translator::inEvent, group, eventKey, *evt, *env, false,-1,chunkPolicy);
+  writer.append(Translator::inEvent, group, eventKey, *evt, *env);
+  writer.append(Translator::inEvent, group, eventKey, *evt, *env);
+  group.close();
+  h5file.close();
+  MsgLog(logger,info, "wrote h5file: " << h5outputFile);
   return 0;
 }

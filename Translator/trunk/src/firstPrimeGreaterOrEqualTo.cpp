@@ -1016,6 +1016,7 @@ unsigned firstPrimeGreaterOrEqualTo(unsigned x) {
   unsigned lower = 0;
   unsigned upper = numberFirstPrimes;
   unsigned middle = lower+(upper-lower)/2;
+  if (x <= firstPrimes[0]) return firstPrimes[0];
   while (true) {
     if (firstPrimes[middle] == x) return firstPrimes[middle];
     if (firstPrimes[middle] < x) {

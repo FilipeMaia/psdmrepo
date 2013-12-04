@@ -105,6 +105,9 @@ class HdfWriterGeneric {
 
   void closeDatasets(hid_t groupId);
 
+  hid_t getDatasetId(hid_t groupId, size_t dsetIndex);
+  hid_t getDatasetId(hid_t groupId, const std::string &dsetName);
+
  private:
   size_t getDatasetIndex(hid_t groupId, std::string dsetName);
   static const int m_rankOne = 1;

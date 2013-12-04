@@ -7,6 +7,8 @@
 #include "pdsdata/xtc/BldInfo.hh"
 #include "pdsdata/xtc/ProcInfo.hh"
 #include "PSEvt/TypeInfoUtils.h"
+#include "PSEvt/EventKey.h"
+#include "MsgLogger/MsgLogger.h"
 
 using namespace Translator;
 using namespace std;
@@ -77,6 +79,7 @@ namespace {
    */
   std::string srcName(const Pds::Src& src, bool procPidSpaceSepAtEnd, bool detInfoSpecialAsAstrerik)
   {
+    if ((src == PSEvt::EventKey::anySource()) or (src == PSEvt::EventKey::noSource())) return "";
     if (src.level() == Pds::Level::Source) {
       return ::strDetInfo(static_cast<const Pds::DetInfo&>(src),detInfoSpecialAsAstrerik);
     } else if (src.level() == Pds::Level::Reporter) {
@@ -90,11 +93,18 @@ namespace {
     return ::strProcInfo(static_cast<const Pds::ProcInfo&>(src),procPidSpaceSepAtEnd);
   }
   
-}
+} // local namespace
 
 namespace Translator {
 
-string getH5GroupNameForType(const std::type_info *typeInfoPtr, bool short_bld_name) {
+H5GroupNames::H5GroupNames(bool short_bld_name, const TypeAliases::TypeInfoSet & ndarrays) 
+  : m_short_bld_name(short_bld_name),
+    m_ndarrays(ndarrays) 
+{}
+
+string H5GroupNames::nameForType(const std::type_info *typeInfoPtr)
+{
+  if (m_ndarrays.find(typeInfoPtr) != m_ndarrays.end()) return "NDArray";
   string realName = PSEvt::TypeInfoUtils::typeInfoRealName(typeInfoPtr);
   string::size_type leftParenIdx = realName.find("(");
   if (leftParenIdx != string::npos) {
@@ -105,24 +115,24 @@ string getH5GroupNameForType(const std::type_info *typeInfoPtr, bool short_bld_n
   if (realName.size() > psana.size() and realName.substr(0,psana.size()) == psana) {
     realName = realName.substr(psana.size());
   }
-
+  
   static const string BldBld("Bld::Bld");
   static const string Bld("Bld::");
-  if (short_bld_name) {
+  if (m_short_bld_name) {
     if (realName.size() > BldBld.size() and realName.substr(0,BldBld.size()) == BldBld) {
       realName = realName.substr(Bld.size());
     }
   }
-
+  
   static const string csPadDataV("CsPad::DataV");
   static const string csPadElementV("CsPad::ElementV");
   if ((realName.size()>csPadDataV.size()) and (realName.substr(0,csPadDataV.size()) == csPadDataV)) {
-      realName = csPadElementV + realName.substr(csPadDataV.size());
+    realName = csPadElementV + realName.substr(csPadDataV.size());
   }
   return realName;
 }
-
-std::string getH5GroupNameForSrc(const Pds::Src &src) {
+  
+string H5GroupNames::nameForSrc(const Pds::Src &src) {
   return ::srcName(src,false,false);
 }
 
