@@ -325,12 +325,12 @@ hid_t createH5TypeId_EpicsPvTimeChar(hid_t stampType);
 hid_t createH5TypeId_EpicsPvTimeLong(hid_t stampType);
 hid_t createH5TypeId_EpicsPvTimeDouble(hid_t stampType);
  
+
 template <class U>
 int getNumberStringsForCtrlEnum(boost::shared_ptr<typename U::PsanaSrc> ptr) { return -1; }
-
+ 
 template <>
 int getNumberStringsForCtrlEnum<Unroll::EpicsPvCtrlEnum>(boost::shared_ptr<Unroll::EpicsPvCtrlEnum::PsanaSrc> ptr);
-
 
 } // namespace Translator
 

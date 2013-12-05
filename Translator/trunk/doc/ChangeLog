@@ -11,4 +11,7 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
-
+Tag: V00-00-01
+203-12-04 David Schneider
+- first production tag, however more testing needs to be done before 
+  using in place of o2o-translate.
