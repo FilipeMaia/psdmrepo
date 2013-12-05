@@ -1,0 +1,59 @@
+#ifndef HDFWRITERSTRINGFROMEVENT_H
+#define HDFWRITERSTRINGFROMEVENT_H
+
+#include "Translator/HdfWriterFromEvent.h"
+#include "Translator/HdfWriterString.h"
+
+namespace Translator {
+
+class HdfWriterStringFromEvent : public HdfWriterFromEvent {
+ public:  
+  virtual void make_datasets(DataTypeLoc dataTypeLoc,
+                             hdf5pp::Group & srcGroup, 
+                             const PSEvt::EventKey & eventKey, 
+                             PSEvt::Event & evt, 
+                             PSEnv::Env & env,
+                             bool shuffle,
+                             int deflate,
+                             boost::shared_ptr<Translator::ChunkPolicy> chunkPolicy) {
+    boost::shared_ptr<std::string> ptr = getFromEventStore<std::string>(eventKey, dataTypeLoc, evt, env);
+    DataSetCreationProperties dataSetCreationProperties(chunkPolicy, shuffle, deflate);
+    writer.setDatasetCreationProperties(dataSetCreationProperties);
+    writer.make_dataset(srcGroup.id());
+  }
+
+  virtual void store(DataTypeLoc dataTypeLoc,
+                     hdf5pp::Group & srcGroup, 
+                     const PSEvt::EventKey & eventKey, 
+                     PSEvt::Event & evt, 
+                     PSEnv::Env & env) {
+    throw ErrSvc::Issue(ERR_LOC, "HdfWriterStringFromEvent::store()  not implemented");
+  }
+
+  virtual void store_at(DataTypeLoc dataTypeLoc,
+                        long index, hdf5pp::Group & srcGroup, 
+                        const PSEvt::EventKey & eventKey, 
+                        PSEvt::Event & evt, 
+                        PSEnv::Env & env) {
+    throw ErrSvc::Issue(ERR_LOC, "HdfWriterStringFromEvent::store_at() not implemented");
+  }
+  
+  virtual void append(DataTypeLoc dataTypeLoc,
+                      hdf5pp::Group & srcGroup, 
+                      const PSEvt::EventKey & eventKey, 
+                      PSEvt::Event & evt, 
+                      PSEnv::Env & env) {
+    boost::shared_ptr<std::string> ptr = getFromEventStore<std::string>(eventKey, dataTypeLoc, evt, env);
+    writer.append(srcGroup.id(), *ptr);
+  }
+
+  virtual void addBlank(hdf5pp::Group & group) {
+    throw ErrSvc::Issue(ERR_LOC, "HdfWriterStringFromEvent::addBlank() not implemented");
+  }
+ private:
+  HdfWriterString writer;
+}; // class HdfWriterStringFromEvent
+
+} // namespace Translator
+
+#endif
