@@ -335,44 +335,60 @@ class DdlHdf5Translator ( object ) :
         # typeAliasMap['Princeton'].update(typeAliasMap['PrincetonInfo'])
         # del typeAliasMap['PrincetonInfo']
 
-        sortedAliases = []
+        aliasesOrderedForTemplates = []
         aliases = typeAliasMap.keys()
         aliases.sort()
         for alias in aliases:
             typeList = list(typeAliasMap[alias])
             typeList.sort()
-            sortedAliases.append({'alias':alias,'typelist':typeList})
+            aliasesOrderedForTemplates.append({'alias':alias,'typelist':typeList})
         
-        self.writeDefaultPsanaCfg(sortedAliases)
-        self.writeTypeAliasesCpp(base_headers, sortedAliases)
-        self.writeHdfWriterMapCpp(base_headers, namespaces, psanaTypes)
+        # make all the ndarray types we will translate
+        # The ndarray's translated are described in default_psana.cfg, update that file if this
+        # list is changed.
+        intTypes = ['%sint%d_t' % (signed,bitsize) for signed in ['','u'] for bitsize in [8,16,32,64]]
+        elemenTypes = intTypes + ['float','double']
+        elemDimPairs = [(elem,ndim) for elem in elemenTypes for ndim in [1,2,3,4]]
+        ndarrays = ['ndarray<%s,%d>' % (elem,ndim) for elem,ndim in elemDimPairs]
+        ndarrayAlias = 'ndarray_types'
+
+        # below we insert ndarray before string. This order matters,
+        # some generated code may insert comments before the ndarray to distinguish these types from
+        # psana types
+        aliasesOrderedForTemplates.append({'alias':ndarrayAlias, 'typelist':ndarrays})
+        aliasesOrderedForTemplates.append({'alias':'std_string', 'typelist':['std::string']})
+        self.writeDefaultPsanaCfg(aliasesOrderedForTemplates, ndarrayAlias)
+        self.writeTypeAliasesCpp(base_headers, aliasesOrderedForTemplates)
+        self.writeHdfWriterMapCpp(base_headers, namespaces, psanaTypes, elemDimPairs)
         epicsPackage = [package for package in model.packages() if package.name.lower()=='epics']
         assert len(epicsPackage)==1, "could not find epics package, names are: %r" % ([x.name for x in model.packages()],)
         epicsPackage = epicsPackage[0]
         self.writeEpicsHdfWriterDetails(epicsPackage)
 
-    def writeDefaultPsanaCfg(self,sortedAliases):
+    def writeDefaultPsanaCfg(self,aliasesOrderedForTemplates, ndarrayAlias):
         tmpl = self.jiEnv.get_template('hdf5Translator.tmpl?psana_cfg_template')
         type_filter_options = ''
-        for entry in sortedAliases:
+        for entry in aliasesOrderedForTemplates:
             alias,typeList = entry['alias'],entry['typelist']
-            ln = '%s = include' % alias
-            ln = ln.ljust(30)
-            ln += ' # %s' % ', '.join(typeList)
-            ln += '\n'
-            type_filter_options += ln
+            lns = ''
+            if alias == ndarrayAlias:
+              lns += "\n# user types to translate from the event store\n"
+            lns += ('%s = include' % alias).ljust(30)
+            lns += ' # %s' % ', '.join(typeList)
+            lns += '\n'
+            type_filter_options += lns
         fname = os.path.join(self.packageDir, "default_psana.cfg")
         fout = file(fname,'w')
         fout.write(tmpl.render(locals()))
         
-    def writeTypeAliasesCpp(self, base_headers, sortedAliases):
+    def writeTypeAliasesCpp(self, base_headers, aliasesOrderedForTemplates):
         class Entry(object):
             def __init__(self,alias,typeList):
                 self.alias=alias
                 self.typeList=typeList
 
         type_aliases = []
-        for entry in sortedAliases:
+        for entry in aliasesOrderedForTemplates:
             alias,typeList = entry['alias'],entry['typelist']
             type_aliases.append(Entry(alias,typeList))
         tmpl = self.jiEnv.get_template('hdf5Translator.tmpl?type_aliases_cpp')
@@ -380,7 +396,7 @@ class DdlHdf5Translator ( object ) :
         fout = file(fname,'w')
         fout.write(tmpl.render(locals()))
 
-    def writeHdfWriterMapCpp(self, base_headers, namespaces, psanaTypes):
+    def writeHdfWriterMapCpp(self, base_headers, namespaces, psanaTypes, elemDimPairs ):
         tmpl = self.jiEnv.get_template('hdf5Translator.tmpl?hdfwritermap_cpp')
         fname = os.path.join(self.packageDir, 'src', 'HdfWriterMap.cpp')
         fout = file(fname,'w')
@@ -428,8 +444,7 @@ class DdlHdf5Translator ( object ) :
         type_create_args = ''
         if typename.find('Ctrl')>0:
           if typename.find('Enum')>0:
-            type_create_args = 'hid_t %s, hid_t %s' % (specialTypes['pvname'],
-                                                       specialTypes['strs'])
+            type_create_args = 'hid_t %s, hid_t strsArrayType, int numberOfStrings' % (specialTypes['pvname'],)
           elif typename.find('String')>0:
             type_create_args = 'hid_t %s, hid_t %s' % (specialTypes['pvname'],
                                                        specialTypes['string'])
