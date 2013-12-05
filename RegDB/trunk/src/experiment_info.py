@@ -336,6 +336,17 @@ def experiment_runs(instr, exper=None, station=0):
 
     return runs
 
+def unique_detector_names():
+
+    """
+    Return a list of all known detector names configured in the DAQ system
+    accross all known experiments and runs
+    """
+
+    query = "SELECT DISTINCT name FROM logbook.run_attr WHERE class='DAQ_Detectors' ORDER BY name"
+    return [row['name'] for row in __do_select_many(query)]
+
+
 def detectors(instr, exper, run):
 
     """
@@ -591,6 +602,18 @@ if __name__ == "__main__" :
                 print "   %4d  |  %-40s  |  %s"  % (run, calibtypes, comment,)
 
 
+        print """
+
+ Unique detector names which have ever been used for any experiments and runs
+ ----------------------------------------------------------------------------"""
+
+        names = unique_detector_names()
+        for name in names:
+            print "   %s" % name
+
+        print """ -----------------------------------------
+   Total: %d
+ """ % len(names)
 
 
     except db.Error, e:

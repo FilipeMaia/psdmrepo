@@ -11,6 +11,11 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-21
+2013-12-05 Igor Gaponenko
+- extended Python module experiment_info with function unique_detector_names()
+
+
 Tag: V00-01-20
 2013-11-01 Igor Gaponenko
 - added indexes for the data migration tables
