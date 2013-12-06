@@ -38,7 +38,13 @@
                 <tag name="auto"/>
             </ctor>
 
-
+            <method name="sampleInterval_sec" type="double">
+                <expr lang="C++" body="
+                double v=0;
+                for (unsigned r=_baseClockFrequency; r!=0; r>>4)
+                  v += 10*(r &amp; 0xf);
+                return double(_adcClkHalfT)*2.e-3/v;" />
+            </method>
         </pstype>
         
         <!-- ========================================================================= -->

@@ -316,6 +316,55 @@
         </pstype>
 
         <!-- ========================================================================= -->
+	
+        <pstype name="SrcEventCode" pack="4">
+              Describes configuration of self-contained event generator.
+
+            <tag name="value-type"/>
+
+            <const name="DescSize" value="16"/>
+            
+            <const name="MaxReadoutGroup" value="7"/>
+				
+            <attribute name="_u16Code" type="uint16_t" accessor="code">
+               Assigned eventcode.
+            </attribute>
+
+            <attribute name="_u16rsvd" type="uint16_t"/>
+
+            <attribute name="_u32Period" type="uint32_t" accessor="period">
+               Repetition period in 119 MHz counts or 0 for external source.
+            </attribute>
+
+            <attribute name="_u32MaskTriggerP" type="uint32_t" accessor="maskTriggerP">
+               Bit mask of persistent pulse triggers.
+            </attribute>
+
+            <attribute name="_u32MaskTriggerR" type="uint32_t" accessor="maskTriggerR">
+               Bit mask of running pulse triggers.
+            </attribute>
+
+            <attribute name="_desc" type="char" shape="DescSize" accessor="desc">
+               Optional description.
+            </attribute>
+
+            <attribute name="_u16ReadGroup" type="uint16_t" accessor="readoutGroup">
+               Assigned readout group.
+            </attribute>
+
+            <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="inline"/>
+                <tag name="auto"/>
+            </ctor>
+
+        </pstype>
+
+        <!-- ========================================================================= -->
 
 
         <pstype name="OutputMap">
@@ -793,6 +842,50 @@
             </attribute>
 
             <attribute name="_seq_config" type="SequencerConfigV1" accessor="seq_config">
+            </attribute>
+
+            <ctor>
+                Default constructor
+                <tag name="inline"/>
+            </ctor>
+            <ctor>
+                Constructor which takes values for every attribute
+                <tag name="auto"/>
+            </ctor>
+
+        </pstype>
+        
+        
+        <!-- ========================================================================= -->
+        
+        <pstype name="SrcConfigV1" version="1" type_id="Id_EvsConfig" pack="4">
+              Describes configuration of self-contained event generator.
+		
+            <tag name="config-type"/>
+
+            <const name="MaxPulses" value="12">
+            Maximum pulses in the system
+            </const>
+            <const name="MaxOutputs" value="12">
+            Maximum outputs in the system
+            </const>
+		
+            <attribute name="_neventcodes" type="uint32_t" accessor="neventcodes">
+            </attribute>
+
+            <attribute name="_npulses" type="uint32_t" accessor="npulses">
+            </attribute>
+
+            <attribute name="_noutputs" type="uint32_t" accessor="noutputs">
+            </attribute>
+
+            <attribute name="_eventcodes" type="SrcEventCode" shape="{self}._neventcodes" accessor="eventcodes">
+            </attribute>
+
+            <attribute name="_pulses" type="PulseConfigV3" shape="{self}._npulses" accessor="pulses">
+            </attribute>
+
+            <attribute name="_output_maps" type="OutputMapV2" shape="{self}._noutputs" accessor="output_maps">
             </attribute>
 
             <ctor>
