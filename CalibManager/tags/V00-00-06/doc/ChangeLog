@@ -1,0 +1,70 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package CalibManager
+#------------------------------------------------------------------------
+
+Package author: Mikhail S. Dubrovin
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-06
+2013-12-77 Mikhail S. Dubrovin
+- improve logistics of buttons in GUIInsExpDirDet, GUIStatus.py, GUIDarkListItemRun.py
+- add src/GUIFileManager.py, src/GUIFileManagerSelect.py
+	
+Tag: V00-00-05
+2013-11-27 Mikhail S. Dubrovin
+- refactoring DarkList... classes for correct widget resizing.
+- enable/disable "Go" button for scan at submission
+- check that Go/Stop/Deploy button status is updated properly.
+
+Tag: V00-00-04
+2013-11-26 Mikhail S. Dubrovin
+- add more icons in data/icons/
+- add app/plims for "standalone" plotting procedure
+- in PlotImgSpe add buttons
+	Load - to load any array and 
+	Diff - to see diffetence between current and image array from file
+
+Tag: V00-00-03
+2013-11-22 Mikhail S. Dubrovin
+- add popup window for confirmation of sources before deployment
+- fix problem with missing non-automatic call of resizeEvent
+- add saving history file
+- add auto-create work directory
+- change file permissions after its saving
+	
+Tag: V00-00-02
+2013-11-19 Mikhail S. Dubrovin
+- It was found that RegDB returns sources which are missing in xtc...
+- combined access to scanned xtc with RegDB, RegDB is used only when 
+	scan log is not yet available.
+
+2013-11-18 Mikhail S. Dubrovin
+- code of many modules is significantly changed in order to
+	have dark image averaging for any set of detectors simultaneously.
+
+2013-11-05 Mikhail S. Dubrovin
+- add access to DB on data files 
+A       src/RegDBUtils.py
+A       src/GUIPopupChecklist.py
+A       src/GUIDarkControlBar.py
+	
+Tag: V00-00-01
+2013-10-06 Mikhail S. Dubrovin
+- works for pedestals and mask editor
+
+2013-07-15 Mikhail S. Dubrovin
+- create this package on dubrovin@psdev106:
+cd /reg/neh/home1/dubrovin/LCLS
+newrel ana-current CalibManager-v01
+cd CalibManager-v01
+newpkg CalibManager
+psvn newpkg CalibManager
+addpkg CalibManager
+
+#--------------------
