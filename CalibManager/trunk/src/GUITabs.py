@@ -48,6 +48,7 @@ from Logger               import logger
 from GUIConfig            import * 
 from GUIDark              import * 
 from GUIMaskEditor        import * 
+from GUIFileManager       import * 
 
 #---------------------
 #  Class definition --
@@ -63,6 +64,7 @@ class GUITabs ( QtGui.QWidget ) :
                     ,'Gain'
                     ,'ROI'
                     ,'Geometry'
+                    ,'File Manager'
                     ,'Configuration'
                     ]
 
@@ -166,26 +168,10 @@ class GUITabs ( QtGui.QWidget ) :
             tab_ind = self.tab_bar.addTab( tab_name )
             self.tab_bar.setTabTextColor(tab_ind, QtGui.QColor('blue')) #gray, red, grayblue
 
-        #Uses self.list_file_types
-        #self.ind_tab_0 = self.tab_bar.addTab( self.list_of_tabs[0] )
-        #self.ind_tab_1 = self.tab_bar.addTab( self.list_of_tabs[1] )
-        #self.ind_tab_2 = self.tab_bar.addTab( self.list_of_tabs[2] )
-        #self.ind_tab_3 = self.tab_bar.addTab( self.list_of_tabs[3] )
-        #self.ind_tab_4 = self.tab_bar.addTab( self.list_of_tabs[4] )
-
-        #self.tab_bar.setTabTextColor(self.ind_tab_0, QtGui.QColor('blue')) #gray, red, grayblue
-        #self.tab_bar.setTabTextColor(self.ind_tab_1, QtGui.QColor('blue'))
-        #self.tab_bar.setTabTextColor(self.ind_tab_2, QtGui.QColor('blue'))
-        #self.tab_bar.setTabTextColor(self.ind_tab_3, QtGui.QColor('blue'))
-        #self.tab_bar.setTabTextColor(self.ind_tab_4, QtGui.QColor('blue'))
-
         if self.orientation == 'H' :
             self.tab_bar.setShape(QtGui.QTabBar.RoundedNorth)
         else :
             self.tab_bar.setShape(QtGui.QTabBar.RoundedWest)
-
-        #self.tab_bar.setTabEnabled(1, False)
-        #self.tab_bar.setTabEnabled(3, False)
 
         self.setTabByName(cp.current_tab.value())
             
@@ -218,15 +204,19 @@ class GUITabs ( QtGui.QWidget ) :
             #self.setStatus(0, 'Status: processing for pedestals')
             
         elif cp.current_tab.value() == self.list_of_tabs[1] :
-            self.gui_win = QtGui.QTextEdit() # GUIDark(self)
+            self.gui_win = QtGui.QTextEdit('') # Gain is not implemented.') # GUIDark(self)
 
         elif cp.current_tab.value() == self.list_of_tabs[2] :
             self.gui_win = GUIMaskEditor(self)
 
         elif cp.current_tab.value() == self.list_of_tabs[3] :
-            self.gui_win = QtGui.QTextEdit()
+            self.gui_win = QtGui.QTextEdit('')
 
         elif cp.current_tab.value() == self.list_of_tabs[4] :
+            #self.gui_win = QtGui.QTextEdit('File manager is not implemented.')
+            self.gui_win = GUIFileManager(self)
+
+        elif cp.current_tab.value() == self.list_of_tabs[5] :
             self.gui_win = GUIConfig(self)
             #self.setStatus(0, 'Status: processing for data')
 

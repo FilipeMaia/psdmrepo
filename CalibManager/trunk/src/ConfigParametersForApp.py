@@ -40,8 +40,8 @@ class ConfigParametersForApp ( ConfigParameters ) :
 
     list_pars = []
 
-    list_of_queues = ['psnehq', 'psfehq', 'psanacsq']
-    list_of_instr  = ['AMO', 'SXR', 'XPP', 'XCS', 'CXI', 'MEC']
+    list_of_queues    = ['psnehq', 'psfehq', 'psanacsq']
+    list_of_instr     = ['AMO', 'SXR', 'XPP', 'XCS', 'CXI', 'MEC']
     list_of_show_runs = ['all', 'dark']
     list_of_show_dets = ['any', 'selected any', 'selected all']
 
@@ -60,19 +60,21 @@ class ConfigParametersForApp ( ConfigParameters ) :
         self.defineStyles()
   
     def initRunTimeParameters( self ) :
-        self.iconsAreLoaded  = False
+        self.iconsAreLoaded    = False
         #self.char_expand = u' \u25BE' # down-head triangle
-        self.guilogger       = None
-        self.guimain         = None
-        self.guidark         = None
-        self.guidarklist     = None
-        self.guitabs         = None
-        self.guistatus       = None
-        self.guiinsexpdirdet = None
-        self.guifilebrowser  = None 
-        self.blsp            = None 
+        self.guilogger         = None
+        self.guimain           = None
+        self.guidark           = None
+        self.guidarklist       = None
+        self.guitabs           = None
+        self.guistatus         = None
+        self.guiinsexpdirdet   = None
+        self.guifilebrowser    = None 
+        self.blsp              = None 
         self.guidarkcontrolbar = None 
-  
+        self.guifilemanager    = None 
+        self.guifilemanagerselect = None 
+
 #-----------------------------
 
     def setIcons(self) :
@@ -202,7 +204,8 @@ class ConfigParametersForApp ( ConfigParameters ) :
         self.instr_dir          = self.declareParameter( name='INSTRUMENT_DIR',    val_def='/reg/d/psdm',  type='str' ) 
         self.instr_name         = self.declareParameter( name='INSTRUMENT_NAME',   val_def='Select',       type='str' ) # 'CXI'
         self.exp_name           = self.declareParameter( name='EXPERIMENT_NAME',   val_def='Select',       type='str' ) # 'cxitut13'
-        self.det_name           = self.declareParameter( name='DETECTOR_NAME',     val_def='Select',       type='str' ) # 'CSPAD'
+        self.det_but_title      = self.declareParameter( name='DETECTOR_BUT_TITLE',val_def='Select',       type='str' ) # 'Select' or 'Selected:N'
+        self.det_name           = self.declareParameter( name='DETECTOR_NAMES',    val_def='',             type='str' ) # 'CSPAD'
         self.calib_dir          = self.declareParameter( name='CALIB_DIRECTORY',   val_def='Select',       type='str' ) # '/reg/d/psdm/CXI/cxitut13/calib'
 
         # FileDeployer.py
@@ -262,8 +265,8 @@ class ConfigParametersForApp ( ConfigParameters ) :
         #self.in_file_dark      = self.declareParameter( name='IN_FILE_NAME_DARK', val_def='e167-r0020-s00-c00.xtc',type='str' )
 
         #self.bat_dark_total    = self.declareParameter( name='BATCH_DARK_TOTAL',      val_def=-1,       type='int' )
-        self.bat_dark_start    = self.declareParameter( name='BATCH_DARK_START',      val_def= 1,       type='int' )
-        self.bat_dark_end      = self.declareParameter( name='BATCH_DARK_END'  ,      val_def=1000,     type='int' )
+        self.bat_dark_start    = self.declareParameter( name='BATCH_DARK_START',      val_def= 1,      type='int' )
+        self.bat_dark_end      = self.declareParameter( name='BATCH_DARK_END'  ,      val_def=100,     type='int' )
         self.bat_det_info      = self.declareParameter( name='BATCH_DET_INFO',        val_def='DetInfo(:Princeton)',  type='str' )
         self.bat_img_rec_mod   = self.declareParameter( name='BATCH_IMG_REC_MODULE',  val_def='ImgAlgos.PrincetonImageProducer',  type='str' )
         self.mask_hot_thr      = self.declareParameter( name='MASK_HOT_PIX_ADU_THR_ON_RMS',  val_def=10.0,  type='float' )
@@ -277,26 +280,33 @@ class ConfigParametersForApp ( ConfigParameters ) :
         # GUIMaskEditor.py
         self.path_mask_img      = self.declareParameter( name='PATH_TO_MASK_IMAGE',        val_def='./work/*.txt',       type='str' )
 
+        # GUIFileManagerSelect.py
+        #self.path_fm_selected   = self.declareParameter( name='PATH_FM_SELECTED',  val_def='./work/*.txt',       type='str' )
+
 #-----------------------------
     
-        self.list_of_dets   = ['CSPAD', 'CSPAD2x2', 'Princeton', 'pnCCD', 'Tm6740', 'Opal2000', 'Opal4000', 'Acqiris']
+        self.list_of_dets   = ['CSPAD', 'CSPAD2x2', 'Princeton', 'pnCCD', 'Tm6740', 'Opal1000', 'Opal2000', 'Opal4000', 'Opal8000', 'Acqiris']
         self.list_of_dets_lower = [det.lower() for det in self.list_of_dets]
 
-        self.list_of_types  = ['CsPad::DataV',
-                               'CsPad2x2::ElementV',
-                               'Princeton::FrameV',
-                               'PNCCD::FullFrameV',
-                               'Camera::FrameV',
-                               'Camera::FrameV',
-                               'Camera::FrameV',
-                               'Acqiris::DataDesc']
-        self.dict_of_det_data_types = dict( zip(self.list_of_dets, self.list_of_types) )
+        self.list_of_data_types  = ['CsPad::DataV',
+                                    'CsPad2x2::ElementV',
+                                    'Princeton::FrameV',
+                                    'PNCCD::FullFrameV',
+                                    'Camera::FrameV',
+                                    'Camera::FrameV',
+                                    'Camera::FrameV',
+                                    'Camera::FrameV',
+                                    'Camera::FrameV',
+                                    'Acqiris::DataDesc']
+        self.dict_of_det_data_types = dict( zip(self.list_of_dets, self.list_of_data_types) )
         #self.print_dict_of_det_data_types()
         
         self.list_of_calib_types = ['CsPad::CalibV1',
                                     'CsPad2x2::CalibV1',
                                     'Princeton::CalibV1',
                                     'PNCCD::CalibV1',
+                                    'Camera::CalibV1',
+                                    'Camera::CalibV1',
                                     'Camera::CalibV1',
                                     'Camera::CalibV1',
                                     'Camera::CalibV1',
@@ -313,12 +323,204 @@ class ConfigParametersForApp ( ConfigParameters ) :
                            (False, False ,'bool'), \
                            (False, False ,'bool'), \
                            (False, False ,'bool'), \
+                           (False, False ,'bool'), \
+                           (False, False ,'bool'), \
                            (False, False ,'bool') ]
         self.det_cbx_states_list = self.declareListOfPars( 'DETECTOR_CBX_STATE', det_cbx_states )
 
 #-----------------------------
 
-        self.list_of_det_pars = zip(self.list_of_dets, self.list_of_types, self.det_cbx_states_list)
+        self.const_types_cspad = [
+            'center'
+           ,'center_global'
+           ,'offset'
+           ,'offset_corr'
+           ,'marg_gap_shift'
+           ,'quad_rotation'
+           ,'quad_tilt'
+           ,'rotation'
+           ,'tilt'
+           ,'pedestals'
+           ,'pixel_status'
+           ,'common_mode'
+           ,'filter'
+           ,'pixel_gain'
+           #,'beam_vector'
+           #,'beam_intersect'
+            ]
+        
+        self.const_types_cspad2x2 = [
+            'center'
+           ,'tilt'     
+           ,'pedestals'
+           ,'pixel_status'
+           ,'common_mode'
+           ,'filter'
+           ,'pixel_gain'
+            ]
+
+        #Dictionary for 'CSPAD', 'CSPAD2x2', 'Princeton', 'pnCCD', 'Tm6740', 'Opal1000', 'Opal2000', 'Opal4000', 'Opal8000', 'Acqiris', etc.
+        self.dict_of_det_const_types = dict( zip(self.list_of_dets, [ self.const_types_cspad 
+                                                                     ,self.const_types_cspad2x2
+                                                                     ,['pedestals']
+                                                                     ,['pedestals']
+                                                                     ,['pedestals']
+                                                                     ,['pedestals']
+                                                                     ,['pedestals']
+                                                                     ,['pedestals']
+                                                                     ,['pedestals']
+                                                                      ]) )
+     
+        self.srcs_cspad = [ 
+            'CxiDs1.0:Cspad.0'
+           ,'CxiDsd.0:Cspad.0'
+           ,'MecTargetChamber.0:Cspad.0'
+           ,'XcsEndstation.0:Cspad.0'
+           ,'XppGon.0:Cspad.0'
+            ]
+        
+        self.srcs_cspad2x2 = [ 
+            'CxiSc1.0:Cspad2x2.0'
+           ,'CxiSc2.0:Cspad2x2.0'
+           ,'CxiSc2.0:Cspad2x2.1'
+           ,'CxiSc2.0:Cspad2x2.2'
+           ,'CxiSc2.0:Cspad2x2.3'
+           ,'CxiSc2.0:Cspad2x2.4'
+           ,'CxiSc2.0:Cspad2x2.5'
+           ,'CxiSc2.0:Cspad2x2.6'
+           ,'CxiSc2.0:Cspad2x2.7'
+           ,'MecEndstation.0:Cspad2x2.6'
+           ,'MecTargetChamber.0:Cspad2x2.0'
+           ,'MecTargetChamber.0:Cspad2x2.1'
+           ,'MecTargetChamber.0:Cspad2x2.2'
+           ,'MecTargetChamber.0:Cspad2x2.3'
+           ,'MecTargetChamber.0:Cspad2x2.4'
+           ,'MecTargetChamber.0:Cspad2x2.5'
+           ,'XcsEndstation.0:Cspad2x2.0'
+           ,'XcsEndstation.0:Cspad2x2.1'
+           ,'XppGon.0:Cspad2x2.0'
+           ,'XppGon.0:Cspad2x2.1'
+           ,'XppGon.0:Cspad2x2.2'
+           ,'XppGon.0:Cspad2x2.3'
+            ]
+        
+        self.srcs_princeton = [ 
+            'CxiEndstation.0:Princeton.0'
+           ,'MecTargetChamber.0:Princeton.0'
+           ,'MecTargetChamber.0:Princeton.1'
+           ,'MecTargetChamber.0:Princeton.2'
+           ,'MecTargetChamber.0:Princeton.3'
+           ,'MecTargetChamber.0:Princeton.4'
+           ,'MecTargetChamber.0:Princeton.5'
+           ,'SxrEndstation.0:Princeton.0'
+           ,'XcsBeamline.0:Princeton.0'
+            ]
+
+        self.srcs_pnccd = [ 
+            'Camp.0:pnCCD.0'
+           ,'Camp.0:pnCCD.1'
+           ,'SxrEndstation.0:pnCCD.0'
+           ,'XcsEndstation.0:pnCCD.0'
+            ]
+
+        self.srcs_tm6740 = [ 
+            'CxiDg1.0:Tm6740.0'
+           ,'CxiDg2.0:Tm6740.0'
+           ,'CxiDg4.0:Tm6740.0'
+           ,'CxiDsd.0:Tm6740.0'
+           ,'CxiDsu.0:Tm6740.0'
+           ,'CxiKb1.0:Tm6740.0'
+           ,'CxiSc1.0:Tm6740.0'
+           ,'CxiSc2.0:Tm6740.0'
+           ,'CxiSc2.0:Tm6740.1'
+           ,'XcsBeamline.1:Tm6740.4'
+           ,'XcsBeamline.1:Tm6740.5'
+           ,'XppEndstation.1:Tm6740.1'
+           ,'XppMonPim.1:Tm6740.1'
+           ,'XppSb3Pim.1:Tm6740.1'
+           ,'XppSb4Pim.1:Tm6740.1'
+            ]
+
+        self.srcs_opal1000 = [ 
+            'AmoBPS.0:Opal1000.0'
+           ,'AmoBPS.0:Opal1000.1'
+           ,'AmoEndstation.0:Opal1000.0'
+           ,'AmoEndstation.1:Opal1000.0'
+           ,'AmoEndstation.2:Opal1000.0'
+           ,'AmoVMI.0:Opal1000.0'
+           ,'CxiDg3.0:Opal1000.0'
+           ,'CxiEndstation.0:Opal1000.1'
+           ,'CxiEndstation.0:Opal1000.2'
+           ,'MecTargetChamber.0:Opal1000.1'
+           ,'SxrBeamline.0:Opal1000.0'
+           ,'SxrBeamline.0:Opal1000.1'
+           ,'SxrBeamline.0:Opal1000.100'
+           ,'SxrEndstation.0:Opal1000.0'
+           ,'SxrEndstation.0:Opal1000.1'
+           ,'SxrEndstation.0:Opal1000.2'
+           ,'SxrEndstation.0:Opal1000.3'
+           ,'XcsEndstation.0:Opal1000.0'
+           ,'XcsEndstation.0:Opal1000.1'
+           ,'XcsEndstation.1:Opal1000.1'
+           ,'XcsEndstation.1:Opal1000.2'
+           ,'XppEndstation.0:Opal1000.0'
+           ,'XppEndstation.0:Opal1000.1'
+           ,'XppEndstation.0:Opal1000.2'
+            ]
+
+        self.srcs_opal2000 = [ 
+            'CxiEndstation.0:Opal2000.1'
+           ,'CxiEndstation.0:Opal2000.2'
+           ,'CxiEndstation.0:Opal2000.3'
+           ,'MecTargetChamber.0:Opal2000.0'
+           ,'MecTargetChamber.0:Opal2000.1'
+           ,'MecTargetChamber.0:Opal2000.2'
+            ]
+
+        self.srcs_opal4000 = [ 
+            'CxiEndstation.0:Opal4000.1'
+           ,'CxiEndstation.0:Opal4000.3'
+           ,'MecTargetChamber.0:Opal4000.0'
+           ,'MecTargetChamber.0:Opal4000.1'
+            ]
+
+        self.srcs_opal8000 = [ 
+            'MecTargetChamber.0:Opal8000.0'
+           ,'MecTargetChamber.0:Opal8000.1'
+            ]
+
+        self.srcs_acqiris = [ 
+            'AmoETOF.0:Acqiris.0'
+           ,'AmoITOF.0:Acqiris.0'
+           ,'Camp.0:Acqiris.0'
+           ,'CxiEndstation.0:Acqiris.0'
+           ,'CxiSc1.0:Acqiris.0'
+           ,'MecTargetChamber.0:Acqiris.0'
+           ,'SxrEndstation.0:Acqiris.0'
+           ,'SxrEndstation.0:Acqiris.1'
+           ,'SxrEndstation.0:Acqiris.2'
+           ,'SxrEndstation.0:Acqiris.3'
+           ,'SxrEndstation.0:Acqiris.4'
+           ,'XcsBeamline.0:Acqiris.0'
+           ,'XppLas.0:Acqiris.0'
+            ]
+
+        #Dictionary for 'CSPAD', 'CSPAD2x2', 'Princeton', 'pnCCD', 'Tm6740', 'Opal1000', 'Opal2000', 'Opal4000', 'Opal8000', 'Acqiris', etc.
+        self.dict_of_det_sources = dict( zip(self.list_of_dets, [ self.srcs_cspad 
+                                                                 ,self.srcs_cspad2x2
+                                                                 ,self.srcs_princeton
+                                                                 ,self.srcs_pnccd
+                                                                 ,self.srcs_tm6740
+                                                                 ,self.srcs_opal1000
+                                                                 ,self.srcs_opal2000
+                                                                 ,self.srcs_opal4000
+                                                                 ,self.srcs_opal8000
+                                                                 ,self.srcs_acqiris
+                                                                  ]) )
+ 
+#-----------------------------
+
+        self.list_of_det_pars = zip(self.list_of_dets, self.list_of_data_types, self.det_cbx_states_list)
 
 #-----------------------------
 

@@ -32,6 +32,12 @@ from RegDB import experiment_info
 
 #------------------------------
 
+def unique_detector_names() :
+    """Returns complete list of available detectors at LCLS"""
+    return experiment_info.unique_detector_names()
+
+#------------------------------
+
 def detectors (ins, exp, run, style='psana') :
     """Returns the list of detectors, for example: ['BldEb-0|NoDevice-0', 'CxiDg1-0|Tm6740-0', 'CxiDg2-0|Tm6740-0', 'CxiDs1-0|Cspad-0', ...].
     """
@@ -44,13 +50,6 @@ def detectors (ins, exp, run, style='psana') :
 def list_of_sources_in_run (ins, exp, run) :
     """Returns the list of detectors in style of psana, for example 'CxiDs1.0:Cspad.0'
     """
-    #list_of_detectors = experiment_info.detectors (ins, exp, run)
-    #list_of_dets_for_psana = []
-    #for det in list_of_detectors :
-    #    det_in_psana = det.replace("|",":").replace("-",".")
-    #    list_of_dets_for_psana.append(det_in_psana)
-    #return list_of_dets_for_psana
-
     return [det.replace("|",":").replace("-",".") for det in experiment_info.detectors (ins, exp, run)]
 
 #------------------------------
@@ -70,18 +69,19 @@ def list_of_sources_in_run_for_selected_detector (ins, exp, run, det_selected) :
     """Returns the list of detectors in run for selected detector. For example, for CSPAD returns ['CxiDs1.0:Cspad.0', 'CxiDsd.0:Cspad.0']
     """
     pattern = det_selected.lower() + '.'
-
-    #lst = []
-    #for src_name in list_of_sources_in_run(ins, exp, run) :
-    #    if src_name.lower().find(pattern) != -1 :
-    #        lst.append(src_name)
-    #return lst
-
     return [src for src in list_of_sources_in_run(ins, exp, run) if src.lower().find(pattern) != -1]
 
 #------------------------------
 
+def list_of_sources_for_det (det_name='CSPAD') :
+    """Returns the list of sources for specified detector in style of psana, for example 'CxiDs1.0:Cspad.0'
+    """
+    pattern = det_name.lower() + '-'
+    lst = [src.replace("|",":").replace("-",".") for src in experiment_info.unique_detector_names() if src.lower().find(pattern) != -1 and src.find('NoDet') == -1]
+    #for i, det in enumerate(lst) : print '%4d : %s' %(i, det)
+    return lst
 
+#------------------------------
 
 
 
@@ -221,6 +221,16 @@ def list_of_calibs_for_run (ins, exp, runnum) :
     return dict_of_recs_for_run(ins, exp, runnum)['calibrations']
 
 #------------------------------
+
+def print_unique_detector_names () :
+    for i, detname in enumerate(unique_detector_names()):
+        print '%4d : %s' %(i, detname)
+
+def print_list_of_sources_for_det (det_name='CSPAD') :
+    for i, detname in enumerate( list_of_sources_for_det (det_name)) :
+        print '%4d : %s' %(i, detname)
+ 
+#------------------------------
 #------------------------------
 #------------------------------
 #------------------------------
@@ -266,8 +276,21 @@ if __name__ == "__main__" :
     print "\n\nTest : list_of_calibs_for_run('CXI','cxic0213', 162)"
     print list_of_calibs_for_run('CXI','cxic0213',162)
 
+    print "\n\nTest : unique_detector_names()"
+    print_unique_detector_names()
 
-
+    #det_name = 'cspad'
+    #det_name = 'cspad2x2'
+    #det_name = 'princeton'
+    #det_name = 'pnccd'
+    #det_name = 'tm6740'
+    #det_name = 'opal1000'
+    #det_name = 'opal2000'
+    #det_name = 'opal4000'
+    det_name = 'opal8000'
+    #det_name = 'Acqiris'
+    print "\n\nTest : list_of_sources_for_det ('%s')" % det_name
+    print_list_of_sources_for_det (det_name)
     sys.exit ( "End of test" )
 
 #------------------------------

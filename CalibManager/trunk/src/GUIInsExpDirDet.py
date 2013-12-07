@@ -52,6 +52,7 @@ class GUIInsExpDirDet ( QtGui.QWidget ) :
         self.exp_name       = cp.exp_name
         self.det_name       = cp.det_name
         self.calib_dir      = cp.calib_dir
+        self.det_but_title  = cp.det_but_title
 
         self.setGeometry(100, 50, 700, 30)
         self.setWindowTitle('Select calibration directory')
@@ -63,9 +64,9 @@ class GUIInsExpDirDet ( QtGui.QWidget ) :
         self.titExp  = QtGui.QLabel('Exp:')
         self.titDet  = QtGui.QLabel('Det:')
 
-        self.butIns  = QtGui.QPushButton( self.instr_name.value() + self.char_expand )
-        self.butExp  = QtGui.QPushButton( self.exp_name.value()   + self.char_expand )
-        self.butDet  = QtGui.QPushButton( 'Select' + self.char_expand )
+        self.butIns  = QtGui.QPushButton( self.instr_name.value()    + self.char_expand )
+        self.butExp  = QtGui.QPushButton( self.exp_name.value()      + self.char_expand )
+        self.butDet  = QtGui.QPushButton( self.det_but_title.value() + self.char_expand )
         self.butBro  = QtGui.QPushButton( 'Browse' )
 
         self.ediDir = QtGui.QLineEdit  ( self.calib_dir.value() )
@@ -96,7 +97,7 @@ class GUIInsExpDirDet ( QtGui.QWidget ) :
         self.setStyle()
 
         #self.setStatusMessage()
-        if cp.guistatus is not None : cp.guistatus.updateStatusInfo()
+        #if cp.guistatus is not None : cp.guistatus.updateStatusInfo()
 
         cp.guiinsexpdirdet = self
 
@@ -154,6 +155,8 @@ class GUIInsExpDirDet ( QtGui.QWidget ) :
             self.butExp.setEnabled(False)            
             self.butBro.setEnabled(False)            
             self.butDet.setEnabled(False)
+            if cp.guistatus is not None :
+                cp.guistatus.setStatusMessage('Select Instrument...')
             return
 
         self.butIns.setStyleSheet(cp.styleDefault)
@@ -165,6 +168,8 @@ class GUIInsExpDirDet ( QtGui.QWidget ) :
             self.butExp.setEnabled(True)            
             self.butBro.setEnabled(False)            
             self.butDet.setEnabled(False)            
+            if cp.guistatus is not None :
+                cp.guistatus.setStatusMessage('Select Experiment...')
             return
 
         self.butExp.setStyleSheet(cp.styleDefault)
@@ -172,8 +177,12 @@ class GUIInsExpDirDet ( QtGui.QWidget ) :
         self.butDet.setStyleSheet(cp.styleDefault)
         self.butDet.setEnabled(True)            
 
-        if self.det_name.value() == 'Select' :
+        #if self.det_name.value() == '' :
+        if self.det_but_title.value() == 'Select' :
             self.butDet.setStyleSheet(cp.styleButtonGood)
+            if cp.guistatus is not None :
+                cp.guistatus.setStatusMessage('Select Detector(s)...')
+            return
 
         #self.but.setVisible(False)
         #self.but.setEnabled(True)
@@ -233,8 +242,7 @@ class GUIInsExpDirDet ( QtGui.QWidget ) :
         self.setStyleButtons()
 
         path_to_xtc_dir = fnm.path_to_xtc_dir()
-        if os.path.lexists(path_to_xtc_dir) : return
-        
+        if os.path.lexists(path_to_xtc_dir) : return        
         msg = 'XTC data are not seen on this computer for path: %s' % path_to_xtc_dir
         logger.warning(msg, __name__)
         print msg
@@ -283,12 +291,14 @@ class GUIInsExpDirDet ( QtGui.QWidget ) :
 
         self.det_name.setValue(str_of_detectors.rstrip(' '))
 
+        if self.det_name.value() == '' :
+            self.butDet.setStyleSheet(cp.styleButtonBad)
+            logger.warning('At least one detector needs to be selected !!!', __name__)
+            self.setDet('Select')
+            return
+
         self.setDet()
-        #self.setStyleButtons()
-
-
-    def onEdiDir(self):
-        pass
+        self.setStyleButtons()
 
 
     def setIns(self, txt='Select'):
@@ -310,13 +320,13 @@ class GUIInsExpDirDet ( QtGui.QWidget ) :
         logger.info('Set calibration directory: ' + str(txt), __name__)
 
 
-    def setDet(self, txt='Select'):
-        
-        #self.butDet.setText( 'Select' + self.char_expand )
-        #self.det_name.setValue(txt)
-        #self.butDet.setText( txt + self.char_expand)
-
-        #if txt == 'Select' : self.list_of_exp = None        
+    def setDet(self, txt=None):        
+        but_title = 'Select'
+        if txt is None :
+            but_title = 'Selected:%d' % len(cp.list_of_dets_selected())
+            
+        self.butDet.setText( but_title + self.char_expand )
+        self.det_but_title.setValue(but_title)
         logger.info('Selected detector(s): ' + self.det_name.value(), __name__)
 
         if cp.guistatus is not None :
@@ -324,6 +334,9 @@ class GUIInsExpDirDet ( QtGui.QWidget ) :
 
         if cp.guidarklist is not None :
             cp.guidarklist.updateList()
+
+        if cp.guifilemanagerselect is not None :
+            cp.guifilemanagerselect.resetFields()
 
             #if txt=='Select' : cp.guidarklist.setFieldsEnabled(False)
             #else             : cp.guidarklist.setFieldsEnabled(True)

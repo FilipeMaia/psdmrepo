@@ -340,8 +340,11 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
             if len(list_of_fnames) > 1 :
                 fname = gu.selectFromListInPopupMenu(list_of_fnames)
 
+            if fname is None or fname == '' : return
+
             msg = 'Selected file to plot: %s' % fname
             logger.info(msg, __name__)
+            print msg
 
             #self.img_arr = self.get_image_array_from_file(fname)
             #if self.img_arr == None :
@@ -349,6 +352,7 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
 
             #print arr.shape,'\n', arr.shape
             tit = 'Plot for %s' % os.path.basename(fname)
+            
             cp.plotimgspe = PlotImgSpe(None, ifname=fname, ofname=fnm.path_peds_aver_plot(), title=tit, load_is_visible=True)
             #cp.plotimgspe = PlotImgSpe(None, self.img_arr, ofname=fnm.path_peds_aver_plot(), title=tit)
             #cp.plotimgspe = PlotImgSpe(None, self.img_arr, ifname=fnm.path_peds_ave(), ofname=fnm.path_peds_aver_plot())

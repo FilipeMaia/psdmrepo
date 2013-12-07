@@ -11,6 +11,11 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-06
+2013-12-77 Mikhail S. Dubrovin
+- improve logistics of buttons in GUIInsExpDirDet, GUIStatus.py, GUIDarkListItemRun.py
+- add src/GUIFileManager.py, src/GUIFileManagerSelect.py
+	
 Tag: V00-00-05
 2013-11-27 Mikhail S. Dubrovin
 - refactoring DarkList... classes for correct widget resizing.

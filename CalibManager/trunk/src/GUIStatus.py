@@ -49,9 +49,10 @@ class GUIStatus ( QtGui.QGroupBox ) :
         self.setFrame()
 
         #self.instr_dir      = cp.instr_dir
-        #self.instr_name     = cp.instr_name
-        #self.exp_name       = cp.exp_name
+        self.instr_name     = cp.instr_name
+        self.exp_name       = cp.exp_name
         self.det_name       = cp.det_name
+        self.det_but_title  = cp.det_but_title
         self.calib_dir      = cp.calib_dir
         self.current_tab    = cp.current_tab
 
@@ -148,15 +149,23 @@ class GUIStatus ( QtGui.QGroupBox ) :
 
     def updateStatusInfo(self) :
 
-        msg = 'Selected detector(s): %s' % self.det_name.value()
+        msg = ''
 
-        if self.det_name.value() == '' : 
-            msg += '!!! Detector is not selected !!!'
+        if self.instr_name.value() == 'Select' : 
+            msg += 'Select instrument now!'
+
+        elif self.exp_name.value() == 'Select' : 
+            msg += 'Select experiment now!'
+
+        elif self.det_but_title.value() == 'Select' : 
+            msg += 'Select detector(s) now!'
 
             #try : cp.guiinsexpdirdet.butDet.setStyleSheet(cp.styleButtonBad)
             #except : pass
 
         else :
+            msg += 'Selected list of detector(s): %s' % self.det_name.value()
+
             ctype='pedestals'
             if self.current_tab.value() == 'Dark' : ctype='pedestals'
             #if self.current_tab.value() == cp.guitabs.list_of_tabs[0] : ctype='pedestals'

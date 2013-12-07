@@ -81,6 +81,7 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
         #self.but_stop.setVisible(False)
 
         self.edi_from.setValidator(QtGui.QIntValidator(0,9999,self))
+        self.edi_to  .setValidator(QtGui.QRegExpValidator(QtCore.QRegExp("[0-9]\\d{0,3}|end$"),self))
 
         self.hbox = QtGui.QHBoxLayout()
         self.hbox.addWidget(self.lab_run)
@@ -108,7 +109,7 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
         self.showToolTips()
 
         self.setStatusMessage()
-        self.setFieldsEnabled(cp.det_name.value() != 'None')
+        self.setFieldsEnabled(cp.det_name.value() != '')
 
         #cp.guidarkrunitem = self
 
@@ -201,8 +202,8 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
         if self.edi_to.isReadOnly()   : self.edi_to.setStyleSheet (cp.styleEditInfo)
         else                          : self.edi_to.setStyleSheet (cp.styleEdit)
 
-        self.but_depl.setVisible(files_are_available)
-        self.but_go  .setVisible(self.but_go.isEnabled())
+        self.but_depl.setVisible(self.but_depl.isEnabled() and files_are_available )
+        self.but_go  .setVisible(self.but_go  .isEnabled())
 
         if files_are_available : self.but_go.setStyleSheet(cp.styleButton)
         else                   : self.but_go.setStyleSheet(cp.styleButtonGood)

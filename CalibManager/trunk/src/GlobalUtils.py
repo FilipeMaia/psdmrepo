@@ -865,8 +865,8 @@ def confirm_dialog_box(parent=None, text='Please confirm that you aware!', title
         #mesbox.setDefaultButton(QtGui.QMessageBox.Ok)
         #mesbox.setMinimumSize(400, 200)
         #style = "background-color: rgb(255, 200, 220); color: rgb(0, 0, 100);" # Pinkish
-        style = "background-color: rgb(255, 255, 220); color: rgb(0, 0, 0);" # Yellowish
-        mesbox.setStyleSheet (style)
+        #style = "background-color: rgb(255, 255, 220); color: rgb(0, 0, 0);" # Yellowish
+        #mesbox.setStyleSheet (style)
 
         clicked = mesbox.exec_() # DISPLAYS THE QMessageBox HERE
 
@@ -880,6 +880,27 @@ def confirm_dialog_box(parent=None, text='Please confirm that you aware!', title
 
         logger.info('You acknowkeged that saw the message:\n' + text, 'confirm_dialog_box')
         return
+
+#----------------------------------
+
+def confirm_or_cancel_dialog_box(parent=None, text='Please confirm or cancel', title='Confirm or cancel') :
+        """Pop-up MODAL box for confirmation"""
+
+        mesbox = QtGui.QMessageBox(parent, windowTitle=title,
+                                           text=text,
+                                           standardButtons=QtGui.QMessageBox.Ok | QtGui.QMessageBox.Cancel)
+               #standardButtons=QtGui.QMessageBox.Save | QtGui.QMessageBox.Discard | QtGui.QMessageBox.Cancel)
+        mesbox.setDefaultButton(QtGui.QMessageBox.Ok)
+        #mesbox.setMinimumSize(400, 200)
+        #style = "background-color: rgb(255, 200, 220); color: rgb(0, 0, 100);" # Pinkish
+        #style = "background-color: rgb(255, 255, 220); color: rgb(0, 0, 0);" # Yellowish
+        #mesbox.setStyleSheet (style)
+
+        clicked = mesbox.exec_() # DISPLAYS THE QMessageBox HERE
+
+        if   clicked == QtGui.QMessageBox.Ok     : return True
+        elif clicked == QtGui.QMessageBox.Cancel : return False
+        else                                     : return False
 
 #----------------------------------
 
