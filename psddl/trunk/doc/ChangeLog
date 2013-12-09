@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-12-11
+2013-12-09 David Schneider
+- hdf5 Translator backend, epics handling, added bounds checking for ctrl enum pv
+
 Tag: V00-12-10
 2013-12-04 David Schneider
 - hdf5 Translator backend, ndarray support
