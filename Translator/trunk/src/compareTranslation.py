@@ -219,17 +219,10 @@ def compareTranslation(tester,o2o, psana, diffs, cmpDsetValues=True, recurse=Tru
         tester.assertEqual(type(o2o), h5py._hl.dataset.Dataset)
         tester.assertEqual(type(psana), h5py._hl.dataset.Dataset)
         
-# currently we are not trying to get the same chunk size, shuffle and compression as o2o-translate
-# uncomment to compare these things:
-#
-#        print "chunk= %s,%s  shuffle= %s,%s  compr= %s,%s  comp_opts= %s,%s  %s" % \
-#            (o2o.chunks,psana.chunks, o2o.shuffle,psana.shuffle, o2o.compression, psana.compression,
-#             o2o.compression_opts, psana.compression_opts, o2o.name)
-#        if not o2o.name.startswith('/Configure:0000/Epics::EpicsPv/EpicsArch.0:NoDevice.0') and not \
-#           o2o.name.startswith('/Configure:0000/Run:0000/CalibCycle:0000/Epics::EpicsPv/EpicsArch.0'):
-#            tester.assertEqual(o2o.chunks, psana.chunks, "chunk differs in %s" % o2o.name)
-#            tester.assertEqual(o2o.shuffle, psana.shuffle, "shuffle differs in %s" % o2o.name)
-#            tester.assertEqual(o2o.compression,psana.compression, "compression differs in %s" % o2o.name)
+        if (o2o.chunks != psana.chunks) or (o2o.shuffle != psana.shuffle) or (o2o.compression != psana.compression):
+            diffs['dataset creation parameters differ: o2o=(%r,%r,%r) psana=(%r,%r,%r)' % \
+                  (o2o.chunks, o2o.shuffle, o2o.compression, psana.chunks, psana.shuffle, psana.compression)].add(o2o.name)
+
         if cmpDsetValues:
             if o2o.name.find('Epics::EpicsPv')>=0:
                 compareEpicsDataset(tester,o2o,psana,diffs)
@@ -387,7 +380,7 @@ def compareEpicsDataset(tester,o2o,psana,diffs):
                     o2oVal = o2o['stamp'][fld][o2oIdx]
                     psanaVal = psana['stamp'][fld][psanaIdx]
                     tester.assertEqual(o2oVal, psanaVal,msg=('epics %s in stamp not equal: %s o2oIdx=%d psanaIdx=%d' % \
-                                   (fld,o2o.name, o2oIdx, psanaIdx)))
+                                   (fld, o2o.name, o2oIdx, psanaIdx)))
                 continue
             elif nm.lower()=='strs':
                 print "not checking strs"
@@ -457,6 +450,15 @@ def compareNonEpicsDataset(tester,o2o,psana, diffs):
                     subRes[1].insert(0,nm)
                     return subRes
             else:
+                try:
+                    fldAlen = len(fldA)
+                    fldBlen = len(fldB)
+                    minLen = min(fldAlen, fldBlen)
+                    fldA = fldA[0:minLen]
+                    fldB = fldB[0:minLen]
+                except TypeError:
+                    # the data has no len, probably from a scalar set
+                    pass
                 equalCompare = fldA == fldB
                 if not isinstance(equalCompare,bool):
                     equalCompare = equalCompare.all()

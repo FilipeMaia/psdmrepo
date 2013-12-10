@@ -18,8 +18,8 @@ class HdfWriterStringFromEvent : public HdfWriterFromEvent {
                              boost::shared_ptr<Translator::ChunkPolicy> chunkPolicy) {
     boost::shared_ptr<std::string> ptr = getFromEventStore<std::string>(eventKey, dataTypeLoc, evt, env);
     DataSetCreationProperties dataSetCreationProperties(chunkPolicy, shuffle, deflate);
-    writer.setDatasetCreationProperties(dataSetCreationProperties);
-    writer.make_dataset(srcGroup.id());
+    m_writer.setDatasetCreationProperties(dataSetCreationProperties);
+    m_writer.make_dataset(srcGroup.id());
   }
 
   virtual void store(DataTypeLoc dataTypeLoc,
@@ -44,14 +44,18 @@ class HdfWriterStringFromEvent : public HdfWriterFromEvent {
                       PSEvt::Event & evt, 
                       PSEnv::Env & env) {
     boost::shared_ptr<std::string> ptr = getFromEventStore<std::string>(eventKey, dataTypeLoc, evt, env);
-    writer.append(srcGroup.id(), *ptr);
+    m_writer.append(srcGroup.id(), *ptr);
   }
 
   virtual void addBlank(hdf5pp::Group & group) {
     throw ErrSvc::Issue(ERR_LOC, "HdfWriterStringFromEvent::addBlank() not implemented");
   }
+
+  virtual void closeDatasets(hdf5pp::Group &group) { m_writer.closeDataset(group.id()); }
+  virtual void closeDatasetsForAllGroups() { m_writer.closeDatasetsForAllGroups(); }
+
  private:
-  HdfWriterString writer;
+  HdfWriterString m_writer;
 }; // class HdfWriterStringFromEvent
 
 } // namespace Translator

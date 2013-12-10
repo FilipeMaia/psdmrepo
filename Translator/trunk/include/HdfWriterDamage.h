@@ -30,7 +30,8 @@ class HdfWriterDamage {
   void store_at(long index, hdf5pp::Group & group, Pds::Damage damage, MaskVal mask) { store_at(index,group.id(),damage, mask); }
 
   void closeDatasets(hid_t groupId);
-  void closeDatasets(hdf5pp::Group &group) { close(group.id()); }
+  void closeDatasets(hdf5pp::Group &group) { closeDatasets(group.id()); }
+  void closeDatasetsForAllGroups() { m_writer.closeDatasetsForAllGroups(); }
 
   const DataSetCreationProperties & dataSetCreationProperties() 
   { return m_dataSetCreationProperties; }

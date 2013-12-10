@@ -42,7 +42,10 @@ class HdfWriterEpicsPv {
               boost::shared_ptr<PSEvt::EventId> eventId) {
     dispatch(groupId, dbrType, epicsStore,pvName, eventId, Append);
   }
-  void closeDataset(hid_t groupId) { m_hdfWriterGeneric->closeDatasets(groupId); }
+
+  void closeDataset(hid_t groupId);
+
+  void closeDatasetsForAllGroups(); 
   
   const DataSetCreationProperties & dataSetCreationProperties() 
   { return m_dataSetCreationProperties; }

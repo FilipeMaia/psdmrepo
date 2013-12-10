@@ -25,15 +25,17 @@ class HdfWriterGeneric {
    * 
    * Manages a hdf5 datasets that looks like a 1D array of whatever data types the client code provides.
    * The client code provides the following:
-   *    hdf5 group Id's for where the datasets are to be written
-   *    One or more sets of the following, for each dataset to be managed in a given group id:
-   *      a hdf5 type Id for the type in the dataset  
+   *    hdf5 group Id for where the datasets are to be written
+   *    For each dataset that is a child of the group:
+   *      hdf5 type Id for the type in the dataset  
    *      name of the dataset
-   *      a DatasetCreationProperties object (which includes a boost smart pointer to a ChunkPolicy instance
+   *      a DatasetCreationProperties object (which includes a boost smart pointer to a ChunkPolicy instance)
    *
    * The client code owns the groupId's and typeId's.  HdfWriterGeneric will not call H5close on these
-   * resources.  It will remember the groupId and typeId's, so behavior is unpredictable if the 
-   * resources are closed before HdfWriterGeneric is finished using them.
+   * resources.  The typeId should remain valid during the lifetime of the HdfWriterGeneric instance.
+   * 
+   * closeDatasets() should be called when the group is to be closed.  
+   * The open datasets are closed, and the groupId is erased from the HdfWriterGeneric cache.
    *
    * The client code references a dataset via the original groupId used to create it, and the
    * dataset name, or a dataset index.  HdfWriterGeneric will make any number of distinct datasets
@@ -85,7 +87,7 @@ class HdfWriterGeneric {
    *  @author David Schneider
    */
 
-  HdfWriterGeneric();
+  HdfWriterGeneric(const std::string &debugName);
   ~HdfWriterGeneric();
 
   size_t createUnlimitedSizeDataset(hid_t groupId,
@@ -104,18 +106,20 @@ class HdfWriterGeneric {
   void store_at(hid_t groupId, long storeIndex, const std::string & dsetName, const void * data);
 
   void closeDatasets(hid_t groupId);
-
+  void closeDatasetsForAllGroups();
   hid_t getDatasetId(hid_t groupId, size_t dsetIndex);
   hid_t getDatasetId(hid_t groupId, const std::string &dsetName);
 
  private:
-  size_t getDatasetIndex(hid_t groupId, std::string dsetName);
+  size_t createNewDatasetSlotForGroup(hid_t groupId, const std::string & dsetName);
   static const int m_rankOne = 1;
 
   // maps group Id's to a list of datasets created for that group.
   std::map<hid_t, std::vector<DataSetMeta> > m_datasetMap;
   hid_t m_singleTransferDataSpaceIdMemory;
   hid_t m_unlimitedDataSpaceIdForFile;
+
+  std::string m_debugName;
 
  public:
   class PropertyListException : public ErrSvc::Issue {

@@ -33,7 +33,7 @@ void Translator::hdf5util::addAttribute_uint64(hid_t hid, const char * name, uin
 }
                  
 
-// this function is copied from hdf5pp::Group::name()
+// this function is based on hdf5pp::Group::name()
 std::string Translator::hdf5util::objectName(hid_t obj)
 {
   const int maxsize = 255;
@@ -43,7 +43,7 @@ std::string Translator::hdf5util::objectName(hid_t obj)
   ssize_t size = H5Iget_name(obj, buf, maxsize+1);
   if (size < 0) {
     ostringstream msg;
-    msg << "groupName, obj=" << obj << " H5I_get_name failed";
+    msg << "objectName: H5Iget_name call failed for hid_t=" << obj;
     throw ErrSvc::Issue( ERR_LOC, msg.str());
   }
   if (size == 0) {

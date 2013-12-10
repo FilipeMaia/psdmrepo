@@ -15,7 +15,7 @@ namespace {
   const char * logger = "HdfWriterString";
 };
 
-HdfWriterString::HdfWriterString() {
+HdfWriterString::HdfWriterString() : m_writer("string") {
   herr_t err = m_h5typeId = H5Tcopy(H5T_C_S1);
   err = std::min(err,H5Tset_size(m_h5typeId, H5T_VARIABLE));
   if (err<0) throw HdfWriterGeneric::DataSetException(ERR_LOC,

@@ -65,6 +65,12 @@ class HdfWriterFromEvent {
 
   virtual void addBlank(hdf5pp::Group & group) = 0;
 
+  // psddl_hdf2psana based writers should not implement close dataset operations,
+  // datasets are closed by the hdf5pp::Group object.  However HdfWriterGeneric based 
+  // writers need to implement these functions.
+  virtual void closeDatasets(hdf5pp::Group &group) {}
+  virtual void closeDatasetsForAllGroups() {}
+
   virtual ~HdfWriterFromEvent() {};
 };
 

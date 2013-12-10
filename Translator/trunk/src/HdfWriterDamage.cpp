@@ -29,7 +29,7 @@ namespace {
   const char * logger = "HdfWriterDamage";
 };
 
-HdfWriterDamage::HdfWriterDamage()
+HdfWriterDamage::HdfWriterDamage() : m_writer("damage")
 {
   m_damagePos = 0xFFFF;
   m_maskPos = 0xFFFF;

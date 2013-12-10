@@ -19,7 +19,7 @@ namespace {
   const char * logger = "HdfWriterEventId";
 };
 
-HdfWriterEventId::HdfWriterEventId() {
+HdfWriterEventId::HdfWriterEventId() : m_writer("eventId") {
   m_dsetPos = 0xFFFF;
   m_h5typeId = H5Tcreate(H5T_COMPOUND, sizeof(EventIdStruct));
   herr_t status = std::min(0,H5Tinsert(m_h5typeId, "seconds", offsetof(EventIdStruct,seconds), H5T_NATIVE_UINT32));

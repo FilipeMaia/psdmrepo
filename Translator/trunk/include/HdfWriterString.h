@@ -33,6 +33,7 @@ class HdfWriterString {
 
   void closeDataset(hdf5pp::Group &group) { closeDataset(group.id()); }
   void closeDataset(hid_t groupId);
+  void closeDatasetsForAllGroups() { m_writer.closeDatasetsForAllGroups(); }
 
  private:
   DataSetCreationProperties m_dataSetCreationProperties;

@@ -143,6 +143,9 @@ void SrcKeyGroup::close()  {
       m_datasetsCreated == ArrayForOnlyTimeDamage) {
     m_hdfWriterEventId->closeDataset(m_group);
     m_hdfWriterDamage->closeDatasets(m_group);
+  } 
+  if (m_datasetsCreated == ArrayForTypeTimeDamage) {
+    m_hdfWriter->closeDatasets(m_group);
   }
   m_group.close(); 
 };

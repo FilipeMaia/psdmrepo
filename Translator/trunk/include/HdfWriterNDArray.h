@@ -72,6 +72,7 @@ enum ndns::Order get_C_orFortran_StrideOnly(const ndarray<ElemType, NDim> &array
 template <class ElemType, unsigned NDim>
 class HdfWriterNDArray : public HdfWriterFromEvent {
  public:
+ HdfWriterNDArray() : m_writer("ndarray") {}
   void make_datasets(DataTypeLoc dataTypeLoc, hdf5pp::Group & srcGroup, 
                      const PSEvt::EventKey & eventKey, 
                      PSEvt::Event & evt, PSEnv::Env & env,
@@ -147,6 +148,9 @@ class HdfWriterNDArray : public HdfWriterFromEvent {
                 PSEnv::Env & env) { throw NotImplementedException(ERR_LOC, "store_at()"); }
 
   void addBlank(hdf5pp::Group & group) { throw NotImplementedException(ERR_LOC, "addBlank()"); }
+
+  void closeDatasets(hdf5pp::Group & group) { m_writer.closeDatasets(group.id()); }
+  void closeDatasetsForAllGroups() { m_writer.closeDatasetsForAllGroups(); }
 
   class NotImplementedException : public ErrSvc::Issue {
   public:

@@ -271,7 +271,6 @@ void EpicsH5GroupDirectory::processBeginJob(hid_t currentConfigGroup,
   // the same name, but different id's.  Presumably they all hold the same
   // data and only one need be recorded.  The trace message allows the user
   // to investigate this further.
-  // TODO: should this be a warning?
   WithMsgLog(logger("processBeginJob"),trace,str) {
     pvIdReport(str,pvIds, pvNames.size());
   }

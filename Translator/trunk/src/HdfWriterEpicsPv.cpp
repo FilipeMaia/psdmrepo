@@ -37,7 +37,7 @@ HdfWriterEpicsPv::HdfWriterEpicsPv(const DataSetCreationProperties & dataSetCrea
     m_enumStrsArrayTypes(Psana::Epics::MAX_ENUM_STATES+1),
     m_numberStringsToH5TypeForCtrlEnum(Psana::Epics::MAX_ENUM_STATES+1)
 {
-  m_hdfWriterGeneric = boost::make_shared<HdfWriterGeneric>();
+  m_hdfWriterGeneric = boost::make_shared<HdfWriterGeneric>("epics");
   for (unsigned idx=0; idx < m_enumStrsArrayTypes.size(); ++idx) {
     m_enumStrsArrayTypes.at(idx) = -1;
     m_numberStringsToH5TypeForCtrlEnum.at(idx) = -1;
@@ -64,6 +64,16 @@ void HdfWriterEpicsPv::makeSharedTypes() {
 
   m_stampType = createH5TypeId_epicsTimeStamp();
   if (m_stampType<0) MsgLog(logger(),fatal, "failed to create enum time stamp hdf5 type id");
+}
+
+void HdfWriterEpicsPv::closeDataset(hid_t groupId) { 
+  m_hdfWriterGeneric->closeDatasets(groupId); 
+  m_hdfWriterEventId->closeDataset(groupId); 
+}
+
+void HdfWriterEpicsPv::closeDatasetsForAllGroups() { 
+  m_hdfWriterGeneric->closeDatasetsForAllGroups();
+  m_hdfWriterEventId->closeDatasetsForAllGroups(); 
 }
 
 void HdfWriterEpicsPv::closeSharedTypes() {

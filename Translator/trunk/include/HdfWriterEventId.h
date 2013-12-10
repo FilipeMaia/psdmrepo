@@ -31,6 +31,7 @@ class HdfWriterEventId {
 
   void closeDataset(hdf5pp::Group &group);
   void closeDataset(hid_t groupId);
+  void closeDatasetsForAllGroups() { m_writer.closeDatasetsForAllGroups(); }
  private:
   DataSetCreationProperties m_dataSetCreationProperties;
   hid_t m_h5typeId;
