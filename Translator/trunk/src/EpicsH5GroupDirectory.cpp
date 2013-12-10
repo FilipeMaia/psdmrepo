@@ -37,7 +37,7 @@ namespace {
     return alias;
   }
 
-  void createEpicsTypeAndSrcGroups(const hid_t parentGroup, const string msgLogType, 
+  void createEpicsTypeAndSrcGroups(const hid_t parentGroup, const string & msgLogType, 
                                    hid_t & typeGroup, hid_t & srcGroup) {
 
     static const char * EPICS_TYPE_NAME = "Epics::EpicsPv";
@@ -58,6 +58,19 @@ namespace {
     MsgLog(logger(),debug,"Added attribute _xtcSrc="<< EPICS_SRC_VAL << " to group " << srcGroup);
   }
   
+  void createEpicsPvGroup(hid_t parentGroup, const string & pvName, 
+                          const string & msgLogType, map<string, hid_t> &epicsPvGroups) {
+    hid_t epicsPvGroup = H5Gcreate(parentGroup,pvName.c_str(),
+                                   H5P_DEFAULT,H5P_DEFAULT,H5P_DEFAULT);
+    if (epicsPvGroup<0) {
+      MsgLog(logger(),fatal,"failed to created " << msgLogType 
+             << " epics pv group for " << pvName);
+    }
+    epicsPvGroups[pvName] = epicsPvGroup;
+    MsgLog(logger(),debug,"created epics group for pvname=" << pvName << " id= " 
+           << epicsPvGroup << " as child of group= " << parentGroup << " in " << msgLogType);
+  }
+
   void createEpicsPvGroups(hid_t parentGroup, 
                            PSEnv::EpicsStore & epicsStore, const string msgLogType,
                            map<string, hid_t> &epicsPvGroups) {
@@ -71,20 +84,12 @@ namespace {
         MsgLog(logger(), warning, "**pvName " << pvName << " shows up more than once in epics store");
         continue;
       }
-      hid_t epicsPvGroup = H5Gcreate(parentGroup,pvName.c_str(),
-                                     H5P_DEFAULT,H5P_DEFAULT,H5P_DEFAULT);
-      if (epicsPvGroup<0) {
-        MsgLog(logger(),fatal,"failed to created " << msgLogType 
-               << " epics pv group for " << pvName);
-      }
-      epicsPvGroups[pvName] = epicsPvGroup;
-      MsgLog(logger(),debug,"created epics group for pvname=" << pvName << " id= " 
-             << epicsPvGroup << " as child of group= " << parentGroup << " in " << msgLogType);
+      createEpicsPvGroup(parentGroup,pvName,msgLogType,epicsPvGroups);
     }
   }
 
   void createAliasLinks(hid_t parentGroup, PSEnv::EpicsStore & epicsStore, 
-                        const string msgLogType) {
+                        map<string, vector<string> > & pv2aliases, const string msgLogType) {
 
     vector<string> validTargetsVector = epicsStore.pvNames();
     set<string> validTargets;
@@ -98,6 +103,7 @@ namespace {
         MsgLog(logger(),warning,"Epics alias has a leading or trailing blank: '" << aliases[idx] << "'");
       }
     }
+    pv2aliases.clear();
     sort(aliases.begin(), aliases.end());
     for (size_t idx = 0; idx < aliases.size(); ++idx) {
       string alias = aliases[idx];
@@ -133,6 +139,7 @@ namespace {
                << alias << "' target= '" << targetName 
                << "' relative to epics src " << msgLogType << " group hid=" << parentGroup);
       } else {
+        pv2aliases[targetName].push_back(alias);
         MsgLog(logger(),debug,"Created alias link: alias '" << alias << "' target '"<<targetName<<
                "' parentGroup= " << parentGroup);
       }
@@ -238,7 +245,7 @@ void EpicsH5GroupDirectory::processBeginJob(hid_t currentConfigGroup,
   }
   createEpicsPvGroups(m_configEpicsSrcGroup, epicsStore, "config", 
                       m_configEpicsPvGroups);
-  createAliasLinks(m_configEpicsSrcGroup, epicsStore, "config");
+  createAliasLinks(m_configEpicsSrcGroup, epicsStore, m_epicsPv2Aliases, "config");
 
   // create the datasets for the configure epics groups.  
   vector<string> pvNames = epicsStore.pvNames();
@@ -284,17 +291,15 @@ void EpicsH5GroupDirectory::processBeginCalibCycle(hid_t currentCalibCycleGroup,
   }
   if (thereAreEpics(epicsStore) and (m_epicsStatus == noEpics)) {
     MsgLog(logger("processBeginCalibCycle"), warning, 
-           "*unexpected DAQ problem*: no epics detected during beginJob, "
-           << "but epics detected during calib cycle. epics is *NOT* being converted");
+           "No epics detected during beginJob, but epics detected "
+           << "during calib cycle. aliases and epics ctrl pv's "
+           << " will not be written");
+    m_epicsStatus = hasEpics;
   }
   if (m_epicsStatus == noEpics) return;
 
   m_currentCalibCycleGroup = currentCalibCycleGroup;
-  createEpicsTypeAndSrcGroups(m_currentCalibCycleGroup, "calib",  
-                              m_calibCycleEpicsTypeGroup, m_calibCycleEpicsSrcGroup);
-  createEpicsPvGroups(m_calibCycleEpicsSrcGroup, epicsStore, "calib", 
-                      m_calibEpicsPvGroups);
-  createAliasLinks(m_calibCycleEpicsSrcGroup, epicsStore, "calib");
+  m_epicsTypeAndSrcGroupsCreatedForThisCalibCycle = false;
 }
 
 void EpicsH5GroupDirectory::processEvent(PSEnv::EpicsStore & epicsStore, 
@@ -306,7 +311,8 @@ void EpicsH5GroupDirectory::processEvent(PSEnv::EpicsStore & epicsStore,
     // we only expect time epics pv's
     boost::shared_ptr<Psana::Epics::EpicsPvTimeHeader> pvTime = epicsStore.getPV(pvName);
     if (not pvTime) {
-      MsgLog(logger(), debug, "processEvent - no time header for pv " << pvName);
+      MsgLog(logger(), warning, "epics writing only implement for Time pv's, but pv: " 
+             << pvName << " is not Time, pv will not be written.");
       continue;
     }
     ostringstream debugMsg;
@@ -335,11 +341,34 @@ void EpicsH5GroupDirectory::processEvent(PSEnv::EpicsStore & epicsStore,
       continue;
     }
     MsgLog(logger(), debug, debugMsg.str() << ", going to translate");
-    int16_t dbrType = pvTime->dbrType();
+    if (not m_epicsTypeAndSrcGroupsCreatedForThisCalibCycle) {
+      createEpicsTypeAndSrcGroups(m_currentCalibCycleGroup, "calib",  
+                                  m_calibCycleEpicsTypeGroup, m_calibCycleEpicsSrcGroup);
+      m_epicsTypeAndSrcGroupsCreatedForThisCalibCycle = true;
+    }
     map<string,hid_t>::iterator groupIdPos = m_calibEpicsPvGroups.find(pvName);
     if (groupIdPos == m_calibEpicsPvGroups.end()) {
-      MsgLog(logger(),fatal,"event loop, unexpected pvName: " << pvName << " not in group map");
+      createEpicsPvGroup(m_calibCycleEpicsSrcGroup, 
+                         pvName, "calib",  m_calibEpicsPvGroups);
+      createDataset = true;
+      std::map<std::string, std::vector<std::string> >::iterator pv2AliasPos;
+      pv2AliasPos = m_epicsPv2Aliases.find(pvName);
+      if (pv2AliasPos != m_epicsPv2Aliases.end()) {
+        vector<string> & aliasesForThisPv = pv2AliasPos->second;
+        for (unsigned idx = 0; idx < aliasesForThisPv.size(); ++idx) {
+          const string & alias = aliasesForThisPv.at(idx);
+          herr_t err = H5Lcreate_soft(pvName.c_str(), 
+                                      m_calibCycleEpicsSrcGroup,
+                                      alias.c_str(),
+                                      H5P_DEFAULT, H5P_DEFAULT);
+          if (err < 0) MsgLog(logger(), warning, "H5Lcreate_soft call failed for "
+                              << "alias= '" << alias << "' target= '"
+                              << pvName << " during a calib cycle");
+        }
+      }
+      groupIdPos = m_calibEpicsPvGroups.find(pvName);
     }
+    int16_t dbrType = pvTime->dbrType();
     hid_t groupId = groupIdPos->second;
     try {
       if (createDataset) {
@@ -357,8 +386,6 @@ void EpicsH5GroupDirectory::processEvent(PSEnv::EpicsStore & epicsStore,
 }
 
 void EpicsH5GroupDirectory::processEndCalibCycle() {
-  m_lastWriteMap.clear();  // this means we may copy the last epics pv from the 
-                           // previous calib cycle to the start of the new calib cycle.
   std::map<std::string, hid_t>::iterator iter;
   for (iter = m_calibEpicsPvGroups.begin(); iter != m_calibEpicsPvGroups.end(); ++iter) {
     hid_t &epicsPvGroup = iter->second;

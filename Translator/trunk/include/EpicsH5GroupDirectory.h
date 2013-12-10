@@ -3,6 +3,7 @@
 
 #include <string>
 #include <map>
+#include <vector>
 
 #include "hdf5/hdf5.h"
 #include "PSEnv/EpicsStore.h"
@@ -43,10 +44,17 @@ class EpicsH5GroupDirectory {
   hid_t m_calibCycleEpicsSrcGroup;
   // map epics pv name to group id
   std::map<std::string, hid_t> m_calibEpicsPvGroups;
-  // map epics pvid to timestamp of the last write into the pv's group
+
+  // For epics that occur outside of the configure 
+  // transition, we map epics pvid 2 timestamp of the last time
+  // the epics was written.
   std::map<std::string, Unroll::epicsTimeStamp> m_lastWriteMap;
+
   typedef enum {unknown, hasEpics, noEpics} EpicsStatus;
   EpicsStatus m_epicsStatus;
+
+  bool m_epicsTypeAndSrcGroupsCreatedForThisCalibCycle;
+  std::map<std::string, std::vector<std::string> > m_epicsPv2Aliases;
 };
 
 }

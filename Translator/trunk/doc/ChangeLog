@@ -11,6 +11,12 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-03
+2013-12-10 David Schneider
+- Changed epics handling. Previous version printed the current state of all
+  epics at the start of each calib cycle. This version only creates an epics
+  pv group/dataset in a calib cycle if it changed.
+
 Tag: V00-00-02
 2013-12-09 David Schneider
 - Bug fixes and more detailed debugging statements.

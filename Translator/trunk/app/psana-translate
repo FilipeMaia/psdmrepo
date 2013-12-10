@@ -6,9 +6,9 @@ import tempfile
 
 usage='''** Wrapper to the psana Translator.H5Output module
 Run as:
-   %s [optional psana arguments] --output_file=h5outfile [optional H5Output options] [--save_cfg=filename]
-The argument --output_file=h5outfile MUST be given.  
-Before that, one can give arguments that are passed to psana on the command line 
+   %s [psana arguments] --output_file=h5outfile [optional H5Output options] [--save_cfg=filename]
+The argument --output_file=h5outfile MUST be given, as well as some input to psana.
+The psana options line 
 (such as -v, -n, -m , etc) 
 After that, one can include options that are written into the Translator.H5Output module parameters.
 The format for these options are:
@@ -29,6 +29,9 @@ Otherwise there should be no spaces in the arguments, or a space separating opti
 
 The optional argument --save_cfg is to save the cfg file. i.e:
 --save=cfg=psana.cfg
+
+EXAMPLE: 
+psana-translate -n 5 /reg/d/psdm/mec/meca6013/xtc/e355-r0384-s00-c00.xtc --output_file=myout.h5 --Epics=exclude
 ''' % (os.path.basename(sys.argv[0]), )
 
 # this is initialized with the default values from default_psana.cfg
