@@ -1,0 +1,182 @@
+#!@PYTHON@
+
+import sys
+import os
+import tempfile
+
+usage='''** Wrapper to the psana Translator.H5Output module
+Run as:
+   %s [optional psana arguments] --output_file=h5outfile [optional H5Output options] [--save_cfg=filename]
+The argument --output_file=h5outfile MUST be given.  
+Before that, one can give arguments that are passed to psana on the command line 
+(such as -v, -n, -m , etc) 
+After that, one can include options that are written into the Translator.H5Output module parameters.
+The format for these options are:
+
+--store_epics=true --Andor=exclude
+
+That is you cannot do:
+
+--store_epics = true --Andor = exclude
+
+Every command line argument must start with -- and have a = sign in it.
+
+For the multiword options, use appropriate shell escape charaters, i.e.
+
+--src_filter="include all"
+
+Otherwise there should be no spaces in the arguments, or a space separating options from values.
+
+The optional argument --save_cfg is to save the cfg file. i.e:
+--save=cfg=psana.cfg
+''' % (os.path.basename(sys.argv[0]), )
+
+# this is initialized with the default values from default_psana.cfg
+defaultTranslatorOptions = (('store_epics','true'),
+                            ('AcqTdc','include'),
+                            ('AcqWaveform','include'),
+                            ('Alias','include'),
+                            ('Andor','include'),
+                            ('Control','include'),
+                            ('Cspad','include'),
+                            ('Cspad2x2','include'),
+                            ('DiodeFex','include'),
+                            ('EBeam','include'),
+                            ('Encoder','include'),
+                            ('Epics','include'),
+                            ('Evr','include'),
+                            ('EvrIO','include'),
+                            ('FEEGasDetEnergy','include'),
+                            ('Fccd','include'),
+                            ('Fli','include'),
+                            ('Frame','include'),
+                            ('FrameFccd','include'),
+                            ('FrameFex','include'),
+                            ('GMD','include'),
+                            ('Gsc16ai','include'),
+                            ('Imp','include'),
+                            ('Ipimb','include'),
+                            ('IpmFex','include'),
+                            ('L3T','include'),
+                            ('OceanOptics','include'),
+                            ('Opal1k','include'),
+                            ('Orca','include'),
+                            ('PhaseCavity','include'),
+                            ('PimImage','include'),
+                            ('Princeton','include'),
+                            ('PrincetonInfo','include'),
+                            ('Quartz','include'),
+                            ('Rayonix','include'),
+                            ('SharedAcqADC','include'),
+                            ('SharedIpimb','include'),
+                            ('SharedPim','include'),
+                            ('Spectrometer','include'),
+                            ('TM6740','include'),
+                            ('Timepix','include'),
+                            ('TwoDGaussian','include'),
+                            ('UsdUsb','include'),
+                            ('pnCCD','include'),
+                            ('ndarray_types','include'),
+                            ('std_string','include'),
+                            ('src_filter',"include all"),
+                            ('calibration_key','calibrated'),
+                            ('include_uncalibrated_data','false'),
+                            ('ndarray_key_filter','include all'),
+                            ('std_string_key_filter','include all'),
+                            ('shuffle','true'),
+                            ('deflate','1'),
+                            ('chunkSizeTargetInBytes','1703936'),
+                            ('chunkSizeTargetObjects','0'),
+                            ('maxChunkSizeInBytes','10649600'),
+                            ('minObjectsPerChunk','50'),              
+                            ('maxObjectsPerChunk','2048'),
+                            ('chunkCacheSizeTargetInChunks','3'),
+                            ('maxChunkCacheSizeInBytes','10649600'),
+                            ('damageShuffle','false'),
+                            ('stringShuffle','false'),
+                            ('epicsPvShuffle','false'),
+                            ('stringDeflate','-1'),
+                            ('eventIdChunkSizeTargetInBytes','16384'),
+                            ('epicsPvChunkSizeTargetInBytes','16384'),
+                            ('eventIdShuffle','true'),
+                            ('eventIdDeflate','1'),
+                            ('damageDeflate','1'),
+                            ('epicsPvDeflate','1'),
+                            ('ndarrayShuffle','true'),
+                            ('ndarrayDeflate','1'),
+                            ('eventIdChunkSizeTargetObjects','0'),
+                            ('damageChunkSizeTargetInBytes','1703936'),
+                            ('damageChunkSizeTargetObjects','0'),
+                            ('stringChunkSizeTargetInBytes','1703936'),
+                            ('stringChunkSizeTargetObjects','0'),
+                            ('ndarrayChunkSizeTargetInBytes','1703936'),
+                            ('ndarrayChunkSizeTargetObjects','0'),
+                            ('epicsPvChunkSizeTargetObjects','0'),
+                            ('max_saved_split_events','3000'),
+                            ('short_bld_name','false'),
+                            ('split','NoSplit'),
+                            ('splitSize','10737418240'))
+
+args = sys.argv[1:]
+if len(args)==0 or args[0] == '-h' or args[0]=='--help':
+  print usage
+  sys.exit(0)
+
+psanaArgs = []
+while len(args)>0:
+  if args[0].startswith('--output_file='):
+    break
+  psanaArgs.append(args.pop(0))
+
+# must provide output_file:
+if len(args)==0 or not args[0].startswith('--output_file='):
+  print "ERROR: no --output_file=argument given"
+  print usage 
+  sys.exit(1)
+
+h5output = args.pop(0).split('--output_file=')[1]
+translatorOptions = dict(defaultTranslatorOptions)
+save_cfg = None
+
+for arg in args:
+  if not arg.startswith('--'):
+    print "ERROR: argument %s does not start with --" % arg
+    print usage
+    sys.exit(1)
+  option = arg.split('--')[1].split('=')[0]
+  if arg.find('=')<3:
+    print "ERROR: argument %s does not have a = to separate option from value" % arg
+    print usage
+    sys.exit(1)
+  value = arg.split('=')[1]
+  if option in translatorOptions:
+    translatorOptions[option] = value
+  else:
+    if option == 'save_cfg':
+      save_cfg = value
+    else:
+      print "ERROR: argument %s contains unknown option (%s)" % (arg, option)
+      print usage
+      sys.exit(1)
+
+cfg = tempfile.NamedTemporaryFile(suffix='.cfg',prefix='psana-translate_')
+cfg.write("[psana]\n")
+cfg.write("modules = Translator.H5Output\n")
+cfg.write("[Translator.H5Output]\n")
+cfg.write("output_file = %s\n" % h5output)
+for option in [x[0] for x in defaultTranslatorOptions]:
+  cfg.write("%s = %s\n" % (option, translatorOptions[option]))
+cfg.file.flush()
+
+if save_cfg is not None:
+  if save_cfg == cfg.name:
+    print "Amazing!  You picked a randomly generated cfg name! Sorry, I can't save your file."
+  else:
+    os.system('cp %s %s' % (cfg.name, save_cfg))
+    print "copied cfg file to: %s" % save_cfg
+
+psana_cmd = 'psana -c %s %s' % (cfg.name, ' '.join(psanaArgs))
+print psana_cmd
+os.system(psana_cmd)
+
+
