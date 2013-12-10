@@ -509,17 +509,20 @@ O2OHdf5Writer::splitSharedObject(const void* fulldata, size_t fullsize, const Pd
 
   if (typeId.id() == Pds::TypeId::Id_SharedIpimb and typeId.version() == 0) {
 
+    const char* ddata = data;
+    size_t dsize = std::min(fullsize, sizeof(Pds::Ipimb::DataV1));
+
     // config object should be stored first as it may be needed by data object
+    data += dsize;
+    fullsize -= dsize;
     Pds::TypeId typeId = Pds::TypeId(Pds::TypeId::Id_IpimbConfig, 1);
     size_t size = std::min(fullsize, sizeof(Pds::Ipimb::ConfigV1));
     this->configObject(data, size, typeId, src, damage);
     this->dataObject(data, size, typeId, src, damage);
 
-    data += size;
-    fullsize -= size;
-    size = std::min(fullsize, sizeof(Pds::Ipimb::DataV1));
+    // now store data object
     typeId = Pds::TypeId(Pds::TypeId::Id_IpimbData, 1);
-    this->dataObject(data, size, typeId, src, damage);
+    this->dataObject(ddata, dsize, typeId, src, damage);
 
     data += size;
     fullsize -= size;
@@ -529,18 +532,19 @@ O2OHdf5Writer::splitSharedObject(const void* fulldata, size_t fullsize, const Pd
 
   } else if (typeId.id() == Pds::TypeId::Id_SharedIpimb and typeId.version() == 1) {
 
+    const char* ddata = data;
+    size_t dsize = std::min(fullsize, sizeof(Pds::Ipimb::DataV2));
 
     // config object should be stored first as it may be needed by data object
+    data += dsize;
+    fullsize -= dsize;
     Pds::TypeId typeId = Pds::TypeId(Pds::TypeId::Id_IpimbConfig, 2);
     size_t size = std::min(fullsize, sizeof(Pds::Ipimb::ConfigV2));
     this->configObject(data, size, typeId, src, damage);
     this->dataObject(data, size, typeId, src, damage);
 
-    data += size;
-    fullsize -= size;
-    size = std::min(fullsize, sizeof(Pds::Ipimb::DataV2));
     typeId = Pds::TypeId(Pds::TypeId::Id_IpimbData, 2);
-    this->dataObject(data, size, typeId, src, damage);
+    this->dataObject(ddata, dsize, typeId, src, damage);
 
     data += size;
     fullsize -= size;
