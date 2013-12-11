@@ -8,8 +8,8 @@ sinkdir="figs-2012-08-10-cxii0212-peakfinder-tuning"
 exp_run="cxii0212-r0091"
 evt="ev00001"
 beg_name="cspad"
-#add_name="-selected"
 add_name=""
+#add_name="-selected"
 ext="png"
 
 if [ $# == 0 ] ; then

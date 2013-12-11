@@ -15,7 +15,7 @@ def plot_image (arr, img_range=None, zrange=None) :    # range = (left, right, l
     figAxes = fig.add_subplot(111)
     imAxes = figAxes.imshow(arr, origin='upper', interpolation='nearest', aspect='auto', extent=img_range)
     if zrange != None : imAxes.set_clim(zrange[0],zrange[1])
-    colbar = fig.colorbar(imAxes, pad=0.03, fraction=0.04, shrink=1.0, aspect=40, orientation=1)
+    colbar = fig.colorbar(imAxes, pad=0.03, fraction=0.04, shrink=1.0, aspect=40, orientation='horizontal')
 
 def plot_histogram(arr, amp_range=None, figsize=(6,6)) :
     fig = plt.figure(figsize=figsize, dpi=80, facecolor='w', edgecolor='w', frameon=True)
@@ -112,9 +112,11 @@ def do_main() :
 
     plot_image(arr, zrange=ampRange)
     plt.get_current_fig_manager().window.geometry('+10+10') # move(10,10)
+    plt.savefig('cspad2x2-img.png')
 
     plot_histogram(arr, ampRange)
     plt.get_current_fig_manager().window.geometry('+950+10') # .move(950,10)
+    plt.savefig('cspad2x2-spe.png')
 
     plt.show()
 

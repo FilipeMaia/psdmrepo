@@ -4,8 +4,9 @@
 import os
 import sys
 import numpy as np
-import scipy.misc as scimisc
 from optparse import OptionParser
+#import scipy.misc as scimisc
+import Image
 
 #--------------------
 
@@ -25,8 +26,10 @@ def get_input_parameters() :
 #--------------------
 
 def save_array_in_file(ofname, arr) :
-    scimisc.imsave(ofname, arr)
-
+    #scimisc.imsave(ofname, arr) # saves as uint8
+    img = Image.fromarray(arr.astype(np.int16))  # or int32
+    img.save(ofname)
+ 
 #--------------------
 
 def get_array_from_file(fname) :

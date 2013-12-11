@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-23
+2013-12-10 Mikhail S. Dubrovin
+- update data/*.py scripts
+
 Tag: V00-03-22
 2013-12-10 Mikhail S. Dubrovin
 - add module NDArrAverage

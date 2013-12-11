@@ -29,7 +29,7 @@ def plot_image (arr, img_range=None, zrange=None, title='',figsize=(12,12), dpi=
     store.figAxes = figAxes = fig.add_subplot(111)
     store.imAxes  = imAxes  = figAxes.imshow(arr, origin='upper', interpolation='nearest', aspect='auto', extent=img_range)
     if zrange != None : imAxes.set_clim(zrange[0],zrange[1])
-    colbar = fig.colorbar(imAxes, pad=0.03, fraction=0.04, shrink=1.0, aspect=40, orientation=1)
+    colbar = fig.colorbar(imAxes, pad=0.03, fraction=0.04, shrink=1.0, aspect=40, orientation='horizontal')
     fig.canvas.set_window_title(title)
 
 def plot_histogram(arr, amp_range=None, figsize=(5,5)) :

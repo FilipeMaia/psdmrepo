@@ -13,19 +13,40 @@ import h5py
 #--------------------
 # Define graphical methods
 
-def plot_image (arr, img_range=None, zrange=None) :    # range = (left, right, low, high), zrange=(zmin,zmax)
-    fig = plt.figure(num=1, figsize=(12,12), dpi=80, facecolor='w', edgecolor='w', frameon=True)
-    fig.subplots_adjust(left=0.05, bottom=0.03, right=0.98, top=0.98, wspace=0.2, hspace=0.1)
-    figAxes = fig.add_subplot(111)
-    #figAxes = fig.add_axes([0.15, 0.06, 0.78, 0.21])
-    imAxes = figAxes.imshow(arr, origin='upper', interpolation='nearest', aspect='auto', extent=img_range)
-    if zrange != None : imAxes.set_clim(zrange[0],zrange[1])
-    colbar = fig.colorbar(imAxes, pad=0.03, fraction=0.04, shrink=1.0, aspect=40, orientation='horizontal')
-
-def plot_histogram(arr, amp_range=None, figsize=(6,6), bins=40) :
+def plot_graphs(arr, trange=None, figsize=(10,5)) :
     fig = plt.figure(figsize=figsize, dpi=80, facecolor='w', edgecolor='w', frameon=True)
-    plt.hist(arr.flatten(), bins=bins, range=amp_range)
-    #fig.canvas.manager.window.move(500,10)
+    plt.xlabel('T-scale')
+    plt.ylabel('V-scale')
+
+
+    n_chan, n_samp = arr.shape
+
+    list_of_lines = ['r-', 'g-', 'b-', 'y-', 'k-', \
+                     'r-', 'g-', 'b-', 'y-', 'k-', \
+                     'r-', 'g-', 'b-', 'y-', 'k-', \
+                     'r-', 'g-', 'b-', 'y-', 'k-']
+
+    list_of_pars = []
+
+    #plt.plot(t, arr[0,:], 'r-', \
+    #         t, arr[1,:], 'k-')
+
+    if trange is None :
+        t = np.arange(0,n_samp)
+        for chan in range( n_chan ) :
+            list_of_pars.append( t )
+            list_of_pars.append( arr[chan,:] )
+            list_of_pars.append( list_of_lines[chan] )
+    else :
+        t = np.arange(trange[0],trange[1])
+        for chan in range( n_chan ) :
+            list_of_pars.append( t )
+            list_of_pars.append( arr[chan,trange[0]:trange[1]] )
+            list_of_pars.append( list_of_lines[chan] )
+
+    plt.plot(*list_of_pars)
+    #plt.axis([0, 6, 0, 20])
+    plt.get_current_fig_manager().window.geometry("+950+10")
     
 #--------------------
 
@@ -34,7 +55,6 @@ def get_array_from_file(fname, dtype=np.float32) :
     arr = np.loadtxt(fname, dtype=dtype)
     print 'arr.shape=', arr.shape
     return arr
-
 
 def get_array_from_bin_file(fname, dtype=np.float32) :
     print 'get_array_from_bin_file:', fname
@@ -58,7 +78,7 @@ def get_input_parameters() :
 
     if nargs == 1 :
         print 'Will use all default parameters\n',\
-              'Expected command: ' + sys.argv[0] + ' <infname> <Amin> <Amax>' 
+              'Expected command: ' + sys.argv[0] + ' <infname> <Tmin> <Tmax>' 
         sys.exit('CHECK INPUT PARAMETERS!')
 
     if nargs  > 1 : fname = sys.argv[1]
@@ -95,21 +115,6 @@ def get_array(fname) :
     elif os.path.splitext(fname)[1] == '.npy' :
         return get_numpy_array_from_file(fname) 
 
-    elif os.path.splitext(fname)[1] == '.bin' :
-
-        arr = get_array_from_bin_file(fname, dtype=np.uint16)
-        if arr.shape[0] == 1300*1340 :
-            arr.shape=(1300,1340)
-            return arr
-
-        arr = get_array_from_bin_file(fname, dtype=np.float)
-        if arr.shape[0] == 400*400 :
-            arr.shape=(400,400)
-            return arr
-
-        else :
-            print "WARNING !!! Binary file array shape: %s, unknown case of reshaping to 2d..." % arr.shape
-
     elif os.path.splitext(fname)[1] == '.tiff' \
     or   os.path.splitext(fname)[1] == '.TIFF' :
         arr = scim.imread(fname, flatten=True) #, dtype=np.uint16)
@@ -125,27 +130,21 @@ def get_array(fname) :
 
 def do_main() :
 
-    fname, ampRange = get_input_parameters()
+    fname, trange = get_input_parameters()
 
     arr = get_array(fname)
-
-    #arr = get_array_from_file('/reg/neh/home1/sikorski/xcs_pyana_current/e167-r0020-s00-c00/2013-04-03-09-43-06-939033/e167-r0020-s00-c00_dark_img.txt'
-    #arr = get_array_from_file('z-comparison/e167-r0020-s00-c00-dark-img-from-marcin.txt') 
-    #arr -= get_array_from_file('z-comparison/t1-xcsi0112-r0020-peds-ave.txt') 
 
     print 'arr:\n', arr
     print 'arr.shape=', arr.shape
 
-    plot_image(arr, zrange=ampRange)
+    #plot_image(arr, zrange=ampRange)
     #plt.get_current_fig_manager().window.move(10,10)       # works for GTk
-    plt.get_current_fig_manager().window.geometry("+10+10") # works for Tk 
-    plt.savefig('camera-img.png')
+    #plt.get_current_fig_manager().window.geometry("+10+10") # works for Tk 
+    #plt.savefig('camera-img.png')
 
-
-    plot_histogram(arr, amp_range=ampRange)
+    plot_graphs(arr, trange)
     plt.get_current_fig_manager().window.geometry("+950+10")
-    plt.savefig('camera-spe.png')
-
+    plt.savefig('wforms.png')
 
     plt.show()
 

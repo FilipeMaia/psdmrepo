@@ -19,7 +19,7 @@ def plot_image (arr, img_range=None, zrange=None, title='',figsize=(12,12), dpi=
     figAxes = fig.add_subplot(111)
     imAxes = figAxes.imshow(arr, origin='upper', interpolation='nearest', aspect='auto', extent=img_range)
     if zrange != None : imAxes.set_clim(zrange[0],zrange[1])
-    colbar = fig.colorbar(imAxes, pad=0.03, fraction=0.04, shrink=1.0, aspect=40, orientation=1)
+    colbar = fig.colorbar(imAxes, pad=0.03, fraction=0.04, shrink=1.0, aspect=40, orientation='horizontal')
     fig.canvas.set_window_title(title)
 
 def plot_histogram(arr, amp_range=None, figsize=(6,6)) :
@@ -234,13 +234,13 @@ def do_main() :
     arr_segs = getCSPadSegments2D(arr_raw)
     print 'arr_segs.shape=', arr_segs.shape
     
-    #arr = getCSPadImage(arr_raw) # GET IMAGE WITHOUT ALIGNMENT !!!
+    arr = getCSPadImage(arr_raw) # GET IMAGE WITHOUT ALIGNMENT !!!
     #arr = getQuadImage(arr_raw,quad=1)
 
     #------------------------------------- New stuff
-    runnum = 150
-    path_calib = '/reg/d/psdm/CXI/cxi49012/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/'
-    arr = getCSPadImageAligned(arr_raw, path_calib, runnum)
+    #runnum = 150
+    #path_calib = '/reg/d/psdm/CXI/cxi49012/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/'
+    #arr = getCSPadImageAligned(arr_raw, path_calib, runnum)
 
     #------------------------------------- New stuff
 
@@ -254,9 +254,9 @@ def do_main() :
 
 
     # Plot 2
-    #plot_image(arr, zrange=ampRange)
-    #plt.get_current_fig_manager().window.geometry("+450+10")
-    #plt.savefig('cspad-img.png')
+    plot_image(arr, zrange=ampRange)
+    plt.get_current_fig_manager().window.geometry("+450+10")
+    plt.savefig('cspad-img.png')
 
 
     # Plot 3
