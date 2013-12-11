@@ -22,19 +22,11 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-//#include "PSCalib/CSPadCalibPars.h"
-
-//#include "CSPadPixCoords/QuadParameters.h"
-//#include "CSPadPixCoords/PixCoords2x1.h"
-//#include "CSPadPixCoords/PixCoordsQuad.h"
-//#include "CSPadPixCoords/PixCoordsCSPad.h"
-
-//#include "CSPadPixCoords/Image2D.h"
+#include "CSPadPixCoords/GlobalMethods.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
-
 #include "PSEvt/Source.h"
 #include "psddl_psana/cspad.ddl.h"
 
@@ -127,8 +119,9 @@ private:
   std::string m_inkey; 
   std::string m_outkey;
   std::string m_outtype;
-  unsigned m_print_bits;
-  long     m_count;
+  unsigned    m_print_bits;
+  long        m_count;
+  DATA_TYPE   m_dtype;
 
   // Parameters form Psana::CsPad::ConfigV# object
   uint32_t m_numQuadsInConfig;
@@ -140,20 +133,6 @@ private:
   uint32_t m_numQuads;
   uint32_t m_quadNumber     [4];
   uint32_t m_num2x1Stored   [4];
-
-//-------------------
-  /**
-   * @brief Adds image in the event as ndarray<T,2> or Image2D<T>, depending on m_imgkey.
-   * 
-   * @param[in]  arr2d    pointer to the data array with image of type T.
-   */
-
-  template <typename T>
-  void addNDArrInEventForType(Event& evt, ndarray<T,3>& ndarr)
-  {
-      shared_ptr< ndarray<T,3> > shp( new ndarray<T,3>(ndarr) );
-      evt.put(shp, m_src, m_outkey);
-  }
 
 //-------------------
   /**
@@ -238,7 +217,7 @@ private:
       	    }
 	}
 
-	addNDArrInEventForType<TOUT>(evt, out_ndarr);
+	save3DArrInEvent<TOUT>(evt, m_src, m_outkey, out_ndarr);
 
         return true;
       } // if (shp.get())

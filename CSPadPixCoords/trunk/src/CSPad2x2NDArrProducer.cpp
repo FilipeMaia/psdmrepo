@@ -3,7 +3,7 @@
 // 	$Id$
 //
 // Description:
-//	Class CSPadNDArrProducer...
+//	Class CSPad2x2NDArrProducer...
 //
 // Author List:
 //      Mikhail S. Dubrovin
@@ -13,7 +13,7 @@
 //-----------------------
 // This Class's Header --
 //-----------------------
-#include "CSPadPixCoords/CSPadNDArrProducer.h"
+#include "CSPadPixCoords/CSPad2x2NDArrProducer.h"
 
 //-----------------
 // C/C++ Headers --
@@ -33,7 +33,7 @@
 
 // This declares this class as psana module
 using namespace CSPadPixCoords;
-PSANA_MODULE_FACTORY(CSPadNDArrProducer)
+PSANA_MODULE_FACTORY(CSPad2x2NDArrProducer)
 
 using namespace std;
 
@@ -47,7 +47,7 @@ namespace CSPadPixCoords {
 // Constructors --
 //----------------
 
-CSPadNDArrProducer::CSPadNDArrProducer (const std::string& name)
+CSPad2x2NDArrProducer::CSPad2x2NDArrProducer (const std::string& name)
   : Module(name)
   , m_source()
   , m_inkey()
@@ -57,9 +57,9 @@ CSPadNDArrProducer::CSPadNDArrProducer (const std::string& name)
   , m_count(0)
 {
   // get the values from configuration or use defaults
-  m_source        = configSrc("source",     ":Cspad.0");
+  m_source        = configSrc("source",     ":Cspad2x2.0");
   m_inkey         = configStr("inkey",      "");
-  m_outkey        = configStr("outkey",     "cspad_ndarr");
+  m_outkey        = configStr("outkey",     "cspad2x2_ndarr");
   m_outtype       = configStr("outtype",    "float");
   m_print_bits    = config   ("print_bits", 0);
 
@@ -70,7 +70,7 @@ CSPadNDArrProducer::CSPadNDArrProducer (const std::string& name)
 // Destructor --
 //--------------
 
-CSPadNDArrProducer::~CSPadNDArrProducer ()
+CSPad2x2NDArrProducer::~CSPad2x2NDArrProducer ()
 {
 }
 
@@ -78,7 +78,7 @@ CSPadNDArrProducer::~CSPadNDArrProducer ()
 
 /// Print input parameters
 void 
-CSPadNDArrProducer::printInputParameters()
+CSPad2x2NDArrProducer::printInputParameters()
 {
   WithMsgLog(name(), info, log) {
     log << "\nInput parameters:"
@@ -96,26 +96,9 @@ CSPadNDArrProducer::printInputParameters()
 
 /// Method which is called once at the beginning of the job
 void 
-CSPadNDArrProducer::beginJob(Event& evt, Env& env)
+CSPad2x2NDArrProducer::beginJob(Event& evt, Env& env)
 {
   if( m_print_bits & 1 ) printInputParameters();
-}
-
-//--------------------
-
-/// Method which is called at the beginning of the run
-void 
-CSPadNDArrProducer::beginRun(Event& evt, Env& env)
-{
-  // getQuadConfigPars(env); // DO NOT NEED THEM TO COPY ENTIRE ARRAY
-}
-
-//--------------------
-
-/// Method which is called at the beginning of the calibration cycle
-void 
-CSPadNDArrProducer::beginCalibCycle(Event& evt, Env& env)
-{
 }
 
 //--------------------
@@ -123,9 +106,11 @@ CSPadNDArrProducer::beginCalibCycle(Event& evt, Env& env)
 /// Method which is called with event data, this is the only required 
 /// method, all other methods are optional
 void 
-CSPadNDArrProducer::event(Event& evt, Env& env)
+CSPad2x2NDArrProducer::event(Event& evt, Env& env)
 {
   ++m_count;
+
+  if (m_count==1) getConfigParameters(evt, env);
 
   struct timespec start, stop;
   int status = clock_gettime( CLOCK_REALTIME, &start ); // Get LOCAL time
@@ -134,67 +119,34 @@ CSPadNDArrProducer::event(Event& evt, Env& env)
 
   if( m_print_bits & 4 ) {
     status = clock_gettime( CLOCK_REALTIME, &stop ); // Get LOCAL time
-    cout << "  Time to produce cspad ndarray is " 
+    cout << "  Time to produce cspad2x2 ndarray is " 
          << stop.tv_sec - start.tv_sec + 1e-9*(stop.tv_nsec - start.tv_nsec) 
          << " sec" << endl;
   }
 }
 
 //--------------------
-  
-/// Method which is called at the end of the calibration cycle
-void 
-CSPadNDArrProducer::endCalibCycle(Event& evt, Env& env)
+
+void CSPad2x2NDArrProducer::getConfigParameters(Event& evt, Env& env)
 {
+  m_config = new CONFIG ( m_source ); 
+  m_config -> setCSPad2x2ConfigPars (evt, env); 
+  if( m_print_bits & 2 ) m_config -> printCSPad2x2ConfigPars();
 }
 
 //--------------------
 
-/// Method which is called at the end of the run
-void 
-CSPadNDArrProducer::endRun(Event& evt, Env& env)
-{
-}
-
-//--------------------
-
-/// Method which is called once at the end of the job
-void 
-CSPadNDArrProducer::endJob(Event& evt, Env& env)
-{
-}
+void CSPad2x2NDArrProducer::beginRun(Event& evt, Env& env) {}
+void CSPad2x2NDArrProducer::beginCalibCycle(Event& evt, Env& env) {}
+void CSPad2x2NDArrProducer::endCalibCycle(Event& evt, Env& env) {}
+void CSPad2x2NDArrProducer::endRun(Event& evt, Env& env) {}
+void CSPad2x2NDArrProducer::endJob(Event& evt, Env& env) {}
 
 //--------------------
 
 void 
-CSPadNDArrProducer::getQuadConfigPars(Env& env)
-{
-  if ( getQuadConfigParsForType<Psana::CsPad::ConfigV2>(env) ) return;
-  if ( getQuadConfigParsForType<Psana::CsPad::ConfigV3>(env) ) return;
-  if ( getQuadConfigParsForType<Psana::CsPad::ConfigV4>(env) ) return;
-  if ( getQuadConfigParsForType<Psana::CsPad::ConfigV5>(env) ) return;
-
-  MsgLog(name(), warning, "CsPad::ConfigV2 - V5 is not available in this run.");
-}
-
-//--------------------
-
-void 
-CSPadNDArrProducer::getCSPadConfigFromData(Event& evt)
-{
-  if ( getCSPadConfigFromDataForType <Psana::CsPad::DataV1, Psana::CsPad::ElementV1> (evt) ) return;
-  if ( getCSPadConfigFromDataForType <Psana::CsPad::DataV2, Psana::CsPad::ElementV2> (evt) ) return;
-
-  MsgLog(name(), warning, "getCSPadConfigFromData(...): Psana::CsPad::DataV# / ElementV# for #=[2-5] is not available in this event.");
-}
-
-//--------------------
-
-void 
-CSPadNDArrProducer::procEvent(Event& evt, Env& env)
+CSPad2x2NDArrProducer::procEvent(Event& evt, Env& env)
 {  
-  getCSPadConfigFromData(evt);
-
   // proc event  for one of the supported data types
   if ( m_dtype == FLOAT   and procEventForOutputType<float>   (evt) ) return; 
   if ( m_dtype == DOUBLE  and procEventForOutputType<double>  (evt) ) return; 
@@ -205,7 +157,7 @@ CSPadNDArrProducer::procEvent(Event& evt, Env& env)
 //--------------------
 
 void 
-CSPadNDArrProducer::checkTypeImplementation()
+CSPad2x2NDArrProducer::checkTypeImplementation()
 {  
   if ( m_outtype == "float"   ) { m_dtype = FLOAT;  return; }
   if ( m_outtype == "double"  ) { m_dtype = DOUBLE; return; } 

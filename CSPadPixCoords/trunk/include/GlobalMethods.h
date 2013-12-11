@@ -61,6 +61,10 @@ namespace CSPadPixCoords {
 
 using namespace std;
 
+
+enum DATA_TYPE {FLOAT, DOUBLE, SHORT, UNSIGNED, INT, INT16, INT32, UINT, UINT8, UINT16, UINT32};
+
+
 class GlobalMethods  {
 public:
   GlobalMethods () ;
@@ -130,10 +134,27 @@ private:
 //--------------------
 // Save 2-D array in event
   template <typename T>
-  void save2DArrayInEvent(PSEvt::Event& evt, const Pds::Src& src, const std::string& key, const ndarray<T,2>& data)
+  void save2DArrayInEvent(PSEvt::Event& evt, const Pds::Src& src, const std::string& key, const ndarray<T,2>& ndarr)
   {
-    boost::shared_ptr< ndarray<T,2> > img2d( new ndarray<T,2>(data) );
-    evt.put(img2d, src, key);
+    boost::shared_ptr< ndarray<T,2> > shp( new ndarray<T,2>(ndarr) );
+    evt.put(shp, src, key);
+  }
+
+//-------------------
+  /**
+   * @brief Save 3-D array in event, for src and key.
+   * 
+   * @param[in]  evt
+   * @param[in]  src
+   * @param[in]  key
+   * @param[out] ndarr
+   */
+
+  template <typename T>
+  void save3DArrInEvent(PSEvt::Event& evt, const Pds::Src& src, const std::string& key, const ndarray<T,3>& ndarr)
+  {
+      boost::shared_ptr< ndarray<T,3> > shp( new ndarray<T,3>(ndarr) );
+      evt.put(shp, src, key);
   }
 
 //--------------------

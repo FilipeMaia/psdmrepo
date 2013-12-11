@@ -6,7 +6,7 @@
 // 	$Id$
 //
 // Description:
-//	Class CSPadImageProducer.
+//	Class CSPadConfigPars.
 //
 //------------------------------------------------------------------------
 

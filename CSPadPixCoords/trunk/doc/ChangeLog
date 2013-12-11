@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-12
+2013-12-10 Mikhail S. Dubrovin
+- add CSPad2x2ConfigPars, CSPad2x2NDArrProducer
+
 Tag: V00-03-11
 2013-11-13 Mikhail S. Dubrovin
 - in CSPad2x2ImageProducer add parameter m_outtype() and produce image for this data type, set defauly int16
