@@ -11,6 +11,11 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-22
+2013-12-10 Mikhail S. Dubrovin
+- add module NDArrAverage
+- add in GlobalMethods methods saveNDArrayInFile, defineNDArrParsForType, etc.
+
 Tag: V00-03-21
 2013-11-19 Mikhail S. Dubrovin
 - in CameraImageProducer, ImgAverage, and GlobalMethods:

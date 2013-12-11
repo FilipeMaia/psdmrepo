@@ -41,20 +41,47 @@ using namespace ImgAlgos;
 
 namespace ImgAlgos {
 
-//----------------
-// Constructors --
-//----------------
-GlobalMethods::GlobalMethods ()
+//--------------------
+//--------------------
+
+NDArrPars::NDArrPars()
+  : m_ndim(0)
+  , m_size(0)
+  , m_dtype(DOUBLE)
 {
+  //m_shape[0] = 0;  
+  for(unsigned i=0; i<5; ++i) m_shape[i] = 0;
 }
 
-//--------------
-// Destructor --
-//--------------
-GlobalMethods::~GlobalMethods ()
+NDArrPars::NDArrPars(const unsigned ndim, const unsigned size, const unsigned* shape, const DATA_TYPE dtype)
 {
+  setPars(ndim, size, shape, dtype);
 }
 
+void
+NDArrPars::setPars(const unsigned ndim, const unsigned size, const unsigned* shape, const DATA_TYPE dtype)
+{
+  m_ndim  = ndim;
+  m_size  = size;
+  m_dtype = dtype;
+  for(unsigned i=0; i<m_ndim; ++i) m_shape[i] = shape[i];
+}
+
+void
+NDArrPars::print()
+{
+  WithMsgLog("NDArrPars::print():", info, log) {
+    log << "\n NDArrPars parameters:"
+        << "\n ndim : " << m_ndim 
+        << "\n size : " << m_size    
+        << "\n dtype: " << m_dtype  
+        << "\n shape: ";                        
+    for(unsigned i=0; i<m_ndim; ++i) log << m_shape[i] << " ";
+    log << "\n";
+  }
+}
+
+//--------------------
 //--------------------
 
 std::string 
@@ -136,15 +163,15 @@ printSizeOfTypes()
 {
   std::cout << "Size Of Types:" 
             << "\nsizeof(bool    ) = " << sizeof(bool    ) << " with typeid(bool    ).name(): " << typeid(bool    ).name() 
-            << "\nsizeof(uint8_t ) = " << sizeof(uint8_t ) << " with typeid(uint8_t ).name(): " << typeid(uint8_t ).name()  
-            << "\nsizeof(uint16_t) = " << sizeof(uint16_t) << " with typeid(uint16_t).name(): " << typeid(uint16_t).name()  
-            << "\nsizeof(int16_t ) = " << sizeof(int16_t ) << " with typeid(int16_t ).name(): " << typeid(int16_t ).name()  
-            << "\nsizeof(uint32_t) = " << sizeof(uint32_t) << " with typeid(uint32_t).name(): " << typeid(uint32_t).name()  
-            << "\nsizeof(int32_t ) = " << sizeof(int32_t ) << " with typeid(int32_t ).name(): " << typeid(int32_t ).name()  
             << "\nsizeof(int     ) = " << sizeof(int     ) << " with typeid(int     ).name(): " << typeid(int     ).name()  
             << "\nsizeof(float   ) = " << sizeof(float   ) << " with typeid(float   ).name(): " << typeid(float   ).name()  
             << "\nsizeof(double  ) = " << sizeof(double  ) << " with typeid(double  ).name(): " << typeid(double  ).name()  
             << "\nsizeof(short   ) = " << sizeof(short   ) << " with typeid(short   ).name(): " << typeid(short   ).name()  
+            << "\nsizeof(uint8_t ) = " << sizeof(uint8_t ) << " with typeid(uint8_t ).name(): " << typeid(uint8_t ).name()  
+            << "\nsizeof(uint16_t) = " << sizeof(uint16_t) << " with typeid(uint16_t).name(): " << typeid(uint16_t).name()  
+            << "\nsizeof(uint32_t) = " << sizeof(uint32_t) << " with typeid(uint32_t).name(): " << typeid(uint32_t).name()  
+            << "\nsizeof(int16_t ) = " << sizeof(int16_t ) << " with typeid(int16_t ).name(): " << typeid(int16_t ).name()  
+            << "\nsizeof(int32_t ) = " << sizeof(int32_t ) << " with typeid(int32_t ).name(): " << typeid(int32_t ).name()  
             << "\n\n";
 }
 
@@ -166,14 +193,46 @@ defineImageShape(PSEvt::Event& evt, const PSEvt::Source& src, const std::string&
 
   static long counter = 0; counter ++;
 
-  if (counter < 100) {
-
+  if (counter < 50) {
     const std::string msg = "Image shape is tested for double, uint16_t, int, float, uint8_t, int16_t, short and is not defined in the event(...)\nfor source:" 
-                        + boost::lexical_cast<std::string>(src) + " key:" + key;
+                          + boost::lexical_cast<std::string>(src) + " key:" + key;
     MsgLog("GlobalMethods::defineImageShape", warning, msg);
   }
-  if (counter == 100)
-     MsgLog("GlobalMethods::defineImageShape", warning, "STOP PRINTING WARNINGS for source:" << boost::lexical_cast<std::string>(src) << " key:" << key);
+  if (counter == 50)
+     MsgLog("GlobalMethods::defineImageShape", warning, "STOP PRINTING WARNINGS for source:" 
+             << boost::lexical_cast<std::string>(src) << " key:" << key);
+  //throw std::runtime_error("EXIT psana...");
+  return false;
+}
+
+
+//--------------------
+
+// Define ndarray parameters or throw message that can not do that.
+bool
+defineNDArrPars(PSEvt::Event& evt, const PSEvt::Source& src, const std::string& key, NDArrPars* ndarr_pars)
+{
+  if ( defineNDArrParsForType<double>  (evt, src, key, DOUBLE,   ndarr_pars) ) return true;
+  if ( defineNDArrParsForType<float>   (evt, src, key, FLOAT,    ndarr_pars) ) return true;
+  if ( defineNDArrParsForType<int>     (evt, src, key, INT,      ndarr_pars) ) return true;
+  if ( defineNDArrParsForType<int32_t> (evt, src, key, INT32,    ndarr_pars) ) return true;
+  if ( defineNDArrParsForType<uint32_t>(evt, src, key, UINT32,   ndarr_pars) ) return true;
+  if ( defineNDArrParsForType<uint16_t>(evt, src, key, UINT16,   ndarr_pars) ) return true;
+  if ( defineNDArrParsForType<uint8_t> (evt, src, key, UINT8,    ndarr_pars) ) return true;
+  if ( defineNDArrParsForType<int16_t> (evt, src, key, INT16,    ndarr_pars) ) return true;
+  if ( defineNDArrParsForType<short>   (evt, src, key, SHORT,    ndarr_pars) ) return true;
+  if ( defineNDArrParsForType<unsigned>(evt, src, key, UNSIGNED, ndarr_pars) ) return true;
+
+  static long counter = 0; counter ++;
+
+  if (counter < 50) {
+    const std::string msg = "Image shape is tested for double, uint16_t, int, float, uint8_t, int16_t, short and is not defined in the event(...)\nfor source:" 
+                        + boost::lexical_cast<std::string>(src) + " key:" + key;
+    MsgLog("GlobalMethods::defineNDArrPars", warning, msg);
+  }
+  if (counter == 50)
+     MsgLog("GlobalMethods::defineNDArrPars", warning, "STOP PRINTING WARNINGS for source:" 
+            << boost::lexical_cast<std::string>(src) << " key:" << key);
   //throw std::runtime_error("EXIT psana...");
   return false;
 }

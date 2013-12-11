@@ -99,13 +99,40 @@ using namespace std;
 //typedef image<gray_double_pixel_t,false> gray_double_image_t;
 //typedef gray_double_image_t::view_t      gray_double_view_t; 
 
+enum DATA_TYPE {FLOAT, DOUBLE, SHORT, UNSIGNED, INT, INT16, INT32, UINT, UINT8, UINT16, UINT32};
+
 enum FILE_MODE {BINARY, TEXT, TIFF, PNG};
+
+
+class NDArrPars {
+public:
+  NDArrPars();
+  NDArrPars(const unsigned ndim, const unsigned size, const unsigned* shape, const DATA_TYPE dtype);
+  virtual ~NDArrPars(){}
+
+  void setPars(const unsigned ndim, const unsigned size, const unsigned* shape, const DATA_TYPE dtype);
+  void print();
+  unsigned  ndim()  {return m_ndim;}
+  unsigned  size()  {return m_size;}
+  unsigned* shape() {return &m_shape[0];}
+  DATA_TYPE dtype() {return m_dtype;}
+
+private:
+  unsigned  m_ndim;
+  unsigned  m_size;
+  unsigned  m_shape[5];
+  DATA_TYPE m_dtype;
+
+  // Copy constructor and assignment are disabled by default
+  NDArrPars ( const NDArrPars& ) ;
+  NDArrPars& operator = ( const NDArrPars& ) ;
+};
 
 
 class GlobalMethods  {
 public:
-  GlobalMethods () ;
-  virtual ~GlobalMethods () ;
+  GlobalMethods() {}
+  virtual ~GlobalMethods() {}
 
 private:
   // Copy constructor and assignment are disabled by default
@@ -124,7 +151,8 @@ private:
   unsigned eventCounterSinceConfigure(PSEvt::Event& evt); // returns 15-bits (32767)  integer value: event counter since Configure.
   void printSizeOfTypes();
   /// Define the shape or throw message that can not do that.
-  bool defineImageShape(PSEvt::Event& evt, const PSEvt::Source& m_str_src, const std::string& m_key, unsigned* shape);
+  bool defineImageShape(PSEvt::Event& evt, const PSEvt::Source& src, const std::string& key, unsigned* shape);
+  bool defineNDArrPars(PSEvt::Event& evt, const PSEvt::Source& src, const std::string& key, NDArrPars* ndarr_pars);
   void saveTextInFile(const std::string& fname, const std::string& text, bool print_msg);
   std::string stringInstrument(PSEnv::Env& env);
   std::string stringExperiment(PSEnv::Env& env);
@@ -160,16 +188,39 @@ private:
     }
 
 //--------------------
-/// Define inage shape in the event for specified type, str_src, and str_key 
+/// Define inage shape in the event for specified type, src, and key 
   template <typename T>
-  bool defineImageShapeForType(PSEvt::Event& evt, const PSEvt::Source& str_src, const std::string& str_key, unsigned* shape)
+  bool defineImageShapeForType(PSEvt::Event& evt, const PSEvt::Source& src, const std::string& key, unsigned* shape)
   {
-    boost::shared_ptr< ndarray<T,2> > img = evt.get(str_src, str_key);
+    boost::shared_ptr< ndarray<T,2> > img = evt.get(src, key);
     if (img.get()) {
       for(int i=0;i<2;i++) shape[i]=img->shape()[i];
       //shape=img->shape();
       return true;
     } 
+    return false;
+  }
+
+//--------------------
+/// Define ndarray parameters in the event for specified type, src, and key 
+  template <typename T>
+  bool defineNDArrParsForType(PSEvt::Event& evt, const PSEvt::Source& src, const std::string& key, DATA_TYPE dtype, NDArrPars* ndarr_pars)
+  {
+    boost::shared_ptr< ndarray<T,2> > arr2 = evt.get(src, key);
+    if (arr2.get()) { ndarr_pars->setPars(2, arr2->size(), arr2->shape(), dtype); return true; } 
+
+    boost::shared_ptr< ndarray<T,3> > arr3 = evt.get(src, key);
+    if (arr3.get()) { ndarr_pars->setPars(3, arr3->size(), arr3->shape(), dtype); return true; } 
+
+    boost::shared_ptr< ndarray<T,4> > arr4 = evt.get(src, key);
+    if (arr4.get()) { ndarr_pars->setPars(4, arr4->size(), arr4->shape(), dtype); return true; } 
+
+    boost::shared_ptr< ndarray<T,5> > arr5 = evt.get(src, key);
+    if (arr5.get()) { ndarr_pars->setPars(5, arr5->size(), arr5->shape(), dtype); return true; } 
+
+    boost::shared_ptr< ndarray<T,1> > arr1 = evt.get(src, key);
+    if (arr1.get()) { ndarr_pars->setPars(1, arr1->size(), arr1->shape(), dtype); return true; } 
+
     return false;
   }
 
@@ -470,6 +521,57 @@ private:
       
       in.close();
   }
+
+
+//--------------------
+/// Save ndarray in file
+  template <typename T>
+  void saveNDArrayInFile(const std::string& fname, const T* arr, NDArrPars* ndarr_pars, bool print_msg, FILE_MODE file_type=TEXT)
+  {  
+    if (fname.empty()) {
+      MsgLog("GlobalMethods", warning, "The output file name is empty. 2-d array is not saved.");
+      return;
+    }
+
+    if( print_msg ) MsgLog("GlobalMethods", info, "Save 2-d array in file " << fname.c_str() << " file type:" << strOfDataTypeAndSize<T>());
+
+    unsigned* shape = ndarr_pars->shape();
+    unsigned  ndim  = ndarr_pars->ndim();
+
+    unsigned cols = shape[ndim-1];
+    unsigned rows = (ndim>1) ? ndarr_pars->size()/cols : 1; 
+
+    //======================
+    if (file_type == TEXT) {
+        std::ofstream out(fname.c_str()); 
+	out << std::setprecision(9); // << std::setw(8) << std::setprecision(0) << std::fixed 
+              for (unsigned r = 0; r != rows; ++r) {
+                for (unsigned c = 0; c != cols; ++c) {
+                  out << arr[r*cols + c] << ' ';
+                }
+                out << '\n';
+              }
+        out.close();
+        return; 
+    }
+
+    //======================
+    if (file_type == BINARY) {
+        std::ios_base::openmode mode = std::ios_base::out | std::ios_base::binary;
+        std::ofstream out(fname.c_str(), mode);
+        //out.write(reinterpret_cast<const char*>(arr), rows*cols*sizeof(T));
+        for (unsigned r = 0; r != rows; ++r) {
+	  const T* data = &arr[r*cols];
+          out.write(reinterpret_cast<const char*>(data), cols*sizeof(T));
+	}
+        out.close();
+        return; 
+    }
+
+    //======================
+  }
+
+
 //--------------------
 //--------------------
 //--------------------

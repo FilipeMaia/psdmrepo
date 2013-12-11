@@ -161,7 +161,8 @@ Tahometer::printInputParameters()
   WithMsgLog(name(), info, log) {
     log << "\n Input parameters:"
 	<< "\n dn         : " << m_dn
-	<< "\n print_bits : " << m_print_bits;
+	<< "\n print_bits : " << m_print_bits
+        << "\n";     
   }
 }
 

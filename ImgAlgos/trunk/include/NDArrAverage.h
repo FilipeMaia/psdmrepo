@@ -1,12 +1,12 @@
-#ifndef IMGALGOS_IMGAVERAGE_H
-#define IMGALGOS_IMGAVERAGE_H
+#ifndef IMGALGOS_NDARRAVERAGE_H
+#define IMGALGOS_NDARRAVERAGE_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class ImgAverage.
+//	Class NDArrAverage.
 //
 //------------------------------------------------------------------------
 
@@ -27,6 +27,7 @@
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
+#include "ImgAlgos/GlobalMethods.h"
 
 //		---------------------
 // 		-- Class Interface --
@@ -38,11 +39,12 @@ namespace ImgAlgos {
 
 /**
  *
- * This module averages over events the per-pixel data of the image array (ndarray<double,2>) 
- * and saves two files for averaged and rms values. Input data can be specified by the source 
+ * This module averages over events the per-pixel data of the ndarray<double,NDim>, where NDim=[1,5] 
+ * and saves files for sum, averaged, rms, and mask if the file name(s) are specified. 
+ * Input data can be specified by the source 
  * and key parameters. Averaging may have up to three stages, depending on configuration parameters:
  * 
- *     0-stage: the pixel amplitudes are averaged without any constrains for events from 0 
+ *     0-stage: the pixel intensities are averaged without any constrains for events from 0 
  *              to evts_stage1, the preliminary averaged and rms values are defined for each 
  *              pixel at the end of this stage.
  *     1-stage: starting from event evts_stage1 the pixel data are collected only for 
@@ -68,14 +70,14 @@ namespace ImgAlgos {
  *  @author Mikhail S. Dubrovin
  */
 
-class ImgAverage : public Module {
+class NDArrAverage : public Module {
 public:
 
   // Default constructor
-  ImgAverage (const std::string& name) ;
+  NDArrAverage (const std::string& name) ;
 
   // Destructor
-  virtual ~ImgAverage () ;
+  virtual ~NDArrAverage () ;
 
   /// Method which is called once at the beginning of the job
   virtual void beginJob(Event& evt, Env& env);
@@ -118,14 +120,17 @@ private:
   std::string    m_sumFile;
   std::string    m_aveFile;
   std::string    m_rmsFile;
+  std::string    m_mskFile;
   std::string    m_hotFile;
 
   std::string    m_fname_ext;       // file name extension, for example for run 123: "-r0123.dat" 
 
-  double         m_hot_thr;
+  double         m_thr_rms;         // if rms > m_thr_rms - pixel is bad
+  double         m_thr_min;         // if ave < m_thr_min - pixel is bad
+  double         m_thr_max;         // if ave > m_thr_max - pixel is bad
   unsigned       m_print_bits;   
-  unsigned long  m_count;     // number of found images
-  unsigned long  m_count_ev;  // number of events from the beginning of job
+  unsigned long  m_count;           // number of found images
+  unsigned long  m_count_ev;        // number of events from the beginning of job
   unsigned long  m_nev_stage1;
   unsigned long  m_nev_stage2;
   double         m_gate_width1;
@@ -136,11 +141,10 @@ private:
   bool           m_do_sum;
   bool           m_do_ave;
   bool           m_do_rms;
-  bool           m_do_mask;
+  bool           m_do_msk;
+  bool           m_do_hot;
 
-  unsigned       m_shape[2]; // image shape
-  unsigned       m_rows;
-  unsigned       m_cols;
+  NDArrPars*     m_ndarr_pars;
   unsigned       m_size;
 
   unsigned*      m_stat;  // statistics per pixel
@@ -148,8 +152,8 @@ private:
   double*        m_sum2;  // sum of squares per pixel
   double*        m_ave;   // average per pixel
   double*        m_rms;   // rms per pixel
-  int*           m_hot;   // hot-pixel mask per pixel; pixel is hot if rms > m_hot_thr
-
+  int*           m_msk;   // pixel mask per pixel; pixel is hot if rms > m_thr_rms, hot/cold = 0/1 
+  int*           m_hot;   // hot-pixel mask per pixel (in style of Phil); pixel is hot if rms > m_thr_rms, hot/cold = 1/0 , 
 
 protected:
 //-------------------
@@ -157,12 +161,32 @@ protected:
     template <typename T>
     bool collectStatForType(Event& evt)
     { 
-      shared_ptr< ndarray<T,2> > img = evt.get(m_str_src, m_key, &m_src);
-      if (img.get()) {
-          const T* data = img->data();
-          accumulateCorrelators<T>(data);
-          return true;
-      } 
+      unsigned ndim = m_ndarr_pars->ndim();
+      if (ndim == 2) {
+        shared_ptr< ndarray<T,2> > arr2 = evt.get(m_str_src, m_key, &m_src);
+        if (arr2.get()) { accumulateCorrelators<T>(arr2->data()); return true; } 
+      }
+
+      else if (ndim == 3) {
+        shared_ptr< ndarray<T,3> > arr3 = evt.get(m_str_src, m_key, &m_src);
+        if (arr3.get()) { accumulateCorrelators<T>(arr3->data()); return true; } 
+      }
+
+      else if (ndim == 4) {
+        shared_ptr< ndarray<T,4> > arr4 = evt.get(m_str_src, m_key, &m_src);
+        if (arr4.get()) { accumulateCorrelators<T>(arr4->data()); return true; } 
+      }
+
+      else if (ndim == 5) {
+        shared_ptr< ndarray<T,5> > arr5 = evt.get(m_str_src, m_key, &m_src);
+        if (arr5.get()) { accumulateCorrelators<T>(arr5->data()); return true; } 
+      }
+
+      else if (ndim == 1) {
+        shared_ptr< ndarray<T,1> > arr1 = evt.get(m_str_src, m_key, &m_src);
+        if (arr1.get()) { accumulateCorrelators<T>(arr1->data()); return true; } 
+      }
+
       return false;
     }
 
@@ -189,4 +213,4 @@ protected:
 
 } // namespace ImgAlgos
 
-#endif // IMGALGOS_IMGAVERAGE_H
+#endif // IMGALGOS_NDARRAVERAGE_H

@@ -3,7 +3,7 @@
 // 	$Id$
 //
 // Description:
-//	Class ImgAverage...
+//	Class NDArrAverage...
 //
 // Author List:
 //      Mikhail S. Dubrovin
@@ -13,7 +13,7 @@
 //-----------------------
 // This Class's Header --
 //-----------------------
-#include "ImgAlgos/ImgAverage.h"
+#include "ImgAlgos/NDArrAverage.h"
 
 //-----------------
 // C/C++ Headers --
@@ -26,7 +26,6 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "MsgLogger/MsgLogger.h"
-#include "ImgAlgos/GlobalMethods.h"
 //#include "PSEvt/EventId.h"
 
 //-----------------------------------------------------------------------
@@ -37,7 +36,7 @@
 using namespace Psana;
 using namespace ImgAlgos;
 
-PSANA_MODULE_FACTORY(ImgAverage)
+PSANA_MODULE_FACTORY(NDArrAverage)
 
 using namespace std;
 
@@ -50,15 +49,18 @@ namespace ImgAlgos {
 //----------------
 // Constructors --
 //----------------
-ImgAverage::ImgAverage (const std::string& name)
+NDArrAverage::NDArrAverage (const std::string& name)
   : Module(name)
   , m_str_src()
   , m_key()
   , m_sumFile()
   , m_aveFile()
   , m_rmsFile()
+  , m_mskFile()
   , m_hotFile()
-  , m_hot_thr()
+  , m_thr_rms()
+  , m_thr_min()
+  , m_thr_max()
   , m_print_bits()
   , m_count(0)
   , m_count_ev(0)
@@ -73,8 +75,11 @@ ImgAverage::ImgAverage (const std::string& name)
   m_sumFile =  configStr("sumfile",     "");
   m_aveFile =  configStr("avefile",     "");
   m_rmsFile =  configStr("rmsfile",     "");
-  m_hotFile =  configStr("hotpix_mask", "");
-  m_hot_thr     = config("hotpix_thr_adu", 10000.);
+  m_mskFile =  configStr("maskfile",    "");
+  m_hotFile =  configStr("hotpixfile",  "");
+  m_thr_rms     = config("thr_rms_ADU",   10000.);
+  m_thr_min     = config("thr_min_ADU", -100000.);
+  m_thr_max     = config("thr_max_ADU",  100000.);
   m_nev_stage1  = config("evts_stage1",  1000000);
   m_nev_stage2  = config("evts_stage2",        0);
   m_gate_width1 = config("gate_width1",        0); 
@@ -84,10 +89,12 @@ ImgAverage::ImgAverage (const std::string& name)
   m_do_sum  = (m_sumFile.empty()) ? false : true;
   m_do_ave  = (m_aveFile.empty()) ? false : true;
   m_do_rms  = (m_rmsFile.empty()) ? false : true;
-  m_do_mask = (m_hotFile.empty()) ? false : true;
+  m_do_msk  = (m_mskFile.empty()) ? false : true;
+  m_do_hot  = (m_hotFile.empty()) ? false : true;
 
   // If all file names are empty - save average and rms with default names
-  if (    !m_do_mask 
+  if (    !m_do_msk 
+       && !m_do_hot 
        && !m_do_sum 
        && !m_do_ave
        && !m_do_rms ) {
@@ -97,13 +104,15 @@ ImgAverage::ImgAverage (const std::string& name)
     m_do_ave  = true;
     m_do_rms  = true;
   }
+
+    if( m_print_bits & 1 ) printInputParameters();
  }
 
 //--------------------
 
 // Print input parameters
 void 
-ImgAverage::printInputParameters()
+NDArrAverage::printInputParameters()
 {
   WithMsgLog(name(), info, log) {
     log << "\n Input parameters:"
@@ -112,58 +121,57 @@ ImgAverage::printInputParameters()
         << "\n m_sumFile  : " << m_sumFile    
         << "\n m_aveFile  : " << m_aveFile    
         << "\n m_rmsFile  : " << m_rmsFile    
+        << "\n m_mskFile  : " << m_mskFile    
         << "\n m_hotFile  : " << m_hotFile    
-        << "\n m_hot_thr  : " << m_hot_thr    
+        << "\n m_thr_rms  : " << m_thr_rms  
+        << "\n m_thr_min  : " << m_thr_min  
+        << "\n m_thr_max  : " << m_thr_max
         << "\n m_do_sum   : " << m_do_sum
         << "\n m_do_ave   : " << m_do_ave
         << "\n m_do_rms   : " << m_do_rms
-        << "\n m_do_mask  : " << m_do_mask
+        << "\n m_do_msk   : " << m_do_msk
+        << "\n m_do_hot   : " << m_do_hot
         << "\n print_bits : " << m_print_bits
         << "\n evts_stage1: " << m_nev_stage1   
         << "\n evts_stage2: " << m_nev_stage2  
         << "\n gate_width1: " << m_gate_width1 
         << "\n gate_width2: " << m_gate_width2 
         << "\n";     
-    log << "\n Image shape parameters:"
-        << "\n Columns : "    << m_cols  
-        << "\n Rows    : "    << m_rows     
-        << "\n Size    : "    << m_size  
-        << "\n";
   }
 }
 
 //--------------
 // Destructor --
 //--------------
-ImgAverage::~ImgAverage ()
+NDArrAverage::~NDArrAverage ()
 {
 }
 
 /// Method which is called once at the beginning of the job
 void 
-ImgAverage::beginJob(Event& evt, Env& env)
+NDArrAverage::beginJob(Event& evt, Env& env)
 {
 }
 
 /// Method which is called at the beginning of the run
 void 
-ImgAverage::beginRun(Event& evt, Env& env)
+NDArrAverage::beginRun(Event& evt, Env& env)
 {
   boost::filesystem::path path = m_aveFile;
   if ( path.extension().string() == string(".txt") ) m_fname_ext = "";
-  else                                               m_fname_ext = "-r" + stringRunNumber(evt) + ".dat";
+  else                                               m_fname_ext = "-" + stringExperiment(env) + "-r" + stringRunNumber(evt) + ".dat";
 }
 
 /// Method which is called at the beginning of the calibration cycle
 void 
-ImgAverage::beginCalibCycle(Event& evt, Env& env)
+NDArrAverage::beginCalibCycle(Event& evt, Env& env)
 {
 }
 
 /// Method which is called with event data, this is the only required 
 /// method, all other methods are optional
 void 
-ImgAverage::event(Event& evt, Env& env)
+NDArrAverage::event(Event& evt, Env& env)
 {
   ++ m_count_ev;
   if ( m_print_bits & 2 ) printEventRecord(evt);
@@ -173,31 +181,34 @@ ImgAverage::event(Event& evt, Env& env)
   
 /// Method which is called at the end of the calibration cycle
 void 
-ImgAverage::endCalibCycle(Event& evt, Env& env)
+NDArrAverage::endCalibCycle(Event& evt, Env& env)
 {
 }
 
 /// Method which is called at the end of the run
 void 
-ImgAverage::endRun(Event& evt, Env& env)
+NDArrAverage::endRun(Event& evt, Env& env)
 {
 }
 
 /// Method which is called once at the end of the job
 void 
-ImgAverage::endJob(Event& evt, Env& env)
+NDArrAverage::endJob(Event& evt, Env& env)
 {
   if (m_count == 0) {
-    MsgLog(name(), warning, "Images for src: " << m_str_src << " and key: " << m_key 
-                            << " WERE NOT FOUND in " << m_count_ev << " events.\nFiles are NOT SAVED!!!");
+    MsgLog(name(), warning, "ndarray object for src: " << m_str_src << " and key: " << m_key 
+                            << " IS NOT FOUND in " << m_count_ev << " events.\nFiles are NOT SAVED!!!");
     return;
   }
 
   procStatArrays();
-  if (m_do_sum)  save2DArrayInFile<double> ( m_sumFile+m_fname_ext, m_sum, m_rows, m_cols, m_print_bits & 16 );
-  if (m_do_ave)  save2DArrayInFile<double> ( m_aveFile+m_fname_ext, m_ave, m_rows, m_cols, m_print_bits & 16 );
-  if (m_do_rms)  save2DArrayInFile<double> ( m_rmsFile+m_fname_ext, m_rms, m_rows, m_cols, m_print_bits & 16 );
-  if (m_do_mask) save2DArrayInFile<int>    ( m_hotFile+m_fname_ext, m_hot, m_rows, m_cols, m_print_bits & 16 );
+
+  if (m_do_sum)  saveNDArrayInFile<double> ( m_sumFile+m_fname_ext, m_sum, m_ndarr_pars, m_print_bits & 16, TEXT ); // or BINARY
+  if (m_do_ave)  saveNDArrayInFile<double> ( m_aveFile+m_fname_ext, m_ave, m_ndarr_pars, m_print_bits & 16, TEXT );
+  if (m_do_rms)  saveNDArrayInFile<double> ( m_rmsFile+m_fname_ext, m_rms, m_ndarr_pars, m_print_bits & 16, TEXT );
+  if (m_do_msk)  saveNDArrayInFile<int>    ( m_mskFile+m_fname_ext, m_msk, m_ndarr_pars, m_print_bits & 16, TEXT );
+  if (m_do_hot)  saveNDArrayInFile<int>    ( m_hotFile+m_fname_ext, m_hot, m_ndarr_pars, m_print_bits & 16, TEXT );
+
   if( m_print_bits & 16 ) printSummaryForParser(evt);
 }
 
@@ -205,27 +216,29 @@ ImgAverage::endJob(Event& evt, Env& env)
 
 /// Check the event counter and deside what to do next accumulate/change mode/etc.
 bool 
-ImgAverage::setCollectionMode(Event& evt)
+NDArrAverage::setCollectionMode(Event& evt)
 {
   // Set the statistics collection mode without gate
   if (m_count == 0) {
-    // shape is not available in beginJob and beginRun
-    if ( ! defineImageShape(evt, m_str_src, m_key, m_shape) ) return false;
+    // shape is not available in beginJob and beginRun, so need to define it in the 1st event
 
-    m_rows = m_shape[0];
-    m_cols = m_shape[1];
-    m_size = m_rows*m_cols;
+    m_ndarr_pars = new NDArrPars();
 
-    if( m_print_bits & 1 ) printInputParameters();
+    if ( ! defineNDArrPars(evt, m_str_src, m_key, m_ndarr_pars) ) return false;
+
+    m_size = m_ndarr_pars -> size();
+
+    if( m_print_bits & 1 ) m_ndarr_pars -> print();
     m_stat = new unsigned[m_size];
     m_sum  = new double  [m_size];
     m_sum2 = new double  [m_size];
     m_ave  = new double  [m_size];
     m_rms  = new double  [m_size]; 
+    m_msk  = new int     [m_size]; 
     m_hot  = new int     [m_size]; 
     resetStatArrays();
     m_gate_width = 0;
-    if( m_print_bits & 4 ) MsgLog(name(), info, "Stage 0: Image = " << m_count << " Begin to collect statistics without gate.");
+    if( m_print_bits & 4 ) MsgLog(name(), info, "Stage 0: evt = " << m_count << " Begin to collect statistics without gate.");
     return true;
   }
 
@@ -234,7 +247,7 @@ ImgAverage::setCollectionMode(Event& evt)
     procStatArrays();
     resetStatArrays();
     m_gate_width = m_gate_width1;
-    if( m_print_bits & 4 ) MsgLog(name(), info, "Stage 1: Image = " << m_count << " Begin to collect statistics with gate =" << m_gate_width);
+    if( m_print_bits & 4 ) MsgLog(name(), info, "Stage 1: evt = " << m_count << " Begin to collect statistics with gate =" << m_gate_width);
     return true;
   } 
 
@@ -243,7 +256,7 @@ ImgAverage::setCollectionMode(Event& evt)
     procStatArrays();
     resetStatArrays();
     m_gate_width = m_gate_width2;
-    if( m_print_bits & 4 ) MsgLog(name(), info, "Stage 2: Image = " << m_count << " Begin to collect statistics with gate =" << m_gate_width);
+    if( m_print_bits & 4 ) MsgLog(name(), info, "Stage 2: evt = " << m_count << " Begin to collect statistics with gate =" << m_gate_width);
     return true;
   }
   return true;
@@ -253,7 +266,7 @@ ImgAverage::setCollectionMode(Event& evt)
 
 /// Reset arrays for statistics accumulation
 void
-ImgAverage::resetStatArrays()
+NDArrAverage::resetStatArrays()
 {
   std::fill_n(m_stat, int(m_size), unsigned(0));
   std::fill_n(m_sum,  int(m_size), double(0.));
@@ -264,20 +277,21 @@ ImgAverage::resetStatArrays()
 
 /// Collect statistics
 bool 
-ImgAverage::collectStat(Event& evt)
+NDArrAverage::collectStat(Event& evt)
 {
-  if ( collectStatForType<double>  (evt) ) return true;
-  if ( collectStatForType<uint16_t>(evt) ) return true;
-  if ( collectStatForType<int>     (evt) ) return true;
-  if ( collectStatForType<float>   (evt) ) return true;
-  if ( collectStatForType<uint8_t> (evt) ) return true;
-  if ( collectStatForType<short>   (evt) ) return true;
-  if ( collectStatForType<int16_t> (evt) ) return true;
-  if ( collectStatForType<unsigned>(evt) ) return true;
+  DATA_TYPE dtype = m_ndarr_pars->dtype();
+  if      (dtype == DOUBLE   && collectStatForType<double>  (evt)) return true;
+  else if (dtype == UINT16   && collectStatForType<uint16_t>(evt)) return true;
+  else if (dtype == INT      && collectStatForType<int>     (evt)) return true;
+  else if (dtype == FLOAT    && collectStatForType<float>   (evt)) return true;
+  else if (dtype == UINT8    && collectStatForType<uint8_t> (evt)) return true;
+  else if (dtype == SHORT    && collectStatForType<short>   (evt)) return true;
+  else if (dtype == INT16    && collectStatForType<int16_t> (evt)) return true;
+  else if (dtype == UNSIGNED && collectStatForType<unsigned>(evt)) return true;
 
   static unsigned m_count_msg=0; m_count_msg ++;
   if (m_count_msg < 50)
-     MsgLog(name(), warning, "Image is not available in the event(...) for source:" << m_str_src << " key:" << m_key);
+     MsgLog(name(), warning, "ndarray object is not available in the event(...) for source:" << m_str_src << " key:" << m_key);
   if (m_count_msg == 50)
      MsgLog(name(), warning, "STOP PRINTING WARNINGS for source:" << m_str_src << " key:" << m_key);
   return false;
@@ -287,10 +301,10 @@ ImgAverage::collectStat(Event& evt)
 
 /// Process accumulated stat arrays and evaluate m_ave(rage) and m_rms arrays
 void 
-ImgAverage::procStatArrays()
+NDArrAverage::procStatArrays()
 {
   if( m_print_bits & 8 ) MsgLog(name(), info, "Process statistics for collected total " << m_count 
-                                              << " images found in " << m_count_ev << " evetts");
+                                              << " ndarrays found in " << m_count_ev << " events");
   
     for (unsigned i=0; i!=m_size; ++i) {
 
@@ -307,16 +321,22 @@ ImgAverage::procStatArrays()
         }
     }
 
-    if (m_do_mask) {
-      for (unsigned i=0; i!=m_size; ++i)
-         m_hot[i] = (m_rms[i] > m_hot_thr) ? 0 : 1;
+    if (m_do_msk || m_do_hot) {
+      for (unsigned i=0; i!=m_size; ++i) {
+ 	 bool is_bad_pixel = m_rms[i] > m_thr_rms
+                          || m_ave[i] < m_thr_min
+                          || m_ave[i] > m_thr_max;
+
+         m_msk[i] = (is_bad_pixel) ? 0 : 1;
+         m_hot[i] = (is_bad_pixel) ? 1 : 0;
+      }
     }
 }
 
 //--------------------
 
 void 
-ImgAverage::printEventRecord(Event& evt)
+NDArrAverage::printEventRecord(Event& evt)
 {
   MsgLog( name(), info,  "Run="    << stringRunNumber(evt) 
                      << " Evt="    << stringFromUint(m_count_ev) 
@@ -328,14 +348,12 @@ ImgAverage::printEventRecord(Event& evt)
 //--------------------
 
 void 
-ImgAverage::printSummaryForParser(Event& evt)
+NDArrAverage::printSummaryForParser(Event& evt)
 {
-  cout << "ImgAverage: Summary for parser" << endl;
+  cout << "NDArrAverage: Summary for parser"      << endl;
   cout << "BATCH_NUMBER_OF_EVENTS " << m_count_ev << endl;
   cout << "BATCH_NUMBER_OF_IMAGES " << m_count    << endl;
-  cout << "BATCH_IMG_ROWS         " << m_rows     << endl;
-  cout << "BATCH_IMG_COLS         " << m_cols     << endl;
-  cout << "BATCH_IMG_SIZE         " << m_size     << endl;
+  cout << "BATCH_ARR_SIZE         " << m_size     << endl;
 }
 
 //--------------------
