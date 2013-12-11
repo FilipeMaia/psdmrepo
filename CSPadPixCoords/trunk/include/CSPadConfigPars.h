@@ -214,16 +214,19 @@ private:
   PSEvt::Source m_source;        /// member data for data source set from config file
   Pds::Src      m_src;           /// source address as Pds::Src 
  
+  unsigned      m_count_cfg;
+  std::string   m_config_vers;
+  std::string   m_data_vers;
+ 
   // Parameters form Psana::CsPad::ConfigV# object
   uint32_t m_roiMask        [4]; /// mask for turrned on/off (1/0) 2x1s
-  //uint32_t m_numAsicsStored [4];
 
   // Parameters form Psana::CsPad::DataV# and Psana::CsPad::ElementV# object
   uint32_t m_numQuads;           /// number of quads in data
   uint32_t m_quadNumber     [4]; /// quad numbers for index in the range [0, m_numQuads]
   uint32_t m_num2x1Stored   [4]; /// number of 2x1s in quad by index
   uint32_t m_num2x1StoredInData; /// number of 2x1s in CSPAD stored in data
- 
+
 //-------------------
   /**
    * @brief Gets m_src, m_roiMask[q] and m_num2x1Stored[q] from the Psana::CsPad::ConfigV# object.
@@ -235,8 +238,8 @@ private:
         if (config.get()) {
             for (uint32_t q = 0; q < NQuadsMax; ++ q) {
               m_roiMask[q]         = config->roiMask(q);
-              //m_numAsicsStored[q]  = config->numAsicsStored(q);
             }
+            ++ m_count_cfg;
 	    return true;
 	}
 	return false;
@@ -278,9 +281,6 @@ public:
       
       const unsigned* shape = arr_det.shape();
       unsigned size2x1 = shape[1]*shape[2];
-      //cout << "size2x1 = " << size2x1 << endl;
-      //const unsigned shape[] = {32, PC2X1:ROWS2X1, PC2X1:COLS2X1}; // (32,185,388)
-      //unsigned int shape_data[] = {m_num2x1StoredInData, shape[1], shape[2]}; // (N,185,388)
 
       ndarray<T,3> arr_data = make_ndarray<T>(m_num2x1StoredInData, shape[1], shape[2]);
 
@@ -295,7 +295,7 @@ public:
               if( !bitIsOn ) continue; 
       
               int ind2x1_in_det = qNum*8 + sect;             
-      	      std::memcpy(&arr_data[ind2x1_in_data][0][0], &arr_det[ind2x1_in_det][0][0], size2x1*sizeof(double));      
+      	      std::memcpy(&arr_data[ind2x1_in_data][0][0], &arr_det[ind2x1_in_det][0][0], size2x1*sizeof(T));
               ind2x1_in_data ++;
       	  }
       }        
@@ -317,7 +317,7 @@ public:
 
       int numPixTotal = 32*size2x1;
       ndarray<T,3> arr_det = make_ndarray<T>(32, shape[1], shape[2]);
-      std::fill_n(&arr_det[0][0][0], numPixTotal, double(default_value));
+      std::fill_n(&arr_det[0][0][0], numPixTotal, default_value);
 
       uint32_t ind2x1_in_data = 0;
       for (uint32_t q = 0; q < m_numQuads; ++ q) {
@@ -330,7 +330,7 @@ public:
               if( !bitIsOn ) continue; 
 
               int ind2x1_in_det = qNum*8 + sect;             
-      	      std::memcpy(&arr_det[ind2x1_in_det][0][0], &arr_data[ind2x1_in_data][0][0], size2x1*sizeof(double));
+      	      std::memcpy(&arr_det[ind2x1_in_det][0][0], &arr_data[ind2x1_in_data][0][0], size2x1*sizeof(T));
               ind2x1_in_data ++;
 	  }
       }        

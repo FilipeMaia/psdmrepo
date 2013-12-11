@@ -23,6 +23,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "CSPadPixCoords/GlobalMethods.h"
+#include "CSPadPixCoords/CSPadConfigPars.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -67,11 +68,19 @@ namespace CSPadPixCoords {
 class CSPadNDArrProducer : public Module {
 public:
 
-  enum { NQuadsMax    = Psana::CsPad::MaxQuadsPerSensor  };  // 4
-  enum { N2x1         = Psana::CsPad::SectorsPerQuad     };  // 8
-  enum { NCols2x1     = Psana::CsPad::ColumnsPerASIC     };  // 185
-  enum { NRows2x1     = Psana::CsPad::MaxRowsPerASIC * 2 };  // 388
-  enum { SizeOf2x1Arr = NRows2x1 * NCols2x1              };  // 185*388;
+  typedef CSPadPixCoords::CSPadConfigPars CONFIG;
+
+  const static uint32_t NQuadsMax    = 4;
+  const static uint32_t N2x1         = 8;
+  const static uint32_t NRows2x1     = 185;
+  const static uint32_t NCols2x1     = 388;
+  const static uint32_t SizeOf2x1Arr = NRows2x1 * NCols2x1;
+
+  //enum { NQuadsMax    = Psana::CsPad::MaxQuadsPerSensor  };  // 4
+  //enum { N2x1         = Psana::CsPad::SectorsPerQuad     };  // 8
+  //enum { NCols2x1     = Psana::CsPad::ColumnsPerASIC     };  // 185
+  //enum { NRows2x1     = Psana::CsPad::MaxRowsPerASIC * 2 };  // 388
+  //enum { SizeOf2x1Arr = NRows2x1 * NCols2x1              };  // 185*388;
 
   // Default constructor
   CSPadNDArrProducer (const std::string& name) ;
@@ -105,10 +114,12 @@ public:
 protected:
 
   void printInputParameters();
-  void getQuadConfigPars(Env& env);
+  //void getQuadConfigPars(Env& env);
   void getCSPadConfigFromData(Event& evt);
   void procEvent(Event& evt, Env& env);
   void checkTypeImplementation();
+
+  void getConfigParameters(Event& evt, Env& env);
 
 private:
 
@@ -119,68 +130,11 @@ private:
   std::string m_inkey; 
   std::string m_outkey;
   std::string m_outtype;
+  bool        m_is_fullsize;
   unsigned    m_print_bits;
   long        m_count;
   DATA_TYPE   m_dtype;
-
-  // Parameters form Psana::CsPad::ConfigV# object
-  uint32_t m_numQuadsInConfig;
-  uint32_t m_roiMask        [4];
-  uint32_t m_numAsicsStored [4];
-
-  // Parameters form Psana::CsPad::DataV# and Psana::CsPad::ElementV# object
-  uint32_t m_num2x1_actual;
-  uint32_t m_numQuads;
-  uint32_t m_quadNumber     [4];
-  uint32_t m_num2x1Stored   [4];
-
-//-------------------
-  /**
-   * @brief Gets m_numQuadsInConfig, m_roiMask[q] and m_numAsicsStored[q] from the Psana::CsPad::ConfigV# object.
-   * 
-   */
-
-  template <typename T>
-  bool getQuadConfigParsForType(Env& env) {
-
-        shared_ptr<T> config = env.configStore().get(m_source);
-        if (config.get()) {
-            for (uint32_t q = 0; q < NQuadsMax; ++ q) {
-              m_roiMask[q]         = config->roiMask(q);
-              m_numAsicsStored[q]  = config->numAsicsStored(q);
-            }
-	    return true;
-	}
-	return false;
-  }
-
-//-------------------
-  /**
-   * @brief Gets m_num2x1_actual, m_numQuads, and m_quadNumber[q] from the Psana::CsPad::DataV# and ElementV# objects.
-   * 
-   */
-
-  template <typename TDATA, typename TELEMENT>
-  bool getCSPadConfigFromDataForType(Event& evt) {
-
-    shared_ptr<TDATA> shp = evt.get(m_source, m_inkey, &m_src);
-    if (shp.get()) {
-      m_numQuads = shp->quads_shape()[0];
-
-      m_num2x1_actual = 0;
-      //cout << "m_numQuads = " << m_numQuads << "   m_quadNumber[q] = " << endl;
-      for (uint32_t q = 0; q < m_numQuads; ++ q) {
-        const TELEMENT& el = shp->quads(q);
-        m_quadNumber[q]    = el.quad();
-        m_num2x1Stored[q]  = el.data().shape()[0];
-        m_num2x1_actual   += m_num2x1Stored[q];	
-	//for(uint32_t sect=0; sect < N2x1; sect++)
-	//  if( m_roiMask[q] & (1<<sect) ) m_num2x1_actual ++; 
-      }
-      return true;
-    }
-    return false;
-  }
+  CONFIG*     m_config;
 
 //-------------------
   /**
@@ -198,16 +152,16 @@ private:
       if (shp.get()) {
 
         // Create and initialize the array of the same shape as data, but for all 2x1...
-        const unsigned shape[] = {m_num2x1_actual, NCols2x1, NRows2x1};
+        const unsigned shape[] = {m_config->num2x1StoredInData(), NRows2x1, NCols2x1};
         ndarray<TOUT,3> out_ndarr(shape);
         std::fill(out_ndarr.begin(), out_ndarr.end(), TOUT(0));    
 
         typename ndarray<TOUT,3>::iterator it_out = out_ndarr.begin(); 
         //TOUT* it_out = out_ndarr.data();
 
-        m_numQuads = shp->quads_shape()[0];
+        uint32_t numQuads = shp->quads_shape()[0];
 
-        for (uint32_t q = 0; q < m_numQuads; ++ q) {
+        for (uint32_t q = 0; q < numQuads; ++ q) {
             const TELEMENT& el = shp->quads(q);      
             const ndarray<const data_cspad_t,3>& quad_ndarr = el.data();
 
@@ -217,7 +171,11 @@ private:
       	    }
 	}
 
-	save3DArrInEvent<TOUT>(evt, m_src, m_outkey, out_ndarr);
+        if (m_is_fullsize) {
+             ndarray<TOUT,3> nda_det = m_config->getCSPadPixNDArrFromNDArrShapedAsData<TOUT>(out_ndarr);
+	     save3DArrInEvent<TOUT>(evt, m_src, m_outkey, nda_det);
+	}
+	else save3DArrInEvent<TOUT>(evt, m_src, m_outkey, out_ndarr);
 
         return true;
       } // if (shp.get())

@@ -71,7 +71,7 @@ public:
   typedef CSPadPixCoords::CSPad2x2ConfigPars CONFIG;
 
   const static uint32_t NRows2x1 = 185; 
-  const static uint32_t NCols2x1 = 288; 
+  const static uint32_t NCols2x1 = 388; 
   const static uint32_t N2x1     = 2; 
 
   // Default constructor

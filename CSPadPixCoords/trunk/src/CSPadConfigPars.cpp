@@ -97,6 +97,8 @@ CSPadConfigPars::setCSPadConfigParsDefault()
     m_num2x1Stored[q]     = 8;
     m_num2x1StoredInData += m_num2x1Stored[q]; 
   }
+  m_config_vers    = "N/A yet";
+  m_data_vers      = "N/A yet";
 }
 
 //--------------------
@@ -106,9 +108,11 @@ void
 CSPadConfigPars::printCSPadConfigPars()
 {
   WithMsgLog(name(), info, log) {
-    log << "\nCurrent CSPAD configuration parameters:"
-        << "\n  number of quads stored: "   << m_numQuads    
-        << "\n  number of 2x1 stored:   "   << m_num2x1StoredInData;    
+    log << "CSPAD config pars from "      << m_config_vers
+        << " and "                        << m_data_vers
+        << "\n  N configs found:"         << m_count_cfg
+        << "\n  number of quads stored: " << m_numQuads    
+        << "\n  number of 2x1 stored:   " << m_num2x1StoredInData;    
 
     for (uint32_t q = 0; q < m_numQuads; ++ q) {
       log << "\n  quad="  << m_quadNumber[q]
@@ -133,10 +137,11 @@ CSPadConfigPars::setCSPadConfigPars(PSEvt::Event& evt, PSEnv::Env& env)
 void 
 CSPadConfigPars::setCSPadConfigParsFromEnv(PSEnv::Env& env)
 {
-  if ( getQuadConfigParsForType<Psana::CsPad::ConfigV2>(env) ) return;
-  if ( getQuadConfigParsForType<Psana::CsPad::ConfigV3>(env) ) return;
-  if ( getQuadConfigParsForType<Psana::CsPad::ConfigV4>(env) ) return;
-  if ( getQuadConfigParsForType<Psana::CsPad::ConfigV5>(env) ) return;
+  m_count_cfg = 0;
+  if ( getQuadConfigParsForType<Psana::CsPad::ConfigV2>(env) ) { m_config_vers = "CsPad::ConfigV2"; return; }
+  if ( getQuadConfigParsForType<Psana::CsPad::ConfigV3>(env) ) { m_config_vers = "CsPad::ConfigV3"; return; }
+  if ( getQuadConfigParsForType<Psana::CsPad::ConfigV4>(env) ) { m_config_vers = "CsPad::ConfigV4"; return; }
+  if ( getQuadConfigParsForType<Psana::CsPad::ConfigV5>(env) ) { m_config_vers = "CsPad::ConfigV5"; return; }
 
   MsgLog(name(), warning, "CsPad::ConfigV2 - V5 is not available in this run.");
 }
@@ -146,8 +151,8 @@ CSPadConfigPars::setCSPadConfigParsFromEnv(PSEnv::Env& env)
 void 
 CSPadConfigPars::setCSPadConfigParsFromEvent(PSEvt::Event& evt)
 {
-  if ( getCSPadConfigFromDataForType <Psana::CsPad::DataV1, Psana::CsPad::ElementV1> (evt) ) return;
-  if ( getCSPadConfigFromDataForType <Psana::CsPad::DataV2, Psana::CsPad::ElementV2> (evt) ) return;
+  if ( getCSPadConfigFromDataForType <Psana::CsPad::DataV1, Psana::CsPad::ElementV1> (evt) ) { m_config_vers = "CsPad::ConfigV1"; return; }
+  if ( getCSPadConfigFromDataForType <Psana::CsPad::DataV2, Psana::CsPad::ElementV2> (evt) ) { m_config_vers = "CsPad::ConfigV1"; return; }
 
   MsgLog(name(), warning, "getCSPadConfigFromData(...): Psana::CsPad::DataV# / ElementV# for #=[2-5] is not available in this event.");
 }

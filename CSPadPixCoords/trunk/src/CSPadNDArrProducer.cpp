@@ -53,15 +53,17 @@ CSPadNDArrProducer::CSPadNDArrProducer (const std::string& name)
   , m_inkey()
   , m_outkey()
   , m_outtype()
+  , m_is_fullsize()  
   , m_print_bits()
   , m_count(0)
 {
   // get the values from configuration or use defaults
-  m_source        = configSrc("source",     ":Cspad.0");
-  m_inkey         = configStr("inkey",      "");
-  m_outkey        = configStr("outkey",     "cspad_ndarr");
-  m_outtype       = configStr("outtype",    "float");
-  m_print_bits    = config   ("print_bits", 0);
+  m_source        = configSrc("source",       ":Cspad.0");
+  m_inkey         = configStr("inkey",        "");
+  m_outkey        = configStr("outkey",       "cspad_ndarr");
+  m_outtype       = configStr("outtype",      "float");
+  m_is_fullsize   = config   ("is_fullsize",  false);
+  m_print_bits    = config   ("print_bits",   0);
 
   checkTypeImplementation();
 }
@@ -87,6 +89,7 @@ CSPadNDArrProducer::printInputParameters()
         << "\noutkey        : "     << m_outkey       
         << "\nouttype       : "     << m_outtype
         << "\ndtype         : "     << m_dtype
+        << "\nis_fullsize   : "     << m_is_fullsize
         << "\nprint_bits    : "     << m_print_bits
         << "\n";
   }
@@ -103,29 +106,14 @@ CSPadNDArrProducer::beginJob(Event& evt, Env& env)
 
 //--------------------
 
-/// Method which is called at the beginning of the run
-void 
-CSPadNDArrProducer::beginRun(Event& evt, Env& env)
-{
-  // getQuadConfigPars(env); // DO NOT NEED THEM TO COPY ENTIRE ARRAY
-}
-
-//--------------------
-
-/// Method which is called at the beginning of the calibration cycle
-void 
-CSPadNDArrProducer::beginCalibCycle(Event& evt, Env& env)
-{
-}
-
-//--------------------
-
 /// Method which is called with event data, this is the only required 
 /// method, all other methods are optional
 void 
 CSPadNDArrProducer::event(Event& evt, Env& env)
 {
   ++m_count;
+
+  if (m_count==1) getConfigParameters(evt, env);
 
   struct timespec start, stop;
   int status = clock_gettime( CLOCK_REALTIME, &start ); // Get LOCAL time
@@ -141,60 +129,27 @@ CSPadNDArrProducer::event(Event& evt, Env& env)
 }
 
 //--------------------
+
+void CSPadNDArrProducer::getConfigParameters(Event& evt, Env& env)
+{
+  m_config = new CONFIG ( m_source );
+  m_config -> setCSPadConfigPars (evt, env);
+  if( m_print_bits & 2 ) m_config -> printCSPadConfigPars();
+}
+
+//--------------------
+
+void CSPadNDArrProducer::beginRun(Event& evt, Env& env) {}
+void CSPadNDArrProducer::beginCalibCycle(Event& evt, Env& env) {}
+void CSPadNDArrProducer::endCalibCycle(Event& evt, Env& env) {}
+void CSPadNDArrProducer::endRun(Event& evt, Env& env) {}
+void CSPadNDArrProducer::endJob(Event& evt, Env& env) {}
   
-/// Method which is called at the end of the calibration cycle
-void 
-CSPadNDArrProducer::endCalibCycle(Event& evt, Env& env)
-{
-}
-
-//--------------------
-
-/// Method which is called at the end of the run
-void 
-CSPadNDArrProducer::endRun(Event& evt, Env& env)
-{
-}
-
-//--------------------
-
-/// Method which is called once at the end of the job
-void 
-CSPadNDArrProducer::endJob(Event& evt, Env& env)
-{
-}
-
-//--------------------
-
-void 
-CSPadNDArrProducer::getQuadConfigPars(Env& env)
-{
-  if ( getQuadConfigParsForType<Psana::CsPad::ConfigV2>(env) ) return;
-  if ( getQuadConfigParsForType<Psana::CsPad::ConfigV3>(env) ) return;
-  if ( getQuadConfigParsForType<Psana::CsPad::ConfigV4>(env) ) return;
-  if ( getQuadConfigParsForType<Psana::CsPad::ConfigV5>(env) ) return;
-
-  MsgLog(name(), warning, "CsPad::ConfigV2 - V5 is not available in this run.");
-}
-
-//--------------------
-
-void 
-CSPadNDArrProducer::getCSPadConfigFromData(Event& evt)
-{
-  if ( getCSPadConfigFromDataForType <Psana::CsPad::DataV1, Psana::CsPad::ElementV1> (evt) ) return;
-  if ( getCSPadConfigFromDataForType <Psana::CsPad::DataV2, Psana::CsPad::ElementV2> (evt) ) return;
-
-  MsgLog(name(), warning, "getCSPadConfigFromData(...): Psana::CsPad::DataV# / ElementV# for #=[2-5] is not available in this event.");
-}
-
 //--------------------
 
 void 
 CSPadNDArrProducer::procEvent(Event& evt, Env& env)
 {  
-  getCSPadConfigFromData(evt);
-
   // proc event  for one of the supported data types
   if ( m_dtype == FLOAT   and procEventForOutputType<float>   (evt) ) return; 
   if ( m_dtype == DOUBLE  and procEventForOutputType<double>  (evt) ) return; 
