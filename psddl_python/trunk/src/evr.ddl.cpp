@@ -138,6 +138,22 @@ void createWrappers(PyObject* module) {
 
   {
   scope outer = 
+  class_<Psana::EvrData::SrcEventCode >("SrcEventCode", "Describes configuration of self-contained event generator.", no_init)
+    .def("code", &Psana::EvrData::SrcEventCode::code,"Assigned eventcode.")
+    .def("period", &Psana::EvrData::SrcEventCode::period,"Repetition period in 119 MHz counts or 0 for external source.")
+    .def("maskTriggerP", &Psana::EvrData::SrcEventCode::maskTriggerP,"Bit mask of persistent pulse triggers.")
+    .def("maskTriggerR", &Psana::EvrData::SrcEventCode::maskTriggerR,"Bit mask of running pulse triggers.")
+    .def("desc", &Psana::EvrData::SrcEventCode::desc,"Optional description.")
+    .def("readoutGroup", &Psana::EvrData::SrcEventCode::readoutGroup,"Assigned readout group.")
+    .def("desc_shape", &method_shape<Psana::EvrData::SrcEventCode, &Psana::EvrData::SrcEventCode::desc_shape>)
+  ;
+  scope().attr("DescSize")=16;
+  scope().attr("MaxReadoutGroup")=7;
+  }
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::EvrData::SrcEventCode> >(-1));
+
+  {
+  scope outer = 
   class_<Psana::EvrData::OutputMap >("OutputMap", no_init)
     .def("value", &Psana::EvrData::OutputMap::value)
     .def("source", &Psana::EvrData::OutputMap::source)
@@ -351,6 +367,23 @@ void createWrappers(PyObject* module) {
   }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::EvrData::ConfigV7> >(Pds::TypeId::Id_EvrConfig));
 
+  {
+  scope outer = 
+  class_<Psana::EvrData::SrcConfigV1, boost::shared_ptr<Psana::EvrData::SrcConfigV1>, boost::noncopyable >("SrcConfigV1", "Describes configuration of self-contained event generator.", no_init)
+    .def("neventcodes", &Psana::EvrData::SrcConfigV1::neventcodes)
+    .def("npulses", &Psana::EvrData::SrcConfigV1::npulses)
+    .def("noutputs", &Psana::EvrData::SrcConfigV1::noutputs)
+    .def("eventcodes", &Psana::EvrData::SrcConfigV1::eventcodes)
+    .def("pulses", &Psana::EvrData::SrcConfigV1::pulses)
+    .def("output_maps", &Psana::EvrData::SrcConfigV1::output_maps)
+  ;
+  scope().attr("Version")=1;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_EvsConfig);
+  scope().attr("MaxPulses")=12;
+  scope().attr("MaxOutputs")=12;
+  }
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::EvrData::SrcConfigV1> >(Pds::TypeId::Id_EvsConfig));
+
   class_<Psana::EvrData::FIFOEvent >("FIFOEvent", no_init)
     .def("timestampHigh", &Psana::EvrData::FIFOEvent::timestampHigh)
     .def("timestampLow", &Psana::EvrData::FIFOEvent::timestampLow)
@@ -396,8 +429,8 @@ void createWrappers(PyObject* module) {
 
   {
     PyObject* unvlist = PyList_New(1);
-    PyList_SET_ITEM(unvlist, 0, PyObject_GetAttrString(submodule, "DataV3"));
-    PyObject_SetAttrString(submodule, "Data", unvlist);
+    PyList_SET_ITEM(unvlist, 0, PyObject_GetAttrString(submodule, "SrcConfigV1"));
+    PyObject_SetAttrString(submodule, "SrcConfig", unvlist);
     Py_CLEAR(unvlist);
   }
   {
@@ -418,8 +451,15 @@ void createWrappers(PyObject* module) {
     PyObject_SetAttrString(submodule, "IOConfig", unvlist);
     Py_CLEAR(unvlist);
   }
+  {
+    PyObject* unvlist = PyList_New(1);
+    PyList_SET_ITEM(unvlist, 0, PyObject_GetAttrString(submodule, "DataV3"));
+    PyObject_SetAttrString(submodule, "Data", unvlist);
+    Py_CLEAR(unvlist);
+  }
   detail::register_ndarray_to_list_cvt<const Psana::EvrData::SequencerEntry>();
   detail::register_ndarray_to_list_cvt<const Psana::EvrData::OutputMap>();
+  detail::register_ndarray_to_list_cvt<const Psana::EvrData::SrcEventCode>();
   detail::register_ndarray_to_list_cvt<const Psana::EvrData::IOChannel>();
   detail::register_ndarray_to_list_cvt<const Psana::EvrData::EventCodeV4>();
   detail::register_ndarray_to_list_cvt<const Psana::EvrData::EventCodeV5>();

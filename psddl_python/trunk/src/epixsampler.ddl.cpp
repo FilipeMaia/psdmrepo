@@ -48,6 +48,7 @@ void createWrappers(PyObject* module) {
     .def("samplesPerChannel", &Psana::EpixSampler::ConfigV1::samplesPerChannel)
     .def("baseClockFrequency", &Psana::EpixSampler::ConfigV1::baseClockFrequency)
     .def("testPatternEnable", &Psana::EpixSampler::ConfigV1::testPatternEnable)
+    .def("sampleInterval_sec", &Psana::EpixSampler::ConfigV1::sampleInterval_sec)
   ;
   scope().attr("Version")=1;
   scope().attr("TypeId")=int(Pds::TypeId::Id_EpixSamplerConfig);
