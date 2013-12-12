@@ -111,6 +111,7 @@ protected:
   void saveArrInFile(std::string& fname, double* arr);
   void printEventRecord(Event& evt);
   void printSummaryForParser(Event& evt);
+  void printStatBadPix();
 
 private:
 
@@ -146,6 +147,7 @@ private:
 
   NDArrPars*     m_ndarr_pars;
   unsigned       m_size;
+  unsigned       m_nbadpix;
 
   unsigned*      m_stat;  // statistics per pixel
   double*        m_sum;   // sum per pixel

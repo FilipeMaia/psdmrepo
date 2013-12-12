@@ -99,8 +99,8 @@ NDArrAverage::NDArrAverage (const std::string& name)
        && !m_do_ave
        && !m_do_rms ) {
 
-    m_aveFile = "img-ave";
-    m_rmsFile = "img-rms";
+    m_aveFile = "arr-ave";
+    m_rmsFile = "arr-rms";
     m_do_ave  = true;
     m_do_rms  = true;
   }
@@ -209,7 +209,8 @@ NDArrAverage::endJob(Event& evt, Env& env)
   if (m_do_msk)  saveNDArrayInFile<int>    ( m_mskFile+m_fname_ext, m_msk, m_ndarr_pars, m_print_bits & 16, TEXT );
   if (m_do_hot)  saveNDArrayInFile<int>    ( m_hotFile+m_fname_ext, m_hot, m_ndarr_pars, m_print_bits & 16, TEXT );
 
-  if( m_print_bits & 16 ) printSummaryForParser(evt);
+  if( m_print_bits & 32 ) printSummaryForParser(evt);
+  if( m_print_bits & 64 ) printStatBadPix();
 }
 
 //--------------------
@@ -321,6 +322,7 @@ NDArrAverage::procStatArrays()
         }
     }
 
+    m_nbadpix = 0;
     if (m_do_msk || m_do_hot) {
       for (unsigned i=0; i!=m_size; ++i) {
  	 bool is_bad_pixel = m_rms[i] > m_thr_rms
@@ -328,7 +330,8 @@ NDArrAverage::procStatArrays()
                           || m_ave[i] > m_thr_max;
 
          m_msk[i] = (is_bad_pixel) ? 0 : 1;
-         m_hot[i] = (is_bad_pixel) ? 1 : 0;
+         m_hot[i] = (is_bad_pixel) ? 1 : 0;	 
+         if (is_bad_pixel) ++ m_nbadpix; 
       }
     }
 }
@@ -350,12 +353,26 @@ NDArrAverage::printEventRecord(Event& evt)
 void 
 NDArrAverage::printSummaryForParser(Event& evt)
 {
-  cout << "NDArrAverage: Summary for parser"      << endl;
-  cout << "BATCH_NUMBER_OF_EVENTS " << m_count_ev << endl;
-  cout << "BATCH_NUMBER_OF_IMAGES " << m_count    << endl;
-  cout << "BATCH_ARR_SIZE         " << m_size     << endl;
+  cout << "NDArrAverage: Summary for parser"     
+       << "\nBATCH_NUMBER_OF_EVENTS " << m_count_ev
+       << "\nBATCH_NUMBER_OF_IMAGES " << m_count   
+       << "\nBATCH_ARR_SIZE         " << m_size
+       << "\n\n";
 }
 
+//--------------------
+
+void 
+NDArrAverage::printStatBadPix()
+{
+  if (m_do_msk || m_do_hot)
+    cout << "NUMBER_OF_PIXELS_TOTAL " << m_size    
+    	 << "\nNUMBER_OF_PIXELS_BAD   " << m_nbadpix 
+    	 << "\nFRACTION_OF_BAD_PIXELS " << fixed << std::setw(8) << std::setprecision(6) << double(m_nbadpix)/m_size
+    	 << "\n\n";
+}
+
+//--------------------
 //--------------------
 
 } // namespace ImgAlgos
