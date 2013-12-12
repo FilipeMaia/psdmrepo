@@ -82,10 +82,10 @@ namespace CSPadPixCoords {
  *  @endcode
  *  from the PSEvt::Event and PSEnv::Env variables using method
  *  @code
- *      config -> setCSPad2x2ConfigPars (evt, env); 
- *      // or its separate sub-methods
- *      config -> setCSPad2x2ConfigParsFromEnv (env); 
- *      config -> setCSPad2x2ConfigParsFromEvent (evt); 
+ *      bool is_set = config -> setCSPad2x2ConfigPars (evt, env); 
+ *      // or its separate private methods
+ *      bool is_set = config -> setCSPad2x2ConfigParsFromEnv (env); 
+ *      bool is_set = config -> setCSPad2x2ConfigParsFromEvent (evt); 
  *  @endcode
  *  \n
  *  Constructor from explicitly defined configuration parameters. It is not recommended to use. Can be used for stable non-complete configuration of the detector or for test purpose.
@@ -107,8 +107,11 @@ namespace CSPadPixCoords {
  *      uint32_t roiMask  = config -> roiMask();
  *      float common_mode = config -> commonMode();
  *  @endcode
- *  
- *  
+ *
+ */  
+
+
+/*   
  * @li  Conversion between entire CSPAD2x2 pixel array shaped as (185,388,2) and data array shaped as (185,388,N), where N<=2 \n
  * Conversion from (185,388,2) to (185,388,N)
  * @code
@@ -121,7 +124,10 @@ namespace CSPadPixCoords {
  *     ndarray<double,3> nda_data = make_ndarray (p_pix_arr_data, N2X1_IN_DATA, ROWS2X1, COLS2X1); 
  *     ndarray<double,3> nda_det  = cspad_configpars -> getCSPadPixNDArrFromNDArrShapedAsData<double> ( nda_data ); 
  * @endcode
- * 
+ */
+
+  
+/** 
  *  @version \$Id:$
  *
  *  @author Mikhail S. Dubrovin
@@ -160,7 +166,7 @@ public:
    *  @param[in] evt pointer to the event store
    *  @param[in] env pointer to the environment store 
    */
-  void setCSPad2x2ConfigPars(PSEvt::Event& evt, PSEnv::Env& env);
+  bool setCSPad2x2ConfigPars(PSEvt::Event& evt, PSEnv::Env& env);
 
   /// Sets CSPAD configuration parameters to their default values
   void setCSPad2x2ConfigParsDefault();
@@ -180,6 +186,10 @@ public:
   /// Returns the number of 2x1s available in the CSPAD detector (def.= 32)
   uint32_t num2x1Stored() { return m_num2x1Stored; }
 
+  /// Returns status: true if configuration parameters are set from env and evt, otherwise false.
+  bool isSet() { return m_is_set; }   
+
+  /// Returns common mode for 2x1s sections from evt
   float commonMode(int sec) { return m_common_mode[sec]; }
 
 //--------------------
@@ -188,11 +198,11 @@ protected:
 
   /// part of the setCSPad2x2ConfigPars(PSEvt::Event& evt, PSEnv::Env& env)
   /// @param[in] env pointer to the environment store 
-  void setCSPad2x2ConfigParsFromEnv(PSEnv::Env& env);
+  bool setCSPad2x2ConfigParsFromEnv(PSEnv::Env& env);
 
   /// part of the setCSPad2x2ConfigPars(PSEvt::Event& evt, PSEnv::Env& env)
   /// @param[in] evt pointer to the event store
-  void setCSPad2x2ConfigParsFromEvent(PSEvt::Event& evt);
+  bool setCSPad2x2ConfigParsFromEvent(PSEvt::Event& evt);
 
 private:
 
@@ -201,6 +211,9 @@ private:
   unsigned      m_count_cfg;
   std::string   m_config_vers; 
   std::string   m_data_vers; 
+  bool          m_is_set_for_evt;
+  bool          m_is_set_for_env;
+  bool          m_is_set;
  
   // Parameters form Psana::CsPad::ConfigV# object
   uint32_t m_roiMask; /// mask for turrned on/off (1/0) 2x1s

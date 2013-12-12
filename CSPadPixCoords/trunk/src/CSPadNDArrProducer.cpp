@@ -66,6 +66,7 @@ CSPadNDArrProducer::CSPadNDArrProducer (const std::string& name)
   m_print_bits    = config   ("print_bits",   0);
 
   checkTypeImplementation();
+  m_config = new CONFIG ( m_source );
 }
 
 //--------------
@@ -113,7 +114,8 @@ CSPadNDArrProducer::event(Event& evt, Env& env)
 {
   ++m_count;
 
-  if (m_count==1) getConfigParameters(evt, env);
+  if( ! m_config -> isSet() ) m_config -> setCSPadConfigPars(evt, env);
+  if( m_count==1 && m_print_bits & 2 ) m_config -> printCSPadConfigPars();
 
   struct timespec start, stop;
   int status = clock_gettime( CLOCK_REALTIME, &start ); // Get LOCAL time
@@ -126,15 +128,6 @@ CSPadNDArrProducer::event(Event& evt, Env& env)
          << stop.tv_sec - start.tv_sec + 1e-9*(stop.tv_nsec - start.tv_nsec) 
          << " sec" << endl;
   }
-}
-
-//--------------------
-
-void CSPadNDArrProducer::getConfigParameters(Event& evt, Env& env)
-{
-  m_config = new CONFIG ( m_source );
-  m_config -> setCSPadConfigPars (evt, env);
-  if( m_print_bits & 2 ) m_config -> printCSPadConfigPars();
 }
 
 //--------------------

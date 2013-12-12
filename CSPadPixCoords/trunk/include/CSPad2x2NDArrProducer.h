@@ -106,7 +106,6 @@ public:
 protected:
 
   void printInputParameters();
-  void getConfigParameters(Event& evt, Env& env);
   void procEvent(Event& evt, Env& env);
   void checkTypeImplementation();
 

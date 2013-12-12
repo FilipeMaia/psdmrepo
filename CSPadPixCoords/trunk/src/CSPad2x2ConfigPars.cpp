@@ -86,6 +86,9 @@ CSPad2x2ConfigPars::setCSPad2x2ConfigParsDefault()
     m_config_vers    = "N/A yet";
     m_data_vers      = "N/A yet";
     std::fill_n(&m_common_mode[0], int(N2x1), float(0));
+    m_is_set_for_evt = false;
+    m_is_set_for_env = false;
+    m_is_set         = false;
 }
 
 //--------------------
@@ -102,40 +105,47 @@ CSPad2x2ConfigPars::printCSPad2x2ConfigPars()
         << "  num2x1Stored="    << m_num2x1Stored
         << "  numAsicsStored="  << m_numAsicsStored
         << "  common_mode="     << m_common_mode[0] << ", " << m_common_mode[1]
+        << "  is_set_for_evt:"  << m_is_set_for_evt    
+        << "  is_set_for_env:"  << m_is_set_for_env    
+        << "  is_set:"          << m_is_set    
         << "\n";
   }  
 }
 
 //--------------------
 
-void 
+bool
 CSPad2x2ConfigPars::setCSPad2x2ConfigPars(PSEvt::Event& evt, PSEnv::Env& env)
 {
-  setCSPad2x2ConfigParsFromEnv(env);
-  setCSPad2x2ConfigParsFromEvent(evt);
+  if ( ! m_is_set_for_env ) { m_is_set_for_env = setCSPad2x2ConfigParsFromEnv(env); }
+  if ( ! m_is_set_for_evt ) { m_is_set_for_evt = setCSPad2x2ConfigParsFromEvent(evt); }
+  m_is_set = m_is_set_for_env && m_is_set_for_evt;
+  return m_is_set;
 }
 
 //--------------------
 
-void 
+bool 
 CSPad2x2ConfigPars::setCSPad2x2ConfigParsFromEnv(PSEnv::Env& env)
 {
   m_count_cfg = 0; 
-  if ( getConfigParsForType <Psana::CsPad2x2::ConfigV1> (env) ) { m_config_vers = "CsPad2x2::ConfigV1"; return; }
-  if ( getConfigParsForType <Psana::CsPad2x2::ConfigV2> (env) ) { m_config_vers = "CsPad2x2::ConfigV2"; return; }
+  if ( getConfigParsForType <Psana::CsPad2x2::ConfigV1> (env) ) { m_config_vers = "CsPad2x2::ConfigV1"; return true; }
+  if ( getConfigParsForType <Psana::CsPad2x2::ConfigV2> (env) ) { m_config_vers = "CsPad2x2::ConfigV2"; return true; }
 
-  MsgLog(name(), warning, "CsPad2x2::ConfigV1 - V2 is not available in this run.");
-  terminate();
+  MsgLog(name(), warning, "CsPad2x2::ConfigV1 - V2 is not available in this event...");
+  //terminate();
+  return false;
 }
 
 //--------------------
 
-void 
+bool 
 CSPad2x2ConfigPars::setCSPad2x2ConfigParsFromEvent(PSEvt::Event& evt)
 {
-  if ( getCSPadConfigFromDataForType <Psana::CsPad2x2::ElementV1> (evt) ) { m_data_vers = "CsPad2x2::ElementV1"; return; }
+  if ( getCSPadConfigFromDataForType <Psana::CsPad2x2::ElementV1> (evt) ) { m_data_vers = "CsPad2x2::ElementV1"; return true; }
 
-  MsgLog(name(), warning, "setCSPad2x2ConfigParsFromEvent(...): Psana::CsPad2x2::ElementV1 is not available in this event.");
+  MsgLog(name(), warning, "setCSPad2x2ConfigParsFromEvent(...): Psana::CsPad2x2::ElementV1 is not available in this event...");
+  return false;
 }
 
 //--------------------

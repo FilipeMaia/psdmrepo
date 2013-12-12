@@ -11,6 +11,14 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-14
+2013-12-12 Mikhail S. Dubrovin
+- optimization of retreiving of configuration parameters
+M       CSPad2x2ConfigPars
+M       CSPadConfigPars
+M       CSPad2x2NDArrProducer
+M       CSPadNDArrProducer
+
 Tag: V00-03-13
 2013-12-10 Mikhail S. Dubrovin
 - use CSPadConfigPars in CSPadNDArrProducer

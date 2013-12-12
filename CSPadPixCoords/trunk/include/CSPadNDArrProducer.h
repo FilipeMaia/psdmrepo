@@ -114,12 +114,8 @@ public:
 protected:
 
   void printInputParameters();
-  //void getQuadConfigPars(Env& env);
-  void getCSPadConfigFromData(Event& evt);
   void procEvent(Event& evt, Env& env);
   void checkTypeImplementation();
-
-  void getConfigParameters(Event& evt, Env& env);
 
 private:
 

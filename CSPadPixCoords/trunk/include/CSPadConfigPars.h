@@ -82,10 +82,10 @@ namespace CSPadPixCoords {
  *  @endcode
  *  from the PSEvt::Event and PSEnv::Env variables using method
  *  @code
- *      config -> setCSPadConfigPars (evt, env); 
- *      // or its separate sub-methods
- *      config -> setCSPadConfigParsFromEnv (env); 
- *      config -> setCSPadConfigParsFromEvent (evt); 
+ *      bool is_set = config -> setCSPadConfigPars (evt, env); 
+ *      // or its separate private methods
+ *      bool is_set = config -> setCSPadConfigParsFromEnv (env); 
+ *      bool is_set = config -> setCSPadConfigParsFromEvent (evt); 
  *  @endcode
  *  \n
  *  Constructor from explicitly defined configuration parameters. It is not recommended to use. Can be used for stable non-complete configuration of the detector or for test purpose.
@@ -166,7 +166,7 @@ public:
    *  @param[in] evt pointer to the event store
    *  @param[in] env pointer to the environment store 
    */
-  void setCSPadConfigPars(PSEvt::Event& evt, PSEnv::Env& env);
+  bool setCSPadConfigPars(PSEvt::Event& evt, PSEnv::Env& env);
 
   /// Sets CSPAD configuration parameters to their default values
   void setCSPadConfigParsDefault();
@@ -195,6 +195,9 @@ public:
   /// Returns the number of 2x1s available in the CSPAD detector (def.= 32)
   uint32_t num2x1StoredInData  ()       { return m_num2x1StoredInData; }
 
+  /// Returns status: true if configuration parameters are set from env and evt, otherwise false.
+  bool isSet() { return m_is_set; }   
+
   //uint32_t numberOfAsicsStored (int iq) { return m_numAsicsStored[iq]; }
 
 //--------------------
@@ -203,11 +206,11 @@ protected:
 
   /// part of the setCSPadConfigPars(PSEvt::Event& evt, PSEnv::Env& env)
   /// @param[in] env pointer to the environment store 
-  void setCSPadConfigParsFromEnv(PSEnv::Env& env);
+  bool setCSPadConfigParsFromEnv(PSEnv::Env& env);
 
   /// part of the setCSPadConfigPars(PSEvt::Event& evt, PSEnv::Env& env)
   /// @param[in] evt pointer to the event store
-  void setCSPadConfigParsFromEvent(PSEvt::Event& evt);
+  bool setCSPadConfigParsFromEvent(PSEvt::Event& evt);
 
 private:
 
@@ -217,6 +220,9 @@ private:
   unsigned      m_count_cfg;
   std::string   m_config_vers;
   std::string   m_data_vers;
+  bool          m_is_set_for_evt;
+  bool          m_is_set_for_env;
+  bool          m_is_set;
  
   // Parameters form Psana::CsPad::ConfigV# object
   uint32_t m_roiMask        [4]; /// mask for turrned on/off (1/0) 2x1s
@@ -236,8 +242,10 @@ private:
 
         boost::shared_ptr<T> config = env.configStore().get(m_source, &m_src);
         if (config.get()) {
+            m_num2x1StoredInData = 0;
             for (uint32_t q = 0; q < NQuadsMax; ++ q) {
-              m_roiMask[q]         = config->roiMask(q);
+              m_roiMask[q] = config->roiMask(q);
+              m_num2x1StoredInData += getNum2x1InMask(m_roiMask[q]); 
             }
             ++ m_count_cfg;
 	    return true;

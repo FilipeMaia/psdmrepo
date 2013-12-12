@@ -52,9 +52,10 @@ CSPadConfigPars::CSPadConfigPars ( uint32_t numQuads,
 				   uint32_t roiMask[]
 				  )
 {
+  setCSPadConfigParsDefault();
+
   m_numQuads = numQuads;
   m_num2x1StoredInData = 0;
-
   for (uint32_t q = 0; q < m_numQuads; ++ q) {
     m_quadNumber[q]       = quadNumber[q];
     m_roiMask[q]          = roiMask[q];
@@ -90,7 +91,6 @@ CSPadConfigPars::setCSPadConfigParsDefault()
 {
   m_numQuads = NQuadsMax;
   m_num2x1StoredInData = 0;
-
   for (uint32_t q = 0; q < m_numQuads; ++ q) {
     m_quadNumber[q]       = q;
     m_roiMask[q]          = 0377; // or 255;
@@ -99,6 +99,9 @@ CSPadConfigPars::setCSPadConfigParsDefault()
   }
   m_config_vers    = "N/A yet";
   m_data_vers      = "N/A yet";
+  m_is_set_for_evt = false;
+  m_is_set_for_env = false;
+  m_is_set         = false;
 }
 
 //--------------------
@@ -112,7 +115,10 @@ CSPadConfigPars::printCSPadConfigPars()
         << " and "                        << m_data_vers
         << "\n  N configs found:"         << m_count_cfg
         << "\n  number of quads stored: " << m_numQuads    
-        << "\n  number of 2x1 stored:   " << m_num2x1StoredInData;    
+        << "\n  number of 2x1 stored:   " << m_num2x1StoredInData    
+        << "\n  is_set_for_evt:         " << m_is_set_for_evt 
+        << "\n  is_set_for_env:         " << m_is_set_for_env    
+        << "\n  is_set:                 " << m_is_set;    
 
     for (uint32_t q = 0; q < m_numQuads; ++ q) {
       log << "\n  quad="  << m_quadNumber[q]
@@ -125,36 +131,40 @@ CSPadConfigPars::printCSPadConfigPars()
 
 //--------------------
 
-void 
+bool 
 CSPadConfigPars::setCSPadConfigPars(PSEvt::Event& evt, PSEnv::Env& env)
 {
-  setCSPadConfigParsFromEnv(env);
-  setCSPadConfigParsFromEvent(evt);
+  if ( ! m_is_set_for_env ) { m_is_set_for_env = setCSPadConfigParsFromEnv(env); }
+  if ( ! m_is_set_for_evt ) { m_is_set_for_evt = setCSPadConfigParsFromEvent(evt); }
+  m_is_set = m_is_set_for_env && m_is_set_for_evt;
+  return m_is_set;
 }
 
 //--------------------
 
-void 
+bool
 CSPadConfigPars::setCSPadConfigParsFromEnv(PSEnv::Env& env)
 {
   m_count_cfg = 0;
-  if ( getQuadConfigParsForType<Psana::CsPad::ConfigV2>(env) ) { m_config_vers = "CsPad::ConfigV2"; return; }
-  if ( getQuadConfigParsForType<Psana::CsPad::ConfigV3>(env) ) { m_config_vers = "CsPad::ConfigV3"; return; }
-  if ( getQuadConfigParsForType<Psana::CsPad::ConfigV4>(env) ) { m_config_vers = "CsPad::ConfigV4"; return; }
-  if ( getQuadConfigParsForType<Psana::CsPad::ConfigV5>(env) ) { m_config_vers = "CsPad::ConfigV5"; return; }
+  if ( getQuadConfigParsForType<Psana::CsPad::ConfigV2>(env) ) { m_config_vers = "CsPad::ConfigV2"; return true; }
+  if ( getQuadConfigParsForType<Psana::CsPad::ConfigV3>(env) ) { m_config_vers = "CsPad::ConfigV3"; return true; }
+  if ( getQuadConfigParsForType<Psana::CsPad::ConfigV4>(env) ) { m_config_vers = "CsPad::ConfigV4"; return true; }
+  if ( getQuadConfigParsForType<Psana::CsPad::ConfigV5>(env) ) { m_config_vers = "CsPad::ConfigV5"; return true; }
 
-  MsgLog(name(), warning, "CsPad::ConfigV2 - V5 is not available in this run.");
+  MsgLog(name(), warning, "CsPad::ConfigV2-V5 is not available in this event...");
+  return false;
 }
 
 //--------------------
 
-void 
+bool 
 CSPadConfigPars::setCSPadConfigParsFromEvent(PSEvt::Event& evt)
 {
-  if ( getCSPadConfigFromDataForType <Psana::CsPad::DataV1, Psana::CsPad::ElementV1> (evt) ) { m_config_vers = "CsPad::ConfigV1"; return; }
-  if ( getCSPadConfigFromDataForType <Psana::CsPad::DataV2, Psana::CsPad::ElementV2> (evt) ) { m_config_vers = "CsPad::ConfigV1"; return; }
+  if ( getCSPadConfigFromDataForType <Psana::CsPad::DataV1, Psana::CsPad::ElementV1> (evt) ) { m_data_vers = "CsPad::ElementV1"; return true; }
+  if ( getCSPadConfigFromDataForType <Psana::CsPad::DataV2, Psana::CsPad::ElementV2> (evt) ) { m_data_vers = "CsPad::ElementV2"; return true; }
 
-  MsgLog(name(), warning, "getCSPadConfigFromData(...): Psana::CsPad::DataV# / ElementV# for #=[2-5] is not available in this event.");
+  MsgLog(name(), warning, "getCSPadConfigFromData(...): Psana::CsPad::DataV# / ElementV# for #=[1,2] is not available in this event...");
+  return false;
 }
 
 //--------------------
