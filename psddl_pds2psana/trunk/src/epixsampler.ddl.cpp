@@ -88,6 +88,11 @@ uint8_t ConfigV1::testPatternEnable() const {
   return m_xtcObj->testPatternEnable();
 }
 
+
+double ConfigV1::sampleInterval_sec() const {
+  return m_xtcObj->sampleInterval_sec();
+}
+
 template <typename Config>
 ElementV1<Config>::ElementV1(const boost::shared_ptr<const XtcType>& xtcPtr, const boost::shared_ptr<const Config>& cfgPtr)
   : Psana::EpixSampler::ElementV1()

@@ -22,6 +22,8 @@ Psana::EvrData::EventCodeV5 pds_to_psana(Pds::EvrData::EventCodeV5 pds);
 
 Psana::EvrData::EventCodeV6 pds_to_psana(Pds::EvrData::EventCodeV6 pds);
 
+Psana::EvrData::SrcEventCode pds_to_psana(Pds::EvrData::SrcEventCode pds);
+
 Psana::EvrData::OutputMap pds_to_psana(Pds::EvrData::OutputMap pds);
 
 Psana::EvrData::OutputMapV2 pds_to_psana(Pds::EvrData::OutputMapV2 pds);
@@ -194,6 +196,27 @@ private:
   ndarray<Psana::EvrData::PulseConfigV3, 1> _pulses_ndarray_storage_;
   ndarray<Psana::EvrData::OutputMapV2, 1> _output_maps_ndarray_storage_;
   psddl_pds2psana::EvrData::SequencerConfigV1 _seq_config;
+};
+
+
+class SrcConfigV1 : public Psana::EvrData::SrcConfigV1 {
+public:
+  typedef Pds::EvrData::SrcConfigV1 XtcType;
+  typedef Psana::EvrData::SrcConfigV1 PsanaType;
+  SrcConfigV1(const boost::shared_ptr<const XtcType>& xtcPtr);
+  virtual ~SrcConfigV1();
+  virtual uint32_t neventcodes() const;
+  virtual uint32_t npulses() const;
+  virtual uint32_t noutputs() const;
+  virtual ndarray<const Psana::EvrData::SrcEventCode, 1> eventcodes() const;
+  virtual ndarray<const Psana::EvrData::PulseConfigV3, 1> pulses() const;
+  virtual ndarray<const Psana::EvrData::OutputMapV2, 1> output_maps() const;
+  const XtcType& _xtcObj() const { return *m_xtcObj; }
+private:
+  boost::shared_ptr<const XtcType> m_xtcObj;
+  ndarray<Psana::EvrData::SrcEventCode, 1> _eventcodes_ndarray_storage_;
+  ndarray<Psana::EvrData::PulseConfigV3, 1> _pulses_ndarray_storage_;
+  ndarray<Psana::EvrData::OutputMapV2, 1> _output_maps_ndarray_storage_;
 };
 
 Psana::EvrData::FIFOEvent pds_to_psana(Pds::EvrData::FIFOEvent pds);

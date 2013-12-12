@@ -818,6 +818,22 @@ try {
       } // end switch (version)
     }
     break;
+  case Pds::TypeId::Id_EvsConfig:
+    {
+      switch (version) {
+      case 1:
+        {
+          // store XTC object in config store
+          boost::shared_ptr<Pds::EvrData::SrcConfigV1> xptr(xtc, (Pds::EvrData::SrcConfigV1*)(xtc->payload()));
+          cfgStore.put(xptr, xtc->src);
+          // create and store psana object in config store
+          boost::shared_ptr<Psana::EvrData::SrcConfigV1> obj = boost::make_shared<psddl_pds2psana::EvrData::SrcConfigV1>(xptr);
+          cfgStore.put(obj, xtc->src);
+        }
+        break;
+      } // end switch (version)
+    }
+    break;
   case Pds::TypeId::Id_FccdConfig:
     {
       switch (version) {
@@ -2178,6 +2194,13 @@ std::vector<const std::type_info *> getXtcConvertTypeInfoPtrs(const Pds::TypeId 
     switch(typeId.version()) {
     case 1:
       typeIdPtrs.push_back( &typeid(Psana::EvrData::IOConfigV1) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_EvsConfig:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::EvrData::SrcConfigV1) );
       break;
     } // end version switch
     break;

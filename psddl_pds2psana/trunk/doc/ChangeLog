@@ -11,8 +11,13 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-07
+2013-12-12 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-53
+- new type Evr::SrcConfigV1
+
 Tag: V00-08-06
-2013-12-o2 Andy Salnikov
+2013-12-02 Andy Salnikov
 - regenerate whole thing from psddldata V00-04-50
 - new epixsampler package
 

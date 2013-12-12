@@ -30,6 +30,7 @@ public:
   virtual uint32_t samplesPerChannel() const;
   virtual uint32_t baseClockFrequency() const;
   virtual uint8_t testPatternEnable() const;
+  virtual double sampleInterval_sec() const;
   const XtcType& _xtcObj() const { return *m_xtcObj; }
 private:
   boost::shared_ptr<const XtcType> m_xtcObj;
