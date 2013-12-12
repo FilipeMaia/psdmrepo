@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-06
+2013-12-12 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-53
+- new type Evr::SrcConfigV1
+
 Tag: V00-05-05
 2013-11-12 Andy Salnikov
 - regenerate whole thing from psddldata V00-04-50

@@ -36,6 +36,7 @@ public:
   virtual uint32_t samplesPerChannel() const = 0;
   virtual uint32_t baseClockFrequency() const = 0;
   virtual uint8_t testPatternEnable() const = 0;
+  virtual double sampleInterval_sec() const = 0;
 };
 
 /** @class ElementV1

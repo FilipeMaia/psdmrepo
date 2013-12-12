@@ -32,6 +32,13 @@ EventCodeV6::desc_shape() const {
   shape.push_back(DescSize);
   return shape;
 }
+std::vector<int>
+SrcEventCode::desc_shape() const {
+  std::vector<int> shape;
+  shape.reserve(1);
+  shape.push_back(DescSize);
+  return shape;
+}
 uint32_t
 OutputMap::map() const {
      enum { Pulse_Offset=0, DBus_Offset=32, Prescaler_Offset=40 };    unsigned src_id = source_id();   switch(source()) {   case Pulse     : return src_id + Pulse_Offset;   case DBus      : return src_id + DBus_Offset;   case Prescaler : return src_id + Prescaler_Offset;   case Force_High: return 62;   case Force_Low : return 63;   }   return 0;
@@ -218,6 +225,9 @@ ConfigV6::~ConfigV6() {}
 
 
 ConfigV7::~ConfigV7() {}
+
+
+SrcConfigV1::~SrcConfigV1() {}
 
 
 DataV3::~DataV3() {}

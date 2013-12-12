@@ -252,6 +252,49 @@ private:
   uint16_t	_u16ReadGroup;
 };
 
+/** @class SrcEventCode
+
+  Describes configuration of self-contained event generator.
+*/
+
+
+class SrcEventCode {
+public:
+  enum { DescSize = 16 };
+  enum { MaxReadoutGroup = 7 };
+  SrcEventCode()
+  {
+  }
+  SrcEventCode(uint16_t arg__u16Code, uint32_t arg__u32Period, uint32_t arg__u32MaskTriggerP, uint32_t arg__u32MaskTriggerR, const char* arg__desc, uint16_t arg__u16ReadGroup)
+    : _u16Code(arg__u16Code), _u32Period(arg__u32Period), _u32MaskTriggerP(arg__u32MaskTriggerP), _u32MaskTriggerR(arg__u32MaskTriggerR), _u16ReadGroup(arg__u16ReadGroup)
+  {
+    if (arg__desc) std::copy(arg__desc, arg__desc+(16), &_desc[0]);
+  }
+  /** Assigned eventcode. */
+  uint16_t code() const { return _u16Code; }
+  /** Repetition period in 119 MHz counts or 0 for external source. */
+  uint32_t period() const { return _u32Period; }
+  /** Bit mask of persistent pulse triggers. */
+  uint32_t maskTriggerP() const { return _u32MaskTriggerP; }
+  /** Bit mask of running pulse triggers. */
+  uint32_t maskTriggerR() const { return _u32MaskTriggerR; }
+  /** Optional description. */
+  const char* desc() const { return _desc; }
+  /** Assigned readout group. */
+  uint16_t readoutGroup() const { return _u16ReadGroup; }
+  static uint32_t _sizeof() { return (((((16+(1*(DescSize)))+2)+4)-1)/4)*4; }
+  /** Method which returns the shape (dimensions) of the data returned by desc() method. */
+  std::vector<int> desc_shape() const;
+private:
+  uint16_t	_u16Code;	/**< Assigned eventcode. */
+  uint16_t	_u16rsvd;
+  uint32_t	_u32Period;	/**< Repetition period in 119 MHz counts or 0 for external source. */
+  uint32_t	_u32MaskTriggerP;	/**< Bit mask of persistent pulse triggers. */
+  uint32_t	_u32MaskTriggerR;	/**< Bit mask of running pulse triggers. */
+  char	_desc[DescSize];	/**< Optional description. */
+  uint16_t	_u16ReadGroup;	/**< Assigned readout group. */
+};
+
 /** @class OutputMap
 
   
@@ -541,6 +584,27 @@ public:
   virtual ndarray<const EvrData::PulseConfigV3, 1> pulses() const = 0;
   virtual ndarray<const EvrData::OutputMapV2, 1> output_maps() const = 0;
   virtual const EvrData::SequencerConfigV1& seq_config() const = 0;
+};
+
+/** @class SrcConfigV1
+
+  Describes configuration of self-contained event generator.
+*/
+
+
+class SrcConfigV1 {
+public:
+  enum { TypeId = Pds::TypeId::Id_EvsConfig /**< XTC type ID value (from Pds::TypeId class) */ };
+  enum { Version = 1 /**< XTC type version number */ };
+  enum { MaxPulses = 12 /**< Maximum pulses in the system */ };
+  enum { MaxOutputs = 12 /**< Maximum outputs in the system */ };
+  virtual ~SrcConfigV1();
+  virtual uint32_t neventcodes() const = 0;
+  virtual uint32_t npulses() const = 0;
+  virtual uint32_t noutputs() const = 0;
+  virtual ndarray<const EvrData::SrcEventCode, 1> eventcodes() const = 0;
+  virtual ndarray<const EvrData::PulseConfigV3, 1> pulses() const = 0;
+  virtual ndarray<const EvrData::OutputMapV2, 1> output_maps() const = 0;
 };
 
 /** @class FIFOEvent
