@@ -39,11 +39,11 @@
             </ctor>
 
             <method name="sampleInterval_sec" type="double">
-                <expr lang="C++" body="
+                <code lang="C++" body="
                 double v=0;
-                for (unsigned r=_baseClockFrequency; r!=0; r>>4)
+                for (unsigned r=baseClockFrequency(); r!=0; r&gt;&gt;=4)
                   v += 10*(r &amp; 0xf);
-                return double(_adcClkHalfT)*2.e-3/v;" />
+                return double(adcClkHalfT())*2.e-3/v;" />
             </method>
         </pstype>
         

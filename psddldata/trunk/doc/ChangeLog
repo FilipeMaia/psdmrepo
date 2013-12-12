@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-53
+2013-12-12 Andy
+- fix definition of EpicsSampler.ConfigV1.sampleInterval_sec method
+
 Tag: V00-04-52
 2013-12-06 Matt
 - add Evr::SrcConfigV1 for event source hardware - SLAC modification of EVR.
