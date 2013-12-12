@@ -6,6 +6,25 @@
     <use file="psddldata/epixsampler.ddl.xml" />
 
     <package name="EpixSampler">
+
+        <h5schema name="ConfigV1" version="0">
+            <dataset name="config">
+                <attribute name="version"/>
+                <attribute name="runTrigDelay"/>
+                <attribute name="daqTrigDelay"/>
+                <attribute name="daqSetting"/>
+                <attribute name="adcClkHalfT"/>
+                <attribute name="adcPipelineDelay"/>
+                <attribute name="digitalCardId0"/>
+                <attribute name="digitalCardId1"/>
+                <attribute name="analogCardId0"/>
+                <attribute name="analogCardId1"/>
+                <attribute name="numberOfChannels"/>
+                <attribute name="samplesPerChannel"/>
+                <attribute name="baseClockFrequency"/>
+                <attribute name="testPatternEnable"/>
+            </dataset>
+        </h5schema>
     
         <h5schema name="ElementV1" version="0">
             <dataset name="data">

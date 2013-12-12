@@ -62,6 +62,8 @@ public:
   virtual uint32_t samplesPerChannel() const;
   virtual uint32_t baseClockFrequency() const;
   virtual uint8_t testPatternEnable() const;
+    double sampleInterval_sec() const;
+
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;

@@ -329,6 +329,10 @@ try {
     // EvrData::IOConfigV1
     cfgStore.putProxy(psddl_hdf2psana::EvrData::make_IOConfigV1(schema_version, group, idx), src);
     break;
+  case 2001219479:
+    // EvrData::SrcEventCode
+    evt.putProxy(psddl_hdf2psana::EvrData::make_SrcEventCode(schema_version, group, idx), src);
+    break;
   case 2058892252:
     // Imp::ConfigV1
     cfgStore.putProxy(psddl_hdf2psana::Imp::make_ConfigV1(schema_version, group, idx), src);
@@ -496,6 +500,10 @@ try {
   case 3486939574:
     // CsPad2x2::ConfigV2
     cfgStore.putProxy(psddl_hdf2psana::CsPad2x2::make_ConfigV2(schema_version, group, idx), src);
+    break;
+  case 3515749019:
+    // EvrData::SrcConfigV1
+    cfgStore.putProxy(psddl_hdf2psana::EvrData::make_SrcConfigV1(schema_version, group, idx), src);
     break;
   case 3565044250:
     // Acqiris::ConfigV1
