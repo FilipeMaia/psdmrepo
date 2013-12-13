@@ -139,7 +139,7 @@
             <attribute name="_u16Code" type="uint16_t" accessor="code">
             </attribute>
 
-            <attribute name="_u16MaskEventAttr" type="uint16_t" accessor="_u16MaskEventAttr_value">
+            <attribute name="_u16MaskEventAttr" type="uint16_t">
                 <bitfield name="_bf_isReadout" size="1" type="uint8_t" accessor="isReadout"/>                
                 <bitfield name="_bf_isTerminator" size="1" type="uint8_t" accessor="isTerminator"/>                
             </attribute>
@@ -174,7 +174,7 @@
             <attribute name="_u16Code" type="uint16_t" accessor="code">
             </attribute>
 
-            <attribute name="_u16MaskEventAttr" type="uint16_t" accessor="_u16MaskEventAttr_value">
+            <attribute name="_u16MaskEventAttr" type="uint16_t">
                 <bitfield name="_bf_isReadout" size="1" type="uint8_t" accessor="isReadout"/>                
                 <bitfield name="_bf_isTerminator" size="1" type="uint8_t" accessor="isTerminator"/>                
             </attribute>

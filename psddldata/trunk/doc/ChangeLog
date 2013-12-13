@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-54
+2013-12-12 Andy
+- in evr.EventCodeV[34] remove _u16MaskEventAttr_value() method, this is not 
+  used anywhere and interferes with default HDF5 schema
+
 Tag: V00-04-53
 2013-12-12 Andy
 - fix definition of EpicsSampler.ConfigV1.sampleInterval_sec method
