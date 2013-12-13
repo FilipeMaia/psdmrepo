@@ -79,25 +79,27 @@
 
             <method name="frameSize" type="uint32_t">
             Total size in bytes of the Frame object
-                <expr lang="C++" value="sizeof(FrameV1) + {self}.numPixels()*2"/>
+            <!-- The code here cannot reference pdsdata directly so we cannot write sizeof(Pds::Andor::FrameV1),
+            instead we use hardcoded number for it.  -->
+                <expr lang="C++" value="12 + {self}.numPixels()*2"/>
             </method>
 
             <method name="numPixelsX" type="uint32_t">
             calculate frame X size in pixels based on the current ROI and binning settings
                 <tag name="inline"/>
-                <expr lang="C++" value="(_uWidth + _uBinX - 1) / _uBinX"/>
+                <expr lang="C++" value="(width() + binX() - 1) / binX()"/>
             </method>
 
             <method name="numPixelsY" type="uint32_t">
             calculate frame Y size in pixels based on the current ROI and binning settings
                 <tag name="inline"/>
-                <expr lang="C++" value="(_uHeight+ _uBinY - 1) / _uBinY"/>
+                <expr lang="C++" value="(height() + binY() - 1) / binY()"/>
             </method>
 
             <method name="numPixels" type="uint32_t">
             calculate total frame size in pixels based on the current ROI and binning settings
                 <tag name="inline"/>
-                <expr lang="C++" value="((_uWidth + _uBinX-1)/ _uBinX )*((_uHeight+ _uBinY-1)/ _uBinY )"/>
+                <expr lang="C++" value="numPixelsX()*numPixelsY()"/>
             </method>
 
         </pstype>

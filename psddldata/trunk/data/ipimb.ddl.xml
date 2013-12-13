@@ -96,7 +96,7 @@
                 /* return type is actually ndarray&lt;uint8_t, 1&gt; (at least for now) */
                 ndarray&lt;uint8_t, 1&gt; cap = make_ndarray&lt;uint8_t&gt;(4);
                 for (int ch = 0; ch != 4; ++ ch) {
-                  cap[ch] = uint8_t(({self}.chargeAmpRange() &gt;&gt; (ch*4)) &amp; 0xf);
+                  cap[ch] = uint8_t(({self}.chargeAmpRange() &gt;&gt; (ch*2)) &amp; 0x3);
                 }
                 return cap;" />
             </method>

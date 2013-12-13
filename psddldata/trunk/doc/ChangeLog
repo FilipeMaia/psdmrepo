@@ -11,6 +11,14 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-55
+2013-12-12 Andy
+- bug fix in Ipimb.ConfigV1.capacitorValues() method, it returned incorrect 
+  values
+- fix Andor.ConfigV1 methods to use methods instead of direct data access, 
+  this is necessary to support new HDF5 schema which does not store corresponding
+  data fields
+
 Tag: V00-04-54
 2013-12-12 Andy
 - in evr.EventCodeV[34] remove _u16MaskEventAttr_value() method, this is not 
