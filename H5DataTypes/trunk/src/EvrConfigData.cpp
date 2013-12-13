@@ -444,6 +444,70 @@ EvrEventCodeV6::native_type()
 }
 
 //
+// Helper type for Pds::EvrData::EvrSrcEventCode
+//
+EvrSrcEventCode::EvrSrcEventCode ()
+  : desc(0)
+{
+}
+
+EvrSrcEventCode::EvrSrcEventCode ( const Pds::EvrData::SrcEventCode& evtcode )
+  : code(evtcode.code())
+  , period(evtcode.period())
+  , maskTriggerP(evtcode.maskTriggerP())
+  , maskTriggerR(evtcode.maskTriggerR())
+  , readoutGroup(evtcode.readoutGroup())
+{
+  const char* p = evtcode.desc();
+  int len = strlen(p)+1;
+  desc = new char[len];
+  std::copy(p, p+len, desc);
+}
+
+EvrSrcEventCode&
+EvrSrcEventCode::operator= ( const Pds::EvrData::SrcEventCode& evtcode )
+{
+  code = evtcode.code();
+  period = evtcode.period();
+  maskTriggerP = evtcode.maskTriggerP();
+  maskTriggerR = evtcode.maskTriggerR();
+  readoutGroup = evtcode.readoutGroup();
+
+  delete [] desc;
+  const char* p = evtcode.desc();
+  int len = strlen(p)+1;
+  desc = new char[len];
+  std::copy(p, p+len, desc);
+
+  return *this;
+}
+
+EvrSrcEventCode::~EvrSrcEventCode ()
+{
+  delete [] desc;
+}
+
+hdf5pp::Type
+EvrSrcEventCode::stored_type()
+{
+  return native_type() ;
+}
+
+hdf5pp::Type
+EvrSrcEventCode::native_type()
+{
+  typedef EvrSrcEventCode DsType;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
+  type.insert("code", offsetof(DsType, code), hdf5pp::TypeTraits<uint16_t>::native_type());
+  type.insert("period", offsetof(DsType, period), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("maskTriggerP", offsetof(DsType, maskTriggerP), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("maskTriggerR", offsetof(DsType, maskTriggerR), hdf5pp::TypeTraits<uint32_t>::native_type());
+  type.insert("desc", offsetof(DsType, desc), hdf5pp::TypeTraits<const char*>::native_type());
+  type.insert("readoutGroup", offsetof(DsType, readoutGroup), hdf5pp::TypeTraits<uint16_t>::native_type());
+  return type;
+}
+
+//
 // Helper type for Pds::EvrData::IOChannel
 //
 

@@ -244,6 +244,32 @@ private:
 };
 
 //
+// Helper type for Pds::EvrData::EvrSrcEventCode
+//
+class EvrSrcEventCode : boost::noncopyable {
+public:
+
+  EvrSrcEventCode ();
+  EvrSrcEventCode ( const Pds::EvrData::SrcEventCode& evtcode ) ;
+  ~EvrSrcEventCode ();
+
+  EvrSrcEventCode& operator= ( const Pds::EvrData::SrcEventCode& evtcode ) ;
+
+  static hdf5pp::Type stored_type() ;
+  static hdf5pp::Type native_type() ;
+
+private:
+  
+  uint16_t      code;       /**< Assigned eventcode. */
+  uint32_t      period;     /**< Repetition period in 119 MHz counts or 0 for external source. */
+  uint32_t      maskTriggerP;       /**< Bit mask of persistent pulse triggers. */
+  uint32_t      maskTriggerR;       /**< Bit mask of running pulse triggers. */
+  char*         desc;
+  uint16_t      readoutGroup;  /**< Assigned readout group. */
+
+};
+
+//
 // Helper type for Pds::EvrData::IOChannel
 //
 struct EvrIOChannelDetInfo_Data {
