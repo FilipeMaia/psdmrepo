@@ -134,6 +134,8 @@ class FileDeployer :
 
         gu.save_textfile(rec, path_history, mode='a')
 
+        self.changeFilePermissions(path_history)
+
 #-----------------------------
 
 fd = FileDeployer()

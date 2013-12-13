@@ -166,8 +166,9 @@ class GUIStatus ( QtGui.QGroupBox ) :
         else :
             msg += 'Selected list of detector(s): %s' % self.det_name.value()
 
-            ctype='pedestals'
-            if self.current_tab.value() == 'Dark' : ctype='pedestals'
+            ctype = 'pedestals'
+            if self.current_tab.value() == 'Dark'         : ctype = 'pedestals'
+            if self.current_tab.value() == 'File Manager' : ctype = None
             #if self.current_tab.value() == cp.guitabs.list_of_tabs[0] : ctype='pedestals'
             
             #msg = 'From %s to %s use dark run %s' % (self.str_run_from.value(), self.str_run_to.value(), self.str_run_number.value())

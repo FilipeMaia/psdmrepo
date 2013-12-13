@@ -12,7 +12,14 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 Tag: V00-00-06
-2013-12-77 Mikhail S. Dubrovin
+2013-12-12 Mikhail S. Dubrovin
+- Tuning of the GUIFileManager features;
+  - apply copy command through FileDeployer with record to the hystory file.
+  - show GUIStatus depending on type of tab: "Dark"-pedestals, "File Manager" - all calib types 
+  - add more default file extensions for GUIFileBrowser, do not restric opening of any file...
+	
+Tag: V00-00-06
+2013-12-07 Mikhail S. Dubrovin
 - improve logistics of buttons in GUIInsExpDirDet, GUIStatus.py, GUIDarkListItemRun.py
 - add src/GUIFileManager.py, src/GUIFileManagerSelect.py
 	

@@ -74,7 +74,7 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         self.but_sxtc = QtGui.QPushButton( 'Sources XTC' )
         self.but_flst = QtGui.QPushButton( 'O/Files' )
         self.but_fxtc = QtGui.QPushButton( 'xtc Files' )
-        self.but_fbro = QtGui.QPushButton( 'File Browser' )
+        self.but_view = QtGui.QPushButton( 'View' )
         self.but_plot = QtGui.QPushButton( 'Plot' )
         self.but_show = QtGui.QPushButton( 'Show cmd' )
 
@@ -86,7 +86,7 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         self.hbox.addWidget(self.but_flst)
         self.hbox.addWidget(self.but_show)
         self.hbox.addWidget(self.cbx_dark_more)
-        self.hbox.addWidget(self.but_fbro)
+        self.hbox.addWidget(self.but_view)
         self.hbox.addWidget(self.but_plot)
         self.hbox.addStretch(1)     
 
@@ -113,7 +113,7 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         self.connect( self.but_sxtc, QtCore.SIGNAL('clicked()'), self.on_but_sxtc )
         self.connect( self.but_flst, QtCore.SIGNAL('clicked()'), self.on_but_flst )
         self.connect( self.but_fxtc, QtCore.SIGNAL('clicked()'), self.on_but_fxtc )
-        self.connect( self.but_fbro, QtCore.SIGNAL('clicked()'), self.on_but_fbro )
+        self.connect( self.but_view, QtCore.SIGNAL('clicked()'), self.on_but_view )
         self.connect( self.but_plot, QtCore.SIGNAL('clicked()'), self.on_but_plot )
         self.connect( self.but_show, QtCore.SIGNAL('clicked()'), self.on_but_show )
    
@@ -130,7 +130,7 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         self.but_sxtc.setToolTip('Show data types and sources from xtc file scan')
         self.but_flst.setToolTip('Show status list of output files')
         self.but_fxtc.setToolTip('Show input xtc files for run %s' % self.run_number)
-        self.but_fbro.setToolTip('Start text file browser in separate window')
+        self.but_view.setToolTip('Start text file browser in separate window')
         self.but_plot.setToolTip('Start image plot browser in separate window')
         self.but_show.setToolTip('Show commands for file deployment')
         self.cbx_dark_more.setToolTip('Add more buttons with other options')
@@ -171,7 +171,7 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         self.but_sxtc.setFixedWidth(90)
         self.but_flst.setFixedWidth(60)
         self.but_show.setFixedWidth(80)
-        self.but_fbro.setFixedWidth(90)
+        self.but_view.setFixedWidth(90)
         self.but_plot.setFixedWidth(60)
 
         #self.setContentsMargins (QtCore.QMargins(-9,-9,-9,-9))
@@ -184,7 +184,7 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         #self.but_flst.setVisible( self.cbx_dark_more.isChecked() )
         #self.but_fxtc.setVisible( self.cbx_dark_more.isChecked() )
         #self.but_show.setVisible( self.cbx_dark_more.isChecked() )
-        self.but_fbro.setVisible( self.cbx_dark_more.isChecked() )
+        self.but_view.setVisible( self.cbx_dark_more.isChecked() )
         self.but_plot.setVisible( self.cbx_dark_more.isChecked() )
 
 
@@ -304,15 +304,15 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
              + gu.get_list_of_files_for_list_of_insets(fnm.path_hotpix_mask(), lst_of_srcs)
 
 
-    def on_but_fbro(self):
+    def on_but_view(self):
         self.exportLocalPars()
 
-        logger.debug('on_but_fbro', __name__)
+        logger.debug('on_but_view', __name__)
         try    :
             cp.guifilebrowser.close()
-            #self.but_fbro.setStyleSheet(cp.styleButtonBad)
+            #self.but_view.setStyleSheet(cp.styleButtonBad)
         except :
-            #self.but_fbro.setStyleSheet(cp.styleButtonGood)
+            #self.but_view.setStyleSheet(cp.styleButtonGood)
             
             cp.guifilebrowser = GUIFileBrowser(None, self.get_list_of_files_peds(), fnm.path_peds_scan_psana_cfg())
             cp.guifilebrowser.move(self.pos().__add__(QtCore.QPoint(880,40))) # open window with offset w.r.t. parent

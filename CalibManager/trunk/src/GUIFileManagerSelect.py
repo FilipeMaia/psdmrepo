@@ -54,6 +54,7 @@ import GlobalUtils     as     gu
 import RegDBUtils      as     ru
 from GUIFileBrowser         import *
 from PlotImgSpe             import *
+from FileDeployer           import fd
 
 #---------------------
 #  Class definition --
@@ -82,6 +83,7 @@ class GUIFileManagerSelect ( QtGui.QWidget ) :
 
         #cp.setIcons()
 
+        self.path_fm_selected = ''
         self.setParams()
  
         self.lab_src        = QtGui.QLabel('for detector')
@@ -102,7 +104,7 @@ class GUIFileManagerSelect ( QtGui.QWidget ) :
  
         self.but_copy   = QtGui.QPushButton('Copy')
         self.but_delete = QtGui.QPushButton('Delete')
-        self.but_fbro   = QtGui.QPushButton('File Browser')
+        self.but_view   = QtGui.QPushButton('View')
         self.but_plot   = QtGui.QPushButton('Plot')
         #self.but_copy  .setIcon(cp.icon_monitor)
 
@@ -117,7 +119,7 @@ class GUIFileManagerSelect ( QtGui.QWidget ) :
 
         self.hboxD = QtGui.QHBoxLayout() 
         #self.hboxD.addSpacing(50)
-        self.hboxD.addWidget( self.but_fbro   )
+        self.hboxD.addWidget( self.but_view   )
         self.hboxD.addWidget( self.but_plot   )
         self.hboxD.addWidget( self.but_delete )
         self.hboxD.addStretch(1)     
@@ -147,7 +149,7 @@ class GUIFileManagerSelect ( QtGui.QWidget ) :
 
         self.connect( self.but_browse, QtCore.SIGNAL('clicked()'), self.onButBrowse ) 
         self.connect( self.but_copy,   QtCore.SIGNAL('clicked()'), self.onButCopy   ) 
-        self.connect( self.but_fbro,   QtCore.SIGNAL('clicked()'), self.onButFBro   ) 
+        self.connect( self.but_view,   QtCore.SIGNAL('clicked()'), self.onButView   ) 
         self.connect( self.but_plot,   QtCore.SIGNAL('clicked()'), self.onButPlot   ) 
         self.connect( self.but_delete, QtCore.SIGNAL('clicked()'), self.onButDelete ) 
         self.connect( self.but_src,    QtCore.SIGNAL('clicked()'), self.onButSrc    ) 
@@ -174,7 +176,7 @@ class GUIFileManagerSelect ( QtGui.QWidget ) :
         self.but_src   .setToolTip('Select name of the detector')
         self.but_type  .setToolTip('Select type of calibration parameters')
         self.but_copy  .setToolTip('Copy selected file')
-        self.but_fbro  .setToolTip('Launch file browser')
+        self.but_view  .setToolTip('Launch file browser')
         self.but_plot  .setToolTip('Launch plot browser')
         self.but_delete.setToolTip('Delete selected file\nDelete  is allowed for\nWORK or CALIB directories only')
         self.edi_from  .setToolTip('Enter run number in range [0,9999]')
@@ -193,7 +195,7 @@ class GUIFileManagerSelect ( QtGui.QWidget ) :
         self.          setStyleSheet(cp.styleBkgd)
         self.but_copy  .setStyleSheet(cp.styleButton)
         self.but_delete.setStyleSheet(cp.styleButton)
-        self.but_fbro  .setStyleSheet(cp.styleButton)
+        self.but_view  .setStyleSheet(cp.styleButton)
         self.but_plot  .setStyleSheet(cp.styleButton)
         
         self.setMinimumSize(630,100)
@@ -217,7 +219,7 @@ class GUIFileManagerSelect ( QtGui.QWidget ) :
         self.lab_from  .setStyleSheet(cp.styleLabel)
         self.lab_to    .setStyleSheet(cp.styleLabel)
  
-        #self.butFBrowser.setVisible(False)
+        #self.butViewwser.setVisible(False)
         #self.butSave.setText('')
         #self.butExit.setText('')
         #self.butExit.setFlat(True)
@@ -236,7 +238,7 @@ class GUIFileManagerSelect ( QtGui.QWidget ) :
         else :
             self.but_browse.setStyleSheet(cp.styleButton)
 
-        self.but_fbro.setEnabled(file_is_enable)
+        self.but_view.setEnabled(file_is_enable)
         self.but_plot.setEnabled(file_is_enable)
 
         #print '\nself.str_path()', self.str_path()
@@ -270,7 +272,8 @@ class GUIFileManagerSelect ( QtGui.QWidget ) :
  
 
     def setParams(self) :
-        self.path_fm_selected = ''
+        if self.path_fm_selected != '' :
+            self.path_fm_selected = os.path.dirname(self.path_fm_selected)
         self.str_run_from     = '0'
         self.str_run_to       = 'end'
         self.source_name      = 'Select'
@@ -288,7 +291,7 @@ class GUIFileManagerSelect ( QtGui.QWidget ) :
 
 
     def resetFieldsOnDelete(self) :
-        self.path_fm_selected = ''
+        self.path_fm_selected = os.path.dirname(self.path_fm_selected) # ''
         self.edi_file  .setText(self.path_fm_selected)
         self.setStyleButtons()
 
@@ -325,34 +328,33 @@ class GUIFileManagerSelect ( QtGui.QWidget ) :
     def onButCopy(self):
         #logger.info('onButCopy', __name__)
         cmd = 'cp %s %s' % (self.str_path(), self.get_out_path())
-        self.actionOnBut(self.but_copy, cmd)
+        if self.approveCommand(self.but_copy, cmd) :
+            #os.system(cmd)
+            fd.procDeployCommand(cmd)
 
 
     def onButDelete(self):
         #logger.info('onButDelete', __name__)
         cmd = 'rm %s' % self.str_path()
-        self.actionOnBut(self.but_delete, cmd)
-        self.resetFieldsOnDelete()
+        if self.approveCommand(self.but_delete, cmd) :
+            os.system(cmd)
+            self.resetFieldsOnDelete()
+            
 
-
-    def actionOnBut(self, but, cmd):
+    def approveCommand(self, but, cmd):
         msg = 'Approve command:\n' + cmd
         resp = gu.confirm_or_cancel_dialog_box(parent=but, text=msg, title='Please confirm or cancel!')
-        #print 'resp = ', resp
-        #cmd_seq = cmd.split()
-
         if resp :
-            #logger.info('os.system(cmd) IS COMMENTED!', __name__)
-            os.system(cmd)
             logger.info('Approved command:\n' + cmd, __name__)
-
+        return resp
 
     def selectDirFromPopupMenu(self, dir_current='.'):
 
         list_of_opts = [  'Use WORK directory'
                          ,'Use CALIB directory'
-                         ,'Use CURRENT directory'
+                         ,'Use CURRENT FILE directory'
                          ,'Use OTHER EXPERIMENT directory'
+                         ,'Use ./'
                          ,'Reset'
                          ,'Cancel'
                         ]
@@ -364,8 +366,9 @@ class GUIFileManagerSelect ( QtGui.QWidget ) :
         elif selected == list_of_opts[1] : return fnm.path_to_calib_dir()
         elif selected == list_of_opts[2] : return dir_current
         elif selected == list_of_opts[3] : return os.path.join(fnm.path_to_calib_dir(),'../../')
-        elif selected == list_of_opts[4] : return ''
-        elif selected == list_of_opts[5] : return None
+        elif selected == list_of_opts[4] : return './'
+        elif selected == list_of_opts[5] : return ''
+        elif selected == list_of_opts[6] : return None
         else                             : return None
  
 
@@ -390,7 +393,7 @@ class GUIFileManagerSelect ( QtGui.QWidget ) :
         if path0 is '' :
             path = path0
         else :
-            file_filter = 'Files (*.txt *.data)\nAll files (*)'
+            file_filter = 'Files (*.txt *.data *.dat HISTORY)\nAll files (*)'
             path = gu.get_open_fname_through_dialog_box(self, path0, 'Select file', filter=file_filter)
             if path == None or path == '' :
                 logger.debug('File selection is cancelled...', __name__ )
@@ -472,9 +475,9 @@ class GUIFileManagerSelect ( QtGui.QWidget ) :
         self.setStyleButtons()
 
 
-    def onButFBro(self):
+    def onButView(self):
         #self.exportLocalPars()
-        logger.debug('onButFBro', __name__)
+        logger.debug('onButView', __name__)
         try    :
             cp.guifilebrowser.close()
         except :

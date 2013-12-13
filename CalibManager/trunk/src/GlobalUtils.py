@@ -504,7 +504,7 @@ def xtc_fname_for_all_chunks(path='e167-r0015-s00-c00.xtc') :
 # for example        /reg/d/psdm/CXI/cxitut13/calib
 # or                 /reg/d/psdm/XPP/xpptut13/calib
 
-def get_text_content_of_calib_dir_for_detector(path, det='cspad', subdir='CsPad::CalibV1', level=0, calib_type='pedestals') :
+def get_text_content_of_calib_dir_for_detector(path, det='cspad', subdir='CsPad::CalibV1', level=0, calib_type=None) :
 
     #logger.debug( 'get_txt_content_of_calib_dir_for_detector(...): ' + path, __name__)
     det_lower = det.lower()
@@ -525,7 +525,7 @@ def get_text_content_of_calib_dir_for_detector(path, det='cspad', subdir='CsPad:
         #cond0 = level==0 and det.lower()+'::' in fname_lower
         cond0 = level==0 and subdir in file
         cond1 = level==1 and det.lower()+'.'  in fname_lower
-        cond2 = level==2 and file == calib_type
+        cond2 = level==2 and (file == calib_type or calib_type is None)
         cond3 = level==3
 
         if not ( cond0 or cond1 or cond2 or cond3 ) : continue

@@ -189,7 +189,7 @@ class GUIFileBrowser ( QtGui.QWidget ) :
         path0 ='./'
         if len(self.list_of_files) > 1 : path0 = self.list_of_files[1]
 
-        path = gu.get_open_fname_through_dialog_box(self, path0, 'Select text file for browser', filter='Text files (*.txt *.cfg *.npy)\nAll files (*)')
+        path = gu.get_open_fname_through_dialog_box(self, path0, 'Select text file for browser', filter='Text files (*.txt *.dat *.data *.cfg *.npy)\nAll files (*)')
         if path == None or path == '' or path == path0 :
             logger.debug('Loading is cancelled...', __name__ )
             return
@@ -211,7 +211,8 @@ class GUIFileBrowser ( QtGui.QWidget ) :
 
         if self.fname == '' : return
 
-        self.list_of_supported = 'cfg', 'log', 'txt', 'txt-tmp' 
+        #self.list_of_supported = ['cfg', 'log', 'txt', 'txt-tmp', '', 'dat', 'data']
+        self.list_of_supported = ['ALL']
         self.str_of_supported = ''
         for ext in self.list_of_supported : self.str_of_supported += ' ' + ext
 
@@ -225,7 +226,7 @@ class GUIFileBrowser ( QtGui.QWidget ) :
         elif os.path.lexists(self.fname) :
             ext = os.path.splitext(self.fname)[1].lstrip('.')
 
-            if ext in self.list_of_supported :
+            if ext in self.list_of_supported or self.list_of_supported[0] == 'ALL' :
                 self.box_txt.setText(gu.load_textfile(self.fname))
                 self.setStatus(0, 'Status: enjoy browsing the selected file...')
 
