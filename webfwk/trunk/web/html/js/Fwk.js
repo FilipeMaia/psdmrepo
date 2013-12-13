@@ -1,8 +1,41 @@
 /*
+ * The base class for user-defined applications.
+ *
+ * @returns {FwkApplication}
+ */
+function FwkApplication () {
+
+    this.container = null ;
+    this.active = false ;
+
+    this.set_container = function (container) { if (!this.container) this.container = container ; }
+    this.activate = function (container) {
+        this.set_container(container) ;
+        this.active = true ;
+        this.on_activate() ;
+    } ;
+    this.deactivate = function (container) {
+        this.set_container(container) ;
+        this.active = false ;
+        this.on_deactivate() ;
+    } ;
+    this.update = function (container) {
+        this.set_container(container) ;
+        this.on_update() ;
+    } ;
+
+    // These methods are supposed to be implemented by derived classes
+
+    this.on_activate   = function () { window.console.log('FwkApplication::on_activate() NOT IMPLEMENTED') ; } ;
+    this.on_deactivate = function () { window.console.log('FwkApplication::on_deactivate() NOT IMPLEMENTED') ; } ;
+    this.on_update     = function () { window.console.log('FwkApplication::on_update() NOT IMPLEMENTED') ; } ;
+}
+
+/*
  * An interface providing persistent support for run-time configurations
  * of Web applications.
  */
-function FwkConfigHandlerCreator (application_config, scope, parameter) {
+function _FwkConfigHandlerCreator (application_config, scope, parameter) {
 
     this.application_config = application_config ;
 
@@ -27,7 +60,7 @@ function FwkConfigHandlerCreator (application_config, scope, parameter) {
     } ;
 }
 
-function FwkConfigCreator (application_name) {
+function _FwkConfigCreator (application_name) {
 
     this.application_name = application_name ;
 
@@ -35,7 +68,7 @@ function FwkConfigCreator (application_name) {
     
     this.handler = function (scope, parameter) {
         if (!(scope     in this.cached_handlers))        this.cached_handlers[scope] = {} ;
-        if (!(parameter in this.cached_handlers[scope])) this.cached_handlers[scope][parameter] = new FwkConfigHandlerCreator(this, scope, parameter) ;
+        if (!(parameter in this.cached_handlers[scope])) this.cached_handlers[scope][parameter] = new _FwkConfigHandlerCreator(this, scope, parameter) ;
         return this.cached_handlers[scope][parameter] ;
     } ;
 
@@ -81,48 +114,15 @@ function FwkConfigCreator (application_name) {
 }
 
 /*
- * The base class for user-defined applications.
- *
- * @returns {FwkApplication}
- */
-function FwkApplication () {
-
-    this.container = null ;
-    this.active = false ;
-
-    this.set_container = function (container) { if (!this.container) this.container = container ; }
-    this.activate = function (container) {
-        this.set_container(container) ;
-        this.active = true ;
-        this.on_activate() ;
-    } ;
-    this.deactivate = function (container) {
-        this.set_container(container) ;
-        this.active = false ;
-        this.on_deactivate() ;
-    } ;
-    this.update = function (container) {
-        this.set_container(container) ;
-        this.on_update() ;
-    } ;
-
-    // These methods are supposed to be implemented by derived classes
-
-    this.on_activate   = function () { window.console.log('FwkApplication::on_activate() NOT IMPLEMENTED') ; } ;
-    this.on_deactivate = function () { window.console.log('FwkApplication::on_deactivate() NOT IMPLEMENTED') ; } ;
-    this.on_update     = function () { window.console.log('FwkApplication::on_update() NOT IMPLEMENTED') ; } ;
-}
-
-/*
  * The proxy class representing applications within the framework
  * 
  * @param {String} name
  * @param {String} full_name
- * @returns {FwkApplicationProxy}
+ * @returns {_FwkApplicationProxy}
  */
-function FwkApplicationProxy (name, full_name) {
+function _FwkApplicationProxy (name, full_name) {
 
-    var that = this ;
+    var _that = this ;
 
     this.name = name ;
     this.full_name = full_name ;
@@ -140,8 +140,8 @@ function FwkApplicationProxy (name, full_name) {
     this.is_initialized = false ;
 
     this.select = function (ctx1, ctx2) {
-        that.context1 = ctx1 || '' ;
-        that.context2 = ctx2 || '' ;
+        _that.context1 = ctx1 || '' ;
+        _that.context2 = ctx2 || '' ;
     } ;
     this.context1_to_name = function () {
         if (this.context[this.context1] !== undefined)
@@ -298,7 +298,7 @@ function FwkApplicationProxy (name, full_name) {
  */
 function FwkCreator () {
 
-    var that = this;
+    var _that = this;
 
     this.title = null ;
     this.subtitle = null ;
@@ -334,11 +334,11 @@ function FwkCreator () {
         this.title = title ;
         this.subtitle = subtitle ;
 
-        this.config_svc = new FwkConfigCreator(this.title+':'+this.subtitle) ;
+        this.config_svc = new _FwkConfigCreator(this.title+':'+this.subtitle) ;
 
         for (var i in ui_config) {
             var menu1 = ui_config[i] ;
-            var app_proxy = new FwkApplicationProxy(''+i, menu1.name) ;
+            var app_proxy = new _FwkApplicationProxy(''+i, menu1.name) ;
             app_proxy.wa_id = null ;
             if (menu1.menu) {
                 var first_menu2 = true ;
@@ -403,25 +403,25 @@ function FwkCreator () {
         // Delayed initialization after we get the authentication context
         // of the logged user.
 
-        that.web_service_GET (
+        this.web_service_GET (
             '../authdb/ws/AuthenticationProfile.php' ,
             {} ,
             function (data) {
 
                 // Finalize the UI builfing process
 
-                that.auth = data.profile ;
-                that.is_built = true ;
+                _that.auth = data.profile ;
+                _that.is_built = true ;
 
                 // Build the UI and start the framework services
 
-                that.init_html () ;
-                that.start_vsplitter_manager() ;
-                that.auth_timer_restart() ;
-                that.init_tabs_menus () ;
-                that.update_timer_restart() ;
+                _that._init_html () ;
+                _that._start_vsplitter_manager() ;
+                _that._auth_timer_restart() ;
+                _that._init_tabs_menus () ;
+                _that._update_timer_restart() ;
                 
-                if (that.on_build) that.on_build() ;
+                if (_that.on_build) _that.on_build() ;
             }
         ) ;
     } ;
@@ -445,9 +445,9 @@ function FwkCreator () {
      * --------------------------------
      */
  
-    this.mouse_down = false ;
+    this._mouse_down = false ;
 
-    this.resize = function () {
+    this._resize = function () {
         var    top_height = 132 ;
         var bottom_height = 0 ;
         var center_height = $(window).height() - top_height - bottom_height ;
@@ -458,7 +458,7 @@ function FwkCreator () {
 
     /* Get mouse position relative to the document.
      */
-    this.getMousePosition = function (e) {
+    this._getMousePosition = function (e) {
 
         var posx = 0 ;
         var posy = 0 ;
@@ -474,27 +474,27 @@ function FwkCreator () {
         return {'x': posx, 'y': posy } ;
     } ;
 
-    this.move_split = function  (e) {
-        var pos = this.getMousePosition(e) ;
+    this._move_split = function  (e) {
+        var pos = this._getMousePosition(e) ;
         $('#fwk-left'    ).css('width',       pos['x']) ;
         $('#fwk-splitter').css('left',        pos['x']) ;
         $('#fwk-center'  ).css('margin-left', pos['x']+1) ;
     }
 
-    this.start_vsplitter_manager = function() {
+    this._start_vsplitter_manager = function() {
 
-        $('body').attr('onresize', 'Fwk.resize()') ;
+        $('body').attr('onresize', 'Fwk._resize()') ;
 
-        this.resize() ;
+        this._resize() ;
 
-        $('#fwk-splitter').mousedown (function(e) { that.mouse_down = true ; return false ; }) ;
+        $('#fwk-splitter').mousedown (function(e) { _that._mouse_down = true ; return false ; }) ;
 
-        $('#fwk-left'    ).mousemove(function(e) { if (that.mouse_down) that.move_split(e) ; });
-        $('#fwk-center'  ).mousemove(function(e) { if (that.mouse_down) that.move_split(e) ; });
+        $('#fwk-left'    ).mousemove(function(e) { if (_that._mouse_down) _that._move_split(e) ; });
+        $('#fwk-center'  ).mousemove(function(e) { if (_that._mouse_down) _that._move_split(e) ; });
 
-        $('#fwk-left'    ).mouseup  (function(e) { that.mouse_down = false ; });
-        $('#fwk-splitter').mouseup  (function(e) { that.mouse_down = false ; });
-        $('#fwk-center'  ).mouseup  (function(e) { that.mouse_down = false ; });
+        $('#fwk-left'    ).mouseup  (function(e) { _that._mouse_down = false ; });
+        $('#fwk-splitter').mouseup  (function(e) { _that._mouse_down = false ; });
+        $('#fwk-center'  ).mouseup  (function(e) { _that._mouse_down = false ; });
     } ;
 
     /* -----------------------------
@@ -502,16 +502,14 @@ function FwkCreator () {
      * -----------------------------
      */
 
-    this.auth_timer = null ;
+    this._auth_timer = null ;
 
-    this.auth_timer_restart = function () {
+    this._auth_timer_restart = function () {
         if (this.auth.is_authenticated && (this.auth.type === 'WebAuth'))
-            this.auth_timer = window.setTimeout('Fwk.auth_timer_event()', 1000 ) ;
+            this._auth_timer = window.setTimeout('Fwk._auth_timer_event()', 1000 ) ;
     } ;
 
-    this.auth_last_secs = null ;
-
-    this.auth_timer_event = function () {
+    this._auth_timer_event = function () {
         var now_sec = this.now().sec ;
         var seconds = this.auth.webauth_token_expiration - now_sec ;
         if (seconds <= 0) {
@@ -526,7 +524,7 @@ function FwkCreator () {
                 buttons: {
                     'Ok': function () {
                         $(this).dialog('close') ;
-                        that.refresh_page() ;
+                        _that._refresh_page() ;
                     }
                 } ,
                 title: 'Session Expiration Notification'
@@ -548,7 +546,7 @@ function FwkCreator () {
             '<b>'+hours_left_str+':'+minutes_left_str+'.'+seconds_left_str+'</b>'
         ) ;
 
-        this.auth_timer_restart() ;
+        this._auth_timer_restart() ;
     } ;
 
     this.logout = function () {
@@ -564,7 +562,7 @@ function FwkCreator () {
                     $(this).dialog('close') ;
                     document.cookie = 'webauth_wpt_krb5=; expires=Fri, 27 Jul 2001 02:47:11 UTC; path=/' ;
                     document.cookie = 'webauth_at=; expires=Fri, 27 Jul 2001 02:47:11 UTC; path=/' ;
-                    that.refresh_page() ;
+                    _that._refresh_page() ;
                 } ,
                 Cancel: function () {
                     $(this).dialog('close') ;
@@ -574,7 +572,7 @@ function FwkCreator () {
         }) ;
     } ;
 
-    this.refresh_page = function () {
+    this._refresh_page = function () {
         window.location = this.url ;
     } ;
 
@@ -611,6 +609,14 @@ function FwkCreator () {
         container.dialog ({
             modal:  true ,
             title:  'e-mail: '+user
+        }) ;
+    } ;
+    this.show_path = function (filepath) {
+        var container = $('#fwk-popupdialogs') ;
+        container.html('<p>'+filepath+'</p>') ;
+        container.dialog ({
+            modal:  true ,
+            title:  'File Path'
         }) ;
     } ;
     this.ask_yes_no = function (title, msg, on_yes, on_cancel) {
@@ -830,7 +836,7 @@ function FwkCreator () {
         return ;
     } ;
 
-    this.v_item_group = function (item) {
+    this._v_item_group = function (item) {
         var item = $(item) ;
         var parent = item.parent() ;
         if (parent.hasClass('fwk-menu-group-members')) return parent.prev() ;
@@ -840,7 +846,7 @@ function FwkCreator () {
     /* Event handler for application selections from the top-level menu bar
      * to fill current application context.
      */
-    this.m_item_selected = function (item) {
+    this._m_item_selected = function (item) {
 
         var item = $(item) ;
 
@@ -857,15 +863,15 @@ function FwkCreator () {
         this.set_context(app_proxy, app_proxy.context1, app_proxy.context2) ;
 
         if (app_proxy.context2)
-            this.v_item_selected($('#fwk-menu > #'+app_proxy.name+' > #'+app_proxy.context1).next().children('.fwk-menu-item#'+app_proxy.context2)) ;
+            this._v_item_selected($('#fwk-menu > #'+app_proxy.name+' > #'+app_proxy.context1).next().children('.fwk-menu-item#'+app_proxy.context2)) ;
         else
-            this.v_item_selected($('#fwk-menu > #'+app_proxy.name).children('.fwk-menu-item#'+app_proxy.context1)) ;
+            this._v_item_selected($('#fwk-menu > #'+app_proxy.name).children('.fwk-menu-item#'+app_proxy.context1)) ;
     } ;
 
     /* Event handler for vertical menu group selections will only
      * show/hide children (if any).
      */
-    this.v_group_selected = function (group) {
+    this._v_group_selected = function (group) {
         var group = $(group) ;
         var toggler = group.children('.ui-icon') ;
         if (toggler.hasClass('ui-icon-triangle-1-s')) {
@@ -884,21 +890,21 @@ function FwkCreator () {
      * - execute the commands
      * - switch the work area (make the old one invisible, and the new one visible)
      */
-    this.v_item_selected = function (item) {
+    this._v_item_selected = function (item) {
 
         var item = $(item) ;
 
         $('#fwk-menu > #'+this.app_proxy_current.name).find('.fwk-menu-item.fwk-menu-select').each(function () {
             $(this).children('.ui-icon').removeClass('ui-icon-triangle-1-s').addClass('ui-icon-triangle-1-e') ;
             $(this).removeClass('fwk-menu-select') ;
-            var this_group = that.v_item_group(this) ;
+            var this_group = _that._v_item_group(this) ;
             if (this_group != null) this_group.removeClass('fwk-menu-select') ;
         });
 
         item.children('.ui-icon').removeClass('ui-icon-triangle-1-e').addClass('ui-icon-triangle-1-s') ;
         item.addClass('fwk-menu-select') ;
 
-        var group = this.v_item_group(item) ;
+        var group = this._v_item_group(item) ;
         if (group) {
 
             /* Force the group to unwrap
@@ -925,17 +931,17 @@ function FwkCreator () {
         $('#fwk-applications > #'+this.app_proxy_current.get_wa_id()).addClass('fwk-visible') ;
     } ;
 
-    this.init_tabs_menus = function () {
+    this._init_tabs_menus = function () {
 
-	$('.fwk-tab'       ).click(function() { that.m_item_selected (this) ; }) ;
-	$('.fwk-menu-group').click(function() { that.v_group_selected(this) ; }) ;
-	$('.fwk-menu-item' ).click(function() { that.v_item_selected (this) ; }) ;
+	$('.fwk-tab'       ).click(function() { _that._m_item_selected (this) ; }) ;
+	$('.fwk-menu-group').click(function() { _that._v_group_selected(this) ; }) ;
+	$('.fwk-menu-item' ).click(function() { _that._v_item_selected (this) ; }) ;
 
         if (this.on_quick_search) {
             $('#fwk-search-text').keyup(function (e) {
                 var text2search = $('#fwk-search-text').val() ;
                 if ((text2search != '') && (e.keyCode == 13)) {
-                    that.on_quick_search(text2search) ;
+                    _that.on_quick_search(text2search) ;
                 }
             }) ;
         }
@@ -949,17 +955,17 @@ function FwkCreator () {
             var app_proxy = this.app_proxies[id] ;
             if (this.select_app) {
                 if (app_proxy.name === this.select_app) {
-                    $('#fwk-tabs').children('#'+app_proxy.name).each(function() { that.m_item_selected(this) ; }) ;
+                    $('#fwk-tabs').children('#'+app_proxy.name).each(function() { _that._m_item_selected(this) ; }) ;
                     if (this.select_app_context1) {
-                        this.v_item_selected($('#fwk-menu > #'+app_proxy.name+' > #'+this.select_app_context1)) ;
+                        this._v_item_selected($('#fwk-menu > #'+app_proxy.name+' > #'+this.select_app_context1)) ;
                         this.set_context(app_proxy, this.select_app_context1, this.select_app_context2) ;
                     } else {
-                        alert('Fwk.init_tabs_menus(): implementation error, code: 1') ;
+                        alert('Fwk._init_tabs_menus(): implementation error, code: 1') ;
                     }
                     break ;
                 }
             } else {
-                this.m_item_selected($('#fwk-tabs > #'+app_proxy.name)) ;
+                this._m_item_selected($('#fwk-tabs > #'+app_proxy.name)) ;
                 this.set_context(app_proxy, app_proxy.context1, app_proxy.context2) ;
                 break ;
             }
@@ -983,14 +989,14 @@ function FwkCreator () {
 	for (var id in this.app_proxies) {
             var app_proxy = this.app_proxies[id] ;
             if (app_proxy.full_name === application_name) {
-                $('#fwk-tabs').children('#'+app_proxy.name).each(function() { that.m_item_selected(this) ; }) ;
+                $('#fwk-tabs').children('#'+app_proxy.name).each(function() { _that._m_item_selected(this) ; }) ;
                 if (context1_name) {
                     var context1 = app_proxy.name_to_context1(context1_name) ;
                     if (!context1) {
                         console.log('Fwk.activate(): implementation error, code: 1') ;
                         return undefined ;
                     }
-                    this.v_item_selected($('#fwk-menu > #'+app_proxy.name+' > #'+context1)) ;
+                    this._v_item_selected($('#fwk-menu > #'+app_proxy.name+' > #'+context1)) ;
                     this.set_context(app_proxy, context1) ;
                 } else {
                     console.log('Fwk.activate(): implementation error, code: 2') ;
@@ -1011,8 +1017,8 @@ function FwkCreator () {
         return result ;
     }
 
-    this.init_html = function () {
-        var that = this ;
+    this._init_html = function () {
+        var _that = this ;
         var html =
 '<div id="fwk-top">' +
 '  <div id="fwk-top-header">' +
@@ -1131,19 +1137,19 @@ function FwkCreator () {
                         var context2 = context1.context[k] ;
                         var wa_id = app_proxy.name + '-' + j + '-' + k ;
                         context2.wa_id = wa_id ;
-                        html += this.init_wa_html(wa_id) ;
+                        html += this._init_wa_html(wa_id) ;
                     }
                 }
                 if (context1_empty) {
                     var wa_id = app_proxy.name + '-' + j ;
                     context1.wa_id = wa_id ;
-                    html += this.init_wa_html(wa_id) ;
+                    html += this._init_wa_html(wa_id) ;
                 }
             }
             if (application_empty) {
                 var wa_id = app_proxy.name ;
                 app_proxy.wa_id = wa_id ;
-                html += this.init_wa_html(wa_id) ;
+                html += this._init_wa_html(wa_id) ;
             }
         }
         html +=
@@ -1156,7 +1162,7 @@ function FwkCreator () {
 '  <div id="fwk-largedialogs"              style="display:none;"></div>' +
 '</div>';
         $('body').html(html);
-        $('#fwk-session-logout').button().click(function () { that.logout(); }) ;
+        $('#fwk-session-logout').button().click(function () { _that.logout(); }) ;
     } ;
 
     /*
@@ -1165,7 +1171,7 @@ function FwkCreator () {
      * @param {String} id
      * @returns {String}
      */
-    this.init_wa_html = function (id) {
+    this._init_wa_html = function (id) {
         var html =
 '    <div id="'+id+'" class="fwk-appl-wa fwk-hidden">' +
 '      <div class="fwk-appl-wa-cont"></div>' +
@@ -1177,10 +1183,10 @@ function FwkCreator () {
      *   APPLICATIONS UPDATE TIMER
      * -----------------------------
      */
-    this.update_timer = null ;
+    this._update_timer = null ;
 
-    this.update_timer_restart = function () {
-        if (this.on_update) this.update_timer = window.setTimeout('Fwk.update_timer_event()', 1000 ) ;
+    this._update_timer_restart = function () {
+        if (this.on_update) this._update_timer = window.setTimeout('Fwk._update_timer_event()', 1000 ) ;
     } ;
 
     /*
@@ -1188,10 +1194,17 @@ function FwkCreator () {
      *
      * @returns {undefined}
      */
-    this.update_timer_event = function () {
+    this._update_timer_event = function () {
         this.on_update() ;
-        this.update_timer_restart() ;
+        this._update_timer_restart() ;
     } ;
+    
+    
+    this.is_desktop = (function () {
+        return
+            !('ontouchstart'      in window) ||   // most browsers 
+            !('onmsgesturechange' in window) ;    // ie10
+    })() ;
 }
 
 /* ATTENTION: This will only create an instance of the framework. No actions

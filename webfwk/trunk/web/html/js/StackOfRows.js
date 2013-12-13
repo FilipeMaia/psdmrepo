@@ -23,26 +23,72 @@ function RowTitle_Factory (title, hdr) {
     throw new WidgetError('RowTitle_Factory: missing or unsupported row title') ;
 }
 
-/*
- * One wrapper class and a factory for producing an appropriate
- * StackRowBody object from the specified input.
+/**
+ * The base class representing the body of a row.
+ * 
+ * Note that this is not the final class as it doesn't implement the 'render' method
+ * of the base class 'Widget'.
+ * 
+ * Also note that properties of this class are set externaly by the StackRowBody_Factory
+ * factory function when inserting rows into a stack object, not by derived classes.
+ *
+ * @returns {StackRowBody}
+ * @see {StackRowBody_Factory]
+ * @see {Widget]
  */
-function StackRowBody (parent_stack, row_id) {
-    this.parent_stack = parent_stack ;
-    this.row_id = row_id ;
+function StackRowBody () {
+
+    Widget.call(this) ;
+    
+    /*
+     * The parent stack object
+     *
+     * @type {StackOfRows}
+     */
+    this.parent_stack = null ;
+
+    /**
+     * A numeric identifier of the row
+     *
+     * @type {Number}
+     */
+    this.row_id = null ;
 }
 define_class(StackRowBody, Widget, {}, {}) ;
 
+/**
+ * The final class to package the body of a stack from 
+ * @param {StackOfRows} parent_stack
+ * @param {Number} row_id
+ * @param {String} text
+ * @returns {StackRowBody_FromString}
+ * @see {StackRowBody}
+ */
 function StackRowBody_FromString (parent_stack, row_id, text) {
-    this.parent_stack = parent_stack ;
-    this.row_id = row_id ;
+
+    StackRowBody.call(this, parent_stack, row_id) ;
+
     this.text = text ;
+
+    /**
+     * Implementing the method of the base class
+     *
+     * @returns {undefined}
+     */
     this.render = function () {
         this.container.html(this.text) ;
     } ;
 }
 define_class(StackRowBody_FromString, StackRowBody, {}, {}) ;
 
+/**
+ * The factory method will return an object coformant to the StackRowBody interface
+ *
+ * @param {StackOfRows} parent_stack
+ * @param {Number} row_id
+ * @param {a subclass of StackRowBody, or String or Object} body
+ * @returns {Object} an object coformant to the StackRowBody interface
+ */
 function StackRowBody_Factory (parent_stack, row_id, body) {
     if (body instanceof StackRowBody) {
         body.parent_stack = parent_stack ;
@@ -83,6 +129,9 @@ function StackRowData () {
  * @returns {SimpleStackRowData}
  */
 function SimpleStackRowData (title, body) {
+
+    StackRowData.call(this) ;
+
     this.title = title ;
     this.body  = body ;
 }
@@ -93,7 +142,8 @@ define_class(SimpleStackRowData, StackRowData, {}, {}) ;
  * @param number id
  * @param object row
  * @param array hdr
- * @param boolean expand_propagate
+ * @param array opt
+ * @param function effect_on_insert_required
  * @returns {StackRow}
  */
 function StackRowData_Factory (parent, id, row, hdr, opt, effect_on_insert_required) {
@@ -107,7 +157,9 @@ function StackRowData_Factory (parent, id, row, hdr, opt, effect_on_insert_requi
             opt.expand_propagate ,
             row.color_theme ,
             row.block_common_expand ,
-            effect_on_insert
+            effect_on_insert ,
+            row.block_expand ,
+            opt.allow_replicated_headers
         ) ;
     } else if ((typeof row === 'object') && !row.isArray) {
         return new StackRow (
@@ -121,7 +173,9 @@ function StackRowData_Factory (parent, id, row, hdr, opt, effect_on_insert_requi
             opt.expand_propagate ,
             row.color_theme ,
             row.block_common_expand ,
-            effect_on_insert
+            effect_on_insert ,
+            row.block_expand ,
+            opt.allow_replicated_headers
         ) ;
     }
     throw new WidgetError('StackRowData_Factory: unsupported type of the row') ;
@@ -148,7 +202,10 @@ function StackRowData_Factory (parent, id, row, hdr, opt, effect_on_insert_requi
  * @param Array data_object - the data object descriibing the title and the body of the row
  * @returns {StackRow}
  */
-function StackRow (parent, id, data_object, hdr, expand_propagate, color_theme, block_common_expand, effect_on_insert) {
+function StackRow (parent, id, data_object, hdr, expand_propagate, color_theme, block_common_expand, effect_on_insert, block_expand, allow_replicated_headers) {
+
+    Widget.call(this) ;
+
     this.parent = parent ;
     this.id = id ;
     this.data_object = data_object ;
@@ -157,6 +214,8 @@ function StackRow (parent, id, data_object, hdr, expand_propagate, color_theme, 
     this.color_theme = color_theme ? color_theme : '' ;
     this.block_common_expand = block_common_expand ? true : false ;
     this.effect_on_insert = effect_on_insert ;
+    this.block_expand = block_expand ? true : false ;
+    this.allow_replicated_headers = allow_replicated_headers ? true : false ;
 }
 define_class (StackRow, Widget, {}, {
 
@@ -167,7 +226,7 @@ render : function () {
     var that = this ;
     var html =
 '<div class="stack-row-header">' +
-'  <div class="stack-row-column-first"><span class="stack-row-toggler ui-icon ui-icon-triangle-1-e"></span></div>' +
+'  <div class="stack-row-column-first">' + (this.block_expand ? '&nbsp;' : '<span class="stack-row-toggler ui-icon ui-icon-triangle-1-e"></span>') + '</div>' +
 '  <div class="stack-row-column-last"></div>' +
 '</div>' +
 '<div class="stack-row-body stack-row-hidden"></div>' ;
@@ -189,7 +248,7 @@ render : function () {
             var col = this.hdr[i] ;
             if (col.id === '|') {
                 html +=
-'<div class="stack-row-column-separator"></div>' ;
+'<div class="stack-row-column-separator">&nbsp;</div>' ;
             } else if (col.id === '>') {
                 float_right = true ;
                 html +=
@@ -225,7 +284,7 @@ toggle : function () {
  * 
  * NOTES:
  * - this method will also do lazy rendering of the body first time the expansion operation is called on a row.
- * - the group expand operations may be blocked by the 'block_common_expand' parameter of the row
+ * - the group expand operations may be blocked by the 'block_expand' or 'block_common_expand' parameters of the row
  * - the 'focus_relative_to' parameter only applies to the row expansion operation
  * - the 'focus_relative_to' is ignored if this is a part of the group expand operation
  *
@@ -235,6 +294,7 @@ toggle : function () {
  */
 body_is_rendered : false ,
 expand_or_collapse : function (expand, common_expand, focus_relative_to) {
+    if (this.block_expand) return ;
     if (expand && !(common_expand && this.block_common_expand)) {
         if (!this.body_is_rendered) {
             this.body_is_rendered = true ;
@@ -247,10 +307,20 @@ expand_or_collapse : function (expand, common_expand, focus_relative_to) {
             var offset_top = focus_relative_to.scrollTop() + this.body.position().top - 24;
             focus_relative_to.animate({scrollTop: offset_top}, 'slow') ;
         }
+        if (this.allow_replicated_headers && !common_expand) {
+            var replicated_header = this.container.next('.stack-header') ;
+            if (!replicated_header.length)
+                $(this.parent.stack_header()).insertAfter(this.container) ;
+        }
     } else {
         this.header.removeClass('stack-row-header-open') ;
         this.toggler.removeClass('ui-icon-triangle-1-s').addClass('ui-icon-triangle-1-e') ;
         this.body.removeClass('stack-row-visible').addClass('stack-row-hidden') ;
+        if (this.allow_replicated_headers) {
+            var replicated_header = this.container.next('.stack-header') ;
+            if (replicated_header.length)
+                replicated_header.remove() ;
+        }
     }
     if (this.expand_propagate)
         this.data_object.body.expand_or_collapse(expand) ;
@@ -287,22 +357,23 @@ function StackOfRows (hdr, rows, options) {
 
     this.hdr = hdr ? hdr : null ;
 
-    this.rows = [] ;
-    if (rows)
-        for(var i in rows)
-            this.add_row(rows[i]) ;
-
     this.options = {
-        expand_buttons   : false ,
-        expand_propagate : false ,
-        theme            : null ,
-        hidden_header    : false ,
-        effect_on_insert : null
+        expand_buttons          : false ,
+        expand_propagate        : false ,
+        theme                   : null ,
+        hidden_header           : false ,
+        effect_on_insert        : null ,
+        allow_replicated_headers: false
     } ;
     if (options)
         for(var key in this.options)
             if (key in options)
                 this.options[key] = options[key] ;
+
+    this.rows = [] ;
+    if (rows)
+        for(var i in rows)
+            this.add_row(rows[i]) ;
 
 }
 define_class (StackOfRows, Widget, {
@@ -400,33 +471,8 @@ render : function () {
 '  <button name="expand"   title="expand all rows"   >expand</button>' +
 '  <button name="collapse" title="collapse all rows" >collapse</button>' ;
     html +=
-'</div>' ;
-    if (this.hdr && !this.options.hidden_header) {
-        html +=
-'<div class="stack-header">' +
-'  <div class="stack-column-first"><span class="stack-header-toggler ui-icon ui-icon-triangle-1-e"></span></div>' ;
-
-        var float_right = false ;   // once triggered, it will shift the remaining columns to the right
-
-        for(var i in this.hdr) {
-            var col = this.hdr[i] ;
-            if (col.id === '|') {
-                html +=
-'  <div class="stack-column-separator">&nbsp;</div>' ;
-            } else if (col.id === '>') {
-                float_right = true ;
-                html +=
-'  <div class="stack-column"></div>' ;
-            } else {
-                html +=
-'  <div class="stack-column'+(float_right ? '-right' : '')+'" id="'+col.id+'" style="width:'+col.width+'px;" >'+col.title+'</div>' ;
-            }
-        }
-        html +=
-'  <div class="stack-column-last"></div>' +
-'</div>' ;
-    }
-    html +=
+'</div>' +
+    this.stack_header() +
 '<div class="stack-body" >' ;
     for(var i in this.rows) html +=
 '  <div class="stack-row" id="'+this.rows[i].id+'" >' +
@@ -469,6 +515,36 @@ render : function () {
             that.expand_or_collapse(false) ;
         }
     }) ;
+} ,
+
+stack_header: function () {
+    var html = '' ;
+    if (this.hdr && !this.options.hidden_header) {
+        html +=
+'<div class="stack-header">' +
+'  <div class="stack-column-first"><span class="stack-header-toggler ui-icon ui-icon-triangle-1-e"></span></div>' ;
+
+        var float_right = false ;   // once triggered, it will shift the remaining columns to the right
+
+        for(var i in this.hdr) {
+            var col = this.hdr[i] ;
+            if (col.id === '|') {
+                html +=
+'  <div class="stack-column-separator">&nbsp;</div>' ;
+            } else if (col.id === '>') {
+                float_right = true ;
+                html +=
+'  <div class="stack-column"></div>' ;
+            } else {
+                html +=
+'  <div class="stack-column'+(float_right ? '-right' : '')+'" id="'+col.id+'" style="width:'+col.width+'px;" >'+col.title+'</div>' ;
+            }
+        }
+        html +=
+'  <div class="stack-column-last"></div>' +
+'</div>' ;
+    }
+    return html ;
 } ,
 
 assert_initialized: function () {

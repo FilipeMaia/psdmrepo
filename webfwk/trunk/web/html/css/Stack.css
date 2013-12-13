@@ -172,6 +172,13 @@
 
 /* Color theme overides for individual rows */
 
+.stack-theme-default.stack-row > .stack-row-header            { background-color: #f0f0f0 !important; border-color: #c0c0c0 !important; }
+.stack-theme-default.stack-row > .stack-row-header:hover      { background-color: #c0c0c0 !important; }
+.stack-theme-default.stack-row > .stack-row-header-open       { background:       linear-gradient(to bottom, default, #f0f0f0) !important; }
+.stack-theme-default.stack-row > .stack-row-header-open:hover { background:       linear-gradient(to bottom, #c0c0c0, #ffffff) !important; }
+.stack-theme-default.stack-row > .stack-row-body              { border-color:     #c0c0c0 !important; }
+.stack-theme-default.stack-row:last-child > .stack-row-body   { border-color:     #c0c0c0 !important; }
+
 .stack-theme-aliceblue.stack-row > .stack-row-header            { background-color: aliceblue !important; border-color: #A6C9E2 !important; }
 .stack-theme-aliceblue.stack-row > .stack-row-header:hover      { background-color: #A6C9E2 !important; }
 .stack-theme-aliceblue.stack-row > .stack-row-header-open       { background:       linear-gradient(to bottom, aliceblue, #ffffff) !important; }

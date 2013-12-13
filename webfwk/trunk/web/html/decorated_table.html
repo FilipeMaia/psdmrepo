@@ -1,115 +1,73 @@
 <!DOCTYPE html>
 <html>
 <head>
+
 <script type="text/javascript" src="/jquery/js/jquery.min.js"></script>
 <script type="text/javascript" src="/jquery/js/jquery.resize.js"></script>
+<script type="text/javascript" src="js/libs/jquery-ui-1.10.3/jquery-ui.min.js" ></script>
+
+<script type="text/javascript" src="../webfwk/js/SmartTable.js" ></script>
+
+<link type="text/css" href="css/jquery-ui-1.10.3/jquery-ui.min.css" rel="Stylesheet" />
+
+<link type="text/css" href="../webfwk/css/SmartTable.css" rel="Stylesheet" />
+
 <style>
-
-div.container {
-  margin: 10px;
-  /*width: 100%;*/
-}
-
-div.table_header {
-  width: 100%;
-  padding: 0;
+body {
   margin: 0;
-}
-div.table_container {
-  width: 100%;
   padding: 0;
-  margin: 0;
-  overflow: auto;
 }
-div.table_container > table {
-  width: 100%;
+#test {
+  margin: 20px;
 }
-div.table_container > table td {
-  font-size: 12px;
-  padding: 2px;
-  border-left: solid 1px;
-  border-bottom: solid 1px;
-}
-
-div.table_container > table td:last-child {
-  border-right: solid 1px;
-}
-
 </style>
 
 <script>
 
-function create_fancy_table (container, hdr, rows) {
-    var that = this ;
-    switch (typeof container) {
-        case 'string': this.container = $('#'+container) ; break ;
-        case 'object': this.container = container ; break ;
-        default: throw 'create_fancy_table: wrong type of the container parameter' ;
-    }
-    var html =
-'<div class="table_header"></div>' +
-'<div class="table_container">' +
-'  <table><tbody>' ;
-    for (var i in rows) {
-        var row = rows[i] ;
-        html +=
-'    <tr>' ;
-        for (var j in row) {
-            var cell = row[j] ;
-            html +=
-'      <td>' +
-cell +
-'      </td>' ;
-        }
-        html +=
-'    </tr>' ;
-    }
-    html +=
-'  </tbody></table>' +
-'</div>' ;
-    this.container.html(html) ;
-    this.table_header    = this.container.find('.table_header') ;
-    this.table_container = this.container.find('.table_container') ;
-    this.table           = this.table_container.find('table') ;
-    this.container.resize(function () { that.render_header() ; }) ;
-    this.render_header = function () {
-        var column_width = [] ;
-        that.table.find('tr:first-child td').each(function () {
-            var borderLeft   = parseInt($(this).css('borderLeft')) ;
-            var paddingLeft  = parseInt($(this).css('paddingLeft')) ;
-            var paddingRight = parseInt($(this).css('paddingRight')) ;
-            var borderRight  = parseInt($(this).css('borderRight')) ;
-            column_width.push(borderLeft + paddingLeft + $(this).width() + paddingRight + borderRight) ;
-        }) ;
-        console.log(column_width) ;
-        //console.log('width='+that.table.width()+', height='+that.table.height()) ;
-        console.log([this.container.height(), this.table_header.height(), this.table_container.height()]) ;
-        this.table_container.height(this.container.height() - this.table_header.height()) ;
-    } ;
-    this.render_header() ;
-    return this ;
-}
-
 $(function () {
+    var num_rows = 100 ;
+    var num_hdr_rows = 2 ;
+    var max_hdr_rows = 4 ;
+    var num_cols = 20 ;
     var rows = [] ;
-    for (var i=0; i < 40; i++) {
-        var row = [] ;
-        for (var j=0; j < 4; j++) {
-            row.push(j) ;
+    for (var i=0; i < num_rows; i++) {
+        var row = ['<b>'+(num_rows-i)+'</b>'] ;
+        for (var j=1; j < num_cols; j++) {
+            var val = (j + 1) % 7 ? 100000 * (i % 10 + 1) + j*j*j*j : 'TEXT-FIELD' ;
+            row.push(val) ;
         }
         rows.push(row) ;
     }
-    var table = create_fancy_table (
-        $('#container') ,
-        ['First', 'Second', 'And the third one', 'etc.'] ,
-        rows
-    ) ;
+    var hdr = [
+        '<b>Run</b>',
+        'AMO:R14:IOC:21:VHS7:CH2:VoltageMeasure',
+        'AmoEndstation-0|Opal1000-0',
+        'AMO:R14:IOC:10:ao0:out2',
+        'FEE mirror LVDT position',
+        'AMO:R14:EVR:21:CTRL.DG0D',
+        'AMO:HFP:MMS:72.RBV',
+        '7-th may not be as long as others',
+        'AMO:DIA:STC:07',
+        'Gas attenuator calculated transmission',
+        'And one more before to finish',
+        'AMO:R14:IOC:21:VHS7:CH2:VoltageMeasure',
+        'The long one again',
+        'AMO:DIA:STC:07',
+        '7-th may not be as long as others',
+        'gasjet x-position (rel. distance)',
+        'AMO:HFP:MMS:72.RBV',
+        'And the third one',
+        'AMO:DIA:STC:07',
+        'etc.'
+    ] ;
+    var table = new SmartTable($('#test'), hdr, rows, num_hdr_rows, max_hdr_rows) ;
+    table.display() ;
 }) ;
 
 </script>
 
 </head>
 <body>
-<div id="container" class="container"></div>
+    <div id="test"></div>
 </body>
 </html>
