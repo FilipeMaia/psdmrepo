@@ -37,10 +37,6 @@ hdf5pp::Type ns_ConfigV1_v0_dataset_config_stored_type()
   type.insert("readoutSpeedIndex", offsetof(DsType, readoutSpeedIndex), hdf5pp::TypeTraits<uint16_t>::stored_type());
   type.insert("exposureEventCode", offsetof(DsType, exposureEventCode), hdf5pp::TypeTraits<uint16_t>::stored_type());
   type.insert("numDelayShots", offsetof(DsType, numDelayShots), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("frameSize", offsetof(DsType, frameSize), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("numPixelsX", offsetof(DsType, numPixelsX), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("numPixelsY", offsetof(DsType, numPixelsY), hdf5pp::TypeTraits<uint32_t>::stored_type());
-  type.insert("numPixels", offsetof(DsType, numPixels), hdf5pp::TypeTraits<uint32_t>::stored_type());
   return type;
 }
 
@@ -75,10 +71,6 @@ hdf5pp::Type ns_ConfigV1_v0_dataset_config_native_type()
   type.insert("readoutSpeedIndex", offsetof(DsType, readoutSpeedIndex), hdf5pp::TypeTraits<uint16_t>::native_type());
   type.insert("exposureEventCode", offsetof(DsType, exposureEventCode), hdf5pp::TypeTraits<uint16_t>::native_type());
   type.insert("numDelayShots", offsetof(DsType, numDelayShots), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("frameSize", offsetof(DsType, frameSize), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("numPixelsX", offsetof(DsType, numPixelsX), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("numPixelsY", offsetof(DsType, numPixelsY), hdf5pp::TypeTraits<uint32_t>::native_type());
-  type.insert("numPixels", offsetof(DsType, numPixels), hdf5pp::TypeTraits<uint32_t>::native_type());
   return type;
 }
 
@@ -108,10 +100,6 @@ ns_ConfigV1_v0::dataset_config::dataset_config(const Psana::Andor::ConfigV1& psa
   , readoutSpeedIndex(psanaobj.readoutSpeedIndex())
   , exposureEventCode(psanaobj.exposureEventCode())
   , numDelayShots(psanaobj.numDelayShots())
-  , frameSize(psanaobj.frameSize())
-  , numPixelsX(psanaobj.numPixelsX())
-  , numPixelsY(psanaobj.numPixelsY())
-  , numPixels(psanaobj.numPixels())
 {
 }
 
@@ -178,22 +166,13 @@ uint32_t ConfigV1_v0::numDelayShots() const {
   if (not m_ds_config) read_ds_config();
   return uint32_t(m_ds_config->numDelayShots);
 }
-uint32_t ConfigV1_v0::frameSize() const {
-  if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->frameSize);
+uint32_t
+ConfigV1_v0::frameSize() const{ 
+return sizeof(FrameV1) + this->numPixels()*2; 
 }
-uint32_t ConfigV1_v0::numPixelsX() const {
-  if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->numPixelsX);
-}
-uint32_t ConfigV1_v0::numPixelsY() const {
-  if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->numPixelsY);
-}
-uint32_t ConfigV1_v0::numPixels() const {
-  if (not m_ds_config) read_ds_config();
-  return uint32_t(m_ds_config->numPixels);
-}
+
+
+
 void ConfigV1_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<Andor::ns_ConfigV1_v0::dataset_config>(m_group, "config", m_idx);
 }

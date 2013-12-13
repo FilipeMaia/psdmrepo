@@ -70,7 +70,6 @@ struct dataset_data {
   ~dataset_data();
 
   uint16_t code;
-  uint16_t _u16MaskEventAttr_value;
   uint8_t isReadout;
   uint8_t isTerminator;
   uint32_t maskTrigger;
@@ -92,7 +91,6 @@ struct dataset_data {
   ~dataset_data();
 
   uint16_t code;
-  uint16_t _u16MaskEventAttr_value;
   uint8_t isReadout;
   uint8_t isTerminator;
   uint32_t reportDelay;

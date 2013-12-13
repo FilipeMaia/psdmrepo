@@ -35,10 +35,6 @@ struct dataset_config {
   uint16_t readoutSpeedIndex;
   uint16_t exposureEventCode;
   uint32_t numDelayShots;
-  uint32_t frameSize;
-  uint32_t numPixelsX;
-  uint32_t numPixelsY;
-  uint32_t numPixels;
 
 
 };
@@ -68,10 +64,15 @@ public:
   virtual uint16_t readoutSpeedIndex() const;
   virtual uint16_t exposureEventCode() const;
   virtual uint32_t numDelayShots() const;
-  virtual uint32_t frameSize() const;
-  virtual uint32_t numPixelsX() const;
-  virtual uint32_t numPixelsY() const;
-  virtual uint32_t numPixels() const;
+  /** Total size in bytes of the Frame object */
+  uint32_t frameSize() const;
+
+  /** calculate frame X size in pixels based on the current ROI and binning settings */
+  uint32_t numPixelsX() const { return (_uWidth + _uBinX - 1) / _uBinX; }
+  /** calculate frame Y size in pixels based on the current ROI and binning settings */
+  uint32_t numPixelsY() const { return (_uHeight+ _uBinY - 1) / _uBinY; }
+  /** calculate total frame size in pixels based on the current ROI and binning settings */
+  uint32_t numPixels() const { return ((_uWidth + _uBinX-1)/ _uBinX )*((_uHeight+ _uBinY-1)/ _uBinY ); }
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;

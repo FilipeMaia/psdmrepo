@@ -148,7 +148,6 @@ hdf5pp::Type ns_EventCodeV3_v0_dataset_data_stored_type()
   typedef ns_EventCodeV3_v0::dataset_data DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
   type.insert("code", offsetof(DsType, code), hdf5pp::TypeTraits<uint16_t>::stored_type());
-  type.insert("_u16MaskEventAttr_value", offsetof(DsType, _u16MaskEventAttr_value), hdf5pp::TypeTraits<uint16_t>::stored_type());
   type.insert("isReadout", offsetof(DsType, isReadout), hdf5pp::TypeTraits<uint8_t>::stored_type());
   type.insert("isTerminator", offsetof(DsType, isTerminator), hdf5pp::TypeTraits<uint8_t>::stored_type());
   type.insert("maskTrigger", offsetof(DsType, maskTrigger), hdf5pp::TypeTraits<uint32_t>::stored_type());
@@ -168,7 +167,6 @@ hdf5pp::Type ns_EventCodeV3_v0_dataset_data_native_type()
   typedef ns_EventCodeV3_v0::dataset_data DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
   type.insert("code", offsetof(DsType, code), hdf5pp::TypeTraits<uint16_t>::native_type());
-  type.insert("_u16MaskEventAttr_value", offsetof(DsType, _u16MaskEventAttr_value), hdf5pp::TypeTraits<uint16_t>::native_type());
   type.insert("isReadout", offsetof(DsType, isReadout), hdf5pp::TypeTraits<uint8_t>::native_type());
   type.insert("isTerminator", offsetof(DsType, isTerminator), hdf5pp::TypeTraits<uint8_t>::native_type());
   type.insert("maskTrigger", offsetof(DsType, maskTrigger), hdf5pp::TypeTraits<uint32_t>::native_type());
@@ -189,7 +187,6 @@ ns_EventCodeV3_v0::dataset_data::dataset_data()
 
 ns_EventCodeV3_v0::dataset_data::dataset_data(const Psana::EvrData::EventCodeV3& psanaobj)
   : code(psanaobj.code())
-  , _u16MaskEventAttr_value(psanaobj._u16MaskEventAttr_value())
   , isReadout(psanaobj.isReadout())
   , isTerminator(psanaobj.isTerminator())
   , maskTrigger(psanaobj.maskTrigger())
@@ -207,7 +204,6 @@ hdf5pp::Type ns_EventCodeV4_v0_dataset_data_stored_type()
   typedef ns_EventCodeV4_v0::dataset_data DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
   type.insert("code", offsetof(DsType, code), hdf5pp::TypeTraits<uint16_t>::stored_type());
-  type.insert("_u16MaskEventAttr_value", offsetof(DsType, _u16MaskEventAttr_value), hdf5pp::TypeTraits<uint16_t>::stored_type());
   type.insert("isReadout", offsetof(DsType, isReadout), hdf5pp::TypeTraits<uint8_t>::stored_type());
   type.insert("isTerminator", offsetof(DsType, isTerminator), hdf5pp::TypeTraits<uint8_t>::stored_type());
   type.insert("reportDelay", offsetof(DsType, reportDelay), hdf5pp::TypeTraits<uint32_t>::stored_type());
@@ -229,7 +225,6 @@ hdf5pp::Type ns_EventCodeV4_v0_dataset_data_native_type()
   typedef ns_EventCodeV4_v0::dataset_data DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
   type.insert("code", offsetof(DsType, code), hdf5pp::TypeTraits<uint16_t>::native_type());
-  type.insert("_u16MaskEventAttr_value", offsetof(DsType, _u16MaskEventAttr_value), hdf5pp::TypeTraits<uint16_t>::native_type());
   type.insert("isReadout", offsetof(DsType, isReadout), hdf5pp::TypeTraits<uint8_t>::native_type());
   type.insert("isTerminator", offsetof(DsType, isTerminator), hdf5pp::TypeTraits<uint8_t>::native_type());
   type.insert("reportDelay", offsetof(DsType, reportDelay), hdf5pp::TypeTraits<uint32_t>::native_type());
@@ -252,7 +247,6 @@ ns_EventCodeV4_v0::dataset_data::dataset_data()
 
 ns_EventCodeV4_v0::dataset_data::dataset_data(const Psana::EvrData::EventCodeV4& psanaobj)
   : code(psanaobj.code())
-  , _u16MaskEventAttr_value(psanaobj._u16MaskEventAttr_value())
   , isReadout(psanaobj.isReadout())
   , isTerminator(psanaobj.isTerminator())
   , reportDelay(psanaobj.reportDelay())

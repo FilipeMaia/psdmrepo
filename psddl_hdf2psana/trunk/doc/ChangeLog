@@ -11,6 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-07-06
+2013-12-12 Andy Salnikov
+- regenerate whole thing from psddldata V00-04-54
+- special schema for andor.ConfigV1 to remove few derived things that are
+  not in the 020 schema
+
 Tag: V00-07-05
 2013-12-12 Andy Salnikov
 - regenerate whole thing from psddldata V00-04-53
