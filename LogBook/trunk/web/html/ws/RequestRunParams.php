@@ -57,14 +57,14 @@ function extract_params4run ($instr_name, $run) {
      */
     $section = array (
         'section' => 'FOOTER' ,
-        'title'   => LogBook\LogBookUtils::$sections['FOOTER']['TITLE'] ,
+        'title'   => 'Additional Parameters' ,
         'params'  => array()
     ) ;
     foreach ($values as $p) {
 
         $name  = $p->name() ;
         $value = $p->value() ;
-        $descr = array_key_exists($name, LogBook\LogBookUtils::$sections['FOOTER']['PAR2DESCR']) ? LogBook\LogBookUtils::$sections['FOOTER']['PAR2DESCR'][$name] : $name ;
+        $descr = $name ;
 
         if (array_key_exists($name, $used_names)) continue;
 

@@ -566,9 +566,9 @@ class LogBookUtils {
 
         $result =<<< HERE
 {
+  "status": {$status_encoded}, "updated": {$updated_encoded},
   "ResultSet": {
-    "Status": {$status_encoded},
-    "Updated": {$updated_encoded},
+    "Status": {$status_encoded}, "Updated": {$updated_encoded},
     "Result": [
 HERE;
         $first = true;
@@ -651,14 +651,6 @@ HERE;
                     array( 'name' => 'STEP:FEE1:1811:MOTR.RBV',     'descr' => 'FEE mirror RBV position' ),
                     array( 'name' => 'STEP:FEE1:1812:MOTR.RBV',     'descr' => 'FEE mirror RBV position' )
                 )
-            )
-        ),
-
-        'FOOTER' => array(
-
-            'TITLE'     => 'Additional Parameters',
-            'PAR2DESCR' => array(
-                'AMO:DIA:GMP:06:PMON' => 'Pressure (Torr)'
             )
         ),
 

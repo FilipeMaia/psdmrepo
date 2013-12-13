@@ -64,9 +64,9 @@ function report_error( $msg ) {
     $msg_encoded = json_encode( '<b><em style="color:red;" >Error:</em></b>&nbsp;'.$msg );
     print <<< HERE
 {
+  "status": {$status_encoded}, "message": {$msg_encoded} ,
   "ResultSet": {
-    "Status": {$status_encoded},
-    "Message": {$msg_encoded}
+    "Status": {$status_encoded}, "Message": {$msg_encoded}
   }
 }
 HERE;
@@ -92,9 +92,9 @@ try {
             $status_encoded = json_encode("success") ;
             $result =<<< HERE
 {
+    "status": {$status_encoded}, "updated": {$now_encoded},
     "ResultSet": {
-      "Status": {$status_encoded},
-      "Updated": {$now_encoded},
+      "Status": {$status_encoded}, "Updated": {$now_encoded},
       "Result": [
 HERE;
           $result .= "\n".LogBookUtils::entry2json($entry) ;
@@ -103,7 +103,7 @@ HERE;
 HERE;
             print $result ;
         }
-
+ 
     } elseif ($run_num) {
 
         $experiment = LogBook::instance()->find_experiment_by_id($exper_id) or report_error("no such experiment") ;
@@ -118,9 +118,9 @@ HERE;
             $status_encoded = json_encode("success") ;
             $result =<<< HERE
 {
+    "status": {$status_encoded}, "updated": {$now_encoded},
     "ResultSet": {
-      "Status": {$status_encoded},
-      "Updated": {$now_encoded},
+      "Status": {$status_encoded}, "Updated": {$now_encoded},
       "Result": [
 HERE;
           $result .= "\n".LogBookUtils::run2json($run, 'run') ;
