@@ -69,6 +69,7 @@
 #include "H5DataTypes/EvrConfigV7.h"
 #include "H5DataTypes/EvrDataV3.h"
 #include "H5DataTypes/EvrIOConfigV1.h"
+#include "H5DataTypes/EvrSrcConfigV1.h"
 #include "H5DataTypes/FccdConfigV1.h"
 #include "H5DataTypes/FccdConfigV2.h"
 #include "H5DataTypes/FliConfigV1.h"
@@ -893,6 +894,14 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
     switch (version) {
     case 1:
       cvts.push_back(make_shared<EpixSamplerElementV1Cvt>(group, "EpixSampler::ElementV1", src, m_configStore, m_cvtOptions, 0));
+      break;
+    }
+    break;
+
+  case Pds::TypeId::Id_EvsConfig:
+    switch (version) {
+    case 1:
+      ::makeConfigCvt<EvrSrcConfigV1>(cvts, group, "EvrData::SrcConfigV1", src, transition, m_cvtOptions, 0);
       break;
     }
     break;
