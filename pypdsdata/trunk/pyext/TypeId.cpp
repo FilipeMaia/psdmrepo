@@ -111,6 +111,7 @@ namespace {
       { "Id_EpixElement",     Pds::TypeId::Id_EpixElement },
       { "Id_EpixSamplerConfig", Pds::TypeId::Id_EpixSamplerConfig },
       { "Id_EpixSamplerElement", Pds::TypeId::Id_EpixSamplerElement },
+      { "Id_EvsConfig",       Pds::TypeId::Id_EvsConfig },
       { "NumberOf",           Pds::TypeId::NumberOf },
       { 0, 0 }
   };

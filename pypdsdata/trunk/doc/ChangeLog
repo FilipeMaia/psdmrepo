@@ -6,6 +6,11 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V01-01-03
+2013-12-12 Andy Salnikov
+- upgrade to pdsdata V07-02-10
+- new evr.SrcConfigV1 type
+
 Tag: V01-01-02
 2013-12-02 Andy Salnikov
 - upgrade to pdsdata V07-02-08

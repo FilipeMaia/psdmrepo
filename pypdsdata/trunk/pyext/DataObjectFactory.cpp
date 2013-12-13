@@ -89,6 +89,7 @@
 #include "types/evr/ConfigV7.h"
 #include "types/evr/DataV3.h"
 #include "types/evr/IOConfigV1.h"
+#include "types/evr/SrcConfigV1.h"
 
 #include "types/fccd/FccdConfigV1.h"
 #include "types/fccd/FccdConfigV2.h"
@@ -561,6 +562,10 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
 
   case Pds::TypeId::Id_EpixSamplerElement :
     if ( not obj ) obj = xtc2obj<EpixSampler::ElementV1, 1>(xtc, parent);
+    break;
+
+  case Pds::TypeId::Id_EvsConfig :
+    if ( not obj ) obj = xtc2obj<EvrData::SrcConfigV1, 1>(xtc, parent);
     break;
 
   case Pds::TypeId::NumberOf :

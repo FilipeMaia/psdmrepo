@@ -47,6 +47,7 @@ namespace {
   FUN0_WRAPPER(pypdsdata::EpixSampler::ConfigV1, samplesPerChannel)
   FUN0_WRAPPER(pypdsdata::EpixSampler::ConfigV1, baseClockFrequency)
   FUN0_WRAPPER(pypdsdata::EpixSampler::ConfigV1, testPatternEnable)
+  FUN0_WRAPPER(pypdsdata::EpixSampler::ConfigV1, sampleInterval_sec)
 
   PyMethodDef methods[] = {
     { "version",             version,             METH_NOARGS, "self.version() -> int\n\nReturns integer number" },
@@ -63,6 +64,7 @@ namespace {
     { "samplesPerChannel",   samplesPerChannel,   METH_NOARGS, "self.samplesPerChannel() -> int\n\nReturns integer number" },
     { "baseClockFrequency",  baseClockFrequency,  METH_NOARGS, "self.baseClockFrequency() -> int\n\nReturns integer number" },
     { "testPatternEnable",   testPatternEnable,   METH_NOARGS, "self.testPatternEnable() -> int\n\nReturns integer number" },
+    { "sampleInterval_sec",   sampleInterval_sec,   METH_NOARGS, "self.sampleInterval_sec() -> float\n\nReturns floating point number" },
     {0, 0, 0, 0}
    };
 
