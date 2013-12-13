@@ -72,7 +72,6 @@ void createWrappers(PyObject* module) {
 
   class_<Psana::EvrData::EventCodeV3 >("EventCodeV3", no_init)
     .def("code", &Psana::EvrData::EventCodeV3::code)
-    .def("_u16MaskEventAttr_value", &Psana::EvrData::EventCodeV3::_u16MaskEventAttr_value)
     .def("isReadout", &Psana::EvrData::EventCodeV3::isReadout)
     .def("isTerminator", &Psana::EvrData::EventCodeV3::isTerminator)
     .def("maskTrigger", &Psana::EvrData::EventCodeV3::maskTrigger)
@@ -83,7 +82,6 @@ void createWrappers(PyObject* module) {
 
   class_<Psana::EvrData::EventCodeV4 >("EventCodeV4", no_init)
     .def("code", &Psana::EvrData::EventCodeV4::code)
-    .def("_u16MaskEventAttr_value", &Psana::EvrData::EventCodeV4::_u16MaskEventAttr_value)
     .def("isReadout", &Psana::EvrData::EventCodeV4::isReadout)
     .def("isTerminator", &Psana::EvrData::EventCodeV4::isTerminator)
     .def("reportDelay", &Psana::EvrData::EventCodeV4::reportDelay)
