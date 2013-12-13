@@ -21,7 +21,11 @@ function report_error( $msg ) {
 	header( 'Cache-Control: no-cache, must-revalidate' ); // HTTP/1.1
 	header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );   // Date in the past
 
-	echo '{"Status":"error","Message":'.json_encode( $msg ).'}';
+	echo
+'{'.
+'  "Status": "error", "Message":'.json_encode( $msg ).','.
+'  "status": "error", "message":'.json_encode( $msg ).
+'}';
 	exit;
 }
 
@@ -44,7 +48,12 @@ function return_result( $request ) {
 	header( 'Cache-Control: no-cache, must-revalidate' ); // HTTP/1.1
 	header( 'Expires: Sat, 26 Jul 1997 05:00:00 GMT' );   // Date in the past
 
-	echo '{"Status":"success","Result":'.json_encode( $request ).'}';
+	echo
+'{'.
+'  "Status": "success",'.
+'  "status": "success",'.
+'  "Result": '.json_encode( $request ).
+'}';
 	exit;
 }
 

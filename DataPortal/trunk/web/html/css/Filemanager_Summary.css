@@ -1,2 +1,11 @@
+#datafiles-summary {
+  padding: 10px;
+}
 
+#datafiles-summary .info {
+  color: maroon;
+}
 
+#datafiles-summary #ctrl {
+  margin-bottom: 10px;
+}

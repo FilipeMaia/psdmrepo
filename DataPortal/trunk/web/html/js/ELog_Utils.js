@@ -11,22 +11,20 @@ var ELog_Utils = new function () {
      * Load all known tags for the specified experiment.
      * 
      * The result can be teported in three ways:
-     * - by setting a layout of the specified 'target' container (a JSON object is expected)
+     * - by setting a layout of the specified 'target4tags' container (a JSON object is expected)
      * - by calling the 'on_success()' function and passing a list of tags as a parameter
-     * - or by both
-     * If neither is provided the message will report error and optionally call
-     * the failure handler function 'on_failure()'.
+     * - or by both methods
      * 
-     * All other errors are reported either to the standard reporting channel of Fwk
+     * Errors are reported either to the standard reporting channel of Fwk
      * or (if provided) via the failure handler function 'on_failure()'.
      */
-    this.load_tags = function (exper_id, target, on_success,  on_failure) {
+    this.load_tags_and_authors = function (exper_id, target4tags, on_success, on_failure) {
         Fwk.web_service_GET (
             '../logbook/ws/RequestUsedTagsAndAuthors.php' ,
             {id: exper_id} ,
             function (data) {
 
-                if (target) {
+                if (target4tags) {
 
                     var select_tag_html = '<option></option>' ;
                     for (var i in data.Tags) select_tag_html += '<option>'+data.Tags[i]+'</option>' ;
@@ -37,27 +35,18 @@ var ELog_Utils = new function () {
 '  <input type="text"   class="tag-name" id="tag-name-'+i+'"  name="tag_name_'+i+'"  value="" size=16 title="type new tag here or select a known one from the left" />' +
 '  <input type="hidden"                  id="tag-value-'+i+'" name="tag_value_'+i+'" value="" />' +
 '</div>' ;
-                    target.html(html) ;
+                    target4tags.html(html) ;
 
                     for (var i = 0; i < that.max_num_tags; i++) {
-                        target.find('#library-'+i).change(function () {
+                        target4tags.find('#library-'+i).change(function () {
                             var idx = this.name ;
                             var tag = $(this).val() ;
-                            target.find('#tag-name-'+idx    ).val(tag) ;
-                            target.find('#library-'+idx).attr('selectedIndex', 0) ;
+                            target4tags.find('#tag-name-'+idx    ).val(tag) ;
+                            target4tags.find('#library-'+idx).attr('selectedIndex', 0) ;
                         }) ;
                     }
-                    if (on_success) on_success() ;
-
-                } else if (on_success) {
-
-                    on_success() ;
-
-                } else {
-                    var msg = 'ELog_Utils.load_tags() improper use of the function' ;
-                    if (on_failure) on_failure(msg) ;
-                    else            Fwk.report_error(msg) ;
                 }
+                if (on_success) { on_success(data.Tags, data.Authors) ; }
             } ,
             function (msg) {
                 if (on_failure) on_failure(msg) ;

@@ -31,8 +31,8 @@ function report_error( $msg ) {
         $msg_encoded = json_encode( '<b><em style="color:red;" >Error:</em></b>&nbsp;'.$msg );
         print <<< HERE
 {
-  "Status": {$status_encoded},
-  "Message": {$msg_encoded}
+  "Status": {$status_encoded}, "Message": {$msg_encoded} ,
+  "status": {$status_encoded}, "message": {$msg_encoded}
 }
 HERE;
     } else {
@@ -121,6 +121,7 @@ try {
 
         print
         '{ "Status": '.json_encode("success").
+        ', "status": '.json_encode("success").
         ', "updated": '.json_encode( LusiTime::now()->toStringShort()).
         ', "autotranslate2hdf5": '.(get_auto_translation($exper_id) ? 1 : 0).
         ', "requests": '.json_encode( $requests ).

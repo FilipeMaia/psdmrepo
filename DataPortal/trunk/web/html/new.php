@@ -48,13 +48,21 @@ $known_apps = array (
         'context1_default' => 'Summary' ,
         'context1'         => array (
             'summary'          => 'Summary' ,
-            'files'            => 'Files' )) ,
+            'files'            => 'XTC HDF5' )) ,
 
     'hdf' => array (
         'name'             => 'HDF5 Translation' ,
         'context1_default' => 'Manage' ,
         'context1'         => array (
             'manage'           => 'Manage' )) ,
+
+    'shiftmgr' => array (
+        'name'             => 'Shift Manager' ,
+        'context1_default' => 'Reports' ,
+        'context1'         => array (
+            'reports'          => 'Reports' ,
+            'history'          => 'History' ,
+            'notifications'    => 'E-mail Notifications' )) ,
 ) ;
 
 $select_app = null ;
@@ -145,6 +153,13 @@ try {
         RegDB::instance()->is_member_of_posix_group('ps-data', AuthDb::instance()->authName()) ||
         RegDB::instance()->is_member_of_posix_group($logbook_experiment->POSIX_gid(), AuthDb::instance()->authName()) ||
         (!$experiment->is_facility() && RegDB::instance()->is_member_of_posix_group('ps-'.strtolower( $instrument->name()), AuthDb::instance()->authName())) ;
+    
+    $shiftmgr_can_edit = AuthDb::instance()->hasRole (
+        AuthDb::instance()->authName() ,
+        null ,
+        'ShiftMgr' ,
+        "Manage_{$instrument->name()}"
+    ) ;
 ?>
 
 <!DOCTYPE html>
@@ -162,9 +177,11 @@ try {
 <link type="text/css" href="../webfwk/css/Fwk.css" rel="Stylesheet" />
 <link type="text/css" href="../webfwk/css/Stack.css" rel="Stylesheet" />
 <link type="text/css" href="../webfwk/css/Table.css" rel="Stylesheet" />
+<link type="text/css" href="../webfwk/css/SmartTable.css" rel="Stylesheet" />
 
 <link type="text/css" href="../portal/css/Experiment_Info.css" rel="Stylesheet" />
 <link type="text/css" href="../portal/css/Experiment_Group.css" rel="Stylesheet" />
+<link type="text/css" href="../portal/css/ELog_MessageViewer.css" rel="Stylesheet" />
 <link type="text/css" href="../portal/css/ELog_Live.css" rel="Stylesheet" />
 <link type="text/css" href="../portal/css/ELog_Post.css" rel="Stylesheet" />
 <link type="text/css" href="../portal/css/ELog_Search.css" rel="Stylesheet" />
@@ -177,7 +194,11 @@ try {
 <link type="text/css" href="../portal/css/Runtables_EPICS.css" rel="Stylesheet" />
 <link type="text/css" href="../portal/css/Filemanager_Summary.css" rel="Stylesheet" />
 <link type="text/css" href="../portal/css/Filemanager_Files.css" rel="Stylesheet" />
+<link type="text/css" href="../portal/css/Filemanager_Files_USR.css" rel="Stylesheet" />
 <link type="text/css" href="../portal/css/HDF5_Manage.css" rel="Stylesheet" />
+
+<link type="text/css" href="../shiftmgr/css/shiftmgr.css" rel="Stylesheet" />
+
 
 <style>
 
@@ -195,6 +216,12 @@ label.control-label {
   color: black;
 }
 
+.shift-reports,
+.shift-history-reports,
+.shift-notifications {
+  padding: 15px 20px 20px 20px;
+}
+
 </style>
 
 <script type="text/javascript" src="/jquery/js/jquery-1.8.2.js"></script>
@@ -203,12 +230,14 @@ label.control-label {
 <script type="text/javascript" src="/jquery/js/jquery.form.js"></script>
 <script type="text/javascript" src="/jquery/js/jquery.json.js"></script>
 <script type="text/javascript" src="/jquery/js/jquery.printElement.js"></script>
+<script type="text/javascript" src="/jquery/js/jquery.resize.js"></script>
 
 <script type="text/javascript" src="../webfwk/js/Class.js" ></script>
 <script type="text/javascript" src="../webfwk/js/Widget.js" ></script>
 <script type="text/javascript" src="../webfwk/js/StackOfRows.js" ></script>
 <script type="text/javascript" src="../webfwk/js/Fwk.js"></script>
 <script type="text/javascript" src="../webfwk/js/Table.js"></script>
+<script type="text/javascript" src="../webfwk/js/SmartTable.js" ></script>
 
 <script type="text/javascript" src="../portal/js/Experiment_Info.js"></script>
 <script type="text/javascript" src="../portal/js/Experiment_Group.js"></script>
@@ -226,7 +255,13 @@ label.control-label {
 <script type="text/javascript" src="../portal/js/Runtables_EPICS.js"></script>
 <script type="text/javascript" src="../portal/js/Filemanager_Summary.js"></script>
 <script type="text/javascript" src="../portal/js/Filemanager_Files.js"></script>
+<script type="text/javascript" src="../portal/js/Filemanager_Files_USR.js"></script>
 <script type="text/javascript" src="../portal/js/HDF5_Manage.js"></script>
+
+<script type="text/javascript" src="../shiftmgr/js/Definitions.js"></script>
+<script type="text/javascript" src="../shiftmgr/js/Reports.js"></script>
+<script type="text/javascript" src="../shiftmgr/js/Notifications.js"></script>
+<script type="text/javascript" src="../shiftmgr/js/History.js"></script>
 
 <script type="text/javascript">
 
@@ -264,7 +299,16 @@ var access_list = {
         edit_calibrations : <?= $calibrations_can_edit    ? 1 : 0 ?>
     } ,
     datafiles : {
-        is_data_administrator : <?=$is_data_administrator ? 1 : 0 ?>
+        read                  : <?=$experiment_can_read_data ? 1 : 0 ?> ,
+        manage                : <?=$elog_can_post_messages   ? 1 : 0 ?> ,
+        is_data_administrator : <?=$is_data_administrator    ? 1 : 0 ?>
+    } ,
+    hdf5 : {
+        read   : <?=$experiment_can_read_data ? 1 : 0 ?> ,
+        manage : <?=$elog_can_post_messages   ? 1 : 0 ?>
+    } ,
+    shiftmgr : {
+        can_edit : <?php echo $shiftmgr_can_edit ? 1 : 0 ; ?>
     } ,
     no_page_access_html :
 '<br><br>' +
@@ -278,7 +322,6 @@ var access_list = {
 '  You\'re encoureged to directly contact the PI of the experiment to resolve this issue.' +
 '</div>'
 } ;
-
 
 var select_app = '<?=$select_app?>' ;
 var select_app_context1 = '<?=$select_app_context1?>' ;
@@ -340,31 +383,54 @@ $(function() {
             name: 'Subscribe' ,
             application: new ELog_Subscribe(experiment, access_list) }]}] ;
 
-    if (!experiment.is_facility) menus.push ({
+    if (!experiment.is_facility) {
+        menus.push ({
         
-        name: 'Run Tables',
-        menu: [{
-            name: 'Calibrations' ,
-            application: new Runtables_Calibrations(experiment, access_list) } , {
- 
-            name: 'DAQ Detectors' ,
-            application: new Runtables_Detectors(experiment, access_list) } , {
+            name: 'Run Tables',
+            menu: [{
+                name: 'Calibrations' ,
+                application: new Runtables_Calibrations(experiment, access_list) } , {
 
-            name: 'EPICS' ,
-            application: new Runtables_EPICS(experiment, access_list) }]} , {
+                name: 'DAQ Detectors' ,
+                application: new Runtables_Detectors(experiment, access_list) } , {
 
-        name: 'File Manager',
-        menu: [{
-            name: 'Summary' ,
-            application: new Filemanager_Summary(experiment, access_list) } , {
-            
-            name: 'Files' ,
-            application: new Filemanager_Files(experiment, access_list) }]} , {
-    
-        name: 'HDF5 Translation',
-        menu: [{
-            name: 'Manage' ,
-            application: new HDF5_Manage(experiment, access_list) }]}) ;
+                name: 'EPICS' ,
+                application: new Runtables_EPICS(experiment, access_list) }]} , {
+
+            name: 'File Manager',
+            menu: [{
+                name: 'Summary' ,
+                application: new Filemanager_Summary(experiment, access_list) } , {
+
+                name: 'XTC HDF5' ,
+                application: new Filemanager_Files(experiment, access_list) } , {
+
+                name: 'USR' ,
+                application: new Filemanager_Files_USR(experiment, access_list) }]} , {
+
+            name: 'HDF5 Translation',
+            menu: [{
+                name: 'Manage' ,
+                application: new HDF5_Manage(experiment, access_list) }]}) ;
+
+        if (access_list.shiftmgr.can_edit) {
+            menus.push ({
+        
+                name: 'Shift Manager',
+                menu: [{
+                    name: 'Reports' ,
+                    application: new Reports(experiment.instrument.name, access_list.shiftmgr.can_edit) ,
+                    html_container: 'shift-reports-'+experiment.instrument.name} , {
+
+                    name: 'History' ,
+                    application: new History(experiment.instrument.name),
+                    html_container: 'shift-history-'+experiment.instrument.name} , {
+
+                    name: 'E-mail Notifications' ,
+                    application: new Notifications(experiment.instrument.namet) ,
+                    html_container: 'shift-notifications-'+experiment.instrument.name}]}) ;
+        }
+    }
 
     Fwk.build (
 
@@ -374,7 +440,7 @@ $(function() {
         menus ,
 
         function (text2search) {
-            Fwk.report_info('Search', text2search) ; } ,
+            global_elog_search_message_by_text (text2search) ; } ,
 
         function () {
             Fwk.activate(select_app, select_app_context1) ; }
@@ -386,17 +452,25 @@ $(function() {
 
 function show_email (user, addr) { Fwk.show_email(user, addr) ; }
 
+function global_elog_search_message_by_text (text2search) {
+    var application = Fwk.activate('e-Log', 'Search') ;
+    if (application) application.search_message_by_text(text2search) ;
+    else console.log('global_elog_search_message_by_text(): not implemented') ;
+} 
+
 function global_elog_search_message_by_id (id, show_in_vicinity) {
     var application = Fwk.activate('e-Log', 'Search') ;
     if (application) application.search_message_by_id(id, show_in_vicinity) ;
-    else alert('global_elog_search_message_by_id(): not implemented') ;
+    else console.log('global_elog_search_message_by_id(): not implemented') ;
 } 
 
 function global_elog_search_run_by_num (num, show_in_vicinity) {
     var application = Fwk.activate('e-Log', 'Search') ;
     if (application) application.search_run_by_num (num, show_in_vicinity) ;
-    else alert('global_elog_search_run_by_num(): not implemented') ;
+    else console.log('global_elog_search_run_by_num(): not implemented') ;
 }
+
+function display_path(filepath) { Fwk.show_path(filepath) ; }
 
 </script>
 
@@ -405,6 +479,245 @@ function global_elog_search_run_by_num (num, show_in_vicinity) {
   <body>
 
       Loading...
+
+<?php { $instr_name = $instrument->name() ; ?>
+
+      <div id="shift-reports-<?php echo $instr_name ; ?>" style="display:none">
+
+        <div class="shift-reports">
+
+          <!-- Controls for selecting shifts for display and updating the list of
+            -- the selected shifts. -->
+
+          <div id="shifts-search-controls"  style="float:left;" >
+
+            <div class="shifts-search-filters" >
+
+              <div class="shifts-search-filter-group" >
+                <div class="header" >Time range</div>
+                <div class="cell-1" >
+                  <select class="filter" name="range" style="padding:1px;">
+                    <option value="week"  >Last 7 days</option>
+                    <option value="month" >Last month</option>
+                    <option value="range" >Specific range</option>
+                  </select>
+                </div>
+                <div class="cell-2" >
+                  <input class="filter" type="text" size=6 name="begin" disabled="disabled" title="specify the first day of the range (optional)" />
+                  <input class="filter" type="text" size=6 name="end"  disabled="disabled" title="specify the last day of the range (optional)" />
+                </div>
+                <div class="terminator" ></div>
+              </div>
+
+              <div class="shifts-search-filter-group" >
+                <div class="header" >Stopper out</div>
+                <div class="cell-2">
+                  <select class="filter" name="stopper" style="padding:1px;">
+                    <option value=""  ></option>
+                    <option value="0" >&gt; 0 %</option>
+                    <option value="1" >&gt; 1 %</option>
+                    <option value="2" >&gt; 2 %</option>
+                    <option value="3" >&gt; 3 %</option>
+                    <option value="4" >&gt; 4 %</option>
+                    <option value="5" >&gt; 5 %</option>
+                  </select>
+                </div>
+                <div class="header-1">Door open</div>
+                <div class="cell-2" >
+                  <select class="filter" name="door" style="padding:1px;">
+                    <option value="" ></option>
+                    <option value="100" >&lt; 100 %</option>
+                    <option value="99"  >&lt; 99 %</option>
+                    <option value="98"  >&lt; 98 %</option>
+                    <option value="97"  >&lt; 97 %</option>
+                    <option value="96"  >&lt; 96 %</option>
+                    <option value="95"  >&lt; 95 %</option>
+                  </select>
+                </div>
+                <div class="header-1" >LCLS beam</div>
+                <div class="cell-2">
+                  <select class="filter"t name="lcls" style="padding:1px;">
+                    <option value=""  ></option>
+                    <option value="0" >&gt; 0 %</option>
+                    <option value="1" >&gt; 1 %</option>
+                    <option value="2" >&gt; 2 %</option>
+                    <option value="3" >&gt; 3 %</option>
+                    <option value="4" >&gt; 4 %</option>
+                    <option value="5" >&gt; 5 %</option>
+                  </select>
+                </div>
+                <div class="header-1">Data taking</div>
+                <div class="cell-2" >
+                  <select class="filter" name="daq" style="padding:1px;">
+                    <option value=""  ></option>
+                    <option value="0" >&gt; 0 %</option>
+                    <option value="1" >&gt; 1 %</option>
+                    <option value="2" >&gt; 2 %</option>
+                    <option value="3" >&gt; 3 %</option>
+                    <option value="4" >&gt; 4 %</option>
+                    <option value="5" >&gt; 5 %</option>
+                  </select>
+                </div>
+                <div class="terminator" ></div>
+              </div>
+
+              <div class="shifts-search-filter-group" >
+                <div class="header" >Shift types</div>
+                <div class="cell-2">
+                  <div class="cell-3" ><input class="filter type" type="checkbox" checked="checked" name="USER"     title="if enabled it will include shifts of this type" /></div><div class="cell-4">USER</div>
+                  <div class="cell-3" ><input class="filter type" type="checkbox" checked="checked" name="MD"       title="if enabled it will include shifts of this type" /></div><div class="cell-4">MD</div>
+                  <div class="cell-3" ><input class="filter type" type="checkbox" checked="checked" name="IN-HOUSE" title="if enabled it will include shifts of this type" /></div><div class="cell-4">IN-HOUSE</div>
+                </div>
+                <div class="terminator" ></div>
+              </div>
+
+            </div>
+            <div class="shifts-search-buttons" >
+              <button name="reset"  title="reset the search form to the default state">RESET</button>
+            </div>
+            <div class="shifts-search-filter-terminator" ></div>
+          </div>
+
+<?php if ($shiftmgr_can_edit) { ?>
+
+          <div id="new-shift-controls" style="float:left; margin-left:10px;">
+            <button name="new-shift" title="open a dialog for creating a new shift" >CREATE NEW SHIFT</button>
+            <div id="new-shift-con" class="new-shift-hdn" style="background-color:#f0f0f0; margin-top:5px; padding:1px 10px 5px 10px; border-radius:5px;" >
+              <div style="max-width:460px;">
+                <p>Note that shifts are usually created automatically based on rules defined
+                in the Administrative section of this application. You may still want to create
+                your own shift if that shift happens to be an exception from the rules.
+                Possible cases would be: non-planned shift, very short shift, etc. In all
+                other cases please see if there is a possibility to reuse an empty shift slot
+                by checking "Display all shifts" checkbox on the left.</p>
+              </div>
+              <div style="float:left;">
+                <table style="font-size:90%;"><tbody>
+                  <tr>
+                    <td class="shift-grid-hdr " valign="center" >Type:</td>
+                    <td class="shift-grid-val " valign="center" >
+                      <select name="type" >
+                        <option value="USER"     >USER</option>
+                        <option value="MD"       >MD</option>
+                        <option value="IN-HOUSE" >IN-HOUSE</option>
+                      </select></td>
+                  </tr>
+                  <tr>
+                    <td class="shift-grid-hdr " valign="center" >Begin:</td>
+                    <td class="shift-grid-val " valign="center" >
+                      <input name="begin-day" type="text" size=8 title="specify the begin date of the shift" />
+                      <input name="begin-h"   type="text" size=1 title="hour: 0..23" />
+                      <input name="begin-m"   type="text" size=1 title="minute: 0..59" /></td>
+                  </tr>
+                  <tr>
+                    <td class="shift-grid-hdr " valign="center" >End:</td>
+                    <td class="shift-grid-val " valign="center" >
+                      <input name="end-day" type="text" size=8 title="specify the end date of the shift" />
+                      <input name="end-h"   type="text" size=1 title="hour: 0..23" />
+                      <input name="end-m"   type="text" size=1 title="minute: 0..59" /></td>
+                  </tr>
+                </tbody></table>
+              </div>
+              <div style="float:left; margin-left:20px; margin-top:40px; padding-top:5px;">
+                <button name="save"   title="submit modifications and open the editing dialog for the new shift">SAVE</button>
+                <button name="cancel" title="discard modifications and close this dialog">CANCEL</button>
+              </div>
+              <div style="clear:both;"></div>
+            </div>
+          </div>
+
+<?php } ?>
+
+          <div style="clear:both;"></div>
+          <div style="float:right;" id="shifts-search-info">Searching...</div>
+          <div style="clear:both;"></div>
+
+          <!-- The shifts display -->
+
+          <div id="shifts-search-display"> </div>
+
+        </div>
+      </div>
+
+      <div id="shift-history-<?php echo $instr_name ; ?>" style="display:none">
+
+        <div class="shift-history-reports">
+
+          <!-- Controls for selecting an interval for display and updating the list of
+            -- the selected shifts. -->
+
+          <div id="shifts-history-controls" style="float:left;" >
+            <div>
+              <table><tbody>
+                <tr>
+                  <td><b>Range:</b></td>
+                  <td><select name="range" style="padding:1px;">
+                        <option value="week"  >Last 7 days</option>
+                        <option value="month" >Last month</option>
+                        <option value="range" >Specific range</option>
+                      </select></td>
+                  <td><div style="width:20px;"></div>&nbsp;</td>
+                  <td><input type="text" size=6 name="begin" disabled="disabled" title="specify the first day of the range (optional)" />
+                      <b>&mdash;</b>
+                      <input type="text" size=6 name="end"  disabled="disabled" title="specify the last day of the range (optional)" /></td>
+                  <td><div style="width:20px;">&nbsp;</div></td>
+                  <td><button name="reset"  title="reset the search form to the default state">Reset</button></td>
+                </tr>
+              </tbody></table>
+            </div>
+            <div style="margin-top:5px;" >
+              <table><tbody>
+                <tr>
+                  <td><b>Display:</b></td>
+                  <td class="annotated"
+                      data="if enabled the table below will display shift creation events">
+                    <input type="checkbox"
+                           name="display-create-shift"
+                           checked="checked" />CREATE SHIFT</td>
+                </tr>
+                <tr>
+                  <td>&nbsp;</td>
+                  <td class="annotated"
+                      data="if enabled the table below will display shift modifications">
+                    <input type="checkbox"
+                           name="display-modify-shift"
+                           checked="checked" />MODIFY SHIFT</td>
+                  <td><div style="width:20px;"></div>&nbsp;</td>
+                  <td class="annotated"
+                      data="if enabled the table below will display area modifications">
+                    <input type="checkbox"
+                           name="display-modify-area"
+                           checked="checked" />MODIFY AREA</td>
+                  <td><div style="width:20px;"></div>&nbsp;</td>
+                  <td class="annotated"
+                      data="if enabled the table below will display timer allocation modifications">
+                    <input type="checkbox"
+                           name="display-modify-time"
+                           checked="checked" />MODIFY TIME ALLOCATION</td>
+                </tr>
+              </tbody></table>
+            </div>
+          </div>
+          <div style="clear:both;"></div>
+          <div style="float:right;" id="shifts-history-info">Searching...</div>
+          <div style="clear:both;"></div>
+
+          <!-- The shifts display -->
+
+          <div id="shifts-history-display"></div>
+
+        </div>
+      </div>
+
+      <div id="shift-notifications-<?php echo $instr_name ; ?>" style="display:none">
+
+        <div class="shift-notifications">
+          View and manage push notifications: who will get an event and what kind of events (new shift created, data updated, etc.
+        </div>
+
+      </div>
+
+<?php } ?>
 
   </body>
 

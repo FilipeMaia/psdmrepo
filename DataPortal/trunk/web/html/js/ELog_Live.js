@@ -110,7 +110,7 @@ function ELog_Live (experiment, access_list) {
 '  <div class="info" id="info" style="float:left;">&nbsp;</div>' +
 '  <div class="info" id="updated" style="float:right;">&nbsp;</div>' +
 '  <div style="clear:both;"></div>' +
-'  <div id="viewer" class="elog-live-viewer"></div>' +
+'  <div id="viewer" class="elog-msg-viewer"></div>' +
 '</div>' ;
         this.wa.html(html) ;
 
@@ -145,7 +145,7 @@ function ELog_Live (experiment, access_list) {
             scope:                   'experiment' ,
             search_in_messages:      1 ,
             search_in_tags:          1 ,
-            search_in_values:        1 ,
+            search_in_values:        0 ,
             posted_at_experiment:    1 ,
             posted_at_shifts:        1 ,
             posted_at_runs:          1 ,
@@ -165,7 +165,9 @@ function ELog_Live (experiment, access_list) {
                     that.latest_timestamp = data.ResultSet.Result[num_threads-1].event_timestamp ;
                     that.viewer.load(data.ResultSet.Result) ;
                 }
-                that.info.html('<b>'+that.viewer.num_rows()+'</b> threads') ;
+                var num_runs = that.viewer.num_runs() ;
+                var num_msgs = that.viewer.num_rows() - num_runs ;
+                that.info.html('<b>'+num_msgs+'</b> messages'+(num_runs ? ', runs: <b>'+that.viewer.min_run()+' .. '+that.viewer.max_run() : '')) ;
                 that.updated.html('[ Last update on: <b>'+data.updated+'</b> ]') ;
             } ,
             function (msg) {
@@ -182,8 +184,8 @@ function ELog_Live (experiment, access_list) {
             id:                      this.experiment.id ,
             scope:                   'experiment' ,
             search_in_messages:      1 ,
-            search_in_tags:          1 ,
-            search_in_values:        1 ,
+            search_in_tags:          0 ,
+            search_in_values:        0 ,
             posted_at_experiment:    1 ,
             posted_at_shifts:        1 ,
             posted_at_runs:          1 ,
@@ -203,7 +205,9 @@ function ELog_Live (experiment, access_list) {
                     that.latest_timestamp = data.ResultSet.Result[num_threads-1].event_timestamp ;
                     that.viewer.update(data.ResultSet.Result) ;
                 }
-                that.info.html('<b>'+that.viewer.num_rows()+'</b> threads') ;
+                var num_runs = that.viewer.num_runs() ;
+                var num_msgs = that.viewer.num_rows() - num_runs ;
+                that.info.html('<b>'+num_msgs+'</b> messages'+(num_runs ? ', runs: <b>'+that.viewer.min_run()+' .. '+that.viewer.max_run() : '')) ;
                 that.updated.html('[ Last update on: <b>'+data.updated+'</b> ]') ;
             } ,
             function (msg) {

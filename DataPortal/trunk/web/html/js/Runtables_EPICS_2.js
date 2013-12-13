@@ -91,20 +91,10 @@ function Runtables_EPICS (experiment, access_list) {
 '  <div id="'+s_name+'">' +
 '    <div id="ctrl">' +
 '      <div class="group">' +
-'        <span class="label">Runs</span>' +
-'        <select class="update-trigger" name="'+s_name+':runs" >' +
-'          <option value="20" >last 20</option>' +
-'          <option value="100">last 100</option>' +
-'          <option value="200">last 200</option>' +
-'          <option value="range">specific range</option>' +
-'          <option value="all">all</option>' +
-'        </select>' +
-'      </div>' +
-'      <div class="group">' +
-'        <span class="label">First</span>' +
-'        <input class="update-trigger" type="text" name="'+s_name+':first" value="-20" size=8 disabled />' +
-'        <span class="label">Last</span>' +
-'        <input class="update-trigger" type="text" name="'+s_name+':last"  value="" size=8 disabled />' +
+'        <span class="label">From run</span>' +
+'        <input class="update-trigger" type="text" name="'+s_name+':first" value="" size=8 />' +
+'        <span class="label">through</span>' +
+'        <input class="update-trigger" type="text" name="'+s_name+':last"  value="" size=8 />' +
 '      </div>' +
 '      <div class="buttons">' +
 '        <button class="control-button" name="'+s_name+':search" title="search and display results" >Search</button>' +
@@ -116,7 +106,12 @@ function Runtables_EPICS (experiment, access_list) {
 '      <div class="info" id="info"    style="float:left;">&nbsp;</div>' +
 '      <div class="info" id="updated" style="float:right;">&nbsp;</div>' +
 '      <div style="clear:both;"></div>' +
-'      <div id="table" class="table" ></div>' +
+'      <div>' +
+'        <button class="control-button" name="'+s_name+':show_all" title="show all columns"                  >Show all</button>' +
+'        <button class="control-button" name="'+s_name+':hide_all" title="hide all columns"                  >Hide all</button>' +
+'        <button class="control-button" name="'+s_name+':advanced" title="select which columns to show/hide" >Select columns</button>' +
+'      </div>' +
+'      <div id="table" class="table"></div>' +
 '    </div>' +
 '  </div>' ;
                 }
@@ -133,31 +128,9 @@ function Runtables_EPICS (experiment, access_list) {
                     switch (op) {
                         case 'search'   : _that._load (section_name) ; break ;
                         case 'reset'    : _that._reset(section_name) ; break ;
-                    }
-                }) ;
-                _that._tabs.find('select.update-trigger').change(function () {
-                    console.log(this.name) ;
-                    var s2 = this.name.split(':') ;
-                    var s_name = s2[0] ;
-                    var range = $(this).val() ;
-                    if (range === 'range') {
-                        _that._tabs.find('input.update-trigger[name="'+s_name+':first"]').removeAttr('disabled') ;
-                        _that._tabs.find('input.update-trigger[name="'+s_name+':last"]') .removeAttr('disabled') ;
-                    } else {
-                        _that._tabs.find('input.update-trigger[name="'+s_name+':first"]').attr('disabled', 'disabled') ;
-                        _that._tabs.find('input.update-trigger[name="'+s_name+':last"]') .attr('disabled', 'disabled') ;
-                        switch (range) {
-                            case '20' :
-                            case '100' :
-                            case '200' :
-                                _that._tabs.find('input[name="'+s_name+':first"]').val(-parseInt(range)) ;
-                                _that._tabs.find('input[name="'+s_name+':last"]').val('') ;
-                                break ;
-                            case 'all' :
-                                _that._tabs.find('input[name="'+s_name+':first"]').val('') ;
-                                _that._tabs.find('input[name="'+s_name+':last"]').val('') ;
-                                break ;
-                        }
+                        case 'show_all' : _that._tables[section_name].display('show_all') ;  break ;
+                        case 'hide_all' : _that._tables[section_name].display('hide_all') ;  break ;
+                        case 'advanced' : _that._advanced(section_name) ;  break ;
                     }
                 }) ;
                 _that._tabs.find('.update-trigger').change(function () {
@@ -170,6 +143,7 @@ function Runtables_EPICS (experiment, access_list) {
                     var s_name = _that._section_names[i] ;
                     _that._tables[s_name] = _that._create_table(s_name) ;
                     _that._load(s_name) ;
+                    console.log(s_name) ;
                 }
             } ,
             function (msg) {
@@ -191,25 +165,92 @@ function Runtables_EPICS (experiment, access_list) {
         var table_cont = tab_body.find('div#table') ;
 
         var hdr = [
-            'RUN'
+            {name: 'RUN', type: Table.Types.Number_HTML}
         ] ;
         for (var i in section.parameters) {
+
             var name = section.parameters[i] ;
-            hdr.push(name) ;
+            var html_name = '' ;
+            var name_split = name.split(':') ;
+            for (var j in name_split)
+                html_name += '<div>'+name_split[j]+'</div>' ;
+
+            hdr.push({
+                name:     '<div>'+html_name+'</div>' ,
+                hideable: true ,
+                align:    'center' ,
+                style:    ' white-space: nowrap;'
+            }) ;
         }
-        var rows = null ;
-        var num_hdr_rows = 2 ;
-        var max_hdr_rows = 5 ;
-        var table = new SmartTable (
+        var table = new Table (
             table_cont ,
             hdr ,
-            rows ,
-            num_hdr_rows ,
-            max_hdr_rows
+            null ,
+            { default_sort_forward: false } ,
+            Fwk.config_handler('runtables', section_name)
         ) ;
+        table.display() ;
+
         this._tables[section_name] = table ;
 
         return table ;
+    } ;
+
+    this._advanced = function (section_name) {
+
+        var detectors_selector = $('#fwk-largedialogs') ;
+
+        var html =
+'<div style="overflow:auto;">' +
+'  <table><tbody>' ;
+        var detectors_per_row = 5 ;
+        var num_detectors = 0 ;
+        var table = this._tables[section_name] ;
+        var header_info = table.header_info() ;
+        for (var i in header_info) {
+            var col = header_info[i] ;
+            if (col.hideable) {
+                if (!num_detectors) {
+                    html +=
+'    <tr>' ;
+                } else if (!(num_detectors % detectors_per_row)) {
+                    html +=
+'    </tr>' +
+'    <tr>' ;
+                }
+                html +=
+'      <td class="table_cell table_cell_borderless">' +
+'        <div style="float:left;"><input type="checkbox" class="detector" name="'+col.number+'" '+(col.hidden?'':'checked="checked"')+' /></div>' +
+'        <div style="float:left; margin-left:5px; font-weight:bold;">'+col.name+'</div>' +
+'        <div style="clear:both;"></div>' +
+'      </td>' ;
+                num_detectors++ ;
+            }
+        }
+        if (num_detectors % detectors_per_row) {
+            html +=
+'    </tr>' ;
+        }
+        html +=
+'  </tbody></table>' ;
+'</div>';
+        detectors_selector.html (html) ;
+        detectors_selector.dialog ({
+            minHeight: 240 ,
+            width: 720 ,
+            resizable: true ,
+            modal: true ,
+            buttons: {
+                "Close": function() {
+                    $( this ).dialog('close') ;
+                }
+            } ,
+            title: 'Switch on/off detectors'
+        });
+        detectors_selector.find('input.detector').change(function() {
+            var col_number = this.name ;
+            table.display(this.checked ? 'show' : 'hide', parseInt(col_number)) ;
+        }) ;
     } ;
 
     this._display = function (section_name) {
@@ -223,18 +264,18 @@ function Runtables_EPICS (experiment, access_list) {
         var rows = [] ;
         for (var run in section.runs) {
             var row = [] ;
-            row.push(
-                '<a href="javascript:global_elog_search_run_by_num('+run+',true);" title="'+title+'" class="lb_link">'+run+'</a>'
-            ) ;
+            row.push({
+                number: run ,
+                html:   '<a href="javascript:global_elog_search_run_by_num('+run+',true);" title="'+title+'" class="lb_link">'+run+'</a>'
+            }) ;
             var param2value = section.runs[run] ;
             for (var i in section.parameters) {
                 var name  = section.parameters[i] ;
                 var value = name in param2value ? param2value[name] : '' ;
-                row.push(value)  ;
+                row.push(value === '' ? '&nbsp;' : value)  ;
             }
             rows.push(row) ;
         }
-        rows.reverse() ;
         table.load(rows) ;
     } ;
 
@@ -243,33 +284,13 @@ function Runtables_EPICS (experiment, access_list) {
         var updated = this._tabs.find('div#'+section_name).find('#updated') ;
         updated.html('Loading...') ;
 
-        var params = {
-            exper_id: this.experiment.id ,
-            section:  section_name
-        } ;
-        var range = this._tabs.find('select[name="'+section_name+':runs"]').val() ;
-        console.log(range) ;
-        switch (range) {
-            case '20' :
-            case '100' :
-            case '200' :
-                params.from_run    = -parseInt(range) ;
-                params.through_run = 0 ;
-                break ;
-            case 'range' :
-                params.from_run    = parseInt(this._tabs.find('input[name="'+section_name+':first"]').val()) ;
-                params.through_run = parseInt(this._tabs.find('input[name="'+section_name+':last"]').val()) ;
-                break ;
-            case 'all' :
-            default :
-                params.from_run    = 0 ;
-                params.through_run = 0 ;
-                break ;
-        }
-
         Fwk.web_service_GET (
             '../portal/ws/runtable_epics_section_get.php' ,
-            params ,
+            {   exper_id:    this.experiment.id ,
+                from_run:    parseInt(this._tabs.find('input[name="'+section_name+':first"]').val()) ,
+                through_run: parseInt(this._tabs.find('input[name="'+section_name+':last"]').val()) ,
+                section:     section_name
+            } ,
             function (data) {
                 _that._sections[section_name].runs = data.runs ;
                 _that._display(section_name) ;

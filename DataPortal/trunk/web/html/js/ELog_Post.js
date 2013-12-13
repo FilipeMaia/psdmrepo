@@ -231,17 +231,9 @@ function ELog_Post (experiment, access_list, post_onsuccess) {
     } ;
     
     this.load_tags = function () {
-        ELog_Utils.load_tags (
+        ELog_Utils.load_tags_and_authors (
             this.experiment.id ,
-            this.form_tags ,
-            function (tags) {
-                // TODO: enable all inputs on the page which can't be used before
-                // the tags information is ready.
-                ;
-            } ,
-            function (msg)  {
-                Fwk.report_error(msg) ;
-            }
+            this.form_tags
         ) ;
     } ;
 }

@@ -48,10 +48,6 @@ function sections ($instr_name, $parameters) {
     // The remaining parameters will go into the last section
 
     $parameter_names = array() ;
-    foreach (LogBook\LogBookUtils::$sections['FOOTER']['PAR2DESCR'] as $name => $descr) {
-        if (array_key_exists($name, $in_use)) continue ;
-        array_push($parameter_names, $name) ;
-    }
     foreach ($parameters as $param) {
         $name = $param->name() ;
         if (array_key_exists($name, $in_use)) continue ;
@@ -59,7 +55,7 @@ function sections ($instr_name, $parameters) {
     }
     array_push($result, array (
         'name'  => 'FOOTER' ,
-        'title' => LogBook\LogBookUtils::$sections['FOOTER']['TITLE'],
+        'title' => 'Additional Parameters',
         'parameters' => $parameter_names)) ;
 
     return $result ;
@@ -92,10 +88,6 @@ function parameter2section_description ($instr_name, $parameters) {
                     'section' => $section['SECTION'] ,
                     'descr'   => $param['descr']) ;
 
-    foreach (LogBook\LogBookUtils::$sections['FOOTER']['PAR2DESCR'] as $name => $descr)
-        $result[$name] = array (
-            'section' => 'FOOTER' ,
-            'descr'   => $descr) ;
 
     // Then go through the list of parameters found in the database to
     // pick up the remaining ones not found witin any predefined sections.

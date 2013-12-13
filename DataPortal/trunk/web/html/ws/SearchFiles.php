@@ -34,6 +34,7 @@ function report_error ($msg) {
     print json_encode(
         array(
             'Status'  => 'error',
+            'status'  => 'error',
             'Message' => '<b><em style="color:red;" >Error:</em></b>&nbsp;'.$msg
         )
     );
@@ -694,6 +695,7 @@ try {
 
     print <<< HERE
 { "Status": {$success_encoded},
+  "status": {$success_encoded},
   "updated": {$updated_str},
   "summary": {
     "runs": {$num_runs},

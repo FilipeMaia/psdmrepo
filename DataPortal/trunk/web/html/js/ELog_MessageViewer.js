@@ -6,7 +6,7 @@ function ELog_RunBody (parent, message) {
     // Allways call the base class's constructor
     // -----------------------------------------
 
-    Widget.call(this) ;
+    StackRowBody.call(this) ;
 
     // ------------------------
     // Parameters of the object
@@ -232,7 +232,7 @@ function ELog_MessageBody (parent, message) {
     // Allways call the base class's constructor
     // -----------------------------------------
 
-    Widget.call(this) ;
+    StackRowBody.call(this) ;
 
     // ------------------------
     // Parameters of the object
@@ -412,9 +412,11 @@ function ELog_MessageBody (parent, message) {
             this.children_viewer = new ELog_MessageViewer (
                 this ,
                 this.m_cont.children('.children') ,
-                hidden_header ,
-                instant_expand ,
-                this.message.deleted || this.parent.deleted) ;
+                {   hidden_header  : hidden_header ,
+                    instant_expand : instant_expand ,
+                    deleted        : this.message.deleted || this.parent.deleted
+                }
+            ) ;
             this.children_viewer.load(this.message.children) ;
         }
 
@@ -867,14 +869,21 @@ function ELog_MessageBody (parent, message) {
 define_class (ELog_MessageBody, StackRowBody, {}, {}) ;
 
 
-function ELog_MessageViewer (parent, cont, hidden_header, instant_expand, deleted) {
+function ELog_MessageViewer (parent, cont, options) {
     this.parent = parent ;
     this.experiment = parent.experiment ;
     this.access_list = parent.access_list ;
     this.cont = cont ;
-    this.hidden_header = hidden_header ? true : false ;
-    this.instant_expand = instant_expand ? true : false ;
-    this.deleted = deleted ? deleted : false ;
+
+    this.hidden_header  = false ;
+    this.instant_expand = false ;
+    this.deleted        = false ;
+    if (options) {
+        for (var opt in options) {
+            var val = options[opt] ;
+            this[opt] = val ? true : false ;
+        }   
+    }
     this.messages = [] ;
     var hdr = [
         {id: 'posted', title: 'Posted',    width: 160} ,
@@ -892,7 +901,7 @@ function ELog_MessageViewer (parent, cont, hidden_header, instant_expand, delete
         [] ,
         {   hidden_header: this.hidden_header ,
             effect_on_insert: function (hdr_cont) {
-               hdr_cont.stop(true,true).effect('highlight', {color:'#ff6666'}, 30000) ;
+               hdr_cont.stop(true,true).effect('highlight', {color:'#ff6666 !important'}, 30000) ;
             }
         }
     ) ;
@@ -905,9 +914,16 @@ function ELog_MessageViewer (parent, cont, hidden_header, instant_expand, delete
         if (this.instant_expand) this.table.expand_or_collapse(true) ;
     } ;
 
-    this.num_rows = function () {
-        return this.table.num_rows() ;
-    } ;
+    this.num_rows = function () { return this.table.num_rows() ; } ;
+
+    this._num_runs = 0 ;
+    this._min_run = 0 ;
+    this._max_run = 0 ;
+
+    this.num_runs = function () { return this._num_runs; }
+    this.min_run  = function () { return this._min_run; }
+    this.max_run  = function () { return this._max_run; }
+
 
     /**
      * Produce a data object to be fed into the StackOfRows as a row
@@ -963,8 +979,14 @@ function ELog_MessageViewer (parent, cont, hidden_header, instant_expand, delete
      * @returns {undefined}
      */
     this.load = function (messages) {
+
         this.messages = jQuery.extend(true, [], messages) ;
         this.messages.reverse() ;
+
+        this._num_runs = 0 ;
+        this._min_run = 0 ;
+        this._max_run = 0 ;
+
         var rows = [] ;
         for (var i in this.messages) {
             var m = this.messages[i] ;
@@ -973,13 +995,18 @@ function ELog_MessageViewer (parent, cont, hidden_header, instant_expand, delete
                 this.messages[i] = m ;
             }
             rows.push(this.message2row(m)) ;
+            if (m.is_run) {
+                this._num_runs++ ;
+                this._min_run = Math.min(this._min_run ? this._min_run : m.run_num, m.run_num) ;
+                this._max_run = Math.max(this._max_run ? this._max_run : m.run_num, m.run_num) ;
+            }
         }
         this.table.set_rows(rows) ;
         this.display(this.cont) ;
     } ;
 
     /**
-     * At the moment this operation is almost identical to 'load'
+     * Insert new messages in front of the table
      * 
      * @param Array new_messages
      * @returns {undefined}
@@ -1000,6 +1027,11 @@ function ELog_MessageViewer (parent, cont, hidden_header, instant_expand, delete
                 if (this.messages.length) this.messages.splice(0, 0, m) ;
                 else                      this.messages.push(m) ;
                 this.table.insert_front(this.message2row(m)) ;
+                if (m.is_run) {
+                    this._num_runs++ ;
+                    this._min_run = Math.min(this._min_run ? this._min_run : m.run_num, m.run_num) ;
+                    this._max_run = Math.max(this._max_run ? this._max_run : m.run_num, m.run_num) ;
+                }
             }
         }
     } ;
@@ -1060,6 +1092,30 @@ function ELog_MessageViewer (parent, cont, hidden_header, instant_expand, delete
                 return ;
             }
         }
+    } ;
+
+    this.focus_at_message = function (message_id) {
+        for (var i in this.table.rows) {
+            var row = this.table.rows[i] ;
+            if (row.data_object.body.message.id == message_id) {
+                var id = row.id ;
+                this.table.expand_or_collapse_row(id, true, $('#fwk-center')) ;
+                return ;
+            }
+        }
+        console.log('ELog_MessageViewer.focus_at_message('+message_id+') the message was not found in StackOfRows') ;
+    } ;
+
+    this.focus_at_run = function (run_num) {
+        for (var i in this.table.rows) {
+            var row = this.table.rows[i] ;
+            if (row.data_object.body.message.is_run && row.data_object.body.message.run_num == run_num) {
+                var id = row.id ;
+                this.table.expand_or_collapse_row(id, true, $('#fwk-center')) ;
+                return ;
+            }
+        }
+        console.log('ELog_MessageViewer.focus_at_run('+run_num+') the message was not found in StackOfRows') ;
     } ;
 
     // Must be the last call. Otherwise the widget won't be able to see
