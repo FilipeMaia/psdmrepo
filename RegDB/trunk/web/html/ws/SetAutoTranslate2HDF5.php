@@ -27,8 +27,8 @@ header( "Expires: Sat, 26 Jul 1997 05:00:00 GMT" );   // Date in the past
 function report_error($msg) {
     print json_encode(
         array(
-            "Status" => "error",
-            "Message" => $msg
+            "Status" => "error", "Message" => $msg ,
+            "status" => "error", "message" => $msg
         )
     );
     exit;
@@ -36,7 +36,8 @@ function report_error($msg) {
 function report_success() {
     print json_encode(
         array(
-            "Status" => "success"
+            "Status" => "success" ,
+            "status" => "success"
         )
     );
 }
