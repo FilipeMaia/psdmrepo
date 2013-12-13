@@ -168,7 +168,7 @@ uint32_t ConfigV1_v0::numDelayShots() const {
 }
 uint32_t
 ConfigV1_v0::frameSize() const{ 
-return sizeof(FrameV1) + this->numPixels()*2; 
+return 12 + this->numPixels()*2; 
 }
 
 

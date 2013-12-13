@@ -68,11 +68,11 @@ public:
   uint32_t frameSize() const;
 
   /** calculate frame X size in pixels based on the current ROI and binning settings */
-  uint32_t numPixelsX() const { return (_uWidth + _uBinX - 1) / _uBinX; }
+  uint32_t numPixelsX() const { return (width() + binX() - 1) / binX(); }
   /** calculate frame Y size in pixels based on the current ROI and binning settings */
-  uint32_t numPixelsY() const { return (_uHeight+ _uBinY - 1) / _uBinY; }
+  uint32_t numPixelsY() const { return (height() + binY() - 1) / binY(); }
   /** calculate total frame size in pixels based on the current ROI and binning settings */
-  uint32_t numPixels() const { return ((_uWidth + _uBinX-1)/ _uBinX )*((_uHeight+ _uBinY-1)/ _uBinY ); }
+  uint32_t numPixels() const { return numPixelsX()*numPixelsY(); }
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
