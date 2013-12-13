@@ -134,6 +134,15 @@ class LusiTime {
     public function  in24hours () {
         return new LusiTime($this->sec + 24 * 3600) ; }
 
+    /* Return the data and time in 25 hours from the ones encoded in
+     * the current object.
+     * 
+     * NOTE: This function can be used to make proper adjustments due to Dayligh Savings
+     *       time switch.
+     */
+    public function  in25hours () {
+        return new LusiTime($this->sec + 25 * 3600) ; }
+
     /* Unlike the previous method this one would return a short (no
      * nanoseconds and time-zone) representation (ISO) of a human-readable
      * date and time.
