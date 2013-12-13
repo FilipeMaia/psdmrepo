@@ -231,9 +231,16 @@ class ShiftMgr extends DbConnection {
         $begin_time = LusiTime::parse("{$begin_time->toStringDay()} 00:00:00") ;
 
         // Never go beyond the comming midnight of the present day.
+        //
+        // NOTE: that we're looking +25 hours ahead just in case if we hit
+        // the Daylight savings time switch which happens at midnight.
+        // If that will happen to be in November then the day will be 25 hours
+        // in length. So we would need to have an interval in 25 hours. This should still
+        // work for normal days as well as for March when an opposite Daylight savings
+        // time switch happens.
 
         $now = LusiTime::now() ;
-        $max_end_time = LusiTime::parse("{$now->in24hours()->toStringDay()} 00:00:00") ;
+        $max_end_time = LusiTime::parse("{$now->in25hours()->toStringDay()} 00:00:00") ;
         $end_time = $end_time ? ($max_end_time->less($end_time) ? $max_end_time : $end_time) : $max_end_time ;
 
         if (!($begin_time->less($end_time))) return ;   // no room for new shifts
@@ -274,7 +281,7 @@ class ShiftMgr extends DbConnection {
                             $this->create_shift (
                                 $instr_name ,
                                 LusiTime::parse("{$day->begin->toStringDay()} 21:00:00") ,
-                                LusiTime::parse("{$day->begin->in24hours()->toStringDay()}  09:00:00")
+                                LusiTime::parse("{$day->begin->in25hours()->toStringDay()}  09:00:00")  // NOTE: see previous notes on the Daylight savings time switch
                             ) ;
                         } catch (FileMgrException $e) {
 
