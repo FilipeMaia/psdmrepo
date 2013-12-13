@@ -115,7 +115,6 @@ public:
   {
   }
   uint16_t code() const { return _u16Code; }
-  uint16_t _u16MaskEventAttr_value() const { return _u16MaskEventAttr; }
   uint8_t isReadout() const { return uint8_t(this->_u16MaskEventAttr & 0x1); }
   uint8_t isTerminator() const { return uint8_t((this->_u16MaskEventAttr>>1) & 0x1); }
   uint32_t maskTrigger() const { return _u32MaskTrigger; }
@@ -146,7 +145,6 @@ public:
   {
   }
   uint16_t code() const { return _u16Code; }
-  uint16_t _u16MaskEventAttr_value() const { return _u16MaskEventAttr; }
   uint8_t isReadout() const { return uint8_t(this->_u16MaskEventAttr & 0x1); }
   uint8_t isTerminator() const { return uint8_t((this->_u16MaskEventAttr>>1) & 0x1); }
   uint32_t reportDelay() const { return _u32ReportDelay; }
