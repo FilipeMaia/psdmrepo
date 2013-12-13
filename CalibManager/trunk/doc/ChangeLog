@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+
+2013-12-12 Mikhail S. Dubrovin
+- in GUIFileManagerSelect.py add Move button/command
+	
 Tag: V00-00-07
 2013-12-12 Mikhail S. Dubrovin
 - Tuning of the GUIFileManager features;

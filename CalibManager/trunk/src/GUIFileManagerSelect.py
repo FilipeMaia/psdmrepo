@@ -102,6 +102,7 @@ class GUIFileManagerSelect ( QtGui.QWidget ) :
         self.edi_file = QtGui.QLineEdit ( self.path_fm_selected ) # fnm.path_to_calib_dir() )
         self.edi_file.setReadOnly(True)
  
+        self.but_move   = QtGui.QPushButton('Move')
         self.but_copy   = QtGui.QPushButton('Copy')
         self.but_delete = QtGui.QPushButton('Delete')
         self.but_view   = QtGui.QPushButton('View')
@@ -126,6 +127,7 @@ class GUIFileManagerSelect ( QtGui.QWidget ) :
 
         self.hboxC = QtGui.QHBoxLayout() 
         #self.hboxC.addStretch(1)     
+        self.hboxC.addWidget( self.but_move )
         self.hboxC.addWidget( self.but_copy )
         self.hboxC.addWidget( self.lab_src  )
         self.hboxC.addWidget( self.but_src  )
@@ -148,6 +150,7 @@ class GUIFileManagerSelect ( QtGui.QWidget ) :
         self.setLayout(self.vboxW)
 
         self.connect( self.but_browse, QtCore.SIGNAL('clicked()'), self.onButBrowse ) 
+        self.connect( self.but_move,   QtCore.SIGNAL('clicked()'), self.onButMove   ) 
         self.connect( self.but_copy,   QtCore.SIGNAL('clicked()'), self.onButCopy   ) 
         self.connect( self.but_view,   QtCore.SIGNAL('clicked()'), self.onButView   ) 
         self.connect( self.but_plot,   QtCore.SIGNAL('clicked()'), self.onButPlot   ) 
@@ -175,6 +178,7 @@ class GUIFileManagerSelect ( QtGui.QWidget ) :
         self.but_browse.setToolTip('Open file browser dialog\nwindow and select the file') 
         self.but_src   .setToolTip('Select name of the detector')
         self.but_type  .setToolTip('Select type of calibration parameters')
+        self.but_move  .setToolTip('Move selected file')
         self.but_copy  .setToolTip('Copy selected file')
         self.but_view  .setToolTip('Launch file browser')
         self.but_plot  .setToolTip('Launch plot browser')
@@ -193,6 +197,7 @@ class GUIFileManagerSelect ( QtGui.QWidget ) :
 
     def setStyle(self):
         self.          setStyleSheet(cp.styleBkgd)
+        self.but_move  .setStyleSheet(cp.styleButton)
         self.but_copy  .setStyleSheet(cp.styleButton)
         self.but_delete.setStyleSheet(cp.styleButton)
         self.but_view  .setStyleSheet(cp.styleButton)
@@ -244,15 +249,16 @@ class GUIFileManagerSelect ( QtGui.QWidget ) :
         #print '\nself.str_path()', self.str_path()
         #print 'fnm.path_dir_work()', fnm.path_dir_work().lstrip('.')
 
-        is_enable_delete = file_is_enable \
-                           and (self.str_path().find(fnm.path_to_calib_dir()) != -1
-                                or self.str_path().find(fnm.path_dir_work().lstrip('.')) != -1
-                                )
+        is_enable_delete = file_is_enable # \
+#                           and (self.str_path().find(fnm.path_to_calib_dir()) != -1
+#                                or self.str_path().find(fnm.path_dir_work().lstrip('.')) != -1
+#                                )
         self.but_delete.setEnabled(is_enable_delete)
 
         is_enable_copy = file_is_enable \
                          and self.source_name != 'Select' \
                          and self.calib_type != 'Select' 
+        self.but_move  .setEnabled(is_enable_copy)
         self.but_copy  .setEnabled(is_enable_copy)
         
         if self.source_name == 'Select' : self.but_src .setStyleSheet(cp.stylePink)
@@ -325,6 +331,15 @@ class GUIFileManagerSelect ( QtGui.QWidget ) :
         self.close()
 
 
+    def onButMove(self):
+        #logger.info('onButMove', __name__)
+        cmd = 'mv %s %s' % (self.str_path(), self.get_out_path())
+        if self.approveCommand(self.but_copy, cmd) :
+            #os.system(cmd)
+            fd.procDeployCommand(cmd)
+            self.resetFieldsOnDelete()
+
+
     def onButCopy(self):
         #logger.info('onButCopy', __name__)
         cmd = 'cp %s %s' % (self.str_path(), self.get_out_path())
@@ -347,6 +362,7 @@ class GUIFileManagerSelect ( QtGui.QWidget ) :
         if resp :
             logger.info('Approved command:\n' + cmd, __name__)
         return resp
+
 
     def selectDirFromPopupMenu(self, dir_current='.'):
 
