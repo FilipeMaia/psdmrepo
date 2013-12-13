@@ -1,0 +1,79 @@
+@CHARSET "ISO-8859-1";
+
+#button-select-experiment {
+  margin-bottom: 20px;
+}
+
+.group-members-hidden {
+  display: none;
+}
+.group-members-visible {
+  display: block;
+  width: 400px;
+  height: 300px;
+  overflow: auto;
+  margin-top: 5px;
+  padding: 0.5em;
+  background-color: #e0e0e0;
+}
+
+.grid-sect-hdr,
+.grid-sect-hdr-first {
+  padding: 10px 0px 0px 0px;
+  font-family: "Times", serif;
+  font-weight: bold;
+  font-size: 0.8em;
+}
+.grid-sect-hdr-first {
+  padding: 0px 0px 0px 0px;
+}
+.grid-key,
+.grid-value {
+  padding: 0px 0px 0px 20px;
+  font-family: "Times", serif;
+  font-size: 0.8em;
+}
+.grid-value {
+  color: maroon;
+}
+#files-search-summary,
+#files-search-filter,
+#files-search-result,
+#translate-search-summary,
+#translate-search-filter,
+#translate-search-result {
+  font-size: 1.0em;
+}
+#files-search-filter,
+#translate-search-filter {
+  margin-left: 80px;
+  padding: 20px;
+  padding-top: 0px;
+  border: solid 1px #d0d0d0;
+  background-color: #f5f5f5;
+}
+#files-search-filter .group,
+#translate-search-filter .group {
+  padding: 10px;
+}
+#files-search-result,
+#translate-search-result {
+  margin-top: 30px;
+}
+.selector-hdr {
+  padding: 0px 0px 0px 0px;
+  font-family: "Times", serif;
+  font-weight: bold;
+}
+.selector-option,
+.selector-value {
+  font-family: "Times", serif;
+  font-size: 0.8em;
+}
+
+/* small button container */
+
+.s-b-con {
+  margin-left: 5px;
+  font-size:80%;
+}

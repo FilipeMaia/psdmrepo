@@ -1,0 +1,23 @@
+#elog-attachments {
+  padding: 0;
+}
+
+#elog-attachments #ctrl {
+  padding: 10px;
+}
+
+#elog-attachments #body {
+  padding: 10px 20px 10px 20px;
+  /*
+  border-top: solid 1px #c0c0c0;
+  */
+}
+
+#elog-attachments #list {
+  margin-top: 15px;
+}
+
+#elog-attachments .info {
+  margin-bottom: 10px;
+  color: maroon;
+}
