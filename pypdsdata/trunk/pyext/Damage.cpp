@@ -34,9 +34,10 @@ namespace {
 
   pypdsdata::EnumType::Enum valueEnumValues[] = {
       { "DroppedContribution",    Pds::Damage::DroppedContribution },
+      { "Uninitialized",          Pds::Damage::Uninitialized },
       { "OutOfOrder",             Pds::Damage::OutOfOrder },
       { "OutOfSynch",             Pds::Damage::OutOfSynch },
-      { "UserDefined",             Pds::Damage::UserDefined },
+      { "UserDefined",            Pds::Damage::UserDefined },
       { "IncompleteContribution", Pds::Damage::IncompleteContribution },
       { "ContainsIncomplete",     Pds::Damage::ContainsIncomplete },
       { 0, 0 }
@@ -45,9 +46,10 @@ namespace {
 
   pypdsdata::EnumType::Enum maskEnumValues[] = {
       { "DroppedContribution",    1 << Pds::Damage::DroppedContribution },
+      { "Uninitialized",          1 << Pds::Damage::Uninitialized },
       { "OutOfOrder",             1 << Pds::Damage::OutOfOrder },
       { "OutOfSynch",             1 << Pds::Damage::OutOfSynch },
-      { "UserDefined",             1 << Pds::Damage::UserDefined },
+      { "UserDefined",            1 << Pds::Damage::UserDefined },
       { "IncompleteContribution", 1 << Pds::Damage::IncompleteContribution },
       { "ContainsIncomplete",     1 << Pds::Damage::ContainsIncomplete },
       { 0, 0 }

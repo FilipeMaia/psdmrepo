@@ -6,6 +6,10 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V01-01-04
+2013-12-13 Andy Salnikov
+- forgot to add new damage type at last commit
+
 Tag: V01-01-03
 2013-12-12 Andy Salnikov
 - upgrade to pdsdata V07-02-10

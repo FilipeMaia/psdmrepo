@@ -715,6 +715,7 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         
         # check enums
         self.assertEqual ( Damage.Value.DroppedContribution, 1 )
+        self.assertEqual ( Damage.Value.Uninitialized, 11 )
         self.assertEqual ( Damage.Value.OutOfOrder, 12 )
         self.assertEqual ( Damage.Value.OutOfSynch, 13 )
         self.assertEqual ( Damage.Value.UserDefined, 14 )
@@ -722,6 +723,7 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual ( Damage.Value.ContainsIncomplete, 16 )
 
         self.assertEqual ( Damage.Mask.DroppedContribution, 1 << 1 )
+        self.assertEqual ( Damage.Mask.Uninitialized, 1 << 11 )
         self.assertEqual ( Damage.Mask.OutOfOrder, 1 << 12 )
         self.assertEqual ( Damage.Mask.OutOfSynch, 1 << 13 )
         self.assertEqual ( Damage.Mask.UserDefined, 1 << 14 )
