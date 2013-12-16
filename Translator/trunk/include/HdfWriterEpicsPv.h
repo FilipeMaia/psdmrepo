@@ -19,6 +19,16 @@
 
 namespace Translator {
 
+/**
+ *  @ingroup Translator
+ *
+ *  @brief class to write epics pv datasets, and the eventId datasets into hdf5 groups.
+ *
+ *  @note This software was developed for the LCLS project.  If you use all or 
+ *  part of it, please give an appropriate acknowledgment.
+ *
+ *  @author David Schneider
+ */
 class HdfWriterEpicsPv {
  public:
   HdfWriterEpicsPv(const DataSetCreationProperties &, boost::shared_ptr<HdfWriterEventId> );
@@ -45,8 +55,6 @@ class HdfWriterEpicsPv {
 
   void closeDataset(hid_t groupId);
 
-  void closeDatasetsForAllGroups(); 
-  
   const DataSetCreationProperties & dataSetCreationProperties() 
   { return m_dataSetCreationProperties; }
   void setDatasetCreationProperties(const DataSetCreationProperties & dataSetCreationProperties) 
@@ -168,7 +176,8 @@ class HdfWriterEpicsPv {
   };
  public:
  class Exception : public ErrSvc::Issue {
-  public: Exception(const ErrSvc::Context &ctx, const std::string &what) : ErrSvc::Issue(ctx,what) {}
+  public: Exception(const ErrSvc::Context &ctx, const std::string &what) 
+     : ErrSvc::Issue(ctx,what) {}
   };
 };
 

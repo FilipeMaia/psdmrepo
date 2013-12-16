@@ -12,18 +12,17 @@ class ChunkManager;
 /**
  *  @ingroup Translator
  *
- *  @brief Copy of default implementation on the chunk size policy, with dynamic updating
+ *  @brief Copy of default implementation on the chunk size policy, with dynamic updating.
  *
  *  This class copies psddl_hdf2psana::DefaultChunkPolicy and extends it to update chunk
- *  parameters after construction.
+ *  parameters after construction. It deviates from DefaultChunkPolicy in how the 
+ *  the per dataset chunk cache is created.  It uses a target of cache size of 2.
  *
  *  @note This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
  *  @author David Schneider
  */
-
-
 class ChunkPolicy : public psddl_hdf2psana::ChunkPolicy {
 public:
   ChunkPolicy(hsize_t chunkSizeTargetBytes = 16*1024*1024,  // 16MB
@@ -64,15 +63,7 @@ protected:
   void chunkCacheSizeTargetInChunks(hsize_t val) {m_chunkCacheSizeTargetInChunks = val;}
   void maxChunkCacheSizeBytes(hsize_t val) { m_maxChunkCacheSizeBytes = val;}
 
-  void clearStats();
-  void getStats(const std::vector<int> * & chunkCacheSizesInChunks,
-                const std::vector<int> * & chunkSizesInObjects,
-                const std::vector<size_t> * & objSizesInBytes);
 private:
-  mutable std::vector<int> m_returnedChunkCacheSizesInChunks;
-  mutable std::vector<int> m_returnedChunkSizesInObjects;
-  mutable std::vector<size_t> m_objSizesInBytesDuringChunkCacheCalls;
-
   hsize_t m_chunkSizeTargetBytes;
   int  m_chunkSizeTargetObjects;
   hsize_t  m_maxChunkSizeBytes;

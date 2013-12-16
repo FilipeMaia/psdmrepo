@@ -71,8 +71,6 @@ int ChunkPolicy::chunkSize(size_t obj_size) const {
          << " maxChunkBytes=" << m_maxChunkSizeBytes 
          << " most objects we can fit in maxChunkBytes=" << maxObjectsThatFitInMaxChunkSizeBytes);
 
-  m_returnedChunkSizesInObjects.push_back(objectsPerChunk);
-
   return objectsPerChunk;
 }
 
@@ -100,23 +98,7 @@ int ChunkPolicy::chunkCacheSize(const size_t obj_size) const {
          << " target cache size (bytes) = " << m_chunkCacheSizeTargetInChunks * chunk_size_bytes
          << " max cache size (bytes) = " << m_maxChunkCacheSizeBytes);
 
-  m_objSizesInBytesDuringChunkCacheCalls.push_back(obj_size);
-  m_returnedChunkCacheSizesInChunks.push_back(cacheSizeChunks);
   return cacheSizeChunks;
-}
-
-void ChunkPolicy::clearStats() {
-  m_returnedChunkCacheSizesInChunks.clear();
-  m_returnedChunkSizesInObjects.clear();
-  m_objSizesInBytesDuringChunkCacheCalls.clear();
-}
-
-void ChunkPolicy::getStats(const std::vector<int> * &chunkCacheSizesInChunks,
-                           const std::vector<int> * &chunkSizesInObjects,
-                           const std::vector<size_t> * &objSizesInBytes) {
-  chunkCacheSizesInChunks = &m_returnedChunkCacheSizesInChunks;
-  chunkSizesInObjects     = &m_returnedChunkSizesInObjects;
-  objSizesInBytes         = &m_objSizesInBytesDuringChunkCacheCalls;
 }
 
 void ChunkPolicy::chunkSizeTargetObjects(int val) {

@@ -150,7 +150,6 @@ class HdfWriterNDArray : public HdfWriterFromEvent {
   void addBlank(hdf5pp::Group & group) { throw NotImplementedException(ERR_LOC, "addBlank()"); }
 
   void closeDatasets(hdf5pp::Group & group) { m_writer.closeDatasets(group.id()); }
-  void closeDatasetsForAllGroups() { m_writer.closeDatasetsForAllGroups(); }
 
   class NotImplementedException : public ErrSvc::Issue {
   public:

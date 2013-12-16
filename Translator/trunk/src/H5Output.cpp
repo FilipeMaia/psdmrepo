@@ -138,9 +138,10 @@ H5Output::H5Output(string moduleName) : Module(moduleName),
                                         m_currentFilteredGroup(-1),
                                         m_event(0),
                                         m_env(0),
-                                        m_totalConfigStoreUpdates(0),
-                                        m_storeEpics(true)
+                                        m_totalConfigStoreUpdates(-1),
+                                        m_storeEpics(EpicsH5GroupDirectory::Unknown)
 {
+  MsgLog(logger(),trace,name() << " constructor()");
   readConfigParameters();
   initializeHdfWriterMap(m_hdfWriters);
   filterHdfWriterMap();
@@ -151,7 +152,8 @@ H5Output::H5Output(string moduleName) : Module(moduleName),
   m_hdfWriterEventId->setDatasetCreationProperties(m_eventIdCreateDsetProp);
   m_hdfWriterDamage->setDatasetCreationProperties(m_damageCreateDsetProp);
   m_hdfWriterFilterMsg->setDatasetCreationProperties(m_stringCreateDsetProp);
-  m_epicsGroupDir.initialize(m_hdfWriterEventId,
+  m_epicsGroupDir.initialize(m_storeEpics,
+                             m_hdfWriterEventId,
                              m_epicsPvCreateDsetProp);
   m_configureGroupDir.setEventIdAndDamageWriters(m_hdfWriterEventId,m_hdfWriterDamage);
   m_calibCycleConfigureGroupDir.setEventIdAndDamageWriters(m_hdfWriterEventId,m_hdfWriterDamage);
@@ -165,18 +167,16 @@ H5Output::H5Output(string moduleName) : Module(moduleName),
   m_calibCycleEventGroupDir.setH5GroupNames(m_h5groupNames);
   initializeSrcAndKeyFilters();
   openH5OutputFile();
-
-  MsgLog(logger(),debug,name() << " constructor()");
 }
 
 void H5Output::readConfigParameters() {
+  MsgLog(logger(), trace, "reading config parameters");
   m_h5fileName = configStr("output_file");
-
   string splitStr = configStr("split","NoSplit");
   if (splitStr == "NoSplit") m_split = NoSplit;
   else if (splitStr == "Family") m_split = Family;
   else if (splitStr == "SplitScan") m_split = SplitScan;
-  else MsgLog(logger(),fatal,"config parameter split must be one of 'NoSplit' 'Family' or 'SplitScan' (default is NoSplit)");
+  else MsgLog(logger(),fatal,"config parameter 'split' must be one of 'NoSplit' 'Family' or 'SplitScan' (default is NoSplit)");
 
   m_splitSize = config("splitSize",10*1073741824ULL);
 
@@ -186,8 +186,19 @@ void H5Output::readConfigParameters() {
   for (alias = typeAliases.begin(); alias != typeAliases.end(); ++alias) {
     m_typeInclude[*alias] = excludeIncludeToBool(*alias,configStr(*alias,"include"));
   }
-  m_storeEpics = config("store_epics",true);
-  if (not m_storeEpics) MsgLog(logger(),trace,"not storing epics");
+  map<string, EpicsH5GroupDirectory::EpicsStoreMode> validStoreEpicsInput;
+  validStoreEpicsInput["no"]=EpicsH5GroupDirectory::DoNotStoreEpics;
+  validStoreEpicsInput["calib_repeat"]=EpicsH5GroupDirectory::RepeatEpicsEachCalib;
+  validStoreEpicsInput["updates_only"]=EpicsH5GroupDirectory::OnlyStoreEpicsUpdates;
+  string storeEpics = configStr("store_epics", "updates_only");
+  map<string, EpicsH5GroupDirectory::EpicsStoreMode>::iterator userInput = validStoreEpicsInput.find(storeEpics);
+  if (userInput == validStoreEpicsInput.end()) {
+    MsgLog(logger(), fatal, "config parameter 'epics_store' must be one of 'calib_repeat' 'updates_only' or 'no'. The value: '"
+           << storeEpics << "' is invalid");
+  }
+  m_storeEpics = userInput->second;
+  MsgLog(logger(),trace,"epics storage: " << EpicsH5GroupDirectory::epicsStoreMode2str(m_storeEpics));
+
   m_short_bld_name = config("short_bld_name",false);
 
   // src filter parameters
@@ -320,6 +331,7 @@ void H5Output::initializeCalibratedTypes() {
 }
 
 void H5Output::openH5OutputFile() {
+  MsgLog(logger(),trace,name() << " opening h5 output file");
   unsigned majnum, minnum, relnum;
   herr_t err = H5get_libversion(&majnum, &minnum, &relnum);
   if (err != 0) throw hdf5pp::Hdf5CallException(ERR_LOC,"failed to get Hdf5 library version number");
@@ -388,10 +400,8 @@ void H5Output::beginJob(Event& evt, Env& env)
   m_configureGroupDir.clearMaps();
   m_chunkManager.beginJob(env);
   addConfigTypes(m_configureGroupDir, m_currentConfigureGroup);
-  if (m_storeEpics) {
-    m_epicsGroupDir.processBeginJob(m_currentConfigureGroup.id(), 
-                                    env.epicsStore(), m_eventId);
-  }
+  m_epicsGroupDir.processBeginJob(m_currentConfigureGroup.id(), 
+                                  env.epicsStore(), m_eventId);
 }
 
 void H5Output::beginRun(Event& evt, Env& env) 
@@ -413,9 +423,7 @@ void H5Output::beginCalibCycle(Event& evt, Env& env)
   m_filteredEventsThisCalibCycle = 0;
   m_chunkManager.beginCalibCycle(env);
   addConfigTypes(m_calibCycleConfigureGroupDir, m_currentCalibCycleGroup);
-  if (m_storeEpics) {
-    m_epicsGroupDir.processBeginCalibCycle(m_currentCalibCycleGroup.id(), env.epicsStore());
-  }
+  m_epicsGroupDir.processBeginCalibCycle(m_currentCalibCycleGroup.id(), env.epicsStore());
 }
 
 void H5Output::event(Event& evt, Env& env) 
@@ -445,7 +453,7 @@ void H5Output::setDamageMapFromEvent() {
   }
 }
 
-bool H5Output::isNDArray( const std::type_info *typeInfoPtr) {
+bool H5Output::isNDArray( const type_info *typeInfoPtr) {
   return m_h5groupNames->isNDArray(typeInfoPtr);
 }
 
@@ -508,7 +516,7 @@ list<EventKey> H5Output::getUpdatedConfigKeys() {
   list<EventKey> updatedConfigKeys;
   const PSEvt::HistI * configHist  = m_env->configStore().proxyDict()->hist();
   if (not configHist) MsgLog(logger("getUpdatedConfigKeys"),fatal,"Internal error - no HistI object in configStore");
-  if (configHist->totalUpdates() <= m_totalConfigStoreUpdates) {
+  if (m_totalConfigStoreUpdates > -1 and (configHist->totalUpdates() <= m_totalConfigStoreUpdates)) {
     return updatedConfigKeys;
   }
   m_totalConfigStoreUpdates = configHist->totalUpdates();
@@ -598,7 +606,7 @@ list<EventKeyTranslation> H5Output::setEventKeysToTranslate(bool checkForCalibra
   return toTranslate;
 }
 
-void H5Output::addToFilteredEventDataset(const PSEvt::EventId &eventId, const std::string & msg) {
+void H5Output::addToFilteredEventDataset(const PSEvt::EventId &eventId, const string & msg) {
   if (m_filteredEventsThisCalibCycle==0) {
     hid_t calibGroup = m_currentCalibCycleGroup.id();
     m_currentFilteredGroup = H5Gcreate(calibGroup, "filtered",
@@ -629,9 +637,7 @@ void H5Output::eventImpl()
   static const string eventImpl("eventImpl");
   bool filteredEvent = checkForAndProcessExcludeEvent();
   if (filteredEvent) return;
-  if (m_storeEpics) {
-    m_epicsGroupDir.processEvent(m_env->epicsStore(), m_eventId);
-  }
+  m_epicsGroupDir.processEvent(m_env->epicsStore(), m_eventId);
   list<EventKeyTranslation> toTranslate = setEventKeysToTranslate(true);
   vector<pair<Pds::Src,Pds::Damage> > droppedContribs = m_damageMap->getSrcDroppedContributions();
   bool splitEvent = droppedContribs.size()>0;
@@ -813,8 +819,7 @@ void H5Output::addConfigTypes(TypeSrcKeyH5GroupDirectory &configGroupDirectory,
     if (locIdx == 1) {
       eventKeys = evtEventKeys;
       dataLoc = inEvent;
-      checkForCalib = true;  // unlikely that there is a calib key for a config type, we
-                             // can probably safely keep checkForCalib as false
+      checkForCalib = true;
     }
     for (iter = eventKeys.begin(); iter != eventKeys.end(); ++iter) {
       EventKey &eventKey = *iter;
@@ -871,7 +876,7 @@ void H5Output::endCalibCycle(Event& evt, Env& env) {
     if (err<0) MsgLog(logger(),fatal,"Failed to close current filtered group: " << m_currentFilteredGroup);
   }
   m_currentFilteredGroup = -1;
-  if (m_storeEpics) m_epicsGroupDir.processEndCalibCycle();
+  m_epicsGroupDir.processEndCalibCycle();
   m_calibCycleEventGroupDir.closeGroups();
   m_calibCycleConfigureGroupDir.closeGroups();
   if (m_eventId) ::storeClock ( m_currentCalibCycleGroup, m_eventId->time(), "end" ) ;
@@ -894,7 +899,7 @@ void H5Output::endJob(Event& evt, Env& env)
 {
   setEventVariables(evt,env);
   m_configureGroupDir.closeGroups();
-  if (m_storeEpics) m_epicsGroupDir.processEndJob();
+  m_epicsGroupDir.processEndJob();
   if (m_eventId) ::storeClock ( m_currentConfigureGroup, m_eventId->time(), "end" ) ;
   m_currentConfigureGroup.close();
   m_chunkManager.endJob();
@@ -991,7 +996,7 @@ bool H5Output::srcIsFiltered(const Pds::Src &src) {
 
 string H5Output::eventPosition() {
   stringstream res;
-  res << "Configure:" << m_currentConfigureCounter
+  res << "eventPosition: Configure:" << m_currentConfigureCounter
       << "/Run:" << m_currentRunCounter
       << "/CalibCycle:" << m_currentCalibCycleCounter
       << "/Event:" << m_currentEventCounter;

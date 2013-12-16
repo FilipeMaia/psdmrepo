@@ -6,13 +6,18 @@
 
 namespace Translator {
 
+/**
+ * @brief adds dataset typeid and name to dataset tracking information
+ *
+ * extends DataSetPos to also keep track of the hdf5 typeid and the name of the
+ * dataset.  Assumes no ownership of the typeid, will not close it.
+ *
+ *  @note This software was developed for the LCLS project.  If you use all or 
+ *  part of it, please give an appropriate acknowledgment.
+ *
+ *  @author David Schneider
+ */
 class DataSetMeta : public DataSetPos {
-  /**
-   * @brief adds dataset typeid and name to dataset tracking information
-   *
-   * extends DataSetPos to also keep track of the hdf5 typeid and the name of the
-   * dataset.  Assumes no ownership of the typeid, will not close it.
-   */
 public:
   DataSetMeta() {};
  DataSetMeta(const std::string & name, hid_t dsetId, MaxSize maxSize, hid_t typeId) : 

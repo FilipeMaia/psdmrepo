@@ -28,6 +28,20 @@
 
 namespace Translator {
 
+/**
+ *  @ingroup Translator
+ *
+ *  @brief class to manage the datasets in a src group.
+ *
+ *  Instances of SrcKeyGroup are created and managed by TypeSrcKeyH5GroupDirectory,
+ *  refer to that class for the top level interface for translated data to the hdf5
+ *  file.
+ * 
+ *  @note This software was developed for the LCLS project.  If you use all or 
+ *  part of it, please give an appropriate acknowledgment.
+ *
+ *  @author David Schneider
+ */
 class SrcKeyGroup {
  public:
  SrcKeyGroup() : 
@@ -128,6 +142,20 @@ class LessSrcKeyPair {
       
 typedef std::map< SrcKeyPair, SrcKeyGroup, LessSrcKeyPair > SrcKeyMap;
 
+/**
+ *  @ingroup Translator
+ *
+ *  @brief class to manage the src groups in a type group.
+ *
+ *  Instances of TypeGroup are created and managed by TypeSrcKeyH5GroupDirectory,
+ *  refer to that class for the top level interface for translated data to the hdf5
+ *  file.
+ * 
+ *  @note This software was developed for the LCLS project.  If you use all or 
+ *  part of it, please give an appropriate acknowledgment.
+ *
+ *  @author David Schneider
+ */
 class TypeGroup {
  public:
   TypeGroup() {};
@@ -149,6 +177,20 @@ class TypeGroup {
 
  typedef std::map<const std::string, TypeGroup> TypeMapContainer;
 
+/**
+ *  @ingroup Translator
+ *
+ *  @brief class to manage the type and source groups in the hdf5 file.
+ * 
+ * This class manages the type and source groups that are children to the
+ * configure and calib cycle groups in the hdf5 file. It provides the top 
+ * level interface for the translator module for working with these groups.
+ *
+ *  @note This software was developed for the LCLS project.  If you use all or 
+ *  part of it, please give an appropriate acknowledgment.
+ *
+ *  @author David Schneider
+ */
 class TypeSrcKeyH5GroupDirectory {
  public:
   TypeSrcKeyH5GroupDirectory() {}
@@ -165,13 +207,13 @@ class TypeSrcKeyH5GroupDirectory {
   void closeGroups(); 
   void clearMaps();
   void markAllSrcKeyGroupsNotWrittenForEvent();
-  TypeMapContainer::iterator findType(const std::type_info *);
+  TypeMapContainer::iterator findType(const std::type_info *typeInfoPtr);
   TypeMapContainer::iterator beginType();
   TypeMapContainer::iterator endType();
-  TypeGroup & addTypeGroup(const std::type_info *, 
+  TypeGroup & addTypeGroup(const std::type_info *typeInfoPtr, 
                            hdf5pp::Group & parentGroup);
-  SrcKeyMap::iterator findSrcKey(const PSEvt::EventKey &);
-  SrcKeyMap::iterator endSrcKey(const std::type_info *);
+  SrcKeyMap::iterator findSrcKey(const PSEvt::EventKey &eventKey);
+  SrcKeyMap::iterator endSrcKey(const std::type_info *typeInfoPtr);
   SrcKeyGroup & addSrcKeyGroup(const PSEvt::EventKey &eventKey, 
                                boost::shared_ptr<Translator::HdfWriterFromEvent> hdfWriter);
   void getNotWrittenSrcPartition(const std::set<Pds::Src> & srcs, 

@@ -19,6 +19,7 @@ psddl/data/templates/hdf5Translator.tmpl?hdfwritermap_cpp
 #include "psddl_hdf2psana/cspad2x2.ddl.h"
 #include "psddl_hdf2psana/encoder.ddl.h"
 #include "psddl_hdf2psana/epics.ddl.h"
+#include "psddl_hdf2psana/epixsampler.ddl.h"
 #include "psddl_hdf2psana/evr.ddl.h"
 #include "psddl_hdf2psana/fccd.ddl.h"
 #include "psddl_hdf2psana/fli.ddl.h"
@@ -58,6 +59,7 @@ using namespace psddl_hdf2psana::L3T;
 using namespace psddl_hdf2psana::OceanOptics;
 using namespace psddl_hdf2psana::EvrData;
 using namespace psddl_hdf2psana::Bld;
+using namespace psddl_hdf2psana::EpixSampler;
 using namespace psddl_hdf2psana::Quartz;
 using namespace psddl_hdf2psana::Timepix;
 using namespace psddl_hdf2psana::Encoder;
@@ -134,20 +136,8 @@ public:
 namespace Translator {
 
 boost::shared_ptr<HdfWriterFromEvent> getHdfWriter(HdfWriterMap & mapping, const std::type_info *typeInfoPtr) {
-  //  static map<HdfWriterFromEvent*,set<std::type_info*> > convertersNotFound;
    HdfWriterMap::iterator pos = mapping.find(typeInfoPtr);
   if (pos == mapping.end()) {
-    // TODO: move this log message into H5Output
-    //    WithMsgLog(logger,trace,str) {
-    //      // to avoid printing messages for every event about converters not found, we do some simple
-    //      // caching here. The first time we see that a converter is not found for a type, we log a 
-    //      //  message. After that, we do not.  Since this function may be called for different 
-    //      set<std::type_info*> notFoundThisMap = convertersNotFound[&mapping];
-    //      if (notFoundThisMap.find(typeInfoPtr) == notFoundThisMap.end()) {
-    //        str << "getHdfWriter: no converter found for type " << PSEvt::typeInfoRealName(typeInfoPtr);
-    //        convertersNotFound.insert(typeInfoPtr);
-    //      }
-    //    }
     return boost::shared_ptr<Translator::HdfWriterFromEvent>();
   }
   return pos->second;
@@ -197,6 +187,8 @@ void initializeHdfWriterMap( HdfWriterMap & mapping) {
   mapping[ & typeid(Psana::Encoder::DataV1) ] = boost::make_shared<HdfWriterPsana<Psana::Encoder::DataV1> >();
   mapping[ & typeid(Psana::Encoder::DataV2) ] = boost::make_shared<HdfWriterPsana<Psana::Encoder::DataV2> >();
   mapping[ & typeid(Psana::Epics::ConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::Epics::ConfigV1> >();
+  mapping[ & typeid(Psana::EpixSampler::ConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::EpixSampler::ConfigV1> >();
+  mapping[ & typeid(Psana::EpixSampler::ElementV1) ] = boost::make_shared<HdfWriterPsana<Psana::EpixSampler::ElementV1> >();
   mapping[ & typeid(Psana::EvrData::ConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::EvrData::ConfigV1> >();
   mapping[ & typeid(Psana::EvrData::ConfigV2) ] = boost::make_shared<HdfWriterPsana<Psana::EvrData::ConfigV2> >();
   mapping[ & typeid(Psana::EvrData::ConfigV3) ] = boost::make_shared<HdfWriterPsana<Psana::EvrData::ConfigV3> >();
@@ -206,6 +198,7 @@ void initializeHdfWriterMap( HdfWriterMap & mapping) {
   mapping[ & typeid(Psana::EvrData::ConfigV7) ] = boost::make_shared<HdfWriterPsana<Psana::EvrData::ConfigV7> >();
   mapping[ & typeid(Psana::EvrData::DataV3) ] = boost::make_shared<HdfWriterPsana<Psana::EvrData::DataV3> >();
   mapping[ & typeid(Psana::EvrData::IOConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::EvrData::IOConfigV1> >();
+  mapping[ & typeid(Psana::EvrData::SrcConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::EvrData::SrcConfigV1> >();
   mapping[ & typeid(Psana::FCCD::FccdConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::FCCD::FccdConfigV1> >();
   mapping[ & typeid(Psana::FCCD::FccdConfigV2) ] = boost::make_shared<HdfWriterPsana<Psana::FCCD::FccdConfigV2> >();
   mapping[ & typeid(Psana::Fli::ConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::Fli::ConfigV1> >();
@@ -234,7 +227,6 @@ void initializeHdfWriterMap( HdfWriterMap & mapping) {
   mapping[ & typeid(Psana::PNCCD::ConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::PNCCD::ConfigV1> >();
   mapping[ & typeid(Psana::PNCCD::ConfigV2) ] = boost::make_shared<HdfWriterPsana<Psana::PNCCD::ConfigV2> >();
   mapping[ & typeid(Psana::PNCCD::FramesV1) ] = boost::make_shared<HdfWriterPsana<Psana::PNCCD::FramesV1> >();
-  mapping[ & typeid(Psana::PNCCD::FullFrameV1) ] = boost::make_shared<HdfWriterPsana<Psana::PNCCD::FullFrameV1> >();
   mapping[ & typeid(Psana::Princeton::ConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::Princeton::ConfigV1> >();
   mapping[ & typeid(Psana::Princeton::ConfigV2) ] = boost::make_shared<HdfWriterPsana<Psana::Princeton::ConfigV2> >();
   mapping[ & typeid(Psana::Princeton::ConfigV3) ] = boost::make_shared<HdfWriterPsana<Psana::Princeton::ConfigV3> >();
@@ -247,6 +239,7 @@ void initializeHdfWriterMap( HdfWriterMap & mapping) {
   mapping[ & typeid(Psana::Pulnix::TM6740ConfigV2) ] = boost::make_shared<HdfWriterPsana<Psana::Pulnix::TM6740ConfigV2> >();
   mapping[ & typeid(Psana::Quartz::ConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::Quartz::ConfigV1> >();
   mapping[ & typeid(Psana::Rayonix::ConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::Rayonix::ConfigV1> >();
+  mapping[ & typeid(Psana::Rayonix::ConfigV2) ] = boost::make_shared<HdfWriterPsana<Psana::Rayonix::ConfigV2> >();
   mapping[ & typeid(Psana::Timepix::ConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::Timepix::ConfigV1> >();
   mapping[ & typeid(Psana::Timepix::ConfigV2) ] = boost::make_shared<HdfWriterPsana<Psana::Timepix::ConfigV2> >();
   mapping[ & typeid(Psana::Timepix::ConfigV3) ] = boost::make_shared<HdfWriterPsana<Psana::Timepix::ConfigV3> >();

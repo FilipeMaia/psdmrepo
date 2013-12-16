@@ -71,11 +71,6 @@ void HdfWriterEpicsPv::closeDataset(hid_t groupId) {
   m_hdfWriterEventId->closeDataset(groupId); 
 }
 
-void HdfWriterEpicsPv::closeDatasetsForAllGroups() { 
-  m_hdfWriterGeneric->closeDatasetsForAllGroups();
-  m_hdfWriterEventId->closeDatasetsForAllGroups(); 
-}
-
 void HdfWriterEpicsPv::closeSharedTypes() {
   herr_t status = H5Tclose(m_pvNameType);
   status = std::min(status, H5Tclose(m_stringType));

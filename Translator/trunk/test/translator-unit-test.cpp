@@ -3,7 +3,7 @@
 #define BOOST_TEST_MODULE translator-unit-test
 #include <boost/test/included/unit_test.hpp>
 
-/**
+/*
  * Simple test suite for module translator-unit-test.
  * See http://www.boost.org/doc/libs/1_36_0/libs/test/doc/html/index.html
  */

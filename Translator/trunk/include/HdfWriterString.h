@@ -15,6 +15,16 @@
 
 namespace Translator {
 
+/**
+ *  @ingroup Translator
+ *
+ *  @brief class to write a dataset for std::string into a hdf5 group
+ *
+ *  @note This software was developed for the LCLS project.  If you use all or 
+ *  part of it, please give an appropriate acknowledgment.
+ *
+ *  @author David Schneider
+ */
 class HdfWriterString {
  public:
   HdfWriterString();
@@ -33,7 +43,6 @@ class HdfWriterString {
 
   void closeDataset(hdf5pp::Group &group) { closeDataset(group.id()); }
   void closeDataset(hid_t groupId);
-  void closeDatasetsForAllGroups() { m_writer.closeDatasetsForAllGroups(); }
 
  private:
   DataSetCreationProperties m_dataSetCreationProperties;

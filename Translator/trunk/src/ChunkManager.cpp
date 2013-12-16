@@ -158,46 +158,11 @@ void ChunkManager::beginJob(PSEnv::Env &env) {
 
 void ChunkManager::beginCalibCycle(PSEnv::Env &env) {
   checkForControlDataToSetChunkSize(env);
-  clearStats();
 }
   
 void ChunkManager::endCalibCycle(size_t ) { // numberEventsInCalibCycle) {
   // here is opportunity to try to adjust the 
   // number of events based on what happend last time
-  reportStats();
-}
-
-void ChunkManager::clearStats() {
-  eventIdChunkPolicy()->clearStats();
-  damageChunkPolicy()->clearStats();
-  stringChunkPolicy()->clearStats();
-  epicsPvChunkPolicy()->clearStats();
-  ndarrayChunkPolicy()->clearStats();
-  defaultChunkPolicy()->clearStats();
-}
-
-void ChunkManager::reportStats() {
-  const std::vector<int> *returnedChunkCacheSizes = NULL;
-  const std::vector<int> *returnedChunkSizes = NULL;
-  const std::vector<size_t> *objSizesDuringChunkCacheCalls = NULL;
-
-  eventIdChunkPolicy()->getStats(returnedChunkCacheSizes, returnedChunkSizes, objSizesDuringChunkCacheCalls);
-  msgLogStats("eventId",*returnedChunkCacheSizes, *returnedChunkSizes, *objSizesDuringChunkCacheCalls);
-
-  damageChunkPolicy()->getStats(returnedChunkCacheSizes, returnedChunkSizes, objSizesDuringChunkCacheCalls);
-  msgLogStats("damage",*returnedChunkCacheSizes, *returnedChunkSizes, *objSizesDuringChunkCacheCalls);
-
-  epicsPvChunkPolicy()->getStats(returnedChunkCacheSizes, returnedChunkSizes, objSizesDuringChunkCacheCalls);
-  msgLogStats("epicsPv",*returnedChunkCacheSizes, *returnedChunkSizes, *objSizesDuringChunkCacheCalls);
-
-  defaultChunkPolicy()->getStats(returnedChunkCacheSizes, returnedChunkSizes, objSizesDuringChunkCacheCalls);
-  msgLogStats("default",*returnedChunkCacheSizes, *returnedChunkSizes, *objSizesDuringChunkCacheCalls);
-
-  stringChunkPolicy()->getStats(returnedChunkCacheSizes, returnedChunkSizes, objSizesDuringChunkCacheCalls);
-  msgLogStats("std_string",*returnedChunkCacheSizes, *returnedChunkSizes, *objSizesDuringChunkCacheCalls);
-
-  ndarrayChunkPolicy()->getStats(returnedChunkCacheSizes, returnedChunkSizes, objSizesDuringChunkCacheCalls);
-  msgLogStats("ndarray",*returnedChunkCacheSizes, *returnedChunkSizes, *objSizesDuringChunkCacheCalls);
 }
 
 void ChunkManager::checkForControlDataToSetChunkSize(PSEnv::Env &env) {

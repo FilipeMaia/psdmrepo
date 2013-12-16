@@ -1,14 +1,23 @@
 #ifndef TRANSLATOR_CHUNK_MANAGER_H
 #define TRANSLATOR_CHUNK_MANAGER_H
 
-#include <vector>
-
 #include "PSEnv/Env.h"
 #include "Translator/ChunkPolicy.h"
 
 namespace Translator {
 
 class H5Output;
+
+/**
+ *  @ingroup Translator
+ *
+ *  @brief Manages chunk settings and ChunkPolicy classes for Translator.
+ *
+ *  @note This software was developed for the LCLS project.  If you use all or 
+ *  part of it, please give an appropriate acknowledgment.
+ *
+ *  @author David Schneider
+ */
 
 class ChunkManager {
  public:
@@ -29,34 +38,38 @@ class ChunkManager {
 
  protected:
   void checkForControlDataToSetChunkSize(PSEnv::Env &env);
-  void clearStats();
-  void reportStats();
   void setChunkSizeTargetObjects(int chunkSizeTargetObjects);
 
  private:
   hsize_t m_chunkSizeTargetInBytes;
-  int m_chunkSizeTargetObjects, m_chunkSizeTargetObjectsOrig;
+  int m_chunkSizeTargetObjects;
+  int m_chunkSizeTargetObjectsOrig;
   hsize_t m_maxChunkSizeInBytes;
   int m_minObjectsPerChunk;
   int m_maxObjectsPerChunk;
-int m_chunkCacheSizeTargetInChunks;
+  int m_chunkCacheSizeTargetInChunks;
   hsize_t m_maxChunkCacheSizeInBytes;
 
   // chunk parameters for specific datasets
   hsize_t m_eventIdChunkSizeTargetInBytes;
-  int m_eventIdChunkSizeTargetObjects, m_eventIdChunkSizeTargetObjectsOrig;
+  int m_eventIdChunkSizeTargetObjects;
+  int m_eventIdChunkSizeTargetObjectsOrig;
 
   hsize_t m_damageChunkSizeTargetInBytes;
-  int m_damageChunkSizeTargetObjects, m_damageChunkSizeTargetObjectsOrig;
+  int m_damageChunkSizeTargetObjects;
+  int m_damageChunkSizeTargetObjectsOrig;
 
   hsize_t m_stringChunkSizeTargetInBytes;
-  int m_stringChunkSizeTargetObjects, m_stringChunkSizeTargetObjectsOrig;
+  int m_stringChunkSizeTargetObjects;
+  int m_stringChunkSizeTargetObjectsOrig;
   
   hsize_t m_ndarrayChunkSizeTargetInBytes;
-  int m_ndarrayChunkSizeTargetObjects, m_ndarrayChunkSizeTargetObjectsOrig;
+  int m_ndarrayChunkSizeTargetObjects;
+  int m_ndarrayChunkSizeTargetObjectsOrig;
 
   hsize_t m_epicsPvChunkSizeTargetInBytes;
-  int m_epicsPvChunkSizeTargetObjects, m_epicsPvChunkSizeTargetObjectsOrig;
+  int m_epicsPvChunkSizeTargetObjects;
+  int m_epicsPvChunkSizeTargetObjectsOrig;
 
   boost::shared_ptr<Translator::ChunkPolicy> m_defaultChunkPolicy;
   boost::shared_ptr<Translator::ChunkPolicy> m_eventIdChunkPolicy;

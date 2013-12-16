@@ -14,12 +14,8 @@
 
 namespace Translator {
 
-
-class HdfWriterGeneric {
-
- public:
   /**
-   *  @ingroup HdfWriterGeneric
+   *  @ingroup Translator
    *  
    *  @brief Class that writes data to hdf5 datasets. Data description is defined outside the class.
    * 
@@ -60,8 +56,8 @@ class HdfWriterGeneric {
    *  The client code must close group, typeA and typeB.
    *
    *  The file structure will now be:
-   *   \file\mygroup\datasetA
-   *   \file\mygroup\datasetB
+   *   /file/mygroup/datasetA
+   *   /file/mygroup/datasetB
    * 
    * append is the most unsafe function to use.  The client code is responsible for providing a 
    * void pointer that contains valid data for one entry of the type for the dataset.  
@@ -86,7 +82,8 @@ class HdfWriterGeneric {
    *
    *  @author David Schneider
    */
-
+class HdfWriterGeneric {
+ public:
   HdfWriterGeneric(const std::string &debugName);
   ~HdfWriterGeneric();
 
@@ -106,7 +103,6 @@ class HdfWriterGeneric {
   void store_at(hid_t groupId, long storeIndex, const std::string & dsetName, const void * data);
 
   void closeDatasets(hid_t groupId);
-  void closeDatasetsForAllGroups();
   hid_t getDatasetId(hid_t groupId, size_t dsetIndex);
   hid_t getDatasetId(hid_t groupId, const std::string &dsetName);
 

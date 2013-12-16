@@ -6,19 +6,23 @@
 
 namespace Translator {
 
+/**
+ * @brief class to store hdf5 dataset creation properties.
+ *
+ * Holds three attributes to be used when making a hdf5 dataset creation property list:
+ *
+ * ChunkPolicy - an object that returns the chunk size and chunk cache size based on 
+ *         the type of data in the dataset (depends primarily on the size of the data)
+ * shuffle - boolean, true if bytes in dataset  should be shuffled to help compression
+ * deflate - int, if 0-9, apply that level of compression, -1 means no gzip compression
+ *  @note This software was developed for the LCLS project.  If you use all or 
+ *  part of it, please give an appropriate acknowledgment.
+ *
+ *  @author David Schneider   
+ */
 class DataSetCreationProperties {
  public:
 
-  /**
-   * @brief class to store dfh5 dataset creation properties.
-   *
-   * Holds three attributes to be used when making a hdf5 dataset creation property list:
-   *
-   * ChunkPolicy - an object that returns the chunk size and chunk cache size
-   *               based on the type of data in the dataset (depends primarily on the size of the data)
-   * shuffle - boolean, true if bytes in dataset  should be shuffled to help compression
-   * deflate - int, if 1-9, apply that level of compression
-   */
 
   // constructors
   DataSetCreationProperties() 

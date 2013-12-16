@@ -16,10 +16,35 @@
 
 namespace Translator {
 
+/**
+ *  @ingroup Translator
+ *
+ *  @brief Manages the epics groups in both the Configure and CalibCycle's
+ *
+ *  An instance of this class should be created to translate epics pv's in the
+ *  Psana configStore.  It creates and uses an instance of HdfWriterEpicsPv for 
+ *  the details of managing and writing to the epics datasets, while this class 
+ *  manages the epics pv groups that are created for all the pv's.  
+ *
+ *  The processBeginJob, processBeginCalibCycle functions are passed the 
+ *  hdf5 groups that will be the parent groups to the epics groups.
+ *  processEvent is called with each event.  This class remembers the epics
+ *  time stamp of the last pv seen.  With each call to processEvent, it goes through
+ *  all the epics pv's in the config store and checks for a new timestamp.
+ * 
+ *  @note This software was developed for the LCLS project. If you use all or 
+ *  part of it, please give an appropriate acknowledgment.
+ *
+ *  @author David Schneider
+ */  
 class EpicsH5GroupDirectory {
  public:
+  typedef enum {Unknown, DoNotStoreEpics, RepeatEpicsEachCalib, OnlyStoreEpicsUpdates} EpicsStoreMode;
+  static std::string epicsStoreMode2str(const EpicsStoreMode storeMode);
+
   EpicsH5GroupDirectory();
-  void initialize(boost::shared_ptr<HdfWriterEventId> hdfWriterEventId,
+  void initialize(EpicsStoreMode epicsStoreMode,
+                  boost::shared_ptr<HdfWriterEventId> hdfWriterEventId,
                   const DataSetCreationProperties & epicsPvHCreateDsetProp);
   void processBeginJob(hid_t currentConfigGroup, 
                        PSEnv::EpicsStore &epicsStore,
@@ -31,6 +56,8 @@ class EpicsH5GroupDirectory {
   void processEndJob();
 
  private:
+  EpicsStoreMode m_epicsStoreMode;
+  bool checkIfStoringEpics();
   boost::shared_ptr<HdfWriterEpicsPv> m_hdfWriterEpicsPv;
 
   hid_t m_configureGroup;

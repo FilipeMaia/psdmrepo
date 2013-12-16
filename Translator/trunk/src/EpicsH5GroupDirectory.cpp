@@ -211,6 +211,7 @@ namespace {
 } // local namespace
 
 EpicsH5GroupDirectory::EpicsH5GroupDirectory() :
+  m_epicsStoreMode(Unknown),
   m_configureGroup(-1),
   m_currentCalibCycleGroup(-1),
   m_configEpicsTypeGroup(-1),
@@ -220,16 +221,26 @@ EpicsH5GroupDirectory::EpicsH5GroupDirectory() :
   m_epicsStatus(unknown)
 {}
 
-void EpicsH5GroupDirectory::initialize(boost::shared_ptr<HdfWriterEventId> hdfWriterEventId,
+void EpicsH5GroupDirectory::initialize(EpicsStoreMode epicsStoreMode,
+                                       boost::shared_ptr<HdfWriterEventId> hdfWriterEventId,
                                        const DataSetCreationProperties & epicsPvCreateDsetProp) 
 {
+  m_epicsStoreMode = epicsStoreMode;
+  if (m_epicsStoreMode == Unknown) MsgLog(logger(), fatal, "epics store mode is unknown");
   m_hdfWriterEpicsPv = boost::make_shared<HdfWriterEpicsPv>(epicsPvCreateDsetProp, hdfWriterEventId);
+}
+
+bool EpicsH5GroupDirectory::checkIfStoringEpics() {
+  if (m_epicsStoreMode == Unknown) MsgLog(logger(), fatal, "epics store mode is unknown");
+  if (m_epicsStoreMode == DoNotStoreEpics) return false;
+  return true;
 }
 
 void EpicsH5GroupDirectory::processBeginJob(hid_t currentConfigGroup, 
                                             PSEnv::EpicsStore &epicsStore,
                                             boost::shared_ptr<PSEvt::EventId> eventId) 
 {
+  if (not checkIfStoringEpics()) return;
   if (currentConfigGroup<0) MsgLog(logger(), fatal, "processBeginJob passed invalid group");
   m_configureGroup = currentConfigGroup;
   if (not thereAreEpics(epicsStore)) {
@@ -285,6 +296,7 @@ void EpicsH5GroupDirectory::processBeginJob(hid_t currentConfigGroup,
 
 void EpicsH5GroupDirectory::processBeginCalibCycle(hid_t currentCalibCycleGroup, 
                                                    PSEnv::EpicsStore &epicsStore) {
+  if (not checkIfStoringEpics()) return;
   if (m_epicsStatus == unknown) {
     MsgLog(logger("processBeginCalibCycle"), fatal, 
            "epicsStatus not set, processBeginJob not called");
@@ -304,6 +316,7 @@ void EpicsH5GroupDirectory::processBeginCalibCycle(hid_t currentCalibCycleGroup,
 
 void EpicsH5GroupDirectory::processEvent(PSEnv::EpicsStore & epicsStore, 
                                          boost::shared_ptr<PSEvt::EventId> eventId) {
+  if (not checkIfStoringEpics()) return;
   vector<string> pvNames = epicsStore.pvNames();
   vector<string>::iterator pvIter;
   for (pvIter = pvNames.begin(); pvIter != pvNames.end(); ++pvIter) {
@@ -386,6 +399,7 @@ void EpicsH5GroupDirectory::processEvent(PSEnv::EpicsStore & epicsStore,
 }
 
 void EpicsH5GroupDirectory::processEndCalibCycle() {
+  if (not checkIfStoringEpics()) return;
   std::map<std::string, hid_t>::iterator iter;
   for (iter = m_calibEpicsPvGroups.begin(); iter != m_calibEpicsPvGroups.end(); ++iter) {
     hid_t &epicsPvGroup = iter->second;
@@ -414,6 +428,10 @@ void EpicsH5GroupDirectory::processEndCalibCycle() {
 }
 
 void EpicsH5GroupDirectory::processEndJob() {
+  if (not checkIfStoringEpics()) return;
+  if (m_epicsStoreMode == RepeatEpicsEachCalib) {
+    m_lastWriteMap.clear();
+  }
   m_configEpicsPvGroups.clear();
   if (m_configEpicsSrcGroup>=0) {
     herr_t res = H5Gclose(m_configEpicsSrcGroup);
@@ -428,3 +446,10 @@ void EpicsH5GroupDirectory::processEndJob() {
   m_configureGroup = -1;
 }
 
+std::string EpicsH5GroupDirectory::epicsStoreMode2str(const EpicsStoreMode storeMode) {
+  if (storeMode == DoNotStoreEpics) return string("DoNotStoreEpics");
+  if (storeMode == RepeatEpicsEachCalib) return string("RepeatEpicsEachCalib");
+  if (storeMode == OnlyStoreEpicsUpdates) return string("OnlyStoreEpicsUpdates");
+  if (storeMode == Unknown) return string("Unknown");
+  return string("**Invalid**");
+}

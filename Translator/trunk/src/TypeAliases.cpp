@@ -12,6 +12,7 @@
 #include "psddl_psana/cspad2x2.ddl.h"
 #include "psddl_psana/encoder.ddl.h"
 #include "psddl_psana/epics.ddl.h"
+#include "psddl_psana/epixsampler.ddl.h"
 #include "psddl_psana/evr.ddl.h"
 #include "psddl_psana/fccd.ddl.h"
 #include "psddl_psana/fli.ddl.h"
@@ -102,6 +103,11 @@ TypeAliases::TypeAliases() {
   Epics.insert( & typeid(Psana::Epics::ConfigV1));
   m_alias2TypesMap["Epics"] = Epics;
 
+  TypeInfoSet EpixSampler;
+  EpixSampler.insert( & typeid(Psana::EpixSampler::ConfigV1));
+  EpixSampler.insert( & typeid(Psana::EpixSampler::ElementV1));
+  m_alias2TypesMap["EpixSampler"] = EpixSampler;
+
   TypeInfoSet Evr;
   Evr.insert( & typeid(Psana::EvrData::ConfigV1));
   Evr.insert( & typeid(Psana::EvrData::ConfigV2));
@@ -116,6 +122,10 @@ TypeAliases::TypeAliases() {
   TypeInfoSet EvrIO;
   EvrIO.insert( & typeid(Psana::EvrData::IOConfigV1));
   m_alias2TypesMap["EvrIO"] = EvrIO;
+
+  TypeInfoSet Evs;
+  Evs.insert( & typeid(Psana::EvrData::SrcConfigV1));
+  m_alias2TypesMap["Evs"] = Evs;
 
   TypeInfoSet FEEGasDetEnergy;
   FEEGasDetEnergy.insert( & typeid(Psana::Bld::BldDataFEEGasDetEnergy));
@@ -217,6 +227,7 @@ TypeAliases::TypeAliases() {
 
   TypeInfoSet Rayonix;
   Rayonix.insert( & typeid(Psana::Rayonix::ConfigV1));
+  Rayonix.insert( & typeid(Psana::Rayonix::ConfigV2));
   m_alias2TypesMap["Rayonix"] = Rayonix;
 
   TypeInfoSet SharedAcqADC;
@@ -262,7 +273,6 @@ TypeAliases::TypeAliases() {
   pnCCD.insert( & typeid(Psana::PNCCD::ConfigV1));
   pnCCD.insert( & typeid(Psana::PNCCD::ConfigV2));
   pnCCD.insert( & typeid(Psana::PNCCD::FramesV1));
-  pnCCD.insert( & typeid(Psana::PNCCD::FullFrameV1));
   m_alias2TypesMap["pnCCD"] = pnCCD;
 
   TypeInfoSet ndarray_types;

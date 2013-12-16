@@ -14,6 +14,16 @@
 
 namespace Translator {
 
+/**
+ *  @ingroup Translator
+ *
+ *  @brief class to write the eventId or time dataset into  hdf5 groups.
+ *
+ *  @note This software was developed for the LCLS project.  If you use all or 
+ *  part of it, please give an appropriate acknowledgment.
+ *
+ *  @author David Schneider
+ */
 class HdfWriterEventId {
  public:
   HdfWriterEventId();
@@ -31,7 +41,6 @@ class HdfWriterEventId {
 
   void closeDataset(hdf5pp::Group &group);
   void closeDataset(hid_t groupId);
-  void closeDatasetsForAllGroups() { m_writer.closeDatasetsForAllGroups(); }
  private:
   DataSetCreationProperties m_dataSetCreationProperties;
   hid_t m_h5typeId;

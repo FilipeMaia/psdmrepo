@@ -289,7 +289,8 @@ def compareEpicsPvGroups(tester,o2o,psana,diffs,cmpDsetValues,recurse):
     psanaNames.sort()
     o2oDupNames = [nm for idx,nm in enumerate(o2oNames[1:]) if nm == o2oNames[idx]]
     if len(o2oDupNames)>0:
-        diffs['o2o has duplicate epics pv names'].add(' '.join(o2oDupNames))
+        diffs["o2o has duplicate epics pv names. This can happen if the same pv name is coming from" + \
+              "different sources.  For instance 'pvName' is in both EpicsArch.0:NoDevice.0 and EpicsArch.0:NoDevice.1"].add(' '.join(o2oDupNames))
     tester.assertEqual(len(psanaNames), len(set(psanaNames)), msg="duplicate psana pv names")
     commonNames, o2oOnlyNames, psanaOnlyNames = partSets(o2oNames, psanaNames)
     tester.assertEqual(o2oOnlyNames,set([]),msg="%s: o2o has epics names psana does not:\n  %s" % (o2o.name,'  \n'.join(list(o2oOnlyLinks))))

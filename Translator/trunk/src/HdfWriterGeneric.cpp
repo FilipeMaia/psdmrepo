@@ -301,27 +301,6 @@ void HdfWriterGeneric::closeDatasets(hid_t groupId)
   m_datasetMap.erase(pos);
 }
 
-void HdfWriterGeneric::closeDatasetsForAllGroups() {
-  std::map<hid_t, vector<DataSetMeta> >::iterator pos;
-  for (pos = m_datasetMap.begin(); pos != m_datasetMap.end(); ++pos) {
-    vector<DataSetMeta> & dsetList = pos->second;
-    for (size_t idx = 0; idx < dsetList.size(); ++idx) {
-      DataSetMeta & dsetMeta = dsetList[idx];
-      hid_t datasetId = dsetMeta.dsetId();
-      herr_t err = H5Dclose(datasetId);
-      if (err < 0) {
-        ostringstream msg;
-        msg << "closeDatasetsForAllGroups: problem closing dataset: " << datasetId 
-            << " name: " << dsetMeta.name() << " for group " << pos->first
-            << " " << hdf5util::objectName(pos->first);
-        throw DataSetException(ERR_LOC, msg.str());
-      }
-    }
-    dsetList.clear();
-  }
-  m_datasetMap.clear();
-}
-
 hid_t HdfWriterGeneric::getDatasetId(hid_t groupId, size_t dsetIndex) {
   map<hid_t, vector<DataSetMeta> >::iterator pos = m_datasetMap.find(groupId);
   ostringstream msg;

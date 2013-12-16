@@ -14,6 +14,7 @@ namespace Translator {
 
 typedef enum { inEvent, inConfigStore } DataTypeLoc;
 
+/// helper function for HdfWriterFromEvent 
 template <class T>
 void checkType(const PSEvt::EventKey &eventKey, const char *logger) {
   const std::type_info & templateType = typeid(T);
@@ -23,6 +24,7 @@ void checkType(const PSEvt::EventKey &eventKey, const char *logger) {
   }
 }
 
+/// helper function for HdfWriterFromEvent 
 template <class T>
 boost::shared_ptr<T> getFromEventStore(const PSEvt::EventKey &eventKey,
                                        DataTypeLoc dataTypeLoc,
@@ -34,6 +36,21 @@ boost::shared_ptr<T> getFromEventStore(const PSEvt::EventKey &eventKey,
   return ptr;
 }
 
+/**
+ *  @ingroup Translator
+ *
+ *  @brief interface for classes that write an Object in the Event, or config store.
+ *
+ *  Base class for hdf writer classes that retrieve an object from the event or 
+ *  config store.  A derived class may implement writing details either using the 
+ *  hdf5 writing functions in psddl_hdf2psana (such as store_at, store) or a 
+ *  Translator/HdfWriterGeneric class.
+ *
+ *  @note This software was developed for the LCLS project.  If you use all or 
+ *  part of it, please give an appropriate acknowledgment.
+ *
+ *  @author David Schneider
+ */
 class HdfWriterFromEvent {
  public:
   virtual void make_datasets(DataTypeLoc dataTypeLoc,
@@ -69,7 +86,6 @@ class HdfWriterFromEvent {
   // datasets are closed by the hdf5pp::Group object.  However HdfWriterGeneric based 
   // writers need to implement these functions.
   virtual void closeDatasets(hdf5pp::Group &group) {}
-  virtual void closeDatasetsForAllGroups() {}
 
   virtual ~HdfWriterFromEvent() {};
 };

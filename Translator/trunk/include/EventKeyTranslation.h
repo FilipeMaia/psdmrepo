@@ -9,7 +9,22 @@
 
 namespace Translator {
 
+/**
+ *  @ingroup Translator
+ *
+ *  @brief Describes how to translate eventKeys.
+ *
+ *  This struct is used to hold some information about how to translate
+ *  EventKeys.  It holds the event damage, if a blank should be written, 
+ *  and where the eventKey is in the configStore or eventStore.
+ *
+ *  @note This software was developed for the LCLS project.  If you use all or 
+ *  part of it, please give an appropriate acknowledgment.
+ *
+ *  @author David Schneider
+ */
 struct EventKeyTranslation {
+
   const PSEvt::EventKey eventKey;
   Pds::Damage damage;
   boost::shared_ptr<Translator::HdfWriterFromEvent> hdfWriter;

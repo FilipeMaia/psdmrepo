@@ -27,11 +27,6 @@
 #include "Translator/LessEventIdPtrs.h"
 #include "Translator/ChunkManager.h"
 #include "Translator/H5GroupNames.h"
-/**
-   Defines the H5Output module.
-   This is a Psana module that will write Psana events to a
-   Hdf5 file.
- */
 
 namespace Translator {
 
@@ -42,6 +37,21 @@ public:
   }
 };
 
+/**
+ *  @ingroup Translator
+ *
+ *  @brief Main module for hdf5 translation.
+ *
+ *  Invoke this module (Translator.H5Output) when running psana to translate
+ *  Psana events into a hdf5 file.  Note, this module should be invoked last
+ *  so that it can pick up any other user module event data that can be 
+ *  translated, or that effects translation.
+ *
+ *  @note This software was developed for the LCLS project.  If you use all or 
+ *  part of it, please give an appropriate acknowledgment.
+ *
+ *  @author David Schneider
+ */
 class H5Output : public Module {
 public:
   enum SplitMode { NoSplit, Family, SplitScan };
@@ -89,6 +99,8 @@ protected:
   void filterHdfWriterMap();
   void initializeSrcAndKeyFilters();
   std::string eventPosition();
+
+  /// returns true if C++ type is an ndarray that the system can translate
   bool isNDArray(const type_info *typeInfoPtr);
 
 private:
@@ -149,7 +161,7 @@ private:
   std::set<std::string> m_ndarrayKeyFilterSet;
   std::set<std::string> m_stdStringKeyFilterSet;
 
-  bool m_storeEpics;
+  EpicsH5GroupDirectory::EpicsStoreMode m_storeEpics;
 
   /////////////////////////////////
   // parameters read in from config:
@@ -161,7 +173,8 @@ private:
   bool m_short_bld_name;
 
   // translation parameters
-  std::map<std::string, bool> m_typeInclude;  // each type alias will be read in and true if we convert that type
+  std::map<std::string, bool> m_typeInclude;  // each type alias will be read in 
+                                              // and true if we convert that type
   std::list<std::string> m_src_filter;
   std::list<std::string> m_ndarray_key_filter; 
   std::list<std::string> m_std_string_key_filter;  

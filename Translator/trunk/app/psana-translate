@@ -35,7 +35,7 @@ psana-translate -n 5 /reg/d/psdm/mec/meca6013/xtc/e355-r0384-s00-c00.xtc --outpu
 ''' % (os.path.basename(sys.argv[0]), )
 
 # this is initialized with the default values from default_psana.cfg
-defaultTranslatorOptions = (('store_epics','true'),
+defaultTranslatorOptions = (('store_epics','updates_only'),
                             ('AcqTdc','include'),
                             ('AcqWaveform','include'),
                             ('Alias','include'),
@@ -134,7 +134,6 @@ while len(args)>0:
 # must provide output_file:
 if len(args)==0 or not args[0].startswith('--output_file='):
   print "ERROR: no --output_file=argument given"
-  print usage 
   sys.exit(1)
 
 h5output = args.pop(0).split('--output_file=')[1]
@@ -144,12 +143,10 @@ save_cfg = None
 for arg in args:
   if not arg.startswith('--'):
     print "ERROR: argument %s does not start with --" % arg
-    print usage
     sys.exit(1)
   option = arg.split('--')[1].split('=')[0]
   if arg.find('=')<3:
     print "ERROR: argument %s does not have a = to separate option from value" % arg
-    print usage
     sys.exit(1)
   value = arg.split('=')[1]
   if option in translatorOptions:
@@ -159,7 +156,6 @@ for arg in args:
       save_cfg = value
     else:
       print "ERROR: argument %s contains unknown option (%s)" % (arg, option)
-      print usage
       sys.exit(1)
 
 cfg = tempfile.NamedTemporaryFile(suffix='.cfg',prefix='psana-translate_')

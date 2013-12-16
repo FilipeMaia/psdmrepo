@@ -44,7 +44,7 @@ void HdfWriterString::make_dataset(hid_t groupId)
     throw HdfWriterGeneric::DataSetException(ERR_LOC, msg.str());
   }
   if (dsetPos != 0) throw HdfWriterGeneric::DataSetException(ERR_LOC, 
-                                                             "HdfWriterString::make_dataset - dsetPos is not 0");
+                                          "HdfWriterString::make_dataset - dsetPos is not 0");
 
 }
 

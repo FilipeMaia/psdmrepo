@@ -14,6 +14,16 @@
 
 namespace Translator {
 
+/**
+ *  @ingroup Translator
+ *
+ *  @brief class to write the damage datasets into an hdf5 group.
+ *
+ *  @note This software was developed for the LCLS project.  If you use all or 
+ *  part of it, please give an appropriate acknowledgment.
+ *
+ *  @author David Schneider
+ */
 class HdfWriterDamage {
  public:
   typedef enum {BlankEntry=0, ValidEntry=1} MaskVal;
@@ -23,15 +33,20 @@ class HdfWriterDamage {
   void make_datasets(hid_t groupId);
   void make_datasets(hdf5pp::Group & group) { make_datasets(group.id()); }
 
-  void append(hid_t groupId, Pds::Damage damage, MaskVal  mask) { store_at(-1,groupId,damage,mask); }
-  void append(hdf5pp::Group & group, Pds::Damage damage, MaskVal mask) { append(group.id(), damage, mask); }
+  void append(hid_t groupId, Pds::Damage damage, MaskVal  mask) { 
+    store_at(-1,groupId,damage,mask); 
+  }
+  void append(hdf5pp::Group & group, Pds::Damage damage, MaskVal mask) { 
+    append(group.id(), damage, mask); 
+  }
 
   void store_at(long index, hid_t groupId, Pds::Damage damage, MaskVal mask);
-  void store_at(long index, hdf5pp::Group & group, Pds::Damage damage, MaskVal mask) { store_at(index,group.id(),damage, mask); }
+  void store_at(long index, hdf5pp::Group & group, Pds::Damage damage, MaskVal mask) { 
+    store_at(index,group.id(),damage, mask); 
+  }
 
   void closeDatasets(hid_t groupId);
   void closeDatasets(hdf5pp::Group &group) { closeDatasets(group.id()); }
-  void closeDatasetsForAllGroups() { m_writer.closeDatasetsForAllGroups(); }
 
   const DataSetCreationProperties & dataSetCreationProperties() 
   { return m_dataSetCreationProperties; }
