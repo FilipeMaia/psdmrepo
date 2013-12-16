@@ -323,6 +323,12 @@ class DdlHdf5Translator ( object ) :
               self.log.trace("package=%s typename=%s xtctype=%s alias=%s groupingterm=%s" % \
                              (namespace, typename, xtcType, typeAlias, groupingTerm))
               psanaTypeName = "Psana::" + namespace + '::' + typename
+
+              # The hdf writing function for PNCCD::FullFrameV1 is presently disabled
+              # so we will skip it:
+              if psanaTypeName == 'Psana::PNCCD::FullFrameV1':
+                continue
+
               isConfig = 'config-type' in packageType.tags
               psanaTypes[psanaTypeName] = isConfig
               typeAliasMap[typeAlias].add(psanaTypeName)
@@ -330,6 +336,7 @@ class DdlHdf5Translator ( object ) :
         # fix up things.  The above logic may produce more aliases than we like.
         typeAliasMap['AcqWaveform'].update(typeAliasMap['Acq'])
         del typeAliasMap['Acq']
+
 
         # If we want to combine PrincetonInfo and Princeton into the same alias, uncomment this
         # typeAliasMap['Princeton'].update(typeAliasMap['PrincetonInfo'])

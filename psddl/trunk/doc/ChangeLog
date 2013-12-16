@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-12-12
+2013-12-16 David Schneider
+- hdf5 Translator backend, epics handling, remove FullFrame, documentation
+
 Tag: V00-12-11
 2013-12-09 David Schneider
 - hdf5 Translator backend, epics handling, added bounds checking for ctrl enum pv

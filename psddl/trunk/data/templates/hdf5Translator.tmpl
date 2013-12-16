@@ -35,9 +35,26 @@ output_file = output_directory/h5output.h5
 
 # # # # # # # # # # # # # # # # # # # # #
 # EPICS FILTERING
-# The Translator defaults to store all Epics Pv's:
+# The Translator can store epics pv's in one of two ways, or not at all.
+# set store_epics below, to one of the following:
+#
+# updates_only   stores an epic pv when it has changed. The pv is stored 
+#                in the current calib cycle.  For mutli calib cycle experiments, 
+#                users may have to look back through several calib cycle's to 
+#                find the latest value of a pv.
+#
+# calib_repeat   each calib cycle will include the latest value of all the epics 
+#                pv's.  This can make it easier to find pv's for a calib cycle. 
+#                For experiments with many short calib cycles, it can degrade 
+#                performance of translation and performance when working with the 
+#                resulting hdf5 file.
+#
+# no             epics pv's will not be stored. You may also want to set Epics=exclude
+#                (see below) if you do not want the epics configuration data stored
 
-store_epics = true
+# The default is 'updates_only'
+
+store_epics = updates_only
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # TYPE FILTERING 
@@ -380,20 +397,8 @@ public:
 namespace Translator {
 
 boost::shared_ptr<HdfWriterFromEvent> getHdfWriter(HdfWriterMap & mapping, const std::type_info *typeInfoPtr) {
-  //  static map<HdfWriterFromEvent*,set<std::type_info*> > convertersNotFound;
    HdfWriterMap::iterator pos = mapping.find(typeInfoPtr);
   if (pos == mapping.end()) {
-    // TODO: move this log message into H5Output
-    //    WithMsgLog(logger,trace,str) {
-    //      // to avoid printing messages for every event about converters not found, we do some simple
-    //      // caching here. The first time we see that a converter is not found for a type, we log a 
-    //      //  message. After that, we do not.  Since this function may be called for different 
-    //      set<std::type_info*> notFoundThisMap = convertersNotFound[&mapping];
-    //      if (notFoundThisMap.find(typeInfoPtr) == notFoundThisMap.end()) {
-    //        str << "getHdfWriter: no converter found for type " << PSEvt::typeInfoRealName(typeInfoPtr);
-    //        convertersNotFound.insert(typeInfoPtr);
-    //      }
-    //    }
     return boost::shared_ptr<Translator::HdfWriterFromEvent>();
   }
   return pos->second;
