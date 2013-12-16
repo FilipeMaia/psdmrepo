@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-07-09
+2013-12-16 Andy Salnikov
+- small fixes to doxy comments
+
 Tag: V00-07-08 David Schneider
 - Adding const correctness to TypeInfoUtils
 

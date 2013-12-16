@@ -143,7 +143,7 @@ EventKey::print(std::ostream& str) const
   str << ')';
 }
 
-/// Compare two Src objects, ignores process ID.
+// Compare two Src objects, ignores process ID.
 int cmpPdsSrc(const Pds::Src& lhs, const Pds::Src& rhs)
 {
   // ignore PID in comparison
@@ -156,7 +156,7 @@ int cmpPdsSrc(const Pds::Src& lhs, const Pds::Src& rhs)
 } // namespace PSEvt
 
 namespace Pds {
-/// Helper method to format Pds::Src to a standard stream
+// Helper method to format Pds::Src to a standard stream
 std::ostream&
 operator<<(std::ostream& out, const Pds::Src& src)
 {

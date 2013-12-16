@@ -61,7 +61,7 @@ public:
    * Derived classes can provide a simple history mechanism by 
    * overriding this class and returning the number of updates
    *  
-   *  @param[out] total number of updates
+   *  @return total number of updates
    */
   virtual long totalUpdates() const = 0;
 
@@ -72,7 +72,7 @@ public:
    *  the total number of updates
    *  
    *  @param[in]  key EventKey to get updates for
-   *  @param[out] number of updates
+   *  @return number of updates
    */
   virtual long updates(const EventKey & key) const = 0;
 };
