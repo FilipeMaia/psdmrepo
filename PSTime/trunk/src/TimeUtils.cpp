@@ -80,7 +80,7 @@ namespace {
 namespace PSTime {
 namespace TimeUtils {
 
-/// Convert broken time to UTC time (in UTC timezone)
+// Convert broken time to UTC time (in UTC timezone)
 time_t 
 timegm(struct tm* timeptr)
 {

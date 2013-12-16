@@ -106,7 +106,7 @@ namespace {
 namespace PSTime {
 namespace TimeFormat {
 
-/**
+/*
  * Parse the time string and return time
  */
 Time
@@ -201,7 +201,7 @@ parseTime( const std::string& timeStr )
   return Time( sec, nsec ) ;
 }
 
-/**
+/*
  * Convert time to string according to format
  */
 std::string
