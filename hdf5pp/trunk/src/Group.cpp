@@ -276,7 +276,7 @@ Group::operator==( const Group& other ) const
   return *m_id == *(other.m_id) ;
 }
 
-/// Insertion operator dumps name and ID of the group.
+// Insertion operator dumps name and ID of the group.
 std::ostream&
 operator<<(std::ostream& out, const Group& grp)
 {

@@ -129,7 +129,7 @@ Type::set_precision( size_t precision )
   }
 }
 
-/// Insertion operator dumps type information in HDF5 DDL format.
+// Insertion operator dumps type information in HDF5 DDL format.
 std::ostream&
 operator<<(std::ostream& out, const Type& dtype)
 {

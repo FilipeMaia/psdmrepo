@@ -284,7 +284,7 @@ public:
    *
    *  @param[in] group   Group object, parent of the dataset.
    *  @param[in] dataset Dataset name
-   *  @param[in] data    Object to store
+   *  @param[in] array   Object to store
    *  @param[in] native_type    In-memory type of the data
    *  @param[in] stored_type    Type of the data as stored in file
    *
@@ -309,7 +309,7 @@ public:
    *
    *  @param[in] group   Group object, parent of the dataset.
    *  @param[in] dataset Dataset name
-   *  @param[in] data    Object to store
+   *  @param[in] array   Object to store
    *  @param[in] index   Position in the dataset.
    *  @param[in] native_type    In-memory type of the array elements
    *
