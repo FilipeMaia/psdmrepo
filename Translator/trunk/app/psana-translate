@@ -8,18 +8,20 @@ usage='''** Wrapper to the psana Translator.H5Output module
 Run as:
    %s [psana arguments] --output_file=h5outfile [optional H5Output options] [--save_cfg=filename]
 The argument --output_file=h5outfile MUST be given, as well as some input to psana.
-The psana options line 
-(such as -v, -n, -m , etc) 
-After that, one can include options that are written into the Translator.H5Output module parameters.
+
+[psana arguments] arguments to psana, such as -v, -n, -m, -s.  Run psana -h for complete options.
+
+[optional H5Output options] include any optional arguments for the Translator.H5Output module.
 The format for these options are:
 
 --store_epics=true --Andor=exclude
 
-That is you cannot do:
+Each of these arguments must start with -- and have a = sign in it
+
+That is you cannot add spaces, such as:
 
 --store_epics = true --Andor = exclude
 
-Every command line argument must start with -- and have a = sign in it.
 
 For the multiword options, use appropriate shell escape charaters, i.e.
 
