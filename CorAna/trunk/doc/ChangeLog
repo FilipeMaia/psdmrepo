@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-17
+2013-12-16 Mikhail S. Dubrovin
+- update all minor changes
+
 2013-12-03 Mikhail S. Dubrovin
 - in GUIMain.py add automatic creation of the work directory, if it is missing
 	
