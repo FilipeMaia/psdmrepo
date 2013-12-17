@@ -98,8 +98,8 @@ class GUIStatus ( QtGui.QGroupBox ) :
         #self.tit_status.setStyleSheet (cp.styleDefault)
         #self.tit_status.setStyleSheet (cp.styleTitleInFrame)
         self.box_txt   .setReadOnly   (True)
-        self.box_txt   .setStyleSheet (cp.styleBkgd)
-        
+        #self.box_txt   .setStyleSheet (cp.styleBkgd)
+        self.box_txt   .setStyleSheet (cp.styleWhiteFixed)
         self.setContentsMargins (QtCore.QMargins(10,20,10,10))
 
         #self.setMinimumHeight(60)

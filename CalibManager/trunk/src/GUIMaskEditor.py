@@ -51,8 +51,6 @@ from FileNameManager      import fnm
 
 from CorAna.MaskEditor import MaskEditor
 import GlobalUtils     as     gu
-#import CSPAD2x2Image   as     cspad2x2img
-#import CSPADImage      as     cspadimg
 
 #---------------------
 #  Class definition --

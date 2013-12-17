@@ -86,8 +86,8 @@ class CalibFile() :
         if self.begin  < other.begin : return -1
         if self.begin  > other.begin : return  1
         if self.begin == other.begin : 
-            if self.end  < other.end : return -1 
-            if self.end  > other.end : return  1 
+            if self.end  < other.end : return  1 # inverse comparison for end
+            if self.end  > other.end : return -1 
             if self.end == other.end : return  0 
 
 #----------------------------------
@@ -180,11 +180,13 @@ def find_calib_file_in_list_for_run(list_sorted_cfiles, runnum=0) :
 def dict_calib_file_actual_run_range(list_of_cfiles) :
 
     list_of_ends   = [cfile.get_begin()-1 for cfile in list_of_cfiles]
-    list_of_ends.append(0)
-    list_of_ends.append(CalibFileFinder.max_run_number)
-
+    list_of_ends.append(0)                              # add minimal end=0
+    list_of_ends.append(CalibFileFinder.max_run_number) # add maximal end=9999
+    list_of_ends.append(list_of_cfiles[-1].get_end())   # end of the last file
+    
     # Fill dictionary with begin-end from file name
-    dict_fname_range = { cfile.get_basename():[cfile.get_begin(), cfile.get_end()] for cfile in list_of_cfiles }
+    #dict_fname_range = { cfile.get_basename():[cfile.get_begin(), cfile.get_end()] for cfile in list_of_cfiles }
+    dict_fname_range = { cfile.get_basename():[-1, -1] for cfile in list_of_cfiles }
 
     # Substitute ends from file finder
     for end in list_of_ends :
@@ -238,7 +240,10 @@ if __name__ == "__main__" :
         #print cfile.get_basename()
         fname = cfile.get_basename()
         range = dict_fname_range[fname]
+
         txt = '%s  run range %04d - %04d' % (fname.rjust(14), range[0], range[1])
+        if range[0] == -1 : txt = '%s  file is not used' % fname.rjust(14)
+
         print txt
 
     sys.exit ( "End of test" )

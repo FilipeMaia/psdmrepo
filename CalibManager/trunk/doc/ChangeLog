@@ -11,6 +11,13 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-09
+2013-12-17 Mikhail S. Dubrovin
+- modules src/CSPAD2x2Image.py CSPADImage.py moved to PyCSPadImage
+- in CalibFileFinder, GlobalUtils - fixed problems with printing run range
+- in GUIStatus.py changed status window font to fixed size
+- in GUIMaskEditor.py get array using self.img_arr = gu.get_image_array_from_file(self.path)
+
 Tag: V00-00-08
 2013-12-16 Mikhail S. Dubrovin
 - in status window implementer output of sorted calibration files with actual run range

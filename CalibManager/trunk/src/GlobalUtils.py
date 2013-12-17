@@ -46,8 +46,8 @@ from LogBook import message_poster
 from GUIPopupCheckList import *
 from GUIPopupRadioList import *
 
-import CSPAD2x2Image        as     cspad2x2img
-import CSPADImage           as     cspadimg
+import PyCSPadImage.CSPAD2x2ImageUtils as cspad2x2img
+import PyCSPadImage.CSPADImageUtils    as cspadimg
 
 #-----------------------------
 # Imports for other modules --
@@ -546,7 +546,7 @@ def get_text_content_of_calib_dir_for_detector(path, det='cspad', subdir='CsPad:
     list_of_fnames = os.listdir(path)
 
     if list_of_fnames == [] :
-        txt +='\n\nDirectory IS EMPTY!'        
+        txt += '\n' + (level+1)*'    ' + 'Directory IS EMPTY!'        
         return txt
 
     if level == 3 :
@@ -559,7 +559,10 @@ def get_text_content_of_calib_dir_for_detector(path, det='cspad', subdir='CsPad:
            fname = cfile.get_basename()
            range = dict_fname_range[fname]
            txt += '\n' + (level+1)*'    '
-           txt += '%s  run range %04d - %04d' % (fname.rjust(14), range[0], range[1])
+           if range[0] == -1 :
+               txt += '%s  file is not used' % fname.ljust(14)
+           else :
+               txt += '%s  run range %04d - %04d' % (fname.ljust(14), range[0], range[1])
 
        return txt
 

@@ -26,14 +26,14 @@ from PyQt4 import QtGui, QtCore
 # Imports for other modules --
 #-----------------------------
 
-from ConfigParametersForApp import cp
-from Logger                 import logger
-import GlobalUtils          as     gu
-from FileNameManager        import fnm
-from GUIFileBrowser         import *
-from PlotImgSpe             import *
-import CSPAD2x2Image        as     cspad2x2img
-import CSPADImage           as     cspadimg
+from   ConfigParametersForApp import cp
+from   Logger                 import logger
+import GlobalUtils            as     gu
+from   FileNameManager        import fnm
+from   GUIFileBrowser         import *
+from   PlotImgSpe             import *
+#import PyCSPadImage.CSPAD2x2Image as     cspad2x2img
+#import PyCSPadImage.CSPADImage    as     cspadimg
 
 #---------------------
 #  Class definition --
@@ -344,7 +344,7 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
 
             msg = 'Selected file to plot: %s' % fname
             logger.info(msg, __name__)
-            print msg
+            #print msg
 
             #self.img_arr = self.get_image_array_from_file(fname)
             #if self.img_arr == None :
@@ -364,61 +364,61 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
 
 
 
-    def get_image_array_from_file(self, fname) :
-        """DEPRICATED: Recognizes detector by file name and returns image array or None
-        """
-
-        arr     = None
-        img_arr = None
-
-        arr = gu.get_array_from_file( fname )
-        if arr is None :
-            logger.warning('Array is not retreaved from file...', __name__)
-            return None
-
-        #print 'arr:\n', arr
-        msg = 'arr.shape: %s' % str(arr.shape)
-        logger.info(msg, __name__)
- 
-        fname_lower = fname.lower()
-
-        #print 'fname_lower =', fname_lower
-        #print 'list_of_dets_lower =', cp.list_of_dets_lower
-
-        #self.list_of_dets   = ['CSPAD', 'CSPAD2x2', 'Princeton', 'pnCCD', 'Tm6740', 'Opal2000', 'Opal4000', 'Acqiris']
-
-        if cp.list_of_dets_lower[0]+'.' in fname_lower : # CSAPD, shape = (5920,388) 
-            arr.shape = (32*185,388) 
-            img_arr = cspadimg.get_cspad_raw_data_array_image(arr)
-
-        elif cp.list_of_dets_lower[1] in fname_lower : # CSAPD2x2
-            arr.shape = (185,388,2) 
-            img_arr = cspad2x2img.get_cspad2x2_non_corrected_image_for_raw_data_array(arr)
-
-        elif cp.list_of_dets_lower[2] in fname_lower : # Princeton
-            img_arr = arr
-
-        elif cp.list_of_dets_lower[3] in fname_lower : # pnCCD
-            img_arr = arr
-
-        elif cp.list_of_dets_lower[4] in fname_lower : # Camera
-            img_arr = arr
-
-        elif cp.list_of_dets_lower[5] in fname_lower : # Camera
-            img_arr = arr
-
-        elif cp.list_of_dets_lower[6] in fname_lower : # Camera
-            img_arr = arr
-
-        elif cp.list_of_dets_lower[7] in fname_lower : # Acqiris
-            img_arr = arr
-
-        else :
-            msg = 'Detector is not recognized in the file name: %s' %  fname
-            logger.warning(msg, __name__)
-            return None
-
-        return img_arr
+#    def get_image_array_from_file(self, fname) :
+#        """DEPRICATED: Recognizes detector by file name and returns image array or None
+#        """
+#
+#        arr     = None
+#        img_arr = None
+#
+#        arr = gu.get_array_from_file( fname )
+#        if arr is None :
+#            logger.warning('Array is not retreaved from file...', __name__)
+#            return None
+#
+#        #print 'arr:\n', arr
+#        msg = 'arr.shape: %s' % str(arr.shape)
+#        logger.info(msg, __name__)
+# 
+#        fname_lower = fname.lower()
+#
+#        #print 'fname_lower =', fname_lower
+#        #print 'list_of_dets_lower =', cp.list_of_dets_lower
+#
+#        #self.list_of_dets   = ['CSPAD', 'CSPAD2x2', 'Princeton', 'pnCCD', 'Tm6740', 'Opal2000', 'Opal4000', 'Acqiris']
+#
+#        if cp.list_of_dets_lower[0]+'.' in fname_lower : # CSAPD, shape = (5920,388) 
+#            arr.shape = (32*185,388) 
+#            img_arr = cspadimg.get_cspad_raw_data_array_image(arr)
+#
+#        elif cp.list_of_dets_lower[1] in fname_lower : # CSAPD2x2
+#            arr.shape = (185,388,2) 
+#            img_arr = cspad2x2img.get_cspad2x2_non_corrected_image_for_raw_data_array(arr)
+#
+#        elif cp.list_of_dets_lower[2] in fname_lower : # Princeton
+#            img_arr = arr
+#
+#        elif cp.list_of_dets_lower[3] in fname_lower : # pnCCD
+#            img_arr = arr
+#
+#        elif cp.list_of_dets_lower[4] in fname_lower : # Camera
+#            img_arr = arr
+#
+#        elif cp.list_of_dets_lower[5] in fname_lower : # Camera
+#            img_arr = arr
+#
+#        elif cp.list_of_dets_lower[6] in fname_lower : # Camera
+#            img_arr = arr
+#
+#        elif cp.list_of_dets_lower[7] in fname_lower : # Acqiris
+#            img_arr = arr
+#
+#        else :
+#            msg = 'Detector is not recognized in the file name: %s' %  fname
+#            logger.warning(msg, __name__)
+#            return None
+#
+#        return img_arr
 
 
 
