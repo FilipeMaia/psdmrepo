@@ -18,7 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
-#include <list>
+#include <algorithm>
 #include <limits>
 #include <iostream>
 #include <stdexcept>
@@ -72,7 +72,7 @@ namespace {
     // comparison for sorting
     bool operator<(const CalibFile& other) const {
       if (m_begin != other.m_begin) return m_begin < other.m_begin;
-      return m_end < other.m_end;
+      return m_end > other.m_end;
     }
     
   private:
@@ -141,37 +141,14 @@ try {
   dir /= dataType;
 
   // scan directory
-  std::list<CalibFile> files;
+  std::vector<std::string> files;
   typedef fs::directory_iterator dir_iter;
   for (dir_iter diriter = dir_iter(dir); diriter != dir_iter(); ++ diriter ) {
-    
     const fs::path& path = diriter->path();
-    
-    // only take *.data files
-    if (path.extension() != ".data") {
-      MsgLog(logger, info, "skipping file: " + path.string());
-      continue;
-    }
-
-    try {
-      files.push_back(CalibFile(path));
-    } catch (const std::exception& ex) {
-      MsgLog(logger, warning, "skipping file: " + path.string() + ": " + ex.what());
-    }
-    
+    files.push_back(path.string());
   }
 
-  unsigned long run = runNumber;
-
-  // find the last file in the list whose begin run is less or equal 
-  // to the run number
-  files.sort();
-  typedef std::list<CalibFile>::const_reverse_iterator FileIter;
-  for (FileIter it = files.rbegin() ; it != files.rend() ; ++ it ) {
-    MsgLog(logger, debug, "trying: " << *it << " for run " << run);
-    if (it->begin() <= run and run <= it->end()) return it->path().string();
-  }
-  return std::string();
+  return selectCalibFile(files, runNumber);
 
 } catch (const fs::filesystem_error& ex) {
   // means cannot read directory
@@ -183,6 +160,41 @@ std::string
 CalibFileFinder::findCalibFile(const Pds::Src& src, const std::string& dataType, unsigned long runNumber) const
 {
   return findCalibFile(::toString(src), dataType, runNumber);
+}
+
+// Selects calibration file from a list of file names.
+std::string
+CalibFileFinder::selectCalibFile(const std::vector<std::string>& files, unsigned long runNumber)
+{
+  // convert strings into sortable objects
+  std::vector<CalibFile> calfiles;
+  for (std::vector<std::string>::const_iterator iter = files.begin(); iter != files.end(); ++ iter) {
+
+    const fs::path path(*iter);
+
+    // only take *.data files
+    if (path.extension() != ".data") {
+      MsgLog(logger, info, "skipping file: " + path.string());
+      continue;
+    }
+
+    try {
+      calfiles.push_back(CalibFile(path));
+    } catch (const std::exception& ex) {
+      MsgLog(logger, warning, "skipping file: " + path.string() + ": " + ex.what());
+    }
+
+  }
+
+  // find the last file in the list whose begin run is less or equal
+  // to the run number
+  std::sort(calfiles.begin(), calfiles.end());
+  typedef std::vector<CalibFile>::const_reverse_iterator FileIter;
+  for (FileIter it = calfiles.rbegin() ; it != calfiles.rend() ; ++ it ) {
+    MsgLog(logger, debug, "trying: " << *it << " for run " << runNumber);
+    if (it->begin() <= runNumber and runNumber <= it->end()) return it->path().string();
+  }
+  return std::string();
 }
 
 } // namespace PSCalib

@@ -11,6 +11,11 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-13
+2013-12-17 Andy
+- CalibFileFinder: bug fix for ordering of the intervals with common start
+- adding unit test for CalibFileFinder
+
 Tag: V00-01-12
 2013-09-17 Mikhail S. Dubrovin
 - improve doxigen documentation, add description of interfaces in CSPadCalibPars and CSPad2x2CalibPars

@@ -14,6 +14,7 @@
 // C/C++ Headers --
 //-----------------
 #include <string>
+#include <vector>
 
 //----------------------
 // Base Class Headers --
@@ -95,6 +96,19 @@ public:
    */
   std::string findCalibFile(const Pds::Src& src, const std::string& datatype, unsigned long runNumber) const;
  
+  /**
+   *  @brief Selects calibration file from a list of file names.
+   *
+   *  This method is mostly for testing purposes, it is used in implementation of findCalibFile().
+   *  It can be used if you have the list of file names instead of scanning pre-defined directory.
+   *  File names that do not match standard naming convention are ignored. Standard convention is
+   *  two run number separated with '-' and extension '.data', second run can be specified as 'end'.
+   *
+   *  @param[in] files      List of file names.
+   *  @param[in] runNumber  Run number to search the valid file name.
+   */
+  static std::string selectCalibFile(const std::vector<std::string>& files, unsigned long runNumber);
+
 protected:
 
 private:
