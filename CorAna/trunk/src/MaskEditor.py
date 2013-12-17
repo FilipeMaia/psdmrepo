@@ -74,7 +74,7 @@ class MaskEditor (QtGui.QWidget) :
         @param mfname  default path-prefix for newly created files with mask and shaping objects.
         @param title   Initial title of the window.
         @param ccd_rot Orientation of the frame in N*90 degrees 0,90,180,270.
-        @param updown  (mirror) flip of the y coordinate True/false. 
+        @param updown  (mirror) flip of the y coordinate True/False. 
         """
  
         #QtGui.QMainWindow.__init__(self, parent)
@@ -220,9 +220,9 @@ class MaskEditor (QtGui.QWidget) :
 def get_array2d_for_test() :
     mu, sigma = 200, 25
     rows, cols = 1300, 1340
-    arr = mu + sigma*np.random.standard_normal(size=rows*cols)
+    #arr = mu + sigma*np.random.standard_normal(size=rows*cols)
     #arr = 100*np.random.standard_exponential(size=2400)
-    #arr = np.arange(2400)
+    arr = np.arange(rows*cols)
     arr.shape = (rows,cols)
     return arr
 
@@ -230,8 +230,8 @@ def get_array2d_for_test() :
 def main():
 
     app = QtGui.QApplication(sys.argv)
-
-    w = MaskEditor(None, get_array2d_for_test(), xyc=(600,700))
+    w = MaskEditor(None, get_array2d_for_test(), xyc=(600,700), ccd_rot=90, updown=False)
+    #w = MaskEditor(None, get_array2d_for_test(), xyc=(600,700))
     #w = MaskEditor(None)
     #w.set_image_array( get_array2d_for_test() )
     w.move(QtCore.QPoint(300,10))

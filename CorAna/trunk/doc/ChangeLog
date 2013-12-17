@@ -12,6 +12,9 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 2013-12-03 Mikhail S. Dubrovin
+- in GUIMain.py add automatic creation of the work directory, if it is missing
+	
+2013-12-03 Mikhail S. Dubrovin
 Tag: V00-00-16
 - in GUISystemSettingsRight.py - add queue psanacsq
 - in ConfigFileGenerator.py and data/scripts/psana-cora-split.cfg - add evaluation of average and rms in splitting (for subtracted peds)

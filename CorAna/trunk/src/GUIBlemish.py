@@ -215,7 +215,7 @@ class GUIBlemish ( QtGui.QWidget ) :
             xy_beam0_img = (cp.x_coord_beam0.value(), cp.y_coord_beam0.value())
 
             cp.maskeditor = MaskEditor(None, ifname=img_fname, xyc=xy_beam0_img, \
-                                       ofname=fnm.path_blem_plot(), mfname=fnm.path_blem_prefix())
+                                       ofname=fnm.path_blem_plot(), mfname=fnm.path_blem_prefix()) # , updown=False)
             cp.maskeditor.move(cp.guimain.pos().__add__(QtCore.QPoint(860,20)))
             cp.maskeditor.show()
             self.but_med.setStyleSheet(cp.styleButtonGood)

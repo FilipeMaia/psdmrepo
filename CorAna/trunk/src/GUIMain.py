@@ -129,6 +129,8 @@ class GUIMain ( QtGui.QWidget ) :
 
         self.onLogger()
 
+        gu.create_directory(cp.dir_work.value())
+
         cp.guimain = self
         self.move(10,25)
         
