@@ -71,7 +71,7 @@ class BatchJobPedestals (BatchJob) :
         cfg.make_psana_cfg_file_for_peds_scan()
 
         command      = 'psana -c ' + fnm.path_peds_scan_psana_cfg() + ' ' + fnm.path_to_xtc_files_for_run() # fnm.path_dark_xtc_cond()
-        queue        = self.queue
+        queue        = self.queue.value()
         bat_log_file = fnm.path_peds_scan_batch_log()
 
         #print 'command     :', command
@@ -121,7 +121,7 @@ class BatchJobPedestals (BatchJob) :
         cfg.make_psana_cfg_file_for_peds_aver()
 
         command      = 'psana -c ' + fnm.path_peds_aver_psana_cfg() + ' ' + fnm.path_to_xtc_files_for_run() # fnm.path_dark_xtc_cond()
-        queue        = self.queue
+        queue        = self.queue.value()
         bat_log_file = fnm.path_peds_aver_batch_log()
 
         self.job_id_peds_str, out, err = gu.batch_job_submit(command, queue, bat_log_file)

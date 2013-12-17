@@ -51,8 +51,8 @@ from FileNameManager      import fnm
 
 from CorAna.MaskEditor import MaskEditor
 import GlobalUtils     as     gu
-import CSPAD2x2Image   as     cspad2x2img
-import CSPADImage      as     cspadimg
+#import CSPAD2x2Image   as     cspad2x2img
+#import CSPADImage      as     cspadimg
 
 #---------------------
 #  Class definition --
@@ -210,44 +210,14 @@ class GUIMaskEditor ( QtGui.QWidget ) :
             logger.info('Selected file for mask editor:\n' + self.path, __name__)
 
 
+
     def openFileWithImageArray(self) :
          #self.path = str( self.ediFile.displayText() )
          self.path = self.path_mask_img.value()
-         self.arr = gu.get_array_from_file(self.path) # , dtype=np.float32)
-         logger.info('self.arr.shape:' + str(self.arr.shape), __name__)
+         self.img_arr = gu.get_image_array_from_file(self.path) # , dtype=np.float32)
+         #print 'openFileWithImageArray: self.arr.shape:', self.img_arr.shape
+         #print self.img_arr
 
-         if self.arr.shape == (5920,388) :
-             logger.info('Treat it as CSPAD', __name__)             
-             self.img_arr = cspadimg.get_cspad_raw_data_array_image(self.arr)
-
-         elif self.arr.shape == (185,388,2) or self.arr.shape == (185*388*2,):
-             logger.info('Treat it as CSPAD2x2', __name__)
-             self.img_arr = cspad2x2img.get_cspad2x2_non_corrected_image_for_raw_data_array(self.arr)
-
-         elif self.arr.shape == (1300,1340) :
-             logger.info('Treat it as Princeton camera', __name__)
-             self.img_arr = self.arr
-
-         elif self.arr.shape == (1024,1024) :
-             logger.info('Treat it as Opal camera', __name__)
-             self.img_arr = self.arr
-
-         else :
-             logger.info('Array of unknown shape', __name__)
-             self.img_arr = None
-
-
-#    def onELog(self):
-#        logger.debug('onELog', self.name)
-#        pixmap = QtGui.QPixmap.grabWidget(self)
-#        fname  = fnm.path_gui_image()
-#        status = pixmap.save(fname, 'PNG')
-#        logger.info('1. Save GUI image in file: ' + fname + ' status: '+str(status), self.name)
-#        if not status : return
-#        logger.info('2. Send GUI image in ELog: ', fname)
-#        wdialog = GUIELogPostingDialog (self, fname=fname)
-#        resp=wdialog.exec_()
-  
 
     def dictOfMaskEditorPars (self):       
         pars = {'parent' : None, 
@@ -264,9 +234,9 @@ class GUIMaskEditor ( QtGui.QWidget ) :
                 'ccd_rot': 0, 
                 'updown' : False}
 
-        print 'Start MaskEditor with input parameters:'
-        for k,v in pars.items():
-            print '%9s : %s' % (k,v)
+        #print 'Start MaskEditor with input parameters:'
+        #for k,v in pars.items():
+        #    print '%9s : %s' % (k,v)
 
         return pars
 

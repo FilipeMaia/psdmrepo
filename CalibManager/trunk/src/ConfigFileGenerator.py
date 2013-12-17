@@ -130,8 +130,10 @@ class ConfigFileGenerator :
                 #print self.ind, self.source, self.fname_ave, self.fname_rms
 
                 # list_of_dets   = ['CSPAD', 'CSPAD2x2', 'Princeton', 'pnCCD', 'Tm6740', 'Opal2000', 'Opal4000', 'Acqiris'] 
-                if   det_name == cp.list_of_dets[0] : self.add_cfg_module_peds_aver_cspad('cspad_mod.CsPadPedestals')
-                elif det_name == cp.list_of_dets[1] : self.add_cfg_module_peds_aver_cspad('cspad_mod.CsPad2x2Pedestals')
+                #if   det_name == cp.list_of_dets[0] : self.add_cfg_module_peds_aver_cspad('cspad_mod.CsPadPedestals')
+                #elif det_name == cp.list_of_dets[1] : self.add_cfg_module_peds_aver_cspad('cspad_mod.CsPad2x2Pedestals')
+                if   det_name == cp.list_of_dets[0] : self.add_cfg_module_peds_aver_cspad_with_mask('CSPadPixCoords.CSPadNDArrProducer')
+                elif det_name == cp.list_of_dets[1] : self.add_cfg_module_peds_aver_cspad_with_mask('CSPadPixCoords.CSPad2x2NDArrProducer')
                 elif det_name == cp.list_of_dets[2] : self.add_cfg_module_peds_aver_princeton()
                 elif det_name == cp.list_of_dets[3] : self.add_cfg_module_peds_aver_pnccd()
                 elif det_name == cp.list_of_dets[4] : self.add_cfg_module_peds_aver_camera()
@@ -160,6 +162,27 @@ class ConfigFileGenerator :
                       }
 
         self.add_module_in_cfg (mod)
+
+#-----------------------------
+
+    def add_cfg_module_peds_aver_cspad_with_mask (self,
+                                                  module_prod='CSPadPixCoords.CSPadNDArrProducer',
+                                                  module_aver='ImgAlgos.NDArrAverage') : 
+
+        self.path_in  = apputils.AppDataPath('CalibManager/scripts/psana-module-peds-aver-cspad-with-mask.cfg').path()
+        mod_prod = '%s:%i' % (module_prod, self.ind)
+        mod_aver = '%s:%i' % (module_aver, self.ind)
+        self.d_subs = {'MODULE_PROD'      : mod_prod,
+                       'MODULE_AVER'      : mod_aver,
+                       'DETINFO'          : self.source,
+                       'FNAME_PEDS_AVE'   : self.fname_ave,
+                       'FNAME_PEDS_RMS'   : self.fname_rms,
+                       'FNAME_PEDS_HOT'   : self.fname_mask,
+                       'THR_RMS_HOTPIX'   : str( cp.mask_hot_thr.value() )
+                      }
+
+        self.add_module_in_cfg (mod_prod)
+        self.add_module_in_cfg (mod_aver)
 
 #-----------------------------
 

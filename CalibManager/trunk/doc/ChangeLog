@@ -11,6 +11,13 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-08
+2013-12-16 Mikhail S. Dubrovin
+- in status window implementer output of sorted calibration files with actual run range
+- add CalibFileFinder - analog of cpp class
+- add data/scripts/psana-module-peds-aver-cspad-with-mask.cfg 
+	and modify ConfigFileGenerator, FileNameManager, BatchJobPedestals, etc. in order to 
+	calculate hot pixel masks for cspads in dark runs.
 
 2013-12-12 Mikhail S. Dubrovin
 - in GUIFileManagerSelect.py add Move button/command

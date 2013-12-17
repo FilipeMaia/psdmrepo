@@ -51,7 +51,7 @@ class BatchJob (QtCore.QObject ) : # need in QtCore.QObject in order to connect 
         QtCore.QObject.__init__(self, None)
 
         self.time_interval_sec = cp.bat_submit_interval_sec.value() # 100
-        self.queue             = cp.bat_queue.value()
+        self.queue             = cp.bat_queue # .value()
         self.str_run_number    = cp.str_run_number.value()
         self.autoRunStage = 0
         
@@ -97,7 +97,7 @@ class BatchJob (QtCore.QObject ) : # need in QtCore.QObject in order to connect 
             logger.info('Batch job for ' + comment + ' was not submitted in this session.', __name__) 
             return
 
-        lines = gu.batch_job_check(job_id, self.queue)
+        lines = gu.batch_job_check(job_id, self.queue.value())
         msg = 'Check batch status for ' + comment + ':\n'
         for line in lines :
             msg += line
@@ -124,7 +124,7 @@ class BatchJob (QtCore.QObject ) : # need in QtCore.QObject in order to connect 
         if job_id == None :
             self.batch_job_status = None
         else :
-            self.batch_job_status = gu.batch_job_status(job_id, self.queue)
+            self.batch_job_status = gu.batch_job_status(job_id, self.queue.value())
 
         if comment != '' :
             logger.info('Status for ' + comment + ': ' + str(self.batch_job_status), __name__) 

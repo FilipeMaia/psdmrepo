@@ -54,7 +54,7 @@ import CSPADImage           as     cspadimg
 #-----------------------------
 #from PkgPackage.PkgModule import PkgClass
 
-#import ConfigParameters as cp
+from CalibFileFinder import *
 
 #------------------------
 # Exported definitions --
@@ -499,6 +499,34 @@ def xtc_fname_for_all_chunks(path='e167-r0015-s00-c00.xtc') :
     fname_all = fields[0] + '-' + fields[1] + '-*.xtc'
     return fname_all
 
+
+#----------------------------------
+
+def list_of_calib_files_with_run_range(list_of_files) :
+
+    list_out = []
+    for file in list_of_files :
+        #print file,
+        str_range = run_range_from_calib_fname(file) 
+        if str_range is None : continue
+        list_out.append(str_range.replace('9999','end'))
+
+    for range in sorted(list_out) :
+        print range
+        
+
+
+        #beg = begin_run_from_calib_fname(file)
+        #if beg == None : continue
+        #dic_num_file[beg] = fname
+
+
+
+
+
+
+
+
 #----------------------------------
 # assumes: path = .../<inst>/<experiment>/calib
 # for example        /reg/d/psdm/CXI/cxitut13/calib
@@ -516,9 +544,24 @@ def get_text_content_of_calib_dir_for_detector(path, det='cspad', subdir='CsPad:
         return txt
 
     list_of_fnames = os.listdir(path)
+
     if list_of_fnames == [] :
         txt +='\n\nDirectory IS EMPTY!'        
         return txt
+
+    if level == 3 :
+
+       list_of_cfiles = list_of_sorted_calib_files_from_list_of_files(list_of_fnames)
+       dict_fname_range = dict_calib_file_actual_run_range(list_of_cfiles)
+
+       for cfile in list_of_cfiles :
+           #print cfile.get_basename()
+           fname = cfile.get_basename()
+           range = dict_fname_range[fname]
+           txt += '\n' + (level+1)*'    '
+           txt += '%s  run range %04d - %04d' % (fname.rjust(14), range[0], range[1])
+
+       return txt
 
     for i,file in enumerate(list_of_fnames) :
         fname_lower = file.lower()
@@ -526,15 +569,12 @@ def get_text_content_of_calib_dir_for_detector(path, det='cspad', subdir='CsPad:
         cond0 = level==0 and subdir in file
         cond1 = level==1 and det.lower()+'.'  in fname_lower
         cond2 = level==2 and (file == calib_type or calib_type is None)
-        cond3 = level==3
 
-        if not ( cond0 or cond1 or cond2 or cond3 ) : continue
+        if not ( cond0 or cond1 or cond2) : continue
         
-        if cond3 and i>0 : txt +='  ' + file # keep the list of files on the same line
-        else             : txt +='\n' + (level+1)*'    ' + file
+        txt +='\n' + (level+1)*'    ' + file
 
         path_to_child = os.path.join(path, file)
-
         if os.path.isdir(path_to_child) : txt += get_text_content_of_calib_dir_for_detector(path_to_child, det, subdir, level=level+1, calib_type=calib_type)
              
     return txt
@@ -983,7 +1023,11 @@ if __name__ == "__main__" :
 
     #print 'Test 1:\n' + get_text_content_of_calib_dir_for_detector(path='/reg/d/psdm/XPP/xpptut13/calibXXX', subdir='CsPad::CalibV1', det='CSPAD')
     #print 'Test 2:\n' + get_text_content_of_calib_dir_for_detector(path='/reg/d/psdm/XPP/xpptut13/calib/', subdir='CsPad2x2::CalibV1', det='CSPAD2x2')
-    print 'Test 3:\n' + get_text_content_of_calib_dir_for_detector(path='/reg/d/psdm/XPP/xpptut13/calib', subdir='CsPad::CalibV1', det='CSPAD', calib_type='tilt')
+#    print 'Test 3:\n' + get_text_content_of_calib_dir_for_detector(path='/reg/d/psdm/XPP/xpptut13/calib', subdir='CsPad::CalibV1', det='CSPAD', calib_type='tilt')
+
+    list_of_files = ['220-230.data', '220-end.data', '221-240.data', '528-end.data', '222-end.data', '659-800.data', '373-end.data', '79-end.data', '45-end.data'] 
+    list_of_calib_files_with_run_range(list_of_files)
+
 
     sys.exit ( "End of test" )
 

@@ -192,13 +192,13 @@ class FileNameManager :
     def path_peds_rms(self) :
         return self.path_prefix_dark() + 'peds-rms.txt'
 
-    def path_peds_aver_plot(self) :
-        return self.path_prefix_dark() + 'peds-aver-plot.png'
+    def path_peds_ave_plot(self) :
+        return self.path_prefix_dark() + 'peds-ave-plot.png'
 
 #-----------------------------
 
     def path_hotpix_mask(self) :
-        return self.path_prefix_dark() + 'hotpix-mask-thr-' \
+        return self.path_prefix_dark() + 'mask-hot-thr-' \
                + str(cp.mask_hot_thr.value()) + 'ADU.txt'
 
     def path_hotpix_mask_prefix(self) :
@@ -222,7 +222,7 @@ class FileNameManager :
     def  get_list_of_files_peds(self) :
         self.list_of_files_peds = self.get_list_of_files_peds_scan()
         self.list_of_files_peds+= self.get_list_of_files_peds_aver()
-        self.list_of_files_peds.append(self.path_peds_aver_plot())
+        self.list_of_files_peds.append(self.path_peds_ave_plot())
         #self.list_of_files_peds.append(self.path_dark_xtc())
         return self.list_of_files_peds
 
