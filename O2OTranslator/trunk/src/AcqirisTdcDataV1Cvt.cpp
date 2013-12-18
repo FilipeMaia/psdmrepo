@@ -72,11 +72,13 @@ AcqirisTdcDataV1Cvt::fillContainers(hdf5pp::Group group,
     const Pds::TypeId& typeId,
     const O2OXtcSrc& src)
 {
-  if ( size % H5Type::xtcSize(data) != 0 ) {
-    throw O2OXTCSizeException ( ERR_LOC, "Acqiris::TdcDataV1", H5Type::xtcSize(data), size ) ;
+  // the number of items is determined by XTC container size
+  const int itemSize = sizeof(Pds::Acqiris::TdcDataV1_Item);
+  if ( size % itemSize != 0 ) {
+    throw O2OXTCSizeException ( ERR_LOC, "Acqiris::TdcDataV1", itemSize, size ) ;
   }
 
-  size_t count = size / H5Type::xtcSize(data);
+  size_t count = size / itemSize;
   
   // store the data in the containers
   H5Type h5data(count, data);

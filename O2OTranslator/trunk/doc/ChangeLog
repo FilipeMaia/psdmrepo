@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-29-12
+2013-12-18 Andy Salnikov
+- fixing AcqirisTdcData converter, the length of the data is wrong
+  after DDL migration
+
 Tag: V00-29-11
 2013-12-12 Andy Salnikov
 - upgrade to pdsdata V07-02-10
