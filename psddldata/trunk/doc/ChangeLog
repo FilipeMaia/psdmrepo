@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-56
+2013-12-18 Matt
+- add Epix.ConfigV1,ElementV1 definitions
+
 Tag: V00-04-55
 2013-12-12 Andy
 - bug fix in Ipimb.ConfigV1.capacitorValues() method, it returned incorrect 
