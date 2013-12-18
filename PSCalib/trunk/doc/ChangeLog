@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-14
+2013-12-18 Andy
+- forgot to add unit test to svn
+
 Tag: V00-01-13
 2013-12-17 Andy
 - CalibFileFinder: bug fix for ordering of the intervals with common start
