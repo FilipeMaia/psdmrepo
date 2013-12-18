@@ -177,7 +177,6 @@ if save_cfg is not None:
     print "copied cfg file to: %s" % save_cfg
 
 psana_cmd = 'psana -c %s %s' % (cfg.name, ' '.join(psanaArgs))
-print psana_cmd
 os.system(psana_cmd)
 
 

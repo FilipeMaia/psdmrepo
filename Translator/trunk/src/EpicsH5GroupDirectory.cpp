@@ -324,8 +324,16 @@ void EpicsH5GroupDirectory::processEvent(PSEnv::EpicsStore & epicsStore,
     // we only expect time epics pv's
     boost::shared_ptr<Psana::Epics::EpicsPvTimeHeader> pvTime = epicsStore.getPV(pvName);
     if (not pvTime) {
-      MsgLog(logger(), warning, "epics writing only implement for Time pv's, but pv: " 
-             << pvName << " is not Time, pv will not be written.");
+      boost::shared_ptr<Psana::Epics::EpicsPvHeader> pvHdr = epicsStore.getPV(pvName);
+      if (not pvHdr) {
+        MsgLog(logger(), error, "no EpicsPvHeader associated with epics pv: " << pvName);
+      } else {
+        if (not pvHdr->isCtrl()) {
+          MsgLog(logger(), warning, "epics writing only implement for Time pv's, but pv: " 
+                 << pvName << " is neither Time (nor Ctrl) pv will not be written. dbr is "
+                 <<  pvHdr->dbrType());
+        }
+      }
       continue;
     }
     ostringstream debugMsg;

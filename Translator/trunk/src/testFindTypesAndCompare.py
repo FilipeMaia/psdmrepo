@@ -9,7 +9,7 @@ import tempfile
 def printAllTypes():  
   '''This function will produce a list of all the Psana types.
   It runs from the release directory and assumes that the psddldata
-  package is installed.  It assumes xml files.
+  package is installed.  It assumes xml files for the DDL.
   '''
   xmlFiles = glob.glob("data/psddldata/*.xml")  
   typeNames=set()
@@ -140,122 +140,6 @@ def getAllTypesList():
 # will map a type to a set of files that contain the type.  This is built with
 # the functions findNewData() and buildXtcFileList() by exploring what is on
 # disk at the time it is run.  
-#
-# Ticket 194 indicates a number of files that cover some of the data as well. If what 
-# is on disk is lacking, you can go through that ticket.  Here is a copy of that
-# ticket with notes:
-#
-# Files to try, per ticket 194
-# Acqiris ConfigV1, DataDescV1   dataset: exp=cxi78513:run=122:h5  but I already have this
-#      TdcConfigV1,  TdcDataV1   sxr16410, but I have this now, after restore restored run 105 12/4/2013
-# Andor ConfigV1 FrameV1 - I have this
-#
-# BLD data
-# BldDataFEEGasDetEnergy   dataset: exp=xpp77213:run=47  I have this
-# BldDataEBeamV0-4 I have these
-# BldDataPhaseCavity    dataset: exp=xpp77213:run=47 I have this
-# BldDataIpimbV0   
-# BldDataIpimbV1   dataset: exp=mec62812:run=570  *DON'T HAVE* RESTORING
-# BldDataPimV1
-# BldDataGMDV0    dataset: exp=mec62812:run=570 I have this
-# BldDataGMDV1    dataset: exp=sxrcom11:run=271 I have
-# Camera data
-# FrameFccdConfigV1
-#    this class was never fully defined 
-# FrameFexConfigV1  I have
-# FrameV1   dataset: exp=xpp77213:run=6  I have
-# TwoDGaussianV1
-#    no recent data on disk
-#    class is very simple, chances are that it is OK   *DON'T HAVE*
-# Control data
-# ConfigV1   exp=xppi0112:run=62  * accidentally restored *
-# ConfigV2     dataset: exp=xpp61412:run=100  I have
-# CsPad data ConfigV1     dataset: exp=xppcom10:run=670  *DON'T HAVE, RESTORING*
-# ConfigV2     dataset: exp=xppcom10:run=1010  I have
-# ConfigV3     dataset: exp=xpp34511:run=100  I have
-# ConfigV4      dataset: exp=cxi52212:run=160 I have
-# DataV1 #    dataset: exp=xppcom10:run=670 I have
-# DataV2 #     dataset: exp=xppcom10:run=1010  I have
-#     dataset: exp=cxi52212:run=160
-#    common mode is stored  * I DON'T HAVE COMMON MODE? *
-# CsPad2x2 data
-# ConfigV1
-# ConfigV2    dataset: exp=xpp77213:run=300 I have
-# ElementV1    dataset: exp=xpp77213:run=300 I have
-# Encoder data
-# ConfigV1    dataset: exp=sxr37111:run=279 I have
-# ConfigV2    dataset: exp=xpp61412:run=100 I have
-# DataV1  *DON't HAVE*
-# DataV2    dataset: exp=sxr37111:run=279 I have
-# Epics data  I have
-#    exp=amo52012:run=34 is interesting as it has EPICs data from 2 sources (AmoVMI.0:Opal1000.0 and EpicsArch.0:NoDevice.0) 
-# Evr data
-# ConfigV1
-# ConfigV2
-# ConfigV3
-# ConfigV4#    dataset: exp=xppcom10:run=613 I have
-# ConfigV5#    dataset: exp=amo40612:run=204 I have
-# ConfigV6#    dataset: exp=xppi0312:run=160 I have
-# ConfigV7#     dataset: exp=sxrcom11:run=280 I have
-# DataV3#     dataset: exp=amo40612:run=204 I have
-# IOConfigV1
-# FCCD data
-# FccdConfigV1
-# FccdConfigV2#   dataset: exp=sxrcom11:run=266 I have
-# Fli data
-# ConfigV1#    dataset: exp=mec55212:run=970 I have
-# FrameV1
-# Gsc16ai data# ConfigV1#     dataset: exp=xpp63412:run=100  *I DON'T HAVE, RESTORING*
-# DataV1
-# Ipimb data
-# ConfigV1
-# DataV1#    dataset: exp=sxr35810:run=97  I have
-# ConfigV2
-# DataV2#    dataset: exp=xppi0313:run=10  I have
-# Lusi
-# DiodeFexConfigV1#    dataset: exp=xppcom10:run=613 * I DON'T HAVE RESTORING*
-# DiodeFexConfigV2
-# DiodeFexV1#     dataset: exp=xppcom10:run=613 * I DON'T HAVE RESTORING*
-# IpmFexConfigV1#     dataset: exp=xppcom10:run=613  I have
-# IpmFexConfigV2         #    dataset: exp=xpp77213:run=6 I have
-# IpmFexV1  PimImageConfigV1     dataset: exp=xpp77213:run=6 I have
-# OceanOptics data
-# ConfigV1
-# DataV1#     dataset: exp=xpp66213:run=6  I have
-# Opal1k data
-# ConfigV1#    dataset: exp=xpp77213:run=130 I have
-# Orca data# ConfigV1
-# PNCCD data
-# ConfigV1
-# ConfigV2#    dataset: exp=sxr19710:run=362 I have
-# FullFrameV1#    dataset: exp=sxr19710:run=362 I have
-# FramesV1
-# Princeton data
-# ConfigV1#     dataset: exp=sxr35810:run=160  I have
-# ConfigV2#    dataset: exp=sxr40912:run=200  I have
-#    command: ./psana-diff.sh psana_examples.DumpPrinceton exp=sxr40912:run=200 -n 10
-# ConfigV3#    dataset: exp=mec62812:run=290 I have
-# ConfigV4#    dataset: exp=mec53212:run=450 *I DON'T HAVE, RESTORING*
-# ConfigV5#    dataset: exp=mec73313:run=599 I have
-# FrameV1
-# FrameV2
-# InfoV1
-# Pulnix data
-# TM6740ConfigV1
-# TM6740ConfigV2#    dataset: exp=xpp63412:run=20 I have
-# Quartz
-# ConfigV1#    dataset: exp=xpp61412:run=25  *I DON'T HAVE RESTORING *
-# Timepix data
-# ConfigV1
-# ConfigV2#    dataset: exp=xcsi0112:run=90  *I DON'T HAVE RESTORING *
-# ConfigV3#    dataset: exp=xcsi0113:run=30 *I DON'T HAVE RESTORING *
-# DataV1
-# DataV2
-# UsdUsb data
-# ConfigV1
-# DataV1#    dataset: exp=amo52012:run=34  I have
-#    note : dataset exp=amo52012:run=34 has zero-payload for UsdUsb? ConfigV1 object 
-
 
 masterType2Files = { 'Psana::Acqiris::ConfigV1': set(['Translator/data/amo64913-r182-s02-noDamage-dropped-OutOfOrder_Frame.xtc', 'Translator/data/amo64913-r182-s02-OutOfOrder_Frame.xtc', 'Translator/data/amo68413-r99-s02-userEbeamDamage.xtc']),
                      'Psana::Acqiris::DataDescV1': set(['Translator/data/amo64913-r182-s02-noDamage-dropped-OutOfOrder_Frame.xtc', 'Translator/data/amo64913-r182-s02-OutOfOrder_Frame.xtc', 'Translator/data/amo68413-r99-s02-userEbeamDamage.xtc']),
@@ -382,8 +266,6 @@ masterType2Files = { 'Psana::Acqiris::ConfigV1': set(['Translator/data/amo64913-
 # 'Psana::Timepix::ConfigV2',
 # 'Psana::Timepix::DataV1']
 
-
-
 def getType2Files():
   '''This returns the current list of Psana types and what files to find them in.
   If the list gets out of date, return an empty dict and have findNewData() go through
@@ -397,6 +279,8 @@ def getAllFiles2Test():
   allFiles = set()
   for fileSet in type2Files.values():
     allFiles.update(fileSet)
+  allFiles=list(allFiles)
+  allFiles.sort()
   return allFiles
   
 def sortMasterList():
@@ -405,7 +289,6 @@ def sortMasterList():
   keys.sort()
   for ky in keys:
     print "'%s': %r" % (ky, masterType2Files[ky])
-
 
 def typesInXtcFile(xtc, numEvents=120):
   '''Returns a set of the Psana types in the first numEvents of the xtc file.
@@ -584,89 +467,123 @@ def checkRestoredFiles():
 #    Ideally, see that psana dumps the xtc and h5 the same way
 #    Compare how it translates to o2o-translate
 
-allPsanaDumpModules = ['DumpAcqTdc','DumpAcqiris','DumpAlias','DumpAndor','DumpBld','DumpCamera','DumpControl','DumpCsad','DumpCsPad2x2','DumpEncoder','DumpEpics','DumpEpixSampler','DumpEvr','DumpFccd','DumpFli','DumpGsc16ai','DumpImp','DumpIpimb','DumpL3T','DumpLusi','DumpOceanOptics','DumpOpal1k','DumpOrca','DumpPnccd','DumpPrinceton','DumpPulnix','DumpQuartz','DumpRayonix','DumpTimepix','DumpUsdUsb']
-dumpModulesNoEpixSamplerRayonixEpics = 'psana_examples.DumpAcqTdc psana_examples.DumpAcqiris psana_examples.DumpAlias psana_examples.DumpAndor psana_examples.DumpBld psana_examples.DumpCamera psana_examples.DumpControl psana_examples.DumpCsPad psana_examples.DumpCsPad2x2 psana_examples.DumpEncoder  psana_examples.DumpEvr psana_examples.DumpFccd psana_examples.DumpFli psana_examples.DumpGsc16ai psana_examples.DumpImp psana_examples.DumpIpimb psana_examples.DumpL3T psana_examples.DumpLusi psana_examples.DumpOceanOptics psana_examples.DumpOpal1k psana_examples.DumpOrca psana_examples.DumpPnccd psana_examples.DumpPrinceton psana_examples.DumpPulnix psana_examples.DumpQuartz psana_examples.DumpTimepix psana_examples.DumpUsdUsb'
-dumpEpics = 'psana_examples.DumpEpics'
-
-def writePsanaDumpFiles(inputFile, dumpFile, epicsDumpFile, numEvents=5, verbose=True):
-
-  for moduleList,outFile in zip([dumpModulesNoEpixSamplerRayonixEpics,dumpEpics],
-                                [dumpFile,epicsDumpFile]):
-    cfgfile = tempfile.NamedTemporaryFile(suffix='.cfg',prefix='translator-unit-test')
-    cfgfile.write("[psana]\n")
-    cfgfile.write("modules = %s\n" % moduleList)
-    cfgfile.write("files = %s\n" % inputFile)
-    cfgfile.file.flush();
-    psana_cmd = 'psana -n %d -c %s > %s' % (numEvents, cfgfile.name, outFile)
-    if verbose:
-      print "outFile=%s psana_cmd=%s" % (outFile, psana_cmd)
-    p = sb.Popen(psana_cmd,shell=True, stdout=sb.PIPE, stderr=sb.PIPE)
-    o,e = p.communicate()
-    if verbose:
-      print o
-      print e
-
-def translate(xtcfile, h5file, numEvents=5, compress=1, shuffle='true', verbose=True):
-  cfgfile = tempfile.NamedTemporaryFile(suffix='.cfg',prefix='translator-unit-test')
-  cfgfile.write("[psana]\n")
-  cfgfile.write("modules = Translator.H5Output\n")
-  cfgfile.write("files = %s\n" % xtcfile)
-  cfgfile.write("[Translator.H5Output]\n")
-  cfgfile.write("output_file = %s\n" % h5file)
-  cfgfile.write("Epics=exclude\n")  # to exclude the epics::ConfigV1, to get things to look 
-                                      # more like o2o-translate
-  cfgfile.write("compress=%d\n" % compress)
-  cfgfile.write("shuffle=%s\n" % shuffle)
-  cfgfile.file.flush();
-  psana_cmd = 'psana -n %d -c %s' % (numEvents, cfgfile.name)
-  if verbose:
-    print "h5OutFile=%s psana_cmd=%s" % (h5file, psana_cmd)
-  p = sb.Popen(psana_cmd,shell=True, stdout=sb.PIPE, stderr=sb.PIPE)
+def captureOutput(cmd,outfile):
+  p = sb.Popen(cmd,shell=True, stdout=sb.PIPE, stderr=sb.PIPE)
   o,e = p.communicate()
-  if verbose:
-    print o
-    print e
-    
-def diffFiles(fileA, fileB, outfname):
-  cmd = 'diff %s %s' % (fileA, fileB)
-  p = sb.Popen(cmd, shell=True, stderr=sb.PIPE, stdout=sb.PIPE)
-  o,e = p.communicate()
-  fout = file(outfname,'w')
-  fout.write(o)
-  fout.write(e)
+  f = file(outfile,'w')
+  f.write(o)
+  f.close()
+  return e.strip()
 
-def testFile(xtcFile, prefix=''):
+def filterErr(err):
+  lns = [ ln.strip() for ln in err.split('\n') if len(ln.strip())>0]
+  lns = [ ln for ln in lns if ln.find('unrecognized experiment name:')<0]
+  lns = [ ln for ln in lns if ln.find('has no valid experiment number')<0]
+  lns = [ ln for ln in lns if ln.find('EpicsH5GroupDirectory')<0 and ln.find('is the same as existing group')<0]
+  lns = [ ln for ln in lns if ln.find('EpicsH5GroupDirectory')<0 and ln.find('has an empty target')<0]
+  lns = [ ln for ln in lns if ln.find('Corrupted XTC, size out of range, xtc payload size:')<0]
+  lns = [ ln for ln in lns if ln.find('H5Output.cpp')<0 and ln.find('has not been seen before.  Not writing blank.')<0]
+  if len(lns)>0:
+    raise Exception('\n'.join(lns))
+
+def testFile(xtcFile, prefix):
+  retDict = {}
   numEvents = 5
+  xtcBaseName = os.path.basename(xtcFile)
+  baseName = os.path.splitext(xtcBaseName)[0]
+
   # dump original xtc
-  dumpFile = prefix + os.path.basename(xtcFile)+'.psana_dump'
-  epicsDumpFile = prefix + os.path.basename(xtcFile)+'.psana_dump_epics'
-  writePsanaDumpFiles(xtcFile, dumpFile=dumpFile, epicsDumpFile=epicsDumpFile, numEvents=numEvents, verbose=True)
+  dumpFile = prefix + xtcBaseName + '.psana_dump'
+  epicsDumpFile = prefix + xtcBaseName + '.psana_dump_epics'
+  dumpAllXtcCmd = 'psana-dump -n %d %s' % (numEvents, xtcFile)
+  dumpEpicsXtcCmd = 'psana-dump -n %d %s --onlyEpics' % (numEvents, xtcFile)
+  filterErr(captureOutput(dumpAllXtcCmd, dumpFile))
+  filterErr(captureOutput(dumpEpicsXtcCmd, epicsDumpFile))
+  retDict.update({'xtcDumpAll':dumpFile,'xtcDumpEpics':epicsDumpFile,
+          'xtcDumpCmd':dumpAllXtcCmd,'xtcDumpEpicsCmd':dumpEpicsXtcCmd})
+
   # translate first few events
-  h5file = prefix + os.path.splitext(os.path.basename(xtcFile))[0] +'.h5'
-  translate(xtcFile, h5file=h5file, numEvents=numEvents, compress=-1, shuffle='false')
+  h5file = prefix + baseName +'.h5'
+  translateOutput = prefix + baseName  + '.psana-translate'
+  translateFirstEventsCmd = 'psana-translate -n %d %s --output_file=%s' % (numEvents, xtcFile, h5file)
+  print translateFirstEventsCmd
+  filterErr(captureOutput(translateFirstEventsCmd, translateOutput))
+  print "done"
+  retDict.update({'translateFew':translateFirstEventsCmd})
+
+  # dump h5 file
   h5Dump = h5file + '.psana_dump'
   h5EpicsDump = h5file + '.psana_dump_epics'
-  writePsanaDumpFiles(h5file, dumpFile=h5Dump, epicsDumpFile=h5EpicsDump, numEvents=numEvents, verbose=True)
-  diffFile = prefix + os.path.splitext(os.path.basename(xtcFile))[0] + '.psana_dump_diff'
-  epicsDiffFile = prefix + os.path.splitext(os.path.basename(xtcFile))[0] + '.psana_dump_epics_diff'
-  diffFiles(dumpFile, h5Dump, diffFile)
-  diffFiles(epicsDumpFile, h5EpicsDump, epicsDiffFile)
+  dumpAllH5Cmd = 'psana-dump -n %d %s' % (numEvents, h5file)
+  dumpEpicsH5Cmd = 'psana-dump -n %d %s --onlyEpics' % (numEvents, h5file)
+  filterErr(captureOutput(dumpAllH5Cmd, h5Dump))
+  filterErr(captureOutput(dumpEpicsH5Cmd, h5EpicsDump))
+  retDict.update({'h5DumpAll':h5Dump,'h5DumpEpics':h5EpicsDump,
+          'h5DumpCmd':dumpAllH5Cmd,'h5DumpEpicsCmd':dumpEpicsH5Cmd})
 
-  # compare longer translation
-  translate(xtcFile, h5file=h5file, numEvents=120, compress=-1, shuffle='false')
-  o2oH5file = prefix + 'o2o-' + os.path.splitext(os.path.basename(xtcFile))[0] + '.h5'
-  o2ocmd = 'o2o-translate -G --overwrite -n %s %s' % (o2oH5file, xtcFile)
-  os.system(o2ocmd)
-  compareLog = prefix + os.path.splitext(os.path.basename(xtcFile))[0] + '.compare_translation'
-  compareCmd = 'python Translator/src/compareTranslation.py %s %s --nostop > %s' % (o2oH5file, h5file, compareLog)
-  os.system(compareCmd)
+  # diff dumps between xtc and h5, grep out experiment warnings
+  diffFile = prefix + baseName  + '.psana_dump_diff'
+  epicsDiffFile = prefix + baseName  + '.psana_dump_epics_diff'
+  allDiffCmd = 'diff %s %s' % (dumpFile, h5Dump)
+  filterErr(captureOutput(allDiffCmd, diffFile))
+  epicsDiffCmd = 'diff %s %s' % (epicsDumpFile, h5EpicsDump)
+  filterErr(captureOutput(epicsDiffCmd, epicsDiffFile))
+  retDict.update({'diff':diffFile, 'epicsDiff':epicsDiffFile, 
+                  'diff_cmd':allDiffCmd,'epics_diff_cmd':epicsDiffCmd})
+  psanaDumpOfXtcAndHdf5Same = False
+  psanaEpicsDumpOfXtcAndHdf5Same = False
+  
+  if file(diffFile).read().strip()=='':
+    psanaDumpOfXtcAndHdf5Same = True
+  if file(epicsDiffFile).read().strip()=='':
+    psanaEpicsDumpOfXtcAndHdf5Same = True
+  retDict.update({'diff_same':psanaDumpOfXtcAndHdf5Same,
+                  'epics_same':psanaEpicsDumpOfXtcAndHdf5Same})
+
+  return retDict
+
+# compare longer translation, note, t
+#  psanaTranslateCmd = 'psana-translate -n 120 %s --output_file=%s -Epics=exclude' % (xtcFile, h5file)
+#  o2oTranslateCmd = 'o2o-translate -G --overwrite -n %s %s' % (o2oH5file, xtcFile)
+#  os.system(o2ocmd)
+#  compareLog = prefix + os.path.splitext(os.path.basename(xtcFile))[0] + '.compare_translation'
+#  compareCmd = 'python Translator/src/compareTranslation.py %s %s --nostop > %s' % (o2oH5file, h5file, compareLog)
+#  os.system(compareCmd)
 
 def testAllFiles():
-  files = list(testTypes.getAllFiles2Test())
+  files = getAllFiles2Test()
+  # alot of times epics will look differnet
+  expectedFailures = { # Belows file has FullFrame data that psana-translate does not translate
+                      '/reg/d/psdm/amo/amoc0113/xtc/e331-r0146-s00-c00.xtc':['diff_same'],  
+                      }
+  crashes = set(['/reg/d/psdm/sxr/sxr16410/xtc/e75-r0105-s00-c00.xtc'])
+  report = []
   for ii,fname in enumerate(files):
+    if ii < 38:
+      continue
+    if fname in crashes:
+      continue
     prefix = 'test_%0.3d_' % ii
-    print "**** %0.3d fname=%s ***" % (ii,fname)
-    testFile(fname,prefix)
+    print ("*** %3d %55s " % (ii,fname)),
+    retDict = testFile(fname,prefix)
+    print " dump diff = %5s  epics diff = %5s ***" % (retDict['diff_same'],retDict['epics_same'])
+    if not retDict['diff_same'] and (fname not in expectedFailures or ('diff_same' not in expectedFailures[fname])):
+      print "  diff dump failed:"
+      print "    diff dump: %s" % retDict['diff']
+      print "    dump xtc cmd:  %s" % retDict['xtcDumpCmd']
+      print "    create h5 cmd: %s" % retDict['translateFew']
+      print "    dump h5 cmd:   %s" % retDict['h5DumpCmd']
+#    if not retDict['epics_same']:
+#      print "  diff epics failed:"
+#      print "    epics diff dump:     %s" % retDict['epicsDiff']
+#      print "    epics dump xtc cmd:  %s" % retDict['xtcDumpEpicsCmd']
+#      print "    epics create h5 cmd: %s" % retDict['translateFew']
+#      print "    epics dump h5 cmd:   %s" % retDict['h5DumpEpicsCmd']
+      
+      
+        
+#    print '\n'.join(['%s=%s' % (k,v) for k,v in retDict.iteritems()])
+#    break
 
 if __name__ == "__main__":
 #  sortMasterList()
