@@ -54,6 +54,7 @@ CSPadImageProducer::CSPadImageProducer (const std::string& name)
   , m_str_src()
   , m_inkey()
   , m_imgkey()
+//, m_outtype()
   , m_tiltIsApplied()
   , m_print_bits()
   , m_count(0)
@@ -64,10 +65,13 @@ CSPadImageProducer::CSPadImageProducer (const std::string& name)
   m_str_src       = configStr("source",        "CxiDs1.0:Cspad.0");
   m_inkey         = configStr("key",           "");
   m_imgkey        = configStr("imgkey",        "image");
+//m_outtype       = configStr("outtype",       "float");
   m_tiltIsApplied = config   ("tiltIsApplied", true);
   m_print_bits    = config   ("print_bits",    0);
 
   m_source        = Source(m_str_src);
+
+//checkTypeImplementation();
 }
 
 
@@ -93,8 +97,10 @@ CSPadImageProducer::printInputParameters()
         << "\nsource        : "     << m_source      
         << "\nkey           : "     << m_inkey        
         << "\nimgkey        : "     << m_imgkey       
+      //<< "\nouttype       : "     << m_outtype
         << "\ntiltIsApplied : "     << m_tiltIsApplied
-        << "\nprint_bits    : "     << m_print_bits;
+        << "\nprint_bits    : "     << m_print_bits
+        << "\n";     
   }
 }
 
@@ -105,6 +111,7 @@ void
 CSPadImageProducer::beginJob(Event& evt, Env& env)
 {
   if( m_print_bits & 1 ) printInputParameters();
+  if( m_print_bits & 16) printSizeOfTypes();
 }
 
 //--------------------
@@ -239,6 +246,22 @@ CSPadImageProducer::procEvent(Event& evt, Env& env)
   if ( procCSPadNDArrForType <uint16_t> (evt) ) return;
 
   MsgLog(name(), warning, "procEvent(...): Psana::CsPad::DataV# / ElementV# for #=[2-5] is not available in this event.");
+}
+
+//--------------------
+
+void 
+CSPadImageProducer::checkTypeImplementation()
+{  
+  if ( m_outtype == "float"   ) { m_dtype = FLOAT;  return; }
+  if ( m_outtype == "double"  ) { m_dtype = DOUBLE; return; } 
+  if ( m_outtype == "int"     ) { m_dtype = INT;    return; } 
+  if ( m_outtype == "int16"   ) { m_dtype = INT16;  return; } 
+  if ( m_outtype == "int16_t" ) { m_dtype = INT16;  return; } 
+
+  const std::string msg = "The requested data type: " + m_outtype + " is not implemented";
+  MsgLog(name(), warning, msg );
+  throw std::runtime_error(msg);
 }
 
 //--------------------

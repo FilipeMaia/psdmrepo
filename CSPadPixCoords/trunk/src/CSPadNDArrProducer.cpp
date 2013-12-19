@@ -103,6 +103,7 @@ void
 CSPadNDArrProducer::beginJob(Event& evt, Env& env)
 {
   if( m_print_bits & 1 ) printInputParameters();
+  if( m_print_bits & 16) printSizeOfTypes();
 }
 
 //--------------------

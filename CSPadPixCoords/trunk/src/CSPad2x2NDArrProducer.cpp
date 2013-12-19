@@ -100,6 +100,7 @@ void
 CSPad2x2NDArrProducer::beginJob(Event& evt, Env& env)
 {
   if( m_print_bits & 1 ) printInputParameters();
+  if( m_print_bits & 16) printSizeOfTypes();
 }
 
 //--------------------

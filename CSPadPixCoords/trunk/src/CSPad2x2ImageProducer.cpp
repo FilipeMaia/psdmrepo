@@ -101,6 +101,7 @@ CSPad2x2ImageProducer::printInputParameters()
         << "\n source                : " << m_source
         << "\n inkey                 : " << m_inkey      
         << "\n outimgkey             : " << m_outimgkey
+        << "\n outtype               : " << m_outtype
         << "\n tiltIsApplied         : " << m_tiltIsApplied
         << "\n useWidePixCenter      : " << m_useWidePixCenter
         << "\n print_bits            : " << m_print_bits
@@ -119,7 +120,8 @@ CSPad2x2ImageProducer::printInputParameters()
 void 
 CSPad2x2ImageProducer::beginJob(Event& evt, Env& env)
 {
-  if( m_print_bits & 1 ) printInputParameters();
+  if( m_print_bits & 1 ) printInputParameters(); 
+  if( m_print_bits & 16) printSizeOfTypes();
 }
 
 //--------------------
@@ -210,60 +212,25 @@ CSPad2x2ImageProducer::getCalibPars(Event& evt, Env& env)
 void 
 CSPad2x2ImageProducer::processEvent(Event& evt, Env& env)
 {
-  shared_ptr<Psana::CsPad2x2::ElementV1> elem1 = evt.get(m_source, m_inkey, &m_src); // get m_src here
+  // Check if the requested src and key are consistent with Psana::CsPad2x2::ElementV1
+  if ( procCSPad2x2DataForType <Psana::CsPad2x2::ElementV1> (evt) ) return;
 
-  if (elem1) {
+  // Check if the requested src and key are consistent with ndarray<T,3> of shape [N][185][388]
+  if ( procCSPad2x2NDArrForType <float>    (evt) ) return;
+  if ( procCSPad2x2NDArrForType <double>   (evt) ) return;
+  if ( procCSPad2x2NDArrForType <int>      (evt) ) return;
+  if ( procCSPad2x2NDArrForType <int16_t>  (evt) ) return;
+  if ( procCSPad2x2NDArrForType <uint16_t> (evt) ) return;
 
-    for (unsigned i=0; i<PC2X2::N2X1_IN_DET; i++) m_common_mode[i] = elem1->common_mode(i);
-
-    const ndarray<const int16_t, 3>& data_nda = elem1->data();
-    //const int16_t* data = &data_nda[0][0][0];
-
-    this -> cspad_image_fill (data_nda);
-    this -> cspad_image_add_in_event(evt);
-  } // if (elem1)
+  MsgLog(name(), warning, "processEvent(...): cspad2x2 data or ndarr is not available in this event for source:" 
+         << m_source << " key:" << m_inkey);
 }
 
 //--------------------
 
-void
-CSPad2x2ImageProducer::cspad_image_fill(const ndarray<const int16_t,3>& data)
-{
-  std::fill_n(&m_arr_cspad2x2_image[0][0], int(NX_CSPAD2X2*NY_CSPAD2X2), double(0));
-
-  for(unsigned sect=0; sect < PC2X2::N2X1_IN_DET; ++sect) {
-    if ( !(m_roiMask & (1<<sect)) ) continue;
- 
-      for (unsigned r=0; r<PC2X2::ROWS2X1; ++r) {
-      for (unsigned c=0; c<PC2X2::COLS2X1; ++c) {
-
-        int ix = int (m_pix_coords_cspad2x2 -> getPixCoor_um (PC2X2::AXIS_X, sect, r, c) * PC2X2::UM_TO_PIX);
-        int iy = int (m_pix_coords_cspad2x2 -> getPixCoor_um (PC2X2::AXIS_Y, sect, r, c) * PC2X2::UM_TO_PIX);
-
-        if(ix <  0)           continue;
-        if(iy <  0)           continue;
-        if(ix >= NX_CSPAD2X2) continue;
-        if(iy >= NY_CSPAD2X2) continue;
-
-        m_arr_cspad2x2_image[ix][iy] += (double)data[r][c][sect]; 
-      }
-      }
-  }
-}
-
-//--------------------
 void
 CSPad2x2ImageProducer::cspad_image_add_in_event(Event& evt)
 {
-  // Compatability stuff
-  /*
-    if(m_outimgkey == "Image2D") {
-      shared_ptr< CSPadPixCoords::Image2D<double> > img2d( new CSPadPixCoords::Image2D<double>(&m_arr_cspad2x2_image[0][0], NY_CSPAD2X2, NX_CSPAD2X2) );
-      evt.put(img2d, m_src, m_outimgkey);
-      return;
-    }
-  */
-
   // Save image in the event for one of the supported data types
   if      ( m_outtype == "float"   ) save2DArrayInEventForType<float>   (evt); 
   else if ( m_outtype == "double"  ) save2DArrayInEventForType<double>  (evt); 
@@ -277,18 +244,16 @@ CSPad2x2ImageProducer::cspad_image_add_in_event(Event& evt)
 void 
 CSPad2x2ImageProducer::checkTypeImplementation()
 {  
-  if      ( m_outtype == "float"   ) return; 
-  else if ( m_outtype == "double"  ) return; 
-  else if ( m_outtype == "int"     ) return; 
-  else if ( m_outtype == "int16"   ) return; 
-  else if ( m_outtype == "int16_t" ) return; 
-  else {
-         const std::string msg = "The requested data type: " + m_outtype + " is not implemented";
-         MsgLog(name(), warning, msg );
-         throw std::runtime_error(msg);
-  }
-}
+  if ( m_outtype == "float"   ) { m_dtype = FLOAT;  return; }
+  if ( m_outtype == "double"  ) { m_dtype = DOUBLE; return; } 
+  if ( m_outtype == "int"     ) { m_dtype = INT;    return; } 
+  if ( m_outtype == "int16"   ) { m_dtype = INT16;  return; } 
+  if ( m_outtype == "int16_t" ) { m_dtype = INT16;  return; } 
 
+  const std::string msg = "The requested data type: " + m_outtype + " is not implemented";
+  MsgLog(name(), warning, msg );
+  throw std::runtime_error(msg);
+}
 
 //--------------------
 

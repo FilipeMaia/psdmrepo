@@ -11,6 +11,13 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-15
+2013-12-18 Mikhail S. Dubrovin
+- in CSPad2x2ImageProducer add image production from ndarray<T,3>
+	with saving image for different types
+- in all *Producer modules add print_bits = 16 for type syzes and char names
+- in CSPadImageProducer still keep the output type equal to the input type of ndarray<T,3>
+	
 Tag: V00-03-14
 2013-12-12 Mikhail S. Dubrovin
 - optimization of retreiving of configuration parameters

@@ -115,7 +115,7 @@ protected:
   void processEvent(Event& evt, Env& env);
 
   //void cspad_image_fill(const int16_t* data, CSPadPixCoords::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar);
-  void cspad_image_fill(const ndarray<const int16_t,3>& data);
+  //void cspad_image_fill(const ndarray<const int16_t,3>& data);
   void cspad_image_add_in_event(Event& evt);
   void checkTypeImplementation();
 
@@ -136,6 +136,7 @@ private:
   unsigned    m_print_bits;
   unsigned    m_count;
   unsigned    m_count_cfg;
+  DATA_TYPE   m_dtype;
 
   uint32_t m_roiMask;
   uint32_t m_numAsicsStored;
@@ -203,6 +204,79 @@ public:
 
       save2DArrayInEvent<TOUT>(evt, m_src, m_outimgkey, img_out);
   }
+
+//--------------------
+
+  template <typename T>
+  void cspad_image_fill(const ndarray<const T,3>& data)
+  {
+    std::fill_n(&m_arr_cspad2x2_image[0][0], int(NX_CSPAD2X2*NY_CSPAD2X2), double(0));
+  
+    for(unsigned sect=0; sect < PC2X2::N2X1_IN_DET; ++sect) {
+      if ( !(m_roiMask & (1<<sect)) ) continue;
+   
+        for (unsigned r=0; r<PC2X2::ROWS2X1; ++r) {
+        for (unsigned c=0; c<PC2X2::COLS2X1; ++c) {
+  
+          int ix = int (m_pix_coords_cspad2x2 -> getPixCoor_um (PC2X2::AXIS_X, sect, r, c) * PC2X2::UM_TO_PIX);
+          int iy = int (m_pix_coords_cspad2x2 -> getPixCoor_um (PC2X2::AXIS_Y, sect, r, c) * PC2X2::UM_TO_PIX);
+  
+          if(ix <  0)           continue;
+          if(iy <  0)           continue;
+          if(ix >= NX_CSPAD2X2) continue;
+          if(iy >= NY_CSPAD2X2) continue;
+
+          m_arr_cspad2x2_image[ix][iy] += (double)data[r][c][sect]; 
+        }
+        }
+    }
+  }
+
+//--------------------
+
+  template <typename TELEMENT>
+  bool procCSPad2x2DataForType (Event& evt) {
+
+    shared_ptr<TELEMENT> elem1 = evt.get(m_source, m_inkey, &m_src); // get m_src here
+
+    if (elem1) {
+
+      for (unsigned i=0; i<PC2X2::N2X1_IN_DET; i++) m_common_mode[i] = elem1->common_mode(i);
+
+      const ndarray<const int16_t, 3>& data_nda = elem1->data();
+      //const int16_t* data = &data_nda[0][0][0];
+
+      cspad_image_fill <int16_t> (data_nda);
+      cspad_image_add_in_event(evt);
+
+      return true; 
+    } // if (elem1)
+    return false;
+  }
+
+//--------------------
+
+  template <typename T>
+  bool procCSPad2x2NDArrForType (Event& evt) {
+ 
+    if( m_print_bits & 8 ) MsgLog(name(), warning, "Produce image from CSPAD array, source:" << m_source 
+                                  << " key:" << m_inkey << " data type:" << typeid(T).name() );
+    
+    shared_ptr< ndarray<T,3> > shp = evt.get(m_source, m_inkey, &m_src); // get m_src here
+    if (shp.get()) {
+    
+       const ndarray<T,3> inp_nda = *shp.get(); //const T* p_data = shp->data();
+
+       cspad_image_fill <T> (inp_nda);
+       cspad_image_add_in_event(evt);
+
+       return true;
+    } // if (shp.get())
+    return false;
+  }
+  
+//--------------------
+
 
 }; // class CSPad2x2ImageProducer
 

@@ -123,6 +123,7 @@ protected:
   void getCalibPars(Event& evt, Env& env);
   void procEvent(Event& evt, Env& env);
   void getCSPadConfigFromData(Event& evt);
+  void checkTypeImplementation();
 
   //void cspad_image_init();
   //void cspad_image_fill(const int16_t* data, CSPadPixCoords::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar);
@@ -141,9 +142,11 @@ private:
   Pds::Src    m_src;
   std::string m_inkey; 
   std::string m_imgkey;   // i.e. "CSPad:Image"
+  std::string m_outtype;
   bool     m_tiltIsApplied;
   unsigned m_print_bits;
   long     m_count;
+  DATA_TYPE   m_dtype;
 
   // Parameters form Psana::CsPad::ConfigV# object
   uint32_t m_numQuadsInConfig;
