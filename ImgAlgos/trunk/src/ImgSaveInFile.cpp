@@ -85,7 +85,8 @@ ImgSaveInFile::printInputParameters()
         << "\nsaveAll      : "     << m_saveAll
         << "\nfname        : "     << m_fname
         << "\nftype        : "     << m_file_type
-        << "\nm_print_bits : "     << m_print_bits;
+        << "\nm_print_bits : "     << m_print_bits
+        << "\n";
   }
 }
 
