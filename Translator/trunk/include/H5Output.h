@@ -103,6 +103,8 @@ protected:
   /// returns true if C++ type is an ndarray that the system can translate
   bool isNDArray(const type_info *typeInfoPtr);
 
+  void checkForNewWriters();
+
 private:
   hdf5pp::File m_h5file;
   ChunkManager m_chunkManager;

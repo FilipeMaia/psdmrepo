@@ -781,7 +781,7 @@ class H5Output( unittest.TestCase ) :
                         ('Ipimb::DataV2/XppSb2_Ipm','XppSb2_Ipm'),
                         ('Ipimb::DataV2/XppSb3_Ipm','XppSb3_Ipm')]
         for group,src in grpSrcList:
-            output_h5 = os.path.join(DATADIR,"unit-test_src_filter_include.h5")
+            output_h5 = os.path.join(DATADIR,"unit-test_src_filter_exclude.h5")
             cfgfile = writeCfgFile(TESTDATA_T1,output_h5)
             cfgfile.write("src_filter = exclude %s\n" % src)
             cfgfile.file.flush()
@@ -795,6 +795,24 @@ class H5Output( unittest.TestCase ) :
             includedGroups = [grpSrc[0] for grpSrc in grpSrcList if grpSrc[1] != src]
             for includedGroup in includedGroups:
                 grp = f['/Configure:0000/Run:0000/CalibCycle:0000/%s' % includedGroup]
+
+        if self.cleanUp:
+            os.unlink(output_h5)
+
+    def test_newWriter(self):
+        '''check newWriter capability
+        '''
+        output_h5 = os.path.join(DATADIR,"unit-test_newwriter.h5")
+        cfgfile = writeCfgFile(TESTDATA_T1,output_h5,
+                               moduleList='Translator.TestNewHdfWriter Translator.H5Output')
+        cfgfile.file.flush()
+        self.runPsanaOnCfg(cfgfile,output_h5)
+        f=h5py.File(output_h5,'r')
+            
+        MyData = f['/Configure:0000/Run:0000/CalibCycle:0000/Translator::MyData/Translator.TestNewHdfWriter/data']
+        self.assertEqual(len(MyData),2)
+        self.assertEqual(MyData['eventCounter'][0],1)
+        self.assertEqual(MyData['eventCounter'][1],2)
 
         if self.cleanUp:
             os.unlink(output_h5)

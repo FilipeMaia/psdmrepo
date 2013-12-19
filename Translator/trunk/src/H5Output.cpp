@@ -23,7 +23,7 @@
 #include "Translator/H5Output.h"
 #include "Translator/H5GroupNames.h"
 #include "Translator/doNotTranslate.h"
-
+#include "Translator/HdfWriterNewDataFromEvent.h"
 
 using namespace Translator;
 using namespace std;
@@ -381,12 +381,41 @@ void H5Output::setEventVariables(Event &evt, Env &env) {
   setDamageMapFromEvent();
 }
 
+void H5Output::checkForNewWriters() {
+  list<EventKey> eventKeys = m_event->keys();
+  list<EventKey>::iterator keyIter;
+  for (keyIter = eventKeys.begin(); keyIter != eventKeys.end(); ++keyIter) {
+    EventKey &eventKey = *keyIter;
+    const std::type_info & keyCppType = *eventKey.typeinfo();
+    if (keyCppType == typeid(Translator::HdfWriterNew)) {
+      const Pds::Src &src = eventKey.src();
+      const string &key = eventKey.key();
+      boost::shared_ptr<Translator::HdfWriterNew> newWriter = m_event->get(src,key);
+      if (not newWriter) {
+        MsgLog(logger(),error," unexpected: could not retrieve new writer");
+        return;
+      }
+      const std::type_info * newType = newWriter->typeInfoPtr();
+      MsgLog(logger(),trace," new hdf5 writer found for type: "
+             << PSEvt::TypeInfoUtils::typeInfoRealName(newType)
+             << " key: " << key);
+      boost::shared_ptr<HdfWriterNewDataFromEvent> newWriterFromEvent = 
+        boost::make_shared<HdfWriterNewDataFromEvent>(*newWriter,key);
+      // overwrite the old writer if it is there.
+      if (m_hdfWriters.find(newType) != m_hdfWriters.end()) {
+        MsgLog(logger(), warning, " overwriting previous writer");
+      }
+      m_hdfWriters[newType] = newWriterFromEvent;
+    }
+  }
+}
+
 //////////////////////////////////////////////////////////
 // Event Processing processing - Module methods
 
 void H5Output::beginJob(Event& evt, Env& env) 
 {
-  MsgLog(logger(),trace,name() << ": beginJob()");
+  MsgLog(logger(),trace,"H5Output beginJob()");
   setEventVariables(evt,env);
 
   // record some info from the env
@@ -396,6 +425,7 @@ void H5Output::beginJob(Event& evt, Env& env)
   m_h5file.createAttr<const char*> ("jobName").store ( env.jobName().c_str() ) ;
 
   m_currentRunCounter = 0;
+  checkForNewWriters();
   createNextConfigureGroup();
   m_configureGroupDir.clearMaps();
   m_chunkManager.beginJob(env);
@@ -635,9 +665,9 @@ bool H5Output::checkForAndProcessExcludeEvent() {
 void H5Output::eventImpl() 
 {
   static const string eventImpl("eventImpl");
+  m_epicsGroupDir.processEvent(m_env->epicsStore(), m_eventId);
   bool filteredEvent = checkForAndProcessExcludeEvent();
   if (filteredEvent) return;
-  m_epicsGroupDir.processEvent(m_env->epicsStore(), m_eventId);
   list<EventKeyTranslation> toTranslate = setEventKeysToTranslate(true);
   vector<pair<Pds::Src,Pds::Damage> > droppedContribs = m_damageMap->getSrcDroppedContributions();
   bool splitEvent = droppedContribs.size()>0;

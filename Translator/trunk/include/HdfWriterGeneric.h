@@ -103,6 +103,10 @@ class HdfWriterGeneric {
   void store_at(hid_t groupId, long storeIndex, const std::string & dsetName, const void * data);
 
   void closeDatasets(hid_t groupId);
+
+  std::map<std::string, hid_t> getDatasetNameToH5TypeMap(hid_t groupId);
+
+ protected:
   hid_t getDatasetId(hid_t groupId, size_t dsetIndex);
   hid_t getDatasetId(hid_t groupId, const std::string &dsetName);
 

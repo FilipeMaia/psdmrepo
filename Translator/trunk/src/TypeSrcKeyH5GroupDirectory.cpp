@@ -259,7 +259,9 @@ SrcKeyGroup & TypeSrcKeyH5GroupDirectory::addSrcKeyGroup(const PSEvt::EventKey &
     if (srcKeyGroupName.size()>0) srcKeyGroupName += "_";
     srcKeyGroupName += eventKey.key();
   }
-  if (srcKeyGroupName.size()==0) MsgLog(logger,fatal,"addSrcKeyGroup: EventKey= " << eventKey << " group name is blank.  Cannot create group.");
+  if (srcKeyGroupName.size()==0) {
+    srcKeyGroupName = "anysrc";
+  }
   hdf5pp::Group typeH5Group = typeGroup.group();
   hdf5pp::Group srcH5Group = typeH5Group.createGroup(srcKeyGroupName);
   uint64_t srcVal = (uint64_t(src.phy()) << 32) + src.log();

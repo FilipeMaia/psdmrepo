@@ -580,8 +580,7 @@ def testAllFiles():
 #      print "    epics create h5 cmd: %s" % retDict['translateFew']
 #      print "    epics dump h5 cmd:   %s" % retDict['h5DumpEpicsCmd']
       
-      
-        
+    
 #    print '\n'.join(['%s=%s' % (k,v) for k,v in retDict.iteritems()])
 #    break
 
