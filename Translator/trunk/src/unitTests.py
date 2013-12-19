@@ -613,6 +613,53 @@ class H5Output( unittest.TestCase ) :
         if self.cleanUp:
             os.unlink(output_h5)
 
+    def test_doNotTranslate_addKey(self):
+        '''
+        '''
+        output_h5 = os.path.join(DATADIR,"unit-test-donottranslate.h5")
+        cfgfile = writeCfgFile(TESTDATA_T1,output_h5,"Translator.TestModuleDoNotTranslate Translator.H5Output")
+        cfgfile.write("[Translator.TestModuleDoNotTranslate]\n")
+        cfgfile.write("skip=0 1\n")
+        msg0='message0'
+        msg1='message1thisIsALongerMessage'
+        cfgfile.write("messages=%s %s\n"% (msg0, msg1))
+        cfgfile.write("key=mytest\n");
+        cfgfile.file.flush()
+        try:
+            self.runPsanaOnCfg(cfgfile,output_h5)
+        except:
+            cfgfile.close()
+            if os.path.exists(output_h5):
+                os.unlink(output_h5)
+            raise
+        f=h5py.File(output_h5,'r')
+        # make sure event data is not present:
+        with self.assertRaises(KeyError):
+            f['/Configure:0000/Run:0000/CalibCycle:0000/Ipimb::DataV2']
+        with self.assertRaises(KeyError):
+            f['/Configure:0000/Run:0000/CalibCycle:0000/EvrData::DataV3']
+            
+        # make sure data for filtered group is present
+        filteredEventIds = f['/Configure:0000/Run:0000/Filtered:0000/time']
+        self.assertTrue(len(filteredEventIds)==2 and
+                        filteredEventIds['seconds'][0]==1364147551 and
+                         filteredEventIds['seconds'][1]==1364147551 and
+                         filteredEventIds['nanoseconds'][0]==107587445 and
+                         filteredEventIds['nanoseconds'][1]==174323092, 
+                        msg="time dataset not right in Filtered:0000/time")
+        filteredMsgs = map(str,f['/Configure:0000/Run:0000/Filtered:0000/std::string/mytest/data'])
+        self.assertEqual(filteredMsgs[0],msg0)
+        self.assertEqual(filteredMsgs[1],msg1)
+        filteredMsgsEventIds = f['/Configure:0000/Run:0000/Filtered:0000/std::string/mytest/time']
+        self.assertTrue(len(filteredMsgsEventIds)==2 and
+                        filteredMsgsEventIds['seconds'][0]==1364147551 and
+                         filteredMsgsEventIds['seconds'][1]==1364147551 and
+                         filteredMsgsEventIds['nanoseconds'][0]==107587445 and
+                         filteredMsgsEventIds['nanoseconds'][1]==174323092, 
+                        msg="time dataset not right in Filtered:0000/std::string/anysrc/time")
+        if self.cleanUp:
+            os.unlink(output_h5)
+        
     def test_doNotTranslate(self):
         '''
         '''
@@ -625,16 +672,38 @@ class H5Output( unittest.TestCase ) :
         cfgfile.write("messages=%s %s\n"% (msg0, msg1))
         cfgfile.file.flush()
         try:
-            self.runPsanaOnCfg(cfgfile,output_h5,extraOpts='-v')
+            self.runPsanaOnCfg(cfgfile,output_h5)
         except:
             cfgfile.close()
             if os.path.exists(output_h5):
                 os.unlink(output_h5)
             raise
         f=h5py.File(output_h5,'r')
-        filteredMsgs = map(str,f['/Configure:0000/Run:0000/CalibCycle:0000/filtered/data'])
+        
+        # make sure event data is not present:
+        with self.assertRaises(KeyError):
+            f['/Configure:0000/Run:0000/CalibCycle:0000/Ipimb::DataV2']
+        with self.assertRaises(KeyError):
+            f['/Configure:0000/Run:0000/CalibCycle:0000/EvrData::DataV3']
+            
+        # make sure filtered data is present
+        filteredEventIds = f['/Configure:0000/Run:0000/Filtered:0000/time']
+        self.assertTrue(len(filteredEventIds)==2 and
+                        filteredEventIds['seconds'][0]==1364147551 and
+                         filteredEventIds['seconds'][1]==1364147551 and
+                         filteredEventIds['nanoseconds'][0]==107587445 and
+                         filteredEventIds['nanoseconds'][1]==174323092, 
+                        msg="time dataset not right in Filtered:0000/time")
+        filteredMsgs = map(str,f['/Configure:0000/Run:0000/Filtered:0000/std::string/no_src/data'])
         self.assertEqual(filteredMsgs[0],msg0)
         self.assertEqual(filteredMsgs[1],msg1)
+        filteredMsgsEventIds = f['/Configure:0000/Run:0000/Filtered:0000/std::string/no_src/time']
+        self.assertTrue(len(filteredMsgsEventIds)==2 and
+                        filteredMsgsEventIds['seconds'][0]==1364147551 and
+                         filteredMsgsEventIds['seconds'][1]==1364147551 and
+                         filteredMsgsEventIds['nanoseconds'][0]==107587445 and
+                         filteredMsgsEventIds['nanoseconds'][1]==174323092, 
+                        msg="time dataset not right in Filtered:0000/std::string/anysrc/time")
         if self.cleanUp:
             os.unlink(output_h5)
         

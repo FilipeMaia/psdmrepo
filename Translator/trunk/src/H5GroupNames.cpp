@@ -1,4 +1,5 @@
 #include "Translator/H5GroupNames.h"
+#include "Translator/doNotTranslate.h"
 
 #include <string>
 #include <sstream>
@@ -102,8 +103,7 @@ H5GroupNames::H5GroupNames(bool short_bld_name, const TypeAliases::TypeInfoSet &
     m_ndarrays(ndarrays) 
 {}
 
-string H5GroupNames::nameForType(const std::type_info *typeInfoPtr)
-{
+string H5GroupNames::nameForType(const std::type_info *typeInfoPtr) {
   if (m_ndarrays.find(typeInfoPtr) != m_ndarrays.end()) return "NDArray";
   string realName = PSEvt::TypeInfoUtils::typeInfoRealName(typeInfoPtr);
   string::size_type leftParenIdx = realName.find("(");
@@ -134,6 +134,20 @@ string H5GroupNames::nameForType(const std::type_info *typeInfoPtr)
   
 string H5GroupNames::nameForSrc(const Pds::Src &src) {
   return ::srcName(src,false,false);
+}
+
+std::string H5GroupNames::nameForSrcKey(const Pds::Src &src, const std::string &key) {
+  string srcKeyGroupName = nameForSrc(src);
+  string keyStringToAdd;
+  hasDoNotTranslatePrefix(key,&keyStringToAdd);
+  if (keyStringToAdd.size()>0) {
+    if (srcKeyGroupName.size()>0) srcKeyGroupName += "_";
+    srcKeyGroupName += keyStringToAdd;
+  }
+  if (srcKeyGroupName.size()==0) {
+    srcKeyGroupName = "no_src";
+  }
+  return srcKeyGroupName;
 }
 
 } // namespace Translator

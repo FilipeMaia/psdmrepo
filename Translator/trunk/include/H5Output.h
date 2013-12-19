@@ -86,11 +86,11 @@ protected:
   boost::shared_ptr<HdfWriterFromEvent> checkTranslationFilters(const EventKey &eventKey, 
                                                            bool checkForCalibratedKey);
   std::list<PSEvt::EventKey> getUpdatedConfigKeys();
-  std::list<EventKeyTranslation> setEventKeysToTranslate(bool checkForCalibratedKey);
+  void setEventKeysToTranslate(std::list<EventKeyTranslation> & toTranslate,
+                               std::list<PSEvt::EventKey> &filtered);
   
-  void addToFilteredEventDataset(const PSEvt::EventId &eventId, const std::string &msg);
+  void addToFilteredEventGroup(const std::list<EventKey> &eventKeys, const PSEvt::EventId &eventId);
   void closeH5File();
-  bool checkForAndProcessExcludeEvent();
 
   bool srcIsFiltered(const Pds::Src &);
   bool stringKeyIsFiltered(const std::string &key);
@@ -117,16 +117,16 @@ private:
   hdf5pp::Group m_currentConfigureGroup;
   hdf5pp::Group m_currentRunGroup;
   hdf5pp::Group m_currentCalibCycleGroup;
-  hid_t m_currentFilteredGroup;
+  hdf5pp::Group m_currentFilteredGroup;
 
   TypeSrcKeyH5GroupDirectory m_configureGroupDir;
   TypeSrcKeyH5GroupDirectory m_calibCycleConfigureGroupDir;
   TypeSrcKeyH5GroupDirectory m_calibCycleEventGroupDir;
+  TypeSrcKeyH5GroupDirectory m_calibCycleFilteredGroupDir;
   EpicsH5GroupDirectory m_epicsGroupDir;
 
   boost::shared_ptr<HdfWriterEventId> m_hdfWriterEventId;
   boost::shared_ptr<HdfWriterDamage> m_hdfWriterDamage;
-  boost::shared_ptr<HdfWriterString> m_hdfWriterFilterMsg;
 
   boost::shared_ptr<PSEvt::DamageMap> m_damageMap;
   Event *m_event;

@@ -135,7 +135,6 @@ H5Output::H5Output(string moduleName) : Module(moduleName),
                                         m_currentEventCounter(0),
                                         m_filteredEventsThisCalibCycle(0),
                                         m_maxSavedPreviousSplitEvents(0),
-                                        m_currentFilteredGroup(-1),
                                         m_event(0),
                                         m_env(0),
                                         m_totalConfigStoreUpdates(-1),
@@ -148,16 +147,16 @@ H5Output::H5Output(string moduleName) : Module(moduleName),
   initializeCalibratedTypes();
   m_hdfWriterEventId = boost::make_shared<HdfWriterEventId>();
   m_hdfWriterDamage = boost::make_shared<HdfWriterDamage>();
-  m_hdfWriterFilterMsg = boost::make_shared<HdfWriterString>();
   m_hdfWriterEventId->setDatasetCreationProperties(m_eventIdCreateDsetProp);
   m_hdfWriterDamage->setDatasetCreationProperties(m_damageCreateDsetProp);
-  m_hdfWriterFilterMsg->setDatasetCreationProperties(m_stringCreateDsetProp);
   m_epicsGroupDir.initialize(m_storeEpics,
                              m_hdfWriterEventId,
                              m_epicsPvCreateDsetProp);
   m_configureGroupDir.setEventIdAndDamageWriters(m_hdfWriterEventId,m_hdfWriterDamage);
   m_calibCycleConfigureGroupDir.setEventIdAndDamageWriters(m_hdfWriterEventId,m_hdfWriterDamage);
   m_calibCycleEventGroupDir.setEventIdAndDamageWriters(m_hdfWriterEventId,m_hdfWriterDamage);
+  boost::shared_ptr<HdfWriterDamage> nullHdfWriterDamage;
+  m_calibCycleFilteredGroupDir.setEventIdAndDamageWriters(m_hdfWriterEventId,nullHdfWriterDamage);
   TypeAliases::Alias2TypesMap::const_iterator pos = m_typeAliases.alias2TypesMap().find("ndarray_types");
   if (pos == m_typeAliases.alias2TypesMap().end()) MsgLog(logger(), fatal, "The TypeAliases map does not include ndarray_types as a key");
   if ((pos->second).size() == 0) MsgLog(logger(), fatal, "There are no types assigned to the  'ndarray_types' alias in the TypeAliases map");
@@ -165,6 +164,7 @@ H5Output::H5Output(string moduleName) : Module(moduleName),
   m_configureGroupDir.setH5GroupNames(m_h5groupNames);
   m_calibCycleConfigureGroupDir.setH5GroupNames(m_h5groupNames);
   m_calibCycleEventGroupDir.setH5GroupNames(m_h5groupNames);
+  m_calibCycleFilteredGroupDir.setH5GroupNames(m_h5groupNames);
   initializeSrcAndKeyFilters();
   openH5OutputFile();
 }
@@ -449,6 +449,7 @@ void H5Output::beginCalibCycle(Event& evt, Env& env)
   createNextCalibCycleGroup();
   m_calibCycleEventGroupDir.clearMaps();
   m_calibCycleConfigureGroupDir.clearMaps();
+  m_calibCycleFilteredGroupDir.clearMaps();
   m_currentEventCounter = 0;
   m_filteredEventsThisCalibCycle = 0;
   m_chunkManager.beginCalibCycle(env);
@@ -565,10 +566,11 @@ list<EventKey> H5Output::getUpdatedConfigKeys() {
   return updatedConfigKeys;
 }
 
-list<EventKeyTranslation> H5Output::setEventKeysToTranslate(bool checkForCalibratedKey) {
+void H5Output::setEventKeysToTranslate(list<EventKeyTranslation> & toTranslate, 
+                                       list<EventKey> &filtered) {
   const string toAdd("setEventKeysToTranslate");
-  list<EventKeyTranslation> toTranslate;
-
+  toTranslate.clear();
+  filtered.clear();
   list<EventKey> eventKeysFromEvent = m_event->keys();
   WithMsgLog(logger(toAdd), debug, str) {
     str << toAdd << " eventKeysFromEvent:";
@@ -586,28 +588,63 @@ list<EventKeyTranslation> H5Output::setEventKeysToTranslate(bool checkForCalibra
     }
   }
   set<EventKey> nonBlanks;
-
-  typedef enum {ConfigList=0, EventList=1} ListType;
-  for (int listType = ConfigList; listType <= EventList; ++listType) {
-    list<EventKey> &eventKeys = updatedConfigKeys;
-    DataTypeLoc dataTypeLoc = inConfigStore;
-    if (listType == EventList) {
-      eventKeys = eventKeysFromEvent;
-      dataTypeLoc = inEvent;
-    }
-    list<EventKey>::iterator keyIter;
-    for (keyIter = eventKeys.begin(); keyIter != eventKeys.end(); ++keyIter) {
-
-      boost::shared_ptr<HdfWriterFromEvent> hdfWriter = checkTranslationFilters(*keyIter, 
-                                                                        checkForCalibratedKey);
-      if (not hdfWriter) continue;
-      Pds::Damage damage = getDamageForEventKey(*keyIter);
-      toTranslate.push_back(EventKeyTranslation(*keyIter, damage, hdfWriter,
-                                                EventKeyTranslation::NonBlank, 
-                                                dataTypeLoc));
-      nonBlanks.insert(*keyIter);
-    }
+  list<EventKey>::iterator keyIter;
+  for (keyIter = updatedConfigKeys.begin(); keyIter != updatedConfigKeys.end(); ++keyIter) {
+    boost::shared_ptr<HdfWriterFromEvent> hdfWriter = checkTranslationFilters(*keyIter,false);
+    if (not hdfWriter) continue;
+    Pds::Damage damage = getDamageForEventKey(*keyIter);
+    toTranslate.push_back(EventKeyTranslation(*keyIter, damage, hdfWriter,
+                                              EventKeyTranslation::NonBlank, 
+                                              inConfigStore));
+    nonBlanks.insert(*keyIter);
   }
+
+  bool eventIsFiltered = false;
+  list<EventKeyTranslation> toTranslateFromEvent;
+  for (keyIter = eventKeysFromEvent.begin(); keyIter != eventKeysFromEvent.end(); ++keyIter) {
+    bool eventFilterKey = hasDoNotTranslatePrefix(keyIter->key());
+    if (eventFilterKey) {
+      filtered.push_back(*keyIter);
+      eventIsFiltered = true;
+      continue;
+    }
+    if (eventIsFiltered) continue;
+
+    boost::shared_ptr<HdfWriterFromEvent> hdfWriter = checkTranslationFilters(*keyIter,true);
+    if (not hdfWriter) continue;
+
+    Pds::Damage damage = getDamageForEventKey(*keyIter);
+    toTranslateFromEvent.push_back(EventKeyTranslation(*keyIter, damage, hdfWriter,
+                                                       EventKeyTranslation::NonBlank, 
+                                                       inEvent));
+    nonBlanks.insert(*keyIter);
+  }
+
+  // if the event is filtered, still return updated config keys, but nothing from the
+  // event for translation to the CalibCycle group - the filtered list will contain any
+  // data to go to the filtered group
+  if (eventIsFiltered) {
+    WithMsgLog(logger(toAdd),trace,str) {
+      str << " event is filtered, filtered key list: ";
+      list<PSEvt::EventKey>::iterator pos;
+      for (pos = filtered.begin(); pos != filtered.end(); ++pos) {
+        str << *pos << ", ";
+      }
+    }
+    WithMsgLog(logger(toAdd),trace,str) {
+      str << " EventKeyTranslation list: ";
+      list<EventKeyTranslation>::iterator pos;
+      for (pos = toTranslate.begin(); pos != toTranslate.end(); ++pos) {
+        EventKeyTranslation & eventKeyTranslation = *pos;
+        str << eventKeyTranslation;
+        str << ", ";
+      }
+    }
+    return;
+  }
+
+  toTranslate.splice(toTranslate.end(), toTranslateFromEvent);
+
   // now add data that should get blanks due to damage
   PSEvt::DamageMap::iterator damagePos;
   for (damagePos = m_damageMap->begin(); damagePos != m_damageMap->end(); ++damagePos) {
@@ -617,15 +654,15 @@ list<EventKeyTranslation> H5Output::setEventKeysToTranslate(bool checkForCalibra
     bool alreadyAddedAsNonBlank = nonBlanks.find(eventKey) != nonBlanks.end();
     if (alreadyAddedAsNonBlank) continue;
 
-    boost::shared_ptr<HdfWriterFromEvent> hdfWriter = checkTranslationFilters(eventKey, 
-                                                                         checkForCalibratedKey);
+    boost::shared_ptr<HdfWriterFromEvent> hdfWriter = checkTranslationFilters(eventKey, true);
     if (not hdfWriter) continue;
+
     toTranslate.push_back(EventKeyTranslation(eventKey,damage,hdfWriter,
                                               EventKeyTranslation::Blank,
                                               inEvent));
   }
   WithMsgLog(logger(toAdd),trace,str) {
-    str << "checkForCalib= " << checkForCalibratedKey << " EventKeyTranslation list: ";
+    str << " EventKeyTranslation list: ";
     list<EventKeyTranslation>::iterator pos;
     for (pos = toTranslate.begin(); pos != toTranslate.end(); ++pos) {
       EventKeyTranslation & eventKeyTranslation = *pos;
@@ -633,42 +670,49 @@ list<EventKeyTranslation> H5Output::setEventKeysToTranslate(bool checkForCalibra
       str << ", ";
     }
   }
-  return toTranslate;
 }
 
-void H5Output::addToFilteredEventDataset(const PSEvt::EventId &eventId, const string & msg) {
+void H5Output::addToFilteredEventGroup(const list<EventKey> &eventKeys, const PSEvt::EventId &eventId) {
   if (m_filteredEventsThisCalibCycle==0) {
-    hid_t calibGroup = m_currentCalibCycleGroup.id();
-    m_currentFilteredGroup = H5Gcreate(calibGroup, "filtered",
-                            H5P_DEFAULT, // propery list for link creation
-                            H5P_DEFAULT, // group creation
-                            H5P_DEFAULT);  // group access, not implemented in hdf5
-    if (m_currentFilteredGroup < 0) throw hdf5pp::Hdf5CallException(ERR_LOC,"Could not create filtered group");
+    char filteredGroupName[128];
+    sprintf(filteredGroupName,"Filtered:%4.4lu", m_currentCalibCycleCounter);
+    m_currentFilteredGroup = m_currentRunGroup.createGroup(filteredGroupName);
     m_hdfWriterEventId->make_dataset(m_currentFilteredGroup);
-    m_hdfWriterFilterMsg->make_dataset(m_currentFilteredGroup);
   }
-  m_hdfWriterEventId->append(m_currentFilteredGroup, eventId);
-  m_hdfWriterFilterMsg->append(m_currentFilteredGroup, msg);
   ++m_filteredEventsThisCalibCycle;
-}
-
-bool H5Output::checkForAndProcessExcludeEvent() {
-  boost::shared_ptr<Translator::ExcludeEvent> excludeEvent = m_event->get();
-  if (excludeEvent) {
-    addToFilteredEventDataset(*m_eventId,excludeEvent->getMsg());
-    MsgLog(logger(),trace,"exclude event found " << eventPosition());
-    return true;
+  m_hdfWriterEventId->append(m_currentFilteredGroup, eventId);
+  list<EventKey>::const_iterator iter;
+  for (iter = eventKeys.begin(); iter != eventKeys.end(); ++iter) {
+    const PSEvt::EventKey &eventKey = *iter;
+    boost::shared_ptr<HdfWriterFromEvent> hdfWriter = checkTranslationFilters(eventKey, true);
+    if (not hdfWriter) continue;
+    const std::type_info * typeInfoPtr = eventKey.typeinfo();
+    TypeMapContainer::iterator typePos = m_calibCycleFilteredGroupDir.findType(typeInfoPtr);
+    if (typePos == m_calibCycleFilteredGroupDir.endType()) {
+      m_calibCycleFilteredGroupDir.addTypeGroup(typeInfoPtr, m_currentFilteredGroup);
+    }
+    SrcKeyMap::iterator srcKeyPos = m_calibCycleFilteredGroupDir.findSrcKey(eventKey);
+    if (srcKeyPos == m_calibCycleFilteredGroupDir.endSrcKey(typeInfoPtr)) {
+      SrcKeyGroup & srcKeyGroup = m_calibCycleFilteredGroupDir.addSrcKeyGroup(eventKey,hdfWriter);
+      srcKeyGroup.make_datasets(inEvent, *m_event, *m_env, m_defaultCreateDsetProp);
+      srcKeyPos = m_calibCycleFilteredGroupDir.findSrcKey(eventKey);
+    }
+    SrcKeyGroup & srcKeyGroup = srcKeyPos->second;
+    Pds::Damage dummyDamage(0);
+    srcKeyGroup.appendDataTimeAndDamage(eventKey, inEvent, *m_event, *m_env, m_eventId, dummyDamage);
   }
-  return false;
 }
 
 void H5Output::eventImpl() 
 {
   static const string eventImpl("eventImpl");
   m_epicsGroupDir.processEvent(m_env->epicsStore(), m_eventId);
-  bool filteredEvent = checkForAndProcessExcludeEvent();
-  if (filteredEvent) return;
-  list<EventKeyTranslation> toTranslate = setEventKeysToTranslate(true);
+  list<EventKeyTranslation> toTranslate;
+  list<EventKey> filtered;
+  setEventKeysToTranslate(toTranslate, filtered);
+  if (filtered.size()>0) {
+    addToFilteredEventGroup(filtered, *m_eventId);
+  }
   vector<pair<Pds::Src,Pds::Damage> > droppedContribs = m_damageMap->getSrcDroppedContributions();
   bool splitEvent = droppedContribs.size()>0;
   bool repeatEvent = false;
@@ -900,12 +944,10 @@ void H5Output::endCalibCycle(Event& evt, Env& env) {
   MsgLog(logger(),trace,"endCalibCycle()");
   setEventVariables(evt,env);
   if (m_filteredEventsThisCalibCycle>0) {
-    m_hdfWriterFilterMsg->closeDataset(m_currentFilteredGroup);
     m_hdfWriterEventId->closeDataset(m_currentFilteredGroup);
-    herr_t err = H5Gclose(m_currentFilteredGroup);
-    if (err<0) MsgLog(logger(),fatal,"Failed to close current filtered group: " << m_currentFilteredGroup);
+    m_calibCycleFilteredGroupDir.closeGroups();
+    m_currentFilteredGroup.close();
   }
-  m_currentFilteredGroup = -1;
   m_epicsGroupDir.processEndCalibCycle();
   m_calibCycleEventGroupDir.closeGroups();
   m_calibCycleConfigureGroupDir.closeGroups();

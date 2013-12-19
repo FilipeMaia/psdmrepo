@@ -27,6 +27,7 @@ class H5GroupNames {
                const TypeAliases::TypeInfoSet & ndarrays);
   std::string nameForType(const std::type_info *typeInfoPtr);
   std::string nameForSrc(const Pds::Src &src);
+  std::string nameForSrcKey(const Pds::Src &src, const std::string &key);
   bool isNDArray(const std::type_info *typeInfoPtr) { 
     return m_ndarrays.find(typeInfoPtr) != m_ndarrays.end(); 
   }

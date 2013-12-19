@@ -1,28 +1,46 @@
 #include <string>
 
-#include "boost/shared_ptr.hpp"
-#include "boost/make_shared.hpp"
-
-#include "Translator/doNotTranslate.h"
 #include "MsgLogger/MsgLogger.h"
-
-using namespace Translator;
+#include "Translator/doNotTranslate.h"
 
 namespace {
-  const char * mainlogger = "doNoTranslate";
+  const std::string do_not_translate("do_not_translate");
+} // local namespace
+
+const std::string & Translator::doNotTranslateKeyPrefix() { 
+  return do_not_translate;
 }
 
-void Translator::doNotTranslateEvent(PSEvt::Event &evt, const std::string & filterMsg) {
-  // see if another module already added an ExcludeEvent:
-  boost::shared_ptr<ExcludeEvent> excludeEvent = evt.get();
-  if (excludeEvent) {
-    MsgLog(mainlogger,warning,"Filtering previously filtered event. discarding previous msg: " << excludeEvent->getMsg());
-    excludeEvent->setMsg(filterMsg);
-    return;
+bool Translator::hasDoNotTranslatePrefix(const std::string &key, 
+                                         std::string *keyWithPrefixStripped) 
+{
+  if (key.size() < do_not_translate.size()) {
+    if (keyWithPrefixStripped != NULL) {
+      *keyWithPrefixStripped = key;
+    }
+    return false;
   }
-  excludeEvent = boost::make_shared<ExcludeEvent>(filterMsg);
-  evt.put(excludeEvent);
+  
+  bool startsWithDoNotTranslate = true;
+  unsigned idx=0;
+  while ((idx < do_not_translate.size()) and startsWithDoNotTranslate) {
+    startsWithDoNotTranslate = (key[idx] == do_not_translate[idx]);
+    ++idx;
+  }
+  if (keyWithPrefixStripped != NULL) {
+    if (not startsWithDoNotTranslate) *keyWithPrefixStripped = key;
+    else {
+      unsigned afterPrefix = do_not_translate.size();
+      if ((key.size() > afterPrefix) and (key[afterPrefix] == ':' or key[afterPrefix]=='_')) {
+        afterPrefix++;
+      }
+      if (afterPrefix <= key.size()) *keyWithPrefixStripped = key.substr(afterPrefix);
+      else *keyWithPrefixStripped = "";
+    }
+  }
+  return startsWithDoNotTranslate;
 }
+
 
 ////////////////////
 // below is for testing - we 
@@ -39,11 +57,8 @@ void Translator::doNotTranslateEvent(PSEvt::Event &evt, const std::string & filt
 //    doNotTranslate() function, which will tell the Translator.H5Output module to 
 //    skip this event.
 #include <vector>
+#include <string>
 #include "psana/Module.h"
-
-namespace {
-  const char * testlogger = "doNoTranslate";
-}
 
 namespace Translator {
   
@@ -52,10 +67,16 @@ public:
   TestModuleDoNotTranslate(std::string moduleName) : Module(moduleName) {
     m_eventsToSkip = configList("skip");
     m_messages = configList("messages");
-    if (m_eventsToSkip.size() != m_messages.size()) {
-      MsgLog(testlogger,fatal,"number of events to skip: " << m_eventsToSkip.size() << " not equal to number of messages " << m_messages.size());
+    m_key = configStr("key","");
+    m_doNotTranslateKey = "do_not_translate";
+    if (m_key.size()>0) {
+      m_doNotTranslateKey += ':';
+      m_doNotTranslateKey += m_key;
     }
-    WithMsgLog(testlogger,trace,str) {
+    if (m_eventsToSkip.size() != m_messages.size()) {
+      MsgLog(name(),fatal,"number of events to skip: " << m_eventsToSkip.size() << " not equal to number of messages " << m_messages.size());
+    }
+    WithMsgLog(name(),trace,str) {
       str << "eventsToSkip: ";
       for (size_t idx=0; idx < m_eventsToSkip.size(); ++idx) str << m_eventsToSkip.at(idx) << " ";
       str << std::endl << "messages: ";
@@ -68,17 +89,20 @@ public:
   virtual void event(Event& evt, Env& env) {
     for (size_t idx=0; idx < m_eventsToSkip.size(); ++idx) {
       if (m_eventsToSkip.at(idx) == m_eventCounter) {
-        doNotTranslateEvent(evt, m_messages.at(idx));
+        boost::shared_ptr<std::string> message = boost::make_shared<std::string>(m_messages.at(idx));        
+        evt.put(message,m_doNotTranslateKey);
       }
     }
     ++m_eventCounter;
   }
-  private:
+private:
   std::vector<size_t> m_eventsToSkip;
   std::vector<std::string> m_messages;
   size_t m_eventCounter;
+  std::string m_key;
+  std::string m_doNotTranslateKey;
 };
-
+  
 PSANA_MODULE_FACTORY(TestModuleDoNotTranslate);
 
 }

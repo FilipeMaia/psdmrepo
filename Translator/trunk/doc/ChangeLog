@@ -11,6 +11,12 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-04
+2013-12-19 David Schneider
+- Users can register new hdf writers for simple classes. 
+- Changed filtered event handling - event key "do_not_translate" can be
+  added to any data - can create numerous datasets in Filtered groups.
+
 Tag: V00-00-03
 2013-12-10 David Schneider
 - Changed epics handling. Previous version printed the current state of all

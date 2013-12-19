@@ -19,8 +19,8 @@ const char* logger = "TypeSrcKeyH5GroupDirectory";
 /////////////////////////////////////////////////////////
 void SrcKeyGroup::make_timeDamageDatasets()
 {
-  m_hdfWriterEventId->make_dataset(group());
-  m_hdfWriterDamage->make_datasets(group());
+  if (m_hdfWriterEventId) m_hdfWriterEventId->make_dataset(group());
+  if (m_hdfWriterDamage) m_hdfWriterDamage->make_datasets(group());
   m_datasetsCreated = ArrayForOnlyTimeDamage;
 }
 
@@ -56,8 +56,8 @@ void SrcKeyGroup::make_datasets(DataTypeLoc dataTypeLoc,
                              dsetCreateProp.deflate(),
                              dsetCreateProp.chunkPolicy());  
 
-  m_hdfWriterEventId->make_dataset(m_group);
-  m_hdfWriterDamage->make_datasets(m_group);
+  if (m_hdfWriterEventId) m_hdfWriterEventId->make_dataset(m_group);
+  if (m_hdfWriterDamage) m_hdfWriterDamage->make_datasets(m_group);
 
   m_datasetsCreated = ArrayForTypeTimeDamage;
 
@@ -91,8 +91,8 @@ long SrcKeyGroup::appendDataTimeAndDamage(const PSEvt::EventKey & eventKey,
     MsgLog(logger,fatal,"appending data but type dataset not created");
   }
   m_hdfWriter->append(dataTypeLoc, group(), eventKey, evt, env);
-  m_hdfWriterEventId->append(group(), *eventId);
-  m_hdfWriterDamage->append(group(), damage, HdfWriterDamage::ValidEntry);
+  if (m_hdfWriterEventId) m_hdfWriterEventId->append(group(), *eventId);
+  if (m_hdfWriterDamage) m_hdfWriterDamage->append(group(), damage, HdfWriterDamage::ValidEntry);
   ++m_totalEntries;
   return m_totalEntries-1;
 }
@@ -109,8 +109,10 @@ long SrcKeyGroup::appendBlankTimeAndDamage(const PSEvt::EventKey & eventKey,
     ++m_initialBlanks;
     MsgLog(logger,trace,"set initial blank count to " << m_initialBlanks);
   }
-  m_hdfWriterEventId->append(group(), *eventId);
-  m_hdfWriterDamage->append(group(), damage, HdfWriterDamage::BlankEntry);
+  if (m_hdfWriterEventId) m_hdfWriterEventId->append(group(), *eventId);
+  if (m_hdfWriterDamage) {
+    m_hdfWriterDamage->append(group(), damage, HdfWriterDamage::BlankEntry);
+  }
   ++m_totalEntries;
   MsgLog(logger,trace,"appended time, damage of " << damage.value() << " total entries=" << m_totalEntries);
   return m_totalEntries-1;
@@ -124,7 +126,9 @@ void SrcKeyGroup::overwriteDataAndDamage(long index,
                                          Pds::Damage damage) {
   MsgLog(logger,trace,"overwriteDataAndDamage: index=" << index );
   m_hdfWriter->store_at(dataTypeLoc, index, group(), eventKey, evt, env);
-  m_hdfWriterDamage->store_at(index, group(), damage, HdfWriterDamage::ValidEntry);
+  if (m_hdfWriterDamage) {
+    m_hdfWriterDamage->store_at(index, group(), damage, HdfWriterDamage::ValidEntry);
+  }
 }
 
 void SrcKeyGroup::overwriteDamage(long index, 
@@ -132,15 +136,19 @@ void SrcKeyGroup::overwriteDamage(long index,
                                   boost::shared_ptr<PSEvt::EventId> eventId, 
                                   Pds::Damage damage) {
   MsgLog(logger,trace,"overwriteDamage: index=" << index );
-  m_hdfWriterDamage->store_at(index, group(), damage, HdfWriterDamage::BlankEntry);
+  if (m_hdfWriterDamage) {
+    m_hdfWriterDamage->store_at(index, group(), damage, HdfWriterDamage::BlankEntry);
+  } else {
+    MsgLog(logger,warning, "overwriteDamage called but no damage writer is NULL");
+  }
 }
 
 
 void SrcKeyGroup::close()  {
   if (m_datasetsCreated == ArrayForTypeTimeDamage or 
       m_datasetsCreated == ArrayForOnlyTimeDamage) {
-    m_hdfWriterEventId->closeDataset(m_group);
-    m_hdfWriterDamage->closeDatasets(m_group);
+    if (m_hdfWriterEventId) m_hdfWriterEventId->closeDataset(m_group);
+    if (m_hdfWriterDamage) m_hdfWriterDamage->closeDatasets(m_group);
   } 
   if (m_datasetsCreated == ArrayForTypeTimeDamage) {
     m_hdfWriter->closeDatasets(m_group);
@@ -254,14 +262,7 @@ SrcKeyGroup & TypeSrcKeyH5GroupDirectory::addSrcKeyGroup(const PSEvt::EventKey &
   const Pds::Src &src = eventKey.src();
   const string &key = eventKey.key();
   SrcKeyPair srcStrPair = make_pair(src,key);
-  string srcKeyGroupName = m_h5GroupNames->nameForSrc(src);
-  if (eventKey.key().size()) {
-    if (srcKeyGroupName.size()>0) srcKeyGroupName += "_";
-    srcKeyGroupName += eventKey.key();
-  }
-  if (srcKeyGroupName.size()==0) {
-    srcKeyGroupName = "anysrc";
-  }
+  string srcKeyGroupName = m_h5GroupNames->nameForSrcKey(src,key);
   hdf5pp::Group typeH5Group = typeGroup.group();
   hdf5pp::Group srcH5Group = typeH5Group.createGroup(srcKeyGroupName);
   uint64_t srcVal = (uint64_t(src.phy()) << 32) + src.log();
