@@ -54,11 +54,13 @@ class cspad_image_producer (object) :
         All parameters are passed as strings
 
         @param calib_dir   string, path to calibration directory for ex.: /reg/d/psdm/mec/meca6113/calib/CsPad2x2::CalibV1/MecTargetChamber.0:Cspad2x2.1/
+        @param source      string, address of Detector.Id:Device.ID
         @param key_in      string, keyword for input array, shape=(4, 8, 185, 388) - for cspad or (185, 388, 2) - for cspad2x2
         @param key_out     string, unique keyword for output image array
         @param print_bits  int, bit-word for verbosity control 
         """
 
+        self.m_src        = self.configSrc  ('source', '*-*|Cspad-*')
         self.m_calib_dir  = self.configStr  ('calib_dir', '')
         self.m_key_in     = self.configStr  ('key_in',    'cspad_array')
         self.m_key_out    = self.configStr  ('key_out',   'cspad_image')
@@ -87,7 +89,7 @@ class cspad_image_producer (object) :
         #print '\ncspad_image_producer: evt.keys():', evt.keys()
 
         if env.fwkName() == "psana":
-            self.arr = evt.get(np.ndarray, self.m_key_in)
+            self.arr = evt.get(np.ndarray, self.m_src, self.m_key_in)
         else : 
             self.arr = evt.get(self.m_key_in)
 
@@ -117,7 +119,7 @@ class cspad_image_producer (object) :
             #logging.info( msg )
             print msg
 
-        evt.put( self.img2d, self.m_key_out ) # save image in event as 2d numpy array
+        evt.put( self.img2d, self.m_src, self.m_key_out ) # save image in event as 2d numpy array
 
 
 
@@ -165,8 +167,8 @@ class cspad_image_producer (object) :
 #-----------------------------
 
     def print_input_pars( self ) :
-        msg = '\n%s: List of input parameters\n  calib_dir %s\n  key_in %s\n  key_out %s\n  print_bits: %4d' % \
-              (__name__ , self.m_calib_dir, self.m_key_in, self.m_key_out, self.m_print_bits)
+        msg = '\n%s: List of input parameters\n  calib_dir %s\n  source %s\n  key_in %s\n  key_out %s\n  print_bits: %4d' % \
+              (__name__ , self.m_calib_dir, self.m_src, self.m_key_in, self.m_key_out, self.m_print_bits)
         #logging.info( msg )
         print msg
 

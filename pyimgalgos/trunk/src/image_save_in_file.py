@@ -52,11 +52,13 @@ class image_save_in_file (object) :
         """Class constructor.
         Parameters are passed from pyana.cfg configuration file.
 
+        @param source      string, address of Detector.Id:Device.ID
         @param key_in      string, keyword for input image array of variable shape
         @param ofname      string, output file name (type is selected by extention) supported formats: txt, tiff, gif, pdf, eps, png, jpg, jpeg, npy (default), npz
         @param print_bits  int, bit-word for verbosity control 
         """
 
+        self.m_src        = self.configSrc  ('source', '*-*|Cspad-*')
         self.m_key_in     = self.configStr  ('key_in',    'image')
         self.m_ofname     = self.configStr  ('ofname',    'img.npy')
         self.m_print_bits = self.configInt  ('print_bits', 1)
@@ -82,7 +84,7 @@ class image_save_in_file (object) :
         @param env    environment object
         """
         if env.fwkName() == "psana":
-            self.image = evt.get(np.ndarray, self.m_key_in)
+            self.image = evt.get(np.ndarray, self.m_src, self.m_key_in)
         else : 
             self.image = evt.get(self.m_key_in)       
 
@@ -134,8 +136,8 @@ class image_save_in_file (object) :
 
 
     def print_input_pars( self ) :
-        msg = '\n%s: List of input parameters\n  key_in %s\n  ofname %s\n  print_bits: %4d' % \
-              ( __name__, self.m_key_in, self.m_ofname, self.m_print_bits)
+        msg = '\n%s: List of input parameters\n  source %s\n  key_in %s\n  ofname %s\n  print_bits: %4d' % \
+              ( __name__, self.m_src, self.m_key_in, self.m_ofname, self.m_print_bits)
         #logging.info( msg )
         print msg
 

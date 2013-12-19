@@ -122,9 +122,9 @@ class image_crop (object) :
 #-----------------------------
 
     def print_input_pars( self ) :
-        msg = '\n%s: List of input parameters\n  src %s\n  key_in %s\n  key_out %s\n  print_bits: %4d' % \
+        msg = '\n%s: List of input parameters\n  source %s\n  key_in %s\n  key_out %s\n  print_bits: %4d' % \
               (__name__ , self.m_src, self.m_key_in, self.m_key_out, self.m_print_bits) + \
-              '\n  rowmin %s\n  rowmax %s\n  colmin %s\n  colmax %s' % \
+              '\n  rowmin %s\n  rowmax %s\n  colmin %s\n  colmax %s\n' % \
               (self.rowmin, self.rowmax, self.colmin, self.colmax)
         #logging.info( msg )
         print msg
