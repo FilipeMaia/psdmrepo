@@ -29,6 +29,7 @@ __version__ = "$Revision: 2987 $"
 import os
 import sys
 import logging
+import tempfile
 
 #-----------------------------
 # Imports for other modules --
@@ -106,18 +107,27 @@ class image_save_in_file (object) :
 
         name_pref, name_ext = os.path.splitext(self.m_ofname)
         fname = '%s-%s-r%04d-ev%06d%s' % (name_pref, self.exp, self.run, self.evnum, name_ext)
-        if self.m_print_bits & 8 :
-            msg = 'Save image in file = %s' % fname
+        if self.m_print_bits & 4 :
+            msg = 'Save image in file %s' % fname
             print msg
 
         if name_ext == '.txt' :
             np.savetxt(fname, self.image) # , fmt='%f')
 
-        elif name_ext in ['.tiff', '.jpg', '.jpeg'] :
+        elif name_ext in ['.tiff'] :
             """Saves 16-bit tiff etc...
             """
+
+            tmp_file = tempfile.NamedTemporaryFile(mode='r+b',suffix='.tiff')
+            tfile = tmp_file.name
+
             img = Image.fromarray(self.image.astype(np.int16))  # or int32
-            img.save(fname)
+            img.save(tfile)
+
+            cmd = 'convert %s -define quantum:format=signed %s' % (tfile, fname) 
+            os.system(cmd)
+
+
  
         elif name_ext in ['.tiff', '.gif', '.pdf', '.eps', '.png', '.jpg', '.jpeg'] : 
             """Saves 8-bit tiff only...
