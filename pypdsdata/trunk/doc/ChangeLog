@@ -6,6 +6,11 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V01-01-05
+2013-12-14 Andy Salnikov
+- upgrade to pdsdata V07-02-12
+- new epix stuff
+
 Tag: V01-01-04
 2013-12-13 Andy Salnikov
 - forgot to add new damage type at last commit

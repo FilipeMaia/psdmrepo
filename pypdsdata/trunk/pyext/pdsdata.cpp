@@ -127,6 +127,10 @@
 
 #include "types/epics/EpicsModule.h"
 
+#include "types/epix/AsicConfigV1.h"
+#include "types/epix/ConfigV1.h"
+#include "types/epix/ElementV1.h"
+
 #include "types/epixsampler/ConfigV1.h"
 #include "types/epixsampler/ElementV1.h"
 
@@ -392,6 +396,13 @@ PyMODINIT_FUNC init_pdsdata()
   module = pypdsdata::Epics::EpicsModule::getModule();
   Py_INCREF( module );
   PyModule_AddObject( this_module, "epics", module );
+
+  module = Py_InitModule3( "_pdsdata.epix", 0, "The Python wrapper module for pdsdata/epix" );
+  pypdsdata::Epix::AsicConfigV1::initType( module );
+  pypdsdata::Epix::ConfigV1::initType( module );
+  pypdsdata::Epix::ElementV1::initType( module );
+  Py_INCREF( module );
+  PyModule_AddObject( this_module, "epix", module );
 
   module = Py_InitModule3( "_pdsdata.epixsampler", 0, "The Python wrapper module for pdsdata/epixsampler" );
   pypdsdata::EpixSampler::ConfigV1::initType( module );
