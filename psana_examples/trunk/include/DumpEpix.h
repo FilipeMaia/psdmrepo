@@ -1,12 +1,12 @@
-#ifndef PSANA_EXAMPLES_DUMPEPIXSAMPLER_H
-#define PSANA_EXAMPLES_DUMPEPIXSAMPLER_H
+#ifndef PSANA_EXAMPLES_DUMPEPIX_H
+#define PSANA_EXAMPLES_DUMPEPIX_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
 // 	$Id$
 //
 // Description:
-//	Class DumpEpixSampler.
+//	Class DumpEpix.
 //
 //------------------------------------------------------------------------
 
@@ -38,7 +38,7 @@ namespace psana_examples {
 /**
  *  @ingroup psana_examples
  *
- *  @brief Example psana module to dump EpixSampler data
+ *  @brief Example psana module to dump Epix data
  *
  *  @note This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
@@ -48,14 +48,14 @@ namespace psana_examples {
  *  @author Andy Salnikov
  */
 
-class DumpEpixSampler : public Module {
+class DumpEpix : public Module {
 public:
 
   // Default constructor
-  DumpEpixSampler (const std::string& name) ;
+  DumpEpix (const std::string& name) ;
 
   // Destructor
-  virtual ~DumpEpixSampler () ;
+  virtual ~DumpEpix () ;
 
   /// Method which is called at the beginning of the run
   virtual void beginRun(Event& evt, Env& env);
@@ -68,12 +68,10 @@ protected:
 
 private:
 
-  // Data members, this is for example purposes only
-  
-  Source m_src;         // Data source set from config file
+  Source m_src;
 
 };
 
 } // namespace psana_examples
 
-#endif // PSANA_EXAMPLES_DUMPEPIXSAMPLER_H
+#endif // PSANA_EXAMPLES_DUMPEPIX_H

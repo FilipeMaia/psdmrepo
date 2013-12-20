@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-08
+2013-12-19 Andy Salnikov
+- add C++ and python examples for epix
+
 Tag: V00-04-07
 2013-12-16 David Schneider
 - add C++ module DumpDamage
