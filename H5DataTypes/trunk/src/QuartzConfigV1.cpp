@@ -100,7 +100,7 @@ QuartzConfigV1::store( const Pds::Quartz::ConfigV1& config, hdf5pp::Group grp )
   storeDataObject ( data, "config", grp ) ;
 
   // make array data set for LUT
-  const uint32_t lutSize = Pds::Quartz::ConfigV1::LUT_Size ;
+  const uint32_t lutSize = config.output_lookup_table_enabled() ? Pds::Quartz::ConfigV1::LUT_Size : 0 ;
   storeDataObjects ( lutSize, config.output_lookup_table().data(), "output_lookup_table", grp ) ;
 
   // make array data set for defect pixels

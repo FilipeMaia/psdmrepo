@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-09
+2013-12-19 Andy Salnikov
+- QuartzConfigV1: fixing the output size of lookup table 
+
 Tag: V00-05-08
 2013-12-19 Andy Salnikov
 - upgrade to pdsdata V07-02-12
