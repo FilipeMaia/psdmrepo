@@ -1,0 +1,23 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  README file for package O2OTranslator
+#------------------------------------------------------------------------
+
+Package author: Andrei Salnikov
+
+Brief description:
+==================
+
+This package contains files necessary to build online-to-offline (o2o) 
+translator for LUSI data. 
+
+Detailed description:
+=====================
+
+The main application in this package is o2o-translator. It reads online-
+produced XTC file and optionally EPICS data file. It writes the output
+file in the offline format (nexus/hdf5).  
+
