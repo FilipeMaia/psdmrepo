@@ -101,6 +101,13 @@ class H5Dataset ( object ) :
         return self._mthd
 
     @property
+    def shape_method(self):
+        """Returns name of the shape method  or None"""
+        if self.attributes: return None
+        attr = self._method().attribute
+        if attr: return attr.shape_method
+
+    @property
     def type(self):
         """Get type"""
         if self.attributes: return None

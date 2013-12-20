@@ -343,8 +343,7 @@ template <typename Config>
 :  Parameters for this template:
 :  type         - object with attribute name and xtcConfig
 :  schema       - object with attribute version
-:  classname    - name of the class
-:  dsName       - dataset name
+:  ds           - dataset instance
 :  dsClassName  - dataset class name
 :
 {% set classname = type.name ~ '_v' ~ schema.version %}
@@ -352,8 +351,8 @@ template <typename Config>
 {% set TMPL = '<Config>' %}
 template <typename Config>
 {% endif %}
-void {{classname}}{{TMPL}}::read_ds_{{dsName}}() const {
-  m_ds_{{dsName}} = hdf5pp::Utils::readGroup<{{dsClassName}}>(m_group, "{{dsName}}", m_idx);
+void {{classname}}{{TMPL}}::read_ds_{{ds.name}}() const {
+  m_ds_{{ds.name}} = hdf5pp::Utils::readGroup<{{dsClassName}}>(m_group, "{{ds.name}}", m_idx);
 }
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ::::template:::: read_array_ds_basic_method
@@ -365,17 +364,22 @@ void {{classname}}{{TMPL}}::read_ds_{{dsName}}() const {
 :  Parameters for this template:
 :  type         - object with attribute name and xtcConfig
 :  schema       - object with attribute version
-:  classname    - name of the class
-:  dsName       - dataset name
-:  rank         - array rank
+:  ds           - dataset instance
+:  typename     - C++ type of the elements
 :
 {% set classname = type.name ~ '_v' ~ schema.version %}
 {% if type.xtcConfig %}
 {% set TMPL = '<Config>' %}
 template <typename Config>
 {% endif %}
-void {{classname}}{{TMPL}}::read_ds_{{dsName}}() const {
-  m_ds_{{dsName}} = hdf5pp::Utils::readNdarray<{{typename}}, {{rank}}>(m_group, "{{dsName}}", m_idx);
+void {{classname}}{{TMPL}}::read_ds_{{ds.name}}() const {
+{% if 'zero_dims' in ds.tags %}
+  if (not m_group.hasChild("{{ds.name}}")) {
+    m_ds_{{ds.name}} = ndarray<{{typename}}, {{ds.rank}}>();
+    return;
+  }
+{% endif %}
+  m_ds_{{ds.name}} = hdf5pp::Utils::readNdarray<{{typename}}, {{ds.rank}}>(m_group, "{{ds.name}}", m_idx);
 }
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ::::template:::: read_array_ds_udt_method
@@ -387,22 +391,60 @@ void {{classname}}{{TMPL}}::read_ds_{{dsName}}() const {
 :  Parameters for this template:
 :  type         - object with attribute name and xtcConfig
 :  schema       - object with attribute version
-:  classname    - name of the class
-:  dsName       - dataset name
+:  ds           - dataset instance
 :  ds_struct    - dataset structure type
 :  typename     - C++ type of the elements
-:  rank         - array rank
 :
 {% set classname = type.name ~ '_v' ~ schema.version %}
 {% if type.xtcConfig %}
 {% set TMPL = '<Config>' %}
 template <typename Config>
 {% endif %}
-void {{classname}}{{TMPL}}::read_ds_{{dsName}}() const {
-  ndarray<{{ds_struct}}, {{rank}}> arr = hdf5pp::Utils::readNdarray<{{ds_struct}}, {{rank}}>(m_group, "{{dsName}}", m_idx);
-  ndarray<{{typename}}, {{rank}}> tmp(arr.shape());
+void {{classname}}{{TMPL}}::read_ds_{{ds.name}}() const {
+{% if 'zero_dims' in ds.tags %}
+  if (not m_group.hasChild("{{ds.name}}")) {
+    m_ds_{{ds.name}} = ndarray<{{typename}}, {{ds.rank}}>();
+    return;
+  }
+{% endif %}
+  ndarray<{{ds_struct}}, {{ds.rank}}> arr = hdf5pp::Utils::readNdarray<{{ds_struct}}, {{ds.rank}}>(m_group, "{{ds.name}}", m_idx);
+  ndarray<{{typename}}, {{ds.rank}}> tmp(arr.shape());
   std::copy(arr.begin(), arr.end(), tmp.begin());
-  m_ds_{{dsName}} = tmp;
+  m_ds_{{ds.name}} = tmp;
+}
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: read_array_ds_abstract_method
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for the out-of-line definition of a method which reads dataset of array 
+:  type with elements of a user-defined types
+:
+:  Parameters for this template:
+:  type         - object with attribute name and xtcConfig
+:  schema       - object with attribute version
+:  ds           - dataset instance
+:  ds_struct    - dataset structure type
+:  typename     - C++ type of the elements
+:
+{% set classname = type.name ~ '_v' ~ schema.version %}
+{% if type.xtcConfig %}
+{% set TMPL = '<Config>' %}
+template <typename Config>
+{% endif %}
+void {{classname}}{{TMPL}}::read_ds_{{ds.name}}() const {
+{% if 'zero_dims' in ds.tags %}
+  if (not m_group.hasChild("{{ds.name}}")) {
+    m_ds_{{ds.name}} = ndarray<{{typename}}, {{ds.rank}}>();
+    return;
+  }
+{% endif %}
+  ndarray<{{ds_struct}}, {{ds.rank}}> arr = hdf5pp::Utils::readNdarray<{{ds_struct}}, {{ds.rank}}>(m_group, "{{ds.name}}", m_idx);
+  ndarray<{{typename}}, {{ds.rank}}> tmp(arr.shape());
+  ndarray<{{typename}}, {{ds.rank}}>::iterator out = tmp.begin();
+  for (ndarray<{{ds_struct}}, {{ds.rank}}>::iterator in = arr.begin(); in != arr.end(); ++ in, ++ out) {
+    *out = {{typename}}(boost::make_shared<{{ds_struct}}>(*in));
+  }
+  m_ds_{{ds.name}} = tmp;
 }
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ::::template:::: read_regular_ds_valuetype_method
@@ -413,8 +455,7 @@ void {{classname}}{{TMPL}}::read_ds_{{dsName}}() const {
 :  Parameters for this template:
 :  type         - object with attribute name and xtcConfig
 :  schema       - object with attribute version
-:  classname    - name of the class
-:  dsName       - dataset name
+:  ds           - dataset instance
 :  dsClassName  - dataset class name
 :
 {% set classname = type.name ~ '_v' ~ schema.version %}
@@ -422,9 +463,9 @@ void {{classname}}{{TMPL}}::read_ds_{{dsName}}() const {
 {% set TMPL = '<Config>' %}
 template <typename Config>
 {% endif %}
-void {{classname}}{{TMPL}}::read_ds_{{dsName}}() const {
-  m_ds_{{dsName}} = hdf5pp::Utils::readGroup<{{dsClassName}}>(m_group, "{{dsName}}", m_idx);
-  m_ds_storage_{{dsName}} = *m_ds_{{dsName}};
+void {{classname}}{{TMPL}}::read_ds_{{ds.name}}() const {
+  m_ds_{{ds.name}} = hdf5pp::Utils::readGroup<{{dsClassName}}>(m_group, "{{ds.name}}", m_idx);
+  m_ds_storage_{{ds.name}} = *m_ds_{{ds.name}};
 }
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ::::template:::: read_regular_ds_abstract_method
@@ -435,8 +476,7 @@ void {{classname}}{{TMPL}}::read_ds_{{dsName}}() const {
 :  Parameters for this template:
 :  type         - object with attribute name and xtcConfig
 :  schema       - object with attribute version
-:  classname    - name of the class
-:  dsName       - dataset name
+:  ds           - dataset instance
 :  dsClassName  - dataset class name
 :
 {% set classname = type.name ~ '_v' ~ schema.version %}
@@ -444,9 +484,9 @@ void {{classname}}{{TMPL}}::read_ds_{{dsName}}() const {
 {% set TMPL = '<Config>' %}
 template <typename Config>
 {% endif %}
-void {{classname}}{{TMPL}}::read_ds_{{dsName}}() const {
-  m_ds_{{dsName}} = hdf5pp::Utils::readGroup<{{dsClassName}}>(m_group, "{{dsName}}", m_idx);
-  m_ds_storage_{{dsName}} = boost::make_shared<{{typename}}>(m_ds_{{dsName}});
+void {{classname}}{{TMPL}}::read_ds_{{ds.name}}() const {
+  m_ds_{{ds.name}} = hdf5pp::Utils::readGroup<{{dsClassName}}>(m_group, "{{ds.name}}", m_idx);
+  m_ds_storage_{{ds.name}} = boost::make_shared<{{typename}}>(m_ds_{{ds.name}});
 }
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ::::template:::: dispatch_header_file
@@ -773,6 +813,9 @@ void store_{{hschema.pstype.name}}_v{{hschema.schema.version}}(const {{hschema.p
   {
     typedef __typeof__(obj.{{ds.method}}()) PsanaArray;
     const PsanaArray& psana_array = obj.{{ds.method}}();
+{% if 'zero_dims' in ds.tags %}
+    if (psana_array.size() > 0) {
+{% endif %}
 {% if ds.rank == 1 %}
     hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<{{ds.type.name}}>::stored_type(), psana_array.shape()[0]);
 {% else %}
@@ -781,6 +824,9 @@ void store_{{hschema.pstype.name}}_v{{hschema.schema.version}}(const {{hschema.p
     hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<{{ds.type.name}}>::stored_type(), {{ds.rank}}, dims);
 {% endif %}
     hdf5pp::Utils::createDataset(group, "{{ds.name}}", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
+{% if 'zero_dims' in ds.tags %}
+    }
+{% endif %}
   }
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ::::template:::: write_array_ds_basic
@@ -791,6 +837,9 @@ void store_{{hschema.pstype.name}}_v{{hschema.schema.version}}(const {{hschema.p
 :  Parameters for this template:
 :      ds  - instance of DatasetRegular type
 :
+{%- if 'zero_dims' in ds.tags %}
+  if (group.hasChild("{{ds.name}}")) {
+{% endif %}
   if (append) {
     if (obj) {
       hdf5pp::Utils::storeNDArrayAt(group, "{{ds.name}}", obj->{{ds.method}}(), index);
@@ -800,6 +849,9 @@ void store_{{hschema.pstype.name}}_v{{hschema.schema.version}}(const {{hschema.p
   } else {
     hdf5pp::Utils::storeNDArray(group, "{{ds.name}}", obj->{{ds.method}}());
   }
+{% if 'zero_dims' in ds.tags %}
+  }
+{%- endif -%}
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ::::template:::: make_array_ds_udt
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -813,6 +865,9 @@ void store_{{hschema.pstype.name}}_v{{hschema.schema.version}}(const {{hschema.p
   {
     typedef __typeof__(obj.{{ds.method}}()) PsanaArray;
     const PsanaArray& psana_array = obj.{{ds.method}}();
+{% if 'zero_dims' in ds.tags %}
+    if (psana_array.size() > 0) {
+{% endif %}
 {% if ds.rank == 1 %}
     hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<{{ds_struct}}>::stored_type(), psana_array.shape()[0]);
 {% else %}
@@ -821,6 +876,9 @@ void store_{{hschema.pstype.name}}_v{{hschema.schema.version}}(const {{hschema.p
     hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<{{ds_struct}}>::stored_type(), {{ds.rank}}, dims);
 {% endif %}
     hdf5pp::Utils::createDataset(group, "{{ds.name}}", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
+{% if 'zero_dims' in ds.tags %}
+    }
+{% endif %}
   }
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ::::template:::: write_array_ds_udt
@@ -832,6 +890,9 @@ void store_{{hschema.pstype.name}}_v{{hschema.schema.version}}(const {{hschema.p
 :      ds         - instance of DatasetRegular type
 :      ds_struct  - name of dataset structure for element type
 :
+{%- if 'zero_dims' in ds.tags %}
+  if (group.hasChild("{{ds.name}}")) {
+{% endif %}
   if (obj) {
     typedef __typeof__(obj->{{ds.method}}()) PsanaArray;
     typedef ndarray<{{ds_struct}}, {{ds.rank}}> HdfArray;
@@ -849,6 +910,77 @@ void store_{{hschema.pstype.name}}_v{{hschema.schema.version}}(const {{hschema.p
   } else if (append) {
     hdf5pp::Utils::resizeDataset(group, "{{ds.name}}", index < 0 ? index : index + 1);
   }
+{% if 'zero_dims' in ds.tags %}
+  }
+{%- endif -%}
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: make_array_ds_abstract
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for piece of code which creates a dataset
+:
+:  Parameters for this template:
+:      ds         - instance of DatasetRegular type
+:      ds_struct  - name of dataset structure for element type
+:      shape_method - name of the shape method
+:
+  {
+    const std::vector<int>& shape = obj.{{shape_method}}();
+{% if 'zero_dims' in ds.tags %}
+    if(std::accumulate(shape.begin(), shape.end(), 1, std::multiply<int>())) {
+{% endif %}
+    hsize_t dims[{{ds.rank}}];
+    std::copy(shape.begin(), shape.end(), dims);
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<{{ds_struct}}>::stored_type(), {{ds.rank}}, dims);
+    hdf5pp::Utils::createDataset(group, "{{ds.name}}", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
+{% if 'zero_dims' in ds.tags %}
+    }
+{% endif %}
+  }
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: write_array_ds_abstract
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for piece of code which writes out ndarray of user-defined types
+:
+:  Parameters for this template:
+:      ds         - instance of DatasetRegular type
+:      ds_struct  - name of dataset structure for element type
+:      shape_method - name of the shape method
+:
+{%- if 'zero_dims' in ds.tags %}
+  if (group.hasChild("{{ds.name}}")) {
+{% endif %}
+  if (obj) {
+{% if ds.rank == 1 %}
+    const std::vector<int>& shape = obj->{{shape_method}}();
+    unsigned dims[{{ds.rank}}] = { shape[0] };
+    ndarray<{{ds_struct}}, {{ds.rank}}> hdf_array(dims);
+    for (unsigned i = 0; i != dims[0]; ++ i) {
+      hdf_array[i] = {{ds_struct}}(obj->{{ds.method}}(i));
+    }
+{% elif ds.rank == 2 %}
+    const std::vector<int>& shape = obj->{{shape_method}}();
+    unsigned dims[{{ds.rank}}];
+    std::copy(shape.begin(), shape.end(), dims);
+    ndarray<{{ds_struct}}, {{ds.rank}}> hdf_array(dims);
+    for (unsigned i = 0; i != dims[0]; ++ i) {
+      for (unsigned j = 0; j != dims[1]; ++ j) {
+        hdf_array[i][j] = {{ds_struct}}(obj->{{ds.method}}(i, j));
+      }
+    }
+{% endif %}
+    if (append) {
+      hdf5pp::Utils::storeNDArrayAt(group, "{{ds.name}}", hdf_array, index);
+    } else {
+      hdf5pp::Utils::storeNDArray(group, "{{ds.name}}", hdf_array);
+    }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "{{ds.name}}", index < 0 ? index : index + 1);
+  }
+{% if 'zero_dims' in ds.tags %}
+  }
+{%- endif -%}
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ::::template:::: make_regular_ds
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -1154,16 +1286,7 @@ template <typename Config>
 {% extends "hdf5.tmpl?attr_access_method_super" %}
 {% block body %}
   if (m_ds_{{ds.name}}.empty()) read_ds_{{ds.name}}();
-  if (m_ds_storage_{{ds.name}}.empty()) {
-    ndarray<{{ds_class}}, {{ds.rank}}> tmparr(m_ds_{{ds.name}}.shape());
-    const unsigned size = m_ds_{{ds.name}}.size();
-    for (unsigned i = 0; i != {{data_size}}; ++ i) {
-      boost::shared_ptr<{{ds_type}}> ptr(m_ds_{{ds.name}}.data_ptr(), &m_ds_{{ds.name}}.begin()[i]);
-      tmparr.begin()[i] = {{ds_class}}(ptr);
-    }
-    m_ds_storage_{{ds.name}} = tmparr;
-  }
-  return m_ds_storage_{{ds.name}}{{arguse}};
+  return m_ds_{{ds.name}}{{arguse}};
 {% endblock %}
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ::::template:::: malloc_copy_string

@@ -260,7 +260,7 @@ class DatasetCompound(object):
         dsClassName = self.ds.classNameNs()
         schema = self.schema
         type = schema.pstype
-        dsName = self.ds.name
+        ds = self.ds
         return [_TEMPL('read_compound_ds_method').render(locals())]
 
     def make_ds_impl(self):
@@ -484,18 +484,20 @@ class DatasetRegular(object):
     def ds_read_impl(self):
         schema = self.schema
         type = schema.pstype
-        dsName = self.ds.name
-        rank = self.ds.rank
+        ds = self.ds
         typename = self._attr_typename()
 
-        if rank > 0:
+        if ds.rank > 0:
             if self.ds.type.basic:
                 return [_TEMPL('read_array_ds_basic_method').render(locals())]
-            else:
+            elif self.ds.type.value_type:
                 ds_struct = self._attr_dsname()
                 return [_TEMPL('read_array_ds_udt_method').render(locals())]
+            else:
+                ds_struct = self._attr_dsname()
+                return [_TEMPL('read_array_ds_abstract_method').render(locals())]
         else:
-            dsClassName = _h5ds_typename(self.ds)
+            dsClassName = _h5ds_typename(ds)
             if self.ds.type.value_type:
                 return [_TEMPL('read_regular_ds_valuetype_method').render(locals())]
             else:
@@ -509,9 +511,15 @@ class DatasetRegular(object):
         if rank > 0:
             if ds.type.basic:
                 return _TEMPL('make_array_ds_basic').render(locals())
-            else:
+            elif ds.type.value_type:
                 ds_struct = self._attr_dsname()
                 return _TEMPL('make_array_ds_udt').render(locals())
+            else:
+                ds_struct = self._attr_dsname()
+                # need a method which returns data shape
+                shape_method = self.ds.shape_method
+                if not shape_method: raise TypeError("shape method is required for dataset " + ds.name)
+                return _TEMPL('make_array_ds_abstract').render(locals())
         else:
             ds_struct = self._attr_dsname()
             return _TEMPL('make_regular_ds').render(locals())
@@ -522,11 +530,18 @@ class DatasetRegular(object):
         rank = ds.rank
 
         if rank > 0:
+            zero_dims = 'zero_dims' in self.ds.tags
             if ds.type.basic:
                 return _TEMPL('write_array_ds_basic').render(locals())
-            else:
+            elif ds.type.value_type:
                 ds_struct = self._attr_dsname()
                 return _TEMPL('write_array_ds_udt').render(locals())
+            else:
+                ds_struct = self._attr_dsname()
+                # need a method which returns data shape
+                shape_method = self.ds.shape_method
+                if not shape_method: raise TypeError("shape method is required for dataset " + ds.name)
+                return _TEMPL('write_array_ds_abstract').render(locals())
         else:
             ds_struct = self._attr_dsname()
             return _TEMPL('write_regular_ds').render(locals())
