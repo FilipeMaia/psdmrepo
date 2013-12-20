@@ -264,6 +264,7 @@ void store_DataV1_v0(const Psana::Gsc16ai::DataV1* obj, hdf5pp::Group group, lon
   } else {
     hdf5pp::Utils::storeNDArray(group, "channelValue", obj->channelValue());
   }
+
   if (append) {
     if (obj) {
       hdf5pp::Utils::storeNDArrayAt(group, "timestamps", obj->timestamp(), index);
@@ -273,6 +274,7 @@ void store_DataV1_v0(const Psana::Gsc16ai::DataV1* obj, hdf5pp::Group group, lon
   } else {
     hdf5pp::Utils::storeNDArray(group, "timestamps", obj->timestamp());
   }
+
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Gsc16ai::DataV1> > make_DataV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::Gsc16ai::ConfigV1>& cfg) {

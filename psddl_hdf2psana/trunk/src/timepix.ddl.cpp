@@ -1956,6 +1956,7 @@ void store_DataV1_v0(const Psana::Timepix::DataV1* obj, hdf5pp::Group group, lon
   } else {
     hdf5pp::Utils::storeNDArray(group, "image", obj->data());
   }
+
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Timepix::DataV1> > make_DataV1(int version, hdf5pp::Group group, hsize_t idx) {
@@ -2129,6 +2130,7 @@ void store_DataV2_v0(const Psana::Timepix::DataV2* obj, hdf5pp::Group group, lon
   } else {
     hdf5pp::Utils::storeNDArray(group, "image", obj->data());
   }
+
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Timepix::DataV2> > make_DataV2(int version, hdf5pp::Group group, hsize_t idx) {

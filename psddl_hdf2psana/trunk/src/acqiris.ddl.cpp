@@ -332,6 +332,7 @@ void store_ConfigV1_v0(const Psana::Acqiris::ConfigV1* obj, hdf5pp::Group group,
   } else if (append) {
     hdf5pp::Utils::resizeDataset(group, "vert", index < 0 ? index : index + 1);
   }
+
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
@@ -777,6 +778,7 @@ void store_TdcConfigV1_v0(const Psana::Acqiris::TdcConfigV1* obj, hdf5pp::Group 
   } else if (append) {
     hdf5pp::Utils::resizeDataset(group, "channel", index < 0 ? index : index + 1);
   }
+
   if (obj) {
     typedef __typeof__(obj->auxio()) PsanaArray;
     typedef ndarray<Acqiris::ns_TdcAuxIO_v0::dataset_data, 1> HdfArray;
@@ -794,6 +796,7 @@ void store_TdcConfigV1_v0(const Psana::Acqiris::TdcConfigV1* obj, hdf5pp::Group 
   } else if (append) {
     hdf5pp::Utils::resizeDataset(group, "auxio", index < 0 ? index : index + 1);
   }
+
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::TdcConfigV1> > make_TdcConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
@@ -948,6 +951,7 @@ void store_TdcDataV1_v0(const Psana::Acqiris::TdcDataV1* obj, hdf5pp::Group grou
   } else if (append) {
     hdf5pp::Utils::resizeDataset(group, "data", index < 0 ? index : index + 1);
   }
+
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::TdcDataV1> > make_TdcDataV1(int version, hdf5pp::Group group, hsize_t idx) {

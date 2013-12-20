@@ -217,6 +217,7 @@ void store_ConfigV1_v0(const Psana::Opal1k::ConfigV1* obj, hdf5pp::Group group, 
   } else {
     hdf5pp::Utils::storeNDArray(group, "output_lookup_table", obj->output_lookup_table());
   }
+
   if (obj) {
     typedef __typeof__(obj->defect_pixel_coordinates()) PsanaArray;
     typedef ndarray<Camera::ns_FrameCoord_v0::dataset_data, 1> HdfArray;
@@ -234,6 +235,7 @@ void store_ConfigV1_v0(const Psana::Opal1k::ConfigV1* obj, hdf5pp::Group group, 
   } else if (append) {
     hdf5pp::Utils::resizeDataset(group, "defect_pixel_coordinates", index < 0 ? index : index + 1);
   }
+
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Opal1k::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx) {

@@ -386,6 +386,7 @@ void store_ElementV1_v0(const Psana::EpixSampler::ElementV1* obj, hdf5pp::Group 
   } else {
     hdf5pp::Utils::storeNDArray(group, "temperatures", obj->temperatures());
   }
+
   if (append) {
     if (obj) {
       hdf5pp::Utils::storeNDArrayAt(group, "frame", obj->frame(), index);
@@ -395,6 +396,7 @@ void store_ElementV1_v0(const Psana::EpixSampler::ElementV1* obj, hdf5pp::Group 
   } else {
     hdf5pp::Utils::storeNDArray(group, "frame", obj->frame());
   }
+
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::EpixSampler::ElementV1> > make_ElementV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::EpixSampler::ConfigV1>& cfg) {

@@ -33,6 +33,7 @@
 #include "psddl_hdf2psana/lusi.ddl.h"
 #include "psddl_hdf2psana/acqiris.ddl.h"
 #include "psddl_hdf2psana/rayonix.ddl.h"
+#include "psddl_hdf2psana/epix.ddl.h"
 
 
 namespace {
@@ -239,6 +240,10 @@ try {
     // EvrData::ConfigV7
     cfgStore.putProxy(psddl_hdf2psana::EvrData::make_ConfigV7(schema_version, group, idx), src);
     break;
+  case 1378175084:
+    // Epix::ConfigV1
+    cfgStore.putProxy(psddl_hdf2psana::Epix::make_ConfigV1(schema_version, group, idx), src);
+    break;
   case 1387299804:
     // OceanOptics::ConfigV1
     cfgStore.putProxy(psddl_hdf2psana::OceanOptics::make_ConfigV1(schema_version, group, idx), src);
@@ -406,6 +411,12 @@ try {
   case 2901814734:
     // Ipimb::DataV2
     evt.putProxy(psddl_hdf2psana::Ipimb::make_DataV2(schema_version, group, idx), src);
+    break;
+  case 2914045208:
+    // Epix::ElementV1
+    if (boost::shared_ptr<Psana::Epix::ConfigV1> cfgPtr = cfgStore.get(src)) {
+      evt.putProxy(psddl_hdf2psana::Epix::make_ElementV1(schema_version, group, idx, cfgPtr), src);
+    }
     break;
   case 2929134982:
     // OceanOptics::DataV1

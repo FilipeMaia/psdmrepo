@@ -328,6 +328,7 @@ void store_FrameV1_v0(const Psana::Fli::FrameV1* obj, hdf5pp::Group group, long 
   } else {
     hdf5pp::Utils::storeNDArray(group, "data", obj->data());
   }
+
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Fli::FrameV1> > make_FrameV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::Fli::ConfigV1>& cfg) {

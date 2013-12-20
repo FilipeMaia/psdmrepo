@@ -357,6 +357,7 @@ void store_FrameFexConfigV1_v0(const Psana::Camera::FrameFexConfigV1* obj, hdf5p
   } else if (append) {
     hdf5pp::Utils::resizeDataset(group, "masked_pixel_coordinates", index < 0 ? index : index + 1);
   }
+
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Camera::FrameFexConfigV1> > make_FrameFexConfigV1(int version, hdf5pp::Group group, hsize_t idx) {

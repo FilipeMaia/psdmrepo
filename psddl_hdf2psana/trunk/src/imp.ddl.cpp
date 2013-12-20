@@ -443,6 +443,7 @@ void store_ElementV1_v0(const Psana::Imp::ElementV1* obj, hdf5pp::Group group, l
   } else if (append) {
     hdf5pp::Utils::resizeDataset(group, "samples", index < 0 ? index : index + 1);
   }
+
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Imp::ElementV1> > make_ElementV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::Imp::ConfigV1>& cfg) {

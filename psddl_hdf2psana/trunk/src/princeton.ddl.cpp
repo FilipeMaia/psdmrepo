@@ -1174,6 +1174,7 @@ void store_FrameV1_v0(const Psana::Princeton::FrameV1* obj, hdf5pp::Group group,
   } else {
     hdf5pp::Utils::storeNDArray(group, "data", obj->data());
   }
+
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::FrameV1> > make_FrameV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::Princeton::ConfigV1>& cfg) {
@@ -1373,6 +1374,7 @@ void store_FrameV2_v0(const Psana::Princeton::FrameV2* obj, hdf5pp::Group group,
   } else {
     hdf5pp::Utils::storeNDArray(group, "data", obj->data());
   }
+
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Princeton::FrameV2> > make_FrameV2(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::Princeton::ConfigV1>& cfg) {

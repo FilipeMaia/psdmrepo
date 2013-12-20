@@ -307,6 +307,7 @@ void store_ConfigV1_v0(const Psana::ControlData::ConfigV1* obj, hdf5pp::Group gr
   } else if (append) {
     hdf5pp::Utils::resizeDataset(group, "pvControls", index < 0 ? index : index + 1);
   }
+
   if (obj) {
     typedef __typeof__(obj->pvMonitors()) PsanaArray;
     typedef ndarray<ControlData::ns_PVMonitor_v0::dataset_data, 1> HdfArray;
@@ -324,6 +325,7 @@ void store_ConfigV1_v0(const Psana::ControlData::ConfigV1* obj, hdf5pp::Group gr
   } else if (append) {
     hdf5pp::Utils::resizeDataset(group, "pvMonitors", index < 0 ? index : index + 1);
   }
+
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::ControlData::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
@@ -544,6 +546,7 @@ void store_ConfigV2_v0(const Psana::ControlData::ConfigV2* obj, hdf5pp::Group gr
   } else if (append) {
     hdf5pp::Utils::resizeDataset(group, "pvControls", index < 0 ? index : index + 1);
   }
+
   if (obj) {
     typedef __typeof__(obj->pvMonitors()) PsanaArray;
     typedef ndarray<ControlData::ns_PVMonitor_v0::dataset_data, 1> HdfArray;
@@ -561,6 +564,7 @@ void store_ConfigV2_v0(const Psana::ControlData::ConfigV2* obj, hdf5pp::Group gr
   } else if (append) {
     hdf5pp::Utils::resizeDataset(group, "pvMonitors", index < 0 ? index : index + 1);
   }
+
   if (obj) {
     typedef __typeof__(obj->pvLabels()) PsanaArray;
     typedef ndarray<ControlData::ns_PVLabel_v0::dataset_data, 1> HdfArray;
@@ -578,6 +582,7 @@ void store_ConfigV2_v0(const Psana::ControlData::ConfigV2* obj, hdf5pp::Group gr
   } else if (append) {
     hdf5pp::Utils::resizeDataset(group, "pvLabels", index < 0 ? index : index + 1);
   }
+
 }
 
 
@@ -752,6 +757,7 @@ void store_ConfigV2_v1(const Psana::ControlData::ConfigV2* obj, hdf5pp::Group gr
   } else if (append) {
     hdf5pp::Utils::resizeDataset(group, "pvControls", index < 0 ? index : index + 1);
   }
+
   if (obj) {
     typedef __typeof__(obj->pvMonitors()) PsanaArray;
     typedef ndarray<ControlData::ns_PVMonitor_v0::dataset_data, 1> HdfArray;
@@ -769,6 +775,7 @@ void store_ConfigV2_v1(const Psana::ControlData::ConfigV2* obj, hdf5pp::Group gr
   } else if (append) {
     hdf5pp::Utils::resizeDataset(group, "pvMonitors", index < 0 ? index : index + 1);
   }
+
   if (obj) {
     typedef __typeof__(obj->pvLabels()) PsanaArray;
     typedef ndarray<ControlData::ns_PVLabel_v0::dataset_data, 1> HdfArray;
@@ -786,6 +793,7 @@ void store_ConfigV2_v1(const Psana::ControlData::ConfigV2* obj, hdf5pp::Group gr
   } else if (append) {
     hdf5pp::Utils::resizeDataset(group, "pvLabels", index < 0 ? index : index + 1);
   }
+
 }
 
 
@@ -966,6 +974,7 @@ void store_ConfigV2_v2(const Psana::ControlData::ConfigV2* obj, hdf5pp::Group gr
   } else if (append) {
     hdf5pp::Utils::resizeDataset(group, "pvControls", index < 0 ? index : index + 1);
   }
+
   if (obj) {
     typedef __typeof__(obj->pvMonitors()) PsanaArray;
     typedef ndarray<ControlData::ns_PVMonitor_v0::dataset_data, 1> HdfArray;
@@ -983,6 +992,7 @@ void store_ConfigV2_v2(const Psana::ControlData::ConfigV2* obj, hdf5pp::Group gr
   } else if (append) {
     hdf5pp::Utils::resizeDataset(group, "pvMonitors", index < 0 ? index : index + 1);
   }
+
   if (obj) {
     typedef __typeof__(obj->pvLabels()) PsanaArray;
     typedef ndarray<ControlData::ns_PVLabel_v0::dataset_data, 1> HdfArray;
@@ -1000,6 +1010,7 @@ void store_ConfigV2_v2(const Psana::ControlData::ConfigV2* obj, hdf5pp::Group gr
   } else if (append) {
     hdf5pp::Utils::resizeDataset(group, "pvLabels", index < 0 ? index : index + 1);
   }
+
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::ControlData::ConfigV2> > make_ConfigV2(int version, hdf5pp::Group group, hsize_t idx) {
@@ -1243,6 +1254,7 @@ void store_ConfigV3_v0(const Psana::ControlData::ConfigV3* obj, hdf5pp::Group gr
   } else if (append) {
     hdf5pp::Utils::resizeDataset(group, "pvControls", index < 0 ? index : index + 1);
   }
+
   if (obj) {
     typedef __typeof__(obj->pvMonitors()) PsanaArray;
     typedef ndarray<ControlData::ns_PVMonitor_v0::dataset_data, 1> HdfArray;
@@ -1260,6 +1272,7 @@ void store_ConfigV3_v0(const Psana::ControlData::ConfigV3* obj, hdf5pp::Group gr
   } else if (append) {
     hdf5pp::Utils::resizeDataset(group, "pvMonitors", index < 0 ? index : index + 1);
   }
+
   if (obj) {
     typedef __typeof__(obj->pvLabels()) PsanaArray;
     typedef ndarray<ControlData::ns_PVLabel_v0::dataset_data, 1> HdfArray;
@@ -1277,6 +1290,7 @@ void store_ConfigV3_v0(const Psana::ControlData::ConfigV3* obj, hdf5pp::Group gr
   } else if (append) {
     hdf5pp::Utils::resizeDataset(group, "pvLabels", index < 0 ? index : index + 1);
   }
+
 }
 
 
@@ -1464,6 +1478,7 @@ void store_ConfigV3_v1(const Psana::ControlData::ConfigV3* obj, hdf5pp::Group gr
   } else if (append) {
     hdf5pp::Utils::resizeDataset(group, "pvControls", index < 0 ? index : index + 1);
   }
+
   if (obj) {
     typedef __typeof__(obj->pvMonitors()) PsanaArray;
     typedef ndarray<ControlData::ns_PVMonitor_v0::dataset_data, 1> HdfArray;
@@ -1481,6 +1496,7 @@ void store_ConfigV3_v1(const Psana::ControlData::ConfigV3* obj, hdf5pp::Group gr
   } else if (append) {
     hdf5pp::Utils::resizeDataset(group, "pvMonitors", index < 0 ? index : index + 1);
   }
+
   if (obj) {
     typedef __typeof__(obj->pvLabels()) PsanaArray;
     typedef ndarray<ControlData::ns_PVLabel_v0::dataset_data, 1> HdfArray;
@@ -1498,6 +1514,7 @@ void store_ConfigV3_v1(const Psana::ControlData::ConfigV3* obj, hdf5pp::Group gr
   } else if (append) {
     hdf5pp::Utils::resizeDataset(group, "pvLabels", index < 0 ? index : index + 1);
   }
+
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::ControlData::ConfigV3> > make_ConfigV3(int version, hdf5pp::Group group, hsize_t idx) {

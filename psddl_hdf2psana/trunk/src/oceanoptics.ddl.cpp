@@ -377,6 +377,7 @@ void store_DataV1_v0(const Psana::OceanOptics::DataV1* obj, hdf5pp::Group group,
   } else {
     hdf5pp::Utils::storeNDArray(group, "spectra", obj->data());
   }
+
   if (obj) {
     OceanOptics::ns_DataV1_v0::dataset_data ds_data(*obj);
     if (append) {

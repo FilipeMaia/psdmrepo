@@ -2428,6 +2428,7 @@ void store_ElementV1_v0(const Psana::CsPad::ElementV1* obj, hdf5pp::Group group,
   } else {
     hdf5pp::Utils::storeNDArray(group, "data", obj->data());
   }
+
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::DataV1> > make_DataV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::CsPad::ConfigV1>& cfg) {
@@ -2711,6 +2712,7 @@ void store_ElementV2_v0(const Psana::CsPad::ElementV2* obj, hdf5pp::Group group,
   } else {
     hdf5pp::Utils::storeNDArray(group, "data", obj->data());
   }
+
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::CsPad::DataV2> > make_DataV2(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::CsPad::ConfigV2>& cfg) {

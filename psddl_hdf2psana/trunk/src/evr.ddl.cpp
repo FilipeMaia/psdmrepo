@@ -809,6 +809,7 @@ void store_ConfigV1_v0(const Psana::EvrData::ConfigV1* obj, hdf5pp::Group group,
   } else if (append) {
     hdf5pp::Utils::resizeDataset(group, "pulses", index < 0 ? index : index + 1);
   }
+
   if (obj) {
     typedef __typeof__(obj->output_maps()) PsanaArray;
     typedef ndarray<EvrData::ns_OutputMap_v0::dataset_data, 1> HdfArray;
@@ -826,6 +827,7 @@ void store_ConfigV1_v0(const Psana::EvrData::ConfigV1* obj, hdf5pp::Group group,
   } else if (append) {
     hdf5pp::Utils::resizeDataset(group, "output_maps", index < 0 ? index : index + 1);
   }
+
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
@@ -1047,6 +1049,7 @@ void store_ConfigV2_v0(const Psana::EvrData::ConfigV2* obj, hdf5pp::Group group,
   } else if (append) {
     hdf5pp::Utils::resizeDataset(group, "pulses", index < 0 ? index : index + 1);
   }
+
   if (obj) {
     typedef __typeof__(obj->output_maps()) PsanaArray;
     typedef ndarray<EvrData::ns_OutputMap_v0::dataset_data, 1> HdfArray;
@@ -1064,6 +1067,7 @@ void store_ConfigV2_v0(const Psana::EvrData::ConfigV2* obj, hdf5pp::Group group,
   } else if (append) {
     hdf5pp::Utils::resizeDataset(group, "output_maps", index < 0 ? index : index + 1);
   }
+
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::ConfigV2> > make_ConfigV2(int version, hdf5pp::Group group, hsize_t idx) {
@@ -1261,6 +1265,7 @@ void store_ConfigV3_v0(const Psana::EvrData::ConfigV3* obj, hdf5pp::Group group,
   } else if (append) {
     hdf5pp::Utils::resizeDataset(group, "eventcodes", index < 0 ? index : index + 1);
   }
+
   if (obj) {
     typedef __typeof__(obj->pulses()) PsanaArray;
     typedef ndarray<EvrData::ns_PulseConfigV3_v0::dataset_data, 1> HdfArray;
@@ -1278,6 +1283,7 @@ void store_ConfigV3_v0(const Psana::EvrData::ConfigV3* obj, hdf5pp::Group group,
   } else if (append) {
     hdf5pp::Utils::resizeDataset(group, "pulses", index < 0 ? index : index + 1);
   }
+
   if (obj) {
     typedef __typeof__(obj->output_maps()) PsanaArray;
     typedef ndarray<EvrData::ns_OutputMap_v0::dataset_data, 1> HdfArray;
@@ -1295,6 +1301,7 @@ void store_ConfigV3_v0(const Psana::EvrData::ConfigV3* obj, hdf5pp::Group group,
   } else if (append) {
     hdf5pp::Utils::resizeDataset(group, "output_maps", index < 0 ? index : index + 1);
   }
+
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::ConfigV3> > make_ConfigV3(int version, hdf5pp::Group group, hsize_t idx) {
@@ -1492,6 +1499,7 @@ void store_ConfigV4_v0(const Psana::EvrData::ConfigV4* obj, hdf5pp::Group group,
   } else if (append) {
     hdf5pp::Utils::resizeDataset(group, "eventcodes", index < 0 ? index : index + 1);
   }
+
   if (obj) {
     typedef __typeof__(obj->pulses()) PsanaArray;
     typedef ndarray<EvrData::ns_PulseConfigV3_v0::dataset_data, 1> HdfArray;
@@ -1509,6 +1517,7 @@ void store_ConfigV4_v0(const Psana::EvrData::ConfigV4* obj, hdf5pp::Group group,
   } else if (append) {
     hdf5pp::Utils::resizeDataset(group, "pulses", index < 0 ? index : index + 1);
   }
+
   if (obj) {
     typedef __typeof__(obj->output_maps()) PsanaArray;
     typedef ndarray<EvrData::ns_OutputMap_v0::dataset_data, 1> HdfArray;
@@ -1526,6 +1535,7 @@ void store_ConfigV4_v0(const Psana::EvrData::ConfigV4* obj, hdf5pp::Group group,
   } else if (append) {
     hdf5pp::Utils::resizeDataset(group, "output_maps", index < 0 ? index : index + 1);
   }
+
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::ConfigV4> > make_ConfigV4(int version, hdf5pp::Group group, hsize_t idx) {
@@ -1940,6 +1950,7 @@ void store_ConfigV5_v0(const Psana::EvrData::ConfigV5* obj, hdf5pp::Group group,
   } else if (append) {
     hdf5pp::Utils::resizeDataset(group, "eventcodes", index < 0 ? index : index + 1);
   }
+
   if (obj) {
     typedef __typeof__(obj->pulses()) PsanaArray;
     typedef ndarray<EvrData::ns_PulseConfigV3_v0::dataset_data, 1> HdfArray;
@@ -1957,6 +1968,7 @@ void store_ConfigV5_v0(const Psana::EvrData::ConfigV5* obj, hdf5pp::Group group,
   } else if (append) {
     hdf5pp::Utils::resizeDataset(group, "pulses", index < 0 ? index : index + 1);
   }
+
   if (obj) {
     typedef __typeof__(obj->output_maps()) PsanaArray;
     typedef ndarray<EvrData::ns_OutputMap_v0::dataset_data, 1> HdfArray;
@@ -1974,6 +1986,7 @@ void store_ConfigV5_v0(const Psana::EvrData::ConfigV5* obj, hdf5pp::Group group,
   } else if (append) {
     hdf5pp::Utils::resizeDataset(group, "output_maps", index < 0 ? index : index + 1);
   }
+
   if (obj) {
     EvrData::ns_SequencerConfigV1_v0::dataset_config ds_data(obj->seq_config());
     if (append) {
@@ -2196,6 +2209,7 @@ void store_ConfigV6_v0(const Psana::EvrData::ConfigV6* obj, hdf5pp::Group group,
   } else if (append) {
     hdf5pp::Utils::resizeDataset(group, "eventcodes", index < 0 ? index : index + 1);
   }
+
   if (obj) {
     typedef __typeof__(obj->pulses()) PsanaArray;
     typedef ndarray<EvrData::ns_PulseConfigV3_v0::dataset_data, 1> HdfArray;
@@ -2213,6 +2227,7 @@ void store_ConfigV6_v0(const Psana::EvrData::ConfigV6* obj, hdf5pp::Group group,
   } else if (append) {
     hdf5pp::Utils::resizeDataset(group, "pulses", index < 0 ? index : index + 1);
   }
+
   if (obj) {
     typedef __typeof__(obj->output_maps()) PsanaArray;
     typedef ndarray<EvrData::ns_OutputMapV2_v0::dataset_data, 1> HdfArray;
@@ -2230,6 +2245,7 @@ void store_ConfigV6_v0(const Psana::EvrData::ConfigV6* obj, hdf5pp::Group group,
   } else if (append) {
     hdf5pp::Utils::resizeDataset(group, "output_maps", index < 0 ? index : index + 1);
   }
+
   if (obj) {
     EvrData::ns_SequencerConfigV1_v0::dataset_config ds_data(obj->seq_config());
     if (append) {
@@ -2452,6 +2468,7 @@ void store_ConfigV7_v0(const Psana::EvrData::ConfigV7* obj, hdf5pp::Group group,
   } else if (append) {
     hdf5pp::Utils::resizeDataset(group, "eventcodes", index < 0 ? index : index + 1);
   }
+
   if (obj) {
     typedef __typeof__(obj->pulses()) PsanaArray;
     typedef ndarray<EvrData::ns_PulseConfigV3_v0::dataset_data, 1> HdfArray;
@@ -2469,6 +2486,7 @@ void store_ConfigV7_v0(const Psana::EvrData::ConfigV7* obj, hdf5pp::Group group,
   } else if (append) {
     hdf5pp::Utils::resizeDataset(group, "pulses", index < 0 ? index : index + 1);
   }
+
   if (obj) {
     typedef __typeof__(obj->output_maps()) PsanaArray;
     typedef ndarray<EvrData::ns_OutputMapV2_v0::dataset_data, 1> HdfArray;
@@ -2486,6 +2504,7 @@ void store_ConfigV7_v0(const Psana::EvrData::ConfigV7* obj, hdf5pp::Group group,
   } else if (append) {
     hdf5pp::Utils::resizeDataset(group, "output_maps", index < 0 ? index : index + 1);
   }
+
   if (obj) {
     EvrData::ns_SequencerConfigV1_v0::dataset_config ds_data(obj->seq_config());
     if (append) {
@@ -2693,6 +2712,7 @@ void store_SrcConfigV1_v0(const Psana::EvrData::SrcConfigV1* obj, hdf5pp::Group 
   } else if (append) {
     hdf5pp::Utils::resizeDataset(group, "eventcodes", index < 0 ? index : index + 1);
   }
+
   if (obj) {
     typedef __typeof__(obj->pulses()) PsanaArray;
     typedef ndarray<EvrData::ns_PulseConfigV3_v0::dataset_data, 1> HdfArray;
@@ -2710,6 +2730,7 @@ void store_SrcConfigV1_v0(const Psana::EvrData::SrcConfigV1* obj, hdf5pp::Group 
   } else if (append) {
     hdf5pp::Utils::resizeDataset(group, "pulses", index < 0 ? index : index + 1);
   }
+
   if (obj) {
     typedef __typeof__(obj->output_maps()) PsanaArray;
     typedef ndarray<EvrData::ns_OutputMapV2_v0::dataset_data, 1> HdfArray;
@@ -2727,6 +2748,7 @@ void store_SrcConfigV1_v0(const Psana::EvrData::SrcConfigV1* obj, hdf5pp::Group 
   } else if (append) {
     hdf5pp::Utils::resizeDataset(group, "output_maps", index < 0 ? index : index + 1);
   }
+
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::EvrData::SrcConfigV1> > make_SrcConfigV1(int version, hdf5pp::Group group, hsize_t idx) {

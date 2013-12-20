@@ -158,6 +158,7 @@ void store_ConfigV1_v0(const Psana::Alias::ConfigV1* obj, hdf5pp::Group group, l
   } else if (append) {
     hdf5pp::Utils::resizeDataset(group, "aliases", index < 0 ? index : index + 1);
   }
+
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Alias::ConfigV1> > make_ConfigV1(int version, hdf5pp::Group group, hsize_t idx) {
