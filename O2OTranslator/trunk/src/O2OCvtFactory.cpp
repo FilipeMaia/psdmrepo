@@ -59,6 +59,7 @@
 #include "H5DataTypes/EncoderDataV1.h"
 #include "H5DataTypes/EncoderDataV2.h"
 #include "H5DataTypes/EpicsPvHeader.h"
+#include "H5DataTypes/EpixConfigV1.h"
 #include "H5DataTypes/EpixSamplerConfigV1.h"
 #include "H5DataTypes/EvrConfigV1.h"
 #include "H5DataTypes/EvrConfigV2.h"
@@ -123,6 +124,7 @@
 #include "O2OTranslator/CsPad2x2CalibV1Cvt.h"
 #include "O2OTranslator/CsPad2x2ElementV1Cvt.h"
 #include "O2OTranslator/EpicsDataTypeCvt.h"
+#include "O2OTranslator/EpixElementV1Cvt.h"
 #include "O2OTranslator/EpixSamplerElementV1Cvt.h"
 #include "O2OTranslator/EvtDataTypeCvtDef.h"
 #include "O2OTranslator/FliFrameV1Cvt.h"
@@ -882,10 +884,26 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
     }
     break;
 
+  case Pds::TypeId::Id_EpixConfig:
+    switch (version) {
+    case 1:
+      ::makeConfigCvt<EpixConfigV1>(cvts, group, "Epix::ConfigV1", src, transition, m_cvtOptions, EpixConfigV1::SchemaVersion);
+      break;
+    }
+    break;
+
+  case Pds::TypeId::Id_EpixElement:
+    switch (version) {
+    case 1:
+      cvts.push_back(make_shared<EpixElementV1Cvt>(group, "Epix::ElementV1", src, m_configStore, m_cvtOptions, int(EpixElementV1::SchemaVersion)));
+      break;
+    }
+    break;
+
   case Pds::TypeId::Id_EpixSamplerConfig:
     switch (version) {
     case 1:
-      ::makeConfigCvt<EpixSamplerConfigV1>(cvts, group, "EpixSampler::ConfigV1", src, transition, m_cvtOptions, 0);
+      ::makeConfigCvt<EpixSamplerConfigV1>(cvts, group, "EpixSampler::ConfigV1", src, transition, m_cvtOptions, EpixSamplerConfigV1::SchemaVersion);
       break;
     }
     break;
@@ -893,7 +911,7 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
   case Pds::TypeId::Id_EpixSamplerElement:
     switch (version) {
     case 1:
-      cvts.push_back(make_shared<EpixSamplerElementV1Cvt>(group, "EpixSampler::ElementV1", src, m_configStore, m_cvtOptions, 0));
+      cvts.push_back(make_shared<EpixSamplerElementV1Cvt>(group, "EpixSampler::ElementV1", src, m_configStore, m_cvtOptions, int(EpixSamplerElementV1::SchemaVersion)));
       break;
     }
     break;
