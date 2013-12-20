@@ -104,9 +104,15 @@ Group::hasChild ( const std::string& name ) const
 
   std::string child = name;
   std::string::size_type p = name.find('/');
-  if (p != std::string::npos) child.erase(p);
-    
-  // check that the group exists
+  if (p != std::string::npos) {
+    child.erase(p);
+  } else {
+    // small optimization, if this is the last item in the path check cached datasets first
+    DsCache::const_iterator it = m_dsCache->find(child);
+    if (it != m_dsCache->end()) return true;
+  }
+
+  // check that the link exists
   hid_t lapl_id = H5Pcreate( H5P_LINK_ACCESS ) ;
   htri_t stat = H5Lexists ( *m_id, child.c_str(), lapl_id ) ;
   H5Pclose( lapl_id ) ;
