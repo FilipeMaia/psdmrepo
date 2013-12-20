@@ -15,6 +15,7 @@
 #include "psddl_pds2psana/lusi.ddl.h"
 #include "psddl_pds2psana/timepix.ddl.h"
 #include "psddl_pds2psana/cspad.ddl.h"
+#include "psddl_pds2psana/epix.ddl.h"
 #include "psddl_pds2psana/orca.ddl.h"
 #include "psddl_pds2psana/control.ddl.h"
 #include "psddl_pds2psana/l3t.ddl.h"
@@ -661,6 +662,46 @@ try {
           // create and store psana object in config store
           boost::shared_ptr<Psana::Epics::ConfigV1> obj = boost::make_shared<psddl_pds2psana::Epics::ConfigV1>(xptr);
           cfgStore.put(obj, xtc->src);
+        }
+        break;
+      } // end switch (version)
+    }
+    break;
+  case Pds::TypeId::Id_EpixConfig:
+    {
+      switch (version) {
+      case 1:
+        {
+          // store XTC object in config store
+          boost::shared_ptr<Pds::Epix::ConfigV1> xptr(xtc, (Pds::Epix::ConfigV1*)(xtc->payload()));
+          cfgStore.put(xptr, xtc->src);
+          // create and store psana object in config store
+          boost::shared_ptr<Psana::Epix::ConfigV1> obj = boost::make_shared<psddl_pds2psana::Epix::ConfigV1>(xptr);
+          cfgStore.put(obj, xtc->src);
+        }
+        break;
+      } // end switch (version)
+    }
+    break;
+  case Pds::TypeId::Id_EpixElement:
+    {
+      switch (version) {
+      case 1:
+        {
+          if (boost::shared_ptr<Pds::Epix::ConfigV1> cfgPtr = cfgStore.get(xtc->src)) {
+            // store proxy
+            typedef EvtProxyCfg<Psana::Epix::ElementV1, psddl_pds2psana::Epix::ElementV1<Pds::Epix::ConfigV1>, Pds::Epix::ElementV1, Pds::Epix::ConfigV1> ProxyType;
+            if (evt) evt->putProxy<Psana::Epix::ElementV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
+          }
+        }
+        break;
+      case 32769:
+        {
+          if (boost::shared_ptr<Pds::Epix::ConfigV1> cfgPtr = cfgStore.get(xtc->src)) {
+            // store proxy
+            typedef EvtProxyCfg<Psana::Epix::ElementV1, psddl_pds2psana::Epix::ElementV1<Pds::Epix::ConfigV1>, Pds::Epix::ElementV1, Pds::Epix::ConfigV1> ProxyType;
+            if (evt) evt->putProxy<Psana::Epix::ElementV1>(boost::make_shared<ProxyType>(xtc, cfgPtr), xtc->src);
+          }
         }
         break;
       } // end switch (version)
@@ -2135,6 +2176,23 @@ std::vector<const std::type_info *> getXtcConvertTypeInfoPtrs(const Pds::TypeId 
     switch(typeId.version()) {
     case 1:
       typeIdPtrs.push_back( &typeid(Psana::Epics::ConfigV1) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_EpixConfig:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::Epix::ConfigV1) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_EpixElement:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::Epix::ElementV1) );
+      break;
+    case 32769:
+      typeIdPtrs.push_back( &typeid(Psana::Epix::ElementV1) );
       break;
     } // end version switch
     break;
