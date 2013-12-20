@@ -41,6 +41,8 @@ namespace H5DataTypes {
 class EpixSamplerConfigV1  {
 public:
 
+  enum { SchemaVersion = 0 };
+
   typedef Pds::EpixSampler::ConfigV1 XtcType ;
 
   EpixSamplerConfigV1 () {}
