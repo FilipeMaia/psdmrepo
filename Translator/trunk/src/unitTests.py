@@ -599,6 +599,8 @@ class H5Output( unittest.TestCase ) :
         cfgfile = writeCfgFile(input_file, output_h5)
         self.runPsanaOnCfg(cfgfile,output_h5, printPsanaOutput=self.printPsanaOutput)
         cfgfile.close()
+        if self.cleanUp:
+            os.unlink(output_h5)
         
     def test_t1_dropped(self):
         '''This file has a split event. 

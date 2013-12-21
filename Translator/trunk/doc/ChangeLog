@@ -11,6 +11,11 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-05
+2013-12-20 David Schneider
+- Finished testing - this version seems production ready.
+- Removed testing scripts.
+
 Tag: V00-00-04
 2013-12-19 David Schneider
 - Users can register new hdf writers for simple classes. 
