@@ -1,3 +1,6 @@
+################
+# This script is for testing.
+
 import sys
 import os
 import glob
@@ -508,7 +511,6 @@ def testFile(xtcFile, prefix):
   translateFirstEventsCmd = 'psana-translate -n %d %s --output_file=%s' % (numEvents, xtcFile, h5file)
   print translateFirstEventsCmd
   filterErr(captureOutput(translateFirstEventsCmd, translateOutput))
-  print "done"
   retDict.update({'translateFew':translateFirstEventsCmd})
 
   # dump h5 file
@@ -559,9 +561,8 @@ def testAllFiles():
   crashes = set(['/reg/d/psdm/sxr/sxr16410/xtc/e75-r0105-s00-c00.xtc'])
   report = []
   for ii,fname in enumerate(files):
-    if ii < 38:
-      continue
     if fname in crashes:
+      print "skipping file %s as it crashes" % fname
       continue
     prefix = 'test_%0.3d_' % ii
     print ("*** %3d %55s " % (ii,fname)),
@@ -584,6 +585,204 @@ def testAllFiles():
 #    print '\n'.join(['%s=%s' % (k,v) for k,v in retDict.iteritems()])
 #    break
 
+def translateTestData(testDataDir='../testdata', tests=None):
+
+  # o2o crashes on this file:
+  o2oTranslateSkip = set(['test_049_Translator_xcscom12-r52-s0-dupTimes-splitEvents'])
+
+  testFiles = glob.glob(os.path.join(testDataDir,"xtc/*.xtc"))
+  testFiles.sort()
+  for testPath in testFiles:
+    testBase = os.path.splitext(os.path.basename(testPath))[0]
+    baseFlds = testBase.split('_')
+    prefix = '_'.join(baseFlds[0:2])
+    testNo = int(baseFlds[1])
+    if tests is not None:
+      if not testNo in tests:
+        continue
+    afterPrefix = '_'.join(baseFlds[2:])
+    o2oName = prefix + '_o2o_' + afterPrefix + '.h5'
+    psanaName = prefix + '_psana_' + afterPrefix + '.h5'
+    o2oOutputDir = os.path.join(testDataDir,'o2o-h5')
+    psanaOutputDir = os.path.join(testDataDir,'psana-h5')
+    psanaOutputName = os.path.join(psanaOutputDir,psanaName)
+    psanaLogFile = os.path.join(psanaOutputDir,psanaName) + '.log'
+    o2oLogFile = os.path.join(o2oOutputDir,o2oName) + '.log'
+    o2ocmd = 'time o2o-translate -v -v -G --overwrite -c 1 -d %s -n %s %s' % (o2oOutputDir, o2oName, testPath)
+    psanacmd = 'time psana-translate -v -v --output_file=%s --Epics=exclude %s' % (psanaOutputName, testPath)
+    if testBase not in o2oTranslateSkip:
+      p = sb.Popen(o2ocmd, shell=True, stdout=sb.PIPE, stderr=sb.PIPE)
+      print "Translating %s - o2o" % prefix
+      o,e = p.communicate()
+      fout = file(o2oLogFile + '.stdout', 'w')
+      fout.write(o)
+      fout.close()
+      fout = file(o2oLogFile + '.stderr', 'w')
+      fout.write(e)
+      fout.close()
+    p = sb.Popen(psanacmd, shell=True, stdout=sb.PIPE, stderr=sb.PIPE)
+    print "Translating %s - psana" % prefix
+    o,e = p.communicate()
+    fout = file(psanaLogFile + '.stdout', 'w')
+    fout.write(o)
+    fout.close()
+    fout = file(psanaLogFile + '.stderr', 'w')
+    fout.write(e)
+    fout.close()
+                        
+def dumpEvents(testDataDir='../testdata', tests=None):
+  minEventsToDump = 5
+  # these counts were made by looking at the xtc, we'll assume the same for the h5's
+  # if file is not in this dictionary, it is 1 event to see all distinct xtc type id's
+  howManyEventsToDumpToSeeAllDistinctXtcTypes = {'test_019_sxr_sxr16410_e75-r0105-s00-c00' : 91,
+                                                 'test_022_sxr_sxr63212_e208-r0020-s00-c00' : 49,
+                                                 'test_038_xpp_xppi1113_e382-r0121-s00-c00' : 27,
+                                                 'test_039_Translator_amo64913-r182-s02-OutOfOrder_Frame' :  2,
+                                                 'test_040_Translator_amo64913-r182-s02-noDamage-dropped-OutOfOrder_Frame' :  2,
+                                                 'test_043_Translator_t1_dropped' :  2,
+                                                 'test_049_Translator_xcscom12-r52-s0-dupTimes-splitEvents' :  3}
+  for inputSubDir,inputExt,outputSubDir in zip(['xtc', 'o2o-h5', 'psana-h5'],
+                                               ['xtc','h5','h5'],
+                                               ['xtc-dump', 'o2o-h5-dump', 'psana-h5-dump'] ):
+    inputDir = os.path.join(testDataDir,inputSubDir)
+    outputDir = os.path.join(testDataDir,outputSubDir)
+    testFiles = glob.glob(os.path.join(inputDir, "*.%s" % inputExt ))
+    testFiles.sort()
+    for testPath in testFiles:
+      testBase = os.path.splitext(os.path.basename(testPath))[0]
+      testNo = int(testBase.split('_')[1])
+      if (tests is not None) and (not (testNo in tests)):
+          continue
+      eventsToSeeAllDistinctTypes = howManyEventsToDumpToSeeAllDistinctXtcTypes.get(testBase,minEventsToDump)
+      dumpAllCmd = 'psana-dump -n %d %s' % (eventsToSeeAllDistinctTypes, testPath)
+      print dumpAllCmd
+      p = sb.Popen(dumpAllCmd, shell=True, stdout=sb.PIPE, stderr=sb.PIPE)
+      o,e = p.communicate()
+      dumpOutputName = os.path.join(outputDir, os.path.basename(testPath) + '.psana-dump')
+      dumpErrOutputName = os.path.join(outputDir, os.path.basename(testPath) + '.psana-dump.stderr')
+      fout = file(dumpOutputName, 'w')
+      fout.write(o)
+      fout.close()
+      fout = file(dumpErrOutputName, 'w')
+      fout.write(e)
+      fout.close()
+  
+def checkStderrLogs(subDirs, testDataDir='../testdata', tests=None):
+  for inputSubDir in subDirs:
+    inputDir = os.path.join(testDataDir,inputSubDir)
+    testFiles = glob.glob(os.path.join(inputDir, "*.stderr"))
+    testFiles.sort()
+    for testPath in testFiles:
+      badLns = []
+      testBase = os.path.splitext(os.path.basename(testPath))[0]
+      testNo = int(testBase.split('_')[1])
+      if (tests is not None) and (not (testNo in tests)):
+        continue
+      for ln in file(testPath).read().split('\n'):
+        ln = ln.strip()
+        if len(ln)==0:
+          continue
+        if (ln.startswith('real') or ln.startswith('user') or ln.startswith('sys')) and len(ln)<30:
+          continue
+        if ln.startswith('[warning:'):
+          if ln.find(' has no valid experiment number')>5 or ln.find(' unrecognized experiment name')>5:
+            continue
+        badLns.append(ln)
+      if len(badLns)>0:
+        print "** STDERR PROBLEM: %s" % testPath
+        print '  ','\n   '.join(badLns)
+
+def checkTranslationLogs(testDataDir='../testdata', tests=None):
+  checkStderrLogs(['o2o-h5','psana-h5'], testDataDir, tests)
+
+def checkDumpLogs(testDataDir='../testdata', tests=None):
+  checkStderrLogs(['xtc-dump', 'psana-h5-dump', 'o2o-h5-dump'], testDataDir, tests)
+
+def fileTestNumber(fname):
+  basename = os.path.basename(fname)
+  assert basename.split('_')[0] == 'test'
+  return int(basename.split('_')[1])
+
+def diffDumps(testDataDir='../testdata', tests=None):
+  for cmpPair in (['xtc-dump','psana-h5-dump'],
+                  ['xtc-dump','o2o-h5-dump'],
+                  ['psana-h5-dump','o2o-h5-dump']):
+    subDirA,subDirB = cmpPair
+    inputDirA = os.path.join(testDataDir,subDirA)
+    inputDirB = os.path.join(testDataDir,subDirB)
+    dumpFilesA = glob.glob(os.path.join(inputDirA,'*.psana-dump'))
+    dumpFilesB = glob.glob(os.path.join(inputDirB,'*.psana-dump'))
+    testNumber2fileA = dict([(fileTestNumber(fname),fname) for fname in dumpFilesA])
+    testNumber2fileB = dict([(fileTestNumber(fname),fname) for fname in dumpFilesB])
+    compareNumbers = list(set(testNumber2fileA.keys()).intersection(set(testNumber2fileB.keys())))
+    compareNumbers.sort()
+    for testNumber in compareNumbers:
+      if (tests is not None) and (not (testNumber in tests)):
+        continue
+      fileA = testNumber2fileA[testNumber]
+      fileB = testNumber2fileB[testNumber]
+      diffCmd = 'diff %s %s' % (fileA, fileB)
+      p = sb.Popen(diffCmd,shell=True,stderr=sb.PIPE, stdout=sb.PIPE)
+      o,e = p.communicate()
+      assert len(e.strip())==0
+      if len(o)>0:
+        print "***********************************"
+        print "*** DIFF CMP PROBLEM: %s vs. %s ***" % (subDirA, subDirB)
+        print "  * fileA: %s" % fileA
+        print "  * fileB: %s" % fileB
+        print o
+
+def compareTranslations(testDataDir='../testdata', tests=None):
+    subDirA,subDirB = 'o2o-h5','psana-h5'
+    inputDirA = os.path.join(testDataDir,subDirA)
+    inputDirB = os.path.join(testDataDir,subDirB)
+    outputDir = os.path.join(testDataDir,'compare-h5')
+    h5FilesA = glob.glob(os.path.join(inputDirA,'*.h5'))
+    h5FilesB = glob.glob(os.path.join(inputDirB,'*.h5'))
+    testNumber2fileA = dict([(fileTestNumber(fname),fname) for fname in h5FilesA])
+    testNumber2fileB = dict([(fileTestNumber(fname),fname) for fname in h5FilesB])
+    compareNumbers = list(set(testNumber2fileA.keys()).intersection(set(testNumber2fileB.keys())))
+    compareNumbers.sort()
+    for testNumber in compareNumbers:
+      if (tests is not None) and (not (testNumber in tests)):
+        continue
+      fileA = testNumber2fileA[testNumber]
+      fileB = testNumber2fileB[testNumber]
+      outputBase = os.path.splitext(os.path.basename(fileA).replace('_o2o_','_'))[0]      
+      outputFile = os.path.join(outputDir, outputBase + '.compare-h5')
+      stderrFile = outputFile + '.stderr'
+      cmpCmd = 'python Translator/src/compareTranslation.py %s %s --nostop' % (fileA, fileB)
+      print cmpCmd
+      p = sb.Popen(cmpCmd,shell=True,stderr=sb.PIPE, stdout=sb.PIPE)
+      o,e = p.communicate()
+      fname = file(outputFile,'w')
+      fname.write(o)
+      fname.close()
+      fname = file(stderrFile,'w')
+      fname.write(e)
+      fname.close()
+
+def reportCompareTranslationsStderr(testDataDir='../testdata', tests=None):
+  compareDir = os.path.join(testDataDir, 'compare-h5')
+  stderrFiles = glob.glob(os.path.join(compareDir, '*.compare-h5.stderr'))
+  stderrFiles.sort()
+  for stderrFile in stderrFiles:
+    e = file(stderrFile).read()
+    if len(e.strip()) > 0:
+      print "###############"
+      print "## COMPARE STDERR PROBLEM: %s" % stderrFile
+      print e
+                           
+def reportCompareTranslations(testDataDir='../testdata', tests=None):
+  compareDir = os.path.join(testDataDir, 'compare-h5')
+  compareFiles = glob.glob(os.path.join(compareDir, '*.compare-h5'))
+  compareFiles.sort()
+  for compareFile in compareFiles:
+    o = file(compareFile).read()
+    print "###############"
+    print "## COMPARE : %s" % compareFile
+    print o
+                           
 if __name__ == "__main__":
 #  sortMasterList()
 #  newFiles = sys.argv[1:]
@@ -596,7 +795,15 @@ if __name__ == "__main__":
 #    print "Can't find %s" %s
 #    sys.exit(1)
 #  testFile(xtcFile, prefix)
-  testAllFiles()
-  
-          
-
+#  testAllFiles()
+  tests=None
+  if len(sys.argv)>1:
+    tests=map(int,sys.argv[1:])
+#  translateTestData(tests=tests)
+#  dumpEvents(tests=tests)
+#  compareTranslations(tests=tests)
+#  checkTranslationLogs(tests=tests)
+#  checkDumpLogs(tests=tests)
+#  diffDumps(tests=tests)
+#  reportCompareTranslationsStderr(tests=tests)
+  reportCompareTranslations(tests=tests)

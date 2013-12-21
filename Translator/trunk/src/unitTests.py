@@ -656,7 +656,13 @@ class H5Output( unittest.TestCase ) :
                          filteredMsgsEventIds['seconds'][1]==1364147551 and
                          filteredMsgsEventIds['nanoseconds'][0]==107587445 and
                          filteredMsgsEventIds['nanoseconds'][1]==174323092, 
-                        msg="time dataset not right in Filtered:0000/std::string/anysrc/time")
+                        msg="time dataset not right in Filtered:0000/std::string/mytest/time")
+        # we don't write damage to the filtered groups:
+        with self.assertRaises(KeyError):
+            f['/Configure:0000/Run:0000/Filtered:0000/std::string/mytest/_damage']
+        with self.assertRaises(KeyError):
+            f['/Configure:0000/Run:0000/Filtered:0000/std::string/mytest/_mask']
+
         if self.cleanUp:
             os.unlink(output_h5)
         
@@ -703,7 +709,14 @@ class H5Output( unittest.TestCase ) :
                          filteredMsgsEventIds['seconds'][1]==1364147551 and
                          filteredMsgsEventIds['nanoseconds'][0]==107587445 and
                          filteredMsgsEventIds['nanoseconds'][1]==174323092, 
-                        msg="time dataset not right in Filtered:0000/std::string/anysrc/time")
+                        msg="time dataset not right in Filtered:0000/std::string/no_src/time")
+
+        # we don't write damage to the filtered groups:
+        with self.assertRaises(KeyError):
+            f['/Configure:0000/Run:0000/Filtered:0000/std::string/no_src/_damage']
+        with self.assertRaises(KeyError):
+            f['/Configure:0000/Run:0000/Filtered:0000/std::string/no_src/_mask']
+
         if self.cleanUp:
             os.unlink(output_h5)
         

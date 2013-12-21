@@ -4,15 +4,21 @@ import collections
 import math
 import h5py
 
+# ###########################
+# This is a script for testing.
+# It reports on differences between o2o-translate and psana-translate.
+
 class MockTesterNoStop(object):
     def assertTrue(self,a,msg=''):
         if not a:
             print "**FAIL** assertTrue - a is false, msg=%s" % msg
+            print "**ENDFAIL**"
 
     def assertEqual(self,a,b,msg=''):
         if a != b:
             print "**FAIL** assertEqual - a!=b\n  a=%r\n  b=%r\n  msg=%s" % (a,b,msg)
-    
+            print "**ENDFAIL**"
+
 class MockTesterStop(object):
     def assertTrue(self,a,msg=''):
         assert a,"a is not true, msg=%s" % msg
@@ -23,7 +29,7 @@ class MockTesterStop(object):
 def getDistinctTimes(timeds):
     '''Takes a dataset with 'seconds' and 'nanoseconds' fields.
     Finds the unique pairs of these values.  Returns a sorted list of these
-    distinct pairs in the dataset along with there positions in the timeds, for instance
+    distinct pairs in the dataset along with their positions in the timeds, for instance
     if
     timeds=array([(1364147551L, 107587445L, 331318L, 118410L, 140L, 0L),
                   (1364147551L, 174323092L, 331570L, 118434L, 12L, 6L),
