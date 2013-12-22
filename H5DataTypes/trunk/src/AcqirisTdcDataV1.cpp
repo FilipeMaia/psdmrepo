@@ -47,7 +47,7 @@ AcqirisTdcDataV1::AcqirisTdcDataV1 (size_t size, const XtcType& xtcData)
   : m_size(size)
   , m_data(new AcqirisTdcDataV1_Data[size])
 {
-  const ndarray<const Pds::Acqiris::TdcDataV1_Item, 1>& items = xtcData.data();
+  const ndarray<const Pds::Acqiris::TdcDataV1_Item, 1>& items = xtcData.data(size);
   for (size_t i = 0 ; i != size ; ++ i ) {
     const Pds::Acqiris::TdcDataV1Common& com = static_cast<const Pds::Acqiris::TdcDataV1Common&>(items[i]);
     m_data[i].source = com.source();
