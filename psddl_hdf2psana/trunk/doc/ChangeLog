@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-07-10
+2013-12-21 Andy Salnikov
+- camera.cpp: bug fix for image reading, checked size of the wrong type
+
 Tag: V00-07-09
 2013-12-19 Andy Salnikov
 - forgot epix-h5.ddl.xml in previous commit 

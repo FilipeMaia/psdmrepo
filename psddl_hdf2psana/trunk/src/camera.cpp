@@ -140,7 +140,7 @@ void FrameV1_v0::read_ds_image() const
 
   // open dataset and check the type
   hdf5pp::DataSet ds = m_group.openDataSet("image");
-  if (ds.type().size() == 1) {
+  if (ds.type().super().size() == 1) {
     // single-byte
     ndarray<const uint8_t, 2> img = hdf5pp::Utils::readNdarray<uint8_t, 2>(ds, m_idx);
     m_ds_image = make_ndarray(img.data_ptr(), img.size());
