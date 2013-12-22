@@ -44,7 +44,7 @@ TdcDataV1::TdcDataV1(const boost::shared_ptr<const XtcType>& xtcPtr, size_t xtcS
 
   typedef ndarray<Psana::Acqiris::TdcDataV1_Item, 1> NDArray;
   typedef ndarray<const Pds::Acqiris::TdcDataV1_Item, 1> XtcNDArray;
-  const XtcNDArray& xtc_ndarr = xtcPtr->data();
+  const XtcNDArray& xtc_ndarr = xtcPtr->data(nItems);
   _data_ndarray_storage_ = NDArray(xtc_ndarr.shape());
   NDArray::iterator out = _data_ndarray_storage_.begin();
   for (unsigned i = 0; i != nItems; ++ i, ++ out) {
