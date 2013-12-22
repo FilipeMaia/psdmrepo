@@ -79,7 +79,8 @@ TimepixDataV1Cvt::fillContainers(hdf5pp::Group group,
 {
   // DataV1 images come with some strange shuffling. To un-shuffle it we transform it
   // into DataV2 which knows how to do it.
-  unsigned objSize = data._sizeof();
+  Pds::Timepix::DataV2 tmp2(data.width(), data.height(), data.timestamp(), data.frameCounter(), data.lostRows());
+  unsigned objSize = tmp2._sizeof();
   char* buf = new char[objSize];
   Pds::Timepix::DataV2* data2 = new (buf) Pds::Timepix::DataV2(data);
 
