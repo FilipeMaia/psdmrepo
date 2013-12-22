@@ -115,11 +115,14 @@ public:
                               const H5DataTypes::XtcClockTimeStamp& time,
                               Pds::Damage damage )
   {
-    // fill my own containers
-    this->fillTimeDamage(typeId, src, time, damage);
+    // make sure datasets are created
+    this->initContainers(typeId, src, time, damage);
 
     // call subclass method to fill its containers with data
     this->fillContainers(m_group, data, size, typeId, src);
+
+    // fill my own containers
+    this->fillTimeDamage(typeId, src, time, damage);
   }
 
   // method called to fill void spaces for missing data
@@ -131,11 +134,14 @@ public:
     // if option is not set then skip this stuff altogether
     if (not m_cvtOptions.fillMissing()) return;
 
-    // fill my own containers
-    this->fillTimeDamage(typeId, src, time, damage);
+    // make sure datasets are created
+    this->initContainers(typeId, src, time, damage);
 
     // call subclass method to fill its containers with missing stuff
     this->fillMissing(m_group, typeId, src);
+
+    // fill my own containers
+    this->fillTimeDamage(typeId, src, time, damage);
   }
 
   const std::string& typeGroupName() const { return m_typeGroupName ; }
@@ -169,7 +175,7 @@ protected:
 private:
 
   // initialize containers
-  void fillTimeDamage(const Pds::TypeId& typeId,
+  void initContainers(const Pds::TypeId& typeId,
       const O2OXtcSrc& src,
       const H5DataTypes::XtcClockTimeStamp& time,
       Pds::Damage damage)
@@ -191,7 +197,15 @@ private:
       // call subclass method to make container for data objects
       makeContainers(m_group, typeId, src);
     }
+  }
 
+
+  // initialize containers
+  void fillTimeDamage(const Pds::TypeId& typeId,
+      const O2OXtcSrc& src,
+      const H5DataTypes::XtcClockTimeStamp& time,
+      Pds::Damage damage)
+  {
     // fill time container with data
     m_timeCont->append(time);
     if (m_damageCont) m_damageCont->append(damage);

@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-29-15
+2013-12-21 Andy Salnikov
+- improve handling of incorrect XTC sizes
+
 Tag: V00-29-14
 2013-12-21 Andy Salnikov
 - TimepixDataV1Cvt: bug in memory allocation for Pds::Timepix::DataV2,
