@@ -11,6 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-12-14
+2013-12-22 Andy Salnikov
+- pdsdata backend: for arrays of unknown size ('*', now exists in 
+  Acqiris.TdcDataV1 only) accessor method now takes arguments specifying 
+  sizes of unknown dimensions
+
 Tag: V00-12-13
 2013-12-19 Andy Salnikov
 - hdf5 backend: add 'zero_dims' tag to dataset, nedeed for new Epix type

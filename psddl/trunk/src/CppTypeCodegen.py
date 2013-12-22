@@ -298,11 +298,16 @@ class CppTypeCodegen ( object ) :
                 
             elif attr.type.value_type :
                 
+                if self._pdsdata:
+                    # in pdsdata we pass arguments defining sizes of unknown dimensions
+                    int_type = self._type.lookup('uint32_t')
+                    args = [('dim%d'%i, int_type) for i, dim in enumerate(attr.shape.dims) if dim is None]
+                    
                 rettype = "ndarray<const %s, %d>" % (_typename(attr.stor_type), len(attr.shape.dims))
                 if self._pdsdata:
                     # for pdsdata only generate method which takes shared pointer to object owning the data
                     body = self._bodyNDArrray(attr, 'T')
-                    args_shptr = [('owner', 'const boost::shared_ptr<T>&')]
+                    args_shptr = [('owner', 'const boost::shared_ptr<T>&')] + args
                     docstring = attr.comment+"\n\n" if attr.comment else ""
                     docstring += "    Note: this overloaded method accepts shared pointer argument which must point to an object containing\n"\
                         "    this instance, the returned ndarray object can be used even after this instance disappears."
