@@ -666,10 +666,8 @@
             Acqiris TDS data object is a container for TdcDataV1_Item object (or their
             sub-types).
 
-            <attribute name="_data" type="TdcDataV1_Item" shape="*" accessor="data"
-                        shape_method="data_shape">
-            Access TDC data items. The data_shape() method should be used to 
-            obtain the number of elements.
+            <attribute name="_data" type="TdcDataV1_Item" shape="*" accessor="data">
+            Access TDC data items.
             </attribute>
 
         </pstype>
