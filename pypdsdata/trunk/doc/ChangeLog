@@ -6,6 +6,11 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V01-01-06
+2013-12-22 Andy Salnikov
+- C++ method Pds::Acqiris::TdcDataV1::data() now requires argument for a 
+  total count of items in an array
+
 Tag: V01-01-05
 2013-12-14 Andy Salnikov
 - upgrade to pdsdata V07-02-12

@@ -98,7 +98,7 @@ pypdsdata::Acqiris::TdcDataV1::print(std::ostream& out) const
   // get the number of items
   size_t count = m_size / itemSize;
 
-  const ndarray<const Pds::Acqiris::TdcDataV1_Item, 1>& items = m_obj->data();
+  const ndarray<const Pds::Acqiris::TdcDataV1_Item, 1>& items = m_obj->data(count);
 
   out << "acqiris.TdcDataV1([" ;
 
@@ -160,7 +160,7 @@ data( PyObject* self, PyObject* )
   // get the number of items
   size_t count = py_this->m_size / itemSize;
 
-  const ndarray<const Pds::Acqiris::TdcDataV1_Item, 1>& items = obj->data();
+  const ndarray<const Pds::Acqiris::TdcDataV1_Item, 1>& items = obj->data(count);
 
   // make a list
   PyObject* list = PyList_New(count);
