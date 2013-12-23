@@ -19,7 +19,6 @@ namespace Acqiris {
 
 class VertV1 {
 public:
-  enum { Version = 1 /**< XTC type version number */ };
 
   /** Coupling modes */
   enum Coupling {
@@ -37,13 +36,11 @@ public:
     MHz20,
     MHz35,
   };
-  VertV1()
-  {
-  }
   VertV1(double arg__fullScale, double arg__offset, uint32_t arg__coupling, uint32_t arg__bandwidth)
     : _fullScale(arg__fullScale), _offset(arg__offset), _coupling(arg__coupling), _bandwidth(arg__bandwidth)
   {
   }
+  VertV1() {}
   /** Full vertical scale. */
   double fullScale() const { return _fullScale; }
   /** Offset value. */
@@ -72,14 +69,11 @@ std::ostream& operator<<(std::ostream& str, Acqiris::VertV1::Bandwidth enval);
 
 class HorizV1 {
 public:
-  enum { Version = 1 /**< XTC type version number */ };
-  HorizV1()
-  {
-  }
   HorizV1(double arg__sampInterval, double arg__delayTime, uint32_t arg__nbrSamples, uint32_t arg__nbrSegments)
     : _sampInterval(arg__sampInterval), _delayTime(arg__delayTime), _nbrSamples(arg__nbrSamples), _nbrSegments(arg__nbrSegments)
   {
   }
+  HorizV1() {}
   /** Interval for single sample. */
   double sampInterval() const { return _sampInterval; }
   /** Delay time. */
@@ -104,7 +98,6 @@ private:
 
 class TrigV1 {
 public:
-  enum { Version = 1 /**< XTC type version number */ };
 
   /** Trigger source. */
   enum Source {
@@ -128,13 +121,11 @@ public:
     HFDivide,
     SpikeStretcher,
   };
-  TrigV1()
-  {
-  }
   TrigV1(uint32_t arg__coupling, uint32_t arg__input, uint32_t arg__slope, double arg__level)
     : _coupling(arg__coupling), _input(arg__input), _slope(arg__slope), _level(arg__level)
   {
   }
+  TrigV1() {}
   uint32_t coupling() const { return _coupling; }
   /** Trigger source */
   uint32_t input() const { return _input; }
@@ -189,14 +180,11 @@ public:
 
 class TimestampV1 {
 public:
-  enum { Version = 1 /**< XTC type version number */ };
-  TimestampV1()
-  {
-  }
   TimestampV1(double arg__horPos, uint32_t arg__timeStampLo, uint32_t arg__timeStampHi)
     : _horPos(arg__horPos), _timeStampLo(arg__timeStampLo), _timeStampHi(arg__timeStampHi)
   {
   }
+  TimestampV1() {}
   /** Horizontal position, for the segment, of the first (nominal) data point with respect 
             to the origin of the nominal trigger delay in seconds. */
   double pos() const { return _horPos; }
@@ -222,7 +210,6 @@ class ConfigV1;
 
 class DataDescV1Elem {
 public:
-  enum { Version = 1 /**< XTC type version number */ };
   enum { NumberOfBits = 10 };
   enum { BitShift = 6 };
   enum { _extraSize = 32 };
@@ -286,13 +273,11 @@ public:
     Positive,
     Negative,
   };
-  TdcChannel()
-  {
-  }
   TdcChannel(Acqiris::TdcChannel::Channel arg__channel, Acqiris::TdcChannel::Slope arg__bf_slope, Acqiris::TdcChannel::Mode arg__bf_mode, double arg__level)
     : _channel(arg__channel), _mode(((arg__bf_slope) & 0x1)|(((arg__bf_mode) & 0x1)<<31)), _level(arg__level)
   {
   }
+  TdcChannel() {}
   /** Channel type as integer number, clients should use channel() method instead. */
   Acqiris::TdcChannel::Channel channel() const { return Acqiris::TdcChannel::Channel(_channel); }
   /** Bitfield value, should not be used directly. Use mode() and slope()
@@ -334,13 +319,11 @@ public:
     ZHigh = 0,
     Z50 = 1,
   };
-  TdcAuxIO()
-  {
-  }
   TdcAuxIO(Acqiris::TdcAuxIO::Channel arg__channel, Acqiris::TdcAuxIO::Mode arg__signal, Acqiris::TdcAuxIO::Termination arg__qualifier)
     : _channel(arg__channel), _signal(arg__signal), _qualifier(arg__qualifier)
   {
   }
+  TdcAuxIO() {}
   Acqiris::TdcAuxIO::Channel channel() const { return Acqiris::TdcAuxIO::Channel(_channel); }
   Acqiris::TdcAuxIO::Mode mode() const { return Acqiris::TdcAuxIO::Mode(_signal); }
   Acqiris::TdcAuxIO::Termination term() const { return Acqiris::TdcAuxIO::Termination(_qualifier); }
@@ -375,13 +358,11 @@ public:
     ZHigh = 0,
     Z50 = 1,
   };
-  TdcVetoIO()
-  {
-  }
   TdcVetoIO(Acqiris::TdcVetoIO::Mode mode, Acqiris::TdcVetoIO::Termination term)
     : _channel(ChVeto), _signal(mode), _qualifier(term)
   {
   }
+  TdcVetoIO() {}
   Acqiris::TdcVetoIO::Channel channel() const { return Acqiris::TdcVetoIO::Channel(_channel); }
   Acqiris::TdcVetoIO::Mode mode() const { return Acqiris::TdcVetoIO::Mode(_signal); }
   Acqiris::TdcVetoIO::Termination term() const { return Acqiris::TdcVetoIO::Termination(_qualifier); }
@@ -436,13 +417,11 @@ public:
     Chan6,
     AuxIO,
   };
-  TdcDataV1_Item()
-  {
-  }
   TdcDataV1_Item(uint32_t arg__bf_val, Acqiris::TdcDataV1_Item::Source arg__bf_source, uint8_t arg__bf_ovf)
     : _value(((arg__bf_val) & 0xfffffff)|(((arg__bf_source) & 0x7)<<28)|(((arg__bf_ovf) & 0x1)<<31))
   {
   }
+  TdcDataV1_Item() {}
   /** Value as integer number whiis composed of several bit fields. Do not use value directly,
                 instead cast this object to one of the actual types and use corresponding methods. */
   uint32_t value() const { return _value; }
@@ -527,8 +506,7 @@ public:
   enum { TypeId = Pds::TypeId::Id_AcqTdcData /**< XTC type ID value (from Pds::TypeId class) */ };
   enum { Version = 1 /**< XTC type version number */ };
   virtual ~TdcDataV1();
-  /** Access TDC data items. The data_shape() method should be used to 
-            obtain the number of elements. */
+  /** Access TDC data items. */
   virtual ndarray<const Acqiris::TdcDataV1_Item, 1> data() const = 0;
 };
 } // namespace Acqiris

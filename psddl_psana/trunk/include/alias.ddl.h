@@ -21,16 +21,14 @@ namespace Alias {
 class SrcAlias {
 public:
   enum { AliasNameMax = 31 };
-  SrcAlias()
-  {
-  }
   SrcAlias(const Pds::Src& arg__src, const char* arg__aliasName);
+  SrcAlias() {}
   /** The src identifier */
   const Pds::Src& src() const { return _src; }
   /** Alias name for src identifier */
   const char* aliasName() const { return _aliasName; }
-  uint8_t operator <(const Alias::SrcAlias& other) const;
-  uint8_t operator ==(const Alias::SrcAlias& other) const;
+  uint8_t operator<(const Alias::SrcAlias& other) const;
+  uint8_t operator==(const Alias::SrcAlias& other) const;
   static uint32_t _sizeof() { return ((((((0+(Pds::Src::_sizeof()))+(1*(AliasNameMax)))+1)+4)-1)/4)*4; }
   /** Method which returns the shape (dimensions) of the data returned by aliasName() method. */
   std::vector<int> aliasName_shape() const;

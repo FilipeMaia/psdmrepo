@@ -82,13 +82,11 @@ public:
 
 class CsPadReadOnlyCfg {
 public:
-  CsPadReadOnlyCfg()
-  {
-  }
   CsPadReadOnlyCfg(uint32_t arg__shiftTest, uint32_t arg__version)
     : _shiftTest(arg__shiftTest), _version(arg__version)
   {
   }
+  CsPadReadOnlyCfg() {}
   uint32_t shiftTest() const { return _shiftTest; }
   uint32_t version() const { return _version; }
   static uint32_t _sizeof() { return 8; }
@@ -105,13 +103,11 @@ private:
 
 class ProtectionSystemThreshold {
 public:
-  ProtectionSystemThreshold()
-  {
-  }
   ProtectionSystemThreshold(uint32_t arg__adcThreshold, uint32_t arg__pixelCountThreshold)
     : _adcThreshold(arg__adcThreshold), _pixelCountThreshold(arg__pixelCountThreshold)
   {
   }
+  ProtectionSystemThreshold() {}
   uint32_t adcThreshold() const { return _adcThreshold; }
   uint32_t pixelCountThreshold() const { return _pixelCountThreshold; }
   static uint32_t _sizeof() { return 8; }
@@ -505,7 +501,7 @@ public:
                 total bit count gives the number of sections active. */
   virtual uint32_t sectionMask() const = 0;
   /** Common mode value for a given section, section number can be 0 to config.numSect().
-                Will return 0 for data read from XTC, may be non-zero after calibration. */
+	 Will return 0 for data read from XTC, may be non-zero after calibration. */
   virtual float common_mode(uint32_t section) const = 0;
 };
 

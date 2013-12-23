@@ -58,13 +58,11 @@ std::ostream& operator<<(std::ostream& str, Imp::ConfigV1::Registers enval);
 class Sample {
 public:
   enum { channelsPerDevice = 4 };
-  Sample()
-  {
-  }
   Sample(const uint16_t* arg__channels)
   {
     if (arg__channels) std::copy(arg__channels, arg__channels+(4), &_channels[0]);
   }
+  Sample() {}
   /**     Note: this method returns ndarray instance which does not control lifetime
     of the data, do not use returned ndarray after this instance disappears. */
   ndarray<const uint16_t, 1> channels() const { return make_ndarray(&_channels[0], 4); }
@@ -81,13 +79,11 @@ private:
 
 class LaneStatus {
 public:
-  LaneStatus()
-  {
-  }
   LaneStatus(uint8_t arg__usLinkErrCount, uint8_t arg__usLinkDownCount, uint8_t arg__usCellErrCount, uint8_t arg__usRxCount, uint8_t arg__usLocLinked, uint8_t arg__usRemLinked, uint16_t arg__zeros, uint8_t arg__powersOkay)
     : _value(((arg__usLinkErrCount) & 0xf)|(((arg__usLinkDownCount) & 0xf)<<4)|(((arg__usCellErrCount) & 0xf)<<8)|(((arg__usRxCount) & 0xf)<<12)|(((arg__usLocLinked) & 0x1)<<16)|(((arg__usRemLinked) & 0x1)<<17)|(((arg__zeros) & 0x3ff)<<18)|(((arg__powersOkay) & 0xf)<<28))
   {
   }
+  LaneStatus() {}
   uint8_t linkErrCount() const { return uint8_t(this->_value & 0xf); }
   uint8_t linkDownCount() const { return uint8_t((this->_value>>4) & 0xf); }
   uint8_t cellErrCount() const { return uint8_t((this->_value>>8) & 0xf); }

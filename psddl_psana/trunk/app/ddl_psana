@@ -7,7 +7,7 @@ if [ ! -d psddldata/data/ ]; then
     exit 1
 fi
 
-files=`ls -1 psddldata/data/*.ddl.xml | grep -v xtc.ddl`
+files=`ls -1 psddldata/data/*.ddl | grep -v xtc.ddl`
 
 for f in $files ; do 
     psddlc -b psana -I data -E psddl_psana/include -O psddl_psana/src -i psddl_psana -t Psana $f

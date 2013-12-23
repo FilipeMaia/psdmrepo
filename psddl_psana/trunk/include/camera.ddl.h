@@ -19,13 +19,11 @@ namespace Camera {
 
 class FrameCoord {
 public:
-  FrameCoord()
-  {
-  }
   FrameCoord(uint16_t arg__column, uint16_t arg__row)
     : _column(arg__column), _row(arg__row)
   {
   }
+  FrameCoord() {}
   /** Column index (x value). */
   uint16_t column() const { return _column; }
   /** Row index (y value). */

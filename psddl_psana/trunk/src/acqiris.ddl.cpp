@@ -8,7 +8,9 @@ namespace Psana {
 namespace Acqiris {
 double
 VertV1::slope() const {
-  return this->fullScale() / ((1 << Acqiris::DataDescV1Elem::NumberOfBits)*(1 << Acqiris::DataDescV1Elem::BitShift));
+  
+    return this->fullScale() / ((1 << Acqiris::DataDescV1Elem::NumberOfBits)*(1 << Acqiris::DataDescV1Elem::BitShift)); 
+
 }
 std::ostream& operator<<(std::ostream& str, Acqiris::VertV1::Coupling enval) {
   const char* val;

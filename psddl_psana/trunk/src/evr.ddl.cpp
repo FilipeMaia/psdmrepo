@@ -41,7 +41,18 @@ SrcEventCode::desc_shape() const {
 }
 uint32_t
 OutputMap::map() const {
-     enum { Pulse_Offset=0, DBus_Offset=32, Prescaler_Offset=40 };    unsigned src_id = source_id();   switch(source()) {   case Pulse     : return src_id + Pulse_Offset;   case DBus      : return src_id + DBus_Offset;   case Prescaler : return src_id + Prescaler_Offset;   case Force_High: return 62;   case Force_Low : return 63;   }   return 0;
+  
+    enum { Pulse_Offset=0, DBus_Offset=32, Prescaler_Offset=40 };
+    unsigned src_id = source_id();
+    switch(source()) {
+    case Pulse     : return src_id + Pulse_Offset;
+    case DBus      : return src_id + DBus_Offset;
+    case Prescaler : return src_id + Prescaler_Offset;
+    case Force_High: return 62;
+    case Force_Low : return 63;
+    }
+    return 0;
+
 }
 std::ostream& operator<<(std::ostream& str, EvrData::OutputMap::Source enval) {
   const char* val;
@@ -82,7 +93,18 @@ std::ostream& operator<<(std::ostream& str, EvrData::OutputMap::Conn enval) {
 }
 uint32_t
 OutputMapV2::map() const {
-     enum { Pulse_Offset=0, DBus_Offset=32, Prescaler_Offset=40 };    unsigned src_id = source_id();   switch(source()) {   case Pulse     : return src_id + Pulse_Offset;   case DBus      : return src_id + DBus_Offset;   case Prescaler : return src_id + Prescaler_Offset;   case Force_High: return 62;   case Force_Low : return 63;   }   return 0;
+  
+    enum { Pulse_Offset=0, DBus_Offset=32, Prescaler_Offset=40 };
+    unsigned src_id = source_id();
+    switch(source()) {
+    case Pulse     : return src_id + Pulse_Offset;
+    case DBus      : return src_id + DBus_Offset;
+    case Prescaler : return src_id + Prescaler_Offset;
+    case Force_High: return 62;
+    case Force_Low : return 63;
+    }
+    return 0;
+
 }
 std::ostream& operator<<(std::ostream& str, EvrData::OutputMapV2::Source enval) {
   const char* val;

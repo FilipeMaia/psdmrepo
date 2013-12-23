@@ -27,20 +27,20 @@ public:
   enum { Map_Set_Ena_Shift = 1 };
   enum { Map_Reset_Ena_Shift = 2 };
   enum { Map_Trigger_Ena_Shift = 3 };
-  PulseConfig()
-  {
-  }
   PulseConfig(uint32_t pulse, int16_t trigger, int16_t set, int16_t clear, uint8_t polarity, uint8_t map_set_enable, uint8_t map_reset_enable, uint8_t map_trigger_enable, uint32_t prescale, uint32_t delay, uint32_t width)
     : _pulse(pulse), _input_control(((trigger+1) & 0xff)|(((set+1) & 0xff)<<8)|(((clear+1) & 0xff)<<16)), _output_control(((polarity) & 0x1)|(((map_set_enable) & 0x1)<<1)|(((map_reset_enable) & 0x1)<<2)|(((map_trigger_enable) & 0x1)<<3)), _prescale(prescale), _delay(delay), _width(width)
   {
   }
+  PulseConfig() {}
   /** internal pulse generation channel */
   uint32_t pulse() const { return _pulse; }
   /** Pulse input control */
   uint32_t _input_control_value() const { return _input_control; }
+private:
   int16_t bf_trigger() const { return int16_t(this->_input_control & 0xff); }
   int16_t bf_set() const { return int16_t((this->_input_control>>8) & 0xff); }
   int16_t bf_clear() const { return int16_t((this->_input_control>>16) & 0xff); }
+public:
   /** Pulse output control */
   uint32_t _output_control_value() const { return _output_control; }
   uint8_t polarity() const { return uint8_t(this->_output_control & 0x1); }
@@ -74,13 +74,11 @@ private:
 
 class PulseConfigV3 {
 public:
-  PulseConfigV3()
-  {
-  }
   PulseConfigV3(uint16_t arg__u16PulseId, uint16_t arg__u16Polarity, uint32_t arg__u32Prescale, uint32_t arg__u32Delay, uint32_t arg__u32Width)
     : _u16PulseId(arg__u16PulseId), _u16Polarity(arg__u16Polarity), _u32Prescale(arg__u32Prescale), _u32Delay(arg__u32Delay), _u32Width(arg__u32Width)
   {
   }
+  PulseConfigV3() {}
   uint16_t pulseId() const { return _u16PulseId; }
   /** 0 -> positive polarity , 1 -> negative polarity */
   uint16_t polarity() const { return _u16Polarity; }
@@ -107,13 +105,11 @@ private:
 
 class EventCodeV3 {
 public:
-  EventCodeV3()
-  {
-  }
   EventCodeV3(uint16_t arg__u16Code, uint8_t arg__bf_isReadout, uint8_t arg__bf_isTerminator, uint32_t arg__u32MaskTrigger, uint32_t arg__u32MaskSet, uint32_t arg__u32MaskClear)
     : _u16Code(arg__u16Code), _u16MaskEventAttr(((arg__bf_isReadout) & 0x1)|(((arg__bf_isTerminator) & 0x1)<<1)), _u32MaskTrigger(arg__u32MaskTrigger), _u32MaskSet(arg__u32MaskSet), _u32MaskClear(arg__u32MaskClear)
   {
   }
+  EventCodeV3() {}
   uint16_t code() const { return _u16Code; }
   uint8_t isReadout() const { return uint8_t(this->_u16MaskEventAttr & 0x1); }
   uint8_t isTerminator() const { return uint8_t((this->_u16MaskEventAttr>>1) & 0x1); }
@@ -137,13 +133,11 @@ private:
 
 class EventCodeV4 {
 public:
-  EventCodeV4()
-  {
-  }
   EventCodeV4(uint16_t arg__u16Code, uint8_t arg__bf_isReadout, uint8_t arg__bf_isTerminator, uint32_t arg__u32ReportDelay, uint32_t arg__u32ReportWidth, uint32_t arg__u32MaskTrigger, uint32_t arg__u32MaskSet, uint32_t arg__u32MaskClear)
     : _u16Code(arg__u16Code), _u16MaskEventAttr(((arg__bf_isReadout) & 0x1)|(((arg__bf_isTerminator) & 0x1)<<1)), _u32ReportDelay(arg__u32ReportDelay), _u32ReportWidth(arg__u32ReportWidth), _u32MaskTrigger(arg__u32MaskTrigger), _u32MaskSet(arg__u32MaskSet), _u32MaskClear(arg__u32MaskClear)
   {
   }
+  EventCodeV4() {}
   uint16_t code() const { return _u16Code; }
   uint8_t isReadout() const { return uint8_t(this->_u16MaskEventAttr & 0x1); }
   uint8_t isTerminator() const { return uint8_t((this->_u16MaskEventAttr>>1) & 0x1); }
@@ -172,14 +166,12 @@ private:
 class EventCodeV5 {
 public:
   enum { DescSize = 16 };
-  EventCodeV5()
-  {
-  }
   EventCodeV5(uint16_t arg__u16Code, uint8_t arg__bf_isReadout, uint8_t arg__bf_isCommand, uint8_t arg__bf_isLatch, uint32_t arg__u32ReportDelay, uint32_t arg__u32ReportWidth, uint32_t arg__u32MaskTrigger, uint32_t arg__u32MaskSet, uint32_t arg__u32MaskClear, const char* arg__desc)
     : _u16Code(arg__u16Code), _u16MaskEventAttr(((arg__bf_isReadout) & 0x1)|(((arg__bf_isCommand) & 0x1)<<1)|(((arg__bf_isLatch) & 0x1)<<2)), _u32ReportDelay(arg__u32ReportDelay), _u32ReportWidth(arg__u32ReportWidth), _u32MaskTrigger(arg__u32MaskTrigger), _u32MaskSet(arg__u32MaskSet), _u32MaskClear(arg__u32MaskClear)
   {
     if (arg__desc) std::copy(arg__desc, arg__desc+(16), &_desc[0]);
   }
+  EventCodeV5() {}
   uint16_t code() const { return _u16Code; }
   uint8_t isReadout() const { return uint8_t(this->_u16MaskEventAttr & 0x1); }
   uint8_t isCommand() const { return uint8_t((this->_u16MaskEventAttr>>1) & 0x1); }
@@ -215,14 +207,12 @@ class EventCodeV6 {
 public:
   enum { DescSize = 16 };
   enum { MaxReadoutGroup = 7 };
-  EventCodeV6()
-  {
-  }
   EventCodeV6(uint16_t arg__u16Code, uint8_t arg__bf_isReadout, uint8_t arg__bf_isCommand, uint8_t arg__bf_isLatch, uint32_t arg__u32ReportDelay, uint32_t arg__u32ReportWidth, uint32_t arg__u32MaskTrigger, uint32_t arg__u32MaskSet, uint32_t arg__u32MaskClear, const char* arg__desc, uint16_t arg__u16ReadGroup)
     : _u16Code(arg__u16Code), _u16MaskEventAttr(((arg__bf_isReadout) & 0x1)|(((arg__bf_isCommand) & 0x1)<<1)|(((arg__bf_isLatch) & 0x1)<<2)), _u32ReportDelay(arg__u32ReportDelay), _u32ReportWidth(arg__u32ReportWidth), _u32MaskTrigger(arg__u32MaskTrigger), _u32MaskSet(arg__u32MaskSet), _u32MaskClear(arg__u32MaskClear), _u16ReadGroup(arg__u16ReadGroup)
   {
     if (arg__desc) std::copy(arg__desc, arg__desc+(16), &_desc[0]);
   }
+  EventCodeV6() {}
   uint16_t code() const { return _u16Code; }
   uint8_t isReadout() const { return uint8_t(this->_u16MaskEventAttr & 0x1); }
   uint8_t isCommand() const { return uint8_t((this->_u16MaskEventAttr>>1) & 0x1); }
@@ -260,14 +250,12 @@ class SrcEventCode {
 public:
   enum { DescSize = 16 };
   enum { MaxReadoutGroup = 7 };
-  SrcEventCode()
-  {
-  }
   SrcEventCode(uint16_t arg__u16Code, uint32_t arg__u32Period, uint32_t arg__u32MaskTriggerP, uint32_t arg__u32MaskTriggerR, const char* arg__desc, uint16_t arg__u16ReadGroup)
     : _u16Code(arg__u16Code), _u32Period(arg__u32Period), _u32MaskTriggerP(arg__u32MaskTriggerP), _u32MaskTriggerR(arg__u32MaskTriggerR), _u16ReadGroup(arg__u16ReadGroup)
   {
     if (arg__desc) std::copy(arg__desc, arg__desc+(16), &_desc[0]);
   }
+  SrcEventCode() {}
   /** Assigned eventcode. */
   uint16_t code() const { return _u16Code; }
   /** Repetition period in 119 MHz counts or 0 for external source. */
@@ -312,13 +300,11 @@ public:
     FrontPanel,
     UnivIO,
   };
-  OutputMap()
-  {
-  }
   OutputMap(EvrData::OutputMap::Source arg__bf_source, uint8_t arg__bf_source_id, EvrData::OutputMap::Conn arg__bf_conn, uint8_t arg__bf_conn_id)
     : _v(((arg__bf_source) & 0xff)|(((arg__bf_source_id) & 0xff)<<8)|(((arg__bf_conn) & 0xff)<<16)|(((arg__bf_conn_id) & 0xff)<<24))
   {
   }
+  OutputMap() {}
   uint32_t value() const { return _v; }
   EvrData::OutputMap::Source source() const { return Source(this->_v & 0xff); }
   uint8_t source_id() const { return uint8_t((this->_v>>8) & 0xff); }
@@ -352,13 +338,11 @@ public:
     FrontPanel,
     UnivIO,
   };
-  OutputMapV2()
-  {
-  }
   OutputMapV2(EvrData::OutputMapV2::Source arg__bf_source, uint8_t arg__bf_source_id, EvrData::OutputMapV2::Conn arg__bf_conn, uint8_t arg__bf_conn_id, uint8_t arg__bf_module)
     : _v(((arg__bf_source) & 0xf)|(((arg__bf_source_id) & 0xff)<<4)|(((arg__bf_conn) & 0xf)<<12)|(((arg__bf_conn_id) & 0xff)<<16)|(((arg__bf_module) & 0xff)<<24))
   {
   }
+  OutputMapV2() {}
   uint32_t value() const { return _v; }
   EvrData::OutputMapV2::Source source() const { return Source(this->_v & 0xf); }
   uint8_t source_id() const { return uint8_t((this->_v>>4) & 0xff); }
@@ -477,13 +461,11 @@ public:
 
 class SequencerEntry {
 public:
-  SequencerEntry()
-  {
-  }
   SequencerEntry(uint32_t eventcode, uint32_t delay)
     : _value(((delay) & 0xffffff)|(((eventcode) & 0xff)<<24))
   {
   }
+  SequencerEntry() {}
   uint32_t delay() const { return uint32_t(this->_value & 0xffffff); }
   uint32_t eventcode() const { return uint32_t((this->_value>>24) & 0xff); }
   static uint32_t _sizeof() { return 4; }
@@ -613,13 +595,11 @@ public:
 
 class FIFOEvent {
 public:
-  FIFOEvent()
-  {
-  }
   FIFOEvent(uint32_t arg__timestampHigh, uint32_t arg__timestampLow, uint32_t arg__eventCode)
     : _timestampHigh(arg__timestampHigh), _timestampLow(arg__timestampLow), _eventCode(arg__eventCode)
   {
   }
+  FIFOEvent() {}
   uint32_t timestampHigh() const { return _timestampHigh; }
   uint32_t timestampLow() const { return _timestampLow; }
   uint32_t eventCode() const { return _eventCode; }
@@ -655,15 +635,13 @@ class IOChannel {
 public:
   enum { NameLength = 12 };
   enum { MaxInfos = 8 };
-  IOChannel()
-  {
-  }
   IOChannel(const char* arg__name, uint32_t arg__ninfo, const Pds::DetInfo* arg__info)
     : _ninfo(arg__ninfo)
   {
     if (arg__name) std::copy(arg__name, arg__name+(12), &_name[0]);
     if (arg__info) std::copy(arg__info, arg__info+(8), &_info[0]);
   }
+  IOChannel() {}
   const char* name() const { return _name; }
   uint32_t ninfo() const { return _ninfo; }
   /**     Note: this method returns ndarray instance which does not control lifetime

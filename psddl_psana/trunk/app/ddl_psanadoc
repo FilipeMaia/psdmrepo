@@ -10,7 +10,7 @@ fi
 dir=${1:-psddl_psana/doc/html}
 mkdir -p "$dir"
 
-files=`ls -1 psddldata/data/*.ddl.xml | grep -v xtc.ddl`
+files=`ls -1 psddldata/data/*.ddl | grep -v xtc.ddl`
 
 psddlc -b psana-doc -I data -O "$dir" -t Psana \
     -B psana-inc:psddl_psana $files

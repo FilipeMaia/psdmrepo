@@ -12,11 +12,11 @@ SrcAlias::SrcAlias(const Pds::Src& arg__src, const char* arg__aliasName)
   if (arg__aliasName) std::copy(arg__aliasName, arg__aliasName+(31), &_aliasName[0]);
 }
 uint8_t
-SrcAlias::operator <(const Alias::SrcAlias& other) const {
+SrcAlias::operator<(const Alias::SrcAlias& other) const {
   return (strcmp(this->_aliasName,other._aliasName)<0);
 }
 uint8_t
-SrcAlias::operator ==(const Alias::SrcAlias& other) const {
+SrcAlias::operator==(const Alias::SrcAlias& other) const {
   return (strcmp(this->_aliasName,other._aliasName)==0);
 }
 std::vector<int>

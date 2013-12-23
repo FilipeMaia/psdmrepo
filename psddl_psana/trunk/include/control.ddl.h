@@ -22,14 +22,12 @@ class PVControl {
 public:
   enum { NameSize = 32 /**< Length of the name array. */ };
   enum { NoArray = 0xFFFFFFFF /**< Special value used for _index when PV is not an array */ };
-  PVControl()
-  {
-  }
   PVControl(const char* arg__name, uint32_t arg__index, double arg__value)
     : _index(arg__index), _value(arg__value)
   {
     if (arg__name) std::copy(arg__name, arg__name+(32), &_name[0]);
   }
+  PVControl() {}
   /** Name of the control. */
   const char* name() const { return _name; }
   /** Index of the control PV (for arrays) or NoArray. */
@@ -55,14 +53,12 @@ class PVMonitor {
 public:
   enum { NameSize = 32 /**< Length of the name array. */ };
   enum { NoArray = 0xFFFFFFFF /**< Special value used for _index when PV is not an array */ };
-  PVMonitor()
-  {
-  }
   PVMonitor(const char* arg__name, uint32_t arg__index, double arg__loValue, double arg__hiValue)
     : _index(arg__index), _loValue(arg__loValue), _hiValue(arg__hiValue)
   {
     if (arg__name) std::copy(arg__name, arg__name+(32), &_name[0]);
   }
+  PVMonitor() {}
   /** Name of the control. */
   const char* name() const { return _name; }
   /** Index of the control PV (for arrays) or NoArray. */
@@ -91,14 +87,12 @@ class PVLabel {
 public:
   enum { NameSize = 32 /**< Length of the PV name array. */ };
   enum { ValueSize = 64 /**< Length of the value array. */ };
-  PVLabel()
-  {
-  }
   PVLabel(const char* arg__name, const char* arg__value)
   {
     if (arg__name) std::copy(arg__name, arg__name+(32), &_name[0]);
     if (arg__value) std::copy(arg__value, arg__value+(64), &_value[0]);
   }
+  PVLabel() {}
   /** PV name. */
   const char* name() const { return _name; }
   /** Label value. */

@@ -36,13 +36,11 @@ public:
 
 class timespec64 {
 public:
-  timespec64()
-  {
-  }
   timespec64(uint64_t arg__tv_sec, uint64_t arg__tv_nsec)
     : _tv_sec(arg__tv_sec), _tv_nsec(arg__tv_nsec)
   {
   }
+  timespec64() {}
   uint64_t tv_sec() const { return _tv_sec; }
   uint64_t tv_nsec() const { return _tv_nsec; }
   static uint32_t _sizeof() { return 16; }

@@ -19,7 +19,6 @@ namespace Epix {
 
 class AsicConfigV1 {
 public:
-  enum { Version = 1 /**< XTC type version number */ };
   virtual ~AsicConfigV1();
   virtual uint8_t monostPulser() const = 0;
   virtual uint8_t dummyTest() const = 0;
