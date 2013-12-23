@@ -339,7 +339,7 @@ void createWrappers(PyObject* module) {
     .def("frame_type", &Psana::CsPad::ElementV2::frame_type)
     .def("data", &Psana::CsPad::ElementV2::data)
     .def("sectionMask", &Psana::CsPad::ElementV2::sectionMask,"Returns section mask for this quadrant. Mask can contain up to 8 bits in the lower byte, \n                total bit count gives the number of sections active.")
-    .def("common_mode", &Psana::CsPad::ElementV2::common_mode,"Common mode value for a given section, section number can be 0 to config.numSect().\n                Will return 0 for data read from XTC, may be non-zero after calibration.")
+    .def("common_mode", &Psana::CsPad::ElementV2::common_mode,"Common mode value for a given section, section number can be 0 to config.numSect().\n	 Will return 0 for data read from XTC, may be non-zero after calibration.")
   ;
   scope().attr("Nsbtemp")=4;
   }

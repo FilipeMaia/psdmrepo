@@ -36,8 +36,8 @@ void createWrappers(PyObject* module) {
   class_<Psana::Alias::SrcAlias >("SrcAlias", no_init)
     .def("src", &Psana::Alias::SrcAlias::src, return_value_policy<copy_const_reference>(),"The src identifier")
     .def("aliasName", &Psana::Alias::SrcAlias::aliasName,"Alias name for src identifier")
-    .def("operator <", &Psana::Alias::SrcAlias::operator <)
-    .def("operator ==", &Psana::Alias::SrcAlias::operator ==)
+    .def("operator<", &Psana::Alias::SrcAlias::operator<)
+    .def("operator==", &Psana::Alias::SrcAlias::operator==)
     .def("aliasName_shape", &method_shape<Psana::Alias::SrcAlias, &Psana::Alias::SrcAlias::aliasName_shape>)
   ;
   scope().attr("AliasNameMax")=31;

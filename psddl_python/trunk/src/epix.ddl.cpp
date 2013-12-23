@@ -31,8 +31,6 @@ void createWrappers(PyObject* module) {
   Py_INCREF(submodule);
   PyModule_AddObject(module, "Epix", submodule);
   scope mod = object(handle<>(borrowed(submodule)));
-  {
-  scope outer = 
   class_<Psana::Epix::AsicConfigV1, boost::shared_ptr<Psana::Epix::AsicConfigV1>, boost::noncopyable >("AsicConfigV1", no_init)
     .def("monostPulser", &Psana::Epix::AsicConfigV1::monostPulser)
     .def("dummyTest", &Psana::Epix::AsicConfigV1::dummyTest)
@@ -80,8 +78,6 @@ void createWrappers(PyObject* module) {
     .def("ColStopAddr", &Psana::Epix::AsicConfigV1::ColStopAddr)
     .def("chipID", &Psana::Epix::AsicConfigV1::chipID)
   ;
-  scope().attr("Version")=1;
-  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Epix::AsicConfigV1> >(-1));
 
   {
@@ -160,12 +156,6 @@ void createWrappers(PyObject* module) {
   }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Epix::ElementV1> >(Pds::TypeId::Id_EpixElement));
 
-  {
-    PyObject* unvlist = PyList_New(1);
-    PyList_SET_ITEM(unvlist, 0, PyObject_GetAttrString(submodule, "AsicConfigV1"));
-    PyObject_SetAttrString(submodule, "AsicConfig", unvlist);
-    Py_CLEAR(unvlist);
-  }
   {
     PyObject* unvlist = PyList_New(1);
     PyList_SET_ITEM(unvlist, 0, PyObject_GetAttrString(submodule, "ConfigV1"));

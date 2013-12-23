@@ -57,20 +57,15 @@ void createWrappers(PyObject* module) {
     .value("MHz20",Psana::Acqiris::VertV1::MHz20)
     .value("MHz35",Psana::Acqiris::VertV1::MHz35)
   ;
-  scope().attr("Version")=1;
   }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Acqiris::VertV1> >(-1));
 
-  {
-  scope outer = 
   class_<Psana::Acqiris::HorizV1 >("HorizV1", "Class containing Acqiris configuration data for horizontal axis.", no_init)
     .def("sampInterval", &Psana::Acqiris::HorizV1::sampInterval,"Interval for single sample.")
     .def("delayTime", &Psana::Acqiris::HorizV1::delayTime,"Delay time.")
     .def("nbrSamples", &Psana::Acqiris::HorizV1::nbrSamples,"Number of samples.")
     .def("nbrSegments", &Psana::Acqiris::HorizV1::nbrSegments,"Number of segments.")
   ;
-  scope().attr("Version")=1;
-  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Acqiris::HorizV1> >(-1));
 
   {
@@ -103,7 +98,6 @@ void createWrappers(PyObject* module) {
     .value("HFDivide",Psana::Acqiris::TrigV1::HFDivide)
     .value("SpikeStretcher",Psana::Acqiris::TrigV1::SpikeStretcher)
   ;
-  scope().attr("Version")=1;
   }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Acqiris::TrigV1> >(-1));
 
@@ -124,16 +118,12 @@ void createWrappers(PyObject* module) {
   }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::Acqiris::ConfigV1> >(Pds::TypeId::Id_AcqConfig));
 
-  {
-  scope outer = 
   class_<Psana::Acqiris::TimestampV1 >("TimestampV1", "Class representing Acqiris timestamp value.", no_init)
     .def("pos", &Psana::Acqiris::TimestampV1::pos,"Horizontal position, for the segment, of the first (nominal) data point with respect \n            to the origin of the nominal trigger delay in seconds.")
     .def("timeStampLo", &Psana::Acqiris::TimestampV1::timeStampLo)
     .def("timeStampHi", &Psana::Acqiris::TimestampV1::timeStampHi)
     .def("value", &Psana::Acqiris::TimestampV1::value,"64-bit trigger timestamp, in units of picoseconds. The timestamp is the trigger time \n                with respect to an arbitrary time origin.")
   ;
-  scope().attr("Version")=1;
-  }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Acqiris::TimestampV1> >(-1));
 
   {
@@ -145,7 +135,6 @@ void createWrappers(PyObject* module) {
     .def("timestamp", &Psana::Acqiris::DataDescV1Elem::timestamp,"Timestamps, one timestamp per segment.")
     .def("waveforms", &Psana::Acqiris::DataDescV1Elem::waveforms,"Waveforms data, two-dimensional array [nbrSegments()]*[nbrSamplesInSeg()]. Note that \n            unlike in pdsdata this already takes into account value of the indexFirstPoint so\n            that client code does not need to correct for this offset.")
   ;
-  scope().attr("Version")=1;
   scope().attr("NumberOfBits")=10;
   scope().attr("BitShift")=6;
   scope().attr("_extraSize")=32;
@@ -316,7 +305,7 @@ void createWrappers(PyObject* module) {
   {
   scope outer = 
   class_<Psana::Acqiris::TdcDataV1, boost::shared_ptr<Psana::Acqiris::TdcDataV1>, boost::noncopyable >("TdcDataV1", "Acqiris TDS data object is a container for TdcDataV1_Item object (or their\n            sub-types).", no_init)
-    .def("data", &Psana::Acqiris::TdcDataV1::data,"Access TDC data items. The data_shape() method should be used to \n            obtain the number of elements.")
+    .def("data", &Psana::Acqiris::TdcDataV1::data,"Access TDC data items.")
   ;
   scope().attr("Version")=1;
   scope().attr("TypeId")=int(Pds::TypeId::Id_AcqTdcData);
@@ -325,14 +314,8 @@ void createWrappers(PyObject* module) {
 
   {
     PyObject* unvlist = PyList_New(1);
-    PyList_SET_ITEM(unvlist, 0, PyObject_GetAttrString(submodule, "DataDescV1"));
-    PyObject_SetAttrString(submodule, "DataDesc", unvlist);
-    Py_CLEAR(unvlist);
-  }
-  {
-    PyObject* unvlist = PyList_New(1);
-    PyList_SET_ITEM(unvlist, 0, PyObject_GetAttrString(submodule, "VertV1"));
-    PyObject_SetAttrString(submodule, "Vert", unvlist);
+    PyList_SET_ITEM(unvlist, 0, PyObject_GetAttrString(submodule, "TdcConfigV1"));
+    PyObject_SetAttrString(submodule, "TdcConfig", unvlist);
     Py_CLEAR(unvlist);
   }
   {
@@ -343,26 +326,8 @@ void createWrappers(PyObject* module) {
   }
   {
     PyObject* unvlist = PyList_New(1);
-    PyList_SET_ITEM(unvlist, 0, PyObject_GetAttrString(submodule, "TdcConfigV1"));
-    PyObject_SetAttrString(submodule, "TdcConfig", unvlist);
-    Py_CLEAR(unvlist);
-  }
-  {
-    PyObject* unvlist = PyList_New(1);
-    PyList_SET_ITEM(unvlist, 0, PyObject_GetAttrString(submodule, "TimestampV1"));
-    PyObject_SetAttrString(submodule, "Timestamp", unvlist);
-    Py_CLEAR(unvlist);
-  }
-  {
-    PyObject* unvlist = PyList_New(1);
-    PyList_SET_ITEM(unvlist, 0, PyObject_GetAttrString(submodule, "TrigV1"));
-    PyObject_SetAttrString(submodule, "Trig", unvlist);
-    Py_CLEAR(unvlist);
-  }
-  {
-    PyObject* unvlist = PyList_New(1);
-    PyList_SET_ITEM(unvlist, 0, PyObject_GetAttrString(submodule, "HorizV1"));
-    PyObject_SetAttrString(submodule, "Horiz", unvlist);
+    PyList_SET_ITEM(unvlist, 0, PyObject_GetAttrString(submodule, "DataDescV1"));
+    PyObject_SetAttrString(submodule, "DataDesc", unvlist);
     Py_CLEAR(unvlist);
   }
   {

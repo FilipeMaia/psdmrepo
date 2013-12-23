@@ -7,16 +7,16 @@ if [ ! -d psddldata/data/ ]; then
     exit 1
 fi
 
-files=`ls -1 psddldata/data/*.ddl.xml | grep -v xtc.ddl`
+files=`ls -1 psddldata/data/*.ddl | grep -v xtc.ddl`
 
 echo "" > psddl_python/src/WrapperList.txt
 for f in $files ; do
-  module=`basename $f .ddl.xml`
-  package=`grep "package name" $f | sed -e 's,^.*name=",,' -e 's,".*,,'`
+  module=`basename $f .ddl`
+  package=`gawk '/^ *@package/{print $2}' $f`
   echo "DECL($package)" >> psddl_python/src/WrapperList.txt
   echo "module $module, package $package"
   psddlc -b python -I data -I psddl_psana -t psddl_python -B dev-types=$devtypes \
     -e psddl_python/include/$module.ddl.h \
     -o psddl_python/src/$module.ddl.cpp \
-    psddldata/data/$module.ddl.xml
+    psddldata/data/$module.ddl
 done
