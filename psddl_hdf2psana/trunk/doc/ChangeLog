@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-00
+2013-12-22 Andy Salnikov
+- regenerate whole thing from psddldata V01-00-00 with psddl V00-13-00
+
 Tag: V00-07-10
 2013-12-21 Andy Salnikov
 - camera.cpp: bug fix for image reading, checked size of the wrong type

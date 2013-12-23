@@ -339,7 +339,19 @@ double DataV1_v0<Config>::durationOfFrame() const {
 template <typename Config>
 double
 DataV1_v0<Config>::nonlinerCorrected(uint32_t iPixel) const{ 
-double fRawValue = (double) (this->data()[iPixel] ^ 0x2000);                     const ndarray<const double, 1>& corr = m_cfg->nonlinCorrect();                     return fRawValue / (                      corr[0] + fRawValue *                      (corr[1] + fRawValue *                      (corr[2] + fRawValue *                      (corr[3] + fRawValue *                      (corr[4] + fRawValue *                      (corr[5] + fRawValue *                      (corr[6] + fRawValue *                       corr[7]))))))); 
+
+    double fRawValue = (double) (this->data()[iPixel] ^ 0x2000);
+    const ndarray<const double, 1>& corr = m_cfg->nonlinCorrect();
+    return fRawValue / (                      
+	corr[0] + fRawValue *
+       (corr[1] + fRawValue *
+       (corr[2] + fRawValue *
+       (corr[3] + fRawValue *
+       (corr[4] + fRawValue *
+       (corr[5] + fRawValue *
+       (corr[6] + fRawValue *
+        corr[7])))))));
+ 
 }
 template <typename Config>
 void DataV1_v0<Config>::read_ds_spectra() const {

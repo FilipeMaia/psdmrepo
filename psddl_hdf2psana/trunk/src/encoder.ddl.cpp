@@ -419,7 +419,7 @@ uint32_t DataV1_v0::encoder_count() const {
 }
 int32_t
 DataV1_v0::value() const{ 
-return int(this->encoder_count() << 8)/256;; 
+return int(this->encoder_count() << 8)/256; 
 }
 void DataV1_v0::read_ds_data() const {
   m_ds_data = hdf5pp::Utils::readGroup<Encoder::ns_DataV1_v0::dataset_data>(m_group, "data", m_idx);
@@ -556,7 +556,7 @@ ndarray<const uint32_t, 1> DataV2_v0::encoder_count() const {
 }
 int32_t
 DataV2_v0::value(uint32_t i) const{ 
-return int(this->encoder_count()[i] << 8)/256;; 
+return int(this->encoder_count()[i] << 8)/256; 
 }
 void DataV2_v0::read_ds_data() const {
   m_ds_data = hdf5pp::Utils::readGroup<Encoder::ns_DataV2_v0::dataset_data>(m_group, "data", m_idx);

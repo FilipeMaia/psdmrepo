@@ -149,7 +149,12 @@ uint8_t ConfigV1_v0::testPatternEnable() const {
 }
 double
 ConfigV1_v0::sampleInterval_sec() const{ 
-                 double v=0;                 for (unsigned r=baseClockFrequency(); r!=0; r>>=4)                   v += 10*(r & 0xf);                 return double(adcClkHalfT())*2.e-3/v; 
+
+    double v=0;
+    for (unsigned r=baseClockFrequency(); r!=0; r>>=4)
+      v += 10*(r & 0xf);
+    return double(adcClkHalfT())*2.e-3/v;
+ 
 }
 void ConfigV1_v0::read_ds_config() const {
   m_ds_config = hdf5pp::Utils::readGroup<EpixSampler::ns_ConfigV1_v0::dataset_config>(m_group, "config", m_idx);

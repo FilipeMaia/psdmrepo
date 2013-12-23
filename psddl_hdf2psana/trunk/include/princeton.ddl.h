@@ -65,7 +65,9 @@ public:
   /** calculate frame Y size in pixels based on the current ROI and binning settings */
   uint32_t numPixelsY() const { return (this->height()+ this->binY() - 1) / this->binY(); }
   /** calculate total frame size in pixels based on the current ROI and binning settings */
-  uint32_t numPixels() const { return ((this->width() + this->binX()-1)/ this->binX() )*((this->height()+ this->binY()-1)/ this->binY() ); }
+  uint32_t numPixels() const { 
+    return ((this->width() + this->binX()-1)/ this->binX() )*((this->height()+ this->binY()-1)/ this->binY() );
+ }
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
@@ -142,7 +144,9 @@ public:
   /** calculate frame Y size in pixels based on the current ROI and binning settings */
   uint32_t numPixelsY() const { return (this->height()+ this->binY() - 1) / this->binY(); }
   /** calculate total frame size in pixels based on the current ROI and binning settings */
-  uint32_t numPixels() const { return ((this->width() + this->binX()-1)/ this->binX() )*((this->height()+ this->binY()-1)/ this->binY() ); }
+  uint32_t numPixels() const { 
+    return ((this->width() + this->binX()-1)/ this->binX() )*((this->height()+ this->binY()-1)/ this->binY() );
+ }
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
@@ -219,7 +223,9 @@ public:
   /** calculate frame Y size in pixels based on the current ROI and binning settings */
   uint32_t numPixelsY() const { return (this->height()+ this->binY() - 1) / this->binY(); }
   /** calculate total frame size in pixels based on the current ROI and binning settings */
-  uint32_t numPixels() const { return ((this->width() + this->binX()-1)/ this->binX() )*((this->height()+ this->binY()-1)/ this->binY() ); }
+  uint32_t numPixels() const { 
+    return ((this->width() + this->binX()-1)/ this->binX() )*((this->height()+ this->binY()-1)/ this->binY() );
+ }
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;
@@ -387,7 +393,9 @@ public:
   /** calculate frame Y size in pixels based on the current ROI and binning settings */
   uint32_t numPixelsY() const { return (this->height()+ this->binY() - 1) / this->binY(); }
   /** calculate total frame size in pixels based on the current ROI and binning settings */
-  uint32_t numPixels() const { return ((this->width() + this->binX()-1)/ this->binX() )*((this->height()+ this->binY()-1)/ this->binY() ); }
+  uint32_t numPixels() const { 
+    return ((this->width() + this->binX()-1)/ this->binX() )*((this->height()+ this->binY()-1)/ this->binY() );
+ }
 private:
   mutable hdf5pp::Group m_group;
   hsize_t m_idx;

@@ -946,7 +946,7 @@ public:
   virtual ndarray<const int16_t, 3> data() const;
   virtual uint32_t sectionMask() const;
   /** Common mode value for a given section, section number can be 0 to config.numSect().
-                Will return 0 for data read from XTC, may be non-zero after calibration. */
+	 Will return 0 for data read from XTC, may be non-zero after calibration. */
   float common_mode(uint32_t section) const;
 
 private:
