@@ -62,9 +62,15 @@ def _TEMPL(template):
 def _interpolate(expr, typeobj):
     
     expr = expr.replace('{xtc-config}', 'cfg')
+    expr = expr.replace('@config', 'cfg')
     expr = expr.replace('{type}.', typeobj.name+"::")
+    expr = expr.replace('@type.', typeobj.name+"::")
     expr = expr.replace('{self}.', "this->")
+    expr = expr.replace('@self.', "this->")
     return expr
+
+def _hasconfig(str):
+    return '{xtc-config}' in str or '@config' in str
 
 def _typename(type):
     
@@ -182,7 +188,7 @@ class CppTypeCodegen ( object ) :
                 # non-value types also get copy constructor (possibly disabled), and disabled assignment
                 _sizeof = self._type.lookup('_sizeof', Method)
                 sizestr = str(self._type.size)
-                if _sizeof is None or '{xtc-config}' in sizestr:
+                if _sizeof is None or _hasconfig(sizestr):
                     access = self._access('private', access)
                     print >>self._inc, T("  $name(const $name&);")[self._type]
                     print >>self._inc, T("  $name& operator=(const $name&);")[self._type]
@@ -199,8 +205,9 @@ class CppTypeCodegen ( object ) :
 
         # generate methods (for interfaces public methods only)
         for meth in self._type.methods(): 
-            access = self._access("public", access)
-            if not self._abs or meth.access == "public": self._genMethod(meth)
+            if not self._abs or meth.access == "public": 
+                access = self._access(meth.access, access)
+                self._genMethod(meth)
 
         # generate _shape() methods for array attributes
         for attr in self._type.attributes() :
@@ -409,9 +416,7 @@ class CppTypeCodegen ( object ) :
         elif attr.type.variable:
             
             # _sizeof may need config
-            sizeofCfg = ''
-            if str(attr.type.size).find('{xtc-config}') >= 0: 
-                sizeofCfg = '{xtc-config}'
+            sizeofCfg = '@config' if _hasconfig(str(attr.type.size)) else ''
                 
             typename = _typename(attr.type)
             body = T("const char* memptr = ((const char*)this)+$offset;")[attr]
@@ -428,9 +433,7 @@ class CppTypeCodegen ( object ) :
                 idxexpr = idxexpr*attr.shape.dims[i] + ExprVal('i%d'%i, self._type)
                 
             # _sizeof may need config
-            sizeofCfg = ''
-            if str(attr.type.size).find('{xtc-config}') >= 0: 
-                sizeofCfg = '{xtc-config}'
+            sizeofCfg = '@config' if _hasconfig(str(attr.type.size)) else ''
 
             typename = _typename(attr.type)
             body = T("ptrdiff_t offset=$offset;")[attr]
@@ -444,7 +447,7 @@ class CppTypeCodegen ( object ) :
         """ Generate method, both declaration and definition, given the body of the method"""
         
         # guess if we need to pass cfg object to method
-        cfgNeeded = body and body.find('{xtc-config}') >= 0
+        cfgNeeded = body and _hasconfig(body)
         if body: body = _interpolate(body, self._type)
 
         configs = [None]
@@ -516,23 +519,22 @@ class CppTypeCodegen ( object ) :
                 bfinit = []
                 for bf in attr.bitfields:
                     bfarg = attr2arg.get(bf)
-                    if bfarg: bfinit.append(bf.assignExpr(bfarg.expr))
+                    if bfarg: 
+                        bfinit.append(bf.assignExpr(bfarg.expr))
+                    else:
+                        for ctorInit in ctor.attr_init:
+                            if ctorInit.dest.name == bf.name:
+                                bfinit.append(bf.assignExpr(ctorInit.expr))
                 init = '|'.join(bfinit)
             else:
-                init = ""
+                init = ''
                 for ctorInit in ctor.attr_init:
                     if ctorInit.dest.name == attr.name:
                         init = ctorInit.expr
             if init: initlist.append(T("$attr($init)")(attr=attr.name, init=init))
 
         # do we need generate definition too?
-        if 'force_definition' in ctor.tags:
-            genDef = True
-        elif 'external' in ctor.tags:
-            genDef = False
-        else:
-            # generate definition only if all destinations are known
-            genDef = None not in [arg.dest for arg in ctor.args]
+        genDef = 'external' not in ctor.tags
 
         classname = self._type.name
         if not genDef:

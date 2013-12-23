@@ -40,7 +40,6 @@ from AppUtils.AppBase import AppBase
 #-----------------------------
 # Imports for other modules --
 #-----------------------------
-from psddl.XmlReader import XmlReader
 from psddl.DdlPds2Psana import DdlPds2Psana
 from psddl.DdlPds2PsanaDispatch import DdlPds2PsanaDispatch
 from psddl.DdlPsanaDoc import DdlPsanaDoc
@@ -50,6 +49,9 @@ from psddl.DdlPdsdata import DdlPdsdata
 from psddl.DdlHdf5Data import DdlHdf5Data
 from psddl.DdlHdf5DataDispatch import DdlHdf5DataDispatch
 from psddl.DdlHdf5Translator import DdlHdf5Translator
+from psddl.DdlDumpHddl import DdlDumpHddl
+from psddl.XmlReader import XmlReader
+from psddl.HddlReader import HddlReader
 
 #---------------------
 # Local definitions --
@@ -76,6 +78,7 @@ class psddlc ( AppBase ) :
                                   include_dir = [],
                                   top_package = None,
                                   backend_options = [],
+                                  input_xml = False,
                                   list_backends = False)
         
         self._parser.add_option("-b", "--backend", metavar="NAME", 
@@ -99,6 +102,7 @@ class psddlc ( AppBase ) :
         self._parser.add_option("-B", "--backend-options", action="append",
                                 help="options for backend, form key:value or key, can be specified multiple times, say -B help for list of supported backend options",
                                 metavar="OPTION")
+        self._parser.add_option("-x", "--input-xml", action="store_true", help="use old unsupported XML parser")
         self._parser.add_option("-l", "--list-backends", action="store_true",
                                 help="print list of available backends and exit")
 
@@ -113,6 +117,7 @@ class psddlc ( AppBase ) :
             "hdf5": DdlHdf5Data,
             "hdf5-dispatch": DdlHdf5DataDispatch,
             "hdf5Translator": DdlHdf5Translator,
+            "dump-hddl": DdlDumpHddl,
         }
         
 
@@ -172,11 +177,18 @@ class psddlc ( AppBase ) :
         generator = factory(backend_options, self)
         
         try :
-            reader = XmlReader(self._args, self._options.include_dir)
+            if self._options.input_xml:
+                reader = XmlReader(self._args, self._options.include_dir)
+            else:
+                reader = HddlReader(self._args, self._options.include_dir)
             model = reader.read()
+        except EOFError, ex:
+            # if parser throws this error means it has already printed as much 
+            # info as possible and we should just stop with error
+            return 2
         except Exception, ex:
             print >>sys.stderr, "parsing failed for file", self._args
-            print >>sys.stderr, "reason:", ex
+            print >>sys.stderr, ex
             raise
             return 2
 
@@ -195,9 +207,14 @@ class psddlc ( AppBase ) :
 
         header = self._options.header
         source = self._options.output
-        
-        if not header : header = os.path.splitext(base)[0] + '.h'
-        if not source : source = os.path.splitext(base)[0] + '.cpp'
+
+        # to keep our old convention when we transformed 'file.ddl.xml' into 'file.ddl.cpp'
+        # with the new DDL naming we want to transform 'file.ddl' into 'file.ddl.cpp'
+        # (or more generally 'file.ext' into 'file.ddl.cpp')
+        base = os.path.splitext(base)[0]
+        if not base.endswith('.ddl'): base += '.ddl'
+        if not header : header = base + '.h'
+        if not source : source = base + '.cpp'
         if self._options.header_dir: header = os.path.join(self._options.header_dir, header)
         if self._options.output_dir: source = os.path.join(self._options.output_dir, source)
 

@@ -77,6 +77,12 @@ class Package ( Namespace ) :
             if not ns.included:
                 return False
 
+        # loop over all h5schemas
+        for type in self.types():
+            for schema in type.h5schemas:
+                if not schema.included:
+                    return False
+
         return True
 
     @property

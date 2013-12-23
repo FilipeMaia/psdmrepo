@@ -288,7 +288,9 @@ class DdlPds2PsanaDispatch ( object ) :
         3. psana type put into event or config store
         '''
         header = os.path.basename(type.location)
-        header = os.path.splitext(header)[0] + '.h'
+        header = os.path.splitext(header)[0]
+        if not header.endswith('.ddl'): header += '.ddl'
+        header = header + '.h'
         header = os.path.join(self.incdirname, header)
         
         xtc_type = type.fullName('C++', self.pdsdata_ns)

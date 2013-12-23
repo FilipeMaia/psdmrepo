@@ -74,7 +74,7 @@ class Bitfield ( object ) :
 
     def expr(self):
         
-        expr = "{self}."+self.parent.name
+        expr = "@self."+self.parent.name
         if self.offset > 0 :
             expr = "(%s>>%d)" % (expr, self.offset)
         expr = "%s(%s & %#x)" % (self.type.name, expr, self.bitmask)

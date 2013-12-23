@@ -61,7 +61,9 @@ def _TEMPL(template):
 
 def _interpolate(expr):
     expr = expr.replace('{xtc-config}.', 'cfgPtr->')
+    expr = expr.replace('@config.', 'cfgPtr->')
     expr = expr.replace('{self}.', "m_xtcObj->")
+    expr = expr.replace('@self.', "m_xtcObj->")
     return expr
 
 def _dimargs(shape):
@@ -73,6 +75,9 @@ def _dimexpr(shape):
 
 def _dimarray(shape):
     return ', '.join([_interpolate(str(s)) for s in shape.dims])
+
+def _hasconfig(str):
+    return '{xtc-config}' in str or '@config' in str
 
 #------------------------
 # Exported definitions --
@@ -158,7 +163,9 @@ class DdlPds2Psana ( object ) :
             path = use['file']
             headers = use['cpp_headers']
             if not headers:
-                header = os.path.splitext(path)[0] + '.h'
+                header = os.path.splitext(path)[0]
+                if not header.endswith('.ddl'): header += '.ddl'
+                header = header + '.h'
                 header = os.path.join(self.incdirname, os.path.basename(header))
                 headers = [header]
             for header in headers:
@@ -278,7 +285,7 @@ class DdlPds2Psana ( object ) :
 
             atype = arg.type
 
-            if not arg.dest.accessor:
+            if not arg.method:
                 raise ValueError('attribute %s has no access method' % arg.dest.name)
 
             expr = "pds."+arg.method.name+"()"
@@ -376,17 +383,14 @@ class DdlPds2Psana ( object ) :
 
             if attr.type.basic:
                 
-                cfgNeeded = False
-                cvt = False
+                cfgNeeded = _hasconfig(str(attr.offset))
+                cvt = attr.type is not attr.stor_type
                 shptr = False
-                if '{xtc-config}' in str(attr.offset) : cfgNeeded = True
-                if attr.type is not attr.stor_type: cvt = True
 
                 args = []
                 rettype = attr.type.fullName('C++', self.psana_ns)
                 if attr.shape :
-                    for d in attr.shape.dims:
-                        if '{xtc-config}' in str(d) : cfgNeeded = True
+                    cfgNeeded = cfgNeeded or any(_hasconfig(str(d)) for d in attr.shape.dims)
                     if attr.type.name == 'char':
                         rettype = "const char*"
                         args = [('i%d'%i, type.lookup('uint32_t')) for i in range(len(attr.shape.dims)-1)]
@@ -451,9 +455,7 @@ class DdlPds2Psana ( object ) :
                 if expr:
                     body = expr
                     if type: body = T("return $expr;")(locals())
-            cfgNeeded = False
-            if body:
-                cfgNeeded = body.find('{xtc-config}') >= 0
+            cfgNeeded = body and _hasconfig(body)
 
             # if no type given then it does not return anything
             rettype = meth.type
@@ -605,17 +607,13 @@ class DdlPds2Psana ( object ) :
             return self._genAttrInitNDArray(attr)
 
         # config objects may be needed
-        cfgNeeded = False
-        if str(attr.offset).find('{xtc-config}') >= 0:
-            cfgNeeded = True
-        if str(attr.type.size).find('{xtc-config}') >= 0:
-            cfgNeeded = True
+        cfgNeeded = _hasconfig(str(attr.offset)) or _hasconfig(str(attr.type.size))
 
         code = ["  {"]
         
         cfg = ''
-        for d in attr.shape.dims:
-            if '{xtc-config}' in str(d) : cfg = "*cfgPtr"
+        if any(_hasconfig(str(d)) for d in attr.shape.dims):
+            cfg = "*cfgPtr"
         code += [T("    const std::vector<int>& dims = xtcPtr->$meth($cfg);")(meth=attr.shape_method, cfg=cfg)]
 
         for r in range(ndims):
@@ -664,12 +662,7 @@ class DdlPds2Psana ( object ) :
         pdstypename = attr.type.fullName('C++', self.pdsdata_ns)
         psanatypename = attr.type.fullName('C++', self.psana_ns)
 
-        cfgNeeded = False
-        if str(attr.offset).find('{xtc-config}') >= 0:
-            cfgNeeded = True
-        for d in attr.shape.dims:
-            if '{xtc-config}' in str(d) : cfgNeeded = True
-            
+        cfgNeeded = _hasconfig(str(attr.offset)) or any(_hasconfig(str(d)) for d in attr.shape.dims)
         cfg = "*cfgPtr" if cfgNeeded else ""
 
         cvt = None
@@ -692,10 +685,7 @@ class DdlPds2Psana ( object ) :
 
         if attr.type.basic:
 
-            cfgNeeded = False
-            if attr.shape:
-                for d in attr.shape.dims:
-                    if '{xtc-config}' in str(d) : cfgNeeded = True
+            cfgNeeded = attr.shape and any(_hasconfig(str(d)) for d in attr.shape.dims)
             return self._genFwdMeth(attr.shape_method, "std::vector<int>", type, cfgNeeded)
             
         else:

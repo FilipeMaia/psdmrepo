@@ -11,6 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-13-00
+2013-12-22 Andy Salnikov
+- merge branch V00-11-00-hddl onto main trunk
+- few additional changes needs to support new stuff which happenned on main 
+  trunk since V00-12-00
+
 Tag: V00-12-14
 2013-12-22 Andy Salnikov
 - pdsdata backend: for arrays of unknown size ('*', now exists in 
@@ -61,20 +67,57 @@ Tag: V00-12-04
 2013-11-12 Andy Salnikov
 - add support for declaration of methods returning arrays of enums
 
+2013-11-08 Andy Salnikov  (on branch V00-11-00-hddl)
+- fix unit test
+
+2013-11-08 Andy Salnikov  (on branch V00-11-00-hddl)
+- more or less complete, can regenerate everyhting from DDL,
+  results are practically identical except for formatting
+  
+2013-11-08 Andy Salnikov  (on branch V00-11-00-hddl)
+- in parser substitute new tag names with internal tag names
+- generators now understand @self, @config, etc.
+
+2013-11-08 Andy Salnikov  (on branch V00-11-00-hddl)
+- fix test
+
+2013-11-08 Andy Salnikov  (on branch V00-11-00-hddl)
+- add tags validation
+
 Tag: V00-12-03
 2013-11-08 David Schneider
 - Translator backend: remove references to xml files
 - Translator backend: change default psana.cfg to include epics config
+
+2013-11-07 Andy Salnikov  (on branch V00-11-00-hddl)
+- add code for matching comments to declarations
+
+2013-11-07 Andy Salnikov  (on branch V00-11-00-hddl)
+- more or less complete reader implementation, not well tested yet
+- sill need to do something about comments
 
 Tag: V00-12-02
 2013-11-07 David Schneider
 - adapt Translator to PSEvt tag V00-07-04
 - fix bug, adapt Translator Ddl backend to psddl tag V00-11-00
 
+2013-11-06 Andy Salnikov  (on branch V00-11-00-hddl)
+- add simple unit test for scanner/parser
+
+2013-11-06 Andy Salnikov  (on branch V00-11-00-hddl)
+- add hdf5 definitoions to parser
+- few fixes everywhere
+
 Tag: V00-12-01
 2013-11-06 David Schneider
 - add back end for Psana Hdf5 Translator module
   - update DdlPds2PsanaDisatch to generate a dispatch for C++ type_id's
+
+2013-11-05 Andy Salnikov  (on branch V00-11-00-hddl)
+- first version of lexer and parser
+
+2013-11-03 Andy Salnikov (on branch V00-11-00-hddl)
+- first version of dump-hddl backend
 
 Tag: V00-12-00
 2013-11-02 Andy Salnikov

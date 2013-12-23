@@ -478,6 +478,7 @@ class XmlReader ( object ) :
                             parent = type, 
                             type = atype,
                             rank = rank,
+                            access = attr.access,
                             comment = attr.comment)
             attr.accessor = method
             logging.debug("XmlReader._parseAttr: new method: %s", method)
@@ -509,7 +510,7 @@ class XmlReader ( object ) :
                                     bitfield = bf, 
                                     parent = type, 
                                     type = bftype,
-                                    access = bitfel.get('access', 'public'),
+                                    access = bitfel.get('access'),
                                     comment = bf.comment)
                     bf.accessor = method
                     logging.debug("XmlReader._parseAttr: new method: %s", method)
@@ -570,7 +571,7 @@ class XmlReader ( object ) :
         # like <attr-init dest="attrname" value="value"/>
         attr_init = []
         for attrel in list(ctorel) :
-            if argel.tag == "attr-init" :
+            if attrel.tag == "attr-init" :
                 
                 # destination must be given
                 dest_name = argel.get('dest')

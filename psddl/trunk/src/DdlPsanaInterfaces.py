@@ -129,7 +129,9 @@ class DdlPsanaInterfaces ( object ) :
             path = use['file']
             headers = use['cpp_headers']
             if not headers:
-                header = os.path.splitext(path)[0] + '.h'
+                header = os.path.splitext(path)[0]
+                if not header.endswith('.ddl'): header += '.ddl'
+                header = header + '.h'
                 header = os.path.join(self.incdirname, os.path.basename(header))
                 headers = [header]
             for header in headers:
@@ -224,7 +226,7 @@ class DdlPsanaInterfaces ( object ) :
         print >>self.inc, T("  enum $name {")(name = enum.name or "")
         for const in enum.constants() :
             val = ""
-            if const.value is not None : val = " = " + const.value
+            if const.value is not None : val = " = " + str(const.value)
             doc = ""
             if const.comment: doc = T(' /**< $comment */')[const]
             print >>self.inc, T("    $name$value,$doc")(name=const.name, value=val, doc=doc)
