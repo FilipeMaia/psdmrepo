@@ -190,9 +190,9 @@ void store_FrameV1_v0(const Psana::Camera::FrameV1* obj, hdf5pp::Group group, lo
 
   // store metadata dataset
   if (append) {
-    hdf5pp::Utils::storeAt(group, "data", ns_FrameV1_v0::dataset_data::dataset_data(*obj), index);
+    hdf5pp::Utils::storeAt(group, "data", ns_FrameV1_v0::dataset_data(*obj), index);
   } else {
-    hdf5pp::Utils::storeScalar(group, "data", ns_FrameV1_v0::dataset_data::dataset_data(*obj));
+    hdf5pp::Utils::storeScalar(group, "data", ns_FrameV1_v0::dataset_data(*obj));
   }
 
   // store image, it can be either 8-bit or 16-bit
