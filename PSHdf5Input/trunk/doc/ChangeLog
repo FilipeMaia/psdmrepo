@@ -11,6 +11,13 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-00
+2013-12-29 Andy
+- check _mask dataet if present when reading data, test is done at very 
+  high level (in Hdf5InputModule) so that if test fails it can decide to 
+  to store damage in the event; I'm not sure that damage may be neded when 
+  reading HDF5, leave it as an option for now
+
 Tag: V00-02-01
 2013-11-06 David Schneider
 - implemented control() in Hdf5EventId to work with V00-07-03 of PSEvt

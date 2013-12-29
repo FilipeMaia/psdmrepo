@@ -117,7 +117,7 @@ Hdf5CalibCycleIter::next()
 
     res = Hdf5IterData(value_type::Event, eid);
     for (MergedData::const_iterator it = data.begin(); it != data.end(); ++ it) {
-      res.add(it->group, it->index);
+      res.add(it->group, it->index, it->mask);
     }
   }
 

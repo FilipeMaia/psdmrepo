@@ -260,7 +260,7 @@ Hdf5InputModule::fillEpics(const Hdf5IterData& data, Env& env)
   // call converter for every piece of data
   const Hdf5IterData::seq_type& pieces = data.data();
   for (Hdf5IterData::const_iterator it = pieces.begin(); it != pieces.end(); ++ it) {
-    m_cvt.convertEpics(it->group, it->index, env.epicsStore());
+    if (it->mask) m_cvt.convertEpics(it->group, it->index, env.epicsStore());
   }
 }
 
@@ -283,7 +283,7 @@ Hdf5InputModule::fillEventEnv(const Hdf5IterData& data, Event& evt, Env& env)
   // call converter for every piece of data
   const Hdf5IterData::seq_type& pieces = data.data();
   for (Hdf5IterData::const_iterator it = pieces.begin(); it != pieces.end(); ++ it) {
-    m_cvt.convert(it->group, it->index, evt, env);
+    if (it->mask) m_cvt.convert(it->group, it->index, evt, env);
   }
 }
 

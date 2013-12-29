@@ -62,10 +62,11 @@ public:
   /// Description of the single data object in HDF5 file
   struct SingleDataItem {
     SingleDataItem() {}
-    SingleDataItem(const hdf5pp::Group& agroup, int64_t aindex)
-      : group(agroup), index(aindex) {}
+    SingleDataItem(const hdf5pp::Group& agroup, int64_t aindex, bool amask)
+      : group(agroup), index(aindex), mask(amask) {}
     hdf5pp::Group group;   ///< Group where object resides
-    int64_t      index;   ///< Object index in a datasets
+    int64_t       index;   ///< Object index in a datasets
+    bool          mask;    ///< If false then damaged event
   };
 
   /// Type of the event for the iterator
@@ -95,8 +96,8 @@ public:
     : m_type(type), m_data(), m_eid(eid) {}
 
   /// Add one more data object
-  void add(const hdf5pp::Group& group, int64_t index) {
-    m_data.push_back(value_type(group, index));
+  void add(const hdf5pp::Group& group, int64_t index, bool mask = true) {
+    m_data.push_back(value_type(group, index, mask));
   }
   
   /// Returns event type for current iteration

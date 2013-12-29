@@ -63,6 +63,7 @@ Hdf5DatasetIter::Hdf5DatasetIter (const hdf5pp::Group& grp, bool fullTsFormat, T
   : m_group(grp)
   , m_fullTsFormat(fullTsFormat)
   , m_ds()
+  , m_mask()
   , m_size(0)
   , m_index(0)
   , m_dataIndex(0)
@@ -70,6 +71,11 @@ Hdf5DatasetIter::Hdf5DatasetIter (const hdf5pp::Group& grp, bool fullTsFormat, T
 {
   // open "time" dataset, will throw if cannot open
   m_ds = m_group.openDataSet("time");
+
+  // open optional _mask dataset
+  if (m_group.hasChild("_mask")) {
+    m_mask = m_group.openDataSet("_mask");
+  }
   
   // get dataset's dataspace
   m_dsp = m_ds.dataSpace();
@@ -77,6 +83,9 @@ Hdf5DatasetIter::Hdf5DatasetIter (const hdf5pp::Group& grp, bool fullTsFormat, T
   // check rank
   if (m_dsp.rank() != 1) {
     throw FileStructure(ERR_LOC, "bad rank for 'time' dataset in group "+grp.name());
+  }
+  if (m_mask.valid() and m_mask.dataSpace().rank() != 1) {
+    throw FileStructure(ERR_LOC, "bad rank for '_mask' dataset in group "+grp.name());
   }
 
   // get its size
@@ -112,6 +121,7 @@ Hdf5DatasetIter::updateData()
   for (unsigned i = 0; i != size; ++ i) {
     m_data[i].index = m_dataIndex + i;
     m_data[i].group = m_group;
+    m_data[i].mask = true;
   }
   
   // in-memory dataspace
@@ -123,6 +133,20 @@ Hdf5DatasetIter::updateData()
   m_dsp.select_hyperslab(H5S_SELECT_SET, start, 0, count, 0);
   
   m_ds.read(mem_ds, m_dsp, m_data.data(), ::iterDataType(m_fullTsFormat));
+
+  if (m_mask.valid()) {
+    // read masks
+    std::vector<uint8_t> mask(size);
+    
+    hdf5pp::DataSpace mask_dsp = m_mask.dataSpace();
+    mask_dsp.select_hyperslab(H5S_SELECT_SET, start, 0, count, 0);
+    
+    m_mask.read(mem_ds, mask_dsp, mask.data());
+    
+    for (unsigned i = 0; i != size; ++ i) {
+      m_data[i].mask = mask[i];
+    }
+  }
 }
 
 } // namespace PSHdf5Input

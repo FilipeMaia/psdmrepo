@@ -109,6 +109,7 @@ private:
   hdf5pp::Group m_group;
   bool m_fullTsFormat;
   hdf5pp::DataSet m_ds;    ///< "time" dataset
+  hdf5pp::DataSet m_mask;  ///< "_mask" dataset
   hdf5pp::DataSpace m_dsp; /// in-file dataspace for "time" dataset
   uint64_t m_size;         ///< Full dataset size
   int64_t m_index;         ///< Current index

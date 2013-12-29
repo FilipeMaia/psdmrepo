@@ -75,6 +75,7 @@ public:
   uint32_t      fiducials;
   uint32_t      control;
   uint32_t      vector;
+  bool          mask;	 ///< If false then damaged event
 };
 
 } // namespace PSHdf5Input
