@@ -90,6 +90,11 @@ XtcChunkDgIter::next()
     for (int i = 0; i != 10; ++ i) str << ' ' << p[i];
   }
 
+  // check header consistency
+  if (header.xtc.extent < sizeof(Pds::Xtc)) {
+    throw XTCExtentException(ERR_LOC, m_file.path().path(), m_off, header.xtc.extent);
+  }
+
   // make an object
   hptr = boost::make_shared<DgHeader>(header, m_file, m_off);
 

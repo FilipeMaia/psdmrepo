@@ -90,6 +90,7 @@ public:
    *
    *  @throw XTCReadException Thrown for any read errors
    *  @throw XTCLiveTimeout Thrown for timeout during live data reading
+   *  @throw XTCExtentException Thrown if XTC header is corrupted and extend is below expected
    */
   boost::shared_ptr<DgHeader> next() ;
 
