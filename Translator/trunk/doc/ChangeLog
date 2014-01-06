@@ -11,6 +11,10 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-06
+2014-01-06 David Schneider
+- Fixing bug with unit tests - one test depended on removed testing scripts.
+
 Tag: V00-00-05
 2013-12-20 David Schneider
 - Finished testing - this version seems production ready.

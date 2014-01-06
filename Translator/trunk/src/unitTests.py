@@ -21,7 +21,6 @@ import numpy as np
 #-----------------------------
 import h5py
 
-from Translator.compareTranslation import compareTranslation
 #-----------------------------
 # Test data
 # below are several small test files that are included in the data
@@ -223,36 +222,6 @@ class H5Output( unittest.TestCase ) :
         self.assertEqual(lowerOutput.find('segmentation fault'),-1,msg="'segmentation fault' found in psana output: ... %s ..." % lowerOutput[lowerOutput.find('segmentation fault')-100:lowerOutput.find('segmentation fault')+100])
         self.assertEqual(lowerOutput.find('seg fault'),-1,msg="'seg fault' found in psana output: ... %s ..." % lowerOutput[lowerOutput.find('seg fault')-100:lowerOutput.find('seg fault')+100])
         self.assertEqual(lowerOutput.find('traceback'),-1,msg="'traceback' found in psana output: ... %s ..." % lowerOutput[lowerOutput.find('traceback')-100:lowerOutput.find('traceback')+100])
-
-    def test_t1(self):
-        '''checks that test data t1 was translated correctly.
-        This file has only two events in it.  We go through all the datasets,
-        and group structure - comparing it to o2o-translate.
-        The test takes about 30 seconds to run.
-        '''
-        input_file = TESTDATA_T1
-        o2o_h5 = os.path.join(DATADIR,"unit-test-o2o-t1-all.h5")
-        psana_h5 = os.path.join(DATADIR,"unit-test-t1-all.h5")
-        # we will re-use the o2o-translator output if it is present
-        if not os.path.exists(o2o_h5):
-            o2o_cmd = 'o2o-translate -G -n %s %s' % (o2o_h5, input_file)
-            p = sb.Popen(o2o_cmd,shell=True,stdout=sb.PIPE, stderr=sb.PIPE)
-            o,e=p.communicate()
-            if len(e)>0:
-                print "o2o-translate output: %s" % o
-                raise Exception("problem creating o2o-translate file: %s" % e)
-            assert os.path.exists(o2o_h5), "o2o-translate output file %s not created" % o2o_h5
-        cfgfile = writeCfgFile(input_file, psana_h5)
-        cfgfile.file.flush();
-        self.runPsanaOnCfg(cfgfile,psana_h5, printPsanaOutput=self.printPsanaOutput)
-        cfgfile.close()
-        o2o_h5_obj = h5py.File(o2o_h5,'r')
-        psana_h5_obj = h5py.File(psana_h5,'r')
-        diffs = collections.defaultdict(set)
-        checkDatasetValues = True
-        compareTranslation(self,o2o_h5_obj, psana_h5_obj,diffs,cmpDsetValues=True)
-        if self.cleanUp:
-            os.unlink(psana_h5)
 
     def test_t1_initial_damage(self):
         '''The input file is a modified version of t1.xtc.
