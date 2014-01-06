@@ -12,6 +12,7 @@
 #include "psddl_psana/cspad2x2.ddl.h"
 #include "psddl_psana/encoder.ddl.h"
 #include "psddl_psana/epics.ddl.h"
+#include "psddl_psana/epix.ddl.h"
 #include "psddl_psana/epixsampler.ddl.h"
 #include "psddl_psana/evr.ddl.h"
 #include "psddl_psana/fccd.ddl.h"
@@ -102,6 +103,11 @@ TypeAliases::TypeAliases() {
   TypeInfoSet Epics;
   Epics.insert( & typeid(Psana::Epics::ConfigV1));
   m_alias2TypesMap["Epics"] = Epics;
+
+  TypeInfoSet Epix;
+  Epix.insert( & typeid(Psana::Epix::ConfigV1));
+  Epix.insert( & typeid(Psana::Epix::ElementV1));
+  m_alias2TypesMap["Epix"] = Epix;
 
   TypeInfoSet EpixSampler;
   EpixSampler.insert( & typeid(Psana::EpixSampler::ConfigV1));

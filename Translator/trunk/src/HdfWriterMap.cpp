@@ -19,6 +19,7 @@ psddl/data/templates/hdf5Translator.tmpl?hdfwritermap_cpp
 #include "psddl_hdf2psana/cspad2x2.ddl.h"
 #include "psddl_hdf2psana/encoder.ddl.h"
 #include "psddl_hdf2psana/epics.ddl.h"
+#include "psddl_hdf2psana/epix.ddl.h"
 #include "psddl_hdf2psana/epixsampler.ddl.h"
 #include "psddl_hdf2psana/evr.ddl.h"
 #include "psddl_hdf2psana/fccd.ddl.h"
@@ -50,13 +51,14 @@ const int latestTypeSchema = -1;
 
 using namespace Translator;
 using namespace psddl_hdf2psana;
+using namespace psddl_hdf2psana::Epix;
 using namespace psddl_hdf2psana::UsdUsb;
 using namespace psddl_hdf2psana::Rayonix;
 using namespace psddl_hdf2psana::CsPad2x2;
 using namespace psddl_hdf2psana::Pulnix;
 using namespace psddl_hdf2psana::Imp;
 using namespace psddl_hdf2psana::L3T;
-using namespace psddl_hdf2psana::OceanOptics;
+using namespace psddl_hdf2psana::Camera;
 using namespace psddl_hdf2psana::EvrData;
 using namespace psddl_hdf2psana::Bld;
 using namespace psddl_hdf2psana::EpixSampler;
@@ -67,16 +69,16 @@ using namespace psddl_hdf2psana::CsPad;
 using namespace psddl_hdf2psana::Opal1k;
 using namespace psddl_hdf2psana::Princeton;
 using namespace psddl_hdf2psana::ControlData;
-using namespace psddl_hdf2psana::Fli;
+using namespace psddl_hdf2psana::FCCD;
 using namespace psddl_hdf2psana::Alias;
 using namespace psddl_hdf2psana::Ipimb;
 using namespace psddl_hdf2psana::Orca;
-using namespace psddl_hdf2psana::FCCD;
+using namespace psddl_hdf2psana::Fli;
 using namespace psddl_hdf2psana::Acqiris;
 using namespace psddl_hdf2psana::Andor;
 using namespace psddl_hdf2psana::Epics;
 using namespace psddl_hdf2psana::Lusi;
-using namespace psddl_hdf2psana::Camera;
+using namespace psddl_hdf2psana::OceanOptics;
 using namespace psddl_hdf2psana::PNCCD;
 using namespace psddl_hdf2psana::Gsc16ai;
 
@@ -187,6 +189,8 @@ void initializeHdfWriterMap( HdfWriterMap & mapping) {
   mapping[ & typeid(Psana::Encoder::DataV1) ] = boost::make_shared<HdfWriterPsana<Psana::Encoder::DataV1> >();
   mapping[ & typeid(Psana::Encoder::DataV2) ] = boost::make_shared<HdfWriterPsana<Psana::Encoder::DataV2> >();
   mapping[ & typeid(Psana::Epics::ConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::Epics::ConfigV1> >();
+  mapping[ & typeid(Psana::Epix::ConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::Epix::ConfigV1> >();
+  mapping[ & typeid(Psana::Epix::ElementV1) ] = boost::make_shared<HdfWriterPsana<Psana::Epix::ElementV1> >();
   mapping[ & typeid(Psana::EpixSampler::ConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::EpixSampler::ConfigV1> >();
   mapping[ & typeid(Psana::EpixSampler::ElementV1) ] = boost::make_shared<HdfWriterPsana<Psana::EpixSampler::ElementV1> >();
   mapping[ & typeid(Psana::EvrData::ConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::EvrData::ConfigV1> >();
