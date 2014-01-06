@@ -292,7 +292,7 @@ class DdlHdf5Translator ( object ) :
           for type in package.types():
             ddlfile = type.location
             basename = os.path.basename(ddlfile)
-            baseheader = os.path.splitext(basename)[0] + '.h'
+            baseheader = basename + '.h'
             if baseheader == 'xtc.ddl.h':
               continue
             base_headers.add(baseheader)
@@ -504,7 +504,7 @@ Invoke using psddlc from the psddl package. Run from a
 release directory where both the psddldata and the Translator
 packages are checked out. Run as:
 
-psddlc -I data -B package_dir:Translator -b hdf5Translator data/psddldata/*.xml
+psddlc -I data -B package_dir:Translator -b hdf5Translator data/psddldata/*.ddl
 '''
 
 if __name__ == "__main__" :

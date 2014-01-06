@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-13-01
+2013-01-07 David Schneider
+- update Translator backend for new dll
+
 Tag: V00-13-00
 2013-12-22 Andy Salnikov
 - merge branch V00-11-00-hddl onto main trunk
