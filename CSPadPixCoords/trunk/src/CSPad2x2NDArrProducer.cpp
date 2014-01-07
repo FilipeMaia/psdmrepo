@@ -53,6 +53,7 @@ CSPad2x2NDArrProducer::CSPad2x2NDArrProducer (const std::string& name)
   , m_inkey()
   , m_outkey()
   , m_outtype()
+  , m_is_2darray()  
   , m_print_bits()
   , m_count(0)
 {
@@ -61,6 +62,7 @@ CSPad2x2NDArrProducer::CSPad2x2NDArrProducer (const std::string& name)
   m_inkey         = configStr("inkey",      "");
   m_outkey        = configStr("outkey",     "cspad2x2_ndarr");
   m_outtype       = configStr("outtype",    "float");
+  m_is_2darray    = config   ("is_2darray", false);
   m_print_bits    = config   ("print_bits", 0);
 
   checkTypeImplementation();
@@ -88,6 +90,7 @@ CSPad2x2NDArrProducer::printInputParameters()
         << "\noutkey        : "     << m_outkey       
         << "\nouttype       : "     << m_outtype
         << "\ndtype         : "     << m_dtype
+        << "\nis_2darray    : "     << m_is_2darray
         << "\nprint_bits    : "     << m_print_bits
         << "\n";
   }

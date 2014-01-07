@@ -127,6 +127,7 @@ private:
   std::string m_outkey;
   std::string m_outtype;
   bool        m_is_fullsize;
+  bool        m_is_2darray;
   unsigned    m_print_bits;
   long        m_count;
   DATA_TYPE   m_dtype;
@@ -162,14 +163,21 @@ private:
             const ndarray<const data_cspad_t,3>& quad_ndarr = el.data();
 
 	    // pixel-by-pixel copy of quad data ndarray to output ndarray with type conversion:
-            for ( ndarray<const data_cspad_t,3>::iterator it=quad_ndarr.begin(); it!=quad_ndarr.end(); ++it ) {
-	      *it_out++ = (TOUT)*it;
+            for ( ndarray<const data_cspad_t,3>::iterator it=quad_ndarr.begin(); it!=quad_ndarr.end(); ++it, ++it_out) {
+	      *it_out = (TOUT)*it;
       	    }
 	}
 
         if (m_is_fullsize) {
              ndarray<TOUT,3> nda_det = m_config->getCSPadPixNDArrFromNDArrShapedAsData<TOUT>(out_ndarr);
-	     save3DArrInEvent<TOUT>(evt, m_src, m_outkey, nda_det);
+
+	     if (m_is_2darray) {
+               //ndarray<TOUT,2> arr2d = make_ndarray(nda_det.data(), NQuadsMax*N2x1*NRows2x1, NCols2x1);
+               ndarray<TOUT,2> arr2d = make_ndarray<TOUT>(NQuadsMax*N2x1*NRows2x1, NCols2x1);
+               std::memcpy(arr2d.begin(), nda_det.begin(), sizeof(TOUT)*32*SizeOf2x1Arr);    	       
+	       save2DArrInEvent<TOUT>(evt, m_src, m_outkey, arr2d);
+	     }
+	     else save3DArrInEvent<TOUT>(evt, m_src, m_outkey, nda_det);
 	}
 	else save3DArrInEvent<TOUT>(evt, m_src, m_outkey, out_ndarr);
 

@@ -54,6 +54,7 @@ CSPadNDArrProducer::CSPadNDArrProducer (const std::string& name)
   , m_outkey()
   , m_outtype()
   , m_is_fullsize()  
+  , m_is_2darray()  
   , m_print_bits()
   , m_count(0)
 {
@@ -63,6 +64,7 @@ CSPadNDArrProducer::CSPadNDArrProducer (const std::string& name)
   m_outkey        = configStr("outkey",       "cspad_ndarr");
   m_outtype       = configStr("outtype",      "float");
   m_is_fullsize   = config   ("is_fullsize",  false);
+  m_is_2darray    = config   ("is_2darray",   false);
   m_print_bits    = config   ("print_bits",   0);
 
   checkTypeImplementation();
@@ -91,6 +93,7 @@ CSPadNDArrProducer::printInputParameters()
         << "\nouttype       : "     << m_outtype
         << "\ndtype         : "     << m_dtype
         << "\nis_fullsize   : "     << m_is_fullsize
+        << "\nis_2darray    : "     << m_is_2darray
         << "\nprint_bits    : "     << m_print_bits
         << "\n";
   }

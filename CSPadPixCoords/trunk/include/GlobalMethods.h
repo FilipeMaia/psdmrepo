@@ -140,6 +140,15 @@ private:
     evt.put(shp, src, key);
   }
 
+// or its copy
+
+  template <typename T>
+  void save2DArrInEvent(PSEvt::Event& evt, const Pds::Src& src, const std::string& key, const ndarray<T,2>& ndarr)
+  {
+    boost::shared_ptr< ndarray<T,2> > shp( new ndarray<T,2>(ndarr) );
+    evt.put(shp, src, key);
+  }
+
 //-------------------
   /**
    * @brief Save 3-D array in event, for src and key.

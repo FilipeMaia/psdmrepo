@@ -118,6 +118,7 @@ private:
   std::string m_inkey; 
   std::string m_outkey;
   std::string m_outtype;
+  bool        m_is_2darray;
   unsigned    m_print_bits;
   long        m_count;
 
@@ -148,20 +149,33 @@ private:
 
         const ndarray<const data_cspad_t,3>& data_ndarr = elem->data();
  
-        // Create and initialize the array of the same shape as data, but for all 2x1...
+        // Create and initialize the array of the same shape as data, for all 2x1...
         //const unsigned shape[] = {NRows2x1, NCols2x1, N2x1};
-        const unsigned* shape = data_ndarr.shape();
-        ndarray<TOUT,3> out_ndarr(shape);
-        //std::fill(out_ndarr.begin(), out_ndarr.end(), TOUT(0));    
+        //const unsigned* shape = data_ndarr.shape();
+        //ndarray<TOUT,3> out_ndarr(shape);
+        //std::fill(out_ndarr.begin(), out_ndarr.end(), TOUT(0));  
 
-        typename ndarray<TOUT,3>::iterator it_out = out_ndarr.begin(); 
+        if (m_is_2darray) {
 
-	// pixel-by-pixel copy of quad data ndarray to output ndarray with type conversion:
-        for ( ndarray<const data_cspad_t,3>::iterator it=data_ndarr.begin(); it!=data_ndarr.end(); ++it ) {
-	  *it_out++ = (TOUT)*it;
-      	}
+            //unsigned int shape[2] = {NRows2x1, NCols2x1*N2x1};
+            //ndarray<TOUT,2> arr2d(out_ndarr.data(), shape);
+	    ndarray<TOUT,2> out_ndarr = make_ndarray<TOUT>(NRows2x1, NCols2x1 * N2x1);
+            typename ndarray<TOUT,2>::iterator it_out = out_ndarr.begin(); 
+            for ( ndarray<const data_cspad_t,3>::iterator it=data_ndarr.begin(); it!=data_ndarr.end(); ++it, ++it_out) {
+	        *it_out = (TOUT)*it;
+      	    }
+	    save2DArrInEvent<TOUT>(evt, m_src, m_outkey, out_ndarr);
+	}
+	else {
 
-	save3DArrInEvent<TOUT>(evt, m_src, m_outkey, out_ndarr);
+	    ndarray<TOUT,3> out_ndarr = make_ndarray<TOUT>(NRows2x1, NCols2x1, N2x1);
+            typename ndarray<TOUT,3>::iterator it_out = out_ndarr.begin(); 
+            for ( ndarray<const data_cspad_t,3>::iterator it=data_ndarr.begin(); it!=data_ndarr.end(); ++it, ++it_out) {
+	        *it_out = (TOUT)*it;
+      	    }
+
+            save3DArrInEvent<TOUT>(evt, m_src, m_outkey, out_ndarr);
+	}
 
         return true;
       } // if (shp.get())

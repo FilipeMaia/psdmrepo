@@ -11,6 +11,13 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-16
+2014-01-08 Mikhail S. Dubrovin
+- in CSPad2x2NDArrProducer and CSPadNDArrProducer add parameter is_2darray
+	and associated option to save cspad/2x2 full-size array shaped as 
+	[32*185,388] for cspad and [185, 388*2] for cspad2x2
+	For now this option seems to be useful for CarAna project.
+
 Tag: V00-03-15
 2013-12-18 Mikhail S. Dubrovin
 - in CSPad2x2ImageProducer add image production from ndarray<T,3>
