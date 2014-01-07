@@ -484,7 +484,7 @@ hdf5pp::Type ns_TdcChannel_v0_dataset_data_stored_type()
 {
   typedef ns_TdcChannel_v0::dataset_data DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  hdf5pp::EnumType<uint32_t> _enum_type_channel = hdf5pp::EnumType<uint32_t>::enumType();
+  hdf5pp::EnumType<int32_t> _enum_type_channel = hdf5pp::EnumType<int32_t>::enumType();
   _enum_type_channel.insert("Veto", Psana::Acqiris::TdcChannel::Veto);
   _enum_type_channel.insert("Common", Psana::Acqiris::TdcChannel::Common);
   _enum_type_channel.insert("Input1", Psana::Acqiris::TdcChannel::Input1);
@@ -517,7 +517,7 @@ hdf5pp::Type ns_TdcChannel_v0_dataset_data_native_type()
 {
   typedef ns_TdcChannel_v0::dataset_data DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  hdf5pp::EnumType<uint32_t> _enum_type_channel = hdf5pp::EnumType<uint32_t>::enumType();
+  hdf5pp::EnumType<int32_t> _enum_type_channel = hdf5pp::EnumType<int32_t>::enumType();
   _enum_type_channel.insert("Veto", Psana::Acqiris::TdcChannel::Veto);
   _enum_type_channel.insert("Common", Psana::Acqiris::TdcChannel::Common);
   _enum_type_channel.insert("Input1", Psana::Acqiris::TdcChannel::Input1);
@@ -850,7 +850,7 @@ hdf5pp::Type ns_TdcDataV1_Item_v0_dataset_data_stored_type()
 {
   typedef ns_TdcDataV1_Item_v0::dataset_data DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  hdf5pp::EnumType<int32_t> _enum_type_source = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<uint8_t> _enum_type_source = hdf5pp::EnumType<uint8_t>::enumType();
   _enum_type_source.insert("Comm", Psana::Acqiris::TdcDataV1_Item::Comm);
   _enum_type_source.insert("Chan1", Psana::Acqiris::TdcDataV1_Item::Chan1);
   _enum_type_source.insert("Chan2", Psana::Acqiris::TdcDataV1_Item::Chan2);
@@ -875,7 +875,7 @@ hdf5pp::Type ns_TdcDataV1_Item_v0_dataset_data_native_type()
 {
   typedef ns_TdcDataV1_Item_v0::dataset_data DsType;
   hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
-  hdf5pp::EnumType<int32_t> _enum_type_source = hdf5pp::EnumType<int32_t>::enumType();
+  hdf5pp::EnumType<uint8_t> _enum_type_source = hdf5pp::EnumType<uint8_t>::enumType();
   _enum_type_source.insert("Comm", Psana::Acqiris::TdcDataV1_Item::Comm);
   _enum_type_source.insert("Chan1", Psana::Acqiris::TdcDataV1_Item::Chan1);
   _enum_type_source.insert("Chan2", Psana::Acqiris::TdcDataV1_Item::Chan2);
@@ -925,10 +925,8 @@ void make_datasets_TdcDataV1_v0(const Psana::Acqiris::TdcDataV1& obj,
       hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
 {
   {
-    typedef __typeof__(obj.data()) PsanaArray;
-    const PsanaArray& psana_array = obj.data();
-    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<Acqiris::ns_TdcDataV1_Item_v0::dataset_data>::stored_type(), psana_array.shape()[0]);
-    hdf5pp::Utils::createDataset(group, "data", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
+    hdf5pp::Type dstype = hdf5pp::VlenType::vlenType(hdf5pp::TypeTraits<Acqiris::ns_TdcDataV1_Item_v0::dataset_data>::stored_type());
+    hdf5pp::Utils::createDataset(group, "data", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);
   }
 }
 
@@ -941,17 +939,18 @@ void store_TdcDataV1_v0(const Psana::Acqiris::TdcDataV1* obj, hdf5pp::Group grou
     HdfArray hdf_array(psana_array.shape());
     HdfArray::iterator out = hdf_array.begin();
     for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
-      *out = Acqiris::ns_TdcDataV1_Item_v0::dataset_data(*it);
+      *out = (*it);
     }
+    std::pair<size_t, Acqiris::ns_TdcDataV1_Item_v0::dataset_data*> vds(hdf_array.size(), hdf_array.data());
+    hdf5pp::Type dstype = hdf5pp::VlenType::vlenType(hdf5pp::TypeTraits<Acqiris::ns_TdcDataV1_Item_v0::dataset_data>::stored_type());
     if (append) {
-      hdf5pp::Utils::storeNDArrayAt(group, "data", hdf_array, index);
+      hdf5pp::Utils::storeAt(group, "data", vds, index, dstype);
     } else {
-      hdf5pp::Utils::storeNDArray(group, "data", hdf_array);
+      hdf5pp::Utils::storeScalar(group, "data", vds, dstype, dstype);
     }
   } else if (append) {
     hdf5pp::Utils::resizeDataset(group, "data", index < 0 ? index : index + 1);
   }
-
 }
 
 boost::shared_ptr<PSEvt::Proxy<Psana::Acqiris::TdcDataV1> > make_TdcDataV1(int version, hdf5pp::Group group, hsize_t idx) {

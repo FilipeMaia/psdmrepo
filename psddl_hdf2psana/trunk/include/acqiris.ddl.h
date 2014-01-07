@@ -166,7 +166,7 @@ struct dataset_data {
   dataset_data(const Psana::Acqiris::TdcChannel& psanaobj);
   ~dataset_data();
 
-  uint32_t channel;
+  int32_t channel;
   uint32_t _mode_int;
   uint16_t slope;
   uint16_t mode;
@@ -258,7 +258,7 @@ struct dataset_data {
   dataset_data(const Psana::Acqiris::TdcDataV1_Item& psanaobj);
   ~dataset_data();
 
-  int32_t source;
+  uint8_t source;
   uint8_t overflow;
   uint32_t value;
 
