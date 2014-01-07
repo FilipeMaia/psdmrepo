@@ -11,8 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-13-02
+2014-01-07 Andy Salnikov
+- hdf5 backend: add support for vlen tag on (regular) datasets
+
 Tag: V00-13-01
-2013-01-07 David Schneider
+2014-01-07 David Schneider
 - update Translator backend for new dll
 
 Tag: V00-13-00

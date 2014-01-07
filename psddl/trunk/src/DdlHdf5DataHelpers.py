@@ -511,7 +511,15 @@ class DatasetRegular(object):
         ds = self.ds
         rank = ds.rank
 
-        if rank > 0:
+        if ds.sizeIsVlen():
+            # vlen array
+            if ds.type.basic:
+                ds_type = ds.type.name
+            else:
+                ds_type = self._attr_dsname()
+            return _TEMPL('make_vlen_ds').render(locals())
+        elif rank > 0:
+            # non-vlen arrays
             if ds.type.basic:
                 return _TEMPL('make_array_ds_basic').render(locals())
             elif ds.type.value_type:
@@ -532,7 +540,20 @@ class DatasetRegular(object):
         ds = self.ds
         rank = ds.rank
 
-        if rank > 0:
+        if ds.sizeIsVlen():
+            if ds.type.basic:
+                ds_type = ds.type.name
+                return _TEMPL('write_vlen_ds_basic').render(locals())
+            elif ds.type.value_type:
+                ds_type = self._attr_dsname()
+                return _TEMPL('write_vlen_ds_udt').render(locals())
+            else:
+                ds_type = self._attr_dsname()
+                # need a method which returns data shape
+                shape_method = self.ds.shape_method
+                if not shape_method: raise TypeError("shape method is required for dataset " + ds.name)
+                return _TEMPL('write_vlen_ds_abstract').render(locals())
+        elif rank > 0:
             zero_dims = 'zero_dims' in self.ds.tags
             if ds.type.basic:
                 return _TEMPL('write_array_ds_basic').render(locals())

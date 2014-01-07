@@ -982,6 +982,111 @@ void store_{{hschema.pstype.name}}_v{{hschema.schema.version}}(const {{hschema.p
   }
 {%- endif -%}
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: make_vlen_ds
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for piece of code which creates a vlen dataset
+:
+:  Parameters for this template:
+:      ds         - instance of DatasetRegular type
+:      ds_type    - element type
+:
+  {
+    hdf5pp::Type dstype = hdf5pp::VlenType::vlenType(hdf5pp::TypeTraits<{{ds_type}}>::stored_type());
+    hdf5pp::Utils::createDataset(group, "{{ds.name}}", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);
+  }
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: write_vlen_ds_basic
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for piece of code which writes out ndarray of basic type as vlen array
+:
+:  Parameters for this template:
+:      ds  - instance of DatasetRegular type
+:      ds_type    - element type
+:
+  if (obj) {
+    __typeof__(obj->{{ds.method}}()) psana_array = obj->{{ds.method}}();
+    std::pair<size_t, const {{ds_type}}*> vds(psana_array.size(), psana_array.data());
+    hdf5pp::Type dstype = hdf5pp::VlenType::vlenType(hdf5pp::TypeTraits<{{ds_type}}>::stored_type());
+    if (append) {
+      hdf5pp::Utils::storeAt(group, "{{ds.name}}", vds, index, dstype);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "{{ds.name}}", vds, dstype, dstype);
+    }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "{{ds.name}}", index < 0 ? index : index + 1);
+  }
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: write_vlen_ds_udt
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for piece of code which writes out ndarray of user-defined types as vlen array
+:
+:  Parameters for this template:
+:      ds         - instance of DatasetRegular type
+:      ds_type    - element type
+:
+  if (obj) {
+    typedef __typeof__(obj->{{ds.method}}()) PsanaArray;
+    typedef ndarray<{{ds_type}}, {{ds.rank}}> HdfArray;
+    PsanaArray psana_array = obj->{{ds.method}}();
+    HdfArray hdf_array(psana_array.shape());
+    HdfArray::iterator out = hdf_array.begin();
+    for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
+      *out = {{ds_struct}}(*it);
+    }
+    std::pair<size_t, {{ds_type}}*> vds(hdf_array.size(), hdf_array.data());
+    hdf5pp::Type dstype = hdf5pp::VlenType::vlenType(hdf5pp::TypeTraits<{{ds_type}}>::stored_type());
+    if (append) {
+      hdf5pp::Utils::storeAt(group, "{{ds.name}}", vds, index, dstype);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "{{ds.name}}", vds, dstype, dstype);
+    }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "{{ds.name}}", index < 0 ? index : index + 1);
+  }
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: write_vlen_ds_abstract
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for piece of code which writes out ndarray of user-defined types as vlen array
+:
+:  Parameters for this template:
+:      ds         - instance of DatasetRegular type
+:      ds_type  - name of dataset structure for element type
+:      shape_method - name of the shape method
+:
+  if (obj) {
+{% if ds.rank == 1 %}
+    const std::vector<int>& shape = obj->{{shape_method}}();
+    unsigned dims[{{ds.rank}}] = { shape[0] };
+    ndarray<{{ds_type}}, {{ds.rank}}> hdf_array(dims);
+    for (unsigned i = 0; i != dims[0]; ++ i) {
+      hdf_array[i] = {{ds_struct}}(obj->{{ds.method}}(i));
+    }
+{% elif ds.rank == 2 %}
+    const std::vector<int>& shape = obj->{{shape_method}}();
+    unsigned dims[{{ds.rank}}];
+    std::copy(shape.begin(), shape.end(), dims);
+    ndarray<{{ds_type}}, {{ds.rank}}> hdf_array(dims);
+    for (unsigned i = 0; i != dims[0]; ++ i) {
+      for (unsigned j = 0; j != dims[1]; ++ j) {
+        hdf_array[i][j] = {{ds_struct}}(obj->{{ds.method}}(i, j));
+      }
+    }
+{% endif %}
+    std::pair<size_t, {{ds_type}}*> vds(hdf_array.size(), hdf_array.data());
+    hdf5pp::Type dstype = hdf5pp::VlenType::vlenType(hdf5pp::TypeTraits<{{ds_type}}>::stored_type());
+    if (append) {
+      hdf5pp::Utils::storeAt(group, "{{ds.name}}", vds, index, dstype);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "{{ds.name}}", vds, dstype, dstype);
+    }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "{{ds.name}}", index < 0 ? index : index + 1);
+  }
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ::::template:::: make_regular_ds
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 :
