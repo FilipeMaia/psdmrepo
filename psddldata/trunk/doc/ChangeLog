@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V01-00-01
+2014-01-07 Andy
+- acqiris.ddl: fixing base type for some enums, this does not change
+  interfaces but makes it better compatible with old HDF5 schema
+
 Tag: V01-00-00
 2013-12-22 Andy
 - switching from XML to new DDL

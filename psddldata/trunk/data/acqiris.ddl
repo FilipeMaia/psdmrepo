@@ -8,14 +8,14 @@
   [[pack(4)]]
 {
   /* Coupling modes */
-  @enum Coupling (int32_t) {
+  @enum Coupling (uint32_t) {
     GND,
     DC,
     AC,
     DC50ohm,
     AC50ohm,
   }
-  @enum Bandwidth (int32_t) {
+  @enum Bandwidth (uint32_t) {
     None,
     MHz25,
     MHz700,
@@ -69,7 +69,7 @@
     Internal = 1,
     External = -1,
   }
-  @enum Coupling (int32_t) {
+  @enum Coupling (uint32_t) {
     DC = 0,
     AC = 1,
     HFreject = 2,
@@ -77,7 +77,7 @@
     AC50ohm = 4,
   }
   /* Triggering slope. */
-  @enum Slope (int32_t) {
+  @enum Slope (uint32_t) {
     Positive,
     Negative,
     OutOfWindow,
@@ -196,7 +196,7 @@
   [[pack(4)]]
 {
   /* Types of channels. */
-  @enum Channel (uint32_t) {
+  @enum Channel (int32_t) {
     Veto = -2,
     Common = -1,
     Input1 = 1,
@@ -321,7 +321,7 @@
 {
   /* Enum for types of data objects. Comm means data object has TdcDataV1Common
               type, AuxIO means TdcDataV1Marker class, all others are for TdcDataV1Channel. */
-  @enum Source (int32_t) {
+  @enum Source (uint8_t) {
     Comm,
     Chan1,
     Chan2,
