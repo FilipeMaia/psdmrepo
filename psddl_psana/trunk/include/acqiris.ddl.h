@@ -288,7 +288,7 @@ public:
   double level() const { return _level; }
   static uint32_t _sizeof() { return 16; }
 private:
-  uint32_t	_channel;	/**< Channel type as integer number, clients should use channel() method instead. */
+  int32_t	_channel;	/**< Channel type as integer number, clients should use channel() method instead. */
   uint32_t	_mode;	/**< Bitfield value, should not be used directly. Use mode() and slope()
                 in the client code. */
   double	_level;
