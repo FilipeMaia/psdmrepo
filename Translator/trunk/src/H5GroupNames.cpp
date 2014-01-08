@@ -129,6 +129,19 @@ string H5GroupNames::nameForType(const std::type_info *typeInfoPtr) {
   if ((realName.size()>csPadDataV.size()) and (realName.substr(0,csPadDataV.size()) == csPadDataV)) {
     realName = csPadElementV + realName.substr(csPadDataV.size());
   }
+
+  static const string PNCCDFrameV("PNCCD::FrameV");
+  static const string PNCCDFramesV("PNCCD::FramesV");
+  if ((realName.size()>PNCCDFramesV.size()) and (realName.substr(0,PNCCDFramesV.size()) == PNCCDFramesV)) {
+    realName = PNCCDFrameV  + realName.substr(PNCCDFramesV.size());
+  }
+
+  static const string AcqirisTdcConfigV("Acqiris::TdcConfigV");
+  static const string AcqirisAcqirisTdcConfigV("Acqiris::AcqirisTdcConfigV");
+  if ((realName.size()>AcqirisTdcConfigV.size()) and (realName.substr(0,AcqirisTdcConfigV.size()) == AcqirisTdcConfigV)) {
+    realName = AcqirisAcqirisTdcConfigV  + realName.substr(AcqirisTdcConfigV.size());
+  }
+
   return realName;
 }
   
