@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-29-16
+2014-01-08 Andy Salnikov
+- FliFrameV1Cvt: bug fix, incorrect type id was used when retrieving config 
+  object for Andor
+
 Tag: V00-29-15
 2013-12-21 Andy Salnikov
 - improve handling of incorrect XTC sizes

@@ -40,10 +40,12 @@ namespace {
   template <>
   struct ConfigTypeMap<H5DataTypes::AndorFrameV1> {
     typedef Pds::Andor::ConfigV1 value;
+    static Pds::TypeId typeId() { return Pds::TypeId(Pds::TypeId::Id_AndorConfig, 1); }
   };
   template <>
   struct ConfigTypeMap<H5DataTypes::FliFrameV1> {
     typedef Pds::Fli::ConfigV1 value;
+    static Pds::TypeId typeId() { return Pds::TypeId(Pds::TypeId::Id_FliConfig, 1); }
   };
 
 }
@@ -62,12 +64,10 @@ FliFrameV1Cvt<FrameType>::FliFrameV1Cvt ( const hdf5pp::Group& group,
     const std::string& typeGroupName,
     const Pds::Src& src,
     const ConfigObjectStore& configStore,
-    Pds::TypeId cfgTypeId,
     const CvtOptions& cvtOptions,
     int schemaVersion )
   : Super(group, typeGroupName, src, cvtOptions, schemaVersion)
   , m_configStore(configStore)
-  , m_cfgTypeId(cfgTypeId)
   , m_frameCont()
   , m_frameDataCont()
   , n_miss(0)
@@ -102,7 +102,7 @@ FliFrameV1Cvt<FrameType>::fillContainers(hdf5pp::Group group,
 {
   // find corresponding configuration object
   typedef typename ConfigTypeMap<FrameType>::value ConfigType;
-  const ConfigType* config = m_configStore.find<ConfigType>(m_cfgTypeId, src.top());
+  const ConfigType* config = m_configStore.find<ConfigType>(ConfigTypeMap<FrameType>::typeId(), src.top());
   if (not config) {
     MsgLog ( logger, error, "no configuration object was defined" );
     return ;

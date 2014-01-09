@@ -749,7 +749,7 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
     switch (version) {
     case 1:
       // very special converter for Fli::FrameV1, it needs two types of data
-      cvts.push_back(make_shared<FliFrameV1Cvt<FliFrameV1> >(group, "Fli::FrameV1", src, m_configStore, Pds::TypeId(Pds::TypeId::Id_FliConfig, 1), m_cvtOptions, 0));
+      cvts.push_back(make_shared<FliFrameV1Cvt<FliFrameV1> >(group, "Fli::FrameV1", src, m_configStore, m_cvtOptions, 0));
       break;
     }
     break;
@@ -780,7 +780,7 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
     switch (version) {
     case 1:
       // very special converter for Andor::FrameV1, it needs two types of data
-      cvts.push_back(make_shared<FliFrameV1Cvt<AndorFrameV1> >(group, "Andor::FrameV1", src, m_configStore, Pds::TypeId(Pds::TypeId::Id_FliConfig, 1), m_cvtOptions, 0));
+      cvts.push_back(make_shared<FliFrameV1Cvt<AndorFrameV1> >(group, "Andor::FrameV1", src, m_configStore, m_cvtOptions, 0));
       break;
     }
     break;

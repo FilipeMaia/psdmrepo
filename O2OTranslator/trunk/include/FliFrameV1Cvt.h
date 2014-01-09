@@ -63,7 +63,6 @@ public:
                   const std::string& typeGroupName,
                   const Pds::Src& src,
                   const ConfigObjectStore& configStore,
-                  Pds::TypeId cfgTypeId,
                   const CvtOptions& cvtOptions,
                   int schemaVersion ) ;
 
@@ -94,7 +93,6 @@ private:
 
   // Data members
   const ConfigObjectStore& m_configStore;
-  Pds::TypeId m_cfgTypeId;
   boost::shared_ptr<FrameCont> m_frameCont ;
   boost::shared_ptr<FrameDataCont> m_frameDataCont ;
   size_t n_miss;
