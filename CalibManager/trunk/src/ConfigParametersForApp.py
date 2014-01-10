@@ -215,7 +215,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
         self.current_tab    = self.declareParameter( name='CURRENT_TAB'      , val_def='Status',        type='str' )
 
         # GUIConfig.py
-        self.current_config_tab = self.declareParameter( name='CURRENT_CONFIG_TAB', val_def='Config File', type='str' )
+        self.current_config_tab = self.declareParameter( name='CURRENT_CONFIG_TAB', val_def='Configuration File', type='str' )
  
 
         # GUIMainSplit.py
@@ -238,6 +238,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
         # GUIDarkControlBar.py
         self.dark_list_show_runs  = self.declareParameter( name='DARK_LIST_SHOW_RUNS', val_def=self.list_of_show_runs[0], type='str' )
         self.dark_list_show_dets  = self.declareParameter( name='DARK_LIST_SHOW_DETS', val_def=self.list_of_show_dets[0], type='str' )
+        self.dark_deploy_hotpix   = self.declareParameter( name='DARK_DEPLOY_HOTPIX',  val_def=False,                     type='bool')
 
         # GUIGrabSubmitELog.py
         #self.cbx_more_options    = self.declareParameter( name='CBX_SHOW_MORE_OPTIONS',   val_def=False,             type='bool' )
@@ -265,8 +266,8 @@ class ConfigParametersForApp ( ConfigParameters ) :
         #self.in_file_dark      = self.declareParameter( name='IN_FILE_NAME_DARK', val_def='e167-r0020-s00-c00.xtc',type='str' )
 
         #self.bat_dark_total    = self.declareParameter( name='BATCH_DARK_TOTAL',      val_def=-1,       type='int' )
-        self.bat_dark_start    = self.declareParameter( name='BATCH_DARK_START',      val_def= 1,      type='int' )
-        self.bat_dark_end      = self.declareParameter( name='BATCH_DARK_END'  ,      val_def=100,     type='int' )
+        self.bat_dark_start    = self.declareParameter( name='BATCH_DARK_START',      val_def= 1,       type='int' )
+        self.bat_dark_end      = self.declareParameter( name='BATCH_DARK_END'  ,      val_def=1000,     type='int' )
         self.bat_det_info      = self.declareParameter( name='BATCH_DET_INFO',        val_def='DetInfo(:Princeton)',  type='str' )
         self.bat_img_rec_mod   = self.declareParameter( name='BATCH_IMG_REC_MODULE',  val_def='ImgAlgos.PrincetonImageProducer',  type='str' )
         self.mask_hot_thr      = self.declareParameter( name='MASK_HOT_PIX_ADU_THR_ON_RMS',  val_def=10.0,  type='float' )

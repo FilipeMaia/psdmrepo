@@ -69,6 +69,7 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         self.cbx_dark_more = QtGui.QCheckBox('More options')
         self.cbx_dark_more.setChecked( cp.dark_more_opts.value() )
  
+ 
         self.lab_show = QtGui.QLabel('Show:')
         self.but_srcs = QtGui.QPushButton( 'Sources DB' )
         self.but_sxtc = QtGui.QPushButton( 'Sources XTC' )

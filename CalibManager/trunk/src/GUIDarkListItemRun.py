@@ -20,7 +20,7 @@ import sys
 import os
 
 from PyQt4 import QtGui, QtCore
-#import time   # for sleep(sec)
+import time   # for sleep(sec)
 
 #-----------------------------
 # Imports for other modules --
@@ -172,7 +172,7 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
         self.but_depl.setStyleSheet(cp.styleButtonGood)
 
         #self.lab_rnum .setFixedWidth(60)        
-        self.lab_type .setFixedWidth(150)        
+        self.lab_type .setMinimumWidth(250)        
         self.edi_from .setFixedWidth(40)
         self.edi_to   .setFixedWidth(40)
         self.but_go   .setFixedWidth(60)        
@@ -191,9 +191,8 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
 
     def setStatusStyleOfButtons(self):
         #logger.debug('setStyleOfButtons - update buttons status for %s' % self.str_run_number, __name__)
-
         files_are_available = self.bjpeds.status_for_peds_files_essential()
-
+        #print 'setStatusStyleOfButtons: files_are_available = ', files_are_available        
         #print 'Work files for run %s status: %s' % (self.str_run_number, files_are_available)
 
         if self.edi_from.isReadOnly() : self.edi_from.setStyleSheet (cp.styleEditInfo)
@@ -294,7 +293,7 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
         logger.info('onStop - buttons status should (if you did not leave Dark tab...) be updated now for %s' % self.str_run_number, __name__ )
         self.but_go.setText('Go')
         self.but_go.setEnabled(True)
-        self.setStatusStyleOfButtons() # self.but_go.setVisible(True)
+        self.setStatusStyleOfButtons()
 
 
     def setStatusMessage(self):
@@ -321,22 +320,45 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
             logger.info('Deployment is cancelled!', __name__)
             return
 
-        for cmd,[src,cbx] in zip(list_of_deploy_commands, list_src_cbx) :
-            #print cbx, src, '\n', cmd, '\n'
-            if cbx : fd.procDeployCommand(cmd)
+        #for cmd,[src,cbx] in zip(list_of_deploy_commands, list_src_cbx) :
+        #    print cbx, src, '\n', cmd, '\n'
+        #    if cbx : fd.procDeployCommand(cmd)
+
+        for cmd in list_of_deploy_commands :
+            print 'cmd: ', cmd
+            if self.is_allowed_command(cmd, list_src_cbx) : fd.procDeployCommand(cmd)
 
         if cp.guistatus is not None : cp.guistatus.updateStatusInfo()
 
+
+    def is_allowed_command(self, cmd, list_src_cbx):
+        """Check the deployment command is for selected src"""
+        destination = cmd.split()[2] # for example: /reg/d/psdm/CXI/cxib2313/calib/CsPad::CalibV1/CxiDsd.0:Cspad.0/pedestals/1-1.data
+        for src,cbx in list_src_cbx :
+            if not cbx : continue
+            if src in destination : return True
+        return False
 
 
     def get_list_of_deploy_commands_and_sources(self):
         """Get list of deploy commands for all detectors of the same type"""
         self.exportLocalPars()
-
         #cp.blsp.print_list_of_types_and_sources()
-
         list_of_types, list_of_sources = cp.blsp.list_of_types_and_sources_for_selected_detectors()
-        list_of_files = gu.get_list_of_files_for_list_of_insets( fnm.path_peds_ave(), list_of_sources )
+        # list_of_types  : ['CsPad::DataV1',    'CsPad::DataV1']
+        # list_of_sources: ['CxiDs1.0:Cspad.0', 'CxiDsd.0:Cspad.0']
+
+        list_of_deploy_commands  = self.get_list_of_deploy_commands_for_calibtype(list_of_types, list_of_sources, fnm.path_peds_ave(),    'pedestals')
+
+        if cp.dark_deploy_hotpix.value() :
+            list_of_deploy_commands += self.get_list_of_deploy_commands_for_calibtype(list_of_types, list_of_sources, fnm.path_hotpix_mask(), 'pixel_status')
+
+        return list_of_deploy_commands, list_of_sources
+
+
+    def get_list_of_deploy_commands_for_calibtype(self, list_of_types, list_of_sources, base_path, calibtype='pedestals'):
+        """Get list of deploy commands for lists of type and sources for calibtype"""
+        list_of_files = gu.get_list_of_files_for_list_of_insets( base_path, list_of_sources )
 
         list_of_deploy_commands = []
 
@@ -350,12 +372,12 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
             fname = '%s-%s.data' % ( self.str_run_from.lstrip('0'),
                                      self.str_run_to  .lstrip('0') )
 
-            calib_path = os.path.join(self.calib_dir.value(), typ, src, 'pedestals', fname)
+            calib_path = os.path.join(self.calib_dir.value(), typ, src, calibtype, fname)
             cmd = 'cp %s %s' % (file, calib_path)
 
             list_of_deploy_commands.append(cmd)
 
-        return list_of_deploy_commands, list_of_sources
+        return list_of_deploy_commands
    
 
 #-----------------------------

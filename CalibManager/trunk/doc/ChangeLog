@@ -11,6 +11,24 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-10
+2014-01-10 Mikhail S. Dubrovin
+- ImgAlgos.ImgAverage is replaced by ImgAlgos.NDArrAverage in files
+M       src/ConfigFileGenerator.py
+M       data/scripts/psana-module-peds-aver-princeton.cfg
+M       data/scripts/psana-module-peds-aver-pnccd.cfg
+M       data/scripts/psana-module-peds-aver-camera.cfg
+- Deploy hot-pixel mask, 
+- In GUIConfigPars.py add more parameters for hot-pixel mask evaluation.
+M       data/scripts/psana-module-peds-aver-cspad-with-mask.cfg
+M       src/GUIConfig.py
+M       src/GUIDarkMoreOpts.py
+M       src/GUIDarkListItemRun.py
+M       src/GUIConfigPars.py
+M       src/ConfigParametersForApp.py
+M       src/ConfigFileGenerator.py
+M       src/GUIDarkControlBar.py
+	
 Tag: V00-00-09
 2013-12-17 Mikhail S. Dubrovin
 - modules src/CSPAD2x2Image.py CSPADImage.py moved to PyCSPadImage

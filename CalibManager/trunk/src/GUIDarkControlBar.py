@@ -30,7 +30,7 @@ from PyQt4 import QtGui, QtCore
 
 from ConfigParametersForApp import cp
 import GlobalUtils          as     gu
-#from GUILogger              import *
+from GUILogger              import *
 #from FileNameManager        import fnm
 
 #---------------------
@@ -66,6 +66,8 @@ class GUIDarkControlBar ( QtGui.QWidget ) :
         self.butDets.setFixedWidth(110)
         #self.butRuns.setMaximumWidth(90)
 
+        self.cbx_deploy_hotpix = QtGui.QCheckBox('Deploy hotpix mask')
+        self.cbx_deploy_hotpix.setChecked( cp.dark_deploy_hotpix.value() )
         
         self.hbox = QtGui.QHBoxLayout() 
         self.hbox.addWidget(self.labRuns)
@@ -73,12 +75,14 @@ class GUIDarkControlBar ( QtGui.QWidget ) :
         self.hbox.addWidget(self.labDets)
         self.hbox.addWidget(self.butDets)
         self.hbox.addStretch(1)
+        self.hbox.addWidget(self.cbx_deploy_hotpix)
     
         self.setLayout(self.hbox)
 
         #self.connect( self.ediExp,     QtCore.SIGNAL('editingFinished ()'), self.processEdiExp )
         self.connect( self.butRuns,     QtCore.SIGNAL('clicked()'),          self.onButRuns  )
         self.connect( self.butDets,     QtCore.SIGNAL('clicked()'),          self.onButDets  )
+        self.connect( self.cbx_deploy_hotpix, QtCore.SIGNAL('stateChanged(int)'), self.on_cbx ) 
 
         self.showToolTips()
         self.setStyle()
@@ -183,6 +187,17 @@ class GUIDarkControlBar ( QtGui.QWidget ) :
         #self.setFile()
         if cp.guidarklist != None :
             cp.guidarklist.updateList()
+
+
+    def on_cbx(self):
+        #if self.cbx.hasFocus() :
+        par = cp.dark_deploy_hotpix
+        cbx = self.cbx_deploy_hotpix
+
+        par.setValue( cbx.isChecked() )
+        msg = 'check box ' + cbx.text()  + ' is set to: ' + str( par.value())
+        logger.info(msg, __name__ )
+
 
 #-----------------------------
 

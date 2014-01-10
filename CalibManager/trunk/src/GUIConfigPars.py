@@ -43,7 +43,7 @@ class GUIConfigPars ( QtGui.QWidget ) :
     #----------------
     def __init__ ( self, parent=None ) :
         QtGui.QWidget.__init__(self, parent)
-        self.setGeometry(200, 400, 500, 180)
+        self.setGeometry(200, 400, 500, 280)
         self.setWindowTitle('Files')
         self.setFrame()
 
@@ -65,6 +65,22 @@ class GUIConfigPars ( QtGui.QWidget ) :
         self.box_bat_queue.addItems(cp.list_of_queues)
         self.box_bat_queue.setCurrentIndex( cp.list_of_queues.index(cp.bat_queue.value()) )
 
+        self.lab_dark_start = QtGui.QLabel('Event start:') 
+        self.lab_dark_end   = QtGui.QLabel('end:') 
+        self.lab_hot_thr    = QtGui.QLabel('Threshold, ADU:') 
+
+
+        self.edi_dark_start = QtGui.QLineEdit  ( str( cp.bat_dark_start.value() ) )
+        self.edi_dark_end   = QtGui.QLineEdit  ( str( cp.bat_dark_end.value()) )
+        self.edi_hot_thr    = QtGui.QLineEdit  ( str( cp.mask_hot_thr.value()) )
+
+        self.edi_dark_start.setValidator(QtGui.QIntValidator(0,9999999,self))
+        self.edi_dark_end  .setValidator(QtGui.QIntValidator(0,9999999,self))
+        self.edi_hot_thr   .setValidator(QtGui.QDoubleValidator(0,65000,3,self))
+        #self.edi_events.setValidator(QtGui.QRegExpValidator(QtCore.QRegExp("[0-9]\\d{0,3}|end$"),self))
+
+        self.cbx_deploy_hotpix = QtGui.QCheckBox('Deploy hotpix mask')
+        self.cbx_deploy_hotpix.setChecked( cp.dark_deploy_hotpix.value() )
 
         self.grid = QtGui.QGridLayout()
         self.grid_row = 0
@@ -76,7 +92,14 @@ class GUIConfigPars ( QtGui.QWidget ) :
         self.grid.addWidget(self.lab_fname_prefix,  self.grid_row+3, 0)
         self.grid.addWidget(self.edi_fname_prefix,  self.grid_row+3, 1, 1, 4)
         self.grid.addWidget(self.lab_bat_queue,     self.grid_row+4, 0)
-        self.grid.addWidget(self.box_bat_queue,     self.grid_row+4, 1, 1, 4)
+        self.grid.addWidget(self.box_bat_queue,     self.grid_row+4, 1)
+        self.grid.addWidget(self.lab_dark_start,    self.grid_row+5, 0)
+        self.grid.addWidget(self.edi_dark_start,    self.grid_row+5, 1)
+        self.grid.addWidget(self.lab_dark_end,      self.grid_row+5, 3)
+        self.grid.addWidget(self.edi_dark_end,      self.grid_row+5, 4)
+        self.grid.addWidget(self.lab_hot_thr,       self.grid_row+6, 0)
+        self.grid.addWidget(self.edi_hot_thr,       self.grid_row+6, 1, 1, 4)
+        self.grid.addWidget(self.cbx_deploy_hotpix, self.grid_row+6, 3, 1, 4)
 
         #self.setLayout(self.grid)
 
@@ -87,9 +110,13 @@ class GUIConfigPars ( QtGui.QWidget ) :
 
         self.connect( self.but_dir_work,     QtCore.SIGNAL('clicked()'),          self.onButDirWork )
         self.connect( self.but_dir_results,  QtCore.SIGNAL('clicked()'),          self.onButDirResults )
-        self.connect( self.edi_fname_prefix, QtCore.SIGNAL('editingFinished ()'), self.onEditPrefix )
         self.connect( self.box_bat_queue,    QtCore.SIGNAL('currentIndexChanged(int)'), self.onBoxBatQueue )
-
+        self.connect( self.edi_fname_prefix, QtCore.SIGNAL('editingFinished ()'), self.onEditPrefix )
+        self.connect( self.edi_dark_start,   QtCore.SIGNAL('editingFinished()'),  self.onEdiDarkStart )
+        self.connect( self.edi_dark_end,     QtCore.SIGNAL('editingFinished()'),  self.onEdiDarkEnd )
+        self.connect( self.edi_hot_thr,      QtCore.SIGNAL('editingFinished()'),  self.onEdiHotThr )
+        self.connect( self.cbx_deploy_hotpix,QtCore.SIGNAL('stateChanged(int)'),  self.on_cbx ) 
+ 
 
         self.showToolTips()
         self.setStyle()
@@ -116,29 +143,39 @@ class GUIConfigPars ( QtGui.QWidget ) :
 
     def setStyle(self):
         self.                 setStyleSheet (cp.styleBkgd)
-        self.setMinimumSize(500,180)
-        self.setMaximumSize(700,180)
+        self.setMinimumSize(500,280)
+        self.setMaximumSize(700,280)
 
-        self.tit_dir_work    .setStyleSheet (cp.styleTitle)
-        self.edi_dir_work    .setStyleSheet (cp.styleEditInfo)       
-        self.but_dir_work    .setStyleSheet (cp.styleButton) 
-        self.edi_dir_results .setStyleSheet (cp.styleEditInfo)       
-        self.but_dir_results .setStyleSheet (cp.styleButton) 
-        self.lab_fname_prefix.setStyleSheet (cp.styleLabel)
-        self.edi_fname_prefix.setStyleSheet (cp.styleEdit)
-        self.lab_bat_queue   .setStyleSheet (cp.styleLabel)
+        self.tit_dir_work     .setStyleSheet (cp.styleTitle)
+        self.edi_dir_work     .setStyleSheet (cp.styleEditInfo)       
+        self.but_dir_work     .setStyleSheet (cp.styleButton) 
+        self.edi_dir_results  .setStyleSheet (cp.styleEditInfo)       
+        self.but_dir_results  .setStyleSheet (cp.styleButton) 
+        self.lab_fname_prefix .setStyleSheet (cp.styleLabel)
+        self.edi_fname_prefix .setStyleSheet (cp.styleEdit)
+        self.lab_bat_queue    .setStyleSheet (cp.styleLabel)
+        self.lab_dark_start   .setStyleSheet (cp.styleLabel)
+        self.lab_dark_end     .setStyleSheet (cp.styleLabel)
+        self.lab_hot_thr      .setStyleSheet (cp.styleLabel)
+        self.cbx_deploy_hotpix.setStyleSheet (cp.styleLabel)
 
         self.tit_dir_work    .setAlignment (QtCore.Qt.AlignLeft)
         self.edi_dir_work    .setAlignment (QtCore.Qt.AlignRight)
         self.edi_dir_results .setAlignment (QtCore.Qt.AlignRight)
         self.lab_fname_prefix.setAlignment (QtCore.Qt.AlignRight)
         self.lab_bat_queue   .setAlignment (QtCore.Qt.AlignRight)
+        self.lab_dark_start  .setAlignment (QtCore.Qt.AlignRight)
+        self.lab_dark_end    .setAlignment (QtCore.Qt.AlignRight)
+        self.lab_hot_thr     .setAlignment (QtCore.Qt.AlignRight)
 
         self.edi_dir_work    .setMinimumWidth(300)
         self.but_dir_work    .setFixedWidth(80)
         self.edi_dir_results .setMinimumWidth(300)
         self.but_dir_results .setFixedWidth(80)
         self.box_bat_queue   .setFixedWidth(100)
+        self.edi_dark_start  .setFixedWidth(80)
+        self.edi_dark_end    .setFixedWidth(80)
+        self.edi_hot_thr     .setFixedWidth(80)
 
     def setParent(self,parent) :
         self.parent = parent
@@ -190,16 +227,46 @@ class GUIConfigPars ( QtGui.QWidget ) :
         gu.create_directory(dir)
 
 
+
+    def onBoxBatQueue(self):
+        queue_selected = self.box_bat_queue.currentText()
+        cp.bat_queue.setValue( queue_selected ) 
+        logger.info('onBoxBatQueue - queue_selected: ' + queue_selected, __name__)
+
+
     def onEditPrefix(self):
         logger.debug('onEditPrefix', __name__)
         cp.fname_prefix.setValue( str(self.edi_fname_prefix.displayText()) )
         logger.info('Set file name common prefix: ' + str( cp.fname_prefix.value()), __name__ )
 
 
-    def onBoxBatQueue(self):
-        queue_selected = self.box_bat_queue.currentText()
-        cp.bat_queue.setValue( queue_selected ) 
-        logger.info('onBoxBatQueue - queue_selected: ' + queue_selected, __name__)
+    def onEdiDarkStart(self):
+        str_value = str( self.edi_dark_start.displayText() )
+        cp.bat_dark_start.setValue(int(str_value))      
+        logger.info('Set start event for dark run: %s' % str_value, __name__ )
+
+
+    def onEdiDarkEnd(self):
+        str_value = str( self.edi_dark_end.displayText() )
+        cp.bat_dark_end.setValue(int(str_value))      
+        logger.info('Set last event for dark run: %s' % str_value, __name__ )
+
+
+    def onEdiHotThr(self):
+        str_value = str( self.edi_hot_thr.displayText() )
+        cp.mask_hot_thr.setValue(float(str_value))  
+        logger.info('Set hot pixel RMS threshold: %s' % str_value, __name__ )
+
+
+    def on_cbx(self):
+        #if self.cbx.hasFocus() :
+        par = cp.dark_deploy_hotpix
+        cbx = self.cbx_deploy_hotpix
+
+        par.setValue( cbx.isChecked() )
+        msg = 'check box ' + cbx.text()  + ' is set to: ' + str( par.value())
+        logger.info(msg, __name__ )
+
 
 #-----------------------------
 
