@@ -93,7 +93,19 @@ namespace {
     }
     return ::strProcInfo(static_cast<const Pds::ProcInfo&>(src),procPidSpaceSepAtEnd);
   }
-  
+
+  std::string replaceCharactersThatAreBadForH5GroupNames(const std::string & orig) {
+    std::string newString;
+    for (unsigned idx = 0; idx < orig.size(); ++idx) {
+      if (orig[idx] == '/') {
+        newString.push_back('_');
+      } else {
+        newString.push_back(orig[idx]);
+      }
+    }
+    return newString;
+  }
+
 } // local namespace
 
 namespace Translator {
@@ -116,6 +128,7 @@ string H5GroupNames::nameForType(const std::type_info *typeInfoPtr) {
     realName = realName.substr(psana.size());
   }
   
+  // shorten Bld::Bld to Bld:: if option is set
   static const string BldBld("Bld::Bld");
   static const string Bld("Bld::");
   if (m_short_bld_name) {
@@ -124,18 +137,21 @@ string H5GroupNames::nameForType(const std::type_info *typeInfoPtr) {
     }
   }
   
+  // replace CsPad::DataV with CsPad::ElementV for backward compatibility
   static const string csPadDataV("CsPad::DataV");
   static const string csPadElementV("CsPad::ElementV");
   if ((realName.size()>csPadDataV.size()) and (realName.substr(0,csPadDataV.size()) == csPadDataV)) {
     realName = csPadElementV + realName.substr(csPadDataV.size());
   }
 
+  // replace PNCCD::FramesV with PNCCD::FrameV for backward compatibility
   static const string PNCCDFrameV("PNCCD::FrameV");
   static const string PNCCDFramesV("PNCCD::FramesV");
   if ((realName.size()>PNCCDFramesV.size()) and (realName.substr(0,PNCCDFramesV.size()) == PNCCDFramesV)) {
     realName = PNCCDFrameV  + realName.substr(PNCCDFramesV.size());
   }
 
+  // replace Acqiris::TdcConfigV with Acqiris::AcqirisTdcConfigV for backward compatibility
   static const string AcqirisTdcConfigV("Acqiris::TdcConfigV");
   static const string AcqirisAcqirisTdcConfigV("Acqiris::AcqirisTdcConfigV");
   if ((realName.size()>AcqirisTdcConfigV.size()) and (realName.substr(0,AcqirisTdcConfigV.size()) == AcqirisTdcConfigV)) {
@@ -151,8 +167,9 @@ string H5GroupNames::nameForSrc(const Pds::Src &src) {
 
 std::string H5GroupNames::nameForSrcKey(const Pds::Src &src, const std::string &key) {
   string srcKeyGroupName = nameForSrc(src);
-  string keyStringToAdd;
-  hasDoNotTranslatePrefix(key,&keyStringToAdd);
+  string keyStringToAddOrig;
+  hasDoNotTranslatePrefix(key,&keyStringToAddOrig);
+  string keyStringToAdd = replaceCharactersThatAreBadForH5GroupNames(keyStringToAddOrig);
   if (keyStringToAdd.size()>0) {
     if (srcKeyGroupName.size()>0) srcKeyGroupName += "_";
     srcKeyGroupName += keyStringToAdd;
