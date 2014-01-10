@@ -11,6 +11,10 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-09
+2014-01-09 David Schneider
+- cleaning user key strings before making h5 group names.
+
 Tag: V00-00-08
 2014-01-08 David Schneider
 - changing two type names to be backward compatible with o2o-translate.
