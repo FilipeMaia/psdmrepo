@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-01
+2014-01-10 Andy Salnikov
+- unregister ROOT handler for PIPE signal
+
 Tag: V00-02-00
 2012-07-24 Andy Salnikov
 - moved trunk to branch version1

@@ -28,6 +28,7 @@
 #include "RootHist/RootH1.h"
 #include "RootHist/RootH2.h"
 #include "RootHist/RootProfile.h"
+#include "root/TSystem.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -46,6 +47,11 @@ namespace {
     
   }
   
+  // ROOT installs too many signal handlers, reset some of them
+  bool resetRootSignals() {
+    gSystem->ResetSignal(kSigPipe);
+  }
+  bool initRoot = resetRootSignals();
 }
 
 //		----------------------------------------
