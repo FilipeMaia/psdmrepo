@@ -30,19 +30,7 @@
 //------------------ DataV1 ------------------
 @h5schema DataV1
   [[version(0)]]
+  [[external("psddl_hdf2psana/oceanoptics.h")]]
 {
-  @dataset spectra [[method(data)]];
-  @dataset data {
-    @attribute frameCounter;
-    @attribute numDelayedFrames;
-    @attribute numDiscardFrames;
-    @attribute timeFrameStart;
-    @attribute timeFrameFirstData;
-    @attribute timeFrameEnd;
-    @attribute numSpectraInData;
-    @attribute numSpectraInQueue;
-    @attribute numSpectraUnused;
-    @attribute durationOfFrame;
-  }
 }
 } //- @package OceanOptics

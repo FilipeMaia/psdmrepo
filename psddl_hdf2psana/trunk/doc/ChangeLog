@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-03
+2014-01-10 Andy Salnikov
+- oceanoptics: add special dataset "corrSpectra" like in old translator
+
 Tag: V00-08-02
 2014-01-07 Andy Salnikov
 - regenerate whole thing from psddldata V01-00-01 with psddl V00-13-02
