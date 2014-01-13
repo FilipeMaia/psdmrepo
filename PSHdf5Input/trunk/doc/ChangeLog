@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-00
+2014-01-13 Andy Salnikov
+- alias support: input module fills alias map 
+
 Tag: V00-03-00
 2013-12-29 Andy
 - check _mask dataet if present when reading data, test is done at very 

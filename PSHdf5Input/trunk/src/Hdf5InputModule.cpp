@@ -25,6 +25,7 @@
 //-------------------------------
 #include "IData/Dataset.h"
 #include "MsgLogger/MsgLogger.h"
+#include "psddl_psana/alias.ddl.h"
 #include "PSHdf5Input/Exceptions.h"
 #include "PSHdf5Input/Hdf5EventId.h"
 #include "PSHdf5Input/Hdf5FileListIter.h"
@@ -279,6 +280,46 @@ void
 Hdf5InputModule::fillEventEnv(const Hdf5IterData& data, Event& evt, Env& env)
 {
   MsgLog(name(), debug, name() << ": in fillEvent()");
+
+  // may need to update alias map first
+  if (data.type() == Hdf5IterData::Configure and env.aliasMap()) {
+
+    boost::shared_ptr<PSEvt::AliasMap> amap = env.aliasMap();
+
+    // search for Alias groups, update alias map with all found instances,
+    // reset alias map once only
+    bool reset = true;
+    const Hdf5IterData::seq_type& pieces = data.data();
+    for (Hdf5IterData::const_iterator it = pieces.begin(); it != pieces.end(); ++ it) {
+
+      const std::string grpname = it->group.name();
+      if (grpname.find("/Alias::ConfigV1/") != std::string::npos) {
+
+        // found aliases, need to update alias maps, clear it first from old entries
+        if (reset) {
+          amap->clear();
+          reset = false;
+        }
+
+        // convert it using standard tools and use immediately
+        m_cvt.convert(it->group, it->index, evt, env);
+
+        boost::shared_ptr<Psana::Alias::ConfigV1> cfgV1 = env.configStore().get(Source());
+        if (cfgV1) {
+          const ndarray<const Psana::Alias::SrcAlias, 1>& aliases = cfgV1->srcAlias();
+          for (unsigned i = 0; i != aliases.shape()[0]; ++ i) {
+            const Psana::Alias::SrcAlias& alias = aliases[i];
+            amap->add(alias.aliasName(), alias.src());
+          }
+        } else {
+          MsgLog(name(), warning, name() << "failed to find Alias::ConfigV1 in config store");
+        }
+
+
+      }
+    }
+
+  }
 
   // call converter for every piece of data
   const Hdf5IterData::seq_type& pieces = data.data();
