@@ -46,6 +46,7 @@ namespace psana_examples {
 DumpAcqiris::DumpAcqiris (const std::string& name)
   : Module(name)
 {
+  m_source = configSrc("source", "DetInfo(:Acqiris.*)");
 }
 
 //--------------
@@ -61,8 +62,7 @@ DumpAcqiris::beginCalibCycle(Event& evt, Env& env)
 {
   MsgLog(name(), trace, "in beginCalibCycle()");
 
-  Source src(configStr("source", "DetInfo(:Acqiris)"));
-  shared_ptr<Psana::Acqiris::ConfigV1> acqConfig = env.configStore().get(src, &m_src);
+  shared_ptr<Psana::Acqiris::ConfigV1> acqConfig = env.configStore().get(m_source, &m_src);
   if (acqConfig) {
     WithMsgLog(name(), info, str) {
       str << "Acqiris::ConfigV1: nbrBanks=" << acqConfig->nbrBanks()

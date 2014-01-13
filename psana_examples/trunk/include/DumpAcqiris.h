@@ -64,6 +64,7 @@ protected:
 private:
 
   // Data members, this is for example purposes only
+  Source m_source;
   Pds::Src m_src;
 
 };

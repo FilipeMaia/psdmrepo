@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-09
+2014-01-13 Andy Salnikov
+- DumpAcqiris: source was hardcoded
+
 Tag: V00-04-08
 2013-12-19 Andy Salnikov
 - add C++ and python examples for epix
