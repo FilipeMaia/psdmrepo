@@ -81,8 +81,33 @@ store_epics = updates_only
 #
 # src_filter exclude srcname1 srcname2
 #
-# The srcname's in xtc input can be printed using the EventKeys
-# module.  For example
+# The syntax for specifying a srcname follows that of the Psana Source.
+# The Psana Source syntax allows for several styles for specifying a Pds Src
+# as well as detector matches where the detector number, or device number is 
+# not known.
+# 
+# Specifically, format of the match string can be:
+#
+#       DetInfo(det.detId:dev.devId) - fully or partially specified DetInfo
+#       det.detId:dev.devId - same as above
+#       DetInfo(det-detId|dev.devId) - same as above
+#       det-detId|dev.devId - same as above
+#       BldInfo(type) - fully or partially specified BldInfo
+#       type - same as above
+#       ProcInfo(ipAddr) - fully or partially specified ProcInfo
+#
+# For example
+#        DetInfo(AmoETOF.0.Acqiris.0)  
+#        DetInfo(AmoETOF.0.Acqiris)  
+#        DetInfo(AmoETOF:Acqiris)
+#        AmoETOF:Acqiris
+#        AmoETOF|Acqiris
+#
+# will all match the same data, AmoETOF.0.Acqiris.0. The later ones will match
+# additional data (such as detector 1, 2, etc.) if it is present.
+#
+# A simple way to set up src filtering is to take a look at the sources in the 
+# xtc input using the psana EventKeys module.  For example
 #
 # psana -n 5 -m EventKeys exp=cxi1235:run=33 
 #
