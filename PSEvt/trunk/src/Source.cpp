@@ -65,12 +65,14 @@ namespace PSEvt {
  *  This object will match any source.
  */
 Source::Source () 
-  : m_src(Pds::Level::NumberOfLevels) 
+  : m_src(Pds::Level::NumberOfLevels)
+  , m_str()
 {
 }
 
 Source::Source (const Pds::Src& src) 
   : m_src(src) 
+  , m_str()
 {
 } 
 
@@ -81,6 +83,7 @@ Source::Source (const Pds::Src& src)
  */
 Source::Source(Pds::DetInfo::Detector det, uint32_t detId, Pds::DetInfo::Device dev, uint32_t devId) 
   : m_src(Pds::DetInfo(0, det, detId, dev, devId))
+  , m_str()
 {
 }
 
@@ -91,20 +94,21 @@ Source::Source(Pds::DetInfo::Detector det, uint32_t detId, Pds::DetInfo::Device 
  */
 Source::Source(Pds::BldInfo::Type type)
   : m_src(Pds::BldInfo(0, type))
+  , m_str()
 {
 }
 
 Source::Source (const std::string& spec)
-  : m_src(::parse(spec))
+  : m_src(Pds::Src(Pds::Level::NumberOfLevels))
+  , m_str(spec)
 {
-  
 }
 
 Source& 
 Source::operator=(const std::string& spec)
 {
-  Source src(spec);
-  m_src = src.m_src;
+  m_src = Pds::Src();
+  m_str = spec;
   return *this;
 }
 
@@ -112,7 +116,7 @@ Source::operator=(const std::string& spec)
  *  @brief Match source with Pds::Src object.
  */
 bool 
-Source::match(const Pds::Src& src) const
+Source::SrcMatch::match(const Pds::Src& src) const
 {
   if (m_src == Pds::Src()) {
     
@@ -172,7 +176,7 @@ Source::match(const Pds::Src& src) const
 
 /// Returns true if it is exact match
 bool 
-Source::isExact() const
+Source::SrcMatch::isExact() const
 {
   if (m_src.level() == Pds::Level::NumberOfLevels) {
     // match-any object is not exact
@@ -204,10 +208,31 @@ Source::isExact() const
 
 }
 
-std::ostream&
-operator<<(std::ostream& out, const Source& src)
+// Returns object which can be used to match Src instances
+Source::SrcMatch
+Source::srcMatch(const AliasMap& amap) const
 {
-  return operator<<(out, src.src());
+  Pds::Src src = m_src;
+  if (not m_str.empty()) {
+    // fist check string in alias map
+    src = amap.src(m_str);
+    if (src == Pds::Src()) {
+      // try to parse, it may throw
+      src = ::parse(m_str);
+    }
+  }
+  return Source::SrcMatch(src);
+}
+
+// Format Source contents.
+void
+Source::print(std::ostream& out) const
+{
+  if (not m_str.empty()) {
+    out << m_str;
+  } else {
+    out << m_src;
+  }
 }
 
 } // namespace PSEvt

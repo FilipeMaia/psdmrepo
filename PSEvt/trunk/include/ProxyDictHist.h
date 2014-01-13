@@ -49,7 +49,7 @@ namespace PSEvt {
 class ProxyDictHist : public ProxyDict, private HistI {
 public:
 
- ProxyDictHist() : ProxyDict(), m_totalUpdates(0) {}
+  ProxyDictHist(const boost::shared_ptr<AliasMap>& amap) : ProxyDict(amap), m_totalUpdates(0) {}
  
  /**
    *  @brief returns total number of put and remove calls made with dictionary

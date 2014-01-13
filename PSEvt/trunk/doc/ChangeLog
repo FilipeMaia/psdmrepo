@@ -11,6 +11,15 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-00
+2014-01-13 Andy Salnikov
+- adding support for aliases (see also 
+  https://pswww.slac.stanford.edu/trac/psdm/ticket/259): 
+  - redesigned Source class to support delayed parsing of strings
+  - EventKey adds alias data member
+  - new AliasMap class to keep alias mapping to Src
+  - ProxyDict keeps optional AliasMap pointer
+
 Tag: V00-07-09
 2013-12-16 Andy Salnikov
 - small fixes to doxy comments

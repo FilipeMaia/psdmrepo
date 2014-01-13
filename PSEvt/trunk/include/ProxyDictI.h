@@ -27,6 +27,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "pdsdata/xtc/Src.hh"
+#include "PSEvt/AliasMap.h"
 #include "PSEvt/EventKey.h"
 #include "PSEvt/ProxyI.h"
 #include "PSEvt/HistI.h"
@@ -81,6 +82,9 @@ public:
 
    *  @param[in] proxy   Proxy object for type T.
    *  @param[in] key     Event key for the data object.
+   *
+   *  @throw ExceptionDuplicateKey
+   *  @throw ExceptionNoAliasMap
    */
   void put( const boost::shared_ptr<ProxyI>& proxy, const EventKey& key ) 
   {
@@ -151,7 +155,14 @@ public:
    * its existance. The implementation of updates(EventKey&) should be the 
    * sum of all puts and removes for the given EventKey.
    */
-  virtual const HistI * hist() const { return NULL; }
+  virtual const HistI* hist() const { return 0; }
+
+  /**
+   *  @brief Return pointer to alias map
+   *
+   *  Can return 0 pointer if alias map is not present.
+   */
+  virtual const AliasMap* aliasMap() const { return 0; }
 
 protected:
 

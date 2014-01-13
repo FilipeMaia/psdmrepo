@@ -32,13 +32,15 @@ using namespace PSEvt ;
 class TestFixture {
 public:
   TestFixture()
-    : dict(new ProxyDict)
+    : amap(boost::make_shared<AliasMap>())
+    , dict(boost::make_shared<ProxyDict>(amap))
     , evt(dict)
     , di1(0, Pds::DetInfo::Detector(1), 1, Pds::DetInfo::Device(1), 1)
     , di2(0, Pds::DetInfo::Detector(2), 2, Pds::DetInfo::Device(2), 2)
   {
   }
 
+  boost::shared_ptr<AliasMap> amap;
   boost::shared_ptr<ProxyDict> dict;
   Event evt;
   Pds::DetInfo di1;

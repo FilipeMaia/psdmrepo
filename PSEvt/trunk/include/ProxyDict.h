@@ -58,8 +58,8 @@ namespace PSEvt {
 class ProxyDict : public ProxyDictI {
 public:
 
-  // Default constructor
-  ProxyDict () ;
+  // Constructor
+  ProxyDict(const boost::shared_ptr<AliasMap>& amap);
 
   // Destructor
   virtual ~ProxyDict () ;
@@ -113,6 +113,13 @@ protected:
    */
   virtual void keysImpl(std::list<EventKey>& keys, const Source& source) const;
 
+  /**
+   *  @brief Return pointer to alias map
+   *
+   *  Can return 0 pointer if alias map is not present.
+   */
+  virtual const AliasMap* aliasMap() const { return m_amap.get(); }
+
 private:
 
   typedef boost::shared_ptr<ProxyI> proxy_ptr;
@@ -120,6 +127,7 @@ private:
 
   // Data members
   Dict m_dict;
+  boost::shared_ptr<AliasMap> m_amap;
 
 };
 

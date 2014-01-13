@@ -23,6 +23,7 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "PSEvt/AliasMap.h"
 #include "pdsdata/xtc/BldInfo.hh"
 #include "pdsdata/xtc/DetInfo.hh"
 #include "pdsdata/xtc/ProcInfo.hh"
@@ -58,25 +59,62 @@ namespace PSEvt {
  *  @author Andrei Salnikov
  */
 
-class Source  {
+class Source {
 public:
 
-  /// Special enum type to signify objects without source
-  enum NoSource { 
-    null   ///< Special constant to be used as argument for constructor  
+  /**
+   *  Helper class which provides logic for matching Source
+   *  values to Src instances.
+   */
+  class SrcMatch {
+  public:
+
+    SrcMatch(const Pds::Src& src)
+        : m_src(src)
+    {
+    }
+
+    /// Match source with Pds::Src object.
+    bool match(const Pds::Src& src) const;
+
+    /// Returns true if matches no-source only
+    bool isNoSource() const
+    {
+      return m_src == Pds::Src();
+    }
+
+    /// Returns true if it is exact match, no-source is also exact.
+    bool isExact() const;
+
+    /// Returns internal Src representation
+    const Pds::Src& src() const
+    {
+      return m_src;
+    }
+
+  private:
+    Pds::Src m_src;
   };
-  
+
+  /// Special enum type to signify objects without source
+  enum NoSource {
+    null ///< Special constant to be used as argument for constructor
+  };
+
   /**
    *  @brief Make source which matches objects without source only.
    */
-  explicit Source (NoSource) : m_src() {}
+  explicit Source(NoSource)
+      : m_src()
+  {
+  }
 
   /**
    *  @brief Make source which matches any source.
    *  
    *  This object will match any source.
    */
-  Source ();
+  Source();
 
   /**
    *  @brief Exact match for source.
@@ -84,73 +122,77 @@ public:
    *  This object will match fully-specified source. Note that Source(Pds::Src())
    *  is equivalent to Source(null).
    */
-  explicit Source (const Pds::Src& src);
-  
+  explicit Source(const Pds::Src& src);
+
   /**
    *  @brief Exact match for DetInfo source.
    *  
    *  This object will match fully-specified DetInfo source.
    */
-  Source (Pds::DetInfo::Detector det, uint32_t detId, Pds::DetInfo::Device dev, uint32_t devId);
-  
+  Source(Pds::DetInfo::Detector det, uint32_t detId, Pds::DetInfo::Device dev, uint32_t devId);
+
   /**
    *  @brief Exact match for BldInfo.
    *  
    *  This object will match fully-specified BldInfo source.
    */
-  explicit Source (Pds::BldInfo::Type type);
+  explicit Source(Pds::BldInfo::Type type);
 
   /**
-   *  @brief Approximate matching specified via string.
+   *  @brief Matching specified via string.
    *  
-   *  Format of the match string can be:
+   *  Argument string can be either alias name or match string in one of these formats:
    *    "" - match anything
    *    "DetInfo(det.detId:dev.devId)" - fully or partially specified DetInfo
    *    "det.detId:dev.devId" - same as above
    *    "DetInfo(det-detId|dev.devId)" - same as above
    *    "det-detId|dev.devId" - same as above
-   *    "BldInfo(type)" - fully or partially specified BldInfo
+   *    "BldInfo(type)" - fully specified BldInfo
    *    "type" - same as above
-   *    "ProcInfo(ipAddr)" - fully or partially specified ProcInfo
-   *  
-   *  @throw PSEvt::ExceptionSourceFormat if string is not recognized
+   *    "BldInfo()" - any BldInfo
+   *    "ProcInfo(ipAddr)" - fully specified ProcInfo
+   *    "ProcInfo()" - any ProcInfo
    */
-  explicit Source (const std::string& spec) ;
-  
-  // Destructor
-  ~Source () {}
-  
+  explicit Source(const std::string& spec);
+
   /**
    *  @brief Assign a string specification.
-   *    
-   *  @throw PSEvt::ExceptionSourceFormat if string is not recognized
    */
-  Source& operator=(const std::string& spec) ;
+  Source& operator=(const std::string& spec);
 
-  /// Match source with Pds::Src object.
-  bool match(const Pds::Src& src) const;
-  
-  /// Returns true if matches no-source only
-  bool isNoSource() const { return m_src == Pds::Src(); }
-  
-  /// Returns true if it is exact match, no-source is also exact.
-  bool isExact() const;
-  
-  /// Returns the source
-  const Pds::Src& src() const { return m_src; }
-  
+  /**
+   *  @brief Returns object which can be used to match Src instances.
+   *
+   *  If Source instance was constructed from a string then this method tries to
+   *  resolve string as an alias. If alias is not found then it tries to parse
+   *  the string according to the definitions above. If parsing fails then exception
+   *  is thrown.
+   *
+   *  @param[in] amap Alias map instance.
+   *
+   *  @throw PSEvt::ExceptionSourceFormat if string cannot be parsed
+   */
+  SrcMatch srcMatch(const AliasMap& amap) const;
+
+  /// Format Source contents.
+  void print(std::ostream& out) const;
+
 protected:
 
 private:
 
-  // Data members
   Pds::Src m_src;
-  
+  std::string m_str;
+
 };
 
 /// Helper operator to format Source to a standard stream
-std::ostream&
-operator<<(std::ostream& out, const Source& src);
+inline std::ostream&
+operator<<(std::ostream& out, const Source& src)
+{
+  src.print(out);
+  return out;
+}
 
 } // namespace PSEvt
 

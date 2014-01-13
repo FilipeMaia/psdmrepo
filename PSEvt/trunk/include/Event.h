@@ -115,6 +115,9 @@ public:
    *  
    *  @param[in] proxy  Proxy object for type T.
    *  @param[in] key    Optional key to distinguish different objects of the same type.
+   *
+   *  @throw ExceptionDuplicateKey
+   *  @throw ExceptionNoAliasMap
    */
   template <typename T>
   void putProxy(const boost::shared_ptr<Proxy<T> >& proxy, const std::string& key=std::string()) 
@@ -129,6 +132,9 @@ public:
    *  @param[in] proxy   Proxy object for type T.
    *  @param[in] source Source detector address.
    *  @param[in] key     Optional key to distinguish different objects of the same type.
+   *
+   *  @throw ExceptionDuplicateKey
+   *  @throw ExceptionNoAliasMap
    */
   template <typename T>
   void putProxy(const boost::shared_ptr<Proxy<T> >& proxy, 
@@ -144,6 +150,9 @@ public:
    *  
    *  @param[in] data   Object to store in the event.
    *  @param[in] key    Optional key to distinguish different objects of the same type.
+   *
+   *  @throw ExceptionDuplicateKey
+   *  @throw ExceptionNoAliasMap
    */
   template <typename T>
   void put(const boost::shared_ptr<T>& data, const std::string& key=std::string()) 
@@ -159,6 +168,9 @@ public:
    *  @param[in] data    Object to store in the event.
    *  @param[in] source Source detector address.
    *  @param[in] key     Optional key to distinguish different objects of the same type.
+   *
+   *  @throw ExceptionDuplicateKey
+   *  @throw ExceptionNoAliasMap
    */
   template <typename T>
   void put(const boost::shared_ptr<T>& data, 

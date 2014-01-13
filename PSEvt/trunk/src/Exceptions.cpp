@@ -34,21 +34,24 @@
 
 namespace PSEvt {
 
-Exception::Exception( const ErrSvc::Context& ctx, const std::string& what )
-  : ErrSvc::Issue( ctx, "PSEvt::Exception: " + what )
+Exception::Exception(const ErrSvc::Context& ctx, const std::string& what)
+    : ErrSvc::Issue(ctx, "PSEvt::Exception: " + what)
 {
 }
 
-ExceptionDuplicateKey::ExceptionDuplicateKey ( const ErrSvc::Context& ctx, 
-                                               const EventKey& key ) 
-  : Exception( ctx, "duplicate key: " + boost::lexical_cast<std::string>(key))
-{  
+ExceptionDuplicateKey::ExceptionDuplicateKey(const ErrSvc::Context& ctx, const EventKey& key)
+    : Exception(ctx, "duplicate key: " + boost::lexical_cast < std::string > (key))
+{
 }
 
-ExceptionSourceFormat::ExceptionSourceFormat ( const ErrSvc::Context& ctx, 
-                                               const std::string& format ) 
-  : Exception( ctx, "Source string cannot be parsed: '" + format + "'")
-{  
+ExceptionSourceFormat::ExceptionSourceFormat(const ErrSvc::Context& ctx, const std::string& format)
+    : Exception(ctx, "Source string cannot be parsed: '" + format + "'")
+{
+}
+
+ExceptionNoAliasMap::ExceptionNoAliasMap(const ErrSvc::Context& ctx)
+    : Exception(ctx, "Alias name used but alias map is not defined")
+{
 }
 
 } // namespace PSEvt

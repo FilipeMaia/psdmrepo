@@ -37,7 +37,9 @@ namespace PSEvt {
 //----------------
 // Constructors --
 //----------------
-ProxyDict::ProxyDict ()
+ProxyDict::ProxyDict (const boost::shared_ptr<AliasMap>& amap)
+  : m_dict()
+  , m_amap(amap)
 {
 }
 
@@ -53,13 +55,31 @@ void
 ProxyDict::putImpl( const boost::shared_ptr<ProxyI>& proxy, 
                     const EventKey& key )
 {
-  // there should not be existing key
-  Dict::iterator it = m_dict.find(key);
-  if ( it != m_dict.end() ) {
-    throw ExceptionDuplicateKey(ERR_LOC, key);
+  // key may define one of alias or Src
+  EventKey ekey = key;
+  if (not ekey.alias().empty()) {
+    if (m_amap) {
+      // get src from alias
+      Pds::Src src = m_amap->src(ekey.alias());
+      ekey = EventKey(ekey.typeinfo(), src, ekey.key(), ekey.alias());
+    } else {
+      throw ExceptionNoAliasMap(ERR_LOC);
+    }
+  } else {
+    if (m_amap) {
+      // try to find alias for src
+      const std::string& alias = m_amap->alias(ekey.src());
+      ekey = EventKey(ekey.typeinfo(), ekey.src(), ekey.key(), alias);
+    }
   }
 
-  m_dict.insert(Dict::value_type(key, proxy));
+  // there should not be existing key
+  Dict::iterator it = m_dict.find(ekey);
+  if ( it != m_dict.end() ) {
+    throw ExceptionDuplicateKey(ERR_LOC, ekey);
+  }
+
+  m_dict.insert(Dict::value_type(ekey, proxy));
 }
 
 
@@ -69,9 +89,11 @@ ProxyDict::getImpl( const std::type_info* typeinfo,
                     const std::string& key,
                     Pds::Src* foundSrc )
 {
-  if (source.isExact()) {
+  Source::SrcMatch srcm = source.srcMatch(m_amap ? *m_amap : AliasMap());
+
+  if (srcm.isExact()) {
     
-    EventKey proxyKey(typeinfo, source.src(), key);
+    EventKey proxyKey(typeinfo, srcm.src(), key);
     Dict::const_iterator it = m_dict.find(proxyKey);
     if ( it != m_dict.end() ) {
       // call proxy to get the value
@@ -84,15 +106,15 @@ ProxyDict::getImpl( const std::type_info* typeinfo,
     it = m_dict.find(proxyKeyAny);
     if ( it != m_dict.end() ) {
       // call proxy to get the value
-      if (foundSrc) *foundSrc = source.src();
-      return it->second->get(this, source.src(), key);
+      if (foundSrc) *foundSrc = srcm.src();
+      return it->second->get(this, srcm.src(), key);
     }
 
   } else {
 
     // When source is a match then no-source objects have priority. Try to
     // find no-source object first and see if it matches
-    if (source.match(Pds::Src())) {
+    if (srcm.match(Pds::Src())) {
       EventKey proxyKey(typeinfo, Pds::Src(), key);
       Dict::const_iterator it = m_dict.find(proxyKey);
       if ( it != m_dict.end() ) {
@@ -106,7 +128,7 @@ ProxyDict::getImpl( const std::type_info* typeinfo,
     for (Dict::const_iterator it = m_dict.begin(); it != m_dict.end(); ++ it) {
       if (*typeinfo == *it->first.typeinfo() and
           key == it->first.key() and 
-          source.match(it->first.src()) ) {
+          srcm.match(it->first.src()) ) {
         // call proxy to get the value
         if (foundSrc) *foundSrc = it->first.src();
         return it->second->get(this, it->first.src(), key);
@@ -134,9 +156,11 @@ ProxyDict::removeImpl(const EventKey& key)
 void 
 ProxyDict::keysImpl(std::list<EventKey>& keys, const Source& source) const
 {
+  Source::SrcMatch srcm = source.srcMatch(m_amap ? *m_amap : AliasMap());
+
   keys.clear();
   for (Dict::const_iterator it = m_dict.begin(); it != m_dict.end(); ++ it) {
-    if (source.match(it->first.src())) keys.push_back(it->first);
+    if (srcm.match(it->first.src())) keys.push_back(it->first);
   }
 }
 

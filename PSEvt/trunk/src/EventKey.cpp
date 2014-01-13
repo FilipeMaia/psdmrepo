@@ -137,6 +137,9 @@ EventKey::print(std::ostream& str) const
     str << ", src=";
     ::print(str, m_src);
   }
+  if (not m_alias.empty()) {
+    str << ", alias=\"" << m_alias << "\"";
+  }
   if (not m_key.empty()) {
     str << ", key=" << m_key; 
   }

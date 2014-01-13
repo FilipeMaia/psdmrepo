@@ -64,9 +64,11 @@ public:
    *  @param[in] typeinfo    Pointer to typeinfo object
    *  @param[in] src         Data source address
    *  @param[in] key         String key
+   *  @param[in] alias       Alias name
    */
-  EventKey (const std::type_info* typeinfo, const Pds::Src& src, const std::string& key)
-    : m_typeinfo(typeinfo), m_src(src), m_key(key) 
+  EventKey (const std::type_info* typeinfo, const Pds::Src& src, const std::string& key,
+      const std::string& alias=std::string())
+    : m_typeinfo(typeinfo), m_src(src), m_key(key), m_alias(alias)
   {}
 
   /// default constructor
@@ -97,6 +99,9 @@ public:
   /// Returns string key
   const std::string& key() const {return m_key;}
   
+  /// Returns alias name
+  const std::string& alias() const {return m_alias;}
+
   /// Returns true if data source address is a valid address.
   bool validSrc() const { return not (m_src == Pds::Src()); }
   
@@ -108,6 +113,7 @@ private:
   const std::type_info* m_typeinfo; ///< Pointer to typeinfo object
   Pds::Src m_src;             ///< Data source address
   std::string m_key;          ///< String key
+  std::string m_alias;        ///< Optional alias name
 
 };
 
