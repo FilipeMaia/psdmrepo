@@ -79,10 +79,12 @@ public:
    *  @param[in] calibDir  Name of the calibration directory, can include "{exp}"
    *                       and "{instr}" strings which will be replaced with experiment
    *                       and instrument names.
+   *  @param[in] aliasMap  Optional instance of the alias map.
    */
   Env (const std::string& jobName,
       const boost::shared_ptr<IExpNameProvider>& expNameProvider,
-      const std::string& calibDir) ;
+      const std::string& calibDir,
+      const boost::shared_ptr<PSEvt::AliasMap>& aliasMap) ;
 
   // Destructor
   ~Env () ;
@@ -126,6 +128,9 @@ public:
   /// Access to EPICS Store object.
   EpicsStore& epicsStore() { return *m_epicsStore; }
 
+  /// Access to alias map.
+  boost::shared_ptr<PSEvt::AliasMap> aliasMap() { return m_aliasMap; }
+
   /**
    *  @brief DEPRECATED: Access to ROOT histogram manager.
    *  
@@ -143,6 +148,7 @@ private:
   // Data members
   std::string m_fwkName;   ///< Framework name
   std::string m_jobName;   ///< Job name
+  boost::shared_ptr<PSEvt::AliasMap> m_aliasMap;  ///< Alias map instance
   boost::shared_ptr<EnvObjectStore> m_cfgStore;   ///< Pointer to Configuration Store
   boost::shared_ptr<EnvObjectStore> m_calibStore;   ///< Pointer to Calibration Store
   boost::shared_ptr<EpicsStore> m_epicsStore;  ///< Pointer to EPICS Store

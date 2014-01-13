@@ -55,9 +55,11 @@ namespace PSEnv {
 //----------------
 Env::Env (const std::string& jobName,
     const boost::shared_ptr<IExpNameProvider>& expNameProvider,
-    const std::string& calibDir)
+    const std::string& calibDir,
+    const boost::shared_ptr<PSEvt::AliasMap>& aliasMap)
   : m_fwkName("psana")
   , m_jobName(jobName)
+  , m_aliasMap(aliasMap)
   , m_cfgStore()
   , m_calibStore()
   , m_epicsStore(boost::make_shared<EpicsStore>())
@@ -68,11 +70,11 @@ Env::Env (const std::string& jobName,
   , m_calibDirSetup(false)
 {
   // instantiate dictionary for config store and store itself
-  boost::shared_ptr<PSEvt::ProxyDictHist> cfgDict(new PSEvt::ProxyDictHist());
+  boost::shared_ptr<PSEvt::ProxyDictHist> cfgDict(new PSEvt::ProxyDictHist(m_aliasMap));
   m_cfgStore = boost::make_shared<EnvObjectStore>(cfgDict);
   
   // instantiate dictionary for calib store and store itself
-  boost::shared_ptr<PSEvt::ProxyDictHist> calibDict(new PSEvt::ProxyDictHist());
+  boost::shared_ptr<PSEvt::ProxyDictHist> calibDict(new PSEvt::ProxyDictHist(m_aliasMap));
   m_calibStore = boost::make_shared<EnvObjectStore>(calibDict);
   
   // make root file name
