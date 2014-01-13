@@ -159,7 +159,7 @@ private:
   bool m_ndarrayKeyIsExclude;
   bool m_stdStringKeyIsExclude;
 
-  std::set<std::string> m_srcNameFilterSet;
+  std::vector<PSEvt::Source> m_psevtSourceFilterList;
   std::set<std::string> m_ndarrayKeyFilterSet;
   std::set<std::string> m_stdStringKeyFilterSet;
 
@@ -180,6 +180,8 @@ private:
   std::list<std::string> m_src_filter;
   std::list<std::string> m_ndarray_key_filter; 
   std::list<std::string> m_std_string_key_filter;  
+
+  std::vector<PSEvt::Source> m_SourceFilterList;
 
   std::string m_calibration_key;
   bool m_include_uncalibrated_data;

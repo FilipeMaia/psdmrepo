@@ -317,7 +317,12 @@ namespace {
 } // local namespace
 
 void H5Output::initializeSrcAndKeyFilters() {
-  parseFilterConfigString("src_filter",         m_src_filter,         m_srcFilterIsExclude,    m_includeAllSrc,          m_srcNameFilterSet);
+  set<string> srcNameFilterSet;
+  parseFilterConfigString("src_filter",         m_src_filter,         m_srcFilterIsExclude,    m_includeAllSrc,          srcNameFilterSet);
+  m_psevtSourceFilterList.clear();
+  for (set<string>::iterator pos = srcNameFilterSet.begin(); pos != srcNameFilterSet.end(); ++pos) {
+    m_psevtSourceFilterList.push_back(PSEvt::Source(*pos));
+  }
   parseFilterConfigString("ndarray_key_filter", m_ndarray_key_filter, m_ndarrayKeyIsExclude,   m_includeAllNdarrayKey,   m_ndarrayKeyFilterSet);
   parseFilterConfigString("std_string_key_filter",  m_std_string_key_filter,  m_stdStringKeyIsExclude, m_includeAllStdStringKey, m_stdStringKeyFilterSet);
 }
@@ -1062,8 +1067,34 @@ bool H5Output::ndarrayKeyIsFiltered(const string &key) {
 }
 
 bool H5Output::srcIsFiltered(const Pds::Src &src) {
-  string srcName = m_h5groupNames->nameForSrc(src);
-  return keyIsFiltered(srcName, m_includeAllSrc, m_srcFilterIsExclude, m_srcNameFilterSet);
+  if (m_includeAllSrc) return false;
+  bool srcInList = false;
+  for (unsigned idx = 0; idx < m_psevtSourceFilterList.size(); ++idx) {
+    if (m_psevtSourceFilterList.at(idx).match(src)) {
+      srcInList = true;
+      break;
+    }
+  }
+  if (m_srcFilterIsExclude) {
+    bool inExcludeList = srcInList;
+    if (inExcludeList) {
+      MsgLog(logger(),trace,"src: log=0x" << hex << src.log() << " phy=0x" << src.phy() 
+             << " name=" << m_h5groupNames->nameForSrc(src) 
+             << " matches Source exclude list - no translation");
+      return true;
+    } else {
+      return false;
+    }
+  } 
+  // it is an include set
+  bool srcNotInIncludeSet = not srcInList;
+  if (srcNotInIncludeSet) {
+    MsgLog(logger(),trace,"src: log=0x" << hex << src.log() << " phy=0x" << src.phy() 
+           << " name=" << m_h5groupNames->nameForSrc(src) 
+           << " does not match any Source in include list - no translation");
+    return true;
+  }
+  return false;
 }
 
 string H5Output::eventPosition() {

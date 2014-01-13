@@ -11,6 +11,10 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-10
+2014-01-13 David Schneider
+- using PSEvt::Source instead of string for user src filter list
+
 Tag: V00-00-09
 2014-01-09 David Schneider
 - cleaning user key strings before making h5 group names.
