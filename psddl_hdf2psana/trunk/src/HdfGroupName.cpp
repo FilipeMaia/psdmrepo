@@ -145,11 +145,12 @@ HdfGroupName::nameToSource(const std::string& name)
     // parse it for existing PSEvt parser
     try {
       PSEvt::Source src(name);
-      if (not src.isExact()) {
+      PSEvt::Source::SrcMatch srcm = src.srcMatch(PSEvt::AliasMap());
+      if (not srcm.isExact()) {
         // parsed OK but contains wildcards?
         throw ExceptionGroupSourceName(ERR_LOC, name);
       }
-      return src.src();
+      return srcm.src();
     } catch (const std::exception& ex) {
       throw ExceptionGroupSourceName(ERR_LOC, name);
     }
