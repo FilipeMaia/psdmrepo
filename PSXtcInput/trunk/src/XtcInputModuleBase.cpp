@@ -28,6 +28,7 @@
 //-------------------------------
 #include "MsgLogger/MsgLogger.h"
 #include "pdsdata/xtc/L1AcceptEnv.hh"
+#include "pdsdata/psddl/alias.ddl.h"
 #include "psddl_psana/epics.ddl.h"
 #include "PSTime/Time.h"
 #include "PSXtcInput/Exceptions.h"
@@ -460,6 +461,31 @@ XtcInputModuleBase::fillEnv(const XtcInput::Dgram& dg, Env& env)
   const Pds::Sequence& seq = dgptr->seq ;
   if (seq.service() == Pds::TransitionId::Configure or 
       seq.service() == Pds::TransitionId::BeginCalibCycle) {
+
+    // before we start adding all config types we need to update alias map so
+    // that when we add objects to proxy dict correct version of alias map is used
+    if (env.aliasMap()) {
+      XtcInput::XtcIterator iter1(&dgptr->xtc);
+      while (Pds::Xtc* xtc = iter1.next()) {
+        if (xtc->contains.id() == Pds::TypeId::Id_AliasConfig) {
+
+          // need to fill alias maps, clear it first from old entries
+          boost::shared_ptr<PSEvt::AliasMap> amap = env.aliasMap();
+          amap->clear();
+
+          if (xtc->contains.version() == 1) {
+            const Pds::Alias::ConfigV1* cfgV1 = (const Pds::Alias::ConfigV1*)xtc->payload();
+            const ndarray<const Pds::Alias::SrcAlias, 1>& aliases = cfgV1->srcAlias();
+            for (unsigned i = 0; i != aliases.shape()[0]; ++ i) {
+              const Pds::Alias::SrcAlias& alias = aliases[i];
+              amap->add(alias.aliasName(), alias.src());
+            }
+          } else {
+            MsgLog(name(), warning, name() << "failed to find Alias::ConfigV1 in config store");
+          }
+        }
+      }
+    }
     
     // Loop over all XTC contained in the datagram
     XtcInput::XtcIterator iter(&dgptr->xtc);
