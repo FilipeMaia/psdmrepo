@@ -50,6 +50,7 @@ namespace {
   // ROOT installs too many signal handlers, reset some of them
   bool resetRootSignals() {
     gSystem->ResetSignal(kSigPipe);
+    return true;
   }
   bool initRoot = resetRootSignals();
 }
