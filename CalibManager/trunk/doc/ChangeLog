@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-11
+2014-01-13 Mikhail S. Dubrovin
+- minor corrections in window titles and sizes...
+
 Tag: V00-00-10
 2014-01-10 Mikhail S. Dubrovin
 - ImgAlgos.ImgAverage is replaced by ImgAlgos.NDArrAverage in files

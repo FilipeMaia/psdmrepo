@@ -74,7 +74,7 @@ class GUIFileManagerSelect ( QtGui.QWidget ) :
         QtGui.QWidget.__init__(self, parent)
 
         self.setGeometry(10, 25, 630, 120)
-        self.setWindowTitle('File Maneger Select & Action GUI')
+        self.setWindowTitle('File Manager Select & Action GUI')
         #self.setWindowIcon(cp.icon_monitor)
         self.palette = QtGui.QPalette()
         self.resetColorIsSet = False

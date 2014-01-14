@@ -43,8 +43,8 @@ class GUIConfigPars ( QtGui.QWidget ) :
     #----------------
     def __init__ ( self, parent=None ) :
         QtGui.QWidget.__init__(self, parent)
-        self.setGeometry(200, 400, 500, 280)
-        self.setWindowTitle('Files')
+        self.setGeometry(200, 400, 500, 250)
+        self.setWindowTitle('Configuration Parameters')
         self.setFrame()
 
         self.tit_dir_work = QtGui.QLabel('Parameters:')
@@ -143,8 +143,8 @@ class GUIConfigPars ( QtGui.QWidget ) :
 
     def setStyle(self):
         self.                 setStyleSheet (cp.styleBkgd)
-        self.setMinimumSize(500,280)
-        self.setMaximumSize(700,280)
+        self.setMinimumSize(500,240)
+        self.setMaximumSize(700,240)
 
         self.tit_dir_work     .setStyleSheet (cp.styleTitle)
         self.edi_dir_work     .setStyleSheet (cp.styleEditInfo)       

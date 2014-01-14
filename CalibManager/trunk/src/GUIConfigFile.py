@@ -48,7 +48,7 @@ class GUIConfigFile ( QtGui.QWidget ) :
         #self.parent = cp.guimain
 
         self.setGeometry(370, 350, 500,150)
-        self.setWindowTitle('Configuration Parameters')
+        self.setWindowTitle('Configuration File')
         self.setFrame()
         
         self.titFile     = QtGui.QLabel('File with configuration parameters:')
