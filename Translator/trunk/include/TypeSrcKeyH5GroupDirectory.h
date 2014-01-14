@@ -197,6 +197,8 @@ class TypeSrcKeyH5GroupDirectory {
   void setH5GroupNames(boost::shared_ptr<Translator::H5GroupNames> h5GroupNames) {
     m_h5GroupNames = h5GroupNames;
   }
+  void setAliasMap(boost::shared_ptr<PSEvt::AliasMap> aliasMap) { m_aliasMap = aliasMap; }
+  std::string getAlias(const Pds::Src &src);
   void setEventIdAndDamageWriters(boost::shared_ptr<Translator::HdfWriterEventId> hdfWriterEventId,
                                   boost::shared_ptr<Translator::HdfWriterDamage> hdfWriterDamage) 
   {
@@ -226,6 +228,7 @@ class TypeSrcKeyH5GroupDirectory {
   boost::shared_ptr<Translator::HdfWriterEventId> m_hdfWriterEventId;
   boost::shared_ptr<Translator::HdfWriterDamage> m_hdfWriterDamage;
   boost::shared_ptr<Translator::H5GroupNames> m_h5GroupNames;
+  boost::shared_ptr<PSEvt::AliasMap> m_aliasMap;
 };
 
 } // namespace Translator

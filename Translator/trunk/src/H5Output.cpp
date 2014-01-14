@@ -199,6 +199,8 @@ void H5Output::readConfigParameters() {
   MsgLog(logger(),trace,"epics storage: " << EpicsH5GroupDirectory::epicsStoreMode2str(m_storeEpics));
 
   m_short_bld_name = config("short_bld_name",false);
+  m_create_alias_links = config("create_alias_links",true);
+  m_overwrite = config("overwrite",false);
 
   // src filter parameters
   std::list<std::string> include_all, empty_list;
@@ -344,7 +346,8 @@ void H5Output::openH5OutputFile() {
   if (err != 0) throw hdf5pp::Hdf5CallException(ERR_LOC,"failed to get Hdf5 library version number");
   MsgLog(logger(),debug,"Hdf Library version info: " << majnum << "." << minnum << "." << relnum);
 
-  hdf5pp::File::CreateMode mode = hdf5pp::File::Truncate;
+  hdf5pp::File::CreateMode mode = m_overwrite ? hdf5pp::File::Truncate : hdf5pp::File::Exclusive ;
+
   // change the size of the B-Tree for chunked datasets
   hdf5pp::PListFileCreate fcpl;
   fcpl.set_istore_k(2);
@@ -446,6 +449,12 @@ void H5Output::beginRun(Event& evt, Env& env)
   MsgLog(logger(),debug,name() << ": beginRun()");
   setEventVariables(evt,env);
   initializeSrcAndKeyFilters();
+  if (m_create_alias_links) {
+    m_configureGroupDir.setAliasMap(env.aliasMap());
+    m_calibCycleConfigureGroupDir.setAliasMap(env.aliasMap());
+    m_calibCycleEventGroupDir.setAliasMap(env.aliasMap());
+    m_calibCycleFilteredGroupDir.setAliasMap(env.aliasMap());
+  }
   m_currentCalibCycleCounter = 0;
   createNextRunGroup();  
 }

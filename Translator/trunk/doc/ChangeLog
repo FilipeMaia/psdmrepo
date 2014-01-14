@@ -11,6 +11,10 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-13
+2014-01-14 David Schneider
+- use AliasMap to create h5 soft links for Pds::Src groups
+
 Tag: V00-00-12
 2014-01-14 David Schneider
 - removing test xtc files from the data subdirectory.

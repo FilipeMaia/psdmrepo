@@ -6,6 +6,7 @@
 #include "MsgLogger/MsgLogger.h"
 #include "Translator/TypeSrcKeyH5GroupDirectory.h"
 #include "Translator/H5GroupNames.h"
+#include "Translator/hdf5util.h"
 
 using namespace std;
 using namespace Translator;
@@ -252,6 +253,13 @@ SrcKeyMap::iterator TypeSrcKeyH5GroupDirectory::endSrcKey(const type_info *typeI
   return srcKeyMap.end();
 }
 
+string TypeSrcKeyH5GroupDirectory::getAlias(const Pds::Src &src) {
+  if (m_aliasMap) {
+    return m_aliasMap->alias(src);
+  }
+  return "";
+}
+
 SrcKeyGroup & TypeSrcKeyH5GroupDirectory::addSrcKeyGroup(const PSEvt::EventKey &eventKey, 
                                                          boost::shared_ptr<Translator::HdfWriterFromEvent> hdfWriter) {
   const type_info * typeInfoPtr = eventKey.typeinfo();
@@ -263,8 +271,22 @@ SrcKeyGroup & TypeSrcKeyH5GroupDirectory::addSrcKeyGroup(const PSEvt::EventKey &
   const string &key = eventKey.key();
   SrcKeyPair srcStrPair = make_pair(src,key);
   string srcKeyGroupName = m_h5GroupNames->nameForSrcKey(src,key);
+  string srcAlias = getAlias(src);
   hdf5pp::Group typeH5Group = typeGroup.group();
   hdf5pp::Group srcH5Group = typeH5Group.createGroup(srcKeyGroupName);
+  if (srcAlias.size()>0) {
+    herr_t err = H5Lcreate_soft(srcKeyGroupName.c_str(), 
+                                typeH5Group.id(), srcAlias.c_str(), H5P_DEFAULT, H5P_DEFAULT);
+    if (err<0) {
+      MsgLog(logger, error, "Failed to create alias=" << srcAlias 
+             << " for target=" << srcKeyGroupName 
+             << " relative to type group=" << hdf5util::objectName(typeH5Group.id()));
+    } else {
+      MsgLog(logger,trace, "Created alias=" << srcAlias
+             << " for target=" << srcKeyGroupName
+             << " relative to type group=" << hdf5util::objectName(typeH5Group.id()));
+    }
+  }
   uint64_t srcVal = (uint64_t(src.phy()) << 32) + src.log();
   srcH5Group.createAttr<uint64_t>("_xtcSrc").store(srcVal);
   MsgLog(logger,trace,"addSrcKeyGroup " << srcKeyGroupName);

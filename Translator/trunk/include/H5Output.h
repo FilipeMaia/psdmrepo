@@ -173,6 +173,8 @@ private:
   hsize_t m_splitSize;
 
   bool m_short_bld_name;
+  bool m_create_alias_links;
+  bool m_overwrite;
 
   // translation parameters
   std::map<std::string, bool> m_typeInclude;  // each type alias will be read in 

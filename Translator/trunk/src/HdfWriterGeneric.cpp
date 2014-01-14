@@ -385,7 +385,7 @@ std::map<std::string, hid_t> HdfWriterGeneric::getDatasetNameToH5TypeMap(hid_t g
   }
   vector<DataSetMeta> & dsetMeta = pos->second;
   std::map<std::string, hid_t> dset2hid;
-  for (int idx = 0; idx < dsetMeta.size(); idx++) {
+  for (unsigned idx = 0; idx < dsetMeta.size(); idx++) {
     hid_t h5type = dsetMeta.at(idx).typeId();
     string name = dsetMeta.at(idx).name();
     dset2hid[name]=h5type;

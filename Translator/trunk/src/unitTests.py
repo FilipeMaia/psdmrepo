@@ -37,6 +37,7 @@ TESTDATA_AMO64913_r182_s2_NODAMAGE_DROPPED_OUTOFORDER = os.path.join(DATADIR,"te
 TESTDATA_XCSCOM12_r52_s0 = os.path.join(DATADIR,"test_049_Translator_xcscom12-r52-s0-dupTimes-splitEvents.xtc")
 TESTDATA_T1_DROPPED_SRC = os.path.join(DATADIR,"test_044_Translator_t1_dropped_src.xtc")
 TESTDATA_T1_DROPPED = os.path.join(DATADIR,"test_043_Translator_t1_dropped.xtc")
+TESTDATA_ALIAS = os.path.join(DATADIR,"test_050_sxr_sxrb6813_e363-r0069-s00-c00.xtc")
 
 ## ----------------
 # this string is for the test_ndarrays_allWritenToFile test
@@ -874,6 +875,74 @@ class H5Output( unittest.TestCase ) :
         if self.cleanUp:
             os.unlink(output_h5)
 
+    def test_alias(self):
+        '''check that aliases are getting created.
+
+        test_050 has an aliasCfg object in the config, the aliases are:
+        numAlias=7 
+        0: EXS_OPAL -> SxrBeamline.0:Opal1000.1 
+        1: Laser_OPAL_CVD02 -> SxrEndstation.0:Opal1000.2 
+        2: Scienta_OPAL_CVD01A -> SxrEndstation.0:Opal1000.0 
+        3: TSS_OPAL -> SxrBeamline.0:Opal1000.0 
+        4: XES_OPAL_CVD01B -> SxrEndstation.0:Opal1000.1 
+        5: acq01 -> SxrEndstation.0:Acqiris.0 
+        6: acq02 -> SxrEndstation.0:Acqiris.2
+
+        During the first 120 events that are in the test_050 file, we get data from 
+        SxrEndstation.0:Acqiris.0 and SxrEndstation.0:Acqiris.2 but not the Opal1000
+        sources. So one can test for those links.
+        '''
+        input_file = TESTDATA_ALIAS
+        output_h5 = os.path.join(OUTDIR,"unit-test_alias.h5")
+        cfgfile = writeCfgFile(input_file, output_h5)
+        self.runPsanaOnCfg(cfgfile,output_h5, extraOpts='-n 10',printPsanaOutput=self.printPsanaOutput)
+        cfgfile.close()
+
+        # check for acq01 soft link:
+        cmd = 'h5ls -r %s | grep acq01' % output_h5
+        p = sb.Popen(cmd,shell=True,stdout=sb.PIPE,stderr=sb.PIPE)
+        o,e = p.communicate()
+        assert e == ""
+        expectedOutput = "/Configure:0000/Run:0000/CalibCycle:0000/Acqiris::DataDescV1/acq01 Soft Link {SxrEndstation.0:Acqiris.0}"
+        self.assertEqual(o.strip(),expectedOutput, msg="Do not see acq01 alias: expected=\n'%s' observed=\n'%s'" % (expectedOutput,o))
+
+        # check for acq02 soft link:
+        cmd = 'h5ls -r %s | grep acq02' % output_h5
+        p = sb.Popen(cmd,shell=True,stdout=sb.PIPE,stderr=sb.PIPE)
+        o,e = p.communicate()
+        assert e == ""
+        expectedOutput = "/Configure:0000/Run:0000/CalibCycle:0000/Acqiris::DataDescV1/acq02 Soft Link {SxrEndstation.0:Acqiris.2}"
+        self.assertEqual(o.strip(),expectedOutput, msg="Do not see acq02 alias: expected=\n'%s' observed=\n'%s'" % (expectedOutput,o))
+        
+        # check that if we turn off aliases, we do not see them:
+        cfgfile = writeCfgFile(input_file, output_h5)
+        cfgfile.write("create_alias_links=false\n")
+        cfgfile.flush()
+        self.runPsanaOnCfg(cfgfile,output_h5, extraOpts='-n 10', printPsanaOutput=self.printPsanaOutput)
+        cfgfile.close()
+        cmd = 'h5ls -r %s | grep "acq02\|acq01"' % output_h5
+        p = sb.Popen(cmd,shell=True,stdout=sb.PIPE,stderr=sb.PIPE)
+        o,e = p.communicate()
+        self.assertEqual(e.strip(),"",msg="Error running h5ls on %s, err=%s"  % (output_h5,e))
+        self.assertEqual(o.strip(),"",msg="acq01 or acq02 still in file: %s, h5ls output=%s" % (output_h5,o))
+        if self.cleanUp:
+            os.unlink(output_h5)
+
+        # check that if we uses aliases in the src_filter option, that it works
+        cfgfile = writeCfgFile(input_file, output_h5)
+        cfgfile.write("src_filter=exclude acq01 acq02\n")
+        cfgfile.flush()
+        self.runPsanaOnCfg(cfgfile,output_h5, extraOpts='-n 10', printPsanaOutput=self.printPsanaOutput)
+        cfgfile.close()
+        cmd = 'h5ls -r %s | grep "SxrEndstation.0:Acqiris.0\|SxrEndstation.0:Acqiris.2"' % output_h5
+        p = sb.Popen(cmd,shell=True,stdout=sb.PIPE,stderr=sb.PIPE)
+        o,e = p.communicate()
+        self.assertEqual(e.strip(),"",msg="There was a problem running h5ls: stderr=%s"%e.strip())
+        self.assertEqual(o.strip(),"",msg="The src's were not filtered by the aliases, output of h5ls -r is: %s" % o)
+        
+        
+        
+        
 #  run unit tests when imported as a main module
 #
 #  To run an individual test, do something like (from the release directory)
