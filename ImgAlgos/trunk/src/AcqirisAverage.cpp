@@ -215,8 +215,8 @@ AcqirisAverage::procEvent(Event& evt, Env& env)
 		      if (wf[s] < threshold) { threshold_is_crossed = true; break; }
 		}
 
-		if(     threshold_is_crossed &&  v_do_inverse_selection[c]
-		    or !threshold_is_crossed && !v_do_inverse_selection[c] ) {
+		if(     (threshold_is_crossed &&  v_do_inverse_selection[c])
+		    or (!threshold_is_crossed && !v_do_inverse_selection[c]) ) {
 
 		    // discard waveform - fill it with 0
                     std::fill_n(&m_wf[c][0], int(m_nbrSamples), wform_t(0));

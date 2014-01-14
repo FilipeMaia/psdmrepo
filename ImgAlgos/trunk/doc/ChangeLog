@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-25
+2014-01-13 Andy
+- add some parens to avoid compiler warnings (gcc44)
+
 Tag: V00-03-24
 2013-12-12 Mikhail S. Dubrovin
 - is NDArrAverage add printStatBadPix()
