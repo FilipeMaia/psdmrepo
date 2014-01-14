@@ -165,7 +165,6 @@ H5Output::H5Output(string moduleName) : Module(moduleName),
   m_calibCycleConfigureGroupDir.setH5GroupNames(m_h5groupNames);
   m_calibCycleEventGroupDir.setH5GroupNames(m_h5groupNames);
   m_calibCycleFilteredGroupDir.setH5GroupNames(m_h5groupNames);
-  initializeSrcAndKeyFilters();
   openH5OutputFile();
 }
 
@@ -280,6 +279,7 @@ namespace {
       MsgLog(logger(),fatal, configParamKey 
              << " must start with either\n 'include' or 'exclude' and be followed by at least one src (which can be 'all' for include)");
     }
+    filterSet.clear();
     list<string>::const_iterator pos = configParamValues.begin();
     string filter0 = *pos;
     ++pos;
@@ -318,10 +318,12 @@ namespace {
 
 void H5Output::initializeSrcAndKeyFilters() {
   set<string> srcNameFilterSet;
-  parseFilterConfigString("src_filter",         m_src_filter,         m_srcFilterIsExclude,    m_includeAllSrc,          srcNameFilterSet);
+  parseFilterConfigString("src_filter", m_src_filter, m_srcFilterIsExclude, m_includeAllSrc, srcNameFilterSet);
   m_psevtSourceFilterList.clear();
   for (set<string>::iterator pos = srcNameFilterSet.begin(); pos != srcNameFilterSet.end(); ++pos) {
-    m_psevtSourceFilterList.push_back(PSEvt::Source(*pos));
+    PSEvt::Source source(*pos);
+    PSEvt::Source::SrcMatch srcMatch = source.srcMatch(*(m_env->aliasMap()));
+    m_psevtSourceFilterList.push_back(srcMatch);
   }
   parseFilterConfigString("ndarray_key_filter", m_ndarray_key_filter, m_ndarrayKeyIsExclude,   m_includeAllNdarrayKey,   m_ndarrayKeyFilterSet);
   parseFilterConfigString("std_string_key_filter",  m_std_string_key_filter,  m_stdStringKeyIsExclude, m_includeAllStdStringKey, m_stdStringKeyFilterSet);
@@ -443,6 +445,7 @@ void H5Output::beginRun(Event& evt, Env& env)
 {
   MsgLog(logger(),debug,name() << ": beginRun()");
   setEventVariables(evt,env);
+  initializeSrcAndKeyFilters();
   m_currentCalibCycleCounter = 0;
   createNextRunGroup();  
 }

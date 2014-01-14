@@ -159,7 +159,7 @@ private:
   bool m_ndarrayKeyIsExclude;
   bool m_stdStringKeyIsExclude;
 
-  std::vector<PSEvt::Source> m_psevtSourceFilterList;
+  std::vector<PSEvt::Source::SrcMatch> m_psevtSourceFilterList;
   std::set<std::string> m_ndarrayKeyFilterSet;
   std::set<std::string> m_stdStringKeyFilterSet;
 
