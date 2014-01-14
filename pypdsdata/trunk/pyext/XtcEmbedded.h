@@ -13,6 +13,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include "python/Python.h"     // Python.h should appear first to suppress warnings about _POSIX_C_SOURCE
 #include <boost/shared_ptr.hpp>
 
 //----------------------
