@@ -21,29 +21,25 @@ import numpy as np
 #-----------------------------
 import h5py
 
-#-----------------------------
+# -----------------------------
 # Test data
-# below are several small test files that are included in the data
-# subdirectory.  There are
-#  t1.xtc - two events, 
-
-#----------------------------
-DATADIR = "data/Translator"
-TESTDATA_T1= os.path.join(DATADIR, "t1.xtc")
-TESTDATA_T1_INITIAL_DAMAGE = os.path.join(DATADIR,"t1_initial_damage.xtc")
-TESTDATA_T1_END_DAMAGE = os.path.join(DATADIR,"t1_end_damage.xtc")
-TESTDATA_T1_NEW_OUTOFORDER = os.path.join(DATADIR,"t1_new_out_of_order.xtc")
-TESTDATA_T1_PREVIOUS_OUTOFORDER = os.path.join(DATADIR,"t1_previously_seen_out_of_order.xtc")
-TESTDATA_AMO68413_r99_s2 = os.path.join(DATADIR,"amo68413-r99-s02-userEbeamDamage.xtc")
-TESTDATA_AMO64913_r182_s2_OUTOFORDER_FRAME = os.path.join(DATADIR,'amo64913-r182-s02-OutOfOrder_Frame.xtc')
-TESTDATA_AMO64913_r182_s2_NODAMAGE_DROPPED_OUTOFORDER = os.path.join(DATADIR,"amo64913-r182-s02-noDamage-dropped-OutOfOrder_Frame.xtc")
-TESTDATA_XCSCOM12_r52_s0 = os.path.join(DATADIR,"xcscom12-r52-s0-dupTimes-splitEvents.xtc")
-TESTDATA_T1_DROPPED_SRC = os.path.join(DATADIR,"t1_dropped_src.xtc")
-TESTDATA_T1_DROPPED = os.path.join(DATADIR,"t1_dropped.xtc")
+# -----------------------------
+DATADIR = "/reg/g/psdm/data_test/Translator"
+OUTDIR = "data/Translator"
+TESTDATA_T1= os.path.join(DATADIR, "test_042_Translator_t1.xtc")
+TESTDATA_T1_INITIAL_DAMAGE = os.path.join(DATADIR,"test_046_Translator_t1_initial_damage.xtc")
+TESTDATA_T1_END_DAMAGE = os.path.join(DATADIR,"test_045_Translator_t1_end_damage.xtc")
+TESTDATA_T1_NEW_OUTOFORDER = os.path.join(DATADIR,"test_047_Translator_t1_new_out_of_order.xtc")
+TESTDATA_T1_PREVIOUS_OUTOFORDER = os.path.join(DATADIR,"test_048_Translator_t1_previously_seen_out_of_order.xtc")
+TESTDATA_AMO68413_r99_s2 = os.path.join(DATADIR,"test_041_Translator_amo68413-r99-s02-userEbeamDamage.xtc")
+TESTDATA_AMO64913_r182_s2_OUTOFORDER_FRAME = os.path.join(DATADIR,'test_039_Translator_amo64913-r182-s02-OutOfOrder_Frame.xtc')
+TESTDATA_AMO64913_r182_s2_NODAMAGE_DROPPED_OUTOFORDER = os.path.join(DATADIR,"test_040_Translator_amo64913-r182-s02-noDamage-dropped-OutOfOrder_Frame.xtc")
+TESTDATA_XCSCOM12_r52_s0 = os.path.join(DATADIR,"test_049_Translator_xcscom12-r52-s0-dupTimes-splitEvents.xtc")
+TESTDATA_T1_DROPPED_SRC = os.path.join(DATADIR,"test_044_Translator_t1_dropped_src.xtc")
+TESTDATA_T1_DROPPED = os.path.join(DATADIR,"test_043_Translator_t1_dropped.xtc")
 
 ## ----------------
-# this string is for the test_ndarrays_allWritenToFile test - a fragile 
-# shortcut to testing that all the data looks Ok
+# this string is for the test_ndarrays_allWritenToFile test
 
 NDARRAY_2EVENTS='''double3D:
 array([[[[ 1.,  2.],
@@ -84,7 +80,8 @@ array([This is a second string.  10 * event number is 10,
 # Utility functions 
 #------------------
 def makeH5OutputNameFromXtc(xtcfile):
-    h5out = os.path.splitext(xtcfile)[0] + '.h5'
+    xtcbase = os.path.basename(xtcfile)
+    h5out = os.path.join(OUTDIR, os.path.splitext(xtcbase)[0]) + '.h5'
     assert h5out != xtcfile, "xtcfile ends with .h5, it is %s" % xtcfile
     return h5out
 
@@ -164,6 +161,8 @@ class H5Output( unittest.TestCase ) :
     	before calling the test method; any exception raised by this method 
     	will be considered an error rather than a test failure.  
     	"""
+        assert os.path.exists(DATADIR), "Data dir: %s does not exist, cannot run unit tests" % DATADIR
+        assert os.path.exists(OUTDIR), "Output directory: %s does not exist, can't run unit tests" % OUTDIR
         self.cleanUp = True      # Several tests run psana to produce .h5 files.  
                                  # If cleanup is True the files are deleted when
                                  # the test is done.
@@ -224,7 +223,8 @@ class H5Output( unittest.TestCase ) :
         self.assertEqual(lowerOutput.find('traceback'),-1,msg="'traceback' found in psana output: ... %s ..." % lowerOutput[lowerOutput.find('traceback')-100:lowerOutput.find('traceback')+100])
 
     def test_t1_initial_damage(self):
-        '''The input file is a modified version of t1.xtc.
+        '''check for initial blanks.
+        The input file is a modified version of t1.xtc.
         Damage has been introduced for the first of the two Ipimb::Data types
         coming from the XppSb3_Ipm source.  Hence we should get a blank starting
         that dataset.  This will test the initial_blank logic of 
@@ -264,13 +264,15 @@ class H5Output( unittest.TestCase ) :
             os.unlink(output_h5)
 
     def test_t1_end_damage(self):
-        '''The input file is a modified version of t1.xtc.
+        '''Check for blanks at the end of the datasets.
+        The input file is a modified version of t1.xtc.
         Damage has been introduced at the end of the Ipimb::Data types
         coming from the XppSb3_Ipm source.  Hence we should get a blank at the end
         of that dataset. 
         '''
         input_file = TESTDATA_T1_END_DAMAGE
         output_h5 = makeH5OutputNameFromXtc(input_file)
+                         
         cfgfile = writeCfgFile(input_file, output_h5)
         self.runPsanaOnCfg(cfgfile,output_h5, printPsanaOutput=self.printPsanaOutput)
         cfgfile.close()
@@ -304,7 +306,8 @@ class H5Output( unittest.TestCase ) :
             os.unlink(output_h5)
 
     def test_t1_new_outoforder(self):
-        '''The input file is a modified version of t1.xtc. If has out of order damage for the
+        '''Check for proper handling of outoforder damage.
+        The input file is a modified version of t1.xtc. If has out of order damage for the
         second event for ipimb data from sb32.
         '''
         input_file = TESTDATA_T1_NEW_OUTOFORDER
@@ -340,7 +343,8 @@ class H5Output( unittest.TestCase ) :
             os.unlink(output_h5)
 
     def test_t1_previously_seen_out_of_order(self):
-        '''The input file is a modified version of t1.xtc. There are two L1Accept datagrams with the
+        '''check for proper damage handling.
+        The input file is a modified version of t1.xtc. There are two L1Accept datagrams with the
         same time.  The first one has damage, and the second one says out of order.
 
         The datagrams:
@@ -435,8 +439,8 @@ class H5Output( unittest.TestCase ) :
         the user damaged ebeam data is present. psana has a switch to not store damaged user ebeam, but
         by default it is on, so it should be stored.
         '''
-        input_file = "data/Translator/amo68413-r99-s02-userEbeamDamage.xtc"
-        output_h5 = "data/Translator/unit-test-userEBeamDamage.h5"
+        input_file = TESTDATA_AMO68413_r99_s2
+        output_h5 = makeH5OutputNameFromXtc(input_file)
         cfgfile = writeCfgFile(input_file,output_h5)
         self.runPsanaOnCfg(cfgfile,output_h5)
         cfgfile.close()
@@ -460,7 +464,7 @@ class H5Output( unittest.TestCase ) :
             os.unlink(output_h5)
 
     def test_outOfOrderFrame(self):
-        '''This file has
+        '''Test proper damage handling. This file has
         dg1=config, dg2=beginRun, dg3=beginCalib, dg4=Enable
         dg5=L1Accept with:  sec=5159D9BB nano=37A715E2
           xtc extent=00000014 dmg=00002 src=01003A03,17010300,level=1 typeid= 0 version=0 value=00000 type_name=Any
@@ -499,7 +503,7 @@ class H5Output( unittest.TestCase ) :
             os.unlink(output_h5)
 
     def test_noDamageDroppedOutOfOrder(self):
-        '''This file has
+        '''Check proper damage handling. This file has
         dg1=config, dg2=beginRun, dg3=beginCalib, dg4=Enable
         dg5=L1Accept with:  sec=5159D9BB nano=36A8E830
           xtc extent=00200024 dmg=00000 src=01003A03,17010300, typeid= 2 type_name=Frame
@@ -530,7 +534,8 @@ class H5Output( unittest.TestCase ) :
             os.unlink(output_h5)
         
     def test_dupTimesSplitEvents(self):
-        '''
+        '''Check that we run without on error on file with split events.
+        TODO: check for proper handling of split events.
         This file contains several pairs of datagrams with the same timestamps:
         dg=    8 sec=4F540ABB nano=0A5FC451  xtc dmg=00002 src=02001038,AC151974, type_name=Any
         dg=   11 sec=4F540ABB nano=0A5FC451  all xtc dmg=00002
@@ -546,13 +551,6 @@ class H5Output( unittest.TestCase ) :
 
         dg=   13 sec=4F540ABB nano=164DEBBF xtc dmg=00002 src=02001038,AC151974, type_name=Any
         dg=   17 sec=4F540ABB nano=164DEBBF all xtc, smg=00002
-        
-        This file also has shared xtc types that get split apart, so it provides a good test
-        case for code that refactors psddl_pds2psana/XtcConverter.
-
-        I honestly don't know what kind of output is useful for this data, it has a lot of damage.
-        It does make for an interesting test case.  Presently we just make sure we don't crash
-        on it.
         '''
         input_file = TESTDATA_XCSCOM12_r52_s0
         output_h5 = makeH5OutputNameFromXtc(input_file)
@@ -563,6 +561,8 @@ class H5Output( unittest.TestCase ) :
             os.unlink(output_h5)
 
     def test_t1_dropped_src(self):
+        '''Check that we run successful on this xtc file with damage.
+        '''
         input_file = TESTDATA_T1_DROPPED_SRC
         output_h5 = makeH5OutputNameFromXtc(input_file)
         cfgfile = writeCfgFile(input_file, output_h5)
@@ -572,9 +572,7 @@ class H5Output( unittest.TestCase ) :
             os.unlink(output_h5)
         
     def test_t1_dropped(self):
-        '''This file has a split event. 
-        TODO: develop better test case to make sure
-        split event gets repaired.
+        '''Check that we run successful on this xtc file with damage.
         '''
         input_file = TESTDATA_T1_DROPPED
         output_h5 = makeH5OutputNameFromXtc(input_file)
@@ -585,10 +583,11 @@ class H5Output( unittest.TestCase ) :
             os.unlink(output_h5)
 
     def test_doNotTranslate_addKey(self):
+        '''Test doNotTranslate with a key string like "mytest:do_not_translate"
         '''
-        '''
-        output_h5 = os.path.join(DATADIR,"unit-test-donottranslate.h5")
-        cfgfile = writeCfgFile(TESTDATA_T1,output_h5,"Translator.TestModuleDoNotTranslate Translator.H5Output")
+        input_file = TESTDATA_T1
+        output_h5 = os.path.join(OUTDIR,'unit-test_doNotTranslate_addKey.h5')
+        cfgfile = writeCfgFile(input_file,output_h5,"Translator.TestModuleDoNotTranslate Translator.H5Output")
         cfgfile.write("[Translator.TestModuleDoNotTranslate]\n")
         cfgfile.write("skip=0 1\n")
         msg0='message0'
@@ -638,10 +637,11 @@ class H5Output( unittest.TestCase ) :
             os.unlink(output_h5)
         
     def test_doNotTranslate(self):
+        '''Test doNotTranslate with a basic key string: "do_not_translate"
         '''
-        '''
-        output_h5 = os.path.join(DATADIR,"unit-test-donottranslate.h5")
-        cfgfile = writeCfgFile(TESTDATA_T1,output_h5,"Translator.TestModuleDoNotTranslate Translator.H5Output")
+        input_file = TESTDATA_T1
+        output_h5 = os.path.join(OUTDIR,'unit_test_doNotTranslate.h5')
+        cfgfile = writeCfgFile(input_file,output_h5,"Translator.TestModuleDoNotTranslate Translator.H5Output")
         cfgfile.write("[Translator.TestModuleDoNotTranslate]\n")
         cfgfile.write("skip=0 1\n")
         msg0='message0'
@@ -694,8 +694,9 @@ class H5Output( unittest.TestCase ) :
     def test_ndarrays_allWrittenToFile(self):
         '''check that all ndarrays and strings written to the file
         '''
-        output_h5 = os.path.join(DATADIR,"unit-test-ndarrays.h5")
-        cfgfile = writeCfgFile(TESTDATA_T1,output_h5,"Translator.TestModuleNDArrayString Translator.H5Output")
+        input_file = TESTDATA_T1
+        output_h5 = os.path.join(OUTDIR,'unit_test_ndarrays_allWrittenToFile.h5')
+        cfgfile = writeCfgFile(input_file,output_h5,"Translator.TestModuleNDArrayString Translator.H5Output")
         cfgfile.file.flush()
         self.runPsanaOnCfg(cfgfile,output_h5)
         f=h5py.File(output_h5,'r')
@@ -715,8 +716,9 @@ class H5Output( unittest.TestCase ) :
     def test_filter_all_ndarray(self):
         '''check that we can filter out all ndarrays and strings
         '''
-        output_h5 = os.path.join(DATADIR,"unit-test-filter_all_ndarray.h5")
-        cfgfile = writeCfgFile(TESTDATA_T1,output_h5,"Translator.TestModuleNDArrayString Translator.H5Output")
+        input_file = TESTDATA_T1
+        output_h5 = os.path.join(OUTDIR, "unit_test_filter_all_ndarray.h5")
+        cfgfile = writeCfgFile(input_file,output_h5,"Translator.TestModuleNDArrayString Translator.H5Output")
         # first add any options to H5Output, then other modules
         cfgfile.write("ndarray_types = exclude\n")
         cfgfile.write("std_string = exclude\n")
@@ -744,8 +746,9 @@ class H5Output( unittest.TestCase ) :
     def test_filter_some_ndarray_exclude(self):
         '''check that we can filter some ndarrays by excluding them
         '''
-        output_h5 = os.path.join(DATADIR,"unit-test-filter_some_ndarray_exclude.h5")
-        cfgfile = writeCfgFile(TESTDATA_T1,output_h5,"Translator.TestModuleNDArrayString Translator.H5Output")
+        input_file = TESTDATA_T1
+        output_h5 = os.path.join(OUTDIR, "unit_test_filter_some_ndarray_exclude.h5")
+        cfgfile = writeCfgFile(input_file,output_h5,"Translator.TestModuleNDArrayString Translator.H5Output")
         # first add any options to H5Output, then other modules
         cfgfile.write("ndarray_key_filter = exclude my_int1D my_float2Da\n")
         cfgfile.write("std_string_key_filter = exclude my_string1\n")
@@ -771,8 +774,9 @@ class H5Output( unittest.TestCase ) :
     def test_filter_some_ndarray_include(self):
         '''check that we can filter some ndarrays by including them
         '''
-        output_h5 = os.path.join(DATADIR,"unit-test-filter_some_ndarray_include.h5")
-        cfgfile = writeCfgFile(TESTDATA_T1,output_h5,"Translator.TestModuleNDArrayString Translator.H5Output")
+        input_file = TESTDATA_T1
+        output_h5 = os.path.join(OUTDIR, "unit_test_filter_some_ndarray_include.h5")
+        cfgfile = writeCfgFile(input_file,output_h5,"Translator.TestModuleNDArrayString Translator.H5Output")
         # first add any options to H5Output, then other modules
         cfgfile.write("ndarray_key_filter = include my_int1D my_float2Da\n")
         cfgfile.write("std_string_key_filter = include my_string1\n")
@@ -806,7 +810,7 @@ class H5Output( unittest.TestCase ) :
                         ('Ipimb::DataV2/XppSb2_Ipm','XppSb2_Ipm'),
                         ('Ipimb::DataV2/XppSb3_Ipm','XppSb3_Ipm')]
         for group,src in grpSrcList:
-            output_h5 = os.path.join(DATADIR,"unit-test_src_filter_include.h5")
+            output_h5 = os.path.join(OUTDIR,"unit-test_src_filter_include.h5")
             cfgfile = writeCfgFile(TESTDATA_T1,output_h5)
             cfgfile.write("src_filter = include %s\n" % src)
             cfgfile.file.flush()
@@ -834,7 +838,7 @@ class H5Output( unittest.TestCase ) :
                         ('Ipimb::DataV2/XppSb2_Ipm','XppSb2_Ipm'),
                         ('Ipimb::DataV2/XppSb3_Ipm','XppSb3_Ipm')]
         for group,src in grpSrcList:
-            output_h5 = os.path.join(DATADIR,"unit-test_src_filter_exclude.h5")
+            output_h5 = os.path.join(OUTDIR,"unit-test_src_filter_exclude.h5")
             cfgfile = writeCfgFile(TESTDATA_T1,output_h5)
             cfgfile.write("src_filter = exclude %s\n" % src)
             cfgfile.file.flush()
@@ -855,7 +859,7 @@ class H5Output( unittest.TestCase ) :
     def test_newWriter(self):
         '''check newWriter capability
         '''
-        output_h5 = os.path.join(DATADIR,"unit-test_newwriter.h5")
+        output_h5 = os.path.join(OUTDIR,"unit-test_newwriter.h5")
         cfgfile = writeCfgFile(TESTDATA_T1,output_h5,
                                moduleList='Translator.TestNewHdfWriter Translator.H5Output')
         cfgfile.file.flush()

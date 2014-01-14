@@ -11,6 +11,10 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-12
+2014-01-14 David Schneider
+- removing test xtc files from the data subdirectory.
+
 Tag: V00-00-11
 2014-01-13 David Schneider
 - updating to work with PSEvt V00-08-00, new tag with Alias support.
