@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-13-04
+2014-01-14 David Schneider
+- Translator backend: documentation (overwrite and create_alias_links options)
+
 Tag: V00-13-03
 2014-01-13 David Schneider
 - Translator backend: update documentation to describe psana Source syntax

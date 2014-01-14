@@ -33,6 +33,9 @@ files = **TODO: SPECIFY INPUT FILES OR DATA SOURCE HERE**
 # TODO: enter the full h5 output file name, including the output directory
 output_file = output_directory/h5output.h5
 
+# by default, the Translator will not overwrite the h5 file if it already exists
+overwrite = false
+
 # # # # # # # # # # # # # # # # # # # # #
 # EPICS FILTERING
 # The Translator can store epics pv's in one of two ways, or not at all.
@@ -64,7 +67,7 @@ store_epics = updates_only
 # type filtering options. 
 # 
 # Note - Epics in the list below refers only to the epicsConfig data
-# which is the alias list, not the epics pv's (see store_epics above for those)
+# which is the epics alias list, not the epics pv's (see store_epics above for those)
 
 {{type_filter_options}}
 
@@ -81,10 +84,10 @@ store_epics = updates_only
 #
 # src_filter exclude srcname1 srcname2
 #
-# The syntax for specifying a srcname follows that of the Psana Source.
-# The Psana Source syntax allows for several styles for specifying a Pds Src
-# as well as detector matches where the detector number, or device number is 
-# not known.
+# The syntax for specifying a srcname follows that of the Psana Source (discussed in 
+# the Psana Users Guide). The Psana Source recognizes DAQ alias names (if present
+# in the xtc files), several styles for specifying a Pds Src, as well as detector matches 
+# where the detector number, or device number is not known.
 # 
 # Specifically, format of the match string can be:
 #
@@ -185,6 +188,22 @@ std_string_key_filter = include all
 
 shuffle = true
 deflate = 1
+
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# DAQ ALIAS LINKS
+#
+# When DAQ aliases exist in the xtc files, the Translator will create links
+# using the alias names to the src hdf5 group. For example if one has an 
+# alias such as: 
+# acq01 -> SxrEndstation.0:Acqiris.0
+# and one has Acqiris::DataDescV1 coming from this source, the h5 file will 
+# contain the link:
+#  Acqiris::DataDescV1/acq01 -> Acqiris::DataDescV1/SxrEndstation.0:Acqiris.0
+# so that one does not have to use the full src to access the data.
+# 
+# To turn this feature off, set create_alias_links to false
+
+create_alias_links = true
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # TECHNICAL, ADVANCED CONFIGURATION
