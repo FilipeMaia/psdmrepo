@@ -2,7 +2,7 @@
 #include "MsgLogger/MsgLogger.h"
 
 namespace {
-  char * logger = "DamageMap";
+  const char * logger = "DamageMap";
 }
 
 PSEvt::DamageMap::iterator PSEvt::DamageMap::find(const PSEvt::EventKey &eventKey) {

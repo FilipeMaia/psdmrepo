@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-01
+2014-01-13 Andy Salnikov
+- DamageMap.cpp: fix compilation warning (string literal to char* assignment)
+
 Tag: V00-08-00
 2014-01-13 Andy Salnikov
 - adding support for aliases (see also 
