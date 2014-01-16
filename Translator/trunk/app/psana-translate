@@ -41,7 +41,7 @@ psana-translate -n 5 --output_file=myout.h5 --Epics=exclude /reg/d/psdm/mec/meca
 ''' % (os.path.basename(sys.argv[0]), )
 
 # this is initialized with the default values from default_psana.cfg
-defaultTranslatorOptions = (('overwrite','false),
+defaultTranslatorOptions = (('overwrite','false'),
                             ('store_epics','updates_only'),
                             ('output_file','**PUT SOMETHING HERE**'),
                             ('overwrite','false'),

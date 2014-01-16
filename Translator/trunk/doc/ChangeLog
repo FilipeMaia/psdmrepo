@@ -11,6 +11,12 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-14
+2014-01-15 David Schneider
+- fix bug with when scr_filter is initialized
+- add unit test for writing Alias Config
+- move codegen template from psddl package here
+
 Tag: V00-00-13
 2014-01-14 David Schneider
 - use AliasMap to create h5 soft links for Pds::Src groups

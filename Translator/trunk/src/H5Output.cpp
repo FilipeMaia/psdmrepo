@@ -327,6 +327,7 @@ void H5Output::initializeSrcAndKeyFilters() {
     PSEvt::Source::SrcMatch srcMatch = source.srcMatch(*(m_env->aliasMap()));
     m_psevtSourceFilterList.push_back(srcMatch);
   }
+  MsgLog(logger(),trace, "src_filter: isExclude=" << m_srcFilterIsExclude << " all=" << m_includeAllSrc);
   parseFilterConfigString("ndarray_key_filter", m_ndarray_key_filter, m_ndarrayKeyIsExclude,   m_includeAllNdarrayKey,   m_ndarrayKeyFilterSet);
   parseFilterConfigString("std_string_key_filter",  m_std_string_key_filter,  m_stdStringKeyIsExclude, m_includeAllStdStringKey, m_stdStringKeyFilterSet);
 }
@@ -427,6 +428,13 @@ void H5Output::beginJob(Event& evt, Env& env)
 {
   MsgLog(logger(),trace,"H5Output beginJob()");
   setEventVariables(evt,env);
+  initializeSrcAndKeyFilters();
+  if (m_create_alias_links) {
+    m_configureGroupDir.setAliasMap(env.aliasMap());
+    m_calibCycleConfigureGroupDir.setAliasMap(env.aliasMap());
+    m_calibCycleEventGroupDir.setAliasMap(env.aliasMap());
+    m_calibCycleFilteredGroupDir.setAliasMap(env.aliasMap());
+  }
 
   // record some info from the env
   m_h5file.createAttr<uint32_t> ("expNum").store ( env.expNum() ) ;
@@ -448,13 +456,8 @@ void H5Output::beginRun(Event& evt, Env& env)
 {
   MsgLog(logger(),debug,name() << ": beginRun()");
   setEventVariables(evt,env);
+  // the aliasMap can change from run to run, so reinialize the src filter list with each run.
   initializeSrcAndKeyFilters();
-  if (m_create_alias_links) {
-    m_configureGroupDir.setAliasMap(env.aliasMap());
-    m_calibCycleConfigureGroupDir.setAliasMap(env.aliasMap());
-    m_calibCycleEventGroupDir.setAliasMap(env.aliasMap());
-    m_calibCycleFilteredGroupDir.setAliasMap(env.aliasMap());
-  }
   m_currentCalibCycleCounter = 0;
   createNextRunGroup();  
 }

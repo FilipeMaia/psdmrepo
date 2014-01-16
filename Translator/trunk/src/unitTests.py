@@ -903,16 +903,33 @@ class H5Output( unittest.TestCase ) :
         p = sb.Popen(cmd,shell=True,stdout=sb.PIPE,stderr=sb.PIPE)
         o,e = p.communicate()
         assert e == ""
-        expectedOutput = "/Configure:0000/Run:0000/CalibCycle:0000/Acqiris::DataDescV1/acq01 Soft Link {SxrEndstation.0:Acqiris.0}"
-        self.assertEqual(o.strip(),expectedOutput, msg="Do not see acq01 alias: expected=\n'%s' observed=\n'%s'" % (expectedOutput,o))
+        o=o.strip()
+        expectedOutput = '''/Configure:0000/Acqiris::ConfigV1/acq01 Soft Link {SxrEndstation.0:Acqiris.0}
+/Configure:0000/Run:0000/CalibCycle:0000/Acqiris::DataDescV1/acq01 Soft Link {SxrEndstation.0:Acqiris.0}'''
+        self.assertEqual(o,expectedOutput, msg="acq01 alias output for cmd=%s mismatch, expected=\n'%s'\nobserved=\n'%s'" % (cmd,expectedOutput,o))
 
         # check for acq02 soft link:
         cmd = 'h5ls -r %s | grep acq02' % output_h5
         p = sb.Popen(cmd,shell=True,stdout=sb.PIPE,stderr=sb.PIPE)
         o,e = p.communicate()
         assert e == ""
-        expectedOutput = "/Configure:0000/Run:0000/CalibCycle:0000/Acqiris::DataDescV1/acq02 Soft Link {SxrEndstation.0:Acqiris.2}"
-        self.assertEqual(o.strip(),expectedOutput, msg="Do not see acq02 alias: expected=\n'%s' observed=\n'%s'" % (expectedOutput,o))
+        o=o.strip()
+        expectedOutput = '''/Configure:0000/Acqiris::ConfigV1/acq02 Soft Link {SxrEndstation.0:Acqiris.2}
+/Configure:0000/Run:0000/CalibCycle:0000/Acqiris::DataDescV1/acq02 Soft Link {SxrEndstation.0:Acqiris.2}'''
+        self.assertEqual(o,expectedOutput, msg="acq02 alias output for cmd=%s mismatch, expected=\n'%s'\nobserved=\n'%s'" % (cmd,expectedOutput,o))
+
+        # check that the Alias::ConfigV1 object got written:
+        h5file=h5py.File(output_h5,'r')
+        aliases=h5file['/Configure:0000/Alias::ConfigV1/Control/aliases']
+        srcLog = aliases['src']['log']
+        srcPhy = aliases['src']['phy']
+        aliasName = aliases['aliasName']
+        srcLogExpected=np.array([16782900, 16783349, 16779118, 16783350, 16779116, 16790217, 16790229], dtype=np.uint32)
+        srcPhyExpected=np.array([184550145, 201327362, 201327360, 184550144, 201327361, 201327104, 201327106], dtype=np.uint32)
+        aliasNameExpected=np.array(['EXS_OPAL', 'Laser_OPAL_CVD02', 'Scienta_OPAL_CVD01A', 'TSS_OPAL', 'XES_OPAL_CVD01B', 'acq01', 'acq02'], dtype='|S31')
+        self.assertTrue(all(aliasName == aliasNameExpected), msg="Alias::ConfigV1 aliasName mismatch, expected=\n'%s'\nobserved=\n'%s'" % (aliasNameExpected,aliasName))
+        self.assertTrue(all(srcPhy == srcPhyExpected), msg="Alias::ConfigV1 srcPhy mismatch, expected=\n'%s'\nobserved=\n'%s'" % (srcLog,srcLogExpected))
+        self.assertTrue(all(srcLog == srcLogExpected), msg="Alias::ConfigV1 srcLog mismatch, expected=\n'%s'\nobserved=\n'%s'" % (srcPhy,srcPhyExpected))
         
         # check that if we turn off aliases, we do not see them:
         cfgfile = writeCfgFile(input_file, output_h5)
