@@ -279,7 +279,9 @@ class DdlHdf5Translator ( object ) :
             
         self.log = appBaseArg
         self.packageDir = backend_options['package_dir']
-        self.jiEnv = ji.Environment(loader=TemplateLoader(), trim_blocks=True,
+        self.jiEnv = ji.Environment(loader=TemplateLoader(package='Translator',
+                                                          templateSubDir='templates'), 
+                                    trim_blocks=True,
                                     line_statement_prefix='$',
                                     line_comment_prefix='$$')
     #-------------------

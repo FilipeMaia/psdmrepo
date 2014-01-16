@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-13-05
+2014-01-15 David Schneider
+- Allow templates to be loaded from different packages other than psddl
+- Translator backend: get codegen template from Translator package
+
 Tag: V00-13-04
 2014-01-14 David Schneider
 - Translator backend: documentation (overwrite and create_alias_links options)

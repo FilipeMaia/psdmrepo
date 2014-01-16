@@ -64,8 +64,16 @@ class TemplateLoader(ji.FileSystemLoader):
     #----------------
     #  Constructor --
     #----------------
-    def __init__(self):
-
+    def __init__(self, package='psddl', templateSubDir='templates'):
+        '''Loads templates for psddl. Similar to the jinja2 PackageLoader()
+        function but adapted for packages within the SIT build system
+        (as opposed to Python packages.)
+        ARGS:
+        templateSubdir -  a subdirectory to the data directory of the 
+        package.
+        '''
+        self.package=package
+        self.templateSubDir=templateSubDir
         path = os.environ['SIT_DATA'].split(':')
         ji.FileSystemLoader.__init__(self, path)
 
@@ -79,8 +87,8 @@ class TemplateLoader(ji.FileSystemLoader):
         # template name is the file name followed by "?template"
         fname, template = template.split('?')
 
-        # prepend psddl/templates to path
-        fname = os.path.join("psddl/templates", fname)
+        # prepend package/templateSubDir to path (defaults to psddl/templates)
+        fname = os.path.join("%s/%s" % (self.package,self.templateSubDir), fname)
 
         # call base class method
         source, path, helper = ji.FileSystemLoader.get_source(self, environment, fname)
