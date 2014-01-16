@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-13-06
+2014-01-16 David Schneider
+- Translator backend: remove template as it has been relocated to Translator package
+
 Tag: V00-13-05
 2014-01-15 David Schneider
 - Allow templates to be loaded from different packages other than psddl
