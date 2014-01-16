@@ -213,8 +213,8 @@ ImgSaveInFile::saveImageInFile(Event& evt)
 
   const std::string msg = "Image is not defined in the event(...) for source:" 
                           + boost::lexical_cast<std::string>(m_str_src) + " key:" + m_key;
-  MsgLogRoot(error, msg);
-  throw std::runtime_error(msg);
+  MsgLogRoot(warning, msg);
+  //throw std::runtime_error(msg);
 }
 
 //--------------------
