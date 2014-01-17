@@ -46,7 +46,7 @@ DumpAndor::DumpAndor (const std::string& name)
   : Module(name)
   , m_src()
 {
-  m_src = configSrc("source", "DetInfo(:Acqiris)");
+  m_src = configSrc("source", "DetInfo(:Andor)");
 }
 
 //--------------

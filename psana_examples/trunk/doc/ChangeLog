@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-10
+2014-01-17 Andy Salnikov
+- DumpAndor: default source was for Acqiris
+
 Tag: V00-04-09
 2014-01-13 Andy Salnikov
 - DumpAcqiris: source was hardcoded
