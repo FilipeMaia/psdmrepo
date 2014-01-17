@@ -99,7 +99,7 @@ using namespace std;
 //typedef image<gray_double_pixel_t,false> gray_double_image_t;
 //typedef gray_double_image_t::view_t      gray_double_view_t; 
 
-enum DATA_TYPE {FLOAT, DOUBLE, SHORT, UNSIGNED, INT, INT16, INT32, UINT, UINT8, UINT16, UINT32};
+enum DATA_TYPE {ASDATA, FLOAT, DOUBLE, SHORT, UNSIGNED, INT, INT16, INT32, UINT, UINT8, UINT16, UINT32};
 
 enum FILE_MODE {BINARY, TEXT, TIFF, PNG};
 

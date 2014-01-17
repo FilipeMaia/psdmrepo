@@ -172,6 +172,7 @@ printSizeOfTypes()
             << "\nsizeof(uint32_t) = " << sizeof(uint32_t) << " with typeid(uint32_t).name(): " << typeid(uint32_t).name()  
             << "\nsizeof(int16_t ) = " << sizeof(int16_t ) << " with typeid(int16_t ).name(): " << typeid(int16_t ).name()  
             << "\nsizeof(int32_t ) = " << sizeof(int32_t ) << " with typeid(int32_t ).name(): " << typeid(int32_t ).name()  
+            << "\nsizeof(unsigned short) = " << sizeof(unsigned short) << " with typeid(unsigned short).name(): " << typeid(unsigned short).name()  
             << "\n\n";
 }
 

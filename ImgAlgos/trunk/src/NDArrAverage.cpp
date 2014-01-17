@@ -103,9 +103,12 @@ NDArrAverage::NDArrAverage (const std::string& name)
     m_rmsFile = "arr-rms";
     m_do_ave  = true;
     m_do_rms  = true;
+
   }
 
-    if( m_print_bits & 1 ) printInputParameters();
+  m_ndarr_pars = 0;
+
+  if( m_print_bits & 1 ) printInputParameters();
  }
 
 //--------------------
@@ -353,11 +356,16 @@ NDArrAverage::printEventRecord(Event& evt)
 void 
 NDArrAverage::printSummaryForParser(Event& evt)
 {
-  cout << "NDArrAverage: Summary for parser"     
-       << "\nBATCH_NUMBER_OF_EVENTS " << m_count_ev
-       << "\nBATCH_NUMBER_OF_IMAGES " << m_count   
-       << "\nBATCH_ARR_SIZE         " << m_size
-       << "\n\n";
+  cout << "NDArrAverage: Summary for parser"      << endl;   
+  cout << "BATCH_NUMBER_OF_EVENTS " << m_count_ev << endl;
+  cout << "BATCH_NUMBER_OF_IMAGES " << m_count    << endl;
+  cout << "BATCH_IMG_SIZE         " << m_size     << endl;
+
+  if ( m_ndarr_pars == 0 ) return;
+  if ( m_ndarr_pars->ndim() != 2 ) return;
+
+  cout << "BATCH_IMG_ROWS         " << m_ndarr_pars->shape()[0] << endl;
+  cout << "BATCH_IMG_COLS         " << m_ndarr_pars->shape()[1] << endl;
 }
 
 //--------------------
