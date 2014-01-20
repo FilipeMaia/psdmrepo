@@ -100,12 +100,14 @@ def main( argv ) :
         xtc = dg.xtc
         
         l3t = ""
+        trimmed = ""
         if seq.service() == TransitionId.L1Accept:
             l3t = "l3t=%s, " % str(dg.env.l3t_result()).split('.')[-1]
+            if dg.env.trimmed : trimmed = "trimmed, "
 
         # print datagram info
-        print "%s transition: damage=%#x, type=%d, %stime=%u.%09u, ticks=%u, fiducials=%u, control=%u, vector=%d, payloadSize=%d" \
-            % ( seq.service(), xtc.damage.value(), seq.type(), l3t, clock.seconds(), clock.nanoseconds(),
+        print "%s transition: damage=%#x, type=%d, %s%stime=%u.%09u, ticks=%u, fiducials=%u, control=%u, vector=%d, payloadSize=%d" \
+            % ( seq.service(), xtc.damage.value(), seq.type(), l3t, trimmed, clock.seconds(), clock.nanoseconds(),
                 stamp.ticks(), stamp.fiducials(), stamp.control(), stamp.vector(), xtc.sizeofPayload() )
 
         # recursively dump Xtc info

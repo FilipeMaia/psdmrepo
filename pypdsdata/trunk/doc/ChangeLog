@@ -6,6 +6,10 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V01-01-08
+2014-01-20 Andy Salnikov
+- add printing of trimmed flag to L1AcceptEnv
+
 Tag: V01-01-07
 2014-01-13 Andy Salnikov
 - suppress compilation warning about _POSIX_C_SOURCE redefinition

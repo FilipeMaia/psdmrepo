@@ -97,5 +97,6 @@ void
 pypdsdata::L1AcceptEnv::print(std::ostream& out) const
 {
   out << "L1AcceptEnv(clientGroupMask=" << std::hex << std::showbase << m_obj.clientGroupMask() << std::dec 
-      << ", l3t_result=" << ::l3t_name(m_obj.l3t_result()) << ")";
+      << ", l3t_result=" << ::l3t_name(m_obj.l3t_result()) 
+      << ", trimmed=" << (m_obj.trimmed() ? "True" : "False") << ")";
 }
