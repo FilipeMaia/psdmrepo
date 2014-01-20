@@ -54,6 +54,7 @@ O2OXtcIterator::O2OXtcIterator ( Xtc* xtc, O2OXtcScannerI* scanner, bool config 
   , m_scanner( scanner )
   , m_src()
   , m_config(config)
+  , m_typeIds()
 {
 }
 
@@ -68,10 +69,35 @@ O2OXtcIterator::~O2OXtcIterator ()
 int
 O2OXtcIterator::process(Xtc* xtc)
 {
+  // DAQ sometimes send the same data in both compressed and uncompressed format,
+  // we need to record only one of those
+  if (xtc->contains.id() != Pds::TypeId::Id_Epics and xtc->contains.id() != Pds::TypeId::Id_Xtc and 
+      xtc->contains.id() != Pds::TypeId::Any) {
+    std::vector<Pds::TypeId>& typeIds = m_typeIds[xtc->src];
+    for (std::vector<Pds::TypeId>::const_iterator it = typeIds.begin(); it != typeIds.end(); ++it) {
+      const Pds::TypeId& stored = *it;
+      if (xtc->contains.id() == stored.id() and xtc->contains.compressed_version() == stored.compressed_version()) {
+        // was seen already
+        if (xtc->contains.compressed() != stored.compressed()) {
+          // one is compressed, another is uncompressed - OK, skip this one
+          return 1;
+        }
+      }
+    }
+    typeIds.push_back(xtc->contains);
+  }
+
+  return this->process_int(xtc);
+}
+
+// process one sub-XTC, returns >0 for success, 0 for error
+int
+O2OXtcIterator::process_int(Xtc* xtc)
+{
   if (xtc->contains.compressed()) {
     MsgLog(logger, debug, "Found compressed XTC, decompressing");
     boost::shared_ptr<Pds::Xtc> uxtc = Pds::CompressedXtc::uncompress(*xtc);
-    return this->process(uxtc.get());
+    return this->process_int(uxtc.get());
   }
 
   Pds::TypeId::Type type = xtc->contains.id() ;

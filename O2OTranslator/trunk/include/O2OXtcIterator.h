@@ -13,6 +13,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <map>
 
 //----------------------
 // Base Class Headers --
@@ -67,12 +68,16 @@ public:
 
 protected:
 
+  // process one sub-XTC, returns >0 for success, 0 for error
+  int process_int(Xtc* xtc) ;
+
 private:
 
   // Data members
   O2OXtcScannerI* m_scanner ;
   O2OXtcSrc m_src ;
   bool m_config;
+  std::map<Pds::Src, std::vector<Pds::TypeId> > m_typeIds;   // Stores list of types stored per device
 
   // Copy constructor and assignment are disabled by default
   O2OXtcIterator ( const O2OXtcIterator& ) ;

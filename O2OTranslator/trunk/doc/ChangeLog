@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-30-00
+- modified O2OXtcIterator to filter out duplicate data in cases the data 
+  appears in the event in both compressed and uncompressed format
+
 Tag: V00-29-16
 2014-01-08 Andy Salnikov
 - FliFrameV1Cvt: bug fix, incorrect type id was used when retrieving config 
