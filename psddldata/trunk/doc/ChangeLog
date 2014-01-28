@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V01-00-02
+2014-01-27 Matt
+- partition.ddl: added a DAQ partition configuration object that describes
+	which segments contribute to which readout groups
+
 Tag: V01-00-01
 2014-01-07 Andy
 - acqiris.ddl: fixing base type for some enums, this does not change
