@@ -91,7 +91,7 @@ class DdlHdf5Data ( object ) :
         return [
             ('psana-inc', 'PATH', "directory for Psana includes, default: psddl_psana"),
             ('psana-ns', 'STRING', "namespace for Psana types, default: Psana"),
-            ('dump-schema', '', "if specified then only dump schema in XML format, including default schema"),
+            ('dump-schema', '', "if specified then only dump schema in DDL format, including default schema"),
             ]
 
 
@@ -334,21 +334,21 @@ class DdlHdf5Data ( object ) :
         for pkg in model.packages():
             self._dumpPkgSchema(pkg)
 
-    def _dumpPkgSchema(self, pkg, offset=1):
+    def _dumpPkgSchema(self, pkg):
 
-        if not pkg.included: print '%s<package name="%s">' % ("    "*offset, pkg.name)
+        if not pkg.included: print '@package {} {{'.format(pkg.name)
 
         for ns in pkg.namespaces() :
             
             if isinstance(ns, Package) :
-                self._dumpPkgSchema(ns, offset+1)
+                self._dumpPkgSchema(ns)
             elif isinstance(ns, Type) :
-                self._dumpTypeSchema(ns, offset+1)
+                self._dumpTypeSchema(ns)
 
 
-        if not pkg.included: print '%s</package>' % ("    "*offset,)
+        if not pkg.included: print '}} //- @package {}'.format(pkg.name)
 
-    def _dumpTypeSchema(self, type, offset=1):
+    def _dumpTypeSchema(self, type):
 
         if type.included: return
 
@@ -356,35 +356,53 @@ class DdlHdf5Data ( object ) :
             
         for schema in type.h5schemas:
             
-            print '{}<h5schema name="{}" version="{}">'.format("    "*(offset), schema.name, schema.version)
+            print '@h5schema {0.name}'.format(schema)
+            print '  [[version({0.version})]]'.format(schema)
             
             for tag, val in schema.tags.items():
-                print '{}<tag name="{}" value="{}">'.format("    "*(offset+1), tag, val)
+                if val is None:
+                    print '  [[{0}]]'.format(tag)
+                else:
+                    print '  [[{0}({1})]]'.format(tag, val)
+                    
+            print '{'
             
             for ds in schema.datasets:
             
-                print '{}<dataset name="{}">'.format("    "*(offset+1), ds.name)
+                if ds.attributes:
+                    print '  @dataset {0.name}'.format(ds)
                 
-                for tag, val in ds.tags.items():
-                    print '{}<tag name="{}" value="{}">'.format("    "*(offset+2), tag, val)
+                    for tag, val in ds.tags.items():
+                        if val is None:
+                            print '    [[{0}]]'.format(tag)
+                        else:
+                            print '    [[{0}({1})]]'.format(tag, val)
+                    print '  {'
+                        
+                    for attr in ds.attributes:
                     
-                for attr in ds.attributes:
-                
-                    rank = ""
-                    meth = ""
-                    if attr.rank: rank = ' rank="%d"' % attr.rank
-                    if attr.method != attr.name: meth = ' method="%s"' % attr.method
-                    if attr.tags:
-                        print '{}<attribute name="{}"{}{}>'.format("    "*(offset+2), attr.name, meth, rank)
+                        print '    @attribute {0.name}'.format(attr),
+                        if attr.method != attr.name: print '[[method({0.method})]]'.format(attr.method),
                         for tag, val in attr.tags.items():
-                            print '{}<tag name="{}" value="{}"/>'.format("    "*(offset+3), tag, val)
-                        print '{}</attribute>'.format("    "*(offset+2))
-                    else:
-                        print '{}<attribute name="{}"{}{}/>'.format("    "*(offset+2), attr.name, meth, rank)
-                
-                print '{}</dataset>'.format("    "*(offset+1))
+                            if val is None:
+                                print '[[{0}]]'.format(tag),
+                            else:
+                                print '[[{0}({1})]]'.format(tag, val),
+                        print ';'
+                    
+                    print '  }'
+    
+                else:
+                    
+                    print '  @dataset {0.name}'.format(ds),
+                    for tag, val in ds.tags.items():
+                        if val is None:
+                            print '[[{0}]]'.format(tag),
+                        else:
+                            print '[[{0}({1})]]'.format(tag, val),
+                    print ';'
             
-            print '{}</h5schema>'.format("    "*(offset))
+            print '}'
             
 
     def _schemaFixup(self, type):
