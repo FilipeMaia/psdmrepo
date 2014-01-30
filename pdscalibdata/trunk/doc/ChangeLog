@@ -11,6 +11,16 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-01
+2014-01-29 Mikhail Dubrovin
+- add new calibration types for pnCCD:
+	PnccdBaseV1
+	PnccdPixelGainV1
+	PnccdPedestalsV1
+	PnccdPixelStatusV1
+	PnccdCommonModeV1
+	GlobalMethods
+	
 Tag: V00-05-00
 2013-09-24 Andy Salnikov
 - pdsdata is now DDL-based, with a lot of changes to interface
