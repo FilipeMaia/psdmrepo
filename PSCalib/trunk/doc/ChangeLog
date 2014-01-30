@@ -11,6 +11,12 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-15
+2014-01-29 Mikhail S. Dubrovin
+
+- add new class for pnCCD with example: PnccdCalibPars, test/ex_pnccd_calib_pars.cpp
+- in CalibFileFinder add parameter print_bits to control verbosity
+	
 Tag: V00-01-14
 2013-12-18 Andy
 - forgot to add unit test to svn

@@ -113,10 +113,21 @@ namespace PSCalib {
 // Constructors --
 //----------------
 
+
 CalibFileFinder::CalibFileFinder (const std::string& calibDir,
                                   const std::string& typeGroupName)
   : m_calibDir(calibDir)
   , m_typeGroupName(typeGroupName)
+  , m_print_bits(255)
+{
+}
+
+CalibFileFinder::CalibFileFinder (const std::string& calibDir,
+                                  const std::string& typeGroupName,
+                                  unsigned           print_bits)
+  : m_calibDir(calibDir)
+  , m_typeGroupName(typeGroupName)
+  , m_print_bits(print_bits)
 {
 }
 
@@ -148,7 +159,7 @@ try {
     files.push_back(path.string());
   }
 
-  return selectCalibFile(files, runNumber);
+  return selectCalibFile(files, runNumber, m_print_bits);
 
 } catch (const fs::filesystem_error& ex) {
   // means cannot read directory
@@ -164,7 +175,7 @@ CalibFileFinder::findCalibFile(const Pds::Src& src, const std::string& dataType,
 
 // Selects calibration file from a list of file names.
 std::string
-CalibFileFinder::selectCalibFile(const std::vector<std::string>& files, unsigned long runNumber)
+CalibFileFinder::selectCalibFile(const std::vector<std::string>& files, unsigned long runNumber, unsigned print_bits)
 {
   // convert strings into sortable objects
   std::vector<CalibFile> calfiles;
@@ -172,16 +183,19 @@ CalibFileFinder::selectCalibFile(const std::vector<std::string>& files, unsigned
 
     const fs::path path(*iter);
 
+    // Ignore HISTORY files
+    if (path.stem().string() == "HISTORY") continue;
+
     // only take *.data files
     if (path.extension() != ".data") {
-      MsgLog(logger, info, "skipping file: " + path.string());
+      if( print_bits & 1 ) MsgLog(logger, info, "skipping file with wrong extension: " + path.string());
       continue;
     }
 
     try {
       calfiles.push_back(CalibFile(path));
     } catch (const std::exception& ex) {
-      MsgLog(logger, warning, "skipping file: " + path.string() + ": " + ex.what());
+      if( print_bits & 2 ) MsgLog(logger, warning, "skipping file: " + path.string() + ": " + ex.what());
     }
 
   }

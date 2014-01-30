@@ -71,6 +71,15 @@ public:
    *
    *  @param[in] calibDir   Calibration directory for current experiment.
    *  @param[in] className  Calibration class name, e.g. CsPad::CalibV1
+   *  @param[in] print_bits =0-print nothing, +1-wrong file extension, +2-skipping file
+   */
+    
+  CalibFileFinder (const std::string& calibDir,
+                   const std::string& className,
+                   unsigned print_bits);
+
+  /**
+   *  @brief For unknown reason need to keep it for backward compatability...
    */
   CalibFileFinder (const std::string& calibDir,
                    const std::string& className);
@@ -107,7 +116,7 @@ public:
    *  @param[in] files      List of file names.
    *  @param[in] runNumber  Run number to search the valid file name.
    */
-  static std::string selectCalibFile(const std::vector<std::string>& files, unsigned long runNumber);
+  static std::string selectCalibFile(const std::vector<std::string>& files, unsigned long runNumber, unsigned print_bits=255);
 
 protected:
 
@@ -116,7 +125,7 @@ private:
   // Data members
   const std::string m_calibDir;
   const std::string m_typeGroupName;
-
+  unsigned          m_print_bits;
 };
 
 } // namespace PSCalib
