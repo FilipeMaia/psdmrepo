@@ -2,8 +2,8 @@
 @package Partition  {
 
 
-//------------------ Segment ------------------
-@type Segment
+//------------------ Source ------------------
+@type Source
   [[value_type]]
   [[pack(4)]]
 {
@@ -21,8 +21,8 @@
   [[config_type]]
 {
   uint64_t _bldMask     -> bldMask;       /* Mask of requested BLD */
-  uint32_t _numSegments -> numSegments;	  /* Number of segment definitions */
-  Segment _segments[@self.numSegments()] -> segments  [[shape_method(segments_shape)]];	/* Segment configuration objects */
+  uint32_t _numSources -> numSources;	  /* Number of source definitions */
+  Source _sources[@self.numSources()] -> sources  [[shape_method(sources_shape)]];	/* Source configuration objects */
 
   /* Constructor which takes values for every attribute */
   @init()  [[auto]];
