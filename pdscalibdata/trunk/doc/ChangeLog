@@ -11,6 +11,12 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-02
+2014-01-30 Mikhail Dubrovin
+- in /GlobalMethods.h to get rid of compilation errors in RHEL6 
+	include <typeinfo>  // for typeid 
+	include <stdint.h>  // for uint8_t, uint16_t etc.
+	
 Tag: V00-05-01
 2014-01-29 Mikhail Dubrovin
 - add new calibration types for pnCCD:

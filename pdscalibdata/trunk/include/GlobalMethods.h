@@ -20,6 +20,8 @@
 #include <sstream>   // for stringstream
 #include <iostream>
 #include <stdexcept>
+#include <typeinfo>  // for typeid
+#include <stdint.h>    // for uint8_t, uint16_t etc.
 //#include <algorithm>
 
 //----------------------
