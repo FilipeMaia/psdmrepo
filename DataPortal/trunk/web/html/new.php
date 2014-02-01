@@ -41,7 +41,8 @@ $known_apps = array (
         'context1'         => array (
             'calibrations'     => 'Calibrations' ,
             'detectors'        => 'DAQ Detectors' ,
-            'epics'            => 'EPICS' )) ,
+            'epics'            => 'EPICS' ,
+            'user'             => 'User' )) ,
 
     'datafiles' => array (
         'name'             => 'File Manager' ,
@@ -171,6 +172,8 @@ try {
 
 <meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 
+<link rel="icon" href="../webfwk/img/Portal_favicon.ico"/>
+
 <link type="text/css" href="/jquery/css/custom-theme-1.9.1/jquery-ui.custom.css" rel="Stylesheet" />
 <link type="text/css" href="/jquery/css/jquery-ui-timepicker-addon.css" rel="Stylesheet" />
 
@@ -181,6 +184,7 @@ try {
 
 <link type="text/css" href="../portal/css/Experiment_Info.css" rel="Stylesheet" />
 <link type="text/css" href="../portal/css/Experiment_Group.css" rel="Stylesheet" />
+
 <link type="text/css" href="../portal/css/ELog_MessageViewer.css" rel="Stylesheet" />
 <link type="text/css" href="../portal/css/ELog_Live.css" rel="Stylesheet" />
 <link type="text/css" href="../portal/css/ELog_Post.css" rel="Stylesheet" />
@@ -189,12 +193,16 @@ try {
 <link type="text/css" href="../portal/css/ELog_Runs.css" rel="Stylesheet" />
 <link type="text/css" href="../portal/css/ELog_Attachments.css" rel="Stylesheet" />
 <link type="text/css" href="../portal/css/ELog_Subscribe.css" rel="Stylesheet" />
+
 <link type="text/css" href="../portal/css/Runtables_Calibrations.css" rel="Stylesheet" />
 <link type="text/css" href="../portal/css/Runtables_Detectors.css" rel="Stylesheet" />
 <link type="text/css" href="../portal/css/Runtables_EPICS.css" rel="Stylesheet" />
+<link type="text/css" href="../portal/css/Runtables_User.css" rel="Stylesheet" />
+
 <link type="text/css" href="../portal/css/Filemanager_Summary.css" rel="Stylesheet" />
 <link type="text/css" href="../portal/css/Filemanager_Files.css" rel="Stylesheet" />
 <link type="text/css" href="../portal/css/Filemanager_Files_USR.css" rel="Stylesheet" />
+
 <link type="text/css" href="../portal/css/HDF5_Manage.css" rel="Stylesheet" />
 
 <link type="text/css" href="../shiftmgr/css/shiftmgr.css" rel="Stylesheet" />
@@ -222,6 +230,12 @@ label.control-label {
   padding: 15px 20px 20px 20px;
 }
 
+button {
+  //background: 0 !important;
+  background: rgba(240, 248, 255, 0.39) !important;
+  border-radius: 2px !important;
+}
+
 </style>
 
 <script type="text/javascript" src="/jquery/js/jquery-1.8.2.js"></script>
@@ -241,6 +255,7 @@ label.control-label {
 
 <script type="text/javascript" src="../portal/js/Experiment_Info.js"></script>
 <script type="text/javascript" src="../portal/js/Experiment_Group.js"></script>
+
 <script type="text/javascript" src="../portal/js/ELog_Utils.js"></script>
 <script type="text/javascript" src="../portal/js/ELog_MessageViewer.js"></script>
 <script type="text/javascript" src="../portal/js/ELog_Live.js"></script>
@@ -250,12 +265,16 @@ label.control-label {
 <script type="text/javascript" src="../portal/js/ELog_Runs.js"></script>
 <script type="text/javascript" src="../portal/js/ELog_Attachments.js"></script>
 <script type="text/javascript" src="../portal/js/ELog_Subscribe.js"></script>
+
 <script type="text/javascript" src="../portal/js/Runtables_Calibrations.js"></script>
 <script type="text/javascript" src="../portal/js/Runtables_Detectors.js"></script>
 <script type="text/javascript" src="../portal/js/Runtables_EPICS.js"></script>
+<script type="text/javascript" src="../portal/js/Runtables_User.js"></script>
+
 <script type="text/javascript" src="../portal/js/Filemanager_Summary.js"></script>
 <script type="text/javascript" src="../portal/js/Filemanager_Files.js"></script>
 <script type="text/javascript" src="../portal/js/Filemanager_Files_USR.js"></script>
+
 <script type="text/javascript" src="../portal/js/HDF5_Manage.js"></script>
 
 <script type="text/javascript" src="../shiftmgr/js/Definitions.js"></script>
@@ -280,8 +299,8 @@ var experiment = {
 var access_list = {
     user : {
         uid   : '<?= $user["uid"]   ?>' ,
-        gecos : '<?= htmlspecialchars($user["gecos"], ENT_QUOTES | ENT_HTML5) ?>' ,
-        email : '<?= htmlspecialchars($user["email"], ENT_QUOTES | ENT_HTML5) ?>'
+        gecos : '<?= htmlspecialchars($user["gecos"], ENT_QUOTES) ?>' ,
+        email : '<?= htmlspecialchars($user["email"], ENT_QUOTES) ?>'
     } ,
     experiment : {
         view_info    : <?= $experiment_can_read_data    ? 1 : 0 ?> ,
@@ -295,20 +314,21 @@ var access_list = {
         manage_shifts   : <?= $elog_can_manage_shifts   ? 1 : 0 ?>
     } ,
     runtables : {
-        read :              <?= $experiment_can_read_data ? 1 : 0 ?> ,
-        edit_calibrations : <?= $calibrations_can_edit    ? 1 : 0 ?>
+        read              : <?= $experiment_can_read_data ? 1 : 0 ?> ,
+        edit_calibrations : <?= $calibrations_can_edit    ? 1 : 0 ?> ,
+        edit              : <?= $elog_can_post_messages   ? 1 : 0 ?>
     } ,
     datafiles : {
-        read                  : <?=$experiment_can_read_data ? 1 : 0 ?> ,
-        manage                : <?=$elog_can_post_messages   ? 1 : 0 ?> ,
-        is_data_administrator : <?=$is_data_administrator    ? 1 : 0 ?>
+        read                  : <?= $experiment_can_read_data ? 1 : 0 ?> ,
+        manage                : <?= $elog_can_post_messages   ? 1 : 0 ?> ,
+        is_data_administrator : <?= $is_data_administrator    ? 1 : 0 ?>
     } ,
     hdf5 : {
-        read   : <?=$experiment_can_read_data ? 1 : 0 ?> ,
-        manage : <?=$elog_can_post_messages   ? 1 : 0 ?>
+        read   : <?= $experiment_can_read_data ? 1 : 0 ?> ,
+        manage : <?= $elog_can_post_messages   ? 1 : 0 ?>
     } ,
     shiftmgr : {
-        can_edit : <?php echo $shiftmgr_can_edit ? 1 : 0 ; ?>
+        can_edit : <?= $shiftmgr_can_edit ? 1 : 0 ; ?>
     } ,
     no_page_access_html :
 '<br><br>' +
@@ -395,9 +415,12 @@ $(function() {
                 application: new Runtables_Detectors(experiment, access_list) } , {
 
                 name: 'EPICS' ,
-                application: new Runtables_EPICS(experiment, access_list) }]} , {
+                application: new Runtables_EPICS(experiment, access_list) } , {
 
-            name: 'File Manager',
+                name: 'User' ,
+                application: new Runtables_User(experiment, access_list) } ] } , {
+
+           name: 'File Manager',
             menu: [{
                 name: 'Summary' ,
                 application: new Filemanager_Summary(experiment, access_list) } , {

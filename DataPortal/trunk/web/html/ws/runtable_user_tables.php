@@ -1,16 +1,11 @@
 <?php
 
 /**
- * Return the list of EPICS sections for an experiment.
+ * Return defnitions of user tables for an experiment.
  */
 require_once 'dataportal/dataportal.inc.php' ;
 require_once 'logbook/logbook.inc.php' ;
 
-/**
- * Return an array with definitions of EPICS PV sections and PVs
- * 
- * @see function LogBook\LogBookUtils::get_epics_sections()
- */
 DataPortal\ServiceJSON::run_handler ('GET', function ($SVC) {
 
     $exper_id = $SVC->required_int('exper_id') ;
@@ -18,7 +13,16 @@ DataPortal\ServiceJSON::run_handler ('GET', function ($SVC) {
     $experiment = $SVC->logbook()->find_experiment_by_id($exper_id) ;
     if (!$experiment) $SVC->abort("no experiment found for id={$xper_id}") ;
 
-    $SVC->finish (LogBook\LogBookUtils::get_epics_sections($experiment)) ;
+    $table_data = array() ;
+
+    foreach ($experiment->run_tables() as $table) {
+        $table_data[$table->id()] = $table->as_data() ;
+    }
+    $run = $experiment->find_last_run() ;
+    $SVC->finish (array(
+        'table_data'  => $table_data ,
+        'last_runnum' => $run ? $run->num() : 0
+    )) ;
 }) ;
 
 ?>

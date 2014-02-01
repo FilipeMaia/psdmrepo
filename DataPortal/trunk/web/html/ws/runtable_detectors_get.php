@@ -4,6 +4,7 @@
  * Return the information about DAQ detectors configured for runs of the experiment.
  */
 require_once 'dataportal/dataportal.inc.php' ;
+require_once 'logbook/logbook.inc.php' ;
 
 DataPortal\ServiceJSON::run_handler ('GET', function ($SVC) {
 
@@ -15,26 +16,9 @@ DataPortal\ServiceJSON::run_handler ('GET', function ($SVC) {
         $SVC->abort("illegal range of runs: make sure the second run is equal or greater then the first one") ;
 
     $experiment = $SVC->logbook()->find_experiment_by_id($exper_id) ;
-    if (!$experiment) $SVC->abort("no experiment found for id={$xper_id}") ;
-
-    $detectors = array() ;
-    $runs = array() ;
-    foreach ($experiment->runs() as $run) {
-
-        $runnum = $run->num() ;
-        if ($from_runnum    && ($runnum < $from_runnum))    continue ;
-        if ($through_runnum && ($runnum > $through_runnum)) continue ;
-
-        $runs[$runnum] = array() ;
-
-        foreach ($run->attributes('DAQ_Detectors') as $attr) {
-            $detector = $attr->name() ;
-            $runs[$runnum][$detector] = 1 ;
-            $detectors[$detector] = 1 ;
-        }
-    }
+    if (!$experiment) $SVC->abort("no experiment found for id={$exper_id}") ;
     
-    $SVC->finish (array('runs' => $runs, 'detectors' => $detectors)) ;
+    $SVC->finish (LogBook\LogBookUtils::get_daq_detectors($experiment, $from_runnum, $through_runnum)) ;
 }) ;
 
 ?>

@@ -886,16 +886,15 @@ function ELog_MessageViewer (parent, cont, options) {
     }
     this.messages = [] ;
     var hdr = [
-        {id: 'posted',   title: 'Posted',    width: 150} ,
-        {id: 'run',      title: 'Run',       width:  34, align: 'right'} ,
-        {id: 'duration', title: 'Length',    width:  55, align: 'right', style: 'color:maroon;'} ,
-        {id: 'attach',   title: '&nbsp',     width:  16} ,
-        {id: 'tag',      title: '&nbsp;',    width:  16} ,
-        {id: 'child',    title: '&nbsp;',    width:  20} ,
-        {id: 'subj',     title: 'Subject',   width: 520} ,
+        {id: 'posted', title: 'Posted',    width: 160} ,
+        {id: 'run',    title: 'Run',       width:  34} ,
+        {id: 'attach', title: '&nbsp',     width:  16} ,
+        {id: 'tag',    title: '&nbsp;',    width:  16} ,
+        {id: 'child',  title: '&nbsp;',    width:  20} ,
+        {id: 'subj',   title: 'Subject',   width: 520} ,
         {id: '>'} ,
-        {id: 'id',       title: 'MessageId', width:  70} ,
-        {id: 'author',   title: 'Author',    width:  90}
+        {id: 'id',     title: 'MessageId', width:  70} ,
+        {id: 'author', title: 'Author',    width:  90}
     ] ;
     this.table = new StackOfRows (
         hdr ,
@@ -942,15 +941,13 @@ function ELog_MessageViewer (parent, cont, options) {
                 id: '&nbsp;' ,
                 attach: '&nbsp;' ,
                 child: '&nbsp;' ,
-                tag: '&nbsp;' ,
-                duration: '&nbsp;'
+                tag: '&nbsp;'
             } ,
             body: ''
         } ;
         if (m.is_run) {
             row.title.run = '<div class="m-run">'+m.run_num+'</div>' ;
             row.title.subj = this.run2subj(m) ;
-            if (m.type !== 'begin_run') { row.title.duration = m.duration1 ; }
             row.body = new ELog_RunBody(this, m) ;
             row.color_theme = 'stack-theme-green' ;
             row.block_common_expand = true ;
@@ -966,8 +963,8 @@ function ELog_MessageViewer (parent, cont, options) {
     } ;
     this.run2subj = function (m) {
         switch (m.type) {
-            case 'run'       : return '<b>stop</b>';
-            case 'end_run'   : return '<b>stop</b>' ;
+            case 'run'       : return '<b>stop</b>: '+m.duration+'' ;
+            case 'end_run'   : return '<b>stop</b>: '+m.duration+'' ;
             case 'begin_run' : return '<b>start</b>' ;
         }
         return '' ;

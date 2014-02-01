@@ -25,7 +25,7 @@ function Runtables_EPICS (experiment, access_list) {
         this._init() ;
     } ;
 
-    this.on_update = function (sec) {
+    this.on_update = function () {
         if (this.active) {
             this._init() ;
         }
@@ -136,7 +136,6 @@ function Runtables_EPICS (experiment, access_list) {
                     }
                 }) ;
                 _that._tabs.find('select.update-trigger').change(function () {
-                    console.log(this.name) ;
                     var s2 = this.name.split(':') ;
                     var s_name = s2[0] ;
                     var range = $(this).val() ;
@@ -248,7 +247,6 @@ function Runtables_EPICS (experiment, access_list) {
             section:  section_name
         } ;
         var range = this._tabs.find('select[name="'+section_name+':runs"]').val() ;
-        console.log(range) ;
         switch (range) {
             case '20' :
             case '100' :
