@@ -216,7 +216,8 @@ class LogBookUtils {
          * for runs. an assumption is that normal message entries will
          * outnumber 512 million records.
          */
-        $duration  = $type === 'begin_run' ? '' : LogBookUtils::format_seconds( $run->end_time()->sec - $run->begin_time()->sec );
+        $duration  = $type === 'begin_run' ? '' : LogBookUtils::format_seconds  ( $run->end_time()->sec - $run->begin_time()->sec );
+        $duration1 = $type === 'begin_run' ? '' : LogBookUtils::format_seconds_1( $run->end_time()->sec - $run->begin_time()->sec );
         $timestamp = '';
         $msg       = '';
         $id        = '';
@@ -274,6 +275,7 @@ class LogBookUtils {
                 "end_run"         => is_null($run->end_time()) ? '' : $run->end_time()->toStringShort(),
                 "run_num"         => $run->num(),
                 "duration"        => $duration,
+                "duration1"       => $duration1,
                 "ymd"             => $timestamp->toStringDay(),
                 "hms"             => $timestamp->toStringHMS()
             )
@@ -293,11 +295,23 @@ class LogBookUtils {
      * @param number $sec
      * @return unknown_type
      */
-    private static function format_seconds ($sec) {
+    public static function format_seconds ($sec) {
         if( $sec < 60 ) return $sec.' sec';
         return floor( $sec / 60 ).' min '.( $sec % 60 ).' sec ';
     }
-  
+    public static function format_seconds_1 ($sec) {
+
+        if     ( $sec <   60 ) return sprintf("%2d", $sec);
+        else if( $sec < 3600 ) return sprintf("%d:%02d", floor($sec / 60), $sec % 60);
+
+        $h = floor($sec / 3600);
+        $sec_minus_hours = $sec - $h * 3600;
+        $m = floor($sec_minus_hours / 60);
+        $s = $sec_minus_hours % 60;
+
+        return $h > 9 ? "** ** **" : sprintf("%d:%02d:%02d", $h, $m, $s);
+    }
+
     public static function search_around_message ($message_id, $report_error) {
         $entry = LogBook::instance()->find_entry_by_id($message_id) or $report_error("no such message entry") ;
         return LogBookUtils::search_around($entry->exper_id(), $report_error) ;
@@ -1157,6 +1171,11 @@ HERE;
                     array( 'descr' => 'Total pressure change 2', 'name' => 'CXI:R52:UPDATE2'      )
                 )
             )
+        ),
+
+        'XCS' => array(
+        ),
+        'MEC' => array(
         )
     );
 
@@ -1169,5 +1188,111 @@ HERE;
         'DAQ_Detectors' => 'DAQ Detectors'
     ) ;
 
+    /**
+     * Return definitions of the EPICS PV sections along with PVs
+     *
+     * The result is returned as teh following data structure:
+     *
+     *   { 'sections'      : { <section_name> : { 'title'      : <section-title> ,
+     *                                            'parameters' : [ <pv-name>, ... ] } } ,
+     *     'section_names' : [ <section_name>, ... ]
+     *   }
+     *
+     * The 'section_names' array is used to store the order in which the sections should
+     * be used in the Web UI.
+     *
+     * @param LogBookExperiment $experiment
+     * @return array
+     */
+    public static function get_epics_sections ($experiment) {
+
+        $instr_name = $experiment->instrument()->name() ;
+
+        $section_names = array() ;  // ordered list of names
+        $sections = array() ;
+
+        // Predefined sections first
+
+        $in_use = array() ;
+
+        foreach (array('HEADER', $instr_name) as $area) {
+            foreach (LogBookUtils::$sections[$area] as $section) {
+                $parameters = array() ;
+                foreach ($section['PARAMS'] as $p) {
+                    $p_name = $p['name'] ;
+                    $in_use[$p_name] = True ;
+                    array_push($parameters, $p_name) ;
+                }
+                sort($parameters) ;
+                $s_name = $section['SECTION'] ;
+                array_push($section_names, $s_name) ;
+                $sections[$s_name] = array (
+                    'title'      => $section['TITLE'] ,
+                    'parameters' => $parameters) ;
+            }
+        }
+
+        // The last section is for any other parameters
+
+        $parameters = array() ;
+        foreach ($experiment->run_params() as $p) {
+            $p_name = $p->name() ;
+            if (!array_key_exists($p_name, $in_use)) {
+                $in_use[$p_name] = True ;
+                array_push($parameters, $p_name) ;
+            }
+        }
+        $s_name = 'FOOTER' ;
+        array_push($section_names, $s_name) ;
+        $sections[$s_name] = array (
+            'title'      => 'Additional Parameters' ,
+            'parameters' => $parameters) ;
+
+        return array(
+            'section_names' => $section_names ,
+            'sections'      => $sections
+        ) ;
+    }
+    
+    /**
+     * Return names of detectors used for a specific range of runs of an experiment
+     *
+     * The result is returned into the following data structure:
+     * 
+     *   {  'runs'       : { <run-num>  : { <detector> : 1 } } ,
+     *      'detecttors' :                { <detector> : 1 }
+     *   }
+     * 
+     * Note that the first dictionary will tell a caller all detectors used
+     * for a particular run. MEanwhile the second one - all detectors which
+     * have ever been used in any run of the specified range (of runs).
+     *
+     * @param LogBookExperiment $experiment
+     * @param integer $from_runnum
+     * @param integer $through_runnum
+     * @return array()
+     */
+    public static function get_daq_detectors ($experiment, $from_runnum=null, $through_runnum=null) {
+        $runs = array() ;
+        $detectors = array() ;
+        foreach ($experiment->runs() as $run) {
+
+            $runnum = $run->num() ;
+            if ($from_runnum    && ($runnum < $from_runnum))    continue ;
+            if ($through_runnum && ($runnum > $through_runnum)) continue ;
+
+            $runs[$runnum] = array() ;
+
+            foreach ($run->attributes('DAQ_Detectors') as $attr) {
+                $detector = $attr->name() ;
+                $runs[$runnum][$detector] = 1 ;
+                $detectors[$detector] = 1 ;
+            }
+        }
+        $detector_names = array() ;
+        foreach ($detectors as $detector_name => $val) array_push($detector_names, $detector_name) ;
+        sort($detector_names) ;
+        return array('runs' => $runs, 'detectors' => $detectors, 'detector_names' => $detector_names) ;
+    }
 }
 ?>

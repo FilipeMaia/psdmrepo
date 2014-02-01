@@ -113,8 +113,7 @@ class LogBookRun {
         $result = $this->logbook->query (
             "SELECT p.*,v.val FROM {$this->logbook->database}.run_val p, ".$value_table.' v WHERE p.run_id='.$this->id().
             ' AND p.param_id='.$param_id.
-            ' AND p.run_id=v.run_id AND p.param_id=v.param_id'.
-            $extra_condition );
+            ' AND p.run_id=v.run_id AND p.param_id=v.param_id' );
 
         $nrows = mysql_numrows( $result );
         if( $nrows == 0 ) return null;
@@ -126,6 +125,8 @@ class LogBookRun {
         return new LogBookRunVal (
             $this->logbook,
             $this,
+            $param,
+            $type,
             mysql_fetch_array( $result, MYSQL_ASSOC ));
     }
 

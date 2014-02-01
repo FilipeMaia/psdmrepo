@@ -1,12 +1,12 @@
 <?php
 
-namespace LogBook;
+namespace LogBook ;
 
-require_once( 'logbook.inc.php' );
-require_once( 'lusitime/lusitime.inc.php' );
+require_once 'logbook.inc.php' ;
+require_once 'lusitime/lusitime.inc.php' ;
 
-use LusiTime\LusiTime;
-use LusiTime\LusiInterval;
+use LusiTime\LusiTime ;
+use LusiTime\LusiInterval ;
 
 /**
  * Class LogBookExperiment an abstraction for experiments.
@@ -17,61 +17,40 @@ class LogBookExperiment {
 
     /* Data members
      */
-    private $logbook;
-    private $regdb_experiment;
+    private $logbook ;
+    private $regdb_experiment ;
 
-    public $attr;
+    public $attr ;
 
     /* Constructor
      */
-    public function __construct ( $logbook, $regdb_experiment ) {
-        $this->logbook = $logbook;
-        $this->regdb_experiment = $regdb_experiment;
+    public function __construct ($logbook, $regdb_experiment) {
+        $this->logbook = $logbook ;
+        $this->regdb_experiment = $regdb_experiment ;
         $this->attr = array (
-            'id'         => $this->regdb_experiment->id(),
-            'name'       => $this->regdb_experiment->name(),
-            'begin_time' => $this->regdb_experiment->begin_time()->to64(),
-            'end_time'   => $this->regdb_experiment->end_time()->to64());
+            'id'         => $this->regdb_experiment->id() ,
+            'name'       => $this->regdb_experiment->name() ,
+            'begin_time' => $this->regdb_experiment->begin_time()->to64() ,
+            'end_time'   => $this->regdb_experiment->end_time()->to64()) ;
     }
-    public function regdb_experiment() {
-    	return $this->regdb_experiment; }
 
-    public function id () {
-        return $this->regdb_experiment->id(); }
+    public function logbook          ()      { return $this->logbook ; }
+    public function regdb_experiment ()      { return $this->regdb_experiment ; }
+    public function id               ()      { return $this->regdb_experiment->id            () ; }
+    public function name             ()      { return $this->regdb_experiment->name          () ; }
+    public function begin_time       ()      { return $this->regdb_experiment->begin_time    () ; }
+    public function end_time         ()      { return $this->regdb_experiment->end_time      () ; }
+    public function description      ()      { return $this->regdb_experiment->description   () ; }
+    public function instrument       ()      { return $this->regdb_experiment->instrument    () ; }
+    public function leader_account   ()      { return $this->regdb_experiment->leader_account() ; }
+    public function contact_info     ()      { return $this->regdb_experiment->contact_info  () ; }
+    public function POSIX_gid        ()      { return $this->regdb_experiment->POSIX_gid     () ; }
+    public function in_interval      ($time) { return $this->regdb_experiment->in_interval   ($time) ; }
+    public function is_facility      ()      { return $this->regdb_experiment->is_facility   () ; }
 
-    public function name () {
-        return $this->regdb_experiment->name(); }
-
-    public function begin_time () {
-        return $this->regdb_experiment->begin_time(); }
-
-    public function end_time () {
-        return $this->regdb_experiment->end_time(); }
-
-    public function description () {
-        return $this->regdb_experiment->description(); }
-
-    public function instrument () {
-        return $this->regdb_experiment->instrument(); }
-
-    public function leader_account () {
-        return $this->regdb_experiment->leader_account(); }
-
-    public function contact_info () {
-        return $this->regdb_experiment->contact_info(); }
-
-    public function POSIX_gid () {
-        return $this->regdb_experiment->POSIX_gid(); }
-
-    public function in_interval ( $time ) {
-        return $this->regdb_experiment->in_interval( $time ); }
-
-  	public function is_facility () {
-  		return $this->regdb_experiment->is_facility(); }
-
-    public function days() {
-        $ival = new LusiInterval( $this->begin_time(), $this->end_time());
-        return $ival->splitIntoDays();
+    public function days () {
+        $ival = new LusiInterval($this->begin_time(), $this->end_time()) ;
+        return $ival->splitIntoDays() ;
     }
 
     /* ==========
@@ -926,6 +905,95 @@ fclose( $debug_file );
             "UPDATE {$this->logbook->database}.entry SET deleted_time=NULL, deleted_by=NULL WHERE id=".$id );
     }
 
+    /* =========================
+     *   PERSISTENT RUN TABLES
+     * =========================
+     */
+    public function run_tables () { return $this->find_run_tables_by_() ; }
+
+    public function create_run_table ($name, $descr, $uid, $coldef) {
+
+        $now = LusiTime::now()->to64() ;
+        $uid = $this->logbook->escape_string(trim($uid)) ;
+        $this->logbook->query (
+            "INSERT INTO {$this->logbook->database}.run_table VALUES(NULL,".$this->id()
+            .",'".$this->logbook->escape_string(trim($name))
+            ."','".$this->logbook->escape_string(trim($descr))
+            ."','".$uid
+            ."',".$now
+            .",'".$uid
+            ."',".$now
+            .")"
+        ) ;
+        $tables = $this->find_run_tables_by_('id IN (SELECT LAST_INSERT_ID())') ;
+        if (count($tables) !== 1)
+            throw new LogBookException (
+                __METHOD__ ,
+                "internal error") ;
+
+        $table = $tables[0] ;
+
+        $is_editable = false ;
+        switch ($col->type) {
+            case 'Editable':
+                $is_editable = true ;
+                break ;
+            case 'Run Info':
+                if ($col->source === 'Run Title') $is_editable = true ;
+                break ;
+        }
+        
+        foreach ($coldef as $col)
+            $table->add_column (
+                $col->name ,
+                $col->type ,
+                $col->source ,
+                $col->type === 'Editable',
+                $col->position) ;
+
+        return $table ;
+    }
+    public function find_run_table_by_id ($id) {
+        if (!is_numeric($id))
+            throw new LogBookException (
+                __METHOD__ ,
+                "illegal table identifier. A positive number was expected.") ;
+
+        $tables = $this->find_run_tables_by_("id={$id}") ;
+        $num_tables = count($tables) ;
+        if (!$num_tables) return null ;
+        if ($num_tables === 1) return $tables[0] ;
+        throw new LogBookException (
+            __METHOD__ ,
+            "internal error") ;
+    }
+    private function find_run_tables_by_ ($condition='') {
+        $extra_condition = $condition === '' ? '' : ' AND '.$condition ;
+        $sql = "SELECT * FROM {$this->logbook->database}.run_table WHERE exper_id={$this->id()}"
+            .$extra_condition
+            ." ORDER BY name" ;
+        $result = $this->logbook->query($sql) ;
+        $list = array() ;
+        for ($nrows=mysql_numrows($result), $i=0; $i<$nrows; $i++)
+            array_push (
+                $list ,
+                new LogBookRunTable (
+                    $this ,
+                    mysql_fetch_array($result, MYSQL_ASSOC))) ;
+
+        return $list ;
+    }
+
+    public function delete_run_table_by_id ($id) {
+        if (!is_numeric($id))
+            throw new LogBookException (
+                __METHOD__ ,
+                "illegal table identifier. A positive number was expected.") ;
+
+        $sql = "DELETE FROM {$this->logbook->database}.run_table WHERE exper_id={$this->id()} AND id={$id}";
+        $this->logbook->query($sql) ;
+    }
+    
     /* ====================
      *   OTHER OPERATIONS
      * ====================
