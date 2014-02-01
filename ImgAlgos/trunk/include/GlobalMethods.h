@@ -444,6 +444,32 @@ private:
     evt.put(img2d, src, key);
   }
 
+// or its copy
+
+  template <typename T>
+  void save2DArrInEvent(PSEvt::Event& evt, const Pds::Src& src, const std::string& key, const ndarray<T,2>& ndarr)
+  {
+    boost::shared_ptr< ndarray<T,2> > shp( new ndarray<T,2>(ndarr) );
+    evt.put(shp, src, key);
+  }
+
+//-------------------
+  /**
+   * @brief Save 3-D array in event, for src and key.
+   * 
+   * @param[in]  evt
+   * @param[in]  src
+   * @param[in]  key
+   * @param[out] ndarr
+   */
+
+  template <typename T>
+  void save3DArrInEvent(PSEvt::Event& evt, const Pds::Src& src, const std::string& key, const ndarray<T,3>& ndarr)
+  {
+      boost::shared_ptr< ndarray<T,3> > shp( new ndarray<T,3>(ndarr) );
+      evt.put(shp, src, key);
+  }
+
 //--------------------
 /// Get string of the 2-D array partial data for test print purpose
   template <typename T>

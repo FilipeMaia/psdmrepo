@@ -132,6 +132,9 @@ ImgSaveInFile::beginJob(Event& evt, Env& env)
 void 
 ImgSaveInFile::beginRun(Event& evt, Env& env)
 {
+  m_str_runnum     = stringRunNumber(evt);
+  m_str_experiment = stringExperiment(env);
+  m_fname_common   = m_fname + "-" + m_str_experiment + "-r" + m_str_runnum;
 }
 
 //--------------------
@@ -189,8 +192,7 @@ void
 ImgSaveInFile::saveImageInFile(Event& evt)
 {
   // Define the file name
-  string fname = m_fname
-        + "-r"    + stringRunNumber(evt) 
+  string fname = m_fname_common
         + "-e"    + stringFromUint(m_count,8,'0')
         + "-"     + stringTimeStamp(evt) 
         + "."     + m_file_type;

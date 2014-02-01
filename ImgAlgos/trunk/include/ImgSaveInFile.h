@@ -96,19 +96,44 @@ public:
 
 private:
 
-  // Data members, this is for example purposes only
+  /// Source address of the data object
+   Pds::Src    m_src;
 
-  //Source      m_src;       // Data source set from config file
-  Pds::Src    m_src;
-  Source      m_str_src;     // i.e. CxiDs1.0:Cspad.0
-  std::string m_key;         // i.e. Image2D
-  unsigned    m_eventSave;   // event number starting from 1 to be saved in file
-  bool        m_saveAll;     // should be true to save all events in files
-  std::string m_fname;       // common part of the file name
-  std::string m_file_type;   // file type "txt" or "bin" 
+  /// String-like object with source name
+  Source      m_str_src;
+
+  /// String with key for input data
+  std::string m_key;
+
+  /// Event number starting from 1 to be saved in file
+  unsigned    m_eventSave;
+
+  /// Should be true to save all events in files
+  bool        m_saveAll;
+
+  /// Common prefix of the file name
+  std::string m_fname;
+
+  /// File type "txt" or "bin" 
+  std::string m_file_type;
+
+  /// Bit mask for print options
   unsigned    m_print_bits;
+
+  /// Event counter
   long        m_count;
-  FILE_MODE   m_file_mode;   // enumerated file type for "txt", "bin", etc. 
+
+  /// Enumerated file type for "txt", "bin", etc. 
+  FILE_MODE   m_file_mode;
+
+  /// String with run number
+  std::string m_str_runnum; 
+
+  /// String with experiment name
+  std::string m_str_experiment;
+
+  /// String file name common prefix 
+  std::string m_fname_common;
 };
 
 } // namespace ImgAlgos

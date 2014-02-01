@@ -1,9 +1,9 @@
 //--------------------------------------------------------------------------
 // File and Version Information:
-// 	$Id: PnccdImageProducer.cpp 0001 2012-07-06 09:00:00Z dubrovin@SLAC.STANFORD.EDU $
+// 	$Id: PnccdNDArrProducer.cpp 0001 2014-01-17 09:00:00Z dubrovin@SLAC.STANFORD.EDU $
 //
 // Description:
-//	Class PnccdImageProducer...
+//	Class PnccdNDArrProducer...
 //
 // Author List:
 //      Mikhail Dubrovin
@@ -13,7 +13,7 @@
 //-----------------------
 // This Class's Header --
 //-----------------------
-#include "ImgAlgos/PnccdImageProducer.h"
+#include "ImgAlgos/PnccdNDArrProducer.h"
 
 //-----------------
 // C/C++ Headers --
@@ -23,6 +23,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "MsgLogger/MsgLogger.h"
+#include "ImgAlgos/GlobalMethods.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -30,7 +31,7 @@
 using namespace Psana;
 using namespace ImgAlgos;
 
-PSANA_MODULE_FACTORY(PnccdImageProducer)
+PSANA_MODULE_FACTORY(PnccdNDArrProducer)
 
 using namespace std;
 
@@ -43,27 +44,27 @@ namespace ImgAlgos {
 //----------------
 // Constructors --
 //----------------
-PnccdImageProducer::PnccdImageProducer (const std::string& name)
+PnccdNDArrProducer::PnccdNDArrProducer (const std::string& name)
   : Module(name)
   , m_str_src()
   , m_key_in()
   , m_key_out()
-  , m_gap()
-  , m_gap_value()
+  , m_outtype()
   , m_print_bits()
- {
-    m_str_src    = configSrc("source",    "DetInfo(:pnCCD)");
-    m_key_in     = configStr("inkey",     "");
-    m_key_out    = configStr("outimgkey", "pnccdimg");
-    m_gap        = config   ("gap_size", 0);
-    m_gap_value  = config   ("gap_value", 0);
+{
+    m_str_src    = configSrc("source",     "DetInfo(:pnCCD)");  // DetInfo(Camp.0:pnCCD.1)
+    m_key_in     = configStr("key_in",     "");
+    m_key_out    = configStr("key_out",    "pnccd-ndarr");
+    m_outtype    = configStr("outtype",    "asdata");
     m_print_bits = config   ("print_bits", 0);
+
+    checkTypeImplementation();
 }
 
 //--------------
 // Destructor --
 //--------------
-PnccdImageProducer::~PnccdImageProducer ()
+PnccdNDArrProducer::~PnccdNDArrProducer ()
 {
 }
 
@@ -71,26 +72,27 @@ PnccdImageProducer::~PnccdImageProducer ()
 
 /// Method which is called once at the beginning of the job
 void 
-PnccdImageProducer::beginJob(Event& evt, Env& env)
+PnccdNDArrProducer::beginJob(Event& evt, Env& env)
 {
   if( m_print_bits & 1 ) printInputParameters();
+  if( m_print_bits & 8 ) printSizeOfTypes();
 }
 
 // Method which is called at the beginning of the calibration cycle
 void 
-PnccdImageProducer::beginCalibCycle(Event& evt, Env& env)
+PnccdNDArrProducer::beginCalibCycle(Event& evt, Env& env)
 {
   MsgLog(name(), trace, "in beginCalibCycle()");
 
   shared_ptr<Psana::PNCCD::ConfigV1> config1 = env.configStore().get(m_str_src);
-  if (config1.get()) {
-    if( m_print_bits & 4 ) {    
+  if (config1.get()) {    
+    if( m_print_bits & 4 ) {
       WithMsgLog(name(), info, str) {
         str << "PNCCD::ConfigV1:";
         str << "\n  numLinks = " << config1->numLinks();
         str << "\n  payloadSizePerLink = " << config1->payloadSizePerLink();
-      }
-    }    
+      }    
+    }
   }
 
   shared_ptr<Psana::PNCCD::ConfigV2> config2 = env.configStore().get(m_str_src);
@@ -116,39 +118,55 @@ PnccdImageProducer::beginCalibCycle(Event& evt, Env& env)
 //--------------------
 // Method which is called with event data
 void 
-PnccdImageProducer::event(Event& evt, Env& env)
+PnccdNDArrProducer::event(Event& evt, Env& env)
 {
-  if ( procEventForFullFrame<Psana::PNCCD::FullFrameV1> (evt) ) return;
+  procEvent(evt, env);
+}
 
-  if ( procEventFor3DArrType<uint16_t> (evt) ) return; // as data
-  if ( procEventFor3DArrType<float>    (evt) ) return;
-  if ( procEventFor3DArrType<double>   (evt) ) return;
-  if ( procEventFor3DArrType<int>      (evt) ) return;
-  if ( procEventFor3DArrType<int16_t>  (evt) ) return;
+//--------------------
 
-  MsgLog(name(), warning, "PNCCD::FullFrameV1 or ndarray<T,3> object is not available in the event(...) for source:"
-          << m_str_src << " key:" << m_key_in);
+void 
+PnccdNDArrProducer::procEvent(Event& evt, Env& env)
+{  
+  // proc event  for one of the supported data types
+  if ( m_dtype == ASDATA  and procEventForOutputType<uint16_t> (evt) ) return;
+  if ( m_dtype == FLOAT   and procEventForOutputType<float>    (evt) ) return;
+  if ( m_dtype == DOUBLE  and procEventForOutputType<double>   (evt) ) return;
+  if ( m_dtype == INT     and procEventForOutputType<int>      (evt) ) return;
+  if ( m_dtype == INT16   and procEventForOutputType<int16_t>  (evt) ) return;
+}
+
+//--------------------
+
+void 
+PnccdNDArrProducer::checkTypeImplementation()
+{  
+  if ( m_outtype == "asdata"  ) { m_dtype = ASDATA; return; }
+  if ( m_outtype == "float"   ) { m_dtype = FLOAT;  return; }
+  if ( m_outtype == "double"  ) { m_dtype = DOUBLE; return; } 
+  if ( m_outtype == "int"     ) { m_dtype = INT;    return; } 
+  if ( m_outtype == "int16"   ) { m_dtype = INT16;  return; } 
+
+  const std::string msg = "The requested data type: " + m_outtype + " is not implemented";
+  MsgLog(name(), warning, msg );
+  throw std::runtime_error(msg);
 }
 
 //--------------------
 /// Print input parameters
 void 
-PnccdImageProducer::printInputParameters()
+PnccdNDArrProducer::printInputParameters()
 {
   WithMsgLog(name(), info, log) {
-    log << "\nInput parameters:"
-        << "\nsource       : "     << m_str_src
-        << "\ninkey        : "     << m_key_in      
-        << "\noutimgkey    : "     << m_key_out
-        << "\ngap          : "     << m_gap
-        << "\ngap_value    : "     << m_gap_value
-        << "\nm_print_bits : "     << m_print_bits
+    log << "\n Input parameters:"
+        << "\n source     : "     << m_str_src
+        << "\n key_in     : "     << m_key_in      
+        << "\n key_out    : "     << m_key_out
+        << "\n outtype    : "     << m_outtype
+        << "\n print_bits : "     << m_print_bits
         << "\n";
   }
 }
-
-//--------------------
-
 
 //--------------------
 

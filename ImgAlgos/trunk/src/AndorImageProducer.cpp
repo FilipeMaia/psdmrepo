@@ -57,6 +57,8 @@ AndorImageProducer::AndorImageProducer (const std::string& name)
     m_key_out    = configStr("key_out",    "andorimg");
     m_outtype    = configStr("outtype",    "asdata");
     m_print_bits = config   ("print_bits", 0);
+
+    checkTypeImplementation();
 }
 
 //--------------
@@ -143,7 +145,6 @@ AndorImageProducer::checkTypeImplementation()
   if ( m_outtype == "double"  ) { m_dtype = DOUBLE; return; } 
   if ( m_outtype == "int"     ) { m_dtype = INT;    return; } 
   if ( m_outtype == "int16"   ) { m_dtype = INT16;  return; } 
-  if ( m_outtype == "int16_t" ) { m_dtype = INT16;  return; } 
 
   const std::string msg = "The requested data type: " + m_outtype + " is not implemented";
   MsgLog(name(), warning, msg );
@@ -156,12 +157,13 @@ void
 AndorImageProducer::printInputParameters()
 {
   WithMsgLog(name(), info, log) {
-    log << "\nInput parameters:"
-        << "\nsource       : "     << m_str_src
-        << "\ninkey        : "     << m_key_in      
-        << "\noutimgkey    : "     << m_key_out
-        << "\nouttype       : "    << m_outtype
-        << "\nm_print_bits : "     << m_print_bits;
+    log << "\n Input parameters:"
+        << "\n source     : "     << m_str_src
+        << "\n key_in     : "     << m_key_in      
+        << "\n key_out    : "     << m_key_out
+        << "\n outtype    : "     << m_outtype
+        << "\n print_bits : "     << m_print_bits
+        << "\n";
   }
 }
 

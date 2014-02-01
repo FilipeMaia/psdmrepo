@@ -11,7 +11,12 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
-
+Tag: V00-03-28
+2014-01-31 Mikhail S. Dubrovin
+- add PnccdNDArrProducer
+- modify PnccdImageProducer, add image production from ndarray<T,3>
+- other small cosmetic things	
+	
 Tag: V00-03-27
 2014-01-17 Mikhail S. Dubrovin
 - add AndorImageProducer
