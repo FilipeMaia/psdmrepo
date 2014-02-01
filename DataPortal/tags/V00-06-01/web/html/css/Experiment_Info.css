@@ -1,0 +1,17 @@
+#exp-info {
+  padding: 20px;
+}
+.exp-info-descr {
+  max-width: 640px;
+  max-height: 240px;
+  overflow: auto;
+}
+
+#exp-info #group-members {
+  margin-left: 8px;
+  border-left: 1px solid #c0c0c0;
+  border-radius: 4px;
+  -moz-border-radius: 4px;
+}
+#exp-info .group-hidden  { display: none; }
+#exp-info .group-visible { display: block; }
