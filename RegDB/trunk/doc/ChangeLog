@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-23
+2014-01-31 Igor Gaponenko
+- a bug fix in class RegDB
+
 Tag: V00-01-22
 2013-12-13 Igor Gaponenko
 - modifications needed by the Portal refactoring

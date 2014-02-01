@@ -475,7 +475,7 @@ HERE;
                 __METHOD__,
                 "the instrument is not properly configured in the database, experiment ID: {$exper_id}" );
 
-        if( $station >= intval($num_stations->value()))
+        if( !intval($num_stations->value()))
             throw new RegDBException (
                 __METHOD__,
                 "the instrument is not configured to take data, experiment ID: {$exper_id}" );
