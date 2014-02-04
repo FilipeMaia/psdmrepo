@@ -123,7 +123,53 @@ namespace {
     MsgLog(logger(),debug,"storeClock - stored " << what << ".seconds than .nanoseconds to group " << group);
   }
 
-};
+  void parseFilterConfigString(const string &configParamKey, 
+                               const list<string> & configParamValues,
+                               bool & isExclude,
+                               bool & includeAll,
+                               set<string> & filterSet) 
+  {
+    if (configParamValues.size() < 2) {
+      MsgLog(logger(),fatal, configParamKey 
+             << " must start with either\n 'include' or 'exclude' and be followed by at least one entry (which can be 'all' for include)");
+    }
+    filterSet.clear();
+    list<string>::const_iterator pos = configParamValues.begin();
+    string filter0 = *pos;
+    ++pos;
+    string filter1 = *pos;
+    string include = "include";
+    string exclude = "exclude";
+    string all = "all";
+    if (filter0 != include and filter0 != exclude) {
+      MsgLog(logger(), fatal, configParamKey << " first entry must be either 'include' or 'exclude'");
+    }
+    isExclude = filter0 == exclude;
+    if (isExclude) {
+      if (filter1 == all) MsgLog(logger(), fatal, "src_filter = cannot be 'exclude all' this does no processing");
+    } else {
+      if (filter1 == all) {
+        includeAll = true;
+        MsgLog(logger(),debug, configParamKey << ": include all");
+        return;
+      }
+    }
+    includeAll = false;
+    filterSet.clear();
+    while (pos != configParamValues.end()) {
+      filterSet.insert(*pos);
+      ++pos;
+    }  
+    WithMsgLog(logger(), debug, str) {
+      str << configParamKey << ": is_exclude=" 
+          << isExclude << " filterSet: ";
+      copy(filterSet.begin(), filterSet.end(),
+           ostream_iterator<string>(str,", "));
+    }
+   }
+
+}; // local namespace
+
 
 /////////////////////////////////////////
 // constructor and initialization methods:
@@ -179,17 +225,24 @@ void H5Output::readConfigParameters() {
 
   m_splitSize = config("splitSize",10*1073741824ULL);
 
+  // default list for type_filter, src_filter, ndarray_key_filter and std_string_key_filter
+  std::list<std::string> include_all;
+  include_all.push_back("include");
+  include_all.push_back("all");
+
   // type filter parameters
   const set<string> & typeAliases = m_typeAliases.aliases();
   set<string>::const_iterator alias;
   for (alias = typeAliases.begin(); alias != typeAliases.end(); ++alias) {
     m_typeInclude[*alias] = excludeIncludeToBool(*alias,configStr(*alias,"include"));
   }
+  m_type_filter = configList("type_filter", include_all);
+
   map<string, EpicsH5GroupDirectory::EpicsStoreMode> validStoreEpicsInput;
   validStoreEpicsInput["no"]=EpicsH5GroupDirectory::DoNotStoreEpics;
   validStoreEpicsInput["calib_repeat"]=EpicsH5GroupDirectory::RepeatEpicsEachCalib;
   validStoreEpicsInput["updates_only"]=EpicsH5GroupDirectory::OnlyStoreEpicsUpdates;
-  string storeEpics = configStr("store_epics", "updates_only");
+  string storeEpics = configStr("store_epics", "calib_repeat");
   map<string, EpicsH5GroupDirectory::EpicsStoreMode>::iterator userInput = validStoreEpicsInput.find(storeEpics);
   if (userInput == validStoreEpicsInput.end()) {
     MsgLog(logger(), fatal, "config parameter 'epics_store' must be one of 'calib_repeat' 'updates_only' or 'no'. The value: '"
@@ -201,11 +254,9 @@ void H5Output::readConfigParameters() {
   m_short_bld_name = config("short_bld_name",false);
   m_create_alias_links = config("create_alias_links",true);
   m_overwrite = config("overwrite",false);
+  
 
   // src filter parameters
-  std::list<std::string> include_all, empty_list;
-  include_all.push_back("include");
-  include_all.push_back("all");
   m_src_filter = configList("src_filter", include_all);
 
   // key filter parameters
@@ -259,6 +310,40 @@ void H5Output::readConfigParameters() {
 }
 
 void H5Output::filterHdfWriterMap() {
+  bool isExclude, includeAll;
+  set<string> filterSet;
+  parseFilterConfigString("type_filter", m_type_filter, isExclude, includeAll, filterSet);
+  if (not includeAll) {
+    bool hasPsana = false;
+    if (filterSet.find("psana") != filterSet.end()) {
+      if (filterSet.size() != 1) MsgLog(name(),fatal, "type_filter list includes 'psana' "
+                                 " and other entries. If psana is in type_filter list, it must be the only entry.");
+      hasPsana = true;
+    }
+    map<string, bool>::iterator typeAliasIter;
+    if (hasPsana) {
+      for (typeAliasIter = m_typeInclude.begin(); typeAliasIter != m_typeInclude.end(); ++typeAliasIter) {
+        const string &typeAlias = typeAliasIter->first;
+        bool &includeFlag = typeAliasIter->second;
+        if (typeAlias == "ndarray_types" or typeAlias == "std_string") {
+          includeFlag = isExclude;
+        } else {
+          includeFlag = not isExclude;
+        }
+      }
+    } else {
+      for (typeAliasIter = m_typeInclude.begin(); typeAliasIter != m_typeInclude.end(); ++typeAliasIter) {
+        typeAliasIter->second = isExclude;
+      }
+      for (set<string>::iterator filterIter = filterSet.begin(); filterIter != filterSet.end(); ++filterIter) {
+        const string &filter = *filterIter;
+        typeAliasIter = m_typeInclude.find(filter);
+        if (typeAliasIter == m_typeInclude.end()) MsgLog(name(),fatal,"type_filter contains '"<< filter 
+                                                         << "' which is an unknown type alias");
+        typeAliasIter->second = not isExclude;
+      }
+    }
+  }    
   const TypeAliases::Alias2TypesMap & alias2TypesMap = m_typeAliases.alias2TypesMap();
   TypeAliases::Alias2TypesMap::const_iterator aliasPos;
   for (aliasPos = alias2TypesMap.begin(); aliasPos != alias2TypesMap.end(); ++aliasPos) {
@@ -269,54 +354,6 @@ void H5Output::filterHdfWriterMap() {
     }
   }
 }
-
-namespace {
-  void parseFilterConfigString(const string &configParamKey, 
-                               const list<string> & configParamValues,
-                               bool & isExclude,
-                               bool & includeAll,
-                               set<string> & filterSet) 
-  {
-    if (configParamValues.size() < 2) {
-      MsgLog(logger(),fatal, configParamKey 
-             << " must start with either\n 'include' or 'exclude' and be followed by at least one src (which can be 'all' for include)");
-    }
-    filterSet.clear();
-    list<string>::const_iterator pos = configParamValues.begin();
-    string filter0 = *pos;
-    ++pos;
-    string filter1 = *pos;
-    string include = "include";
-    string exclude = "exclude";
-    string all = "all";
-    if (filter0 != include and filter0 != exclude) {
-      MsgLog(logger(), fatal, configParamKey << " first entry must be either 'include' or 'exclude'");
-    }
-    isExclude = filter0 == exclude;
-    if (isExclude) {
-      if (filter1 == all) MsgLog(logger(), fatal, "src_filter = cannot be 'exclude all' this does no processing");
-    } else {
-      if (filter1 == all) {
-        includeAll = true;
-        MsgLog(logger(),debug, configParamKey << ": include all");
-        return;
-      }
-    }
-    includeAll = false;
-    filterSet.clear();
-    while (pos != configParamValues.end()) {
-      filterSet.insert(*pos);
-      ++pos;
-    }  
-    WithMsgLog(logger(), debug, str) {
-      str << configParamKey << ": is_exclude=" 
-          << isExclude << " filterSet: ";
-      copy(filterSet.begin(), filterSet.end(),
-           ostream_iterator<string>(str,", "));
-    }
-   }
-
-} // local namespace
 
 void H5Output::initializeSrcAndKeyFilters() {
   set<string> srcNameFilterSet;

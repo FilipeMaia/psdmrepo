@@ -1,0 +1,11 @@
+#!/bin/sh
+
+set -e
+
+if [ ! -d psddldata/data/ ]; then
+    echo "The psddldata/data directory was not found. Try doing 'addpkg psddldata' first."
+    exit 1
+fi
+
+psddlc -I data -B package_dir:Translator -b hdf5Translator data/psddldata/*.ddl
+

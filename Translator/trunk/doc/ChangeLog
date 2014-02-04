@@ -11,6 +11,12 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-15
+2014-02-16 David Schneider
+- change default value for store_epics 
+- add type_filter option 
+- add ddl_Translator to generate ddl depedenent code
+
 Tag: V00-00-14
 2014-01-15 David Schneider
 - fix bug with when scr_filter is initialized

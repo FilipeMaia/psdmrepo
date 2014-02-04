@@ -42,7 +42,7 @@ psana-translate -n 5 --output_file=myout.h5 --Epics=exclude /reg/d/psdm/mec/meca
 
 # this is initialized with the default values from default_psana.cfg
 defaultTranslatorOptions = (('overwrite','false'),
-                            ('store_epics','updates_only'),
+                            ('store_epics','calib_repeat'),
                             ('output_file','**PUT SOMETHING HERE**'),
                             ('overwrite','false'),
                             ('AcqTdc','include'),
@@ -93,6 +93,7 @@ defaultTranslatorOptions = (('overwrite','false'),
                             ('pnCCD','include'),
                             ('ndarray_types','include'),
                             ('std_string','include'),
+                            ('type_filter','include all'),
                             ('src_filter',"include all"),
                             ('calibration_key','calibrated'),
                             ('include_uncalibrated_data','false'),

@@ -180,6 +180,7 @@ private:
   std::map<std::string, bool> m_typeInclude;  // each type alias will be read in 
                                               // and true if we convert that type
   std::list<std::string> m_src_filter;
+  std::list<std::string> m_type_filter;
   std::list<std::string> m_ndarray_key_filter; 
   std::list<std::string> m_std_string_key_filter;  
 

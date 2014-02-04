@@ -875,6 +875,46 @@ class H5Output( unittest.TestCase ) :
         if self.cleanUp:
             os.unlink(output_h5)
 
+    def test_type_filter(self):
+        '''check that the type_filter switch works
+        '''
+        output_file = os.path.join(OUTDIR,"unit-test-type_filter.h5")
+        cfgfile = writeCfgFile(TESTDATA_T1, output_file)
+        cfgfile.write("store_epics = no\n")
+        cfgfile.write("type_filter = exclude psana\n")
+        cfgfile.file.flush()
+        self.runPsanaOnCfg(cfgfile,output_file)
+        h5 = h5py.File(output_file,'r')
+        self.assertEqual(h5.keys(),['Configure:0000'])
+        self.assertEqual(h5['Configure:0000'].keys(),['Run:0000'])
+        self.assertEqual(h5['Configure:0000/Run:0000'].keys(),['CalibCycle:0000'])
+        self.assertEqual(h5['Configure:0000/Run:0000/CalibCycle:0000'].keys(),[])
+
+        # now check that if we exclude psana we see ndarrays
+        cfgfile = writeCfgFile(TESTDATA_T1, output_file,
+                               moduleList='Translator.TestModuleNDArrayString Translator.H5Output')
+        cfgfile.write("type_filter = exclude psana\n")
+        cfgfile.write("overwrite = true\n")
+        cfgfile.file.flush()
+        self.runPsanaOnCfg(cfgfile,output_file)
+        h5 = h5py.File(output_file,'r')
+        nddata = h5['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/my_double3D/data']
+        self.assertEqual(len(nddata),2)
+
+        # now check that type_filter will pick out a few types:
+        cfgfile = writeCfgFile(TESTDATA_T1, output_file)
+        cfgfile.write("type_filter = include IpmFex Evr\n")
+        cfgfile.write("store_epics = no\n")
+        cfgfile.write("overwrite = true\n")
+        cfgfile.file.flush()
+        self.runPsanaOnCfg(cfgfile,output_file)
+        cmd = 'h5ls -r %s | grep data' % output_file
+        p = sb.Popen(cmd, shell=True, stdout=sb.PIPE, stderr=sb.PIPE)
+        o,e = p.communicate()
+        self.assertEqual(e,'')
+        hasTypes = [ ln.find('EvrData')>=0 or ln.find('IpmFex')>=0 for ln in o.strip().split('\n') ]
+        self.assertTrue(all(hasTypes), "all lines are EvrData or IpmFex")
+        
     def test_alias(self):
         '''check that aliases are getting created.
 
