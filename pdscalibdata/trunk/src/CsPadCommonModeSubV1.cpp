@@ -59,29 +59,30 @@ CsPadCommonModeSubV1::CsPadCommonModeSubV1 (const std::string& fname)
   : m_mode(uint32_t(None))
 {
   std::fill_n(m_data, int(DataSize), 0.0);
+  // cpo: to make analysis easier for users, put in sensible cspad defaults
+  m_data[0]=1;
+  m_data[1]=50;
+  m_data[2]=10;
   
   // open file
   std::ifstream in(fname.c_str());
-  if (not in.good()) {
-    const std::string msg = "Failed to open common mode file: "+fname;
-    MsgLogRoot(error, msg);
-    throw std::runtime_error(msg);
-  }
+  if (in.good()) {
+    // found file. over-ride defaults
+    // read first number into a mode
+    if (not (in >> m_mode)) {
+      const std::string msg = "Common mode file does not have enough data: "+fname;
+      MsgLogRoot(error, msg);
+      throw std::runtime_error(msg);
+    }
 
-  // read first number into a mode
-  if (not (in >> m_mode)) {
-    const std::string msg = "Common mode file does not have enough data: "+fname;
-    MsgLogRoot(error, msg);
-    throw std::runtime_error(msg);
-  }
-
-  // read whatever left into the array
-  // TODO: some error checking, what if non-number appears in a file
-  double* it = m_data;
-  size_t count = 0;
-  while(in and count != DataSize) {
-    in >> *it++;
-    ++ count;
+    // read whatever left into the array
+    // TODO: some error checking, what if non-number appears in a file
+    double* it = m_data;
+    size_t count = 0;
+    while(in and count != DataSize) {
+      in >> *it++;
+      ++ count;
+    }
   }
 
   MsgLog(logger, trace, "CsPadCommonModeSubV1: mode=" << m_mode << " data=" << m_data[0] << "," << m_data[1] << "," << m_data[2]);
