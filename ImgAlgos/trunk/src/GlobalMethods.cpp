@@ -27,6 +27,8 @@
 #include "PSEvt/EventId.h"
 #include "PSTime/Time.h"
 //#include "psana/Module.h"
+#include "pdsdata/xtc/DetInfo.hh" // for srcToString( const Pds::Src& src )
+#include "PSCalib/Exceptions.h"   // for srcToString( const Pds::Src& src )
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -48,22 +50,26 @@ NDArrPars::NDArrPars()
   : m_ndim(0)
   , m_size(0)
   , m_dtype(DOUBLE)
+  , m_src()
+  , m_is_set(false)
 {
   //m_shape[0] = 0;  
   for(unsigned i=0; i<5; ++i) m_shape[i] = 0;
 }
 
-NDArrPars::NDArrPars(const unsigned ndim, const unsigned size, const unsigned* shape, const DATA_TYPE dtype)
+NDArrPars::NDArrPars(const unsigned ndim, const unsigned size, const unsigned* shape, const DATA_TYPE dtype, const Pds::Src& src)
 {
-  setPars(ndim, size, shape, dtype);
+  setPars(ndim, size, shape, dtype, src);
 }
 
 void
-NDArrPars::setPars(const unsigned ndim, const unsigned size, const unsigned* shape, const DATA_TYPE dtype)
+NDArrPars::setPars(const unsigned ndim, const unsigned size, const unsigned* shape, const DATA_TYPE dtype, const Pds::Src& src)
 {
-  m_ndim  = ndim;
-  m_size  = size;
-  m_dtype = dtype;
+  m_ndim   = ndim;
+  m_size   = size;
+  m_dtype  = dtype;
+  m_src    = src;
+  m_is_set = true;
   for(unsigned i=0; i<m_ndim; ++i) m_shape[i] = shape[i];
 }
 
@@ -72,10 +78,12 @@ NDArrPars::print()
 {
   WithMsgLog("NDArrPars::print():", info, log) {
     log << "\n NDArrPars parameters:"
-        << "\n ndim : " << m_ndim 
-        << "\n size : " << m_size    
-        << "\n dtype: " << m_dtype  
-        << "\n shape: ";                        
+        << "\n ndim   : " << m_ndim 
+        << "\n size   : " << m_size    
+        << "\n dtype  : " << m_dtype  
+        << "\n src    : " << ImgAlgos::srcToString(m_src)
+        << "\n is_set : " << m_is_set 
+        << "\n shape  : ";                        
     for(unsigned i=0; i<m_ndim; ++i) log << m_shape[i] << " ";
     log << "\n";
   }
@@ -213,6 +221,10 @@ defineImageShape(PSEvt::Event& evt, const PSEvt::Source& src, const std::string&
 bool
 defineNDArrPars(PSEvt::Event& evt, const PSEvt::Source& src, const std::string& key, NDArrPars* ndarr_pars)
 {
+
+  //std::cout << "defineNDArrPars src:" << boost::lexical_cast<std::string>(src) << " key:" << key << "\n";
+  std::cout << "defineNDArrPars src:" << src << " key:" << key << "\n";
+
   if ( defineNDArrParsForType<double>  (evt, src, key, DOUBLE,   ndarr_pars) ) return true;
   if ( defineNDArrParsForType<float>   (evt, src, key, FLOAT,    ndarr_pars) ) return true;
   if ( defineNDArrParsForType<int>     (evt, src, key, INT,      ndarr_pars) ) return true;
@@ -227,7 +239,7 @@ defineNDArrPars(PSEvt::Event& evt, const PSEvt::Source& src, const std::string& 
   static long counter = 0; counter ++;
 
   if (counter < 50) {
-    const std::string msg = "Image shape is tested for double, uint16_t, int, float, uint8_t, int16_t, short and is not defined in the event(...)\nfor source:" 
+    const std::string msg = "ndarray shape is tested for double, uint16_t, int, float, uint8_t, int16_t, short and is not defined in the event(...)\nfor source:" 
                         + boost::lexical_cast<std::string>(src) + " key:" + key;
     MsgLog("GlobalMethods::defineNDArrPars", warning, msg);
   }
@@ -293,6 +305,19 @@ file_exists(std::string& fname)
 }
 
 //--------------------
+// convert source address to string
+std::string srcToString( const Pds::Src& src )
+{
+  if ( src.level() != Pds::Level::Source ) {
+    throw PSCalib::NotDetInfoError(ERR_LOC);
+  }
+
+  const Pds::DetInfo& info = static_cast<const Pds::DetInfo&>( src ) ;
+  std::ostringstream str ;
+  str << Pds::DetInfo::name(info.detector()) << '.' << info.detId()
+      << ':' << Pds::DetInfo::name(info.device()) << '.' << info.devId() ;
+  return str.str() ;
+}
 
 //--------------------
 

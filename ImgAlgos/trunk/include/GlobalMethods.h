@@ -64,6 +64,7 @@
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
+#include "pdsdata/xtc/Src.hh"     // for srcToString( const Pds::Src& src )
 
 //		---------------------
 // 		-- Class Interface --
@@ -107,21 +108,25 @@ enum FILE_MODE {BINARY, TEXT, TIFF, PNG};
 class NDArrPars {
 public:
   NDArrPars();
-  NDArrPars(const unsigned ndim, const unsigned size, const unsigned* shape, const DATA_TYPE dtype);
+  NDArrPars(const unsigned ndim, const unsigned size, const unsigned* shape, const DATA_TYPE dtype, const Pds::Src& src);
   virtual ~NDArrPars(){}
 
-  void setPars(const unsigned ndim, const unsigned size, const unsigned* shape, const DATA_TYPE dtype);
+  void setPars(const unsigned ndim, const unsigned size, const unsigned* shape, const DATA_TYPE dtype, const Pds::Src& src);
   void print();
-  unsigned  ndim()  {return m_ndim;}
-  unsigned  size()  {return m_size;}
-  unsigned* shape() {return &m_shape[0];}
-  DATA_TYPE dtype() {return m_dtype;}
+  bool      is_set()    {return m_is_set;}
+  unsigned  ndim()      {return m_ndim;}
+  unsigned  size()      {return m_size;}
+  unsigned* shape()     {return &m_shape[0];}
+  DATA_TYPE dtype()     {return m_dtype;}
+  const Pds::Src& src() {return m_src;}
 
 private:
   unsigned  m_ndim;
   unsigned  m_size;
   unsigned  m_shape[5];
   DATA_TYPE m_dtype;
+  Pds::Src  m_src;
+  bool      m_is_set;
 
   // Copy constructor and assignment are disabled by default
   NDArrPars ( const NDArrPars& ) ;
@@ -159,6 +164,7 @@ private:
   unsigned expNum(PSEnv::Env& env);
   std::string stringExpNum(PSEnv::Env& env, unsigned width=4);
   bool file_exists(std::string& fname);
+  std::string srcToString( const Pds::Src& src ); // convert source address to string
 
 //--------------------
 //--------------------
@@ -206,20 +212,22 @@ private:
   template <typename T>
   bool defineNDArrParsForType(PSEvt::Event& evt, const PSEvt::Source& src, const std::string& key, DATA_TYPE dtype, NDArrPars* ndarr_pars)
   {
-    boost::shared_ptr< ndarray<T,2> > arr2 = evt.get(src, key);
-    if (arr2.get()) { ndarr_pars->setPars(2, arr2->size(), arr2->shape(), dtype); return true; } 
+    Pds::Src pds_src;    
 
-    boost::shared_ptr< ndarray<T,3> > arr3 = evt.get(src, key);
-    if (arr3.get()) { ndarr_pars->setPars(3, arr3->size(), arr3->shape(), dtype); return true; } 
+    boost::shared_ptr< ndarray<T,2> > shp2 = evt.get(src, key, &pds_src);
+    if (shp2.get()) { ndarr_pars->setPars(2, shp2->size(), shp2->shape(), dtype, pds_src); return true; } 
 
-    boost::shared_ptr< ndarray<T,4> > arr4 = evt.get(src, key);
-    if (arr4.get()) { ndarr_pars->setPars(4, arr4->size(), arr4->shape(), dtype); return true; } 
+    boost::shared_ptr< ndarray<T,3> > shp3 = evt.get(src, key, &pds_src);
+    if (shp3.get()) { ndarr_pars->setPars(3, shp3->size(), shp3->shape(), dtype, pds_src); return true; } 
 
-    boost::shared_ptr< ndarray<T,5> > arr5 = evt.get(src, key);
-    if (arr5.get()) { ndarr_pars->setPars(5, arr5->size(), arr5->shape(), dtype); return true; } 
+    boost::shared_ptr< ndarray<T,4> > shp4 = evt.get(src, key, &pds_src);
+    if (shp4.get()) { ndarr_pars->setPars(4, shp4->size(), shp4->shape(), dtype, pds_src); return true; } 
 
-    boost::shared_ptr< ndarray<T,1> > arr1 = evt.get(src, key);
-    if (arr1.get()) { ndarr_pars->setPars(1, arr1->size(), arr1->shape(), dtype); return true; } 
+    boost::shared_ptr< ndarray<T,5> > shp5 = evt.get(src, key, &pds_src);
+    if (shp5.get()) { ndarr_pars->setPars(5, shp5->size(), shp5->shape(), dtype, pds_src); return true; } 
+
+    boost::shared_ptr< ndarray<T,1> > shp1 = evt.get(src, key, &pds_src);
+    if (shp1.get()) { ndarr_pars->setPars(1, shp1->size(), shp1->shape(), dtype, pds_src); return true; } 
 
     return false;
   }
@@ -460,7 +468,7 @@ private:
    * @param[in]  evt
    * @param[in]  src
    * @param[in]  key
-   * @param[out] ndarr
+   * @param[in] ndarr
    */
 
   template <typename T>
@@ -468,6 +476,54 @@ private:
   {
       boost::shared_ptr< ndarray<T,3> > shp( new ndarray<T,3>(ndarr) );
       evt.put(shp, src, key);
+  }
+
+//-------------------
+  /**
+   * @brief Save N-D array in event, for src and key.
+   * 
+   * @param[in]  evt
+   * @param[in]  src
+   * @param[in]  key
+   * @param[in]  arr
+   * @param[in]  ndarr_pars
+   * @param[in]  print_bits = 1-warnings
+   */
+
+  template <typename T>
+  void saveNDArrInEvent(PSEvt::Event& evt, const Pds::Src& src, const std::string& key, T* arr, NDArrPars* ndarr_pars, unsigned print_bits=1)
+  {
+      if ( print_bits & 1 && ! ndarr_pars->is_set() ) 
+        MsgLog("saveNDArrInEvent", warning, "NDArrPars are not set for src: " << boost::lexical_cast<std::string>(src) << " key: " << key);
+
+      unsigned ndim = ndarr_pars->ndim();
+      if ( print_bits & 1 && ndim > 5 ) MsgLog("saveNDArrInEvent", warning, "ndim=" << ndim << " out of the range of implemented ndims [1,5]");
+      if ( print_bits & 1 && ndim < 1 ) MsgLog("saveNDArrInEvent", warning, "ndim=" << ndim << " out of the range of implemented ndims [1,5]");
+
+      if (ndim == 2) {
+        boost::shared_ptr< ndarray<T,2> > shp( new ndarray<T,2>(arr, ndarr_pars->shape()) );
+        evt.put(shp, src, key);
+      } 
+
+      else if (ndim == 3) {
+        boost::shared_ptr< ndarray<T,3> > shp( new ndarray<T,3>(arr, ndarr_pars->shape()) );
+        evt.put(shp, src, key);
+      }
+
+      else if (ndim == 4) {
+        boost::shared_ptr< ndarray<T,4> > shp( new ndarray<T,4>(arr, ndarr_pars->shape()) );
+        evt.put(shp, src, key);
+      }
+
+      else if (ndim == 5) {
+        boost::shared_ptr< ndarray<T,5> > shp( new ndarray<T,5>(arr, ndarr_pars->shape()) );
+        evt.put(shp, src, key);
+      }
+
+      else if (ndim == 1) {
+        boost::shared_ptr< ndarray<T,1> > shp( new ndarray<T,1>(arr, ndarr_pars->shape()) );
+        evt.put(shp, src, key);
+      }
   }
 
 //--------------------

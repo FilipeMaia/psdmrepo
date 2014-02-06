@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+
+2014-02-05 Mikhail S. Dubrovin
+- add NDArrCalib
+
 Tag: V00-03-28
 2014-01-31 Mikhail S. Dubrovin
 - add PnccdNDArrProducer
