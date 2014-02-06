@@ -44,7 +44,8 @@ namespace pdscalibdata {
 PnccdPixelGainV1::PnccdPixelGainV1() 
 : PnccdBaseV1 ()
 {
-  std::fill_n(m_pars, int(Size), pars_t(0));
+  std::fill_n(m_pars, int(Size), pars_t(1)); // All pixels have unit gain by default
+  // std::fill_n(m_pars, int(Size), pars_t(0.5)); // For test purpose only!
 }
 
 

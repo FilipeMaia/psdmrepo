@@ -44,7 +44,7 @@ namespace pdscalibdata {
 PnccdPedestalsV1::PnccdPedestalsV1() 
 : PnccdBaseV1 ()
 {
-  std::fill_n(m_pars, int(Size), pars_t(0));
+  std::fill_n(m_pars, int(Size), pars_t(0)); // All pixels have zero pedestal by default
 }
 
 

@@ -44,7 +44,8 @@ namespace pdscalibdata {
 PnccdPixelStatusV1::PnccdPixelStatusV1() 
 : PnccdBaseV1 ()
 {
-  std::fill_n(m_pars, int(Size), pars_t(0));
+  std::fill_n(m_pars, int(Size), pars_t(0)); // All pixels are good by default
+  //std::fill_n(&m_pars[Size/4], int(Size/8), pars_t(1)); // For test purpose only add bad pixels in center!
 }
 
 

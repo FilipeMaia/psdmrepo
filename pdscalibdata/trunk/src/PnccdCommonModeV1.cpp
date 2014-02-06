@@ -44,7 +44,10 @@ namespace pdscalibdata {
 PnccdCommonModeV1::PnccdCommonModeV1() 
 : PnccdBaseV1 ()
 {
-  std::fill_n(m_pars, int(CMSize), pars_t(0));
+  //std::fill_n(m_pars, int(CMSize), pars_t(0));
+  m_pars[0] = 1; //= {1, 50, 10}; - default common_mode parameters
+  m_pars[1] = 50;
+  m_pars[2] = 10;
 }
 
 

@@ -51,6 +51,7 @@ namespace pdscalibdata {
 class PnccdBaseV1 {
 public:
 
+  const static size_t   Ndim = 3; 
   const static size_t   Segs = 4; 
   const static size_t   Rows = 512; 
   const static size_t   Cols = 512; 

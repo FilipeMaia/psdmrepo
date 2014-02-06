@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-04
+2014-02-05 Mikhail Dubrovin
+- cosmetic changes in Pnccd* modules
+
 Tag: V00-05-03
 2014-02-01 Christopher O'Grady
 - put in cspad common-mode defaults of "1 50 10" in case common mode file doesn't exist
