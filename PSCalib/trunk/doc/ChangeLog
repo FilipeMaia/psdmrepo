@@ -11,9 +11,14 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-16
+2014-02-05 Mikhail S. Dubrovin
+- add superclass CalibPars.h
+- now PnccdCalibPars is derived from class CalibPars
+- add static factory CalibParsStore.h
+	
 Tag: V00-01-15
 2014-01-29 Mikhail S. Dubrovin
-
 - add new class for pnCCD with example: PnccdCalibPars, test/ex_pnccd_calib_pars.cpp
 - in CalibFileFinder add parameter print_bits to control verbosity
 	

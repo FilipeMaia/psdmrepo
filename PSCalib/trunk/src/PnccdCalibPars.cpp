@@ -44,8 +44,9 @@ const char logger[] = "PSCalib";
 // Constructors --
 //----------------
 
-PnccdCalibPars::PnccdCalibPars (bool isTestMode)
-  : m_calibDir     (std::string())
+  PnccdCalibPars::PnccdCalibPars(bool isTestMode)
+  : PSCalib::CalibPars()
+  , m_calibDir     (std::string())
   , m_typeGroupName(std::string())
   , m_source       (std::string())
   , m_runNumber    (0)
@@ -70,7 +71,8 @@ PnccdCalibPars::PnccdCalibPars ( const std::string&   calibDir,      //  "/reg/d
                                  const std::string&   source,        //  "Camp.0:pnCCD.0"
                                  const unsigned long& runNumber,     //  10
                                  unsigned             print_bits)
-  : m_calibDir(calibDir)
+  : PSCalib::CalibPars()
+  , m_calibDir(calibDir)
   , m_typeGroupName(typeGroupName)
   , m_source(source)
   , m_runNumber(runNumber)
@@ -92,9 +94,10 @@ PnccdCalibPars::PnccdCalibPars ( const std::string&   calibDir,      //  "/reg/d
                                  const Pds::Src&      src,           //  Pds::Src m_src; <- is defined in get(...,&m_src)
                                  const unsigned long& runNumber,     //  10
                                  unsigned             print_bits)
-  : m_calibDir(calibDir)
+  : PSCalib::CalibPars()
+  , m_calibDir(calibDir)
   , m_typeGroupName(typeGroupName)
-  , m_source(std::string())
+  , m_source(std::string()) // "in this constructor source is defined through Pds::Src"
   , m_src(src)
   , m_runNumber(runNumber)
   , m_print_bits(print_bits)

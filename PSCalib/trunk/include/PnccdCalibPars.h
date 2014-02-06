@@ -23,6 +23,7 @@
 // Base Class Headers --
 //----------------------
 #include "ndarray/ndarray.h"
+#include "PSCalib/CalibPars.h"
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -30,6 +31,7 @@
 #include "psddl_psana/pnccd.ddl.h"
 #include "pdsdata/xtc/Src.hh"
 
+#include "pdscalibdata/PnccdBaseV1.h"      
 #include "pdscalibdata/PnccdPedestalsV1.h"      
 #include "pdscalibdata/PnccdCommonModeV1.h"        
 #include "pdscalibdata/PnccdPixelStatusV1.h"        
@@ -123,7 +125,7 @@ namespace PSCalib {
 
 //----------------
 
-class PnccdCalibPars  {
+  class PnccdCalibPars: public PSCalib::CalibPars  {
 public:
 
   /// Default and test constructor
@@ -187,28 +189,43 @@ public:
   void msgUseDefault         ();
 
   /// Prints calibration parameters
-  void printCalibPars        ();
+  void printCalibPars        (); // declared as pure virtual in superclass
 
   /// Prints input parameters of the object
   void printInputPars        ();
 
-  /// Prints calibration parameters status
-  void printCalibParsStatus  ();
-
   /// Returns status of the calibration constants, 0-default, 1-loaded from file @param[in] type - calibration type string-name, for example "center" or "tilt"
   int getCalibTypeStatus(const std::string&  type) { return m_calibtype_status[type]; };
 
+
+
+  /// INTERFACE METHODS
+
+  /// Prints calibration parameters status
+  virtual void printCalibParsStatus  ();
+
   /// Returns ndarray of pnCCD pedestals
-  ndarray<pdscalibdata::PnccdPedestalsV1::pars_t, 3> pedestals(){ return m_pedestals -> pedestals(); };
+  //pdscalibdata::PnccdPedestalsV1::pars_t
+  //ndarray<CalibPars::pedestals_t, 3> pedestals(){ return m_pedestals -> pedestals(); };
+
+  virtual const size_t    ndim() { return pdscalibdata::PnccdBaseV1::Ndim; };
+  virtual const size_t    size() { return pdscalibdata::PnccdBaseV1::Size; };
+  virtual const unsigned* shape(){ return m_pedestals -> pedestals().shape(); };
+
+  virtual const CalibPars::pedestals_t* pedestals(){ return m_pedestals -> pedestals().data(); };
 
   /// Returns ndarray of pnCCD pixel status
-  ndarray<pdscalibdata::PnccdPixelStatusV1::pars_t, 3> pixel_status(){ return m_pixel_status -> pixel_status(); };
+  //pdscalibdata::PnccdPixelStatusV1::pars_t
+  //ndarray<CalibPars::pixel_status_t, 3> pixel_status(){ return m_pixel_status -> pixel_status(); };
+  virtual const CalibPars::pixel_status_t* pixel_status(){ return m_pixel_status -> pixel_status().data(); };
 
   /// Returns ndarray of pnCCD common mode
-  ndarray<pdscalibdata::PnccdCommonModeV1::pars_t, 1> common_mode(){ return m_common_mode -> common_mode(); };
+  //ndarray<CalibPars::common_mode_t, 1> common_mode(){ return m_common_mode -> common_mode(); };
+  virtual const CalibPars::common_mode_t* common_mode(){ return m_common_mode -> common_mode().data(); };
 
   /// Returns ndarray of pnCCD pixel gain
-  ndarray<pdscalibdata::PnccdPixelGainV1::pars_t, 3> pixel_gain(){ return m_pixel_gain -> pixel_gain(); };
+  //ndarray<CalibPars::pixel_gain_t, 3> pixel_gain(){ return m_pixel_gain -> pixel_gain(); };
+  virtual const CalibPars::pixel_gain_t* pixel_gain(){ return m_pixel_gain -> pixel_gain().data(); };
 
 
 private:
@@ -216,7 +233,7 @@ private:
   /// Copy constructor is disabled by default
   PnccdCalibPars ( const PnccdCalibPars& ) ;
   /// Assignment is disabled by default
-  PnccdCalibPars operator = ( const PnccdCalibPars& ) ;
+  //PnccdCalibPars operator = ( const PnccdCalibPars& ) ;
 
 //------------------
 // Static Members --
