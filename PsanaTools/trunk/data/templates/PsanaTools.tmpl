@@ -1,0 +1,189 @@
+:
+:  Library of Jinja2 templates for PsanaTools backend
+:
+:  Lines starting with colon are comments, except for special '::::template::::'
+:
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: macros
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: include_headers
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for first part of PsanaTools/src/psddl_Dump.cpp
+:
+:  Parameters for this template:
+:
+:  base_headers  - list of the basename of the header files in the psddl_psana package 
+:
+
+/* Do not modify this file, it is generated code. 
+   Modify the template file and Ddl backend and run the psddl compiler. */
+
+{% for header in base_headers %}
+#include "psddl_psana/{{header}}"
+{% endfor %}
+
+#include "MsgLogger/MsgLogger.h"
+#include "PSEvt/Event.h"
+#include "PSEnv/Env.h"
+#include "PsanaTools/psddl_Dump.h"
+#include <cstdio>
+#include <vector>
+
+using namespace std;
+using namespace Psana;
+
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: local_namespace
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for second part of PsanaTools/src/psddl_Dump.cpp
+:
+:  Parameters for this template:
+:
+:
+
+namespace {
+const char * logger = "psddl_Dump";
+}
+
+namespace PrintPsddl {
+
+// helper function to indent lines. 
+// Uses global variable that print functions set.
+int INDENT = 0;
+void indent() {
+  for (int idx=0; idx < INDENT; ++idx) printf(" ");
+}
+
+// helper function to get a small set of indicies to print
+// for big arrays.
+vector<int> arrayInds(size_t arraySize, int numInds = 10) {
+  if (arraySize <= size_t(numInds)) {
+    vector<int> inds(arraySize);
+    for (unsigned idx=0; idx < arraySize; ++idx) inds[idx]=idx;
+    return inds;
+  }
+  vector<int> inds(numInds);
+  for (int idx=0; idx < numInds; ++idx) {
+    inds[idx]=idx*arraySize;
+  }
+  return inds;
+}
+
+// declare print functions for all xtc types and their subtypes
+{% for nsType in namespaceTypePairs %}
+{% set ns,tp = nsType %}
+void print(const {{ns}}::{{tp}} &obj);
+{% endfor %}
+
+// declare print functions for the basic types
+{% for stype,fmt in standardTypes %}
+void print(const {{stype}} d) {
+  printf("{{fmt}}",d);
+}
+
+{% endfor %}
+
+// define print functions for all xtc types and subtypes.
+{% for nsType in namespaceTypePairs %}
+{% set ns,type = nsType %}
+{% set simpleAccessors = namespaceTypeDict[nsType].simpleAccessors %}
+{% set arrays = namespaceTypeDict[nsType].arrayAccessors %}
+void print(const {{ns}}::{{type}} &obj) {
+  printf("{{ns}} {{type}}\n");
+  indent();
+  INDENT += 2;
+{% for simpAcc in simpleAccessors %}
+   indent(); printf("{{simpAcc}}: "); print(obj.{{simpAcc}}()); printf("\n");
+{% endfor %}
+
+{% for array in arrays %}
+{% set accessor,baseType,simpleBaseType,valueType = array %} 
+{% if valueType %}
+{% if simpleBaseType %}
+{#  value and simple base, use ndarray, unless it is a char #}
+{% if baseType=='char' %}
+  printf(" {{accessor}}: %s\n", obj.{{accessor}}());
+{% else %}
+  {
+    const {{baseType}} *dataPtr = obj.{{accessor}}().data();
+    size_t numElements = obj.{{accessor}}().size();
+    vector<int> inds = arrayInds(numElements);
+    indent(); printf("{{accessor}} (ndarray with %lu elements): ", numElements); 
+    for (unsigned i=0; i < inds.size(); ++i) {
+      printf(" [%d]=",inds[i]); 
+      print(dataPtr[inds[i]]);
+    }
+    printf("\n");
+  }
+{% endif %}
+{% else %}
+{# value and not simple base #}
+  {
+  }
+{% endif %}
+{% else %}
+{# not value and we assume not simple base #}
+{% endif %}
+{% endfor %}
+  INDENT -= 2;
+}
+
+{% endfor %}
+
+  /*
+void print(const Epics::EpicsPvCtrlString &obj) {
+  printf("Epics EpicsPvCtrlString\n");
+  INDENT += 2;
+  indent(); printf("dbr: "); print(obj.dbr());
+  for (int i = 0; i < obj.numElements(); ++i) {
+    indent(); printf("string(%d): %s\n",i,obj.value(i));
+  }
+  INDENT -= 2;
+}
+  */
+} // PrintPsddl namespace
+
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: dispatch_tmpl
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for third part of PsanaTools/src/psddl_Dump.cpp
+:
+:  Parameters for this template:
+:    xtcTypes
+:
+
+namespace PsanaTools {
+void getAndDumpPsddlObject(PSEvt::Event &evt, PSEnv::Env &env, PSEvt::EventKey &eventKey, bool inEvt) { 
+  const std::type_info & keyCppType = *eventKey.typeinfo();
+  const Pds::Src &src = eventKey.src();
+  const string &key = eventKey.key();
+
+{% for nmTp in xtcTypes %}
+{% set  nm,tp = nmTp %}
+  if (keyCppType == typeid({{nm}}::{{tp}})) {
+    if (inEvt) {
+      boost::shared_ptr<{{nm}}::{{tp}}> p = evt.get(eventKey.src(), eventKey.key());
+      if (not p) MsgLog(logger,error,"Did not get object for " << eventKey << " from evt");
+      if (p) {
+        cout << "EventKey src: " << src << " type: ";
+        PrintPsddl::print(*p);
+      }
+    } else {
+      boost::shared_ptr<{{nm}}::{{tp}}> p = env.configStore().get(eventKey.src());
+      if (not p) MsgLog(logger,error,"Did not get object for " << eventKey << " from configStore");
+      if (p) {
+        PrintPsddl::print(*p);
+        cout << "EventKey src: " << src << " type: ";
+      }
+    }
+    return;
+  }
+{% endfor %}
+}
+
+} // PsanaTools namespace
+

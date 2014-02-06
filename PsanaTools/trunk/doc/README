@@ -1,0 +1,26 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  README file for package psana-tools
+#------------------------------------------------------------------------
+
+Package author: David A. Schneider
+
+Brief description:
+==================
+
+Tools for testing - presently a C++ psana Dump module generated from the ddl.
+Plan to do a Python module. May not be suitable for release.
+
+Detailed description:
+=====================
+
+Package provides a module Dump, psana -m PsanaTools.Dump
+Module will go through eventKeys and print all Psana objects to stdout.
+
+Output will not be user friendly, use output to test refactoring
+of Psana, or comparing how Psana processes input that should be
+treated the same (such as xtc and hdf5, C++ vs. Python wrappers).
+
