@@ -74,6 +74,8 @@ class ConfigParametersForApp ( ConfigParameters ) :
         self.guidarkcontrolbar = None 
         self.guifilemanager    = None 
         self.guifilemanagerselect = None 
+        self.guigeometry       = None
+        self.guimetrology      = None
 
 #-----------------------------
 
@@ -108,6 +110,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
         path_icon_logviewer      = apputils.AppDataPath('CalibManager/icons/logviewer.png'    ).path()
         path_icon_lock           = apputils.AppDataPath('CalibManager/icons/locked-icon.png'  ).path()
         path_icon_unlock         = apputils.AppDataPath('CalibManager/icons/unlocked-icon.png').path()
+        path_icon_convert        = apputils.AppDataPath('CalibManager/icons/icon-convert.png' ).path()
 
         path_icon_table          = apputils.AppDataPath('CalibManager/icons/table.gif'        ).path()
         path_icon_folder_open    = apputils.AppDataPath('CalibManager/icons/folder_open.gif'  ).path()
@@ -134,6 +137,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
         self.icon_logviewer     = QtGui.QIcon(path_icon_logviewer    )
         self.icon_lock          = QtGui.QIcon(path_icon_lock         )
         self.icon_unlock        = QtGui.QIcon(path_icon_unlock       )
+        self.icon_convert       = QtGui.QIcon(path_icon_convert      )
 
         self.icon_table         = QtGui.QIcon(path_icon_table        )
         self.icon_folder_open   = QtGui.QIcon(path_icon_folder_open  )
@@ -216,7 +220,11 @@ class ConfigParametersForApp ( ConfigParameters ) :
 
         # GUIConfig.py
         self.current_config_tab = self.declareParameter( name='CURRENT_CONFIG_TAB', val_def='Configuration File', type='str' )
- 
+
+        # GUIGeometry.py
+        self.current_geometry_tab = self.declareParameter( name='CURRENT_GEOMETRY_TAB',    val_def='Metrology',     type='str' )
+        self.fname_metrology_xlsx = self.declareParameter( name='FNAME_METROLOGY_XLSX',    val_def='*.xlsx',        type='str' )
+        self.fname_metrology_text = self.declareParameter( name='FNAME_METROLOGY_TEXT',    val_def='metrology.txt', type='str' )
 
         # GUIMainSplit.py
         ####self.fname_cp       = self.declareParameter( name='FNAME_CONFIG_PARS', val=fname, val_def='confpars.txt', type='str' )
@@ -360,11 +368,18 @@ class ConfigParametersForApp ( ConfigParameters ) :
            ,'pixel_gain'
             ]
 
+        self.const_types_pnccd = [
+            'pedestals'
+           ,'pixel_status'
+           ,'common_mode'
+           ,'pixel_gain'
+            ]
+
         #Dictionary for 'CSPAD', 'CSPAD2x2', 'Princeton', 'pnCCD', 'Tm6740', 'Opal1000', 'Opal2000', 'Opal4000', 'Opal8000', 'Acqiris', etc.
         self.dict_of_det_const_types = dict( zip(self.list_of_dets, [ self.const_types_cspad 
                                                                      ,self.const_types_cspad2x2
                                                                      ,['pedestals']
-                                                                     ,['pedestals']
+                                                                     ,self.const_types_pnccd
                                                                      ,['pedestals']
                                                                      ,['pedestals']
                                                                      ,['pedestals']
@@ -573,6 +588,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
         #self.styleEditInfo     = self.styleGreenish # Bluish
         self.styleEditBad      = self.styleRedBkgd
         self.styleButton       = self.styleGray
+        self.styleButtonLeft   = self.styleButton + 'text-align: left;'
         self.styleButtonOn     = self.styleBluish
         self.styleButtonClose  = self.stylePink
         self.styleButtonWarning= self.styleYellowBkg

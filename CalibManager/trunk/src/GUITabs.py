@@ -49,6 +49,7 @@ from GUIConfig            import *
 from GUIDark              import * 
 from GUIMaskEditor        import * 
 from GUIFileManager       import * 
+from GUIGeometry          import * 
 
 #---------------------
 #  Class definition --
@@ -210,7 +211,7 @@ class GUITabs ( QtGui.QWidget ) :
             self.gui_win = GUIMaskEditor(self)
 
         elif cp.current_tab.value() == self.list_of_tabs[3] :
-            self.gui_win = QtGui.QTextEdit('')
+            self.gui_win = GUIGeometry(self)
 
         elif cp.current_tab.value() == self.list_of_tabs[4] :
             #self.gui_win = QtGui.QTextEdit('File manager is not implemented.')

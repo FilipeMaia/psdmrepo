@@ -189,7 +189,7 @@ class GUIMaskEditor ( QtGui.QWidget ) :
 
 
     def onButBrowse(self):
-        logger.debug('oonButBrowse', __name__)
+        logger.debug('onButBrowse', __name__)
         self.path = str( self.ediFile.displayText() )
         self.dname, self.fname = os.path.split(self.path)
         msg = 'dir : %s   file : %s' % (self.dname, self.fname)

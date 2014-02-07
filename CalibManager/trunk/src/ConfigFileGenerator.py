@@ -135,7 +135,8 @@ class ConfigFileGenerator :
                 if   det_name == cp.list_of_dets[0] : self.add_cfg_module_peds_aver_cspad_with_mask('CSPadPixCoords.CSPadNDArrProducer')
                 elif det_name == cp.list_of_dets[1] : self.add_cfg_module_peds_aver_cspad_with_mask('CSPadPixCoords.CSPad2x2NDArrProducer')
                 elif det_name == cp.list_of_dets[2] : self.add_cfg_module_peds_aver_princeton()
-                elif det_name == cp.list_of_dets[3] : self.add_cfg_module_peds_aver_pnccd()
+                elif det_name == cp.list_of_dets[3] : self.add_cfg_module_peds_aver_pnccd_ndarr()
+               #elif det_name == cp.list_of_dets[3] : self.add_cfg_module_peds_aver_pnccd_img()
                 elif det_name == cp.list_of_dets[4] : self.add_cfg_module_peds_aver_camera()
                 elif det_name == cp.list_of_dets[5] : self.add_cfg_module_peds_aver_camera()
                 elif det_name == cp.list_of_dets[6] : self.add_cfg_module_peds_aver_camera()
@@ -213,8 +214,27 @@ class ConfigFileGenerator :
 
 #-----------------------------
 
-    def add_cfg_module_peds_aver_pnccd (self, module='ImgAlgos.PnccdImageProducer') :
-        self.path_in  = apputils.AppDataPath('CalibManager/scripts/psana-module-peds-aver-pnccd.cfg').path()
+    def add_cfg_module_peds_aver_pnccd_ndarr (self, module='ImgAlgos.PnccdNDArrProducer') :
+        self.path_in  = apputils.AppDataPath('CalibManager/scripts/psana-module-peds-aver-pnccd-ndarr.cfg').path()
+        mod_ndarr_prod= '%s:%i' % (module, self.ind)
+        mod           = '%s:%i' % ('ImgAlgos.NDArrAverage', self.ind)
+        self.d_subs   = {
+                         'MODULE_NDARR_PROD'    : mod_ndarr_prod,
+                         'DETINFO'              : self.source, # str( cp.bat_det_info.value() ),
+                         'KEY_TRANSIT'          : 'img-%i' % self.ind,
+                         'MODULE_AVERAGE'       : mod,
+                         'FNAME_PEDS_AVE'       : self.fname_ave,
+                         'FNAME_PEDS_RMS'       : self.fname_rms,
+                         'FNAME_HOTPIX_MASK'    : self.fname_mask,
+                         'HOTPIX_THRESHOLD_ADU' : str( cp.mask_hot_thr.value() )
+                         }
+
+        self.add_module_in_cfg ('%s %s' % (mod_ndarr_prod, mod))
+
+#-----------------------------
+
+    def add_cfg_module_peds_aver_pnccd_img (self, module='ImgAlgos.PnccdImageProducer') :
+        self.path_in  = apputils.AppDataPath('CalibManager/scripts/psana-module-peds-aver-pnccd-img.cfg').path()
         mod_img_rec = '%s:%i' % (module, self.ind)
         mod         = '%s:%i' % ('ImgAlgos.NDArrAverage', self.ind)
         self.d_subs   = {

@@ -160,6 +160,27 @@ class FileNameManager :
 
 #-----------------------------
 
+    def get_list_of_metrology_text_files(self) :
+        return gu.get_list_of_files_in_dir_for_part_fname(cp.dir_work.value(), pattern='metrology')
+
+#-----------------------------
+
+    def path_metrology_text(self) :
+        return cp.dir_work.value() + '/' + cp.fname_metrology_text.value()
+
+#-----------------------------
+
+    def path_metrology_ptrn(self) :
+        return self.path_prefix() + 'metrology.txt'
+
+#-----------------------------
+
+    def path_metrology_xlsx(self) :
+        #return cp.dir_work.value() + '/' + cp.fname_metrology_xlsx.value()
+        return cp.fname_metrology_xlsx.value()
+
+#-----------------------------
+
     def path_prefix(self) :
         return cp.dir_work.value() + '/' + cp.fname_prefix.value() 
 

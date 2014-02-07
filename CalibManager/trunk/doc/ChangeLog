@@ -11,6 +11,25 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-12
+2014-02-07 Mikhail S. Dubrovin
+- add GUI for Metrology processing
+	- xlsx to text conversion
+	- to do: processing of the text file 
+- add empty GUI for Geometry
+- pnCCD pedestals calculation for image (FullFrame) is replaced by ndarr [4,512,512] 
+M       src/GUITabs.py
+A       src/xlsx_parser.py
+A       src/GUIMetrology.py
+A       src/GUIGeometry.py
+M       src/ConfigParametersForApp.py
+M       src/GUIMaskEditor.py
+M       src/FileNameManager.py
+M       src/ConfigFileGenerator.py
+A  +    data/scripts/psana-module-peds-aver-pnccd-ndarr.cfg
+A       data/scripts/psana-module-peds-aver-pnccd-img.cfg
+D       data/scripts/psana-module-peds-aver-pnccd.cfg
+
 Tag: V00-00-11
 2014-01-13 Mikhail S. Dubrovin
 - minor corrections in window titles and sizes...
