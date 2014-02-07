@@ -60,10 +60,10 @@ namespace pdscalibdata {
  */
 
 using namespace std;
-
-
+ 
 enum DATA_TYPE {FLOAT, DOUBLE, SHORT, UNSIGNED, INT, INT16, INT32, UINT, UINT8, UINT16, UINT32};
 
+const static int UnknownCM = -10000; 
 
 class GlobalMethods  {
 public:
@@ -83,6 +83,28 @@ private:
   void printSizeOfTypes();
 
 //--------------------
+
+  /**
+   *  Find common mode for an CsPad  section.
+   *  
+   *  Function will return UnknownCM value if the calculation 
+   *  cannot be performed (or need not be performed).
+   *  
+   *  @param pars   array[3] of control parameters
+   *  @param sdata  pixel data
+   *  @param peddata  pedestal data, can be zero pointer
+   *  @param pixStatus  pixel status data, can be zero pointer
+   *  @param ssize  size of all above arrays
+   *  @param stride increment for pixel indices
+   */ 
+  float findCommonMode(const double* pars,
+                       const int16_t* sdata,
+                       const float* peddata, 
+                       const  uint16_t *pixStatus, 
+                       unsigned ssize,
+                       int stride = 1); // const;
+  
+//--------------------
 // For type=T returns the string with symbolic data type and its size, i.e. "d of size 8"
   template <typename T>
   std::string strOfDataTypeAndSize()
@@ -99,10 +121,11 @@ private:
    * @param[in]  type  - type of parameters for messages
    * @param[in]  size  - size of array with parameters; number of values to load from file
    * @param[out] pars  - pointer to array with parameters
+   * @param[in]  check_bits - +1: check if input does not have enough data, +2: check if file has extra data 
    */
 
   template <typename T>
-  void load_pars_from_file(const std::string& fname, const std::string& comment, const size_t size, T* pars)
+  void load_pars_from_file(const std::string& fname, const std::string& comment, const size_t size, T* pars, const unsigned check_bits=255)
   { 
     // open file
     std::ifstream in(fname.c_str());
@@ -121,7 +144,7 @@ private:
     }
   
     // check that we read whole array
-    if (count != size) {
+    if (check_bits & 1 && count < size) {
       const std::string msg = comment+" file does not have enough data: "+fname;
       MsgLogRoot(error, msg);
       throw std::runtime_error(msg);
@@ -129,7 +152,7 @@ private:
   
     // and no data left after we finished reading
     float tmp ;
-    if ( in >> tmp ) {
+    if (check_bits & 2 && in >> tmp ) {
       ++ count;
       const std::string msg = comment+" file has extra data: "+fname;
       MsgLogRoot(error, msg);

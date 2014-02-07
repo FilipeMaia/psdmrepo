@@ -37,7 +37,6 @@
 namespace pdscalibdata {
 
 /**
- *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
@@ -51,9 +50,9 @@ namespace pdscalibdata {
 class PnccdCommonModeV1: public PnccdBaseV1 {
 public:
 
-  const static size_t CMSize = 3; 
+  const static size_t CMSize = 16; 
  
-  typedef uint16_t pars_t;
+  typedef double pars_t;
 
   /// Default constructor
   PnccdCommonModeV1 () ;

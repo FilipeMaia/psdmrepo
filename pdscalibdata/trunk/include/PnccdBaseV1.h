@@ -36,7 +36,7 @@
 namespace pdscalibdata {
 
 /**
- *  class PnccdBaseV1 contains common parameters and methods for pnCCD. 
+ *  class PnccdBaseV1 contains common parameters and methods (if any) for pnCCD. 
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
