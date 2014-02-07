@@ -52,13 +52,13 @@ namespace PSCalib {
 /**
  *  @ingroup PSCalib
  *
- *  @brief PnccdCalibPars class loads/holds/provides access to the CSPad2x2
+ *  @brief PnccdCalibPars class loads/holds/provides access to the pnCCD
  *  geometry calibration parameters.
  *
  *  This software was developed for the LCLS project. If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
- *  @see CalibFileFinder
+ *  @see CalibPars, CalibParsStore
  *
  *  @version $Id$
  *
@@ -89,7 +89,7 @@ namespace PSCalib {
  *  const std::string groupName  = "PNCCD::CalibV1";
  *  const std::string source     = "Camp.0:pnCCD.1";
  *  unsigned long     runNumber  = 10;
- *  Pds::Src src; env.get(...,&src);
+ *  Pds::Src src; env.get(source, key, &src);
  *  CALIB *calibpars = new CALIB(calibDir, groupName, src, runNumber);  
  *  @endcode
  *  \n
@@ -101,6 +101,13 @@ namespace PSCalib {
  *  unsigned long     runNumber  = 10;
  *  CALIB *calibpars = new CALIB(calibDir, groupName, source, runNumber);  
  *  @endcode
+ *  \n
+ *  or for the same list of parameters using polymorphism:
+ *  @code
+ *  PSCalib::CalibPars *calibpars = new CALIB(calibDir, groupName, source, runNumber);  
+ *  @endcode
+ *  In this case all virtual methods defined in the base class PSCalib::CalibPars will be accessible through the calibpars pointer.
+ *  
  *
  *  @li Printing methods
  *  @code
@@ -111,12 +118,13 @@ namespace PSCalib {
  *
  *  @li Access methods
  *  @code
- *  size_t sect=1; // for example...
- *  int status  = calibpars -> getCalibTypeStatus("pedestals") // Returns status: 0-default, 1-loaded from file
- *  ndarray<pdscalibdata::PnccdPedestalsV1::pars_t, 3>   nda_peds = calibpars -> pedestals();
- *  ndarray<pdscalibdata::PnccdPixelStatusV1::pars_t, 3> nda_stat = calibpars -> pixel_status();
- *  ndarray<pdscalibdata::PnccdCommonModeV1::pars_t, 1>  nda_cmod = calibpars -> common_mode();
- *  ndarray<pdscalibdata::PnccdPixelGainV1::pars_t, 3>   nda_gain = calibpars -> pixel_gain();
+ *  const size_t    ndim = calibpars -> ndim();
+ *  const size_t    size = calibpars -> size();
+ *  const unsigned* p_shape = calibpars -> shape();
+ *  const CalibPars::pedestals_t*    p_pedestals = calibpars -> pedestals()
+ *  const CalibPars::pixel_status_t* p_pixel_stat  = calibpars -> pixel_status()
+ *  const CalibPars::common_mode_t*  p_common_mode = calibpars -> common_mode()
+ *  const CalibPars::pixel_gain_t*   p_pixel_gain  = calibpars -> pixel_gain()
  *  ... etc. for all other access methods
  *  @endcode
  *
@@ -141,10 +149,10 @@ public:
    *  @param[in] runNumber      Run number to search the valid file name.
    *  @param[in] print_bits     =0-print no messages; +1-input parameters, +2-print msges from  PSCalib::CalibFileFinder, +4-use default, +8-missing type
    */ 
-  PnccdCalibPars ( const std::string&   calibDir,           //  /reg/d/psdm/mec/mec73313/calib
-                   const std::string&   typeGroupName,      //  CsPad2x2::CalibV1
-                   const std::string&   source,             //  MecTargetChamber.0:Cspad2x2.1
-                   const unsigned long& runNumber,          //  10
+  PnccdCalibPars ( const std::string&   calibDir,           //  /reg/d/psdm/AMO/amoa1214/calib
+                   const std::string&   typeGroupName,      //  PNCCD::CalibV1
+                   const std::string&   source,             //  Camp.0:pnCCD.0
+                   const unsigned long& runNumber,          //  7
                    unsigned             print_bits=255 );
 
   /**
@@ -154,11 +162,12 @@ public:
    *  @param[in] typeGroupName  Data type and group names.
    *  @param[in] src            The data source object, for example Pds::Src m_src; defined in the env.get(...,&m_src)
    *  @param[in] runNumber      Run number to search the valid file name.
+   *  @param[in] print_bits     =0-print no messages; +1-input parameters, +2-print msges from  PSCalib::CalibFileFinder, +4-use default, +8-missing type
    */ 
-  PnccdCalibPars ( const std::string&   calibDir,           //  /reg/d/psdm/mec/mec73313/calib
-                   const std::string&   typeGroupName,      //  CsPad2x2::CalibV1
+  PnccdCalibPars ( const std::string&   calibDir,           //  /reg/d/psdm/AMO/amoa1214/calib
+                   const std::string&   typeGroupName,      //  PNCCD::CalibV1
                    const Pds::Src&      src,                //  Pds::Src m_src; <- is defined in env.get(...,&m_src)
-                   const unsigned long& runNumber,          //  10
+                   const unsigned long& runNumber,          //  7
                    unsigned             print_bits=255 ) ;  
 
   /// Destructor

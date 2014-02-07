@@ -54,11 +54,44 @@ namespace PSCalib {
  *  This software was developed for the LCLS project. If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
- *  @see CalibFileFinder
+ *  @see CalibPars
  *
  *  @version $Id$
  *
  *  @author Mikhail S. Dubrovin
+ *
+ *
+ *  @anchor interface
+ *  @par<interface> Interface Description
+ * 
+ *  @li  Includes
+ *  @code
+ *  #include "psana/Module.h" // for evt, env, get,  etc.
+ *  #include "PSCalib/CalibPars.h"
+ *  #include "PSCalib/CalibParsStore.h"
+ *  @endcode
+ *
+ *  @li Instatiation
+ *  \n
+ *  Here we assume that code is working inside psana module where evt and env variables are defined through input parameters of call-back methods. 
+ *  Code below instateates calibpars object using factory static method PSCalib::CalibParsStore::Create:
+ *  @code
+ *  std::string calib_dir = env.calibDir(); // or "/reg/d/psdm/<INS>/<experiment>/calib"
+ *  std::string  group = std::string(); // or something like "PNCCD::CalibV1";
+ *  const std::string source = "Camp.0:pnCCD.1";
+ *  const std::string key = ""; // key for raw data
+ *  Pds::Src src; env.get(source, key, &src);
+ *  PSCalib::CalibPars* calibpars = PSCalib::CalibParsStore::Create(calib_dir, group, src, PSCalib::getRunNumber(evt));
+ *  @endcode
+ *
+ *  @li Access methods
+ *  @code
+ *  calibpars->printCalibPars();
+ *  const PSCalib::CalibPars::pedestals_t*    peds_data = calibpars->pedestals();
+ *  const PSCalib::CalibPars::pixel_gain_t*   gain_data = calibpars->pixel_gain();
+ *  const PSCalib::CalibPars::pixel_status_t* mask_data = calibpars->pixel_status();
+ *  const PSCalib::CalibPars::common_mode_t*  cmod_data = calibpars->common_mode();
+ *  @endcode
  */
 
 //----------------
