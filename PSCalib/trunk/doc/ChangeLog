@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-17
+2014-02-06 Mikhail S. Dubrovin
+- in CalibPars.h get all calibration types from pdscalibdata::Pnccd*V1::pars_t
+
 Tag: V00-01-16
 2014-02-05 Mikhail S. Dubrovin
 - add superclass CalibPars.h

@@ -27,6 +27,10 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "pdscalibdata/PnccdPedestalsV1.h"
+#include "pdscalibdata/PnccdPixelStatusV1.h"
+#include "pdscalibdata/PnccdCommonModeV1.h"
+#include "pdscalibdata/PnccdPixelGainV1.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -67,13 +71,17 @@ public:
   // Destructor
   virtual ~CalibPars () {}
 
-  typedef uint16_t pixel_status_t;
-  typedef uint16_t common_mode_t;
-  typedef float    pedestals_t;
-  typedef float    pixel_gain_t;
+  //typedef uint16_t pixel_status_t;
+  //typedef double   common_mode_t;
+  //typedef float    pedestals_t;
+  //typedef float    pixel_gain_t;
   typedef float    pixel_nrms_t;
   typedef float    pixel_bkgd_t;
 
+  typedef pdscalibdata::PnccdPixelStatusV1::pars_t pixel_status_t;
+  typedef pdscalibdata::PnccdCommonModeV1::pars_t  common_mode_t;
+  typedef pdscalibdata::PnccdPedestalsV1::pars_t   pedestals_t;
+  typedef pdscalibdata::PnccdPixelGainV1::pars_t   pixel_gain_t;
 
   // NOTE1: THE METHOD DECLARED AS
   // virtual ndarray<pedestals_t, 1> pedestals() = 0; IS PURE VIRTUAL,
