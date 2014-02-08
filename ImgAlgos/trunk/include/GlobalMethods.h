@@ -19,6 +19,8 @@
 #include <iomanip>   // for setw, setfill
 #include <sstream>   // for stringstream
 #include <iostream>
+#include <math.h>
+//#include <stdio.h>
 
 //----------------------
 // Base Class Headers --
@@ -649,10 +651,46 @@ private:
         out.close();
         return; 
     }
-
-    //======================
   }
 
+
+
+//--------------------
+// averages all values in array "data" for length "length"
+// that are below "threshold".  If the magniture of the correction
+// is greater than "maxCorrection" leave "data" unchanged, otherwise
+// subtract the average in place.  
+// mask is either a null pointer (in which case nothing is masked)
+// or a list of values arranged like the data where non-zero means ignore
+
+   template <typename T>
+   void commonMode(T* data, const uint16_t* mask, const unsigned length, const T threshold, const T maxCorrection, T& cm) {
+     // do dumbest thing possible to start - switch to median
+     // do 2nd dumbest thing possible to start - switch to median
+     cm = 0;
+     T* tmp = data;
+     double sum = 0;
+     int nSummed = 0;
+     for (unsigned col=0; col<length; col++) {
+       T cval = *tmp++;
+       T mval = (mask) ? *mask++ : 0;
+       if (mval==0 && cval<threshold) {
+         nSummed++;
+         sum += cval;
+       }
+     }
+     
+     if (nSummed>0) {
+       T mean = (T)(sum/nSummed);
+       if (fabs(mean)<=maxCorrection) {
+         cm = mean;
+         tmp = data;
+         for (unsigned col=0; col<length; col++) {
+   	*tmp++ -= cm;
+         }
+       }
+     }
+   }
 
 //--------------------
 //--------------------

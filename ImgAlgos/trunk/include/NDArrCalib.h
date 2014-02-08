@@ -7,7 +7,7 @@
 //
 // Description:
 //	Class NDArrCalib.
-//      Apply corrections to 2d image using pedestals, background, gain factor, and mask.
+//      Apply corrections to ndarray using pedestals, common mode, background, gain factor, and mask.
 //
 //------------------------------------------------------------------------
 
@@ -23,13 +23,15 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "ImgAlgos/ImgParametersV1.h"
-#include "ImgAlgos/GlobalMethods.h" // ::toString( const Pds::Src& src )
-#include "PSCalib/PnccdCalibPars.h"
+#include "ImgAlgos/GlobalMethods.h"
 #include "PSCalib/CalibPars.h"
+
+//#include "ImgAlgos/ImgParametersV1.h"
+//#include "PSCalib/PnccdCalibPars.h"
 //#include "PSCalib/CSPad2x2CalibPars.h"
 
-#include "psddl_psana/pnccd.ddl.h"
+#include "psalg/psalg.h"
+//#include "psddl_psana/pnccd.ddl.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -44,7 +46,7 @@ namespace ImgAlgos {
 /// @addtogroup ImgAlgos
 
 /**
- *  Apply corrections to 2d image using pedestals, background, gain factor, and mask.
+ *  Apply corrections to ndarray using pedestals, common mode, background, gain factor, and mask.
  *
  *  @ingroup ImgAlgos
  *
@@ -97,7 +99,7 @@ public:
 protected:
   void init(Event& evt, Env& env);
   void getCalibPars(Event& evt, Env& env);
-  void getConfigPars(Env& env);
+  //void getConfigPars(Env& env);
   void defImgIndexesForBkgdNorm();
   void initAtFirstGetNdarray(Event& evt, Env& env);
   void procEvent(Event& evt, Env& env);
@@ -112,68 +114,47 @@ private:
   std::string     m_key_out;          // string with key for output image
   bool            m_do_peds;          // flag: true = do pedestal subtraction
   bool            m_do_cmod;          // flag: true = do common mode subtraction
-  bool            m_do_mask;          // flag: true = apply mask
+  bool            m_do_stat;          // flag: true = mask hot/bad pixels from pixel_status file 
+  bool            m_do_mask;          // flag: true = apply mask from file
   bool            m_do_bkgd;          // flag: true = subtract background
   bool            m_do_gain;          // flag: true = apply the gain correction
   bool            m_do_nrms;          // flag: true = apply the threshold as nRMS
   bool            m_do_thre;          // flag: true = apply the threshold
-  std::string     m_fname_peds;       // string file name for pedestals 
-  std::string     m_fname_bkgd;       // string file name for background
-  std::string     m_fname_gain;       // string file name for gain factors     
   std::string     m_fname_mask;       // string file name for mask
+  std::string     m_fname_bkgd;       // string file name for background
   std::string     m_fname_nrms;       // string file name for threshold in nRMS
   double          m_mask_val;         // Value substituted for masked bits
   double          m_low_nrms;         // The low threshold number of RMS
   double          m_low_thre;         // The low threshold
   double          m_low_val;          // The value of substituting amplitude below threshold
-  unsigned        m_row_min;          // window for background normalization
-  unsigned        m_row_max;          // window for background normalization
-  unsigned        m_col_min;          // window for background normalization
-  unsigned        m_col_max;          // window for background normalization
+  unsigned        m_ind_min;          // window for background normalization from      m_ind_min
+  unsigned        m_ind_max;          // window for background normalization to        m_ind_max
+  unsigned        m_ind_inc;          // window for background normalization increment m_ind_inc
   unsigned        m_print_bits;       // bit mask for print options
   long            m_count_event;      // local event counter
   long            m_count_get;        // local successful get() counter
-
   NDArrPars*      m_ndarr_pars;       // holds input data ndarray parameters
   unsigned        m_ndim;             // rank of the input data ndarray 
   unsigned        m_size;             // number of elements in the input data ndarray 
   DATA_TYPE       m_dtype;            // numerated datatype for data array
 
-  unsigned        m_shape[2];         // image shape
-  unsigned        m_cols;             // number of columns in the image 
-  unsigned        m_rows;             // number of rows    in the image 
-
 
   PSCalib::CalibPars* m_calibpars;
   //PSCalib::PnccdCalibPars* m_calibpars;
-  std::string m_typeGroup;            // for example: "PNCCD::CalibV1";
 
   data_out_t* p_cdata;                // pointer to calibrated data array
 
   const PSCalib::CalibPars::pedestals_t*     m_peds_data;
   const PSCalib::CalibPars::pixel_gain_t*    m_gain_data;
-  const PSCalib::CalibPars::pixel_status_t*  m_mask_data;
+  const PSCalib::CalibPars::pixel_status_t*  m_stat_data;
   const PSCalib::CalibPars::common_mode_t*   m_cmod_data;
 
   PSCalib::CalibPars::pixel_bkgd_t*    m_bkgd_data;
   PSCalib::CalibPars::pixel_nrms_t*    m_nrms_data;
-
-//   ImgParametersV1* m_peds;
-//   ImgParametersV1* m_bkgd;
-//   ImgParametersV1* m_gain;
-//   ImgParametersV1* m_mask;
-//   ImgParametersV1* m_nrms;
-
-//   ImgParametersV1::pars_t* m_peds_data;
-//   ImgParametersV1::pars_t* m_bkgd_data;
-//   ImgParametersV1::pars_t* m_gain_data;
-//   ImgParametersV1::pars_t* m_mask_data;
-//   ImgParametersV1::pars_t* m_nrms_data;
+  PSCalib::CalibPars::pixel_mask_t*    m_mask_data;
 
   std::vector<unsigned> v_inds;       // vector of the image indexes for background normalization
-
   double           m_norm;            // Normalization factor for background subtraction
-  //double*          m_cdat;            // Calibrated data for image
 
 //-------------------
 
@@ -210,22 +191,31 @@ private:
 
 //-------------------
 
+  template <typename T>
+    void do_common_mode(T* data)
+    {
+      T threshold     = (T)        m_cmod_data[1];
+      T maxCorrection = (T)        m_cmod_data[2];
+      unsigned length = (unsigned) m_cmod_data[3];
+      T cm            = 0;
+
+      for (unsigned i0=0; i0<m_size; i0+=length)
+	//psalg::commonMode<T>(&data[i0], &m_stat_data[i0], length, threshold, maxCorrection, cm);
+          commonMode<T>(&data[i0], &m_stat_data[i0], length, threshold, maxCorrection, cm); // Local from ImgAlgos::GlobalMethods.h
+    }
+
+//-------------------
+
   template <typename T, typename TOUT>
     void applyCorrections(Event& evt, const T* p_rdata)
     {
-     	  // 1) Evaluate: m_cdat[i] = (p_rdata[i] - m_peds[i] - m_norm*m_bkgd[i]) * m_gain[i]; 
-     	  // 2) apply mask: m_mask[i];
-     	  // 3) apply constant threshold: m_low_thre;
-     	  // 4) apply nRMS threshold: m_low_nrms*m_nrms_data[i];
-
-	  //m_cdat = new double[m_size];
-     	  //memcpy(m_cdat,m_rdat,m_size*sizeof(double)); 
-          //MsgLog( name(), info, "m_shape: " << m_shape[0] << " " << m_shape[1] );
+     	  // 1) Evaluate: m_cdat[i] = (p_rdata[i] - m_peds[i] - comm_mode[...] - m_norm*m_bkgd[i]) * m_gain[i]; 
+     	  // 2) apply bad pixel status mask: m_stat[i];
+     	  // 3) apply mask: m_mask[i];
+     	  // 4) apply constant threshold: m_low_thre;
+     	  // 5) apply nRMS threshold: m_low_nrms*m_nrms_data[i];
 
 	  m_count_get++;
-
-	  //ndarray<TOUT,2> cdata(m_shape);
-	  //TOUT* p_cdata = cdata.data();
 
 	  TOUT low_val  = (TOUT) m_low_val; 
 	  TOUT low_thre = (TOUT) m_low_thre; 
@@ -234,12 +224,19 @@ private:
      	  for(unsigned i=0; i<m_size; i++) p_cdata[i] = (TOUT)p_rdata[i];
 
      	  if (m_do_peds) {                    for(unsigned i=0; i<m_size; i++) p_cdata[i] -= (TOUT) m_peds_data[i];         }
+     	  if (m_do_cmod) { do_common_mode<TOUT>(p_cdata); }
      	  if (m_do_bkgd) { normBkgd(p_cdata); for(unsigned i=0; i<m_size; i++) p_cdata[i] -= (TOUT)(m_bkgd_data[i]*m_norm); }
      	  if (m_do_gain) {                    for(unsigned i=0; i<m_size; i++) p_cdata[i] *= (TOUT) m_gain_data[i];         }
 
+     	  if (m_do_stat) {             
+     	    for(unsigned i=0; i<m_size; i++) {
+     	      if (m_stat_data[i]!=0) p_cdata[i] = mask_val; 
+     	    }
+     	  }
+
      	  if (m_do_mask) {             
      	    for(unsigned i=0; i<m_size; i++) {
-     	      if (m_mask_data[i]!=0) p_cdata[i] = mask_val; 
+     	      if (m_mask_data[i]==0) p_cdata[i] = mask_val; 
      	    }
      	  }
 
@@ -255,13 +252,19 @@ private:
      	    }
      	  }
 
-          // if( m_print_bits &  8 ) MsgLog( name(), info, stringOf2DArrayData<T>(*ndarr.get(), std::string("Raw ndarr data:")) );
-          // if( m_print_bits & 16 ) MsgLog( name(), info, stringOf2DArrayData<TOUT>(cdata, std::string("Calibr. data:")) );
+          if( m_print_bits & 32 ) {
+	    std::stringstream ss; ss<<"Raw data:      "; for (int i=0; i<10;  ++i) ss << " " << p_rdata[i];
+            MsgLog( name(), info, ss.str());
+	  }
+
+          if( m_print_bits & 64 ) {
+	    std::stringstream ss; ss<<"Corrected data:"; for (int i=0; i<10;  ++i) ss << " " << p_cdata[i];
+            MsgLog( name(), info, ss.str());
+          }
  	  
           saveNDArrInEvent <TOUT> (evt, m_src, m_key_out, p_cdata, m_ndarr_pars, 1);
     }  
 
-//-------------------
 //-------------------
 
   template <typename T>
@@ -278,8 +281,8 @@ private:
     }
 
 //--------------------
-//--------------------
 
+/*
   template <typename T>
   bool getConfigParsForType(Env& env)
   {
@@ -297,8 +300,10 @@ private:
       }
       return false;
   }
-//--------------------
+*/
 
+//--------------------
+//--------------------
 };
 
 } // namespace ImgAlgos

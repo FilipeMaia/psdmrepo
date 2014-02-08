@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-30
+2014-02-07 Mikhail S. Dubrovin
+- NDArrCalib - full functional peds, common mode, pixel_status, mask, gain, background, threshold (const and rms)
+	
 Tag: V00-03-29
 2014-02-05 Mikhail S. Dubrovin
 - add NDArrCalib - 1st working version w/o common mode correction
