@@ -354,6 +354,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
            ,'common_mode'
            ,'filter'
            ,'pixel_gain'
+           ,'pixel_rms'
            #,'beam_vector'
            #,'beam_intersect'
             ]
@@ -366,6 +367,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
            ,'common_mode'
            ,'filter'
            ,'pixel_gain'
+           ,'pixel_rms'
             ]
 
         self.const_types_pnccd = [
@@ -373,6 +375,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
            ,'pixel_status'
            ,'common_mode'
            ,'pixel_gain'
+           ,'pixel_rms'
             ]
 
         #Dictionary for 'CSPAD', 'CSPAD2x2', 'Princeton', 'pnCCD', 'Tm6740', 'Opal1000', 'Opal2000', 'Opal4000', 'Opal8000', 'Acqiris', etc.

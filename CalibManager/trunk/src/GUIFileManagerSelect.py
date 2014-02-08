@@ -336,7 +336,7 @@ class GUIFileManagerSelect ( QtGui.QWidget ) :
         cmd = 'mv %s %s' % (self.str_path(), self.get_out_path())
         if self.approveCommand(self.but_copy, cmd) :
             #os.system(cmd)
-            fd.procDeployCommand(cmd)
+            fd.procDeployCommand(cmd, 'f-manager')
             self.resetFieldsOnDelete()
 
 
@@ -345,7 +345,7 @@ class GUIFileManagerSelect ( QtGui.QWidget ) :
         cmd = 'cp %s %s' % (self.str_path(), self.get_out_path())
         if self.approveCommand(self.but_copy, cmd) :
             #os.system(cmd)
-            fd.procDeployCommand(cmd)
+            fd.procDeployCommand(cmd, 'f-manager')
 
 
     def onButDelete(self):

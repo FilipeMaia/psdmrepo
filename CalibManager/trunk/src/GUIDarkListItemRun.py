@@ -325,8 +325,8 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
         #    if cbx : fd.procDeployCommand(cmd)
 
         for cmd in list_of_deploy_commands :
-            print 'cmd: ', cmd
-            if self.is_allowed_command(cmd, list_src_cbx) : fd.procDeployCommand(cmd)
+            #print 'cmd: ', cmd
+            if self.is_allowed_command(cmd, list_src_cbx) : fd.procDeployCommand(cmd,'calib-dark')
 
         if cp.guistatus is not None : cp.guistatus.updateStatusInfo()
 
@@ -349,6 +349,7 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
         # list_of_sources: ['CxiDs1.0:Cspad.0', 'CxiDsd.0:Cspad.0']
 
         list_of_deploy_commands  = self.get_list_of_deploy_commands_for_calibtype(list_of_types, list_of_sources, fnm.path_peds_ave(),    'pedestals')
+        list_of_deploy_commands += self.get_list_of_deploy_commands_for_calibtype(list_of_types, list_of_sources, fnm.path_peds_rms(),    'pixel_rms')
 
         if cp.dark_deploy_hotpix.value() :
             list_of_deploy_commands += self.get_list_of_deploy_commands_for_calibtype(list_of_types, list_of_sources, fnm.path_hotpix_mask(), 'pixel_status')

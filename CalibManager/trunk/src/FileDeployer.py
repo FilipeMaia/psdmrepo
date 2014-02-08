@@ -37,7 +37,7 @@ class FileDeployer :
         pass
 
     
-    def procDeployCommand(self, cmd):
+    def procDeployCommand(self, cmd, comment='dark'):
         
         cmd_seq = cmd.split()
         msg = 'Command: ' + cmd
@@ -76,21 +76,18 @@ class FileDeployer :
 
         self.changeFilePermissions(path)
 
-        self.addHistoryRecord(cmd)
+        self.addHistoryRecord(cmd, comment)
 
 
 
     def changeFilePermissions(self, path):
         msg = 'Change permissions for file: %s' % path
         logger.info(msg, __name__)
-        
-        #st = os.stat(path)
-        #os.chmod(path, st.st_mode | stat.S_IEXEC)
         os.system('chmod 670 %s' % path)
 
 
 
-    def addHistoryRecord(self, cmd):
+    def addHistoryRecord(self, cmd, comment='dark'):
         #print 'cmd  = ', cmd
         fname_history  = cp.fname_history.value()
         if fname_history == '' : return
@@ -108,11 +105,13 @@ class FileDeployer :
         dir_out, fname_out = path_out.rsplit('/',1) 
         path_history = os.path.join(dir_out,fname_history)
 
-        rec = 'file:%s  copy_of:%s  exp:%s  run:%s  user:%s  host:%s  cptime:%s\n' % \
+        rec = 'file:%s  copy_of:%s  exp:%s  run:%s  comment:%s  user:%s  host:%s  cptime:%s\n' % \
               (fname_out.ljust(14),
-               fname_inp,
+               path_inp,
+               #fname_inp,
                exp_name.ljust(8),
                str_run_number.ljust(4),
+               comment.ljust(10),
                user,
                host,
                tstamp.ljust(29))

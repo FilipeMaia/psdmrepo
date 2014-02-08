@@ -11,6 +11,11 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-13
+2014-02-08 Mikhail S. Dubrovin
+- in FileDeployer.py add "comment" in history record
+- in GUIDarkListItemRun.py etc. add deployment of "pixel_rms" type of files at Dark processing
+	
 Tag: V00-00-12
 2014-02-07 Mikhail S. Dubrovin
 - add GUI for Metrology processing
