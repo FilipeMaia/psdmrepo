@@ -278,9 +278,10 @@ class ConfigParametersForApp ( ConfigParameters ) :
         self.bat_dark_end      = self.declareParameter( name='BATCH_DARK_END'  ,      val_def=1000,     type='int' )
         self.bat_det_info      = self.declareParameter( name='BATCH_DET_INFO',        val_def='DetInfo(:Princeton)',  type='str' )
         self.bat_img_rec_mod   = self.declareParameter( name='BATCH_IMG_REC_MODULE',  val_def='ImgAlgos.PrincetonImageProducer',  type='str' )
-        self.mask_hot_thr      = self.declareParameter( name='MASK_HOT_PIX_ADU_THR_ON_RMS',  val_def=10.0,  type='float' )
-        self.mask_hot_is_used  = self.declareParameter( name='MASK_HOT_PIX_IS_USED',         val_def=True,  type='bool' )
-
+        self.mask_rms_thr      = self.declareParameter( name='MASK_HOT_PIX_ADU_THR_RMS',  val_def=   10,  type='float' )
+        self.mask_min_thr      = self.declareParameter( name='MASK_HOT_PIX_ADU_THR_MIN',  val_def=    2,  type='float' )
+        self.mask_max_thr      = self.declareParameter( name='MASK_HOT_PIX_ADU_THR_MAX',  val_def=65000,  type='float' )
+        self.mask_hot_is_used  = self.declareParameter( name='MASK_HOT_PIX_IS_USED',      val_def= True,  type='bool'  )
 
         # For batch jobs
         self.bat_queue               = self.declareParameter( name='BATCH_QUEUE',                val_def='psnehq', type='str' )

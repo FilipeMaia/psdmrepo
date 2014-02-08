@@ -67,16 +67,22 @@ class GUIConfigPars ( QtGui.QWidget ) :
 
         self.lab_dark_start = QtGui.QLabel('Event start:') 
         self.lab_dark_end   = QtGui.QLabel('end:') 
-        self.lab_hot_thr    = QtGui.QLabel('Threshold, ADU:') 
+        self.lab_rms_thr    = QtGui.QLabel('Threshold RMS, ADU:') 
+        self.lab_min_thr    = QtGui.QLabel('Threshold MIN, ADU:') 
+        self.lab_max_thr    = QtGui.QLabel('MAX:') 
 
 
         self.edi_dark_start = QtGui.QLineEdit  ( str( cp.bat_dark_start.value() ) )
         self.edi_dark_end   = QtGui.QLineEdit  ( str( cp.bat_dark_end.value()) )
-        self.edi_hot_thr    = QtGui.QLineEdit  ( str( cp.mask_hot_thr.value()) )
+        self.edi_rms_thr    = QtGui.QLineEdit  ( str( cp.mask_rms_thr.value()) )
+        self.edi_min_thr    = QtGui.QLineEdit  ( str( cp.mask_min_thr.value()) )
+        self.edi_max_thr    = QtGui.QLineEdit  ( str( cp.mask_max_thr.value()) )
 
         self.edi_dark_start.setValidator(QtGui.QIntValidator(0,9999999,self))
         self.edi_dark_end  .setValidator(QtGui.QIntValidator(0,9999999,self))
-        self.edi_hot_thr   .setValidator(QtGui.QDoubleValidator(0,65000,3,self))
+        self.edi_rms_thr   .setValidator(QtGui.QDoubleValidator(0,65000,3,self))
+        self.edi_min_thr   .setValidator(QtGui.QDoubleValidator(0,65000,3,self))
+        self.edi_max_thr   .setValidator(QtGui.QDoubleValidator(0,65000,3,self))
         #self.edi_events.setValidator(QtGui.QRegExpValidator(QtCore.QRegExp("[0-9]\\d{0,3}|end$"),self))
 
         self.cbx_deploy_hotpix = QtGui.QCheckBox('Deploy hotpix mask')
@@ -97,9 +103,13 @@ class GUIConfigPars ( QtGui.QWidget ) :
         self.grid.addWidget(self.edi_dark_start,    self.grid_row+5, 1)
         self.grid.addWidget(self.lab_dark_end,      self.grid_row+5, 3)
         self.grid.addWidget(self.edi_dark_end,      self.grid_row+5, 4)
-        self.grid.addWidget(self.lab_hot_thr,       self.grid_row+6, 0)
-        self.grid.addWidget(self.edi_hot_thr,       self.grid_row+6, 1, 1, 4)
+        self.grid.addWidget(self.lab_rms_thr,       self.grid_row+6, 0)
+        self.grid.addWidget(self.edi_rms_thr,       self.grid_row+6, 1, 1, 4)
         self.grid.addWidget(self.cbx_deploy_hotpix, self.grid_row+6, 3, 1, 4)
+        self.grid.addWidget(self.lab_min_thr,       self.grid_row+7, 0)
+        self.grid.addWidget(self.edi_min_thr,       self.grid_row+7, 1, 1, 2)
+        self.grid.addWidget(self.lab_max_thr,       self.grid_row+7, 3)
+        self.grid.addWidget(self.edi_max_thr,       self.grid_row+7, 4, 1, 2)
 
         #self.setLayout(self.grid)
 
@@ -114,7 +124,9 @@ class GUIConfigPars ( QtGui.QWidget ) :
         self.connect( self.edi_fname_prefix, QtCore.SIGNAL('editingFinished ()'), self.onEditPrefix )
         self.connect( self.edi_dark_start,   QtCore.SIGNAL('editingFinished()'),  self.onEdiDarkStart )
         self.connect( self.edi_dark_end,     QtCore.SIGNAL('editingFinished()'),  self.onEdiDarkEnd )
-        self.connect( self.edi_hot_thr,      QtCore.SIGNAL('editingFinished()'),  self.onEdiHotThr )
+        self.connect( self.edi_rms_thr,      QtCore.SIGNAL('editingFinished()'),  self.onEdiRmsThr )
+        self.connect( self.edi_min_thr,      QtCore.SIGNAL('editingFinished()'),  self.onEdiMinThr )
+        self.connect( self.edi_max_thr,      QtCore.SIGNAL('editingFinished()'),  self.onEdiMaxThr )
         self.connect( self.cbx_deploy_hotpix,QtCore.SIGNAL('stateChanged(int)'),  self.on_cbx ) 
  
 
@@ -156,7 +168,9 @@ class GUIConfigPars ( QtGui.QWidget ) :
         self.lab_bat_queue    .setStyleSheet (cp.styleLabel)
         self.lab_dark_start   .setStyleSheet (cp.styleLabel)
         self.lab_dark_end     .setStyleSheet (cp.styleLabel)
-        self.lab_hot_thr      .setStyleSheet (cp.styleLabel)
+        self.lab_rms_thr      .setStyleSheet (cp.styleLabel)
+        self.lab_min_thr      .setStyleSheet (cp.styleLabel)
+        self.lab_max_thr      .setStyleSheet (cp.styleLabel)
         self.cbx_deploy_hotpix.setStyleSheet (cp.styleLabel)
 
         self.tit_dir_work    .setAlignment (QtCore.Qt.AlignLeft)
@@ -166,7 +180,9 @@ class GUIConfigPars ( QtGui.QWidget ) :
         self.lab_bat_queue   .setAlignment (QtCore.Qt.AlignRight)
         self.lab_dark_start  .setAlignment (QtCore.Qt.AlignRight)
         self.lab_dark_end    .setAlignment (QtCore.Qt.AlignRight)
-        self.lab_hot_thr     .setAlignment (QtCore.Qt.AlignRight)
+        self.lab_rms_thr     .setAlignment (QtCore.Qt.AlignRight)
+        self.lab_min_thr     .setAlignment (QtCore.Qt.AlignRight)
+        self.lab_max_thr     .setAlignment (QtCore.Qt.AlignRight)
 
         self.edi_dir_work    .setMinimumWidth(300)
         self.but_dir_work    .setFixedWidth(80)
@@ -175,7 +191,9 @@ class GUIConfigPars ( QtGui.QWidget ) :
         self.box_bat_queue   .setFixedWidth(100)
         self.edi_dark_start  .setFixedWidth(80)
         self.edi_dark_end    .setFixedWidth(80)
-        self.edi_hot_thr     .setFixedWidth(80)
+        self.edi_rms_thr     .setFixedWidth(80)
+        self.edi_min_thr     .setFixedWidth(80)
+        self.edi_max_thr     .setFixedWidth(80)
 
     def setParent(self,parent) :
         self.parent = parent
@@ -252,10 +270,21 @@ class GUIConfigPars ( QtGui.QWidget ) :
         logger.info('Set last event for dark run: %s' % str_value, __name__ )
 
 
-    def onEdiHotThr(self):
-        str_value = str( self.edi_hot_thr.displayText() )
-        cp.mask_hot_thr.setValue(float(str_value))  
+    def onEdiRmsThr(self):
+        str_value = str( self.edi_rms_thr.displayText() )
+        cp.mask_rms_thr.setValue(float(str_value))  
         logger.info('Set hot pixel RMS threshold: %s' % str_value, __name__ )
+
+    def onEdiMinThr(self):
+        str_value = str( self.edi_min_thr.displayText() )
+        cp.mask_min_thr.setValue(float(str_value))  
+        logger.info('Set hot pixel MIN threshold: %s' % str_value, __name__ )
+
+    def onEdiMaxThr(self):
+        str_value = str( self.edi_max_thr.displayText() )
+        cp.mask_max_thr.setValue(float(str_value))  
+        logger.info('Set hot pixel MAX threshold: %s' % str_value, __name__ )
+
 
 
     def on_cbx(self):

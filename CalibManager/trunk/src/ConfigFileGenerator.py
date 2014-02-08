@@ -179,7 +179,9 @@ class ConfigFileGenerator :
                        'FNAME_PEDS_AVE'   : self.fname_ave,
                        'FNAME_PEDS_RMS'   : self.fname_rms,
                        'FNAME_PEDS_HOT'   : self.fname_mask,
-                       'THR_RMS_HOTPIX'   : str( cp.mask_hot_thr.value() )
+                       'THR_RMS_HOTPIX'   : str( cp.mask_rms_thr.value() ),
+                       'THR_MIN_HOTPIX'   : str( cp.mask_min_thr.value() ),
+                       'THR_MAX_HOTPIX'   : str( cp.mask_max_thr.value() )
                       }
 
         self.add_module_in_cfg (mod_prod)
@@ -192,20 +194,24 @@ class ConfigFileGenerator :
         mod_img_rec = '%s:%i' % (module, self.ind) # str( cp.bat_img_rec_mod.value()
         mod         = '%s:%i' % ('ImgAlgos.NDArrAverage', self.ind)
         self.d_subs   = {
-                         'MODULE_IMG_REC' : mod_img_rec,
-                         'DETINFO'        : self.source, # str( cp.bat_det_info.value() ),
-                         'KEY_TRANSIT'    : 'img-%i' % self.ind,
-                         'MODULE_AVERAGE' : mod,
-                         'FNAME_PEDS_AVE' : self.fname_ave,
-                         'FNAME_PEDS_RMS' : self.fname_rms
+                         'MODULE_IMG_REC'       : mod_img_rec,
+                         'DETINFO'              : self.source, # str( cp.bat_det_info.value() ),
+                         'KEY_TRANSIT'          : 'img-%i' % self.ind,
+                         'MODULE_AVERAGE'       : mod,
+                         'FNAME_PEDS_AVE'       : self.fname_ave,
+                         'FNAME_PEDS_RMS'       : self.fname_rms,
+                         'FNAME_HOTPIX_MASK'    : self.fname_mask,
+                         'THR_RMS_HOTPIX'       : str( cp.mask_rms_thr.value() ),
+                         'THR_MIN_HOTPIX'       : str( cp.mask_min_thr.value() ),
+                         'THR_MAX_HOTPIX'       : str( cp.mask_max_thr.value() )
                          }
 
-        self.d_subs['FNAME_HOTPIX_MASK'   ] = self.fname_mask # fnm.path_hotpix_mask()
-        self.d_subs['HOTPIX_THRESHOLD_ADU'] = str( cp.mask_hot_thr.value() )
+        #self.d_subs['FNAME_HOTPIX_MASK'   ] = self.fname_mask # fnm.path_hotpix_mask()
+        #self.d_subs['HOTPIX_THRESHOLD_ADU'] = str( cp.mask_rms_thr.value() )
 
         #if cp.mask_hot_is_used.value() : 
         #    self.d_subs['FNAME_HOTPIX_MASK'   ] = fnm.path_hotpix_mask()
-        #    self.d_subs['HOTPIX_THRESHOLD_ADU'] = str( cp.mask_hot_thr.value() )
+        #    self.d_subs['HOTPIX_THRESHOLD_ADU'] = str( cp.mask_rms_thr.value() )
         #else :
         #    self.d_subs['FNAME_HOTPIX_MASK'   ] = ''
         #    self.d_subs['HOTPIX_THRESHOLD_ADU'] = '10000'
@@ -226,7 +232,9 @@ class ConfigFileGenerator :
                          'FNAME_PEDS_AVE'       : self.fname_ave,
                          'FNAME_PEDS_RMS'       : self.fname_rms,
                          'FNAME_HOTPIX_MASK'    : self.fname_mask,
-                         'HOTPIX_THRESHOLD_ADU' : str( cp.mask_hot_thr.value() )
+                         'THR_RMS_HOTPIX'       : str( cp.mask_rms_thr.value() ),
+                         'THR_MIN_HOTPIX'       : str( cp.mask_min_thr.value() ),
+                         'THR_MAX_HOTPIX'       : str( cp.mask_max_thr.value() )
                          }
 
         self.add_module_in_cfg ('%s %s' % (mod_ndarr_prod, mod))
@@ -245,7 +253,9 @@ class ConfigFileGenerator :
                          'FNAME_PEDS_AVE'       : self.fname_ave,
                          'FNAME_PEDS_RMS'       : self.fname_rms,
                          'FNAME_HOTPIX_MASK'    : self.fname_mask,
-                         'HOTPIX_THRESHOLD_ADU' : str( cp.mask_hot_thr.value() )
+                         'THR_RMS_HOTPIX'       : str( cp.mask_rms_thr.value() ),
+                         'THR_MIN_HOTPIX'       : str( cp.mask_min_thr.value() ),
+                         'THR_MAX_HOTPIX'       : str( cp.mask_max_thr.value() )
                          }
 
         self.add_module_in_cfg ('%s %s' % (mod_img_rec, mod))
@@ -264,7 +274,9 @@ class ConfigFileGenerator :
                          'FNAME_PEDS_AVE'       : self.fname_ave,
                          'FNAME_PEDS_RMS'       : self.fname_rms,
                          'FNAME_HOTPIX_MASK'    : self.fname_mask,
-                         'HOTPIX_THRESHOLD_ADU' : str( cp.mask_hot_thr.value() )
+                         'THR_RMS_HOTPIX'       : str( cp.mask_rms_thr.value() ),
+                         'THR_MIN_HOTPIX'       : str( cp.mask_min_thr.value() ),
+                         'THR_MAX_HOTPIX'       : str( cp.mask_max_thr.value() )
                          }
 
         self.add_module_in_cfg ('%s %s' % (mod_img_rec, mod))
