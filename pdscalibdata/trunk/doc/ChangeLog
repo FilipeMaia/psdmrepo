@@ -11,6 +11,12 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-06
+2014-02-08 Mikhail Dubrovin
+- add class PnccdPixelRmsV1
+A         include/PnccdPixelRmsV1.h
+A         src/PnccdPixelRmsV1.cpp
+	
 Tag: V00-05-05
 2014-02-07 Mikhail Dubrovin
 - in PnccdCommonModeV1 extend CMSize up to 16 parameters
