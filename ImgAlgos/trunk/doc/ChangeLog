@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-31
+2014-02-09 Mikhail S. Dubrovin
+- in NDArrCalib - use for n*rms threshold calibration parameters from pixel_rms
+	
 Tag: V00-03-30
 2014-02-07 Mikhail S. Dubrovin
 - NDArrCalib - full functional peds, common mode, pixel_status, mask, gain, background, threshold (const and rms)

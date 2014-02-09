@@ -97,14 +97,12 @@ public:
   void printEventRecord(Event& evt);
 
 protected:
-  void init(Event& evt, Env& env);
   void getCalibPars(Event& evt, Env& env);
   //void getConfigPars(Env& env);
   void defImgIndexesForBkgdNorm();
   void initAtFirstGetNdarray(Event& evt, Env& env);
   void procEvent(Event& evt, Env& env);
-  //void normBkgd();
-  void saveImageInEvent(Event& evt);
+  void printCommonModePars();
 
 private:
 
@@ -122,7 +120,6 @@ private:
   bool            m_do_thre;          // flag: true = apply the threshold
   std::string     m_fname_mask;       // string file name for mask
   std::string     m_fname_bkgd;       // string file name for background
-  std::string     m_fname_nrms;       // string file name for threshold in nRMS
   double          m_mask_val;         // Value substituted for masked bits
   double          m_low_nrms;         // The low threshold number of RMS
   double          m_low_thre;         // The low threshold
@@ -139,19 +136,18 @@ private:
   DATA_TYPE       m_dtype;            // numerated datatype for data array
 
 
-  PSCalib::CalibPars* m_calibpars;
-  //PSCalib::PnccdCalibPars* m_calibpars;
-
-  data_out_t* p_cdata;                // pointer to calibrated data array
-
   const PSCalib::CalibPars::pedestals_t*     m_peds_data;
   const PSCalib::CalibPars::pixel_gain_t*    m_gain_data;
   const PSCalib::CalibPars::pixel_status_t*  m_stat_data;
   const PSCalib::CalibPars::common_mode_t*   m_cmod_data;
+  const PSCalib::CalibPars::pixel_rms_t*     m_rms_data;
 
   PSCalib::CalibPars::pixel_bkgd_t*    m_bkgd_data;
-  PSCalib::CalibPars::pixel_nrms_t*    m_nrms_data;
   PSCalib::CalibPars::pixel_mask_t*    m_mask_data;
+  data_out_t*                          m_nrms_data;
+
+  PSCalib::CalibPars* m_calibpars;    // pointer to calibration store
+  data_out_t* p_cdata;                // pointer to calibrated data array
 
   std::vector<unsigned> v_inds;       // vector of the image indexes for background normalization
   double           m_norm;            // Normalization factor for background subtraction
@@ -210,7 +206,7 @@ private:
     void applyCorrections(Event& evt, const T* p_rdata)
     {
      	  // 1) Evaluate: m_cdat[i] = (p_rdata[i] - m_peds[i] - comm_mode[...] - m_norm*m_bkgd[i]) * m_gain[i]; 
-     	  // 2) apply bad pixel status mask: m_stat[i];
+     	  // 2) apply bad pixel status: m_stat[i];
      	  // 3) apply mask: m_mask[i];
      	  // 4) apply constant threshold: m_low_thre;
      	  // 5) apply nRMS threshold: m_low_nrms*m_nrms_data[i];
@@ -230,13 +226,13 @@ private:
 
      	  if (m_do_stat) {             
      	    for(unsigned i=0; i<m_size; i++) {
-     	      if (m_stat_data[i]!=0) p_cdata[i] = mask_val; 
+     	      if (m_stat_data[i]!=0) p_cdata[i] = mask_val; // m_stat_data[i] == 0 - good pixel
      	    }
      	  }
 
      	  if (m_do_mask) {             
      	    for(unsigned i=0; i<m_size; i++) {
-     	      if (m_mask_data[i]==0) p_cdata[i] = mask_val; 
+     	      if (m_mask_data[i]==0) p_cdata[i] = mask_val; // m_mask_data[i] == 1 - good pixel 
      	    }
      	  }
 
@@ -248,17 +244,17 @@ private:
 
      	  if (m_do_nrms) {             
      	    for(unsigned i=0; i<m_size; i++) {
-     	      if (p_cdata[i] < (TOUT) m_nrms_data[i]) p_cdata[i] = low_val; 
+     	      if (p_cdata[i] < m_nrms_data[i]) p_cdata[i] = low_val; 
      	    }
      	  }
 
           if( m_print_bits & 32 ) {
-	    std::stringstream ss; ss<<"Raw data:      "; for (int i=0; i<10;  ++i) ss << " " << p_rdata[i];
+	    std::stringstream ss; ss<<"Raw data: "; for (int i=0; i<10; ++i) ss << " " << p_rdata[i];
             MsgLog( name(), info, ss.str());
 	  }
 
           if( m_print_bits & 64 ) {
-	    std::stringstream ss; ss<<"Corrected data:"; for (int i=0; i<10;  ++i) ss << " " << p_cdata[i];
+	    std::stringstream ss; ss<<"Corr data:"; for (int i=0; i<10; ++i) ss << " " << p_cdata[i];
             MsgLog( name(), info, ss.str());
           }
  	  

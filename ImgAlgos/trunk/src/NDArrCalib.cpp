@@ -61,7 +61,6 @@ NDArrCalib::NDArrCalib (const std::string& name)
   , m_do_thre() 
   , m_fname_mask()
   , m_fname_bkgd()
-  , m_fname_nrms()
   , m_mask_val()
   , m_low_nrms()
   , m_low_thre()
@@ -87,7 +86,6 @@ NDArrCalib::NDArrCalib (const std::string& name)
   m_do_thre           = config   ("do_thre",              false );
   m_fname_mask        = configStr("fname_mask",               "");
   m_fname_bkgd        = configStr("fname_bkgd",               "");
-  m_fname_nrms        = configStr("fname_rms",                "");
   m_mask_val          = config   ("masked_value",             0.);
   m_low_nrms          = config   ("threshold_nrms",           3.);
   m_low_thre          = config   ("threshold",                0.);
@@ -120,7 +118,6 @@ NDArrCalib::printInputParameters()
         << "\n m_do_thre         : " << m_do_thre     
         << "\n m_fname_mask      : " << m_fname_mask     
         << "\n m_fname_bkgd      : " << m_fname_bkgd     
-        << "\n m_fname_nrms      : " << m_fname_nrms     
         << "\n m_mask_val        : " << m_mask_val   
         << "\n m_low_nrms        : " << m_low_nrms   
         << "\n m_low_thre        : " << m_low_thre   
@@ -158,8 +155,6 @@ void
 NDArrCalib::beginRun(Event& evt, Env& env)
 {
   m_count_get = 0; // In order to load calibration pars etc for each run
-  //getConfigPars(env);      // get m_src here
-  //getCalibPars(evt, env);  // use m_src here
 }
 
 /// Method which is called at the beginning of the calibration cycle
@@ -173,10 +168,8 @@ NDArrCalib::beginCalibCycle(Event& evt, Env& env)
 void 
 NDArrCalib::event(Event& evt, Env& env)
 {
-  //if(!m_count_event) init(evt, env);
   if( m_print_bits & 16 ) printEventRecord(evt);
   procEvent(evt, env);
-  // saveImageInEvent(evt); -> moved to procEventForType
   ++ m_count_event;
 }
   
@@ -230,28 +223,27 @@ NDArrCalib::getCalibPars(Event& evt, Env& env)
   m_gain_data = m_calibpars->pixel_gain();
   m_stat_data = m_calibpars->pixel_status();
   m_cmod_data = m_calibpars->common_mode();
+  m_rms_data  = m_calibpars->pixel_rms();
 
-  m_bkgd_data = new PSCalib::CalibPars::pixel_bkgd_t[m_size];
-  m_nrms_data = new PSCalib::CalibPars::pixel_nrms_t[m_size];
-  m_mask_data = new PSCalib::CalibPars::pixel_mask_t[m_size];
+  static bool is_done_once = false; 
+  if ( ! is_done_once ) {
+         is_done_once = true;
+      m_bkgd_data = new PSCalib::CalibPars::pixel_bkgd_t[m_size];
+      m_mask_data = new PSCalib::CalibPars::pixel_mask_t[m_size];
+      m_nrms_data = new data_out_t[m_size];
 
-  if( m_do_mask && !m_fname_mask.empty())
-    pdscalibdata::load_pars_from_file<PSCalib::CalibPars::pixel_mask_t> (m_fname_mask, "Mask", m_size, m_mask_data);
-  else std::fill_n(m_mask_data, int(m_size), PSCalib::CalibPars::pixel_mask_t(1));    
-
-  if( m_do_bkgd && !m_fname_bkgd.empty())
-    pdscalibdata::load_pars_from_file<PSCalib::CalibPars::pixel_bkgd_t> (m_fname_bkgd, "Background", m_size, m_bkgd_data);
-  else std::fill_n(m_bkgd_data, int(m_size), PSCalib::CalibPars::pixel_bkgd_t(0));    
-
-  if( m_do_nrms && !m_fname_nrms.empty())
-    pdscalibdata::load_pars_from_file<PSCalib::CalibPars::pixel_nrms_t> (m_fname_nrms, "Pixel RMS", m_size, m_nrms_data);
-  else std::fill_n(m_nrms_data, int(m_size), PSCalib::CalibPars::pixel_nrms_t(m_low_thre));    
-
-  if( m_print_bits & 4 ) {
-     std::stringstream ss; ss << "Common mode parameters: "; 
-     for (int i=0; i<16;  ++i) ss << " " << m_cmod_data[i];
-     MsgLog( name(), info, ss.str());
+      if( m_do_mask && !m_fname_mask.empty())
+        pdscalibdata::load_pars_from_file<PSCalib::CalibPars::pixel_mask_t> (m_fname_mask, "Mask", m_size, m_mask_data);
+      else std::fill_n(m_mask_data, int(m_size), PSCalib::CalibPars::pixel_mask_t(1));    
+      
+      if( m_do_bkgd && !m_fname_bkgd.empty())
+        pdscalibdata::load_pars_from_file<PSCalib::CalibPars::pixel_bkgd_t> (m_fname_bkgd, "Background", m_size, m_bkgd_data);
+      else std::fill_n(m_bkgd_data, int(m_size), PSCalib::CalibPars::pixel_bkgd_t(0));    
   }
+
+  if( m_do_nrms ) { for(unsigned i=0; i<m_size; i++) m_nrms_data[i] = m_low_nrms * m_rms_data[i]; }
+
+  if( m_print_bits & 4 ) printCommonModePars();
 }
 
 //--------------------
@@ -310,6 +302,16 @@ NDArrCalib::printEventRecord(Event& evt)
                      << " get="    << stringFromUint(m_count_get) 
                      << " Time="   << stringTimeStamp(evt) 
   );
+}
+
+//--------------------
+
+void 
+NDArrCalib::printCommonModePars()
+{
+     std::stringstream ss; ss << "Common mode parameters: "; 
+     for (int i=0; i<16;  ++i) ss << " " << m_cmod_data[i];
+     MsgLog( name(), info, ss.str());
 }
 
 //--------------------
