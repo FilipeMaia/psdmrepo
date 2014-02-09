@@ -31,6 +31,7 @@
 #include "pdscalibdata/PnccdPixelStatusV1.h"
 #include "pdscalibdata/PnccdCommonModeV1.h"
 #include "pdscalibdata/PnccdPixelGainV1.h"
+#include "pdscalibdata/PnccdPixelRmsV1.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -82,11 +83,13 @@ public:
   typedef pdscalibdata::PnccdCommonModeV1::pars_t  common_mode_t;
   typedef pdscalibdata::PnccdPedestalsV1::pars_t   pedestals_t;
   typedef pdscalibdata::PnccdPixelGainV1::pars_t   pixel_gain_t;
+  typedef pdscalibdata::PnccdPixelRmsV1::pars_t    pixel_rms_t;
 
   //typedef uint16_t pixel_status_t;
   //typedef double   common_mode_t;
   //typedef float    pedestals_t;
   //typedef float    pixel_gain_t;
+  //typedef float    pixel_rms_t;
 
   // NOTE1: THE METHOD DECLARED AS
   // virtual ndarray<pedestals_t, 1> pedestals() = 0; IS PURE VIRTUAL,
@@ -121,6 +124,9 @@ public:
 
   /// Returns the pointer to array with pixel_gain 
   virtual const pixel_gain_t*   pixel_gain()   = 0;
+
+  /// Returns the pointer to array with pixel_gain 
+  virtual const pixel_rms_t*    pixel_rms()   = 0;
 
   /*
   virtual ndarray<pedestals_t, 3> pedestals() = 0; 

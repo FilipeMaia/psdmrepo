@@ -36,6 +36,7 @@
 #include "pdscalibdata/PnccdCommonModeV1.h"        
 #include "pdscalibdata/PnccdPixelStatusV1.h"        
 #include "pdscalibdata/PnccdPixelGainV1.h"        
+#include "pdscalibdata/PnccdPixelRmsV1.h"        
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -125,6 +126,7 @@ namespace PSCalib {
  *  const CalibPars::pixel_status_t* p_pixel_stat  = calibpars -> pixel_status()
  *  const CalibPars::common_mode_t*  p_common_mode = calibpars -> common_mode()
  *  const CalibPars::pixel_gain_t*   p_pixel_gain  = calibpars -> pixel_gain()
+ *  const CalibPars::pixel_rms_t*    p_pixel_rms   = calibpars -> pixel_rms()
  *  ... etc. for all other access methods
  *  @endcode
  *
@@ -213,28 +215,31 @@ public:
   /// Prints calibration parameters status
   virtual void printCalibParsStatus  ();
 
-  /// Returns ndarray of pnCCD pedestals
-  //pdscalibdata::PnccdPedestalsV1::pars_t
-  //ndarray<CalibPars::pedestals_t, 3> pedestals(){ return m_pedestals -> pedestals(); };
-
   virtual const size_t    ndim() { return pdscalibdata::PnccdBaseV1::Ndim; };
   virtual const size_t    size() { return pdscalibdata::PnccdBaseV1::Size; };
   virtual const unsigned* shape(){ return m_pedestals -> pedestals().shape(); };
 
+  /// Returns ndarray of pnCCD pedestals
+  //pdscalibdata::PnccdPedestalsV1::pars_t
+  ndarray<CalibPars::pedestals_t, 3> pedestals_ndarr(){ return m_pedestals -> pedestals(); };
   virtual const CalibPars::pedestals_t* pedestals(){ return m_pedestals -> pedestals().data(); };
 
   /// Returns ndarray of pnCCD pixel status
   //pdscalibdata::PnccdPixelStatusV1::pars_t
-  //ndarray<CalibPars::pixel_status_t, 3> pixel_status(){ return m_pixel_status -> pixel_status(); };
+  ndarray<CalibPars::pixel_status_t, 3> pixel_status_ndarr(){ return m_pixel_status -> pixel_status(); };
   virtual const CalibPars::pixel_status_t* pixel_status(){ return m_pixel_status -> pixel_status().data(); };
 
   /// Returns ndarray of pnCCD common mode
-  //ndarray<CalibPars::common_mode_t, 1> common_mode(){ return m_common_mode -> common_mode(); };
+  ndarray<CalibPars::common_mode_t, 1> common_mode_ndarr(){ return m_common_mode -> common_mode(); };
   virtual const CalibPars::common_mode_t* common_mode(){ return m_common_mode -> common_mode().data(); };
 
   /// Returns ndarray of pnCCD pixel gain
-  //ndarray<CalibPars::pixel_gain_t, 3> pixel_gain(){ return m_pixel_gain -> pixel_gain(); };
+  ndarray<CalibPars::pixel_gain_t, 3> pixel_gain_ndarr(){ return m_pixel_gain -> pixel_gain(); };
   virtual const CalibPars::pixel_gain_t* pixel_gain(){ return m_pixel_gain -> pixel_gain().data(); };
+
+  /// Returns ndarray of pnCCD pixel rms
+  ndarray<CalibPars::pixel_rms_t, 3> pixel_rms_ndarr(){ return m_pixel_rms -> pixel_rms(); };
+  virtual const CalibPars::pixel_rms_t* pixel_rms(){ return m_pixel_rms -> pixel_rms().data(); };
 
 
 private:
@@ -278,9 +283,9 @@ private:
 
   pdscalibdata::PnccdPedestalsV1   *m_pedestals;
   pdscalibdata::PnccdPixelGainV1   *m_pixel_gain;
+  pdscalibdata::PnccdPixelRmsV1    *m_pixel_rms;
   pdscalibdata::PnccdCommonModeV1  *m_common_mode;
   pdscalibdata::PnccdPixelStatusV1 *m_pixel_status; 
-
 };
 
 } // namespace PSCalib

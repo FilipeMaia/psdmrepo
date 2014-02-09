@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-19
+2014-02-08 Mikhail S. Dubrovin
+- in PnccdCalibPars, CalibPars, and CalibParsStore include new type of constants PnccdPixelRmsV1
+	
 Tag: V00-01-18
 2014-02-07 Mikhail S. Dubrovin
 - cosmetic edition for doxygen documentation

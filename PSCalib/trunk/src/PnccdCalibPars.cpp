@@ -120,6 +120,7 @@ void PnccdCalibPars::fillCalibNameVector ()
     v_calibname.push_back("pixel_status");
     v_calibname.push_back("common_mode");
     v_calibname.push_back("pixel_gain");
+    v_calibname.push_back("pixel_rms");
 }
 
 //----------------
@@ -183,6 +184,7 @@ void PnccdCalibPars::fillCalibParsV1 ()
   else if( m_cur_calibname == v_calibname[1] ) m_pixel_status = new pdscalibdata::PnccdPixelStatusV1(m_fname);
   else if( m_cur_calibname == v_calibname[2] ) m_common_mode  = new pdscalibdata::PnccdCommonModeV1 (m_fname);
   else if( m_cur_calibname == v_calibname[3] ) m_pixel_gain   = new pdscalibdata::PnccdPixelGainV1  (m_fname);
+  else if( m_cur_calibname == v_calibname[4] ) m_pixel_rms    = new pdscalibdata::PnccdPixelRmsV1   (m_fname);
 }
 
 //----------------
@@ -195,6 +197,7 @@ void PnccdCalibPars::fillDefaultCalibParsV1 ()
   else if( m_cur_calibname == v_calibname[1] ) m_pixel_status = new pdscalibdata::PnccdPixelStatusV1();
   else if( m_cur_calibname == v_calibname[2] ) m_common_mode  = new pdscalibdata::PnccdCommonModeV1 ();
   else if( m_cur_calibname == v_calibname[3] ) m_pixel_gain   = new pdscalibdata::PnccdPixelGainV1  ();
+  else if( m_cur_calibname == v_calibname[4] ) m_pixel_rms    = new pdscalibdata::PnccdPixelRmsV1   ();
 
   else if( m_print_bits & 8 ) fatalMissingFileName ();
 }
@@ -237,6 +240,7 @@ void PnccdCalibPars::printCalibPars()
     m_pixel_status -> print();
     m_common_mode  -> print();
     m_pixel_gain   -> print();
+    m_pixel_rms    -> print();
 }
 
 //----------------

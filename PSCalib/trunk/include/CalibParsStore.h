@@ -89,6 +89,7 @@ namespace PSCalib {
  *  calibpars->printCalibPars();
  *  const PSCalib::CalibPars::pedestals_t*    peds_data = calibpars->pedestals();
  *  const PSCalib::CalibPars::pixel_gain_t*   gain_data = calibpars->pixel_gain();
+ *  const PSCalib::CalibPars::pixel_rms_t*    rms_data  = calibpars->pixel_rms();
  *  const PSCalib::CalibPars::pixel_status_t* mask_data = calibpars->pixel_status();
  *  const PSCalib::CalibPars::common_mode_t*  cmod_data = calibpars->common_mode();
  *  @endcode
