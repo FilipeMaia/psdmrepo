@@ -34,6 +34,7 @@
 #include "psddl_pds2psana/opal1k.ddl.h"
 #include "psddl_pds2psana/cspad2x2.ddl.h"
 #include "psddl_pds2psana/imp.ddl.h"
+#include "psddl_pds2psana/partition.ddl.h"
 #include "psddl_pds2psana/epixsampler.ddl.h"
 #include "psddl_pds2psana/CsPadDataOrdered.h"
 #include "psddl_pds2psana/PnccdFullFrameV1Proxy.h"
@@ -1353,6 +1354,22 @@ try {
       } // end switch (version)
     }
     break;
+  case Pds::TypeId::Id_PartitionConfig:
+    {
+      switch (version) {
+      case 1:
+        {
+          // store XTC object in config store
+          boost::shared_ptr<Pds::Partition::ConfigV1> xptr(xtc, (Pds::Partition::ConfigV1*)(xtc->payload()));
+          cfgStore.put(xptr, xtc->src);
+          // create and store psana object in config store
+          boost::shared_ptr<Psana::Partition::ConfigV1> obj = boost::make_shared<psddl_pds2psana::Partition::ConfigV1>(xptr);
+          cfgStore.put(obj, xtc->src);
+        }
+        break;
+      } // end switch (version)
+    }
+    break;
   case Pds::TypeId::Id_PhaseCavity:
     {
       switch (version) {
@@ -2464,6 +2481,13 @@ std::vector<const std::type_info *> getXtcConvertTypeInfoPtrs(const Pds::TypeId 
     switch(typeId.version()) {
     case 1:
       typeIdPtrs.push_back( &typeid(Psana::Orca::ConfigV1) );
+      break;
+    } // end version switch
+    break;
+  case Pds::TypeId::Id_PartitionConfig:
+    switch(typeId.version()) {
+    case 1:
+      typeIdPtrs.push_back( &typeid(Psana::Partition::ConfigV1) );
       break;
     } // end version switch
     break;
