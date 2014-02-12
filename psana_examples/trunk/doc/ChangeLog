@@ -11,6 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-11
+2014-02-12 David Schneider
+- updated for psddldata V01-00-03
+- DumpPartition and dump_partition
+- DumpDamage - add dump about src only, split event damage
+
 Tag: V00-04-10
 2014-01-17 Andy Salnikov
 - DumpAndor: default source was for Acqiris

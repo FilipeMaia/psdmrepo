@@ -6,7 +6,6 @@
 //	Class EventKeys...
 //
 // Author List:
-//      Andrei Salnikov
 //
 //------------------------------------------------------------------------
 
@@ -139,8 +138,9 @@ DumpDamage::printKeysAndDamage(std::ostream& out, Event &evt, Env &env) {
   
   const std::list<EventKey> configKeys = env.configStore().keys();
 
-  // only print config keys that we have not seen, or that have changed
-  // since we last saw them:
+  // gather list of event keys and their damage for printing
+
+  // find config keys that we have not seen or that have changed since we last saw them
   for (iter = configKeys.begin(); iter != configKeys.end(); ++iter) {
     const EventKey &configKey = *iter;
     if ( (m_configUpdates.find(configKey) == m_configUpdates.end()) or
@@ -158,8 +158,7 @@ DumpDamage::printKeysAndDamage(std::ostream& out, Event &evt, Env &env) {
 
   const std::list<EventKey> calibKeys = env.calibStore().keys();
 
-  // only print calib keys that we have not seen, or that have changed
-  // since we last saw them:
+  // find calib keys that we have not seen or that have changed since we last saw them
   for (iter = calibKeys.begin(); iter != calibKeys.end(); ++iter) {
     const EventKey &calibKey = *iter;
     if ( (m_calibUpdates.find(calibKey) == m_calibUpdates.end()) or
@@ -189,6 +188,7 @@ DumpDamage::printKeysAndDamage(std::ostream& out, Event &evt, Env &env) {
 
   const std::list<EventKey> eventKeys = evt.keys();
 
+  // now go through all even keys
   for (iter = eventKeys.begin(); iter != eventKeys.end(); ++iter) {
     const EventKey &eventKey = *iter;
     setDamage(m_damageMap, eventKey, inDamageMap, damage);
@@ -214,7 +214,7 @@ DumpDamage::printKeysAndDamage(std::ostream& out, Event &evt, Env &env) {
     }
   }
 
-  // print all keys that are damaged, but were not in the event
+  // find all keys that are damaged, but were not in the event
   if (m_damageMap) {
     PSEvt::DamageMap::const_iterator damageIter;
     for (damageIter = m_damageMap->begin(); damageIter != m_damageMap->end(); ++damageIter) {
@@ -235,6 +235,8 @@ DumpDamage::printKeysAndDamage(std::ostream& out, Event &evt, Env &env) {
     allKeysList.push_back(pos->second);
   }
   sort(allKeysList.begin(), allKeysList.end());
+
+  // finally, print all the keys
   std::vector<LocationAndDamage>::iterator printPos;
   for (printPos = allKeysList.begin(); printPos != allKeysList.end(); ++printPos) {
     LocationAndDamage &locAndDamage = *printPos;
@@ -257,7 +259,7 @@ DumpDamage::printKeysAndDamage(std::ostream& out, Event &evt, Env &env) {
         bool IncompleteContribution = value & (1<<Pds::Damage::IncompleteContribution);
         bool ContainsIncomplete     = value & (1<<Pds::Damage::ContainsIncomplete);
         damageBits << "dropped=" << DroppedContribution;
-        damageBits << " unititialized="<<Uninitialized;
+        damageBits << " uninitialized="<<Uninitialized;
         damageBits << " OutOfOrder="<<OutOfOrder;
         damageBits << " OutOfSynch="<<OutOfSynch;
         damageBits << " UserDefined="<<UserDefined;
@@ -272,6 +274,21 @@ DumpDamage::printKeysAndDamage(std::ostream& out, Event &evt, Env &env) {
     std::string damageBitsStr = damageBits.str();
     if (damageBitsStr.size()) {
       out << "                    " << damageBitsStr << '\n';
+    }
+  }
+  // report on any src only damage:
+  if (m_damageMap) {
+    const std::vector<std::pair<Pds::Src,Pds::Damage> > & srcDmgList = 
+      m_damageMap->getSrcDroppedContributions();
+    if (srcDmgList.size()>0) {
+      out << " -------- src damage with dropped contribs --------- \n";
+      for (unsigned idx=0; idx < srcDmgList.size(); ++idx) {
+        const std::pair<Pds::Src,Pds::Damage> &srcDmgPair = srcDmgList.at(idx);
+        const Pds::Src &src = srcDmgPair.first;
+        const Pds::Damage &dmg = srcDmgPair.second;
+        out << "   0x" << std::setw(8) << std::setfill('0') << std::hex << dmg.value();
+        out << "  " << src << '\n';
+      }
     }
   }
 }

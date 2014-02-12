@@ -55,10 +55,13 @@ namespace psana_examples {
     --- --- evt dmg 0x00000000 EventKey(type=Psana::Bld::BldDataEBeamV1, src=BldInfo(EBeam))
     --- --- --- dmg 0x00004000 EventKey(type=Psana::Ipimb::ConfigV1, src=BldInfo(NH2-SB1-IPM-01))
                     dropped=0 unititialized=0 OutOfOrder=0 OutOfSynch=0 UserDefined=1 IncompleteContribution=0 ContainsIncomplete=0 userBits=0x0
-@endverbatim
+ -------- src damage with dropped contribs --------- 
+   0x00000002  ProcInfo(ac.15.15.2b, pid=6ccb)
+[@endverbatim
  * Notice the counter which gives the event number within the calib cycle, as well as the
  * total number of events the module has seen.  
  * 
+ * There are two sections of output, the list of keys and their damage, as well as src damage.
  * The first four columns indicate where the EventKey was found:
  * 
  * - cfg: in the ConfigStore
@@ -69,6 +72,9 @@ namespace psana_examples {
  * Keys that are in the damage map will also have their 32 bit damage value printed.
  * If this damage value is nonzero, then a second line is printed which indicates which
  * damage bits are on, and the value of the user damage bits.
+ *
+ * The second section, if present, means that src only damage was found. The damage, and then the
+ * src are printed. A
  *
  *  @note This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
