@@ -34,6 +34,8 @@ import GlobalUtils          as     gu
 import RegDBUtils           as     ru
 from BatchLogScanParser     import blsp
 
+from time import time
+
 #---------------------
 #  Class definition --
 #---------------------
@@ -44,6 +46,8 @@ class GUIDarkList ( QtGui.QWidget ) :
     def __init__ ( self, parent=None ) :
 
         self.parent = parent
+        self.dark_list_run_min     = cp.dark_list_run_min 
+        self.dark_list_run_max     = cp.dark_list_run_max 
         self.dark_list_show_runs   = cp.dark_list_show_runs
         self.dark_list_show_dets   = cp.dark_list_show_dets
         self.list_of_show_dets     = cp.list_of_show_dets
@@ -92,42 +96,58 @@ class GUIDarkList ( QtGui.QWidget ) :
     #  Public methods --
     #-------------------
 
-    def updateList(self):
+    def updateList(self) :
+
+        self.t0_sec = time()
 
         self.list.clear()
+        self.list_of_records = []
 
         if self.instr_name.value() == self.instr_name.value_def() : return
         if self.exp_name  .value() == self.exp_name  .value_def() : return
 
+        msg = 'Begin to update the list of runs. It is slow procedure that takes ~0.1s/run, stay calm and wait.'
+        logger.info(msg, __name__)
+        #print msg
         # Get run records from RegDB
         self.dict_run_recs = ru.calibration_runs (self.instr_name.value(), self.exp_name.value())
         #print 'self.dict_run_recs = ', self.dict_run_recs
 
-        self.list_of_records = []
         self.list_of_run_strs_in_dir = fnm.get_list_of_xtc_runs()   # ['0001', '0202', '0203',...]
         self.list_of_run_nums_in_dir = gu.list_of_int_from_list_of_str(self.list_of_run_strs_in_dir) # [1, 202, 203, 204,...]
         self.list_of_run_nums_in_regdb = ru.list_of_runnums(self.instr_name.value(), self.exp_name.value())
 
         #print 'list_of_run_nums_in_dir:\n',   self.list_of_run_nums_in_dir
         #print 'list_of_run_nums_in_regdb:\n', self.list_of_run_nums_in_regdb
+        #print '\nA. Consumed time (sec) =', time()-self.t0_sec
+        #print 'Begin to construct the list of items for %s' % self.exp_name.value()
+
         
         if self.list_of_run_nums_in_regdb == [] : self.list_of_runs = self.list_of_run_nums_in_dir
         else                                    : self.list_of_runs = self.list_of_run_nums_in_regdb
 
+
         for run_num in self.list_of_runs :
+
+            self.t1_sec = time()            
 
             str_run_num = '%04d' % run_num
             self.str_run_number.setValue(str_run_num)
 
             if not self.isSelectedRun            (run_num) : continue
             if not self.hasSelectedDetectorsInRun(run_num) : continue
-        
+
             if not run_num in self.list_of_run_nums_in_dir :
                 self.comment = 'NOT FOUND xtc file!'
                 #self.type    = 'N/A'
 
+            # 13ms here
 
-            widg = GUIDarkListItem ( self, str_run_num, self.type, self.comment)
+            # THIS GUY CONSUMES ~90ms !
+            widg = GUIDarkListItem ( self, str_run_num, self.type, self.comment) 
+
+            # 100-110 ms here
+
             item = QtGui.QListWidgetItem('', self.list)
             #self.list.addItem(item)
             #item.setFlags (  QtCore.Qt.ItemIsEnabled ) #| QtCore.Qt.ItemIsSelectable  | QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsTristate)
@@ -143,6 +163,12 @@ class GUIDarkList ( QtGui.QWidget ) :
             record = str_run_num, item, widg
             self.list_of_records.append(record)
 
+            # 100-110 ms here
+            #print '   make item for run:', str_run_num,'  Consumed time (sec) =', time()-self.t1_sec
+
+        msg = 'Consumed time to generate list of files (sec) = %7.3f' % (time()-self.t0_sec)        
+        logger.info(msg, __name__)
+
 
 
     def isSelectedRun(self, run_num, type_to_select = 'dark') :
@@ -153,17 +179,23 @@ class GUIDarkList ( QtGui.QWidget ) :
             list_of_calibs = run_rec['calibrations']
             self.comment   = run_rec['comment']
             self.is_found_type = type_to_select in list_of_calibs
-            #print run_num, is_found_type, list_of_calibs, self.comment
+            if self.is_found_type : self.type = type_to_select
+            else                  : self.type = ''
         else :
             self.is_found_type = False
-            self.comment   = ''
+            self.comment = ''
+            self.type = ''
 
+        if self.dark_list_show_runs.value() == 'in range' : # self.list_of_show_runs[0]
+            if   run_num > self.dark_list_run_max.value() : return False
+            elif run_num < self.dark_list_run_min.value() : return False
+            else                                          : return True
+
+        #if self.dark_list_show_runs.value() == 'dark' : # self.list_of_show_runs[1]
         if self.is_found_type :
-            self.type = type_to_select
             return True
 
-        if self.dark_list_show_runs.value() == self.dark_list_show_runs.value_def() : # 'all' - For all runs
-            self.type = ''
+        if self.dark_list_show_runs.value() == 'all' : # self.list_of_show_runs[2]
             return True
 
         return False

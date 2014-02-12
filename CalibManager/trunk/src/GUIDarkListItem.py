@@ -21,6 +21,7 @@ import os
 
 from PyQt4 import QtGui, QtCore
 #import time   # for sleep(sec)
+#from time import time
 
 #-----------------------------
 # Imports for other modules --
@@ -46,7 +47,9 @@ class GUIDarkListItem ( QtGui.QWidget ) :
     #char_expand    = u'\u25BD' # open down-head triangle
     #char_shrink    = u'\u25B7' # open right-head triangle
 
-    def __init__ ( self, parent=None, run_number='0000', run_type='Type N/A', comment='') :
+    def __init__ ( self, parent=None, str_run_num='0000', run_type='Type N/A', comment='') :
+
+        #self.t0_sec = time()
 
         QtGui.QWidget.__init__(self, parent)
 
@@ -61,7 +64,7 @@ class GUIDarkListItem ( QtGui.QWidget ) :
 
         self.list_of_runs    = None
 
-        self.run_number = run_number # cp.str_run_number
+        self.str_run_num = str_run_num # cp.str_run_number
 
         #self.str_run_number = cp.str_run_number # cp.str_run_number
         #self.calib_dir      = cp.calib_dir
@@ -70,7 +73,7 @@ class GUIDarkListItem ( QtGui.QWidget ) :
         self.but_expand_shrink = QtGui.QPushButton(self.char_expand)
 
         self.gui_add = None
-        self.gui_run = GUIDarkListItemRun(self, run_number, run_type, comment)
+        self.gui_run = GUIDarkListItemRun(self, str_run_num, run_type, comment)
         self.hboxTT = QtGui.QHBoxLayout()
         self.hboxTT.addSpacing(5)     
         self.hboxTT.addWidget(self.but_expand_shrink)
@@ -97,6 +100,8 @@ class GUIDarkListItem ( QtGui.QWidget ) :
         self.showToolTips()
 
         self.setStyle()
+
+        #print '\nConsumed time (sec) =', time()-self.t0_sec
 
 
     def showToolTips(self):
@@ -191,7 +196,7 @@ class GUIDarkListItem ( QtGui.QWidget ) :
     def onClickExpand(self):
         logger.debug('onClickExpand', __name__)
         #self.gui_add = QtGui.QLabel('Additional information')  
-        self.gui_add = GUIDarkListItemAdd(self, self.run_number) 
+        self.gui_add = GUIDarkListItemAdd(self, self.str_run_num) 
         self.hboxW.addWidget(self.gui_add)
 
         self.setFixedHeight( self.height() + self.gui_add.height() )
@@ -235,7 +240,7 @@ class GUIDarkListItem ( QtGui.QWidget ) :
 if __name__ == "__main__" :
 
     app = QtGui.QApplication(sys.argv)
-    w = GUIDarkListItem(parent=None, run_number='0016')
+    w = GUIDarkListItem(parent=None, str_run_num='0016')
     w.setFieldsEnabled(True)
     w.show()
     app.exec_()

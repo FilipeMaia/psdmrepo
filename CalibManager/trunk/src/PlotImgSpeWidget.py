@@ -33,6 +33,7 @@ import os
 import random
 import numpy as np
 from math import log10
+import math
 
 # For self-run debugging:
 if __name__ == "__main__" :
@@ -60,6 +61,36 @@ def arr_rot_n90(arr, rot_ang_n90=0) :
     else                  : return arr
 
 #---------------------
+
+def add_stat_text(axhi, weights, bins) :
+    mean, rms, err_mean, err_rms, neff = proc_stat(weights,bins)
+    pm = r'$\pm$' 
+    txt = 'Mean=%8.2f%s%8.2f\nRMS=%8.2f%s%8.2f' % (mean, pm, err_mean, rms, pm, err_rms)
+    xb,xe = axhi.get_xlim()     
+    yb,ye = axhi.get_ylim()     
+    x = xb + (xe-xb)*0.80
+    y = yb + (ye-yb)*0.80
+    axhi.text(x, y, txt, fontsize=10, color='k', ha='center', rotation=0)
+
+#--------------------
+
+def proc_stat(weights, bins) :
+    center = np.array([0.5*(bins[i] + bins[i+1]) for i,w in enumerate(weights)])
+
+    sum_w  = weights.sum()
+    sum_w2 = (weights*weights).sum()
+    neff   = sum_w*sum_w/sum_w2
+    sum_1  = (weights*center).sum()
+    sum_2  = (weights*center*center).sum()
+    mean = sum_1/sum_w
+    rms2 = sum_2/sum_w - mean*mean
+    rms  = math.sqrt(rms2)
+    err_mean = rms/math.sqrt(neff)
+    err_rms  = err_mean/math.sqrt(2)    
+
+    return mean, rms, err_mean, err_rms, neff
+
+#--------------------
 
 class PlotImgSpeWidget (QtGui.QWidget) :
     """Plots image and spectrum for 2d numpy array."""
@@ -358,7 +389,9 @@ class PlotImgSpeWidget (QtGui.QWidget) :
         #msg = 'self.nbins: %s  self.range_his: %s' % (self.nbins, self.range_his)
         #print 'plots_in_linear_scale: ' + msg
 
-        self.axhi.hist(self.arrwin.flatten(), bins=self.nbins, range=self.range_his)
+        weights, bins, patches = self.axhi.hist(self.arrwin.flatten(), bins=self.nbins, range=self.range_his)
+        add_stat_text(self.axhi, weights, bins)
+
         self.set_hist_yticks()
         self.axhi.xaxis.set_major_formatter(NullFormatter())
 

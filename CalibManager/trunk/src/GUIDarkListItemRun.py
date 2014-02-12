@@ -21,6 +21,7 @@ import os
 
 from PyQt4 import QtGui, QtCore
 import time   # for sleep(sec)
+from time import time 
 
 #-----------------------------
 # Imports for other modules --
@@ -44,6 +45,8 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
 
     def __init__ ( self, parent=None, str_run_number='0000', str_run_type='Type N/A', comment='') :
 
+        self.t0_sec = time()
+
         QtGui.QWidget.__init__(self, parent)
 
         self.setGeometry(100, 100, 600, 35)
@@ -54,7 +57,7 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
 
         #self.list_of_runs   = None
         self.parent = parent
-        
+
         self.str_run_number = str_run_number # cp.str_run_number
         self.str_run_type   = str_run_type   # cp.str_run_number
         self.str_run_from   = str_run_number # cp.str_run_from
@@ -101,10 +104,10 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
 
         self.setLayout(self.hbox)
 
-        self.connect( self.but_go  , QtCore.SIGNAL('clicked()'),         self.onButGo )
+        self.connect( self.but_go,   QtCore.SIGNAL('clicked()'),         self.onButGo )
         self.connect( self.but_depl, QtCore.SIGNAL('clicked()'),         self.onButDeploy )
         self.connect( self.edi_from, QtCore.SIGNAL('editingFinished()'), self.onEdiFrom )
-        self.connect( self.edi_to  , QtCore.SIGNAL('editingFinished()'), self.onEdiTo )
+        self.connect( self.edi_to,   QtCore.SIGNAL('editingFinished()'), self.onEdiTo )
    
         self.showToolTips()
 
@@ -112,6 +115,7 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
         self.setFieldsEnabled(cp.det_name.value() != '')
 
         #cp.guidarkrunitem = self
+        #print '  GUIDarkListItemRun Consumed time (sec) =', time()-self.t0_sec
 
 
     def create_or_use_butch_object(self) :
@@ -291,8 +295,8 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
 
     def onStop(self):
         logger.info('onStop - buttons status should (if you did not leave Dark tab...) be updated now for %s' % self.str_run_number, __name__ )
-        self.but_go.setText('Go')
         self.but_go.setEnabled(True)
+        self.but_go.setText('Go')
         self.setStatusStyleOfButtons()
 
 

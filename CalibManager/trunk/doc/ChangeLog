@@ -11,6 +11,17 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-14
+2014-02-12 Mikhail S. Dubrovin
+- add run range in GUIDarkControlBar to speed-up generation of list gui in GUIDarkList 
+- in PlotImgSpeWidget add statistics box
+M       src/GUIDarkListItemRun.py
+M       src/GUIDarkListItem.py
+M       src/ConfigParametersForApp.py
+M       src/GUIDarkControlBar.py
+M       src/GUIDarkList.py
+M       src/PlotImgSpeWidget.py	
+
 Tag: V00-00-13
 2014-02-08 Mikhail S. Dubrovin
 - in FileDeployer.py add "comment" in history record

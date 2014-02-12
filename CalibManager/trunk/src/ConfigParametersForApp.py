@@ -42,7 +42,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
 
     list_of_queues    = ['psnehq', 'psfehq', 'psanacsq']
     list_of_instr     = ['AMO', 'SXR', 'XPP', 'XCS', 'CXI', 'MEC']
-    list_of_show_runs = ['all', 'dark']
+    list_of_show_runs = [ 'in range', 'all', 'dark']
     list_of_show_dets = ['any', 'selected any', 'selected all']
 
     dict_bjpeds = {} # dictionary of BatchJobPedestals objects
@@ -247,6 +247,9 @@ class ConfigParametersForApp ( ConfigParameters ) :
         self.dark_list_show_runs  = self.declareParameter( name='DARK_LIST_SHOW_RUNS', val_def=self.list_of_show_runs[0], type='str' )
         self.dark_list_show_dets  = self.declareParameter( name='DARK_LIST_SHOW_DETS', val_def=self.list_of_show_dets[0], type='str' )
         self.dark_deploy_hotpix   = self.declareParameter( name='DARK_DEPLOY_HOTPIX',  val_def=False,                     type='bool')
+        self.dark_list_run_min    = self.declareParameter( name='DARK_LIST_RUN_MIN',   val_def=1,      type='int' )
+        self.dark_list_run_max    = self.declareParameter( name='DARK_LIST_RUN_MAX',   val_def=10,     type='int' )
+
 
         # GUIGrabSubmitELog.py
         #self.cbx_more_options    = self.declareParameter( name='CBX_SHOW_MORE_OPTIONS',   val_def=False,             type='bool' )
@@ -273,9 +276,9 @@ class ConfigParametersForApp ( ConfigParameters ) :
         #self.in_dir_dark       = self.declareParameter( name='IN_DIRECTORY_DARK', val_def='/reg/d/ana12/xcs/xcsi0112/xtc',type='str' )
         #self.in_file_dark      = self.declareParameter( name='IN_FILE_NAME_DARK', val_def='e167-r0020-s00-c00.xtc',type='str' )
 
-        #self.bat_dark_total    = self.declareParameter( name='BATCH_DARK_TOTAL',      val_def=-1,       type='int' )
+        #self.bat_dark_total    = self.declareParameter( name='BATCH_DARK_TOTAL',     val_def=-1,       type='int' )
         self.bat_dark_start    = self.declareParameter( name='BATCH_DARK_START',      val_def= 1,       type='int' )
-        self.bat_dark_end      = self.declareParameter( name='BATCH_DARK_END'  ,      val_def=1000,     type='int' )
+        self.bat_dark_end      = self.declareParameter( name='BATCH_DARK_END',        val_def=1000,     type='int' )
         self.bat_det_info      = self.declareParameter( name='BATCH_DET_INFO',        val_def='DetInfo(:Princeton)',  type='str' )
         self.bat_img_rec_mod   = self.declareParameter( name='BATCH_IMG_REC_MODULE',  val_def='ImgAlgos.PrincetonImageProducer',  type='str' )
         self.mask_rms_thr      = self.declareParameter( name='MASK_HOT_PIX_ADU_THR_RMS',  val_def=   10,  type='float' )
