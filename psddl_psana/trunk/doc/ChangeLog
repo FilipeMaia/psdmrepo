@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-06-02
+2014-02-12 David Schneider
+- regenerate whole thing from psddldata V01-00-03 with psddl V00-13-06
+
 Tag: V00-06-01
 2014-01-07 Andy Salnikov
 - regenerate whole thing from psddldata V01-00-01 with psddl V00-13-02
