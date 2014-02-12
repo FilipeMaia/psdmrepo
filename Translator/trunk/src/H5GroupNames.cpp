@@ -87,6 +87,8 @@ namespace {
       return ::strBldInfo(static_cast<const Pds::BldInfo&>(src));
     } else if (src.level() == Pds::Level::Control) {
       return std::string("Control");
+    } else if (src.level() == Pds::Level::Event) {
+      return std::string("Event");
     } else if (src.level() == Pds::Level::NumberOfLevels) {
       // special match-anything source, empty string
       return std::string();

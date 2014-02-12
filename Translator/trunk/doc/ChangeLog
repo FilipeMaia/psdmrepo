@@ -11,8 +11,13 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-16
+2014-02-12 David Schneider
+- regenerate whole thing from psddldata V01-00-03 with psddl V00-13-06
+- change a diagnostic message, change group name for Event level Source
+	
 Tag: V00-00-15
-2014-02-16 David Schneider
+2014-02-03 David Schneider
 - change default value for store_epics 
 - add type_filter option 
 - add ddl_Translator to generate ddl depedenent code

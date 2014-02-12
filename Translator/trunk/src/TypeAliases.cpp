@@ -25,6 +25,7 @@
 #include "psddl_psana/oceanoptics.ddl.h"
 #include "psddl_psana/opal1k.ddl.h"
 #include "psddl_psana/orca.ddl.h"
+#include "psddl_psana/partition.ddl.h"
 #include "psddl_psana/pnccd.ddl.h"
 #include "psddl_psana/princeton.ddl.h"
 #include "psddl_psana/pulnix.ddl.h"
@@ -204,6 +205,10 @@ TypeAliases::TypeAliases() {
   TypeInfoSet Orca;
   Orca.insert( & typeid(Psana::Orca::ConfigV1));
   m_alias2TypesMap["Orca"] = Orca;
+
+  TypeInfoSet Partition;
+  Partition.insert( & typeid(Psana::Partition::ConfigV1));
+  m_alias2TypesMap["Partition"] = Partition;
 
   TypeInfoSet PhaseCavity;
   PhaseCavity.insert( & typeid(Psana::Bld::BldDataPhaseCavity));

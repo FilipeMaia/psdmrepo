@@ -32,6 +32,7 @@ psddl/data/templates/hdf5Translator.tmpl?hdfwritermap_cpp
 #include "psddl_hdf2psana/oceanoptics.ddl.h"
 #include "psddl_hdf2psana/opal1k.ddl.h"
 #include "psddl_hdf2psana/orca.ddl.h"
+#include "psddl_hdf2psana/partition.ddl.h"
 #include "psddl_hdf2psana/pnccd.ddl.h"
 #include "psddl_hdf2psana/princeton.ddl.h"
 #include "psddl_hdf2psana/pulnix.ddl.h"
@@ -68,6 +69,7 @@ using namespace psddl_hdf2psana::Encoder;
 using namespace psddl_hdf2psana::CsPad;
 using namespace psddl_hdf2psana::Opal1k;
 using namespace psddl_hdf2psana::Princeton;
+using namespace psddl_hdf2psana::Partition;
 using namespace psddl_hdf2psana::ControlData;
 using namespace psddl_hdf2psana::FCCD;
 using namespace psddl_hdf2psana::Alias;
@@ -231,6 +233,7 @@ void initializeHdfWriterMap( HdfWriterMap & mapping) {
   mapping[ & typeid(Psana::PNCCD::ConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::PNCCD::ConfigV1> >();
   mapping[ & typeid(Psana::PNCCD::ConfigV2) ] = boost::make_shared<HdfWriterPsana<Psana::PNCCD::ConfigV2> >();
   mapping[ & typeid(Psana::PNCCD::FramesV1) ] = boost::make_shared<HdfWriterPsana<Psana::PNCCD::FramesV1> >();
+  mapping[ & typeid(Psana::Partition::ConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::Partition::ConfigV1> >();
   mapping[ & typeid(Psana::Princeton::ConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::Princeton::ConfigV1> >();
   mapping[ & typeid(Psana::Princeton::ConfigV2) ] = boost::make_shared<HdfWriterPsana<Psana::Princeton::ConfigV2> >();
   mapping[ & typeid(Psana::Princeton::ConfigV3) ] = boost::make_shared<HdfWriterPsana<Psana::Princeton::ConfigV3> >();

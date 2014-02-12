@@ -38,7 +38,7 @@ TESTDATA_XCSCOM12_r52_s0 = os.path.join(DATADIR,"test_049_Translator_xcscom12-r5
 TESTDATA_T1_DROPPED_SRC = os.path.join(DATADIR,"test_044_Translator_t1_dropped_src.xtc")
 TESTDATA_T1_DROPPED = os.path.join(DATADIR,"test_043_Translator_t1_dropped.xtc")
 TESTDATA_ALIAS = os.path.join(DATADIR,"test_050_sxr_sxrb6813_e363-r0069-s00-c00.xtc")
-
+TESTDATA_PARTITION = os.path.join(DATADIR,"test_051_sxr_sxrdaq10_e19-r057-s01-c00.xtc")
 ## ----------------
 # this string is for the test_ndarrays_allWritenToFile test
 
@@ -914,6 +914,40 @@ class H5Output( unittest.TestCase ) :
         self.assertEqual(e,'')
         hasTypes = [ ln.find('EvrData')>=0 or ln.find('IpmFex')>=0 for ln in o.strip().split('\n') ]
         self.assertTrue(all(hasTypes), "all lines are EvrData or IpmFex")
+        if self.cleanUp:
+            os.unlink(output_file)
+        
+    def test_partition(self):
+        '''check that partition type is getting written
+        test_051 has partition object
+        '''
+        input_file = TESTDATA_PARTITION
+        output_h5 = os.path.join(OUTDIR,"unit-test_partition.h5")
+        cfgfile = writeCfgFile(input_file, output_h5)
+        self.runPsanaOnCfg(cfgfile,output_h5, extraOpts='-n 1',printPsanaOutput=self.printPsanaOutput)
+        cfgfile.close()
+        f = h5py.File(output_h5,'r')
+        cfg=f['Configure:0000/Partition::ConfigV1/Control/config']
+        value=cfg.value
+        expected=(67108871L, 8L)
+        self.assertEqual(value[0],expected[0],msg="bldMask wrong: read=%s expected=%s" % (value[0],expected[0]) )
+        self.assertEqual(value[1],expected[1],msg="number of groups: read=%s expected=%s" % (value[1],expected[1]) )
+        sources=f['Configure:0000/Partition::ConfigV1/Control/sources']
+        expectedSources = [((16788226L, 256L), 0L),
+                           ((16796544L, 184551937L), 1L),
+                           ((100682534L, 0L), 0L),
+                           ((100682534L, 1L), 0L),
+                           ((100682534L, 2L), 0L),
+                           ((100682534L, 26L), 0L),
+                           ((16796457L, 184552706L), 2L),
+                           ((16796017L, 184552707L), 3L)]
+
+        for source,expected in zip(sources,expectedSources):
+            self.assertEqual(source[0][0],expected[0][0], "source logical wrong")
+            self.assertEqual(source[0][1],expected[0][1], "source physical wrong")
+            self.assertEqual(source[1],expected[1], "group wrong")
+        if self.cleanUp:
+            os.unlink(output_h5)
         
     def test_alias(self):
         '''check that aliases are getting created.
@@ -996,10 +1030,10 @@ class H5Output( unittest.TestCase ) :
         o,e = p.communicate()
         self.assertEqual(e.strip(),"",msg="There was a problem running h5ls: stderr=%s"%e.strip())
         self.assertEqual(o.strip(),"",msg="The src's were not filtered by the aliases, output of h5ls -r is: %s" % o)
+        if self.cleanUp:
+            os.unlink(output_h5)
         
-        
-        
-        
+                
 #  run unit tests when imported as a main module
 #
 #  To run an individual test, do something like (from the release directory)

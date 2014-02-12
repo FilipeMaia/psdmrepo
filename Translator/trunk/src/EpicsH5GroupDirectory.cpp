@@ -194,7 +194,7 @@ namespace {
            dupPos != dupPvIds.end(); ++dupPos) {
         str << " " << *dupPos;
       }
-      str << " **this should not happen.**";
+      str << " happens with multiple Source's for epics.**";
     }
   }
 
