@@ -30,6 +30,7 @@
 #include "psddl_hdf2psana/andor.ddl.h"
 #include "psddl_hdf2psana/fli.ddl.h"
 #include "psddl_hdf2psana/oceanoptics.ddl.h"
+#include "psddl_hdf2psana/partition.ddl.h"
 #include "psddl_hdf2psana/lusi.ddl.h"
 #include "psddl_hdf2psana/acqiris.ddl.h"
 #include "psddl_hdf2psana/rayonix.ddl.h"
@@ -397,6 +398,10 @@ try {
   case 2708910361:
     // Lusi::DiodeFexV1
     evt.putProxy(psddl_hdf2psana::Lusi::make_DiodeFexV1(schema_version, group, idx), src);
+    break;
+  case 2814362282:
+    // Partition::ConfigV1
+    cfgStore.putProxy(psddl_hdf2psana::Partition::make_ConfigV1(schema_version, group, idx), src);
     break;
   case 2869143498:
     // Gsc16ai::DataV1
