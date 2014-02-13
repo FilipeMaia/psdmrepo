@@ -21,5 +21,5 @@ from _pdsdata import Error
 
 __all__ = ['Error', 'acqiris', 'alias', 'andor', 'bld', 'camera', 'control',  'cspad', 'cspad2x2', 
            'encoder', 'epics', 'epix', 'epixsampler', 'evr', 'fccd', 'fli', 'gsc16ai', 'io', 'ipimb', 
-           'l3t', 'lusi', 'oceanoptics', 'opal1k', 'pnccd', 'pulnix', 'princeton', 'quartz', 'rayonix', 
-           'timepix', 'usdusb', 'xtc']
+           'l3t', 'lusi', 'oceanoptics', 'opal1k', 'partition', 'pnccd', 'pulnix', 'princeton', 
+           'quartz', 'rayonix', 'timepix', 'usdusb', 'xtc']

@@ -195,6 +195,9 @@
 
 #include "types/orca/ConfigV1.h"
 
+#include "types/partition/ConfigV1.h"
+#include "types/partition/Source.h"
+
 #include "types/pnCCD/ConfigV1.h"
 #include "types/pnCCD/ConfigV2.h"
 #include "types/pnCCD/FrameV1.h"
@@ -503,6 +506,12 @@ PyMODINIT_FUNC init_pdsdata()
   pypdsdata::Orca::ConfigV1::initType( module );
   Py_INCREF( module );
   PyModule_AddObject( this_module, "orca", module );
+
+  module = Py_InitModule3( "_pdsdata.partition", 0, "The Python wrapper module for pdsdata/partition" );
+  pypdsdata::Partition::ConfigV1::initType( module );
+  pypdsdata::Partition::Source::initType( module );
+  Py_INCREF( module );
+  PyModule_AddObject( this_module, "partition", module );
 
   module = Py_InitModule3( "_pdsdata.pnccd", 0, "The Python wrapper module for pdsdata/pnCCD" );
   pypdsdata::PNCCD::ConfigV1::initType( module );

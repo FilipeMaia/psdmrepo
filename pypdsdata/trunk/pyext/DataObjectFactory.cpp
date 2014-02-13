@@ -129,6 +129,8 @@
 
 #include "types/orca/ConfigV1.h"
 
+#include "types/partition/ConfigV1.h"
+
 #include "types/pnCCD/ConfigV1.h"
 #include "types/pnCCD/ConfigV2.h"
 #include "types/pnCCD/FramesV1.h"
@@ -577,6 +579,10 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
 
   case Pds::TypeId::Id_EvsConfig :
     if ( not obj ) obj = xtc2obj<EvrData::SrcConfigV1, 1>(xtc, parent);
+    break;
+
+  case Pds::TypeId::Id_PartitionConfig :
+    if ( not obj ) obj = xtc2obj<Partition::ConfigV1, 1>(xtc, parent);
     break;
 
   case Pds::TypeId::NumberOf :

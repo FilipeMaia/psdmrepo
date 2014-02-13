@@ -6,6 +6,10 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V01-01-09
+2014-02-12 Andy Salnikov
+- upgrade to pdsdata V07-02-19
+
 Tag: V01-01-08
 2014-01-20 Andy Salnikov
 - add printing of trimmed flag to L1AcceptEnv
