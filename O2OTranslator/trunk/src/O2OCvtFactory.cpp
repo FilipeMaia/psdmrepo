@@ -93,6 +93,7 @@
 #include "H5DataTypes/OceanOpticsConfigV1.h"
 #include "H5DataTypes/Opal1kConfigV1.h"
 #include "H5DataTypes/OrcaConfigV1.h"
+#include "H5DataTypes/PartitionConfigV1.h"
 #include "H5DataTypes/PnCCDConfigV1.h"
 #include "H5DataTypes/PnCCDConfigV2.h"
 #include "H5DataTypes/PrincetonConfigV1.h"
@@ -920,6 +921,14 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
     switch (version) {
     case 1:
       ::makeConfigCvt<EvrSrcConfigV1>(cvts, group, "EvrData::SrcConfigV1", src, transition, m_cvtOptions, 0);
+      break;
+    }
+    break;
+
+  case Pds::TypeId::Id_PartitionConfig:
+    switch (version) {
+    case 1:
+      ::makeConfigCvt<PartitionConfigV1>(cvts, group, "Partition::ConfigV1", src, transition, m_cvtOptions, 0);
       break;
     }
     break;

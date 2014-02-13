@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-30-01
+2014-02-12 Andy Salnikov
+- updating to pdsdata V07-02-19
+
 Tag: V00-30-00
 2014-01-20 Andy Salnikov
 - modified O2OXtcIterator to filter out duplicate data in cases the data 
