@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-11
+2014-02-12 Andy Salnikov
+- updating to pdsdata V07-02-19
+
 Tag: V00-05-10
 2013-12-22 Andy Salnikov
 - AcqirisTdcDataV1.cpp: upgrade to pdsdata 7.2.13 there TdcDataV1::data() 
