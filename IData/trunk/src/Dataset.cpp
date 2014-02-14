@@ -519,16 +519,17 @@ isFileName(const std::string& str)
   std::string::size_type col = str.find(':');
   if (col == std::string::npos) {
 
-    // no columns but an equal sign - should be an option
+    // no colons but an equal sign - should be an option
     if (str.find('=') != std::string::npos) return false;
     
-    // no colons and some dots - must be a file,
-    // no colons and no dots - assume it's an option
-    return str.find('.') != std::string::npos;
+    // no colons and either dots or slashes - must be a file,
+    // no colons and no dots, no slashes - assume it's an option
+    return str.find_first_of("./") != std::string::npos;
   
   } else {
   
     // there are colons, if they are followed by slash or digits still fine for a file name
+    // (expect URL-type names to be supported in the future)
     while (col != std::string::npos) {
       
       if (col == str.size()-1) {
