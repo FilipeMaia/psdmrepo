@@ -43,5 +43,6 @@ PREFIX = pjoin('$SIT_EXTERNAL_SW', pkg, pkg_ver)
 INCDIR = "psalg"
 LIBDIR = "lib"
 LINKLIBS = "libpsalg.so*"
+PKGLIBS = "libpsalg.so"
 
 standardExternalPackage ( pkg, **locals() )
