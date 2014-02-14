@@ -126,7 +126,7 @@ PnccdImageProducer::event(Event& evt, Env& env)
   if ( procEventFor3DArrType<int>      (evt) ) return;
   if ( procEventFor3DArrType<int16_t>  (evt) ) return;
 
-  MsgLog(name(), warning, "PNCCD::FullFrameV1 or ndarray<T,3> object is not available in the event(...) for source:"
+  if( m_print_bits & 16 ) MsgLog(name(), warning, "PNCCD::FullFrameV1 or ndarray<T,3> object is not available in the event(...) for source:"
           << m_str_src << " key:" << m_key_in);
 }
 

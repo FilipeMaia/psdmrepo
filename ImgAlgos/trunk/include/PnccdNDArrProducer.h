@@ -139,7 +139,7 @@ private:
       }
       else
       {
-          MsgLog(name(), warning, "PNCCD::FramesV1 object is not available in the event(...) for source:"
+          if( m_print_bits & 16 ) MsgLog(name(), warning, "PNCCD::FramesV1 object is not available in the event(...) for source:"
               << m_str_src << " key:" << m_key_in);
 	  return false;
       }
