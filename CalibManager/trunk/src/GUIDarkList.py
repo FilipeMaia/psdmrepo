@@ -57,7 +57,8 @@ class GUIDarkList ( QtGui.QWidget ) :
         self.str_run_number        = cp.str_run_number
         self.list_of_det_pars      = cp.list_of_det_pars
         self.list_of_dets_selected = cp.list_of_dets_selected
-        self.list_of_records       = []
+        self.list_of_visible_records       = []
+        self.dict_guidarklistitem  = cp.dict_guidarklistitem
 
         #self.calib_dir      = cp.calib_dir
         #self.det_name       = cp.det_name
@@ -72,7 +73,10 @@ class GUIDarkList ( QtGui.QWidget ) :
         #except : pass
         self.setFrame()
 
-        self.list = QtGui.QListWidget(parent=self)
+        #self.list = QtGui.QListWidget(parent=self)
+        # Use singleton object 
+        if cp.dark_list is None : self.list = cp.dark_list = QtGui.QListWidget()
+        else                    : self.list = cp.dark_list
 
         self.updateList()
 
@@ -96,12 +100,17 @@ class GUIDarkList ( QtGui.QWidget ) :
     #  Public methods --
     #-------------------
 
-    def updateList(self) :
+    def updateList(self, clearList=False) :
 
         self.t0_sec = time()
 
-        self.list.clear()
-        self.list_of_records = []
+        if clearList :
+            self.list.clear()
+            self.dict_guidarklistitem = {}
+
+        self.setItemsHidden()
+
+        self.list_of_visible_records = []
 
         if self.instr_name.value() == self.instr_name.value_def() : return
         if self.exp_name  .value() == self.exp_name  .value_def() : return
@@ -129,8 +138,6 @@ class GUIDarkList ( QtGui.QWidget ) :
 
         for run_num in self.list_of_runs :
 
-            self.t1_sec = time()            
-
             str_run_num = '%04d' % run_num
             self.str_run_number.setValue(str_run_num)
 
@@ -141,38 +148,64 @@ class GUIDarkList ( QtGui.QWidget ) :
                 self.comment = 'NOT FOUND xtc file!'
                 #self.type    = 'N/A'
 
-            # 13ms here
+            #item = QtGui.QListWidgetItem('', self.list)
+            #widg = GUIDarkListItem(self, str_run_num, self.type, self.comment) # THIS GUY CONSUMES ~90ms !
+            item, widg = self.create_or_use_guidarklistitem(run_num)
 
-            # THIS GUY CONSUMES ~90ms !
-            widg = GUIDarkListItem ( self, str_run_num, self.type, self.comment) 
+            self.list.setItemHidden (item, False)
 
-            # 100-110 ms here
+            record = run_num, item, widg
+            self.list_of_visible_records.append(record)
 
-            item = QtGui.QListWidgetItem('', self.list)
             #self.list.addItem(item)
             #item.setFlags (  QtCore.Qt.ItemIsEnabled ) #| QtCore.Qt.ItemIsSelectable  | QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsTristate)
             #print 'item.flags(): %o' % item.flags()
-            #item.setCheckState(0)
-            item.setFlags (  QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable  | QtCore.Qt.ItemIsUserCheckable )
+            #item.setCheckState(0) 
             #item.setFlags ( QtCore.Qt.ItemIsEnabled )
 
-            item.setSizeHint(widg.size())
-            self.list.setItemWidget(item, widg)
+            #item.setFlags (  QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable  | QtCore.Qt.ItemIsUserCheckable )
+            #item.setSizeHint(widg.size())
+            #self.list.setItemWidget(item, widg)
+
             #self.list.setItemSelected(item, True)
 
-            record = str_run_num, item, widg
-            self.list_of_records.append(record)
-
-            # 100-110 ms here
-            #print '   make item for run:', str_run_num,'  Consumed time (sec) =', time()-self.t1_sec
+        self.list.sortItems(QtCore.Qt.AscendingOrder)
 
         msg = 'Consumed time to generate list of files (sec) = %7.3f' % (time()-self.t0_sec)        
         logger.info(msg, __name__)
 
 
 
-    def isSelectedRun(self, run_num, type_to_select = 'dark') :
+    def create_or_use_guidarklistitem(self, run_num) :
+        """Creates QListWidgetItem and GUIDarkListItem objects for the 1st time and add them to self.list or use existing from the dictionary
+        """
+        if run_num in self.dict_guidarklistitem.keys() :
+            #print 'Use existing GUIDarkListItem object for run %d' % run_num
+            item, widg = self.dict_guidarklistitem[run_num]
+            #widg.update()
+            return item, widg
+        else :
+            #print 'Create new GUIDarkListItem object for run %d' % run_num
+            str_run_num = '%04d'%run_num
+            item = QtGui.QListWidgetItem(str_run_num, self.list)
+            widg = GUIDarkListItem(self, str_run_num, self.type, self.comment)  
+            self.dict_guidarklistitem[run_num] = item, widg
+            item.setTextColor(QtGui.QColor(0, 0, 0, alpha=0)) # set item text invisible. All pars in the range [0,255]
+            item.setFlags ( QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable  | QtCore.Qt.ItemIsUserCheckable )
+            item.setSizeHint(widg.size())
+            self.list.setItemWidget(item, widg)
+            return item, widg
 
+
+
+    def setItemsHidden(self) :
+        for run, (item, widg) in self.dict_guidarklistitem.iteritems() :
+            self.list.setItemHidden (item, True)
+            #print 'Hide item for run %d' % run
+ 
+
+
+    def isSelectedRun(self, run_num, type_to_select = 'dark') :
         # Unpack RegDB info
         if self.dict_run_recs != {} :
             run_rec = self.dict_run_recs[run_num]
@@ -237,15 +270,17 @@ class GUIDarkList ( QtGui.QWidget ) :
 
 
     def setFieldsEnabled(self, is_enabled=False):
-        for (run, item, widg) in self.list_of_records :
+        #for run, (item, widg) in self.dict_guidarklistitem.iteritems() :
+        for (run, item, widg) in self.list_of_visible_records :
             #print '  run:', run          
             widg.setFieldsEnabled(is_enabled)
 
 
     def getRunAndItemForWidget(self, widg_active):
-        for (run, item, widg) in self.list_of_records :
+        #for run, (item, widg) in self.dict_guidarklistitem.iteritems() :
+        for (run, item, widg) in self.list_of_visible_records :
             if widg == widg_active :
-                return run, item
+                return '%04d'%run, item
         return None, None
 
 
@@ -266,7 +301,7 @@ class GUIDarkList ( QtGui.QWidget ) :
     def setStyle(self):
         self.setMinimumSize(760,80)
         self.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
-        self.           setStyleSheet (cp.styleBkgd)
+        self.setStyleSheet (cp.styleBkgd)
         self.setContentsMargins (QtCore.QMargins(-9,-9,-9,-9))
 
 
@@ -308,8 +343,9 @@ class GUIDarkList ( QtGui.QWidget ) :
         #try    : del cp.guidarklist # GUIDarkList
         #except : pass
 
-        for (run, item, widg) in self.list_of_records :
-            widg.close()
+        # DO NOT CLOSE THESE WIDGETS!
+        #for run, (item, widg) in self.dict_guidarklistitem.iteritems() :
+        #    widg.close()
 
 
     def onClose(self):
@@ -352,7 +388,6 @@ class GUIDarkList ( QtGui.QWidget ) :
         logger.debug('onItemDoubleClick', __name__)
         #print 'onItemDoubleClick' #, isChecked: ', str(item.checkState())
 
-    
 #-----------------------------
 
 if __name__ == "__main__" :

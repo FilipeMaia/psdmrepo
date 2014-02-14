@@ -234,6 +234,11 @@ class GUIDarkListItem ( QtGui.QWidget ) :
         if self.gui_add is not None :
             h += self.gui_add.getHeight()
         return h + 10
+
+
+    def update(self) :
+        #logger.info('update', __name__)
+        self.gui_run.update()
         
 #-----------------------------
 

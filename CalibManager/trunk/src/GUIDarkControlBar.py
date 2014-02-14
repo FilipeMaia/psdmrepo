@@ -217,21 +217,24 @@ class GUIDarkControlBar ( QtGui.QWidget ) :
     def setRuns(self, txt='None'):
         #print 'setType', txt
         self.dark_list_show_runs.setValue(txt)
-        self.butRuns.setText(txt + self.char_expand)        
-        #if txt == 'None' : self.list_of_run = None
-        #self.setFile()
-        if cp.guidarklist != None :
-            cp.guidarklist.updateList()
+        self.updateListOfRuns(self.butRuns, txt)
 
 
     def setDets(self, txt='None'):
         #print 'setType', txt
         self.dark_list_show_dets.setValue(txt)
-        self.butDets.setText(txt + self.char_expand)        
-        #if txt == 'None' : self.list_of_run = None
-        #self.setFile()
+        self.updateListOfRuns(self.butDets, txt)
+
+    
+    def updateListOfRuns(self, but, txt='None') :
+        but.setText('WAIT...')        
+        but.setStyleSheet(cp.styleButtonBad)
+
         if cp.guidarklist != None :
             cp.guidarklist.updateList()
+
+        but.setText(txt + self.char_expand)        
+        but.setStyleSheet(cp.styleButton)
 
 
     def on_cbx(self):

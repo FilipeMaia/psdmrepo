@@ -238,7 +238,7 @@ class GUIInsExpDirDet ( QtGui.QWidget ) :
 
         self.setExp(item_selected)
         self.setDir(fnm.path_to_calib_dir_default())
-        self.setDet('Select')
+        self.setDet('Select', clearList=True)
         self.setStyleButtons()
 
         path_to_xtc_dir = fnm.path_to_xtc_dir()
@@ -320,7 +320,7 @@ class GUIInsExpDirDet ( QtGui.QWidget ) :
         logger.info('Set calibration directory: ' + str(txt), __name__)
 
 
-    def setDet(self, txt=None):        
+    def setDet(self, txt=None, clearList=True):        
         but_title = 'Select'
         if txt is None :
             but_title = 'Selected:%d' % len(cp.list_of_dets_selected())
@@ -333,7 +333,7 @@ class GUIInsExpDirDet ( QtGui.QWidget ) :
             cp.guistatus.updateStatusInfo()
 
         if cp.guidarklist is not None :
-            cp.guidarklist.updateList()
+            cp.guidarklist.updateList(clearList)
 
         if cp.guifilemanagerselect is not None :
             cp.guifilemanagerselect.resetFields()

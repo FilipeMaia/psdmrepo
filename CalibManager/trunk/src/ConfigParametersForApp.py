@@ -42,10 +42,11 @@ class ConfigParametersForApp ( ConfigParameters ) :
 
     list_of_queues    = ['psnehq', 'psfehq', 'psanacsq']
     list_of_instr     = ['AMO', 'SXR', 'XPP', 'XCS', 'CXI', 'MEC']
-    list_of_show_runs = [ 'in range', 'all', 'dark']
+    list_of_show_runs = ['in range', 'dark', 'all']
     list_of_show_dets = ['any', 'selected any', 'selected all']
 
-    dict_bjpeds = {} # dictionary of BatchJobPedestals objects
+    dict_bjpeds = {} # dictionary of run_num:BatchJobPedestals objects
+    dict_guidarklistitem = {} # dictionary of run_num:GUIDarkListItem objects 
 
     def __init__ ( self, fname=None ) :
         """Constructor.
@@ -76,6 +77,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
         self.guifilemanagerselect = None 
         self.guigeometry       = None
         self.guimetrology      = None
+        self.dark_list         = None
 
 #-----------------------------
 

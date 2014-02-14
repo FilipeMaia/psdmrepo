@@ -11,6 +11,20 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-15
+2014-02-13 Mikhail S. Dubrovin
+- Generation of the large number of list items with embedded widget is slow in python.
+  Some optimization can be done if for each run number a single item and widget is generated once
+  and saved in the dictionary:
+  + the self.list in GUIDarkList now is treated as a singleton object
+  + all new item objects in the list are added once and saved in the dictionary run_num:(item,wigg)
+M       src/GUIInsExpDirDet.py
+M       src/GUIDarkListItemRun.py
+M       src/GUIDarkListItem.py
+M       src/ConfigParametersForApp.py
+M       src/GUIDarkControlBar.py
+M       src/GUIDarkList.py
+	
 Tag: V00-00-14
 2014-02-12 Mikhail S. Dubrovin
 - add run range in GUIDarkControlBar to speed-up generation of list gui in GUIDarkList 

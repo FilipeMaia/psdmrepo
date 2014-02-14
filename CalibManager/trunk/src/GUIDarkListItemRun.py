@@ -58,6 +58,7 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
         #self.list_of_runs   = None
         self.parent = parent
 
+        self.run_number     = int(str_run_number) # int run number
         self.str_run_number = str_run_number # cp.str_run_number
         self.str_run_type   = str_run_type   # cp.str_run_number
         self.str_run_from   = str_run_number # cp.str_run_from
@@ -121,12 +122,12 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
     def create_or_use_butch_object(self) :
         """Creates BatchJobPedestals object for the 1st time or use existing in the dictionary
         """
-        if self.str_run_number in self.dict_bjpeds.keys() :
+        if self.run_number in self.dict_bjpeds.keys() :
             #print 'Use existing BatchJobPedestals object for run %s' % self.str_run_number
-            self.bjpeds = self.dict_bjpeds[self.str_run_number]
+            self.bjpeds = self.dict_bjpeds[self.run_number]
         else :
             #print 'Create new BatchJobPedestals object for run %s' % self.str_run_number
-            self.bjpeds = self.dict_bjpeds[self.str_run_number] = BatchJobPedestals(parent=self) 
+            self.bjpeds = self.dict_bjpeds[self.run_number] = BatchJobPedestals(parent=self) 
 
 
     def showToolTips(self):
@@ -384,6 +385,12 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
 
         return list_of_deploy_commands
    
+
+    def update(self) :
+        #logger.info('update', __name__)
+        self.setFieldsEnabled(cp.det_name.value() != '')
+        self.setStatusStyleOfButtons()
+
 
 #-----------------------------
 
