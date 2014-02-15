@@ -80,7 +80,9 @@ ShmemMonitorClient::processDgram(Pds::Dgram* dg)
     std::copy(src, src+size, dst);
 
     // wrap into object and push into queue
-    XtcInput::Dgram dgobj(XtcInput::Dgram::make_ptr((Pds::Dgram*)dst), XtcInput::XtcFileName("<ShMem>"));
+    // need to create a large run number so shmem analysis can pick
+    // up the latest calibration constants.
+    XtcInput::Dgram dgobj(XtcInput::Dgram::make_ptr((Pds::Dgram*)dst), XtcInput::XtcFileName("<ShMem>",0,std::numeric_limits<short>::max()-1,0,0));
     m_queue.push(dgobj);
   }
 
