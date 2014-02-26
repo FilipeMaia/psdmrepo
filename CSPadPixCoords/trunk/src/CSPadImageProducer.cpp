@@ -44,8 +44,6 @@ using namespace std;
 
 namespace CSPadPixCoords {
 
-    typedef int16_t pixmap_cspad_t;
-
 
 //----------------
 // Constructors --
@@ -58,7 +56,6 @@ CSPadImageProducer::CSPadImageProducer (const std::string& name)
   , m_str_src()
   , m_inkey()
   , m_imgkey()
-//, m_outtype()
   , m_tiltIsApplied()
   , m_print_bits()
   , m_count(0)
@@ -70,7 +67,7 @@ CSPadImageProducer::CSPadImageProducer (const std::string& name)
   m_inkey         = configStr("key",           "");
   m_imgkey        = configStr("imgkey",        "image");
   m_fname_pixmap  = configStr("fname_pixmap",  "");
-//m_outtype       = configStr("outtype",       "float");
+  m_fname_pixnum  = configStr("fname_pixnum",  "");
   m_tiltIsApplied = config   ("tiltIsApplied", true);
   m_print_bits    = config   ("print_bits",    0);
 
@@ -103,7 +100,7 @@ CSPadImageProducer::printInputParameters()
         << "\nkey           : "     << m_inkey        
         << "\nimgkey        : "     << m_imgkey       
         << "\nfname_pixmap  : "     << m_fname_pixmap       
-      //<< "\nouttype       : "     << m_outtype
+        << "\nfname_pixnum  : "     << m_fname_pixnum 
         << "\ntiltIsApplied : "     << m_tiltIsApplied
         << "\nprint_bits    : "     << m_print_bits
         << "\n";     
@@ -277,7 +274,9 @@ CSPadImageProducer::cspadImgActivePixelMask(Env& env)
 {
         const unsigned shape[] = {NY_CSPAD,NX_CSPAD};
         ndarray<pixmap_cspad_t,2> pixmap_2da(shape);
+        ndarray<pixnum_cspad_t,2> pixnum_2da(shape);
         std::fill(pixmap_2da.begin(), pixmap_2da.end(), pixmap_cspad_t(0));    
+        std::fill(pixnum_2da.begin(), pixnum_2da.end(), pixnum_cspad_t(-1));    
         //std::fill_n(img_nda.data(), int(IMG_SIZE), mask_cspad_t(0));    
 
 	int ix=0; int iy=0;
@@ -286,15 +285,23 @@ CSPadImageProducer::cspadImgActivePixelMask(Env& env)
                ix = m_coor_x_int[pix];
                iy = m_coor_y_int[pix];
 	       pixmap_2da[ix][iy] = 1;
+	       pixnum_2da[ix][iy] = pix;
 	}
 
         save2DArrayInEnv<pixmap_cspad_t>(env, m_src, pixmap_2da);
+        save2DArrayInEnv<pixnum_cspad_t>(env, m_src, pixnum_2da);
 
-        if( m_fname_pixmap.empty() ) return;
+        if( ! m_fname_pixmap.empty() ) {
+          const std::string msg = "Save active pixel map in file: " + m_fname_pixmap;
+          MsgLog(name(), info, msg );
+	  save2DArrayInFile<pixmap_cspad_t>(m_fname_pixmap, pixmap_2da, m_print_bits&32);
+	}
 
-        const std::string msg = "Save active pixel map in file: " + m_fname_pixmap;
-        MsgLog(name(), info, msg );
-	save2DArrayInFile<pixmap_cspad_t>(m_fname_pixmap, pixmap_2da, m_print_bits&32);
+        if( ! m_fname_pixnum.empty() ) {
+          const std::string msg = "Save enumerated pixel map in file: " + m_fname_pixnum;
+          MsgLog(name(), info, msg );
+	  save2DArrayInFile<pixnum_cspad_t>(m_fname_pixnum, pixnum_2da, m_print_bits&32);
+	}
 }
 
 //--------------------

@@ -77,6 +77,10 @@ namespace CSPadPixCoords {
  *
  *  @author Mikhail S. Dubrovin
  */
+    
+typedef int16_t pixmap_cspad_t;
+typedef int32_t pixnum_cspad_t;
+
 
 class CSPadImageProducer : public Module {
 public:
@@ -145,6 +149,7 @@ private:
   std::string m_inkey; 
   std::string m_imgkey;         
   std::string m_fname_pixmap;
+  std::string m_fname_pixnum;
   std::string m_outtype;
   bool     m_tiltIsApplied;
   unsigned m_print_bits;

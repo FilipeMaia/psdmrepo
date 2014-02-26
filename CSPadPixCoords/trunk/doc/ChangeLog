@@ -11,9 +11,13 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-18
+2014-02-26 Mikhail S. Dubrovin
+- in CSPadImageProducer add saving in env.calibStore the image-size map of enumerated pixels of type int32_t
+
 Tag: V00-03-17
 2014-02-25 Mikhail S. Dubrovin
-- in CSPadImageProducer add saving in env.calibStore the image-size map of active pixels
+- in CSPadImageProducer add saving in env.calibStore the image-size map of active pixels of type int16_t
 - in GlobalMethods.h add save2DArrayInFile, save2DArrayInEnv
 
 Tag: V00-03-16
