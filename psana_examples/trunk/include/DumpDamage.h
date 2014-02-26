@@ -35,6 +35,8 @@
 
 namespace psana_examples {
 
+/// @addtogroup psana_examples
+
 /**
  *  @ingroup psana_examples
  *
