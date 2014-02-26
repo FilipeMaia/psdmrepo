@@ -86,6 +86,7 @@ public:
   enum { NCols2x1     = Psana::CsPad::ColumnsPerASIC     };  // 185
   enum { NRows2x1     = Psana::CsPad::MaxRowsPerASIC * 2 };  // 388
   enum { SizeOf2x1Arr = NRows2x1 * NCols2x1              };  // 185*388;
+  const static uint32_t ARR_SIZE=32*SizeOf2x1Arr;
 
   /// Default constructor
   CSPadImageProducer (const std::string& name) ;
@@ -124,6 +125,7 @@ protected:
   void procEvent(Event& evt, Env& env);
   void getCSPadConfigFromData(Event& evt);
   void checkTypeImplementation();
+  void cspadImgActivePixelMask(Env& env);
 
   //void cspad_image_init();
   //void cspad_image_fill(const int16_t* data, CSPadPixCoords::QuadParameters* quadpars, PSCalib::CSPadCalibPars *cspad_calibpar);
@@ -141,7 +143,8 @@ private:
   Source      m_source;         // Data source set from config file
   Pds::Src    m_src;
   std::string m_inkey; 
-  std::string m_imgkey;   // i.e. "CSPad:Image"
+  std::string m_imgkey;         
+  std::string m_fname_pixmap;
   std::string m_outtype;
   bool     m_tiltIsApplied;
   unsigned m_print_bits;
@@ -169,12 +172,19 @@ private:
   uint32_t  *m_coor_x_int;
   uint32_t  *m_coor_y_int;
 
-  enum{ NX_QUAD=850, 
-        NY_QUAD=850 };
+  const static int NX_QUAD=850;
+  const static int NY_QUAD=850;
 
-  enum{ NX_CSPAD=1750, 
-        NY_CSPAD=1750,
-        IMG_SIZE=NX_CSPAD*NY_CSPAD };
+  const static int NX_CSPAD=1750;
+  const static int NY_CSPAD=1750;
+  const static uint32_t IMG_SIZE=NX_CSPAD*NY_CSPAD;
+
+  //enum{ NX_QUAD=850, 
+  //      NY_QUAD=850 };
+
+  //enum{ NX_CSPAD=1750, 
+  //      NY_CSPAD=1750,
+  //      IMG_SIZE=NX_CSPAD*NY_CSPAD };
 
   //double m_arr_cspad_image[NX_CSPAD][NY_CSPAD];
 

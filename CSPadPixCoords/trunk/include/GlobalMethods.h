@@ -64,6 +64,8 @@ using namespace std;
 
 enum DATA_TYPE {FLOAT, DOUBLE, SHORT, UNSIGNED, INT, INT16, INT32, UINT, UINT8, UINT16, UINT32};
 
+enum FILE_MODE {BINARY, TEXT, TIFF, PNG};
+
 
 class GlobalMethods  {
 public:
@@ -132,6 +134,15 @@ private:
   }
 
 //--------------------
+// Save 2-D array in environment
+  template <typename T>
+  void save2DArrayInEnv(PSEnv::Env& env, const Pds::Src& src, const ndarray<T,2>& ndarr)
+  {
+    boost::shared_ptr< ndarray<T,2> > shp( new ndarray<T,2>(ndarr) );
+    env.calibStore().put(shp, src);
+  }
+
+//--------------------
 // Save 2-D array in event
   template <typename T>
   void save2DArrayInEvent(PSEvt::Event& evt, const Pds::Src& src, const std::string& key, const ndarray<T,2>& ndarr)
@@ -140,13 +151,14 @@ private:
     evt.put(shp, src, key);
   }
 
-// or its copy
+// or its alias
 
   template <typename T>
   void save2DArrInEvent(PSEvt::Event& evt, const Pds::Src& src, const std::string& key, const ndarray<T,2>& ndarr)
   {
-    boost::shared_ptr< ndarray<T,2> > shp( new ndarray<T,2>(ndarr) );
-    evt.put(shp, src, key);
+    save2DArrayInEvent<T>(evt, src, key, ndarr);
+    //boost::shared_ptr< ndarray<T,2> > shp( new ndarray<T,2>(ndarr) );
+    //evt.put(shp, src, key);
   }
 
 //-------------------
@@ -164,6 +176,51 @@ private:
   {
       boost::shared_ptr< ndarray<T,3> > shp( new ndarray<T,3>(ndarr) );
       evt.put(shp, src, key);
+  }
+
+//--------------------
+/// Save ndarray in file
+  template <typename T>
+  void save2DArrayInFile(const std::string& fname, const ndarray<T,2>& ndarr, bool print_msg, FILE_MODE file_type=TEXT)
+  {  
+    if (fname.empty()) {
+      MsgLog("GlobalMethods", warning, "The output file name is empty. 2-d array is not saved.");
+      return;
+    }
+
+    if( print_msg ) MsgLog("GlobalMethods", info, "Save 2-d array in file " << fname.c_str() << " file type:" << strOfDataTypeAndSize<T>());
+
+    const unsigned* shape = ndarr.shape();
+    const unsigned rows = shape[0]; 
+    const unsigned cols = shape[1];
+    const T* arr = ndarr.data();
+
+    //======================
+    if (file_type == TEXT) {
+        std::ofstream out(fname.c_str()); 
+        out << std::setprecision(9); // << std::setw(8) << std::setprecision(0) << std::fixed 
+              for (unsigned r = 0; r != rows; ++r) {
+                for (unsigned c = 0; c != cols; ++c) {
+                  out << arr[r*cols + c] << ' ';
+                }
+                out << '\n';
+              }
+        out.close();
+        return; 
+    }
+
+    //======================
+    if (file_type == BINARY) {
+        std::ios_base::openmode mode = std::ios_base::out | std::ios_base::binary;
+        std::ofstream out(fname.c_str(), mode);
+        //out.write(reinterpret_cast<const char*>(arr), rows*cols*sizeof(T));
+        for (unsigned r = 0; r != rows; ++r) {
+          const T* data = &arr[r*cols];
+          out.write(reinterpret_cast<const char*>(data), cols*sizeof(T));
+        }
+        out.close();
+        return; 
+    }
   }
 
 //--------------------

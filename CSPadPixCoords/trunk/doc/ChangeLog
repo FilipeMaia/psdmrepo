@@ -11,6 +11,11 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-17
+2014-02-25 Mikhail S. Dubrovin
+- in CSPadImageProducer add saving in env.calibStore the image-size map of active pixels
+- in GlobalMethods.h add save2DArrayInFile, save2DArrayInEnv
+
 Tag: V00-03-16
 2014-01-08 Mikhail S. Dubrovin
 - in CSPad2x2NDArrProducer and CSPadNDArrProducer add parameter is_2darray

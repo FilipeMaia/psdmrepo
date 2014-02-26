@@ -25,6 +25,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "PSEvt/EventId.h"
+//#include "ImgAlgos/GlobalMethods.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -42,6 +43,9 @@ using namespace std;
 //		----------------------------------------
 
 namespace CSPadPixCoords {
+
+    typedef int16_t pixmap_cspad_t;
+
 
 //----------------
 // Constructors --
@@ -65,6 +69,7 @@ CSPadImageProducer::CSPadImageProducer (const std::string& name)
   m_str_src       = configStr("source",        "CxiDs1.0:Cspad.0");
   m_inkey         = configStr("key",           "");
   m_imgkey        = configStr("imgkey",        "image");
+  m_fname_pixmap  = configStr("fname_pixmap",  "");
 //m_outtype       = configStr("outtype",       "float");
   m_tiltIsApplied = config   ("tiltIsApplied", true);
   m_print_bits    = config   ("print_bits",    0);
@@ -97,6 +102,7 @@ CSPadImageProducer::printInputParameters()
         << "\nsource        : "     << m_source      
         << "\nkey           : "     << m_inkey        
         << "\nimgkey        : "     << m_imgkey       
+        << "\nfname_pixmap  : "     << m_fname_pixmap       
       //<< "\nouttype       : "     << m_outtype
         << "\ntiltIsApplied : "     << m_tiltIsApplied
         << "\nprint_bits    : "     << m_print_bits
@@ -122,6 +128,7 @@ CSPadImageProducer::beginRun(Event& evt, Env& env)
 {
   getConfigPars(env);     // get m_src
   getCalibPars(evt, env); // use m_src
+  cspadImgActivePixelMask(env);
 }
 
 //--------------------
@@ -265,5 +272,31 @@ CSPadImageProducer::checkTypeImplementation()
 }
 
 //--------------------
+void 
+CSPadImageProducer::cspadImgActivePixelMask(Env& env) 
+{
+        const unsigned shape[] = {NY_CSPAD,NX_CSPAD};
+        ndarray<pixmap_cspad_t,2> pixmap_2da(shape);
+        std::fill(pixmap_2da.begin(), pixmap_2da.end(), pixmap_cspad_t(0));    
+        //std::fill_n(img_nda.data(), int(IMG_SIZE), mask_cspad_t(0));    
 
+	int ix=0; int iy=0;
+        for(uint32_t pix=0; pix<ARR_SIZE; pix++)
+        {
+               ix = m_coor_x_int[pix];
+               iy = m_coor_y_int[pix];
+	       pixmap_2da[ix][iy] = 1;
+	}
+
+        save2DArrayInEnv<pixmap_cspad_t>(env, m_src, pixmap_2da);
+
+        if( m_fname_pixmap.empty() ) return;
+
+        const std::string msg = "Save active pixel map in file: " + m_fname_pixmap;
+        MsgLog(name(), info, msg );
+	save2DArrayInFile<pixmap_cspad_t>(m_fname_pixmap, pixmap_2da, m_print_bits&32);
+}
+
+//--------------------
+ 
 } // namespace CSPadPixCoords
