@@ -1,0 +1,28 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  README file for package PSXtcMPInput
+#------------------------------------------------------------------------
+
+Package author: Andy Salnikov
+
+Brief description:
+==================
+
+This package contains a bunch of psana input modules which are used by
+multi-process psana:
+
+XtcMPMasterInput
+	input module for master process, reads the data from XTC files 
+	and sends datagrams to clients
+	
+ShmemMPMasterInput
+	input module for master process, reads XTC data from shared memory
+	and sends datagrams to clients
+
+XtcMPWorkerInput
+	input module for worker processes, receives data sent by the two 
+	above modules
+	
