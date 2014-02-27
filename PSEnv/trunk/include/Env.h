@@ -109,7 +109,7 @@ public:
   
   /// Returns combination of job name and subprocess index as a string
   /// which is unique for all subprocesses in a job..
-  const std::string& jobNameSub() const;
+  const std::string& jobNameSub() const { return m_jobNameSub; }
 
   /// Returns instrument name
   const std::string& instrument() const { return m_expNameProvider->instrument(); }

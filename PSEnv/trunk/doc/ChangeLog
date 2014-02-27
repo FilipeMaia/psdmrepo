@@ -11,10 +11,14 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-13-01
+2014-02-27 Andy Salnikov
+- forgot to implement PSEnv::jobNameSub()
+
 Tag: V00-13-00
 2014-02-26 Andy Salnikov
 - preparing for multi-process psana
-  - Env now has subprocess() and jobNamSub() methods
+  - Env now has subprocess() and jobNameSub() methods
   - Env constructor takes subprocess id as an argument
 
 Tag: V00-12-00
