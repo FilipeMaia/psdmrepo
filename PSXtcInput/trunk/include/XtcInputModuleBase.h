@@ -14,8 +14,6 @@
 // C/C++ Headers --
 //-----------------
 #include <vector>
-#include <boost/thread/thread.hpp>
-#include <boost/scoped_ptr.hpp>
 #include <boost/shared_ptr.hpp>
 
 //----------------------
@@ -26,20 +24,15 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "XtcInput/Dgram.h"
+#include "PSXtcInput/DamagePolicy.h"
+#include "PSXtcInput/IDatagramSource.h"
 #include "psddl_pds2psana/XtcConverter.h"
 #include "pdsdata/xtc/TransitionId.hh"
 #include "pdsdata/xtc/ClockTime.hh"
-#include "pdsdata/xtc/Damage.hh"
-#include "pdsdata/xtc/TypeId.hh"
 
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
-namespace XtcInput {
-  class DgramQueue;
-}
-
 
 //		---------------------
 // 		-- Class Interface --
@@ -63,8 +56,18 @@ namespace PSXtcInput {
 class XtcInputModuleBase : public InputModule {
 public:
 
-  /// Constructor takes the name of the module.
-  XtcInputModuleBase (const std::string& name) ;
+  /**
+   *  @brief Constructor takes the name of the module and instance of datagram source.
+   *
+   *  If noSkip parameter is set to true then psana parameters "skip-events", "events",
+   *  "skip-epics" and "l3t-accept-only" are ignored. This is intended for use with
+   *  slave worker process in multi-process mode where all skipping is done on master
+   *  side.
+   *
+   */
+  XtcInputModuleBase (const std::string& name,
+      const boost::shared_ptr<IDatagramSource>& dgsource,
+      bool noSkip = false);
 
   // Destructor
   virtual ~XtcInputModuleBase () ;
@@ -92,22 +95,11 @@ protected:
   /// Fill environment with datagram contents
   void fillEnv(const XtcInput::Dgram& dg, Env& env);
   
-  /// determines if an xtc type should be stored in the event
-  bool eventDamagePolicy(Pds::Damage damage, enum Pds::TypeId::Type typeId);
-
-  /// determines if an xtc type should be stored in the config
-  bool configDamagePolicy(Pds::Damage damage);
-
 private:
 
-  // Initialization method for external datagram source
-  virtual void initDgramSource() = 0;
-
-  // Get the next datagram from some external source
-  virtual XtcInput::Dgram nextDgram() = 0;
-
-  // Data members
-  XtcInput::Dgram m_putBack;                          ///< Buffer for one put-back datagram
+  boost::shared_ptr<IDatagramSource> m_dgsource;      ///< Datagram source instance
+  DamagePolicy m_damagePolicy;                        ///< Policy instance for damage data
+  std::vector<XtcInput::Dgram> m_putBack;             ///< Buffer for put-back datagrams
   psddl_pds2psana::XtcConverter m_cvt;                ///< Data converter object
   Pds::ClockTime m_transitions[Pds::TransitionId::NumberOf];  ///< Timestamps of the observed transitions
   unsigned long m_skipEvents;                         ///< Number of events (L1Accept transitions) to skip
@@ -116,9 +108,6 @@ private:
   bool m_l3tAcceptOnly;                               ///< If true then pass only events accepted by L3T
   unsigned long m_l1Count;                            ///< Number of events (L1Accept transitions) seen so far
   int m_simulateEOR;                                  ///< if non-zero then simulate endRun/stop
-  bool m_storeOutOfOrderDamage;                       ///< if false, do not parse Xtc Type, just report damage
-  bool m_storeUserEbeamDamage;                        ///< if true, make exception for user damage if for Ebeam
-  bool m_storeDamagedConfig;                          ///< if true, store damaged config
 };
 
 } // namespace PSXtcInput

@@ -75,6 +75,24 @@ public:
 
 };
 
+// thrown for unexpected input
+class UnexpectedInput : public Exception {
+public:
+
+  UnexpectedInput(const ErrSvc::Context& ctx)
+    : Exception( ctx, "UnexpectedInput", "Number of datagrams received from source is not expected" ) {}
+
+};
+
+/// Exception class which extracts error info from errno.
+class ExceptionErrno : public Exception {
+public:
+
+  /// Constructor takes the reason for an exception
+  ExceptionErrno ( const ErrSvc::Context& ctx, const std::string& what ) ;
+
+};
+
 } // namespace PSXtcInput
 
 #endif // PSXTCINPUT_EXCEPTIONS_H

@@ -18,6 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <cerrno>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -40,6 +41,11 @@ Exception::Exception (const ErrSvc::Context& ctx,
                       const std::string& className, 
                       const std::string& what)
   : ErrSvc::Issue(ctx, className+": "+what)
+{
+}
+
+ExceptionErrno::ExceptionErrno ( const ErrSvc::Context& ctx, const std::string& what )
+  : Exception( ctx, "ExceptionErrno", what + ": " + std::strerror(errno) )
 {
 }
 

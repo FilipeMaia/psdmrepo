@@ -11,6 +11,16 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-12-00
+2014-02-26 Andy Salnikov
+- some redesign/refactoring to simplify multi-process psana implementation
+- new concept of datagram source and new interface for it (IDatagramSource)
+- XtcInputModuleBase now uses IDatagramSource to abstract datagram iteration
+- damage policy code moved to a separate class (DamagePolicy) which can
+  be reused by other modules
+- DgramSourceFile is an implementation of IDatagramSource which reads data 
+  from XTC files (actually from datagram reader queue)
+
 Tag: V00-11-00
 2014-01-13 Andy Salnikov
 - alias support: input module fills alias map 

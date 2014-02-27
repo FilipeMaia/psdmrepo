@@ -22,6 +22,7 @@
 #include <iterator>
 #include <vector>
 #include <boost/make_shared.hpp>
+#include <boost/foreach.hpp>
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -50,26 +51,32 @@ using namespace XtcInput;
 namespace {
 
 
-  // return true if container contains EPICS data only
-  bool epicsOnly(Pds::Xtc* xtc)
+  // return true if all datagrams contains EPICS data only
+  bool epicsOnly(const std::vector<XtcInput::Dgram>& dgs)
   {
-    XtcInput::XtcIterator iter(xtc);
-    while (Pds::Xtc* x = iter.next()) {
-      switch (x->contains.id()) {
-      case Pds::TypeId::Id_Xtc:
-      case Pds::TypeId::Id_Epics:
-        continue;
-      default:
-        return false;
+    BOOST_FOREACH(const XtcInput::Dgram& dg, dgs) {
+      XtcInput::XtcIterator iter(&(dg.dg()->xtc));
+      while (Pds::Xtc* x = iter.next()) {
+        switch (x->contains.id()) {
+        case Pds::TypeId::Id_Xtc:
+        case Pds::TypeId::Id_Epics:
+          continue;
+        default:
+          return false;
+        }
       }
     }
     return true;
   }
 
   // return true if event passed L3 selection (of there was no L3 defined)
-  bool l3accept(const Pds::Dgram& dg)
+  bool l3accept(const std::vector<XtcInput::Dgram>& dgs)
   {
-    return not static_cast<const Pds::L1AcceptEnv&>(dg.env).trimmed();
+    // if at least one is not trimmed then we accept all
+    BOOST_FOREACH(const XtcInput::Dgram& dg, dgs) {
+      if (not static_cast<const Pds::L1AcceptEnv&>(dg.dg()->env).trimmed()) return true;
+    }
+    return false;
   }
 
 }
@@ -85,66 +92,30 @@ namespace PSXtcInput {
 //----------------
 // Constructors --
 //----------------
-XtcInputModuleBase::XtcInputModuleBase (const std::string& name)
+XtcInputModuleBase::XtcInputModuleBase (const std::string& name,
+    const boost::shared_ptr<IDatagramSource>& dgsource, bool noSkip)
   : InputModule(name)
+  , m_dgsource(dgsource)
+  , m_damagePolicy()
   , m_putBack()
   , m_cvt()
   , m_skipEvents(0)
   , m_maxEvents(0)
-  , m_skipEpics(false)
+  , m_skipEpics(true)
   , m_l3tAcceptOnly(true)
   , m_l1Count(0)
   , m_simulateEOR(0)
 {
   std::fill_n(m_transitions, int(Pds::TransitionId::NumberOf), Pds::ClockTime(0, 0));
 
-  // get number of events to process/skip from psana configuration
-  ConfigSvc::ConfigSvc cfg = configSvc();
-  m_skipEvents = cfg.get("psana", "skip-events", 0UL);
-  m_maxEvents = cfg.get("psana", "events", 0UL);
-  m_skipEpics = cfg.get("psana", "skip-epics", true);
-  m_storeOutOfOrderDamage = cfg.get("psana", "store-out-of-order-damage", false); 
-  m_storeUserEbeamDamage = cfg.get("psana", "store-user-ebeam-damage", true); 
-  m_storeDamagedConfig = cfg.get("psana", "store-damaged-config", false); 
-  m_l3tAcceptOnly = cfg.get("psana", "l3t-accept-only", true);
-}
-
-// return true if damage/type combo is good to store, false if we don't want it going in event.
-// note - always returns True for undamaged types, but we do not store all undamaged types (such as Xtc).
-bool XtcInputModuleBase::eventDamagePolicy(Pds::Damage damage, enum Pds::TypeId::Type typeId) {
-  if (damage.value() == 0) return true;
-
-  MsgLog(name(),debug,"eventDamagePolicy: nonzero damage=" << std::hex << damage.value() 
-         << " typeId=" << std::dec <<  typeId << " " << Pds::TypeId::name(typeId));
-
-  bool userDamageBitSet = (damage.value() & (1<<Pds::Damage::UserDefined));
-  uint32_t otherDamageBits = (damage.bits() & (~(1<<Pds::Damage::UserDefined)));
-  bool userDamageByteSet = damage.userBits();
-
-  if (not userDamageBitSet and userDamageByteSet) {
-    MsgLog(name(),warning,"UserDefined damage bit is *not* set but user bits are present: damage=" 
-           << std::hex << damage.value() << " typeId=" << typeId << Pds::TypeId::name(typeId));
-    return false;
+  if (not noSkip) {
+    // get number of events to process/skip from psana configuration
+    ConfigSvc::ConfigSvc cfg = configSvc();
+    m_skipEvents = cfg.get("psana", "skip-events", 0UL);
+    m_maxEvents = cfg.get("psana", "events", 0UL);
+    m_skipEpics = cfg.get("psana", "skip-epics", true);
+    m_l3tAcceptOnly = cfg.get("psana", "l3t-accept-only", true);
   }
-
-  bool userDamageOk = ((not userDamageBitSet and not userDamageByteSet) or 
-                       (userDamageBitSet and (typeId==Pds::TypeId::Id_EBeam) and m_storeUserEbeamDamage));
-  
-  bool onlyOutOfOrderInOtherBits = otherDamageBits == (1<<Pds::Damage::OutOfOrder);
-  if (userDamageOk) {
-    if (otherDamageBits == 0) return true;
-    if ((onlyOutOfOrderInOtherBits) and m_storeOutOfOrderDamage) return true;
-  }
-  MsgLog(name(),debug,"eventDamagePolicy: do not store, userDamageOk=" << userDamageOk 
-         << " only OutOfOrder in other bits=" << onlyOutOfOrderInOtherBits
-         << " store out of order=" <<m_storeOutOfOrderDamage);
-
-  return false;
-}
-
-bool XtcInputModuleBase::configDamagePolicy(Pds::Damage damage) {
-  if (damage.value() == 0 or m_storeDamagedConfig) return true;
-  return false;
 }
 
 //--------------
@@ -161,37 +132,61 @@ XtcInputModuleBase::beginJob(Event& evt, Env& env)
   MsgLog(name(), debug, name() << ": in beginJob()");
 
   // call initialization method for external datagram source
-  this->initDgramSource();
+  m_dgsource->init();
 
   // try to read first event and see if it is a Configure transition
-  XtcInput::Dgram dg(this->nextDgram());
-  if (dg.empty()) {
+  std::vector<XtcInput::Dgram> eventDg;
+  std::vector<XtcInput::Dgram> nonEventDg;
+  if (not m_dgsource->next(eventDg, nonEventDg)) {
     // Nothing there at all, this is unexpected
     throw EmptyInput(ERR_LOC);
   }
   
-  Dgram::ptr dgptr = dg.dg();
+  // for now we only expect one event datagram, can't handle other cases yet
+  if (eventDg.size() != 1 or not nonEventDg.empty()) {
+    throw UnexpectedInput(ERR_LOC);
+  }
 
-  MsgLog(name(), debug, name() << ": read first datagram, transition = "
-        << Pds::TransitionId::name(dgptr->seq.service()));
+  // push non-event stuff to environment
+  // usually first transition (Configure) should not have any non-event attached data
+  BOOST_FOREACH(const XtcInput::Dgram& dg, nonEventDg) {
+    fillEnv(dg, env);
+  }
 
-  if ( dgptr->seq.service() != Pds::TransitionId::Configure ) {
-    // Something else than Configure, store if for event()
-    MsgLog(name(), warning, "Expected Configure transition for first datagram, received "
-           << Pds::TransitionId::name(dgptr->seq.service()) );
-    m_putBack = dg;
-    return;
+  bool first = true;
+  BOOST_FOREACH(const XtcInput::Dgram& dg, eventDg) {
+
+    XtcInput::Dgram::ptr dgptr = dg.dg();
+
+    if (first) {
+      // we expect Configure here, anything else must be handled in event(0
+      MsgLog(name(), debug, name() << ": read first datagram, transition = "
+            << Pds::TransitionId::name(dgptr->seq.service()));
+
+      if (dgptr->seq.service() != Pds::TransitionId::Configure) {
+        // Something else than Configure, store if for event()
+        MsgLog(name(), warning, "Expected Configure transition for first datagram, received "
+               << Pds::TransitionId::name(dgptr->seq.service()) );
+        m_putBack = eventDg;
+        return;
+      }
+
+      m_transitions[dgptr->seq.service()] = dgptr->seq.clock();
+
+      // TODO: we only store one datagram in event, for multiple datagrams we need to review our model
+      fillEventDg(dg, evt);
+      fillEventId(dg, evt);
+    }
+
+    // Store configuration info in the environment
+    fillEnv(dg, env);
+
+    // there is BLD data in Configure which is event-like data
+    fillEvent(dg, evt, env);
+
+    first = false;
   }
   
-  m_transitions[dgptr->seq.service()] = dgptr->seq.clock();
-  
-  // Store configuration info in the environment
-  fillEnv(dg, env);
-  fillEventDg(dg, evt);
-  fillEventId(dg, evt);
-  // there is BLD data in Configure which is event-like data
-  fillEvent(dg, evt, env);
-
 }
 
 InputModule::Status 
@@ -204,8 +199,10 @@ XtcInputModuleBase::event(Event& evt, Env& env)
   if (m_simulateEOR > 0) {
     // fake EndRun, prepare to stop on next call
     MsgLog(name(), debug, name() << ": simulated EOR");
-    fillEventId(m_putBack, evt);
-    fillEventDg(m_putBack, evt);
+    if (m_putBack.size()) {
+      fillEventId(m_putBack[0], evt);
+      fillEventDg(m_putBack[0], evt);
+    }
     // negative means stop at next call
     m_simulateEOR = -1;
     return EndRun;
@@ -219,27 +216,44 @@ XtcInputModuleBase::event(Event& evt, Env& env)
   bool found = false;
   while (not found) {
 
+
+    std::vector<XtcInput::Dgram> eventDg;
+    std::vector<XtcInput::Dgram> nonEventDg;
+
     // get datagram either from saved event or queue
-    XtcInput::Dgram dg;
     if (not m_putBack.empty()) {
-      dg = m_putBack;
-      m_putBack = Dgram();
+
+      std::swap(eventDg, m_putBack);
+      m_putBack.clear();
+
     } else {
-      dg = this->nextDgram();
-    }
-  
-    if (dg.empty()) {
-      // finita
-      MsgLog(name(), debug, "EOF seen");
-      return Stop;
+
+      if (not m_dgsource->next(eventDg, nonEventDg)) {
+        // finita
+        MsgLog(name(), debug, "EOF seen");
+        return Stop;
+      }
+
     }
 
+    // push all non-event stuff into environment
+    BOOST_FOREACH(const XtcInput::Dgram& dg, nonEventDg) {
+      fillEnv(dg, env);
+    }
 
-    const Pds::Sequence& seq = dg.dg()->seq ;
-    const Pds::ClockTime& clock = seq.clock() ;
+    if (eventDg.empty()) {
+      // can't do anything, skip to next transition
+      continue;
+    }
+
+    // TODO: here we assume that all datagrams in eventDg come from the same
+    // transition so they have same timestamp and transition id. May be worth
+    // checking it later.
+    const Pds::Sequence& seq = eventDg.front().dg()->seq;
+    const Pds::ClockTime& clock = seq.clock();
     Pds::TransitionId::Value trans = seq.service();
 
-    MsgLog(name(), debug, name() << ": found new datagram, transition = "
+    MsgLog(name(), debug, name() << ": found " << eventDg.size() << " new datagram(s), transition = "
           << Pds::TransitionId::name(trans));
 
     switch (trans) {
@@ -248,7 +262,9 @@ XtcInputModuleBase::event(Event& evt, Env& env)
       if (not (clock == m_transitions[trans])) {
         MsgLog(name(), warning, name() << ": Multiple Configure transitions encountered");
         m_transitions[trans] = clock;
-        fillEnv(dg, env);
+        BOOST_FOREACH(const XtcInput::Dgram& dg, eventDg) {
+          fillEnv(dg, env);
+        }
       }
       break;
       
@@ -258,8 +274,8 @@ XtcInputModuleBase::event(Event& evt, Env& env)
     case Pds::TransitionId::BeginRun:
       // signal new run, content is not relevant
       if (not (clock == m_transitions[trans])) {
-        fillEventId(dg, evt);
-        fillEventDg(dg, evt);
+        fillEventId(eventDg.front(), evt);
+        fillEventDg(eventDg.front(), evt);
         status = BeginRun;
         found = true;
         m_transitions[trans] = clock;
@@ -269,8 +285,8 @@ XtcInputModuleBase::event(Event& evt, Env& env)
     case Pds::TransitionId::EndRun:
       // signal end of run, content is not relevant
       if (not (clock == m_transitions[trans])) {
-        fillEventId(dg, evt);
-        fillEventDg(dg, evt);
+        fillEventId(eventDg.front(), evt);
+        fillEventDg(eventDg.front(), evt);
         status = EndRun;
         found = true;
         m_transitions[trans] = clock;
@@ -280,9 +296,11 @@ XtcInputModuleBase::event(Event& evt, Env& env)
     case Pds::TransitionId::BeginCalibCycle:
       // copy config data and signal new calib cycle
       if (not (clock == m_transitions[trans])) {
-        fillEnv(dg, env);
-        fillEventId(dg, evt);
-        fillEventDg(dg, evt);
+        BOOST_FOREACH(const XtcInput::Dgram& dg, eventDg) {
+          fillEnv(dg, env);
+        }
+        fillEventId(eventDg.front(), evt);
+        fillEventDg(eventDg.front(), evt);
         status = BeginCalibCycle;
         found = true;
         m_transitions[trans] = clock;
@@ -292,8 +310,8 @@ XtcInputModuleBase::event(Event& evt, Env& env)
     case Pds::TransitionId::EndCalibCycle:
       // stop calib cycle
       if (not (clock == m_transitions[trans])) {
-        fillEventId(dg, evt);
-        fillEventDg(dg, evt);
+        fillEventId(eventDg.front(), evt);
+        fillEventDg(eventDg.front(), evt);
         status = EndCalibCycle;
         found = true;
         m_transitions[trans] = clock;
@@ -303,35 +321,41 @@ XtcInputModuleBase::event(Event& evt, Env& env)
     case Pds::TransitionId::L1Accept:
       // regular event
 
-      if (m_l3tAcceptOnly and not ::l3accept(*dg.dg())) {
+      if (m_l3tAcceptOnly and not ::l3accept(eventDg)) {
 
         // did not pass L3, its payload is usually empty but if there is Epics
         // data in the event it may be preserved, so try to save it
-        fillEnv(dg, env);
+        BOOST_FOREACH(const XtcInput::Dgram& dg, eventDg) {
+          fillEnv(dg, env);
+        }
 
-      } else if (m_skipEpics and ::epicsOnly(&(dg.dg()->xtc))) {
+      } else if (m_skipEpics and ::epicsOnly(eventDg)) {
 
         // datagram is likely filtered, has only epics data and users do not need to
         // see it. Do not count it as an event too, just save EPICS data and move on.
-        fillEnv(dg, env);
+        BOOST_FOREACH(const XtcInput::Dgram& dg, eventDg) {
+          fillEnv(dg, env);
+        }
 
       } else if (m_maxEvents and m_l1Count >= m_skipEvents+m_maxEvents) {
 
         // reached event limit, will go in simulated end-of-run
         MsgLog(name(), debug, name() << ": event limit reached, simulated EndCalibCycle");
-        fillEventId(dg, evt);
-        fillEventDg(dg, evt);
+        fillEventId(eventDg.front(), evt);
+        fillEventDg(eventDg.front(), evt);
         found = true;
         status = EndCalibCycle;
         m_simulateEOR = 1;
         // remember datagram to be used in simulated EndRun
-        m_putBack = dg;
+        m_putBack = eventDg;
 
       } else if (m_l1Count < m_skipEvents) {
 
         // skipping the events, note that things like environment and EPICS need to be updated
         MsgLog(name(), debug, name() << ": skipping event");
-        fillEnv(dg, env);
+        BOOST_FOREACH(const XtcInput::Dgram& dg, eventDg) {
+          fillEnv(dg, env);
+        }
         found = true;
         status = Skip;
 
@@ -339,10 +363,12 @@ XtcInputModuleBase::event(Event& evt, Env& env)
 
       } else {
 
-        fillEnv(dg, env);
-        fillEvent(dg, evt, env);
-        fillEventId(dg, evt);
-        fillEventDg(dg, evt);
+        BOOST_FOREACH(const XtcInput::Dgram& dg, eventDg) {
+          fillEnv(dg, env);
+          fillEvent(dg, evt, env);
+        }
+        fillEventId(eventDg.front(), evt);
+        fillEventDg(eventDg.front(), evt);
         found = true;
         status = DoEvent;
 
@@ -399,7 +425,7 @@ XtcInputModuleBase::fillEvent(const XtcInput::Dgram& dg, Event& evt, Env& env)
     for (unsigned idx=0; idx < convertTypeInfoPtrs.size(); ++idx) {
       (*damageMap)[PSEvt::EventKey( convertTypeInfoPtrs[idx], xtc->src, "") ] = damage;
     }
-    bool storeObject = eventDamagePolicy(damage, typeId.id());
+    bool storeObject = m_damagePolicy.eventDamagePolicy(damage, typeId.id());
     if (not storeObject) {
       MsgLog(name(),debug,name() << "damage = " << damage.value() << " typeId=" 
              << typeId.id() << " src=" << xtc->src << " not storing in Event");
