@@ -56,9 +56,11 @@ namespace PSEnv {
 Env::Env (const std::string& jobName,
     const boost::shared_ptr<IExpNameProvider>& expNameProvider,
     const std::string& calibDir,
-    const boost::shared_ptr<PSEvt::AliasMap>& aliasMap)
+    const boost::shared_ptr<PSEvt::AliasMap>& aliasMap,
+    int subproc)
   : m_fwkName("psana")
   , m_jobName(jobName)
+  , m_jobNameSub(jobName)
   , m_aliasMap(aliasMap)
   , m_cfgStore()
   , m_calibStore()
@@ -68,6 +70,7 @@ Env::Env (const std::string& jobName,
   , m_expNameProvider(expNameProvider)
   , m_calibDir(calibDir)
   , m_calibDirSetup(false)
+  , m_subproc(subproc)
 {
   // instantiate dictionary for config store and store itself
   boost::shared_ptr<PSEvt::ProxyDictHist> cfgDict(new PSEvt::ProxyDictHist(m_aliasMap));
@@ -80,6 +83,10 @@ Env::Env (const std::string& jobName,
   // make root file name
   std::string rfname = jobName + "-rhmgr.root";
   m_rhmgr.reset(new RootHistoManager::RootHMgr(rfname));
+
+  if (subproc >= 0) {
+    m_jobNameSub += boost::lexical_cast<std::string>(subproc);
+  }
 }
 
 //--------------

@@ -11,6 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-13-00
+2014-02-26 Andy Salnikov
+- preparing for multi-process psana
+  - Env now has subprocess() and jobNamSub() methods
+  - Env constructor takes subprocess id as an argument
+
 Tag: V00-12-00
 2014-01-13 Andy Salnikov
 - environment now keeps an optional instance of alias map which has to

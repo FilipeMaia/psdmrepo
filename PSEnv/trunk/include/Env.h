@@ -84,7 +84,8 @@ public:
   Env (const std::string& jobName,
       const boost::shared_ptr<IExpNameProvider>& expNameProvider,
       const std::string& calibDir,
-      const boost::shared_ptr<PSEvt::AliasMap>& aliasMap) ;
+      const boost::shared_ptr<PSEvt::AliasMap>& aliasMap,
+      int subproc) ;
 
   // Destructor
   ~Env () ;
@@ -106,6 +107,10 @@ public:
   /// Returns job name.
   const std::string& jobName() const { return m_jobName; }
   
+  /// Returns combination of job name and subprocess index as a string
+  /// which is unique for all subprocesses in a job..
+  const std::string& jobNameSub() const;
+
   /// Returns instrument name
   const std::string& instrument() const { return m_expNameProvider->instrument(); }
 
@@ -114,6 +119,10 @@ public:
 
   /// Returns experiment number or 0
   const unsigned expNum() const { return m_expNameProvider->expNum(); }
+
+  /// Returns sub-process number. In case of multi-processing job it will be a non-negative number
+  /// ranging from 0 to a total number of sub-processes. In case of single-process job it will return -1.
+  const int subprocess() const { return m_subproc; }
 
   /// Returns that name of the calibration directory for current
   /// instrument/experiment.
@@ -148,6 +157,7 @@ private:
   // Data members
   std::string m_fwkName;   ///< Framework name
   std::string m_jobName;   ///< Job name
+  std::string m_jobNameSub;   ///< Job name with sub-process index
   boost::shared_ptr<PSEvt::AliasMap> m_aliasMap;  ///< Alias map instance
   boost::shared_ptr<EnvObjectStore> m_cfgStore;   ///< Pointer to Configuration Store
   boost::shared_ptr<EnvObjectStore> m_calibStore;   ///< Pointer to Calibration Store
@@ -157,6 +167,7 @@ private:
   boost::shared_ptr<IExpNameProvider> m_expNameProvider; ///< Object which provides experiment and instrument names
   mutable std::string m_calibDir;              ///< Name of the calibration directory
   mutable bool m_calibDirSetup;                ///< Flag set to true after calibration directory name is fixed
+  int m_subproc;
   
 };
 
