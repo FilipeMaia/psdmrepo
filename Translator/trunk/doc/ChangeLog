@@ -11,6 +11,11 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-17
+2014-02-26 Andy
+- write-ndarray-to-h5-example.cpp: Env constructor argument have changed,
+  need to update the code for new interface
+
 Tag: V00-00-16
 2014-02-12 David Schneider
 - regenerate whole thing from psddldata V01-00-03 with psddl V00-13-06

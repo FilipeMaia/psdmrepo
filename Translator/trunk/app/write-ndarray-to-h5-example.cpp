@@ -49,7 +49,7 @@ int main() {
   boost::shared_ptr<PSEvt::ProxyDictI> proxyDict = boost::make_shared<PSEvt::ProxyDict>(amap);
   boost::shared_ptr<PSEvt::Event> evt = boost::make_shared<PSEvt::Event>(proxyDict);
   boost::shared_ptr<PSEnv::IExpNameProvider> expNameProvider;
-  boost::shared_ptr<PSEnv::Env> env = boost::make_shared<PSEnv::Env>("", expNameProvider, "", amap);
+  boost::shared_ptr<PSEnv::Env> env = boost::make_shared<PSEnv::Env>("", expNameProvider, "", amap, 0);
   MsgLog(logger, info, "loading event with ndarray");
   loadEvent(evt);
   boost::shared_ptr< ndarray<int,2> > myarray = evt->get(arrayKeyString);
