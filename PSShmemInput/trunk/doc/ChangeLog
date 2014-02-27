@@ -11,6 +11,13 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-00
+2014-02-26 Andy
+- refactoring for multi-process psana
+- datagram reading code is now in a separate class DgramSourceShmem
+  which implements IDatagramSource interface
+- ShmemInputModule becomes trivial
+
 Tag: V00-00-04
 2014-02-14 Christopher O'Grady
 - Changed default run number for Shmem input to a large number

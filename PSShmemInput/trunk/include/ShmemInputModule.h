@@ -14,8 +14,6 @@
 // C/C++ Headers --
 //-----------------
 #include <string>
-#include <boost/thread.hpp>
-#include <boost/scoped_ptr.hpp>
 
 //----------------------
 // Base Class Headers --
@@ -25,14 +23,10 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "XtcInput/Dgram.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
 //------------------------------------
-namespace XtcInput {
-  class DgramQueue;
-}
 
 //		---------------------
 // 		-- Class Interface --
@@ -99,15 +93,6 @@ public:
 protected:
 
 private:
-
-  // Initialization method for external datagram source
-  virtual void initDgramSource();
-
-  // Get the next datagram from some external source
-  virtual XtcInput::Dgram nextDgram();
-
-  boost::scoped_ptr<XtcInput::DgramQueue> m_dgQueue;  ///< Input datagram queue
-  boost::scoped_ptr<boost::thread> m_readerThread;    ///< Thread which does datagram reading
 
 };
 
