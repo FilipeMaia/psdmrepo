@@ -72,6 +72,7 @@ CSPadImageProducer::CSPadImageProducer (const std::string& name)
   m_print_bits    = config   ("print_bits",    0);
 
   m_source        = Source(m_str_src);
+  m_count_wornings= 0;
 
 //checkTypeImplementation();
 }
@@ -123,9 +124,7 @@ CSPadImageProducer::beginJob(Event& evt, Env& env)
 void 
 CSPadImageProducer::beginRun(Event& evt, Env& env)
 {
-  getConfigPars(env);     // get m_src
-  getCalibPars(evt, env); // use m_src
-  cspadImgActivePixelMask(env);
+  m_count_cfg = 0; 
 }
 
 //--------------------
@@ -143,9 +142,19 @@ CSPadImageProducer::beginCalibCycle(Event& evt, Env& env)
 void 
 CSPadImageProducer::event(Event& evt, Env& env)
 {
-  // this is how to gracefully stop analysis job
   ++m_count;
   if( m_print_bits & 2 ) printTimeStamp(evt, m_count);
+
+
+  if ( m_count_cfg==0 ) {
+      getConfigPars(env);     // get m_src, incriments m_count_cfg
+
+      if ( m_count_cfg==0 ) return; // skip event processing if configuration is missing
+
+      getCalibPars(evt, env); // use m_src
+      cspadImgActivePixelMask(env);
+  }
+
 
   struct timespec start, stop;
   int status = clock_gettime( CLOCK_REALTIME, &start ); // Get LOCAL time
@@ -194,7 +203,9 @@ CSPadImageProducer::getConfigPars(Env& env)
   if ( getQuadConfigParsForType<Psana::CsPad::ConfigV4>(env) ) return;
   if ( getQuadConfigParsForType<Psana::CsPad::ConfigV5>(env) ) return;
 
-  MsgLog(name(), warning, "CsPad::ConfigV2 - V5 is not available in this run.");
+  m_count_wornings++;
+  if (m_count_wornings < 20) MsgLog(name(), warning, "CsPad::ConfigV2 - V5 is not available in this run.");
+  if (m_count_wornings ==20) MsgLog(name(), warning, "STOP PRINTING WARNINGS !!!")
 }
 
 //--------------------

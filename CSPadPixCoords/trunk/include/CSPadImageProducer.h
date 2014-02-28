@@ -154,6 +154,8 @@ private:
   bool     m_tiltIsApplied;
   unsigned m_print_bits;
   long     m_count;
+  long     m_count_cfg;
+  long     m_count_wornings;
   DATA_TYPE   m_dtype;
 
   // Parameters form Psana::CsPad::ConfigV# object
@@ -210,6 +212,7 @@ private:
               m_roiMask[q]         = config->roiMask(q);
               m_numAsicsStored[q]  = config->numAsicsStored(q);
             }
+            m_count_cfg ++;
 	    return true;
 	}
 	return false;

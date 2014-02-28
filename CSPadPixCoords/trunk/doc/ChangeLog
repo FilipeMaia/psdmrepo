@@ -11,6 +11,15 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-19
+2014-02-28 Mikhail S. Dubrovin
+- do not stop data processing if CSPAD data or configuration information is missing, print warning message.
+- number of worning message is restricted to 20. 
+M       include/CSPadImageProducer.h
+M       include/CSPadConfigPars.h
+M       src/CSPadImageProducer.cpp
+M       src/CSPadConfigPars.cpp
+
 Tag: V00-03-18
 2014-02-26 Mikhail S. Dubrovin
 - in CSPadImageProducer add saving in env.calibStore the image-size map of enumerated pixels of type int32_t

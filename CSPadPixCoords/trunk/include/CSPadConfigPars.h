@@ -218,6 +218,7 @@ private:
   Pds::Src      m_src;           /// source address as Pds::Src 
  
   unsigned      m_count_cfg;
+  unsigned      m_count_wornings;
   std::string   m_config_vers;
   std::string   m_data_vers;
   bool          m_is_set_for_evt;

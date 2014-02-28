@@ -102,6 +102,7 @@ CSPadConfigPars::setCSPadConfigParsDefault()
   m_is_set_for_evt = false;
   m_is_set_for_env = false;
   m_is_set         = false;
+  m_count_wornings = 0;
 }
 
 //--------------------
@@ -151,7 +152,9 @@ CSPadConfigPars::setCSPadConfigParsFromEnv(PSEnv::Env& env)
   if ( getQuadConfigParsForType<Psana::CsPad::ConfigV4>(env) ) { m_config_vers = "CsPad::ConfigV4"; return true; }
   if ( getQuadConfigParsForType<Psana::CsPad::ConfigV5>(env) ) { m_config_vers = "CsPad::ConfigV5"; return true; }
 
-  MsgLog(name(), warning, "CsPad::ConfigV2-V5 is not available in this event...");
+  m_count_wornings++;
+  if (m_count_wornings < 20) MsgLog(name(), warning, "CsPad::ConfigV2-V5 is not available in this event...")
+  if (m_count_wornings ==20) MsgLog(name(), warning, "STOP PRINTING WARNINGS !!!")
   return false;
 }
 
@@ -163,7 +166,9 @@ CSPadConfigPars::setCSPadConfigParsFromEvent(PSEvt::Event& evt)
   if ( getCSPadConfigFromDataForType <Psana::CsPad::DataV1, Psana::CsPad::ElementV1> (evt) ) { m_data_vers = "CsPad::ElementV1"; return true; }
   if ( getCSPadConfigFromDataForType <Psana::CsPad::DataV2, Psana::CsPad::ElementV2> (evt) ) { m_data_vers = "CsPad::ElementV2"; return true; }
 
-  MsgLog(name(), warning, "getCSPadConfigFromData(...): Psana::CsPad::DataV# / ElementV# for #=[1,2] is not available in this event...");
+  m_count_wornings++;
+  if (m_count_wornings < 20) MsgLog(name(), warning, "getCSPadConfigFromData(...): Psana::CsPad::DataV# / ElementV# for #=[1,2] is not available in this event...");
+  if (m_count_wornings ==20) MsgLog(name(), warning, "STOP PRINTING WARNINGS !!!")
   return false;
 }
 
