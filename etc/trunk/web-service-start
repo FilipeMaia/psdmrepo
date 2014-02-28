@@ -9,7 +9,7 @@
 venv=/reg/g/psdm/sw/external/Pylons/0.9.7-python2.7/x86_64-rhel5-gcc41-opt
 
 # release location
-release=/reg/g/psdm/sw/releases/web-0.2.0
+release=/reg/g/psdm/sw/releases/web-0.2.1
 #release=/reg/neh/home1/salnikov/releases/web-0.1.14
 
 # log directory
@@ -113,7 +113,7 @@ loop() {
 	while true; do
 		echo "[web-service-start] Starting new server at" `date '+%Y-%m-%d %H:%M:%S'`
 		echo command: PYTHONPATH=web/$package:$PYTHONPATH paster serve -v web/$package/$config &
-		PYTHONPATH=web/$package:$PYTHONPATH paster serve -v web/$package/$config &
+		PYTHONWARNINGS=once PYTHONPATH=web/$package:$PYTHONPATH paster serve -v web/$package/$config &
         child=$!
         wait $child
         test -d /proc/$child && kill $child
