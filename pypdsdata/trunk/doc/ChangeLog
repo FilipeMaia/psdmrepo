@@ -6,6 +6,10 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V01-01-10
+2014-02-28 Andy Salnikov
+- pyxtcreader: bug was causing "trimmed" printed for any event even non-trimmed
+
 Tag: V01-01-09
 2014-02-12 Andy Salnikov
 - upgrade to pdsdata V07-02-19

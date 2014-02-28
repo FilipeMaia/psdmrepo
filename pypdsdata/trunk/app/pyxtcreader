@@ -103,7 +103,7 @@ def main( argv ) :
         trimmed = ""
         if seq.service() == TransitionId.L1Accept:
             l3t = "l3t=%s, " % str(dg.env.l3t_result()).split('.')[-1]
-            if dg.env.trimmed : trimmed = "trimmed, "
+            if dg.env.trimmed() : trimmed = "trimmed, "
 
         # print datagram info
         print "%s transition: damage=%#x, type=%d, %s%stime=%u.%09u, ticks=%u, fiducials=%u, control=%u, vector=%d, payloadSize=%d" \
