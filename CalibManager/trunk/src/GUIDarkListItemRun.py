@@ -120,12 +120,14 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
     def create_or_use_butch_object(self) :
         """Creates BatchJobPedestals object for the 1st time or use existing in the dictionary
         """
-        if self.run_number in self.dict_bjpeds.keys() :
-            #print 'Use existing BatchJobPedestals object for run %s' % self.str_run_number
-            self.bjpeds = self.dict_bjpeds[self.run_number]
-        else :
-            #print 'Create new BatchJobPedestals object for run %s' % self.str_run_number
-            self.bjpeds = self.dict_bjpeds[self.run_number] = BatchJobPedestals(self.run_number) 
+        self.bjpeds = BatchJobPedestals(self.run_number) 
+
+#        if self.run_number in self.dict_bjpeds.keys() :
+#            #print 'Use existing BatchJobPedestals object for run %s' % self.str_run_number
+#            self.bjpeds = self.dict_bjpeds[self.run_number]
+#        else :
+#            #print 'Create new BatchJobPedestals object for run %s' % self.str_run_number
+#            self.bjpeds = self.dict_bjpeds[self.run_number] = BatchJobPedestals(self.run_number) 
 
 
     def showToolTips(self):

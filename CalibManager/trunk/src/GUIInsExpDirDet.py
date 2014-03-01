@@ -54,6 +54,7 @@ class GUIInsExpDirDet ( QtGui.QWidget ) :
         self.det_name       = cp.det_name
         self.calib_dir      = cp.calib_dir
         self.det_but_title  = cp.det_but_title
+        self.but_current    = None
 
         self.setGeometry(100, 50, 700, 30)
         self.setWindowTitle('Select calibration directory')
@@ -217,6 +218,7 @@ class GUIInsExpDirDet ( QtGui.QWidget ) :
 
     def onButIns(self):
         #print 'onButIns'
+        self.but_current = self.butIns
         item_selected = gu.selectFromListInPopupMenu(cp.list_of_instr)
         if item_selected is None : return            # selection is cancelled
         if item_selected == self.instr_name.value() : return # selected the same item  
@@ -230,6 +232,7 @@ class GUIInsExpDirDet ( QtGui.QWidget ) :
 
     def onButExp(self):
         #print 'onButExp'
+        self.but_current = self.butExp
         dir = self.instr_dir.value() + '/' + self.instr_name.value()
         #print 'dir =', dir
         if self.list_of_exp is None : self.list_of_exp=sorted(os.listdir(dir))
@@ -267,6 +270,7 @@ class GUIInsExpDirDet ( QtGui.QWidget ) :
 
     def onButDet(self):
         #print 'onButDet'
+        self.but_current = self.butDet
         #item_selected = gu.selectFromListInPopupMenu(cp.list_of_dets)
         #if item_selected is None : return            # selection is cancelled
         #if item_selected == self.instr_name.value() : return # selected the same item  
@@ -334,7 +338,10 @@ class GUIInsExpDirDet ( QtGui.QWidget ) :
             cp.guistatus.updateStatusInfo()
 
         if cp.guidarklist is not None :
-            cp.guidarklist.updateList(clearList)
+            if self.but_current == self.butIns or self.but_current == self.butExp :
+                cp.guidarklist.updateList(clearList)
+            else :
+                cp.guidarklist.updateList()
 
         if cp.guifilemanagerselect is not None :
             cp.guifilemanagerselect.resetFields()

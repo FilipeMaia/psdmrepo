@@ -57,8 +57,8 @@ class GUIDarkList ( QtGui.QWidget ) :
         self.str_run_number        = cp.str_run_number
         self.list_of_det_pars      = cp.list_of_det_pars
         self.list_of_dets_selected = cp.list_of_dets_selected
-        self.list_of_visible_records  = []
         self.dict_guidarklistitem  = cp.dict_guidarklistitem
+        self.list_of_visible_records = []
 
         self.click_counter = 0
 
@@ -77,7 +77,6 @@ class GUIDarkList ( QtGui.QWidget ) :
 
         #self.list = QtGui.QListWidget(parent=self)
         # Use singleton object
-
         if cp.dark_list is None : self.list = cp.dark_list = QtGui.QListWidget()
         else                    : self.list = cp.dark_list
 
@@ -98,7 +97,6 @@ class GUIDarkList ( QtGui.QWidget ) :
         self.setStyle()
 
         cp.guidarklist = self
-        
 
     #-------------------
     #  Public methods --
@@ -109,8 +107,11 @@ class GUIDarkList ( QtGui.QWidget ) :
         self.t0_sec = time()
 
         if clearList :
+            self.removeItemWidgets()            
             self.list.clear()
-            self.dict_guidarklistitem = {}
+            self.dict_guidarklistitem.clear()
+            #msg = 'Consumed time to clean list (sec) = %7.3f' % (time()-self.t0_sec)        
+            #print msg
 
         self.setItemsHidden()
 
@@ -193,7 +194,7 @@ class GUIDarkList ( QtGui.QWidget ) :
             str_run_num = '%04d'%run_num
             item = QtGui.QListWidgetItem(str_run_num, self.list)
             widg = GUIDarkListItem(self, str_run_num, self.type, self.comment)  
-            self.dict_guidarklistitem[run_num] = item, widg
+            self.dict_guidarklistitem[run_num] = [item, widg]
             item.setTextColor(QtGui.QColor(0, 0, 0, alpha=0)) # set item text invisible. All pars in the range [0,255]
             item.setFlags ( QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable  | QtCore.Qt.ItemIsUserCheckable )
             item.setSizeHint(widg.size())
@@ -202,11 +203,16 @@ class GUIDarkList ( QtGui.QWidget ) :
 
 
 
-    def setItemsHidden(self) :
+    def setItemsHidden(self) :        
         for run, (item, widg) in self.dict_guidarklistitem.iteritems() :
             self.list.setItemHidden (item, True)
             #print 'Hide item for run %d' % run
  
+
+    def removeItemWidgets(self) :     
+        for run, (item, widg) in self.dict_guidarklistitem.iteritems() :
+            self.list.removeItemWidget(item)
+            widg.close()
 
 
     def isSelectedRun(self, run_num, type_to_select = 'dark') :
