@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #--------------------------------------------------------------------------
 # File and Version Information:
 #  $Id$
@@ -18,6 +19,7 @@ __version__ = "$Revision: 4 $"
 #--------------------------------
 import sys
 import os
+import unicodedata
 
 from PyQt4 import QtGui, QtCore
 #import time   # for sleep(sec)
@@ -43,9 +45,12 @@ class GUIDarkListItem ( QtGui.QWidget ) :
     """GUI sets the source dark run number, validity range, and starts calibration of pedestals"""
 
     char_expand    = u'\u25BC' # solid down-head triangle
-    char_shrink    = u'\u25B6' # solid right-head triangle
+    char_shrink    = u'\u25B2' # solid up-head triangle
+    #char_shrink    = u'\u25B6' # solid right-head triangle
     #char_expand    = u'\u25BD' # open down-head triangle
     #char_shrink    = u'\u25B7' # open right-head triangle
+    #char_expand    = 'V' # solid down-head triangle
+    #char_shrink    = '>' # solid right-head triangle
 
     def __init__ ( self, parent=None, str_run_num='0000', run_type='Type N/A', comment='') :
 
@@ -191,6 +196,8 @@ class GUIDarkListItem ( QtGui.QWidget ) :
             but.setText(self.char_expand)
             self.onClickShrink()
             self.parent.onItemShrink(self)
+
+        self.updateButtons()
         
 
     def onClickExpand(self):
@@ -236,9 +243,9 @@ class GUIDarkListItem ( QtGui.QWidget ) :
         return h + 10
 
 
-    def update(self) :
+    def updateButtons(self) :
         #logger.info('update', __name__)
-        self.gui_run.update()
+        self.gui_run.updateButtons()
         
 #-----------------------------
 

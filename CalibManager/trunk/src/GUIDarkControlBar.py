@@ -39,7 +39,8 @@ from GUILogger              import *
 class GUIDarkControlBar ( QtGui.QWidget ) :
     """GUI sets the configuration parameters for instrument, experiment, and run number"""
 
-    char_expand    = u' \u25BE' # down-head triangle
+    char_expand    = u' \u25BC' # down-head triangle
+    #char_expand    = '' # down-head triangle
 
     def __init__ ( self, parent=None ) :
 

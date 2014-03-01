@@ -19,6 +19,7 @@ __version__ = "$Revision: 4 $"
 import sys
 import os
 import stat
+import socket
 
 #-----------------------------
 # Imports for other modules --
@@ -81,9 +82,9 @@ class FileDeployer :
 
 
     def changeFilePermissions(self, path):
-        msg = 'Change permissions for file: %s' % path
+        msg = 'DO NOT change permissions for file: %s' % path
         logger.info(msg, __name__)
-        os.system('chmod 670 %s' % path)
+        #os.system('chmod 670 %s' % path)
 
 
 
@@ -97,7 +98,8 @@ class FileDeployer :
 
         user   = gu.get_enviroment(env='USER')
         login  = gu.get_enviroment(env='LOGNAME')
-        host   = gu.get_enviroment(env='HOST')
+        #host   = gu.get_enviroment(env='HOSTNAME')
+        host   = socket.gethostname()
         tstamp = gu.get_current_local_time_stamp(fmt='%Y-%m-%dT%H:%M:%S  zone:%Z')
 
         cmd_cp, path_inp, path_out = cmd.split() 

@@ -174,7 +174,7 @@ class GUIStatus ( QtGui.QGroupBox ) :
             #msg = 'From %s to %s use dark run %s' % (self.str_run_from.value(), self.str_run_to.value(), self.str_run_number.value())
             
             
-            #for det_name in self.det_name.value().split(' ') :
+            #for det_name in self.det_name.value().split() :
             for det_name in cp.list_of_dets_selected() :
                 calib_subdir = cp.dict_of_det_calib_types[det_name]
                 #print 'calib_subdir =', calib_subdir

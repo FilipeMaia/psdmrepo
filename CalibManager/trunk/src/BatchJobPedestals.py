@@ -38,12 +38,12 @@ class BatchJobPedestals (BatchJob) :
     """Deals with batch jobs for dark runs (pedestals).
     """
 
-    def __init__ (self, parent=None) :
+    def __init__ (self, run_number) :
         """
         @param fname  the file name for output log file
         """
 
-        self.parent = parent
+        self.run_number = run_number
 
         BatchJob.__init__(self)
 
@@ -55,10 +55,21 @@ class BatchJobPedestals (BatchJob) :
 
         self.procDarkStatus  = 0 # 0=inactive, 1=scan, 2=averaging, 3=both
 
+        #self.opt = ' -o psana.l3t-accept-only=0'
+        self.opt = ''
+
+#-----------------------------
+
+    def getParent(self):
+        # parent depends on self.run_number
+        item, widg = cp.dict_guidarklistitem[self.run_number]
+        return widg.gui_run
+
 #-----------------------------
 
     def exportLocalPars(self):
-        self.parent.exportLocalPars()
+        #self.getParent().exportLocalPars()
+        cp.str_run_number.setValue('%04d' % self.run_number)
 
 #-----------------------------
 
@@ -93,8 +104,8 @@ class BatchJobPedestals (BatchJob) :
         cfg.make_psana_cfg_file_for_peds_scan()
 
         #command = 'env'
-        command = 'psana -c ' + fnm.path_peds_scan_psana_cfg()
-        command_seq = command.split(' ')
+        command = 'psana -c ' + fnm.path_peds_scan_psana_cfg() + self.opt 
+        command_seq = command.split()
 
         msg = 'Scan xtc file(s) using command:\n%s' % command \
             + '\nand save results in the log-file: %s' % fnm.path_peds_scan_batch_log()
@@ -120,7 +131,8 @@ class BatchJobPedestals (BatchJob) :
 
         cfg.make_psana_cfg_file_for_peds_aver()
 
-        command      = 'psana -c ' + fnm.path_peds_aver_psana_cfg() + ' ' + fnm.path_to_xtc_files_for_run() # fnm.path_dark_xtc_cond()
+        #command      = 'psana -c ' + fnm.path_peds_aver_psana_cfg() + ' ' + fnm.path_to_xtc_files_for_run() # fnm.path_dark_xtc_cond()
+        command      = 'psana -c ' + fnm.path_peds_aver_psana_cfg() + self.opt + ' ' + fnm.path_to_xtc_files_for_run() # fnm.path_dark_xtc_cond()
         queue        = self.queue.value()
         bat_log_file = fnm.path_peds_aver_batch_log()
 
@@ -222,8 +234,12 @@ class BatchJobPedestals (BatchJob) :
 
     def switch_stop_go_button(self):
         logger.debug('switch_stop_go_button', __name__)
-        try : self.parent.onStop()
-        except : pass
+        try :
+            self.getParent().onStop()
+        except :
+            logger.warning('Lost connection to the object for run %d. Click on run string to reset buttons....' % self.run_number, __name__)
+        #try : self.parent.onStop() # <- but this is not necessarily a parent !!!!
+        #except : pass
 
 #-----------------------------
 
@@ -295,7 +311,7 @@ class BatchJobPedestals (BatchJob) :
 
 #-----------------------------
 
-bjpeds = BatchJobPedestals ()
+#bjpeds = BatchJobPedestals (1)
 
 #-----------------------------
 #

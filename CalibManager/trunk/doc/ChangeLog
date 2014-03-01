@@ -11,6 +11,24 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-16
+2014-02-28 Mikhail S. Dubrovin
+- add protection in evaluation of statistcal values for plots
+- in BatchJobPedestals add hardwired option, which can be used for damaged data... #self.opt = ' -o psana.l3t-accept-only=0' 
+- split(' ') -> split() in order to remove all blanks
+- Use char_expand = u'\u25BC', which is defined on psanacs... comps
+- In ana/calibman add check of AFS token before starting application using GlobalUtils.check_token()
+	
+2014-02-24 Mikhail S. Dubrovin
+- keep chasing the bug for non-updating buttons
+M       src/CalibFileFinder.py - add protection for empty list;  if len(list_of_cfiles)>0 :
+M       src/FileDeployer.py    - replace HOST -> HOSTNAME
+M       src/GUIDarkListItemRun.py
+M       src/GUIDarkListItem.py
+M       src/BatchJobPedestals.py
+M       src/GUIDarkList.py
+M       src/PlotImgSpeWidget.py
+	
 Tag: V00-00-15
 2014-02-13 Mikhail S. Dubrovin
 - Generation of the large number of list items with embedded widget is slow in python.

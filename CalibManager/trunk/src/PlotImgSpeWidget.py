@@ -63,13 +63,16 @@ def arr_rot_n90(arr, rot_ang_n90=0) :
 #---------------------
 
 def add_stat_text(axhi, weights, bins) :
-    mean, rms, err_mean, err_rms, neff = proc_stat(weights,bins)
+    #mean, rms, err_mean, err_rms, neff = proc_stat(weights,bins)
+    mean, rms, err_mean, err_rms, neff, skew, kurt, err_err = proc_stat(weights,bins)
     pm = r'$\pm$' 
-    txt = 'Mean=%8.2f%s%8.2f\nRMS=%8.2f%s%8.2f' % (mean, pm, err_mean, rms, pm, err_rms)
+    txt  = 'Mean=%.2f%s%.2f\nRMS=%.2f%s%.2f\n' % (mean, pm, err_mean, rms, pm, err_rms)
+    txt += r'$\gamma1$=%.3f  $\gamma2$=%.3f' % (skew, kurt)
+    #txt += '\nErr of err=%8.2f' % (err_err)
     xb,xe = axhi.get_xlim()     
     yb,ye = axhi.get_ylim()     
-    x = xb + (xe-xb)*0.80
-    y = yb + (ye-yb)*0.80
+    x = xb + (xe-xb)*0.84
+    y = yb + (ye-yb)*0.66
     axhi.text(x, y, txt, fontsize=10, color='k', ha='center', rotation=0)
 
 #--------------------
@@ -78,17 +81,39 @@ def proc_stat(weights, bins) :
     center = np.array([0.5*(bins[i] + bins[i+1]) for i,w in enumerate(weights)])
 
     sum_w  = weights.sum()
+    if sum_w == 0 : return  0, 0, 0, 0, 0, 0, 0, 0
+    
     sum_w2 = (weights*weights).sum()
     neff   = sum_w*sum_w/sum_w2
     sum_1  = (weights*center).sum()
-    sum_2  = (weights*center*center).sum()
     mean = sum_1/sum_w
-    rms2 = sum_2/sum_w - mean*mean
-    rms  = math.sqrt(rms2)
+    d      = center - mean
+    d2     = d * d
+    wd2    = weights*d2
+    m2     = (wd2)   .sum() / sum_w
+    m3     = (wd2*d) .sum() / sum_w
+    m4     = (wd2*d2).sum() / sum_w
+
+    #sum_2  = (weights*center*center).sum()
+    #err2 = sum_2/sum_w - mean*mean
+    #err  = math.sqrt(err2)
+
+    rms  = math.sqrt(m2)
+    rms2 = m2
+    
     err_mean = rms/math.sqrt(neff)
     err_rms  = err_mean/math.sqrt(2)    
 
-    return mean, rms, err_mean, err_rms, neff
+    skew, kurt, var_4 = 0, 0, 0
+
+    if rms>0 and rms2>0 :
+        skew  = m3/(rms2 * rms) 
+        kurt  = m4/(rms2 * rms2) - 3
+        var_4 = (m4 - rms2*rms2*(neff-3)/(neff-1))/neff
+    err_err = math.sqrt( math.sqrt( var_4 ) )
+    #print  'mean:%f, rms:%f, err_mean:%f, err_rms:%f, neff:%f' % (mean, rms, err_mean, err_rms, neff)
+    #print  'skew:%f, kurt:%f, err_err:%f' % (skew, kurt, err_err)
+    return mean, rms, err_mean, err_rms, neff, skew, kurt, err_err
 
 #--------------------
 
@@ -695,8 +720,8 @@ class PlotImgSpeWidget (QtGui.QWidget) :
 
 def get_array2d_for_test() :
     mu, sigma = 200, 25
-    #arr = mu + sigma*np.random.standard_normal(size=2400)
-    arr = 100*np.random.standard_exponential(size=2400)
+    arr = mu + sigma*np.random.standard_normal(size=2400)
+    #arr = 100*np.random.standard_exponential(size=2400)
     #arr = np.arange(2400)
     arr.shape = (40,60)
     return arr

@@ -42,7 +42,8 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
 #class GUIDarkMoreOpts ( QtGui.QGroupBox ) :
     """GUI sets the source dark run number, validity range, and starts calibration of pedestals"""
 
-    char_expand    = u' \u25BE' # down-head triangle
+    char_expand    = u' \u25BC' # down-head triangle
+    #char_expand    = ' V' # down-head triangle
     dict_status = {True  : 'Created:', 
                    False : 'N/A     '}
                

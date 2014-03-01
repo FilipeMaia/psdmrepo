@@ -41,8 +41,6 @@ from BatchLogScanParser     import blsp # Just in order to instatiate it
 class GUIDarkListItemRun ( QtGui.QWidget ) :
     """GUI sets the source dark run number, validity range, and starts calibration of pedestals"""
 
-    #char_expand    = u' \u25BE' # down-head triangle
-
     def __init__ ( self, parent=None, str_run_number='0000', str_run_type='Type N/A', comment='') :
 
         self.t0_sec = time()
@@ -76,7 +74,7 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
 
         #self.lab_rnum = QtGui.QPushButton( self.str_run_number )
         self.lab_rnum = QtGui.QLabel( self.str_run_number )
-        self.lab_type = QtGui.QLabel( self.str_run_type + ': ' + comment)
+        self.lab_type = QtGui.QLabel( self.str_run_type + '  ' + comment)
         self.but_go   = QtGui.QPushButton( 'Go' )
         self.but_depl = QtGui.QPushButton( 'Deploy' )
         self.edi_from = QtGui.QLineEdit  ( self.str_run_from )
@@ -127,7 +125,7 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
             self.bjpeds = self.dict_bjpeds[self.run_number]
         else :
             #print 'Create new BatchJobPedestals object for run %s' % self.str_run_number
-            self.bjpeds = self.dict_bjpeds[self.run_number] = BatchJobPedestals(parent=self) 
+            self.bjpeds = self.dict_bjpeds[self.run_number] = BatchJobPedestals(self.run_number) 
 
 
     def showToolTips(self):
@@ -295,10 +293,12 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
 
 
     def onStop(self):
-        logger.info('onStop - buttons status should (if you did not leave Dark tab...) be updated now for %s' % self.str_run_number, __name__ )
+        msg = 'onStop - buttons status should be updated now for %s' % (self.str_run_number)
+        logger.info(msg, __name__)
         self.but_go.setEnabled(True)
         self.but_go.setText('Go')
-        self.setStatusStyleOfButtons()
+        #self.setStatusStyleOfButtons()
+        self.updateButtons()
 
 
     def setStatusMessage(self):
@@ -386,7 +386,7 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
         return list_of_deploy_commands
    
 
-    def update(self) :
+    def updateButtons(self) :
         #logger.info('update', __name__)
         self.setFieldsEnabled(cp.det_name.value() != '')
         self.setStatusStyleOfButtons()

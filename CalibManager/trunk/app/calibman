@@ -29,6 +29,7 @@ import os
 
 from PyQt4 import QtGui
 from CalibManager.GUIMain import GUIMain
+from CalibManager.GlobalUtils import check_token
 from CalibManager.ThreadWorker import ThreadWorker
 
 #---------------------------------
@@ -39,6 +40,13 @@ class StartCalibManager :
         """Start application"""
 
         self.input_parameters()
+
+        status, msg = check_token(do_print=True)
+	#print msg
+
+	if not status :
+	    print 'Before starting this application please update AFS token using commands:\nkinit;\naklog;'
+	    return
 
 	print "Start the CalibManager GUI"
         app = QtGui.QApplication(sys.argv)

@@ -65,7 +65,8 @@ class GUIFileManagerSelect ( QtGui.QWidget ) :
     @see BaseClass
     @see OtherClass
     """
-    char_expand    = u' \u25BE' # down-head triangle
+    char_expand    = u' \u25BC' # down-head triangle
+    #char_expand    = '' # down-head triangle
 
     def __init__ (self, parent=None, app=None) :
 

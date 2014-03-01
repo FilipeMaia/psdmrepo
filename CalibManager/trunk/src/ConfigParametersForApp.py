@@ -289,7 +289,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
         self.mask_hot_is_used  = self.declareParameter( name='MASK_HOT_PIX_IS_USED',      val_def= True,  type='bool'  )
 
         # For batch jobs
-        self.bat_queue               = self.declareParameter( name='BATCH_QUEUE',                val_def='psnehq', type='str' )
+        self.bat_queue               = self.declareParameter( name='BATCH_QUEUE',                val_def='psanacsq', type='str' )
         self.bat_submit_interval_sec = self.declareParameter( name='BATCH_SUBMIT_INTERVAL_SEC',  val_def=100,      type='int' )
 
         # GUIMaskEditor.py

@@ -39,7 +39,8 @@ from Logger                 import logger
 class GUIInsExpDirDet ( QtGui.QWidget ) :
     """GUI sets the configuration parameters for instrument, experiment, and run number"""
 
-    char_expand    = u' \u25BE' # down-head triangle
+    char_expand    = u' \u25BC' # down-head triangle
+    #char_expand    = '' # down-head triangle
 
     def __init__ ( self, parent=None ) :
 
@@ -231,7 +232,7 @@ class GUIInsExpDirDet ( QtGui.QWidget ) :
         #print 'onButExp'
         dir = self.instr_dir.value() + '/' + self.instr_name.value()
         #print 'dir =', dir
-        if self.list_of_exp is None : self.list_of_exp=os.listdir(dir)
+        if self.list_of_exp is None : self.list_of_exp=sorted(os.listdir(dir))
         item_selected = gu.selectFromListInPopupMenu(self.list_of_exp)
         if item_selected is None : return          # selection is cancelled
         #if item_selected == self.exp_name.value() : return # selected the same item 

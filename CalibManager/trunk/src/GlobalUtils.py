@@ -34,8 +34,10 @@ import os
 import pwd
 #import time
 from time import localtime, gmtime, strftime, clock, time, sleep
+#from datetime import datetime
 
 import numpy as np
+from commands import getoutput
 
 #import commands # use 'subprocess' instead of 'commands'
 import subprocess # for subprocess.Popen
@@ -276,7 +278,7 @@ def send_msg_with_att_to_elog_v0(inst='AMO', expt='amodaq09', run='825', tag='TA
 #    line = p.stdout.readline() # read() - reads entire file
 #    # here we parse the line assuming that it looks like: Job <126090> is submitted to queue <psfehq>.
 #    #print line
-#    line_fields = line.split(' ')
+#    line_fields = line.split()
 #    if line_fields[0] != 'Job' :
 #        sys.exit('EXIT: Unexpected response at batch submission: ' + line)
 #    job_id_str = line_fields[1].strip('<').rstrip('>')
@@ -287,7 +289,7 @@ def batch_job_submit(command, queue='psnehq', log_file='batch-log.txt') :
     if os.path.lexists(log_file) : remove_file(log_file)
 
     out, err = subproc(['bsub', '-q', queue, '-o', log_file, command])
-    line_fields = out.split(' ')
+    line_fields = out.split()
     if line_fields[0] != 'Job' :
         msg = 'EXIT: Unexpected response at batch submission:\nout: %s \nerr: %s'%(out, err)
         print msg
@@ -519,11 +521,6 @@ def list_of_calib_files_with_run_range(list_of_files) :
         #beg = begin_run_from_calib_fname(file)
         #if beg == None : continue
         #dic_num_file[beg] = fname
-
-
-
-
-
 
 
 
@@ -970,6 +967,36 @@ def arr_rot_n90(arr, rot_ang_n90=0) :
     elif rot_ang_n90==270 : return np.fliplr(arr.T)
     else                  : return arr
 
+#----------------------------------
+
+def check_token(do_print=False) :
+    token = getoutput('tokens')
+    #if do_print : print token
+    status = True if 'Expire' in token else False
+    timestamp = parse_token(token) if status else ''
+    msg = 'Your AFS token %s %s' % ({True:'IS valid until', False:'IS NOT valid'}[status], timestamp)
+    if do_print : print msg
+    return status, msg
+
+
+def parse_token(token) :
+    """ from string like: User's (AFS ID 5269) tokens for afs@slac.stanford.edu [Expires Feb 28 19:16] 54 75 Expires Feb 28 19:16
+        returns date/time: Feb 28 19:16
+    """
+    timestamp = ''
+
+    for line in token.split('\n') :
+        pos_beg = line.find('[Expire')
+        if pos_beg == -1 : continue
+        pos_end = line.find(']', pos_beg)
+        #print line
+        timestamp = line[pos_beg+9:pos_end]
+
+        #date_object = datetime.strptime('Jun 1 2005  1:33PM', '%b %d %Y %I:%M%p')
+        #date_object = datetime.strptime(timestamp, '%b %d %H:%M')
+        #print 'date_object', str(date_object)
+
+    return timestamp 
 
 #----------------------------------
 
@@ -1028,9 +1055,10 @@ if __name__ == "__main__" :
     #print 'Test 2:\n' + get_text_content_of_calib_dir_for_detector(path='/reg/d/psdm/XPP/xpptut13/calib/', subdir='CsPad2x2::CalibV1', det='CSPAD2x2')
 #    print 'Test 3:\n' + get_text_content_of_calib_dir_for_detector(path='/reg/d/psdm/XPP/xpptut13/calib', subdir='CsPad::CalibV1', det='CSPAD', calib_type='tilt')
 
-    list_of_files = ['220-230.data', '220-end.data', '221-240.data', '528-end.data', '222-end.data', '659-800.data', '373-end.data', '79-end.data', '45-end.data'] 
-    list_of_calib_files_with_run_range(list_of_files)
+    #list_of_files = ['220-230.data', '220-end.data', '221-240.data', '528-end.data', '222-end.data', '659-800.data', '373-end.data', '79-end.data', '45-end.data'] 
+    #list_of_calib_files_with_run_range(list_of_files)
 
+    status, msg = check_token(do_print=True)
 
     sys.exit ( "End of test" )
 
