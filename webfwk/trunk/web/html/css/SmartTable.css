@@ -42,11 +42,18 @@ and open the template in the editor.
   background-color: #A6C9E2;
   font-weight: bold;
 }
-.t-cont > .menu .item#before {
+
+/* Temporarily disable all items in the column menu
+ */
+.t-cont > .menu div.item {
   font-weight: normal !important;
   color: #a0a0a0 !important;
   cursor: none;
 }
+.t-cont > .menu div.item:hover {
+  cursor: none;
+}
+
 div.t-cont > .header {
   position: relative;
   top: 0px;
@@ -81,6 +88,8 @@ div.t-cont > .header > .column {
   height: 22px;
 
   border: solid 1px transparent;
+  border-left-color: #ffffff;
+  border-top-color: #ffffff;
   border-right-color: #c0c0c0;
   border-bottom-color: #c0c0c0;
 
@@ -121,6 +130,7 @@ div.t-cont > .header > .column.group {
 }
 div.t-cont > .header > .column > .ctrl {
   padding: 4px;
+  white-space: nowrap;
 }
 div.t-cont > .header > .column > div.ctrl:hover {
   cursor: pointer;

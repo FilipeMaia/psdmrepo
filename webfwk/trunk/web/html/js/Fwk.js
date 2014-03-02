@@ -585,6 +585,11 @@ function FwkCreator () {
         return (len ? new Array(len).join('0') : '') + num ;
     } ;
 
+    /**
+     * Return the current time info
+     *
+     * @returns {object}
+     */
     this.now = function () {
         var date = new Date() ;
         var msec = date.getTime() ;
@@ -1023,6 +1028,9 @@ function FwkCreator () {
 '<div id="fwk-top">' +
 '  <div id="fwk-top-header">' +
 '    <div id="fwk-top-title">' +
+'      <div style="float:left; padding-left:15px; padding-top:10px;">' +
+'          <a href="../../" title="Go back to the applicaton selector"><img style="height:42px;" src="../webfwk/img/home_icon.png" /></a>' +
+'      </div>' +
 '      <div style="float:left; padding-left:15px; padding-top:10px;">' +
 '        <span id="fwk-title">'+this.title+' : </span>' +
 '        <span id="fwk-subtitle">'+this.subtitle+'</span>' +

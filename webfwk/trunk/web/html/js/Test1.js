@@ -63,4 +63,15 @@ $(function () {
     ctrl.find('button[name="focus"]').button().click(function () {
         expand_or_collapse(true, true) ;
     }) ;
+    $(document).bind('scroll', function () {
+        console.log('scroll detected') ;
+        if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+            console.log("you're at the bottom of the page") ;
+            stack1.append({
+                title: '<b>new row' ,
+                body:  'row body is here'
+            }) ;
+        }
+    });
+
 }) ;

@@ -254,8 +254,9 @@ render : function () {
                 html +=
 '<div class="stack-row-column"></div>' ;
             } else {
+                var align = col.align === 'right' ? 'text-align:right;' : '' ;
                 html +=
-'<div class="stack-row-column'+(float_right ? '-right' : '')+'" id="'+col.id+'" style="min-width:'+col.width+'px;" >'+(title_as_function ? this.data_object.title.html(col.id) : this.data_object.title[col.id])+'</div>' ;
+'<div class="stack-row-column'+(float_right ? '-right' : '')+'" id="'+col.id+'" style="min-width:'+col.width+'px; '+align+' '+col.style+'" >'+(title_as_function ? this.data_object.title.html(col.id) : this.data_object.title[col.id])+'</div>' ;
             }
         }
         $(html).insertAfter(this.first) ;
@@ -536,8 +537,9 @@ stack_header: function () {
                 html +=
 '  <div class="stack-column"></div>' ;
             } else {
+                var align = col.align === 'right' ? 'text-align:right;' : '' ;
                 html +=
-'  <div class="stack-column'+(float_right ? '-right' : '')+'" id="'+col.id+'" style="width:'+col.width+'px;" >'+col.title+'</div>' ;
+'  <div class="stack-column'+(float_right ? '-right' : '')+'" id="'+col.id+'" style="width:'+col.width+'px; '+align+'" >'+col.title+'</div>' ;
             }
         }
         html +=
@@ -715,7 +717,9 @@ append : function (row_data) {
 
     this.assert_initialized() ;
 
-    var effect_on_insert_required = true ;
+    var effect_on_insert_required = false ;     // for now, don't allow any effects when adding rows by
+                                                // the end of a stack until ther ewill be a clear
+                                                // use case for that.
     var new_row_obj = StackRowData_Factory (
         this ,
         this.next_id() ,

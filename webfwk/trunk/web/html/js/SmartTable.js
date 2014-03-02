@@ -143,27 +143,32 @@ function SmartTable (container, hdr, rows, num_hdr_rows, max_hdr_rows) {
             var col = this.id ;
             if (that.menu_available(col)) that.attach_menu_to(this) ;
         }) ;
+        
 
-        this.menu.find('.item').click(function() {
-            var col = that.prev_menu_col ;
-            var op = this.id ;
-            switch (op) {
-                case 'rename' :
-                    var elem = that.header.find('.column#'+col).find('.ctrl') ;
-                    elem.html(elem.text().substr(0,5)) ;
-                    break ;
-                case 'front' :
-                    var elem = that.header.find('.column#'+col) ;
-                    elem.css('z-index', parseInt(elem.css('z-index')) + 1) ;
-                    break ;
-                case 'back' :
-                    var elem = that.header.find('.column#'+col) ;
-                    elem.css('z-index', parseInt(elem.css('z-index')) - 1) ;
-                    break ;
-            }
-            that.deactivate_menu() ;
-            
-        }) ;
+////////////////////////////////////////////////////////////////////////////////
+//
+//  TODO: Temporarily disable all items in the column menu
+//
+//        this.menu.find('.item').click(function() {
+//            var col = that.prev_menu_col ;
+//            var op = this.id ;
+//            switch (op) {
+//                case 'rename' :
+//                    var elem = that.header.find('.column#'+col).find('.ctrl') ;
+//                    elem.html(elem.text().substr(0,5)) ;
+//                    break ;
+//                case 'front' :
+//                    var elem = that.header.find('.column#'+col) ;
+//                    elem.css('z-index', parseInt(elem.css('z-index')) + 1) ;
+//                    break ;
+//                case 'back' :
+//                    var elem = that.header.find('.column#'+col) ;
+//                    elem.css('z-index', parseInt(elem.css('z-index')) - 1) ;
+//                    break ;
+//            }
+//            that.deactivate_menu() ;
+//            
+//        }) ;
 
         this.t_cont.resize(function () { that.render_header() ; }) ;
 
