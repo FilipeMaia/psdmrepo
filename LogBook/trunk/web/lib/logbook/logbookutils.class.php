@@ -1221,6 +1221,83 @@ HERE;
                 foreach ($section['PARAMS'] as $p) {
                     $p_name = $p['name'] ;
                     $in_use[$p_name] = True ;
+                    
+                    // - overload the defaulr description of the parameter from the database
+                    //   if it's available in there
+            
+                    $p_descr = $p['descr'] ;
+                    $param = $experiment->find_run_param_by_name($p_name) ;
+                    if ($param) {
+                        $descr = $param->description() ;
+                        switch ($descr) {
+                            case ''  :
+                            case 'PV': break ;
+                            default  : $p_descr = $descr ; break ;
+                        }
+                    }
+                    array_push($parameters, array (
+                        'name'  => $p_name ,
+                        'descr' => $p_descr
+                    )) ;
+                }
+                sort($parameters) ;
+                $s_name = $section['SECTION'] ;
+                array_push($section_names, $s_name) ;
+                $sections[$s_name] = array (
+                    'title'      => $section['TITLE'] ,
+                    'parameters' => $parameters) ;
+            }
+        }
+
+        // The last section is for any other parameters
+
+        $parameters = array() ;
+        foreach ($experiment->run_params() as $param) {
+            $p_name = $param->name() ;
+            if (!array_key_exists($p_name, $in_use)) {
+                $in_use[$p_name] = True ;
+                $p_descr = $p_name ;
+                $descr = $param->description() ;
+                switch ($descr) {
+                    case ''  :
+                    case 'PV': break ;
+                    default  : $p_descr = $descr ; break ;
+                }
+                array_push($parameters, array (
+                    'name'  => $p_name ,
+                    'descr' => $p_descr
+                )) ;
+            }
+        }
+        $s_name = 'FOOTER' ;
+        array_push($section_names, $s_name) ;
+        $sections[$s_name] = array (
+            'title'      => 'Additional Parameters' ,
+            'parameters' => $parameters) ;
+
+        return array(
+            'section_names' => $section_names ,
+            'sections'      => $sections
+        ) ;
+    }
+
+    public static function get_epics_sections_1 ($experiment) {
+
+        $instr_name = $experiment->instrument()->name() ;
+
+        $section_names = array() ;  // ordered list of names
+        $sections = array() ;
+
+        // Predefined sections first
+
+        $in_use = array() ;
+
+        foreach (array('HEADER', $instr_name) as $area) {
+            foreach (LogBookUtils::$sections[$area] as $section) {
+                $parameters = array() ;
+                foreach ($section['PARAMS'] as $p) {
+                    $p_name = $p['name'] ;
+                    $in_use[$p_name] = True ;
                     array_push($parameters, $p_name) ;
                 }
                 sort($parameters) ;
@@ -1253,7 +1330,7 @@ HERE;
             'sections'      => $sections
         ) ;
     }
-    
+
     /**
      * Return names of detectors used for a specific range of runs of an experiment
      *

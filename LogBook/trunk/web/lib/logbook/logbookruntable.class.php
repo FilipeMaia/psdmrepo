@@ -95,7 +95,7 @@ class LogBookRunTable {
             $type = $col['type'] ;
             $source = $col['source'] ;
 
-            $row[$name] = ' ' ;
+            $row[$name] = '' ;
 
             switch ($type) {
 
@@ -108,7 +108,7 @@ class LogBookRunTable {
                         $attr = mysql_fetch_array($result, MYSQL_NUM) ;
                         $row[$name] = $attr[0] ;
                     } else {
-                        $row[$name] = 'edit me' ;
+                        $row[$name] = '' ;
                     }
                     break ;
 
@@ -141,9 +141,9 @@ class LogBookRunTable {
 
                 case 'Calibrations':
                     foreach ($run->attributes('Calibrations') as $attr) {
-                        switch ($attr->name()) {
-                            case 'comment' : $row[$name] = $attr->val() ; break ;
-                            default : $row[$name] = $attr->val() ? 'Y' : ' '  ; break ;
+                        if ($attr->name() === $source) {
+                            $row[$name] = $attr->val() ? 'Y' : ' ' ;
+                            break ;
                         }
                     }
                     break ;
@@ -232,7 +232,10 @@ class LogBookRunTable {
             " WHERE id={$this->id()}"
         ) ;
 
-        // Update/extend column definitions. Note the following: 
+        // Update/extend column definitions.
+        // 
+        // Note the following:
+        //
         // - new colums are added if their identifiers are found to be equal to 0
         // - changing a type of an existing column from 'Editable' would result in recreating the column definition
         //   because we need to delete the data entries associated with that colum.
@@ -281,6 +284,35 @@ class LogBookRunTable {
                 " position={$col->position}".
                 " WHERE id={$col->id}"
             ) ;
+        }
+        
+        // Remove existing collumns which aren't found among parameters of
+        // the method.
+        //
+        // NOTES:
+        // - this step should be run after applying modifications to
+        //   existing columns.
+        // - a column becomes a subject for the deletion if there is no full
+        //   match of its triplet: (name,type,source).
+
+        foreach ($this->columns() as $oldcol) {
+
+            $id     = $oldcol['id'] ;
+            $name   = $oldcol['name'] ;
+            $type   = $oldcol['type'] ;
+            $source = $oldcol['source'] ;
+
+            $found = false ;
+            foreach ($coldef as $col) {
+                if (($col->name   == $name) &&
+                    ($col->type   == $type) &&
+                    ($col->source == $source)) {
+                    $found = true ;
+                    break ;
+                }
+            }
+            if (!$found) $this->remove_column_by_id ($id) ;
+            
         }
         return $this->experiment()->find_run_table_by_id($this->id()) ;
     }

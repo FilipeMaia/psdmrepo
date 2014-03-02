@@ -64,8 +64,15 @@ function extract_params4run ($instr_name, $run) {
 
         $name  = $p->name() ;
         $value = $p->value() ;
+
         $descr = $name ;
 
+        $param = $run->parent()->find_run_param_by_name($name) ;
+        if ($param) {
+            $param_descr = $param->description() ;
+            if ($param_descr !== '') $descr = $param_descr ;
+        }
+                        
         if (array_key_exists($name, $used_names)) continue;
 
         array_push (
