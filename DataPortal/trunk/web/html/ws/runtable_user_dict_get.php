@@ -16,12 +16,26 @@ DataPortal\ServiceJSON::run_handler ('GET', function ($SVC) {
     if (!$experiment) $SVC->abort("no experiment found for id={$xper_id}") ;
 
     $types = array(
-        'Editable'     => array() ,
-        'Run Info'     => array('Run Duration', 'Run Title') ,
-        'Calibrations' => array('dark', 'flat', 'geometry')
+        'Editable' => array() ,
+        'Run Info' => array(
+            array('name' => 'Run Duration', 'descr' => 'Run Duration') ,
+            array('name' => 'Run Title'   , 'descr' => 'Run Title'   )
+        ) ,
+        'Calibrations'  => array(
+            array('name' => 'dark',     'descr' => 'dark') ,
+            array('name' => 'flat',     'descr' => 'flat') ,
+            array('name' => 'geometry', 'descr' => 'geometry')
+        ) ,
+        'DAQ Detectors' => array()
     ) ;
+
     $daq_detectors = LogBook\LogBookUtils::get_daq_detectors($experiment) ;
-    $types['DAQ Detectors'] = $daq_detectors['detector_names'] ;
+    foreach ($daq_detectors['detector_names'] as $d) {
+        array_push(
+            $types['DAQ Detectors'] ,
+            array('name' => $d , 'descr' => $d)
+        ) ;
+    }
 
     $epics_sections = LogBook\LogBookUtils::get_epics_sections($experiment) ;
     foreach ($epics_sections['section_names'] as $section_name) {

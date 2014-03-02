@@ -29,3 +29,10 @@
 #elog-live .info {
   color: maroon;
 }
+#elog-live > #loading {
+  position: fixed;
+  right: 20px;
+  bottom: 5px;
+  
+  display: none;
+}

@@ -256,7 +256,7 @@ function ELog_Search (experiment, access_list) {
 '  <div class="info" id="info" style="float:left;">&nbsp;</div>' +
 '  <div class="info" id="updated" style="float:right;">&nbsp;</div>' +
 '  <div style="clear:both;"></div>' +
-'  <div style="float:left;">Here be the visual index</div>' +
+'  <div style="float:left;"></div>' +
 '  <div id="viewer" class="elog-msg-viewer"></div>' +
 '</div>' ;
         this._wa.html(html) ;

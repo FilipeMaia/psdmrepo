@@ -18,8 +18,9 @@ DataPortal\ServiceJSON::run_handler ('GET', function ($SVC) {
     $experiment = $SVC->logbook()->find_experiment_by_id($exper_id) ;
     if (!$experiment) $SVC->abort("no experiment found for id={$xper_id}") ;
 
+    $last_run = $experiment->find_last_run() ;
+
     if ($from_runnum < 0) {
-        $last_run = $experiment->find_last_run() ;
         if ($last_run) {
             $runnum = $last_run->num() ;
             $from_runnum = abs($from_runnum) <= $runnum ? $runnum - abs($from_runnum) : 0 ;
@@ -52,8 +53,9 @@ DataPortal\ServiceJSON::run_handler ('GET', function ($SVC) {
             'modified_time' => $table->modified_time()->toStringShort() ,
             'modified_uid'  => $table->modified_uid()
         ) ,
-        'runs'   => $runs ,
-        'run2id' => $run2id
+        'runs'     => $runs ,
+        'run2id'   => $run2id ,
+        'last_run' => $last_run ? $last_run->num() : 0
     )) ;
 }) ;
 

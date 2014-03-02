@@ -94,7 +94,7 @@ DataPortal\ServiceJSON::run_handler ('GET', function ($SVC) {
             'end_time_64'    => $last_run_end_time ? $last_run_end_time->to64() : '' ,
             'end_time_sec'   => $last_run_end_time ? $last_run_end_time->sec : '') ,
 
-        'num_runs' => $logbook_experiment->num_shifts() ,
+        'num_shifts' => $logbook_experiment->num_shifts() ,
 
         'num_elog_entries'       => $logbook_experiment->num_entries() ,
         'last_elog_entry_posted' => $last_entry ? $last_entry->insert_time()->toStringShort() : ''

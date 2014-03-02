@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-06-02
+2014-03-02 Igor Gaponenko
+- saving results of the on-going development
+
 Tag: V00-06-01
 2014-01-31 Igor Gaponenko
 - the first implementation of the new Web Portal

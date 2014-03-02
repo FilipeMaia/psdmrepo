@@ -19,10 +19,14 @@ use LusiTime\LusiTimeException;
 use RegDB\RegDB;
 use RegDB\RegDBException;
 
+
+/* Override the default target page if teh one provide by a caller
+ */
+$on_select = 'index.php' ;
+if (isset($_GET['on_select'])) $on_select = trim($_GET['on_select']) ;
+
 /* Descending sort experiments by their identifiers
  */
-
-
 function sort_experiments_by_id_desc( $experiments ) {
     usort( $experiments, function($a, $b) {    return $b->id() - $a->id();    });
     return $experiments;
@@ -148,8 +152,9 @@ function show_email( user, addr ) {
     }
 
     function table_row ($e, $is_facility=false) {
+        global $on_select ;
         $row = array (
-            '<a href="index.php?exper_id='.$e->id().'" class="link">'.$e->name().'</a>',
+            '<a href="'.$on_select.'?exper_id='.$e->id().'" class="link">'.$e->name().'</a>',
             $e->id()
         );
         if ($is_facility) {

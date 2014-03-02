@@ -870,15 +870,10 @@ define_class (ELog_MessageBody, StackRowBody, {}, {}) ;
 
 
 function ELog_MessageViewer (parent, cont, options) {
-
-    // -- parameters
-
     this.parent = parent ;
     this.experiment = parent.experiment ;
     this.access_list = parent.access_list ;
     this.cont = cont ;
-
-    // -- options
 
     this.hidden_header  = false ;
     this.instant_expand = false ;
@@ -889,7 +884,6 @@ function ELog_MessageViewer (parent, cont, options) {
             this[opt] = val ? true : false ;
         }   
     }
-
     this.messages = [] ;
     var hdr = [
         {id: 'posted',   title: 'Posted',    width: 150} ,
@@ -1027,7 +1021,7 @@ function ELog_MessageViewer (parent, cont, options) {
 
             // Put deep copies of the new messages in front of the local list.
             // Note that this will also reverse the order in which we got the new
-            // messages so that the newest ones will always get to the front.
+            // messages so that the newest ones will alwats get to the front.
 
             for (var i in new_messages) {
                 var m = new_messages[i] ;
@@ -1036,39 +1030,6 @@ function ELog_MessageViewer (parent, cont, options) {
                 if (this.messages.length) this.messages.splice(0, 0, m) ;
                 else                      this.messages.push(m) ;
                 this.table.insert_front(this.message2row(m)) ;
-                if (m.is_run) {
-                    this._num_runs++ ;
-                    this._min_run = Math.min(this._min_run ? this._min_run : m.run_num, m.run_num) ;
-                    this._max_run = Math.max(this._max_run ? this._max_run : m.run_num, m.run_num) ;
-                }
-            }
-        }
-    } ;
-
-    /**
-     * Append messages at the bottom of the table
-     * 
-     * @param Array new_messages
-     * @returns {undefined}
-     */
-    this.append = function (new_messages) {
-
-        var length = new_messages ? new_messages.length : 0;
-        if (length) {
-
-            // Put deep copies of the new messages iat the very end of the of the local list.
-            // Note that this will also reverse the order in which we got the new
-            // messages so that the newest ones will alwats get to the front.
-
-            new_messages.reverse() ;    // need this to append newst message first
-
-            for (var i in new_messages) {
-                var m = new_messages[i] ;
-                if (typeof m === 'string') m = eval('('+m+')') ;
-                m = jQuery.extend(true, {}, m) ;
-                if (this.messages.length) this.messages.splice(0, 0, m) ;
-                else                      this.messages.push(m) ;
-                this.table.append(this.message2row(m)) ;
                 if (m.is_run) {
                     this._num_runs++ ;
                     this._min_run = Math.min(this._min_run ? this._min_run : m.run_num, m.run_num) ;

@@ -1,5 +1,12 @@
 <?php
 
+
+// Extend the default 30 seconds limit becase the script has to harvest a lot
+// of data from various sources.
+
+set_time_limit( 300 );
+
+
 require_once( 'dataportal/dataportal.inc.php' );
 require_once( 'logbook/logbook.inc.php' );
 require_once( 'filemgr/filemgr.inc.php' );

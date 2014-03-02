@@ -116,6 +116,14 @@ function Runtables_EPICS (experiment, access_list) {
 '      <div class="info" id="info"    style="float:left;">&nbsp;</div>' +
 '      <div class="info" id="updated" style="float:right;">&nbsp;</div>' +
 '      <div style="clear:both;"></div>' +
+'      <div id="table_ctrl">' +
+'        <span>Display EPICS columns</span>' +
+'        <select class="display-trigger" name="'+s_name+':column_mode">' +
+'          <option value="descr"        >PV Description</option>' +
+'          <option value="pv"           >PV Name</option>' +
+'          <option value="descr_and_pv" >both</option>' +
+'        </select>' +
+'      </div>' +
 '      <div id="table" class="table" ></div>' +
 '    </div>' +
 '  </div>' ;
@@ -128,11 +136,11 @@ function Runtables_EPICS (experiment, access_list) {
 
                 _that._tabs.find('.control-button').button().click(function () {
                     var s2 = this.name.split(':') ;
-                    var section_name = s2[0] ;
+                    var s_name = s2[0] ;
                     var op = s2[1] ;
                     switch (op) {
-                        case 'search'   : _that._load (section_name) ; break ;
-                        case 'reset'    : _that._reset(section_name) ; break ;
+                        case 'search'   : _that._load (s_name) ; break ;
+                        case 'reset'    : _that._reset(s_name) ; break ;
                     }
                 }) ;
                 _that._tabs.find('select.update-trigger').change(function () {
@@ -161,8 +169,15 @@ function Runtables_EPICS (experiment, access_list) {
                 }) ;
                 _that._tabs.find('.update-trigger').change(function () {
                     var s2 = this.name.split(':') ;
-                    var section_name = s2[0] ;
-                    _that._load(section_name) ;
+                    var s_name = s2[0] ;
+                    _that._load(s_name) ;
+                }) ;
+                _that._tabs.find('select.display-trigger').change(function () {
+                    var s2 = this.name.split(':') ;
+                    var s_name = s2[0] ;
+                    console.log('tab: '+s_name+', display: '+$(this).val()) ;
+                    _that._tables[s_name] = _that._create_table(s_name) ;
+                    _that._display(s_name) ;
                 }) ;
 
                 for (var i in _that._section_names) {
@@ -176,48 +191,53 @@ function Runtables_EPICS (experiment, access_list) {
             }
         ) ;
     } ;
-    this._reset = function (section_name) {
-        var tab_body = this._tabs.find('div#'+section_name) ;
+    this._reset = function (s_name) {
+        var tab_body = this._tabs.find('div#'+s_name) ;
         tab_body.find('.update-trigger').val('') ;
-        this._load (section_name) ;
+        this._load (s_name) ;
     } ;
 
-    this._create_table = function (section_name)  {
+    this._create_table = function (s_name)  {
 
-        var section = this._sections[section_name] ;
+        var section = this._sections[s_name] ;
 
-        var tab_body   = this._tabs.find('div#'+section_name) ;
-        var table_cont = tab_body.find('div#table') ;
+        var tab_body = this._tabs.find('div#'+s_name) ;
+
+        var column_mode = this._tabs.find('select.display-trigger[name="'+s_name+':column_mode"]').val() ;
 
         var hdr = [
             'RUN'
         ] ;
         for (var i in section.parameters) {
-            var name = section.parameters[i] ;
-            hdr.push(name) ;
+            var p = section.parameters[i] ;
+            switch (column_mode) {
+                case 'descr'        : hdr.push(p.descr) ; break ;
+                case 'pv'           : hdr.push(p.name) ; break ;
+                case 'descr_and_pv' : hdr.push(p.descr + '&nbsp; | &nbsp;'+p.name) ; break ;
+            }
         }
         var rows = null ;
         var num_hdr_rows = 2 ;
         var max_hdr_rows = 5 ;
         var table = new SmartTable (
-            table_cont ,
+            tab_body.find('div#table') ,
             hdr ,
             rows ,
             num_hdr_rows ,
             max_hdr_rows
         ) ;
-        this._tables[section_name] = table ;
+        this._tables[s_name] = table ;
 
         return table ;
     } ;
 
-    this._display = function (section_name) {
+    this._display = function (s_name) {
 
-        var table = this._tables[section_name] ;
+        var table = this._tables[s_name] ;
 
         var title = 'show the run in the e-Log Search panel within the current Portal' ;
 
-        var section = this._sections[section_name] ;
+        var section = this._sections[s_name] ;
 
         var rows = [] ;
         for (var run in section.runs) {
@@ -227,8 +247,8 @@ function Runtables_EPICS (experiment, access_list) {
             ) ;
             var param2value = section.runs[run] ;
             for (var i in section.parameters) {
-                var name  = section.parameters[i] ;
-                var value = name in param2value ? param2value[name] : '' ;
+                var p = section.parameters[i] ;
+                var value = p.name in param2value ? param2value[p.name] : '' ;
                 row.push(value)  ;
             }
             rows.push(row) ;
@@ -237,16 +257,16 @@ function Runtables_EPICS (experiment, access_list) {
         table.load(rows) ;
     } ;
 
-    this._load = function (section_name) {
+    this._load = function (s_name) {
 
-        var updated = this._tabs.find('div#'+section_name).find('#updated') ;
+        var updated = this._tabs.find('div#'+s_name).find('#updated') ;
         updated.html('Loading...') ;
 
         var params = {
             exper_id: this.experiment.id ,
-            section:  section_name
+            section:  s_name
         } ;
-        var range = this._tabs.find('select[name="'+section_name+':runs"]').val() ;
+        var range = this._tabs.find('select[name="'+s_name+':runs"]').val() ;
         switch (range) {
             case '20' :
             case '100' :
@@ -255,8 +275,8 @@ function Runtables_EPICS (experiment, access_list) {
                 params.through_run = 0 ;
                 break ;
             case 'range' :
-                params.from_run    = parseInt(this._tabs.find('input[name="'+section_name+':first"]').val()) ;
-                params.through_run = parseInt(this._tabs.find('input[name="'+section_name+':last"]').val()) ;
+                params.from_run    = parseInt(this._tabs.find('input[name="'+s_name+':first"]').val()) ;
+                params.through_run = parseInt(this._tabs.find('input[name="'+s_name+':last"]').val()) ;
                 break ;
             case 'all' :
             default :
@@ -269,8 +289,8 @@ function Runtables_EPICS (experiment, access_list) {
             '../portal/ws/runtable_epics_section_get.php' ,
             params ,
             function (data) {
-                _that._sections[section_name].runs = data.runs ;
-                _that._display(section_name) ;
+                _that._sections[s_name].runs = data.runs ;
+                _that._display(s_name) ;
                 updated.html('[ Last update on: <b>'+data.updated+'</b> ]') ;
             }
         ) ;

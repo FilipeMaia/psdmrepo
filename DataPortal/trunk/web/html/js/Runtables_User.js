@@ -103,9 +103,24 @@ function Runtable_DialogView (parent, table_data) {
     this._table = null ;
     this._get_table = function ()  {
         if (!this._table) {
+
             var hdr = ['RUN'] ;
+
+            var column_mode = this._get_cont().find('select.display-trigger[name="column_mode"]').val() ;
+
             var coldef = this._table_data.config.coldef ;
-            for (var i in coldef) hdr.push(coldef[i].name) ;
+            for (var i in coldef) {
+                var col = coldef[i] ;
+                if (col.type.substring(0, 5) === 'EPICS') {
+                    switch (column_mode) {
+                        case 'descr'        : hdr.push(col.name) ; break ;
+                        case 'pv'           : hdr.push(col.source) ; break ;
+                        case 'descr_and_pv' : hdr.push(col.name + '&nbsp; | &nbsp;'+col.source) ; break ;
+                    }
+                } else {
+                    hdr.push(col.name) ;
+                }
+            }
 
             var num_hdr_rows = 2 ,
                 max_hdr_rows = 5 ;
@@ -119,6 +134,10 @@ function Runtable_DialogView (parent, table_data) {
             ) ;
         }
         return this._table ;
+    } ;
+    this._re_create_table = function ()  {
+        this._table = null ;
+        this._table = this._get_table() ;
     } ;
 
     /**
@@ -182,6 +201,14 @@ function Runtable_DialogView (parent, table_data) {
 '      <div class="info" id="info"    style="float:left;">&nbsp;</div>' +
 '      <div class="info" id="updated" style="float:right;">&nbsp;</div>' +
 '      <div style="clear:both;"></div>' +
+'      <div id="table_ctrl">' +
+'        <span>Display EPICS columns</span>' +
+'        <select class="display-trigger" name="column_mode">' +
+'          <option value="descr"        >PV Description</option>' +
+'          <option value="pv"           >PV Name</option>' +
+'          <option value="descr_and_pv" >both</option>' +
+'        </select>' +
+'      </div>' +
 '      <div id="table" class="table" ></div>' +
 '    </div>' ;
         this._get_cont().html(html) ;
@@ -224,6 +251,11 @@ function Runtable_DialogView (parent, table_data) {
         this._get_cont().find('.update-trigger').change(function () {
             _that._load() ;
         }) ;
+        this._get_cont().find('select.display-trigger').change(function () {
+             console.log('display: '+$(this).val()) ;
+             _that._re_create_table() ;
+             _that._display() ;
+         }) ;
 
         this._load() ;
     } ;
@@ -469,6 +501,12 @@ function Runtable_DialogEdit (parent, table_data, new_table_mode) {
 '       the <b>Save</b> button. Note that more columns can be added later using the table manager' +
 '       dialog when viewing the table. If no columns are provided when creating the table then the table' +
 '       will initially have just one - for run numbers. Columns can also be removed later.' +
+'       Note that the EPICS selector' +
+'    </p>' +
+'    <p><b>NOTE:</b> each EPICS PV source is composed of a description separated by the <b>vertical bar</b> symbol from a formal name of the PV.' +
+'       The current state of the global selector instructs the editor which part of' +
+'       the sources to pull into column names. Feel free to change the selector at any moment.' +
+'       It will not affect previously formed columns.' +
 '    </p>' :
 '    <p><b>IMPORTANT:</b> Removing columns of the <b>Editable</b> type or changing their type will' +
 '       result in loosing all relevant information from the database after you hit the <b>Save</b> button.') +
@@ -498,12 +536,20 @@ function Runtable_DialogEdit (parent, table_data, new_table_mode) {
 '    <div id="initial-columns">' +
 '      <div class="info" id="info" style="float:right;">&nbsp;</div>' +
 '      <div style="clear:both;"></div>' +
+'      <div id="table_ctrl">' +
+'        <span>The editor will pull</span>' +
+'        <select class="display-trigger" name="column_mode">' +
+'          <option value="descr" >PV Description</option>' +
+'          <option value="pv"    >PV Name</option>' +
+'        </select>' +
+'        <span>from EPICS sources</span>' +
+'      </div>' +
 '      <table class="columns" border="0" cellspacing="0">' +
 '        <thead>' +
 '          <tr>' +
 '            <td>&nbsp;</td>' +
 '            <td>Column Name</td>' +
-'            <td>Type</td>' +
+'            <td>Category</td>' +
 '            <td>Data Source</td>' +
 '          </tr>' +
 '        </thead>' +
@@ -537,6 +583,9 @@ function Runtable_DialogEdit (parent, table_data, new_table_mode) {
             _that._table_data.dict = dict ;
             _that._init_columns() ;
             _that._set_button_save('enable') ;
+            _that._get_cont().find('select.display-trigger[name="column_mode"]').off().change(function () {
+                _that._adjust_column_types() ;
+             }) ;
         }) ;
     } ;
 
@@ -693,14 +742,11 @@ function Runtable_DialogEdit (parent, table_data, new_table_mode) {
     this._move_column2left = function (row) {
         var tr = this._get_columns().find('tr.coldef[row="'+row+'"]') ;
         if (tr.length) {
-            console.log('_move_column2left: tr.length='+tr.length) ;
             var tr_prev = tr.prev() ;
             if (tr_prev.length) {
 
                 var pos      = tr     .attr('pos') ;
                 var pos_prev = tr_prev.attr('pos') ;
-
-                console.log('_move_column2left: pos='+pos+' pos_prev='+pos_prev) ;
 
                 tr     .attr('pos', pos_prev) ;
                 tr_prev.attr('pos', pos) ;
@@ -716,14 +762,11 @@ function Runtable_DialogEdit (parent, table_data, new_table_mode) {
     this._move_column2right = function (row) {
         var tr = this._get_columns().find('tr.coldef[row="'+row+'"]') ;
         if (tr.length) {
-            console.log('_move_column2right: tr.length='+tr.length) ;
             var tr_next = tr.next() ;
             if (tr_next.length) {
 
                 var pos      = tr     .attr('pos') ;
                 var pos_next = tr_next.attr('pos') ;
-
-                console.log('_move_column2right: pos='+pos+' pos_next='+pos_next) ;
 
                 tr     .attr('pos', pos_next) ;
                 tr_next.attr('pos', pos) ;
@@ -851,7 +894,9 @@ function Runtable_DialogEdit (parent, table_data, new_table_mode) {
             var elem = $(this) ;
             var tr = elem.closest('tr') ;
             var select_source = elem.val() ;
-            tr.find('input[name="column"]').val(select_source) ;
+            //var select_descr  = elem.find('option[value="'+select_source+'"]').text() ;
+            var select_descr  = elem.find('option[value="'+select_source+'"]').attr('name') ;
+            tr.find('input[name="column"]').val(select_descr) ;
             if (select_source === '') {
                 tr.addClass('spare') ;
             } else {
@@ -888,7 +933,8 @@ function Runtable_DialogEdit (parent, table_data, new_table_mode) {
      * @param {type} select_type
      * @returns {undefined}
      */
-    this._install_column_types = function (row, select_type) {
+    this._install_column_types = function (row, select_type, select_source) {
+        var column_mode = this._get_cont().find('select.display-trigger[name="column_mode"]').val() ;
         var tr = this._get_columns().find(row === undefined ? 'tr.coldef' : 'tr.coldef[row="'+row+'"]') ;
         if (tr.length) {
             var html = '<option value="">&lt;select&gt;</option>' ;
@@ -900,14 +946,27 @@ function Runtable_DialogEdit (parent, table_data, new_table_mode) {
             var source_elem = tr.find('select[name="source"]') ;
             if (select_type !== undefined) {
                 type_elem.val(select_type) ;
-                if (this._table_data.dict[select_type].length) {
+                if (select_type in this._table_data.dict) {
                     var html = '<option value="">&lt;select&gt;</option>' ;
                     for (var i in this._table_data.dict[select_type]) {
-                        var source = this._table_data.dict[select_type][i] ;
-                        html += '<option>'+source+'</option>' ;
+                        var p = this._table_data.dict[select_type][i] ;
+                        var source = p.name ;
+                        var descr  = p.descr ;
+                        if (select_type.substr(0,5) === 'EPICS') {
+                            var opt = descr+' &nbsp;  |  &nbsp; '+source ;
+                            switch (column_mode) {
+                                case 'descr'        : html += '<option value="'+source+'" name="'+descr+'"  >'+opt+'</option>' ; break ;
+                                case 'pv'           : html += '<option value="'+source+'" name="'+source+'" >'+opt+'</option>' ; break ;
+                            }
+                        } else {
+                            html += '<option value="'+source+'" name="'+descr+'" >'+descr+'</option>' ;
+                        }
                     }
                     source_elem.html(html) ;
                     source_elem.removeAttr('disabled') ;
+                    if (select_source !== undefined) {
+                        source_elem.val(select_source) ;
+                    }
                 } else {
                     source_elem.html('') ;
                     source_elem.attr('disabled', 'disabled') ;
@@ -918,7 +977,28 @@ function Runtable_DialogEdit (parent, table_data, new_table_mode) {
             }
         }
     } ;
+    /**
+     * Adjust selectors for EPICS types to display PV names, descriptiosn or both
+     * as per the current configuration of the UI.
+     *
+     * @returns {undefined}
+     */
+    this._adjust_column_types = function () {
 
+        this._get_columns().find('tr.coldef').each(function () {
+            var tr = $(this) ;
+            var row = tr.attr('row') ;
+
+            var type = tr.find('select[name="type"]').val() ;
+            if ((type !== '') && (type.substring(0, 5) === 'EPICS')) {
+
+                var source = tr.find('select[name="source"]').val() ;
+                if (source !== '') _that._install_column_types(row, type, source) ;
+                else               _that._install_column_types(row, type) ;
+            }
+        }) ;
+    } ;
+    
     this._update_preview = function ()  {
 
         var table_cont = this._get_cont().find('div#table.table') ;
@@ -946,7 +1026,7 @@ function Runtable_DialogEdit (parent, table_data, new_table_mode) {
                         var type  = tr.find('select[name="type"]').val() ;
                         switch (type) {
                             case 'Editable' :
-                                row.push('<input type="text" value="edit me" >') ;
+                                row.push('<input type="text" value="" >') ;
                                 break ;
                             default :
                                 row.push(++j) ;
@@ -992,11 +1072,11 @@ function Runtables_User (experiment, access_list) {
     // ------------------------------------------------
 
     this.on_activate = function() {
-        this.on_update() ;
+        this._init() ;
     } ;
 
     this.on_deactivate = function() {
-        this._init() ;
+        ;
     } ;
 
     this._update_ival_sec = 10 ;
@@ -1004,7 +1084,7 @@ function Runtables_User (experiment, access_list) {
 
     this.on_update = function () {
         if (!this.active) return ;
-        this._init() ;
+        if (!this._is_initialized) return ;
         var now_sec = Fwk.now().sec ;
         if (this._prev_update_sec + this._update_ival_sec < now_sec) {
             this._update() ;
@@ -1145,7 +1225,7 @@ function Runtables_User (experiment, access_list) {
                     // For now just let the table to update its cells.
                     //
                     // TODO: the tricky stuff of checking of the run number has modified, or
-                    //       something else. Perhaps we just need to utrigger on_update() signal
+                    //       something else. Perhaps we just need to trigger on_update() signal
                     //       on that table and let it figure out what's new?
 
                     dialog.on_update() ;
