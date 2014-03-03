@@ -1,12 +1,12 @@
-#ifndef PDSCALIBDATA_PNCCDBASEV1_H
-#define PDSCALIBDATA_PNCCDBASEV1_H
+#ifndef PDSCALIBDATA_CSPADBASEV2_H
+#define PDSCALIBDATA_CSPADBASEV2_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
-// 	$Id: CsPadBaseV1.h 6832 2013-09-24 21:14:17Z dubrovin@SLAC.STANFORD.EDU $
+//      $Id: CsPadBaseV2.h 1 2014-03-01 18:00:00Z dubrovin@SLAC.STANFORD.EDU $
 //
 // Description:
-//	Class CsPadBaseV1.
+//	Class CsPadBaseV2.
 //
 //------------------------------------------------------------------------
 
@@ -22,8 +22,8 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "ndarray/ndarray.h"
-#include "pdsdata/psddl/pnccd.ddl.h"
+// #include "ndarray/ndarray.h"
+// #include "pdsdata/psddl/cspad.ddl.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -36,42 +36,43 @@
 namespace pdscalibdata {
 
 /**
- *  class PnccdBaseV1 contains common parameters and methods (if any) for pnCCD. 
+ *  class CsPadBaseV2 contains common parameters and methods (if any) for CSPAD. 
  *
  *  This software was developed for the LCLS project.  If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
  *  @see AdditionalClass
  *
- *  @version $Id: PnccdBaseV1.h 2014-01-24 11:00:00Z dubrovin@SLAC.STANFORD.EDU $
+ *  @version $Id: CsPadBaseV2.cpp 2014-03-01 18:00:00Z dubrovin@SLAC.STANFORD.EDU $
  *
  *  @author Mikhail Dubrovin
  */
 
-class PnccdBaseV1 {
+class CsPadBaseV2 {
 public:
 
-  const static size_t   Ndim = 3; 
-  const static size_t   Segs = 4; 
-  const static size_t   Rows = 512; 
-  const static size_t   Cols = 512; 
-  const static size_t   Size = Segs*Rows*Cols; 
+  const static size_t   Ndim = 4; 
+  const static size_t   Quads= 4; 
+  const static size_t   Segs = 8; 
+  const static size_t   Rows = 185; 
+  const static size_t   Cols = 388; 
+  const static size_t   Size = Quads*Segs*Rows*Cols; 
   
   // Default constructor
-  PnccdBaseV1 () {};
+  CsPadBaseV2 () {};
   
   // Destructor
-  ~PnccdBaseV1 () {};
+  ~CsPadBaseV2 () {};
 
 protected:
 
 private:
 
   // Copy constructor and assignment are disabled by default
-  PnccdBaseV1 ( const PnccdBaseV1& ) ;
-  PnccdBaseV1& operator = ( const PnccdBaseV1& ) ;
+  CsPadBaseV2 ( const CsPadBaseV2& ) ;
+  CsPadBaseV2& operator = ( const CsPadBaseV2& ) ;
 };
 
 } // namespace pdscalibdata
 
-#endif // PDSCALIBDATA_PNCCDBASEV1_H
+#endif // PDSCALIBDATA_CSPADBASEV2_H

@@ -1,12 +1,12 @@
-#ifndef PDSCALIBDATA_PNCCDCOMMONMODEV1_H
-#define PDSCALIBDATA_PNCCDCOMMONMODEV1_H
+#ifndef PDSCALIBDATA_CSPADCOMMONMODEV2_H
+#define PDSCALIBDATA_CSPADCOMMONMODEV2_H
 
 //--------------------------------------------------------------------------
 // File and Version Information:
-// 	$Id: PnccdCommonModeV1.h 1 2014-01-28 18:00:00Z dubrovin@SLAC.STANFORD.EDU $
+// 	$Id: CsPadCommonModeV2.h 1 2014-01-28 18:00:00Z dubrovin@SLAC.STANFORD.EDU $
 //
 // Description:
-//	Class PnccdCommonModeV1.
+//	Class CsPadCommonModeV2.
 //
 //------------------------------------------------------------------------
 
@@ -18,14 +18,14 @@
 //----------------------
 // Base Class Headers --
 //----------------------
-#include "pdscalibdata/PnccdBaseV1.h" // Segs, Rows, Cols etc.
+#include "pdscalibdata/CsPadBaseV2.h" // Segs, Rows, Cols etc.
 #include "pdscalibdata/GlobalMethods.h"
 
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
 #include "ndarray/ndarray.h"
-#include "pdsdata/psddl/pnccd.ddl.h"
+// #include "pdsdata/psddl/cspad.ddl.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -44,12 +44,12 @@ namespace pdscalibdata {
  *
  *  @see AdditionalClass
  *
- *  @version $Id: PnccdCommonModeV1.cpp 2014-01-28 18:00:00Z dubrovin@SLAC.STANFORD.EDU $
+ *  @version $Id: CsPadCommonModeV2.cpp 2014-01-28 18:00:00Z dubrovin@SLAC.STANFORD.EDU $
  *
  *  @author Mikhail Dubrovin
  */
 
-class PnccdCommonModeV1: public PnccdBaseV1 {
+class CsPadCommonModeV2: public CsPadBaseV2 {
 public:
 
   const static size_t CMSize = 16; 
@@ -57,28 +57,26 @@ public:
   typedef double pars_t;
 
   /// Default constructor
-  PnccdCommonModeV1 ()
-  : PnccdBaseV1 ()
+  CsPadCommonModeV2 ()
+  : CsPadBaseV2 ()
   {
     std::fill_n(m_pars, int(CMSize), pars_t(0));
     // default common_mode parameters
     m_pars[0] = 1;   // Common mode algorithm number
-    m_pars[1] = 300; // Threshold; values below threshold are averaged
-    m_pars[2] = 50;  // Maximal correction; correction is applied if it is less than this value
-    m_pars[3] = 128; // Number of pixels for averaging
-    m_pars[4] = 0.2; // Fraction of pixels in cm peak ...
+    m_pars[1] = 25;  // Threshold; values below threshold are averaged
+    m_pars[2] = 10;  // Maximal correction; correction is applied if it is less than this value
   }
 
   /// Read parameters from file
-  PnccdCommonModeV1 (const std::string& fname)
-  : PnccdBaseV1 ()
+  CsPadCommonModeV2 (const std::string& fname)
+  : CsPadBaseV2 ()
   {
     std::fill_n(m_pars, int(CMSize), pars_t(0));
     load_pars_from_file <pars_t> (fname, "common_mode", CMSize, m_pars, 2);
   }
 
   /// Destructor
-  ~PnccdCommonModeV1 (){}
+  ~CsPadCommonModeV2 (){}
 
   /// Access parameters
   ndarray<pars_t, 1> common_mode() const {
@@ -88,7 +86,7 @@ public:
   /// Print array of parameters
   void  print()
   {
-    MsgLog("PnccdCommonModeV1", info, "common_mode:\n" << common_mode());
+    MsgLog("CsPadCommonModeV2", info, "common_mode:\n" << common_mode());
   }
 
 protected:
@@ -101,10 +99,10 @@ private:
   //std::string m_comment; 
   
   /// Copy constructor and assignment are disabled by default
-  PnccdCommonModeV1 ( const PnccdCommonModeV1& ) ;
-  PnccdCommonModeV1& operator = ( const PnccdCommonModeV1& ) ;
+  CsPadCommonModeV2 ( const CsPadCommonModeV2& ) ;
+  CsPadCommonModeV2& operator = ( const CsPadCommonModeV2& ) ;
 };
 
 } // namespace pdscalibdata
 
-#endif // PDSCALIBDATA_PNCCDCOMMONMODEV1_H
+#endif // PDSCALIBDATA_CSPADCOMMONMODEV2_H
