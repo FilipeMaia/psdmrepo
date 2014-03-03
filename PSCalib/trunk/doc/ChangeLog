@@ -11,6 +11,12 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-20
+2014-03-03 Mikhail S. Dubrovin
+- add CSPad2x2CalibIntensity and CSPadCalibIntensity to access cspad and cspad2x2 calibration parameters
+- add examples in test/ex_cspad2x2_calib_intensity.cpp, test/ex_cspad_calib_intensity.cpp
+- modify factory class include/CalibParsStore.h to account for cspad and cspad2x2
+	
 Tag: V00-01-19
 2014-02-08 Mikhail S. Dubrovin
 - in PnccdCalibPars, CalibPars, and CalibParsStore include new type of constants PnccdPixelRmsV1
