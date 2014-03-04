@@ -18,6 +18,7 @@
 //#include <vector>
 //#include <map>
 //#include <fstream>  // open, close etc.
+#include <stdint.h> // for uint8_t, uint16_t etc.
 
 //----------------------
 // Base Class Headers --
