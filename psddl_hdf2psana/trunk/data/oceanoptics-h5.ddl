@@ -15,6 +15,20 @@
 }
 
 
+//------------------ ConfigV2 ------------------
+@h5schema ConfigV2
+  [[version(0)]]
+{
+  @dataset config {
+    @attribute exposureTime;
+    @attribute deviceType;
+    @attribute waveLenCalib;
+    @attribute nonlinCorrect;
+    @attribute strayLightConstant;
+  }
+}
+
+
 //------------------ timespec64 ------------------
 @h5schema timespec64
   [[version(0)]]
@@ -33,4 +47,13 @@
   [[external("psddl_hdf2psana/oceanoptics.h")]]
 {
 }
+
+
+//------------------ DataV2 ------------------
+@h5schema DataV2
+  [[version(0)]]
+  [[external("psddl_hdf2psana/oceanoptics.h")]]
+{
+}
+
 } //- @package OceanOptics

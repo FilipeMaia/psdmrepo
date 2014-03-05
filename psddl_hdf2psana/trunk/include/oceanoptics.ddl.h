@@ -62,6 +62,59 @@ void make_datasets(const Psana::OceanOptics::ConfigV1& obj, hdf5pp::Group group,
 void store_at(const Psana::OceanOptics::ConfigV1* obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 
+namespace ns_ConfigV2_v0 {
+struct dataset_config {
+  static hdf5pp::Type native_type();
+  static hdf5pp::Type stored_type();
+
+  dataset_config();
+  dataset_config(const Psana::OceanOptics::ConfigV2& psanaobj);
+  ~dataset_config();
+
+  float exposureTime;
+  int32_t deviceType;
+  double waveLenCalib[4];
+  double nonlinCorrect[8];
+  double strayLightConstant;
+
+
+};
+}
+
+
+class ConfigV2_v0 : public Psana::OceanOptics::ConfigV2 {
+public:
+  typedef Psana::OceanOptics::ConfigV2 PsanaType;
+  ConfigV2_v0() {}
+  ConfigV2_v0(hdf5pp::Group group, hsize_t idx)
+    : m_group(group), m_idx(idx) {}
+  ConfigV2_v0(const boost::shared_ptr<OceanOptics::ns_ConfigV2_v0::dataset_config>& ds) : m_ds_config(ds) {}
+  virtual ~ConfigV2_v0() {}
+  virtual float exposureTime() const;
+  virtual int32_t deviceType() const;
+  virtual ndarray<const double, 1> waveLenCalib() const;
+  virtual ndarray<const double, 1> nonlinCorrect() const;
+  virtual double strayLightConstant() const;
+private:
+  mutable hdf5pp::Group m_group;
+  hsize_t m_idx;
+  mutable boost::shared_ptr<OceanOptics::ns_ConfigV2_v0::dataset_config> m_ds_config;
+  void read_ds_config() const;
+};
+
+boost::shared_ptr<PSEvt::Proxy<Psana::OceanOptics::ConfigV2> > make_ConfigV2(int version, hdf5pp::Group group, hsize_t idx);
+
+/// Store object as a single instance (scalar dataset) inside specified group.
+void store(const Psana::OceanOptics::ConfigV2& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::OceanOptics::ConfigV2& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method at the specified index,
+/// negative index means append to the end of dataset. If pointer to object is zero then
+/// datsets are extended with zero-filled of default-initialized data.
+void store_at(const Psana::OceanOptics::ConfigV2* obj, hdf5pp::Group group, long index = -1, int version = -1);
+
+
 namespace ns_timespec64_v0 {
 struct dataset_data {
   static hdf5pp::Type native_type();
@@ -79,6 +132,7 @@ struct dataset_data {
 };
 }
 boost::shared_ptr<PSEvt::Proxy<Psana::OceanOptics::DataV1> > make_DataV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::OceanOptics::ConfigV1>& cfg);
+boost::shared_ptr<PSEvt::Proxy<Psana::OceanOptics::DataV1> > make_DataV1(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::OceanOptics::ConfigV2>& cfg);
 
 /// Store object as a single instance (scalar dataset) inside specified group.
 void store(const Psana::OceanOptics::DataV1& obj, hdf5pp::Group group, int version = -1);
@@ -89,6 +143,18 @@ void make_datasets(const Psana::OceanOptics::DataV1& obj, hdf5pp::Group group, c
 /// negative index means append to the end of dataset. If pointer to object is zero then
 /// datsets are extended with zero-filled of default-initialized data.
 void store_at(const Psana::OceanOptics::DataV1* obj, hdf5pp::Group group, long index = -1, int version = -1);
+
+boost::shared_ptr<PSEvt::Proxy<Psana::OceanOptics::DataV2> > make_DataV2(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Psana::OceanOptics::ConfigV2>& cfg);
+
+/// Store object as a single instance (scalar dataset) inside specified group.
+void store(const Psana::OceanOptics::DataV2& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::OceanOptics::DataV2& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method at the specified index,
+/// negative index means append to the end of dataset. If pointer to object is zero then
+/// datsets are extended with zero-filled of default-initialized data.
+void store_at(const Psana::OceanOptics::DataV2* obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 } // namespace OceanOptics
 } // namespace psddl_hdf2psana

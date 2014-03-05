@@ -20,6 +20,7 @@
 #include "psddl_hdf2psana/pulnix.ddl.h"
 #include "psddl_hdf2psana/fccd.ddl.h"
 #include "psddl_hdf2psana/imp.ddl.h"
+#include "psddl_hdf2psana/arraychar.ddl.h"
 #include "psddl_hdf2psana/pnccd.ddl.h"
 #include "psddl_hdf2psana/epics.ddl.h"
 #include "psddl_hdf2psana/ipimb.ddl.h"
@@ -27,6 +28,7 @@
 #include "psddl_hdf2psana/control.ddl.h"
 #include "psddl_hdf2psana/cspad2x2.ddl.h"
 #include "psddl_hdf2psana/opal1k.ddl.h"
+#include "psddl_hdf2psana/pimax.ddl.h"
 #include "psddl_hdf2psana/andor.ddl.h"
 #include "psddl_hdf2psana/fli.ddl.h"
 #include "psddl_hdf2psana/oceanoptics.ddl.h"
@@ -249,6 +251,10 @@ try {
     // OceanOptics::ConfigV1
     cfgStore.putProxy(psddl_hdf2psana::OceanOptics::make_ConfigV1(schema_version, group, idx), src);
     break;
+  case 1387299807:
+    // OceanOptics::ConfigV2
+    cfgStore.putProxy(psddl_hdf2psana::OceanOptics::make_ConfigV2(schema_version, group, idx), src);
+    break;
   case 1422110804:
     // Camera::FrameCoord
     evt.putProxy(psddl_hdf2psana::Camera::make_FrameCoord(schema_version, group, idx), src);
@@ -395,6 +401,10 @@ try {
     // Camera::FrameFexConfigV1
     cfgStore.putProxy(psddl_hdf2psana::Camera::make_FrameFexConfigV1(schema_version, group, idx), src);
     break;
+  case 2519955859:
+    // Arraychar::DataV1
+    evt.putProxy(psddl_hdf2psana::Arraychar::make_DataV1(schema_version, group, idx), src);
+    break;
   case 2708910361:
     // Lusi::DiodeFexV1
     evt.putProxy(psddl_hdf2psana::Lusi::make_DiodeFexV1(schema_version, group, idx), src);
@@ -417,15 +427,27 @@ try {
     // Ipimb::DataV2
     evt.putProxy(psddl_hdf2psana::Ipimb::make_DataV2(schema_version, group, idx), src);
     break;
+  case 2913417125:
+    // Pimax::ConfigV1
+    cfgStore.putProxy(psddl_hdf2psana::Pimax::make_ConfigV1(schema_version, group, idx), src);
+    break;
   case 2914045208:
     // Epix::ElementV1
     if (boost::shared_ptr<Psana::Epix::ConfigV1> cfgPtr = cfgStore.get(src)) {
       evt.putProxy(psddl_hdf2psana::Epix::make_ElementV1(schema_version, group, idx, cfgPtr), src);
     }
     break;
+  case 2929134981:
+    // OceanOptics::DataV2
+    if (boost::shared_ptr<Psana::OceanOptics::ConfigV2> cfgPtr = cfgStore.get(src)) {
+      evt.putProxy(psddl_hdf2psana::OceanOptics::make_DataV2(schema_version, group, idx, cfgPtr), src);
+    }
+    break;
   case 2929134982:
     // OceanOptics::DataV1
     if (boost::shared_ptr<Psana::OceanOptics::ConfigV1> cfgPtr = cfgStore.get(src)) {
+      evt.putProxy(psddl_hdf2psana::OceanOptics::make_DataV1(schema_version, group, idx, cfgPtr), src);
+    } else if (boost::shared_ptr<Psana::OceanOptics::ConfigV2> cfgPtr = cfgStore.get(src)) {
       evt.putProxy(psddl_hdf2psana::OceanOptics::make_DataV1(schema_version, group, idx, cfgPtr), src);
     }
     break;
@@ -453,6 +475,12 @@ try {
     // Acqiris::DataDescV1
     if (boost::shared_ptr<Psana::Acqiris::ConfigV1> cfgPtr = cfgStore.get(src)) {
       evt.putProxy(psddl_hdf2psana::Acqiris::make_DataDescV1(schema_version, group, idx, cfgPtr), src);
+    }
+    break;
+  case 2962565746:
+    // Pimax::FrameV1
+    if (boost::shared_ptr<Psana::Pimax::ConfigV1> cfgPtr = cfgStore.get(src)) {
+      evt.putProxy(psddl_hdf2psana::Pimax::make_FrameV1(schema_version, group, idx, cfgPtr), src);
     }
     break;
   case 2968036851:
