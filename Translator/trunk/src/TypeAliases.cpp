@@ -5,6 +5,7 @@
 #include "psddl_psana/acqiris.ddl.h"
 #include "psddl_psana/alias.ddl.h"
 #include "psddl_psana/andor.ddl.h"
+#include "psddl_psana/arraychar.ddl.h"
 #include "psddl_psana/bld.ddl.h"
 #include "psddl_psana/camera.ddl.h"
 #include "psddl_psana/control.ddl.h"
@@ -26,6 +27,7 @@
 #include "psddl_psana/opal1k.ddl.h"
 #include "psddl_psana/orca.ddl.h"
 #include "psddl_psana/partition.ddl.h"
+#include "psddl_psana/pimax.ddl.h"
 #include "psddl_psana/pnccd.ddl.h"
 #include "psddl_psana/princeton.ddl.h"
 #include "psddl_psana/pulnix.ddl.h"
@@ -57,6 +59,10 @@ TypeAliases::TypeAliases() {
   Andor.insert( & typeid(Psana::Andor::ConfigV1));
   Andor.insert( & typeid(Psana::Andor::FrameV1));
   m_alias2TypesMap["Andor"] = Andor;
+
+  TypeInfoSet Arraychar;
+  Arraychar.insert( & typeid(Psana::Arraychar::DataV1));
+  m_alias2TypesMap["Arraychar"] = Arraychar;
 
   TypeInfoSet Control;
   Control.insert( & typeid(Psana::ControlData::ConfigV1));
@@ -195,7 +201,9 @@ TypeAliases::TypeAliases() {
 
   TypeInfoSet OceanOptics;
   OceanOptics.insert( & typeid(Psana::OceanOptics::ConfigV1));
+  OceanOptics.insert( & typeid(Psana::OceanOptics::ConfigV2));
   OceanOptics.insert( & typeid(Psana::OceanOptics::DataV1));
+  OceanOptics.insert( & typeid(Psana::OceanOptics::DataV2));
   m_alias2TypesMap["OceanOptics"] = OceanOptics;
 
   TypeInfoSet Opal1k;
@@ -217,6 +225,11 @@ TypeAliases::TypeAliases() {
   TypeInfoSet PimImage;
   PimImage.insert( & typeid(Psana::Lusi::PimImageConfigV1));
   m_alias2TypesMap["PimImage"] = PimImage;
+
+  TypeInfoSet Pimax;
+  Pimax.insert( & typeid(Psana::Pimax::ConfigV1));
+  Pimax.insert( & typeid(Psana::Pimax::FrameV1));
+  m_alias2TypesMap["Pimax"] = Pimax;
 
   TypeInfoSet Princeton;
   Princeton.insert( & typeid(Psana::Princeton::ConfigV1));

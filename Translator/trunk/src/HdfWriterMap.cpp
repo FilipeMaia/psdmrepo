@@ -12,6 +12,7 @@ psddl/data/templates/hdf5Translator.tmpl?hdfwritermap_cpp
 #include "psddl_hdf2psana/acqiris.ddl.h"
 #include "psddl_hdf2psana/alias.ddl.h"
 #include "psddl_hdf2psana/andor.ddl.h"
+#include "psddl_hdf2psana/arraychar.ddl.h"
 #include "psddl_hdf2psana/bld.ddl.h"
 #include "psddl_hdf2psana/camera.ddl.h"
 #include "psddl_hdf2psana/control.ddl.h"
@@ -33,6 +34,7 @@ psddl/data/templates/hdf5Translator.tmpl?hdfwritermap_cpp
 #include "psddl_hdf2psana/opal1k.ddl.h"
 #include "psddl_hdf2psana/orca.ddl.h"
 #include "psddl_hdf2psana/partition.ddl.h"
+#include "psddl_hdf2psana/pimax.ddl.h"
 #include "psddl_hdf2psana/pnccd.ddl.h"
 #include "psddl_hdf2psana/princeton.ddl.h"
 #include "psddl_hdf2psana/pulnix.ddl.h"
@@ -63,11 +65,13 @@ using namespace psddl_hdf2psana::Camera;
 using namespace psddl_hdf2psana::EvrData;
 using namespace psddl_hdf2psana::Bld;
 using namespace psddl_hdf2psana::EpixSampler;
+using namespace psddl_hdf2psana::Arraychar;
 using namespace psddl_hdf2psana::Quartz;
 using namespace psddl_hdf2psana::Timepix;
 using namespace psddl_hdf2psana::Encoder;
 using namespace psddl_hdf2psana::CsPad;
 using namespace psddl_hdf2psana::Opal1k;
+using namespace psddl_hdf2psana::Pimax;
 using namespace psddl_hdf2psana::Princeton;
 using namespace psddl_hdf2psana::Partition;
 using namespace psddl_hdf2psana::ControlData;
@@ -155,6 +159,7 @@ void initializeHdfWriterMap( HdfWriterMap & mapping) {
   mapping[ & typeid(Psana::Alias::ConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::Alias::ConfigV1> >();
   mapping[ & typeid(Psana::Andor::ConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::Andor::ConfigV1> >();
   mapping[ & typeid(Psana::Andor::FrameV1) ] = boost::make_shared<HdfWriterPsana<Psana::Andor::FrameV1> >();
+  mapping[ & typeid(Psana::Arraychar::DataV1) ] = boost::make_shared<HdfWriterPsana<Psana::Arraychar::DataV1> >();
   mapping[ & typeid(Psana::Bld::BldDataAcqADCV1) ] = boost::make_shared<HdfWriterPsana<Psana::Bld::BldDataAcqADCV1> >();
   mapping[ & typeid(Psana::Bld::BldDataEBeamV0) ] = boost::make_shared<HdfWriterPsana<Psana::Bld::BldDataEBeamV0> >();
   mapping[ & typeid(Psana::Bld::BldDataEBeamV1) ] = boost::make_shared<HdfWriterPsana<Psana::Bld::BldDataEBeamV1> >();
@@ -227,13 +232,17 @@ void initializeHdfWriterMap( HdfWriterMap & mapping) {
   mapping[ & typeid(Psana::Lusi::IpmFexV1) ] = boost::make_shared<HdfWriterPsana<Psana::Lusi::IpmFexV1> >();
   mapping[ & typeid(Psana::Lusi::PimImageConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::Lusi::PimImageConfigV1> >();
   mapping[ & typeid(Psana::OceanOptics::ConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::OceanOptics::ConfigV1> >();
+  mapping[ & typeid(Psana::OceanOptics::ConfigV2) ] = boost::make_shared<HdfWriterPsana<Psana::OceanOptics::ConfigV2> >();
   mapping[ & typeid(Psana::OceanOptics::DataV1) ] = boost::make_shared<HdfWriterPsana<Psana::OceanOptics::DataV1> >();
+  mapping[ & typeid(Psana::OceanOptics::DataV2) ] = boost::make_shared<HdfWriterPsana<Psana::OceanOptics::DataV2> >();
   mapping[ & typeid(Psana::Opal1k::ConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::Opal1k::ConfigV1> >();
   mapping[ & typeid(Psana::Orca::ConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::Orca::ConfigV1> >();
   mapping[ & typeid(Psana::PNCCD::ConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::PNCCD::ConfigV1> >();
   mapping[ & typeid(Psana::PNCCD::ConfigV2) ] = boost::make_shared<HdfWriterPsana<Psana::PNCCD::ConfigV2> >();
   mapping[ & typeid(Psana::PNCCD::FramesV1) ] = boost::make_shared<HdfWriterPsana<Psana::PNCCD::FramesV1> >();
   mapping[ & typeid(Psana::Partition::ConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::Partition::ConfigV1> >();
+  mapping[ & typeid(Psana::Pimax::ConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::Pimax::ConfigV1> >();
+  mapping[ & typeid(Psana::Pimax::FrameV1) ] = boost::make_shared<HdfWriterPsana<Psana::Pimax::FrameV1> >();
   mapping[ & typeid(Psana::Princeton::ConfigV1) ] = boost::make_shared<HdfWriterPsana<Psana::Princeton::ConfigV1> >();
   mapping[ & typeid(Psana::Princeton::ConfigV2) ] = boost::make_shared<HdfWriterPsana<Psana::Princeton::ConfigV2> >();
   mapping[ & typeid(Psana::Princeton::ConfigV3) ] = boost::make_shared<HdfWriterPsana<Psana::Princeton::ConfigV3> >();
