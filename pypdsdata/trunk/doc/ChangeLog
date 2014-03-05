@@ -6,6 +6,10 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V01-01-12
+2014-03-04 Andy Salnikov
+- forgot to update tests and add enums to TypeId/DetInfo
+
 Tag: V01-01-11
 2014-03-04 Andy Salnikov
 - upgrade to pdsdata V07-02-20

@@ -113,6 +113,9 @@ namespace {
       { "Id_EpixSamplerElement", Pds::TypeId::Id_EpixSamplerElement },
       { "Id_EvsConfig",       Pds::TypeId::Id_EvsConfig },
       { "Id_PartitionConfig", Pds::TypeId::Id_PartitionConfig },
+      { "Id_PimaxConfig",     Pds::TypeId::Id_PimaxConfig },
+      { "Id_PimaxFrame",      Pds::TypeId::Id_PimaxFrame },
+      { "Id_Arraychar",       Pds::TypeId::Id_Arraychar },
       { "NumberOf",           Pds::TypeId::NumberOf },
       { 0, 0 }
   };
