@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-24
+2014-03-05 Igor Gaponenko
+- added a function to the Switch
+
 Tag: V00-01-23
 2014-01-31 Igor Gaponenko
 - a bug fix in class RegDB

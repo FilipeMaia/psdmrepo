@@ -455,6 +455,51 @@ HERE;
     }
 
     /**
+     * 
+     * @param String $instrument_name
+     * @param Number $station
+     * @param LusiTime $before
+     * @return Array
+     * @throws RegDBException
+     */
+    public function last_experiment_switch_before( $instrument_name, $station, $before ) {
+
+        $instrument = $this->find_instrument_by_name($instrument_name);
+
+        $num_stations = $instrument->find_param_by_name( 'num_stations' );
+        if( is_null($num_stations))
+            throw new RegDBException (
+                __METHOD__,
+                "the instrument is not properly configured in the database, instrument: {$instrument_name}" );
+
+        if( $station >= intval($num_stations->value()))
+            throw new RegDBException (
+                __METHOD__,
+                "the instrument is not configured to take data, instrument: {$instrument_name}" );
+
+        $sql =<<<HERE
+SELECT * FROM {$this->connection->database}.expswitch
+WHERE exper_id IN ( SELECT e.id FROM {$this->connection->database}.experiment `e`,
+                                     {$this->connection->database}.instrument `i`
+                    WHERE e.instr_id=i.id
+                    AND i.name='{$instrument_name}' )
+AND station={$station}
+AND switch_time < {$before->to64()}
+ORDER BY switch_time DESC LIMIT 1
+HERE;
+        $result = $this->connection->query( $sql );
+        $nrows = mysql_numrows( $result );
+        if( $nrows == 0 ) return null;
+        if( $nrows == 1 ) {
+            $attr = mysql_fetch_array( $result, MYSQL_ASSOC );
+            return $attr;
+        }
+        throw new RegDBException(
+            __METHOD__,
+            "unexpected size of result set returned by the query" );
+    }
+
+    /**
      * Return true if the specified experiment is active (current) at any DAQ station
      * of the corresponding instrument.
      *
@@ -582,6 +627,7 @@ HERE;
                 $g = $exper->name();
                 if(( 1 == preg_match( '/^[a-z]{3}[0-9]{5}$/', $g )) ||
                    ( 1 == preg_match( '/^[a-z]{3}[a-z][0-9]{4}$/', $g )) ||
+                   ( 1 == preg_match( '/^[a-z]{3}daq[0-9]{2}$/', $g )) ||
                    ( 1 == preg_match( '/^dia[a-z]{3}[0-9]{2}$/', $g ))) $groups[$g] = True;
             }
         }
