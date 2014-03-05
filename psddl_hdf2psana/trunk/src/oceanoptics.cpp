@@ -162,6 +162,7 @@ void DataV1_v0<Config>::read_ds_data() const {
   m_ds_data = hdf5pp::Utils::readGroup<OceanOptics::ns_DataV1_v0::dataset_data>(m_group, "data", m_idx);
 }
 template class DataV1_v0<Psana::OceanOptics::ConfigV1>;
+template class DataV1_v0<Psana::OceanOptics::ConfigV2>;
 
 void make_datasets_DataV1_v0(const Psana::OceanOptics::DataV1& obj, 
       hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
