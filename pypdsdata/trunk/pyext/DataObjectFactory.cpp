@@ -34,6 +34,8 @@
 #include "types/andor/ConfigV1.h"
 #include "types/andor/FrameV1.h"
 
+#include "types/arraychar/DataV1.h"
+
 #include "types/bld/BldDataAcqADCV1.h"
 #include "types/bld/BldDataEBeamV0.h"
 #include "types/bld/BldDataEBeamV1.h"
@@ -123,13 +125,18 @@
 #include "types/lusi/PimImageConfigV1.h"
 
 #include "types/oceanoptics/ConfigV1.h"
+#include "types/oceanoptics/ConfigV2.h"
 #include "types/oceanoptics/DataV1.h"
+#include "types/oceanoptics/DataV2.h"
 
 #include "types/opal1k/ConfigV1.h"
 
 #include "types/orca/ConfigV1.h"
 
 #include "types/partition/ConfigV1.h"
+
+#include "types/pimax/ConfigV1.h"
+#include "types/pimax/FrameV1.h"
 
 #include "types/pnCCD/ConfigV1.h"
 #include "types/pnCCD/ConfigV2.h"
@@ -475,10 +482,12 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
 
   case Pds::TypeId::Id_OceanOpticsConfig :
     if ( not obj ) obj = xtc2obj<OceanOptics::ConfigV1, 1>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<OceanOptics::ConfigV2, 2>(xtc, parent);
     break ;
 
   case Pds::TypeId::Id_OceanOpticsData :
     if ( not obj ) obj = xtc2obj<OceanOptics::DataV1, 1>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<OceanOptics::DataV2, 2>(xtc, parent);
     break ;
 
   case Pds::TypeId::Id_EpicsConfig :
@@ -583,6 +592,18 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
 
   case Pds::TypeId::Id_PartitionConfig :
     if ( not obj ) obj = xtc2obj<Partition::ConfigV1, 1>(xtc, parent);
+    break;
+
+  case Pds::TypeId::Id_PimaxConfig :
+    if ( not obj ) obj = xtc2obj<Pimax::ConfigV1, 1>(xtc, parent);
+    break;
+
+  case Pds::TypeId::Id_PimaxFrame :
+    if ( not obj ) obj = xtc2obj<Pimax::FrameV1, 1>(xtc, parent);
+    break;
+
+  case Pds::TypeId::Id_Arraychar :
+    if ( not obj ) obj = xtc2obj<Arraychar::DataV1, 1>(xtc, parent);
     break;
 
   case Pds::TypeId::NumberOf :

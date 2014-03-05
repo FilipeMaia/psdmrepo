@@ -34,9 +34,9 @@
 namespace {
 
   // type-specific methods
-  FUN0_WRAPPER(pypdsdata::Andor::FrameV1, shotIdStart)
-  FUN0_WRAPPER(pypdsdata::Andor::FrameV1, readoutTime)
-  FUN0_WRAPPER(pypdsdata::Andor::FrameV1, temperature)
+  FUN0_WRAPPER(pypdsdata::Pimax::FrameV1, shotIdStart)
+  FUN0_WRAPPER(pypdsdata::Pimax::FrameV1, readoutTime)
+  FUN0_WRAPPER(pypdsdata::Pimax::FrameV1, temperature)
   PyObject* data( PyObject* self, PyObject* args );
 
   PyMethodDef methods[] = {
@@ -47,7 +47,7 @@ namespace {
     {0, 0, 0, 0}
    };
 
-  char typedoc[] = "Python class wrapping C++ Pds::Andor::FrameV1 class.";
+  char typedoc[] = "Python class wrapping C++ Pds::Pimax::FrameV1 class.";
 
 }
 
@@ -56,7 +56,7 @@ namespace {
 //		----------------------------------------
 
 void
-pypdsdata::Andor::FrameV1::initType( PyObject* module )
+pypdsdata::Pimax::FrameV1::initType( PyObject* module )
 {
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
@@ -66,9 +66,9 @@ pypdsdata::Andor::FrameV1::initType( PyObject* module )
 }
 
 void
-pypdsdata::Andor::FrameV1::print(std::ostream& str) const
+pypdsdata::Pimax::FrameV1::print(std::ostream& str) const
 {
-  str << "Andor.FrameV1(shotIdStart=" << m_obj->shotIdStart()
+  str << "Pimax.FrameV1(shotIdStart=" << m_obj->shotIdStart()
       << ", readoutTime=" << m_obj->readoutTime()
       << ", temperature=" << m_obj->temperature()
       << ", ...)";
@@ -79,26 +79,24 @@ namespace {
 PyObject*
 data( PyObject* self, PyObject* args )
 {
-  Pds::Andor::FrameV1* obj = pypdsdata::Andor::FrameV1::pdsObject( self );
+  Pds::Pimax::FrameV1* obj = pypdsdata::Pimax::FrameV1::pdsObject( self );
   if ( not obj ) return 0;
 
   // parse args
   PyObject* configObj ;
-  if ( not PyArg_ParseTuple( args, "O:Andor.FrameV1.data", &configObj ) ) return 0;
+  if ( not PyArg_ParseTuple( args, "O:Pimax.FrameV1.data", &configObj ) ) return 0;
 
   // dimensions
   npy_intp dims[2] = { 0, 0 };
 
   // get dimensions from config object
-  Pds::Andor::ConfigV1* config = 0;
-  if ( pypdsdata::Andor::ConfigV1::Object_TypeCheck( configObj ) ) {
-    config = pypdsdata::Andor::ConfigV1::pdsObject( configObj );
-    uint32_t binX = config->binX();
-    uint32_t binY = config->binY();
-    dims[0] = (config->height() + binY - 1) / binY;
-    dims[1] = (config->width() + binX - 1) / binX;
+  Pds::Pimax::ConfigV1* config = 0;
+  if ( pypdsdata::Pimax::ConfigV1::Object_TypeCheck( configObj ) ) {
+    config = pypdsdata::Pimax::ConfigV1::pdsObject( configObj );
+    dims[0] = config->numPixelsY();
+    dims[1] = config->numPixelsX();
   } else {
-    PyErr_SetString(PyExc_TypeError, "Error: parameter is not a Andor.ConfigV* object");
+    PyErr_SetString(PyExc_TypeError, "Error: parameter is not a Pimax.ConfigV* object");
     return 0;
   }
 

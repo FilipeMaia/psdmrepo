@@ -3,7 +3,7 @@
 // 	$Id$
 //
 // Description:
-//	Class DataV1...
+//	Class DataV2...
 //
 // Author List:
 //      Andrei Salnikov
@@ -13,7 +13,7 @@
 //-----------------------
 // This Class's Header --
 //-----------------------
-#include "DataV1.h"
+#include "DataV2.h"
 
 //-----------------
 // C/C++ Headers --
@@ -23,7 +23,6 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "ConfigV1.h"
 #include "ConfigV2.h"
 #include "../TypeLib.h"
 #include "../../EnumType.h"
@@ -37,23 +36,23 @@ namespace {
 
   // list of enums
   pypdsdata::TypeLib::EnumEntry enums[] = {
-        { "iDataReadSize", Pds::OceanOptics::DataV1::iDataReadSize },
+        { "iDataReadSize", Pds::OceanOptics::DataV2::iDataReadSize },
 
-        { "iNumPixels", Pds::OceanOptics::DataV1::iNumPixels },
+        { "iNumPixels", Pds::OceanOptics::DataV2::iNumPixels },
 
-        { "iActivePixelIndex", Pds::OceanOptics::DataV1::iActivePixelIndex },
+        { "iActivePixelIndex", Pds::OceanOptics::DataV2::iActivePixelIndex },
 
         { 0, 0 }
   };
 
   // methods
-  FUN0_WRAPPER(pypdsdata::OceanOptics::DataV1, frameCounter)
-  FUN0_WRAPPER(pypdsdata::OceanOptics::DataV1, numDelayedFrames)
-  FUN0_WRAPPER(pypdsdata::OceanOptics::DataV1, numDiscardFrames)
-  FUN0_WRAPPER(pypdsdata::OceanOptics::DataV1, numSpectraInData)
-  FUN0_WRAPPER(pypdsdata::OceanOptics::DataV1, numSpectraInQueue)
-  FUN0_WRAPPER(pypdsdata::OceanOptics::DataV1, numSpectraUnused)
-  FUN0_WRAPPER(pypdsdata::OceanOptics::DataV1, durationOfFrame)
+  FUN0_WRAPPER(pypdsdata::OceanOptics::DataV2, frameCounter)
+  FUN0_WRAPPER(pypdsdata::OceanOptics::DataV2, numDelayedFrames)
+  FUN0_WRAPPER(pypdsdata::OceanOptics::DataV2, numDiscardFrames)
+  FUN0_WRAPPER(pypdsdata::OceanOptics::DataV2, numSpectraInData)
+  FUN0_WRAPPER(pypdsdata::OceanOptics::DataV2, numSpectraInQueue)
+  FUN0_WRAPPER(pypdsdata::OceanOptics::DataV2, numSpectraUnused)
+  FUN0_WRAPPER(pypdsdata::OceanOptics::DataV2, durationOfFrame)
   PyObject* data( PyObject* self, PyObject* );
   PyObject* timeFrameStart( PyObject* self, PyObject* );
   PyObject* timeFrameFirstData( PyObject* self, PyObject* );
@@ -82,7 +81,7 @@ namespace {
     {0, 0, 0, 0}
    };
 
-  char typedoc[] = "Python class wrapping C++ Pds::OceanOptics::DataV1 class.";
+  char typedoc[] = "Python class wrapping C++ Pds::OceanOptics::DataV2 class.";
 }
 
 //              ----------------------------------------
@@ -90,7 +89,7 @@ namespace {
 //              ----------------------------------------
 
 void
-pypdsdata::OceanOptics::DataV1::initType( PyObject* module )
+pypdsdata::OceanOptics::DataV2::initType( PyObject* module )
 {
   PyTypeObject* type = BaseType::typeObject() ;
   type->tp_doc = ::typedoc;
@@ -101,13 +100,13 @@ pypdsdata::OceanOptics::DataV1::initType( PyObject* module )
   pypdsdata::TypeLib::DefineEnums( tp_dict, ::enums );
   type->tp_dict = tp_dict;
 
-  BaseType::initType( "DataV1", module );
+  BaseType::initType( "DataV2", module );
 }
 
 void
-pypdsdata::OceanOptics::DataV1::print(std::ostream& str) const
+pypdsdata::OceanOptics::DataV2::print(std::ostream& str) const
 {
-  str << "oceanoptics.DataV1(frameCounter=" << m_obj->frameCounter()
+  str << "oceanoptics.DataV2(frameCounter=" << m_obj->frameCounter()
       << ", numDelayedFrames=" << m_obj->numDelayedFrames()
       << ", numDiscardFrames=" << m_obj->numDiscardFrames()
       << ", durationOfFrame=" << m_obj->durationOfFrame()
@@ -119,7 +118,7 @@ namespace {
 PyObject*
 data( PyObject* self, PyObject* )
 {
-  Pds::OceanOptics::DataV1* obj = pypdsdata::OceanOptics::DataV1::pdsObject(self);
+  Pds::OceanOptics::DataV2* obj = pypdsdata::OceanOptics::DataV2::pdsObject(self);
   if ( not obj ) return 0;
 
   // NumPy type number
@@ -129,7 +128,7 @@ data( PyObject* self, PyObject* )
   int flags = NPY_C_CONTIGUOUS ;
 
   // dimensions
-  npy_intp dims[1] = { Pds::OceanOptics::DataV1::iNumPixels };
+  npy_intp dims[1] = { Pds::OceanOptics::DataV2::iNumPixels };
 
   // make array
   PyObject* array = PyArray_New(&PyArray_Type, 1, dims, typenum, 0,
@@ -145,7 +144,7 @@ data( PyObject* self, PyObject* )
 PyObject*
 timeFrameStart( PyObject* self, PyObject* )
 {
-  Pds::OceanOptics::DataV1* obj = pypdsdata::OceanOptics::DataV1::pdsObject(self);
+  Pds::OceanOptics::DataV2* obj = pypdsdata::OceanOptics::DataV2::pdsObject(self);
   if(not obj) return 0;
 
   const Pds::OceanOptics::timespec64& ts = obj->timeFrameStart();
@@ -159,7 +158,7 @@ timeFrameStart( PyObject* self, PyObject* )
 PyObject*
 timeFrameFirstData( PyObject* self, PyObject* )
 {
-  Pds::OceanOptics::DataV1* obj = pypdsdata::OceanOptics::DataV1::pdsObject(self);
+  Pds::OceanOptics::DataV2* obj = pypdsdata::OceanOptics::DataV2::pdsObject(self);
   if(not obj) return 0;
 
   const Pds::OceanOptics::timespec64& ts = obj->timeFrameStart();
@@ -173,7 +172,7 @@ timeFrameFirstData( PyObject* self, PyObject* )
 PyObject*
 timeFrameEnd( PyObject* self, PyObject* )
 {
-  Pds::OceanOptics::DataV1* obj = pypdsdata::OceanOptics::DataV1::pdsObject(self);
+  Pds::OceanOptics::DataV2* obj = pypdsdata::OceanOptics::DataV2::pdsObject(self);
   if(not obj) return 0;
 
   const Pds::OceanOptics::timespec64& ts = obj->timeFrameStart();
@@ -184,10 +183,26 @@ timeFrameEnd( PyObject* self, PyObject* )
   return tuple;
 }
 
-template <typename Config>
 PyObject*
-nonlinerCorrected(const Pds::OceanOptics::DataV1& obj, const Config& config)
+nonlinerCorrected( PyObject* self, PyObject* args)
 {
+  Pds::OceanOptics::DataV2* obj = pypdsdata::OceanOptics::DataV2::pdsObject(self);
+  if ( not obj ) return 0;
+
+  // parse args
+  PyObject* configObj ;
+  if ( not PyArg_ParseTuple( args, "O:OceanOptics.DataV2.nonlinerCorrected", &configObj ) ) return 0;
+
+  // get Pds::OceanOptics::ConfigV2 from argument
+  const Pds::OceanOptics::ConfigV2* config = 0;
+  if ( pypdsdata::OceanOptics::ConfigV2::Object_TypeCheck( configObj ) ) {
+    config = pypdsdata::OceanOptics::ConfigV2::pdsObject( configObj );
+  } else {
+    PyErr_SetString(PyExc_TypeError, "Error: parameter is not a oceanoptics.ConfigV2 object");
+    return 0;
+  }
+
+
   // NumPy type number
   int typenum = NPY_DOUBLE;
 
@@ -195,41 +210,18 @@ nonlinerCorrected(const Pds::OceanOptics::DataV1& obj, const Config& config)
   int flags = NPY_C_CONTIGUOUS ;
 
   // dimensions
-  npy_intp dims[1] = { Pds::OceanOptics::DataV1::iNumPixels };
+  npy_intp dims[1] = { Pds::OceanOptics::DataV2::iNumPixels };
 
   // make array, it will allocate memory for its data
   PyObject* array = PyArray_New(&PyArray_Type, 1, dims, typenum, 0,
                                 (void*)0, 0, flags, 0);
 
   // copy corrected data
-  for (int i = 0; i != Pds::OceanOptics::DataV1::iNumPixels; ++ i) {
-    *(double*)PyArray_GETPTR1(array, i) = obj.nonlinerCorrected(config, i);
+  for (int i = 0; i != Pds::OceanOptics::DataV2::iNumPixels; ++ i) {
+    *(double*)PyArray_GETPTR1(array, i) = obj->nonlinerCorrected(*config, i);
   }
 
   return array;
-}
-
-PyObject*
-nonlinerCorrected(PyObject* self, PyObject* args)
-{
-  Pds::OceanOptics::DataV1* obj = pypdsdata::OceanOptics::DataV1::pdsObject(self);
-  if ( not obj ) return 0;
-
-  // parse args
-  PyObject* configObj ;
-  if ( not PyArg_ParseTuple( args, "O:OceanOptics.DataV1.nonlinerCorrected", &configObj ) ) return 0;
-
-  // get Pds::OceanOptics::ConfigV* from argument
-  if ( pypdsdata::OceanOptics::ConfigV1::Object_TypeCheck( configObj ) ) {
-    const Pds::OceanOptics::ConfigV1* config = pypdsdata::OceanOptics::ConfigV1::pdsObject( configObj );
-    return nonlinerCorrected(*obj, *config);
-  } else if ( pypdsdata::OceanOptics::ConfigV2::Object_TypeCheck( configObj ) ) {
-    const Pds::OceanOptics::ConfigV2* config = pypdsdata::OceanOptics::ConfigV2::pdsObject( configObj );
-    return nonlinerCorrected(*obj, *config);
-  } else {
-    PyErr_SetString(PyExc_TypeError, "Error: parameter is not a oceanoptics.ConfigV1 or V2 object");
-    return 0;
-  }
 }
 
 }

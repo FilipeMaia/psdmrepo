@@ -66,6 +66,8 @@
 #include "types/andor/ConfigV1.h"
 #include "types/andor/FrameV1.h"
 
+#include "types/arraychar/DataV1.h"
+
 #include "types/bld/BldDataAcqADCV1.h"
 #include "types/bld/BldDataEBeamV0.h"
 #include "types/bld/BldDataEBeamV1.h"
@@ -189,7 +191,9 @@
 #include "types/lusi/PimImageConfigV1.h"
 
 #include "types/oceanoptics/ConfigV1.h"
+#include "types/oceanoptics/ConfigV2.h"
 #include "types/oceanoptics/DataV1.h"
+#include "types/oceanoptics/DataV2.h"
 
 #include "types/opal1k/ConfigV1.h"
 
@@ -197,6 +201,9 @@
 
 #include "types/partition/ConfigV1.h"
 #include "types/partition/Source.h"
+
+#include "types/pimax/ConfigV1.h"
+#include "types/pimax/FrameV1.h"
 
 #include "types/pnCCD/ConfigV1.h"
 #include "types/pnCCD/ConfigV2.h"
@@ -317,6 +324,11 @@ PyMODINIT_FUNC init_pdsdata()
   pypdsdata::Andor::FrameV1::initType( module );
   Py_INCREF( module );
   PyModule_AddObject( this_module, "andor", module );
+
+  module = Py_InitModule3( "_pdsdata.arraychar", 0, "The Python wrapper module for pdsdata/arraychar" );
+  pypdsdata::Arraychar::DataV1::initType( module );
+  Py_INCREF( module );
+  PyModule_AddObject( this_module, "arraychar", module );
 
   module = Py_InitModule3( "_pdsdata.bld", 0, "The Python wrapper module for pdsdata/bld" );
   pypdsdata::Bld::BldDataAcqADCV1::initType( module );
@@ -493,7 +505,9 @@ PyMODINIT_FUNC init_pdsdata()
 
   module = Py_InitModule3( "_pdsdata.oceanoptics", 0, "The Python wrapper module for pdsdata/oceanoptics" );
   pypdsdata::OceanOptics::ConfigV1::initType( module );
+  pypdsdata::OceanOptics::ConfigV2::initType( module );
   pypdsdata::OceanOptics::DataV1::initType( module );
+  pypdsdata::OceanOptics::DataV2::initType( module );
   Py_INCREF( module );
   PyModule_AddObject( this_module, "oceanoptics", module );
 
@@ -512,6 +526,12 @@ PyMODINIT_FUNC init_pdsdata()
   pypdsdata::Partition::Source::initType( module );
   Py_INCREF( module );
   PyModule_AddObject( this_module, "partition", module );
+
+  module = Py_InitModule3( "_pdsdata.pimax", 0, "The Python wrapper module for pdsdata/pimax" );
+  pypdsdata::Pimax::ConfigV1::initType( module );
+  pypdsdata::Pimax::FrameV1::initType( module );
+  Py_INCREF( module );
+  PyModule_AddObject( this_module, "pimax", module );
 
   module = Py_InitModule3( "_pdsdata.pnccd", 0, "The Python wrapper module for pdsdata/pnCCD" );
   pypdsdata::PNCCD::ConfigV1::initType( module );

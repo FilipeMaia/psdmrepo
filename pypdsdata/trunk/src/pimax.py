@@ -3,11 +3,11 @@
 #  $Id$
 #
 # Description:
-#  Module andor...
+#  Module pimax...
 #
 #------------------------------------------------------------------------
 
-"""Wrapper module for :py:mod:`_pdsdata.andor`. 
+"""Wrapper module for :py:mod:`_pdsdata.pimax`. 
 
 This software was developed for the LCLS project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
@@ -44,17 +44,17 @@ __version__ = "$Revision$"
 # Exported definitions --
 #------------------------
 
-from _pdsdata.andor import *
+from _pdsdata.pimax import *
 
 class FrameV1(object):
     """
-    This is a wrapper for :py:class:`_pdsdata.andor.FrameV1` which removes the need to pass 
+    This is a wrapper for :py:class:`_pdsdata.pimax.FrameV1` which removes the need to pass 
     configuration objects to several methods.
     """
     
     def __init__(self, frame, cfg):
-        """ Constructor takes instance of :py:class:`_pdsdata.andor.FrameV1` and 
-        one `_pdsdata.andor.ConfigV1` object """
+        """ Constructor takes instance of :py:class:`_pdsdata.pimax.FrameV1` and 
+        one `_pdsdata.pimax.ConfigV1` object """
         self.__frame = frame
         self.__cfg = cfg
     
