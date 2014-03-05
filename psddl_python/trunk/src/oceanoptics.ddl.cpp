@@ -44,6 +44,20 @@ void createWrappers(PyObject* module) {
   }
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::OceanOptics::ConfigV1> >(Pds::TypeId::Id_OceanOpticsConfig));
 
+  {
+  scope outer = 
+  class_<Psana::OceanOptics::ConfigV2, boost::shared_ptr<Psana::OceanOptics::ConfigV2>, boost::noncopyable >("ConfigV2", no_init)
+    .def("exposureTime", &Psana::OceanOptics::ConfigV2::exposureTime)
+    .def("deviceType", &Psana::OceanOptics::ConfigV2::deviceType)
+    .def("waveLenCalib", &Psana::OceanOptics::ConfigV2::waveLenCalib)
+    .def("nonlinCorrect", &Psana::OceanOptics::ConfigV2::nonlinCorrect)
+    .def("strayLightConstant", &Psana::OceanOptics::ConfigV2::strayLightConstant)
+  ;
+  scope().attr("Version")=2;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_OceanOpticsConfig);
+  }
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::OceanOptics::ConfigV2> >(Pds::TypeId::Id_OceanOpticsConfig));
+
   class_<Psana::OceanOptics::timespec64 >("timespec64", no_init)
     .def("tv_sec", &Psana::OceanOptics::timespec64::tv_sec)
     .def("tv_nsec", &Psana::OceanOptics::timespec64::tv_nsec)
@@ -75,14 +89,40 @@ void createWrappers(PyObject* module) {
   ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::OceanOptics::DataV1> >(Pds::TypeId::Id_OceanOpticsData));
 
   {
-    PyObject* unvlist = PyList_New(1);
+  scope outer = 
+  class_<Psana::OceanOptics::DataV2, boost::shared_ptr<Psana::OceanOptics::DataV2>, boost::noncopyable >("DataV2", no_init)
+    .def("data", &Psana::OceanOptics::DataV2::data)
+    .def("frameCounter", &Psana::OceanOptics::DataV2::frameCounter)
+    .def("numDelayedFrames", &Psana::OceanOptics::DataV2::numDelayedFrames)
+    .def("numDiscardFrames", &Psana::OceanOptics::DataV2::numDiscardFrames)
+    .def("timeFrameStart", &Psana::OceanOptics::DataV2::timeFrameStart, return_value_policy<copy_const_reference>())
+    .def("timeFrameFirstData", &Psana::OceanOptics::DataV2::timeFrameFirstData, return_value_policy<copy_const_reference>())
+    .def("timeFrameEnd", &Psana::OceanOptics::DataV2::timeFrameEnd, return_value_policy<copy_const_reference>())
+    .def("numSpectraInData", &Psana::OceanOptics::DataV2::numSpectraInData)
+    .def("numSpectraInQueue", &Psana::OceanOptics::DataV2::numSpectraInQueue)
+    .def("numSpectraUnused", &Psana::OceanOptics::DataV2::numSpectraUnused)
+    .def("durationOfFrame", &Psana::OceanOptics::DataV2::durationOfFrame)
+    .def("nonlinerCorrected", &Psana::OceanOptics::DataV2::nonlinerCorrected)
+  ;
+  scope().attr("Version")=2;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_OceanOpticsData);
+  scope().attr("iDataReadSize")=4608;
+  scope().attr("iNumPixels")=2048;
+  scope().attr("iActivePixelIndex")=0;
+  }
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDefSharedPtr<Psana::OceanOptics::DataV2> >(Pds::TypeId::Id_OceanOpticsData));
+
+  {
+    PyObject* unvlist = PyList_New(2);
     PyList_SET_ITEM(unvlist, 0, PyObject_GetAttrString(submodule, "DataV1"));
+    PyList_SET_ITEM(unvlist, 1, PyObject_GetAttrString(submodule, "DataV2"));
     PyObject_SetAttrString(submodule, "Data", unvlist);
     Py_CLEAR(unvlist);
   }
   {
-    PyObject* unvlist = PyList_New(1);
+    PyObject* unvlist = PyList_New(2);
     PyList_SET_ITEM(unvlist, 0, PyObject_GetAttrString(submodule, "ConfigV1"));
+    PyList_SET_ITEM(unvlist, 1, PyObject_GetAttrString(submodule, "ConfigV2"));
     PyObject_SetAttrString(submodule, "Config", unvlist);
     Py_CLEAR(unvlist);
   }
