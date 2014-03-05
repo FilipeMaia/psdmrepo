@@ -28,6 +28,7 @@
 #include "H5DataTypes/AliasConfigV1.h"
 #include "H5DataTypes/AndorConfigV1.h"
 #include "H5DataTypes/AndorFrameV1.h"
+#include "H5DataTypes/ArraycharDataV1.h"
 #include "H5DataTypes/BldDataEBeamV0.h"
 #include "H5DataTypes/BldDataEBeamV1.h"
 #include "H5DataTypes/BldDataEBeamV2.h"
@@ -91,9 +92,12 @@
 #include "H5DataTypes/LusiIpmFexV1.h"
 #include "H5DataTypes/LusiPimImageConfigV1.h"
 #include "H5DataTypes/OceanOpticsConfigV1.h"
+#include "H5DataTypes/OceanOpticsConfigV2.h"
 #include "H5DataTypes/Opal1kConfigV1.h"
 #include "H5DataTypes/OrcaConfigV1.h"
 #include "H5DataTypes/PartitionConfigV1.h"
+#include "H5DataTypes/PimaxConfigV1.h"
+#include "H5DataTypes/PimaxFrameV1.h"
 #include "H5DataTypes/PnCCDConfigV1.h"
 #include "H5DataTypes/PnCCDConfigV2.h"
 #include "H5DataTypes/PrincetonConfigV1.h"
@@ -132,6 +136,7 @@
 #include "O2OTranslator/Gsc16aiDataV1Cvt.h"
 #include "O2OTranslator/ImpElementV1Cvt.h"
 #include "O2OTranslator/OceanOpticsDataV1Cvt.h"
+#include "O2OTranslator/OceanOpticsDataV2Cvt.h"
 #include "O2OTranslator/PnCCDFrameV1Cvt.h"
 #include "O2OTranslator/PrincetonFrameCvt.h"
 #include "O2OTranslator/TimepixDataV1Cvt.h"
@@ -722,6 +727,9 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
     case 1:
       ::makeConfigCvt<OceanOpticsConfigV1>(cvts, group, "OceanOptics::ConfigV1", src, transition, m_cvtOptions, 0);
       break;
+    case 2:
+      ::makeConfigCvt<OceanOpticsConfigV2>(cvts, group, "OceanOptics::ConfigV2", src, transition, m_cvtOptions, 0);
+      break;
     }
     break;
 
@@ -730,6 +738,10 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
     case 1:
       // very special converter for OceanOptics::DataV1, it needs two types of data
       cvts.push_back(make_shared<OceanOpticsDataV1Cvt>(group, "OceanOptics::DataV1", src, m_configStore, m_cvtOptions, 0));
+      break;
+    case 2:
+      // very special converter for OceanOptics::DataV1, it needs two types of data
+      cvts.push_back(make_shared<OceanOpticsDataV2Cvt>(group, "OceanOptics::DataV2", src, m_configStore, m_cvtOptions, 0));
       break;
     }
     break;
@@ -932,6 +944,31 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
       break;
     }
     break;
+
+  case Pds::TypeId::Id_PimaxConfig:
+    switch (version) {
+    case 1:
+      ::makeConfigCvt<PimaxConfigV1>(cvts, group, "Pimax::ConfigV1", src, transition, m_cvtOptions, 0);
+      break;
+    }
+    break;
+
+  case Pds::TypeId::Id_PimaxFrame:
+    switch (version) {
+    case 1:
+      // very special converter for Pimax::FrameV1, it needs two types of data
+      cvts.push_back(make_shared<FliFrameV1Cvt<PimaxFrameV1> >(group, "Pimax::FrameV1", src, m_configStore, m_cvtOptions, 0));
+      break;
+    }
+    break;
+
+    case Pds::TypeId::Id_Arraychar:
+      switch (version) {
+      case 1:
+        cvts.push_back(make_shared<EvtDataTypeCvtDef<ArraycharDataV1> >(group, "Arraychar::DataV1", src, m_cvtOptions, 0));
+        break;
+      }
+      break;
 
   case Pds::TypeId::NumberOf:
     break;

@@ -18,8 +18,9 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
-#include "H5DataTypes/FliFrameV1.h"
 #include "H5DataTypes/AndorFrameV1.h"
+#include "H5DataTypes/FliFrameV1.h"
+#include "H5DataTypes/PimaxFrameV1.h"
 #include "MsgLogger/MsgLogger.h"
 #include "O2OTranslator/ConfigObjectStore.h"
 #include "O2OTranslator/O2OExceptions.h"
@@ -46,6 +47,11 @@ namespace {
   struct ConfigTypeMap<H5DataTypes::FliFrameV1> {
     typedef Pds::Fli::ConfigV1 value;
     static Pds::TypeId typeId() { return Pds::TypeId(Pds::TypeId::Id_FliConfig, 1); }
+  };
+  template <>
+  struct ConfigTypeMap<H5DataTypes::PimaxFrameV1> {
+    typedef Pds::Pimax::ConfigV1 value;
+    static Pds::TypeId typeId() { return Pds::TypeId(Pds::TypeId::Id_PimaxConfig, 1); }
   };
 
 }
@@ -145,5 +151,6 @@ FliFrameV1Cvt<FrameType>::fillMissing(hdf5pp::Group group,
 // explicitly instantiate for know types
 template class FliFrameV1Cvt<H5DataTypes::AndorFrameV1>;
 template class FliFrameV1Cvt<H5DataTypes::FliFrameV1>;
+template class FliFrameV1Cvt<H5DataTypes::PimaxFrameV1>;
 
 } // namespace O2OTranslator

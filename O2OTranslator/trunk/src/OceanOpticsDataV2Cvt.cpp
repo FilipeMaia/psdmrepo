@@ -3,7 +3,7 @@
 // 	$Id$
 //
 // Description:
-//	Class OceanOpticsDataV1Cvt...
+//	Class OceanOpticsDataV2Cvt...
 //
 // Author List:
 //      Andy Salnikov
@@ -13,7 +13,7 @@
 //-----------------------
 // This Class's Header --
 //-----------------------
-#include "O2OTranslator/OceanOpticsDataV1Cvt.h"
+#include "O2OTranslator/OceanOpticsDataV2Cvt.h"
 
 //-----------------
 // C/C++ Headers --
@@ -31,7 +31,7 @@
 //-----------------------------------------------------------------------
 
 namespace {
-  const char logger[] = "OceanOpticsDataV1Cvt" ;
+  const char logger[] = "OceanOpticsDataV2Cvt" ;
 }
 
 //		----------------------------------------
@@ -43,7 +43,7 @@ namespace O2OTranslator {
 //----------------
 // Constructors --
 //----------------
-OceanOpticsDataV1Cvt::OceanOpticsDataV1Cvt(const hdf5pp::Group& group,
+OceanOpticsDataV2Cvt::OceanOpticsDataV2Cvt(const hdf5pp::Group& group,
     const std::string& typeGroupName,
     const Pds::Src& src,
     const ConfigObjectStore& configStore,
@@ -61,13 +61,13 @@ OceanOpticsDataV1Cvt::OceanOpticsDataV1Cvt(const hdf5pp::Group& group,
 //--------------
 // Destructor --
 //--------------
-OceanOpticsDataV1Cvt::~OceanOpticsDataV1Cvt ()
+OceanOpticsDataV2Cvt::~OceanOpticsDataV2Cvt ()
 {
 }
 
 // method called to create all necessary data containers
 void
-OceanOpticsDataV1Cvt::makeContainers(hdf5pp::Group group, const Pds::TypeId& typeId, const O2OXtcSrc& src)
+OceanOpticsDataV2Cvt::makeContainers(hdf5pp::Group group, const Pds::TypeId& typeId, const O2OXtcSrc& src)
 {
   // create container for objects
   m_objCont = makeCont<ObjectCont>("data", group, true) ;
@@ -75,29 +75,24 @@ OceanOpticsDataV1Cvt::makeContainers(hdf5pp::Group group, const Pds::TypeId& typ
 
 // typed conversion method
 void
-OceanOpticsDataV1Cvt::fillContainers(hdf5pp::Group group,
+OceanOpticsDataV2Cvt::fillContainers(hdf5pp::Group group,
     const XtcType& data,
     size_t size,
     const Pds::TypeId& typeId,
     const O2OXtcSrc& src)
 {
-  // make corrected data
-  float corrData[Pds::OceanOptics::DataV1::iNumPixels];
-
   // find corresponding configuration object
-  Pds::TypeId cfgTypeId1(Pds::TypeId::Id_OceanOpticsConfig, 1);
   Pds::TypeId cfgTypeId2(Pds::TypeId::Id_OceanOpticsConfig, 2);
-  if (const Pds::OceanOptics::ConfigV1* config = m_configStore.find<Pds::OceanOptics::ConfigV1>(cfgTypeId1, src.top())) {
-    for (int i = 0; i != Pds::OceanOptics::DataV1::iNumPixels; ++ i) {
-      corrData[i] = data.nonlinerCorrected(*config, i);
-    }
-  } else if (const Pds::OceanOptics::ConfigV2* config = m_configStore.find<Pds::OceanOptics::ConfigV2>(cfgTypeId2, src.top())) {
-    for (int i = 0; i != Pds::OceanOptics::DataV1::iNumPixels; ++ i) {
-      corrData[i] = data.nonlinerCorrected(*config, i);
-    }
-  } else {
-    MsgLog ( logger, error, "OceanOpticsDataV1Cvt - no configuration object was defined" );
+  const Pds::OceanOptics::ConfigV2* config = m_configStore.find<Pds::OceanOptics::ConfigV2>(cfgTypeId2, src.top());
+  if (not config) {
+    MsgLog ( logger, error, "OceanOpticsDataV2Cvt - no configuration object was defined" );
     return ;
+  }
+
+  // make corrected data
+  float corrData[Pds::OceanOptics::DataV2::iNumPixels];
+  for (int i = 0; i != Pds::OceanOptics::DataV2::iNumPixels; ++ i) {
+    corrData[i] = data.nonlinerCorrected(*config, i);
   }
 
   // store the data
@@ -121,7 +116,7 @@ OceanOpticsDataV1Cvt::fillContainers(hdf5pp::Group group,
 
 // fill containers for missing data
 void
-OceanOpticsDataV1Cvt::fillMissing(hdf5pp::Group group,
+OceanOpticsDataV2Cvt::fillMissing(hdf5pp::Group group,
                          const Pds::TypeId& typeId,
                          const O2OXtcSrc& src)
 {
