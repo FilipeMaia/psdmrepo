@@ -1,0 +1,235 @@
+//--------------------------------------------------------------------------
+// File and Version Information:
+// 	$Id$
+//
+// Description:
+//	Class FexampConfigV1...
+//
+// Author List:
+//      Andy Salnikov
+//
+//------------------------------------------------------------------------
+
+//-----------------------
+// This Class's Header --
+//-----------------------
+#include "H5DataTypes/FexampConfigV1.h"
+
+//-----------------
+// C/C++ Headers --
+//-----------------
+#include <stdio.h>
+
+//-------------------------------
+// Collaborating Class Headers --
+//-------------------------------
+#include "H5DataTypes/H5DataUtils.h"
+#include "hdf5pp/CompoundType.h"
+#include "hdf5pp/TypeTraits.h"
+#include "hdf5pp/DataSet.h"
+#include "hdf5pp/DataSpace.h"
+#include "MsgLogger/MsgLogger.h"
+
+//-----------------------------------------------------------------------
+// Local Macros, Typedefs, Structures, Unions and Forward Declarations --
+//-----------------------------------------------------------------------
+
+namespace {
+
+  char logger[] = "FexampConfigV1"; 
+
+  static char* channelBitsNames[] = {
+      "TrimBits",
+      "EnableTest",
+      "ChannelMask",
+      "ChannelSelectorEnable"
+  };
+  const unsigned nChannelBitsNames = sizeof channelBitsNames / sizeof channelBitsNames[0];
+
+  static char* asicNames[] = {
+      "ManualPulseDAC",
+      "ThresholdDAC",
+      "BaselineAdjust",
+      "ResetTime",
+      "PumpLength",
+      "FilterTimeToFlatTop",
+      "EnableDacMonitor",
+      "ResetTweakOP",
+      "ResetCompensation",
+      "TestPulsePolarity",
+      "DisableOutputs",
+      "AutoTestMode",
+      "EnableAPSMon",
+      "Gain",
+      "HighResTestMode",
+      "CalibrationRange",
+      "OutputBuffersEnable",
+      "TestPulserEnable",
+      "EnableAuxiliaryOutput",
+      "DisableMultipleFirings",
+      "DisableFilterPump",
+      "DACMonitorSelect",
+      "SelectCDSTest",
+      "SignalPolarity",
+      "PreampCurrentBooster"
+  };
+  const unsigned nAsicNames = sizeof asicNames / sizeof asicNames[0];
+
+  static char* regNames[] = {
+      "AsicVersion",
+      "CckDisable",
+      "MckDisable",
+      "EnExtTrig",
+      "LemoSelect",
+      "NoPayload",
+      "ClkDisable",
+      "AsicRstHwEn",
+      "PtDelay",
+      "ScDelay",
+      "CCkPosWidth",
+      "CCkNegWidth",
+      "ScPosWidth",
+      "ScNegWidth",
+      "ScCount",
+      "MckPosWidth",
+      "AdcClkPer",
+      "MckNegWidth",
+      "MckLimit",
+      "MckDelay",
+      "AdcDelay",
+      "AdcPhase",
+      "PerMclkCount",
+      "SlowAdcDelay0",
+      "SlowAdcDelay1"
+  };
+  const unsigned nRegNames = sizeof regNames / sizeof regNames[0];
+
+}
+
+//		----------------------------------------
+// 		-- Public Function Member Definitions --
+//		----------------------------------------
+
+namespace H5DataTypes {
+
+//----------------
+// Constructors --
+//----------------
+FexampChannelV1::FexampChannelV1(const XtcType& data)
+{
+  for (int i = 0; i != NValues; ++ i) {
+    m_values[i] = data.get(XtcType::ChannelBitFields(i));
+  }
+}
+
+hdf5pp::Type 
+FexampChannelV1::native_type()
+{
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<FexampChannelV1>();
+  for (unsigned i = 0; i != NValues; ++ i) {
+    
+    // get the name for this value
+    const char* name = 0;
+    if (i < ::nChannelBitsNames) {
+      name = ::channelBitsNames[i];
+    } else {
+      MsgLog(logger, warning, "Channel bits name index out of range");
+      char buf[32];
+      snprintf(buf, sizeof buf, "ChannelBits_%d", i);
+      name = buf;
+    }
+    
+    type.insert_native<uint32_t>(name, i*sizeof(uint32_t));
+  }
+
+  return type;
+}
+
+FexampASIC_V1::FexampASIC_V1(const XtcType& data)
+{
+  for (int i = 0; i != NValues; ++ i) {
+    m_values[i] = data.get(XtcType::ASIC_Entries(i));
+  }
+}
+
+hdf5pp::Type 
+FexampASIC_V1::native_type()
+{
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<FexampASIC_V1>();
+  for (unsigned i = 0; i != NValues; ++ i) {
+    
+    // get the name for this value
+    const char* name = 0;
+    if (i < ::nAsicNames) {
+      name = ::asicNames[i];
+    } else {
+      MsgLog(logger, warning, "ASIC bits name index out of range");
+      char buf[32];
+      snprintf(buf, sizeof buf, "AsicBits_%d", i);
+      name = buf;
+    }
+    
+    type.insert_native<uint32_t>(name, i*sizeof(uint32_t));
+  }
+
+  return type;
+}
+
+
+FexampConfigV1::FexampConfigV1(const XtcType& data)
+  : m_FPGAversion(data.FPGAversion())
+{
+  for (int i = 0; i != NValues; ++ i) {
+    m_values[i] = data.get(XtcType::Registers(i));
+  }
+}
+
+hdf5pp::Type 
+FexampConfigV1::native_type()
+{
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<FexampConfigV1>();
+  
+  type.insert_native<uint32_t>("FPGAversion", offsetof(FexampConfigV1, m_FPGAversion)) ;
+
+  for (unsigned i = 0; i != NValues; ++ i) {
+    
+    // get the name for this value
+    const char* name = 0;
+    if (i < ::nRegNames) {
+      name = ::regNames[i];
+    } else {
+      MsgLog(logger, warning, "Register name index out of range");
+      char buf[32];
+      snprintf(buf, sizeof buf, "Register_%d", i);
+      name = buf;
+    }
+    
+    type.insert_native<uint32_t>(name, offsetof(FexampConfigV1, m_values) + i*sizeof(uint32_t));
+  }
+
+  return type;
+}
+
+void 
+FexampConfigV1::store(const XtcType& config, hdf5pp::Group location)
+{
+  // make scalar data set for main object
+  FexampConfigV1 data ( config ) ;
+  storeDataObject ( data, "config", location ) ;
+
+  // make scalar data set for subobject
+  const Pds::Fexamp::ASIC_V1& asic0 = config.ASICs()[0];
+  FexampASIC_V1 asic( asic0 ) ;
+  storeDataObject ( asic, "asic", location ) ;
+
+  // make array data set for subobject
+  const int nChan = Pds::Fexamp::ASIC_V1::NumberOfChannels;
+  FexampChannelV1 chdata[nChan];
+  for (int i = 0 ; i < nChan; ++ i) {
+    chdata[i] = FexampChannelV1( asic0.channels()[i] ) ;
+  }
+  storeDataObjects ( nChan, chdata, "channels", location ) ;
+
+}
+
+} // namespace H5DataTypes
