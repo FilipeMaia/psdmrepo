@@ -187,7 +187,7 @@ class GUIDarkList ( QtGui.QWidget ) :
         if run_num in self.dict_guidarklistitem.keys() :
             #print 'Use existing GUIDarkListItem object for run %d' % run_num
             item, widg = self.dict_guidarklistitem[run_num]
-            #widg.updateButtons()
+            widg.updateButtons()
             return item, widg
         else :
             #print 'Create new GUIDarkListItem object for run %d' % run_num

@@ -569,7 +569,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
     def defineStyles( self ) :
         self.styleYellowish = "background-color: rgb(255, 255, 220); color: rgb(0, 0, 0);" # Yellowish
         self.stylePink      = "background-color: rgb(255, 200, 220); color: rgb(0, 0, 0);" # Pinkish
-        self.styleYellowBkg = "background-color: rgb(255, 255, 120); color: rgb(0, 0, 0);" # YellowBkg
+        self.styleYellowBkg = "background-color: rgb(220, 220, 100); color: rgb(0, 0, 0);" # YellowBkg
         self.styleGreenMy   = "background-color: rgb(150, 250, 230); color: rgb(0, 0, 0);" # My
         self.styleGray      = "background-color: rgb(230, 240, 230); color: rgb(0, 0, 0);" # Gray
         self.styleGreenish  = "background-color: rgb(100, 240, 200); color: rgb(0, 0, 0);" # Greenish

@@ -11,6 +11,11 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-18
+2014-03-04 Mikhail S. Dubrovin
+- in GUIDarkList.py uncommented widg.updateButtons() at list update
+- change color of Stop button to yellow
+	
 Tag: V00-00-17
 2014-03-01 Mikhail S. Dubrovin
 - fix problem with list buttons update; in GUIDarkList self.dict_guidarklistitem  ={} -> .clear()

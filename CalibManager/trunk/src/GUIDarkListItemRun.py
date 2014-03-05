@@ -291,7 +291,7 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
             but.setEnabled(True)
             but.setText('Go')
 
-        but.setStyleSheet(cp.styleButtonBad)
+        but.setStyleSheet(cp.styleButtonWarning)
 
 
     def onStop(self):
