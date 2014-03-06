@@ -106,7 +106,7 @@ enum DATA_TYPE {ASDATA, FLOAT, DOUBLE, SHORT, UNSIGNED, INT, INT16, INT32, UINT,
 
 enum FILE_MODE {BINARY, TEXT, TIFF, PNG};
 
-enum DETECTOR_TYPE {OTHER, CSPAD, CSPAD2X2};
+ enum DETECTOR_TYPE {OTHER, CSPAD, CSPAD2X2, PNCCD, PRINCETON, ACQIRIS, TM6740, OPAL1000, OPAL2000, OPAL4000, OPAL8000};
 
 const static int UnknownCM = -10000; 
 
@@ -699,6 +699,7 @@ private:
 // This method was originally designed by Andy for CSPAD in pdscalibdata/src/CsPadCommonModeSubV1.cpp
 // - data type int16_t is changed to T
 // - subtract CM inside this module
+// - pedestal is not subtracted in this algorithm; assume that it is already subtracted
 
   /**
    *  Find common mode for an CsPad  section.
@@ -714,14 +715,14 @@ private:
    *  @param stride increment for pixel indices
    */ 
 
-   //float cm_corr =  findCommonMode(sdata, peddata, pixStatus, ssize, nSect); 
+   //float cm_corr =  findCommonMode<T>(pars, sdata, pixStatus, ssize, nSect); 
 
 template <typename T>
 float 
 findCommonMode(const double* pars,
                T* sdata,
                //const int16_t* sdata,
-               const float* peddata, 
+               //const float* peddata, 
                const uint16_t *pixStatus, 
                unsigned ssize,
                int stride = 1
@@ -732,7 +733,7 @@ findCommonMode(const double* pars,
 
   // for now it does not make sense to calculate common mode
   // if pedestals are not known
-  if (not peddata) return float(UnknownCM);
+  // if (not peddata) return float(UnknownCM);
   
   // declare array for histogram
   const int low = -1000;
@@ -750,7 +751,7 @@ findCommonMode(const double* pars,
     if (pixStatus and pixStatus[p]) continue; // Discard  pixels with any status > 0
     
     // pixel value with pedestal subtracted, rounded to integer
-    double dval = sdata[p] - peddata[p];
+    double dval = sdata[p]; // - peddata[p];
     int val = dval < 0 ? int(dval - 0.5) : int(dval + 0.5);
     
     // histogram bin
@@ -822,13 +823,12 @@ findCommonMode(const double* pars,
   MsgLog("findCommonMode", debug, "mean = " << mean << " sigma = " << sigma);
 
   // limit the values to some reasonable numbers
-  if (mean > pars[0] or sigma > pars[1]) return float(UnknownCM);
+  if (abs(mean) > pars[0] or sigma > pars[1]) return float(UnknownCM);
   
   //--------------------
   // subtract CM 
   for (unsigned c = 0, p = 0; c < ssize; ++ c, p += stride) {
-        double val = sdata[p] - mean;
-        sdata[p] = val < 0 ? int(val - 0.5) : int(val + 0.5);
+        sdata[p] = sdata[p] - mean;
   } 
 
   return mean;

@@ -332,9 +332,13 @@ NDArrAverage::procStatArrays()
                           || m_ave[i] < m_thr_min
                           || m_ave[i] > m_thr_max;
 
-         m_msk[i] = (is_bad_pixel) ? 0 : 1;
-         m_hot[i] = (is_bad_pixel) ? 1 : 0;	 
-         if (is_bad_pixel) ++ m_nbadpix; 
+         if (is_bad_pixel) { m_msk[i] = 1; ++ m_nbadpix; }
+	 else                m_msk[i] = 0;
+
+         m_hot[i] = 0;                            // good pixel
+	 if (m_rms[i] > m_thr_rms) m_hot[i]  = 1; // hot pixel
+	 if (m_ave[i] > m_thr_max) m_hot[i] |= 2; // satturated
+	 if (m_ave[i] < m_thr_min) m_hot[i] |= 4; // cold
       }
     }
 }

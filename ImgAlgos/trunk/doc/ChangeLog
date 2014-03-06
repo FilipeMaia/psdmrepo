@@ -11,6 +11,11 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-34
+2014-03-06 Mikhail S. Dubrovin
+- in NDArrCalib and GlobalMethods - Andy's common mode correction is implemented for CSPAD and CSPAD2x2
+- in NDArrAverage.cpp - status mask bits are distinguishable now; 0-good, 1-hot(too big rms), 2-satturated(too big ave), 3-cold(too small ave)   
+
 Tag: V00-03-33
 2014-03-05 Mikhail S. Dubrovin
 - in NDArrCalib - work in progress for common mode implementation for cspads

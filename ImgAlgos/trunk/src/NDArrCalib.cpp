@@ -130,6 +130,7 @@ NDArrCalib::printInputParameters()
         << "\n m_ind_inc         : " << m_ind_inc
         << "\n m_print_bits      : " << m_print_bits
 	<< "\n Output data type  : " << typeid(data_out_t).name() << " of size " << sizeof(data_out_t)
+        << "\n m_dettype         : " << m_dettype
         << "\n";     
 
     printSizeOfTypes();
@@ -143,11 +144,17 @@ void
 NDArrCalib::findDetectorType()
 { 
   std::stringstream ss; ss << m_str_src; std::string str_src = ss.str();
-  if      ( str_src.find("Cspad.") != std::string::npos )    m_dettype = CSPAD;
-  else if ( str_src.find("Cspad2x2.") != std::string::npos ) m_dettype = CSPAD2X2;
-  else                                                       m_dettype = OTHER;
-
-  if( m_print_bits & 1 ) MsgLog(name(), info, "Detector type = " << m_dettype << " for " << str_src );
+  if      ( str_src.find("Cspad.")     != std::string::npos ) m_dettype = CSPAD; // from GlobalMethods.h
+  else if ( str_src.find("Cspad2x2.")  != std::string::npos ) m_dettype = CSPAD2X2;
+  else if ( str_src.find("pnCCD.")     != std::string::npos ) m_dettype = PNCCD;
+  else if ( str_src.find("Princeton.") != std::string::npos ) m_dettype = PRINCETON;
+  else if ( str_src.find("Acqiris.")   != std::string::npos ) m_dettype = ACQIRIS;
+  else if ( str_src.find("Tm6740.")    != std::string::npos ) m_dettype = TM6740;
+  else if ( str_src.find("Opal1000.")  != std::string::npos ) m_dettype = OPAL1000;
+  else if ( str_src.find("Opal2000.")  != std::string::npos ) m_dettype = OPAL2000;
+  else if ( str_src.find("Opal4000.")  != std::string::npos ) m_dettype = OPAL4000;
+  else if ( str_src.find("Opal8000.")  != std::string::npos ) m_dettype = OPAL8000;
+  else                                                        m_dettype = OTHER;
 }
 
 //--------------------

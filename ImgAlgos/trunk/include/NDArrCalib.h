@@ -155,56 +155,70 @@ private:
 
 //-------------------
 
-  template <typename T, typename TOUT>
-    bool procEventForType(Event& evt)
+  template <typename T>
+    void normBkgd(const T* p_cdata)
     {
-      if (m_ndim == 2) {
-     	shared_ptr< ndarray<T,2> > shp2 = evt.get(m_str_src, m_key_in, &m_src);
-     	if (shp2.get()) { applyCorrections<T,TOUT>(evt, shp2->data()); return true; } 
+      double sum_data=0;
+      double sum_bkgd=0;
+      for(std::vector<unsigned>::const_iterator it = v_inds.begin(); it != v_inds.end(); ++ it) {
+        sum_data += p_cdata[*it];
+        sum_bkgd += m_bkgd_data[*it];
+        //sum_bkgd += m_bkgd->data()[*it];
       }
-
-      if (m_ndim == 3) {
-     	shared_ptr< ndarray<T,3> > shp3 = evt.get(m_str_src, m_key_in, &m_src);
-     	if (shp3.get()) { applyCorrections<T,TOUT>(evt, shp3->data()); return true; } 
-      }
-
-      if (m_ndim == 4) {
-     	shared_ptr< ndarray<T,4> > shp4 = evt.get(m_str_src, m_key_in, &m_src);
-     	if (shp4.get()) { applyCorrections<T,TOUT>(evt, shp4->data()); return true; } 
-      }
-
-      if (m_ndim == 5) {
-     	shared_ptr< ndarray<T,5> > shp5 = evt.get(m_str_src, m_key_in, &m_src);
-     	if (shp5.get()) { applyCorrections<T,TOUT>(evt, shp5->data()); return true; } 
-      }
-
-      if (m_ndim == 1) {
-     	shared_ptr< ndarray<T,1> > shp1 = evt.get(m_str_src, m_key_in, &m_src);
-     	if (shp1.get()) { applyCorrections<T,TOUT>(evt, shp1->data()); return true; } 
-      }
-
-      return false;
-    }  
+      m_norm = (sum_bkgd != 0)? (float)(sum_data/sum_bkgd) : 1;
+    }
 
 //-------------------
 
   template <typename T>
     void do_common_mode(T* data)
     {
-      //if      ( m_dettype == CSPAD )    return;
-      //else if ( m_dettype == CSPAD2X2 ) return;
-      //else {}
+      unsigned mode = (unsigned) m_cmod_data[0];
+      const PSCalib::CalibPars::common_mode_t* pars = &m_cmod_data[1]; // [0] element=mode is excluded from parameters
+      float cmod_corr = 0;
 
-      T threshold     = (T)        m_cmod_data[1];
-      T maxCorrection = (T)        m_cmod_data[2];
-      unsigned length = (unsigned) m_cmod_data[3];
-      T cm            = 0;
+      if (mode == 0) return;
 
-      length = (length>100) ? length : 128;
+      // CSPAD specific algorithm
+      if ( m_dettype == CSPAD ) {
+          unsigned ssize = 185*388;
+	  for (unsigned ind = 0; ind<32*ssize; ind+=ssize) {
+	    cmod_corr = findCommonMode<T>(pars, &data[ind], &m_stat_data[ind], ssize); 
+	  }
+          return;
+      }
 
-      for (unsigned i0=0; i0<m_size; i0+=length)
-	//psalg::commonMode<T>(&data[i0], &m_stat_data[i0], length, threshold, maxCorrection, cm);
-          commonMode<T>(&data[i0], &m_stat_data[i0], length, threshold, maxCorrection, cm); // Local from ImgAlgos::GlobalMethods.h
+      // CSPAD2X2 specific algorithm
+      else if ( m_dettype == CSPAD2X2 ) {
+	  unsigned ssize = 185*388;
+	  int stride = 2;
+	  for (unsigned seg = 0; seg<2; ++seg) {
+	    cmod_corr = findCommonMode<T>(pars, &data[seg], &m_stat_data[seg], ssize, stride); 
+	  }
+          return;
+      }
+
+      // Other detector algorithms
+      else {
+	  if (mode == 1) {
+              T threshold     = (T)        m_cmod_data[1];
+              T maxCorrection = (T)        m_cmod_data[2];
+              unsigned length = (unsigned) m_cmod_data[3];
+              T cm            = 0;
+              
+              length = (length>100) ? length : 128;
+              
+              for (unsigned i0=0; i0<m_size; i0+=length) {
+                  //psalg::commonMode<T>(&data[i0], &m_stat_data[i0], length, threshold, maxCorrection, cm);
+                  commonMode<T>(&data[i0], &m_stat_data[i0], length, threshold, maxCorrection, cm); // from GlobalMethods.h
+              }
+              return; 
+           }
+           else {
+              return; 
+	   }
+       
+       }
     }
 
 //-------------------
@@ -227,7 +241,7 @@ private:
      	  for(unsigned i=0; i<m_size; i++) p_cdata[i] = (TOUT)p_rdata[i];
 
      	  if (m_do_peds) {                    for(unsigned i=0; i<m_size; i++) p_cdata[i] -= (TOUT) m_peds_data[i];         }
-     	  if (m_do_cmod) { do_common_mode<TOUT>(p_cdata); }
+     	  if (m_do_cmod && m_do_peds) { do_common_mode<TOUT>(p_cdata); }
      	  if (m_do_bkgd) { normBkgd(p_cdata); for(unsigned i=0; i<m_size; i++) p_cdata[i] -= (TOUT)(m_bkgd_data[i]*m_norm); }
      	  if (m_do_gain) {                    for(unsigned i=0; i<m_size; i++) p_cdata[i] *= (TOUT) m_gain_data[i];         }
 
@@ -267,21 +281,38 @@ private:
  	  
           saveNDArrInEvent <TOUT> (evt, m_src, m_key_out, p_cdata, m_ndarr_pars, 1);
     }  
-
 //-------------------
 
-  template <typename T>
-    void normBkgd(const T* p_cdata)
+  template <typename T, typename TOUT>
+    bool procEventForType(Event& evt)
     {
-      double sum_data=0;
-      double sum_bkgd=0;
-      for(std::vector<unsigned>::const_iterator it = v_inds.begin(); it != v_inds.end(); ++ it) {
-        sum_data += p_cdata[*it];
-        sum_bkgd += m_bkgd_data[*it];
-        //sum_bkgd += m_bkgd->data()[*it];
+      if (m_ndim == 2) {
+     	shared_ptr< ndarray<T,2> > shp2 = evt.get(m_str_src, m_key_in, &m_src);
+     	if (shp2.get()) { applyCorrections<T,TOUT>(evt, shp2->data()); return true; } 
       }
-      m_norm = (sum_bkgd != 0)? (float)(sum_data/sum_bkgd) : 1;
-    }
+
+      if (m_ndim == 3) {
+     	shared_ptr< ndarray<T,3> > shp3 = evt.get(m_str_src, m_key_in, &m_src);
+     	if (shp3.get()) { applyCorrections<T,TOUT>(evt, shp3->data()); return true; } 
+      }
+
+      if (m_ndim == 4) {
+     	shared_ptr< ndarray<T,4> > shp4 = evt.get(m_str_src, m_key_in, &m_src);
+     	if (shp4.get()) { applyCorrections<T,TOUT>(evt, shp4->data()); return true; } 
+      }
+
+      if (m_ndim == 5) {
+     	shared_ptr< ndarray<T,5> > shp5 = evt.get(m_str_src, m_key_in, &m_src);
+     	if (shp5.get()) { applyCorrections<T,TOUT>(evt, shp5->data()); return true; } 
+      }
+
+      if (m_ndim == 1) {
+     	shared_ptr< ndarray<T,1> > shp1 = evt.get(m_str_src, m_key_in, &m_src);
+     	if (shp1.get()) { applyCorrections<T,TOUT>(evt, shp1->data()); return true; } 
+      }
+
+      return false;
+    }  
 
 //--------------------
 
