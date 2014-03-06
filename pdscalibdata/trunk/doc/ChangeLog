@@ -11,6 +11,12 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-08
+2014-03-06 Mikhail Dubrovin
+- in CsPadCommonModeSubV1.cpp
+	- correct the list of default parameters introduced by cpo
+	- do not consider pixels with any status different form 0 (in the past only status=1 were discarded)
+	
 Tag: V00-05-07
 2014-03-03 Mikhail Dubrovin
 - add include/CsPad*V2.h modules for CsPad and CsPad2x2 for types:

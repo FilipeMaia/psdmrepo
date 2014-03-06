@@ -60,9 +60,10 @@ CsPadCommonModeSubV1::CsPadCommonModeSubV1 (const std::string& fname)
 {
   std::fill_n(m_data, int(DataSize), 0.0);
   // cpo: to make analysis easier for users, put in sensible cspad defaults
-  m_data[0]=1;
-  m_data[1]=50;
-  m_data[2]=10;
+  m_mode   =1;   // Algorithm mode / number
+  m_data[0]=50;  // Maximal allowed correction of the mean value to apply correction 
+  m_data[1]=10;  // Maximal allowed value of the peak sigma to apply correction 
+  m_data[2]=100; // Threshold on number of pixels per ADU bin to be used in peak finding algorithm
   
   // open file
   std::ifstream in(fname.c_str());
@@ -129,7 +130,8 @@ CsPadCommonModeSubV1::findCommonMode(const int16_t* sdata,
   for (unsigned c = 0, p = 0; c != ssize; ++ c, p += stride) {
     
     // ignore channels that re too noisy
-    if (pixStatus and (pixStatus[p] & CsPadPixelStatusV1::VeryHot)) continue;
+    //if (pixStatus and (pixStatus[p] & CsPadPixelStatusV1::VeryHot)) continue;
+    if (pixStatus and pixStatus[p]) continue; // all bad pixels (>0) are discarded
     
     // pixel value with pedestal subtracted, rounded to integer
     double dval = sdata[p] - peddata[p];
