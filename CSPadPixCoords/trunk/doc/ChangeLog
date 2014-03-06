@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-20
+2014-03-05 Mikhail S. Dubrovin
+- minor changes in messages
+
 Tag: V00-03-19
 2014-02-28 Mikhail S. Dubrovin
 - do not stop data processing if CSPAD data or configuration information is missing, print warning message.

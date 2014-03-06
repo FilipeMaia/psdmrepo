@@ -353,11 +353,11 @@ private:
   template <typename T>
   bool procCSPadNDArrForType (Event& evt) {
  
-        if( m_print_bits & 8 ) MsgLog(name(), warning, "Produce image from CSPAD array, source:" << m_source 
-	                              << " key:" << m_inkey << " data type:" << typeid(T).name() );
-        
         shared_ptr< ndarray<T,3> > shp = evt.get(m_source, m_inkey, &m_src); // get m_src here
         if (shp.get()) {
+        
+          if( m_print_bits & 8 ) MsgLog(name(), info, "Produce image from CSPAD ndarray, source:" << m_source 
+    	                                           << " key:" << m_inkey << " data type:" << typeid(T).name() );
         
           const unsigned shape[] = {NY_CSPAD,NX_CSPAD};
           ndarray<T,2> img_nda(shape);

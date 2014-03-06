@@ -143,7 +143,7 @@ void
 CSPadImageProducer::event(Event& evt, Env& env)
 {
   ++m_count;
-  if( m_print_bits & 2 ) printTimeStamp(evt, m_count);
+  if( m_print_bits & 4 ) printTimeStamp(evt, m_count);
 
 
   if ( m_count_cfg==0 ) {
@@ -163,9 +163,12 @@ CSPadImageProducer::event(Event& evt, Env& env)
 
   if( m_print_bits & 4 ) {
     status = clock_gettime( CLOCK_REALTIME, &stop ); // Get LOCAL time
-    cout << "  Time to produce cspad image is " 
+    //cout << "  Time to produce cspad image is " 
+    //     << stop.tv_sec - start.tv_sec + 1e-9*(stop.tv_nsec - start.tv_nsec) 
+    //     << " sec" << endl;
+    MsgLog(name(), info, "Time to produce cspad image is " 
          << stop.tv_sec - start.tv_sec + 1e-9*(stop.tv_nsec - start.tv_nsec) 
-         << " sec" << endl;
+         << " sec");
   }
 }
 
