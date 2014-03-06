@@ -1,0 +1,31 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  Matrix and vector arithmetic
+#------------------------------------------------------------------------
+
+Package author: http://eigen.tuxfamily.org/
+
+Brief description:
+==================
+
+Add here a brief description of the package main purpose, one or two
+sentences is probably enough.
+
+Detailed description:
+=====================
+
+The source code of teh package has been copied from:
+
+  http://eigen.tuxfamily.org/
+
+
+License notes:
+==============
+
+The information can be found at:
+
+  http://eigen.tuxfamily.org/index.php?title=Main_Page#License
+
