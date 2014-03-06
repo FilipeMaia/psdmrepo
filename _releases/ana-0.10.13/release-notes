@@ -1,0 +1,6 @@
+- the first version of the parallel psana
+- python package for MPI: mpi4py
+- improved Calibration Manager application
+- adding ddl files of pimax and arraychar
+- add ocean optics data v2 and config v2
+- fixed mpi4py package name
