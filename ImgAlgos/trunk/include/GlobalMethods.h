@@ -106,6 +106,9 @@ enum DATA_TYPE {ASDATA, FLOAT, DOUBLE, SHORT, UNSIGNED, INT, INT16, INT32, UINT,
 
 enum FILE_MODE {BINARY, TEXT, TIFF, PNG};
 
+enum DETECTOR_TYPE {OTHER, CSPAD, CSPAD2X2};
+
+const static int UnknownCM = -10000; 
 
 class NDArrPars {
 public:
@@ -691,6 +694,145 @@ private:
        }
      }
    }
+
+//--------------------
+// This method was originally designed by Andy for CSPAD in pdscalibdata/src/CsPadCommonModeSubV1.cpp
+// - data type int16_t is changed to T
+// - subtract CM inside this module
+
+  /**
+   *  Find common mode for an CsPad  section.
+   *  
+   *  Function will return UnknownCM value if the calculation 
+   *  cannot be performed (or need not be performed).
+   *  
+   *  @param pars   array[3] of control parameters; mean_max, sigma_max, threshold on number of pixels/ADC count
+   *  @param sdata  pixel data
+   *  @param peddata  pedestal data, can be zero pointer
+   *  @param pixStatus  pixel status data, can be zero pointer
+   *  @param ssize  size of all above arrays
+   *  @param stride increment for pixel indices
+   */ 
+
+   //float cm_corr =  findCommonMode(sdata, peddata, pixStatus, ssize, nSect); 
+
+template <typename T>
+float 
+findCommonMode(const double* pars,
+               T* sdata,
+               //const int16_t* sdata,
+               const float* peddata, 
+               const uint16_t *pixStatus, 
+               unsigned ssize,
+               int stride = 1
+               )
+{
+  // do we even need it
+  //if (m_mode == None) return float(UnknownCM);
+
+  // for now it does not make sense to calculate common mode
+  // if pedestals are not known
+  if (not peddata) return float(UnknownCM);
+  
+  // declare array for histogram
+  const int low = -1000;
+  const int high = 2000;
+  const unsigned hsize = high-low;
+  int hist[hsize];
+  std::fill_n(hist, hsize, 0);
+  unsigned long count = 0;
+  
+  // fill histogram
+  for (unsigned c = 0, p = 0; c != ssize; ++ c, p += stride) {
+    
+    // ignore channels that re too noisy
+    //if (pixStatus and (pixStatus[p] & 1)) continue;
+    if (pixStatus and pixStatus[p]) continue; // Discard  pixels with any status > 0
+    
+    // pixel value with pedestal subtracted, rounded to integer
+    double dval = sdata[p] - peddata[p];
+    int val = dval < 0 ? int(dval - 0.5) : int(dval + 0.5);
+    
+    // histogram bin
+    unsigned bin = unsigned(val - low);
+    
+    // increment bin value if in range
+    if (bin < hsize) {
+      ++hist[bin] ;
+      ++ count;
+    }      
+  }
+
+  MsgLog("findCommonMode", debug, "histo filled count = " << count);
+  
+  // analyze histogram now, first find peak position
+  // as the position of the lowest bin with highest count 
+  // larger than 100 and which has a bin somewhere on 
+  // right side with count dropping by half
+  int peakPos = -1;
+  int peakCount = -1;
+  int hmRight = hsize;
+  int thresh = int(pars[2]);
+  if(thresh<=0) thresh=100;
+  for (unsigned i = 0; i < hsize; ++ i ) {
+    if (hist[i] > peakCount and hist[i] > thresh) {
+      peakPos = i;
+      peakCount = hist[i];
+    } else if (peakCount > 0 and hist[i] <= peakCount/2) {
+      hmRight = i;
+      break;
+    }
+  }
+
+  // did we find anything resembling
+  if (peakPos < 0) {
+    MsgLog("findCommonMode", debug, "peakPos = " << peakPos);
+    return float(UnknownCM);
+  }
+
+  // find half maximum channel on left side
+  int hmLeft = -1;
+  for (int i = peakPos; hmLeft < 0 and i >= 0; -- i) {
+    if(hist[i] <= peakCount/2) hmLeft = i;
+  }
+  MsgLog("findCommonMode", debug, "peakPos = " << peakPos << " peakCount = " << peakCount 
+      << " hmLeft = " << hmLeft << " hmRight = " << hmRight);
+  
+  // full width at half maximum
+  int fwhm = hmRight - hmLeft;
+  double sigma = fwhm / 2.36;
+
+  // calculate mean and sigma
+  double mean = peakPos;
+  for (int j = 0; j < 2; ++j) {
+    int s0 = 0;
+    double s1 = 0;
+    double s2 = 0;
+    int d = int(sigma*2+0.5);
+    for (int i = std::max(0,peakPos-d); i < int(hsize) and i <= peakPos+d; ++ i) {
+      s0 += hist[i];
+      s1 += (i-mean)*hist[i];
+      s2 += (i-mean)*(i-mean)*hist[i];
+    }
+    mean = mean + s1/s0;
+    sigma = std::sqrt(s2/s0 - (s1/s0)*(s1/s0));
+  }
+  mean += low;
+  
+  MsgLog("findCommonMode", debug, "mean = " << mean << " sigma = " << sigma);
+
+  // limit the values to some reasonable numbers
+  if (mean > pars[0] or sigma > pars[1]) return float(UnknownCM);
+  
+  //--------------------
+  // subtract CM 
+  for (unsigned c = 0, p = 0; c < ssize; ++ c, p += stride) {
+        double val = sdata[p] - mean;
+        sdata[p] = val < 0 ? int(val - 0.5) : int(val + 0.5);
+  } 
+
+  return mean;
+}
 
 //--------------------
 //--------------------

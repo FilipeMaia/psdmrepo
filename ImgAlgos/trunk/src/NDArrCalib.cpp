@@ -18,6 +18,7 @@
 //-----------------
 // C/C++ Headers --
 //-----------------
+#include <sstream> // for stringstream
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -96,6 +97,8 @@ NDArrCalib::NDArrCalib (const std::string& name)
   m_print_bits        = config   ("print_bits",               0 );
 
   m_ndarr_pars = new NDArrPars();
+
+  findDetectorType();
 }
 
 //--------------------
@@ -134,7 +137,20 @@ NDArrCalib::printInputParameters()
 }
 
 //--------------------
+//--------------------
 
+void 
+NDArrCalib::findDetectorType()
+{ 
+  std::stringstream ss; ss << m_str_src; std::string str_src = ss.str();
+  if      ( str_src.find("Cspad.") != std::string::npos )    m_dettype = CSPAD;
+  else if ( str_src.find("Cspad2x2.") != std::string::npos ) m_dettype = CSPAD2X2;
+  else                                                       m_dettype = OTHER;
+
+  if( m_print_bits & 1 ) MsgLog(name(), info, "Detector type = " << m_dettype << " for " << str_src );
+}
+
+//--------------------
 
 //--------------
 // Destructor --

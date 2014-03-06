@@ -103,6 +103,7 @@ protected:
   void initAtFirstGetNdarray(Event& evt, Env& env);
   void procEvent(Event& evt, Env& env);
   void printCommonModePars();
+  void findDetectorType();
 
 private:
 
@@ -133,8 +134,8 @@ private:
   NDArrPars*      m_ndarr_pars;       // holds input data ndarray parameters
   unsigned        m_ndim;             // rank of the input data ndarray 
   unsigned        m_size;             // number of elements in the input data ndarray 
-  DATA_TYPE       m_dtype;            // numerated datatype for data array
-
+  DATA_TYPE       m_dtype;            // numerated data type for data array
+  DETECTOR_TYPE   m_dettype;          // numerated detector type source
 
   const PSCalib::CalibPars::pedestals_t*     m_peds_data;
   const PSCalib::CalibPars::pixel_gain_t*    m_gain_data;
@@ -190,10 +191,16 @@ private:
   template <typename T>
     void do_common_mode(T* data)
     {
+      //if      ( m_dettype == CSPAD )    return;
+      //else if ( m_dettype == CSPAD2X2 ) return;
+      //else {}
+
       T threshold     = (T)        m_cmod_data[1];
       T maxCorrection = (T)        m_cmod_data[2];
       unsigned length = (unsigned) m_cmod_data[3];
       T cm            = 0;
+
+      length = (length>100) ? length : 128;
 
       for (unsigned i0=0; i0<m_size; i0+=length)
 	//psalg::commonMode<T>(&data[i0], &m_stat_data[i0], length, threshold, maxCorrection, cm);
