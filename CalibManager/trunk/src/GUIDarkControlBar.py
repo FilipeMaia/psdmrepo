@@ -151,6 +151,9 @@ class GUIDarkControlBar ( QtGui.QWidget ) :
         self.ediTo.  setVisible(show_run_range)
         self.labTo.  setVisible(show_run_range)
 
+        # DO NOT SHOW CHECKBOX!
+        self.cbx_deploy_hotpix.  setVisible(False)
+
  
     def setParent(self,parent) :
         self.parent = parent

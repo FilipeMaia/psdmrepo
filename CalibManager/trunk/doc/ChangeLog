@@ -11,6 +11,15 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-19
+2014-03-07 Mikhail S. Dubrovin
+- in FileDeployer change command "cp" -> "cat", command "mv" -> "cat" and "rm"
+	in order to deploy files with calib directory ACL permissions
+- in GUIDarkControlBar self.cbx_deploy_hot.pixsetVisible(False) - set invisible
+- in self.mask_rms_thr: set default threshold on rms = 0 - automatic definition of threshold for hot pixels
+- by default pixel_status will be saved .... cp.dark_deploy_hotpix   =... True 
+- in GUIFileManagerSelect update status after Copy, Move, and Delete; cp.guistatus.updateStatusInfo()
+	
 Tag: V00-00-18
 2014-03-04 Mikhail S. Dubrovin
 - in GUIDarkList.py uncommented widg.updateButtons() at list update

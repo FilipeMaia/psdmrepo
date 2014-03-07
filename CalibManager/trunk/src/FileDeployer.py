@@ -39,52 +39,57 @@ class FileDeployer :
 
     
     def procDeployCommand(self, cmd, comment='dark'):
+        """Accepts command like 'cp path_inp path_out' and replace it by command 'cat path_inp > path_out'"""
         
         cmd_seq = cmd.split()
-        msg = 'Command: ' + cmd
+        action, path_inp, path_out = cmd_seq
+        #------------------------------------------------------------------------------------
+        # USE cat in stead of cp and move in order to create output file with ACL permissions
+        #------------------------------------------------------------------------------------
+        cmd_cat = 'cat %s > %s' % (path_inp, path_out)
 
-        path = cmd_seq[2]
-        #print 'Destination directory: %s' % dir_des
-        #/reg/neh/home/dubrovin/calib/CsPad::CalibV1/CxiDsd.0:Cspad.0/pedestals/132-end.data
-
-        dir_ctype, fname      = path      .rsplit('/',1)
+        dir_ctype, fname      = path_out  .rsplit('/',1)
         dir_src,   calib_type = dir_ctype .rsplit('/',1)
         dir_dtype, src        = dir_src   .rsplit('/',1)
         dir_calib, dtype      = dir_dtype .rsplit('/',1)
 
-        #print 'path, fname : ', path, fname
-        #print 'path     : ', path
+        #print 'path_out : ', path_out
         #print 'fname    : ', fname
         #print 'dir_ctype: ', dir_ctype
         #print 'dir_src  : ', dir_src
         #print 'dir_dtype: ', dir_dtype
         #print 'dir_calib: ', dir_calib
 
+        # Create output directory tree if it does not exist
         list_of_dirs = [dir_calib, dir_dtype, dir_src, dir_ctype]
 
         for dir in list_of_dirs :
-
             dir_exists = os.path.exists(dir) 
             #print dir, dir_exists
-
             if not dir_exists :
                 gu.create_directory(dir)
 
-        out, err = gu.subproc(cmd_seq)
-        if err != '' : msg += '\nERROR: ' + err
-        if out != '' : msg += '\nRESPONCE: ' + out
+        #out, err = gu.subproc(cmd_cat.split())
+        #if err != '' : msg += '\nERROR: ' + err
+        #if out != '' : msg += '\nRESPONCE: ' + out
+
+        #os.system(cmd_cat)
+        stream = os.popen(cmd_cat)
+        resp = stream.read()
+        msg = 'Command: %s\n%s' % (cmd_cat,resp)
         logger.info(msg, __name__)
 
-        self.changeFilePermissions(path)
-
+        if action == 'mv' and resp == '' : os.system('rm %s'%(path_inp))
+        #self.changeFilePermissions(path_out)
         self.addHistoryRecord(cmd, comment)
 
 
 
-    def changeFilePermissions(self, path):
-        msg = 'DO NOT change permissions for file: %s' % path
+    def changeFilePermissions(self, path, mode=660):
+        cmd = 'chmod %d %s' % (mode,path)
+        msg = 'Change permissions for file: %s' % cmd
         logger.info(msg, __name__)
-        #os.system('chmod 670 %s' % path)
+        os.system(cmd)
 
 
 
@@ -135,7 +140,7 @@ class FileDeployer :
 
         gu.save_textfile(rec, path_history, mode='a')
 
-        self.changeFilePermissions(path_history)
+        #self.changeFilePermissions(path_history)
 
 #-----------------------------
 

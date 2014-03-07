@@ -339,6 +339,7 @@ class GUIFileManagerSelect ( QtGui.QWidget ) :
             #os.system(cmd)
             fd.procDeployCommand(cmd, 'f-manager')
             self.resetFieldsOnDelete()
+            if cp.guistatus is not None : cp.guistatus.updateStatusInfo()
 
 
     def onButCopy(self):
@@ -347,6 +348,7 @@ class GUIFileManagerSelect ( QtGui.QWidget ) :
         if self.approveCommand(self.but_copy, cmd) :
             #os.system(cmd)
             fd.procDeployCommand(cmd, 'f-manager')
+            if cp.guistatus is not None : cp.guistatus.updateStatusInfo()
 
 
     def onButDelete(self):
@@ -355,6 +357,7 @@ class GUIFileManagerSelect ( QtGui.QWidget ) :
         if self.approveCommand(self.but_delete, cmd) :
             os.system(cmd)
             self.resetFieldsOnDelete()
+            if cp.guistatus is not None : cp.guistatus.updateStatusInfo()
             
 
     def approveCommand(self, but, cmd):

@@ -248,7 +248,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
         # GUIDarkControlBar.py
         self.dark_list_show_runs  = self.declareParameter( name='DARK_LIST_SHOW_RUNS', val_def=self.list_of_show_runs[0], type='str' )
         self.dark_list_show_dets  = self.declareParameter( name='DARK_LIST_SHOW_DETS', val_def=self.list_of_show_dets[0], type='str' )
-        self.dark_deploy_hotpix   = self.declareParameter( name='DARK_DEPLOY_HOTPIX',  val_def=False,                     type='bool')
+        self.dark_deploy_hotpix   = self.declareParameter( name='DARK_DEPLOY_HOTPIX',  val_def=True,                      type='bool')
         self.dark_list_run_min    = self.declareParameter( name='DARK_LIST_RUN_MIN',   val_def=1,      type='int' )
         self.dark_list_run_max    = self.declareParameter( name='DARK_LIST_RUN_MAX',   val_def=10,     type='int' )
 
@@ -283,7 +283,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
         self.bat_dark_end      = self.declareParameter( name='BATCH_DARK_END',        val_def=1000,     type='int' )
         self.bat_det_info      = self.declareParameter( name='BATCH_DET_INFO',        val_def='DetInfo(:Princeton)',  type='str' )
         self.bat_img_rec_mod   = self.declareParameter( name='BATCH_IMG_REC_MODULE',  val_def='ImgAlgos.PrincetonImageProducer',  type='str' )
-        self.mask_rms_thr      = self.declareParameter( name='MASK_HOT_PIX_ADU_THR_RMS',  val_def=   10,  type='float' )
+        self.mask_rms_thr      = self.declareParameter( name='MASK_HOT_PIX_ADU_THR_RMS',  val_def=    0,  type='float' )
         self.mask_min_thr      = self.declareParameter( name='MASK_HOT_PIX_ADU_THR_MIN',  val_def=    2,  type='float' )
         self.mask_max_thr      = self.declareParameter( name='MASK_HOT_PIX_ADU_THR_MAX',  val_def=65000,  type='float' )
         self.mask_hot_is_used  = self.declareParameter( name='MASK_HOT_PIX_IS_USED',      val_def= True,  type='bool'  )
@@ -569,7 +569,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
     def defineStyles( self ) :
         self.styleYellowish = "background-color: rgb(255, 255, 220); color: rgb(0, 0, 0);" # Yellowish
         self.stylePink      = "background-color: rgb(255, 200, 220); color: rgb(0, 0, 0);" # Pinkish
-        self.styleYellowBkg = "background-color: rgb(220, 220, 100); color: rgb(0, 0, 0);" # YellowBkg
+        self.styleYellowBkg = "background-color: rgb(240, 240, 100); color: rgb(0, 0, 0);" # YellowBkg
         self.styleGreenMy   = "background-color: rgb(150, 250, 230); color: rgb(0, 0, 0);" # My
         self.styleGray      = "background-color: rgb(230, 240, 230); color: rgb(0, 0, 0);" # Gray
         self.styleGreenish  = "background-color: rgb(100, 240, 200); color: rgb(0, 0, 0);" # Greenish
