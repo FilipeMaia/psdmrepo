@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-11
+2014-03-06 Mikhail S. Dubrovin
+in image_save_in_file.py - cosmetic changes
+	
 Tag: V00-00-10
 2013-12-19 Mikhail S. Dubrovin
 in image_save_in_file implicitly convert tiff file to signed int16 tiff

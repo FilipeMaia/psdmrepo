@@ -115,19 +115,18 @@ class image_save_in_file (object) :
             np.savetxt(fname, self.image) # , fmt='%f')
 
         elif name_ext in ['.tiff'] :
-            """Saves 16-bit tiff etc...
+            """Saves 16-bit tiff
             """
 
             tmp_file = tempfile.NamedTemporaryFile(mode='r+b',suffix='.tiff')
             tfile = tmp_file.name
 
-            img = Image.fromarray(self.image.astype(np.int16))  # or int32
+            #img = Image.fromarray(self.image.astype(np.int16),'I;16B')
+            img = Image.fromarray(self.image.astype(np.int16))
             img.save(tfile)
 
             cmd = 'convert %s -define quantum:format=signed %s' % (tfile, fname) 
             os.system(cmd)
-
-
  
         elif name_ext in ['.tiff', '.gif', '.pdf', '.eps', '.png', '.jpg', '.jpeg'] : 
             """Saves 8-bit tiff only...
