@@ -219,8 +219,7 @@ class FileNameManager :
 #-----------------------------
 
     def path_hotpix_mask(self) :
-        return self.path_prefix_dark() + 'mask-hot-thr-' \
-               + str(cp.mask_rms_thr.value()) + 'ADU.txt'
+        return self.path_prefix_dark() + 'mask-hot-thr-%.2fADU.txt' % (cp.mask_rms_thr.value())
 
     def path_hotpix_mask_prefix(self) :
         return os.path.splitext(self.path_hotpix_mask())[0]

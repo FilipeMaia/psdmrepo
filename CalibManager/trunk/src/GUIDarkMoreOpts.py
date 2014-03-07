@@ -87,6 +87,7 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         self.hbox.addWidget(self.but_sxtc)
         self.hbox.addWidget(self.but_flst)
         self.hbox.addWidget(self.but_show)
+        self.hbox.addSpacing(50) 
         self.hbox.addWidget(self.cbx_dark_more)
         self.hbox.addWidget(self.but_view)
         self.hbox.addWidget(self.but_plot)
@@ -188,6 +189,8 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
         #self.but_show.setVisible( self.cbx_dark_more.isChecked() )
         self.but_view.setVisible( self.cbx_dark_more.isChecked() )
         self.but_plot.setVisible( self.cbx_dark_more.isChecked() )
+
+        self.cbx_dark_more.setVisible( False )
 
 
 
