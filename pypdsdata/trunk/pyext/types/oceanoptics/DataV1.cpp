@@ -76,8 +76,8 @@ namespace {
         "self.timeFrameFirstData() -> tuple\n\nReturns tuple of two integers (sec, nsec)." },
     {"timeFrameEnd",        timeFrameEnd,       METH_NOARGS,
         "self.timeFrameEnd() -> tuple\n\nReturns tuple of two integers (sec, nsec)." },
-    {"nonlinerCorrected",   nonlinerCorrected,  METH_NOARGS,
-        "self.nonlinCorrect() -> ndarray\n\nReturns 1-dim ndarray of floats, which is data corrected for non-linearity,"
+    {"nonlinerCorrected",   nonlinerCorrected,  METH_VARARGS,
+        "self.nonlinCorrect(cfg: ConfigVx) -> ndarray\n\nReturns 1-dim ndarray of floats, which is data corrected for non-linearity,"
         " size of array is `iNumPixels`" },
     {0, 0, 0, 0}
    };
@@ -162,7 +162,7 @@ timeFrameFirstData( PyObject* self, PyObject* )
   Pds::OceanOptics::DataV1* obj = pypdsdata::OceanOptics::DataV1::pdsObject(self);
   if(not obj) return 0;
 
-  const Pds::OceanOptics::timespec64& ts = obj->timeFrameStart();
+  const Pds::OceanOptics::timespec64& ts = obj->timeFrameFirstData();
   PyObject* tuple = PyTuple_New(2);
   PyTuple_SET_ITEM(tuple, 0, PyLong_FromLongLong(ts.tv_sec()));
   PyTuple_SET_ITEM(tuple, 1, PyInt_FromLong(ts.tv_nsec()));
@@ -176,7 +176,7 @@ timeFrameEnd( PyObject* self, PyObject* )
   Pds::OceanOptics::DataV1* obj = pypdsdata::OceanOptics::DataV1::pdsObject(self);
   if(not obj) return 0;
 
-  const Pds::OceanOptics::timespec64& ts = obj->timeFrameStart();
+  const Pds::OceanOptics::timespec64& ts = obj->timeFrameEnd();
   PyObject* tuple = PyTuple_New(2);
   PyTuple_SET_ITEM(tuple, 0, PyLong_FromLongLong(ts.tv_sec()));
   PyTuple_SET_ITEM(tuple, 1, PyInt_FromLong(ts.tv_nsec()));
