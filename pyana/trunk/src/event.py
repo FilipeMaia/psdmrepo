@@ -27,6 +27,8 @@ from pypdsdata import pnccd
 from pypdsdata import princeton
 from pypdsdata import fli
 from pypdsdata import andor
+from pypdsdata import pimax
+from pypdsdata import oceanoptics
 
 _log = logging.getLogger("pyana.event")
 
@@ -301,6 +303,10 @@ class Event(object):
             wrapper = self._wrapAndorData
         elif typeId == xtc.TypeId.Type.Id_CspadElement:
             wrapper = self._wrapCsPadQuads
+        elif typeId == xtc.TypeId.Type.Id_PimaxFrame:
+            wrapper = self._wrapPimaxData
+        elif typeId == xtc.TypeId.Type.Id_OceanOpticsData:
+            wrapper = self._wrapOceanOpticsData
 
         if wrapper is not None:
             return wrapper(obj, typeId, xtcObj.contains.version(), xtcObj.src)
@@ -315,6 +321,16 @@ class Event(object):
         cfg = self.m_env.getConfig(xtc.TypeId.Type.Id_Gsc16aiConfig, address=src)
         if not cfg : raise Error("cannot find Gsc16ai config for address %s" % src )    
         return gsc16ai.DataV1( obj, cfg )
+
+    def _wrapOceanOpticsData(self, obj, typeId, typeVersion, src):
+        """ Wrapper method for Gsc16ai data """
+        
+        cfg = self.m_env.getConfig(xtc.TypeId.Type.Id_OceanOpticsData, address=src)
+        if not cfg : raise Error("cannot find OceanOpticsData config for address %s" % src )    
+
+        if typeVersion == 1: return oceanoptics.DataV1( obj, cfg )
+        if typeVersion == 2: return oceanoptics.DataV2( obj, cfg )
+        return obj
 
     def _wrapAcqirisData(self, obj, typeId, typeVersion, src):
         """ Wrapper method for Acqiris data """
@@ -362,6 +378,15 @@ class Event(object):
         if not cfg : raise Error("cannot find Andor config for address %s" % src )
 
         if typeVersion == 1: return andor.FrameV1( obj, cfg )
+        return obj
+
+    def _wrapPimaxData(self, obj, typeId, typeVersion, src):
+        """ Wrapper method for Pimax data"""
+
+        cfg = self.m_env.getConfig(xtc.TypeId.Type.Id_PimaxConfig, address=src)
+        if not cfg : raise Error("cannot find Pimax config for address %s" % src )
+
+        if typeVersion == 1: return pimax.FrameV1( obj, cfg )
         return obj
 
     def _wrapCsPadQuads(self, obj, typeId, typeVersion, src):

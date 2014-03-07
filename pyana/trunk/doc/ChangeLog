@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-04
+2014-03-06 Andy Salnikov
+- event.py: add wrappers for oceanoptics.DataV[12] and pimax.FrameV1
+
 Tag: V00-03-03
 2013-10-24 Andy Salnikov
 - use flag stored in datagram header for filtering instead of looking 
