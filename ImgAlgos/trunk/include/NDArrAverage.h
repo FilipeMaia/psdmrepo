@@ -112,6 +112,7 @@ protected:
   void printEventRecord(Event& evt);
   void printSummaryForParser(Event& evt);
   void printStatBadPix();
+  double evaluateThresholdOnRMS();
 
 private:
 

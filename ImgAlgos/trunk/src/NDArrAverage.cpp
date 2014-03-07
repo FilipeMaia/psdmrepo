@@ -325,10 +325,13 @@ NDArrAverage::procStatArrays()
         }
     }
 
+    // Use default or non-default or default (auto-evaluated) threshold
+    double thr_rms = (m_thr_rms>0) ? m_thr_rms : evaluateThresholdOnRMS();
+
     m_nbadpix = 0;
     if (m_do_msk || m_do_hot) {
       for (unsigned i=0; i!=m_size; ++i) {
- 	 bool is_bad_pixel = m_rms[i] > m_thr_rms
+ 	 bool is_bad_pixel = m_rms[i] >   thr_rms
                           || m_ave[i] < m_thr_min
                           || m_ave[i] > m_thr_max;
 
@@ -336,11 +339,53 @@ NDArrAverage::procStatArrays()
 	 else                m_msk[i] = 0;
 
          m_hot[i] = 0;                            // good pixel
-	 if (m_rms[i] > m_thr_rms) m_hot[i]  = 1; // hot pixel
+	 if (m_rms[i] >   thr_rms) m_hot[i]  = 1; // hot pixel
 	 if (m_ave[i] > m_thr_max) m_hot[i] |= 2; // satturated
 	 if (m_ave[i] < m_thr_min) m_hot[i] |= 4; // cold
       }
     }
+}
+
+//--------------------
+
+double 
+NDArrAverage::evaluateThresholdOnRMS()
+{
+    // calculate mean and sigma usling a few iterations with evolving constraints
+
+    double mean  = 0;
+    double width = m_thr_max;
+    for (unsigned iter=0; iter<3; ++iter) {
+        int    s0 = 0;
+        double s1 = 0;
+        double s2 = 0;
+        for (unsigned i=0; i!=m_size; ++i) {
+	        // do not use "cold" and "satturated" pixels:
+          	if ( m_ave[i] < m_thr_min || m_ave[i] > m_thr_max ) continue;	
+
+		double dev = m_rms[i] - mean;
+
+                // do not use outlayers:
+		if (abs(dev) > width) continue; 
+          	s0 += 1;
+          	s1 += dev;
+          	s2 += dev*dev;
+        }
+        double ave = (s0>0) ? s1/s0 : 0;
+        double rms = (s0>0) ? std::sqrt(s2/s0 - ave*ave) : 0;
+
+	mean = mean + ave;
+	width = 5*rms;	
+
+        if( m_print_bits & 128 )	  
+            MsgLog(name(), info, "Iteration: " << iter << "  mean: " << mean << "  rms: " << rms);
+    }
+
+    double threshold = mean + width;
+    if( m_print_bits & 128 )
+      MsgLog(name(), info, "Use threshold: " << threshold << " ADU for " << m_str_src);
+
+    return threshold;
 }
 
 //--------------------
