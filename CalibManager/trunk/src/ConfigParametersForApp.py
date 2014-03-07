@@ -290,7 +290,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
 
         # For batch jobs
         self.bat_queue               = self.declareParameter( name='BATCH_QUEUE',                val_def='psanacsq', type='str' )
-        self.bat_submit_interval_sec = self.declareParameter( name='BATCH_SUBMIT_INTERVAL_SEC',  val_def=100,      type='int' )
+        self.bat_submit_interval_sec = self.declareParameter( name='BATCH_SUBMIT_INTERVAL_SEC',  val_def=30,      type='int' )
 
         # GUIMaskEditor.py
         self.path_mask_img      = self.declareParameter( name='PATH_TO_MASK_IMAGE',        val_def='./work/*.txt',       type='str' )

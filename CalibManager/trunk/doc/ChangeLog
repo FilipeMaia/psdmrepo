@@ -11,6 +11,11 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-20
+2014-03-07 Mikhail S. Dubrovin
+- in data/scripts/* set print_bits = 221 (in stead of 93) to print auto-threshold iterations
+- in ConfigParametersForApp decrease the batch job submission time interval from 100 to 30 sec.
+	
 Tag: V00-00-19
 2014-03-07 Mikhail S. Dubrovin
 - in FileDeployer change command "cp" -> "cat", command "mv" -> "cat" and "rm"
