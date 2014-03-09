@@ -3,13 +3,17 @@
 #  $Id$
 #
 # Description:
-#  ChangeLog file for package docutils
+#  ChangeLog file for package doctools
 #------------------------------------------------------------------------
 
 Package author: Andy Salnikov
 
 Please describe any modifications that you made to the package in the
 reverse time order.
+
+Tag: V00-00-22
+2014-03-08 Andy Salnikov
+- pydoc-driver: try to improve how do we get the list of modules in a package
 
 Tag: V00-00-21
 2013-09-19 Andy Salnikov

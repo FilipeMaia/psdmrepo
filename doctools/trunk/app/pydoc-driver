@@ -25,9 +25,12 @@ modules() {
         python -c "import $1 as m; from $1 import *; print ' '.join([k for k, v in m.__dict__.items() if type(v) == type(m) and v.__name__.startswith(m.__name__)]);" |\
             tr ' ' '\n' | grep -v '^_' | sort
     else
-        for f in $dir/*.py; do
+        (for f in $dir/*.py; do
             basename $f .py | grep -v __init__
-        done
+        done;
+        python -c "import $1 as m; from $1 import *; print ' '.join([k for k, v in m.__dict__.items() if type(v) == type(m) and v.__name__.startswith(m.__name__)]);" |\
+            tr ' ' '\n' | grep -v '^_'
+        ) | sort -u
     fi
 }
 
@@ -217,6 +220,7 @@ html_theme_options = {
     "sidebarwidth": "280",
 }
 autoclass_content = 'both'
+autodoc_member_order = 'groupwise'
 EOD
 
 # run sphinx
