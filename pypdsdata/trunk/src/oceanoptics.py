@@ -58,11 +58,11 @@ def _fwd(method, type):
     method.__name__ = unbm.__name__
     return method
 
-def _fwd_cfg(method, type):
+def _fwd_cfg(method, type, doc):
     unbm = getattr(type, method)
     def method(self):
-        return unbm(self.__data, self.__config)
-    method.__doc__ = unbm.__doc__
+        return unbm(self.__data, self.__cfg)
+    method.__doc__ = doc
     method.__name__ = unbm.__name__
     return method
 
@@ -71,6 +71,10 @@ class DataV1(object):
     This is a wrapper for :py:class:`_pdsdata.oceanoptics.DataV1` which removes the need to pass 
     configuration objects to some methods.
     """
+    
+    iDataReadSize = _DataV1.iDataReadSize
+    iNumPixels = _DataV1.iNumPixels
+    iActivePixelIndex = _DataV1.iActivePixelIndex
     
     def __init__(self, data, cfg):
         """ Constructor takes one :py:class:`_pdsdata.oceanoptics.DataV1` and one 
@@ -89,13 +93,18 @@ class DataV1(object):
     timeFrameStart = _fwd('timeFrameStart', _DataV1)
     timeFrameFirstData = _fwd('timeFrameFirstData', _DataV1)
     timeFrameEnd = _fwd('timeFrameEnd', _DataV1)
-    nonlinerCorrected = _fwd_cfg('nonlinerCorrected', _DataV1)
+    nonlinerCorrected = _fwd_cfg('nonlinerCorrected', _DataV1,
+        "self.nonlinerCorrected() -> ndarray\n\nReturns 1-dim ndarray of floats, which is data corrected for non-linearity, size of array is `iNumPixels`")
     
 class DataV2(object):
     """
     This is a wrapper for :py:class:`_pdsdata.oceanoptics.DataV2` which removes the need to pass 
     configuration objects to some methods.
     """
+
+    iDataReadSize = _DataV2.iDataReadSize
+    iNumPixels = _DataV2.iNumPixels
+    iActivePixelIndex = _DataV2.iActivePixelIndex
     
     def __init__(self, data, cfg):
         """ Constructor takes one :py:class:`_pdsdata.oceanoptics.DataV2` and one 
@@ -114,5 +123,6 @@ class DataV2(object):
     timeFrameStart = _fwd('timeFrameStart', _DataV2)
     timeFrameFirstData = _fwd('timeFrameFirstData', _DataV2)
     timeFrameEnd = _fwd('timeFrameEnd', _DataV2)
-    nonlinerCorrected = _fwd_cfg('nonlinerCorrected', _DataV2)
+    nonlinerCorrected = _fwd_cfg('nonlinerCorrected', _DataV2,
+        "self.nonlinerCorrected() -> ndarray\n\nReturns 1-dim ndarray of floats, which is data corrected for non-linearity, size of array is `iNumPixels`")
     

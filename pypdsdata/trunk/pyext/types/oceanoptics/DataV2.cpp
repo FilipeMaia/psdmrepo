@@ -76,7 +76,7 @@ namespace {
     {"timeFrameEnd",        timeFrameEnd,       METH_NOARGS,
         "self.timeFrameEnd() -> tuple\n\nReturns tuple of two integers (sec, nsec)." },
     {"nonlinerCorrected",   nonlinerCorrected,  METH_VARARGS,
-        "self.nonlinCorrect(cfg: ConfigVx) -> ndarray\n\nReturns 1-dim ndarray of floats, which is data corrected for non-linearity,"
+        "self.nonlinerCorrected(cfg: ConfigVx) -> ndarray\n\nReturns 1-dim ndarray of floats, which is data corrected for non-linearity,"
         " size of array is `iNumPixels`" },
     {0, 0, 0, 0}
    };

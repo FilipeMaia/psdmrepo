@@ -6,6 +6,10 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V01-01-14
+2014-03-08 Andy Salnikov
+- few fixes in oceanoptics python wrapper
+
 Tag: V01-01-13
 2014-03-06 Andy Salnikov
 - fix bug in oceanoptics/DataV[12] in declaration of nonlinerCorrected()
