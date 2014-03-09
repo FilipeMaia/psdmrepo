@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-36
+2014-03-08 Mikhail S. Dubrovin
+- in PnccdImageProducer introduce two gap parameters in rows and cols in stead of one
+
 Tag: V00-03-35
 2014-03-07 Mikhail S. Dubrovin
 - in NDArrAverage add automatic evaluation of threshold on rms for evaluation of hot pixels.

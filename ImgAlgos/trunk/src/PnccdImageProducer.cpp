@@ -48,15 +48,17 @@ PnccdImageProducer::PnccdImageProducer (const std::string& name)
   , m_str_src()
   , m_key_in()
   , m_key_out()
-  , m_gap()
+  , m_gap_rows()
+  , m_gap_cols()
   , m_gap_value()
   , m_print_bits()
  {
     m_str_src    = configSrc("source",    "DetInfo(:pnCCD)");
     m_key_in     = configStr("inkey",     "");
     m_key_out    = configStr("outimgkey", "pnccdimg");
-    m_gap        = config   ("gap_size", 0);
-    m_gap_value  = config   ("gap_value", 0);
+    m_gap_rows   = config   ("gap_rows",   0);
+    m_gap_cols   = config   ("gap_cols",   0);
+    m_gap_value  = config   ("gap_value",  0);
     m_print_bits = config   ("print_bits", 0);
 }
 
@@ -140,7 +142,8 @@ PnccdImageProducer::printInputParameters()
         << "\nsource       : "     << m_str_src
         << "\ninkey        : "     << m_key_in      
         << "\noutimgkey    : "     << m_key_out
-        << "\ngap          : "     << m_gap
+        << "\ngap_rows     : "     << m_gap_rows
+        << "\ngap_cols     : "     << m_gap_cols
         << "\ngap_value    : "     << m_gap_value
         << "\nm_print_bits : "     << m_print_bits
         << "\n";

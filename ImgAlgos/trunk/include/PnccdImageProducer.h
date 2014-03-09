@@ -84,7 +84,8 @@ private:
   Source      m_str_src;
   std::string m_key_in; 
   std::string m_key_out;
-  size_t      m_gap;
+  size_t      m_gap_rows;
+  size_t      m_gap_cols;
   uint16_t    m_gap_value;
   unsigned    m_print_bits;
 
@@ -126,14 +127,15 @@ private:
 
 	  if( m_print_bits & 2 ) std::cout << "Input ndarray<T,3>:\n" << inp_ndarr;
 	  
-          ndarray<T,2> img_ndarr = make_ndarray<T>(ImRows+m_gap, ImCols);
+          ndarray<T,2> img_ndarr = make_ndarray<T>(ImRows+m_gap_rows, ImCols+m_gap_cols);
 
-          std::fill_n(&img_ndarr[Rows][0], int(ImCols*m_gap), T(m_gap_value));
+          //std::fill_n(&img_ndarr[Rows][0], int(ImCols*m_gap_rows), T(m_gap_value));
+          std::fill_n(&img_ndarr[0][0], int(img_ndarr.size()), T(m_gap_value));
 
 	  // Hardwired configuration:
-	  size_t rows0    [Segs] = {0,     Rows+m_gap, Rows+m_gap, 0   };
-	  size_t cols0    [Segs] = {0,     0,          Cols,       Cols};
-	  bool  is_rotated[Segs] = {false, true,       true,       false}; // rotated by 180 degree
+	  size_t rows0    [Segs] = {0,     Rows+m_gap_rows, Rows+m_gap_rows, 0};
+	  size_t cols0    [Segs] = {0,     0,               Cols+m_gap_cols, Cols+m_gap_cols};
+	  bool  is_rotated[Segs] = {false, true,            true,            false}; // rotated by 180 degree
 
 	  for (size_t s=0; s<Segs; ++s) {
 
