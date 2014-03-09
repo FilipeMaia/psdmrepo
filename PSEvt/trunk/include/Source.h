@@ -63,34 +63,42 @@ class Source {
 public:
 
   /**
-   *  Helper class which provides logic for matching Source
-   *  values to Src instances.
+   *  @brief Helper class which provides logic for matching Source values to Src instances.
+   *
+   *  This is an abstraction of the set of addresses. Having this set one can ask
+   *  questions like:
+   *  - does a specific address (Pds::Src instance) belong to the set (match() method).
+   *  - does other set (another SrcMatch instance) contains this set completely (so that
+   *    for example one could ask question like "will this set match cspad-only devices")
+   *  - check if this is a special "no-source" match (matching only data that do not come
+   *    from any device)
+   *  - check if this is "exact" match (matching only one specific device, or no-source)
+   *
+   *  Internal representation of this object is Pds::Src instance with some special
+   *  bit patterns representing special cases. This representation may change if these
+   *  patterns become unavailable (if DAQ decides to use them for some purpose).
    */
   class SrcMatch {
   public:
 
-    SrcMatch(const Pds::Src& src)
-        : m_src(src)
-    {
-    }
+    SrcMatch(const Pds::Src& src) : m_src(src) {}
 
     /// Match source with Pds::Src object.
     bool match(const Pds::Src& src) const;
 
+    /// Returns true if set of addresses matched by this instance is
+    /// contained entirely in the set of addresses matched by an argument.
+    bool in(const SrcMatch& other) const;
+
     /// Returns true if matches no-source only
-    bool isNoSource() const
-    {
-      return m_src == Pds::Src();
-    }
+    bool isNoSource() const { return m_src == Pds::Src(); }
 
     /// Returns true if it is exact match, no-source is also exact.
     bool isExact() const;
 
-    /// Returns internal Src representation
-    const Pds::Src& src() const
-    {
-      return m_src;
-    }
+    /// Returns internal Src representation, this representation can be changed at any
+    /// moment, client code should not rely on existence of this data.
+    const Pds::Src& src() const { return m_src; }
 
   private:
     Pds::Src m_src;

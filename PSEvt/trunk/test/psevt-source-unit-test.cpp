@@ -550,7 +550,6 @@ BOOST_AUTO_TEST_CASE( test_src_format )
 
 // ==============================================================
 
-
 BOOST_AUTO_TEST_CASE( test_src_alias )
 {
   amap.add("dinfo1", dinfo1);
@@ -566,6 +565,237 @@ BOOST_AUTO_TEST_CASE( test_src_alias )
   ::checkBldInfo(Source("binfo2"), Pds::BldInfo::PhaseCavity);
   ::checkProcInfo1(Source("pinfo1"));
   BOOST_CHECK_THROW(Source("pinfo3").srcMatch(amap), ExceptionSourceFormat);
+}
+
+// ==============================================================
+
+BOOST_AUTO_TEST_CASE( test_src_in_any )
+{
+  Source::SrcMatch any = Source().srcMatch(amap);
+  BOOST_CHECK(any.in(any));
+
+  Source::SrcMatch nosrc = Source(Source::null).srcMatch(amap);
+  BOOST_CHECK(nosrc.in(any));
+  BOOST_CHECK(not any.in(nosrc));
+
+  Source::SrcMatch match1 = Source("DetInfo(NoDetector.*:NoDevice.0)").srcMatch(amap);
+  BOOST_CHECK(match1.in(any));
+  BOOST_CHECK(not any.in(match1));
+
+  Source::SrcMatch match2 = Source("DetInfo()").srcMatch(amap);
+  BOOST_CHECK(match2.in(any));
+  BOOST_CHECK(not any.in(match2));
+
+  Source::SrcMatch match3 = Source("BldInfo(EBeam)").srcMatch(amap);
+  BOOST_CHECK(match3.in(any));
+  BOOST_CHECK(not any.in(match3));
+
+  Source::SrcMatch match4 = Source("BldInfo()").srcMatch(amap);
+  BOOST_CHECK(match4.in(any));
+  BOOST_CHECK(not any.in(match4));
+
+  Source::SrcMatch match5 = Source("ProcInfo(1.2.3.4)").srcMatch(amap);
+  BOOST_CHECK(match5.in(any));
+  BOOST_CHECK(not any.in(match5));
+
+  Source::SrcMatch match6 = Source("ProcInfo()").srcMatch(amap);
+  BOOST_CHECK(match6.in(any));
+  BOOST_CHECK(not any.in(match6));
+
+  Source::SrcMatch match7 = Source("").srcMatch(amap);
+  BOOST_CHECK(match7.in(any));
+  BOOST_CHECK(any.in(match7));
+}
+
+// ==============================================================
+
+BOOST_AUTO_TEST_CASE( test_src_in_nosrc )
+{
+  Source::SrcMatch nosrc = Source(Source::null).srcMatch(amap);
+  BOOST_CHECK(nosrc.in(nosrc));
+
+  Source::SrcMatch match1 = Source("DetInfo(NoDetector.*:NoDevice.0)").srcMatch(amap);
+  BOOST_CHECK(not match1.in(nosrc));
+  BOOST_CHECK(not nosrc.in(match1));
+
+  Source::SrcMatch match2 = Source("DetInfo()").srcMatch(amap);
+  BOOST_CHECK(not match2.in(nosrc));
+  BOOST_CHECK(not nosrc.in(match2));
+
+  Source::SrcMatch match3 = Source("BldInfo(EBeam)").srcMatch(amap);
+  BOOST_CHECK(not match3.in(nosrc));
+  BOOST_CHECK(not nosrc.in(match3));
+
+  Source::SrcMatch match4 = Source("BldInfo()").srcMatch(amap);
+  BOOST_CHECK(not match4.in(nosrc));
+  BOOST_CHECK(not nosrc.in(match4));
+
+  Source::SrcMatch match5 = Source("ProcInfo(1.2.3.4)").srcMatch(amap);
+  BOOST_CHECK(not match5.in(nosrc));
+  BOOST_CHECK(not nosrc.in(match5));
+
+  Source::SrcMatch match6 = Source("ProcInfo()").srcMatch(amap);
+  BOOST_CHECK(not match6.in(nosrc));
+  BOOST_CHECK(not nosrc.in(match6));
+
+  Source::SrcMatch match7 = Source("").srcMatch(amap);
+  BOOST_CHECK(not match7.in(nosrc));
+  BOOST_CHECK(nosrc.in(match7));
+}
+
+// ==============================================================
+
+BOOST_AUTO_TEST_CASE( test_src_in_bld )
+{
+  Source::SrcMatch any = Source().srcMatch(amap);
+  Source::SrcMatch nosrc = Source(Source::null).srcMatch(amap);
+
+  Source::SrcMatch match1 = Source("BldInfo(EBeam)").srcMatch(amap);
+  Source::SrcMatch match2 = Source("BldInfo(PhaseCavity)").srcMatch(amap);
+  Source::SrcMatch match3 = Source("BldInfo()").srcMatch(amap);
+
+  BOOST_CHECK(match1.in(any));
+  BOOST_CHECK(match2.in(any));
+  BOOST_CHECK(match3.in(any));
+  BOOST_CHECK(not match1.in(nosrc));
+  BOOST_CHECK(not match2.in(nosrc));
+  BOOST_CHECK(not match3.in(nosrc));
+  BOOST_CHECK(match1.in(match3));
+  BOOST_CHECK(match2.in(match3));
+  BOOST_CHECK(not match1.in(match2));
+  BOOST_CHECK(not match2.in(match1));
+  BOOST_CHECK(not match3.in(match2));
+  BOOST_CHECK(not match3.in(match1));
+
+  Source::SrcMatch match4 = Source("DetInfo()").srcMatch(amap);
+  Source::SrcMatch match5 = Source("ProcInfo()").srcMatch(amap);
+  BOOST_CHECK(not match1.in(match4));
+  BOOST_CHECK(not match2.in(match4));
+  BOOST_CHECK(not match3.in(match4));
+  BOOST_CHECK(not match4.in(match1));
+  BOOST_CHECK(not match4.in(match2));
+  BOOST_CHECK(not match4.in(match3));
+  BOOST_CHECK(not match1.in(match5));
+  BOOST_CHECK(not match2.in(match5));
+  BOOST_CHECK(not match3.in(match5));
+  BOOST_CHECK(not match5.in(match1));
+  BOOST_CHECK(not match5.in(match2));
+  BOOST_CHECK(not match5.in(match3));
+}
+
+// ==============================================================
+
+BOOST_AUTO_TEST_CASE( test_src_in_det )
+{
+  Source::SrcMatch any = Source().srcMatch(amap);
+  Source::SrcMatch nosrc = Source(Source::null).srcMatch(amap);
+
+  Source::SrcMatch match1 = Source("DetInfo(NoDetector.10:NoDevice.20)").srcMatch(amap);
+  Source::SrcMatch match2 = Source("DetInfo(NoDetector.*:NoDevice.20)").srcMatch(amap);
+  Source::SrcMatch match3 = Source("DetInfo(NoDetector.10:NoDevice.*)").srcMatch(amap);
+  Source::SrcMatch match4 = Source("DetInfo(*.10:NoDevice.20)").srcMatch(amap);
+  Source::SrcMatch match5 = Source("DetInfo(NoDetector.10:*.20)").srcMatch(amap);
+  Source::SrcMatch match6 = Source("DetInfo(AmoIms.1:Evr.1)").srcMatch(amap);
+
+  BOOST_CHECK(match1.in(any));
+  BOOST_CHECK(match2.in(any));
+  BOOST_CHECK(match3.in(any));
+  BOOST_CHECK(match4.in(any));
+  BOOST_CHECK(match5.in(any));
+  BOOST_CHECK(match6.in(any));
+  BOOST_CHECK(not match1.in(nosrc));
+  BOOST_CHECK(not match2.in(nosrc));
+  BOOST_CHECK(not match3.in(nosrc));
+  BOOST_CHECK(not match4.in(nosrc));
+  BOOST_CHECK(not match5.in(nosrc));
+  BOOST_CHECK(not match6.in(nosrc));
+  BOOST_CHECK(match1.in(match2));
+  BOOST_CHECK(match1.in(match3));
+  BOOST_CHECK(match1.in(match4));
+  BOOST_CHECK(match1.in(match5));
+  BOOST_CHECK(not match2.in(match1));
+  BOOST_CHECK(not match3.in(match1));
+  BOOST_CHECK(not match4.in(match1));
+  BOOST_CHECK(not match5.in(match1));
+  BOOST_CHECK(not match2.in(match3));
+  BOOST_CHECK(not match3.in(match2));
+  BOOST_CHECK(not match4.in(match5));
+  BOOST_CHECK(not match5.in(match4));
+
+  BOOST_CHECK(not match1.in(match6));
+  BOOST_CHECK(not match6.in(match1));
+
+  BOOST_CHECK(not match6.in(match2));
+  BOOST_CHECK(not match6.in(match3));
+  BOOST_CHECK(not match6.in(match4));
+  BOOST_CHECK(not match6.in(match5));
+
+  Source::SrcMatch match8 = Source("BldInfo()").srcMatch(amap);
+  Source::SrcMatch match9 = Source("ProcInfo()").srcMatch(amap);
+  BOOST_CHECK(not match1.in(match8));
+  BOOST_CHECK(not match2.in(match8));
+  BOOST_CHECK(not match3.in(match8));
+  BOOST_CHECK(not match4.in(match8));
+  BOOST_CHECK(not match5.in(match8));
+  BOOST_CHECK(not match6.in(match8));
+  BOOST_CHECK(not match8.in(match1));
+  BOOST_CHECK(not match8.in(match2));
+  BOOST_CHECK(not match8.in(match3));
+  BOOST_CHECK(not match8.in(match4));
+  BOOST_CHECK(not match8.in(match5));
+  BOOST_CHECK(not match8.in(match6));
+  BOOST_CHECK(not match1.in(match9));
+  BOOST_CHECK(not match2.in(match9));
+  BOOST_CHECK(not match3.in(match9));
+  BOOST_CHECK(not match4.in(match9));
+  BOOST_CHECK(not match5.in(match9));
+  BOOST_CHECK(not match6.in(match9));
+  BOOST_CHECK(not match9.in(match1));
+  BOOST_CHECK(not match9.in(match2));
+  BOOST_CHECK(not match9.in(match3));
+  BOOST_CHECK(not match9.in(match4));
+  BOOST_CHECK(not match9.in(match5));
+  BOOST_CHECK(not match9.in(match6));
+}
+
+// ==============================================================
+
+BOOST_AUTO_TEST_CASE( test_src_in_proc )
+{
+  Source::SrcMatch any = Source().srcMatch(amap);
+  Source::SrcMatch nosrc = Source(Source::null).srcMatch(amap);
+
+  Source::SrcMatch match1 = Source("ProcInfo(1.1.1.1)").srcMatch(amap);
+  Source::SrcMatch match2 = Source("ProcInfo(2.2.2.2)").srcMatch(amap);
+  Source::SrcMatch match3 = Source("ProcInfo()").srcMatch(amap);
+
+  BOOST_CHECK(match1.in(any));
+  BOOST_CHECK(match2.in(any));
+  BOOST_CHECK(match3.in(any));
+  BOOST_CHECK(not match1.in(nosrc));
+  BOOST_CHECK(not match2.in(nosrc));
+  BOOST_CHECK(not match3.in(nosrc));
+  BOOST_CHECK(match1.in(match3));
+  BOOST_CHECK(match2.in(match3));
+  BOOST_CHECK(not match1.in(match2));
+  BOOST_CHECK(not match2.in(match1));
+  BOOST_CHECK(not match3.in(match2));
+  BOOST_CHECK(not match3.in(match1));
+
+  Source::SrcMatch match4 = Source("DetInfo()").srcMatch(amap);
+  Source::SrcMatch match5 = Source("BldInfo()").srcMatch(amap);
+  BOOST_CHECK(not match1.in(match4));
+  BOOST_CHECK(not match2.in(match4));
+  BOOST_CHECK(not match3.in(match4));
+  BOOST_CHECK(not match4.in(match1));
+  BOOST_CHECK(not match4.in(match2));
+  BOOST_CHECK(not match4.in(match3));
+  BOOST_CHECK(not match1.in(match5));
+  BOOST_CHECK(not match2.in(match5));
+  BOOST_CHECK(not match3.in(match5));
+  BOOST_CHECK(not match5.in(match1));
+  BOOST_CHECK(not match5.in(match2));
+  BOOST_CHECK(not match5.in(match3));
 }
 
 // ==============================================================

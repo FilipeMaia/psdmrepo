@@ -174,6 +174,70 @@ Source::SrcMatch::match(const Pds::Src& src) const
   
 }
 
+// Returns true if set of addresses matched by this instance is
+// contained entirely in the set of addresses matched by an argument.
+bool
+Source::SrcMatch::in(const SrcMatch& other) const
+{
+  // if other address is any-source then it contains anything
+  if (other.src().level() == Pds::Level::NumberOfLevels) return true;
+
+  if (m_src == Pds::Src()) {
+
+    // no-source, other should be no-source or any-source (handled above)
+    return other.src() == Pds::Src();
+
+  } else if (m_src.level() == Pds::Level::NumberOfLevels) {
+
+    // any-source, other should be any-source as well (handled above)
+    return false;
+
+  } else if (int(other.src().level()) > Pds::Level::NumberOfLevels) {
+
+    // strange address (probably no-source)
+    return false;
+
+  } else if (m_src.level() == Pds::Level::Source) {
+
+    // DetInfo match, source must be the same level
+    if (other.src().level() != Pds::Level::Source) return false;
+
+    const Pds::DetInfo& this_info = static_cast<const Pds::DetInfo&>(m_src);
+    const Pds::DetInfo& other_info = static_cast<const Pds::DetInfo&>(other.src());
+
+    if (int(other_info.detector()) != 255 and this_info.detector() != other_info.detector()) return false;
+    if (int(other_info.device()) != 255 and this_info.device() != other_info.device()) return false;
+    if (other_info.detId() != 255 and this_info.detId() != other_info.detId()) return false;
+    if (other_info.devId() != 255 and this_info.devId() != other_info.devId()) return false;
+    return true;
+
+  } else if (m_src.level() == Pds::Level::Reporter) {
+
+    // BldInfo match, source must be the same level
+    if (other.src().level() != Pds::Level::Reporter) return false;
+
+    const Pds::BldInfo& this_info = static_cast<const Pds::BldInfo&>(m_src);
+    const Pds::BldInfo& other_info = static_cast<const Pds::BldInfo&>(other.src());
+
+    if (uint32_t(other_info.type()) != 0xffffffff and this_info.type() != other_info.type()) return false;
+    return true;
+
+  } else {
+
+    // ProcInfo match, level can be anything except Source and Reporter
+    if (other.src().level() == Pds::Level::Source) return false;
+    if (other.src().level() == Pds::Level::Reporter) return false;
+
+    const Pds::ProcInfo& this_info = static_cast<const Pds::ProcInfo&>(m_src);
+    const Pds::ProcInfo& other_info = static_cast<const Pds::ProcInfo&>(other.src());
+
+    if (other_info.ipAddr() != 0xffffffff and this_info.ipAddr() != other_info.ipAddr()) return false;
+    return true;
+
+  }
+
+}
+
 /// Returns true if it is exact match
 bool 
 Source::SrcMatch::isExact() const
