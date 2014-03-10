@@ -201,6 +201,53 @@ void createWrappers(PyObject* module) {
 
   {
   scope outer = 
+  class_<Psana::Bld::BldDataEBeamV5 >("BldDataEBeamV5", no_init)
+    .def("damageMask", &Psana::Bld::BldDataEBeamV5::damageMask,"Damage mask.")
+    .def("ebeamCharge", &Psana::Bld::BldDataEBeamV5::ebeamCharge,"Beam charge in nC.")
+    .def("ebeamL3Energy", &Psana::Bld::BldDataEBeamV5::ebeamL3Energy,"Beam energy in MeV.")
+    .def("ebeamLTUPosX", &Psana::Bld::BldDataEBeamV5::ebeamLTUPosX,"LTU beam position (BPMS:LTU1:720 through 750) in mm.")
+    .def("ebeamLTUPosY", &Psana::Bld::BldDataEBeamV5::ebeamLTUPosY,"LTU beam position in mm.")
+    .def("ebeamLTUAngX", &Psana::Bld::BldDataEBeamV5::ebeamLTUAngX,"LTU beam angle in mrad.")
+    .def("ebeamLTUAngY", &Psana::Bld::BldDataEBeamV5::ebeamLTUAngY,"LTU beam angle in mrad.")
+    .def("ebeamPkCurrBC2", &Psana::Bld::BldDataEBeamV5::ebeamPkCurrBC2,"Beam current in Amps.")
+    .def("ebeamEnergyBC2", &Psana::Bld::BldDataEBeamV5::ebeamEnergyBC2,"Beam position in mm (related to beam energy).")
+    .def("ebeamPkCurrBC1", &Psana::Bld::BldDataEBeamV5::ebeamPkCurrBC1,"Beam current in Amps.")
+    .def("ebeamEnergyBC1", &Psana::Bld::BldDataEBeamV5::ebeamEnergyBC1,"Beam position in mm (related to beam energy).")
+    .def("ebeamUndPosX", &Psana::Bld::BldDataEBeamV5::ebeamUndPosX,"Undulator launch feedback (BPMs U4 through U10) beam x-position in mm.")
+    .def("ebeamUndPosY", &Psana::Bld::BldDataEBeamV5::ebeamUndPosY,"Undulator launch feedback beam y-position in mm.")
+    .def("ebeamUndAngX", &Psana::Bld::BldDataEBeamV5::ebeamUndAngX,"Undulator launch feedback beam x-angle in mrad.")
+    .def("ebeamUndAngY", &Psana::Bld::BldDataEBeamV5::ebeamUndAngY,"Undulator launch feedback beam y-angle in mrad.")
+    .def("ebeamXTCAVAmpl", &Psana::Bld::BldDataEBeamV5::ebeamXTCAVAmpl,"XTCAV Amplitude in MVolt.")
+    .def("ebeamXTCAVPhase", &Psana::Bld::BldDataEBeamV5::ebeamXTCAVPhase,"XTCAV Phase in degrees.")
+    .def("ebeamDumpCharge", &Psana::Bld::BldDataEBeamV5::ebeamDumpCharge,"Bunch charge at Dump in num. electrons")
+  ;
+
+  enum_<Psana::Bld::BldDataEBeamV5::DamageMask>("DamageMask")
+    .value("EbeamChargeDamage",Psana::Bld::BldDataEBeamV5::EbeamChargeDamage)
+    .value("EbeamL3EnergyDamage",Psana::Bld::BldDataEBeamV5::EbeamL3EnergyDamage)
+    .value("EbeamLTUPosXDamage",Psana::Bld::BldDataEBeamV5::EbeamLTUPosXDamage)
+    .value("EbeamLTUPosYDamage",Psana::Bld::BldDataEBeamV5::EbeamLTUPosYDamage)
+    .value("EbeamLTUAngXDamage",Psana::Bld::BldDataEBeamV5::EbeamLTUAngXDamage)
+    .value("EbeamLTUAngYDamage",Psana::Bld::BldDataEBeamV5::EbeamLTUAngYDamage)
+    .value("EbeamPkCurrBC2Damage",Psana::Bld::BldDataEBeamV5::EbeamPkCurrBC2Damage)
+    .value("EbeamEnergyBC2Damage",Psana::Bld::BldDataEBeamV5::EbeamEnergyBC2Damage)
+    .value("EbeamPkCurrBC1Damage",Psana::Bld::BldDataEBeamV5::EbeamPkCurrBC1Damage)
+    .value("EbeamEnergyBC1Damage",Psana::Bld::BldDataEBeamV5::EbeamEnergyBC1Damage)
+    .value("EbeamUndPosXDamage",Psana::Bld::BldDataEBeamV5::EbeamUndPosXDamage)
+    .value("EbeamUndPosYDamage",Psana::Bld::BldDataEBeamV5::EbeamUndPosYDamage)
+    .value("EbeamUndAngXDamage",Psana::Bld::BldDataEBeamV5::EbeamUndAngXDamage)
+    .value("EbeamUndAngYDamage",Psana::Bld::BldDataEBeamV5::EbeamUndAngYDamage)
+    .value("EbeamXTCAVAmplDamage",Psana::Bld::BldDataEBeamV5::EbeamXTCAVAmplDamage)
+    .value("EbeamXTCAVPhaseDamage",Psana::Bld::BldDataEBeamV5::EbeamXTCAVPhaseDamage)
+    .value("EbeamDumpChargeDamage",Psana::Bld::BldDataEBeamV5::EbeamDumpChargeDamage)
+  ;
+  scope().attr("Version")=5;
+  scope().attr("TypeId")=int(Pds::TypeId::Id_EBeam);
+  }
+  ConverterMap::instance().addConverter(boost::make_shared<ConverterBoostDef<Psana::Bld::BldDataEBeamV5> >(Pds::TypeId::Id_EBeam));
+
+  {
+  scope outer = 
   class_<Psana::Bld::BldDataPhaseCavity >("BldDataPhaseCavity", "PV names: UND:R02:IOC:16:BAT:FitTime1, UND:R02:IOC:16:BAT:FitTime2, \n                UND:R02:IOC:16:BAT:Charge1,  UND:R02:IOC:16:BAT:Charge2", no_init)
     .def("fitTime1", &Psana::Bld::BldDataPhaseCavity::fitTime1,"UND:R02:IOC:16:BAT:FitTime1 value in pico-seconds.")
     .def("fitTime2", &Psana::Bld::BldDataPhaseCavity::fitTime2,"UND:R02:IOC:16:BAT:FitTime2 value in pico-seconds.")
@@ -322,12 +369,13 @@ void createWrappers(PyObject* module) {
     Py_CLEAR(unvlist);
   }
   {
-    PyObject* unvlist = PyList_New(5);
+    PyObject* unvlist = PyList_New(6);
     PyList_SET_ITEM(unvlist, 0, PyObject_GetAttrString(submodule, "BldDataEBeamV0"));
     PyList_SET_ITEM(unvlist, 1, PyObject_GetAttrString(submodule, "BldDataEBeamV1"));
     PyList_SET_ITEM(unvlist, 2, PyObject_GetAttrString(submodule, "BldDataEBeamV2"));
     PyList_SET_ITEM(unvlist, 3, PyObject_GetAttrString(submodule, "BldDataEBeamV3"));
     PyList_SET_ITEM(unvlist, 4, PyObject_GetAttrString(submodule, "BldDataEBeamV4"));
+    PyList_SET_ITEM(unvlist, 5, PyObject_GetAttrString(submodule, "BldDataEBeamV5"));
     PyObject_SetAttrString(submodule, "BldDataEBeam", unvlist);
     Py_CLEAR(unvlist);
   }
