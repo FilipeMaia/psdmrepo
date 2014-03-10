@@ -6,6 +6,10 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V01-01-15
+2014-03-08 David Schneider
+- update to pdsdata V07-02-21
+
 Tag: V01-01-14
 2014-03-08 Andy Salnikov
 - few fixes in oceanoptics python wrapper
