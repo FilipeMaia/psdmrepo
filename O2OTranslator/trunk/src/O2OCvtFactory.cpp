@@ -34,6 +34,7 @@
 #include "H5DataTypes/BldDataEBeamV2.h"
 #include "H5DataTypes/BldDataEBeamV3.h"
 #include "H5DataTypes/BldDataEBeamV4.h"
+#include "H5DataTypes/BldDataEBeamV5.h"
 #include "H5DataTypes/BldDataFEEGasDetEnergy.h"
 #include "H5DataTypes/BldDataGMDV0.h"
 #include "H5DataTypes/BldDataGMDV1.h"
@@ -376,6 +377,9 @@ O2OCvtFactory::makeCvts(const hdf5pp::Group& group, Pds::TypeId typeId, Pds::Src
       break;
     case 4:
       cvts.push_back(make_shared<EvtDataTypeCvtDef<BldDataEBeamV4> >(group, "Bld::BldDataEBeamV4", src, m_cvtOptions, 0));
+      break;
+    case 5:
+      cvts.push_back(make_shared<EvtDataTypeCvtDef<BldDataEBeamV5> >(group, "Bld::BldDataEBeamV5", src, m_cvtOptions, 0));
       break;
     }
     break;
