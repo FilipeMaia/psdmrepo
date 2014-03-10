@@ -103,6 +103,32 @@
   }
 }
 
+//------------------ BldDataEBeamV5 ------------------
+@h5schema BldDataEBeamV5
+  [[version(0)]]
+{
+  @dataset data {
+    @attribute uDamageMask [[method(damageMask)]];
+    @attribute fEbeamCharge [[method(ebeamCharge)]];
+    @attribute fEbeamL3Energy [[method(ebeamL3Energy)]];
+    @attribute fEbeamLTUPosX [[method(ebeamLTUPosX)]];
+    @attribute fEbeamLTUPosY [[method(ebeamLTUPosY)]];
+    @attribute fEbeamLTUAngX [[method(ebeamLTUAngX)]];
+    @attribute fEbeamLTUAngY [[method(ebeamLTUAngY)]];
+    @attribute fEbeamPkCurrBC2 [[method(ebeamPkCurrBC2)]];
+    @attribute fEbeamEnergyBC2 [[method(ebeamEnergyBC2)]];
+    @attribute fEbeamPkCurrBC1 [[method(ebeamPkCurrBC1)]];
+    @attribute fEbeamEnergyBC1 [[method(ebeamEnergyBC1)]];
+    @attribute fEbeamUndPosX [[method(ebeamUndPosX)]];
+    @attribute fEbeamUndPosY [[method(ebeamUndPosY)]];
+    @attribute fEbeamUndAngX [[method(ebeamUndAngX)]];
+    @attribute fEbeamUndAngY [[method(ebeamUndAngY)]];
+    @attribute fEbeamXTCAVAmpl [[method(ebeamXTCAVAmpl)]];
+    @attribute fEbeamXTCAVPhase [[method(ebeamXTCAVPhase)]];
+    @attribute fEbeamDumpCharge [[method(ebeamDumpCharge)]];
+  }
+}
+
 
 //------------------ BldDataPhaseCavity ------------------
 @h5schema BldDataPhaseCavity

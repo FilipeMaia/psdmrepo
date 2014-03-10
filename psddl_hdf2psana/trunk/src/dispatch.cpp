@@ -153,6 +153,10 @@ try {
     // Bld::BldDataFEEGasDetEnergy
     evt.putProxy(psddl_hdf2psana::Bld::make_BldDataFEEGasDetEnergy(schema_version, group, idx), src);
     break;
+  case 1078464760:
+    // Bld::BldDataEBeamV5
+    evt.putProxy(psddl_hdf2psana::Bld::make_BldDataEBeamV5(schema_version, group, idx), src);
+    break;
   case 1078464761:
     // Bld::BldDataEBeamV4
     evt.putProxy(psddl_hdf2psana::Bld::make_BldDataEBeamV4(schema_version, group, idx), src);

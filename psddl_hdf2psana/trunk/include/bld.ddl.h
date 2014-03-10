@@ -336,6 +336,68 @@ void make_datasets(const Psana::Bld::BldDataEBeamV4& obj, hdf5pp::Group group, c
 void store_at(const Psana::Bld::BldDataEBeamV4* obj, hdf5pp::Group group, long index = -1, int version = -1);
 
 
+namespace ns_BldDataEBeamV5_v0 {
+struct dataset_data {
+  static hdf5pp::Type native_type();
+  static hdf5pp::Type stored_type();
+
+  dataset_data();
+  dataset_data(const Psana::Bld::BldDataEBeamV5& psanaobj);
+  ~dataset_data();
+
+  uint32_t uDamageMask;
+  double fEbeamCharge;
+  double fEbeamL3Energy;
+  double fEbeamLTUPosX;
+  double fEbeamLTUPosY;
+  double fEbeamLTUAngX;
+  double fEbeamLTUAngY;
+  double fEbeamPkCurrBC2;
+  double fEbeamEnergyBC2;
+  double fEbeamPkCurrBC1;
+  double fEbeamEnergyBC1;
+  double fEbeamUndPosX;
+  double fEbeamUndPosY;
+  double fEbeamUndAngX;
+  double fEbeamUndAngY;
+  double fEbeamXTCAVAmpl;
+  double fEbeamXTCAVPhase;
+  double fEbeamDumpCharge;
+
+  operator Psana::Bld::BldDataEBeamV5() const { return Psana::Bld::BldDataEBeamV5(uDamageMask, fEbeamCharge, fEbeamL3Energy, fEbeamLTUPosX, fEbeamLTUPosY, fEbeamLTUAngX, fEbeamLTUAngY, fEbeamPkCurrBC2, fEbeamEnergyBC2, fEbeamPkCurrBC1, fEbeamEnergyBC1, fEbeamUndPosX, fEbeamUndPosY, fEbeamUndAngX, fEbeamUndAngY, fEbeamXTCAVAmpl, fEbeamXTCAVPhase, fEbeamDumpCharge); }
+
+};
+}
+class Proxy_BldDataEBeamV5_v0 : public PSEvt::Proxy<Psana::Bld::BldDataEBeamV5> {
+public:
+  typedef Psana::Bld::BldDataEBeamV5 PsanaType;
+
+  Proxy_BldDataEBeamV5_v0(hdf5pp::Group group, hsize_t idx) : m_group(group), m_idx(idx) {}
+  virtual ~Proxy_BldDataEBeamV5_v0() {}
+
+protected:
+
+  virtual boost::shared_ptr<PsanaType> getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key);
+
+private:
+
+  mutable hdf5pp::Group m_group;
+  hsize_t m_idx;
+  boost::shared_ptr<PsanaType> m_data;
+};
+boost::shared_ptr<PSEvt::Proxy<Psana::Bld::BldDataEBeamV5> > make_BldDataEBeamV5(int version, hdf5pp::Group group, hsize_t idx);
+
+/// Store object as a single instance (scalar dataset) inside specified group.
+void store(const Psana::Bld::BldDataEBeamV5& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const Psana::Bld::BldDataEBeamV5& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method at the specified index,
+/// negative index means append to the end of dataset. If pointer to object is zero then
+/// datsets are extended with zero-filled of default-initialized data.
+void store_at(const Psana::Bld::BldDataEBeamV5* obj, hdf5pp::Group group, long index = -1, int version = -1);
+
+
 namespace ns_BldDataPhaseCavity_v0 {
 struct dataset_data {
   static hdf5pp::Type native_type();
