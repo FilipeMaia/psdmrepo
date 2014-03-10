@@ -16,7 +16,7 @@
   float    _f32CoolingTemp          -> coolingTemp;
   float    _f32ReadoutSpeed         -> readoutSpeed;
   uint16_t _u16GainIndex            -> gainIndex;
-  uint16_t _u16IntesifierGain       -> intesifierGain;
+  uint16_t _u16IntensifierGain      -> intensifierGain;
   double   _f64GateDelay            -> gateDelay;
   double   _f64GateWidth            -> gateWidth;
   uint32_t _u32MaskedHeight         -> maskedHeight;
