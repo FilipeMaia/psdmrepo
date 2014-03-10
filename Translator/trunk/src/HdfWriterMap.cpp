@@ -166,6 +166,7 @@ void initializeHdfWriterMap( HdfWriterMap & mapping) {
   mapping[ & typeid(Psana::Bld::BldDataEBeamV2) ] = boost::make_shared<HdfWriterPsana<Psana::Bld::BldDataEBeamV2> >();
   mapping[ & typeid(Psana::Bld::BldDataEBeamV3) ] = boost::make_shared<HdfWriterPsana<Psana::Bld::BldDataEBeamV3> >();
   mapping[ & typeid(Psana::Bld::BldDataEBeamV4) ] = boost::make_shared<HdfWriterPsana<Psana::Bld::BldDataEBeamV4> >();
+  mapping[ & typeid(Psana::Bld::BldDataEBeamV5) ] = boost::make_shared<HdfWriterPsana<Psana::Bld::BldDataEBeamV5> >();
   mapping[ & typeid(Psana::Bld::BldDataFEEGasDetEnergy) ] = boost::make_shared<HdfWriterPsana<Psana::Bld::BldDataFEEGasDetEnergy> >();
   mapping[ & typeid(Psana::Bld::BldDataGMDV0) ] = boost::make_shared<HdfWriterPsana<Psana::Bld::BldDataGMDV0> >();
   mapping[ & typeid(Psana::Bld::BldDataGMDV1) ] = boost::make_shared<HdfWriterPsana<Psana::Bld::BldDataGMDV1> >();
