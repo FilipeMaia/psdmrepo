@@ -69,8 +69,8 @@ uint16_t ConfigV1::gainIndex() const {
 }
 
 
-uint16_t ConfigV1::intesifierGain() const {
-  return m_xtcObj->intesifierGain();
+uint16_t ConfigV1::intensifierGain() const {
+  return m_xtcObj->intensifierGain();
 }
 
 

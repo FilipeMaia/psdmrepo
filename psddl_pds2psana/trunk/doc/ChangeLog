@@ -11,6 +11,11 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-09-04
+2014-03-10 David Schneider
+- regenerate whole thing from psddldata V01-00-06
+- trac ticket #278
+
 Tag: V00-09-03
 2014-03-10 David Schneider
 - regenerate whole thing from psddldata V01-00-05

@@ -26,7 +26,7 @@ public:
   virtual float coolingTemp() const;
   virtual float readoutSpeed() const;
   virtual uint16_t gainIndex() const;
-  virtual uint16_t intesifierGain() const;
+  virtual uint16_t intensifierGain() const;
   virtual double gateDelay() const;
   virtual double gateWidth() const;
   virtual uint32_t maskedHeight() const;
