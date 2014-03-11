@@ -84,6 +84,9 @@ DgHeader::dgram()
   // copy header
   std::copy((const char*)&m_header, ((const char*)&m_header)+headerSize, (char*)dg);
 
+  // wrap into smart pointer so it gets deleted
+  Dgram::ptr dgram = Dgram::make_ptr(dg);
+
   // make sure that we are at correct location
   m_file.seek(m_off + headerSize, SEEK_SET);
 
@@ -93,11 +96,11 @@ DgHeader::dgram()
   if (nread < 0) {
     throw XTCReadException(ERR_LOC, m_file.path().path());
   } else if (nread != ssize_t(payloadSize)) {
-    MsgLog(logger, error, "EOF while reading datagram payload from file: " << m_file.path());
+    MsgLog(logger, warning, "EOF while reading datagram payload from file: " << m_file.path());
     return Dgram::ptr();
   }
 
-  return Dgram::make_ptr(dg);
+  return dgram;
 }
 
 } // namespace XtcInput

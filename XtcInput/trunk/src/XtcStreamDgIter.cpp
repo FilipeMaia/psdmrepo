@@ -85,10 +85,18 @@ XtcStreamDgIter::next()
 
   // pop one datagram if queue is not empty
   Dgram dgram;
-  if (not m_headerQueue.empty()) {
+  while (not m_headerQueue.empty()) {
     boost::shared_ptr<DgHeader> hptr = m_headerQueue.front();
     m_headerQueue.erase(m_headerQueue.begin());
-    dgram = Dgram(hptr->dgram(), hptr->path());
+    Dgram::ptr dg = hptr->dgram();
+    if (dg) {
+      dgram = Dgram(dg, hptr->path());
+      break;
+    } else {
+      // header failed to read datagram, this is likely due to non-fatal
+      // error like premature EOF. Skip this one and try to go to the next
+      readAhead();
+    }
   }
 
   return dgram ;
