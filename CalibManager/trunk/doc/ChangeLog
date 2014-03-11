@@ -11,6 +11,11 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-22
+2014-03-11 Mikhail S. Dubrovin
+- add NotificationDB
+- in GUIConfigPars add the button to print package tags in the tab of Config Parameters
+	
 Tag: V00-00-21
 2014-03-07 Mikhail S. Dubrovin
 - in GUIDarkMoreOpts.py set invisible the check box for additional options

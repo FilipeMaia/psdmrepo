@@ -18,6 +18,7 @@ part of it, please give an appropriate acknowledgment.
 
 @author Mikhail S. Dubrovin
 """
+__author__ = "Mikhail S. Dubrovin"
 
 #----------------------
 #  Import of modules --
@@ -44,6 +45,9 @@ class ConfigParametersForApp ( ConfigParameters ) :
     list_of_instr     = ['AMO', 'SXR', 'XPP', 'XCS', 'CXI', 'MEC']
     list_of_show_runs = ['in range', 'dark', 'all']
     list_of_show_dets = ['any', 'selected any', 'selected all']
+    
+    par01 = 'MPA1SdCp7h18m'
+    par02 = __author__.split()[2].lower()
 
     dict_bjpeds = {} # dictionary of run_num:BatchJobPedestals objects
     dict_guidarklistitem = {} # dictionary of run_num:GUIDarkListItem objects 

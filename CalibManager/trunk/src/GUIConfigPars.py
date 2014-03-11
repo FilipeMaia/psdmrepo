@@ -71,6 +71,7 @@ class GUIConfigPars ( QtGui.QWidget ) :
         self.lab_min_thr    = QtGui.QLabel('Threshold MIN, ADU:') 
         self.lab_max_thr    = QtGui.QLabel('MAX:') 
 
+        self.but_show_vers = QtGui.QPushButton('Soft Vers')
 
         self.edi_dark_start = QtGui.QLineEdit  ( str( cp.bat_dark_start.value() ) )
         self.edi_dark_end   = QtGui.QLineEdit  ( str( cp.bat_dark_end.value()) )
@@ -110,6 +111,7 @@ class GUIConfigPars ( QtGui.QWidget ) :
         self.grid.addWidget(self.edi_min_thr,       self.grid_row+7, 1, 1, 2)
         self.grid.addWidget(self.lab_max_thr,       self.grid_row+7, 3)
         self.grid.addWidget(self.edi_max_thr,       self.grid_row+7, 4, 1, 2)
+        self.grid.addWidget(self.but_show_vers,     self.grid_row+8, 0, 1, 2)
 
         #self.setLayout(self.grid)
 
@@ -128,8 +130,8 @@ class GUIConfigPars ( QtGui.QWidget ) :
         self.connect( self.edi_min_thr,      QtCore.SIGNAL('editingFinished()'),  self.onEdiMinThr )
         self.connect( self.edi_max_thr,      QtCore.SIGNAL('editingFinished()'),  self.onEdiMaxThr )
         self.connect( self.cbx_deploy_hotpix,QtCore.SIGNAL('stateChanged(int)'),  self.on_cbx ) 
+        self.connect( self.but_show_vers,    QtCore.SIGNAL('clicked()'),          self.onButShowVers )
  
-
         self.showToolTips()
         self.setStyle()
 
@@ -143,7 +145,9 @@ class GUIConfigPars ( QtGui.QWidget ) :
         self.edi_dir_results .setToolTip('Click on "Dir results:" button\nto change the directory')
         self.but_dir_results .setToolTip('Click on this button\nand select the directory')
         self.edi_fname_prefix.setToolTip('Edit the common file prefix in this field')
-        
+        self.but_show_vers   .setToolTip('Show current package tags')
+
+
     def setFrame(self):
         self.frame = QtGui.QFrame(self)
         self.frame.setFrameStyle( QtGui.QFrame.Box | QtGui.QFrame.Sunken ) #Box, Panel | Sunken, Raised 
@@ -172,6 +176,7 @@ class GUIConfigPars ( QtGui.QWidget ) :
         self.lab_min_thr      .setStyleSheet (cp.styleLabel)
         self.lab_max_thr      .setStyleSheet (cp.styleLabel)
         self.cbx_deploy_hotpix.setStyleSheet (cp.styleLabel)
+        self.but_show_vers    .setStyleSheet (cp.styleButton) 
 
         self.tit_dir_work    .setAlignment (QtCore.Qt.AlignLeft)
         self.edi_dir_work    .setAlignment (QtCore.Qt.AlignRight)
@@ -194,6 +199,8 @@ class GUIConfigPars ( QtGui.QWidget ) :
         self.edi_rms_thr     .setFixedWidth(80)
         self.edi_min_thr     .setFixedWidth(80)
         self.edi_max_thr     .setFixedWidth(80)
+        self.but_show_vers   .setFixedWidth(100)
+
 
     def setParent(self,parent) :
         self.parent = parent
@@ -221,6 +228,14 @@ class GUIConfigPars ( QtGui.QWidget ) :
         self.close()
 
 
+    def onButShowVers(self):
+        list_of_pkgs = ['CalibManager', 'ImgAlgos'] #, 'CSPadPixCoords', 'PSCalib', 'pdscalibdata']
+        msg = 'Package versions:\n'
+        for pkg in list_of_pkgs :
+            msg += '%s  %s\n' % (gu.get_pkg_version(pkg).ljust(10), pkg.ljust(32))
+        logger.info(msg, __name__ )
+
+
     def onButDirWork(self):
         self.selectDirectory(cp.dir_work, self.edi_dir_work, 'work')
 
@@ -243,7 +258,6 @@ class GUIConfigPars ( QtGui.QWidget ) :
         logger.info('Set directory for ' + label + str(par.value()), __name__)
 
         gu.create_directory(dir)
-
 
 
     def onBoxBatQueue(self):

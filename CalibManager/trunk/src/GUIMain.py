@@ -46,6 +46,7 @@ from GUIButtonBar           import *
 from GUILogger              import *
 from GUITabs                import *
 from GUIInsExpDirDet        import *
+from NotificationDB         import *
 #from GUICalibDirTree        import *
 
 #---------------------
@@ -208,6 +209,12 @@ class GUIMain ( QtGui.QWidget ) :
         self.main_win_pos_y .setValue(y)
         self.main_win_width .setValue(w)
         self.main_win_height.setValue(h)
+
+        try :
+            ndb = NotificationDB()
+            ndb.add_record()
+        except :
+            pass
         
         cp.close()
 

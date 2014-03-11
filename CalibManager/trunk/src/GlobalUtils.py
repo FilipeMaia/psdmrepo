@@ -32,6 +32,7 @@ __version__ = "$Revision: 4 $"
 import sys
 import os
 import pwd
+import socket
 #import time
 from time import localtime, gmtime, strftime, clock, time, sleep
 #from datetime import datetime
@@ -157,12 +158,6 @@ def print_list_of_files_in_dir(dirname, path_or_fname) :
         if fname in fname_in_dir :
             print fname_in_dir    
     print '\n'
-
-
-def get_enviroment(env='USER') :
-    """Returns the value of specified by string name environment variable
-    """
-    return os.environ[env]
 
 
 def get_path_owner(path) :
@@ -368,7 +363,8 @@ def batch_job_status_and_nodename(job_id_str, queue='psnehq') :
 
 
 def remove_file(path) :
-    #print 'remove file: ' + path
+    #print 'remove file: ' + pathOut[11]: ''
+
     logger.debug('remove: ' + path, __name__)
     p = subprocess.Popen(['rm', path], stdout=subprocess.PIPE)
     p.wait() # short time waiting untill submission is done, 
@@ -612,6 +608,18 @@ def get_pwd() :
     out, err = subproc(['pwd'])
     pwdir = out.strip('\n')
     return pwdir
+
+def get_cwd() :
+    """get corrent work directory"""
+    return os.getcwd()
+
+def get_hostname() :
+    return socket.gethostname()
+ 
+def get_enviroment(env='USER') :
+    """Returns the value of specified by string name environment variable
+    """
+    return os.environ[env]
 
 #----------------------------------
 
@@ -969,6 +977,15 @@ def arr_rot_n90(arr, rot_ang_n90=0) :
 
 #----------------------------------
 
+def has_kerberos_ticket():
+    """Checks to see if the user has a valid Kerberos ticket"""
+    #stream = os.popen('klist -s')
+    #out = subproc(['klist', '-s'])
+    output = getoutput('klist -4')
+    print 'Kerberos ticket: ', output.split()[-1]
+    return True
+
+
 def check_token(do_print=False) :
     token = getoutput('tokens')
     #if do_print : print token
@@ -997,6 +1014,25 @@ def parse_token(token) :
         #print 'date_object', str(date_object)
 
     return timestamp 
+
+#----------------------------------
+
+def get_pkg_version(pkg_name='CalibManager') :
+    """Returns the latest version of the package"""
+    try :
+        cmd = 'psvn tags %s' % pkg_name
+        output = getoutput(cmd)
+        lines = output.split('\n')
+        last_line = lines[-1]
+        fields = last_line.split()
+        version = fields[-1].rstrip('/')
+        #print cmd, '\n', output
+        #print 'Last line: ', last_line
+        #print 'Version: ', version
+        return version
+    except :
+        return 'V is N/A'
+    
 
 #----------------------------------
 
@@ -1060,6 +1096,10 @@ if __name__ == "__main__" :
 
     status, msg = check_token(do_print=True)
 
+    #print 'Package version: ', get_pkg_version('CalibManager')
+
+    status = has_kerberos_ticket()
+    
     sys.exit ( "End of test" )
 
 #----------------------------------

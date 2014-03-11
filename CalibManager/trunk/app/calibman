@@ -29,7 +29,7 @@ import os
 
 from PyQt4 import QtGui
 from CalibManager.GUIMain import GUIMain
-from CalibManager.GlobalUtils import check_token
+from CalibManager.GlobalUtils import check_token, has_kerberos_ticket
 from CalibManager.ThreadWorker import ThreadWorker
 
 #---------------------------------
@@ -41,11 +41,15 @@ class StartCalibManager :
 
         self.input_parameters()
 
+	#if not has_kerberos_ticket() :
+	#    print 'Before starting this application please update Kerberos tisket and AFS token using commands:\nkinit;\naklog;'
+	#    return
+
         status, msg = check_token(do_print=True)
 	#print msg
 
 	if not status :
-	    print 'Before starting this application please update AFS token using commands:\nkinit;\naklog;'
+	    print 'Before starting this application please update AFS token using command:\nkinit;\naklog;'
 	    return
 
 	print "Start the CalibManager GUI"
