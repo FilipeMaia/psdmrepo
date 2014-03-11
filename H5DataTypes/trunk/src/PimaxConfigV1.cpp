@@ -48,7 +48,7 @@ PimaxConfigV1::PimaxConfigV1 ( const Pds::Pimax::ConfigV1& data )
   , coolingTemp(data.coolingTemp())
   , readoutSpeed(data.readoutSpeed())
   , gainIndex(data.gainIndex())
-  , intesifierGain(data.intesifierGain())
+  , intensifierGain(data.intensifierGain())
   , gateDelay(data.gateDelay())
   , gateWidth(data.gateWidth())
   , maskedHeight(data.maskedHeight())
@@ -85,7 +85,7 @@ PimaxConfigV1::native_type()
   type.insert("coolingTemp", offsetof(DsType, coolingTemp), hdf5pp::TypeTraits<float>::native_type());
   type.insert("readoutSpeed", offsetof(DsType, readoutSpeed), hdf5pp::TypeTraits<float>::native_type());
   type.insert("gainIndex", offsetof(DsType, gainIndex), hdf5pp::TypeTraits<uint16_t>::native_type());
-  type.insert("intesifierGain", offsetof(DsType, intesifierGain), hdf5pp::TypeTraits<uint16_t>::native_type());
+  type.insert("intensifierGain", offsetof(DsType, intensifierGain), hdf5pp::TypeTraits<uint16_t>::native_type());
   type.insert("gateDelay", offsetof(DsType, gateDelay), hdf5pp::TypeTraits<double>::native_type());
   type.insert("gateWidth", offsetof(DsType, gateWidth), hdf5pp::TypeTraits<double>::native_type());
   type.insert("maskedHeight", offsetof(DsType, maskedHeight), hdf5pp::TypeTraits<uint32_t>::native_type());

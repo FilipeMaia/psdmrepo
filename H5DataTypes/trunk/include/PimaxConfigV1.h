@@ -66,7 +66,7 @@ private:
   float coolingTemp;
   float readoutSpeed;
   uint16_t gainIndex;
-  uint16_t intesifierGain;
+  uint16_t intensifierGain;
   double gateDelay;
   double gateWidth;
   uint32_t maskedHeight;
