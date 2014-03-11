@@ -155,6 +155,31 @@ DumpBld::event(Event& evt, Env& env)
     }
   }
 
+  shared_ptr<Psana::Bld::BldDataEBeamV5> ebeam5 = evt.get(m_ebeamSrc);
+  if (ebeam5) {
+    WithMsgLog(name(), info, str) {
+      str << "Bld::BldDataEBeamV5:"
+          << "\n  damageMask=" << std::showbase << std::hex << ebeam5->damageMask() << std::dec
+          << "\n  ebeamCharge=" << ebeam5->ebeamCharge()
+          << "\n  ebeamL3Energy=" << ebeam5->ebeamL3Energy()
+          << "\n  ebeamLTUPosX=" << ebeam5->ebeamLTUPosX()
+          << "\n  ebeamLTUPosY=" << ebeam5->ebeamLTUPosY()
+          << "\n  ebeamLTUAngX=" << ebeam5->ebeamLTUAngX()
+          << "\n  ebeamLTUAngY=" << ebeam5->ebeamLTUAngY()
+          << "\n  ebeamPkCurrBC2=" << ebeam5->ebeamPkCurrBC2()
+          << "\n  ebeamEnergyBC2=" << ebeam5->ebeamEnergyBC2()
+          << "\n  ebeamPkCurrBC1=" << ebeam5->ebeamPkCurrBC1()
+          << "\n  ebeamEnergyBC1=" << ebeam5->ebeamEnergyBC1()
+          << "\n  ebeamUndPosX=" << ebeam5->ebeamUndPosX()
+          << "\n  ebeamUndPosY=" << ebeam5->ebeamUndPosY()
+          << "\n  ebeamUndAngX=" << ebeam5->ebeamUndAngX()
+          << "\n  ebeamUndAngY=" << ebeam5->ebeamUndAngY()
+          << "\n  ebeamXTCAVAmpl=" << ebeam5->ebeamXTCAVAmpl()
+          << "\n  ebeamXTCAVPhase=" << ebeam5->ebeamXTCAVPhase()
+          << "\n  ebeamDumpCharge=" << ebeam5->ebeamDumpCharge();
+    }
+  }
+
   shared_ptr<Psana::Bld::BldDataPhaseCavity> cav = evt.get(m_cavSrc);
   if (cav) {
     WithMsgLog(name(), info, str) {

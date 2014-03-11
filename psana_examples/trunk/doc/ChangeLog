@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-13
+2014-03-10 David Schneider
+- DumpBld: dump EBeamV5
+
 Tag: V00-04-12
 2014-02-26 David Schneider
 - fixed DumpDamage so that its documentation will be added to the group
