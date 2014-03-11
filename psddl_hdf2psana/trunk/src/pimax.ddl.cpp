@@ -26,7 +26,7 @@ hdf5pp::Type ns_ConfigV1_v0_dataset_config_stored_type()
   type.insert("coolingTemp", offsetof(DsType, coolingTemp), hdf5pp::TypeTraits<float>::stored_type());
   type.insert("readoutSpeed", offsetof(DsType, readoutSpeed), hdf5pp::TypeTraits<float>::stored_type());
   type.insert("gainIndex", offsetof(DsType, gainIndex), hdf5pp::TypeTraits<uint16_t>::stored_type());
-  type.insert("intesifierGain", offsetof(DsType, intesifierGain), hdf5pp::TypeTraits<uint16_t>::stored_type());
+  type.insert("intensifierGain", offsetof(DsType, intensifierGain), hdf5pp::TypeTraits<uint16_t>::stored_type());
   type.insert("gateDelay", offsetof(DsType, gateDelay), hdf5pp::TypeTraits<double>::stored_type());
   type.insert("gateWidth", offsetof(DsType, gateWidth), hdf5pp::TypeTraits<double>::stored_type());
   type.insert("maskedHeight", offsetof(DsType, maskedHeight), hdf5pp::TypeTraits<uint32_t>::stored_type());
@@ -62,7 +62,7 @@ hdf5pp::Type ns_ConfigV1_v0_dataset_config_native_type()
   type.insert("coolingTemp", offsetof(DsType, coolingTemp), hdf5pp::TypeTraits<float>::native_type());
   type.insert("readoutSpeed", offsetof(DsType, readoutSpeed), hdf5pp::TypeTraits<float>::native_type());
   type.insert("gainIndex", offsetof(DsType, gainIndex), hdf5pp::TypeTraits<uint16_t>::native_type());
-  type.insert("intesifierGain", offsetof(DsType, intesifierGain), hdf5pp::TypeTraits<uint16_t>::native_type());
+  type.insert("intensifierGain", offsetof(DsType, intensifierGain), hdf5pp::TypeTraits<uint16_t>::native_type());
   type.insert("gateDelay", offsetof(DsType, gateDelay), hdf5pp::TypeTraits<double>::native_type());
   type.insert("gateWidth", offsetof(DsType, gateWidth), hdf5pp::TypeTraits<double>::native_type());
   type.insert("maskedHeight", offsetof(DsType, maskedHeight), hdf5pp::TypeTraits<uint32_t>::native_type());
@@ -99,7 +99,7 @@ ns_ConfigV1_v0::dataset_config::dataset_config(const Psana::Pimax::ConfigV1& psa
   , coolingTemp(psanaobj.coolingTemp())
   , readoutSpeed(psanaobj.readoutSpeed())
   , gainIndex(psanaobj.gainIndex())
-  , intesifierGain(psanaobj.intesifierGain())
+  , intensifierGain(psanaobj.intensifierGain())
   , gateDelay(psanaobj.gateDelay())
   , gateWidth(psanaobj.gateWidth())
   , maskedHeight(psanaobj.maskedHeight())
@@ -158,9 +158,9 @@ uint16_t ConfigV1_v0::gainIndex() const {
   if (not m_ds_config) read_ds_config();
   return uint16_t(m_ds_config->gainIndex);
 }
-uint16_t ConfigV1_v0::intesifierGain() const {
+uint16_t ConfigV1_v0::intensifierGain() const {
   if (not m_ds_config) read_ds_config();
-  return uint16_t(m_ds_config->intesifierGain);
+  return uint16_t(m_ds_config->intensifierGain);
 }
 double ConfigV1_v0::gateDelay() const {
   if (not m_ds_config) read_ds_config();

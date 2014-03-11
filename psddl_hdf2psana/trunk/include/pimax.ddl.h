@@ -30,7 +30,7 @@ struct dataset_config {
   float coolingTemp;
   float readoutSpeed;
   uint16_t gainIndex;
-  uint16_t intesifierGain;
+  uint16_t intensifierGain;
   double gateDelay;
   double gateWidth;
   uint32_t maskedHeight;
@@ -67,7 +67,7 @@ public:
   virtual float coolingTemp() const;
   virtual float readoutSpeed() const;
   virtual uint16_t gainIndex() const;
-  virtual uint16_t intesifierGain() const;
+  virtual uint16_t intensifierGain() const;
   virtual double gateDelay() const;
   virtual double gateWidth() const;
   virtual uint32_t maskedHeight() const;
