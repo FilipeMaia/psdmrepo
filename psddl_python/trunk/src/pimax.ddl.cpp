@@ -44,7 +44,7 @@ void createWrappers(PyObject* module) {
     .def("coolingTemp", &Psana::Pimax::ConfigV1::coolingTemp)
     .def("readoutSpeed", &Psana::Pimax::ConfigV1::readoutSpeed)
     .def("gainIndex", &Psana::Pimax::ConfigV1::gainIndex)
-    .def("intesifierGain", &Psana::Pimax::ConfigV1::intesifierGain)
+    .def("intensifierGain", &Psana::Pimax::ConfigV1::intensifierGain)
     .def("gateDelay", &Psana::Pimax::ConfigV1::gateDelay)
     .def("gateWidth", &Psana::Pimax::ConfigV1::gateWidth)
     .def("maskedHeight", &Psana::Pimax::ConfigV1::maskedHeight)
