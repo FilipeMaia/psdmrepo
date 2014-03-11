@@ -1,0 +1,3 @@
+- new type in Bld: BldDataEBeamV5
+- Improvements to calibman for handling file permissions
+- new C++ package Eigen
