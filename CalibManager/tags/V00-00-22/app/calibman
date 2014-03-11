@@ -1,0 +1,82 @@
+#!@PYTHON@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  Script calibman...
+#
+#------------------------------------------------------------------------
+
+"""This script starts the CalibManager GUI and other threads for signal exchange
+
+This software was developed for the LCLS project.  If you use all or 
+part of it, please give an appropriate acknowledgement.
+
+@see RelatedModule
+
+@version $Id$ 
+
+@author Mikhail S. Dubrovin
+"""
+
+#-------------------
+#  Import modules --
+#-------------------
+
+import sys
+import os
+
+from PyQt4 import QtGui
+from CalibManager.GUIMain import GUIMain
+from CalibManager.GlobalUtils import check_token, has_kerberos_ticket
+from CalibManager.ThreadWorker import ThreadWorker
+
+#---------------------------------
+
+class StartCalibManager :
+
+    def __init__ ( self ) :
+        """Start application"""
+
+        self.input_parameters()
+
+	#if not has_kerberos_ticket() :
+	#    print 'Before starting this application please update Kerberos tisket and AFS token using commands:\nkinit;\naklog;'
+	#    return
+
+        status, msg = check_token(do_print=True)
+	#print msg
+
+	if not status :
+	    print 'Before starting this application please update AFS token using command:\nkinit;\naklog;'
+	    return
+
+	print "Start the CalibManager GUI"
+        app = QtGui.QApplication(sys.argv)
+
+	t1 = ThreadWorker()
+	#t2 = ThreadWorker()
+	#t3 = ThreadWorker()
+
+	t1.start()
+	#t2.start()
+	#t3.start()
+
+        gui = GUIMain(None,app)
+        gui.show()
+        
+        sys.exit(app.exec_())
+
+
+    def input_parameters(self):	
+        msg = "Input parameters:" + str(sys.argv)
+	#print msg	
+
+#---------------------------------
+
+if __name__ == "__main__" :
+
+    StartCalibManager()
+
+#---------------------------------
