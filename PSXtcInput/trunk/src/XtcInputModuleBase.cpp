@@ -134,59 +134,80 @@ XtcInputModuleBase::beginJob(Event& evt, Env& env)
   // call initialization method for external datagram source
   m_dgsource->init();
 
-  // try to read first event and see if it is a Configure transition
-  std::vector<XtcInput::Dgram> eventDg;
-  std::vector<XtcInput::Dgram> nonEventDg;
-  if (not m_dgsource->next(eventDg, nonEventDg)) {
-    // Nothing there at all, this is unexpected
-    throw EmptyInput(ERR_LOC);
-  }
-  
-  // for now we only expect one event datagram, can't handle other cases yet
-  if (eventDg.size() != 1 or not nonEventDg.empty()) {
-    throw UnexpectedInput(ERR_LOC);
-  }
+  // Read initial datagrams, skip all Map transitions, stop at first non-Map.
+  // If first non-Map is Configure then update event/env, otherwise push
+  // it into read_back buffer.
+  bool foundNonMap = false;
+  for (int count = 0; not foundNonMap; ++ count) {
 
-  // push non-event stuff to environment
-  // usually first transition (Configure) should not have any non-event attached data
-  BOOST_FOREACH(const XtcInput::Dgram& dg, nonEventDg) {
-    fillEnv(dg, env);
-  }
-
-  bool first = true;
-  BOOST_FOREACH(const XtcInput::Dgram& dg, eventDg) {
-
-    XtcInput::Dgram::ptr dgptr = dg.dg();
-
-    if (first) {
-      // we expect Configure here, anything else must be handled in event(0
-      MsgLog(name(), debug, name() << ": read first datagram, transition = "
-            << Pds::TransitionId::name(dgptr->seq.service()));
-
-      if (dgptr->seq.service() != Pds::TransitionId::Configure) {
-        // Something else than Configure, store if for event()
-        MsgLog(name(), warning, "Expected Configure transition for first datagram, received "
-               << Pds::TransitionId::name(dgptr->seq.service()) );
-        m_putBack = eventDg;
-        return;
+    std::vector<XtcInput::Dgram> eventDg;
+    std::vector<XtcInput::Dgram> nonEventDg;
+    if (not m_dgsource->next(eventDg, nonEventDg)) {
+      if (count == 0) {
+        // Nothing there at all, this is unexpected
+        throw EmptyInput(ERR_LOC);
+      } else {
+        // just stop here
+        break;
       }
-
-      m_transitions[dgptr->seq.service()] = dgptr->seq.clock();
-
-      // TODO: we only store one datagram in event, for multiple datagrams we need to review our model
-      fillEventDg(dg, evt);
-      fillEventId(dg, evt);
     }
 
-    // Store configuration info in the environment
-    fillEnv(dg, env);
+    // for now we only expect one event datagram, can't handle other cases yet
+    if (eventDg.size() != 1 or not nonEventDg.empty()) {
+      throw UnexpectedInput(ERR_LOC);
+    }
 
-    // there is BLD data in Configure which is event-like data
-    fillEvent(dg, evt, env);
+    // push non-event stuff to environment
+    // usually first transition (Configure) should not have any non-event attached data
+    BOOST_FOREACH(const XtcInput::Dgram& dg, nonEventDg) {
+      fillEnv(dg, env);
+    }
 
-    first = false;
-  }
+    // get type of a transition
+    Pds::TransitionId::Value transition = Pds::TransitionId::Map;
+    if (not eventDg.empty()) {
+      transition = eventDg.front().dg()->seq.service();
+    }
+
+    MsgLog(name(), debug, name() << ": read first datagram(s), transition = "
+          << Pds::TransitionId::name(transition));
+
+    // skip Map transition
+    foundNonMap = transition != Pds::TransitionId::Map;
+    if (not foundNonMap) continue;
+
+    // If this is not Map then we expect Configure here, anything else must be handled in event()
+    if (transition != Pds::TransitionId::Configure) {
+      // Something else than Configure, store if for event()
+      MsgLog(name(), warning, "Expected Configure transition for first datagram, received "
+             << Pds::TransitionId::name(transition) );
+      m_putBack = eventDg;
+      break;
+    }
+
+    bool first = true;
+    BOOST_FOREACH(const XtcInput::Dgram& dg, eventDg) {
+
+      XtcInput::Dgram::ptr dgptr = dg.dg();
+
+      if (first) {
+        m_transitions[dgptr->seq.service()] = dgptr->seq.clock();
   
+        // TODO: we only store one datagram in event, for multiple datagrams we need to review our model
+        fillEventDg(dg, evt);
+        fillEventId(dg, evt);
+      }
+
+      // Store configuration info in the environment
+      fillEnv(dg, env);
+
+      // there is BLD data in Configure which is event-like data
+      fillEvent(dg, evt, env);
+
+      first = false;
+    }
+
+  }
 }
 
 InputModule::Status 

@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-12-01
+2014-03-11 Andy Salnikov
+- implement skipping of the Map datagrams if it is the first datagram 
+  in a file 
+
 Tag: V00-12-00
 2014-02-26 Andy Salnikov
 - some redesign/refactoring to simplify multi-process psana implementation
