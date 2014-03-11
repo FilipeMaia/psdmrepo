@@ -517,7 +517,8 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual ( DetInfo.Device.Rayonix, 30 )
         self.assertEqual ( DetInfo.Device.EpixSampler, 31 )
         self.assertEqual ( DetInfo.Device.Pimax, 32 )
-        self.assertEqual ( DetInfo.Device.NumDevice, 33 )
+        self.assertEqual ( DetInfo.Device.Fccd960, 33 )
+        self.assertEqual ( DetInfo.Device.NumDevice, 34 )
 
         
         o1 = DetInfo(0,0,0,0)
@@ -669,7 +670,11 @@ class pypdsdata_unit_test ( unittest.TestCase ) :
         self.assertEqual ( BldInfo.Type.FeeSpec0, 46 )
         self.assertEqual ( BldInfo.Type.SxrSpec0, 47 )
         self.assertEqual ( BldInfo.Type.XppSpec0, 48 )
-        self.assertEqual ( BldInfo.Type.NumberOf, 49 )
+        self.assertEqual ( BldInfo.Type.XcsUsrIpm01, 49 )
+        self.assertEqual ( BldInfo.Type.XcsUsrIpm02, 50 )
+        self.assertEqual ( BldInfo.Type.XcsUsrIpm03, 51 )
+        self.assertEqual ( BldInfo.Type.XcsUsrIpm04, 52 )
+        self.assertEqual ( BldInfo.Type.NumberOf, 53 )
 
         o1 = BldInfo(0,0)
         

@@ -138,6 +138,7 @@ namespace {
       { "Rayonix",   Pds::DetInfo::Rayonix },
       { "EpixSampler", Pds::DetInfo::EpixSampler },
       { "Pimax",     Pds::DetInfo::Pimax },
+      { "Fccd960",   Pds::DetInfo::Fccd960 },
       { "NumDevice", Pds::DetInfo::NumDevice },
       { 0, 0 }
   };

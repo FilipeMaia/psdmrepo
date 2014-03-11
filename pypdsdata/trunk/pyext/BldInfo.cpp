@@ -83,6 +83,10 @@ namespace {
         { "FeeSpec0",        Pds::BldInfo::FeeSpec0 },
         { "SxrSpec0",        Pds::BldInfo::SxrSpec0 },
         { "XppSpec0",        Pds::BldInfo::XppSpec0 },
+        { "XcsUsrIpm01",     Pds::BldInfo::XcsUsrIpm01 },
+        { "XcsUsrIpm02",     Pds::BldInfo::XcsUsrIpm02 },
+        { "XcsUsrIpm03",     Pds::BldInfo::XcsUsrIpm03 },
+        { "XcsUsrIpm04",     Pds::BldInfo::XcsUsrIpm04 },
         { "NumberOf",        Pds::BldInfo::NumberOf },
         { 0, 0 }
     };
