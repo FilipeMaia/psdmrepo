@@ -317,7 +317,7 @@ DataObjectFactory::makeObject( const Pds::Xtc& xtc, PyObject* parent )
     if ( not obj ) obj = xtc2obj<Bld::BldDataEBeamV2, 2>(xtc, parent);
     if ( not obj ) obj = xtc2obj<Bld::BldDataEBeamV3, 3>(xtc, parent);
     if ( not obj ) obj = xtc2obj<Bld::BldDataEBeamV4, 4>(xtc, parent);
-    if ( not obj ) obj = xtc2obj<Bld::BldDataEBeamV4, 5>(xtc, parent);
+    if ( not obj ) obj = xtc2obj<Bld::BldDataEBeamV5, 5>(xtc, parent);
     break ;
 
   case Pds::TypeId::Id_PhaseCavity :

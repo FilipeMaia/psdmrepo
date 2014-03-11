@@ -6,6 +6,11 @@
 #  ChangeLog file for package pypdsdata
 #------------------------------------------------------------------------
 
+Tag: V01-01-16
+2014-03-08 David Schneider
+- fix bug with EBeamV5
+- update to pdsdata V07-02-22 to get pimax typo fix
+
 Tag: V01-01-15
 2014-03-08 David Schneider
 - update to pdsdata V07-02-21

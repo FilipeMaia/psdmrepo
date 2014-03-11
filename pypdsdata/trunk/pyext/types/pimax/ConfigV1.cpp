@@ -43,7 +43,7 @@ namespace {
   FUN0_WRAPPER(pypdsdata::Pimax::ConfigV1, coolingTemp)
   FUN0_WRAPPER(pypdsdata::Pimax::ConfigV1, readoutSpeed)
   FUN0_WRAPPER(pypdsdata::Pimax::ConfigV1, gainIndex)
-  FUN0_WRAPPER(pypdsdata::Pimax::ConfigV1, intesifierGain)
+  FUN0_WRAPPER(pypdsdata::Pimax::ConfigV1, intensifierGain)
   FUN0_WRAPPER(pypdsdata::Pimax::ConfigV1, gateDelay)
   FUN0_WRAPPER(pypdsdata::Pimax::ConfigV1, gateWidth)
   FUN0_WRAPPER(pypdsdata::Pimax::ConfigV1, maskedHeight)
@@ -68,7 +68,7 @@ namespace {
     { "coolingTemp",       coolingTemp,       METH_NOARGS, "self.coolingTemp() -> float\n\nReturns integer number" },
     { "readoutSpeed",      readoutSpeed,      METH_NOARGS, "self.readoutSpeed() -> float\n\nReturns readout speed" },
     { "gainIndex",         gainIndex,         METH_NOARGS, "self.gainIndex() -> int\n\nReturns integer number" },
-    { "intesifierGain",    intesifierGain,    METH_NOARGS, "self.intesifierGain() -> int\n\nReturns integer number" },
+    { "intensifierGain",    intensifierGain,    METH_NOARGS, "self.intensifierGain() -> int\n\nReturns integer number" },
     { "gateDelay",         gateDelay,         METH_NOARGS, "self.gateDelay() -> float\n\nReturns floating number" },
     { "gateWidth",         gateWidth,         METH_NOARGS, "self.gateWidth() -> float\n\nReturns floating number" },
     { "maskedHeight",      maskedHeight,      METH_NOARGS, "self.maskedHeight() -> int\n\nReturns integer number" },
