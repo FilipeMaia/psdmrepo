@@ -981,9 +981,13 @@ def has_kerberos_ticket():
     """Checks to see if the user has a valid Kerberos ticket"""
     #stream = os.popen('klist -s')
     #out = subproc(['klist', '-s'])
-    output = getoutput('klist -4')
-    print 'Kerberos ticket: ', output.split()[-1]
-    return True
+
+    #output = getoutput('klist -4')
+    #print 'Kerberos ticket: ', output.split()[-1]
+
+    resp = subprocess.check_call(["klist", "-s"])
+    if resp == 0 : return True
+    else         : return False
 
 
 def check_token(do_print=False) :
