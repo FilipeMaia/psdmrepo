@@ -88,6 +88,9 @@ namespace IData {
  *      is given a value (number) then it specifies stream number to read,
  *      without value arbitrary single stream will be selected. If option
  *      is not specified then data from all stream are read.
+ *  @li @b stream - specifies set of streams belonging to dataset which is a
+ *      comma-separated list of stream ranges, range can be a single stream number
+ *      or two number separated by dash (stream=0,2-4,11)
  *
  *  If the same key appears multiple times in the input string the latter
  *  values for this key override earlier values.
@@ -114,6 +117,8 @@ public:
 
   typedef std::pair<unsigned, unsigned> RunRange;
   typedef std::vector<RunRange> Runs;
+  typedef std::pair<unsigned, unsigned> StreamRange;
+  typedef std::vector<StreamRange> Streams;
   typedef std::vector<std::string> NameList;
 
   /**
@@ -191,6 +196,9 @@ public:
   /// Returns set of run numbers
   const Runs& runs() const;
 
+  /// Returns set of stream numbers
+  const Streams& streams() const;
+
   /// Returns true if dataset was specified as a single file name
   bool isFile() const { return m_isFile; }
   
@@ -217,6 +225,7 @@ private:
   bool m_isFile;             ///< True if dataset is a file name 
   Key2Val m_key2val;         ///< Mapping of keys to values
   Runs m_runs;               ///< Set of runs
+  Streams m_streams;         ///< Set of streams
   unsigned m_expId;          ///< Experiment ID
   std::string m_instrName;   ///< Instrument name
   std::string m_expName;     ///< Experiment name

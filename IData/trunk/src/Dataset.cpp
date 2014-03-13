@@ -47,7 +47,10 @@ namespace {
 
   // parse run list
   void parseRuns(const std::string& str, IData::Dataset::Runs& runs);
-  
+
+  // parse run list
+  void parseStreams(const std::string& str, IData::Dataset::Streams& streams);
+ 
   // checks to see if the string is a file name
   bool isFileName(const std::string& str);
 
@@ -172,8 +175,9 @@ Dataset::Dataset(const std::string& ds)
         }
       } else if (key == "run") {
         ::parseRuns(val, m_runs);
+      } else if (key == "stream") {
+        ::parseStreams(val, m_streams);
       }
-  
       m_key2val[key] = val;
 
     }
@@ -253,6 +257,13 @@ const Dataset::Runs&
 Dataset::runs() const
 {
   return m_runs;
+}
+
+/// Returns set of stream ranges
+const Dataset::Streams&
+Dataset::streams() const
+{
+  return m_streams;
 }
 
 /// Return the directory name for files
@@ -511,6 +522,53 @@ void parseRuns(const std::string& str, IData::Dataset::Runs& runs)
   }
 
 }
+
+// parse stream list
+void parseStreams(const std::string& str, IData::Dataset::Streams& streams)
+{
+  streams.clear();
+
+  // split it at commas
+  std::vector<std::string> ranges;
+  boost::split(ranges, str, boost::is_any_of(","), boost::token_compress_on);
+  for (std::vector<std::string>::const_iterator it = ranges.begin(); it != ranges.end(); ++ it) {
+
+    std::string range = *it;
+    boost::trim(range);
+    if (range.empty()) continue;
+
+    std::string startStr(range);
+    std::string endStr;
+
+    std::string::size_type p = range.find('-');
+    if (p != std::string::npos) {
+      startStr.erase(p);
+      boost::trim(startStr);
+      endStr = range.substr(p+1);
+      boost::trim(endStr);
+    }
+
+    unsigned start, end;
+    try {
+      start = boost::lexical_cast<unsigned>(startStr);
+      if (endStr.empty()) {
+        end = start;
+      } else {
+        end = boost::lexical_cast<unsigned>(endStr);
+      }
+    } catch (const boost::bad_lexical_cast& ex) {
+      throw IData::StreamRangeSpecException(ERR_LOC, str, ex.what());
+    }
+    if (end < start) {
+      throw IData::StreamRangeSpecException(ERR_LOC, str, "the first number in the range must be less or equal to teh last one");
+    }
+
+    streams.push_back(IData::Dataset::Streams::value_type(start, end));
+
+  }
+
+}
+
 
 // checks to see if the string is a file name
 bool 

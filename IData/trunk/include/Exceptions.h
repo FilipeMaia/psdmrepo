@@ -85,6 +85,16 @@ public:
 
 };
 
+/// Exception thrown when stream range is not recognized
+class StreamRangeSpecException : public Exception {
+public:
+
+  StreamRangeSpecException(const ErrSvc::Context& ctx, const std::string& spec, const std::string& msg)
+    : Exception(ctx, "invalid stream range specification: '" + spec + "' -- "+ msg)
+  {}
+
+};
+
 } // namespace IData
 
 #endif // IDATA_EXCEPTIONS_H

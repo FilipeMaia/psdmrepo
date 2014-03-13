@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-09
+2014-03-12 Igor Gaponenko
+- extended dataset specification to allow filtering on ranges of streams
+
 Tag: V00-01-08
 2014-02-14 Andy Salnikov
 - DataSet/isFileName() did not classify /dev/null as file name
