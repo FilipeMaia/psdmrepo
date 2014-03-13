@@ -11,6 +11,10 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-09-11
+2014-03-12 Igor Gaponenko
+- added support for filtering on stream ranges
+
 Tag: V00-09-10
 2014-03-11 Andy
 - improve handling of EOF while reading datagram payload

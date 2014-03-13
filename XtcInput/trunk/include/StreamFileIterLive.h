@@ -25,6 +25,7 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "XtcInput/LiveFilesDB.h"
+#include "IData/Dataset.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -59,11 +60,12 @@ public:
    *
    *  @param[in] expNum    Experiment number
    *  @param[in] run       Run number
-   *  @param[in] stream    Stream number, or -1 for all stream, -2 for any one stream
+   *  @param[in] stream    Stream number, or -1 for all stream, -2 for any one streama, -3 for ranges of streams
+   *  @param[in] ds_streams Ranges of streams
    *  @param[in] liveTimeout Timeout in second to wait for live data
    *  @param[in] filesdb   Database connection
    */
-  StreamFileIterLive (unsigned expNum, unsigned run, int stream, unsigned liveTimeout,
+  StreamFileIterLive (unsigned expNum, unsigned run, int stream, const IData::Dataset::Streams& ds_streams, unsigned liveTimeout,
       const boost::shared_ptr<LiveFilesDB>& filesdb) ;
 
   // Destructor
@@ -90,6 +92,7 @@ private:
   unsigned m_expNum;
   unsigned m_run;
   int m_stream;
+  IData::Dataset::Streams m_ds_streams;
   unsigned m_liveTimeout;
   boost::shared_ptr<LiveFilesDB> m_filesdb;
   bool m_initialized;

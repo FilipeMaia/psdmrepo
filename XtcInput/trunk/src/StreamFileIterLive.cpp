@@ -48,12 +48,13 @@ namespace XtcInput {
 //----------------
 // Constructors --
 //----------------
-StreamFileIterLive::StreamFileIterLive (unsigned expNum, unsigned run, int stream, 
+StreamFileIterLive::StreamFileIterLive (unsigned expNum, unsigned run, int stream, const IData::Dataset::Streams& ds_streams,
     unsigned liveTimeout, const boost::shared_ptr<LiveFilesDB>& filesdb)
   : StreamFileIterI()
   , m_expNum(expNum)
   , m_run(run)
   , m_stream(stream)
+  , m_ds_streams(ds_streams)
   , m_liveTimeout(liveTimeout)
   , m_filesdb(filesdb)
   , m_initialized(false)
@@ -136,24 +137,45 @@ StreamFileIterLive::next()
       // filter unwanted streams
       if (not m_streams.empty() and m_stream != -1) {
 
-        Streams::iterator it;
-        if (m_stream == -2) {
-          // leave one stream only, try to randomize but in a reproducible way
-          unsigned idx = m_run % m_streams.size();
-          it = m_streams.begin();
-          std::advance(it, idx);
+        if (m_stream == -3) {
+
+          // evict streams which do not fall into any range in the dataset specification
+          for (Streams::const_iterator s_it = m_streams.begin(); s_it != m_streams.end(); ++ s_it) {
+            bool evict = true ;
+            for (IData::Dataset::Streams::const_iterator ds_s_it = m_ds_streams.begin(); ds_s_it != m_ds_streams.end(); ++ ds_s_it) {
+              if (ds_s_it->first <= *s_it && *s_it <= ds_s_it->second) {
+                evict = false;
+                break;
+              }
+            }
+            if (evict) {
+              MsgLog(logger, debug, "Stream filtering mode, excluding stream number: " << *s_it);
+              m_streams.erase(*s_it);
+            }
+          }
+
         } else {
-          // leave one specific stream
-          it = m_streams.find(m_stream);
-        }
+
+          Streams::iterator it;
+          if (m_stream == -2) {
+            // leave one stream only, try to randomize but in a reproducible way
+            unsigned idx = m_run % m_streams.size();
+            it = m_streams.begin();
+            std::advance(it, idx);
+          } else {
+            // leave one specific stream
+            it = m_streams.find(m_stream);
+          }
       
-        if (it == m_streams.end()) {
-          m_streams.clear();
-          MsgLog(logger, debug, "One-stream mode, no matching streams");
-        } else {
-          m_streams.erase(m_streams.begin(), it);
-          m_streams.erase(++it, m_streams.end());
-          MsgLog(logger, debug, "One-stream mode, stream number: " << *m_streams.begin());
+          if (it == m_streams.end()) {
+            m_streams.clear();
+            MsgLog(logger, debug, "One-stream mode, no matching streams");
+          } else {
+            m_streams.erase(m_streams.begin(), it);
+            m_streams.erase(++it, m_streams.end());
+            MsgLog(logger, debug, "One-stream mode, stream number: " << *m_streams.begin());
+          }
+
         }
 
       } // if (not m_streams.empty())

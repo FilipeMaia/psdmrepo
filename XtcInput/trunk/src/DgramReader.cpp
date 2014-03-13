@@ -75,10 +75,11 @@ try {
   // specify live mode, other datasets do not matter.
 
   enum {Unknown, Live, Dead} liveMode = Unknown;
-  enum {AllStreams=-1, AnyOneStream=-2};
+  enum {AllStreams=-1, AnyOneStream=-2, RangeOfStreams=-3};
 
   std::vector<XtcFileName> files;  // file names for "dead" mode
   IData::Dataset::Runs runs;  // run numbers for live mode
+  IData::Dataset::Streams streams;  // stream ranges for live mode
   unsigned expId = 0;
   std::string liveDir;
   int stream = AllStreams;
@@ -88,6 +89,9 @@ try {
     
     IData::Dataset ds(*it);
     
+    // make sure the stream number and range filters are not user together
+    if (ds.exists("one-stream") && ds.exists("stream")) throw DatasetSpecError(ERR_LOC, "cannot specify both 'one-stream' and 'stream'");
+
     if (ds.isFile()) {
 
       // must be file name
@@ -121,6 +125,20 @@ try {
           } else if (stream != int(val)) {
             throw LiveStreamError(ERR_LOC);
           }
+        }
+      }
+
+      // check if using ranges of streams
+      if (ds.exists("stream")) {
+        std::string strval = ds.value("stream");
+        if (strval.empty()) {
+          stream = AllStreams;       // no value means all streams
+        } else {
+          stream = RangeOfStreams;
+          // copy stream ranges
+          const IData::Dataset::Streams& dsstreams = ds.streams();
+          std::copy(dsstreams.begin(), dsstreams.end(), std::back_inserter(streams));
+
         }
       }
 
@@ -186,25 +204,46 @@ try {
       for (RunStreamMap::iterator r_it = rsMap.begin(); r_it != rsMap.end(); ++ r_it) {
         
         StreamMap& streamMap = r_it->second;
-        StreamMap::iterator it;
-        if (stream == AnyOneStream) {
-          // leave one stream only, try to randomize but in a reproducible way
-          unsigned run = r_it->first;
-          unsigned idx = run % streamMap.size();
-          it = streamMap.begin();
-          std::advance(it, idx);
+        if (stream == RangeOfStreams) {
+
+          // filter on streams which fall into any range in the dataset specification
+          for (StreamMap::const_iterator it = streamMap.begin(); it != streamMap.end(); ++ it) {
+            bool evict = true;
+            for (IData::Dataset::Streams::const_iterator s_it = streams.begin(); s_it != streams.end(); ++ s_it) {
+              if (s_it->first <= it->first && it->first <= s_it->second) {
+                evict = false;
+                break;
+              }
+            }
+            if (evict) {
+              MsgLog(logger, debug, "Stream filtering mode, evict stream number: " << it->first);
+            } else {
+              files.insert(files.end(), it->second.begin(), it->second.end());
+              MsgLog(logger, debug, "Stream filtering mode, accept stream number: " << it->first);
+            }
+          }
+
         } else {
-          // find one specific stream
-          it = streamMap.find(stream);
-        }
+
+          StreamMap::iterator it;
+          if (stream == AnyOneStream) {
+            // leave one stream only, try to randomize but in a reproducible way
+            unsigned run = r_it->first;
+            unsigned idx = run % streamMap.size();
+            it = streamMap.begin();
+            std::advance(it, idx);
+          } else {
+            // find one specific stream
+            it = streamMap.find(stream);
+          }
         
-        if (it == streamMap.end()) {
-          MsgLog(logger, debug, "One-stream mode, no matching streams");
-        } else {
-          files.insert(files.end(), it->second.begin(), it->second.end());
-          MsgLog(logger, debug, "One-stream mode, stream number: " << it->first);
+          if (it == streamMap.end()) {
+            MsgLog(logger, debug, "one-stream filtering mode, no matching streams");
+          } else {
+            files.insert(files.end(), it->second.begin(), it->second.end());
+            MsgLog(logger, debug, "one-stream filtering mode, stream number: " << it->first);
+          }
         }
-        
       }
     }
     
@@ -224,7 +263,7 @@ try {
     if (not numbers.empty()) {
       // use default table name if none was given
       if (m_liveDbConn.empty()) m_liveDbConn = "Server=psdb.slac.stanford.edu;Database=regdb;Uid=regdb_reader";
-      fileIter = boost::make_shared<RunFileIterLive>(numbers.begin(), numbers.end(), expId, stream, 
+      fileIter = boost::make_shared<RunFileIterLive>(numbers.begin(), numbers.end(), expId, stream, streams,
           m_liveTimeout, m_liveDbConn, m_liveTable, liveDir);
     }
   }
