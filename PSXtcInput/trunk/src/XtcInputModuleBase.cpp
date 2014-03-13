@@ -105,6 +105,7 @@ XtcInputModuleBase::XtcInputModuleBase (const std::string& name,
   , m_l3tAcceptOnly(true)
   , m_l1Count(0)
   , m_simulateEOR(0)
+  , m_run(-1)
 {
   std::fill_n(m_transitions, int(Pds::TransitionId::NumberOf), Pds::ClockTime(0, 0));
 
@@ -293,6 +294,13 @@ XtcInputModuleBase::event(Event& evt, Env& env)
       break;
    
     case Pds::TransitionId::BeginRun:
+      // take run number from transition env, in some streams env is not set (or set to 0), so we want to skip those
+      BOOST_FOREACH(const XtcInput::Dgram& dg, eventDg) {
+        if (dg.dg()->env.value() > 0) {
+          m_run = dg.dg()->env.value();
+          break;
+        }
+      }
       // signal new run, content is not relevant
       if (not (clock == m_transitions[trans])) {
         fillEventId(eventDg.front(), evt);
@@ -308,6 +316,8 @@ XtcInputModuleBase::event(Event& evt, Env& env)
       if (not (clock == m_transitions[trans])) {
         fillEventId(eventDg.front(), evt);
         fillEventDg(eventDg.front(), evt);
+        // reset run number, so that if next BeginRun is missing we don't reuse this run
+        m_run = -1;
         status = EndRun;
         found = true;
         m_transitions[trans] = clock;
@@ -472,7 +482,7 @@ XtcInputModuleBase::fillEventId(const XtcInput::Dgram& dg, Event& evt)
 
   // Store event ID
   PSTime::Time evtTime(clock.seconds(), clock.nanoseconds());
-  unsigned run = dg.file().run();
+  unsigned run = m_run > 0 ? int(m_run) : dg.file().run();
   unsigned fiducials = seq.stamp().fiducials();
   unsigned ticks = seq.stamp().ticks();
   unsigned vect = seq.stamp().vector();

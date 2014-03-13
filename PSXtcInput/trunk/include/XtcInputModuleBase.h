@@ -108,6 +108,7 @@ private:
   bool m_l3tAcceptOnly;                               ///< If true then pass only events accepted by L3T
   unsigned long m_l1Count;                            ///< Number of events (L1Accept transitions) seen so far
   int m_simulateEOR;                                  ///< if non-zero then simulate endRun/stop
+  int m_run;                                          ///< Run number that comes from BeginRun transition (or -1)
 };
 
 } // namespace PSXtcInput
