@@ -4,7 +4,7 @@
 #  $Id$
 #
 # Description:
-#  Module GUIFileManagerSelect...
+#  Module GUIFileManagerSingleControl...
 #
 #------------------------------------------------------------------------
 
@@ -59,7 +59,7 @@ from FileDeployer           import fd
 #---------------------
 #  Class definition --
 #---------------------
-class GUIFileManagerSelect ( QtGui.QWidget ) :
+class GUIFileManagerSingleControl ( QtGui.QWidget ) :
     """Main GUI for main button bar.
 
     @see BaseClass
@@ -70,7 +70,7 @@ class GUIFileManagerSelect ( QtGui.QWidget ) :
 
     def __init__ (self, parent=None, app=None) :
 
-        self.name = 'GUIFileManagerSelect'
+        self.name = 'GUIFileManagerSingleControl'
         self.myapp = app
         QtGui.QWidget.__init__(self, parent)
 
@@ -164,7 +164,7 @@ class GUIFileManagerSelect ( QtGui.QWidget ) :
         self.showToolTips()
         self.setStyle()
 
-        cp.guifilemanagerselect = self
+        cp.guifilemanagersinglecontrol = self
         self.move(10,25)
         
         #print 'End of init'
@@ -306,7 +306,7 @@ class GUIFileManagerSelect ( QtGui.QWidget ) :
     def resizeEvent(self, e):
         #logger.debug('resizeEvent', self.name) 
         self.frame.setGeometry(self.rect())
-        #print 'GUIFileManagerSelect resizeEvent: %s' % str(self.size())
+        #print 'GUIFileManagerSingleControl resizeEvent: %s' % str(self.size())
 
 
     def moveEvent(self, e):
@@ -337,7 +337,7 @@ class GUIFileManagerSelect ( QtGui.QWidget ) :
         cmd = 'mv %s %s' % (self.str_path(), self.get_out_path())
         if self.approveCommand(self.but_copy, cmd) :
             #os.system(cmd)
-            fd.procDeployCommand(cmd, 'f-manager')
+            fd.procDeployCommand(cmd, 'single-file-manager')
             self.resetFieldsOnDelete()
             if cp.guistatus is not None : cp.guistatus.updateStatusInfo()
 
@@ -347,7 +347,7 @@ class GUIFileManagerSelect ( QtGui.QWidget ) :
         cmd = 'cp %s %s' % (self.str_path(), self.get_out_path())
         if self.approveCommand(self.but_copy, cmd) :
             #os.system(cmd)
-            fd.procDeployCommand(cmd, 'f-manager')
+            fd.procDeployCommand(cmd, 'single-file-manager')
             if cp.guistatus is not None : cp.guistatus.updateStatusInfo()
 
 
@@ -528,7 +528,7 @@ class GUIFileManagerSelect ( QtGui.QWidget ) :
 #
 if __name__ == "__main__" :
     app = QtGui.QApplication(sys.argv)
-    ex  = GUIFileManagerSelect()
+    ex  = GUIFileManagerSingleControl()
     ex.show()
     app.exec_()
 #-----------------------------

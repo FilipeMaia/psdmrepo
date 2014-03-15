@@ -93,6 +93,8 @@ class GUIFileBrowser ( QtGui.QWidget ) :
         self.showToolTips()
         self.setStyle()
 
+        #self.guifilebrowser = self
+
     #-------------------
     #  Public methods --
     #-------------------

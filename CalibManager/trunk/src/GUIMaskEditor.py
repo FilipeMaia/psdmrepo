@@ -82,6 +82,7 @@ class GUIMaskEditor ( QtGui.QWidget ) :
         self.setFrame()
  
         self.titFile = QtGui.QLabel('File:')
+        self.lab_status = QtGui.QLabel('Status: ')
 
         self.ediFile = QtGui.QLineEdit ( self.path_mask_img.value() )
         self.ediFile.setReadOnly(True)
@@ -103,11 +104,16 @@ class GUIMaskEditor ( QtGui.QWidget ) :
         self.hboxE.addWidget( self.butMaskEditor )
         self.hboxE.addStretch(1)     
 
+        self.hboxS = QtGui.QHBoxLayout()
+        self.hboxS.addWidget(self.lab_status)
+        self.hboxS.addStretch(1)     
+
         self.vboxW = QtGui.QVBoxLayout() 
         self.vboxW.addStretch(1)
         self.vboxW.addLayout( self.hboxB ) 
         self.vboxW.addLayout( self.hboxE ) 
         self.vboxW.addStretch(1)
+        self.vboxW.addLayout( self.hboxS ) 
         
         self.setLayout(self.vboxW)
 
@@ -116,6 +122,8 @@ class GUIMaskEditor ( QtGui.QWidget ) :
  
         self.showToolTips()
         self.setStyle()
+
+        self.setStatus(0, 'Status: operations with ROI mask editor')
 
         cp.guimaskeditor = self
         self.move(10,25)
@@ -181,6 +189,7 @@ class GUIMaskEditor ( QtGui.QWidget ) :
         #try    : del cp.guimain
         #except : pass
 
+        cp.guimaskeditor = None
 
 
     def onExit(self):
@@ -256,6 +265,15 @@ class GUIMaskEditor ( QtGui.QWidget ) :
             cp.maskeditor = MaskEditor(**pars)
             cp.maskeditor.move(self.pos().__add__(QtCore.QPoint(820,-7))) # open window with offset w.r.t. parent
             cp.maskeditor.show()
+
+    def setStatus(self, status_index=0, msg=''):
+        list_of_states = ['Good','Warning','Alarm']
+        if status_index == 0 : self.lab_status.setStyleSheet(cp.styleStatusGood)
+        if status_index == 1 : self.lab_status.setStyleSheet(cp.styleStatusWarning)
+        if status_index == 2 : self.lab_status.setStyleSheet(cp.styleStatusAlarm)
+
+        #self.lab_status.setText('Status: ' + list_of_states[status_index] + msg)
+        self.lab_status.setText(msg)
 
 #-----------------------------
 #  In case someone decides to run this module

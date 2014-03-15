@@ -108,6 +108,30 @@ class FileNameManager :
         else                              : return self.path_to_calib_dir_default()
 
 #-----------------------------
+#-----------------------------
+#-----------------------------
+#-----------------------------
+
+    def path_to_calib_dir_src_custom(self):
+        """Returns path to the user selected (non-default) calib dir, for example /reg/neh/home1/<user-name>/<further-path>/calib"""
+        return cp.calib_dir_src.value()
+
+#-----------------------------
+
+    def path_to_calib_dir_src_default(self):
+        """Returns somthing like /reg/d/psdm/CXI/cxitut13/calib or None"""
+        if cp.instr_dir.value()    is None : return None
+        if cp.instr_name.value()   is None : return None
+        if cp.exp_name_src.value() is None : return None
+        return cp.instr_dir.value() + '/' + cp.instr_name.value() + '/' + cp.exp_name_src.value() + '/calib'
+
+#-----------------------------
+
+    def path_to_calib_dir_src(self):
+        if cp.calib_dir_src.value() != 'None' : return self.path_to_calib_dir_src_custom()
+        else                                  : return self.path_to_calib_dir_src_default()
+
+#-----------------------------
 
     def path_to_xtc_dir(self):
         """Returns somthing like /reg/d/psdm/CXI/cxitut13/xtc/ or None"""

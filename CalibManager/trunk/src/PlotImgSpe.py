@@ -142,6 +142,7 @@ class PlotImgSpe (QtGui.QWidget) :
 
         #print 'Close application'
 
+        cp.plotimgspe = None
 
 #-----------------------------
 # Test

@@ -11,6 +11,16 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-23
+2014-03-14 Mikhail S. Dubrovin
+- add GUIFileManager* etc for group file management
+A       src/GUIFileManagerGroupControl.py
+A       src/GUIFileManagerSingle.py
+A       src/GUIFileManagerSingleControl.py
+A       src/GUIExpCalibDir.py
+A       src/GUIFileManagerGroup.py
+A       src/GUIDirTree.py
+		
 Tag: V00-00-22
 2014-03-11 Mikhail S. Dubrovin
 - add NotificationDB

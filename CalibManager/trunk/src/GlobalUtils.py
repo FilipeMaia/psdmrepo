@@ -36,6 +36,7 @@ import socket
 #import time
 from time import localtime, gmtime, strftime, clock, time, sleep
 #from datetime import datetime
+import tempfile
 
 import numpy as np
 from commands import getoutput
@@ -173,6 +174,12 @@ def get_path_mode(path) :
     return os.stat(path).st_mode
 
 
+#----------------------------------
+
+def get_tempfile(mode='r+b',suffix='.txt') :
+    tf = tempfile.NamedTemporaryFile(mode=mode,suffix=suffix)
+    return tf # .name
+ 
 #----------------------------------
 
 def call(command_seq, shell=False) :
@@ -980,14 +987,9 @@ def arr_rot_n90(arr, rot_ang_n90=0) :
 def has_kerberos_ticket():
     """Checks to see if the user has a valid Kerberos ticket"""
     #stream = os.popen('klist -s')
-    #out = subproc(['klist', '-s'])
-
     #output = getoutput('klist -4')
-    #print 'Kerberos ticket: ', output.split()[-1]
-
-    resp = subprocess.check_call(["klist", "-s"])
-    if resp == 0 : return True
-    else         : return False
+    #resp = subprocess.call(["klist", "-s"])
+    return True if subprocess.call(["klist", "-s"]) == 0 else False
 
 
 def check_token(do_print=False) :
@@ -1102,7 +1104,7 @@ if __name__ == "__main__" :
 
     #print 'Package version: ', get_pkg_version('CalibManager')
 
-    status = has_kerberos_ticket()
+    print 'has_kerberos_ticket(): ', has_kerberos_ticket()
     
     sys.exit ( "End of test" )
 

@@ -98,12 +98,35 @@ class NotificationDB :
         return result.fetch_row(maxrows=0,how=1 ) # all rows, as dictionary
 
 
+    def get_list_of_recs(self) :
+        return self.get_list_of_recs_for_query(self.cmd_fetch())
+
+
+    def get_list_of_values(self) :
+        return [rec.values() for rec in self.get_list_of_recs()]
+
+
+    def get_list_of_keys(self) :
+        cmd = """SELECT * FROM %s WHERE id=1;""" % self.table
+        return self.get_list_of_recs_for_query(cmd)[0].keys()
+
+
+    def is_permitted(self) :
+        return True if gu.get_enviroment(env='LOGNAME') == cp.par02 else False
+
+
+    def msg_about_permission(self) :
+        print 'Sorry, this operation is not permitted!'
+
+
     def create_table(self) :
-        self.db.query(self.cmd_create_table())
+        if self.is_permitted() : self.db.query(self.cmd_create_table())
+        else                   : self.msg_about_permission()
 
 
     def delete_table(self) :
-        self.db.query('DROP TABLE %s' % self.table)
+        if self.is_permitted() : self.db.query('DROP TABLE %s' % self.table)
+        else                   : self.msg_about_permission()
 
 
     def insert_record(self) :
@@ -125,35 +148,58 @@ class NotificationDB :
 
 #------------------------------
 
-def test_create_table() :
+def test_notification_db(test_num):
+
+    print 'Test: %d' % test_num
+
     ndb = NotificationDB()
-    print 'cmd_create_table(): ', ndb.cmd_create_table()
-    ndb.create_table()
-    ndb.close()
 
+    if test_num == 0 :
+        print 'cmd_create_table(): ', ndb.cmd_create_table()
+        ndb.create_table()
 
-def test_get_dict() :
-    ndb = NotificationDB()
-    list_of_recs = ndb.get_list_of_recs_for_query(ndb.cmd_fetch())
-    print 'Resp:\n',
-    for rec in list_of_recs : print rec
-    #ndb.delete_table()
-    ndb.close()
+    elif test_num == 1 :
+        list_of_recs = ndb.get_list_of_recs_for_query(ndb.cmd_fetch())
+        print 'Resp:\n',
+        for rec in list_of_recs : print rec
 
+    elif test_num == 2 :
+        ndb.insert_record()
 
-def test_insert_record() :
-    ndb = NotificationDB()
-    ndb.insert_record()
+    elif test_num == 3 :
+        print ndb.get_list_of_keys()
+
+    elif test_num == 4 :
+        for vals in ndb.get_list_of_values() : print vals
+
+    elif test_num == 9 :
+        ndb.delete_table()
+
     ndb.close()
 
 #------------------------------
 
 if __name__ == "__main__" :
 
-    #test_create_table()
-    #test_insert_record()
-    test_get_dict()
+    if len(sys.argv)==2 and sys.argv[1] == '-h' :
+        msg  = 'Use %s with a single parameter, <test number=0-3>' % sys.argv[0]
+        msg += '\n    0 - create table in db ...'        
+        msg += '\n    1 - print db content'        
+        msg += '\n    2 - insert/submit a record in the db'        
+        msg += '\n    3 - print keys'        
+        msg += '\n    4 - print values'        
+        msg += '\n    9 - delete table ...'        
+        print msg
 
-    sys.exit (0)
+    else :
+
+        try    :
+            test_num = int(sys.argv[1])
+            test_notification_db(test_num)
+        except :
+            test_notification_db(3)
+            test_notification_db(4)
+
+    sys.exit ( 'End of test.' )
 
 #------------------------------

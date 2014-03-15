@@ -343,8 +343,11 @@ class GUIInsExpDirDet ( QtGui.QWidget ) :
             else :
                 cp.guidarklist.updateList()
 
-        if cp.guifilemanagerselect is not None :
-            cp.guifilemanagerselect.resetFields()
+        if cp.guifilemanagersinglecontrol is not None :
+            cp.guifilemanagersinglecontrol.resetFields()
+
+        if cp.guifilemanagergroup is not None :
+            cp.guifilemanagergroup.resetFields()
 
             #if txt=='Select' : cp.guidarklist.setFieldsEnabled(False)
             #else             : cp.guidarklist.setFieldsEnabled(True)

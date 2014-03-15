@@ -77,11 +77,19 @@ class ConfigParametersForApp ( ConfigParameters ) :
         self.guifilebrowser    = None 
         self.blsp              = None 
         self.guidarkcontrolbar = None 
-        self.guifilemanager    = None 
-        self.guifilemanagerselect = None 
         self.guigeometry       = None
         self.guimetrology      = None
         self.dark_list         = None
+        self.guifilemanager    = None 
+        self.guifilemanagersingle = None
+        self.guifilemanagersinglecontrol = None 
+        self.guifilemanagergroup  = None
+        self.guifilemanagergroupcontrol = None 
+        self.guiexpcalibdir    = None
+        self.guidirtree        = None
+        self.dirtreemodel      = None
+
+
 
 #-----------------------------
 
@@ -218,6 +226,10 @@ class ConfigParametersForApp ( ConfigParameters ) :
         self.det_name           = self.declareParameter( name='DETECTOR_NAMES',    val_def='',             type='str' ) # 'CSPAD'
         self.calib_dir          = self.declareParameter( name='CALIB_DIRECTORY',   val_def='Select',       type='str' ) # '/reg/d/psdm/CXI/cxitut13/calib'
 
+        # GUIExpCalibDet.py
+        self.calib_dir_src      = self.declareParameter( name='CALIB_DIRECTORY_SRC', val_def='Select',     type='str' ) # '/reg/d/psdm/CXI/cxitut13/calib'
+        self.exp_name_src       = self.declareParameter( name='EXPERIMENT_NAME_SRC', val_def='Select',     type='str' ) # 'cxitut13'
+
         # FileDeployer.py
         self.fname_history      = self.declareParameter( name='HISTORY_FILE_NAME', val_def='HISTORY',      type='str' )
 
@@ -225,7 +237,10 @@ class ConfigParametersForApp ( ConfigParameters ) :
         self.current_tab    = self.declareParameter( name='CURRENT_TAB'      , val_def='Status',        type='str' )
 
         # GUIConfig.py
-        self.current_config_tab = self.declareParameter( name='CURRENT_CONFIG_TAB', val_def='Configuration File', type='str' )
+        self.current_config_tab   = self.declareParameter( name='CURRENT_CONFIG_TAB', val_def='Configuration File', type='str' )
+
+        # GUIFileManager.py
+        self.current_fmanager_tab = self.declareParameter( name='CURRENT_FILE_MANAGER_TAB', val_def='Single File', type='str' )
 
         # GUIGeometry.py
         self.current_geometry_tab = self.declareParameter( name='CURRENT_GEOMETRY_TAB',    val_def='Metrology',     type='str' )
@@ -299,7 +314,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
         # GUIMaskEditor.py
         self.path_mask_img      = self.declareParameter( name='PATH_TO_MASK_IMAGE',        val_def='./work/*.txt',       type='str' )
 
-        # GUIFileManagerSelect.py
+        # GUIFileManagerSingleControl.py
         #self.path_fm_selected   = self.declareParameter( name='PATH_FM_SELECTED',  val_def='./work/*.txt',       type='str' )
 
 #-----------------------------

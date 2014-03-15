@@ -228,6 +228,8 @@ class GUIGeometry ( QtGui.QWidget ) :
         #try    : del cp.guifiles # GUIGeometry
         #except : pass # silently ignore
 
+        cp.guigeometry = None
+
 
     def onClose(self):
         logger.debug('onClose', __name__)

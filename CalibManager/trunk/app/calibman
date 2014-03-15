@@ -41,15 +41,14 @@ class StartCalibManager :
 
         self.input_parameters()
 
-	#if not has_kerberos_ticket() :
-	#    print 'Before starting this application please update Kerberos tisket and AFS token using commands:\nkinit;\naklog;'
-	#    return
+	if not has_kerberos_ticket() :
+	    print 'Before starting this application please update Kerberos tisket and AFS token using commands:\nkinit;\naklog;'
+	    return
 
         status, msg = check_token(do_print=True)
 	#print msg
-
 	if not status :
-	    print 'Before starting this application please update AFS token using command:\nkinit;\naklog;'
+	    print 'Before starting this application please update AFS token using command:\naklog;'
 	    return
 
 	print "Start the CalibManager GUI"
