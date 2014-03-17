@@ -11,6 +11,12 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-25
+2014-03-17 Mikhail S. Dubrovin
+- in PackageVersions add clean-up tmp files
+- in ConfigFileGenerator and scripts/psana-scan.cfg use SKIP events for scan as for data
+- in GUIDarkControlBar - update list of files when run_num_max is entered
+	
 Tag: V00-00-24
 2014-03-16 Mikhail S. Dubrovin
 - add PackageVersions.py in order to get package versions in background subprocesses,
