@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-14
+2014-03-17 Mikhail Dubrovin
+- add DumpPimax, tested for exp=amob5114:run=16
+- in DumpOceanOptics.cpp add ConfigV2 and DataV2
+
 Tag: V00-04-13
 2014-03-10 David Schneider
 - DumpBld: dump EBeamV5

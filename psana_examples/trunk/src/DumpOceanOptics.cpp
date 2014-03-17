@@ -68,12 +68,25 @@ DumpOceanOptics::beginCalibCycle(Event& evt, Env& env)
     WithMsgLog(name(), info, str) {
       str << "Psana::OceanOptics::ConfigV1:";
       str << "\n  exposureTime = " << config1->exposureTime();
-      str << "\n  strayLightConstant = " << config1->strayLightConstant();
       str << "\n  waveLenCalib = " << config1->waveLenCalib();
       str << "\n  nonlinCorrect = " << config1->nonlinCorrect();
+      str << "\n  strayLightConstant = " << config1->strayLightConstant();
     }
-
   }
+
+  shared_ptr<Psana::OceanOptics::ConfigV2> config2 = env.configStore().get(m_src);
+  if (config2) {
+
+    WithMsgLog(name(), info, str) {
+      str << "Psana::OceanOptics::ConfigV1:";
+      str << "\n  exposureTime = " << config2->exposureTime();
+      str << "\n  deviceType = " << config2->deviceType();
+      str << "\n  waveLenCalib = " << config2->waveLenCalib();
+      str << "\n  nonlinCorrect = " << config2->nonlinCorrect();
+      str << "\n  strayLightConstant = " << config2->strayLightConstant();
+    }
+  }
+
 }
 
 /// Method which is called with event data, this is the only required 
@@ -98,8 +111,28 @@ DumpOceanOptics::event(Event& evt, Env& env)
       str << "\n  numSpectraUnused = " << int(data1->numSpectraUnused());
       str << "\n  durationOfFrame = " << data1->durationOfFrame();
     }
-
   }
+
+  shared_ptr<Psana::OceanOptics::DataV2> data2 = evt.get(m_src);
+  if (data2) {
+
+    WithMsgLog(name(), info, str) {
+      str << "Psana::OceanOptics::DataV1:";
+      str << "\n  data = " << data2->data();
+      str << "\n  frameCounter = " << data2->frameCounter();
+      str << "\n  numDelayedFrames = " << data2->numDelayedFrames();
+      str << "\n  numDiscardFrames = " << data2->numDiscardFrames();
+      str << "\n  timeFrameStart =     " << PSTime::Time(data2->timeFrameStart().tv_sec(), data2->timeFrameStart().tv_nsec());
+      str << "\n  timeFrameFirstData = " << PSTime::Time(data2->timeFrameFirstData().tv_sec(), data2->timeFrameFirstData().tv_nsec());
+      str << "\n  timeFrameEnd =       " << PSTime::Time(data2->timeFrameEnd().tv_sec(), data2->timeFrameEnd().tv_nsec());
+      str << "\n  numSpectraInData = " << int(data2->numSpectraInData());
+      str << "\n  numSpectraInQueue = " << int(data2->numSpectraInQueue());
+      str << "\n  numSpectraUnused = " << int(data2->numSpectraUnused());
+      str << "\n  durationOfFrame = " << data2->durationOfFrame();
+      str << "\n  nonlinerCorrected(0) = " << data2->nonlinerCorrected(0);
+    }
+  }
+
 }
 
 } // namespace psana_examples
