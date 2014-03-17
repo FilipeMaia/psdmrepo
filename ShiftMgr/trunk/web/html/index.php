@@ -52,6 +52,8 @@ div.shift-history-reports {
 <script type="text/javascript" src="/jquery/js/jquery.json.js"></script>
 <script type="text/javascript" src="/jquery/js/jquery.printElement.js"></script>
 
+<script type="text/javascript" src="/underscore/underscore-min.js"></script>
+
 <script type="text/javascript" src="../webfwk/js/Class.js" ></script>
 <script type="text/javascript" src="../webfwk/js/Widget.js" ></script>
 <script type="text/javascript" src="../webfwk/js/StackOfRows.js" ></script>

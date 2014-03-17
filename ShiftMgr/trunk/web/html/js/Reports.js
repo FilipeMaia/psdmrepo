@@ -115,6 +115,12 @@ function ShiftBody (parent, data, can_edit) {
         var door_open_hm = Fwk.zeroPad(door_open_h, 2)+':'+Fwk.zeroPad(door_open_m, 2) ;
         var door_open_percent = shift.duration_min ? Math.floor(100 * door_open_min / shift.duration_min) : 0 ;
 
+        var experiments = '' ;
+        for (var i in shift.experiments) {
+            var e = shift.experiments[i] ;
+            experiments += '<a target="_blank" href="../portal/index.php?exper_id='+e.id+'" title="open Web Portal of the Experiment in new window/tab">'+e.name+'</a>&nbsp;&nbsp;&nbsp;' ;
+        }
+
         var html =
 '<div>' +
 
@@ -133,6 +139,8 @@ function ShiftBody (parent, data, can_edit) {
 '              <option value="IN-HOUSE" >IN-HOUSE</option>' +
 '            </select>' +
 '          </div></td>' +
+'        <td class="annotated shift-grid-hdr " valign="center" data="experiments which were active during the shift" >Experiment(s):</td>' +
+'        <td class="shift-grid-val " colspan="2" valign="center" >'+experiments+'</td>' +
 '      </tr>' +
 '      <tr class="shift-active-row" >' +
 '        <td class="annotated shift-grid-hdr " valign="center" data="This is the nominal start data & time of the shift" >Begin:</td>' +

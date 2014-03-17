@@ -5,10 +5,12 @@ namespace ShiftMgr ;
 require_once 'shiftmgr.inc.php' ;
 require_once 'lusitime/lusitime.inc.php' ;
 require_once 'dataportal/dataportal.inc.php' ;
+require_once( 'regdb/regdb.inc.php' );
 
 use LusiTime\LusiTime ;
 use LusiTime\LusiInterval ;
 use DataPortal\ExpTimeMon ;
+use RegDB\RegDB;
 
 /**
  * Class Shift is an abstraction for shifts.
@@ -133,7 +135,71 @@ class Shift {
         }
         return $allocations ;
     }
-    
+
+    /**
+     * Return a list of experiments which were active during the shift
+     * 
+     * The result is returned as an array of dictionaries, where each such
+     * dictionary has twpo keys:
+     * 
+     *   'id'   - experiment identifier
+     *   'name' - experiment name
+     * 
+     * @return array
+     */
+    public function experiments () {
+
+        $result = array() ;
+
+        // - collect activated experiments accross all stattions o fteh instrument
+
+        $begin_time = $this->begin_time() ;
+
+        RegDB::instance()->begin() ;
+
+        $instr = RegDB::instance()->find_instrument_by_name($this->instr_name()) ;
+        $num_stations = $instr->find_param_by_name('num_stations') ;
+        if (!$num_stations)
+            throw new ShiftMgrException (
+                __METHOD__ ,
+                "the instrument is not configured for data taking, instrument: {$this->instr_name()}") ;
+
+        for ($station = 0 ;
+             $station < $num_stations->value() ;
+             $station++) {
+
+            $before = $this->end_time() ;
+
+            do {
+                $sw = RegDB::instance()->last_experiment_switch_before($this->instr_name(), $station, $before) ;
+                if (!$sw) break ;
+
+                $exp = RegDB::instance()->find_experiment_by_id($sw['exper_id']) ;
+                if (!$exp)
+                    throw new ShiftMgrException (
+                        __class__.'::'.__METHOD__ ,
+                        "internal error") ;
+
+                array_push ($result, array (
+                    'id'   => $exp->id() ,
+                    'name' => $exp->name())) ;
+
+                // - check if another switch occured earlier within an interval of
+                //   the shift
+
+                $sw_time = LusiTime::from64(intval($sw['switch_time'])) ;
+                if ($begin_time->less($sw_time)) {
+                    $before = $sw_time ;
+                    continue ;
+                }
+
+                break ;
+
+            } while (true) ;
+        }
+        return $result ;
+    }
+
     /**
      * Return all history events in a scope of this shift, its areas and time allocations
      * 

@@ -65,6 +65,12 @@ class Utils {
                 'duration_min' => $a->duration_min() ,
                 'comments'     => $a->comments()) ;
 
+        $experiments = array() ;
+        foreach ($s->experiments() as $e)
+            array_push($experiments, array (
+                'id' => $e['id'] ,
+                'name' => $e['name'])) ;
+
         return array (
             'id'           => $s->id() ,
             'instr_name'   => $s->instr_name() ,
@@ -77,6 +83,7 @@ class Utils {
             'door_min'     => $s->door() ,
             'area'         => $areas ,
             'allocation'   => $allocations ,
+            'experiments'  => $experiments ,
             'notes'        => $s->notes() ,
             'editor'       => $s->modified_uid()  ? $s->modified_uid() : '' ,
             'modified'     => $s->modified_time() ? $s->modified_time()->toStringShort() : ''

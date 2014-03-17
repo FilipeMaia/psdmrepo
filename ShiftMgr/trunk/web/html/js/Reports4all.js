@@ -84,6 +84,9 @@ function DayBody (parent, data) {
             hdr.push(
                 { name: Definitions.AreaNames[i].key, sorted: false }) ;
 
+        hdr.push (
+            { name: 'experiments', sorted: false }) ;
+
         var rows = [] ;
         for (var i in this.data.shifts) {
             var shift = this.data.shifts[i] ;
@@ -101,6 +104,14 @@ function DayBody (parent, data) {
             ] ;
             for (var j in Definitions.AreaNames)
                 row.push('<div class="status-'+(shift.area[Definitions.AreaNames[j].key].problems ?'red':'neutral')+'"></div>') ;
+
+            row.push(_.reduce (
+                shift.experiments ,
+                function (memo, e) {
+                    return memo + '<div style="float:left; width:70px; font-family:Courier New; font-size:14px; text-align:right;">' + e.name + '</div>' ;
+                } ,
+                ''
+            )) ;
 
             rows.push(row) ;
         }
