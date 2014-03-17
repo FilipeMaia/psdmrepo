@@ -12,7 +12,7 @@ use LusiTime\LusiTime;
  */
 class Logger {
 
-	// ---------------------------------------------------
+    // ---------------------------------------------------
     // --- SIMPLIFIED INTERFACE AND ITS IMPLEMENTATION ---
     // ---------------------------------------------------
 
@@ -25,14 +25,14 @@ class Logger {
      */
     public static function instance() {
         if( is_null( Logger::$instance )) Logger::$instance =
-        	new Logger (
-        		LOGGER_DEFAULT_HOST,
-				LOGGER_DEFAULT_USER,
-				LOGGER_DEFAULT_PASSWORD,
-				LOGGER_DEFAULT_DATABASE );
+            new Logger (
+                LOGGER_DEFAULT_HOST,
+                LOGGER_DEFAULT_USER,
+                LOGGER_DEFAULT_PASSWORD,
+                LOGGER_DEFAULT_DATABASE );
         return Logger::$instance;
     }
-	
+    
     /* Parameters of the object
      */
     private $host;
@@ -68,9 +68,9 @@ class Logger {
      */
     public function __destruct () {
 
-    	// Do not close this connection from here because it might be shared
-    	// with other instances of the class (also from other APIs).
-    	//
+        // Do not close this connection from here because it might be shared
+        // with other instances of the class (also from other APIs).
+        //
         //if( isset( $this->link )) mysql_close( $this->link );
     }
 
@@ -80,19 +80,19 @@ class Logger {
      * ================================
      */
     public function group_management ( $operation, $user_name, $group_name, $group_type = 'POSIX' ) {
-    	$this->connect();
-    	$authdb = AuthDB::instance();
-    	$authdb->begin();
-    	$now = LusiTime::now();
-    	$sql =
-    		"INSERT INTO group_management VALUES (NULL,".$now->to64().
-    		",'".$this->escape_string( $authdb->authName()).
-    		"','".$this->escape_string( $authdb->authRemoteAddr()).
-    		"','".strtoupper( $operation ).
-    		"','".$this->escape_string( $user_name ).
-    		"','".$this->escape_string( $group_name ).
-    		"','".$group_type."')";
-    	$this->query( $sql );
+        $this->connect();
+        $authdb = AuthDB::instance();
+        $authdb->begin();
+        $now = LusiTime::now();
+        $sql =
+            "INSERT INTO group_management VALUES (NULL,".$now->to64().
+            ",'".$this->escape_string( $authdb->authName()).
+            "','".$this->escape_string( $authdb->authRemoteAddr()).
+            "','".strtoupper( $operation ).
+            "','".$this->escape_string( $user_name ).
+            "','".$this->escape_string( $group_name ).
+            "','".$group_type."')";
+        $this->query( $sql );
     }
 
     /*
@@ -118,16 +118,16 @@ class Logger {
      *
      */
     public function get_group_management () {
-    	$list = array();
-    	$this->connect();
-    	$result = $this->query( "SELECT * FROM group_management" );
-    	$nrows = mysql_numrows( $result );
+        $list = array();
+        $this->connect();
+        $result = $this->query( "SELECT * FROM group_management" );
+        $nrows = mysql_numrows( $result );
         for( $i = 0; $i < $nrows; $i++ ) {
-        	$row = mysql_fetch_array( $result, MYSQL_ASSOC );
-        	$row['event_time'] = LusiTime::from64($row['event_time']);
-        	$row['operation']  = strtolower( $row['operation'] );
-        	$row['class']      = 'group_management';
-        	array_push ( $list, $row );
+            $row = mysql_fetch_array( $result, MYSQL_ASSOC );
+            $row['event_time'] = LusiTime::from64($row['event_time']);
+            $row['operation']  = strtolower( $row['operation'] );
+            $row['class']      = 'group_management';
+            array_push ( $list, $row );
         }
         return $list;
     }
@@ -205,7 +205,7 @@ class Logger {
              * NOTE: using the 'persistent' connection. This connection won't be
              * closed by 'mysql_close()'.
              */
-        	$new_link = false; // true;
+            $new_link = false; // true;
             $this->link = mysql_pconnect( $this->host, $this->user, $this->password, $new_link );
             if( !$this->link )
                 throw new AuthDBException (
@@ -239,23 +239,23 @@ class Logger {
  * ==========================
  *
 try {
-	$logger = Logger::instance();
-	$logger->begin();
-	$logger->group_management ( 'add', 'perazzo', 'amo14410' );
-	foreach( $logger->get_group_management() as $entry ) {
-		print(
-			'<br>id             : <b>'.$entry['id'].'</b>'.
-		    '<br>event_time     : <b>'.$entry['event_time']->toStringShort().'</b>'.
-		    '<br>requestor      : <b>'.$entry['requestor'].'</b>'.
-		    '<br>requestor_host : <b>'.$entry['requestor_host'].'</b>'.
-		    '<br>class          : <b>'.$entry['class'].'</b>'.
-		    '<br>operation      : <b>'.$entry['operation'].'</b>'.
-		    '<br>user_account   : <b>'.$entry['user_account'].'</b>'.
-		    '<br>group_name     : <b>'.$entry['group_name'].'</b>'.
-		    '<br>group_type     : <b>'.$entry['group_type'].'</b>'
-		);
-	}
-	$logger->commit();
+    $logger = Logger::instance();
+    $logger->begin();
+    $logger->group_management ( 'add', 'perazzo', 'amo14410' );
+    foreach( $logger->get_group_management() as $entry ) {
+        print(
+            '<br>id             : <b>'.$entry['id'].'</b>'.
+            '<br>event_time     : <b>'.$entry['event_time']->toStringShort().'</b>'.
+            '<br>requestor      : <b>'.$entry['requestor'].'</b>'.
+            '<br>requestor_host : <b>'.$entry['requestor_host'].'</b>'.
+            '<br>class          : <b>'.$entry['class'].'</b>'.
+            '<br>operation      : <b>'.$entry['operation'].'</b>'.
+            '<br>user_account   : <b>'.$entry['user_account'].'</b>'.
+            '<br>group_name     : <b>'.$entry['group_name'].'</b>'.
+            '<br>group_type     : <b>'.$entry['group_type'].'</b>'
+        );
+    }
+    $logger->commit();
 
 } catch ( Exception $e ) { print e; }
 */
