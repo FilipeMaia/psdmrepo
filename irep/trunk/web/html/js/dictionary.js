@@ -62,8 +62,66 @@ function p_appl_dictionary () {
      * ----------------------------
      */
     this.manufacturer = null ;
+
     this.manufacturers = function () {
         return this.manufacturer ;
+    } ;
+
+    /**
+     * Return a dictionary with a manufacturer and a model if available.
+     * 
+     * NOTE: the function must be called after loading the dictionary.
+     *
+     * @param {number} id
+     * @returns {object}
+     */
+    this.find_model_by_id = function (id) {
+        if (this.manufacturer) {
+            for (var i in this.manufacturer) {
+                var manufacturer = this.manufacturer[i] ;
+                for (var j in manufacturer.model) {
+                    var model = manufacturer.model[j] ;
+                    if (id == model.id) {
+                        return {
+                            manufacturer: manufacturer ,
+                            model:        model
+                        } ;
+                        break ;
+                    }
+                }
+            }
+        }
+        return null ;
+    } ;
+
+    /**
+     * Return a dictionary with a manufacturer and a model if available.
+     * 
+     * NOTE: the function must be called after loading the dictionary.
+     *
+     * @param {string} manuf_name
+     * @param {string} model_name
+     * @returns {string}
+     */
+    this.find_model = function (manuf_name, model_name) {
+        if (this.manufacturer) {
+            for (var i in this.manufacturer) {
+                var manufacturer = this.manufacturer[i] ;
+                if (manufacturer.name == manuf_name) {
+                    for (var j in manufacturer.model) {
+                        var model = manufacturer.model[j] ;
+                        if (model.name == model_name) {
+                            return {
+                                manufacturer: manufacturer ,
+                                model:        model
+                            } ;
+                            break ;
+                        }
+                    }
+                }
+            }
+        }
+        return null ;
     } ;
 
     this.init_manufacturer = function () {

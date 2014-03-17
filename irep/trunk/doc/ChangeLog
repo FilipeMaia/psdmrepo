@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-01
+2014-03-17 Igor Gaponenko
+- Add an option for displaying model descriptions for each piece of equipment
+
 Tag: V00-01-00
 2013-07-25 Igor Gaponenko
 - database schema for equipment extended to support composed objects

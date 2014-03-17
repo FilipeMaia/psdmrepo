@@ -52,6 +52,8 @@ try {
 <script type="text/javascript" src="/jquery/js/jquery.printElement.js"></script>
 <script type="text/javascript" src="/jquery/js/jquery.json.js"></script>
 
+<script type="text/javascript" src="/underscore/underscore-min.js"></script>
+
 <script type="text/javascript" src="js/datetime.js"></script>
 <script type="text/javascript" src="js/fwk.js"></script>
 <script type="text/javascript" src="js/ws.js"></script>
@@ -616,6 +618,10 @@ function global_equipment_sorter_by_modified     (a,b) { return a.modified.time_
                 <input type="checkbox" id="option_model_image"        ><label for="option_model_image"       > display images of models</label><br>
                 <input type="checkbox" id="option_attachment_preview" ><label for="option_attachment_preview"> preview attachments     </label>
             </div>
+            <div style="float:left; margin-left:20px;">
+                <center><b>&nbsp;</b></center>
+                <input type="checkbox" id="option_model_descr"        ><label for="option_model_descr"       > display descriptions of models</label><br>
+            </div>
             <div style="clear:both ;"></div>
             <div id="equipment-inventory-table" style="margin-top:10px;" ></div>
           </div>
@@ -710,88 +716,7 @@ function global_equipment_sorter_by_modified     (a,b) { return a.modified.time_
 
     <!-- Search equipment issues -->
     <div id="issues-search" class="application-workarea hidden">
-
       <p>This is still under implementation</p>
-
-      <!--
-
-      <div id="issues-search-controls">
-        <div id="issues-search-controls-left" style="float:left ;">
-          <form id="issues-search-form">
-            <table><tbody>
-              <tr>
-                 <td><b>Manufacturer:</b></td>
-                  <td><select name="manufacturer" class="form-elem" ></select></td>
-                  <td>&nbsp;</td>
-                  <td><b>Model:</b></td>
-                  <td><select name="model" class="form-elem" ></select></td>
-                  <td>&nbsp;</td>
-                  <td><b>Serial number:</b></td>
-                  <td><input type="text" name="serial" size="10" class="form-elem"  style="padding:2px ;" value="" /></td>
-              </tr>
-              <tr><td><b>Location:</b></td>
-                  <td><select name="location" class="form-elem" ></select></td>
-                  <td>&nbsp;</td>
-                  <td><b>Custodian:</b></td>
-                  <td><select name="custodian" class="form-elem" ></select></td>
-                  <td>&nbsp;</td>
-                  <td><b>Property Control #:</b></td>
-                  <td><input type="text" name="pc"  size="5" class="form-elem" style="padding:2px ;" value="" /></td>
-              </tr>
-              <tr><td><b>Status:</b></td>
-                  <td><select name="status" class="form-elem" ></select></td>
-                  <td>&nbsp;</td>
-                  <td><b>Sub-status:</b></td>
-                  <td><select name="status2" class="form-elem" ></select></td>
-                  <td>&nbsp;</td>
-                  <td><b>SLAC ID:</b></td>
-                  <td><input type="text" name="slacid"  size="5" class="form-elem" style="padding:2px ;" value="" /></td>
-              </tr>
-              <tr><td><b>Tag:</b></td>
-                  <td><select name="tag" class="form-elem"></select></td>
-              </tr>
-            </tbody></table>
-          </form>
-        </div>
-        <div style="float:left ; margin-left:20px ;">
-          <button name="search" title="refresh the list">Search</button>
-          <button name="reset"  title="reset the search form to the default state">Reset Form</button>
-        </div>
-        <div style="clear:both ;"></div>
-      </div>
-      <div style="float:right ;" id="issues-search-info">&nbsp;</div>
-      <div style="clear:both ;"></div>
-
-      <div id="tabs" style="font-size:12px;">
-        <ul>
-          <li><a href="#results">Search Results</a></li>
-        </ul>
-
-        <div id="results" >
-          <div style=" border:solid 1px #b0b0b0; padding:20px;" >
-            <div style="float:left;">
-              <button class="export" name="excel" title="Export into Microsoft Excel 2007 File"><img src="../irep/img/EXCEL_icon.gif" /></button>
-            </div>
-            <div style="float:left; margin-left:20px;">
-              <center><b>&nbsp;</b></center>
-              <div id="view">
-                <input type="radio" id="view_table" name="view" checked="checked" ><label for="view_table" title="view as a table" ><img src="../irep/img/table.png" /></label>
-                <input type="radio" id="view_grid"  name="view"                   ><label for="view_grid"  title="view as a grid"  ><img src="../irep/img/stock_table_borders.png" /></label>
-              </div>
-            </div>
-            <div style="float:left; margin-left:20px;">
-                <center><b>&nbsp;</b></center>
-                <input type="checkbox" id="option_model_image"        ><label for="option_model_image"       > display images of models</label><br>
-                <input type="checkbox" id="option_attachment_preview" ><label for="option_attachment_preview"> preview attachments     </label>
-            </div>
-            <div style="clear:both ;"></div>
-            <div id="issues-search-table" style="margin-top:10px;" ></div>
-          </div>
-        </div>
-      </div>
-
-      -->
-
     </div>
 
     <!-- Produce reports on equipment issues -->

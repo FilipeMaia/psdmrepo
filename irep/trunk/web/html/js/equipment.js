@@ -214,6 +214,26 @@ function p_appl_equipment () {
                 elements.removeClass('visible').addClass('hidden') ;
             }
         }) ;
+
+        $('#equipment-inventory').find('#option_model_descr').change(function () {
+            var checked = $(this).attr('checked') ? true : false ;
+            var elements = $('#equipment-inventory-table').find('div.equipment-model-descr') ;
+            if (checked) {
+                elements.removeClass('hidden').addClass('visible') ;
+                elements.each(function () {
+                    var equipment_id = $(this).attr('name') ;
+                    var equipment = that.equipment_by_id[equipment_id] ;
+                    function model_descr2html () {
+                        var dict_info = dict.find_model(equipment.manufacturer, equipment.model) ;
+                        return dict_info ? _.escape(dict_info.model.description) : '' ;
+                    }
+                    $(this).find('span').text(model_descr2html()) ;
+                }) ;
+            } else {
+                elements.removeClass('visible').addClass('hidden') ;
+            }
+        }) ;
+
         $('#equipment-inventory').find('#option_attachment_preview').change(function () {
             var checked = $(this).attr('checked') ? true : false ;
             var tgl = $('#equipment-inventory-table').find('span.equipment-attachment-tgl') ;
@@ -372,6 +392,7 @@ function p_appl_equipment () {
     } ;
     this.equipment_display_table = function () {
         var option_model_image = $('#equipment-inventory').find('#option_model_image').attr('checked') ? true : false ;
+        var option_model_descr = $('#equipment-inventory').find('#option_model_descr').attr('checked') ? true : false ;
         var option_attachment_preview = $('#equipment-inventory').find('#option_attachment_preview').attr('checked') ? true : false ;
         var elem = $('#equipment-inventory-table') ;
         var hdr = [
@@ -437,6 +458,10 @@ function p_appl_equipment () {
 
             var equipment = this.equipment[i] ;
 
+            function model_descr2html () {
+                var dict_info = dict.find_model(equipment.manufacturer, equipment.model) ;
+                return dict_info ? _.escape(dict_info.model.description) : '' ;
+            }
             var tags_html = '' ;
             for (var j in equipment.tag) {
                 var t = equipment.tag[j] ;
@@ -460,7 +485,7 @@ function p_appl_equipment () {
 '        </div>' +
 '        <div style="clear:both;"></div>' + (option_attachment_preview ?
 '        <div id="equipment-attachment-con-'+a.id+'" class="visible equipment-attachment-preview" name="'+a.id+'" style="margin-left:20px; padding:5px;" ><a class="link" href="../irep/equipment_attachments/'+a.id+'/file" target="_blank" title="click on the image to open/download a full size attachment in a separate tab"><img src="../irep/equipment_attachments/preview/'+a.id+'" /></a></div>' :
-'        <div id="equipment-attachment-con-'+a.id+'" class="hidden equipment-attachment-preview" name="'+a.id+'" style="margin-left:20px; padding:5px;" ></div>') +
+'        <div id="equipment-attachment-con-'+a.id+'" class="hidden  equipment-attachment-preview" name="'+a.id+'" style="margin-left:20px; padding:5px;" ></div>') +
 '      </div>' ;
             }
             rows.push ([
@@ -492,9 +517,15 @@ function p_appl_equipment () {
 
                 equipment.manufacturer ,
 
-                '<div>'+equipment.model+'</div>'+(option_model_image ?
-                '<div class="visible equipment-model-image" name="'+equipment.id+'" style="float:left; padding:5px;"><a class="link" href="../irep/equipment_model_attachments/'+equipment.id+'/file" target="_blank" title="click on the image to open/download a full size image in a separate tab"><img src="../irep/equipment_model_attachments/preview/'+equipment.id+'" width="102" height="72" /></a></div>' :
-                '<div class="hidden equipment-model-image" name="'+equipment.id+'" style="float:left; padding:5px;"></div>') ,
+                '<div>'+equipment.model+'</div>' +
+                (option_model_image ?
+                '<div class="visible equipment-model-image" name="'+equipment.id+'" style=" padding:5px;"><a class="link" href="../irep/equipment_model_attachments/'+equipment.id+'/file" target="_blank" title="click on the image to open/download a full size image in a separate tab"><img src="../irep/equipment_model_attachments/preview/'+equipment.id+'" width="102" height="72" /></a></div>' :
+                '<div class="hidden equipment-model-image" name="'+equipment.id+'" style="padding:5px;"></div>') +
+                (option_model_descr ?
+//                '<div class="visible equipment-model-descr" name="'+equipment.id+'" style="margin-top:2px; padding-top:2px; border-top:1px solid #c0c0c0;">'+model_descr2html()+'</div>' :
+//                '<div class="hidden  equipment-model-descr" name="'+equipment.id+'" style="margin-top:2px; padding-top:2px; border-top:1px solid #c0c0c0;"></div>') ,
+                '<div class="visible equipment-model-descr" name="'+equipment.id+'" style=""><b>Model descr:</b>&nbsp;<span>'+model_descr2html()+'</span></div>' :
+                '<div class="hidden  equipment-model-descr" name="'+equipment.id+'" style=""><b>Model descr:</b>&nbsp;<span></span></div>') ,
                 equipment.serial ,
                 equipment.slacid ,
                 equipment.pc ,
@@ -518,6 +549,7 @@ function p_appl_equipment () {
     this.equipment_display_grid = function () {
         var elem = $('#equipment-inventory-table') ;
         var option_model_image = $('#equipment-inventory').find('#option_model_image').attr('checked') ? true : false ;
+        var option_model_descr = $('#equipment-inventory').find('#option_model_descr').attr('checked') ? true : false ;
         var option_attachment_preview = $('#equipment-inventory').find('#option_attachment_preview').attr('checked') ? true : false ;
         var cell_left  = 'class="table_cell table_cell_left  " style="border:0; padding-right:0px;" align="right"' ;
         var cell_right = 'class="table_cell table_cell_right " style="border:0; padding-right:10px;"' ;
@@ -525,6 +557,11 @@ function p_appl_equipment () {
         for (var i in this.equipment) {
             var equipment = this.equipment[i] ;
 
+            function model_descr2html () {
+                var dict_info = dict.find_model(equipment.manufacturer, equipment.model) ;
+                return dict_info ? _.escape(dict_info.model.description) : '' ;
+            }
+            
             var tags_html = '' ;
             var num_tags = 0 ;
             for (var j in equipment.tag) {
@@ -596,9 +633,13 @@ function p_appl_equipment () {
 '        <td '+cell_right+' >'+equipment.status+'</td>' +
 '        <td '+cell_left+' >Sub-status :</td>' +
 '        <td '+cell_right+' >'+equipment.status2+'</td>' +
-'        <td '+cell_left+' rowspan="4">' + (option_model_image ?
-'          <div class="visible equipment-model-image" name="'+equipment.id+'" style="float:left; padding:5px;"><a class="link" href="../irep/equipment_model_attachments/'+equipment.id+'/file" target="_blank" title="click on the image to open/download a full size image in a separate tab"><img src="../irep/equipment_model_attachments/preview/'+equipment.id+'" width="102" height="72" /></a></div>' :
-'          <div class="hidden equipment-model-image" name="'+equipment.id+'" style="float:left; padding:5px;"></div>') +
+'        <td '+cell_left+' rowspan="4" valign="top" >' + (option_model_image ?
+'          <div class="visible equipment-model-image" name="'+equipment.id+'" ><a class="link" href="../irep/equipment_model_attachments/'+equipment.id+'/file" target="_blank" title="click on the image to open/download a full size image in a separate tab"><img src="../irep/equipment_model_attachments/preview/'+equipment.id+'" width="102" height="72" /></a></div>' :
+'          <div class="hidden  equipment-model-image" name="'+equipment.id+'" ></div>') +
+'          </td>' +
+'        <td '+cell_right+' rowspan="4" valign="top" style="white-space:normal!important;" >' + (option_model_descr ?
+'          <div class="visible equipment-model-descr" name="'+equipment.id+'" style=""><b>Model descr:</b>&nbsp;<span>'+model_descr2html()+'</span></div>' :
+'          <div class="hidden  equipment-model-descr" name="'+equipment.id+'" style=""><b>Model descr:</b>&nbsp;<span></span></div>') +
 '          </td>' +
 '      </tr>' +
 '      <tr>' +
@@ -1772,7 +1813,14 @@ function p_appl_equipment () {
                 that.equipment_by_id[equipment.id] = equipment ;
                 num++ ;
             }
+
+            // -- force model description display if the one was found among
+            //    parameters of teh request.
+            
+            $('#equipment-inventory').find('#option_model_descr').attr('checked', 'checked') ;
+
             that.equipment_display() ;
+
             $('#equipment-inventory-info').text('[ Last search: '+data.updated+' ]') ;
         },
         'JSON').error(function () {
