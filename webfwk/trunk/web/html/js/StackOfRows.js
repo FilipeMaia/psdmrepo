@@ -430,6 +430,7 @@ add_row : function (row_data) {
 
 set_rows : function (row_data) {
     this.rows = [] ;
+    this.last_id = null ;
     if (row_data)
         for(var i in row_data)
             this.add_row(row_data[i]) ;
@@ -580,6 +581,12 @@ first_row: function () {
  * ==========================================================================
  */
 
+reset: function () {
+    console.log('StackOfRows::reset()') ;
+    this.assert_initialized() ;
+    this.body.children('.stack-row').remove() ;
+    this.set_rows([]) ;
+} ,
 
 /**
  * Expand or collapse all rows
@@ -675,6 +682,7 @@ update_row : function (id, row_data) {
  * Insert a new row in front of the stack
  * 
  * @param Object row_data - the data object to initialize the row
+ * @return Number - the unique identifier of the row witin the table
  */
 insert_front : function (row_data) {
 
@@ -704,12 +712,15 @@ insert_front : function (row_data) {
         this.body.html(html) ;
     }
     new_row_obj.display(this.body.children('.stack-row#'+new_row_obj.id)) ;
+
+    return new_row_obj.id ;
 } ,
 
 /**
  * Append a new row to the stack
  * 
  * @param Object row_data - the data object to initialize the row
+ * @return Number - the unique identifier of the row witin the table
  */
 append : function (row_data) {
 
@@ -736,6 +747,8 @@ append : function (row_data) {
     this.body.append(html) ;
 
     new_row_obj.display(this.body.children('.stack-row#'+new_row_obj.id)) ;
+    
+    return new_row_obj.id ;
 }
 
 }) ;
