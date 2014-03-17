@@ -147,6 +147,7 @@ a:hover, a.link:hover {
   position: relative;
   top:130px;
   margin: 0px 0px 20px 203px;
+  margin-bottom: 0px;
   overflow: auto;
   background-color: #ffffff;
   border-left: 1px solid #a0a0a0;
@@ -877,7 +878,7 @@ function global_export_cables(search_params,outformat) {
     );
 }
 function global_truncate_cable    (str) { return str.substring(0, 8); }
-function global_truncate_connector(str) { return str.substring(0, 7); }
+function global_truncate_connector(str) { return str.substring(0, 8); }
 function global_truncate_pinlist  (str) { return str.substring(0,16); }
 function global_truncate_location (str) { return str.substring(0, 6); }
 function global_truncate_rack     (str) { return str.substring(0, 6); }
