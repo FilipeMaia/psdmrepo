@@ -46,6 +46,7 @@ from GUIButtonBar           import *
 from GUILogger              import *
 from GUITabs                import *
 from GUIInsExpDirDet        import *
+from PackageVersions        import PackageVersions
 from NotificationDB         import *
 #from GUICalibDirTree        import *
 
@@ -65,6 +66,7 @@ class GUIMain ( QtGui.QWidget ) :
         QtGui.QWidget.__init__(self, parent)
 
         cp.setIcons()
+        cp.package_versions = PackageVersions()
 
         self.main_win_width  = cp.main_win_width 
         self.main_win_height = cp.main_win_height

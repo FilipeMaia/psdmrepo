@@ -29,7 +29,7 @@ import os
 
 from PyQt4 import QtGui
 from CalibManager.GUIMain import GUIMain
-from CalibManager.GlobalUtils import check_token, has_kerberos_ticket
+from CalibManager.GlobalUtils import check_token, has_kerberos_ticket, is_good_lustre_version, get_hostname
 from CalibManager.ThreadWorker import ThreadWorker
 
 #---------------------------------
@@ -40,6 +40,10 @@ class StartCalibManager :
         """Start application"""
 
         self.input_parameters()
+
+	if not is_good_lustre_version() :
+	    print 'WARNING: The host "%s" uses old lustre driver version. CHANGE HOST !!!' % get_hostname()
+	    return
 
 	if not has_kerberos_ticket() :
 	    print 'Before starting this application please update Kerberos tisket and AFS token using commands:\nkinit;\naklog;'

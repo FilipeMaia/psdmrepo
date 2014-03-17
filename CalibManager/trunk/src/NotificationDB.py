@@ -74,7 +74,8 @@ class NotificationDB :
         info_dict['exp']  = cp.exp_name.value()
         info_dict['run']  = cp.str_run_number.value()
         info_dict['dets'] = cp.det_name.value()
-        info_dict['vers'] = gu.get_pkg_version('CalibManager')
+        info_dict['vers'] = cp.package_versions.get_pkg_version('CalibManager')
+        #info_dict['vers'] = gu.get_pkg_version('CalibManager') # Very slow
         return info_dict
 
 

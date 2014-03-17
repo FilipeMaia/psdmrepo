@@ -11,6 +11,12 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-24
+2014-03-16 Mikhail S. Dubrovin
+- add PackageVersions.py in order to get package versions in background subprocesses,
+  swap appropriate methods for new one.
+- in app/calibman add protection in case of launching on the node with old version of lustre driver
+	
 Tag: V00-00-23
 2014-03-14 Mikhail S. Dubrovin
 - add GUIFileManager* etc for group file management

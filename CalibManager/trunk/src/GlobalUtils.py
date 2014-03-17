@@ -1024,7 +1024,7 @@ def parse_token(token) :
 #----------------------------------
 
 def get_pkg_version(pkg_name='CalibManager') :
-    """Returns the latest version of the package"""
+    """Returns the latest version of the package - VERY SLOW COMMAND"""
     try :
         cmd = 'psvn tags %s' % pkg_name
         output = getoutput(cmd)
@@ -1038,6 +1038,30 @@ def get_pkg_version(pkg_name='CalibManager') :
         return version
     except :
         return 'V is N/A'
+    
+#----------------------------------
+
+def is_good_lustre_version() :
+    """Checks the lustre version and returns True/False for new/ols version"""
+    try :
+        cmd = '/sbin/lsmod | grep lustre'
+        output = getoutput(cmd)
+        lines = output.split('\n')
+        line_one = lines[1]
+        for line in lines :
+            if line[0:3] == 'lov' : line_one = line
+
+        fields = line_one.split()
+        version = fields[1]
+
+        #print cmd, '\n', output
+        #print 'Necessary line_one: ', line_one
+        #print 'Lustre Version: ', version
+
+        return False if version == '354504' else True
+
+    except :
+        return True
     
 
 #----------------------------------
@@ -1100,12 +1124,15 @@ if __name__ == "__main__" :
     #list_of_files = ['220-230.data', '220-end.data', '221-240.data', '528-end.data', '222-end.data', '659-800.data', '373-end.data', '79-end.data', '45-end.data'] 
     #list_of_calib_files_with_run_range(list_of_files)
 
-    status, msg = check_token(do_print=True)
+    #status, msg = check_token(do_print=True)
 
     #print 'Package version: ', get_pkg_version('CalibManager')
 
-    print 'has_kerberos_ticket(): ', has_kerberos_ticket()
-    
+    #print 'has_kerberos_ticket(): ', has_kerberos_ticket()
+
+    status = is_good_lustre_version()
+    print 'Lustre version status: %s' % status
+ 
     sys.exit ( "End of test" )
 
 #----------------------------------

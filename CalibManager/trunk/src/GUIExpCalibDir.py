@@ -60,7 +60,7 @@ class GUIExpCalibDir ( QtGui.QWidget ) :
         self.setWindowTitle('Select source calibration directory')
         self.setFrame()
  
-        self.titExp = QtGui.QLabel('Source calib of files:')
+        self.titExp = QtGui.QLabel('Source of files:')
         self.butExp = QtGui.QPushButton( self.exp_name_src.value() + self.char_expand )
         self.butBro = QtGui.QPushButton( 'Browse' )
 

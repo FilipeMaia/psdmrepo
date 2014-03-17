@@ -229,10 +229,12 @@ class GUIConfigPars ( QtGui.QWidget ) :
 
 
     def onButShowVers(self):
-        list_of_pkgs = ['CalibManager', 'ImgAlgos'] #, 'CSPadPixCoords', 'PSCalib', 'pdscalibdata']
-        msg = 'Package versions:\n'
-        for pkg in list_of_pkgs :
-            msg += '%s  %s\n' % (gu.get_pkg_version(pkg).ljust(10), pkg.ljust(32))
+        #list_of_pkgs = ['CalibManager', 'ImgAlgos'] #, 'CSPadPixCoords', 'PSCalib', 'pdscalibdata']
+        #msg = 'Package versions:\n'
+        #for pkg in list_of_pkgs :
+        #    msg += '%s  %s\n' % (gu.get_pkg_version(pkg).ljust(10), pkg.ljust(32))
+
+        msg = cp.package_versions.text_version_for_all_packages()
         logger.info(msg, __name__ )
 
 
