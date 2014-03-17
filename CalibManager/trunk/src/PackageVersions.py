@@ -28,6 +28,7 @@ If you use all or part of it, please give an appropriate acknowledgment.
 import sys
 import os
 import subprocess # for subprocess.Popen
+from commands import getoutput
 import tempfile
 from time import time, sleep
 
@@ -60,16 +61,28 @@ class PackageVersions :
     def __init__(self, list_of_pkgs = ['CalibManager', 'ImgAlgos', 'PSCalib', 'pdscalibdata', 'CSPadPixCoords']) :
         t0_sec = time()
         self.list_of_pkgs = list_of_pkgs
+        self.delete_old_tmp_files()        
         self.make_logfiles_in_background_mode()
 
         #msg = 'Consumed time to launch subprocesses = %7.3f sec' % (time()-t0_sec)
         #print msg
 
 
+    def delete_old_tmp_files(self) :
+        cmd = 'rm /tmp/calibman-*txt'
+        try : 
+            output = getoutput(cmd)
+            #print output
+            #stream = os.popen(cmd)
+            #print stream.read()
+        except :
+            pass # print 'Some problem with cleanup tmp files "rm /tmp/calibman-*txt" '
+
+
     def make_logfiles_in_background_mode(self) :
         """Returns dictionary with temporary file names for packages as keys"""
-        self.dict_pkg_fname = {pkg:get_tempfname() for pkg in self.list_of_pkgs}
 
+        self.dict_pkg_fname = {pkg:get_tempfname() for pkg in self.list_of_pkgs}
         for pkg, fname in self.dict_pkg_fname.iteritems() :
             cmd = 'psvn tags %s' % pkg
             subproc_in_log(cmd.split(), fname)

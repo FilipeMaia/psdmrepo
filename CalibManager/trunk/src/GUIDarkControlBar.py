@@ -199,6 +199,7 @@ class GUIDarkControlBar ( QtGui.QWidget ) :
         msg = 'Set the run range to %s' % str_run_max
         logger.info(msg, __name__ )
         self.dark_list_run_max.setValue(int(str_run_max))
+        self.updateListOfRunsForNumEvents()
 
 
     def onButRuns(self):
@@ -239,6 +240,13 @@ class GUIDarkControlBar ( QtGui.QWidget ) :
 
         but.setText(txt + self.char_expand)        
         but.setStyleSheet(cp.styleButton)
+
+
+    def updateListOfRunsForNumEvents(self) :
+        logger.info('WAIT for list of runs update...', __name__ )
+        
+        if cp.guidarklist != None :
+            cp.guidarklist.updateList()
 
 
     def on_cbx(self):

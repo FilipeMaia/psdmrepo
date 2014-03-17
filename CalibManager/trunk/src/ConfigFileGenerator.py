@@ -73,7 +73,7 @@ class ConfigFileGenerator :
     def make_psana_cfg_file_for_peds_scan (self) :
         self.path_in  = apputils.AppDataPath('CalibManager/scripts/psana-scan.cfg').path()
         self.d_subs   = {'FNAME_XTC' : self.path_to_data_files(),
-                         'SKIP'      : '0',
+                         'SKIP'      : str( cp.bat_dark_start.value() - 1 ),
                          'EVENTS'    : '10',
                          }
 
