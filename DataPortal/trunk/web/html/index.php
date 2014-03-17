@@ -181,6 +181,7 @@ try {
 <link type="text/css" href="../webfwk/css/Stack.css" rel="Stylesheet" />
 <link type="text/css" href="../webfwk/css/Table.css" rel="Stylesheet" />
 <link type="text/css" href="../webfwk/css/SmartTable.css" rel="Stylesheet" />
+<link type="text/css" href="../webfwk/css/RadioBox.css" rel="Stylesheet" />
 
 <link type="text/css" href="../portal/css/Experiment_Info.css" rel="Stylesheet" />
 <link type="text/css" href="../portal/css/Experiment_Group.css" rel="Stylesheet" />
@@ -254,6 +255,7 @@ button {
 <script type="text/javascript" src="../webfwk/js/Fwk.js"></script>
 <script type="text/javascript" src="../webfwk/js/Table.js"></script>
 <script type="text/javascript" src="../webfwk/js/SmartTable.js" ></script>
+<script type="text/javascript" src="../webfwk/js/RadioBox.js" ></script>
 
 <script type="text/javascript" src="../portal/js/Experiment_Info.js"></script>
 <script type="text/javascript" src="../portal/js/Experiment_Group.js"></script>
@@ -326,8 +328,9 @@ var access_list = {
         is_data_administrator : <?= $is_data_administrator    ? 1 : 0 ?>
     } ,
     hdf5 : {
-        read   : <?= $experiment_can_read_data ? 1 : 0 ?> ,
-        manage : <?= $elog_can_post_messages   ? 1 : 0 ?>
+        read                  : <?= $experiment_can_read_data ? 1 : 0 ?> ,
+        manage                : <?= $elog_can_post_messages   ? 1 : 0 ?> ,
+        is_data_administrator : <?= $is_data_administrator    ? 1 : 0 ?>
     } ,
     shiftmgr : {
         can_edit : <?= $shiftmgr_can_edit ? 1 : 0 ; ?>

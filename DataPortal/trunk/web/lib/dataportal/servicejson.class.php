@@ -383,20 +383,27 @@ class ServiceJSON {
     // ------------------
 
     private static function report_error ($message, $parameters, $options) {
+        $status = 'error' ;
         ServiceJSON::report_ (
             array (
-                'status' => 'error' ,
-                'message' => $message
+                'status'  => $status ,
+                'message' => $message ,
+                'Status'  => $status ,      // -- backward compatibility with older clients 
+                'Message' => $message       // -- backward compatibility with older clients 
             ) ,
             $parameters ,
             $options
         ) ;
     }
     private static function report_success ($parameters, $options) {
+        $status  = 'success' ;
+        $now_str = LusiTime::now()->toStringShort() ;
         ServiceJSON::report_ (
             array (
-                'status'  => 'success' ,
-                'updated' => LusiTime::now()->toStringShort()
+                'status'  => $status ,
+                'updated' => $now_str ,
+                'Status'  => $status ,      // -- backward compatibility with older clients 
+                'Updated' => $now_str       // -- backward compatibility with older clients 
             ) ,
             $parameters ,
             $options

@@ -42,8 +42,9 @@ class DataPortal {
 <title>{$page_name}</title> 
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"> 
 
-<link type="text/css" href="/jquery/css/custom-theme/jquery-ui.custom.css" rel="Stylesheet" />
-<link type="text/css" href="css/default.css" rel="Stylesheet" />
+<link type="text/css" href="/jquery/css/custom-theme-1.9.1/jquery-ui.custom.css" rel="Stylesheet" />
+
+<link type="text/css" href="../portal/css/default.css" rel="Stylesheet" />
 
 HERE;
     }
@@ -58,8 +59,9 @@ HERE;
         echo <<<HERE
 
 <script type="text/javascript" src="/jquery/js/jquery.min.js"></script>
-<script type="text/javascript" src="/jquery/js/jquery-ui.custom.min.js"></script>
-<script type="text/javascript" src="js/Utilities.js"></script>
+<script type="text/javascript" src="/jquery/js/jquery-ui-1.9.1.custom.min.js"></script>
+        
+<script type="text/javascript" src="../portal/js/Utilities.js"></script>
 <script type="text/javascript">
 
 /* ----------------------------------------------
@@ -206,6 +208,19 @@ function large_dialog( title, msg ) {
     });
 }
 
+function report_error( title, msg ) {
+    $('#popupdialogs').html(
+        '<p><span class="ui-icon ui-icon-alert" style="float:left;"></span>'+
+        msg+
+        '</p>'
+    );
+    $('#editdialogs').dialog({
+        title:     title,
+        resizable: true,
+        modal:     true
+    });
+}
+    
 /* --------------------------------------------------- 
  * The starting point where the JavaScript code starts
  * ---------------------------------------------------
@@ -243,9 +258,9 @@ HERE;
     <div style="float:right;">
       <table><tbody><tr>
         <td valign="bottom">
-          <div style="float:right; margin-right:10px;" class="not4print"><a href="javascript:printer_friendly('tabs-experiment')" title="Printer friendly version of this page"><img src="img/PRINTER_icon.gif" /></a></div>
+          <div style="float:right; margin-right:10px;" class="not4print"><a href="javascript:printer_friendly('tabs-experiment')" title="Printer friendly version of this page"><img src="../portal/img/PRINTER_icon.gif" /></a></div>
           <!--
-          <div style="float:right; margin-right:10px;" class="not4print"><a href="javascript:pdf('experiment')" title="PDF version of this page"><img src="img/PDF_icon.gif" /></a></div>
+          <div style="float:right; margin-right:10px;" class="not4print"><a href="javascript:pdf('experiment')" title="PDF version of this page"><img src="../portal/img/PDF_icon.gif" /></a></div>
           -->
           <div style="clear:both;" class="not4print"></div>
         </td>
@@ -356,10 +371,13 @@ HERE;
 HERE;
 
         foreach( $cols as $c ) {
-            $name  = $c['name'];
-            $width = $c['width'];
+            $style  = array_key_exists( 'style',  $c ) ? 'style="'. $c['style']. '"' : '';
+            $width  = array_key_exists( 'width',  $c ) ? 'width="'. $c['width']. '"' : '';
+            $align  = array_key_exists( 'align',  $c ) ? 'align="'. $c['align']. '"' : '';
+            $valign = array_key_exists( 'valign', $c ) ? 'valign="'.$c['valign'].'"' : '';
+            $name   = array_key_exists( 'name',   $c ) ? $c['name']                  : '&nbsp;';
             $html .= <<<HERE
-      <td class="table_hdr" width="{$width}">{$name}</td>
+      <td class="table_hdr" {$style} {$width} {$align} {$valign}>{$name}</td>
 
 HERE;
         }
@@ -371,22 +389,45 @@ HERE;
         return $html;
     }
 
-    static function table_row_html( $values, $end_of_group=true ) {
+    static function table_row_html( $values, $end_of_group=true, $td_options=array(), $tr_options=array()) {
 
-        $class = $end_of_group ? 'table_cell' : 'table_cell_within_group';
+        $tr_class = 'table_row';
+        $tr_attr  = '';
+
+        foreach( $tr_options as $opt => $val ) {
+            switch( $opt ) {
+                case 'class' : $tr_class .= " {$val}"; break;
+                default:       $tr_attr  .= " {$opt}=\"{$val}\""; break;
+            }
+        }
         $html = <<<HERE
-    <tr>
+    <tr class="{$tr_class}" {$tr_attr} >
 
 HERE;
 
-        foreach( $values as $v ) {
+        $td_class = $end_of_group ? 'table_cell' : 'table_cell_within_group';
+
+        for( $col=0; $col < count($values); $col++ ) {
+
+            $v = $values[$col];
+
+            $align  = '';
+            $valign = '';
+
+            if( array_key_exists( $col, $td_options )) {
+
+                $opt = $td_options[$col];
+
+                if (array_key_exists( 'align',  $opt)) $align  = 'align="'. $opt['align']. '"';
+                if (array_key_exists( 'valign', $opt)) $valign = 'valign="'.$opt['valign'].'"';
+            }
 
             // Replace empty values with non-breakable space to avoid screwing up CSS
             // for table cells on Mozilla Firefox & IE browsers.
             //
             if( $v == '' ) $v = '&nbsp;';
             $html .= <<<HERE
-      <td class="{$class}">{$v}</td>
+      <td class="{$td_class}" {$align} {$valign}>{$v}</td>
 
 HERE;
         }

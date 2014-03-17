@@ -1161,6 +1161,7 @@ HERE;
     position: relative;
     top:130px;
     margin: 0px 0px 20px 203px;
+    margin-bottom: 0px;
     overflow: auto;
     background-color: #ffffff;
     border-left: 1px solid #a0a0a0;

@@ -173,6 +173,12 @@ function HDF5_Manage (experiment, access_list) {
             _that._display() ;
         }) ;
 
+        if (!this.access_list.hdf5.manage) {
+            this._body_ctrl.find('button.control-button[name="translate"]').button('disable') ;
+            this._body_ctrl.find('button.control-button[name="stop"]').button('disable') ;
+            this._auto.attr('disabled', 'disabled') ;
+        }        
+
         this._viewer = body.find('#viewer') ;
 
         this._load() ;
@@ -306,7 +312,10 @@ function HDF5_Manage (experiment, access_list) {
 '  </tbody>' +
 '</table>' ;
         this._viewer.html(html) ;
-        this._viewer.find('.control-button').button().click(function () {
+        this._viewer.find('.control-button')
+        .button()
+        .button(!this.access_list.hdf5.manage ? 'disable' : 'enable')
+        .click(function () {
             var val = parseInt($(this).attr('value')) ;
             switch (this.name) {
                 case 'translate' :
@@ -323,7 +332,9 @@ function HDF5_Manage (experiment, access_list) {
                     break ;
             }
         }) ;
-
+        if (!this.access_list.hdf5.is_data_administrator) {
+            this._viewer.find('.control-button.retranslate').button('disable') ;
+        }
         var summary_html = '' ;
         for (var status in summary) {
             var counter = summary[status] ;

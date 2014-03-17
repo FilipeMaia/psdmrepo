@@ -18,16 +18,24 @@ function ELog_Runs (experiment, access_list) {
     // ------------------------------------------------
 
     this.on_activate = function() {
-        this.on_update() ;
+        this._init() ;
     } ;
 
     this.on_deactivate = function() {
         this._init() ;
     } ;
 
+    this._prev_refresh_sec     = 0 ;
+    this._refresh_interval_sec = 10 ;
+
     this.on_update = function () {
-        if (this.active) {
-            this._init() ;
+        this._init() ;
+        if (this.active && this._refresh_interval_sec) {
+            var now_sec = Fwk.now().sec ;
+            if (Math.abs(now_sec - this._prev_refresh_sec) > this._refresh_interval_sec) {
+                this._prev_refresh_sec = now_sec ;
+                this._search() ;
+            }
         }
     } ;
 
@@ -41,6 +49,48 @@ function ELog_Runs (experiment, access_list) {
     // --------------------
     // Own data and methods
     // --------------------
+
+    this._last_request = null ;
+    this._max_seconds = 0 ;
+
+    // ---------------------------------------
+    //   BEGIN INITIALIZING THE UI FROM HERE
+    // ---------------------------------------
+
+    this._is_initialized = false ;
+
+    this._init = function () {
+
+        if (this._is_initialized) return ;
+        this._is_initialized = true ;
+
+        // -- no further initialization beyond this point if not authorized
+
+        if (!this.access_list.elog.read_messages) {
+            this._wa(this.access_list.no_page_access_html) ;
+            return ;
+        }
+
+        // -- set up event handlers
+
+        this._ctrl().find('input.update-trigger').change(function () {
+            _that._search() ; }) ;
+
+        this._ctrl().find('button.control-button').button().click(function () {
+            switch (this.name) {
+                case 'search':
+                    _that._search() ;
+                    break ;
+                case 'reset' :
+                    _that._runs2search('') ;
+                    _that._search_in_deleted(true) ;
+                    _that._search() ;
+                    break ; }}) ;
+  
+        // -- initiate the loading
+
+        this._search() ;
+    } ;
 
     /**
      * Initialize the work area and return an element. Use an html document from 
@@ -166,7 +216,7 @@ function ELog_Runs (experiment, access_list) {
     } ;
 
     this._run_table  = function () {
-        if (!this._viewer_obj) {
+        if (!this._run_table_obj) {
             this._viewer_elem = this._body().children('#viewer') ;
 
             var hdr = [
@@ -187,49 +237,11 @@ function ELog_Runs (experiment, access_list) {
         return this._run_table_obj ;
     }
 
-    // ---------------------------------------
-    //   BEGIN INITIALIZING THE UI FROM HERE
-    // ---------------------------------------
 
-    this._is_initialized = false ;
-
-    this._init = function () {
-
-        if (this._is_initialized) return ;
-        this._is_initialized = true ;
-
-        // -- no further initialization beyond this point if not authorized
-
-        if (!this.access_list.elog.read_messages) {
-            this._wa(this.access_list.no_page_access_html) ;
-            return ;
-        }
-
-        // -- set up event handlers
-
-        this._ctrl().find('input.update-trigger').change(function () {
-            _that._search() ; }) ;
-
-        this._ctrl().find('button.control-button').button().click(function () {
-            switch (this.name) {
-                case 'search':
-                    _that._search() ;
-                    break ;
-                case 'reset' :
-                    _that._runs2search('') ;
-                    _that._search_in_deleted(true) ;
-                    _that._search() ;
-                    break ; }}) ;
-  
-        // -- initiate the loading
-
-        this._search() ;
-
-    } ;
-
-    this._last_request = [] ;
-    this._max_seconds = 0 ;
-
+    /**
+     * Search for runs in teh specified range
+     * @returns {undefined}
+     */
     this._search = function () {
         this._set_updated('Loading...') ;
         var params = {
@@ -240,52 +252,211 @@ function ELog_Runs (experiment, access_list) {
             '../logbook/ws/RequestAllRuns.php' ,
             params ,
             function (data) {
-                _that._last_request = data.Runs ;
-                _that._max_seconds  = data.MaxSeconds ;
-                _that._set_info('<b>'+_that._last_request.length+'</b> runs') ;
+                _that._set_info('<b>'+data.Runs.length+'</b> runs') ;
                 _that._set_updated('[ Last update on: <b>'+data.updated+'</b> ]') ;
-                _that._display() ;
+                _that._display(data.Runs, data.MaxSeconds) ;
             } ,
             function (msg) {
                 Fwk.report_error(msg) ;
             }
         ) ;
     } ;
-    
-    this._display = function () {
+
+    /**
+     * Display a table of runs
+     *
+     * @returns {undefined}
+     */    
+    this._display = function (runs, max_seconds) {
         var table = this._run_table() ;
-        for (var i in this._last_request) {
-            var r = this._last_request[i] ;
+
+        // Redisplay the table from scratch if:
+        // 
+        //   - this is the very first request
+        //   - the maxumu run duration has changed (and we need to rescale the run duration bars)
+        //
+        // Only apply updates to the table if:
+        //
+        //   - changed status of the last run from the previous request
+        //   - new runs appeared since the previous request
+
+        if (!this._last_request) {
+            console.log('ELog_Runs::_display()  !this._last_request') ;
+
+            this._last_request = runs ;
+            this._max_seconds  = max_seconds ;
+
+            for (var i in this._last_request) {
+                var r = this._last_request[i] ;
+                r.row_id = table.append(this._run2row(r, max_seconds)) ;
+            }
             
-            var row = {
-                title: {
-                    begin: '<b>'+r.ymd+'</b>&nbsp;&nbsp;'+r.hms ,
-                    run:   '<div class="m-run">'+r.num+'</div>' ,
-                    duration:  r.durat1 ,
-                    duration_bar: ''
-                } ,
-                body: 'Here be a list of messages, ...soon' ,       // new ELog_Runs_RunBody(this, r) ;
-                block_common_expand: true
-            } ;
-            table.append(row) ;
+        } else if (this._max_seconds !== max_seconds) {
+            console.log('ELog_Runs::_display()  this._max_seconds('+this._max_seconds+') !== max_seconds('+max_seconds+')') ;
+
+            table.reset() ;
+
+            // TODO: consider rescaling the run duration bars w/o redisplaying
+            //       the table from scratch
+
+            this._last_request = runs ;
+            this._max_seconds  = max_seconds ;
+
+            for (var i in this._last_request) {
+                var r = this._last_request[i] ;
+                r.row_id = table.append(this._run2row(r, max_seconds)) ;
+            }
+
+        } else {
+
+            // -- update the first row if there were any changes in the run status
+
+            var r_last_old = this._last_request[0] ;
+            var r_last_new = runs[runs.length - this._last_request.length] ;    // in case if there are more new runs
+            if (r_last_old.sec !== r_last_new.sec) {
+                console.log('ELog_Runs::_display()  r_last_old.secs('+r_last_old.sec+') !== r_last_new.sec('+r_last_new.sec+')') ;
+                table.update_row(r_last_old.row_id, this._run2row(r_last_new, max_seconds)) ;
+                this._last_request[0] = r_last_new ;
+                this._last_request[0].row_id = r_last_old.row_id ;
+            }
+
+            // -- check if more runs should be added to the front
+
+            if (runs.length > this._last_request.length) {
+                
+                // -- insert new runs at the begining of the list
+
+                for (var i = runs.length - this._last_request.length - 1; i >= 0; i--) {
+                    var r = runs[i] ;
+                    r.row_id = table.insert_front(this._run2row(r, max_seconds)) ;
+                }
+                
+                // -- and do NOT bother to carry over identifiers of rows from
+                //    the previous request
+
+                ;
+
+                this._last_request = runs ;
+                this._max_seconds  = max_seconds ;
+            }
         }
+    } ;
+    
+    this._run2row = function (r, max_seconds) {
+        var duration_bar_width = 0 ;
+        if (max_seconds) duration_bar_width = Math.floor(385.0 * (r.sec / max_seconds)) ;
+        var row = {
+            title: {
+                begin: '<b>'+r.ymd+'</b>&nbsp;&nbsp;'+r.hms ,
+                run:   '<div class="m-run">'+r.num+'</div>' ,
+                duration:  r.durat1 ,
+                duration_bar: '<div style="margin-left:15px; width:'+duration_bar_width+'px; background:#5C5C33;">&nbsp;</div>'
+            } ,
+            body: new ELog_Runs_RunBody(this, r) ,
+            block_common_expand: true
+        } ;
+        return row ;
     } ;
 }
 define_class (ELog_Runs, FwkApplication, {}, {});
 
 
-function ELog_RunViewer (parent, cont, options) {
+function ELog_Runs_RunBody (parent, run) {
 
+    var _that = this ;
+   
+    // -----------------------------------------
+    // Allways call the base class's constructor
+    // -----------------------------------------
+
+    Widget.call(this) ;
+ 
     // -- parameters
 
     this.parent = parent ;
     this.experiment = parent.experiment ;
     this.access_list = parent.access_list ;
-    this.cont = cont ;
 
-    // Must be the last call. Otherwise the widget won't be able to see
-    // functon 'render()' defined above in this code.
+    this.run = run ;
 
-    this.display(this.cont) ;
+    this._run_url = function () {
+        var idx = window.location.href.indexOf('?') ;
+        var url = (idx < 0 ? window.location.href : window.location.href.substr(0, idx))+'?exper_id='+this.experiment.id+'&app=elog:search&params=run:'+this.run.num;
+        var html = '<a href="'+url+'" target="_blank" title="Click to open in a separate tab, or cut and paste to incorporate into another document as a link."><img src="../portal/img/link.png"></img></a>' ;
+        return html ;
+    }
+
+    this._cont = function () {
+        if (!this._cont_elem) {
+            var html =
+'<div class="run-cont">' +
+'  <div id="ctrl">' +
+'    <div style="float:right;">'+this._run_url()+'</div>' +
+'    <div style="clear:both;"></div>' +
+'  </div>' +
+'  <div id="messages"></div>' +
+'</div>' ;
+            this.container.html(html) ;        
+            this._cont_elem = this.container.children('.run-cont') ;
+        }
+        return this._cont_elem ;
+    } ;
+    this._ctrl = function () {
+        if (!this._ctrl_elem) {
+            this._ctrl_elem = this._cont().children('#ctrl') ;
+        }
+        return this._ctrl_elem ;
+    } ;
+    this._messages = function () {
+        if (!this._messages_elem) {
+            this._messages_elem = this._cont().children('#messages') ;
+        }
+        return this._messages_elem ;
+    } ;
+
+    this._viewer = function () {
+        if (!this._viewer_obj) {
+            this._viewer_obj = new ELog_MessageViewer (this, this._messages(), {}) ;
+        }
+        return this._viewer_obj ;
+    } ;
+
+    // ------------------------------------------------
+    // Override event handler defined in thw base class
+    // ------------------------------------------------
+
+    this._is_rendered = false ;
+
+    this.render = function () {
+
+        if (this._is_rendered) return ;
+        this._is_rendered = true ;
+
+        this._messages().html('Loading...') ;
+
+        var params = {
+            id:                   this.experiment.id ,
+            scope:                "experiment" ,
+            search_in_messages:   1 ,
+            search_in_tags:       1 ,
+            search_in_values:     1 ,
+            posted_at_experiment: 0 ,
+            posted_at_shifts:     0 ,
+            posted_at_runs:       1 ,
+            range_of_runs:        this.run.num ,
+            inject_runs:          '' ,
+            format:               "detailed"
+        } ;
+        Fwk.web_service_GET (
+            '../logbook/ws/Search.php' ,
+            params ,
+            function (data) {
+                _that._viewer().load(data.ResultSet.Result) ;
+            } ,
+            function (msg) {
+                Fwk.report_error(msg) ;
+            }
+        ) ;
+    } ;
 }
-define_class (ELog_MessageViewer, Widget, {}, {}) ;
+define_class (ELog_Runs_RunBody, Widget, {}, {}) ;

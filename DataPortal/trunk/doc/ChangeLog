@@ -11,6 +11,13 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-06-03
+2014-03-17 Igor Gaponenko
+- implemented the 'Runs' application within ELog
+- allowed HDF5 'Retranslate' for privileged users
+- fixed a bug in the experiment info report (teh bug was affecting Portals of the non-regular experiments)
+- extended the Web services framework to allow backward compatibility woth older clients (capitalzed 'Status' and 'Message' fields)
+
 Tag: V00-06-02
 2014-03-02 Igor Gaponenko
 - saving results of the on-going development

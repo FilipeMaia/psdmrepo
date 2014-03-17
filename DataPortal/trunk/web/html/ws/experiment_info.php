@@ -57,7 +57,7 @@ DataPortal\ServiceJSON::run_handler ('GET', function ($SVC) {
         'end_time_sec' => $experiment->end_time()->sec ,
 
         'is_facility' => $experiment->is_facility() ? 1 : 0 ,
-        'is_active'   => $SVC->regdb()->is_active_experiment($experiment->id()) ? 1 : 0 ,
+        'is_active'   => !$experiment->is_facility() && $SVC->regdb()->is_active_experiment($experiment->id()) ? 1 : 0 ,
 
         'contact_info'           => $experiment->contact_info() ,
         'contact_info_decorated' => DataPortal\DataPortal::decorated_experiment_contact_info($experiment) ,
