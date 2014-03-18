@@ -29,6 +29,7 @@
 #include "XtcInput/StreamFileIterI.h"
 #include "XtcInput/XtcStreamDgIter.h"
 #include "XtcInput/XtcFileName.h"
+#include "XtcInput/FiducialsCompare.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -66,9 +67,11 @@ public:
    *
    *  @param[in]  streamIter  Iterator for input files
    *  @param[in]  l1OffsetSec Time offset to add to non-L1Accept transitions.
+   *  @param[in]  l1OffsetSec Time offset to add to non-L1Accept transitions.
+   *  @param[in]  maxClockDriftSeconds fiducials equal plus seconds within this value are the same event
    */
   XtcStreamMerger(const boost::shared_ptr<StreamFileIterI>& streamIter,
-      double l1OffsetSec = 0 ) ;
+                  double l1OffsetSec = 0, unsigned maxClockDriftSeconds = 120 ) ;
 
   // Destructor
   ~XtcStreamMerger () ;
@@ -86,6 +89,7 @@ public:
    *  @throw XTCLiveTimeout Thrown for timeout during live data reading
    */
   Dgram next() ;
+  const FiducialsCompare & fiducialsCompare() { return m_fiducialsCompare; }
 
 protected:
 
@@ -99,7 +103,7 @@ private:
   int32_t m_l1OffsetSec ;                     ///< Time offset to add to non-L1Accept transitions (seconds)
   int32_t m_l1OffsetNsec ;                    ///< Time offset to add to non-L1Accept transitions (nanoseconds)
   std::queue<Dgram> m_outputQueue;            ///< Output queue for datagrams
-
+  FiducialsCompare m_fiducialsCompare;        ///< To order datagrams by fiducials
 };
 
 } // namespace XtcInput

@@ -7,6 +7,7 @@
 //
 // Author List:
 //      Andrei Salnikov
+//      David Schneider
 //
 //------------------------------------------------------------------------
 
@@ -50,12 +51,13 @@ namespace XtcInput {
 // Constructors --
 //----------------
 XtcStreamMerger::XtcStreamMerger(const boost::shared_ptr<StreamFileIterI>& streamIter,
-        double l1OffsetSec)
+                                 double l1OffsetSec, unsigned maxClockDriftSeconds)
   : m_streams()
   , m_dgrams()
   , m_l1OffsetSec(int(l1OffsetSec))
   , m_l1OffsetNsec(int((l1OffsetSec-m_l1OffsetSec)*1e9))
   , m_outputQueue()
+  , m_fiducialsCompare(maxClockDriftSeconds)
 {
 
   // create all streams
@@ -67,7 +69,7 @@ XtcStreamMerger::XtcStreamMerger(const boost::shared_ptr<StreamFileIterI>& strea
 
     // create new stream
     const boost::shared_ptr<XtcStreamDgIter>& stream = 
-        boost::make_shared<XtcStreamDgIter>(chunkFileIter) ;
+      boost::make_shared<XtcStreamDgIter>(chunkFileIter, fiducialsCompare());
     m_streams.push_back(stream) ;
     Dgram dg(stream->next());
     if (not dg.empty()) updateDgramTime(*dg.dg());
@@ -95,11 +97,11 @@ XtcStreamMerger::next()
 
     unsigned ns =  m_streams.size() ;
 
-    // find datagram with lowest timestamp
+    // find datagram with lowest fiducials
     int stream = -1 ;
     for ( unsigned i = 0 ; i < ns ; ++ i ) {
       if (not m_dgrams[i].empty()) {
-        if ( stream < 0 or m_dgrams[stream].dg()->seq.clock() > m_dgrams[i].dg()->seq.clock() ) {
+        if ( stream < 0 or m_fiducialsCompare.fiducialsGreater(*m_dgrams[stream].dg(),*m_dgrams[i].dg()) ) {
           stream = i ;
         }
       }
@@ -109,12 +111,11 @@ XtcStreamMerger::next()
 
     if (stream >= 0) {
 
-      // send all datagrams with this timestamp to output queue
-      Pds::ClockTime ts = m_dgrams[stream].dg()->seq.clock();
+      // send all datagrams with this fiducial to the output queue
+      const Pds::Dgram &earliestDg = *m_dgrams[stream].dg();
       for ( unsigned i = 0 ; i < ns ; ++ i ) {
         if (not m_dgrams[i].empty()) {
-          if (m_dgrams[i].dg()->seq.clock() == ts) {
-
+          if (m_fiducialsCompare.fiducialsEqual(*m_dgrams[i].dg(),earliestDg)) {
             m_outputQueue.push(m_dgrams[i]);
 
             // get next datagram from that stream
@@ -145,7 +146,6 @@ XtcStreamMerger::next()
 
   return dg ;
 }
-
 
 void 
 XtcStreamMerger::updateDgramTime(Pds::Dgram& dgram) const

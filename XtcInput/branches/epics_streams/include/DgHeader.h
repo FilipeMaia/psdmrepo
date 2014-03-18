@@ -77,6 +77,9 @@ public:
   /// Get transition time
   const Pds::ClockTime& clock() const { return m_header.seq.clock(); }
 
+  /// Get transition fiducial
+  const unsigned fiducials() const { return m_header.seq.stamp().fiducials(); }
+
   /// Get damage
   Pds::Damage damage() const { return m_header.xtc.damage; }
 

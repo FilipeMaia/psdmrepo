@@ -26,6 +26,7 @@
 #include "MsgLogger/MsgLogger.h"
 #include "XtcInput/Exceptions.h"
 #include "XtcInput/XtcChunkDgIter.h"
+#include "XtcInput/FiducialsCompare.h"
 #include "pdsdata/xtc/Xtc.hh"
 
 //-----------------------------------------------------------------------
@@ -48,6 +49,25 @@ namespace {
 
     Pds::ClockTime m_clock;
   };
+
+  // functor to match header against specified Fiducials and clock time
+  struct MatchFiducials {
+    MatchFiducials(const Pds::ClockTime& clock, 
+                   const unsigned fiducials,
+                   const XtcInput::FiducialsCompare &fiducialsCompare) :
+      m_clock(clock), m_fiducials(fiducials), 
+      m_fiducialsCompare(fiducialsCompare) {}
+    bool operator()(const boost::shared_ptr<XtcInput::DgHeader>& header) const {
+      return m_fiducialsCompare.fiducialsEqual(header->clock().seconds(),
+                                               header->fiducials(),
+                                               m_clock.seconds(),
+                                               m_fiducials);
+    }
+
+    Pds::ClockTime m_clock;
+    unsigned m_fiducials;
+    const XtcInput::FiducialsCompare & m_fiducialsCompare;
+  };
 }
 
 //		----------------------------------------
@@ -59,11 +79,13 @@ namespace XtcInput {
 //----------------
 // Constructors --
 //----------------
-XtcStreamDgIter::XtcStreamDgIter(const boost::shared_ptr<ChunkFileIterI>& chunkIter)
+XtcStreamDgIter::XtcStreamDgIter(const boost::shared_ptr<ChunkFileIterI>& chunkIter, 
+                                 const FiducialsCompare &fiducialsCompare)
   : m_chunkIter(chunkIter)
   , m_dgiter()
   , m_count(0)
   , m_headerQueue()
+  , m_fiducialsCompare(fiducialsCompare)
 {
   m_headerQueue.reserve(::readAheadSize);
 }
@@ -147,14 +169,17 @@ XtcStreamDgIter::queueHeader(const boost::shared_ptr<DgHeader>& header)
 {
   Pds::TransitionId::Value tran = header->transition();
   const Pds::ClockTime& clock = header->clock();
+  const unsigned fiducials = header->fiducials();
   MsgLog(logger, debug, "XtcStreamDgIter::queueHeader: transition: " << Pds::TransitionId::name(tran)
-         << " time: " << clock.seconds() << "sec " << clock.nanoseconds() << " nsec");
+         << " time: " << clock.seconds() << "sec " << clock.nanoseconds() << " nsec, "
+         << " fiducials: " << fiducials);
 
   // For split transitions look at the queue and find matching split transition,
   // store them together if found, otherwise assume it's first piece and store
   // it like normal transition.
   if (header->damage().value() & (1 << Pds::Damage::DroppedContribution)) {
-    HeaderQueue::iterator it = std::find_if(m_headerQueue.begin(), m_headerQueue.end(), MatchClock(clock));
+    HeaderQueue::iterator it = std::find_if(m_headerQueue.begin(), m_headerQueue.end(), 
+                                            MatchFiducials(clock, fiducials, m_fiducialsCompare));
     if (it != m_headerQueue.end()) {
       MsgLog(logger, debug, "XtcStreamDgIter::queueHeader: split transition, found match");
       m_headerQueue.insert(it, header);
