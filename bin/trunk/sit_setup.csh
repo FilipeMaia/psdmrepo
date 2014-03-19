@@ -21,8 +21,7 @@ set tmp_sh=/tmp/uss-$$.csh
 if ( -f $tmp_sh ) then
   /bin/rm $tmp_sh
 endif
-"$ussbindir/uss.sh" -c -- "$ussbindir/sit_setup.uss" ${argv:q} > $tmp_sh
-source $tmp_sh
+"$ussbindir/uss.sh" -c -- "$ussbindir/sit_setup.uss" ${argv:q} > $tmp_sh && source $tmp_sh
 
 # cleanup
 /bin/rm $tmp_sh
