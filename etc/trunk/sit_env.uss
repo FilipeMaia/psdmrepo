@@ -22,6 +22,3 @@ test $uss_mode = "sh" && set_alias sit_setup ". $ussbindir/sit_setup.sh"
 
 # source the main script too
 . $ussbindir/sit_setup.uss
-
-# cleanup
-unset ussbindir
