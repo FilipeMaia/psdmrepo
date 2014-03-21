@@ -45,7 +45,7 @@ namespace CSPadPixCoords {
 
 // Default constructor
 template <typename T>
-Image2D<T>::Image2D (T* data, size_t nrows, size_t ncols) :
+Image2D<T>::Image2D (const T* data, size_t nrows, size_t ncols) :
     m_data(data),
     m_nrows(nrows),
     m_ncols(ncols)

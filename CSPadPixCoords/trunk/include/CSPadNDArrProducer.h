@@ -175,7 +175,7 @@ private:
                //ndarray<TOUT,2> arr2d = make_ndarray(nda_det.data(), NQuadsMax*N2x1*NRows2x1, NCols2x1);
                ndarray<TOUT,2> arr2d = make_ndarray<TOUT>(NQuadsMax*N2x1*NRows2x1, NCols2x1);
                std::memcpy(arr2d.begin(), nda_det.begin(), sizeof(TOUT)*32*SizeOf2x1Arr);    	       
-	       save2DArrInEvent<TOUT>(evt, m_src, m_outkey, arr2d);
+	       save2DArrayInEvent<TOUT>(evt, m_src, m_outkey, arr2d);
 	     }
 	     else save3DArrInEvent<TOUT>(evt, m_src, m_outkey, nda_det);
 	}

@@ -353,7 +353,7 @@ private:
   template <typename T>
   bool procCSPadNDArrForType (Event& evt) {
  
-        shared_ptr< ndarray<T,3> > shp = evt.get(m_source, m_inkey, &m_src); // get m_src here
+        shared_ptr< ndarray<const T,3> > shp = evt.get(m_source, m_inkey, &m_src); // get m_src here
         if (shp.get()) {
         
           if( m_print_bits & 8 ) MsgLog(name(), info, "Produce image from CSPAD ndarray, source:" << m_source 
@@ -364,7 +364,7 @@ private:
           //std::fill_n(img_nda.data(), int(IMG_SIZE), T(0));    
           std::fill(img_nda.begin(), img_nda.end(), T(0));    
 
-          const ndarray<T,3> inp_ndarr = *shp.get(); //const T* p_data = shp->data();
+          const ndarray<const T,3> inp_ndarr = *shp.get(); //const T* p_data = shp->data();
         
           int ind2x1_in_arr = 0;        
           for (uint32_t q = 0; q < m_numQuads; ++ q) {

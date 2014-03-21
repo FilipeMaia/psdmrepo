@@ -124,7 +124,7 @@ private:
   template <typename T>
   bool defineImageShapeForType(PSEvt::Event& evt, const PSEvt::Source& str_src, const std::string& str_key, unsigned* shape)
   {
-    boost::shared_ptr< ndarray<T,2> > img = evt.get(str_src, str_key);
+    boost::shared_ptr< ndarray<const T,2> > img = evt.get(str_src, str_key);
     if (img.get()) {
       for(int i=0;i<2;i++) shape[i]=img->shape()[i];
       //shape=img->shape();
@@ -136,31 +136,29 @@ private:
 //--------------------
 // Save 2-D array in environment
   template <typename T>
-  void save2DArrayInEnv(PSEnv::Env& env, const Pds::Src& src, const ndarray<T,2>& ndarr)
+  void save2DArrayInEnv(PSEnv::Env& env, const Pds::Src& src, const ndarray<const T,2>& ndarr)
   {
-    boost::shared_ptr< ndarray<T,2> > shp( new ndarray<T,2>(ndarr) );
+    boost::shared_ptr< ndarray<const T,2> > shp( new ndarray<const T,2>(ndarr) );
     env.calibStore().put(shp, src);
   }
 
 //--------------------
 // Save 2-D array in event
   template <typename T>
-  void save2DArrayInEvent(PSEvt::Event& evt, const Pds::Src& src, const std::string& key, const ndarray<T,2>& ndarr)
+  void save2DArrayInEvent(PSEvt::Event& evt, const Pds::Src& src, const std::string& key, const ndarray<const T,2>& ndarr)
   {
-    boost::shared_ptr< ndarray<T,2> > shp( new ndarray<T,2>(ndarr) );
+    boost::shared_ptr< ndarray<const T,2> > shp( new ndarray<const T,2>(ndarr) );
     evt.put(shp, src, key);
   }
 
 // or its alias
-
+/*
   template <typename T>
-  void save2DArrInEvent(PSEvt::Event& evt, const Pds::Src& src, const std::string& key, const ndarray<T,2>& ndarr)
+  void save2DArrInEvent(PSEvt::Event& evt, const Pds::Src& src, const std::string& key, const ndarray<const T,2>& ndarr)
   {
     save2DArrayInEvent<T>(evt, src, key, ndarr);
-    //boost::shared_ptr< ndarray<T,2> > shp( new ndarray<T,2>(ndarr) );
-    //evt.put(shp, src, key);
   }
-
+*/
 //-------------------
   /**
    * @brief Save 3-D array in event, for src and key.
@@ -172,16 +170,16 @@ private:
    */
 
   template <typename T>
-  void save3DArrInEvent(PSEvt::Event& evt, const Pds::Src& src, const std::string& key, const ndarray<T,3>& ndarr)
+  void save3DArrInEvent(PSEvt::Event& evt, const Pds::Src& src, const std::string& key, const ndarray<const T,3>& ndarr)
   {
-      boost::shared_ptr< ndarray<T,3> > shp( new ndarray<T,3>(ndarr) );
+      boost::shared_ptr< ndarray<const T,3> > shp( new ndarray<const T,3>(ndarr) );
       evt.put(shp, src, key);
   }
 
 //--------------------
 /// Save ndarray in file
   template <typename T>
-  void save2DArrayInFile(const std::string& fname, const ndarray<T,2>& ndarr, bool print_msg, FILE_MODE file_type=TEXT)
+  void save2DArrayInFile(const std::string& fname, const ndarray<const T,2>& ndarr, bool print_msg, FILE_MODE file_type=TEXT)
   {  
     if (fname.empty()) {
       MsgLog("GlobalMethods", warning, "The output file name is empty. 2-d array is not saved.");

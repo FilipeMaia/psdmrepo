@@ -201,7 +201,7 @@ CSPadImageGetTest::saveImageInFile(Event& evt)
   } // if (img2d.get())
 
 
-  shared_ptr< ndarray<double,2> > img = evt.get(m_str_src, m_key, &m_src);
+  shared_ptr< ndarray<const double,2> > img = evt.get(m_str_src, m_key, &m_src);
   if (img.get()) {
     MsgLog(name(), info, "::saveImageInFile(...): Get image as ndarray<double,2> from event and save it in file");
     CSPadPixCoords::Image2D<double> *img2d = new CSPadPixCoords::Image2D<double>(img->data(),img->shape()[0],img->shape()[1]);

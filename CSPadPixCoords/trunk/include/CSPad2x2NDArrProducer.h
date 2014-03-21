@@ -164,7 +164,7 @@ private:
             for ( ndarray<const data_cspad_t,3>::iterator it=data_ndarr.begin(); it!=data_ndarr.end(); ++it, ++it_out) {
 	        *it_out = (TOUT)*it;
       	    }
-	    save2DArrInEvent<TOUT>(evt, m_src, m_outkey, out_ndarr);
+	    save2DArrayInEvent<TOUT>(evt, m_src, m_outkey, out_ndarr);
 	}
 	else {
 
