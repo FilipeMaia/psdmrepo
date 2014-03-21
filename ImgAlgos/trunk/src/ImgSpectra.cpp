@@ -212,13 +212,13 @@ ImgSpectra::difSpectrum()
 void 
 ImgSpectra::procEvent(Event& evt)
 {
-  shared_ptr< ndarray<double,2> > sp_img = evt.get(m_str_src, m_key_in, &m_src);
+  shared_ptr< ndarray<const double,2> > sp_img = evt.get(m_str_src, m_key_in, &m_src);
   if (sp_img) {
     retrieveSpectra<double> (*sp_img, m_print_bits & 4);
     save2DArrayInEvent<double> (evt, m_src, m_key_out, m_data);
   }
 
-  shared_ptr< ndarray<uint16_t,2> > sp_img_u16 = evt.get(m_str_src, m_key_in, &m_src);
+  shared_ptr< ndarray<const uint16_t,2> > sp_img_u16 = evt.get(m_str_src, m_key_in, &m_src);
   if (sp_img_u16) {
     retrieveSpectra<uint16_t> (*sp_img_u16, m_print_bits & 4);
     save2DArrayInEvent<double> (evt, m_src, m_key_out, m_data);

@@ -203,6 +203,13 @@ private:
   template <typename T>
   bool defineImageShapeForType(PSEvt::Event& evt, const PSEvt::Source& src, const std::string& key, unsigned* shape)
   {
+    boost::shared_ptr< ndarray<const T,2> > img_const = evt.get(src, key);
+    if (img_const.get()) {
+      for(int i=0;i<2;i++) shape[i]=img_const->shape()[i];
+      //shape=img->shape();
+      return true;
+    } 
+
     boost::shared_ptr< ndarray<T,2> > img = evt.get(src, key);
     if (img.get()) {
       for(int i=0;i<2;i++) shape[i]=img->shape()[i];
@@ -219,19 +226,38 @@ private:
   {
     Pds::Src pds_src;    
 
-    boost::shared_ptr< ndarray<T,2> > shp2 = evt.get(src, key, &pds_src);
+    // CONST
+
+    boost::shared_ptr< ndarray<const T,2> >  shp2_const = evt.get(src, key, &pds_src);
+    if (shp2_const.get()) { ndarr_pars->setPars(2, shp2_const->size(), shp2_const->shape(), dtype, pds_src); return true; } 
+
+    boost::shared_ptr< ndarray<const T,3> >  shp3_const = evt.get(src, key, &pds_src);
+    if (shp3_const.get()) { ndarr_pars->setPars(3, shp3_const->size(), shp3_const->shape(), dtype, pds_src); return true; } 
+
+    boost::shared_ptr< ndarray<const T,4> >  shp4_const = evt.get(src, key, &pds_src);
+    if (shp4_const.get()) { ndarr_pars->setPars(4, shp4_const->size(), shp4_const->shape(), dtype, pds_src); return true; } 
+
+    boost::shared_ptr< ndarray<const T,5> >  shp5_const = evt.get(src, key, &pds_src);
+    if (shp5_const.get()) { ndarr_pars->setPars(5, shp5_const->size(), shp5_const->shape(), dtype, pds_src); return true; } 
+
+    boost::shared_ptr< ndarray<const T,1> >  shp1_const = evt.get(src, key, &pds_src);
+    if (shp1_const.get()) { ndarr_pars->setPars(1, shp1_const->size(), shp1_const->shape(), dtype, pds_src); return true; } 
+
+    // NON-CONST
+
+    boost::shared_ptr< ndarray<T,2> >  shp2 = evt.get(src, key, &pds_src);
     if (shp2.get()) { ndarr_pars->setPars(2, shp2->size(), shp2->shape(), dtype, pds_src); return true; } 
 
-    boost::shared_ptr< ndarray<T,3> > shp3 = evt.get(src, key, &pds_src);
+    boost::shared_ptr< ndarray<T,3> >  shp3 = evt.get(src, key, &pds_src);
     if (shp3.get()) { ndarr_pars->setPars(3, shp3->size(), shp3->shape(), dtype, pds_src); return true; } 
 
-    boost::shared_ptr< ndarray<T,4> > shp4 = evt.get(src, key, &pds_src);
+    boost::shared_ptr< ndarray<T,4> >  shp4 = evt.get(src, key, &pds_src);
     if (shp4.get()) { ndarr_pars->setPars(4, shp4->size(), shp4->shape(), dtype, pds_src); return true; } 
 
-    boost::shared_ptr< ndarray<T,5> > shp5 = evt.get(src, key, &pds_src);
+    boost::shared_ptr< ndarray<T,5> >  shp5 = evt.get(src, key, &pds_src);
     if (shp5.get()) { ndarr_pars->setPars(5, shp5->size(), shp5->shape(), dtype, pds_src); return true; } 
 
-    boost::shared_ptr< ndarray<T,1> > shp1 = evt.get(src, key, &pds_src);
+    boost::shared_ptr< ndarray<T,1> >  shp1 = evt.get(src, key, &pds_src);
     if (shp1.get()) { ndarr_pars->setPars(1, shp1->size(), shp1->shape(), dtype, pds_src); return true; } 
 
     return false;
@@ -409,17 +435,33 @@ private:
 
 
 //--------------------
-/// Save ndarray<T,2> in TEXT file
+/// Save ndarray<T,2> in TEXT file NON-CONST T
+//  template <typename T>
+//  void save2DArrayInFile(const std::string& fname, const ndarray<T,2>& p_ndarr, bool print_msg, FILE_MODE file_type=TEXT)
+//  {  
+//    save2DArrayInFile<T> (fname, p_ndarr.data(), p_ndarr.shape()[0], p_ndarr.shape()[1], print_msg, file_type);
+//  }
+
+//--------------------
+/// Save ndarray<const T,2> in TEXT file
   template <typename T>
-  void save2DArrayInFile(const std::string& fname, const ndarray<T,2>& p_ndarr, bool print_msg, FILE_MODE file_type=TEXT)
+  void save2DArrayInFile(const std::string& fname, const ndarray<const T,2>& p_ndarr, bool print_msg, FILE_MODE file_type=TEXT)
   {  
     save2DArrayInFile<T> (fname, p_ndarr.data(), p_ndarr.shape()[0], p_ndarr.shape()[1], print_msg, file_type);
   }
 
 //--------------------
-/// Save shared_ptr< ndarray<T,2> > in TEXT file
+/// Save shared_ptr< ndarray<const T,2> > in TEXT file WITH NON-CONST
   template <typename T>
   void save2DArrayInFile(const std::string& fname, const boost::shared_ptr< ndarray<T,2> >& p_ndarr, bool print_msg, FILE_MODE file_type=TEXT)
+  {  
+    save2DArrayInFile<T> (fname, p_ndarr->data(), p_ndarr->shape()[0], p_ndarr->shape()[1], print_msg, file_type);
+  }
+
+//--------------------
+/// Save shared_ptr< ndarray<T,2> > in TEXT file WITH CONST
+  template <typename T>
+  void save2DArrayInFile(const std::string& fname, const boost::shared_ptr< ndarray<const T,2> >& p_ndarr, bool print_msg, FILE_MODE file_type=TEXT)
   {  
     save2DArrayInFile<T> (fname, p_ndarr->data(), p_ndarr->shape()[0], p_ndarr->shape()[1], print_msg, file_type);
   }
@@ -429,10 +471,19 @@ private:
   template <typename T>
   bool save2DArrayInFileForType(PSEvt::Event& evt, const PSEvt::Source& src, const std::string& key, const std::string& fname, bool print_msg, FILE_MODE file_type=TEXT)
   {
-    boost::shared_ptr< ndarray<T,2> > img = evt.get(src, key);
-    if ( ! img.get() ) return false; 
-    save2DArrayInFile<T> (fname, img, print_msg, file_type);
-    return true;
+    boost::shared_ptr< ndarray<const T,2> > shp_const = evt.get(src, key);
+    if ( shp_const.get() ) {
+        save2DArrayInFile<T> (fname, shp_const, print_msg, file_type);
+        return true;
+    }
+
+    boost::shared_ptr< ndarray<T,2> > shp = evt.get(src, key);
+    if ( shp.get() ) {
+        save2DArrayInFile<T> (fname, shp, print_msg, file_type);
+        return true;
+    }
+
+    return false; 
   }
 
 //--------------------
@@ -448,22 +499,21 @@ private:
   }
 
 //--------------------
-/// Save 2-D array in event
+/// Save 2-D array in event for const T
   template <typename T>
-  void save2DArrayInEvent(PSEvt::Event& evt, const Pds::Src& src, const std::string& key, const ndarray<T,2>& data)
+  void save2DArrayInEvent(PSEvt::Event& evt, const Pds::Src& src, const std::string& key, const ndarray<const T,2>& data)
   {
-    boost::shared_ptr< ndarray<T,2> > img2d( new ndarray<T,2>(data) );
-    //boost::shared_ptr< ndarray<T,2> > img2d( &data );
+    boost::shared_ptr< ndarray<const T,2> > img2d( new ndarray<const T,2>(data) );
     evt.put(img2d, src, key);
   }
 
-// or its copy
-
+//--------------------
+/// Save 2-D non-const T array in event
   template <typename T>
-  void save2DArrInEvent(PSEvt::Event& evt, const Pds::Src& src, const std::string& key, const ndarray<T,2>& ndarr)
+  void saveNonConst2DArrayInEvent(PSEvt::Event& evt, const Pds::Src& src, const std::string& key, const ndarray<T,2>& data)
   {
-    boost::shared_ptr< ndarray<T,2> > shp( new ndarray<T,2>(ndarr) );
-    evt.put(shp, src, key);
+    boost::shared_ptr< ndarray<T,2> > img2d( new ndarray<T,2>(data) );
+    evt.put(img2d, src, key);
   }
 
 //-------------------
@@ -477,9 +527,9 @@ private:
    */
 
   template <typename T>
-  void save3DArrInEvent(PSEvt::Event& evt, const Pds::Src& src, const std::string& key, const ndarray<T,3>& ndarr)
+  void save3DArrInEvent(PSEvt::Event& evt, const Pds::Src& src, const std::string& key, const ndarray<const T,3>& ndarr)
   {
-      boost::shared_ptr< ndarray<T,3> > shp( new ndarray<T,3>(ndarr) );
+      boost::shared_ptr< ndarray<const T,3> > shp( new ndarray<const T,3>(ndarr) );
       evt.put(shp, src, key);
   }
 
@@ -506,29 +556,45 @@ private:
       if ( print_bits & 1 && ndim < 1 ) MsgLog("saveNDArrInEvent", warning, "ndim=" << ndim << " out of the range of implemented ndims [1,5]");
 
       if (ndim == 2) {
-        boost::shared_ptr< ndarray<T,2> > shp( new ndarray<T,2>(arr, ndarr_pars->shape()) );
+        boost::shared_ptr< ndarray<const T,2> > shp( new ndarray<const T,2>(arr, ndarr_pars->shape()) );
         evt.put(shp, src, key);
       } 
 
       else if (ndim == 3) {
-        boost::shared_ptr< ndarray<T,3> > shp( new ndarray<T,3>(arr, ndarr_pars->shape()) );
+        boost::shared_ptr< ndarray<const T,3> > shp( new ndarray<const T,3>(arr, ndarr_pars->shape()) );
         evt.put(shp, src, key);
       }
 
       else if (ndim == 4) {
-        boost::shared_ptr< ndarray<T,4> > shp( new ndarray<T,4>(arr, ndarr_pars->shape()) );
+        boost::shared_ptr< ndarray<const T,4> > shp( new ndarray<const T,4>(arr, ndarr_pars->shape()) );
         evt.put(shp, src, key);
       }
 
       else if (ndim == 5) {
-        boost::shared_ptr< ndarray<T,5> > shp( new ndarray<T,5>(arr, ndarr_pars->shape()) );
+        boost::shared_ptr< ndarray<const T,5> > shp( new ndarray<const T,5>(arr, ndarr_pars->shape()) );
         evt.put(shp, src, key);
       }
 
       else if (ndim == 1) {
-        boost::shared_ptr< ndarray<T,1> > shp( new ndarray<T,1>(arr, ndarr_pars->shape()) );
+        boost::shared_ptr< ndarray<const T,1> > shp( new ndarray<const T,1>(arr, ndarr_pars->shape()) );
         evt.put(shp, src, key);
       }
+  }
+
+//--------------------
+/// Get string of the 2-D array partial data for test print purpose with "const T"
+  template <typename T>
+    std::string stringOf2DArrayData(const ndarray<const T,2>& data, std::string comment="",
+                                  unsigned row_min=0, unsigned row_max=1, 
+                                  unsigned col_min=0, unsigned col_max=10 )
+  {
+      std::stringstream ss;
+      ss << comment << std::setprecision(3); 
+          for (unsigned r = row_min; r < row_max; ++ r) {
+            for (unsigned c = col_min; c < col_max; ++ c ) ss << " " << std::setw(7) << data[r][c]; 
+            if(row_max > 1) ss << " ...\n";
+	  }
+      return ss.str();
   }
 
 //--------------------

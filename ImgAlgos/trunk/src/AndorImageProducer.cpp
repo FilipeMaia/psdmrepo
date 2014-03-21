@@ -51,7 +51,8 @@ AndorImageProducer::AndorImageProducer (const std::string& name)
   , m_key_out()
   , m_outtype()
   , m_print_bits()
- {
+  , m_count_msg(0)
+{
     m_str_src    = configSrc("source",     "DetInfo(:Andor)");  // DetInfo(MecTargetChamber.0:Andor.1)
     m_key_in     = configStr("key_in",     "");
     m_key_out    = configStr("key_out",    "andorimg");
@@ -127,13 +128,12 @@ void
 AndorImageProducer::procEvent(Event& evt, Env& env)
 {  
   // proc event  for one of the supported data types
-  if ( m_dtype == ASDATA  and procEventForOutputType<unsigned short>   (evt) ) return; 
-  if ( m_dtype == FLOAT   and procEventForOutputType<float>            (evt) ) return; 
-  if ( m_dtype == DOUBLE  and procEventForOutputType<double>           (evt) ) return; 
-  if ( m_dtype == INT     and procEventForOutputType<int>              (evt) ) return; 
-  if ( m_dtype == INT16   and procEventForOutputType<int16_t>          (evt) ) return; 
+  if ( m_dtype == ASDATA  and procEventForOutputType<data_t> (evt) ) return; 
+  if ( m_dtype == FLOAT   and procEventForOutputType<float>  (evt) ) return; 
+  if ( m_dtype == DOUBLE  and procEventForOutputType<double> (evt) ) return; 
+  if ( m_dtype == INT     and procEventForOutputType<int>    (evt) ) return; 
+  if ( m_dtype == INT16   and procEventForOutputType<int16_t>(evt) ) return;
 }
-
 
 //--------------------
 

@@ -138,7 +138,7 @@ AcqirisCFD::event(Event& evt, Env& env)
           edges[j][0]= time;
         }
         std::stringstream ss; ss<<i;
-        save2DArrayInEvent<double> (evt, m_src, m_key_edges+ss.str(), edges);
+        saveNonConst2DArrayInEvent<double> (evt, m_src, m_key_edges+ss.str(), edges);
       }
     }
   }

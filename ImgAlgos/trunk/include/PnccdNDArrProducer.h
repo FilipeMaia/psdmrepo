@@ -52,6 +52,9 @@ namespace ImgAlgos {
 class PnccdNDArrProducer : public Module {
 public:
 
+  /// Data type for detector image 
+  typedef uint16_t data_t;
+
   const static size_t   Segs   = 4; 
   const static size_t   Rows   = 512; 
   const static size_t   Cols   = 512; 
@@ -114,7 +117,7 @@ private:
           for (unsigned i = 0 ; i != frames1->numLinks(); ++ i) {
           
               const Psana::PNCCD::FrameV1& frame = frames1->frame(i);          
-              const ndarray<const uint16_t, 2> data = frame.data();
+              const ndarray<const data_t, 2> data = frame.data();
 
               if( m_print_bits & 2 ) {      
                 str << "\n  Frame #" << i;          
@@ -126,7 +129,7 @@ private:
 	      }      
 
 	      // Copy frame from data to output ndarray with changing type
-              for ( ndarray<const uint16_t, 2>::iterator it=data.begin(); it!=data.end(); ++it, ++it_out) {
+              for ( ndarray<const data_t, 2>::iterator it=data.begin(); it!=data.end(); ++it, ++it_out) {
                   *it_out = (TOUT)*it;
               }
           }

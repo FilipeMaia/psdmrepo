@@ -25,10 +25,6 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "MsgLogger/MsgLogger.h"
-#include "psddl_psana/camera.ddl.h"
-#include "ImgAlgos/GlobalMethods.h"
-//#include "PSEvt/EventId.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -42,6 +38,18 @@ PSANA_MODULE_FACTORY(CameraImageProducer)
 // 		-- Public Function Member Definitions --
 //		----------------------------------------
 
+namespace {
+  
+  void
+  printFrameCoord(std::ostream& str, const Psana::Camera::FrameCoord& coord) 
+  {
+    str << "(" << coord.column() << ", " << coord.row() << ")";
+  }
+  
+}
+
+//--------------------
+
 namespace ImgAlgos {
 
 //----------------
@@ -52,6 +60,7 @@ CameraImageProducer::CameraImageProducer (const std::string& name)
   , m_str_src()
   , m_key_in()
   , m_key_out() 
+  , m_outtype()
   , m_subtract_offset()
   , m_print_bits()
   , m_count(0)
@@ -61,8 +70,11 @@ CameraImageProducer::CameraImageProducer (const std::string& name)
   m_str_src           = configSrc("source", "DetInfo(:Camera)");
   m_key_in            = configStr("key_in",                 "");
   m_key_out           = configStr("key_out",           "image");
+  m_outtype           = configStr("outtype",          "asdata");
   m_subtract_offset   = config   ("subtract_offset",      true);
   m_print_bits        = config   ("print_bits",             0 );
+
+  checkTypeImplementation();
 }
 
 //--------------------
@@ -75,6 +87,7 @@ CameraImageProducer::printInputParameters()
         << "\n source           : " << m_str_src
         << "\n key_in           : " << m_key_in      
         << "\n key_out          : " << m_key_out
+        << "\n outtype          : " << m_outtype
         << "\n subtract_offset  : " << m_subtract_offset     
         << "\n print_bits       : " << m_print_bits
         << "\n";     
@@ -98,15 +111,41 @@ CameraImageProducer::beginJob(Event& evt, Env& env)
 }
 
 /// Method which is called at the beginning of the run
-void 
-CameraImageProducer::beginRun(Event& evt, Env& env)
-{
-}
+void CameraImageProducer::beginRun(Event& evt, Env& env) {}
 
 /// Method which is called at the beginning of the calibration cycle
 void 
-CameraImageProducer::beginCalibCycle(Event& evt, Env& env)
+CameraImageProducer::beginCalibCycle(Event& evt, Env& env) 
 {
+  if( m_print_bits & 16 ) {
+
+      MsgLog(name(), info, "in beginCalibCycle()");
+      
+      shared_ptr<Psana::Camera::FrameFexConfigV1> config1 = env.configStore().get(m_src);
+      if (config1) {
+        WithMsgLog(name(), info, str) {
+          str << "Camera::FrameFexConfigV1:";
+          str << "\n  forwarding = " << config1->forwarding();
+          str << "\n  forward_prescale = " << config1->forward_prescale();
+          str << "\n  processing = " << config1->processing();
+          str << "\n  roiBegin = ";
+          ::printFrameCoord(str, config1->roiBegin());
+          str << "\n  roiEnd = ";
+          ::printFrameCoord(str, config1->roiEnd());
+          str << "\n  threshold = " << config1->threshold();
+          str << "\n  number_of_masked_pixels = " << config1->number_of_masked_pixels();
+          const ndarray<const Psana::Camera::FrameCoord, 1>& masked_pixels = config1->masked_pixel_coordinates();
+          for (unsigned i = 0; i < masked_pixels.shape()[0]; ++ i) {
+            str << "\n    ";
+            ::printFrameCoord(str, masked_pixels[i]);
+          }
+        }     
+      
+      } else {
+        MsgLog(name(), info, "Camera::FrameFexConfigV1 not found");    
+      }
+
+  }
 }
 
 /// Method which is called with event data, this is the only required 
@@ -120,20 +159,13 @@ CameraImageProducer::event(Event& evt, Env& env)
 }
   
 /// Method which is called at the end of the calibration cycle
-void 
-CameraImageProducer::endCalibCycle(Event& evt, Env& env)
-{
-}
+void CameraImageProducer::endCalibCycle(Event& evt, Env& env) {}
 
 /// Method which is called at the end of the run
-void 
-CameraImageProducer::endRun(Event& evt, Env& env)
-{
-}
+void CameraImageProducer::endRun(Event& evt, Env& env) {}
 
 /// Method which is called once at the end of the job
-void 
-CameraImageProducer::endJob(Event& evt, Env& env)
+void CameraImageProducer::endJob(Event& evt, Env& env)
 {
   if( m_print_bits & 4 ) printSummary(evt);
 }
@@ -144,43 +176,12 @@ CameraImageProducer::endJob(Event& evt, Env& env)
 void 
 CameraImageProducer::procEvent(Event& evt, Env& env)
 {
-  shared_ptr<Psana::Camera::FrameV1> frmData = evt.get(m_str_src, m_key_in, &m_src);
-  if (frmData.get()) {
-
-      // reserve memory for image array:
-      if(m_data.empty()) m_data = make_ndarray<double>(frmData->height(), frmData->width());
-
-      int offset = (m_subtract_offset) ? frmData->offset() : 0;
-
-      const ndarray<const uint8_t, 2>& data8 = frmData->data8();
-      if (not data8.empty()) {
-        if( m_print_bits & 8 ) MsgLog(name(), info, "procEvent(...): Get image as ndarray<const uint8_t,2>, subtract offset=" << offset);
-        ndarray<const uint8_t, 2>::iterator cit;
-        ndarray<double, 2>::iterator dit;
-        for(cit=data8.begin(), dit=m_data.begin(); cit!=data8.end(); ++cit, ++dit) { *dit = double(int(*cit) - offset); }
-
-        save2DArrayInEvent<double> (evt, m_src, m_key_out, m_data);
-      }
-
-      const ndarray<const uint16_t, 2>& data16 = frmData->data16();
-      if (not data16.empty()) {
-        if( m_print_bits & 8 ) MsgLog(name(), info, "procEvent(...): Get image as ndarray<const uint16_t,2>, subtract offset=" << offset);
-        ndarray<const uint16_t, 2>::iterator cit;
-        ndarray<double, 2>::iterator dit;
-        // This loop consumes ~5 ms/event for Opal1000 camera with 1024x1024 image size 
-        for(cit=data16.begin(), dit=m_data.begin(); cit!=data16.end(); ++cit, ++dit) { *dit = double(*cit) - offset; }
-
-	save2DArrayInEvent<double> (evt, m_src, m_key_out, m_data);
-      }
-    }
-  else
-    {
-      m_count_msg ++;
-      if (m_count_msg < 100)
-      MsgLog(name(), warning, "Camera::FrameV1 object is not available in the event(...) for source:" << m_str_src << " key:" << m_key_in);
-      if (m_count_msg == 100)
-      MsgLog(name(), warning, "STOP PRINTING WARNINGS for source:" << m_str_src << " key:" << m_key_in);
-    }
+  // proc event  for one of the supported data types
+  if ( m_dtype == ASDATA  and procEventForOutputType<data_t>  (evt) ) return; 
+  if ( m_dtype == FLOAT   and procEventForOutputType<float>   (evt) ) return; 
+  if ( m_dtype == DOUBLE  and procEventForOutputType<double>  (evt) ) return; 
+  if ( m_dtype == INT     and procEventForOutputType<int>     (evt) ) return; 
+  if ( m_dtype == INT16   and procEventForOutputType<int16_t> (evt) ) return; 
 }
 
 //--------------------
@@ -191,6 +192,7 @@ CameraImageProducer::printEventRecord(Event& evt, std::string comment)
   MsgLog( name(), info,  "Run="    << stringRunNumber(evt) 
                      << " Evt="    << stringFromUint(m_count) 
                      << " Time="   << stringTimeStamp(evt) 
+                     << comment.c_str() 
   );
 }
 
@@ -205,4 +207,21 @@ CameraImageProducer::printSummary(Event& evt, std::string comment)
 }
 
 //--------------------
+
+void 
+CameraImageProducer::checkTypeImplementation()
+{  
+  if ( m_outtype == "asdata" ) { m_dtype = ASDATA; return; }
+  if ( m_outtype == "float"  ) { m_dtype = FLOAT;  return; }
+  if ( m_outtype == "double" ) { m_dtype = DOUBLE; return; } 
+  if ( m_outtype == "int"    ) { m_dtype = INT;    return; } 
+  if ( m_outtype == "int16"  ) { m_dtype = INT16;  return; } 
+
+  const std::string msg = "The requested data type: " + m_outtype + " is not implemented";
+  MsgLog(name(), warning, msg );
+  throw std::runtime_error(msg);
+}
+
+//--------------------
 } // namespace ImgAlgos
+//--------------------

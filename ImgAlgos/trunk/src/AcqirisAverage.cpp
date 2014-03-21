@@ -296,7 +296,7 @@ AcqirisAverage::evaluateAverage(Event& evt)
     else std::fill_n(&m_wf_ave[c][0], int(m_nbrSamples), wform_t(0));
   }        
 
-  if (m_do_save_ave_evt) save2DArrayInEvent<wform_t> (evt, m_src, m_key_ave, m_wf_ave);
+  if (m_do_save_ave_evt) saveNonConst2DArrayInEvent<wform_t> (evt, m_src, m_key_ave, m_wf_ave);
   if (m_do_save_ave_file) save2DArrayInFile<wform_t> (m_fname_ave, m_wf_ave, m_print_bits & 8);
 
   if( m_print_bits & 4 ) MsgLog( name(), info, "Save average after local event = " << m_count_event );  

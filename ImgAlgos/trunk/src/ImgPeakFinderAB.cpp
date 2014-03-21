@@ -397,7 +397,7 @@ ImgPeakFinderAB::procStatArrays()
 void 
 ImgPeakFinderAB::procData(Event& evt)
 {
-  shared_ptr< ndarray<double,2> > img = evt.get(m_str_src, m_key, &m_src);
+  shared_ptr< ndarray<const double,2> > img = evt.get(m_str_src, m_key, &m_src);
   if (img.get()) {
     const double* m_data = img->data();
 

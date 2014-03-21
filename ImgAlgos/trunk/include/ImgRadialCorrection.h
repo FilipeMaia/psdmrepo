@@ -128,7 +128,7 @@ private:
   long        m_count;
 
   CSPadPixCoords::Image2D<double> *m_img2d;
-  ndarray<double,2> *m_ndarr;
+  ndarray<const double,2> *m_ndarr;
   //CSPadPixCoords::Image2D<double> *m_work2d;
 
   double m_data_arr[MAX_IMG_SIZE];

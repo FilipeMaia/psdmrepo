@@ -48,6 +48,9 @@ namespace ImgAlgos {
 class PnccdImageProducer : public Module {
 public:
 
+  /// Data type for detector image 
+  typedef uint16_t data_t;
+
   const static size_t   Segs   = ImgAlgos::PnccdNDArrProducer::Segs; 
   const static size_t   Rows   = ImgAlgos::PnccdNDArrProducer::Rows; 
   const static size_t   Cols   = ImgAlgos::PnccdNDArrProducer::Cols; 
@@ -97,17 +100,17 @@ private:
   template <typename T>
   bool procEventForFullFrame(Event& evt)
   { 
-      shared_ptr<T> frame = evt.get(m_str_src, m_key_in, &m_src);
+      shared_ptr<const T> frame = evt.get(m_str_src, m_key_in, &m_src);
       if (frame) {
       
-          const ndarray<uint16_t, 2> data = frame->data().copy();
+	  const ndarray<const data_t, 2> data = frame->data(); // .copy(); - if no const
       
           if( m_print_bits & 2 ) {
             for (int i=0; i<10; ++i) cout << " " << data[0][i];
             std::cout << "\n";
           }
      
-          save2DArrayInEvent<uint16_t> (evt, m_src, m_key_out, data);
+          save2DArrayInEvent<data_t> (evt, m_src, m_key_out, data);
           return true;
       }
       return false;
@@ -120,10 +123,10 @@ private:
   template <typename T>
   bool procEventFor3DArrType(Event& evt)
   { 
-      shared_ptr< ndarray<T,3> > shp = evt.get(m_str_src, m_key_in, &m_src);
+      shared_ptr< ndarray<const T,3> > shp = evt.get(m_str_src, m_key_in, &m_src);
       if (shp.get()) {
 
-          const ndarray<T,3> inp_ndarr = *shp.get(); //const T* p_data = shp->data();
+          const ndarray<const T,3> inp_ndarr = *shp.get(); //const T* p_data = shp->data();
 
 	  if( m_print_bits & 2 ) std::cout << "Input ndarray<T,3>:\n" << inp_ndarr;
 	  

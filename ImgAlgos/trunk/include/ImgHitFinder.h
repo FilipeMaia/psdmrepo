@@ -155,7 +155,7 @@ private:
   template <typename T, typename TOUT>
     bool procEventForType(Event& evt)
     {
-     	shared_ptr< ndarray<T,2> > img = evt.get(m_str_src, m_key_in, &m_src);
+     	shared_ptr< ndarray<const T,2> > img = evt.get(m_str_src, m_key_in, &m_src);
      	if (img.get()) {
 
      	  const T* _rdat = img->data();

@@ -9,6 +9,7 @@ import Image
 import os
 import sys
 import h5py
+import math
 
 #--------------------
 # Define graphical methods
@@ -24,9 +25,40 @@ def plot_image (arr, img_range=None, zrange=None) :    # range = (left, right, l
 
 def plot_histogram(arr, amp_range=None, figsize=(6,6), bins=40) :
     fig = plt.figure(figsize=figsize, dpi=80, facecolor='w', edgecolor='w', frameon=True)
-    plt.hist(arr.flatten(), bins=bins, range=amp_range)
-    #fig.canvas.manager.window.move(500,10)
-    
+    axhi = fig.add_axes([0.15, 0.1, 0.8, 0.85])
+    weights, bins, patches = axhi.hist(arr.flatten(), bins=bins, range=amp_range)
+    axhi.set_xlim([bins[0],bins[-1]]) 
+    add_stat_text(axhi, weights, bins)
+
+
+def add_stat_text(axhi, weights, bins) :
+    mean, rms, err_mean, err_rms, neff = proc_stat(weights,bins)
+    pm = r'$\pm$' 
+    txt = 'Mean = %8.2f%s%8.2f\nRMS = %8.2f%s%8.2f' % (mean, pm, err_mean, rms, pm, err_rms)
+    xb,xe = axhi.get_xlim()     
+    yb,ye = axhi.get_ylim()     
+    x = xb + (xe-xb)*0.75
+    y = yb + (ye-yb)*0.90
+    #bd=dict(fc=(1.0, 0.7, 0.7), ec=(1., .5, .5)),
+    axhi.text(x, y, txt, fontsize=12, color='k', backgroundcolor='c', bbox=None, ha='center', rotation=0)
+
+
+def proc_stat(weights, bins) :
+    center = np.array([0.5*(bins[i] + bins[i+1]) for i,w in enumerate(weights)])
+
+    sum_w  = weights.sum()
+    sum_w2 = (weights*weights).sum()
+    neff   = sum_w*sum_w/sum_w2
+    sum_1  = (weights*center).sum()
+    sum_2  = (weights*center*center).sum()
+    mean = sum_1/sum_w
+    rms2 = sum_2/sum_w - mean*mean
+    rms  = math.sqrt(rms2)
+    err_mean = rms/math.sqrt(neff)
+    err_rms  = err_mean/math.sqrt(2)    
+
+    return mean, rms, err_mean, err_rms, neff
+
 #--------------------
 
 def get_array_from_file(fname, dtype=np.float32) :
@@ -142,7 +174,7 @@ def do_main() :
     plt.savefig('camera-img.png')
 
 
-    plot_histogram(arr, amp_range=ampRange)
+    plot_histogram(arr, amp_range=ampRange, bins=80)
     plt.get_current_fig_manager().window.geometry("+950+10")
     plt.savefig('camera-spe.png')
 

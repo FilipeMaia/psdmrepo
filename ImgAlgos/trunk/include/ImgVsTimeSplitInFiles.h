@@ -175,7 +175,7 @@ protected:
     template <typename T>
     bool initSplitInFilesForType(Event& evt, Env& env)
     {
-      shared_ptr< ndarray<T,2> > img = evt.get(m_str_src, m_key, &m_src);
+      shared_ptr< ndarray<const T,2> > img = evt.get(m_str_src, m_key, &m_src);
 
       if (img.get()) {
 
@@ -238,10 +238,10 @@ protected:
     template <typename T>
     bool procEventForType(Event& evt)
     {
-      shared_ptr< ndarray<T,2> > img = evt.get(m_str_src, m_key, &m_src);
-      if (img.get()) {
+      shared_ptr< ndarray<const T,2> > shp = evt.get(m_str_src, m_key, &m_src);
+      if (shp.get()) {
         m_data_type_input = typeid(T).name();
-        procSplitAndWriteImgInFiles<T> (img, m_print_bits & 8);
+        procSplitAndWriteImgInFiles<T> (shp, m_print_bits & 8);
 	return true;
       }
       return false;      
@@ -250,7 +250,7 @@ protected:
 //--------------------
 // Splits the image for blocks and saves the blocks in files
     template <typename T>
-    void procSplitAndWriteImgInFiles (const boost::shared_ptr< ndarray<T,2> >& p_ndarr, 
+    void procSplitAndWriteImgInFiles (const boost::shared_ptr< ndarray<const T,2> >& p_ndarr, 
                                       bool print_msg=false) 
     {
       const T* img_data = p_ndarr->data();             // Access to entire image

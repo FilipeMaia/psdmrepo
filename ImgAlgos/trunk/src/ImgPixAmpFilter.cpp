@@ -171,7 +171,7 @@ ImgPixAmpFilter::getAndProcImage(Event& evt)
     return procImage(evt);
   }
 
-  shared_ptr< ndarray<double,2> > img = evt.get(m_src, m_key, &m_actualSrc);
+  shared_ptr< ndarray<const double,2> > img = evt.get(m_src, m_key, &m_actualSrc);
   if (img.get()) {
     MsgLog(name(), debug, "::procImage(...): Get image as ndarray<double,2> and wrap it in Image2D<double>");
     m_img2d = new CSPadPixCoords::Image2D<double>(img->data(),img->shape()[0],img->shape()[1]);

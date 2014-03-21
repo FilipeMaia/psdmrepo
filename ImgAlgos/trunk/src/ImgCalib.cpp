@@ -64,7 +64,8 @@ ImgCalib::ImgCalib (const std::string& name)
   , m_col_min()
   , m_col_max()
   , m_print_bits()
-  , m_count(0)
+  , m_count_event(0)
+  , m_count_get(0)
 {
   // get the values from configuration or use defaults
   m_str_src           = configSrc("source",   "DetInfo(:Camera)");
@@ -152,6 +153,7 @@ ImgCalib::beginJob(Event& evt, Env& env)
 void 
 ImgCalib::beginRun(Event& evt, Env& env)
 {
+  m_count_get = 0; // In order to load calibration pars etc for each run
 }
 
 /// Method which is called at the beginning of the calibration cycle
@@ -165,11 +167,10 @@ ImgCalib::beginCalibCycle(Event& evt, Env& env)
 void 
 ImgCalib::event(Event& evt, Env& env)
 {
-  if(!m_count) init(evt, env);
   if( m_print_bits & 2 ) printEventRecord(evt);
   procEvent(evt, env);
   // saveImageInEvent(evt); -> moved to procEventForType
-  ++ m_count;
+  ++ m_count_event;
 }
   
 /// Method which is called at the end of the calibration cycle
@@ -238,6 +239,8 @@ ImgCalib::init(Event& evt, Env& env)
 void 
 ImgCalib::procEvent(Event& evt, Env& env)
 {
+  if ( ! m_count_get  ) init(evt, env);
+
   if ( procEventForType<uint16_t, data_out_t> (evt) ) return;
   if ( procEventForType<int,      data_out_t> (evt) ) return;
   if ( procEventForType<float,    data_out_t> (evt) ) return;
@@ -265,8 +268,9 @@ void
 ImgCalib::printEventRecord(Event& evt)
 {
   MsgLog( name(), info,  "Run="    << stringRunNumber(evt) 
-                     << " Evt="    << stringFromUint(m_count) 
-                     << " Time="   << stringTimeStamp(evt) 
+                     << " evt="    << stringFromUint(m_count_event) 
+                     << " get="    << stringFromUint(m_count_get) 
+                     << " time="   << stringTimeStamp(evt) 
   );
 }
 

@@ -165,7 +165,37 @@ protected:
     bool collectStatForType(Event& evt)
     { 
       unsigned ndim = m_ndarr_pars->ndim();
+
+      // CONST
+
       if (ndim == 2) {
+        shared_ptr< ndarray<const T,2> > arr2_const = evt.get(m_str_src, m_key, &m_src);
+        if (arr2_const.get()) { accumulateCorrelators<T>(arr2_const->data()); return true; } 
+      }
+
+      else if (ndim == 3) {
+        shared_ptr< ndarray<const T,3> > arr3_const = evt.get(m_str_src, m_key, &m_src);
+        if (arr3_const.get()) { accumulateCorrelators<T>(arr3_const->data()); return true; } 
+      }
+
+      else if (ndim == 4) {
+        shared_ptr< ndarray<const T,4> > arr4_const = evt.get(m_str_src, m_key, &m_src);
+        if (arr4_const.get()) { accumulateCorrelators<T>(arr4_const->data()); return true; } 
+      }
+
+      else if (ndim == 5) {
+        shared_ptr< ndarray<const T,5> > arr5_const = evt.get(m_str_src, m_key, &m_src);
+        if (arr5_const.get()) { accumulateCorrelators<T>(arr5_const->data()); return true; } 
+      }
+
+      else if (ndim == 1) {
+        shared_ptr< ndarray<const T,1> > arr1_const = evt.get(m_str_src, m_key, &m_src);
+        if (arr1_const.get()) { accumulateCorrelators<T>(arr1_const->data()); return true; } 
+      }
+
+     // NON-CONST
+
+      else if (ndim == 2) {
         shared_ptr< ndarray<T,2> > arr2 = evt.get(m_str_src, m_key, &m_src);
         if (arr2.get()) { accumulateCorrelators<T>(arr2->data()); return true; } 
       }

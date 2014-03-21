@@ -185,7 +185,7 @@ SaveImageInFile::saveImageInFile(Event& evt)
   }
 
 
-  shared_ptr< ndarray<double,2> > img = evt.get(m_str_src, m_key, &m_src);
+  shared_ptr< ndarray<const double,2> > img = evt.get(m_str_src, m_key, &m_src);
   if (img.get()) {
     if( m_print_bits & 2 ) MsgLog(name(), info, "::saveImageInFile(...): Get image as ndarray<double,2> from event and save it in file");
     CSPadPixCoords::Image2D<double> *img2d = new CSPadPixCoords::Image2D<double>(img->data(),img->shape()[0],img->shape()[1]);
@@ -193,7 +193,7 @@ SaveImageInFile::saveImageInFile(Event& evt)
   }
 
 
-  shared_ptr< ndarray<uint16_t,2> > img_u16 = evt.get(m_str_src, m_key, &m_src);
+  shared_ptr< ndarray<const uint16_t,2> > img_u16 = evt.get(m_str_src, m_key, &m_src);
   if (img_u16.get()) {
     if( m_print_bits & 2 ) MsgLog(name(), info, "::saveImageInFile(...): Get image as ndarray<uint16_t,2> from event and save it in file");
     CSPadPixCoords::Image2D<uint16_t> *img2d = new CSPadPixCoords::Image2D<uint16_t>(img_u16->data(),img_u16->shape()[0],img_u16->shape()[1]);

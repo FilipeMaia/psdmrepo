@@ -157,12 +157,20 @@ protected:
     template <typename T>
     bool collectStatForType(Event& evt)
     { 
+      shared_ptr< ndarray<const T,2> > img_const = evt.get(m_str_src, m_key, &m_src);
+      if (img_const.get()) {
+          const T* data = img_const->data();
+          accumulateCorrelators<T>(data);
+          return true;
+      } 
+
       shared_ptr< ndarray<T,2> > img = evt.get(m_str_src, m_key, &m_src);
       if (img.get()) {
           const T* data = img->data();
           accumulateCorrelators<T>(data);
           return true;
       } 
+
       return false;
     }
 

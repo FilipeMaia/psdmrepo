@@ -129,7 +129,7 @@ void
 PnccdNDArrProducer::procEvent(Event& evt, Env& env)
 {  
   // proc event  for one of the supported data types
-  if ( m_dtype == ASDATA  and procEventForOutputType<uint16_t> (evt) ) return;
+  if ( m_dtype == ASDATA  and procEventForOutputType<data_t>   (evt) ) return;
   if ( m_dtype == FLOAT   and procEventForOutputType<float>    (evt) ) return;
   if ( m_dtype == DOUBLE  and procEventForOutputType<double>   (evt) ) return;
   if ( m_dtype == INT     and procEventForOutputType<int>      (evt) ) return;

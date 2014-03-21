@@ -10,31 +10,7 @@ from PyCSPadImage import CalibPars          as calp
 from PyCSPadImage import CalibParsEvaluated as cpe
 from PyCSPadImage import CSPadImageProducer as cip
 
-#--------------------
-# Define graphical methods
-
-def plot_image (arr, img_range=None, zrange=None, title='',figsize=(12,12), dpi=80) :    # img_range = (left, right, low, high), zrange=(zmin,zmax)
-    fig = plt.figure(figsize=figsize, dpi=dpi, facecolor='w',edgecolor='w',frameon=True)
-    fig.subplots_adjust(left=0.10, bottom=0.08, right=0.98, top=0.92, wspace=0.2, hspace=0.1)
-    figAxes = fig.add_subplot(111)
-    imAxes = figAxes.imshow(arr, origin='upper', interpolation='nearest', aspect='auto', extent=img_range)
-    if zrange != None : imAxes.set_clim(zrange[0],zrange[1])
-    colbar = fig.colorbar(imAxes, pad=0.03, fraction=0.04, shrink=1.0, aspect=40, orientation='horizontal')
-    fig.canvas.set_window_title(title)
-
-def plot_histogram(arr, amp_range=None, figsize=(6,6)) :
-    fig = plt.figure(figsize=figsize, dpi=80, facecolor='w', edgecolor='w', frameon=True)
-    plt.hist(arr.flatten(), bins=100, range=amp_range)
-    #fig.canvas.manager.window.move(500,10)
-
-def saveHRImageInFile(arr, ampRange=None, fname='cspad-arr-hr.png', figsize=(12,12), dpi=300) :
-    print 'SAVE HIGH RESOLUTION IMAGE IN FILE', fname
-    plot_image(arr, zrange=ampRange, figsize=figsize, dpi=dpi)
-    title = ''
-    for q in range(4) : title += ('Quad %d'%(q) + 20*' ')  
-    plt.title(title,color='b',fontsize=20)
-    plt.savefig(fname,dpi=dpi)
-    #plt.imsave('test.png', format='png',dpi=300)
+import GlobalGraphics as gg
 
 #--------------------
 
@@ -203,10 +179,10 @@ def get_input_parameters() :
     if nargs  > 1 : fname = sys.argv[1]
     else          : fname = fname_def
 
-    if nargs  > 2 : Amin = int(sys.argv[2])
+    if nargs  > 2 : Amin = float(sys.argv[2])
     else          : Amin = Amin_def
 
-    if nargs  > 3 : Amax = int(sys.argv[3])
+    if nargs  > 3 : Amax = float(sys.argv[3])
     else          : Amax = Amax_def
 
     if nargs  > 4 :         
@@ -245,7 +221,7 @@ def do_main() :
     #------------------------------------- New stuff
 
     # Plot 1
-    plot_image(arr_segs, zrange=ampRange)
+    gg.plot_image(arr_segs, zrange=ampRange)
     title = ''
     for q in range(4) : title += ('Quad %d'%(q) + 20*' ')  
     plt.title(title,color='b',fontsize=20)
@@ -254,20 +230,20 @@ def do_main() :
 
 
     # Plot 2
-    plot_image(arr, zrange=ampRange)
+    gg.plot_image(arr, zrange=ampRange)
     plt.get_current_fig_manager().window.geometry("+450+10")
     plt.savefig('cspad-img.png')
 
 
     # Plot 3
-    plot_histogram(arr_segs, amp_range=ampRange)
+    gg.plot_histogram(arr_raw, amp_range=ampRange)
     plt.get_current_fig_manager().window.geometry("+950+10")
     plt.savefig('cspad-spe.png')
 
     plt.show()
 
-    #saveHRImageInFile(arr_segs,ampRange,fname='cspad-arr-hr.png') 
-    #saveHRImageInFile(arr, ampRange, fname='cspad-img-hr.png') 
+    #gg.saveHRImageInFile(arr_segs,ampRange,fname='cspad-arr-hr.png') 
+    #gg.saveHRImageInFile(arr, ampRange, fname='cspad-img-hr.png') 
 
 
 #--------------------

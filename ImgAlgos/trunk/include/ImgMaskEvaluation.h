@@ -212,7 +212,7 @@ protected:
       template <typename T>
       bool collectStatForType(Event& evt) // const T* data, 
       { 
-        shared_ptr< ndarray<T,2> > img = evt.get(m_str_src, m_key, &m_src);
+        shared_ptr< ndarray<const T,2> > img = evt.get(m_str_src, m_key, &m_src);
         if (img.get()) {
 
             const T* _data = img->data();

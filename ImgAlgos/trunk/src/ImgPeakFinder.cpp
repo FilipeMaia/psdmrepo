@@ -202,11 +202,11 @@ ImgPeakFinder::getAndProcImage(Event& evt)
     if( m_print_bits & 16 ) MsgLog(name(), info, "getAndProcImage(...): Get image as Image2D<double>");
     m_img2d = img2d.get();
     const unsigned shape[] = {m_img2d->getNRows(), m_img2d->getNCols()};
-    m_ndarr = new ndarray<double,2>(m_img2d->data(), shape);
+    m_ndarr = new ndarray<const double,2>(m_img2d->data(), shape);
     return procImage(evt);
   }
 
-  shared_ptr< ndarray<double,2> > img = evt.get(m_str_src, m_key, &m_src);
+  shared_ptr< ndarray<const double,2> > img = evt.get(m_str_src, m_key, &m_src);
   if (img.get()) {
     if( m_print_bits & 16 ) MsgLog(name(), info, "getAndProcImage(...): Get image as ndarray<double,2>");
     m_img2d = new CSPadPixCoords::Image2D<double>(img->data(), img->shape()[0], img->shape()[1]);
@@ -232,7 +232,7 @@ ImgPeakFinder::getAndProcImage(Event& evt)
 	ndarray<const uint8_t, 2>::iterator cit;
 	for(cit=data8.begin(); cit!=data8.end(); cit++) { p_data[ind++] = double(int(*cit) - offset); }
 
-        m_ndarr = new ndarray<double,2>(p_data, shape);
+        m_ndarr = new ndarray<const double,2>(p_data, shape);
         m_img2d = new CSPadPixCoords::Image2D<double>(p_data, shape[0], shape[1]);
         return procImage(evt);
       }
@@ -245,7 +245,7 @@ ImgPeakFinder::getAndProcImage(Event& evt)
 	// This loop consumes ~5 ms/event for Opal1000 camera with 1024x1024 image size 
 	for(cit=data16.begin(); cit!=data16.end(); cit++) { p_data[ind++] = double(*cit) - offset; }
 
-        m_ndarr = new ndarray<double,2>(p_data, shape);
+        m_ndarr = new ndarray<const double,2>(p_data, shape);
         m_img2d = new CSPadPixCoords::Image2D<double>(p_data, shape[0], shape[1]);
         return procImage(evt);
       }

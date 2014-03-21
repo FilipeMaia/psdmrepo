@@ -148,7 +148,7 @@ private:
   size_t   m_colmin;
   size_t   m_colmax;
 
-  ndarray<double,2> *m_ndarr;
+  ndarray<const double,2> *m_ndarr;
   CSPadPixCoords::Image2D<double> *m_img2d;
   CSPadPixCoords::Image2D<double> *m_work2d;
 

@@ -175,7 +175,7 @@ ImgSpectraProc::printSpectra(Event& evt)
 void 
 ImgSpectraProc::getSpectra(Event& evt, bool print_msg)
 {
-  shared_ptr< ndarray<double,2> > sp = evt.get(m_str_src, m_key_in, &m_src);
+  shared_ptr< ndarray<const double,2> > sp = evt.get(m_str_src, m_key_in, &m_src);
   if (sp.get()) {
         m_data = sp->data(); 
 	m_rows = sp->shape()[0];

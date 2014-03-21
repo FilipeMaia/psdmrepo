@@ -135,7 +135,7 @@ protected:
 //--------------------
 
     template <typename T>
-    void retrieveSpectra(const ndarray<T,2>& sp_ndarr, bool print_msg=false)
+    void retrieveSpectra(const ndarray<const T,2>& sp_ndarr, bool print_msg=false)
       {
         const T* img_data = sp_ndarr.data();               // Access to entire image
 	unsigned rows = sp_ndarr.shape()[0];

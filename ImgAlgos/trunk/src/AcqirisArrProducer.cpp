@@ -287,8 +287,8 @@ AcqirisArrProducer::proc_and_put_wf_in_event(Event& evt, Env& env)
             }          
         }
     }
-    save2DArrayInEvent<wform_t> (evt, m_src, m_key_wform, wf);
-    save2DArrayInEvent<wtime_t> (evt, m_src, m_key_wtime, wt);
+    saveNonConst2DArrayInEvent<wform_t> (evt, m_src, m_key_wform, wf);
+    saveNonConst2DArrayInEvent<wtime_t> (evt, m_src, m_key_wtime, wt);
   }
 }
 

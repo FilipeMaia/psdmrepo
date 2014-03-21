@@ -51,6 +51,9 @@ namespace ImgAlgos {
 class AndorImageProducer : public Module {
 public:
 
+  /// Data type for detector image 
+  typedef uint16_t data_t;
+
   // Default constructor
   AndorImageProducer (const std::string& name) ;
 
@@ -80,8 +83,10 @@ private:
   std::string m_key_out;
   std::string m_outtype;
   unsigned    m_print_bits;
+  unsigned long  m_count_msg; 
 
   DATA_TYPE   m_dtype;
+
  
 //--------------------
   /**
@@ -89,10 +94,10 @@ private:
    * Returns false if data is missing.
    */
 
-  template <typename TOUT>
-  bool procEventForOutputType (Event& evt) {
+  template <typename TDATA, typename TOUT>
+  bool procDataForIOTypes (Event& evt) {
 
-      shared_ptr<Psana::Andor::FrameV1> frame1 = evt.get(m_str_src, m_key_in, &m_src);
+      shared_ptr<TDATA> frame1 = evt.get(m_str_src, m_key_in, &m_src);
       if (frame1) {
 
           if( m_print_bits & 2 ) {      
@@ -105,21 +110,20 @@ private:
 	  // Use ndarray directly from data
 	  if(m_dtype == ASDATA) {
 
-	      const ndarray<unsigned short, 2>& data_ndarr = frame1->data().copy(); // copy ... because need to get rid of const ?
+	      const ndarray<const data_t, 2>& data_ndarr = frame1->data();
               if( m_print_bits & 2 ) {for (int i=0; i<10; ++i) cout << " " << data_ndarr[0][i]; cout << "\n"; }      
 
-              //save2DArrayInEvent<const unsigned short> (evt, m_src, m_key_out, data_ndarr);
-              save2DArrayInEvent<unsigned short> (evt, m_src, m_key_out, data_ndarr);
+              save2DArrayInEvent<data_t> (evt, m_src, m_key_out, data_ndarr);
               return true;
 	  } 
 
 	  // Copy ndarray from data with type changing
-	  const ndarray<const unsigned short, 2>& data_ndarr = frame1->data();
+	  const ndarray<const data_t, 2>& data_ndarr = frame1->data();
           //const unsigned* shape = data_ndarr.shape();
           //ndarray<TOUT,2> out_ndarr = make_ndarray<TOUT>(shape[0], shape[1]);
           ndarray<TOUT,2> out_ndarr( data_ndarr.shape() );
           typename ndarray<TOUT,2>::iterator it_out = out_ndarr.begin(); 
-          for ( ndarray<const unsigned short,3>::iterator it=data_ndarr.begin(); it!=data_ndarr.end(); ++it, ++it_out) {
+          for ( ndarray<const data_t,3>::iterator it=data_ndarr.begin(); it!=data_ndarr.end(); ++it, ++it_out) {
               *it_out = (TOUT)*it;
           }
 
@@ -128,15 +132,33 @@ private:
  
           return true;
       }
-      else
-      {
-          MsgLog(name(), warning, "Andor::FrameV1 object is not available in the event(...) for source:"
-              << m_str_src << " key:" << m_key_in);
-	  return false;
-      }
 
     return false;
   }
+
+  //--------------------
+  /**
+   * @brief Process event for requested output type  TOUT
+   * Returns false if data is missing.
+   */
+
+  template <typename TOUT>
+  bool procEventForOutputType (Event& evt) {
+
+    if ( procDataForIOTypes <Psana::Andor::FrameV1, TOUT> (evt) ) return true;
+    //if ( procDataForIOTypes <Psana::Camera::FrameV2, TOUT> (evt) ) return true;
+
+    m_count_msg ++;
+    if (m_count_msg < 50)
+    MsgLog(name(), warning, "Andor::FrameV1 object is not available in the event(...) for source:" << m_str_src << " key:" << m_key_in);
+    if (m_count_msg == 50)
+    MsgLog(name(), warning, "STOP PRINTING WARNINGS for source:" << m_str_src << " key:" << m_key_in);
+
+    return false;
+  }
+
+  //--------------------
+
 
 //-------------------
 

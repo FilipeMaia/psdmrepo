@@ -286,6 +286,35 @@ private:
   template <typename T, typename TOUT>
     bool procEventForType(Event& evt)
     {
+      // CONST
+
+      if (m_ndim == 2) {
+     	shared_ptr< ndarray<const T,2> > shp2_const= evt.get(m_str_src, m_key_in, &m_src);
+     	if (shp2_const.get()) { applyCorrections<T,TOUT>(evt, shp2_const->data()); return true; } 
+      }
+
+      if (m_ndim == 3) {
+     	shared_ptr< ndarray<const T,3> > shp3_const = evt.get(m_str_src, m_key_in, &m_src);
+     	if (shp3_const.get()) { applyCorrections<T,TOUT>(evt, shp3_const->data()); return true; } 
+      }
+
+      if (m_ndim == 4) {
+     	shared_ptr< ndarray<const T,4> > shp4_const = evt.get(m_str_src, m_key_in, &m_src);
+     	if (shp4_const.get()) { applyCorrections<T,TOUT>(evt, shp4_const->data()); return true; } 
+      }
+
+      if (m_ndim == 5) {
+     	shared_ptr< ndarray<const T,5> > shp5_const = evt.get(m_str_src, m_key_in, &m_src);
+     	if (shp5_const.get()) { applyCorrections<T,TOUT>(evt, shp5_const->data()); return true; } 
+      }
+
+      if (m_ndim == 1) {
+     	shared_ptr< ndarray<const T,1> > shp1_const = evt.get(m_str_src, m_key_in, &m_src);
+     	if (shp1_const.get()) { applyCorrections<T,TOUT>(evt, shp1_const->data()); return true; } 
+      }
+
+      // NON-CONST
+
       if (m_ndim == 2) {
      	shared_ptr< ndarray<T,2> > shp2 = evt.get(m_str_src, m_key_in, &m_src);
      	if (shp2.get()) { applyCorrections<T,TOUT>(evt, shp2->data()); return true; } 

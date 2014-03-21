@@ -117,7 +117,8 @@ private:
   unsigned        m_col_min;          // window for background normalization
   unsigned        m_col_max;          // window for background normalization
   unsigned        m_print_bits;       // bit mask for print options
-  long            m_count;            // local event counter
+  long            m_count_event;      // local event counter
+  long            m_count_get;        // local successful get() counter
 
   unsigned        m_shape[2];         // image shape
   unsigned        m_cols;             // number of columns in the image 
@@ -150,13 +151,8 @@ private:
 //-------------------
 
   template <typename T, typename TOUT>
-    bool procEventForType(Event& evt)
+    void applyCorrections(Event& evt, const T* _rdat)
     {
-     	shared_ptr< ndarray<T,2> > img = evt.get(m_str_src, m_key_in, &m_src);
-     	if (img.get()) {
-
-     	  const T* _rdat = img->data();
-
      	  // 1) Evaluate: m_cdat[i] = (_rdat[i] - m_peds[i] - m_norm*m_bkgd[i]) * m_gain[i]; 
      	  // 2) apply mask: m_mask[i];
      	  // 3) apply constant threshold: m_low_thre;
@@ -165,6 +161,8 @@ private:
 	  //m_cdat = new double[m_size];
      	  //memcpy(m_cdat,m_rdat,m_size*sizeof(double)); 
           //MsgLog( name(), info, "m_shape: " << m_shape[0] << " " << m_shape[1] );
+
+	  m_count_get++;
 
 	  ndarray<TOUT,2> cdata(m_shape);
 	  TOUT* p_cdata = cdata.data();
@@ -196,15 +194,28 @@ private:
      	    }
      	  }
 
-          if( m_print_bits &  8 ) MsgLog( name(), info, stringOf2DArrayData<T>(*img.get(), std::string("Raw img data:")) );
+          //if( m_print_bits &  8 ) MsgLog( name(), info, stringOf2DArrayData<T>(*img.get(), std::string("Raw img data:")) );
+          if( m_print_bits &  8 ) MsgLog( name(), info, stringOf2DArrayData<T>(ndarray<const T,2>(_rdat, m_shape), std::string("Raw img data:")) );
           if( m_print_bits & 16 ) MsgLog( name(), info, stringOf2DArrayData<TOUT>(cdata, std::string("Calibr. data:")) );
  	  
           save2DArrayInEvent<TOUT> (evt, m_src, m_key_out, cdata);
-
-     	  return true;
-     	} 
-        return false;
     }  
+
+//-------------------
+
+  template <typename T, typename TOUT>
+    bool procEventForType(Event& evt)
+    {
+        // CONST
+     	shared_ptr< ndarray<const T,2> > shp_const = evt.get(m_str_src, m_key_in, &m_src);
+     	if (shp_const.get()) { applyCorrections<T,TOUT>(evt, shp_const->data()); return true; } 
+
+        // NON-CONST
+     	shared_ptr< ndarray<T,2> > shp = evt.get(m_str_src, m_key_in, &m_src);
+     	if (shp.get()) { applyCorrections<T,TOUT>(evt, shp->data()); return true; } 
+
+        return false;
+    }
 
 //-------------------
 

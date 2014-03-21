@@ -26,8 +26,6 @@
 // Collaborating Class Headers --
 //-------------------------------
 #include "MsgLogger/MsgLogger.h"
-#include "psddl_psana/princeton.ddl.h"
-#include "ImgAlgos/GlobalMethods.h"
 
 //-----------------------------------------------------------------------
 // Local Macros, Typedefs, Structures, Unions and Forward Declarations --
@@ -51,14 +49,19 @@ PrincetonImageProducer::PrincetonImageProducer (const std::string& name)
   , m_str_src()
   , m_key_in()
   , m_key_out() 
+  , m_outtype()
   , m_print_bits()
   , m_count(0)
+  , m_count_msg(0)
 {
   // get the values from configuration or use defaults
   m_str_src           = configSrc("source", "DetInfo(:Princeton)");
-  m_key_in            = configStr("key_in",                 "");
-  m_key_out           = configStr("key_out",           "image");
-  m_print_bits        = config   ("print_bits",             0 );
+  m_key_in            = configStr("key_in",                    "");
+  m_key_out           = configStr("key_out",              "image");
+  m_outtype           = configStr("outtype",             "asdata");
+  m_print_bits        = config   ("print_bits",                0 );
+
+  checkTypeImplementation();
 }
 
 //--------------------
@@ -71,6 +74,7 @@ PrincetonImageProducer::printInputParameters()
         << "\n source           : " << m_str_src
         << "\n key_in           : " << m_key_in      
         << "\n key_out          : " << m_key_out
+        << "\n outtype          : " << m_outtype
         << "\n print_bits       : " << m_print_bits
         << "\n";     
   }
@@ -167,6 +171,86 @@ PrincetonImageProducer::beginCalibCycle(Event& evt, Env& env)
         str << "\n  numPixels = " << config3->numPixels();
       } 
     }
+
+    shared_ptr<Psana::Princeton::ConfigV4> config4 = env.configStore().get(m_src);
+    if (config4) {
+      WithMsgLog(name(), info, str) {
+        str << "Princeton::ConfigV4:";
+        str << "\n  width = " << config4->width();
+        str << "\n  height = " << config4->height();
+        str << "\n  orgX = " << config4->orgX();
+        str << "\n  orgY = " << config4->orgY();
+        str << "\n  binX = " << config4->binX();
+        str << "\n  binY = " << config4->binY();
+        str << "\n  maskedHeight = " << config4->maskedHeight();
+        str << "\n  kineticHeight = " << config4->kineticHeight();
+        str << "\n  vsSpeed = " << config4->vsSpeed();
+        str << "\n  exposureTime = " << config4->exposureTime();
+        str << "\n  coolingTemp = " << config4->coolingTemp();
+        str << "\n  gainIndex = " << int(config4->gainIndex());
+        str << "\n  readoutSpeedIndex = " << int(config4->readoutSpeedIndex());
+        str << "\n  exposureEventCode = " << config4->exposureEventCode();
+        str << "\n  numDelayShots = " << config4->numDelayShots();
+        str << "\n  frameSize = " << config4->frameSize();
+        str << "\n  numPixels = " << config4->numPixels();
+      }
+    }
+  
+    shared_ptr<Psana::Princeton::ConfigV5> config5 = env.configStore().get(m_src);
+    if (config5) {
+      WithMsgLog(name(), info, str) {
+        str << "Princeton::ConfigV5:";
+        str << "\n  width = " << config5->width();
+        str << "\n  height = " << config5->height();
+        str << "\n  orgX = " << config5->orgX();
+        str << "\n  orgY = " << config5->orgY();
+        str << "\n  binX = " << config5->binX();
+        str << "\n  binY = " << config5->binY();
+        str << "\n  exposureTime = " << config5->exposureTime();
+        str << "\n  coolingTemp = " << config5->coolingTemp();
+        str << "\n  gainIndex = " << config5->gainIndex();
+        str << "\n  readoutSpeedIndex = " << config5->readoutSpeedIndex();
+        str << "\n  maskedHeight = " << config5->maskedHeight();
+        str << "\n  kineticHeight = " << config5->kineticHeight();
+        str << "\n  vsSpeed = " << config5->vsSpeed();
+        str << "\n  infoReportInterval = " << config5->infoReportInterval();
+        str << "\n  exposureEventCode = " << config5->exposureEventCode();
+        str << "\n  numDelayShots = " << config5->numDelayShots();
+        str << "\n  frameSize = " << config5->frameSize();
+        str << "\n  numPixels = " << config5->numPixels();
+      }
+    }
+
+    shared_ptr<Psana::Pimax::ConfigV1> config1_pimax = env.configStore().get(m_src);
+    if (config1_pimax) {    
+      WithMsgLog(name(), info, str) {
+        str << "Pimax::ConfigV1:";
+        str << "\n  width = " << config1_pimax->width();
+        str << "\n  height = " << config1_pimax->height();
+        str << "\n  orgX = " << config1_pimax->orgX();
+        str << "\n  orgY = " << config1_pimax->orgY();
+        str << "\n  binX = " << config1_pimax->binX();
+        str << "\n  binY = " << config1_pimax->binY();
+        str << "\n  exposureTime = " << config1_pimax->exposureTime();
+        str << "\n  coolingTemp = " << config1_pimax->coolingTemp();
+        str << "\n  readoutSpeed = " << config1_pimax->readoutSpeed();
+        str << "\n  gainIndex = " << config1_pimax->gainIndex();
+        str << "\n  intensifierGain = " << config1_pimax->intensifierGain();
+        str << "\n  gateDelay = " << config1_pimax->gateDelay();
+        str << "\n  gateWidth = " << config1_pimax->gateWidth();
+        str << "\n  maskedHeight = " << config1_pimax->maskedHeight();
+        str << "\n  kineticHeight = " << config1_pimax->kineticHeight();
+        str << "\n  vsSpeed = " << config1_pimax->vsSpeed();
+        str << "\n  infoReportInterval = " << config1_pimax->infoReportInterval();
+        str << "\n  exposureEventCode = " << config1_pimax->exposureEventCode();
+        str << "\n  numIntegrationShots = " << config1_pimax->numIntegrationShots();
+        str << "\n  frameSize = " << config1_pimax->frameSize();
+        str << "\n  numPixelsX = " << config1_pimax->numPixelsX();
+        str << "\n  numPixelsY = " << config1_pimax->numPixelsY();
+        str << "\n  numPixels = " << config1_pimax->numPixels();
+      }    
+    }
+
   }
 }
 
@@ -205,20 +289,12 @@ PrincetonImageProducer::endJob(Event& evt, Env& env)
 void 
 PrincetonImageProducer::procEvent(Event& evt, Env& env)
 {
-  shared_ptr<Psana::Princeton::FrameV1> frame = evt.get(m_str_src, m_key_in, &m_src);
-  if (frame.get()) {
-
-      const ndarray<uint16_t, 2>& data = frame->data().copy();
-      save2DArrayInEvent<uint16_t> (evt, m_src, m_key_out, data);
-          
-      if( m_print_bits & 1 && m_count < 2 ) MsgLog( name(), info, " I/O data type: " << strOfDataTypeAndSize<uint16_t>() );
-      if( m_print_bits & 8 ) MsgLog( name(), info, stringOf2DArrayData<uint16_t>(data, std::string(" data: ")) );
-  }
-  else
-  {
-    MsgLog(name(), info, "Princeton::FrameV1 object is not available in the event(...) for source:"
-        << m_str_src << " key:" << m_key_in);
-  }
+  // proc event  for one of the supported data types
+  if ( m_dtype == ASDATA  and procEventForOutputType<data_t>  (evt) ) return; 
+  if ( m_dtype == FLOAT   and procEventForOutputType<float>   (evt) ) return; 
+  if ( m_dtype == DOUBLE  and procEventForOutputType<double>  (evt) ) return; 
+  if ( m_dtype == INT     and procEventForOutputType<int>     (evt) ) return; 
+  if ( m_dtype == INT16   and procEventForOutputType<int16_t> (evt) ) return; 
 }
 
 //--------------------
@@ -242,6 +318,22 @@ PrincetonImageProducer::printSummary(Event& evt, std::string comment)
 	                << " Number of processed events=" << stringFromUint(m_count)
                         << comment.c_str()
   );
+}
+
+//--------------------
+
+void 
+PrincetonImageProducer::checkTypeImplementation()
+{  
+  if ( m_outtype == "asdata" ) { m_dtype = ASDATA; return; }
+  if ( m_outtype == "float"  ) { m_dtype = FLOAT;  return; }
+  if ( m_outtype == "double" ) { m_dtype = DOUBLE; return; } 
+  if ( m_outtype == "int"    ) { m_dtype = INT;    return; } 
+  if ( m_outtype == "int16"  ) { m_dtype = INT16;  return; } 
+
+  const std::string msg = "The requested data type: " + m_outtype + " is not implemented";
+  MsgLog(name(), warning, msg );
+  throw std::runtime_error(msg);
 }
 
 //--------------------

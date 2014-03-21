@@ -11,6 +11,15 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-37
+2014-03-21 Mikhail S. Dubrovin
+- in all modules except Acquiris* 
+   -  all ndarr<T,Ndim> are replaced by ndarr<const T,Ndim> in evt.put(...) methods
+   -  along with
+          ndarr<T,Ndim> = get.evt(...) also check
+	  ndarr<const T,Ndim> = get.evt(...)
+- add ExampleDumpImg
+	
 Tag: V00-03-36
 2014-03-08 Mikhail S. Dubrovin
 - in PnccdImageProducer introduce two gap parameters in rows and cols in stead of one
