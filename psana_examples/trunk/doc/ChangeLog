@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-04-15
+2014-03-21 Mikhail Dubrovin
+- in DumpPimax change comment from Princeton::FrameV1 to Pimax::FrameV1
+	
 Tag: V00-04-14
 2014-03-17 Mikhail Dubrovin
 - add DumpPimax, tested for exp=amob5114:run=16

@@ -64,7 +64,7 @@ DumpPimax::beginCalibCycle(Event& evt, Env& env)
   if (config1) {
     
     WithMsgLog(name(), info, str) {
-      str << "Princeton::ConfigV1:";
+      str << "Pimax::ConfigV1:";
       str << "\n  width = " << config1->width();
       str << "\n  height = " << config1->height();
       str << "\n  orgX = " << config1->orgX();
@@ -100,7 +100,7 @@ DumpPimax::event(Event& evt, Env& env)
   shared_ptr<Psana::Pimax::FrameV1> frame1 = evt.get(m_src);
   if (frame1) {
     WithMsgLog(name(), info, str) {
-      str << "Princeton::FrameV1:";
+      str << "Pimax::FrameV1:";
       str << "\n  shotIdStart = " << frame1->shotIdStart();
       str << "\n  readoutTime = " << frame1->readoutTime();
       str << "\n  temperature = " << frame1->temperature();
