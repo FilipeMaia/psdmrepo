@@ -7,7 +7,8 @@
             <file>file:/F:/lcls/releases/pswww-apps-dev/LogBook/web/lib/logbook/logbookutils.class.php</file>
         </group>
         <group name="PCDS Web App">
-            <file>file://AFS/slac.stanford.edu/u/ec/gapon/lcls/releases/pswww-apps-dev/LogBook/web/html/ws/RequestAllRuns.php</file>
+            <file>file://AFS/slac.stanford.edu/u/ec/gapon/lcls/releases/pswww-apps-dev/LogBook/web/lib/logbook/logbookexperiment.class.php</file>
+            <file>file://AFS/slac.stanford.edu/u/ec/gapon/lcls/releases/pswww-apps-dev/LogBook/web/html/ws/RequestShifts.php</file>
         </group>
     </open-files>
 </project-private>

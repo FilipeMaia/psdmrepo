@@ -95,6 +95,12 @@ class LogBookUtils {
                 "relevance_time"  => is_null( $entry->relevance_time()) ? 'n/a' : $entry->relevance_time()->toStringShort(),
                 "run"             => '',
                 "shift"           => '',
+                "shift_id"        => 0,
+                "shift_begin"     => 
+                    array (
+                        'ymd'  => '',
+                        'hms'  => '',
+                        'time' => ''),
                 "author"          => ( $posted_at_instrument ? $entry->parent()->name().'&nbsp;-&nbsp;' : '' ).$entry->author(),
                 "id"              => $entry->id(),
                 "parent_id"       => $entry->parent_entry_id() ,
@@ -177,6 +183,16 @@ class LogBookUtils {
                 "relevance_time"  => is_null( $entry->relevance_time()) ? 'n/a' : $entry->relevance_time()->toStringShort(),
                 "run"             => is_null( $run   ) ? '' : "<a href=\"javascript:select_run({$run->shift()->id()},{$run->id()})\" class=\"lb_link\">{$run->num()}</a>",
                 "shift"           => is_null( $shift ) ? '' : "<a href=\"javascript:select_shift(".$shift->id().")\" class=\"lb_link\">".$shift->begin_time()->toStringShort().'</a>',
+                "shift_id"        => is_null( $shift ) ? 0  : $shift->id() ,
+                "shift_begin"     => is_null( $shift ) ?
+                    array (
+                        'ymd'  => '',
+                        'hms'  => '',
+                        'time' => '') :
+                    array (
+                        'ymd'  => $shift->begin_time()->toStringDay(),
+                        'hms'  => $shift->begin_time()->toStringHMS(),
+                        'time' => $shift->begin_time()->toStringShort()),
                 "author"          => ( $posted_at_instrument ? $entry->parent()->name().'&nbsp;-&nbsp;' : '' ).$entry->author(),
                 "id"              => $entry->id(),
                 "parent_id"       => 0 ,
@@ -243,7 +259,7 @@ class LogBookUtils {
         $event_time_url =  "<a href=\"javascript:select_run({$run->shift()->id()},{$run->id()})\" class=\"lb_link\">{$timestamp->toStringShort()}</a>";
         $relevance_time_str = $timestamp->toStringShort();
     
-        $shift_begin_time_str = '';
+        $shift = $run->shift();
         $run_number_str = '';
     
         $tag_ids = array();
@@ -257,7 +273,13 @@ class LogBookUtils {
                 "event_time"      => $event_time_url, //$entry->insert_time()->toStringShort(),
                 "relevance_time"  => $relevance_time_str,
                 "run"             => $run_number_str,
-                "shift"           => $shift_begin_time_str,
+                "shift"           => is_null( $shift ) ? '' : "<a href=\"javascript:select_shift(".$shift->id().")\" class=\"lb_link\">".$shift->begin_time()->toStringShort().'</a>',
+                "shift_id"        => is_null( $shift ) ? 0  : $shift->id() ,
+                "shift_begin"     =>
+                    array (
+                        'ymd'  => $shift->begin_time()->toStringDay(),
+                        'hms'  => $shift->begin_time()->toStringHMS(),
+                        'time' => $shift->begin_time()->toStringShort()),
                 "author"          => ( $posted_at_instrument ? $entry->parent()->name().'&nbsp;-&nbsp;' : '' ).'DAQ/RC',
                 "id"              => $id,
                 "parent_id"       => 0 ,

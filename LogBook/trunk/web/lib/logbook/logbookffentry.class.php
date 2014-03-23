@@ -56,8 +56,18 @@ class LogBookFFEntry {
     public function exper_id() {
         return $this->attr['exper_id']; }
 
+    /**
+     * Return a numeric identifier of the shift.
+     * 
+     * Note that this method will only return a shift which was explicitly provided
+     * when posting the message. The other method LogBookFFEntry::shift() would also
+     * return the default shift for the message.
+     *
+     * @see LogBookFFEntry::shift()
+     * @return Number
+     */
     public function shift_id() {
-        return $this->attr['shift_id']; }
+        return intval($this->attr['shift_id']); }
 
     public function run_id() {
         return $this->attr['run_id']; }
@@ -94,13 +104,26 @@ class LogBookFFEntry {
     public function deleted_by() {
         return $this->attr['deleted_by']; }
 
-    /* Operations
+    /**
+     * Find a shift object for the entry.
+     * 
+     * None that that would be either a shift which was explicitly specified
+     * when posting the entry, or the one deduced based on the relevance time
+     * of the message.
+     *
+     * @return LogBookShift
+     * @throws LogBookException
      */
     public function shift() {
-        $shift = $this->parent()->find_shift_by_id( $this->shift_id());
+        $shift_id = intval($this->attr['shift_id']);
+        $shift = $shift_id ?
+            $this->parent()->find_shift_by_id( $shift_id ) :
+            $this->parent()->find_shift_at   ( $this->relevance_time()->to64());
+/*
         if( is_null( $shift ))
             throw new LogBookException (
-                __METHOD__, "no shift for the entry. Database may be corrupted." );
+                __METHOD__, "no shift for the entry. Database may be corrupted: hdr_id={$this->hdr_id()} shift_id={$shift_id}" );
+*/
         return $shift;
     }
 
