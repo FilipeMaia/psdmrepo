@@ -144,6 +144,7 @@ try {
     $elog_can_manage_shifts   = LogBookAuth::instance()->canManageShifts   ($logbook_experiment->id()) ;
 
     $calibrations_can_edit = 
+        $elog_can_post_messages ||
         RegDB::instance()->is_member_of_posix_group('ps-data', AuthDb::instance()->authName()) ||
         (!$experiment->is_facility() && RegDB::instance()->is_member_of_posix_group('ps-'.strtolower($instrument->name()), AuthDb::instance()->authName())) ;
 
@@ -155,6 +156,9 @@ try {
         RegDB::instance()->is_member_of_posix_group($logbook_experiment->POSIX_gid(), AuthDb::instance()->authName()) ||
         (!$experiment->is_facility() && RegDB::instance()->is_member_of_posix_group('ps-'.strtolower( $instrument->name()), AuthDb::instance()->authName())) ;
     
+    $hdf5_can_retranslate =
+        $is_data_administrator || (!$experiment->is_facility() && RegDB::instance()->is_member_of_posix_group('ps-'.strtolower( $instrument->name()), AuthDb::instance()->authName())) ;
+
     $shiftmgr_can_edit = AuthDb::instance()->hasRole (
         AuthDb::instance()->authName() ,
         null ,
@@ -330,7 +334,7 @@ var access_list = {
     hdf5 : {
         read                  : <?= $experiment_can_read_data ? 1 : 0 ?> ,
         manage                : <?= $elog_can_post_messages   ? 1 : 0 ?> ,
-        is_data_administrator : <?= $is_data_administrator    ? 1 : 0 ?>
+        is_data_administrator : <?= $hdf5_can_retranslate     ? 1 : 0 ?>
     } ,
     shiftmgr : {
         can_edit : <?= $shiftmgr_can_edit ? 1 : 0 ; ?>

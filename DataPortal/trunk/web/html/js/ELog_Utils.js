@@ -54,6 +54,31 @@ var ELog_Utils = new function () {
             }
         ) ;
     } ;
+
+
+    this.load_shifts = function (exper_id, target4shifts, on_success, on_failure) {
+        Fwk.web_service_GET (
+            '../logbook/ws/RequestShifts.php' ,
+            {id: exper_id} ,
+            function (data) {
+
+                if (target4shifts) {
+                    var html = '<option value="0" ></option>' ;
+                    for (var i in data.ResultSet.Result) {
+                        var shift = data.ResultSet.Result[i] ;
+                        html += '<option value="'+shift.id+'" >'+shift.begin_time+'</option>' ;
+                    }
+                    target4shifts.html(html) ;
+
+                }
+                if (on_success) { on_success(data.ResultSet.Result) ; }
+            } ,
+            function (msg) {
+                if (on_failure) on_failure(msg) ;
+                else            Fwk.report_error(msg) ; 
+            }
+        ) ;
+    } ;
 } ;
 
 

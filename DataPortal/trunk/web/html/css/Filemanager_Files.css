@@ -80,6 +80,9 @@
   margin-right: 5px;
 }
 
+#datafiles-xtchdf5 > #body > #viewer {
+  margin-top:10px;
+}
 #datafiles-xtchdf5 > #body > #viewer * {
   font-family: Verdana !important;
 }

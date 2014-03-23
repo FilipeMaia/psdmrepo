@@ -142,7 +142,7 @@ function ELog_Live (experiment, access_list) {
         this._info    = body.find('div#info') ;
         this._updated = body.find('div#updated') ;
 
-        this._viewer = new ELog_MessageViewer(this, this._wa.find('#viewer')) ;
+        this._viewer = new ELog_MessageViewer(this, this._wa.find('#viewer'), {allow_groups: true}) ;
 
         if (when_done) when_done () ;
     } ;

@@ -18,7 +18,9 @@ function ELog_Post (experiment, access_list, post_onsuccess) {
     // ------------------------------------------------
 
     this.on_activate = function() {
-        this.on_update() ;
+        this.init() ;
+        this.load_shifts() ;    // -- make sure we have the latest state of the shifts
+        this.load_tags() ;      // -- make sure we have the latest state of the shifts
     } ;
 
     this.on_deactivate = function() {
@@ -81,6 +83,11 @@ function ELog_Post (experiment, access_list, post_onsuccess) {
 '    <input type="text" id="runnum" value="" size=4 />' +
 '  </div>' +
 '  <div class="info" style="float:left; margin-left:5px; padding-top:5px;">(optional)</div>' +
+'  <div style="float:left; font-weight:bold; margin-left:20px; padding-top:5px;">Shift:</div>' +
+'  <div style="float:left; margin-left:5px;">' +
+'    <select id="shift" ></select>' +
+'  </div>' +
+'  <div class="info" style="float:left; margin-left:5px; padding-top:5px;">(optional)</div>' +
 '  <div style="clear:both;"></div>' +
 '  <form id="form" enctype="multipart/form-data" action="../logbook/ws/NewFFEntry4portalJSON.php" method="post">' +
 '    <input type="hidden" name="id" value="'+this.experiment.id+'" />' +
@@ -122,6 +129,7 @@ function ELog_Post (experiment, access_list, post_onsuccess) {
         this.wa.html(html) ;
 
         this.runnum = this.wa.find('input#runnum') ;
+        this.shift  = this.wa.find('select#shift') ;
         this.form   = this.wa.find('form#form') ;
 
         this.form_scope          = this.form.find('input[name="scope"]') ;
@@ -148,9 +156,12 @@ function ELog_Post (experiment, access_list, post_onsuccess) {
                 return ;
             }
 
+            that.form_scope.val('experiment') ;
+
+            var runnum = 0 ;
             var str = that.runnum.val() ;
             if (str) {
-                var runnum = parseInt(str) ;
+                runnum = parseInt(str) ;
                 if (!runnum) {
                     Fwk.report_error('Failed to parse the run number. Please, correct or clean the field.') ;
                     return ;
@@ -158,8 +169,20 @@ function ELog_Post (experiment, access_list, post_onsuccess) {
                 that.form_scope.val('run') ;
                 that.form_run_num.val(runnum) ;
             } else {
-                that.form_scope.val('experiment') ;
                 that.form_run_num.val('') ;
+            }
+
+            var shift_id = parseInt(that.shift.val()) ;
+            if (shift_id) {
+                that.form_scope.val('shift') ;
+                that.form_shift_id.val(shift_id) ;
+            } else {
+                that.form_shift_id.val('') ;
+            }
+
+            if (runnum && shift_id) {
+                Fwk.report_error('Run number and shift are mutually exclusive options. Please, chose either one or another.') ;
+                return ;
             }
 
             /* Submit the new message using the JQuery AJAX POST plug-in,
@@ -193,6 +216,7 @@ function ELog_Post (experiment, access_list, post_onsuccess) {
             that.post_reset() ;
         }) ;
 
+        this.load_shifts() ;
         this.load_tags() ;
         this.post_reset() ;
     };
@@ -203,7 +227,11 @@ function ELog_Post (experiment, access_list, post_onsuccess) {
 
     this.post_reset = function () {
 
+        this.load_shifts() ;    // -- make sure we have the latest state of the shifts
+        this.load_tags() ;      // -- make sure we have the latest state of the shifts
+
         this.runnum.val('') ;
+        this.shift.val(0) ;
 
         this.form_scope.val('') ;
         this.form_message_text.val('') ;
@@ -230,6 +258,12 @@ function ELog_Post (experiment, access_list, post_onsuccess) {
         this.form_attachments.find('input:file[name="file2attach_'+num+'"]').change(function () { that.post_add_attachment() ; }) ;
     } ;
     
+    this.load_shifts = function () {
+        ELog_Utils.load_shifts (
+            this.experiment.id ,
+            this.shift
+        ) ;
+    } ;
     this.load_tags = function () {
         ELog_Utils.load_tags_and_authors (
             this.experiment.id ,

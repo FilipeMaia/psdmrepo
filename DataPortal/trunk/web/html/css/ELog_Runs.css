@@ -42,7 +42,10 @@
 #elog-runs .info {
   color: maroon;
 }
-
+#elog-runs > #body > #viewer {
+  margin-top: 10px;
+}
+    
 #elog-runs > #body .run-cont > #messages {
   margin: 0px 10px 15px 10px;
 }

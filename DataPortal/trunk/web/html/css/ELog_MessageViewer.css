@@ -1,3 +1,18 @@
+.elog-msg-viewer > #ctrl {
+  margin: 15px 0px 0px 0px;
+}
+.elog-msg-viewer > #body {
+  margin: 0px;
+  margin-top: 10px;
+  padding: 0px;
+}
+
+.elog-msg-viewer > #body .group-viewer {
+  margin: 10px;
+  margin-left: 16px;
+  box-shadow: 0 5px 10px rgba(0,0,0,0.36);
+}
+
 .elog-msg-viewer .m-id {
   padding: 0px 4px 0px 2px;
   margin: 2px;

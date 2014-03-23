@@ -1,3 +1,10 @@
+/**
+ * Display a run within a table row's body.
+ *
+ * @param {Object} parent
+ * @param {Array} message
+ * @returns {ELog_RunBody}
+ */
 function ELog_RunBody (parent, message) {
 
     var that = this ;
@@ -26,7 +33,8 @@ function ELog_RunBody (parent, message) {
         var url = (idx < 0 ? window.location.href : window.location.href.substr(0, idx))+'?exper_id='+this.experiment.id+'&app=elog:search&params=run:'+message.run_num;
         var html = '<a href="'+url+'" target="_blank" title="Click to open in a separate tab, or cut and paste to incorporate into another document as a link."><img src="../portal/img/link.png"></img></a>' ;
         return html ;
-    }
+    } ;
+
     // ------------------------------------------------
     // Override event handler defined in thw base class
     // ------------------------------------------------
@@ -191,7 +199,7 @@ function ELog_RunBody (parent, message) {
         //
         this.form_cont.ajaxSubmit ({
             success: function (data) {
-                if (data.Status != 'success') {
+                if (data.Status !== 'success') {
                     Fwk.report_error(data.Message) ; return ;
                     this.dialogs_cont.children('.button-cont-left').children('.control-button').button('enable') ;
                 }
@@ -224,6 +232,13 @@ function ELog_RunBody (parent, message) {
 }
 define_class (ELog_RunBody, StackRowBody, {}, {}) ;
 
+/**
+ * Display a message within a table row's body.
+ *
+ * @param {Object} parent
+ * @param {Array} message
+ * @returns {ELog_MessageBody}
+ */
 function ELog_MessageBody (parent, message) {
 
     var that = this ;
@@ -252,7 +267,7 @@ function ELog_MessageBody (parent, message) {
         var url = (idx < 0 ? window.location.href : window.location.href.substr(0, idx))+'?exper_id='+this.experiment.id+'&app=elog:search&params=message:'+this.message.id;
         var html = '<a href="'+url+'" target="_blank" title="Click to open in a separate tab, or cut and paste to incorporate into another document as a link."><img src="../portal/img/link.png"></img></a>' ;
         return html ;
-    }
+    } ;
 
     // ------------------------------------------------
     // Override event handler defined in thw base class
@@ -445,8 +460,8 @@ function ELog_MessageBody (parent, message) {
         this.m_cont.children('.edit').css('display', view ? 'none'  : 'block') ;
     } ;
 
-    this.enable_view = function () { this.view_vs_edit(true) ; }
-    this.enable_edit = function () { this.view_vs_edit(false) ; }
+    this.enable_view = function () { this.view_vs_edit(true) ; } ;
+    this.enable_edit = function () { this.view_vs_edit(false) ; } ;
 
 
     /**
@@ -525,7 +540,7 @@ function ELog_MessageBody (parent, message) {
         //
         this.form_cont.ajaxSubmit ({
             success: function (data) {
-                if (data.Status != 'success') {
+                if (data.Status !== 'success') {
                     Fwk.report_error(data.Message) ;
                     this.dialogs_cont.children('.button-cont-left').children('.control-button').button('enable') ;
                     return ;
@@ -600,7 +615,7 @@ function ELog_MessageBody (parent, message) {
         //
         this.form_cont.ajaxSubmit ({
             success: function (data) {
-                if (data.Status != 'success') {
+                if (data.Status !== 'success') {
                     Fwk.report_error(data.Message) ;
                     this.dialogs_cont.children('.button-cont-left').children('.control-button').button('enable') ;
                     return ;
@@ -657,7 +672,7 @@ function ELog_MessageBody (parent, message) {
             }
         }) ;
         this.form_cont = this.dialogs_cont.find('form#'+this.message.id) ;
-        ELog_Utils.load_tags (
+        ELog_Utils.load_tags_and_authors (
             this.experiment.id ,
             this.form_cont.find('.tags') ,
             function (tags) {
@@ -679,14 +694,20 @@ function ELog_MessageBody (parent, message) {
         //
         this.form_cont.ajaxSubmit ({
             success: function (data) {
-                if (data.Status != 'success') {
+                if (data.Status !== 'success') {
                     Fwk.report_error(data.Message) ;
                     this.dialogs_cont.children('.button-cont-left').children('.control-button').button('enable') ;
                     return ;
                 }
 
-                // TODO: Refresh the current message.
+                // Extend the message and refresh the current message tree
 
+                var tags = data.Extended.tags ;
+                for (var i in tags) {
+                    that.message.tags.push(tags[i]) ;
+                    that.message.tags_num++ ;
+                }
+                that.parent.update_row(that, that.message) ;
                 that.enable_view() ;
             } ,
             complete: function () { } ,
@@ -750,14 +771,20 @@ function ELog_MessageBody (parent, message) {
         //
         this.form_cont.ajaxSubmit ({
             success: function (data) {
-                if (data.Status != 'success') {
+                if (data.Status !== 'success') {
                     Fwk.report_error(data.Message) ;
                     this.dialogs_cont.children('.button-cont-left').children('.control-button').button('enable') ;
                     return ;
                 }
 
-                // TODO: Refresh the current message.
+                // Extend the message and refresh the current message tree
 
+                var attachments = data.Extended.attachments ;
+                for (var i in attachments) {
+                    that.message.attachments.push(attachments[i]) ;
+                    that.message.attachments_num++ ;
+                }
+                that.parent.update_row(that, that.message) ;
                 that.enable_view() ;
             } ,
             complete: function () { } ,
@@ -805,7 +832,14 @@ function ELog_MessageBody (parent, message) {
             '../logbook/ws/MoveFFEntry4portalJSON.php' ,
             params ,
             function (data) {
-                // TODO: tell the container to update the current message tree.
+
+                // Extend the message and refresh the current message tree
+
+                that.message.run_id = data.run_id ;
+                that.message.run_num = data.run_num ;
+
+                that.parent.update_row(that, that.message) ;
+                that.enable_view() ;
             } ,
             function (msg) {
                 Fwk.report_error(msg) ;
@@ -836,7 +870,7 @@ function ELog_MessageBody (parent, message) {
             function (data) {
                 switch (operation) {
                     case 'undelete': that.parent.undelete_row(that) ; break ;
-                    case 'delete': that.parent.delete_row(that, data.deleted_time, data.deleted_by) ; break ;
+                    case 'delete':   that.parent.delete_row(that, data.deleted_time, data.deleted_by) ; break ;
                 }
             } ,
             function (msg) {
@@ -869,20 +903,95 @@ function ELog_MessageBody (parent, message) {
 define_class (ELog_MessageBody, StackRowBody, {}, {}) ;
 
 
-function ELog_MessageViewer (parent, cont, options) {
+/**
+ * The base class for displaying a stack of messages witin a table row's body
+ *
+ * @param {Object} parent
+ * @param {Array} messages
+ * @param {Object} options
+ * @param {String} id
+ * @returns {ELog_MessageGroupBody}
+ */
+function ELog_MessageGroupBody (parent, messages, options, id) {
+   
+    // -----------------------------------------
+    // Allways call the base class's constructor
+    // -----------------------------------------
+
+    StackRowBody.call(this) ;
+
+    // ------------------------
+    // Parameters of the object
+    // ------------------------
+
+    this.parent  = parent ;
+    this.options = jQuery.extend(true, {}, options) ;
+    this.id      = id;
+
+    this.experiment  = parent.experiment ;
+    this.access_list = parent.access_list ;
+
+    this._messages = messages ;
+
+    // ------------------------------------------------
+    // Override event handler defined in thw base class
+    // ------------------------------------------------
+
+    this._viewer = null ;
+    this.is_rendered = false ;
+
+    this.render = function () {
+
+        if (this.is_rendered) return ;
+        this.is_rendered = true ;
+
+        var html =
+'<div id="'+this.id+'" class="group-viewer" ></div>' ;
+        this.container.html(html) ;
+
+        this._viewer = new ELog_MessageViewerNoGroupping(this.parent, this.options) ;
+        this._viewer.display(this.container.children('div#'+this.id)) ;
+        this._viewer.load(this._messages) ;
+    } ;
+    
+    this.insert_front = function (m) {
+        if (this._messages.length) this._messages.splice(0, 0, m) ;
+        else                       this._messages.push(m) ;
+        if (this.is_rendered)
+            this._viewer.update([m]) ;
+    } ;
+}
+define_class (ELog_MessageGroupBody, StackRowBody, {}, {}) ;
+
+
+/**
+ * This class provides an interface for implementing the viewer proxy (class ELog_MessageViewer)
+ * and various type sof viewers, such as: ELog_MessageViewerNoGroupping,
+ * ELog_MessageViewerGroupByDay,  ELog_MessageViewerGroupByShift, etc.
+ *
+ * @param {Object} parent
+ * @param {Object} options
+ * @returns {ELog_MessageViewerBase}
+ */
+function ELog_MessageViewerBase (parent, options) {
+
+    // Always call the c-tor of the base class
+
+    Widget.call(this) ;
 
     // -- parameters
 
     this.parent = parent ;
     this.experiment = parent.experiment ;
     this.access_list = parent.access_list ;
-    this.cont = cont ;
 
     // -- options
 
     this.hidden_header  = false ;
     this.instant_expand = false ;
     this.deleted        = false ;
+    this.allow_groups   = false ;
+    this.no_ymd         = false ;   // -- do not display the data in timestamps if true
     if (options) {
         for (var opt in options) {
             var val = options[opt] ;
@@ -890,47 +999,86 @@ function ELog_MessageViewer (parent, cont, options) {
         }   
     }
 
-    this.messages = [] ;
-    var hdr = [
-        {id: 'posted',   title: 'Posted',    width: 150} ,
-        {id: 'run',      title: 'Run',       width:  34, align: 'right'} ,
-        {id: 'duration', title: 'Length',    width:  55, align: 'right', style: 'color:maroon;'} ,
-        {id: 'attach',   title: '&nbsp',     width:  16} ,
-        {id: 'tag',      title: '&nbsp;',    width:  16} ,
-        {id: 'child',    title: '&nbsp;',    width:  20} ,
-        {id: 'subj',     title: 'Subject',   width: 520} ,
-        {id: '>'} ,
-        {id: 'id',       title: 'MessageId', width:  70} ,
-        {id: 'author',   title: 'Author',    width:  90}
-    ] ;
-    this.table = new StackOfRows (
-        hdr ,
-        [] ,
-        {   hidden_header: this.hidden_header ,
-            effect_on_insert: function (hdr_cont) {
-               hdr_cont.stop(true,true).effect('highlight', {color:'#ff6666 !important'}, 30000) ;
-            }
-        }
-    ) ;
+    // -- methods to be implemented by the base classes
 
-    /**
-     * @function - overloading the function of the base class Widget
-     */
-    this.render = function () {
-        this.table.display(this.container) ;
-        if (this.instant_expand) this.table.expand_or_collapse(true) ;
+    this.messages = function () {
+        throw new WidgetError('ELog_MessageViewerBase::messages() the implementation must be provided by a derived class') ;
+    } ;
+    this.num_rows = function () {
+        throw new WidgetError('ELog_MessageViewerBase::num_rows() the implementation must be provided by a derived class') ;
+    } ;
+    this.num_runs = function () {
+        throw new WidgetError('ELog_MessageViewerBase::num_runs() the implementation must be provided by a derived class') ;
+    } ;
+    this.min_run  = function () {
+        throw new WidgetError('ELog_MessageViewerBase::min_run() the implementation must be provided by a derived class') ;
+    } ;
+    this.max_run  = function () {
+        throw new WidgetError('ELog_MessageViewerBase::max_run() the implementation must be provided by a derived class') ;
     } ;
 
-    this.num_rows = function () { return this.table.num_rows() ; } ;
+    /**
+     * Reload internal message store and redisplay the list of messages.
+     * 
+     * NOTE: The method will make a local deep copy of the input messages.
+     * 
+     * @param Array messages
+     * @returns {undefined}
+     */
+    this.load = function (messages) {
+        throw new WidgetError('ELog_MessageViewerBase::load() the implementation must be provided by a derived class') ;
+    } ;
 
-    this._num_runs = 0 ;
-    this._min_run = 0 ;
-    this._max_run = 0 ;
+    /**
+     * Insert new messages in front of the table
+     * 
+     * @param Array new_messages
+     * @returns {undefined}
+     */
+    this.update = function (new_messages) {
+        throw new WidgetError('ELog_MessageViewerBase::update() the implementation must be provided by a derived class') ;
+    } ;
 
-    this.num_runs = function () { return this._num_runs; }
-    this.min_run  = function () { return this._min_run; }
-    this.max_run  = function () { return this._max_run; }
+    /**
+     * Append messages at the bottom of the table
+     * 
+     * @param Array new_messages
+     * @returns {undefined}
+     */
+    this.append = function (new_messages) {
+        throw new WidgetError('ELog_MessageViewerBase::append() the implementation must be provided by a derived class') ;
+    } ;
 
+    /**
+     * This handler is meant to be used by row (bodies) to report that their
+     * content has been updated.
+     * 
+     * The method will update its local data storage (for the message content)
+     * and redisplay the message tree.
+     * 
+     * @param StackRow old_row
+     * @param Array new_message
+     * @returns {undefined}
+     */
+    this.update_row = function (old_row, new_message) {
+        throw new WidgetError('ELog_MessageViewerBase::update_row() the implementation must be provided by a derived class') ;
+    } ;
+
+    this.undelete_row = function (row) {
+        throw new WidgetError('ELog_MessageViewerBase::undelete_row() the implementation must be provided by a derived class') ;
+    } ;
+
+    this.delete_row = function (row, deleted_time, deleted_by) {
+        throw new WidgetError('ELog_MessageViewerBase::delete_row() the implementation must be provided by a derived class') ;
+    } ;
+
+    this.focus_at_message = function (message_id) {
+        throw new WidgetError('ELog_MessageViewerBase::focus_at_message() the implementation must be provided by a derived class') ;
+    } ;
+
+    this.focus_at_run = function (run_num) {
+        throw new WidgetError('ELog_MessageViewerBase::focus_at_run() the implementation must be provided by a derived class') ;
+    } ;
 
     /**
      * Produce a data object to be fed into the StackOfRows as a row
@@ -938,10 +1086,11 @@ function ELog_MessageViewer (parent, cont, options) {
      * @param object m 
      * @returns array of data objects
      */
-    this.message2row = function (m) {
+    this._message2row = function (m) {
+        var posted = this.no_ymd ? m.hms : '<b>'+m.ymd+'</b>&nbsp;&nbsp;'+m.hms ;
         var row = {
             title: {
-                posted: '<b>'+m.ymd+'</b>&nbsp;&nbsp;'+m.hms ,
+                posted: posted ,
                 run: m.run_num ? '<div class="m-run">'+m.run_num+'</div>' : '&nbsp;' ,
                 author: m.author ,
                 subj:  '&nbsp;' ,
@@ -955,7 +1104,7 @@ function ELog_MessageViewer (parent, cont, options) {
         } ;
         if (m.is_run) {
             row.title.run = '<div class="m-run">'+m.run_num+'</div>' ;
-            row.title.subj = this.run2subj(m) ;
+            row.title.subj = this._run2subj(m) ;
             if (m.type !== 'begin_run') { row.title.duration = m.duration1 ; }
             row.body = new ELog_RunBody(this, m) ;
             row.color_theme = 'stack-theme-green' ;
@@ -970,7 +1119,7 @@ function ELog_MessageViewer (parent, cont, options) {
         }
         return row ;
     } ;
-    this.run2subj = function (m) {
+    this._run2subj = function (m) {
         switch (m.type) {
             case 'run'       : return '<b>stop</b>';
             case 'end_run'   : return '<b>stop</b>' ;
@@ -978,6 +1127,76 @@ function ELog_MessageViewer (parent, cont, options) {
         }
         return '' ;
     } ;
+}
+define_class (ELog_MessageViewerBase, Widget, {}, {}) ;
+
+
+
+/**
+ * Display a simple stream of messages and runs w/o any groupping.
+ *
+ * @param {Object} parent
+ * @param {Object} options
+ * @returns {ELog_MessageViewerNoGroupping}
+ */
+function ELog_MessageViewerNoGroupping (parent, options) {
+
+    // Always call the c-tor of the base class
+
+    ELog_MessageViewerBase.call(this, parent, options) ;
+
+    // -- parameters
+
+    this._messages = [] ;
+    var hdr = [(this.no_ymd ? 
+        {id: 'posted',   title: 'Time',      width:  80} :
+        {id: 'posted',   title: 'Posted',    width: 150}),
+        {id: 'run',      title: 'Run',       width:  34, align: 'right'} ,
+        {id: 'duration', title: 'Length',    width:  55, align: 'right', style: 'color:maroon;'} ,
+        {id: 'attach',   title: '&nbsp',     width:  16} ,
+        {id: 'tag',      title: '&nbsp;',    width:  16} ,
+        {id: 'child',    title: '&nbsp;',    width:  20} ,
+        {id: 'subj',     title: 'Subject',   width: 520} ,
+        {id: '>'} ,
+        {id: 'id',       title: 'MessageId', width:  70} ,
+        {id: 'author',   title: 'Author',    width:  90}
+    ] ;
+    this._table = new StackOfRows (
+        hdr ,
+        [] ,
+        {   hidden_header: this.hidden_header ,
+            effect_on_insert: function (hdr_cont) {
+               hdr_cont.stop(true,true).effect('highlight', {color:'#ff6666 !important'}, 30000) ;
+            }
+        }
+    ) ;
+
+    this._is_rendered = false ;
+
+    /**
+     * @function - overloading the function of the base class Widget
+     */
+    this.render = function () {
+
+        if (this._is_rendered) return ;
+        this._is_rendered = true ;
+
+        this._table.display(this.container) ;
+        if (this.instant_expand) this._table.expand_or_collapse(true) ;
+    } ;
+
+    this.messages = function () { return this._messages ; } ;
+
+    this.num_rows = function () { return this._table.num_rows() ; } ;
+
+    this._num_runs = 0 ;
+    this._min_run = 0 ;
+    this._max_run = 0 ;
+
+    this.num_runs = function () { return this._num_runs; } ;
+    this.min_run  = function () { return this._min_run; } ;
+    this.max_run  = function () { return this._max_run; } ;
+
 
     /**
      * Reload internal message store and redisplay the list of messages.
@@ -989,29 +1208,28 @@ function ELog_MessageViewer (parent, cont, options) {
      */
     this.load = function (messages) {
 
-        this.messages = jQuery.extend(true, [], messages) ;
-        this.messages.reverse() ;
+        this._messages = jQuery.extend(true, [], messages) ;
+        this._messages.reverse() ;
 
         this._num_runs = 0 ;
         this._min_run = 0 ;
         this._max_run = 0 ;
 
-        var rows = [] ;
-        for (var i in this.messages) {
-            var m = this.messages[i] ;
+        this._table.reset() ;
+
+        for (var i in this._messages) {
+            var m = this._messages[i] ;
             if (typeof m === 'string') {
                 m = eval('('+m+')') ;
-                this.messages[i] = m ;
+                this._messages[i] = m ;
             }
-            rows.push(this.message2row(m)) ;
             if (m.is_run) {
                 this._num_runs++ ;
                 this._min_run = Math.min(this._min_run ? this._min_run : m.run_num, m.run_num) ;
                 this._max_run = Math.max(this._max_run ? this._max_run : m.run_num, m.run_num) ;
             }
+            this._table.append(this._message2row(m)) ;
         }
-        this.table.set_rows(rows) ;
-        this.display(this.cont) ;
     } ;
 
     /**
@@ -1033,9 +1251,9 @@ function ELog_MessageViewer (parent, cont, options) {
                 var m = new_messages[i] ;
                 if (typeof m === 'string') m = eval('('+m+')') ;
                 m = jQuery.extend(true, {}, m) ;
-                if (this.messages.length) this.messages.splice(0, 0, m) ;
-                else                      this.messages.push(m) ;
-                this.table.insert_front(this.message2row(m)) ;
+                if (this._messages.length) this._messages.splice(0, 0, m) ;
+                else                      this._messages.push(m) ;
+                this._table.insert_front(this._message2row(m)) ;
                 if (m.is_run) {
                     this._num_runs++ ;
                     this._min_run = Math.min(this._min_run ? this._min_run : m.run_num, m.run_num) ;
@@ -1066,9 +1284,9 @@ function ELog_MessageViewer (parent, cont, options) {
                 var m = new_messages[i] ;
                 if (typeof m === 'string') m = eval('('+m+')') ;
                 m = jQuery.extend(true, {}, m) ;
-                if (this.messages.length) this.messages.splice(0, 0, m) ;
-                else                      this.messages.push(m) ;
-                this.table.append(this.message2row(m)) ;
+                if (this._messages.length) this._messages.splice(0, 0, m) ;
+                else                      this._messages.push(m) ;
+                this._table.append(this._message2row(m)) ;
                 if (m.is_run) {
                     this._num_runs++ ;
                     this._min_run = Math.min(this._min_run ? this._min_run : m.run_num, m.run_num) ;
@@ -1092,13 +1310,13 @@ function ELog_MessageViewer (parent, cont, options) {
     this.update_row = function (old_row, new_message) {
         if (typeof new_message === 'string') new_message = eval('('+new_message+')') ;
         var id = old_row.message.id ;
-        for (var i in this.messages) {
-            var m = this.messages[i] ;
+        for (var i in this._messages) {
+            var m = this._messages[i] ;
             if (id === m.id) {
-                this.messages[i] = new_message ;
-                this.table.update_row (
+                this._messages[i] = new_message ;
+                this._table.update_row (
                     old_row.row_id ,
-                    this.message2row(new_message)) ;
+                    this._message2row(new_message)) ;
                 return ;
             }
         }
@@ -1106,15 +1324,15 @@ function ELog_MessageViewer (parent, cont, options) {
 
     this.undelete_row = function (row) {
         var id = row.message.id ;
-        for (var i in this.messages) {
-            var m = this.messages[i] ;
+        for (var i in this._messages) {
+            var m = this._messages[i] ;
             if (id === m.id) {
                 m.deleted = 0 ;
                 m.deleted_time = '' ;
                 m.deleted_by = '' ;
-                this.table.update_row (
+                this._table.update_row (
                     row.row_id ,
-                    this.message2row(m)) ;
+                    this._message2row(m)) ;
                 return ;
             }
         }
@@ -1122,47 +1340,1537 @@ function ELog_MessageViewer (parent, cont, options) {
 
     this.delete_row = function (row, deleted_time, deleted_by) {
         var id = row.message.id ;
-        for (var i in this.messages) {
-            var m = this.messages[i] ;
+        for (var i in this._messages) {
+            var m = this._messages[i] ;
             if (id === m.id) {
                 m.deleted = 1 ;
                 m.deleted_time = deleted_time ;
                 m.deleted_by = deleted_by ;
-                this.table.update_row (
+                this._table.update_row (
                     row.row_id ,
-                    this.message2row(m)) ;
+                    this._message2row(m)) ;
                 return ;
             }
         }
     } ;
 
     this.focus_at_message = function (message_id) {
-        for (var i in this.table.rows) {
-            var row = this.table.rows[i] ;
+        for (var i in this._table.rows) {
+            var row = this._table.rows[i] ;
             if (row.data_object.body.message.id == message_id) {
                 var id = row.id ;
-                this.table.expand_or_collapse_row(id, true, $('#fwk-center')) ;
+                this._table.expand_or_collapse_row(id, true, $('#fwk-center')) ;
                 return ;
             }
         }
-        console.log('ELog_MessageViewer.focus_at_message('+message_id+') the message was not found in StackOfRows') ;
+        console.log('ELog_MessageViewerNoGroupping.focus_at_message('+message_id+') the message was not found in StackOfRows') ;
     } ;
 
     this.focus_at_run = function (run_num) {
-        for (var i in this.table.rows) {
-            var row = this.table.rows[i] ;
+        for (var i in this._table.rows) {
+            var row = this._table.rows[i] ;
             if (row.data_object.body.message.is_run && row.data_object.body.message.run_num == run_num) {
                 var id = row.id ;
-                this.table.expand_or_collapse_row(id, true, $('#fwk-center')) ;
+                this._table.expand_or_collapse_row(id, true, $('#fwk-center')) ;
                 return ;
             }
         }
-        console.log('ELog_MessageViewer.focus_at_run('+run_num+') the message was not found in StackOfRows') ;
+        console.log('ELog_MessageViewerNoGroupping.focus_at_run('+run_num+') the message was not found in StackOfRows') ;
     } ;
+}
+define_class (ELog_MessageViewerNoGroupping, ELog_MessageViewerBase, {}, {}) ;
+
+
+/**
+ * Specialization for displaying a conatiner of mesasages within a table row's body
+ *
+ * @param {Object} parent
+ * @param {Array} messages
+ * @param {Object} options
+ * @returns {ELog_DayBody}
+ */
+function ELog_DayBody (parent, messages, options) {
+    var options = jQuery.extend(true, {no_ymd: true}, options) ;
+    ELog_MessageGroupBody.call(this, parent, messages, options, 'day-viewer') ;
+}
+define_class (ELog_DayBody, ELog_MessageGroupBody, {}, {}) ;
+
+/**
+ * Group messages by a day they were posted.
+ *
+ * @param {Object} parent
+ * @param {Object} options
+ * @returns {ELog_MessageViewerByDay}
+ */
+function ELog_MessageViewerByDay (parent, options) {
+
+    // Always call the c-tor of the base class
+
+    ELog_MessageViewerBase.call(this, parent, options) ;
+
+    // -- parameters
+
+    this._messages = [] ;
+    this._days = {} ;
+
+    var hdr = [
+        {id: 'day',            title: 'Day',      width: 80} ,
+        {id: 'runs-end',       title: 'Runs',     width: 60, align: 'right'} ,
+        {id: 'runs-separator', title: '&nbsp;',   width: 10, align: 'center'} ,
+        {id: 'runs-begin' ,    title: '&nbsp;',   width: 60, align: 'left'} ,
+        {id: 'messages',       title: 'Messages', width: 40, align: 'right'}
+    ] ;
+    this._table = new StackOfRows (
+        hdr ,
+        [] ,
+        {   hidden_header: this.hidden_header ,
+            effect_on_insert: function (hdr_cont) {
+               hdr_cont.stop(true,true).effect('highlight', {color:'#ff6666 !important'}, 30000) ;
+            } ,
+            theme: 'stack-theme-aliceblue'
+        }
+    ) ;
+
+    /**
+     * @function - overloading the function of the base class Widget
+     */
+    this.render = function () {
+        this._table.display(this.container) ;
+        if (this.instant_expand) this._table.expand_or_collapse(true) ;
+    } ;
+
+    this.messages = function () { return this._messages ; } ;
+
+    this.num_rows = function () { return this._messages.length ; } ;
+
+    this._num_runs = 0 ;
+    this._min_run = 0 ;
+    this._max_run = 0 ;
+
+    this.num_runs = function () { return this._num_runs; } ;
+    this.min_run  = function () { return this._min_run; } ;
+    this.max_run  = function () { return this._max_run; } ;
+
+
+    /**
+     * Reload internal message store and redisplay the list of messages.
+     * 
+     * NOTE: The method will make a local deep copy of the input messages.
+     * 
+     * @param Array messages
+     * @returns {undefined}
+     */
+    this.load = function (messages) {
+
+        this._messages = jQuery.extend(true, [], messages) ;
+        this._messages.reverse() ;
+
+        this._days = {} ;
+
+        this._num_runs = 0 ;
+        this._min_run = 0 ;
+        this._max_run = 0 ;
+
+        for (var i in this._messages) {
+            var m = this._messages[i] ;
+            if (typeof m === 'string') {
+                m = eval('('+m+')') ;
+                this._messages[i] = m ;
+            }
+            if (m.is_run) {
+                this._num_runs++ ;
+                this._min_run = Math.min(this._min_run ? this._min_run : m.run_num, m.run_num) ;
+                this._max_run = Math.max(this._max_run ? this._max_run : m.run_num, m.run_num) ;
+            }
+            var ymd = m.ymd ;
+            if (!_.has(this._days, ymd)) {
+                this._days[ymd] = {
+                    messages: []
+                } ;
+            }
+            this._days[ymd].messages.push(m) ;
+        }
+        var ymds = _.keys(this._days) ;
+        ymds.sort() ;
+        ymds.reverse() ;
+
+        this._table.reset() ;
+
+        for (var i in ymds) {
+            var ymd = ymds[i] ;
+            this._days[ymd].messages.reverse() ;
+            this._days[ymd].row_id = this._table.append(this._day2row(ymd)) ;
+        }
+    } ;
+
+    /**
+     * Insert new messages in front of the table
+     * 
+     * @param Array new_messages
+     * @returns {undefined}
+     */
+    this.update = function (new_messages) {
+
+        var length = new_messages ? new_messages.length : 0;
+        if (length) {
+
+            // Put deep copies of the new messages in front of the local list.
+            // Note that this will also reverse the order in which we got the new
+            // messages so that the newest ones will always get to the front.
+
+            var days = {} ;
+
+            for (var i in new_messages) {
+                var m = new_messages[i] ;
+                if (typeof m === 'string') m = eval('('+m+')') ;
+                m = jQuery.extend(true, {}, m) ;
+                if (this._messages.length) this._messages.splice(0, 0, m) ;
+                else                       this._messages.push(m) ;
+                if (m.is_run) {
+                    this._num_runs++ ;
+                    this._min_run = Math.min(this._min_run ? this._min_run : m.run_num, m.run_num) ;
+                    this._max_run = Math.max(this._max_run ? this._max_run : m.run_num, m.run_num) ;
+                }
+                var ymd = m.ymd ;
+                if (!_.has(days, ymd)) {
+                    days[ymd] = {
+                        messages: []
+                    } ;
+                }
+                days[ymd].messages.push(m) ;
+            }
+
+            var ymds = _.keys(days) ;
+            ymds.sort() ;
+            for (var i in ymds) {
+
+                var ymd = ymds[i] ;
+                if (_.has(this._days, ymd)) {
+
+                    // Extend the list of messages at the day
+                    var messages = days[ymd].messages ;
+                    for (var j in messages) {
+                        var m = messages[j] ;
+                        this._days[ymd].messages.push(m) ;
+                    }
+
+                    // Update the title of the day
+                    var row = this._table.get_row_by_id(this._days[ymd].row_id) ;
+                    row.update_title(this._day2row_title(ymd), function (hdr_cont) {
+                        hdr_cont.stop(true,true).effect('highlight', {color:'#ff6666 !important'}, 30000) ;
+                    }) ;
+                    
+                    // Update the list of messages within the row's body
+                    var row_body = row.get_body() ;
+                    for (var j in messages) {
+                        var m = messages[j] ;
+                        row_body.insert_front(m) ;
+                    }
+                } else {
+                    
+                    // Create a new row for the day
+                    this._days[ymd] = days[ymd] ;
+                    this._days[ymd].row_id = this._table.insert_front(this._day2row(ymd)) ;
+                }
+            }
+        }
+    } ;
+
+    /**
+     * Append messages at the bottom of the table
+     * 
+     * @param Array new_messages
+     * @returns {undefined}
+     */
+    this.append = function (new_messages) {
+
+        var length = new_messages ? new_messages.length : 0;
+        if (length) {
+
+            // Put deep copies of the new messages at the very end of the of the local list.
+            // Note that this will also reverse the order in which we got the new
+            // messages so that the newest ones will alwats get to the front.
+
+            new_messages.reverse() ;    // need this to append newst message first
+
+            var days = {} ;
+
+            for (var i in new_messages) {
+                var m = new_messages[i] ;
+                if (typeof m === 'string') m = eval('('+m+')') ;
+                m = jQuery.extend(true, {}, m) ;
+                if (this._messages.length) this._messages.splice(0, 0, m) ;
+                else                       this._messages.push(m) ;
+                if (m.is_run) {
+                    this._num_runs++ ;
+                    this._min_run = Math.min(this._min_run ? this._min_run : m.run_num, m.run_num) ;
+                    this._max_run = Math.max(this._max_run ? this._max_run : m.run_num, m.run_num) ;
+                }            
+                var ymd = m.ymd ;
+                if (!_.has(days, ymd)) {
+                    days[ymd] = {
+                        messages: []
+                    } ;
+                }
+                days[ymd].messages.push(m) ;
+            }
+            var ymds = _.keys(days) ;
+            ymds.sort() ;
+            ymds.reverse() ;   
+            for (var i in ymds) {
+                var ymd = ymds[i] ;
+                if (_.has(this._days, ymd)) {
+                    var day = this._days[ymd] ;
+                    var messages = days[ymd].messages ;
+                    for (var j in messages) {
+                        var m = messages[j] ;
+                        day.messages.push(m) ;
+                    }
+                    day.row_id = this._table.update_row(day.row_id, this._day2row(ymd)) ;
+                } else {
+                    this._days[ymd] = days[ymd] ;
+                    this._days[ymd].row_id = this._table.append(this._day2row(ymd)) ;
+                }
+            }
+        }
+    } ;
+
+
+    this.update_row = function (old_row, new_message) {
+        console.log('ELog_MessageViewerByDay::update_row() not implemented for this viewer') ;
+        return ;
+    } ;
+
+    this.undelete_row = function (row) {
+        console.log('ELog_MessageViewerByDay::undelete_row() not implemented for this viewer') ;
+        return ;
+    } ;
+
+    this.delete_row = function (row, deleted_time, deleted_by) {
+        console.log('ELog_MessageViewerByDay::delete_row() not implemented for this viewer') ;
+        return ;
+    } ;
+
+    this.focus_at_message = function (message_id) {
+        console.log('ELog_MessageViewerByDay::focus_at_message() not implemented for this viewer') ;
+        return ;
+    } ;
+
+    this.focus_at_run = function (run_num) {
+        console.log('ELog_MessageViewerByDay::focus_at_run() not implemented for this viewer') ;
+        return ;
+    } ;
+
+    this._day2row = function (ymd) {
+        var row = {
+            title: this._day2row_title(ymd) ,
+            body:  new ELog_DayBody(this, this._days[ymd].messages, this.options)
+        } ;
+        return row ; 
+    } ;
+    this._day2row_title = function (ymd) {
+        var messages = this._days[ymd].messages ;
+        var first_run    = 0 ;
+        var last_run     = 0 ;
+        var num_messages = 0 ;
+        for (var i in messages) {
+            var m = messages[i] ;
+            if (m.is_run) {
+                if (!first_run) {
+                    first_run = m.run_num ;
+                    last_run  = m.run_num ;
+                } else {
+                    if (m.run_num < first_run) first_run = m.run_num ;
+                    if (m.run_num > last_run)  last_run  = m.run_num ;
+                }
+            } else {
+                num_messages++ ;
+            }
+        }
+        var title = {
+            'day'            : '<b>'+ymd+'</b>' ,
+            'runs-end'       : last_run && (last_run !== first_run) ? last_run        : '&nbsp;' ,
+            'runs-separator' : last_run && (last_run !== first_run) ? '&nbsp;-&nbsp;' : '&nbsp;' ,
+            'runs-begin'     : first_run                            ? first_run       : '&nbsp;' ,
+            'messages'       : num_messages                         ? num_messages    : '&nbsp;'
+        } ;
+        return title ; 
+    } ;
+}
+define_class (ELog_MessageViewerByDay, ELog_MessageViewerBase, {}, {}) ;
+
+
+/**
+ * Specialization for displaying a conatiner of mesasages within a table row's body
+ *
+ * @param {Object} parent
+ * @param {Array} messages
+ * @param {Object} options
+ * @returns {ELog_ShiftBody}
+ */
+function ELog_ShiftBody (parent, messages, options) {
+    ELog_MessageGroupBody.call(this, parent, messages, options, 'shift-viewer') ;
+}
+define_class (ELog_ShiftBody, ELog_MessageGroupBody, {}, {}) ;
+
+/**
+ * Group messages by a shift they were posted.
+ *
+ * @param {Object} parent
+ * @param {Object} options
+ * @returns {ELog_MessageViewerNoGroupping}
+ */
+function ELog_MessageViewerByShift (parent, options) {
+
+    // Always call the c-tor of the base class
+
+    ELog_MessageViewerBase.call(this, parent, options) ;
+
+    // -- parameters
+
+    this._messages = [] ;
+    this._shifts = {} ;
+
+    var hdr = [
+        {id: 'shift',          title: 'Shift', width: 160} ,
+        {id: 'runs-end',       title: 'Runs',               width:  50, align: 'right'} ,
+        {id: 'runs-separator', title: '&nbsp;',             width:  10, align: 'center'} ,
+        {id: 'runs-begin' ,    title: '&nbsp;',             width:  60, align: 'left'} ,
+        {id: 'messages',       title: 'Messages',           width:  60, align: 'right'} ,
+        {id: '_',                                           width:  20} ,
+        {id: 'goals' ,         title: '&nbsp;',             width: 460, align: 'left'}
+    ] ;
+    this._table = new StackOfRows (
+        hdr ,
+        [] ,
+        {   hidden_header: this.hidden_header ,
+            effect_on_insert: function (hdr_cont) {
+               hdr_cont.stop(true,true).effect('highlight', {color:'#ff6666 !important'}, 30000) ;
+            } ,
+            theme: 'stack-theme-aliceblue'
+        }
+    ) ;
+
+    /**
+     * @function - overloading the function of the base class Widget
+     */
+    this.render = function () {
+        this._table.display(this.container) ;
+        if (this.instant_expand) this._table.expand_or_collapse(true) ;
+    } ;
+
+    this.messages = function () { return this._messages ; } ;
+
+    this.num_rows = function () { return this._messages.length ; } ;
+
+    this._num_runs = 0 ;
+    this._min_run = 0 ;
+    this._max_run = 0 ;
+
+    this.num_runs = function () { return this._num_runs; } ;
+    this.min_run  = function () { return this._min_run; } ;
+    this.max_run  = function () { return this._max_run; } ;
+
+
+    /**
+     * Reload internal message store and redisplay the list of messages.
+     * 
+     * NOTE: The method will make a local deep copy of the input messages.
+     * 
+     * @param {Array} messages
+     * @returns {undefined}
+     */
+    this.load = function (messages) {
+
+        this._messages = jQuery.extend(true, [], messages) ;
+        this._messages.reverse() ;
+
+        this._shifts = {} ;
+
+        this._num_runs = 0 ;
+        this._min_run = 0 ;
+        this._max_run = 0 ;
+
+        var shift_goals = {} ;  // -- harvest shift goals (if any) for each shift
+
+        for (var i in this._messages) {
+            var m = this._messages[i] ;
+            if (typeof m === 'string') {
+                m = eval('('+m+')') ;
+                this._messages[i] = m ;
+            }
+            var shift_begin_time = m.shift_begin.time ;
+            if (m.is_run) {
+                this._num_runs++ ;
+                this._min_run = Math.min(this._min_run ? this._min_run : m.run_num, m.run_num) ;
+                this._max_run = Math.max(this._max_run ? this._max_run : m.run_num, m.run_num) ;
+            } else {
+                if (_.find(m.tags, function (e) { return e.tag === 'SHIFT_GOALS' ; }))
+                    shift_goals[shift_begin_time] = m.subject ;
+            }
+            if (!_.has(this._shifts, shift_begin_time)) {
+                this._shifts[shift_begin_time] = {
+                    messages: [] ,
+                    goals: ''
+                } ;
+            }
+            this._shifts[shift_begin_time].messages.push(m) ;
+        }
+        var shift_begin_times = _.keys(this._shifts) ;
+        shift_begin_times.sort() ;
+        shift_begin_times.reverse() ;
+
+        this._table.reset() ;
+
+        for (var i in shift_begin_times) {
+            var shift_begin_time = shift_begin_times[i] ;
+            this._shifts[shift_begin_time].messages.reverse() ;
+            if (_.has(shift_goals, shift_begin_time)) this._shifts[shift_begin_time].goals = shift_goals[shift_begin_time] ;
+            this._shifts[shift_begin_time].row_id = this._table.append(this._shift2row(shift_begin_time)) ;
+        }
+    } ;
+
+    /**
+     * Insert new messages in front of the table
+     * 
+     * @param Array new_messages
+     * @returns {undefined}
+     */
+    this.update = function (new_messages) {
+
+        var length = new_messages ? new_messages.length : 0;
+        if (length) {
+
+            // Put deep copies of the new messages in front of the local list.
+            // Note that this will also reverse the order in which we got the new
+            // messages so that the newest ones will always get to the front.
+
+            var shifts = {} ;
+
+            for (var i in new_messages) {
+                var m = new_messages[i] ;
+                if (typeof m === 'string') m = eval('('+m+')') ;
+                m = jQuery.extend(true, {}, m) ;
+                if (this._messages.length) this._messages.splice(0, 0, m) ;
+                else                       this._messages.push(m) ;
+                if (m.is_run) {
+                    this._num_runs++ ;
+                    this._min_run = Math.min(this._min_run ? this._min_run : m.run_num, m.run_num) ;
+                    this._max_run = Math.max(this._max_run ? this._max_run : m.run_num, m.run_num) ;
+                }
+                var shift_begin_time = m.shift_begin.time ;
+                if (!_.has(shifts, shift_begin_time)) {
+                    shifts[shift_begin_time] = {
+                        messages: []
+                    } ;
+                }
+                shifts[shift_begin_time].messages.push(m) ;
+            }
+
+            var shift_begin_times = _.keys(shifts) ;
+            shift_begin_times.sort() ;
+            for (var i in shift_begin_times) {
+
+                var shift_begin_time = shift_begin_times[i] ;
+                if (_.has(this._shifts, shift_begin_time)) {
+
+                    // Extend the list of messages at the shift
+                    var messages = shifts[shift_begin_time].messages ;
+                    for (var j in messages) {
+                        var m = messages[j] ;
+                        this._shifts[shift_begin_time].messages.push(m) ;
+                    }
+
+                    // Update the title of the shift
+                    var row = this._table.get_row_by_id(this._shifts[shift_begin_time].row_id) ;
+                    row.update_title(this._shift2row_title(shift_begin_time), function (hdr_cont) {
+                        hdr_cont.stop(true,true).effect('highlight', {color:'#ff6666 !important'}, 30000) ;
+                    }) ;
+                    
+                    // Update the list of messages within the row's body
+                    var row_body = row.get_body() ;
+                    for (var j in messages) {
+                        var m = messages[j] ;
+                        row_body.insert_front(m) ;
+                    }
+                } else {
+                    
+                    // Create a new row for the shift
+                    this._shifts[shift_begin_time] = shifts[shift_begin_time] ;
+                    this._shifts[shift_begin_time].row_id = this._table.insert_front(this._shift2row(shift_begin_time)) ;
+                }
+            }
+        }
+    } ;
+
+    /**
+     * Append messages at the bottom of the table
+     * 
+     * @param Array new_messages
+     * @returns {undefined}
+     */
+    this.append = function (new_messages) {
+
+        var length = new_messages ? new_messages.length : 0;
+        if (length) {
+
+            // Put deep copies of the new messages at the very end of the of the local list.
+            // Note that this will also reverse the order in which we got the new
+            // messages so that the newest ones will alwats get to the front.
+
+            new_messages.reverse() ;    // need this to append newst message first
+
+            var shifts = {} ;
+
+            for (var i in new_messages) {
+                var m = new_messages[i] ;
+                if (typeof m === 'string') m = eval('('+m+')') ;
+                m = jQuery.extend(true, {}, m) ;
+                if (this._messages.length) this._messages.splice(0, 0, m) ;
+                else                       this._messages.push(m) ;
+                if (m.is_run) {
+                    this._num_runs++ ;
+                    this._min_run = Math.min(this._min_run ? this._min_run : m.run_num, m.run_num) ;
+                    this._max_run = Math.max(this._max_run ? this._max_run : m.run_num, m.run_num) ;
+                }            
+                var shift_begin_time = m.shift_begin.time ;
+                if (!_.has(shifts, shift_begin_time)) {
+                    shifts[shift_begin_time] = {
+                        messages: []
+                    } ;
+                }
+                shifts[shift_begin_time].messages.push(m) ;
+            }
+            var shift_begin_times = _.keys(shifts) ;
+            shift_begin_times.sort() ;
+            shift_begin_times.reverse() ;   
+            for (var i in shift_begin_times) {
+                var shift_begin_time = shift_begin_times[i] ;
+                if (_.has(this._shifts, shift_begin_time)) {
+                    var shift = this._shifts[shift_begin_time] ;
+                    var messages = shifts[shift_begin_time].messages ;
+                    for (var j in messages) {
+                        var m = messages[j] ;
+                        shift.messages.push(m) ;
+                    }
+                    shift.row_id = this._table.update_row(shift.row_id, this._shift2row(shift_begin_time)) ;
+                } else {
+                    this._shifts[shift_begin_time] = shifts[shift_begin_time] ;
+                    this._shifts[shift_begin_time].row_id = this._table.append(this._shift2row(shift_begin_time)) ;
+                }
+            }
+        }
+    } ;
+
+
+    this.update_row = function (old_row, new_message) {
+        console.log('ELog_MessageViewerByShift::update_row() not implemented for this viewer') ;
+        return ;
+    } ;
+
+    this.undelete_row = function (row) {
+        console.log('ELog_MessageViewerByShift::undelete_row() not implemented for this viewer') ;
+        return ;
+    } ;
+
+    this.delete_row = function (row, deleted_time, deleted_by) {
+        console.log('ELog_MessageViewerByShift::delete_row() not implemented for this viewer') ;
+        return ;
+    } ;
+
+    this.focus_at_message = function (message_id) {
+        console.log('ELog_MessageViewerByShift::focus_at_message() not implemented for this viewer') ;
+        return ;
+    } ;
+
+    this.focus_at_run = function (run_num) {
+        console.log('ELog_MessageViewerByShift::focus_at_run() not implemented for this viewer') ;
+        return ;
+    } ;
+
+    this._shift2row = function (shift_begin_time) {
+        var row = {
+            title: this._shift2row_title(shift_begin_time) ,
+            body:  new ELog_ShiftBody(this, this._shifts[shift_begin_time].messages, this.options)
+        } ;
+        return row ; 
+    } ;
+    this._shift2row_title = function (shift_begin_time) {
+        var messages = this._shifts[shift_begin_time].messages ;
+        var first_run    = 0 ;
+        var last_run     = 0 ;
+        var num_messages = 0 ;
+        for (var i in messages) {
+            var m = messages[i] ;
+            if (m.is_run) {
+                if (!first_run) {
+                    first_run = m.run_num ;
+                    last_run  = m.run_num ;
+                } else {
+                    if (m.run_num < first_run) first_run = m.run_num ;
+                    if (m.run_num > last_run)  last_run  = m.run_num ;
+                }
+            } else {
+                num_messages++ ;
+            }
+        }
+        var ymd_hms = shift_begin_time.split(' ') ;
+        var ymd = ymd_hms[0] ;
+        var hms = ymd_hms[1] ;
+        var title = {
+            'shift'          : '<b>'+ymd+'</b>&nbsp;&nbsp;'+hms ,
+            'runs-end'       : last_run && (last_run !== first_run) ? last_run        : '&nbsp;' ,
+            'runs-separator' : last_run && (last_run !== first_run) ? '&nbsp;-&nbsp;' : '&nbsp;' ,
+            'runs-begin'     : first_run                            ? first_run       : '&nbsp;' ,
+            'messages'       : num_messages                         ? num_messages    : '&nbsp;' ,
+            'goals'          : '<span style="color:maroon;">'+_.escape(this._shifts[shift_begin_time].goals)+'</span>'
+        } ;
+        return title ; 
+    } ;
+}
+define_class (ELog_MessageViewerByShift, ELog_MessageViewerBase, {}, {}) ;
+
+
+
+/**
+ * Specialization for displaying a conatiner of mesasages within a table row's body
+ *
+ * @param {Object} parent
+ * @param {Array} messages
+ * @param {Object} options
+ * @returns {ELog_TagBody}
+ */
+function ELog_TagBody (parent, messages, options) {
+    ELog_MessageGroupBody.call(this, parent, messages, options, 'tag-viewer') ;
+}
+define_class (ELog_TagBody, ELog_MessageGroupBody, {}, {}) ;
+
+/**
+ * Group messages by a tag they were posted with.
+ *
+ * @param {Object} parent
+ * @param {Object} options
+ * @returns {ELog_MessageViewerByAuthor}
+ */
+function ELog_MessageViewerByTag (parent, options) {
+
+    // Always call the c-tor of the base class
+
+    ELog_MessageViewerBase.call(this, parent, options) ;
+
+    // -- parameters
+
+    this._messages = [] ;
+    this._tags = {} ;
+
+    var hdr = [
+        {id: 'tag',            title: 'Tag',        width: 180} ,
+        {id: 'runs-end',       title: 'Runs',       width:  50, align: 'right'} ,
+        {id: 'runs-separator', title: '&nbsp;',     width:  10, align: 'center'} ,
+        {id: 'runs-begin' ,    title: '&nbsp;',     width:  60, align: 'left'} ,
+        {id: 'messages',       title: 'Messages',   width:  60, align: 'right'}
+    ] ;
+    this._table = new StackOfRows (
+        hdr ,
+        [] ,
+        {   hidden_header: this.hidden_header ,
+            effect_on_insert: function (hdr_cont) {
+               hdr_cont.stop(true,true).effect('highlight', {color:'#ff6666 !important'}, 30000) ;
+            } ,
+            theme: 'stack-theme-aliceblue'
+        }
+    ) ;
+
+    /**
+     * @function - overloading the function of the base class Widget
+     */
+    this.render = function () {
+        this._table.display(this.container) ;
+        if (this.instant_expand) this._table.expand_or_collapse(true) ;
+    } ;
+
+    this.messages = function () { return this._messages ; } ;
+
+    this.num_rows = function () { return this._messages.length ; } ;
+
+    this._num_runs = 0 ;
+    this._min_run = 0 ;
+    this._max_run = 0 ;
+
+    this.num_runs = function () { return this._num_runs; } ;
+    this.min_run  = function () { return this._min_run; } ;
+    this.max_run  = function () { return this._max_run; } ;
+
+
+    /**
+     * Reload internal message store and redisplay the list of messages.
+     * 
+     * NOTE: The method will make a local deep copy of the input messages.
+     * 
+     * @param Array messages
+     * @returns {undefined}
+     */
+    this.load = function (messages) {
+
+        this._messages = jQuery.extend(true, [], messages) ;
+        this._messages.reverse() ;
+
+        this._tags = {} ;
+
+        this._num_runs = 0 ;
+        this._min_run = 0 ;
+        this._max_run = 0 ;
+
+        for (var i in this._messages) {
+            var m = this._messages[i] ;
+            if (typeof m === 'string') {
+                m = eval('('+m+')') ;
+                this._messages[i] = m ;
+            }
+            if (m.is_run) {
+                this._num_runs++ ;
+                this._min_run = Math.min(this._min_run ? this._min_run : m.run_num, m.run_num) ;
+                this._max_run = Math.max(this._max_run ? this._max_run : m.run_num, m.run_num) ;
+            }
+            if (m.tags.length) {
+                for (var j in m.tags) {
+                    var tag_name = m.tags[j].tag ;
+                    if (!_.has(this._tags, tag_name)) {
+                        this._tags[tag_name] = {
+                            messages: []
+                        } ;
+                    }
+                    this._tags[tag_name].messages.push(m) ;
+                }
+            } else {
+                var tag_name = '' ;
+                if (!_.has(this._tags, tag_name)) {
+                    this._tags[tag_name] = {
+                        messages: []
+                    } ;
+                }
+                this._tags[tag_name].messages.push(m) ;
+            }
+        }
+        var tag_names = _.keys(this._tags) ;
+        tag_names.sort() ;
+        tag_names.reverse() ;
+
+        this._table.reset() ;
+
+        for (var i in tag_names) {
+            var tag_name = tag_names[i] ;
+            this._tags[tag_name].messages.reverse() ;
+            this._tags[tag_name].row_id = this._table.append(this._tag2row(tag_name)) ;
+        }
+    } ;
+
+    /**
+     * Insert new messages in front of the table
+     * 
+     * @param Array new_messages
+     * @returns {undefined}
+     */
+    this.update = function (new_messages) {
+
+        var length = new_messages ? new_messages.length : 0;
+        if (length) {
+
+            // Put deep copies of the new messages in front of the local list.
+            // Note that this will also reverse the order in which we got the new
+            // messages so that the newest ones will always get to the front.
+
+            var tags = {} ;
+
+            for (var i in new_messages) {
+                var m = new_messages[i] ;
+                if (typeof m === 'string') m = eval('('+m+')') ;
+                m = jQuery.extend(true, {}, m) ;
+                if (this._messages.length) this._messages.splice(0, 0, m) ;
+                else                       this._messages.push(m) ;
+                if (m.is_run) {
+                    this._num_runs++ ;
+                    this._min_run = Math.min(this._min_run ? this._min_run : m.run_num, m.run_num) ;
+                    this._max_run = Math.max(this._max_run ? this._max_run : m.run_num, m.run_num) ;
+                }
+                if (m.tags.length) {
+                    for (var j in m.tags) {
+                        var tag_name = m.tags[j].tag ;
+                        if (!_.has(tags, tag_name)) {
+                            tags[tag_name] = {
+                                messages: []
+                            } ;
+                        }
+                        tags[tag_name].messages.push(m) ;
+                    }
+                } else {
+                    var tag_name = '' ;
+                    if (!_.has(tags, tag_name)) {
+                        tags[tag_name] = {
+                            messages: []
+                        } ;
+                    }
+                    tags[tag_name].messages.push(m) ;
+                }
+            }
+
+            var tag_names = _.keys(tags) ;
+            tag_names.sort() ;
+            for (var i in tag_names) {
+
+                var tag_name = tag_names[i] ;
+                if (_.has(this._tags, tag_name)) {
+
+                    // Extend the list of messages with the tag
+                    var messages = tags[tag_name].messages ;
+                    for (var j in messages) {
+                        var m = messages[j] ;
+                        this._tags[tag_name].messages.push(m) ;
+                    }
+
+                    // Update the title of the tag bar
+                    var row = this._table.get_row_by_id(this._tags[tag_name].row_id) ;
+                    row.update_title(this._tag2row_title(tag_name), function (hdr_cont) {
+                        hdr_cont.stop(true,true).effect('highlight', {color:'#ff6666 !important'}, 30000) ;
+                    }) ;
+                    
+                    // Update the list of messages within the row's body
+                    var row_body = row.get_body() ;
+                    for (var j in messages) {
+                        var m = messages[j] ;
+                        row_body.insert_front(m) ;
+                    }
+                } else {
+                    
+                    // Create a new row for the tag
+                    this._tags[tag_name] = tags[tag_name] ;
+                    this._tags[tag_name].row_id = this._table.insert_front(this._tag2row(tag_name)) ;
+                }
+            }
+        }
+    } ;
+
+    /**
+     * Append messages at the bottom of the table
+     * 
+     * @param Array new_messages
+     * @returns {undefined}
+     */
+    this.append = function (new_messages) {
+
+        var length = new_messages ? new_messages.length : 0;
+        if (length) {
+
+            // Put deep copies of the new messages at the very end of the of the local list.
+            // Note that this will also reverse the order in which we got the new
+            // messages so that the newest ones will alwats get to the front.
+
+            new_messages.reverse() ;    // need this to append newst message first
+
+            var tags = {} ;
+
+            for (var i in new_messages) {
+                var m = new_messages[i] ;
+                if (typeof m === 'string') m = eval('('+m+')') ;
+                m = jQuery.extend(true, {}, m) ;
+                if (this._messages.length) this._messages.splice(0, 0, m) ;
+                else                       this._messages.push(m) ;
+                if (m.is_run) {
+                    this._num_runs++ ;
+                    this._min_run = Math.min(this._min_run ? this._min_run : m.run_num, m.run_num) ;
+                    this._max_run = Math.max(this._max_run ? this._max_run : m.run_num, m.run_num) ;
+                }
+                if (m.tags.length) {
+                    for (var j in m.tags) {
+                        var tag_name = m.tags[j].tag ;
+                        if (!_.has(tags, tag_name)) {
+                            tags[tag_name] = {
+                                messages: []
+                            } ;
+                        }
+                        tags[tag_name].messages.push(m) ;
+                    }
+                } else {
+                    var tag_name = '' ;
+                    if (!_.has(tags, tag_name)) {
+                        tags[tag_name] = {
+                            messages: []
+                        } ;
+                    }
+                    tags[tag_name].messages.push(m) ;
+                }
+            }
+            var tag_names = _.keys(tags) ;
+            tag_names.sort() ;
+            tag_names.reverse() ;   
+            for (var i in tag_names) {
+                var tag_name = tag_names[i] ;
+                if (_.has(this._tags, tag_name)) {
+                    var messages = tags[tag_name].messages ;
+                    for (var j in messages) {
+                        var m = messages[j] ;
+                        this._tags[tag_name].messages.push(m) ;
+                    }
+                    this._tags[tag_name].row_id = this._table.update_row(this._tags[tag_name].row_id, this._tag2row(tag_name)) ;
+                } else {
+                    this._tags[tag_name] = tags[tag_name] ;
+                    this._tags[tag_name].row_id = this._table.append(this._tag2row(tag_name)) ;
+                }
+            }
+        }
+    } ;
+
+
+    this.update_row = function (old_row, new_message) {
+        console.log('ELog_MessageViewerByTag::update_row() not implemented for this viewer') ;
+        return ;
+    } ;
+
+    this.undelete_row = function (row) {
+        console.log('ELog_MessageViewerByTag::undelete_row() not implemented for this viewer') ;
+        return ;
+    } ;
+
+    this.delete_row = function (row, deleted_time, deleted_by) {
+        console.log('ELog_MessageViewerByTag::delete_row() not implemented for this viewer') ;
+        return ;
+    } ;
+
+    this.focus_at_message = function (message_id) {
+        console.log('ELog_MessageViewerByTag::focus_at_message() not implemented for this viewer') ;
+        return ;
+    } ;
+
+    this.focus_at_run = function (run_num) {
+        console.log('ELog_MessageViewerByTag::focus_at_run() not implemented for this viewer') ;
+        return ;
+    } ;
+
+    this._tag2row = function (tag_name) {
+        var row = {
+            title: this._tag2row_title(tag_name) ,
+            body:  new ELog_TagBody(this, this._tags[tag_name].messages, this.options)
+        } ;
+        return row ; 
+    } ;
+    this._tag2row_title = function (tag_name) {
+        var messages = this._tags[tag_name].messages ;
+        var first_run    = 0 ;
+        var last_run     = 0 ;
+        var num_messages = 0 ;
+        for (var i in messages) {
+            var m = messages[i] ;
+            if (m.is_run) {
+                if (!first_run) {
+                    first_run = m.run_num ;
+                    last_run  = m.run_num ;
+                } else {
+                    if (m.run_num < first_run) first_run = m.run_num ;
+                    if (m.run_num > last_run)  last_run  = m.run_num ;
+                }
+            } else {
+                num_messages++ ;
+            }
+        }
+        var title = {
+            'tag'            : tag_name                             ? tag_name        : '&nbsp;' ,
+            'runs-end'       : last_run && (last_run !== first_run) ? last_run        : '&nbsp;' ,
+            'runs-separator' : last_run && (last_run !== first_run) ? '&nbsp;-&nbsp;' : '&nbsp;' ,
+            'runs-begin'     : first_run                            ? first_run       : '&nbsp;' ,
+            'messages'       : num_messages                         ? num_messages    : '&nbsp;'
+        } ;
+        return title ; 
+    } ;
+}
+define_class (ELog_MessageViewerByTag, ELog_MessageViewerBase, {}, {}) ;
+
+
+
+/**
+ * Specialization for displaying a conatiner of mesasages within a table row's body
+ *
+ * @param {Object} parent
+ * @param {Array} messages
+ * @param {Object} options
+ * @returns {ELog_AuthorBody}
+ */
+function ELog_AuthorBody (parent, messages, options) {
+    ELog_MessageGroupBody.call(this, parent, messages, options, 'author-viewer') ;
+}
+define_class (ELog_AuthorBody, ELog_MessageGroupBody, {}, {}) ;
+
+
+/**
+ * Group messages by a shift they were posted.
+ *
+ * @param {Object} parent
+ * @param {Object} options
+ * @returns {ELog_MessageViewerNoGroupping}
+ */
+function ELog_MessageViewerByAuthor (parent, options) {
+
+    // Always call the c-tor of the base class
+
+    ELog_MessageViewerBase.call(this, parent, options) ;
+
+    // -- parameters
+
+    this._messages = [] ;
+    this._authors = {} ;
+
+    var hdr = [
+        {id: 'author',         title: 'Author',     width: 100} ,
+        {id: 'runs-end',       title: 'Runs',       width:  50, align: 'right'} ,
+        {id: 'runs-separator', title: '&nbsp;',     width:  10, align: 'center'} ,
+        {id: 'runs-begin' ,    title: '&nbsp;',     width:  60, align: 'left'} ,
+        {id: 'messages',       title: 'Messages',   width:  60, align: 'right'}
+    ] ;
+    this._table = new StackOfRows (
+        hdr ,
+        [] ,
+        {   hidden_header: this.hidden_header ,
+            effect_on_insert: function (hdr_cont) {
+               hdr_cont.stop(true,true).effect('highlight', {color:'#ff6666 !important'}, 30000) ;
+            } ,
+            theme: 'stack-theme-aliceblue'
+        }
+    ) ;
+
+    /**
+     * @function - overloading the function of the base class Widget
+     */
+    this.render = function () {
+        this._table.display(this.container) ;
+        if (this.instant_expand) this._table.expand_or_collapse(true) ;
+    } ;
+
+    this.messages = function () { return this._messages ; } ;
+
+    this.num_rows = function () { return this._messages.length ; } ;
+
+    this._num_runs = 0 ;
+    this._min_run = 0 ;
+    this._max_run = 0 ;
+
+    this.num_runs = function () { return this._num_runs; } ;
+    this.min_run  = function () { return this._min_run; } ;
+    this.max_run  = function () { return this._max_run; } ;
+
+
+    /**
+     * Reload internal message store and redisplay the list of messages.
+     * 
+     * NOTE: The method will make a local deep copy of the input messages.
+     * 
+     * @param Array messages
+     * @returns {undefined}
+     */
+    this.load = function (messages) {
+
+        this._messages = jQuery.extend(true, [], messages) ;
+        this._messages.reverse() ;
+
+        this._authors = {} ;
+
+        this._num_runs = 0 ;
+        this._min_run = 0 ;
+        this._max_run = 0 ;
+
+        for (var i in this._messages) {
+            var m = this._messages[i] ;
+            if (typeof m === 'string') {
+                m = eval('('+m+')') ;
+                this._messages[i] = m ;
+            }
+            if (m.is_run) {
+                this._num_runs++ ;
+                this._min_run = Math.min(this._min_run ? this._min_run : m.run_num, m.run_num) ;
+                this._max_run = Math.max(this._max_run ? this._max_run : m.run_num, m.run_num) ;
+            }
+            var author_name = m.author ;
+            if (!_.has(this._authors, author_name)) {
+                this._authors[author_name] = {
+                    messages: []
+                } ;
+            }
+            this._authors[author_name].messages.push(m) ;
+        }
+        var author_names = _.keys(this._authors) ;
+        author_names.sort() ;
+        author_names.reverse() ;
+
+        this._table.reset() ;
+
+        for (var i in author_names) {
+            var author_name = author_names[i] ;
+            this._authors[author_name].messages.reverse() ;
+            this._authors[author_name].row_id = this._table.append(this._author2row(author_name)) ;
+        }
+    } ;
+
+    /**
+     * Insert new messages in front of the table
+     * 
+     * @param Array new_messages
+     * @returns {undefined}
+     */
+    this.update = function (new_messages) {
+
+        var length = new_messages ? new_messages.length : 0;
+        if (length) {
+
+            // Put deep copies of the new messages in front of the local list.
+            // Note that this will also reverse the order in which we got the new
+            // messages so that the newest ones will always get to the front.
+
+            var authors = {} ;
+
+            for (var i in new_messages) {
+                var m = new_messages[i] ;
+                if (typeof m === 'string') m = eval('('+m+')') ;
+                m = jQuery.extend(true, {}, m) ;
+                if (this._messages.length) this._messages.splice(0, 0, m) ;
+                else                       this._messages.push(m) ;
+                if (m.is_run) {
+                    this._num_runs++ ;
+                    this._min_run = Math.min(this._min_run ? this._min_run : m.run_num, m.run_num) ;
+                    this._max_run = Math.max(this._max_run ? this._max_run : m.run_num, m.run_num) ;
+                }
+                var author_name = m.author ;
+                if (!_.has(authors, author_name)) {
+                    authors[author_name] = {
+                        messages: []
+                    } ;
+                }
+                authors[author_name].messages.push(m) ;
+            }
+
+            var author_names = _.keys(authors) ;
+            author_names.sort() ;
+            for (var i in author_names) {
+
+                var author_name = author_names[i] ;
+                if (_.has(this._authors, author_name)) {
+
+                    // Extend the list of messages of the author
+                    var messages = authors[author_name].messages ;
+                    for (var j in messages) {
+                        var m = messages[j] ;
+                        this._authors[author_name].messages.push(m) ;
+                    }
+
+                    // Update the title of the author bar
+                    var row = this._table.get_row_by_id(this._authors[author_name].row_id) ;
+                    row.update_title(this._author2row_title(author_name), function (hdr_cont) {
+                        hdr_cont.stop(true,true).effect('highlight', {color:'#ff6666 !important'}, 30000) ;
+                    }) ;
+                    
+                    // Update the list of messages within the row's body
+                    var row_body = row.get_body() ;
+                    for (var j in messages) {
+                        var m = messages[j] ;
+                        row_body.insert_front(m) ;
+                    }
+                } else {
+                    
+                    // Create a new row for the author
+                    this._authors[author_name] = authors[author_name] ;
+                    this._authors[author_name].row_id = this._table.insert_front(this._author2row(author_name)) ;
+                }
+            }
+        }
+    } ;
+
+    /**
+     * Append messages at the bottom of the table
+     * 
+     * @param Array new_messages
+     * @returns {undefined}
+     */
+    this.append = function (new_messages) {
+
+        var length = new_messages ? new_messages.length : 0;
+        if (length) {
+
+            // Put deep copies of the new messages at the very end of the of the local list.
+            // Note that this will also reverse the order in which we got the new
+            // messages so that the newest ones will alwats get to the front.
+
+            new_messages.reverse() ;    // need this to append newst message first
+
+            var authors = {} ;
+
+            for (var i in new_messages) {
+                var m = new_messages[i] ;
+                if (typeof m === 'string') m = eval('('+m+')') ;
+                m = jQuery.extend(true, {}, m) ;
+                if (this._messages.length) this._messages.splice(0, 0, m) ;
+                else                       this._messages.push(m) ;
+                if (m.is_run) {
+                    this._num_runs++ ;
+                    this._min_run = Math.min(this._min_run ? this._min_run : m.run_num, m.run_num) ;
+                    this._max_run = Math.max(this._max_run ? this._max_run : m.run_num, m.run_num) ;
+                }            
+                var author_name = m.author ;
+                if (!_.has(authors, author_name)) {
+                    authors[author_name] = {
+                        messages: []
+                    } ;
+                }
+                authors[author_name].messages.push(m) ;
+            }
+            var author_names = _.keys(authors) ;
+            author_names.sort() ;
+            author_names.reverse() ;   
+            for (var i in author_names) {
+                var author_name = author_names[i] ;
+                if (_.has(this._authors, author_name)) {
+                    var messages = authors[author_name].messages ;
+                    for (var j in messages) {
+                        var m = messages[j] ;
+                        this._authors[author_name].messages.push(m) ;
+                    }
+                    this._authors[author_name].row_id = this._table.update_row(this._authors[author_name].row_id, this._author2row(author_name)) ;
+                } else {
+                    this._authors[author_name] = authors[author_name] ;
+                    this._authors[author_name].row_id = this._table.append(this._author2row(author_name)) ;
+                }
+            }
+        }
+    } ;
+
+
+    this.update_row = function (old_row, new_message) {
+        console.log('ELog_MessageViewerByAuthor::update_row() not implemented for this viewer') ;
+        return ;
+    } ;
+
+    this.undelete_row = function (row) {
+        console.log('ELog_MessageViewerByAuthor::undelete_row() not implemented for this viewer') ;
+        return ;
+    } ;
+
+    this.delete_row = function (row, deleted_time, deleted_by) {
+        console.log('ELog_MessageViewerByAuthor::delete_row() not implemented for this viewer') ;
+        return ;
+    } ;
+
+    this.focus_at_message = function (message_id) {
+        console.log('ELog_MessageViewerByAuthor::focus_at_message() not implemented for this viewer') ;
+        return ;
+    } ;
+
+    this.focus_at_run = function (run_num) {
+        console.log('ELog_MessageViewerByAuthor::focus_at_run() not implemented for this viewer') ;
+        return ;
+    } ;
+
+    this._author2row = function(author_name) {
+        var row = {
+            title: this._author2row_title(author_name) ,
+            body:  new ELog_AuthorBody(this, this._authors[author_name].messages, this.options)
+        } ;
+        return row ; 
+    } ;
+    this._author2row_title = function (author_name) {
+        var messages = this._authors[author_name].messages ;
+        var first_run    = 0 ;
+        var last_run     = 0 ;
+        var num_messages = 0 ;
+        for (var i in messages) {
+            var m = messages[i] ;
+            if (m.is_run) {
+                if (!first_run) {
+                    first_run = m.run_num ;
+                    last_run  = m.run_num ;
+                } else {
+                    if (m.run_num < first_run) first_run = m.run_num ;
+                    if (m.run_num > last_run)  last_run  = m.run_num ;
+                }
+            } else {
+                num_messages++ ;
+            }
+        }
+        var title = {
+            'author'         : author_name                          ? author_name     : '&nbsp;'  ,
+            'runs-end'       : last_run && (last_run !== first_run) ? last_run        : '&nbsp;' ,
+            'runs-separator' : last_run && (last_run !== first_run) ? '&nbsp;-&nbsp;' : '&nbsp;' ,
+            'runs-begin'     : first_run                            ? first_run       : '&nbsp;' ,
+            'messages'       : num_messages                         ? num_messages    : '&nbsp;'
+        } ;
+        return title ; 
+    } ;
+}
+define_class (ELog_MessageViewerByAuthor, ELog_MessageViewerBase, {}, {}) ;
+
+
+/**
+ * The front-end dispatcher managing and coordinating specific message viewers
+ *
+ * @param {Object} parent
+ * @param {JQuery} cont
+ * @param {Object} options
+ * @returns {ELog_MessageViewer}
+ */
+function ELog_MessageViewer (parent, cont, options) {
+
+    var _that = this ;
+
+    // Always call the c-tor of the base class
+
+    ELog_MessageViewerBase.call(this, parent, options) ;
+
+    // Parameters of the object
+
+    this.cont = cont ;
+
+    // Construct the default viewer instance
+ 
+    this._body = null ;
+    this._viewer = null ;
+    this._rb = null ;
+
+    /**
+     * @function - overloading the function of the base class Widget
+     */
+    this.render = function () {
+
+        // TODO: Construct the DOM including RadioBox for switching between
+        //       different views, and the container for a viewer instance.
+
+        if (this.allow_groups) {
+            var html =
+'<div id="ctrl"></div>' +
+'<div id="body">' +
+'  <div id="stream"></div>' +
+'  <div id="day"></div>' +
+'  <div id="shift"></div>' +
+'  <div id="tag"></div>' +
+'  <div id="author"></div>' +
+'</div>' ;
+            this.cont.html(html) ;
+
+            this._rb = new RadioBox(
+                [{  name:  "stream" ,
+                    text:  "SIMPLE STREAM" ,
+                    class: "control-button" ,
+                    title: "The groupping is off. Messages are show in the same order they were posted."
+                } , {
+                    name:  "day" ,
+                    text:  "GROUP BY DAY" ,
+                    class: "control-button" ,
+                    title: "Group messages by a day they were posted."
+                } , {
+                    name:  "shift" ,
+                    text:  "GROUP BY SHIFT" ,
+                    class: "control-button" ,
+                    title: "Group messages by a shift in which they were posted."
+                } , {
+                    name:  "tag" ,
+                    text:  "GROUP BY TAG" ,
+                    class: "control-button" ,
+                    title: "Group messages by message tags."
+                } , {
+                    name:  "author" ,
+                    text:  "GROUP BY AUTHOR" ,
+                    class: "control-button" ,
+                    title: "Group messages by message authors."
+                }] ,
+
+                function (name) {
+
+                    // Borrow messages from the old viewer. Make sure they're sorted
+                    // correctly. Otherwise the viewer will show them in the reverse order.
+
+                    var messages = _that._viewer.messages() ;
+                    messages.reverse() ;
+
+                    switch (name) {
+                        case 'stream' :
+                            _that._viewer = new ELog_MessageViewerNoGroupping(_that.parent, _that.options) ;
+                            _that._viewer.display(_that._body.children('div#stream')) ;
+                            _that._body.children('div#day').html('') ;
+                            _that._body.children('div#shift').html('') ;
+                            _that._body.children('div#tag').html('') ;
+                            _that._body.children('div#author').html('') ;
+                            break ;
+                        case 'day' :
+                            _that._viewer = new ELog_MessageViewerByDay(_that.parent, _that.options) ;
+                            _that._viewer.display(_that._body.children('div#day') ) ;
+                            _that._body.children('div#stream').html('') ;
+                            _that._body.children('div#shift').html('') ;
+                            _that._body.children('div#tag').html('') ;
+                            _that._body.children('div#author').html('') ;
+                            break ;
+                        case 'shift' :
+                            _that._viewer = new ELog_MessageViewerByShift(_that.parent, _that.options) ;
+                            _that._viewer.display(_that._body.children('div#shift') ) ;
+                            _that._body.children('div#stream').html('') ;
+                            _that._body.children('div#day').html('') ;
+                            _that._body.children('div#tag').html('') ;
+                            _that._body.children('div#author').html('') ;
+                            break ;
+                        case 'tag' :
+                            _that._viewer = new ELog_MessageViewerByTag(_that.parent, _that.options) ;
+                            _that._viewer.display(_that._body.children('div#tag') ) ;
+                            _that._body.children('div#stream').html('') ;
+                            _that._body.children('div#day').html('') ;
+                            _that._body.children('div#shift').html('') ;
+                            _that._body.children('div#author').html('') ;
+                            break ;
+                        case 'author' :
+                            _that._viewer = new ELog_MessageViewerByAuthor(_that.parent, _that.options) ;
+                            _that._viewer.display(_that._body.children('div#author') ) ;
+                            _that._body.children('div#stream').html('') ;
+                            _that._body.children('div#day').html('') ;
+                            _that._body.children('div#shift').html('') ;
+                            _that._body.children('div#tag').html('') ;
+                            break ;
+                    }
+                    _that._viewer.load(messages) ;
+                } ,
+
+                {
+                    activate: "stream"}
+            ) ;
+            this._rb.display(this.cont.children('div#ctrl')) ;
+
+        } else {
+            var html =
+'<div id="body">' +
+'  <div id="stream"></div>' +
+'</div>' ;
+            this.cont.html(html) ;
+        }
+
+        // Install the initial viewer
+
+        this._body = this.cont.children('div#body') ;
+        this._viewer = new ELog_MessageViewerNoGroupping(this.parent, this.options) ;
+        this._viewer.display(this._body.children('div#stream') ) ;
+    } ;
+
+    // Forward base class's methods to the viewer's instance
+
+    this.num_rows = function () { return this._viewer.num_rows() ; } ;
+    this.num_runs = function () { return this._viewer.num_runs() ; } ;
+    this.min_run  = function () { return this._viewer.min_run () ; } ;
+    this.max_run  = function () { return this._viewer.max_run () ; } ;
+
+    this.load     = function (messages)     { this._viewer.load  (messages) ; } ;
+    this.update   = function (new_messages) { this._viewer.update(new_messages) ; } ;
+    this.append   = function (new_messages) { this._viewer.append(new_messages) ; } ;
+
+    this.update_row   = function (old_row, new_message)          { this._viewer.update_row  (old_row, new_message) ; } ;    
+    this.undelete_row = function (row)                           { this._viewer.undelete_row(row) ; } ;
+    this.delete_row   = function (row, deleted_time, deleted_by) { this._viewer.delete_row  (row, deleted_time, deleted_by) ; } ;
+
+    this.focus_at_message = function (message_id) { this._viewer.focus_at_message(message_id) ; } ;
+    this.focus_at_run     = function (run_num)    { this._viewer.focus_at_run    (run_num) ; } ;
 
     // Must be the last call. Otherwise the widget won't be able to see
     // functon 'render()' defined above in this code.
 
     this.display(this.cont) ;
 }
-define_class (ELog_MessageViewer, Widget, {}, {}) ;
+define_class (ELog_MessageViewer, ELog_MessageViewerBase, {}, {}) ;

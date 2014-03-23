@@ -2,20 +2,20 @@
   padding: 0;
 }
 
-#elog-live #ctrl {
+#elog-live > #ctrl {
   padding: 10px;
 }
-#elog-live #ctrl > div {
+#elog-live > #ctrl > div {
   margin-right: 10px;
 }
-#elog-live #ctrl > div > span {
+#elog-live > #ctrl > div > span {
   font-weight: bold;
 }
-#elog-live #ctrl > div:first-child {
+#elog-live > #ctrl > div:first-child {
   margin-left: 10px;
 }
 
-#elog-live #body {
+#elog-live > #body {
   padding: 10px 20px 10px 20px;
   /*
   border-top: solid 1px #c0c0c0;
