@@ -21,7 +21,7 @@ function RadioBox (buttons, onchange, options) {
 
     var _that = this ;
 
-    // Always call the c-tor of teh base class
+    // Always call the c-tor of the base class
 
     Widget.call(this) ;
 

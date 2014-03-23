@@ -246,7 +246,10 @@ render : function () {
         var float_right = false ;   // once triggered, it will shift the remaining columns to the right
         for(var i in this.hdr) {
             var col = this.hdr[i] ;
-            if (col.id === '|') {
+            if (col.id === '_') {
+                html +=
+'<div class="stack-row-column" style="min-width:'+col.width+'px;">&nbsp;</div>' ;
+            } else if (col.id === '|') {
                 html +=
 '<div class="stack-row-column-separator">&nbsp;</div>' ;
             } else if (col.id === '>') {
@@ -270,6 +273,44 @@ render : function () {
     if (this.effect_on_insert) {
         this.effect_on_insert(this.header) ;
     }
+} ,
+
+/**
+ * @function - update valued of the specified columnd in the table title
+ * @param Object title - a map of column identifiers and new values
+ */
+update_title : function (title, effect_on_update) {
+    
+    // Replace the title in the local store and render updates
+
+    this.data_object.title = RowTitle_Factory (title, this.hdr) ;
+    if (this.hdr) {
+        var title_as_function = typeof(this.data_object.title.html) === 'function' ;
+        for(var i in this.hdr) {
+            var id = this.hdr[i].id ;
+            switch (id) {
+                case '|' : break ;
+                case '>' : break ;
+                default:
+                    this.header.find('div#'+id).html(title_as_function ? this.data_object.title.html(id) : this.data_object.title[id]) ;
+            }
+        }
+    } else {
+        this.first = this.header.children('.stack-row-column-first') ;
+        this.first.next().html(this.data_object.title.html()) ;
+    }
+
+    // Enfore the header effect if requested and if the effect has been provided
+    
+    if (effect_on_update)
+        effect_on_update(this.header) ;
+} ,
+
+/**
+ * @function - return the body of the row
+ */
+get_body : function () {
+    return this.data_object.body ;
 } ,
 
 /**
@@ -530,7 +571,10 @@ stack_header: function () {
 
         for(var i in this.hdr) {
             var col = this.hdr[i] ;
-            if (col.id === '|') {
+            if (col.id === '_') {
+                html +=
+'  <div class="stack-column">&nbsp;</div>' ;
+            } else if (col.id === '|') {
                 html +=
 '  <div class="stack-column-separator">&nbsp;</div>' ;
             } else if (col.id === '>') {
@@ -582,7 +626,6 @@ first_row: function () {
  */
 
 reset: function () {
-    console.log('StackOfRows::reset()') ;
     this.assert_initialized() ;
     this.body.children('.stack-row').remove() ;
     this.set_rows([]) ;
@@ -651,8 +694,10 @@ delete_row : function (id) {
  * 
  * @param Number id - an identifier of the row
  * @param Object row_data - the data object to initialize the row
+ * @param Boolean effect_on_update_required - teh optional flag indicating if the updated orw shoudl be highlighted
+ * @return Number - the unique identifier of the row witin the table
  */
-update_row : function (id, row_data) {
+update_row : function (id, row_data, effect_on_update_required) {
 
     if (!row_data) throw new WidgetError('StackRows.update_row: illegal row data') ;
 
@@ -664,18 +709,21 @@ update_row : function (id, row_data) {
     var is_expanded = old_row.is_expanded() ;
     var common_expand = false ;
 
-    var new_row = StackRowData_Factory (
+    var effect_on_update_required = effect_on_update_required ? true : false ;
+    var new_row_obj = StackRowData_Factory (
         this ,
         id ,
         row_data ,
         this.hdr ,
-        this.options
+        this.options ,
+        effect_on_update_required
     ) ;
-    this.rows[i] = new_row ;
+    this.rows[i] = new_row_obj ;
 
-    new_row.display(this.body.children('.stack-row#'+id)) ;
-    new_row.expand_or_collapse(is_expanded, common_expand) ;
+    new_row_obj.display(this.body.children('.stack-row#'+id)) ;
+    new_row_obj.expand_or_collapse(is_expanded, common_expand) ;
 
+    return new_row_obj.id ;
 } ,
 
 /**
