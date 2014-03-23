@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-25
+2014-03-22 Igor Gaponenko
+- added group management support for 'ps-las'
+
 Tag: V00-01-24
 2014-03-05 Igor Gaponenko
 - added a function to the Switch

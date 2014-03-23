@@ -708,6 +708,12 @@ HERE;
             $groups['ps-usr-sci'] = True;
         }
 
+        /* Facility e-logs.
+         */
+        if( is_null( $instr ) || ( $instr == 'NEH' )) {
+            $groups['ps-las'] = True;
+        }
+
         /* Add groups which aren't really experiment or instrument specific.
          */
         $groups['ps-data'] = True;
