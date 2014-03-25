@@ -1,0 +1,294 @@
+:
+:  Library of Jinja2 templates for psana and pdsdata backends
+:
+:  Lines starting with colon are comments, except for special '::::template::::'
+:
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: macros
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+{% macro comma_shape(shape) -%}
+{% for dim in shape -%}
+, {% if dim is none %}dim{{loop.index0}}{% else %}{{dim}}{% endif %}
+{%- endfor %}
+{%- endmacro %}
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: method_decl
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for declaration of class method. 
+:  
+:  Parameters for this template:
+:    doc       - comment string
+:    template  - optional, template parameter name
+:    static    - if true method is declared static
+:    abstract  - if true method is declared pure virtual
+:    rettype   - return type
+:    methname  - method name
+:    argsspec  - argument declaration
+:    inline    - if true then body is inlined
+:    body      - method body
+:
+$ if doc:
+  /** {{doc}} */
+$ endif
+$ if template:
+  template <typename {{template}}>
+$ endif
+  {% if static %}static {% endif %}{% if abstract %}virtual {% endif %}
+{{rettype}} {{methname}}({{argsspec}})
+{%- if not static %} const{% endif %}{% if abstract %} = 0{% endif %}
+{%- if inline and body and not abstract %} { {{body}} }{% else %};{% endif %}
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: method_impl
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for implementation of class method. 
+:  
+:  Parameters for this template:
+:    template  - optional, template parameter name
+:    static    - if true method is declared static
+:    rettype   - return type
+:    classname - class name
+:    methname  - method name
+:    argsspec  - argument declaration
+:    body      - method body
+:
+$ if template:
+  template <typename {{template}}>
+$ endif
+{{rettype}}
+{{classname}}::{{methname}}({{argsspec}})
+{%- if not static %} const{% endif %} {
+  {{body}}
+}
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: enum_decl
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for declaration of the enum in C++.
+:
+:  Parameters for this template:
+:    enum - object of type Enum 
+:
+{% if enum.comment %}
+
+  /** {{enum.comment}} */
+{% endif %}
+  enum {{enum.name}} {
+{% for const in enum.constants() %}
+    {{const.name}}{% if const.value is not none %} = {{const.value}}{% endif %},{% if const.comment %} /**< {{const.comment}} */{% endif %}
+
+{% endfor %}
+  };
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: enum_print_decl
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for declaration of enum printing function. 
+:  
+:  Parameters for this template:
+:    enum      - instance of Enum type
+:
+std::ostream& operator<<(std::ostream& str, {{enum.fullNameCpp()}} enval);
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: enum_print_impl
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for implementation of enum printing function. 
+:  
+:  Parameters for this template:
+:    enum      - instance of Enum type
+:
+std::ostream& operator<<(std::ostream& str, {{enum.fullNameCpp()}} enval) {
+  const char* val;
+  switch (enval) {
+$ for const in enum.unique_constants():
+  case {{enum.parent.fullNameCpp()}}::{{const.name}}:
+    val = "{{const.name}}";
+    break;
+$ endfor
+  default:
+    return str << "{{enum.name}}(" << int(enval) << ")";
+  }
+  return str << val;
+}
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: body_non_array
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for method body returning non-array members.
+:  
+:  Parameters for this template:
+:    attr      - instance of Attribute type
+:
+{% if attr.isfixed() %}
+{% if attr.type != attr.stor_type %}
+return {{attr.type.fullNameCpp()}}({{attr.name}});
+{%- else %}
+return {{attr.name}};
+{%- endif %}
+{% else %}
+ptrdiff_t offset={{attr.offset}};
+  return *(const {{attr.type.fullNameCpp()}}*)(((const char*)this)+offset);
+{%- endif %}
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: body_ndarray
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for method body returning ndarray.
+:  
+:  Parameters for this template:
+:    attr      - instance of Attribute type
+:
+{% import 'cppcodegen.tmpl?macros' as macros %}
+{% set comma_shape = macros.comma_shape(attr.shape.dims) %}
+{% if attr.isfixed() %}
+return make_ndarray(&{{attr.name}}{% for i in attr.shape.dims %}[0]{% endfor %}{{comma_shape}});
+{%- else %}
+{% set type = attr.type.fullNameCpp() %}
+ptrdiff_t offset={{attr.offset}};
+  const {{type}}* data = (const {{type}}*)(((char*)this)+offset);
+  return make_ndarray(data{{comma_shape}});
+{%- endif %}
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: body_ndarray_shptr
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for method body returning ndarray.
+:  
+:  Parameters for this template:
+:    attr      - instance of Attribute type
+:
+{% import 'cppcodegen.tmpl?macros' as macros %}
+{% set comma_shape = macros.comma_shape(attr.shape.dims) %}
+{% set type = attr.stor_type.fullNameCpp() %}
+{% if attr.isfixed() %}
+
+    const {{type}}* data = &{{attr.name}}{% for i in attr.shape.dims %}[0]{% endfor %};
+{% else %}
+
+    ptrdiff_t offset={{attr.offset}};
+    const {{type}}* data = (const {{type}}*)(((char*)this)+offset);
+{% endif %}
+    return make_ndarray(boost::shared_ptr<const {{type}}>(owner, data){{comma_shape}});
+ 
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: body_shape
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for method body returning attribute shape.
+:  
+:  Parameters for this template:
+:    shape      - list of dimensions
+:
+std::vector<int> shape;
+  shape.reserve({{shape|length}});
+$ for dim in shape:
+  shape.push_back({{dim}});
+$ endfor
+  return shape;
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: ctor_decl
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for constructor declaration
+:  
+:  Parameters for this template:
+:    classname    - class name
+:    arglist      - list of arguments
+:
+  {{classname}}({{arglist|join(", ")}});
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: ctor_decl_inline
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for constructor declaration with inline definition
+:  
+:  Parameters for this template:
+:    classname    - class name
+:    arglist      - list of arguments
+:    initlist     - initializers 
+:    arrayinit    - initializes for arrays
+:
+  {{classname}}({{arglist|join(", ")}})
+$ if initlist:
+    : {{initlist|join(", ")}}
+$ endif
+  {
+{% for arg, size, attr in arrayinit %}
+{% if size is none %}
+    {
+      ptrdiff_t offset = {{attr.offset}};
+      {{type}}* data = reinterpret_cast<{{type}}*>(((char*)this)+offset);
+      new (data) {{attr.type.name}}({{arg}});
+    }
+{% else %}
+{% if attr.isfixed() %}
+    if ({{arg}}) std::copy({{arg}}, {{arg}}+({{size}}), &{{attr.name}}{% for i in attr.shape.dims %}[0]{% endfor %});
+{% else %}
+{% set type = attr.type.fullNameCpp() %}
+    if ({{arg}} and ({{size}})) {
+      ptrdiff_t offset = {{attr.offset}};
+      {{type}}* data = reinterpret_cast<{{type}}*>(((char*)this)+offset);
+      std::copy({{arg}}, {{arg}}+({{size}}), data);
+    }
+{% endif %}
+{% endif %}
+{% endfor %}
+  }
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: ctor_impl
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for constructor out-of-inline definition
+:  
+:  Parameters for this template:
+:    classname    - class name
+:    arglist      - list of arguments
+:    initlist     - initializers 
+:    arrayinit    - initializes for arrays
+:
+{{classname}}::{{classname}}({{arglist|join(", ")}})
+$ if initlist:
+    : {{initlist|join(", ")}}
+$ endif
+{
+{% for arg, size, attr in arrayinit %}
+{% if size is none %}
+  {
+    ptrdiff_t offset = {{attr.offset}};
+    {{type}}* data = reinterpret_cast<{{type}}*>(((char*)this)+offset);
+    new (data) {{attr.type.name}}({{arg}});
+  }
+{% else %}
+{% if attr.isfixed() %}
+  if ({{arg}}) std::copy({{arg}}, {{arg}}+({{size}}), &{{attr.name}}{% for i in attr.shape.dims %}[0]{% endfor %});
+{% else %}
+{% set type = attr.type.fullNameCpp() %}
+  if ({{arg}} and ({{size}})) {
+    ptrdiff_t offset = {{attr.offset}};
+    {{type}}* data = reinterpret_cast<{{type}}*>(((char*)this)+offset);
+    std::copy({{arg}}, {{arg}}+({{size}}), data);
+  }
+{% endif %}
+{% endif %}
+{% endfor %}
+}
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: copy_ctor
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for constructor out-of-inline definition
+:  
+:  Parameters for this template:
+:    classname    - class name
+:
+  {{classname}}(const {{classname}}& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+  }
+  {{classname}}& operator=(const {{classname}}& other) {
+    const char* src = reinterpret_cast<const char*>(&other);
+    std::copy(src, src+other._sizeof(), reinterpret_cast<char*>(this));
+    return *this;
+  }
