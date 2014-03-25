@@ -1,0 +1,1485 @@
+:
+:  Library of Jinja2 templates for HDF5 backends
+:
+:  Lines starting with colon are comments, except for special '::::template::::'
+:
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: compound_dataset_decl
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for declaration of C++ struct corresponding to 
+:  compound HDF5 dataset. 
+:  
+:  Parameters for this template:
+:    hds         - instance of type DatasetCompound
+:    conversion  - optional, C++ return type of conversion method
+:    cvt_args    - arguments to constructor of conversion type
+:
+{% set classname = hds.ds.className() %}
+
+namespace {{hds.schema.nsName()}} {
+struct {{classname}} {
+  static hdf5pp::Type native_type();
+  static hdf5pp::Type stored_type();
+
+  {{classname}}();
+  {{classname}}(const {{hds.pstypename}}& psanaobj);
+  ~{{classname}}();
+
+{% for attr in hds.attributes %}
+{% for decl in attr.ds_attr_decl() %}
+  {{decl}}
+{% endfor %}
+{% endfor %}
+
+{% if conversion %}
+  operator {{conversion}}() const { return {{conversion}}({{cvt_args}}); }
+{% endif %}
+
+{% if pointers %}
+private:
+  {{classname}}(const {{classname}}&);
+  {{classname}}& operator=(const {{classname}}&);
+{% endif %}
+};
+}
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: compound_dataset_ctor_dtor
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for implementation of the constructor and destructor for the classes
+:  defining compound dataset/
+:
+:  Parameters for this template:
+:    hds         - instance of type DatasetCompound
+:    pointers    - list of data members which are pointers
+:    vlen_pointers - list of data members which are pointers to VLEN data
+:
+{% set ns = hds.schema.nsName() %}
+{% set classname = hds.ds.className() %}
+
+{{ns}}::{{classname}}::{{classname}}()
+{
+{% for attr in vlen_pointers %}
+  this->vlen_{{attr}} = 0;
+{% endfor %}
+{% for attr in pointers %}
+  this->{{attr}} = 0;
+{% endfor %}
+}
+
+{{ns}}::{{classname}}::{{classname}}(const {{hds.pstypename}}& psanaobj)
+{% set sep = joiner(",") %}
+{% for attr in hds.attributes %}
+{% for init in attr.ds_attr_init() %}
+  {{sep() or ':'}} {{init}}
+{% endfor %}
+{% endfor %}
+{
+{% for attr in hds.attributes %}
+{% for init in attr.ds_attr_initcode() %}
+{{init}}
+{% endfor %}
+{% endfor %}
+}
+
+{{ns}}::{{classname}}::~{{classname}}()
+{
+{% for attr in pointers %}
+  free(this->{{attr}});
+{% endfor %}
+}
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: compound_dataset_h5type_method
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for implementation of the stored_type() or native_type()
+:  methods.
+:
+:  Parameters for this template:
+:  func        - string "native" or "stored"
+:  ns          - C++ namespace
+:  className   - C++ class name
+:  attributes  - list of attributes, each item is a dictionary with keys 
+:      name      - name of the dataset attribute
+:      type      - type definition of the attribute
+:      member    - data memeber of C++ struct
+:      type_decl - optional, additional piece of code to declare type
+:
+
+hdf5pp::Type {{ns}}_{{className}}_{{func}}_type()
+{
+  typedef {{ns}}::{{className}} DsType;
+  hdf5pp::CompoundType type = hdf5pp::CompoundType::compoundType<DsType>();
+{% for attr in attributes %}
+{% if attr.type_decl %}
+{{attr.type_decl}}
+{%- endif %}
+  type.insert("{{attr.name}}", offsetof(DsType, {{attr.member}}), {{attr.type}});
+{% endfor %}
+  return type;
+}
+
+hdf5pp::Type {{ns}}::{{className}}::{{func}}_type()
+{
+  static hdf5pp::Type type = {{ns}}_{{className}}_{{func}}_type();
+  return type;
+}
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: h5type_definition_enum
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for the definition of HDF5 type for enum type.
+:
+:  Parameters for this template:
+:    enum_base   - base type for enum, string like 'int32_t'
+:    type        - variable name for resulting type
+:    constants   - list of constants, each item is a dictionary with keys
+:      h5name    - name of the constant in HDF5
+:      type      - C++ class name where enum is defined
+:      name      - C++ class name of the enum constant
+:
+  hdf5pp::EnumType<{{enum_base}}> {{type}} = hdf5pp::EnumType<{{enum_base}}>::enumType();
+{% for c in constants %}
+  {{type}}.insert("{{c.h5name}}", {{c.type}}::{{c.name}});
+{% endfor %}
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: h5type_definition_array
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for the definition of HDF5 type for array type.
+:
+:  Parameters for this template:
+:  rank        - array runk, number
+:  type        - variable name for resulting type
+:  baseType    - expression evaluating to HDF5 type of the elements
+:  shape       - string, comma-separated list of dimensions
+:
+:  If rank is 0 or negative then VLEN array type is created, shape is not used in this case
+:
+{% if rank > 0 %}
+  hsize_t {{type}}_shape[] = { {{shape}} };
+  hdf5pp::ArrayType {{type}} = hdf5pp::ArrayType::arrayType({{baseType}}, {{rank}}, {{type}}_shape);
+{% else %}
+  hdf5pp::VlenType {{type}} = hdf5pp::VlenType::vlenType({{baseType}});
+{% endif %}
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: proxy_valtype_declaration
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for the declaration of the proxy class for value-type
+:
+:  Parameters for this template:
+:  hschema        - instance of type SchemaValueType
+:
+{% set classname = 'Proxy_' ~ hschema.schema.name ~ '_v' ~ hschema.schema.version %}
+class {{classname}} : public PSEvt::Proxy<{{hschema.pstypename}}> {
+public:
+  typedef {{hschema.pstypename}} PsanaType;
+
+  {{classname}}(hdf5pp::Group group, hsize_t idx) : m_group(group), m_idx(idx) {}
+  virtual ~{{classname}}() {}
+
+protected:
+
+  virtual boost::shared_ptr<PsanaType> getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key);
+
+private:
+
+  mutable hdf5pp::Group m_group;
+  hsize_t m_idx;
+  boost::shared_ptr<PsanaType> m_data;
+};
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: proxy_valtype_impl_getTypedImpl
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for the implementation of getTypedImpl() method for value-type proxy
+:
+:  Parameters for this template:
+:    hschema        - instance of type SchemaValueType
+:    args           - list of arguments to constructor
+:
+boost::shared_ptr<{{hschema.pstypename}}>
+Proxy_{{hschema.schema.name}}_v{{hschema.schema.version}}::getTypedImpl(PSEvt::ProxyDictI* dict, const Pds::Src& source, const std::string& key)
+{
+  if (not m_data) {
+{% for ds in hschema.schema.datasets %}
+    boost::shared_ptr<{{ds.classNameNs()}}> ds_{{ds.name}} = hdf5pp::Utils::readGroup<{{ds.classNameNs()}}>(m_group, "{{ds.name}}", m_idx);
+{% endfor %}
+{% if 1 %}
+    m_data.reset(new PsanaType({{args|join(', ')}}));
+{% else %}
+    m_data = boost::make_shared<PsanaType>({{args|join(', ')}});
+{% endif %}
+  }
+  return m_data;
+}
+
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: shape_method_impl
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for the implementation of var_shape() method
+:
+:  Parameters for this template:
+:  shape   - list of expressions for dimensions
+:
+  int shape[] = { {{shape|join(', ')}} };
+  return std::vector<int>(shape, shape+{{shape|length}});
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: abstract_type_declaration
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for the declaration of the class for abstract types
+:
+:  Parameters for this template:
+:  hschema        - instance of type SchemaAbstractType
+:  methods        - list of methods declarations
+:  dsCtorWithArg  - optional, constructor arguments for construction fron dataset data
+:
+
+{% set className = hschema.pstype.name ~ '_v' ~ hschema.schema.version %}
+
+{% if hschema.pstype.xtcConfig %}
+template <typename Config>
+{% endif %}
+class {{className}} : public {{hschema.pstypename}} {
+public:
+  typedef {{hschema.pstypename}} PsanaType;
+  {{className}}() {}
+{% if hschema.pstype.xtcConfig %}
+  {{className}}(hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<Config>& cfg)
+    : m_group(group), m_idx(idx), m_cfg(cfg) {}
+{% else %}
+  {{className}}(hdf5pp::Group group, hsize_t idx)
+    : m_group(group), m_idx(idx) {}
+{% endif %}
+{% if dsCtorWithArg %}
+  {{className}}{{dsCtorWithArg}}
+{% endif %}
+  virtual ~{{className}}() {}
+{% for meth in methods if meth %}
+  {{meth}}
+{% endfor %}
+private:
+  mutable hdf5pp::Group m_group;
+  hsize_t m_idx;
+{% if hschema.pstype.xtcConfig %}
+  boost::shared_ptr<Config> m_cfg;
+{% endif %}
+{% for ds in hschema.datasets %}
+{% for decl in ds.ds_read_decl() %}
+  {{decl}}
+{% endfor %}
+{% for attr in ds.attributes %}
+{% for sdecl in attr.storage_decl() %}
+  {{sdecl}}
+{% endfor %}
+{% endfor %}
+{% endfor %}
+};
+
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: method_declaration
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for the declaration of the method
+:
+:  Parameters for this template:
+:  methname     - method name
+:  argsspec     - argument declaration
+:  rettype      - method return type
+:  static       - optional, if true method will be declared static
+:  doc          - optional comment string
+:  inline       - optional, if true method body is inlined
+:  body         - method body
+:
+{% if doc %}
+/** {{doc}} */
+{% endif %}
+  {% if static %}static{% endif %}
+{{rettype}} {{methname}}({{argsspec}}){% if not static %} const{% endif %}
+{%- if inline and body %}
+ { {{body}} }
+{%- else %}
+;
+{% endif -%}
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: method_definition
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for the out-of-line definition of a method
+:
+:  Parameters for this template:
+:  type         - object with attribute name and xtcConfig
+:  schema       - object with attribute version
+:  classname    - name of the class
+:  methname     - method name
+:  argsspec     - argument declaration
+:  rettype      - method return type
+:  static       - optional, if true method will be declared static
+:  inline       - optional, if true method body is inlined
+:  body         - method body
+:
+{% set classname = type.name ~ '_v' ~ schema.version %}
+{% if body and not inline -%}
+{% if type.xtcConfig %}
+{% set TMPL = '<Config>' %}
+template <typename Config>
+{% endif %}
+{{rettype}}
+{{classname}}{{TMPL}}::{{methname}}({{argsspec}}){% if not static %} const{% endif %}
+{ 
+{{body}} 
+}
+{%- endif -%}
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: read_compound_ds_method
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for the out-of-line definition of a method which reads compound dataset
+:
+:  Parameters for this template:
+:  type         - object with attribute name and xtcConfig
+:  schema       - object with attribute version
+:  ds           - dataset instance
+:  dsClassName  - dataset class name
+:
+{% set classname = type.name ~ '_v' ~ schema.version %}
+{% if type.xtcConfig %}
+{% set TMPL = '<Config>' %}
+template <typename Config>
+{% endif %}
+void {{classname}}{{TMPL}}::read_ds_{{ds.name}}() const {
+  m_ds_{{ds.name}} = hdf5pp::Utils::readGroup<{{dsClassName}}>(m_group, "{{ds.name}}", m_idx);
+}
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: read_array_ds_basic_method
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for the out-of-line definition of a method which reads dataset of array 
+:  type with elements of a basic types (int, double, etc)
+:
+:  Parameters for this template:
+:  type         - object with attribute name and xtcConfig
+:  schema       - object with attribute version
+:  ds           - dataset instance
+:  typename     - C++ type of the elements
+:
+{% set classname = type.name ~ '_v' ~ schema.version %}
+{% if type.xtcConfig %}
+{% set TMPL = '<Config>' %}
+template <typename Config>
+{% endif %}
+void {{classname}}{{TMPL}}::read_ds_{{ds.name}}() const {
+{% if 'zero_dims' in ds.tags %}
+  if (not m_group.hasChild("{{ds.name}}")) {
+    m_ds_{{ds.name}} = ndarray<{{typename}}, {{ds.rank}}>();
+    return;
+  }
+{% endif %}
+  m_ds_{{ds.name}} = hdf5pp::Utils::readNdarray<{{typename}}, {{ds.rank}}>(m_group, "{{ds.name}}", m_idx);
+}
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: read_array_ds_udt_method
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for the out-of-line definition of a method which reads dataset of array 
+:  type with elements of a user-defined types
+:
+:  Parameters for this template:
+:  type         - object with attribute name and xtcConfig
+:  schema       - object with attribute version
+:  ds           - dataset instance
+:  ds_struct    - dataset structure type
+:  typename     - C++ type of the elements
+:
+{% set classname = type.name ~ '_v' ~ schema.version %}
+{% if type.xtcConfig %}
+{% set TMPL = '<Config>' %}
+template <typename Config>
+{% endif %}
+void {{classname}}{{TMPL}}::read_ds_{{ds.name}}() const {
+{% if 'zero_dims' in ds.tags %}
+  if (not m_group.hasChild("{{ds.name}}")) {
+    m_ds_{{ds.name}} = ndarray<{{typename}}, {{ds.rank}}>();
+    return;
+  }
+{% endif %}
+  ndarray<{{ds_struct}}, {{ds.rank}}> arr = hdf5pp::Utils::readNdarray<{{ds_struct}}, {{ds.rank}}>(m_group, "{{ds.name}}", m_idx);
+  ndarray<{{typename}}, {{ds.rank}}> tmp(arr.shape());
+  std::copy(arr.begin(), arr.end(), tmp.begin());
+  m_ds_{{ds.name}} = tmp;
+}
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: read_array_ds_abstract_method
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for the out-of-line definition of a method which reads dataset of array 
+:  type with elements of a user-defined types
+:
+:  Parameters for this template:
+:  type         - object with attribute name and xtcConfig
+:  schema       - object with attribute version
+:  ds           - dataset instance
+:  ds_struct    - dataset structure type
+:  typename     - C++ type of the elements
+:
+{% set classname = type.name ~ '_v' ~ schema.version %}
+{% if type.xtcConfig %}
+{% set TMPL = '<Config>' %}
+template <typename Config>
+{% endif %}
+void {{classname}}{{TMPL}}::read_ds_{{ds.name}}() const {
+{% if 'zero_dims' in ds.tags %}
+  if (not m_group.hasChild("{{ds.name}}")) {
+    m_ds_{{ds.name}} = ndarray<{{typename}}, {{ds.rank}}>();
+    return;
+  }
+{% endif %}
+  ndarray<{{ds_struct}}, {{ds.rank}}> arr = hdf5pp::Utils::readNdarray<{{ds_struct}}, {{ds.rank}}>(m_group, "{{ds.name}}", m_idx);
+  ndarray<{{typename}}, {{ds.rank}}> tmp(arr.shape());
+  ndarray<{{typename}}, {{ds.rank}}>::iterator out = tmp.begin();
+  for (ndarray<{{ds_struct}}, {{ds.rank}}>::iterator in = arr.begin(); in != arr.end(); ++ in, ++ out) {
+    *out = {{typename}}(boost::make_shared<{{ds_struct}}>(*in));
+  }
+  m_ds_{{ds.name}} = tmp;
+}
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: read_regular_ds_valuetype_method
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for the out-of-line definition of a method which reads dataset of value-type
+:
+:  Parameters for this template:
+:  type         - object with attribute name and xtcConfig
+:  schema       - object with attribute version
+:  ds           - dataset instance
+:  dsClassName  - dataset class name
+:
+{% set classname = type.name ~ '_v' ~ schema.version %}
+{% if type.xtcConfig %}
+{% set TMPL = '<Config>' %}
+template <typename Config>
+{% endif %}
+void {{classname}}{{TMPL}}::read_ds_{{ds.name}}() const {
+  m_ds_{{ds.name}} = hdf5pp::Utils::readGroup<{{dsClassName}}>(m_group, "{{ds.name}}", m_idx);
+  m_ds_storage_{{ds.name}} = *m_ds_{{ds.name}};
+}
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: read_regular_ds_abstract_method
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for the out-of-line definition of a method which reads dataset of abstract type.
+:
+:  Parameters for this template:
+:  type         - object with attribute name and xtcConfig
+:  schema       - object with attribute version
+:  ds           - dataset instance
+:  dsClassName  - dataset class name
+:
+{% set classname = type.name ~ '_v' ~ schema.version %}
+{% if type.xtcConfig %}
+{% set TMPL = '<Config>' %}
+template <typename Config>
+{% endif %}
+void {{classname}}{{TMPL}}::read_ds_{{ds.name}}() const {
+  m_ds_{{ds.name}} = hdf5pp::Utils::readGroup<{{dsClassName}}>(m_group, "{{ds.name}}", m_idx);
+  m_ds_storage_{{ds.name}} = boost::make_shared<{{typename}}>(m_ds_{{ds.name}});
+}
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: dispatch_header_file
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for the header file generated by dispatch backend 
+:
+:  Parameters for this template:
+:  inc_guard   - include guard string
+:  namespace   - C++ namespace
+:
+#ifndef {{inc_guard}}
+#define {{inc_guard}} 1
+
+// *** Do not edit this file, it is auto-generated ***
+
+#include <stdint.h>
+
+#include "hdf5pp/Group.h"
+#include "PSEvt/Event.h"
+#include "PSEnv/EnvObjectStore.h"
+
+{% if namespace %}
+namespace {{namespace}} {
+{% endif %}
+
+  /**
+   *  Function takes HDF5 group, converts its contents into psana-type instance and stores either in
+   *  event or config-store. Pointer to even may be zero.
+   */
+  void hdfConvert(const hdf5pp::Group& group, int64_t idx, const std::string& typeName, int schema_version, 
+                  const Pds::Src& src, PSEvt::Event& evt, PSEnv::EnvObjectStore& cfgStore);
+
+{% if namespace %}
+} // namespace {{namespace}}
+{% endif %}
+
+#endif // {{inc_guard}}
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: dispatch_impl_file
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for the implementation file generated by dispatch backend
+:
+:  Parameters for this template:
+:  headers     - list of header files to include
+:  hash        - object with method code() which produces C++ code for hash function str_hash()
+:  namespace   - C++ namespace
+:  hashes      - dict hash -> list of types, each type has members name and code
+:
+// *** Do not edit this file, it is auto-generated ***
+
+#include "MsgLogger/MsgLogger.h"
+#include "PSEvt/Exceptions.h"
+
+{% for header in headers %}
+#include "{{header}}"
+{% endfor %}
+
+{{hash.code()}}
+
+{% if namespace %}
+namespace {{namespace}} {
+{% endif %}
+void hdfConvert(const hdf5pp::Group& group, int64_t idx, const std::string& typeName, int schema_version, 
+                const Pds::Src& src, PSEvt::Event& evt, PSEnv::EnvObjectStore& cfgStore)
+try {
+
+  uint32_t hash = str_hash(typeName);
+  switch(hash) {
+{% for hash, types in hashes|dictsort %}
+  case {{hash}}:
+{% if types|length > 1 %}
+{% for type in types %}
+    if (typeName == "{{type.name}}") {{type.code}}
+{% endfor %}
+{% else %}
+    // {{types[0].name}}
+{{types[0].code}}
+{% endif %}
+    break;
+{% endfor %}
+  } // end switch
+
+} catch (const PSEvt::ExceptionDuplicateKey& ex) {
+  // catch exception for duplicated objects, issue warning
+  MsgLog("hdfConvert", warning, ex.what());
+} // end hdfConvert(...)
+
+{% if namespace %}
+} // namespace {{namespace}}
+{% endif %}
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: dispatch_config_store
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for piece of code which stores objects to config store 
+:
+:  Parameters for this template:
+:  namespace   - C++ namespace
+:  type         - object with attribute name
+:
+    cfgStore.putProxy({{namespace}}::make_{{type.name}}(schema_version, group, idx), src);
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: dispatch_event_store
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for iece of code which stores objects to event store 
+:
+:  Parameters for this template:
+:  namespace   - C++ namespace
+:  type         - object with attribute name
+:
+    evt.putProxy({{namespace}}::make_{{type.name}}(schema_version, group, idx), src);
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: dispatch_event_store_cfg
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for piece of code which stores objects to event store in case data proxy needs 
+:  configuration object. 
+:
+:  Parameters for this template:
+:  namespace   - C++ namespace
+:  type         - object with attribute name
+:  config_types - list of config type names
+:
+{% for config_type in config_types %}
+{% if loop.first %}
+    if (boost::shared_ptr<{{config_type}}> cfgPtr = cfgStore.get(src)) {
+{% else %}
+    } else if (boost::shared_ptr<{{config_type}}> cfgPtr = cfgStore.get(src)) {
+{% endif %}
+      evt.putProxy({{namespace}}::make_{{type.name}}(schema_version, group, idx, cfgPtr), src);
+{% endfor %}
+    }
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: make_proxy_decl
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for declaration of the make_TypeName() methods. 
+:
+:  Parameters for this template:
+:  type        - object with attribute name
+:  cfgtypename - optional, name of the config type
+:  psanatypename - name of C++ psana interface type 
+:
+{% if cfgtypename %}
+boost::shared_ptr<PSEvt::Proxy<{{psanatypename}}> > make_{{type.name}}(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<{{cfgtypename}}>& cfg);
+{%- else %}
+boost::shared_ptr<PSEvt::Proxy<{{psanatypename}}> > make_{{type.name}}(int version, hdf5pp::Group group, hsize_t idx);
+{%- endif %}
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: make_proxy_impl
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for definition of the make_TypeName() methods. 
+:
+:  Parameters for this template:
+:  type        - object with attribute name, h5schemas
+:  cfgtypename - optional, name of the config type 
+:  psanatypename - name of C++ psana interface type
+:
+{% if cfgtypename %}
+boost::shared_ptr<PSEvt::Proxy<{{psanatypename}}> > make_{{type.name}}(int version, hdf5pp::Group group, hsize_t idx, const boost::shared_ptr<{{cfgtypename}}>& cfg) {
+{% else %}
+boost::shared_ptr<PSEvt::Proxy<{{psanatypename}}> > make_{{type.name}}(int version, hdf5pp::Group group, hsize_t idx) {
+{% endif %}
+  switch (version) {
+{% for schema in type.h5schemas %}
+  case {{schema.version}}:
+{% if type.value_type %}
+    return boost::make_shared<Proxy_{{type.name}}_v{{schema.version}}>(group, idx);
+{% else %}
+{% if cfgtypename %}
+    return boost::make_shared<PSEvt::DataProxy<{{psanatypename}}> >(boost::make_shared<{{type.name}}_v{{schema.version}}<{{cfgtypename}}> >(group, idx, cfg));
+{% else %}
+    return boost::make_shared<PSEvt::DataProxy<{{psanatypename}}> >(boost::make_shared<{{type.name}}_v{{schema.version}}>(group, idx));
+{% endif %}
+{% endif %}
+{% endfor %}
+  default:
+    return boost::make_shared<PSEvt::DataProxy<{{psanatypename}}> >(boost::shared_ptr<{{psanatypename}}>());
+  }
+}
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: store_decl
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for declaration of the store() and store_at() methods. 
+:
+:  Parameters for this template:
+:  psanatypename - name of C++ psana interface type 
+:
+
+/// Store object as a single instance (scalar dataset) inside specified group.
+void store(const {{psanatypename}}& obj, hdf5pp::Group group, int version = -1);
+/// Create container (rank=1) datasets for storing objects of specified type.
+void make_datasets(const {{psanatypename}}& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
+                   int deflate, bool shuffle, int version = -1);
+/// Add one more object to the containers created by previous method at the specified index,
+/// negative index means append to the end of dataset. If pointer to object is zero then
+/// datsets are extended with zero-filled of default-initialized data.
+void store_at(const {{psanatypename}}* obj, hdf5pp::Group group, long index = -1, int version = -1);
+
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: store_impl
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for implementation of the store() and store_at() methods. 
+:
+:  Parameters for this template:
+:    type          - instance of Type class
+:    versions      - list of all schema versions
+:    max_version   - latest schema version number
+:
+
+void make_datasets(const {{psanatypename}}& obj, hdf5pp::Group group, const ChunkPolicy& chunkPolicy,
+                   int deflate, bool shuffle, int version)
+{
+  if (version < 0) version = {{max_version}};
+  group.createAttr<uint32_t>("_schemaVersion").store(version);
+  switch (version) {
+{% for v in versions %}
+  case {{v}}:
+    make_datasets_{{type.name}}_v{{v}}(obj, group, chunkPolicy, deflate, shuffle);
+    break;
+{% endfor %}
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "{{type.fullName()}}", version);
+  }
+}
+
+void store_{{type.name}}(const {{psanatypename}}* obj, hdf5pp::Group group, long index, int version, bool append)
+{
+  if (version < 0) version = {{max_version}};
+  if (not append) group.createAttr<uint32_t>("_schemaVersion").store(version);
+  switch (version) {
+{% for v in versions %}
+  case {{v}}:
+    store_{{type.name}}_v{{v}}(obj, group, index, append);
+    break;
+{% endfor %}
+  default:
+    throw ExceptionSchemaVersion(ERR_LOC, "{{type.fullName()}}", version);
+  }
+}
+
+void store(const {{psanatypename}}& obj, hdf5pp::Group group, int version) 
+{
+  store_{{type.name}}(&obj, group, 0, version, false);
+}
+
+void store_at(const {{psanatypename}}* obj, hdf5pp::Group group, long index, int version)
+{
+  store_{{type.name}}(obj, group, index, version, true);
+}
+
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: schema_store_impl
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for implementation of the store() and store_at() methods. 
+:
+:  Parameters for this template:
+:    hschema    - instance of SchemaType class
+:
+
+void make_datasets_{{hschema.pstype.name}}_v{{hschema.schema.version}}(const {{hschema.pstypename}}& obj, 
+      hdf5pp::Group group, const ChunkPolicy& chunkPolicy, int deflate, bool shuffle)
+{
+{% for ds in hschema.datasets %}
+{{ds.make_ds_impl()}}
+{% endfor %}
+}
+
+void store_{{hschema.pstype.name}}_v{{hschema.schema.version}}(const {{hschema.pstypename}}* obj, hdf5pp::Group group, long index, bool append)
+{
+{% for ds in hschema.datasets %}
+{{ds.ds_write_impl()}}
+{% endfor %}
+}
+
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: make_compound_ds
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for piece of code which creates a dataset
+:
+:  Parameters for this template:
+:      ds  - instance of DatasetCompund type
+:
+  {
+    hdf5pp::Type dstype = {{ds.classNameNs()}}::stored_type();
+    hdf5pp::Utils::createDataset(group, "{{ds.name}}", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
+  }
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: write_compound_ds
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for piece of code which writes an object of compound type
+:
+:  Parameters for this template:
+:      ds  - instance of DatasetCompund type
+:
+  if (obj) {
+    {{ds.classNameNs()}} ds_data(*obj);
+    if (append) {
+      hdf5pp::Utils::storeAt(group, "{{ds.name}}", ds_data, index);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "{{ds.name}}", ds_data);
+    }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "{{ds.name}}", index < 0 ? index : index + 1);
+  }
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: make_array_ds_basic
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for piece of code which creates a dataset
+:
+:  Parameters for this template:
+:      ds  - instance of DatasetRegular type
+:
+  {
+    typedef __typeof__(obj.{{ds.method}}()) PsanaArray;
+    const PsanaArray& psana_array = obj.{{ds.method}}();
+{% if 'zero_dims' in ds.tags %}
+    if (psana_array.size() > 0) {
+{% endif %}
+{% if ds.rank == 1 %}
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<{{ds.type.name}}>::stored_type(), psana_array.shape()[0]);
+{% else %}
+    hsize_t dims[{{ds.rank}}];
+    std::copy(psana_array.shape(), psana_array.shape()+{{ds.rank}}, dims);
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<{{ds.type.name}}>::stored_type(), {{ds.rank}}, dims);
+{% endif %}
+    hdf5pp::Utils::createDataset(group, "{{ds.name}}", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
+{% if 'zero_dims' in ds.tags %}
+    }
+{% endif %}
+  }
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: write_array_ds_basic
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for piece of code which writes out ndarray of basic type
+:
+:  Parameters for this template:
+:      ds  - instance of DatasetRegular type
+:
+{%- if 'zero_dims' in ds.tags %}
+  if (group.hasChild("{{ds.name}}")) {
+{% endif %}
+  if (append) {
+    if (obj) {
+      hdf5pp::Utils::storeNDArrayAt(group, "{{ds.name}}", obj->{{ds.method}}(), index);
+    } else {
+      hdf5pp::Utils::resizeDataset(group, "{{ds.name}}", index < 0 ? index : index + 1);
+    }
+  } else {
+    hdf5pp::Utils::storeNDArray(group, "{{ds.name}}", obj->{{ds.method}}());
+  }
+{% if 'zero_dims' in ds.tags %}
+  }
+{%- endif -%}
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: make_array_ds_udt
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for piece of code which creates a dataset
+:
+:  Parameters for this template:
+:      ds         - instance of DatasetRegular type
+:      ds_struct  - name of dataset structure for element type
+:
+  {
+    typedef __typeof__(obj.{{ds.method}}()) PsanaArray;
+    const PsanaArray& psana_array = obj.{{ds.method}}();
+{% if 'zero_dims' in ds.tags %}
+    if (psana_array.size() > 0) {
+{% endif %}
+{% if ds.rank == 1 %}
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<{{ds_struct}}>::stored_type(), psana_array.shape()[0]);
+{% else %}
+    hsize_t dims[{{ds.rank}}];
+    std::copy(psana_array.shape(), psana_array.shape()+{{ds.rank}}, dims);
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<{{ds_struct}}>::stored_type(), {{ds.rank}}, dims);
+{% endif %}
+    hdf5pp::Utils::createDataset(group, "{{ds.name}}", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
+{% if 'zero_dims' in ds.tags %}
+    }
+{% endif %}
+  }
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: write_array_ds_udt
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for piece of code which writes out ndarray of user-defined types
+:
+:  Parameters for this template:
+:      ds         - instance of DatasetRegular type
+:      ds_struct  - name of dataset structure for element type
+:
+{%- if 'zero_dims' in ds.tags %}
+  if (group.hasChild("{{ds.name}}")) {
+{% endif %}
+  if (obj) {
+    typedef __typeof__(obj->{{ds.method}}()) PsanaArray;
+    typedef ndarray<{{ds_struct}}, {{ds.rank}}> HdfArray;
+    PsanaArray psana_array = obj->{{ds.method}}();
+    HdfArray hdf_array(psana_array.shape());
+    HdfArray::iterator out = hdf_array.begin();
+    for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
+      *out = {{ds_struct}}(*it);
+    }
+    if (append) {
+      hdf5pp::Utils::storeNDArrayAt(group, "{{ds.name}}", hdf_array, index);
+    } else {
+      hdf5pp::Utils::storeNDArray(group, "{{ds.name}}", hdf_array);
+    }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "{{ds.name}}", index < 0 ? index : index + 1);
+  }
+{% if 'zero_dims' in ds.tags %}
+  }
+{%- endif -%}
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: make_array_ds_abstract
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for piece of code which creates a dataset
+:
+:  Parameters for this template:
+:      ds         - instance of DatasetRegular type
+:      ds_struct  - name of dataset structure for element type
+:      shape_method - name of the shape method
+:
+  {
+    const std::vector<int>& shape = obj.{{shape_method}}();
+{% if 'zero_dims' in ds.tags %}
+    if(std::accumulate(shape.begin(), shape.end(), 1, std::multiply<int>())) {
+{% endif %}
+    hsize_t dims[{{ds.rank}}];
+    std::copy(shape.begin(), shape.end(), dims);
+    hdf5pp::Type dstype = hdf5pp::ArrayType::arrayType(hdf5pp::TypeTraits<{{ds_struct}}>::stored_type(), {{ds.rank}}, dims);
+    hdf5pp::Utils::createDataset(group, "{{ds.name}}", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
+{% if 'zero_dims' in ds.tags %}
+    }
+{% endif %}
+  }
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: write_array_ds_abstract
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for piece of code which writes out ndarray of user-defined types
+:
+:  Parameters for this template:
+:      ds         - instance of DatasetRegular type
+:      ds_struct  - name of dataset structure for element type
+:      shape_method - name of the shape method
+:
+{%- if 'zero_dims' in ds.tags %}
+  if (group.hasChild("{{ds.name}}")) {
+{% endif %}
+  if (obj) {
+{% if ds.rank == 1 %}
+    const std::vector<int>& shape = obj->{{shape_method}}();
+    unsigned dims[{{ds.rank}}] = { shape[0] };
+    ndarray<{{ds_struct}}, {{ds.rank}}> hdf_array(dims);
+    for (unsigned i = 0; i != dims[0]; ++ i) {
+      hdf_array[i] = {{ds_struct}}(obj->{{ds.method}}(i));
+    }
+{% elif ds.rank == 2 %}
+    const std::vector<int>& shape = obj->{{shape_method}}();
+    unsigned dims[{{ds.rank}}];
+    std::copy(shape.begin(), shape.end(), dims);
+    ndarray<{{ds_struct}}, {{ds.rank}}> hdf_array(dims);
+    for (unsigned i = 0; i != dims[0]; ++ i) {
+      for (unsigned j = 0; j != dims[1]; ++ j) {
+        hdf_array[i][j] = {{ds_struct}}(obj->{{ds.method}}(i, j));
+      }
+    }
+{% endif %}
+    if (append) {
+      hdf5pp::Utils::storeNDArrayAt(group, "{{ds.name}}", hdf_array, index);
+    } else {
+      hdf5pp::Utils::storeNDArray(group, "{{ds.name}}", hdf_array);
+    }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "{{ds.name}}", index < 0 ? index : index + 1);
+  }
+{% if 'zero_dims' in ds.tags %}
+  }
+{%- endif -%}
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: make_vlen_ds
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for piece of code which creates a vlen dataset
+:
+:  Parameters for this template:
+:      ds         - instance of DatasetRegular type
+:      ds_type    - element type
+:
+  {
+    hdf5pp::Type dstype = hdf5pp::VlenType::vlenType(hdf5pp::TypeTraits<{{ds_type}}>::stored_type());
+    hdf5pp::Utils::createDataset(group, "{{ds.name}}", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);
+  }
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: write_vlen_ds_basic
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for piece of code which writes out ndarray of basic type as vlen array
+:
+:  Parameters for this template:
+:      ds  - instance of DatasetRegular type
+:      ds_type    - element type
+:
+  if (obj) {
+    __typeof__(obj->{{ds.method}}()) psana_array = obj->{{ds.method}}();
+    std::pair<size_t, const {{ds_type}}*> vds(psana_array.size(), psana_array.data());
+    hdf5pp::Type dstype = hdf5pp::VlenType::vlenType(hdf5pp::TypeTraits<{{ds_type}}>::stored_type());
+    if (append) {
+      hdf5pp::Utils::storeAt(group, "{{ds.name}}", vds, index, dstype);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "{{ds.name}}", vds, dstype, dstype);
+    }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "{{ds.name}}", index < 0 ? index : index + 1);
+  }
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: write_vlen_ds_udt
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for piece of code which writes out ndarray of user-defined types as vlen array
+:
+:  Parameters for this template:
+:      ds         - instance of DatasetRegular type
+:      ds_type    - element type
+:
+  if (obj) {
+    typedef __typeof__(obj->{{ds.method}}()) PsanaArray;
+    typedef ndarray<{{ds_type}}, {{ds.rank}}> HdfArray;
+    PsanaArray psana_array = obj->{{ds.method}}();
+    HdfArray hdf_array(psana_array.shape());
+    HdfArray::iterator out = hdf_array.begin();
+    for (PsanaArray::iterator it = psana_array.begin(); it != psana_array.end(); ++ it, ++ out) {
+      *out = {{ds_struct}}(*it);
+    }
+    std::pair<size_t, {{ds_type}}*> vds(hdf_array.size(), hdf_array.data());
+    hdf5pp::Type dstype = hdf5pp::VlenType::vlenType(hdf5pp::TypeTraits<{{ds_type}}>::stored_type());
+    if (append) {
+      hdf5pp::Utils::storeAt(group, "{{ds.name}}", vds, index, dstype);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "{{ds.name}}", vds, dstype, dstype);
+    }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "{{ds.name}}", index < 0 ? index : index + 1);
+  }
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: write_vlen_ds_abstract
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for piece of code which writes out ndarray of user-defined types as vlen array
+:
+:  Parameters for this template:
+:      ds         - instance of DatasetRegular type
+:      ds_type  - name of dataset structure for element type
+:      shape_method - name of the shape method
+:
+  if (obj) {
+{% if ds.rank == 1 %}
+    const std::vector<int>& shape = obj->{{shape_method}}();
+    unsigned dims[{{ds.rank}}] = { shape[0] };
+    ndarray<{{ds_type}}, {{ds.rank}}> hdf_array(dims);
+    for (unsigned i = 0; i != dims[0]; ++ i) {
+      hdf_array[i] = {{ds_struct}}(obj->{{ds.method}}(i));
+    }
+{% elif ds.rank == 2 %}
+    const std::vector<int>& shape = obj->{{shape_method}}();
+    unsigned dims[{{ds.rank}}];
+    std::copy(shape.begin(), shape.end(), dims);
+    ndarray<{{ds_type}}, {{ds.rank}}> hdf_array(dims);
+    for (unsigned i = 0; i != dims[0]; ++ i) {
+      for (unsigned j = 0; j != dims[1]; ++ j) {
+        hdf_array[i][j] = {{ds_struct}}(obj->{{ds.method}}(i, j));
+      }
+    }
+{% endif %}
+    std::pair<size_t, {{ds_type}}*> vds(hdf_array.size(), hdf_array.data());
+    hdf5pp::Type dstype = hdf5pp::VlenType::vlenType(hdf5pp::TypeTraits<{{ds_type}}>::stored_type());
+    if (append) {
+      hdf5pp::Utils::storeAt(group, "{{ds.name}}", vds, index, dstype);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "{{ds.name}}", vds, dstype, dstype);
+    }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "{{ds.name}}", index < 0 ? index : index + 1);
+  }
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: make_regular_ds
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for piece of code which creates a dataset
+:
+:  Parameters for this template:
+:      ds         - instance of DatasetRegular type
+:      ds_struct  - name of dataset structure for element type
+:
+  {
+    hdf5pp::Type dstype = {{ds_struct}}::stored_type();
+    hdf5pp::Utils::createDataset(group, "{{ds.name}}", dstype, chunkPolicy.chunkSize(dstype), chunkPolicy.chunkCacheSize(dstype), deflate, shuffle);    
+  }
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: write_regular_ds
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for piece of code which writes out regular non-array datasets
+:
+:  Parameters for this template:
+:      ds         - instance of DatasetRegular type
+:      ds_struct  - name of dataset structure for element type
+:
+  if (obj) {
+    {{ds_struct}} ds_data(obj->{{ds.method}}());
+    if (append) {
+      hdf5pp::Utils::storeAt(group, "{{ds.name}}", ds_data, index);
+    } else {
+      hdf5pp::Utils::storeScalar(group, "{{ds.name}}", ds_data);
+    }
+  } else if (append) {
+    hdf5pp::Utils::resizeDataset(group, "{{ds.name}}", index < 0 ? index : index + 1);
+  }
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: enum_decl
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for declaration of the enum in C++.
+:
+:  Parameters for this template:
+:    enum - object of type Enum 
+:
+{% if enum.comment %}
+
+  /** {{enum.comment}} */
+{% endif %}
+  enum {{enum.name}} {
+{% for const in enum.constants() %}
+    {{const.name}}{% if const.value is not none %} = {{const.value}}{% endif %},{% if const.comment %} /**< {{const.comment}} */{% endif %}
+
+{% endfor %}
+  };
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: const_decl
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for declaration of the constant in C++.
+:
+:  Parameters for this template:
+:    const - object of type Constant 
+:
+  enum {
+    {{const.name}} = {{const.value}} /**< {{const.comment}} */
+  };
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: attr_access_method_super
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for implementation of the access method for attribute, this is a base 
+:  template inherited by others.
+:
+:  Parameters for this template:
+:    type         - object of type Type
+:    schema       - object of type H5Type
+:    meth         - object of type Method
+:    argdecl      - argument declarations
+:    ret_type     - name of the return type
+:    
+{% set classname = type.name ~ '_v' ~ schema.version %}
+{% if type.xtcConfig %}
+{% set TMPL = '<Config>' %}
+template <typename Config>
+{% endif %}
+{{ret_type}} {{classname}}{{TMPL}}::{{meth.name}}({{argdecl}}) const {
+{% block body %}
+{% endblock %}
+}
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: attr_access_method_basic
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for implementation of the access method for attribute of basic type
+:
+:  Parameters for this template:
+:    ds           - object of type H5Dataset
+:    attr         - object of type H5Attribute
+:    ret_type     - name of the return type
+:    plus all parameters needed by attr_access_method_super
+:    
+{% extends "hdf5.tmpl?attr_access_method_super" %}
+{% block body %}
+  if (not m_ds_{{ds.name}}) read_ds_{{ds.name}}();
+  return {{ret_type}}(m_ds_{{ds.name}}->{{attr.name}});
+{% endblock %}
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: attr_access_method_valtype
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for implementation of the access method for attribute of value-type UDT
+:
+:  Parameters for this template:
+:    ds           - object of type H5Dataset
+:    attr         - object of type H5Attribute
+:    attr_type    - storage attribute type
+:    plus all parameters needed by attr_access_method_super
+:    
+{% extends "hdf5.tmpl?attr_access_method_super" %}
+{% block body %}
+  if (not m_ds_{{ds.name}}) read_ds_{{ds.name}}();
+  m_ds_storage_{{ds.name}}_{{attr.name}} = {{attr_type}}(m_ds_{{ds.name}}->{{attr.name}});
+  return m_ds_storage_{{ds.name}}_{{attr.name}};
+{% endblock %}
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: attr_access_method_abstype
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for implementation of the access method for attribute of abstract-type UDT
+:
+:  Parameters for this template:
+:    ds           - object of type H5Dataset
+:    attr         - object of type H5Attribute
+:    attr_type    - storage attribute type
+:    attr_class   - C++ class name for attribute
+:    plus all parameters needed by attr_access_method_super
+:    
+{% extends "hdf5.tmpl?attr_access_method_super" %}
+{% block body %}
+  if (not m_ds_storage_{{ds.name}}_{{attr.name}}) {
+    if (not m_ds_{{ds.name}}) read_ds_{{ds.name}}();
+    boost::shared_ptr<{{attr_type}}> tmp(m_ds_{{ds.name}}, &m_ds_{{ds.name}}->{{attr.name}});
+    m_ds_storage_{{ds.name}}_{{attr.name}} = boost::make_shared<{{attr_class}}>(tmp);
+  }
+  return *m_ds_storage_{{ds.name}}_{{attr.name}};
+{% endblock %}
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: attr_access_method_array_char
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for implementation of the access method for array attribute of type char
+:
+:  Parameters for this template:
+:    ds           - object of type H5Dataset
+:    attr         - object of type H5Attribute
+:    ret_type     - name of the return type
+:    plus all parameters needed by attr_access_method_super
+:    
+{% extends "hdf5.tmpl?attr_access_method_super" %}
+{% block body %}
+  if (not m_ds_{{ds.name}}) read_ds_{{ds.name}}();
+  return ({{ret_type}})(m_ds_{{ds.name}}->{{attr.name}});
+{% endblock %}
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: attr_access_method_array_basic
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for implementation of the access method for array attribute of basic type
+:
+:  Parameters for this template:
+:    ds           - object of type H5Dataset
+:    attr         - object of type H5Attribute
+:    shape        - expression defining array shape (comma-separated)
+:    plus all parameters needed by attr_access_method_super
+:    
+{% extends "hdf5.tmpl?attr_access_method_super" %}
+{% block body %}
+  if (not m_ds_{{ds.name}}) read_ds_{{ds.name}}();
+  boost::shared_ptr<{{attr_type}}> ptr(m_ds_{{ds.name}}, m_ds_{{ds.name}}->{{attr.name}}{{attr_index}});
+  return make_ndarray(ptr, {{shape}});
+{% endblock %}
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: attr_access_method_array_valtype
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for implementation of the access method for array attribute of value-type UDT
+:
+:  Parameters for this template:
+:    ds           - object of type H5Dataset
+:    attr         - object of type H5Attribute
+:    shape        - expression defining array shape (comma-separated)
+:    attr_type    - type of the element of storage array
+:    plus all parameters needed by attr_access_method_super
+:    
+{% extends "hdf5.tmpl?attr_access_method_super" %}
+{% block body %}
+  if (not m_ds_{{ds.name}}) read_ds_{{ds.name}}();
+  if (m_ds_storage_{{ds.name}}_{{attr.name}}.empty()) {
+    unsigned shape[] = {{'{'}}{{shape}}{{'}'}};
+    ndarray<{{attr_type}}, {{attr.rank}}> tmparr(shape);
+    unsigned size = tmparr.size();
+    ndarray<{{attr_type}}, {{attr.rank}}>::iterator it = tmparr.begin();
+    for (unsigned i = 0; i != size; ++ i, ++ it) {
+      *it = {{attr_type}}(m_ds_{{ds.name}}->{{attr.name}}[i]);
+    }
+    m_ds_storage_{{ds.name}}_{{attr.name}} = tmparr;
+  }
+  return m_ds_storage_{{ds.name}}_{{attr.name}};
+{% endblock %}
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: attr_access_method_array_abstype
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for implementation of the access method for array attribute of abstract-type UDT
+:
+:  Parameters for this template:
+:    ds           - object of type H5Dataset
+:    attr         - object of type H5Attribute
+:    shape        - expression defining array shape (comma-separated)
+:    attr_type    - type of the element of HDF5 array
+:    attr_class   - type of the element of storage array
+:    arguse       - indexing arguments
+:    plus all parameters needed by attr_access_method_super
+:    
+{% extends "hdf5.tmpl?attr_access_method_super" %}
+{% block body %}
+  if (not m_ds_{{ds.name}}) read_ds_{{ds.name}}();
+  if (m_ds_storage_{{ds.name}}_{{attr.name}}.empty()) {
+    unsigned shape[] = {{'{'}}{{shape}}{{'}'}};
+    ndarray<{{attr_class}}, {{attr.rank}}> tmparr(shape);
+    for (int i = 0; i != {{data_size}}; ++ i) {
+      boost::shared_ptr<{{attr_type}}> ptr(m_ds_{{ds.name}}, &m_ds_{{ds.name}}->{{attr.name}}[i]);
+      tmparr.begin()[i] = {{attr_class}}(ptr);
+    }
+    m_ds_storage_{{ds.name}}_{{attr.name}} = tmparr;
+  }
+  return m_ds_storage_{{ds.name}}_{{attr.name}}{{arguse}};
+{% endblock %}
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: ds_access_method_valtype
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for implementation of the access method for dataset of value-type UDT
+:
+:  Parameters for this template:
+:    ds           - object of type H5Dataset
+:    ds_type      - psana type name corresponding to dataset
+:    plus all parameters needed by attr_access_method_super
+:    
+{% extends "hdf5.tmpl?attr_access_method_super" %}
+{% block body %}
+  if (not m_ds_{{ds.name}}) read_ds_{{ds.name}}();
+  m_ds_storage_{{ds.name}} = {{ds_type}}(*m_ds_{{ds.name}});
+  return m_ds_storage_{{ds.name}};
+{% endblock %}
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: ds_access_method_abstype
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for implementation of the access method for dataset of abstract-type UDT
+:
+:  Parameters for this template:
+:    ds           - object of type H5Dataset
+:    ds_class      - type name corresponding to dataset
+:    plus all parameters needed by attr_access_method_super
+:    
+{% extends "hdf5.tmpl?attr_access_method_super" %}
+{% block body %}
+  if (not m_ds_storage_{{ds.name}}) {
+    if (not m_ds_{{ds.name}}) read_ds_{{ds.name}}();
+    m_ds_storage_{{ds.name}} = boost::make_shared<{{ds_class}}>(m_ds_{{ds.name}});
+  }
+  return *m_ds_storage_{{ds.name}};
+{% endblock %}
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: ds_access_method_array_valtype
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for implementation of the access method for array dataset of value-type UDT
+:
+:  Parameters for this template:
+:    ds           - object of type H5Dataset
+:    plus all parameters needed by attr_access_method_super
+:    
+{% extends "hdf5.tmpl?attr_access_method_super" %}
+{% block body %}
+  if (m_ds_{{ds.name}}.empty()) read_ds_{{ds.name}}();
+  return m_ds_{{ds.name}};
+{% endblock %}
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: ds_access_method_array_abstype
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Template for implementation of the access method for array dataset of abstract-type UDT
+:
+:  Parameters for this template:
+:    ds           - object of type H5Dataset
+:    ds_class      - type name corresponding to dataset
+:    arguse       - indexing arguments
+:    ds_type     - type name corresponding to dataset element
+:    ds_class     - type name corresponding to dataset element
+:    plus all parameters needed by attr_access_method_super
+:    
+{% extends "hdf5.tmpl?attr_access_method_super" %}
+{% block body %}
+  if (m_ds_{{ds.name}}.empty()) read_ds_{{ds.name}}();
+  return m_ds_{{ds.name}}{{arguse}};
+{% endblock %}
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: malloc_copy_string
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Parameters for this template:
+:    src_method, dst
+:    
+  {{dst}} = strdup(psanaobj.{{src_method}}());
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: copy_string
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Parameters for this template:
+:    src_method, dst, dst_size
+:    
+  strncpy({{dst}}, psanaobj.{{src_method}}(), {{dst_size}});
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: copy_vlen_data
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Parameters for this template:
+:    src_method, dst, dst_type
+:  src_method shall return ndarray
+:
+  {
+    const __typeof__(psanaobj.{{src_method}}())& arr = psanaobj.{{src_method}}();
+    vlen_{{dst}} = arr.size();
+    {{dst}} = static_cast<{{dst_type}}*>(malloc(vlen_{{dst}}*sizeof({{dst_type}})));
+    std::copy(arr.begin(), arr.end(), {{dst}});
+  }
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: malloc_copy_data
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Parameters for this template:
+:    src_method, dst, dst_type
+:  src_method shall return ndarray
+:
+  {
+    {{dst}} = static_cast<{{dst_type}}*>(malloc({{src}}.size()*sizeof({{dst_type}})));
+    const __typeof__(psanaobj.{{src_method}}())& arr = psanaobj.{{src_method}}();
+    std::copy(arr.begin(), arr.end(), {{dst}});
+  }
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: copy_data
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Parameters for this template:
+:    src_method, dst, dst_size
+:    
+  {
+    const __typeof__(psanaobj.{{src_method}}())& arr = psanaobj.{{src_method}}();
+    std::copy(arr.begin(), arr.begin()+{{dst_size}}, {{dst}});
+  }
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: copy_abs_vlen_data
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Parameters for this template:
+:    src_method, dst, dst_type, dst_size
+:  src is an expression resulting in ndarray
+:
+  vlen_{{dst}} = {{dst_size}};
+  {{dst}} = static_cast<{{dst_type}}*>(malloc(vlen_{{dst}}*sizeof({{dst_type}})));
+  for (size_t i = 0; i != vlen_{{dst}}; ++ i) {
+    {{dst}}[i] = {{dst_type}}(psanaobj.{{src_method}}(i));
+  }
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: malloc_copy_abs_data
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Parameters for this template:
+:    src_method, dst, dst_type, dst_size
+:  src is an expression resulting in ndarray
+:
+  {{dst}} = static_cast<{{dst_type}}*>(malloc({{dst_size}}*sizeof({{dst_type}}));
+  for (size_t i = 0, len = {{dst_size}}; i != len; ++ i) {
+    {{dst}}[i] = {{dst_type}}(psanaobj.{{src_method}}(i));
+  }
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+::::template:::: copy_abs_data
+::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
+:
+:  Parameters for this template:
+:    src_method, dst, dst_type, dst_size
+:  src is an expression resulting in ndarray
+:
+  for (size_t i = 0, len = {{dst_size}}; i != len; ++ i) {
+    {{dst}}[i] = {{dst_type}}(psanaobj.{{src_method}}(i));
+  }
