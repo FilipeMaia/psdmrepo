@@ -121,6 +121,25 @@ class BatchJobPedestals (BatchJob) :
 
 #-----------------------------
 
+    def is_good_lsf(self) :
+        """Checks and returns LSF status"""
+        queue = self.queue.value()
+        msg, status = gu.msg_and_status_of_lsf(queue)
+
+        ###status = False # FOR TEST PURPOSE ONLY!!!
+
+        if status :
+            logger.info('LSF status is ok', __name__)
+        else :
+            msgi = '\nLSF status for queue: %s \n%s\n' % (queue, msg)
+            msgw = 'LSF farm for queue %s IS BUSY OR DOES NOT WORK !!!\n' % (queue)
+            logger.info(msgi, __name__)
+            logger.warning(msgw, __name__)
+
+        return status
+
+#-----------------------------
+
     def submit_batch_for_peds_aver(self) :
         self.exportLocalPars() # export run_number to cp.str_run_number
 
@@ -129,7 +148,15 @@ class BatchJobPedestals (BatchJob) :
 
         self.command_for_peds_scan()
 
-        cfg.make_psana_cfg_file_for_peds_aver()
+        if not cfg.make_psana_cfg_file_for_peds_aver() :            
+            self.stop_auto_processing(is_stop_on_button_click=False)
+            logger.warning('BATCH JOB IS NOT SUBMITTED !!!', __name__)
+            return False
+
+        if not self.is_good_lsf() :
+            self.stop_auto_processing(is_stop_on_button_click=False)
+            logger.warning('BATCH JOB IS NOT SUBMITTED !!!', __name__)
+            return False
 
         #command      = 'psana -c ' + fnm.path_peds_aver_psana_cfg() + ' ' + fnm.path_to_xtc_files_for_run() # fnm.path_dark_xtc_cond()
         command      = 'psana -c ' + fnm.path_peds_aver_psana_cfg() + self.opt + ' ' + fnm.path_to_xtc_files_for_run() # fnm.path_dark_xtc_cond()
@@ -142,6 +169,10 @@ class BatchJobPedestals (BatchJob) :
         if err != '' :
             self.stop_auto_processing(is_stop_on_button_click=False)
             logger.warning('Autoprocessing for run %s is stopped due to batch submission error!!!' % self.str_run_number, __name__)
+            logger.warning('BATCH JOB IS NOT SUBMITTED !!!', __name__)
+            return False
+
+        return True
 
 #-----------------------------
 
@@ -306,8 +337,8 @@ class BatchJobPedestals (BatchJob) :
 
     def onRunAver(self):
         logger.debug('onRunAver', __name__)
-        self.submit_batch_for_peds_aver()
-        self.autoRunStage = 2
+        if self.submit_batch_for_peds_aver() : self.autoRunStage = 2
+        else : self.autoRunStage = 0
 
 #-----------------------------
 

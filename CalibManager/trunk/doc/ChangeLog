@@ -11,6 +11,12 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-26
+2014-03-25 Mikhail S. Dubrovin
+- in BatchJobPedestals.submit_batch_for_peds_aver(...) add protections:
+	- if LSF is down
+	- if selected detector(s) is(are) not found in xtc scan log parsing.
+
 Tag: V00-00-25
 2014-03-17 Mikhail S. Dubrovin
 - in PackageVersions add clean-up tmp files

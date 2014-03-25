@@ -93,10 +93,12 @@ class ConfigFileGenerator :
         self.txt_cfg_body   = '\n'
 
         self.add_cfg_module_tahometer()
-        self.cfg_file_body_for_peds_aver()
+        status = self.cfg_file_body_for_peds_aver()
         self.cfg_file_header()
 
         self.save_cfg_file(self.txt_cfg_header + self.txt_cfg_body, fnm.path_peds_aver_psana_cfg())
+
+        return status
 
 #-----------------------------
 
@@ -118,7 +120,7 @@ class ConfigFileGenerator :
         self.ind = 0
 
         for det_name in cp.list_of_dets_selected() :
-            lst_tepes, lst_srcs = cp.blsp.list_of_types_and_sources_for_detector(det_name)
+            lst_types, lst_srcs = cp.blsp.list_of_types_and_sources_for_detector(det_name)
             list_path_peds_ave    = gu.get_list_of_files_for_list_of_insets(fnm.path_peds_ave(),    lst_srcs)
             list_path_peds_rms    = gu.get_list_of_files_for_list_of_insets(fnm.path_peds_rms(),    lst_srcs)
             list_path_hotpix_mask = gu.get_list_of_files_for_list_of_insets(fnm.path_hotpix_mask(), lst_srcs)
@@ -143,6 +145,12 @@ class ConfigFileGenerator :
                 elif det_name == cp.list_of_dets[7] : self.add_cfg_module_peds_aver_acqiris()
                 elif det_name == cp.list_of_dets[8] : self.print_warning()
                 else : logger.warning('UNKNOWN DETECTOR: %s' % det_name, __name__)
+
+        if self.ind > 0 : return True
+
+        msg = 'Selected detectors NOT FOUND in the list of keys in xtc scan log file !!!'
+        logger.warning(msg, __name__)
+        return False
 
 #-----------------------------
 

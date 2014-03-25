@@ -1023,6 +1023,46 @@ def parse_token(token) :
 
 #----------------------------------
 
+def text_sataus_of_lsf_hosts(farm='psanacsfarm'):
+    """Returns text output of the command: bhosts farm"""
+    cmd = 'bhosts %s' % farm
+    return getoutput(cmd)
+    
+
+def msg_and_status_of_lsf(queue='psanacsq', print_bits=0):
+    """Checks the LSF status for requested queue"""
+
+    farm = '%sfarm' % queue[0:-1]
+    if print_bits & 1 : print 'farm =', farm
+
+    output = text_sataus_of_lsf_hosts(farm)
+
+    if print_bits & 2 : print 'list_of_hosts:\n', output
+    lines = output.split('\n')
+
+       #HOST_NAME          STATUS       JL/U    MAX  NJOBS    RUN  SSUSP  USUSP    RSV 
+       #psanacs001         unavail         -     16      0      0      0      0      0
+       #psanacs002         closed          -     16     16     16      0      0      0
+       #psanacs003         ok              -     16      0      0      0      0      0
+
+    count_ok = 0
+    count_closed = 0
+    count_unavail = 0
+
+    for line in lines :
+        #print line
+        fields = line.split()
+        if fields[1] == 'ok'      : count_ok += 1
+        if fields[1] == 'closed'  : count_closed += 1
+        if fields[1] == 'unavail' : count_unavail += 1
+
+    if print_bits & 4 : print 'Number of ok:%d, closed:%d, unavail:%d, ' %(count_ok, count_closed, count_unavail)
+
+    if count_ok > 0 : return output, True
+    return output, False
+
+#----------------------------------
+
 def get_pkg_version(pkg_name='CalibManager') :
     """Returns the latest version of the package - VERY SLOW COMMAND"""
     try :
@@ -1130,9 +1170,13 @@ if __name__ == "__main__" :
 
     #print 'has_kerberos_ticket(): ', has_kerberos_ticket()
 
-    status = is_good_lustre_version()
-    print 'Lustre version status: %s' % status
- 
+    #status = is_good_lustre_version()
+    #print 'Lustre version status: %s' % status
+
+    queue='psfehq' # psnehq, psfehq, 'psanacsq'
+    output, status = msg_and_status_of_lsf(queue)
+    print 'LSF status: \n%s \nqueue:%s, status:%s' % (output, queue, status)
+          
     sys.exit ( "End of test" )
 
 #----------------------------------

@@ -71,7 +71,8 @@ class GUIConfigPars ( QtGui.QWidget ) :
         self.lab_min_thr    = QtGui.QLabel('Threshold MIN, ADU:') 
         self.lab_max_thr    = QtGui.QLabel('MAX:') 
 
-        self.but_show_vers = QtGui.QPushButton('Soft Vers')
+        self.but_show_vers  = QtGui.QPushButton('Soft Vers')
+        self.but_lsf_status = QtGui.QPushButton('LSF status')
 
         self.edi_dark_start = QtGui.QLineEdit  ( str( cp.bat_dark_start.value() ) )
         self.edi_dark_end   = QtGui.QLineEdit  ( str( cp.bat_dark_end.value()) )
@@ -112,6 +113,7 @@ class GUIConfigPars ( QtGui.QWidget ) :
         self.grid.addWidget(self.lab_max_thr,       self.grid_row+7, 3)
         self.grid.addWidget(self.edi_max_thr,       self.grid_row+7, 4, 1, 2)
         self.grid.addWidget(self.but_show_vers,     self.grid_row+8, 0, 1, 2)
+        self.grid.addWidget(self.but_lsf_status,    self.grid_row+8, 1, 1, 2)
 
         #self.setLayout(self.grid)
 
@@ -131,6 +133,7 @@ class GUIConfigPars ( QtGui.QWidget ) :
         self.connect( self.edi_max_thr,      QtCore.SIGNAL('editingFinished()'),  self.onEdiMaxThr )
         self.connect( self.cbx_deploy_hotpix,QtCore.SIGNAL('stateChanged(int)'),  self.on_cbx ) 
         self.connect( self.but_show_vers,    QtCore.SIGNAL('clicked()'),          self.onButShowVers )
+        self.connect( self.but_lsf_status,   QtCore.SIGNAL('clicked()'),          self.onButLsfStatus )
  
         self.showToolTips()
         self.setStyle()
@@ -146,6 +149,7 @@ class GUIConfigPars ( QtGui.QWidget ) :
         self.but_dir_results .setToolTip('Click on this button\nand select the directory')
         self.edi_fname_prefix.setToolTip('Edit the common file prefix in this field')
         self.but_show_vers   .setToolTip('Show current package tags')
+        self.but_lsf_status  .setToolTip('Show LSF status')
 
 
     def setFrame(self):
@@ -177,6 +181,7 @@ class GUIConfigPars ( QtGui.QWidget ) :
         self.lab_max_thr      .setStyleSheet (cp.styleLabel)
         self.cbx_deploy_hotpix.setStyleSheet (cp.styleLabel)
         self.but_show_vers    .setStyleSheet (cp.styleButton) 
+        self.but_lsf_status   .setStyleSheet (cp.styleButton) 
 
         self.tit_dir_work    .setAlignment (QtCore.Qt.AlignLeft)
         self.edi_dir_work    .setAlignment (QtCore.Qt.AlignRight)
@@ -200,6 +205,7 @@ class GUIConfigPars ( QtGui.QWidget ) :
         self.edi_min_thr     .setFixedWidth(80)
         self.edi_max_thr     .setFixedWidth(80)
         self.but_show_vers   .setFixedWidth(100)
+        self.but_lsf_status  .setFixedWidth(100)
 
 
     def setParent(self,parent) :
@@ -236,6 +242,13 @@ class GUIConfigPars ( QtGui.QWidget ) :
 
         msg = cp.package_versions.text_version_for_all_packages()
         logger.info(msg, __name__ )
+
+
+    def onButLsfStatus(self):
+        queue = cp.bat_queue.value()
+        msg, status = gu.msg_and_status_of_lsf(queue)
+        msgi = '\nLSF status for queue %s: \n%s\nLSF status for %s is %s' % (queue, msg, queue, {False:'bad',True:'good'}[status])
+        logger.info(msgi, __name__ )
 
 
     def onButDirWork(self):

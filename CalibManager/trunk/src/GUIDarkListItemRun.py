@@ -275,6 +275,8 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
         self.exportLocalPars()
         self.but_depl.setVisible(False)
 
+        logger.info('onButGo', __name__)
+
         but = self.but_go
         but.setStyleSheet(cp.styleDefault)
 
@@ -282,7 +284,8 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
             logger.info('onButGo for run %s' % self.str_run_number, __name__ )
             but.setEnabled(False)
             self.bjpeds.start_auto_processing()
-            but.setText('Stop')
+            if self.bjpeds.autoRunStage :            
+                but.setText('Stop')
             but.setEnabled(True)
 
         elif but.text() == 'Stop' : 
@@ -297,9 +300,8 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
     def onStop(self):
         msg = 'onStop - buttons status should be updated now for %s' % (self.str_run_number)
         logger.info(msg, __name__)
-        self.but_go.setEnabled(True)
+        self.but_go.setEnabled(True)        
         self.but_go.setText('Go')
-        #self.setStatusStyleOfButtons()
         self.updateButtons()
 
 
@@ -391,7 +393,7 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
     def updateButtons(self) :
         #logger.info('update', __name__)
         self.setFieldsEnabled(cp.det_name.value() != '')
-        self.setStatusStyleOfButtons()
+        #self.setStatusStyleOfButtons()
 
 
 #-----------------------------
