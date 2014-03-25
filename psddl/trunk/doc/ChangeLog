@@ -11,6 +11,11 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-13-09
+2014-03-25 David
+- Documenting error with check in of Tag V00-13-13 from Jan 2013. That
+- tag name is an error. It was supposed to be tag V00-13-03.
+
 Tag: V00-13-08
 2014-03-25 David
 - Translator backend: add ndarray writers for const elements
@@ -32,9 +37,10 @@ Tag: V00-13-04
 2014-01-14 David Schneider
 - Translator backend: documentation (overwrite and create_alias_links options)
 
-Tag: V00-13-03
+Tag: V00-13-13
 2014-01-13 David Schneider
 - Translator backend: update documentation to describe psana Source syntax
+- note error naming tag, it should have been V00-00-03.
 
 Tag: V00-13-02
 2014-01-07 Andy Salnikov
