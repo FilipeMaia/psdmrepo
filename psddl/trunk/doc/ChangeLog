@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-13-08
+2014-03-25 David
+- Translator backend: add ndarray writers for const elements
+
 Tag: V00-13-07
 2014-01-29 Andy
 - hdf5 backend now dumps schema in DDL format instead of old XML format

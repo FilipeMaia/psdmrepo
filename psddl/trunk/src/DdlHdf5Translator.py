@@ -357,6 +357,8 @@ class DdlHdf5Translator ( object ) :
         # list is changed.
         intTypes = ['%sint%d_t' % (signed,bitsize) for signed in ['','u'] for bitsize in [8,16,32,64]]
         elemenTypes = intTypes + ['float','double']
+        constTypes = ['const '+tp for tp in elemenTypes]
+        elemenTypes.extend(constTypes)
         elemDimPairs = [(elem,ndim) for elem in elemenTypes for ndim in [1,2,3,4]]
         ndarrays = ['ndarray<%s,%d>' % (elem,ndim) for elem,ndim in elemDimPairs]
         ndarrayAlias = 'ndarray_types'
