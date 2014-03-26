@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-12
+2014-03-26 Mikhail S. Dubrovin
+- add src/FastArrayTransformation.py
+	
 Tag: V00-00-11
 2014-03-06 Mikhail S. Dubrovin
 in image_save_in_file.py - cosmetic changes
