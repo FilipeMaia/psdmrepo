@@ -357,7 +357,7 @@ void getType2CalibTypesMap(Type2CalibTypesMap & type2calibTypeMap) {
   cspad2x2Calib.push_back(&typeid(pdscalibdata::CsPad2x2PedestalsV1));
   cspad2x2Calib.push_back(&typeid(pdscalibdata::CsPad2x2PixelStatusV1));
   cspad2x2Calib.push_back(&typeid(pdscalibdata::CsPad2x2PixelGainV1));
-  cspadCalib.push_back(&typeid(pdscalibdata::CsPadCommonModeSubV1));
+  cspad2x2Calib.push_back(&typeid(pdscalibdata::CsPadCommonModeSubV1));
   
   cspadCalib.push_back(&typeid(pdscalibdata::CsPadPedestalsV1));
   cspadCalib.push_back(&typeid(pdscalibdata::CsPadPixelStatusV1));

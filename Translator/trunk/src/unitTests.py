@@ -1047,15 +1047,19 @@ class H5Output( unittest.TestCase ) :
         f = h5py.File(output_h5,'r')
         calibStore=f['/Configure:0000/CalibStore']
         self.assertEqual(set(calibStore.keys()), 
-                         set([u'pdscalibdata::CsPad2x2PedestalsV1', u'pdscalibdata::CsPad2x2PixelStatusV1']),
-                         msg = "calibStore does not contain only pdscalibdata::CsPad2x2PedestalsV1, pdscalibdata::CsPad2x2PixelStatusV1")
+                         set([u'pdscalibdata::CsPad2x2PedestalsV1', 
+                              u'pdscalibdata::CsPad2x2PixelStatusV1',
+                              u'pdscalibdata::CsPadCommonModeSubV1']),
+                         msg = "calibStore does not contain only pdscalibdata::CsPad2x2PedestalsV1, pdscalibdata::CsPad2x2PixelStatusV1, pdscalibdata::CsPadCommonModeSubV1")
         pedestalsA = calibStore['pdscalibdata::CsPad2x2PedestalsV1/XppGon.0:Cspad2x2.0/pedestals'][:]
         pedestalsB = calibStore['pdscalibdata::CsPad2x2PedestalsV1/XppGon.0:Cspad2x2.1/pedestals'][:]
+        status = calibStore['pdscalibdata::CsPad2x2PixelStatusV1/XppGon.0:Cspad2x2.0/status'][:]
+        commonMode = calibStore['pdscalibdata::CsPadCommonModeSubV1/XppGon.0:Cspad2x2.0/data']
         self.assertEqual(pedestalsA.shape,(185,388,2),msg="pedestals for 2x2 shape is not 185 388 2")
         self.assertEqual(pedestalsB.shape,(185,388,2),msg="pedestals for 2x2 shape is not 185 388 2")
-        status = calibStore['pdscalibdata::CsPad2x2PixelStatusV1/XppGon.0:Cspad2x2.0/status'][:]
         self.assertEqual(status.shape,(185,388,2),msg="status for 2x2 shape is not 185 388 2")
-        
+        self.assertEqual(commonMode['mode'],1,msg="CsPadCommonModeSubV1.mode != 1, it was 1 when test was developed")
+        self.assertEqual(commonMode['data'][0],24.,msg="CsPadCommonModeSubV1.data[0] != 24., it was 24. when test was developed")
         if self.cleanUp:
             os.unlink(output_h5)
                 
