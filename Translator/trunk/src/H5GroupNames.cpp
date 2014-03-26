@@ -66,10 +66,8 @@ namespace {
   }
 
   /**
-   * srcName and the functions strDetInfo nand  strBldInfo above are just a slight variation
-   * of the code in PSEvt::EventKey.cpp.  It provides flags to print the srcName the way that 
-   * PSEvt::srcName (in EventKey.cpp) does, as well as they they will be used for hdf5 
-   * translation.  
+   * srcName and the functions strDetInfo nand  strBldInfo above are based on the code
+   * in PSEvt::EventKey.cpp, but adapted for Translation.
    * Calling the function as 
    *     srcName(src,true,true)
    * mimics PSEvt::srcName, and calling the function as
@@ -77,6 +75,8 @@ namespace {
    * gives the src names for translation.
    * when the flags are true, you can get a space ' ', or an asterick '*' in the 
    * src name, which we do not want for translation. 
+   * Another difference is that this function checks if the src level is Event.
+   * if so, it returns Event.
    */
   std::string srcName(const Pds::Src& src, bool procPidSpaceSepAtEnd, bool detInfoSpecialAsAstrerik)
   {

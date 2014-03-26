@@ -132,6 +132,7 @@ class LessSrcKeyPair {
   bool operator()(const SrcKeyPair &a, const SrcKeyPair &b) {
     const Pds::Src & aSrc = a.first;
     const Pds::Src & bSrc = b.first;
+    if ((aSrc.level() ==  Pds::Level::Event) and (bSrc.level() ==  Pds::Level::Event)) return false;
     if (aSrc < bSrc) return true;
     if (bSrc < aSrc) return false;
     const std::string & aStr = a.second;

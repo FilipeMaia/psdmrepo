@@ -513,7 +513,7 @@ void H5Output::event(Event& evt, Env& env)
   try {
     eventImpl();
   } catch (...) {
-    MsgLog(logger(),error,name() << "event: error, closing file");
+    MsgLog(logger(),error,name() << " event: error, closing file");
     closeH5File();
     throw;
   }
