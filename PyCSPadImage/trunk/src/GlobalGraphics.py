@@ -31,9 +31,11 @@ import sys
 import numpy as np
 
 import matplotlib
-if matplotlib.get_backend() != 'Qt4Agg' : matplotlib.use('Qt4Agg')
+#if matplotlib.get_backend() != 'Qt4Agg' : matplotlib.use('Qt4Agg')
 
-import matplotlib.pyplot as plt
+import matplotlib.pyplot  as plt
+import matplotlib.lines   as lines
+import matplotlib.patches as patches
 
 #---------------------
 #class CSPadImageProducer (object) :
@@ -111,6 +113,7 @@ def plotImageLarge(arr, img_range=None, amp_range=None, figsize=(12,10), title='
     colb = fig.colorbar(imsh, pad=0.005, fraction=0.09, shrink=1, aspect=40) # orientation=1
     if amp_range is not None : imsh.set_clim(amp_range[0],amp_range[1])
     fig.canvas.set_window_title(title)
+    return axim
 
 #--------------------------------
 
@@ -130,6 +133,40 @@ def plotImageAndSpectrum(arr, amp_range=None) : #range=(0,500)
     plt.xlabel('Bins')
     plt.ylabel('Stat') #u'\u03C6'
     #plt.ion()
+
+#------------------------------
+
+def plotGraph(x,y, figsize=(10,5)) : 
+    fig = plt.figure(figsize=figsize, dpi=80, facecolor='w', edgecolor='w', frameon=True)
+    #fig.subplots_adjust(left=0.05, bottom=0.03, right=0.98, top=0.98, wspace=0.2, hspace=0.1)
+    #figAxes = fig.add_subplot(111)
+    ax = fig.add_axes([0.15, 0.10, 0.78, 0.86])
+    ax.plot(x,y,'b-')
+
+#------------------------------
+
+def drawCircle(axes, xy0, radius, linewidth=1, color='w', fill=False) : 
+    circ = patches.Circle(xy0, radius=radius, linewidth=linewidth, color=color, fill=fill)
+    axes.add_artist(circ)
+
+
+def drawCenter(axes, xy0, s=10, linewidth=1, color='w') : 
+    xc, yc = xy0
+    d = 0.15*s
+    arrx = (xc+s, xc-s, xc-d, xc,   xc)
+    arry = (yc,   yc,   yc-d, yc-s, yc+s)
+    line = lines.Line2D(arrx, arry, linewidth=linewidth, color=color)   
+    axes.add_artist(line)
+
+
+def drawLine(axes, xarr, yarr, s=10, linewidth=1, color='w') : 
+    line = lines.Line2D(xarr, yarr, linewidth=linewidth, color=color)   
+    axes.add_artist(line)
+
+
+def drawRectangle(axes, xy, width, height, linewidth=1, color='w') :
+    rect = patches.Rectangle(xy, width, height, linewidth=linewidth, color=color)
+    axes.add_artist(rect)
 
 #--------------------------------
 

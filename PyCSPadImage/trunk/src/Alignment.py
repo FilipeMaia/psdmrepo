@@ -14,7 +14,7 @@ part of it, please give an appropriate acknowledgment.
 
 @see RelatedModule
 
-@version $Id: 2011-11-18$
+@version $Id: 2014-03-24$
 
 @author Mikhail S. Dubrovin
 """
@@ -30,16 +30,20 @@ __version__ = "$Revision: 4 $"
 #----------
 import sys
 import os
-import numpy              as np
+import numpy as np
 
+import PyCSPadImage.AngularIntegrator  as ai
 import PyCSPadImage.CalibParsDefault   as cald
 import PyCSPadImage.CalibPars          as calp
 import PyCSPadImage.CSPadConfigPars    as ccp
 import PyCSPadImage.CSPadImageProducer as cip
 import PyCSPadImage.GlobalMethods      as gm # getCSPadArrayFromFile for pedestal subtraction 
+import PyCSPadImage.CSPADPixCoords     as pixcoor
 
 import PyCSPadImage.GlobalGraphics     as gg # For test purpose in main only
 import PyCSPadImage.HDF5Methods        as hm # For test purpose in main only
+
+import pyimgalgos.FastArrayTransformation as fat 
 
 #----------------------------------------------
 
@@ -77,118 +81,141 @@ def main_example_CSpad2x2() :
 
 #----------------------------------------------
 
-def main_alignment_test() :
+def plot_img_in_polar_coords(image, center=(50,40), rad_range=(600,700,100), phi_range=(-180,180,90), amp_range=None, rad_plot=700) :
 
-    print 'Start test in main_alignment_test()'
+    origin = center
+    RRange = rad_range
+    PRange = phi_range
+    RPRange= (PRange[0], PRange[1], RRange[0], RRange[1])
 
-    #path_calib = '/reg/d/psdm/CXI/cxi80410/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0'            # 2011-05-25
-    #path_calib = '/reg/d/psdm/CXI/cxi37411/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0'            # 2011-08-10
-    #path_calib = '/reg/d/psdm/CXI/cxi35711/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0'            # 2011-10-18
-    #path_calib = '/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi43312-Dsd'        # 2012-01-12
-    #path_calib = '/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi80410-r1150-Ds1'  # 2012-01-18
-    #path_calib = '/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi39112-r0009-Ds1'  # 2012-02-17
-    #path_calib = '/reg/d/psdm/CXI/cxi39112/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0'            # 2012-02-17
-    #path_calib = '/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-xpp-2012-02-26'      # 2012-02-26
-    #path_calib = '/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi49812-r0073-Ds1'  # 2012-03-08
-    #path_calib = '/reg/d/psdm/CXI/cxi49812/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0'            # 2012-03-08    
-    #path_calib = '/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi49012-r0020-Ds1'  # 2012-03-14
-    #path_calib = '/reg/d/psdm/CXI/cxi49012/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0'            # 2012-03-14    
-    #path_calib = '/reg/d/psdm/XPP/xppcom10/calib/CsPad::CalibV1/XppGon.0:Cspad.0'            # 2012-03-23 check    
-    #path_calib = '/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-xpp-2013-01-24'      # 2013-01-24
-    #path_calib = '/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi64813-r0058-Ds1'  # 2013-01-31
-    #path_calib = '/reg/d/psdm/cxi/cxi64813/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0'
-    path_calib = '/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-xpp-2013-01-29'      # 2013-01-29
-    #path_calib = '/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi-ds1-2013-01-31'  # 2013-02-21
-    #path_calib = '/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi80410-r1458-Ds1'  # 2013-02-21 identic to calib-cxi-ds1-2013-01-31
+    polar_arr = fat.transformCartToPolarArray(image, RRange, PRange, origin)
 
+    axis = gg.plotImageLarge(polar_arr, img_range=RPRange, amp_range=amp_range, figsize=(12,8), origin='down')
+    gg.drawLine(axis, xarr=(PRange[0], PRange[1]), yarr=(rad_plot, rad_plot))
+    gg.savefig('cspad-img-r-phi.png')
 
+#----------------------------------------------
 
-    #fname, runnum = '/reg/d/psdm/CXI/cxi35711/hdf5/cxi35711-r0009.h5',      9 
-    #fname, runnum = '/reg/d/psdm/CXI/cxi37411/hdf5/cxi37411-r0080.h5',     80
-    #fname, runnum = '/reg/d/psdm/CXI/cxi37411/hdf5/cxi37411-r0039.h5',     39 
-    #fname, runnum = '/reg/d/psdm/CXI/cxi80410/hdf5/cxi80410-r1150.h5',   1150
-    #fname, runnum = '/reg/d/psdm/CXI/cxi39112/hdf5/cxi39112-r0009.h5',      9 
-    #fname, runnum = '/reg/d/psdm/XPP/xppcom10/hdf5/xppcom10-r1437.h5',   1437
-    #fname, runnum = '/reg/d/psdm/CXI/cxi49812/hdf5/cxi49812-r0073.h5',     73
-    #fname, runnum = '/reg/d/psdm/CXI/cxi49012/hdf5/cxi49012-r0020-raw.h5', 20
-    #fname, runnum = '/reg/d/psdm/CXI/cxi80410/hdf5/cxi80410-r0628.h5',    628
-    #fname, runnum = '/reg/d/psdm/xpp/xppcom13/hdf5/xppcom13-r0066.h5',     66
-    #fname, runnum = '/reg/d/psdm/CXI/cxi64813/hdf5/cxi64813-r0058.h5',     58
-    #fname, runnum = '/reg/d/psdm/CXI/cxi80410/hdf5/cxi80410-r1458.h5',   1458
-    fname, runnum = '/reg/d/psdm/xpp/xpp66213/hdf5/xpp66213-r0150.h5',     150
+def alignment_for_cspad_ndarray(fname, amps=(0,500), center=(877.0,875.5), rad_range=(600,720,120), radius=664, amps_rad=(0,20000)) :
 
-    dsname = '/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/XppGon.0:Cspad.0/data'
-    #dsname = '/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/CxiDsd.0:Cspad.0/data'
-    #dsname = '/Configure:0000/Run:0000/CalibCycle:0000/CsPad::ElementV2/CxiDs1.0:Cspad.0/data'
+    #xc, yc = 859, 859
+    #xc, yc = 855.3+22.7, 860.2+14.5
+    xc, yc = center
+    rmin, rmax, rbins = rad_range
+    nda = gm.getCSPadArrayFromFile(fname, dtype=np.float32, shape = (32, 185, 388)) 
 
-    event   = 0
+    print 'Use default configuration parameters for entire cspad'
+    config = ccp.CSPadConfigPars()
+    config.printCSPadConfigPars()
 
+    print 'Start alignment_for_cspad_ndarray()'
+    #path_calib, runnum = '/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi-ds1-2013-12-20', 136
+    #path_calib, runnum = '/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi-ds1-2014-03-19', 227
+    path_calib, runnum = '/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi-ds1-2014-03-19', 136
+    #path_calib, runnum = '/reg/d/psdm/CXI/cxii0114/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0', 227
     print 'Load calibration parameters from', path_calib 
-    #calibpars = calp.calibpars.setCalibParsForPath ( run=runnum, path=path_calib )
-    calibpars = calp.CalibPars( path=path_calib, run=runnum  )
-    print 'center_global:\n', calibpars.getCalibPars('center_global')
-    #print 'offset:\n', calibpars.getCalibPars('offset')
-    #calp.calibpars.printCalibPars()
-    #calp.calibpars.printCalibFiles ()
-    #calp.calibpars.printListOfCalibTypes()
-    #cald.calibparsdefault.printListOfCalibTypes()
-    #cald.calibparsdefault.printCalibParsDefault()
-    #cald.calibparsdefault.printCalibParsDefault('center_global')
+    calib = calp.CalibPars( path=path_calib, run=runnum  )
+    print 'center:\n',          calib.getCalibPars('center')
+    print 'tilt:\n',            calib.getCalibPars('tilt')
+    print 'marg_gap_shift::\n', calib.getCalibPars('marg_gap_shift')
+    print 'offset:\n',          calib.getCalibPars('offset')
+    print 'offset_corr:\n',     calib.getCalibPars('offset_corr')
+    print 'quad_rotation:\n',   calib.getCalibPars('quad_rotation')
+    print 'quad_tilt:\n',       calib.getCalibPars('quad_tilt')
 
-    print 'Get raw CSPad event %d from file %s \ndataset %s' % (event, fname, dsname)
-    ds1ev = hm.getOneCSPadEventForTest( fname, dsname, event )
-    #ds1ev = hm.getAverageCSPadEvent( fname, dsname, event=200, nevents=500 )
-    #ds1ev = hm.getAverageCSPadEvent( fname, dsname, event, nevents=10 )
-    #print 'ds1ev.shape = ',ds1ev.shape # should be (32, 185, 388)
-    #print 'ds1ev = ',ds1ev[1,:]
+    coord = pixcoor.CSPADPixCoords(calib)
+    coord.print_cspad_geometry_pars()
 
-    #print 'Subtract pedestals'
-    #ped_fname = '/reg/neh/home1/dubrovin/LCLS/CSPadPedestals/cspad-pedestals-cxi49812-r0072.dat' # shape = (5920, 388)
-    #ped_fname = '/reg/neh/home1/dubrovin/LCLS/CSPadPedestals/cspad-pedestals-cxi49012-r0008.dat' # shape = (5920, 388)
-    #ped_fname = '/reg/neh/home1/dubrovin/LCLS/CSPadPedestals/cspad-pedestals-cxi49012-r0038.dat' # shape = (5920, 388)
-    #ped_fname = '/reg/neh/home1/dubrovin/LCLS/CSPadPedestals/cspad-pedestals-cxi49012-r0027.dat' # shape = (5920, 388)
-    #ped_fname = '/reg/neh/home1/dubrovin/LCLS/CSPadPedestals/cspad-pedestals-xppcom10-r1435.dat' # shape = (5920, 388) low gain
-    #ped_fname = '/reg/d/psdm/CXI/cxi49012/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0/pedestals/9-37.data' # shape = (5920, 388)
-    #ped_fname = '/reg/neh/home1/dubrovin/LCLS/CSPadPedestals/cspad-pedestals-cxi80410-r1453.dat' # shape = (5920, 388)
-    ped_fname = '/reg/neh/home1/dubrovin/LCLS/CSPadPedestals/cspad-pedestals-xpp66213-r0149.dat' # shape = (5920, 388)
-    #ds1ev  = gm.getCSPadArrayFromFile(ped_fname)
-    #ds1ev -= gm.getCSPadArrayFromFile('/reg/neh/home1/dubrovin/LCLS/CSPadPedestals/cspad-pedestals-cxi49012-r0027.dat')
-    #ds1ev -= gm.getCSPadArrayFromFile('/reg/neh/home1/dubrovin/LCLS/CSPadPedestals/cspad-pedestals-xppcom10-r1442.dat')
-    ds1ev -= gm.getCSPadArrayFromFile(ped_fname)
-    print 'ds1ev.shape = ',ds1ev.shape # should be (32, 185, 388)
+    # Make mask of active pixels on image
+    quads = [1,1,1,1]
 
-    print 'Make the CSPad image from raw array'
-    #cspadimg = cip.CSPadImageProducer(rotation=0, tiltIsOn=True)#, mirror=True)
-    cspadimg = cip.CSPadImageProducer(calibpars, rotation=0, tiltIsOn=True)#, mirror=True)
-    #cspadimg.printInputPars()
-    #cspadimg.printGeometryPars()
-    #arr = cspadimg.getImageArrayForCSPadElement( ds1ev )
-    arr = cspadimg.getCSPadImage( ds1ev )
+    mask_quad0_nda = np.ones((8, 185, 388)) if quads[0] else np.zeros((8, 185, 388))
+    mask_quad1_nda = np.ones((8, 185, 388)) if quads[1] else np.zeros((8, 185, 388))
+    mask_quad2_nda = np.ones((8, 185, 388)) if quads[2] else np.zeros((8, 185, 388))
+    mask_quad3_nda = np.ones((8, 185, 388)) if quads[3] else np.zeros((8, 185, 388))
+    mask_cspad_nda = np.vstack((mask_quad0_nda, mask_quad1_nda, mask_quad2_nda, mask_quad3_nda))
+    mask_cspad_nda.shape = (32, 185, 388)
+    mask = coord.get_cspad_image(mask_cspad_nda, config)
 
-    print 'Plot CSPad image'
+    #print 'cspad nda:\n', nda
+    print 'cspad nda.shape: ', nda.shape
 
-    #AmpRange = (800,  1300) # for cxi
-    AmpRange = (0,  10) # for cxi
-    #AmpRange = (-10, 50) # for xpp
+    image = coord.get_cspad_image(nda*mask_cspad_nda, config)    
+    print 'image.shape =', image.shape
 
-    #gg.plotImage(arr,range=AmpRange,figsize=(1.16*12,12))
-    gg.plotImageLarge(arr,range=AmpRange,figsize=(1.15*12,12))
-    gg.move(200,100)
-    gg.plotSpectrum(arr,range=AmpRange)
-    gg.move(50,50)
-    #gg.plotImageAndSpectrum(arr,range=(1,2001))
-    print 'To EXIT the test click on "x" in the top-right corner of each plot window.'
+    #gg.plotImageLarge(mask, amp_range=amps, figsize=(12,11))
+    axis = gg.plotImageLarge(image, amp_range=amps, figsize=(12,11))
+    #gg.plotImageLarge(img2d, amp_range=None, figsize=(12,11))
+
+    angint = ai.AngularIntegrator()
+    ysize, xsize = image.shape
+    
+    #-------- find corrections to center position
+    if True :
+    #if False :
+        dc_list = xrange(-4,5,1)
+        
+        dxmax = 0
+        dymax = 0
+        intmax = 0
+        
+        print '\ndx: ', 
+        for dx in dc_list :       
+            print '        %2d' % dx,
+        
+        for dy in dc_list :
+            print '\ndy: %2d ' % dy, 
+            for dx in dc_list :       
+                angint.setParameters(xsize, ysize, xc+dx, yc+dy, rmin, rmax, rbins, mask=mask)
+                bincent, binint = angint.getRadialHistogramArrays(image)
+                intval = max(binint)
+                print '%10.3f' % intval,
+                if intval > intmax :
+                    dxmax = dx
+                    dymax = dy
+                    intmax = intval
+        
+        print '\nMaximum dx=%2d, dy=%2d, val=%.3f' % (dxmax, dymax, intmax)
+
+    #-------- 
+
+    gg.drawCircle(axis, (xc,yc), radius)
+    gg.drawCenter(axis, (xc,yc), 40)
+    gg.savefig('cspad-img.png')
+
+    plot_img_in_polar_coords(image, (xc,yc), rad_range, phi_range=(-180,180,180), amp_range=amps_rad, rad_plot=radius)
+
+    angint.setParameters(xsize, ysize, xc, yc, rmin, rmax, rbins, mask=mask)
+    bincent, binint = angint.getRadialHistogramArrays(image)
+    gg.plotGraph(bincent, binint)
+    gg.savefig('cspad-img-angular-integral.png')
+
     gg.show()
-
-    #ds1ev.shape = (5920, 388)
-    #gm.saveNumpyArrayInFile(ds1ev, fname='cspad-arr.txt') 
-
+ 
 #----------------------------------------------
 #----------------------------------------------
 
 if __name__ == "__main__" :
 
-    main_alignment_test()
+    if len(sys.argv)==1 :
+        fname  = '/reg/neh/home1/dubrovin/LCLS/HDF5Analysis-v01/cspad-ndarr-ave-cxii0114-r0227.dat'
+        amps   = (0,500)    
+        center = (877.0,875.5)
+        rad_range = (600,720,120)
+        radius = 664
+        amps_rad  = (0,20000)
+        alignment_for_cspad_ndarray(fname, amps, center, rad_range, radius, amps_rad)
+
+    elif sys.argv[1]=='1' :
+        fname     = '/reg/neh/home1/dubrovin/LCLS/HDF5Analysis-v01/cspad-ndarr-ave-cxi83714-r0136.dat'
+        amps      = (0,0.5)
+        center    = (882,875)
+        rad_range = (100,400,300)
+        #rad_range = (125,175,50)
+        radius    = 146
+        amps_rad  = (0,5)
+        alignment_for_cspad_ndarray(fname, amps, center, rad_range, radius, amps_rad)
+
     #main_example_CSpad2x2()
     sys.exit ( 'End of test.' )
 

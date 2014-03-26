@@ -12,6 +12,11 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 #---------------------
+2014-03-26 Mikhail S. Dubrovin
+Tag: V00-00-20
+- add new ring center searching algorithm in quad alignment Alignment.py old went to AlignmentV1.py
+	
+#---------------------
 2012-12-17 Mikhail S. Dubrovin
 Tag: V00-00-19
 A       src/CSPAD2x2ImageUtils.py

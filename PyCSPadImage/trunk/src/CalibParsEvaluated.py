@@ -602,7 +602,7 @@ class CalibParsEvaluated (object) :
 
 #----------------------------------------------
 
-# cpeval = CalibParsEvaluated() # Sets the default calibration parameters.
+#cpeval = CalibParsEvaluated() # Sets the default calibration parameters.
 
 #----------------------------------------------
 # In case someone decides to run this module --

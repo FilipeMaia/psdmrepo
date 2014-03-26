@@ -344,6 +344,7 @@ def findCalibFile (path_to_clib_types, type=None, run=None) :
 
     for fname in flist :
 
+        if fname == 'HISTORY' : continue # skip HISTORY files
         if fname[-1] == '~' : continue # skip old files with ~(tilde) at the end
 
         basename = fname.split('.') # Assume: basename[0]='0-end', basename[1]='data' 

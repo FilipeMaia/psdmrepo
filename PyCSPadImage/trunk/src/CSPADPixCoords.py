@@ -147,7 +147,7 @@ class CSPADPixCoords (PixCoords2x1) :
 
 #------------------------------
 
-    def make_cspad_pix_coordinate_arrays (sp, xc_um, yc_um, orient_deg, tilt_deg=None) : # All lists of [4,8]
+    def make_cspad_pix_coordinate_arrays (sp, xc_um, yc_um, orient_deg, tilt_deg=None, do_crop=False) : # All lists of [4,8]
         """Makes [4,8,185,388] cspad pixel x and y coordinate arrays"""        
         sp.make_maps_of_2x1_pix_coordinates()
 
@@ -167,8 +167,10 @@ class CSPADPixCoords (PixCoords2x1) :
                 sp.x_pix_um[quad][sect][:] =  Xrot + xc_um[quad][sect]
                 sp.y_pix_um[quad][sect][:] =  Yrot + yc_um[quad][sect]
 
-        sp.x_pix_um -= sp.x_pix_um.min()
-        sp.y_pix_um -= sp.y_pix_um.min()
+        print 'make_cspad_pix_coordinate_arrays: xmin, ymin:', sp.x_pix_um.min()/sp.pixs, sp.y_pix_um.min()/sp.pixs
+        if do_crop :
+            sp.x_pix_um -= sp.x_pix_um.min()
+            sp.y_pix_um -= sp.y_pix_um.min()
 
         sp.x_pix_pix = (sp.x_pix_um/sp.pixs+0.25).astype(int) 
         sp.y_pix_pix = (sp.y_pix_um/sp.pixs+0.25).astype(int)

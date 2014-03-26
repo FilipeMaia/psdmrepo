@@ -364,6 +364,7 @@ class CSPadImageProducer (object) :
 
         self.detDimX, self.detDimY, self.segmX, self.segmY, self.segmRotInd = \
                       cpe.cpeval.getCSPadGeometry (rotation)
+                      #self.calibpars.getCSPadGeometry (rotation)
 
         #self.printInputPars()
         #self.printGeometryPars()
