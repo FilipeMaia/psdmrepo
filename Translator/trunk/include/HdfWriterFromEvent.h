@@ -12,7 +12,7 @@
 
 namespace Translator {
 
-typedef enum { inEvent, inConfigStore } DataTypeLoc;
+typedef enum { inEvent, inConfigStore, inCalibStore } DataTypeLoc;
 
 /// helper function for HdfWriterFromEvent 
 template <class T>
@@ -31,8 +31,17 @@ boost::shared_ptr<T> getFromEventStore(const PSEvt::EventKey &eventKey,
                                        PSEvt::Event & evt, PSEnv::Env & env) {
   checkType<T>(eventKey, "HdfWriter");
   boost::shared_ptr<T> ptr;
-  if (dataTypeLoc == inEvent) ptr = evt.get(eventKey.src(), eventKey.key()); 
-  else if (dataTypeLoc == inConfigStore) ptr = env.configStore().get(eventKey.src());
+  switch (dataTypeLoc) {
+  case inEvent: 
+    ptr = evt.get(eventKey.src(), eventKey.key()); 
+    break;
+  case inConfigStore:
+    ptr = env.configStore().get(eventKey.src());
+    break;
+  case inCalibStore:
+    ptr = env.calibStore().get(eventKey.src());
+    break;
+  }
   return ptr;
 }
 

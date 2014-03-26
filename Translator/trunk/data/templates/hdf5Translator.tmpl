@@ -175,10 +175,12 @@ src_filter = include all
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # CALIBRATION FILTERING
 #
-# Psana calibration modules can produce a calibrated version of CsPad data
-# (The data types CsPad::DataV1 or CsPad::DataV2). The module output will be 
-# data of the same type and src as the uncalibrated data, with an additional key, 
-# such as 'calibrated'.
+# Psana calibration modules can produce calibrated versions of different 
+# data types. Depending on the module used, you may get an NDArray, an 
+# image, or the same data type as was in the xtc but with calibrated data.
+#
+# If you are doing the latter, the module output will be data of the same type 
+# and src as the uncalibrated data, with an additional key, such as 'calibrated'.
 #
 # The Translator defaults to skipping the translation of the uncalibrated
 # data when a calibrated version of that data is present.  Below you 
@@ -187,39 +189,66 @@ src_filter = include all
 
 calibration_key = calibrated
 include_uncalibrated_data = false
+exclude_calibrated_data = false
+
+# Sometimes the calibrated data is not the end result desired, it may be input to 
+# another module, such as an image producer. In this case you may want to set
+# exclude_calibrated_data=true
 
 # Note: this only affects calibrated data of the same type and src as the
 # uncalibrated data.  When the calibration module produces a NDArray, both
 # the NDArray and the uncalibrated data are translated.  If you do not wish
 # to translate the uncalibrated data, use appropriate type or src_filter options.
 # Likewise if you do not want to translate certain NDArray's, see the 
-# ndarray_key_filter options below.
+# key_filter options below.
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# NDARRAY AND STD::STRING KEY FILTERING
+# CALIBSTORE FILTERING
 #
-# A number of NDArray's and any std::string found in the event store are translated into 
-# the hdf5 file.  NDarray's up to 4 dimensions of 10 basic types (8, 16, 32 and 64 bit 
-# signed and unsigned int, float and double) are translated, but see the comment after the 
-# ndarray_types option in the type filtering section for the most up to date list.
-#
-# These NDArray's and std::string's can be filtered by specifying the eventKey key that was
-# used to put the data in the event.  While a srcname and key uniquely distinguish data in the
-# event store, the Translator filter's NDArray's and std::string's using only the
-# key string. The default is to include all ndarray's and std::string's found:
+# Calibration modules may publish the data they used to produce the calibrated
+# event objects. Examples of data would be pedestal values, pixel status (what
+# pixels are hot) and common mode algorithm parameters. This data will be published
+# in what is called the Psana calibStore. When the Translator sees calibrated 
+# event data, it will look for the corresponsinding calibStore data as well.
+# If you do not want it to translate calibStore data, set the following to true.
 
-ndarray_key_filter = include all
-std_string_key_filter = include all
+exclude_calibstore = false
 
-# an example of including only one ndarray (with keystring being 'finalanswer') would be
-#
-# ndarray_key_filter include finalanswer
-#
-# and several ndarrays or strings can be included or excluded
-#
-# ndarray_key_filter = exclude arrayA arrayB
-# std_string_key_filter = include message1 eventDescription
+# otherwise, the Translator will create a group CalibStore that holds the
+# calibstore data. Note, the Translator looks for all calibStore data associated 
+# with the calibration modules. If a calibration module was configured to not do 
+# certain calibrations (such as gain) but the module still put gain values
+# in the config store (even though it did not use them) the Translator 
+# would still translate those gain values.
 
+# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+# KEY FILTERING
+#
+# Psana modules loaded before the translator may put a variety of objects in the event 
+# store. Be default, the Translator will translate any new data that it knows about.
+# In addition to the psana types, it knows about NDArrays, C++ strings, and has a C++ interface 
+# for registering new simple types. NDarray's up to 4 dimensions of 10 basic types 
+# (8, 16, 32 and 64 bit signed and unsigned int, float and double) as well as the const 
+# versions of these types are translated.
+#
+# Generally Psana modules will attach keys to these objects (the keys are simply strings).
+# To filter the set of keys that are translated, modify the parameter below:
+
+key_filter = include all
+
+# The default is to not look at the key but rather translate all data that the translator
+# knows about. An example of including only data with the key finalanswer would be
+#
+# key_filter = include finalanswer
+#
+# To exclude a few keys, one can do
+#
+# key_filter = exclude arrayA arrayB
+#
+# Note, key filtering does not affect translation of data without keys. For instance
+# setting key_filter = include keyA does not turn off translation of data without keys.
+# Of all the data with keys, only those where the key is keyA will be translated.
+#
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # 
 # COMPRESSION 
 #

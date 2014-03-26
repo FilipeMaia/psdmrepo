@@ -19,18 +19,22 @@ namespace Translator {
    *  
    *  @brief Class that writes data to hdf5 datasets. Data description is defined outside the class.
    * 
-   * Manages a hdf5 datasets that looks like a 1D array of whatever data types the client code provides.
+   * Manages two kinds of hdf5 datasets. The first is a 1D array of whatever data types the client 
+   * code provides. This is for datasets that are periodically written to and grow to unknown sizes.
+   * The second is a 'one shot' mode, the datasets are created, stored, and closed in one call.
    * The client code provides the following:
    *    hdf5 group Id for where the datasets are to be written
    *    For each dataset that is a child of the group:
    *      hdf5 type Id for the type in the dataset  
    *      name of the dataset
-   *      a DatasetCreationProperties object (which includes a boost smart pointer to a ChunkPolicy instance)
+   *      for the 1D array datasets, a DatasetCreationProperties object, which includes a boost smart 
+   *      pointer to a ChunkPolicy instance.
+   *      
    *
    * The client code owns the groupId's and typeId's.  HdfWriterGeneric will not call H5close on these
    * resources.  The typeId should remain valid during the lifetime of the HdfWriterGeneric instance.
    * 
-   * closeDatasets() should be called when the group is to be closed.  
+   * For the 1D array datasets, closeDatasets() should be called when the group is to be closed.  
    * The open datasets are closed, and the groupId is erased from the HdfWriterGeneric cache.
    *
    * The client code references a dataset via the original groupId used to create it, and the
@@ -47,8 +51,8 @@ namespace Translator {
    *  size_t BPos = writer.createUnlimitedSizeDataset(group,"datasetB",typeB,dsetProp);  // BPos == 1
    *  writer.append(group,APos,AdataBuffer)
    *  writer.append(group,BPos,BdataBuffer)
-   *  writer.append(group,"A",AdataBuffer)  // slower, but can look up dataset by name
-   *  writer.append(group,"B",BdataBuffer)
+   *  writer.append(group,"datasetA",AdataBuffer)  // same thing, but look up dataset by name
+   *  writer.append(group,"datasetB",BdataBuffer)
    *  writer.store_at(group,0,Apos,AdataBuffer)  // you can overwrite previous records
    *  writer.store_at(group,1,Apos,AdataBuffer)  
    *  writer.closeDatasets(group)  // closes both the hdf5 datasets for "datasetA" and "datasetB"
@@ -59,11 +63,8 @@ namespace Translator {
    *   /file/mygroup/datasetA
    *   /file/mygroup/datasetB
    * 
-   * append is the most unsafe function to use.  The client code is responsible for providing a 
-   * void pointer that contains valid data for one entry of the type for the dataset.  
-   *
    * Exceptions: several exceptions are thrown, all derived from ErrSvc::Issue.  Most involve
-   *   errors with hdf5 library calls and are serious. The exceptions are:
+   *   errors with hdf5 library calls. The exceptions are:
    *
    *  DataSpaceException - serious error closing the hdf5 dataspace id's that 
    *                       describe the in memory or file layout.
@@ -78,8 +79,6 @@ namespace Translator {
    *                      map. No dataset was created for this group.  Other cases involve a bad 
    *                      dataset index.
    *                      
-   *  @version \$Id:
-   *
    *  @author David Schneider
    */
 class HdfWriterGeneric {
@@ -91,16 +90,25 @@ class HdfWriterGeneric {
                                     const std::string & dsetName,
                                     hid_t h5type,
                                     const DataSetCreationProperties & dsetCreateProp);
+
   size_t createFixedSizeDataset(hid_t groupId,
                                 const std::string & dsetName,
                                 hid_t h5type,
                                 hsize_t fixedSize);
   
+  void createAndStoreDataset(hid_t groupId,
+                             const std::string & dsetName,
+                             hid_t h5type,
+                             const void * data);
+
   void append(hid_t groupId, size_t idx, const void * data) { store_at(groupId,-1,idx,data); };
   void append(hid_t groupId, const std::string & dsetName, const void * data);
 
   void store_at(hid_t groupId, long storeIndex, size_t dsetIndex, const void * data);
   void store_at(hid_t groupId, long storeIndex, const std::string & dsetName, const void * data);
+
+  void store(hid_t groupId, size_t dsetIndex, const void * data);
+  void store(hid_t groupId, const std::string & dsetName, const void * data);
 
   void closeDatasets(hid_t groupId);
 

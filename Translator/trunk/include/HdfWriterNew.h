@@ -34,7 +34,7 @@ class HdfWriterNew {
   CreateHDF5Type m_createType;
   FillHdf5WriteBuffer m_fillWriteBuffer;
   CloseHDF5Type m_closeType;
-}; // NewWriter
+}; // HdfNewWriter
 
 } // namesapce Translator
 

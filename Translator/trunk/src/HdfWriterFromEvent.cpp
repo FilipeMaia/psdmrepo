@@ -10,9 +10,12 @@ std::ostream & operator<<(std::ostream &o, DataTypeLoc &dataTypeLoc) {
   case inConfigStore:
     o << "inConfigStore";
     break;
-    default:
-      o<< "*error*";
-      break;
+  case inCalibStore:
+    o << "inCalibStore";
+    break;
+  default:
+    o<< "*error*";
+    break;
   }
   return o;
 } 

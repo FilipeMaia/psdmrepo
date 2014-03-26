@@ -25,6 +25,9 @@ class HdfWriterNewDataFromEvent : public HdfWriterFromEvent {
   HdfWriterNewDataFromEvent(const HdfWriterNew & newWriter, 
                             const std::string & key);
 
+  HdfWriterNewDataFromEvent(boost::shared_ptr<HdfWriterNew> newWriter, 
+                            const std::string & key);
+
   virtual void make_datasets(DataTypeLoc dataTypeLoc,
                              hdf5pp::Group & srcGroup, 
                              const PSEvt::EventKey & eventKey, 
@@ -60,6 +63,7 @@ class HdfWriterNewDataFromEvent : public HdfWriterFromEvent {
 
   const std::string & key() { return m_key; }
  protected:
+  bool checkTypeMatch(const PSEvt::EventKey & eventKey, std::string msg="");
   class NotImplementedException : public ErrSvc::Issue {
   public:
   NotImplementedException(const ErrSvc::Context &ctx, const std::string &what) : ErrSvc::Issue(ctx,what) {}

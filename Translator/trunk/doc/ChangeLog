@@ -11,6 +11,14 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-20
+2014-03-25 David
+- support for const ndarrays
+- add translation of calibStore data
+- added option to skip calibrated data
+- add option to skip calibStore data
+- replaced ndarray and string key filtering with general key filtering
+	
 Tag: V00-00-19
 2014-03-10 David
 - update for psddldata V01-00-05

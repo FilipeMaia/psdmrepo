@@ -145,6 +145,7 @@ def writeCfgFile(input_file, output_h5, moduleList="Translator.H5Output"):
     cfgfile.write("files = %s\n" % input_file)
     cfgfile.write("[Translator.H5Output]\n")
     cfgfile.write("output_file = %s\n" % output_h5)
+    cfgfile.write("overwrite = true\n")
     cfgfile.write("Epics=exclude\n")  # to exclude the epics::ConfigV1, to get things to look 
                                       # more like o2o-translate
     cfgfile.file.flush();
@@ -744,15 +745,14 @@ class H5Output( unittest.TestCase ) :
         if self.cleanUp:
             os.unlink(output_h5)
 
-    def test_filter_some_ndarray_exclude(self):
+    def test_filter_key_exclude(self):
         '''check that we can filter some ndarrays by excluding them
         '''
         input_file = TESTDATA_T1
-        output_h5 = os.path.join(OUTDIR, "unit_test_filter_some_ndarray_exclude.h5")
+        output_h5 = os.path.join(OUTDIR, "unit_test_filter_key_exclude.h5")
         cfgfile = writeCfgFile(input_file,output_h5,"Translator.TestModuleNDArrayString Translator.H5Output")
         # first add any options to H5Output, then other modules
-        cfgfile.write("ndarray_key_filter = exclude my_int1D my_float2Da\n")
-        cfgfile.write("std_string_key_filter = exclude my_string1\n")
+        cfgfile.write("key_filter = exclude my_int1D my_float2Da my_string1\n")
         cfgfile.file.flush()
         self.runPsanaOnCfg(cfgfile,output_h5,extraOpts='',printPsanaOutput=False)
         f=h5py.File(output_h5,'r')
@@ -772,15 +772,14 @@ class H5Output( unittest.TestCase ) :
         if self.cleanUp:
             os.unlink(output_h5)
 
-    def test_filter_some_ndarray_include(self):
+    def test_filter_key_include(self):
         '''check that we can filter some ndarrays by including them
         '''
         input_file = TESTDATA_T1
-        output_h5 = os.path.join(OUTDIR, "unit_test_filter_some_ndarray_include.h5")
+        output_h5 = os.path.join(OUTDIR, "unit_test_filter_key_include.h5")
         cfgfile = writeCfgFile(input_file,output_h5,"Translator.TestModuleNDArrayString Translator.H5Output")
         # first add any options to H5Output, then other modules
-        cfgfile.write("ndarray_key_filter = include my_int1D my_float2Da\n")
-        cfgfile.write("std_string_key_filter = include my_string1\n")
+        cfgfile.write("key_filter = include my_int1D my_float2Da my_string1\n")
         cfgfile.file.flush()
         self.runPsanaOnCfg(cfgfile,output_h5)
         f=h5py.File(output_h5,'r')
@@ -1033,6 +1032,32 @@ class H5Output( unittest.TestCase ) :
         if self.cleanUp:
             os.unlink(output_h5)
         
+    def test_calibstore(self):
+        '''runs on xpptut data to see if calibration stuff gets written.
+        Note - this data is not in the translator test directory. It has to be on disk
+        for the test to succeed.
+        '''
+        input_file = "exp=xpptut13:run=71"
+        output_h5 = os.path.join(OUTDIR,"unit-test_xpptut13_r71.h5")
+        cfgfile = writeCfgFile(input_file, output_h5, moduleList="cspad_mod.CsPadCalib Translator.H5Output")
+        cfgfile.write("deflate = -1\n")
+        cfgfile.flush()
+        self.runPsanaOnCfg(cfgfile,output_h5, extraOpts='-n 2',printPsanaOutput=self.printPsanaOutput)
+        cfgfile.close()
+        f = h5py.File(output_h5,'r')
+        calibStore=f['/Configure:0000/CalibStore']
+        self.assertEqual(set(calibStore.keys()), 
+                         set([u'pdscalibdata::CsPad2x2PedestalsV1', u'pdscalibdata::CsPad2x2PixelStatusV1']),
+                         msg = "calibStore does not contain only pdscalibdata::CsPad2x2PedestalsV1, pdscalibdata::CsPad2x2PixelStatusV1")
+        pedestalsA = calibStore['pdscalibdata::CsPad2x2PedestalsV1/XppGon.0:Cspad2x2.0/pedestals'][:]
+        pedestalsB = calibStore['pdscalibdata::CsPad2x2PedestalsV1/XppGon.0:Cspad2x2.1/pedestals'][:]
+        self.assertEqual(pedestalsA.shape,(185,388,2),msg="pedestals for 2x2 shape is not 185 388 2")
+        self.assertEqual(pedestalsB.shape,(185,388,2),msg="pedestals for 2x2 shape is not 185 388 2")
+        status = calibStore['pdscalibdata::CsPad2x2PixelStatusV1/XppGon.0:Cspad2x2.0/status'][:]
+        self.assertEqual(status.shape,(185,388,2),msg="status for 2x2 shape is not 185 388 2")
+        
+        if self.cleanUp:
+            os.unlink(output_h5)
                 
 #  run unit tests when imported as a main module
 #

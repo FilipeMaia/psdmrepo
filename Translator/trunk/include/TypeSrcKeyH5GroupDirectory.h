@@ -112,7 +112,7 @@ class SrcKeyGroup {
   //  If the first entries for a type are blanks we cannot store them until we see
   //  actual data and can create the datasets.  So we keep track of how many initial 
   //  blanks to write once we have the datasets.  We will write entries for time and
-  //  damage when initial blanks come in.  This is the only point when then lengths of
+  //  damage when initial blanks come in.  This is the only point when the lengths of
   //  the time/damage datasest is not equal to that of the type dataset.
   size_t m_initialBlanks; 
   size_t m_totalEntries; // total entries counts initial blanks that we have not been

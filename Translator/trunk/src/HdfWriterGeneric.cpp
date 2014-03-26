@@ -162,6 +162,80 @@ size_t HdfWriterGeneric::createFixedSizeDataset(hid_t groupId,
   return dsetIndex;
 }
 
+std::string dbgMessage(const std::string &header, hid_t groupId,  
+                       const string & dsetName, hid_t h5type) {
+   ostringstream msg;
+   msg << header << " h5type=" << h5type << " groupId " << groupId << " " 
+       << hdf5util::objectName(groupId)  << " dsetname: " << dsetName;
+   return msg.str();
+}
+
+void HdfWriterGeneric::createAndStoreDataset(hid_t groupId,
+                                             const string & dsetName,
+                                             hid_t h5type,
+                                             const void *data)
+{
+  bool isArray = false;
+  hid_t baseType = -1;
+  std::string isArrayDbgMsg = "array=false";
+  int ndims = 0;
+  vector<hsize_t> dims;
+  H5T_class_t h5class = H5Tget_class(h5type);
+  if (h5class == H5T_ARRAY) {
+    isArray = true;
+    isArrayDbgMsg = "array=true";
+    baseType = H5Tget_super(h5type);
+    if (baseType<0) throw DataSetException(ERR_LOC,dbgMessage("H5Tget_super failed for array type",
+                                                              groupId, dsetName, h5type));
+    ndims = H5Tget_array_ndims(h5type);
+    if (ndims < 0) throw DataSetException(ERR_LOC,dbgMessage("H5Tget_array_ndims failed: ",
+                                                             groupId, dsetName, h5type));
+    dims.resize(ndims);
+    ndims = H5Tget_array_dims2(h5type, &dims[0]);
+    if (ndims < 0) throw DataSetException(ERR_LOC,dbgMessage("H5Tget_array_dims2 failed: ",
+                                                             groupId, dsetName, h5type));
+  } else if (h5class == H5T_NO_CLASS) {
+    throw DataSetException(ERR_LOC,dbgMessage("H5Tget_class failed: ",
+                                              groupId, dsetName, h5type));
+  }
+  hid_t dataSpaceIdForCreation = -1;
+  hid_t typeForCreate = -1;
+  if (isArray) {
+    dataSpaceIdForCreation = H5Screate_simple(dims.size(), &dims[0], NULL);
+    typeForCreate = baseType;
+  } else {
+    dataSpaceIdForCreation = H5Screate(H5S_SCALAR);
+    typeForCreate = h5type;
+  }
+  if (dataSpaceIdForCreation < 0) throw DataSetException(ERR_LOC,
+                                                         dbgMessage("failed to create dataspace: " 
+                                                                    + isArrayDbgMsg,
+                                                                    groupId, dsetName, h5type));
+  hid_t dataset = H5Dcreate(groupId, dsetName.c_str(), typeForCreate, 
+                            dataSpaceIdForCreation,
+                            H5P_DEFAULT, // link creation property list
+                            H5P_DEFAULT,
+                            H5P_DEFAULT);  // access
+  if (dataset<0) throw DataSetException(ERR_LOC,dbgMessage("error creating dataset", 
+                                                           groupId, dsetName, h5type));
+
+  // write the data
+  herr_t err = H5Dwrite(dataset, typeForCreate, H5S_ALL, H5S_ALL, H5P_DEFAULT, data);
+
+  if (err<0) throw DataSetException(ERR_LOC, dbgMessage("H5Dwrite failed" + isArrayDbgMsg,
+                                                        groupId, dsetName, h5type));
+  // close resources
+  if (H5Dclose(dataset) < 0) throw DataSetException(ERR_LOC,dbgMessage("H5Dclose failed",
+                                                                       groupId, dsetName, h5type));
+  if (baseType > -1) {
+    if (H5Tclose(baseType) < 0) throw DataSetException(ERR_LOC,dbgMessage("H5Tclose(baseType) failed", 
+                                                                          groupId, dsetName, h5type));
+  }
+  if (H5Sclose(dataSpaceIdForCreation) < 0) throw DataSetException(ERR_LOC,
+                                                                   dbgMessage("H5Sclose failed for dataspace", 
+                                                                              groupId, dsetName, h5type));
+}
+
 void HdfWriterGeneric::append(hid_t groupId, const string & dsetName, const void * data) 
 {  
   std::map<hid_t, vector<DataSetMeta> >::iterator pos = m_datasetMap.find(groupId);
@@ -232,8 +306,8 @@ void HdfWriterGeneric::store_at(hid_t groupId, long storeIndex, size_t dsetIndex
   hsize_t start = storeIndex;
   if (storeIndex == -1) {
     hsize_t newSize = currentSize + 1;
-    DataSetPos::MaxSize maxSize = dsetMeta.maxSize();
-    if (maxSize == DataSetPos::Unlimited) {
+    DataSetPos::Shape shape = dsetMeta.shape();
+    if (shape == DataSetPos::Unlimited) {
       herr_t err = H5Dset_extent(datasetId, &newSize);
       if (err<0) {
         ostringstream msg;

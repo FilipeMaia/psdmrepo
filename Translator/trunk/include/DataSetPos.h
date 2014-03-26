@@ -19,19 +19,19 @@ namespace Translator {
  */
 class DataSetPos {
 public:
-  typedef enum {Unlimited, Fixed} MaxSize;
+  typedef enum {Unlimited, Fixed} Shape;
   DataSetPos() {};
- DataSetPos(hid_t dsetId, MaxSize maxSize=Unlimited) : 
-  m_dsetId(dsetId), m_currentSize(0), m_maxSize(maxSize) {};
+ DataSetPos(hid_t dsetId, Shape shape=Unlimited) : 
+  m_dsetId(dsetId), m_currentSize(0), m_shape(shape) {};
   hid_t dsetId() const { return m_dsetId; }               /// the hdf5 dataset id
   hsize_t currentSize() const { return m_currentSize; }   /// the current size of the dataset, based on accumulated 
                                                           /// calls to increaseSizeByOne()
   void increaseSizeByOne() { ++m_currentSize; }     /// increases recorded size for dataset
-  MaxSize maxSize() const { return m_maxSize; }     /// wether or not this is Unlimited size, or Fixed
+  Shape shape() const { return m_shape; }    
  private:
   hid_t m_dsetId;
   hsize_t m_currentSize;
-  MaxSize m_maxSize;
+  Shape m_shape;
 };
 
 } // namespace

@@ -18,8 +18,6 @@
 #include "PSEvt/DamageMap.h"
 #include "PSEvt/TypeInfoUtils.h"
 
-#include "psddl_psana/cspad.ddl.h"   // for specifying calibrated types
-
 #include "Translator/H5Output.h"
 #include "Translator/H5GroupNames.h"
 #include "Translator/doNotTranslate.h"
@@ -190,7 +188,6 @@ H5Output::H5Output(string moduleName) : Module(moduleName),
   readConfigParameters();
   initializeHdfWriterMap(m_hdfWriters);
   filterHdfWriterMap();
-  initializeCalibratedTypes();
   m_hdfWriterEventId = boost::make_shared<HdfWriterEventId>();
   m_hdfWriterDamage = boost::make_shared<HdfWriterDamage>();
   m_hdfWriterEventId->setDatasetCreationProperties(m_eventIdCreateDsetProp);
@@ -199,6 +196,7 @@ H5Output::H5Output(string moduleName) : Module(moduleName),
                              m_hdfWriterEventId,
                              m_epicsPvCreateDsetProp);
   m_configureGroupDir.setEventIdAndDamageWriters(m_hdfWriterEventId,m_hdfWriterDamage);
+  m_calibStoreGroupDir.setEventIdAndDamageWriters(m_hdfWriterEventId,m_hdfWriterDamage);
   m_calibCycleConfigureGroupDir.setEventIdAndDamageWriters(m_hdfWriterEventId,m_hdfWriterDamage);
   m_calibCycleEventGroupDir.setEventIdAndDamageWriters(m_hdfWriterEventId,m_hdfWriterDamage);
   boost::shared_ptr<HdfWriterDamage> nullHdfWriterDamage;
@@ -208,6 +206,7 @@ H5Output::H5Output(string moduleName) : Module(moduleName),
   if ((pos->second).size() == 0) MsgLog(logger(), fatal, "There are no types assigned to the  'ndarray_types' alias in the TypeAliases map");
   m_h5groupNames = boost::make_shared<H5GroupNames>(m_short_bld_name, pos->second);
   m_configureGroupDir.setH5GroupNames(m_h5groupNames);
+  m_calibStoreGroupDir.setH5GroupNames(m_h5groupNames);
   m_calibCycleConfigureGroupDir.setH5GroupNames(m_h5groupNames);
   m_calibCycleEventGroupDir.setH5GroupNames(m_h5groupNames);
   m_calibCycleFilteredGroupDir.setH5GroupNames(m_h5groupNames);
@@ -260,12 +259,13 @@ void H5Output::readConfigParameters() {
   m_src_filter = configList("src_filter", include_all);
 
   // key filter parameters
-  m_ndarray_key_filter = configList("ndarray_key_filter", include_all);
-  m_std_string_key_filter = configList("std_string_key_filter", include_all);
+  m_key_filter = configList("key_filter", include_all);
 
   // other translation parameters, calibration, metadata
   m_include_uncalibrated_data = config("include_uncalibrated_data",false);
   m_calibration_key = configStr("calibration_key","calibrated");
+  m_exclude_calibrated_data = config("exclude_calibrated_data",false);
+  m_exclude_calibstore = config("exclude_calibstore",false);
 
   m_chunkManager.readConfigParameters(*this);
 
@@ -365,16 +365,7 @@ void H5Output::initializeSrcAndKeyFilters() {
     m_psevtSourceFilterList.push_back(srcMatch);
   }
   MsgLog(logger(),trace, "src_filter: isExclude=" << m_srcFilterIsExclude << " all=" << m_includeAllSrc);
-  parseFilterConfigString("ndarray_key_filter", m_ndarray_key_filter, m_ndarrayKeyIsExclude,   m_includeAllNdarrayKey,   m_ndarrayKeyFilterSet);
-  parseFilterConfigString("std_string_key_filter",  m_std_string_key_filter,  m_stdStringKeyIsExclude, m_includeAllStdStringKey, m_stdStringKeyFilterSet);
-}
-
-// when updating the calibration set below, update the 
-// calibration filtering section of default_psana.cfg with the
-// complete, updated type list.
-void H5Output::initializeCalibratedTypes() {
-  m_calibratedTypes.insert( & typeid(Psana::CsPad::DataV1) );
-  m_calibratedTypes.insert( & typeid(Psana::CsPad::DataV2) );
+  parseFilterConfigString("key_filter", m_key_filter, m_keyFilterIsExclude,   m_includeAllKey,   m_keyFilterSet);
 }
 
 void H5Output::openH5OutputFile() {
@@ -468,6 +459,7 @@ void H5Output::beginJob(Event& evt, Env& env)
   initializeSrcAndKeyFilters();
   if (m_create_alias_links) {
     m_configureGroupDir.setAliasMap(env.aliasMap());
+    m_calibStoreGroupDir.setAliasMap(env.aliasMap());
     m_calibCycleConfigureGroupDir.setAliasMap(env.aliasMap());
     m_calibCycleEventGroupDir.setAliasMap(env.aliasMap());
     m_calibCycleFilteredGroupDir.setAliasMap(env.aliasMap());
@@ -496,7 +488,8 @@ void H5Output::beginRun(Event& evt, Env& env)
   // the aliasMap can change from run to run, so reinialize the src filter list with each run.
   initializeSrcAndKeyFilters();
   m_currentCalibCycleCounter = 0;
-  createNextRunGroup();  
+  createNextRunGroup();
+  m_calibratedEventKeys.clear();
 }
 
 void H5Output::beginCalibCycle(Event& evt, Env& env) 
@@ -574,9 +567,9 @@ boost::shared_ptr<HdfWriterFromEvent> H5Output::checkTranslationFilters(const Ev
     MsgLog(logger(),debug,"srcIsFiltered(src)==True for " << eventKey << " filtering");
     return nullHdfWriter;
   }
-  if (isString(typeInfoPtr) and stringKeyIsFiltered(strKey)) return nullHdfWriter;
-  if (isNDArray(typeInfoPtr) and ndarrayKeyIsFiltered(strKey)) return nullHdfWriter;
-
+  if (keyIsFiltered(strKey)) return nullHdfWriter;
+  if (m_exclude_calibrated_data and eventKey.key() == m_calibration_key) return nullHdfWriter;
+    
   boost::shared_ptr<HdfWriterFromEvent> hdfWriter = getHdfWriter(m_hdfWriters, typeInfoPtr);
   if (not hdfWriter) {
     MsgLog(logger(),debug,"No hdfwriter found for type: " << PSEvt::TypeInfoUtils::typeInfoRealName(typeInfoPtr));
@@ -584,16 +577,10 @@ boost::shared_ptr<HdfWriterFromEvent> H5Output::checkTranslationFilters(const Ev
   }
   if (not m_include_uncalibrated_data and checkForCalibratedKey) {
     if (strKey.size()==0) {
-
-      bool typeThatIsCalibrated = 
-        m_calibratedTypes.find( typeInfoPtr ) != m_calibratedTypes.end();
-
-      if (typeThatIsCalibrated) {
-        EventKey calibratedKey(typeInfoPtr,src, m_calibration_key);
-        if (m_event->proxyDict()->exists(calibratedKey)) {
-          MsgLog(logger(), debug, "calibrated key exists for " << eventKey << " filtering");
-          return nullHdfWriter;
-        }
+      EventKey calibratedKey(typeInfoPtr,src, m_calibration_key);
+      if (m_event->proxyDict()->exists(calibratedKey)) {
+        MsgLog(logger(), debug, "calibrated key exists for " << eventKey << " filtering");
+        return nullHdfWriter;
       }
     }
   }
@@ -799,6 +786,11 @@ void H5Output::eventImpl()
     const Pds::Src & src = eventKey.src();
     MsgLog(logger(),debug,eventImpl << " eventKey=" << eventKey << "damage= " << damage.value() << 
            " writeBlank=" << writeBlank << " loc=" << dataTypeLoc << " hdfwriter=" << hdfWriter);
+    const std::string  & key = eventKey.key();
+    if (key == m_calibration_key) {
+      m_calibratedEventKeys.insert(eventKey);
+      MsgLog(logger(),debug,eventImpl << " eventKey is calibration key. Adding Pds::Src to calibratedSrcSrc.");
+    }
     TypeMapContainer::iterator typePos = m_calibCycleEventGroupDir.findType(typeInfoPtr);
     if (typePos == m_calibCycleEventGroupDir.endType()) {
       m_calibCycleEventGroupDir.addTypeGroup(typeInfoPtr, m_currentCalibCycleGroup);
@@ -1021,12 +1013,114 @@ void H5Output::endRun(Event& evt, Env& env)
   if (m_eventId) ::storeClock ( m_currentRunGroup, m_eventId->time(), "end" ) ;
   m_currentRunGroup.close();
   ++m_currentRunCounter;
-
 }
+
+void H5Output::addCalibStoreHdfWriters(HdfWriterMap &hdfWriters) {
+  vector< boost::shared_ptr<HdfWriterNew> > calibStoreWriters;
+  getHdfWritersForCalibStore(calibStoreWriters);
+  MsgLog(logger("calibstore"),trace,"Adding calibstore hdfwriters: got " << calibStoreWriters.size() << " writers");
+  vector< boost::shared_ptr<HdfWriterNew> >::iterator iter;
+  for (iter = calibStoreWriters.begin(); iter != calibStoreWriters.end(); ++iter) {
+    boost::shared_ptr<HdfWriterNew> calibWriter = *iter;
+    const std::type_info *calibType = calibWriter->typeInfoPtr();
+    if (hdfWriters.find(calibType) != hdfWriters.end()) {
+      MsgLog(logger(), warning, "calib type " << TypeInfoUtils::typeInfoRealName(calibType)
+             << " already has writer, OVERWRITING");
+    }
+    hdfWriters[calibType] = boost::make_shared<HdfWriterNewDataFromEvent>(*calibWriter,"calib-store");
+  }
+}
+
+void H5Output::removeCalibStoreHdfWriters(HdfWriterMap &hdfWriters) {
+  vector< boost::shared_ptr<HdfWriterNew> > calibStoreWriters;
+  getHdfWritersForCalibStore(calibStoreWriters);
+  MsgLog(logger("calibstore"),trace,"Removing calibstore hdfwriters: got " << calibStoreWriters.size() << " writers");
+  vector< boost::shared_ptr<HdfWriterNew> >::iterator iter;
+  for (iter = calibStoreWriters.begin(); iter != calibStoreWriters.end(); ++iter) {
+    boost::shared_ptr<HdfWriterNew> calibWriter = *iter;
+    const std::type_info *calibType = calibWriter->typeInfoPtr();
+    size_t numberErased = hdfWriters.erase(calibType);
+    if (numberErased != 1) {
+      MsgLog(logger(), warning, "Erased " <<
+             numberErased << " rather than 1 of calib type " << TypeInfoUtils::typeInfoRealName(calibType));
+    }
+  }
+}
+
+void H5Output::lookForAndStoreCalibData() {
+  addCalibStoreHdfWriters(m_hdfWriters);
+  Type2CalibTypesMap type2calibTypeMap;
+  getType2CalibTypesMap(type2calibTypeMap);
+  bool calibGroupCreated = false;
+  hdf5pp::Group calibGroup;
+
+  std::set<PSEvt::EventKey, LessEventKey>::iterator calibEventKeyIter;
+  for (calibEventKeyIter = m_calibratedEventKeys.begin(); 
+       calibEventKeyIter != m_calibratedEventKeys.end(); ++calibEventKeyIter) {
+    const PSEvt::EventKey &calibEventKey = *calibEventKeyIter;
+    const type_info * calibEventType = calibEventKey.typeinfo();
+    const Pds::Src &src = calibEventKey.src();
+    vector<const type_info *> calibStoreTypes = type2calibTypeMap[calibEventType];
+    for (unsigned idx = 0; idx < calibStoreTypes.size(); ++idx) {
+      const type_info * calibStoreType = calibStoreTypes[idx];
+      boost::shared_ptr<void> calibStoreData;
+      try {
+        calibStoreData = 
+          m_env->calibStore().proxyDict()->get(calibStoreType,PSEvt::Source(src),"",NULL);
+      } catch (const std::runtime_error &except) {
+        MsgLog(logger(),warning,"Error retreiving data for " 
+               << TypeInfoUtils::typeInfoRealName(calibStoreType)
+               << " error is: " << except.what());
+        continue;
+      }
+      if (calibStoreData) {
+        HdfWriterMap::iterator hdfWriterIter = m_hdfWriters.find(calibStoreType);
+        if (hdfWriterIter == m_hdfWriters.end()) {
+          MsgLog(logger(),trace,"No HdfWriter found for calibStore type: " 
+                 << TypeInfoUtils::typeInfoRealName(calibStoreType));
+          continue;
+        }
+        boost::shared_ptr<HdfWriterFromEvent> hdfWriter = hdfWriterIter->second;
+        PSEvt::EventKey calibStoreEventKey(calibStoreType, src, "");
+        MsgLog(logger(),trace,"calib data and hdfwriter obtained for " << calibStoreEventKey);
+        if (not calibGroupCreated) {
+          MsgLog(logger(),trace,"Creating CalibStore group");
+          calibGroup = m_currentConfigureGroup.createGroup("CalibStore");
+          calibGroupCreated = true;
+        }
+        TypeMapContainer::iterator typePos = m_calibStoreGroupDir.findType(calibStoreType);
+        if (typePos == m_calibStoreGroupDir.endType()) {
+          m_calibStoreGroupDir.addTypeGroup(calibStoreType, calibGroup);
+        }
+        SrcKeyMap::iterator srcKeyPos = m_calibStoreGroupDir.findSrcKey(calibStoreEventKey);
+        if (srcKeyPos == m_calibStoreGroupDir.endSrcKey(calibStoreType)) {
+          m_calibStoreGroupDir.addSrcKeyGroup(calibStoreEventKey,hdfWriter);
+          srcKeyPos = m_calibStoreGroupDir.findSrcKey(calibStoreEventKey);
+        }
+        SrcKeyGroup & srcKeyGroup = srcKeyPos->second;
+        try {
+          srcKeyGroup.storeData(calibStoreEventKey, inCalibStore, *m_event, *m_env);
+        } catch (ErrSvc::Issue &issue) {
+          m_calibStoreGroupDir.dump();
+          MsgLog(logger(),info, "caught exception trying to storeData for " << calibStoreEventKey << " issue: " << issue.what());
+          throw issue;
+        }
+      }
+    }
+  }
+  // close things up
+  m_calibStoreGroupDir.closeGroups();
+  calibGroup.close();
+  removeCalibStoreHdfWriters(m_hdfWriters);
+}
+
 
 void H5Output::endJob(Event& evt, Env& env) 
 {
   setEventVariables(evt,env);
+  if (not m_exclude_calibstore) {
+    lookForAndStoreCalibData();
+  }
   m_configureGroupDir.closeGroups();
   m_epicsGroupDir.processEndJob();
   if (m_eventId) ::storeClock ( m_currentConfigureGroup, m_eventId->time(), "end" ) ;
@@ -1108,13 +1202,8 @@ namespace {
 
 } // local namespace
 
-bool H5Output::stringKeyIsFiltered(const string &key) {
-  bool retVal = keyIsFiltered(key, m_includeAllStdStringKey, m_stdStringKeyIsExclude, m_stdStringKeyFilterSet);
-  return retVal;
-}
-
-bool H5Output::ndarrayKeyIsFiltered(const string &key) {
-  bool retVal = keyIsFiltered(key, m_includeAllNdarrayKey, m_ndarrayKeyIsExclude, m_ndarrayKeyFilterSet);
+bool H5Output::keyIsFiltered(const string &key) {
+  bool retVal = ::keyIsFiltered(key, m_includeAllKey, m_keyFilterIsExclude, m_keyFilterSet);
   return retVal;
 }
 

@@ -27,6 +27,7 @@
 #include "Translator/LessEventIdPtrs.h"
 #include "Translator/ChunkManager.h"
 #include "Translator/H5GroupNames.h"
+#include "Translator/HdfWriterCalib.h"
 
 namespace Translator {
 
@@ -71,7 +72,8 @@ public:
 
 protected:  
   void readConfigParameters();
-  void initializeCalibratedTypes();
+  void addCalibStoreHdfWriters(HdfWriterMap &hdfWriters);
+  void removeCalibStoreHdfWriters(HdfWriterMap &hdfWriters);
   void openH5OutputFile();
   void createNextConfigureGroup();
   void setEventVariables(Event &evt, Env &env);
@@ -79,6 +81,7 @@ protected:
                       hdf5pp::Group & parentGroup);
   void createNextRunGroup();
   void createNextCalibCycleGroup();
+  void lookForAndStoreCalibData();
   void eventImpl();
   void setDamageMapFromEvent();
   Pds::Damage getDamageForEventKey(const EventKey &eventKey);
@@ -93,8 +96,7 @@ protected:
   void closeH5File();
 
   bool srcIsFiltered(const Pds::Src &);
-  bool stringKeyIsFiltered(const std::string &key);
-  bool ndarrayKeyIsFiltered(const std::string &key);
+  bool keyIsFiltered(const std::string &key);
 
   void filterHdfWriterMap();
   void initializeSrcAndKeyFilters();
@@ -123,6 +125,7 @@ private:
   TypeSrcKeyH5GroupDirectory m_calibCycleConfigureGroupDir;
   TypeSrcKeyH5GroupDirectory m_calibCycleEventGroupDir;
   TypeSrcKeyH5GroupDirectory m_calibCycleFilteredGroupDir;
+  TypeSrcKeyH5GroupDirectory m_calibStoreGroupDir;
   EpicsH5GroupDirectory m_epicsGroupDir;
 
   boost::shared_ptr<HdfWriterEventId> m_hdfWriterEventId;
@@ -149,19 +152,15 @@ private:
   HdfWriterMap m_hdfWriters;
 
   TypeAliases m_typeAliases;
-  std::set<const std::type_info *, PSEvt::TypeInfoUtils::lessTypeInfoPtr> m_calibratedTypes;
 
   bool m_includeAllSrc;
-  bool m_includeAllNdarrayKey;
-  bool m_includeAllStdStringKey;
+  bool m_includeAllKey;
 
   bool m_srcFilterIsExclude;
-  bool m_ndarrayKeyIsExclude;
-  bool m_stdStringKeyIsExclude;
+  bool m_keyFilterIsExclude;
 
   std::vector<PSEvt::Source::SrcMatch> m_psevtSourceFilterList;
-  std::set<std::string> m_ndarrayKeyFilterSet;
-  std::set<std::string> m_stdStringKeyFilterSet;
+  std::set<std::string> m_keyFilterSet;
 
   EpicsH5GroupDirectory::EpicsStoreMode m_storeEpics;
 
@@ -181,14 +180,16 @@ private:
                                               // and true if we convert that type
   std::list<std::string> m_src_filter;
   std::list<std::string> m_type_filter;
-  std::list<std::string> m_ndarray_key_filter; 
-  std::list<std::string> m_std_string_key_filter;  
+  std::list<std::string> m_key_filter; 
 
   std::vector<PSEvt::Source> m_SourceFilterList;
 
   std::string m_calibration_key;
   bool m_include_uncalibrated_data;
+  bool m_exclude_calibrated_data;
+  bool m_exclude_calibstore;
 
+  std::set<PSEvt::EventKey, LessEventKey> m_calibratedEventKeys;
 
   bool m_defaultShuffle, m_eventIdShuffle, m_damageShuffle, 
     m_stringShuffle, m_epicsPvShuffle;

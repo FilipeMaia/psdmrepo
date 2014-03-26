@@ -44,6 +44,36 @@ hid_t getH5BaseType<float>() { return H5T_NATIVE_FLOAT; }
 template<>
 hid_t getH5BaseType<double>() { return H5T_NATIVE_DOUBLE; }
 
+template<>
+hid_t getH5BaseType<const uint8_t>() { return H5T_NATIVE_UINT8; }
+
+template<>
+hid_t getH5BaseType<const uint16_t>() { return H5T_NATIVE_UINT16; }
+
+template<>
+hid_t getH5BaseType<const uint32_t>() { return H5T_NATIVE_UINT32; }
+
+template<>
+hid_t getH5BaseType<const uint64_t>() { return H5T_NATIVE_UINT64; }
+
+template<>
+hid_t getH5BaseType<const int8_t>() { return H5T_NATIVE_INT8; }
+
+template<>
+hid_t getH5BaseType<const int16_t>() { return H5T_NATIVE_INT16; }
+
+template<>
+hid_t getH5BaseType<const int32_t>() { return H5T_NATIVE_INT32; }
+
+template<>
+hid_t getH5BaseType<const int64_t>() { return H5T_NATIVE_INT64; }
+
+template<>
+hid_t getH5BaseType<const float>() { return H5T_NATIVE_FLOAT; }
+
+template<>
+hid_t getH5BaseType<const double>() { return H5T_NATIVE_DOUBLE; }
+
 // --------------------------------------------------
 // Determine if a NDArray has C or Fortran strides, throw exception if neither
 template<class ElemType, unsigned NDim>

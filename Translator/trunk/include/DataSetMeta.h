@@ -20,8 +20,8 @@ namespace Translator {
 class DataSetMeta : public DataSetPos {
 public:
   DataSetMeta() {};
- DataSetMeta(const std::string & name, hid_t dsetId, MaxSize maxSize, hid_t typeId) : 
-  DataSetPos(dsetId, maxSize), m_name(name), m_typeId(typeId) {}
+ DataSetMeta(const std::string & name, hid_t dsetId, Shape shape, hid_t typeId) : 
+  DataSetPos(dsetId, shape), m_name(name), m_typeId(typeId) {}
   hid_t typeId() const { return m_typeId; }
   std::string name() const { return m_name; }
   

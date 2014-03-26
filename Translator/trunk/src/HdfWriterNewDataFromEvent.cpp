@@ -2,6 +2,25 @@
 
 namespace {
   const char *logger = "HdfWriterNewData";
+
+  boost::shared_ptr<void> getData(Translator::DataTypeLoc dataTypeLoc, const PSEvt::EventKey & eventKey,
+                                  PSEvt::Event & evt, PSEnv::Env & env)
+  {
+    if (dataTypeLoc == Translator::inEvent) {
+      return evt.proxyDict()->get(eventKey.typeinfo(), 
+                                  PSEvt::Source(eventKey.src()), eventKey.key(), NULL); 
+    } else if (dataTypeLoc == Translator::inConfigStore) {
+      return env.configStore().proxyDict()->get(eventKey.typeinfo(), 
+                                                PSEvt::Source(eventKey.src()), eventKey.key(), NULL);
+    } else if (dataTypeLoc == Translator::inCalibStore) {
+      return env.calibStore().proxyDict()->get(eventKey.typeinfo(), 
+                                               PSEvt::Source(eventKey.src()), eventKey.key(), NULL);
+    }
+    MsgLog(logger,error,"getData: dataTypeLoc not recognized: " << dataTypeLoc << " for eventKey: " << eventKey);
+    boost::shared_ptr<void> nullPtr;
+    return nullPtr;
+  }
+  
 }
 
 namespace Translator {
@@ -18,6 +37,16 @@ HdfWriterNewDataFromEvent::HdfWriterNewDataFromEvent(const HdfWriterNew & newWri
 {
 }
 
+bool HdfWriterNewDataFromEvent::checkTypeMatch(const PSEvt::EventKey & eventKey, std::string msg)
+{
+  if (*(eventKey.typeinfo()) == *m_typeInfoPtr) return true;
+
+  MsgLog(logger, error,  msg + " eventkey type does not agree with stored type"
+         << " stored: " << PSEvt::TypeInfoUtils::typeInfoRealName(m_typeInfoPtr)
+         << " eventKey type: " << PSEvt::TypeInfoUtils::typeInfoRealName(eventKey.typeinfo()));
+  return false;
+}
+
 void HdfWriterNewDataFromEvent::make_datasets(DataTypeLoc dataTypeLoc,
                                               hdf5pp::Group & srcGroup, 
                                               const PSEvt::EventKey & eventKey, 
@@ -27,19 +56,11 @@ void HdfWriterNewDataFromEvent::make_datasets(DataTypeLoc dataTypeLoc,
                                               int deflate,
                                               boost::shared_ptr<Translator::ChunkPolicy> chunkPolicy)
 {
-  if (not (*(eventKey.typeinfo()) == *m_typeInfoPtr)) {
-    MsgLog(logger, fatal, " make_datsets for new data, but eventkey type does not agree with stored type"
-           << " stored: " << PSEvt::TypeInfoUtils::typeInfoRealName(m_typeInfoPtr)
-           << " eventKey type: " << PSEvt::TypeInfoUtils::typeInfoRealName(eventKey.typeinfo()));
-  }
-  boost::shared_ptr<void> data;
-  if (dataTypeLoc == inEvent) {
-    data = evt.proxyDict()->get(eventKey.typeinfo(), PSEvt::Source(eventKey.src()), eventKey.key(), NULL); 
-  } else if (dataTypeLoc == inConfigStore) {
-    data = env.configStore().proxyDict()->get(eventKey.typeinfo(), PSEvt::Source(eventKey.src()), eventKey.key(), NULL); 
-  }
+  if (not checkTypeMatch(eventKey)) return;
+
+  boost::shared_ptr<void> data =  getData(dataTypeLoc, eventKey, evt, env);
   if (not data) {
-    MsgLog(logger,error, "could not retrieve data from event store, eventkey=" 
+    MsgLog(logger,error, "make_datasets: could not retrieve eventkey=" 
            << eventKey << "loc=" << dataTypeLoc);
     return;
   }
@@ -50,8 +71,9 @@ void HdfWriterNewDataFromEvent::make_datasets(DataTypeLoc dataTypeLoc,
   hid_t h5type = m_createType(data.get());
   size_t size = H5Tget_size(h5type);
   if ( size == 0 ) {
-    MsgLog(logger, fatal, "HdfWriterNewDataFromEvent, H5Tget_size call failed for h5type="
+    MsgLog(logger, error, "HdfWriterNewDataFromEvent, H5Tget_size call failed for h5type="
            << h5type << " returned for C++ type: " << PSEvt::TypeInfoUtils::typeInfoRealName(m_typeInfoPtr));
+    return;
   }
   
   Translator::DataSetCreationProperties dataSetCreationProperties(chunkPolicy,shuffle, deflate);
@@ -67,22 +89,15 @@ void HdfWriterNewDataFromEvent::append(DataTypeLoc dataTypeLoc,
                                        PSEvt::Event & evt, 
                                        PSEnv::Env & env)
 {
-  if (not (*(eventKey.typeinfo()) == *m_typeInfoPtr)) {
-    MsgLog(logger, fatal, " append for new data, but eventkey type does not agree with stored type"
-           << " stored: " << PSEvt::TypeInfoUtils::typeInfoRealName(m_typeInfoPtr)
-           << " eventKey type: " << PSEvt::TypeInfoUtils::typeInfoRealName(eventKey.typeinfo()));
-  }
-  boost::shared_ptr<void> data;
-  if (dataTypeLoc == inEvent) {
-    data = evt.proxyDict()->get(eventKey.typeinfo(), PSEvt::Source(eventKey.src()), eventKey.key(), NULL); 
-  } else if (dataTypeLoc == inConfigStore) {
-    data = env.configStore().proxyDict()->get(eventKey.typeinfo(), PSEvt::Source(eventKey.src()), eventKey.key(), NULL); 
-  }
+  if (not checkTypeMatch(eventKey)) return;
+
+  boost::shared_ptr<void> data =  getData(dataTypeLoc, eventKey, evt, env);
   if (not data) {
-    MsgLog(logger,error, "could not retrieve data from event store, eventkey=" 
+    MsgLog(logger,error, "append: could not retrieve eventkey=" 
            << eventKey << "loc=" << dataTypeLoc);
     return;
   }
+
   if (m_fillWriteBuffer == NULL) {
     MsgLog(logger,error, "newWriter fillWriteBuffer is NULL, key=" << m_key);
     return;
@@ -108,14 +123,44 @@ void HdfWriterNewDataFromEvent::closeDatasets(hdf5pp::Group &group)
 }
 
 
-
 void HdfWriterNewDataFromEvent::store(DataTypeLoc dataTypeLoc,
                                       hdf5pp::Group & srcGroup, 
                                       const PSEvt::EventKey & eventKey, 
                                       PSEvt::Event & evt, 
                                       PSEnv::Env & env)
 {
-  throw NotImplementedException(ERR_LOC, "HdfWriterNewDataFromEvent::store()");
+  if (not checkTypeMatch(eventKey)) return;
+
+  boost::shared_ptr<void> data =  getData(dataTypeLoc, eventKey, evt, env);
+  if (not data) {
+    MsgLog(logger,error, "store: could not retrieve eventkey=" 
+           << eventKey << "loc=" << dataTypeLoc);
+    return;
+  }
+
+  if (m_createType == NULL) {
+    MsgLog(logger,error, "newWriter createType is NULL, key=" << m_key);
+    return;
+  }
+
+  hid_t h5type = m_createType(data.get());
+  size_t size = H5Tget_size(h5type);
+  if ( size == 0 ) {
+    MsgLog(logger, error, "HdfWriterNewDataFromEvent, H5Tget_size call failed for h5type="
+           << h5type << " returned for C++ type: " << PSEvt::TypeInfoUtils::typeInfoRealName(m_typeInfoPtr));
+    return;
+  }
+  
+  if (m_fillWriteBuffer == NULL) {
+    MsgLog(logger,error, "newWriter fillWriteBuffer is NULL, key=" << m_key);
+    return;
+  }
+  const void * writeBuffer = m_fillWriteBuffer(data.get());
+
+  m_writer.createAndStoreDataset(srcGroup.id(), 
+                                 m_datasetName,
+                                 h5type,
+                                 writeBuffer);
 }
 
 void HdfWriterNewDataFromEvent::store_at(DataTypeLoc dataTypeLoc,
