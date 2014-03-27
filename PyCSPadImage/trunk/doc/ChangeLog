@@ -12,6 +12,13 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 #---------------------
+2014-03-27 Mikhail S. Dubrovin
+Tag: V00-00-21
+- move GlobalGraphics and AngularIntegrator in pyimgalgos
+- in all imports use full path - import Package.Module as ...
+- removed loop dependence between HDF5Methods and CSPADCalibParsEvaluated
+	
+#---------------------
 2014-03-26 Mikhail S. Dubrovin
 Tag: V00-00-20
 - add new ring center searching algorithm in quad alignment Alignment.py old went to AlignmentV1.py

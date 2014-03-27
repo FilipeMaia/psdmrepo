@@ -6,7 +6,7 @@ import numpy as np
 
 from   PyCSPadImage.CSPAD2x2CalibPars import *
 from   PyCSPadImage.CSPAD2x2PixCoords import *
-import PyCSPadImage.GlobalGraphics    as gg
+import pyimgalgos.GlobalGraphics as gg
 
 #------------------------------
 

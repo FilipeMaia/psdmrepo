@@ -32,18 +32,17 @@ import sys
 import os
 import numpy as np
 
-import PyCSPadImage.AngularIntegrator  as ai
 import PyCSPadImage.CalibParsDefault   as cald
 import PyCSPadImage.CalibPars          as calp
 import PyCSPadImage.CSPadConfigPars    as ccp
 import PyCSPadImage.CSPadImageProducer as cip
 import PyCSPadImage.GlobalMethods      as gm # getCSPadArrayFromFile for pedestal subtraction 
 import PyCSPadImage.CSPADPixCoords     as pixcoor
-
-import PyCSPadImage.GlobalGraphics     as gg # For test purpose in main only
 import PyCSPadImage.HDF5Methods        as hm # For test purpose in main only
 
+import pyimgalgos.GlobalGraphics          as gg # For test purpose in main only
 import pyimgalgos.FastArrayTransformation as fat 
+import pyimgalgos.AngularIntegrator       as ai
 
 #----------------------------------------------
 
@@ -96,7 +95,7 @@ def plot_img_in_polar_coords(image, center=(50,40), rad_range=(600,700,100), phi
 
 #----------------------------------------------
 
-def alignment_for_cspad_ndarray(fname, amps=(0,500), center=(877.0,875.5), rad_range=(600,720,120), radius=664, amps_rad=(0,20000)) :
+def alignment_for_cspad_ndarray(fname, amps=(0,500), center=(877.0,875.5), rad_range=(600,720,120), radius=664, amps_rad=(0,20000), path_calib='./', runnum=1) :
 
     #xc, yc = 859, 859
     #xc, yc = 855.3+22.7, 860.2+14.5
@@ -109,10 +108,6 @@ def alignment_for_cspad_ndarray(fname, amps=(0,500), center=(877.0,875.5), rad_r
     config.printCSPadConfigPars()
 
     print 'Start alignment_for_cspad_ndarray()'
-    #path_calib, runnum = '/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi-ds1-2013-12-20', 136
-    #path_calib, runnum = '/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi-ds1-2014-03-19', 227
-    path_calib, runnum = '/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi-ds1-2014-03-19', 136
-    #path_calib, runnum = '/reg/d/psdm/CXI/cxii0114/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0', 227
     print 'Load calibration parameters from', path_calib 
     calib = calp.CalibPars( path=path_calib, run=runnum  )
     print 'center:\n',          calib.getCalibPars('center')
@@ -204,7 +199,9 @@ if __name__ == "__main__" :
         rad_range = (600,720,120)
         radius = 664
         amps_rad  = (0,20000)
-        alignment_for_cspad_ndarray(fname, amps, center, rad_range, radius, amps_rad)
+        path_calib, runnum = '/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi-ds1-2014-03-19', 227
+        #path_calib, runnum = '/reg/d/psdm/CXI/cxii0114/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0', 227
+        alignment_for_cspad_ndarray(fname, amps, center, rad_range, radius, amps_rad, path_calib, runnum)
 
     elif sys.argv[1]=='1' :
         fname     = '/reg/neh/home1/dubrovin/LCLS/HDF5Analysis-v01/cspad-ndarr-ave-cxi83714-r0136.dat'
@@ -214,7 +211,9 @@ if __name__ == "__main__" :
         #rad_range = (125,175,50)
         radius    = 146
         amps_rad  = (0,5)
-        alignment_for_cspad_ndarray(fname, amps, center, rad_range, radius, amps_rad)
+        #path_calib, runnum = '/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi-ds1-2013-12-20', 1 # for v1 of offset_corr
+        path_calib, runnum = '/reg/neh/home1/dubrovin/LCLS/CSPadAlignment-v01/calib-cxi-ds1-2013-12-20', 136
+        alignment_for_cspad_ndarray(fname, amps, center, rad_range, radius, amps_rad, path_calib, runnum)
 
     #main_example_CSpad2x2()
     sys.exit ( 'End of test.' )

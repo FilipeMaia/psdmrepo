@@ -23,8 +23,8 @@ import sys
 import os
 
 import numpy as np
-import CSPAD2x2CalibParsDefault as cpd
-from   CalibPars import findCalibFile
+import PyCSPadImage.CSPAD2x2CalibParsDefault as cpd
+from   PyCSPadImage.CalibPars import findCalibFile
 
 #---------------------
 #  Class definition --

@@ -32,8 +32,8 @@ import PyCSPadImage.CSPAD2x2CalibPars        as calpars
 import PyCSPadImage.CSPAD2x2CalibParsDefault as cpd
 import PyCSPadImage.PixCoords2x1             as pixcoor2x1
 
-import PyCSPadImage.HDF5Methods       as hm 
-import PyCSPadImage.GlobalGraphics    as gg
+import PyCSPadImage.HDF5Methods  as hm 
+import pyimgalgos.GlobalGraphics as gg
 #------------------------------
 
 def test_CSPAD2x2PixCoords() :

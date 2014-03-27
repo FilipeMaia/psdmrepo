@@ -32,11 +32,11 @@ import sys
 import os
 import math
 import numpy as np
-import CalibParsDefault as cpd
-import CSPadConfigPars  as ccp
+import PyCSPadImage.CalibParsDefault as cpd
+import PyCSPadImage.CSPadConfigPars  as ccp
 
-#import GlobalGraphics   as gg # For test purpose in main only
-#import HDF5Methods      as hm # For test purpose in main only
+#import pyimgalgos.GlobalGraphics as gg # For test purpose in main only
+#import PyCSPadImage.HDF5Methods  as hm # For test purpose in main only
 
 #---------------------
 #  Class definition --
@@ -608,7 +608,7 @@ class CalibParsEvaluated (object) :
 # In case someone decides to run this module --
 #----------------------------------------------
 
-import CalibPars as calp # for test purpose only
+import PyCSPadImage.CalibPars as calp # for test purpose only
 
 def main_test() :
 

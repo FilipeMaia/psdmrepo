@@ -33,9 +33,8 @@ import os
 import h5py
 import numpy as np
 
-#import ConfigParameters as cp
-import CSPadConfigPars  as ccp
-import GlobalMethods    as gm
+import PyCSPadImage.CSPadConfigPars as ccp
+import PyCSPadImage.GlobalMethods   as gm
 
 #---------------------
 #  Class definition --

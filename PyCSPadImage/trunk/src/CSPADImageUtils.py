@@ -7,7 +7,7 @@ import sys
 #from   PyCSPadImage.CSPAD2x2CalibPars import *
 #from   PyCSPadImage.CSPAD2x2PixCoords import *
 from   PyCSPadImage.CSPadArrayImage   import *
-#import PyCSPadImage.GlobalGraphics    as gg
+#import pyimgalgos.GlobalGraphics    as gg
 #from Logger                 import logger
 
 #------------------------------

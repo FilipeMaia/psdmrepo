@@ -40,7 +40,7 @@ import numpy as np
 #-----------------------------
 #from PkgPackage.PkgModule import PkgClass
 
-#import ConfigParameters as cp
+#import PyCSPadImage.ConfigParameters as cp
 
 #------------------------
 # Exported definitions --

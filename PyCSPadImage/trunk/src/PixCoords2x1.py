@@ -51,7 +51,7 @@ import numpy as np
 from time import time
 
 #import matplotlib.pyplot as plt
-import GlobalGraphics as gg # For test purpose in main only
+import pyimgalgos.GlobalGraphics as gg # For test purpose in main only
 #------------------------------
 
 def rotation(X, Y, C, S) :

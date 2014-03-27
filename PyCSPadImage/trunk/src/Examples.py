@@ -39,7 +39,7 @@ import PyCSPadImage.CSPADPixCoords     as pixcoor
 import PyCSPadImage.PixCoords2x1       as pixcoor2x1
 
 
-import PyCSPadImage.GlobalGraphics     as gg # For test purpose in main only
+import pyimgalgos.GlobalGraphics       as gg # For test purpose in main only
 import PyCSPadImage.GlobalMethods      as gm # For test purpose in main only
 import PyCSPadImage.HDF5Methods        as hm # For test purpose in main only
 
@@ -159,7 +159,7 @@ if __name__ == "__main__" :
 
     elif sys.argv[1]=='20': pixcoor2x1.test_2x1_xy_maps()
     elif sys.argv[1]=='21': pixcoor2x1.test_2x1_img()
-    elif sys.argv[1]=='22': pixcoor2x1.test_2x1_img_easy()()
+    elif sys.argv[1]=='22': pixcoor2x1.test_2x1_img_easy()
 
     else : print 'Non-expected arguments: sys.argv=', sys.argv
 

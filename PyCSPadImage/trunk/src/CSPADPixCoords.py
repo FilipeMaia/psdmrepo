@@ -32,7 +32,7 @@ from time import time
 
 #import matplotlib.pyplot as plt
 from PixCoords2x1 import *
-import GlobalGraphics  as gg # For test purpose in main only
+import pyimgalgos.GlobalGraphics as gg # For test purpose in main only
 #------------------------------
 
 class CSPADPixCoords (PixCoords2x1) :

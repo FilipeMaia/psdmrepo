@@ -32,7 +32,6 @@ import sys
 import os
 import numpy              as np
 
-import PyCSPadImage.AngularIntegrator  as ai
 import PyCSPadImage.CalibParsDefault   as cald
 import PyCSPadImage.CalibPars          as calp
 import PyCSPadImage.CSPadConfigPars    as ccp
@@ -40,7 +39,7 @@ import PyCSPadImage.CSPadImageProducer as cip
 import PyCSPadImage.GlobalMethods      as gm # getCSPadArrayFromFile for pedestal subtraction 
 import PyCSPadImage.CSPADPixCoords     as pixcoor
 
-import PyCSPadImage.GlobalGraphics     as gg # For test purpose in main only
+import pyimgalgos.GlobalGraphics       as gg # For test purpose in main only
 import PyCSPadImage.HDF5Methods        as hm # For test purpose in main only
 
 #----------------------------------------------

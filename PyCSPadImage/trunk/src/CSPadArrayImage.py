@@ -75,7 +75,7 @@ def getCSPadArrayAs2DImage(arr, gap=3, hspace=5, vspace=5) :
 
 #------------------------------
 
-import GlobalGraphics as gg # For test purpose in main only
+import pyimgalgos.GlobalGraphics as gg # For test purpose in main only
 
 #------------------------------
 

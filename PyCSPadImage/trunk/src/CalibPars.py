@@ -32,8 +32,8 @@ import sys
 import os
 #from PyQt4 import QtGui, QtCore
 import numpy as np
-import CalibParsDefault   as cpd
-import CSPADCalibParsEvaluated as cpe
+import PyCSPadImage.CalibParsDefault   as cpd
+import PyCSPadImage.CSPADCalibParsEvaluated as cpe
 
 #---------------------
 #  Class definition --

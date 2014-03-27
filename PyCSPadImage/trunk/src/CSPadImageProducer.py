@@ -35,12 +35,12 @@ import math
 import numpy as np
 import scipy.ndimage as spi # rotate(...)
 
-import CalibPars          as calp
-import CalibParsEvaluated as cpe
-import CSPadConfigPars    as ccp
+import PyCSPadImage.CalibPars          as calp
+import PyCSPadImage.CalibParsEvaluated as cpe
+import PyCSPadImage.CSPadConfigPars    as ccp
 
-import GlobalGraphics as gg # For test purpose in main only
-import HDF5Methods    as hm # For test purpose in main only
+import pyimgalgos.GlobalGraphics as gg # For test purpose in main only
+import PyCSPadImage.HDF5Methods  as hm # For test purpose in main only
 
 #---------------------
 #  Class definition --

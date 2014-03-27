@@ -28,14 +28,96 @@ __version__ = "$Revision: 4 $"
 #----------
 #  Imports 
 #----------
-#import os
+import os
 import sys
+import numpy as np
 
-import numpy            as np
-import GlobalMethods    as gm
-import HDF5Methods      as hm
-#import ConfigParameters as cp
+import h5py
+import PyCSPadImage.GlobalMethods as gm
+#import PyCSPadImage.HDF5Methods   as hm
+#import PyCSPadImage.ConfigParameters as cp
 
+#---------------------
+#  Class definition --
+#---------------------
+
+class HDF5File(object) :
+    """This class contains a few methods to manipulate with hdf5 files"""
+
+#---------------------
+
+    def __init__ (self, fname=None) :
+        #print """HDF5File: Initialization"""
+        self.dset  = None   
+        self.fname = fname   
+        if fname != None : h5file = self.open_hdf5_file(fname)
+        else             : self.h5file = None
+
+#---------------------
+
+    def open_hdf5_file(self, fname) :
+
+        #print '=== Open HDF5 file: ' + fname
+        if not os.path.exists(fname) :
+            print  'ERROR: THE SPECIFIED FILE "', fname, '" DOES NOT EXIST.'
+            return None
+            #sys.exit ( 'Exit on ERROR' )
+
+        try :
+            self.h5file = h5py.File(fname,'r') # open read-only
+            self.fname = fname
+            print  'Open file', fname
+            return self.h5file
+
+        except IOError:
+            print 'IOError: CAN NOT OPEN FILE:', fname
+            return None
+            #sys.exit ( 'Exit on ERROR' )
+
+#---------------------
+
+    def close_hdf5_file(self) :
+        self.h5file.close()
+        #print '=== Close HDF5 file ==='
+
+#---------------------
+
+    def get_dataset_from_hdf5_file(self,dsname) :
+        #print 'From hdf5 file get dataset :', dsname
+        try :
+            self.dset = self.h5file[str(dsname)]
+            return self.dset
+        except KeyError:
+            #print 'ERROR: DATASET %s \nDOES NOT EXIST IN HDF5 file %s' % (dsname, self.fname)
+            return None
+            #sys.exit ( 'Exit on ERROR' )
+
+#---------------------
+
+    def get_cspad_config_dsname( self, data_dsname ) :
+        """Find the CSPAD configuration dataset name in hdf5 file."""
+
+        grpname = '/Configure:0000'
+        pattern = 'CsPad::ConfigV'
+        suffix  = gm.get_item_second_to_last_name(data_dsname) + '/config' 
+
+        #print 'get_cspad_config_dsname(): loop over group content:'
+        grp = self.get_dataset_from_hdf5_file(grpname)
+        for key,val in dict(grp).iteritems() :
+            #print '  ', key, val
+            if key.find(pattern)==0 :
+                #print '    ', val.name
+                dsname = val.name  + '/' + suffix
+                #print 'get_cspad_config_dsname(): found configuration dsname in hdf5 file:', dsname
+                return dsname
+
+        return None
+
+#---------------------
+#---------------------
+#---------------------
+#---------------------
+#---------------------
 #---------------------
 #  Class definition --
 #---------------------
@@ -76,7 +158,7 @@ class CSPadConfigPars(object) :
         config.printCSPadConfigPars()
 
     2.2 Access to static class parameters:    
-        import CSPadConfigPars as ccp
+        import PyCSPadImage.CSPadConfigPars as ccp
         my_wid2x1 = ccp.CSPadConfigPars().wid2x1
         etc...
 
@@ -235,7 +317,7 @@ class CSPadConfigPars(object) :
     def setCSPadConfiguration( self, fname, dsname, event=0 ):
         """Sets the CSPAD configuration parameters from hdf5 file."""
 
-        h5file = hm.HDF5File(fname) 
+        h5file = HDF5File(fname) 
         self.setCSPadConfigurationFromOpenFile( h5file, dsname, event )
         h5file.close_hdf5_file()
 

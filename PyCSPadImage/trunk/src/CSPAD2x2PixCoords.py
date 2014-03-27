@@ -32,8 +32,8 @@ from time import time
 
 #import matplotlib.pyplot as plt
 
-from PixCoords2x1 import *
-import GlobalGraphics as gg # For test purpose in main only
+from PyCSPadImage.PixCoords2x1 import *
+import pyimgalgos.GlobalGraphics as gg # For test purpose in main only
 
 #------------------------------
 
@@ -300,7 +300,7 @@ def test_instantiation_1 () :
 
 #------------------------------
 
-from CSPAD2x2CalibPars import *
+from PyCSPadImage.CSPAD2x2CalibPars import *
 
 def test_instantiation_2() :
     """ Instantiation with regular calibration parameters.

@@ -32,8 +32,8 @@ import sys
 import os
 import math
 import numpy as np
-import CalibParsDefault as cpd
-import CSPadConfigPars  as ccp
+import PyCSPadImage.CalibParsDefault as cpd
+import PyCSPadImage.CSPadConfigPars  as ccp
 
 #---------------------
 #  Class definition --
@@ -49,7 +49,7 @@ class CSPADCalibParsEvaluated (object) :
        Interface
        =========
 
-       import CalibPars as calp
+       import PyCSPadImage.CalibPars as calp
 
        path='/reg/d/psdm/xpp/xpptut13/calib/CsPad::CalibV1/XppGon.0:Cspad.0/'
        calibpars = calp.CalibPars(path, run=123)
@@ -305,27 +305,22 @@ class CSPADCalibParsEvaluated (object) :
 
 #----------------------------------------------
 
-import CalibPars as calp # for test purpose only
-
-def main_test() :
-    """Test of the basic interface.
-    """
-
-    #path='/reg/d/psdm/CXI/cxi35711/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0'
-    calibpars = calp.CalibPars(path='/reg/d/psdm/xpp/xpptut13/calib/CsPad::CalibV1/XppGon.0:Cspad.0/', run=10)
-    cpeval = CSPADCalibParsEvaluated (calibpars)
-
-    cpeval.printListOfEvaluatedTypes()
-    print 'center_global =\n', cpeval.getCalibParsEvaluated('center_global')
-
-    #cpeval.printCalibParsEvaluated() # for all evaluated parameters
-    #cpeval.printCalibParsEvaluated('center_global')
-
+#import PyCSPadImage.CalibPars as calp # for test purpose only
+#def main_test() :
+#    """Test of the basic interface.
+#    """
+#    #path='/reg/d/psdm/CXI/cxi35711/calib/CsPad::CalibV1/CxiDs1.0:Cspad.0'
+#    calibpars = calp.CalibPars(path='/reg/d/psdm/xpp/xpptut13/calib/CsPad::CalibV1/XppGon.0:Cspad.0/', run=10)
+#    cpeval = CSPADCalibParsEvaluated (calibpars)
+#    cpeval.printListOfEvaluatedTypes()
+#    print 'center_global =\n', cpeval.getCalibParsEvaluated('center_global')
+#    #cpeval.printCalibParsEvaluated() # for all evaluated parameters
+#    #cpeval.printCalibParsEvaluated('center_global')
 #---------------------
 
 if __name__ == "__main__" :
 
-    main_test()
-    sys.exit ( 'End of job' )
+    #main_test()
+    sys.exit ( 'Test is NON-AVAILABLE. End of job' )
 
 #----------------------------------------------
