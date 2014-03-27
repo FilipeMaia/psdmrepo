@@ -64,43 +64,43 @@ ChunkManager::~ChunkManager()
 
 void ChunkManager::readConfigParameters(const Translator::H5Output &h5Output) {
   // chunk parameters
-  m_chunkSizeTargetInBytes = h5Output.config("chunkSizeTargetInBytes",_16MB);  // default - 16 MB chunks
-  m_chunkSizeTargetObjects = h5Output.config("chunkSizeTargetObjects", 0);      // a non-zero value overrides 
+  m_chunkSizeTargetInBytes = h5Output.configReportIfNotDefault("chunkSizeTargetInBytes",_16MB);  // default - 16 MB chunks
+  m_chunkSizeTargetObjects = h5Output.configReportIfNotDefault("chunkSizeTargetObjects", 0);      // a non-zero value overrides 
   m_chunkSizeTargetObjectsOrig = m_chunkSizeTargetObjects;
   
                                                                  // default chunk size calculation
-  m_maxChunkSizeInBytes = h5Output.config("maxChunkSizeInBytes",_100MB); // max chunk size is 100 MB
-  m_minObjectsPerChunk = h5Output.config("minObjectsPerChunk",50);              
-  m_maxObjectsPerChunk = h5Output.config("maxObjectsPerChunk",2048);
+  m_maxChunkSizeInBytes = h5Output.configReportIfNotDefault("maxChunkSizeInBytes",_100MB); // max chunk size is 100 MB
+  m_minObjectsPerChunk = h5Output.configReportIfNotDefault("minObjectsPerChunk",50);              
+  m_maxObjectsPerChunk = h5Output.configReportIfNotDefault("maxObjectsPerChunk",2048);
 
   // the chunk cache needs to be big enough for at least one chunk, otherwise the chunk gets
   // brought back and forth from disk when writting each element.  Ideally the chunk cache holds
   // all the chunks that we are working with for a dataset.
-  m_chunkCacheSizeTargetInChunks = h5Output.config("chunkCacheSizeTargetInChunks",3);
-  m_maxChunkCacheSizeInBytes = h5Output.config("maxChunkCacheSizeInBytes",_100MB);
+  m_chunkCacheSizeTargetInChunks = h5Output.configReportIfNotDefault("chunkCacheSizeTargetInChunks",3);
+  m_maxChunkCacheSizeInBytes = h5Output.configReportIfNotDefault("maxChunkCacheSizeInBytes",_100MB);
 
-  m_eventIdChunkSizeTargetInBytes = h5Output.config("eventIdChunkSizeTargetInBytes",_16KB); // 16 KB
-  m_eventIdChunkSizeTargetObjects = h5Output.config("eventIdChunkSizeTargetObjects", m_chunkSizeTargetObjects);
+  m_eventIdChunkSizeTargetInBytes = h5Output.configReportIfNotDefault("eventIdChunkSizeTargetInBytes",_16KB); // 16 KB
+  m_eventIdChunkSizeTargetObjects = h5Output.configReportIfNotDefault("eventIdChunkSizeTargetObjects", m_chunkSizeTargetObjects);
   m_eventIdChunkSizeTargetObjectsOrig = m_eventIdChunkSizeTargetObjects;
 
-  m_damageChunkSizeTargetInBytes = h5Output.config("damageChunkSizeTargetInBytes",m_chunkSizeTargetInBytes);
-  m_damageChunkSizeTargetObjects = h5Output.config("damageChunkSizeTargetObjects",m_chunkSizeTargetObjects);
+  m_damageChunkSizeTargetInBytes = h5Output.configReportIfNotDefault("damageChunkSizeTargetInBytes",m_chunkSizeTargetInBytes);
+  m_damageChunkSizeTargetObjects = h5Output.configReportIfNotDefault("damageChunkSizeTargetObjects",m_chunkSizeTargetObjects);
   m_damageChunkSizeTargetObjectsOrig = m_damageChunkSizeTargetObjects;
 
-  m_stringChunkSizeTargetInBytes = h5Output.config("stringChunkSizeTargetInBytes",m_chunkSizeTargetInBytes);
-  m_stringChunkSizeTargetObjects = h5Output.config("stringChunkSizeTargetObjects",m_chunkSizeTargetObjects);
+  m_stringChunkSizeTargetInBytes = h5Output.configReportIfNotDefault("stringChunkSizeTargetInBytes",m_chunkSizeTargetInBytes);
+  m_stringChunkSizeTargetObjects = h5Output.configReportIfNotDefault("stringChunkSizeTargetObjects",m_chunkSizeTargetObjects);
   m_stringChunkSizeTargetObjectsOrig = m_stringChunkSizeTargetObjects;
 
-  m_ndarrayChunkSizeTargetInBytes = h5Output.config("ndarrayChunkSizeTargetInBytes",m_chunkSizeTargetInBytes);
-  m_ndarrayChunkSizeTargetObjects = h5Output.config("ndarrayChunkSizeTargetObjects",m_chunkSizeTargetObjects);
+  m_ndarrayChunkSizeTargetInBytes = h5Output.configReportIfNotDefault("ndarrayChunkSizeTargetInBytes",m_chunkSizeTargetInBytes);
+  m_ndarrayChunkSizeTargetObjects = h5Output.configReportIfNotDefault("ndarrayChunkSizeTargetObjects",m_chunkSizeTargetObjects);
   m_ndarrayChunkSizeTargetObjectsOrig = m_ndarrayChunkSizeTargetObjects;
 
   // there will be a lot of epics datasets, and an epics entry tends to be only 30 bytes or so.
   // If we used 16 Mb chunks, and we had 200 epics pv, we'd have at least 3.2 Gb of chunks that we'd 
   // be writing, and each chunk would hold an hours worth of data.  
   // We set the epics pv chunk size in bytes to 16 kilobytes.
-  m_epicsPvChunkSizeTargetInBytes = h5Output.config("epicsPvChunkSizeTargetInBytes",_16KB); 
-  m_epicsPvChunkSizeTargetObjects = h5Output.config("epicsPvChunkSizeTargetObjects",m_chunkSizeTargetObjects);
+  m_epicsPvChunkSizeTargetInBytes = h5Output.configReportIfNotDefault("epicsPvChunkSizeTargetInBytes",_16KB); 
+  m_epicsPvChunkSizeTargetObjects = h5Output.configReportIfNotDefault("epicsPvChunkSizeTargetObjects",m_chunkSizeTargetObjects);
   m_epicsPvChunkSizeTargetObjectsOrig = m_epicsPvChunkSizeTargetObjects;
 
   m_defaultChunkPolicy = boost::make_shared<Translator::ChunkPolicy>(m_chunkSizeTargetInBytes,

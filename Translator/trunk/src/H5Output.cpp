@@ -12,8 +12,6 @@
 
 #include "boost/make_shared.hpp"
 
-#include "LusiTime/Time.h"
-
 #include "MsgLogger/MsgLogger.h"
 #include "PSEvt/DamageMap.h"
 #include "PSEvt/TypeInfoUtils.h"
@@ -213,19 +211,35 @@ H5Output::H5Output(string moduleName) : Module(moduleName),
   openH5OutputFile();
 }
 
+list<string> H5Output::configListReportIfNotDefault(const string &param, 
+                                                    const list<string> &defaultList) const {
+  list<string> value = configList(param, defaultList);
+  if ((not m_quiet) and (value != defaultList)) {
+    WithMsgLog(logger(),info,stream) {
+      stream << "param " << param << " = ";
+      std::ostream_iterator<string> out_it (stream," ");
+      std::copy ( value.begin(), value.end(), out_it );
+      stream << " (not default value)";
+    }
+  }
+  return value;
+}
+
 void H5Output::readConfigParameters() {
   MsgLog(logger(), trace, "reading config parameters");
+  m_quiet = config("quiet",false);
   m_h5fileName = configStr("output_file");
-  string splitStr = configStr("split","NoSplit");
+  if (not m_quiet) MsgLog(logger(), info, "output file: " << m_h5fileName);
+  string splitStr = configReportIfNotDefault(string("split"),string("NoSplit"));
   if (splitStr == "NoSplit") m_split = NoSplit;
   else if (splitStr == "Family") m_split = Family;
   else if (splitStr == "SplitScan") m_split = SplitScan;
   else MsgLog(logger(),fatal,"config parameter 'split' must be one of 'NoSplit' 'Family' or 'SplitScan' (default is NoSplit)");
-
-  m_splitSize = config("splitSize",10*1073741824ULL);
+  if (m_split != NoSplit) MsgLog(logger(),info,"split = " << splitStr << " (non-default value)");
+  m_splitSize = configReportIfNotDefault("splitSize",10*1073741824ULL);
 
   // default list for type_filter, src_filter, ndarray_key_filter and std_string_key_filter
-  std::list<std::string> include_all;
+  list<string> include_all;
   include_all.push_back("include");
   include_all.push_back("all");
 
@@ -234,14 +248,17 @@ void H5Output::readConfigParameters() {
   set<string>::const_iterator alias;
   for (alias = typeAliases.begin(); alias != typeAliases.end(); ++alias) {
     m_typeInclude[*alias] = excludeIncludeToBool(*alias,configStr(*alias,"include"));
+    if ((not m_quiet) and (not m_typeInclude[*alias])) {
+      MsgLog(logger(),info,"param " << *alias << " = exclude (not default)");
+    }
   }
-  m_type_filter = configList("type_filter", include_all);
-
+  //  m_type_filter = configList("type_filter", include_all);
+  m_type_filter = configListReportIfNotDefault("type_filter", include_all);
   map<string, EpicsH5GroupDirectory::EpicsStoreMode> validStoreEpicsInput;
   validStoreEpicsInput["no"]=EpicsH5GroupDirectory::DoNotStoreEpics;
   validStoreEpicsInput["calib_repeat"]=EpicsH5GroupDirectory::RepeatEpicsEachCalib;
   validStoreEpicsInput["updates_only"]=EpicsH5GroupDirectory::OnlyStoreEpicsUpdates;
-  string storeEpics = configStr("store_epics", "calib_repeat");
+  string storeEpics = configReportIfNotDefault(string("store_epics"), string("calib_repeat"));
   map<string, EpicsH5GroupDirectory::EpicsStoreMode>::iterator userInput = validStoreEpicsInput.find(storeEpics);
   if (userInput == validStoreEpicsInput.end()) {
     MsgLog(logger(), fatal, "config parameter 'epics_store' must be one of 'calib_repeat' 'updates_only' or 'no'. The value: '"
@@ -250,42 +267,42 @@ void H5Output::readConfigParameters() {
   m_storeEpics = userInput->second;
   MsgLog(logger(),trace,"epics storage: " << EpicsH5GroupDirectory::epicsStoreMode2str(m_storeEpics));
 
-  m_short_bld_name = config("short_bld_name",false);
-  m_create_alias_links = config("create_alias_links",true);
-  m_overwrite = config("overwrite",false);
+  m_short_bld_name = configReportIfNotDefault("short_bld_name",false);
+  m_create_alias_links = configReportIfNotDefault("create_alias_links",true);
+  m_overwrite = configReportIfNotDefault("overwrite",false);
   
 
   // src filter parameters
-  m_src_filter = configList("src_filter", include_all);
+  m_src_filter = configListReportIfNotDefault("src_filter", include_all);
 
   // key filter parameters
-  m_key_filter = configList("key_filter", include_all);
+  m_key_filter = configListReportIfNotDefault("key_filter", include_all);
 
   // other translation parameters, calibration, metadata
-  m_include_uncalibrated_data = config("include_uncalibrated_data",false);
-  m_calibration_key = configStr("calibration_key","calibrated");
-  m_exclude_calibrated_data = config("exclude_calibrated_data",false);
-  m_exclude_calibstore = config("exclude_calibstore",false);
+  m_include_uncalibrated_data = configReportIfNotDefault("include_uncalibrated_data",false);
+  m_calibration_key = configReportIfNotDefault(string("calibration_key"),string("calibrated"));
+  m_exclude_calibrated_data = configReportIfNotDefault("exclude_calibrated_data",false);
+  m_exclude_calibstore = configReportIfNotDefault("exclude_calibstore",false);
 
   m_chunkManager.readConfigParameters(*this);
 
-  m_defaultShuffle = config("shuffle",true);
-  m_defaultDeflate = config("deflate",1);
+  m_defaultShuffle = configReportIfNotDefault("shuffle",true);
+  m_defaultDeflate = configReportIfNotDefault("deflate",1);
 
-  bool eventIdShuffle = config("eventIdShuffle",m_defaultShuffle);
-  int eventIdDeflate = config("eventIdDeflate",m_defaultDeflate);
+  bool eventIdShuffle = configReportIfNotDefault("eventIdShuffle",m_defaultShuffle);
+  int eventIdDeflate = configReportIfNotDefault("eventIdDeflate",m_defaultDeflate);
 
-  bool damageShuffle = config("damageShuffle",false);
-  int damageDeflate = config("damageDeflate",m_defaultDeflate);
+  bool damageShuffle = configReportIfNotDefault("damageShuffle",false);
+  int damageDeflate = configReportIfNotDefault("damageDeflate",m_defaultDeflate);
 
-  bool stringShuffle = config("stringShuffle",false);
-  int stringDeflate = config("stringDeflate",-1);
+  bool stringShuffle = configReportIfNotDefault("stringShuffle",false);
+  int stringDeflate = configReportIfNotDefault("stringDeflate",-1);
 
-  bool epicsPvShuffle = config("epicsPvShuffle",false);
-  int epicsPvDeflate = config("epicsPvDeflate",m_defaultDeflate);
+  bool epicsPvShuffle = configReportIfNotDefault("epicsPvShuffle",false);
+  int epicsPvDeflate = configReportIfNotDefault("epicsPvDeflate",m_defaultDeflate);
 
-  bool ndarrayShuffle = config("ndarrayShuffle",m_defaultShuffle);
-  int ndarrayDeflate = config("ndarrayDeflate",m_defaultDeflate);
+  bool ndarrayShuffle = configReportIfNotDefault("ndarrayShuffle",m_defaultShuffle);
+  int ndarrayDeflate = configReportIfNotDefault("ndarrayDeflate",m_defaultDeflate);
 
   m_eventIdCreateDsetProp = DataSetCreationProperties(m_chunkManager.eventIdChunkPolicy(),
                                                       eventIdShuffle,
@@ -306,7 +323,7 @@ void H5Output::readConfigParameters() {
                                                       ndarrayShuffle,
                                                       ndarrayDeflate);
 
-  m_maxSavedPreviousSplitEvents = config("max_saved_split_events", 3000);
+  m_maxSavedPreviousSplitEvents = configReportIfNotDefault("max_saved_split_events", 3000);
 }
 
 void H5Output::filterHdfWriterMap() {
@@ -407,9 +424,10 @@ void H5Output::openH5OutputFile() {
   m_h5file.createAttr<const char*> ("UUID").store ( uuid_buf ) ;
 
   // add some metadata to the top group
-  LusiTime::Time ctime = LusiTime::Time::now() ;
+  m_startTime = LusiTime::Time::now();
+  if (not m_quiet) MsgLog(logger(),info,"Starting translation process " << m_startTime);
   m_h5file.createAttr<const char*> ("origin").store ( "psana-translator" ) ;
-  m_h5file.createAttr<const char*> ("created").store ( ctime.toString().c_str() ) ;
+  m_h5file.createAttr<const char*> ("created").store ( m_startTime.toString().c_str() ) ;
 
 }
 
@@ -1128,7 +1146,11 @@ void H5Output::endJob(Event& evt, Env& env)
   m_chunkManager.endJob();
   ++m_currentConfigureCounter;
 
-  MsgLog(logger(),trace,name() << ": endJob()");
+  m_endTime = LusiTime::Time::now();
+  double deltaTime = (m_endTime.sec()-m_startTime.sec()) + (m_endTime.nsec()-m_startTime.nsec())/1e9;
+  MsgLog(logger(),info,": endJob " << m_endTime);
+  MsgLog(logger(), info, "real time (finish - start): " << deltaTime << " (sec) =  " 
+         << deltaTime/60.0 << " (min)");
 }
 
 ////////////////////////////////////////////////////

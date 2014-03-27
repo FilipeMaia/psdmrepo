@@ -11,6 +11,11 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-23
+2014-03-26 David
+- report start,end and processing time
+- report on non default values from configuration
+
 Tag: V00-00-22
 2014-03-26 David
 - fix bug L3T::Data, treat all Event level Pds::Src as equal.

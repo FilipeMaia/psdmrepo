@@ -9,9 +9,12 @@
 
 #include "boost/shared_ptr.hpp"
 
+#include "MsgLogger/MsgLogger.h"
 #include "psana/Module.h"
 #include "hdf5pp/File.h"
 #include "hdf5pp/Group.h"
+
+#include "LusiTime/Time.h"
 
 #include "PSEvt/TypeInfoUtils.h"
 
@@ -72,6 +75,17 @@ public:
 
 protected:  
   void readConfigParameters();
+  template <typename T>
+    T configReportIfNotDefault(const std::string &param, const T &defaultValue) const
+    {
+      T configValue = config(param,defaultValue);
+      if ((configValue != defaultValue) and (not m_quiet)) {
+        MsgLog(name(),info," param " << param << " = " << configValue << " (non-default value)");
+      }
+      return configValue;
+    }
+  std::list<std::string> configListReportIfNotDefault(const std::string &param, 
+                                                      const std::list<std::string> &defaultValue) const;
   void addCalibStoreHdfWriters(HdfWriterMap &hdfWriters);
   void removeCalibStoreHdfWriters(HdfWriterMap &hdfWriters);
   void openH5OutputFile();
@@ -191,6 +205,8 @@ private:
 
   std::set<PSEvt::EventKey, LessEventKey> m_calibratedEventKeys;
 
+  bool m_quiet;
+
   bool m_defaultShuffle, m_eventIdShuffle, m_damageShuffle, 
     m_stringShuffle, m_epicsPvShuffle;
 
@@ -205,6 +221,8 @@ private:
   DataSetCreationProperties m_ndarrayCreateDsetProp;
 
   boost::shared_ptr<H5GroupNames> m_h5groupNames;
+
+  LusiTime::Time m_startTime, m_endTime;
 }; // class H5Output
 
 } // namespace
