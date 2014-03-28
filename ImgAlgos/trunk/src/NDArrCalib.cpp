@@ -23,7 +23,6 @@
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
-#include "MsgLogger/MsgLogger.h"
 #include "PSEvt/EventId.h"
 #include "PSCalib/CalibParsStore.h"
 #include "pdscalibdata/GlobalMethods.h" // for load_pars_from_file(...)
@@ -298,6 +297,7 @@ NDArrCalib::procEvent(Event& evt, Env& env)
 
   if      (m_dtype == UINT16   && procEventForType<uint16_t, data_out_t> (evt) ) return;
   else if (m_dtype == INT      && procEventForType<int,      data_out_t> (evt) ) return;
+  else if (m_dtype == INT16    && procEventForType<int16_t,  data_out_t> (evt) ) return;
   else if (m_dtype == FLOAT    && procEventForType<float,    data_out_t> (evt) ) return;
   else if (m_dtype == UINT8    && procEventForType<uint8_t,  data_out_t> (evt) ) return;
   else if (m_dtype == DOUBLE   && procEventForType<double,   data_out_t> (evt) ) return;

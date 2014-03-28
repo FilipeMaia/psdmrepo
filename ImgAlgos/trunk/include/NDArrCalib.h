@@ -19,6 +19,7 @@
 // Base Class Headers --
 //----------------------
 #include "psana/Module.h"
+#include "MsgLogger/MsgLogger.h"
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -29,8 +30,8 @@
 //#include "ImgAlgos/ImgParametersV1.h"
 //#include "PSCalib/PnccdCalibPars.h"
 //#include "PSCalib/CSPad2x2CalibPars.h"
-
 #include "psalg/psalg.h"
+
 //#include "psddl_psana/pnccd.ddl.h"
 
 //------------------------------------
@@ -151,7 +152,7 @@ private:
   data_out_t* p_cdata;                // pointer to calibrated data array
 
   std::vector<unsigned> v_inds;       // vector of the image indexes for background normalization
-  double           m_norm;            // Normalization factor for background subtraction
+  double m_norm;                      // Normalization factor for background subtraction
 
 //-------------------
 
@@ -177,10 +178,10 @@ private:
       const PSCalib::CalibPars::common_mode_t* pars = &m_cmod_data[1]; // [0] element=mode is excluded from parameters
       float cmod_corr = 0;
 
-      if (mode == 0) return;
+      if ( mode == 0 ) return;
 
-      // CSPAD specific algorithm
-      if ( m_dettype == CSPAD ) {
+      // Algorithm 1 for CSPAD
+      if ( mode == 1 && m_dettype == CSPAD ) {
           unsigned ssize = 185*388;
 	  for (unsigned ind = 0; ind<32*ssize; ind+=ssize) {
 	    cmod_corr = findCommonMode<T>(pars, &data[ind], &m_stat_data[ind], ssize); 
@@ -188,8 +189,8 @@ private:
           return;
       }
 
-      // CSPAD2X2 specific algorithm
-      else if ( m_dettype == CSPAD2X2 ) {
+      // Algorithm 1 for CSPAD2X2
+      else if ( mode == 1 && m_dettype == CSPAD2X2 ) {
 	  unsigned ssize = 185*388;
 	  int stride = 2;
 	  for (unsigned seg = 0; seg<2; ++seg) {
@@ -198,27 +199,62 @@ private:
           return;
       }
 
-      // Other detector algorithms
+      // Algorithm 1 for other detectors 
+      else if ( mode == 1 ) {  
+	//unsigned mode     = m_cmod_data[0]; // mode - algorithm number for common mode
+	//unsigned mean_max = m_cmod_data[1]; // maximal value for the common mode correctiom
+	//unsigned rms_max  = m_cmod_data[2]; // maximal value for the found peak rms
+	//unsigned thresh   = m_cmod_data[3]; // threshold on number of pixels in the peak finding algorithm
+	  unsigned nsegs    = (unsigned)m_cmod_data[4]; // number of segments in the detector
+	  unsigned ssize    = (unsigned)m_cmod_data[5]; // segment size
+	  unsigned stride   = (unsigned)m_cmod_data[6]; // stride (step to jump)
+
+          nsegs  = (nsegs<1)   ?   1 : nsegs;
+          ssize  = (ssize<100) ? 128 : ssize;
+          stride = (nsegs<1)   ?   1 : stride;
+
+	  for (unsigned ind = 0; ind<nsegs*ssize; ind+=ssize) {
+	    cmod_corr = findCommonMode<T>(pars, &data[ind], &m_stat_data[ind], ssize, stride); 
+	  }
+          return;
+      }
+
+      // Algorithm 2 - MEAN
+      else if (mode == 2) {
+          T threshold     = (T)        m_cmod_data[1];
+          T maxCorrection = (T)        m_cmod_data[2];
+          unsigned length = (unsigned) m_cmod_data[3];
+          T cm            = 0;          
+          length = (length<100) ? 128 : length;
+          
+          for (unsigned i0=0; i0<m_size; i0+=length) {
+              psalg::commonMode<T>(&data[i0], &m_stat_data[i0], length, threshold, maxCorrection, cm);
+              //     commonMode<T>(&data[i0], &m_stat_data[i0], length, threshold, maxCorrection, cm); // from GlobalMethods.h
+          }
+          return; 
+      }
+
+      // Algorithm 3 - MEDIAN
+      else if (mode == 3) {
+          T threshold     = (T)        m_cmod_data[1];
+          T maxCorrection = (T)        m_cmod_data[2];
+          unsigned length = (unsigned) m_cmod_data[3];
+          T cm            = 0;          
+          length = (length<100) ? 128 : length;
+          
+          for (unsigned i0=0; i0<m_size; i0+=length) {
+              psalg::commonModeMedian<T>(&data[i0], &m_stat_data[i0], length, threshold, maxCorrection, cm);
+          }
+          return; 
+      }
+
+      // Other algorithms which are not implemented yet
       else {
-	  if (mode == 1) {
-              T threshold     = (T)        m_cmod_data[1];
-              T maxCorrection = (T)        m_cmod_data[2];
-              unsigned length = (unsigned) m_cmod_data[3];
-              T cm            = 0;
-              
-              length = (length>100) ? length : 128;
-              
-              for (unsigned i0=0; i0<m_size; i0+=length) {
-                  //psalg::commonMode<T>(&data[i0], &m_stat_data[i0], length, threshold, maxCorrection, cm);
-                  commonMode<T>(&data[i0], &m_stat_data[i0], length, threshold, maxCorrection, cm); // from GlobalMethods.h
-              }
-              return; 
-           }
-           else {
-              return; 
-	   }
-       
-       }
+	  static long counter = 0; counter ++;
+	  if (counter<21) {  MsgLog( name(), warning, "Algorithm " << mode << " requested in common_mode parameters is not implemented.");
+	    if (counter==20) MsgLog( name(), warning, "STOP PRINTING ABOVE WARNING MESSAGE.");
+	  }
+      }
     }
 
 //-------------------

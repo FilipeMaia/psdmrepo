@@ -11,6 +11,14 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-38
+2014-03-28 Mikhail S. Dubrovin
+- in NDArrCalib.h call common mode correction methods depending on 1-st parameter in common_mode calib file.
+	3 algorithms are implemented
+	1 - Andy's - common mode peak finding from GlobalMethods.h
+	2, 3 - Phil's - Mean and Median from psalg package
+- in NDArrCalib.cpp add m_dtype = INT16
+
 Tag: V00-03-37
 2014-03-21 Mikhail S. Dubrovin
 - in all modules except Acquiris* 

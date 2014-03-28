@@ -755,7 +755,7 @@ private:
          cm = mean;
          tmp = data;
          for (unsigned col=0; col<length; col++) {
-   	*tmp++ -= cm;
+   	   *tmp++ -= cm;
          }
        }
      }
@@ -894,7 +894,7 @@ findCommonMode(const double* pars,
   //--------------------
   // subtract CM 
   for (unsigned c = 0, p = 0; c < ssize; ++ c, p += stride) {
-        sdata[p] = sdata[p] - mean;
+        sdata[p] -= mean;
   } 
 
   return mean;
