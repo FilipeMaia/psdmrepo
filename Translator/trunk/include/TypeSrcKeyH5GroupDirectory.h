@@ -127,6 +127,13 @@ class SrcKeyGroup {
 
 typedef std::pair<Pds::Src, std::string> SrcKeyPair;
 
+inline SrcKeyPair getSrcKeyPair(const PSEvt::EventKey &eventKey) {
+  SrcKeyPair srcKeyPair;
+  srcKeyPair.first = eventKey.src();
+  srcKeyPair.second = eventKey.key();
+  return srcKeyPair;
+}
+
 class LessSrcKeyPair {
  public:
   bool operator()(const SrcKeyPair &a, const SrcKeyPair &b) {

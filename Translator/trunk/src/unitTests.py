@@ -1062,7 +1062,55 @@ class H5Output( unittest.TestCase ) :
         self.assertEqual(commonMode['data'][0],24.,msg="CsPadCommonModeSubV1.data[0] != 24., it was 24. when test was developed")
         if self.cleanUp:
             os.unlink(output_h5)
-                
+            
+    def test_keyAndSrcFilter(self):
+        '''test that src filtering does not filter keys attached to that src.
+        filter srcA in the translator, but have a module add an ndarray with the key
+        srcA,key. The test succeeds if srcA data is not present, but
+        srcA,key data is.
+        '''
+        input_file = TESTDATA_T1
+        output_h5 = makeH5OutputNameFromXtc(input_file)
+        cfgfile = writeCfgFile(input_file, output_h5, moduleList = "Translator.testModuleForNDarray Translator.H5Output")
+        cfgfile.write('src_filter = exclude BldInfo(XppSb2_Ipm)\n')
+        cfgfile.write('[Translator.testModuleForNDarray]\n')
+        cfgfile.write('add_to_event_src = BldInfo(XppSb2_Ipm)\n')
+        cfgfile.write('add_to_event_key = array\n')
+        
+        self.runPsanaOnCfg(cfgfile,output_h5,printPsanaOutput=self.printPsanaOutput)
+        cfgfile.close()
+        cmd = 'h5ls -r %s' % output_h5
+        p = sb.Popen(cmd, shell=True, stdout=sb.PIPE, stderr=sb.PIPE)
+        o,e = p.communicate()
+        assert e==''
+        lns = [ ln for ln in o.split('\n') if ln.find('XppSb2_Ipm')>=0]
+        lnsWithNDarray = [ln for ln in lns if ln.lower().find('ndarray')>=0]
+        self.assertEqual(len(lns), len(lnsWithNDarray), 
+                         msg="There are %d lines with XppSb2_Ipm in it, but only %d of those have ndarray in it" % (len(lns), len(lnsWithNDarray)))
+        if self.cleanUp:
+            os.unlink(output_h5)
+
+#    In the future, I would like to translate ndarrays that are placed in the 
+#    calibStore. Presently, we only translate known types associated with 
+#    calibrated objects that were seen - that is we are not doing a general
+#    translation of the calibstore. If we do that in the future, I can
+#    develop the below test further.
+# 
+#    def test_ndarrayCalibStore(self):
+#        '''place an ndarray in the calibstore, make sure it makes it to the hdf5
+#        '''
+#        input_file = TESTDATA_T1
+#        output_h5 = makeH5OutputNameFromXtc(input_file)
+#        cfgfile = writeCfgFile(input_file, output_h5, moduleList = "Translator.testModuleForNDarray Translator.H5Output")
+#        cfgfile.write('[Translator.testModuleForNDarray]\n')
+#        cfgfile.write('add_to_calib_src = BldInfo(XppSb2_Ipm)\n')
+#        self.runPsanaOnCfg(cfgfile,output_h5,printPsanaOutput=self.printPsanaOutput)
+#        cfgfile.close()
+#        h5 = h5py.File(output_h5,'r')
+#        if self.cleanUp:
+#            os.unlink(output_h5)
+
+
 #  run unit tests when imported as a main module
 #
 #  To run an individual test, do something like (from the release directory)

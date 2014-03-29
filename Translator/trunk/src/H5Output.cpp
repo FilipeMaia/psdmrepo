@@ -582,10 +582,17 @@ boost::shared_ptr<HdfWriterFromEvent> H5Output::checkTranslationFilters(const Ev
   const string & strKey = eventKey.key();
   boost::shared_ptr<HdfWriterFromEvent> nullHdfWriter;
   if (srcIsFiltered(src)) {
-    MsgLog(logger(),debug,"srcIsFiltered(src)==True for " << eventKey << " filtering");
+    if (strKey.size() == 0)  {
+      MsgLog(logger(),debug,"Filtering " << eventKey << " due to src_filter");
+      return nullHdfWriter;
+    } else {
+      MsgLog(logger(),debug,"Although src_filter applies to " << eventKey << " it has a non-empty key string. NOT filtering");
+    }
+  }
+  if (keyIsFiltered(strKey)) {
+    MsgLog(logger(),debug,"key is filtered for " << eventKey << ", filtering.");
     return nullHdfWriter;
   }
-  if (keyIsFiltered(strKey)) return nullHdfWriter;
   if (m_exclude_calibrated_data and eventKey.key() == m_calibration_key) return nullHdfWriter;
     
   boost::shared_ptr<HdfWriterFromEvent> hdfWriter = getHdfWriter(m_hdfWriters, typeInfoPtr);
@@ -1071,7 +1078,8 @@ void H5Output::lookForAndStoreCalibData() {
   getType2CalibTypesMap(type2calibTypeMap);
   bool calibGroupCreated = false;
   hdf5pp::Group calibGroup;
-
+  map<SrcKeyPair, set<const type_info *> , LessSrcKeyPair> calibStoreTypesAlreadyWritten;
+  map<SrcKeyPair, set<const type_info *> , LessSrcKeyPair>::iterator alreadyWrittenIter;
   std::set<PSEvt::EventKey, LessEventKey>::iterator calibEventKeyIter;
   for (calibEventKeyIter = m_calibratedEventKeys.begin(); 
        calibEventKeyIter != m_calibratedEventKeys.end(); ++calibEventKeyIter) {
@@ -1086,9 +1094,10 @@ void H5Output::lookForAndStoreCalibData() {
         calibStoreData = 
           m_env->calibStore().proxyDict()->get(calibStoreType,PSEvt::Source(src),"",NULL);
       } catch (const std::runtime_error &except) {
-        MsgLog(logger(),warning,"Error retreiving data for " 
+        MsgLog(logger(),error,"Error retreiving data for " 
                << TypeInfoUtils::typeInfoRealName(calibStoreType)
-               << " error is: " << except.what());
+               << " error is: " << except.what() 
+               << " skipping and going to next calibStore entry");
         continue;
       }
       if (calibStoreData) {
@@ -1116,12 +1125,35 @@ void H5Output::lookForAndStoreCalibData() {
           srcKeyPos = m_calibStoreGroupDir.findSrcKey(calibStoreEventKey);
         }
         SrcKeyGroup & srcKeyGroup = srcKeyPos->second;
-        try {
-          srcKeyGroup.storeData(calibStoreEventKey, inCalibStore, *m_event, *m_env);
-        } catch (ErrSvc::Issue &issue) {
-          m_calibStoreGroupDir.dump();
-          MsgLog(logger(),info, "caught exception trying to storeData for " << calibStoreEventKey << " issue: " << issue.what());
-          throw issue;
+        bool alreadyStored = false;
+        SrcKeyPair srcKeyPair = getSrcKeyPair(calibStoreEventKey);
+        alreadyWrittenIter = calibStoreTypesAlreadyWritten.find(srcKeyPair);
+        if (alreadyWrittenIter != calibStoreTypesAlreadyWritten.end()) {
+          const set<const type_info *> & typesWritten = alreadyWrittenIter->second;
+          if (typesWritten.find(calibStoreEventKey.typeinfo()) != typesWritten.end()) {
+            alreadyStored = true;
+            MsgLog(logger(),trace,"calibStore data for " << calibStoreEventKey
+                   << " already stored. No need to store again for eventKey: " 
+                   << calibEventKey);
+          }
+        }
+        if (not alreadyStored) {
+          try {
+            srcKeyGroup.storeData(calibStoreEventKey, inCalibStore, *m_event, *m_env);
+          } catch (ErrSvc::Issue &issue) {
+            m_calibStoreGroupDir.dump();
+            MsgLog(logger(),error, "caught exception trying to storeData for " << calibStoreEventKey << " issue: " << issue.what());
+            throw issue;
+          }
+          alreadyWrittenIter = calibStoreTypesAlreadyWritten.find(srcKeyPair);
+          if (alreadyWrittenIter == calibStoreTypesAlreadyWritten.end()) {
+            set<const type_info *> typesWritten;
+            typesWritten.insert(calibStoreEventKey.typeinfo());
+            calibStoreTypesAlreadyWritten[srcKeyPair] = typesWritten;
+          } else {
+            set<const type_info *> &typesWritten = alreadyWrittenIter->second;
+            typesWritten.insert(calibStoreEventKey.typeinfo());
+          }
         }
       }
     }

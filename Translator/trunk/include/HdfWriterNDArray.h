@@ -97,6 +97,19 @@ enum ndns::Order get_C_orFortran_StrideOnly(const ndarray<ElemType, NDim> &array
   throw ErrSvc::Issue(ERR_LOC, errorMsg);
 }
 
+template<class ElemType, unsigned NDim>
+boost::shared_ptr< ndarray< ElemType, NDim> > 
+getNDArrayPtr(const PSEvt::EventKey &eventKey, const DataTypeLoc dataTypeLoc, 
+              PSEvt::Event &evt, PSEnv::Env & env) 
+{
+  checkType<ndarray<ElemType,NDim> >(eventKey, "HdfWriterNDArray");
+  boost::shared_ptr< ndarray< ElemType, NDim> > ndarrayPtr;
+  if (dataTypeLoc == inEvent) ndarrayPtr = evt.get(eventKey.src(), eventKey.key()); 
+  else if (dataTypeLoc == inConfigStore) ndarrayPtr = env.configStore().get(eventKey.src());
+  else if (dataTypeLoc == inCalibStore) ndarrayPtr = env.calibStore().get(eventKey.src());
+  return ndarrayPtr;
+}
+
 //----------------------------------------------
 // NDArray writer:
 template <class ElemType, unsigned NDim>
@@ -109,10 +122,9 @@ class HdfWriterNDArray : public HdfWriterFromEvent {
                      bool shuffle, int deflate,
                      boost::shared_ptr<Translator::ChunkPolicy> chunkPolicy) 
   {
-    checkType<ndarray<ElemType,NDim> >(eventKey, "HdfWriterNDArray");
     boost::shared_ptr< ndarray<ElemType, NDim> > ndarrayPtr;
-    if (dataTypeLoc == inEvent) ndarrayPtr = evt.get(eventKey.src(), eventKey.key()); 
-    else if (dataTypeLoc == inConfigStore) ndarrayPtr = env.configStore().get(eventKey.src());
+    ndarrayPtr= getNDArrayPtr<ElemType, NDim>(eventKey, dataTypeLoc, evt, env);
+    if (not ndarrayPtr) throw EventKeyNotFound(ERR_LOC, eventKey, dataTypeLoc);
 
     enum ndns::Order order = get_C_orFortran_StrideOnly<ElemType,NDim>(*ndarrayPtr, errorMsgForUnsupportedStride);
     if (order != ndns::C) throw NotImplementedException(ERR_LOC, "Fortran stride not implemented");
@@ -120,10 +132,13 @@ class HdfWriterNDArray : public HdfWriterFromEvent {
     NDArrayFormat ndArrayFormat;
     hsize_t dims[NDim];
     ndArrayFormat.order = order;
+    bool hasZeroDim = false;
     for (unsigned i = 0; i < NDim; ++i) {
       ndArrayFormat.dim[i]=ndarrayPtr->shape()[i];
       dims[i]=ndarrayPtr->shape()[i];
+      if (dims[i]==0) hasZeroDim = true;
     }
+    if (hasZeroDim) throw NotImplementedException(ERR_LOC, "Arrays with a 0 in the shape are not supported");
     hid_t baseType = getH5BaseType<ElemType>();
     hid_t arrayType = H5Tarray_create2(baseType,NDim, dims);
     
@@ -140,11 +155,9 @@ class HdfWriterNDArray : public HdfWriterFromEvent {
               PSEvt::Event & evt, PSEnv::Env & env) 
   {
     MsgLog("HdfWriterNDArray",debug,"HdfWriterNDArray::append");
-    checkType<ndarray<ElemType,NDim> >(eventKey, "HdfWriterNDArray");
-    
-    boost::shared_ptr< ndarray<ElemType,NDim> > ptr; 
-    if (dataTypeLoc == inEvent) ptr = evt.get(eventKey.src(), eventKey.key()); 
-    else if (dataTypeLoc == inConfigStore) ptr = env.configStore().get(eventKey.src());
+    boost::shared_ptr< ndarray<ElemType, NDim> > ndarrayPtr;
+    ndarrayPtr= getNDArrayPtr<ElemType, NDim>(eventKey, dataTypeLoc, evt, env);
+    if (not ndarrayPtr) throw EventKeyNotFound(ERR_LOC, eventKey, dataTypeLoc);
     
     if (m_firstArrayOfDatasetFormat.find(eventKey) == m_firstArrayOfDatasetFormat.end()) {
       throw ErrSvc::Issue(ERR_LOC, "HDFWriterNDArray::append called for unknown eventKey");
@@ -152,24 +165,50 @@ class HdfWriterNDArray : public HdfWriterFromEvent {
 
     const NDArrayFormat & firstNdArrayFormat = m_firstArrayOfDatasetFormat[eventKey];
     
-    if (firstNdArrayFormat.order != get_C_orFortran_StrideOnly(*ptr,errorMsgForUnsupportedStride)) {
+    if (firstNdArrayFormat.order != get_C_orFortran_StrideOnly(*ndarrayPtr,errorMsgForUnsupportedStride)) {
       throw ErrSvc::Issue(ERR_LOC, "HdfWriterNDArray::append, this array has an order (C or Fortran) different from the first array in the dataset");
     }
     bool sameDimensionsAtFirstNDarray = true;
     for (unsigned i = 0; i < NDim; ++i) {
-      if (firstNdArrayFormat.dim[i] != ptr->shape()[i]) sameDimensionsAtFirstNDarray = false;
+      if (firstNdArrayFormat.dim[i] != ndarrayPtr->shape()[i]) sameDimensionsAtFirstNDarray = false;
     }
     if (not sameDimensionsAtFirstNDarray) {
       throw ErrSvc::Issue(ERR_LOC, "HdfWriterNDArray::append, this array has dimensions different from the first array in the dataset");
     }
-    m_writer.append(srcGroup.id(), "data", ptr->data());
+    m_writer.append(srcGroup.id(), "data", ndarrayPtr->data());
   }
   
   void store(DataTypeLoc dataTypeLoc, 
              hdf5pp::Group & srcGroup, 
              const PSEvt::EventKey & eventKey, 
              PSEvt::Event & evt, 
-             PSEnv::Env & env) { throw NotImplementedException(ERR_LOC, "store()"); }
+             PSEnv::Env & env) 
+  {
+    boost::shared_ptr< ndarray<ElemType, NDim> > ndarrayPtr;
+    ndarrayPtr= getNDArrayPtr<ElemType, NDim>(eventKey, dataTypeLoc, evt, env);
+    if (not ndarrayPtr) throw EventKeyNotFound(ERR_LOC, eventKey, dataTypeLoc);
+
+    enum ndns::Order order = get_C_orFortran_StrideOnly<ElemType,NDim>(*ndarrayPtr, errorMsgForUnsupportedStride);
+    if (order != ndns::C) throw NotImplementedException(ERR_LOC, "Fortran stride not implemented");
+
+    NDArrayFormat ndArrayFormat;
+    hsize_t dims[NDim];
+    ndArrayFormat.order = order;
+    bool hasZeroDim = false;
+    for (unsigned i = 0; i < NDim; ++i) {
+      ndArrayFormat.dim[i]=ndarrayPtr->shape()[i];
+      dims[i]=ndarrayPtr->shape()[i];
+      if (dims[i]==0) hasZeroDim = true;
+    }
+    if (hasZeroDim) throw NotImplementedException(ERR_LOC, "Arrays with a 0 in the shape are not supported");
+    hid_t baseType = getH5BaseType<ElemType>();
+    hid_t arrayType = H5Tarray_create2(baseType,NDim, dims);
+    
+    m_writer.createAndStoreDataset(srcGroup.id(),
+                                   "data",
+                                   arrayType,
+                                   ndarrayPtr->data());
+  }
 
   void store_at(DataTypeLoc dataTypeLoc, 
                 long index, hdf5pp::Group & srcGroup, 
@@ -185,6 +224,22 @@ class HdfWriterNDArray : public HdfWriterFromEvent {
   public:
   NotImplementedException(const ErrSvc::Context &ctx, const std::string &what) : ErrSvc::Issue(ctx,what) {}
   }; // class NotImplementedException
+
+  class EventKeyNotFound : public std::exception {
+  public:
+  EventKeyNotFound(const ErrSvc::Context &ctx, const PSEvt::EventKey &eventKey, DataTypeLoc dataTypeLoc) 
+    : std::exception()
+    {
+      std::ostringstream str;
+      str << "EventKey " << eventKey << " not found in location: " << dataTypeLoc << " [ " << ctx << " ]";
+      m_fullMessage = str.str();
+    }
+    virtual const char * what() const throw() { return m_fullMessage.c_str(); };
+    ~EventKeyNotFound() throw() {};
+  private:
+    std::string m_fullMessage;
+  }; // class EventKeyNotFound
+
  private:
   struct NDArrayFormat {
     unsigned dim[NDim];

@@ -11,6 +11,10 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-24
+2014-03-28 David
+- change filtering so src_filter does not apply if there is a key with the src.
+
 Tag: V00-00-23
 2014-03-26 David
 - report start,end and processing time
