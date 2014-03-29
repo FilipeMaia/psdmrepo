@@ -11,10 +11,18 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+2014-03-27 Mikhail S. Dubrovin
+	
+=======
+Tag: V00-00-14
+2014-03-28 Mikhail S. Dubrovin
+- in image_crop.py uncomment self.img2d.setflags(write=False) 
+	
 Tag: V00-00-13
 2014-03-27 Mikhail S. Dubrovin
+- in image_crop.py set self.img2d.setflags(write=False)
 - add AngularIntegrator.py and GlobalGraphics.py, remove then from PyCSPadImage
-	
+
 Tag: V00-00-12
 2014-03-26 Mikhail S. Dubrovin
 - add src/FastArrayTransformation.py

@@ -109,6 +109,9 @@ class image_crop (object) :
         self.img2d = np.array(self.arr[self.rowmin:self.rowmax, self.colmin:self.colmax])
         #self.img2d = self.arr
 
+        #self.img2d.flags.writeable = False
+        self.img2d.setflags(write=False)
+
         #evt.put( self.img2d, self.m_key_out ) # save image in event as 2d numpy array
         evt.put( self.img2d, self.m_src, self.m_key_out ) # save image in event as 2d numpy array
 
