@@ -10,7 +10,7 @@ from SConsTools.scons_functions import *
 
 # Qt4 directory location relative to SIT_ROOT
 qt_dir = "sw/external/qt"
-qt_ver = "4.6.2"
+qt_ver = "4.8.5"
 
 def _qtdir(env):
     for arch in env['SIT_ARCH'], env['SIT_ARCH_BASE'], env['SIT_ARCH_BASE']+'-opt':
