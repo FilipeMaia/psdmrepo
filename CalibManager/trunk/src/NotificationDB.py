@@ -74,8 +74,11 @@ class NotificationDB :
         info_dict['exp']  = cp.exp_name.value()
         info_dict['run']  = cp.str_run_number.value()
         info_dict['dets'] = cp.det_name.value()
-        info_dict['vers'] = cp.package_versions.get_pkg_version('CalibManager')
-        #info_dict['vers'] = gu.get_pkg_version('CalibManager') # Very slow
+        try :
+            info_dict['vers'] = cp.package_versions.get_pkg_version('CalibManager')
+        except :
+            info_dict['vers'] = 'N/A'
+            #info_dict['vers'] = gu.get_pkg_version('CalibManager') # Very slow
         return info_dict
 
 
@@ -130,7 +133,8 @@ class NotificationDB :
         else                   : self.msg_about_permission()
 
 
-    def insert_record(self) :
+    def insert_record(self, mode='self-disabled') :
+        if mode=='self-disabled' and self.is_permitted() : return
         #try :
         cmd = self.cmd_insert_record() 
         #print 'cmd: %s' % cmd
@@ -165,7 +169,8 @@ def test_notification_db(test_num):
         for rec in list_of_recs : print rec
 
     elif test_num == 2 :
-        ndb.insert_record()
+        ndb.insert_record(mode='enabled')
+        #ndb.insert_record() # default: mode='self-disabled'
 
     elif test_num == 3 :
         print ndb.get_list_of_keys()

@@ -75,6 +75,7 @@ class GUIDarkControlBar ( QtGui.QWidget ) :
         self.butRuns.setFixedWidth(90)
         self.butDets = QtGui.QPushButton( self.dark_list_show_dets.value() + self.char_expand )
         self.butDets.setFixedWidth(110)
+        self.butUpdate = QtGui.QPushButton("Update list")
         #self.butRuns.setMaximumWidth(90)
 
         self.cbx_deploy_hotpix = QtGui.QCheckBox('Deploy hotpix mask')
@@ -88,6 +89,7 @@ class GUIDarkControlBar ( QtGui.QWidget ) :
         self.hbox.addWidget(self.ediTo)
         self.hbox.addWidget(self.labDets)
         self.hbox.addWidget(self.butDets)
+        self.hbox.addWidget(self.butUpdate)
         self.hbox.addStretch(1)
         self.hbox.addWidget(self.cbx_deploy_hotpix)
     
@@ -96,6 +98,7 @@ class GUIDarkControlBar ( QtGui.QWidget ) :
         #self.connect( self.ediExp,     QtCore.SIGNAL('editingFinished ()'), self.processEdiExp )
         self.connect( self.butRuns,     QtCore.SIGNAL('clicked()'),          self.onButRuns  )
         self.connect( self.butDets,     QtCore.SIGNAL('clicked()'),          self.onButDets  )
+        self.connect( self.butUpdate,   QtCore.SIGNAL('clicked()'),          self.onButUpdate )
         self.connect( self.ediFrom,     QtCore.SIGNAL('editingFinished()'),  self.onEdiFrom )
         self.connect( self.ediTo,       QtCore.SIGNAL('editingFinished()'),  self.onEdiTo )
         self.connect( self.cbx_deploy_hotpix, QtCore.SIGNAL('stateChanged(int)'), self.on_cbx ) 
@@ -114,6 +117,7 @@ class GUIDarkControlBar ( QtGui.QWidget ) :
         #self           .setToolTip('This GUI deals with the configuration parameters.')
         self.butRuns  .setToolTip('Select the type of runs to list')
         self.butDets  .setToolTip('Select the type of dets to list')
+        self.butUpdate.setToolTip('Update list of runs')
         self.ediFrom.setToolTip('Fir run in the list')
         self.ediTo.  setToolTip('Last run in the list')
 
@@ -142,6 +146,7 @@ class GUIDarkControlBar ( QtGui.QWidget ) :
     def setStyleButtons(self):
         self.butRuns.setStyleSheet(cp.styleButton)
         self.butDets.setStyleSheet(cp.styleButton)
+        self.butUpdate.setStyleSheet(cp.styleButton)
         self.setButtonsVisible()
 
 
@@ -219,6 +224,10 @@ class GUIDarkControlBar ( QtGui.QWidget ) :
         #self.setStyleButtons()
 
 
+    def onButUpdate(self):
+        self.updateListOfRuns(self.butUpdate, 'Update list')
+
+
     def setRuns(self, txt='None'):
         #print 'setType', txt
         self.dark_list_show_runs.setValue(txt)
@@ -238,7 +247,8 @@ class GUIDarkControlBar ( QtGui.QWidget ) :
         if cp.guidarklist != None :
             cp.guidarklist.updateList()
 
-        but.setText(txt + self.char_expand)        
+        txt_on_but = txt if txt == 'Update list' else txt + self.char_expand 
+        but.setText(txt_on_but)        
         but.setStyleSheet(cp.styleButton)
 
 
