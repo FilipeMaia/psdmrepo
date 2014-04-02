@@ -1031,7 +1031,8 @@ class H5Output( unittest.TestCase ) :
         self.assertEqual(o.strip(),"",msg="The src's were not filtered by the aliases, output of h5ls -r is: %s" % o)
         if self.cleanUp:
             os.unlink(output_h5)
-        
+
+    @unittest.skip("disabled no data access")
     def test_calibstore(self):
         '''runs on xpptut data to see if calibration stuff gets written.
         Note - this data is not in the translator test directory. It has to be on disk
