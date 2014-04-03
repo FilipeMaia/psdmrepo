@@ -1,0 +1,10 @@
+- upgraded Qt to 4.8.5
+- upgraded PyQt to 4.10.4 
+- upgraded sip to 4.15.5 
+- psana translator allows to apply calibration and store them in hdf5
+- fstat in live mode if 0 bytes read. Fixes issue in gluster if a client seeks
+  ahead of the file length. 
+- various changes for the calibman
+- stream filtering in data set specification for psana
+- Added common mode correction algorithm to psalg
+- fixed a bug in the python module RegDB.experiment_info to always begin a new transaction when making queries 
