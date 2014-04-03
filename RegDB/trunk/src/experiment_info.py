@@ -75,6 +75,7 @@ def __do_select_many(statement):
 
     cursor = __get_connection().cursor(db.cursors.SSDictCursor)
     cursor.execute("SET SESSION SQL_MODE='ANSI'")
+    cursor.execute("BEGIN")
     cursor.execute(statement)
     return cursor.fetchall()
 
