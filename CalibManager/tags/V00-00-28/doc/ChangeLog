@@ -1,0 +1,264 @@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  ChangeLog file for package CalibManager
+#------------------------------------------------------------------------
+
+Package author: Mikhail S. Dubrovin
+
+Please describe any modifications that you made to the package in the
+reverse time order.
+
+Tag: V00-00-28
+2014-04-03 Mikhail S. Dubrovin
+- xppopr complained that the list of runs was not updated for newly created xtc files...
+	- Igor fixed RegDB experiment_info.experiment_runs(ins, exp), where update did not work 
+	- in GUIDarkList add automatic update of the list of runs when new xtc file is available 
+- in app/calibman add thread worker to check new xtc files
+- add ThreadCheckNewXtcFiles - new thread worker which checks new xtc files
+- in GUIDarkListItemRun - add update of the run item comment
+  with associate propagation of parameters from GUIDarkList to GUIDarkListItem
+- in GUIMetrology begin to work on integration of the cspad optic metrology data processing 
+	
+Tag: V00-00-27
+2014-04-02 Mikhail S. Dubrovin
+- moved OpticAlignmentCspadV1.py in this project but not use it yet  
+- in NotificationDB - do not submit records from myself
+- in GUIDarkControlBar - add "Update list" button in GUIDark
+	
+Tag: V00-00-26
+2014-03-25 Mikhail S. Dubrovin
+- in BatchJobPedestals.submit_batch_for_peds_aver(...) add protections:
+	- if LSF is down
+	- if selected detector(s) is(are) not found in xtc scan log parsing.
+
+Tag: V00-00-25
+2014-03-17 Mikhail S. Dubrovin
+- in PackageVersions add clean-up tmp files
+- in ConfigFileGenerator and scripts/psana-scan.cfg use SKIP events for scan as for data
+- in GUIDarkControlBar - update list of files when run_num_max is entered
+	
+Tag: V00-00-24
+2014-03-16 Mikhail S. Dubrovin
+- add PackageVersions.py in order to get package versions in background subprocesses,
+  swap appropriate methods for new one.
+- in app/calibman add protection in case of launching on the node with old version of lustre driver
+	
+Tag: V00-00-23
+2014-03-14 Mikhail S. Dubrovin
+- add GUIFileManager* etc for group file management
+A       src/GUIFileManagerGroupControl.py
+A       src/GUIFileManagerSingle.py
+A       src/GUIFileManagerSingleControl.py
+A       src/GUIExpCalibDir.py
+A       src/GUIFileManagerGroup.py
+A       src/GUIDirTree.py
+		
+Tag: V00-00-22
+2014-03-11 Mikhail S. Dubrovin
+- add NotificationDB
+- in GUIConfigPars add the button to print package tags in the tab of Config Parameters
+	
+Tag: V00-00-21
+2014-03-07 Mikhail S. Dubrovin
+- in GUIDarkMoreOpts.py set invisible the check box for additional options
+- in FileNameManager.py path_hotpix_mask() set explicit format for threshold in file name: mask-hot-thr-%.2fADU.txt
+	
+Tag: V00-00-20
+2014-03-07 Mikhail S. Dubrovin
+- in data/scripts/* set print_bits = 221 (in stead of 93) to print auto-threshold iterations
+- in ConfigParametersForApp decrease the batch job submission time interval from 100 to 30 sec.
+	
+Tag: V00-00-19
+2014-03-07 Mikhail S. Dubrovin
+- in FileDeployer change command "cp" -> "cat", command "mv" -> "cat" and "rm"
+	in order to deploy files with calib directory ACL permissions
+- in GUIDarkControlBar self.cbx_deploy_hot.pixsetVisible(False) - set invisible
+- in self.mask_rms_thr: set default threshold on rms = 0 - automatic definition of threshold for hot pixels
+- by default pixel_status will be saved .... cp.dark_deploy_hotpix   =... True 
+- in GUIFileManagerSelect update status after Copy, Move, and Delete; cp.guistatus.updateStatusInfo()
+	
+Tag: V00-00-18
+2014-03-04 Mikhail S. Dubrovin
+- in GUIDarkList.py uncommented widg.updateButtons() at list update
+- change color of Stop button to yellow
+	
+Tag: V00-00-17
+2014-03-01 Mikhail S. Dubrovin
+- fix problem with list buttons update; in GUIDarkList self.dict_guidarklistitem  ={} -> .clear()
+- in GUIInsExpDirDet request to clear list for butExp and butInst, but not for butDet 
+	
+Tag: V00-00-16
+2014-02-28 Mikhail S. Dubrovin
+- add protection in evaluation of statistcal values for plots
+- in BatchJobPedestals add hardwired option, which can be used for damaged data... #self.opt = ' -o psana.l3t-accept-only=0' 
+- split(' ') -> split() in order to remove all blanks
+- Use char_expand = u'\u25BC', which is defined on psanacs... comps
+- In ana/calibman add check of AFS token before starting application using GlobalUtils.check_token()
+	
+2014-02-24 Mikhail S. Dubrovin
+- keep chasing the bug for non-updating buttons
+M       src/CalibFileFinder.py - add protection for empty list;  if len(list_of_cfiles)>0 :
+M       src/FileDeployer.py    - replace HOST -> HOSTNAME
+M       src/GUIDarkListItemRun.py
+M       src/GUIDarkListItem.py
+M       src/BatchJobPedestals.py
+M       src/GUIDarkList.py
+M       src/PlotImgSpeWidget.py
+	
+Tag: V00-00-15
+2014-02-13 Mikhail S. Dubrovin
+- Generation of the large number of list items with embedded widget is slow in python.
+  Some optimization can be done if for each run number a single item and widget is generated once
+  and saved in the dictionary:
+  + the self.list in GUIDarkList now is treated as a singleton object
+  + all new item objects in the list are added once and saved in the dictionary run_num:(item,wigg)
+M       src/GUIInsExpDirDet.py
+M       src/GUIDarkListItemRun.py
+M       src/GUIDarkListItem.py
+M       src/ConfigParametersForApp.py
+M       src/GUIDarkControlBar.py
+M       src/GUIDarkList.py
+	
+Tag: V00-00-14
+2014-02-12 Mikhail S. Dubrovin
+- add run range in GUIDarkControlBar to speed-up generation of list gui in GUIDarkList 
+- in PlotImgSpeWidget add statistics box
+M       src/GUIDarkListItemRun.py
+M       src/GUIDarkListItem.py
+M       src/ConfigParametersForApp.py
+M       src/GUIDarkControlBar.py
+M       src/GUIDarkList.py
+M       src/PlotImgSpeWidget.py	
+
+Tag: V00-00-13
+2014-02-08 Mikhail S. Dubrovin
+- in FileDeployer.py add "comment" in history record
+- in GUIDarkListItemRun.py etc. add deployment of "pixel_rms" type of files at Dark processing
+- add parameters and buttons for hot pixel mask thresholds on rms and average min/max 
+	
+Tag: V00-00-12
+2014-02-07 Mikhail S. Dubrovin
+- add GUI for Metrology processing
+	- xlsx to text conversion
+	- to do: processing of the text file 
+- add empty GUI for Geometry
+- pnCCD pedestals calculation for image (FullFrame) is replaced by ndarr [4,512,512] 
+M       src/GUITabs.py
+A       src/xlsx_parser.py
+A       src/GUIMetrology.py
+A       src/GUIGeometry.py
+M       src/ConfigParametersForApp.py
+M       src/GUIMaskEditor.py
+M       src/FileNameManager.py
+M       src/ConfigFileGenerator.py
+A  +    data/scripts/psana-module-peds-aver-pnccd-ndarr.cfg
+A       data/scripts/psana-module-peds-aver-pnccd-img.cfg
+D       data/scripts/psana-module-peds-aver-pnccd.cfg
+
+Tag: V00-00-11
+2014-01-13 Mikhail S. Dubrovin
+- minor corrections in window titles and sizes...
+
+Tag: V00-00-10
+2014-01-10 Mikhail S. Dubrovin
+- ImgAlgos.ImgAverage is replaced by ImgAlgos.NDArrAverage in files
+M       src/ConfigFileGenerator.py
+M       data/scripts/psana-module-peds-aver-princeton.cfg
+M       data/scripts/psana-module-peds-aver-pnccd.cfg
+M       data/scripts/psana-module-peds-aver-camera.cfg
+- Deploy hot-pixel mask, 
+- In GUIConfigPars.py add more parameters for hot-pixel mask evaluation.
+M       data/scripts/psana-module-peds-aver-cspad-with-mask.cfg
+M       src/GUIConfig.py
+M       src/GUIDarkMoreOpts.py
+M       src/GUIDarkListItemRun.py
+M       src/GUIConfigPars.py
+M       src/ConfigParametersForApp.py
+M       src/ConfigFileGenerator.py
+M       src/GUIDarkControlBar.py
+	
+Tag: V00-00-09
+2013-12-17 Mikhail S. Dubrovin
+- modules src/CSPAD2x2Image.py CSPADImage.py moved to PyCSPadImage
+- in CalibFileFinder, GlobalUtils - fixed problems with printing run range
+- in GUIStatus.py changed status window font to fixed size
+- in GUIMaskEditor.py get array using self.img_arr = gu.get_image_array_from_file(self.path)
+
+Tag: V00-00-08
+2013-12-16 Mikhail S. Dubrovin
+- in status window implementer output of sorted calibration files with actual run range
+- add CalibFileFinder - analog of cpp class
+- add data/scripts/psana-module-peds-aver-cspad-with-mask.cfg 
+	and modify ConfigFileGenerator, FileNameManager, BatchJobPedestals, etc. in order to 
+	calculate hot pixel masks for cspads in dark runs.
+
+2013-12-12 Mikhail S. Dubrovin
+- in GUIFileManagerSelect.py add Move button/command
+	
+Tag: V00-00-07
+2013-12-12 Mikhail S. Dubrovin
+- Tuning of the GUIFileManager features;
+  - apply copy command through FileDeployer with record to the hystory file.
+  - show GUIStatus depending on type of tab: "Dark"-pedestals, "File Manager" - all calib types 
+  - add more default file extensions for GUIFileBrowser, do not restric opening of any file...
+	
+Tag: V00-00-06
+2013-12-07 Mikhail S. Dubrovin
+- improve logistics of buttons in GUIInsExpDirDet, GUIStatus.py, GUIDarkListItemRun.py
+- add src/GUIFileManager.py, src/GUIFileManagerSelect.py
+	
+Tag: V00-00-05
+2013-11-27 Mikhail S. Dubrovin
+- refactoring DarkList... classes for correct widget resizing.
+- enable/disable "Go" button for scan at submission
+- check that Go/Stop/Deploy button status is updated properly.
+
+Tag: V00-00-04
+2013-11-26 Mikhail S. Dubrovin
+- add more icons in data/icons/
+- add app/plims for "standalone" plotting procedure
+- in PlotImgSpe add buttons
+	Load - to load any array and 
+	Diff - to see diffetence between current and image array from file
+
+Tag: V00-00-03
+2013-11-22 Mikhail S. Dubrovin
+- add popup window for confirmation of sources before deployment
+- fix problem with missing non-automatic call of resizeEvent
+- add saving history file
+- add auto-create work directory
+- change file permissions after its saving
+	
+Tag: V00-00-02
+2013-11-19 Mikhail S. Dubrovin
+- It was found that RegDB returns sources which are missing in xtc...
+- combined access to scanned xtc with RegDB, RegDB is used only when 
+	scan log is not yet available.
+
+2013-11-18 Mikhail S. Dubrovin
+- code of many modules is significantly changed in order to
+	have dark image averaging for any set of detectors simultaneously.
+
+2013-11-05 Mikhail S. Dubrovin
+- add access to DB on data files 
+A       src/RegDBUtils.py
+A       src/GUIPopupChecklist.py
+A       src/GUIDarkControlBar.py
+	
+Tag: V00-00-01
+2013-10-06 Mikhail S. Dubrovin
+- works for pedestals and mask editor
+
+2013-07-15 Mikhail S. Dubrovin
+- create this package on dubrovin@psdev106:
+cd /reg/neh/home1/dubrovin/LCLS
+newrel ana-current CalibManager-v01
+cd CalibManager-v01
+newpkg CalibManager
+psvn newpkg CalibManager
+addpkg CalibManager
+
+#--------------------
