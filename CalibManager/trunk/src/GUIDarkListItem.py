@@ -243,9 +243,9 @@ class GUIDarkListItem ( QtGui.QWidget ) :
         return h + 10
 
 
-    def updateButtons(self) :
+    def updateButtons(self, str_run_type='', comment='') :
         #logger.info('update', __name__)
-        self.gui_run.updateButtons()
+        self.gui_run.updateButtons(str_run_type, comment)
         
 #-----------------------------
 

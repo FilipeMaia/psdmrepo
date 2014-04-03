@@ -61,6 +61,7 @@ class GUIDarkList ( QtGui.QWidget ) :
         self.list_of_visible_records = []
 
         self.click_counter = 0
+        self.update_counter = 0
 
         #self.calib_dir      = cp.calib_dir
         #self.det_name       = cp.det_name
@@ -96,13 +97,43 @@ class GUIDarkList ( QtGui.QWidget ) :
         self.showToolTips()
         self.setStyle()
 
+        self.connectToThreadWorker()
+
         cp.guidarklist = self
 
     #-------------------
     #  Public methods --
     #-------------------
 
+    def connectToThreadWorker(self):
+        try : self.connect   ( cp.thread_check_new_xtc_files, QtCore.SIGNAL('update(QString)'), self.signalReciever )
+        except : logger.warning('connectToThreadWorker is failed', __name__)
+
+
+    def disconnectFromThreadWorker(self):
+        try : self.disconnect( cp.thread_check_new_xtc_files, QtCore.SIGNAL('update(QString)'), self.signalReciever )
+        except : pass
+
+
+    def signalReciever(self, text):
+        msg = 'Signal received: new xtc file is available, msg: %s' % text
+        #print msg 
+        logger.info(msg, __name__)
+        self.updateList()
+        self.scrollDown()
+
+
+    def scrollDown(self):
+        #self.list.moveCursor(QtGui.QTextCursor.End)
+        #self.list.repaint()
+        last_run_num = self.list_of_runs[-1]
+        item, widg = self.dict_guidarklistitem[last_run_num]
+        self.list.scrollToItem (item) #, hint=QAbstractItemView.EnsureVisible)
+
+
     def updateList(self, clearList=False) :
+
+        self.update_counter += 1
 
         self.t0_sec = time()
 
@@ -131,8 +162,8 @@ class GUIDarkList ( QtGui.QWidget ) :
         self.list_of_run_nums_in_dir = gu.list_of_int_from_list_of_str(self.list_of_run_strs_in_dir) # [1, 202, 203, 204,...]
         self.list_of_run_nums_in_regdb = ru.list_of_runnums(self.instr_name.value(), self.exp_name.value())
 
-        #print 'list_of_run_nums_in_dir:\n',   self.list_of_run_nums_in_dir
-        #print 'list_of_run_nums_in_regdb:\n', self.list_of_run_nums_in_regdb
+        #print 'list_of_run_nums_in_dir  :', self.list_of_run_nums_in_dir
+        #print 'list_of_run_nums_in_regdb:', self.list_of_run_nums_in_regdb
         #print '\nA. Consumed time (sec) =', time()-self.t0_sec
         #print 'Begin to construct the list of items for %s' % self.exp_name.value()
 
@@ -140,21 +171,26 @@ class GUIDarkList ( QtGui.QWidget ) :
         if self.list_of_run_nums_in_regdb == [] : self.list_of_runs = self.list_of_run_nums_in_dir
         else                                    : self.list_of_runs = self.list_of_run_nums_in_regdb
 
+        #print 'update runs:'
 
         for run_num in self.list_of_runs :
+            #print run_num, 
 
             str_run_num = '%04d' % run_num
             self.str_run_number.setValue(str_run_num)
 
-            if not self.isSelectedRun            (run_num) : continue
-            if not self.hasSelectedDetectorsInRun(run_num) : continue
+            if not self.isSelectedRun            (run_num) :
+                print 'not self.isSelectedRun', run_num 
+                continue
+
+            if not self.hasSelectedDetectorsInRun(run_num) :
+                print 'not self.hasSelectedDetectorsInRun', run_num 
+                continue
 
             if not run_num in self.list_of_run_nums_in_dir :
                 self.comment = 'NOT FOUND xtc file!'
                 #self.type    = 'N/A'
 
-            #item = QtGui.QListWidgetItem('', self.list)
-            #widg = GUIDarkListItem(self, str_run_num, self.type, self.comment) # THIS GUY CONSUMES ~90ms !
             item, widg = self.create_or_use_guidarklistitem(run_num)
 
             self.list.setItemHidden (item, False)
@@ -162,17 +198,8 @@ class GUIDarkList ( QtGui.QWidget ) :
             record = run_num, item, widg
             self.list_of_visible_records.append(record)
 
-            #self.list.addItem(item)
-            #item.setFlags (  QtCore.Qt.ItemIsEnabled ) #| QtCore.Qt.ItemIsSelectable  | QtCore.Qt.ItemIsUserCheckable | QtCore.Qt.ItemIsTristate)
-            #print 'item.flags(): %o' % item.flags()
-            #item.setCheckState(0) 
-            #item.setFlags ( QtCore.Qt.ItemIsEnabled )
-
-            #item.setFlags (  QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable  | QtCore.Qt.ItemIsUserCheckable )
-            #item.setSizeHint(widg.size())
-            #self.list.setItemWidget(item, widg)
-
-            #self.list.setItemSelected(item, True)
+        #    print 'ok ', 
+        #print '\n' 
 
         self.list.sortItems(QtCore.Qt.AscendingOrder)
 
@@ -187,7 +214,7 @@ class GUIDarkList ( QtGui.QWidget ) :
         if run_num in self.dict_guidarklistitem.keys() :
             #print 'Use existing GUIDarkListItem object for run %d' % run_num
             item, widg = self.dict_guidarklistitem[run_num]
-            widg.updateButtons()
+            widg.updateButtons(self.type, self.comment)
             return item, widg
         else :
             #print 'Create new GUIDarkListItem object for run %d' % run_num
@@ -217,7 +244,7 @@ class GUIDarkList ( QtGui.QWidget ) :
 
     def isSelectedRun(self, run_num, type_to_select = 'dark') :
         # Unpack RegDB info
-        if self.dict_run_recs != {} :
+        if self.dict_run_recs != {} : ### and run_num in self.dict_run_recs.keys() : ###!!!!!!!!!!!!!!!!!!!
             run_rec = self.dict_run_recs[run_num]
             list_of_calibs = run_rec['calibrations']
             self.comment   = run_rec['comment']
@@ -343,6 +370,9 @@ class GUIDarkList ( QtGui.QWidget ) :
 
     def closeEvent(self, event):
         logger.debug('closeEvent', __name__)
+
+        self.disconnectFromThreadWorker()
+
         #self.saveLogTotalInFile() # It will be saved at closing of GUIMain
 
         #try    : cp.guimain.butLogger.setStyleSheet(cp.styleButtonBad)

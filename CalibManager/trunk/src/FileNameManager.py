@@ -100,6 +100,7 @@ class FileNameManager :
         if cp.instr_name.value() is None : return None
         if cp.exp_name  .value() is None : return None
         return cp.instr_dir.value() + '/' + cp.instr_name.value() + '/' + cp.exp_name.value() + '/calib'
+        #return os.path.join(cp.instr_dir.value(), cp.instr_name.value(), cp.exp_name.value(), 'calib')
 
 #-----------------------------
 
@@ -124,6 +125,7 @@ class FileNameManager :
         if cp.instr_name.value()   is None : return None
         if cp.exp_name_src.value() is None : return None
         return cp.instr_dir.value() + '/' + cp.instr_name.value() + '/' + cp.exp_name_src.value() + '/calib'
+        #return os.path.join(cp.instr_dir.value(), cp.instr_name.value(), cp.exp_name_src.value(),'calib')
 
 #-----------------------------
 
@@ -139,11 +141,11 @@ class FileNameManager :
         if cp.instr_name.value() is None : return None
         if cp.exp_name.value()   is None : return None
         return cp.instr_dir.value() + '/' + cp.instr_name.value() + '/' + cp.exp_name.value() + '/xtc/'
+        #return os.path.join(cp.instr_dir.value(), cp.instr_name.value(), cp.exp_name.value(), 'xtc/')
 
 
     def get_list_of_xtc_files(self):
-        dir = self.path_to_xtc_dir()
-        return gu.get_list_of_files_in_dir_for_ext(dir, '.xtc')
+        return gu.get_list_of_files_in_dir_for_ext(self.path_to_xtc_dir(), '.xtc')
 
 
     def get_list_of_xtc_runs(self):
@@ -161,11 +163,12 @@ class FileNameManager :
     def get_list_of_xtc_run_nums(self):
         """Returns the list of xtc integer run numbers:  [1, 202, 203, 204,...]
         """
-        list_of_xtc_runs = self.get_list_of_xtc_runs()
-        list_of_xtc_run_nums = []
-        for run in list_of_xtc_runs :
-            list_of_xtc_run_nums.append(int(run))
-        return list_of_xtc_run_nums
+        return [int(run) for run in self.get_list_of_xtc_runs()]
+        #list_of_xtc_runs = self.get_list_of_xtc_runs()
+        #list_of_xtc_run_nums = []
+        #for run in list_of_xtc_runs :
+        #    list_of_xtc_run_nums.append(int(run))
+        #return list_of_xtc_run_nums
 
 
     def path_to_xtc_files_for_run(self):

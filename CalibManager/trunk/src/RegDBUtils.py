@@ -279,6 +279,9 @@ if __name__ == "__main__" :
     print "\n\nTest : unique_detector_names()"
     print_unique_detector_names()
 
+    l = list_of_runnums('XPP','xppc7014')
+    print "\n\nTest list_of_run_nums('XPP','xppc7014'):\n", l 
+
     #det_name = 'cspad'
     #det_name = 'cspad2x2'
     #det_name = 'princeton'

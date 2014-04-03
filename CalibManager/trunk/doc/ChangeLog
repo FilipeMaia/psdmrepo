@@ -11,6 +11,17 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-28
+2014-04-03 Mikhail S. Dubrovin
+- xppopr complained that the list of runs was not updated for newly created xtc files...
+	- Igor fixed RegDB experiment_info.experiment_runs(ins, exp), where update did not work 
+	- in GUIDarkList add automatic update of the list of runs when new xtc file is available 
+- in app/calibman add thread worker to check new xtc files
+- add ThreadCheckNewXtcFiles - new thread worker which checks new xtc files
+- in GUIDarkListItemRun - add update of the run item comment
+  with associate propagation of parameters from GUIDarkList to GUIDarkListItem
+- in GUIMetrology begin to work on integration of the cspad optic metrology data processing 
+	
 Tag: V00-00-27
 2014-04-02 Mikhail S. Dubrovin
 - moved OpticAlignmentCspadV1.py in this project but not use it yet  

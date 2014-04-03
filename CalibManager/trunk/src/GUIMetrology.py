@@ -81,7 +81,9 @@ class GUIMetrology ( QtGui.QWidget ) :
         self.resetColorIsSet = False
 
         self.setFrame()
- 
+
+        self.setParams()
+  
         #self.titFileXlsx = QtGui.QLabel('File xlsx:')
 
         self.ediFileXlsx = QtGui.QLineEdit ( fnm.path_metrology_xlsx() )
@@ -99,6 +101,7 @@ class GUIMetrology ( QtGui.QWidget ) :
         self.butRemove    = QtGui.QPushButton('Remove')
         self.butViewOffice= QtGui.QPushButton('View xlsx')
         self.butViewText  = QtGui.QPushButton('View text')
+        self.butSrc       = QtGui.QPushButton(self.source_name + cp.char_expand )
 
         self.butViewOffice .setIcon(cp.icon_monitor)
         self.butViewText   .setIcon(cp.icon_monitor)
@@ -119,6 +122,7 @@ class GUIMetrology ( QtGui.QWidget ) :
         self.grid.addWidget(self.butViewText,   self.grid_row+2, 8)
 
         self.grid.addWidget(self.butEvaluate,   self.grid_row+3, 0)
+        self.grid.addWidget(self.butSrc,        self.grid_row+3, 1)
         self.grid.addWidget(self.butDeploy,     self.grid_row+4, 0)
         #self.setLayout(self.grid)
           
@@ -136,6 +140,7 @@ class GUIMetrology ( QtGui.QWidget ) :
         self.connect( self.butList,       QtCore.SIGNAL('clicked()'), self.onButList       )
         self.connect( self.butEvaluate,   QtCore.SIGNAL('clicked()'), self.onButEvaluate   )
         self.connect( self.butDeploy,     QtCore.SIGNAL('clicked()'), self.onButDeploy     )
+        self.connect( self.butSrc,        QtCore.SIGNAL('clicked()'), self.onButSrc        )
  
         self.showToolTips()
         self.setStyle()
@@ -163,7 +168,8 @@ class GUIMetrology ( QtGui.QWidget ) :
         self.butRemove    .setToolTip('Remove temporarty metrology text file(s)')
         self.butEvaluate  .setToolTip('Run quality check script and\nevaluate geometry alignment parameters')
         self.butDeploy    .setToolTip('Deploy geometry alignment parameters')
-
+        self.butSrc       .setToolTip('Select name of the detector')
+ 
 
     def setFrame(self):
         self.frame = QtGui.QFrame(self)
@@ -172,6 +178,14 @@ class GUIMetrology ( QtGui.QWidget ) :
         self.frame.setMidLineWidth(1)
         self.frame.setGeometry(self.rect())
         self.frame.setVisible(False)
+
+    def setParams(self) :
+        #if self.path_fm_selected != '' :
+        #    self.path_fm_selected = os.path.dirname(self.path_fm_selected)
+        self.str_run_from     = '0'
+        self.str_run_to       = 'end'
+        self.source_name      = 'Select'
+        self.calib_type       = 'Select'
 
 
     def setStyle(self):
@@ -201,7 +215,14 @@ class GUIMetrology ( QtGui.QWidget ) :
         #self.butExit.setText('')
         #self.butExit.setFlat(True)
 
+        self.setStyleButtons()
 
+
+    def setStyleButtons(self):
+        if self.source_name == 'Select' : self.butSrc.setStyleSheet(cp.stylePink)
+        else                            : self.butSrc.setStyleSheet(cp.styleButton)
+
+  
     def resizeEvent(self, e):
         #logger.debug('resizeEvent', self.name) 
         self.frame.setGeometry(self.rect())
@@ -339,6 +360,43 @@ class GUIMetrology ( QtGui.QWidget ) :
         msg = 'List of metrology text files in %s\n' % fnm.path_dir_work()
         for fname in fnm.get_list_of_metrology_text_files() : msg += '    %s\n' % fname
         logger.info(msg, __name__)        
+
+
+    def get_detector_selected(self):
+        lst = cp.list_of_dets_selected()
+        len_lst = len(lst)
+        msg = '%d detector(s) selected: %s' % (len_lst, str(lst))
+        #logger.info(msg, __name__ )
+
+        if len_lst !=1 :
+            msg += ' Select THE ONE!'
+            logger.warning(msg, __name__ )
+            return None
+
+        return lst[0]
+
+
+    def onButSrc(self):
+        logger.info('onButSrc', __name__ )
+
+        det = self.get_detector_selected()
+        if det is None : return
+
+        try    :
+            lst = ru.list_of_sources_for_det(det)
+        except :
+            lst = cp.dict_of_det_sources[det]
+
+        selected = gu.selectFromListInPopupMenu(lst)
+
+        if selected is None : return            # selection is cancelled
+
+        txt = str(selected)
+        self.source_name = txt
+        self.butSrc.setText( txt + cp.char_expand )
+        logger.info('Source selected: ' + txt, __name__)
+
+        self.setStyleButtons()
 
   
     def onButEvaluate(self):

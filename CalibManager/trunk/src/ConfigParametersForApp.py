@@ -41,6 +41,8 @@ class ConfigParametersForApp ( ConfigParameters ) :
 
     list_pars = []
 
+    char_expand    = u' \u25BC' # down-head triangle
+ 
     list_of_queues    = ['psnehq', 'psfehq', 'psanacsq']
     list_of_instr     = ['AMO', 'SXR', 'XPP', 'XCS', 'CXI', 'MEC']
     list_of_show_runs = ['in range', 'dark', 'all']
@@ -89,7 +91,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
         self.guidirtree        = None
         self.dirtreemodel      = None
 
-
+        #self.thread_check_new_xtc_files = None
 
 #-----------------------------
 

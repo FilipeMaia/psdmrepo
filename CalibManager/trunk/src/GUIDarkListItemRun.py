@@ -390,8 +390,12 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
         return list_of_deploy_commands
    
 
-    def updateButtons(self) :
+    def updateButtons(self, str_run_type='', comment='') :
         #logger.info('update', __name__)
+        self.str_run_type = str_run_type
+        self.comment = comment
+        self.lab_type.setText(str_run_type + '  ' + comment)
+
         self.setFieldsEnabled(cp.det_name.value() != '')
         #self.setStatusStyleOfButtons()
 

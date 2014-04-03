@@ -32,11 +32,12 @@ from ConfigParametersForApp import confpars as cp
 
 class ThreadWorker (QtCore.QThread) :
 
-    def __init__ ( self, parent=None ) :
+    def __init__ ( self, parent=None, dt_sec=5, print_bits=0 ) :
         QtCore.QThread.__init__(self, parent)        
-        self.thread_id = random.random()
-        #self.thread_id    = self.currentThreadId()
-        #self.thread_count = self.idealThreadCount()
+
+        self.dt_sec     = dt_sec
+        self.print_bits = print_bits
+        self.thread_id  = random.random()
 
         cp.thread1 = self
         self.counter = 0
@@ -51,21 +52,21 @@ class ThreadWorker (QtCore.QThread) :
     def run( self ) :
         while True :
             self.counter += 1
-            #print '\nThreadWorker id, i:', self.thread_id, self.counter
+            if self.print_bits & 2 : print '\nThreadWorker id, i:', self.thread_id, self.counter
             self.emitCheckStatusSignal()
-            self.sleep(5)
+            self.sleep(self.dt_sec)
             #time.sleep(1)
 
 
     def emitCheckStatusSignal( self ) :
-        #bstatus, bstatus_str = bjcora.status_batch_job_for_cora_split()
-        #fstatus, fstatus_str = bjcora.status_for_cora_split_files()
-        #status_str = bstatus_str + '   ' + fstatus_str
-        #status_str = bstatus_str
-        self.emit( QtCore.SIGNAL('update(QString)'), \
-                   'from work thread ' + str(self.thread_id) +\
-                   '  check counter: ' + str(self.counter) )
-        #print status_str
+        msg = 'from work thread ' + str(self.thread_id) + '  check counter: ' + str(self.counter)
+        self.emit( QtCore.SIGNAL('update(QString)'), msg) \
 
+        if self.print_bits & 1 : print msg
+
+        #self.emit( QtCore.SIGNAL('update(QString)'), \
+        #           'from work thread ' + str(self.thread_id) +\
+        #           '  check counter: ' + str(self.counter) )
+        #print status_str
 
 #---------------------
