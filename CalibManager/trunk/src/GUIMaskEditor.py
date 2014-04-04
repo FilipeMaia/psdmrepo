@@ -33,9 +33,13 @@ __version__ = "$Revision: 4 $"
 import sys
 import os
 
-import matplotlib
-#matplotlib.use('Qt4Agg') # forse Agg rendering to a Qt4 canvas (backend)
-if matplotlib.get_backend() != 'Qt4Agg' : matplotlib.use('Qt4Agg')
+# For self-run debugging:
+if __name__ == "__main__" :
+    import matplotlib
+    matplotlib.use('Qt4Agg') # forse Agg rendering to a Qt4 canvas (backend)
+
+#import matplotlib
+#if matplotlib.get_backend() != 'Qt4Agg' : matplotlib.use('Qt4Agg')
 
 from PyQt4 import QtGui, QtCore
 #import time   # for sleep(sec)

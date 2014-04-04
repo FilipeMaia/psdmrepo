@@ -27,6 +27,10 @@ part of it, please give an appropriate acknowledgement.
 import sys
 import os
 
+if __name__ == "__main__" :
+    import matplotlib
+    matplotlib.use('Qt4Agg') # forse Agg rendering to a Qt4 canvas (backend)
+
 from PyQt4 import QtGui
 from CalibManager.GUIMain import GUIMain
 from CalibManager.GlobalUtils import check_token, has_kerberos_ticket, is_good_lustre_version, get_hostname

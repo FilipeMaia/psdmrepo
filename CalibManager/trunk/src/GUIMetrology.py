@@ -33,10 +33,6 @@ __version__ = "$Revision: 4 $"
 import sys
 import os
 
-import matplotlib
-#matplotlib.use('Qt4Agg') # forse Agg rendering to a Qt4 canvas (backend)
-if matplotlib.get_backend() != 'Qt4Agg' : matplotlib.use('Qt4Agg')
-
 from PyQt4 import QtGui, QtCore
 #import time   # for sleep(sec)
 
@@ -49,9 +45,10 @@ from ConfigParametersForApp import cp
 from Logger               import logger
 from FileNameManager      import fnm
 from GUIFileBrowser       import *
-#from CorAna.MaskEditor import MaskEditor
+from GUIRunRange          import *
 import GlobalUtils        as     gu
 from xlsx_parser          import convert_xlsx_to_text
+
 #---------------------
 #  Class definition --
 #---------------------
@@ -101,7 +98,11 @@ class GUIMetrology ( QtGui.QWidget ) :
         self.butRemove    = QtGui.QPushButton('Remove')
         self.butViewOffice= QtGui.QPushButton('View xlsx')
         self.butViewText  = QtGui.QPushButton('View text')
+        self.butScript    = QtGui.QPushButton(self.script + cp.char_expand )
         self.butSrc       = QtGui.QPushButton(self.source_name + cp.char_expand )
+        self.labSrc       = QtGui.QLabel('for detector')
+        self.labScript    = QtGui.QLabel('using script')
+        self.guirunrange  = GUIRunRange()
 
         self.butViewOffice .setIcon(cp.icon_monitor)
         self.butViewText   .setIcon(cp.icon_monitor)
@@ -122,8 +123,13 @@ class GUIMetrology ( QtGui.QWidget ) :
         self.grid.addWidget(self.butViewText,   self.grid_row+2, 8)
 
         self.grid.addWidget(self.butEvaluate,   self.grid_row+3, 0)
-        self.grid.addWidget(self.butSrc,        self.grid_row+3, 1)
+        self.grid.addWidget(self.labScript,     self.grid_row+3, 1)
+        self.grid.addWidget(self.butScript,     self.grid_row+3, 2)
+
         self.grid.addWidget(self.butDeploy,     self.grid_row+4, 0)
+        self.grid.addWidget(self.labSrc,        self.grid_row+4, 1)
+        self.grid.addWidget(self.butSrc,        self.grid_row+4, 2)
+        self.grid.addWidget(self.guirunrange,   self.grid_row+4, 3, 1, 5)
         #self.setLayout(self.grid)
           
         self.vbox = QtGui.QVBoxLayout() 
@@ -140,6 +146,7 @@ class GUIMetrology ( QtGui.QWidget ) :
         self.connect( self.butList,       QtCore.SIGNAL('clicked()'), self.onButList       )
         self.connect( self.butEvaluate,   QtCore.SIGNAL('clicked()'), self.onButEvaluate   )
         self.connect( self.butDeploy,     QtCore.SIGNAL('clicked()'), self.onButDeploy     )
+        self.connect( self.butScript,     QtCore.SIGNAL('clicked()'), self.onButScript     )
         self.connect( self.butSrc,        QtCore.SIGNAL('clicked()'), self.onButSrc        )
  
         self.showToolTips()
@@ -168,6 +175,7 @@ class GUIMetrology ( QtGui.QWidget ) :
         self.butRemove    .setToolTip('Remove temporarty metrology text file(s)')
         self.butEvaluate  .setToolTip('Run quality check script and\nevaluate geometry alignment parameters')
         self.butDeploy    .setToolTip('Deploy geometry alignment parameters')
+        self.butScript    .setToolTip('Select the script to process optic metrology file')
         self.butSrc       .setToolTip('Select name of the detector')
  
 
@@ -185,6 +193,7 @@ class GUIMetrology ( QtGui.QWidget ) :
         self.str_run_from     = '0'
         self.str_run_to       = 'end'
         self.source_name      = 'Select'
+        self.script           = 'Select'
         self.calib_type       = 'Select'
 
 
@@ -210,6 +219,9 @@ class GUIMetrology ( QtGui.QWidget ) :
         self.ediFileText.setStyleSheet(cp.styleEditInfo) 
         self.ediFileText.setEnabled(False)            
 
+        self.labSrc     .setStyleSheet(cp.styleLabel)
+        self.labScript  .setStyleSheet(cp.styleLabel)
+
         #self.butFBrowser.setVisible(False)
         #self.butSave.setText('')
         #self.butExit.setText('')
@@ -221,6 +233,9 @@ class GUIMetrology ( QtGui.QWidget ) :
     def setStyleButtons(self):
         if self.source_name == 'Select' : self.butSrc.setStyleSheet(cp.stylePink)
         else                            : self.butSrc.setStyleSheet(cp.styleButton)
+
+        if self.script == 'Select' : self.butScript.setStyleSheet(cp.stylePink)
+        else                       : self.butScript.setStyleSheet(cp.styleButton)
 
   
     def resizeEvent(self, e):
@@ -376,6 +391,29 @@ class GUIMetrology ( QtGui.QWidget ) :
         return lst[0]
 
 
+    def onButScript(self):
+        logger.info('onButScript', __name__ )
+
+        det = self.get_detector_selected()
+        if det is None : return
+
+        if det != cp.list_of_dets[0] :
+            logger.info('Scripts are implemented for CSPAD ONLY !!!: ', __name__)
+        
+        lst = cp.list_of_metrology_scripts
+
+        selected = gu.selectFromListInPopupMenu(lst)
+
+        if selected is None : return            # selection is cancelled
+
+        txt = str(selected)
+        self.script = txt
+        self.butScript.setText( txt + cp.char_expand )
+        logger.info('Script is selected: ' + txt, __name__)
+
+        self.setStyleButtons()
+
+  
     def onButSrc(self):
         logger.info('onButSrc', __name__ )
 
