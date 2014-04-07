@@ -1026,7 +1026,7 @@ def parse_token(token) :
 def text_sataus_of_lsf_hosts(farm='psanacsfarm'):
     """Returns text output of the command: bhosts farm"""
     cmd = 'bhosts %s' % farm
-    return getoutput(cmd)
+    return cmd, getoutput(cmd)
     
 
 def msg_and_status_of_lsf(queue='psanacsq', print_bits=0):
@@ -1035,7 +1035,7 @@ def msg_and_status_of_lsf(queue='psanacsq', print_bits=0):
     farm = '%sfarm' % queue[0:-1]
     if print_bits & 1 : print 'farm =', farm
 
-    output = text_sataus_of_lsf_hosts(farm)
+    cmd, output = text_sataus_of_lsf_hosts(farm)
 
     if print_bits & 2 : print 'list_of_hosts:\n', output
     lines = output.split('\n')
@@ -1045,6 +1045,7 @@ def msg_and_status_of_lsf(queue='psanacsq', print_bits=0):
        #psanacs002         closed          -     16     16     16      0      0      0
        #psanacs003         ok              -     16      0      0      0      0      0
 
+    count_nodes = 0
     count_ok = 0
     count_closed = 0
     count_unavail = 0
@@ -1052,14 +1053,18 @@ def msg_and_status_of_lsf(queue='psanacsq', print_bits=0):
     for line in lines :
         #print line
         fields = line.split()
-        if fields[1] == 'ok'      : count_ok += 1
-        if fields[1] == 'closed'  : count_closed += 1
-        if fields[1] == 'unavail' : count_unavail += 1
+        if fields[0][0:5] == 'psana': count_nodes += 1
+        if fields[1] == 'ok'        : count_ok += 1
+        if fields[1] == 'closed'    : count_closed += 1
+        if fields[1] == 'unavail'   : count_unavail += 1
 
-    if print_bits & 4 : print 'Number of ok:%d, closed:%d, unavail:%d, ' %(count_ok, count_closed, count_unavail)
+    status = True if count_ok > 0 else False
 
-    if count_ok > 0 : return output, True
-    return output, False
+    msg = 'Number of nodes:%d, ok:%d, closed:%d, unavail:%d, status:%s' %(count_nodes, count_ok, count_closed, count_unavail, status)
+    if print_bits & 4 : print msg
+
+    txt = 'Command: %s\n%s\n%s' % (cmd, output, msg)
+    return txt, status
 
 #----------------------------------
 

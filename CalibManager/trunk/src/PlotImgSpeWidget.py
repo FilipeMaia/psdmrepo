@@ -71,9 +71,22 @@ def add_stat_text(axhi, weights, bins) :
     #txt += '\nErr of err=%8.2f' % (err_err)
     xb,xe = axhi.get_xlim()     
     yb,ye = axhi.get_ylim()     
-    x = xb + (xe-xb)*0.84
-    y = yb + (ye-yb)*0.66
-    axhi.text(x, y, txt, fontsize=10, color='k', ha='center', rotation=0)
+    #x = xb + (xe-xb)*0.84
+    #y = yb + (ye-yb)*0.66
+    #axhi.text(x, y, txt, fontsize=10, color='k', ha='center', rotation=0)
+    x = xb + (xe-xb)*0.98
+    y = yb + (ye-yb)*0.95
+
+    if axhi.get_yscale() is 'log' :
+        #print 'axhi.get_yscale():', axhi.get_yscale()
+        log_yb, log_ye = log10(yb), log10(ye)
+        log_y = log_yb + (log_ye-log_yb)*0.95
+        y = 10**log_y
+
+    axhi.text(x, y, txt, fontsize=10, color='k',
+              horizontalalignment='right',
+              verticalalignment='top',
+              rotation=0)
 
 #--------------------
 
@@ -178,7 +191,8 @@ class PlotImgSpeWidget (QtGui.QWidget) :
         self.fig.myZmax      = None
         self.fig.myNBins     = 100
         self.fig.myGridIsOn  = False
-        self.fig.myLogIsOn   = False
+        self.fig.myLogXIsOn  = False
+        self.fig.myLogYIsOn  = False
         self.fig.myZoomIsOn  = False
         self.fig.ntbZoomIsOn = False
         self.fig.my_xyc      = None
@@ -287,9 +301,12 @@ class PlotImgSpeWidget (QtGui.QWidget) :
         #self.axim.clear()
         #self.axcb.clear()
 
-        #if self.fig.myLogIsOn : self.plots_in_log10_scale_for_img_and_xhist()
-        if self.fig.myLogIsOn : self.plots_in_log10_scale_for_img_and_yhist()
-        else :                  self.plots_in_linear_scale()
+        #   self.plots_in_log10_scale_for_img_and_xhist()
+        if self.fig.myLogXIsOn :
+            self.plots_in_log10_scale_for_img_and_yhist()
+
+        else :
+            self.plots_in_linear_scale()
 
         self.axhi.grid(self.fig.myGridIsOn)
         self.axim.grid(self.fig.myGridIsOn)
@@ -299,8 +316,9 @@ class PlotImgSpeWidget (QtGui.QWidget) :
 
 
     def plots_in_log10_scale_for_img_and_yhist(self) :
+
         self.arr2d = np.log10(self.arrwin)
-        #self.arr2d = self.arrwin
+        # self.arr2d = self.arrwin
 
         if self.range_his == None : 
             vmin, vmax = np.min(self.arrwin), np.max(self.arrwin)
@@ -320,11 +338,17 @@ class PlotImgSpeWidget (QtGui.QWidget) :
         #self.axhi = self.fig.add_axes([0.15, 0.75, 0.78, 0.23])
         #self.axim = self.fig.add_axes([0.10, 0.04, 0.85, 0.65])
 
+        if self.fig.myLogYIsOn :
+            self.axhi.yaxis.set_major_locator(MaxNLocator(4))
+
         self.axhi.xaxis.set_major_locator(MaxNLocator(5))
-        self.axhi.yaxis.set_major_locator(MaxNLocator(4))
         self.axhi.xaxis.set_major_formatter(NullFormatter())
 
-        self.axhi.hist(self.arrwin.flatten(), bins=self.nbins, range=self.range_his, log=True)
+        weights, bins, patches = self.axhi.hist(self.arrwin.flatten(), bins=self.nbins, range=self.range_his, log=self.fig.myLogYIsOn)
+        add_stat_text(self.axhi, weights, bins)
+        
+        if not self.fig.myLogYIsOn :
+            self.set_hist_yticks()
 
         self.imsh = self.axim.imshow(self.arr2d, origin='upper', \
                                           interpolation='nearest', \
@@ -414,10 +438,15 @@ class PlotImgSpeWidget (QtGui.QWidget) :
         #msg = 'self.nbins: %s  self.range_his: %s' % (self.nbins, self.range_his)
         #print 'plots_in_linear_scale: ' + msg
 
-        weights, bins, patches = self.axhi.hist(self.arrwin.flatten(), bins=self.nbins, range=self.range_his)
+        if self.fig.myLogYIsOn :
+            self.axhi.yaxis.set_major_locator(MaxNLocator(4))
+
+        weights, bins, patches = self.axhi.hist(self.arrwin.flatten(), bins=self.nbins, range=self.range_his, log=self.fig.myLogYIsOn)
         add_stat_text(self.axhi, weights, bins)
 
-        self.set_hist_yticks()
+        if not self.fig.myLogYIsOn :
+            self.set_hist_yticks()
+
         self.axhi.xaxis.set_major_formatter(NullFormatter())
 
         xticks = self.axhi.get_xticks()
@@ -615,7 +644,7 @@ class PlotImgSpeWidget (QtGui.QWidget) :
     def mousePressOnColorBar(self, event) :
         #print 'PressOnColorBar'
 
-        if self.fig.myLogIsOn : return
+        if self.fig.myLogYIsOn : return
 
         lims = self.imsh.get_clim()
         colmin = lims[0]

@@ -41,7 +41,7 @@ from BatchLogScanParser     import blsp # Just in order to instatiate it
 class GUIDarkListItemRun ( QtGui.QWidget ) :
     """GUI sets the source dark run number, validity range, and starts calibration of pedestals"""
 
-    def __init__ ( self, parent=None, str_run_number='0000', str_run_type='Type N/A', comment='') :
+    def __init__ ( self, parent=None, str_run_number='0000', str_run_type='Type N/A', comment='', xtc_in_dir=True) :
 
         self.t0_sec = time()
 
@@ -62,6 +62,7 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
         self.str_run_from   = str_run_number # cp.str_run_from
         self.str_run_to     = 'end'          # cp.str_run_to
         self.comment        = comment
+        self.xtc_in_dir     = xtc_in_dir
         self.calib_dir      = cp.calib_dir
         self.det_name       = cp.det_name
         self.dict_bjpeds    = cp.dict_bjpeds
@@ -111,7 +112,7 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
         self.showToolTips()
 
         self.setStatusMessage()
-        self.setFieldsEnabled(cp.det_name.value() != '')
+        self.setFieldsEnabled(cp.det_name.value() != '' and self.xtc_in_dir)
 
         #cp.guidarkrunitem = self
         #print '  GUIDarkListItemRun Consumed time (sec) =', time()-self.t0_sec
@@ -390,13 +391,14 @@ class GUIDarkListItemRun ( QtGui.QWidget ) :
         return list_of_deploy_commands
    
 
-    def updateButtons(self, str_run_type='', comment='') :
+    def updateButtons(self, str_run_type='', comment='', xtc_in_dir=True) :
         #logger.info('update', __name__)
         self.str_run_type = str_run_type
         self.comment = comment
+        self.xtc_in_dir = xtc_in_dir
         self.lab_type.setText(str_run_type + '  ' + comment)
 
-        self.setFieldsEnabled(cp.det_name.value() != '')
+        self.setFieldsEnabled(cp.det_name.value() != '' and self.xtc_in_dir)
         #self.setStatusStyleOfButtons()
 
 

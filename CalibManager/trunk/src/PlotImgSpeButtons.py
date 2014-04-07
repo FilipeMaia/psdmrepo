@@ -63,7 +63,16 @@ class PlotImgSpeButtons (QtGui.QWidget) :
         self.load_is_visible = load_is_visible
 
         self.widgimage = widgimage
-        self.fig       = widgimage.fig
+        if widgimage is None :
+            self.fig = self # need it to pass pars
+            self.fig.myNBins    = 40
+            self.fig.myGridIsOn = False    
+            self.fig.myLogXIsOn = False    
+            self.fig.myLogYIsOn = False    
+            self.fig.myZmin     = None
+            self.fig.myZmax     = None
+        else :
+            self.fig = widgimage.fig
 
         if help_msg==None : self.help_msg = self.help_message()
         else              : self.help_msg = help_msg
@@ -76,7 +85,9 @@ class PlotImgSpeButtons (QtGui.QWidget) :
         self.but_elog  = QtGui.QPushButton('&ELog') #u'\u2192 &ELog'
         self.but_quit  = QtGui.QPushButton('&Close')
         self.cbox_grid = QtGui.QCheckBox('&Grid')
-        self.cbox_log  = QtGui.QCheckBox('&Log')
+        self.cbox_logx = QtGui.QCheckBox('&X')
+        self.cbox_logy = QtGui.QCheckBox('&Y')
+        self.tit_log   = QtGui.QLabel('Log:')
         self.tit_nbins = QtGui.QLabel('N bins:')
         self.edi_nbins = QtGui.QLineEdit(self.stringOrNone(self.fig.myNBins))
 
@@ -107,7 +118,8 @@ class PlotImgSpeButtons (QtGui.QWidget) :
         self.connect(self.but_elog,  QtCore.SIGNAL('clicked()'),          self.on_but_elog)
         self.connect(self.but_quit,  QtCore.SIGNAL('clicked()'),          self.on_but_quit)
         self.connect(self.cbox_grid, QtCore.SIGNAL('stateChanged(int)'),  self.on_cbox_grid)
-        self.connect(self.cbox_log,  QtCore.SIGNAL('stateChanged(int)'),  self.on_cbox_log)
+        self.connect(self.cbox_logx, QtCore.SIGNAL('stateChanged(int)'),  self.on_cbox_logx)
+        self.connect(self.cbox_logy, QtCore.SIGNAL('stateChanged(int)'),  self.on_cbox_logy)
         self.connect(self.edi_nbins, QtCore.SIGNAL('editingFinished ()'), self.on_edit_nbins)
 
         #self.setGridLayout()        
@@ -133,7 +145,9 @@ class PlotImgSpeButtons (QtGui.QWidget) :
         self.hbox.addWidget(self.tit_nbins)
         self.hbox.addWidget(self.edi_nbins)
         self.hbox.addWidget(self.cbox_grid)
-        self.hbox.addWidget(self.cbox_log)
+        self.hbox.addWidget(self.tit_log)
+        self.hbox.addWidget(self.cbox_logx)
+        self.hbox.addWidget(self.cbox_logy)
         self.hbox.addWidget(self.but_reset)
         self.hbox.addStretch(1)
         self.hbox.addWidget(self.but_load)
@@ -156,12 +170,14 @@ class PlotImgSpeButtons (QtGui.QWidget) :
         self.grid.addWidget(self.tit_nbins, 0, 1)
         self.grid.addWidget(self.edi_nbins, 0, 2)
         self.grid.addWidget(self.cbox_grid, 0, 3)
-        self.grid.addWidget(self.cbox_log,  0, 4)
-        self.grid.addWidget(self.but_reset, 0, 6)
-        self.grid.addWidget(self.but_load,  0, 7)
-        self.grid.addWidget(self.but_diff,  0, 8)
-        self.grid.addWidget(self.but_save,  0, 9)
-        self.grid.addWidget(self.but_quit,  0, 10)
+        self.grid.addWidget(self.tit_log,   0, 4)
+        self.grid.addWidget(self.cbox_logx, 0, 5)
+        self.grid.addWidget(self.cbox_logy, 0, 6)
+        self.grid.addWidget(self.but_reset, 0, 7)
+        self.grid.addWidget(self.but_load,  0, 8)
+        self.grid.addWidget(self.but_diff,  0, 9)
+        self.grid.addWidget(self.but_save,  0, 10)
+        self.grid.addWidget(self.but_quit,  0, 11)
         self.setLayout(self.grid)
 
 
@@ -174,7 +190,8 @@ class PlotImgSpeButtons (QtGui.QWidget) :
         self.but_elog .setToolTip('Send figure to ELog') 
         self.but_help .setToolTip('Click on this button\nand get help') 
         self.cbox_grid.setToolTip('On/Off grid') 
-        self.cbox_log .setToolTip('Log/Linear scale') 
+        self.cbox_logx.setToolTip('Log/Linear X scale') 
+        self.cbox_logy.setToolTip('Log/Linear Y scale') 
         self.edi_nbins.setToolTip('Edit the number of bins\nfor spectrum [1-1000]')
 
 
@@ -217,7 +234,8 @@ class PlotImgSpeButtons (QtGui.QWidget) :
 
     def set_buttons(self) :
         self.cbox_grid.setChecked(self.fig.myGridIsOn)
-        self.cbox_log .setChecked(self.fig.myLogIsOn)
+        self.cbox_logx.setChecked(self.fig.myLogXIsOn)
+        self.cbox_logy.setChecked(self.fig.myLogYIsOn)
         self.edi_nbins.setText(self.stringOrNone(self.fig.myNBins))
 
 
@@ -322,9 +340,17 @@ class PlotImgSpeButtons (QtGui.QWidget) :
         resp=wdialog.exec_()
          
 
-    def on_cbox_log(self):
-        logger.info('Set log10 scale', __name__ )
-        self.fig.myLogIsOn = self.cbox_log.isChecked()
+    def on_cbox_logx(self):
+        logger.info('Set log10 for X scale', __name__ )
+        self.fig.myLogXIsOn = self.cbox_logx.isChecked()
+        self.fig.myZmin    = None
+        self.fig.myZmax    = None        
+        self.widgimage.processDraw()
+
+
+    def on_cbox_logy(self):
+        logger.info('Set log10 for Y scale', __name__ )
+        self.fig.myLogYIsOn = self.cbox_logy.isChecked()
         self.fig.myZmin    = None
         self.fig.myZmax    = None        
         self.widgimage.processDraw()

@@ -48,6 +48,7 @@ from GUIFileBrowser       import *
 from GUIRunRange          import *
 import GlobalUtils        as     gu
 from xlsx_parser          import convert_xlsx_to_text
+from OpticAlignmentCspadV1 import *
 
 #---------------------
 #  Class definition --
@@ -68,7 +69,8 @@ class GUIMetrology ( QtGui.QWidget ) :
         self.fname_metrology_xlsx = cp.fname_metrology_xlsx
         self.fname_metrology_text = cp.fname_metrology_text
         self.img_arr = None
-
+        self.list_of_calib_types = ['center', 'tilt', 'geometry']
+        
         cp.setIcons()
 
         self.setGeometry(10, 25, 650, 30)
@@ -254,11 +256,8 @@ class GUIMetrology ( QtGui.QWidget ) :
     def closeEvent(self, event):
         logger.debug('closeEvent', self.name)
 
-        #try    : cp.guimain.close()
-        #except : pass
-
-        #try    : del cp.guimain
-        #except : pass
+        try    : cp.guifilebrowser.close()
+        except : pass
 
 
     def onExit(self):
@@ -322,6 +321,8 @@ class GUIMetrology ( QtGui.QWidget ) :
             if resp :
                 logger.info('Approved command:\n' + cmd, __name__)
                 self.commandInSubproc(cmd)
+            else :
+                logger.info('Command is cancelled', __name__)
 
         except :
             self.butViewOffice.setStyleSheet(cp.styleButtonGood)
@@ -332,7 +333,6 @@ class GUIMetrology ( QtGui.QWidget ) :
             #cp.viewoffice.show()
 
 
-
     def onButViewText(self):
         logger.debug('onButViewText', __name__)
         try    :
@@ -340,8 +340,12 @@ class GUIMetrology ( QtGui.QWidget ) :
             #self.but_view.setStyleSheet(cp.styleButtonBad)
         except :
             #self.but_view.setStyleSheet(cp.styleButtonGood)
-            
-            cp.guifilebrowser = GUIFileBrowser(None, fnm.get_list_of_metrology_text_files(), fnm.path_metrology_text())
+
+            list_of_files = fnm.get_list_of_metrology_text_files()
+            if self.script != 'Select' :
+                list_of_files += self.list_metrology_alignment_const_fnames()
+
+            cp.guifilebrowser = GUIFileBrowser(None, list_of_files, fnm.path_metrology_text())
             cp.guifilebrowser.move(self.pos().__add__(QtCore.QPoint(880,40))) # open window with offset w.r.t. parent
             cp.guifilebrowser.show()
 
@@ -358,7 +362,6 @@ class GUIMetrology ( QtGui.QWidget ) :
         logger.info(msg, __name__)
 
 
-
     def onButRemove(self):
         #logger.debug('onButRemove', __name__)        
         cmd = 'rm'
@@ -369,6 +372,8 @@ class GUIMetrology ( QtGui.QWidget ) :
         if resp :
             logger.info('Approved command:\n' + cmd, __name__)
             self.commandInSubproc(cmd)
+        else :
+            logger.info('Command is cancelled', __name__)
 
 
     def onButList(self):
@@ -392,30 +397,30 @@ class GUIMetrology ( QtGui.QWidget ) :
 
 
     def onButScript(self):
-        logger.info('onButScript', __name__ )
+        logger.debug('onButScript', __name__ )
 
         det = self.get_detector_selected()
         if det is None : return
 
         if det != cp.list_of_dets[0] :
-            logger.info('Scripts are implemented for CSPAD ONLY !!!: ', __name__)
+            logger.warning('Scripts are implemented for CSPAD ONLY !!!: ', __name__)
         
-        lst = cp.list_of_metrology_scripts
+        lst = cp.dict_of_metrology_scripts[det]
 
         selected = gu.selectFromListInPopupMenu(lst)
 
-        if selected is None : return            # selection is cancelled
-
+        if selected is None : return        # selection is cancelled
+        if selected is self.script : return # the same
+        
         txt = str(selected)
-        self.script = txt
-        self.butScript.setText( txt + cp.char_expand )
-        logger.info('Script is selected: ' + txt, __name__)
 
+        self.setScript(txt)
+        self.setSrc()
         self.setStyleButtons()
 
-  
+
     def onButSrc(self):
-        logger.info('onButSrc', __name__ )
+        logger.debug('onButSrc', __name__ )
 
         det = self.get_detector_selected()
         if det is None : return
@@ -427,22 +432,167 @@ class GUIMetrology ( QtGui.QWidget ) :
 
         selected = gu.selectFromListInPopupMenu(lst)
 
-        if selected is None : return            # selection is cancelled
+        if selected is None : return             # selection is cancelled
+        if selected is self.source_name : return # the same
 
         txt = str(selected)
+        self.setSrc(txt)
+        self.setStyleButtons()
+
+
+    def setScript(self,txt='Select'):
+        self.script = txt
+        self.butScript.setText( txt + cp.char_expand )
+        logger.info('Script is selected: ' + txt, __name__)
+
+  
+    def setSrc(self,txt='Select'):
         self.source_name = txt
         self.butSrc.setText( txt + cp.char_expand )
         logger.info('Source selected: ' + txt, __name__)
 
-        self.setStyleButtons()
-
   
     def onButEvaluate(self):
-        logger.info('onButEvaluate - NON IMPLEMENTED YET', __name__)        
+        logger.debug('onButEvaluate', __name__)
+        det = self.get_detector_selected()
+        if det is None : return
+
+        list_of_metrology_scripts = cp.dict_of_metrology_scripts[det]
+
+        if self.script == 'Select' :
+            msg = 'Script for processing metrology file is not selected. Select it first...'
+            logger.warning(msg, __name__)
+            return
+
+        #print 'list_of_metrology_scripts', list_of_metrology_scripts
+
+        #for CSPAD script CSPADV1
+        if det == cp.list_of_dets[0] and self.script == list_of_metrology_scripts[0] :            
+            msg = 'Evaluate parameters for %s using script %s' % (det, self.script)
+            logger.info(msg, __name__)
+            self.procCspadV1()
+
+
+        # for other detectors and scripts for now...
+        else :            
+            msg = 'Script %s is not yet implemented for detector %s...' % (self.script, det)
+            logger.warning(msg, __name__)
+            return
+        
  
+    def procCspadV1(self):
+        """Create and save interim files for calibration types"""
+        self.list_of_calib_types = ['center', 'tilt', 'geometry']
+
+        fname_metrology = fnm.path_metrology_text()
+        msg = 'procCspadV1 for metrology data in file %s' % fname_metrology
+        logger.info(msg, __name__)       
+
+        optal = OpticAlignmentCspadV1(fname_metrology, print_bits=0, plot_bits=0)
+
+        txt_qc_table_xy = optal.txt_qc_table_xy()
+        txt_qc_table_z  = optal.txt_qc_table_z()
+
+        txt_center      = optal.txt_center_pix_formatted_array()
+        txt_tilt        = optal.txt_tilt_formatted_array()
+        txt_geometry    = optal.txt_geometry()
+
+        logger.info('Quality check in X-Y plane:\n'+txt_qc_table_xy, __name__)       
+        logger.info('Quality check in Z:\n'+txt_qc_table_z, __name__)       
+        logger.info('parameters of type "center":\n'+txt_center, __name__)       
+        logger.info('parameters of type "tilt":\n'+txt_tilt, __name__)       
+        logger.info('parameters of type "geometry":\n'+txt_geometry, __name__)       
+        
+        # Save calibration files in work directory
+
+        dic_type_fname = self.dict_metrology_alignment_const_fname_for_type()
+
+        gu.save_textfile(txt_center,   dic_type_fname['center']) 
+        gu.save_textfile(txt_tilt,     dic_type_fname['tilt']) 
+        gu.save_textfile(txt_geometry, dic_type_fname['geometry']) 
+
+        msg = 'Save interim metrology alignment files:'
+        for type in self.list_of_calib_types :
+            msg += '\n  %s   %s' % (type.ljust(16), dic_type_fname[type])
+
+        logger.info(msg, __name__)       
+
+
+    def dict_metrology_alignment_const_fname_for_type(self) : 
+        #lst_const_types = cp.const_types_cspad # ex. ['center', 'tilt',...]
+        lst_const_types = self.list_of_calib_types
+        lst_of_insets = ['%s-%s' % (self.script,type) for type in lst_const_types] # ex. ['CSPADV1-tilt', ...]
+        lst_of_const_fnames = gu.get_list_of_files_for_list_of_insets(fnm.path_metrology_alignment_const(), lst_of_insets)
+        return dict(zip(lst_const_types, lst_of_const_fnames))
+
+
+    def list_metrology_alignment_const_fnames(self) : 
+        return self.dict_metrology_alignment_const_fname_for_type().values()
+
 
     def onButDeploy(self):
-        logger.info('onButDeploy - NON IMPLEMENTED YET', __name__)        
+        logger.debug('onButDeploy', __name__)        
+
+        if self.script == 'Select' :
+            msg = 'Script for processing metrology file is not selected.... Select it first and evaluate constants (Item 4)'
+            logger.warning(msg, __name__)
+            return
+
+        if self.source_name == 'Select' :
+            msg = 'Detector is not selected. Select it first...'
+            logger.warning(msg, __name__)
+            return
+
+        list_of_cmds = self.list_of_copy_cmds()
+
+
+        txt = '\nList of commands for tentetive file deployment:'
+        for cmd in list_of_cmds :
+            txt += '\n' + cmd
+        logger.info(txt, __name__)
+
+
+        msg = 'Approve commands \njust printed in the logger'
+        if self.approveCommand(self.butDeploy, msg) :
+
+            for cmd in list_of_cmds :
+                fd.procDeployCommand(cmd, 'metrology-alignment')
+                #print 'Command for deployer: ', cmd
+
+            if cp.guistatus is not None : cp.guistatus.updateStatusInfo()
+
+
+
+
+    def approveCommand(self, but, msg):
+        resp = gu.confirm_or_cancel_dialog_box(parent=but, text=msg, title='Please confirm or cancel!')
+        if resp : logger.info('Commands approved', __name__)
+        else    : logger.info('Command is cancelled', __name__)
+        return resp
+
+
+    def list_of_copy_cmds(self):
+
+        det = self.get_detector_selected()
+        if det is None : return
+
+        dst_calib_dir  = fnm.path_to_calib_dir()
+        dst_calib_type = cp.dict_of_det_calib_types[det]
+        dst_source     = self.source_name
+        dst_fname      = '%s.data' % cp.guirunrange.getRunRange()
+
+        #print 'dst_calib_dir  ', dst_calib_dir
+        #print 'dst_calib_type ', dst_calib_type
+        #print 'dst_source     ', dst_source
+        #print 'dst_fname      ', dst_fname
+
+        list_of_cmds = []
+        for type, fname in self.dict_metrology_alignment_const_fname_for_type().iteritems() :
+            dst_path = os.path.join(dst_calib_dir, dst_calib_type, dst_source, type, dst_fname)
+            cmd = 'cp %s %s' % (fname, dst_path)
+            list_of_cmds.append(cmd)
+
+        return list_of_cmds
 
  
     def commandInSubproc(self, cmd):

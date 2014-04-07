@@ -337,7 +337,7 @@ class GUIInsExpDirDet ( QtGui.QWidget ) :
         if cp.guistatus is not None :
             cp.guistatus.updateStatusInfo()
 
-        if cp.guidarklist is not None :
+        if cp.guitabs is not None and cp.current_tab.value() == cp.guitabs.list_of_tabs[0] and cp.guidarklist is not None :
             if self.but_current == self.butIns or self.but_current == self.butExp :
                 cp.guidarklist.updateList(clearList)
             else :

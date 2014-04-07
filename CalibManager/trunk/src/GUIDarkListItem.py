@@ -52,7 +52,7 @@ class GUIDarkListItem ( QtGui.QWidget ) :
     #char_expand    = 'V' # solid down-head triangle
     #char_shrink    = '>' # solid right-head triangle
 
-    def __init__ ( self, parent=None, str_run_num='0000', run_type='Type N/A', comment='') :
+    def __init__ ( self, parent=None, str_run_num='0000', run_type='Type N/A', comment='', xtc_in_dir=True) :
 
         #self.t0_sec = time()
 
@@ -78,7 +78,7 @@ class GUIDarkListItem ( QtGui.QWidget ) :
         self.but_expand_shrink = QtGui.QPushButton(self.char_expand)
 
         self.gui_add = None
-        self.gui_run = GUIDarkListItemRun(self, str_run_num, run_type, comment)
+        self.gui_run = GUIDarkListItemRun(self, str_run_num, run_type, comment, xtc_in_dir)
         self.hboxTT = QtGui.QHBoxLayout()
         self.hboxTT.addSpacing(5)     
         self.hboxTT.addWidget(self.but_expand_shrink)
@@ -243,9 +243,9 @@ class GUIDarkListItem ( QtGui.QWidget ) :
         return h + 10
 
 
-    def updateButtons(self, str_run_type='', comment='') :
+    def updateButtons(self, str_run_type='', comment='', xtc_in_dir=True) :
         #logger.info('update', __name__)
-        self.gui_run.updateButtons(str_run_type, comment)
+        self.gui_run.updateButtons(str_run_type, comment, xtc_in_dir)
         
 #-----------------------------
 

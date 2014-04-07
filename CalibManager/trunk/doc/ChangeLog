@@ -11,6 +11,15 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-30
+2014-04-07 Mikhail S. Dubrovin
+- in PackageVersions fix hangout at tmp files cleanup
+- in PlotImg* separate log scales for X, Y
+- GUIMetrology is ready for CSPADV1 processing
+- in GUIDarkList* 
+	- do not show "Go" button for missing on disk xtc files,
+        - update the comment field on run item
+
 Tag: V00-00-29
 2014-04-03 Mikhail S. Dubrovin
 - New version of pyqt does not allow to redefine graphical backend after 

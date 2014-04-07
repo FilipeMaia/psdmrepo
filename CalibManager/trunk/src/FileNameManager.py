@@ -208,6 +208,11 @@ class FileNameManager :
 
 #-----------------------------
 
+    def path_metrology_alignment_const(self) :
+        return self.path_prefix() + 'metro-align.txt'
+
+#-----------------------------
+
     def path_prefix(self) :
         return cp.dir_work.value() + '/' + cp.fname_prefix.value() 
 

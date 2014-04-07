@@ -48,7 +48,6 @@ class ConfigParametersForApp ( ConfigParameters ) :
     list_of_show_runs = ['in range', 'dark', 'all']
     list_of_show_dets = ['any', 'selected any', 'selected all']
 
-    list_of_metrology_scripts = ['CSPADV1', 'CSPADV2', 'CSPAD2X2']
     
     par01 = 'MPA1SdCp7h18m'
     par02 = __author__.split()[2].lower()
@@ -384,6 +383,7 @@ class ConfigParametersForApp ( ConfigParameters ) :
            ,'filter'
            ,'pixel_gain'
            ,'pixel_rms'
+           ,'geometry'
            #,'beam_vector'
            #,'beam_intersect'
             ]
@@ -565,6 +565,20 @@ class ConfigParametersForApp ( ConfigParameters ) :
                                                                  ,self.srcs_opal8000
                                                                  ,self.srcs_acqiris
                                                                   ]) )
+
+
+        self.dict_of_metrology_scripts = dict( zip(self.list_of_dets, [ ['CSPADV1', 'CSPADV2']
+                                                                       ,['CSPAD2X2']
+                                                                       ,['N/A']
+                                                                       ,['N/A']
+                                                                       ,['N/A']
+                                                                       ,['N/A']
+                                                                       ,['N/A']
+                                                                       ,['N/A']
+                                                                       ,['N/A']
+                                                                       ,['N/A']
+                                                                        ]) )
+
  
 #-----------------------------
 

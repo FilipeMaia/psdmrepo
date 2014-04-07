@@ -171,10 +171,8 @@ class GUIDarkList ( QtGui.QWidget ) :
         if self.list_of_run_nums_in_regdb == [] : self.list_of_runs = self.list_of_run_nums_in_dir
         else                                    : self.list_of_runs = self.list_of_run_nums_in_regdb
 
-        #print 'update runs:'
 
         for run_num in self.list_of_runs :
-            #print run_num, 
 
             str_run_num = '%04d' % run_num
             self.str_run_number.setValue(str_run_num)
@@ -188,7 +186,10 @@ class GUIDarkList ( QtGui.QWidget ) :
                 continue
 
             if not run_num in self.list_of_run_nums_in_dir :
-                self.comment = 'NOT FOUND xtc file!'
+                self.comment = 'xtc file IS NOT on disk!'
+                self.xtc_in_dir = False
+            else :
+                self.xtc_in_dir = True
                 #self.type    = 'N/A'
 
             item, widg = self.create_or_use_guidarklistitem(run_num)
@@ -198,8 +199,6 @@ class GUIDarkList ( QtGui.QWidget ) :
             record = run_num, item, widg
             self.list_of_visible_records.append(record)
 
-        #    print 'ok ', 
-        #print '\n' 
 
         self.list.sortItems(QtCore.Qt.AscendingOrder)
 
@@ -214,13 +213,13 @@ class GUIDarkList ( QtGui.QWidget ) :
         if run_num in self.dict_guidarklistitem.keys() :
             #print 'Use existing GUIDarkListItem object for run %d' % run_num
             item, widg = self.dict_guidarklistitem[run_num]
-            widg.updateButtons(self.type, self.comment)
+            widg.updateButtons(self.type, self.comment, self.xtc_in_dir)
             return item, widg
         else :
             #print 'Create new GUIDarkListItem object for run %d' % run_num
             str_run_num = '%04d'%run_num
             item = QtGui.QListWidgetItem(str_run_num, self.list)
-            widg = GUIDarkListItem(self, str_run_num, self.type, self.comment)  
+            widg = GUIDarkListItem(self, str_run_num, self.type, self.comment, self.xtc_in_dir)  
             self.dict_guidarklistitem[run_num] = [item, widg]
             item.setTextColor(QtGui.QColor(0, 0, 0, alpha=0)) # set item text invisible. All pars in the range [0,255]
             item.setFlags ( QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsSelectable  | QtCore.Qt.ItemIsUserCheckable )

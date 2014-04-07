@@ -66,6 +66,7 @@ class GUIMain ( QtGui.QWidget ) :
         QtGui.QWidget.__init__(self, parent)
 
         cp.setIcons()
+
         cp.package_versions = PackageVersions()
 
         self.main_win_width  = cp.main_win_width 
@@ -84,7 +85,7 @@ class GUIMain ( QtGui.QWidget ) :
         self.resetColorIsSet = False
 
         self.setFrame()
- 
+
         #self.guitree   = GUICalibDirTree()
         self.guitabs   = GUITabs(self) # QtGui.QTextEdit()
         self.guilogger = GUILogger(show_buttons=False)
@@ -94,7 +95,6 @@ class GUIMain ( QtGui.QWidget ) :
         self.vsplit.addWidget(self.guitabs)
         self.vsplit.addWidget(self.guilogger)
         #self.vsplit.moveSplitter(0,200)
-        
 
         self.vbox = QtGui.QVBoxLayout() 
         #self.vbox.addWidget(self.guibuttonbar)
@@ -165,14 +165,10 @@ class GUIMain ( QtGui.QWidget ) :
 
 
     def resizeEvent(self, e):
-        #logger.debug('resizeEvent', self.name) 
-        #self.frame.setGeometry(self.rect())
-        #point, size = self.mapToGlobal(QtCore.QPoint(0,0)), self.size()
-        #x,y,w,h = point.x(), point.y(), size.width(), size.height()
-        #msg = 'x,y,w,h : %d, %d, %d, %d, ' % (x,y,w,h)
-        #logger.info(msg, self.name)
-        #print msg
-        pass
+         #logger.debug('resizeEvent', self.name) 
+         #print 'GUIMain resizeEvent: %s' % str(self.size())
+         pass
+
 
     def moveEvent(self, e):
         #logger.debug('moveEvent', self.name) 
