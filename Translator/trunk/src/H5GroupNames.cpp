@@ -71,10 +71,8 @@ namespace {
 
   std::string srcName(const Pds::Src& src, bool procPidSpaceSepAtEnd, bool detInfoSpecialAsAstrerik)
   {
-    if (src == PSEvt::EventKey::noSource()) {
+    if ((src == PSEvt::EventKey::noSource()) or (src == PSEvt::EventKey::anySource())) {
       return std::string("noSrc");
-    } else if (src == PSEvt::EventKey::anySource()) {
-      return std::string("anySrc");
     } else if (src.level() == Pds::Level::Source) {
       return ::strDetInfo(static_cast<const Pds::DetInfo&>(src),detInfoSpecialAsAstrerik);
     } else if (src.level() == Pds::Level::Reporter) {
@@ -159,17 +157,12 @@ string H5GroupNames::nameForSrc(const Pds::Src &src) {
 }
 
 std::string H5GroupNames::nameForSrcKey(const Pds::Src &src, const std::string &key) {
+  string srcKeyGroupName = nameForSrc(src); // should always be non-zero length
   string keyStringToAddOrig;
   hasDoNotTranslatePrefix(key,&keyStringToAddOrig);
   string keyStringToAdd = replaceCharactersThatAreBadForH5GroupNames(keyStringToAddOrig);
-  bool notSpecificSource = ((src == PSEvt::EventKey::anySource()) or 
-                            (src == PSEvt::EventKey::noSource()));
-  if ((keyStringToAdd.size()>0) and (notSpecificSource)) {
-    return keyStringToAdd;
-  }
-  string srcKeyGroupName = nameForSrc(src); // should always be non-zero length
   if (keyStringToAdd.size()>0) {
-    return srcKeyGroupName + srcKeySep() + keyStringToAdd;
+    srcKeyGroupName += (srcKeySep() + keyStringToAdd);
   }
   return srcKeyGroupName;
 }

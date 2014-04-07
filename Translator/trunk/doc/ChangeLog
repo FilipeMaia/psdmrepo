@@ -11,6 +11,10 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-28
+2014-04-07 David
+- modify srckey group names, write noSrc__key rather than just key when no src given
+
 Tag: V00-00-27
 2014-04-07 David
 - change src/key separator to __ to better distinguish two in name.

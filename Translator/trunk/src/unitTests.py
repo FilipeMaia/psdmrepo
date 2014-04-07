@@ -619,21 +619,21 @@ class H5Output( unittest.TestCase ) :
                          filteredEventIds['nanoseconds'][0]==107587445 and
                          filteredEventIds['nanoseconds'][1]==174323092, 
                         msg="time dataset not right in Filtered:0000/time")
-        filteredMsgs = map(str,f['/Configure:0000/Run:0000/Filtered:0000/std::string/mytest/data'])
+        filteredMsgs = map(str,f['/Configure:0000/Run:0000/Filtered:0000/std::string/noSrc__mytest/data'])
         self.assertEqual(filteredMsgs[0],msg0)
         self.assertEqual(filteredMsgs[1],msg1)
-        filteredMsgsEventIds = f['/Configure:0000/Run:0000/Filtered:0000/std::string/mytest/time']
+        filteredMsgsEventIds = f['/Configure:0000/Run:0000/Filtered:0000/std::string/noSrc__mytest/time']
         self.assertTrue(len(filteredMsgsEventIds)==2 and
                         filteredMsgsEventIds['seconds'][0]==1364147551 and
                          filteredMsgsEventIds['seconds'][1]==1364147551 and
                          filteredMsgsEventIds['nanoseconds'][0]==107587445 and
                          filteredMsgsEventIds['nanoseconds'][1]==174323092, 
-                        msg="time dataset not right in Filtered:0000/std::string/mytest/time")
+                        msg="time dataset not right in Filtered:0000/std::string/noSrc__mytest/time")
         # we don't write damage to the filtered groups:
         with self.assertRaises(KeyError):
-            f['/Configure:0000/Run:0000/Filtered:0000/std::string/mytest/_damage']
+            f['/Configure:0000/Run:0000/Filtered:0000/std::string/noSrc__mytest/_damage']
         with self.assertRaises(KeyError):
-            f['/Configure:0000/Run:0000/Filtered:0000/std::string/mytest/_mask']
+            f['/Configure:0000/Run:0000/Filtered:0000/std::string/noSrc__mytest/_mask']
 
         if self.cleanUp:
             os.unlink(output_h5)
@@ -703,12 +703,12 @@ class H5Output( unittest.TestCase ) :
         self.runPsanaOnCfg(cfgfile,output_h5)
         f=h5py.File(output_h5,'r')
 
-        double3D = f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/my_double3D/data'][...]
-        float2Da = f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/my_float2Da/data'][...]
-        float2Db = f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/my_float2Db/data'][...]
-        int1D = f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/my_int1D/data'][...]
-        str1=f['/Configure:0000/Run:0000/CalibCycle:0000/std::string/my_string1/data'][...]
-        str2=f['/Configure:0000/Run:0000/CalibCycle:0000/std::string/my_string2/data'][...]
+        double3D = f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/noSrc__my_double3D/data'][...]
+        float2Da = f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/noSrc__my_float2Da/data'][...]
+        float2Db = f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/noSrc__my_float2Db/data'][...]
+        int1D = f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/noSrc__my_int1D/data'][...]
+        str1=f['/Configure:0000/Run:0000/CalibCycle:0000/std::string/noSrc__my_string1/data'][...]
+        str2=f['/Configure:0000/Run:0000/CalibCycle:0000/std::string/noSrc__my_string2/data'][...]
 
         output="double3D:\n%r\nfloat2Da:\n%r\nfloat2Db:\n%r\nint1D:\n%r\nstr1:\n%r\nstr2:\n%r\n" % (double3D, float2Da, float2Db, int1D, str1, str2)
         self.assertEqual(output,NDARRAY_2EVENTS, "output of all nd arrays wrong,\n *** expected: ***\n%s\n*** produced: ***\n%s\n" % (NDARRAY_2EVENTS, output))
@@ -730,17 +730,17 @@ class H5Output( unittest.TestCase ) :
 
         # none of the ndarrays or strings should be in here:
         with self.assertRaises(KeyError):
-            f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/my_double3D']
+            f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/noSrc__my_double3D']
         with self.assertRaises(KeyError):
-            f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/my_float2Da']
+            f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/noSrc__my_float2Da']
         with self.assertRaises(KeyError):
-            f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/my_float2Db']
+            f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/noSrc__my_float2Db']
         with self.assertRaises(KeyError):
-            f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/my_int1D']
+            f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/noSrc__my_int1D']
         with self.assertRaises(KeyError):
-            f['/Configure:0000/Run:0000/CalibCycle:0000/std::string/my_string1']
+            f['/Configure:0000/Run:0000/CalibCycle:0000/std::string/noSrc__my_string1']
         with self.assertRaises(KeyError):
-            f['/Configure:0000/Run:0000/CalibCycle:0000/std::string/my_string2']
+            f['/Configure:0000/Run:0000/CalibCycle:0000/std::string/noSrc__my_string2']
 
         if self.cleanUp:
             os.unlink(output_h5)
@@ -759,15 +759,15 @@ class H5Output( unittest.TestCase ) :
 
         # now these should not be here
         with self.assertRaises(KeyError):
-            f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/my_int1D']
+            f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/noSrc__my_int1D']
         with self.assertRaises(KeyError):
-            f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/my_float2Da']
+            f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/noSrc__my_float2Da']
         with self.assertRaises(KeyError):
-            f['/Configure:0000/Run:0000/CalibCycle:0000/std::string/my_string1']
+            f['/Configure:0000/Run:0000/CalibCycle:0000/std::string/noSrc__my_string1']
         # but these should
-        self.assertEqual(len(f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/my_double3D/data']),2)
-        self.assertEqual(len(f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/my_float2Db/data']),2)
-        self.assertEqual(len(f['/Configure:0000/Run:0000/CalibCycle:0000/std::string/my_string2/data']),2)
+        self.assertEqual(len(f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/noSrc__my_double3D/data']),2)
+        self.assertEqual(len(f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/noSrc__my_float2Db/data']),2)
+        self.assertEqual(len(f['/Configure:0000/Run:0000/CalibCycle:0000/std::string/noSrc__my_string2/data']),2)
 
         if self.cleanUp:
             os.unlink(output_h5)
@@ -786,16 +786,16 @@ class H5Output( unittest.TestCase ) :
 
         # now these should not be here
         with self.assertRaises(KeyError):
-            f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/my_double3D']
+            f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/noSrc__my_double3D']
         with self.assertRaises(KeyError):
-            f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/my_float2Db']
+            f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/noSrc__my_float2Db']
         with self.assertRaises(KeyError):
-            f['/Configure:0000/Run:0000/CalibCycle:0000/std::string/my_string2']
+            f['/Configure:0000/Run:0000/CalibCycle:0000/std::string/noSrc__my_string2']
 
         # but these should
-        self.assertEqual(len(f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/my_int1D/data']),2)
-        self.assertEqual(len(f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/my_float2Da/data']),2)
-        self.assertEqual(len(f['/Configure:0000/Run:0000/CalibCycle:0000/std::string/my_string1/data']),2)
+        self.assertEqual(len(f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/noSrc__my_int1D/data']),2)
+        self.assertEqual(len(f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/noSrc__my_float2Da/data']),2)
+        self.assertEqual(len(f['/Configure:0000/Run:0000/CalibCycle:0000/std::string/noSrc__my_string1/data']),2)
 
         if self.cleanUp:
             os.unlink(output_h5)
@@ -864,15 +864,16 @@ class H5Output( unittest.TestCase ) :
                                moduleList='Translator.TestNewHdfWriter Translator.H5Output')
         cfgfile.file.flush()
         self.runPsanaOnCfg(cfgfile,output_h5)
+        os.system('cp %s newwriter.cfg' % cfgfile.name)
         f=h5py.File(output_h5,'r')
             
-        MyData = f['/Configure:0000/Run:0000/CalibCycle:0000/Translator::MyData/Translator.TestNewHdfWriter/data']
+        MyData = f['/Configure:0000/Run:0000/CalibCycle:0000/Translator::MyData/noSrc__Translator.TestNewHdfWriter/data']
         self.assertEqual(len(MyData),2)
         self.assertEqual(MyData['eventCounter'][0],1)
         self.assertEqual(MyData['eventCounter'][1],2)
 
-        if self.cleanUp:
-            os.unlink(output_h5)
+#        if self.cleanUp:
+#            os.unlink(output_h5)
 
     def test_type_filter(self):
         '''check that the type_filter switch works
@@ -897,7 +898,7 @@ class H5Output( unittest.TestCase ) :
         cfgfile.file.flush()
         self.runPsanaOnCfg(cfgfile,output_file)
         h5 = h5py.File(output_file,'r')
-        nddata = h5['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/my_double3D/data']
+        nddata = h5['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/noSrc__my_double3D/data']
         self.assertEqual(len(nddata),2)
 
         # now check that type_filter will pick out a few types:
@@ -1007,7 +1008,6 @@ class H5Output( unittest.TestCase ) :
         # check that if we turn off aliases, we do not see them:
         cfgfile = writeCfgFile(input_file, output_h5)
         cfgfile.write("create_alias_links=false\n")
-        cfgfile.flush()
         self.runPsanaOnCfg(cfgfile,output_h5, extraOpts='-n 10', printPsanaOutput=self.printPsanaOutput)
         cfgfile.close()
         cmd = 'h5ls -r %s | grep "acq02\|acq01"' % output_h5
@@ -1021,7 +1021,6 @@ class H5Output( unittest.TestCase ) :
         # check that if we uses aliases in the src_filter option, that it works
         cfgfile = writeCfgFile(input_file, output_h5)
         cfgfile.write("src_filter=exclude acq01 acq02\n")
-        cfgfile.flush()
         self.runPsanaOnCfg(cfgfile,output_h5, extraOpts='-n 10', printPsanaOutput=self.printPsanaOutput)
         cfgfile.close()
         cmd = 'h5ls -r %s | grep "SxrEndstation.0:Acqiris.0\|SxrEndstation.0:Acqiris.2"' % output_h5
@@ -1042,7 +1041,6 @@ class H5Output( unittest.TestCase ) :
         output_h5 = os.path.join(OUTDIR,"unit-test_xpptut13_r71.h5")
         cfgfile = writeCfgFile(input_file, output_h5, moduleList="cspad_mod.CsPadCalib Translator.H5Output")
         cfgfile.write("deflate = -1\n")
-        cfgfile.flush()
         self.runPsanaOnCfg(cfgfile,output_h5, extraOpts='-n 2',printPsanaOutput=self.printPsanaOutput)
         cfgfile.close()
         f = h5py.File(output_h5,'r')

@@ -48,8 +48,7 @@ class H5GroupNames {
    *   @li no spaces or asterick's are returned.
    *   @li any src where the level is Control returns "Control"
    *   @li any src where the level is Event return "Event"
-   *   @li the special value noSource return "noSrc"
-   *   @li the special value anySource returns "anySrc"
+   *   @li the special values noSource and anySource return "noSrc"
    *
    * @param[in] src the Pds::Src for the group
    * @return non empty string name for the h5 group
@@ -59,15 +58,12 @@ class H5GroupNames {
   /**
    * @brief returns h5 group name for a Pds::Src and key
    *
-   * The H5 group name for a src,key pair is a concatenation
-   * of the two. A special string is used to separate the src
-   * from the key in the concatenation. The key string checked
-   * for the "do not translate" string, as well as for characters
-   * that are problemeatic for h5 filenames. The cleaned key string
-   * is used in the group name. 
-   *
-   * If the src is anySource or noSource, and there is a valid
-   * key string, then just the key string is returned.
+   * If the key is empty, just the src is returned. For a non empty
+   * key, the H5 group name is a concatenation of the two. A special 
+   * string is used to separate the src from the key in the concatenation. 
+   * The key string checked for the "do not translate" string, as well as 
+   * for characters that are problemeatic for h5 filenames. The cleaned key 
+   * string is used in the group name. 
    *
    * @param[in] src the Pds::Src for the group
    * @param[in] key the key string for the group
@@ -78,8 +74,8 @@ class H5GroupNames {
   /**
    * @brief returns h5 group name for a alias string and key
    *
-   * The H5 group name for a alias,key pair is a concatenation
-   * of the two. If the alias is empty, and empty string is returned.
+   * If the alias is empty, and empty string is returned. Otherwise the H5 
+   * group name for an alias,key pair is a concatenation of the two. 
    * Otherwise, a special string is used to separate the src
    * from the key in the concatenation. It the alias itself contains this
    * special substring, a warning is printed and an empty string is returned.
