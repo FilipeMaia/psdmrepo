@@ -16,6 +16,10 @@ using namespace std;
 
 namespace {
 
+  const std::string srcKeySepStr = "__";
+
+  const char * logger = "H5GroupNames";
+
   std::string strDetInfo(const Pds::DetInfo& src, bool detInfoSpecialAsAstrerik)
   {
     std::ostringstream str ;
@@ -65,23 +69,13 @@ namespace {
     return str.str();
   }
 
-  /**
-   * srcName and the functions strDetInfo nand  strBldInfo above are based on the code
-   * in PSEvt::EventKey.cpp, but adapted for Translation.
-   * Calling the function as 
-   *     srcName(src,true,true)
-   * mimics PSEvt::srcName, and calling the function as
-   *     srcName(src,false,false)
-   * gives the src names for translation.
-   * when the flags are true, you can get a space ' ', or an asterick '*' in the 
-   * src name, which we do not want for translation. 
-   * Another difference is that this function checks if the src level is Event.
-   * if so, it returns Event.
-   */
   std::string srcName(const Pds::Src& src, bool procPidSpaceSepAtEnd, bool detInfoSpecialAsAstrerik)
   {
-    if ((src == PSEvt::EventKey::anySource()) or (src == PSEvt::EventKey::noSource())) return "";
-    if (src.level() == Pds::Level::Source) {
+    if (src == PSEvt::EventKey::noSource()) {
+      return std::string("noSrc");
+    } else if (src == PSEvt::EventKey::anySource()) {
+      return std::string("anySrc");
+    } else if (src.level() == Pds::Level::Source) {
       return ::strDetInfo(static_cast<const Pds::DetInfo&>(src),detInfoSpecialAsAstrerik);
     } else if (src.level() == Pds::Level::Reporter) {
       return ::strBldInfo(static_cast<const Pds::BldInfo&>(src));
@@ -89,9 +83,6 @@ namespace {
       return std::string("Control");
     } else if (src.level() == Pds::Level::Event) {
       return std::string("Event");
-    } else if (src.level() == Pds::Level::NumberOfLevels) {
-      // special match-anything source, empty string
-      return std::string();
     }
     return ::strProcInfo(static_cast<const Pds::ProcInfo&>(src),procPidSpaceSepAtEnd);
   }
@@ -168,18 +159,42 @@ string H5GroupNames::nameForSrc(const Pds::Src &src) {
 }
 
 std::string H5GroupNames::nameForSrcKey(const Pds::Src &src, const std::string &key) {
-  string srcKeyGroupName = nameForSrc(src);
   string keyStringToAddOrig;
   hasDoNotTranslatePrefix(key,&keyStringToAddOrig);
   string keyStringToAdd = replaceCharactersThatAreBadForH5GroupNames(keyStringToAddOrig);
-  if (keyStringToAdd.size()>0) {
-    if (srcKeyGroupName.size()>0) srcKeyGroupName += "_";
-    srcKeyGroupName += keyStringToAdd;
+  bool notSpecificSource = ((src == PSEvt::EventKey::anySource()) or 
+                            (src == PSEvt::EventKey::noSource()));
+  if ((keyStringToAdd.size()>0) and (notSpecificSource)) {
+    return keyStringToAdd;
   }
-  if (srcKeyGroupName.size()==0) {
-    srcKeyGroupName = "no_src";
+  string srcKeyGroupName = nameForSrc(src); // should always be non-zero length
+  if (keyStringToAdd.size()>0) {
+    return srcKeyGroupName + srcKeySep() + keyStringToAdd;
   }
   return srcKeyGroupName;
+}
+
+std::string H5GroupNames::nameForAliasKey(const std::string &alias, const std::string &key) {
+  string aliasClean = replaceCharactersThatAreBadForH5GroupNames(alias);
+  if (aliasClean.size() == 0) return "";
+  size_t sepPos = aliasClean.find(srcKeySep());
+  if (sepPos != string::npos) {
+    MsgLog(logger,warning,"alias: " << aliasClean << " (after H5 clean) "
+           << " includes the src key separation string: " << srcKeySep() 
+           << " so no soft link will be created with it.");
+    return "";
+  }
+  string keyStringToAddOrig;
+  hasDoNotTranslatePrefix(key,&keyStringToAddOrig);
+  string keyStringToAdd = replaceCharactersThatAreBadForH5GroupNames(keyStringToAddOrig);  
+  if (keyStringToAdd.size()>0) {
+    return aliasClean + srcKeySep() + keyStringToAdd;
+  }
+  return aliasClean;
+}
+
+std::string H5GroupNames::srcKeySep() {
+  return ::srcKeySepStr;
 }
 
 } // namespace Translator

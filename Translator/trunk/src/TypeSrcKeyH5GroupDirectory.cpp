@@ -271,18 +271,18 @@ SrcKeyGroup & TypeSrcKeyH5GroupDirectory::addSrcKeyGroup(const PSEvt::EventKey &
   const string &key = eventKey.key();
   SrcKeyPair srcStrPair = make_pair(src,key);
   string srcKeyGroupName = m_h5GroupNames->nameForSrcKey(src,key);
-  string srcAlias = getAlias(src);
+  string aliasKeyGroupName = m_h5GroupNames->nameForAliasKey(getAlias(src),key);
   hdf5pp::Group typeH5Group = typeGroup.group();
   hdf5pp::Group srcH5Group = typeH5Group.createGroup(srcKeyGroupName);
-  if (srcAlias.size()>0) {
+  if (aliasKeyGroupName.size()>0) {
     herr_t err = H5Lcreate_soft(srcKeyGroupName.c_str(), 
-                                typeH5Group.id(), srcAlias.c_str(), H5P_DEFAULT, H5P_DEFAULT);
+                                typeH5Group.id(), aliasKeyGroupName.c_str(), H5P_DEFAULT, H5P_DEFAULT);
     if (err<0) {
-      MsgLog(logger, error, "Failed to create alias=" << srcAlias 
+      MsgLog(logger, error, "Failed to create alias=" << aliasKeyGroupName
              << " for target=" << srcKeyGroupName 
              << " relative to type group=" << hdf5util::objectName(typeH5Group.id()));
     } else {
-      MsgLog(logger,trace, "Created alias=" << srcAlias
+      MsgLog(logger,trace, "Created alias=" << aliasKeyGroupName
              << " for target=" << srcKeyGroupName
              << " relative to type group=" << hdf5util::objectName(typeH5Group.id()));
     }

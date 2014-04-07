@@ -35,7 +35,7 @@ HdfWriterEventId::HdfWriterEventId() : m_writer("eventId") {
 HdfWriterEventId::~HdfWriterEventId() {
   herr_t status = H5Tclose(m_h5typeId);
   if (status<0) MsgLog(logger,error,"error closing type");
-  MsgLog(logger,trace,"Closed hdf5 type for EventId " << m_h5typeId);
+  MsgLog(logger,trace,"Closed hdf5 type for EventId (" << m_h5typeId << ")");
 }
 
 void HdfWriterEventId::make_dataset(hdf5pp::Group & group)

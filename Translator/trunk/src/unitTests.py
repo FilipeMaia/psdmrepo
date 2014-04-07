@@ -673,22 +673,22 @@ class H5Output( unittest.TestCase ) :
                          filteredEventIds['nanoseconds'][0]==107587445 and
                          filteredEventIds['nanoseconds'][1]==174323092, 
                         msg="time dataset not right in Filtered:0000/time")
-        filteredMsgs = map(str,f['/Configure:0000/Run:0000/Filtered:0000/std::string/no_src/data'])
+        filteredMsgs = map(str,f['/Configure:0000/Run:0000/Filtered:0000/std::string/noSrc/data'])
         self.assertEqual(filteredMsgs[0],msg0)
         self.assertEqual(filteredMsgs[1],msg1)
-        filteredMsgsEventIds = f['/Configure:0000/Run:0000/Filtered:0000/std::string/no_src/time']
+        filteredMsgsEventIds = f['/Configure:0000/Run:0000/Filtered:0000/std::string/noSrc/time']
         self.assertTrue(len(filteredMsgsEventIds)==2 and
                         filteredMsgsEventIds['seconds'][0]==1364147551 and
                          filteredMsgsEventIds['seconds'][1]==1364147551 and
                          filteredMsgsEventIds['nanoseconds'][0]==107587445 and
                          filteredMsgsEventIds['nanoseconds'][1]==174323092, 
-                        msg="time dataset not right in Filtered:0000/std::string/no_src/time")
+                        msg="time dataset not right in Filtered:0000/std::string/noSrc/time")
 
         # we don't write damage to the filtered groups:
         with self.assertRaises(KeyError):
-            f['/Configure:0000/Run:0000/Filtered:0000/std::string/no_src/_damage']
+            f['/Configure:0000/Run:0000/Filtered:0000/std::string/noSrc/_damage']
         with self.assertRaises(KeyError):
-            f['/Configure:0000/Run:0000/Filtered:0000/std::string/no_src/_mask']
+            f['/Configure:0000/Run:0000/Filtered:0000/std::string/noSrc/_mask']
 
         if self.cleanUp:
             os.unlink(output_h5)
