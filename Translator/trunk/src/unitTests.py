@@ -864,16 +864,14 @@ class H5Output( unittest.TestCase ) :
                                moduleList='Translator.TestNewHdfWriter Translator.H5Output')
         cfgfile.file.flush()
         self.runPsanaOnCfg(cfgfile,output_h5)
-        os.system('cp %s newwriter.cfg' % cfgfile.name)
-        f=h5py.File(output_h5,'r')
-            
+        f=h5py.File(output_h5,'r')            
         MyData = f['/Configure:0000/Run:0000/CalibCycle:0000/Translator::MyData/noSrc__Translator.TestNewHdfWriter/data']
         self.assertEqual(len(MyData),2)
         self.assertEqual(MyData['eventCounter'][0],1)
         self.assertEqual(MyData['eventCounter'][1],2)
 
-#        if self.cleanUp:
-#            os.unlink(output_h5)
+        if self.cleanUp:
+            os.unlink(output_h5)
 
     def test_type_filter(self):
         '''check that the type_filter switch works
