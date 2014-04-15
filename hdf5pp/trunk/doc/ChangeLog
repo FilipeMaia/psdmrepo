@@ -11,6 +11,12 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-07-06
+2014-04-15 David Schneider
+- more detailed diagnostic for HDwrite and H5Dread calls.
+- Add type traits for long double.
+- add function and enum to wrap H5Pset_close_degree.
+
 Tag: V00-07-05
 2013-12-19 Andy Salnikov
 - small optimization in Group::hasChild() method

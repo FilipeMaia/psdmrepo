@@ -101,8 +101,13 @@ DataSet::_store(const Type& memType,
                 const DataSpace& fileDspc,
                 const void* data)
 {
+  
   herr_t stat = H5Dwrite( *m_id, memType.id(), memDspc.id(), fileDspc.id(), H5P_DEFAULT, data ) ;
-  if ( stat < 0 ) throw Hdf5CallException( ERR_LOC, "H5Dwrite" ) ;
+  if ( stat < 0 ) {
+    MsgLog(logger, error, "H5Dwrite failed, h5 type for memory: " 
+           << memType << " h5 type for file: " << type() << " dataset name: " << name());
+      throw Hdf5CallException( ERR_LOC, "H5Dwrite" ) ;
+    }
 }
 
 // read the data
@@ -114,7 +119,8 @@ DataSet::_read(const Type& memType,
 {
   herr_t stat = H5Dread(*m_id, memType.id(), memDspc.id(), fileDspc.id(), H5P_DEFAULT, data);
   if ( stat < 0 ) {
-    MsgLog(logger, debug, "H5Dread failed, memtype = " << memType);
+    MsgLog(logger, error, "H5Dread failed, h5 type for memory: " 
+           << memType << " h5 type for file: " << type() << " dataset name: " << name());
     throw Hdf5CallException( ERR_LOC, "H5Dread" ) ;
   }
 }

@@ -51,6 +51,8 @@ namespace hdf5pp {
 class PListFileAccess  {
 public:
 
+  enum CloseDegree {CloseWeak, CloseSemi, CloseStrong, CloseDefault};
+
   // Default constructor
   PListFileAccess () ;
 
@@ -65,6 +67,9 @@ public:
 
   // define chunk cache parameters, see for parameter documentation
   void set_cache(size_t rdcc_nelmts, size_t rdcc_nbytes, double rdcc_w0 = 0.75);
+
+  /// set file close degree
+  void set_fclose_degree(CloseDegree degree);
 
 protected:
 
