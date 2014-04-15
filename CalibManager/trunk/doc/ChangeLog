@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-32	
+2014-04-14 Mikhail S. Dubrovin
+- cleanup edi_from in in GUIFileManagerGroupControl
+	
 Tag: V00-00-31
 2014-04-14 Mikhail S. Dubrovin
 - in GUIFileManagerGroup add slider to change GUIDirTree-window hor-size (in order to see long file names)

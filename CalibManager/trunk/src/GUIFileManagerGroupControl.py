@@ -197,8 +197,6 @@ class GUIFileManagerGroupControl ( QtGui.QWidget ) :
 
     def resetFields(self) :
         self.setParams()
-        self.edi_from  .setText(self.str_run_from)
-        self.edi_to    .setText(self.str_run_to)
         self.setStyleButtons()
         self.guirunrange.resetFields()
 
