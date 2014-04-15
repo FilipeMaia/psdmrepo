@@ -11,6 +11,22 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-31
+2014-04-14 Mikhail S. Dubrovin
+- in GUIFileManagerGroup add slider to change GUIDirTree-window hor-size (in order to see long file names)
+- in CalibFileFinder remove run number 0 from the list_of_ends (protection against "0-0" range)
+- in GUIDarkListItemRun, GUIFileManagerGroupControl, and GUIFileManagerSingleControl
+	use widget GUIRunRange. Cleanup old stuff.
+- in GUIRunRange.getRunRange() 
+	- do not strip ALL '0' for run 0 (protection against "-end.data" file name).
+        - add protection if run_begin > run_end (red-color, warniong message, and begin-begin at return)  
+- move common deployment methods from GUIDarkListItemRun.py to FileDeployer.py (needs them for command line)
+- add src/CommandLineCalib.py and app/calibrun - new command-line calibration
+- in GUIDarkList.onItemClick - get and use correct list of parameters for 
+	widg.updateButtons(self.type, self.comment, self.xtc_in_dir)
+- in GUIConfig, GUIMetrology - cosmetic tuning of window size
+- in GUIDarkListItem add getStrRunNum(), getRunNum()
+	
 Tag: V00-00-30
 2014-04-07 Mikhail S. Dubrovin
 - in PackageVersions fix hangout at tmp files cleanup

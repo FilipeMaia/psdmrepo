@@ -43,11 +43,11 @@ class GUIConfigPars ( QtGui.QWidget ) :
     #----------------
     def __init__ ( self, parent=None ) :
         QtGui.QWidget.__init__(self, parent)
-        self.setGeometry(200, 400, 500, 250)
+        self.setGeometry(200, 400, 500, 200)
         self.setWindowTitle('Configuration Parameters')
         self.setFrame()
 
-        self.tit_dir_work = QtGui.QLabel('Parameters:')
+        #self.tit_dir_work = QtGui.QLabel('Parameters:')
 
         self.edi_dir_work = QtGui.QLineEdit( cp.dir_work.value() )        
         self.but_dir_work = QtGui.QPushButton('Dir work:')
@@ -92,7 +92,7 @@ class GUIConfigPars ( QtGui.QWidget ) :
 
         self.grid = QtGui.QGridLayout()
         self.grid_row = 0
-        self.grid.addWidget(self.tit_dir_work,      self.grid_row,   0, 1, 9)
+        #self.grid.addWidget(self.tit_dir_work,      self.grid_row,   0, 1, 9)
         self.grid.addWidget(self.but_dir_work,      self.grid_row+1, 0)
         self.grid.addWidget(self.edi_dir_work,      self.grid_row+1, 1, 1, 8)
         self.grid.addWidget(self.but_dir_results,   self.grid_row+2, 0)
@@ -101,6 +101,8 @@ class GUIConfigPars ( QtGui.QWidget ) :
         self.grid.addWidget(self.edi_fname_prefix,  self.grid_row+3, 1, 1, 4)
         self.grid.addWidget(self.lab_bat_queue,     self.grid_row+4, 0)
         self.grid.addWidget(self.box_bat_queue,     self.grid_row+4, 1)
+        self.grid.addWidget(self.but_lsf_status,    self.grid_row+4, 4) #, 1, 2)
+        self.grid.addWidget(self.but_show_vers,     self.grid_row+4, 5) #, 1, 2)
         self.grid.addWidget(self.lab_dark_start,    self.grid_row+5, 0)
         self.grid.addWidget(self.edi_dark_start,    self.grid_row+5, 1)
         self.grid.addWidget(self.lab_dark_end,      self.grid_row+5, 3)
@@ -112,8 +114,6 @@ class GUIConfigPars ( QtGui.QWidget ) :
         self.grid.addWidget(self.edi_min_thr,       self.grid_row+7, 1, 1, 2)
         self.grid.addWidget(self.lab_max_thr,       self.grid_row+7, 3)
         self.grid.addWidget(self.edi_max_thr,       self.grid_row+7, 4, 1, 2)
-        self.grid.addWidget(self.but_show_vers,     self.grid_row+8, 0, 1, 2)
-        self.grid.addWidget(self.but_lsf_status,    self.grid_row+8, 1, 1, 2)
 
         #self.setLayout(self.grid)
 
@@ -166,7 +166,7 @@ class GUIConfigPars ( QtGui.QWidget ) :
         self.setMinimumSize(500,240)
         self.setMaximumSize(700,240)
 
-        self.tit_dir_work     .setStyleSheet (cp.styleTitle)
+        #self.tit_dir_work     .setStyleSheet (cp.styleTitle)
         self.edi_dir_work     .setStyleSheet (cp.styleEditInfo)       
         self.but_dir_work     .setStyleSheet (cp.styleButton) 
         self.edi_dir_results  .setStyleSheet (cp.styleEditInfo)       
@@ -183,7 +183,7 @@ class GUIConfigPars ( QtGui.QWidget ) :
         self.but_show_vers    .setStyleSheet (cp.styleButton) 
         self.but_lsf_status   .setStyleSheet (cp.styleButton) 
 
-        self.tit_dir_work    .setAlignment (QtCore.Qt.AlignLeft)
+        #self.tit_dir_work    .setAlignment (QtCore.Qt.AlignLeft)
         self.edi_dir_work    .setAlignment (QtCore.Qt.AlignRight)
         self.edi_dir_results .setAlignment (QtCore.Qt.AlignRight)
         self.lab_fname_prefix.setAlignment (QtCore.Qt.AlignRight)

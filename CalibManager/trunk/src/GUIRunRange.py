@@ -45,27 +45,36 @@ class GUIRunRange ( QtGui.QWidget ) :
     @see OtherClass
     """
 
-    def __init__ (self, parent=None) :
+    def __init__ (self, parent=None, str_run_from=None, str_run_to=None, txt_from='valid from') :
 
         QtGui.QWidget.__init__(self, parent)
 
-        self.setGeometry(10, 25, 250, 40)
+        if txt_from == '' :
+            self.setGeometry(10, 25, 140, 40)
+            self.use_lab_from = False
+        else :
+            self.setGeometry(10, 25, 200, 40)
+            self.use_lab_from = True
+
         self.setWindowTitle('Run range setting GUI')
 
         self.setFrame()
 
-        self.setParams()
- 
-        self.lab_from       = QtGui.QLabel('valid from run')
+        self.setParams(str_run_from, str_run_to)
+
+        self.txt_from = txt_from
+        if self.use_lab_from : self.lab_from = QtGui.QLabel(txt_from)
         self.lab_to         = QtGui.QLabel('to')
         self.edi_from       = QtGui.QLineEdit  ( self.str_run_from )
         self.edi_to         = QtGui.QLineEdit  ( self.str_run_to )
 
         self.edi_from.setValidator(QtGui.QIntValidator(0,9999,self))
-        self.edi_to  .setValidator(QtGui.QRegExpValidator(QtCore.QRegExp("[0-9]\\d{0,3}|end$"),self))
+        self.edi_to  .setValidator(QtGui.QRegExpValidator(QtCore.QRegExp("[1-9]|[1-9][0-9]|[1-9][0-9][0-9]|[1-9][0-9][0-9][0-9]|end$"),self))
+        #self.edi_to  .setValidator(QtGui.QRegExpValidator(QtCore.QRegExp("[0-9]\\d{0,3}|end$"),self))
  
-        self.hboxC = QtGui.QHBoxLayout() 
-        self.hboxC.addWidget( self.lab_from )
+        self.hboxC = QtGui.QHBoxLayout()
+        self.hboxC.addStretch(1)     
+        if self.use_lab_from : self.hboxC.addWidget( self.lab_from )
         self.hboxC.addWidget( self.edi_from )
         self.hboxC.addWidget( self.lab_to )
         self.hboxC.addWidget( self.edi_to )
@@ -84,7 +93,7 @@ class GUIRunRange ( QtGui.QWidget ) :
         self.showToolTips()
         self.setStyle()
 
-        cp.guirunrange = self
+        # cp.guirunrange = self # DO NOT REGISTER THIS OBJECT! There may be many instances in the list of runs...
 
 
     #-------------------
@@ -107,27 +116,51 @@ class GUIRunRange ( QtGui.QWidget ) :
 
     def setStyle(self):
         self.          setStyleSheet(cp.styleBkgd)
-        
-        self.setMinimumSize(225,32)
+
+        if self.use_lab_from :
+            self.setMinimumSize(200,32)
+        else :
+            self.setMinimumSize(100,32)
+
         #self.setFixedHeight(40)
-        self.setContentsMargins (QtCore.QMargins(0,-9,0,-9))
+        self.setContentsMargins (QtCore.QMargins(-9,-9,-9,-9))
 
         self.edi_from.setFixedWidth(40)
         self.edi_to  .setFixedWidth(40)
 
-        self.lab_from  .setStyleSheet(cp.styleLabel)
+        self.edi_from .setAlignment (QtCore.Qt.AlignRight)
+        self.edi_to   .setAlignment (QtCore.Qt.AlignRight)
+
+        if self.use_lab_from : self.lab_from  .setStyleSheet(cp.styleLabel)
         self.lab_to    .setStyleSheet(cp.styleLabel)
  
         self.setStyleButtons()
 
 
+    def statusButtonsIsGood(self):
+        if self.str_run_to == 'end' : return True
+
+        if int(self.str_run_from) > int(self.str_run_to) :
+            msg  = 'Begin run number %s exceeds the end run number %s' % (self.str_run_from, self.str_run_to)
+            msg += '\nRUN RANGE SEQUENCE SHOULD BE FIXED !!!!!!!!'
+            logger.warning(msg, __name__ )            
+            return False
+
+        return True
+
+
     def setStyleButtons(self):
-        pass
+        if self.statusButtonsIsGood() :
+            self.edi_from.setStyleSheet(cp.styleEdit)
+            self.edi_to  .setStyleSheet(cp.styleEdit)
+        else :
+            self.edi_from.setStyleSheet(cp.styleEditBad)
+            self.edi_to  .setStyleSheet(cp.styleEditBad)
 
 
-    def setParams(self) :
-        self.str_run_from = '0'
-        self.str_run_to   = 'end'
+    def setParams(self, str_run_from, str_run_to) :
+        self.str_run_from = str_run_from if str_run_from is not None else '0'
+        self.str_run_to   = str_run_to   if str_run_to is not None else 'end'
 
 
     def resizeEvent(self, e):
@@ -147,7 +180,7 @@ class GUIRunRange ( QtGui.QWidget ) :
 
     def closeEvent(self, event):
         logger.debug('closeEvent', __name__)
-        cp.guirunrange = None
+        # cp.guirunrange = None 
 
 
     def onEdiFrom(self):
@@ -155,6 +188,7 @@ class GUIRunRange ( QtGui.QWidget ) :
         self.str_run_from = str( self.edi_from.displayText() )        
         msg = 'Set the run validity range from %s' % self.str_run_from
         logger.info(msg, __name__ )
+        self.setStyleButtons()
 
 
     def onEdiTo(self):
@@ -162,19 +196,24 @@ class GUIRunRange ( QtGui.QWidget ) :
         self.str_run_to = str( self.edi_to.displayText() )        
         msg = 'Set the run validity range up to %s' % self.str_run_to
         logger.info(msg, __name__ )
+        self.setStyleButtons()
 
 
-    def setFieldsEnable(self, is_enable=True):
+    def setFieldsEnable(self, is_enabled=True):
         """Interface method enabling/disabling the edit fields"""
-        if is_enable :
-            self.edi_from.setStyleSheet(cp.styleEdit)
-            self.edi_to  .setStyleSheet(cp.styleEdit)
+        if is_enabled :
+            self.setStyleButtons()
+            #self.edi_from.setStyleSheet(cp.styleEdit)
+            #self.edi_to  .setStyleSheet(cp.styleEdit)
         else :
             self.edi_from.setStyleSheet(cp.styleEditInfo)
             self.edi_to  .setStyleSheet(cp.styleEditInfo)
 
-        self.edi_from.setEnabled(is_enable) 
-        self.edi_to  .setEnabled(is_enable) 
+        self.edi_from.setEnabled(is_enabled) 
+        self.edi_to  .setEnabled(is_enabled) 
+
+        self.edi_from .setReadOnly(not is_enabled)
+        self.edi_to   .setReadOnly(not is_enabled)
 
 
     def resetFields(self) :
@@ -187,13 +226,20 @@ class GUIRunRange ( QtGui.QWidget ) :
 
     def getRunRange(self) :
         """Interface method returning run range string, for example '123-end' """
-        return self.str_run_from + '-' + self.str_run_to
+        if self.statusButtonsIsGood() :
+            return '%d-%s' % ( int(self.str_run_from),
+                                   self.str_run_to.lstrip('0') )
+        else :
+            return '%d-%d' % ( int(self.str_run_from), int(self.str_run_from) )
+
+        #return self.str_run_from + '-' + self.str_run_to
 
 #-----------------------------
 
 if __name__ == "__main__" :
     app = QtGui.QApplication(sys.argv)
-    ex  = GUIRunRange()
+    ex  = GUIRunRange(None,'0','end','')
+    #ex  = GUIRunRange(None,'0','end')
     ex.move(10,25)
     ex.show()
     app.exec_()

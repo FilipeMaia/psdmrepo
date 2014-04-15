@@ -230,14 +230,15 @@ class ConfigParameters :
 #---------------------------------------
 
     def printParameters( self ) :
-        msg = 'printParameters - Number of declared parameters in the dict: %d' % len(self.dict_pars)
+        msg = self.getTextParameters()
         logger.info(msg, self.name)
-        #print msg
 
-        for par in self.dict_pars.values() :
-            s = par.strParInfo()
-            logger.info( s )
-            #print s
+#---------------------------------------
+
+    def getTextParameters( self ) :
+        txt = 'printParameters - Number of declared parameters in the dict: %d\n' % len(self.dict_pars)
+        list_of_recs = [par.strParInfo() for par in self.dict_pars.values()]
+        return txt + '  ' + '\n  '.join(list_of_recs)
 
 #---------------------------------------
 
@@ -252,6 +253,11 @@ class ConfigParameters :
             self.fname = self.fname_cp
         else :
             self.fname = fname
+
+#---------------------------------------
+
+    def getParsFileName ( self ) :
+        return self.fname
 
 #---------------------------------------
 

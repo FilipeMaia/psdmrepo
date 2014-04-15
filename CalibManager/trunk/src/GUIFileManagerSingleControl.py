@@ -51,6 +51,7 @@ import RegDBUtils      as     ru
 from GUIFileBrowser         import *
 from PlotImgSpe             import *
 from FileDeployer           import fd
+from GUIRunRange            import *
 
 #---------------------
 #  Class definition --
@@ -61,8 +62,8 @@ class GUIFileManagerSingleControl ( QtGui.QWidget ) :
     @see BaseClass
     @see OtherClass
     """
-    char_expand    = u' \u25BC' # down-head triangle
-    #char_expand    = '' # down-head triangle
+    char_expand = cp.char_expand
+    #char_expand = '' # down-head triangle
 
     def __init__ (self, parent=None, app=None) :
 
@@ -82,19 +83,14 @@ class GUIFileManagerSingleControl ( QtGui.QWidget ) :
 
         self.path_fm_selected = ''
         self.setParams()
+
+        self.guirunrange  = GUIRunRange(None, self.str_run_from, self.str_run_to)
  
         self.lab_src        = QtGui.QLabel('for detector')
         self.lab_type       = QtGui.QLabel('calib type')
-        self.lab_from       = QtGui.QLabel('valid from run')
-        self.lab_to         = QtGui.QLabel('to')
-        self.edi_from       = QtGui.QLineEdit  ( self.str_run_from )
-        self.edi_to         = QtGui.QLineEdit  ( self.str_run_to )
         self.but_src        = QtGui.QPushButton(self.source_name + self.char_expand )
         self.but_type       = QtGui.QPushButton(self.calib_type + self.char_expand )
 
-        self.edi_from.setValidator(QtGui.QIntValidator(0,9999,self))
-        self.edi_to  .setValidator(QtGui.QRegExpValidator(QtCore.QRegExp("[0-9]\\d{0,3}|end$"),self))
- 
         self.lab_file = QtGui.QLabel('File:')
         self.edi_file = QtGui.QLineEdit ( self.path_fm_selected ) # fnm.path_to_calib_dir() )
         self.edi_file.setReadOnly(True)
@@ -130,10 +126,7 @@ class GUIFileManagerSingleControl ( QtGui.QWidget ) :
         self.hboxC.addWidget( self.but_src  )
         self.hboxC.addWidget( self.lab_type )
         self.hboxC.addWidget( self.but_type )
-        self.hboxC.addWidget( self.lab_from )
-        self.hboxC.addWidget( self.edi_from )
-        self.hboxC.addWidget( self.lab_to   )
-        self.hboxC.addWidget( self.edi_to   )
+        self.hboxC.addWidget( self.guirunrange )
         self.hboxC.addStretch(1)     
 
 
@@ -154,8 +147,6 @@ class GUIFileManagerSingleControl ( QtGui.QWidget ) :
         self.connect( self.but_delete, QtCore.SIGNAL('clicked()'), self.onButDelete ) 
         self.connect( self.but_src,    QtCore.SIGNAL('clicked()'), self.onButSrc    ) 
         self.connect( self.but_type,   QtCore.SIGNAL('clicked()'), self.onButType   ) 
-        self.connect( self.edi_from,   QtCore.SIGNAL('editingFinished()'), self.onEdiFrom )
-        self.connect( self.edi_to,     QtCore.SIGNAL('editingFinished()'), self.onEdiTo )
   
         self.showToolTips()
         self.setStyle()
@@ -180,8 +171,6 @@ class GUIFileManagerSingleControl ( QtGui.QWidget ) :
         self.but_view  .setToolTip('Launch file browser')
         self.but_plot  .setToolTip('Launch plot browser')
         self.but_delete.setToolTip('Delete selected file\nDelete  is allowed for\nWORK or CALIB directories only')
-        self.edi_from  .setToolTip('Enter run number in range [0,9999]')
-        self.edi_to    .setToolTip('Enter run number in range [0,9999] or "end"')
 
     def setFrame(self):
         self.frame = QtGui.QFrame(self)
@@ -208,9 +197,6 @@ class GUIFileManagerSingleControl ( QtGui.QWidget ) :
         #self.but_delete.setFixedWidth(100)
         #self.but_copy.setMinimumHeight(60)
 
-        self.edi_from.setFixedWidth(40)
-        self.edi_to  .setFixedWidth(40)
-
         self.edi_file.setFixedWidth(490)
         self.edi_file.setStyleSheet(cp.styleEditInfo) 
         self.edi_file.setEnabled(False)            
@@ -218,8 +204,6 @@ class GUIFileManagerSingleControl ( QtGui.QWidget ) :
         self.lab_file  .setStyleSheet(cp.styleLabel)
         self.lab_src   .setStyleSheet(cp.styleLabel)
         self.lab_type  .setStyleSheet(cp.styleLabel)
-        self.lab_from  .setStyleSheet(cp.styleLabel)
-        self.lab_to    .setStyleSheet(cp.styleLabel)
  
         #self.butViewwser.setVisible(False)
         #self.butSave.setText('')
@@ -263,6 +247,8 @@ class GUIFileManagerSingleControl ( QtGui.QWidget ) :
         if self.calib_type  == 'Select' : self.but_type.setStyleSheet(cp.stylePink)
         else                            : self.but_type.setStyleSheet(cp.styleButton)
 
+        self.guirunrange.setFieldsEnable(True)
+
         #self.setButtonDelete()
         #self.setButtonCopy()
 
@@ -286,11 +272,10 @@ class GUIFileManagerSingleControl ( QtGui.QWidget ) :
     def resetFields(self) :
         self.setParams()
         self.edi_file  .setText(self.path_fm_selected)
-        self.edi_from  .setText(self.str_run_from)
-        self.edi_to    .setText(self.str_run_to)
         self.but_src   .setText(self.source_name + self.char_expand )
         self.but_type  .setText(self.calib_type + self.char_expand )
         self.setStyleButtons()
+        self.guirunrange.resetFields()
 
 
     def resetFieldsOnDelete(self) :
@@ -388,12 +373,17 @@ class GUIFileManagerSingleControl ( QtGui.QWidget ) :
         else                             : return None
  
 
+    def getRunRange(self) :
+        """Interface method returning run range string, for example '123-end' """
+        return self.guirunrange.getRunRange()
+
+
     def get_out_path(self):
         det = self.get_detector_selected()
         if det is None : return
         calib_dir = fnm.path_to_calib_dir()
         calib_type = cp.dict_of_det_calib_types[det]
-        fname = '%s-%s.data' % (self.str_run_from, self.str_run_to)
+        fname = '%s.data' % self.getRunRange()
         path = os.path.join(calib_dir, calib_type, self.source_name, self.calib_type, fname)
         return path
 
@@ -420,20 +410,6 @@ class GUIFileManagerSingleControl ( QtGui.QWidget ) :
         logger.debug('Selected file:\n' + path, __name__)
 
         self.setStyleButtons()
-
-
-    def onEdiFrom(self):
-        logger.debug('onEdiFrom', __name__ )
-        self.str_run_from = str( self.edi_from.displayText() )        
-        msg = 'Set the run validity range from %s' % self.str_run_from
-        logger.info(msg, __name__ )
-
-
-    def onEdiTo(self):
-        logger.debug('onEdiTo', __name__ )
-        self.str_run_to = str( self.edi_to.displayText() )        
-        msg = 'Set the run validity range up to %s' % self.str_run_to
-        logger.info(msg, __name__ )
 
 
     def get_detector_selected(self):

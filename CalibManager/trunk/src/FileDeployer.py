@@ -28,6 +28,96 @@ import socket
 from ConfigParametersForApp import cp
 from   Logger               import logger
 import GlobalUtils          as     gu
+from FileNameManager        import fnm
+
+#-----------------------------
+
+def get_list_of_deploy_commands_and_sources_dark(str_run_number, str_run_range):
+    """Get list of deploy commands for all detectors of the same type"""
+
+    cp.str_run_number.setValue(str_run_number)
+    #cp.blsp.print_list_of_types_and_sources()
+    list_of_types, list_of_sources = cp.blsp.list_of_types_and_sources_for_selected_detectors()
+    # list_of_types  : ['CsPad::DataV1',    'CsPad::DataV1']
+    # list_of_sources: ['CxiDs1.0:Cspad.0', 'CxiDsd.0:Cspad.0']
+
+    list_of_deploy_commands  = get_list_of_deploy_commands_for_calibtype(list_of_types, list_of_sources, fnm.path_peds_ave(), 'pedestals', str_run_range)
+    list_of_deploy_commands += get_list_of_deploy_commands_for_calibtype(list_of_types, list_of_sources, fnm.path_peds_rms(), 'pixel_rms', str_run_range)
+
+    if cp.dark_deploy_hotpix.value() :
+        list_of_deploy_commands += get_list_of_deploy_commands_for_calibtype(list_of_types, list_of_sources, fnm.path_hotpix_mask(), 'pixel_status', str_run_range)
+
+    return list_of_deploy_commands, list_of_sources
+    
+#-----------------------------
+
+def get_list_of_deploy_commands_and_sources(str_run_number, str_run_range, mode='dark'):
+    if mode=='calibman-dark' or \
+       mode=='calibrun-dark' : return get_list_of_deploy_commands_and_sources_dark(str_run_number, str_run_range)
+    else                     : return [], []
+
+#-----------------------------
+#-----------------------------
+#-----------------------------
+
+def deploy_calib_files(str_run_number, str_run_range, mode='calibrun-dark', ask_confirm=True):
+    """Deploys the calibration file(s)"""
+    list_of_deploy_commands, list_of_sources = get_list_of_deploy_commands_and_sources(str_run_number, str_run_range, mode)
+    msg = 'Deploy calibration file(s):'
+
+    if list_of_deploy_commands == [] :
+        msg += 'List of commands IS EMPTY !!!'  
+        logger.info(msg, __name__)
+        return
+    
+    msg =  '\nTentative deployment commands:\n' + '\n'.join(list_of_deploy_commands)
+    logger.info(msg, __name__)
+
+    list_src_cbx = [[src,True] for src in list_of_sources]
+    if ask_confirm :
+        resp = gu.changeCheckBoxListInPopupMenu(list_src_cbx, win_title='Confirm depl. for:')
+        if resp != 1 :
+            logger.info('Deployment is cancelled!', __name__)
+            return
+
+    for cmd in list_of_deploy_commands :
+        #print 'cmd: ', cmd
+        if is_allowed_command(cmd, list_src_cbx) : fd.procDeployCommand(cmd, mode)
+
+
+
+def is_allowed_command(cmd, list_src_cbx):
+    """Check the deployment command is for selected src"""
+    destination = cmd.split()[2] # for example: /reg/d/psdm/CXI/cxib2313/calib/CsPad::CalibV1/CxiDsd.0:Cspad.0/pedestals/1-1.data
+    for src,cbx in list_src_cbx :
+        if not cbx : continue
+        if src in destination : return True
+    return False
+
+
+
+def get_list_of_deploy_commands_for_calibtype(list_of_types, list_of_sources, base_path, calibtype='pedestals', str_run_range='0-end'):
+    """Get list of deploy commands for lists of type and sources for calibtype"""
+    
+    list_of_files = gu.get_list_of_files_for_list_of_insets( base_path, list_of_sources )
+
+    list_of_deploy_commands = []
+
+    for file, type, source in zip(list_of_files, list_of_types, list_of_sources) :
+
+        src  = source
+
+        pos1 = type.find('::')
+        typ  = type[:pos1] + '::CalibV1'
+        fname = '%s.data' % str_run_range
+        
+        calib_path = os.path.join(cp.calib_dir.value(), typ, src, calibtype, fname)
+        cmd = 'cp %s %s' % (file, calib_path)
+
+        list_of_deploy_commands.append(cmd)
+
+    return list_of_deploy_commands
+   
 
 #-----------------------------
 

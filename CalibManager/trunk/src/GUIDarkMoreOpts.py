@@ -32,6 +32,8 @@ import GlobalUtils            as     gu
 from   FileNameManager        import fnm
 from   GUIFileBrowser         import *
 from   PlotImgSpe             import *
+import FileDeployer           as     fdmets
+
 #import PyCSPadImage.CSPAD2x2Image as     cspad2x2img
 #import PyCSPadImage.CSPADImage    as     cspadimg
 
@@ -438,10 +440,10 @@ class GUIDarkMoreOpts ( QtGui.QWidget ) :
 
     def on_but_show(self):
         """Prints the list of commands for deployment of calibration file(s)"""
-        list_of_deploy_commands, list_of_sources = self.get_gui_run().get_list_of_deploy_commands_and_sources()
-        msg = '\n' + 50*'-' + '\nTentative deploy command(s):'
-        for cmd in list_of_deploy_commands :
-            msg += '\n' + cmd
+        #str_run_number = '%04d' % self.run_number
+        list_of_deploy_commands, list_of_sources = \
+          fdmets.get_list_of_deploy_commands_and_sources_dark(self.run_number, self.get_gui_run().strRunRange())
+        msg = '\n' + 50*'-' + '\nTentative deployment commands:\n' + '\n'.join(list_of_deploy_commands)
         logger.info(msg, __name__)
 
 

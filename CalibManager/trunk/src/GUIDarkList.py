@@ -178,11 +178,11 @@ class GUIDarkList ( QtGui.QWidget ) :
             self.str_run_number.setValue(str_run_num)
 
             if not self.isSelectedRun            (run_num) :
-                print 'not self.isSelectedRun', run_num 
+                #print 'not self.isSelectedRun', run_num 
                 continue
 
             if not self.hasSelectedDetectorsInRun(run_num) :
-                print 'not self.hasSelectedDetectorsInRun', run_num 
+                #print 'not self.hasSelectedDetectorsInRun', run_num 
                 continue
 
             if not run_num in self.list_of_run_nums_in_dir :
@@ -407,28 +407,31 @@ class GUIDarkList ( QtGui.QWidget ) :
     def onItemClick(self, item):
         #print 'onItemClick' # , isChecked: ', str(item.checkState())
 
-        #self.click_counter += 1
-        #if self.click_counter%2 : item.setSelected(False)
-        if   item.isSelected(): item.setSelected(False)
-        #else                  : item.setSelected(True)
+        if item.isSelected(): item.setSelected(False)
+        #else               : item.setSelected(True)
+
+        self.list_of_run_strs_in_dir = fnm.get_list_of_xtc_runs()   # ['0001', '0202', '0203',...]
+        self.list_of_run_nums_in_dir = gu.list_of_int_from_list_of_str(self.list_of_run_strs_in_dir) # [1, 202, 203, 204,...]
 
         widg = self.list.itemWidget(item)
-        widg.updateButtons()
+        run_num = widg.getRunNum()
 
-        msg = 'onItemClick - update button status for run %s' % widg.str_run_num
+        run_rec = self.dict_run_recs[run_num]
+        self.comment   = run_rec['comment']
+        list_of_calibs = run_rec['calibrations']
+        self.type = ', '.join(list_of_calibs)
+
+        if not run_num in self.list_of_run_nums_in_dir :
+            self.comment = 'xtc file IS NOT on disk!'
+            self.xtc_in_dir = False
+        else :
+            self.xtc_in_dir = True
+
+        widg.updateButtons(self.type, self.comment, self.xtc_in_dir)
+
+        msg = 'onItemClick - update button status for run %s with calib_type: %s, comment: %s, xtc_in_dir %s' \
+              % (widg.str_run_num, self.type, self.comment, self.xtc_in_dir) 
         logger.info(msg, __name__)
-
-        #if item.sizeHint() == self.size_ext :
-        #    pass
-            #widg.onClickShrink()
-            #print 'widg.size:', widg.size()
-            #item.setSizeHint(self.size)
-        #else :
-        #    pass
-            #widg.onClickExpand()
-            #print 'widg.size:', widg.size()
-
-            #item.setSizeHint(self.size_ext)
 
 
     def onItemDoubleClick(self, item):

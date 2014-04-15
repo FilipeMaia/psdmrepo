@@ -49,14 +49,19 @@ class GUIFileManagerGroup ( QtGui.QWidget ) :
         self.guiexpcalibdir  = GUIExpCalibDir()
         #self.guisrcfile  = QtGui.QTextEdit('Source file GUI is not implemented.') # GUIDark(self)
         
-        self.hbox = QtGui.QHBoxLayout() 
-        self.hbox.addWidget(self.guidirtree)
-        self.hbox.addWidget(self.guifilemanagergroupcontrol)
-        self.hbox.addWidget(self.guistatus)
+        #self.hbox = QtGui.QHBoxLayout() 
+        #self.hbox.addWidget(self.guifilemanagergroupcontrol)
+        #self.hbox.addWidget(self.guistatus)
 
+        self.hsplitter = QtGui.QSplitter(QtCore.Qt.Horizontal)
+        self.hsplitter.addWidget(self.guidirtree)
+        self.hsplitter.addWidget(self.guifilemanagergroupcontrol)
+        self.hsplitter.addWidget(self.guistatus)
+        
         self.vbox = QtGui.QVBoxLayout() 
         self.vbox.addWidget(self.guiexpcalibdir)
-        self.vbox.addLayout(self.hbox)
+        self.vbox.addWidget(self.hsplitter)
+        #self.vbox.addLayout(self.hbox)
 
         #self.vwidg = QtGui.QWidget(self)
         #self.vwidg.setLayout(self.box) 
@@ -85,6 +90,10 @@ class GUIFileManagerGroup ( QtGui.QWidget ) :
 
         self.setContentsMargins (QtCore.QMargins(-5,-5,-5,2))
         self.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Expanding)
+
+        #self.hbox.moveSplitter(250, self.hbox.indexOf(self.guifilemanagergroupcontrol))
+        self.hsplitter.setSizes([200,100,600])
+
         #self.vsplit.setSizePolicy(QtGui.QSizePolicy.Expanding, QtGui.QSizePolicy.Ignored)
         #self.setMinimumSize(790,210)
         #self.setMinimumHeight(320)

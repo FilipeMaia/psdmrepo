@@ -1002,6 +1002,12 @@ def check_token(do_print=False) :
     return status, msg
 
 
+def get_afs_token(do_print=False) :
+    output = getoutput('aklog')
+    if do_print : print str(output)
+    return output
+
+
 def parse_token(token) :
     """ from string like: User's (AFS ID 5269) tokens for afs@slac.stanford.edu [Expires Feb 28 19:16] 54 75 Expires Feb 28 19:16
         returns date/time: Feb 28 19:16
@@ -1020,6 +1026,37 @@ def parse_token(token) :
         #print 'date_object', str(date_object)
 
     return timestamp 
+
+#---------------------------------
+
+def ready_to_start(check_bits=0777, fatal_bits=0777) :
+    """Check availability of services and credentuals marked by the check_bits"""
+
+    if check_bits & 1 and not is_good_lustre_version() :
+        print 'WARNING: The host "%s" uses old lustre driver version. CHANGE HOST !!!' % get_hostname()
+        if fatal_bits & 1 : return False
+	else              : print 'Continue with old lustre driver...'
+
+    if check_bits & 2 and not has_kerberos_ticket() :
+        print 'WARNING: Kerberos ticket is missing. To get one use command: kinit'
+        if fatal_bits & 2 : return False
+	else              : print 'Continue without Kerberos ticket...'
+
+    if check_bits & 4 : 
+        status, msg = check_token(do_print=False)
+        if not status :
+            get_afs_token(do_print=True)
+
+            status, msg = check_token(do_print=False)
+            if not status :
+                print 'WARNING: AFS token is missing. To get one use commands: kinit; aklog'
+                if fatal_bits & 4 : return False
+	        else              : print 'Continue without AFS token...'
+
+    return True
+
+#---------------------------------
+
 
 #----------------------------------
 

@@ -20,7 +20,6 @@ part of it, please give an appropriate acknowledgment.
 @author Mikhail S. Dubrovin
 """
 
-
 #------------------------------
 #  Module's version from CVS --
 #------------------------------
@@ -51,6 +50,7 @@ import RegDBUtils      as     ru
 from GUIFileBrowser         import *
 from PlotImgSpe             import *
 from FileDeployer           import fd
+from GUIRunRange            import *
 
 #---------------------
 #  Class definition --
@@ -61,8 +61,8 @@ class GUIFileManagerGroupControl ( QtGui.QWidget ) :
     @see BaseClass
     @see OtherClass
     """
-    char_expand    = u' \u25BC' # down-head triangle
-    #char_expand    = '' # down-head triangle
+    char_expand = cp.char_expand
+    #char_expand = '' # down-head triangle
 
     def __init__ (self, parent=None, app=None) :
 
@@ -70,7 +70,7 @@ class GUIFileManagerGroupControl ( QtGui.QWidget ) :
         self.myapp = app
         QtGui.QWidget.__init__(self, parent)
 
-        self.setGeometry(10, 25, 120, 300)
+        self.setGeometry(10, 25, 130, 300)
         self.setWindowTitle('File Manager Select & Action GUI')
         #self.setWindowIcon(cp.icon_monitor)
         self.palette = QtGui.QPalette()
@@ -82,28 +82,16 @@ class GUIFileManagerGroupControl ( QtGui.QWidget ) :
 
         self.setParams()
  
-        self.lab_from       = QtGui.QLabel('for run range')
-        self.lab_to         = QtGui.QLabel(':')
-        self.edi_from       = QtGui.QLineEdit  ( self.str_run_from )
-        self.edi_to         = QtGui.QLineEdit  ( self.str_run_to )
+        self.guirunrange  = GUIRunRange(None, self.str_run_from, self.str_run_to, txt_from='')
 
-        self.edi_from.setValidator(QtGui.QIntValidator(0,9999,self))
-        self.edi_to  .setValidator(QtGui.QRegExpValidator(QtCore.QRegExp("[0-9]\\d{0,3}|end$"),self))
- 
         self.but_move   = QtGui.QPushButton('-> Move ->')
         self.but_copy   = QtGui.QPushButton('-> Copy -> ')
         self.but_delete = QtGui.QPushButton('Delete')
         self.but_list   = QtGui.QPushButton('<- List')
         self.but_view   = QtGui.QPushButton('<- View')
         self.but_plot   = QtGui.QPushButton('<- Plot')
+        self.lab_from   = QtGui.QLabel('Run valid from')
         #self.but_copy  .setIcon(cp.icon_monitor)
-
-        self.hboxC = QtGui.QHBoxLayout() 
-        #self.hboxC.addStretch(1)     
-        self.hboxC.addWidget( self.edi_from )
-        self.hboxC.addWidget( self.lab_to   )
-        self.hboxC.addWidget( self.edi_to   )
-        self.hboxC.addStretch(1)     
 
         self.vboxW = QtGui.QVBoxLayout() 
         self.vboxW.addStretch(1)
@@ -115,7 +103,7 @@ class GUIFileManagerGroupControl ( QtGui.QWidget ) :
         self.vboxW.addWidget( self.but_move )
         self.vboxW.addWidget( self.but_copy )
         self.vboxW.addWidget( self.lab_from )
-        self.vboxW.addLayout( self.hboxC ) 
+        self.vboxW.addWidget( self.guirunrange )
         self.vboxW.addStretch(1)
         
         self.setLayout(self.vboxW)
@@ -126,8 +114,6 @@ class GUIFileManagerGroupControl ( QtGui.QWidget ) :
         self.connect( self.but_view,   QtCore.SIGNAL('clicked()'), self.onButView ) 
         self.connect( self.but_plot,   QtCore.SIGNAL('clicked()'), self.onButPlot ) 
         self.connect( self.but_delete, QtCore.SIGNAL('clicked()'), self.onButDelete ) 
-        self.connect( self.edi_from,   QtCore.SIGNAL('editingFinished()'), self.onEdiFrom )
-        self.connect( self.edi_to,     QtCore.SIGNAL('editingFinished()'), self.onEdiTo )
   
         self.showToolTips()
         self.setStyle()
@@ -149,8 +135,6 @@ class GUIFileManagerGroupControl ( QtGui.QWidget ) :
         self.but_view  .setToolTip('Launch file browser')
         self.but_plot  .setToolTip('Launch plot browser')
         self.but_delete.setToolTip('Delete selected file\nDelete  is allowed for\nWORK or CALIB directories only')
-        self.edi_from  .setToolTip('Enter run number in range [0,9999]')
-        self.edi_to    .setToolTip('Enter run number in range [0,9999] or "end"')
 
     def setFrame(self):
         self.frame = QtGui.QFrame(self)
@@ -169,17 +153,13 @@ class GUIFileManagerGroupControl ( QtGui.QWidget ) :
         self.but_list  .setStyleSheet(cp.styleButton)
         self.but_view  .setStyleSheet(cp.styleButton)
         self.but_plot  .setStyleSheet(cp.styleButton)
+        self.lab_from  .setStyleSheet(cp.styleLabel)
+        self.lab_from  .setAlignment(QtCore.Qt.AlignCenter)
         
-        self.setMinimumSize(120, 200)
-        self.setFixedWidth(120)
+        self.setMinimumSize(130, 200)
+        self.setFixedWidth(130)
         self.setContentsMargins (QtCore.QMargins(0,-9,0,-9))
 
-        self.edi_from.setFixedWidth(40)
-        self.edi_to  .setFixedWidth(40)
-
-        self.lab_from  .setStyleSheet(cp.styleLabel)
-        self.lab_to    .setStyleSheet(cp.styleLabel)
- 
         self.setStyleButtons()
 
 
@@ -204,6 +184,8 @@ class GUIFileManagerGroupControl ( QtGui.QWidget ) :
                          and self.calib_type != 'Select' 
         self.but_move  .setEnabled(is_enable_copy)
         #self.but_copy  .setEnabled(is_enable_copy)
+
+        self.guirunrange.setFieldsEnable(True)
         
  
     def setParams(self) :
@@ -218,6 +200,7 @@ class GUIFileManagerGroupControl ( QtGui.QWidget ) :
         self.edi_from  .setText(self.str_run_from)
         self.edi_to    .setText(self.str_run_to)
         self.setStyleButtons()
+        self.guirunrange.resetFields()
 
 
     def resetFieldsOnDelete(self) :
@@ -296,12 +279,17 @@ class GUIFileManagerGroupControl ( QtGui.QWidget ) :
         return resp
 
 
+    def getRunRange(self) :
+        """Interface method returning run range string, for example '123-end' """
+        return self.guirunrange.getRunRange()
+
+
     def list_of_group_copy_cmds(self):
 
         list_of_fnames = cp.guidirtree.get_list_of_checked_item_names()
 
         dst_calib_dir = fnm.path_to_calib_dir()
-        dst_fname = '%s-%s.data' % (self.str_run_from, self.str_run_to)
+        dst_fname = '%s.data' % self.getRunRange()
 
         #print 'dst_calib_dir:', dst_calib_dir
         #print 'dst_fname:', dst_fname
@@ -323,20 +311,6 @@ class GUIFileManagerGroupControl ( QtGui.QWidget ) :
             list_of_cmds.append(cmd)
 
         return list_of_cmds
-
-
-    def onEdiFrom(self):
-        logger.debug('onEdiFrom', __name__ )
-        self.str_run_from = str( self.edi_from.displayText() )        
-        msg = 'Set the run validity range from %s' % self.str_run_from
-        logger.info(msg, __name__ )
-
-
-    def onEdiTo(self):
-        logger.debug('onEdiTo', __name__ )
-        self.str_run_to = str( self.edi_to.displayText() )        
-        msg = 'Set the run validity range up to %s' % self.str_run_to
-        logger.info(msg, __name__ )
 
 
     def get_detector_selected(self):

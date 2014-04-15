@@ -242,10 +242,11 @@ class GUIDirTree (QtGui.QWidget):
         pass
         #self.setMinimumSize(100,200)
         #self.setMinimumSize(200,300)
-        self.setFixedWidth(300)
-        #self.setMaximumWidth(300)
+        #self.setFixedWidth(300)
+        self.setMinimumWidth(200)
         #self.setMinimumHeight(300)
         self.setContentsMargins (QtCore.QMargins(-9,-9,-9,-9))
+        
         #self.view.setMinimumWidth(200)
 
     def setFrame(self):

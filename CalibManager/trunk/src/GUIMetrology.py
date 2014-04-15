@@ -73,7 +73,7 @@ class GUIMetrology ( QtGui.QWidget ) :
         
         cp.setIcons()
 
-        self.setGeometry(10, 25, 650, 30)
+        self.setGeometry(10, 25, 725, 200)
         self.setWindowTitle('Metrology')
         #self.setWindowIcon(cp.icon_monitor)
         self.palette = QtGui.QPalette()
@@ -187,7 +187,7 @@ class GUIMetrology ( QtGui.QWidget ) :
         self.frame.setLineWidth(0)
         self.frame.setMidLineWidth(1)
         self.frame.setGeometry(self.rect())
-        self.frame.setVisible(False)
+        #self.frame.setVisible(False)
 
     def setParams(self) :
         #if self.path_fm_selected != '' :
@@ -200,6 +200,10 @@ class GUIMetrology ( QtGui.QWidget ) :
 
 
     def setStyle(self):
+
+        self.setMinimumSize(725,200)
+        self.setMaximumSize(800,200)
+        
         self.              setStyleSheet(cp.styleBkgd)
         self.butViewOffice.setStyleSheet(cp.styleButton)
         self.butViewText  .setStyleSheet(cp.styleButton)
@@ -243,6 +247,7 @@ class GUIMetrology ( QtGui.QWidget ) :
     def resizeEvent(self, e):
         #logger.debug('resizeEvent', self.name) 
         self.frame.setGeometry(self.rect())
+        #print 'GUIMetrology.resizeEvent: %s' % str(self.size())
 
 
     def moveEvent(self, e):

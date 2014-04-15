@@ -180,7 +180,7 @@ def find_calib_file_in_list_for_run(list_sorted_cfiles, runnum=0) :
 def dict_calib_file_actual_run_range(list_of_cfiles) :
 
     list_of_ends   = [cfile.get_begin()-1 for cfile in list_of_cfiles]
-    list_of_ends.append(0)                              # add minimal end=0
+    #list_of_ends.append(0)                              # add minimal end=0
     list_of_ends.append(CalibFileFinder.max_run_number) # add maximal end=9999
     if len(list_of_cfiles)>0 :
         list_of_ends.append(list_of_cfiles[-1].get_end())   # end of the last file

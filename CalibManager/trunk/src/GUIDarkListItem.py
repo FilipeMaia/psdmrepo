@@ -246,7 +246,14 @@ class GUIDarkListItem ( QtGui.QWidget ) :
     def updateButtons(self, str_run_type='', comment='', xtc_in_dir=True) :
         #logger.info('update', __name__)
         self.gui_run.updateButtons(str_run_type, comment, xtc_in_dir)
-        
+
+
+    def getStrRunNum(self) :
+        return self.str_run_num
+       
+    def getRunNum(self) :
+        return int(self.str_run_num)
+       
 #-----------------------------
 
 if __name__ == "__main__" :

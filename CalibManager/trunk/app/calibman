@@ -33,7 +33,7 @@ if __name__ == "__main__" :
 
 from PyQt4 import QtGui
 from CalibManager.GUIMain import GUIMain
-from CalibManager.GlobalUtils import check_token, has_kerberos_ticket, is_good_lustre_version, get_hostname
+from CalibManager.GlobalUtils import ready_to_start
 from CalibManager.ThreadWorker import ThreadWorker
 from CalibManager.ThreadCheckNewXtcFiles import ThreadCheckNewXtcFiles
 #---------------------------------
@@ -45,21 +45,10 @@ class StartCalibManager :
 
         self.input_parameters()
 
-	if not is_good_lustre_version() :
-	    print 'WARNING: The host "%s" uses old lustre driver version. CHANGE HOST !!!' % get_hostname()
-	    return
+        if not ready_to_start(check_bits=0777, fatal_bits=0) : 
+            sys.exit('Not ready to start aplication yet...')
 
-	if not has_kerberos_ticket() :
-	    print 'Before starting this application please update Kerberos tisket and AFS token using commands:\nkinit\naklog'
-	    return
-
-        status, msg = check_token(do_print=True)
-	#print msg
-	if not status :
-	    print 'Before starting this application please update AFS token using command:\naklog'
-	    return
-
-	print "Start the CalibManager GUI"
+	print "Start Calibration Manager GUI"
         app = QtGui.QApplication(sys.argv)
 
 	t1 = ThreadWorker(dt_sec=5, print_bits=0)
