@@ -60,7 +60,7 @@ class ThreadWorker (QtCore.QThread) :
 
     def emitCheckStatusSignal( self ) :
         msg = 'from work thread ' + str(self.thread_id) + '  check counter: ' + str(self.counter)
-        self.emit( QtCore.SIGNAL('update(QString)'), msg) \
+        self.emit( QtCore.SIGNAL('update(QString)'), msg)
 
         if self.print_bits & 1 : print msg
 

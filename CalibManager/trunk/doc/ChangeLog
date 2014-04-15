@@ -11,6 +11,14 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-33	
+2014-04-15 Mikhail S. Dubrovin	
+- Command line calibration is implemented in full design scale:
+- in CommandLineCalib and BatchJobPedestals add interactive mode for command line calibration
+- in ConfigFileGenerator remove duplicatin of module description for cspad
+- in GUIDarkControlBar replace run range edit-fields by the GUIRunRange widget
+- in GUIRunRange emit signal when any of run range fields is changed
+
 Tag: V00-00-32	
 2014-04-14 Mikhail S. Dubrovin
 - cleanup edi_from in in GUIFileManagerGroupControl

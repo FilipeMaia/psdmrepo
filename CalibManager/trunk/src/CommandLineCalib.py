@@ -57,12 +57,16 @@ class CommandLineCalib () :
 
         self.print_local_pars()
 
-        if self.queue is not None :
+        self.print_list_of_xtc_files()
+        self.print_list_of_sources_from_regdb()
+
+        if self.queue is None :
+            self.proc_dark_run_interactively()
+        else :
             if not self.get_print_lsf_status() : return
             self.proc_dark_run_in_batch()
+            self.print_list_of_types_and_sources_from_xtc()
 
-        self.print_list_of_sources_from_regdb()
-        self.print_list_of_types_and_sources_from_xtc()
         self.print_list_of_files_dark_in_work_dir()
 
         self.deploy_calib_files()
@@ -74,7 +78,13 @@ class CommandLineCalib () :
     def set_pars(self) :
 
 	if self.opts['runnum'] is None :
-	    print 'Run number must be specified as optional parameter -r <number>'
+            appname = os.path.basename(sys.argv[0])
+	    msg = 'This command line calibration interface should be launched with parameters.'\
+                  +'\nTo see the list of parameters use command: %s -h' % appname\
+                  +'\nIf the "%s" is launched after "calibman" most of parameters may be already set.' % appname\
+	          +'\nBut, at least run number must be specified as an optional parameter, try command:\n    %s -r <number>'\
+                  % appname
+            print msg
 	    return False
         self.runnum = self.opts['runnum']
         self.str_run_number = '%04d' % self.runnum
@@ -110,13 +120,13 @@ class CommandLineCalib () :
 	    print 'Detector name(s) is not defined, should be specified as optional parameter -d <det-names>, ex.: -d CSPAD,CSPAD2x2 etc'
 	    return False
 
-        
+
         self.skip_events = cp.bat_dark_start.value() if self.opts['skip_events'] is None else self.opts['skip_events']
         self.num_events  = cp.bat_dark_end.value() - cp.bat_dark_start.value() if self.opts['num_events'] is None else self.opts['num_events']
         self.thr_rms     = cp.mask_rms_thr.value() if self.opts['thr_rms'] is None else self.opts['thr_rms']
-        self.calibdir    = cp.calib_dir.value()  if self.opts['calibdir'] is None else self.opts['calibdir']
         self.workdir     = cp.dir_work.value()  if self.opts['workdir'] is None else self.opts['workdir']
-	self.queue       = cp.bat_queue.value() if self.opts['queue'] is None else self.opts['queue']
+	#self.queue       = cp.bat_queue.value() if self.opts['queue'] is None else self.opts['queue']
+	self.queue       = self.opts['queue']
 	#self.logfile     = cp.log_file.value()  if self.opts['logfile']  is None else self.opts['logfile']
 
 	self.process     = self.opts['process'] 
@@ -126,6 +136,11 @@ class CommandLineCalib () :
         cp.str_run_number.setValue(self.str_run_number)
         cp.exp_name      .setValue(self.exp_name)
         cp.instr_name    .setValue(self.instr_name)
+
+        self.calibdir     = cp.calib_dir.value() if self.opts['calibdir'] is None else self.opts['calibdir']
+        if self.calibdir == cp.calib_dir.value_def() :
+            self.calibdir = fnm.path_to_calib_dir_default()
+
         cp.calib_dir     .setValue(self.calibdir)
         cp.dir_work      .setValue(self.workdir)
         cp.bat_queue     .setValue(self.queue)
@@ -145,7 +160,7 @@ class CommandLineCalib () :
     def print_local_pars(self) :
         print '\n' + 50*'-' \
         + '\nprint_local_pars(): Combination of command line parameters and' \
-        + '\nconfiguration parameters from file %s' % cp.getParsFileName() \
+        + '\nconfiguration parameters from file %s (if available after "calibman")' % cp.getParsFileName() \
         + '\n     str_run_number: %s' % self.str_run_number \
         + '\n     runrange      : %s' % self.str_run_range \
         + '\n     exp_name      : %s' % self.exp_name \
@@ -176,12 +191,38 @@ class CommandLineCalib () :
 
 #------------------------------
 
+    def proc_dark_run_interactively(self) :
+
+        if self.process :
+            print '\n' + 50*'-' + '\nBegin dark run data processing interactively'
+        else :
+            print '\n' + 50*'-' + '\nWARNING: File processing option IS TURNED OFF...'\
+                  + '\nAdd "-P" option in the command line to process files' 
+            return
+
+        self.bjpeds = BatchJobPedestals(self.runnum)
+        self.bjpeds.command_for_peds_scan()
+
+        self.print_list_of_types_and_sources_from_xtc()
+
+        if not self.bjpeds.command_for_peds_aver() :
+            msg = '\n' + 50*'-' + '\nSTATUS OF PROCESSING IS NOT GOOD !!!'\
+                  +'\nSee details in the logfile(s)'
+            print msg
+            #return
+
+        self.print_dark_ave_batch_log()
+        return
+
+#------------------------------
+
     def proc_dark_run_in_batch(self) :
 
         if self.process :
             print '\n' + 50*'-' + '\nBegin dark run data processing in batch queue %s' % self.queue
         else :
-            print '\n' + 50*'-' + '\nWARNING: File processing option IS TURNED OFF... \nAdd "-P" option in the command line to process files' 
+            print '\n' + 50*'-' + '\nWARNING: File processing option IS TURNED OFF...'\
+                  + '\nAdd "-P" option in the command line to process files' 
             return
 
         self.bjpeds = BatchJobPedestals(self.runnum)
@@ -194,7 +235,9 @@ class CommandLineCalib () :
             sum_dt += dt
             status = self.bjpeds.status_for_peds_files_essential()
             print '%3d sec: Files %s available' % (sum_dt, {False:'ARE NOT', True:'ARE'}[status])
-            if status : break
+            if status :
+                self.print_dark_ave_batch_log()
+                return
 
         print 'WARNING: Too many check cycles. Probably LSF is dead...'
         
@@ -212,6 +255,7 @@ class CommandLineCalib () :
         if self.deploy :
             print '\n' + 50*'-' + '\nBegin deployment of calibration files' 
             fdmets.deploy_calib_files(self.str_run_number, self.str_run_range, mode='calibrun-dark', ask_confirm=False)
+            print '\nDeployment of calibration files is completed'
         else :
             print '\n' + 50*'-' + '\nWARNING: File deployment option IS TURNED OFF... \nAdd "-D" option in the command line to deploy files' 
 
@@ -267,13 +311,31 @@ class CommandLineCalib () :
         print txt
 
 
+    def print_dark_ave_batch_log(self) :
+        path = fnm.path_peds_aver_batch_log()
+        txt = '\n' + 50*'-' + '\npsana log file %s:\n\n' % path \
+            + gu.load_textfile(fnm.path_peds_aver_batch_log()) \
+            + 'End of psana log file %s' % path
+        print txt
+
+
     def get_print_lsf_status(self) :
         queue = cp.bat_queue.value()
         msg, status = gu.msg_and_status_of_lsf(queue)
-        msgi = '\n' + 50*'-' + '\nLSF status for queue %s: \n%s\nLSF status for %s is %s' % (queue, msg, queue, {False:'bad',True:'good'}[status])
+        msgi = '\n' + 50*'-' + '\nLSF status for queue %s: \n%s\nLSF status for %s is %s'\
+               % (queue, msg, queue, {False:'bad',True:'good'}[status])
         print msgi
         return status
- 
+
+
+    def print_list_of_xtc_files(self) :
+        pattern = '-r%s' % self.str_run_number
+        lst = fnm.get_list_of_xtc_files()
+        lst_for_run = [path for path in lst if pattern in os.path.basename(path)]
+        txt = '\n' + 50*'-' + '\nList of xtc files for exp=%s:run=%s :\n' % (self.exp_name, self.str_run_number)
+        txt += '\n'.join(lst_for_run)
+        print txt
+
 #------------------------------
 #------------------------------
 #------------------------------

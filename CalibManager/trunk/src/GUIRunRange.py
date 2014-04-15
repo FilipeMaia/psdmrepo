@@ -45,7 +45,7 @@ class GUIRunRange ( QtGui.QWidget ) :
     @see OtherClass
     """
 
-    def __init__ (self, parent=None, str_run_from=None, str_run_to=None, txt_from='valid from') :
+    def __init__ (self, parent=None, str_run_from=None, str_run_to=None, txt_from='valid from', txt_to='to') :
 
         QtGui.QWidget.__init__(self, parent)
 
@@ -64,7 +64,7 @@ class GUIRunRange ( QtGui.QWidget ) :
 
         self.txt_from = txt_from
         if self.use_lab_from : self.lab_from = QtGui.QLabel(txt_from)
-        self.lab_to         = QtGui.QLabel('to')
+        self.lab_to         = QtGui.QLabel(txt_to)
         self.edi_from       = QtGui.QLineEdit  ( self.str_run_from )
         self.edi_to         = QtGui.QLineEdit  ( self.str_run_to )
 
@@ -132,7 +132,7 @@ class GUIRunRange ( QtGui.QWidget ) :
         self.edi_to   .setAlignment (QtCore.Qt.AlignRight)
 
         if self.use_lab_from : self.lab_from  .setStyleSheet(cp.styleLabel)
-        self.lab_to    .setStyleSheet(cp.styleLabel)
+        self.lab_to.setStyleSheet(cp.styleLabel)
  
         self.setStyleButtons()
 
@@ -183,20 +183,35 @@ class GUIRunRange ( QtGui.QWidget ) :
         # cp.guirunrange = None 
 
 
+#    def run( self ) :
+#        self.emitFieldIsChangedSignal()
+
+
+    def emitFieldIsChangedSignal(self,msg) :
+        self.emit(QtCore.SIGNAL('update(QString)'), msg)
+        #print msg
+
+  
     def onEdiFrom(self):
         logger.debug('onEdiFrom', __name__ )
-        self.str_run_from = str( self.edi_from.displayText() )        
+        txt = str( self.edi_from.displayText() )        
+        if txt == self.str_run_from : return # if text has not changed
+        self.str_run_from = txt
         msg = 'Set the run validity range from %s' % self.str_run_from
         logger.info(msg, __name__ )
         self.setStyleButtons()
+        self.emitFieldIsChangedSignal('from:%s'%self.str_run_from)
 
 
     def onEdiTo(self):
         logger.debug('onEdiTo', __name__ )
-        self.str_run_to = str( self.edi_to.displayText() )        
+        txt = str( self.edi_to.displayText() )        
+        if txt == self.str_run_to : return # if text has not changed
+        self.str_run_to = txt
         msg = 'Set the run validity range up to %s' % self.str_run_to
         logger.info(msg, __name__ )
         self.setStyleButtons()
+        self.emitFieldIsChangedSignal('to:%s'%self.str_run_to)
 
 
     def setFieldsEnable(self, is_enabled=True):

@@ -31,6 +31,7 @@ from PyQt4 import QtGui, QtCore
 from ConfigParametersForApp import cp
 import GlobalUtils          as     gu
 from GUILogger              import *
+from GUIRunRange            import *
 #from FileNameManager        import fnm
 
 #---------------------
@@ -63,14 +64,12 @@ class GUIDarkControlBar ( QtGui.QWidget ) :
 
         self.labRuns = QtGui.QLabel('Show runs')
         self.labDets = QtGui.QLabel('  for detectors:')
-        self.labTo   = QtGui.QLabel(':')
 
-        self.ediFrom = QtGui.QLineEdit  ( str(self.dark_list_run_min.value()) )
-        self.ediTo   = QtGui.QLineEdit  ( str(self.dark_list_run_max.value()) )
-
-        self.ediFrom.setValidator(QtGui.QIntValidator(0,9999,self))
-        self.ediTo  .setValidator(QtGui.QIntValidator(0,9999,self))
-
+        self.guirunrange  = GUIRunRange(None,\
+                                        str(self.dark_list_run_min.value()),\
+                                        str(self.dark_list_run_max.value()),\
+                                        txt_from='', txt_to=':')
+ 
         self.butRuns = QtGui.QPushButton( self.dark_list_show_runs.value() + self.char_expand )
         self.butRuns.setFixedWidth(90)
         self.butDets = QtGui.QPushButton( self.dark_list_show_dets.value() + self.char_expand )
@@ -84,9 +83,7 @@ class GUIDarkControlBar ( QtGui.QWidget ) :
         self.hbox = QtGui.QHBoxLayout() 
         self.hbox.addWidget(self.labRuns)
         self.hbox.addWidget(self.butRuns)
-        self.hbox.addWidget(self.ediFrom)
-        self.hbox.addWidget(self.labTo)
-        self.hbox.addWidget(self.ediTo)
+        self.hbox.addWidget(self.guirunrange)
         self.hbox.addWidget(self.labDets)
         self.hbox.addWidget(self.butDets)
         self.hbox.addWidget(self.butUpdate)
@@ -99,9 +96,9 @@ class GUIDarkControlBar ( QtGui.QWidget ) :
         self.connect( self.butRuns,     QtCore.SIGNAL('clicked()'),          self.onButRuns  )
         self.connect( self.butDets,     QtCore.SIGNAL('clicked()'),          self.onButDets  )
         self.connect( self.butUpdate,   QtCore.SIGNAL('clicked()'),          self.onButUpdate )
-        self.connect( self.ediFrom,     QtCore.SIGNAL('editingFinished()'),  self.onEdiFrom )
-        self.connect( self.ediTo,       QtCore.SIGNAL('editingFinished()'),  self.onEdiTo )
         self.connect( self.cbx_deploy_hotpix, QtCore.SIGNAL('stateChanged(int)'), self.on_cbx ) 
+
+        self.connect( self.guirunrange, QtCore.SIGNAL('update(QString)'), self.updateRunRange )
 
         self.showToolTips()
         self.setStyle()
@@ -118,8 +115,6 @@ class GUIDarkControlBar ( QtGui.QWidget ) :
         self.butRuns  .setToolTip('Select the type of runs to list')
         self.butDets  .setToolTip('Select the type of dets to list')
         self.butUpdate.setToolTip('Update list of runs')
-        self.ediFrom.setToolTip('Fir run in the list')
-        self.ediTo.  setToolTip('Last run in the list')
 
 
     def setFrame(self):
@@ -135,12 +130,9 @@ class GUIDarkControlBar ( QtGui.QWidget ) :
         #self.setStyleSheet(cp.styleYellow)
         self.labRuns.setStyleSheet (cp.styleLabel)
         self.labDets.setStyleSheet (cp.styleLabel)
-        self.labTo  .setStyleSheet (cp.styleLabel)
         self.setStyleButtons()
         self.setContentsMargins (QtCore.QMargins(-9,-9,-9,-9))
         self.setMinimumSize(390,28)
-        self.ediFrom.setFixedWidth(40)
-        self.ediTo.  setFixedWidth(40)
  
 
     def setStyleButtons(self):
@@ -152,9 +144,8 @@ class GUIDarkControlBar ( QtGui.QWidget ) :
 
     def setButtonsVisible(self):
         show_run_range = self.dark_list_show_runs.value() == 'in range' # self.list_of_show_runs[0]
-        self.ediFrom.setVisible(show_run_range)
-        self.ediTo.  setVisible(show_run_range)
-        self.labTo.  setVisible(show_run_range)
+        #self.guirunrange.setFieldsEnable(show_run_range)
+        self.guirunrange.setVisible(show_run_range)
 
         # DO NOT SHOW CHECKBOX!
         self.cbx_deploy_hotpix.  setVisible(False)
@@ -190,21 +181,17 @@ class GUIDarkControlBar ( QtGui.QWidget ) :
 #        cp.posGUIMain = (self.pos().x(),self.pos().y())
 
 
-    def onEdiFrom(self):
-        #logger.info('onEdiFrom', __name__ )
-        str_run_min = str( self.ediFrom.displayText() )        
-        msg = 'Set the run range from %s' % str_run_min
+    def updateRunRange(self, text):
+        fields = str(text).split(':')
+        msg = 'updateRunRange %s'%text
         logger.info(msg, __name__ )
-        self.dark_list_run_min.setValue(int(str_run_min))
+        if fields[0] == 'from' :
+            self.dark_list_run_min.setValue(int(fields[1]))
+        if fields[0] == 'to' :
+            self.dark_list_run_max.setValue(int(fields[1]))
 
-
-    def onEdiTo(self):
-        #logger.info('onEdiFrom', __name__ )
-        str_run_max = str( self.ediTo.displayText() )        
-        msg = 'Set the run range to %s' % str_run_max
-        logger.info(msg, __name__ )
-        self.dark_list_run_max.setValue(int(str_run_max))
-        self.updateListOfRunsForNumEvents()
+        #self.updateListOfRunsForNumRuns()
+        self.updateListOfRuns(self.butUpdate, 'Update list')
 
 
     def onButRuns(self):
@@ -252,9 +239,9 @@ class GUIDarkControlBar ( QtGui.QWidget ) :
         but.setStyleSheet(cp.styleButton)
 
 
-    def updateListOfRunsForNumEvents(self) :
-        logger.info('WAIT for list of runs update...', __name__ )
-        
+    def updateListOfRunsForNumRuns(self) :
+        """DEPRICATED"""
+        logger.info('WAIT for list of runs update...', __name__ )        
         if cp.guidarklist != None :
             cp.guidarklist.updateList()
 

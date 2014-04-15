@@ -192,8 +192,7 @@ class ConfigFileGenerator :
                        'THR_MAX_HOTPIX'   : str( cp.mask_max_thr.value() )
                       }
 
-        self.add_module_in_cfg (mod_prod)
-        self.add_module_in_cfg (mod_aver)
+        self.add_module_in_cfg ('%s %s' % (mod_prod, mod_aver))
 
 #-----------------------------
 

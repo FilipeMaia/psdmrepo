@@ -121,6 +121,30 @@ class BatchJobPedestals (BatchJob) :
 
 #-----------------------------
 
+    def command_for_peds_aver(self) :
+
+        if not cfg.make_psana_cfg_file_for_peds_aver() :            
+            logger.warning('INTERACTIVE JOB IS NOT STARTED !!!', __name__)
+            return False
+
+        command = 'psana -c ' + fnm.path_peds_aver_psana_cfg() # + ' ' + fnm.path_to_xtc_files_for_run() # fnm.path_dark_xtc_cond()
+        command_seq = command.split()
+
+        msg = 'Avereging xtc file(s) using command:\n%s' % command \
+            + '\nand save results in the log-file: %s' % fnm.path_peds_scan_batch_log()
+        logger.info(msg, __name__)
+        
+        err = gu.subproc_in_log(command_seq, fnm.path_peds_aver_batch_log()) # , shell=True)
+        if err != '' :
+            logger.error('\nerr: %s' % (err), __name__)
+            logger.warning('Processing for run %s is stopped due to error at execution of the averaging command' % self.str_run_number, __name__)
+            return False
+        else :
+            logger.info('Avereging for run %s is completed' % self.str_run_number, __name__)
+            return True
+
+#-----------------------------
+
     def is_good_lsf(self) :
         """Checks and returns LSF status"""
         queue = self.queue.value()
