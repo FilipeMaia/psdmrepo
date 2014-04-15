@@ -119,7 +119,7 @@ EpixElementV1Cvt::fillContainers(hdf5pp::Group group,
   if (m_excludedRowsCont) {
     ndarray<const uint16_t, 2> excludedRows = data.excludedRows(*config);
     type = H5Type::excludedRows_data_type(config->lastRowExclusions(), config->numberOfColumns());
-    m_frameCont->append(*excludedRows.data(), type);
+    m_excludedRowsCont->append(*excludedRows.data(), type);
   }
 
   ndarray<const uint16_t, 1> temperatures = data.temperatures(*config);
