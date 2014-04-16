@@ -11,6 +11,10 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-34	
+2014-04-15 Mikhail S. Dubrovin	
+- in ThreadCheckNewXtcFiles add protection against sending signal when experiment name has changed
+	
 Tag: V00-00-33	
 2014-04-15 Mikhail S. Dubrovin	
 - Command line calibration is implemented in full design scale:
