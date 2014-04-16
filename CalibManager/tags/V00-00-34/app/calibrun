@@ -1,0 +1,81 @@
+#!@PYTHON@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id$
+#
+# Description:
+#  Script calibrun...
+#
+#------------------------------------------------------------------------
+
+"""Command line for dark run calibration 
+
+This software was developed for the LCLS project.  If you use all or 
+part of it, please give an appropriate acknowledgement.
+
+@see RelatedModule
+
+@version $Id$ 
+
+@author Mikhail S. Dubrovin
+"""
+
+#------------------------------
+#  Module's version from CVS --
+#------------------------------
+__version__ = "$Revision: 8 $"
+# $Source$
+
+#--------------------------------
+#  Imports
+#--------------------------------
+import sys
+import os
+#import time
+#import matplotlib
+#matplotlib.use('Qt4Agg') # forse Agg rendering to a Qt4 canvas (backend)
+
+from CalibManager.GlobalUtils import ready_to_start
+from CalibManager.CommandLineCalib import *
+
+from optparse import OptionParser
+
+#-----------------------------
+
+def input_options_parser() :
+
+    parser = OptionParser(description='Optional input parameters.', usage ='usage: %prog [options] args')
+    parser.add_option('-e', '--exp',         dest='exp',        default=None,         action='store', type='string', help='experiment name, ex.: cxi12345')
+    parser.add_option('-r', '--run',         dest='runnum',     default=None,         action='store', type='int',    help='run number')
+    parser.add_option('-n', '--num_events',  dest='num_events', default=None,         action='store', type='int',    help='number of events to process')
+    parser.add_option('-s', '--skip_events', dest='skip_events',default=None,         action='store', type='int',    help='number of events to skip before processing')
+    parser.add_option('-t', '--thr_rms',     dest='thr_rms',    default=None,         action='store', type='float',  help='threshold on rms for hot pixel mask evaluation')
+    parser.add_option('-v', '--runrange',    dest='runrange',   default=None,         action='store', type='string', help='validity run range, ex.: 123-567 or 123-end')
+    parser.add_option('-q', '--queue',       dest='queue',      default=None,         action='store', type='string', help='queue name, ex: psnehq, psfehq, psanacsq. If specified - run in batch')
+    parser.add_option('-w', '--workdir',     dest='workdir',    default=None,         action='store', type='string', help='work directory, ex: ./work')
+    parser.add_option('-c', '--calibdir',    dest='calibdir',   default=None,         action='store', type='string', help='non-standard calibration directory, ex: /reg/neh/home/user/project/calib')
+    parser.add_option('-d', '--detector',    dest='detector',   default=None,         action='store', type='string', help='detector names separated by comma, ex:CSPAD,CSPAD2x2,PNCCD')
+    parser.add_option('-p', '--print_bits',  dest='print_bits', default=0,            action='store', type='int',    help='print_bits - on/off bits to print messages')
+    parser.add_option('-P', '--process',     dest='process',    default=False,        action='store_true',           help='process xtc files and produce calib files under the "work" directory')
+    parser.add_option('-D', '--deploy',      dest='deploy',     default=False,        action='store_true',           help='deploy calibrated files under the "calib" directory')
+
+    (opts, args) = parser.parse_args()
+    return (opts, args)
+ 
+#---------------------------------
+
+if __name__ == "__main__" :
+
+    if not ready_to_start(check_bits=0776, fatal_bits=0) : 
+        sys.exit('Not ready to start aplication yet...')
+
+    (opts, args) = input_options_parser()
+    list_args = args
+    dict_opts = vars(opts)
+
+    CommandLineCalib(list_args, dict_opts)
+    #CommandLineCalib(*args, **opts)
+
+    sys.exit('End of application calibrun')
+
+#---------------------------------
