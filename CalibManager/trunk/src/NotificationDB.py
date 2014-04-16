@@ -32,10 +32,10 @@ import GlobalUtils          as     gu
 class NotificationDB :
     """Is intended for submission of notification records in db
     """
-    server = 'psdb'
-    table  = 'calibman'
 
-    def __init__(self) :
+    def __init__(self, server='psdb', table='calibman') :
+        self.server = server
+        self.table  = table
         self.db = _mysql.connect(self.server, cp.par02, cp.par01[7:3:-1].lower(), cp.par02)
 
 
@@ -74,12 +74,16 @@ class NotificationDB :
         info_dict['exp']  = cp.exp_name.value()
         info_dict['run']  = cp.str_run_number.value()
         info_dict['dets'] = cp.det_name.value()
-        try :
-            info_dict['vers'] = cp.package_versions.get_pkg_version('CalibManager')
-        except :
-            info_dict['vers'] = 'N/A'
-            #info_dict['vers'] = gu.get_pkg_version('CalibManager') # Very slow
+        info_dict['vers'] = self.get_version()
         return info_dict
+
+
+    def get_version(self) :
+        try :
+            return cp.package_versions.get_pkg_version('CalibManager')
+        except :
+            return 'N/A'
+            #return gu.get_pkg_version('CalibManager') # Very slow
 
 
     def cmd_insert_record(self) :
@@ -151,49 +155,63 @@ class NotificationDB :
         self.insert_record()
         self.close()
 
+
+    def print_pars(self) :
+        print 'server = %s' % self.server
+        print 'table  = %s' % self.table
+
+
 #------------------------------
 
-def test_notification_db(test_num):
+def test_notification_db(ndb, test_num):
 
     print 'Test: %d' % test_num
 
-    ndb = NotificationDB()
-
     if test_num == 0 :
+        print 'Create table for:'
+        ndb.print_pars()
         print 'cmd_create_table(): ', ndb.cmd_create_table()
         ndb.create_table()
 
     elif test_num == 1 :
+        print 'DB content:'
         list_of_recs = ndb.get_list_of_recs_for_query(ndb.cmd_fetch())
         print 'Resp:\n',
         for rec in list_of_recs : print rec
 
     elif test_num == 2 :
+        print 'insert/submit a record in the DB'
         ndb.insert_record(mode='enabled')
         #ndb.insert_record() # default: mode='self-disabled'
 
     elif test_num == 3 :
-        print ndb.get_list_of_keys()
+        print 'Keys:  %s' % ndb.get_list_of_keys()
 
     elif test_num == 4 :
+        print 'Values:'
         for vals in ndb.get_list_of_values() : print vals
 
-    elif test_num == 9 :
-        ndb.delete_table()
+    elif test_num == 5 :
+        print 'DB parameters:'
+        ndb.print_pars()
 
-    ndb.close()
+    elif test_num == 9 :
+        print 'Delete table:'
+        ndb.print_pars()
+        ndb.delete_table()
 
 #------------------------------
 
-if __name__ == "__main__" :
+def main_test(ndb):
 
     if len(sys.argv)==2 and sys.argv[1] == '-h' :
-        msg  = 'Use %s with a single parameter, <test number=0-3>' % sys.argv[0]
+        msg  = 'Use %s with a single parameter, <test number=0,1,2,3,...>' % sys.argv[0]
         msg += '\n    0 - create table in db ...'        
         msg += '\n    1 - print db content'        
         msg += '\n    2 - insert/submit a record in the db'        
         msg += '\n    3 - print keys'        
         msg += '\n    4 - print values'        
+        msg += '\n    5 - print DB parameters'        
         msg += '\n    9 - delete table ...'        
         print msg
 
@@ -201,11 +219,19 @@ if __name__ == "__main__" :
 
         try    :
             test_num = int(sys.argv[1])
-            test_notification_db(test_num)
+            test_notification_db(ndb, test_num)
         except :
-            test_notification_db(3)
-            test_notification_db(4)
+            test_notification_db(ndb, 3)
+            test_notification_db(ndb, 4)
 
-    sys.exit ( 'End of test.' )
+#------------------------------
+
+if __name__ == "__main__" :
+
+    ndb = NotificationDB()
+    main_test(ndb)
+    ndb.close()
+
+    sys.exit ( 'End of test NotificationDB' )
 
 #------------------------------

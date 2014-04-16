@@ -32,12 +32,12 @@ class Logger :
     """Is intended as a log-book keeper.
     """
     name = 'Logger'
+    levels = ['debug','info','warning','error','crytical']
 
     def __init__ ( self, fname=None, level='info' ) :
         """Constructor.
         @param fname  the file name for output log file
         """
-        self.levels = ['debug','info','warning','error','crytical']
         self.setLevel(level)
         self.selectionIsOn = True # It is used to get total log content
         

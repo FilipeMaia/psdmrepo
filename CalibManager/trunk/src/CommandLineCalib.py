@@ -35,6 +35,7 @@ from BatchJobPedestals        import *
 from BatchLogScanParser       import blsp # Just in order to instatiate it
 
 import FileDeployer           as     fdmets
+from NotificationDBForCL      import *
 
 #------------------------------
 class CommandLineCalib () :
@@ -48,6 +49,7 @@ class CommandLineCalib () :
 
         self.args = args
         self.opts = opts
+        self.count_msg = 0
 
         #self.print_command_line_pars(args, opts)
 
@@ -71,7 +73,8 @@ class CommandLineCalib () :
 
         self.deploy_calib_files()
         
-        logger.saveLogInFile(fnm.log_file())
+        self.save_log_file()
+        self.add_record_in_db()
 
 #------------------------------
 
@@ -84,11 +87,12 @@ class CommandLineCalib () :
                   +'\nIf the "%s" is launched after "calibman" most of parameters may be already set.' % appname\
 	          +'\nBut, at least run number must be specified as an optional parameter, try command:\n    %s -r <number>'\
                   % appname
-            print msg
+            self.log(msg,4)
 	    return False
         self.runnum = self.opts['runnum']
         self.str_run_number = '%04d' % self.runnum
 
+        self.print_bits = self.opts['print_bits']
 
 	if self.opts['runrange'] is None :
             self.str_run_range = '%s-end' % self.runnum
@@ -98,7 +102,7 @@ class CommandLineCalib () :
 
 	self.exp_name = cp.exp_name.value() if self.opts['exp'] is None else self.opts['exp']
         if self.exp_name == cp.exp_name.value_def() :
-	    print 'Experiment name is not defined, should be specified as optional parameter -e <exp-name>'
+	    self.log('Experiment name is not defined, should be specified as optional parameter -e <exp-name>',4)
 	    return False
 
 
@@ -110,14 +114,18 @@ class CommandLineCalib () :
         list_of_dets_sel = self.det_name.split()
         list_of_dets_sel_lower = [det.lower() for det in list_of_dets_sel]
 
+        msg = '\n' + 50*'-' + 'List of detectors:'
         for det, par in zip(cp.list_of_dets_lower, cp.det_cbx_states_list) :
             par.setValue(det in list_of_dets_sel_lower)
-            print '%s %s' % (det.ljust(10), par.value())
+            msg += '\n%s %s' % (det.ljust(10), par.value())
+
+        self.log(msg,1)
 
 
 
         if self.det_name == cp.det_name.value_def() :
-	    print 'Detector name(s) is not defined, should be specified as optional parameter -d <det-names>, ex.: -d CSPAD,CSPAD2x2 etc'
+	    self.log('Detector name(s) is not defined, should be specified as '\
+                     + 'optional parameter -d <det-names>, ex.: -d CSPAD,CSPAD2x2 etc',4)
 	    return False
 
 
@@ -158,46 +166,43 @@ class CommandLineCalib () :
 #------------------------------
 
     def print_local_pars(self) :
-        print '\n' + 50*'-' \
+        msg = '\n' + 50*'-' \
         + '\nprint_local_pars(): Combination of command line parameters and' \
         + '\nconfiguration parameters from file %s (if available after "calibman")' % cp.getParsFileName() \
-        + '\n     str_run_number: %s' % self.str_run_number \
-        + '\n     runrange      : %s' % self.str_run_range \
-        + '\n     exp_name      : %s' % self.exp_name \
-        + '\n     instr_name    : %s' % self.instr_name \
-        + '\n     workdir       : %s' % self.workdir \
-        + '\n     calibdir      : %s' % self.calibdir \
-        + '\n     det_name      : %s' % self.det_name \
-        + '\n     queue         : %s' % self.queue \
-        + '\n     num_events    : %d' % self.num_events \
-        + '\n     skip_events   : %d' % self.skip_events \
-        + '\n     thr_rms       : %f' % self.thr_rms \
-        + '\n     process       : %s' % self.process \
-        + '\n     deploy        : %s' % self.deploy
+        + '\n     str_run_number: %s' % self.str_run_number\
+        + '\n     runrange      : %s' % self.str_run_range\
+        + '\n     exp_name      : %s' % self.exp_name\
+        + '\n     instr_name    : %s' % self.instr_name\
+        + '\n     workdir       : %s' % self.workdir\
+        + '\n     calibdir      : %s' % self.calibdir\
+        + '\n     det_name      : %s' % self.det_name\
+        + '\n     queue         : %s' % self.queue\
+        + '\n     num_events    : %d' % self.num_events\
+        + '\n     skip_events   : %d' % self.skip_events\
+        + '\n     thr_rms       : %f' % self.thr_rms\
+        + '\n     process       : %s' % self.process\
+        + '\n     deploy        : %s' % self.deploy\
+        + '\n     print_bits    : %s' % self.print_bits
         #+ '\nself.logfile       : ' % self.logfile     
+
+        self.log(msg,1)
 
 #------------------------------
 
     def print_command_line_pars(self, args, opts) :
 
-        print '\nprint_command_line_pars(...):'
-
-        print 'args:', args
-        print 'opts:', opts
-        #print 'args:\n', ', '.join(args)
-
-        #for k,v in opts.iteritems():
-       	#    print '%s : %s' % (k.ljust(16),v)
+        msg = '\nprint_command_line_pars(...):\n  args: %s\n  opts: %s' % (args,opts)
+        self.log(msg,1)
 
 #------------------------------
 
     def proc_dark_run_interactively(self) :
 
         if self.process :
-            print '\n' + 50*'-' + '\nBegin dark run data processing interactively'
+            self.log('\n' + 50*'-' + '\nBegin dark run data processing interactively',1)
         else :
-            print '\n' + 50*'-' + '\nWARNING: File processing option IS TURNED OFF...'\
-                  + '\nAdd "-P" option in the command line to process files' 
+            self.log('\n' + 50*'-' + '\nWARNING: File processing option IS TURNED OFF...'\
+                  + '\nAdd "-P" option in the command line to process files',4) 
             return
 
         self.bjpeds = BatchJobPedestals(self.runnum)
@@ -208,7 +213,7 @@ class CommandLineCalib () :
         if not self.bjpeds.command_for_peds_aver() :
             msg = '\n' + 50*'-' + '\nSTATUS OF PROCESSING IS NOT GOOD !!!'\
                   +'\nSee details in the logfile(s)'
-            print msg
+            self.log(msg,4)
             #return
 
         self.print_dark_ave_batch_log()
@@ -219,10 +224,10 @@ class CommandLineCalib () :
     def proc_dark_run_in_batch(self) :
 
         if self.process :
-            print '\n' + 50*'-' + '\nBegin dark run data processing in batch queue %s' % self.queue
+            self.log('\n' + 50*'-' + '\nBegin dark run data processing in batch queue %s' % self.queue,1)
         else :
-            print '\n' + 50*'-' + '\nWARNING: File processing option IS TURNED OFF...'\
-                  + '\nAdd "-P" option in the command line to process files' 
+            self.log('\n' + 50*'-' + '\nWARNING: File processing option IS TURNED OFF...'\
+                  + '\nAdd "-P" option in the command line to process files',4)
             return
 
         self.bjpeds = BatchJobPedestals(self.runnum)
@@ -234,7 +239,7 @@ class CommandLineCalib () :
             sleep(dt)
             sum_dt += dt
             status = self.bjpeds.status_for_peds_files_essential()
-            print '%3d sec: Files %s available' % (sum_dt, {False:'ARE NOT', True:'ARE'}[status])
+            self.log('%3d sec: Files %s available' % (sum_dt, {False:'ARE NOT', True:'ARE'}[status]),1)
             if status :
                 self.print_dark_ave_batch_log()
                 return
@@ -250,14 +255,15 @@ class CommandLineCalib () :
     def deploy_calib_files(self) :
         list_of_deploy_commands, list_of_sources = fdmets.get_list_of_deploy_commands_and_sources_dark(self.str_run_number, self.str_run_range)
         msg = '\n' + 50*'-' + '\nTentative deployment commands:\n' + '\n'.join(list_of_deploy_commands)
-        print msg
+        self.log(msg,1)
 
         if self.deploy :
-            print '\n' + 50*'-' + '\nBegin deployment of calibration files' 
+            self.log('\n' + 50*'-' + '\nBegin deployment of calibration files',1) 
             fdmets.deploy_calib_files(self.str_run_number, self.str_run_range, mode='calibrun-dark', ask_confirm=False)
-            print '\nDeployment of calibration files is completed'
+            self.log('\nDeployment of calibration files is completed',1)
         else :
-            print '\n' + 50*'-' + '\nWARNING: File deployment option IS TURNED OFF... \nAdd "-D" option in the command line to deploy files' 
+            self.log('\n' + 50*'-' + '\nWARNING: File deployment option IS TURNED OFF...'\
+                     +'\nAdd "-D" option in the command line to deploy files',4)
 
 #------------------------------
 
@@ -277,12 +283,29 @@ class CommandLineCalib () :
 
 #------------------------------
 
+    def save_log_file(self) :
+        logfname = fnm.log_file()
+        msg = 'Save log-file: %s' % logfname
+        if self.print_bits & 1 : print msg
+        logger.saveLogInFile(logfname)
+
+
+    def add_record_in_db(self) :
+        try :
+            ndb = NotificationDBForCL()
+            ndb.insert_record(mode='enabled')
+            ndb.close()
+            #ndb.add_record()
+        except :
+            pass
+
+ 
     def print_list_of_files_dark_in_work_dir(self) :
         lst = self.get_list_of_files_dark_in_work_dir()
         msg = '\n' + 50*'-' + '\nList of files in work directory for command "ls %s*"' % fnm.path_prefix_dark()
         if lst == [] : msg += ' is empty'
         else         : msg += ':\n' + '\n'.join(lst)
-        print msg
+        self.log(msg,1)
 
 
     def get_list_of_files_dark_in_work_dir(self) :
@@ -302,13 +325,13 @@ class CommandLineCalib () :
     def print_list_of_types_and_sources_from_xtc(self) :
         txt = '\n' + 50*'-' + '\nData Types and Sources from xtc scan of the\n' \
             + cp.blsp.txt_list_of_types_and_sources()
-        print txt
+        self.log(txt,1)
 
 
     def print_list_of_sources_from_regdb(self) :
         txt = '\n' + 50*'-' + '\nSources from DB:\n' \
             + cp.blsp.txt_of_sources_in_run()
-        print txt
+        self.log(txt,1)
 
 
     def print_dark_ave_batch_log(self) :
@@ -316,7 +339,7 @@ class CommandLineCalib () :
         txt = '\n' + 50*'-' + '\npsana log file %s:\n\n' % path \
             + gu.load_textfile(fnm.path_peds_aver_batch_log()) \
             + 'End of psana log file %s' % path
-        print txt
+        self.log(txt,1)
 
 
     def get_print_lsf_status(self) :
@@ -324,7 +347,7 @@ class CommandLineCalib () :
         msg, status = gu.msg_and_status_of_lsf(queue)
         msgi = '\n' + 50*'-' + '\nLSF status for queue %s: \n%s\nLSF status for %s is %s'\
                % (queue, msg, queue, {False:'bad',True:'good'}[status])
-        print msgi
+        self.log(msgi,1)
         return status
 
 
@@ -334,7 +357,22 @@ class CommandLineCalib () :
         lst_for_run = [path for path in lst if pattern in os.path.basename(path)]
         txt = '\n' + 50*'-' + '\nList of xtc files for exp=%s:run=%s :\n' % (self.exp_name, self.str_run_number)
         txt += '\n'.join(lst_for_run)
-        print txt
+        self.log(txt,1)
+
+#------------------------------
+
+    def log(self, msg, level=1) :
+        #logger.levels = ['debug','info','warning','error','crytical']
+        self.count_msg += 1
+        #print 'Received msg: %d' % self.count_msg
+        if self.print_bits & 1 or level==4 : print msg
+
+        if   level==1 : logger.info    (msg, __name__)
+        elif level==0 : logger.debug   (msg, __name__)
+        elif level==2 : logger.warning (msg, __name__)
+        elif level==3 : logger.error   (msg, __name__)
+        elif level==4 : logger.crytical(msg, __name__)
+        else          : logger.info    (msg, __name__)
 
 #------------------------------
 #------------------------------

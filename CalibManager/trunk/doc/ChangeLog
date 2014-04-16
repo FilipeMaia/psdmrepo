@@ -11,6 +11,13 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-35	
+2014-04-16 Mikhail S. Dubrovin	
+- in CommandLineCalib - pass all printout through self.log(...), use print_bits, submit in logger.
+- in app/calibrun cosmetic - add time, time-stamps, process name in messages
+- add NotificationDBForCL as subclass of NotificationDB adjusted for calibrun
+- adjust NotificationDB in order to use it as superclass
+	
 Tag: V00-00-34	
 2014-04-15 Mikhail S. Dubrovin	
 - in ThreadCheckNewXtcFiles add protection against sending signal when experiment name has changed
@@ -23,7 +30,7 @@ Tag: V00-00-33
 - in GUIDarkControlBar replace run range edit-fields by the GUIRunRange widget
 - in GUIRunRange emit signal when any of run range fields is changed
 
-Tag: V00-00-32	
+Tag: V00-00-32
 2014-04-14 Mikhail S. Dubrovin
 - cleanup edi_from in in GUIFileManagerGroupControl
 	
