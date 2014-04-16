@@ -83,8 +83,9 @@ store_epics = calib_repeat
 # translation occurs with the data - regardless of src or key. For data that gets 
 # past the type filter, the Translator looks at the src and key. If the key 
 # string is empty, it checks the source filter. Data with non empty key strings are 
-# handled via the key filter. Data with the special calibration key string are handled via the 
-# calibration filtering. 
+# handled via the key filter. If the src is filtered, but the key is not, then the
+# data will be translated. Data with the special calibration key string are handled 
+# via the calibration filtering. 
 #
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # TYPE FILTERING 
@@ -191,26 +192,18 @@ src_filter = include all
 #
 # If you are doing the latter, the module output will be data of the same type 
 # and src as the uncalibrated data, with an additional key, such as 'calibrated'.
-#
-# The Translator defaults to skipping the translation of the uncalibrated
-# data when a calibrated version of that data is present.  Below you 
-# can control the calibration key and whether or not to include the
-# uncalibrated data.
+# If these modules are configured to use a different key, set calibration_key
+# below accordingly:
 
 calibration_key = calibrated
-include_uncalibrated_data = false
-exclude_calibrated_data = false
 
-# Sometimes the calibrated data is not the end result desired, it may be input to 
-# another module, such as an image producer. In this case you may want to set
-# exclude_calibrated_data=true
+# The Translator defaults to writing calibrated data in place of uncalibrated
+# data. If you do not want the calibrated data, set skip_calibrated to true.
 
-# Note: this only affects calibrated data of the same type and src as the
-# uncalibrated data.  When the calibration module produces a NDArray, both
-# the NDArray and the uncalibrated data are translated.  If you do not wish
-# to translate the uncalibrated data, use appropriate type or src_filter options.
-# Likewise if you do not want to translate certain NDArray's, see the 
-# key_filter options below.
+skip_calibrated = false
+
+# note, setting skip_calibrated to true will force sets exclude_calibstore 
+# (below) to be true as well.
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # CALIBSTORE FILTERING
@@ -269,22 +262,6 @@ key_filter = include all
 
 shuffle = true
 deflate = 1
-
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
-# DAQ ALIAS LINKS
-#
-# When DAQ aliases exist in the xtc files, the Translator will create links
-# using the alias names to the src hdf5 group. For example if one has an 
-# alias such as: 
-# acq01 -> SxrEndstation.0:Acqiris.0
-# and one has Acqiris::DataDescV1 coming from this source, the h5 file will 
-# contain the link:
-#  Acqiris::DataDescV1/acq01 -> Acqiris::DataDescV1/SxrEndstation.0:Acqiris.0
-# so that one does not have to use the full src to access the data.
-# 
-# To turn this feature off, set create_alias_links to false
-
-create_alias_links = true
 
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 # TECHNICAL, ADVANCED CONFIGURATION
@@ -356,16 +333,6 @@ create_alias_links = true
 # split events to look back through here (default is 3000):
 
 max_saved_split_events = 3000
-
-# ---------------------------------------
-# HDF5 GROUP NAMES
-# The typenames for beam line data defaults to being written as (for example) 
-# Bld::BldDataEBeamV0. Setting short_bld_name to true causes it to be 
-# written as BldDataEBeamV0. If set to true, names are written differently
-# then with o2o-translate and the change may break code that reads h5 files 
-# (such as psana)
-
-short_bld_name = false
 
 # ---------------------------------------
 # HDF5 FILE PROPERTIES

@@ -185,8 +185,6 @@ private:
   SplitMode m_split;
   hsize_t m_splitSize;
 
-  bool m_short_bld_name;
-  bool m_create_alias_links;
   bool m_overwrite;
 
   // translation parameters
@@ -199,8 +197,7 @@ private:
   std::vector<PSEvt::Source> m_SourceFilterList;
 
   std::string m_calibration_key;
-  bool m_include_uncalibrated_data;
-  bool m_exclude_calibrated_data;
+  bool m_skip_calibrated;
   bool m_exclude_calibstore;
 
   std::set<PSEvt::EventKey, LessEventKey> m_calibratedEventKeys;

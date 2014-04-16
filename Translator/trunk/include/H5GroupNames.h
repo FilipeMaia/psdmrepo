@@ -23,8 +23,7 @@ namespace Translator {
  */
 class H5GroupNames {
  public:
-  H5GroupNames(bool short_bld_name, 
-               const TypeAliases::TypeInfoSet & ndarrays);
+  H5GroupNames(const std::string & calibratedKey, const TypeAliases::TypeInfoSet & ndarrays);
   /**
    * @brief returns H5 group name for a C++ type
    *
@@ -72,26 +71,9 @@ class H5GroupNames {
   std::string nameForSrcKey(const Pds::Src &src, const std::string &key);
 
   /**
-   * @brief returns h5 group name for a alias string and key
-   *
-   * If the alias is empty, and empty string is returned. Otherwise the H5 
-   * group name for an alias,key pair is a concatenation of the two. 
-   * Otherwise, a special string is used to separate the src
-   * from the key in the concatenation. It the alias itself contains this
-   * special substring, a warning is printed and an empty string is returned.
-   * The alias string is further checked for the "do not translate" string, as 
-   * well as for characters that are problemeatic for h5 filenames. The cleaned 
-   * key string is used in the group name.
-   *
-   * @param[in] src the Pds::Src for the group
-   * @return string name for the h5 group, empty if alias is empty.
-   */
-  std::string nameForAliasKey(const std::string &alias, const std::string &key);
-
-  /**
    * @brief returns true if the type is one of the known NDArrays.
    *
-   * @param[in] C++ type.
+   * @param[in] typeInfoPtr the C++ type.
    * @return true if it is a known NDArray.
    */
   bool isNDArray(const std::type_info *typeInfoPtr) { 
@@ -103,8 +85,7 @@ class H5GroupNames {
   std::string srcKeySep();
 
  private:
-
-  bool m_short_bld_name;
+  const std::string m_calibratedKey;
   const TypeAliases::TypeInfoSet m_ndarrays;
 }; // class H5GroupNames
 

@@ -18,8 +18,6 @@ namespace {
 
   const std::string srcKeySepStr = "__";
 
-  const char * logger = "H5GroupNames";
-
   std::string strDetInfo(const Pds::DetInfo& src, bool detInfoSpecialAsAstrerik)
   {
     std::ostringstream str ;
@@ -101,9 +99,8 @@ namespace {
 
 namespace Translator {
 
-H5GroupNames::H5GroupNames(bool short_bld_name, const TypeAliases::TypeInfoSet & ndarrays) 
-  : m_short_bld_name(short_bld_name),
-    m_ndarrays(ndarrays) 
+H5GroupNames::H5GroupNames(const std::string & calibratedKey, const TypeAliases::TypeInfoSet & ndarrays) 
+  : m_calibratedKey(calibratedKey), m_ndarrays(ndarrays) 
 {}
 
 string H5GroupNames::nameForType(const std::type_info *typeInfoPtr) {
@@ -117,15 +114,6 @@ string H5GroupNames::nameForType(const std::type_info *typeInfoPtr) {
   static const string psana("Psana::");
   if (realName.size() > psana.size() and realName.substr(0,psana.size()) == psana) {
     realName = realName.substr(psana.size());
-  }
-  
-  // shorten Bld::Bld to Bld:: if option is set
-  static const string BldBld("Bld::Bld");
-  static const string Bld("Bld::");
-  if (m_short_bld_name) {
-    if (realName.size() > BldBld.size() and realName.substr(0,BldBld.size()) == BldBld) {
-      realName = realName.substr(Bld.size());
-    }
   }
   
   // replace CsPad::DataV with CsPad::ElementV for backward compatibility
@@ -158,6 +146,7 @@ string H5GroupNames::nameForSrc(const Pds::Src &src) {
 
 std::string H5GroupNames::nameForSrcKey(const Pds::Src &src, const std::string &key) {
   string srcKeyGroupName = nameForSrc(src); // should always be non-zero length
+  if (key == m_calibratedKey) return srcKeyGroupName;
   string keyStringToAddOrig;
   hasDoNotTranslatePrefix(key,&keyStringToAddOrig);
   string keyStringToAdd = replaceCharactersThatAreBadForH5GroupNames(keyStringToAddOrig);
@@ -167,24 +156,6 @@ std::string H5GroupNames::nameForSrcKey(const Pds::Src &src, const std::string &
   return srcKeyGroupName;
 }
 
-std::string H5GroupNames::nameForAliasKey(const std::string &alias, const std::string &key) {
-  string aliasClean = replaceCharactersThatAreBadForH5GroupNames(alias);
-  if (aliasClean.size() == 0) return "";
-  size_t sepPos = aliasClean.find(srcKeySep());
-  if (sepPos != string::npos) {
-    MsgLog(logger,warning,"alias: " << aliasClean << " (after H5 clean) "
-           << " includes the src key separation string: " << srcKeySep() 
-           << " so no soft link will be created with it.");
-    return "";
-  }
-  string keyStringToAddOrig;
-  hasDoNotTranslatePrefix(key,&keyStringToAddOrig);
-  string keyStringToAdd = replaceCharactersThatAreBadForH5GroupNames(keyStringToAddOrig);  
-  if (keyStringToAdd.size()>0) {
-    return aliasClean + srcKeySep() + keyStringToAdd;
-  }
-  return aliasClean;
-}
 
 std::string H5GroupNames::srcKeySep() {
   return ::srcKeySepStr;

@@ -970,26 +970,6 @@ class H5Output( unittest.TestCase ) :
         self.runPsanaOnCfg(cfgfile,output_h5, extraOpts='-n 10',printPsanaOutput=self.printPsanaOutput)
         cfgfile.close()
 
-        # check for acq01 soft link:
-        cmd = 'h5ls -r %s | grep acq01' % output_h5
-        p = sb.Popen(cmd,shell=True,stdout=sb.PIPE,stderr=sb.PIPE)
-        o,e = p.communicate()
-        assert e == ""
-        o=o.strip()
-        expectedOutput = '''/Configure:0000/Acqiris::ConfigV1/acq01 Soft Link {SxrEndstation.0:Acqiris.0}
-/Configure:0000/Run:0000/CalibCycle:0000/Acqiris::DataDescV1/acq01 Soft Link {SxrEndstation.0:Acqiris.0}'''
-        self.assertEqual(o,expectedOutput, msg="acq01 alias output for cmd=%s mismatch, expected=\n'%s'\nobserved=\n'%s'" % (cmd,expectedOutput,o))
-
-        # check for acq02 soft link:
-        cmd = 'h5ls -r %s | grep acq02' % output_h5
-        p = sb.Popen(cmd,shell=True,stdout=sb.PIPE,stderr=sb.PIPE)
-        o,e = p.communicate()
-        assert e == ""
-        o=o.strip()
-        expectedOutput = '''/Configure:0000/Acqiris::ConfigV1/acq02 Soft Link {SxrEndstation.0:Acqiris.2}
-/Configure:0000/Run:0000/CalibCycle:0000/Acqiris::DataDescV1/acq02 Soft Link {SxrEndstation.0:Acqiris.2}'''
-        self.assertEqual(o,expectedOutput, msg="acq02 alias output for cmd=%s mismatch, expected=\n'%s'\nobserved=\n'%s'" % (cmd,expectedOutput,o))
-
         # check that the Alias::ConfigV1 object got written:
         h5file=h5py.File(output_h5,'r')
         aliases=h5file['/Configure:0000/Alias::ConfigV1/Control/aliases']
@@ -1003,19 +983,6 @@ class H5Output( unittest.TestCase ) :
         self.assertTrue(all(srcPhy == srcPhyExpected), msg="Alias::ConfigV1 srcPhy mismatch, expected=\n'%s'\nobserved=\n'%s'" % (srcLog,srcLogExpected))
         self.assertTrue(all(srcLog == srcLogExpected), msg="Alias::ConfigV1 srcLog mismatch, expected=\n'%s'\nobserved=\n'%s'" % (srcPhy,srcPhyExpected))
         
-        # check that if we turn off aliases, we do not see them:
-        cfgfile = writeCfgFile(input_file, output_h5)
-        cfgfile.write("create_alias_links=false\n")
-        self.runPsanaOnCfg(cfgfile,output_h5, extraOpts='-n 10', printPsanaOutput=self.printPsanaOutput)
-        cfgfile.close()
-        cmd = 'h5ls -r %s | grep "acq02\|acq01"' % output_h5
-        p = sb.Popen(cmd,shell=True,stdout=sb.PIPE,stderr=sb.PIPE)
-        o,e = p.communicate()
-        self.assertEqual(e.strip(),"",msg="Error running h5ls on %s, err=%s"  % (output_h5,e))
-        self.assertEqual(o.strip(),"",msg="acq01 or acq02 still in file: %s, h5ls output=%s" % (output_h5,o))
-        if self.cleanUp:
-            os.unlink(output_h5)
-
         # check that if we uses aliases in the src_filter option, that it works
         cfgfile = writeCfgFile(input_file, output_h5)
         cfgfile.write("src_filter=exclude acq01 acq02\n")
@@ -1057,6 +1024,89 @@ class H5Output( unittest.TestCase ) :
         self.assertEqual(status.shape,(185,388,2),msg="status for 2x2 shape is not 185 388 2")
         self.assertEqual(commonMode['mode'],1,msg="CsPadCommonModeSubV1.mode != 1, it was 1 when test was developed")
         self.assertEqual(commonMode['data'][0],24.,msg="CsPadCommonModeSubV1.data[0] != 24., it was 24. when test was developed")
+        if self.cleanUp:
+            os.unlink(output_h5)
+            
+    @unittest.skip("disabled no data access")
+    def test_calibration(self):
+        '''runs on xpptut data to see if calibration occurs. We are testing against 
+        calibrated values seen when running on 4/16/2014 - if different calibration 
+        constants are deployed, this test may fail (or if the calib directory is moved or
+        not found).
+
+        Note - this data is not in the translator test directory. It has to be on disk
+        for the test to succeed.
+        '''
+        idx = [100,100,0]  # the index for the below values
+        cspad0raw = 499
+        cspad0calib = 4
+        cspad1raw = 409
+        cspad1calib = 8
+
+        cspad0DataPath = '/Configure:0000/Run:0000/CalibCycle:0000/CsPad2x2::ElementV1/XppGon.0:Cspad2x2.0/data'
+        cspad1DataPath = '/Configure:0000/Run:0000/CalibCycle:0000/CsPad2x2::ElementV1/XppGon.0:Cspad2x2.1/data'
+
+        input_file = "exp=xpptut13:run=71"
+        output_h5 = os.path.join(OUTDIR,"unit-test_xpptut13_r71.h5")
+
+        #######################################
+        # test that calibrated data written where uncalibrated would be:
+        cfgfile = writeCfgFile(input_file, output_h5, moduleList="cspad_mod.CsPadCalib Translator.H5Output")
+        cfgfile.write("deflate = -1\n")
+        self.runPsanaOnCfg(cfgfile,output_h5, extraOpts='-n 2',printPsanaOutput=self.printPsanaOutput)
+        cfgfile.close()
+        f = h5py.File(output_h5,'r')
+        cspad0data = f[cspad0DataPath][0]
+        cspad1data = f[cspad1DataPath][0]
+        cspad0inH5 = cspad0data[idx[0],idx[1],idx[2] ]
+        cspad1inH5 = cspad1data[idx[0],idx[1],idx[2] ]
+        failMsg0 = "calibrated value should be %s but read %s. (uncalibrated value is %s)." % \
+                  (cspad0calib, cspad0inH5, cspad0raw)
+        failMsg0 += " dataset is: %s" % cspad0DataPath
+        failMsg0 += " Perhaps calibration directory not found, or calibration data changed since test written"
+        failMsg1 = "calibrated value should be %s but read %s. (uncalibrated value is %s)." % \
+                  (cspad0calib, cspad0inH5, cspad0raw)
+        failMsg1 += " dataset is: %s" % cspad1DataPath
+        failMsg1 += " Perhaps calibration directory not found, or calibration data changed since test written"
+        self.assertEqual( cspad0inH5, cspad0calib, msg=failMsg0)
+        self.assertEqual( cspad1inH5, cspad1calib, msg=failMsg1)
+        calibStore=f['/Configure:0000/CalibStore']
+        self.assertEqual(set(calibStore.keys()), 
+                         set([u'pdscalibdata::CsPad2x2PedestalsV1', 
+                              u'pdscalibdata::CsPad2x2PixelStatusV1',
+                              u'pdscalibdata::CsPadCommonModeSubV1']),
+                         msg = "calibStore does not contain only pdscalibdata::CsPad2x2PedestalsV1, pdscalibdata::CsPad2x2PixelStatusV1, pdscalibdata::CsPadCommonModeSubV1")
+        del f
+        os.unlink(output_h5)
+
+        #####################################################
+        # test that uncalibrated data written when skip in place
+        cfgfile = writeCfgFile(input_file, output_h5, moduleList="cspad_mod.CsPadCalib Translator.H5Output")
+        cfgfile.write("deflate = -1\n")
+        cfgfile.write("skip_calibrated = true\n")
+        self.runPsanaOnCfg(cfgfile,output_h5, extraOpts='-n 2',printPsanaOutput=self.printPsanaOutput)
+        cfgfile.close()
+        f = h5py.File(output_h5,'r')
+
+        # check that no calibstore group made:
+        with self.assertRaises(KeyError):
+            calibStore=f['/Configure:0000/CalibStore']
+
+        cspad0data = f[cspad0DataPath][0]
+        cspad1data = f[cspad1DataPath][0]
+        cspad0inH5 = cspad0data[idx[0],idx[1],idx[2] ]
+        cspad1inH5 = cspad1data[idx[0],idx[1],idx[2] ]
+        failMsg0 = "skipped calibrated value should be %s but read %s. (calibrated value is %s)." % \
+                  (cspad0raw, cspad0inH5, cspad0calib)
+        failMsg0 += " dataset is: %s" % cspad0DataPath
+        failMsg0 += " problem with Translator code, not skipping calibrated?"
+        failMsg1 = "skipped calibrated value should be %s but read %s. (calibrated value is %s)." % \
+                  (cspad0raw, cspad0inH5, cspad0calib)
+        failMsg1 += " dataset is: %s" % cspad1DataPath
+        failMsg1 += " problem with Translator code, not skipping calibrated?"
+        self.assertEqual( cspad0inH5, cspad0raw, msg=failMsg0)
+        self.assertEqual( cspad1inH5, cspad1raw, msg=failMsg1)
+
         if self.cleanUp:
             os.unlink(output_h5)
             

@@ -11,6 +11,15 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-00
+2014-04-15 David
+- First production tag for replacing o2o-translate. Changes:
+- Don't create src alias links. remove create_alias_links option
+- switch calibration handling to be backward compatible with o2o-translate
+- remove include_uncalibrated_data and excluce_calibrated_data switches
+- add skip_calibrated switch
+- remove short_bld_name option - always write Bld names as o2o did
+
 Tag: V00-00-29
 2014-04-07 David
 - fix unit test

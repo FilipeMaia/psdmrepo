@@ -211,7 +211,7 @@ void TypeSrcKeyH5GroupDirectory::markAllSrcKeyGroupsNotWrittenForEvent() {
 }
 
 
-TypeMapContainer::iterator TypeSrcKeyH5GroupDirectory::findType(const type_info *typeInfoPtr) {
+TypeMapContainer::iterator TypeSrcKeyH5GroupDirectory::findType(const std::type_info *typeInfoPtr) {
   std::string h5GroupName = m_h5GroupNames->nameForType(typeInfoPtr);
   return m_map.find(h5GroupName);
 }
@@ -224,7 +224,7 @@ TypeMapContainer::iterator TypeSrcKeyH5GroupDirectory::endType() {
   return m_map.end();
 }
 
-TypeGroup & TypeSrcKeyH5GroupDirectory::addTypeGroup(const type_info *typeInfoPtr, hdf5pp::Group & parentGroup) {
+TypeGroup & TypeSrcKeyH5GroupDirectory::addTypeGroup(const std::type_info *typeInfoPtr, hdf5pp::Group & parentGroup) {
   string groupName = m_h5GroupNames->nameForType(typeInfoPtr);
   hdf5pp::Group group = parentGroup.createGroup(groupName);
   return (m_map[ groupName ] = TypeGroup(group,
@@ -245,7 +245,7 @@ SrcKeyMap::iterator TypeSrcKeyH5GroupDirectory::findSrcKey(const PSEvt::EventKey
   return srcPos;
 }
 
-SrcKeyMap::iterator TypeSrcKeyH5GroupDirectory::endSrcKey(const type_info *typeInfoPtr) {
+SrcKeyMap::iterator TypeSrcKeyH5GroupDirectory::endSrcKey(const std::type_info *typeInfoPtr) {
   TypeMapContainer::iterator typePos = findType(typeInfoPtr);
   if (typePos == endType()) MsgLog(logger,fatal,"endSrc - typeInfo " << PSEvt::TypeInfoUtils::typeInfoRealName(typeInfoPtr) << " not stored");
   TypeGroup & typeGroup = typePos->second;
@@ -271,22 +271,8 @@ SrcKeyGroup & TypeSrcKeyH5GroupDirectory::addSrcKeyGroup(const PSEvt::EventKey &
   const string &key = eventKey.key();
   SrcKeyPair srcStrPair = make_pair(src,key);
   string srcKeyGroupName = m_h5GroupNames->nameForSrcKey(src,key);
-  string aliasKeyGroupName = m_h5GroupNames->nameForAliasKey(getAlias(src),key);
   hdf5pp::Group typeH5Group = typeGroup.group();
   hdf5pp::Group srcH5Group = typeH5Group.createGroup(srcKeyGroupName);
-  if (aliasKeyGroupName.size()>0) {
-    herr_t err = H5Lcreate_soft(srcKeyGroupName.c_str(), 
-                                typeH5Group.id(), aliasKeyGroupName.c_str(), H5P_DEFAULT, H5P_DEFAULT);
-    if (err<0) {
-      MsgLog(logger, error, "Failed to create alias=" << aliasKeyGroupName
-             << " for target=" << srcKeyGroupName 
-             << " relative to type group=" << hdf5util::objectName(typeH5Group.id()));
-    } else {
-      MsgLog(logger,trace, "Created alias=" << aliasKeyGroupName
-             << " for target=" << srcKeyGroupName
-             << " relative to type group=" << hdf5util::objectName(typeH5Group.id()));
-    }
-  }
   uint64_t srcVal = (uint64_t(src.phy()) << 32) + src.log();
   srcH5Group.createAttr<uint64_t>("_xtcSrc").store(srcVal);
   MsgLog(logger,trace,"addSrcKeyGroup " << srcKeyGroupName);

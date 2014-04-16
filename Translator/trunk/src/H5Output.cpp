@@ -202,7 +202,7 @@ H5Output::H5Output(string moduleName) : Module(moduleName),
   TypeAliases::Alias2TypesMap::const_iterator pos = m_typeAliases.alias2TypesMap().find("ndarray_types");
   if (pos == m_typeAliases.alias2TypesMap().end()) MsgLog(logger(), fatal, "The TypeAliases map does not include ndarray_types as a key");
   if ((pos->second).size() == 0) MsgLog(logger(), fatal, "There are no types assigned to the  'ndarray_types' alias in the TypeAliases map");
-  m_h5groupNames = boost::make_shared<H5GroupNames>(m_short_bld_name, pos->second);
+  m_h5groupNames = boost::make_shared<H5GroupNames>(m_calibration_key, pos->second);
   m_configureGroupDir.setH5GroupNames(m_h5groupNames);
   m_calibStoreGroupDir.setH5GroupNames(m_h5groupNames);
   m_calibCycleConfigureGroupDir.setH5GroupNames(m_h5groupNames);
@@ -267,8 +267,6 @@ void H5Output::readConfigParameters() {
   m_storeEpics = userInput->second;
   MsgLog(logger(),trace,"epics storage: " << EpicsH5GroupDirectory::epicsStoreMode2str(m_storeEpics));
 
-  m_short_bld_name = configReportIfNotDefault("short_bld_name",false);
-  m_create_alias_links = configReportIfNotDefault("create_alias_links",true);
   m_overwrite = configReportIfNotDefault("overwrite",false);
   
 
@@ -279,10 +277,13 @@ void H5Output::readConfigParameters() {
   m_key_filter = configListReportIfNotDefault("key_filter", include_all);
 
   // other translation parameters, calibration, metadata
-  m_include_uncalibrated_data = configReportIfNotDefault("include_uncalibrated_data",false);
+  m_skip_calibrated = configReportIfNotDefault("skip_calibrated",false);
   m_calibration_key = configReportIfNotDefault(string("calibration_key"),string("calibrated"));
-  m_exclude_calibrated_data = configReportIfNotDefault("exclude_calibrated_data",false);
   m_exclude_calibstore = configReportIfNotDefault("exclude_calibstore",false);
+  if ((m_skip_calibrated) and (not m_exclude_calibstore)) {
+    MsgLog(logger(),info, "setting skip_calibstore to true since skip_calibrated is true");
+    m_exclude_calibstore = true;
+  }
 
   m_chunkManager.readConfigParameters(*this);
 
@@ -475,13 +476,11 @@ void H5Output::beginJob(Event& evt, Env& env)
   MsgLog(logger(),trace,"H5Output beginJob()");
   setEventVariables(evt,env);
   initializeSrcAndKeyFilters();
-  if (m_create_alias_links) {
-    m_configureGroupDir.setAliasMap(env.aliasMap());
-    m_calibStoreGroupDir.setAliasMap(env.aliasMap());
-    m_calibCycleConfigureGroupDir.setAliasMap(env.aliasMap());
-    m_calibCycleEventGroupDir.setAliasMap(env.aliasMap());
-    m_calibCycleFilteredGroupDir.setAliasMap(env.aliasMap());
-  }
+  m_configureGroupDir.setAliasMap(env.aliasMap());
+  m_calibStoreGroupDir.setAliasMap(env.aliasMap());
+  m_calibCycleConfigureGroupDir.setAliasMap(env.aliasMap());
+  m_calibCycleEventGroupDir.setAliasMap(env.aliasMap());
+  m_calibCycleFilteredGroupDir.setAliasMap(env.aliasMap());
 
   // record some info from the env
   m_h5file.createAttr<uint32_t> ("expNum").store ( env.expNum() ) ;
@@ -593,14 +592,17 @@ boost::shared_ptr<HdfWriterFromEvent> H5Output::checkTranslationFilters(const Ev
     MsgLog(logger(),debug,"key is filtered for " << eventKey << ", filtering.");
     return nullHdfWriter;
   }
-  if (m_exclude_calibrated_data and eventKey.key() == m_calibration_key) return nullHdfWriter;
+  if (m_skip_calibrated and eventKey.key() == m_calibration_key) {
+    MsgLog(logger(),debug,"skipping calibrated data: " << eventKey);
+    return nullHdfWriter;
+  }
     
   boost::shared_ptr<HdfWriterFromEvent> hdfWriter = getHdfWriter(m_hdfWriters, typeInfoPtr);
   if (not hdfWriter) {
     MsgLog(logger(),debug,"No hdfwriter found for type: " << PSEvt::TypeInfoUtils::typeInfoRealName(typeInfoPtr));
     return nullHdfWriter;
   }
-  if (not m_include_uncalibrated_data and checkForCalibratedKey) {
+  if ((not m_skip_calibrated) and checkForCalibratedKey) {
     if (strKey.size()==0) {
       EventKey calibratedKey(typeInfoPtr,src, m_calibration_key);
       if (m_event->proxyDict()->exists(calibratedKey)) {
@@ -636,7 +638,7 @@ list<EventKey> H5Output::getUpdatedConfigKeys() {
 }
 
 void H5Output::setEventKeysToTranslate(list<EventKeyTranslation> & toTranslate, 
-                                       list<EventKey> &filtered) {
+                                       list<PSEvt::EventKey> &filtered) {
   const string toAdd("setEventKeysToTranslate");
   toTranslate.clear();
   filtered.clear();
