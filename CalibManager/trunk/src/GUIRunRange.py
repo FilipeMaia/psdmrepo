@@ -102,7 +102,7 @@ class GUIRunRange ( QtGui.QWidget ) :
 
     def showToolTips(self):
         self.edi_from  .setToolTip('Enter run number in range [0,9999]')
-        self.edi_to    .setToolTip('Enter run number in range [0,9999] or "end"')
+        self.edi_to    .setToolTip('Enter run number in range [1,9999] or "end"')
 
 
     def setFrame(self):

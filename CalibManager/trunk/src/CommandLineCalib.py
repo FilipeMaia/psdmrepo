@@ -43,6 +43,9 @@ class CommandLineCalib () :
 
     @see FileNameManager, ConfigFileGenerator, ConfigParametersForApp, BatchJobPedestals, BatchLogScanParser, FileDeployer
     """
+
+    sep = '\n' + 50*'-'
+
     def __init__ (self, args, opts) :
 
         #print '__name__', __name__ # CalibManager.CommandLineCalib
@@ -114,7 +117,7 @@ class CommandLineCalib () :
         list_of_dets_sel = self.det_name.split()
         list_of_dets_sel_lower = [det.lower() for det in list_of_dets_sel]
 
-        msg = '\n' + 50*'-' + 'List of detectors:'
+        msg = self.sep + 'List of detectors:'
         for det, par in zip(cp.list_of_dets_lower, cp.det_cbx_states_list) :
             par.setValue(det in list_of_dets_sel_lower)
             msg += '\n%s %s' % (det.ljust(10), par.value())
@@ -166,7 +169,7 @@ class CommandLineCalib () :
 #------------------------------
 
     def print_local_pars(self) :
-        msg = '\n' + 50*'-' \
+        msg = self.sep \
         + '\nprint_local_pars(): Combination of command line parameters and' \
         + '\nconfiguration parameters from file %s (if available after "calibman")' % cp.getParsFileName() \
         + '\n     str_run_number: %s' % self.str_run_number\
@@ -199,9 +202,9 @@ class CommandLineCalib () :
     def proc_dark_run_interactively(self) :
 
         if self.process :
-            self.log('\n' + 50*'-' + '\nBegin dark run data processing interactively',1)
+            self.log(self.sep + '\nBegin dark run data processing interactively',1)
         else :
-            self.log('\n' + 50*'-' + '\nWARNING: File processing option IS TURNED OFF...'\
+            self.log(self.sep + '\nWARNING: File processing option IS TURNED OFF...'\
                   + '\nAdd "-P" option in the command line to process files',4) 
             return
 
@@ -211,7 +214,7 @@ class CommandLineCalib () :
         self.print_list_of_types_and_sources_from_xtc()
 
         if not self.bjpeds.command_for_peds_aver() :
-            msg = '\n' + 50*'-' + '\nSTATUS OF PROCESSING IS NOT GOOD !!!'\
+            msg = self.sep + '\nSTATUS OF PROCESSING IS NOT GOOD !!!'\
                   +'\nSee details in the logfile(s)'
             self.log(msg,4)
             #return
@@ -224,9 +227,9 @@ class CommandLineCalib () :
     def proc_dark_run_in_batch(self) :
 
         if self.process :
-            self.log('\n' + 50*'-' + '\nBegin dark run data processing in batch queue %s' % self.queue,1)
+            self.log(self.sep + '\nBegin dark run data processing in batch queue %s' % self.queue,1)
         else :
-            self.log('\n' + 50*'-' + '\nWARNING: File processing option IS TURNED OFF...'\
+            self.log(self.sep + '\nWARNING: File processing option IS TURNED OFF...'\
                   + '\nAdd "-P" option in the command line to process files',4)
             return
 
@@ -254,15 +257,15 @@ class CommandLineCalib () :
 
     def deploy_calib_files(self) :
         list_of_deploy_commands, list_of_sources = fdmets.get_list_of_deploy_commands_and_sources_dark(self.str_run_number, self.str_run_range)
-        msg = '\n' + 50*'-' + '\nTentative deployment commands:\n' + '\n'.join(list_of_deploy_commands)
+        msg = self.sep + '\nTentative deployment commands:\n' + '\n'.join(list_of_deploy_commands)
         self.log(msg,1)
 
         if self.deploy :
-            self.log('\n' + 50*'-' + '\nBegin deployment of calibration files',1) 
+            self.log(self.sep + '\nBegin deployment of calibration files',1) 
             fdmets.deploy_calib_files(self.str_run_number, self.str_run_range, mode='calibrun-dark', ask_confirm=False)
             self.log('\nDeployment of calibration files is completed',1)
         else :
-            self.log('\n' + 50*'-' + '\nWARNING: File deployment option IS TURNED OFF...'\
+            self.log(self.sep + '\nWARNING: File deployment option IS TURNED OFF...'\
                      +'\nAdd "-D" option in the command line to deploy files',4)
 
 #------------------------------
@@ -302,7 +305,7 @@ class CommandLineCalib () :
  
     def print_list_of_files_dark_in_work_dir(self) :
         lst = self.get_list_of_files_dark_in_work_dir()
-        msg = '\n' + 50*'-' + '\nList of files in work directory for command "ls %s*"' % fnm.path_prefix_dark()
+        msg = self.sep + '\nList of files in work directory for command "ls %s*"' % fnm.path_prefix_dark()
         if lst == [] : msg += ' is empty'
         else         : msg += ':\n' + '\n'.join(lst)
         self.log(msg,1)
@@ -323,20 +326,20 @@ class CommandLineCalib () :
 
 
     def print_list_of_types_and_sources_from_xtc(self) :
-        txt = '\n' + 50*'-' + '\nData Types and Sources from xtc scan of the\n' \
+        txt = self.sep + '\nData Types and Sources from xtc scan of the\n' \
             + cp.blsp.txt_list_of_types_and_sources()
         self.log(txt,1)
 
 
     def print_list_of_sources_from_regdb(self) :
-        txt = '\n' + 50*'-' + '\nSources from DB:\n' \
+        txt = self.sep + '\nSources from DB:\n' \
             + cp.blsp.txt_of_sources_in_run()
         self.log(txt,1)
 
 
     def print_dark_ave_batch_log(self) :
         path = fnm.path_peds_aver_batch_log()
-        txt = '\n' + 50*'-' + '\npsana log file %s:\n\n' % path \
+        txt = self.sep + '\npsana log file %s:\n\n' % path \
             + gu.load_textfile(fnm.path_peds_aver_batch_log()) \
             + 'End of psana log file %s' % path
         self.log(txt,1)
@@ -345,7 +348,7 @@ class CommandLineCalib () :
     def get_print_lsf_status(self) :
         queue = cp.bat_queue.value()
         msg, status = gu.msg_and_status_of_lsf(queue)
-        msgi = '\n' + 50*'-' + '\nLSF status for queue %s: \n%s\nLSF status for %s is %s'\
+        msgi = self.sep + '\nLSF status for queue %s: \n%s\nLSF status for %s is %s'\
                % (queue, msg, queue, {False:'bad',True:'good'}[status])
         self.log(msgi,1)
         return status
@@ -355,7 +358,7 @@ class CommandLineCalib () :
         pattern = '-r%s' % self.str_run_number
         lst = fnm.get_list_of_xtc_files()
         lst_for_run = [path for path in lst if pattern in os.path.basename(path)]
-        txt = '\n' + 50*'-' + '\nList of xtc files for exp=%s:run=%s :\n' % (self.exp_name, self.str_run_number)
+        txt = self.sep + '\nList of xtc files for exp=%s:run=%s :\n' % (self.exp_name, self.str_run_number)
         txt += '\n'.join(lst_for_run)
         self.log(txt,1)
 
