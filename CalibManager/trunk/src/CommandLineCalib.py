@@ -41,10 +41,10 @@ from NotificationDBForCL      import *
 class CommandLineCalib () :
     """Command line calibration of dark runs
 
-    @see FileNameManager, ConfigFileGenerator, ConfigParametersForApp, BatchJobPedestals, BatchLogScanParser, FileDeployer
+    @see FileNameManager, ConfigFileGenerator, ConfigParametersForApp, BatchJobPedestals, BatchLogScanParser, FileDeployer, Logger
     """
 
-    sep = '\n' + 50*'-'
+    sep = '\n' + 60*'-' + '\n'
 
     def __init__ (self, args, opts) :
 
@@ -83,6 +83,9 @@ class CommandLineCalib () :
 
     def set_pars(self) :
 
+        self.print_bits = self.opts['print_bits']
+        logger.setPrintBits(self.print_bits)
+
 	if self.opts['runnum'] is None :
             appname = os.path.basename(sys.argv[0])
 	    msg = 'This command line calibration interface should be launched with parameters.'\
@@ -94,8 +97,6 @@ class CommandLineCalib () :
 	    return False
         self.runnum = self.opts['runnum']
         self.str_run_number = '%04d' % self.runnum
-
-        self.print_bits = self.opts['print_bits']
 
 	if self.opts['runrange'] is None :
             self.str_run_range = '%s-end' % self.runnum
@@ -170,7 +171,7 @@ class CommandLineCalib () :
 
     def print_local_pars(self) :
         msg = self.sep \
-        + '\nprint_local_pars(): Combination of command line parameters and' \
+        + 'print_local_pars(): Combination of command line parameters and' \
         + '\nconfiguration parameters from file %s (if available after "calibman")' % cp.getParsFileName() \
         + '\n     str_run_number: %s' % self.str_run_number\
         + '\n     runrange      : %s' % self.str_run_range\
@@ -202,9 +203,9 @@ class CommandLineCalib () :
     def proc_dark_run_interactively(self) :
 
         if self.process :
-            self.log(self.sep + '\nBegin dark run data processing interactively',1)
+            self.log(self.sep + 'Begin dark run data processing interactively',1)
         else :
-            self.log(self.sep + '\nWARNING: File processing option IS TURNED OFF...'\
+            self.log(self.sep + 'WARNING: File processing option IS TURNED OFF...'\
                   + '\nAdd "-P" option in the command line to process files',4) 
             return
 
@@ -214,7 +215,7 @@ class CommandLineCalib () :
         self.print_list_of_types_and_sources_from_xtc()
 
         if not self.bjpeds.command_for_peds_aver() :
-            msg = self.sep + '\nSTATUS OF PROCESSING IS NOT GOOD !!!'\
+            msg = self.sep + 'STATUS OF PROCESSING IS NOT GOOD !!!'\
                   +'\nSee details in the logfile(s)'
             self.log(msg,4)
             #return
@@ -227,9 +228,9 @@ class CommandLineCalib () :
     def proc_dark_run_in_batch(self) :
 
         if self.process :
-            self.log(self.sep + '\nBegin dark run data processing in batch queue %s' % self.queue,1)
+            self.log(self.sep + 'Begin dark run data processing in batch queue %s' % self.queue,1)
         else :
-            self.log(self.sep + '\nWARNING: File processing option IS TURNED OFF...'\
+            self.log(self.sep + 'WARNING: File processing option IS TURNED OFF...'\
                   + '\nAdd "-P" option in the command line to process files',4)
             return
 
@@ -257,39 +258,25 @@ class CommandLineCalib () :
 
     def deploy_calib_files(self) :
         list_of_deploy_commands, list_of_sources = fdmets.get_list_of_deploy_commands_and_sources_dark(self.str_run_number, self.str_run_range)
-        msg = self.sep + '\nTentative deployment commands:\n' + '\n'.join(list_of_deploy_commands)
+        msg = self.sep + 'Tentative deployment commands:\n' + '\n'.join(list_of_deploy_commands)
         self.log(msg,1)
 
         if self.deploy :
-            self.log(self.sep + '\nBegin deployment of calibration files',1) 
+            self.log(self.sep + 'Begin deployment of calibration files',1) 
             fdmets.deploy_calib_files(self.str_run_number, self.str_run_range, mode='calibrun-dark', ask_confirm=False)
             self.log('\nDeployment of calibration files is completed',1)
         else :
-            self.log(self.sep + '\nWARNING: File deployment option IS TURNED OFF...'\
+            self.log(self.sep + 'WARNING: File deployment option IS TURNED OFF...'\
                      +'\nAdd "-D" option in the command line to deploy files',4)
 
 #------------------------------
-
-#    def submit_job_in_batch(self) :
-#
-#        if not cfg.make_psana_cfg_file_for_peds_aver() :
-#            print 'Can not make_psana_cfg_file_for_peds_aver(...)' 
-#            return
-#
-#        command      = 'psana -c ' + fnm.path_peds_aver_psana_cfg() + ' ' + fnm.path_to_xtc_files_for_run()
-#        queue        = cp.bat_queue.value()
-#        bat_log_file = fnm.path_peds_aver_batch_log()
-#
-#        print 'command', command
-#        print 'queue', queue
-#        print 'bat_log_file', bat_log_file
-
 #------------------------------
 
     def save_log_file(self) :
         logfname = fnm.log_file()
-        msg = 'Save log-file: %s' % logfname
-        if self.print_bits & 1 : print msg
+        msg = 'See details in log-file: %s' % logfname
+        #self.log(msg,4) # set it 4-critical - always print
+        logger.critical(msg) # critical - always print
         logger.saveLogInFile(logfname)
 
 
@@ -305,7 +292,7 @@ class CommandLineCalib () :
  
     def print_list_of_files_dark_in_work_dir(self) :
         lst = self.get_list_of_files_dark_in_work_dir()
-        msg = self.sep + '\nList of files in work directory for command "ls %s*"' % fnm.path_prefix_dark()
+        msg = self.sep + 'List of files in work directory for command "ls %s*"' % fnm.path_prefix_dark()
         if lst == [] : msg += ' is empty'
         else         : msg += ':\n' + '\n'.join(lst)
         self.log(msg,1)
@@ -326,20 +313,20 @@ class CommandLineCalib () :
 
 
     def print_list_of_types_and_sources_from_xtc(self) :
-        txt = self.sep + '\nData Types and Sources from xtc scan of the\n' \
+        txt = self.sep + 'Data Types and Sources from xtc scan of the\n' \
             + cp.blsp.txt_list_of_types_and_sources()
         self.log(txt,1)
 
 
     def print_list_of_sources_from_regdb(self) :
-        txt = self.sep + '\nSources from DB:\n' \
+        txt = self.sep + 'Sources from DB:' \
             + cp.blsp.txt_of_sources_in_run()
         self.log(txt,1)
 
 
     def print_dark_ave_batch_log(self) :
         path = fnm.path_peds_aver_batch_log()
-        txt = self.sep + '\npsana log file %s:\n\n' % path \
+        txt = self.sep + 'psana log file %s:\n\n' % path \
             + gu.load_textfile(fnm.path_peds_aver_batch_log()) \
             + 'End of psana log file %s' % path
         self.log(txt,1)
@@ -348,7 +335,7 @@ class CommandLineCalib () :
     def get_print_lsf_status(self) :
         queue = cp.bat_queue.value()
         msg, status = gu.msg_and_status_of_lsf(queue)
-        msgi = self.sep + '\nLSF status for queue %s: \n%s\nLSF status for %s is %s'\
+        msgi = self.sep + 'LSF status for queue %s: \n%s\nLSF status for %s is %s'\
                % (queue, msg, queue, {False:'bad',True:'good'}[status])
         self.log(msgi,1)
         return status
@@ -358,23 +345,24 @@ class CommandLineCalib () :
         pattern = '-r%s' % self.str_run_number
         lst = fnm.get_list_of_xtc_files()
         lst_for_run = [path for path in lst if pattern in os.path.basename(path)]
-        txt = self.sep + '\nList of xtc files for exp=%s:run=%s :\n' % (self.exp_name, self.str_run_number)
+        txt = self.sep + 'List of xtc files for exp=%s:run=%s :\n' % (self.exp_name, self.str_run_number)
         txt += '\n'.join(lst_for_run)
         self.log(txt,1)
 
 #------------------------------
 
     def log(self, msg, level=1) :
-        #logger.levels = ['debug','info','warning','error','crytical']
+        """Internal logger - re-direct all messages to the project logger, critical messages"""
+        #logger.levels = ['debug','info','warning','error','critical']
         self.count_msg += 1
         #print 'Received msg: %d' % self.count_msg
-        if self.print_bits & 1 or level==4 : print msg
+        #if self.print_bits & 1 or level==4 : print msg
 
         if   level==1 : logger.info    (msg, __name__)
+        elif level==4 : logger.critical(msg, __name__)
         elif level==0 : logger.debug   (msg, __name__)
         elif level==2 : logger.warning (msg, __name__)
         elif level==3 : logger.error   (msg, __name__)
-        elif level==4 : logger.crytical(msg, __name__)
         else          : logger.info    (msg, __name__)
 
 #------------------------------

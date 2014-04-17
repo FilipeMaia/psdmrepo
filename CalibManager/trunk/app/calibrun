@@ -44,6 +44,7 @@ from optparse import OptionParser
 
 def input_options_parser() :
     com_ex = '\nExample: %prog -e xppi0613 -d CSPAD,OPAL1000 -c ./calib -P -D -r 173'
+    help_print_bits = '0-print nothing, +1-debug, +2-info, +4-warning, +8-error, +16-critical; default=036, minimal recommended=020'
     
     parser = OptionParser(description='%prog - command line calibration utility', usage='  %prog [options] args'+com_ex )
     parser.add_option('-e', '--exp',         dest='exp',        default=None,         action='store', type='string', help='experiment name, ex.: cxi12345')
@@ -56,7 +57,7 @@ def input_options_parser() :
     parser.add_option('-w', '--workdir',     dest='workdir',    default=None,         action='store', type='string', help='work directory, ex: ./work')
     parser.add_option('-c', '--calibdir',    dest='calibdir',   default=None,         action='store', type='string', help='non-standard calibration directory, ex: ./calib')
     parser.add_option('-d', '--detector',    dest='detector',   default=None,         action='store', type='string', help='detector names separated by comma, ex:CSPAD,CSPAD2x2,PNCCD')
-    parser.add_option('-p', '--print_bits',  dest='print_bits', default=07777,        action='store', type='int',    help='=0-minimal print+warnings, =1-detailed printout')
+    parser.add_option('-p', '--print_bits',  dest='print_bits', default=036,          action='store', type='int',    help=help_print_bits)
     parser.add_option('-P', '--process',     dest='process',    default=False,        action='store_true',           help='process xtc files and produce calib files under the "work" directory')
     parser.add_option('-D', '--deploy',      dest='deploy',     default=False,        action='store_true',           help='deploy calibrated files under the "calib" directory')
 
@@ -78,12 +79,12 @@ if __name__ == "__main__" :
 
     t0_sec  = time()
     ts1  = strftime('%Y-%m-%d %H:%M:%S', localtime())
-    print('%s  Begin %s - the command line calibration utility' % (ts1, appname))
+    print('%s Begin %s - the command line detector calibration utility using dark runs' % (ts1, appname))
 
     CommandLineCalib(list_args, dict_opts)  #(*args, **opts)
 
     ts2  = strftime('%Y-%m-%d %H:%M:%S', localtime())
-    msg = '%s  End of %s, consumed time = %.3f(sec)' % (ts2, appname, time()-t0_sec)
+    msg = '%s End of %s, consumed time = %.3f(sec)' % (ts2, appname, time()-t0_sec)
     sys.exit(msg)
 
 #---------------------------------

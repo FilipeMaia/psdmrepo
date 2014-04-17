@@ -58,7 +58,7 @@ def txt_of_sources_in_run (ins, exp, run) :
     """Returns the list of detectors as formatted text with heading line
     """
     list_of_detectors = detectors(ins, exp, run)
-    txt = '\nList for detectors for inst: %s  exp: %s  run %d' % (ins, exp, run)
+    txt = '\nList of detectors for inst: %s  exp: %s  run %d' % (ins, exp, run)
     for det in list_of_detectors :
         txt += '\n'+det
     return txt

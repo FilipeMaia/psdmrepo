@@ -7,12 +7,12 @@
 #
 #------------------------------------------------------------------------
 
-"""Logger - class for log-book keeping
+"""Logger - logbook or message storage
 
 This software was developed for the SIT project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
 
-@see RelatedModule
+@see 
 
 @version $Id:$
 
@@ -29,15 +29,18 @@ from time import localtime, strftime
 #-----------------------------
 
 class Logger :
-    """Is intended as a log-book keeper.
+    """Logbook for messages.
     """
     name = 'Logger'
-    levels = ['debug','info','warning','error','crytical']
+    levels = ['debug','info','warning','error','critical']
 
-    def __init__ ( self, fname=None, level='info' ) :
+    def __init__ ( self, fname=None, level='info', print_bits=0 ) :
         """Constructor.
-        @param fname  the file name for output log file
+        @param fname - string file name for output log file
+        @param level - string level from the list of levels which is used as a threshold for accumulated messages
+        @param print_bits - terminal output bits: 1,2,4,8,16 for 'debug','info','warning','error','critical'
         """
+        self.print_bits = print_bits
         self.setLevel(level)
         self.selectionIsOn = True # It is used to get total log content
         
@@ -49,6 +52,12 @@ class Logger :
         """Sets the threshold level of messages for record selection algorithm"""
         self.level_thr     = level
         self.level_thr_ind = self.levels.index(level)
+
+
+    def setPrintBits(self, print_bits):
+        """Sets terminal printout bits: 1,2,4,8,16 for 'debug','info','warning','error','critical' 
+        """
+        self.print_bits = print_bits
 
 
     def getListOfLevels(self):
@@ -79,7 +88,7 @@ class Logger :
 
     def error   ( self, msg, name=None ) : self._message(msg, 3, name)
 
-    def crytical( self, msg, name=None ) : self._message(msg, 4, name)
+    def critical( self, msg, name=None ) : self._message(msg, 4, name)
 
     def _message ( self, msg, index, name=None ) :
         """Store input message the 2D tuple of records, send request to append GUI.
@@ -93,6 +102,9 @@ class Logger :
             str_msg = self.stringForRecord(rec)
             self.appendGUILog(str_msg)
             #print str_msg
+
+        if self.print_bits & (1<<index) :
+            print self.stringForRecord(rec)
 
 
     def recordIsSelected( self, rec ):
@@ -108,15 +120,10 @@ class Logger :
     def stringForRecord( self, rec ):
         """Returns the strind presentation of the log record, which intrinsically is a tuple."""
         tstamp, level, index, name, msg = rec
-        self.msg_tot = '' 
         if name is not None :
-            self.msg_tot  = tstamp
-            self.msg_tot += ' (' + level + ') '
-            self.msg_tot += name + ': '
+            return '%s (%s) %s: %s' % (tstamp, level, name, msg)
         else :
-            self.msg_tot += ': '
-        self.msg_tot += msg
-        return self.msg_tot
+            return '%s' % msg
 
 
     def appendGUILog(self, msg='') :
@@ -138,8 +145,8 @@ class Logger :
         """Logger initialization at start"""
         self.str_start_time = self.timeStamp( fmt='%Y-%m-%d-%H:%M:%S' )
         if  fname == None :
-            self.fname       = self.str_start_time + '-log.txt'
-            self.fname_total = self.str_start_time + '-log-total.txt'
+            self.fname       = '%s-log.txt'       % self.str_start_time
+            self.fname_total = '%s-log-total.txt' % self.str_start_time
         else :        
             self.fname       = fname
             self.fname_total = self.fname + '-total' 
@@ -200,8 +207,8 @@ def test_Logger() :
     logger.info    ('This is a test message 2', __name__)
     logger.warning ('This is a test message 3', __name__)
     logger.error   ('This is a test message 4', __name__)
-    logger.crytical('This is a test message 5', __name__)
-    logger.crytical('This is a test message 6')
+    logger.critical('This is a test message 5', __name__)
+    logger.critical('This is a test message 6')
 
     #logger.saveLogInFile()
     #logger.saveLogTotalInFile()

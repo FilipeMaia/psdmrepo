@@ -158,7 +158,7 @@ class GUIRunRange ( QtGui.QWidget ) :
             self.edi_to  .setStyleSheet(cp.styleEditBad)
 
 
-    def setParams(self, str_run_from, str_run_to) :
+    def setParams(self, str_run_from=None, str_run_to=None) :
         self.str_run_from = str_run_from if str_run_from is not None else '0'
         self.str_run_to   = str_run_to   if str_run_to is not None else 'end'
 
