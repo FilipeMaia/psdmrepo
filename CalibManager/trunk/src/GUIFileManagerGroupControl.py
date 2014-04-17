@@ -15,15 +15,15 @@ part of it, please give an appropriate acknowledgment.
 
 @see RelatedModule
 
-@version $Id:$
+@version $Id$
 
 @author Mikhail S. Dubrovin
 """
 
 #------------------------------
-#  Module's version from CVS --
+#  Module's version from SVN --
 #------------------------------
-__version__ = "$Revision: 4 $"
+__version__ = "$Revision$"
 # $Source$
 
 #--------------------------------

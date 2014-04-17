@@ -12,7 +12,7 @@
 This software was developed for the LCLS project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
 
-@version $Id: template!python!py 4 2008-10-08 19:27:36Z salnikov $
+@version $Id$
 
 @author Mikhail S. Dubrovin
 """
@@ -20,7 +20,7 @@ part of it, please give an appropriate acknowledgment.
 #------------------------------
 #  Module's version from CVS --
 #------------------------------
-__version__ = "$Revision: 4 $"
+__version__ = "$Revision$"
 # $Source$
 
 #--------------------------------

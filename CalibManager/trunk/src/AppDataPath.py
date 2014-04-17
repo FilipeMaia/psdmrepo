@@ -1,6 +1,6 @@
 #--------------------------------------------------------------------------
 # File and Version Information:
-#  $Id: AppDataPath.py 2240 2011-08-19 00:16:36Z salnikov@SLAC.STANFORD.EDU $
+#  $Id$
 #
 # Description:
 #  Module AppDataPath...
@@ -10,7 +10,7 @@
 """AppDataPath class represents a path to a file that can be found in
 one of the $SIT_DATA locations.
 
-@version $Id: AppDataPath.py 2240 2011-08-19 00:16:36Z salnikov@SLAC.STANFORD.EDU $
+@version $Id$
 
 @author Andy Salnikov
 """
@@ -19,7 +19,7 @@ one of the $SIT_DATA locations.
 #------------------------------
 #  Module's version from CVS --
 #------------------------------
-__version__ = "$Revision: 2240 $"
+__version__ = "$Revision$"
 # $Source$
 
 #--------------------------------

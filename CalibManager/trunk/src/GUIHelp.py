@@ -10,9 +10,9 @@
 """GUI for File Browser"""
 
 #------------------------------
-#  Module's version from CVS --
+#  Module's version from SVN --
 #------------------------------
-__version__ = "$Revision: 4 $"
+__version__ = "$Revision$"
 # $Source$
 
 #--------------------------------

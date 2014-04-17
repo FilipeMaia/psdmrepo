@@ -11,6 +11,12 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-37	
+2014-04-17 Mikhail S. Dubrovin	
+- made attempt to fill correct $Revision: and $Id: values;
+	- see ~/.subversion/config - uncomment: enable-auto-props = yes
+	- psvn mktxtprop CalibManager/src/*.py - add properties to files
+	
 Tag: V00-00-36	
 2014-04-17 Mikhail S. Dubrovin	
 - in calibrun, CommandLineCalib, and Logger re-direct all outputh in the Logger
