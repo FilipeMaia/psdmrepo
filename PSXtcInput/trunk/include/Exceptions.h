@@ -66,6 +66,59 @@ public:
 
 };
 
+// thrown when live mode requested in indexing
+class NoLiveIndex : public Exception {
+public:
+
+  NoLiveIndex(const ErrSvc::Context& ctx)
+    : Exception( ctx, "NoLiveIndex", "Live mode not supported with indexing" ) {}
+
+};
+
+// thrown when run is not found in the dataset
+class RunNotInDataset : public Exception {
+public:
+
+  RunNotInDataset(const ErrSvc::Context& ctx)
+    : Exception( ctx, "RunNotInDataset", "Run not found in dataset" ) {}
+
+};
+
+// thrown when run is not found in the dataset
+class CalibCycleNotFound : public Exception {
+public:
+
+  CalibCycleNotFound(const ErrSvc::Context& ctx)
+    : Exception( ctx, "CalibCycleNotFound", "Calib Cycle not found" ) {}
+
+};
+
+class EpicsDataNotFound : public Exception {
+public:
+
+  EpicsDataNotFound(const ErrSvc::Context& ctx)
+    : Exception( ctx, "EpicsDataNotFound", "Epics data not found" ) {}
+
+};
+
+// thrown when xtc file open fails
+class XTCNotFound : public Exception {
+public:
+
+  XTCNotFound(const ErrSvc::Context& ctx)
+    : Exception( ctx, "XTCNotFound", "Unable to open XTC file" ) {}
+
+};
+
+// thrown when xtc file open fails
+class IndexSeekFailed : public Exception {
+public:
+
+  IndexSeekFailed(const ErrSvc::Context& ctx)
+    : Exception( ctx, "IndexseekFailed", "Indexing seek failed" ) {}
+
+};
+
 // thrown for empty file
 class EmptyInput : public Exception {
 public:

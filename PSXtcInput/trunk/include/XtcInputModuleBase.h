@@ -95,9 +95,13 @@ protected:
   /// Fill environment with datagram contents
   void fillEnv(const XtcInput::Dgram& dg, Env& env);
   
+protected:
+
+  /// Protected since the Indexing input module needs access to it.
+  boost::shared_ptr<IDatagramSource> m_dgsource;      ///< Datagram source instance
+
 private:
 
-  boost::shared_ptr<IDatagramSource> m_dgsource;      ///< Datagram source instance
   DamagePolicy m_damagePolicy;                        ///< Policy instance for damage data
   std::vector<XtcInput::Dgram> m_putBack;             ///< Buffer for put-back datagrams
   psddl_pds2psana::XtcConverter m_cvt;                ///< Data converter object
