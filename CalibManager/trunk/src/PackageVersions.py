@@ -113,6 +113,15 @@ class PackageVersions :
         print self.get_text_from_log_for_pkg(pkg)
 
 
+    def get_pkg_revision(self, pkg='CalibManager') :
+        """Returns package revision number"""
+        if pkg=='CalibManager' : 
+            str_revision = __version__.split(':')[1].rstrip('$').strip()
+            return 'Rev-%s' % str_revision
+        else :
+           return 'N/A' 
+
+
     def get_pkg_version(self, pkg='CalibManager') :
         """Returns the latest version of the package"""
         try :

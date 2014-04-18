@@ -12,8 +12,11 @@ Please describe any modifications that you made to the package in the
 reverse time order.
 
 ###Tag: V00-00-37	
+2014-04-18 Mikhail S. Dubrovin	
+- add src/SvnProps.py
+	
 2014-04-17 Mikhail S. Dubrovin	
-- All modules - fill correct $Revision:$ and $Id:$ values;
+- ALL modules - fill correct $Revision:$ and $Id:$ values;
 	- see ~/.subversion/config - uncomment: enable-auto-props = yes
 	- psvn mktxtprop CalibManager/src/*.py - add properties to files
 - in GlobalUtils and NotificationDB use $Revision var. in stead of psvn tags <pkg> 

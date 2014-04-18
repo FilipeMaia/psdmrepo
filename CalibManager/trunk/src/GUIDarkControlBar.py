@@ -57,8 +57,8 @@ class GUIDarkControlBar ( QtGui.QWidget ) :
         self.dark_list_run_min   = cp.dark_list_run_min 
         self.dark_list_run_max   = cp.dark_list_run_max 
 
-        self.setGeometry(100, 50, 390, 30)
-        self.setWindowTitle('Instrument Experiment Run')
+        self.setGeometry(100, 50, 590, 36)
+        self.setWindowTitle('Dark Control Bar')
         self.setFrame()
  
 
