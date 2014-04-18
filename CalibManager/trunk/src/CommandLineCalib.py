@@ -95,11 +95,11 @@ class CommandLineCalib () :
 
 	if self.opts['runnum'] is None :
             appname = os.path.basename(sys.argv[0])
-	    msg = 'This command line calibration interface should be launched with parameters.'\
+	    msg = self.sep + 'This command line calibration interface should be launched with parameters.'\
                   +'\nTo see the list of parameters use command: %s -h' % appname\
                   +'\nIf the "%s" is launched after "calibman" most of parameters may be already set.' % appname\
-	          +'\nBut, at least run number must be specified as an optional parameter, try command:\n    %s -r <number>'\
-                  % appname
+	          +'\nBut, at least run number must be specified as an optional parameter, try command:\n    %s -r <number>'%(appname)\
+                  + self.sep
             self.log(msg,4)
 	    return False
         self.runnum = self.opts['runnum']

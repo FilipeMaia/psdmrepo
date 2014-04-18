@@ -39,6 +39,12 @@ from commands import getoutput
 import tempfile
 from time import time, sleep
 
+from CalibManager.SvnProps   import svnprops as spcm
+#from ImgAlgos.SvnProps       import svnprops as spia
+#from PSCalib.SvnProps        import svnprops as spps
+#from pdscalibdata.SvnProps   import svnprops as spcd
+#from CSPadPixCoords.SvnProps import svnprops as sppc
+
 #from ConfigParametersForApp import cp
 #import GlobalUtils          as     gu
 #------------------------------
@@ -115,11 +121,15 @@ class PackageVersions :
 
     def get_pkg_revision(self, pkg='CalibManager') :
         """Returns package revision number"""
-        if pkg=='CalibManager' : 
-            str_revision = __version__.split(':')[1].rstrip('$').strip()
-            return 'Rev-%s' % str_revision
-        else :
-           return 'N/A' 
+            #str_revision = __version__.split(':')[1].rstrip('$').strip()
+            #str_revision = spcm.get_pkg_revision()
+
+        if pkg=='CalibManager'   : return 'Rev-%s' % spcm.get_pkg_revision()
+        #if pkg=='ImgAlgos'       : return 'Rev-%s' % spia.get_pkg_revision()
+        #if pkg=='PSCalib'        : return 'Rev-%s' % spps.get_pkg_revision()
+        #if pkg=='pdscalibdata'   : return 'Rev-%s' % spcd.get_pkg_revision()
+        #if pkg=='CSPadPixCoords' : return 'Rev-%s' % sppc.get_pkg_revision()
+        else                     : return 'N/A' 
 
 
     def get_pkg_version(self, pkg='CalibManager') :
@@ -170,6 +180,14 @@ def test_packege_version(test_num):
     elif test_num == 3 :
         print pv.text_version_for_all_packages()
 
+    elif test_num == 4 :
+        pkg = 'CalibManager'
+        print 'Package %s revision number: %s' % (pkg, pv.get_pkg_revision(pkg))
+
+    elif test_num == 5 :
+        pkg = 'pyimgalgos'
+        print 'Package %s revision number: %s' % (pkg, pv.get_pkg_revision(pkg))
+        
     msg = 'Consumed time to test method = %7.3f sec' % (time()-t0_sec)
     print msg
 
@@ -178,11 +196,14 @@ def test_packege_version(test_num):
 if __name__ == "__main__" :
 
     if len(sys.argv)!=2 or sys.argv[1] == '-h' :
-        msg  = 'Use %s with a single parameter, <test number=0-3>' % sys.argv[0]
-        msg += '\n    0 - print_list_of_packages()'
+        msg  = 'NOTE!!! psvn command needs in Kerberos ticket !!!'
+        msg += '\nUse %s with a single parameter, <test number=0,1,2,...>' % sys.argv[0]
+        msg += '\n    0 - print_list_of_packages() and associated tmp files'
         msg += '\n    1 - print_log_for_pkg("CalibManager")'
         msg += '\n    2 - get_pkg_version("CalibManager")'
         msg += '\n    3 - text_version_for_all_packages()'
+        msg += '\n    4 - get_pkg_revision("CalibManager")'
+        msg += '\n    5 - get_pkg_revision("pyimgalgos")'
         msg += '\n   -h - this help'
         print msg
 
