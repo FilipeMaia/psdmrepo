@@ -1,29 +1,20 @@
-#--------------------------------------------------------------------------
-# File and Version Information:
-#  $Id$
-#
-# Description:
-#  Module FastArrayTransformation...
-#
-#------------------------------------------------------------------------
-
+#------------------------------
 """A set of methods for the fast array transformation based on NumPy and SciPy
 
 This software was developed for the SIT project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
 
-@see RelatedModule
+@see
 
-@version $Id: template!python!py 4 2008-10-08 19:27:36Z salnikov $
+@version $Id$
 
 @author Mikhail S. Dubrovin
 """
 
-
 #------------------------------
 #  Module's version from CVS --
 #------------------------------
-__version__ = "$Revision: 4 $"
+__version__ = "$Revision$"
 # $Source$
 
 #--------------------------------

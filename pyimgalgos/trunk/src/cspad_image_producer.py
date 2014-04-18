@@ -1,18 +1,10 @@
-#--------------------------------------------------------------------------
-# File and Version Information:
-#  $Id$
-#
-# Description:
-#  Pyana/psana user analysis module cspad_image_producer...
-#
-#------------------------------------------------------------------------
-
+#------------------------------
 """User analysis module for pyana and psana frameworks.
 
 This software was developed for the LCLS project.  If you use all or 
 part of it, please give an appropriate acknowledgment.
 
-@version $Id: template!pyana-module!py 2987 2012-02-25 03:28:58Z salnikov@SLAC.STANFORD.EDU $
+@version $Id$
 
 @author Mikhail S. Dubrovin
 """
@@ -20,7 +12,7 @@ part of it, please give an appropriate acknowledgment.
 #------------------------------
 #  Module's version from SVN --
 #------------------------------
-__version__ = "$Revision: 2987 $"
+__version__ = "$Revision$"
 # $Source$
 
 #--------------------------------
