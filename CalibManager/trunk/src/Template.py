@@ -24,9 +24,8 @@ part of it, please give an appropriate acknowledgment.
 @author Mikhail S. Dubrovin
 """
 
-
 #------------------------------
-#  Module's version from CVS --
+#  Module's version from SVN --
 #------------------------------
 __version__ = "$Revision$"
 # $Source$

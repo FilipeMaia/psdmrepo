@@ -15,9 +15,8 @@ one of the $SIT_DATA locations.
 @author Andy Salnikov
 """
 
-
 #------------------------------
-#  Module's version from CVS --
+#  Module's version from SVN --
 #------------------------------
 __version__ = "$Revision$"
 # $Source$

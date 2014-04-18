@@ -24,7 +24,6 @@ part of it, please give an appropriate acknowledgment.
 __version__ = "$Revision$"
 # $Source$
 
-
 #--------------------------------
 #  Imports of standard modules --
 #--------------------------------
@@ -87,10 +86,11 @@ class NotificationDB :
 
     def get_version(self) :
         try :
-            return cp.package_versions.get_pkg_version('CalibManager')
+            return gu.get_pkg_version()
+            #return gu.get_pkg_tag('CalibManager') # Very slow, uses: psvn tags CalibManager
+            #return cp.package_versions.get_pkg_version('CalibManager')
         except :
             return 'N/A'
-            #return gu.get_pkg_version('CalibManager') # Very slow
 
 
     def cmd_insert_record(self) :

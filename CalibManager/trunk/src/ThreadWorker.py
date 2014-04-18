@@ -11,7 +11,7 @@
 """ThreadWorker"""
 
 #------------------------------
-#  Module's version from CVS --
+#  Module's version from SVN --
 #------------------------------
 __version__ = "$Revision$"
 # $Source$

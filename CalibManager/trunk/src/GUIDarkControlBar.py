@@ -10,7 +10,7 @@
 """GUI sets the instrument, experiment, and run number for signal and dark data"""
 
 #------------------------------
-#  Module's version from CVS --
+#  Module's version from SVN --
 #------------------------------
 __version__ = "$Revision$"
 # $Source$

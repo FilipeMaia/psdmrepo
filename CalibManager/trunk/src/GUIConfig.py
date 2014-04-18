@@ -10,7 +10,7 @@
 """GUI sets path to files"""
 
 #------------------------------
-#  Module's version from CVS --
+#  Module's version from SVN --
 #------------------------------
 __version__ = "$Revision$"
 # $Source$

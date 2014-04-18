@@ -39,13 +39,6 @@ class NotificationDBForCL (NotificationDB):
         NotificationDB.__init__(self, table='calibrun')
 
 
-    def get_version(self) :
-        try :
-            return gu.get_pkg_version('CalibManager') # Very slow
-            #return cp.package_versions.get_pkg_version('CalibManager')
-        except :
-            return 'N/A'
-
 #------------------------------
 
 if __name__ == "__main__" :

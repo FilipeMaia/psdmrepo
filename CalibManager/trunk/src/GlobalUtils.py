@@ -19,9 +19,8 @@ part of it, please give an appropriate acknowledgment.
 @author Mikhail S. Dubrovin
 """
 
-
 #------------------------------
-#  Module's version from CVS --
+#  Module's version from SVN --
 #------------------------------
 __version__ = "$Revision$"
 # $Source$
@@ -1106,6 +1105,13 @@ def msg_and_status_of_lsf(queue='psanacsq', print_bits=0):
 #----------------------------------
 
 def get_pkg_version(pkg_name='CalibManager') :
+    """Returns the latest revision number of the package"""
+    str_revision = __version__.split(':')[1].rstrip('$').strip()
+    return 'Rev-%s' % str_revision
+
+#----------------------------------
+
+def get_pkg_tag(pkg_name='CalibManager') :
     """Returns the latest version of the package - VERY SLOW COMMAND"""
     try :
         cmd = 'psvn tags %s' % pkg_name
@@ -1215,10 +1221,12 @@ if __name__ == "__main__" :
     #status = is_good_lustre_version()
     #print 'Lustre version status: %s' % status
 
-    queue='psfehq' # psnehq, psfehq, 'psanacsq'
-    output, status = msg_and_status_of_lsf(queue)
-    print 'LSF status: \n%s \nqueue:%s, status:%s' % (output, queue, status)
-          
+    #queue='psfehq' # psnehq, psfehq, 'psanacsq'
+    #output, status = msg_and_status_of_lsf(queue)
+    #print 'LSF status: \n%s \nqueue:%s, status:%s' % (output, queue, status)
+
+    print 'CalibManager package revision: "%s"' % get_pkg_version()
+     
     sys.exit ( "End of test" )
 
 #----------------------------------

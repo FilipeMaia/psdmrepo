@@ -10,7 +10,7 @@
 """GUI for Work/Result directories"""
 
 #------------------------------
-#  Module's version from CVS --
+#  Module's version from SVN --
 #------------------------------
 __version__ = "$Revision$"
 # $Source$

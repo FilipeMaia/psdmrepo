@@ -10,7 +10,7 @@
 """GUIStatusTable GUI shows the status table for the list of files"""
 
 #------------------------------
-#  Module's version from CVS --
+#  Module's version from SVN --
 #------------------------------
 __version__ = "$Revision$"
 # $Source$
