@@ -227,6 +227,7 @@ TypeMapContainer::iterator TypeSrcKeyH5GroupDirectory::endType() {
 TypeGroup & TypeSrcKeyH5GroupDirectory::addTypeGroup(const std::type_info *typeInfoPtr, hdf5pp::Group & parentGroup) {
   string groupName = m_h5GroupNames->nameForType(typeInfoPtr);
   hdf5pp::Group group = parentGroup.createGroup(groupName);
+  m_h5GroupNames->addTypeAttributes(group, typeInfoPtr);
   return (m_map[ groupName ] = TypeGroup(group,
                                          m_hdfWriterEventId,
                                          m_hdfWriterDamage));
@@ -270,11 +271,15 @@ SrcKeyGroup & TypeSrcKeyH5GroupDirectory::addSrcKeyGroup(const PSEvt::EventKey &
   const Pds::Src &src = eventKey.src();
   const string &key = eventKey.key();
   SrcKeyPair srcStrPair = make_pair(src,key);
-  string srcKeyGroupName = m_h5GroupNames->nameForSrcKey(src,key);
+  pair<string,string> nameRes = m_h5GroupNames->nameForSrcKey(src,key);
+  string srcKeyGroupName = nameRes.first;
+  string keyInName = nameRes.second;
   hdf5pp::Group typeH5Group = typeGroup.group();
   hdf5pp::Group srcH5Group = typeH5Group.createGroup(srcKeyGroupName);
   uint64_t srcVal = (uint64_t(src.phy()) << 32) + src.log();
   srcH5Group.createAttr<uint64_t>("_xtcSrc").store(srcVal);
+  srcH5Group.createAttr<const char *>("_eventKeyStr").store(key.c_str());
+  srcH5Group.createAttr<const char *>("_groupKeyStr").store(keyInName.c_str());
   MsgLog(logger,trace,"addSrcKeyGroup " << srcKeyGroupName);
   return (srcKeyMap[ srcStrPair ] = SrcKeyGroup(srcH5Group,
                                                 eventKey,
@@ -328,9 +333,11 @@ void TypeSrcKeyH5GroupDirectory::dump() {
       const SrcKeyPair & srcKeyPair = srcPos->first;
       const Pds::Src & src = srcKeyPair.first;
       const string & key = srcKeyPair.second;
-      msg << "  src = " <<   m_h5GroupNames->nameForSrc(src)
+      pair<string,string> nameRes = m_h5GroupNames->nameForSrcKey(src,key);
+      string groupName = nameRes.first;
+      msg << "  srckey name = " <<   groupName
           << " log=0x" << std::hex << src.log() << " phy=0x" << src.phy()
-          << " key='" << key << "'" << endl;
+          << " eventKey='" << key << "'" << endl;
     }
   }
   MsgLog(logger,info,msg.str());

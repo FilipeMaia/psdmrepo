@@ -11,6 +11,15 @@ Package author: David A. Schneider
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-01
+2014-04-17 David
+- Replace NDArray group name with fully qualified type names like
+  ndarray_uint8_2 or ndarray_const_uint8_2. Necessary to keep hdf5 path names
+  unique when event keys differ only by ndarry template params.
+- Add attributes to type, src, and src__key group names to reconstruct
+  parameters like event key and template parameters without parsing path.
+	
+
 Tag: V00-01-00
 2014-04-15 David
 - First production tag for replacing o2o-translate. Changes:

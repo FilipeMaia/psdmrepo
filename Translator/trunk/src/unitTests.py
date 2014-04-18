@@ -70,6 +70,9 @@ array([[[ 1.,  2.],
 int1D:
 array([[1, 2],
        [2, 3]], dtype=int32)
+uint1D:
+array([[1, 2],
+       [2, 3]], dtype=uint32)
 str1:
 array([This is event number: 1, This is event number: 2], dtype=object)
 str2:
@@ -169,7 +172,7 @@ class H5Output( unittest.TestCase ) :
                                  # If cleanup is True the files are deleted when
                                  # the test is done.
 
-        self.printPsanaOutput = False # if True, when a test psana it will write
+        self.printPsanaOutput = False # if True, when a psana test  will write
                                       # it's output.  It will also call h5ls -r on
                                       # on the h5 file created.
     def tearDown(self) :
@@ -700,18 +703,28 @@ class H5Output( unittest.TestCase ) :
         output_h5 = os.path.join(OUTDIR,'unit_test_ndarrays_allWrittenToFile.h5')
         cfgfile = writeCfgFile(input_file,output_h5,"Translator.TestModuleNDArrayString Translator.H5Output")
         cfgfile.file.flush()
-        self.runPsanaOnCfg(cfgfile,output_h5)
+        self.runPsanaOnCfg(cfgfile,output_h5, printPsanaOutput=self.printPsanaOutput )
         f=h5py.File(output_h5,'r')
 
-        double3D = f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/noSrc__my_double3D/data'][...]
-        float2Da = f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/noSrc__my_float2Da/data'][...]
-        float2Db = f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/noSrc__my_float2Db/data'][...]
-        int1D = f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/noSrc__my_int1D/data'][...]
+        double3D = f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_float64_3/noSrc__my_double3D/data'][...]
+        float2Da = f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_float32_2/noSrc__my_float2Da/data'][...]
+        float2Db = f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_float32_2/noSrc__my_float2Db/data'][...]
+        int1D = f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_int32_1/noSrc__my_int1D/data'][...]
+        uint1D = f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_uint32_1/noSrc__my_uint1D/data'][...]
         str1=f['/Configure:0000/Run:0000/CalibCycle:0000/std::string/noSrc__my_string1/data'][...]
         str2=f['/Configure:0000/Run:0000/CalibCycle:0000/std::string/noSrc__my_string2/data'][...]
 
-        output="double3D:\n%r\nfloat2Da:\n%r\nfloat2Db:\n%r\nint1D:\n%r\nstr1:\n%r\nstr2:\n%r\n" % (double3D, float2Da, float2Db, int1D, str1, str2)
+        cdouble3D = f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_const_float64_3/noSrc__cmy_double3D/data'][...]
+        cfloat2Da = f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_const_float32_2/noSrc__cmy_float2Da/data'][...]
+        cfloat2Db = f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_const_float32_2/noSrc__cmy_float2Db/data'][...]
+        cint1D = f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_const_int32_1/noSrc__cmy_int1D/data'][...]
+        cuint1D = f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_const_uint32_1/noSrc__cmy_uint1D/data'][...]
+
+        output="double3D:\n%r\nfloat2Da:\n%r\nfloat2Db:\n%r\nint1D:\n%r\nuint1D:\n%r\nstr1:\n%r\nstr2:\n%r\n" % (double3D, float2Da, float2Db, int1D, uint1D, str1, str2)
+        const_output="double3D:\n%r\nfloat2Da:\n%r\nfloat2Db:\n%r\nint1D:\n%r\nuint1D:\n%r\nstr1:\n%r\nstr2:\n%r\n" % (cdouble3D, cfloat2Da, cfloat2Db, cint1D, cuint1D, str1, str2)
+
         self.assertEqual(output,NDARRAY_2EVENTS, "output of all nd arrays wrong,\n *** expected: ***\n%s\n*** produced: ***\n%s\n" % (NDARRAY_2EVENTS, output))
+        self.assertEqual(const_output,NDARRAY_2EVENTS, "output of all const nd arrays wrong,\n *** expected: ***\n%s\n*** produced: ***\n%s\n" % (NDARRAY_2EVENTS, const_output))
         if self.cleanUp:
             os.unlink(output_h5)
 
@@ -730,13 +743,13 @@ class H5Output( unittest.TestCase ) :
 
         # none of the ndarrays or strings should be in here:
         with self.assertRaises(KeyError):
-            f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/noSrc__my_double3D']
+            f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_float64_3/noSrc__my_double3D']
         with self.assertRaises(KeyError):
-            f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/noSrc__my_float2Da']
+            f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_float32_2/noSrc__my_float2Da']
         with self.assertRaises(KeyError):
-            f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/noSrc__my_float2Db']
+            f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_float32_2/noSrc__my_float2Db']
         with self.assertRaises(KeyError):
-            f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/noSrc__my_int1D']
+            f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_int32_1/noSrc__my_int1D']
         with self.assertRaises(KeyError):
             f['/Configure:0000/Run:0000/CalibCycle:0000/std::string/noSrc__my_string1']
         with self.assertRaises(KeyError):
@@ -759,16 +772,20 @@ class H5Output( unittest.TestCase ) :
 
         # now these should not be here
         with self.assertRaises(KeyError):
-            f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/noSrc__my_int1D']
+            f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_int32_1/noSrc__my_int1D']
         with self.assertRaises(KeyError):
-            f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/noSrc__my_float2Da']
+            f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_float32_2/noSrc__my_float2Da']
         with self.assertRaises(KeyError):
             f['/Configure:0000/Run:0000/CalibCycle:0000/std::string/noSrc__my_string1']
         # but these should
-        self.assertEqual(len(f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/noSrc__my_double3D/data']),2)
-        self.assertEqual(len(f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/noSrc__my_float2Db/data']),2)
+        self.assertEqual(len(f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_float64_3/noSrc__my_double3D/data']),2)
+        self.assertEqual(len(f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_float32_2/noSrc__my_float2Db/data']),2)
         self.assertEqual(len(f['/Configure:0000/Run:0000/CalibCycle:0000/std::string/noSrc__my_string2/data']),2)
-
+        # and these should
+        self.assertEqual(len(f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_const_int32_1/noSrc__cmy_int1D/data']),2)
+        self.assertEqual(len(f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_const_float32_2/noSrc__cmy_float2Da/data']),2)
+        self.assertEqual(len(f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_const_float64_3/noSrc__cmy_double3D/data']),2)
+        self.assertEqual(len(f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_const_float32_2/noSrc__cmy_float2Db/data']),2)
         if self.cleanUp:
             os.unlink(output_h5)
 
@@ -779,22 +796,31 @@ class H5Output( unittest.TestCase ) :
         output_h5 = os.path.join(OUTDIR, "unit_test_filter_key_include.h5")
         cfgfile = writeCfgFile(input_file,output_h5,"Translator.TestModuleNDArrayString Translator.H5Output")
         # first add any options to H5Output, then other modules
-        cfgfile.write("key_filter = include my_int1D my_float2Da my_string1\n")
+        cfgfile.write("key_filter = include my_int1D my_float2Da my_string1 cmy_int1D\n")
         cfgfile.file.flush()
-        self.runPsanaOnCfg(cfgfile,output_h5)
+        self.runPsanaOnCfg(cfgfile,output_h5, printPsanaOutput=False)
         f=h5py.File(output_h5,'r')
 
         # now these should not be here
         with self.assertRaises(KeyError):
-            f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/noSrc__my_double3D']
+            f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_uint32_1/noSrc__my_uint1D']
         with self.assertRaises(KeyError):
-            f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/noSrc__my_float2Db']
+            f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_float64_3/noSrc__my_double3D']
+        with self.assertRaises(KeyError):
+            f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_float32_2/noSrc__my_float2Db']
         with self.assertRaises(KeyError):
             f['/Configure:0000/Run:0000/CalibCycle:0000/std::string/noSrc__my_string2']
+        with self.assertRaises(KeyError):
+            f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_const_uint32_1/noSrc__cmy_uint1D']
+        with self.assertRaises(KeyError):
+            f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_const_float64_3/noSrc__cmy_double3D']
+        with self.assertRaises(KeyError):
+            f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_const_float32_2/noSrc__cmy_float2Db']
 
         # but these should
-        self.assertEqual(len(f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/noSrc__my_int1D/data']),2)
-        self.assertEqual(len(f['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/noSrc__my_float2Da/data']),2)
+        self.assertEqual(len(f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_const_int32_1/noSrc__cmy_int1D/data']),2)
+        self.assertEqual(len(f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_int32_1/noSrc__my_int1D/data']),2)
+        self.assertEqual(len(f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_float32_2/noSrc__my_float2Da/data']),2)
         self.assertEqual(len(f['/Configure:0000/Run:0000/CalibCycle:0000/std::string/noSrc__my_string1/data']),2)
 
         if self.cleanUp:
@@ -892,11 +918,10 @@ class H5Output( unittest.TestCase ) :
         cfgfile = writeCfgFile(TESTDATA_T1, output_file,
                                moduleList='Translator.TestModuleNDArrayString Translator.H5Output')
         cfgfile.write("type_filter = exclude psana\n")
-        cfgfile.write("overwrite = true\n")
         cfgfile.file.flush()
         self.runPsanaOnCfg(cfgfile,output_file)
         h5 = h5py.File(output_file,'r')
-        nddata = h5['/Configure:0000/Run:0000/CalibCycle:0000/NDArray/noSrc__my_double3D/data']
+        nddata = h5['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_float64_3/noSrc__my_double3D/data']
         self.assertEqual(len(nddata),2)
 
         # now check that type_filter will pick out a few types:
@@ -948,7 +973,7 @@ class H5Output( unittest.TestCase ) :
             os.unlink(output_h5)
         
     def test_alias(self):
-        '''check that aliases are getting created.
+        '''check that filtering by src aliases works.
 
         test_050 has an aliasCfg object in the config, the aliases are:
         numAlias=7 
@@ -962,7 +987,7 @@ class H5Output( unittest.TestCase ) :
 
         During the first 120 events that are in the test_050 file, we get data from 
         SxrEndstation.0:Acqiris.0 and SxrEndstation.0:Acqiris.2 but not the Opal1000
-        sources. So one can test for those links.
+        sources.
         '''
         input_file = TESTDATA_ALIAS
         output_h5 = os.path.join(OUTDIR,"unit-test_alias.h5")

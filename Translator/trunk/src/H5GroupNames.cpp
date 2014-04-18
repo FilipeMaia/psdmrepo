@@ -1,5 +1,6 @@
 #include "Translator/H5GroupNames.h"
 #include "Translator/doNotTranslate.h"
+#include "Translator/NDArrayParams.h"
 
 #include <string>
 #include <sstream>
@@ -15,6 +16,8 @@ using namespace Translator;
 using namespace std;
 
 namespace {
+
+  const char * logger = "H5GroupNames";
 
   const std::string srcKeySepStr = "__";
 
@@ -104,7 +107,13 @@ H5GroupNames::H5GroupNames(const std::string & calibratedKey, const TypeAliases:
 {}
 
 string H5GroupNames::nameForType(const std::type_info *typeInfoPtr) {
-  if (m_ndarrays.find(typeInfoPtr) != m_ndarrays.end()) return "NDArray";
+  if (m_ndarrays.find(typeInfoPtr) != m_ndarrays.end()) {
+    string groupName = ndarrayGroupName(typeInfoPtr);
+    if (groupName.size()>0) return groupName;
+    string realName = PSEvt::TypeInfoUtils::typeInfoRealName(typeInfoPtr);
+    MsgLog(logger, error, "type " << realName << " matches known NDArrays "
+           << "but ndarrayGroupName() returned empty name - NOT simplifying name.");
+  }
   string realName = PSEvt::TypeInfoUtils::typeInfoRealName(typeInfoPtr);
   string::size_type leftParenIdx = realName.find("(");
   if (leftParenIdx != string::npos) {
@@ -140,20 +149,47 @@ string H5GroupNames::nameForType(const std::type_info *typeInfoPtr) {
   return realName;
 }
   
+void H5GroupNames::addTypeAttributes(hdf5pp::Group group, const std::type_info *typeInfoPtr) 
+{
+  if (isNDArray(typeInfoPtr)) {
+    group.createAttr<uint8_t>("_ndarray").store(1);
+    boost::shared_ptr<const NDArrayParameters> params = ndarrayParameters(typeInfoPtr);
+    if (not params) {
+      MsgLog(logger,error, "addTypeAttributes: group=" << group.name()
+             << " type=" << PSEvt::TypeInfoUtils::typeInfoRealName(typeInfoPtr)
+             << " no ndarrayParams found");
+      group.createAttr<uint32_t>("_ndarrayDim").store(0);
+      group.createAttr<int16_t>("_ndarrayElemType").store( 
+                                int16_t(NDArrayParameters::unknownElemType));
+      group.createAttr<uint32_t>("_ndarraySizeBytes").store(0);
+      group.createAttr<uint8_t>("_ndarrayConstElem").store(0);
+    } else {
+      group.createAttr<uint32_t>("_ndarrayDim").store(params->dim());
+      group.createAttr<int16_t>("_ndarrayElemType").store(uint16_t(params->elemType()));
+      group.createAttr<uint32_t>("_ndarraySizeBytes").store(params->sizeBytes());
+      group.createAttr<uint8_t>("_ndarrayConstElem").store(uint8_t(params->isConstElem()));
+    }
+  } else {
+    // not an ndarray
+    group.createAttr<uint8_t>("_ndarray").store(0);
+  }
+}
+
 string H5GroupNames::nameForSrc(const Pds::Src &src) {
   return ::srcName(src,false,false);
 }
 
-std::string H5GroupNames::nameForSrcKey(const Pds::Src &src, const std::string &key) {
+std::pair<std::string, std::string> H5GroupNames::nameForSrcKey(const Pds::Src &src, 
+                                                                const std::string &key) {
   string srcKeyGroupName = nameForSrc(src); // should always be non-zero length
-  if (key == m_calibratedKey) return srcKeyGroupName;
+  if (key == m_calibratedKey) return pair<string,string>(srcKeyGroupName,string());
   string keyStringToAddOrig;
   hasDoNotTranslatePrefix(key,&keyStringToAddOrig);
   string keyStringToAdd = replaceCharactersThatAreBadForH5GroupNames(keyStringToAddOrig);
   if (keyStringToAdd.size()>0) {
     srcKeyGroupName += (srcKeySep() + keyStringToAdd);
   }
-  return srcKeyGroupName;
+  return pair<string,string>(srcKeyGroupName,keyStringToAdd);
 }
 
 
