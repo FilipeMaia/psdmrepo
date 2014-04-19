@@ -45,6 +45,8 @@ from CalibManager.SvnProps   import svnprops as spcm
 #from pdscalibdata.SvnProps   import svnprops as spcd
 #from CSPadPixCoords.SvnProps import svnprops as sppc
 
+from CalibManager.SvnPropsViewer import SvnPropsViewer
+
 #from ConfigParametersForApp import cp
 #import GlobalUtils          as     gu
 #------------------------------
@@ -119,16 +121,18 @@ class PackageVersions :
         print self.get_text_from_log_for_pkg(pkg)
 
 
+    def get_revision_msg(self, props) :
+            spv = SvnPropsViewer(props)
+            return 'Rev-%s' % spv.get_pkg_revision()
+
+
     def get_pkg_revision(self, pkg='CalibManager') :
         """Returns package revision number"""
-            #str_revision = __version__.split(':')[1].rstrip('$').strip()
-            #str_revision = spcm.get_pkg_revision()
-
-        if pkg=='CalibManager'   : return 'Rev-%s' % spcm.get_pkg_revision()
-        #if pkg=='ImgAlgos'       : return 'Rev-%s' % spia.get_pkg_revision()
-        #if pkg=='PSCalib'        : return 'Rev-%s' % spps.get_pkg_revision()
-        #if pkg=='pdscalibdata'   : return 'Rev-%s' % spcd.get_pkg_revision()
-        #if pkg=='CSPadPixCoords' : return 'Rev-%s' % sppc.get_pkg_revision()
+        if pkg=='CalibManager'   : return self.get_revision_msg(spcm)
+        #if pkg=='ImgAlgos'       : return self.get_revision_msg(spia)
+        #if pkg=='PSCalib'        : return self.get_revision_msg(spps)
+        #if pkg=='pdscalibdata'   : return self.get_revision_msg(spcd)
+        #if pkg=='CSPadPixCoords' : return self.get_revision_msg(sppc)
         else                     : return 'N/A' 
 
 
@@ -152,6 +156,7 @@ class PackageVersions :
         txt = 'Version of packages'
         for pkg in self.list_of_pkgs :
             txt += '\n    %s  %s' % (self.get_pkg_version(pkg), pkg)
+            #txt += '\n    %s  %s' % (self.get_pkg_revision(pkg), pkg)
         return txt
 
 #------------------------------
