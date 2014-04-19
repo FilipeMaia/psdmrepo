@@ -11,6 +11,11 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-22
+2014-04-18 Mikhail Dubrovin
+- ALL modules: psvn mktxtprop CalibManager/src/*.py - add properties to files
+- add src/SvnProps.py
+
 Tag: V00-03-21
 2014-03-21 Mikhail S. Dubrovin
 - is all modules save/retreive ndarrays as ndarray<const T,N> - CONST IS ADDED !

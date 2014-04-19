@@ -125,7 +125,7 @@ namespace CSPadPixCoords {
  *     ndarray<double,3> nda_det  = cspad_configpars -> getCSPadPixNDArrFromNDArrShapedAsData<double> ( nda_data ); 
  * @endcode
  * 
- *  @version \$Id:$
+ *  @version \$Id$
  *
  *  @author Mikhail S. Dubrovin
  */

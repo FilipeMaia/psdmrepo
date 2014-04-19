@@ -128,7 +128,7 @@ namespace CSPadPixCoords {
 
   
 /** 
- *  @version \$Id:$
+ *  @version \$Id$
  *
  *  @author Mikhail S. Dubrovin
  */

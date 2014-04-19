@@ -144,7 +144,7 @@ namespace CSPadPixCoords {
  *  part of it, please give an appropriate acknowledgment.
  *
  *
- *  @version \$Id:$
+ *  @version \$Id$
  *
  *  @author Mikhail S. Dubrovin
  */ 
