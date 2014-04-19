@@ -3,7 +3,7 @@
 
 //--------------------------------------------------------------------------
 // File and Version Information:
-// 	$Id: AndorImageProducer.h 0001 2014-01-17 09:00:00Z dubrovin@SLAC.STANFORD.EDU $
+// 	$Id$
 //
 // Description:
 //	Class AndorImageProducer.
@@ -43,7 +43,7 @@ namespace ImgAlgos {
  *
  *  @see AdditionalClass
  *
- *  @version $Id: AndorImageProducer.h 0001 2012-07-06 09:00:00Z dubrovin@SLAC.STANFORD.EDU $
+ *  @version $Id$
  *
  *  @author Mikhail Dubrovin
  */

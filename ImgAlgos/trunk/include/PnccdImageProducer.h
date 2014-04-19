@@ -3,7 +3,7 @@
 
 //--------------------------------------------------------------------------
 // File and Version Information:
-// 	$Id: PnccdImageProducer.h 0001 2012-07-06 09:00:00Z dubrovin@SLAC.STANFORD.EDU $
+// 	$Id$
 //
 // Description:
 //	Class PnccdImageProducer.
@@ -40,7 +40,7 @@ namespace ImgAlgos {
  *
  *  @see AdditionalClass
  *
- *  @version $Id: PnccdImageProducer.h 0001 2012-07-06 09:00:00Z dubrovin@SLAC.STANFORD.EDU $
+ *  @version $Id$
  *
  *  @author Mikhail Dubrovin
  */

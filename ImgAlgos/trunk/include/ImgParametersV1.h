@@ -3,7 +3,7 @@
 
 //--------------------------------------------------------------------------
 // File and Version Information:
-// 	$Id: ImgParametersV1.h 2726 2012-08-21 14:50:00Z dubrovin@SLAC.STANFORD.EDU $
+// 	$Id$
 //
 // Description:
 //	Class ImgParametersV1.
@@ -47,7 +47,7 @@ namespace ImgAlgos {
  *
  *  @see AdditionalClass
  *
- *  @version $Id: ImgParametersV1.h 2726 2012-08-21 14:50:00Z dubrovin@SLAC.STANFORD.EDU $
+ *  @version $Id$
  *
  *  @author Mikhail Dubrovin
  */
