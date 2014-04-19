@@ -3,7 +3,7 @@
 
 //--------------------------------------------------------------------------
 // File and Version Information:
-// 	$Id: PnccdPixelGainV1.h 1 2014-01-28 18:00:00Z dubrovin@SLAC.STANFORD.EDU $
+// 	$Id$
 //
 // Description:
 //	Class PnccdPixelGainV1.
@@ -42,7 +42,7 @@ namespace pdscalibdata {
  *
  *  @see AdditionalClass
  *
- *  @version $Id: PnccdPixelGainV1.cpp 2014-01-28 18:00:00Z dubrovin@SLAC.STANFORD.EDU $
+ *  @version $Id$
  *
  *  @author Mikhail Dubrovin
  */

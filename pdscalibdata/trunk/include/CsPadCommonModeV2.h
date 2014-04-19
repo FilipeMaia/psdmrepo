@@ -3,7 +3,7 @@
 
 //--------------------------------------------------------------------------
 // File and Version Information:
-// 	$Id: CsPadCommonModeV2.h 1 2014-01-28 18:00:00Z dubrovin@SLAC.STANFORD.EDU $
+// 	$Id$
 //
 // Description:
 //	Class CsPadCommonModeV2.
@@ -44,7 +44,7 @@ namespace pdscalibdata {
  *
  *  @see AdditionalClass
  *
- *  @version $Id: CsPadCommonModeV2.cpp 2014-01-28 18:00:00Z dubrovin@SLAC.STANFORD.EDU $
+ *  @version $Id$
  *
  *  @author Mikhail Dubrovin
  */

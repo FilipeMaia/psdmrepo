@@ -3,7 +3,7 @@
 
 //--------------------------------------------------------------------------
 // File and Version Information:
-// 	$Id: PnccdPixelRmsV1.h 1 2014-02-08 18:00:00Z dubrovin@SLAC.STANFORD.EDU $
+// 	$Id$
 //
 // Description:
 //	Class PnccdPixelRmsV1.
@@ -42,7 +42,7 @@ namespace pdscalibdata {
  *
  *  @see AdditionalClass
  *
- *  @version $Id: PnccdPixelRmsV1.cpp 2014-02-08 18:00:00Z dubrovin@SLAC.STANFORD.EDU $
+ *  @version $Id$
  *
  *  @author Mikhail Dubrovin
  */

@@ -3,7 +3,7 @@
 
 //--------------------------------------------------------------------------
 // File and Version Information:
-// 	$Id: CsPadBaseV1.h 6832 2013-09-24 21:14:17Z dubrovin@SLAC.STANFORD.EDU $
+// 	$Id$
 //
 // Description:
 //	Class CsPadBaseV1.
@@ -43,7 +43,7 @@ namespace pdscalibdata {
  *
  *  @see AdditionalClass
  *
- *  @version $Id: PnccdBaseV1.h 2014-01-24 11:00:00Z dubrovin@SLAC.STANFORD.EDU $
+ *  @version $Id$
  *
  *  @author Mikhail Dubrovin
  */
