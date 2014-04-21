@@ -1,12 +1,5 @@
 #!@PYTHON@
 #--------------------------------------------------------------------------
-# File and Version Information:
-#  $Id$
-#
-# Description:
-#  Script plims...
-#
-#------------------------------------------------------------------------
 
 """This script starts stand alone version of the PlotImgSpe.
 
@@ -23,7 +16,7 @@ part of it, please give an appropriate acknowledgement.
 #------------------------------
 #  Module's version from CVS --
 #------------------------------
-__version__ = "$Revision: 8 $"
+__version__ = "$Revision$"
 # $Source$
 
 #--------------------------------

@@ -264,9 +264,9 @@ class CommandLineCalib () :
 #------------------------------
 
     def deploy_calib_files(self) :
-        list_of_deploy_commands, list_of_sources = fdmets.get_list_of_deploy_commands_and_sources_dark(self.str_run_number, self.str_run_range)
-        msg = self.sep + 'Tentative deployment commands:\n' + '\n'.join(list_of_deploy_commands)
-        self.log(msg,1)
+        #list_of_deploy_commands, list_of_sources = fdmets.get_list_of_deploy_commands_and_sources_dark(self.str_run_number, self.str_run_range)
+        #msg = self.sep + 'Tentative deployment commands:\n' + '\n'.join(list_of_deploy_commands)
+        #self.log(msg,1)
 
         if self.deploy :
             self.log(self.sep + 'Begin deployment of calibration files',1) 

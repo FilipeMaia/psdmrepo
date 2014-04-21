@@ -190,7 +190,11 @@ class BatchJobPedestals (BatchJob) :
         self.job_id_peds_str, out, err = gu.batch_job_submit(command, queue, bat_log_file)
         self.procDarkStatus ^= 2 # set bit to 1
 
-        if err != '' :
+        if err != 'Warning: job being submitted without an AFS token.' :
+            logger.warning('This job is running on LCLS NFS, it does not need in AFS, ignore warning and continue.', __name__)
+            return True
+
+        elif err != '' :
             self.stop_auto_processing(is_stop_on_button_click=False)
             logger.warning('Autoprocessing for run %s is stopped due to batch submission error!!!' % self.str_run_number, __name__)
             logger.warning('BATCH JOB IS NOT SUBMITTED !!!', __name__)

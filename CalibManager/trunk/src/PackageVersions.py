@@ -40,10 +40,10 @@ import tempfile
 from time import time, sleep
 
 from CalibManager.SvnProps   import svnprops as spcm
-#from ImgAlgos.SvnProps       import svnprops as spia
-#from PSCalib.SvnProps        import svnprops as spps
-#from pdscalibdata.SvnProps   import svnprops as spcd
-#from CSPadPixCoords.SvnProps import svnprops as sppc
+from ImgAlgos.SvnProps       import svnprops as spia
+from PSCalib.SvnProps        import svnprops as spps
+from pdscalibdata.SvnProps   import svnprops as spcd
+from CSPadPixCoords.SvnProps import svnprops as sppc
 
 from CalibManager.SvnPropsViewer import SvnPropsViewer
 
@@ -122,21 +122,21 @@ class PackageVersions :
 
 
     def get_revision_msg(self, props) :
-            spv = SvnPropsViewer(props)
-            return 'Rev-%s' % spv.get_pkg_revision()
+        spv = SvnPropsViewer(props)
+        return 'RN-%s' % spv.get_pkg_revision()
 
 
     def get_pkg_revision(self, pkg='CalibManager') :
         """Returns package revision number"""
         if pkg=='CalibManager'   : return self.get_revision_msg(spcm)
-        #if pkg=='ImgAlgos'       : return self.get_revision_msg(spia)
-        #if pkg=='PSCalib'        : return self.get_revision_msg(spps)
-        #if pkg=='pdscalibdata'   : return self.get_revision_msg(spcd)
-        #if pkg=='CSPadPixCoords' : return self.get_revision_msg(sppc)
+        if pkg=='ImgAlgos'       : return self.get_revision_msg(spia)
+        if pkg=='PSCalib'        : return self.get_revision_msg(spps)
+        if pkg=='pdscalibdata'   : return self.get_revision_msg(spcd)
+        if pkg=='CSPadPixCoords' : return self.get_revision_msg(sppc)
         else                     : return 'N/A' 
 
 
-    def get_pkg_version(self, pkg='CalibManager') :
+    def get_pkg_tag(self, pkg='CalibManager') :
         """Returns the latest version of the package"""
         try :
             output = self.get_text_from_log_for_pkg(pkg).rstrip('\n')
@@ -152,11 +152,16 @@ class PackageVersions :
             return 'V is N/A'
 
 
+    def get_pkg_version(self, pkg='CalibManager') :
+        """Returns the latest version of the package"""
+        return self.get_pkg_revision(pkg)
+        #return self.get_pkg_tag(pkg)
+
+
     def text_version_for_all_packages(self) :
         txt = 'Version of packages'
         for pkg in self.list_of_pkgs :
             txt += '\n    %s  %s' % (self.get_pkg_version(pkg), pkg)
-            #txt += '\n    %s  %s' % (self.get_pkg_revision(pkg), pkg)
         return txt
 
 #------------------------------
@@ -190,9 +195,13 @@ def test_packege_version(test_num):
         print 'Package %s revision number: %s' % (pkg, pv.get_pkg_revision(pkg))
 
     elif test_num == 5 :
-        pkg = 'pyimgalgos'
+        pkg = 'dscalibdata'
         print 'Package %s revision number: %s' % (pkg, pv.get_pkg_revision(pkg))
         
+    elif test_num == 6 :
+        pkg = 'CalibManager'
+        print 'Package %s latest tag: %s' % (pkg, pv.get_pkg_tag(pkg))
+
     msg = 'Consumed time to test method = %7.3f sec' % (time()-t0_sec)
     print msg
 
@@ -209,6 +218,7 @@ if __name__ == "__main__" :
         msg += '\n    3 - text_version_for_all_packages()'
         msg += '\n    4 - get_pkg_revision("CalibManager")'
         msg += '\n    5 - get_pkg_revision("pyimgalgos")'
+        msg += '\n    6 - get_pkg_tag("CalibManager")'
         msg += '\n   -h - this help'
         print msg
 
