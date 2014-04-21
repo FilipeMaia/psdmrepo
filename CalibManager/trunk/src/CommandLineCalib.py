@@ -333,8 +333,13 @@ class CommandLineCalib () :
 
     def print_dark_ave_batch_log(self) :
         path = fnm.path_peds_aver_batch_log()
+        if not os.path.exists(path) :
+            msg = 'File: %s does not exist' % path
+            self.log(msg,2)            
+            return
+        
         txt = self.sep + 'psana log file %s:\n\n' % path \
-            + gu.load_textfile(fnm.path_peds_aver_batch_log()) \
+            + gu.load_textfile(path) \
             + 'End of psana log file %s' % path
         self.log(txt,1)
 

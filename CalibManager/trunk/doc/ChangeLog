@@ -12,6 +12,12 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-40
+2014-04-21 Mikhail S. Dubrovin	
+- PackageVersions - for now commented depencency from other packages 
+	CSPadPixCoords ImgAlgos pdscalibdata PSCalib
+- CommandLineCalib - do not dump log-file if it is not available (not-produced yet) 
+
 Tag: V00-00-39
 2014-04-21 Mikhail S. Dubrovin	
 - psvn mktxtprop doc/ChangeLog

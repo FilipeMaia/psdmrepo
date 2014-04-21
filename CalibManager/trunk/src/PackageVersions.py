@@ -40,10 +40,10 @@ import tempfile
 from time import time, sleep
 
 from CalibManager.SvnProps   import svnprops as spcm
-from ImgAlgos.SvnProps       import svnprops as spia
-from PSCalib.SvnProps        import svnprops as spps
-from pdscalibdata.SvnProps   import svnprops as spcd
-from CSPadPixCoords.SvnProps import svnprops as sppc
+#from ImgAlgos.SvnProps       import svnprops as spia
+#from PSCalib.SvnProps        import svnprops as spps
+#from pdscalibdata.SvnProps   import svnprops as spcd
+#from CSPadPixCoords.SvnProps import svnprops as sppc
 
 from CalibManager.SvnPropsViewer import SvnPropsViewer
 
@@ -129,10 +129,16 @@ class PackageVersions :
     def get_pkg_revision(self, pkg='CalibManager') :
         """Returns package revision number"""
         if pkg=='CalibManager'   : return self.get_revision_msg(spcm)
-        if pkg=='ImgAlgos'       : return self.get_revision_msg(spia)
-        if pkg=='PSCalib'        : return self.get_revision_msg(spps)
-        if pkg=='pdscalibdata'   : return self.get_revision_msg(spcd)
-        if pkg=='CSPadPixCoords' : return self.get_revision_msg(sppc)
+        #if pkg=='ImgAlgos'       : return self.get_revision_msg(spia)
+        #if pkg=='PSCalib'        : return self.get_revision_msg(spps)
+        #if pkg=='pdscalibdata'   : return self.get_revision_msg(spcd)
+        #if pkg=='CSPadPixCoords' : return self.get_revision_msg(sppc)
+
+        if pkg=='ImgAlgos'       : return self.get_pkg_tag(pkg)
+        if pkg=='PSCalib'        : return self.get_pkg_tag(pkg)
+        if pkg=='pdscalibdata'   : return self.get_pkg_tag(pkg)
+        if pkg=='CSPadPixCoords' : return self.get_pkg_tag(pkg)
+
         else                     : return 'N/A' 
 
 
