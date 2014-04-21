@@ -16,19 +16,21 @@ Tag: V00-00-40
 2014-04-21 Mikhail S. Dubrovin	
 - PackageVersions - for now commented depencency from other packages 
 	CSPadPixCoords ImgAlgos pdscalibdata PSCalib
-- CommandLineCalib - do not dump log-file if it is not available (not-produced yet) 
+- CommandLineCalib - do not dump log-file if it is not available (not-produced yet)
+- cosmetic improvement of printed statements for command mode.
 
 Tag: V00-00-39
 2014-04-21 Mikhail S. Dubrovin	
 - psvn mktxtprop doc/ChangeLog
-- psvn mktxtprop app/*   (svn propset svn:keywords app/*)
+- psvn mktxtprop app/* (svn propset svn:keywords app/*)
 - BatchJobPedestals - continue normal batch job processing if AFS token is missing 	
 - PackageVersions - as a package version use revision No. in stead of tag
 - app/calibrun, calibman - do not check AFS token and Kerberos ticket
 	
 Tag: V00-00-38	
 2014-04-18 Mikhail S. Dubrovin	
-- add src/SvnProps.py, SvnPropsViewer.py
+- add src/SvnProps.py, SvnPropsViewer.py, also set properties:
+	svn propset svn:keywords "Revision" src/SvnProps.py
 
 Tag: V00-00-37	
 2014-04-17 Mikhail S. Dubrovin	

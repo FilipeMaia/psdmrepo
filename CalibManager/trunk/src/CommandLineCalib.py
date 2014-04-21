@@ -113,7 +113,8 @@ class CommandLineCalib () :
 
 	self.exp_name = cp.exp_name.value() if self.opts['exp'] is None else self.opts['exp']
         if self.exp_name == cp.exp_name.value_def() :
-	    self.log('Experiment name is not defined, should be specified as optional parameter -e <exp-name>',4)
+	    self.log('\nWARNING: EXPERIMENT NAME IS NOT DEFINED...'\
+                     + '\nAdd optional parameter -e <exp-name>',4)
 	    return False
 
 
@@ -135,8 +136,8 @@ class CommandLineCalib () :
 
 
         if self.det_name == cp.det_name.value_def() :
-	    self.log('Detector name(s) is not defined, should be specified as '\
-                     + 'optional parameter -d <det-names>, ex.: -d CSPAD,CSPAD2x2 etc',4)
+	    self.log('\nWARNING: DETECTOR NAMES ARE NOT DEFINED...'\
+                     + '\nAdd optional parameter -d <det-names>, ex.: -d CSPAD,CSPAD2x2 etc',4)
 	    return False
 
 
@@ -212,7 +213,7 @@ class CommandLineCalib () :
         if self.process :
             self.log(self.sep + 'Begin dark run data processing interactively',1)
         else :
-            self.log(self.sep + 'WARNING: File processing option IS TURNED OFF...'\
+            self.log(self.sep + '\nWARNING: FILE PROCESSING OPTION IS TURNED OFF...'\
                   + '\nAdd "-P" option in the command line to process files',4) 
             return
 
@@ -237,7 +238,7 @@ class CommandLineCalib () :
         if self.process :
             self.log(self.sep + 'Begin dark run data processing in batch queue %s' % self.queue,1)
         else :
-            self.log(self.sep + 'WARNING: File processing option IS TURNED OFF...'\
+            self.log(self.sep + '\nWARNING: FILE PROCESSING OPTION IS TURNED OFF...'\
                   + '\nAdd "-P" option in the command line to process files',4)
             return
 
@@ -273,7 +274,7 @@ class CommandLineCalib () :
             fdmets.deploy_calib_files(self.str_run_number, self.str_run_range, mode='calibrun-dark', ask_confirm=False)
             self.log('\nDeployment of calibration files is completed',1)
         else :
-            self.log(self.sep + 'WARNING: File deployment option IS TURNED OFF...'\
+            self.log(self.sep + '\nWARNING: FILE DEPLOYMENT OPTION IS TURNED OFF...'\
                      +'\nAdd "-D" option in the command line to deploy files',4)
 
 #------------------------------

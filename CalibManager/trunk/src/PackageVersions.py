@@ -155,7 +155,7 @@ class PackageVersions :
             #print 'Version: ', version
             return version
         except :
-            return 'V is N/A'
+            return 'V-is-N/A'
 
 
     def get_pkg_version(self, pkg='CalibManager') :

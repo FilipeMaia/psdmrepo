@@ -1125,7 +1125,7 @@ def get_pkg_tag(pkg_name='CalibManager') :
         #print 'Version: ', version
         return version
     except :
-        return 'V is N/A'
+        return 'V-is-N/A'
     
 #----------------------------------
 

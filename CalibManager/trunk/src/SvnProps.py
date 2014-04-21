@@ -28,6 +28,7 @@ import sys
 
 class SvnProps :
 
+    updated  = "2014-04-21"
     revision = "$Revision$"
     author   = "$Author: dubrovin@SLAC.STANFORD.EDU $"
     id       = "$Id: SvnProps.py 8029 2014-04-18 17:16:45Z dubrovin@SLAC.STANFORD.EDU $"
