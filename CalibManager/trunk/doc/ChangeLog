@@ -18,7 +18,8 @@ Tag: V00-00-40
 	CSPadPixCoords ImgAlgos pdscalibdata PSCalib
 - CommandLineCalib - do not dump log-file if it is not available (not-produced yet)
 - cosmetic improvement of printed statements for command mode.
-
+- FileDeployer - do not deploy non-existent input files
+	
 Tag: V00-00-39
 2014-04-21 Mikhail S. Dubrovin	
 - psvn mktxtprop doc/ChangeLog

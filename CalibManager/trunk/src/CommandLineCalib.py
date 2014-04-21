@@ -214,7 +214,7 @@ class CommandLineCalib () :
             self.log(self.sep + 'Begin dark run data processing interactively',1)
         else :
             self.log(self.sep + '\nWARNING: FILE PROCESSING OPTION IS TURNED OFF...'\
-                  + '\nAdd "-P" option in the command line to process files',4) 
+                  + '\nAdd "-P" option in the command line to process files\n',4) 
             return
 
         self.bjpeds = BatchJobPedestals(self.runnum)
@@ -239,7 +239,7 @@ class CommandLineCalib () :
             self.log(self.sep + 'Begin dark run data processing in batch queue %s' % self.queue,1)
         else :
             self.log(self.sep + '\nWARNING: FILE PROCESSING OPTION IS TURNED OFF...'\
-                  + '\nAdd "-P" option in the command line to process files',4)
+                  + '\nAdd "-P" option in the command line to process files\n',4)
             return
 
         self.bjpeds = BatchJobPedestals(self.runnum)
@@ -275,7 +275,7 @@ class CommandLineCalib () :
             self.log('\nDeployment of calibration files is completed',1)
         else :
             self.log(self.sep + '\nWARNING: FILE DEPLOYMENT OPTION IS TURNED OFF...'\
-                     +'\nAdd "-D" option in the command line to deploy files',4)
+                     +'\nAdd "-D" option in the command line to deploy files\n',4)
 
 #------------------------------
 #------------------------------

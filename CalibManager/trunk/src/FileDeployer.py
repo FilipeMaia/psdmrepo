@@ -88,7 +88,15 @@ def deploy_calib_files(str_run_number, str_run_range, mode='calibrun-dark', ask_
 
 def is_allowed_command(cmd, list_src_cbx):
     """Check the deployment command is for selected src"""
-    destination = cmd.split()[2] # for example: /reg/d/psdm/CXI/cxib2313/calib/CsPad::CalibV1/CxiDsd.0:Cspad.0/pedestals/1-1.data
+
+    fields  = cmd.split()
+    infname = fields[1] # for example:  ./work/clb-cxib2313-r0010-mask-hot-thr-0.00ADU-CxiDs1.0:Cspad.0.txt 
+    if not os.path.exists(infname) :
+        msg = '\nWARNING: INPUT FILE %s DOES NOT EXIST... Is not deployed.\n' % infname
+        logger.warning(msg, __name__)
+        return False
+
+    destination = fields[2] # for example: /reg/d/psdm/CXI/cxib2313/calib/CsPad::CalibV1/CxiDsd.0:Cspad.0/pedestals/1-1.data
     for src,cbx in list_src_cbx :
         if not cbx : continue
         if src in destination : return True
