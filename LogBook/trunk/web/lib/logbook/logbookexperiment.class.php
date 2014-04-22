@@ -614,29 +614,7 @@ HERE;
                 __METHOD__,
                 "conflicting parameters: shift_id=".$shift_id." and run_id=".$run_id );
 
-        /* For explicitly specified shifts and runs force the search limits not
-         * to exceed their intervals (if the one is specified).
-         */
-        if( !is_null( $shift_id )) {
-            $shift = $this->find_shift_by_id( $shift_id );
-            if( is_null( $shift ))
-                throw new LogBookException(
-                    __METHOD__,
-                    "no shift with shift_id=".$shift_id." found" );
-            $begin = $shift->begin_time();
-            $end = $shift->end_time();
-        }
-        if( !is_null( $run_id )) {
-            $run = $this->find_run_by_id( $run_id );
-            if( is_null( $run ))
-                throw new LogBookException(
-                    __METHOD__,
-                    "no run with run_id=".$run_id." found" );
-            $begin = $run->begin_time();
-            $end = $run->end_time();
-        }
-
-        /* Ignore since if it doesn't fall into an interval of the requst.
+        /* Ignore parameter 'since' if it doesn't fall into an interval of the requst.
          */
         if( !is_null( $since )) {
             if( !is_null( $begin ) && $since->less( $begin )) {
@@ -667,16 +645,60 @@ HERE;
                 $scope = " AND ((h.shift_id IS NULL AND h.run_id IS NULL)";
             }
             if( $posted_at_shifts ) {
+                
+                // If a specific shift is requested then look for messages which were:
+                //
+                //   1. either dircetly attached to the shift, or
+                //   2. were posted within the shift's boundaries and were not explicitly
+                //      associated with another shift
+                
+                $shift_id_opt = '' ;
+                if ($shift_id) {
+                    $shift = $this->find_shift_by_id( $shift_id );
+                    if( is_null( $shift ))
+                        throw new LogBookException(
+                            __METHOD__,
+                            "no shift with shift_id=".$shift_id." found" );
+                    $shift_begin = $shift->begin_time();
+                    $shift_end   = $shift->end_time();
+                    $shift_begin_opt = is_null( $shift_begin ) ? "" : " AND e.insert_time >= {$shift_begin->to64()}";
+                    $shift_end_opt   = is_null( $shift_end   ) ? "" : " AND e.insert_time <  {$shift_end->to64()}";
+                    $shift_id_opt = "((h.shift_id={$shift_id}) OR (h.shift_id IS NULL {$shift_begin_opt} {$shift_end_opt}))" ;
+                } else {
+                    $shift_id_opt = '(h.shift_id IS NOT NULL)';
+                }
                 if( $scope == "" )
-                    $scope = " AND ((h.shift_id IS NOT NULL)";
+                    $scope = " AND ({$shift_id_opt}";
                 else
-                    $scope .= " OR (h.shift_id IS NOT NULL)";
+                    $scope .= " OR {$shift_id_opt}";
             }
             if( $posted_at_runs ) {
+
+                // If a specific run is requested then look for messages which were:
+                //
+                //   1. either dircetly attached to the run, or
+                //   2. were posted within the run's boundaries and were not explicitly
+                //      associated with another run
+
+                $run_id_opt = '' ;
+                if ($run_id) {
+                    $run = $this->find_run_by_id( $run_id );
+                    if( is_null( $run ))
+                        throw new LogBookException(
+                            __METHOD__,
+                            "no run with run_id=".$run_id." found" );
+                    $run_begin = $run->begin_time();
+                    $run_end   = $run->end_time();
+                    $run_begin_opt = is_null( $run_begin ) ? "" : " AND e.insert_time >= {$run_begin->to64()}";
+                    $run_end_opt   = is_null( $run_end   ) ? "" : " AND e.insert_time <  {$run_end->to64()}";
+                    $run_id_opt = "((h.run_id={$run_id}) OR (h.run_id IS NULL {$run_begin_opt} {$run_end_opt}))" ;
+                } else {
+                    $run_id_opt = '(h.run_id IS NOT NULL)';
+                }
                 if( $scope == "")
-                    $scope = " AND ((h.run_id IS NOT NULL)";
+                    $scope = " AND ({$run_id_opt}";
                 else
-                    $scope .= " OR (h.run_id IS NOT NULL)";
+                    $scope .= " OR {$run_id_opt}";
             }
             if( $scope != "" )
                 $scope .= ")\n";
@@ -743,6 +765,15 @@ HERE;
         $condition .= $since_str;
         $condition .= $tag_str;
         $condition .= $author_str;
+
+//        if ($shift_id == 927)
+//            file_put_contents('php://stderr', print_r("\n".$this->sql_4_entries_by_(
+//                $condition,
+//                $limit,
+//                $use_tags,
+//                $inject_deleted_messages,
+//                $search_in_children
+//            ), TRUE));
 
         return $this->entries_by_(
             $this->sql_4_entries_by_(

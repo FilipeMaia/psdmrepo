@@ -1,14 +1,14 @@
 <?php
 
 /**
- * Return a list of shifts for teh experiment.
+ * Return a list of shifts for the experiment.
  */
 require_once 'dataportal/dataportal.inc.php' ;
 require_once 'logbook/logbook.inc.php' ;
 require_once 'lusitime/lusitime.inc.php' ;
 
+use LogBook\LogBookUtils ;
 use LusiTime\LusiTime ;
-
 
 /* Translate timestamps which may also contain shortcuts
  */
@@ -28,25 +28,6 @@ function translate_time ($experiment, $str) {
     $result = LusiTime::parse($str) ;
     if ($result) return $result ;
     return LusiTime::from64($str) ;
-}
-
-function shift2array ($shift) {
-    $begin_time_url =
-        "<a href=\"javascript:select_shift(".$shift->id().")\" class=\"lb_link\">" .
-        $shift->begin_time()->toStringShort() .
-        '</a>' ;
-    $end_time_status =
-        is_null( $shift->end_time()) ?
-        '<b><em style="color:red;">on-going</em></b>' :
-        $shift->end_time()->toStringShort() ;
-
-    return array (
-        "id"         => $shift->id() ,
-        "begin_time" => $begin_time_url ,
-        "end_time"   => $end_time_status ,
-        "leader"     => $shift->leader() ,
-        "num_runs"   => $shift->num_runs()
-    ) ;
 }
 
 DataPortal\ServiceJSON::run_handler ('GET', function ($SVC) {
@@ -90,7 +71,7 @@ DataPortal\ServiceJSON::run_handler ('GET', function ($SVC) {
             array_push($shifts, shift2array($last_shift)) ;
     } else {
         foreach ($experiment->shifts_in_interval($begin, $end) as $shift)
-            array_push($shifts, shift2array($shift)) ;
+            array_push($shifts, LogBookUtils::shift2array($shift, false)) ;
     }
     $SVC->finish (
         array (
