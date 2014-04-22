@@ -1,0 +1,58 @@
+<!--
+This is an example of the RadioBox widget.
+-->
+<!DOCTYPE html>
+<html>
+<head>
+<title>An example of the RadioBox widget</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta name="viewport" content="width=device-width, height=device-height, initial-scale=1.0">
+
+<script type="text/javascript" src="/jquery/js/jquery-1.8.2.js"></script>
+<script type="text/javascript" src="/jquery/js/jquery-ui-1.9.1.custom.min.js"></script>
+
+<script type="text/javascript" src="/underscore/underscore-min.js"></script>
+
+<script type="text/javascript" src="js/Class.js" ></script>
+<script type="text/javascript" src="js/Widget.js" ></script>
+<script type="text/javascript" src="js/RadioBox.js" ></script>
+
+<link type="text/css" href="/jquery/css/custom-theme-1.9.1/jquery-ui.custom.css" rel="Stylesheet" />
+<link type="text/css" href="css/RadioBox.css" rel="Stylesheet" />
+
+<style>
+body {
+    margin: 0;
+    padding: 0;
+}
+.test {
+    padding: 0px 20px 20px 20px;
+}
+</style>
+
+<script type="text/javascript" >
+
+$(function () {
+    var rb = new RadioBox(
+        [   {name: "first",  text: "First",   title: "Press the First button" } ,
+            {name: "second", text: "Second",  title: "Press the Second button"} ,
+            {name: "third",  text: "Press me"} ,
+            {name: "next",   text: "Delete",  style: "color:red;"}
+        ] ,
+
+        function (name) {
+            console.log('pressed button: '+name)
+        } ,
+        {   activate: "second"}
+    ) ;
+    rb.display($('#radiobox')) ;
+}) ;
+</script>
+
+</head>
+<body>
+    <div class="test">
+        <div id="radiobox" ></div>
+    </div>
+</body>
+</html>
