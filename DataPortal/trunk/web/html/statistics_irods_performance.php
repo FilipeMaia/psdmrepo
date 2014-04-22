@@ -1,5 +1,5 @@
 
-<!DOCTYPE html">
+<!DOCTYPE html>
 <html>
 <head>
 <link type="text/css" href="../portal/css/Table.css" rel="Stylesheet" />

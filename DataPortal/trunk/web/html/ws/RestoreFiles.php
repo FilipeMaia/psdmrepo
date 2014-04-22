@@ -79,7 +79,7 @@ if( $storage == '' ) report_error( "invalid storage class found in the request" 
  * Analyze and process the request
  */
 try {
-    //report_error("We're sorry! Restoring files from tapes is temporarily disabled due to technical reasons. Please, try again in 24 hours");
+    report_error("We're sorry! Restoring files from tapes is temporarily disabled due to technical reasons. Please, try again in 24 hours");
 
     LogBook::instance()->begin();
     Config::instance()->begin();

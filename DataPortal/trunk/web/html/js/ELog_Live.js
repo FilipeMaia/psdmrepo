@@ -142,8 +142,15 @@ function ELog_Live (experiment, access_list) {
         this._info    = body.find('div#info') ;
         this._updated = body.find('div#updated') ;
 
-        this._viewer = new ELog_MessageViewer(this, this._wa.find('#viewer'), {allow_groups: true}) ;
-
+        this._viewer = new ELog_MessageViewer (
+            this ,
+            this._wa.find('#viewer') ,
+            {
+                allow_groups: true ,
+                allow_runs:   !this.experiment.is_facility ,
+                allow_shifts: !this.experiment.is_facility
+            }
+        ) ;
         if (when_done) when_done () ;
     } ;
 

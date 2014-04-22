@@ -223,7 +223,7 @@ function ELog_Runs (experiment, access_list) {
                 {id: 'begin',        title: 'Begin time',  width:  150} ,
                 {id: 'run',          title: 'Run',         width:   30, align: 'right'} ,
                 {id: 'duration',     title: 'Length',      width:   55, align: 'right', style: 'color:maroon;'} ,
-                {id: 'duration_bar', title: '&nbsp',       width:  400}
+                {id: 'duration_bar', title: '&nbsp',       width:  200}
             ] ;
             this._run_table_obj = new StackOfRows (
                 hdr ,
@@ -239,7 +239,7 @@ function ELog_Runs (experiment, access_list) {
 
 
     /**
-     * Search for runs in teh specified range
+     * Search for runs in the specified range
      * @returns {undefined}
      */
     this._search = function () {
@@ -344,7 +344,7 @@ function ELog_Runs (experiment, access_list) {
     
     this._run2row = function (r, max_seconds) {
         var duration_bar_width = 0 ;
-        if (max_seconds) duration_bar_width = Math.floor(385.0 * (r.sec / max_seconds)) ;
+        if (max_seconds) duration_bar_width = Math.floor(185.0 * (r.sec / max_seconds)) ;
         var row = {
             title: {
                 begin: '<b>'+r.ymd+'</b>&nbsp;&nbsp;'+r.hms ,

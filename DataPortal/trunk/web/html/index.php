@@ -58,7 +58,7 @@ $known_apps = array (
             'manage'           => 'Manage' )) ,
 
     'shiftmgr' => array (
-        'name'             => 'Shift Manager' ,
+        'name'             => 'Hutch Manager' ,
         'context1_default' => 'Reports' ,
         'context1'         => array (
             'reports'          => 'Reports' ,
@@ -379,42 +379,67 @@ var global_extra_params = {} ;
 
 $(function() {
 
-    var menus = [{
-
+    var menus = [] ;
+    menus.push ({
+        
         name: 'Experiment' ,
         menu: [{
             name: 'Info' ,
             application: new Experiment_Info(experiment, access_list) } , {
  
             name: 'Group Manager' ,
-            application: new Experiment_Group(experiment, access_list) }]} , {
-    
-        name: 'e-Log',
-        menu: [{
-            name: 'Recent (Live)' ,
-            application: new ELog_Live(experiment, access_list) } , {
+            application: new Experiment_Group(experiment, access_list) }]}
+    ) ;
 
-            name: 'Post' ,
-            application: new ELog_Post(experiment, access_list) } , {
+    if (experiment.is_facility) {
+        
+        menus.push ({
 
-            name: 'Search' ,
-            application: new ELog_Search(experiment, access_list) } , {
+            name: 'e-Log',
+            menu: [{
+                name: 'Recent (Live)' ,
+                application: new ELog_Live(experiment, access_list) } , {
 
-            name: 'Shifts' ,
-            application: new ELog_Shifts(experiment, access_list) } , {
+                name: 'Post' ,
+                application: new ELog_Post(experiment, access_list) } , {
 
-            name: 'Runs' ,
-            application: new ELog_Runs(experiment, access_list) } , {
+                name: 'Search' ,
+                application: new ELog_Search(experiment, access_list) } , {
 
-            name: 'Attachments' ,
-            application: new ELog_Attachments(experiment, access_list) } , {
+                name: 'Attachments' ,
+                application: new ELog_Attachments(experiment, access_list) } , {
 
-            name: 'Subscribe' ,
-            application: new ELog_Subscribe(experiment, access_list) }]}] ;
+                name: 'Subscribe' ,
+                application: new ELog_Subscribe(experiment, access_list) }]}
+        ) ;
 
-    if (!experiment.is_facility) {
+    } else {
+
         menus.push ({
         
+            name: 'e-Log',
+            menu: [{
+                name: 'Recent (Live)' ,
+                application: new ELog_Live(experiment, access_list) } , {
+
+                name: 'Post' ,
+                application: new ELog_Post(experiment, access_list) } , {
+
+                name: 'Search' ,
+                application: new ELog_Search(experiment, access_list) } , {
+
+                name: 'Shifts' ,
+                application: new ELog_Shifts(experiment, access_list) } , {
+
+                name: 'Runs' ,
+                application: new ELog_Runs(experiment, access_list) } , {
+
+                name: 'Attachments' ,
+                application: new ELog_Attachments(experiment, access_list) } , {
+
+                name: 'Subscribe' ,
+                application: new ELog_Subscribe(experiment, access_list) }]} , {
+
             name: 'Run Tables',
             menu: [{
                 name: 'Calibrations' ,
@@ -429,7 +454,7 @@ $(function() {
                 name: 'User' ,
                 application: new Runtables_User(experiment, access_list) } ] } , {
 
-           name: 'File Manager',
+            name: 'File Manager',
             menu: [{
                 name: 'Summary' ,
                 application: new Filemanager_Summary(experiment, access_list) } , {
@@ -443,12 +468,14 @@ $(function() {
             name: 'HDF5 Translation',
             menu: [{
                 name: 'Manage' ,
-                application: new HDF5_Manage(experiment, access_list) }]}) ;
+                application: new HDF5_Manage(experiment, access_list) }]}
+        ) ;
 
         if (access_list.shiftmgr.can_edit) {
+            
             menus.push ({
         
-                name: 'Shift Manager',
+                name: 'Hutch Manager',
                 menu: [{
                     name: 'Reports' ,
                     application: new Reports(experiment.instrument.name, access_list.shiftmgr.can_edit) ,
@@ -460,7 +487,8 @@ $(function() {
 
                     name: 'E-mail Notifications' ,
                     application: new Notifications(experiment.instrument.namet) ,
-                    html_container: 'shift-notifications-'+experiment.instrument.name}]}) ;
+                    html_container: 'shift-notifications-'+experiment.instrument.name}]}
+            ) ;
         }
     }
 

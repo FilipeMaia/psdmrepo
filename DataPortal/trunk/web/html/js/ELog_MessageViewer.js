@@ -2743,7 +2743,8 @@ function ELog_MessageViewer (parent, cont, options) {
 '<div id="ctrl"></div>' +
 '<div id="body">' +
 '  <div id="stream"></div>' +
-'  <div id="day"></div>' +
+'  <div id="day"></div>' ;
+            html +=
 '  <div id="shift"></div>' +
 '  <div id="tag"></div>' +
 '  <div id="author"></div>' +

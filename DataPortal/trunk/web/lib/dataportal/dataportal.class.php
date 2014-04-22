@@ -460,6 +460,32 @@ HERE;
                $addresses);
         return $addresses[1];
     }
+    static function experiment_contact_info( $experiment ) {
+        
+        $addresses = array();
+        preg_match_all (
+               '/[, ]?(.+)[( ]+(.+@.+)[) ]+/',
+               $experiment->contact_info(),
+               $addresses);
+
+        $result = array() ;
+        for ($i = 0; $i < count($addresses[0]); $i++) {
+
+            $gecos = $addresses[1][$i] ;
+            $email = $addresses[2][$i] ;
+
+            // Extract UID from email if this is a SLAC user
+            
+            $idx = strpos($email, '@slac.stanford.edu') ;
+            $uid = $idx ? substr($email, 0, $idx) : $addresses[1][$i] ;
+
+            array_push($result, array (
+                'gecos' => $gecos ,
+                'email' => $email ,
+                'uid'   => $uid)) ;
+        }
+        return $result;
+    }
     static function decorated_experiment_status( $experiment ) {
         $status = $experiment->in_interval( LusiTime::now());
         if     ( $status > 0 ) return '<b><em style="color:gray">completed</em></b>';
