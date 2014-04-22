@@ -1,0 +1,5 @@
+- the first production version of the new psana-based Translator replacing O2OTranslator
+- fixed a bug in O2OTranslator affecting ePIX-100
+- bug fixes and improvements in the Calibration manager GUI and algorithms
+- the command-line version of the Calibration manager
+- the first implementation of the direct access to events from Python psana
