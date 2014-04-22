@@ -120,6 +120,7 @@ protected:
   bool isNDArray(const type_info *typeInfoPtr);
 
   void checkForNewWriters();
+  bool checkIfNewTypeHasSameH5GroupNameAsCurrentTypes(const std::type_info *);
 
 private:
   hdf5pp::File m_h5file;

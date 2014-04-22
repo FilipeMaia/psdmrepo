@@ -4,7 +4,7 @@
 //
 // Below are the key's and values for the non const ndarray's added, and the strings.  
 // A 1-up counter fo the event is used to for the values.  Each of the 
-// nd arrays will set element 0 to the event number, and go one up from there.  
+// nd arrays will set element 0 to the event number (1-up), and go one up from there.  
 // That is, for event 1, we'll have
 //
 //   type=std::string key="my_string1"              This is event number: 1
@@ -15,6 +15,11 @@
 //   EventKey type=ndarray<int,1>    "my_int1D"     [1,2]
 //   EventKey type=ndarray<unsigned,1> "my_uint1D"  [1,2]
 //   
+//  When we get to event 2, all the starting values will be 2.
+//
+//  Each dimensions of the arrays will be 2 unless vary_array_sizes is true.
+//  In this case, the first dimension will be min(20, 2+eventNumber) where eventNumber is 1-up
+
 //  Here is the const data:
 //
 //   EventKey type=ndarray<const float,2>  "cmy_float2Da"  [[1.0,2.0],[3.0,4.0]]
@@ -31,7 +36,7 @@
 //                                 # should see this and produce an error
 //  use_fortran_stride = false     # this creates arrays with a fortran stride
 //                                 # which is presently not supported in the Translator
-//  keyadd = xxx                   # will cause xxx to be added to the end of the keystrings
+//  add_vlen_prefix = true         # will cause vlen: to be added to the front of the keys
 
 #include <vector>
 #include <sstream>
@@ -66,7 +71,8 @@ public:
   {
     m_vary_array_sizes = config("vary_array_sizes", false);
     m_use_fortran_stride = config("use_fortran_stride", false);
-    m_keyadd = configStr("keyadd","");
+    m_vlen_prefix = config("vlen_prefix",false);
+    m_ndarrayKeyPrefix = m_vlen_prefix ? string("translate_vlen:") : string();
   }
 
   virtual void beginJob(Event& evt, Env& env) {
@@ -82,8 +88,8 @@ public:
     s2 << "This is a second string.  10 * event number is " << 10*m_eventCounter;
     boost::shared_ptr<std::string> string1Ptr = boost::make_shared<std::string>(s1.str());
     boost::shared_ptr<std::string> string2Ptr = boost::make_shared<std::string>(s2.str());
-    evt.put(string1Ptr,string("my_string1") + m_keyadd);
-    evt.put(string2Ptr,string("my_string2") + m_keyadd);
+    evt.put(string1Ptr, string("my_string1"));
+    evt.put(string2Ptr, string("my_string2"));
 
     // put 5 nd arrays in event queue
     const unsigned DIM = 2;
@@ -105,8 +111,9 @@ public:
       const int NDim = NDims[i];
       const unsigned *shape = shapes[i];
       for (int isConst = 0; isConst < 2; ++isConst) {
-        string key = string(_key) + m_keyadd;
+        string key = string(_key);
         if (isConst) key = "c" + key;
+        key = m_ndarrayKeyPrefix + key;
         MsgLog(logger, debug, "  array " << i << " const=" << isConst << " key=" << key);
         switch (types[i]) {
         case 'f':
@@ -176,7 +183,9 @@ protected:
 private:
   size_t m_eventCounter;
   bool m_use_fortran_stride, m_vary_array_sizes;
-  string m_keyadd;
+  bool m_vlen_prefix;
+  string m_ndarrayKeyPrefix;
+  
 };
 
 PSANA_MODULE_FACTORY(TestModuleNDArrayString);

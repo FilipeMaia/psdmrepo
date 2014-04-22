@@ -1,5 +1,5 @@
 #include "Translator/H5GroupNames.h"
-#include "Translator/doNotTranslate.h"
+#include "Translator/specialKeyStrings.h"
 #include "Translator/NDArrayParams.h"
 
 #include <string>
@@ -106,9 +106,11 @@ H5GroupNames::H5GroupNames(const std::string & calibratedKey, const TypeAliases:
   : m_calibratedKey(calibratedKey), m_ndarrays(ndarrays) 
 {}
 
-string H5GroupNames::nameForType(const std::type_info *typeInfoPtr) {
+string H5GroupNames::nameForType(const std::type_info *typeInfoPtr, const std::string &key) {
   if (m_ndarrays.find(typeInfoPtr) != m_ndarrays.end()) {
-    string groupName = ndarrayGroupName(typeInfoPtr);
+    bool vlen = false;
+    if (key.size()>0) vlen = hasNDArrayVlenPrefix(key);
+    string groupName = ndarrayGroupName(typeInfoPtr, vlen);
     if (groupName.size()>0) return groupName;
     string realName = PSEvt::TypeInfoUtils::typeInfoRealName(typeInfoPtr);
     MsgLog(logger, error, "type " << realName << " matches known NDArrays "
@@ -149,7 +151,7 @@ string H5GroupNames::nameForType(const std::type_info *typeInfoPtr) {
   return realName;
 }
   
-void H5GroupNames::addTypeAttributes(hdf5pp::Group group, const std::type_info *typeInfoPtr) 
+void H5GroupNames::addTypeAttributes(hdf5pp::Group group, const std::type_info *typeInfoPtr, const std::string & key) 
 {
   if (isNDArray(typeInfoPtr)) {
     group.createAttr<uint8_t>("_ndarray").store(1);
@@ -163,11 +165,13 @@ void H5GroupNames::addTypeAttributes(hdf5pp::Group group, const std::type_info *
                                 int16_t(NDArrayParameters::unknownElemType));
       group.createAttr<uint32_t>("_ndarraySizeBytes").store(0);
       group.createAttr<uint8_t>("_ndarrayConstElem").store(0);
+      group.createAttr<uint8_t>("_vlen").store(0);
     } else {
       group.createAttr<uint32_t>("_ndarrayDim").store(params->dim());
       group.createAttr<int16_t>("_ndarrayElemType").store(uint16_t(params->elemType()));
       group.createAttr<uint32_t>("_ndarraySizeBytes").store(params->sizeBytes());
       group.createAttr<uint8_t>("_ndarrayConstElem").store(uint8_t(params->isConstElem()));
+      group.createAttr<uint8_t>("_vlen").store(hasNDArrayVlenPrefix(key) ? 1 : 0);
     }
   } else {
     // not an ndarray
@@ -183,10 +187,13 @@ std::pair<std::string, std::string> H5GroupNames::nameForSrcKey(const Pds::Src &
                                                                 const std::string &key) {
   string srcKeyGroupName = nameForSrc(src); // should always be non-zero length
   if (key == m_calibratedKey) return pair<string,string>(srcKeyGroupName,string());
-  string keyStringToAddOrig;
-  hasDoNotTranslatePrefix(key,&keyStringToAddOrig);
-  string keyStringToAdd = replaceCharactersThatAreBadForH5GroupNames(keyStringToAddOrig);
-  if (keyStringToAdd.size()>0) {
+  string keyWithSpecialPrefixesStripped;
+  bool doNotTranslate = hasDoNotTranslatePrefix(key,&keyWithSpecialPrefixesStripped);
+  if (not doNotTranslate){
+    hasNDArrayVlenPrefix(key, &keyWithSpecialPrefixesStripped);
+  }
+  string keyStringToAdd = replaceCharactersThatAreBadForH5GroupNames(keyWithSpecialPrefixesStripped);
+  if (keyWithSpecialPrefixesStripped.size()>0) {
     srcKeyGroupName += (srcKeySep() + keyStringToAdd);
   }
   return pair<string,string>(srcKeyGroupName,keyStringToAdd);

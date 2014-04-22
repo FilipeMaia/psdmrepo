@@ -18,7 +18,7 @@
 
 #include "Translator/H5Output.h"
 #include "Translator/H5GroupNames.h"
-#include "Translator/doNotTranslate.h"
+#include "Translator/specialKeyStrings.h"
 #include "Translator/HdfWriterNewDataFromEvent.h"
 
 using namespace Translator;
@@ -70,15 +70,13 @@ namespace {
   /// types to translate.
   void removeTypes(HdfWriterMap  & hdfWriters, const TypeAliases::TypeInfoSet & typesToRemove) {
     TypeAliases::TypeInfoSet::const_iterator removePos;
-    HdfWriterMap::iterator converterPos;
     for (removePos = typesToRemove.begin(); removePos != typesToRemove.end(); ++removePos) {
       const std::type_info *typeInfoPtr = *removePos;
-      converterPos = hdfWriters.find(typeInfoPtr);
-      if (converterPos == hdfWriters.end()) {
+      bool hadType = hdfWriters.remove(typeInfoPtr);
+      if (not hadType) {
         MsgLog(logger(),fatal,"removeTypes: trying to remove " << PSEvt::TypeInfoUtils::typeInfoRealName(typeInfoPtr) 
                << " but type is not in converter list");
       }
-      converterPos->second = boost::shared_ptr<HdfWriterFromEvent>();
     }
   }
 
@@ -123,7 +121,8 @@ namespace {
                                const list<string> & configParamValues,
                                bool & isExclude,
                                bool & includeAll,
-                               set<string> & filterSet) 
+                               set<string> & filterSet,
+                               bool excludeAllOk = false) 
   {
     if (configParamValues.size() < 2) {
       MsgLog(logger(),fatal, configParamKey 
@@ -142,7 +141,9 @@ namespace {
     }
     isExclude = filter0 == exclude;
     if (isExclude) {
-      if (filter1 == all) MsgLog(logger(), fatal, "src_filter = cannot be 'exclude all' this does no processing");
+      if ((filter1 == all) and (not excludeAllOk)) {
+        MsgLog(logger(), fatal, configParamKey << " cannot be 'exclude all' this does no processing");
+      }
     } else {
       if (filter1 == all) {
         includeAll = true;
@@ -184,7 +185,7 @@ H5Output::H5Output(string moduleName) : Module(moduleName),
 {
   MsgLog(logger(),trace,name() << " constructor()");
   readConfigParameters();
-  initializeHdfWriterMap(m_hdfWriters);
+  m_hdfWriters.initialize();
   filterHdfWriterMap();
   m_hdfWriterEventId = boost::make_shared<HdfWriterEventId>();
   m_hdfWriterDamage = boost::make_shared<HdfWriterDamage>();
@@ -252,7 +253,6 @@ void H5Output::readConfigParameters() {
       MsgLog(logger(),info,"param " << *alias << " = exclude (not default)");
     }
   }
-  //  m_type_filter = configList("type_filter", include_all);
   m_type_filter = configListReportIfNotDefault("type_filter", include_all);
   map<string, EpicsH5GroupDirectory::EpicsStoreMode> validStoreEpicsInput;
   validStoreEpicsInput["no"]=EpicsH5GroupDirectory::DoNotStoreEpics;
@@ -334,7 +334,7 @@ void H5Output::filterHdfWriterMap() {
   if (not includeAll) {
     bool hasPsana = false;
     if (filterSet.find("psana") != filterSet.end()) {
-      if (filterSet.size() != 1) MsgLog(name(),fatal, "type_filter list includes 'psana' "
+      if (filterSet.size() != 1) MsgLog(name(),fatal, "type_filter has 'psana' "
                                  " and other entries. If psana is in type_filter list, it must be the only entry.");
       hasPsana = true;
     }
@@ -383,7 +383,17 @@ void H5Output::initializeSrcAndKeyFilters() {
     m_psevtSourceFilterList.push_back(srcMatch);
   }
   MsgLog(logger(),trace, "src_filter: isExclude=" << m_srcFilterIsExclude << " all=" << m_includeAllSrc);
-  parseFilterConfigString("key_filter", m_key_filter, m_keyFilterIsExclude,   m_includeAllKey,   m_keyFilterSet);
+  parseFilterConfigString("key_filter", m_key_filter, m_keyFilterIsExclude,   m_includeAllKey,   m_keyFilterSet, true);
+  if (m_keyFilterSet.find(doNotTranslatePrefix()) != m_keyFilterSet.end()) {
+    MsgLog(logger(),warning, "key_filter contains special key string: " 
+           << doNotTranslatePrefix() << " it has been removed.");
+    m_keyFilterSet.erase(doNotTranslatePrefix());
+  }
+  if (m_keyFilterSet.find(ndarrayVlenPrefix()) != m_keyFilterSet.end()) {
+    MsgLog(logger(),warning, "key_filter contains special key string: " 
+           << ndarrayVlenPrefix() << " it has been removed.");
+    m_keyFilterSet.erase(ndarrayVlenPrefix());
+  }
 }
 
 void H5Output::openH5OutputFile() {
@@ -439,6 +449,30 @@ void H5Output::setEventVariables(Event &evt, Env &env) {
   setDamageMapFromEvent();
 }
 
+bool H5Output::checkIfNewTypeHasSameH5GroupNameAsCurrentTypes(const std::type_info * newType) {
+  vector<const std::type_info *>  currentTypes;
+  for (unsigned vlenTable = 0; vlenTable < 2; ++vlenTable) {
+    currentTypes = m_hdfWriters.types(bool(vlenTable));
+    string key = vlenTable ? "" : "vlen";
+    string newH5TypeGroupName = m_h5groupNames->nameForType(newType,key);
+    for (unsigned idx = 0; idx < currentTypes.size(); ++idx) {
+      const std::type_info * currentType = currentTypes[idx];
+      if (*currentType == *newType) continue;
+      string currentName = m_h5groupNames->nameForType(currentType,key);
+      if (newH5TypeGroupName == currentName) {
+        MsgLog(logger(), error, "new type "
+               << PSEvt::TypeInfoUtils::typeInfoRealName(newType)
+               << " gets same hdf5 group: " 
+               << currentName << " as type: " 
+               << PSEvt::TypeInfoUtils::typeInfoRealName(currentType)
+               << " **it will NOT be registered**");
+        return true;
+      }
+    }
+  }
+  return false;
+}
+
 void H5Output::checkForNewWriters() {
   list<EventKey> eventKeys = m_event->keys();
   list<EventKey>::iterator keyIter;
@@ -454,16 +488,19 @@ void H5Output::checkForNewWriters() {
         return;
       }
       const std::type_info * newType = newWriter->typeInfoPtr();
+      bool nameCollision = checkIfNewTypeHasSameH5GroupNameAsCurrentTypes(newType);
+      if (nameCollision) continue;
       MsgLog(logger(),trace," new hdf5 writer found for type: "
              << PSEvt::TypeInfoUtils::typeInfoRealName(newType)
              << " key: " << key);
       boost::shared_ptr<HdfWriterNewDataFromEvent> newWriterFromEvent = 
         boost::make_shared<HdfWriterNewDataFromEvent>(*newWriter,key);
       // overwrite the old writer if it is there.
-      if (m_hdfWriters.find(newType) != m_hdfWriters.end()) {
-        MsgLog(logger(), warning, " overwriting previous writer");
+      bool replaced = m_hdfWriters.replace(newType, newWriterFromEvent);
+      if (replaced) {
+        MsgLog(logger(), warning, " overwriting previous writer for type"
+               << PSEvt::TypeInfoUtils::typeInfoRealName(newType));
       }
-      m_hdfWriters[newType] = newWriterFromEvent;
     }
   }
 }
@@ -578,32 +615,51 @@ boost::shared_ptr<HdfWriterFromEvent> H5Output::checkTranslationFilters(const Ev
                                                                    bool checkForCalibratedKey) {
   const type_info * typeInfoPtr = eventKey.typeinfo();
   const Pds::Src & src = eventKey.src();
-  const string & strKey = eventKey.key();
+  const string & key = eventKey.key();
   boost::shared_ptr<HdfWriterFromEvent> nullHdfWriter;
   if (srcIsFiltered(src)) {
-    if (strKey.size() == 0)  {
+    if (key.size() == 0)  {
       MsgLog(logger(),debug,"Filtering " << eventKey << " due to src_filter");
       return nullHdfWriter;
     } else {
       MsgLog(logger(),debug,"Although src_filter applies to " << eventKey << " it has a non-empty key string. NOT filtering");
     }
   }
-  if (keyIsFiltered(strKey)) {
-    MsgLog(logger(),debug,"key is filtered for " << eventKey << ", filtering.");
-    return nullHdfWriter;
+  bool hasVlenPrefix = false;
+  string stripPrefixKey;
+  if (key.size() != 0) {
+    hasVlenPrefix = hasNDArrayVlenPrefix(key, &stripPrefixKey);
+    if (keyIsFiltered(stripPrefixKey)) {
+      MsgLog(logger(),debug,"key is filtered for " << eventKey << ", filtering.");
+      return nullHdfWriter;
+    }
   }
-  if (m_skip_calibrated and eventKey.key() == m_calibration_key) {
+  if (m_skip_calibrated and (stripPrefixKey == m_calibration_key)) {
+    if ((hasVlenPrefix) and (not m_h5groupNames->isNDArray(typeInfoPtr))) {
+      MsgLog(logger(),warning,"eventKey " << eventKey 
+             << " contains key with special prefix only for ndarrays, "
+             << " but type is not a known ndarray");
+    }
     MsgLog(logger(),debug,"skipping calibrated data: " << eventKey);
     return nullHdfWriter;
   }
-    
-  boost::shared_ptr<HdfWriterFromEvent> hdfWriter = getHdfWriter(m_hdfWriters, typeInfoPtr);
+
+  boost::shared_ptr<HdfWriterFromEvent> hdfWriter = m_hdfWriters.find(typeInfoPtr, hasVlenPrefix);
   if (not hdfWriter) {
-    MsgLog(logger(),debug,"No hdfwriter found for type: " << PSEvt::TypeInfoUtils::typeInfoRealName(typeInfoPtr));
+    if (hasVlenPrefix and (not m_h5groupNames->isNDArray(typeInfoPtr))) {
+      // user may have added vlen prefix to non ndarray, but ndarrays won't be there if they
+      // were filtered. check for an ndarray
+      bool ndArraysNotFiltered = m_hdfWriters.find(&typeid(ndarray<uint8_t,1>));
+      if (ndArraysNotFiltered) {
+        MsgLog(logger(), warning, "vlen prefix found for key: " 
+               << eventKey << " but the type is not a known ndarray");
+      }
+    }
+    MsgLog(logger(),debug,"No hdfwriter found for " << eventKey);
     return nullHdfWriter;
   }
   if ((not m_skip_calibrated) and checkForCalibratedKey) {
-    if (strKey.size()==0) {
+    if (key.size()==0) {
       EventKey calibratedKey(typeInfoPtr,src, m_calibration_key);
       if (m_event->proxyDict()->exists(calibratedKey)) {
         MsgLog(logger(), debug, "calibrated key exists for " << eventKey << " filtering");
@@ -757,13 +813,12 @@ void H5Output::addToFilteredEventGroup(const list<EventKey> &eventKeys, const PS
     const PSEvt::EventKey &eventKey = *iter;
     boost::shared_ptr<HdfWriterFromEvent> hdfWriter = checkTranslationFilters(eventKey, true);
     if (not hdfWriter) continue;
-    const std::type_info * typeInfoPtr = eventKey.typeinfo();
-    TypeMapContainer::iterator typePos = m_calibCycleFilteredGroupDir.findType(typeInfoPtr);
+    TypeMapContainer::iterator typePos = m_calibCycleFilteredGroupDir.findType(eventKey);
     if (typePos == m_calibCycleFilteredGroupDir.endType()) {
-      m_calibCycleFilteredGroupDir.addTypeGroup(typeInfoPtr, m_currentFilteredGroup);
+      m_calibCycleFilteredGroupDir.addTypeGroup(eventKey, m_currentFilteredGroup);
     }
     SrcKeyMap::iterator srcKeyPos = m_calibCycleFilteredGroupDir.findSrcKey(eventKey);
-    if (srcKeyPos == m_calibCycleFilteredGroupDir.endSrcKey(typeInfoPtr)) {
+    if (srcKeyPos == m_calibCycleFilteredGroupDir.endSrcKey(eventKey)) {
       SrcKeyGroup & srcKeyGroup = m_calibCycleFilteredGroupDir.addSrcKeyGroup(eventKey,hdfWriter);
       srcKeyGroup.make_datasets(inEvent, *m_event, *m_env, m_defaultCreateDsetProp);
       srcKeyPos = m_calibCycleFilteredGroupDir.findSrcKey(eventKey);
@@ -809,7 +864,6 @@ void H5Output::eventImpl()
     DataTypeLoc dataTypeLoc = keyIter->dataTypeLoc;
     Pds::Damage damage = keyIter->damage;
     boost::shared_ptr<HdfWriterFromEvent> hdfWriter = keyIter->hdfWriter;
-    const std::type_info * typeInfoPtr = eventKey.typeinfo();
     const Pds::Src & src = eventKey.src();
     MsgLog(logger(),debug,eventImpl << " eventKey=" << eventKey << "damage= " << damage.value() << 
            " writeBlank=" << writeBlank << " loc=" << dataTypeLoc << " hdfwriter=" << hdfWriter);
@@ -818,15 +872,15 @@ void H5Output::eventImpl()
       m_calibratedEventKeys.insert(eventKey);
       MsgLog(logger(),debug,eventImpl << " eventKey is calibration key. Adding Pds::Src to calibratedSrcSrc.");
     }
-    TypeMapContainer::iterator typePos = m_calibCycleEventGroupDir.findType(typeInfoPtr);
+    TypeMapContainer::iterator typePos = m_calibCycleEventGroupDir.findType(eventKey);
     if (typePos == m_calibCycleEventGroupDir.endType()) {
-      m_calibCycleEventGroupDir.addTypeGroup(typeInfoPtr, m_currentCalibCycleGroup);
-      MsgLog(logger(eventImpl),trace, "type: " << PSEvt::TypeInfoUtils::typeInfoRealName(typeInfoPtr) 
-             << " with group name " << m_h5groupNames->nameForType(typeInfoPtr)
+      m_calibCycleEventGroupDir.addTypeGroup(eventKey, m_currentCalibCycleGroup);
+      MsgLog(logger(eventImpl),trace, "eventKey: " << eventKey 
+             << " with group name " << m_h5groupNames->nameForType(eventKey.typeinfo(), eventKey.key())
              << " not in calibCycleEventGroupDir.  Added type to groups");
     }
     SrcKeyMap::iterator srcKeyPos = m_calibCycleEventGroupDir.findSrcKey(eventKey);
-    if (srcKeyPos == m_calibCycleEventGroupDir.endSrcKey(typeInfoPtr)) {
+    if (srcKeyPos == m_calibCycleEventGroupDir.endSrcKey(eventKey)) {
       SrcKeyGroup & srcKeyGroup = m_calibCycleEventGroupDir.addSrcKeyGroup(eventKey,hdfWriter);
       MsgLog(logger(eventImpl),trace,
              "src " << src << " not in type group.  Added src to type group");
@@ -978,18 +1032,18 @@ void H5Output::addConfigTypes(TypeSrcKeyH5GroupDirectory &configGroupDirectory,
       if (not hdfWriter) continue;
       const std::type_info * typeInfoPtr = eventKey.typeinfo();
       const Pds::Src & src = eventKey.src();
-      TypeMapContainer::iterator typePos = configGroupDirectory.findType(typeInfoPtr);
+      TypeMapContainer::iterator typePos = configGroupDirectory.findType(eventKey);
       if (typePos == configGroupDirectory.endType()) {
         ++newTypes;
-        configGroupDirectory.addTypeGroup(typeInfoPtr, parentGroup);
-        MsgLog(logger(addTo),trace, "type: " << PSEvt::TypeInfoUtils::typeInfoRealName(typeInfoPtr) 
-               << " with group name " << m_h5groupNames->nameForType(typeInfoPtr)
+        configGroupDirectory.addTypeGroup(eventKey, parentGroup);
+        MsgLog(logger(addTo),trace, "eventKey: " << eventKey
+               << " with group name " << m_h5groupNames->nameForType(eventKey.typeinfo(), eventKey.key())
                << " not in configGroupDir.  Added type to groups");
         MsgLog(logger(addTo),trace, 
                PSEvt::TypeInfoUtils::typeInfoRealName(typeInfoPtr) <<" not in groups.  Added type to groups");
       }
       SrcKeyMap::iterator srcKeyPos = configGroupDirectory.findSrcKey(eventKey);
-      if (srcKeyPos == configGroupDirectory.endSrcKey(typeInfoPtr)) {
+      if (srcKeyPos == configGroupDirectory.endSrcKey(eventKey)) {
         ++newSrcs;
         configGroupDirectory.addSrcKeyGroup(eventKey,hdfWriter);
         MsgLog(logger(addTo), trace,
@@ -1045,31 +1099,36 @@ void H5Output::endRun(Event& evt, Env& env)
 void H5Output::addCalibStoreHdfWriters(HdfWriterMap &hdfWriters) {
   vector< boost::shared_ptr<HdfWriterNew> > calibStoreWriters;
   getHdfWritersForCalibStore(calibStoreWriters);
-  MsgLog(logger("calibstore"),trace,"Adding calibstore hdfwriters: got " << calibStoreWriters.size() << " writers");
+  MsgLog(logger("calibstore"),trace,"Adding calibstore hdfwriters: got " 
+         << calibStoreWriters.size() << " writers");
   vector< boost::shared_ptr<HdfWriterNew> >::iterator iter;
   for (iter = calibStoreWriters.begin(); iter != calibStoreWriters.end(); ++iter) {
-    boost::shared_ptr<HdfWriterNew> calibWriter = *iter;
-    const std::type_info *calibType = calibWriter->typeInfoPtr();
-    if (hdfWriters.find(calibType) != hdfWriters.end()) {
+    boost::shared_ptr<HdfWriterNew> calibWriterNew = *iter;
+    const std::type_info *calibType = calibWriterNew->typeInfoPtr();
+    boost::shared_ptr<HdfWriterNewDataFromEvent> calibWriter;
+    calibWriter = boost::make_shared<HdfWriterNewDataFromEvent>(*calibWriterNew,"calib-store");
+    bool replacedType = hdfWriters.replace(calibType, calibWriter);
+    if (replacedType) {
       MsgLog(logger(), warning, "calib type " << TypeInfoUtils::typeInfoRealName(calibType)
              << " already has writer, OVERWRITING");
     }
-    hdfWriters[calibType] = boost::make_shared<HdfWriterNewDataFromEvent>(*calibWriter,"calib-store");
   }
 }
 
 void H5Output::removeCalibStoreHdfWriters(HdfWriterMap &hdfWriters) {
   vector< boost::shared_ptr<HdfWriterNew> > calibStoreWriters;
   getHdfWritersForCalibStore(calibStoreWriters);
-  MsgLog(logger("calibstore"),trace,"Removing calibstore hdfwriters: got " << calibStoreWriters.size() << " writers");
+  MsgLog(logger("calibstore"),trace,"Removing calibstore hdfwriters: got " 
+         << calibStoreWriters.size() << " writers");
   vector< boost::shared_ptr<HdfWriterNew> >::iterator iter;
   for (iter = calibStoreWriters.begin(); iter != calibStoreWriters.end(); ++iter) {
     boost::shared_ptr<HdfWriterNew> calibWriter = *iter;
     const std::type_info *calibType = calibWriter->typeInfoPtr();
-    size_t numberErased = hdfWriters.erase(calibType);
-    if (numberErased != 1) {
-      MsgLog(logger(), warning, "Erased " <<
-             numberErased << " rather than 1 of calib type " << TypeInfoUtils::typeInfoRealName(calibType));
+    bool removed = hdfWriters.remove(calibType);
+    if (not removed) {
+      MsgLog(logger(), warning, "Removed type from calibStore writeres, but type was "
+             << " not present. Type = " 
+             << TypeInfoUtils::typeInfoRealName(calibType));
     }
   }
 }
@@ -1103,13 +1162,12 @@ void H5Output::lookForAndStoreCalibData() {
         continue;
       }
       if (calibStoreData) {
-        HdfWriterMap::iterator hdfWriterIter = m_hdfWriters.find(calibStoreType);
-        if (hdfWriterIter == m_hdfWriters.end()) {
+        boost::shared_ptr<HdfWriterFromEvent> hdfWriter = m_hdfWriters.find(calibStoreType);
+        if (not hdfWriter) {
           MsgLog(logger(),trace,"No HdfWriter found for calibStore type: " 
                  << TypeInfoUtils::typeInfoRealName(calibStoreType));
           continue;
         }
-        boost::shared_ptr<HdfWriterFromEvent> hdfWriter = hdfWriterIter->second;
         PSEvt::EventKey calibStoreEventKey(calibStoreType, src, "");
         MsgLog(logger(),trace,"calib data and hdfwriter obtained for " << calibStoreEventKey);
         if (not calibGroupCreated) {
@@ -1117,12 +1175,12 @@ void H5Output::lookForAndStoreCalibData() {
           calibGroup = m_currentConfigureGroup.createGroup("CalibStore");
           calibGroupCreated = true;
         }
-        TypeMapContainer::iterator typePos = m_calibStoreGroupDir.findType(calibStoreType);
+        TypeMapContainer::iterator typePos = m_calibStoreGroupDir.findType(calibStoreEventKey);
         if (typePos == m_calibStoreGroupDir.endType()) {
-          m_calibStoreGroupDir.addTypeGroup(calibStoreType, calibGroup);
+          m_calibStoreGroupDir.addTypeGroup(calibStoreEventKey, calibGroup);
         }
         SrcKeyMap::iterator srcKeyPos = m_calibStoreGroupDir.findSrcKey(calibStoreEventKey);
-        if (srcKeyPos == m_calibStoreGroupDir.endSrcKey(calibStoreType)) {
+        if (srcKeyPos == m_calibStoreGroupDir.endSrcKey(calibStoreEventKey)) {
           m_calibStoreGroupDir.addSrcKeyGroup(calibStoreEventKey,hdfWriter);
           srcKeyPos = m_calibStoreGroupDir.findSrcKey(calibStoreEventKey);
         }
@@ -1235,6 +1293,7 @@ void H5Output::closeH5File() {
 
 namespace {
 
+  // key must already have any special prefixes such as translate_vlen striped from it.
   bool keyIsFiltered(const string & key, const bool includeAll, const bool isExclude, const set<string> & filterSet) {
     if (includeAll) return false;
     bool keyInFilterList = filterSet.find(key) != filterSet.end();
@@ -1259,6 +1318,7 @@ namespace {
 } // local namespace
 
 bool H5Output::keyIsFiltered(const string &key) {
+  string afterPrefix;
   bool retVal = ::keyIsFiltered(key, m_includeAllKey, m_keyFilterIsExclude, m_keyFilterSet);
   return retVal;
 }

@@ -26,18 +26,22 @@ class H5GroupNames {
  public:
   H5GroupNames(const std::string & calibratedKey, const TypeAliases::TypeInfoSet & ndarrays);
   /**
-   * @brief returns H5 group name for a C++ type
+   * @brief returns H5 group name for a C++ type, may be modified by key
    *
    * This method returns the string used for the H5 group for data of this
    * type. The is Generally based on the C++ type name, however modifications
    * are made to be backward compatible with o2o-translate and to simplify some
    * names - in particular ndarrays. For example ndarray< int, 2> will return
-   * ndarray_int32_2
+   * ndarray_int32_2. If a key parameter is passed in, it may modify the type. 
+   * Currently the only modification is that ndarrays with the translate_vlen
+   * prefix will have _vlen appeneded to the group name. The longest ndarray
+   * group name is ndarray_const_float128_vlen
    *
    * @param[in] typeInfoPtr type of object for the group
+   * @param[in] key string, will be checked for vlen if type is ndarray
    * @return a non empty string name for the h5 group
    */
-  std::string nameForType(const std::type_info *typeInfoPtr);
+  std::string nameForType(const std::type_info *typeInfoPtr, const std::string &key);
 
   /**
    * @brief adds h5 attributes to group appropriate for type.
@@ -57,8 +61,9 @@ class H5GroupNames {
    *
    * @param[in] group the hdf5 group to modify and add attributes to
    * @param[in] typeInfoPtr type of object for the group
+   * @param[in] key full key from event key, to determin if ndarray is vlen
    */
-  void addTypeAttributes(hdf5pp::Group group, const std::type_info *typeInfoPtr);
+  void addTypeAttributes(hdf5pp::Group group, const std::type_info *typeInfoPtr, const std::string & key);
   /**
    * @brief returns h5 group name for a Pds::Src
    *
@@ -79,19 +84,30 @@ class H5GroupNames {
   /**
    * @brief returns h5 group name and cleaned key for a Pds::Src and key
    *
-   * The h5group name for a src and key will be a __ separated concatanation 
-   * of the string representation of the src, and the key or a modified version of 
-   * the key. If the key is empty, just the src is returned. For a non empty
-   * key, the H5 group name is a concatenation of the two. A special 
-   * string is used to separate the src from the key in the concatenation. 
-   * The key string is checked for the "do not translate" string, as well as 
-   * for characters that are problemeatic for h5 filenames. The cleaned key 
-   * string is used in the group name. 
+   * The h5group name for a src and key is described by a number of cases:
+   *  no key string:  a string representation of the pds source
+   *                  This most always agrees with what EventKeys prints.
+   *  a key string:   Generally, this will be  a __ separated concatenation 
+   *                  of the string representation of the src, and the key
+   *                    
+   * If the source is the special Psana values for no source or any source, 
+   * the string 'noSrc' is used for the source.
    *
-   * @param[in] src the Pds::Src for the group
+   * The key string is first checked to see if it is the special key for
+   * calibrated data. If so, no key string is used, only the source for the
+   * group name and an empty string is returned for the second argument in the
+   * pair. 
+   * The key is then checked for special key strings (do_not_translate and 
+   * translate_vlen) If these are present they are stripped from the key.
+   * The key is then checked for characters bad for h5 group names,
+   * such as a / this is replaced with _ 
+   * 
+   * The cleaned key string, striped of special prefixes, is used in the group name.
+   *
+   * @param[in] src the Pds::Src for the group 
    * @param[in] key the key string for the group
-   * @return a pair with the h5 group name first, and the posibly modified
-   *         key used to form the name.
+   * @return a pair with the h5 group name first, and the possibly modified
+   *         key used to form this name (will be empty for calibrated).
    */
   std::pair<std::string, std::string> nameForSrcKey(const Pds::Src &src, 
                                                     const std::string &key);

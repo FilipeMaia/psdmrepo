@@ -217,13 +217,13 @@ class TypeSrcKeyH5GroupDirectory {
   void closeGroups(); 
   void clearMaps();
   void markAllSrcKeyGroupsNotWrittenForEvent();
-  TypeMapContainer::iterator findType(const std::type_info *typeInfoPtr);
+  TypeMapContainer::iterator findType(const PSEvt::EventKey &eventKey);
   TypeMapContainer::iterator beginType();
   TypeMapContainer::iterator endType();
-  TypeGroup & addTypeGroup(const std::type_info *typeInfoPtr, 
+  TypeGroup & addTypeGroup(const PSEvt::EventKey &eventKey,
                            hdf5pp::Group & parentGroup);
   SrcKeyMap::iterator findSrcKey(const PSEvt::EventKey &eventKey);
-  SrcKeyMap::iterator endSrcKey(const std::type_info *typeInfoPtr);
+  SrcKeyMap::iterator endSrcKey(const PSEvt::EventKey &eventKey);
   SrcKeyGroup & addSrcKeyGroup(const PSEvt::EventKey &eventKey, 
                                boost::shared_ptr<Translator::HdfWriterFromEvent> hdfWriter);
   void getNotWrittenSrcPartition(const std::set<Pds::Src> & srcs, 

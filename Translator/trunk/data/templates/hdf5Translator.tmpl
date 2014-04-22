@@ -21,7 +21,7 @@
 [psana]
 
 # MODULES: any modules that produce data to be translated need be loaded 
-# **BEFORE** Translator.H5Output (such as calibrated data or NDArray's)
+# **BEFORE** Translator.H5Output (such as calibrated data or ndarray's)
 # event data added by modules listed after Translator.H5Output is not translated.
 modules = Translator.H5Output
 
@@ -106,21 +106,21 @@ store_epics = calib_repeat
 # In addition to filtering Psana types by the options above, one can use
 # the type_filter option below. For example:
 #
-# type_filter include cspad       # will only translate cspad types. Will not translate
+# type_filter = include cspad       # will only translate cspad types. Will not translate
 #                                 # ndarrays or strings
-# type_filter exclude Andor evr   # translate all except the Andor or Evr types
+# type_filter = exclude Andor evr   # translate all except the Andor or Evr types
 # 
 # If you do not want to translate what is in the xtc file, use the psana shortcut:
 #
-# type_filter exclude psana       # This will only translate ndarray's and strings 
+# type_filter = exclude psana       # This will only translate ndarray's and strings 
 #
 # Likewise doing:
 #
-# type_filter include psana       # will translate all xtc data, but skip any ndarray's or strings
+# type_filter = include psana       # will translate all xtc data, but skip any ndarray's or strings
 #
 # The default is to include all
 
-type_filter include all
+type_filter = include all
 
 # note - if type_filter is anything other than 'include all' it takes precedence
 # over the classes of type filter options above, like Cspad=include.
@@ -488,26 +488,69 @@ public:
 
 namespace Translator {
 
-boost::shared_ptr<HdfWriterFromEvent> getHdfWriter(HdfWriterMap & mapping, const std::type_info *typeInfoPtr) {
-   HdfWriterMap::iterator pos = mapping.find(typeInfoPtr);
-  if (pos == mapping.end()) {
-    return boost::shared_ptr<Translator::HdfWriterFromEvent>();
-  }
-  return pos->second;
-}
 
-void initializeHdfWriterMap( HdfWriterMap & mapping) {
+void HdfWriterMap::initialize() {
 {% for psana_type in psana_types %}
-  mapping[ & typeid({{psana_type}}) ] = boost::make_shared<HdfWriterPsana<{{psana_type}}> >();
+  m_mainMap[ & typeid({{psana_type}}) ] = boost::make_shared<HdfWriterPsana<{{psana_type}}> >();
 {% endfor %}
 
   // ndarrays
 {% for elem, ndim in elemDimPairs %}
-  mapping[ & typeid(ndarray< {{elem}}, {{ndim}}>) ] = boost::make_shared<HdfWriterNDArray< {{elem}}, {{ndim}} > >();  
+  m_mainMap[ & typeid(ndarray< {{elem}}, {{ndim}}>) ] = boost::make_shared<HdfWriterNDArray< {{elem}}, {{ndim}}, false > >();  
 {% endfor %}
   // string               
-  mapping[ & typeid(std::string) ] = boost::make_shared<HdfWriterStringFromEvent>();
+  m_mainMap[ & typeid(std::string) ] = boost::make_shared<HdfWriterStringFromEvent>();
+
+  // vlen ndarrays
+{% for elem, ndim in elemDimPairs %}
+  m_vlenMap[ & typeid(ndarray< {{elem}}, {{ndim}}>) ] = boost::make_shared<HdfWriterNDArray< {{elem}}, {{ndim}}, true > >();  
+{% endfor %}
 }
+
+bool HdfWriterMap::remove(const std::type_info * typeInfoPtr)
+{
+  MapImpl::iterator posMain = m_mainMap.find(typeInfoPtr);
+  MapImpl::iterator posVlen = m_vlenMap.find(typeInfoPtr);
+  bool inMain = posMain != m_mainMap.end();
+  bool inVlen = posVlen != m_vlenMap.end();
+  if ((not inMain) and (not inVlen)) return false;
+  if (inMain) m_mainMap.erase(posMain);
+  if (inVlen) m_vlenMap.erase(posVlen);
+  return true;
+}
+
+bool HdfWriterMap::replace(const std::type_info * typeInfoPtr,
+             boost::shared_ptr<HdfWriterFromEvent> hdfWriter, bool vlen )
+{
+  MapImpl *map = &m_mainMap;
+  if (vlen) map = &m_vlenMap;
+  bool replaced = (map->find(typeInfoPtr) != map->end());
+  (*map)[typeInfoPtr] = hdfWriter;
+  return replaced;
+}
+
+boost::shared_ptr<HdfWriterFromEvent> HdfWriterMap::find(const std::type_info * typeInfoPtr, bool vlen)
+{
+  boost::shared_ptr<HdfWriterFromEvent> writer;
+  MapImpl *map = &m_mainMap;
+  if (vlen) map = &m_vlenMap;
+  MapImpl::iterator pos = map->find(typeInfoPtr);
+  if (pos == map->end()) return writer;
+  writer = pos->second;
+  return writer;
+}
+
+std::vector<const std::type_info *>  HdfWriterMap::types(bool vlenTable) {
+  MapImpl *mapPtr = &m_mainMap;
+  if (vlenTable) mapPtr = &m_vlenMap;
+  vector<const type_info *> types(mapPtr->size());
+  unsigned idx = 0;
+  for (MapImpl::iterator pos = mapPtr->begin(); pos != mapPtr->end(); ++pos) {
+    types.at(idx++) = pos->first;
+  }
+  return types;
+}
+
 
 } // Translator namespace
 

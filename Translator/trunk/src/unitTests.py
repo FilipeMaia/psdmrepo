@@ -39,46 +39,7 @@ TESTDATA_T1_DROPPED_SRC = os.path.join(DATADIR,"test_044_Translator_t1_dropped_s
 TESTDATA_T1_DROPPED = os.path.join(DATADIR,"test_043_Translator_t1_dropped.xtc")
 TESTDATA_ALIAS = os.path.join(DATADIR,"test_050_sxr_sxrb6813_e363-r0069-s00-c00.xtc")
 TESTDATA_PARTITION = os.path.join(DATADIR,"test_051_sxr_sxrdaq10_e19-r057-s01-c00.xtc")
-## ----------------
-# this string is for the test_ndarrays_allWritenToFile test
 
-NDARRAY_2EVENTS='''double3D:
-array([[[[ 1.,  2.],
-         [ 3.,  4.]],
-
-        [[ 5.,  6.],
-         [ 7.,  8.]]],
-
-
-       [[[ 2.,  3.],
-         [ 4.,  5.]],
-
-        [[ 6.,  7.],
-         [ 8.,  9.]]]])
-float2Da:
-array([[[ 1.,  2.],
-        [ 3.,  4.]],
-
-       [[ 2.,  3.],
-        [ 4.,  5.]]], dtype=float32)
-float2Db:
-array([[[ 1.,  2.],
-        [ 3.,  4.]],
-
-       [[ 2.,  3.],
-        [ 4.,  5.]]], dtype=float32)
-int1D:
-array([[1, 2],
-       [2, 3]], dtype=int32)
-uint1D:
-array([[1, 2],
-       [2, 3]], dtype=uint32)
-str1:
-array([This is event number: 1, This is event number: 2], dtype=object)
-str2:
-array([This is a second string.  10 * event number is 10,
-       This is a second string.  10 * event number is 20], dtype=object)
-'''
 
 #------------------
 # Utility functions 
@@ -702,29 +663,128 @@ class H5Output( unittest.TestCase ) :
         input_file = TESTDATA_T1
         output_h5 = os.path.join(OUTDIR,'unit_test_ndarrays_allWrittenToFile.h5')
         cfgfile = writeCfgFile(input_file,output_h5,"Translator.TestModuleNDArrayString Translator.H5Output")
+
         cfgfile.file.flush()
-        self.runPsanaOnCfg(cfgfile,output_h5, printPsanaOutput=self.printPsanaOutput )
+        self.runPsanaOnCfg(cfgfile,output_h5,printPsanaOutput=self.printPsanaOutput )
         f=h5py.File(output_h5,'r')
 
-        double3D = f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_float64_3/noSrc__my_double3D/data'][...]
-        float2Da = f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_float32_2/noSrc__my_float2Da/data'][...]
-        float2Db = f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_float32_2/noSrc__my_float2Db/data'][...]
-        int1D = f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_int32_1/noSrc__my_int1D/data'][...]
-        uint1D = f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_uint32_1/noSrc__my_uint1D/data'][...]
-        str1=f['/Configure:0000/Run:0000/CalibCycle:0000/std::string/noSrc__my_string1/data'][...]
-        str2=f['/Configure:0000/Run:0000/CalibCycle:0000/std::string/noSrc__my_string2/data'][...]
+        double3D = f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_float64_3/noSrc__my_double3D/data']
+        float2Da = f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_float32_2/noSrc__my_float2Da/data']
+        float2Db = f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_float32_2/noSrc__my_float2Db/data']
+        int1D = f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_int32_1/noSrc__my_int1D/data']
+        uint1D = f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_uint32_1/noSrc__my_uint1D/data']
+        str1=str(f['/Configure:0000/Run:0000/CalibCycle:0000/std::string/noSrc__my_string1/data'][...])
+        str2=str(f['/Configure:0000/Run:0000/CalibCycle:0000/std::string/noSrc__my_string2/data'][...])
 
-        cdouble3D = f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_const_float64_3/noSrc__cmy_double3D/data'][...]
-        cfloat2Da = f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_const_float32_2/noSrc__cmy_float2Da/data'][...]
-        cfloat2Db = f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_const_float32_2/noSrc__cmy_float2Db/data'][...]
-        cint1D = f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_const_int32_1/noSrc__cmy_int1D/data'][...]
-        cuint1D = f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_const_uint32_1/noSrc__cmy_uint1D/data'][...]
+        cdouble3D = f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_const_float64_3/noSrc__cmy_double3D/data']
+        cfloat2Da = f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_const_float32_2/noSrc__cmy_float2Da/data']
+        cfloat2Db = f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_const_float32_2/noSrc__cmy_float2Db/data']
+        cint1D = f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_const_int32_1/noSrc__cmy_int1D/data']
+        cuint1D = f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_const_uint32_1/noSrc__cmy_uint1D/data']
+        
 
-        output="double3D:\n%r\nfloat2Da:\n%r\nfloat2Db:\n%r\nint1D:\n%r\nuint1D:\n%r\nstr1:\n%r\nstr2:\n%r\n" % (double3D, float2Da, float2Db, int1D, uint1D, str1, str2)
-        const_output="double3D:\n%r\nfloat2Da:\n%r\nfloat2Db:\n%r\nint1D:\n%r\nuint1D:\n%r\nstr1:\n%r\nstr2:\n%r\n" % (cdouble3D, cfloat2Da, cfloat2Db, cint1D, cuint1D, str1, str2)
+        str1expected = "[This is event number: 1 This is event number: 2]"
+        str2expected = "[This is a second string.  10 * event number is 10\n This is a second string.  10 * event number is 20]"
+        
+        self.assertEqual(str1, str1expected, msg="str1=%s does not have expected value=%s" % (str1,str1expected))
+        self.assertEqual(str2, str2expected, msg="str2=%s does not have expected value=%s" % (str2,str2expected))
 
-        self.assertEqual(output,NDARRAY_2EVENTS, "output of all nd arrays wrong,\n *** expected: ***\n%s\n*** produced: ***\n%s\n" % (NDARRAY_2EVENTS, output))
-        self.assertEqual(const_output,NDARRAY_2EVENTS, "output of all const nd arrays wrong,\n *** expected: ***\n%s\n*** produced: ***\n%s\n" % (NDARRAY_2EVENTS, const_output))
+        for ds,dims in zip([double3D,float2Da,float2Db,int1D,uint1D,cdouble3D,cfloat2Da,cfloat2Db,cint1D,cuint1D],
+                            [3,      2,       2,       1,    1,     3,        2,        2,        1,     1]):
+            for entry in range(ds.size):
+                ndarray = ds[entry]
+                dim0 = 2
+                expectedValue = 1+entry
+                if dims == 1:
+                    expectedShape = (dim0,)
+                    self.assertEqual(expectedShape, ndarray.shape, msg="shape not equal, expected=%s found=%s ds=%s" % \
+                                     (expectedShape, ndarray.shape, ds.name))
+                    for i in range(dim0):
+                        self.assertAlmostEqual(expectedValue, ndarray[i], delta=1e-6, msg="not equal, expected = %r found=%r index=%d ds=ndarray%s" % \
+                                                       (expectedValue, ndarray[i], i,ds.name.split('ndarray')[1]))
+                        expectedValue += 1
+                elif dims == 2:
+                    expectedShape = (dim0,2)
+                    self.assertEqual(expectedShape, ndarray.shape, msg="shape not equal, expected=%s found=%s ds=%s" % \
+                                     (expectedShape, ndarray.shape, ds.name))
+                    for i in range(dim0):
+                        for j in range(2):
+                            self.assertAlmostEqual(expectedValue, ndarray[i,j], delta=1e-6, msg="not equal, expected = %r found=%r index=[%d,%d] ds=ndarray%s" % \
+                                                       (expectedValue, ndarray[i,j], i,j,ds.name.split('ndarray')[1]))
+                            expectedValue += 1
+                elif dims == 3:
+                    expectedShape = (dim0,2,2)
+                    self.assertEqual(expectedShape, ndarray.shape, msg="shape not equal, expected=%s found=%s ds=%s" % \
+                                     (expectedShape, ndarray.shape, ds.name))
+                    for i in range(dim0):
+                        for j in range(2):
+                            for k in range(2):
+                                self.assertAlmostEqual(expectedValue, ndarray[i,j,k], delta=1e-6, msg="not equal, expected = %r found=%r index=[%d,%d,%d] ds=ndarray%s" % \
+                                                       (expectedValue, ndarray[i,j,k], i,j,k,ds.name.split('ndarray')[1]))
+                                expectedValue += 1
+
+        if self.cleanUp:
+            os.unlink(output_h5)
+
+    def test_vlen_ndarrays_allWrittenToFile(self):
+        '''check that vlen ndarrays are written to the file
+        '''
+        input_file = TESTDATA_T1
+        output_h5 = os.path.join(OUTDIR,'unit_test_ndarrays_allWrittenToFile.h5')
+        cfgfile = writeCfgFile(input_file,output_h5,"Translator.TestModuleNDArrayString Translator.H5Output")
+        cfgfile.file.write("[Translator.TestModuleNDArrayString]\n")
+        cfgfile.file.write("vary_array_sizes=true\n")
+        cfgfile.file.write("vlen_prefix=true\n")
+
+        cfgfile.file.flush()
+        self.runPsanaOnCfg(cfgfile,output_h5, printPsanaOutput = self.printPsanaOutput)
+        f=h5py.File(output_h5,'r')
+
+        double3D = f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_float64_3_vlen/noSrc__my_double3D/data']
+        float2Da = f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_float32_2_vlen/noSrc__my_float2Da/data']
+        float2Db = f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_float32_2_vlen/noSrc__my_float2Db/data']
+        int1D = f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_int32_1_vlen/noSrc__my_int1D/data']
+        uint1D = f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_uint32_1_vlen/noSrc__my_uint1D/data']
+
+        cdouble3D = f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_const_float64_3_vlen/noSrc__cmy_double3D/data']
+        cfloat2Da = f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_const_float32_2_vlen/noSrc__cmy_float2Da/data']
+        cfloat2Db = f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_const_float32_2_vlen/noSrc__cmy_float2Db/data']
+        cint1D = f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_const_int32_1_vlen/noSrc__cmy_int1D/data']
+        cuint1D = f['/Configure:0000/Run:0000/CalibCycle:0000/ndarray_const_uint32_1_vlen/noSrc__cmy_uint1D/data']
+
+        for ds,dims in zip([double3D,float2Da,float2Db,int1D,uint1D,cdouble3D,cfloat2Da,cfloat2Db,cint1D,cuint1D],
+                            [3,      2,       2,       1,    1,     3,        2,        2,        1,     1]):
+            for entry in range(ds.size):
+                ndarray = ds[entry]
+                dim0 = min(20,1+entry+2)  # the expected variation in ndarray sizes
+                expectedValue = 1+entry
+                if dims == 1:
+                    expectedShape = (dim0,)
+                    self.assertEqual(expectedShape, ndarray.shape, msg="shape not equal, expected=%s found=%s ds=%s" % \
+                                     (expectedShape, ndarray.shape, ds.name))
+                    for i in range(dim0):
+                        self.assertAlmostEqual(expectedValue, ndarray[i], delta=1e-6, msg="not equal, expected = %r found=%r index=%d ds=ndarray%s" % \
+                                                       (expectedValue, ndarray[i], i,ds.name.split('ndarray')[1]))
+                        expectedValue += 1
+                elif dims == 2:
+                    expectedShape = (dim0,2)
+                    self.assertEqual(expectedShape, ndarray.shape, msg="shape not equal, expected=%s found=%s ds=%s" % \
+                                     (expectedShape, ndarray.shape, ds.name))
+                    for i in range(dim0):
+                        for j in range(2):
+                            self.assertAlmostEqual(expectedValue, ndarray[i,j], delta=1e-6, msg="not equal, expected = %r found=%r index=[%d,%d] ds=ndarray%s" % \
+                                                       (expectedValue, ndarray[i,j], i,j,ds.name.split('ndarray')[1]))
+                            expectedValue += 1
+                elif dims == 3:
+                    expectedShape = (dim0,2,2)
+                    self.assertEqual(expectedShape, ndarray.shape, msg="shape not equal, expected=%s found=%s ds=%s" % \
+                                     (expectedShape, ndarray.shape, ds.name))
+                    for i in range(dim0):
+                        for j in range(2):
+                            for k in range(2):
+                                self.assertAlmostEqual(expectedValue, ndarray[i,j,k], delta=1e-6, msg="not equal, expected = %r found=%r index=[%d,%d,%d] ds=ndarray%s" % \
+                                                       (expectedValue, ndarray[i,j,k], i,j,k,ds.name.split('ndarray')[1]))
+                                expectedValue += 1
         if self.cleanUp:
             os.unlink(output_h5)
 

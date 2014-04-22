@@ -28,7 +28,7 @@ class NDArrayParameters {
 
 boost::shared_ptr<const NDArrayParameters>  ndarrayParameters(const std::type_info *ndarrayTypeInfoPtr);
 
-std::string ndarrayGroupName(const std::type_info *ndarrayTypeInfoPtr);
+std::string ndarrayGroupName(const std::type_info *ndarrayTypeInfoPtr, bool vlen = false);
 
 } // namespace Translator
 

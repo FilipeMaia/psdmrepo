@@ -1,36 +1,33 @@
 #include <string>
 
 #include "MsgLogger/MsgLogger.h"
-#include "Translator/doNotTranslate.h"
+#include "Translator/specialKeyStrings.h"
 
 namespace {
-  const std::string do_not_translate("do_not_translate");
-} // local namespace
 
-const std::string & Translator::doNotTranslateKeyPrefix() { 
-  return do_not_translate;
-}
+const std::string do_not_translate("do_not_translate");
+const std::string translate_vlen("translate_vlen");
 
-bool Translator::hasDoNotTranslatePrefix(const std::string &key, 
-                                         std::string *keyWithPrefixStripped) 
+bool hasPrefix(const std::string &prefix, const std::string &key, 
+               std::string *keyWithPrefixStripped) 
 {
-  if (key.size() < do_not_translate.size()) {
+  if (key.size() < prefix.size()) {
     if (keyWithPrefixStripped != NULL) {
       *keyWithPrefixStripped = key;
     }
     return false;
   }
   
-  bool startsWithDoNotTranslate = true;
+  bool startsWithPrefix = true;
   unsigned idx=0;
-  while ((idx < do_not_translate.size()) and startsWithDoNotTranslate) {
-    startsWithDoNotTranslate = (key[idx] == do_not_translate[idx]);
+  while ((idx < prefix.size()) and startsWithPrefix) {
+    startsWithPrefix = (key[idx] == prefix[idx]);
     ++idx;
   }
   if (keyWithPrefixStripped != NULL) {
-    if (not startsWithDoNotTranslate) *keyWithPrefixStripped = key;
+    if (not startsWithPrefix) *keyWithPrefixStripped = key;
     else {
-      unsigned afterPrefix = do_not_translate.size();
+      unsigned afterPrefix = prefix.size();
       if ((key.size() > afterPrefix) and (key[afterPrefix] == ':' or key[afterPrefix]=='_')) {
         afterPrefix++;
       }
@@ -38,7 +35,30 @@ bool Translator::hasDoNotTranslatePrefix(const std::string &key,
       else *keyWithPrefixStripped = "";
     }
   }
-  return startsWithDoNotTranslate;
+  return startsWithPrefix;
+}
+
+
+} // local namespace
+
+const std::string & Translator::doNotTranslatePrefix() { 
+  return do_not_translate;
+}
+
+const std::string & Translator::ndarrayVlenPrefix() { 
+  return translate_vlen;
+}
+
+bool Translator::hasDoNotTranslatePrefix(const std::string &key, 
+                                         std::string *keyWithPrefixStripped) 
+{
+  return hasPrefix(doNotTranslatePrefix(), key, keyWithPrefixStripped);
+}
+
+bool Translator::hasNDArrayVlenPrefix(const std::string &key, 
+                                      std::string *keyWithPrefixStripped) 
+{
+  return hasPrefix(ndarrayVlenPrefix(), key, keyWithPrefixStripped);
 }
 
 

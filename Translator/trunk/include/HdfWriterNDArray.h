@@ -1,3 +1,5 @@
+
+#include <sstream>
 #include <string>
 #include "ndarray/ndarray.h"
 #include "PSEvt/EventKey.h"
@@ -5,6 +7,7 @@
 #include "Translator/DataSetCreationProperties.h"
 #include "Translator/HdfWriterGeneric.h"
 #include "Translator/HdfWriterFromEvent.h"
+#include "Translator/specialKeyStrings.h"
 
 namespace Translator {
 
@@ -45,6 +48,9 @@ template<>
 hid_t getH5BaseType<double>() { return H5T_NATIVE_DOUBLE; }
 
 template<>
+hid_t getH5BaseType<long double>() { return H5T_NATIVE_LDOUBLE; }
+
+template<>
 hid_t getH5BaseType<const uint8_t>() { return H5T_NATIVE_UINT8; }
 
 template<>
@@ -73,6 +79,9 @@ hid_t getH5BaseType<const float>() { return H5T_NATIVE_FLOAT; }
 
 template<>
 hid_t getH5BaseType<const double>() { return H5T_NATIVE_DOUBLE; }
+
+template<>
+hid_t getH5BaseType<const long double>() { return H5T_NATIVE_LDOUBLE; }
 
 // --------------------------------------------------
 // Determine if a NDArray has C or Fortran strides, throw exception if neither
@@ -112,10 +121,10 @@ getNDArrayPtr(const PSEvt::EventKey &eventKey, const DataTypeLoc dataTypeLoc,
 
 //----------------------------------------------
 // NDArray writer:
-template <class ElemType, unsigned NDim>
+ template <class ElemType, unsigned NDim, bool vlen>
 class HdfWriterNDArray : public HdfWriterFromEvent {
  public:
- HdfWriterNDArray() : m_writer("ndarray") {}
+ HdfWriterNDArray() : m_writer(std::string("ndarray")+ (vlen ? std::string("Vlen"): std::string(""))) {}
   void make_datasets(DataTypeLoc dataTypeLoc, hdf5pp::Group & srcGroup, 
                      const PSEvt::EventKey & eventKey, 
                      PSEvt::Event & evt, PSEnv::Env & env,
@@ -140,14 +149,33 @@ class HdfWriterNDArray : public HdfWriterFromEvent {
     }
     if (hasZeroDim) throw NotImplementedException(ERR_LOC, "Arrays with a 0 in the shape are not supported");
     hid_t baseType = getH5BaseType<ElemType>();
-    hid_t arrayType = H5Tarray_create2(baseType,NDim, dims);
+    hid_t arrayType;
+    hid_t vlenType = -1;
+    if (vlen) {
+      if (NDim == 1) {
+        arrayType = baseType;
+      } else {
+        if (order != ndns::C) throw ErrSvc::Issue(ERR_LOC, "vlen arrays only supported for C stride - slow dim must be dim0");
+        arrayType = H5Tarray_create2(baseType,NDim-1, &dims[1]);
+        if (arrayType < 0) throw ErrSvc::Issue(ERR_LOC,"H5Tarray_create2 call failed");
+      }
+      vlenType = H5Tvlen_create(arrayType);
+      if (vlenType < 0) throw ErrSvc::Issue(ERR_LOC, "H5Tvlen_create call failed");
+    } else {
+      arrayType = H5Tarray_create2(baseType,NDim, dims);
+      if (arrayType < 0) throw ErrSvc::Issue(ERR_LOC, "H5Tarray_create2 call failed");
+    }
     
     ndArrayFormat.arrayHdf5BaseType = baseType;
     ndArrayFormat.arrayHdf5Type = arrayType;
     m_firstArrayOfDatasetFormat[eventKey] = ndArrayFormat;
     
-    Translator::DataSetCreationProperties dataSetCreationProperties(chunkPolicy,shuffle, deflate);
-    m_writer.createUnlimitedSizeDataset(srcGroup.id(), "data", arrayType, dataSetCreationProperties);
+    Translator::DataSetCreationProperties dataSetCreationProperties(chunkPolicy, shuffle, deflate);
+    if (vlen) {
+      m_writer.createUnlimitedSizeDataset(srcGroup.id(), "data", vlenType, dataSetCreationProperties);
+    } else {
+      m_writer.createUnlimitedSizeDataset(srcGroup.id(), "data", arrayType, dataSetCreationProperties);
+    }
   }
 
   void append(DataTypeLoc dataTypeLoc,
@@ -169,13 +197,38 @@ class HdfWriterNDArray : public HdfWriterFromEvent {
       throw ErrSvc::Issue(ERR_LOC, "HdfWriterNDArray::append, this array has an order (C or Fortran) different from the first array in the dataset");
     }
     bool sameDimensionsAtFirstNDarray = true;
-    for (unsigned i = 0; i < NDim; ++i) {
+    unsigned startDim = 0;
+    if (vlen) startDim = 1;
+    for (unsigned i = startDim; i < NDim; ++i) {
       if (firstNdArrayFormat.dim[i] != ndarrayPtr->shape()[i]) sameDimensionsAtFirstNDarray = false;
     }
     if (not sameDimensionsAtFirstNDarray) {
-      throw ErrSvc::Issue(ERR_LOC, "HdfWriterNDArray::append, this array has dimensions different from the first array in the dataset");
+      if (vlen) {
+        std::stringstream str;
+        str << "vlen HdfWriterNDArray::append, the fast dimensions of this "
+            << "array (all but dim 0) are different from the first array in "
+            << "the dataset. They must be the same.";
+        throw ErrSvc::Issue(ERR_LOC, str.str());
+      } else {
+        std::stringstream str;
+        str << "HdfWriterNDArray::append, this array has dimensions different "
+            << "from the first array in the dataset. To write variable length ndarrays "
+            << "to the same data set, prepend '" << ndarrayVlenPrefix() 
+            << ":' to key. Such ndarrays may only vary in slow dimension.";
+        throw ErrSvc::Issue(ERR_LOC, str.str());
+      }
     }
-    m_writer.append(srcGroup.id(), "data", ndarrayPtr->data());
+    void * data;
+    if (vlen) {
+      unsigned slowLength = ndarrayPtr->shape()[0];
+      hvl_t vdata;
+      vdata.len = slowLength;
+      vdata.p = (void *)ndarrayPtr->data();
+      data = &vdata;
+    } else {
+      data = (void *)ndarrayPtr->data();
+    }
+    m_writer.append(srcGroup.id(), "data", data);
   }
   
   void store(DataTypeLoc dataTypeLoc, 
@@ -254,10 +307,11 @@ class HdfWriterNDArray : public HdfWriterFromEvent {
 
   static const std::string errorMsgForUnsupportedStride;
   
-}; // HdfWriterNDArray
+ }; // HdfWriterNDArray
 
 } // namespace Translator
 
-template <class ElemType, unsigned NDim>
-  const std::string Translator::HdfWriterNDArray<ElemType, NDim>::errorMsgForUnsupportedStride("HdfWriterNDArray::make_datasets, only C or Fortran strides supported");
+template <class ElemType, unsigned NDim, bool vlen>
+  const std::string Translator::HdfWriterNDArray<ElemType, NDim, vlen>::errorMsgForUnsupportedStride("HdfWriterNDArray::make_datasets, only C or Fortran strides supported");
+
 

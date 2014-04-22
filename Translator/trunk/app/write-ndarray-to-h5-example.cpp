@@ -61,7 +61,7 @@ int main() {
   const char * h5outputFile = "write-ndarray-to-h5-example.h5";
   hdf5pp::File h5file = hdf5pp::File::create(h5outputFile, mode);
   hdf5pp::Group group = h5file.createGroup("group");
-  Translator::HdfWriterNDArray<int,2> writer;
+  Translator::HdfWriterNDArray<int,2,false> writer;
   PSEvt::EventKey eventKey(&typeid(ndarray<int,2>),PSEvt::EventKey::anySource(),arrayKeyString);
   boost::shared_ptr<Translator::ChunkPolicy> chunkPolicy = boost::make_shared<Translator::ChunkPolicy>();
   writer.make_datasets(Translator::inEvent, group, eventKey, *evt, *env, false,-1,chunkPolicy);

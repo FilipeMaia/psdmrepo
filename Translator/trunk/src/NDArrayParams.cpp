@@ -181,7 +181,7 @@ Translator::ndarrayParameters(const std::type_info *ndarrayTypeInfoPtr) {
   return pos->second;
 }
 
-string Translator::ndarrayGroupName(const std::type_info *ndarrayTypeInfoPtr) {
+string Translator::ndarrayGroupName(const std::type_info *ndarrayTypeInfoPtr, bool vlen) {
   NDArrayParamMap::iterator pos;
   pos = ::paramMap.find(ndarrayTypeInfoPtr);
   if (pos == ::paramMap.end()) {
@@ -202,6 +202,7 @@ string Translator::ndarrayGroupName(const std::type_info *ndarrayTypeInfoPtr) {
   groupName += boost::lexical_cast<string>(8*params.sizeBytes());
   groupName += "_";
   groupName += boost::lexical_cast<string>(params.dim());
+  if (vlen) groupName += "_vlen";
   return groupName;
 }
 
