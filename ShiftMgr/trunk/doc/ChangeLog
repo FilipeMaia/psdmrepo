@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-08
+2014-04-22 Igor Gaponenko
+- fixed layout in CSS to deal with a bug in Chrome
+
 Tag: V00-01-07
 2014-03-17 Igor Gaponenko
 - extended the application to report experiments being active during a shift
