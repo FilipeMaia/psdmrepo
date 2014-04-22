@@ -573,7 +573,7 @@ stack_header: function () {
             var col = this.hdr[i] ;
             if (col.id === '_') {
                 html +=
-'  <div class="stack-column">&nbsp;</div>' ;
+'  <div class="stack-column" style="width:'+col.width+'px;" >&nbsp;</div>' ;
             } else if (col.id === '|') {
                 html +=
 '  <div class="stack-column-separator">&nbsp;</div>' ;

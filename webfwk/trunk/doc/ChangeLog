@@ -11,6 +11,12 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-00-08
+2014-04-22 Igor Gaponenko
+- added new classes: PropList, CheckTable
+- moved in the test for Table
+- fixed a bug in StackOfRows
+
 Tag: V00-00-07
 2014-03-17 Igor Gaponenko
 - reinforced CSS to address an issue with Google Chrome

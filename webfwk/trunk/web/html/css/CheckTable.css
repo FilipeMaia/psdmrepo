@@ -1,0 +1,51 @@
+
+.check-table {
+  font-size: 13px;
+}
+.check-table > table {
+  border-spacing: 0;
+}
+
+.check-table > table > thead > tr > td {
+  padding: 5px 8px;
+  border-bottom: 1px solid #a0a0a0;
+  border-right: 1px solid #e0e0e0;
+  font-family: Helvetica, sans-serif !important;
+  font-weight: bold;
+  white-space: nowrap;
+}
+.check-table > table > thead > tr > td:first-of-type {
+  border-right: 1px solid #a0a0a0;
+}
+.check-table > table > thead > tr > td:last-of-type {
+  border-right: 0;
+}
+
+.check-table > table > tbody > tr:hover {
+  cursor: pointer;
+  background-color: aliceblue;
+}
+
+.check-table > table > tbody > tr > td {
+  padding: 5px 8px;
+  border-bottom: 1px solid #e0e0e0;
+  border-right: 1px solid #e0e0e0;
+  font-family: Helvetica, sans-serif !important;
+}
+.check-table > table > tbody > tr > td:first-of-type {
+  border-right: 1px solid #a0a0a0;
+}
+.check-table > table > tbody > tr > td:last-of-type {
+  border-right: 0;
+}
+.check-table > table > tbody > tr:last-child > td {
+  border-bottom: 0;
+}
+
+div.check-table-toggler {
+  width:8px;
+  height:8px;
+}
+div.check-table-toggler-on {
+  background-color:red;
+}
