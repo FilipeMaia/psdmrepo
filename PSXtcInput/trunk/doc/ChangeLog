@@ -18,7 +18,7 @@ Tag: V00-14-01
   evnt.put(DamageMap) would have been called multiple times)
 	
 Tag: V00-14-00
-2014-04-?? Christopher O'Grady
+2014-04-16 Christopher O'Grady
 - many changes to support xtc indexing
 	
 Tag: V00-13-00
