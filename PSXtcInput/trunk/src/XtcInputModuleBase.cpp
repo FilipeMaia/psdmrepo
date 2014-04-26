@@ -198,6 +198,8 @@ XtcInputModuleBase::beginJob(Event& evt, Env& env)
         // TODO: we only store one datagram in event, for multiple datagrams we need to review our model
         fillEventDg(dg, evt);
         fillEventId(dg, evt);
+        boost::shared_ptr<PSEvt::DamageMap> damageMap = boost::make_shared<PSEvt::DamageMap>();
+        evt.put(damageMap);
       }
 
       // Store configuration info in the environment
@@ -394,9 +396,15 @@ XtcInputModuleBase::event(Event& evt, Env& env)
 
       } else {
 
+        bool first = true;
         BOOST_FOREACH(const XtcInput::Dgram& dg, eventDg) {
+          if (first) {
+            boost::shared_ptr<PSEvt::DamageMap> damageMap = boost::make_shared<PSEvt::DamageMap>();
+            evt.put(damageMap);
+          }
           fillEnv(dg, env);
           fillEvent(dg, evt, env);
+          first = false;
         }
         fillEventId(eventDg.front(), evt);
         fillEventDg(eventDg.front(), evt);
@@ -437,8 +445,7 @@ XtcInputModuleBase::fillEvent(const XtcInput::Dgram& dg, Event& evt, Env& env)
 
   Dgram::ptr dgptr = dg.dg();
   
-  boost::shared_ptr<PSEvt::DamageMap> damageMap = boost::make_shared<PSEvt::DamageMap>();
-  evt.put(damageMap);
+  boost::shared_ptr<PSEvt::DamageMap> damageMap = evt.get();
   // Loop over all XTC contained in the datagram
   XtcInput::XtcIterator iter(&dgptr->xtc);
   while (Pds::Xtc* xtc = iter.next()) {

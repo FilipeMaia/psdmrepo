@@ -11,6 +11,16 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-14-01
+2014-04-25 Christopher O'Grady
+- move creation of DamageMap object.  Fixes crash when multiple
+  event-datagrams are returned by the DgramSource (previously
+  evnt.put(DamageMap) would have been called multiple times)
+	
+Tag: V00-14-00
+2014-04-?? Christopher O'Grady
+- many changes to support xtc indexing
+	
 Tag: V00-13-00
 2014-03-13 Andy Salnikov
 - get run number from BeginRun transition's env field
