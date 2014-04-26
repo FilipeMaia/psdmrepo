@@ -237,18 +237,37 @@ class GUIFileManagerGroupControl ( QtGui.QWidget ) :
 
 
     def onButDelete(self):
-        logger.warning('onButDelete - Please use the "Single File" tab to delete file(s)', __name__)
-        return
-            
+        #logger.warning('onButDelete - Please use the "Single File" tab to delete file(s)', __name__)
+        logger.debug('onButDelete', __name__)
 
+        list_of_cmds = self.list_of_group_delete_cmds()
+
+        if list_of_cmds == [] :
+            logger.info('\nThe list of commands IS EMPTY ! Click on check-box of desired file(s).', __name__)
+            return
+
+        txt = '\nList of commands for tentetive file deletion:'
+        for cmd in list_of_cmds :
+            txt += '\n' + cmd
+        logger.info(txt, __name__)
+
+        msg = 'Approve commands \njust printed in the logger'
+        if self.approveCommand(self.but_copy, msg) :
+
+            for cmd in list_of_cmds :
+                os.system(cmd)
+
+            if cp.guistatus is not None : cp.guistatus.updateStatusInfo()
+            if cp.guidirtree is not None : cp.guidirtree.update_dir_tree()
+
+       
     def onButMove(self):
         logger.warnind('onButMove - Please use the "Single File" tab to move file(s)', __name__)
         return
 
 
     def onButCopy(self):
-        logger.info('onButCopy - in implementation', __name__)
-        #return
+        logger.debug('onButCopy', __name__)
     
         list_of_cmds = self.list_of_group_copy_cmds()
 
@@ -280,6 +299,11 @@ class GUIFileManagerGroupControl ( QtGui.QWidget ) :
     def getRunRange(self) :
         """Interface method returning run range string, for example '123-end' """
         return self.guirunrange.getRunRange()
+
+
+    def list_of_group_delete_cmds(self):
+        list_of_fnames = cp.guidirtree.get_list_of_checked_item_names()
+        return ['rm %s' % fname for fname in list_of_fnames]
 
 
     def list_of_group_copy_cmds(self):

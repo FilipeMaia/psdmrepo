@@ -61,16 +61,15 @@ class CommandLineCalib () :
         self.opts = opts
         self.count_msg = 0
 
-        #self.print_command_line_pars(args, opts)
-
-        #print cp.getTextParameters()
-
         if not self.set_pars() : return
 
+        self.print_command_line()
         self.print_local_pars()
-
+        self.print_list_of_detectors()
         self.print_list_of_xtc_files()
         self.print_list_of_sources_from_regdb()
+
+        gu.create_directory(cp.dir_work.value())
 
         if self.queue is None :
             self.proc_dark_run_interactively()
@@ -126,14 +125,11 @@ class CommandLineCalib () :
         list_of_dets_sel = self.det_name.split()
         list_of_dets_sel_lower = [det.lower() for det in list_of_dets_sel]
 
-        msg = self.sep + 'List of detectors:'
+        #msg = self.sep + 'List of detectors:'
         for det, par in zip(cp.list_of_dets_lower, cp.det_cbx_states_list) :
             par.setValue(det in list_of_dets_sel_lower)
-            msg += '\n%s %s' % (det.ljust(10), par.value())
-
-        self.log(msg,1)
-
-
+            #msg += '\n%s %s' % (det.ljust(10), par.value())
+        #self.log(msg,1)
 
         if self.det_name == cp.det_name.value_def() :
 	    self.log('\nWARNING: DETECTOR NAMES ARE NOT DEFINED...'\
@@ -171,8 +167,6 @@ class CommandLineCalib () :
 
         #cp.log_file      .setValue(self.logfile)          
 
-        gu.create_directory(cp.dir_work.value())
-
         return True
 
 #------------------------------
@@ -197,6 +191,20 @@ class CommandLineCalib () :
         + '\n     print_bits    : %s' % self.print_bits
         #+ '\nself.logfile       : ' % self.logfile     
 
+        self.log(msg,1)
+
+#------------------------------
+
+    def print_list_of_detectors(self) :
+        msg = self.sep + 'List of detectors:'
+        for det, par in zip(cp.list_of_dets_lower, cp.det_cbx_states_list) :
+            msg += '\n%s %s' % (det.ljust(10), par.value())
+        self.log(msg,1)
+
+#------------------------------
+
+    def print_command_line(self) :
+        msg = 'Command line for book-keeping:\n%s' % (' '.join(sys.argv))
         self.log(msg,1)
 
 #------------------------------
@@ -351,6 +359,10 @@ class CommandLineCalib () :
         msgi = self.sep + 'LSF status for queue %s: \n%s\nLSF status for %s is %s'\
                % (queue, msg, queue, {False:'bad',True:'good'}[status])
         self.log(msgi,1)
+
+        msg, status = gu.msg_and_status_of_queue(queue)
+        self.log(msg,1)
+
         return status
 
 

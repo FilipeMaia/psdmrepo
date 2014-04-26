@@ -95,8 +95,9 @@ class GUIDirTree (QtGui.QWidget):
 
 #----------------------------
 
-    def update_dir_tree(self, dir_top) :
-        self.dir_top = dir_top
+    def update_dir_tree(self, dir_top=None) :
+        if dir_top is not None :
+            self.dir_top = dir_top
         self.model.clear()
         self.fill_dir_tree(self.dir_top)
         self.view.expandAll()

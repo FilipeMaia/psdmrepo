@@ -1059,6 +1059,27 @@ def ready_to_start(check_bits=0777, fatal_bits=0777) :
 
 #----------------------------------
 
+def text_status_of_queues(lst_of_queues=['psanacsq', 'psnehq', 'psfehq']):
+    """Checks status of queues"""
+    cmd = 'bqueues %s' % (' '.join(lst_of_queues))
+    return cmd, getoutput(cmd)
+
+
+def msg_and_status_of_queue(queue='psanacsq') :
+    """Returns status of queue for command: bqueues <queue-name>"""
+       #QUEUE_NAME      PRIO STATUS          MAX JL/U JL/P JL/H NJOBS  PEND   RUN  SUSP 
+       #psanacsq        115  Open:Active       -    -    -    -     0     0     0     0
+    cmd, txt = text_status_of_queues([queue])
+    lines = txt.split('\n')
+    fields = lines[-1].split()
+    msg = 'Status : %s' % fields[2]
+    txt = 'Command: %s\n%s\n%s' % (cmd, txt, msg)
+    if fields[2] == 'Open:Active' :
+        return txt, True
+    else :
+        return txt, False
+
+
 def text_sataus_of_lsf_hosts(farm='psanacsfarm'):
     """Returns text output of the command: bhosts farm"""
     cmd = 'bhosts %s' % farm

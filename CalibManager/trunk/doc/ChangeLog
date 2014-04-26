@@ -12,7 +12,19 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
-Tag: V00-00-40
+Tag: V00-00-41
+2014-04-25 Mikhail S. Dubrovin	
+- CommandLineCalib - print command line in log for book-keeping, change print order for detectors
+- GUIFileManagerGroupControl - implement group delete button action 
+- GUIExpCalibDir - always update the list of experiments for drop-down menu in exp. selection GUI
+- in GlobalUtils add msg_and_status_of_queue(queue) and use it in BatchJobPedestals, CommandLineCalib, and GUIExpCalibDir
+	
+2014-04-21 Mikhail S. Dubrovin	
+- BatchJobPedestals fix name in dump: fnm.path_peds_scan_batch_log() -> fnm.path_peds_aver_batch_log()
+- PackageVersions - for rel >= ana-0.10.16: as a package version use revision No and tag
+- GUIConfigPars	- use text_rev_and_tag_for_all_packages() for info dump about package versions
+	
+Tag: V00-00-40 for release ana-0.10.16
 2014-04-21 Mikhail S. Dubrovin	
 - PackageVersions - for now commented depencency from other packages 
 	CSPadPixCoords ImgAlgos pdscalibdata PSCalib

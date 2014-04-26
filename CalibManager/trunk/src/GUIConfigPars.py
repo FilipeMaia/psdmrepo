@@ -240,7 +240,8 @@ class GUIConfigPars ( QtGui.QWidget ) :
         #for pkg in list_of_pkgs :
         #    msg += '%s  %s\n' % (gu.get_pkg_version(pkg).ljust(10), pkg.ljust(32))
 
-        msg = cp.package_versions.text_version_for_all_packages()
+        #msg = cp.package_versions.text_version_for_all_packages()
+        msg = cp.package_versions.text_rev_and_tag_for_all_packages()
         logger.info(msg, __name__ )
 
 
@@ -249,6 +250,10 @@ class GUIConfigPars ( QtGui.QWidget ) :
         msg, status = gu.msg_and_status_of_lsf(queue)
         msgi = '\nLSF status for queue %s: \n%s\nLSF status for %s is %s' % (queue, msg, queue, {False:'bad',True:'good'}[status])
         logger.info(msgi, __name__ )
+
+        cmd, msg = gu.text_status_of_queues(cp.list_of_queues)
+        msgq = '\nStatus of queues for command: %s \n%s' % (cmd, msg)       
+        logger.info(msgq, __name__ )
 
 
     def onButDirWork(self):

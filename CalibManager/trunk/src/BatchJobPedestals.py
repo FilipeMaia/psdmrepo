@@ -131,7 +131,7 @@ class BatchJobPedestals (BatchJob) :
         command_seq = command.split()
 
         msg = 'Avereging xtc file(s) using command:\n%s' % command \
-            + '\nand save results in the log-file: %s' % fnm.path_peds_scan_batch_log()
+            + '\nand save results in the log-file: %s' % fnm.path_peds_aver_batch_log()
         logger.info(msg, __name__)
         
         err = gu.subproc_in_log(command_seq, fnm.path_peds_aver_batch_log()) # , shell=True)
@@ -160,6 +160,9 @@ class BatchJobPedestals (BatchJob) :
             logger.info(msgi, __name__)
             logger.warning(msgw, __name__)
 
+        msg, status = gu.msg_and_status_of_queue(queue)
+        logger.info(msg, __name__)
+        
         return status
 
 #-----------------------------

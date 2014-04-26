@@ -64,12 +64,9 @@ class GUIFileManager ( QtGui.QWidget ) :
         self.guiSelector()
 
         self.vbox = QtGui.QVBoxLayout()   
-        #cp.guiworkresdirs = GUIWorkResDirs()
-        #self.vbox.addWidget(cp.guiworkresdirs)
         self.vbox.addWidget(self.lab_title)
         self.vbox.addWidget(self.tab_bar)
         self.vbox.addLayout(self.hboxW)
-        #self.vbox.addStretch(1)     
         self.vbox.addLayout(self.hboxB)
         self.setLayout(self.vbox)
 
