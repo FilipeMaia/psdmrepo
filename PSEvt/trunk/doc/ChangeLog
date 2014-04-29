@@ -11,6 +11,12 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-03
+2014-04-29 David Schneider
+- specialize Event::get for ndarrays.
+  - print warning if ndarray<T,R> requested but ndarray<const T,R> intended
+  - see also https://pswww.slac.stanford.edu/trac/psdm/ticket/292
+
 Tag: V00-08-02
 2014-03-08 Andy Salnikov
 - SrcMatc: add new method in()

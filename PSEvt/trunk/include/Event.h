@@ -34,6 +34,8 @@
 #include "PSEvt/ProxyDictI.h"
 #include "PSEvt/Source.h"
 #include "pdsdata/xtc/Src.hh"
+#include "ndarray/ndarray.h"
+#include "MsgLogger/MsgLogger.h"
 
 //------------------------------------
 // Collaborating Class Declarations --
@@ -92,7 +94,19 @@ public:
       boost::shared_ptr<void> vptr = m_dict->get(&typeid(const T), m_source, m_key, m_foundSrc);
       return boost::static_pointer_cast<T>(vptr);
     }
-    
+
+    /// specializiation to help users diagnose problems with using a non const ndarray template 
+    /// argument when a const argument was intended
+    template<typename T, unsigned NDim>
+    operator boost::shared_ptr< ndarray<T,NDim> >() {
+      boost::shared_ptr<void> vptr = m_dict->get(&typeid(const ndarray<T, NDim>), m_source, m_key, m_foundSrc);
+      if (not vptr and m_dict->get(&typeid(const ndarray<const T, NDim>), m_source, m_key, 0)) {
+        MsgLog("Event::get",warning,"Event::get - requested ndarray<T,R> *not* present *but* ndarray<const T,R> is for"
+               << " src=" << m_source << " key=" << m_key);
+      }
+      return boost::static_pointer_cast< ndarray<T,NDim> >(vptr);
+    }
+      
     boost::shared_ptr<ProxyDictI> m_dict; ///< Proxy dictionary containing the data
     Source m_source;         ///< Data source address
     std::string m_key;       ///< String key
