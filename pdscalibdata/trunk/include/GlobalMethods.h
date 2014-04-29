@@ -118,7 +118,7 @@ private:
    * @brief Load parameters from file
    * 
    * @param[in]  fname - path to the file with parameters
-   * @param[in]  type  - type of parameters for messages
+   * @param[in]  comment - comment to print with messages 
    * @param[in]  size  - size of array with parameters; number of values to load from file
    * @param[out] pars  - pointer to array with parameters
    * @param[in]  check_bits - +1: check if input does not have enough data, +2: check if file has extra data 

@@ -11,9 +11,13 @@ Package author: Andrei Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-05-11
+2014-04-29 Mikhail Dubrovin
+- GlobalMethods.h - fix doxy documentation
+
 Tag: V00-05-10
 2014-04-18 Mikhail Dubrovin
-- ALL modules: psvn mktxtprop CalibManager/src/*.py - add properties to files
+- ALL modules: psvn mktxtprop pdscalibdata/src/*.py - add properties to files
 - add src/SvnProps.py
 	
 Tag: V00-05-09
