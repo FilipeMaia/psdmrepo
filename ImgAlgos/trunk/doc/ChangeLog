@@ -11,6 +11,14 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-03-40
+2014-04-29 Mikhail S. Dubrovin
+- NDArrCalib.h - use ndarray to keep output data unchanged in event store
+- GlobalMethods.h add methods save<n>DArrayInEvent(...), for n = 1,3,4,5, fix doxy doc. 
+- PnccdImageProducer.h - cosmetic
+- AndorImageProducer.h - cosmetic 
+- src/SvnProps.py - add the par "updated" 
+
 Tag: V00-03-39
 2014-04-18 Mikhail S. Dubrovin
 - ALL modules: psvn mktxtprop CalibManager/src/*.py - add properties to files

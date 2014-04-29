@@ -4,13 +4,13 @@
 Class SvnProps stores updated by svn properties.
 
 NOTE: In order to always update revision number in this file when revision changes, use command:
-svn propset svn:keywords "Revision" SvnProps.py
+svn propset svn:keywords "Revision" src/SvnProps.py
 Also see: ~/.subversion/config
 
 This software was developed for the SIT project.
 If you use all or part of it, please give an appropriate acknowledgment.
 
-@version $Id$
+@version $Id: SvnProps.py 8035 2014-04-19 00:56:24Z dubrovin@SLAC.STANFORD.EDU $
 
 @author Mikhai S. Dubrovin
 """
@@ -19,7 +19,7 @@ If you use all or part of it, please give an appropriate acknowledgment.
 # Properties substituted by SVN 
 #------------------------------
 # __revision__ = "$Revision$"
-# __author__   = "$Author$"
+# __author__   = "$Author: dubrovin@SLAC.STANFORD.EDU $"
 #------------------------------
 
 import sys
@@ -28,13 +28,14 @@ import sys
 
 class SvnProps :
 
+    updated  = "2014-04-29"
     revision = "$Revision$"
-    author   = "$Author$"
-    id       = "$Id$"
-    headurl  = "$HeadURL$"
+    author   = "$Author: dubrovin@SLAC.STANFORD.EDU $"
+    id       = "$Id: SvnProps.py 8035 2014-04-19 00:56:24Z dubrovin@SLAC.STANFORD.EDU $"
+    headurl  = "$HeadURL: https://pswww.slac.stanford.edu/svn/psdmrepo/ImgAlgos/trunk/src/SvnProps.py $"
     header   = "$Header:$"
-    datelc   = "$LastChangedDate$"
-    date     = "$Date$"
+    datelc   = "$LastChangedDate: 2014-04-18 17:56:24 -0700 (Fri, 18 Apr 2014) $"
+    date     = "$Date: 2014-04-18 17:56:24 -0700 (Fri, 18 Apr 2014) $"
 
 #------------------------------
 

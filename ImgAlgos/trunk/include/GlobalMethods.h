@@ -491,11 +491,20 @@ private:
   template <typename T>
   bool saveImage2DInFileForType(PSEvt::Event& evt, const PSEvt::Source& src, const std::string& key, const std::string& fname, bool print_msg)
   {
-    boost::shared_ptr< CSPadPixCoords::Image2D<T> > img2d = evt.get(src, key);
-    if ( ! img2d.get() ) return false; 
+    boost::shared_ptr< CSPadPixCoords::Image2D<T> > shp = evt.get(src, key);
+    if ( ! shp.get() ) return false; 
     if( print_msg ) MsgLog("GlobalMethods::saveImage2DInFileForType", info, "Get image as Image2D<T> from event and save it in file");
-    img2d -> saveImageInFile(fname,0);
+    shp -> saveImageInFile(fname,0);
     return true;
+  }
+
+//--------------------
+/// Save 1-D array in event for const T
+  template <typename T>
+  void save1DArrayInEvent(PSEvt::Event& evt, const Pds::Src& src, const std::string& key, const ndarray<const T,1>& data)
+  {
+    boost::shared_ptr< ndarray<const T,1> > shp( new ndarray<const T,1>(data) );
+    evt.put(shp, src, key);
   }
 
 //--------------------
@@ -503,8 +512,36 @@ private:
   template <typename T>
   void save2DArrayInEvent(PSEvt::Event& evt, const Pds::Src& src, const std::string& key, const ndarray<const T,2>& data)
   {
-    boost::shared_ptr< ndarray<const T,2> > img2d( new ndarray<const T,2>(data) );
-    evt.put(img2d, src, key);
+    boost::shared_ptr< ndarray<const T,2> > shp( new ndarray<const T,2>(data) );
+    evt.put(shp, src, key);
+  }
+
+
+//--------------------
+/// Save 3-D array in event for const T
+  template <typename T>
+  void save3DArrayInEvent(PSEvt::Event& evt, const Pds::Src& src, const std::string& key, const ndarray<const T,3>& data)
+  {
+    boost::shared_ptr< ndarray<const T,3> > shp( new ndarray<const T,3>(data) );
+    evt.put(shp, src, key);
+  }
+
+//--------------------
+/// Save 4-D array in event for const T
+  template <typename T>
+  void save4DArrayInEvent(PSEvt::Event& evt, const Pds::Src& src, const std::string& key, const ndarray<const T,4>& data)
+  {
+    boost::shared_ptr< ndarray<const T,4> > shp( new ndarray<const T,4>(data) );
+    evt.put(shp, src, key);
+  }
+
+//--------------------
+/// Save 5-D array in event for const T
+  template <typename T>
+  void save5DArrayInEvent(PSEvt::Event& evt, const Pds::Src& src, const std::string& key, const ndarray<const T,5>& data)
+  {
+    boost::shared_ptr< ndarray<const T,5> > shp( new ndarray<const T,5>(data) );
+    evt.put(shp, src, key);
   }
 
 //--------------------
@@ -512,8 +549,8 @@ private:
   template <typename T>
   void saveNonConst2DArrayInEvent(PSEvt::Event& evt, const Pds::Src& src, const std::string& key, const ndarray<T,2>& data)
   {
-    boost::shared_ptr< ndarray<T,2> > img2d( new ndarray<T,2>(data) );
-    evt.put(img2d, src, key);
+    boost::shared_ptr< ndarray<T,2> > shp( new ndarray<T,2>(data) );
+    evt.put(shp, src, key);
   }
 
 //-------------------
@@ -775,7 +812,6 @@ private:
    *  
    *  @param pars   array[3] of control parameters; mean_max, sigma_max, threshold on number of pixels/ADC count
    *  @param sdata  pixel data
-   *  @param peddata  pedestal data, can be zero pointer
    *  @param pixStatus  pixel status data, can be zero pointer
    *  @param ssize  size of all above arrays
    *  @param stride increment for pixel indices
@@ -787,8 +823,6 @@ template <typename T>
 float 
 findCommonMode(const double* pars,
                T* sdata,
-               //const int16_t* sdata,
-               //const float* peddata, 
                const uint16_t *pixStatus, 
                unsigned ssize,
                int stride = 1

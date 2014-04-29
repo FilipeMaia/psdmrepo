@@ -282,7 +282,7 @@ NDArrCalib::initAtFirstGetNdarray(Event& evt, Env& env)
   m_ndim  = m_ndarr_pars->ndim();
   m_src   = m_ndarr_pars->src();
 
-  p_cdata = new data_out_t[m_size];
+  //p_cdata = new data_out_t[m_size];
 
   getCalibPars(evt, env);
 }

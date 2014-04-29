@@ -107,18 +107,16 @@ private:
                      << "\n  data:\n";
 	  }      
       
+	  const ndarray<const data_t, 2>& data_ndarr = frame1->data();
+          if( m_print_bits & 2 ) {for (int i=0; i<10; ++i) cout << " " << data_ndarr[0][i]; cout << "\n"; }      
+
 	  // Use ndarray directly from data
 	  if(m_dtype == ASDATA) {
-
-	      const ndarray<const data_t, 2>& data_ndarr = frame1->data();
-              if( m_print_bits & 2 ) {for (int i=0; i<10; ++i) cout << " " << data_ndarr[0][i]; cout << "\n"; }      
-
               save2DArrayInEvent<data_t> (evt, m_src, m_key_out, data_ndarr);
               return true;
 	  } 
 
 	  // Copy ndarray from data with type changing
-	  const ndarray<const data_t, 2>& data_ndarr = frame1->data();
           //const unsigned* shape = data_ndarr.shape();
           //ndarray<TOUT,2> out_ndarr = make_ndarray<TOUT>(shape[0], shape[1]);
           ndarray<TOUT,2> out_ndarr( data_ndarr.shape() );

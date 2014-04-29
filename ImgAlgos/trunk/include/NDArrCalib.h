@@ -149,15 +149,15 @@ private:
   data_out_t*                          m_nrms_data;
 
   PSCalib::CalibPars* m_calibpars;    // pointer to calibration store
-  data_out_t* p_cdata;                // pointer to calibrated data array
+  //data_out_t* p_cdata;                // pointer to calibrated data array
 
   std::vector<unsigned> v_inds;       // vector of the image indexes for background normalization
-  double m_norm;                      // Normalization factor for background subtraction
 
 //-------------------
+// Evaluate normalization factor for background subtraction
 
   template <typename T>
-    void normBkgd(const T* p_cdata)
+    double normBkgd(const T* p_cdata)
     {
       double sum_data=0;
       double sum_bkgd=0;
@@ -166,7 +166,8 @@ private:
         sum_bkgd += m_bkgd_data[*it];
         //sum_bkgd += m_bkgd->data()[*it];
       }
-      m_norm = (sum_bkgd != 0)? (float)(sum_data/sum_bkgd) : 1;
+      double norm = (sum_bkgd != 0)? (double)(sum_data/sum_bkgd) : 1;
+      return norm;
     }
 
 //-------------------
@@ -260,9 +261,9 @@ private:
 //-------------------
 
   template <typename T, typename TOUT>
-    void applyCorrections(Event& evt, const T* p_rdata)
+    void applyCorrections(Event& evt, const T* p_rdata, TOUT* p_cdata)
     {
-     	  // 1) Evaluate: m_cdat[i] = (p_rdata[i] - m_peds[i] - comm_mode[...] - m_norm*m_bkgd[i]) * m_gain[i]; 
+     	  // 1) Evaluate: m_cdat[i] = (p_rdata[i] - m_peds[i] - comm_mode[...] - norm*m_bkgd[i]) * m_gain[i]; 
      	  // 2) apply bad pixel status: m_stat[i];
      	  // 3) apply mask: m_mask[i];
      	  // 4) apply constant threshold: m_low_thre;
@@ -276,10 +277,13 @@ private:
 
      	  for(unsigned i=0; i<m_size; i++) p_cdata[i] = (TOUT)p_rdata[i];
 
-     	  if (m_do_peds) {                    for(unsigned i=0; i<m_size; i++) p_cdata[i] -= (TOUT) m_peds_data[i];         }
+     	  if (m_do_peds) { for(unsigned i=0; i<m_size; i++) p_cdata[i] -= (TOUT) m_peds_data[i]; }
      	  if (m_do_cmod && m_do_peds) { do_common_mode<TOUT>(p_cdata); }
-     	  if (m_do_bkgd) { normBkgd(p_cdata); for(unsigned i=0; i<m_size; i++) p_cdata[i] -= (TOUT)(m_bkgd_data[i]*m_norm); }
-     	  if (m_do_gain) {                    for(unsigned i=0; i<m_size; i++) p_cdata[i] *= (TOUT) m_gain_data[i];         }
+     	  if (m_do_bkgd) { 
+                           double norm = normBkgd(p_cdata);  
+                           for(unsigned i=0; i<m_size; i++) p_cdata[i] -= (TOUT)(m_bkgd_data[i]*norm); 
+          }
+     	  if (m_do_gain) { for(unsigned i=0; i<m_size; i++) p_cdata[i] *= (TOUT) m_gain_data[i]; }
 
      	  if (m_do_stat) {             
      	    for(unsigned i=0; i<m_size; i++) {
@@ -315,7 +319,7 @@ private:
             MsgLog( name(), info, ss.str());
           }
  	  
-          saveNDArrInEvent <TOUT> (evt, m_src, m_key_out, p_cdata, m_ndarr_pars, 1);
+          //saveNDArrInEvent <TOUT> (evt, m_src, m_key_out, p_cdata, m_ndarr_pars, 1);
     }  
 //-------------------
 
@@ -326,54 +330,104 @@ private:
 
       if (m_ndim == 2) {
      	shared_ptr< ndarray<const T,2> > shp2_const= evt.get(m_str_src, m_key_in, &m_src);
-     	if (shp2_const.get()) { applyCorrections<T,TOUT>(evt, shp2_const->data()); return true; } 
+     	if (shp2_const.get()) {
+	  ndarray<TOUT,2> out_nda(shp2_const->shape());
+          applyCorrections<T,TOUT>(evt, shp2_const->data(), out_nda.data()); 
+          save2DArrayInEvent<TOUT>(evt, m_src, m_key_out, out_nda);
+          return true;
+        } 
       }
 
       if (m_ndim == 3) {
      	shared_ptr< ndarray<const T,3> > shp3_const = evt.get(m_str_src, m_key_in, &m_src);
-     	if (shp3_const.get()) { applyCorrections<T,TOUT>(evt, shp3_const->data()); return true; } 
+     	if (shp3_const.get()) { 
+	  ndarray<TOUT,3> out_nda(shp3_const->shape());
+          applyCorrections<T,TOUT>(evt, shp3_const->data(), out_nda.data()); 
+          save3DArrayInEvent<TOUT>(evt, m_src, m_key_out, out_nda);
+          return true;
+        } 
       }
 
       if (m_ndim == 4) {
      	shared_ptr< ndarray<const T,4> > shp4_const = evt.get(m_str_src, m_key_in, &m_src);
-     	if (shp4_const.get()) { applyCorrections<T,TOUT>(evt, shp4_const->data()); return true; } 
+     	if (shp4_const.get()) { 
+	  ndarray<TOUT,4> out_nda(shp4_const->shape());
+          applyCorrections<T,TOUT>(evt, shp4_const->data(), out_nda.data());
+          save4DArrayInEvent<TOUT>(evt, m_src, m_key_out, out_nda);
+          return true;
+        } 
       }
 
       if (m_ndim == 5) {
      	shared_ptr< ndarray<const T,5> > shp5_const = evt.get(m_str_src, m_key_in, &m_src);
-     	if (shp5_const.get()) { applyCorrections<T,TOUT>(evt, shp5_const->data()); return true; } 
+     	if (shp5_const.get()) {
+	  ndarray<TOUT,5> out_nda(shp5_const->shape());
+          applyCorrections<T,TOUT>(evt, shp5_const->data(), out_nda.data());
+          save5DArrayInEvent<TOUT>(evt, m_src, m_key_out, out_nda);
+          return true;
+        } 
       }
 
       if (m_ndim == 1) {
      	shared_ptr< ndarray<const T,1> > shp1_const = evt.get(m_str_src, m_key_in, &m_src);
-     	if (shp1_const.get()) { applyCorrections<T,TOUT>(evt, shp1_const->data()); return true; } 
+     	if (shp1_const.get()) {
+	  ndarray<TOUT,1> out_nda(shp1_const->shape());
+          applyCorrections<T,TOUT>(evt, shp1_const->data(), out_nda.data());
+          save1DArrayInEvent<TOUT>(evt, m_src, m_key_out, out_nda);
+          return true;
+        } 
       }
 
       // NON-CONST
 
       if (m_ndim == 2) {
      	shared_ptr< ndarray<T,2> > shp2 = evt.get(m_str_src, m_key_in, &m_src);
-     	if (shp2.get()) { applyCorrections<T,TOUT>(evt, shp2->data()); return true; } 
+     	if (shp2.get()) { 
+	  ndarray<TOUT,2> out_nda(shp2->shape());
+          applyCorrections<T,TOUT>(evt, shp2->data(), out_nda.data()); 
+          save2DArrayInEvent<TOUT>(evt, m_src, m_key_out, out_nda);
+          return true;
+        } 
       }
 
       if (m_ndim == 3) {
      	shared_ptr< ndarray<T,3> > shp3 = evt.get(m_str_src, m_key_in, &m_src);
-     	if (shp3.get()) { applyCorrections<T,TOUT>(evt, shp3->data()); return true; } 
+     	if (shp3.get()) { 
+	  ndarray<TOUT,3> out_nda(shp3->shape());
+          applyCorrections<T,TOUT>(evt, shp3->data(), out_nda.data());
+          save3DArrayInEvent<TOUT>(evt, m_src, m_key_out, out_nda);
+          return true;
+        } 
       }
 
       if (m_ndim == 4) {
      	shared_ptr< ndarray<T,4> > shp4 = evt.get(m_str_src, m_key_in, &m_src);
-     	if (shp4.get()) { applyCorrections<T,TOUT>(evt, shp4->data()); return true; } 
+     	if (shp4.get()) { 
+	  ndarray<TOUT,4> out_nda(shp4->shape());
+          applyCorrections<T,TOUT>(evt, shp4->data(), out_nda.data());
+          save4DArrayInEvent<TOUT>(evt, m_src, m_key_out, out_nda);
+          return true;
+        } 
       }
 
       if (m_ndim == 5) {
      	shared_ptr< ndarray<T,5> > shp5 = evt.get(m_str_src, m_key_in, &m_src);
-     	if (shp5.get()) { applyCorrections<T,TOUT>(evt, shp5->data()); return true; } 
+     	if (shp5.get()) { 
+	  ndarray<TOUT,5> out_nda(shp5->shape());
+          applyCorrections<T,TOUT>(evt, shp5->data(), out_nda.data());
+          save5DArrayInEvent<TOUT>(evt, m_src, m_key_out, out_nda);
+          return true;
+        } 
       }
 
       if (m_ndim == 1) {
      	shared_ptr< ndarray<T,1> > shp1 = evt.get(m_str_src, m_key_in, &m_src);
-     	if (shp1.get()) { applyCorrections<T,TOUT>(evt, shp1->data()); return true; } 
+     	if (shp1.get()) { 
+	  ndarray<TOUT,1> out_nda(shp1->shape());
+          applyCorrections<T,TOUT>(evt, shp1->data(), out_nda.data());
+          save1DArrayInEvent<TOUT>(evt, m_src, m_key_out, out_nda);
+          return true;
+        } 
       }
 
       return false;

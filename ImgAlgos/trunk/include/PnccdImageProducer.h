@@ -104,11 +104,7 @@ private:
       if (frame) {
       
 	  const ndarray<const data_t, 2> data = frame->data(); // .copy(); - if no const
-      
-          if( m_print_bits & 2 ) {
-            for (int i=0; i<10; ++i) cout << " " << data[0][i];
-            std::cout << "\n";
-          }
+          if( m_print_bits & 2 ) {for (int i=0; i<10; ++i) cout << " " << data[0][i]; std::cout << "\n";}
      
           save2DArrayInEvent<data_t> (evt, m_src, m_key_out, data);
           return true;
@@ -128,7 +124,7 @@ private:
 
           const ndarray<const T,3> inp_ndarr = *shp.get(); //const T* p_data = shp->data();
 
-	  if( m_print_bits & 2 ) std::cout << "Input ndarray<T,3>:\n" << inp_ndarr;
+	  if( m_print_bits & 2 ) std::cout << "Input ndarray<const T,3>:\n" << inp_ndarr << "\n";
 	  
           ndarray<T,2> img_ndarr = make_ndarray<T>(ImRows+m_gap_rows, ImCols+m_gap_cols);
 
