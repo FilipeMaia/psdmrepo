@@ -5,9 +5,7 @@
 // File and Version Information:
 // 	$Id$
 //
-// Description:
-//	Class CalibParsStore.
-//
+// $Revision$
 //------------------------------------------------------------------------
 
 //-----------------
@@ -18,10 +16,6 @@
 //#include <vector>
 //#include <map>
 //#include <fstream>  // open, close etc.
-
-//----------------------
-// Base Class Headers --
-//----------------------
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -36,15 +30,14 @@
 #include "CSPad2x2CalibIntensity.h"
 #include "CSPadCalibIntensity.h"
 
-//------------------------------------
-// Collaborating Class Declarations --
-//------------------------------------
-
-//		---------------------
-// 		-- Class Interface --
-//		---------------------
+//-----------------------------
 
 namespace PSCalib {
+
+/**
+ *  @defgroup PSCalib PSCalib package
+ *  @brief Package PSCalib provides access to the calibration parameters of all detectors
+ */
 
 /// @addtogroup PSCalib PSCalib
 
@@ -56,12 +49,11 @@ namespace PSCalib {
  *  This software was developed for the LCLS project. If you use all or 
  *  part of it, please give an appropriate acknowledgment.
  *
- *  @see CalibPars
- *
  *  @version $Id$
  *
  *  @author Mikhail S. Dubrovin
  *
+ *  @see CalibPars
  *
  *  @anchor interface
  *  @par<interface> Interface Description
@@ -112,6 +104,7 @@ public:
    *  @param[in] group          Data type and group names.
    *  @param[in] src            The data source object, for example Pds::Src m_src; defined in the env.get(...,&m_src)
    *  @param[in] runnum         Run number to search the valid file name.
+   *  @param[in] print_bits     Print control bit-word.
    */ 
   static PSCalib::CalibPars*
   Create ( const std::string&   calibdir,     //  /reg/d/psdm/mec/mec73313/calib

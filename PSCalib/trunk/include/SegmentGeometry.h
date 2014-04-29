@@ -5,9 +5,7 @@
 // File and Version Information:
 // 	$Id$
 //
-// Description:
-//	Class SegmentGeometry.
-//
+// $Revision$
 //------------------------------------------------------------------------
 
 //-----------------
@@ -20,22 +18,11 @@
 //#include <fstream>  // open, close etc.
 //#include <stdint.h> // for uint8_t, uint16_t etc.
 
-//----------------------
-// Base Class Headers --
-//----------------------
-#include "ndarray/ndarray.h"
-
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
 
-//------------------------------------
-// Collaborating Class Declarations --
-//------------------------------------
-
-//		---------------------
-// 		-- Class Interface --
-//		---------------------
+#include "ndarray/ndarray.h"
 
 //-----------------------------
 
@@ -56,8 +43,6 @@ namespace PSCalib {
  *  @version $Id$
  *
  *  @author Mikhail S. Dubrovin
- *
- *  @endcode
  *
  *  @see CalibFileFinder
  *

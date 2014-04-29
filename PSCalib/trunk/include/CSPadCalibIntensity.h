@@ -5,9 +5,7 @@
 // File and Version Information:
 // 	$Id$
 //
-// Description:
-//	Class CSPadCalibIntensity.
-//
+// $Revision$
 //------------------------------------------------------------------------
 
 //-----------------
@@ -38,13 +36,7 @@
 #include "pdscalibdata/CsPadPixelGainV2.h"        
 #include "pdscalibdata/CsPadPixelRmsV2.h"        
 
-//------------------------------------
-// Collaborating Class Declarations --
-//------------------------------------
-
-//		---------------------
-// 		-- Class Interface --
-//		---------------------
+//-------------------------------
 
 namespace PSCalib {
 

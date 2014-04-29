@@ -5,9 +5,7 @@
 // File and Version Information:
 // 	$Id$
 //
-// Description:
-//	Class CalibFileFinder.
-//
+// $Revision$
 //------------------------------------------------------------------------
 
 //-----------------
@@ -16,22 +14,12 @@
 #include <string>
 #include <vector>
 
-//----------------------
-// Base Class Headers --
-//----------------------
-
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
 #include "pdsdata/xtc/Src.hh"
 
-//------------------------------------
-// Collaborating Class Declarations --
-//------------------------------------
-
-//		---------------------
-// 		-- Class Interface --
-//		---------------------
+//-----------------------------
 
 namespace PSCalib {
 
@@ -115,6 +103,7 @@ public:
    *
    *  @param[in] files      List of file names.
    *  @param[in] runNumber  Run number to search the valid file name.
+   *  @param[in] print_bits print control bit-word.
    */
   static std::string selectCalibFile(const std::vector<std::string>& files, unsigned long runNumber, unsigned print_bits=255);
 

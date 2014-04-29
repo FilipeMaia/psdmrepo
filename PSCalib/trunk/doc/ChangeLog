@@ -11,9 +11,13 @@ Package author: Mikhail S. Dubrovin
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-24
+2014-04-29 Mikhail Dubrovin
+- ALL modules: edit comments and correct doxy documentation
+	
 Tag: V00-01-23
 2014-04-18 Mikhail Dubrovin
-- ALL modules: psvn mktxtprop CalibManager/src/*.py - add properties to files
+- ALL modules: psvn mktxtprop PSCalib/src/*.py - add properties to files
 - add src/SvnProps.py
 	
 Tag: V00-01-22

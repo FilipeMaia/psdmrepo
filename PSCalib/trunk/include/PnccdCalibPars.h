@@ -5,9 +5,7 @@
 // File and Version Information:
 // 	$Id$
 //
-// Description:
-//	Class PnccdCalibPars.
-//
+// $Revision$
 //------------------------------------------------------------------------
 
 //-----------------
@@ -22,12 +20,12 @@
 //----------------------
 // Base Class Headers --
 //----------------------
-#include "ndarray/ndarray.h"
 #include "PSCalib/CalibPars.h"
 
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+#include "ndarray/ndarray.h"
 #include "psddl_psana/pnccd.ddl.h"
 #include "pdsdata/xtc/Src.hh"
 
@@ -38,13 +36,7 @@
 #include "pdscalibdata/PnccdPixelGainV1.h"        
 #include "pdscalibdata/PnccdPixelRmsV1.h"        
 
-//------------------------------------
-// Collaborating Class Declarations --
-//------------------------------------
-
-//		---------------------
-// 		-- Class Interface --
-//		---------------------
+//-------------------------------
 
 namespace PSCalib {
 

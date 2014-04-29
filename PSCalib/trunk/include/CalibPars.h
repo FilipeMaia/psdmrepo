@@ -5,9 +5,7 @@
 // File and Version Information:
 // 	$Id$
 //
-// Description:
-//	Class CalibPars.
-//
+// $Revision$
 //------------------------------------------------------------------------
 
 //-----------------
@@ -20,27 +18,19 @@
 //#include <fstream>  // open, close etc.
 #include <stdint.h> // for uint8_t, uint16_t etc.
 
-//----------------------
-// Base Class Headers --
-//----------------------
-#include "ndarray/ndarray.h"
-
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
+
+#include "ndarray/ndarray.h"
+
 // #include "pdscalibdata/PnccdPedestalsV1.h"
 // #include "pdscalibdata/PnccdPixelStatusV1.h"
 // #include "pdscalibdata/PnccdCommonModeV1.h"
 // #include "pdscalibdata/PnccdPixelGainV1.h"
 // #include "pdscalibdata/PnccdPixelRmsV1.h"
 
-//------------------------------------
-// Collaborating Class Declarations --
-//------------------------------------
-
-//		---------------------
-// 		-- Class Interface --
-//		---------------------
+//-----------------------------
 
 namespace PSCalib {
 
@@ -59,8 +49,6 @@ namespace PSCalib {
  *  @version $Id$
  *
  *  @author Mikhail S. Dubrovin
- *
- *  @endcode
  *
  *  @see CalibFileFinder
  *

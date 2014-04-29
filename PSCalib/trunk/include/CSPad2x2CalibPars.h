@@ -5,9 +5,7 @@
 // File and Version Information:
 // 	$Id$
 //
-// Description:
-//	Class CSPad2x2CalibPars.
-//
+// $Revision$
 //------------------------------------------------------------------------
 
 //-----------------
@@ -19,11 +17,6 @@
 #include <map>
 #include <fstream>  // open, close etc.
 
-//----------------------
-// Base Class Headers --
-//----------------------
-
-
 //-------------------------------
 // Collaborating Class Headers --
 //-------------------------------
@@ -33,13 +26,7 @@
 #include "pdscalibdata/CsPad2x2CenterV1.h"      
 #include "pdscalibdata/CsPad2x2TiltV1.h"        
 
-//------------------------------------
-// Collaborating Class Declarations --
-//------------------------------------
-
-//		---------------------
-// 		-- Class Interface --
-//		---------------------
+//-----------------------------
 
 namespace PSCalib {
 

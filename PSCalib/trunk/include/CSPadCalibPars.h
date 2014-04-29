@@ -5,9 +5,7 @@
 // File and Version Information:
 // 	$Id$
 //
-// Description:
-//	Class CSPadCalibPars.
-//
+// $Revision$
 //------------------------------------------------------------------------
 
 //-----------------
@@ -18,10 +16,6 @@
 #include <vector>
 #include <map>
 #include <fstream>  // open, close etc.
-
-//----------------------
-// Base Class Headers --
-//----------------------
 
 //-------------------------------
 // Collaborating Class Headers --
@@ -43,24 +37,14 @@
 #include "pdscalibdata/CsPadCenterGlobalV1.h"      
 #include "pdscalibdata/CsPadRotationGlobalV1.h"    
 
-//------------------------------------
-// Collaborating Class Declarations --
-//------------------------------------
-
-//		---------------------
-// 		-- Class Interface --
-//		---------------------
+//-----------------------------
 
 namespace PSCalib {
 
 /**
- *  @defgroup PSCalib PSCalib package
- *  @brief Package PSCalib provides access to the CSPAD calibration parameters
- *
  *  @version $Id$
  *
  *  @author Mikhail S. Dubrovin
- *
  */
 
 ///  @addtogroup PSCalib PSCalib
