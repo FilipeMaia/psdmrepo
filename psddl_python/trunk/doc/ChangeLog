@@ -11,6 +11,11 @@ Package author: Joseph S. Barrera
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-08-05
+2014-04-29 David
+- convert ndarray<const T,R> to non-writeable numpy array.
+- trac ticket #291
+
 Tag: V00-08-04
 2014-03-10 David
 - regenerate whole thing from psddldata V01-00-06

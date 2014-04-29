@@ -57,7 +57,7 @@ void _ndarray_dtor(void* ptr)
   delete static_cast<ndarray<const T, NDim>*>(ptr);
 }
 
-// convert ndarray to numpy array
+// convert ndarray of const elements to non-writeable numpy array
 template <typename T, unsigned NDim, typename U>
 PyObject*
 ndToNumpy(const ndarray<const T, NDim>& array, const boost::shared_ptr<U>& owner)
@@ -84,6 +84,9 @@ ndToNumpy(const ndarray<const T, NDim>& array, const boost::shared_ptr<U>& owner
   // add reference to the owner of the data
   ((PyArrayObject*)nparr)->base = ndarr;
 
+  // set flags to be non-writeable
+  PyArray_FLAGS(nparr) &= ~NPY_WRITEABLE;
+  
   return nparr;
 }
 
