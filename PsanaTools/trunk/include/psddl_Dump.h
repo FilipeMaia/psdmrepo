@@ -1,7 +1,11 @@
-#include <iostream>
+namespace PSEvt {
+  class Event;
+  class EventKey;
+};
 
-#include "PSEvt/Event.h"
-#include "PSEnv/Env.h"
+namespace PSEnv {
+  class Env;
+};
 
 namespace PsanaTools {
 
