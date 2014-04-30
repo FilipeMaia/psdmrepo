@@ -1,0 +1,177 @@
+#!@PYTHON@
+#--------------------------------------------------------------------------
+# File and Version Information:
+#  $Id: ws-client-test 490 2009-08-10 17:53:04Z salnikov $
+#
+# Description:
+#  Script ws-client-test...
+#
+#------------------------------------------------------------------------
+
+"""Script which show the status of the translation requests using
+the web service.
+
+This software was developed for the LCLS project.  If you use all or 
+part of it, please give an appropriate acknowledgement.
+
+@see RelatedModule
+
+@version $Id: ws-client-test 490 2009-08-10 17:53:04Z salnikov $ 
+
+@author Andrei Salnikov
+"""
+
+#------------------------------
+#  Module's version from CVS --
+#------------------------------
+__version__ = "$Revision: 490 $"
+# $Source$
+
+#--------------------------------
+#  Imports of standard modules --
+#--------------------------------
+import sys
+import os
+import urllib
+import urllib2 as u2
+import urllib2_kerberos
+import time
+
+#---------------------------------
+#  Imports of base class module --
+#---------------------------------
+from AppUtils.AppBase import AppBase
+
+#-----------------------------
+# Imports for other modules --
+#-----------------------------
+from WSClient.WSApp import WSApp
+from WSClient.WSResource import WSResource
+
+#---------------------
+# Local definitions --
+#---------------------
+
+#---------------------------------
+#  Application class definition --
+#---------------------------------
+
+class IcWsStatus ( AppBase ) :
+
+    def __init__ ( self ) :
+
+        AppBase.__init__ ( self, installLogger = True, usage = "usage: %prog [options] instrument experiment" )
+
+        # add application options, see optparse module for details
+        self._parser.add_option ( '-u', "--user", 
+                                  default=None, help="specify user name" )
+        self._parser.add_option ( '-p', "--password", 
+                                  default=None, help="password to access web service" )
+        self._parser.add_option ( '-f', "--pwd-file", 
+                                  default='/reg/g/psdm/psdatmgr/ic/.icws-pwd', 
+                                  help="password file to access web service" )
+        self._parser.add_option ( '-l', "--list", action='store_true', 
+                                  default=False, help="list experiments" )
+        self._parser.add_option ( '-s', "--system", action='store_true', 
+                                  default=False, help="show system status" )
+        self._parser.add_option ( '-a', "--app-name",  
+                                  default='icws', help="name of the web service" )
+        self._parser.add_option ( '-H', "--no-header", action='store_true', 
+                                  default=False, help="do not print header" )
+        
+
+    #
+    #  Run the whole thing after parsing the command argunments and 
+    #  installing logger. See BbrPyApp class for details.
+    #
+    def _run ( self ) :
+
+        # check arguments
+        if len(self._args) != 2 and not self._options.list and not self._options.system:
+            self._parser.error("two arguments or -l or -s option are required, use -h for help")
+            return 2
+        
+        # make resource object
+        app = WSApp( self._options.app_name,
+                     user=self._options.user,
+                     password=self._options.password,
+                     pwdfile=self._options.pwd_file )
+        
+        if self._options.list :
+                        
+            res = WSResource( app, '/exp' )
+            data = res.request( 'GET' )
+            if data:
+                if not self._options.no_header :
+                    print 'Instrument Experiment'
+                    print '---------------------'
+                data = [ (d['instrument'], d['experiment']) for d in data ]
+                data.sort()
+                for d in data :
+                    print '%-10s %s' % d
+            else :
+                print 'No experiments were found'
+                return 1
+                    
+        elif self._options.system :
+                        
+            res = WSResource( app, '/system' )
+            data = res.request( 'GET' )
+            fmt = '%6s  %-32s  %-8s  %-19s  %6s  %s'
+            if data:
+                if not self._options.no_header :
+                    print fmt % ('ID', 'Host', 'Status', 'Time', 'PID', 'Instruments')
+                    print '--------------------------------------------------------------------------------------------'
+                data = [ (d['id'], d['host'], d['status'], d['stopped'] or d['started'], d['pid'], d.get('instruments',[])) for d in data ]
+                data.sort()
+                for d in data :
+                    instr = d[5]
+                    instr = ', '.join(instr)
+                    d = d[:5] + (instr,) 
+                    print fmt % d
+            else :
+                print 'No experiments were found'
+                return 1
+                    
+        else:
+            
+            res_name = '/exp/%s/%s' % (self._args[0], self._args[1])
+            res = WSResource( app, res_name )
+            data = res.request( 'GET' )
+            fmt = '%6s  %-20s  %6s  %8s  %4s  %-19s  %s'
+            if data:
+                if not self._options.no_header :
+                    print fmt % ('Run', 'Status', 'ReqID', 'JobID', 'Prio', 'Req Time', 'Files')
+                    print '  --------------------------------------------------------------------------------------'
+                data = [ (d['run'], d['id'], d['created'], d['status'], d.get('priority', 0), d.get('xtc_files'), d.get('jobid', 0)) for d in data ]
+                data.sort()
+
+                for d in data :
+                    run = str(d[0])
+                    reqid = str(d[1])
+                    time = str(d[2])
+                    stat = d[3]
+                    prio = d[4]
+                    files = d[5]
+                    jobid = d[6]
+                    if not files : files = ['']
+                    for f in files :
+                        print fmt % (run, stat, reqid, jobid, prio, time, f)
+                        run = ''
+                        reqid = ''
+                        time = ''
+                        stat = ''
+                        prio = ''
+                        jobid = ''
+                        
+            else :
+                print 'No requests were found'
+                return 1
+
+#
+#  run application when imported as a main module
+#
+if __name__ == "__main__" :
+    app = IcWsStatus()
+    rc = app.run()
+    sys.exit(rc)
