@@ -1,0 +1,25 @@
+- The Translator is now able to translate variable length ndarrays.
+
+- Fixed psana XTC input module to only add one damagemap for the case where
+indexing tries to fix split events. Previously the code  would throw
+an "identical key" exception.
+
+- Fixed a memory management problem in the psana calibration modules
+- Fixed problems with Doxygen documentation generation in a number of packages
+
+- Improve bookkeeping quality in log files of the Calibration Manager
+- Add group operations in the file manager of the Calibration Manager
+
+- Print warning to help C++ users get ndarrays of const elements from
+the Event when they forgot to add the const qualifier.
+
+- Fix bug with printing event keys that include ndarray's of const items.
+The bug affected the Python API to the psana event.
+
+- Check for ambiguous conversion of a const/non-const pair of ndarrays
+to one numpy array.
+
+- Make the Python interface to DAQ datatypes consistent with the C++
+interface - methods of DAQ datatypes that return numpy arrays now return
+read-only arrays. Users that were modifying the data in place now need
+to make a deep copy, ie: my_array = my_array.copy().
