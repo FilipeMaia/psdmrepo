@@ -80,6 +80,7 @@ public:
    *                       and "{instr}" strings which will be replaced with experiment
    *                       and instrument names.
    *  @param[in] aliasMap  Optional instance of the alias map.
+   *  @param[in] subproc   Subprocess number.
    */
   Env (const std::string& jobName,
       const boost::shared_ptr<IExpNameProvider>& expNameProvider,

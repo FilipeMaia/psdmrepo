@@ -11,6 +11,10 @@ Package author: Andy Salnikov
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-13-02
+2014-04-30 Mikhail Dubrovin
+- in Env.h - fix doxygen documentation
+	
 Tag: V00-13-01
 2014-02-27 Andy Salnikov
 - forgot to implement PSEnv::jobNameSub()
