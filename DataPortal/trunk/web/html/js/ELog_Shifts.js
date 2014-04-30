@@ -214,7 +214,7 @@ function ELog_Shifts (experiment, access_list) {
             exper_id: this.experiment.id
         } ;
         Fwk.web_service_POST (
-            '../logbook/ws/CreateShift.php' ,
+            '../logbook/ws/shift_create.php' ,
             params ,
             function (data) {
                 var update_mode = false ;

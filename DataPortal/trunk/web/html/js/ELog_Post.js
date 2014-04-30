@@ -97,7 +97,7 @@ function ELog_Post (experiment, access_list, post_onsuccess) {
 '  <div class="info" style="float:left; margin-left:5px; padding-top:5px;">(optional)</div>' +
 '  <div style="clear:both;"></div>' ;
         html +=
-'  <form id="form" enctype="multipart/form-data" action="../logbook/ws/NewFFEntry4portalJSON.php" method="post">' +
+'  <form id="form" enctype="multipart/form-data" action="../logbook/ws/message_new.php" method="post">' +
 '    <input type="hidden" name="id" value="'+this.experiment.id+'" />' +
 '    <input type="hidden" name="scope" value="" />' +
 '    <input type="hidden" name="run_num" value="" />' +

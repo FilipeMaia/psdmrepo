@@ -177,7 +177,7 @@ function ELog_Live (experiment, access_list) {
         if (this._wa.find('input[name="show_deleted"]').attr('checked')) params.inject_deleted_messages = 1 ;
 
         Fwk.web_service_GET (
-            '../logbook/ws/Search.php' ,
+            '../logbook/ws/message_search.php' ,
             params ,
             function (data) {
 
@@ -218,7 +218,7 @@ function ELog_Live (experiment, access_list) {
         if (this._wa.find('input[name="show_deleted"]').attr('checked')) params.inject_deleted_messages = 1 ;
 
         Fwk.web_service_GET (
-            '../logbook/ws/Search.php' ,
+            '../logbook/ws/message_search.php' ,
             params ,
             function (data) {
 
@@ -269,7 +269,7 @@ function ELog_Live (experiment, access_list) {
         if (this._wa.find('input[name="show_deleted"]').attr('checked')) params.inject_deleted_messages = 1 ;
 
         Fwk.web_service_GET (
-            '../logbook/ws/Search.php' ,
+            '../logbook/ws/message_search.php' ,
             params ,
             function (data) {
 

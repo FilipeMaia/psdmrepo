@@ -11,6 +11,12 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-07-00
+2014-04-30 Igor Gaponenko
+- code cleanup (removed the old version of the Portal)
+- refactoring due to migration of Web Services in LogBook
+- finished the new version of the Portal (ready to be deployed in production)
+
 Tag: V00-06-03
 2014-03-17 Igor Gaponenko
 - implemented the 'Runs' application within ELog

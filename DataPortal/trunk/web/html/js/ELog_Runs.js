@@ -435,20 +435,12 @@ function ELog_Runs_RunBody (parent, run) {
         this._messages().html('Loading...') ;
 
         var params = {
-            id:                   this.experiment.id ,
-            scope:                "experiment" ,
-            search_in_messages:   1 ,
-            search_in_tags:       1 ,
-            search_in_values:     1 ,
-            posted_at_experiment: 0 ,
-            posted_at_shifts:     0 ,
-            posted_at_runs:       1 ,
-            range_of_runs:        this.run.num ,
-            inject_runs:          '' ,
-            format:               "detailed"
+            exper_id: this.experiment.id ,
+            run:      this.run.num ,
+            inject_deleted_messages: ''
         } ;
         Fwk.web_service_GET (
-            '../logbook/ws/Search.php' ,
+            '../logbook/ws/message_search_run.php' ,
             params ,
             function (data) {
                 _that._viewer().load(data.ResultSet.Result) ;

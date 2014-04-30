@@ -61,7 +61,7 @@ HERE;
 <script type="text/javascript" src="/jquery/js/jquery.min.js"></script>
 <script type="text/javascript" src="/jquery/js/jquery-ui-1.9.1.custom.min.js"></script>
         
-<script type="text/javascript" src="../portal/js/Utilities.js"></script>
+<script type="text/javascript" src="../webfwk/js/Utilities.js"></script>
 <script type="text/javascript">
 
 /* ----------------------------------------------

@@ -138,7 +138,7 @@ function ELog_RunBody (parent, message) {
         var html =
 '<div style="color:maroon;">Compose message. Note the total limit of <b>25 MB</b> for attachments.</div>' +
 '<div style="float:left; margin-right:20px;">' +
-'  <form id="'+this.message.id+'" enctype="multipart/form-data" action="../logbook/ws/NewFFEntry4portalJSON.php" method="post">' +
+'  <form id="'+this.message.id+'" enctype="multipart/form-data" action="../logbook/ws/message_new.php" method="post">' +
 '    <input type="hidden" name="id" value="'+this.experiment.id+'" />' +
 '    <input type="hidden" name="scope" value="run" />' +
 '    <input type="hidden" name="message_id" value="" />' +
@@ -477,7 +477,7 @@ function ELog_MessageBody (parent, message) {
 '<div style="float:left; margin-right:20px; padding-top:5px;">' +
 '  <div style="color:maroon;">Compose message. Note the total limit of <b>25 MB</b> for attachments.</div>' +
 '  <div style="margin-top:20px; padding-left:10px;">' +
-'    <form id="'+this.message.id+'" enctype="multipart/form-data" action="../logbook/ws/NewFFEntry4portalJSON.php" method="post">' +
+'    <form id="'+this.message.id+'" enctype="multipart/form-data" action="../logbook/ws/message_new.php" method="post">' +
 '      <input type="hidden" name="id" value="'+this.experiment.id+'" />' +
 '      <input type="hidden" name="scope" value="message" />' +
 '      <input type="hidden" name="message_id" value="'+this.message.id+'" />' +
@@ -569,7 +569,7 @@ function ELog_MessageBody (parent, message) {
 '<div style="float:left; margin-right:20px; padding-top:5px;">' +
 '  <div style="color:maroon;">Edit message text. Note the total limit of <b>25 MB</b> for attachments.</div>' +
 '  <div style="margin-top:20px; padding-left:10px;" >' +
-'    <form id="'+this.message.id+'" enctype="multipart/form-data" action="../logbook/ws/UpdateFFEntry4portalJSON.php" method="post">' +
+'    <form id="'+this.message.id+'" enctype="multipart/form-data" action="../logbook/ws/message_update.php" method="post">' +
 '      <input type="hidden" name="id" value="'+this.message.id+'" />' +
 '      <input type="hidden" name="content_type" value="TEXT" />'+
 '      <input type="hidden" name="MAX_FILE_SIZE" value="25000000" />' +
@@ -615,7 +615,7 @@ function ELog_MessageBody (parent, message) {
         //
         this.form_cont.ajaxSubmit ({
             success: function (data) {
-                if (data.Status !== 'success') {
+                if (data.status !== 'success') {
                     Fwk.report_error(data.Message) ;
                     this.dialogs_cont.children('.button-cont-left').children('.control-button').button('enable') ;
                     return ;
@@ -646,7 +646,7 @@ function ELog_MessageBody (parent, message) {
 '<div style="float:left; margin-right:20px; padding-top:5px;">' +
 '  <div style="color:maroon;">Select additional tags or add the new ones.</div>' +
 '  <div style="margin-top:20px; padding-left:10px;" >' +
-'    <form id="'+this.message.id+'" enctype="multipart/form-data" action="../logbook/ws/ExtendFFEntry4portalJSON.php" method="post">' +
+'    <form id="'+this.message.id+'" enctype="multipart/form-data" action="../logbook/ws/message_extend.php" method="post">' +
 '      <input type="hidden" name="message_id" value="'+this.message.id+'" />' +
 '      <input type="hidden" name="MAX_FILE_SIZE" value="25000000" />' +
 '      <input type="hidden" name="num_tags" value="'+ELog_Utils.max_num_tags+'" />' +
@@ -694,7 +694,7 @@ function ELog_MessageBody (parent, message) {
         //
         this.form_cont.ajaxSubmit ({
             success: function (data) {
-                if (data.Status !== 'success') {
+                if (data.status !== 'success') {
                     Fwk.report_error(data.Message) ;
                     this.dialogs_cont.children('.button-cont-left').children('.control-button').button('enable') ;
                     return ;
@@ -728,7 +728,7 @@ function ELog_MessageBody (parent, message) {
 '<div style="float:left; margin-right:20px; padding-top:5px;">' +
 '  <div style="color:maroon;">Select attachments to upload. Note the total limit of <b>25 MB</b>.</div>' +
 '  <div style="margin-top:20px; padding-left:10px;" >' +
-'    <form id="'+this.message.id+'" enctype="multipart/form-data" action="../logbook/ws/ExtendFFEntry4portalJSON.php" method="post">' +
+'    <form id="'+this.message.id+'" enctype="multipart/form-data" action="../logbook/ws/message_extend.php" method="post">' +
 '      <input type="hidden" name="message_id" value="'+this.message.id+'" />' +
 '      <input type="hidden" name="MAX_FILE_SIZE" value="25000000" />' +
 '      <input type="hidden" name="num_tags" value="0" />' +
@@ -829,7 +829,7 @@ function ELog_MessageBody (parent, message) {
     } ;
     this.edit_run_submit = function (params) {
         Fwk.web_service_GET (
-            '../logbook/ws/MoveFFEntry4portalJSON.php' ,
+            '../logbook/ws/message_move.php' ,
             params ,
             function (data) {
 
@@ -850,23 +850,25 @@ function ELog_MessageBody (parent, message) {
     this.delete_message = function (operation) {
         switch (operation) {
             case 'undelete':
-                this.delete_message_submit(operation, '../logbook/ws/UndeleteFFEntry4portalJSON.php') ;
+                this.delete_message_submit(operation) ;
                 break ;
             case 'delete':
                 Fwk.ask_yes_no (
                     'Information Deletion Warning' ,
                     '<span style="color:red;">You have requested to delete the selected message. Are you sure?</span>' ,
                     function () {
-                        that.delete_message_submit(operation, '../logbook/ws/DeleteFFEntry4portalJSON.php') ;
+                        that.delete_message_submit(operation) ;
                     }
                 ) ;
                 break ;
         }
     } ;
-    this.delete_message_submit = function (operation, url) {
+    this.delete_message_submit = function (operation) {
         Fwk.web_service_GET (
-            url ,
-            {id: this.message.id} ,
+            '../logbook/ws/message_delete.php' ,
+            {   id:        this.message.id ,
+                operation: operation
+            } ,
             function (data) {
                 switch (operation) {
                     case 'undelete': that.parent.undelete_row(that) ; break ;
@@ -1112,7 +1114,7 @@ function ELog_MessageViewerBase (parent, options) {
         } else {
             row.title.subj = m.deleted ? '<span class="m-subj-deleted">'+m.subject+'</span>'+' <span class="m-subj-notes">deleted by <b>'+m.deleted_by+'</b> [ '+m.deleted_time+' ]</span>': m.subject ;
             row.title.id = '<div class="m-id">'+m.id+'</div>' ;
-            if (m.attachments_num) row.title.attach = '<img src="../logbook/images/attachment.png" height="18">' ;
+            if (m.attachments_num) row.title.attach = '<img src="../portal/img/attachment.png" height="18">' ;
             if (m.children_num) row.title.child = '<sup><b>&crarr;</b></sup>' ;
             if (m.tags_num) row.title.tag = '<sup><b>T</b></sup>' ;
             row.body = new ELog_MessageBody(this, m) ;

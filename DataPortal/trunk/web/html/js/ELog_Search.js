@@ -82,7 +82,6 @@ function ELog_Search (experiment, access_list) {
     this._byrunrange = null ;
     this._byrun      = null ;
     this._bymessage  = null ;
-    this._byimage    = null ;
 
     this._info    = null ;
     this._updated = null ;
@@ -113,7 +112,6 @@ function ELog_Search (experiment, access_list) {
 '      <li><a href="#byrunrange">Range of Runs</a></li>' +
 '      <li><a href="#byrun">By Run #</a></li>' +
 '      <li><a href="#bymessage">By Message ID</a></li>' +
-'      <li><a href="#byimage" title="search for entries by looking at thumbnails of atatchments">By Image</a></li>' +
 '    </ul>' +
 
 '    <div id="simple">' +
@@ -235,20 +233,6 @@ function ELog_Search (experiment, access_list) {
 '      </div>' +
 '    </div>' +
 
-'    <div id="byimage">' +
-'      <div class="search-dialog">' +
-'        <div class="group" >' +
-'          <span class="label">Include:</span>' +
-'          <div><input class="update-trigger" type="checkbox" name="show_in_vicinity" /> surrounding messages</div>' +
-'        </div>' +
-'        <div class="buttons" style="float:left;" >' +
-'          <button class="control-button" name="byimage:search" title="search and display results">Search</button>' +
-'          <button class="control-button" name="byimage:reset"  title="reset the form">Reset</button>' +
-'        </div>' +
-'        <div style="clear:both;"></div>' +
-'      </div>' +
-'    </div>' +
-
 '  </div>' +
 '</div>' +
 
@@ -269,7 +253,6 @@ function ELog_Search (experiment, access_list) {
         this._byrunrange = this._tabs.children('div#byrunrange') ;
         this._byrun      = this._tabs.children('div#byrun') ;
         this._bymessage  = this._tabs.children('div#bymessage') ;
-        this._byimage    = this._tabs.children('div#byimage') ;
 
         this._tabs.find('button.control-button').button().click(function () {
             var s2 = this.name.split(':') ;
@@ -281,7 +264,6 @@ function ELog_Search (experiment, access_list) {
                 case 'byrunrange' : if (op === 'search') _that._search_byrunrange() ; else _that._search_byrunrange_reset() ; break ;
                 case 'byrun'      : if (op === 'search') _that._search_byrun() ;      else _that._search_byrun_reset() ;      break ;
                 case 'bymessage'  : if (op === 'search') _that._search_bymessage() ;  else _that._search_bymessage_reset() ;  break ;
-                case 'byimage'    : if (op === 'search') _that._search_byimage() ;    else _that._search_byimage_reset() ;  break ;
             }
         }) ;
         this._simple    .find('.update-trigger').change(function () { _that._search_simple() ;     }) ;
@@ -289,7 +271,6 @@ function ELog_Search (experiment, access_list) {
         this._byrunrange.find('.update-trigger').change(function () { _that._search_byrunrange() ; }) ;
         this._byrun     .find('.update-trigger').change(function () { _that._search_byrun() ;      }) ;
         this._bymessage .find('.update-trigger').change(function () { _that._search_bymessage() ;  }) ;
-        this._byimage   .find('.update-trigger').change(function () { _that._search_byimage() ;    }) ;
 
         var body = this._wa.children('div#body') ;
 
@@ -403,7 +384,7 @@ function ELog_Search (experiment, access_list) {
                 show_in_vicinity : show_in_vicinity
             } ;
             Fwk.web_service_GET (
-                '../logbook/ws/SearchOne.php' ,
+                '../logbook/ws/message_search_one.php' ,
                 params ,
                 function (data) {
                     _that._viewer.load(data.ResultSet.Result) ;
@@ -439,7 +420,7 @@ function ELog_Search (experiment, access_list) {
                 show_in_vicinity : show_in_vicinity
             } ;
             Fwk.web_service_GET (
-                '../logbook/ws/SearchOne.php' ,
+                '../logbook/ws/message_search_one.php' ,
                 params ,
                 function (data) {
                     _that._viewer.load(data.ResultSet.Result) ;
@@ -458,17 +439,6 @@ function ELog_Search (experiment, access_list) {
         this._bymessage.find('input[name="message2search"]').val('') ;
         this._bymessage.find('input[name="show_in_vicinity"]').removeAttr('checked') ;
     } ;
-
-
-    this._search_byimage = function () {
-        this._init() ;
-        console.log('ELog_Search._search_byimage(): not implemented') ;
-    } ;
-    this._search_byimage_reset = function () {
-        this._init() ;
-        this._byimage.find('input[name="show_in_vicinity"]').removeAttr('checked') ;
-    } ;
-
 
     this._default_params = {
         id:                   this.experiment.id ,
@@ -498,7 +468,7 @@ function ELog_Search (experiment, access_list) {
         this._updated.html('Loading messages...') ;
 
         Fwk.web_service_GET (
-            '../logbook/ws/Search.php' ,
+            '../logbook/ws/message_search.php' ,
             params ,
             function (data) {
                 _that._viewer.load(data.ResultSet.Result) ;

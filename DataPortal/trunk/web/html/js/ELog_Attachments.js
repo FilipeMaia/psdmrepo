@@ -140,6 +140,31 @@ function ELog_Attachments (experiment, access_list) {
         this.attachments_last_request.sort(sort_function) ;
     } ;
 
+    function _a2link_url (a) {
+        var title = 'show the message in the e-Log Search panel within the current Portal' ;
+        var url =
+'<a href="javascript:global_elog_search_message_by_id('+a.e_id+',true);" title="'+title+'" class="lb_link"><img src="../portal/img/link2message_32by32.png" /></a>' ;
+        return url ;
+    }
+
+    function _a2url (a) {
+        var title = 'show the message in the e-Log Search panel within the current Portal' ;
+        var url =
+'<a href="../logbook/attachments/'+a.a_id+'/'+a.a_name+'" target="_blank" title="'+title+'" class="lb_link">'+a.a_name+'</a>' ;
+        return url ;
+    }
+
+    function _r2url (r, style) {
+        var title = 'show the run in the e-Log Search panel within the current Portal' ;
+        var img = style === 1 ?
+            '../portal/img/link2run_32x32.png' :
+            '../portal/img/link2run_f0f0f0_32x32.png' ;
+        var url =
+'<a href="javascript:global_elog_search_run_by_num('+r.r_num+',true);" title="'+title+'" class="lb_link"><img src="'+img+'" /></a>' ;
+        return url ;
+    }
+
+
     this.display_attachments_as_table = function () {
         var html =
 '<table><tbody>' +
@@ -158,10 +183,10 @@ function ELog_Attachments (experiment, access_list) {
             if (a.type !== 'a') continue ;
             html +=
 '  <tr>' +
-'    <td class="table_cell '+extra_class+' table_cell_left"><div style="float:left;">'+a.e_link_url+'</div><div style="float:left; padding-left:8px; padding-top:8px;">'+a.e_id+'</div><div style="clear:both;"></div></td>' +
+'    <td class="table_cell '+extra_class+' table_cell_left"><div style="float:left;">'+_a2link_url(a)+'</div><div style="float:left; padding-left:8px; padding-top:8px;">'+a.e_id+'</div><div style="clear:both;"></div></td>' +
 '    <td class="table_cell '+extra_class+'">'+a.e_time  +'</td>' +
 '    <td class="table_cell '+extra_class+'" align="right" >'+a.e_author+'</td>' +
-'    <td class="table_cell '+extra_class+'" align="right" >'+a.a_url+'</td>' +
+'    <td class="table_cell '+extra_class+'" align="right" >'+_a2url(a)+'</td>' +
 '    <td class="table_cell '+extra_class+'" align="right" >'+a.a_type+'</td>' +
 '    <td class="table_cell '+extra_class+' table_cell_right" align="right" >'+a.a_size+'</td>' +
 '  </tr>' ;
@@ -194,17 +219,17 @@ function ELog_Attachments (experiment, access_list) {
 '  <tr>' +
 '    <td class="table_cell '+extra_class+' table_cell_left">'+'</td>' +
 '    <td class="table_cell '+extra_class+' ">'+'</td>' +
-'    <td class="table_cell '+extra_class+' "><div style="float:left;">'+a.e_link_url+'</div><div style="float:left; padding-left:8px; padding-top:8px;">'+a.e_id+'</div><div style="clear:both;"></div></td>' +
+'    <td class="table_cell '+extra_class+' "><div style="float:left;">'+_a2link_url(a)+'</div><div style="float:left; padding-left:8px; padding-top:8px;">'+a.e_id+'</div><div style="clear:both;"></div></td>' +
 '    <td class="table_cell '+extra_class+' ">'+a.e_time+'</td>' +
 '    <td class="table_cell '+extra_class+' " align="right" >'+a.e_author+'</td>' +
-'    <td class="table_cell '+extra_class+' " align="right" >'+a.a_url+'</td>' +
+'    <td class="table_cell '+extra_class+' " align="right" >'+_a2url(a)+'</td>' +
 '    <td class="table_cell '+extra_class+' " align="right" >'+a.a_type+'</td>' +
 '    <td class="table_cell '+extra_class+' table_cell_right" align="right" >'+a.a_size+'</td>' +
 '  </tr>' ;
             } else {
                 html +=
 '  <tr>' +
-'    <td class="table_cell '+extra_class+' table_cell_left" '+run_specific_style+'><div style="float:left;">'+a.r_url+'</div><div style="float:left; padding-left:8px; padding-top:8px;">'+a.r_num+'</div><div style="clear:both;"></div></td>' +
+'    <td class="table_cell '+extra_class+' table_cell_left" '+run_specific_style+'><div style="float:left;">'+_r2url(a)+'</div><div style="float:left; padding-left:8px; padding-top:8px;">'+a.r_num+'</div><div style="clear:both;"></div></td>' +
 '    <td class="table_cell '+extra_class+'" '+run_specific_style+'>'+a.r_begin+'</td>' +
 '    <td class="table_cell '+extra_class+'" '+run_specific_style+'>'+'</td>' +
 '    <td class="table_cell '+extra_class+'" '+run_specific_style+'>'+'</td>' +
@@ -234,7 +259,7 @@ function ELog_Attachments (experiment, access_list) {
                 'author: '+a.e_author ;
             html +=
 '<div style="float:left; margin-left:10px;">' +
-'  <div style="float:left; margin-left:10px;">'+a.e_link_url+'</div>' +
+'  <div style="float:left; margin-left:10px;">'+_a2link_url(a)+'</div>' +
 '  <div style="float:left;" title="'+title+'"><a href="../logbook/attachments/'+a.a_id+'/'+a.a_name+'" target="_blank"><img style="height:160px; padding:8px;" src="../logbook/attachments/preview/'+a.a_id+'" /></a></div>' +
 '  <div style="clear:both;"></div>' +
 '</div>' ;
@@ -256,7 +281,7 @@ function ELog_Attachments (experiment, access_list) {
                     'author: '+a.e_author ;
                 html +=
 '<div style="float:left; border-top:solid 1px #d0d0d0;">' +
-'  <div style="float:left; margin-left:10px; margin-top:10px;">'+a.e_link_url+'</div>' +
+'  <div style="float:left; margin-left:10px; margin-top:10px;">'+_a2link_url(a)+'</div>' +
 '  <div style="float:left;" title="'+title+'"><a href="../logbook/attachments/'+a.a_id+'/'+a.a_name+'" target="_blank"><img style="height:160px; padding:8px;" src="../logbook/attachments/preview/'+a.a_id+'" /></a></div>' +
 '  <div style="clear:both;"></div>' +
 '</div>' ;
@@ -266,7 +291,7 @@ function ELog_Attachments (experiment, access_list) {
                     'begin: '+a.r_begin+'\n' +
                     'end: '  +a.r_end ;
                 html +=
-'<div style="float:left; height:160px; padding:8px; border-left:solid 1px #d0d0d0; border-top:solid 1px #d0d0d0; font-weight:bold;" title="'+title+'"><div style="padding-top:3px;">'+a.r_url_1+'</div><div style="padding-top:40px; font-size:20px; font-weight:bold;">'+a.r_num+'</div></div>' ;
+'<div style="float:left; height:160px; padding:8px; border-left:solid 1px #d0d0d0; border-top:solid 1px #d0d0d0; font-weight:bold;" title="'+title+'"><div style="padding-top:3px;">'+_r2url(a, 1)+'</div><div style="padding-top:40px; font-size:20px; font-weight:bold;">'+a.r_num+'</div></div>' ;
             }
         }
         return html ;
@@ -295,7 +320,7 @@ function ELog_Attachments (experiment, access_list) {
 '<table><tbody>' +
 '  <tr>' +
 '    <td class="table_cell table_cell_bottom table_cell_left" align="right" >Host Message</td>' +
-'    <td class="table_cell table_cell_bottom table_cell_right"><div style="float:left;">'+a.e_link_url+'</div><div style="float:left; padding-left:8px; padding-top:8px;">'+a.e_id+'</div><div style="clear:both;"></div></td>' +
+'    <td class="table_cell table_cell_bottom table_cell_right"><div style="float:left;">'+_a2link_url(a)+'</div><div style="float:left; padding-left:8px; padding-top:8px;">'+a.e_id+'</div><div style="clear:both;"></div></td>' +
 '  </tr>' +
 '  <tr>' +
 '    <td class="table_cell table_cell_bottom table_cell_left" align="right" >Posted</td>' +
@@ -307,7 +332,7 @@ function ELog_Attachments (experiment, access_list) {
 '  </tr>' +
 '  <tr>' +
 '    <td class="table_cell table_cell_bottom table_cell_left" align="right" >Attachment Name</td>' +
-'    <td class="table_cell table_cell_bottom table_cell_right">'+a.a_url+'</td>' +
+'    <td class="table_cell table_cell_bottom table_cell_right">'+_a2url(a)+'</td>' +
 '  </tr>' +
 '  <tr>' +
 '    <td class="table_cell table_cell_bottom table_cell_left" align="right" >Type</td>' +
@@ -355,7 +380,7 @@ function ELog_Attachments (experiment, access_list) {
 '<table><tbody>' +
 '  <tr>' +
 '    <td class="table_cell table_cell_bottom table_cell_left" align="right" >Message ID</td>' +
-'    <td class="table_cell table_cell_bottom table_cell_right"><div style="float:left;">'+a.e_link_url+'</div><div style="float:left; padding-left:8px; padding-top:8px;">'+a.e_id+'</div><div style="clear:both;"></div></td>' +
+'    <td class="table_cell table_cell_bottom table_cell_right"><div style="float:left;">'+_a2link_url(a)+'</div><div style="float:left; padding-left:8px; padding-top:8px;">'+a.e_id+'</div><div style="clear:both;"></div></td>' +
 '  </tr>' +
 '  <tr>' +
 '    <td class="table_cell table_cell_bottom table_cell_left" align="right" >Posted</td>' +
@@ -367,7 +392,7 @@ function ELog_Attachments (experiment, access_list) {
 '  </tr>' +
 '  <tr>' +
 '    <td class="table_cell table_cell_bottom table_cell_left" align="right" >Attachment Name</td>' +
-'    <td class="table_cell table_cell_bottom table_cell_right" >'+a.a_url+'</td>' +
+'    <td class="table_cell table_cell_bottom table_cell_right" >'+_a2url(a)+'</td>' +
 '  </tr>' +
 '  <tr>' +
 '    <td class="table_cell table_cell_bottom table_cell_left" align="right" >Type</td>' +
@@ -388,7 +413,7 @@ function ELog_Attachments (experiment, access_list) {
             } else {
                 html +=
 '  <tr>' +
-'    <td class="table_cell '+extra_class+' table_cell_left" '+run_specific_style+'><div style="float:left;">'+a.r_url+'</div><div style="float:left; padding-left:8px; padding-top:8px;">'+a.r_num+'</div><div style="clear:both;"></div></td>' +
+'    <td class="table_cell '+extra_class+' table_cell_left" '+run_specific_style+'><div style="float:left;">'+_r2url(a)+'</div><div style="float:left; padding-left:8px; padding-top:8px;">'+a.r_num+'</div><div style="clear:both;"></div></td>' +
 '    <td class="table_cell '+extra_class+'" '                 +run_specific_style+'>'+a.r_begin+'</td>' +
 '    <td class="table_cell '+extra_class+'" '                 +run_specific_style+'>'          +'</td>' +
 '    <td class="table_cell '+extra_class+' table_cell_right" '+run_specific_style+'>'          +'</td>' +

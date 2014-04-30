@@ -12,7 +12,8 @@ class ServiceJSON {
     public static function run_handler ($method, $body, $options=array()) {
         try {
             $svc = new ServiceJSON ($method, $options) ;
-            $body($svc) ;
+            $svc->finish($body($svc)) ;     // in case if users won't call $SVC->finish()
+                                            // or chose to return result using 'return'.
         } catch( \Exception $e ) {
             ServiceJSON::report_error (
                 $e.'<pre>'.print_r($e->getTrace(), true).'</pre>' ,
@@ -199,13 +200,26 @@ class ServiceJSON {
         throw new DataPortalException (
             __CLASS__.'::'.__METHOD__, "invalid value of parameter '{$name}'") ;
     }
-
     public function optional_time ($name, $default) {
         $result = $this->parse ($name, false, true, true) ;
         if (!$result[0] || ($result[1] == '')) return $default ;
         require_once 'lusitime/lusitime.inc.php' ;
         $time = \LusiTime\LusiTime::parse ($result[1]) ;
         if (!is_null($time)) return $time ;
+        throw new DataPortalException (
+            __CLASS__.'::'.__METHOD__, "invalid value of parameter '{$name}'") ;
+    }
+
+    public function required_enum ($name, $allowed_values) {
+        $str = $this->required_str($name) ;
+        if (in_array($str, $allowed_values)) return $str ;
+        throw new DataPortalException (
+            __CLASS__.'::'.__METHOD__, "invalid value of parameter '{$name}'") ;
+    }
+    public function optional_enum ($name, $allowed_values, $default) {
+        $str = $this->optional_str($name, null) ;
+        if (is_null($str)) return $default ;
+        if (in_array($str, $allowed_values)) return $str ;
         throw new DataPortalException (
             __CLASS__.'::'.__METHOD__, "invalid value of parameter '{$name}'") ;
     }
@@ -217,13 +231,13 @@ class ServiceJSON {
         if ($num_files != 1) $this->abort('too many file attachments instdead of one') ;
         return $files[0] ;
     }
-
     public function optional_files () {
-        if ($this->method != 'POST')
-            $this->abort("can't process file uploading with method {$this->method} (POST is required)") ;
+
+        $this->assert ($this->method == 'POST' ,
+                       "can't process file uploading with method {$this->method} (POST is required)") ;
 
         $files = array () ;
-        foreach ( array_keys($_FILES) as $file_key) {
+        foreach (array_keys($_FILES) as $file_key) {
 
             $name  = $_FILES[$file_key]['name'] ;
             $error = $_FILES[$file_key]['error'] ;
@@ -262,6 +276,43 @@ class ServiceJSON {
             }
         }
         return $files ;
+    }
+
+    public function optional_tags () {
+
+        $this->assert ($this->method == 'POST' ,
+                       "can't process tags uploading with method {$this->method} (POST is required)") ;
+
+        $tags = array();
+        if (isset($_POST['num_tags'])) {
+            
+            $num_tags = 0 ;
+            $this->assert (sscanf(trim($_POST['num_tags']), "%d", $num_tags) == 1 ,
+                           'not a number where a number of tags was expected') ;
+
+            for ($i = 0; $i < $num_tags; $i++) {
+                $tag_name_key  = 'tag_name_'.$i ;
+                if (isset($_POST[$tag_name_key])) {
+
+                    $tag = trim($_POST[$tag_name_key]) ;
+                    if ($tag) {
+
+                        $tag_value_key = 'tag_value_'.$i ;
+                        $this->assert (isset($_POST[$tag_value_key]) ,
+                                       "No valid value for tag {$tag_name_key}") ;
+
+                        $value = trim($_POST[$tag_value_key]) ;
+
+                        array_push (
+                            $tags ,
+                            array (
+                                'tag'   => $tag ,
+                                'value' => $value)) ;
+                    }
+                }
+            }
+        }
+        return $tags ;
     }
 
     // ------------------------
@@ -356,6 +407,19 @@ class ServiceJSON {
         return $this->shiftmgr ;
     }
 
+    // -----------------------
+    //  Convenience functions
+    // -----------------------
+
+    public function safe_assign ($in, $msg, $parameters=array()) {
+        if (!$in) $this->abort($msg ? $msg : 'Web service failed', $parameters) ;
+        return $in ;
+    }
+
+    public function assert ($condition, $msg, $parameters=array()) {
+        if (!$condition) $this->abort($msg ? $msg : 'Web service failed', $parameters) ;
+    }
+
     // -------------
     //  Finalizers
     // -------------
@@ -363,7 +427,8 @@ class ServiceJSON {
     public function abort ($message, $parameters=array()) {
         ServiceJSON::report_error ($message, $parameters, $this->options) ;
     }
-    public function finish ($parameters=array()) {
+    public function finish ($parameters) {
+        if (!$parameters) $parameters = array() ;
         if (!is_null($this->authdb     )) $this->authdb    ->commit() ;
         if (!is_null($this->regdb      )) $this->regdb     ->commit() ;
         if (!is_null($this->logbook    )) $this->logbook   ->commit() ;

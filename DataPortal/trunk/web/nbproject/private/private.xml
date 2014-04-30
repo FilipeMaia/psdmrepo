@@ -6,12 +6,6 @@
             <file>file://AFS/slac.stanford.edu/u/ec/gapon/lcls/releases/pswww-apps-dev/DataPortal/web/html/js/ExpSwitch_Station.js</file>
             <file>file://AFS/slac.stanford.edu/u/ec/gapon/lcls/releases/pswww-apps-dev/DataPortal/web/html/css/ExpSwitch_Station.css</file>
         </group>
-        <group name="PCDS Web Apps">
-            <file>file:/F:/lcls/releases/pswww-apps-dev/DataPortal/web/html/ws/expswitch_next.php</file>
-            <file>file:/F:/lcls/releases/pswww-apps-dev/DataPortal/web/lib/dataportal/switchutils.class.php</file>
-            <file>file:/F:/lcls/releases/pswww-apps-dev/DataPortal/web/html/experiment_switch_new.php</file>
-            <file>file:/F:/lcls/releases/pswww-apps-dev/DataPortal/web/html/js/ExpSwitch_Station.js</file>
-            <file>file:/F:/lcls/releases/pswww-apps-dev/DataPortal/web/html/css/ExpSwitch_Station.css</file>
-        </group>
+        <group name="PCDS Web Apps"/>
     </open-files>
 </project-private>

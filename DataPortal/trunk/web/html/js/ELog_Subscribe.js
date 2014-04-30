@@ -115,7 +115,7 @@ function ELog_Subscribe (experiment, access_list) {
         var params = {exper_id: this.experiment.id, operation: operation} ;
         if (id) params.id = id ;
         Fwk.web_service_GET (
-            '../logbook/ws/CheckSubscription.php' ,
+            '../logbook/ws/subscribe_check.php' ,
             params ,
             function (data) {
                 that.wa.find('#subscribed'  ).css('display', data.Subscribed ? 'block' : 'none' ) ;
