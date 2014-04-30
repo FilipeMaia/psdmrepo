@@ -59,7 +59,7 @@ namespace psana_examples {
                     dropped=0 unititialized=0 OutOfOrder=0 OutOfSynch=0 UserDefined=1 IncompleteContribution=0 ContainsIncomplete=0 userBits=0x0
  -------- src damage with dropped contribs --------- 
    0x00000002  ProcInfo(ac.15.15.2b, pid=6ccb)
-[@endverbatim
+@endverbatim
  * Notice the counter which gives the event number within the calib cycle, as well as the
  * total number of events the module has seen.  
  * 
