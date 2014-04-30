@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-02-00
+2014-04-30 Igor Gaponenko
+- moved javascript libraries to package webfwk/
+
 Tag: V00-01-06
 2013-08-08 Igor Gaponenko
 - changed implementation of html/AuthInstrGroups.php to allow LDAP management
