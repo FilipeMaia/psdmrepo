@@ -44,7 +44,7 @@ try {
 <link type="text/css" href="css/fwk.css" rel="Stylesheet" />
 <link type="text/css" href="css/irep.css" rel="Stylesheet" />
 
-<link type="text/css" href="../portal/css/Table.css" rel="Stylesheet" />
+<link type="text/css" href="../webfwk/css/Table.css" rel="Stylesheet" />
 
 <script type="text/javascript" src="/jquery/js/jquery-1.8.2.js"></script>
 <script type="text/javascript" src="/jquery/js/jquery-ui-1.9.1.custom.min.js"></script>
@@ -62,8 +62,8 @@ try {
 <script type="text/javascript" src="js/dictionary.js"></script>
 <script type="text/javascript" src="js/admin.js"></script>
 
-<script type="text/javascript" src="../portal/js/config.js"></script>
-<script type="text/javascript" src="../portal/js/Table.js"></script>
+<script type="text/javascript" src="../webfwk/js/config.js"></script>
+<script type="text/javascript" src="../webfwk/js/Table.js"></script>
 
 <!-- Window layout styles and support actions -->
 
@@ -391,7 +391,7 @@ function global_search_equipment_by_status2      (id) { global_switch_context('e
 
 function global_export_equipment(search_params,outformat) {
     search_params.format = outformat ;
-    var html = '<img src="../logbook/images/ajaxloader.gif" />' ;
+    var html = '<img src="../webfwk/img/loading.gif" />' ;
     var dialog = report_action('Generating Document: '+outformat,html) ;
     var jqXHR = $.get(
         '../irep/ws/equipment_inventory_search.php', search_params,

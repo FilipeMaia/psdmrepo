@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-02
+2014-04-30 Igor Gaponenko
+- minor refactoring to depend on webfwk/
+
 Tag: V00-01-01
 2014-03-17 Igor Gaponenko
 - Add an option for displaying model descriptions for each piece of equipment
