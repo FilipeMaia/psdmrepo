@@ -46,7 +46,7 @@ try {
 <link type="text/css" href="css/common.css" rel="Stylesheet" />
 <link type="text/css" href="css/neocaptar.css" rel="Stylesheet" />
 
-<link type="text/css" href="../portal/css/Table.css" rel="Stylesheet" />
+<link type="text/css" href="../webfwk/css/Table.css" rel="Stylesheet" />
 
 <script type="text/javascript" src="/jquery/js/jquery.min.js"></script>
 <script type="text/javascript" src="/jquery/js/jquery-ui.custom.min.js"></script>
@@ -54,14 +54,14 @@ try {
 <script type="text/javascript" src="/jquery/js/jquery.printElement.js"></script>
 <script type="text/javascript" src="/jquery/js/jquery.json.js"></script>
 
-<script type="text/javascript" src="js/Utilities.js"></script>
 <script type="text/javascript" src="js/projects.js"></script>
 <script type="text/javascript" src="js/dictionary.js"></script>
 <script type="text/javascript" src="js/search.js"></script>
 <script type="text/javascript" src="js/admin.js"></script>
 
-<script type="text/javascript" src="../portal/js/config.js"></script>
-<script type="text/javascript" src="../portal/js/Table.js"></script>
+<script type="text/javascript" src="../webfwk/js/config.js"></script>
+<script type="text/javascript" src="../webfwk/js/Table.js"></script>
+<script type="text/javascript" src="../webfwk/js/Utilities.js"></script>
 
 
 <!-- Window layout styles and support actions -->
@@ -853,7 +853,7 @@ function global_search_cables_by_dict_device_component_id(id)   { global_switch_
 
 function global_export_cables(search_params,outformat) {
     search_params.format = outformat;
-    var html = '<img src="../logbook/images/ajaxloader.gif" />';
+    var html = '<img src="../webfwk/img/loading.gif" />';
     var dialog = report_action('Generating Document: '+outformat,html);
     var jqXHR = $.get(
         '../neocaptar/ws/cable_search.php', search_params,
