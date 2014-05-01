@@ -216,7 +216,7 @@
     uint8_t _dummyG:1 -> dummyG;
     uint8_t _dummyGA:1 -> dummyGA;
     uint16_t _dummyUpper12bits:12 -> dummyUpper12bits;
-    uint32_t _z:28;
+    uint32_t _z:16;
   }
   uint32_t _reg3 {
     uint16_t _pulser:10 -> pulser;
@@ -226,7 +226,7 @@
     uint8_t _sabTest:1 -> sabTest;
     uint8_t _hrTest:1 -> hrTest;
     uint8_t _PulserR:1 -> pulserR;
-    uint32_t _z:17;
+    uint32_t _z:16;
   }
   uint32_t _reg4 {
     uint8_t _digMon1:4 -> digMon1;
@@ -286,7 +286,7 @@
     uint8_t _TC:2 -> TC;
     uint8_t _S2d:3 -> S2d;
     uint8_t _S2dDacBias:3 -> S2dDacBias;
-    uint32_t _z:25;
+    uint32_t _z:24;
   }
   uint32_t _reg14 {
     uint8_t _TpsTcDac:2 -> TpsTcDac;
@@ -367,7 +367,7 @@
     uint8_t _testPatternEnable:1 -> testPatternEnable;
     uint8_t _SyncMode:2 -> SyncMode;  // new
     uint8_t _R0Mode:1 -> R0Mode;  // new
-    uint8_t _z1:23;
+    uint8_t _z1:20;
   }
   uint32_t _DoutPipelineDelay -> DoutPipelineDelay;  // new
   uint32_t _acqToAsicR0Delay -> acqToAsicR0Delay;
