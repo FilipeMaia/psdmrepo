@@ -11,6 +11,10 @@ Package author: Igor Gaponenko
 Please describe any modifications that you made to the package in the
 reverse time order.
 
+Tag: V00-01-07
+2014-04-30 Igor Gaponenko
+- minor cleanup and refactoring of the package
+
 Tag: V00-01-06
 2013-10-11 Igor Gaponenko
 - got rid of foreign keys in the file system analytics tables in an attempt to

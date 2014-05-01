@@ -29,15 +29,15 @@ try {
 
 <link type="text/css" href="/jquery/css/custom-theme/jquery-ui.custom.css" rel="Stylesheet" />
 
-<link type="text/css" href="../portal/css/Table.css" rel="Stylesheet" />
+<link type="text/css" href="../webfwk/css/Table.css" rel="Stylesheet" />
 
 <script type="text/javascript" src="/jquery/js/jquery.min.js"></script>
 <script type="text/javascript" src="/jquery/js/jquery-ui.custom.min.js"></script>
 <script type="text/javascript" src="/jquery/js/jquery.form.js"></script> 
 <script type="text/javascript" src="/jquery/js/jquery.json.js"></script>
 
-<script type="text/javascript" src="../portal/js/config.js"></script>
-<script type="text/javascript" src="../portal/js/Table.js"></script>
+<script type="text/javascript" src="../webfwk/js/config.js"></script>
+<script type="text/javascript" src="../webfwk/js/Table.js"></script>
 
 <style type="text/css">
 
