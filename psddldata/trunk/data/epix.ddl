@@ -171,8 +171,11 @@
   uint32_t _lastRowExclusions -> lastRowExclusions;
   uint32_t _numberOfAsicsPerRow -> numberOfAsicsPerRow;
   uint32_t _numberOfAsicsPerColumn -> numberOfAsicsPerColumn;
+  // generally 2 x 2
   uint32_t _numberOfRowsPerAsic -> numberOfRowsPerAsic;
+  // for epix100  352
   uint32_t _numberOfPixelsPerAsicRow -> numberOfPixelsPerAsicRow;
+  // for epix100 96*4
   uint32_t _baseClockFrequency -> baseClockFrequency;
   uint32_t _asicMask -> asicMask;
   AsicConfigV1 _asics[@self.numberOfAsicsPerRow()*@self.numberOfAsicsPerColumn()] -> asics;
@@ -393,7 +396,9 @@
   uint32_t _numberOfAsicsPerRow -> numberOfAsicsPerRow;
   uint32_t _numberOfAsicsPerColumn -> numberOfAsicsPerColumn;
   uint32_t _numberOfRowsPerAsic -> numberOfRowsPerAsic;
+  // for epix10k  176
   uint32_t _numberOfPixelsPerAsicRow -> numberOfPixelsPerAsicRow;
+  // for epix10k 48*4
   uint32_t _baseClockFrequency -> baseClockFrequency;
   uint32_t _asicMask -> asicMask;
   uint32_t _Scope {
