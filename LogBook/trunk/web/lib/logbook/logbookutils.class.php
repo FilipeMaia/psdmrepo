@@ -52,13 +52,13 @@ class LogBookUtils {
     }
 
     /**
-     * Translate a child entry into a JSON object. Return the serialized object.
+     * @brief Translate a child entry into an array
      *
      * @param LogBookFFEntry $entry
      * @param boolean $posted_at_instrument
      * @return string
      */
-    public static function child2json( $entry, $posted_at_instrument=false, $inject_deleted_messages=false ) {
+    public static function child2array( $entry, $posted_at_instrument=false, $inject_deleted_messages=false ) {
     
         $timestamp = $entry->insert_time();
     
@@ -85,55 +85,56 @@ class LogBookUtils {
         foreach( $entry->children() as $child ) {
             if( $child->deleted() && !$inject_deleted_messages ) continue;
             $children_num++;
-            array_push( $children_ids, LogBookUtils::child2json( $child, $posted_at_instrument, $inject_deleted_messages ));
+            array_push( $children_ids, LogBookUtils::child2array( $child, $posted_at_instrument, $inject_deleted_messages ));
         }
         $content = wordwrap( $entry->content(), 128 );
-        return json_encode(
-            array (
-                "event_timestamp" => $timestamp->to64(),
-                "event_time"      => $entry->insert_time()->toStringShort(),
-                "relevance_time"  => is_null( $entry->relevance_time()) ? 'n/a' : $entry->relevance_time()->toStringShort(),
-                "run"             => '',
-                "shift"           => '',
-                "shift_id"        => 0,
-                "shift_begin"     => 
-                    array (
-                        'ymd'  => '',
-                        'hms'  => '',
-                        'time' => ''),
-                "author"          => ( $posted_at_instrument ? $entry->parent()->name().'&nbsp;-&nbsp;' : '' ).$entry->author(),
-                "id"              => $entry->id(),
-                "parent_id"       => $entry->parent_entry_id() ,
-                "subject"         => htmlspecialchars( substr( $entry->content(), 0, 72).(strlen( $entry->content()) > 72 ? '...' : '' )),
-                "html"            => "<pre style=\"padding:4px; padding-left:8px; font-size:14px; border: solid 2px #efefef;\">".htmlspecialchars($content)."</pre>",
-                "html1"           => "<pre>".htmlspecialchars($content)."</pre>",
-                "content"         => htmlspecialchars( $entry->content()),
-                "attachments_num" => $attachments_num,
-                "attachments"     => $attachment_ids,
-                "tags_num"        => $tags_num,
-                "tags"            => $tag_ids,
-                "children_num"    => $children_num,
-                "children"        => $children_ids,
-                "is_run"          => 0,
-                "run_id"          => 0,
-                "run_num"         => 0,
-                "ymd"             => $timestamp->toStringDay(),
-                "hms"             => $timestamp->toStringHMS(),
-                "deleted"         => $entry->deleted() ? 1 : 0,
-                "deleted_by"      => $entry->deleted() ? $entry->deleted_by() : '',
-                "deleted_time"    => $entry->deleted() ? $entry->deleted_time()->toStringShort() : ''
-            )
+        return array (
+            "event_timestamp" => $timestamp->to64(),
+            "event_time"      => $entry->insert_time()->toStringShort(),
+            "relevance_time"  => is_null( $entry->relevance_time()) ? 'n/a' : $entry->relevance_time()->toStringShort(),
+            "run"             => '',
+            "shift"           => '',
+            "shift_id"        => 0,
+            "shift_begin"     => 
+                array (
+                    'ymd'  => '',
+                    'hms'  => '',
+                    'time' => ''),
+            "author"          => ( $posted_at_instrument ? $entry->parent()->name().'&nbsp;-&nbsp;' : '' ).$entry->author(),
+            "id"              => $entry->id(),
+            "parent_id"       => $entry->parent_entry_id() ,
+            "subject"         => htmlspecialchars( substr( $entry->content(), 0, 72).(strlen( $entry->content()) > 72 ? '...' : '' )),
+            "html"            => "<pre style=\"padding:4px; padding-left:8px; font-size:14px; border: solid 2px #efefef;\">".htmlspecialchars($content)."</pre>",
+            "html1"           => "<pre>".htmlspecialchars($content)."</pre>",
+            "content"         => htmlspecialchars( $entry->content()),
+            "attachments_num" => $attachments_num,
+            "attachments"     => $attachment_ids,
+            "tags_num"        => $tags_num,
+            "tags"            => $tag_ids,
+            "children_num"    => $children_num,
+            "children"        => $children_ids,
+            "is_run"          => 0,
+            "run_id"          => 0,
+            "run_num"         => 0,
+            "ymd"             => $timestamp->toStringDay(),
+            "hms"             => $timestamp->toStringHMS(),
+            "deleted"         => $entry->deleted() ? 1 : 0,
+            "deleted_by"      => $entry->deleted() ? $entry->deleted_by() : '',
+            "deleted_time"    => $entry->deleted() ? $entry->deleted_time()->toStringShort() : ''
         );
+    }
+    public static function child2json( $entry, $posted_at_instrument=false, $inject_deleted_messages=false ) {
+        return json_encode(LogBookUtils::child2array($entry, $posted_at_instrument, $inject_deleted_messages)) ;
     }
 
     /**
-     * Translate an entry into a JSON object. Return the serialized object.
+     * @brief Translate an entry into an array
      *
      * @param LogBookFFEntry $entry
      * @param boolean $posted_at_instrument
      * @return unknown_type
      */
-    public static function entry2json( $entry, $posted_at_instrument=false, $inject_deleted_messages=false ) {
+    public static function entry2array( $entry, $posted_at_instrument=false, $inject_deleted_messages=false ) {
     
         $timestamp = $entry->insert_time();
         $shift     = is_null( $entry->shift_id()) ? null : $entry->shift();
@@ -172,61 +173,62 @@ class LogBookUtils {
         foreach( $entry->children() as $child ) {
             if( $child->deleted() && !$inject_deleted_messages ) continue;
             $children_num++;
-            array_push( $children_ids, LogBookUtils::child2json( $child, $posted_at_instrument, $inject_deleted_messages ));
+            array_push( $children_ids, LogBookUtils::child2array( $child, $posted_at_instrument, $inject_deleted_messages ));
         }
     
         $content = wordwrap( $entry->content(), 128 );
-        return json_encode(
-            array (
-                "event_timestamp" => $timestamp->to64(),
-                "event_time"      => "<a href=\"index.php?action=select_message&id={$entry->id()}\"  target=\"_blank\" class=\"lb_link\">{$timestamp->toStringShort()}</a>",
-                "relevance_time"  => is_null( $entry->relevance_time()) ? 'n/a' : $entry->relevance_time()->toStringShort(),
-                "run"             => is_null( $run   ) ? '' : "<a href=\"javascript:select_run({$run->shift()->id()},{$run->id()})\" class=\"lb_link\">{$run->num()}</a>",
-                "shift"           => is_null( $shift ) ? '' : "<a href=\"javascript:select_shift(".$shift->id().")\" class=\"lb_link\">".$shift->begin_time()->toStringShort().'</a>',
-                "shift_id"        => is_null( $shift ) ? 0  : $shift->id() ,
-                "shift_begin"     => is_null( $shift ) ?
-                    array (
-                        'ymd'  => '',
-                        'hms'  => '',
-                        'time' => '') :
-                    array (
-                        'ymd'  => $shift->begin_time()->toStringDay(),
-                        'hms'  => $shift->begin_time()->toStringHMS(),
-                        'time' => $shift->begin_time()->toStringShort()),
-                "author"          => ( $posted_at_instrument ? $entry->parent()->name().'&nbsp;-&nbsp;' : '' ).$entry->author(),
-                "id"              => $entry->id(),
-                "parent_id"       => 0 ,
-                "subject"         => htmlspecialchars( substr( $entry->content(), 0, 72).(strlen( $entry->content()) > 72 ? '...' : '' )),
-                "html"            => "<pre style=\"padding:4px; padding-left:8px; font-size:14px; border: solid 2px #efefef;\">".htmlspecialchars($content)."</pre>",
-                "html1"           => "<pre>".htmlspecialchars($content)."</pre>",
-                "content"         => htmlspecialchars( $entry->content()),
-                "attachments_num" => $attachments_num,
-                "attachments"     => $attachment_ids,
-                "tags_num"        => $tags_num,
-                "tags"            => $tag_ids,
-                "children_num"    => $children_num,
-                "children"        => $children_ids,
-                "is_run"          => 0,
-                "run_id"          => is_null( $run ) ? 0 : $run->id(),
-                "run_num"         => is_null( $run ) ? 0 : $run->num(),
-                "ymd"             => $timestamp->toStringDay(),
-                "hms"             => $timestamp->toStringHMS(),
-                "deleted"         => $entry->deleted() ? 1 : 0,
-                "deleted_by"      => $entry->deleted() ? $entry->deleted_by() : '',
-                "deleted_time"    => $entry->deleted() ? $entry->deleted_time()->toStringShort() : ''
-            )
+        return array (
+            "event_timestamp" => $timestamp->to64(),
+            "event_time"      => "<a href=\"index.php?action=select_message&id={$entry->id()}\"  target=\"_blank\" class=\"lb_link\">{$timestamp->toStringShort()}</a>",
+            "relevance_time"  => is_null( $entry->relevance_time()) ? 'n/a' : $entry->relevance_time()->toStringShort(),
+            "run"             => is_null( $run   ) ? '' : "<a href=\"javascript:select_run({$run->shift()->id()},{$run->id()})\" class=\"lb_link\">{$run->num()}</a>",
+            "shift"           => is_null( $shift ) ? '' : "<a href=\"javascript:select_shift(".$shift->id().")\" class=\"lb_link\">".$shift->begin_time()->toStringShort().'</a>',
+            "shift_id"        => is_null( $shift ) ? 0  : $shift->id() ,
+            "shift_begin"     => is_null( $shift ) ?
+                array (
+                    'ymd'  => '',
+                    'hms'  => '',
+                    'time' => '') :
+                array (
+                    'ymd'  => $shift->begin_time()->toStringDay(),
+                    'hms'  => $shift->begin_time()->toStringHMS(),
+                    'time' => $shift->begin_time()->toStringShort()),
+            "author"          => ( $posted_at_instrument ? $entry->parent()->name().'&nbsp;-&nbsp;' : '' ).$entry->author(),
+            "id"              => $entry->id(),
+            "parent_id"       => 0 ,
+            "subject"         => htmlspecialchars( substr( $entry->content(), 0, 72).(strlen( $entry->content()) > 72 ? '...' : '' )),
+            "html"            => "<pre style=\"padding:4px; padding-left:8px; font-size:14px; border: solid 2px #efefef;\">".htmlspecialchars($content)."</pre>",
+            "html1"           => "<pre>".htmlspecialchars($content)."</pre>",
+            "content"         => htmlspecialchars( $entry->content()),
+            "attachments_num" => $attachments_num,
+            "attachments"     => $attachment_ids,
+            "tags_num"        => $tags_num,
+            "tags"            => $tag_ids,
+            "children_num"    => $children_num,
+            "children"        => $children_ids,
+            "is_run"          => 0,
+            "run_id"          => is_null( $run ) ? 0 : $run->id(),
+            "run_num"         => is_null( $run ) ? 0 : $run->num(),
+            "ymd"             => $timestamp->toStringDay(),
+            "hms"             => $timestamp->toStringHMS(),
+            "deleted"         => $entry->deleted() ? 1 : 0,
+            "deleted_by"      => $entry->deleted() ? $entry->deleted_by() : '',
+            "deleted_time"    => $entry->deleted() ? $entry->deleted_time()->toStringShort() : ''
         );
+    }
+    public static function entry2json( $entry, $posted_at_instrument=false, $inject_deleted_messages=false ) {
+        return json_encode(LogBookUtils::entry2array($entry, $posted_at_instrument, $inject_deleted_messages)) ;
     }
 
     /**
-     * Translate a run entry into a JSON object
+     * @brief Translate a run entry into an array
      *
      * @param LogBookRun $run
      * @param string $type
      * @param boolean $posted_at_instrument
      * @return unknown_type
      */
-    public static function run2json( $run, $type, $posted_at_instrument=false ) {
+    public static function run2array( $run, $type, $posted_at_instrument=false ) {
     
         /* TODO: WARNING! Pay attention to the artificial message identifier
          * for runs. an assumption is that normal message entries will
@@ -302,6 +304,9 @@ class LogBookUtils {
                 "hms"             => $timestamp->toStringHMS()
             )
         );
+    }
+    public static function run2json( $run, $type, $posted_at_instrument=false ) {
+        return json_encode(LogBookUtils::run2array($run, $type, $posted_at_instrument)) ;
     }
 
     public static function shift2array ($s, $extended_format=true) {
@@ -724,43 +729,19 @@ class LogBookUtils {
             }
         }
 
-        $timestamps = sort_and_truncate_from_head( $entries_by_timestamps, $limit, $report_error );
+        $result = array() ;
 
-        $status_encoded  = json_encode( "success" );
-        $updated_encoded = json_encode( LusiTime::now()->toStringShort());
-
-        $result =<<< HERE
-{
-  "status": {$status_encoded}, "updated": {$updated_encoded},
-  "ResultSet": {
-    "Status": {$status_encoded}, "Updated": {$updated_encoded},
-    "Result": [
-HERE;
-        $first = true;
-        foreach( $timestamps as $t ) {
+        foreach( sort_and_truncate_from_head( $entries_by_timestamps, $limit, $report_error ) as $t ) {
             foreach( $entries_by_timestamps[$t] as $pair ) {
                 $type  = $pair['type'];
                 $entry = $pair['object'];
-                if( $type == 'entry' ) {
-                    if( $first ) {
-                        $first = false;
-                        $result .= "\n".LogBookUtils::entry2json( $entry, $posted_at_instrument, $inject_deleted_messages );
-                    } else {
-                        $result .= ",\n".LogBookUtils::entry2json( $entry, $posted_at_instrument, $inject_deleted_messages );
-                    }
-                } else {
-                    if( $first ) {
-                        $first = false;
-                        $result .= "\n".LogBookUtils::run2json( $entry, $type, $posted_at_instrument );
-                    } else {
-                        $result .= ",\n".LogBookUtils::run2json( $entry, $type, $posted_at_instrument );
-                    }
-                }
+                array_push (
+                    $result ,
+                    $type == 'entry' ?
+                        LogBookUtils::entry2array( $entry,        $posted_at_instrument, $inject_deleted_messages ) :
+                        LogBookUtils::run2array  ( $entry, $type, $posted_at_instrument ));
             }
         }
-        $result .=<<< HERE
- ] } }
-HERE;
         return $result;
     }
 

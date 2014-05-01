@@ -5,8 +5,7 @@
 require_once 'dataportal/dataportal.inc.php' ;
 require_once 'logbook/logbook.inc.php' ;
 
-use LogBook\LogBookUtils;
-
+use LogBook\LogBookUtils ;
 
 DataPortal\ServiceJSON::run_handler ('GET', function ($SVC) {
 

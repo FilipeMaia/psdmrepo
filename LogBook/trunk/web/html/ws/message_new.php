@@ -1,25 +1,32 @@
 <?php
 
 /*
- * Create a new message (in behalf of the Grabber)
+ * Create a new message
+ *
+ * NOTE: Wrapping the result into HTML <textarea> instead of
+ * returning JSON MIME type because of the following issue:
+ * 
+ *   http://jquery.malsup.com/form/#file-upload
  */
-
 require_once 'dataportal/dataportal.inc.php' ;
+require_once 'logbook/logbook.inc.php' ;
 require_once 'lusitime/lusitime.inc.php' ;
+
+use LogBook\LogBookUtils ;
 
 use LusiTime\LusiTime ;
 
-\DataPortal\ServiceJSON::run_handler ('POST', function ($SVC) {
+function handler ($SVC) {
 
-    $id      = $SVC->required_int('id') ;
-    $message = $SVC->required_str('message_text') ;
-    $author  = $SVC->required_str('author_account') ;
-    $scope   = $SVC->required_str('scope') ;
+    $id           = $SVC->required_int('id') ;
+    $message      = $SVC->required_str('message_text') ;
+    $author       = $SVC->required_str('author_account') ;
+    $scope        = $SVC->required_str('scope') ;
 
-    $shift_id   = $SVC->optional_int('shift_id',   null) ;
-    $run_id     = $SVC->optional_int('run_id',     null) ;
-    $run_num    = $SVC->optional_int('run_num',    null) ;
-    $message_id = $SVC->optional_int('message_id', null) ;
+    $shift_id     = $SVC->optional_int('shift_id',   null) ;
+    $run_id       = $SVC->optional_int('run_id',     null) ;
+    $run_num      = $SVC->optional_int('run_num',    null) ;
+    $message_id   = $SVC->optional_int('message_id', null) ;
 
     switch ($scope) {
         case 'shift'      : $SVC->assert ($shift_id,           'no valid shift id in the request') ; break ;
@@ -30,11 +37,15 @@ use LusiTime\LusiTime ;
             $SVC->assert (false, "invalid scope: '{$scope}'") ;
     }
 
-    $text4child     = $SVC->optional_str ('text4child',     '') ;
     $relevance_time = $SVC->optional_time('relevance_time', LusiTime::now()) ;
+    $files          = $SVC->optional_files() ;
+    $tags           = $SVC->optional_tags() ;
 
-    $files = $SVC->optional_files() ;
-    $tags  = $SVC->optional_tags() ;
+    // If set this will tell the script to return the updated parent object
+    // instead of the new one (the reply).
+
+    $return_parent = $SVC->optional_bool('return_parent', false) ;
+
 
     $experiment = $SVC->safe_assign ($SVC->logbook()->find_experiment_by_id($id) ,
                                      'no such experiment') ;
@@ -54,33 +65,35 @@ use LusiTime\LusiTime ;
     	$run_id = $run->id() ;
     }
 
-    // If the request has been made in a scope of some parent entry then
-    // one the one and create the new one in its scope.
-    //
-    // NOTE: Remember that child entries have no tags, but they
-    //       are allowed to have attachments.
-
     $content_type = "TEXT" ;
 
-    if ($scope === 'message') {
+    /* If the request has been made in a scope of some parent entry then
+     * one the one and create the new one in its scope.
+     *
+     * NOTE: Remember that child entries have no tags, but they
+     *       are allowed to have attachments.
+     */
+    if ($scope == 'message') {
         $parent = $SVC->safe_assign ($experiment->find_entry_by_id($message_id) ,
-                                     'no such parent message exists') ;
+                                     "no such parent message exists") ;
         $entry = $parent->create_child($author, $content_type, $message) ;
     } else {
         $entry = $experiment->create_entry($author, $content_type, $message, $shift_id, $run_id, $relevance_time) ;        
-        foreach ($tags as $t)
-            $entry->add_tag($t['tag'], $t['value']) ;
+        foreach($tags as $t)
+            $tag = $entry->add_tag($t['tag'], $t['value']) ;
     }
     foreach ($files as $f)
-        $entry->attach_document($f['contents'], $f['type'], $f['description']) ;
-
-    if ($text4child)
-        $entry->create_child($author, $content_type, $text4child) ;
+        $attachment = $entry->attach_document($f['contents'], $f['type'], $f['description']) ;
 
     $experiment->notify_subscribers($entry) ;
 
     return array (
-        'message_id' => $entry->id()) ;
-}) ;
+        'Entry' =>
+            $scope == 'message' ?
+                LogBookUtils::child2array($return_parent ? $parent : $entry, false) :
+                LogBookUtils::entry2array($entry, false)) ;
+}
+DataPortal\ServiceJSON::run_handler ('POST', 'handler', array('wrap_in_textarea' => true)) ;
+
 
 ?>
